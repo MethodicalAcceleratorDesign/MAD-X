@@ -51,10 +51,10 @@
 !   IERR     (integer)  0 if OK, else GXPLOT error
 !
 ! calls the routines peiact and pegacn in this file.
-! calls the routines gxsave, gxswnd, gxpnbl, jsln, jsplci,  gxpl, 
+! calls the routines gxsave, gxswnd, gxpnbl, jsln, jsplci,  gxpl,
 !                    gxplt1, gvpl, jsmk, gxpmsw, jspmci, jschh, jstxal,
-!                    gxqrvp, jschxp, gxtx, jstxci, gxrest  
-!                    defined in file gxx11.F. 
+!                    gxqrvp, jschxp, gxtx, jstxci, gxrest
+!                    defined in file gxx11.F.
 !
 ! it is called by the routine peplot in this file.
 !----------------------------------------------------------------------*
@@ -79,6 +79,7 @@
      &kf, kl, npt, j, iecub
       integer   istyl, ipbar, isave(20)
       character symloc*1
+      data winnor /0., 1., 0., 1./
 
 !--- Output initialisation
 
@@ -86,7 +87,6 @@
 
 !--- Initialisation of local variables
 
-      data winnor /0., 1., 0., 1./
       iecub = 0
 
 !--- Routine body
@@ -302,7 +302,7 @@
 
 !--- plot annotation string
 
-        call gxtx (xpos, ypos, spname(kft:klt))    
+        call gxtx (xpos, ypos, spname(kft:klt))
 
 !--- connect to curve
 
@@ -369,9 +369,9 @@
 ! output:
 !   am          (d.p.)  matrix
 !
-! calls the function node_value and the routine store_node_value 
+! calls the function node_value and the routine store_node_value
 ! defined in file madxn.c.
-! calls the functions tmbend, tmquad and tmfoc 
+! calls the functions tmbend, tmquad and tmfoc
 ! defined in the file Twiss.F.
 !
 ! it is called by the routine peintp in this file.
@@ -389,7 +389,7 @@
 
 !--- type definitions of local variables
 
-      double precision rk2, cangle, sangle, tilt, d, f 
+      double precision rk2, cangle, sangle, tilt, d, f
       double precision ek(6), te(6,6,6), orbit(6), am2(6,6)
       integer i, j, k
       logical drift, bend, quad, fmap,ftrk,cecptk,cebttk
@@ -464,17 +464,17 @@
             am2(4,4) = cangle
             am2(3,4) = sangle
             am2(4,3) = -rk2 * sangle
-         endif   
+         endif
       endif
-   
-!---  restore values of centre_cptk & centre_bttk 
+
+!---  restore values of centre_cptk & centre_bttk
 
       centre_cptk = cecptk
       centre_bttk = cebttk
 
       end
 !***********************************************************************
- 
+
       subroutine pefill(ierr)
 
 #ifdef _WIN32
@@ -513,6 +513,14 @@
       integer double_from_table, advance_to_pos, restart_sequ
       integer lastnb, table_length
 
+!--- codes see in peschm
+
+      data ilist /                                                      &
+     &0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
+     &6, 0, 0, 0, 0,  0,  4, 4, 4, 0,                                   &
+     &0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
+     &20 * 0 /
+
 !--- Output initialisation
 
       ierr = 0
@@ -524,18 +532,18 @@
         nqval(j) = 0
       enddo
       do j = 1 , maxseql
-	ieltyp(j) = 0
+        ieltyp(j) = 0
       enddo
 
 !--- Initialisation of variables in common peaddr
 
       do i = 1 , maxseql
-	estart(i) = 0.0
-	eend(i) = 0.0
-	do j = 1 , mxcurv
-	  qhval(i,j) = 0.0
-	  qvval(i,j) = 0.0
-	enddo
+        estart(i) = 0.0
+        eend(i) = 0.0
+        do j = 1 , mxcurv
+          qhval(i,j) = 0.0
+          qvval(i,j) = 0.0
+        enddo
       enddo
 
 !--- Initialisation of variables in common e2save
@@ -553,14 +561,6 @@
       pltyp = 0
       pos_flag = 3
       machp = itbv .ne. 0
-
-!--- codes see in peschm
-
-      data ilist /                                                      &
-     &0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
-     &6, 0, 0, 0, 0,  0,  4, 4, 4, 0,                                   &
-     &0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
-     &20 * 0 /
 
       do i=1,mxplot
         p(i)=0
@@ -1476,7 +1476,7 @@
 !   ierr        (int)   0 if ok, else > 0
 !   the results are stored in qhval and qvval
 !
-! calls the functions double_from_table and get_value 
+! calls the functions double_from_table and get_value
 ! defined in file madxn.c.
 ! calls the function peelma in this file.
 !
@@ -1489,7 +1489,7 @@
 
 !--- type definition of the routine arguments
 
-      integer crow, nint, type, proc(2,*), ierr 
+      integer crow, nint, type, proc(2,*), ierr
       double precision telpar(*)
 
 !--- type definitions of local variables
@@ -1497,7 +1497,7 @@
       integer mat
       double precision tw1(mintpl), dmu, step, am(6,6)
       double precision ex, ey, bx0, ax0, ux0, dx0, dpx0,                &
-     &by0, ay0, uy0, dy0, dpy0, x0, px0, y0, py0, xn0, pxn0, yn0, pyn0
+     &by0, ay0, uy0, dy0, dpy0, x0, px0, y0, py0, xn0, yn0
       double precision bx1, ax1, ux1, dx1, dpx1,                        &
      &by1, ay1, uy1, dy1, dpy1, x1, px1, y1, py1, xn1, pxn1, yn1, pyn1
       double precision s0, dstp, gamx, gamy
@@ -1513,7 +1513,7 @@
      &(xn1,tw1(15)), (pxn1, tw1(16)),                                   &
      &(yn1, tw1(17)), (pyn1, tw1(18))
 
-      
+
 !--- definitions of function primitives
 
       integer double_from_table
@@ -1584,7 +1584,7 @@
 !--- get intermediate s values, and interpolate twiss parameters
 
         do i = 1, nint
-	  if (i .gt. 1) mat = 2
+        if (i .gt. 1) mat = 2
           if (i .eq. nint)  mat = 3
           dstp = i * step
 
@@ -1903,7 +1903,7 @@
 ! calls the routines pegetn, pecurv and peschm in this file.
 ! calls the routines gxsdef, gxsvar, jslwsc, gxsvpt, gxpnbl, gxqaxs,
 !                    gxsaxs, iaxseq, gxqcrv, gxscrv, axlabel, gxfrm1,
-!                    gxswnd  defined in file gxx11.F. 
+!                    gxswnd  defined in file gxx11.F.
 !
 ! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
@@ -1928,8 +1928,8 @@
       character sdum(mxdep)*(mcnam)
       character * 1 ssymb
       real prmach, symch, tmpval, yvtop, fdum, chh
-      real vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8) 
-      integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4) 
+      real vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
+      integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4)
       integer lastnb, iaxseq(4)
       integer idum, k1dum, k2dum, k3dum, i, npar, ivvar, nvax, ivax,    &
      &ierr, vdum(2), j
@@ -2441,7 +2441,7 @@
       toptitle = ' '
       do i = 1 , mxcurv
          sname(i) = ' '
-      enddo   
+      enddo
 
 !--- Initialisation of variables in common peotcl
 
@@ -2701,7 +2701,7 @@
 !
 !--- Input
 !   n_str      number of sub-strings
-!   char_l     number of characters of each sub-string  
+!   char_l     number of characters of each sub-string
 !   char_a     character string
 !--- Output
 !   cahr_buf   sub_strings
@@ -2747,7 +2747,7 @@
 ! defined in file madxn.c.
 ! calls the function intrac defined in file madxu.c.
 ! calls the routines gxtint, gxsvar, gxasku, gxinit, gxclos
-! defined in file gxx11.F 
+! defined in file gxx11.F
 !
 ! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
@@ -2849,7 +2849,7 @@
       save plpnam
 
 !--- Routine body
-	
+
       if (initfl .eq. 0)  then
 
 !--- overall initialization
