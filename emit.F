@@ -473,19 +473,23 @@
 !---- Prepare data.
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
-      an = node_value('angle ')
-      sk0 = an / el
-      sk0s = node_value('k0s ')
-      if (sk0s .eq. zero)  then
-        tilt = zero
-      else
-        tilt = atan2(sk0s, sk0)
-        sk0 = sqrt(sk0**2 + sk0s**2)
-        an = sk0 * el
-      endif
-      an = bv0 * an
-      sk0 = bv0 * sk0
-      sk0s = bv0 * sk0s
+! FRS 16.11.2004 This is still in the intermediate spirit of k0&k0s
+!      an = node_value('angle ')
+!      sk0 = an / el
+!      sk0s = node_value('k0s ')
+!      if (sk0s .eq. zero)  then
+!        tilt = zero
+!      else
+!        tilt = atan2(sk0s, sk0)
+!        sk0 = sqrt(sk0**2 + sk0s**2)
+!        an = sk0 * el
+!      endif
+!      an = bv0 * an
+!      sk0 = bv0 * sk0
+!      sk0s = bv0 * sk0s
+! FRS 16.11.2004 here the correction
+      an = bv0 * node_value('angle ') * el/node_value('l ')
+      tilt = -node_value('tilt ')
       edg1 = bv0 * node_value('e1 ')
       edg2 = bv0 * node_value('e2 ')
       sk1 = bvk * node_value('k1 ')
