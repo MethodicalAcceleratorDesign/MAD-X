@@ -1170,20 +1170,21 @@ char command_def[] =
 "track: track track 1 0 "
 "deltap   = [r, 0], "
 "onepass  = [l, false, true], "
-"damp     = [l, false, true], "
-"quantum  = [l, false, true], "
+/* "damp     = [l, false, true], " */
+/* "quantum  = [l, false, true], " */
 "dump     = [l, false, true], "
+/* "fast     = [l, false, true], " */
 "aperture = [l, false, true], "
 "onetable = [l, false, true], "
-"file     = [s, track, track], "
+"file     = [s, track, track]; "
 " "
 "dynap: track track 0 0 "
 "turns   = [i, 64], "
 "fastune  = [l, false,true], "
 "lyapunov = [r, 1.e-7], "
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
-"damp     = [l, true], "
-"quantum  = [l, true], "
+/* "damp     = [l, true], " */
+/* "quantum  = [l, true], " */
 "orbit    = [l, true]; "
 " "
 "endtrack: track track 2 0 ; "
