@@ -760,10 +760,9 @@ CONTAINS
     real(dp) :: d_val = 0.0
     character (len = *) var
     integer :: column(*)
-    integer j,k,n1,n2,nn,var_length,ptc_variable_length,ind(6),ord(3)
+    integer j,k,n1,n2,nn,var_length,ptc_variable_length,ind(6)
     integer double_from_table, string_from_table
     logical var_check
-    character, dimension(4) :: s_val
 
     double_from_ptc = 0.0
     var_length = LEN(ptc_var)
@@ -793,13 +792,6 @@ CONTAINS
        print *,"The order is larger than ",order
        RETURN
     ENDIF
-    k = string_from_table("normal_results ", "name ", 1, s_val)
-    k = double_from_table("normal_results ", "order1 ", 1, d_val)
-    ord(1) = INT(d_val)
-    k = double_from_table("normal_results ", "order2 ", 1, d_val)
-    ord(2) = INT(d_val)
-    k = double_from_table("normal_results ", "order3 ", 1, d_val)
-    ord(3) = INT(d_val)
     double_from_ptc = y(j)%t.sub.ind
   END FUNCTION double_from_ptc
 
@@ -1038,7 +1030,7 @@ CONTAINS
 !------ get values and store them in the table 'normal_results' ---------
 
        n_rows = select_ptc_idx()
-       if (no <> minimum_acceptable_order()) then  
+       if (no .ne. minimum_acceptable_order()) then  
           print *,"The minimum required order is ",minimum_acceptable_order(), &
                "while the 'no' attribute in the command ptc_normal is ",no  
        endif
