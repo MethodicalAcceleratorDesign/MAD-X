@@ -80,14 +80,16 @@
       integer   istyl, ipbar, isave(20)
       character symloc*1
 
-!--- Output initialisation
-
-      ierr = 0
-
 !--- Initialisation of local variables
 
       data winnor /0., 1., 0., 1./
+      save act
+
       iecub = 0
+
+!--- Output initialisation
+
+      ierr = 0
 
 !--- Routine body
 
@@ -368,7 +370,7 @@
 
 !--- definitions of function primitives
 
-      integer double_from_table, advance_to_pos, restart_sequ
+      integer double_from_table, restart_sequ
       integer lastnb, table_length
       integer advance_node
 
@@ -391,23 +393,19 @@
         nqval(j) = 0
       enddo
       do j = 1 , maxseql
-	ieltyp(j) = 0
+         ieltyp(j) = 0
       enddo
 
 !--- Initialisation of variables in common peaddr
 
       do i = 1 , maxseql
-	estart(i) = 0.0
-	eend(i) = 0.0
-	do j = 1 , mxcurv
-	  qhval(i,j) = 0.0
-	  qvval(i,j) = 0.0
-	enddo
+         estart(i) = 0.0
+         eend(i) = 0.0
+         do j = 1 , mxcurv
+            qhval(i,j) = 0.0
+            qvval(i,j) = 0.0
+         enddo
       enddo
-
-!--- Initialisation of variables in common e2save
-
-      e2s = 0d0
 
 !--- Initialisation of local variables
 
@@ -534,7 +532,7 @@
             if (machp .and. j .gt. nrrang(1) .and. currleng .gt. zero     &
      &          .and. splinef .gt. 0 .and. step .gt. zero)  then
 
-               call peintp(crow, nint, pltyp, proc_n, adble, ierr)
+               call peintp(crow, nint, proc_n, adble, ierr)
 
                if (ierr .eq. 1)  then
                   ierr = 0
@@ -1320,7 +1318,7 @@
       end
 !***********************************************************************
 
-      subroutine peintp(crow, nint, type, proc, telpar, ierr)
+      subroutine peintp(crow, nint, proc, telpar, ierr)
 
 #ifdef _WIN32
       include 'win32calls.fi'
@@ -1354,7 +1352,7 @@
 
 !---  type definition of the routine arguments
 
-      integer crow, nint, type, proc(2,*), ierr 
+      integer crow, nint, proc(2,*), ierr 
       double precision telpar(*)
 
 !---  type definitions of local variables
@@ -1362,7 +1360,7 @@
       double precision tw1(mintpl)
       double precision ex, ey, betx,bety,dx
       double precision xn1, pxn1, yn1, pyn1
-      double precision s_elem, s_incr, s, dstp, gamx, gamy
+      double precision s_elem, s_incr, s, gamx, gamy
       double precision length
       integer i, j, k, ipc
 
@@ -1372,9 +1370,7 @@
       integer interp_node
       integer reset_interpolation
       integer embedded_twiss
-      integer restart_sequ
       double precision get_value
-      double precision node_value
 
 !---  Output initialisation
 
@@ -1796,16 +1792,19 @@
       character stemp*(mtitl), stext*300, sform*20
       character sdum(mxdep)*(mcnam)
       character * 1 ssymb
+      character*80 ch
+      double precision deltap
       real prmach, symch, tmpval, yvtop, fdum, chh
       real vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8) 
       integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4) 
       integer lastnb, iaxseq(4)
       integer idum, k1dum, k2dum, k3dum, i, npar, ivvar, nvax, ivax,    &
-     &ierr, vdum(2), j
+     &ierr, vdum(2), j, k
 
 !--- definitions of function primitives
 
       double precision plot_option
+      integer double_from_table
 
 !--- Initialisation of local variables
 
@@ -1838,6 +1837,14 @@
 
 !--- Routine body
 
+!--- Acquire deltap
+
+      k = double_from_table('summ ','deltap ',1,deltap)
+      deltap = deltap*100.0
+      write(ch,'(f9.4)') deltap
+
+      slocn = 'Momentum spread = '//ch(:7)//' %'//'&'//'<#>'
+
 !--- reset axis and curve defaults
 
       call gxsdef ('AXIS', 0)
@@ -1845,7 +1852,7 @@
 
 !--- set "new line" character (change default = '/')
 
-      call gxsvar ('SDEFNL', idum, fdum, '%')
+      call gxsvar ('SDEFNL', idum, fdum, '&')
 
 !--- set top of viewport - leave space to plot machine if required
 
@@ -1874,9 +1881,8 @@
 
       svar = horname
       call pegetn (1, svar, itbv, vdum, sdum, slname)
-      slocn = ' '
       call gxpnbl(slname, k1dum, k2dum)
-      k3dum = 0
+      k3dum = 31
       do idum = k1dum, k2dum
         if (slname(idum:idum) .ne. '_') then
           k3dum = k3dum + 1
@@ -1929,7 +1935,7 @@
 
 !--- bottom title
 
-          stext = '<#>' // slocn(:lastnb(slocn))
+           stext = slocn(:lastnb(slocn))
         else
 
 !--- suppress labels on upper axis
@@ -2008,7 +2014,7 @@
           endif
         enddo
         if (nvax .eq. 1) then
-          stext = '%' // stemp
+          stext = '&' // stemp
         else
           stext = stemp
         endif
