@@ -258,6 +258,7 @@ char command_def[] =
 "monerror = [i, 0], "
 "monscale = [i, 0], "
 "monon    = [r, 1], "
+"moncut   = [r, 0], "
 "corrlim  = [r, 1], "
 "resout   = [i, 0], "
 "sequence = [s, {none}], "
