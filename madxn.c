@@ -362,7 +362,7 @@ int aperture_count(struct sequence* sequ)
   struct node* node = sequ->start;
   while (node != NULL)
     {
-     if ((p = command_par_string("apertype", node->p_elem->def)))
+     if ((node->p_elem)&&(p = command_par_string("apertype", node->p_elem->def)))
        {
 	while(aperture_types[i][0] != ' ')
 	  {
