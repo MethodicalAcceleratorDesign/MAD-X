@@ -30,7 +30,7 @@
 /name_len.fi -text
 /orbf.fpp -text
 /physcons.fi -text
-/plot.f -text
+/plot.F -text
 /survey.F -text
 /sxf.c -text
 /track.fi -text
