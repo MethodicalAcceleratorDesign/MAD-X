@@ -63,11 +63,11 @@ void wopen(int *uswid, int *ushi)
 
         argc = 0;
       argv = NULL;
-      
+
       /* initialization */
       mydisplay = XOpenDisplay((char *) getenv("DISPLAY"));
         if (!mydisplay) {
-            fprintf(stderr, "cannot open display\n"); exit(1); 
+            fprintf(stderr, "cannot open display\n"); exit(1);
       }
       myscreen = DefaultScreen(mydisplay);
 
@@ -95,7 +95,7 @@ void wopen(int *uswid, int *ushi)
         xswa.backing_store = Always;
       valuemask = CWBackingStore;
         XChangeWindowAttributes(mydisplay, mywindow, valuemask, &xswa);
-      
+
       /* GC creation and initialization */
 
       mygc[0] = XCreateGC(mydisplay, mywindow, 0, 0);
@@ -105,7 +105,7 @@ void wopen(int *uswid, int *ushi)
           gcv.line_style = LineOnOffDash;
         mygc[i] = XCreateGC(mydisplay, mywindow, GCLineStyle, &gcv);
           XSetDashes(mydisplay, mygc[i], 0, dash_list[i],
-                     dash_list_length[i]); 
+                     dash_list_length[i]);
       XSetBackground(mydisplay, mygc[i], mybackground);
       XSetForeground(mydisplay, mygc[i], myforeground);
         XSetFillStyle (mydisplay, mygc[i], FillSolid);
@@ -142,7 +142,7 @@ void wopen(int *uswid, int *ushi)
                 if ((v_corrf - 1.) * (v_corrf - 1.) <= 0.002) {
           v_corrf = 1.;
        }
-       
+
       }
         sleep(3);
 }

@@ -1,7 +1,8 @@
       subroutine fort_info(t1, t2)
+      implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
       character *(*) t1, t2
@@ -10,9 +11,10 @@
      &print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
       end
       subroutine fort_warn(t1, t2)
+      implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 
@@ -36,8 +38,8 @@
 !----------------------------------------------------------------------*
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
-	!DEC$ ATTRIBUTES C, ALIAS:'_getclor_' :: getclor
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_getclor_' :: getclor
 #endif
 
       include 'twiss0.fi'
@@ -856,7 +858,7 @@
 !----------------------------------------------------------------------*
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
       double precision x,y,twopi,get_variable
 
@@ -1568,7 +1570,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -1903,9 +1905,9 @@
 !        enddo
         do i = 1, 6
           temp(i) = ek(i)                                               &
-     &      + re(i)    * track(1,itrack) + re(i+ 6) * track(2,itrack)   &
-     &      + re(i+12) * track(3,itrack) + re(i+18) * track(4,itrack)   &
-     &      + re(i+24) * track(5,itrack) + re(i+30) * track(6,itrack)
+     &    + re(i)    * track(1,itrack) + re(i+ 6) * track(2,itrack)     &
+     &    + re(i+12) * track(3,itrack) + re(i+18) * track(4,itrack)     &
+     &    + re(i+24) * track(5,itrack) + re(i+30) * track(6,itrack)
         enddo
         do i = 1, 6
           track(i,itrack) = temp(i)

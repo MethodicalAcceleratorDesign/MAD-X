@@ -5,8 +5,8 @@
 
 
 #ifdef _WIN32
-	include 'win32calls.fi'
-        !DEC$ ATTRIBUTES C, ALIAS:'_dynap_' :: dynap
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_dynap_' :: dynap
 #endif
 
       integer turns,npart
@@ -44,7 +44,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -98,7 +98,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -134,7 +134,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -247,7 +247,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -326,7 +326,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -392,7 +392,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -472,7 +472,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -539,7 +539,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*

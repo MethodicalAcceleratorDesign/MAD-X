@@ -12,8 +12,8 @@
       implicit none
 
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_setup_' :: setup
-	include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_setup_' :: setup
+      include 'win32calls.fi'
 #endif
       integer im,ic,nm,nc
       double precision resp,a(nm, nc)
@@ -39,8 +39,8 @@
       implicit none
 
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_micit_' :: micit
-	include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_micit_' :: micit
+      include 'win32calls.fi'
 #endif
       integer im,ic,iter,i,j,nx(ic),ny(ic)
       real rms,ax(im,ic),cinx(ic),xinx(im),resx(im),rho(3*ic),ptop(ic), &
@@ -92,7 +92,7 @@
       implicit none
 
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_haveit_' :: haveit
+      !DEC$ ATTRIBUTES C, ALIAS:'_haveit_' :: haveit
 #endif
 
       integer im,ic,nx(ic),i,j
@@ -2456,7 +2456,7 @@ c
       return
       end
       subroutine rvord(inv,outv,ws,n)
-c     implicit   none
+      implicit   none
       integer    n
       double precision   inv(n), ws(n)
       double precision   maxv, minv

@@ -601,7 +601,7 @@
       subroutine pefill(ierr)
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 
@@ -1593,7 +1593,7 @@
       subroutine peintp(crow, nint, type, proc, telpar, ierr)
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 
@@ -1850,7 +1850,7 @@
       subroutine pelfill(tabname, type, row, n, a)
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 
@@ -2101,7 +2101,7 @@
       subroutine peplot
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 
@@ -2735,7 +2735,7 @@
       subroutine pesopt(ierr)
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -3092,7 +3092,7 @@
       subroutine plginit
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*

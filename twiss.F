@@ -2,8 +2,8 @@
 
       implicit none
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_twiss_' :: twiss
-	include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_twiss_' :: twiss
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -133,8 +133,8 @@
 !---- Print summary
       if(summ.ne.0) call tw_summ(rt,tt)
       if (get_option('keeporbit ') .ne. 0)  then
-         i = 6
-         call store_node_vector('orbit0 ', i, opt_fun0(9))
+        i = 6
+        call store_node_vector('orbit0 ', i, opt_fun0(9))
       endif
       call set_option('twiss_success ', ione)
       goto 9999
@@ -143,7 +143,7 @@
       subroutine tmrefe(rt)
       implicit none
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_tmrefe_' :: tmrefe
+      !DEC$ ATTRIBUTES C, ALIAS:'_tmrefe_' :: tmrefe
 #endif
 
 !----------------------------------------------------------------------*
@@ -165,8 +165,8 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
-        !DEC$ ATTRIBUTES C, ALIAS:'_tmrefo_' :: tmrefo
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_tmrefo_' :: tmrefo
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -195,7 +195,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -294,7 +294,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -319,29 +319,29 @@
 !---- Initialize
       twopi=get_variable('twopi ')
       if (flag .ne. 0)  then
-      if(case.eq.1) then
-        opt_fun(2)=position
-        opt5 = opt_fun(5)
-        opt_fun(5)= opt_fun(5) / twopi
-        opt8 = opt_fun(8)
-        opt_fun(8)= opt_fun(8) / twopi
-        i = 17
-        call vector_to_table(table_name, 's ', i, opt_fun(2))
-        i = 5
-        call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
-        if(rmatrix) then
-          i = 36
-          call vector_to_table(table_name, 're11 ', i, opt_fun(34))
+        if(case.eq.1) then
+          opt_fun(2)=position
+          opt5 = opt_fun(5)
+          opt_fun(5)= opt_fun(5) / twopi
+          opt8 = opt_fun(8)
+          opt_fun(8)= opt_fun(8) / twopi
+          i = 17
+          call vector_to_table(table_name, 's ', i, opt_fun(2))
+          i = 5
+          call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
+          if(rmatrix) then
+            i = 36
+            call vector_to_table(table_name, 're11 ', i, opt_fun(34))
+          endif
+          opt_fun(5)= opt5
+          opt_fun(8)= opt8
+        elseif(case.eq.2) then
+          i = 10
+          call vector_to_table(table_name, 'wx ', i, opt_fun(19))
         endif
-        opt_fun(5)= opt5
-        opt_fun(8)= opt8
-      elseif(case.eq.2) then
-        i = 10
-        call vector_to_table(table_name, 'wx ', i, opt_fun(19))
-      endif
 
 !---- Augment table twiss
-      call augment_count(table_name)
+        call augment_count(table_name)
       endif
       end
       subroutine tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
@@ -349,7 +349,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -426,10 +426,11 @@
 
 !---- Message and convergence test.
         if (pflag)  then
-        print *, ' '
-        print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '', &
-     &  1p,e14.6)',itra,err,deltap
-        print '(''orbit: '', 1p,6e14.6)', orbit0
+          print *, ' '
+          print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: ''&
+     &    ,                                                             &
+     &    1p,e14.6)',itra,err,deltap
+          print '(''orbit: '', 1p,6e14.6)', orbit0
         endif
         if (err.lt.cotol) then
           save_opt=get_option('keeporbit ')
@@ -472,7 +473,7 @@
      &thr_on)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -649,7 +650,7 @@
      &            '-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))     &
      &            // '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total ' &
      &            //ptxt(kpro)//'kick:', tmptxt1)
-*--- restore restart values
+!--- restore restart values
                   suml = restsum(kpro)
                   call dcopy(restorb(1,kpro),orbit,6)
                   call dcopy(restm(1,1,kpro),rt,36)
@@ -688,24 +689,24 @@
       subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
-*----------------------------------------------------------------------*
-* Purpose:
-*   Correct orbit position at bpm in first pass (threader)
-* Input:
-*   kpro       (integer) projection (1 = x, 2 = y)
-*   dorb       (d.p.)    difference orbit at pickup
-*   cmatr      (d.p.)    transfer matrix up to preceding corrector
-*   pmatr      (d.p.)    transfer matrix up to current pickup
-*   thrvec     (d.p.)    threader parameter vector (see madxdict.h)
-* Input/Output:
-*   node       (integer) current node
-* Output:
-* cick         (d.p.)    kick value applied
-* error        (integer) 0: OK, else aborted
-*----------------------------------------------------------------------*
+!----------------------------------------------------------------------*
+! Purpose:
+!   Correct orbit position at bpm in first pass (threader)
+! Input:
+!   kpro       (integer) projection (1 = x, 2 = y)
+!   dorb       (d.p.)    difference orbit at pickup
+!   cmatr      (d.p.)    transfer matrix up to preceding corrector
+!   pmatr      (d.p.)    transfer matrix up to current pickup
+!   thrvec     (d.p.)    threader parameter vector (see madxdict.h)
+! Input/Output:
+!   node       (integer) current node
+! Output:
+! cick         (d.p.)    kick value applied
+! error        (integer) 0: OK, else aborted
+!----------------------------------------------------------------------*
       integer error,node,kpro
       integer i,j,npick,advance_node,ccode
       integer both,code,icorr,itp,lc,lc1,lc2,retreat_node,ncorr
@@ -713,9 +714,9 @@
       double precision cick,d,tol1min,node_value,atemp(6,6)
       parameter (tol1min = 1.d-2,ccode=15)
 
-*--- keep position of current pickup
+!--- keep position of current pickup
       npick = node
-*--- look for one preceding corrector of correct (MAD-8) type
+!--- look for one preceding corrector of correct (MAD-8) type
       both = ccode
       itp = both + (-1)**kpro
       lc = 2 * (kpro - 1)
@@ -738,17 +739,17 @@
         ncorr = node
       endif
       if (icorr .eq. 0) goto 10
-*--- transport matrix from kicker to pickup
+!--- transport matrix from kicker to pickup
       call m66inv(cmatr,atemp)
       call m66mpy(pmatr,atemp,atemp)
       if (abs(atemp(lc1,lc2)) .lt. tol1min) then
-*--- kicker does not change orbit at pickup - try again
+!--- kicker does not change orbit at pickup - try again
         icorr = 0
         goto 10
       endif
-*--- now we got one good corrector - get kick with attenuation factor
+!--- now we got one good corrector - get kick with attenuation factor
       cick = -thrvec(3)*dorb(2*kpro-1)/atemp(lc1,lc2)
-*--- add kick to kicker strengths
+!--- add kick to kicker strengths
       if (kpro .eq. 1)  then
         cick = node_value('dipole_bv ') * cick + node_value('chkick ')
         call store_node_value('chkick ', cick)
@@ -756,7 +757,7 @@
         cick = node_value('dipole_bv ') * cick + node_value('cvkick ')
         call store_node_value('cvkick ', cick)
       endif
-*--- set node for restart in front of kicker
+!--- set node for restart in front of kicker
       if (retreat_node() .eq. 0)  then
         error = 2
         do i = node+1,npick
@@ -772,7 +773,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -906,16 +907,16 @@
       opt_fun0(31)=r0mat(2,1)
       opt_fun0(32)=r0mat(2,2)
 
-  910 format('Mode ',i1,' is unstable  for delta(p)/p =',f12.6,
+  910 format('Mode ',i1,' is unstable  for delta(p)/p =',f12.6,         &
      &', cosmux = ',f12.6,', cosmuy = ',f12.6)
-  920 format('Both modes are unstable for delta(p)/p = ',f12.6,
+  920 format('Both modes are unstable for delta(p)/p = ',f12.6,         &
      &', cosmux = ',f12.6,', cosmuy = ',f12.6)
  9999 end
       subroutine twdisp(rt,vect,disp)
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -960,7 +961,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1149,7 +1150,7 @@
       subroutine twcptk(re,orbit)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1280,7 +1281,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1348,9 +1349,9 @@
         betx = rt(1,2) / sinmux
         alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
         bx = rtp(1,2) / rt(1,2) +                                       &
-     &       (rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
+     &  (rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
         ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                   &
-     &       alfx * rtp(1,2) / rt(1,2)
+     &  alfx * rtp(1,2) / rt(1,2)
         wx = sqrt(bx**2 + ax**2)
         if (wx.gt.eps) phix = atan2(ax,bx)
       endif
@@ -1365,9 +1366,9 @@
         bety = rt(3,4) / sinmuy
         alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
         by = rtp(3,4) / rt(3,4) +                                       &
-     &       (rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
+     &  (rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
         ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                   &
-     &       alfy * rtp(3,4) / rt(3,4)
+     &  alfy * rtp(3,4) / rt(3,4)
         wy = sqrt(by**2 + ay**2)
         if (wy.gt.eps) phiy = atan2(ay,by)
       endif
@@ -1387,7 +1388,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1512,7 +1513,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1690,7 +1691,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1831,7 +1832,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
@@ -1901,7 +1902,7 @@
       go to 500
 
 !---- Arbitrary matrix.
-   40 continue 
+   40 continue
       call tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
@@ -2007,7 +2008,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -2173,7 +2174,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -2668,7 +2669,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -2778,7 +2779,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -2930,7 +2931,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3103,7 +3104,7 @@
       subroutine tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 ! Purpose:                                                             *
 !   TRANSPORT map for arbitrary element.                               *
@@ -3408,7 +3409,7 @@
       subroutine tmquad(fsec,ftrk,orbit,fmap,el,ek,re,te)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3499,7 +3500,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3604,7 +3605,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3671,7 +3672,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3779,7 +3780,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3874,7 +3875,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -3990,7 +3991,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4099,7 +4100,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4149,7 +4150,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4200,7 +4201,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4290,7 +4291,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4376,7 +4377,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4440,7 +4441,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -4653,7 +4654,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
@@ -4881,7 +4882,7 @@
       subroutine ccperrf(xx, yy, wx, wy)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
@@ -4982,14 +4983,14 @@
 !----------------------------------------------------------------------*
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
       include 'twissotm.fi'
       integer i, k, l
       double precision sum1, sum2, pos, orbit(6)
       double precision ek(6)
 
-*---- Track ORBIT0 using zero kick.
+!---- Track ORBIT0 using zero kick.
       do i = 1, 6
         sum2 = orbit(i)
         do k = 1, 6
@@ -5003,13 +5004,13 @@
         ek(i) = sum2
       enddo
       call dcopy(orbit, sorb, 6)
-*---- Output.
+!---- Output.
       call sector_out(pos, ek, srmat, stmat)
 !      write (99, '(g20.6)') pos
 !      write (99, '(6e16.8)') ek
 !      write (99, '(6e16.8)') srmat
 !      write (99, '(6e16.8)') stmat
-*---- re-initialize map.
+!---- re-initialize map.
       call m66one(srmat)
       call dzero(stmat, 216)
 

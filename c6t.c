@@ -2434,20 +2434,20 @@ void write_f3_matrix()
   while (current_element != NULL)
     {
       if (strcmp(current_element->base_name, "matrix") == 0)
-	{
-	  if (f3_matrix_cnt++ == 0)     
-	    {
-	      f3matrix  = fopen("fc.3", "w");
-	      fprintf(f3matrix,"TROM\n");
-	      fprintf(f3matrix,"%-16s\n",current_element->name);
-	    }
-	  for (i = 1; i < i_max; i++)
-	    {
-	      fprintf(f3matrix,"%23.15e", current_element->value[i]);
-	      if (i%3 == 0) fprintf(f3matrix,"\n");
-	    }
-	  fprintf(f3matrix,"NEXT\n");
-	}
+      {
+        if (f3_matrix_cnt++ == 0)
+          {
+            f3matrix  = fopen("fc.3", "w");
+            fprintf(f3matrix,"TROM\n");
+            fprintf(f3matrix,"%-16s\n",current_element->name);
+          }
+        for (i = 1; i < i_max; i++)
+          {
+            fprintf(f3matrix,"%23.15e", current_element->value[i]);
+            if (i%3 == 0) fprintf(f3matrix,"\n");
+          }
+        fprintf(f3matrix,"NEXT\n");
+      }
       current_element = current_element->next;
     }
 }

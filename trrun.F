@@ -3,8 +3,8 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
-        !DEC$ ATTRIBUTES C, ALIAS:'_trrun_' :: trrun
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_trrun_' :: trrun
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -295,7 +295,7 @@
      &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -328,44 +328,44 @@
       call dzero(te,216)
 !---- Drift space
       if(code.eq.1) then
-         call ttdrf(el,track,ktrack)
-      go to 502
+        call ttdrf(el,track,ktrack)
+        go to 502
       endif
 !---- Collimator with elliptic aperture.
       if(code.eq.20) then
-       apx = node_value('xsize ')
-       apy = node_value('ysize ')
+        apx = node_value('xsize ')
+        apy = node_value('ysize ')
         if(apx.eq.zero) then
-        apx=maxaper(1)
+          apx=maxaper(1)
         endif
         if(apy.eq.zero) then
-        apy=maxaper(3)
+          apy=maxaper(3)
         endif
-       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,          &
-     & last_pos, last_orbit, track, ktrack,al_errors)
-      go to 502
+        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
+     &  last_pos, last_orbit, track, ktrack,al_errors)
+        go to 502
       endif
 !---- Collimator with rectangular aperture.
       if(code.eq.21) then
-       apx = node_value('xsize ')
-       apy = node_value('ysize ')
+        apx = node_value('xsize ')
+        apy = node_value('ysize ')
         if(apx.eq.zero) then
-         apx=maxaper(1)
+          apx=maxaper(1)
         endif
         if(apy.eq.zero) then
-         apy=maxaper(3)
+          apy=maxaper(3)
         endif
-       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
-     & last_pos, last_orbit, track, ktrack,al_errors)
-       go to 502
+        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
+     &  last_pos, last_orbit, track, ktrack,al_errors)
+        go to 502
       endif
 !---- Beam-beam,  standard 4D, no aperture
       if(code.eq.22) then
-       parvec(5)=get_value('probe ', 'arad ')
-       parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-       parvec(7)=get_value('probe ','gamma ')
-       call ttbb(track, ktrack, parvec)
-       go to 502
+        parvec(5)=get_value('probe ', 'arad ')
+        parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+        parvec(7)=get_value('probe ','gamma ')
+        call ttbb(track, ktrack, parvec)
+        go to 502
       endif
 
 !____ Test aperture. ALL ELEMENTS BUT DRIFTS
@@ -431,12 +431,12 @@
           st = sin(theta)
           ct = cos(theta)
           do jtrk = 1,ktrack
-          tmp = track(1,jtrk)
-          track(1,jtrk) = ct * tmp + st * track(3,jtrk)
-          track(3,jtrk) = ct * track(3,jtrk) - st * tmp
-          tmp = track(2,jtrk)
-          track(2,jtrk) = ct * tmp + st * track(4,jtrk)
-          track(4,jtrk) = ct * track(4,jtrk) - st * tmp
+            tmp = track(1,jtrk)
+            track(1,jtrk) = ct * tmp + st * track(3,jtrk)
+            track(3,jtrk) = ct * track(3,jtrk) - st * tmp
+            tmp = track(2,jtrk)
+            track(2,jtrk) = ct * tmp + st * track(4,jtrk)
+            track(4,jtrk) = ct * track(4,jtrk) - st * tmp
           enddo
         endif
       endif
@@ -523,12 +523,12 @@
         if (theta .ne. zero)  then
 !--- rotate trajectory at exit
           do jtrk = 1,ktrack
-          tmp = track(1,jtrk)
-          track(1,jtrk) = ct * tmp - st * track(3,jtrk)
-          track(3,jtrk) = ct * track(3,jtrk) + st * tmp
-          tmp = track(2,jtrk)
-          track(2,jtrk) = ct * tmp - st * track(4,jtrk)
-          track(4,jtrk) = ct * track(4,jtrk) + st * tmp
+            tmp = track(1,jtrk)
+            track(1,jtrk) = ct * tmp - st * track(3,jtrk)
+            track(3,jtrk) = ct * track(3,jtrk) + st * tmp
+            tmp = track(2,jtrk)
+            track(2,jtrk) = ct * tmp - st * track(4,jtrk)
+            track(4,jtrk) = ct * track(4,jtrk) + st * tmp
           enddo
         endif
       endif
@@ -540,7 +540,7 @@
       subroutine ttmult(track, ktrack, dxt, dyt)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -744,7 +744,7 @@
       subroutine trphot(el,curv,rfac,deltap)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -884,7 +884,7 @@
       subroutine ttdrf(el,track,ktrack)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -917,7 +917,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -1035,7 +1035,7 @@
       subroutine ttcorr(el,track,ktrack)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1191,7 +1191,7 @@
       subroutine dpoissn (amu,n,ierror)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 !    POISSON GENERATOR                                                 *
@@ -1231,7 +1231,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
@@ -1368,7 +1368,7 @@
 !hbu--- kill particle:  print, modify part_id list
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
       include 'name_len.fi'
       integer i,j,n,turn,part_id(*),jmax,last_turn(*)
@@ -1406,7 +1406,7 @@
 !hbu added spos, ielem, el_name
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 !--- purpose: enter all particle coordinates in one table              *
@@ -1462,7 +1462,7 @@
 !hbu added spos
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 !--- purpose: enter particle coordinates in table                      *
@@ -1501,7 +1501,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1561,7 +1561,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1667,7 +1667,7 @@
       subroutine trbegn(rt,eigen)
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *

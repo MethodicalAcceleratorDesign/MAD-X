@@ -27,7 +27,7 @@ void madx()
 {
 #ifdef _CATCH_MEM
 /* provide a termination routine for access to memory outside scope */
-  if (signal(SIGSEGV, termination_handler) == SIG_IGN) 
+  if (signal(SIGSEGV, termination_handler) == SIG_IGN)
      signal(SIGSEGV, SIG_IGN);
 #endif
   madx_start();
@@ -2477,7 +2477,7 @@ void expand_curr_sequ(int flag)
   char rout_name[] = "expand_curr_sequ";
   struct node* c_node;
   int j;
-  if (current_sequ->l_expr) current_sequ->length = current_sequ->end->at_value 
+  if (current_sequ->l_expr) current_sequ->length = current_sequ->end->at_value
     = current_sequ->end->position = expression_value(current_sequ->l_expr, 2);
   if (current_sequ->ex_start != NULL)
     {
@@ -2771,7 +2771,7 @@ void fill_twiss_header(struct table* t)
           stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""), 
+  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""),
           i, stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "mass");
@@ -6186,7 +6186,7 @@ void seq_cycle(struct in_cmd* cmd)
          clone = clone_node(node, 0);
          clone->p_elem = clone_element(node->p_elem);
          strcpy(clone->p_elem->name, c_dummy);
-         add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type, 
+         add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
          element_list, 1);
          link_in_front(clone, node);
         }
@@ -6682,7 +6682,7 @@ void set_defaults(char* string) /* reset options, beam etc. to defaults */
       if (options != NULL) delete_command(options);
         options = clone_command(defined_commands->commands[pos]);
        }
-     else if (strcmp(string, "set") == 0) 
+     else if (strcmp(string, "set") == 0)
        store_set(defined_commands->commands[pos], 0);
      else if (strcmp(string, "setplot") == 0)
        {
@@ -7690,7 +7690,7 @@ void store_set(struct command* comm, int flag)
   struct command_parameter* cp;
   struct name_list* nl = comm->par_names;
   int i, lp, n = 0, posf = name_list_pos("format", nl),
-         poss = name_list_pos("sequence", nl); 
+         poss = name_list_pos("sequence", nl);
   if (flag == 0 || (posf > -1 && nl->inform[posf]))
     {
      n++;
@@ -7995,12 +7995,12 @@ void track_dynap(struct in_cmd* cmd)
   if (get_option("dynap_dump")) dynap_tables_dump();
   */
   /* free buffers */
-  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); 
+  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2);
   myfree(rout_name, ibuf3); myfree(rout_name, buf1); myfree(rout_name, buf2);
-  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt); 
-  myfree(rout_name, buf3); myfree(rout_name, buf4); myfree(rout_name, buf5); 
-  myfree(rout_name, buf6); myfree(rout_name, buf7); myfree(rout_name, buf8); 
-  myfree(rout_name, buf9); myfree(rout_name, buf10); 
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
+  myfree(rout_name, buf3); myfree(rout_name, buf4); myfree(rout_name, buf5);
+  myfree(rout_name, buf6); myfree(rout_name, buf7); myfree(rout_name, buf8);
+  myfree(rout_name, buf9); myfree(rout_name, buf10);
   myfree(rout_name, buf11);
 }
 
@@ -8154,8 +8154,8 @@ void track_run(struct in_cmd* cmd)
   if (get_option("track_dump")) track_tables_dump();
   /* free buffers */
   myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); myfree(rout_name, ibuf3);
-  myfree(rout_name, buf1); myfree(rout_name, buf2); 
-  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt); 
+  myfree(rout_name, buf1); myfree(rout_name, buf2);
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
   myfree(rout_name, buf3);
   myfree(rout_name, buf4); myfree(rout_name, buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");

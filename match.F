@@ -1,16 +1,17 @@
       subroutine mtgetc(num,vect,dvect)
-* This is exactly equivalent to mtgeti but this version is used for calling
-* from C.
-*
-* This seems to be the only way deal with the problem that originally the
-* subroutine mtgeti was called both from C and from Fortran.
-* Because madX is setup with Linux-specific name-mangling, the adjustments
-* made with the !DEC$ ATTRIBUTES do not seem able to cope with such a case.
-* Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ
-*
-*
+      implicit none
+! This is exactly equivalent to mtgeti but this version is used for calling
+! from C.
+!
+! This seems to be the only way deal with the problem that originally the
+! subroutine mtgeti was called both from C and from Fortran.
+! Because madX is setup with Linux-specific name-mangling, the adjustments
+! made with the !DEC$ ATTRIBUTES do not seem able to cope with such a case.
+! Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ
+!
+!
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtgetc_' :: mtgetc
+      !DEC$ ATTRIBUTES C, ALIAS:'_mtgetc_' :: mtgetc
 #endif
       integer  num
       double precision vect(*),dvect(*)
@@ -18,13 +19,13 @@
       end
 
       subroutine mtgeti(num,vect,dvect)
-* This subroutine should only be called from Fortran.  There is an
-* equivalent mtgetc for the occasions when it needs to be called from C.
-* Modified at 10:38:56 on 8 Apr 2003 by JMJ
+! This subroutine should only be called from Fortran.  There is an
+! equivalent mtgetc for the occasions when it needs to be called from C.
+! Modified at 10:38:56 on 8 Apr 2003 by JMJ
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
       logical psum
@@ -71,7 +72,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
       integer num,j,next_vary,name_l,ireset
@@ -111,8 +112,8 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
-	!DEC$ ATTRIBUTES C, ALIAS:'_collect_' :: collect
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_collect_' :: collect
 #endif
 
       logical fprt,local,psum
@@ -205,7 +206,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -236,7 +237,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
       integer num,j,next_vary,name_l
@@ -256,7 +257,7 @@
       subroutine mtlmdf(ncon,nvar,tol,calls,call_lim,vect,dvect,fun_vec,&
      &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,xold)
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtlmdf_' :: mtlmdf
+      !DEC$ ATTRIBUTES C, ALIAS:'_mtlmdf_' :: mtlmdf
 #endif
       implicit none
 !----------------------------------------------------------------------*
@@ -297,7 +298,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -754,7 +755,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -895,7 +896,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -1280,7 +1281,7 @@
       implicit none
 
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtmigr_' :: mtmigr
+      !DEC$ ATTRIBUTES C, ALIAS:'_mtmigr_' :: mtmigr
 #endif
 
 !----------------------------------------------------------------------*
@@ -1327,7 +1328,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -1566,7 +1567,7 @@
 
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1667,7 +1668,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -1772,7 +1773,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -1952,7 +1953,7 @@
       implicit none
 
 #ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtsimp_' :: mtsimp
+      !DEC$ ATTRIBUTES C, ALIAS:'_mtsimp_' :: mtsimp
 #endif
 
 !----------------------------------------------------------------------*
@@ -1989,7 +1990,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*

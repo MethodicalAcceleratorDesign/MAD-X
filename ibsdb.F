@@ -30,7 +30,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -82,7 +82,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
       integer i,lg,code,get_string,restart_sequ,advance_node
@@ -112,7 +112,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -226,8 +226,8 @@
       implicit none
 
 #ifdef _WIN32
-        !DEC$ ATTRIBUTES C, ALIAS:'_ibs_' :: ibs
-	include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_ibs_' :: ibs
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*
@@ -553,7 +553,7 @@
       implicit none
 
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 
 !----------------------------------------------------------------------*

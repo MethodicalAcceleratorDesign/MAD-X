@@ -204,7 +204,7 @@ void sxf_fill_command(struct command* comm, int ntok, char** toks)
 
   if ((pos = name_list_pos("l", nl)) > -1)
     {
-     if (strstr(toks[1], "bend"))  
+     if (strstr(toks[1], "bend"))
      {
       if ((length = find_value("arc", ntok, toks)) == INVALID)
           length = find_value("l", ntok, toks);

@@ -963,7 +963,7 @@ void dump_command_parameter(struct command_parameter* par)
 
 void dump_constraint(struct constraint* c)
 {
-  fprintf(prt_file, 
+  fprintf(prt_file,
           v_format("name: %s type: %I value: %F min: %F max: %F weight: %F\n"),
           c->name, c->type, c->value, c->c_min, c->c_max, c->weight);
 }
@@ -979,7 +979,7 @@ void dump_constraint_list(struct constraint_list* cl)
 
 void dump_element(struct element* el)
 {
-  fprintf(prt_file, v_format("+++ dumping element %S  parent %S\n"), 
+  fprintf(prt_file, v_format("+++ dumping element %S  parent %S\n"),
           el->name, el->parent->name);
   dump_command(el->def);
 }
@@ -993,7 +993,7 @@ void dump_el_list(struct el_list* ell)
 void dump_expression(struct expression* ex)
 {
  ex->value = expression_value(ex, 2);
- fprintf(prt_file, v_format("expression: %s :: value: %F\n"), 
+ fprintf(prt_file, v_format("expression: %s :: value: %F\n"),
          ex->string, ex->value);
 }
 
@@ -1080,7 +1080,7 @@ void dump_name_list(struct name_list* nl)
   puts(" ");
   for (i = 0; i < nl->curr; i++)
     {
-     fprintf(prt_file, v_format("%S %I\n"), 
+     fprintf(prt_file, v_format("%S %I\n"),
              nl->names[nl->index[i]], nl->inform[nl->index[i]]);
     }
 }
@@ -1091,7 +1091,7 @@ void dump_node(struct node* node)
   char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL";
   if (node->previous != NULL) strcpy(pname, node->previous->name);
   if (node->next != NULL) strcpy(nname, node->next->name);
-  fprintf(prt_file, v_format("name: %S  occ: %I base: %S  position: %F\n"), 
+  fprintf(prt_file, v_format("name: %S  occ: %I base: %S  position: %F\n"),
           node->name, node->occ_cnt, node->base_name, node->position);
   fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
          pname, nname);
@@ -1114,7 +1114,7 @@ void dump_sequ(struct sequence* c_sequ, int level)
         if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
        }
      else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-       fprintf(prt_file, v_format("%S: at = %F\n"), 
+       fprintf(prt_file, v_format("%S: at = %F\n"),
                c_node->name, c_node->position);
      if (c_node == c_sequ->end)  break;
      c_node = c_node->next;
@@ -1497,7 +1497,7 @@ void export_variable(struct variable* var, FILE* file)
     }
   else
     {
-     sprintf(c_join, v_format("%F"), var->value); 
+     sprintf(c_join, v_format("%F"), var->value);
      strcat(c_dummy, supp_tb(c_join));
     }
   write_nice(c_dummy, file);
@@ -1523,12 +1523,12 @@ void export_var_8(struct variable* var, FILE* file)
   if (var->expr != NULL) strcat(c_dummy, var->expr->string);
   else if (var->val_type == 0)
     {
-     k = var->value; sprintf(c_join, v_format("%I"), k); 
+     k = var->value; sprintf(c_join, v_format("%I"), k);
      strcat(c_dummy, c_join);
     }
   else
     {
-     sprintf(c_join, v_format("%F"), var->value); 
+     sprintf(c_join, v_format("%F"), var->value);
      strcat(c_dummy, supp_tb(c_join));
     }
   write_nice_8(c_dummy, file);
@@ -1990,7 +1990,7 @@ void myfree(char* rout_name, void* p)
   char* l_p = (char*)p - sizeof(int);
   int* i_p = (int*) l_p;
   myfree_caller = rout_name;
-  if (*i_p == FREECODE) 
+  if (*i_p == FREECODE)
   {
    *i_p = 0; free(l_p);
   }
@@ -2751,11 +2751,11 @@ void print_global(double delta)
   printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
   printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
   printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
-  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), 
+  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"),
                   bcurrent, kbunch);
-  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), 
+  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"),
                   npart,energy);
-  printf(v_format(" gamma     %F            beta      %F\n"), 
+  printf(v_format(" gamma     %F            beta      %F\n"),
                   gamma, beta);
 }
 
@@ -2796,14 +2796,14 @@ void print_table(struct table* t)
         n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
         fprintf(prt_file, "\n");
         for (i = wpl*k; i < n; i++)
-	   {
+         {
             if (t->columns->inform[i] == 1)
                fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
             else if (t->columns->inform[i] == 2)
                fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
             else if (t->columns->inform[i] == 3)
                fprintf(prt_file, v_format("%S "), t->columns->names[i]);
-	   }
+         }
         fprintf(prt_file, "\n");
         for (j = 0; j < t->curr; j++)
           {
@@ -3038,21 +3038,21 @@ char* v_format(char* string)
     {
      if ((int)p > (int)q)
        {
-	t = p; t--;
+      t = p; t--;
         if (*t == '%')
-	  {
+        {
            c = *p;
            strncat(var_form, q, (int)p - (int)q);
            if (c == 'N')
-	      {
-	       sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
-	       p++;
-	      }
+            {
+             sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
+             p++;
+            }
            else if (c == 'F')  strcat(var_form, float_format);
            else if (c == 'S')  strcat(var_form, string_format);
            else if (c == 'I')  strcat(var_form, int_format);
            q = p; q++;
-	  }
+        }
        }
      s = ++p;
     }
@@ -3267,12 +3267,12 @@ void write_table(struct table* t, char* filename)
               {
                tmp = t->d_cols[col->i[i]][j];
                fprintf(out_file, v_format(" %I"), tmp);
-              }    
+              }
             else if (t->columns->inform[col->i[i]] == 2)
                   fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
             else if (t->columns->inform[col->i[i]] == 3)
               {
-	       *c_dummy = '\"';
+             *c_dummy = '\"';
                strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
                stoupper(c_dummy);
                pc = strip(c_dummy); /* remove :<occ_count> */

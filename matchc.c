@@ -575,7 +575,7 @@ void match_prepare_varypos()
 /* keeps constraints from nodes, reexpands, adds constraints to nodes */
 {
   struct node* node = current_sequ->ex_start;
-  struct constraint_list** tmplist = (struct constraint_list**) 
+  struct constraint_list** tmplist = (struct constraint_list**)
          malloc(current_sequ->n_nodes * sizeof(struct constraint_list*));
   int i = 0;
   while (node != NULL)

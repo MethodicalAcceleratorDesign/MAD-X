@@ -5,8 +5,8 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
-        !DEC$ ATTRIBUTES C, ALIAS:'_survey_' :: survey
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_survey_' :: survey
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -162,7 +162,7 @@
 
       implicit none
 #ifdef _WIN32
-	include 'win32calls.fi'
+      include 'win32calls.fi'
 #endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
