@@ -603,7 +603,8 @@
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
      &f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
      &ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half
+     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half,lrad    &
+
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
       save first,ordinv
       data first / .true. /
@@ -621,7 +622,6 @@
       bvk = node_value('other_bv ')
 !---- Multipole length for radiation.
       elrad = node_value('lrad ')
-
 !---- Multipole components.
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
@@ -635,21 +635,17 @@
       do iord = 0, ns
         vals(2,iord) = skew(iord)
       enddo
-
 !---- Field error vals.
       call dzero(field,2*(maxmul+1))
       if (n_ferr .gt. 0) then
         call dcopy(f_errors,field,n_ferr)
       endif
-
 !---- Dipole error.
       dbr = bv0 * field(1,0) / (one + deltas)
       dbi = bv0 * field(2,0) / (one + deltas)
-
 !---- Nominal dipole strength.
       dipr = bv0 * vals(1,0) / (one + deltas)
       dipi = bv0 * vals(2,0) / (one + deltas)
-
 !---- Other components and errors.
       nord = 0
       do iord = 1, nd/2
@@ -660,13 +656,19 @@
         enddo
       enddo
 
-!---- Pure dipole: no higher terms.
+!---- Pure dipole: only quadrupole kicks according to lrad.
       if (nord .eq. 0) then
         do jtrk = 1,ktrack
           dxt(jtrk) = zero
           dyt(jtrk) = zero
         enddo
-
+!----------- introduction of dipole focusing 
+         if(elrad.gt.zero) then
+           do jtrk = 1,ktrack
+           dxt(jtrk) =  dipr*dipr*track(1,jtrk)/elrad
+           dyt(jtrk) =  dipi*dipi*track(3,jtrk)/elrad
+           enddo
+         endif
 !---- Accumulate multipole kick from highest multipole to quadrupole.
       else
         do jtrk = 1,ktrack
@@ -688,6 +690,12 @@
           dxt(jtrk) = dxt(jtrk) / (one + deltas)
           dyt(jtrk) = dyt(jtrk) / (one + deltas)
         enddo
+          if(elrad.gt.zero) then
+           do jtrk = 1,ktrack
+           dxt(jtrk) = dxt(jtrk) + dipr*dipr/elrad
+           dyt(jtrk) = dyt(jtrk) + dipi*dipi/elrad
+           enddo
+          endif
       endif
 
 !---- Radiation loss at entrance.
