@@ -31,6 +31,7 @@
 /e_define_newda.f90 -text
 /emit.F -text
 /emit.fi -text
+/epause.c -text
 /f_newda.f90 -text
 /first_ptc.f90 -text
 /g_newLielib.f90 -text
@@ -69,6 +70,7 @@
 /set_para.f90 -text
 /survey.F -text
 /sxf.c -text
+/timel.c -text
 /track.fi -text
 /trrun.F -text
 /ttwm_dum.F -text
@@ -81,6 +83,7 @@
 /twissotm.fi -text
 /twtrr.fi -text
 /u1_twiss.f90 -text
+/usleep.c -text
 /util.F -text
 /win32calls.fi -text
 /wmaxmin0.fi -text
