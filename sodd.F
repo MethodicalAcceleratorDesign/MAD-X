@@ -2406,7 +2406,7 @@
      &iu_on,n1,n2
       double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
      &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-     &qy,sbeta,sign,two,zero
+     &qy,sbeta,sign,two,zero, factor
       real tlim,time0,time1,time2,time3,time4
       real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
       character*16 strn
@@ -2477,7 +2477,9 @@
             if(isize.gt.nblz) call prror(3,3,nblz)
             etl(itype,isize)=et
             strn(itype,isize)=name
-            bstr(itype,isize)=str
+            factor = 10**(3*(iabs(itype)-2))
+            print *,"itype, factor = ",itype,factor
+            bstr(itype,isize)=str*factor
             beta(1,itype,isize)=betx
             beta(2,itype,isize)=bety
             sbeta(1,itype,isize)=dsqrt(betx)
