@@ -1,5 +1,5 @@
 /* defined constants for word lengths etc. */
-#define ALIGN_MAX 12        /* alignment error array length */
+#define ALIGN_MAX 14        /* alignment error array length */
 #define FIELD_MAX 42        /* field error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 24           /* internal name length */
