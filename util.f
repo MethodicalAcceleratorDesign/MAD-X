@@ -828,7 +828,7 @@
       n = tint(1)
       do i = 1, n
         j = tint(i+1)
-        if (j < m)  charconv(i:i) = letter(j:j)
+        if (j .lt. m)  charconv(i:i) = letter(j:j)
       enddo
       end
       subroutine laseig(fm,reeig,aieig,am)
