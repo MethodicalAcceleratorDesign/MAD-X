@@ -1,3 +1,47 @@
+/*---------------------------------------------------------------------*
+*                                                                      *
+*                           CERN                                       *
+*                                                                      *
+*     European Organization for Nuclear Research                       *
+*                                                                      *
+*     Program name: c6t: MAD-Sixtrack Format Converter                 *
+*                                                                      *
+*     Author and contact:   Hans GROTE                                 *
+*                           SL Division                                *
+*                           CERN                                       *
+*                           CH-1211 GENEVA 23                          *
+*                           SWITZERLAND                                *
+*                      Tel. [041] (022) 767 49 61                      *
+*                           Hans.Grote@cern.ch                         *
+*                                                                      *
+*     Converted to MAD-X by Mark HAYES                                 *
+*     Followed up by Frank Schmidt                                     *
+*                                                                      *
+*     Copyright  CERN,  Geneva  2000  -  Copyright  and  any   other   *
+*     appropriate  legal  protection  of  this  computer program and   *
+*     associated documentation reserved  in  all  countries  of  the   *
+*     world.                                                           *
+*                                                                      *
+*     Organizations collaborating with CERN may receive this program   *
+*     and documentation freely and without charge.                     *
+*                                                                      *
+*     CERN undertakes no obligation  for  the  maintenance  of  this   *
+*     program,  nor responsibility for its correctness,  and accepts   *
+*     no liability whatsoever resulting from its use.                  *
+*                                                                      *
+*     Program  and documentation are provided solely for the use  of   *
+*     the organization to which they are distributed.                  *
+*                                                                      *
+*     This program  may  not  be  copied  or  otherwise  distributed   *
+*     without  permission. This message must be retained on this and   *
+*     any other authorized copies.                                     *
+*                                                                      *
+*     The material cannot be sold. CERN should be  given  credit  in   *
+*     all references.                                                  *
+*                                                                      *
+*---------------------------------------------------------------------*/
+
+/* 15/03/2004 - FS fixing faulty variable passing to "create_aperture" */
 /* 01/07/2003 - FS added the "arbitrary matrix" element */
 /* 21/03/2003 - FS fixed segmentation fault which was due to a faulty
    free-ing of object that had already been freed before */
@@ -35,47 +79,6 @@ to see if it helps  for Visual Fortran ....
 */
 
 
-/*---------------------------------------------------------------------*
-*                                                                      *
-*                           CERN                                       *
-*                                                                      *
-*     European Organization for Nuclear Research                       *
-*                                                                      *
-*     Program name: c6t: MAD-Sixtrack Format Converter                 *
-*                                                                      *
-*     Author and contact:   Hans GROTE                                 *
-*                           SL Division                                *
-*                           CERN                                       *
-*                           CH-1211 GENEVA 23                          *
-*                           SWITZERLAND                                *
-*                      Tel. [041] (022) 767 49 61                      *
-*                           Hans.Grote@cern.ch                         *
-*                                                                      *
-*     Converted to MAD-X by Mark HAYES                                 *
-*                                                                      *
-*     Copyright  CERN,  Geneva  2000  -  Copyright  and  any   other   *
-*     appropriate  legal  protection  of  this  computer program and   *
-*     associated documentation reserved  in  all  countries  of  the   *
-*     world.                                                           *
-*                                                                      *
-*     Organizations collaborating with CERN may receive this program   *
-*     and documentation freely and without charge.                     *
-*                                                                      *
-*     CERN undertakes no obligation  for  the  maintenance  of  this   *
-*     program,  nor responsibility for its correctness,  and accepts   *
-*     no liability whatsoever resulting from its use.                  *
-*                                                                      *
-*     Program  and documentation are provided solely for the use  of   *
-*     the organization to which they are distributed.                  *
-*                                                                      *
-*     This program  may  not  be  copied  or  otherwise  distributed   *
-*     without  permission. This message must be retained on this and   *
-*     any other authorized copies.                                     *
-*                                                                      *
-*     The material cannot be sold. CERN should be  given  credit  in   *
-*     all references.                                                  *
-*                                                                      *
-*---------------------------------------------------------------------*/
 
 /* already defined as 42 in fulll.h */
 /*#define FIELD_MAX 40*/        /* field error array length */
