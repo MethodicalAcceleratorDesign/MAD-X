@@ -54,6 +54,7 @@ char predef_constants[] =
 /* threader tolerances and maxima: xmax,ymax:  orbit excursion at which
    threader is switched on; att: attenuation factor for kicks.
 */
+/* FS 15.03.2004: initial matrix for ptc_twiss, preparation of Touschek */
 char command_def[] =
 "antiproton: data none 0 0 "  /* comment allowed outside quotes */
 "mass     = [r, pmass], "
