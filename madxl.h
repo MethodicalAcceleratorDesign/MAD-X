@@ -1,7 +1,9 @@
 /* defined constants for word lengths etc. */
-#define ALIGN_MAX 8         /* alignment error array length */
+#define ALIGN_MAX 12        /* alignment error array length */
 #define FIELD_MAX 42        /* field error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
+#define NAME_L 24           /* internal name length */
+#define FNAME_L 240         /* for file names */
 #define AUX_LG 10000        /* for all sorts of ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
@@ -20,8 +22,6 @@
 #define MATCH_WORK 10       /* no. of work spaces in matching */
 #define TABLE_KEY 16        /* max. table keyword is TABLE_KEY-1 */
 #define TRACK_ROWS 1200     /* initial length of track tables */
-#define NAME_L 24           /* internal name length */
-#define FNAME_L 240         /* for file names */
 
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
