@@ -81,13 +81,14 @@
       character symloc*1
       data winnor /0., 1., 0., 1./
 
+!--- Initialisation of local variables
+
+      save act
+      iecub = 0
+
 !--- Output initialisation
 
       ierr = 0
-
-!--- Initialisation of local variables
-
-      iecub = 0
 
 !--- Routine body
 
