@@ -5434,7 +5434,7 @@ void pro_twiss()
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
   char *filename, *name, *table_name, *sector_name;
-  double tol_keep;
+  double tol,tol_keep;
   int i, j, l, lp, k_orb, u_orb, pos, k = 1, ks, w_file, beta_def;
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
@@ -5549,9 +5549,9 @@ void pro_twiss()
   pos = name_list_pos("tolerance", nl);
   if (nl->inform[pos])
     {
-     tol_keep = command_par_value("tolerance", current_twiss);
+     tol = command_par_value("tolerance", current_twiss);
+     set_variable("twiss_tol", &tol);
     }
-  set_variable("twiss_tol", &tol_keep);
  /*
              end of command decoding
   */
@@ -5564,6 +5564,7 @@ void pro_twiss()
      if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
      else if (beta_def == -2)
          warning("betx or bety missing,", "Twiss ignored");
+     set_variable("twiss_tol", &tol_keep);
      return;
     }
   set_option("twiss_inval", &beta_def);
@@ -5635,6 +5636,7 @@ void pro_twiss()
   set_option("keeporbit", &k);
   set_option("useorbit", &k);
   set_option("info", &keep_info);
+  set_variable("twiss_tol", &tol_keep);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
 }
