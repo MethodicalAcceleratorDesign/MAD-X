@@ -1504,7 +1504,7 @@ contains
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
        CALL XMID(MID,X,1)
     ELSE
-      if(EL%P%TIME) then
+       if(EL%P%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
           X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
@@ -2119,6 +2119,10 @@ contains
     real(dp) D(3,3),FI(3),FI0,B,co1,co2
     integer i
 
+    if((.not.el%exact)) then
+       write(6,*) " Fringer should be called in exact magnets only "
+       stop 101
+    endif
 
     IF(.not.EL%BEND_FRINGE) RETURN
     IF(K==1.AND.EL%KILL_ENT_FRINGE) RETURN
@@ -2201,9 +2205,13 @@ contains
     integer i,J
     ! etienne
 
+    if((.not.el%exact)) then
+       write(6,*) " Fringep should be called in exact magnets only "
+       stop 102
+    endif
 
 
-    IF(.not.EL%BEND_FRINGE) RETURN
+    IF((.not.EL%BEND_FRINGE).or.(.not.el%exact)) RETURN
     IF(K==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
@@ -2452,8 +2460,12 @@ contains
        ENDIF
 
        X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
-       X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
-            & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
+
+       IF(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE))) THEN
+
+          X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+               & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
+       ENDIF
 
        IF(EL%DIR==1) THEN
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X)
@@ -2507,8 +2519,11 @@ contains
        ENDIF
 
        X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
-       X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
-            & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
+
+       IF(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE))) THEN
+          X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+               & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
+       ENDIF
 
        IF(EL%DIR==1) THEN
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X)
@@ -4210,7 +4225,17 @@ contains
     DIR=EL%P%DIR*EL%P%CHARGE
     CHARGE=EL%P%CHARGE
 
-    DH=EL%L/EL%P%NST
+    IF(EL%P%METHOD==2.AND.OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
+       DH=EL%L/EL%P%NST
+    ELSE
+       IF(EL%P%METHOD/=6) THEN
+          DH=EL%L/EL%P%NST/two
+       ELSE
+          DH=EL%L/EL%P%NST/four
+       ENDIF
+    ENDIF
+
+
     BH=CHARGE*EL%B_SOL/two
 
 
@@ -4286,7 +4311,15 @@ contains
     DIR=EL%P%DIR*EL%P%CHARGE
     CHARGE=EL%P%CHARGE
 
-    DH=EL%L/EL%P%NST
+    IF(EL%P%METHOD==2.AND.OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
+       DH=EL%L/EL%P%NST
+    ELSE
+       IF(EL%P%METHOD/=6) THEN
+          DH=EL%L/EL%P%NST/two
+       ELSE
+          DH=EL%L/EL%P%NST/four
+       ENDIF
+    ENDIF
     BH=CHARGE*EL%B_SOL/two
 
 
@@ -13778,10 +13811,10 @@ contains
     O=EL%freq*twopi/CLIGHT
     C1=(eps1+(EL%P%DIR-eps1)*half)*COS(O*(x(6)-Z0)+EL%PHAS+phase0)
     C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
+    ! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
     S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
     S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
+    ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
     V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
@@ -13833,10 +13866,10 @@ contains
     O=EL%freq*twopi/CLIGHT
     C1=(eps1+(EL%P%DIR-eps1)*half)*COS(O*(x(6)-Z0)+EL%PHAS+phase0)
     C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
+    ! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
     S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
     S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
+    ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
     V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
@@ -14571,10 +14604,10 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
-          NULLIFY(EL%thin_h_foc)
-          NULLIFY(EL%thin_v_foc)
-          NULLIFY(EL%thin_h_angle)
-          NULLIFY(EL%thin_v_angle)
+       NULLIFY(EL%thin_h_foc)
+       NULLIFY(EL%thin_v_foc)
+       NULLIFY(EL%thin_h_angle)
+       NULLIFY(EL%thin_v_angle)
     endif
 
   END SUBROUTINE ZEROR_KICKT3
@@ -14598,10 +14631,10 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
-          NULLIFY(EL%thin_h_foc)
-          NULLIFY(EL%thin_v_foc)
-          NULLIFY(EL%thin_h_angle)
-          NULLIFY(EL%thin_v_angle)
+       NULLIFY(EL%thin_h_foc)
+       NULLIFY(EL%thin_v_foc)
+       NULLIFY(EL%thin_h_angle)
+       NULLIFY(EL%thin_v_angle)
     endif
 
   END SUBROUTINE ZEROP_KICKT3
