@@ -1,6 +1,7 @@
 void match_action(struct in_cmd* cmd)
 {
   int i;
+  int iseed, iprint;
 
   if (stored_match_var->curr == 0)
     {
@@ -81,6 +82,26 @@ void match_action(struct in_cmd* cmd)
             vary_vect->a, vary_dvect->a, fun_vect->a,
            match_work[0]->a, match_work[1]->a, match_work[2]->a);
     }
+  else if (strcmp(cmd->tok_list->p[0], "siman") == 0)
+    {
+     print_match_summary = 1;
+     iseed = 1;
+     iprint = 0;
+     match_work[0] = new_double_array(total_vars+1);
+     match_work[1] = new_double_array(total_vars+1);
+     match_work[2] = new_double_array(total_vars+1);
+     match_work[3] = new_double_array(total_vars+1);
+     match_work[4] = new_double_array(total_vars+1);
+     match_work[5] = new_double_array(total_vars+1);
+     match_work[6] = new_double_array(total_vars+1);
+     fprintf(prt_file, "START SIMAN:\n\n");
+     mtsa_(&total_const, &total_vars,
+	   &match_tol, &current_calls, &current_call_lim,
+           vary_vect->a, fun_vect->a,&iseed,&iprint,
+           match_work[0]->a, match_work[1]->a, match_work[2]->a,
+           match_work[3]->a, match_work[4]->a, match_work[5]->a,
+           match_work[6]->a);
+    }
   for (i = 0; i < MATCH_WORK; i++)
   match_work[i] = delete_double_array(match_work[i]);
 }
@@ -98,6 +119,8 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
                match_sequs->sequs[i]->name); */
      current_twiss = local_twiss[i]->clone;
      if (get_option("varylength") != zero) match_prepare_varypos();
+
+     if (get_option("rmatrix") != zero) fprintf(prt_file, "%s %s\n", "call TWISS with RMATRIX");
 
      pro_twiss();
      if (twiss_success)
@@ -190,15 +213,25 @@ void match_end(struct in_cmd* cmd)
   if (get_option("varylength") != zero) match_prepare_varypos();
   pro_twiss();
   current_const = 0;
-  set_option("match_summary", &print_match_summary);
-  if (twiss_success && print_match_summary == 1)
-    {
       fprintf(prt_file, "\n");
       fprintf(prt_file, "MATCH SUMMARY\n\n");
       fprintf(prt_file, "Node_Name                  Constraint   Type  Target Value       Final Value        Penalty\n");
       fprintf(prt_file, "--------------------------------------------------------------------------------------------------\n");
-      collect_(&current_const, &penalty, fun_vect->a);
+  print_match_summary = 1;
+  set_option("match_summary", &print_match_summary);
+  for (i = 0; i < match_num_seqs; i++)
+    {
+      current_twiss = local_twiss[i]->clone;
+      pro_twiss();
+      if (twiss_success && print_match_summary == 1)
+	{
+	collect_(&current_const, &penalty, fun_vect->a);
+	}
     }
+  fprintf(prt_file, "\n\n");
+
+  fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
+
   fprintf(prt_file, "\n\n");
   fprintf(prt_file, "Variable                   Final Value        Lower Limit        Upper Limit\n");
   fprintf(prt_file, "-------------------------------------------------------------------------------\n");
@@ -513,6 +546,24 @@ void match_match(struct in_cmd* cmd)
     }
   /* END CHK-KEEPORBIT; HG 28.1.2003 */
 
+  /* START CHK-R-MATRIX; OB 6.10.2003 */
+  pos = name_list_pos("rmatrix", nl);
+  if(nl->inform[pos]) /* rmatrix specified */
+    {
+     cp = cmd->clone->par->parameters[pos];
+     for (i = 0; i < match_num_seqs; i++)
+       {
+      /* START adding rmatrix to TWISS input command for each sequence */
+      tnl = local_twiss[i]->cmd_def->par_names;
+      tpos = name_list_pos("rmatrix", tnl);
+      local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+      local_twiss[i]->cmd_def->par->parameters[tpos]->double_value
+               = 1;
+      /* END adding rmatrix to TWISS input command for each sequence */
+       }
+    }
+  /* END CHK-R-MATRIX; OB 6.10.2003 */
+
   /* START CHK-ENTRIES of TYPE DOUBLE-REAL; OB 23.1.2002 */
   for (j = 0; j < nl->curr; j++)
     {
@@ -575,7 +626,7 @@ void match_prepare_varypos()
 /* keeps constraints from nodes, reexpands, adds constraints to nodes */
 {
   struct node* node = current_sequ->ex_start;
-  struct constraint_list** tmplist = (struct constraint_list**)
+  struct constraint_list** tmplist = (struct constraint_list**) 
          malloc(current_sequ->n_nodes * sizeof(struct constraint_list*));
   int i = 0;
   while (node != NULL)
