@@ -288,6 +288,8 @@ FILE *f2, *f3, *f3aux, *f3matrix, *f3aper, *f8, *f16, *f34;
 
 void conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
 {
+  last_row = 0;
+
   puts("  ++++++++++++++++++++++++++++");
   puts("  +   c6t version 2.0        +");
   puts("  ++++++++++++++++++++++++++++\n");
