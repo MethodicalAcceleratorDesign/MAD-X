@@ -1749,6 +1749,7 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
         new_el->twtab_row = el->twtab_row;
         new_el->na_err = el->na_err; /* el->na_err = 0; */
         new_el->p_al_err = el->p_al_err; /*  el->p_al_err = NULL; */
+        new_el->tilt_err = el->tilt_err; /*  keep tilt info */
         link_c6t_in_front(new_el, el);
         add_to_ellist(new_el);
         strcpy(tmp_name, el->name); strcpy(el->name, new_el->name);
@@ -1884,7 +1885,8 @@ void pro_elem(struct node* cnode)
       current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
   }
   /* if we have a tilt set the flag */
-  if (current_element->n_values >= 7 && current_element->value[6] > zero) {
+  if (current_element->n_values >= 7 && fabs(current_element->value[6]) > zero) {
+    align_cnt++;
     current_element->tilt_err = 1;
   } else {
     current_element->tilt_err = 0;
