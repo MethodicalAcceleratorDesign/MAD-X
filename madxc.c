@@ -115,14 +115,17 @@ void correct_correct2(struct in_cmd* cmd)
   char    *conm;             /* vector to hold corrector names (for MICADO) */
   int     *sing;             /* array to store pointer to singular correctors */
   static int     *nm, *nx, *nc;
-  struct id_mic2  *c, *m;
+  struct id_mic2  *c;
+  /*
+  struct id_mic2   *m;
+  */
 
   strcpy(clist1,"\0");
   strcpy(clist2,"\0");
 
   printf("for two beam orbit corrections ...\n");
   ip = pro_correct_getcommands(cmd);
-  im = correct2_gettables(ip,cmd);
+  im = pro_correct2_gettables(ip,cmd);
   ncorr = im%10000; nmon  = im/10000;
   printf("%d monitors and %d correctors found in input\n",nmon,ncorr);
   if(nmon == 0) {
@@ -305,10 +308,10 @@ void correct_correct2(struct in_cmd* cmd)
 
 }
 
-int  correct2_gettables(int iplane, struct in_cmd* cmd)
+int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 {
 
-  char rout_name[] = "correct2_gettables";
+  char rout_name[] = "pro_correct2_gettables";
 
   struct id_mic2 *cor_l1,  *cor_l2;
   struct id_mic2 *mon_l1,  *mon_l2;
@@ -317,8 +320,8 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
 
   struct table *ttb;
 
-  struct table *b1;
-  struct table *b2;
+  struct table *b1 = NULL;
+  struct table *b2 = NULL;
 
   char* orbtab1;
   char* orbtab2;
@@ -361,13 +364,17 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
 
   }
 
-// store as globals for later use
-  twiss_table_beam1 = b1;
-  twiss_table_beam2 = b2;
+/* store as globals for later use */
+  if((b1 != NULL) && (b2 != NULL)) {
+     twiss_table_beam1 = b1;
+     twiss_table_beam2 = b2;
+  } else {
+       fatal_error("Beam 1 and 2 orbit tables not found:",orbtab1);
+  }
  
-// reserve space for orbit correction structures
+/* reserve space for orbit correction structures */
   if(correct_orbit12 == NULL) {
-    correct_orbit12 = (struct orb_cor2*)mycalloc("correct2_gettables",1, 
+    correct_orbit12 = (struct orb_cor2*)mycalloc("pro_correct2_gettables",1, 
                      sizeof(struct orb_cor2));
   }
 
@@ -376,11 +383,11 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
   if(correct_orbit12->cor_table != NULL) myfree(rout_name,correct_orbit12->cor_table);
   if(correct_orbit12->mon_table != NULL) myfree(rout_name,correct_orbit12->mon_table);
 
-  correct_orbit12->cor_table = (struct id_mic2 *)mycalloc("correct2_gettables_cor",5200, sizeof(struct id_mic2));
-  correct_orbit12->mon_table = (struct id_mic2 *)mycalloc("correct2_gettables_mon",5200, sizeof(struct id_mic2));
+  correct_orbit12->cor_table = (struct id_mic2 *)mycalloc("pro_correct2_gettables_cor",5200, sizeof(struct id_mic2));
+  correct_orbit12->mon_table = (struct id_mic2 *)mycalloc("pro_correct2_gettables_mon",5200, sizeof(struct id_mic2));
 
   ttb = model_table;
-// no more need, we have b1 and b2 as pointers ...
+/* no more need, we have b1 and b2 as pointers .. */
 
   correct_orbit12->mon_table->previous = NULL;
   correct_orbit12->mon_table->next = NULL;
@@ -393,7 +400,7 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
   for (j=0; j < b1->curr; j++) {
    if((strncmp(atm[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
       (strncmp(atm[2],      b1->p_nodes[j]->base_name,4) == 0))  {
-//    printf("1m: %s %ld\n", b1->p_nodes[j]->name, strstr(".b2", b1->p_nodes[j]->name));
+/*    printf("1m: %s %ld\n", b1->p_nodes[j]->name, strstr(".b2", b1->p_nodes[j]->name)); */
       if(strstr(b1->p_nodes[j]->name,".b1") != NULL) {
         mon_l1->id_ttb[0] = j;
         mon_l1->id_ttb[1] = -1;
@@ -403,12 +410,12 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
         mon_l1->next++; mon_l1++;
         cntm1++;
       } else {
-//      printf("Removed: %s\n",b1->p_nodes[j]->name);
+/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
     if((strncmp(atm[iplane+2],b1->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atm[5],       b1->p_nodes[j]->base_name,4) == 0))  {
-//    printf("1c: %s %ld\n", b1->p_nodes[j]->name, b1->p_nodes[j]->name);
+/*    printf("1c: %s %ld\n", b1->p_nodes[j]->name, b1->p_nodes[j]->name); */
       if(strstr(b1->p_nodes[j]->name,".b1") != NULL) {
         cor_l1->id_ttb[0] = j;
         cor_l1->id_ttb[1] = -1;
@@ -424,7 +431,7 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l1->next++; cor_l1++;
         cntc1++;
       } else {
-//      printf("Removed: %s\n",b1->p_nodes[j]->name);
+/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
   }
@@ -434,7 +441,7 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
   for (j=0; j < b2->curr; j++) {
    if((strncmp(atm[iplane-1],b2->p_nodes[j]->base_name,4) == 0) ||
       (strncmp(atm[2],      b2->p_nodes[j]->base_name,4) == 0))  {
-//    printf("2m: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name);
+/*    printf("2m: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name); */
       if(strstr(b2->p_nodes[j]->name,".b2") != NULL) {
         mon_l2->id_ttb[0] = -1;
         mon_l2->id_ttb[1] = j;
@@ -444,12 +451,12 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
         mon_l2->next++; mon_l2++;
         cntm2++;
       } else {
-//      printf("Removed: %s\n",b2->p_nodes[j]->name);
+/*      printf("Removed: %s\n",b2->p_nodes[j]->name); */
       }
     }
     if((strncmp(atm[iplane+2],b2->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atm[5],       b2->p_nodes[j]->base_name,4) == 0))  {
-//    printf("2c: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name);
+/*    printf("2c: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name); */
       if(strstr(b2->p_nodes[j]->name,".b2") != NULL) {
         cor_l2->id_ttb[0] = -1;
         cor_l2->id_ttb[1] = j;
@@ -465,7 +472,7 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l2->next++; cor_l2++;
         cntc2++;
       } else {
-//      printf("Removed: %s\n",b2->p_nodes[j]->name);
+/*      printf("Removed: %s\n",b2->p_nodes[j]->name); */
       }
     }
   }
@@ -475,7 +482,7 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
   for (j=0; j < b1->curr; j++) {
    if((strncmp(atm[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
       (strncmp(atm[2],      b1->p_nodes[j]->base_name,4) == 0))  {
-//    printf("12m: %s \n", b1->p_nodes[j]->name);
+/*    printf("12m: %s \n", b1->p_nodes[j]->name); */
       if((strstr(b1->p_nodes[j]->name,".b1") == NULL)  &&
          (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
         mon_l12->id_ttb[0] = j;
@@ -490,12 +497,12 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
         mon_l12->next++; mon_l12++;
         cntm12++;
       } else {
-//      printf("Removed: %s\n",b1->p_nodes[j]->name);
+/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
     if((strncmp(atm[iplane+2],b1->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atm[5],       b1->p_nodes[j]->base_name,4) == 0))  {
-//    printf("12c: %s \n", b1->p_nodes[j]->name);
+/*    printf("12c: %s \n", b1->p_nodes[j]->name);     */
       if((strstr(b1->p_nodes[j]->name,".b1") == NULL)  &&
          (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
          cor_l12->id_ttb[0] = j;
@@ -520,11 +527,11 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l12->next++; cor_l12++;
         cntc12++;
       } else {
-//      printf("Removed: %s\n",b1->p_nodes[j]->name);
+/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
   }
-  // terminate linked list
+  /* terminate linked list   */
   mon_l12--; mon_l12->next = NULL;
   cor_l12--; cor_l12->next = NULL;
 
@@ -669,13 +676,13 @@ int pro_correct2_getcorrs(struct in_cmd* cmd)
   c = correct_orbit12->cor_table;
   while(c) {
     if(c->id_ttb[0] > 0) {
-//     c->val.before[0] = da1[59][c->id_ttb[0]]*1000.;
-//     c->val.before[1] = da1[60][c->id_ttb[0]]*1000.;
+/*     c->val.before[0] = da1[59][c->id_ttb[0]]*1000.; */
+/*     c->val.before[1] = da1[60][c->id_ttb[0]]*1000.; */
        c->val.before[0] = c->p_node_s1->chkick*1000.;
        c->val.before[1] = c->p_node_s1->cvkick*1000.;
     } else if(c->id_ttb[1] > 0) {
-//     c->val.before[0] = da2[59][c->id_ttb[1]]*1000.;
-//     c->val.before[1] = da2[60][c->id_ttb[1]]*1000.;
+/*     c->val.before[0] = da2[59][c->id_ttb[1]]*1000.; */
+/*     c->val.before[1] = da2[60][c->id_ttb[1]]*1000.; */
        c->val.before[0] = c->p_node_s2->chkick*1000.;
        c->val.before[1] = c->p_node_s2->cvkick*1000.;
     }
@@ -769,7 +776,7 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
   dmat = (double *)mycalloc("pro_correct2_response_ring",nc*nm,sizeof(double));
   imat = (int *)mycalloc("pro_correct2_response_ring",nc*nm,sizeof(int));
 
-// initialize imat:
+/* initialize imat: */
   for (i=0; i<nc; i++) {
      for (j=0; j<nm; j++) {
          setupi_(&i_zero, imat, &j, &i, &nm, &nc);
@@ -980,7 +987,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s1->chkick);
-//                                    c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]);
+/*                                    c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
            fprintf(fcdata,"[1] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]);
          }
@@ -993,7 +1000,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s2->chkick);
-//                                    c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]);
+/*                                    c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
            fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]);
          }
@@ -1008,7 +1015,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s1->cvkick);
-//                                    c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]);
+/*                                    c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
            fprintf(fcdata,"[1] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]);
          }
@@ -1021,7 +1028,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s2->cvkick);
-//                                    c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]);
+/*                                    c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
            fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]);
          }
@@ -1419,7 +1426,7 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
            printf("-0-\n");
        }
 
-//    if(corr_table == NULL) {
+/*    if(corr_table == NULL) {   */
     corr_table = make_table("corr", "corr", corr_table_cols,
             corr_table_types, 5000);
        if (get_option("debug")) {
@@ -1433,12 +1440,12 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
        if (get_option("debug")) {
            printf("-03-\n");
        }
-//    }
+/*    }                          */
        if (get_option("debug")) {
            printf("-1-\n");
        }
 
-//    if(mon_table == NULL) {
+/*    if(mon_table == NULL) { */
     mon_table = make_table("mon", "mon", mon_table_cols,
            mon_table_types, 5000);
        if (get_option("debug")) {
@@ -1452,7 +1459,7 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
        if (get_option("debug")) {
            printf("-13-\n");
        }
-//    }
+/*    }                       */
        if (get_option("debug")) {
            printf("-2-\n");
        }
@@ -1519,14 +1526,16 @@ int pro_correct_getorbit(struct in_cmd* cmd)
   int pos;
   struct id_mic *m;  /* access to tables for monitors and correctors */
   struct table *ttb;
-  struct table *tar;
+  struct table *tar = NULL;
   double **da1;
-  double **da2;
+  double **da2 = NULL;
   double xlimit;
   double rx, ry, dpsi;
 
   int    posx, posy, pospx, pospy;
-  int    tosx, tosy, tospx, tospy;
+  int    tosx = -1;
+  int    tosy = -1;
+  int    tospx, tospy;
 
   ttb = orbin_table;
   da1 = ttb->d_cols;
@@ -1652,18 +1661,19 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
   int pos;
   struct id_mic *m;  /* access to tables for monitors and correctors */
   struct table *ttb;
-  struct table *tar;
+  struct table *tar = NULL;
   double **da1;
-  double **da2;
+  double **da2 = NULL;
   double xlimit;
   char     name[NAME_L];
   char   l1name[NAME_L];
   char   l2name[NAME_L];
-  char   slname[NAME_L];
   double rx, ry, dpsi;
 
   int    posx, posy, pospx, pospy;
-  int    tosx, tosy, tospx, tospy;
+  int    tosx = -1;
+  int    tosy = -1;
+  int    tospx, tospy;
 
   int    jjx;
 
@@ -1816,8 +1826,8 @@ int pro_correct_getcorrs(struct in_cmd* cmd)
 
   c = correct_orbit->cor_table;
   while(c) {
-//  c->val.before[0] = da1[59][c->id_ttb]*1000.;
-//  c->val.before[1] = da1[60][c->id_ttb]*1000.;
+/*  c->val.before[0] = da1[59][c->id_ttb]*1000.;   */
+/*  c->val.before[1] = da1[60][c->id_ttb]*1000.;   */
     c->val.before[0] = c->p_node->chkick*1000.;
     c->val.before[1] = c->p_node->cvkick*1000.;
 
@@ -1907,7 +1917,7 @@ int pro_correct_filter(int iplane, double sigcut)
   struct table *ttb;
   static char  pl[2] = "xy";
   double **da1;
-  double bx_m;
+  double bx_m = -9999.;
   double xsig;
   double xmea, ymea;
   double xn;
@@ -2155,7 +2165,6 @@ void pro_correct_make_corr_table()
 void pro_correct2_make_corr_table()
 {
   struct id_mic2 *ttb;
-  int j;
   static char atm[5][4] = {"hmon","vmon","hkic","vkic","kick"};
 
   ttb = correct_orbit12->cor_table;
@@ -2199,7 +2208,6 @@ void pro_correct_make_mon_table()
 void pro_correct2_make_mon_table()
 {
   struct id_mic2 *ttb;
-  int j;
   static char atm[3][4] = {"hmon","vmon","moni"};
 
   ttb = correct_orbit12->mon_table;
@@ -2233,9 +2241,13 @@ void pro_correct_fill_corr_table(int ip ,char *name, double old, double new)
 
 void pro_correct2_fill_corr_table(int b, int ip ,char *name, double old, double new)
 {
-  struct table *cor;
+  struct table *cor = NULL;
 
   int j;
+
+  if((b != 1) && (b != 0)) {
+      fatal_error("Invalid beam requested:",(char *)b);
+  }
 
   if(b == 0) cor =  corr_table1;
   if(b == 1) cor =  corr_table2;
@@ -2350,7 +2362,7 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
                                   c[nc[i]].p_node->name,
                                   c[nc[i]].val.before[ip-1]*0.001,
                                   c[nc[i]].p_node->chkick);
-//                                c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]);
+/*                                c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]); */
       if(fcdata != NULL) {
          fprintf(fcdata,"%s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]);
       }
@@ -2360,7 +2372,7 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
                                   c[nc[i]].p_node->name,
                                   c[nc[i]].val.before[ip-1]*0.001,
                                   c[nc[i]].p_node->cvkick);
-//                                c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]);
+/*                                c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]); */
       if(fcdata != NULL) {
          fprintf(fcdata,"%s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]);
       }
@@ -2600,7 +2612,6 @@ void c_haveit(double *dmat,double *monvec,double *corvec,double *resvec,int *nx,
 int  c_svddec(double *dmat, int imon, int icor, int *sing)
 {
   char rout_name[] = "c_svddev";
-  int    i;
   int    flag;
   int    dbg;
 
@@ -2638,7 +2649,6 @@ int  c_svddec(double *dmat, int imon, int icor, int *sing)
 int  c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int imon, int icor)
 {
   char rout_name[] = "c_svdcorr";
-  int    i;
   int    flag;
   int    dbg;
 
@@ -2710,13 +2720,13 @@ void   f_ctof(int *j, char *string, int *nel)
 
 float fextim()
 {
-   #if ( __GNUC__==2 && __GNUC_MINOR__ > 94 ) || __GNUC__ > 2 //hbu  gettimeofday available
+   #if ( __GNUC__==2 && __GNUC_MINOR__ > 94 ) || __GNUC__ > 2 /*hbu  gettimeofday available */
      float mytime;
      struct timeval tp;
      struct timezone tzp;
      gettimeofday(&tp,&tzp);
-     mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; // seconds from epoch, modulo 10 000
-   #else // use old ftime
+     mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; /* seconds from epoch, modulo 10 000 */
+   #else /* use old ftime */
      struct timeb tp;
      float mytime;
 
@@ -2793,7 +2803,6 @@ struct table* read_my_table(struct in_cmd* cmd)
   char *cc, *filename, *type = NULL, *tmp, *name;
 
   char* namtab;
-  int   t1;
 
   if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
        printf("Want to make named table: %s\n",namtab);
@@ -2932,9 +2941,7 @@ void correct_setcorr(struct in_cmd* cmd)
    ===> Uses table with name specified in parameter: table=
 */
 
-  struct name_list* nl = cmd->clone->par_names;
-  int i, ix, iy, debug;
-  int val, pos, seed;
+  int i, ix;
 
   struct node *ndexe;
   struct node *nextnode;
@@ -2948,7 +2955,7 @@ void correct_setcorr(struct in_cmd* cmd)
   char*    namtab;
   int      t1;
 
-  double   xold, xnew, yold, ynew;
+  double   xnew, ynew;
 
 /* set up pointers to current sequence for later use */
   struct sequence* mysequ = current_sequ;
@@ -3040,9 +3047,7 @@ void correct_readcorr(struct in_cmd* cmd)
    ===> Always uses table with name "corr", will change ...
 */
 
-  struct name_list* nl = cmd->clone->par_names;
-  int i, ix, iy, debug;
-  int val, pos, seed;
+  int i, ix;
 
   struct node *ndexe;
   struct node *nextnode;
@@ -3057,7 +3062,7 @@ void correct_readcorr(struct in_cmd* cmd)
   char   slnname[NAME_L];
   char* uslnname;
 
-  double   xold, xnew, yold, ynew;
+  double   xnew, ynew;
 
 /* set up pointers to current sequence for later use */
   struct sequence* mysequ = current_sequ;

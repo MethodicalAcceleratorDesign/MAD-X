@@ -55,9 +55,7 @@ void error_seterr(struct in_cmd* cmd)
    ===> (unless table exists in memory !)
 */
 
-  struct name_list* nl = cmd->clone->par_names;
-  int i, ix, iy, debug;
-  int val, pos, seed;
+  int i, ix;
   int j;
 
   struct node *ndexe;
@@ -74,8 +72,6 @@ void error_seterr(struct in_cmd* cmd)
 
   struct   table  *err;
 
-  double   xold, xnew, yold, ynew;
-
 /* set up pointers to current sequence for later use */
   struct sequence* mysequ = current_sequ;
   nextnode = mysequ->ex_start;
@@ -91,6 +87,8 @@ void error_seterr(struct in_cmd* cmd)
           /* fatal_error("Error table requested, but not existing:",namtab); */
           /* exit(-77); */ 
           printf("No such error table in memory: %s\n",namtab);
+          /* try now, better a clean exit afterwards ... */
+          exit(-77);
        }
 
   } else {
@@ -99,6 +97,15 @@ void error_seterr(struct in_cmd* cmd)
          printf("Use default name\n");
        }
        strcpy(namtab,"error");
+       if ((t1 = name_list_pos(namtab, table_register->names)) > -1) {
+          printf("The default table ==> %s <=== was found \n",namtab);
+       } else {
+          /* fatal_error("Error table requested, but not existing:",namtab); */
+          /* exit(-77); */ 
+          printf("No default error table in memory: %s\n",namtab);
+          /* try now, better a clean exit afterwards ... */
+          exit(-77);
+       }
   }
  
   err = table_register->tables[t1];
@@ -127,7 +134,7 @@ void error_seterr(struct in_cmd* cmd)
        
              if(strcmp(slname,slnname) == 0) {
 
-//              printf("O.K.:  %s in sequence and input table\n",slname);
+/*              printf("O.K.:  %s in sequence and input table\n",slname); */
                 /*
                 ===>  now we have the match of the elements ..
                 */
@@ -140,11 +147,11 @@ void error_seterr(struct in_cmd* cmd)
                 nextnode->p_al_err->curr = ALIGN_MAX;
 
                 for (j = 1; j < EFIELD_TAB; j++) {
-             //   printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]);
+             /*   printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]); */
                   nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
                 }
                 for (j = 1; j < err->num_cols-EFIELD_TAB; j++) {
-             //   printf("ealign errors: %d %e\n",j,err->d_cols[j+EFIELD_TAB][i-1]);
+             /*   printf("ealign errors: %d %e\n",j,err->d_cols[j+EFIELD_TAB][i-1]); */
                   nextnode->p_al_err->a[j-1] = err->d_cols[j+EFIELD_TAB][i-1];
                 }
                 
@@ -167,12 +174,12 @@ return;
 void error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
-//  if(efield_table == NULL) {
+/*  if(efield_table == NULL) { */
        efield_table = make_table("efield", "efield", efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
        pro_error_make_efield_table();
-//  }
+/*  }                          */
     ef_table_file = command_par_string("file",cmd->clone);
     out_table("efield",efield_table,ef_table_file);
 }
@@ -315,13 +322,14 @@ void error_efcomp(struct in_cmd* cmd)
   struct node *nextnode;
   int i,j,k;
   int    lvec;
-  int    hyst;
+  int    hyst = 0;
   int    flgmgt = 0;
   int chcount[3] = {0,0,0};
   char rout_name[] = "error_efcomp";
   double norfac; /* factor for normalization at reference radius */
-  int    n;     /* order of reference multipole */
-  double rr, rrr;    /* reference radius for multipole error */
+  int    n = -1;     /* order of reference multipole */
+  double rr = 0.0;   /* reference radius for multipole error */
+  double rrr = 0.0;  /* reference radius for multipole error */
   struct double_array *ptr;
   struct double_array *pcoef;
   double h_co_n[FIELD_MAX/2][4];
@@ -348,7 +356,7 @@ void error_efcomp(struct in_cmd* cmd)
 
   nl = cmd->clone->par_names;
 
-// here comes a kludge, check which of the assignment vectors is there
+/* here comes a kludge, check which of the assignment vectors is there */
 /*
     i = 0;
     while((cmd->tok_list->p[i]) != NULL) {
@@ -416,7 +424,7 @@ void error_efcomp(struct in_cmd* cmd)
                hyst = val[i];
                /* debug printout */
                if (get_option("debug"))
-               fprintf(prt_file, "hyster flag is %d\n",val[i]);
+               fprintf(prt_file, "hyster flag is %d\n",(int)val[i]);
              }
           }
 
@@ -451,7 +459,8 @@ void error_efcomp(struct in_cmd* cmd)
 
 
 /* get length of node and check if magnet */
-           ref_str = 0.0;
+           ref_str  = 0.0;
+           ref_strn = 0.0;
            nlength = node_value("l");
            ref_len = nlength;
            if (get_option("debug"))
@@ -471,6 +480,7 @@ void error_efcomp(struct in_cmd* cmd)
            if (get_option("debug"))
            fprintf(prt_file, "====n====>>> %d %f %f \n\n",n,nvec[n],nlength);
            ref_str = nvec[n];
+           ref_strn = fabs(ref_str);
          } else if (strcmp(nextnode->base_name,"sbend") == 0) {
            nvec0 = node_value("k0");
            if (get_option("debug")) {

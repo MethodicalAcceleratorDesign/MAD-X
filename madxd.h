@@ -553,6 +553,7 @@ void pro_ptc_twiss();
 void put_info(char*, char*);
 struct table* read_table(struct in_cmd*);
 struct table* read_my_table(struct in_cmd*);
+struct table* read_his_table(struct in_cmd*);
 int remove_colon(char**, int, int);
 void remove_from_command_list(char*, struct command_list*);
 int remove_from_name_list(char*, struct name_list*);
@@ -678,9 +679,13 @@ int zero_string(char*);
 void pro_correct(struct in_cmd* cmd);
 int  pro_correct_getcommands(struct in_cmd* cmd);
 int  pro_correct_gettables(int ip, struct in_cmd* cmd);
-int  pro_correct2_gettables(int ip, struct in_cmd* cmd);
 int  pro_correct_getorbit(struct in_cmd* cmd);
 int  pro_correct_getorbit_ext(struct in_cmd* cmd);
+int  pro_correct_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, double *monvec,char *conm);
+int  pro_correct2_gettables(int ip, struct in_cmd* cmd);
+int  pro_correct2_getorbit(struct in_cmd* cmd);
+int  pro_correct2_getcorrs(struct in_cmd* cmd);
+int  pro_correct2_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, double *monvec,char *conm);
 void pro_correct_prtwiss();
 void pro_correct_write_cocu_table();
 void pro_correct_fill_corr_table(int ip , char *name, double old, double new);
@@ -693,14 +698,16 @@ void pro_correct_make_mon_table();
 void pro_correct2_make_mon_table();
 void pro_correct_fill_mon_table(int ip ,char *name, double old, double new);
 void pro_correct2_fill_mon_table(int ip ,char *name, double old, double new);
-int pro_correct_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, double *monvec,char *conm);
 double crms(double *r, int m);
 float  fextim();
-
 
 double* pro_correct_response_ring(int ip, int nc, int nm);
 double* pro_correct2_response_ring(int ip, int nc, int nm);
 double* pro_correct_response_line(int ip, int nc, int nm);
+
+/* define utilities for orbit and error routines */
+int str_from_table(char* table, char* name, int* row, char* val);
+int str_from_tablet(struct table *t, char* name, int* row, char* val);
 
 /* C wrapper to allocate memory for Fortran77 */
 int c_micit(double *,char *,double *,double *,double *,int *,float,int,int,int);
