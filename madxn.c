@@ -9270,7 +9270,7 @@ void write_nice(char* string, FILE* file)
      for (pos = LINE_FILL; pos > 10; pos--)
        {
 	k = c[pos];
-	if (strchr(" '+-*/", k))  break;
+	if (strchr(" ,+-*/", k))  break;
        }
      c[pos] = '\0';
      add[0] = k; add[1] = '\0';
@@ -9295,7 +9295,7 @@ void write_nice_8(char* string, FILE* file)
      for (pos = LINE_F_MAD8; pos > 10; pos--)
        {
 	k = c[pos];
-	if (strchr(" '+-*/", k))  break;
+	if (strchr(" ,+-*/", k))  break;
        }
      c[pos] = '\0';
      add[0] = k; add[1] = '\0';
