@@ -1596,7 +1596,7 @@
 ! it is called by the routine exec_plot in file madxn.c after pefill.  *
 !----------------------------------------------------------------------*
 
-      implicit none     
+      implicit none
 
       include 'plot.fi'
       include 'plot_b.fi'

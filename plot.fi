@@ -7,7 +7,7 @@
       parameter (mcnam = 16, maxpnt = 500)
 
 !--- szcompar is the size of the arrays returned by the routine comm_para
-      integer szcompar  	
+      integer szcompar
       parameter (szcompar = 100)
 
 !--- szchara is the size of the character strings char_a & version in
@@ -18,7 +18,7 @@
 !--- character sizes:
 !   MLSIZE    label character height
 !   MTSIZE    text   - " -
-!   MASIZE    annotation - " -	
+!   MASIZE    annotation - " -
       integer mlsize, mtsize, masize
       parameter  (mlsize = 13,mtsize = 13,masize = 20)
 

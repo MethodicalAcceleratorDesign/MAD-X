@@ -2836,7 +2836,7 @@
         dpy = dbi + (di * x + dr * y)
 
 
-*---- Radiation effects at entrance.
+!---- Radiation effects at entrance.
         if (dorad  .and.  elrad .ne. zero) then
           dpxr = dpx + dipr
           dpyr = dpy + dipi
@@ -2857,7 +2857,7 @@
         orbit(4) = orbit(4)-dipi*dipi/elrad*y
       endif
 
-*---- Radiation effects at exit.
+!---- Radiation effects at exit.
         if (dorad  .and.  elrad .ne. zero) then
           pt = orbit(6)
           orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
