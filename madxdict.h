@@ -1176,7 +1176,8 @@ char command_def[] =
 /* "fast     = [l, false, true], " */
 "aperture = [l, false, true], "
 "onetable = [l, false, true], "
-"file     = [s, track, track]; "
+"file     = [s, track, track], "
+"extension= [s, none, none]; "
 " "
 "dynap: track track 0 0 "
 "turns   = [i, 64], "
