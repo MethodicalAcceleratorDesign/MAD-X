@@ -1,4 +1,4 @@
-struct r_char_array           /* dynamic array of char for regex */
+struct r_char_array             /* dynamic array of char for regex */
 {
   int  max,                     /* max. array size */
        curr;                    /* current occupation */
