@@ -241,16 +241,16 @@ struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
     if ((kn_param->expr_list->list[i]!=NULL && zero_string(kn_param->expr_list->list[i]->string)==0)
       || kn_param->double_array->a[i]!=0) {
       last_non_zero=i;
-      if (kl_flag == 0 && angle_conversion==0) {
-      if ((length_param->expr) || (kn_param->expr_list->list[i])) {
-        kn_param->expr_list->list[i] =
-          compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
-          "*",length_param->expr,length_param->double_value);
-      } else {
-        kn_param->double_array->a[i] =  kn_param->double_array->a[i] * length_param->double_value;
+        if (kl_flag == 0 && (angle_conversion==0||i>0)) { /*hbu apply the angle_conversion==0 check only to zero order multipole */
+        if ((length_param->expr) || (kn_param->expr_list->list[i])) {
+          kn_param->expr_list->list[i] =
+            compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
+            "*",length_param->expr,length_param->double_value); /* multiply expression with length */
+        } else { /* multiply value with length */
+          kn_param->double_array->a[i] =  kn_param->double_array->a[i] * length_param->double_value;
+        }
       }
-      }
-      if (slices > 1) {
+      if (slices > 1) { /* give the correct weight by slice (multiply with the inverse of the number of slices) */
       if (kn_param->expr_list->list[i])  {
         kn_param->expr_list->list[i] =
           compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
