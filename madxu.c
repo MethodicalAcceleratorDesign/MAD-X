@@ -3079,7 +3079,9 @@ void write_table(struct table* t, char* filename)
   tm = localtime(&now); /* split system time */
   if (strcmp(filename, "terminal") == 0) out_file = stdout;
   else if ((out_file = fopen(filename, "w")) == NULL)
-      warning("cannot open output file:", filename);
+    {
+     warning("cannot open output file:", filename); return;
+    }
   if (t != NULL)
     {
      strcpy(l_name, t->name);
