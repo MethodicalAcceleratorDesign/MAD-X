@@ -27,10 +27,10 @@ subroutine ptc_input(lhc,icav,EXCEPTION)
   !!valid October 2002: oldscheme=.true.
   CALL MAKE_STATES(PARTICLE)
 
-  with_external_frame=.false.
-  with_internal_frame=.false.
-  with_chart=.false.
-  with_patch=.false.
+!  with_external_frame=.false.
+!  with_internal_frame=.false.
+!  with_chart=.false.
+!  with_patch=.false.
   mad=.true. ! permanent
   madlength=.false.
 
