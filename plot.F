@@ -516,16 +516,16 @@
       integer pos, itp
       double precision temp(*), dstp, am(6,6)
 
-      double precision e2, rk2, cangle, sangle, tilt, d, f 
+      double precision e2, e2s, rk2, cangle, sangle, tilt, d, f 
       double precision ek(6), te(6,6,6), orbit(6), am2(6,6)
       double precision node_value
       integer i, j, k
       logical drift, bend, quad, fmap,ftrk,cecptk,cebttk
+      common /e2/ e2s
 
 !--- Initialise
 
       ftrk = .false.
-      e2 = 0.0d0
       do i = 1, 6
         do j = 1, 6
           am(j,i) = zero
@@ -558,10 +558,11 @@
       else
          if (bend) then
             if (pos .eq. 1) then
-              e2 = node_value('e2 ')
-              call store_node_value('e2 ', zero)
-            endif  
-            if (pos .eq. 3) call store_node_value('e2 ', e2)
+               e2s = node_value('e2 ')
+               call store_node_value('e2 ', zero)
+            endif
+            if (pos .eq. 3) call store_node_value('e2 ', e2s)
+            e2s = 0d0
             call tmbend(.false.,orbit,fmap,dstp,ek,am,te)
          else
 
@@ -688,6 +689,8 @@
      &d_val, d_val1, adble(m_adble)
       real tval, step
       logical machp, rselect
+      double precision e2s
+      common /e2/ e2s
 !--- codes see in peschm
       data ilist /                                                      &
      &0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
@@ -695,6 +698,7 @@
      &0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
      &20 * 0 /
 
+      e2s = 0d0
       do i=1,mxplot
         p(i)=0
       enddo
