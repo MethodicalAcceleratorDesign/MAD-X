@@ -181,6 +181,9 @@ module precision_constants
   integer,private,parameter::n_read_max=20,NCAR=120
   private EQUAL_i,EQUAL_Si,EQUAL_r,EQUAL_c,WRITE_G
   private read_d,read_int,read_int_a,read_d_a
+  logical(lp), parameter:: my_true=.true.
+  logical(lp), parameter:: my_false=.false.
+  logical(lp) :: global_verbose=.true.
 
   type info_window
      character(3) adv
@@ -240,14 +243,16 @@ module precision_constants
      LOGICAL(lp), pointer :: MAD         !=.false. mad definition of multipole for input only
      LOGICAL(lp), pointer :: EXACT_MODEL != .false. exact model used
      logical(lp),pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
-     logical(lp),pointer :: ALWAYS_FRINGE !=.FALSE.  quadrupole fringe permanent
+     INTEGER,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
      ! creates a reverse propagator
      INTEGER,pointer ::FIBRE_DIR         !=1 or -1 for reversed
      ! creates a reverse propagator and a reversed ring in combination with above
      logical(lp),pointer ::FIBRE_flip    !=.true.
 
      ! fill once and never touch again
-     INTEGER, pointer :: SECTOR_NMUL     != 4 maxwell equations is solved to order 4 in exact sectors
+
+     INTEGER, pointer :: SECTOR_NMUL_MAX     != 10 maxwell equations is solved to order 10 in exact sectors
+     INTEGER, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
      LOGICAL(lp), pointer:: electron     !  electron if true otherwise proton
      real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true
      ! global on the fly
@@ -257,6 +262,8 @@ module precision_constants
      ! used to output horror messages
      logical,pointer :: escape_da !=.false.  interrupts DA if check_da is true
      logical,pointer :: check_da  !=.true.
+     logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK  !=.true.
+     real(dp),pointer :: phase0 ! default phase in cavity
      character*120 message
   end TYPE CONTROL
 
@@ -391,6 +398,7 @@ contains
     IMPLICIT NONE
     INTEGER, OPTIONAL :: IEX
     INTEGER I,MYPAUSE,IPAUSE
+    if(.not.global_verbose) return
     IF(W_P%NC/=0) THEN
        if(W_P%FC/=' ') then
           WRITE(6,W_P%FC,advance=W_P%ADV) (W_P%C(I), I=1,W_P%NC)
