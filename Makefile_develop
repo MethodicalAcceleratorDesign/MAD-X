@@ -6,19 +6,19 @@
 
 # parameters
 
-FCP=-O3 -fno-second-underscore -funroll-loops
-FCM=-O2 -fno-second-underscore -funroll-loops
+FCP=-O3 -fno-second-underscore -funroll-loops -I.
+FCM=-O2 -fno-second-underscore -funroll-loops -I.
 FCDB=-g -O0 -fno-second-underscore
 FC=g77
 f95=f95
 GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM
 GCCP_FLAGS=-g -O3 -funroll-loops -fno-second-underscore -D_CATCH_MEM
-f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan
-#f95_FLAGS=-c -O4 -maxcontin=24 -w=unused
-FFLAGS77=-gline -g90 -c -maxcontin=24 -nan -ieee=full
-#FFLAGS77=-g90 -c -O4 -maxcontin=24 -w=unused
+f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
+#f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
+FFLAGS77=-gline -g90 -c -fpp -maxcontin=24 -nan -ieee=full
+#FFLAGS77=-g90 -c -fpp -O4 -maxcontin=24 -w=unused -ieee=full
 CC=gcc
-LIBX="-L/usr/X11R6/lib" -lX11
+LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/"
 GLIB=/afs/cern.ch/group/si/slap/lib
 GPUB=/afs/cern.ch/group/si/slap/bin
 
