@@ -489,18 +489,17 @@ void copy_name_list(struct name_list* out, struct name_list* in)
 
 struct char_array* delete_char_array(struct char_array* pa)
 {
+  char rout_name[] = "delete_char_array";
   if (pa == NULL)  return NULL;
-  if (stamp_flag && pa->stamp != 123456)
-     fprintf(stamp_file, "d_c_a double delete --> %s\n", pa->name);
-  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", pa->name);
-  if (pa->c != NULL)  free(pa->c);
-  free(pa);
+  if (pa->c != NULL)  myfree(rout_name, pa->c);
+  myfree(rout_name, pa);
   return NULL;
 }
 
 struct char_p_array* delete_char_p_array(struct char_p_array* pa, int flag)
      /* flag = 0: delete only pointer array, = 1: delete char. buffers, too */
 {
+  char rout_name[] = "delete_char_p_array";
   int i;
   if (pa == NULL)  return NULL;
   if (stamp_flag && pa->stamp != 123456)
@@ -508,27 +507,29 @@ struct char_p_array* delete_char_p_array(struct char_p_array* pa, int flag)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", pa->name);
   if (flag)
     {
-     for (i = 0; i < pa->curr; i++)  free(pa->p[i]);
+     for (i = 0; i < pa->curr; i++)  myfree(rout_name, pa->p[i]);
     }
-  if (pa->p != NULL)  free(pa->p);
-  free(pa);
+  if (pa->p != NULL)  myfree(rout_name, pa->p);
+  myfree(rout_name, pa);
   return NULL;
 }
 
 struct command* delete_command(struct command* cmd)
 {
+  char rout_name[] = "delete_command";
   if (cmd == NULL) return NULL;
   if (stamp_flag && cmd->stamp != 123456)
      fprintf(stamp_file, "d_c double delete --> %s\n", cmd->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", cmd->name);
   if (cmd->par != NULL)  delete_command_parameter_list(cmd->par);
   if (cmd->par_names != NULL) delete_name_list(cmd->par_names);
-  free(cmd);
+  myfree(rout_name, cmd);
   return NULL;
 }
 
 struct command_list* delete_command_list(struct command_list* cl)
 {
+  char rout_name[] = "delete_command_list";
   int i;
   if (cl == NULL) return NULL;
   if (stamp_flag && cl->stamp != 123456)
@@ -536,14 +537,15 @@ struct command_list* delete_command_list(struct command_list* cl)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", cl->name);
   if (cl->list != NULL) delete_name_list(cl->list);
   for (i = 0; i < cl->curr; i++) delete_command(cl->commands[i]);
-  if (cl->commands) free(cl->commands);
-  free(cl);
+  if (cl->commands) myfree(rout_name, cl->commands);
+  myfree(rout_name, cl);
   return NULL;
 }
 
 struct command_parameter*
        delete_command_parameter(struct command_parameter* par)
 {
+  char rout_name[] = "delete_command_parameter";
   if (par == NULL) return NULL;
   if (stamp_flag && par->stamp != 123456)
      fprintf(stamp_file, "d_c_p double delete --> %s\n", par->name);
@@ -554,13 +556,14 @@ struct command_parameter*
   if (par->double_array != NULL) delete_double_array(par->double_array);
   if (par->expr_list != NULL)    delete_expr_list(par->expr_list);
   if (par->m_string != NULL)     delete_char_p_array(par->m_string, 0);
-  free(par);
+  myfree(rout_name, par);
   return NULL;
 }
 
 struct command_parameter_list*
        delete_command_parameter_list(struct command_parameter_list* parl)
 {
+  char rout_name[] = "delete_command_parameter_list";
   int i;
   if (parl == NULL) return NULL;
   if (stamp_flag && parl->stamp != 123456)
@@ -571,78 +574,85 @@ struct command_parameter_list*
      for (i = 0; i < parl->curr; i++)
       if (parl->parameters[i] != NULL)
         parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
-     if (parl->parameters)  free(parl->parameters);
+     if (parl->parameters)  myfree(rout_name, parl->parameters);
     }
-  free(parl);
+  myfree(rout_name, parl);
   return NULL;
 }
 
 struct constraint* delete_constraint(struct constraint* cst)
 {
+  char rout_name[] = "delete_constraint";
   if (cst == NULL)  return NULL;
   if (stamp_flag && cst->stamp != 123456)
      fprintf(stamp_file, "d_c double delete --> %s\n", cst->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", "constraint");
-  free(cst);
+  myfree(rout_name, cst);
   return NULL;
 }
 
 struct constraint_list* delete_constraint_list(struct constraint_list* cl)
 {
+  char rout_name[] = "delete_constraint_list";
   if (cl == NULL)  return NULL;
   if (stamp_flag && cl->stamp != 123456)
      fprintf(stamp_file, "d_c_l double delete --> %s\n", cl->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", "constraint_list");
-  free(cl);
+  myfree(rout_name, cl);
   return NULL;
 }
 
 struct double_array* delete_double_array(struct double_array* a)
 {
+  char rout_name[] = "delete_double_array";
   if (a != NULL)
     {
-     if (a->a != NULL) free(a->a);
-     free(a);
+     if (a->a != NULL) myfree(rout_name, a->a);
+     myfree(rout_name, a);
     }
   return NULL;
 }
 
 struct element* delete_element(struct element* el)
 {
+  char rout_name[] = "delete_element";
   if (el == NULL)  return NULL;
   if (stamp_flag && el->stamp != 123456)
      fprintf(stamp_file, "d_e double delete --> %s\n", el->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", el->name);
-  free(el);
+  myfree(rout_name, el);
   return NULL;
 }
 
 struct el_list* delete_el_list(struct el_list* ell)
 {
+  char rout_name[] = "delete_el_list";
   if (ell->list == NULL) return NULL;
   if (stamp_flag && ell->stamp != 123456)
      fprintf(stamp_file, "d_e_l double delete --> %s\n", ell->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", ell->name);
   delete_name_list(ell->list);
-  if (ell->elem != NULL) free(ell->elem);
-  free(ell);
+  if (ell->elem != NULL) myfree(rout_name, ell->elem);
+  myfree(rout_name, ell);
   return NULL;
 }
 
 struct expression* delete_expression(struct expression* expr)
 {
+  char rout_name[] = "delete_expression";
   if (expr == NULL) return NULL;
   if (stamp_flag && expr->stamp != 123456)
      fprintf(stamp_file, "d_ex double delete --> %s\n", expr->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", expr->name);
   if (expr->polish != NULL) expr->polish = delete_int_array(expr->polish);
-  if (expr->string != NULL) free(expr->string);
-  free(expr);
+  if (expr->string != NULL) myfree(rout_name, expr->string);
+  myfree(rout_name, expr);
   return NULL;
 }
 
 struct expr_list* delete_expr_list(struct expr_list* exprl)
 {
+  char rout_name[] = "delete_expr_list";
   int i;
   if (exprl == NULL) return NULL;
   if (stamp_flag && exprl->stamp != 123456)
@@ -652,37 +662,40 @@ struct expr_list* delete_expr_list(struct expr_list* exprl)
     {
      for (i = 0; i < exprl->curr; i++)
       if (exprl->list[i] != NULL)  delete_expression(exprl->list[i]);
-     free(exprl->list);
+     myfree(rout_name, exprl->list);
     }
-  free(exprl);
+  myfree(rout_name, exprl);
   return NULL;
 }
 
 struct in_cmd* delete_in_cmd(struct in_cmd* cmd)
 {
+  char rout_name[] = "delete_in_cmd";
   if (cmd == NULL) return NULL;
   if (stamp_flag && cmd->stamp != 123456)
      fprintf(stamp_file, "d_i_c double delete --> %s\n", cmd->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", cmd->name);
   if (cmd->tok_list != NULL)
         cmd->tok_list = delete_char_p_array(cmd->tok_list, 0);
-  free(cmd);
+  myfree(rout_name, cmd);
   return NULL;
 }
 
 struct int_array* delete_int_array(struct int_array* i)
 {
+  char rout_name[] = "delete_int_array";
   if (i == NULL)  return NULL;
   if (stamp_flag && i->stamp != 123456)
      fprintf(stamp_file, "d_i_a double delete --> %s\n", i->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", i->name);
-  if (i->i != NULL) free(i->i);
-  free(i);
+  if (i->i != NULL) myfree(rout_name, i->i);
+  myfree(rout_name, i);
   return NULL;
 }
 
 struct macro* delete_macro(struct macro* macro)
 {
+  char rout_name[] = "delete_macro";
   if (macro == NULL)  return NULL;
   if (stamp_flag && macro->stamp != 123456)
      fprintf(stamp_file, "d_m double delete --> %s\n", macro->name);
@@ -690,32 +703,34 @@ struct macro* delete_macro(struct macro* macro)
   if (macro->formal != NULL) delete_char_p_array(macro->formal, 0);
   if (macro->tokens != NULL) delete_char_p_array(macro->tokens, 0);
   if (macro->body != NULL) delete_char_array(macro->body);
-  free(macro);
+  myfree(rout_name, macro);
   return NULL;
 }
 
 struct name_list* delete_name_list(struct name_list* l)
 {
+  char rout_name[] = "delete_name_list";
   if (l == NULL) return NULL;
   if (stamp_flag && l->stamp != 123456)
      fprintf(stamp_file, "d_n_l double delete --> %s\n", l->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", l->name);
-  if (l->index != NULL)  free(l->index);
-  if (l->inform != NULL)  free(l->inform);
-  if (l->names != NULL)   free(l->names);
-  free(l);
+  if (l->index != NULL)  myfree(rout_name, l->index);
+  if (l->inform != NULL)  myfree(rout_name, l->inform);
+  if (l->names != NULL)   myfree(rout_name, l->names);
+  myfree(rout_name, l);
   return NULL;
 }
 
 struct node* delete_node(struct node* p)
 {
+  char rout_name[] = "delete_node";
   if (p == NULL) return NULL;
   if (stamp_flag && p->stamp != 123456)
      fprintf(stamp_file, "d_n double delete --> %s\n", p->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", p->name);
   if (p->p_al_err) p->p_al_err = delete_double_array(p->p_al_err);
   if (p->p_fd_err) p->p_fd_err = delete_double_array(p->p_fd_err);
-  free(p);
+  myfree(rout_name, p);
   return NULL;
 }
 
@@ -735,47 +750,51 @@ struct node* delete_node_ring(struct node* start)
 
 struct node_list* delete_node_list(struct node_list* l)
 {
+  char rout_name[] = "delete_node_list";
   if (l == NULL)  return NULL;
   if (stamp_flag && l->stamp != 123456)
      fprintf(stamp_file, "d_no_l double delete --> %s\n", l->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", l->name);
-  if (l->nodes != NULL)  free(l->nodes);
+  if (l->nodes != NULL)  myfree(rout_name, l->nodes);
   if (l->list != NULL)  delete_name_list(l->list);
-  free(l);
+  myfree(rout_name, l);
   return NULL;
 }
 
 struct sequence* delete_sequence(struct sequence* sequ)
 {
+  char rout_name[] = "delete_sequence";
   if (sequ->ex_start != NULL)
     {
      sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
      sequ->ex_start = delete_node_ring(sequ->ex_start);
      sequ->orbits = delete_vector_list(sequ->orbits);
-     free(sequ->all_nodes);
+     myfree(rout_name, sequ->all_nodes);
     }
   if (sequ->l_expr) sequ->l_expr = delete_expression(sequ->l_expr);
   sequ->nodes = delete_node_list(sequ->nodes);
   sequ->start = delete_node_ring(sequ->start);
   if (sequ->cavities) sequ->cavities = delete_el_list(sequ->cavities);
-  free(sequ);
+  myfree(rout_name, sequ);
   return NULL;
 }
 
 struct sequence_list* delete_sequence_list(struct sequence_list* sql)
 {
+  char rout_name[] = "delete_sequence_list";
   if (sql == NULL) return NULL;
   if (stamp_flag && sql->stamp != 123456)
      fprintf(stamp_file, "d_s_l double delete --> %s\n", sql->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", sql->name);
   if (sql->list != NULL) delete_name_list(sql->list);
-  if (sql->sequs != NULL) free(sql->sequs);
-  free(sql);
+  if (sql->sequs != NULL) myfree(rout_name, sql->sequs);
+  myfree(rout_name, sql);
   return NULL;
 }
 
 struct table* delete_table(struct table* t)
 {
+  char rout_name[] = "delete_table";
   int i, j;
   if (t == NULL) return NULL;
   if (stamp_flag && t->stamp != 123456)
@@ -790,13 +809,13 @@ struct table* delete_table(struct table* t)
      if (t->l_head[i] != NULL)
         t->l_head[i] = delete_char_p_array(t->l_head[i], 1);
     }
-  if (t->l_head)  free(t->l_head);
-  if (t->p_nodes) free(t->p_nodes);
+  if (t->l_head)  myfree(rout_name, t->l_head);
+  if (t->p_nodes) myfree(rout_name, t->p_nodes);
   if (t->d_cols)
     {
      for (i = 0; i < t->num_cols; i++)
-        if (t->columns->inform[i] < 3 && t->d_cols[i]) free(t->d_cols[i]);
-     free(t->d_cols);
+        if (t->columns->inform[i] < 3 && t->d_cols[i]) myfree(rout_name, t->d_cols[i]);
+     myfree(rout_name, t->d_cols);
     }
   if (t->s_cols)
     {
@@ -805,43 +824,46 @@ struct table* delete_table(struct table* t)
         if (t->columns->inform[i] == 3 && t->s_cols[i])
         {
          for (j = 0; j < t->curr; j++)
-              if (t->s_cols[i][j]) free(t->s_cols[i][j]);
-           free(t->s_cols[i]);
+              if (t->s_cols[i][j]) myfree(rout_name, t->s_cols[i][j]);
+           myfree(rout_name, t->s_cols[i]);
         }
        }
-     free (t->s_cols);
+     myfree(rout_name, t->s_cols);
     }
   t->columns = delete_name_list(t->columns);
-  free(t);
+  myfree(rout_name, t);
   return NULL;
 }
 
 struct variable* delete_variable(struct variable* var)
 {
+  char rout_name[] = "delete_variable";
   if (var == NULL)  return NULL;
   if (stamp_flag && var->stamp != 123456)
      fprintf(stamp_file, "d_v double delete --> %s\n", var->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", var->name);
   if (var->expr != NULL) delete_expression(var->expr);
-  if (var->string != NULL) free(var->string);
-  free(var);
+  if (var->string != NULL) myfree(rout_name, var->string);
+  myfree(rout_name, var);
   return NULL;
 }
 
 struct var_list* delete_var_list(struct var_list* varl)
 {
+  char rout_name[] = "delete_var_list";
   if (varl == NULL) return NULL;
   if (stamp_flag && varl->stamp != 123456)
      fprintf(stamp_file, "d_v_l double delete --> %s\n", varl->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", varl->name);
   if (varl->list != NULL) delete_name_list(varl->list);
-  if (varl->vars != NULL) free(varl->vars);
-  free(varl);
+  if (varl->vars != NULL) myfree(rout_name, varl->vars);
+  myfree(rout_name, varl);
   return NULL;
 }
 
 struct vector_list* delete_vector_list(struct vector_list* vector)
 {
+  char rout_name[] = "delete_vector_list";
   int j;
   if (vector == NULL) return NULL;
   if (vector->names != NULL)
@@ -850,8 +872,8 @@ struct vector_list* delete_vector_list(struct vector_list* vector)
        if (vector->vectors[j]) delete_double_array(vector->vectors[j]);
      delete_name_list(vector->names);
     }
-  if (vector->vectors != NULL) free(vector->vectors);
-  free(vector);
+  if (vector->vectors != NULL) myfree(rout_name, vector->vectors);
+  myfree(rout_name, vector);
   return NULL;
 }
 
@@ -1551,7 +1573,7 @@ void grow_char_array( /* doubles array size */
   p->max = new;
   p->c = (char*) mymalloc(rout_name, new);
   for (j = 0; j < p->curr; j++) p->c[j] = p_loc[j];
-  free(p_loc);
+  myfree(rout_name, p_loc);
 }
 
 void grow_char_p_array( /* doubles array size */
@@ -1564,7 +1586,7 @@ void grow_char_p_array( /* doubles array size */
   p->max = new;
   p->p = (char**) mycalloc(rout_name,new, sizeof(char*));
   for (j = 0; j < p->curr; j++) p->p[j] = p_loc[j];
-  free(p_loc);
+  myfree(rout_name, p_loc);
 }
 
 void grow_command_list( /* doubles list size */
@@ -1578,7 +1600,7 @@ void grow_command_list( /* doubles list size */
   p->commands
      = (struct command**) mycalloc(rout_name,new, sizeof(struct command*));
   for (j = 0; j < p->curr; j++) p->commands[j] = c_loc[j];
-  free(c_loc);
+  myfree(rout_name, c_loc);
 }
 
 void grow_command_list_list( /* doubles list size */
@@ -1592,7 +1614,7 @@ void grow_command_list_list( /* doubles list size */
   p->command_lists = (struct command_list**)
                      mycalloc(rout_name,new, sizeof(struct command_list*));
   for (j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
-  free(c_loc);
+  myfree(rout_name, c_loc);
 }
 
 void grow_command_parameter_list( /* doubles list size */
@@ -1606,7 +1628,7 @@ void grow_command_parameter_list( /* doubles list size */
   p->parameters = (struct command_parameter**)
                    mycalloc(rout_name,new, sizeof(struct command_parameter*));
   for (j = 0; j < p->curr; j++) p->parameters[j] = c_loc[j];
-  free(c_loc);
+  myfree(rout_name, c_loc);
 }
 
 void grow_constraint_list( /* doubles list size */
@@ -1620,7 +1642,7 @@ void grow_constraint_list( /* doubles list size */
   p->constraints = (struct constraint**)
                     mycalloc(rout_name,new, sizeof(struct constraint*));
   for (j = 0; j < p->curr; j++) p->constraints[j] = c_loc[j];
-  free(c_loc);
+  myfree(rout_name, c_loc);
 }
 
 void grow_double_array( /* doubles array size */
@@ -1633,7 +1655,7 @@ void grow_double_array( /* doubles array size */
   p->max = new;
   p->a = (double*) mymalloc(rout_name,new * sizeof(double));
   for (j = 0; j < p->curr; j++) p->a[j] = a_loc[j];
-  free(a_loc);
+  myfree(rout_name, a_loc);
 }
 
 void grow_el_list( /* doubles list size */
@@ -1646,7 +1668,7 @@ void grow_el_list( /* doubles list size */
   p->elem
      = (struct element**) mycalloc(rout_name,new, sizeof(struct element*));
   for (j = 0; j < p->curr; j++) p->elem[j] = e_loc[j];
-  free(e_loc);
+  myfree(rout_name, e_loc);
 }
 
 void grow_expr_list( /* doubles list size */
@@ -1659,7 +1681,7 @@ void grow_expr_list( /* doubles list size */
   p->list
    = (struct expression**) mycalloc(rout_name,new, sizeof(struct expression*));
   for (j = 0; j < p->curr; j++) p->list[j] = e_loc[j];
-  free(e_loc);
+  myfree(rout_name, e_loc);
 }
 
 void grow_in_buff_list( /* doubles list size */
@@ -1673,10 +1695,10 @@ void grow_in_buff_list( /* doubles list size */
   p->buffers
     = (struct in_buffer**) mycalloc(rout_name,new, sizeof(struct in_buffer*));
   for (j = 0; j < p->curr; j++) p->buffers[j] = e_loc[j];
-  free(e_loc);
+  myfree(rout_name, e_loc);
   p->input_files = mycalloc(rout_name, new, sizeof(FILE*));
   for (j = 0; j < p->curr; j++) p->input_files[j] = f_loc[j];
-  free(f_loc);
+  myfree(rout_name, f_loc);
 }
 
 void grow_in_cmd_list( /* doubles list size */
@@ -1690,7 +1712,7 @@ void grow_in_cmd_list( /* doubles list size */
   p->in_cmds
     = (struct in_cmd**) mycalloc(rout_name,new, sizeof(struct in_cmd*));
   for (j = 0; j < p->curr; j++) p->in_cmds[j] = c_loc[j];
-  free(c_loc);
+  myfree(rout_name, c_loc);
 }
 
 void grow_int_array( /* doubles array size */
@@ -1703,7 +1725,7 @@ void grow_int_array( /* doubles array size */
   p->max = new;
   p->i = (int*) mymalloc(rout_name,new * sizeof(int));
   for (j = 0; j < p->curr; j++) p->i[j] = i_loc[j];
-  free(i_loc);
+  myfree(rout_name, i_loc);
 }
 
 void grow_macro_list( /* doubles list size */
@@ -1715,7 +1737,7 @@ void grow_macro_list( /* doubles list size */
   p->max = new;
   p->macros = (struct macro**) mycalloc(rout_name,new, sizeof(struct macro*));
   for (j = 0; j < p->curr; j++) p->macros[j] = n_loc[j];
-  free(n_loc);
+  myfree(rout_name, n_loc);
 }
 
 void grow_name_list( /* doubles list size */
@@ -1737,9 +1759,9 @@ void grow_name_list( /* doubles list size */
      p->index[j] = l_ind[j];
      p->inform[j] = l_inf[j];
     }
-  free(n_loc);
-  free(l_ind);
-  free(l_inf);
+  myfree(rout_name, n_loc);
+  myfree(rout_name, l_ind);
+  myfree(rout_name, l_inf);
 }
 
 void grow_node_list( /* doubles list size */
@@ -1751,7 +1773,7 @@ void grow_node_list( /* doubles list size */
   p->max = new;
   p->nodes = (struct node**) mycalloc(rout_name,new, sizeof(struct node*));
   for (j = 0; j < p->curr; j++) p->nodes[j] = n_loc[j];
-  free(n_loc);
+  myfree(rout_name, n_loc);
 }
 
 void grow_sequence_list(struct sequence_list* l)
@@ -1763,7 +1785,7 @@ void grow_sequence_list(struct sequence_list* l)
   l->sequs
     = (struct sequence**) mycalloc(rout_name,new, sizeof(struct sequence*));
   for (j = 0; j < l->curr; j++) l->sequs[j] = sloc[j];
-  free(sloc);
+  myfree(rout_name, sloc);
 }
 
 void grow_table(struct table* t) /* doubles number of rows */
@@ -1789,15 +1811,15 @@ void grow_table(struct table* t) /* doubles number of rows */
      t->l_head[i] = pa_loc[i];
     }
   delete_char_p_array(t_loc, 0);
-  free(pa_loc);
-  t->node_nm->curr = t->curr; free(t_loc);
+  myfree(rout_name, pa_loc);
+  t->node_nm->curr = t->curr; myfree(rout_name, t_loc);
   for (j = 0; j < t->num_cols; j++)
     {
      if ((s_loc = t->s_cols[j]) != NULL)
        {
         t->s_cols[j] = (char**) mycalloc(rout_name,new, sizeof(char*));
         for (i = 0; i < t->curr; i++) t->s_cols[j][i] = s_loc[i];
-        free(s_loc);
+        myfree(rout_name, s_loc);
        }
     }
   for (j = 0; j < t->num_cols; j++)
@@ -1806,7 +1828,7 @@ void grow_table(struct table* t) /* doubles number of rows */
        {
         t->d_cols[j] = (double*) mycalloc(rout_name,new, sizeof(double));
         for (i = 0; i < t->curr; i++) t->d_cols[j][i] = d_loc[i];
-        free(d_loc);
+        myfree(rout_name, d_loc);
        }
     }
 }
@@ -1821,7 +1843,7 @@ void grow_table_list(struct table_list* tl)
   tl->max = new;
   tl->tables = (struct table**) mycalloc(rout_name,new, sizeof(struct table*));
   for (j = 0; j < tl->curr; j++) tl->tables[j] = t_loc[j];
-  free(t_loc);
+  myfree(rout_name, t_loc);
 }
 
 void grow_var_list( /* doubles list size */
@@ -1835,7 +1857,7 @@ void grow_var_list( /* doubles list size */
   p->vars
     = (struct variable**) mycalloc(rout_name,new, sizeof(struct variable*));
   for (j = 0; j < p->curr; j++) p->vars[j] = v_loc[j];
-  free(v_loc);
+  myfree(rout_name, v_loc);
 }
 
 void grow_vector_list( /* doubles list size */
@@ -1850,7 +1872,7 @@ void grow_vector_list( /* doubles list size */
     = (struct double_array**) mycalloc(rout_name,new,
                                        sizeof(struct double_array*));
   for (j = 0; j < p->curr; j++) p->vectors[j] = v_loc[j];
-  free(v_loc);
+  myfree(rout_name, v_loc);
 }
 
 double grndm()
@@ -1933,9 +1955,12 @@ void* mycalloc(char* caller, size_t nelem, size_t size)
 {
   /* calls calloc, checks for memory granted */
   void* p;
-  if ((p = calloc(nelem, size)) == NULL)
+  int* i_p;
+  size_t l_size = nelem*size + sizeof(int);
+  if ((p = calloc(1, l_size)) == NULL)
      fatal_error("memory overflow, called from routine:", caller);
-  return p;
+  i_p = (int*) p; *i_p = FREECODE;
+  return (p+sizeof(int));
 }
 
 void mycpy(char* sout, char* sin)
@@ -1952,13 +1977,28 @@ void mycpy(char* sout, char* sin)
   *q = '\0';
 }
 
+void myfree(char* rout_name, void* p)
+{
+  char* l_p = p - sizeof(int);
+  int* i_p = (int*) l_p;
+  myfree_caller = rout_name;
+  if (*i_p == FREECODE) 
+  {
+   *i_p = 0; free(l_p);
+  }
+  myfree_caller = none;
+}
+
 void* mymalloc(char* caller, size_t size)
 {
   /* calls malloc, checks for memory granted */
   void* p;
-  if ((p = malloc(size)) == NULL)
+  int* i_p;
+  size_t l_size = size + sizeof(int);
+  if ((p = malloc(l_size)) == NULL)
     fatal_error("memory overflow, called from routine:", caller);
-  return p;
+  i_p = (int*) p; *i_p = FREECODE;
+  return (p+sizeof(int));
 }
 
 char* mystrchr(char* string, char c)
@@ -2051,9 +2091,7 @@ struct char_array* new_char_array(int length)
   char rout_name[] = "new_char_array";
   struct char_array* il =
        (struct char_array*) mycalloc(rout_name,1, sizeof(struct char_array));
-  strcpy(il->name, "char_array");
   il->stamp = 123456;
-  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   il->c = (char*) mymalloc(rout_name,length);
@@ -2919,6 +2957,17 @@ char* supp_tb(char* string) /* suppress trailing blanks in string */
      string[j] = '\0';
     }
   return string;
+}
+
+void termination_handler(int signum)
+{
+    if (strcmp(myfree_caller, "none") == 0)
+        puts("+++ memory access outside program range, fatal +++");
+    else
+        printf("+++ illegal call to free memory from routine: %s +++\n",
+               myfree_caller);
+    puts("good bye");
+    exit(1);
 }
 
 double tgrndm(double cut)

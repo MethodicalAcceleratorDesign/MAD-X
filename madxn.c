@@ -11,6 +11,9 @@
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
+#ifdef _CATCH_MEM
+#include <signal.h>
+#endif
 #include "madxl.h"
 #include "madx.h"
 #include "madxreg.h"
@@ -22,6 +25,11 @@
 
 void madx()
 {
+#ifdef _CATCH_MEM
+/* provide a termination routine for access to memory outside scope */
+  if (signal(SIGSEGV, termination_handler) == SIG_IGN) 
+     signal(SIGSEGV, SIG_IGN);
+#endif
   madx_start();
   madx_init();
   main_input(0);
@@ -47,6 +55,7 @@ void madx()
 int act_special(int type, char* statement)
      /* acts on special commands (IF{..} etc.) */
 {
+  char rout_name[] = "act_special";
   char* loc_buff = NULL;
   char* loc_w = NULL;
   int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
@@ -132,8 +141,8 @@ int act_special(int type, char* statement)
     default:
       ret_val = -1;
     }
-  if (loc_buff != NULL) free(loc_buff);
-  if (loc_w != NULL) free(loc_w);
+  if (loc_buff != NULL) myfree(rout_name, loc_buff);
+  if (loc_w != NULL) myfree(rout_name, loc_w);
   delete_char_p_array(logic, 0);
   return ret_val;
 }
@@ -1861,6 +1870,7 @@ void exec_command()
 void exec_create_table(struct in_cmd* cmd)
      /* makes a user defined table */
 {
+  char rout_name[] = "exec_create_table";
   struct table* t;
   int* t_types;
   struct name_list* nl = cmd->clone->par_names;
@@ -1902,7 +1912,7 @@ void exec_create_table(struct in_cmd* cmd)
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
   t->org_cols = 0;  /* all entries are "added" */
   add_to_table_list(t, table_register);
-  free(t_c); free(t_types);
+  myfree(rout_name, t_c); myfree(rout_name, t_types);
 }
 
 void exec_store_coguess(struct in_cmd* cmd)
@@ -2461,9 +2471,13 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
 
 void expand_curr_sequ(int flag)
      /* expands the current sequence, i.e. flattens it, inserts drifts etc. */
+     /* The sequence length is updated - new feature HG 26.5.03 */
 {
+  char rout_name[] = "expand_curr_sequ";
   struct node* c_node;
   int j;
+  if (current_sequ->l_expr) current_sequ->length = current_sequ->end->at_value 
+    = current_sequ->end->position = expression_value(current_sequ->l_expr, 2);
   if (current_sequ->ex_start != NULL)
     {
      current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
@@ -2482,7 +2496,7 @@ void expand_curr_sequ(int flag)
      expand_sequence(current_sequ, flag);
      current_sequ->n_nodes =
        add_drifts(current_sequ->ex_start, current_sequ->ex_end);
-     if (current_sequ->all_nodes != NULL) free(current_sequ->all_nodes);
+     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
      current_sequ->all_nodes
         = (struct node**) malloc(current_sequ->n_nodes * sizeof(struct node*));
      c_node = current_sequ->ex_start;
@@ -3236,7 +3250,7 @@ void get_defined_commands()
   for (i = 1; i < n; i++) /* make temporary list - strtok is called again */
      p[i] = strtok(NULL, ";");
   for (i = 0; i < n; i++) store_command_def(p[i]);
-  free(p);
+  myfree(rout_name, p);
 }
 
 void get_defined_constants()
@@ -4188,7 +4202,7 @@ void make_sequ_from_line(char* name)
 {
   char** tmp = NULL;
   int pos = name_list_pos(name, line_list->list);
-  int j, spos;
+  int spos;
   struct sequence* old_sequ = NULL;
   struct macro* line;
   int mpos = name_list_pos("marker", defined_commands->list);
@@ -5036,6 +5050,7 @@ void process()  /* steering routine: processes one command */
 void pro_emit(struct in_cmd* cmd)
      /* calls the emit module */
 {
+  char rout_name[] = "pro_emit";
   struct command* emit = cmd->clone;
   double e_deltap, e_tol, u0;
   int j, error, keep;
@@ -5070,7 +5085,7 @@ void pro_emit(struct in_cmd* cmd)
   printf("guess: %d %f %f\n",guess_flag, guess_orbit[0],guess_orbit[1]);
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
-  free(tt);
+  myfree(rout_name, tt);
   if (error == 0)
     {
      current_node = current_sequ->ex_start;
@@ -5781,6 +5796,7 @@ void remove_from_node_list(struct node* node, struct node_list* nodes)
 
 int remove_one(struct node* node)
 {
+  char rout_name[] = "remove_one";
   int pos;
   /* removes a node from a sequence being edited */
   if ((pos = name_list_pos(node->p_elem->name, occ_list)) < 0)  return 0;
@@ -5792,7 +5808,7 @@ int remove_one(struct node* node)
      remove_from_name_list(node->p_elem->name, occ_list);
     }
   else --occ_list->inform[pos];
-  free(node);
+  myfree(rout_name, node);
   return 1;
 }
 
@@ -6886,7 +6902,7 @@ char* spec_join(char** it_list, int n)
           && (var = find_variable(p[j+2], variable_list)) != NULL)
         p[j+2] = var->string;
      for (j = 0; j < n; j++) strcat(c_join, p[j]);
-     free(p);
+     myfree(rout_name, p);
     }
   return c_join;
 }
@@ -7931,9 +7947,13 @@ void track_dynap(struct in_cmd* cmd)
   if (get_option("dynap_dump")) dynap_tables_dump();
   */
   /* free buffers */
-  free(ibuf1); free(ibuf2); free(ibuf3); free(buf1); free(buf2);
-  free(buf_dxt); free(buf_dyt); free(buf3); free(buf4); free(buf5); free(buf6);
-  free(buf7); free(buf8); free(buf9); free(buf10); free(buf11);
+  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); 
+  myfree(rout_name, ibuf3); myfree(rout_name, buf1); myfree(rout_name, buf2);
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt); 
+  myfree(rout_name, buf3); myfree(rout_name, buf4); myfree(rout_name, buf5); 
+  myfree(rout_name, buf6); myfree(rout_name, buf7); myfree(rout_name, buf8); 
+  myfree(rout_name, buf9); myfree(rout_name, buf10); 
+  myfree(rout_name, buf11);
 }
 
 void track_end(struct in_cmd* cmd)
@@ -8085,9 +8105,11 @@ void track_run(struct in_cmd* cmd)
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
   /* free buffers */
-  free(ibuf1); free(ibuf2); free(ibuf3);
-  free(buf1); free(buf2); free(buf_dxt); free(buf_dyt); free(buf3);
-  free(buf4); free(buf6);
+  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); myfree(rout_name, ibuf3);
+  myfree(rout_name, buf1); myfree(rout_name, buf2); 
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt); 
+  myfree(rout_name, buf3);
+  myfree(rout_name, buf4); myfree(rout_name, buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 
@@ -8576,6 +8598,7 @@ void update_vector(struct expr_list* ell, struct double_array* da)
 
 void use_sequ(struct in_cmd* cmd)
 {
+  char rout_name[] = "use_sequ";
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos, lp;
@@ -8589,7 +8612,7 @@ void use_sequ(struct in_cmd* cmd)
     {
      if (current_range != NULL)
        {
-      free(current_range); current_range = NULL;
+        myfree(rout_name, current_range); current_range = NULL;
        }
      name = pl->parameters[pos]->string;
      if ((pos = name_list_pos(name, line_list->list)) > -1)

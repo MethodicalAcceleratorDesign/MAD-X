@@ -489,8 +489,8 @@ int pro_correct_getorbit(struct in_cmd* cmd)
       if((command_par_value("monscale",cmd->clone)) == 1) {
         if(m->p_node->p_al_err != NULL) {
           if (get_option("debug")) {
-           printf("m-list: %d %s %s\n",m->id_ttb,m->p_node->name,m->p_node->base_name);
-           printf("scales: %e %e\n",m->p_node->p_al_err->a[12],m->p_node->p_al_err->a[13]);
+            printf("m-list: %d %s %s\n",m->id_ttb,m->p_node->name,m->p_node->base_name);
+            printf("scales: %e %e\n",m->p_node->p_al_err->a[12],m->p_node->p_al_err->a[13]);
           }
           m->val.before[0] = m->val.before[0]*(1.0 + m->p_node->p_al_err->a[12]);
           m->val.before[1] = m->val.before[1]*(1.0 + m->p_node->p_al_err->a[13]);

@@ -778,31 +778,32 @@ void conv_elem()
 
 void c6t_finish()
 {
+  char rout_name[] = "c6t_finish";
   int i,j;
   struct block* p;
   /* remove elements and elements list */
   for(i=0; i<types.curr; i++) {
     for(j=0; j<types.member[i]->curr; j++) {
       if (types.member[i]->elem[j]->value)
-      free(types.member[i]->elem[j]->value);
+      myfree(rout_name, types.member[i]->elem[j]->value);
       if (types.member[i]->elem[j]->p_al_err &&
         types.member[i]->elem[j]->do_not_free != 1) {
       if (types.member[i]->elem[j]->p_al_err->a_dble)
-        free(types.member[i]->elem[j]->p_al_err->a_dble);
-      free(types.member[i]->elem[j]->p_al_err);
+        myfree(rout_name, types.member[i]->elem[j]->p_al_err->a_dble);
+      myfree(rout_name, types.member[i]->elem[j]->p_al_err);
       types.member[i]->elem[j]->p_al_err = NULL;
       }
       if (types.member[i]->elem[j]->p_fd_err &&
         types.member[i]->elem[j]->do_not_free != 1) {
       if (types.member[i]->elem[j]->p_fd_err->a_dble)
-        free(types.member[i]->elem[j]->p_fd_err->a_dble);
-      free(types.member[i]->elem[j]->p_fd_err);
+        myfree(rout_name, types.member[i]->elem[j]->p_fd_err->a_dble);
+      myfree(rout_name, types.member[i]->elem[j]->p_fd_err);
       types.member[i]->elem[j]->p_fd_err = NULL;
       }
-      free(types.member[i]->elem[j]);
+      myfree(rout_name, types.member[i]->elem[j]);
       types.member[i]->elem[j]=NULL;
     }
-    free(types.member[i]);
+    myfree(rout_name, types.member[i]);
   }
   types.curr=0; first_in_sequ = NULL; last_in_sequ = NULL;
   current_element=NULL;
@@ -811,13 +812,13 @@ void c6t_finish()
   while (p != NULL)
     {
      p = p->next;
-     if (p) free(p->previous);
+     if (p) myfree(rout_name, p->previous);
     }
   first_block = NULL; last_block=NULL; prev_block=NULL;
   current_block = NULL;
   /* remove split_list */
   if (split_list) {
-    free(split_list); split_list = NULL;
+    myfree(rout_name, split_list); split_list = NULL;
   }
   /* clear acro_cnt and acro_list */
   for(i=0; i<20; i++) {
@@ -1349,7 +1350,7 @@ void grow_ellist( /* doubles object list size */
   p->max = new;
   p->elem = (struct c6t_element**) mycalloc(rout_name,new, sizeof(struct c6t_element*));
   for (j = 0; j < p->curr; j++) p->elem[j] = p_loc[j];
-  free(p_loc);
+  myfree(rout_name, p_loc);
 }
 
 int ident_el(struct c6t_element* el1, struct c6t_element* el2)
@@ -2315,7 +2316,7 @@ void write_f3_aper()
         current_element->value[1], current_element->value[2]);
       } else {
         fprintf(f3aper,"%s %s %f %f\n",current_element->name,"EL",
-        current_element->value[1], current_element->value[2]); 
+        current_element->value[1], current_element->value[2]);
       }
       }
      current_element = current_element->next;

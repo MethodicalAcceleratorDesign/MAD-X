@@ -304,7 +304,6 @@ char command_def[] =
 "model    = [s, none], "
 "corzero  = [i, 0], "
 "target   = [s, none]; "
-
 " "
 "getorbit: correct correct 0 0 "
 "file = [s, orbit, orbit]; "

@@ -5,6 +5,7 @@
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 24           /* internal name length */
 #define FNAME_L 240         /* for file names */
+#define FREECODE 380226     /* check-code to avoid multiple "free" */
 #define AUX_LG 10000        /* for all sorts of ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
@@ -201,7 +202,7 @@ int mon_table_types[] =
 
 char* mon_table_cols[] =
 {
-  "name", "x.old", "y.old", "x.new", "y.new",
+  "name", "x(old)", "y(old)", "x(new)", "y(new)",
 " "  /* blank terminates */
 };
 
@@ -212,7 +213,7 @@ int corr_table_types[] =
 
 char* corr_table_cols[] =
 {
-  "name", "px.old", "py.old", "px.correction", "py.correction",
+  "name", "px(old)", "py(old)", "px(correction)", "py(correction)",
 " "  /* blank terminates */
 };
 

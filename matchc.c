@@ -97,7 +97,8 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
      /* fprintf(prt_file, "%s %s\n", "call TWISS from matching: sequence=",
                match_sequs->sequs[i]->name); */
      current_twiss = local_twiss[i]->clone;
-     if (get_option("varylength") != zero) expand_curr_sequ(0);
+     if (get_option("varylength") != zero) match_prepare_varypos();
+
      pro_twiss();
      if (twiss_success)
        {
@@ -186,7 +187,7 @@ void match_end(struct in_cmd* cmd)
   struct node* c_node;
   /* OB 5.3.2002: write out all final constraint values and vary parameters */
   penalty = zero;
-  if (get_option("varylength") != zero) expand_curr_sequ(0);
+  if (get_option("varylength") != zero) match_prepare_varypos();
   pro_twiss();
   current_const = 0;
   set_option("match_summary", &print_match_summary);
@@ -568,6 +569,31 @@ void match_match(struct in_cmd* cmd)
   if ((comm = find_command("gweight", defined_commands)) != NULL)
     current_gweight = clone_command(comm);
   else fatal_error("no gweight command in dictionary,","good bye");
+}
+
+void match_prepare_varypos()
+/* keeps constraints from nodes, reexpands, adds constraints to nodes */
+{
+  struct node* node = current_sequ->ex_start;
+  struct constraint_list** tmplist = (struct constraint_list**) 
+         malloc(current_sequ->n_nodes * sizeof(struct constraint_list*));
+  int i = 0;
+  while (node != NULL)
+    {
+     tmplist[i] = current_sequ->all_nodes[i]->cl; i++;
+     if (node == current_sequ->ex_end) break;
+     node = node->next;
+    }
+  expand_curr_sequ(0);
+  i = 0;
+  node = current_sequ->ex_start;
+  while (node != NULL)
+    {
+     current_sequ->all_nodes[i]->cl = tmplist[i]; i++;
+     if (node == current_sequ->ex_end) break;
+     node = node->next;
+    }
+  myfree("match_prepare_varypos", tmplist);
 }
 
 void match_rmatrix(struct in_cmd* cmd)

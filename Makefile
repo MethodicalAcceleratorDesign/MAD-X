@@ -10,8 +10,8 @@ FCP=-O3 -fno-second-underscore -funroll-loops
 FCM=-O2 -fno-second-underscore -funroll-loops
 FCDB=-g -O0 -fno-second-underscore
 FC=g77
-GCC_FLAGS=-g -Wall -fno-second-underscore
-GCCP_FLAGS=-g -O3 -funroll-loops -fno-second-underscore
+GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS=-g -O3 -funroll-loops -fno-second-underscore -D_CATCH_MEM
 CC=gcc
 LIBX="-L/usr/X11R6/lib" -lX11
 GLIB=/afs/cern.ch/group/si/slap/lib
@@ -23,7 +23,7 @@ ifeq ($(OSTYPE),darwin)
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # better no optimization (safer for 2.95.2 compiler, should be no problem for 3.1) 
 # include headers for gxx11c
-  GCCP_FLAGS=-g -Wall -I /usr/X11R6/include/
+  GCCP_FLAGS=-g -Wall -D_CATCH_MEM -I /usr/X11R6/include/
 # use next to get older compiler
   CC=gcc2
 # use next to get newer compiler

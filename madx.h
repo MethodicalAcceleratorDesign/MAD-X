@@ -1,7 +1,6 @@
 struct char_array           /* dynamic array of char */
 {
   int stamp;
-  char name[NAME_L];
   int  max,                     /* max. array size */
        curr;                    /* current occupation */
   char* c;

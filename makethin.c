@@ -229,7 +229,7 @@ double el_par_value_recurse(char* par, struct element* elem)
 }
 
 /* multiply the k by length and divide by slice */
-struct command_parameter* scale_and_slice(struct command_parameter *kn_param,  
+struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
             struct command_parameter *length_param,
             int slices, int slice_no,
             int angle_conversion, int kl_flag)

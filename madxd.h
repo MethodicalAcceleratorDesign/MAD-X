@@ -417,6 +417,7 @@ void match_global(struct in_cmd*);
 int match_input(struct command*);  /* OB 23.1.2002 */
 void match_level(struct in_cmd*);
 void match_match(struct in_cmd*);
+void match_prepare_varypos();
 void match_rmatrix(struct in_cmd*);
 void match_tmatrix(struct in_cmd*);
 void match_vary(struct in_cmd*);
@@ -425,6 +426,7 @@ void mtcond(int*, int*, double*, int*);
 double mult_par(char*, struct element*);
 void mycpy(char*, char*);
 void* mycalloc(char*, size_t, size_t);
+void myfree(char*, void*);
 void* mymalloc(char*, size_t);
 char* mystrchr(char*, char);
 char* mystrstr(char*, char*);
@@ -567,6 +569,7 @@ char* supp_tb(char*);
 double table_value();
 int table_row(struct table*, char*);
 int tab_name_code(char*, char*);
+void termination_handler(int);
 void time_stamp(char*);
 double tgrndm(double);
 char* tmpbuff(char*);
@@ -829,7 +832,7 @@ char  tmp_key[NAME_L],
 
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.11";
+char myversion[] = "MAD-X 1.12";
 char one_string[] = "1";
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
@@ -839,15 +842,16 @@ char* title = NULL;
 char* match_seqs[2];             /* OB 23.1.2002   */
 char* match_beta[2];             /* OB 23.1.2002   */
 char* match_range[2];            /* HG 12.11.2002   */
+char* myfree_caller = none;      /* for routine name in myfree calls */
 char* track_filename;            /* track module file name start */
 char* track_fileext;             /* track module file name extension */
 
 double pi, twopi, degrad, raddeg, e, clight, hbar;
 double penalty;
 double match_tol;
-double sxf_suml;
 double orbit0[6];
 double disp0[6];
+double sxf_suml = 0;
 double track_deltap=0;
 double oneturnmat[36];
 
