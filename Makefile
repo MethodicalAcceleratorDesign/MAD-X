@@ -26,15 +26,8 @@ GPUB=/afs/cern.ch/group/si/slap/bin
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
-# better no optimization (safer for 2.95.2 compiler, should be no problem for 3.1) 
 # include headers for gxx11c
-  GCCP_FLAGS=-g -Wall -D_CATCH_MEM -I /usr/X11R6/include/
-# use next to get older compiler
-  CC=gcc2
-# use next to get newer compiler
-# CC=gcc3
-# better use g77 without optimization
-  FCP=-fno-second-underscore -funroll-loops
+  GCCP_FLAGS=-g -O3 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
 endif
 
 default: madx
