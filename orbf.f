@@ -19,7 +19,8 @@
       end
 
       subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
-     &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter)
+     &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
+
       implicit none
       integer im,ic,iter,i,j,nx(ic),ny(ic)
       real rms,ax(im,ic),cinx(ic),xinx(im),resx(im),rho(3*ic),ptop(ic), &
@@ -28,6 +29,7 @@
       double precision a(im,ic),xin(im),cin(ic),res(im)
       character*16 conm(ic)
       integer      n
+      integer      ifail
 
       do  j = 1,ic
         call f_ctof(n, conm(j), 16)
@@ -49,7 +51,7 @@
       write(*,*) 'start MICADO correction with ',iter,' correctors'
       write(*,*) ' '
       call micado(ax,conm,xinx,resx,cinx,ny,rms,im,ic,iter,rho,ptop,    &
-     &rmss,xrms,xptp,xiter)
+     &rmss,xrms,xptp,xiter,ifail)
       do  i = 1,ic
         cin(i) = cinx(i)
         nx(ny(i)) = i
@@ -163,7 +165,7 @@
       end
 !CDECK  ID>, MICADO.
       subroutine micado(a,conm,b,orbr,xinc,nx,rms,m,n,iter,rho,ptop,    &
-     &rmss,xrms,xptp,xiter)
+     &rmss,xrms,xptp,xiter,ifail)
       implicit none
 !*********************************************************************
 !     Subroutine MICADO to run MICADO minimisation                   *
@@ -179,6 +181,7 @@
 !     XINC(N)      : strength of correctors
 !     NX(N)        : sequence number of correctors
       integer m,n,nx(n),prtlev,iter
+      integer ifail
       real a(m,n),b(m),orbr(m),xinc(n),rms,rho(3*n),ptop(n),rmss(n),    &
      &xrms(n),xptp(n),xiter(n)
       character*16 conm(n)
@@ -186,7 +189,7 @@
       prtlev = 3
 
       call htls(a,conm,b,m,n,xinc,nx,orbr,rms,prtlev,iter,rho,ptop,rmss,&
-     &xrms,xptp,xiter)
+     &xrms,xptp,xiter,ifail)
 
 ! --- energy shift caused by corrector strength changes
 !     (inhibited)
@@ -199,7 +202,7 @@
       end
 !CDECK  ID>, HHT.
       subroutine htls(a,conm,b,m,n,x,ipiv,r,rms,prtlev,iter,rho,ptop,   &
-     &rmss,xrms,xptp,xiter)
+     &rmss,xrms,xptp,xiter,ifail)
       implicit none
 !*********************************************************************
 !     Subroutine HTLS to make Householder transform                  *
@@ -219,16 +222,21 @@
       parameter(rzero=0e0,reps7=1e-7)
       character*4 units
       character*16 conm(n)
+      integer      ifail
 
       interm = .true.
+      ifail = 0
       units = 'mrad'
       ptp = rzero
 
       call calrms(b,m,rm,pt)
 
       if(rm.le.rms) then
+        write(*,*) '++++++ WARNING: RMS already smaller than desired '
+        write(*,*) '++++++ WARNING: no correction is done            '
         rms = rm
         iter = 0
+        ifail = -2
         return
       endif
 
@@ -331,11 +339,16 @@
 
           if(h.lt.reps7) then
             write(*,*) 'Correction process aborted'
+            write(*,*) 'during ',k,'th iteration'    
+            write(*,*) 'Last r.m.s.: ',rmss(k-1)     
+            write(*,*) 'Last p-t-p.: ',ptop(k-1)     
             write(*,*) 'Division by zero expected'
             write(*,*) 'Probably two kickers too close'
             write(*,*) 'SUSPECTED KICKER: ',J,'  '
             write(*,*) conm(ipiv(j))
-            stop 777
+            ifail = -1
+            return
+!           stop 777
           endif
 
           rho(j)=h
