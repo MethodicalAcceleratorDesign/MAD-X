@@ -151,8 +151,8 @@ extern void survey_();
 extern void tmrefe_(double*);
 extern void tmrefo_(int*,double*,double*,double*);
 extern void trrun_(int*,int*,double*,double*,int*,int*,
-                   double*,double*,double*,double*,
-                   double*,int*, int*, double*, double*, double*);
+                   double*,double*,double*,double*,double*,double*,
+                   double*,int*, int*, double*);
 extern void twiss_(double*, double*, int*);
 
 /* C routines called from Fortran and C */
