@@ -519,7 +519,7 @@
       go to 500
 !---- Rotation around s-axis.
   120 continue
-!        call ttsrot(track, ktrack)
+        call ttsrot(track, ktrack)
       go to 500
 !---- Rotation around y-axis.
   130 continue
@@ -916,11 +916,63 @@
           enddo
         endif
       endif
-
       end
+
+      subroutine ttsrot(track,ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Coordinate change due to rotation about s axis                     *
+! Input/output:                                                        *
+!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+!   KTRACK    (integer) number of surviving tracks.        tmsrot      *
+!----------------------------------------------------------------------*
+      include 'track.fi'
+      integer itrack,ktrack,j
+      double precision track(6,*),psi,node_value,ct,st,trb(4)
+      psi = node_value('angle ')
+      ct = cos(psi)
+      st = -sin(psi)
+       do  itrack = 1, ktrack
+          do  j = 1,4
+          trb(j)=track(j,itrack)
+          enddo
+       track(1,itrack) = trb(1)*ct-trb(3)*st
+       track(2,itrack) = trb(2)*ct-trb(4)*st
+       track(3,itrack) = trb(1)*st+trb(3)*ct
+       track(4,itrack) = trb(2)*st+trb(4)*ct
+       enddo
+      end
+
+
+      subroutine ttyrot(track,ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Coordinate change due to rotation about s axis                     *
+! Input/output:                                                        *
+!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+!   KTRACK    (integer) number of surviving tracks.        tmsrot      *
+!----------------------------------------------------------------------*
+      include 'track.fi'
+      integer itrack,ktrack,j
+      double precision track(6,*),theta,node_value,ct,st,trb(6)
+      theta = node_value('angle ')
+      ct = cos(theta)
+      st = -sin(theta)
+       do  itrack = 1, ktrack
+          do  j = 1,6
+          trb(j)=track(j,itrack)
+          enddo
+       track(1,itrack) = trb(1)*ct-trb(5)*st
+       track(2,itrack) = trb(2)*ct-trb(6)*st
+       track(5,itrack) = trb(1)*st+trb(5)*ct
+       track(6,itrack) = trb(2)*st+trb(6)*ct
+       enddo
+      end
+
       subroutine ttdrf(el,track,ktrack)
       implicit none
-
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track a set of particle through a drift space.                     *
