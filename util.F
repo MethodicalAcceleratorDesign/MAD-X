@@ -1878,3 +1878,38 @@
       endif
 
       end
+      subroutine tttrak(ek,re,te,track,ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Track a set of particle with a given TRANSPORT map.                *
+! Input:                                                               *
+!   EK(6)     (real)    Kick.                                          *
+!   RE(6,6)   (real)    First-order terms.                             *
+!   TE(6,6,6) (real)    Second-order terms.                            *
+! Input/output:                                                        *
+!   TRACK(6,*)(real)    Track coordinates: (X, PX, Y, PY, T, PT).      *
+!   KTRACK    (integer) number of surviving tracks.                    *
+!----------------------------------------------------------------------*
+      integer i,itrack,ktrack
+      double precision ek(6),re(36),se(36),te(36,6),temp(6),track(6,*)
+
+      do itrack = 1, ktrack
+!        do i = 1, 36
+!          se(i) = re(i)                                                 &
+!     &      + te(i,1)*track(1,itrack) + te(i,2) * track(2,itrack)       &
+!     &      + te(i,3)*track(3,itrack) + te(i,4) * track(4,itrack)       &
+!     &      + te(i,5)*track(5,itrack) + te(i,6) * track(6,itrack)
+!        enddo
+        do i = 1, 6
+          temp(i) = ek(i)                                               &
+     &      + re(i)    * track(1,itrack) + re(i+ 6) * track(2,itrack)   &
+     &      + re(i+12) * track(3,itrack) + re(i+18) * track(4,itrack)   &
+     &      + re(i+24) * track(5,itrack) + re(i+30) * track(6,itrack)
+        enddo
+        do i = 1, 6
+          track(i,itrack) = temp(i)
+        enddo
+      enddo
+
+      end

@@ -50,10 +50,17 @@
       character*4 vec_names(7)
 !hbu
       character*(name_len) el_name
+      character*120 msg
       data tol_a,char_a / 'maxaper ', ' ' /
 !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
 
+      if(fsecarb) then
+        write (msg,*) 'Second order terms of arbitrary Matrix not '//   &
+     &  'allowed for tracking.'
+        call aawarn('trrun: ',msg)
+        return
+      endif
       aperflag = .false.
       e_flag = 0
       last_out = .false.   ! flag to avoid double entry of last line
@@ -146,11 +153,12 @@
           el = l_buf(nlm+1)
           code = code_buf(nlm+1)
         endif
-        if (code .ne. 1 .and. el .ne. zero) then
+        if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
+          print*,"code: ",code," el: ",el
           sum = node_value('name ')
           call aafail('TRRUN',                                          &
-     &    '----element with length found : CONVERT STRUCTURE WITH MAKETH&
-     &    IN')
+     &    '----element with length found : CONVERT STRUCTURE WITH '//   &
+     &    'MAKETHIN')
         endif
         if (switch .eq. 1) then
           nobs = node_value('obs_point ')
@@ -303,16 +311,21 @@
       include 'twiss0.fi'
       include 'name_len.fi'
       include 'twtrr.fi'
-      logical aperflag,bend
+      logical aperflag,bend,fmap
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
      &get_option
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
      &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,   &
      &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
-     &st,theta                                                          &
+     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6)
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
+      fmap=.false.
+      call dzero(ek,6)
+      call dzero(craporb,6)
+      call dzero(re,36)
+      call dzero(te,216)
 !---- Drift space
       if(code.eq.1) then
          call ttdrf(el,track,ktrack)
@@ -440,6 +453,9 @@
    30 continue
 !---- Arbitrary matrix. OBSOLETE, to be kept for go to
    40 continue
+      call tmarb(.false.,.false.,craporb,fmap,el,ek,re,te)
+      call tttrak(ek,re,te,track,ktrack)
+      go to 500
 !---- Quadrupole. OBSOLETE, to be kept for go to
    50 continue
 !---- Sextupole. OBSOLETE, to be kept for go to

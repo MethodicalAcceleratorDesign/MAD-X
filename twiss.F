@@ -14,6 +14,7 @@
       include 'twissl.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
+      include 'track.fi'
       integer i
       integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
@@ -28,6 +29,7 @@
       summ=0
       eflag=0
       inval=0
+      fsecarb=.false.
       i = 6
       call dzero(orbit0,6)
       call get_node_vector('orbit0 ', i, orbit0)
@@ -1899,7 +1901,8 @@
       go to 500
 
 !---- Arbitrary matrix.
-   40 continue
+   40 continue 
+      call tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Quadrupole.
@@ -3097,9 +3100,312 @@
       endif
 
       end
+      subroutine tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+! Purpose:                                                             *
+!   TRANSPORT map for arbitrary element.                               *
+! Input:                                                               *
+!   FSEC      (logical) If true, return second order terms.            *
+!   FTRK      (logical) If true, track orbit.                          *
+! Input/output:                                                        *
+!   ORBIT(6)  (real)    Closed orbit.                                  *
+! Output:                                                              *
+!   FMAP      (logical) If true, element has a map.                    *
+!   EK(6)     (real)    Kick due to element.                           *
+!   RE(6,6)   (real)    Transfer matrix.                               *
+!   TE(6,6,6) (real)    Second-order terms.                            *
+!----------------------------------------------------------------------*
+      include 'track.fi'
+      logical fsec,ftrk,fmap
+      integer i1,i2,i3
+      double precision el,orbit(6),ek(6),re(6,6),te(6,6,6),node_value,  &
+     &test,zero
+      parameter(zero=0d0)
+
+!---- Element Kick
+      ek(1)=node_value('kick1 ')
+      ek(2)=node_value('kick2 ')
+      ek(3)=node_value('kick3 ')
+      ek(4)=node_value('kick4 ')
+      ek(5)=node_value('kick5 ')
+      ek(6)=node_value('kick6 ')
+
+!---- Matrix
+      re(1,1)=node_value('rm11 ')
+      re(1,2)=node_value('rm12 ')
+      re(1,3)=node_value('rm13 ')
+      re(1,4)=node_value('rm14 ')
+      re(1,5)=node_value('rm15 ')
+      re(1,6)=node_value('rm16 ')
+      re(2,1)=node_value('rm21 ')
+      re(2,2)=node_value('rm22 ')
+      re(2,3)=node_value('rm23 ')
+      re(2,4)=node_value('rm24 ')
+      re(2,5)=node_value('rm25 ')
+      re(2,6)=node_value('rm26 ')
+      re(3,1)=node_value('rm31 ')
+      re(3,2)=node_value('rm32 ')
+      re(3,3)=node_value('rm33 ')
+      re(3,4)=node_value('rm34 ')
+      re(3,5)=node_value('rm35 ')
+      re(3,6)=node_value('rm36 ')
+      re(4,1)=node_value('rm41 ')
+      re(4,2)=node_value('rm42 ')
+      re(4,3)=node_value('rm43 ')
+      re(4,4)=node_value('rm44 ')
+      re(4,5)=node_value('rm45 ')
+      re(4,6)=node_value('rm46 ')
+      re(5,1)=node_value('rm51 ')
+      re(5,2)=node_value('rm52 ')
+      re(5,3)=node_value('rm53 ')
+      re(5,4)=node_value('rm54 ')
+      re(5,5)=node_value('rm55 ')
+      re(5,6)=node_value('rm56 ')
+      re(6,1)=node_value('rm61 ')
+      re(6,2)=node_value('rm62 ')
+      re(6,3)=node_value('rm63 ')
+      re(6,4)=node_value('rm64 ')
+      re(6,5)=node_value('rm65 ')
+      re(6,6)=node_value('rm66 ')
+
+!---- Second Order Terms
+      if (fsec) then
+        te(1,1,1)=node_value('tm111 ')
+        te(1,1,2)=node_value('tm112 ')
+        te(1,1,3)=node_value('tm113 ')
+        te(1,1,4)=node_value('tm114 ')
+        te(1,1,5)=node_value('tm115 ')
+        te(1,1,6)=node_value('tm116 ')
+        te(1,2,1)=node_value('tm121 ')
+        te(1,2,2)=node_value('tm122 ')
+        te(1,2,3)=node_value('tm123 ')
+        te(1,2,4)=node_value('tm124 ')
+        te(1,2,5)=node_value('tm125 ')
+        te(1,2,6)=node_value('tm126 ')
+        te(1,3,1)=node_value('tm131 ')
+        te(1,3,2)=node_value('tm132 ')
+        te(1,3,3)=node_value('tm133 ')
+        te(1,3,4)=node_value('tm134 ')
+        te(1,3,5)=node_value('tm135 ')
+        te(1,3,6)=node_value('tm136 ')
+        te(1,4,1)=node_value('tm141 ')
+        te(1,4,2)=node_value('tm142 ')
+        te(1,4,3)=node_value('tm143 ')
+        te(1,4,4)=node_value('tm144 ')
+        te(1,4,5)=node_value('tm145 ')
+        te(1,4,6)=node_value('tm146 ')
+        te(1,5,1)=node_value('tm151 ')
+        te(1,5,2)=node_value('tm152 ')
+        te(1,5,3)=node_value('tm153 ')
+        te(1,5,4)=node_value('tm154 ')
+        te(1,5,5)=node_value('tm155 ')
+        te(1,5,6)=node_value('tm156 ')
+        te(1,6,1)=node_value('tm161 ')
+        te(1,6,2)=node_value('tm162 ')
+        te(1,6,3)=node_value('tm163 ')
+        te(1,6,4)=node_value('tm164 ')
+        te(1,6,5)=node_value('tm165 ')
+        te(1,6,6)=node_value('tm166 ')
+        te(2,1,1)=node_value('tm211 ')
+        te(2,1,2)=node_value('tm212 ')
+        te(2,1,3)=node_value('tm213 ')
+        te(2,1,4)=node_value('tm214 ')
+        te(2,1,5)=node_value('tm215 ')
+        te(2,1,6)=node_value('tm216 ')
+        te(2,2,1)=node_value('tm221 ')
+        te(2,2,2)=node_value('tm222 ')
+        te(2,2,3)=node_value('tm223 ')
+        te(2,2,4)=node_value('tm224 ')
+        te(2,2,5)=node_value('tm225 ')
+        te(2,2,6)=node_value('tm226 ')
+        te(2,3,1)=node_value('tm231 ')
+        te(2,3,2)=node_value('tm232 ')
+        te(2,3,3)=node_value('tm233 ')
+        te(2,3,4)=node_value('tm234 ')
+        te(2,3,5)=node_value('tm235 ')
+        te(2,3,6)=node_value('tm236 ')
+        te(2,4,1)=node_value('tm241 ')
+        te(2,4,2)=node_value('tm242 ')
+        te(2,4,3)=node_value('tm243 ')
+        te(2,4,4)=node_value('tm244 ')
+        te(2,4,5)=node_value('tm245 ')
+        te(2,4,6)=node_value('tm246 ')
+        te(2,5,1)=node_value('tm251 ')
+        te(2,5,2)=node_value('tm252 ')
+        te(2,5,3)=node_value('tm253 ')
+        te(2,5,4)=node_value('tm254 ')
+        te(2,5,5)=node_value('tm255 ')
+        te(2,5,6)=node_value('tm256 ')
+        te(2,6,1)=node_value('tm261 ')
+        te(2,6,2)=node_value('tm262 ')
+        te(2,6,3)=node_value('tm263 ')
+        te(2,6,4)=node_value('tm264 ')
+        te(2,6,5)=node_value('tm265 ')
+        te(2,6,6)=node_value('tm266 ')
+        te(3,1,1)=node_value('tm311 ')
+        te(3,1,2)=node_value('tm312 ')
+        te(3,1,3)=node_value('tm313 ')
+        te(3,1,4)=node_value('tm314 ')
+        te(3,1,5)=node_value('tm315 ')
+        te(3,1,6)=node_value('tm316 ')
+        te(3,2,1)=node_value('tm321 ')
+        te(3,2,2)=node_value('tm322 ')
+        te(3,2,3)=node_value('tm323 ')
+        te(3,2,4)=node_value('tm324 ')
+        te(3,2,5)=node_value('tm325 ')
+        te(3,2,6)=node_value('tm326 ')
+        te(3,3,1)=node_value('tm331 ')
+        te(3,3,2)=node_value('tm332 ')
+        te(3,3,3)=node_value('tm333 ')
+        te(3,3,4)=node_value('tm334 ')
+        te(3,3,5)=node_value('tm335 ')
+        te(3,3,6)=node_value('tm336 ')
+        te(3,4,1)=node_value('tm341 ')
+        te(3,4,2)=node_value('tm342 ')
+        te(3,4,3)=node_value('tm343 ')
+        te(3,4,4)=node_value('tm344 ')
+        te(3,4,5)=node_value('tm345 ')
+        te(3,4,6)=node_value('tm346 ')
+        te(3,5,1)=node_value('tm351 ')
+        te(3,5,2)=node_value('tm352 ')
+        te(3,5,3)=node_value('tm353 ')
+        te(3,5,4)=node_value('tm354 ')
+        te(3,5,5)=node_value('tm355 ')
+        te(3,5,6)=node_value('tm356 ')
+        te(3,6,1)=node_value('tm361 ')
+        te(3,6,2)=node_value('tm362 ')
+        te(3,6,3)=node_value('tm363 ')
+        te(3,6,4)=node_value('tm364 ')
+        te(3,6,5)=node_value('tm365 ')
+        te(3,6,6)=node_value('tm366 ')
+        te(4,1,1)=node_value('tm411 ')
+        te(4,1,2)=node_value('tm412 ')
+        te(4,1,3)=node_value('tm413 ')
+        te(4,1,4)=node_value('tm414 ')
+        te(4,1,5)=node_value('tm415 ')
+        te(4,1,6)=node_value('tm416 ')
+        te(4,2,1)=node_value('tm421 ')
+        te(4,2,2)=node_value('tm422 ')
+        te(4,2,3)=node_value('tm423 ')
+        te(4,2,4)=node_value('tm424 ')
+        te(4,2,5)=node_value('tm425 ')
+        te(4,2,6)=node_value('tm426 ')
+        te(4,3,1)=node_value('tm431 ')
+        te(4,3,2)=node_value('tm432 ')
+        te(4,3,3)=node_value('tm433 ')
+        te(4,3,4)=node_value('tm434 ')
+        te(4,3,5)=node_value('tm435 ')
+        te(4,3,6)=node_value('tm436 ')
+        te(4,4,1)=node_value('tm441 ')
+        te(4,4,2)=node_value('tm442 ')
+        te(4,4,3)=node_value('tm443 ')
+        te(4,4,4)=node_value('tm444 ')
+        te(4,4,5)=node_value('tm445 ')
+        te(4,4,6)=node_value('tm446 ')
+        te(4,5,1)=node_value('tm451 ')
+        te(4,5,2)=node_value('tm452 ')
+        te(4,5,3)=node_value('tm453 ')
+        te(4,5,4)=node_value('tm454 ')
+        te(4,5,5)=node_value('tm455 ')
+        te(4,5,6)=node_value('tm456 ')
+        te(4,6,1)=node_value('tm461 ')
+        te(4,6,2)=node_value('tm462 ')
+        te(4,6,3)=node_value('tm463 ')
+        te(4,6,4)=node_value('tm464 ')
+        te(4,6,5)=node_value('tm465 ')
+        te(4,6,6)=node_value('tm466 ')
+        te(5,1,1)=node_value('tm511 ')
+        te(5,1,2)=node_value('tm512 ')
+        te(5,1,3)=node_value('tm513 ')
+        te(5,1,4)=node_value('tm514 ')
+        te(5,1,5)=node_value('tm515 ')
+        te(5,1,6)=node_value('tm516 ')
+        te(5,2,1)=node_value('tm521 ')
+        te(5,2,2)=node_value('tm522 ')
+        te(5,2,3)=node_value('tm523 ')
+        te(5,2,4)=node_value('tm524 ')
+        te(5,2,5)=node_value('tm525 ')
+        te(5,2,6)=node_value('tm526 ')
+        te(5,3,1)=node_value('tm531 ')
+        te(5,3,2)=node_value('tm532 ')
+        te(5,3,3)=node_value('tm533 ')
+        te(5,3,4)=node_value('tm534 ')
+        te(5,3,5)=node_value('tm535 ')
+        te(5,3,6)=node_value('tm536 ')
+        te(5,4,1)=node_value('tm541 ')
+        te(5,4,2)=node_value('tm542 ')
+        te(5,4,3)=node_value('tm543 ')
+        te(5,4,4)=node_value('tm544 ')
+        te(5,4,5)=node_value('tm545 ')
+        te(5,4,6)=node_value('tm546 ')
+        te(5,5,1)=node_value('tm551 ')
+        te(5,5,2)=node_value('tm552 ')
+        te(5,5,3)=node_value('tm553 ')
+        te(5,5,4)=node_value('tm554 ')
+        te(5,5,5)=node_value('tm555 ')
+        te(5,5,6)=node_value('tm556 ')
+        te(5,6,1)=node_value('tm561 ')
+        te(5,6,2)=node_value('tm562 ')
+        te(5,6,3)=node_value('tm563 ')
+        te(5,6,4)=node_value('tm564 ')
+        te(5,6,5)=node_value('tm565 ')
+        te(5,6,6)=node_value('tm566 ')
+        te(6,1,1)=node_value('tm611 ')
+        te(6,1,2)=node_value('tm612 ')
+        te(6,1,3)=node_value('tm613 ')
+        te(6,1,4)=node_value('tm614 ')
+        te(6,1,5)=node_value('tm615 ')
+        te(6,1,6)=node_value('tm616 ')
+        te(6,2,1)=node_value('tm621 ')
+        te(6,2,2)=node_value('tm622 ')
+        te(6,2,3)=node_value('tm623 ')
+        te(6,2,4)=node_value('tm624 ')
+        te(6,2,5)=node_value('tm625 ')
+        te(6,2,6)=node_value('tm626 ')
+        te(6,3,1)=node_value('tm631 ')
+        te(6,3,2)=node_value('tm632 ')
+        te(6,3,3)=node_value('tm633 ')
+        te(6,3,4)=node_value('tm634 ')
+        te(6,3,5)=node_value('tm635 ')
+        te(6,3,6)=node_value('tm636 ')
+        te(6,4,1)=node_value('tm641 ')
+        te(6,4,2)=node_value('tm642 ')
+        te(6,4,3)=node_value('tm643 ')
+        te(6,4,4)=node_value('tm644 ')
+        te(6,4,5)=node_value('tm645 ')
+        te(6,4,6)=node_value('tm646 ')
+        te(6,5,1)=node_value('tm651 ')
+        te(6,5,2)=node_value('tm652 ')
+        te(6,5,3)=node_value('tm653 ')
+        te(6,5,4)=node_value('tm654 ')
+        te(6,5,5)=node_value('tm655 ')
+        te(6,5,6)=node_value('tm656 ')
+        te(6,6,1)=node_value('tm661 ')
+        te(6,6,2)=node_value('tm662 ')
+        te(6,6,3)=node_value('tm663 ')
+        te(6,6,4)=node_value('tm664 ')
+        te(6,6,5)=node_value('tm665 ')
+        te(6,6,6)=node_value('tm666 ')
+        test=zero
+        do i1=1,6
+          do i2=1,6
+            do i3=1,6
+              test=test+abs(te(i1,i2,i3))
+            enddo
+          enddo
+        enddo
+        if(test.ne.zero) fsecarb=.true.
+      endif
+
+!---- Track orbit.
+      fmap = .true.
+      if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+      end
       subroutine tmquad(fsec,ftrk,orbit,fmap,el,ek,re,te)
-
-
       implicit none
 #ifdef _WIN32
 	include 'win32calls.fi'
