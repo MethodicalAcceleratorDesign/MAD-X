@@ -295,6 +295,7 @@ char command_def[] =
 "icase      = [i, 4], "
 "no         = [i, 1], "
 "deltap     = [r, 0], "
+"normal     = [l, false, true], "
 "ptc_twiss  = [l, false, true]; "
 " "
 "correct: correct correct 0 0 "

@@ -66,6 +66,7 @@
 /physcons.fi -text
 /plot.F -text
 /ptc_input.f90 -text
+/ptc_normal.f90 -text
 /ptc_twiss.f90 -text
 /set_para.f90 -text
 /survey.F -text

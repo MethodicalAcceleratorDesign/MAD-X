@@ -18,6 +18,7 @@ subroutine ttwm()
      return
   endif
   if(get_value('ptc ','ptc_twiss ') .ne. 0) call ptc_twiss(lhc,icav)
+  if(get_value('ptc ','normal ') .ne. 0) call ptc_normal(lhc,icav)
   call kill(lhc)
   call kill_tpsa
   call nul_coef(SECTOR_B)

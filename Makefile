@@ -200,6 +200,9 @@ u1_twiss.o: zza_keywords.o u1_twiss.f90
 ptc_twiss.o: u1_twiss.o ptc_twiss.f90
 	$(f95) $(f95_FLAGS) ptc_twiss.f90
 
+ptc_normal.o: zza_keywords.o ptc_normal.f90
+	$(f95) $(f95_FLAGS) ptc_normal.f90
+
 madx: madxnp.o twissp.o ttwm_dump.o surveyp.o orbfp.o emitp.o utilp.o matchp.o dynapp.o plotp.o ibsdbp.o trrunp.o gxx11p.o gxx11c.o
 	$(FC) $(FP) -o madx madxm.F madxnp.o twissp.o ttwm_dump.o matchp.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o $(LIBX) -lm -lc
 
@@ -214,6 +217,7 @@ madxdev: \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o zza_keywords.o \
 	first_ptc.o ptc_input.o u1_twiss.o set_para.o ptc_twiss.o \
+	ptc_normal.o \
 	madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o dynap.o \
 	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o
 	$(f95) $(FOPT) -o madxdev madxm.F \
@@ -226,7 +230,7 @@ madxdev: \
 	Sg_1_template_my_kind.o Sg_2_template_my_kind.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o zza_keywords.o \
-	first_ptc.o ptc_input.o u1_twiss.o set_para.o ptc_twiss.o \
+	first_ptc.o ptc_input.o u1_twiss.o set_para.o ptc_twiss.o ptc_normal.o \
 	madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o dynap.o \
 	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o $(LIBX) -lm -lc
 
