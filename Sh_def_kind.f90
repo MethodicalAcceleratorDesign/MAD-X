@@ -3447,12 +3447,10 @@ contains
        CALL KILL(B2)
     ENDIF
     if(EL%P%TIME) then
-       CALL ALLOC(X5)
        x5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
        X(2)=X(2)-YL*(EL%B_SOL)**2*X(1)/four/x5
        X(4)=X(4)-YL*(EL%B_SOL)**2*X(3)/four/x5
        X(6)=X(6)+(one/EL%P%beta0+x(5))*YL*(EL%B_SOL)**2*(X(1)**2+X(3)**2)/eight/x5**3
-       CALL KILL(X5)
     else
        X(2)=X(2)-YL*(EL%B_SOL)**2*X(1)/four/(one+X(5))
        X(4)=X(4)-YL*(EL%B_SOL)**2*X(3)/four/(one+X(5))
@@ -4916,7 +4914,6 @@ contains
        ENDDO
 
        CALL KILL( DK,DK2,DK4,DK5,DK6);
-       CALL KILL(EL)
 
     CASE DEFAULT
        w_p=0
@@ -4926,6 +4923,7 @@ contains
        call write_e(357)
     END SELECT
 
+    CALL KILL(EL)
     CALL KILL(DKT)
 
   END SUBROUTINE INTSOLP
@@ -5029,7 +5027,6 @@ contains
        ENDDO
 
        CALL KILL( DK,DK2,DK4,DK5,DK6);
-       CALL KILL(EL)
 
     CASE DEFAULT
        w_p=0
@@ -5039,6 +5036,7 @@ contains
        call write_e(357)
     END SELECT
 
+    CALL KILL(EL)
     CALL KILL(DKT)
 
   END SUBROUTINE INTSOLS

@@ -1105,13 +1105,14 @@ CONTAINS
     SOLTILT%LD=L1
     SOLTILT%LC=L1
     SOLTILT%BSOL=K11
-    SOLTILT%nmul=1
+    SOLTILT%nmul=2
     IF(L1==zero) THEN
        SOLTILT%KIND=KIND0
     ELSE
        SOLTILT%K(2)=KQ/FAC(2)    ! MAD FACTOR
        if(madkind2==kind2) then
-          SOLTILT%KIND=KIND5
+          !SOLTILT%KIND=kind17  !KIND5
+          SOLTILT%KIND=kind15 ! special fix by Etienne 04.02.2004
        else
           SOLTILT%KIND=KIND17
 !          SOLTILT%nmul=2
