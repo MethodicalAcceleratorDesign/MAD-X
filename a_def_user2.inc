@@ -1,0 +1,20 @@
+! user2
+
+TYPE USER2
+   TYPE(MAGNET_CHART), POINTER :: P
+   real(dp), POINTER ::L      !  MUST ALWAYS BE THERE
+   real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component (OPTIONAL)
+   !   ADD INTERNAL STUFF HERE AS POINTERS
+   !           .........
+   real(dp), POINTER ::INTERNAL           ! INTERNAL IS AN EXAMPLE
+END  TYPE USER2
+
+TYPE USER2P
+   TYPE(MAGNET_CHART), POINTER :: P
+   TYPE(REAL_8), POINTER ::L       !  MUST ALWAYS BE THERE
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component (OPTIONAL)
+   !   ADD INTERNAL STUFF HERE AS POINTERS
+   !           .........
+   TYPE(REAL_8), POINTER ::INTERNAL        ! INTERNAL IS AN EXAMPLE
+END  TYPE USER2P
+

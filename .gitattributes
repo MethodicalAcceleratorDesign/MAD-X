@@ -18,6 +18,11 @@
 /Sm_tracking.f90 -text
 /Sn_mad_like.f90 -text
 /So_fitting.f90 -text
+/Sp_keywords.f90 -text
+/a_def_all_kind.inc -text
+/a_def_element_fibre_layout.inc -text
+/a_def_user1.inc -text
+/a_def_user2.inc -text
 /a_scratch_size.f90 -text
 /b_da_arrays_all.f90 -text
 /bb.fi -text
