@@ -294,6 +294,7 @@ char command_def[] =
 "nst        = [i, 1], "
 "icase      = [i, 4], "
 "no         = [i, 1], "
+"deltap     = [r, 0], "
 "ptc_twiss  = [l, false, true]; "
 " "
 "correct: correct correct 0 0 "

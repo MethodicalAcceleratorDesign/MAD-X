@@ -4,7 +4,7 @@ subroutine ptc_twiss(lhc,icav)
   use twisspara
   implicit none
   integer i,no,mynd2,npara,mynpa,nda,icase,icav,ij
-  real(dp) x(6),suml
+  real(dp) x(6),suml,deltap0,deltap
   type(layout) LHC
   type(real_8) y(6)
   real(kind(1d0)) get_value
@@ -16,12 +16,15 @@ subroutine ptc_twiss(lhc,icav)
   suml=zero
 
   icase = get_value('ptc ','icase ')
+  deltap0 = get_value('ptc ','deltap ')
+  deltap = zero
   select case(icase)
   CASE(4)
      default=default+only_4d+NOCAVITY
      mynpa=4
   CASE(5)
      default=default+delta
+     deltap=deltap0
      mynpa=5
   CASE DEFAULT
      default=default+only_4d+NOCAVITY
@@ -38,6 +41,7 @@ subroutine ptc_twiss(lhc,icav)
   call print(default,6)
 
   x(:)=zero
+  if(icase.eq.5) x(5)=deltap
   call find_orbit(lhc,x,1,default)
   print*,"Closed orbit: ",x
 
@@ -59,7 +63,8 @@ subroutine ptc_twiss(lhc,icav)
      call track(lhc,y,i,i+1,default)
      suml=suml+current%MAG%P%ld
      tw=y
-     write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%beta(1,1),tw%beta(1,2),tw%beta(2,1),tw%beta(2,2)
+     write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%beta(1,1),tw%beta(1,2),tw%beta(2,1),tw%beta(2,2),&
+tw%disp(1),tw%disp(3)
      current=>current%next
   enddo
   call kill(tw)
