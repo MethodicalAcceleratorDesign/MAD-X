@@ -2754,7 +2754,11 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
                    - get_refpos(nodesequ);
      if (p->p_sequ != NULL) p = expand_node(p, top_sequ, 
                                             p->p_sequ, p->position);
-     else add_to_node_list(p, 0, top_sequ->ex_nodes);
+     else 
+       {
+	p->share = top_sequ->share;
+	add_to_node_list(p, 0, top_sequ->ex_nodes);
+       }
     }
   delete_node(node);
   return p;
