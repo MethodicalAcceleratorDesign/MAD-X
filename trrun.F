@@ -407,10 +407,27 @@
 !     &  aperture(1),"  Yrect= ",aperture(2),"  Rcirc= ",aperture(3)
           apx = aperture(3)
           apy = aperture(3)
+!JMJ!     Making essential changes in AV's absence, 16/7/2003
+!JMJ!     this tests whether the particle is outside the circumscribing
+!JMJ!     circle.
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
      &    last_pos, last_orbit, track, ktrack,al_errors)
-          apx = aperture(1)
-          apy = aperture(2)
+!JMJ!
+!JMJ!     This tests whether particles are outside the space bounded by
+!JMJ!     two or four lines intersecting the circle.
+!JMJ!     The previous version checked that it was outside a rectangle,
+!JMJ!     one of whose dimensions was zero (in the LHC) so particles
+!JMJ!     were ALWAYS lost on the beam screen.
+!JMJ!     The new version of the test works on the understanding that
+!JMJ!     values of aperture(1) or aperture(2) greater than aperture(3)
+!JMJ!     have no meaning and that specifying a zero value is equivalent.
+!JMJ!     The most general aperture described by the present
+!JMJ!     implementation of LHCSCREEN is a rectangle with rounded
+!JMJ!     corners.
+!JMJ!     N.B. apx and apy already have the value aperture(3); the "if"s
+!JMJ!     ensure that they don't get set to zero.
+          if(aperture(1).gt.0.) apx = aperture(1)
+          if(aperture(2).gt.0.) apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
      &    last_pos, last_orbit, track, ktrack,al_errors)
 !        print *, "LHC screen end"
