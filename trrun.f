@@ -305,46 +305,64 @@
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
-!-- switch on element type
-      go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
-     &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
-     &210, 220, 230, 240, 250, 260, 270, 280, 290, 300,                 &
-     &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
-
-!---- Drift space, monitors, beam instrument.
-   10 continue
-  170 continue
-  180 continue
-  190 continue
-  240 continue
+!---- Drift space
+      if(code.eq.1) then
       call ttdrf(el,track,ktrack)
       go to 500
+      endif
+!---- Collimator with elliptic aperture.
+      if(code.eq.20) then
+      apx = node_value('xsize ')
+      apy = node_value('ysize ')
+      if(apx.eq.zero) then
+        apx=maxaper(1)
+      endif
+      if(apy.eq.zero) then
+        apy=maxaper(3)
+      endif
+      call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
+     &last_pos, last_orbit, track, ktrack,al_errors)
+      go to 500
+      endif
+!---- Collimator with rectangular aperture.
+      if(code.eq.21) then
+      apx = node_value('xsize ')
+      apy = node_value('ysize ')
+      if(apx.eq.zero) then
+        apx=maxaper(1)
+      endif
+      if(apy.eq.zero) then
+        apy=maxaper(3)
+      endif
+      call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
+     &last_pos, last_orbit, track, ktrack,al_errors)
+      go to 500
+      endif
+!---- Beam-beam,  standard 4D
+      if(code.eq.22) then
+      parvec(5)=get_value('probe ', 'arad ')
+      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+      parvec(7)=get_value('probe ','gamma ')
+      call ttbb(track, ktrack, parvec)
+      go to 500
+      endif
+      go to 501
 
-!---- Bending magnet.
+!---- Bending magnet. OBSOLETE, to be kept for go to 
    20 continue
    30 continue
-      go to 500
-
-!---- Arbitrary matrix.
+!---- Arbitrary matrix. OBSOLETE, to be kept for go to 
    40 continue
-      go to 500
-
-!---- Quadrupole.
+!---- Quadrupole. OBSOLETE, to be kept for go to 
    50 continue
-      go to 500
-
-!---- Sextupole.
+!---- Sextupole. OBSOLETE, to be kept for go to 
    60 continue
-      go to 500
-
-!---- Octupole.
+!---- Octupole. OBSOLETE, to be kept for go to 
    70 continue
       go to 500
 
-!---- Multipole.
-   80 continue
-!____ Test aperture.
-      aperflag = get_option('aperture ') .ne. 0
+!____ Test aperture. ALL ELEMENTS BUT DRIFTS
+ 501  aperflag = get_option('aperture ') .ne. 0
       if(aperflag) then
         nn=24
         call node_string('apertype ',aptype,nn)
@@ -395,29 +413,38 @@
      &    last_pos, last_orbit, track, ktrack,al_errors)
         endif
       endif
+!-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
+!-- 500 has been specified at the relevant places in go to below
+      go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
+     &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
+     &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
+     &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
+!     monitors, beam instrument. 
+  170 continue
+  180 continue
+  190 continue
+  240 continue
+      call ttdrf(el,track,ktrack)
+      go to 500
+   80 continue
       call ttmult(track,ktrack,dxt,dyt)
       go to 500
-
 !---- Solenoid.
    90 continue
 !        call ttsol(el, track, ktrack)
       go to 500
-
 !---- RF cavity.
   100 continue
       call ttrf(track,ktrack)
       go to 500
-
 !---- Electrostatic separator.
   110 continue
 !        call ttsep(el, track, ktrack)
       go to 500
-
 !---- Rotation around s-axis.
   120 continue
 !        call ttsrot(track, ktrack)
       go to 500
-
 !---- Rotation around y-axis.
   130 continue
 !        call ttyrot(track, ktrack)
@@ -430,42 +457,6 @@
       call ttcorr(el, track, ktrack)
       go to 500
 
-!---- Collimator with elliptic aperture.
-  200 continue
-      apx = node_value('xsize ')
-      apy = node_value('ysize ')
-      if(apx.eq.zero) then
-        apx=maxaper(1)
-      endif
-      if(apy.eq.zero) then
-        apy=maxaper(3)
-      endif
-      call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
-     &last_pos, last_orbit, track, ktrack,al_errors)
-      go to 500
-
-!---- Collimator with rectangular aperture.
-  210 continue
-      apx = node_value('xsize ')
-      apy = node_value('ysize ')
-      if(apx.eq.zero) then
-        apx=maxaper(1)
-      endif
-      if(apy.eq.zero) then
-        apy=maxaper(3)
-      endif
-      call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
-     &last_pos, last_orbit, track, ktrack,al_errors)
-      go to 500
-
-!---- Beam-beam.
-  220 continue
-!--- standard 4D
-      parvec(5)=get_value('probe ', 'arad ')
-      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-      parvec(7)=get_value('probe ','gamma ')
-      call ttbb(track, ktrack, parvec)
-      go to 500
 
 !---- Lump.
   230 continue
