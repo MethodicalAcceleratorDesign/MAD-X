@@ -95,12 +95,18 @@ int efield_table_types[] =
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
-2, 2, 2
+2, 2, 2, 2, 2,
+2, 2, 2, 2, 2,
+2, 2, 2, 2, 2,
+2, 2
 };
 
 char* efield_table_cols[] =
 {
 "name", 
+"dx", "dy", "ds", "dphi", "dtheta",
+"dpsi", "mrex", "mrey", "mredx", "mredy",
+"arex", "arey", "mscalx", "mscaly",
 "k0l", "k0sl", "k1l", "k1sl", 
 "k2l", "k2sl", "k3l", "k3sl", "k4l", 
 "k4sl", "k5l", "k5sl", "k6l", "k6sl", 
