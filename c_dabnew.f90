@@ -255,12 +255,12 @@ contains
     !       is(i) = 0
     !    enddo
     !
-    !
     if(nv.gt.lnv.or.no.gt.lno) then
        write(line,'(a36,1x,i4,1x,i4)') 'ERROR IN SUBROUTINE DAINI, NO, NV = ',no,nv
        ipause=mypauses(1,line)
        call dadeb(31,'ERR DAINI ',1)
     endif
+    !
     ibase = no+1
     js    = nv/2
     if(float(ibase)**((nv+1)/2).gt.float(lia)) then
@@ -5301,13 +5301,14 @@ contains
   !
   subroutine dacycle(ina,ipresent,value,illa,j)
     implicit none
+    integer ipause, mypauses
     !     ***************************
     !
     !     THIS SUBROUTINE PRINTS THE DA VECTOR INA TO UNIT IUNIT.
     !
     !-----------------------------------------------------------------------------
     !
-    integer i,ii,illa,ilma,ina,inoa,inva,iout,ipoa,ipresent,ipause,mypauses
+    integer i,ii,illa,ilma,ina,inoa,inva,iout,ipoa,ipresent
     integer,optional,dimension(:)::j
     real(dp) value
     !
