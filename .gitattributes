@@ -38,7 +38,6 @@
 /emit.fi -text
 /epause.c -text
 /f_newda.f90 -text
-/first_ptc.f90 -text
 /g_newLielib.f90 -text
 /gxx11.F -text
 /gxx11c.c -text
@@ -71,10 +70,6 @@
 /orbf.F -text
 /physcons.fi -text
 /plot.F -text
-/ptc_input.f90 -text
-/ptc_normal.f90 -text
-/ptc_twiss.f90 -text
-/set_para.f90 -text
 /survey.F -text
 /sxf.c -text
 /timel.c -text
@@ -89,9 +84,7 @@
 /twissl.fi -text
 /twissotm.fi -text
 /twtrr.fi -text
-/u1_twiss.f90 -text
 /usleep.c -text
 /util.F -text
 /win32calls.fi -text
 /wmaxmin0.fi -text
-/zza_keywords.f90 -text
