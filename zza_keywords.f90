@@ -1,4 +1,5 @@
 module madx_keywords
+  USE Mad_like
   use S_fitting
   type keywords
      character*20 magnet
@@ -203,46 +204,6 @@ contains
     FRAME%CHART=1
   end subroutine zero_MAD_SURVEY
 
-
-  subroutine drift_bending(el,F) ! this turns a drift into a bend for survey purposes
-    implicit none
-    type(fibre), intent(inout)::el
-    TYPE(MADX_SURVEY), intent(in):: F
-
-    ! THIS MUST BE USED ONLY IN MAD-X SURVEYS.
-    ! TURN ON with_external_frame  TEMPORARILY IF OFF
-    ! TURN ON with_internal_frame  TEMPORARILY IF OFF
-    ! TURN ON with_chart           TEMPORARILY IF OFF
-    ! TURN ON with_patch           TEMPORARILY IF OFF
-    !
-    EL%MAG%P%LD=F%LD
-    EL%MAG%P%TILTD=F%TILT
-
-    IF(F%ALPHA/=ZERO) THEN
-       EL%MAG%P%LC=TWO*EL%MAG%P%LD*SIN(F%ALPHA/TWO)/F%ALPHA
-       EL%MAG%L=EL%MAG%P%LC    ! NOT REALLY NECESSARY
-       EL%MAG%P%B0=F%ALPHA/el%MAG%P%LD
-    ELSE
-       EL%MAG%L=EL%MAG%P%LD
-       EL%MAG%P%LC=EL%MAG%P%LD
-       EL%MAG%P%B0=ZERO
-    ENDIF
-    CALL SURVEY(EL)
-  end subroutine drift_bending
-
-  subroutine SURVEY_LEAP_FROG(D1,D2,F)
-    IMPLICIT NONE
-    type(fibre), intent(inout)::D1,D2
-    TYPE(MADX_SURVEY), intent(inout)::F
-
-    CALL drift_bending(D2,F)
-    CALL ROTATE_FIBRE(D2,D1)
-    CALL COPY(D2%MAG,D1%MAG)
-    CALL COPY(D2%CHART,D1%CHART)
-    CALL EXTRACT_MADX_FRAME(D1,F)
-
-
-  END subroutine SURVEY_LEAP_FROG
 
   subroutine EXTRACT_MADX_FRAME(D1,F)
     IMPLICIT NONE
