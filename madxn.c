@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/utsname.h>
-#include <unistd.h>
+#include <sys/unistd.h> //hbu
 #endif
 #include <sys/timeb.h>
 #include <ctype.h>
