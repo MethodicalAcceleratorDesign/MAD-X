@@ -447,7 +447,7 @@
       double precision  r1sq, r2sq, fh1, fh2, dr, di, drt, hcb
       double precision  rfv, rff, rfl, rfvlt, rffrq, rflag, time
       double precision  xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
-      double precision  sk3, rfac, dbr, dbi, dipr, dipi, rfacx, rfacy
+      double precision  sk3, rfac, rfacx, rfacy
       double precision  get_variable, fh
 
       if (code .eq. 8)  then
@@ -692,6 +692,7 @@
 !---- Thin multipoles, EL is the fictitious length for radiation.
    80 continue
 !---- Multipole components.
+      call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
@@ -714,17 +715,9 @@
       endif
       nd = 2 * max(nn, ns, n_ferr/2-1)
 
-!---- Dipole error.
-      dbr = bv0 * field(1,0) / (one + deltap)
-      dbi = bv0 * field(2,0) / (one + deltap)
-
-!---- Nominal dipole strength.
-      dipr = bv0 * vals(1,0) / (one + deltap)
-      dipi = bv0 * vals(2,0) / (one + deltap)
-
 !---- Other components and errors.
       nord = 0
-      do iord = 1, nd/2
+      do iord = 0, nd/2
         do j = 1, 2
           field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
      &    / (one + deltap)
