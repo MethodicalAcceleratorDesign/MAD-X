@@ -35,6 +35,7 @@ void correct_correct(struct in_cmd* cmd)
   int niter;
   int resout;
   int twism;
+  int ifail;
   float  rms;
   double tmp1, tmp2, tmp3, tmp4;
   char    *clist, *mlist;    /* file names for monitor and corrector output */ 
@@ -48,6 +49,14 @@ void correct_correct(struct in_cmd* cmd)
   im = pro_correct_gettables(ip);
   ncorr = im%10000; nmon  = im/10000;
   printf("%d monitors and %d correctors found in input\n",nmon,ncorr);
+  if(nmon == 0) {
+    printf("No monitor found in input, no correction done\n");
+    return;
+  } 
+  if(ncorr == 0) {
+    printf("No corrector found in input, no correction done\n");
+    return;
+  }
   setbuf(stdout,NULL);
 
   if((resout = command_par_value("resout",cmd->clone)) > 0) {              
@@ -122,19 +131,32 @@ void correct_correct(struct in_cmd* cmd)
     pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
   }
 
+  corrl = command_par_value("corrlim",cmd->clone);
+  set_variable("corrlim",&corrl);                         
+
   /* MICADO correction, get desired number of correctors from command */
   if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
-    if((niter =command_par_value("ncorr",cmd->clone)) == 0) niter = icor;
-    if((niter =command_par_value("ncorr",cmd->clone)) < 0) niter = 0;     
-    if(niter > icor) {
+    if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
+          printf("Requested %d correctors (???) set to %d\n",niter,icor);
+          niter = icor;
+    }
+    else if((niter = command_par_value("ncorr",cmd->clone)) < 0) {
+          printf("Requested %d correctors (???) set to 0\n",niter);
+          niter = 0;     
+    }
+    else if((niter = command_par_value("ncorr",cmd->clone)) > icor) {
           printf("Fewer correctors available than requested by ncorr\n");
+          printf("you want %d,  you get %d\n",niter,icor);
           printf("ncorr reset to %d\n",icor);
           niter = icor;
     }
     
     rms  = 1000.0*command_par_value("error",cmd->clone);
     /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
-    c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
+    ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
+    if(ifail != 0) {
+       printf("MICADO correction completed with error code %d\n\n",ifail);
+    }
     pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
   }
 
@@ -205,8 +227,8 @@ int pro_correct_getcommands(struct in_cmd* cmd)
 
   n_iter = command_par_value(att[0],cmd->clone);
   ncorr  = command_par_value(att[2],cmd->clone);
-  printf("mode is: %s\n",command_par_string(att[7],cmd->clone));
-  printf("flag is: %s\n",command_par_string(att[6],cmd->clone));
+  /* printf("mode is: %s\n",command_par_string(att[7],cmd->clone));
+  printf("flag is: %s\n",command_par_string(att[6],cmd->clone)); */
   strcpy(plane,command_par_string(att[1],cmd->clone));
   if(strcmp("x",plane) == 0) {
     iplane = 1; 
@@ -646,6 +668,7 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
 {
   int i;
   int rst;
+  double corrm;
   struct id_mic *m, *c;      /* access to tables for monitors and correctors */
 
   m = correct_orbit->mon_table;
@@ -675,6 +698,13 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
     pro_correct_fill_mon_table(ip,m[nm[i]].p_node->name,monvec[i],resvec[i]);
   }
 
+  corrm = copk(corvec,icor);
+
+  printf("Max strength: %e should be less than %e\n",corrm,corrl);
+  if(corrm > corrl) {
+     printf("++++++ warning: maximum corrector strength larger than limit\n");
+  }
+  set_variable("corrmax",&corrm);                         
   if(print_correct_opt > 1) {
      printf("Max strength: %e\n",copk(corvec,icor));
      printf("Corrector:  Before:     After:    Difference:\n");     
@@ -867,9 +897,10 @@ unsigned int locf_(iadr)
   return( ((unsigned) iadr) >> LADUPW );
 }
 
-void c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resvec,int *nx,float rms,int imon,int icor,int niter)
+int c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resvec,int *nx,float rms,int imon,int icor,int niter)
 {
   int *ny;
+  int ifail;
   float *ax,*cinx,*xinx,*resx;
   float *rho,*ptop,*rmss,*xrms,*xptp,*xiter;
   
@@ -886,7 +917,7 @@ void c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resv
   xptp =(float *)mycalloc("c_micit_xptp",icor,sizeof(float));
   xiter=(float *)mycalloc("c_micit_xiter",icor,sizeof(float));
   
-  micit_(dmat,conm,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter,ny,ax,cinx,xinx,resx,rho,ptop,rmss,xrms,xptp,xiter);
+  micit_(dmat,conm,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter,ny,ax,cinx,xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,&ifail);
 
   free(ny);
   free(ax);
@@ -902,7 +933,7 @@ void c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resv
 /*
 */
 
-  return;
+  return(ifail);
 }
 
 void c_haveit(double *dmat,double *monvec,double *corvec,double *resvec,int *nx,int imon,int icor)
