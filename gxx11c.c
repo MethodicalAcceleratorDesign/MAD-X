@@ -48,11 +48,11 @@
   XWindowAttributes     theAtt;
   XGCValues             gcv;
 
-  static unsigned char solid[1]  = {0},
+  static char solid[1]  = {0},
                        dashed[2] = {3,3},
                        dotted[2] = {1,3},
                        dot_dashed[4] = {1,3,3,3};
-  static unsigned char *dash_list[] = {solid, dashed, dotted, dot_dashed};
+  static char *dash_list[] = {solid, dashed, dotted, dot_dashed};
   static int dash_list_length[] = {0, 2, 2, 4};
 
 void wopen(int *uswid, int *ushi)
