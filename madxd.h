@@ -397,7 +397,8 @@ int get_select_ex_ranges(struct sequence*,struct command_list*,
                          struct node_list*);
 int get_select_ranges(struct sequence*,struct command_list*,
                       struct node_list*);
-void get_select_t_ranges(struct command_list*, struct table*);
+void get_select_t_ranges(struct command_list*,
+                         struct command_list*, struct table*);
 int get_sub_range(char*, struct sequence*, struct node**);
 int square_to_colon(char*);
 int get_stmt(FILE*, int);
@@ -592,7 +593,8 @@ void set_range(char*, struct sequence*);
 void set_selected_columns(struct table*, struct command_list*);
 void set_selected_elements();
 void set_selected_errors();
-void set_selected_rows(struct table*, struct command_list*);
+void set_selected_rows(struct table*, struct command_list*, 
+                       struct command_list*);
 void set_twiss_deltas(struct command*);
 void set_sub_variable(char*, char*, struct in_cmd*);
 void set_sector();
@@ -609,9 +611,10 @@ void store_command_def(char*);
 struct command_parameter* store_comm_par_def(char**, int, int);
 void store_comm_par_value(char*, double, struct command*);
 void store_comm_par_vector(char*, double*, struct command*);
+void store_deselect(struct in_cmd*);
 void store_orbit(struct command*, double*);
 void store_savebeta(struct in_cmd*);
-void store_select(struct in_cmd*, int);
+void store_select(struct in_cmd*);
 void store_set(struct command*, int);
 void store_threader(struct in_cmd*);
 int string_cnt(char, int, char**);
@@ -836,6 +839,7 @@ struct command_list* stored_match_var;  /* list of match vary commands */
 struct command_list* stored_track_start;/* list of track start commands */
 struct command_list* sector_select;     /* current sectormap select commands */
 
+struct command_list_list* table_deselect; /* list of table deselect lists */
 struct command_list_list* table_select; /* list of all table select lists */
 
 struct constraint_list* comm_constraints; /* for each constraint command */
@@ -862,6 +866,8 @@ struct int_array* oper;       /* Polish: operator references */
 struct int_array* func;       /* Polish: function references */
 struct int_array* s_range;    /* starts of ranges */
 struct int_array* e_range;    /* ends of ranges */
+struct int_array* sd_range;   /* starts of deselect ranges */
+struct int_array* ed_range;   /* ends of deselect ranges */
 struct int_array* match_i_work[MATCH_WORK];  /* int work space for matching */
 
 struct in_cmd* this_cmd;      /* contains command just read */
@@ -968,7 +974,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 2.13.8";
+char myversion[] = "MAD-X 2.13.09";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

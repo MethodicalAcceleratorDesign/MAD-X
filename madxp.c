@@ -433,8 +433,8 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
-  else if (strcmp(toks[k], "select")      == 0) store_select(cmd, 0);
-  else if (strcmp(toks[k], "deselect")    == 0) store_select(cmd, 1);
+  else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
 #endif
 #ifndef _FULL
   puts("++++++++++++++ command skipped in parser version");
@@ -2476,9 +2476,9 @@ if (final_message == 0)
 	}
 #endif
       if (get_option("trace")) time_stamp("end");
-      printf("\n  ++++++++++++++++++++++++++++++++\n");
+      printf("\n  +++++++++++++++++++++++++++++++++++\n");
       printf("  + %s finished normally +\n", myversion);
-      printf("  ++++++++++++++++++++++++++++++++\n");
+      printf("  +++++++++++++++++++++++++++++++++++\n");
     }
 }
 void madx_init()
@@ -2510,6 +2510,7 @@ void madx_init()
   comm_constraints = new_constraint_list(10);
   beam_list = new_command_list(10);
   stored_track_start = new_command_list(100);
+  table_deselect = new_command_list_list(10);
   table_select = new_command_list_list(10);
   defined_commands = new_command_list(100);
   stored_commands = new_command_list(500);
@@ -2555,6 +2556,8 @@ void madx_init()
   sector_select = new_command_list(10); /* for "select sectormap" commands */
   s_range = new_int_array(10);
   e_range = new_int_array(10);
+  sd_range = new_int_array(10);
+  ed_range = new_int_array(10);
   zero_double(orbit0, 6);
   zero_double(disp0, 6);
   zero_double(guess_orbit,6);
@@ -2571,11 +2574,11 @@ void madx_start()
   time(&start_time); /* initialize timing */
   tm = localtime(&start_time); /* split system time */
   last_time = start_time;
-  printf("\n  ++++++++++++++++++++++++++++++++\n");
+  printf("\n  +++++++++++++++++++++++++++++++++++\n");
   printf("  + %s %02d/%02d/%02d %02d.%02d.%02d +\n", myversion,
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
-  printf("  ++++++++++++++++++++++++++++++++\n");
+  printf("  +++++++++++++++++++++++++++++++++++\n");
 }
 
 void main_input(int top)
@@ -2800,7 +2803,6 @@ int pass_select(char* name, struct command* sc)
   struct command_parameter_list* pl = sc->par;
   struct element* el = find_element(strip(name), element_list);
   int pos, in = 0, any = 0;
-  int toggle = sc->select_type;  /* 0 for select, 1 for deselect commands */
   char *class, *pattern;
   pos = name_list_pos("class", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
@@ -2810,7 +2812,7 @@ int pass_select(char* name, struct command* sc)
        {
         class = pl->parameters[pos]->string;
         in = belongs_to_class(el, class);
-        if (in == 0) return toggle;
+        if (in == 0) return 0;
        }
     }
   any = in = 0;
@@ -2821,8 +2823,8 @@ int pass_select(char* name, struct command* sc)
      pattern = stolower(pl->parameters[pos]->string);
      if(myregex(pattern, strip(name)) == 0)  in = 1;
     }
-  if (any == 0) return 1 - toggle;
-  else return abs(in - toggle);
+  if (any == 0) return 1;
+  else return in;
 }
 
 int pass_select_list(char* name, struct command_list* cl)
@@ -3493,7 +3495,7 @@ int scan_expr(int c_item, char** item)   /* split input */
      */
 
 {
-  int i, lp, lx, l_cat = 0, level = 0, pos, f_level[MAX_ITEM];
+  int i, lp, lx = -1, l_cat = 0, level = 0, pos, f_level[MAX_ITEM];
   char c;
   char* bf;
 

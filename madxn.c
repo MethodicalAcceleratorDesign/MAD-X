@@ -2697,17 +2697,19 @@ int get_select_ranges(struct sequence* sequ, struct command_list* select,
   return s_ranges->curr;
 }
 
-void get_select_t_ranges(struct command_list* select, struct table* t)
-     /* makes a list of table rows that pass the range selection */
+void get_select_t_ranges(struct command_list* select, 
+                         struct command_list* deselect, struct table* t)
+     /* makes a list of table rows that pass the range selection and
+        subsequent deselection */
 {
   int rows[2];
   struct name_list* nl;
   struct command_parameter_list* pl;
-  int i, pos;
+  int i, j, k, pos;
   s_range->curr = 0; e_range->curr = 0;
-  while (s_range->max < select->curr) grow_int_array(s_range);
-  while (e_range->max < select->curr) grow_int_array(e_range);
-  for (i = 0; i < select->curr; i++)
+  if (select != NULL)
+  {
+   for (i = 0; i < select->curr; i++)
     {
      nl = select->commands[i]->par_names;
      pl = select->commands[i]->par;
@@ -2716,15 +2718,38 @@ void get_select_t_ranges(struct command_list* select, struct table* t)
 	 && get_table_range(pl->parameters[pos]->string, t, rows)
          && (rows[0] <= rows[1]))
            {
+            if (s_range->max == s_range->curr) grow_int_array(s_range);
+            if (e_range->max == e_range->curr) grow_int_array(e_range);
             s_range->i[s_range->curr++] = rows[0];
             e_range->i[e_range->curr++] = rows[1];
            }
       else
            {
+            if (s_range->max == s_range->curr) grow_int_array(s_range);
+            if (e_range->max == e_range->curr) grow_int_array(e_range);
             s_range->i[s_range->curr++] = 0;
             e_range->i[e_range->curr++] = t->curr - 1;
            }
     }
+  }
+  if (deselect != NULL)
+  {
+   for (i = 0; i < deselect->curr; i++)
+    {
+     nl = deselect->commands[i]->par_names;
+     pl = deselect->commands[i]->par;
+     pos = name_list_pos("range", nl);
+     if (pos > -1 && nl->inform[pos]  /* parameter has been read */
+	 && get_table_range(pl->parameters[pos]->string, t, rows)
+         && (rows[0] <= rows[1]))
+           {
+            if (sd_range->max == sd_range->curr) grow_int_array(sd_range);
+            if (ed_range->max == ed_range->curr) grow_int_array(ed_range);
+            sd_range->i[sd_range->curr++] = rows[0];
+            ed_range->i[ed_range->curr++] = rows[1];
+           }
+    }
+  }
 }
 
 int get_node_count(struct node* node)
@@ -3500,22 +3525,23 @@ void out_table(char* tname, struct table* t, char* filename)
      /* output of a table */
 {
   int j;
-  struct command_list* scl;
+  struct command_list* scl = find_command_list(tname, table_select);
+  struct command_list* dscl = find_command_list(tname, table_deselect);
   while (t->num_cols > t->col_out->max)
          grow_int_array(t->col_out);
   while (t->curr > t->row_out->max)
          grow_int_array(t->row_out);
   t->row_out->curr = t->curr;
-  if ((scl = find_command_list(tname, table_select)) != NULL
-       && scl->curr > 0 && par_present("full", NULL, scl) == 0)
-          prepare_table_file(t, scl);
-  else
-    {
-     for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
-     for (j = 0; j < t->num_cols; j++)
-          t->col_out->i[j] = j;
-     t->col_out->curr = t->num_cols;
-    }
+  if (par_present("full", NULL, scl))
+      put_info("obsolete option 'full'"," ignored on 'select'");
+  for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
+  for (j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+  t->col_out->curr = t->num_cols;
+  if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0))
+     {
+      set_selected_columns(t, scl);
+      set_selected_rows(t, scl, dscl);
+     }
   write_table(t, filename);
 }
 
@@ -3541,20 +3567,6 @@ int par_present(char* par, struct command* cmd, struct command_list* c_list)
     }
   return 0;
 }
-
-void prepare_table_file(struct table* t, struct command_list* scl)
-     /* prepares a table file for output */
-{
-  int j;
-  if (scl->curr != 0) set_selected_columns(t, scl);
-  if (scl->curr == 0 || par_present("full", NULL, scl))
-    {
-      for (j = 0; j < t->row_out->curr; j++) /* select all rows */
-          t->row_out->i[j] = 1;
-    }
-  else set_selected_rows(t, scl);
-}
-
 
 void pro_aperture(struct in_cmd* cmd)
 {
@@ -5856,14 +5868,11 @@ void set_selected_columns(struct table* t, struct command_list* select)
   char* p;
   struct name_list* nl;
   struct command_parameter_list* pl;
-  if (par_present("column", NULL, select) == 0)
+  if (select && par_present("column", NULL, select))
     {
-     for (j = 0; j < t->num_cols; j++)  /* select all columns */
-          t->col_out->i[j] = j;
-     t->col_out->curr = t->num_cols;
-    }
-  else
-    {
+     for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
+          t->col_out->i[j] = 0;
+     t->col_out->curr = 0;
      for (i = 0; i < select->curr; i++)
        {
         nl = select->commands[i]->par_names;
@@ -5874,45 +5883,45 @@ void set_selected_columns(struct table* t, struct command_list* select)
          for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
            {
             if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
-       {
+              {
                for (k = 0; k < t->num_cols; k++)
-          {
-           if (strncmp("re", t->columns->names[k], 2) == 0)
-             {
+                  {
+                   if (strncmp("re", t->columns->names[k], 2) == 0)
+                     {
                        if (k <  t->num_cols
                            && int_in_array(k, n, t->col_out->i) == 0)
                               t->col_out->i[n++] = k;
-             }
-          }
-       }
+                     }
+                  }
+               }
             else if (strcmp(pl->parameters[pos]->m_string->p[j],
                        "apertype") == 0)
-       {
+              {
                for (k = 0; k < t->num_cols; k++)
-          {
-           if (strncmp("aper", t->columns->names[k], 4) == 0)
-             {
+                 {
+                  if (strncmp("aper", t->columns->names[k], 4) == 0)
+                     {
                        if (k <  t->num_cols
                            && int_in_array(k, n, t->col_out->i) == 0)
                               t->col_out->i[n++] = k;
-             }
-          }
-       }
-              else
-       {
-        p = pl->parameters[pos]->m_string->p[j];
-        if ((k = name_list_pos(p, t->columns)) > -1)
-          {
+                     }
+                 }
+              }
+            else
+              {
+               p = pl->parameters[pos]->m_string->p[j];
+               if ((k = name_list_pos(p, t->columns)) > -1)
+                  {
                     if (k <  t->num_cols
                         && int_in_array(k, n, t->col_out->i) == 0)
                             t->col_out->i[n++] = k;
-          }
-       }
+                  }
+              }         
            }
         }
        }
+     t->col_out->curr = n;
     }
-  t->col_out->curr = n;
 }
 
 void set_selected_elements()
@@ -5961,14 +5970,17 @@ void set_selected_errors()
     }
 }
 
-void set_selected_rows(struct table* t, struct command_list* select)
+void set_selected_rows(struct table* t, struct command_list* select, 
+                       struct command_list* deselect)
 {
   int i, j;
   c_range_start = get_node_count(current_sequ->range_start);
   c_range_end = get_node_count(current_sequ->range_end);
-  get_select_t_ranges(select, t);
-  for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
-  for (i = 0; i < select->curr; i++)
+  get_select_t_ranges(select, deselect, t);
+  if (select != 0)
+  {
+   for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
+   for (i = 0; i < select->curr; i++)
     {
      for (j = s_range->i[i]; j <= e_range->i[i]; j++)
        {
@@ -5976,6 +5988,18 @@ void set_selected_rows(struct table* t, struct command_list* select)
             = pass_select(t->s_cols[0][j], select->commands[i]);
        }
     }
+   }
+  if (deselect != NULL)
+  {
+   for (i = 0; i < deselect->curr; i++)
+    {
+     for (j = sd_range->i[i]; j <= ed_range->i[i]; j++)
+       {
+      if (t->row_out->i[j] == 1) t->row_out->i[j]
+            = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
+       }
+    }
+  }
 }
 
 void set_twiss_deltas(struct command* comm)
@@ -6071,6 +6095,55 @@ void store_comm_par_vector(char* parameter, double* val, struct command* cmd)
     }
 }
 
+void store_deselect(struct in_cmd* cmd)
+{
+  char* flag_name;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct command_list* dscl;
+  int pos = name_list_pos("flag", nl);
+  if (nl->inform[pos] == 0 ||
+      (flag_name = pl->parameters[pos]->string) == NULL)
+    {
+     warning("no FLAG specified", "ignored");
+     return;
+    }
+  if (strcmp(flag_name, "seqedit") == 0)
+    {
+    }
+  else if (strcmp(flag_name, "error") == 0)
+    {
+    }
+  else if (strcmp(flag_name, "makethin") == 0)
+    {
+    }
+  else if (strcmp(flag_name, "save") == 0)
+    {
+    }
+  else if (strcmp(flag_name, "sectormap") == 0)
+    {
+    }
+  else /* store deselect for all tables */
+    {
+     if ((dscl = find_command_list(flag_name, table_deselect)) == NULL)
+       {
+      dscl = new_command_list(10);
+        add_to_command_list_list(flag_name, dscl, table_deselect);
+       }
+     if (log_val("clear", cmd->clone))
+       {
+      dscl = new_command_list(10);
+        add_to_command_list_list(flag_name, dscl, table_deselect);
+       }
+     else
+       {
+      if (dscl->curr == dscl->max) grow_command_list(dscl);
+        dscl->commands[dscl->curr++] = cmd->clone;
+        cmd->clone_flag = 1; /* do not drop */
+       }
+    }
+}
+
 void store_savebeta(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
@@ -6102,7 +6175,7 @@ void store_savebeta(struct in_cmd* cmd)
     }
 }
 
-void store_select(struct in_cmd* cmd, int type)
+void store_select(struct in_cmd* cmd)
 {
   char* flag_name;
   struct name_list* nl = cmd->clone->par_names;
@@ -6127,7 +6200,6 @@ void store_select(struct in_cmd* cmd, int type)
       if (seqedit_select->curr == seqedit_select->max)
             grow_command_list(seqedit_select);
         seqedit_select->commands[seqedit_select->curr++] = cmd->clone;
-        cmd->clone->select_type = type; /* store select/deselect switch */
         cmd->clone_flag = 1; /* do not drop */
        }
     }
@@ -6174,7 +6246,6 @@ void store_select(struct in_cmd* cmd, int type)
       if (save_select->curr == save_select->max)
             grow_command_list(save_select);
         save_select->commands[save_select->curr++] = cmd->clone;
-        cmd->clone->select_type = type; /* store select/deselect switch */
         cmd->clone_flag = 1; /* do not drop */
        }
     }
@@ -6212,7 +6283,6 @@ void store_select(struct in_cmd* cmd, int type)
        {
       if (scl->curr == scl->max) grow_command_list(scl);
         scl->commands[scl->curr++] = cmd->clone;
-        cmd->clone->select_type = type; /* store select/deselect switch */
         cmd->clone_flag = 1; /* do not drop */
        }
     }
