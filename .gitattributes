@@ -60,6 +60,7 @@
 /match.F -text
 /match.fi -text
 /matchc.c -text
+/matchsa.F -text
 /n_complex_polymorph.f90 -text
 /name_len.fi -text
 /orbf.F -text
