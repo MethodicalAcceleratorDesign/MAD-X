@@ -6824,7 +6824,7 @@ void track_dynap(struct in_cmd* cmd)
   char rout_name[] = "track_dynap";
   int e_flag, flag = 2, izero = 0,
       turns = command_par_value("turns", cmd->clone),
-      npart = stored_track_start->curr;
+      npart = 2*stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
   double *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5, *buf6,
