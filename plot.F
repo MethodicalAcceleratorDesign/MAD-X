@@ -390,7 +390,7 @@
 
 !--- type definitions of local variables
 
-      double precision rk2, cangle, sangle, tilt, d, f
+      double precision rk2, cangle, sangle, tilt, d, f, e2_read, angle
       double precision ek(6), te(6,6,6), orbit(6), am2(6,6)
       integer i, j, k
       logical drift, bend, quad, fmap,ftrk,cecptk,cebttk
@@ -441,9 +441,11 @@
         am(3,4) = dstp
       else
          if (bend) then
+           angle = node_value('angle ')
+           e2_read = zero
             if (pos .eq. 1) then
                e2s = node_value('e2 ')
-               call store_node_value('e2 ', zero)
+               call store_node_value('e2 ', e2_read)
             endif
             if (pos .eq. 3) call store_node_value('e2 ', e2s)
             call tmbend(.false.,orbit,fmap,dstp,ek,am,te)
