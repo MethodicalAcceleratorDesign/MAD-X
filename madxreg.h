@@ -1,5 +1,5 @@
 struct r_char_array           /* dynamic array of char for regex */
-{ 
+{
   int  max,                     /* max. array size */
        curr;                    /* current occupation */
   char* chars;
@@ -7,7 +7,7 @@ struct r_char_array           /* dynamic array of char for regex */
 
 struct reg_token
 {
-  int type;                    /* 0: empty, 1: char, 2: simple, 
+  int type;                    /* 0: empty, 1: char, 2: simple,
                                   3: list,  4: dot */
   int rep;                     /* 0 no, 1 yes (including 0 repetitions) */
   int rep_cnt;                 /*  no. of repitions at current match */

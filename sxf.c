@@ -85,7 +85,7 @@ void sxf_read(struct command* comm)
      fatal_error("USE - sequence without beam:", current_sequ->name);
   current_sequ->beam = current_beam;
   current_range = tmpbuff("#s/#e");
-  expand_curr_sequ(1);        
+  expand_curr_sequ(1);
  term:
   set_option("echo", &echo);
   sequ_is_on = 0;
@@ -108,7 +108,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     {
      if (ntok < 2 || strcmp(toks[1], "sequence") != 0) return -1;
      else current_sequ = new_sequence(toks[0], 0);
-     if (occ_list == NULL) 
+     if (occ_list == NULL)
            occ_list = new_name_list(10000);  /* for occurrence count */
      else occ_list->curr = 0;
      current_sequ->cavities = new_el_list(100);
@@ -120,7 +120,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
      current_sequ->start = current_node;
      for (j = 3; j < ntok; j++) /* push first element down */
        {
-	toks[j-3] = toks[j];
+      toks[j-3] = toks[j];
        }
      ntok -= 3;
     }
@@ -139,7 +139,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
      return 1;
     }
   if ((pos = name_list_pos(toks[1], defined_commands->list)) < 0)
-  	  fatal_error("element type not found:", toks[1]);
+        fatal_error("element type not found:", toks[1]);
   clone = clone_command(defined_commands->commands[pos]);
   sxf_fill_command(clone, ntok, toks);
   el = make_element(toks[0], toks[1], clone, sequ_is_on+1);
@@ -149,7 +149,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   add_to_name_list(el->name, 1, occ_list);
   make_elem_node(el, 1);
   if ((at = find_value("at", ntok, toks)) == INVALID)
-	  fatal_error("element without position:", toks[0]);
+        fatal_error("element without position:", toks[0]);
   current_node->at_value = at;
   for (n = 0; n < ntok; n++)  if(strcmp("align.dev", toks[n]) == 0) break;
   if (n < ntok)
@@ -183,7 +183,7 @@ int join_prefix(char* prefix, int ntok, char** toks)
     {
      if (strcmp(toks[j], prefix) == 0 && j+1 < ntok)
        {
-	strcat(toks[j], toks[j+1]);
+      strcat(toks[j], toks[j+1]);
         for (k = j+1; k < ntok-1; k++)  toks[k] = toks[k+1];
         ntok--;
        }
@@ -223,7 +223,7 @@ int sxf_align_fill(int start, int end, int ntok, char** toks, double* vec)
      get_bracket_t_range(toks, '[', ']', start+3, ntok, &rss, &res);
      if (rss == start+3)  /* square bracket found */
        {
-	rss++; res--;
+      rss++; res--;
         for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
        }
     }
@@ -245,13 +245,13 @@ int sxf_field_fill(int start, int end, int ntok, char** toks, double* vec)
            get_bracket_t_range(toks, '[', ']', i+2, ntok, &rss, &res);
            if (rss == i+2)  /* square bracket found */
              {
-	       rss++; res--; cnt[k] = k;
-              for (j = rss; j <= res; j++) 
-		{
+             rss++; res--; cnt[k] = k;
+              for (j = rss; j <= res; j++)
+       {
                  sscanf(toks[j], "%lf", &vec[cnt[k]]);
                  cnt[k] += 2;
-		}
-	     }
+       }
+           }
           }
        }
     }
@@ -269,9 +269,9 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
   /* scan for magnet strengths first - special format */
   for (skew = 0; skew < 2; skew++)
     {
-     for (k = start+1; k < end; k++) 
+     for (k = start+1; k < end; k++)
        {
-	 if      (skew == 0 && strcmp("kl", toks[k]) == 0)  break;
+       if      (skew == 0 && strcmp("kl", toks[k]) == 0)  break;
          else if (skew == 1 && strcmp("kls", toks[k]) == 0) break;
        }
      if (k < end)
@@ -279,28 +279,28 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
         get_bracket_t_range(toks, '[', ']', k, ntok, &rss, &res);
         if (rss == k + 2)  /* square bracket found */
           {
-	   rss++; res--;
+         rss++; res--;
           }
         else rss = res = k+2;
         cnt = 0;
         for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
         if (strstr(toks[1], "bend"))
           {
-	   if (length == zero) fatal_error("bend without length:", toks[0]);
+         if (length == zero) fatal_error("bend without length:", toks[0]);
            if (skew == 0) pos = name_list_pos("k0", nl);
            else           pos = name_list_pos("k0s", nl);
            pl->parameters[pos]->double_value = vec[0] / length;
           }
         else if (strstr(toks[1], "quad"))
           {
-	   if (length == zero) fatal_error("quad without length:", toks[0]);
+         if (length == zero) fatal_error("quad without length:", toks[0]);
            if (skew == 0)  pos = name_list_pos("k1", nl);
            else            pos = name_list_pos("k1s", nl);
            pl->parameters[pos]->double_value = vec[1] / length;
           }
         else if (strstr(toks[1], "sext"))
           {
-	   if (length == zero) fatal_error("sextupole without length:", 
+         if (length == zero) fatal_error("sextupole without length:",
                                             toks[0]);
            if (skew == 0)  pos = name_list_pos("k2", nl);
            else            pos = name_list_pos("k2s", nl);
@@ -308,7 +308,7 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
           }
         else if (strstr(toks[1], "oct"))
           {
-	   if (length == zero) fatal_error("octupole without length:", 
+         if (length == zero) fatal_error("octupole without length:",
                                             toks[0]);
            if (skew == 0)  pos = name_list_pos("k3", nl);
            else            pos = name_list_pos("k3s", nl);
@@ -325,30 +325,30 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
            if (skew == 0)  pos = name_list_pos("knl", nl);
            else            pos = name_list_pos("ksl", nl);
            while(pl->parameters[pos]->double_array->max < cnt)
-	     grow_double_array(pl->parameters[pos]->double_array);
-           for (j = 0; j < cnt; j++) 
-	     {
+           grow_double_array(pl->parameters[pos]->double_array);
+           for (j = 0; j < cnt; j++)
+           {
               pl->parameters[pos]->double_array->a[j] = vec[j];
-	     }
+           }
            pl->parameters[pos]->double_array->curr = cnt;
-           pl->parameters[pos]->expr_list 
+           pl->parameters[pos]->expr_list
               = delete_expr_list(pl->parameters[pos]->expr_list);
-	  }
+        }
        }
     }
   /* now all the other parameters */
-  for (k = start+1; k < end; k++) 
+  for (k = start+1; k < end; k++)
     {
      if (isalpha(*toks[k]) && strstr(toks[k], "kl") == NULL)
        {
-	if ((pos = name_list_pos(toks[k], nl)) < 0)
-	    warning("unknown input parameter skipped: ", toks[k]);
+      if ((pos = name_list_pos(toks[k], nl)) < 0)
+          warning("unknown input parameter skipped: ", toks[k]);
         else if (k+2 < end && *toks[k+1] == '=' && *toks[k+2] != '[')
            sscanf(toks[k+2], "%lf", &pl->parameters[pos]->double_value);
        }
     }
 }
-        
+
 
 void sxf_write(struct command* comm, FILE* out)
      /* writes the currently USEd sequence in SXF format to a file */
@@ -360,7 +360,7 @@ void sxf_write(struct command* comm, FILE* out)
     }
   sxf_rtag();
   put_line(out, "// SXF version 2.0");
-  sprintf(c_dummy, "%s sequence", current_sequ->name); 
+  sprintf(c_dummy, "%s sequence", current_sequ->name);
   put_line(out, c_dummy);
   s_indent(add_indent[0]); put_line(out, "{");
   current_node = current_sequ->range_start;
@@ -393,7 +393,7 @@ void sxf_rtag()
     {
      strcpy(tag_type[j], type[j]);
      strcpy(tag_code[j], code[j]);
-     lower(tag_type[j]); lower(tag_code[j]); 
+     lower(tag_type[j]); lower(tag_code[j]);
     }
   if (tag_cnt > 0)  tag_flag = 2;
 }
@@ -479,12 +479,12 @@ void write_elstart(FILE* out)
   s_indent(add_indent[3]);
   if (tag_flag == 1 &&  current_node->p_elem != current_node->p_elem->parent)
     {
-     sprintf(c_dummy, "tag = %s", current_node->p_elem->parent->name); 
+     sprintf(c_dummy, "tag = %s", current_node->p_elem->parent->name);
      put_line(out, c_dummy);
     }
   else if (tag_flag == 2 && (pc = tag_spec(current_node->base_name)) != NULL)
     {
-     sprintf(c_dummy, "tag = %s", pc); 
+     sprintf(c_dummy, "tag = %s", pc);
      put_line(out,c_dummy);
     }
   if (current_node->length > zero)
@@ -540,7 +540,7 @@ void write_align(FILE* out, struct double_array* al)
 
 void write_elend(FILE* out)
 {
-  put_line(out, "};"); 
+  put_line(out, "};");
   r_indent(); r_indent(); r_indent();
 }
 
@@ -550,7 +550,7 @@ void accu_line(FILE* out, char* s)
   strcpy(&line[strlen(line)], s);
 }
 
-void fill_dump(FILE* out, int flag, char* label, double* values, int count, 
+void fill_dump(FILE* out, int flag, char* label, double* values, int count,
                int inc)
 {
   int j;
@@ -562,7 +562,7 @@ void fill_dump(FILE* out, int flag, char* label, double* values, int count,
     {
      sprintf(c_dummy, " %.12g", values[j]); accu_line(out, c_dummy);
     }
-  if (flag != 0) 
+  if (flag != 0)
     {
      accu_line(out, "]"); reset_line(out);
     }
@@ -581,28 +581,28 @@ void write_body(FILE* out)
      if (strcmp(eldef->par_names->names[i], "l") != 0
          && (pos = name_list_pos(eldef->par_names->names[i], sxf_list)) > -1)
        {
-  	if ((nval = kl_trans(sxf_list->names[pos], out_name, val, &flag)) > 0)
-  	  {
-           if (set++ == 0) 
-  	     {
+      if ((nval = kl_trans(sxf_list->names[pos], out_name, val, &flag)) > 0)
+        {
+           if (set++ == 0)
+           {
               put_line(out, "body = {"); s_indent(add_indent[4]);
-  	     }
+           }
            fill_dump(out, flag, out_name, val, nval, 1);
-  	  }
+        }
        }
     }
   if (strcmp(current_node->base_name, "beambeam") == 0)
     {
-     if (set++ == 0) 
+     if (set++ == 0)
         {
          put_line(out, "body = {"); s_indent(add_indent[4]);
-  	}
+      }
      val[0] = command_par_value(npart,current_beam);
      fill_dump(out, flag, npart, val, 1, 1);
     }
-  if(set > 0) 
+  if(set > 0)
     {
-     put_line(out, "}"); r_indent(); 
+     put_line(out, "}"); r_indent();
     }
 }
 
@@ -613,7 +613,7 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
   *flag = 0;
   if (strstr(name, "kick") != NULL)
     {
-     if (strchr(name, 'v') == NULL)  
+     if (strchr(name, 'v') == NULL)
        {
         corr = current_node->chkick;
         strcpy(out_name, "kl");
@@ -635,14 +635,14 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
         if (strchr(name, 's') == NULL)  strcpy(out_name, "kl");
         else                            strcpy(out_name, "kls");
         length = element_vector(current_node->p_elem, name, val);
-	if (length > 1 || val[0] != zero)   return length;
+      if (length > 1 || val[0] != zero)   return length;
         else return 0;
        }
      sscanf(&name[1], "%1d", &rep);
      for (j = 0; j < rep; j++)  val[j] = zero;
      if (strchr(name, 's') == NULL)  strcpy(out_name, "kl");
      else                            strcpy(out_name, "kls");
-     if ((val[rep] = current_node->length * node_value(name)) != zero)  
+     if ((val[rep] = current_node->length * node_value(name)) != zero)
           return (rep+1);
      else return 0;
     }

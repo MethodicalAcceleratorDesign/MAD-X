@@ -41,9 +41,9 @@ const int s_match[] = /* position of first token of command below */
 
 const int t_match[] = /* order in which the commands are matched */
 {0, 1, 16, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-const char* cmd_match_base[] = 
-{ /*  0 */ "@cmd", 
-  /*  1 */ "@name", ":", "@cmd", 
+const char* cmd_match_base[] =
+{ /*  0 */ "@cmd",
+  /*  1 */ "@name", ":", "@cmd",
   /*  2 */ "int", "const", "@name", "=",
   /*  3 */ "int", "const", "@name", ":", "=",
   /*  4 */ "real", "const", "@name", "=",
@@ -103,11 +103,11 @@ int efield_table_types[] =
 
 char* efield_table_cols[] =
 {
-"name", 
-"k0l", "k0sl", "k1l", "k1sl", 
-"k2l", "k2sl", "k3l", "k3sl", "k4l", 
-"k4sl", "k5l", "k5sl", "k6l", "k6sl", 
-"k7l", "k7sl", "k8l", "k8sl", "k9l", 
+"name",
+"k0l", "k0sl", "k1l", "k1sl",
+"k2l", "k2sl", "k3l", "k3sl", "k4l",
+"k4sl", "k5l", "k5sl", "k6l", "k6sl",
+"k7l", "k7sl", "k8l", "k8sl", "k9l",
 "k9sl", "k10l", "k10sl",
 "dx", "dy", "ds", "dphi", "dtheta",
 "dpsi", "mrex", "mrey", "mredx", "mredy",
@@ -129,7 +129,7 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 61; /* last standard column filled 
+int twiss_fill_end = 61; /* last standard column filled
                             by twiss_table_complete */
 /* warning: modify routine twiss_table_complete in case of changes */
 int twiss_table_types[] =
@@ -159,27 +159,27 @@ int twiss_table_types[] =
 
 char* twiss_table_cols[] =
 {
-"name", "keyword", "s", "betx", "alfx", 
-"mux", "bety", "alfy", "muy", "x", 
-"px", "y", "py", "t", "pt", 
-"dx", "dpx", "dy", "dpy", "wx", 
-"phix", "dmux", "wy", "phiy", "dmuy", 
-"ddx", "ddpx", "ddy", "ddpy", "r11", 
+"name", "keyword", "s", "betx", "alfx",
+"mux", "bety", "alfy", "muy", "x",
+"px", "y", "py", "t", "pt",
+"dx", "dpx", "dy", "dpy", "wx",
+"phix", "dmux", "wy", "phiy", "dmuy",
+"ddx", "ddpx", "ddy", "ddpy", "r11",
 "r12", "r21", "r22", "energy", "l",
-"angle", "k0l", "k0sl", "k1l", "k1sl", 
-"k2l", "k2sl", "k3l", "k3sl", "k4l", 
-"k4sl", "k5l", "k5sl", "k6l", "k6sl", 
-"k7l", "k7sl", "k8l", "k8sl", "k9l", 
-"k9sl", "k10l", "k10sl", "ks", "hkick", 
+"angle", "k0l", "k0sl", "k1l", "k1sl",
+"k2l", "k2sl", "k3l", "k3sl", "k4l",
+"k4sl", "k5l", "k5sl", "k6l", "k6sl",
+"k7l", "k7sl", "k8l", "k8sl", "k9l",
+"k9sl", "k10l", "k10sl", "ks", "hkick",
 "vkick", "tilt", "parent",
 "re11", "re12", "re13", "re14", "re15",
 "re16", "re21", "re22", "re23", "re24",
 "re25", "re26", "re31", "re32", "re33",
 "re34", "re35", "re36", "re41", "re42",
 "re43", "re44", "re45", "re46", "re51",
-"re52", "re53", "re54", "re55", "re56", 
+"re52", "re53", "re54", "re55", "re56",
 "re61", "re62", "re63", "re64", "re65",
-"re66", 
+"re66",
 " "  /* blank terminates */
 };
 
@@ -251,7 +251,7 @@ char* summ_table_cols[] =
 {
 "length", "orbit5", "alfa", "gammatr", "q1",
 "dq1", "betxmax", "dxmax", "dxrms", "xcomax",
-"xcorms", "q2", "dq2", "betymax", "dymax", 
+"xcorms", "q2", "dq2", "betymax", "dymax",
 "dyrms", "ycomax", "ycorms", "deltap",
 " "  /* blank terminates */
 };

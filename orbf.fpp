@@ -118,7 +118,7 @@ c         write(*,*) i,cin(i)
 !                                                    *
 ! ****************************************************
       implicit none
-      integer im,ic,i,j,jj,ii 
+      integer im,ic,i,j,jj,ii
       integer iflag,sing(2,ic)
       double precision a(im,ic)
       double precision svdmat(im,ic)
@@ -127,7 +127,7 @@ c         write(*,*) i,cin(i)
       double precision wmat(im,ic), wtmat(ic,im)
       double precision wvec(ic)
       double precision svdtest(10,3)
-      double precision ddum, rat, zero, sngval, sngcut         
+      double precision ddum, rat, zero, sngval, sngcut
       double precision ws(ic)
       integer amater, svdmx, svdnx, svdnm
       integer sortw(ic)
@@ -155,7 +155,7 @@ c         write(*,*) i,cin(i)
             svdmat(i,j) = a(i,j)
         enddo
       enddo
-      
+
       if(dbg.eq.1) then
           write(*,*) 'A0:'
       do  j = 1,im
@@ -169,7 +169,7 @@ c         write(*,*) i,cin(i)
  6003 format(16(2X,F7.2))
  6004 format(16(2X,F7.2))
       if(amater.ne.0) then
-        write(*,*) 'end SVD with error code: ',amater                       
+        write(*,*) 'end SVD with error code: ',amater
       endif
       if(dbg.eq.1) then
       do  i = 1,ic
@@ -265,7 +265,7 @@ c           svdmat(i,j) = a(i,j)
       enddo
 
  8373 continue
-      
+
       if(dbg.eq.1) then
           write(*,*) 'A0:'
       do  j = 1,ic
@@ -279,7 +279,7 @@ c           svdmat(i,j) = a(i,j)
  6003 format(16(2X,F7.2))
  6004 format(16(2X,F7.2))
       if(amater.ne.0) then
-        write(*,*) 'end SVD with error code: ',amater                       
+        write(*,*) 'end SVD with error code: ',amater
       endif
       if(dbg.eq.1) then
       do  i = 1,im
@@ -337,7 +337,7 @@ c           svdmat(i,j) = a(i,j)
 !                                                    *
 ! ****************************************************
       implicit none
-      integer im,ic,i,j,jj,ii 
+      integer im,ic,i,j,jj,ii
       integer iflag,sing(2,ic)
       double precision a(im,ic)
       double precision svdmat(im,ic)
@@ -347,7 +347,7 @@ c           svdmat(i,j) = a(i,j)
       double precision wvec(ic)
       double precision wvmat(im,ic),uwvmat(im,ic)
       double precision svdtest(10,3)
-      double precision ddum, rat, zero, sngval, sngcut         
+      double precision ddum, rat, zero, sngval, sngcut
       double precision ws(ic)
       integer amater, svdmx, svdnx, svdnm
       integer sortw(ic)
@@ -385,7 +385,7 @@ c           svdmat(i,j) = a(i,j)
             uwvmat(i,j) = 0.0
         enddo
       enddo
-      
+
       if(dbg.eq.1) then
           write(*,*) 'A0:'
       do  j = 1,im
@@ -399,7 +399,7 @@ c           svdmat(i,j) = a(i,j)
  6003 format(16(2X,F7.2))
  6004 format(16(2X,F7.2))
       if(amater.ne.0) then
-        write(*,*) 'end SVD with error code: ',amater                       
+        write(*,*) 'end SVD with error code: ',amater
       endif
       if(dbg.eq.1) then
       do  i = 1,ic
@@ -538,7 +538,7 @@ c           svdmat(i,j) = a(i,j)
       enddo
 
  8373 continue
-      
+
       if(dbg.eq.1) then
           write(*,*) 'A0:'
       do  j = 1,ic
@@ -552,7 +552,7 @@ c           svdmat(i,j) = a(i,j)
  6003 format(16(2X,F7.2))
  6004 format(16(2X,F7.2))
       if(amater.ne.0) then
-        write(*,*) 'end SVD with error code: ',amater                       
+        write(*,*) 'end SVD with error code: ',amater
       endif
       if(dbg.eq.1) then
       do  i = 1,im
@@ -650,7 +650,7 @@ c           svdmat(i,j) = a(i,j)
 !                                                      *
 ! ******************************************************
       implicit none
-      integer im,ic,nx(ic),i,j 
+      integer im,ic,nx(ic),i,j
       integer iflag
       double precision a(im,ic)
       double precision svdmat(im,ic)
@@ -676,7 +676,7 @@ c           svdmat(i,j) = a(i,j)
       svdnx = ic
 
       do  i = 1,ic
-         nx(i) = i                             
+         nx(i) = i
       enddo
 
       do  i = 1,im
@@ -684,7 +684,7 @@ c           svdmat(i,j) = a(i,j)
             svdmat(i,j) = a(i,j)
         enddo
       enddo
-      
+
       if(dbg.eq.1) then
           write(*,*) 'A0:'
       do  j = 1,im
@@ -698,7 +698,7 @@ c           svdmat(i,j) = a(i,j)
  6003 format(16(2X,F7.2))
  6004 format(16(2X,F7.2))
       if(amater.ne.0) then
-        write(*,*) 'end SVD with error code: ',amater                       
+        write(*,*) 'end SVD with error code: ',amater
       endif
       do  i = 1,ic
           if(dbg.eq.1) then
@@ -825,7 +825,7 @@ c           svdmat(i,j) = a(i,j)
       enddo
 
  8373 continue
-      
+
       if(dbg.eq.1) then
           write(*,*) 'A0:'
       do  j = 1,ic
@@ -839,7 +839,7 @@ c           svdmat(i,j) = a(i,j)
  6003 format(16(2X,F7.2))
  6004 format(16(2X,F7.2))
       if(amater.ne.0) then
-        write(*,*) 'end SVD with error code: ',amater                       
+        write(*,*) 'end SVD with error code: ',amater
       endif
       do  i = 1,im
           if(dbg.eq.1) then
@@ -1176,9 +1176,9 @@ C       write(*,*) '=> ',i,cb(i)
 
           if(h.lt.reps7) then
             write(*,*) 'Correction process aborted'
-            write(*,*) 'during ',k,'th iteration'    
-            write(*,*) 'Last r.m.s.: ',rmss(k-1)     
-            write(*,*) 'Last p-t-p.: ',ptop(k-1)     
+            write(*,*) 'during ',k,'th iteration'
+            write(*,*) 'Last r.m.s.: ',rmss(k-1)
+            write(*,*) 'Last p-t-p.: ',ptop(k-1)
             write(*,*) 'Division by zero expected'
             write(*,*) 'Probably two kickers too close'
             write(*,*) 'SUSPECTED KICKER: ',J,'  '
@@ -2414,7 +2414,7 @@ c                singular value after 30 iterations ..........
  1000 ierr = k
  1001 return
       end
-CDECK  ID>, PYTHAG. 
+CDECK  ID>, PYTHAG.
       DOUBLE PRECISION FUNCTION PYTHAG(A,B)
       double precision a,b
 c

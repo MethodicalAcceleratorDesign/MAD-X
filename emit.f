@@ -413,7 +413,7 @@
       include 'twtrr.fi'
       integer i, j, ir, ii, n, n_ferr, iord, nn, ns, nd, nord
       integer node_fd_errors
-      double precision  rw(6,6), tw(6,6,6), ferror(2) 
+      double precision  rw(6,6), tw(6,6,6), ferror(2)
       double precision  normal(0:maxmul), skew(0:maxmul)
       double precision  vals(2,0:maxmul), field(2,0:maxmul)
       double precision  f_errors(0:50)

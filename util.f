@@ -13,7 +13,7 @@
       subroutine getclor(orbit0, rt, tt, error)
 !----------------------------------------------------------------------*
 ! Purpose:
-!   Get periodic closed orbit (e.g. at start of Twiss), 
+!   Get periodic closed orbit (e.g. at start of Twiss),
 !   first + second order one-turn map
 ! Input:
 !   orbit0(6)   (real)  initial guess
@@ -1662,7 +1662,7 @@
       ds = zero
       go to 490
 
-!---- Any kind of  bend. 
+!---- Any kind of  bend.
    20 continue
 !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
       angle = node_value('angle ')*node_value('dipole_bv ')

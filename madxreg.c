@@ -9,7 +9,7 @@ struct reg_token* add_tok(char c, struct reg_token* rt)
   if (rn->type == 0)
     {
      rn->type = 2;
-     rn->simple = (struct r_char_array*) calloc(1, 
+     rn->simple = (struct r_char_array*) calloc(1,
                    sizeof(struct r_char_array));
      rn->simple->chars = (char*) malloc(100);
      rn->simple->max = 100;
@@ -47,24 +47,24 @@ struct reg_token* convert_pattern(char* pattern, int dollar, int* error)
      if (pattern[i] == '\\') toggle = 1;
      else if (toggle == 0 && pattern[i] == '[')
        {
-	k = 0;
-	for (j = i+2; j < last; j++)
-	  {
-           if (pattern[j] == ']')  
-	     {
+      k = 0;
+      for (j = i+2; j < last; j++)
+        {
+           if (pattern[j] == ']')
+           {
               k = j; break;
-	     }
-	  }
+           }
+        }
         if (k == 0)  {*error = 2; return NULL;} /* no closing right ']' */
         rt = make_list(rt, pattern, i+1, j-1);
         i = j;
        }
-     else if (toggle == 0 && pattern[i] == '*')  
+     else if (toggle == 0 && pattern[i] == '*')
        {
-	rt = flag(rt, error); if (*error != 0)  return NULL;
+      rt = flag(rt, error); if (*error != 0)  return NULL;
        }
      else if (toggle == 0 && pattern[i] == '.') rt = make_dot(rt);
-     else 
+     else
        {
         rt = add_tok(pattern[i], rt);
         toggle = 0;
@@ -84,7 +84,7 @@ void dump_tokens(struct reg_token* tk)
     }
 }
 
-void edit_tokens(struct reg_token* start, 
+void edit_tokens(struct reg_token* start,
                   char* pattern, char* string, int dollar)
 {
   struct reg_token *tk, *tp;
@@ -94,7 +94,7 @@ void edit_tokens(struct reg_token* start,
      if (tk->rep)
        {
         if (tk->type == 1) tk->rep_max = char_count(tk->c, string);
-        else if (tk->type == 3)  
+        else if (tk->type == 3)
             tk->rep_max = list_count(tk->list, tk->invert, string);
         else if (tk->type == 4)  tk->rep_max = strlen(string);
        }
@@ -107,7 +107,7 @@ void edit_tokens(struct reg_token* start,
 void fill_list(char s, char e, struct r_char_array* a)
 {
   int i;
-  while ((int)s <= (int)e) 
+  while ((int)s <= (int)e)
     {
      if (a->curr == a->max) grow_r_char_array(a);
      a->chars[a->curr++] = s;
@@ -160,7 +160,7 @@ void grow_r_char_array(struct r_char_array* a)
 struct reg_token* make_dot(struct reg_token* rt)
 {
   struct reg_token *rn = rt;
-  if (rn->type != 0) rn = 
+  if (rn->type != 0) rn =
        (struct reg_token*) calloc(1, sizeof(struct reg_token));
   rn->type = 4;
   if (rn != rt)
@@ -170,14 +170,14 @@ struct reg_token* make_dot(struct reg_token* rt)
   return rn;
 }
 
-struct reg_token* make_list(struct reg_token* rt, char* pattern, 
+struct reg_token* make_list(struct reg_token* rt, char* pattern,
                             int is, int ie)
 {
   int i;
   struct reg_token *rn = rt;
-  if (rn->type != 0) 
+  if (rn->type != 0)
     {
-     rn = (struct reg_token*) calloc(1, 
+     rn = (struct reg_token*) calloc(1,
                                sizeof(struct reg_token));
      rt->next = rn; rn->previous = rt;
     }
@@ -193,7 +193,7 @@ struct reg_token* make_list(struct reg_token* rt, char* pattern,
     {
      if (i < ie && pattern[i+1] == '-')
        {
-	fill_list(pattern[i], pattern[i+2], rn->list);
+      fill_list(pattern[i], pattern[i+2], rn->list);
         i += 2;
        }
      else fill_list(pattern[i], pattern[i], rn->list);
@@ -230,11 +230,11 @@ int match_all(struct reg_token* start, char* string)
     {
       if (((p = match_token(rt, p)) == NULL)) break;
       else if (rt->match_end && *p != '\0')
-	{
-	 if (rt->rep == 0)  break;
+      {
+       if (rt->rep == 0)  break;
          else if (rt->rep_cnt != 0) break;
          else if (rt == start)  break;
-	}
+      }
      rt = rt->next;
     }
   if (rt == NULL) return 0;
@@ -254,17 +254,17 @@ char* match_token(struct reg_token* rt, char* p)
       return p;
     case 2:      /* simple string */
       if (strncmp(rt->simple->chars, p, rt->simple->curr) == 0)
-	 return &p[rt->simple->curr];
+       return &p[rt->simple->curr];
       else return NULL;
     case 3:    /* match character from list */
       if (rt->rep == 0)  n = 1;
       else               n = rt->rep_cnt;
       for (j = 0; j < n; j++)
-	{
-	 q = strchr(rt->list->chars, *p++);
-	 if ((q == NULL && rt->invert == 0)
+      {
+       q = strchr(rt->list->chars, *p++);
+       if ((q == NULL && rt->invert == 0)
              || (q != NULL && rt->invert != 0)) return NULL;
-	}
+      }
       return p;
     case 4:      /* dot */
       if (rt->rep == 0)  n = 1;
@@ -285,12 +285,12 @@ void myregend(char* mypat, struct reg_token* start)
        {
         if (rp->simple != NULL)
           {
-	   if (rp->simple->chars != NULL) free(rp->simple->chars);
+         if (rp->simple->chars != NULL) free(rp->simple->chars);
            free(rp->simple);
           }
         if (rp->list != NULL)
           {
-	   if (rp->list->chars != NULL) free(rp->list->chars);
+         if (rp->list->chars != NULL) free(rp->list->chars);
            free(rp->list);
           }
         aux = rp;
@@ -310,7 +310,7 @@ int myregex(char* pattern, char* string)
   strcpy(mypat, pattern);
 /* $ at end ? */
   if (mypat[l-1] == '$')
-    { 
+    {
      if (l == 1)  return 0;
      else if (l > 2 && strncmp(&mypat[l-3], ".*", 2) == 0)
       {

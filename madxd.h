@@ -58,7 +58,7 @@ int is_operator(char c) {return (strchr("-+*/^", c) ? 1 : 0);}
 int is_expr_start(char c) {return (strchr("-+(",c) || is_operand(c));}
 int mymax(int a, int b) {return (a > b ? a : b);}
 int mymin(int a, int b) {return (a < b ? a : b);}
-int str_pos(const char s[], char c) 
+int str_pos(const char s[], char c)
 {unsigned int i; for (i = 0; i < strlen(s); i++) if (s[i] == c) return i; return -1;}
 
 /* Fortran routines called from C */
@@ -86,17 +86,17 @@ int *,int *,int *,int *,float *,float *,float *,float *,float *,
 float *,float *,float *,float *,float *,int *);
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
-                    double*, double*, double*, double*, double*); 
+                    double*, double*, double*, double*, double*);
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
-                    double*, double*, double*); 
+                    double*, double*, double*);
 extern void mtsimp_(int*, int*, double*, int*, int*, double*, double*,
-                    double*, double*, double*, double*); 
+                    double*, double*, double*, double*);
 extern void pefill_(int*);
 extern void pemima_();
 extern void pesopt_(int*);
 extern void plotit_(int*);
-extern void setup_(double *respx,double *dmat,int *im, 
+extern void setup_(double *respx,double *dmat,int *im,
 int *ic, int *nm, int*nc);
 extern void survey_();
 extern void tmrefe_(double*);
@@ -161,7 +161,7 @@ int act_special(int, char*);
 int add_drifts(struct node*, struct node*);
 void add_table_vars(struct name_list*, struct command_list*);
 void add_to_command_list(char*, struct command*, struct command_list*, int);
-void add_to_command_list_list(char*, struct command_list*, 
+void add_to_command_list_list(char*, struct command_list*,
                               struct command_list_list*);
 void add_to_constraint_list(struct constraint*, struct constraint_list*);
 void add_to_el_list(struct element**, int, struct el_list*, int);
@@ -219,7 +219,7 @@ struct char_p_array* delete_char_p_array(struct char_p_array*, int);
 struct command* delete_command(struct command*);
 struct command_list* delete_command_list(struct command_list*);
 struct command_parameter* delete_command_parameter(struct command_parameter*);
-struct command_parameter_list* 
+struct command_parameter_list*
        delete_command_parameter_list(struct command_parameter_list*);
 struct double_array* command_par_array(char*, struct command*);
 struct expression* command_par_expr(char*, struct command*);
@@ -295,7 +295,7 @@ void exec_show(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
 void expand_curr_sequ(int);
 void expand_line(struct char_p_array*);
-struct node* expand_node(struct node*, struct sequence*, struct sequence*, 
+struct node* expand_node(struct node*, struct sequence*, struct sequence*,
                          double);
 void expand_sequence(struct sequence*, int);
 void export_comm_par(struct command_parameter*, char*);
@@ -314,13 +314,13 @@ void fill_beta0(struct command*, struct node*);
 void fill_constraint_list(int, struct command*, struct constraint_list*);
 void fill_elem_var_list(struct element*, struct el_list*, struct var_list*);
 void fill_expr_list(char**, int, int, struct expr_list*);
-void fill_expr_var_list(struct el_list*, 
+void fill_expr_var_list(struct el_list*,
                         struct expression*, struct var_list*);
 void fill_orbit_table(struct table*, struct table*);
-void fill_par_var_list(struct el_list*, 
+void fill_par_var_list(struct el_list*,
                        struct command_parameter*, struct var_list*);
 void fill_sequ_list(struct sequence*, struct sequence_list*);
-void fill_sequ_var_list(struct sequence_list*, struct el_list*, 
+void fill_sequ_var_list(struct sequence_list*, struct el_list*,
                         struct var_list*);
 void fill_twiss_header(struct table*);
 struct command* find_command(char*, struct command_list*);
@@ -346,7 +346,7 @@ int get_node_count(struct node*);
 int get_ex_range(char*, struct sequence*, struct node**);
 int get_range(char*, struct sequence*, struct node**);
 double get_refpos(struct sequence*);
-int get_select_ex_ranges(struct sequence*,struct command_list*, 
+int get_select_ex_ranges(struct sequence*,struct command_list*,
                          struct node_list*);
 int get_select_ranges(struct sequence*,struct command_list*,
                       struct node_list*);
@@ -553,7 +553,7 @@ void store_command_def(char*);
 struct command_parameter* store_comm_par_def(char**, int, int);
 void store_comm_par_value(char*, double, struct command*);
 void store_comm_par_vector(char*, double*, struct command*);
-void store_orbit(struct command*, double*);  
+void store_orbit(struct command*, double*);
 void store_savebeta(struct in_cmd*);
 void store_select(struct in_cmd*);
 void store_threader(struct in_cmd*);
@@ -893,8 +893,8 @@ int next_rand = 0;          /* for random generator */
 int plots_made = 0;         /* set to 1 if plots are made */
 int polish_cnt = 0;         /* used to detect infinite loops */
 int print_match_summary = 0;/* OB 6.3.2002:
-			       activate the print option in the 
-			       'mtgeti' and 'collect' routines */
+               activate the print option in the
+               'mtgeti' and 'collect' routines */
 int quote_toggle = 0;       /* for quote strings on input */
 int return_flag = 0;        /* 1 when "return" read */
 int scrap_count = 0;        /* running counter to make things unique */
@@ -920,17 +920,17 @@ int           na_err,              /* current no. of alignment errors */
               b_level = 0,         /* current brace level */
               sxf_elem_cnt = 0,    /* element count */
               tag_flag = 0,        /* if > 0, tag = parent name written */
-              tag_cnt = 0,         /* if > 0, tag = specified type code 
+              tag_cnt = 0,         /* if > 0, tag = specified type code
                                       written for selected types only */
               sxf_align_cnt = 0,       /* element with align errors count */
               sxf_field_cnt = 0,       /* element with field errors count */
               stop_flag = 0,           /* 1 if stop condition */
-              occnt_add = 0,       /* flag for element name modification */ 
+              occnt_add = 0,       /* flag for element name modification */
               b_indent[100],       /* list of indents */
               add_indent[] = {1, 2, 2, 4, 7, 7, 7, 7, 7, 7};
 
 double        sequ_length,         /* length of  sequence */
-              sequ_start, 
+              sequ_start,
               sequ_end,
               guess_orbit[6],
               al_errors[ALIGN_MAX],

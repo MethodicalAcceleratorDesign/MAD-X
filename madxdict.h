@@ -17,12 +17,12 @@ char predef_constants[] =
 
 /* command definitions, sorted by module resp. type */
 
-/* The special commands  
+/* The special commands
    "if(", "else{", "elseif(", "while(", ">:macro", ">:line"
-   are not included here, but can be found in fulll.h 
+   are not included here, but can be found in fulll.h
    under special_comm_desc */
 /* IMPORTANT:
-   beta0 and twiss MUST have identical portions 
+   beta0 and twiss MUST have identical portions
    up to "energy" included */
 
 /* format as follows: <...> optional, missing defaults become 0
@@ -35,15 +35,15 @@ char predef_constants[] =
                    2: end of group
           mad_8  = mad-8 element code
    remark: sequence ... endsequence is NOT a group
-   
+
    parameter 1 = (type <,default<, call default>>),
    parameter 2 = (type <,default<, call default>>),
    etc.
    some commands contain only data (module "data") for easy access.
-   examples: 
+   examples:
    l = (r) means: default l = 0, l in command without value -> 0
    energy = (r, 1) means: default energy is 1, in command without value -> 0
-   file = (s, none, twiss) means: default no file, 
+   file = (s, none, twiss) means: default no file,
                                   file in command without value -> twiss
 
    types: l=logical, i=int, r=real, s=string
@@ -51,7 +51,7 @@ char predef_constants[] =
    arrays must be defined with maximum length.
    */
 
-/* threader tolerances and maxima: xmax,ymax:  orbit excursion at which 
+/* threader tolerances and maxima: xmax,ymax:  orbit excursion at which
    threader is switched on; att: attenuation factor for kicks.
 */
 char command_def[] =
@@ -122,11 +122,11 @@ char command_def[] =
 "beta0: control none 0 0 "
 "betx     = [r, 0], alfx     = [r, 0], mux      = [r, 0], "
 "bety     = [r, 0], alfy     = [r, 0], muy      = [r, 0], "
-"x        = [r, 0], px       = [r, 0],		       "
-"y        = [r, 0], py       = [r, 0],		       "
-"t        = [r, 0], pt       = [r, 0],		       "
-"dx       = [r, 0], dpx      = [r, 0],		       "
-"dy       = [r, 0], dpy      = [r, 0],		       "
+"x        = [r, 0], px       = [r, 0],         "
+"y        = [r, 0], py       = [r, 0],         "
+"t        = [r, 0], pt       = [r, 0],         "
+"dx       = [r, 0], dpx      = [r, 0],         "
+"dy       = [r, 0], dpy      = [r, 0],         "
 "wx       = [r, 0], phix     = [r, 0], dmux     = [r, 0], "
 "wy       = [r, 0], phiy     = [r, 0], dmuy     = [r, 0], "
 "ddx      = [r, 0], ddpx     = [r, 0], "
@@ -881,11 +881,11 @@ char command_def[] =
 "twiss: twiss none 0 0 "
 "betx     = [r, 0], alfx     = [r, 0], mux      = [r, 0], "
 "bety     = [r, 0], alfy     = [r, 0], muy      = [r, 0], "
-"x        = [r, 0], px       = [r, 0],		       "
-"y        = [r, 0], py       = [r, 0],		       "
-"t        = [r, 0], pt       = [r, 0],		       "
-"dx       = [r, 0], dpx      = [r, 0],		       "
-"dy       = [r, 0], dpy      = [r, 0],		       "
+"x        = [r, 0], px       = [r, 0],         "
+"y        = [r, 0], py       = [r, 0],         "
+"t        = [r, 0], pt       = [r, 0],         "
+"dx       = [r, 0], dpx      = [r, 0],         "
+"dy       = [r, 0], dpy      = [r, 0],         "
 "wx       = [r, 0], phix     = [r, 0], dmux     = [r, 0], "
 "wy       = [r, 0], phiy     = [r, 0], dmuy     = [r, 0], "
 "ddx      = [r, 0], ddpx     = [r, 0], "

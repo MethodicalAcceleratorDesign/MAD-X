@@ -1,5 +1,5 @@
 struct char_array           /* dynamic array of char */
-{ 
+{
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. array size */
@@ -17,7 +17,7 @@ struct char_array_list
 };
 
 struct char_p_array           /* dynamic array of char pointers */
-{ 
+{
   char name[NAME_L];
   int  max,                     /* max. array size */
        curr,                    /* current occupation */
@@ -62,7 +62,7 @@ struct command_list_list /* contains list of command lists */
 struct command_parameter        /* holds one command parameter */
 {
   char name[NAME_L];
-  int type;                           /* 0 logical 1 integer 2 double 
+  int type;                           /* 0 logical 1 integer 2 double
                                          3 string 4 constraint */
                                       /* 11 int array 12 double array
                                          13 string array */
@@ -137,7 +137,7 @@ struct double_array        /* dynamic array of double */
 struct element             /* each element is unique */
 {
   char name[NAME_L];
-  int def_type;                 /* 0 if defined separately, 
+  int def_type;                 /* 0 if defined separately,
                                    1 if inside sequence */
   int bv;                       /* bv: 0 false, 1 true (invert angle for
                                    sequence bv = -1) */
@@ -227,7 +227,7 @@ struct in_cmd_list /* contains list of in_cmd pointers sorted by label */
 };
 
 struct int_array           /* dynamic array of int */
-{ 
+{
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. array size */
@@ -370,7 +370,7 @@ struct table
   char*** s_cols;               /* string columns */
   double** d_cols;              /* double precision columns */
   int stamp;
-  struct name_list* columns;    /* names + types (in inform): 
+  struct name_list* columns;    /* names + types (in inform):
                                    1 double, 3 string */
   struct sequence* org_sequ;    /* pointer to sequence it refers to */
 };

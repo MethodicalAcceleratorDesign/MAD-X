@@ -426,18 +426,18 @@
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
      &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
      &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
-!---- Bending magnet. OBSOLETE, to be kept for go to 
+!---- Bending magnet. OBSOLETE, to be kept for go to
    20 continue
    30 continue
-!---- Arbitrary matrix. OBSOLETE, to be kept for go to 
+!---- Arbitrary matrix. OBSOLETE, to be kept for go to
    40 continue
-!---- Quadrupole. OBSOLETE, to be kept for go to 
+!---- Quadrupole. OBSOLETE, to be kept for go to
    50 continue
-!---- Sextupole. OBSOLETE, to be kept for go to 
+!---- Sextupole. OBSOLETE, to be kept for go to
    60 continue
-!---- Octupole. OBSOLETE, to be kept for go to 
+!---- Octupole. OBSOLETE, to be kept for go to
    70 continue
-!     monitors, beam instrument. 
+!     monitors, beam instrument.
   170 continue
   180 continue
   190 continue

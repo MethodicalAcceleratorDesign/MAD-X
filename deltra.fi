@@ -1,4 +1,4 @@
       logical dorad,dodamp,dorand,fastune
-      double precision deltax     
+      double precision deltax
       common / deltax / deltax
       common / dynaptrack / dorad,dodamp,dorand,fastune

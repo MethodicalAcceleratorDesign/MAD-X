@@ -6,13 +6,13 @@
 struct aper_struct {
   int apply;
   char name[255];
-  char style[255]; 
+  char style[255];
   double value[3];
 };
 
 
 struct c6t_element
-{  
+{
   char name[48],           /* name including occurrence count if > 1 */
   org_name[48],            /* original name */
   base_name[48];           /* basic type */
@@ -79,8 +79,8 @@ struct li_list /* contains list of list pointers */
 struct type_info /* info about types */
 {
   char name[48];    /* base_type */
-  /* flag meanings - 0: skip, 1: linear, >1: non-linear, 
-                     2: convert to multipole (temporarily), 3: cavity 
+  /* flag meanings - 0: skip, 1: linear, >1: non-linear,
+                     2: convert to multipole (temporarily), 3: cavity
                      4: make 2 if in explicit list, else skip
                      5: only split */
   int      flag_1,  /* for length = 0 */
@@ -144,7 +144,7 @@ struct object
 {
   char key[48];          /* d.b. key */
 /* The order of the first 11 variables below is FIXED */
-  int ma_time,            /* start of control part = 
+  int ma_time,            /* start of control part =
                              major time at creation or last modification */
       mi_time,            /* minor time at creation or last modification */
       l_int,              /* length of integer array */

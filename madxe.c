@@ -36,7 +36,7 @@ void pro_error(struct in_cmd* cmd)
           }
  else if (strcmp(cmd->tok_list->p[0], "esave") == 0)
           {
-           error_esave(cmd); 
+           error_esave(cmd);
           }
 }
 
@@ -98,14 +98,14 @@ void error_ealign(struct in_cmd* cmd)
           }
       }  /* end of treatment of selected node */
       nextnode = nextnode->next;
-  }  /* end of loop over all nodes */           
-  if(chcount[0] != 0) 
+  }  /* end of loop over all nodes */
+  if(chcount[0] != 0)
   fprintf(prt_file, "Assigned alignment errors to %d elements\n",chcount[0]);
-  if(chcount[1] != 0) 
+  if(chcount[1] != 0)
   fprintf(prt_file, "Replaced alignment errors for %d elements\n",chcount[1]);
-  if(chcount[2] != 0) 
+  if(chcount[2] != 0)
   fprintf(prt_file, "Added alignment errors to %d elements\n",chcount[2]);
-  
+
 }
 
 void error_eprint(struct in_cmd* cmd)
@@ -161,7 +161,7 @@ void error_eprint(struct in_cmd* cmd)
 
       nextnode = nextnode->next;
   }
-  
+
 }
 
 
@@ -236,7 +236,7 @@ void error_efcomp(struct in_cmd* cmd)
           }
           if (get_option("debug"))
           fprintf(prt_file, "field for %s %s %d\n",
-                 nextnode->name,nextnode->base_name,nextnode->sel_err); 
+                 nextnode->name,nextnode->base_name,nextnode->sel_err);
 
 /* now get order (n) and radius (rr) from command, if any */
           for(i=0;i<2;i++){
@@ -374,12 +374,12 @@ void error_efcomp(struct in_cmd* cmd)
          }
       }  /* end of treatment of selected node */
       nextnode = nextnode->next;
-  }      /* end of loop over all nodes */           
-  if(chcount[0] != 0) 
+  }      /* end of loop over all nodes */
+  if(chcount[0] != 0)
   fprintf(prt_file, "Assigned field errors to %d elements\n",chcount[0]);
-  if(chcount[1] != 0) 
+  if(chcount[1] != 0)
   fprintf(prt_file, "Replaced field errors for %d elements\n",chcount[1]);
-  if(chcount[2] != 0) 
+  if(chcount[2] != 0)
   fprintf(prt_file, "Added field errors to %d elements\n",chcount[2]);
   free(nvec);
 
@@ -420,7 +420,7 @@ void error_eoption(struct in_cmd* cmd)
   }
   if ((pos = name_list_pos("seed", nl)) > -1)
     {
-     if (nl->inform[pos]) 
+     if (nl->inform[pos])
        {
         seed = command_par_value("seed", cmd->clone);
         init55(seed);
@@ -458,7 +458,7 @@ double fact(int i)
      return(-1.0);
   }
 }
-  
+
 void pro_error_make_efield_table()
 {
   struct table *ttb = efield_table;

@@ -1885,7 +1885,7 @@
       a(1) = node_value('l ')
       if (a(1) .gt. 0.d0 .and. type .gt. 1 .and. type .lt. 8)  then
         if (n .ge. 11) then
-!frs   use angle&tilt instead of k0l&k0sl since the later are no longer 
+!frs   use angle&tilt instead of k0l&k0sl since the later are no longer
 !frs   calculated from the former 25.04.2003
 !          j = double_from_table(tabname, 'k0l ' , row, tmp1)
 !          j = double_from_table(tabname, 'k0sl ' , row, tmp2)
