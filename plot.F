@@ -364,7 +364,6 @@
       integer i,j,k,l,new1,new2,currtyp,crow,pltyp,pos_flag
       integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
       integer nint, ndble, char_l(szcompar)
-      integer plot_style(szcompar),plot_symbol(szcompar)
       double precision fact, d_val, d_val1
       double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
      &currk2l, currk2sl, currk3l, currk3sl
@@ -441,19 +440,6 @@
       enddo
 
 !--- Routine body
-
-!--- Check that STYLE & SYMBOL are both non zero
-
-      call comm_para('style ', nint, ndble, k, plot_style, d_arr,          &
-     &               char_a, char_l)
-      call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,         &
-     &               char_a, char_l)
-      if (plot_style(1) + plot_symbol(1) .eq. 0) then
-        print *,'Warning: style & symbol attributes will make plot invis&
-     &ible. Thus style is set to 1.'
-        plot_style(1) = 1
-      endif
-      ipparm(1,1) = plot_style(1)
 
 !--- No interpolation if centre option is set
 
@@ -2233,6 +2219,7 @@
       integer i, j, k, notitle, noversi, nivaxs,inter_setplot
       character * (mcnam) sdum(1)
       integer nint, ndble, int_arr(szcompar), char_l(szcompar)
+      integer plot_style,plot_symbol
       double precision d_arr(szcompar)
       double precision plot_option
       character * (szchara) char_a, version
@@ -2332,14 +2319,14 @@
 
       if(ptc_flag) then
         call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr,    &
-     &  char_a, char_l)
+     &                 char_a, char_l)
         if (k .gt. 0) tabname = char_a
       else
 
 !--- else normal twiss treatment : any table - for hor = s plot machine
 
         call comm_para('table ', nint, ndble, k, int_arr, d_arr,        &
-     &  char_a, char_l)
+     &                  char_a, char_l)
         if (k .gt. 0) tabname = char_a
       endif
 
@@ -2424,11 +2411,22 @@
         vrange(2,i) = d_arr(i)
       enddo
 
+!--- Check that STYLE & SYMBOL are both non zero
+
+      call comm_para('style ', nint, ndble, k, plot_style, d_arr,       &
+     &               char_a, char_l)
+      call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,     &
+     &               char_a, char_l)
+      if (plot_style + plot_symbol .eq. 0) then
+        print *,'Warning: style & symbol attributes will make plot invis&
+     &ible. Thus style is set to 1.'
+        plot_style = 1
+      endif
+      ipparm(1,1) = plot_style
+      ipparm(4,1) = plot_symbol
+
       char_a = ' '
       call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr,       &
-     &char_a, char_l)
-
-      call comm_para('symbol ', nint, ndble, k, ipparm(4,1), d_arr,     &
      &char_a, char_l)
 
       call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr,     &
@@ -2442,15 +2440,15 @@
 
       if (.not. ptc_flag) then
         call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr,       &
-     &  char_a,char_l)
+     &                   char_a,char_l)
         if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action t&
-     &  aken, use interpolate attribute instead.'
+     & aken, use interpolate attribute instead.'
 
         ipparm(2,1) = 0
         inter_setplot = plot_option('interpolate ')
         if (inter_setplot .eq. 0) then
           call comm_para('interpolate ', nint, ndble, k, ipparm(2,1),   &
-     &    d_arr,char_a, char_l)
+     &                     d_arr,char_a, char_l)
         else
           ipparm(2,1) = inter_setplot
         endif
@@ -2462,7 +2460,7 @@
 
       char_a = ' '
       call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr,          &
-     &char_a, char_l)
+     &                   char_a, char_l)
       if (k .gt. 0)  then
         nivaxs = 1
         nivvar = min(k, mxcurv)
@@ -2473,7 +2471,7 @@
       else
         char_a = ' '
         call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr,       &
-     &  char_a, char_l)
+     &                     char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2489,7 +2487,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr,       &
-     &  char_a, char_l)
+     &                     char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2504,7 +2502,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr,       &
-     &  char_a, char_l)
+     &                     char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2519,7 +2517,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr,       &
-     &  char_a, char_l)
+     &                     char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
