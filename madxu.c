@@ -1960,7 +1960,7 @@ void* mycalloc(char* caller, size_t nelem, size_t size)
   if ((p = calloc(1, l_size)) == NULL)
      fatal_error("memory overflow, called from routine:", caller);
   i_p = (int*) p; *i_p = FREECODE;
-  return (p+sizeof(int));
+  return ((char*)p+sizeof(int));
 }
 
 void mycpy(char* sout, char* sin)
@@ -1979,7 +1979,7 @@ void mycpy(char* sout, char* sin)
 
 void myfree(char* rout_name, void* p)
 {
-  char* l_p = p - sizeof(int);
+  char* l_p = (char*)p - sizeof(int);
   int* i_p = (int*) l_p;
   myfree_caller = rout_name;
   if (*i_p == FREECODE) 
@@ -1998,7 +1998,7 @@ void* mymalloc(char* caller, size_t size)
   if ((p = malloc(l_size)) == NULL)
     fatal_error("memory overflow, called from routine:", caller);
   i_p = (int*) p; *i_p = FREECODE;
-  return (p+sizeof(int));
+  return ((char*)p+sizeof(int));
 }
 
 char* mystrchr(char* string, char c)
