@@ -364,7 +364,7 @@
       integer i,j,k,l,new1,new2,currtyp,crow,pltyp,pos_flag
       integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
       integer nint, ndble, char_l(szcompar)
-      integer plot_style,plot_symbol
+      integer plot_style(szcompar),plot_symbol(szcompar)
       double precision fact, d_val, d_val1
       double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
      &currk2l, currk2sl, currk3l, currk3sl
@@ -448,12 +448,12 @@
      &               char_a, char_l)
       call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,         &
      &               char_a, char_l)
-      if (plot_style + plot_symbol .eq. 0) then
+      if (plot_style(1) + plot_symbol(1) .eq. 0) then
         print *,'Warning: style & symbol attributes will make plot invis&
      &ible. Thus style is set to 1.'
-        plot_style = 1
+        plot_style(1) = 1
       endif
-      ipparm(1,1) = plot_style
+      ipparm(1,1) = plot_style(1)
 
 !--- No interpolation if centre option is set
 
