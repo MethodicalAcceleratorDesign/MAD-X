@@ -807,7 +807,7 @@
 !---- Second mode.
         cosmuy = (d(1,1) + d(2,2)) / two
         staby=0
-        if(abs(cosmux).lt.one) staby=1
+        if(abs(cosmuy).lt.one) staby=1
         if (staby.ne.0) then
           sinmu2 = - d(1,2)*d(2,1) - fourth*(d(1,1) - d(2,2))**2
           if (sinmu2.lt.zero) sinmu2 = eps
