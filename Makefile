@@ -135,7 +135,7 @@ wrap.o: madx_ptc_module.o wrap.f90
 	$(f95) $(f95_FLAGS) $<
 
 # madx_objectsf77: madxnp.o gxx11c.o  + all *.F except for gxx11ps.F (windows special). Append f77 to distinguish from objects compiled with f95
-madx_objectsf77 = madxnp.o gxx11c.o $(filter-out gxx11ps_f77.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+madx_objectsf77 = madxnp.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 madx: $(madx_objectsf77) ; 
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
