@@ -180,9 +180,11 @@
 ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
 !   Added LCAVITY element at ISP 27                                    *
 !----------------------------------------------------------------------*
-      integer code,nn,ns
+      integer code,nn,ns,maxmul
+      parameter(maxmul=20)
       double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
-     &ve(3),we(3,3),node_value,el,normal(0:20),skew(0:20),fskw,one
+     &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul),fskw
+     &,one
       parameter(one=1d0)
 !---- Branch on subprocess code.
       code = node_value('mad8_type ')
@@ -266,10 +268,12 @@
 
 !---- multipoles , introduced  17.09.02 / AV
    80 continue
+      call dzero(normal,maxmul+1)
+      call dzero(skew,maxmul+1)
       call node_vector('knl ',nn,normal)
       call node_vector('ksl ',ns,skew)
-!      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
-!     *,skew(0)
+      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
+     *,skew(0)
       angle = normal(0)
       fskw = skew(0)
       if(angle.eq.0.0) then
