@@ -606,7 +606,7 @@ int zero_string(char*);
 /* define orbit correction routines */
 void pro_correct(struct in_cmd* cmd);
 int  pro_correct_getcommands(struct in_cmd* cmd);
-int  pro_correct_gettables(int ip);
+int  pro_correct_gettables(int ip, struct in_cmd* cmd);
 int  pro_correct_getorbit(struct in_cmd* cmd);
 void pro_correct_prtwiss();
 void pro_correct_write_cocu_table();
@@ -789,6 +789,11 @@ struct table* survey_table;       /* current survey table */
 struct table* corr_table;         /* corrector table after orbit correction */
 struct table* mon_table;          /* monitor table after orbit correction */
 struct table* orbit_table;        /* orbit positions at monitors */
+
+struct table* target_table = NULL;       /* current target table */
+struct table* model_table = NULL;        /* current model table */
+struct table* orbin_table = NULL;        /* current orbit table */
+
 
 struct table_list* optics_tables; /* contains optics tables from last twiss */
 struct table_list* table_register; /* contains all tables */
