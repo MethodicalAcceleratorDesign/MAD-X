@@ -8392,6 +8392,7 @@ double table_value()
   if (current_variable != NULL && current_variable->string != NULL)
     {
      strcpy(c_dummy, current_variable->string);
+     supp_char(',', c_dummy);
      mysplit(c_dummy, tmp_p_array);
      toks = tmp_p_array->p; ntok = tmp_p_array->curr;
      if (ntok > 1)
