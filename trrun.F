@@ -32,7 +32,7 @@
       integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
      &nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
-     &int_arr(1),tot_segm,code_buf(*)
+     &int_arr(1),tot_segm,code_buf(*),jtrk
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
      &al_errors(align_max),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,         &
      &node_value,one,                                                   &
@@ -159,6 +159,7 @@
           print*,"MAKETHIN will save you"
           print*," "
           print*," "
+! Better to use stop. If use return, irrelevant tracking output is printed
           stop
 !          call aafail('TRRUN',                                          &
 !     &    '----element with length found : CONVERT STRUCTURE WITH '//   &
@@ -177,7 +178,7 @@
             enddo
           endif
         endif
-!-------- Track through element
+!-------- Track through element  // suppress dxt 13.12.04
         call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
      &  last_pos, last_orbit,aperflag,maxaper,al_errors)
 !--------  Misalignment at end of element (from twissfs.f)
@@ -301,7 +302,8 @@
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
-!   Track through an element by TRANSPORT method (Switch routine).     *
+!   -  Test apertures                                                  *
+!   -  Track through thin lenses ONLY.                                 *
 !                                                                      *
 ! Input/output:                                                        *
 !   SUM       (double)    Accumulated length.                          *
@@ -315,10 +317,10 @@
       logical aperflag,bend,fmap
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
      &get_option
-      double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
-     &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,   &
+      double precision apx,apy,el,sum,node_value,track(6,*),            &
+     &last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
      &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
-     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6)
+     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*)
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
@@ -551,6 +553,8 @@
   280 continue
   290 continue
   300 continue
+!---- Dipole edge
+      call ttdpdg(track,ktrack)
   310 continue
 
   500 continue
@@ -572,9 +576,8 @@
       return
       end
 
-      subroutine ttmult(track, ktrack, dxt, dyt)
+      subroutine ttmult(track, ktrack,dxt,dyt)
       implicit none
-
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !    Track particle through a general thin multipole.                  *
@@ -1747,6 +1750,36 @@
         endif
       endif
       end
+      subroutine ttdpdg(track, ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose: computes the effect of the dipole edge                      *
+! Input/Output:  ktrack , number of surviving trajectories             *
+!                 track , trajectory coordinates
+!----------------------------------------------------------------------*
+      integer ktrack,itrack
+      double precision fint,el,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),    &
+     &track(6,*),node_value,zero,one
+      parameter(zero=0d0,one=1d0)
 
+      call m66one(rw)
+!      call dzero(tw, 216)
 
-
+      bv0 = node_value('dipole_bv ')
+      e1 = bv0 * node_value('e1 ')
+!--- bvk applied further down
+      h = one/node_value('rho ')
+      hgap = node_value('hgap ')
+      fint = node_value('fint ')
+      corr = (h + h) * hgap * fint
+!          print*,"------------------------------------------ "
+!---- Fringe fields effects computed from the TWISS routine tmfrng
+!     tmfrng returns the matrix elements rw(used) and tw(unused)
+!     No radiation effects as it is a pure thin lens with no lrad
+      call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
+      do itrack = 1, ktrack
+        track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
+        track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
+      enddo
+      return
+      end
