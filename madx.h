@@ -274,6 +274,7 @@ struct node                /* the sequence is a linked list of nodes */
   int occ_cnt;             /* element occurrence count at node */
   int obs_point;           /* observation point number (tracking) */
   int sel_err;             /* error select flag */
+  int sel_sector;          /* sectormap select flag */
   int con_cnt;             /* constraint counter */
   int enable;              /* flag for correctors and monitors: 0 off, 1 on */
   double position;         /* s position in sequence [m] */

@@ -34,6 +34,7 @@
 #define plot_option           plot_option__
 #define reset_count           reset_count__
 #define restart_sequ          restart_sequ__
+#define sector_out            sector_out__
 #define sequence_name         sequence_name__
 #define set_option            set_option__
 #define set_value             set_value__
@@ -83,6 +84,7 @@
 #define plot_option           plot_option_
 #define reset_count           reset_count_
 #define restart_sequ          restart_sequ_
+#define sector_out            sector_out_
 #define sequence_name         sequence_name_
 #define set_option            set_option_
 #define set_value             set_value_
@@ -361,8 +363,10 @@ int get_node_count(struct node*);
 int get_ex_range(char*, struct sequence*, struct node**);
 int get_range(char*, struct sequence*, struct node**);
 double get_refpos(struct sequence*);
-int get_select_ex_ranges(struct sequence*,struct command_list*);
-int get_select_ranges(struct sequence*,struct command_list*);
+int get_select_ex_ranges(struct sequence*,struct command_list*, 
+                         struct node_list*);
+int get_select_ranges(struct sequence*,struct command_list*,
+                      struct node_list*);
 void get_select_t_ranges(struct command_list*, struct table*);
 int square_to_colon(char*);
 int get_stmt(FILE*);
@@ -514,9 +518,11 @@ void replace_lines(struct macro*, int, char**);
 void replace_one(struct node*, struct element*);
 void resequence_nodes(struct sequence*);
 void reset_errors(struct sequence*);
+void reset_sector(struct sequence*, int);
 double rfc_slope();
 int scan_expr(int, char**);
 void scan_in_cmd(struct in_cmd*);
+void sector_out(double*, double*, double*, double*);
 void seq_cycle(struct in_cmd*);
 void seq_edit(struct in_cmd*);
 void seq_edit_main(struct in_cmd*);
@@ -540,6 +546,7 @@ void set_selected_errors();
 void set_selected_rows(struct table*, struct command_list*);
 void set_twiss_deltas(struct command*);
 void set_sub_variable(char*, char*, struct in_cmd*);
+void set_sector();
 void show_beam(char*);
 double simple_double(char**, int, int);
 int simple_logic_expr(int, char**);
@@ -685,6 +692,7 @@ struct command_list* slice_select;      /* current slice select commands */
 struct command_list* stored_commands;   /* list of stored commands */
 struct command_list* stored_match_var;  /* list of match vary commands */
 struct command_list* stored_track_start;/* list of track start commands */
+struct command_list* sector_select;     /* current sectormap select commands */
 
 struct command_list_list* table_select; /* list of all table select lists */
 
@@ -730,6 +738,7 @@ struct node* current_node = NULL;
 struct node* debug_node = NULL;
 
 struct node_list* selected_ranges; /* filled by some select commands */
+struct node_list* sector_ranges;   /* filled by the sectormap select command */
 
 struct sequence* current_sequ;  /* pointer to currently used sequence */
 struct sequence* edit_sequ;     /* pointer to sequence being edited */
@@ -764,6 +773,7 @@ FILE* debug_file;              /* for debug output */
 FILE* stamp_file;              /* for debug output */
 FILE* out_file;                /* for table output */
 FILE* prt_file;                /* for echo output */
+FILE* sec_file = NULL;         /* for sector output */
 FILE* tab_file;                /* for table input */
 
 /* Global simple variables by type */
@@ -778,7 +788,7 @@ char  tmp_key[NAME_L],
 
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.03";
+char myversion[] = "MAD-X 1.04";
 char one_string[] = "1";
 
 char* aux_char_pt;               /* for debug purposes */

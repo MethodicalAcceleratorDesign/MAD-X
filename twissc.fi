@@ -1,10 +1,10 @@
-      double precision opt_fun0,opt_fun,disp,ddisp,rmat,rw,betx,alfx,   &
+      double precision opt_fun0,opt_fun,disp,ddisp,rmat,betx,alfx,      &
      &amux,bety,alfy,amuy,bxmax,dxmax,bymax,dymax,xcomax,ycomax,sigxco, &
      &sigyco,sigdx,sigdy,wgt,cosmux,cosmuy,wx,phix,dmux,wy,phiy,dmuy,   &
      &synch_1,synch_2,synch_3,synch_4,synch_5,suml,eta,alfa,gamtr,qx,qy,&
-     &sinmux,sinmuy,xix,xiy
+     &sinmux,sinmuy,xix,xiy,currpos
       common/twissc/ opt_fun0(fundim),opt_fun(fundim),disp(6),ddisp(6), &
-     &rmat(2,2),rw(6,6),betx,alfx,amux,bety,alfy,amuy,bxmax,dxmax,bymax,&
+     &rmat(2,2),betx,alfx,amux,bety,alfy,amuy,bxmax,dxmax,bymax,        &
      &dymax,xcomax,ycomax,sigxco,sigyco,sigdx,sigdy,wgt,cosmux,cosmuy,  &
      &wx,phix,dmux,wy,phiy,dmuy,synch_1,synch_2,synch_3,synch_4,synch_5,&
-     &suml,eta,alfa,gamtr,qx,qy,sinmux,sinmuy,xix,xiy
+     &suml,eta,alfa,gamtr,qx,qy,sinmux,sinmuy,xix,xiy,currpos

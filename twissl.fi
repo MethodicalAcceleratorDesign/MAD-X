@@ -1,2 +1,5 @@
-      logical centre,centre_cptk,centre_bttk,first
-      common/twissl/centre,centre_cptk,centre_bttk,first
+!----------------------------------------------------------------------*
+      logical      centre,centre_cptk,centre_bttk,first,rmatrix,        &
+     &sectormap
+      common/twissl/centre,centre_cptk,centre_bttk,first,rmatrix,       &
+     &sectormap

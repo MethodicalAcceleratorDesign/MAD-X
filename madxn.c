@@ -1,4 +1,4 @@
-/* Development version of MAD-X */
+/* Production version of MAD-X, version number: see madxd.h */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -3461,6 +3461,7 @@ void ftoi_array(struct double_array* da, struct int_array* ia)
 
 void madx_finish()
 {
+  if (sec_file)  fclose(sec_file);
   if (plots_made) gxterm_();
   if (get_option("trace")) time_stamp("end");
   printf("\n  ++++++++++++++++++++++++++++++++\n");
@@ -3529,6 +3530,7 @@ void madx_init()
   seqedit_select = new_command_list(10); /* for "select seqedit" commands */
   error_select = new_command_list(10); /* for "select error" commands */
   slice_select = new_command_list(10); /* for "select makethin" commands */
+  sector_select = new_command_list(10); /* for "select sectormap" commands */
   s_range = new_int_array(10);
   e_range = new_int_array(10);
   for (j = 0; j < 6; j++) orbit0[j] = zero;
@@ -3615,10 +3617,11 @@ char* get_new_name()
   return permbuff(name);
 }
 
-int get_select_ex_ranges(struct sequence* sequ, struct command_list* select)
+int get_select_ex_ranges(struct sequence* sequ, struct command_list* select,
+                         struct node_list* s_ranges)
 {
   /*returns 0 if invalid sequence pointer
-            1 if nodes in selected_ranges (including 0) */
+            1 if nodes in s_ranges (including 0) */
   struct name_list* nl;
   struct command* cd;
   struct command_parameter_list* pl;
@@ -3650,7 +3653,7 @@ int get_select_ex_ranges(struct sequence* sequ, struct command_list* select)
      while (c_node != NULL)
        {
 	if (full != 0 || pass_select(c_node->p_elem->name, cd) != 0)
-              add_to_node_list(c_node, 0, selected_ranges);
+              add_to_node_list(c_node, 0, s_ranges);
         if (c_node == nodes[1]) break;
         c_node = c_node->next;
        }
@@ -3659,7 +3662,8 @@ int get_select_ex_ranges(struct sequence* sequ, struct command_list* select)
   return 1;
 }
 
-int get_select_ranges(struct sequence* sequ, struct command_list* select)
+int get_select_ranges(struct sequence* sequ, struct command_list* select,
+                      struct node_list* s_ranges)
 {
   struct name_list* nl;
   struct command_parameter_list* pl;
@@ -3680,14 +3684,14 @@ int get_select_ranges(struct sequence* sequ, struct command_list* select)
 	   c_node = nodes[0];
            while (c_node != NULL)
 	     {
-	      add_to_node_list(c_node, 0, selected_ranges);
+	      add_to_node_list(c_node, 0, s_ranges);
               if (c_node == nodes[1]) break;
               c_node = c_node->next;
 	     }
 	  }
        }
     }
-  return selected_ranges->curr;
+  return s_ranges->curr;
 }
 
 void get_select_t_ranges(struct command_list* select, struct table* t)
@@ -3713,6 +3717,11 @@ void get_select_t_ranges(struct command_list* select, struct table* t)
 	     {
               s_range->i[s_range->curr++] = rows[0];
               e_range->i[e_range->curr++] = rows[1];
+	     }
+	   else
+	     {
+              s_range->i[s_range->curr++] = 0;
+              e_range->i[e_range->curr++] = t->curr - 1;
 	     }
 	  }
        }
@@ -4970,6 +4979,7 @@ double node_value(char* par)
   else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
   else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
   else if (strcmp(lpar, "obs_point") == 0) value = current_node->obs_point;
+  else if (strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
   else value =  element_value(current_node, lpar);
   return value;
 }
@@ -6007,6 +6017,8 @@ void pro_twiss()
   l = strlen(table_name);
   tarr = new_int_array(l+1);
   conv_char(table_name, tarr);
+  reset_sector(current_sequ, 0);
+  set_sector();
   for (i = 0; i < twiss_deltas->curr; i++)
     {
      twiss_table = make_table(table_name, twiss_table_cols, 
@@ -6358,6 +6370,21 @@ void reset_errors(struct sequence* sequ)
     }
 }
 
+void reset_sector(struct sequence* sequ, int val)
+{
+  struct node* c_node;
+  if (sequ != NULL && sequ->ex_start != NULL && sequ->ex_end != NULL)
+    {
+     c_node = sequ->ex_start;
+     while (c_node != NULL)
+       {
+	c_node->sel_sector = val;
+        if (c_node == sequ->ex_end) break;
+        c_node = c_node->next;
+       }
+    }
+}
+
 int restart_sequ()
 {
   current_node = current_sequ->range_start;
@@ -6521,6 +6548,29 @@ void scan_in_cmd(struct in_cmd* cmd)
         cmd->clone->par_names->inform[k] = ++cnt; /* mark parameter as read */
        }
      i++;
+    }
+}
+
+void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
+{
+  int i;
+  if (sec_file == NULL)
+    {
+     if ((sec_file = fopen("sectormap", "w")) == NULL)
+             fatal_error("cannot open output file:", "sectormap");
+    }
+  fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
+  for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]);
+  fprintf(sec_file,"\n");
+  for (i = 0; i < 36; i++) 
+    {
+     fprintf(sec_file, "%15.8e ", rmatrix[i]);
+     if ((i+1)%6 == 0)  fprintf(sec_file,"\n");
+    }
+  for (i = 0; i < 216; i++) 
+    {
+     fprintf(sec_file, "%15.8e ", tmatrix[i]);
+     if ((i+1)%6 == 0)  fprintf(sec_file,"\n");
     }
 }
 
@@ -6701,7 +6751,8 @@ void seq_install(struct in_cmd* cmd)
           }
         else
           {
-	   if (get_select_ranges(edit_sequ, seqedit_select) == 0) any = 1;
+	   if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) 
+               == 0) any = 1;
            c_node = edit_sequ->start;
            while (c_node != NULL)
 	     {
@@ -6773,7 +6824,8 @@ void seq_move(struct in_cmd* cmd)
               warning("no 'by' given,", "ignored"); return;
 	     }
 	   by = command_par_value("by", cmd->clone);
-	   if (get_select_ranges(edit_sequ, seqedit_select) == 0) any = 1;
+	   if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) 
+               == 0) any = 1;
            node = edit_sequ->start;
            while (node != NULL)
 	     {
@@ -6894,7 +6946,8 @@ void seq_remove(struct in_cmd* cmd)
           }
         else
           {
-	   if (get_select_ranges(edit_sequ, seqedit_select) == 0) any = 1;
+	   if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) 
+               == 0) any = 1;
            c_node = edit_sequ->start;
            while (c_node != NULL)
 	     {
@@ -6965,7 +7018,8 @@ void seq_replace(struct in_cmd* cmd)
               warning("'by' missing, ","ignored");
               return;
 	     }
-	   if (get_select_ranges(edit_sequ, seqedit_select) == 0) any = 1;
+	   if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) 
+               == 0) any = 1;
            c_node = edit_sequ->start;
            while (c_node != NULL)
 	     {
@@ -7424,7 +7478,8 @@ void set_selected_elements()
 void set_selected_errors()
 {
   int i, flag;
-  if ((flag = get_select_ex_ranges(current_sequ, error_select)) != 0)
+  if ((flag = 
+      get_select_ex_ranges(current_sequ, error_select, selected_ranges)) != 0)
     {
      for (i = 0; i < selected_ranges->curr; i++)
           selected_ranges->nodes[i]->sel_err = 1;
@@ -7530,6 +7585,18 @@ void set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   else if ((command = find_command(comm, defined_commands)) != NULL)
       set_command_par_value(par, command, val);
   current_beam = keep_beam;
+}
+
+void set_sector()
+{
+  int i, flag;
+  if (sector_select->curr == 0) reset_sector(current_sequ, 1);
+  else if ((flag = 
+      get_select_ex_ranges(current_sequ, sector_select, sector_ranges)) != 0)
+    {
+     for (i = 0; i < sector_ranges->curr; i++)
+          sector_ranges->nodes[i]->sel_sector = 1;
+    }
 }
 
 void show_beam(char* tok)
@@ -7938,6 +8005,24 @@ void store_select(struct in_cmd* cmd)
 	if (slice_select->curr == slice_select->max) 
             grow_command_list(slice_select);
         slice_select->commands[slice_select->curr++] = cmd->clone;
+        cmd->clone_flag = 1; /* do not drop */
+       }
+    }
+  else if (strcmp(flag_name, "sectormap") == 0) 
+    {
+     if (sector_ranges == NULL)   sector_ranges = new_node_list(10000);
+     if (log_val("clear", cmd->clone)) 
+       {
+	delete_command_list(sector_select);  
+        sector_select = new_command_list(10);
+        sector_ranges->curr = 0;
+        sector_ranges->list->curr = 0;
+       }
+     else
+       {
+	if (sector_select->curr == sector_select->max) 
+            grow_command_list(sector_select);
+        sector_select->commands[sector_select->curr++] = cmd->clone;
         cmd->clone_flag = 1; /* do not drop */
        }
     }

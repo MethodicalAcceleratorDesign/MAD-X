@@ -4,15 +4,16 @@
 ! Purpose:                                                             *
 !   TWISS command: Track linear lattice parameters.                    *
 !----------------------------------------------------------------------*
-      integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione, &
-     &fundim
-      parameter(fundim=69)
+      include 'twiss0.fi'
+      include 'twissa.fi'
+      include 'twissl.fi'
+      include 'twissc.fi'
+      include 'twissotm.fi'
+      integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
-     &ddisp0(6),r0mat(2,2),zero,one,two
+     &ddisp0(6),r0mat(2,2),zero,one,two,get_value
       parameter(zero=0d0,one=1d0,two=2d0)
       character*48 charconv
-      include 'twissa.fi'
-      include 'twissc.fi'
       data izero, ione / 0, 1 /
 
 !---- Initialization
@@ -82,6 +83,9 @@
 
 !---- Initial value flag.
       inval=get_option('twiss_inval ')
+!--- flags for writing cumulative or lumped matrices
+      rmatrix=get_value('twiss ','rmatrix ').ne.zero
+      sectormap=get_value('twiss ','sectormap ').ne.zero
 !---- Initial values from command attributes.
       if (inval.ne.0) then
 
@@ -97,6 +101,11 @@
         if(eflag.ne.0) go to 900
         call twcpin(rt,disp0,r0mat,eflag)
         if(eflag.ne.0) go to 900
+      endif
+      if (sectormap)  then
+        call dcopy(orbit0, sorb, 6)
+        call m66one(srmat)
+        call dzero(stmat, 216)
       endif
 
 !---- Initialize opt_fun0
@@ -146,8 +155,8 @@
 !   orbit(6)  (double) closed orbit at obs. point kobs, or at end      *
 !   rt(6,6) (double) transfer matrix.                                  *
 !----------------------------------------------------------------------*
-      integer eflag,kobs,izero,ione,fundim
-      parameter(fundim=69)
+      include 'twiss0.fi'
+      integer eflag,kobs,izero,ione
       double precision opt_fun0(fundim),orbit0(6),orbit(6),rt(6,6),     &
      &tt(6,6,6)
       data izero, ione / 0, 1 /
@@ -168,8 +177,9 @@
 !   opt_fun0(fundim) (double) initial optical values:                  *
 !                         betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.    *
 !----------------------------------------------------------------------*
-      integer i1,i2,fundim
-      parameter(fundim=69)
+      include 'twiss0.fi'
+      include 'twissl.fi'
+      integer i1,i2
       double precision opt_fun0(*),rt(6,6),betx,alfx,mux,bety,alfy,muy, &
      &x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,phix,dmux,wy,phiy,dmuy,ddx,ddpx,  &
      &ddy,ddpy,r(2,2),energy,get_value,zero
@@ -243,7 +253,7 @@
       if(r(2,1).ne.zero) opt_fun0(31)=r(2,1)
       if(r(2,2).ne.zero) opt_fun0(32)=r(2,2)
       if(energy.ne.zero) opt_fun0(33)=energy
-      if(get_value('twiss ','rmatrix ').ne.zero) then
+      if(rmatrix) then
         do i1=1,6
           do i2=1,6
             opt_fun0(33+(i1-1)*6+i2)=rt(i1,i2)
@@ -252,7 +262,7 @@
       endif
 
       end
-      subroutine twfill(case,opt_fun,position)
+      subroutine twfill(case,opt_fun,position,flag)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -260,19 +270,22 @@
 ! Input:                                                               *
 !   case        (integer) =1 fill from twcpgo; =2 fill from twchgo     *
 !   position    (double)  end position of element                      *
+!   flag        (integer) fill flag: 0 no, !=0 yes                     *
 ! Input/output:                                                        *
 !   opt_fun(fundim) (double) optical values:                           *
 !                        betx,alfx,amux,bety,alfy,amuy, etc.           *
 !----------------------------------------------------------------------*
-      integer case,i
-      double precision opt_fun(*),position,twopi,tmp,get_variable,      &
-     &get_value,zero
-      parameter(zero=0d0)
       include 'twissa.fi'
+      include 'twissl.fi'
+      include 'twissotm.fi'
+      integer case,i,flag
+      double precision opt_fun(*),position,twopi,tmp,get_variable,      &
+     &zero
+      parameter(zero=0d0)
 
 !---- Initialize
       twopi=get_variable('twopi ')
-
+      if (flag .ne. 0)  then
       if(case.eq.1) then
         opt_fun(2)=position
         call double_to_table(table_name,'s '     ,opt_fun(2 ))
@@ -299,7 +312,7 @@
         call double_to_table(table_name,'r21    ',opt_fun(31))
         call double_to_table(table_name,'r22    ',opt_fun(32))
         call double_to_table(table_name,'energy ',opt_fun(33))
-        if(get_value('twiss ','rmatrix ').ne.zero) then
+        if(rmatrix) then
           i = 36
           call vector_to_table(table_name, 're11 ', i, opt_fun(34))
         endif
@@ -318,7 +331,7 @@
 
 !---- Augment table twiss
       call augment_count(table_name)
-
+      endif
       end
       subroutine tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
       implicit none
@@ -446,18 +459,17 @@
 !   eflag     (integer) error flag.                                    *
 !   kobs      (integer) if > 0, stop at node with this obs. point #    *
 !----------------------------------------------------------------------*
-      logical fsec,ftrk,fmap
       include 'twiss0.fi'
+      include 'twissa.fi'
+      include 'twissc.fi'
+      include 'bb.fi'
+      logical fsec,ftrk,fmap
       integer eflag,i,j,code,restart_sequ,advance_node,node_al_errors,  &
-     &n_align,kobs,nobs,fundim
-      parameter(fundim=69)
+     &n_align,kobs,nobs
       double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6),el,ek(6),   &
      &re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
      &get_value,parvec(26),orb_limit,zero
       parameter(orb_limit=1d1,zero=0d0)
-      include 'twissa.fi'
-      include 'twissc.fi'
-      include 'bb.fi'
 
 !---- Initialize.
       betas = get_value('probe ','beta ')
@@ -522,15 +534,15 @@
 !   r0mat(2,2)   (double)  coupling matrix                             *
 !   eflag        (integer) error flag.                                 *
 !----------------------------------------------------------------------*
-      integer eflag,stabx,staby,fundim
-      parameter(fundim=69)
+      include 'twiss0.fi'
+      include 'twissa.fi'
+      include 'twissc.fi'
+      integer eflag,stabx,staby
       double precision rt(6,6),disp0(6),r0mat(2,2),a(2,2),arg,aux(2,2), &
      &d(2,2),den,det,dtr,sinmu2,betx0,alfx0,amux0,bety0,alfy0,amuy0,    &
      &deltap,get_value,eps,zero,one,two,fourth
       parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0,fourth=0.25d0)
       character*120 msg
-      include 'twissa.fi'
-      include 'twissc.fi'
 
 !---- Initialization
       deltap = get_value('probe ','deltap ')
@@ -695,23 +707,23 @@
 ! Input:                                                               *
 !   rt(6,6)   (double)  one turn transfer matrix.                      *
 !----------------------------------------------------------------------*
-      logical fmap,cplxy,cplxt,dorad
       include 'twiss0.fi'
-      integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
-     &node_al_errors,n_align,fundim
-      parameter(fundim=69)
-      double precision rt(6,6),ek(6),re(6,6),rwi(6,6),rc(6,6),te(6,6,6),&
-     &el,orbit(6),position,betas,gammas,al_errors(align_max),bv0,bvk,   &
-     &pos0,node_value,get_value,zero,one,two
-      parameter(zero=0d0,one=1d0,two=2d0)
-      character*120 msg
       include 'twissl.fi'
       include 'twissa.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
+      logical fmap,cplxy,cplxt,dorad,sector_sel
+      integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
+     &node_al_errors,n_align
+      double precision rt(6,6),ek(6),re(6,6),rwi(6,6),rc(6,6),te(6,6,6),&
+     &el,orbit(6),betas,gammas,al_errors(align_max),bv0,bvk, sumloc,    &
+     &pos0,node_value,get_value,zero,one,two
+      parameter(zero=0d0,one=1d0,two=2d0)
+      character*120 msg
 
 !---- Initialization
-      position=zero
+      currpos=zero
+      sumloc = zero
       dorad = get_value('probe ','radiate ').ne.zero
       centre = get_value('twiss ','centre ').ne.zero
       call m66one(rwi)
@@ -769,6 +781,7 @@
       centre_cptk=.false.
       i = restart_sequ()
  10   continue
+      sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
       code = node_value('mad8_type ')
       el = node_value('l ')
       bv0 = node_value('dipole_bv ')
@@ -777,24 +790,27 @@
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)
         call twcptk(re,orbit)
+        if (sectormap) call m66mpy(re,srmat,srmat)
       endif
       if(centre) centre_cptk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       centre_cptk=.false.
       if(centre) then
-        pos0=position
-        position=position+el/two
-        if(save.ne.0) call twfill(1,opt_fun,position)
+        pos0=currpos
+        currpos=currpos+el/two
+        if(save.ne.0) call twfill(1,opt_fun,currpos, 1)
       endif
       if (fmap) then
         call twcptk(re,orbit)
-      else
-
+        if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
       endif
       if (n_align.ne.0)  then
         call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
         call twcptk(re,orbit)
+        if (sectormap) call m66mpy(re,srmat,srmat)
       endif
+      sumloc = sumloc + el
+      if (sector_sel) call twwmap(sumloc, orbit)
       if(centre) then
         bxmax =max(opt_fun(3)      ,bxmax)
         bymax =max(opt_fun(6)      ,bymax)
@@ -809,7 +825,7 @@
         opt_fun(12)=orbit(4)
         opt_fun(13)=orbit(5)
         opt_fun(14)=orbit(6)
-        position=position+el
+        currpos=currpos+el
       endif
       iecnt=iecnt+1
       bxmax =max(betx         ,bxmax)
@@ -822,10 +838,10 @@
       sigyco=sigyco+orbit(3)**2
       sigdx =sigdx + disp(1)**2
       sigdy =sigdy + disp(3)**2
-      if(save.ne.0.and..not.centre) call twfill(1,opt_fun,position)
+      if(save.ne.0.and..not.centre) call twfill(1,opt_fun,currpos,1)
       if(centre) then
-        position=pos0+el
-        opt_fun(2 )=position
+        currpos=pos0+el
+        opt_fun(2 )=currpos
         opt_fun(3 )=betx
         opt_fun(4 )=alfx
         opt_fun(5 )=amux
@@ -879,20 +895,16 @@
 !   rt(6,6)  (double)   one turn transfer matrix.                      *
 !   orbit(6) (double)   closed orbit                                   *
 !----------------------------------------------------------------------*
-      logical rmatrix
-      integer i,i1,i2,j,fundim
-      parameter(fundim=69)
-      double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
-     &rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
-     &alfy0,betx0,bety0,amux0,amuy0,get_value,zero,one
-      parameter(zero=0d0,one=1d0)
+      include 'twiss0.fi'
       include 'twissl.fi'
       include 'twissa.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
-
-!---- Flag for Rmatrix Calculation
-      rmatrix=get_value('twiss ','rmatrix ').ne.zero
+      integer i,i1,i2,j
+      double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
+     &rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
+     &alfy0,betx0,bety0,amux0,amuy0,zero,one
+      parameter(zero=0d0,one=1d0)
 
 !---- Dispersion.
       call dzero(dt,6)
@@ -1009,14 +1021,14 @@
 !   rt(6,6)   (double)  transfer matrix.                               *
 !   tt(6,6,6) (double)  second order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twiss0.fi'
+      include 'twissa.fi'
+      include 'twissc.fi'
       logical stabx,staby
-      integer i,k,j,fundim
-      parameter(fundim=69)
+      integer i,k,j
       double precision rt(6,6),tt(6,6,6),disp0(6),ddisp0(6),rtp(6,6),   &
      &sinmu2,bx,ax,by,ay,eps,temp,aux(6),zero,one,two,fourth
       parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0,fourth=0.25d0)
-      include 'twissa.fi'
-      include 'twissc.fi'
 
 !---- Initialization
       betx   =opt_fun0(3 )
@@ -1109,19 +1121,18 @@
 ! Purpose:                                                             *
 !   Track Chromatic functions.                                         *
 !----------------------------------------------------------------------*
-      logical fmap,cplxy,cplxt,dorad
       include 'twiss0.fi'
+      include 'twissl.fi'
+      include 'twissa.fi'
+      include 'twissc.fi'
+      logical fmap,cplxy,cplxt,dorad
       integer i,code,save,restart_sequ,advance_node,get_option,n_align, &
-     &node_al_errors,fundim
-      parameter(fundim=69)
+     &node_al_errors
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),                &
      &al_errors(align_max),deltap,el,betas,gammas,node_value,get_value, &
      &zero,one
       parameter(zero=0d0,one=1d0)
       character*120 msg
-      include 'twissl.fi'
-      include 'twissa.fi'
-      include 'twissc.fi'
 
 !---- If save requested reset table
       save=get_option('twiss_save ')
@@ -1183,7 +1194,7 @@
       if(centre) centre_bttk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       centre_bttk=.false.
-      if(save.ne.0.and.centre) call twfill(2,opt_fun,zero)
+      if(save.ne.0.and.centre) call twfill(2,opt_fun,zero,1)
       if (fmap) then
         call twbttk(re,te)
       endif
@@ -1191,7 +1202,7 @@
         call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
         call twbttk(re,te)
       endif
-      if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero)
+      if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero,1)
       if(centre) then
         opt_fun(5)=amux
         opt_fun(8)=amuy
@@ -1234,16 +1245,16 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second order terms.                            *
 !----------------------------------------------------------------------*
-      integer save,i,j,k,get_option,fundim
-      parameter(fundim=69)
+      include 'twiss0.fi'
+      include 'twissl.fi'
+      include 'twissa.fi'
+      include 'twissc.fi'
+      integer save,i,j,k,get_option
       double precision re(6,6),te(6,6,6),aux(6),auxp(6),ax1,ax2,ay1,ay2,&
      &bx1,bx2,by1,by2,proxim,rep(6,6),t2,ta,tb,temp,tg,fre(6,6),        &
      &frep(6,6),curlyh,detl,f,rhoinv,blen,alfx0,alfy0,betx0,bety0,amux0,&
      &amuy0,wx0,wy0,dmux0,dmuy0,rmat0(2,2),node_value,eps,zero,one,two
       parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0)
-      include 'twissl.fi'
-      include 'twissa.fi'
-      include 'twissc.fi'
 
 !---- Create internal table for lattice functions if requested
       save=get_option('twiss_save ')
@@ -1408,14 +1419,14 @@
 !   rt(6,6)   (double)  one turn transfer matrix.                      *
 !   tt(6,6,6) (double)  second order terms.                            *
 !----------------------------------------------------------------------*
-      integer i,inval,get_option,fundim
-      parameter(fundim=69)
+      include 'twiss0.fi'
+      include 'twissa.fi'
+      include 'twissc.fi'
+      integer i,inval,get_option
       double precision rt(6,6),tt(6,6,6),deltap,sd,betas,gammas,        &
      &disp0(6),detl,f,tb,frt(6,6),frtp(6,6),rtp(6,6),t2,bx0,ax0,by0,ay0,&
      &sx,sy,orbit5,twopi,get_variable,get_value,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
-      include 'twissa.fi'
-      include 'twissc.fi'
 
 !---- Initialization chromatic part
       twopi=get_variable('twopi ')
@@ -1490,7 +1501,7 @@
       endif
 
 !---- Initialization transverse part
-      suml    = opt_fun(2)-get_value('sequence ','range_start ')
+      suml    = currpos-get_value('sequence ','range_start ')
       betx    = opt_fun0(3)
       alfx    = opt_fun0(4)
       amux    = opt_fun(5)
@@ -1696,6 +1707,7 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical ftrk,fmap,cplxy,dorad
       integer nd,n_ferr,node_fd_errors,maxmul
       parameter(maxmul=20)
@@ -1705,7 +1717,6 @@
      &rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,sk0,sk0s,bv0, &
      &bvk,el0,orbit0(6),zero,one,two,three
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       call dzero(ek0,6)
@@ -2498,6 +2509,7 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap
       integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors,maxmul
       parameter(maxmul=20)
@@ -2506,7 +2518,6 @@
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),              &
      &skew(0:maxmul),node_value,get_value,bv0,bvk,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       n_ferr = node_fd_errors(f_errors)
@@ -2648,6 +2659,7 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
       double precision orbit(6),f_errors(0:50),ek(6),re(6,6),te(6,6,6), &
@@ -2655,7 +2667,6 @@
      &posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,field(2,0:3), &
      &el0,orbit0(6),zero,one,two,three,four,six
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       fmap = el .ne. zero
@@ -2816,13 +2827,13 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
       double precision orbit(6),orbit0(6),f_errors(0:50),ek(6),re(6,6), &
      &te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s,bvk,     &
      &field(2,0:1),node_value,get_value,zero,one,two,three
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       fmap = el .ne. zero
@@ -3002,12 +3013,12 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap,cplxy
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
      &get_value,zero,one,two,ten3m
       parameter(zero=0d0,one=1d0,two=2d0,ten3m=1d-3)
-      include 'twissl.fi'
 
 !---- Initialize.
       charge = get_value('probe ','charge ')
@@ -3165,13 +3176,13 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
       double precision orbit(6),orbit0(6),f_errors(0:50),ek(6),re(6,6), &
      &te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s,bvk,     &
      &field(2,0:2),node_value,get_value,zero,one,two,three,twelve
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       fmap = el .ne. zero
@@ -3330,11 +3341,11 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &el,el0,two
       parameter(two=2d0)
-      include 'twissl.fi'
 
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
@@ -3467,11 +3478,11 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical ftrk,fmap,cplxy
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),theta,ct,st,    &
      &node_value,zero
       parameter(zero=0d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       theta = node_value('angle ')
@@ -3514,11 +3525,11 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical ftrk,fmap
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),phi,cosphi,     &
      &sinphi,tanphi,beta,node_value,get_value,zero,one
       parameter(zero=0d0,one=1d0)
-      include 'twissl.fi'
 
 !---- Initialize.
       phi = node_value('angle ')
@@ -3611,11 +3622,11 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap
       double precision dl,dl0,orbit(6),orbit0(6),ek(6),re(6,6),         &
      &te(6,6,6),two
       parameter(two=2d0)
-      include 'twissl.fi'
 
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
@@ -3645,6 +3656,7 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
       logical fsec,ftrk,fmap
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &rw(6,6),tw(6,6,6),el,rfv,rff,rfl,dl,omega,vrf,phirf,pc,deltap,c0, &
@@ -3652,7 +3664,6 @@
      &zero,one,two,half,ten3m
       parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
      &ten3m=1d-3)
-      include 'twissl.fi'
 
 !---- Initialize.
       call dzero(ek0,6)
@@ -3994,6 +4005,8 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twissl.fi'
+      include 'bb.fi'
       logical fsec,ftrk,fmap,bborbit
       integer get_option
       double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,sx,sy,  &
@@ -4004,8 +4017,6 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
 !     if x > explim, exp(-x) is outside machine limits.
-      include 'twissl.fi'
-      include 'bb.fi'
 
 !---- initialize.
       bborbit = get_option('bborbit ') .ne. 0
@@ -4293,4 +4304,44 @@
       xx = x / sqrt(two)
       call ccperrf(zero,xx,re,im)
       gauss_erf = one - half * exp(-xx**2) * re
+      end
+      subroutine twwmap(pos, orbit)
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Save concatenated sectormap (kick, rmatrix, tmatrix)               *
+!   Input:                                                             *
+!   pos   (double)  position                                           *
+!   orbit (double)  current orbit                                      *
+!   Further input in twissotm.fi                                       *
+!----------------------------------------------------------------------*
+      implicit none
+      include 'twissotm.fi'
+      integer i, k, l
+      double precision sum1, sum2, pos, orbit(6)
+      double precision ek(6)
+
+*---- Track ORBIT0 using zero kick.
+      do i = 1, 6
+        sum2 = orbit(i)
+        do k = 1, 6
+          sum1 = 0.d0
+          do l = 1, 6
+            sum1 = sum1 + stmat(i,k,l) * sorb(l)
+          enddo
+          sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
+          srmat(i,k) = srmat(i,k) - 2.d0 * sum1
+        enddo
+        ek(i) = sum2
+      enddo
+      call dcopy(orbit, sorb, 6)
+*---- Output.
+      call sector_out(pos, ek, srmat, stmat)
+!      write (99, '(g20.6)') pos
+!      write (99, '(6e16.8)') ek
+!      write (99, '(6e16.8)') srmat
+!      write (99, '(6e16.8)') stmat
+*---- re-initialize map.
+      call m66one(srmat)
+      call dzero(stmat, 216)
+
       end
