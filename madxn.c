@@ -8624,10 +8624,12 @@ void track_track(struct in_cmd* cmd)
     }
   track_is_on = 1;
   puts("enter TRACK module");
-  pos = name_list_pos("onepass", nl);
   if ((k = get_value(current_command->name,"onepass")) != 0)
      fprintf(prt_file, "one pass is on\n");
   set_option("onepass", &k);
+  if ((k = get_value(current_command->name,"aperture")) != 0)
+     fprintf(prt_file, "aperture tracking is on\n");
+  set_option("aperture", &k);
   k = get_value(current_command->name,"dump");
   set_option("track_dump", &k);
   k = get_value(current_command->name,"onetable");

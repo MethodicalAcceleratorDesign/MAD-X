@@ -1035,6 +1035,7 @@ char command_def[] =
 "quantum  = [l, false, true], "
 "dump     = [l, false, true], "
 "fast     = [l, false, true], "
+"aperture = [l, false, true], "
 "onetable = [l, false, true]; "
 " "
 "dynap: track track 0 0 "

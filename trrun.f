@@ -249,11 +249,12 @@
 !----------------------------------------------------------------------*
       logical aperflag
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk
+      integer get_option
       double precision apx,apy,el,sum,node_value,track(6,*),last_pos(*),&
      &last_orbit(6,*),parvec(26),get_value,aperture(100),one,
-     &tolerance(6)
+     &tolerance(6), zero
       character*24 aptype
-      parameter(one=1d0)
+      parameter(zero = 0.d0, one=1d0)
 
 !-- switch on element type
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
@@ -293,8 +294,8 @@
 
 !---- Multipole.
    80 continue
-!____ Test aperture. Aperflag should be read in the TRACK command
-      aperflag = .true.
+!____ Test aperture.
+      aperflag = get_option('aperture ') .ne. zero
       if(aperflag) then
       nn=24
       call node_string('apertype ',aptype,nn)
