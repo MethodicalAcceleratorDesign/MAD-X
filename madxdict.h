@@ -195,6 +195,7 @@ char command_def[] =
 "colour   = [i, 0, 100], "
 "symbol   = [i, 0, 1], "
 "spline   = [l, false, true], "
+"nointerp = [l, false, true], "
 "noline   = [l, false, true], "
 "notitle  = [l, false, true], "
 "noversion  = [l, false, true], "

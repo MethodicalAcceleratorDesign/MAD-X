@@ -1,179 +1,3 @@
-      subroutine pearwe (ibk, actwin)
-!----------------------------------------------------------------------*
-! Purpose:
-!   Plot Arnold web
-!
-!--- Input
-!   IBK       (integer) array containing:
-!                       number of superperiods
-!                       number of constraints  N
-!                       N constraints:
-!                       minimum
-!                       maximum
-!                       step
-!                       Length L
-!                       expression in polish notation of length L,
-!                       coded as 1+, 2-, 3*, 4/, 1 KX, 2 KY, 3 KS
-!                       + MQADD + 4, e.g. 100006 = KY
-!   ACTWIN       (real) active user window (WC)
-!----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
-
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
-
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      integer    ibk(*)
-      real       actwin(4)
-      integer klwid, ipm, ipp, ip, j
-      integer ifp, kx, ky, kax, kay, ksmax, k1, k2, k3, iselct, ierr
-      integer k(3), l(2), lstyl(0:3)
-      real s, qs, v1, v2, vm, vp, sclwid
-      real ql(2), qu(2), x(2), y(2)
-      data lstyl / 1, 2, 4, 3 /
-
-!--- set flag for first error message (following suppressed)
-      ifp = 0
-      if (horname(:2) .eq. 'QX' .or. horname(:2) .eq. 'qx')  then
-        kx = 1
-      else
-        kx = 2
-      endif
-      ky  = 3 - kx
-      kax = 2 * kx -1
-      kay = 2 * ky -1
-      ql(kx) = actwin(kax)
-      qu(kx) = actwin(kax+1)
-      ql(ky) = actwin(kay)
-      qu(ky) = actwin(kay+1)
-      qs = qsval
-      s   = ibk(1)
-      if (qs .eq. 0.)  then
-        ksmax = 0
-      else
-        ksmax = mksmax
-      endif
-      do k1 = -ntmax, ntmax
-        k(kx) = k1
-        l(kx) = ntmax - abs(k1)
-        do k2 = -l(kx), l(kx)
-          if (k1 .ne. 0 .or. k2 .ne. 0)  then
-            k(ky) = k2
-            l(ky) = min(l(kx) - abs(k2), ksmax)
-            do k3 = -l(ky), l(ky)
-              k(3) = k3
-              call peqcon(kx, ky, k, ibk, iselct, ierr)
-              if (iselct .ne. 0 .or. ierr .ne. 0)  then
-                call jsln(lstyl(min(abs(k3),3)))
-                if (ierr .ne. 0 .and. ifp .eq. 0)  then
-                  ifp = 1
-!                  call pewarn ('PLARWE', 1,
-!     +            'Illegal constraint --- all constraints ignored.')
-                endif
-!--- set line width scale factor
-                klwid = max(1, 6 - abs(k1) - abs(k2))
-                sclwid = klwid
-                call jslwsc(sclwid)
-                if (k1*k2 .lt. 0)  then
-                  v1 = k(kx) * ql(kx) + k(ky) * qu(ky) + k3 * qs
-                  v2 = k(kx) * qu(kx) + k(ky) * ql(ky) + k3 * qs
-                else
-                  v1 = k(kx) * qu(kx) + k(ky) * qu(ky) + k3 * qs
-                  v2 = k(kx) * ql(kx) + k(ky) * ql(ky) + k3 * qs
-                endif
-                vm = min(v1, v2)
-                vp = max(v1, v2)
-                ipm = vm / s + 0.499 * (1. + sign(1., vm))
-                ipp = vp / s - 0.499 * (1. - sign(1., vm))
-                do ip = max(0, ipm), ipp
-                  if (k(2) .eq. 0)  then
-!--- vertical line
-                    y(1) = ql(2)
-                    y(2) = qu(2)
-                    x(1) = (ip * s - k3 * qs) / k(1)
-                    x(2) = x(1)
-                  else
-                    x(1) = ql(1)
-                    x(2) = qu(1)
-                    y(1) = (ip * s - k(1) * ql(1) - k3 * qs) / k(2)
-                    y(2) = (ip * s - k(1) * qu(1) - k3 * qs) / k(2)
-                    if (k(1) .ne. 0)  then
-                      do j = 1, 2
-                        if (y(j) .lt. ql(2))  then
-                          x(j) = (ip * s - k(2) * ql(2) - k3 * qs) / k  &
-     &                    (1)
-                          y(j) = ql(2)
-                        elseif (y(j) .gt. qu(2))  then
-                          x(j) = (ip * s - k(2) * qu(2) - k3 * qs) / k  &
-     &                    (1)
-                          y(j) = qu(2)
-                        endif
-                      enddo
-                    endif
-                  endif
-                  call gvpl(2,x,y)
-                enddo
-              endif
-            enddo
-          endif
-        enddo
-      enddo
-!--- reset line width scale factor
-      call jslwsc(1.)
-      end
       subroutine pecat1(rb, ra, rd)
 !----------------------------------------------------------------------*
 ! purpose:
@@ -185,11 +9,16 @@
 !   rd(6,6) result map.
 !----------------------------------------------------------------------*
       implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+
+!--- type definition of the routine arguments
 
       double precision rb(6,6), ra(6,6), rd(6,6)
+
+!--- type definitions of local variables
+
       integer k, j
+
+!--- Routine body
 
       do k = 1, 6
         do j = 1, 6
@@ -199,6 +28,8 @@
         enddo
       enddo
       end
+!***********************************************************************
+
       subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
      &np, xval, yval, window, actwin, ierr)
 !----------------------------------------------------------------------*
@@ -218,91 +49,60 @@
 !   ACTWIN   (real)     active (inside frame) window
 ! Output:
 !   IERR     (integer)  0 if OK, else GXPLOT error
+!
+! calls the routines peiact and pegacn in this file.
+! calls the routines gxsave, gxswnd, gxpnbl, jsln, jsplci,  gxpl, 
+!                    gxplt1, gvpl, jsmk, gxpmsw, jspmci, jschh, jstxal,
+!                    gxqrvp, jschxp, gxtx, jstxci, gxrest  
+!                    defined in file gxx11.F. 
+!
+! it is called by the routine peplot in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      include 'plot.fi'
 
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
+!--- type definition of the routine arguments
+
+      integer  ncc, np, ierr, ippar(*)
+      character spname*(*)
       real annh, sych, xval(*), yval(*), window(*)
-      real actwin(*), gxcubv, usex
+      real actwin(*), usex
+
+!--- type definitions of local variables
+
       real xpos, ypos, xwpos, ywpos, xf, wsclx, wscly
       real xaux, yaux
       real rsave(20), act(4), xpl(2), ypl(2), winnor(4)
-      real xreal(maxpnt), yreal(maxpnt), yy1d(maxpnt)
-      real yy2d(maxpnt)
+      real xreal(maxpnt), yreal(maxpnt)
       real xmd
-      integer ippar(*)
       integer isymb, icolr, ilb, ispli, kft, klt, kact,                 &
      &kf, kl, npt, j, iecub
-      integer              ncc, np, ierr, istyl, ipbar, isave(20)
-      character         spname*(*), symloc*1
-      save                 act
+      integer   istyl, ipbar, isave(20)
+      character symloc*1
+
+!--- Output initialisation
+
+      ierr = 0
+
+!--- Initialisation of local variables
+
       data winnor /0., 1., 0., 1./
+      iecub = 0
+
+!--- Routine body
 
 !--- save GKS settings
+
       call gxsave (isave, rsave, ierr)
       call gxswnd (window)
       wsclx = 1. / (window(2) - window(1))
       wscly = 1. / (window(4) - window(3))
       xmd = 1.e-8 * (window(2) - window(1))**2
       if (ncc .eq. 1)  then
+
 !--- first curve in frame - reset label position array, get act.
 !    window in NDC
+
         act(1) = (actwin(1) - window(1)) * wsclx
         act(2) = (actwin(2) - window(1)) * wsclx
         act(3) = (actwin(3) - window(3)) * wscly
@@ -316,25 +116,39 @@
       icolr = max(1, min(icolr, 7))
       ilb = -1
       if (istyl .ne. 0)  then
+
 !--- polyline requested
+
         if (np .lt. 2) goto 999
         if(istyl .eq. 100)  istyl = mod(ncc-1,4) + 1
         ispli = ippar(2)
+
 !--- get first and last blank in annotation
+
         call gxpnbl (spname, kft, klt)
         if (kft .ne. 0) then
+
 !--- annotation exists
+
           ilb    = 0
         endif
+
 !--- set line style
+
         call jsln (max (1, min (4, istyl)))
+
 !--- set line colour
+
         call jsplci(icolr)
         kact = 1
    10   continue
+
 !--- get first and last point inside
+
         call peiact(kact, np, xval, yval, actwin, kf, kl)
+
 !--- quit if no points inside
+
         if (kf .eq. 0) goto 40
         kf = max(1, kf - 1)
         kl = min(np, kl + 1)
@@ -342,7 +156,9 @@
         xreal(1) = xval(kf)
         yreal(1) = yval(kf)
         do j = kf + 1, kl
+
 !--- avoid identical points
+
           if ((xreal(npt) - xval(j))**2 +                               &
      &    (yreal(npt) - yval(j))**2 .gt. xmd) then
             npt        = npt + 1
@@ -350,29 +166,35 @@
             yreal(npt) = yval(j)
           endif
           if ((j .eq. kl .and. npt .ge. 2) .or. npt .eq. maxpnt) then
+
 !--- plot - get first curve annotation position
+
             if (ilb .eq. 0)                                             &
      &      call pegacn(ncc, window, act, xreal, yreal, npt, usex,      &
      &      xwpos, xpos, ypos, ilb)
             if (splinef .eq. 0 .or. npt .eq. 2 .or. ispli .ne. 0) then
+
 !--- no spline
+
               call gxpl (npt, xreal, yreal, actwin)
               if (ilb .gt. 0) then
+
 !--- get y pos. on curve for label
+
                 ywpos = yreal(ilb - 1) + (yreal(ilb) - yreal(ilb-1))    &
      &          * (xwpos  - xreal(ilb - 1))                             &
      &          / (xreal(ilb) - xreal(ilb - 1))
                 ilb = -2
               endif
             else
+
 !--- spline
+
               call gxplt1 (npt, xreal, yreal, actwin)
-              if (ilb .gt. 0) then
+              if (ilb .gt. 0) ilb   = -2
+
 !--- get y pos. on curve for label
-!                call gxcubi (npt, xreal, yreal, yy1d, yy2d, iecub)
-!                ywpos = gxcubv (xwpos, npt, xreal, yreal, yy1d, yy2d)
-                ilb   = -2
-              endif
+
             endif
             xreal(1) = xreal(npt)
             yreal(1) = yreal(npt)
@@ -384,13 +206,19 @@
           goto 10
         endif
       else
+
 !--- no polyline
+
         if (np .eq. 0) goto 999
       endif
+
 !--- plot symbols or bars if requested
+
       if (ipbar .ne. 0)  then
         call jsln (1)
+
 !--- set line colour
+
         call jsplci(icolr)
         do j = 1, np
           xpl(1) = xval(j)
@@ -407,24 +235,38 @@
           call gxpmsw (np, xval, yval, actwin)
         elseif (isymb .eq. 100)  then
           if (istyl .ne. 0)  then
+
 !--- use current curve count
+
             write (symloc, '(I1)')  mod (ncc, 10)
           endif
+
 !--- set marker colour
+
           call jspmci(icolr)
+
 !--- plot one character symbol
 !    switch to normalized window
+
           call gxswnd (winnor)
+
 !--- set character height
+
           call jschh (sych)
+
 !--- text alignment
+
           call jstxal (2, 3)
+
 !--- text expansion factor - mind distorted viewports
+
           call gxqrvp (xf)
           call jschxp (xf)
           do j = 1, np
             if (isymb .eq. 100 .and. istyl .eq. 0)  then
+
 !--- use current point number
+
               write (symloc, '(I1)')  mod (j, 10)
             endif
             xaux = wsclx * (xval(j) - window(1))
@@ -436,37 +278,60 @@
         endif
       endif
       if (ilb .eq. -2)  then
+
 !--- plot annotation
 !    switch to normalized window
+
         call gxswnd (winnor)
+
 !--- set character height
+
         call jschh (annh)
 !--- text alignment
+
         call jstxal (2, 5)
+
 !--- text expansion factor - mind distorted viewports
+
         call gxqrvp (xf)
         call jschxp (xf)
+
 !--- set marker colour
+
         call jstxci(icolr)
+
 !--- plot annotation string
-        call gxtx (xpos, ypos, spname(kft:klt))
+
+        call gxtx (xpos, ypos, spname(kft:klt))    
+
 !--- connect to curve
+
         xpl(1) = xpos
         xpl(2) = xpos
         ypl(1) = ypos
         ypl(2) = (ywpos - window(3)) * wscly
         if (ypl(2) .gt. ypl(1))  ypl(1) = ypl(1) + .02
+
 !--- set dotted line
+
         call jsln (3)
+
 !--- set line colour
+
         call jsplci(icolr)
+
 !--- plot line
+
         call gxpl (2, xpl, ypl, act)
       endif
+
 !--- restore
+
       call gxrest (isave, rsave)
   999 continue
       end
+!***********************************************************************
+
       subroutine peelma(pos, itp, temp, dstp, am)
 !----------------------------------------------------------------------*
 ! purpose:
@@ -503,38 +368,58 @@
 !   dstp        (d.p.)  sublength
 ! output:
 !   am          (d.p.)  matrix
+!
+! calls the function node_value and the routine store_node_value 
+! defined in file madxn.c.
+! calls the functions tmbend, tmquad and tmfoc 
+! defined in the file Twiss.F.
+!
+! it is called by the routine peintp in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      include 'twissl.fi'
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      double precision pi, zero, eps, one, two, twopi
-      parameter         (pi = 3.1415926535898d0)
-      parameter         (zero = 0.d0, eps = 1.d-5)
-      parameter         (one = 1.d0, two = 2.d0, twopi = two * pi)
+      implicit none
+      include 'plot_c.fi'
+      include 'plot_math.fi'
+      include 'twissl.fi'
+
+!--- type definition of the routine arguments
+
       integer pos, itp
       double precision temp(*), dstp, am(6,6)
 
-      double precision e2, e2s, rk2, cangle, sangle, tilt, d, f 
+!--- type definitions of local variables
+
+      double precision rk2, cangle, sangle, tilt, d, f 
       double precision ek(6), te(6,6,6), orbit(6), am2(6,6)
-      double precision node_value
       integer i, j, k
       logical drift, bend, quad, fmap,ftrk,cecptk,cebttk
-      common /e2/ e2s
+
+!--- definitions of function primitives
+
+      double precision node_value
+
+!--- Output initialisation
+
+      do i = 1, 6
+        do j = 1, 6
+          am(j,i) = zero
+        enddo
+        am(i,i) = one
+      enddo
 
 !--- Initialise
 
       ftrk = .false.
       do i = 1, 6
         do j = 1, 6
-          am(j,i) = zero
           am2(j,i) = zero
         enddo
-        am(i,i) = one
         am2(i,i) = one
         orbit(i) = zero
+        ek(i) = zero
       enddo
+
+!--- Routine body
 
 !---  save values of centre_cptk & centre_bttk and set them to .false.
 
@@ -542,8 +427,6 @@
       cebttk = centre_bttk
       centre_cptk = .false.
       centre_bttk = .false.
-
-!--- End of initialisation
 
 !--- treat quads with non-zero tilt, and bends with non-zero tilt
 !    different from pi/2 as drifts
@@ -590,6 +473,7 @@
       centre_bttk = cebttk
 
       end
+!***********************************************************************
  
       subroutine pefill(ierr)
 
@@ -601,108 +485,97 @@
 !----------------------------------------------------------------------*
 ! Purpose:
 !   fill plot arrays with coordinate values, set up machine plot
+!
+! Output:  ierr  (int)     =0: OK, >0: error
+!
+! calls the functions double_from_table, advance_to_pos
+! table_length and restart_sequ defined in file madxn.c.
+! calls the function lastnb defined in file util.F.
+! calls the routines peintp and the routine pelfill in this file.
+!
+! it is called by the routine exec_plot in file madxn.c after pesopt.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+      include 'plot.fi'
+      include 'plot_b.fi'
+      include 'plot_c.fi'
+      include 'plot_math.fi'
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
-
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
-
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      integer mtype, m_adble
-      parameter (mtype = 50, m_adble = 20)
-      double precision zero, half
-      parameter (zero = 0.d0, half = 0.5d0)
-      integer ierr,i,j,k,l,ndble,new1,new2,currtyp,nint,crow,pltyp
-      integer double_from_table, advance_to_pos,                        &
-     &restart_sequ
+      integer ierr
+      integer i,j,k,l,ndble,new1,new2,currtyp,nint,crow,pltyp,pos_flag
       integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
-      integer lastnb, table_length
       double precision fact, currpos, currleng, node_value,             &
      &d_val, d_val1, adble(m_adble)
       real tval, step
       logical machp, rselect
-      double precision e2s
-      common /e2/ e2s
+
+!--- definitions of function primitives
+
+      integer double_from_table, advance_to_pos, restart_sequ
+      integer lastnb, table_length
+
+!--- Output initialisation
+
+      ierr = 0
+
+!--- Initialisation of variables in common peaddi
+
+      nelmach = 0
+      do j = 1, mxcurv
+        nqval(j) = 0
+      enddo
+      do j = 1 , maxseql
+	ieltyp(j) = 0
+      enddo
+
+!--- Initialisation of variables in common peaddr
+
+      do i = 1 , maxseql
+	estart(i) = 0.0
+	eend(i) = 0.0
+	do j = 1 , mxcurv
+	  qhval(i,j) = 0.0
+	  qvval(i,j) = 0.0
+	enddo
+      enddo
+
+!--- Initialisation of variables in common e2save
+
+      e2s = 0d0
+
+!--- Initialisation of local variables
+
+      ndble = m_adble
+      new1 = 0
+      new2 = 0
+      currtyp = 0
+      nint = 0
+      crow = 0
+      pltyp = 0
+      pos_flag = 3
+      machp = itbv .ne. 0
+
 !--- codes see in peschm
+
       data ilist /                                                      &
      &0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
      &6, 0, 0, 0, 0,  0,  4, 4, 4, 0,                                   &
      &0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
      &20 * 0 /
 
-      e2s = 0d0
       do i=1,mxplot
         p(i)=0
       enddo
 
-      ierr = 0
+!--- save process flags, proc_flag may be modified in peintp
+
+      do i = 1, mxcurv
+        do j = 1, 2
+          proc_n(j,i) = proc_flag(j,i)
+        enddo
+      enddo
+
+!--- Routine body
+
       k = double_from_table(tabname, horname, 1, d_val)
       if (k .lt. 0)  then
         if (k .eq. -1)  then
@@ -716,14 +589,7 @@
         ierr = 1
         goto 999
       endif
-!--- save process flags, proc_flag may be modified in peintp
-      do i = 1, mxcurv
-        do j = 1, 2
-          proc_n(j,i) = proc_flag(j,i)
-        enddo
-      enddo
-      machp = itbv .ne. 0
-      rselect = itbv .ne. 0 .and. hrange(2) .gt. hrange(1)
+      rselect = machp .and. hrange(2) .gt. hrange(1)
       do l = 1, nivvar
         k = double_from_table(tabname, sname(l), 1, d_val)
         if (k .lt. 0)  then
@@ -735,7 +601,9 @@
         endif
       enddo
       if (rselect)  then
+
 !------- adjust element range to horizontal range
+
         new1 = nrrang(1)
         new2 = nrrang(2)
         crow = nrrang(1)
@@ -753,17 +621,14 @@
         nrrang(2) = table_length(tabname)
       endif
       if (nrrang(1) .eq. 0) nrrang(1) = 1
+
 !--- get interpolation interval size
+
       if (machp)  then
         k = double_from_table(tabname, horname, nrrang(1), d_val)
         k = double_from_table(tabname, horname, nrrang(2), d_val1)
         step = (d_val1 - d_val) / (maxpnt / 2)
       endif
-      do j = 1, mxcurv
-        nqval(j) = 0
-      enddo
-      nelmach = 0
-      pos_flag = 3
       fact = pos_flag - 1
       j = restart_sequ()
       do j = nrrang(1), nrrang(2)
@@ -772,25 +637,30 @@
         k = double_from_table(tabname, horname, j, currpos)
         if (itbv .eq. 1)  then
           currtyp = node_value('mad8_type ')
-          if (currtyp .le. mtype) then
-            pltyp = ilist(currtyp)
-          else
-            pltyp = 0
-          endif
+          if (currtyp .le. mtype) pltyp = ilist(currtyp)
+
 !--- get element parameters
-          ndble = m_adble
-          call pelfill(tabname, currtyp, j, ndble, adble)
+
+          call pelfill(currtyp, j, ndble, adble)
           currleng = adble(1)
+
 !--- sbend, rbend
+
           if (mod(pltyp,20) .eq. 1 .and. adble(7) .ne. zero)            &
      &    pltyp = pltyp + 6
+
 !--- quad
+
           if (pltyp .eq. 2 .and. min(adble(15), adble(16)) .lt. zero)   &
      &    pltyp = 3
+
 !--- sext
+
           if (pltyp .eq. 10 .and. min(adble(17), adble(18)) .lt. zero)  &
      &    pltyp = 11
+
 !--- oct
+
           if (pltyp .eq. 12 .and. min(adble(19), adble(20)) .lt. zero)  &
      &    pltyp = 13
           if (pltyp .gt. 0 .and. machp)  then
@@ -845,6 +715,8 @@
       fpmach = machp .and. nelmach .gt. 0 .and. noline .eq. 0
   999 continue
       end
+!***********************************************************************
+
       subroutine pegacn(ncc, window, act, xreal, yreal, np, usex,       &
      &xwpos, xpos, ypos, ilb)
 !----------------------------------------------------------------------*
@@ -864,79 +736,40 @@
 !   YPOS     (real)     y pos. of label in NDC
 !   ILB      (integer)  number of point behind label, or 0 if no
 !                       label possible
+!
+! calls the utility routine iucomp in this file.
+!
+! it is called by the routine pecurv in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      include 'plot.fi'
 
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      integer mposx, mposy, mpost
-      parameter (mposx = 8, mposy = 3, mpost = mposx * mposy)
+!--- type definition of the routine arguments
 
+      integer ncc, np, ilb
       real window(*), act(*), xreal(*), yreal(*)
-      real xwpos, xpos, ypos, usex
+      real usex, xwpos, xpos, ypos
+
+!--- type definitions of local variables
+
       real ywpos, xmax, xmin, xdiff, ydiff, d, t, eps
       real xdiag(2,2), ydiag(2,2)
       real xadd, yadd
-      integer ncc, np, ilb, i, iapos, iposx, iposy, j, iy
+      integer i, iapos, iposx, iposy, j, iy
       integer iucomp, kapos(mposx, mposy)
+
+!--- Initialisation of local variables
+
       save kapos
 
+!--- Output initialisation
+
+      ilb = 0
+
+!--- Routine body
+
 !--- reset position array if first curve in frame
+
       if (ncc .eq. 1)  then
         do i = 1, mposx
           do j = 1, mposy
@@ -954,7 +787,9 @@
         xmax = max(xmax, xreal(i))
       enddo
    20 continue
+
 !--- find first unoccupied position
+
       iapos  = iucomp(0, kapos, mpost)
       if (iapos .eq. 0)  then
         ilb = 0
@@ -962,17 +797,25 @@
         iposx  = mod (iapos-1, mposx) + 1
         iposy  = (iapos-1) / mposx + 1
         kapos(iposx,iposy) = -1
+
 !--- annot. pos. in NDC
+
         xpos = act(1) +                                                 &
      &  0.125 * usex * (iposx - .5) * (act(2) - act(1))
         ypos = act(4) -                                                 &
      &  usex * (0.05 * (act(4) - act(3)) + 0.03 * (iposy - 1))
+
 !---- annot. position in world coord.
+
         xwpos = window(1) + xpos * xdiff
+
 !--- get next if outside x values of curve
+
         if (xwpos .le. xmin .or. xwpos .gt. xmax) goto 20
         ywpos = window(3) + ypos * ydiff
+
 !--- get endpoint of both diagonals of box
+
         xadd = 0.0625 * xdiff
         yadd = 0.03  * ydiff
         xdiag(1,1) = xwpos - xadd
@@ -983,8 +826,10 @@
         ydiag(2,1) = ywpos + yadd
         ydiag(1,2) = ywpos + yadd
         ydiag(2,2) = ywpos
+
 !--- make sure no part of curve cuts these lines (curve approx. by
 !    straight line segments)
+
         do i = 2, np
           if (xwpos .gt. xreal(i-1) .and. xwpos .le. xreal(i)) ilb = i
           do j = 1, 2
@@ -1014,6 +859,8 @@
         enddo
       enddo
       end
+!***********************************************************************
+
       subroutine pegaxn (nax, vax, sax, ns)
 !----------------------------------------------------------------------*
 ! Purpose:
@@ -1025,17 +872,31 @@
 !---Output
 !   SAX          (char) remaining (possibly truncated) names
 !   NS        (integer) no. of names in SAX
+! calls the routines gxpnbl in file gxx11.F.
+!
+! it is called by the routine pemima in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      character * 16 vax(*), sax(*), scut, saloc
-      integer nax, ns, i, k, k1, k2, j, k1f, k2f
+      implicit none
+
+!--- type definition of the routine arguments
+
+      character * 16 vax(*), sax(*)
+      integer nax, ns
+
+!--- type definitions of local variables
+
+      character * 16 scut, saloc
+      integer i, k, k1, k2, j, k1f, k2f
+
+!--- Initialisation of local variables
+
       ns = 0
-      if (nax .le. 0)  then
-        sax(1) = ' '
-      else
+      sax(1) = ' '
+
+!--- Routine body
+
+      if (nax .gt. 0)  then
         do  i = 1, nax
           saloc = vax(i)
           call gxpnbl(saloc, k1, k2)
@@ -1064,7 +925,9 @@
         enddo
       endif
       end
-      subroutine  pegetn (iflag, svar, it, ipflg, sovar, sname)
+!***********************************************************************
+
+      subroutine  pegetn (iflag, svar, it, ipflg, sovar, reqann)
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Finds variable, dependent variables, axis and curve annotations    *
@@ -1080,38 +943,22 @@
 !   IPFLG(2) (integer)  interpol. flag: 0 spline, else call            *
 !                       function PEINTP                                *
 !   SOVAR       (char)  array of (up to MXDEP) dependent variables     *
-!   SNAME       (char)  requested annotation                           *
+!   reqann      (char)  requested annotation                           *
+!                                                                      *
+! calls the utility routine pupnbl in this file.                       *
+!                                                                      *
+! it is called by the routines pemima, peplot and pesopt in this file. *
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+      include 'plot.fi'
+      include 'plot_b.fi'
+
+!--- type definition of the routine arguments
 
       integer iflag, it, ipflg(2)
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      character         svar*(mcnam), sovar(*)*(mcnam), reqann * (*)
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
+!--- type definitions of local variables
 
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-
-      character         svar*(mcnam), sovar(*)*(mcnam),                 &
-     &sname * (*)
       character         svlabl(mnvar)*(mxlabl)
       character         svanno(mnvar)*(mxlabl)
       character         svname(mnvar)*(mcnam)
@@ -1122,6 +969,8 @@
       integer i, iref, k1, k2, k1f, k2f, j
       integer              iproc(mnvar,3), intpo(mnvar)
       integer              ivdep(mnvar,mxdep,3)
+
+!--- Initialisation of local variables
 
       data (svname(j), j = 1, 32) /                                     &
      &'s', 'size', 'deltap',                                            &
@@ -1478,17 +1327,21 @@
      &0, 0,                                                             &
      &0, 0, 0, 0 /
 
+!--- Routine body
+
       if (it .le. 0 .or. it .gt. 3)  then
         sovar(1) = svar
         sovar(2) = ' '
-        sname    = svar
+        reqann   = svar
         ipflg(1) = 0
         ipflg(2) = 0
         goto 999
       endif
       sovar(1) = ' '
-      sname = svar
+      reqann = svar
+
 !--- search in list of known variables
+
       do  iref = 1, mnvar
         if (svar .eq. svname(iref))  goto 9
       enddo
@@ -1504,7 +1357,7 @@
       goto 999
     9 continue
       if (iflag .eq. 0)  then
-        sname = svname(iref)
+        reqann = svname(iref)
         ipflg(1) = iproc(iref,it)
         ipflg(2) = intpo(iref)
         do  j = 1, mxdep
@@ -1515,29 +1368,34 @@
           endif
         enddo
       elseif (iflag .eq. 1) then
-        sname = svlabl(iref)
+        reqann = svlabl(iref)
         if (svar .ne. svname(iref))  then
+
 !--- incomplete match
 !    replace x or y in name by blank
-          call pupnbl(sname, k1, k2)
+
+          call pupnbl(reqann, k1, k2)
           do  i = 2, k2
-            if (index('XYxy', sname(i:i)) .ne. 0)  then
-              sname(i:i) = ' '
+            if (index('XYxy', reqann(i:i)) .ne. 0)  then
+              reqann(i:i) = ' '
             endif
           enddo
         endif
       elseif (iflag .eq. 2) then
-        sname = svanno(iref)
+        reqann = svanno(iref)
       elseif (iflag .eq. 3) then
         if (svar .eq. svname(iref))  then
-          sname = svname(iref)
+          reqann = svname(iref)
         else
-          sname = svname(iref)(:k2)
+          reqann = svname(iref)(:k2)
         endif
       else
-        sname = svar
+        reqann = svar
       endif
   999 end
+
+!***********************************************************************
+
       subroutine peiact(kact, np, x, y, ac, kf, kl)
 !----------------------------------------------------------------------*
 ! Purpose:
@@ -1554,13 +1412,20 @@
 !
 !----------------------------------------------------------------------*
       implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
+!--- type definition of the routine arguments
+
+      integer kact, np, kf, kl
       real x(*), y(*), ac(4)
+
+!--- type definitions of local variables
+
+      integer i
       real toleps, xtol, ytol
       parameter (toleps = 1.e-5)
-      integer i, kact, np, kf, kl
+
+!--- Routine body
+
       xtol = toleps * (ac(2) - ac(1))
       ytol = toleps * (ac(4) - ac(3))
       kf = 0
@@ -1574,7 +1439,9 @@
         goto 20
    10   continue
       enddo
+
 !--- no point inside
+
       goto 999
    20 continue
       do i = kf, np
@@ -1586,6 +1453,8 @@
    40 kl = i - 1
   999 continue
       end
+!***********************************************************************
+
       subroutine peintp(crow, nint, type, proc, telpar, ierr)
 
 #ifdef _WIN32
@@ -1606,100 +1475,36 @@
 ! output:
 !   ierr        (int)   0 if ok, else > 0
 !   the results are stored in qhval and qvval
+!
+! calls the functions double_from_table and get_value 
+! defined in file madxn.c.
+! calls the function peelma in this file.
+!
+! it is called by the routine pefill in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      include 'plot.fi'
+      include 'plot_b.fi'
+      include 'plot_math.fi'
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
+!--- type definition of the routine arguments
 
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      double precision pi, zero, eps, one, two, twopi
-      parameter         (pi = 3.1415926535898d0)
-      parameter         (zero = 0.d0, eps = 1.d-5)
-      parameter         (one = 1.d0, two = 2.d0, twopi = two * pi)
-      integer nint, crow, mat, type, ierr, proc(2,*)
-      integer double_from_table
+      integer crow, nint, type, proc(2,*), ierr 
       double precision telpar(*)
-      double precision get_value
-      double precision tw0(mintpl), tw1(mintpl), dmu, step, am(6,6)
+
+!--- type definitions of local variables
+
+      integer mat
+      double precision tw1(mintpl), dmu, step, am(6,6)
       double precision ex, ey, bx0, ax0, ux0, dx0, dpx0,                &
      &by0, ay0, uy0, dy0, dpy0, x0, px0, y0, py0, xn0, pxn0, yn0, pyn0
       double precision bx1, ax1, ux1, dx1, dpx1,                        &
      &by1, ay1, uy1, dy1, dpy1, x1, px1, y1, py1, xn1, pxn1, yn1, pyn1
-      equivalence       (bx0, tw0(1)), (ax0, tw0(2)), (ux0, tw0(3)),    &
-     &(dx0, tw0(4)), (dpx0, tw0(5)),                                    &
-     &(by0, tw0(6)), (ay0, tw0(7)), (uy0, tw0(8)),                      &
-     &(dy0, tw0(9)), (dpy0, tw0(10)), (x0,tw0(11)),                     &
-     &(px0, tw0(12)), (y0, tw0(13)), (py0, tw0(14)),                    &
-     &(xn0, tw0(15)), (pxn0, tw0(16)),                                  &
-     &(yn0, tw0(17)), (pyn0, tw0(18))
+      double precision s0, dstp, gamx, gamy
+      real currdp
+      integer i, j, k, ipc
+      logical elmflg
+
       equivalence       (bx1, tw1(1)), (ax1, tw1(2)), (ux1, tw1(3)),    &
      &(dx1, tw1(4)), (dpx1, tw1(5)),                                    &
      &(by1, tw1(6)), (ay1, tw1(7)), (uy1, tw1(8)),                      &
@@ -1707,16 +1512,29 @@
      &(px1, tw1(12)), (y1, tw1(13)), (py1, tw1(14)),                    &
      &(xn1,tw1(15)), (pxn1, tw1(16)),                                   &
      &(yn1, tw1(17)), (pyn1, tw1(18))
-      double precision s0, dstp, gamx, gamy
-      integer i, j, k, ipc
-      integer jrp,jcp
-      logical elmflg
-      double precision bxx0,byy0
+
+      
+!--- definitions of function primitives
+
+      integer double_from_table
+      double precision get_value
+
+!--- Output initialisation
 
       ierr = 0
+
+!--- Initialisation of local variables
+
+      mat = 1
+      currdp = 0.0
+
+!--- Routine body
+
       if (telpar(1) .eq. zero)  goto 999
       step = telpar(1) / nint
+
 !---  set flag for correct interpolation
+
       elmflg = .false.
       do i = 1, nivvar
         elmflg = elmflg .or. proc_flag(2,i) .gt. 0
@@ -1741,6 +1559,7 @@
         ey = get_value('beam ','ey ')
 
 !--- xn, pxn, yn, pyn
+
         if (ex * bx0 .eq. zero)  then
           xn0 = zero
         else
@@ -1761,35 +1580,38 @@
         else
           gamy = zero
         endif
+
 !--- get intermediate s values, and interpolate twiss parameters
 
         do i = 1, nint
-          if (i .eq. 1)  then
-            mat = 1
-          elseif (i .eq. nint)  then
-            mat = 3
-          else
-            mat = 2
-          endif
+	  if (i .gt. 1) mat = 2
+          if (i .eq. nint)  mat = 3
           dstp = i * step
+
 !--- element matrices 6x6: entry, body, exit
+
           call peelma(mat, type, telpar, dstp, am(1,1))
 
 !--- interpolate twiss parameters
+
 !    beta_x, beta_y
+
           bx1 = -two * am(1,1) * am(1,2) * ax0                          &
      &    + am(1,1)**2 * bx0 + am(1,2)**2 * gamx
           by1 = -two * am(3,3) * am(3,4) * ay0                          &
      &    + am(3,3)**2 * by0 + am(3,4)**2 * gamy
 
 !--- alfa_x, alfa_y
+
           ax1 = (am(1,1) * am(2,2) + am(1,2) * am(2,1))                 &
      &    * ax0 - am(1,1) * am(2,1) * bx0                               &
      &    - am(1,2) * am(2,2) * gamx
           ay1 = (am(3,3) * am(4,4) + am(3,4) * am(4,3))                 &
      &    * ay0 - am(3,3) * am(4,3) * by0                               &
      &    - am(3,4) * am(4,4) * gamy
+
 !--- mu_x, mu_y
+
           dmu = atan2(am(1,2), bx0 * am(1,1)                            &
      &    - ax0 * am(1,2))
           if (dmu .lt. zero)  dmu = dmu + twopi
@@ -1798,13 +1620,19 @@
      &    - ay0 * am(3,4))
           if (dmu .lt. zero)  dmu = dmu + twopi
           uy1 = uy0 + dmu / twopi
+
 !--- d-x, d-y
+
           dx1 = am(1,1) * dx0 + am(1,2) * dpx0 + am(1,6)
           dy1 = am(3,3) * dy0 + am(3,4) * dpy0 + am(3,6)
+
 !--- d'-x, d'-y
+
           dpx1 = am(2,1) * dx0 + am(2,2) * dpx0 + am(2,6)
           dpy1 = am(4,3) * dy0 + am(4,4) * dpy0 + am(4,6)
+
 !--- x, px, y, py
+
           x1 = am(1,1) * x0 + am(1,2) * px0                             &
      &    + am(1,6) * currdp
           y1 = am(3,3) * y0 + am(3,4) * py0                             &
@@ -1813,7 +1641,9 @@
      &    + am(2,6) * currdp
           py1 = am(4,3) * y0 + am(4,4) * py0                            &
      &    + am(4,6) * currdp
+
 !--- xn, pxn, yn, pyn
+
           if (ex * bx1.eq. zero)  then
             xn1 = zero
           else
@@ -1826,7 +1656,9 @@
           endif
           pxn1 = px1 * gamx
           pyn1 = py1 * gamy
+
 !--- loop over variables, interpolate those with codes
+
           do j = 1, nivvar
             ipc = mod(proc(2,j), 100)
             if (ipc .gt. 0)  then
@@ -1849,8 +1681,10 @@
         enddo
       endif
   999 end
+!***********************************************************************
 
-      subroutine pelfill(tabname, type, row, n, a)
+
+      subroutine pelfill(type, row, n, a)
 
 #ifdef _WIN32
       include 'win32calls.fi'
@@ -1888,43 +1722,42 @@
 !16   17    k2 or k2*l          fractional charge
 !17   18    k2s  etc.           npart (# particles in opposite beam)
 !
+! calls the functions double_from_table and node_value in file madxn.c.
+!
+! it is called by the routine pefill in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+      include 'plot.fi'
 
-      integer type,n
-      double precision mi, mx, tmp1, tmp2, a(n)
+      integer type, n, row
+      double precision a(n)
+
+      integer j
+      double precision mi, mx, tmp2
+
+!--- definitions of function primitives
+
+      integer double_from_table
       double precision node_value
-      integer j, row, double_from_table
-      character *(*) tabname
+
+!--- Output initialisation
+
       do j = 1, n
         a(j) = 0.d0
       enddo
-      tmp1 = 0.d0
+
+!--- Initialisation of local variables
+
       tmp2 = 0.d0
+
+!--- Routine body
+
       a(1) = node_value('l ')
       if (a(1) .gt. 0.d0 .and. type .gt. 1 .and. type .lt. 8)  then
         if (n .ge. 11) then
-!frs   use angle&tilt instead of k0l&k0sl since the later are no longer
-!frs   calculated from the former 25.04.2003
-!          j = double_from_table(tabname, 'k0l ' , row, tmp1)
-!          j = double_from_table(tabname, 'k0sl ' , row, tmp2)
-!          if (tmp1 .ne. 0.d0)  then
-!            a(11) = tmp1
-!          else
-!            a(11) = tmp2
-!          endif
-
           a(11) = node_value('angle ')
           a(7) = node_value('tilt ')
           a(3) = node_value('e1 ')
           a(4) = node_value('e2 ')
-!          if (abs(tmp2) .ne. 0.d0) then
-!            a(11) = cos(tmp2) * tmp1
-!          else
-!            a(11) = tmp1
-!          endif
         endif
         if (n .ge. 15)                                                  &
      &  j = double_from_table(tabname, 'k1l ' , row, a(15))
@@ -1946,95 +1779,40 @@
       mx = max(tmp2, a(16), a(18), a(20))
       if (mi .ne. mx) a(7) = 1.d0
       end
+!***********************************************************************
+
       subroutine pemima
 !----------------------------------------------------------------------*
-! Purpose:
-!   Constrain axis reference, find minima and maxima of coordinates,
-!   construct axis labels
-!
+! Purpose:                                                             *
+!   Constrain axis reference, find minima and maxima of coordinates,   *
+!   construct axis labels                                              *
+! calls the routine gxpnbl in file gxx11.F.                            *
+! calls the routines pegetn and pegaxn in this file.                   *
+!                                                                      *
+! it is called by the routine exec_plot in file madxn.c after pefill.  *
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+      include 'plot.fi'
+      include 'plot_b.fi'
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+!--- type definitions of local variables
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
-
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
       integer i, j, k, iv, idum(2), ns, k1, k2, i1, i2, it(4)
       character * (mtitl)  s
       character * (mxlabl) slab
-      character * (mcnam) sdum(mxcurv), saxis(mxcurv)
+      character * (mcnam) sdum(mxcurv), saxis(mxcurv), vaxis(mxcurv,4)
+
+!--- Initialisation of variables in common peaddi
+
+      numax = 0
+
+!--- Initialisation of local variables
 
       do i = 1, 4
         it(i) = 0
       enddo
-      numax = 0
+
+!--- Routine body
+
       do  j = 1, nivvar
         do i = 1, numax
           if (it(i) .eq. naxref(j))  goto 10
@@ -2074,7 +1852,9 @@
           vmima(2,k) = max(vmima(2,k), qvval(i,j))
         enddo
       enddo
+
 !--- get axis annotation
+
       do j = 1, nivvar
         k = naxref(j)
         nvvar(k) = nvvar(k) + 1
@@ -2104,6 +1884,8 @@
         endif
       enddo
       end
+!***********************************************************************
+
       subroutine peplot
 
 #ifdef _WIN32
@@ -2115,95 +1897,21 @@
 ! Purpose:
 !   Plot all types of graphs from MAD.
 !   Uses GXPLOT with underlying X-Windows (PostScript)
+!
+! calls the function plot_option and the routine comm_para
+! defined in file madxn.c.
+! calls the routines pegetn, pecurv and peschm in this file.
+! calls the routines gxsdef, gxsvar, jslwsc, gxsvpt, gxpnbl, gxqaxs,
+!                    gxsaxs, iaxseq, gxqcrv, gxscrv, axlabel, gxfrm1,
+!                    gxswnd  defined in file gxx11.F. 
+!
+! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      include 'plot.fi'
+      include 'plot_b.fi'
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
-
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      integer mlsize, mtsize, masize
-      parameter            (mlsize = 13,mtsize = 13,masize = 20)
-!--- character sizes:
-!   MLSIZE    label character height
-!   MTSIZE    text   - " -
-!   MASIZE    annotation - " -
-      character svar*(mcnam)
-      character *(mxlabl) slocn, slname
-      character stemp*(mtitl), stext*300, sform*20
-      character sdum(mxdep)*(mcnam)
-      real prmach, symch, tmpval
-      double precision plot_option
-      integer lastnb, iaxseq(4)
-      integer idum, k1dum, k2dum, k3dum, i, npar, ivvar, nvax, ivax,    &
-     &ierr, vdum(2)
+!--- type definitions of local variables
 !--- strings:
 !   SVAR     buffer for variable names etc.
 !   SLOCN    local name buffer (without leading "_")
@@ -2214,32 +1922,87 @@
 !   PRMACH fraction of viewport taken by machine plot
 !   SYMCH  preset symbol character height
 
+      character svar*(mcnam)
+      character *(mxlabl) slocn, slname
+      character stemp*(mtitl), stext*300, sform*20
+      character sdum(mxdep)*(mcnam)
+      character * 1 ssymb
+      real prmach, symch, tmpval, yvtop, fdum, chh
+      real vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8) 
+      integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4) 
+      integer lastnb, iaxseq(4)
+      integer idum, k1dum, k2dum, k3dum, i, npar, ivvar, nvax, ivax,    &
+     &ierr, vdum(2), j
+
+!--- definitions of function primitives
+
+      double precision plot_option
+
+!--- Initialisation of local variables
+
       data prmach /0.1/, symch /0.01/
       data iaxseq / 1, 4, 2, 3 /
+      ssymb = ' '
+      fdum = 0.0D0
+      chh = 0.0D0
+      do i = 1 , 4
+         vpt(i) = 0.0D0
+         nptval(i) = 0
+         ipxval(i) = 0
+         ipyval(i) = 0
+         icvref(i) = 0
+         do j = 1 , 4
+            window(i,j) = 0.0D0
+            actwin(i,j) = 0.0D0
+         enddo
+      enddo
+      do i = 1 , 2
+         range(i) = 0.0D0
+         xax(i) = 0.0D0
+      enddo
+      do i = 1 , 8
+         yax(i) = 0.0D0
+      enddo
+      do i = 1 , 50
+         ipar(i) = 0
+      enddo
+
+!--- Routine body
 
 !--- reset axis and curve defaults
+
       call gxsdef ('AXIS', 0)
       call gxsdef ('CURVE', 0)
+
 !--- set "new line" character (change default = '/')
+
       call gxsvar ('SDEFNL', idum, fdum, '%')
+
 !--- set top of viewport - leave space to plot machine if required
+
       if (fpmach)  then
         yvtop = 1. - prmach
       else
         yvtop = 1.
       endif
+
 !--- set line width scale factor
+
       tmpval = plot_option('lwidth ')
       if (tmpval .eq. 0.) tmpval = 1.
       call jslwsc (tmpval)
+
 !--- loop over frames
 !--- set viewport
+
       vpt(1) = 0.
       vpt(2) = 1.
       vpt(3) = 0.
       vpt(4) = yvtop
       call gxsvpt (vpt)
+
 !--- find variable name in list
+
       svar = horname
       call pegetn (1, svar, itbv, vdum, sdum, slname)
       slocn = ' '
@@ -2251,26 +2014,42 @@
           slocn(k3dum:k3dum) = slname(idum:idum)
         endif
       enddo
+
 !--- prepare horizontal axis
+
       do i = 1, 4, 3
         call gxqaxs ('X', i, npar, ipar, range, stext, sform)
+
 !--- set character sizes for labels and text including user requests
+
         ipar(7) = max (mlsize * qlscl + .01, 1.1)
         ipar(13) = max( mtsize * qtscl + .01, 1.1)
+
 !--- text left adjusted
+
         ipar(10) = 1
+
 !--- font
+
         ipar(11) = plot_option('font ')
         if (ipar(11) .eq. 0) ipar(11) = 1
+
 !--- axis ref. number
+
         ipar(21) = 1
+
 !--- range centre etc.
+
         if (hrange(1) .lt. hrange(2)) then
+
 !--- use range as is
+
           ipar(23) = 1
           range(1) = hrange(1)
           range(2) = hrange(2)
+
 !--- set min. and max. for horizontal axis
+
           xax(1) = hrange(1)
           xax(2) = hrange(2)
         else
@@ -2278,49 +2057,77 @@
           xax(2) = hmima(2)
         endif
         if (i .eq. 1) then
+
 !--- bottom title
+
           stext = '<#>' // slocn(:lastnb(slocn))
         else
+
 !--- suppress labels on upper axis
+
           ipar(3) = 0
+
 !--- ticks below axis
+
           ipar(4) = 1
+
 !--- top title
+
           stext = toptitle
         endif
+
 !--- set axis parameters
+
         call gxsaxs ('X', i, npar, ipar, range, stext, sform)
       enddo
       do nvax = 1, numax
+
 !--- set curve parameters for frame call
+
         ivax = iaxseq(nvax)
         call gxqcrv (nvax, npar, ipar, ssymb)
         ipar(2) = ivax
         call gxscrv (nvax, npar, ipar, ' ')
         call gxqaxs ('Y', ivax, npar, ipar, range, stext, sform)
+
 !--- set character sizes for labels and text including user requests
+
         ipar(7) = max (mlsize * qlscl + .01, 1.1)
         ipar(13) = max (mtsize * qtscl + .01, 1.1)
+
 !--- right adjusted label
+
         ipar(10) = 3
+
 !--- font
+
         ipar(11) = plot_option('font ')
         if (ipar(11) .eq. 0) ipar(11) = 1
-!--- range centre etc.
+
+!--- range centre etc
+
         if (vrange(1,nvax) .lt. vrange(2,nvax)) then
+
 !--- use range as is
+
           ipar(23) = 1
           range(1) = vrange(1,nvax)
           range(2) = vrange(2,nvax)
+
 !--- store y values for frame scaling
+
           yax(2 * nvax - 1) = vrange(1,nvax)
           yax(2 * nvax) = vrange(2,nvax)
         else
+
 !--- store y values for frame scaling
+
           yax(2 * nvax - 1) = vmima(1,nvax)
           yax(2 * nvax) = vmima(2,nvax)
         endif
+
 !--- get axis annotation
+
         slocn = axlabel(nvax)
         stemp = ' '
         call gxpnbl(slocn, k1dum, k2dum)
@@ -2342,7 +2149,9 @@
         ipyval(nvax) = 2 * nvax - 1
         icvref(nvax) = nvax
       enddo
+
 !--- if only one y axis, plot right axis with ticks only
+
       if (numax .eq. 1) then
         ivax = 4
         call gxqaxs ('Y', ivax, npar, ipar, range, stext, sform)
@@ -2351,15 +2160,21 @@
         ipar(21) = 1
         call gxsaxs ('Y', ivax, npar, ipar, range, stext, sform)
       endif
+
 !--- plot frame, keep windows for curves + clipping
+
       call gxfrm1 (numax, nptval, ipxval, ipyval, icvref, xax, yax,     &
      &window, actwin, ierr)
       if (ierr .ne. 0) goto 120
+
 !--- now loop over vertical variables for real curve plotting
+
       do ivvar = 1, nivvar
         nvax = naxref(ivvar)
         ivax = iaxseq(nvax)
+
 !--- find variable name in list for annotation
+
         svar = slabl(ivvar)
         call pegetn (2, svar, itbv, vdum, sdum, slname)
         slocn = ' '
@@ -2371,9 +2186,13 @@
             slocn(k3dum:k3dum) = slname(idum:idum)
           endif
         enddo
+
 !--- character height including user request
+
         chh = 0.001 * masize * qascl
+
 !--- call curve plot routine with simple arrays and flags
+
         call pecurv (ivvar, slocn, chh, qascl,                          &
      &  symch * qsscl, ipparm(1,ivvar), nqval(ivvar), qhval(1,ivvar),   &
      &  qvval(1,ivvar), window(1,nvax), actwin(1,nvax), ierr)
@@ -2390,172 +2209,17 @@
         call gxswnd (window)
         call peschm (nelmach, ieltyp, xax, estart, eend, actwin)
       endif
-!--- plot Arnold web if requested
-      if (ngrid .ne. 0 .and. lgrid .eq. 0)  then
-        call pearwe(igrid, actwin)
-      endif
       goto 999
 
   120 continue
+
 !--- curve for vert. var. missing
+
   150 continue
   999 continue
       end
-      subroutine peqcon (kx, ky, kxys, ibk, iselct, ierr)
-!----------------------------------------------------------------------*
-! Purpose:
-!   Check user constraints on Arnold web
-!
-!--- Input
-!   KX        (integer) position of K_x in KXYS
-!   KY        (integer) position of K_y in KXYS
-!   KXYS      (integer) array containing K_x at KX, K_y at KY, KS at 3
-!   IBK       (integer) array containing:
-!                       number of superperiods
-!                       number of constraints  N
-!                       N constraints:
-!                       minimum
-!                       maximum
-!                       step
-!                       Length L
-!                       expression in polish notation of length L,
-!                       coded as 1+, 2-, 3*, 4/, 1 KX, 2 KY, 3 KS
-!                       + MQADD + 4, e.g. 100006 = KY
-!--- Output
-!   ISELCT    (integer) 1 if combination of KX, KY, KS accepted,
-!                       0 if not accepted
-!   IERR                0 if OK, 1 if expression illegal, 2 if / 0
-!
-!----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+!***********************************************************************
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
-
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      integer ibk(*), kxys(3)
-      integer kx, ky, iselct, ierr, ipt, mqadd4, ic, low, lup, lsp, nw, &
-     &nstack, i, kc, k, kop
-      integer kloc(3), istack(100)
-      ierr = 0
-      kloc(1) = kx
-      kloc(2) = ky
-      kloc(3) = 3
-      iselct = 1
-      ipt = 2
-      mqadd4 = mqadd + 4
-      do ic = 1, ibk(2)
-        low = ibk(ipt+1)
-        lup = ibk(ipt+2)
-        lsp = max(1, ibk(ipt+3))
-        nw  = ibk(ipt+4)
-        ipt = ipt + 4
-!--- calculate expression given in inverse Polish
-        nstack = 0
-        do i = 1, nw
-          kc = ibk(ipt+i)
-          if (kc .le. mqadd)  then
-!--- simple integer
-            nstack = nstack + 1
-            istack(nstack) = kc
-          elseif (kc .gt. mqadd4)  then
-!--- K_x, K_y, or K_s
-            k = kc - mqadd4
-            nstack = nstack + 1
-            istack(nstack) = kxys(kloc(k))
-          else
-!--- operator
-            if (nstack .lt. 2)  then
-              ierr = 1
-              goto 999
-            endif
-            kop = kc - mqadd
-            if (kop .eq. 1)  then
-              istack(nstack-1) =                                        &
-     &        istack(nstack-1) + istack(nstack)
-            elseif (kop .eq. 2)  then
-              istack(nstack-1) =                                        &
-     &        istack(nstack-1) - istack(nstack)
-            elseif (kop .eq. 3)  then
-              istack(nstack-1) =                                        &
-     &        istack(nstack-1) * istack(nstack)
-            elseif (kop .eq. 4)  then
-              if (istack(nstack) .eq. 0)  then
-                ierr = 2
-                goto 999
-              endif
-              istack(nstack-1) =                                        &
-     &        istack(nstack-1) / istack(nstack)
-            endif
-            nstack = nstack - 1
-          endif
-        enddo
-        if (nstack .ne. 1)  then
-          ierr = 1
-          goto 999
-        endif
-        do i = low, lup, lsp
-          if (istack(1) .eq. i) goto 30
-        enddo
-!--- test failed
-        iselct = 0
-        goto 999
-   30   ipt = ipt + nw
-      enddo
-  999 end
       subroutine  peschm (nel, ityp, hr, es, ee, actwin)
 !----------------------------------------------------------------------*
 ! Purpose:
@@ -2584,73 +2248,26 @@
 !   es          (real)  array with element start position
 !   ee          (real)  array with element end position
 !   actwin      (real)  active window for curve plot (array of 4)
+!
+! calls the routines jsln, gvpl defined in file gx11.F
+! it is called by the routine peplot in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      include 'plot.fi'
 
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      integer ityp(*)
-      integer nel, i, it, j, mobj, msize
-      parameter (mobj = 14, msize = 88)
+!--- type definition of the routine arguments
+
+      integer nel, ityp(*)
+      real hr(2), es(*), ee(*), actwin(4)
+
+!--- type definitions of local variables
+
+      integer i, it, j
       integer npst(mobj), npnd(mobj), npsl(msize)
-      real ell, hr(2), es(*), ee(*), actwin(4)
-      real shapex(msize), shapey(msize)
+      real ell, shapex(msize), shapey(msize)
       real txp(2), typ(2), typz(2)
+
+!--- Initialisation of local variables
 
       data npst   / 1,  6, 11, 16, 21,                                  &
      &33, 43, 48,                                                       &
@@ -2696,7 +2313,10 @@
      &0., 0., -0.25, -0.25, 0.,                                         &
      &0.2, 0.2, -0.2, -0.2, 0.2 /
 
+!--- Routine body
+
 !--- set line style to solid
+
       call jsln(1)
       do i = 1, nel
         it = mod(ityp(i), 20)
@@ -2738,6 +2358,8 @@
         call gvpl (2, txp, typz)
       endif
       end
+!***********************************************************************
+
       subroutine pesopt(ierr)
 
 #ifdef _WIN32
@@ -2749,143 +2371,119 @@
 !   Stores plot options and values, checks
 !
 ! Output:  ierr  (int)     =0: OK, >0: error
+!
+! calls the function plot_option and the routines comm_para,
+! get_title, get_version and table_range defined in file madxn.c.
+! calls the utility routine pesplit and the routine pegetn in this file.
+!
+! it is called by the routine exec_plot in file madxn.c
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+      include 'plot.fi'
+      include 'plot_b.fi'
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      integer ierr
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
-
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,noversi,                   &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-!   ITYP     (integer)  array with element types:
-!                       0: drift
-!                       1: bend, zero tilt
-!                       2: focussing quad
-!                       3: defocussing quad
-!                       4: monitor
-!                       5: collimator
-!                       6: electrostatic separator
-!                       7: bend, non-zero tilt
-!                       8: multipole
-      integer ierr, table_org
-      integer i, j, k
-      character * (mcnam) sdum(mxcurv)
-      integer nint, ndble, int_arr(100), char_l(100)
-      double precision d_arr(100)
+      integer i, j, k, notitle, noversi, nivaxs
+      character * (mcnam) sdum(1)
+      integer nint, ndble, int_arr(szcompar), char_l(szcompar)
+      double precision d_arr(szcompar)
       double precision plot_option
-      character * 400 char_a, version
-      character * 10 tmp_a
+      character * (szchara) char_a, version
 
-      splinef = 0
       ierr = 0
-      nivaxs = 0
+
+!--- Initialisation of variables in common peaddi
+
+      itbv = 0
       nivvar = 0
-      nelmach = 0
-      fpmach = .false.
-      ndeltap = 1
-      toptitle = ' '
-      hmima(1) = 1.e20
-      hmima(2) = -hmima(1)
+      splinef = 0
+      noline = 0
       do i = 1, 4
-        vmima(1,i) = 1.e20
-        vmima(2,i) = -1.e20
         nvvar(i) = 0
       enddo
-      do i = 1, 100
-        d_arr(i)=0d0
+      do i = 1 , 2
+         do j = 1 , mxcurv
+            proc_flag(i,j)= 0
+         enddo
+      enddo
+      do i = 1 , mpparm
+         do j = 1 , mxcurv
+            ipparm(i,j) = 0
+         enddo
+      enddo
+      do i = 1, mxcurv
+        naxref(i) = 0
+      enddo
+      nrrang(1) = 0
+      nrrang(2) = 0
+
+!--- Initialisation of variables in common peaddr
+
+      qascl = 0.0
+      qlscl = 0.0
+      qsscl = 0.0
+      qtscl = 0.0
+      hrange(1) = 0.0
+      hrange(2) = 0.0
+      hmima(1) = 1.e20
+      hmima(2) = -1.e20
+      do j = 1 , 4
+         vrange(1,j) = 0.0
+         vrange(2,j) = 0.0
+         vmima(1,j) = 1.e20
+         vmima(2,j) = -1.e20
+      enddo
+
+!--- Initialisation of variables in common peaddc
+
+      horname = ' '
+      tabname = ' '
+      toptitle = ' '
+      do i = 1 , mxcurv
+         sname(i) = ' '
+      enddo   
+
+!--- Initialisation of variables in common peotcl
+
+      fpmach = .false.
+
+!--- Initialisation of local variables
+
+      nivaxs = 0
+      notitle = 0
+      noversi = 0
+      do i = 1, szcompar
+         int_arr(i) = 0
+         char_l(i) = 0
+        d_arr(i)=0.0d0
       enddo
       char_a = ' '
-      tmp_a = 'notitle '
-      notitle = 0
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      sdum(1) = ' '
+
+!--- Routine body
+
+!--- Get notitle
+
+      call comm_para('notitle ', nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       if (nint .gt. 0) notitle = int_arr(1)
 
 !--- get noversi
-      char_a = ' '
-      tmp_a = 'noversion '
-      noversi = 0
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+
+      call comm_para('noversion ', nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       if (nint .gt. 0) noversi = int_arr(1)
 
 !--- any table - for hor = s plot machine
-      char_a = ' '
-      tabname = ' '
-      tmp_a = 'table '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+
+      call comm_para('table ', nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       if (k .gt. 0)  tabname = char_a
 
+!--- Horizontal variable
+
       char_a = ' '
-      tmp_a = 'haxis '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para( 'haxis ', nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       if (k .eq. 0)  then
         print *, 'no horizontal variable'
@@ -2894,17 +2492,14 @@
       else
         horname = char_a
       endif
-      if (horname .eq. 's' .and. table_org(tabname) .eq. 0)  then
-        itbv = 1
-      else
-        itbv = 0
-      endif
+      itbv = 0
+      if (horname .eq. 's')  itbv = 1
 
 !--- Prepare title
+
       if (notitle .eq. 0)  then
         char_a = ' '
-        tmp_a = 'title '
-        call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,           &
+        call comm_para('title ', nint, ndble, k, int_arr, d_arr,           &
      &  char_a, char_l)
         if (k .eq. 0) then
           call get_title(char_a, k)
@@ -2919,11 +2514,7 @@
             toptitle = '<#>' // version(:j)
           endif
         else
-          if (k .gt. 0) then
-            toptitle = char_a(:k)
-          else
-            toptitle = ' '
-          endif
+          if (k .gt. 0) toptitle = char_a(:k)
         endif
       endif
 
@@ -2933,8 +2524,7 @@
       qtscl = plot_option('rscale ')
 
       char_a = ' '
-      tmp_a = 'range '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para('range ', nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       call table_range(tabname, char_a, nrrang)
       if (nrrang(1) .eq. 0 .and. nrrang(2) .eq. 0)  then
@@ -2944,75 +2534,61 @@
       endif
 
       char_a = ' '
-      tmp_a = 'noline '
-      noline = 0
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+
+      call comm_para('noline ', nint, ndble, k, int_arr, d_arr,            &
      &char_a, char_l)
       if (nint .gt. 0) noline = int_arr(1)
 
-      char_a = ' '
-      tmp_a = 'qs '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
-     &char_a, char_l)
-      qsval = d_arr(1)
-
-      hrange(1) = 0
-      tmp_a = 'hmin '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para('hmin ', nint, ndble, k, int_arr, d_arr,              &
      &char_a, char_l)
       if (ndble .gt. 0) hrange(1) = d_arr(1)
 
-      hrange(2) = 0
-      tmp_a = 'hmax '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para('hmax ', nint, ndble, k, int_arr, d_arr,              &
      &char_a, char_l)
       if (ndble .gt. 0) hrange(2) = d_arr(1)
 
-      tmp_a = 'vmin '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para('vmin ', nint, ndble, k, int_arr, d_arr,              &
      &char_a, char_l)
-      do i = 1, 4
-        vrange(1,i) = 0
-      enddo
+
       do i = 1, ndble
         vrange(1,i) = d_arr(i)
       enddo
 
-      tmp_a = 'vmax '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para('vmax ', nint, ndble, k, int_arr, d_arr,              &
      &char_a, char_l)
-      do i = 1, 4
-        vrange(2,i) = 0
-      enddo
+
       do i = 1, ndble
         vrange(2,i) = d_arr(i)
       enddo
 
-      do i = 1, 5
-        ipparm(i,1) = 0
-      enddo
       char_a = ' '
-      tmp_a = 'style '
-      call comm_para(tmp_a, nint, ndble, k, ipparm(1,1), d_arr,         &
+      call comm_para('style ', nint, ndble, k, ipparm(1,1), d_arr,         &
      &char_a, char_l)
 
-      tmp_a = 'spline '
-      call comm_para(tmp_a, nint, ndble, k, ipparm(2,1), d_arr,         &
+      call comm_para('spline ', nint, ndble, k, ipparm(2,1), d_arr,        &
      &char_a, char_l)
       if (ipparm(2,1) .eq. 1) print *,'SPLINE attribute is obsolete, the&
      & interpolation is done by default.'
+
+!--- SPLINE attribute is obsolete. Interpolation is done by default
+!--- unless the attribute NOINTERP is specified
+!--- get nointerp
+
       ipparm(2,1) = 1
+      call comm_para('nointerp ', nint, ndble, k, int_arr, d_arr,             &
+     &char_a, char_l)
+      if (nint .gt. 0) ipparm(2,1) = 1 - int_arr(1)
       splinef = ipparm(2,1)
 
-      tmp_a = 'bars '
-      call comm_para(tmp_a, nint, ndble, k, ipparm(3,1), d_arr,         &
+      call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr,          &
      &char_a, char_l)
-      tmp_a = 'symbol '
-      call comm_para(tmp_a, nint, ndble, k, ipparm(4,1), d_arr,         &
+
+      call comm_para('symbol ', nint, ndble, k, ipparm(4,1), d_arr,        &
      &char_a, char_l)
-      tmp_a = 'colour '
-      call comm_para(tmp_a, nint, ndble, k, ipparm(5,1), d_arr,         &
+
+      call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr,        &
      &char_a, char_l)
+
       do i = 2, mxcurv
         ipparm(1,i) = ipparm(1,1)
         ipparm(2,i) = ipparm(2,1)
@@ -3022,8 +2598,7 @@
       enddo
 
       char_a = ' '
-      tmp_a = 'vaxis '
-      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+      call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       if (k .gt. 0)  then
         nivaxs = 1
@@ -3034,11 +2609,13 @@
         enddo
       else
         char_a = ' '
-        tmp_a = 'vaxis1 '
-        call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,           &
+        call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr,          &
      &  char_a, char_l)
         if (k .gt. 0)  then
-          if (nivvar+k .gt. mxcurv) goto 100
+          if (nivvar+k .gt. mxcurv) then
+             print *, 'Warning: # vertical variables cut at = ', nivvar
+             goto 110
+          endif
           nivaxs = nivaxs + 1
           call pesplit(k, char_a, char_l, slabl(nivvar+1))
           do j = 1, k
@@ -3047,11 +2624,13 @@
           enddo
         endif
         char_a = ' '
-        tmp_a = 'vaxis2 '
-        call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,           &
+        call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr,           &
      &  char_a, char_l)
         if (k .gt. 0)  then
-          if (nivvar+k .gt. mxcurv) goto 100
+          if (nivvar+k .gt. mxcurv) then
+             print *, 'Warning: # vertical variables cut at = ', nivvar
+             goto 110
+          endif
           nivaxs = nivaxs + 1
           call pesplit(k, char_a, char_l, slabl(nivvar+1))
           do j = 1, k
@@ -3060,11 +2639,13 @@
           enddo
         endif
         char_a = ' '
-        tmp_a = 'vaxis3 '
-        call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,           &
+        call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr,           &
      &  char_a, char_l)
         if (k .gt. 0)  then
-          if (nivvar+k .gt. mxcurv) goto 100
+          if (nivvar+k .gt. mxcurv) then
+             print *, 'Warning: # vertical variables cut at = ', nivvar
+             goto 110
+          endif
           nivaxs = nivaxs + 1
           call pesplit(k, char_a, char_l, slabl(nivvar+1))
           do j = 1, k
@@ -3073,11 +2654,13 @@
           enddo
         endif
         char_a = ' '
-        tmp_a = 'vaxis4 '
-        call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,           &
+        call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr,           &
      &  char_a, char_l)
         if (k .gt. 0)  then
-          if (nivvar+k .gt. mxcurv) goto 100
+          if (nivvar+k .gt. mxcurv) then
+             print *, 'Warning: # vertical variables cut at = ', nivvar
+             goto 110
+          endif
           nivaxs = nivaxs + 1
           call pesplit(k, char_a, char_l, slabl(nivvar+1))
           do j = 1, k
@@ -3091,10 +2674,8 @@
         ierr = 1
         goto 999
       endif
-      goto 110
-  100 continue
-      print *, 'Warning: # vertical variables cut at = ', nivvar
   110 continue
+
       do j = 1, nivvar
         call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j),       &
      &  sdum(1))
@@ -3110,18 +2691,48 @@
         endif
       enddo
   999 end
+!***********************************************************************
+
       subroutine pesplit(n_str, char_a, char_l, char_buff)
+!----------------------------------------------------------------------*
+!
+!   Utility routine
+!   Purpose: splits a string in several sub-strings
+!
+!--- Input
+!   n_str      number of sub-strings
+!   char_l     number of characters of each sub-string  
+!   char_a     character string
+!--- Output
+!   cahr_buf   sub_strings
+!
+!----------------------------------------------------------------------*
+
       implicit none
+
+!--- type definition of the routine arguments
+
       integer n_str, char_l(*)
       character*(*) char_a, char_buff(*)
+
+!--- type definitions of local variables
+
       integer i, k, l
+
+!--- Initialisation of local variables
+
       k = 0
+
+!--- Routine body
+
       do i = 1, n_str
         l = char_l(i)
         char_buff(i) = char_a(k+1:k+l)
         k = k+l
       enddo
       end
+!***********************************************************************
+
       subroutine plginit
 
 #ifdef _WIN32
@@ -3132,95 +2743,44 @@
 ! Purpose:
 !   Overall initialization
 !
+! calls the function plot_option and the routine comm_para
+! defined in file madxn.c.
+! calls the function intrac defined in file madxu.c.
+! calls the routines gxtint, gxsvar, gxasku, gxinit, gxclos
+! defined in file gxx11.F 
+!
+! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+      include 'plot.fi'
+      include 'plot_b.fi'
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
+!--- type definitions of local variables
 
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
-      logical intrac
       integer ipseps, iset, nint, ndble, k, int_arr(100), char_l(100)
-      double precision plot_option
       double precision d_arr(100)
       real tmpval
       character * 40 char_a
       character * 8 tmp_a
+
+!--- definitions of function primitives
+
+      double precision plot_option
+      logical intrac
+
+!--- Initialisation of local variables
+
       data iset / 0 /
+
+!--- Routine body
+
       call gxtint
       call gxsvar ('INUNIT', 5, 0., ' ')
       call gxsvar ('IOUNIT', 6, 0., ' ')
       char_a = ' '
       tmp_a = 'file '
       call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
-     &char_a, char_l)
+     &               char_a, char_l)
       if (k .gt. 0) then
         plfnam = char_a(:char_l(1))
       else
@@ -3236,123 +2796,90 @@
         call gxsvar('IPSEPS', ipseps, 0., ' ')
       endif
       if (intrac())  then
+
 !--- set wait time to 1 sec.
+
         call gxsvar ('WTTIME', 0, 1., ' ')
         call gxasku
       endif
+
 !--- reduce window size (only X11)
+
       call gxsvar('NYPIX', 670, 0., ' ')
+
 !--- set bounding box (only X11)
+
       tmpval=plot_option('xsize ')
       call gxsvar('XMETAF', 0, tmpval, ' ')
       tmpval=plot_option('ysize ')
       call gxsvar('YMETAF', 0, tmpval, ' ')
+
 !--- inhibit initial X-Window (only X11)
+
       call gxsvar('ITSEOP', 1, 0., ' ')
       call gxinit
       call gxclos
       end
+!***********************************************************************
+
       subroutine plotit(initfl)
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Plots on screen and/or file
 !
+! calls the routines gxsvar, gxterm, gxinit, gxopen, gxwait, gxclrw and
+! gxclos in file gxx11.F.
+! calls  the routines plginit and peplot in this file.
+!
+! it is called by the routine exec_plot in file madxn.c after pemima.
 !----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+      include 'plot.fi'
+      include 'plot_b.fi'
 
-      integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
-     &mplred, mplout
-      parameter (mtitl  = 128, mxlabl = 80)
-      parameter (mnvar = 74, mxdep = 2)
-      parameter (mqadd = 100000)
-      parameter (mntmax = 20, mksmax = 10)
-      parameter (mplred = 46, mplout = 47)
+!--- type definition of the routine arguments
 
-      common /peotcl/ fpmach
-      save   /peotcl/
-      logical fpmach
-      common /peotcr/ yvtop, fdum, chh,                                 &
-     &vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      save   /peotcr/
-
-      real yvtop, fdum, chh
-      real vpt, window, actwin, range, xax, yax
-
-      common /peotci/ ivnarw, ipar(50), nptval(4), ipxval(4),           &
-     &ipyval(4), icvref(4)
-      integer ivnarw, ipar, nptval, ipxval, ipyval, icvref
-      save   /peotci/
-      integer maxseql, mtwcol, mpparm,                                  &
-     &mxcurv, mopt, mfile, marg, maxarg,                                &
-     &mxdp, mxplot
-      parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
-     &mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
-     &mxdp = 25, mxplot = 100)
-      integer mintpl
-      parameter (mintpl = 18)
-      common / peaddi / itbv, ntmax, mared, nivvar, nivaxs,             &
-     &nelmach, ngrid, lgrid,        ndeltap, ndeltas, numax,            &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag,            &
-     &n_names, splinef, noline, notitle,                                &
-     &nqval(mxcurv), nvvar(4), nrrang(2), proc_flag(2, mxcurv),         &
-     &lvcol(maxseql), ipparm(mpparm,mxcurv), naxref(mxcurv),            &
-     &ieltyp(maxseql), igrid(maxseql), intopt(mxdp,mopt),               &
-     &numopt(mopt), countopt(mopt), pstart(mxplot), pend(mxplot),       &
-     &occnt(maxseql), twtpos(mintpl)
-      integer itbv, ntmax, mared, nivvar, nivaxs, nelmach,              &
-     &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
-     &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
-     &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
-     &numopt, countopt, pstart, pend,                                   &
-     &occnt, twtpos
-      common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
-     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
-     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
-     &estart(maxseql), eend(maxseql)
-      real qascl, qlscl, qsscl, qtscl, qsval, currdp,                   &
-     &hrange, vrange, hmima, vmima,                                     &
-     &qhval, qvval,                                                     &
-     &estart, eend
-      common / peaddc / horname, tabname, toptitle,                     &
-     &inname, outname, dbname, sequ_name, tabtype, plfnam, plpnam,      &
-     &arglist(maxarg), elnames(maxseql),                                &
-     &axlabel(4), sname(mxcurv), slabl(mxcurv),                         &
-     &vaxis(mxcurv,4), charopt(mxcurv,mopt),                            &
-     &defopt(mopt), c_names(mtwcol), ssymb
-      character * (mfile) plfnam, plpnam
-      character * (mcnam) horname, tabname, sname, slabl,               &
-     &vaxis, defopt, elnames, sequ_name, c_names, tabtype
-      character * (marg) arglist
-      character * (mfile) inname, outname, dbname
-      character * (mxlabl) axlabel
-      character * (mtitl) toptitle, charopt
-      character * 1 ssymb
-      save /peaddi/, /peaddr/, /peaddc/
       integer initfl
+
+!--- type definitions of local variables
+
+      character * (mfile) plpnam
+
+!--- Initialisation of local variables
+
+      save plpnam
+
+!--- Routine body
+	
       if (initfl .eq. 0)  then
-!--- overall initalization
+
+!--- overall initialization
+
         call plginit
         plpnam = plfnam
       endif
+
       if (plpnam .ne. plfnam)  then
         call gxsvar ('SMETNM', 0, 0., plfnam)
+
 !--- close current .ps file if any
+
         call gxterm
         plpnam = plfnam
         call gxinit
       endif
+
       call gxopen
       call peplot
       call gxwait
       call gxclrw
       call gxclos
       end
-      subroutine pupnbl(string,ifirst,ilast)
 !***********************************************************************
+
+      subroutine pupnbl(string,ifirst,ilast)
+!----------------------------------------------------------------------*
 !
+!   Utility routine
 !   Purpose: returns position of first and last non-blank in STRING
 !
 !--- Input
@@ -3364,10 +2891,26 @@
 !   Author: H. Grote / CERN                        date: June 16, 1987
 !                                             last mod: Sept. 13, 2001
 !
-!***********************************************************************
+!----------------------------------------------------------------------*
+
+      implicit none
+
+!--- type definition of the routine arguments
+
       character *(*)  string
+      integer ifirst, ilast
+
+!--- type definitions of local variables
+
+      integer i
+
+!--- Output initialisation
+
       ifirst=0
       ilast=0
+
+!--- Routine body
+
       do i=1,len(string)
         if(string(i:i).ne.' ') then
           ifirst=i
@@ -3383,8 +2926,11 @@
         endif
       enddo
   999 end
+!***********************************************************************
+
       integer function iucomp(comp, arr, n)
 !----------------------------------------------------------------------*
+! Utility function
 ! Purpose:
 !   Find first occurrence of integer in integer array
 !
@@ -3395,13 +2941,23 @@
 !
 !  returns 0 if not found, else position in arr
 !----------------------------------------------------------------------*
+
       implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
+
+!--- type definition of the routine arguments
 
       integer comp, arr(*), n
+
+!--- type definitions of local variables
+
       integer j
+
+!--- Output initialisation
+
       iucomp = 0
+
+!--- Routine body
+
       do j = 1, n
         if (comp .eq. arr(j))  then
           iucomp = j
