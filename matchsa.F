@@ -7,7 +7,7 @@
 ! Attributes :                                                         *
 !   ncon      (int)     # constraints                                  *
 !   nvar      (int)     # variables                                    *
-!   iseed     (int)     initial seed                                   * 
+!   iseed     (int)     initial seed                                   *
 !   iprint    (int)     print flag  (0 = minimum info printed)         *
 !   tol       (real)    Final tolerance for match.                     *
 !   calls     (int)     current call count                             *
@@ -18,7 +18,7 @@
 !----------------------------------------------------------------------*
       integer calls,call_lim,ncon,nvar,nacp(*),neps,n,m,ns,nt,
      &iprint,iseed,iseed2,nacc,nobds,ier,i,iflag
-      parameter(neps=4)        
+      parameter(neps=4)
       double precision tol,t,vect(*),fun_vect(*),fopt,vmod
       double precision rt,lb(*),ub(*),xopt(*),c(*),
      1     vm(*),xp(*),fstar(neps)
@@ -29,7 +29,7 @@
       parameter(name_l=24)
 c     include 'name_len.fi'
 c     character*(name_len) name !uncomment when name_len.fi present
-      character*(name_l) name   !clear 
+      character*(name_l) name   !clear
       n=nvar
       m=ncon
 c     include 'match.fi'         !not used here i guess
@@ -47,15 +47,15 @@ c     include 'match.fi'         !not used here i guess
          goto 1
       endif
   830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
-c Choose SA parameters next: 
-c The value of rt and ns as suggested by Corana 
-      rt=0.85d0  
-      ns = 20 
+c Choose SA parameters next:
+c The value of rt and ns as suggested by Corana
+      rt=0.85d0
+      ns = 20
 c The value of nt suggested by Corana is max(100, 5*nvar)
       nt = max(100, 5*nvar)
 c      iprint=1
 c      iseed=1
-      iseed2 = iseed+1  
+      iseed2 = iseed+1
       logmax=.FALSE.
 c The initial temeprature T is best to be an user-defined parameter
 c set it to 10 here for brevery
@@ -67,12 +67,12 @@ c set it to 10 here for brevery
      2       /,' initial temp: ',g8.2, ' rt: ',g8.2,' eps:',g8.2,
      3       /,' ns: ',i3, '   nt: ',i4, '   neps: ',i2,
      4       /,' calls: ',i10, '   iprint: ',i1, '   iseed: ',i4,
-     5       '   iseed2: ',i4) 
+     5       '   iseed2: ',i4)
 8001  format(/,' optimal function value: ',g20.13
      1       /,' number of function evaluations:     ',i10,
      2       /,' number of accepted evaluations:     ',i10,
      3       /,' number of out of bound evaluations: ',i10,
-     4       /,' final temp: ', g20.13,'  ier: ', i3)    
+     4       /,' final temp: ', g20.13,'  ier: ', i3)
       call prtvec(vect,n,'starting values')
       call prtvec(vm,n,'initial step length')
       call prtvec(lb,n,'lower bound')
@@ -89,7 +89,7 @@ c set it to 10 here for brevery
       enddo
 
       call mtfcn(ncon,nvar,vect,fun_vect,iflag)
-      
+
       fopt = vmod(m,fun_vect)
 
       print *," fopt again = ", fopt
@@ -112,7 +112,7 @@ c      f = dsqrt(f)
       END
 
 c* ======================================================================
-c GAMS : Source of SIMANN in OPT from NETLIB 
+c GAMS : Source of SIMANN in OPT from NETLIB
 * ======================================================================
 * NIST Guide to Available Math Software.
 * Source for module SIMANN from package OPT.
@@ -266,13 +266,13 @@ C
 C  For modifications to the algorithm and many details on its use,
 C  (particularly for econometric applications) see Goffe, Ferrier
 C  and Rogers, "Global Optimization of Statistical Functions with
-C  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2, 
+C  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2,
 C  Jan./Feb. 1994, pp. 65-100.
-C  For more information, contact 
+C  For more information, contact
 C              Bill Goffe
 C              Department of Economics and International Business
-C              University of Southern Mississippi 
-C              Hattiesburg, MS  39506-5072 
+C              University of Southern Mississippi
+C              Hattiesburg, MS  39506-5072
 C              (601) 266-4484 (office)
 C              (601) 266-4920 (fax)
 C              bgoffe@whale.st.usm.edu (Internet)
@@ -469,7 +469,7 @@ C  Set initial values.
       NOBDS = 0
       NFCNEV = 0
       IER = 99
-	
+
       DO 10, I = 1, N
          XOPT(I) = X(I)
          NACP(I) = 0
@@ -477,12 +477,12 @@ C  Set initial values.
 
       DO 20, I = 1, NEPS
          FSTAR(I) = 1.0D+20
-20    CONTINUE 
+20    CONTINUE
 
-C  If the initial temperature is not positive, notify the user and 
-C  return to the calling routine.  
+C  If the initial temperature is not positive, notify the user and
+C  return to the calling routine.
       IF (T .LE. 0.0) THEN
-         WRITE(*,'(/,''  THE INITIAL TEMPERATURE IS NOT POSITIVE.'')') 
+         WRITE(*,'(/,''  THE INITIAL TEMPERATURE IS NOT POSITIVE.'')')
 c         '',
 c     1             /,''  RESET THE VARIABLE T. ''/)')
          IER = 3
@@ -490,20 +490,20 @@ c     1             /,''  RESET THE VARIABLE T. ''/)')
       END IF
 
 C  If the initial value is out of bounds, notify the user and return
-C  to the calling routine. 
+C  to the calling routine.
       DO 30, I = 1, N
          IF ((X(I) .GT. UB(I)) .OR. (X(I) .LT. LB(I))) THEN
             CALL PRT1
             IER = 2
             RETURN
          END IF
- 
+
 30    CONTINUE
 
 C  Evaluate the function with input X and return value as F.
 
       CALL FCNSA(N,X,F)
-      
+
 C  If the function is to be minimized, switch the sign of the function.
 C  Note that all intermediate and final output switches the sign back
 C  to eliminate any possible confusion for the user.
@@ -521,15 +521,15 @@ C  function evaluations (more than MAXEVL).
       NNEW = 0
       NDOWN = 0
       LNOBDS = 0
-      	
-      DO 400, M = 1,NT 
+
+      DO 400, M = 1,NT
          DO 300, J = 1, NS
             DO 200, H = 1, N
-              
+
 C  Generate XP, the trial value of X. Note use of VM to choose XP.
                DO 110, I = 1, N
-                  IF (I .EQ. H) THEN                  
-999                   XP(I) = X(I) + (RANMAR()*2.- 1.) * VM(I)             
+                  IF (I .EQ. H) THEN
+999                   XP(I) = X(I) + (RANMAR()*2.- 1.) * VM(I)
                   ELSE
                      XP(I) = X(I)
                   END IF
@@ -542,16 +542,16 @@ C  If XP is out of bounds, select a point in bounds for the trial.
                     NOBDS = NOBDS + 1
                     IF(IPRINT .GE. 3) CALL PRT3(MAX,N,XP,X,FP,F)
                  END IF
-                  
+
 110            CONTINUE
-                  
+
                   IF((XP(h) .LT. LB(h)) .OR. (XP(h) .GT. UB(h))) THEN
                     XP(h) = LB(h) + (UB(h) - LB(h))*RANMAR()
                     LNOBDS = LNOBDS + 1
                     NOBDS = NOBDS + 1
                     IF(IPRINT .GE. 3) CALL PRT3(MAX,N,XP,X,FP,F)
                   END IF
-       	 
+
 
 C  Evaluate the function with the trial point XP and return as FP.
                CALL FCNSA(N,XP,FP)
@@ -589,7 +589,7 @@ C  If greater than any other point, record as new optimum.
                         XOPT(I) = XP(I)
 130                  CONTINUE
                      FOPT = FP
-                   
+
                      NNEW = NNEW + 1
                   END IF
 
@@ -615,10 +615,10 @@ C  acceptance or rejection.
 
 200         CONTINUE
 300      CONTINUE
-        
+
 C  Adjust VM so that approximately half of all evaluations are accepted.
          DO 310, I = 1, N
-            RATIO = DFLOAT(NACP(I)) /DFLOAT(NS)
+            RATIO = DBLE(NACP(I)) /DBLE(NS)
             IF (RATIO .GT. .6) THEN
                VM(I) = VM(I)*(1. + C(I)*(RATIO - .6)/.4)
             ELSE IF (RATIO .LT. .4) THEN
@@ -628,7 +628,7 @@ C  Adjust VM so that approximately half of all evaluations are accepted.
                VM(I) = UB(I) - LB(I)
             END IF
 310      CONTINUE
-         
+
          IF(IPRINT .GE. 2) THEN
             CALL PRT8(N,VM,XOPT,X)
          END IF
@@ -636,7 +636,7 @@ C  Adjust VM so that approximately half of all evaluations are accepted.
          DO 320, I = 1, N
             NACP(I) = 0
 320      CONTINUE
-        
+
 400   CONTINUE
 
       IF(IPRINT .GE. 1) THEN
@@ -666,7 +666,7 @@ C  If termination criteria is not met, prepare for another loop.
       T = RT*T
       DO 430, I = NEPS, 2, -1
          FSTAR(I) = FSTAR(I-1)
-430   CONTINUE      
+430   CONTINUE
       F = FOPT
       DO 440, I = 1, N
          X(I) = XOPT(I)
@@ -740,9 +740,9 @@ C                                                      0 <= KL <= 30081
 3        continue
          U(ii) = s
 2     continue
-      C = 362436.0 / 16777216.0        
-      CD = 7654321.0 / 16777216.0  
-      CM = 16777213.0 /16777216.0 
+      C = 362436.0 / 16777216.0
+      CD = 7654321.0 / 16777216.0
+      CM = 16777213.0 /16777216.0
       I97 = 97
       J97 = 33
       return
@@ -842,8 +842,8 @@ C  it minimizes by maximizing the negative a function.
 
       SUBROUTINE PRT5
 
-      WRITE(*, '(/,''TOO MANY FUNCTION EVALUATIONS; CONSIDER '',/)')     
-      WRITE(*, '(/,''INCREASING MAXEVL OR EPS, OR DECREASING '',/)')     
+      WRITE(*, '(/,''TOO MANY FUNCTION EVALUATIONS; CONSIDER '',/)')
+      WRITE(*, '(/,''INCREASING MAXEVL OR EPS, OR DECREASING '',/)')
       WRITE(*, '(/,''NT OR RT. THESE RESULTS ARE LIKELY TO BE '',/)')
       WRITE(*, '(/,''POOR.'',/)')
 
@@ -881,7 +881,7 @@ C  it minimizes by maximizing the negative a function.
       DOUBLE PRECISION  VM(*), XOPT(*), X(*)
       INTEGER  N
 
-      WRITE(*,'(/''INTERMEDIATE RESULTS AFTER'',/)') 
+      WRITE(*,'(/''INTERMEDIATE RESULTS AFTER'',/)')
       WRITE(*,'(/'' STEP LENGTH ADJUSTMENT'',/)')
       CALL PRTVEC(VM,N,'NEW STEP LENGTH (VM)')
       CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
