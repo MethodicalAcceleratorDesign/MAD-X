@@ -97,14 +97,14 @@
       rmatrix=get_value('twiss ','rmatrix ').ne.zero
       sectormap=get_option('twiss_sector ').ne.zero
 !---- Initial values from command attributes.
-      if (inval.ne.0) then
+!      if (inval.ne.0) then
 
 !---- Get transfer matrix.
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
-        if(eflag.ne.0) go to 900
-
+!        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
+!        if(eflag.ne.0) go to 900
 !---- Initial values from periodic solution.
-      else
+!      else
+      if (inval.eq.0) then
         call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
         if(eflag.ne.0) go to 900
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
@@ -1178,7 +1178,7 @@
       include 'twissa.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
-      integer i,i1,i2,j
+      integer i,i1,i2,j,inval,get_option
       double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
      &rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
      &alfy0,betx0,bety0,amux0,amuy0,zero,one
@@ -1233,10 +1233,15 @@
 
 !---- Cummulative R matrix and one-turn map at element location.
       if(rmatrix) then
+        inval=get_option('twiss_inval ')
         call m66mpy(re,rw,rw)
-        call m66inv(rw,rwi)
-        call m66mpy(rotm,rw,rc)
-        call m66mpy(rwi,rc,rc)
+        if (inval.ne.0) then
+          call dcopy(rw,rc,36)
+        else
+          call m66inv(rw,rwi)
+          call m66mpy(rotm,rw,rc)
+          call m66mpy(rwi,rc,rc)
+        endif
       endif
 
 !---- Mode 1.
@@ -1895,7 +1900,7 @@
 !---- Select element type.
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
-     &210, 220, 230, 240, 250, 260, 270, 280, 290, 300,                 &
+     &210, 220, 230, 240, 250, 260,  10, 280, 290, 300,                 &
      &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
 
 !---- Drift space, monitor, collimator, or beam instrument.
