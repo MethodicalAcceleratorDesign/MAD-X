@@ -90,13 +90,13 @@
    10 continue
       code = node_value('mad8_type ')
       if (code .eq. 10) then      ! cavity
-      lg = get_string('element ', 'name ', el_name)
-      el = node_value('l ')
-      rfv = node_value('volt ')
-      rff = node_value('freq ')
-      rfl = node_value('lag ')
-      deltap = get_value('probe ','deltap ')
-      print '(a,5g14.6)', el_name(:lg), el, rfv, rff, rfl, deltap
+        lg = get_string('element ', 'name ', el_name)
+        el = node_value('l ')
+        rfv = node_value('volt ')
+        rff = node_value('freq ')
+        rfl = node_value('lag ')
+        deltap = get_value('probe ','deltap ')
+        print '(a,5g14.6)', el_name(:lg), el, rfv, rff, rfl, deltap
       endif
       if (advance_node().ne.0)  goto 10
       end
@@ -148,12 +148,12 @@
       sigycm = ot2 * sqrt(ey * bybar)
       sigtcm = ot2 * sigt
       if (fbch) then
-      vol    = eight * sqrt(pi**3) * sigxcm * sigycm * sigtcm
-      densty = parnum / vol
+        vol    = eight * sqrt(pi**3) * sigxcm * sigycm * sigtcm
+        densty = parnum / vol
       else
-      vol    = four * pi * sigxcm * sigycm * ot2 * circ
-      pnbtot = currnt * circ / (qion * qelect * betas * clight)
-      densty = pnbtot / vol
+        vol    = four * pi * sigxcm * sigycm * ot2 * circ
+        pnbtot = currnt * circ / (qion * qelect * betas * clight)
+        densty = pnbtot / vol
       endif
 
 !---- Calculate RMAX as smaller of SIGXCM and DEBYE length.
@@ -169,11 +169,11 @@
       bgam = betas * gammas
       qion   = abs(charge)
       if (fbch) then
-      const = parnum * coulog * arad**2 * clight / (eight * pi * betas  &
+        const = parnum * coulog * arad**2 * clight / (eight * pi * betas&
      &**3 * gammas**4 * ex * ey * sige * sigt)
-      cbunch = qion * parnum * qelect * betas * clight / circ
+        cbunch = qion * parnum * qelect * betas * clight / circ
       else
-      const = currnt * coulog * arad**2 /                               &
+        const = currnt * coulog * arad**2 /                             &
      &(four * sqrt(pi) * qion * qelect * bgam**4 * ex * ey * sige)
       endif
       write (*, 910) const
@@ -184,16 +184,16 @@
 !     Usually this error is due to a starting guess far from
 !     the equilibrium value.
       if (coulog .lt. zero) then
-      call aawarn('TWCLOG', 'Coulomb logarithm gives invalid'           &
+        call aawarn('TWCLOG', 'Coulomb logarithm gives invalid'         &
      &// ' result --- check input parameters.')
       endif
 
       write (*, 940) ex, ey
 
       if (fbch) then
-      write (*, 950) sige, sigt, parnum, cbunch
+        write (*, 950) sige, sigt, parnum, cbunch
       else
-      write (*, 960) sige, currnt
+        write (*, 960) sige, currnt
       endif
 
   910 format(' '/5x,'CONST               = ',1p,e14.6)
@@ -373,89 +373,89 @@
 !
       j = restart_sequ()
       do i = range(1)+1, range(2)
-      j = advance_to_pos('twiss ', i)
-      flag = double_from_table('twiss ', 's ', i, s2)
-      if (flag .ne. 0)  goto 102
-      flag = double_from_table('twiss ', 'betx ', i, bx2)
-      if (flag .ne. 0)  goto 102
-      flag = double_from_table('twiss ', 'bety ', i, by2)
-      if (flag .ne. 0)  goto 102
-      flag = double_from_table('twiss ', 'alfx ', i, ax2)
-      if (flag .ne. 0)  goto 102
-      flag = double_from_table('twiss ', 'alfy ', i, ay2)
-      if (flag .ne. 0)  goto 102
-      flag = double_from_table('twiss ', 'dx ', i, dx2)
-      if (flag .ne. 0)  goto 102
-      flag = double_from_table('twiss ', 'dpx ', i, dpx2)
-      if (flag .ne. 0)  goto 102
-      dels = s2-s1
+        j = advance_to_pos('twiss ', i)
+        flag = double_from_table('twiss ', 's ', i, s2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'betx ', i, bx2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'bety ', i, by2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'alfx ', i, ax2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'alfy ', i, ay2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'dx ', i, dx2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'dpx ', i, dpx2)
+        if (flag .ne. 0)  goto 102
+        dels = s2-s1
 
-      sdum = half * (s2 + s1)
+        sdum = half * (s2 + s1)
 
-      betax  = half * (bx2 + bx1)
-      sbxb   = sbxb + betax * dels
-      sbxinv = sbxinv + dels / betax
+        betax  = half * (bx2 + bx1)
+        sbxb   = sbxb + betax * dels
+        sbxinv = sbxinv + dels / betax
 
-      betay  = half * (by2 + by1)
-      sbyb   = sbyb + betay * dels
-      sbyinv = sbyinv + dels / betay
+        betay  = half * (by2 + by1)
+        sbyb   = sbyb + betay * dels
+        sbyinv = sbyinv + dels / betay
 
-      alx    = half * (ax2 + ax1)
-      salxb  = salxb + alx * dels
+        alx    = half * (ax2 + ax1)
+        salxb  = salxb + alx * dels
 
-      aly    = half * (ay2 + ay1)
-      salyb  = salyb + aly * dels
+        aly    = half * (ay2 + ay1)
+        salyb  = salyb + aly * dels
 
-      dx     = half * (dx2 + dx1)
-      sdxb   = sdxb + dx * dels
+        dx     = half * (dx2 + dx1)
+        sdxb   = sdxb + dx * dels
 
-      dpx    = half * (dpx2 + dpx1)
-      sdpxb  = sdpxb + dpx * dels
+        dpx    = half * (dpx2 + dpx1)
+        sdpxb  = sdpxb + dpx * dels
 
 
 !*---- Calculate weighted average in region of non-zero DX's.
 !     These values are used to calculate "average" ring lifetimes
 !     in TWSINT.
-      if (dx .gt. zero) then
-        wnorm  = wnorm + dels
-        dxwtd  = dxwtd + dels * dx
-        dpxwtd = dpxwtd + dels * dpx
-        bywtd  = bywtd + dels / sqrt(betay)
-        alxwtd = alxwtd + dels * alx
-        hscrpt = betax * dpx**2 + two * alx * dx * dpx +                &
+        if (dx .gt. zero) then
+          wnorm  = wnorm + dels
+          dxwtd  = dxwtd + dels * dx
+          dpxwtd = dpxwtd + dels * dpx
+          bywtd  = bywtd + dels / sqrt(betay)
+          alxwtd = alxwtd + dels * alx
+          hscrpt = betax * dpx**2 + two * alx * dx * dpx +              &
      &(one + alx**2) * dx**2 / betax
-        hscwtd = hscwtd + dels * sqrt(hscrpt)
-      endif
+          hscwtd = hscwtd + dels * sqrt(hscrpt)
+        endif
 
 !---- TWSINT calculates the Bjorken/Mtingwa integral.
-      call twsint(betax, betay, alx, dx, dpx, txidc, tyidc, tlidc)
+        call twsint(betax, betay, alx, dx, dpx, txidc, tyidc, tlidc)
 
 !---- Accumulate contributions.
-      tavlc = tavlc + tlidc * dels
-      tavxc = tavxc + txidc * dels
-      tavyc = tavyc + tyidc * dels
+        tavlc = tavlc + tlidc * dels
+        tavxc = tavxc + txidc * dels
+        tavyc = tavyc + tyidc * dels
 
 ! *************** Fill "ibs_table" if required *********************
 
-      if(n.ne.0) then
-        call string_to_table('ibs ', 'name ', 'name ')
-        call double_to_table('ibs ','s ', sdum)
-        call double_to_table('ibs ','dels ', dels)
-        call double_to_table('ibs ','tli ', tlidc)
-        call double_to_table('ibs ','txi ', txidc)
-        call double_to_table('ibs ','tyi ', tyidc)
-        call augment_count('ibs ')
-      endif
+        if(n.ne.0) then
+          call string_to_table('ibs ', 'name ', 'name ')
+          call double_to_table('ibs ','s ', sdum)
+          call double_to_table('ibs ','dels ', dels)
+          call double_to_table('ibs ','tli ', tlidc)
+          call double_to_table('ibs ','txi ', txidc)
+          call double_to_table('ibs ','tyi ', tyidc)
+          call augment_count('ibs ')
+        endif
 
 ! *********** Make sure the following lines are not moved ******
 ! *********** by the compiler ***************
-      s1   = s2
-      bx1  = bx2
-      by1  = by2
-      ax1  = ax2
-      ay1  = ay2
-      dx1  = dx2
-      dpx1 = dpx2
+        s1   = s2
+        bx1  = bx2
+        by1  = by2
+        ax1  = ax2
+        ay1  = ay2
+        dx1  = dx2
+        dpx1 = dpx2
 
       enddo
       goto 101
@@ -627,51 +627,51 @@
       al(1)  = zero
 
       do iloop = 1, maxdec
-      bl(iloop) = ten**iloop
-      al(iloop+1) = bl(iloop)
-      h = (bl(iloop) - al(iloop)) / ns
-      aloop = al(iloop)
+        bl(iloop) = ten**iloop
+        al(iloop+1) = bl(iloop)
+        h = (bl(iloop) - al(iloop)) / ns
+        aloop = al(iloop)
 
 !---- Evaluate Simpson's rule summation for one interval.
 !     The integrand is calculated in the loop itself
-      term = sqrt((cy + aloop) * ccy) *                                 &
+        term = sqrt((cy + aloop) * ccy) *                               &
      &sqrt(aloop * ccy * aloop + td1 * aloop + td2)
-      func = sqrt(aloop) / term**3
-      polyl = tl1 * aloop + tl2
-      polyx = tx1 * aloop + tx2
-      polyy = ty1 * aloop + ty2
-      suml = func * polyl
-      sumx = func * polyx
-      sumy = func * polyy
+        func = sqrt(aloop) / term**3
+        polyl = tl1 * aloop + tl2
+        polyx = tx1 * aloop + tx2
+        polyy = ty1 * aloop + ty2
+        suml = func * polyl
+        sumx = func * polyx
+        sumy = func * polyy
 
 
-      do iiz = 1, ns
-        alam = aloop + iiz * h
-        cof = coeff(mod(iiz,2)+1)
-        term = sqrt((cy+alam)*ccy) *                                    &
+        do iiz = 1, ns
+          alam = aloop + iiz * h
+          cof = coeff(mod(iiz,2)+1)
+          term = sqrt((cy+alam)*ccy) *                                  &
      &sqrt(alam*ccy*alam+td1*alam+td2)
-        f = sqrt(alam) / term**3
-        polyl = tl1 * alam + tl2
-        polyx = tx1 * alam + tx2
-        polyy = ty1 * alam + ty2
+          f = sqrt(alam) / term**3
+          polyl = tl1 * alam + tl2
+          polyx = tx1 * alam + tx2
+          polyy = ty1 * alam + ty2
 
-        suml = suml + cof * f * polyl
-        sumx = sumx + cof * f * polyx
-        sumy = sumy + cof * f * polyy
-      enddo
+          suml = suml + cof * f * polyl
+          sumx = sumx + cof * f * polyx
+          sumy = sumy + cof * f * polyy
+        enddo
 
-      suml = suml - f * polyl
-      sumx = sumx - f * polyx
-      sumy = sumy - f * polyy
-      tmpl = (suml / three) * h
-      tmpx = (sumx / three) * h
-      tmpy = (sumy / three) * h
-      zintl = zintl + tmpl
-      zintx = zintx + tmpx
-      zinty = zinty + tmpy
+        suml = suml - f * polyl
+        sumx = sumx - f * polyx
+        sumy = sumy - f * polyy
+        tmpl = (suml / three) * h
+        tmpx = (sumx / three) * h
+        tmpy = (sumy / three) * h
+        zintl = zintl + tmpl
+        zintx = zintx + tmpx
+        zinty = zinty + tmpy
 
 !---- Test to see if integral has converged.
-      if (abs(tmpl/zintl) .lt. test .and.                               &
+        if (abs(tmpl/zintl) .lt. test .and.                             &
      &abs(tmpx/zintx) .lt. test .and.                                   &
      &abs(tmpy/zinty) .lt. test) goto 100
       enddo
