@@ -1,5 +1,16 @@
 #define BASE_TYPES 100    /* maximum no. of element types allowed */
 #define EL_COUNT   100    /* initial length of element type list */
+
+/* MADX name     : circle, ellipse, rectangle, lhcscreen */
+/* internal code :    1       2         3          4     */
+struct aper_struct {
+  int apply;
+  char name[255];
+  char style[255]; 
+  double value[3];
+};
+
+
 struct c6t_element
 {  
   char name[48],           /* name including occurrence count if > 1 */
