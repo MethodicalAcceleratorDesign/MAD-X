@@ -5440,9 +5440,8 @@ void pro_twiss()
     {
      name = pl->parameters[pos]->string;
      if ((lp = name_list_pos(name, sequences->list)) > -1)
-       {
-      current_sequ = sequences->sequs[lp];
-       }
+        current_sequ = sequences->sequs[lp];
+
      else
        {
         warning("unknown sequence ignored:", name);
@@ -7467,7 +7466,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
          }
        }
        break;
-	case 3: /* string */
+     case 3: /* string */
        if (start <= end)
        {
           get_bracket_t_range(toks, '{', '}', start, end, &s_start, &s_end);
@@ -7684,12 +7683,15 @@ void store_select(struct in_cmd* cmd)
 void store_set(struct command* comm, int flag)
 {
   char* p;
+  char* name;
   struct command_parameter* cp;
   struct name_list* nl = comm->par_names;
-  int i, pos = name_list_pos("format", nl);
-  if (flag == 0 || nl->inform[pos])
+  int i, lp, n = 0, posf = name_list_pos("format", nl),
+         poss = name_list_pos("sequence", nl); 
+  if (flag == 0 || (posf > -1 && nl->inform[posf]))
     {
-     cp = comm->par->parameters[pos];
+     n++;
+     cp = comm->par->parameters[posf];
      for (i = 0; i < cp->m_string->curr; i++)
        {
         p = noquote(cp->m_string->p[i]);
@@ -7698,9 +7700,22 @@ void store_set(struct command* comm, int flag)
         else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
        }
     }
-  else
+  if (poss > -1 && nl->inform[poss])
     {
-     warning("no parameter specified", "ignored");
+     n++;
+     name = comm->par->parameters[poss]->string;
+     if ((lp = name_list_pos(name, sequences->list)) > -1
+         && sequences->sequs[lp]->ex_start != NULL)
+        current_sequ = sequences->sequs[lp];
+     else
+       {
+        warning("ignoring unknown or unused sequence:", name);
+        return;
+       }
+    }
+  if (n == 0)
+    {
+     warning("no parameter specified,", "ignored");
      return;
     }
 }
