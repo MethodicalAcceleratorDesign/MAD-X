@@ -2154,7 +2154,7 @@
         call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
 !---- Tor: use FINTX if set
-        if (fintx .gt. 0) then
+        if (fintx .ge. 0) then
           corr = (h + h) * hgap * fintx
         else
           corr = (h + h) * hgap * fint
