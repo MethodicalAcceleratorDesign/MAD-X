@@ -37,7 +37,7 @@ ifeq ($(OSTYPE),darwin)
   FCP=-fno-second-underscore -funroll-loops
 endif
 
-default: madx madxdev
+default: madx
 
 # files
 
@@ -229,7 +229,6 @@ madxdev: \
 	first_ptc.o ptc_input.o u1_twiss.o set_para.o ptc_twiss.o \
 	madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o dynap.o \
 	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o $(LIBX) -lm -lc
-	rm -f *.g90 *.mod
 
 clean:
 	rm -f *.o

@@ -31,18 +31,18 @@ subroutine ptc_input(lhc,icav)
   with_patch=.false.
   mad=.true. ! permanent
   madlength=.false.
-  READ(98,*) method
+  method = get_value('ptc ','method ')
   print*,'method: ',method
-  READ(98,*) nst
+  nst = get_value('ptc ','nst ')
   print*,'nst: ',nst
-  metd=method
-  nstd=nst
+  metd = method
+  nstd = nst
 
   print*,"Fortran tiny",tiny(one)
 
   call Set_Up(LHC)
  
-  CALL SET_MAD(energy=energy,METHOD=metd,STEP=nst)
+  CALL SET_MAD(energy=energy,METHOD=method,STEP=nst)
 
   icav=0
   nt=0

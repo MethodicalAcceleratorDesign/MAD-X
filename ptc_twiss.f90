@@ -3,10 +3,11 @@ subroutine ptc_twiss(lhc,icav)
   use set_para
   use twisspara
   implicit none
-  integer i,myno,mynd2,npara,mynpa,nda,icase,icav,ij
+  integer i,no,mynd2,npara,mynpa,nda,icase,icav,ij
   real(dp) x(6),suml
   type(layout) LHC
   type(real_8) y(6)
+  real(kind(1d0)) get_value
   type(twiss) tw
   type(fibre), POINTER :: current
 !------------------------------------------------------------------------------
@@ -14,7 +15,7 @@ subroutine ptc_twiss(lhc,icav)
   nda=0
   suml=zero
 
-  READ(98,*)   icase
+  icase = get_value('ptc ','icase ')
   if(icase==4) then
      default=default+only_4d+NOCAVITY
      mynpa=4
@@ -45,9 +46,9 @@ subroutine ptc_twiss(lhc,icav)
 !     current=>current%next
 !  enddo
 
-  READ(98,*)   myno
+  no = get_value('ptc ','no ')
 
-  call init(default,1,nda,BERZ,mynd2,npara)
+  call init(default,no,nda,BERZ,mynd2,npara)
   call alloc(y)
   y=npara
   Y=X
