@@ -51,7 +51,7 @@ f95_FOPT=-static
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
-LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl
+LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 # NAG f95 lib extension
 #LIBX_ext= -lgcc
