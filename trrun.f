@@ -29,7 +29,7 @@
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
      &int_arr(1),tot_segm,code_buf(*)
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
-     &al_errors(8),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one,  &
+     &al_errors(14),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one,  &
      &get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
      &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
       parameter(zero=0d0,one=1d0)
