@@ -24,7 +24,7 @@ FCP=$(f95_FLAGS)
 
 CC=gcc
 FOPT=-Bstatic
-FP=-static
+FP=-Bstatic
 
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 GLIB=/afs/cern.ch/group/si/slap/lib
