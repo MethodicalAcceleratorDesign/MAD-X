@@ -97,6 +97,7 @@ c set it to 10 here for brevery
  9999 end
 
       subroutine fcnsa(n,x,f)
+      implicit none
       integer iflag,nf,n
       double precision f,x(n),fvec(nf),vmod
       common/forsa/nf
@@ -196,6 +197,7 @@ C    6. Try constraining the algorithm with either LB or UB.
       SUBROUTINE SA(N,X,MAX,RT,EPS,NS,NT,NEPS,MAXEVL,LB,UB,C,IPRINT,
      1              ISEED1,ISEED2,T,VM,XOPT,FOPT,NACC,NFCNEV,NOBDS,IER,
      2              FSTAR,XP,NACP)
+      implicit none
 
 C  Version: 3.2
 C  Date: 1/22/94.
@@ -678,6 +680,7 @@ C  Loop again.
       END
 
       FUNCTION  EXPREP(RDUM)
+      implicit none
 C  This function replaces exp to avoid under- and overflows and is
 C  designed for IBM 370 type machines. It may be necessary to modify
 C  it for other machines. Note that the maximum and minimum values of
@@ -697,6 +700,7 @@ C  EXPREP are such that they has no effect on the algorithm.
       END
 
       subroutine RMARIN(IJ,KL)
+      implicit none
 C  This subroutine and the next function generate random numbers. See
 C  the comments for SA for more information. The only changes from the
 C  orginal code is that (1) the test to make sure that RMARIN runs first
@@ -709,7 +713,9 @@ C This is the initialization routine for the random number generator
 C     RANMAR()
 C NOTE: The seed variables can have values between:    0 <= IJ <= 31328
 C                                                      0 <= KL <= 30081
+      real s,t
       real U(97), C, CD, CM
+      integer IJ,KL,i,j,k,l,ii,jj,ll,m,lines
       integer I97, J97
       common /raset1/ U, C, CD, CM, I97, J97
       if( IJ .lt. 0  .or.  IJ .gt. 31328  .or.
@@ -768,6 +774,7 @@ C                                                      0 <= KL <= 30081
       END
 
       SUBROUTINE PRT1
+      implicit none
 C  This subroutine prints intermediate output, as does PRT2 through
 C  PRT10. Note that if SA is minimizing the function, the sign of the
 C  function value and the directions (up/down) are reversed in all
@@ -784,6 +791,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT2(MAX,N,X,F)
+      implicit none
 
       DOUBLE PRECISION  X(*), F
       INTEGER  N
@@ -801,6 +809,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT3(MAX,N,XP,X,FP,F)
+      implicit none
 
       DOUBLE PRECISION  XP(*), X(*), FP, F
       INTEGER  N
@@ -820,6 +829,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT4(MAX,N,XP,X,FP,F)
+      implicit none
 
       DOUBLE PRECISION  XP(*), X(*), FP, F
       INTEGER  N
@@ -841,6 +851,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT5
+      implicit none
 
       WRITE(*, '(/,''TOO MANY FUNCTION EVALUATIONS; CONSIDER '',/)')
       WRITE(*, '(/,''INCREASING MAXEVL OR EPS, OR DECREASING '',/)')
@@ -851,6 +862,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT6(MAX)
+      implicit none
 
       LOGICAL  MAX
 
@@ -864,6 +876,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT7(MAX)
+      implicit none
 
       LOGICAL  MAX
 
@@ -877,6 +890,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT8(N,VM,XOPT,X)
+      implicit none
 
       DOUBLE PRECISION  VM(*), XOPT(*), X(*)
       INTEGER  N
@@ -892,6 +906,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT9(MAX,N,T,XOPT,VM,FOPT,NUP,NDOWN,NREJ,LNOBDS,NNEW)
+      implicit none
 
       DOUBLE PRECISION  XOPT(*), VM(*), T, FOPT
       INTEGER  N, NUP, NDOWN, NREJ, LNOBDS, NNEW, TOTMOV
@@ -927,6 +942,7 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRT10
+      implicit none
 
       WRITE(*,'(/,''  SA ACHIEVED TERMINATION CRITERIA. IER = 0. '',/)')
 
@@ -934,12 +950,14 @@ C  it minimizes by maximizing the negative a function.
       END
 
       SUBROUTINE PRTVEC(VECTOR,NCOLS,NAME)
+      implicit none
 C  This subroutine prints the double precision vector named VECTOR.
 C  Elements 1 thru NCOLS will be printed. NAME is a character variable
 C  that describes VECTOR. Note that if NAME is given in the call to
 C  PRTVEC, it must be enclosed in quotes. If there are more than 10
 C  elements in VECTOR, 10 elements will be printed on each line.
 
+      integer i,j,ll,lines
       INTEGER NCOLS
       DOUBLE PRECISION VECTOR(NCOLS)
       CHARACTER *(*) NAME
