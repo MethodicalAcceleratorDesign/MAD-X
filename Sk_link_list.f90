@@ -692,6 +692,7 @@ CONTAINS
     nullify(current%next);nullify(current%previous);
     nullify(current%PARENT_LAYOUT);nullify(current%PARENT_PATCH);
     nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
+    nullify(current%i)
   END SUBROUTINE NULL_FIBRE
 
   SUBROUTINE ALLOCATE_FIBRE(CURRENT)   ! allocates and nullifies current's content
