@@ -977,9 +977,10 @@
       logical fmap,cplxy,cplxt,dorad,sector_sel
       integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
      &node_al_errors,n_align
-      double precision rt(6,6),ek(6),re(6,6),rwi(6,6),rc(6,6),te(6,6,6),&
-     &el,orbit(6),betas,gammas,al_errors(align_max),bv0,bvk, sumloc,    &
-     &pos0,node_value,get_value,zero,one,two
+      double precision rt(6,6),ek(6),re(6,6),rm(6,6),rwi(6,6),rc(6,6),  &
+     &te(6,6,6),el,elh,orbit(6),orbit0(6),betas,gammas,                 &
+     &al_errors(align_max),bv0,bvk,sumloc,pos0,node_value,get_value,    &
+     &zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*120 msg
 
@@ -1056,12 +1057,24 @@
       endif
       if(centre) centre_cptk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
-      centre_cptk=.false.
       if(centre) then
         pos0=currpos
         currpos=currpos+el/two
+        if (n_align.ne.0)  then
+          orbit0(1)=opt_fun(9 )
+          orbit0(2)=opt_fun(10)
+          orbit0(3)=opt_fun(11)
+          orbit0(4)=opt_fun(12)
+          orbit0(5)=opt_fun(13)
+          orbit0(6)=opt_fun(14)
+          call m66one(rm)
+          elh=el/two
+          call tmali2(elh,orbit0,al_errors,betas,gammas,orbit0,rm)
+          call twcptk(rm,orbit0)
+        endif
         if(save.ne.0) call twfill(1,opt_fun,currpos, 1)
       endif
+      centre_cptk=.false.
       if (fmap) then
         call twcptk(re,orbit)
         if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
