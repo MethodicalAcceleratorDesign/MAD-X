@@ -233,6 +233,7 @@ void correct_getorbit(struct in_cmd*);
 void correct_putorbit(struct in_cmd*);
 void correct_usekick(struct in_cmd*);
 void correct_usemonitor(struct in_cmd*);
+void correct_option(struct in_cmd* cmd);
 void deco_init();
 int decode_command();
 int decode_par(struct in_cmd*, int, int, int, int);
@@ -790,6 +791,7 @@ const double ten_m_16 = 1.e-16;
 const double ten_m_19 = 1.e-19;
 
 int add_error_opt = 0;      /* ADD error option, set with eoption */
+int print_correct_opt = 1;  /* PRINT options for orbit correction */
 int assign_start = 0;       /* flag for multiple assign statements */
 int aux_count = 0;          /* for debug purposes */
 int beam_info = -1;         /* flag to print beam information once */
