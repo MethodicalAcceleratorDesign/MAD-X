@@ -330,6 +330,18 @@ CONTAINS
     NV=NV1
   end  subroutine set_in_tpsa
 
+  subroutine count_taylor(n,ns,ne)
+    implicit none
+    integer n,ns,ne,i
+    call count_da(n)
+    ns=0
+    do i=1,ndumt
+       ns=scratchda(i)%n+ns
+    enddo
+    ne=n-ns
+  end subroutine count_taylor
+
+
   FUNCTION unaryADD( S1 )
     implicit none
     TYPE (TAYLOR) unaryADD

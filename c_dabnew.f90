@@ -14,6 +14,7 @@ module dabnew
   PUBLIC DACLR,DACMU,DALIN,DAREA,DAPRI,DAABS,DAEPS,DATRA,MATINV,DAFUN
   PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR,DAPOI
   PUBLIC DACFUI,DAPRI77,DAREA77,DAINF,GET_C_J,PPUSH1,KILL_BERZ,DALLSTA,dacycle
+  public count_da
   !integer,public::idao
   !  integer,public,dimension(100)::is
   !integer,public,dimension(100)::iscrri
@@ -1039,6 +1040,22 @@ contains
     return
   end subroutine dadal1
 
+  subroutine count_da(n)
+    implicit none
+    !     ************************
+    !
+    !     THIS SUBROUTINE counts allocate da
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,n
+    !
+    n=0
+    do i=1,lda
+       if(allvec(i)) n=n+1
+    enddo
+    return
+  end subroutine count_da
 
   subroutine davar(ina,ckon,i)
     implicit none
