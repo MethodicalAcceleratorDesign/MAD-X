@@ -2415,7 +2415,7 @@ void expand_line(struct char_p_array* l_buff)
   for (i = 0; i < l_buff->curr; i++) 
     {
      if (isalpha(*l_buff->p[i]))  l_buff->p[n++] = l_buff->p[i];
-     else free(l_buff->p[i]);
+     /*     else free(l_buff->p[i]);*/
     }
   l_buff->curr = n;
   lbpos = delete_int_array(lbpos);
