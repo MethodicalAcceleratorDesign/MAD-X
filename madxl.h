@@ -364,7 +364,8 @@ int summ_table_types[] =
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
-2, 2, 2, 2
+2, 2, 2, 2, 2,
+2, 2, 2, 2,
 };
 
 char* summ_table_cols[] =
@@ -373,6 +374,7 @@ char* summ_table_cols[] =
 "dq1", "betxmax", "dxmax", "dxrms", "xcomax",
 "xcorms", "q2", "dq2", "betymax", "dymax",
 "dyrms", "ycomax", "ycorms", "deltap",
+"synch_1","synch_2","synch_3","synch_4","synch_5",
 " "  /* blank terminates */
 };
 

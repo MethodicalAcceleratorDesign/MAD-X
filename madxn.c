@@ -2446,7 +2446,7 @@ void fill_orbit_table(struct table* t_out, struct table* t_in)
 void fill_twiss_header(struct table* t)
      /* puts beam parameters etc. at start of twiss table */
 {
-  int i, pos, h_length = 34; /* change adding header lines ! */
+  int i, pos, h_length = 39; /* change adding header lines ! */
   double dtmp;
   struct table* s;
   char tmp[16];
@@ -2579,6 +2579,26 @@ void fill_twiss_header(struct table* t)
      pos = name_list_pos("deltap", s->columns);
      dtmp = s->d_cols[pos][0];
      sprintf(c_dummy, v_format("@ DELTAP           %%le  %F"), dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("synch_1", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, v_format("@ SYNCH_1           %%le  %F"), dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("synch_2", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, v_format("@ SYNCH_2           %%le  %F"), dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("synch_3", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, v_format("@ SYNCH_3           %%le  %F"), dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("synch_4", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, v_format("@ SYNCH_4           %%le  %F"), dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("synch_5", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, v_format("@ SYNCH_5           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
     }
 }
@@ -6154,6 +6174,7 @@ void store_select(struct in_cmd* cmd, int type)
       if (save_select->curr == save_select->max)
             grow_command_list(save_select);
         save_select->commands[save_select->curr++] = cmd->clone;
+        cmd->clone->select_type = type; /* store select/deselect switch */
         cmd->clone_flag = 1; /* do not drop */
        }
     }
@@ -6191,6 +6212,7 @@ void store_select(struct in_cmd* cmd, int type)
        {
       if (scl->curr == scl->max) grow_command_list(scl);
         scl->commands[scl->curr++] = cmd->clone;
+        cmd->clone->select_type = type; /* store select/deselect switch */
         cmd->clone_flag = 1; /* do not drop */
        }
     }

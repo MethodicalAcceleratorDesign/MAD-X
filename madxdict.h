@@ -12,7 +12,9 @@ char predef_constants[] =
 "const pmass = 0.938271998; "
 "const clight = 299792458.; "
 "const qelect = 1.602176462e-19; "
-"const hbar = 6.58211889e-25; ";
+"const hbar = 6.58211889e-25; "
+"const erad = 2.817940325e-15; " 
+"const prad = erad*emass/pmass; ";
 
 
 /* command definitions, sorted by module resp. type */
@@ -1417,8 +1419,7 @@ char command_def[] =
 " "
 "touschek: touschek none 0 0 "
 "tolerance= [r, 1.e-7], "
-"file     = [s, touschek, touschek], "
-"steps    = [i, 50];"
+"file     = [s, touschek, touschek]; "
 " "
 "makethin: makethin none 0 0 "
 "style    = [s, teapot, teapot], "
