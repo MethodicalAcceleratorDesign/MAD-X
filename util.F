@@ -843,8 +843,10 @@
 !   TEXT      (char)    Message.                                       *
 !----------------------------------------------------------------------*
       character*(*) rout,text
-
+      print *,' '
       print *,  '+-+-+- fatal: ',rout,text
+      print *,' '
+      print *,' '
       stop
 
       end
