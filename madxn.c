@@ -1282,7 +1282,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
 	         if ((expr = 
                    make_expression(end + 1 - start, &toks[start])) == NULL)  
                  return -i;
-                 val = zero;
+                 val = expression_value(expr, 2);
 		}
 	     }
           }
