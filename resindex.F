@@ -1,7 +1,7 @@
-      subroutine res_index(skew,mynorder,myn1,myn2,indexa,mynres)      
+      subroutine res_index(skew,mynorder,myn1,myn2,indexa,mynres)
       implicit none
       include "resindex.fi"
-      integer i,j,n1,n2,n3,n4
+      integer mynorder,i,j,n1,n2,n3,n4
 !---------------------------------------------------------------------
       do i=1,mnres
         do j=1,4
@@ -45,7 +45,7 @@
             n3=0
             n4=0
             goto 1
-          else 
+          else
             n2=n2-1
             goto 2
           endif
@@ -84,7 +84,7 @@
         if(odd.and.mod(nd1,2).ne.0) return
         if(.not.odd.and.(nd1.eq.0.or.mod(nd1,2).eq.0)) return
       endif
-      if((myn1.eq.0.and.myn2.eq.0).or.                                   &
+      if((myn1.eq.0.and.myn2.eq.0).or.                                  &
      &((myn1.eq.nd1).and.(myn2.eq.nd2))) then
         mynres=mynres+1
         if(mynres.gt.mnres) then

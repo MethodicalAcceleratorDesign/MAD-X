@@ -903,7 +903,7 @@
       if (info .ne. 0) then
         write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
   910   format('Unable to find eigenvalues for matrix:'/                &
-     &  (6f12.6))
+     &(6f12.6))
         call aafail('LASEIG',' Unable to find eigenvalues for matrix')
         go to 999
       endif
@@ -913,7 +913,7 @@
         do ipind = 2, 6, 2
           iqind = ipind - 1
           pb = pb + am(iqind,k) * am(ipind,k+1)                         &
-     &    - am(ipind,k) * am(iqind,k+1)
+     &- am(ipind,k) * am(iqind,k+1)
         enddo
         s = sqrt(abs(pb))
         if (pb .lt. zero) then
@@ -996,7 +996,7 @@
       if (info .ne. 0) then
         write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
   910   format('Unable to find eigenvalues for matrix:'/                &
-     &  (6f12.6))
+     &(6f12.6))
         call aafail('LADEIG',' Unable to find eigenvalues for matrix')
         go to 9999
       endif
@@ -1005,7 +1005,7 @@
         pb = zero
         do i = 1, 5, 2
           pb = pb + am(i,k) * am(i+1,k+1)                               &
-     &    - am(i+1,k) * am(i,k+1)
+     &- am(i+1,k) * am(i,k+1)
         enddo
         s = sqrt(abs(pb))
         if (pb .lt. zero) then
@@ -1247,7 +1247,7 @@
    70   continue
         do l = ien, ilow + 1, -1
           if (abs(h(l,l-1)) .le.                                        &
-     &    epsmch * (abs(h(l-1,l-1)) + abs(h(l,l)))) go to 100
+     &epsmch * (abs(h(l-1,l-1)) + abs(h(l,l)))) go to 100
         enddo
         l = ilow
   100   continue
@@ -1286,7 +1286,7 @@
           r = r / s
           if (m .eq. l) go to 150
           if (abs(h(m,m-1)) * (abs(q) + abs(r)) .le. epsmch * abs(p)    &
-     &    * (abs(h(m-1,m-1)) + abs(z) + abs(h(m+1,m+1)))) go to 150
+     &* (abs(h(m-1,m-1)) + abs(z) + abs(h(m+1,m+1)))) go to 150
         enddo
   150   continue
         h(m+2,m) = zero
@@ -1495,7 +1495,7 @@
                 vi = two * (wr(i) - p) * q
                 if (vr .eq. zero  .and.  vi .eq. zero) then
                   vr = epsmch * hnorm                                   &
-     &            * (abs(w) + abs(q) + abs(x) + abs(y) + abs(z))
+     &* (abs(w) + abs(q) + abs(x) + abs(y) + abs(z))
                 endif
                 tempr = x * r - z * ra + q * sa
                 tempi = x * s - z * sa - q * ra
@@ -1910,9 +1910,9 @@
 !        enddo
         do i = 1, 6
           temp(i) = ek(i)                                               &
-     &    + re(i)    * track(1,itrack) + re(i+ 6) * track(2,itrack)     &
-     &    + re(i+12) * track(3,itrack) + re(i+18) * track(4,itrack)     &
-     &    + re(i+24) * track(5,itrack) + re(i+30) * track(6,itrack)
+     &+ re(i)    * track(1,itrack) + re(i+ 6) * track(2,itrack)         &
+     &+ re(i+12) * track(3,itrack) + re(i+18) * track(4,itrack)         &
+     &+ re(i+24) * track(5,itrack) + re(i+30) * track(6,itrack)
         enddo
         do i = 1, 6
           track(i,itrack) = temp(i)

@@ -1,4 +1,4 @@
-      subroutine mtgetc(num,vect,dvect)
+      subroutine mtgetc(vect,dvect)
 !----------------------------------------------------------------------*
 ! This is exactly equivalent to mtgeti but this version is used for    *
 ! calling from C.                                                      *
@@ -11,12 +11,11 @@
 ! Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ                    *
 !----------------------------------------------------------------------*
       implicit none
-      integer  num
       double precision vect(*),dvect(*)
-      call mtgeti(num,vect,dvect)
+      call mtgeti(vect,dvect)
       end
 
-      subroutine mtgeti(num,vect,dvect)
+      subroutine mtgeti(vect,dvect)
 ! This subroutine should only be called from Fortran.  There is an
 ! equivalent mtgetc for the occasions when it needs to be called from C.
 ! Modified at 10:38:56 on 8 Apr 2003 by JMJ
@@ -24,7 +23,7 @@
 
 
       logical psum
-      integer num,j,next_vary,get_option,name_l
+      integer j,next_vary,get_option,name_l
       parameter(name_l=24)
       double precision get_variable,vect(*),dvect(*),c_min,c_max,step,  &
      &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin
@@ -65,12 +64,12 @@
 
 
 
-      subroutine mtlimit(num,vect,ireset)
+      subroutine mtlimit(vect,ireset)
 
       implicit none
 
 
-      integer num,j,next_vary,name_l,ireset
+      integer j,next_vary,name_l,ireset
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,                        &
      &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin
@@ -148,13 +147,13 @@
             fvect(ncon)=f_val
             fsum=fsum+f_val**2
             if(psum .and. type.eq.4)                                    &
-     &      write(*,830) node_name,name,type,value,val,f_val**2
+     &write(*,830) node_name,name,type,value,val,f_val**2
             if(psum .and. type.eq.2)                                    &
-     &      write(*,830) node_name,name,type,c_max,val,f_val**2
+     &write(*,830) node_name,name,type,c_max,val,f_val**2
             if(psum .and. type.eq.1)                                    &
-     &      write(*,830) node_name,name,type,c_min,val,f_val**2
+     &write(*,830) node_name,name,type,c_min,val,f_val**2
             if(psum .and. type.eq.3)                                    &
-     &      write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
+     &write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
             goto 20
           endif
         enddo
@@ -182,8 +181,8 @@
         fsum=fsum+f_val**2
 
         if(psum)                                                        &
-     &  write(*,830) "Global constraint:      ",name,type,value,val,    &
-     &  f_val**2
+     &write(*,830) "Global constraint:      ",name,type,value,val,      &
+     &f_val**2
 
         goto 30
       endif
@@ -218,19 +217,19 @@
       izero = 0
       ione = 1
 !---- Store parameter values in data structure.
-      call mtputi(nx, x)
+      call mtputi(x)
 
 !---- Compute matching functions.
 
       call mtcond(izero, nf, fval, iflag)
 
  9999 end
-      subroutine mtputi(num,vect)
+      subroutine mtputi(vect)
 
       implicit none
 
 
-      integer num,j,next_vary,name_l
+      integer j,next_vary,name_l
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,s_fact
       parameter(s_fact=5d-1)
@@ -273,7 +272,7 @@
 
       icovar = 0
       ilevel = 0
-      call mtgeti(nvar,vect,dvect)
+      call mtgeti(vect,dvect)
       call lmdif(mtfcn,ncon,nvar,calls,call_lim,vect,fun_vec,tol,diag,  &
      &one,w_ifjac,ncon,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,   &
      &xold)
@@ -527,7 +526,7 @@
 !---- Evaluate the function at X + P and calculate its norm.
 ! 23.5.2002: Oliver Bruening: inserted a routine that checks for
 !                       minimum and maximum values of the parameters:
-      call mtlimit(n,wa2,ireset)
+      call mtlimit(wa2,ireset)
       call fcn(m,n,wa2,wa4,iflag)
       calls = calls + 1
       if (iflag .ne. 0) then
@@ -563,7 +562,7 @@
       if (ratio .le. p25) then
         if (actred .ge. zero) temp = p5
         if (actred .lt. zero)                                           &
-     &  temp = p5*dirder/(dirder + p5*actred)
+     &temp = p5*dirder/(dirder + p5*actred)
         if (p1*fnorm1 .ge. fnorm .or. temp .lt. p1) temp = p1
         delta = temp*min(delta,pnorm/p1)
         par = par/temp
@@ -647,7 +646,7 @@
       call fcn(m,n,xold,fvec,iflag)
       fnorm = vmod(m, fvec)
       fmin = fnorm**2
-!      call mtputi(n,xold)
+!      call mtputi(xold)
       write(*,830) calls,fmin
 
       if (ilevel .ge. 1) call mtprnt('last',n, x)
@@ -1289,11 +1288,11 @@
       if (nvar .gt. ncon) then
         call aawarn('MTMIGR','More variables than constraints seen.')
         call aawarn('MTMIGR',                                           &
-     &  'MIGRAD may not converge to optimal solution.')
+     &'MIGRAD may not converge to optimal solution.')
       endif
 
 !---- Call minimization routine.
-      call mtgeti(nvar, vect, dvect)
+      call mtgeti(vect, dvect)
       call mtmig1(mtfcn, ncon, nvar,  strategy, tol, calls, call_lim,   &
      &vect, dvect, fun_vect, w_iwa1, w_iwa2, w_iwa3, w_iwa4, w_iwa5,    &
      &w_iwa6, w_iwa7, w_iwa8)
@@ -1339,7 +1338,7 @@
       calls = calls + 1
       if (iflag .ne. 0) then
         call aawarn('MTMIG1',                                           &
-     &  'Matching stopped -- start point seems to be unstable')
+     &'Matching stopped -- start point seems to be unstable')
         go to 500
       endif
       fmin = vdot(nf, fvec, fvec)
@@ -1353,8 +1352,8 @@
   100 continue
       if (strategy .eq. 2  .or.  strategy.gt.2 .and. icovar.lt.2) then
         call mthess(fcn, nf, nx, calls, covar, x,                       &
-     &  wa(1,mgrd), wa(1,mg2), fvec, wa(1,mvg), work_1, work_2, work_3, &
-     &  work_4, work_5,work_6)
+     &wa(1,mgrd), wa(1,mg2), fvec, wa(1,mvg), work_1, work_2, work_3,   &
+     &work_4, work_5,work_6)
         npsdf = 0
       else
         call mtderi(fcn, nf, nx, calls, x, wa(1,mgrd), wa(1,mg2), fvec)
@@ -1424,7 +1423,7 @@
 
 !---- Search for minimum along predicted line.
         call mtline(fcn, nf, nx, calls, x, dx, fvec,                    &
-     &  wa(1,mxsave), iflag)
+     &wa(1,mxsave), iflag)
 
 !---- No improvement found.
         if (iflag .ne. 0) then
@@ -1517,8 +1516,8 @@
       if (strategy .ge. 2 .or. (strategy.eq.1 .and. icovar.lt.3)) then
         print *, 'verify'
         call mthess(fcn, nf, nx, calls, covar, x,                       &
-     &  wa(1,mgrd), wa(1,mg2), fvec, wa(1,mvg), work_1, work_2, work_3, &
-     &  work_4, work_5,work_6)
+     &wa(1,mgrd), wa(1,mg2), fvec, wa(1,mvg), work_1, work_2, work_3,   &
+     &work_4, work_5,work_6)
         npsdf = 0
         if (edm .gt. eps1 * tol) go to 100
       endif
@@ -1526,7 +1525,7 @@
 
 !---- Common exit point; final print-out.
   500 continue
-      call mtputi(nx, x)
+      call mtputi(x)
       if (ilevel .ge. 1) call mtprnt('final', nx, x)
 
       write(*,830) calls,fmin
@@ -1626,7 +1625,7 @@
       enddo
 
 !---- Restore original point.
-      call mtputi(nx, x)
+      call mtputi(x)
 
 !---- Ensure positive definiteness and invert.
       call mtpsdf(covar,nx,work_4,work_5,work_6)
@@ -1694,7 +1693,7 @@
         x(i) = xsave
       enddo
 
-      call mtputi(nx, x)
+      call mtputi(x)
 
       end
       subroutine mtpsdf(covar,nx,work_4,work_5,work_6)
@@ -1904,7 +1903,7 @@
         dx(i) = svmin * dx(i)
         x(i) = xsave(i) + dx(i)
       enddo
-      call mtputi(nx, x)
+      call mtputi(x)
 
 !---- Return Failure indication.
       iflag = 0
@@ -1937,11 +1936,11 @@
       if (nvar .gt. ncon) then
         call aawarn('MTSIMP','More variables than constraints seen.')
         call aawarn('MTSIMP',                                           &
-     &  'SIMPLEX may not converge to optimal solution.')
+     &'SIMPLEX may not converge to optimal solution.')
       endif
 
 !---- Call minimization routine.
-      call mtgeti(nvar, vect, dvect)
+      call mtgeti(vect, dvect)
       call mtsim1(mtfcn, ncon, nvar, calls, call_lim, tol,              &
      &vect, dvect, fun_vect, w_iwa1, w_iwa2, w_iwa3)
 
@@ -2117,10 +2116,10 @@
           if (rho .lt. rhomin) then
             if (fstst .lt. fsim(jl)) then
               call mtrazz(nx, fstst, wa(1,mstst), fsim, psim,           &
-     &        jh, jl)
+     &jh, jl)
             else
               call mtrazz(nx, fstar, wa(1,mstar), fsim, psim,           &
-     &        jh, jl)
+     &jh, jl)
             endif
 
 !---- Usable minimum found.
@@ -2142,10 +2141,10 @@
               call mtrazz(nx, frho, wa(1,mrho), fsim, psim, jh, jl)
             else if (fstst .lt. fsim(jl)) then
               call mtrazz(nx, fstst, wa(1,mstst), fsim, psim,           &
-     &        jh, jl)
+     &jh, jl)
             else
               call mtrazz(nx, fstar, wa(1,mstar), fsim, psim,           &
-     &        jh, jl)
+     &jh, jl)
             endif
           endif
 
@@ -2160,7 +2159,7 @@
           if (jhold .eq. jh) then
             do i = 1, nx
               wa(i,mstst) = wa(i,mbar)                                  &
-     &        + beta * (psim(i,jh) - wa(i,mbar))
+     &+ beta * (psim(i,jh) - wa(i,mbar))
             enddo
             call fcn(nf, nx, wa(1,mstst), fvec, iflag)
             calls = calls + 1
@@ -2234,7 +2233,7 @@
         x(i) = psim(i,jl)
       enddo
       fmin = fsim(jl)
-      call mtputi(nx, x)
+      call mtputi(x)
 
 !---- Check for necessity to restart after final change.
       if (calls + 3 * nx .lt. call_lim  .and.  nrstrt .eq. 0  .and.     &

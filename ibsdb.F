@@ -423,7 +423,7 @@
         bywtd  = bywtd + dels / sqrt(betay)
         alxwtd = alxwtd + dels * alx
         hscrpt = betax * dpx**2 + two * alx * dx * dpx +                &
-     &  (one + alx**2) * dx**2 / betax
+     &(one + alx**2) * dx**2 / betax
         hscwtd = hscwtd + dels * sqrt(hscrpt)
       endif
 
@@ -649,7 +649,7 @@
         alam = aloop + iiz * h
         cof = coeff(mod(iiz,2)+1)
         term = sqrt((cy+alam)*ccy) *                                    &
-     &  sqrt(alam*ccy*alam+td1*alam+td2)
+     &sqrt(alam*ccy*alam+td1*alam+td2)
         f = sqrt(alam) / term**3
         polyl = tl1 * alam + tl2
         polyx = tx1 * alam + tx2

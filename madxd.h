@@ -90,7 +90,8 @@ int str_pos(const char s[], char c)
 /* Fortran routines called from C */
 extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
                    double*, double*);
-extern void mtgetc_(int*, double*, double*);               /* mtgeti->mtgetc JMJ, 8/4/2003 */
+/* drop first int* passed variable extern void mtgetc_(int*, double*, double*); 05.02.2005 */
+extern void mtgetc_(double*, double*); /* mtgeti->mtgetc JMJ, 8/4/2003 */
 extern void collect_(int*, double*, double*); /* OB 13.2.2002 */
 extern void emit_(double*, double*, double*, double*, double*, double*,
 double*, double*, double*, double*, double*, double*, double*, double*);
@@ -967,7 +968,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 2.13";
+char myversion[] = "MAD-X 2.13.8";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

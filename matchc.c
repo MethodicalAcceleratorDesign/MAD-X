@@ -239,7 +239,8 @@ void match_end(struct in_cmd* cmd)
   fprintf(prt_file, "-------------------------------------------------------------------------------\n");
   if (print_match_summary == 1)
     {
-     mtgetc_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); /* mtgeti->mtgetc JMJ, 8/4/2003 */
+/* drop first int* passed variable mtgetc_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); 05.02.2005 */     
+      mtgetc_(vary_vect->a, vary_dvect->a); /* mtgeti->mtgetc JMJ, 8/4/2003 */
     }
   fprintf(prt_file, "\n");
   fprintf(prt_file, "END MATCH SUMMARY\n\n");
