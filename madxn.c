@@ -2432,7 +2432,14 @@ void exec_plot(struct in_cmd* cmd)
 {
   int ierr, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
   char* pt = title;
-  /*
+
+ /* <JMJ 7/11/2002> The following ifndef exclusion is a quick fix so that 
+     the WIN32 version 
+     does not try to do X11 graphics. However this has the consequence that 
+	 the program will not make Postscript files.  HG needs to separate these things.
+  </JMJ 7/11/2002> */
+
+#ifndef _WIN32
   if (nt && current_sequ != NULL) title = current_sequ->name;
   pesopt_(&ierr);
   if (ierr == 0) pefill_(&ierr);
@@ -2443,7 +2450,7 @@ void exec_plot(struct in_cmd* cmd)
      plots_made = 1;
     }
   if (nt) title = pt;
-*/
+#endif
 }
 
 void exec_print(struct in_cmd* cmd)
