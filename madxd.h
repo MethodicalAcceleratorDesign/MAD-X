@@ -751,6 +751,7 @@ void write_align(FILE*, struct double_array*);
 void write_elend(FILE*);
 void write_field(FILE*, struct double_array*);
 void write_elstart(FILE*);
+void cf77flush();
 
 /* Global structure variables by type (alphabetic) */
 
