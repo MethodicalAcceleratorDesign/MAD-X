@@ -3892,7 +3892,7 @@ double line_nodes(struct char_p_array* flat)
      /* creates a linked node list from a flat element list of a line */
 {
   int i, j, k;
-  double pos = zero;
+  double pos = zero, val;
   struct element* el;
   for (j = 0; j < flat->curr; j++)
     {
@@ -3901,14 +3901,15 @@ double line_nodes(struct char_p_array* flat)
      if (strcmp(el->base_type->name, "rfcavity") == 0 &&
          find_element(el->name, current_sequ->cavities) == NULL)
        add_to_el_list(&el, 0, current_sequ->cavities, 0);
-     pos += el->length / 2;
+     val = el_par_value("l", el);
+     pos += val / 2;
      k = 1;
      if ((i = name_list_pos(el->name, occ_list)) < 0)
          i = add_to_name_list(el->name, k, occ_list);
      else k = ++occ_list->inform[i];
      make_elem_node(el, k);
      current_node->at_value = current_node->position = pos;
-     pos += el->length / 2;
+     pos += val / 2;
     }
   return pos;
 }
