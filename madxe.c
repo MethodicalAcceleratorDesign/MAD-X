@@ -331,6 +331,7 @@ void error_efcomp(struct in_cmd* cmd)
   double *nvec;
   double deer;  
   double ref_str;
+  double ref_strn;
   double ref_len;
   double nlength;
   double nvec0, nvec1, nvec2, nvec3;
@@ -477,6 +478,7 @@ void error_efcomp(struct in_cmd* cmd)
               fprintf(prt_file, "====0====>>> %d %f %f \n\n",n,nvec0,nlength);
            }
            ref_str = nvec0*nlength;
+           ref_strn = fabs(nvec0);
          } else if (strcmp(nextnode->base_name,"rbend") == 0) {
            nvec0 = node_value("k0");
            if (get_option("debug")) {
@@ -484,6 +486,7 @@ void error_efcomp(struct in_cmd* cmd)
               fprintf(prt_file, "====0====>>> %d %f %f \n\n",n,nvec0,nlength);
            }
            ref_str = nvec0*nlength;
+           ref_strn = fabs(nvec0);
          } else if (strcmp(nextnode->base_name,"quadrupole") == 0) {
            nvec1 = node_value("k1");
            if (get_option("debug")) {
@@ -491,6 +494,7 @@ void error_efcomp(struct in_cmd* cmd)
               fprintf(prt_file, "====1====>>> %d %f %f \n\n",n,nvec1,nlength);
            }
            ref_str = nvec1*nlength;
+           ref_strn = fabs(nvec1);
          } else if (strcmp(nextnode->base_name,"sextupole") == 0) {
            nvec2 = node_value("k2");
            if (get_option("debug")) {
@@ -498,6 +502,7 @@ void error_efcomp(struct in_cmd* cmd)
               fprintf(prt_file, "====2====>>> %d %f %f \n\n",n,nvec2,nlength);
            }
            ref_str = nvec2*nlength;
+           ref_strn = fabs(nvec2);
          } else if (strcmp(nextnode->base_name,"octupole") == 0) {
            nvec3 = node_value("k3");
            if (get_option("debug")) {
@@ -505,6 +510,7 @@ void error_efcomp(struct in_cmd* cmd)
               fprintf(prt_file, "====3====>>> %d %f %f \n\n",n,nvec3,nlength);
            }
            ref_str = nvec3*nlength;
+           ref_strn = fabs(nvec3);
          }
 
          /*  edbug print out field components , not done for production version
@@ -552,11 +558,11 @@ void error_efcomp(struct in_cmd* cmd)
                    /* if flag for hysteresis correction is set, use coefficients for correction */
                    deer = 0.0;
                    if(hyst == 1) {
-                      deer = h_co_n[j][3]*pow(ref_str,3) + h_co_n[j][2]*pow(ref_str,2) + 
-                             h_co_n[j][1]*pow(ref_str,1) + h_co_n[j][0];
+                      deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + 
+                             h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
                       if (get_option("debug")) 
                       printf("after correction (n): %d %e %e %e %e\n",
-                              j,ref_str,ptr->a[j],deer,(ptr->a[j] + deer));
+                              j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
                    }
 /*
                    if (get_option("debug"))
@@ -580,11 +586,11 @@ void error_efcomp(struct in_cmd* cmd)
                    /* if flag for hysteresis correction is set, use coefficients for correction */
                    deer = 0.0;
                    if(hyst == 1) {
-                      deer = h_co_s[j][3]*pow(ref_str,3) + h_co_s[j][2]*pow(ref_str,2) + 
-                             h_co_s[j][1]*pow(ref_str,1) + h_co_s[j][0];
+                      deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + 
+                             h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
                       if (get_option("debug")) 
                       printf("after correction (s): %d %e %e %e %e\n",
-                              j,ref_str,ptr->a[j],deer,(ptr->a[j] + deer));
+                              j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
                    }
 /*
                    if (get_option("debug"))
