@@ -24,7 +24,7 @@
 /madxreg.h -text
 /madxu.c -text
 /makethin.c -text
-/match.f -text
+/match.F -text
 /match.fi -text
 /matchc.c -text
 /name_len.fi -text
