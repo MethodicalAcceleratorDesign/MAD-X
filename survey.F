@@ -29,7 +29,8 @@
       integer i,j,code,restart_sequ,advance_node
       double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
      &theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
-     &node_value,el,suml,get_value,tilt,globaltilt
+     &node_value,el,suml,get_value,tilt,globaltilt,zero
+      parameter(zero=0d0)
 
 !---- Retrieve command attributes.
       v0(1)=  get_value('survey ','x0 ')
@@ -45,8 +46,8 @@
       psi =  psi0
 
 !---- Set up initial V and W.
-      suml = 0
-      sums = 0.
+      suml = zero
+      sums = zero
       call sumtrx(theta0, phi0, psi0, w0)
       theta = theta0
       phi = phi0
@@ -114,12 +115,15 @@
       phi = atan2(w(2,3), arg)
 !      print *,"SUANGL: phi =",phi," arg=",arg,"  w23 =",w(2,3),
 !     &"  w22 =",w(2,2),"  w21 =",w(2,1)
-      if (arg .gt. 1.0e-20) then
+
+!*****  old procedure commented as incompatiblr with YROT
+!      if (arg .gt. 1.0e-20) then
         theta = proxim(atan2(w(1,3), w(3,3)), theta)
         psi = proxim(atan2(w(2,1), w(2,2)), psi)
-      else
-        psi = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
-      endif
+!      else
+!        theta = atan2(w(1,3), w(3,3))
+!        psi = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
+!      endif
       end
 !-----------------  end of suangl  subroutine -------------------------
 !
@@ -195,7 +199,7 @@
         call get_node_vector('knl ',nn,normal)
         ang = normal(1)
       else
-        ang = 0
+        ang = 0d0
       endif
       call double_to_table('survey ', 'angle ',ang)
 
