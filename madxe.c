@@ -161,8 +161,8 @@ void error_eprint(struct in_cmd* cmd)
            fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
            for(i=0;i<22;i++) {
               fprintf(prt_file, "%8d          %8e      %8e\n",i/2,
-                     1000*nextnode->p_fd_err->a[i],
-                     1000*nextnode->p_fd_err->a[i+1]);
+                     nextnode->p_fd_err->a[i],
+                     nextnode->p_fd_err->a[i+1]);
               i++;
            }
            fprintf(prt_file, "\n");
