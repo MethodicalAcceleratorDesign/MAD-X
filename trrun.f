@@ -117,10 +117,11 @@
         else
           el = l_buf(nlm+1)
           code = code_buf(nlm+1)
-        endif
+        endif 
         if (code .ne. 1 .and. el .ne. zero) then
           sum = node_value('name ')
-          call aafail('TRRUN', 'element with length found')
+          call aafail('TRRUN',
+     &'----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
         endif
         if (switch .eq. 1) then
           nobs = node_value('obs_point ')
