@@ -1,6 +1,7 @@
 /*******************************************************/
 /* the start of the thick to thin lens converter       */
 /*******************************************************/
+/* pre-CVS comments, new comments are now on CVS only */
 /* 20/06/2002 - MH removed ..0 ending from kickers, by putting slice_no=1 in
    the call for create_thin_obj */
 /* 17/06/2002 - MH - added calls to grow_* in create_thin_obj to make sure the 
@@ -353,11 +354,15 @@ void seq_diet_add_sequ(struct node* thick_node, struct sequence* sub_sequ, struc
    which have to be set up explicitly */
 
 struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
-		    struct command_parameter *at_param,   struct command_parameter *from_param,
-		    struct command_parameter *length_param,
-		    struct command_parameter *kn_param,   struct command_parameter *ks_param,
-		    struct command_parameter *apertype_param,
-		    struct command_parameter *aper_param, struct command_parameter *bv_param,
+			       struct command_parameter *at_param,   
+			       struct command_parameter *from_param,
+			       struct command_parameter *length_param,
+			       struct command_parameter *kn_param,   
+			       struct command_parameter *ks_param,
+			       struct command_parameter *apertype_param,
+			       struct command_parameter *aper_param, 
+			       struct command_parameter *bv_param,
+			       struct command_parameter *tilt_param,
 			       int slices, int slice_no)
 {
   struct command* cmd;
@@ -365,7 +370,7 @@ struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
   char *thin_name;
 
   /* set up new multipole command */
-  cmd = new_command(buffer("thin_multipole"), 10, 10, /* max num names, max num param */
+  cmd = new_command(buffer("thin_multipole"), 11, 11, /* max num names, max num param */
 		    buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
 
   cmd->par->parameters[cmd->par->curr] = new_command_parameter("magnet", 2);
@@ -417,6 +422,10 @@ struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
   if (bv_param) {
     cmd->par->parameters[cmd->par->curr] = clone_command_parameter(bv_param);
     add_to_name_list("bv",1,cmd->par_names); cmd->par->curr++;
+  }
+  if (tilt_param) {
+    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(tilt_param);
+    add_to_name_list("tilt",1,cmd->par_names); cmd->par->curr++;
   }
 /* create element with this command */
   if (slices==1 && slice_no==1) {
@@ -501,7 +510,7 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
                         return_param("at",thick_elem),return_param("from",thick_elem),
 			length_param,kn_param,ks_param,return_param_recurse("apertype",thick_elem),
 			return_param_recurse("aperture",thick_elem),return_param("bv",thick_elem),
-		        slices,slice_no);
+			return_param("tilt",thick_elem),slices,slice_no);
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
 }
