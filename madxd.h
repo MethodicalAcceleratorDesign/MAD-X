@@ -120,7 +120,7 @@ extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
 extern void mtsimp_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*);
 extern void myindex(int*, int*, int*, int*, int*, int*, int *, int*);
-extern void res_index_(int*, int*, int*, int*, int indexa[4][], int*);
+extern void res_index_(int*, int*, int*, int*, int indexa[4][1000], int*);
 extern void pefill_(int*);
 extern void pemima_();
 extern void pesopt_(int*);
