@@ -1055,45 +1055,6 @@ void conv_char(char* string, struct int_array* tint)
   for (i = 0; i < n; i++)  tint->i[i+1] = (int) string[i];
 }
 
-void correct_getorbit(struct in_cmd* cmd)
-{
-}
-
-void correct_putorbit(struct in_cmd* cmd)
-{
-  int i;
-  struct name_list* nl;
-  char* filename = command_par_string("file", cmd->clone);
-  char* table_name;
-  current_twiss = clone_command(find_command("twiss", defined_commands));
-  nl = current_twiss->par_names;
-  for (i = 0; i < nl->curr; i++) nl->inform[i] = 0;
-  pro_twiss();
-  table_name = permbuff("orbit");
-  orbit_table = make_table(table_name, orbit_table_cols, 
-  		     orbit_table_types, current_sequ->n_nodes);
-  add_to_table_list(orbit_table, table_register);
-  fill_orbit_table(orbit_table, twiss_table);
-  out_table("orbit", orbit_table, filename);
-  current_twiss = delete_command(current_twiss);
-}
-
-void correct_usekick(struct in_cmd* cmd)
-{
-  char temp[12];
-  int count = set_enable("kicker", cmd);
-  sprintf(temp, "%d", count);
-  put_info(temp, "corrector(s) affected");
-}
-
-void correct_usemonitor(struct in_cmd* cmd)
-{
-  char temp[12];
-  int count = set_enable("monitor", cmd);
-  sprintf(temp, "%d", count);
-  put_info(temp, "monitor(s) affected");
-}
-
 void deco_init()
 {
   expr_chunks = new_name_list(2000);
@@ -5653,30 +5614,6 @@ void process()  /* steering routine: processes one command */
         if (this_cmd->label != NULL) buffer_in_cmd(this_cmd);
         else this_cmd = delete_in_cmd(this_cmd);
        }
-    }
-}
-
-void pro_correct(struct in_cmd* cmd)
-{
-  if (strcmp(cmd->tok_list->p[0], "correct") == 0)
-    {
-     correct_correct(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "usekick") == 0)
-    {
-     correct_usekick(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0)
-    {
-     correct_usemonitor(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)
-    {
-     correct_getorbit(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)
-    {
-     correct_putorbit(cmd);
     }
 }
 
