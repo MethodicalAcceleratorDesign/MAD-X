@@ -2150,13 +2150,21 @@ void exec_option()
 
 void exec_plot(struct in_cmd* cmd)
 {
-  int ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
-  int nointerp = 0, s_haxis = 1;
-  char* pt = title, *haxis_name;
+  int i, j, k, ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
+  int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0; 
+  int title_size = 114, tsm1 = title_size - 1, tsm2 = title_size - 2;
+  int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
+  int size_plot_title = tsm1, size_version = tsm1;
+  int *title_length = &size_plot_title, *version_length = &size_version;
+  char* pt = title, *haxis_name, *vaxis_name, *file_name;
+  char* particle_list;
   struct command* emit = cmd->clone;
   struct name_list* nl_plot;
   struct command_parameter_list* pl_plot;
   char *table_name, *last_twiss_table;
+  char track_file_name[NAME_L], ps_file_name[NAME_L], trkplot_file_name[NAME_L];
+  char plot_title[title_size], version[title_size];
+  FILE *gpu, *gpups;
 
   /* use correct beam for sequence to be plotted - HG 031127 */
   struct command* keep_beam = current_beam;
@@ -2169,8 +2177,19 @@ void exec_plot(struct in_cmd* cmd)
     {
       nl_plot = this_cmd->clone->par_names;
       pl_plot = this_cmd->clone->par;
-      pos = name_list_pos("nointerp", nl_plot);
-      nointerp = nl_plot->inform[pos];
+
+      /* get vaxis_name */
+
+      pos = name_list_pos("vaxis", nl_plot);
+      vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
+
+      /* get interpolation */
+
+      pos = name_list_pos("interpolation", nl_plot);
+      nointerp = 1 - nl_plot->inform[pos];
+
+      /* get haxis_name & s_haxis flag */
+
       pos = name_list_pos("haxis", nl_plot);
       if(nl_plot->inform[pos]) 
 	{
@@ -2179,15 +2198,23 @@ void exec_plot(struct in_cmd* cmd)
 	  s_haxis = strcmp(haxis_name,"s"); 
 	}
 
+      /* get table_name & track_flag */
+
+      pos = name_list_pos("table", nl_plot);
+      if(nl_plot->inform[pos]) /* table name specified */
+	{
+	  if ((table_name = pl_plot->parameters[pos]->string) == NULL)
+	    table_name = pl_plot->parameters[pos]->call_def->string;
+	  if(strcmp(table_name,"track") == 0)
+	    track_flag = 1;
+	}
+      else 
+	table_name = "twiss";
+
+      /* check if table name is the same of the last twiss call if haxis is "s" and no interpolation */
+
       if(nointerp == 0 && s_haxis == 0) 
 	{
-	  pos = name_list_pos("table", nl_plot);
-	  if(nl_plot->inform[pos]) /* table name specified - overrides save */
-	    {
-	      if ((table_name = pl_plot->parameters[pos]->string) == NULL)
-		table_name = pl_plot->parameters[pos]->call_def->string;
-	    }
-	  else table_name = "twiss";
 	  last_twiss_table = current_sequ->tw_table->name;
 	  if(strcmp(table_name,last_twiss_table) != 0)
 	    {
@@ -2196,8 +2223,143 @@ void exec_plot(struct in_cmd* cmd)
 		pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
 	    }
 	}
+
+      /* get file_name */
+
+      pos = name_list_pos("file", nl_plot);
+      if(nl_plot->inform[pos]) /* file name specified */
+	{
+	  if ((file_name = pl_plot->parameters[pos]->string) == NULL)
+	    file_name = pl_plot->parameters[pos]->call_def->string;
+	}
+      else
+	{
+	  if (track_flag) 
+	    file_name = "madx_track";
+	  else
+	    file_name = "madx";	  
+	}
     }
-  embedded_twiss_cmd = cmd;
+
+  /* If table name is "track" use the gnuplot package */
+
+  if (track_flag) 
+    {
+
+      /* get particle */
+
+      pos = name_list_pos("particle", nl_plot);
+      curr = pl_plot->parameters[pos]->m_string->curr;
+      for (i = 0; i < curr; i++)
+	{
+	  particle_list = pl_plot->parameters[pos]->m_string->p[i];
+	  part_idx[i] = atoi(particle_list);
+	}
+
+      /* get multiple */
+
+      pos = name_list_pos("multiple", nl_plot);
+      multiple = nl_plot->inform[pos];
+
+      /* get noversion */
+
+      pos = name_list_pos("noversion", nl_plot);
+      noversion = nl_plot->inform[pos];
+
+      /* get nolegend */
+
+      pos = name_list_pos("nolegend", nl_plot);
+      nolegend = nl_plot->inform[pos];
+
+      /* find the column numbers corresponding to haxis_name & vaxis_name */
+
+      track_cols_length = sizeof(track_table_cols)/4 - 1;
+      for (j = 0; j < track_cols_length; j++)
+	{
+	  if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
+	    haxis_idx = j + 1;
+	  if(strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
+	    vaxis_idx = j + 1;
+	}
+
+      /* build-up the title */
+
+      for (j = 0; j < tsm1; j++)
+	{
+	  plot_title[j] = ' ';
+	  version[j] = ' ';
+	}
+      plot_title[tsm1] = '\0';
+      version[tsm1] = '\0';
+      get_title(plot_title,title_length);
+      for (k = *title_length + 1; k > 0; k--)
+	{
+	  plot_title[k] = plot_title[k - 1];
+	}
+      plot_title[0]= '\"';
+      if (noversion)
+	{
+	  plot_title[*title_length+1] =  '\"';
+	  plot_title[*title_length+2] =  '\0'; 
+	}
+      else
+	{
+	  plot_title[tsm2] =  '\"';
+	  get_version(version,version_length);
+	  k = tsm2 - *version_length;
+	  for (j = k; j < tsm2; j +=1)
+	    {
+	      plot_title[j] = version[j - k];
+	    } 
+	}
+
+      /* build-up the gnuplot command file */
+
+      if (trkplot_flag == 0) 
+	{
+	  mycpy(track_plot_filename,file_name);
+	  sprintf(ps_file_name,track_plot_filename);
+	  strcat(ps_file_name,".ps");
+	  gpu = fopen("gnu_plot.cmd","w");
+	  fprintf(gpu,"set output '%s'\n",ps_file_name);
+	  fprintf(gpu,"set terminal postscript color\n");
+	  fprintf(gpu,"set pointsize 0.48\n");
+	}
+      else
+	{
+	  gpu = fopen("gnu_plot.cmd","a");
+	  fprintf(gpu,"\n");
+	}
+
+      fprintf(gpu,"set title %s\n",plot_title);
+      fprintf(gpu,"set xlabel '%s'\n",haxis_name);
+      fprintf(gpu,"set ylabel '%s'\n",vaxis_name);
+      fprintf(gpu,"plot ");
+      for (j = 0; j < curr; j++)
+	{
+	  sprintf(track_file_name,"track.obs%04d.p%04d", 1, part_idx[j]);
+	  fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
+	  if (nolegend)
+	    fprintf(gpu,"notitle with points %d ",part_idx[j],part_idx[j]); 
+	  else
+	    fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
+	  if (j < curr - 1)
+	    {
+	      if (multiple == 0)
+		fprintf(gpu,"\nplot ");
+	      else
+		fprintf(gpu,", \\\n     ");	
+	    }
+	}
+      fclose(gpu);
+      trkplot_flag = 1;
+    }
+  else
+
+    /* normal plot */
+
+    {
+      embedded_twiss_cmd = cmd;
 
  /* <JMJ 7/11/2002> The following ifndef exclusion is a quick fix so that
      the WIN32 version
@@ -2206,20 +2368,21 @@ void exec_plot(struct in_cmd* cmd)
   </JMJ 7/11/2002> */
   /*FS 27.03.2004 works now on Windows using gxx11ps.F and gxx11psc.c courtesy HG */
 
-  if (nt && current_sequ != NULL) title = current_sequ->name;
-  pesopt_(&ierr);
-  if (ierr == 0)
-    {
-     adjust_beam();
-     probe_beam = clone_command(current_beam);
-     adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-     adjust_rfc(); /* sets freq in rf-cavities from probe */
-     pefill_(&ierr);
-     pemima_();
-     plotit_(&plots_made);
-     plots_made = 1;
+      if (nt && current_sequ != NULL) title = current_sequ->name;
+      pesopt_(&ierr);
+      if (ierr == 0)
+	{
+	  adjust_beam();
+	  probe_beam = clone_command(current_beam);
+	  adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
+	  adjust_rfc(); /* sets freq in rf-cavities from probe */
+	  pefill_(&ierr);
+	  pemima_();
+	  plotit_(&plots_made);
+	  plots_made = 1;
+	}
+      if (nt) title = pt;
     }
-  if (nt) title = pt;
 
   /* part 2 of HG 031127 */
   current_beam = keep_beam;
@@ -3047,19 +3210,28 @@ struct variable* find_variable(char* name, struct var_list* varl)
 void madx_finish()
      /* write the termination message */
 {
-  if (final_message == 0)
-    {
-     final_message = 1;
- /* should work with Lahey on windows 24.03.2004 */
-     if (plots_made) gxterm_();
 
-     if (get_option("trace")) time_stamp("end");
-     printf("\n  ++++++++++++++++++++++++++++++++\n");
-     printf("  + %s finished normally +\n", myversion);
-     printf("  ++++++++++++++++++++++++++++++++\n");
+/* should work with Lahey on windows 24.03.2004 */
+
+if (final_message == 0)
+    {
+      final_message = 1;
+      if (plots_made) 
+	{
+	  gxterm_();
+	}
+      if(trkplot_flag)
+	{
+	  system("gnuplot 'gnu_plot.cmd'");
+	  trkplot_flag = 0;
+	}
+
+      if (get_option("trace")) time_stamp("end");
+      printf("\n  ++++++++++++++++++++++++++++++++\n");
+      printf("  + %s finished normally +\n", myversion);
+      printf("  ++++++++++++++++++++++++++++++++\n");
     }
 }
-
 void madx_init()
      /* initializes program */
 {
@@ -3933,7 +4105,7 @@ void get_version(char* tlt, int* l)
   sprintf(tlt, "  %02d/%02d/%02d %02d.%02d.%02d\n",
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
-  *l = n + 19;
+   *l = n + 19;
 }
 
 double hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
@@ -9412,6 +9584,10 @@ void update_element(struct element* el, struct command* update)
           case 2:
             e_par->double_value = par->double_value;
             e_par->expr = clone_expression(par->expr);
+          /* fix for bv flag start */
+            if (strcmp(e_par->name, "bv") == 0)
+                el->bv = e_par->double_value;
+          /* fix for bv flag end */
             break;
           case 3:
             e_par->string = permbuff(par->string);
