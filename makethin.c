@@ -728,6 +728,8 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
 	       ) {
 	seq_diet_add_elem(thick_node,thin_sequ);
 /*  	delete_node(thick_node); */
+    } else if (strcmp(thick_node->base_name,"drift") == 0) {
+      /* ignore this as it makes no sense to slice */
     } else {
       fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
       seq_diet_add(copy_thin(thick_node),thin_sequ);
