@@ -36,8 +36,8 @@ dynapp.o: dynap.f
 madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
 	$(CC) $(GCCP_FLAGS) -c -o madxnp.o madxn.c
 
-madx: madxnp.o twissp.o surveyp.o orbfp.o utilp.o matchp.o dynapp.o plotp.o ibsdbp.o trrunp.o $(GLIB)/gxx11.o $(GLIB)/gxx11c.o
-	$(FC) $(FP) -o madx madxm.f madxnp.o twissp.o matchp.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o utilp.o $(GLIB)/gxx11.o $(GLIB)/gxx11c.o $(LIBX) -lm -lc
+madx: madxnp.o twissp.o surveyp.o orbfp.o utilp.o matchp.o dynapp.o plotp.o ibsdbp.o trrunp.o gxx11.o gxx11c.o
+	$(FC) $(FP) -o madx madxm.f madxnp.o twissp.o matchp.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o utilp.o gxx11.o gxx11c.o $(LIBX) -lm -lc
 
 ibsdbp.o: ibsdb.f
 	$(FC) $(FCP) -c -o ibsdbp.o ibsdb.f
@@ -54,4 +54,8 @@ orbfp.o: orbf.f
 matchp.o: match.f
 	$(FC) $(FCP) -c -o matchp.o match.f
 
+gxx11.o: gxx11.f
+	$(FC) $(FCP) -c -o gxx11.o gxx11.f
 
+gxx11c.o: gxx11c.c
+	$(CC) $(GCCP_FLAGS) -c -o gxx11c.o gxx11c.c
