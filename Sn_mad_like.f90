@@ -1111,12 +1111,11 @@ CONTAINS
     ELSE
        SOLTILT%K(2)=KQ/FAC(2)    ! MAD FACTOR
        if(madkind2==kind2) then
-          !SOLTILT%KIND=kind17  !KIND5
-          SOLTILT%KIND=kind15 ! special fix by Etienne 04.02.2004
+          SOLTILT%KIND=KIND5 ! special fix by Etienne 04.02.2004
        else
           SOLTILT%KIND=KIND17
-!          SOLTILT%nmul=2
-!          SOLTILT%METHOD=2
+          !          SOLTILT%nmul=2
+          !          SOLTILT%METHOD=2
        endif
     ENDIF
     IF(PRESENT(t)) then
@@ -2618,10 +2617,10 @@ CONTAINS
        s2%h1=s1%h1
        s2%h2=s1%h2
        IF(S2%KIND==KIND3) THEN
-        s2%K3%thin_h_foc=s1%thin_h_foc
-        s2%K3%thin_v_foc=s1%thin_v_foc
-        s2%K3%thin_h_angle=s1%thin_h_angle
-        s2%K3%thin_v_angle=s1%thin_v_angle
+          s2%K3%thin_h_foc=s1%thin_h_foc
+          s2%K3%thin_v_foc=s1%thin_v_foc
+          s2%K3%thin_h_angle=s1%thin_h_angle
+          s2%K3%thin_v_angle=s1%thin_v_angle
        ENDIF
        if(s1%APERTURE_KIND/=0) then
           call alloc(s2%p%aperture)
