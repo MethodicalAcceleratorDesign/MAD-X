@@ -1,4 +1,4 @@
-cl -c /Zm1000 madxn.c
+cl -c /Zm1000 -D_FULL -D_CATCH_MEM madxp.c
 cl -c /Zm1000 gxx11psc.c
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp plot.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp sodd.F
@@ -54,5 +54,7 @@ lf95 -c -o1 -tp madx_ptc_module.f90
 lf95 -c -o1 -tp wrap.f90
 lf95 -c -o1 -tp timest.f90
 lf95 -c -o1 -tp timex.f90
-lf95 -out madx madxm.obj madxn.obj dynap.obj emit.obj twiss.obj match.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
-lf95 -out madxdev madxm.obj madxn.obj dynap.obj emit.obj twiss.obj match.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj e_define_newda.obj f_newda.obj g_newLielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj madx_ptc_module.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_1_pol_template.obj Sb_2_pol_template.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_0_fitted.obj Sg_1_template_my_kind.obj Sg_2_template_my_kind.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj wrap.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
+lf95 -out madx madxm.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
+lf95 -out madxdev madxm.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj e_define_newda.obj f_newda.obj g_newLielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj madx_ptc_module.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_1_pol_template.obj Sb_2_pol_template.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_0_fitted.obj Sg_1_template_my_kind.obj Sg_2_template_my_kind.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj wrap.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
+cl -c /Zm1000 -D_CATCH_MEM madxp.c
+lf95 -out mpars madxm.obj madxp.obj
