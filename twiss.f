@@ -1954,7 +1954,7 @@
         if (sk0s .eq. zero)  then
           tilt = zero
         else
-          tilt = atan2(sk0s, sk0)
+          tilt = asin(sk0s/sqrt(sk0**2 + sk0s**2))
           sk0 = sqrt(sk0**2 + sk0s**2)
           an = sk0 * el
         endif
@@ -2909,7 +2909,7 @@
         if (sk3s .eq. zero)  then
           tilt4 = zero
         else
-          tilt4 = atan2(sk3s, sk3)
+          tilt4 = asin(sk3s/sqrt(sk3**2 + sk3s**2))
         endif
         sk3 = sk3 + bvk * field(1,3)/el
         sk3s = sk3s + bvk * field(2,3)/el
@@ -3071,7 +3071,7 @@
         tilt = zero
       else
         cplxy = cplxy .or. sk1 .ne. zero
-        tilt = atan2(sk1s, sk1) / two
+        tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two
       endif
       sk1 = sk1 + bvk * field(1,1)/el
       sk1s = sk1s + bvk * field(2,1)/el
@@ -3253,7 +3253,7 @@
         exfld = node_value('ex ')
         eyfld = node_value('ey ')
         if (eyfld .ne. zero)  then
-          tilt = atan2(eyfld, exfld)
+          tilt = asin(eyfld/sqrt(exfld**2 + eyfld**2))
           efield = sqrt(exfld**2 + eyfld**2)
         endif
       else
@@ -3419,7 +3419,7 @@
       if (sk2s .eq. zero)  then
         tilt = zero
       else
-        tilt = atan2(sk2s, sk2) / three
+        tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three
         cplxy = cplxy .or. sk2 .ne. zero
       endif
       sk2 = sk2 + bvk * field(1,2)/el
