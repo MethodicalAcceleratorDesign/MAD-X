@@ -2918,7 +2918,9 @@ void madx_finish()
   if (final_message == 0)
     {
      final_message = 1;
+#ifndef _WIN32
      if (plots_made) gxterm_();
+#endif
      if (get_option("trace")) time_stamp("end");
      printf("\n  ++++++++++++++++++++++++++++++++\n");
      printf("  + %s finished normally +\n", myversion);

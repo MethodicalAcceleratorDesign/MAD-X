@@ -6498,6 +6498,11 @@
       call jswn(inormt,window(1),window(2),window(3),window(4))
       end
       subroutine gxterm
+
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_gxterm_' :: gxterm
+#endif
+
       implicit none
 !***********************************************************************
 !

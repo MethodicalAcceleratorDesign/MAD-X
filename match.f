@@ -1,5 +1,32 @@
+      subroutine mtgetc(num,vect,dvect)
+* This is exactly equivalent to mtgeti but this version is used for calling
+* from C.
+*
+* This seems to be the only way deal with the problem that originally the
+* subroutine mtgeti was called both from C and from Fortran.
+* Because madX is setup with Linux-specific name-mangling, the adjustments
+* made with the !DEC$ ATTRIBUTES do not seem able to cope with such a case.
+* Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ
+*
+*
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_mtgetc_' :: mtgetc
+#endif
+      integer  num
+      double precision vect(*),dvect(*)
+      call mtgeti(num,vect,dvect)
+      end
+
       subroutine mtgeti(num,vect,dvect)
+* This subroutine should only be called from Fortran.  There is an
+* equivalent mtgetc for the occasions when it needs to be called from C.
+* Modified at 10:38:56 on 8 Apr 2003 by JMJ
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
       logical psum
       integer num,j,next_vary,get_option,name_l
       parameter(name_l=24)
@@ -40,7 +67,13 @@
   831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
       subroutine mtlimit(num,vect,ireset)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
       integer num,j,next_vary,name_l,ireset
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,                        &
@@ -74,7 +107,14 @@
   831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
       subroutine collect(ncon,fsum,fvect)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+	!DEC$ ATTRIBUTES C, ALIAS:'_collect_' :: collect
+#endif
+
       logical fprt,local,psum
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,double_from_table,    &
@@ -163,6 +203,11 @@
       end
       subroutine mtfcn(nf,nx,x,fval,iflag)
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Compute matching functions.                                        *
@@ -187,7 +232,13 @@
 
  9999 end
       subroutine mtputi(num,vect)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
       integer num,j,next_vary,name_l
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,s_fact
@@ -204,6 +255,9 @@
       end
       subroutine mtlmdf(ncon,nvar,tol,calls,call_lim,vect,dvect,fun_vec,&
      &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,xold)
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_mtlmdf_' :: mtlmdf
+#endif
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -239,7 +293,13 @@
  9999 end
       subroutine lmdif(fcn,m,n,calls,call_lim,x,fvec,epsfcn,diag,factor,&
      &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,fval,xold)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   The purpose of LMDIF is to minimize the sum of the squares of      *
@@ -690,7 +750,13 @@
 
       end
       subroutine qrfac(m,n,a,lda,pivot,ipvt,lipvt,rdiag,acnorm,wa)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   This subroutine uses Householder transformations with column       *
@@ -824,7 +890,14 @@
 
       end
       subroutine lmpar(n,r,ldr,ipvt,diag,qtb,delta,par,x,sdiag,wa1,wa2)
+
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Given an M by N matrix A, an N by N nonsingular diagonal           *
@@ -1203,7 +1276,13 @@
       subroutine mtmigr(ncon,nvar,strategy,tol,calls,call_lim,vect,     &
      &dvect,fun_vect,w_iwa1,w_iwa2,w_iwa3,w_iwa4,w_iwa5,w_iwa6,w_iwa7,  &
      &w_iwa8)
+
       implicit none
+
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_mtmigr_' :: mtmigr
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   MIGRAD command.                                                    *
@@ -1246,6 +1325,11 @@
       subroutine mtmig1(fcn,nf,nx,strategy,tol,calls,call_lim,x,dx,fvec,&
      &covar, wa,work_1,work_2,work_3,work_4,work_5,work_6)
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Minimization by MIGRAD method by Davidon/Fletcher/Powell.          *
@@ -1477,7 +1561,13 @@
       end
       subroutine mthess(fcn,nf,nx,calls,covar,x,grd,g2,fvec,wa,work_1,  &
      &work_2,work_3,work_4,work_5,work_6)
+
       implicit none
+
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Build covariance matrix.                                           *
@@ -1573,7 +1663,13 @@
 
       end
       subroutine mtderi(fcn,nf,nx,calls,x,grd,g2,fvec)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Find first derivatives of penalty function.                        *
@@ -1672,7 +1768,13 @@
 
       end
       subroutine mtline(fcn,nf,nx,calls,x,dx,fvec,xsave,iflag)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Search for minimum along predicted direction.                      *
@@ -1846,7 +1948,13 @@
       end
       subroutine mtsimp(ncon,nvar,tol,calls,call_lim,vect,dvect,        &
      &fun_vect,w_iwa1,w_iwa2,w_iwa3)
+
       implicit none
+
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_mtsimp_' :: mtsimp
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Control routine for simplex minimization; SIMPLEX command.         *
@@ -1879,6 +1987,11 @@
       subroutine mtsim1(fcn,nf,nx,calls,call_lim,tol,x,dx,fvec,psim,    &
      &fsim,wa)
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Minimization using the SIMPLEX method by Nelder and Mead.          *

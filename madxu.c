@@ -3075,7 +3075,7 @@ void write_table(struct table* t, char* filename)
   strcpy(sys_name, u.sysname);
 #endif
 #ifdef _WIN32
-  strcpy(sys_name, "Windows");
+  strcpy(sys_name, "Win32");
 #endif
   time(&now);    /* get system time */
   tm = localtime(&now); /* split system time */

@@ -1,6 +1,12 @@
       subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
      &nemit_v, bmax, gmax, dismax, tunes, sig_v, pdamp)
       implicit none
+
+#ifdef _WIN32
+      include 'win32calls.fi'
+      !DEC$ ATTRIBUTES C, ALIAS:'_emit_' :: emit
+#endif
+
 *----------------------------------------------------------------------*
 * Purpose:                                                             *
 *   Compute emittances by A. Chao's method.                            *
@@ -177,6 +183,11 @@
       subroutine emsumm(comand, rd, em, bmax, gmax, dismax,stabt,frad,  &
      &u0, emit_v, nemit_v, tunes, sig_v, pdamp)
       implicit none
+
+#ifdef _WIN32
+      include 'win32calls.fi'
+#endif
+
 *----------------------------------------------------------------------*
 * Purpose:                                                             *
 *   Finish radiation damping calculation and print summary.            *
@@ -384,6 +395,11 @@
       end
       subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
       implicit none
+
+#ifdef _WIN32
+      include 'win32calls.fi'
+#endif
+
 *---------------------------------------------------------------------*
 * Purpose:                                                            *
 *   Deal with radiation damping in an element.                        *

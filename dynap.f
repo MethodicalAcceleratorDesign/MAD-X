@@ -2,6 +2,13 @@
       subroutine dynap(eigen, coords, turns, npart, distvect, zn,dq,    &
      &onelog, turnnumber)
       implicit none
+
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+        !DEC$ ATTRIBUTES C, ALIAS:'_dynap_' :: dynap
+#endif
+
       integer turns,npart
       double precision eigen(6,6),coords(6,0:turns,*),get_value
       double precision zn(turns,6), distvect(turns),dq(2*turns),        &
@@ -35,6 +42,11 @@
 !**********************************************************************
       subroutine dynapfill()
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   writes the dynap output in the table "dynap"                       *
@@ -84,6 +96,11 @@
 !**********************************************************************
       subroutine dynaptunefill
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   writes the dynap tunes in the table "dynaptune"                    *
@@ -114,7 +131,12 @@
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
      &turnnumber,dq)
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !
@@ -222,7 +244,11 @@
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine fft(data, nn, isign)
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Computes the FFT                                                   *
@@ -297,7 +323,12 @@
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Computes the tune using formula (18) of CERN SL/95-84 (AP).        *
@@ -358,7 +389,12 @@
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Computes the tune using the interpolated FFT with Hanning filter.  *
@@ -434,6 +470,11 @@
       double precision function fitlyap(distvect, onelog, turnnumber,   &
      &nturn)
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Computes interpolated Lyapunov exponent.
@@ -495,7 +536,12 @@
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine wmaxmin(track,eigen,znt)
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Computes maximum and minimum betatron invariants during tracking.  *

@@ -28,6 +28,11 @@
 
       subroutine enprgl
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Print global data for machine.                                     *
@@ -74,7 +79,12 @@
       end
 ! *************************************************************
       subroutine cavprt()
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
       integer i,lg,code,get_string,restart_sequ,advance_node
       double precision get_value,node_value,el,rfv,rff,rfl,deltap
       include 'name_len.fi'
@@ -100,6 +110,11 @@
 ! *********************************************************************
       subroutine twclog(bxbar, bybar, const)
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Calculation of Coulomb logarithm (and print)                       *
@@ -207,7 +222,14 @@
       end
 ! *********************************************************************
       subroutine ibs
+
       implicit none
+
+#ifdef _WIN32
+        !DEC$ ATTRIBUTES C, ALIAS:'_ibs_' :: ibs
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   INTRABEAM SCATTERING, IBS Command                                  *
@@ -527,7 +549,13 @@
       end
 ! *********************************************************************
       subroutine twsint(betax, betay, alx, dx, dpx, txi, tyi, tli)
+
       implicit none
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Subroutine uses Simpson's rule integration                         *

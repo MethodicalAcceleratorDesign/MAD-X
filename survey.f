@@ -1,6 +1,13 @@
 !  Routines for the survey command in MADX / A. Verdier (started October 2001)
       subroutine survey
+
+
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+        !DEC$ ATTRIBUTES C, ALIAS:'_survey_' :: survey
+#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Execute SURVEY command.                                            *
@@ -18,6 +25,7 @@
 !   ENERGY from BEAM common, and call TMLCAV for each one to update    *
 !   ENERGY                                                             *
 !----------------------------------------------------------------------*
+
       integer i,j,code,restart_sequ,advance_node
       double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
      &theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
@@ -147,12 +155,15 @@
       end
 !-----------------  end of sutrak subroutine --------------------------
 !
-!
-!**********************************************************************
 
 !**********************************************************************
       subroutine sufill(suml,v, theta, phi, psi,globaltilt)
+
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   writes the survey output in the table "survey"                     *

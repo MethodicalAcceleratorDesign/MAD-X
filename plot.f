@@ -599,6 +599,12 @@
       endif
       end
       subroutine pefill(ierr)
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   fill plot arrays with coordinate values, set up machine plot
@@ -1585,6 +1591,12 @@
   999 continue
       end
       subroutine peintp(crow, nint, type, proc, telpar, ierr)
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
+
 !----------------------------------------------------------------------*
 ! purpose:
 !   interpolate variables plotted against s
@@ -1836,6 +1848,12 @@
       endif
   999 end
       subroutine pelfill(tabname, type, row, n, a)
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Returns element parameters needed for plotting
@@ -2081,6 +2099,12 @@
       enddo
       end
       subroutine peplot
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Plot all types of graphs from MAD.
@@ -2709,6 +2733,11 @@
       endif
       end
       subroutine pesopt(ierr)
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Stores plot options and values, checks
@@ -3058,6 +3087,11 @@
       enddo
       end
       subroutine plginit
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Overall initialization

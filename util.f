@@ -1,16 +1,28 @@
       subroutine fort_info(t1, t2)
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
       character *(*) t1, t2
       integer get_option
       if (get_option('info ') .ne. 0 .and. get_option('warn ') .ne. 0)  &
      &print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
       end
       subroutine fort_warn(t1, t2)
+
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
+
       character *(*) t1, t2
       integer get_option
       if (get_option('warn ') .ne. 0)                                   &
      &print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
       end
       subroutine getclor(orbit0, rt, tt, error)
+
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Get periodic closed orbit (e.g. at start of Twiss),
@@ -23,6 +35,11 @@
 !   error       (int)   error flag (0: OK, else != 0)
 !----------------------------------------------------------------------*
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+	!DEC$ ATTRIBUTES C, ALIAS:'_getclor_' :: getclor
+#endif
+
       include 'twiss0.fi'
       double precision orbit0(6), rt(6,6), tt(6,6,6)
       double precision opt(fundim)
@@ -830,12 +847,17 @@
 
       end
       double precision function proxim(x,y)
+
+
 !----------------------------------------------------------------------*
 !   Proximity function of x and y.                                     *
 !   If angle is larger than pi between vector x and y, 2pi is added to *
 !   to this angle                                                      *
 !----------------------------------------------------------------------*
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
       double precision x,y,twopi,get_variable
 
       twopi=get_variable('twopi ')
@@ -1541,7 +1563,14 @@
  9999 end
 
       subroutine suelem(el, ve, we,tilt)
+
+
+
       implicit none
+#ifdef _WIN32
+	include 'win32calls.fi'
+#endif
+
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Compute Displacement and rotation for one element.                 *

@@ -1,4 +1,5 @@
       subroutine setup(resp,a,im,ic,nm,nc)
+
 ! ****************************************************
 !                                                    *
 !    Set DOUBLE PRECISION (A)                        *
@@ -9,6 +10,11 @@
 !                                                    *
 ! ****************************************************
       implicit none
+
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_setup_' :: setup
+	include 'win32calls.fi'
+#endif
       integer im,ic,nm,nc
       double precision resp,a(nm, nc)
 
@@ -20,6 +26,8 @@
 
       subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
      &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
+
+
 ! ****************************************************
 !                                                    *
 !    Driving routine for MICADO correction           *
@@ -29,6 +37,11 @@
 ! ****************************************************
 
       implicit none
+
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_micit_' :: micit
+	include 'win32calls.fi'
+#endif
       integer im,ic,iter,i,j,nx(ic),ny(ic)
       real rms,ax(im,ic),cinx(ic),xinx(im),resx(im),rho(3*ic),ptop(ic), &
      &rmss(ic),xrms(ic),xptp(ic),xiter(ic),rzero
@@ -77,6 +90,11 @@
 !                                                    *
 ! ****************************************************
       implicit none
+
+#ifdef _WIN32
+	!DEC$ ATTRIBUTES C, ALIAS:'_haveit_' :: haveit
+#endif
+
       integer im,ic,nx(ic),i,j
       double precision a(im,ic),xin(im),cin(ic),res(im),cb(ic),         &
      &xmeas(im),xres(im),y(ic,im),z(ic,ic),xd(ic),zero
@@ -1845,7 +1863,12 @@ c           write(61,53)
       stop 888
       end
       subroutine dmmpy(m,n,x,x12,x21,y,y2,z,z2)
+
+
       implicit none
+#ifdef _WIN32
+      include 'win32calls.fi'
+#endif
       integer m,n,ix,jx,jy,iz,lxi1,lzi,i,lxij,lyj,j,locf
       double precision x(*),x12(*),x21(*),y(*),y2(*),z(*),z2(*),sum,zero
       parameter(zero=0d0)
@@ -1873,7 +1896,12 @@ c           write(61,53)
       return
       end
       subroutine dmmlt(m,n,k,x,x12,x21,y,y12,y21,z,z12,z21,t)
+
+
       implicit none
+#ifdef _WIN32
+      include 'win32calls.fi'
+#endif
       integer m,n,k,ix,jx,jy,iz,lz,ly1l,lz1l,l,lxi1,lzil,i,lxij,lyjl,   &
      &j,locf,lzii,lxk1,lzik,kdash,lxkj,ltl,lxil,lti,lyil,lxii,ltk,lxik, &
      &lxki,locx,locy,ly,lzki,locz

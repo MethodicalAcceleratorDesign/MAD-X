@@ -1,3 +1,4 @@
+#ifndef _WIN32
 #define advance_node          advance_node_
 #define advance_to_pos        advance_to_pos_
 #define augment_count         augment_count_
@@ -51,6 +52,7 @@
 #define vector_to_table       vector_to_table_
 #define vdot                  vdot_
 #define vmod                  vmod_
+#endif
 
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
@@ -64,7 +66,7 @@ int str_pos(const char s[], char c)
 /* Fortran routines called from C */
 extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
                    double*, double*);
-extern void mtgeti_(int*, double*, double*);
+extern void mtgetc_(int*, double*, double*);               /* mtgeti->mtgetc JMJ, 8/4/2003 */
 extern void collect_(int*, double*, double*); /* OB 13.2.2002 */
 extern void emit_(double*, double*, double*, double*, double*, double*,
 double*, double*, double*, double*, double*, double*, double*, double*);
@@ -894,7 +896,7 @@ int plots_made = 0;         /* set to 1 if plots are made */
 int polish_cnt = 0;         /* used to detect infinite loops */
 int print_match_summary = 0;/* OB 6.3.2002:
                activate the print option in the
-               'mtgeti' and 'collect' routines */
+               'mtgeti' and 'collect' routines (mtgeti->mtgetc JMJ, 8/4/2003)    */
 int quote_toggle = 0;       /* for quote strings on input */
 int return_flag = 0;        /* 1 when "return" read */
 int scrap_count = 0;        /* running counter to make things unique */
