@@ -54,6 +54,7 @@ char predef_constants[] =
 /* threader tolerances and maxima: xmax,ymax:  orbit excursion at which
    threader is switched on; att: attenuation factor for kicks.
 */
+/* FS 15.03.2004: initial matrix for ptc_twiss, preparation of Touschek */
 char command_def[] =
 "antiproton: data none 0 0 "  /* comment allowed outside quotes */
 "mass     = [r, pmass], "
@@ -313,7 +314,21 @@ char command_def[] =
 "icase = [i, 4], "
 "no = [i, 1], "
 "closed_orbit = [l, false, true], "
-"deltap = [r, 0]; "
+"deltap = [r, 0], "
+"range    = [s, #s/#e, none], "
+"initial_matrix = [l, false, true], "
+"re11     = [r, 1], re12     = [r, 0], re13     = [r, 0], "
+"re14     = [r, 0], re15     = [r, 0], re16     = [r, 0], "
+"re21     = [r, 0], re22     = [r, 1], re23     = [r, 0], "
+"re24     = [r, 0], re25     = [r, 0], re26     = [r, 0], "
+"re31     = [r, 0], re32     = [r, 0], re33     = [r, 1], "
+"re34     = [r, 0], re35     = [r, 0], re36     = [r, 0], "
+"re41     = [r, 0], re42     = [r, 0], re43     = [r, 0], "
+"re44     = [r, 1], re45     = [r, 0], re46     = [r, 0], "
+"re51     = [r, 0], re52     = [r, 0], re53     = [r, 0], "
+"re54     = [r, 0], re55     = [r, 1], re56     = [r, 0], "
+"re61     = [r, 0], re62     = [r, 0], re63     = [r, 0], "
+"re64     = [r, 0], re65     = [r, 0], re66     = [r, 1]; "
 " "
 "ptc_normal: ptc_normal none 0 0 "
 "icase = [i, 4], "
@@ -1097,7 +1112,7 @@ char command_def[] =
 "h2       = [r, 0], "
 "hgap     = [r, 0], "
 "fint     = [r, 0, 0.5], "
-"fintx    = [r, -1], "
+"fintx    = [r, -1.0], "
 "k3       = [r, 0], "
 "k3s      = [r, 0], "
 "fcsr     = [r, 0], "
@@ -1285,6 +1300,11 @@ char command_def[] =
 "ibs: ibs none 0 0 "
 "tolerance= [r, 1.e-7], "
 "file     = [s, ibs, ibs], "
+"steps    = [i, 50];"
+" "
+"touschek: touschek none 0 0 "
+"tolerance= [r, 1.e-7], "
+"file     = [s, touschek, touschek], "
 "steps    = [i, 50];"
 " "
 "makethin: makethin none 0 0 "
