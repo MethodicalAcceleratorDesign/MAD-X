@@ -1822,7 +1822,7 @@ c           write(61,53)
       subroutine tmprnt(name,n,idim,k)
       implicit none
       logical mflag,rflag
-      integer idim,k,n,ifmt,lgfile
+      integer idim,k,n,ifmt
       character*6 name
 
       mflag=.true.
@@ -1830,7 +1830,6 @@ c           write(61,53)
       if(name(3:6) .eq. 'FEQN') ifmt=1001
       if(name(3:6) .ne. 'FEQN') ifmt=1002
       if(mflag) then
-        if(lgfile .eq. 0) then
           if(name(3:6) .eq. 'feqn') then
             if(ifmt.eq.1001) write(*,1001) name, n, idim, k
             if(ifmt.eq.1002) write(*,1002) name, n, idim, k
@@ -1838,15 +1837,6 @@ c           write(61,53)
             if(ifmt.eq.1001) write(*,1001) name, n, idim
             if(ifmt.eq.1002) write(*,1002) name, n, idim
           endif
-        else
-          if(name(3:6) .eq. 'feqn') then
-            if(ifmt.eq.1001) write(lgfile,1001) name, n, idim, k
-            if(ifmt.eq.1002) write(lgfile,1002) name, n, idim, k
-          else
-            if(ifmt.eq.1001) write(lgfile,1001) name, n, idim
-            if(ifmt.eq.1002) write(lgfile,1002) name, n, idim
-          endif
-        endif
       endif
       if(.not. rflag) call abend
       return
