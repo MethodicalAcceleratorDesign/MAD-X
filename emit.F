@@ -456,7 +456,7 @@
       else
         el = node_value('l ')
       endif
-      if (el. eq. zero)  goto 500
+      if (el. eq. zero.and.code .ne. 10) goto 500
       betas = get_value('probe ','beta ')
       gammas = get_value('probe ','gamma ')
 !---- Switch on element type.
