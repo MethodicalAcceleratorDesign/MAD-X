@@ -3352,3 +3352,9 @@ int zero_string(char* string) /* returns 1 if string defaults to '0', else 0 */
   return 1;
 }
 
+int cf77flush()
+#include <stdio.h>
+{
+fflush(stdout);
+fflush(stderr);
+}
