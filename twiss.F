@@ -20,7 +20,6 @@
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
      &ddisp0(6),r0mat(2,2),zero,one,two,get_value
       parameter(zero=0d0,one=1d0,two=2d0)
-      character*48 charconv
       data izero, ione / 0, 1 /
 
 !---- Initialization

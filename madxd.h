@@ -509,6 +509,7 @@ void pro_sxf(struct in_cmd*);
 void pro_survey(struct in_cmd*);
 void pro_track(struct in_cmd*);
 void pro_twiss();
+void pro_ptc_twiss();
 void put_info(char*, char*);
 struct table* read_table(struct in_cmd*);
 int remove_colon(char**, int, int);

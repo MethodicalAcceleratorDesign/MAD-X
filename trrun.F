@@ -603,7 +603,7 @@
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
      &f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
      &ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half,lrad    &
+     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half
 
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
       save first,ordinv

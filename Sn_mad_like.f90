@@ -36,6 +36,7 @@ module Mad_like
   character(80) file_fitted
   !  type(layout),save::mad_list
   type(layout),private::mad_list
+  LOGICAL(LP) :: CURVED_ELEMENT=.FALSE.  !  TO SET UP BEND_FRINGE CORRECTLY FOR EXACT
 
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
@@ -1251,16 +1252,19 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L,angle,E1,E2
     real(dp) L1,ANG1,E11,E22
+    CURVED_ELEMENT=.TRUE.
     L1=zero
     ANG1=zero
     E11=zero
     E22=zero
-
     IF(PRESENT(L)) L1=L
     IF(PRESENT(angle)) ANG1=angle
 
     IF(PRESENT(E1)) E11=E1
     IF(PRESENT(E2)) E22=E2
+
+
+
 
     if(present(list)) then
        SBTILT=list
@@ -1447,7 +1451,7 @@ CONTAINS
     IF(PRESENT(E1)) E11=E1
     IF(PRESENT(E2)) E22=E2
 
-    IF(MADLENGTH) THEN
+    IF(MADLENGTH.or.ang1==zero) THEN
        L1=LM
     ELSE
        L1=two*LM*SIN(ANG1/two)/ANG1
@@ -1455,44 +1459,53 @@ CONTAINS
 
     RECTTILT=0
     RECTTILT%B0=two*SIN(ANG1/two)/L1
-    IF(ANG1==zero) THEN
-       RECTTILT%L=L1
-       RECTTILT%LD=L1
-       RECTTILT%LC=L1
-    ELSE
-       IF(EXACT_MODEL) THEN
-          if(verbose) then
-             w_p=0
-             w_p%nc=2
-             w_p%fc='((1X,a72,/,1x,a72))'
-             w_p%c(1)= NAME
-             w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
-             call write_i
-          endif
+    !    IF(ANG1==zero) THEN
+    !       RECTTILT%L=L1
+    !       RECTTILT%LD=L1
+    !       RECTTILT%LC=L1
+    !    ELSE
+    IF(EXACT_MODEL) THEN
+       if(verbose) then
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72,/,1x,a72))'
+          w_p%c(1)= NAME
+          w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
+          call write_i
+       endif
+       if(ang1==zero) then
+          RECTTILT%LD=L1
+       else
           RECTTILT%LD=ANG1/RECTTILT%B0
-          RECTTILT%L=L1
-          RECTTILT%LC=L1
-          RECTTILT%K(1)=RECTTILT%B0
-          if(LIKEMAD) then
-             RECTTILT%T1=ANG1/two+E11    !one
-             RECTTILT%T2=ANG1/two+E22    !zero
-          else
-             RECTTILT%T1=ANG1/two+E11    !one
-             RECTTILT%T2=ANG1/two+E22    !zero
+       endif
+       RECTTILT%L=L1
+       RECTTILT%LC=L1
+       RECTTILT%K(1)=RECTTILT%B0
+       if(LIKEMAD) then
+          RECTTILT%T1=ANG1/two+E11    !one
+          RECTTILT%T2=ANG1/two+E22    !zero
+       else
+          RECTTILT%T1=ANG1/two+E11    !one
+          RECTTILT%T2=ANG1/two+E22    !zero
 
-             !             RECTTILT%T1=one   !wrong???
-             !             RECTTILT%T2=zero
-          endif
-          RECTTILT%nmul=2
+          !             RECTTILT%T1=one   !wrong???
+          !             RECTTILT%T2=zero
+       endif
+       RECTTILT%nmul=2
+    ELSE
+       RECTTILT%LC=L1
+       IF(ANG1==ZERO) THEN
+          RECTTILT%L=L1
+          RECTTILT%LD=L1
        ELSE
-          RECTTILT%LC=L1
           RECTTILT%L=ANG1/RECTTILT%B0
           RECTTILT%LD=ANG1/RECTTILT%B0
-          RECTTILT%T1=ANG1/two+E11 ; RECTTILT%T2=ANG1/two+E22;
-          RECTTILT%K(1)=RECTTILT%B0 ! NEW IMPLEMENTATION FOR DIR=-1
-          RECTTILT%nmul=2   ! 0 before
        ENDIF
+       RECTTILT%T1=ANG1/two+E11 ; RECTTILT%T2=ANG1/two+E22;
+       RECTTILT%K(1)=RECTTILT%B0 ! NEW IMPLEMENTATION FOR DIR=-1
+       RECTTILT%nmul=2   ! 0 before
     ENDIF
+    !    ENDIF
     IF(LEN(NAME)>nlp) THEN
        w_p=0
        w_p%nc=2
@@ -1535,7 +1548,7 @@ CONTAINS
     E11=LIST%T1
     E22=LIST%T2
 
-    IF(MADLENGTH) THEN
+    IF(MADLENGTH.OR.ANG1==ZERO) THEN
        L1=LM
     ELSE
        L1=two*LM*SIN(ANG1/two)/ANG1
@@ -1543,43 +1556,52 @@ CONTAINS
 
     RECTTILT_MADX=LIST
     RECTTILT_MADX%B0=two*SIN(ANG1/two)/L1
-    IF(ANG1==zero) THEN
-       RECTTILT_MADX%L=L1
-       RECTTILT_MADX%LD=L1
-       RECTTILT_MADX%LC=L1
-    ELSE
-       IF(EXACT_MODEL) THEN
-          if(verbose) then
-             w_p=0
-             w_p%nc=2
-             w_p%fc='((1X,a72,/,1x,a72))'
-             w_p%c(1)= NAME
-             w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
-             call write_i
-          endif
+    !    IF(ANG1==zero) THEN
+    !       RECTTILT_MADX%L=L1
+    !       RECTTILT_MADX%LD=L1
+    !       RECTTILT_MADX%LC=L1
+    !    ELSE
+    IF(EXACT_MODEL) THEN
+       if(verbose) then
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72,/,1x,a72))'
+          w_p%c(1)= NAME
+          w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
+          call write_i
+       endif
+       if(ang1==zero) then
+          RECTTILT_MADX%LD=L1
+       else
           RECTTILT_MADX%LD=ANG1/RECTTILT_MADX%B0
+       endif
+       RECTTILT_MADX%L=L1
+       RECTTILT_MADX%LC=L1
+       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0
+       if(LIKEMAD) then
+          RECTTILT_MADX%T1=ANG1/two+E11    !one
+          RECTTILT_MADX%T2=ANG1/two+E22    !zero
+       else
+          RECTTILT_MADX%T1=ANG1/two+E11    !one
+          RECTTILT_MADX%T2=ANG1/two+E22    !zero
+          !             RECTTILT_MADX%T1=one   !wrong???
+          !             RECTTILT_MADX%T2=zero
+       endif
+       RECTTILT_MADX%nmul=2
+    ELSE
+       RECTTILT_MADX%LC=L1
+       IF(ANG1==ZERO) THEN
           RECTTILT_MADX%L=L1
-          RECTTILT_MADX%LC=L1
-          RECTTILT_MADX%K(1)=RECTTILT_MADX%B0
-          if(LIKEMAD) then
-             RECTTILT_MADX%T1=ANG1/two+E11    !one
-             RECTTILT_MADX%T2=ANG1/two+E22    !zero
-          else
-             RECTTILT_MADX%T1=ANG1/two+E11    !one
-             RECTTILT_MADX%T2=ANG1/two+E22    !zero
-             !             RECTTILT_MADX%T1=one   !wrong???
-             !             RECTTILT_MADX%T2=zero
-          endif
-          RECTTILT_MADX%nmul=2
+          RECTTILT_MADX%LD=L1
        ELSE
-          RECTTILT_MADX%LC=L1
           RECTTILT_MADX%L=ANG1/RECTTILT_MADX%B0
           RECTTILT_MADX%LD=ANG1/RECTTILT_MADX%B0
-          RECTTILT_MADX%T1=ANG1/two+E11 ; RECTTILT_MADX%T2=ANG1/two+E22;
-          RECTTILT_MADX%K(1)=RECTTILT_MADX%B0 ! NEW IMPLEMENTATION FOR DIR=-1
-          RECTTILT_MADX%nmul=2   ! 0 before
        ENDIF
+       RECTTILT_MADX%T1=ANG1/two+E11 ; RECTTILT_MADX%T2=ANG1/two+E22;
+       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0 ! NEW IMPLEMENTATION FOR DIR=-1
+       RECTTILT_MADX%nmul=2   ! 0 before
     ENDIF
+    !    ENDIF
     IF(LEN(NAME)>nlp) THEN
        w_p=0
        w_p%nc=2
@@ -1606,12 +1628,33 @@ CONTAINS
     type (TILTING), optional,INTENT(IN):: T
     real(dp) ANGE,SPE
     real(dp) LM1,ANG1,ANGI1,e11,e22
+    integer tempkind
 
+    CURVED_ELEMENT=.TRUE.
 
     E11=zero
     E22=zero
+    tempkind=madkind2
+    IF(PRESENT(ANGLE)) THEN
+       if(ANGLE==zero) then
+          madkind2=kind2
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72,/),(1x,a72))'
+          w_p%c(1)=name
+          WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
+          call write_i
 
-
+       endif
+    ELSE
+       madkind2=kind2
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
+       call write_i
+    ENDIF
     IF((PRESENT(E1).AND.PRESENT(E2)).OR.(.NOT.PRESENT(E1).AND.(.NOT.PRESENT(E2))) ) THEN !1
        if(present(e1).and.present(e2)) THEN
           IF(EXACT_MODEL) LIKEMAD=.true.
@@ -1644,11 +1687,19 @@ CONTAINS
           rectaETILT%L=LM1
           rectaETILT%LC=rectaETILT%L/COS(SPE)
           rectaETILT%B0=two*SIN(ANG1/two)/rectaETILT%LC
-          rectaETILT%LD=ANG1/rectaETILT%B0
+          if(ang1/=zero) then
+             rectaETILT%LD=ANG1/rectaETILT%B0
+          else
+             rectaETILT%LD=rectaETILT%LC
+          endif
        ELSE
           rectaETILT%LD=LM1
           rectaETILT%B0=ANG1/rectaETILT%LD
-          rectaETILT%LC=two*SIN(ANG1/two)/rectaETILT%B0
+          if(ang1/=zero) then
+             rectaETILT%LC=two*SIN(ANG1/two)/rectaETILT%B0
+          else
+             rectaETILT%LC=rectaETILT%LD
+          endif
           rectaETILT%L=rectaETILT%LC*COS(SPE)
        ENDIF
 
@@ -1698,6 +1749,7 @@ CONTAINS
        endif
 
     ENDIF !1
+    madkind2=TEMPKIND
 
   END FUNCTION rectaETILT
 
@@ -1711,6 +1763,7 @@ CONTAINS
     real(dp) ANGE,SPE
     real(dp) LM1,ANG1,ANGI1,e1,e2
 
+    CURVED_ELEMENT=.TRUE.
 
     E1=LIST%T1
     E2=LIST%T2
@@ -2408,14 +2461,18 @@ CONTAINS
     IF(.NOT.DONE) S2 = S1%NMUL
 
     S2%P%B0=S1%B0
-    if(S2%P%B0/=0.d0) S2%P%bend_fringe=.true.
+    !    if(S2%P%B0/=0.d0) S2%P%bend_fringe=.true.
+    IF(CURVED_ELEMENT) THEN
+       S2%P%bend_fringe=.true.
+       CURVED_ELEMENT=.FALSE.
+    ENDIF
     S2%KIND=S1%KIND; S2%P%METHOD=S1%METHOD ;        S2%P%NST=S1%NST ;
     S2%NAME=S1%NAME        ;S2%VORNAME=S1%VORNAME ;S2%L =S1%L ;S2%P%LD=S1%LD;S2%P%LC=S1%LC;
 
     S2%PERMFRINGE=S1%PERMFRINGE
     S2%P%KILL_EXI_FRINGE=S1%KILL_EXI_FRINGE
     S2%P%KILL_ENT_FRINGE=S1%KILL_ENT_FRINGE
-!    S2%P%BEND_FRINGE=S1%BEND_FRINGE
+    !    S2%P%BEND_FRINGE=S1%BEND_FRINGE    ! SET ON THE BASIS OF B0
 
     DO I=1,S2%P%NMUL
        S2 %BN(I)=flip*S1%K(I) ;S2 %AN(I)=flip*S1%KS(I)
@@ -2532,6 +2589,15 @@ CONTAINS
     if(S2%KIND==KIND10) then
        S2%TP10%DRIFTKICK=DRIFT_KICK
        IF(madkind2==kind6.or.madkind2==kind7)   S2%TP10%DRIFTKICK=.FALSE.   ! 2002.11.04
+       IF(S2%p%b0==zero)   then
+          S2%TP10%DRIFTKICK=.true.
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72,/),(1x,a72))'
+          w_p%c(1)=S2%name
+          WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', S2%name,' CHANGED TO DRIFT-KICK '
+          call write_i
+       endif
     endif
 
     if(S2%KIND==KIND16.OR.S2%KIND==KIND20) then
@@ -2628,6 +2694,7 @@ CONTAINS
     c_%check_y_min => check_y_min
     c_%check_y_max => check_y_max
     c_%hyperbolic_aperture => hyperbolic_aperture
+    c_%WATCH_USER => WATCH_USER
 
 
 

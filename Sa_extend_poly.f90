@@ -9,6 +9,10 @@ module S_extend_poly
   private real_8REAL6,REAL6real_8,env_8map,real_8REAL_8,env_8benv
   private print6,PRINTenv
   private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8,scdadd,daddsc
+
+  LOGICAL(lp) :: ALLOW_TRACKING=.true.
+  LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
+
   LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
@@ -50,6 +54,15 @@ CONTAINS
 
   SUBROUTINE RESET_APERTURE_FLAG
     IMPLICIT NONE
+    IF(c_%WATCH_USER) THEN
+       IF(.NOT.ALLOW_TRACKING) THEN
+          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
+          WRITE(6,*) "  YOU DID NOT CHECK THE APERTURE STATUS"
+          WRITE(6,*) "  USING A CALL TO PRODUCE_APERTURE_FLAG"
+          WRITE(6,*) "  BEFORE CALLING A TRACKING FUNCTION"
+          STOP 666
+       ENDIF
+    ENDIF
     c_%CHECK_STABLE =.TRUE.
     c_%CHECK_MADX_APERTURE =.TRUE.
     c_%check_iteration =.TRUE.
@@ -87,41 +100,43 @@ CONTAINS
     I=0
     B=1
     IF(.NOT.c_%CHECK_STABLE) THEN
-       I=B+I 
+       I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%CHECK_MADX_APERTURE) THEN   
-       I=B+I     
+    IF(.NOT.c_%CHECK_MADX_APERTURE) THEN
+       I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%check_iteration) THEN   
-       I=B+I     
+    IF(.NOT.c_%check_iteration) THEN
+       I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%check_interpolate_x) THEN   
-       I=B+I     
+    IF(.NOT.c_%check_interpolate_x) THEN
+       I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%check_interpolate_y) THEN   
-       I=B+I     
+    IF(.NOT.c_%check_interpolate_y) THEN
+       I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%check_x_min) THEN   
-       I=B+I     
+    IF(.NOT.c_%check_x_min) THEN
+       I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%check_x_max) THEN   
-       I=B+I     
+    IF(.NOT.c_%check_x_max) THEN
+       I=B+I
     ENDIF
     B=B*2
     IF(.NOT.c_%check_y_min) THEN
-       I=B+I     
+       I=B+I
     ENDIF
     B=B*2
     IF(.NOT.c_%check_y_max) THEN
-       I=B+I     
+       I=B+I
     ENDIF
     B=B*2
+
+    ALLOW_TRACKING=.TRUE.
 
   END   SUBROUTINE PRODUCE_APERTURE_FLAG
 
@@ -138,6 +153,19 @@ CONTAINS
     ENDIF
 
   END FUNCTION ROOT
+
+  REAL(DP) FUNCTION  ARCSIN(X)  ! REPLACES ASIN(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+
+    IF(ABS(X)>ONE.AND.ROOT_CHECK) THEN
+       ARCSIN=ZERO
+       CHECK_STABLE=.FALSE.
+    ELSE
+       ARCSIN=ASIN(X)
+    ENDIF
+
+  END FUNCTION ARCSIN
 
 
   REAL(DP) FUNCTION  SINEHX_X(X) ! REPLACES SINH(X)/X

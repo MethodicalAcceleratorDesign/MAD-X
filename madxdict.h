@@ -307,6 +307,8 @@ char command_def[] =
 "ptc_align: ptc_align none 0 0; "
 " "
 "ptc_twiss: ptc_twiss none 0 0 "
+"file     = [s, none, ptc_twiss], "
+"table    = [s, none, ptc_twiss], "
 "icase = [i, 4], "
 "no = [i, 1], "
 "closed_orbit = [l, false, true], "

@@ -23,10 +23,11 @@ subroutine w_ptc_align()
   implicit none
   call ptc_align()
 end subroutine w_ptc_align
-subroutine w_ptc_twiss()
+subroutine w_ptc_twiss(tab_name)
   use madx_ptc_module
   implicit none
-  call ptc_twiss()
+  integer tab_name(*)
+  call ptc_twiss(tab_name)
 end subroutine w_ptc_twiss
 subroutine w_ptc_normal()
   use madx_ptc_module

@@ -223,6 +223,8 @@ module precision_constants
      LOGICAL(lp),POINTER  :: check_y_min     ! check if lost by aperture fitted now
      LOGICAL(lp),POINTER  :: check_y_max     ! check if lost by aperture fitted now
 
+     LOGICAL(lp),POINTER  :: WATCH_USER     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
+
      REAL(dp),POINTER     :: absolute_aperture     !=1e3_dp generic aperture check
      real(dp),POINTER :: hyperbolic_aperture  ! controls crashes in exponentials
 

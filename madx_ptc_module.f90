@@ -387,7 +387,6 @@ CONTAINS
        key%list%bsol=node_value('ks ')
     case(10)
        key%magnet="rfcavity"
-       icav=1
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
@@ -399,6 +398,7 @@ CONTAINS
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
        key%list%harmon=one
+       if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
        !  case(11)
        !     key%magnet="elseparator"
        !     key%list%volt=node_value('ex ')
@@ -438,7 +438,6 @@ CONTAINS
        key%tiltd=node_value('tilt ')
     case(27)
        key%magnet="twcavity"
-       icav=1
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
@@ -451,6 +450,7 @@ CONTAINS
        key%list%dphas=node_value("delta_lag ")
        key%list%psi=node_value("psi ")
        key%list%harmon=one
+       if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
     case default
        print*,"Element: ",name," not implemented"
        stop
@@ -492,15 +492,20 @@ CONTAINS
 
   END subroutine ptc_align
 
-  subroutine ptc_twiss()
+  subroutine ptc_twiss(tab_name)
     implicit none
+    include 'twissa.fi'
     logical(lp) closed_orbit
-    integer i,no,mynd2,npara,mynpa,nda,icase
+    integer i,no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
+    integer ioptfun,iii,restart_sequ,advance_node
+    integer tab_name(*)
+    real(dp) opt_fun(36)
     real(dp) x(6),suml,deltap0,deltap
     type(real_8) y(6)
     type(twiss) tw
     type(fibre), POINTER :: current
     !------------------------------------------------------------------------------
+    table_name = charconv(tab_name)
 
     if(universe.le.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -535,7 +540,17 @@ CONTAINS
     call alloc(y)
     y=npara
     Y=X
+    c_%watch_user=.true.
     call track(my_ring,y,1,default)
+    call PRODUCE_APERTURE_FLAG(flag_index)
+    if(flag_index/=0) then
+       call ANALYSE_APERTURE_FLAG(flag_index,why)
+       Write(6,*) "ptc_twiss unstable (map production)-programs continues "
+       Write(6,*) why ! See produce aperture flag routine in sd_frame
+       c_%watch_user=.false.
+       CALL kill(y)
+       return
+    endif
     call alloc(tw)
     tw=y
 
@@ -543,16 +558,70 @@ CONTAINS
     Y=X
     current=>MY_RING%start
     suml=zero
+    iii=restart_sequ()
     do i=1,MY_RING%n
        call track(my_ring,y,i,i+1,default)
+       call PRODUCE_APERTURE_FLAG(flag_index)
+       if(flag_index/=0) then
+          call ANALYSE_APERTURE_FLAG(flag_index,why)
+          Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
+          Write(6,*) why ! See produce aperture flag routine in sd_frame
+          goto 100
+       endif
        suml=suml+current%MAG%P%ld
        tw=y
+
+       call double_to_table(table_name, 's ', suml)
+
+       opt_fun(1)=tw%beta(1,1)
+       opt_fun(2)=tw%beta(1,2)
+       opt_fun(3)=tw%beta(1,3)
+       opt_fun(4)=tw%beta(2,1)
+       opt_fun(5)=tw%beta(2,2)
+       opt_fun(6)=tw%beta(2,3)
+       opt_fun(7)=tw%beta(3,1)
+       opt_fun(8)=tw%beta(3,2)
+       opt_fun(9)=tw%beta(3,3)
+       opt_fun(10)=tw%alfa(1,1)
+       opt_fun(11)=tw%alfa(1,2)
+       opt_fun(12)=tw%alfa(1,3)
+       opt_fun(13)=tw%alfa(2,1)
+       opt_fun(14)=tw%alfa(2,2)
+       opt_fun(15)=tw%alfa(2,3)
+       opt_fun(16)=tw%alfa(3,1)
+       opt_fun(17)=tw%alfa(3,2)
+       opt_fun(18)=tw%alfa(3,3)
+       opt_fun(19)=tw%gama(1,1)
+       opt_fun(20)=tw%gama(1,2)
+       opt_fun(21)=tw%gama(1,3)
+       opt_fun(22)=tw%gama(2,1)
+       opt_fun(23)=tw%gama(2,2)
+       opt_fun(24)=tw%gama(2,3)
+       opt_fun(25)=tw%gama(3,1)
+       opt_fun(26)=tw%gama(3,2)
+       opt_fun(27)=tw%gama(3,3)
+       opt_fun(28)=tw%mu(1)
+       opt_fun(29)=tw%mu(2)
+       opt_fun(30)=tw%mu(3)
+       opt_fun(31)=tw%disp(1)
+       opt_fun(32)=tw%disp(2)
+       opt_fun(33)=tw%disp(3)
+       opt_fun(34)=tw%disp(4)
+       opt_fun(35)=tw%disp(5)
+       opt_fun(36)=tw%disp(6)
+
+       ioptfun=36
+       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
+       call augment_count(table_name)
        write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),&
             tw%beta(2,1),tw%beta(2,2),tw%beta(3,1),tw%disp(1),tw%disp(3)
        !write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),&
        !     tw%beta(2,1),tw%beta(2,2),&
+       iii=advance_node()
        current=>current%next
     enddo
+100 continue
+    c_%watch_user=.false.
     call kill(tw)
     CALL kill(y)
     call f90flush(20,.false.)
@@ -562,7 +631,7 @@ CONTAINS
   subroutine ptc_normal()
     implicit none
     logical(lp) closed_orbit,normal
-    integer no,mynd2,npara,mynpa,nda,icase
+    integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
     real(dp) x(6),deltap0,deltap
     type(real_8) y(6)
     type(normalform) n
@@ -597,7 +666,18 @@ CONTAINS
     call alloc(y)
     y=npara
     Y=X
+    c_%watch_user=.true.
     call track(my_ring,y,1,default)
+    call PRODUCE_APERTURE_FLAG(flag_index)
+    if(flag_index/=0) then
+       call ANALYSE_APERTURE_FLAG(flag_index,why)
+       Write(6,*) "ptc_normal unstable (map production)-programs continues "
+       Write(6,*) why ! See produce aperture flag routine in sd_frame
+       CALL kill(y)
+       c_%watch_user=.false.
+       return
+    endif
+    c_%watch_user=.false.
     call daprint(y,18)
     normal = get_value('ptc_normal ','normal ') .ne. 0
     if(normal) then
@@ -619,7 +699,7 @@ CONTAINS
 
   subroutine ptc_track()
     implicit none
-    integer i,nint,ndble,nchar,int_arr(1),char_l,mynpa,icase,turns
+    integer i,nint,ndble,nchar,int_arr(1),char_l,mynpa,icase,turns,flag_index,why(9)
     real(dp) x0(6),x(6),deltap0,deltap
     logical(lp) closed_orbit
     character*12 char_a
@@ -652,10 +732,21 @@ CONTAINS
     x(:)=x(:)+x0(:)
     print*,"  Initial Coordinates: ", x
     turns = get_value('ptc_track ','turns ')
+    c_%watch_user=.true.
     do i=1,turns
        call track(my_ring,x,1,default)
+       if(flag_index/=0) then
+          call ANALYSE_APERTURE_FLAG(flag_index,why)
+          Write(6,*) "ptc_track unstable (tracking)-programs continues "
+          Write(6,*) why ! See produce aperture flag routine in sd_frame
+          goto 100
+       endif
     enddo
-    print*,"  End Coordinates: ", x
+    print*,"  End Coordinates: ",x
+    return
+100 continue
+    c_%watch_user=.false.
+    print*,"  Last Coordinates: ",x," after: ",i," turn(s)" 
 
   END subroutine ptc_track
 
@@ -674,6 +765,7 @@ CONTAINS
        call nul_coef(s_b(i))
     enddo
     deallocate(s_b)
+    firsttime_coef=.true.
   end subroutine ptc_end
 
   subroutine zerotwiss(s1,i)

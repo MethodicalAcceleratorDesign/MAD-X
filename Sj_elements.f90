@@ -214,8 +214,8 @@ contains
     TYPE(INNER_FRAME), OPTIONAL :: E_IN
 
     !  All PTC magnet have the same convention for the internal frame
-    ! Show a user want to add a magnet with corckscrew survey
-    ! his survey would have to be "caught" in this interface
+    !  Show a user want to add a magnet with corckscrew survey
+    !  his survey would have to be "caught" in this interface
 
 
     SELECT CASE(EL%KIND)

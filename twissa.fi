@@ -1,2 +1,3 @@
       character*48 table_name
+      character*48 charconv
       common/twissa/table_name

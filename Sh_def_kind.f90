@@ -632,12 +632,12 @@ contains
        IF(D%P%EXACT) THEN
           CALL ALLOC(PZ)
           if(D%P%TIME) then
-             PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+             PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
              X(1)=X(1)+HALF*D%L*X(2)/PZ
              X(3)=X(3)+HALF*D%L*X(4)/PZ
              X(6)=X(6)+HALF*D%L*(one/D%P%BETA0+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
           else
-             PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+             PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
              X(1)=X(1)+HALF*D%L*X(2)/PZ
              X(3)=X(3)+HALF*D%L*X(4)/PZ
              X(6)=X(6)+HALF*D%L*(one+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD
@@ -646,7 +646,7 @@ contains
        ELSE
           if(D%P%TIME) then
              CALL ALLOC(PZ)
-             PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2)
+             PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2)
              X(1)=X(1)+HALF*D%L*X(2)/pz
              X(3)=X(3)+HALF*D%L*X(4)/pz
              ! bug found by Schmidt totalpath=false time=true
@@ -1460,11 +1460,11 @@ contains
        PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
        X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
        X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*X(2)+EL%thin_v_angle*X(4))*(one/EL%P%BETA0+x(5))/pz
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
     else
        X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
        X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*X(2)+EL%thin_v_angle*X(4))
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
     endif
 
     IF(EL%P%NMUL>=1) THEN
@@ -1521,12 +1521,12 @@ contains
        PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
        X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
        X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*X(2)+EL%thin_v_angle*X(4))*(one/EL%P%BETA0+x(5))/pz
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
        call kill(pz)
     else
        X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
        X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*X(2)+EL%thin_v_angle*X(4))
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
     endif
 
     IF(EL%P%NMUL>=1) THEN
@@ -1593,12 +1593,12 @@ contains
        PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
        X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
        X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*X(2)+EL%thin_v_angle*X(4))*(one/EL%P%BETA0+x(5))/pz
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
        call kill(pz)
     else
        X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
        X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*X(2)+EL%thin_v_angle*X(4))
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
     endif
 
     IF(EL%P%NMUL>=1) THEN
@@ -1708,7 +1708,7 @@ contains
     ENDDO
 
     if(EL%TIME) then
-       del=one/SQRT(one+two*X(5)/el%beta0+x(5)**2)
+       del=one/ROOT(one+two*X(5)/el%beta0+x(5)**2)
     else
        DEL=one/(one+X(5))
     endif
@@ -2063,6 +2063,7 @@ contains
     real(dp) D(3,3),FI(3),FI0,B,co1,co2
     integer i
 
+
     IF(.not.EL%BEND_FRINGE) RETURN
     IF(K==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K==2.AND.EL%KILL_EXI_FRINGE) RETURN
@@ -2076,10 +2077,10 @@ contains
 
 
     if(EL%TIME) then
-       PZ=sqrt(one+two*X(5)/el%beta0+x(5)**2-X(2)**2-X(4)**2)
+       PZ=ROOT(one+two*X(5)/el%beta0+x(5)**2-X(2)**2-X(4)**2)
        TIME_FAC=ONE/el%beta0+X(5)
     else
-       PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
+       PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
        TIME_FAC=ONE+X(5)
     endif
     XP=X(2)/PZ ; YP=X(4)/PZ;
@@ -2095,7 +2096,7 @@ contains
     D(3,3)= TIME_FAC/PZ
 
     !    FI0=(B*XP/(one+yp**2)-B2* ( ONE + XP**2*(TWO+YP**2) )/PZ)
-    FI0= ATAN((XP/(one+yp**2)))-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
+    FI0= ATAN((XP/(one+yp**2)))    !-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )   *PZ
     CO2=B/COS(FI0)**2
     CO1=CO2/(ONE+(XP/(one+yp**2))**2 )
 
@@ -2113,7 +2114,7 @@ contains
     DO i=1,3
        B=FI(I)*D(I,2)+B
     ENDDO
-    X(3)=TWO*X(3)/(ONE+ sqrt(ONE-TWO*B*X(3)) )
+    X(3)=TWO*X(3)/(ONE+ ROOT(ONE-TWO*B*X(3)) )
     X(4)=X(4)-FI0*X(3)
 
     B=ZERO
@@ -2143,6 +2144,7 @@ contains
     TYPE(REAL_8) D(3,3),FI(3),CO1,CO2
     integer i,J
     ! etienne
+
 
 
     IF(.not.EL%BEND_FRINGE) RETURN
@@ -10475,30 +10477,36 @@ contains
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
 
-    A=YL*EL%P%B0
-    R=one/EL%P%B0
-    if(EL%P%TIME) then
-       B=EL%P%BETA0
-       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
-       XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
+    if(EL%P%B0/=zero) then
+       A=YL*EL%P%B0
+       R=one/EL%P%B0
+       if(EL%P%TIME) then
+          B=EL%P%BETA0
+          PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=one-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+          XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
+       else
+          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PT=one-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+          XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
+       endif
+       X(1)=XN(1)
+       X(2)=XN(2)
+       X(3)=XN(3)
+       X(6)=XN(6)
     else
-       PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
+       CALL DRIFT(YL,DL,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     endif
-    X(1)=XN(1)
-    X(2)=XN(2)
-    X(3)=XN(3)
-    X(6)=XN(6)
+
+
 
   END SUBROUTINE Sprotr
 
@@ -10511,39 +10519,43 @@ contains
     TYPE(REAL_8) XN(6),PZ,PT,A
     real(dp)  b,R
 
-    CALL ALLOC( XN,6)
-    CALL ALLOC( PZ)
-    CALL ALLOC( PT)
-    CALL ALLOC( A)
-    A=YL*EL%P%B0
-    R=one/EL%P%B0
-    if(EL%P%TIME) then
-       B=EL%P%BETA0
-       PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
-       XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
-    else
-       PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
-    endif
-    X(1)=XN(1)
-    X(2)=XN(2)
-    X(3)=XN(3)
-    X(6)=XN(6)
+    if(EL%P%B0/=zero) then
+       CALL ALLOC( XN,6)
+       CALL ALLOC( PZ)
+       CALL ALLOC( PT)
+       CALL ALLOC( A)
+       A=YL*EL%P%B0
+       R=one/EL%P%B0
+       if(EL%P%TIME) then
+          B=EL%P%BETA0
+          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=one-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+          XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
+       else
+          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PT=one-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+          XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
+       endif
+       X(1)=XN(1)
+       X(2)=XN(2)
+       X(3)=XN(3)
+       X(6)=XN(6)
 
-    CALL KILL( XN,6)
-    CALL KILL( PZ)
-    CALL KILL( PT)
-    CALL KILL( A)
+       CALL KILL( XN,6)
+       CALL KILL( PZ)
+       CALL KILL( PT)
+       CALL KILL( A)
+    else
+       CALL DRIFT(YL,DL,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    endif
   END SUBROUTINE SPROTP
 
   SUBROUTINE SPROTS(EL,YL,DL,Y)
@@ -10555,42 +10567,46 @@ contains
     TYPE(REAL_8) XN(6),PZ,PT,A,X(6)
     real(dp)  b,R
 
-    CALL ALLOC( X,6)
-    CALL ALLOC( XN,6)
-    CALL ALLOC( PZ)
-    CALL ALLOC( PT)
-    CALL ALLOC( A)
-    X=Y
-    A=YL*EL%P%B0
-    R=one/EL%P%B0
-    if(EL%P%TIME) then
-       B=EL%P%BETA0
-       PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
-       XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
+    if(EL%P%B0/=zero) then
+       CALL ALLOC( X,6)
+       CALL ALLOC( XN,6)
+       CALL ALLOC( PZ)
+       CALL ALLOC( PT)
+       CALL ALLOC( A)
+       X=Y
+       A=YL*EL%P%B0
+       R=one/EL%P%B0
+       if(EL%P%TIME) then
+          B=EL%P%BETA0
+          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=one-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+          XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
+       else
+          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PT=one-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+          XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
+       endif
+       X(1)=XN(1)
+       X(2)=XN(2)
+       X(3)=XN(3)
+       X(6)=XN(6)
+       Y=X
+       CALL KILL( X,6)
+       CALL KILL( XN,6)
+       CALL KILL( PZ)
+       CALL KILL( PT)
+       CALL KILL( A)
     else
-       PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
+       CALL DRIFT(YL,DL,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,Y)
     endif
-    X(1)=XN(1)
-    X(2)=XN(2)
-    X(3)=XN(3)
-    X(6)=XN(6)
-    Y=X
-    CALL KILL( X,6)
-    CALL KILL( XN,6)
-    CALL KILL( PZ)
-    CALL KILL( PT)
-    CALL KILL( A)
   END SUBROUTINE SPROTS
 
 
@@ -10616,7 +10632,7 @@ contains
        PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
+       XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
        XN(6)=X(6)+XN(3)*(one/b+x(5))
        XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/EL%P%BETA0
@@ -10630,7 +10646,7 @@ contains
        PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
+       XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
        XN(6)=X(6)+XN(3)*(one+X(5))
        XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
@@ -13504,7 +13520,7 @@ contains
        PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
        XN(1)=X(1)+(PZS-PZ)/DIR/EL%BN(1)
 
-       XN(3)=(ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
+       XN(3)=(ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
        XN(6)=X(6)+XN(3)*(one/b+x(5))
        XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL/b
@@ -13517,7 +13533,7 @@ contains
        PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
        XN(1)=X(1)+(PZS-PZ)/DIR/EL%BN(1)
 
-       XN(3)=(ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
+       XN(3)=(ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
        XN(6)=X(6)+XN(3)*(one+X(5))
        XN(6)=XN(6)+(EL%P%TOTALPATH-1)*DL
@@ -13653,7 +13669,8 @@ contains
     real(dp) XN(6),PZ,PZS,PT,B1
     real(dp)  b
     integer TOTALPATH
-    logical(lp) time
+    logical(lp) time,EXACT
+    EXACT=.TRUE.
 
 
     IF(PRESENT(EL1)) THEN
@@ -13676,41 +13693,48 @@ contains
        call write_e(101)
     ENDIF
 
-    if(TIME) then
-       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+    IF(B1==ZERO) THEN
+       call ROT_XZ(A,X,B,EXACT,time)
 
-       XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
+    ELSE
 
-       PT=ROOT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
 
-       XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2) )&
-            & /(PZS+PZ*COS(A)-X(2)*SIN(A))
+       if(TIME) then
+          PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
+          XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+          PT=ROOT(one+two*x(5)/b+X(5)**2-X(4)**2)
+          PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
 
-       XN(3)=X(3)+X(4)*XN(3)
-    else
-       PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-       XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-       PT=ROOT((one+X(5))**2-X(4)**2)
-       PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
-       XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
-            & /(PZS+PZ*COS(A)-X(2)*SIN(A))
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2) )&
+               & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
+          XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/B1
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+          XN(6)=X(6)+XN(3)*(one/b+x(5))
 
-       XN(3)=X(3)+X(4)*XN(3)
+          XN(3)=X(3)+X(4)*XN(3)
+       else
+          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
+          PT=ROOT((one+X(5))**2-X(4)**2)
+          PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+               & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
-    endif
-    X(1)=XN(1)
-    X(2)=XN(2)
-    X(3)=XN(3)
-    X(6)=XN(6)
+          XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/B1
+
+          XN(6)=X(6)+XN(3)*(one+X(5))
+
+          XN(3)=X(3)+X(4)*XN(3)
+
+       endif
+       X(1)=XN(1)
+       X(2)=XN(2)
+       X(3)=XN(3)
+       X(6)=XN(6)
+    ENDIF
 
   END SUBROUTINE wedger
 
@@ -13723,7 +13747,8 @@ contains
     TYPE(REAL_8) XN(6),PZ,PZS,PT,B1
     real(dp)  b
     integer TOTALPATH
-    logical(lp) time
+    logical(lp) time,EXACT
+    EXACT=.TRUE.
 
     CALL ALLOC(PZ,PZS,PT,B1)
     CALL ALLOC(XN,6)
@@ -13749,39 +13774,44 @@ contains
        call write_e(102)
     ENDIF
 
-    if(TIME) then
-       PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-       PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
-       XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
-            & /(PZS+PZ*COS(A)-X(2)*SIN(A))
+    IF(B1==ZERO) THEN
+       call ROT_XZ(A,X,B,EXACT,time)
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
+    ELSE
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+       if(TIME) then
+          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
+          PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
+          PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+               & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
-       XN(3)=X(3)+X(4)*XN(3)
-    else
-       PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-       XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-       PT=SQRT((one+X(5))**2-X(4)**2)
-       PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
-       XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
-            & /(PZS+PZ*COS(A)-X(2)*SIN(A))
+          XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
+          XN(6)=X(6)+XN(3)*(one/b+x(5))
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+          XN(3)=X(3)+X(4)*XN(3)
+       else
+          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
+          PT=SQRT((one+X(5))**2-X(4)**2)
+          PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+               & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
-       XN(3)=X(3)+X(4)*XN(3)
+          XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
 
-    endif
-    X(1)=XN(1)
-    X(2)=XN(2)
-    X(3)=XN(3)
-    X(6)=XN(6)
+          XN(6)=X(6)+XN(3)*(one+X(5))
 
+          XN(3)=X(3)+X(4)*XN(3)
+
+       endif
+       X(1)=XN(1)
+       X(2)=XN(2)
+       X(3)=XN(3)
+       X(6)=XN(6)
+    ENDIF
     CALL KILL(PZ,PZS,PT,B1)
     CALL KILL(XN,6)
 
@@ -13797,7 +13827,8 @@ contains
     TYPE(REAL_8) XN(6),PZ,PZS,PT,B1
     real(dp)  b
     integer TOTALPATH
-    logical(lp) time
+    logical(lp) time,EXACT
+    EXACT=.TRUE.
 
 
     CALL ALLOC(PZ,PZS,PT,B1)
@@ -13825,41 +13856,47 @@ contains
        call write_e(103)
     ENDIF
 
+    IF(B1==ZERO) THEN
+       call ROT_XZ(A,X,B,EXACT,time)
 
-    if(TIME) then
-       PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-       PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
-       XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
-            & /(PZS+PZ*COS(A)-X(2)*SIN(A))
+    ELSE
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
+       if(TIME) then
+          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
+          PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
+          PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+               & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+          XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
 
-       XN(3)=X(3)+X(4)*XN(3)
-    else
-       PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-       XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-       PT=SQRT((one+X(5))**2-X(4)**2)
-       PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
-       XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
-            & /(PZS+PZ*COS(A)-X(2)*SIN(A))
+          XN(6)=X(6)+XN(3)*(one/b+x(5))
 
-       XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
+          XN(3)=X(3)+X(4)*XN(3)
+       else
+          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
+          PT=SQRT((one+X(5))**2-X(4)**2)
+          PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+               & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+          XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
 
-       XN(3)=X(3)+X(4)*XN(3)
+          XN(6)=X(6)+XN(3)*(one+X(5))
 
-    endif
-    X(1)=XN(1)
-    X(2)=XN(2)
-    X(3)=XN(3)
-    X(6)=XN(6)
+          XN(3)=X(3)+X(4)*XN(3)
 
+       endif
+       X(1)=XN(1)
+       X(2)=XN(2)
+       X(3)=XN(3)
+       X(6)=XN(6)
+
+    ENDIF
     Y=X
+
     CALL KILL(PZ,PZS,PT,B1)
     CALL KILL(XN,6)
     CALL KILL(X,6)
@@ -14249,10 +14286,10 @@ contains
 
     O=EL%freq*twopi/CLIGHT
     C1=(eps1+(EL%P%DIR-eps1)*half)*COS(O*(x(6)-Z0)+EL%PHAS+phase0)
-    C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)   
+    C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
 ! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
     S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
-    S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)    
+    S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
 ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
     V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
@@ -14304,10 +14341,10 @@ contains
 
     O=EL%freq*twopi/CLIGHT
     C1=(eps1+(EL%P%DIR-eps1)*half)*COS(O*(x(6)-Z0)+EL%PHAS+phase0)
-    C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)   
+    C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
 ! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
     S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
-    S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)    
+    S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
 ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
     V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
@@ -14473,10 +14510,10 @@ contains
     IF(EL%P%NOCAVITY) RETURN
 
     EL%DELTA_E=x(5)
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3*COS(EL%PSI)*&
-         SIN(EL%freq*twopi*(x(6)-Z0)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3*SIN(EL%PSI)*&
-         SIN(EL%freq*twopi*(x(6)+Z0)/CLIGHT+EL%PHAS+phase0+EL%DPHAS)/EL%P%P0C
+    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
+         COS(EL%PSI)*SIN(EL%freq*twopi*(x(6)-Z0)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
+    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
+         SIN(EL%PSI)*SIN(EL%freq*twopi*(x(6)+Z0)/CLIGHT+EL%PHAS+phase0+EL%DPHAS)/EL%P%P0C
 
     EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
 
@@ -14490,10 +14527,10 @@ contains
     IF(EL%P%NOCAVITY) RETURN
     EL%DELTA_E=x(5)
 
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3*COS(EL%PSI)*&
-         SIN(EL%freq*twopi*(x(6)-Z0)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3*SIN(EL%PSI)*&
-         SIN(EL%freq*twopi*(x(6)+Z0)/CLIGHT+EL%PHAS+phase0+EL%DPHAS)/EL%P%P0C
+    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
+         COS(EL%PSI)*SIN(EL%freq*twopi*(x(6)-Z0)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
+    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
+         SIN(EL%PSI)*SIN(EL%freq*twopi*(x(6)+Z0)/CLIGHT+EL%PHAS+phase0+EL%DPHAS)/EL%P%P0C
 
     EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
 

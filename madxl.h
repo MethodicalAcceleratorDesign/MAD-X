@@ -155,7 +155,19 @@ int twiss_table_types[] =
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
-2
+2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2,
+2, 2, 2
 };
 
 char* twiss_table_cols[] =
@@ -181,6 +193,18 @@ char* twiss_table_cols[] =
 "re52", "re53", "re54", "re55", "re56",
 "re61", "re62", "re63", "re64", "re65",
 "re66",
+"beta11", "beta12", "beta13",
+"beta21", "beta22", "beta23",
+"beta31", "beta32", "beta33",
+"alfa11", "alfa12", "alfa13",
+"alfa21", "alfa22", "alfa23",
+"alfa31", "alfa32", "alfa33",
+"gama11", "gama12", "gama13",
+"gama21", "gama22", "gama23",
+"gama31", "gama32", "gama33",
+"mu1", "mu2", "mu3",
+"disp1", "disp2", "disp3",
+"disp4", "disp5", "disp6",
 " "  /* blank terminates */
 };
 

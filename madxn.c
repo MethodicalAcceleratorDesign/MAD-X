@@ -1867,7 +1867,8 @@ void exec_command()
         }
       else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
         {
-          w_ptc_twiss_();
+	  current_twiss = p->clone;
+	  pro_ptc_twiss();
         }
       else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
         {
@@ -5481,6 +5482,56 @@ void pro_track(struct in_cmd* cmd)
     }
 }
 
+void pro_ptc_twiss()
+     /* controls ptc_twiss module */
+{
+  struct name_list* nl = current_twiss->par_names;
+  struct command_parameter_list* pl = current_twiss->par;
+  struct int_array* tarr;
+  char *filename, *table_name;
+  double tol,tol_keep;
+  int l ,pos, w_file;
+  /*
+         start command decoding
+  */
+  pos = name_list_pos("table", nl);
+  if(nl->inform[pos]) /* table name specified - overrides save */
+    {
+      if ((table_name = pl->parameters[pos]->string) == NULL)
+	table_name = pl->parameters[pos]->call_def->string;
+    }
+  else table_name = "ptc_twiss";
+  pos = name_list_pos("file", nl);
+  if (nl->inform[pos])
+    {
+     if ((filename = pl->parameters[pos]->string) == NULL)
+       {
+        if (pl->parameters[pos]->call_def != NULL)
+        filename = pl->parameters[pos]->call_def->string;
+       }
+     if (filename == NULL) filename = permbuff("dummy");
+     w_file = 1;
+    }
+  else w_file = 0;
+ /*
+             end of command decoding
+  */
+  l = strlen(table_name);
+  tarr = new_int_array(l+1);
+  conv_char(table_name, tarr);
+  twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+			   twiss_table_types, current_sequ->n_nodes);
+  twiss_table->dynamic = 1;
+  add_to_table_list(twiss_table, table_register);
+  current_sequ->tw_table = twiss_table;
+  twiss_table->org_sequ = current_sequ;
+  twiss_table->curr= 0;
+  current_node = current_sequ->ex_start;
+  w_ptc_twiss_(tarr->i);
+  fill_twiss_header(twiss_table);
+  if (w_file) out_table(table_name, twiss_table, filename);
+}
+
 void pro_twiss()
      /* controls twiss module */
 {
@@ -8815,3 +8866,4 @@ void warning(char* t1, char* t2)
 {
   if (get_option("warn")) printf("++++++ warning: %s %s\n",t1,t2);
 }
+
