@@ -432,9 +432,27 @@ struct vector_list        /* contains named vectors */
          struct id_mic *previous;
   };
 
+  struct id_mic2 {
+         int   id_ttb[2];
+         int   enable;
+         struct val_mic val;
+         struct node* p_node;
+         struct node* p_node_s1;
+         struct node* p_node_s2;
+         struct id_mic2 *next;
+         struct id_mic2 *previous;
+  };
+
   struct orb_cor {
          double qx0;
          double qy0;
          struct id_mic *cor_table;
          struct id_mic *mon_table;
+  };
+
+  struct orb_cor2 {
+         double qx0;
+         double qy0;
+         struct id_mic2 *cor_table;
+         struct id_mic2 *mon_table;
   };
