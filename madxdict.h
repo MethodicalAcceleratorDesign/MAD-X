@@ -197,6 +197,7 @@ char command_def[] =
 "spline   = [l, false, true], "
 "noline   = [l, false, true], "
 "notitle  = [l, false, true], "
+"noversion  = [l, false, true], "
 "table    = [s, twiss], "
 "title    = [s, none], "
 "param    = [s, none], "

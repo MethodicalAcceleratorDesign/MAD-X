@@ -2791,7 +2791,7 @@
      &nqval, ngrid, lgrid,        ndeltap, ndeltas, numax,              &
      &nplot, currplot, suml, nrow, ncolumn, nvcol, pos_flag, lvcol,     &
      &n_names, splinef, nvvar, nrrang, proc_flag, ipparm, naxref,       &
-     &ieltyp, igrid, intopt, noline, notitle,                           &
+     &ieltyp, igrid, intopt, noline, notitle,noversi,                   &
      &numopt, countopt, pstart, pend,                                   &
      &occnt, twtpos
       common / peaddr / qascl, qlscl, qsscl, qtscl, qsval, currdp,      &
@@ -2834,7 +2834,7 @@
       double precision d_arr(100)
       double precision plot_option
       character * 400 char_a, version
-      character * 8 tmp_a
+      character * 10 tmp_a
       ierr = 0
       nivaxs = 0
       nivvar = 0
@@ -2855,6 +2855,14 @@
       call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
      &char_a, char_l)
       if (nint .gt. 0) notitle = int_arr(1)
+
+!--- get noversi
+      char_a = ' '
+      tmp_a = 'noversion '
+      noversi = 0
+      call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
+     &char_a, char_l)
+      if (nint .gt. 0) noversi = int_arr(1)
 
 !--- any table - for hor = s plot machine
       char_a = ' '
@@ -2881,6 +2889,7 @@
         itbv = 0
       endif
 
+!--- Prepare title
       if (notitle .eq. 0)  then
         char_a = ' '
         tmp_a = 'title '
@@ -2891,11 +2900,19 @@
         else
           k = char_l(1)
         endif
-        call get_version(version, j)
-        if (k .gt. 0)  then
-          toptitle = char_a(:k) // '<#>' // version(:j)
+        if (noversi .eq. 0) then
+          call get_version(version, j)
+          if (k .gt. 0)  then
+            toptitle = char_a(:k) // '<#>' // version(:j)
+          else
+            toptitle = '<#>' // version(:j)
+          endif
         else
-          toptitle = '<#>' // version(:j)
+          if (k .gt. 0) then
+            toptitle = char_a(:k)
+          else
+            toptitle = ' '
+          endif
         endif
       endif
 
