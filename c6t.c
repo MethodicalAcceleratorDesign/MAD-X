@@ -953,10 +953,6 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[17] = el_par_value_recurse("k2s",p->p_elem);
     c6t_elem->value[18] = el_par_value_recurse("k3",p->p_elem);
     c6t_elem->value[19] = el_par_value_recurse("k3s",p->p_elem);
-    /* stuff needed to "simulate" mad_c6t */
-/*      if (strstr(t_name,"sq06c2y")!=NULL ||  */
-/*  	strstr(t_name,"sqsk")!=NULL) c6t_elem->value[0] = 0.0; */
-/*          if (fabs(c6t_elem->value[0]) <= eps_6) c6t_elem->value[0] = 0.0; */
    } else if ((strcmp(p->base_name,"multipole") == 0)) {
     maxkn=0;maxks=0;
 /*      if ((kn_param = return_param_recurse("knl",p->p_elem))) maxkn=kn_param->double_array->curr; */
