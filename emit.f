@@ -410,8 +410,7 @@
       parameter         (one   = 1.0d0,  two   = 2.0d0)
       parameter         (three = 3.0d0,  twelve = 12.d0)
       parameter         (four  = 4.0d0,  six   = 6.0d0)
-      integer maxmul
-      parameter (maxmul = 20)
+      include 'twtrr.fi'
       integer i, j, ir, ii, n, n_ferr, iord, nn, ns, nd, nord
       integer node_fd_errors
       double precision  rw(6,6), tw(6,6,6), ferror(2) 
@@ -688,8 +687,8 @@
       bvk = node_value('other_bv ')
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
-      call node_vector('knl ',nn,normal)
-      call node_vector('ksl ',ns,skew)
+      call get_node_vector('knl ',nn,normal)
+      call get_node_vector('ksl ',ns,skew)
       call dzero(vals,2*(maxmul+1))
       do iord = 0, nn
         vals(1,iord) = normal(iord)
@@ -703,7 +702,7 @@
       if (n_ferr .gt. 0) then
         call dcopy(f_errors,field,n_ferr)
       endif
-      nd = 2 * max(nn, ns, n_ferr/2)
+      nd = 2 * max(nn, ns, n_ferr/2-1)
 
 !---- Dipole error.
       dbr = bv0 * field(1,0) / (one + deltap)
@@ -844,13 +843,3 @@
   500 continue
 
  9999 end
-      subroutine getclor(orbit0, rt, tt, error)
-      implicit none
-      include 'twiss0.fi'
-      double precision orbit0(6), rt(6,6), tt(6,6,6)
-      double precision opt(fundim)
-      integer error
-      call m66one(rt)
-      call dzero(opt,fundim)
-      call tmclor(orbit0, .true., .true., opt, rt, tt, error)
-      end

@@ -118,7 +118,7 @@ struct constraint /* contains one constraint */
 };
 
 struct constraint_list /* contains list of constraints */
-{
+ {
   int stamp;
   char name[NAME_L];
   int  max,                           /* max. pointer array size */
@@ -129,7 +129,6 @@ struct constraint_list /* contains list of constraints */
 struct double_array        /* dynamic array of double */
 {
   int stamp;
-  char name[NAME_L];
   int  max,                     /* max. array size */
        curr;                    /* current occupation */
   double* a;
@@ -204,10 +203,10 @@ struct in_cmd          /* contains information about classified command */
   char name[NAME_L];
   char* label;         /* pointer to label: if != NULL then buffer this */
   int type;            /*    0 command from list;
-                             1 link start command from list;
-                             2 link end command from list;
-                             3 element definition;
-                             4 variable definition; */
+                             1 element definiton outside sequence;
+                             2 variable definition;
+                             3 start or end of sequence;
+                             4 element definition; */
   int sub_type;        /* position in cmd_match_base */
   int stamp;
   int decl_start;      /* start of declarative part in tok_list */
@@ -280,6 +279,7 @@ struct node                /* the sequence is a linked list of nodes */
   int sel_sector;          /* sectormap select flag */
   int con_cnt;             /* constraint counter */
   int enable;              /* flag for correctors and monitors: 0 off, 1 on */
+  int stamp;
   double position;         /* s position in sequence [m] */
   double at_value;
   double length;
@@ -287,7 +287,6 @@ struct node                /* the sequence is a linked list of nodes */
   double other_bv;         /* equal to beam_bv (+1 or -1) */
   double chkick;           /* calculated by orbit correction module */
   double cvkick;           /* calculated by orbit correction module */
-  int stamp;
   struct expression* at_expr;
   char* from_name;
   struct element* p_elem;  /* pointer to element if any */
@@ -339,6 +338,7 @@ struct sequence
   struct node_list* ex_nodes;   /* alphabetic list of nodes (no drifts) */
   struct table* tw_table;       /* pointer to latest twiss table created */
   struct constraint_list* cl;   /* pointer to constraint list during match */
+  struct vector_list* orbits;   /* pointer to list of stored orbits */
 };
 
 struct sequence_list /* contains list of sequence pointers sorted by name */
@@ -406,6 +406,18 @@ struct var_list /* contains list of variable pointers sorted by name */
   struct name_list* list;       /* index list of names */
   struct variable** vars;       /* variable pointer list */
 };
+
+struct vector_list        /* contains named vectors */
+{
+  int curr,
+      max;
+  struct name_list* names;
+  struct double_array** vectors;
+};
+
+/*
+  start of corrector module structures
+*/
 
   struct val_mic {
          double before[2];

@@ -226,7 +226,7 @@
      &sdxb,taul,taux,tauy,tavl,tavlc,tavx,tavxc,tavy,tavyc,tlbar,tlidc, &
      &tlwtd,txbar,txidc,txwtd,tybar,tyidc,tywtd,wnorm,sdum,get_value,   &
      &get_variable,zero,one,two,half
-      parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0) 
+      parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0)
       include 'ibsdb.fi'
       include 'physcons.fi'
 

@@ -7,6 +7,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <time.h>
+#include <string.h>
  
 #define MAXCOL 256
  
@@ -171,7 +172,6 @@ void wpl(int *np, float *xp, float *yp)
     /* plot PolyLine of np points with coordinates (xp,yp) */
  
         XPoint          *points;
-        XSegment        *segments;
         int             i, k;
  
         /* polyline drawing */
@@ -191,7 +191,6 @@ void wfa(int *np, float *xp, float *yp)
     /* plot area-filled PolyLine of np points with coordinates (xp,yp) */
  
         XPoint          *points;
-        XSegment        *segments;
         int             i, k;
  
         /* polyline drawing */

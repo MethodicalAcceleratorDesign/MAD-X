@@ -39,15 +39,14 @@ void match_action(struct in_cmd* cmd)
      match_work[5] = new_double_array(total_vars);
      match_work[6] = new_double_array(total_vars);
      match_work[7] = new_double_array(total_const);
-     match_work[8] = new_double_array(total_const);
-     match_work[9] = new_double_array(total_vars);
+     match_work[8] = new_double_array(total_vars);
      fprintf(prt_file, "START LMDIF:\n\n");
      mtlmdf_(&total_const, &total_vars, 
             &match_tol, &current_calls, &current_call_lim,
             vary_vect->a, vary_dvect->a, fun_vect->a, match_work[0]->a,
             match_work[1]->a, match_work[2]->a, match_work[3]->a,
             match_work[4]->a, match_work[5]->a, match_work[6]->a,
-            match_work[7]->a,match_work[8]->a,match_work[9]->a);
+            match_work[7]->a,match_work[8]->a);
     }
   else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 && total_vars <= total_const)
     {
@@ -91,7 +90,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
   current_const = 0;
   penalty = zero;
   set_option("match_print", print_flag);
-  /* mtgeti_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); */
+  /* mtgeti_(vary_vect->a, vary_dvect->a); */
   for (i = 0; i < match_num_seqs; i++) 
     {
      /* fprintf(prt_file, "%s %s\n", "call TWISS from matching: sequence=", 
@@ -204,7 +203,7 @@ void match_end(struct in_cmd* cmd)
   fprintf(prt_file, "-------------------------------------------------------------------------------\n");
   if (print_match_summary == 1)
     {
-     mtgeti_(&stored_match_var->curr, vary_vect->a, vary_dvect->a);
+     mtgeti_(vary_vect->a, vary_dvect->a);
     }
   fprintf(prt_file, "\n");
   fprintf(prt_file, "END MATCH SUMMARY\n\n");
@@ -425,7 +424,7 @@ void match_match(struct in_cmd* cmd)
 
   for (i = 0; i < match_num_seqs; i++) 
     {
-      for (j = 0; j < 40; j++)
+      for (j = 0; j < local_twiss[i]->cmd_def->par->curr; j++)
 	{
 	  local_twiss[i]->cmd_def->par_names->inform[j] = 0;
 	}

@@ -1,3 +1,36 @@
+      subroutine fort_info(t1, t2)
+      character *(*) t1, t2
+      integer get_option
+      if (get_option('info ') .ne. 0 .and. get_option('warn ') .ne. 0)  &
+     &print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
+      end
+      subroutine fort_warn(t1, t2)
+      character *(*) t1, t2
+      integer get_option
+      if (get_option('warn ') .ne. 0)                                   &
+     &print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
+      end
+      subroutine getclor(orbit0, rt, tt, error)
+!----------------------------------------------------------------------*
+! Purpose:
+!   Get periodic closed orbit (e.g. at start of Twiss), 
+!   first + second order one-turn map
+! Input:
+!   orbit0(6)   (real)  initial guess
+! Output:
+!   rt(6,6)     (real)  one-turn matrix
+!   tt(6,6,6)   (real)  one-turn second-order map
+!   error       (int)   error flag (0: OK, else != 0)
+!----------------------------------------------------------------------*
+      implicit none
+      include 'twiss0.fi'
+      double precision orbit0(6), rt(6,6), tt(6,6,6)
+      double precision opt(fundim)
+      integer error
+      call m66one(rt)
+      call dzero(opt,fundim)
+      call tmclor(orbit0, .true., .true., opt, rt, tt, error)
+      end
       subroutine m66add(term1,term2,target)
       implicit none
 !----------------------------------------------------------------------*
@@ -1524,11 +1557,11 @@
 ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
 !   Added LCAVITY element at ISP 27                                    *
 !----------------------------------------------------------------------*
-      integer code,nn,ns,maxmul
-      parameter(maxmul=20)
+      include 'twtrr.fi'
+      integer code,nn
       double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
      &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul)       &
-     &,zero,one,get_variable
+     &,zero,one
       parameter(zero=0d0,one=1d0)
 !---- Branch on subprocess code.
       tilt = zero
@@ -1616,8 +1649,8 @@
    80 continue
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
-      call node_vector('knl ',nn,normal)
-!      call node_vector('ksl ',ns,skew)
+      call get_node_vector('knl ',nn,normal)
+!      call get_node_vector('ksl ',ns,skew)
 !      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
 !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
       angle = normal(0)*node_value('dipole_bv ')
@@ -1761,3 +1794,21 @@
       enddo
       end
 !-----------------  end of sutran subroutine --------------------------
+      integer function lastnb(t)
+!----------------------------------------------------------------------*
+! Purpose:
+!   Find last non-blank in string
+!
+!----------------------------------------------------------------------*
+      implicit none
+      integer mcnam, maxpnt
+      parameter (mcnam = 16, maxpnt = 500)
+
+      character *(*) t
+      integer i
+      do i = len(t), 1, -1
+        if (t(i:i) .ne. ' ') goto 20
+      enddo
+      i = 1
+   20 lastnb = i
+      end

@@ -1,57 +1,3 @@
-#ifdef _LINUX_
-#define advance_node          advance_node__
-#define advance_to_pos        advance_to_pos__
-#define augment_count         augment_count__
-#define char_from_table       char_from_table__  /* OB 2.4.2002 */
-#define comment_to_table      comment_to_table__
-#define comm_para             comm_para__
-#define double_from_table     double_from_table__
-#define double_to_table       double_to_table__
-#define element_name          element_name__
-#define frndm                 frndm_
-#define madx                  madx_
-#define madx_init             madx_init__
-#define f_ctof                f_ctof__
-#define get_disp0             get_disp0__
-#define get_option            get_option__
-#define get_orbit0            get_orbit0__
-#define get_string            get_string__
-#define get_title             get_title__
-#define get_value             get_value__
-#define get_variable          get_variable__
-#define get_version           get_version__
-#define grndm                 grndm_
-#define intrac                intrac_
-#define mtcond                mtcond_
-#define next_constraint       next_constraint__
-#define next_global           next_global__
-#define next_start            next_start__
-#define next_vary             next_vary__
-#define node_al_errors        node_al_errors__
-#define node_fd_errors        node_fd_errors__
-#define node_string           node_string__
-#define node_value            node_value__
-#define node_vector           node_vector__
-#define plot_option           plot_option__
-#define reset_count           reset_count__
-#define restart_sequ          restart_sequ__
-#define sector_out            sector_out__
-#define sequence_name         sequence_name__
-#define set_option            set_option__
-#define set_value             set_value__
-#define set_variable          set_variable__
-#define spec_node_value       spec_node_value__
-#define store_node_vector     store_node_vector__
-#define string_to_table       string_to_table__
-#define table_length          table_length__
-#define table_org             table_org__
-#define table_range           table_range__
-#define track_pteigen         track_pteigen__
-#define vector_to_table       vector_to_table__
-#define vdot                  vdot_
-#define vmod                  vmod_
-#endif
-#ifndef _LINUX_
 #define advance_node          advance_node_
 #define advance_to_pos        advance_to_pos_
 #define augment_count         augment_count_
@@ -66,11 +12,12 @@
 #define madx_init             madx_init_
 #define f_ctof                f_ctof_
 #define get_disp0             get_disp0_
+#define get_node_vector       get_node_vector_
 #define get_option            get_option_
-#define get_orbit0            get_orbit0_
 #define get_string            get_string_
 #define get_title             get_title_
 #define get_variable          get_variable_
+#define get_vector            get_vector_
 #define get_value             get_value_
 #define get_version           get_version_
 #define grndm                 grndm_
@@ -84,16 +31,17 @@
 #define node_fd_errors        node_fd_errors_
 #define node_string           node_string_
 #define node_value            node_value_
-#define node_vector           node_vector_
 #define plot_option           plot_option_
 #define reset_count           reset_count_
 #define restart_sequ          restart_sequ_
+#define retreat_node          retreat_node_
 #define sector_out            sector_out_
 #define sequence_name         sequence_name_
 #define set_option            set_option_
 #define set_value             set_value_
 #define set_variable          set_variable_
 #define spec_node_value       spec_node_value_
+#define store_node_value      store_node_value_
 #define store_node_vector     store_node_vector_
 #define string_to_table       string_to_table_
 #define table_length          table_length_
@@ -103,7 +51,6 @@
 #define vector_to_table       vector_to_table_
 #define vdot                  vdot_
 #define vmod                  vmod_
-#endif
 
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
@@ -117,7 +64,7 @@ int str_pos(const char s[], char c)
 /* Fortran routines called from C */
 extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
                    double*, double*);
-extern void mtgeti_(int*, double*, double*);
+extern void mtgeti_(double*, double*);
 extern void collect_(int*, double*, double*); /* OB 13.2.2002 */
 extern void emit_(double*, double*, double*, double*, double*, double*,
 double*, double*, double*, double*, double*, double*, double*, double*);
@@ -139,7 +86,7 @@ int *,int *,int *,int *,float *,float *,float *,float *,float *,
 float *,float *,float *,float *,float *,int *);
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*,double*, double*, double*, double*,
-                    double*, double*, double*, double*, double*); 
+                    double*, double*, double*, double*); 
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*); 
@@ -174,12 +121,13 @@ void element_name(char*, int*);
 double frndm();
 double get_aperture(struct node*, char*);
 void get_disp0(double*);
+void get_node_vector(char*, int*, double*);
 int get_option(char*);
-void get_orbit0(double*);
 int get_string(char*, char*, char*);
 void get_title(char*, int*);
 double get_value(char*, char*);
 double get_variable(char*);
+int get_vector(char*, char*, double*);
 void get_version(char*, int*);
 double grndm();
 int intrac();
@@ -192,10 +140,10 @@ int node_al_errors(double*);
 int node_fd_errors(double*);
 void node_string(char*, char*, int*);
 double node_value(char*);
-void node_vector(char*, int*, double*);
 double plot_option(char*);
 void reset_count(char*);
 int restart_sequ();
+int retreat_node();
 void sequence_name(char*, int*);
 void set_value(char*, char*, double*);
 void set_variable(char*, double*);
@@ -245,6 +193,7 @@ struct int_array* clone_int_array(struct int_array*);
 struct macro* clone_macro(struct macro*);
 struct name_list* clone_name_list(struct name_list*);
 struct node* clone_node(struct node*, int);
+void copy_double(double*, double*, int);
 void copy_name_list(struct name_list*, struct name_list*);
 int cmd_match(int, char**, int*, int*);
 void complete_twiss_table(struct table*);
@@ -276,6 +225,7 @@ struct double_array* command_par_array(char*, struct command*);
 struct expression* command_par_expr(char*, struct command*);
 char* command_par_string(char*, struct command*);
 double command_par_value(char*, struct command*);
+int command_par_vector(char*, struct command*, double*);
 struct constraint* delete_constraint(struct constraint*);
 struct constraint_list* delete_constraint_list(struct constraint_list*);
 struct element* delete_element(struct element*);
@@ -293,6 +243,7 @@ struct node_list* delete_node_list(struct node_list*);
 struct sequence_list* delete_sequence_list(struct sequence_list*);
 struct variable* delete_variable(struct variable*);
 struct var_list* delete_var_list(struct var_list*);
+struct vector_list* delete_vector_list(struct vector_list*);
 struct table* delete_table(struct table*);
 double double_from_expr(char**, int, int);
 int down_unit(char*);
@@ -340,19 +291,20 @@ void exec_print(struct in_cmd*);
 void exec_save(struct in_cmd*);
 void exec_savebeta();
 void exec_show(struct in_cmd*);
+void exec_store_coguess(struct in_cmd*);
 void expand_curr_sequ(int);
 void expand_line(struct char_p_array*);
 struct node* expand_node(struct node*, struct sequence*, struct sequence*, 
                          double);
 void expand_sequence(struct sequence*, int);
+void export_comm_par(struct command_parameter*, char*);
 void export_element(struct element*, struct el_list*, FILE*);
 void export_elem_8(struct element*, struct el_list*, FILE*);
 void export_el_def(struct element*, char*);
 void export_el_def_8(struct element*, char*);
-void export_el_par(struct command_parameter*, char*);
 void export_el_par_8(struct command_parameter*, char*);
 void export_sequence(struct sequence*, FILE*);
-void export_sequ_8(struct sequence*, FILE*);
+void export_sequ_8(struct sequence*, struct command_list*, FILE*);
 void export_variable(struct variable*, FILE*);
 void export_var_8(struct variable*, FILE*);
 double expression_value(struct expression*, int);
@@ -422,6 +374,7 @@ void grow_sequence_list(struct sequence_list*);
 void grow_table(struct table*);
 void grow_table_list(struct table_list*);
 void grow_var_list(struct var_list*);
+void grow_vector_list(struct vector_list*);
 double hidden_node_pos(char*, struct sequence*);
 void init55(int);
 void irngen();
@@ -510,6 +463,7 @@ struct table_list* new_table_list(int);
 struct variable* new_variable(char*, double, int, int, struct expression*,
                               char*);
 struct var_list* new_var_list(int);
+struct vector_list* new_vector_list(int);
 int next_char(char, char**, int, int);
 char next_non_blank(char*);
 int next_non_blank_pos(char*);
@@ -518,6 +472,7 @@ void out_table(char*, struct table*, char*);
 int par_present(char*, struct command*, struct command_list*);
 int par_out_flag(char*, char*);
 int pass_select(char*, struct command*);
+int pass_select_list(char*, struct command_list*);
 char* permbuff(char*);
 int polish_expr(int, char**);
 double polish_value(struct int_array*);
@@ -557,6 +512,7 @@ void resequence_nodes(struct sequence*);
 void reset_errors(struct sequence*);
 void reset_sector(struct sequence*, int);
 double rfc_slope();
+void save_beam(struct sequence*, FILE*);
 int scan_expr(int, char**);
 void scan_in_cmd(struct in_cmd*);
 void sector_out(double*, double*, double*, double*);
@@ -597,8 +553,10 @@ void store_command_def(char*);
 struct command_parameter* store_comm_par_def(char**, int, int);
 void store_comm_par_value(char*, double, struct command*);
 void store_comm_par_vector(char*, double*, struct command*);
+void store_orbit(struct command*, double*);  
 void store_savebeta(struct in_cmd*);
 void store_select(struct in_cmd*);
+void store_threader(struct in_cmd*);
 int string_cnt(char, int, char**);
 char* strip(char*);
 void supp_char(char, char*);
@@ -632,14 +590,15 @@ double vdot(int*, double*, double*);
 int version_header(char*);
 double vmod(int*, double*);
 void warning(char*, char*);
-void write_elems(struct el_list*, FILE*);
-void write_elems_8(struct el_list*, FILE*);
+void write_elems(struct el_list*, struct command_list*, FILE*);
+void write_elems_8(struct el_list*, struct command_list*, FILE*);
 void write_nice(char*, FILE*);
 void write_nice_8(char*, FILE*);
-void write_sequs(struct sequence_list*, FILE*);
+void write_sequs(struct sequence_list*, struct command_list*, FILE*);
 void write_table(struct table*, char*);
-void write_vars(struct var_list*, FILE*);
-void write_vars_8(struct var_list*, FILE*);
+void write_vars(struct var_list*, struct command_list*, FILE*);
+void write_vars_8(struct var_list*,struct command_list*,  FILE*);
+void zero_double(double*, int);
 int zero_string(char*);
 
 /* define orbit correction routines */
@@ -752,6 +711,7 @@ struct command* current_gweight = NULL; /* current gweight clone */
 struct command* current_weight = NULL;  /* current weight clone */
 struct command* current_match = NULL;   /* OB 23.1.2002: current match comm. */
 struct command* current_eopt  = NULL;   /* to keep eoption command */
+struct command* threader_par  = NULL;   /* threader parameters */
 
 struct command_list* beam_list;         /* list of all beam commands */
 struct command_list* beta0_list;        /* list of user defined beta0s */
@@ -761,6 +721,7 @@ struct command_list* optics_select;     /* current optics select commands */
 struct command_list* optics_list;       /* list of optics command/sequence */
 struct command_list* savebeta_list;
 struct command_list* seqedit_select;    /* current seqedit select commands */
+struct command_list* save_select;       /* current save select commands */
 struct command_list* slice_select;      /* current slice select commands */
 struct command_list* stored_commands;   /* list of stored commands */
 struct command_list* stored_match_var;  /* list of match vary commands */
@@ -862,7 +823,7 @@ char  tmp_key[NAME_L],
 
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.09";
+char myversion[] = "MAD-X 1.10";
 char one_string[] = "1";
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
@@ -910,8 +871,11 @@ int curr_obs_points;        /* current number of observation points */
 int current_calls = 0;      /* call counter in match */
 int current_call_lim = 0;   /* current call limit in match */
 int current_const = 0;      /* current constraint number in match */
+int default_beam_saved = 0; /* flag to avoid multiple save of default beam */
 int edit_is_on = 0;         /* != 0 if inside current sequence edit */
+int final_message = 0;      /* set to 1 when end message written */
 int group_is_on = 0;        /* true when inside group */
+int guess_flag = 0;         /* != 0 if coguess read */
 int in_stop = 0;            /* input buffer stop flag */
 int inbuf_level = 0;        /* input buffer level */
 int init_warn = 1;          /* intialisation warning level */
@@ -939,6 +903,7 @@ int seqedit_install = 0;    /* counter for seqedit installs */
 int seqedit_move = 0;       /* counter for seqedit moves */
 int seqedit_remove = 0;     /* counter for seqedit removes */
 int sequ_is_on = 0;         /* != 0 if inside current sequence decl. */
+int stamp_flag = 0;         /* checks for double delete when != 0 */
 int start_cnt = 0;          /* counter for start commands */
 int total_const = 0;        /* total no. of constraints in match */
 int total_vars = 0;         /* total no. of variables in match */
@@ -948,7 +913,6 @@ int twiss_success = 0;      /* set by twiss module to 1 if OK */
 int use_count = 0;          /* incremented by 1 every time use is executed */
 int vary_cnt = 0;           /* counter for vary commands */
 int watch_flag = 0;         /* produces debug output when != 0 */
-int stamp_flag = 0;         /* checks for double delete when != 0 */
 
 int           na_err,              /* current no. of alignment errors */
               nf_err,              /* current no. of field errors */
@@ -960,6 +924,7 @@ int           na_err,              /* current no. of alignment errors */
                                       written for selected types only */
               sxf_align_cnt = 0,       /* element with align errors count */
               sxf_field_cnt = 0,       /* element with field errors count */
+              stop_flag = 0,           /* 1 if stop condition */
               occnt_add = 0,       /* flag for element name modification */ 
               b_indent[100],       /* list of indents */
               add_indent[] = {1, 2, 2, 4, 7, 7, 7, 7, 7, 7};
@@ -967,6 +932,7 @@ int           na_err,              /* current no. of alignment errors */
 double        sequ_length,         /* length of  sequence */
               sequ_start, 
               sequ_end,
+              guess_orbit[6],
               al_errors[ALIGN_MAX],
               fd_errors[FIELD_MAX];
 

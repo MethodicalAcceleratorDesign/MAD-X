@@ -1,10 +1,10 @@
 !----------------------------------------------------------------------*
-      subroutine dynap(eigen, coords, turns, npart, distvect, zn,dq,     &
+      subroutine dynap(eigen, coords, turns, npart, distvect, zn,dq,    &
      &onelog, turnnumber)
       implicit none
       integer turns,npart
       double precision eigen(6,6),coords(6,0:turns,*),get_value
-      double precision zn(turns,6), distvect(turns),dq(2*turns),         &
+      double precision zn(turns,6), distvect(turns),dq(2*turns),        &
      &onelog(turns), turnnumber(turns)
       include 'deltra.fi'
 
@@ -24,7 +24,7 @@
       fastune = get_value('dynap ','fastune ') .ne. 0
       deltax = get_value('dynap ','lyapunov ')
 
-      call trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,        &
+      call trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,       &
      &turnnumber,dq)
       call dynapfill()
 
@@ -112,7 +112,7 @@
 
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,  &
+      subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
      &turnnumber,dq)
       implicit none
 !----------------------------------------------------------------------*
@@ -120,9 +120,9 @@
 !
 !----------------------------------------------------------------------*
       integer k,ix,iy,initt,turns,ktrturns,nturnhalf,i,j,npart
-      double precision eigen(6,6),coords(6,0:turns,*),distvect(turns),   &
-     &zn(turns,6),znt(6),track(6),tend,ptend,smear,yapunov,fitlyap,      &
-     &templyap,tunx1,tunx2,tuny1,tuny2,tuneabt,tuneabt2,zero,one,two,    &
+      double precision eigen(6,6),coords(6,0:turns,*),distvect(turns),  &
+     &zn(turns,6),znt(6),track(6),tend,ptend,smear,yapunov,fitlyap,     &
+     &templyap,tunx1,tunx2,tuny1,tuny2,tuneabt,tuneabt2,zero,one,two,   &
      &onelog(turns), turnnumber(turns),dq(2*turns)
       parameter(zero=0d0,one=1d0,two=2d0)
       include 'deltra.fi'

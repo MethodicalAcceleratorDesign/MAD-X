@@ -34,14 +34,18 @@
      &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
       parameter(zero=0d0,one=1d0)
       character*12 tol_a, char_a
-      double precision spos !hbu
+!hbu
+      double precision spos
       include 'name_len.fi'
-      character*4 vec_names(7) !hbu
-      character*(name_len) el_name !hbu
+!hbu
+      character*4 vec_names(7)
+!hbu
+      character*(name_len) el_name
       include 'track.fi'
       include 'bb.fi'
       data tol_a,char_a / 'maxaper ', ' ' /
-      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / !hbu
+!hbu
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
 
       aperflag = .false.
       e_flag = 0
@@ -70,9 +74,12 @@
         part_id(k) = k
       enddo
 !hbu--- init info for tables initial s position is 0
-      spos=0  !hbu initial s position is 0
-      nlm=0   !hbu start of line, element 0
-      el_name='start           ' !hbu
+!hbu initial s position is 0
+      spos=0
+!hbu start of line, element 0
+      nlm=0
+!hbu
+      el_name='start           '
 !--- enter start coordinates in summary table
       do  i = 1,j_tot
         tmp_d = i
@@ -83,18 +90,21 @@
           tmp_d = z(j,i) - orbit0(j)
           call double_to_table('tracksumm ', vec_names(j), tmp_d)
         enddo
-        call double_to_table('tracksumm ',vec_names(7),spos) !hbu add s
+!hbu add s
+        call double_to_table('tracksumm ',vec_names(7),spos)
         call augment_count('tracksumm ')
       enddo
 !--- enter first turn, and possibly eigen in tables
       if (switch .eq. 1)  then
         if (onetable)  then
           call track_pteigen(eigen)
+!hbu add s, node id and name
           call tt_putone(jmax, 0, tot_segm, segment, part_id,           &
-     &    z, orbit0,spos,nlm,el_name) !hbu add s, node id and name
+     &    z, orbit0,spos,nlm,el_name)
         else
           do i = 1, jmax
-            call tt_puttab(part_id(i), 0, 1, z(1,i), orbit0,spos) !hbu
+!hbu
+            call tt_puttab(part_id(i), 0, 1, z(1,i), orbit0,spos)
           enddo
         endif
       endif
@@ -123,15 +133,17 @@
           el = node_value('l ')
           code_buf(nlm+1) = code
           l_buf(nlm+1) = el
-          call element_name(el_name,len(el_name)) !hbu get current node name
+!hbu get current node name
+          call element_name(el_name,len(el_name))
         else
           el = l_buf(nlm+1)
           code = code_buf(nlm+1)
-        endif 
+        endif
         if (code .ne. 1 .and. el .ne. zero) then
           sum = node_value('name ')
-          call aafail('TRRUN',
-     &'----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
+          call aafail('TRRUN',                                          &
+     &    '----element with length found : CONVERT STRUCTURE WITH MAKETH&
+     &    IN')
         endif
         if (switch .eq. 1) then
           nobs = node_value('obs_point ')
@@ -159,18 +171,22 @@
         endif
         nlm = nlm+1
         if (nobs .gt. 0)  then
-          call node_vector('obs_orbit ', lobs, obs_orb)
+          call get_node_vector('obs_orbit ', lobs, obs_orb)
           if (lobs .lt. 6)                                              &
      &    call aafail('TRACK', 'obs. point orbit not found')
           if (onetable)  then
-            spos=sum !hbu
-            call element_name(el_name,len(el_name)) !hbu get current node name
+!hbu
+            spos=sum
+!hbu get current node name
+            call element_name(el_name,len(el_name))
+!hbu
             call tt_putone(jmax, turn, tot_segm, segment, part_id,      &
-     &      z, obs_orb,spos,nlm,el_name) !hbu
+     &      z, obs_orb,spos,nlm,el_name)
           else
             do i = 1, jmax
-              call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,
-     &        spos) !hbu add spos
+!hbu add spos
+              call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
+     &        spos)
             enddo
           endif
         endif
@@ -185,12 +201,15 @@
           if (mod(turn, ffile) .eq. 0)  then
             if (turn .eq. turns)  last_out = .true.
             if (onetable)  then
-              spos=sum !hbu
+!hbu
+              spos=sum
+!hbu spos added
               call tt_putone(jmax, turn, tot_segm, segment, part_id,    &
-     &        z, orbit0,spos,nlm,el_name) !hbu spos added
+     &        z, orbit0,spos,nlm,el_name)
             else
               do i = 1, jmax
-                call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos) !hbu
+!hbu
+                call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
               enddo
             endif
           endif
@@ -225,13 +244,17 @@
       if (.not. last_out)  then
         if (switch .eq. 1)  then
           if (onetable)  then
-            spos=sum !hbu
-            call element_name(el_name,len(el_name)) !hbu get current node name
+!hbu
+            spos=sum
+!hbu get current node name
+            call element_name(el_name,len(el_name))
+!hbu spos added
             call tt_putone(jmax, turn, tot_segm, segment, part_id,      &
-     &      z, orbit0,spos,nlm,el_name) !hbu spos added
+     &      z, orbit0,spos,nlm,el_name)
           else
             do i = 1, jmax
-              call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos) !hbu
+!hbu
+              call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
             enddo
           endif
         endif
@@ -246,8 +269,10 @@
           tmp_d = last_orbit(j,i) - orbit0(j)
           call double_to_table('tracksumm ', vec_names(j), tmp_d)
         enddo
-        spos=last_pos(i) !hbu
-        call double_to_table('tracksumm ',vec_names(7),spos) !hbu
+!hbu
+        spos=last_pos(i)
+!hbu
+        call double_to_table('tracksumm ',vec_names(7),spos)
         call augment_count('tracksumm ')
       enddo
  999  end
@@ -266,7 +291,7 @@
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       logical aperflag
-      integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk
+      integer turn,code,ktrack,part_id(*),last_turn(*),nn
       integer get_option
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
      &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
@@ -316,52 +341,52 @@
 !____ Test aperture.
       aperflag = get_option('aperture ') .ne. zero
       if(aperflag) then
-      nn=24
-      call node_string('apertype ',aptype,nn)
-      call node_vector('aperture ',nn,aperture)
+        nn=24
+        call node_string('apertype ',aptype,nn)
+        call get_node_vector('aperture ',nn,aperture)
 !      print *, " TYPE ",aptype,
 !     &"values  x y lhc",aperture(1),aperture(2),aperture(3)
 !------------  ellipse case ----------------------------------
         if(aptype.eq.'ellipse') then
-        apx = aperture(1)
-        apy = aperture(2)
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack,al_errors)
+          apx = aperture(1)
+          apy = aperture(2)
+          call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
-        apx = aperture(1)
+          apx = aperture(1)
           if(apx.eq.0.0) then
-          apx = maxaper(1)
+            apx = maxaper(1)
           endif
-        apy = apx
+          apy = apx
 !        print *,"circle, radius= ",apx
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack,al_errors)
+          call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
 !------------  rectangle case ----------------------------------
         else if(aptype.eq.'rectangle') then
-        apx = aperture(1)
-        apy = aperture(2)
-        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack,al_errors)
+          apx = aperture(1)
+          apy = aperture(2)
+          call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
 !------------  LHC screen case ----------------------------------
         else if(aptype.eq.'lhcscreen') then
 !        print *, "LHC screen start, Xrect= ",
 !     &  aperture(1),"  Yrect= ",aperture(2),"  Rcirc= ",aperture(3)
-        apx = aperture(3)
-        apy = aperture(3)
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack,al_errors)
-        apx = aperture(1)
-        apy = aperture(2)
-        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack,al_errors)       
+          apx = aperture(3)
+          apy = aperture(3)
+          call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
+          apx = aperture(1)
+          apy = aperture(2)
+          call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
 !        print *, "LHC screen end"
 !------------  marguerite case ----------------------------------
         else if(aptype.eq.'marguerite') then
-        apx = aperture(1)
-        apy = aperture(2)
-        call trcoll(3, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack,al_errors)
+          apx = aperture(1)
+          apy = aperture(2)
+          call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
         endif
       endif
       call ttmult(track,ktrack,dxt,dyt)
@@ -399,16 +424,16 @@
       call ttcorr(el, track, ktrack)
       go to 500
 
-!---- Collimator with elliptic aperture. 
+!---- Collimator with elliptic aperture.
   200 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-       if(apx.eq.0.0) then
-       apx=maxaper(1)
-       endif
-       if(apy.eq.0.0) then
-       apy=maxaper(3)
-       endif
+      if(apx.eq.0.0) then
+        apx=maxaper(1)
+      endif
+      if(apy.eq.0.0) then
+        apy=maxaper(3)
+      endif
       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack,al_errors)
       go to 500
@@ -417,12 +442,12 @@
   210 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-       if(apx.eq.0.0) then
-       apx=maxaper(1)
-       endif
-       if(apy.eq.0.0) then
-       apy=maxaper(3)
-       endif
+      if(apx.eq.0.0) then
+        apx=maxaper(1)
+      endif
+      if(apy.eq.0.0) then
+        apy=maxaper(3)
+      endif
       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack,al_errors)
       go to 500
@@ -509,8 +534,8 @@
 !---- Multipole components.
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
-      call node_vector('knl ',nn,normal)
-      call node_vector('ksl ',ns,skew)
+      call get_node_vector('knl ',nn,normal)
+      call get_node_vector('ksl ',ns,skew)
       nd = 2 * max(nn, ns)
       call dzero(vals,2*(maxmul+1))
       do iord = 0, nn
@@ -849,10 +874,10 @@
 !   TTLCAV to change the nominal energy                                *
 !----------------------------------------------------------------------*
       integer itrack,ktrack
-      double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,px,py,rff,    &
-     &betas,gammas,rfl,rfv,track(6,*),el1,clight,twopi,vrf,beti,ttt,    &
-     &deltap,deltas,pc,get_variable,node_value,get_value,one,two,half,  &
-     &ten3m,ten6p
+      double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
+     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,      &
+     &get_variable,node_value,get_value,one,two,half,ten3m,ten6p
+!      double precision px,py,ttt,beti,el1
       parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
 
 !---- Initialize
@@ -1267,8 +1292,7 @@
      &last_orbit, z, maxaper, jmax)
       implicit none
       integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
-      double precision sum,z(6,*),maxaper(6),last_pos(*),               &
-     &last_orbit(6,*)
+      double precision sum,z(6,*),maxaper(6),last_pos(*),last_orbit(6,*)
       include 'name_len.fi'
       character*(name_len) aptype
       n = 1
@@ -1290,13 +1314,14 @@
 
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
      &last_turn, last_pos, last_orbit, z,aptype)
-!----- kill particle:  print, modify part_id list !hbu
+!hbu--- kill particle:  print, modify part_id list
       implicit none
-      integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
+      integer i,j,n,turn,part_id(*),jmax,last_turn(*)
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*)
       include 'name_len.fi'
       character*(name_len) aptype
-      character*(name_len) el_name !hbu
+!hbu
+      character*(name_len) el_name
 
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
@@ -1304,10 +1329,12 @@
         last_orbit(j,part_id(n)) = z(j,n)
       enddo
 
-      call element_name(el_name,len(el_name)) !hbu
-      write(6,'(''particle #'',i6,'' lost turn '',i6,''  at pos. s ='',
-     & f10.2,'' element='',a,'' aperture ='',a)') !hbu
-     & ,part_id(n),turn,sum,el_name,aptype !hbu
+!hbu
+      call element_name(el_name,len(el_name))
+!hbu
+      write(6,'(''particle #'',i6,'' lost turn '',i6,''  at pos. s ='', &
+     &f10.2,'' element='',a,'' aperture ='',a)')                        &
+     &part_id(n),turn,sum,el_name,aptype
       print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
 
       do i = n+1, jmax
@@ -1319,8 +1346,9 @@
       jmax = jmax - 1
       end
 
-      subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,
-     & spos,ielem,el_name) !hbu added spos, ielem, el_name
+      subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
+     &spos,ielem,el_name)
+!hbu added spos, ielem, el_name
       implicit none
 !----------------------------------------------------------------------*
 !--- purpose: enter all particle coordinates in one table              *
@@ -1335,19 +1363,27 @@
 !----------------------------------------------------------------------*
       integer i,j,npart,turn,tot_segm,segment,part_id(*),length
       double precision z(6,*),orbit0(6),tmp,tt,ss
-      character*80 table,comment !hbu was *36 allow longer info
-      integer ielem !hbu
+!hbu was *36 allow longer info
+      character*80 table,comment
+!hbu
+      integer ielem
       include 'name_len.fi'
-      character*(name_len) el_name !hbu name of element
-      double precision spos !hbu
-      character*4 vec_names(7) !hbu
-      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / !hbu
+!hbu name of element
+      character*(name_len) el_name
+!hbu
+      double precision spos
+!hbu
+      character*4 vec_names(7)
+!hbu
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
       data table / 'trackone' /
 
-      length = len(comment) !hbu
+!hbu
+      length = len(comment)
       segment = segment + 1
-      write(comment, '(''!segment'',4i8,1X,A)') !hbu
-     &  segment,tot_segm,npart,ielem,el_name !hbu
+!hbu
+      write(comment, '(''!segment'',4i8,1X,A)')                         &
+     &segment,tot_segm,npart,ielem,el_name
       call comment_to_table(table, comment, length)
       tt = turn
       do i = 1, npart
@@ -1358,11 +1394,13 @@
           tmp = z(j,i) - orbit0(j)
           call double_to_table(table, vec_names(j), tmp)
         enddo
-        call double_to_table(table,vec_names(7),spos) !hbu spos
+!hbu spos
+        call double_to_table(table,vec_names(7),spos)
         call augment_count(table)
       enddo
       end
-      subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos) !hbu added spos
+      subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
+!hbu added spos
       implicit none
 !----------------------------------------------------------------------*
 !--- purpose: enter particle coordinates in table                      *
@@ -1376,9 +1414,12 @@
       integer npart,turn,j,nobs
       double precision orbit(6),orbit0(6),tmp,tt
       character*36 table
-      double precision spos !hbu
-      character*4 vec_names(7) !hbu
-      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / !hbu
+!hbu
+      double precision spos
+!hbu
+      character*4 vec_names(7)
+!hbu
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
       data table / 'track.obs$$$$.p$$$$' /
 
       tt = turn
@@ -1389,7 +1430,8 @@
         tmp = orbit(j) - orbit0(j)
         call double_to_table(table, vec_names(j), tmp)
       enddo
-      call double_to_table(table,vec_names(7),spos) !hbu spos
+!hbu spos
+      call double_to_table(table,vec_names(7),spos)
       call augment_count(table)
       end
       subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
@@ -1427,26 +1469,26 @@
 !---- Is particle outside aperture?
         if (flag .eq. 1.and.((z(1,i)-al_errors(11))/apx)**2             &
      &  +((z(3,i)-al_errors(12)) / apy)**2 .gt. one) then
-        go to 99
+          go to 99
         else if(flag .eq. 2                                             &
-     &  .and. (abs(z(1,i)-al_errors(11)) .gt. apx                       &
-     &  .or. abs(z(3,i)-al_errors(12)) .gt. apy)) then 
-        go to 99
+     &    .and. (abs(z(1,i)-al_errors(11)) .gt. apx                     &
+     &  .or. abs(z(3,i)-al_errors(12)) .gt. apy)) then
+          go to 99
 !***  Introduction of marguerite : two ellipses
         else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)) / apx)**2      &
-     &   + ((z(3,i)-al_errors(12)) / apy)**2 .gt. one .and.             &
-     &   ((z(1,i)-al_errors(11)) / apy)**2 +                            & 
-     &   ((z(3,i)-al_errors(12)) / apx)**2 .gt. one) then
-        go to 99
+     &    + ((z(3,i)-al_errors(12)) / apy)**2 .gt. one .and.            &
+     &    ((z(1,i)-al_errors(11)) / apy)**2 +                           &
+     &  ((z(3,i)-al_errors(12)) / apx)**2 .gt. one) then
+          go to 99
         endif
         go to 98
- 99       n = i
-          nn=24
-          call node_string('apertype ',aptype,nn)
-          call trkill(n, turn, sum, ntrk, part_id,                      &
-     &    last_turn, last_pos, last_orbit, z,aptype)
-           goto 10
- 98     continue   
+ 99     n = i
+        nn=24
+        call node_string('apertype ',aptype,nn)
+        call trkill(n, turn, sum, ntrk, part_id,                        &
+     &  last_turn, last_pos, last_orbit, z,aptype)
+        goto 10
+ 98     continue
       enddo
       end
       subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
@@ -1524,7 +1566,7 @@
      &      + sqrt(et) * (eigen(k,5) * zn(5) + eigen(k,6) * zn(6))
           enddo
           if (switch .gt. 1)  then
-*--- keep initial coordinates for dynap
+!--- keep initial coordinates for dynap
             do k = 1, 6
               coords(k,0,j) = zstart(k)
             enddo

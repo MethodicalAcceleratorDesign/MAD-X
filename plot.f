@@ -1897,18 +1897,18 @@
             a(11) = tmp2
           endif
         endif
-        if (n .ge. 15) 
-     +  j = double_from_table(tabname, 'k1l ' , row, a(15))
-        if (n .ge. 16) 
-     +  j = double_from_table(tabname, 'k1sl ', row, a(16))
-        if (n .ge. 17) 
-     +  j = double_from_table(tabname, 'k2l ' , row, a(17))
-        if (n .ge. 18) 
-     +  j = double_from_table(tabname, 'k2sl ', row, a(18))
-        if (n .ge. 19) 
-     +  j = double_from_table(tabname, 'k3l ' , row, a(19))
-        if (n .ge. 20) 
-     +  j = double_from_table(tabname, 'k3sl ', row, a(20))
+        if (n .ge. 15)                                                  &
+     &  j = double_from_table(tabname, 'k1l ' , row, a(15))
+        if (n .ge. 16)                                                  &
+     &  j = double_from_table(tabname, 'k1sl ', row, a(16))
+        if (n .ge. 17)                                                  &
+     &  j = double_from_table(tabname, 'k2l ' , row, a(17))
+        if (n .ge. 18)                                                  &
+     &  j = double_from_table(tabname, 'k2sl ', row, a(18))
+        if (n .ge. 19)                                                  &
+     &  j = double_from_table(tabname, 'k3l ' , row, a(19))
+        if (n .ge. 20)                                                  &
+     &  j = double_from_table(tabname, 'k3sl ', row, a(20))
         do j = 15, n
           a(j) = a(j) / a(1)
         enddo
@@ -3333,22 +3333,4 @@
           return
         endif
       enddo
-      end
-      integer function lastnb(t)
-!----------------------------------------------------------------------*
-! Purpose:
-!   Find last non-blank in string
-!
-!----------------------------------------------------------------------*
-      implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
-
-      character *(*) t
-      integer i
-      do i = len(t), 1, -1
-        if (t(i:i) .ne. ' ') goto 20
-      enddo
-      i = 1
-   20 lastnb = i
       end

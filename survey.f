@@ -21,8 +21,7 @@
       integer i,j,code,restart_sequ,advance_node
       double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
      &theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
-     &node_value,el,suml,get_value,costhe,sinthe,cosphi,sinphi,cospsi,  &
-     &sinpsi,tilt,globaltilt
+     &node_value,el,suml,get_value,tilt,globaltilt
 
 !---- Retrieve command attributes.
       v0(1)=  get_value('survey ','x0 ')
@@ -37,7 +36,7 @@
       phi =  phi0
       psi =  psi0
 
-!---- Set up initial V and W. 
+!---- Set up initial V and W.
       suml = 0
       sums = 0.
       call sumtrx(theta0, phi0, psi0, w0)
@@ -58,7 +57,7 @@
       j = restart_sequ()
  10   continue
       code = node_value('mad8_type ')
-!      print *,"code   ", code 
+!      print *,"code   ", code
 !**** el is the arc length for all bends  ********
       el = node_value('l ')
       call suelem(el, ve, we,tilt)
@@ -101,18 +100,18 @@
 !   PHI       (real)    Elevation angle.                               *
 !   PSI       (real)    Roll angle.                                    *
 !----------------------------------------------------------------------*
-      double precision arg,theta,phi,psi,w(3,3),proxim,thetaint
+      double precision arg,theta,phi,psi,w(3,3),proxim
 
       arg = sqrt(w(2,1)**2 + w(2,2)**2)
       phi = atan2(w(2,3), arg)
 !      print *,"SUANGL: phi =",phi," arg=",arg,"  w23 =",w(2,3),
 !     &"  w22 =",w(2,2),"  w21 =",w(2,1)
-       if (arg .gt. 1.0e-20) then
+      if (arg .gt. 1.0e-20) then
         theta = proxim(atan2(w(1,3), w(3,3)), theta)
         psi = proxim(atan2(w(2,1), w(2,2)), psi)
-       else
+      else
         psi = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
-       endif
+      endif
       end
 !-----------------  end of suangl  subroutine -------------------------
 !
@@ -163,7 +162,7 @@
 ! theta, phi, psi(real) : the survey angles                            *
 !----------------------------------------------------------------------*
       integer code,nn
-      double precision ang,el,v(3),theta,phi,psi,node_value,suml,
+      double precision ang,el,v(3),theta,phi,psi,node_value,suml,       &
      &normal(20),globaltilt
 
       el = node_value('l ')
@@ -182,7 +181,7 @@
       if(code.eq.2.or.code.eq.3) then
         ang = node_value('angle ')
       else if(code.eq.8) then
-      call node_vector('knl ',nn,normal)
+        call get_node_vector('knl ',nn,normal)
         ang = normal(1)
       else
         ang = 0

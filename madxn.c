@@ -28,6 +28,22 @@ void madx()
   madx_finish();
 }
 
+#include "c6t.c"
+
+#include "madxe.c"
+
+#include "madxc.c"
+
+#include "madxreg.c"
+
+#include "sxf.c"
+
+#include "makethin.c"
+
+#include "matchc.c"
+
+#include "madxu.c"
+
 int act_special(int type, char* statement)
      /* acts on special commands (IF{..} etc.) */
 {
@@ -122,6 +138,7 @@ int act_special(int type, char* statement)
 }
 
 double act_value(int pos, struct name_list* chunks)
+  /* returns the actual value of a variable, element, or command parameter */
 {
   char* name = chunks->names[pos];
   char comm[NAME_L];
@@ -171,275 +188,8 @@ double act_value(int pos, struct name_list* chunks)
   return val;
 }
 
-int add_drifts(struct node* c_node, struct node* end)
-{
-  struct node *d1;
-  struct element *drift;
-  double pos, dl, el2;
-  int cnt = 0;
-  pos = c_node->position 
-        - c_node->length / two;
-  while (c_node != NULL)
-    {
-     cnt++;
-     el2 = c_node->length / two;
-     dl = c_node->position - el2 - pos;
-     if (dl + ten_m_6 < zero)
-       {
-        sprintf(c_dummy, "%s, length %e", c_node->name, dl);
-        fatal_error("negative drift in front of", c_dummy); 
-       }
-     else if (dl > ten_m_6)
-       {
-	cnt++;
-        drift = get_drift(dl);
-        d1 = new_elem_node(drift, 0);
-        link_in_front(d1, c_node);
-        d1->position = pos + dl / two;
-       } 
-     pos = c_node->position + el2;
-     if (c_node == end) break;
-     c_node = c_node->next;
-    }
-  return cnt;
-}
-
-void add_table_vars(struct name_list* cols, struct command_list* select)
-     /* 1: adds user selected variables to table - always type 2 = double
-        2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
-{
-  int i, j, k, n, pos;
-  char* var_name;
-  char tmp[12];
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  for (i = 0; i < select->curr; i++)
-    {
-     nl = select->commands[i]->par_names;
-     pl = select->commands[i]->par;
-     pos = name_list_pos("column", nl);
-     if (nl->inform[pos])
-       {
-	for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-	  {
-	   var_name = pl->parameters[pos]->m_string->p[j]; 
-	   if (strcmp(var_name, "apertype") == 0)
-	     {
-	      if ((n = aperture_count(current_sequ)) > 0)
-		{
-                 add_to_name_list(tmpbuff("apertype"), 3, cols);
-                 for (k = 0; k < n; k++)
-		   {
-		    sprintf(tmp, "aper_%d", k+1);
-                    add_to_name_list(tmpbuff(tmp), 2, cols);
-		   }
-		}
-	     }
-	   else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
-              add_to_name_list(tmpbuff(var_name), 2, cols);
-	  }
-       }
-    }
-}
-
-void add_to_command_list(char* label, struct command* comm, 
-                         struct command_list* cl, int flag)
-     /* flag for printing a warning */
-{
-  int pos, j;
-  if ((pos = name_list_pos(label, cl->list)) > -1)
-    {
-     if (flag) put_info(label, "redefined");
-     if (cl != defined_commands && cl != stored_commands)
-         delete_command(cl->commands[pos]);
-     cl->commands[pos] = comm;
-    }
-  else
-    {
-     if (cl->curr == cl->max) grow_command_list(cl);
-     j = add_to_name_list(permbuff(label), 0, cl->list);
-     cl->commands[cl->curr++] = comm;
-    }
-}
-
-void add_to_command_list_list(char* label, struct command_list* cl,
-                              struct command_list_list* sl)
-{
-  int pos, j;
-  if ((pos = name_list_pos(label, sl->list)) > -1)
-    {
-     delete_command_list(sl->command_lists[pos]);
-     sl->command_lists[pos] = cl;
-    }
-  else
-    {
-     if (sl->curr == sl->max) grow_command_list_list(sl);
-     j = add_to_name_list(permbuff(label), 0, sl->list);
-     sl->command_lists[sl->curr++] = cl;
-    }
-}
-
-void add_to_constraint_list(struct constraint* cs, struct constraint_list* cl)
-{
-  if (cl->curr == cl->max) grow_constraint_list(cl);
-  cl->constraints[cl->curr++] = cs;
-}
-
-void add_to_el_list( /* adds element to alphabetic element list */
-		 struct element* el, int inf, struct el_list* ell, int flag)
-{
-  /*  flag < 0: do not delete if already present, do not warn */
-  /*       = 0: delete, but do not warn */
-  /*       = 1: delete & warn */
-  /*       = 2: warn and ignore if already present */
-  int pos, j;
-  if ((pos = name_list_pos(el->name, ell->list)) > -1)
-    {
-     if (flag > 1) 
-       warning("element re-definition inside sequence ignored:", el->name);
-     else 
-       {
-        if (flag > 0) put_info("element redefined:", el->name);
-        if (flag >= 0 && ell == element_list) delete_element(ell->elem[pos]);
-        ell->elem[pos] = el;
-       }
-    }
-  else
-    {
-     if (ell->curr == ell->max) grow_el_list(ell);
-     j = add_to_name_list(permbuff(el->name), inf, ell->list);
-     ell->elem[ell->curr++] = el;
-    }
-}
-
-void add_to_macro_list( /* adds macro to alphabetic macro list */
-		 struct macro* macro, struct macro_list* nll)
-{
-  int pos, j;
-  if ((pos = name_list_pos(macro->name, nll->list)) > -1)
-    {
-     warning("macro redefined:", macro->name);
-     delete_macro(nll->macros[pos]);
-     nll->macros[pos] = macro;
-    }
-  else
-    {
-     if (nll->curr == nll->max) grow_macro_list(nll);
-     j = add_to_name_list(permbuff(macro->name), 0, nll->list);
-     nll->macros[nll->curr++] = macro;
-    }
-}
-
-int add_to_name_list(char* name, int inf, struct name_list* vlist)
-{
-  int j, num, low = 0, mid, high = vlist->curr - 1, pos = 0, ret;
-
-  if (name == NULL) return -1;
-  if ((ret = name_list_pos(name, vlist)) < 0)
-    {
-     while (low <= high)
-       {
-        mid = (low + high) / 2;
-        if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0)
-                          {high = mid - 1; pos = mid;}
-        else if (num > 0) {low  = mid + 1; pos = low;}
-       }
-     ret = vlist->curr;
-     if (vlist->curr == vlist->max) grow_name_list(vlist);
-     for (j = vlist->curr; j > pos; j--) vlist->index[j] = vlist->index[j-1];
-     vlist->index[pos] = vlist->curr; 
-     vlist->inform[vlist->curr] = inf;
-     vlist->names[vlist->curr++] = name;
-    }
-  else  vlist->inform[ret] = inf;
-  return ret;
-}
-
-void add_to_node_list( /* adds node to alphabetic node list */
-		 struct node* node, int inf, struct node_list* nll)
-{
-  int pos, j;
-  if ((pos = name_list_pos(node->name, nll->list)) < 0)
-    {
-     if (nll->curr == nll->max) grow_node_list(nll);
-     j = add_to_name_list(node->name, inf, nll->list);
-     nll->nodes[nll->curr++] = node;
-    }
-}
-
-void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
-{
-  int i;
-  for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  return;
-  if (sql->curr == sql->max) grow_sequence_list(sql);
-  sql->sequs[sql->curr++] = sequ;
-  add_to_name_list(sequ->name, 0, sql->list);
-}
-
-void add_to_table_list(struct table* t, struct table_list* tl)
-{
-  int pos, j;
-  if ((pos = name_list_pos(t->name, tl->names)) < 0)
-    {
-     if (tl->curr == tl->max) grow_table_list(tl);
-     j = add_to_name_list(tmpbuff(t->name), 0, tl->names);
-     tl->tables[tl->curr++] = t;
-    }
-  else 
-    {
-     tl->tables[pos] = delete_table(tl->tables[pos]);     
-     tl->tables[pos] = t;
-    }
-}
-
-void add_to_var_list( /* adds variable to alphabetic variable list */
-		 struct variable* var, struct var_list* varl, int flag)
-     /* flag = 0: undefined reference in expression, 1: definition 
-               2: separate list, do not drop variable */
-{
-  int pos, j;
-  if ((pos = name_list_pos(var->name, varl->list)) > -1)
-    {
-     if (flag == 1)
-       {
-        if (varl->list->inform[pos] == 1)
-           put_info(var->name, "redefined");
-	else varl->list->inform[pos] = flag;
-       }
-     if (flag < 2) delete_variable(varl->vars[pos]);
-     varl->vars[pos] = var;
-    }
-  else
-    {
-     if (varl->curr == varl->max) grow_var_list(varl);
-     j = add_to_name_list(permbuff(var->name), flag, varl->list);
-     varl->vars[varl->curr++] = var;
-    }
-}
-
-void add_vars_to_table(struct table* t)
-     /* fills user-defined variables into current table_row) */
-{
-  int i;
-  char* p;
-
-  for (i = t->org_cols; i < t->num_cols; i++)
-    {
-     if (t->columns->inform[i] < 3)
-       {
-	if (strstr(t->columns->names[i], "aper_"))
-          t->d_cols[i][t->curr] 
-          = get_aperture(current_node, t->columns->names[i]);
-        else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
-       }
-     else if ((p = command_par_string(t->columns->names[i], 
-		  current_node->p_elem->def)) == NULL)
-          t->s_cols[i][t->curr] = tmpbuff("none");
-     else t->s_cols[i][t->curr] = tmpbuff(p);
-    }
-}
-
 void adjust_beam()
+     /* adjusts beam parameters to current beta, gamma, bcurrent, npart */
 {
   struct name_list* nl = current_beam->par_names;
   double circ = one, freq0, alfa, beta, gamma, bcurrent, npart = 0;
@@ -463,6 +213,7 @@ void adjust_beam()
 }
 
 void adjust_probe(double delta_p)
+     /* adjusts beam parameters to the current deltap */
 {
   int j;
   double etas, slope, qs, fact, tmp, ds = oneturnmat[34];
@@ -529,6 +280,7 @@ void adjust_probe(double delta_p)
 
 void adjust_rfc()
 {
+  /* adjusts rfc frequency to given harmon number */
   double freq0, harmon, freq;
   int i;
   struct element* el;
@@ -545,6 +297,8 @@ void adjust_rfc()
 }
 
 int advance_node()
+     /* advances to next node in expanded sequence;
+        returns 0 if end of range, else 1 */
 {
   if (current_node == current_sequ->range_end)  return 0;
   current_node = current_node->next;
@@ -580,6 +334,7 @@ char* alias(char* par_string) /* returns main parameter for alias */
 }
 
 void all_node_pos(struct sequence* sequ)
+     /* calculates all node positions in an expanded sequence */
 {
   struct node* node = sequ->start;
   while (node != NULL)
@@ -625,6 +380,7 @@ int aperture_count(struct sequence* sequ)
 }
 
 int attach_beam(struct sequence* sequ)
+     /* attaches the beam belonging to the current sequence */
 {
   if ((current_beam = find_command(sequ->name, beam_list)) == NULL)
     current_beam = find_command("default_beam", beam_list);
@@ -641,11 +397,17 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   else return;
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
   if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+  if (t->p_nodes != NULL) t->p_nodes[t->curr] = current_node;
+  if (t->node_nm != NULL)
+    {
+     t->node_nm->p[t->curr] = current_node->name; 
+     t->node_nm->curr = t->curr;
+    }
   if (++t->curr == t->max) grow_table(t);
-  t->node_nm->curr = t->curr;
 }
 
 int belongs_to_class(struct element* el, char* class)
+     /* returns 1 if an element belongs to a class, else 0 */
 {
   int in = 0;
   if (strcmp(el->name, class) == 0) in = 1;
@@ -669,6 +431,7 @@ char* buffer(char* string)  /* replaced by permbuff */
 }
 
 struct in_cmd* buffered_cmd(struct in_cmd* cmd)
+     /* returns a buffered command if found */
 {
   int k;
   if ((k = name_list_pos(cmd->tok_list->p[cmd->decl_start], 
@@ -678,6 +441,7 @@ struct in_cmd* buffered_cmd(struct in_cmd* cmd)
 }
 
 void buffer_in_cmd(struct in_cmd* cmd)
+     /* stores an input command in a buffer */
 {
   int i;
   if (buffered_cmds->curr == buffered_cmds->max) 
@@ -687,20 +451,6 @@ void buffer_in_cmd(struct in_cmd* cmd)
   buffered_cmds->in_cmds[buffered_cmds->curr++] = cmd;
   for (i = 0; i < cmd->tok_list->curr; i++)
     cmd->tok_list->p[i] = permbuff(cmd->tok_list->p[i]);
-}
-
-int char_cnt(char c, char* string)
-{
-  int i, k = 0;
-  for (i = 0; i < strlen(string); i++) if(string[i] == c) k++;
-  return k;
-}
-
-int char_p_pos(char* name, struct char_p_array* p)
-{
-  int i;
-  for (i = 0; i < p->curr; i++) if (strcmp(name, p->p[i]) == 0) return i;
-  return -1;
 }
 
 int char_from_table(char* table, char* name, int* row, char* val)
@@ -754,6 +504,8 @@ void check_table(char* string)
 }
 
 int cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
+     /* matches input (user) command with the symbolic description
+        from the list in madxl.h and returns is type */
 {
   int i, i2, j, k, lp;
   for (i = 0; i < n_match; i++)
@@ -784,6 +536,7 @@ int cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
 }
 
 struct double_array* command_par_array(char* parameter, struct command* cmd)
+     /* returns an updated command parameter array if found, else NULL */
 {
   struct command_parameter* cp;
   struct double_array* arr = NULL;
@@ -801,6 +554,7 @@ struct double_array* command_par_array(char* parameter, struct command* cmd)
 }
 
 struct expression* command_par_expr(char* parameter, struct command* cmd)
+     /* returns a command parameter expression if found, else NULL */
 {
   struct expression* expr = NULL;
   int i;
@@ -810,6 +564,7 @@ struct expression* command_par_expr(char* parameter, struct command* cmd)
 }
 
 char* command_par_string(char* parameter, struct command* cmd)
+     /* returns a command parameter string if found, else NULL */
 {
   struct command_parameter* cp;
   char* p = NULL;
@@ -823,6 +578,7 @@ char* command_par_string(char* parameter, struct command* cmd)
 }
 
 double command_par_value(char* parameter, struct command* cmd)
+     /* returns a command parameter value if found, else zero */
 {
   struct command_parameter* cp;
   double val = zero;
@@ -837,6 +593,26 @@ double command_par_value(char* parameter, struct command* cmd)
        }
     }
   return val;
+}
+
+int command_par_vector(char* parameter, struct command* cmd, double* vector)
+     /* returns the length of, and an updated command parameter vector 
+        if found, else 0 */
+{
+  struct command_parameter* cp;
+  int i;
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
+    {
+     cp = cmd->par->parameters[i];
+     if (cp->double_array != NULL)
+       {
+        if (cp->expr_list != NULL) 
+            update_vector(cp->expr_list, cp->double_array);
+	copy_double(cp->double_array->a, vector, cp->double_array->curr);
+        return cp->double_array->curr;
+       }
+    }
+  return 0;
 }
 
 void comment_to_table(char* table, char* comment, int* length)
@@ -942,6 +718,7 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 }
 
 void complete_twiss_table(struct table* t)
+     /* fills all items missing after "twiss" into twiss table */
 {
   int i, j, mult, n;
   double el, val;
@@ -990,6 +767,7 @@ char* compound(char* e_name, int occ)
 
 struct expression* compound_expr(struct expression* e1, double v1,
                       char* oper, struct expression* e2, double v2)
+     /* make one out of two expressions, using oper to connect them */
 {
   char** toks = tmp_l_array->p;
   struct expression* expr = NULL;
@@ -1030,6 +808,7 @@ struct expression* compound_expr(struct expression* e1, double v1,
 }
 
 void control(struct in_cmd* cmd)
+     /* executes so-called "control" commands */
 {
   char** toks = cmd->tok_list->p;
   int k = cmd->decl_start - 1;
@@ -1037,6 +816,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
   else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
   else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
+  else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
   else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
@@ -1048,20 +828,13 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
   else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
   else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
 }
 
-void conv_char(char* string, struct int_array* tint)
-     /*converts character string to integer array, using ascii code */
-{
-  int i, l = strlen(string),
-  n = (l < tint->max-1) ? l : tint->max-1;
-  tint->i[0] = n;
-  for (i = 0; i < n; i++)  tint->i[i+1] = (int) string[i];
-}
-
 void deco_init()
+     /* initializes Polish decoding */
 {
   expr_chunks = new_name_list(2000);
   cat = new_int_array(MAX_ITEM);
@@ -1402,7 +1175,8 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
 	     }
            expr = delete_expression(expr);
            clp->double_array->a[cnt++] = val;
-           clp->double_array->curr = clp->expr_list->curr = cnt;
+           if (cnt > clp->double_array->curr)
+               clp->double_array->curr = clp->expr_list->curr = cnt;
            start = end + 1;
 	  }
        }
@@ -1413,6 +1187,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
 }
 
 double double_from_expr(char** toks, int s_start, int s_end)
+     /* returns the value of an expression if valid, else INVALID */
 {
   int end, nitem = s_end + 1;
   int type = loc_expr(toks, nitem, s_start, &end);
@@ -1435,9 +1210,6 @@ void double_to_table(char* table, char* name, double* val)
     t = table_register->tables[pos];
   else return;
   mycpy(c_dummy, name);
-  t->p_nodes[t->curr] = current_node;
-  t->node_nm->p[t->curr] = current_node->name; 
-  t->node_nm->curr = t->curr;
   if ((pos = name_list_pos(c_dummy, t->columns)) >= 0
       && t->columns->inform[pos] < 3) t->d_cols[pos][t->curr] = *val;
 }
@@ -1467,6 +1239,7 @@ int double_from_table(char* table, char* name, int* row, double* val)
 }
 
 int down_unit(char* file_name)
+     /* makes a called file the current input unit */
 {
   FILE* new;
   if ((new = fopen(file_name, "r")) == NULL)
@@ -1480,251 +1253,8 @@ int down_unit(char* file_name)
   return 1;
 }
 
-void dump_char_array(struct char_array* a)
-{
-  char* c = a->c;
-  int n = 0, l_cnt = 60, k;
-  while (n < a->curr)
-    {
-     k = a->curr - n; if (k > l_cnt) k = l_cnt;
-     strncpy(c_dummy, c, k);
-     c += k; n += k;
-     c_dummy[k] = '\0';
-     fprintf(prt_file, "%s\n", c_dummy);
-    }
-}
-
-void dump_char_p_array(struct char_p_array* p)
-{
-  int i;
-  for (i = 0; i < p->curr; i++) fprintf(prt_file, "%s\n", p->p[i]);
-}
-
-void dump_command(struct command* cmd)
-{
-  int i;
-  fprintf(prt_file, "command: %s  module: %s\n", 
-          cmd->name, cmd->module);
-  for (i = 0; i < cmd->par->curr; i++)  
-       dump_command_parameter(cmd->par->parameters[i]);
-}
-
-void dump_command_parameter(struct command_parameter* par)
-{
-  int i, k;
-  char logic[2][8] = {"false", "true"};
-  fprintf(prt_file, "parameter: %s   ", par->name);
-  switch (par->type)
-    {
-    case 0:
-     k = par->double_value;
-     fprintf(prt_file, "logical: %s\n", logic[k]);
-     break;
-    case 1:
-     if (par->expr != NULL)
-       {
-        dump_expression(par->expr);
-        par->double_value = expression_value(par->expr, 2);
-       }
-     k = par->double_value;
-     fprintf(prt_file, "integer: %d\n", k);
-     break;
-    case 2:
-     if (par->expr != NULL)
-       {
-        dump_expression(par->expr);
-        par->double_value = expression_value(par->expr, 2);
-       }
-     fprintf(prt_file, "double value: %e\n", par->double_value);
-     break;
-    case 11:
-    case 12:
-    if (par->double_array != NULL)
-      {
-       if (par->expr_list != NULL)
-	 {
-          for (i = 0; i < par->double_array->curr; i++)
-	    {
-	     if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
-	         par->double_array->a[i] 
-                 = expression_value(par->expr_list->list[i], 2);
-	    }
-	 }
-       fprintf(prt_file, "double array: ");
-       for (i = 0; i < par->double_array->curr; i++) 
-            fprintf(prt_file, "%e ", par->double_array->a[i]);
-       fprintf(prt_file, "\n");
-      }
-     break;
-    case 3:
-     fprintf(prt_file, "string: %s\n", par->string);
-     break;
-    case 13:
-      dump_char_p_array(par->m_string);
-    }
-}
-
-void dump_constraint(struct constraint* c)
-{
-  fprintf(prt_file, "name: %s type: %d value: %e min: %e max: %e weight: %e\n",
-         c->name, c->type, c->value, c->c_min, c->c_max, c->weight);
-}
-
-void dump_constraint_list(struct constraint_list* cl)
-{
-  int i;
-  for (i = 0; i < cl->curr; i++) 
-    {
-     if (cl->constraints[i]) dump_constraint(cl->constraints[i]);
-    }
-}
-
-void dump_element(struct element* el)
-{
-  fprintf(prt_file, "+++ dumping element %s  parent %s\n", el->name, el->parent->name);
-  dump_command(el->def);
-}
-
-void dump_el_list(struct el_list* ell)
-{
-  int i;
-  for (i = 0; i < ell->curr; i++) dump_element(ell->elem[i]);
-}
-
-void dump_expression(struct expression* ex)
-{
- ex->value = expression_value(ex, 2);
- fprintf(prt_file, "expression: %s :: value: %e\n", ex->string, ex->value);
-}
-
-void dump_exp_sequ(struct sequence* sequ, int level)
-{
-  struct node* c_node;
-  int j;
-  double suml = zero;
-  puts("+++++++++ dump expanded sequence +++++++++");
-  c_node = sequ->ex_start;
-  while(c_node != NULL)
-    {
-     suml += c_node->length;
-     if (level > 2)
-       {
-        dump_node(c_node);
-        if (c_node->p_al_err != NULL)
-	  {
-	   puts("alignment errors:");
-           for (j = 0; j < c_node->p_al_err->curr; j++) 
-	     printf("%e ", c_node->p_al_err->a[j]);
-           printf("\n");
-	  }
-        if (c_node->p_fd_err != NULL)
-	  {
-	   puts("field errors:");
-           for (j = 0; j < c_node->p_fd_err->curr; j++) 
-	     printf("%e ", c_node->p_fd_err->a[j]);
-           printf("\n");
-	  }
-        if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
-       }
-     else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-       fprintf(prt_file, "%s: at = %f  flag = %d\n", c_node->name, 
-              c_node->position, c_node->enable);
-     if (c_node == sequ->ex_end)  break;
-     c_node = c_node->next;
-    }
-  fprintf(prt_file, "=== sum of node length: %f\n", suml);
-}
-
-void dump_in_cmd(struct in_cmd* p_inp)
-{
-  fprintf(prt_file, "%s: type =%d, sub_type = %d, decl_start = %d\n",
-	    p_inp->label, p_inp->type, p_inp->sub_type, p_inp->decl_start);
-  if (p_inp->cmd_def != NULL) 
-    {
-     fprintf(prt_file, "defining command: %s\n", p_inp->cmd_def->name);
-     /* dump_command(p_inp->cmd_def); */
-    }
-}
-
-void dump_int_array(struct int_array* ia)
-{
-  int i;
-  fprintf(prt_file, "dump integer array, length: %d\n", ia->curr);
-  for (i = 0; i < ia->curr; i++)
-    {
-     fprintf(prt_file, "%d ", ia->i[i]);
-     if ((i+1)%10 == 0) fprintf(prt_file, "\n");
-    }
-  if (ia->curr%10 != 0) fprintf(prt_file, "\n");
-}
-
-void dump_macro(struct macro* m)
-{
-  fprintf(prt_file, "name: %s\n", m->name);
-  if (m->formal != NULL) dump_char_p_array(m->formal);
-  dump_char_array(m->body);
-  if (m->tokens != NULL) dump_char_p_array(m->tokens);
-}
-
-void dump_macro_list(struct macro_list* ml)
-{
-  int i;
-  puts("++++++ dump of macro list");
-  for (i = 0; i < ml->curr; i++) dump_macro(ml->macros[i]);
-}
-
-void dump_name_list(struct name_list* nl)
-{
-  int i;
-  puts(" ");
-  for (i = 0; i < nl->curr; i++) 
-    {
-     fprintf(prt_file, "%-16s %d\n", nl->names[nl->index[i]], nl->inform[nl->index[i]]);
-    }
-}
-
-void dump_node(struct node* node)
-{
-  int i;
-  char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL";
-  if (node->previous != NULL) strcpy(pname, node->previous->name);
-  if (node->next != NULL) strcpy(nname, node->next->name);
-  fprintf(prt_file, "name: %s  occ: %d base: %s  position: %f\n", node->name, 
-          node->occ_cnt, node->base_name, node->position);
-  fprintf(prt_file, "  names of - previous: %s  next: %s\n",
-         pname, nname);
-  if (node->cl != NULL)  for (i = 0; i < node->cl->curr; i++) 
-        dump_constraint(node->cl->constraints[i]);
-}
-
-void dump_sequ(struct sequence* c_sequ, int level)
-{
-  struct node* c_node;
-  double suml = zero;
-  fprintf(prt_file, "+++ dump sequence: %s\n", c_sequ->name);
-  c_node = c_sequ->start;
-  while(c_node != NULL)
-    {
-     suml += c_node->length;
-     if (level > 2)
-       {
-        dump_node(c_node);
-        if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
-       }
-     else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-       fprintf(prt_file, "%s: at = %f\n", c_node->name, c_node->position);
-     if (c_node == c_sequ->end)  break;
-     c_node = c_node->next;
-    }
-  fprintf(prt_file, "=== sum of node length: %f\n", suml);
-}
-
-void dump_variable(struct variable* v)
-{
-  fprintf(prt_file, "=== dumping variable %s\n", v->name);
-}
-
 void dynap_tables_create(struct in_cmd* cmd)
+     /* creates the dynamic tables for DYNAP execution */
 {
   int npart = stored_track_start->curr;
 
@@ -1740,6 +1270,7 @@ void dynap_tables_create(struct in_cmd* cmd)
 }
 
 void enter_element(struct in_cmd* cmd)
+     /* enters an element in the list (and the sequence if applicable) */
 {
   struct name_list* nl;
   struct command_parameter_list* pl;
@@ -1760,7 +1291,8 @@ void enter_element(struct in_cmd* cmd)
      if (k == 0 || strcmp(toks[0], toks[2]) == 0) el = parent;
      else 
        {
-        el = make_element(toks[0], parent->name, cmd->clone, 1+sequ_is_on);
+        if ((el = make_element(toks[0], parent->name, 
+                               cmd->clone, 1+sequ_is_on)) == NULL) return;
         el->def_type = sequ_is_on;
         flag = 1; /* new element - definition only once in sequence allowed */
        }
@@ -1790,6 +1322,7 @@ double element_value(struct node* node, char* par)
 }
 
 double el_par_value(char* par, struct element* el)
+     /* returns an element parameter value */
 {
   int k = 0, n;
   char tmp[8];
@@ -1872,7 +1405,7 @@ void element_name(char* name, int* l)
 int element_vector(struct element* el, char* par, double* vector)
      /* returns length + vector of parameter par for element el */
 {
-  int i, j, l = 0;
+  int i, l = 0;
   struct double_array* da;
   struct expr_list* ell;
   if ((i = name_list_pos(par, el->def->par_names)) > -1)
@@ -1882,13 +1415,14 @@ int element_vector(struct element* el, char* par, double* vector)
 	if ((ell = el->def->par->parameters[i]->expr_list) != NULL)
            update_vector(ell, da);
         l = da->curr;
-        for (j = 0; j < l; j++) vector[j] = da->a[j];
+        copy_double(da->a, vector, l);
        }
     }
   return l;
 }
 
 void enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
+     /* enters an element in a sequence */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -1915,7 +1449,7 @@ void enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
 }
 
 void enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ) 
-   /* sequence in sequence */
+   /* enters a sequence in a sequence */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -1938,7 +1472,8 @@ void enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ)
        current_sequ->nested = sequ->nested + 1;
 }
 
-void enter_sequence(struct in_cmd* cmd) /*sequence start or element ref. */
+void enter_sequence(struct in_cmd* cmd)
+     /* handles sequence start and end on input */
 {
   struct name_list* nl;
   struct command_parameter_list* pl;
@@ -2135,6 +1670,7 @@ void enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
 }
 
 void exec_assign(struct in_cmd* cmd)
+     /* executes output unit assignment */
 {
   char* p;
   char tmp[FNAME_L];
@@ -2162,6 +1698,7 @@ void exec_beam(struct in_cmd* cmd, int flag)
      /* chooses correct beam for beam definitions, upgrades, and resets */
 {
   char* name;
+  char name_def[] = "default_beam";
   struct command* keep_beam = current_beam;
   struct command_parameter_list* pl = cmd->clone->par;
   struct name_list* nl = cmd->clone->par_names;
@@ -2175,7 +1712,12 @@ void exec_beam(struct in_cmd* cmd, int flag)
         add_to_command_list(name, current_beam, beam_list, 0);
        }
     }
-  else current_beam = find_command("default_beam", beam_list);
+  else 
+    {
+     name = name_def;
+     current_beam = find_command(name, beam_list);
+    }
+  current_beam->par->parameters[pos]->string = permbuff(name);
   current_beam->beam_def = 1;
   if (flag == 0) update_beam(cmd->clone);
   else if (flag == 1)
@@ -2187,6 +1729,7 @@ void exec_beam(struct in_cmd* cmd, int flag)
 }
 
 void exec_call(struct in_cmd* cmd)
+     /* handles calling external files */
 {
   struct command_parameter_list* pl = cmd->clone->par;
   struct name_list* nl = cmd->clone->par_names;
@@ -2200,6 +1743,7 @@ void exec_call(struct in_cmd* cmd)
 }
 
 void exec_command()
+     /* executes one command */
 {
   char** toks;
   char* cmd_name;
@@ -2223,7 +1767,10 @@ void exec_command()
      toks = p->tok_list->p;
      cmd_name = p->cmd_def->name;
      if (strcmp(cmd_name, "stop") == 0 || strcmp(cmd_name, "quit") == 0
-         || strcmp(cmd_name, "exit") == 0)  madx_finish();
+         || strcmp(cmd_name, "exit") == 0)  
+       {
+	madx_finish(); stop_flag = 1; return;
+       }
      else if (strcmp(cmd_name, "help") == 0) exec_help(p);
      else if (strcmp(cmd_name, "show") == 0) exec_show(p);
      else if (strcmp(cmd_name, "return") == 0)  return_flag = 1;
@@ -2303,6 +1850,7 @@ void exec_command()
 	   current_twiss = p->clone;
 	   pro_twiss();
 	  }
+        /* else if (strcmp(p->cmd_def->module, "ptc") == 0) ttwm_(); */
       }
     }
 }
@@ -2354,7 +1902,23 @@ void exec_create_table(struct in_cmd* cmd)
   free(t_c); free(t_types);
 }
 
+void exec_store_coguess(struct in_cmd* cmd)
+     /* stores the initial orbit guess of the user */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  int pos = name_list_pos("tolerance", nl);
+  double tol;
+  if (nl->inform[pos])
+    {
+     tol = command_par_value("tolerance", cmd->clone);
+     set_variable("twiss_tol", &tol);
+    }
+  store_orbit(cmd->clone, guess_orbit);
+  guess_flag = 1;
+}
+
 void exec_dump(struct in_cmd* cmd)
+     /* write a table out */
 {
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;
@@ -2389,6 +1953,7 @@ void exec_dump(struct in_cmd* cmd)
 }
 
 void exec_dumpsequ(struct in_cmd* cmd)
+     /* writes a sequence out */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -2409,6 +1974,7 @@ void exec_dumpsequ(struct in_cmd* cmd)
 }
 
 void exec_help(struct in_cmd* cmd)
+     /* prints list of commands */
 {
   char** toks = cmd->tok_list->p;
   int i, k = 0, pos, n = cmd->tok_list->curr;
@@ -2445,6 +2011,7 @@ void exec_help(struct in_cmd* cmd)
 }
 
 void exec_fill_table(struct in_cmd* cmd)
+     /* adds variables to a table */
 {
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;
@@ -2472,6 +2039,7 @@ void exec_fill_table(struct in_cmd* cmd)
 }
 
 void exec_macro(struct in_cmd* cmd, int pos)
+     /* executes a macro */
 {
   int i, rs, re, any = 0, level = pro->curr;
   int n = macro_list->macros[pos]->n_formal;
@@ -2532,6 +2100,7 @@ void exec_plot(struct in_cmd* cmd)
 }
 
 void exec_print(struct in_cmd* cmd)
+     /* prints text from "print" command to current output unit */
 {
   struct command_parameter_list* pl = cmd->clone->par;
   struct name_list* nl = cmd->clone->par_names;
@@ -2542,7 +2111,8 @@ void exec_print(struct in_cmd* cmd)
 void exec_save(struct in_cmd* cmd)
      /* save a sequence with all necessary parameters and sub-sequences */
 {
-  int i, n = 0, pos, prev = 0, mad8 = log_val("mad8", cmd->clone);
+  int i, n = 0, pos, prev = 0, beam_save = log_val("beam", cmd->clone), 
+      mad8 = log_val("mad8", cmd->clone), all_sequ = 0;
   char *name, *filename;
   struct element* el;
   struct el_list* ell;
@@ -2553,6 +2123,7 @@ void exec_save(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   struct command_parameter* clp;
+  default_beam_saved = 0;
   i = name_list_pos("file", nl);
   if (nl->inform[i] == 0)
     {
@@ -2570,7 +2141,7 @@ void exec_save(struct in_cmd* cmd)
   clp = cmd->clone->par->parameters[pos];
   if (nl->inform[pos] == 0)  /* no sequence given, all sequences saved */
     {
-     sqo = sequences;
+     sqo = sequences; all_sequ = 1;
     }
   else 
     {
@@ -2586,59 +2157,68 @@ void exec_save(struct in_cmd* cmd)
   /* now do it */
   sql = new_sequence_list(20);
   ell = new_el_list(10000);
-  varl = new_var_list(2000);
+  if (all_sequ == 0)  varl = new_var_list(2000);
+  else                varl = variable_list; /* write all variables */
   for (pos = 0; pos < sqo->curr; pos++)
     {
      sequ = sqo->sequs[pos];
      fill_sequ_list(sequ, sql);
+     if (beam_save) 
+       {
+        if (mad8 == 0) save_beam(sequ, out_file); /* only mad-X */
+        else warning("when mad-8 format requested,","beam not saved");
+       }
     }
   for (i = sql->curr-1; i >= 0; i--) /* loop over sequences, get elements */
     {
      c_node = sql->sequs[i]->start;
      while (c_node != NULL)
        {
-  	if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
+  	   if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
             && strcmp(el->base_type->name, "drift") != 0)
-  	     {
-  	      if (el->def_type != 0) el = el->parent;
-              while (el->base_type != el)
   	        {
+  	         if (el->def_type != 0) el = el->parent;
+              while (el->base_type != el)
+  	           {
                  add_to_el_list(el, 0, ell, 0);
-  	         el = el->parent;
+  	            el = el->parent;
+  	           }
   	        }
-  	     }
         if (c_node == sql->sequs[i]->end) break;
         c_node = c_node->next;
        }
     }
-  while (prev < ell->curr) /* loop over elements, get variables -
-                           recursive, since elements may be added */
+  if (all_sequ == 0) 
     {
-     prev = ell->curr;
-     for (i = n; i < ell->curr; i++)
-        fill_elem_var_list(ell->elem[i], ell, varl);
-     n = prev;
+     while (prev < ell->curr) /* loop over elements, get variables -
+                                 recursive, since elements may be added */
+       {
+        prev = ell->curr;
+        for (i = n; i < ell->curr; i++)
+           fill_elem_var_list(ell->elem[i], ell, varl);
+        n = prev;
+       }
+     fill_sequ_var_list(sql, ell, varl); /* variables for positions */
     }
-  fill_sequ_var_list(sql, ell, varl); /* variables for positions */
   if (mad8)
     {
-     write_vars_8(varl, out_file);
-     write_elems_8(ell, out_file);
+     write_vars_8(varl, save_select, out_file);
+     write_elems_8(ell, save_select, out_file);
      for (pos = 0; pos < sql->curr; pos++)
        {
         sequ = sql->sequs[pos];
         all_node_pos(sequ);
         sequ->ex_nodes = new_node_list(2*sequ->nodes->curr);
         expand_sequence(sequ, 0);
-        export_sequ_8(sequ, out_file);
+        export_sequ_8(sequ, save_select, out_file);
         sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
        }
     }
   else
     {
-     write_vars(varl, out_file);
-     write_elems(ell, out_file);
-     write_sequs(sql, out_file);
+     write_vars(varl, save_select, out_file);
+     write_elems(ell, save_select, out_file);
+     write_sequs(sql, save_select, out_file);
     }
   fclose(out_file);
   if (sqo != sequences) sqo = delete_sequence_list(sqo);
@@ -2649,6 +2229,7 @@ void exec_save(struct in_cmd* cmd)
 }
 
 void exec_savebeta()
+     /* stores twiss values in a beta0 structure */
 {
   struct name_list* nl;
   struct command_parameter_list* pl;
@@ -2682,6 +2263,7 @@ void exec_savebeta()
 }
 
 void exec_show(struct in_cmd* cmd)
+     /* executes "show" command */
 {
   struct element* el;
   struct variable* var;
@@ -2715,7 +2297,7 @@ void exec_show(struct in_cmd* cmd)
 }
 
 void expand_line(struct char_p_array* l_buff)
-     /* applies rep. count and inversion */
+     /* expands a beam line, applies rep. count and inversion */
 {
   /* first get all bracket pairs with their level; keep max. level */
   int add, i, j, k, n, number, dummy, rep, pos;
@@ -2837,7 +2419,7 @@ void expand_line(struct char_p_array* l_buff)
 
 struct node* expand_node(struct node* node, struct sequence* top_sequ,
                          struct sequence* sequ, double position)
-     /* replaces a node by a sequence of nodes - recursive */
+     /* replaces a (sequence) node by a sequence of nodes - recursive */
 {
   struct sequence* nodesequ = node->p_sequ;
   struct node *p, *q = nodesequ->start;
@@ -2873,6 +2455,7 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
 }
 
 void expand_curr_sequ(int flag)
+     /* expands the current sequence, i.e. flattens it, inserts drifts etc. */
 {
   struct node* c_node;
   int j;
@@ -2880,6 +2463,7 @@ void expand_curr_sequ(int flag)
     {
      current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
      current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
+     current_sequ->orbits = delete_vector_list(current_sequ->orbits);
     }
   if (current_sequ->ex_start == NULL)
     {
@@ -2913,6 +2497,7 @@ void expand_curr_sequ(int flag)
 }
 
 void expand_sequence(struct sequence* sequ, int flag)
+     /* expands a sequence into nodes, expands sequence nodes */
 {
   /* Transfers errors from original nodes if flag != 0; 
      this is needed for SXF input  */
@@ -2942,398 +2527,8 @@ void expand_sequence(struct sequence* sequ, int flag)
     }
 }
 
-void export_element(struct element* el, struct el_list* ell, FILE* file)
-     /* recursive to have parents always in front for MAD-8 */
-{
-  int pos = name_list_pos(el->name, ell->list);
-  char out[ELEM_OUT];
-  if (pos >= 0)
-    {
-     if (ell->list->inform[pos] == 0)  /* not yet written */
-       {
-        export_element(el->parent, ell, file);
-        strcpy(out, el->name);
-        strcat(out, ": ");
-        strcat(out, el->parent->name);
-        export_el_def(el, out);
-        write_nice(out, file);
-        ell->list->inform[pos] = 1;
-       }
-    }
-}
-
-void export_elem_8(struct element* el, struct el_list* ell, FILE* file)
-     /* recursive to have parents always in front for MAD-8 */
-{
-  int pos = name_list_pos(el->name, ell->list);
-  char out[ELEM_OUT];
-  if (pos >= 0)
-    {
-     if (ell->list->inform[pos] == 0)  /* not yet written */
-       {
-        export_elem_8(el->parent, ell, file);
-        strcpy(out, el->name);
-        strcat(out, ": ");
-        strcat(out, el->parent->name);
-        export_el_def_8(el, out);
-        write_nice_8(out, file);
-        ell->list->inform[pos] = 1;
-       }
-    }
-}
-
-void export_el_def(struct element* el, char* string)
-{
-  int i;
-  struct command* def = el->def;
-  struct command_parameter* par;
-  for (i = 0; i < def->par->curr; i++)
-    {
-     par = def->par->parameters[i];
-     if (def->par_names->inform[i] 
-         && par_out_flag(el->base_type->name, par->name))
-       export_el_par(par, string);
-    }
-}
-
-void export_el_def_8(struct element* el, char* string)
-{
-  int i;
-  struct command* def = el->def;
-  struct command_parameter* par;
-  for (i = 0; i < def->par->curr; i++)
-    {
-     par = def->par->parameters[i];
-     if (def->par_names->inform[i] 
-         && par_out_flag(el->base_type->name, par->name))
-       export_el_par_8(par, string);
-    }
-}
-
-void export_el_par(struct command_parameter* par, char* string)
-{
-  int i, k, last;
-  char num[2*NAME_L];
-  strcat(string, ",");
-  strcat(string, par->name);
-  switch(par->type)
-    {
-    case 0: 
-      strcat(string, "=");
-      if (par->double_value == zero) strcat(string, "false");
-      else                           strcat(string, "true");
-      break;
-    case 1:
-    case 2:
-      strcat(string, ":=");
-      if (par->expr != NULL) strcat(string, par->expr->string);
-      else
-	{
-	 if (par->type == 1)
-	   {
-	    k = par->double_value; sprintf(num, "%d", k);
-	   }
-         else sprintf(num, "%-23.15g", par->double_value);
-         strcat(string, supp_tb(num));
-	}
-      break;
-    case 3:
-      strcat(string, "=");
-      strcat(string, par->string);
-      break;
-    case 11:
-    case 12:
-      strcat(string, ":=");
-      for (last = par->double_array->curr-1; last > 0; last--)
-	{
-	 if (par->expr_list->list[last] != NULL)
-	   {
-	    if (zero_string(par->expr_list->list[last]->string) == 0) break;
-	   }
-         else if (par->double_array->a[last] != zero) break;
-	}
-      strcat(string, "{");
-      for (i = 0; i <= last; i++)
-	{
-	 if (i > 0) strcat(string, ",");
-         if (par->expr_list->list[i] != NULL)
-            strcat(string, par->expr_list->list[i]->string);
-         else
-	   {
-	    if (par->type == 11)
-	      {
-	       k = par->double_array->a[i]; sprintf(num, "%d", k);
-	      }
-            else sprintf(num, "%-23.15g", par->double_array->a[i]);
-            strcat(string, supp_tb(num));
-	   }
-	}
-      strcat(string, "}");
-   }
-}
-
-void export_el_par_8(struct command_parameter* par, char* string)
-{
-  int i, k, lp, last, tilt = 0, vtilt = 0;
-  char* const kskew[] = {"k1s", "k2s", "k3s", ""};
-  char* const knorm[] = {"k1", "k2", "k3", ""};
-  char num[2*NAME_L], tmp[8], tmpt[8];
-  switch(par->type)
-    {
-    case 0: 
-      strcat(string, ",");
-      strcat(string, par->name);
-      strcat(string, "=");
-      if (par->double_value == zero) strcat(string, "false");
-      else                           strcat(string, "true");
-      break;
-    case 1:
-    case 2:
-      strcat(string, ",");
-      lp = 0;
-      while (strlen(kskew[lp]))
-        {
-         if (strcmp(kskew[lp], par->name) == 0) 
-           {
-	    strcat(string, knorm[lp]); tilt = 1; break;
-           }
-         lp++;
-        }
-      if (tilt == 0) strcat(string, par->name);
-      strcat(string, "=");
-      if (par->expr != NULL && strcmp(par->name, "harmon") != 0) 
-          strcat(string, par->expr->string);
-      else
-	{
-	 if (par->type == 1)
-	   {
-	    k = par->double_value; sprintf(num, "%d", k);
-	   }
-         else sprintf(num, "%-23.15g", par->double_value);
-         strcat(string, supp_tb(num));
-	}
-      break;
-    case 3:
-      strcat(string, ",");
-      strcat(string, par->name);
-      strcat(string, "=");
-      strcat(string, par->string);
-      break;
-    case 11:
-    case 12:
-      vtilt = strcmp(par->name, "ks") == 0 ? 1 : 0;
-      for (last = par->double_array->curr-1; last > 0; last--)
-	{
-	 if (par->expr_list->list[last] != NULL)
-	   {
-	    if (zero_string(par->expr_list->list[last]->string) == 0) break;
-	   }
-         else if (par->double_array->a[last] != zero) break;
-	}
-      for (i = 0; i <= last; i++)
-	{
-         if (par->expr_list->list[i] != NULL 
-             && !zero_string(par->expr_list->list[i]->string))
-	   {
-            strcat(string, ",");
-	    sprintf(tmp, " k%dl =", i);
-	    sprintf(tmpt, ", t%d", i);
-	    strcat(string, tmp);
-            strcat(string, par->expr_list->list[i]->string);
-            if (vtilt) strcat(string, tmpt); 
-	   }
-         else if (par->double_array->a[i] != zero)
-	   {
-            strcat(string, ",");
-	    sprintf(tmp, " k%dl =", i);
-	    sprintf(tmpt, ", t%d", i);
-	    if (par->type == 11)
-	      {
-	       k = par->double_array->a[i]; sprintf(num, "%d", k);
-	      }
-            else sprintf(num, "%-23.15g", par->double_array->a[i]);
-	    strcat(string, tmp);
-            strcat(string, supp_tb(num));
-            if (vtilt) strcat(string, tmpt); 
-	   }
-	}
-   }
-  if (tilt) strcat(string, ", tilt");
-}
-
-void export_sequence(struct sequence* sequ, FILE* file)
-{
-  char num[2*NAME_L];
-  struct element* el;
-  struct sequence* sq;
-  struct node* c_node = sequ->start;
-  char rpos[3][6] = {"exit", "centre", "entry"};
-  *c_dummy = '\0';
-  if (sequ->share) strcat(c_dummy, "shared ");
-  strcat(c_dummy, sequ->name);
-  strcat(c_dummy, ": sequence");
-  if (sequ->ref_flag)
-    {
-     strcat(c_dummy, ", refer = ");
-     strcat(c_dummy, rpos[sequ->ref_flag+1]);
-    }
-  if (sequ->refpos != NULL)
-    {
-     strcat(c_dummy, ", refpos = ");
-     strcat(c_dummy, sequ->refpos);
-    }
-  strcat(c_dummy, ", l = ");
-  if (sequ->l_expr != NULL) strcat(c_dummy, sequ->l_expr->string);
-  else
-    {
-     sprintf(num, "%-23.15g", sequ->length);
-     strcat(c_dummy, supp_tb(num));
-    }
-  write_nice(c_dummy, file);
-  while(c_node != NULL)
-    {
-     *c_dummy = '\0';
-     if (strchr(c_node->name, '$') == NULL 
-         && strcmp(c_node->base_name, "drift") != 0)
-       {
-        if ((el = c_node->p_elem) != NULL)
-          {
-	   if (c_node->p_elem->def_type)
-	     {
-	      strcat(c_dummy, el->name);
-              strcat(c_dummy, ": ");
-              strcat(c_dummy, el->parent->name);
-	     }
-           else strcat(c_dummy, el->name);
-          }
-        else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
-        else fatal_error("save error: node without link:", c_node->name);
-        strcat(c_dummy, ", at = ");
-        if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
-        else
-          {
-           sprintf(num, "%-23.15g", c_node->at_value);
-           strcat(c_dummy, supp_tb(num));
-          }
-        if (c_node->from_name != NULL)
-          {
-	   strcat(c_dummy, ", from = ");
-           strcat(c_dummy, c_node->from_name);
-          }
-        write_nice(c_dummy, file);
-       }
-     if (c_node == sequ->end)  break;
-     c_node = c_node->next;
-    }
-  strcpy(c_dummy, "endsequence");
-  write_nice(c_dummy, file);
-}
-
-void export_sequ_8(struct sequence* sequ, FILE* file)
-{
-  char num[2*NAME_L];
-  struct element* el;
-  struct sequence* sq;
-  struct node* c_node = sequ->start;
-  *c_dummy = '\0';
-  strcat(c_dummy, sequ->name);
-  strcat(c_dummy, ": sequence");
-  write_nice_8(c_dummy, file);
-  while(c_node != NULL)
-    {
-     *c_dummy = '\0';
-     if (strchr(c_node->name, '$') == NULL
-         && strcmp(c_node->base_name, "drift") != 0)
-       {
-        if ((el = c_node->p_elem) != NULL)
-          {
-	   if (c_node->p_elem->def_type)
-	     {
-	      strcat(c_dummy, el->name);
-              strcat(c_dummy, ": ");
-              strcat(c_dummy, el->parent->name);
-	     }
-           else strcat(c_dummy, el->name);
-          }
-        else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
-        else fatal_error("save error: node without link:", c_node->name);
-        strcat(c_dummy, ", at = ");
-        if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
-        else
-          {
-           sprintf(num, "%-23.15g", c_node->at_value);
-           strcat(c_dummy, supp_tb(num));
-          }
-        if (c_node->from_name != NULL)
-          {
-	   strcat(c_dummy, ", from = ");
-           strcat(c_dummy, c_node->from_name);
-          }
-        write_nice_8(c_dummy, file);
-       }
-     if (c_node == sequ->end)  break;
-     c_node = c_node->next;
-    }
-  strcpy(c_dummy, sequ->name);
-  strcat(c_dummy, "_end: marker, at = ");
-  sprintf(num, "%-23.15g", sequ->length);
-  strcat(c_dummy,num);
-  write_nice_8(c_dummy, file);
-  strcpy(c_dummy, "endsequence");
-  write_nice_8(c_dummy, file);
-}
-
-void export_variable(struct variable* var, FILE* file)
-{
-  int k;
-  *c_dummy = '\0';
-  if (var->status == 0) var->value = expression_value(var->expr, var->type);
-  if (var->val_type == 0) strcat(c_dummy, "int ");
-  if (var->type == 0) strcat(c_dummy, "const ");
-  strcat(c_dummy, var->name);
-  if (var->type < 2) strcat(c_dummy, " = ");
-  else               strcat(c_dummy, " := ");
-  if (var->expr != NULL) strcat(c_dummy, var->expr->string);
-  else if (var->val_type == 0) 
-    {
-     k = var->value; sprintf(c_join, "%d", k); strcat(c_dummy, c_join);
-    }
-  else 
-    {
-     sprintf(c_join, "%-23.15g", var->value); strcat(c_dummy, supp_tb(c_join));
-    }
-  write_nice(c_dummy, file);
-}
-
-void export_var_8(struct variable* var, FILE* file)
-{
-  int k;
-  *c_dummy = '\0';
-  if (var->status == 0) var->value = expression_value(var->expr, var->type);
-  if (var->type == 0) 
-    {
-     strcat(c_dummy, var->name);
-     strcat(c_dummy, ": constant = ");
-    }
-  else
-    {
-     strcat(c_dummy, var->name);
-     if (var->type < 2) strcat(c_dummy, " = ");
-     else               strcat(c_dummy, " := ");
-    }
-  if (var->expr != NULL) strcat(c_dummy, var->expr->string);
-  else if (var->val_type == 0) 
-    {
-     k = var->value; sprintf(c_join, "%d", k); strcat(c_dummy, c_join);
-    }
-  else 
-    {
-     sprintf(c_join, "%-23.15g", var->value); strcat(c_dummy, supp_tb(c_join));
-    }
-  write_nice_8(c_dummy, file);
-}
-
 double expression_value(struct expression* expr, int flag) /* recursive */
+     /* returns the value of an expression if valid, else zero */
 {
   double val = zero;
   if (expr->status == 0 || flag == 2)
@@ -3349,6 +2544,7 @@ double expression_value(struct expression* expr, int flag) /* recursive */
 }
 
 void fatal_error(char* t1, char* t2)
+     /*prints fatal error message, halts program */
 {
   printf("+=+=+= fatal: %s %s\n",t1,t2); exit(1);
 }
@@ -3395,6 +2591,7 @@ void fill_constraint_list(int type /* 1 node, 2 global */,
 
 void fill_elem_var_list(struct element* el, struct el_list* ell,
                         struct var_list* varl)
+     /* puts all variables an element depends on, in a list */
 {
   struct command* cmd = el->def;
   int i;
@@ -3422,6 +2619,7 @@ void fill_expr_list(char** toks, int s_start, int s_end,
 
 void fill_expr_var_list(struct el_list* ell,
                         struct expression* expr, struct var_list* varl)
+     /* puts all variables an expression depends on, in a list */
 {
   struct variable* var;
   struct element* el;
@@ -3451,6 +2649,7 @@ void fill_expr_var_list(struct el_list* ell,
 }
 
 void fill_orbit_table(struct table* t_out, struct table* t_in)
+     /* fills a table with orbit values at monitor positions */
 {
   int i, j, pos;
   t_out->curr = 0;
@@ -3482,6 +2681,7 @@ void fill_orbit_table(struct table* t_out, struct table* t_in)
 
 void fill_par_var_list(struct el_list* ell,
                        struct command_parameter* par, struct var_list* varl)
+     /* puts all variables an element parameter depends on, in a list */
 {
   int i;
   switch (par->type)
@@ -3515,6 +2715,7 @@ void fill_sequ_list(struct sequence* sequ, struct sequence_list* sql)
 
 void fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell,
                         struct var_list* varl)
+     /* puts all variables a sequence depends on, in a list */
 {
   int i;
   struct sequence* sequ;
@@ -3535,6 +2736,7 @@ void fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell,
 }
 
 void fill_twiss_header(struct table* t)
+     /* puts beam parameters etc. at start of twiss table */
 {
   int i, pos, h_length = 33; /* change adding header lines ! */
   double dtmp;
@@ -3701,45 +2903,25 @@ struct variable* find_variable(char* name, struct var_list* varl)
   return varl->vars[pos];
 }
 
-double frndm()
-{
-  const double one = 1;
-  double scale = one / MAX_RAND;
-  if (next_rand == NR_RAND)  irngen();
-  return scale*irn_rand[next_rand++];
-}
-
-void ftoi_array(struct double_array* da, struct int_array* ia)
-{
-  int i, l = da->curr;
-  while (l >= ia->max)  grow_int_array(ia);
-  for (i = 0; i < l; i++) ia->i[i] = da->a[i];
-  ia->curr = l;
-}
-
-#include "c6t.c"
-
-#include "madxe.c"
-
-#include "madxc.c"
-
-#include "madxreg.c"
-
-#include "sxf.c"
-
 void madx_finish()
+     /* write the termination message */
 {
-  if (plots_made) gxterm_();
-  if (get_option("trace")) time_stamp("end");
-  printf("\n  ++++++++++++++++++++++++++++++++\n");
-  printf("  + %s finished normally +\n", myversion);
-  printf("  ++++++++++++++++++++++++++++++++\n");
-  exit(0);
+  if (final_message == 0)
+    {
+     final_message = 1;
+     if (plots_made) gxterm_();
+     if (get_option("trace")) time_stamp("end");
+     printf("\n  ++++++++++++++++++++++++++++++++\n");
+     printf("  + %s finished normally +\n", myversion);
+     printf("  ++++++++++++++++++++++++++++++++\n");
+    }
 }
 
 void madx_init()
+     /* initializes program */
 {
-  int j, ione = 1;
+  struct variable* var;
+  int ione = 1;
 #ifdef _WIN32
   interactive = 1;
 #endif
@@ -3793,27 +2975,33 @@ void madx_init()
   e = get_variable("e");
   clight = get_variable("clight");
   hbar = get_variable("hbar");
+  var = new_variable("twiss_tol", 1.e-6, 1, 1, NULL, NULL);
+  add_to_var_list(var, variable_list, 1);
   title = permbuff("no-title");
   set_defaults("option");
   set_defaults("beam");
   add_to_command_list("default_beam", current_beam, beam_list, 0);
   set_defaults("setplot");
+  set_defaults("threader");
   table_register = new_table_list(10);
   beta0_list = new_command_list(10);
   savebeta_list = new_command_list(10);
   seqedit_select = new_command_list(10); /* for "select seqedit" commands */
   error_select = new_command_list(10); /* for "select error" commands */
+  save_select = new_command_list(10); /* for "select save" commands */
   slice_select = new_command_list(10); /* for "select makethin" commands */
   sector_select = new_command_list(10); /* for "select sectormap" commands */
   s_range = new_int_array(10);
   e_range = new_int_array(10);
-  for (j = 0; j < 6; j++) orbit0[j] = zero;
-  for (j = 0; j < 6; j++) disp0[j] = zero;
-  for (j = 0; j < 36; j++) oneturnmat[j] = zero;
+  zero_double(orbit0, 6);
+  zero_double(disp0, 6);
+  zero_double(guess_orbit,6);
+  zero_double(oneturnmat, 36);
   set_option("twiss_print", &ione);
 }
 
 void madx_start()
+     /* prints start message after having read madxdict.h */
 {
   struct tm* tm;
 
@@ -3829,7 +3017,7 @@ void madx_start()
 }
 
 void get_bracket_range(char* string, char lb, char rb, int* rs, int* re)
-     /* find bracket range outside quotes */
+     /* find bracket range in string outside quotes (brackets are lb and rb) */
 {
   int i, toggle = 0, level = 0, length = strlen(string);
   char quote = ' ';
@@ -3859,6 +3047,7 @@ void get_bracket_range(char* string, char lb, char rb, int* rs, int* re)
 
 void get_bracket_t_range(char* toks[], char lb, char rb, 
                        int start, int end, int* rs, int* re)
+     /* find bracket range in token list (brackets are lb and rb) */
 {
   int i, level = 0;
   *rs = *re = start - 1;
@@ -3890,11 +3079,11 @@ double get_aperture(struct node* node, char* par)
 
 void get_disp0(double* disp)
 {
-  int j;
-  for (j = 0; j < 6; j ++) disp[j] = disp0[j];
+  copy_double(disp0, disp, 6);
 }
 
 char* get_new_name()
+     /* makes a new internal element or variable name */
 {
   char name[NAME_L] = "__";
   sprintf(&name[2], "%d", new_name_count++);
@@ -3904,6 +3093,8 @@ char* get_new_name()
 
 int get_select_ex_ranges(struct sequence* sequ, struct command_list* select,
                          struct node_list* s_ranges)
+     /* makes a list of nodes of an expanded sequence that pass the range
+        selection */
 {
   /*returns 0 if invalid sequence pointer
             1 if nodes in s_ranges (including 0) */
@@ -3949,6 +3140,7 @@ int get_select_ex_ranges(struct sequence* sequ, struct command_list* select,
 
 int get_select_ranges(struct sequence* sequ, struct command_list* select,
                       struct node_list* s_ranges)
+     /* makes a list of nodes of a sequence that pass the range selection */
 {
   struct name_list* nl;
   struct command_parameter_list* pl;
@@ -3980,6 +3172,7 @@ int get_select_ranges(struct sequence* sequ, struct command_list* select,
 }
 
 void get_select_t_ranges(struct command_list* select, struct table* t)
+     /* makes a list of table rows that pass the range selection */
 {
   int rows[2];
   struct name_list* nl;
@@ -4022,6 +3215,7 @@ void get_select_t_ranges(struct command_list* select, struct table* t)
 }
 
 void get_defined_commands()
+     /* reads + stores the commands defined in madxdict.h */
 {
   char rout_name[] = "get_defined_commands";
   int i;
@@ -4037,11 +3231,13 @@ void get_defined_commands()
 
 void get_defined_constants()
 {
+     /* reads + stores the constants defined in madxdict.h */
   supp_char('\n', predef_constants);
   pro_input(predef_constants);
 }
 
 struct element* get_drift(double length)
+     /* makes a drift space with the required length */
 {
   struct element *p, *bt;
   struct command* clone;
@@ -4062,6 +3258,7 @@ struct element* get_drift(double length)
 }
 
 int get_node_count(struct node* node)
+     /* finds the count of a node in the current expanded sequence */
 {
   int cnt = 0;
   current_node = current_sequ->ex_start;
@@ -4118,10 +3315,30 @@ int get_option(char* str)
   else return 0;
 }
 
-void get_orbit0(double* orb)
+void get_node_vector(char* par, int* length, double* vector)  
+/* returns vector for parameter par of current element */
 {
-  int j;
-  for (j = 0; j < 6; j ++) orb[j] = orbit0[j];
+  char lpar[NAME_L];
+  mycpy(lpar, par);
+  if (strcmp(lpar, "orbit0") == 0) copy_double(orbit0, vector, 6);
+  else if (strcmp(lpar, "obs_orbit") == 0)
+    {
+     if (current_node->obs_orbit)
+       {
+	*length = current_node->obs_orbit->curr;
+        copy_double(current_node->obs_orbit->a, vector, *length);
+       }
+     else *length = 0;
+    }
+  else if (strcmp(lpar, "orbit_ref") == 0)
+    {
+     if (current_node->orbit_ref)
+       {
+        *length = current_node->orbit_ref->curr;
+        copy_double(current_node->orbit_ref->a, vector, *length);
+       }
+    }
+  else *length = element_vector(current_node->p_elem, lpar, vector);
 }
 
 int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
@@ -4225,37 +3442,6 @@ void get_sxf_names()
     {
      add_to_name_list(sxf_table_names[i++], 0, sxf_list);
     }
-}
-
-void init55(int seed)
-{
-  int i, ii, k = 1, j = abs(seed)%MAX_RAND;
-  irn_rand[NR_RAND-1] = j;
-  for (i = 0; i < NR_RAND-1; i++)
-    {
-     ii = (ND_RAND*(i+1))%NR_RAND;
-     irn_rand[ii-1] = k;
-     if ((k = j - k) < 0) k += MAX_RAND;
-     j = irn_rand[ii-1];
-    }
-  /* warm up */
-  for (i = 0; i < 3; i++) irngen();
-}
-
-void irngen()
-{
-  int i, j;
-  for (i = 0; i < NJ_RAND; i++)
-    {
-     if ((j = irn_rand[i] - irn_rand[i+NR_RAND-NJ_RAND]) < 0) j += MAX_RAND;
-     irn_rand[i] = j;
-    }
-  for (i = NJ_RAND; i < NR_RAND; i++)
-    {
-     if ((j = irn_rand[i] - irn_rand[i-NJ_RAND]) < 0) j += MAX_RAND;
-     irn_rand[i] = j;
-    }
-  next_rand = 0;
 }
 
 double plot_option(char* name)
@@ -4564,6 +3750,17 @@ double get_value(char* name, char* par)
   else return INVALID;
 }
 
+int get_vector(char* name, char* par, double* vector)
+     /* returns double "vector" for "par" of command or store "name";
+        length is returned as function value (0 if not found) */
+{
+  mycpy(c_dummy, name);
+  mycpy(l_dummy, par);
+  if (strcmp(c_dummy, "threader") == 0)
+     return command_par_vector(l_dummy, threader_par, vector);
+  else return 0;
+}
+
 void get_version(char* tlt, int* l)
 {
   time_t tmp;
@@ -4577,17 +3774,6 @@ void get_version(char* tlt, int* l)
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
   *l = n + 19;
-}
-
-double grndm()
-{
-  double xi1 = 2*frndm()-one, xi2=2*frndm()-one, zzr;
-  while ((zzr = xi1*xi1+xi2*xi2) > one) 
-    {
-     xi1 = 2*frndm()-one; xi2=2*frndm()-one;
-    }
-  zzr = sqrt(-2*log(zzr)/zzr);
-  return xi1*zzr;
 }
 
 double hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
@@ -4681,34 +3867,6 @@ void install_one(struct element* el, char* from_name, double at_value,
   node->at_expr = at_expr;
   node->from_name = from_name;
   insert_elem(edit_sequ, node);
-}
-
-int intrac()
-{
-    return ((int) isatty(0));
-}
-
-char* join(char** it_list, int n)
-{
-  int j;
-  *c_join = '\0';
-  for (j = 0; j < n; j++) strcat(c_join, it_list[j]);
-  return c_join;
-}
-
-char* join_b(char** it_list, int n)
-{
-  char* target;
-  int j, k = 0;
-  target = c_join;
-  for (j = 0; j < n; j++)
-    {
-     strcpy(&target[k], it_list[j]);
-     k += strlen(it_list[j]);
-     target[k++] = ' ';
-    }
-  target[k] = '\0';
-  return target;
 }
 
 double line_nodes(struct char_p_array* flat)
@@ -4836,9 +3994,8 @@ void main_input(int top)
      else 
        {
 	stolower_nq(in->buffers[in->curr]->c_a->c);
-	if (in_spec_list(in->buffers[in->curr]->c_a->c))
-	  pro_input(in->buffers[in->curr]->c_a->c);
-        else pro_input(in->buffers[in->curr]->c_a->c);
+        pro_input(in->buffers[in->curr]->c_a->c);
+        if (stop_flag)  return;
        }
     }
 }
@@ -5076,10 +4233,6 @@ struct table* make_table(char* name, char* type, char** table_cols,
   return t;
 }
 
-#include "makethin.c"
-
-#include "matchc.c"
-
 double mult_par(char* par, struct element* el)
 {
   char tmp[12];
@@ -5102,46 +4255,6 @@ double mult_par(char* par, struct element* el)
   return val;
 }
 
-void my_repl(char* in, char* out, char* string_in, char* string_out)
-     /* replaces all occurrences of "in" in string_in by "out" 
-        in output string string_out */
-{
-  int n, add, l_in = strlen(in), l_out = strlen(out);
-  char* cp;
-  char tmp[8];
-  while ((cp = strstr(string_in, in)) != NULL)
-    {
-     while (string_in != cp) *string_out++ = *string_in++;
-     string_in += l_in;
-     if (*out == '$')
-       {
-	n = get_variable(&out[1]);
-	sprintf(tmp,"%d", n); add = strlen(tmp);
-        strncpy(string_out, tmp, add);
-        string_out += add;
-       }
-     else
-       {
-        strncpy(string_out, out, l_out);
-        string_out += l_out;
-       }
-    }
-  strcpy(string_out, string_in);
-}
-
-int name_list_pos(char* p, struct name_list* vlist)
-{
-  int num, mid, low = 0, high = vlist->curr - 1;
-  while (low <= high)
-    {
-     mid = (low + high) / 2;
-     if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
-     else if ( num > 0) low  = mid + 1;
-     else               return vlist->index[mid];
-    }
-    return -1;
-}
-
 int name_tab(char* chunk, struct name_list* list)
 {
   int i = name_list_pos(chunk, list);
@@ -5149,52 +4262,10 @@ int name_tab(char* chunk, struct name_list* list)
   return add_to_name_list(chunk, 0, list);
 }
 
-#include "madxu.c"
-
 int next_char(char c, char** toks, int start, int nitem)
 {
   int i;
   for (i = start; i < nitem; i++) if(*toks[i] == c)  return i;
-  return -1;
-}
-
-char next_non_blank(char* string) 
-     /* returns next non-blank in string outside quotes, else blank */
-{
-  int i, toggle = 0, l = strlen(string);
-  char quote = ' ';
-  for (i = 0; i < l; i++)
-    {
-     if (toggle)
-       {
-	if (string[i] == quote)  toggle = 0;
-       }
-     else if (string[i] == '\'' || string[i] == '\"')
-       {
-	quote = string[i]; toggle = 1;
-       }
-     else if (string[i] != ' ')  return string[i];
-    }
-  return ' ';
-}
-
-int next_non_blank_pos(char* string)
-     /* returns position of next non-blank in string outside quotes, else -1 */
-{
-  int i, toggle = 0, l = strlen(string);
-  char quote = ' ';
-  for (i = 0; i < l; i++)
-    {
-     if (toggle)
-       {
-	if (string[i] == quote)  toggle = 0;
-       }
-     else if (string[i] == '\'' || string[i] == '\"')
-       {
-	quote = string[i]; toggle = 1;
-       }
-     else if (string[i] != ' ')  return i;
-    }
   return -1;
 }
 
@@ -5306,24 +4377,22 @@ int next_vary(char* name, int* name_l,
 
 int node_al_errors(double* errors)
 {
-  int i;
   if (current_node->p_al_err == NULL) return 0;
   else
     {
-     for (i = 0; i < current_node->p_al_err->curr; i++) 
-           errors[i] = current_node->p_al_err->a[i];
+     copy_double(current_node->p_al_err->a, errors, 
+                 current_node->p_al_err->curr);
      return current_node->p_al_err->curr;
     }
 }
 
 int node_fd_errors(double* errors)
 {
-  int i;
   if (current_node->p_fd_err == NULL) return 0;
   else
     {
-     for (i = 0; i < current_node->p_fd_err->curr; i++) 
-           errors[i] = current_node->p_fd_err->a[i];
+     copy_double(current_node->p_fd_err->a, errors, 
+                 current_node->p_fd_err->curr);
      return current_node->p_fd_err->curr;
     }
 }
@@ -5374,44 +4443,10 @@ double node_value(char* par)
   else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
   else if (strcmp(lpar, "obs_point") == 0) value = current_node->obs_point;
   else if (strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
+  else if (strcmp(lpar, "enable") == 0) value = current_node->enable;
+  else if (strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
   else value =  element_value(current_node, lpar);
   return value;
-}
-
-void node_vector(char* par, int* length, double* vector)  
-/* returns vector for parameter par of current element */
-{
-  int j;
-  char lpar[NAME_L];
-  mycpy(lpar, par);
-  if (strcmp(lpar, "obs_orbit") == 0)
-    {
-     if (current_node->obs_orbit)
-       {
-	*length = current_node->obs_orbit->curr;
-        for (j = 0; j < *length; j++) vector[j]=current_node->obs_orbit->a[j];
-       }
-     else *length = 0;
-    }
-  else *length = element_vector(current_node->p_elem, lpar, vector);
-}
-
-char* noquote(char* string)
-{
-  char* c = string;
-  char* d = c;
-  char k;
-  if (string != NULL)
-    {
-     k = *c;
-     if (k == '\"' || k == '\'')
-       {
-        d++;
-        while (*d != k) *c++ = *d++;
-        *c = '\0';
-       }
-    }
-  return string;
 }
 
 void out_table(char* tname, struct table* t, char* filename)
@@ -5459,45 +4494,45 @@ int par_present(char* par, struct command* cmd, struct command_list* c_list)
   return 0;
 }
 
-int par_out_flag(char* base_name, char* par_name)
-{
-  /* marks the element parameters that are to be written on "save" */
-  if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
-  if (strcmp(base_name, "multipole") == 0 
-      && strcmp(par_name,"l") == 0) return 0;
-  if (strcmp(base_name, "rcollimator") == 0 
-      && strcmp(par_name,"lrad") == 0) return 0;
-  if (strcmp(base_name, "ecollimator") == 0 
-      && strcmp(par_name,"lrad") == 0) return 0;
-  return 1;
-}
-
-int pass_select(char* element, struct command* sc)
+int pass_select(char* name, struct command* sc)
 {
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
-  struct element* el = find_element(strip(element), element_list);
+  struct element* el = find_element(strip(name), element_list);
   int pos, in = 0, any = 0;
   char *class, *pattern;
-  if (el == NULL) return 0;
   pos = name_list_pos("class", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
     {
-     any = 1;
-     class = pl->parameters[pos]->string;
-     in = belongs_to_class(el, class);
+     el = find_element(strip(name), element_list);
+     if (el != NULL)
+       {
+        class = pl->parameters[pos]->string;
+        in = belongs_to_class(el, class);
+        if (in == 0) return 0;
+       }
     }
-  if (any && in == 0) return 0;
   any = in = 0;
   pos = name_list_pos("pattern", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
     {
      any = 1;
      pattern = stolower(pl->parameters[pos]->string);
-     if(myregex(pattern, el->name) == 0)  in = 1;
+     if(myregex(pattern, strip(name)) == 0)  in = 1;
     }
   if (any == 0) return 1;
   else return in;
+}
+
+int pass_select_list(char* name, struct command_list* cl)
+{
+  int i, ret = 0;
+  if (cl->curr == 0)  return 1;
+  for (i = 0; i < cl->curr; i++)
+    {
+     if ((ret = pass_select(name, cl->commands[i]))) break;
+    }
+  return ret;
 }
 
 char* permbuff(char* string)  /* string -> general buffer, returns address */
@@ -5875,156 +4910,6 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
   outbuf[cout] = '\0';
 }
 
-void print_command(struct command* cmd)
-{
-  int i;
-  fprintf(prt_file, "command: %s\n", cmd->name);
-  for (i = 0; i < cmd->par->curr; i++) 
-    { 
-     print_command_parameter(cmd->par->parameters[i]);
-     if ((i+1)%3 == 0) fprintf(prt_file, "\n");
-    }
-  if (i%3 != 0) fprintf(prt_file, "\n");
-}
-
-void print_command_parameter(struct command_parameter* par)
-{
-  int i, k;
-  char logic[2][8] = {"false", "true"};
-  switch (par->type)
-    {
-    case 0:
-     k = par->double_value;
-     fprintf(prt_file, "%s = %s, ", par->name, logic[k]);
-     break;
-    case 1:
-     k = par->double_value;
-     fprintf(prt_file, "%s = %d, ", par->name, k);
-     break;
-    case 2:
-     fprintf(prt_file, "%s = %e, ", par->name, par->double_value);
-     break;
-    case 11:
-    case 12:
-    if (par->double_array != NULL)
-      {
-       fprintf(prt_file, "double array: ");
-       for (i = 0; i < par->double_array->curr; i++) 
-            fprintf(prt_file, "%e, ", par->double_array->a[i]);
-       fprintf(prt_file, "\n");
-      }
-     break;
-    case 3:
-     fprintf(prt_file, "%s = %s, ", par->name, par->string);
-    }
-}
-
-void print_global(double delta)
-{
-  char tmp[NAME_L], trad[4];
-  double alfa = get_value("probe", "alfa");
-  double freq0 = get_value("probe", "freq0");
-  double gamma = get_value("probe", "gamma");
-  double beta = get_value("probe", "beta");
-  double circ = get_value("probe", "circ");
-  double bcurrent = get_value("probe", "bcurrent");
-  double npart = get_value("probe", "npart");
-  double energy = get_value("probe", "energy");
-  int kbunch = get_value("probe", "kbunch");
-  int rad = get_value("probe", "radiate");
-  double gamtr = zero, t0 = zero, eta;
-  get_string("probe", "particle", tmp);
-  if (rad) strcpy(trad, "T");
-  else     strcpy(trad, "F");
-  if (alfa > zero) gamtr = sqrt(one / alfa);
-  else if (alfa < zero) gamtr = sqrt(-one / alfa);
-  if (freq0 > zero) t0 = one / freq0;
-  eta = alfa - one / (gamma*gamma);
-  puts(" ");
-  printf(" Global parameters for %ss, radiate = %s:\n\n",
-         tmp, trad);
-  printf(" C         %16.8g m          f0        %16.8g MHz\n",circ, freq0);
-  printf(" T0        %16.8g musecs     alfa      %16.8e \n", t0, alfa);
-  printf(" eta       %16.8e            gamma(tr) %16.8g \n", eta, gamtr);
-  printf(" Bcurrent  %16.8g A/bunch    Kbunch    %16d \n", bcurrent, kbunch);
-  printf(" Npart     %16.8g /bunch     Energy    %16.8g GeV \n", npart,energy);
-  printf(" gamma     %16.8g            beta      %16.8g\n", gamma, beta);
-}
-
-void print_rfc()
-{
-  double freq0, harmon, freq;
-  int i, n = current_sequ->cavities->curr;
-  struct element* el;
-  if (n == 0)  return;
-  freq0 = command_par_value("freq0", probe_beam);
-  printf("\n RF system: \n");
-  printf(" Cavity                    length[m]  voltage[MV]              lag          freq[MHz]         harmon\n");
-  for (i = 0; i < n; i++)
-    {
-     el = current_sequ->cavities->elem[i];
-     if ((harmon = el_par_value("harmon", el)) > zero)
-       {
-	freq = freq0 * harmon;
-        printf(" %-16s  %14.6g  %14.6g  %14.6g  %18.10g  %12.0f\n",
-               el->name, el->length, el_par_value("volt", el),
-               el_par_value("lag", el), freq, harmon);
-       }
-    }
-}
-
-void print_table(struct table* t)
-{
-  int i, j, k, l, n, tmp, wpl = 4;
-  if (t != NULL)
-    {
-     fprintf(prt_file, "\n");
-     fprintf(prt_file, "++++++ table: %s\n", t->name);
-     l = (t->num_cols-1) / wpl + 1;
-     for (k = 0; k < l; k++)
-       {
-        n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
-        fprintf(prt_file, "\n");
-        for (i = wpl*k; i < n; i++) 
-           fprintf(prt_file, "%18s ", t->columns->names[i]);
-        fprintf(prt_file, "\n");
-        for (j = 0; j < t->curr; j++)
-          {
-	   for (i = wpl*k; i < n; i++)
-	     {
-	      if (t->columns->inform[i] == 1)
-		{ 
-                 tmp = t->d_cols[i][j];
-                 fprintf(prt_file, "%18d ", tmp);
-		}
-	      else if (t->columns->inform[i] == 2) 
-                  fprintf(prt_file, "%18.10e ", t->d_cols[i][j]);
-	      else if (t->columns->inform[i] == 3) 
-                  fprintf(prt_file, "%18s ", t->s_cols[i][j]);
-	     }
-           fprintf(prt_file, "\n");
-	  }
-       }
-    }
-}
-
-void print_value(struct in_cmd* cmd)
-{
-  char** toks = &cmd->tok_list->p[cmd->decl_start];
-  int n = cmd->tok_list->curr - cmd->decl_start;
-  int s_start = 0, end, type, nitem;
-  while((type = loc_expr(toks, n, s_start, &end)) > 0)
-    {
-      nitem = end + 1 - s_start;
-      if (polish_expr(nitem, &toks[s_start]) == 0)
-         fprintf(prt_file, "%s = %-22.14g ;\n", 
-                 spec_join(&toks[s_start], nitem), polish_value(deco));
-      else warning("invalid expression:", spec_join(&toks[s_start], nitem));
-      s_start = end+1;
-      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
-    }
-}
-
 void process()  /* steering routine: processes one command */
 {
   int pos;
@@ -6035,11 +4920,17 @@ void process()  /* steering routine: processes one command */
      switch (this_cmd->type)
        {
        case 0: /* executable commands */
-         exec_command();
+         exec_command(); if (stop_flag)  return;
          break;
        case 1: /* element definition */
          enter_element(this_cmd);
          buffer_in_cmd(this_cmd);
+         break;
+       case 2: /* variable definition */
+         enter_variable(this_cmd);
+         break;
+       case 3: /* sequence start or end */
+         enter_sequence(this_cmd);
          break;
        case 4:
          name = this_cmd->tok_list->p[0];
@@ -6072,12 +4963,6 @@ void process()  /* steering routine: processes one command */
                update_element(el, this_cmd->clone);
 	      }
 	   }
-         break;
-       case 2: /* variable definition */
-         enter_variable(this_cmd);
-         break;
-       case 3: /* sequence definition */
-         enter_sequence(this_cmd);
          break;
        default:
          warning("unknown command type:", 
@@ -6122,9 +5007,9 @@ void pro_emit(struct in_cmd* cmd)
   keep = get_option("twiss_print");
   j = 0;
   set_option("twiss_print", &j);
-  for (j = 0; j < 6; j++) orbit0[j] = zero;
-  for (j = 0; j < 6; j++) disp0[j] = zero;
-  for (j = 0; j < 36; j++) oneturnmat[j] = zero;
+  zero_double(orbit0, 6);
+  zero_double(disp0, 6);
+  zero_double(oneturnmat, 36);
   tt = (double*) mycalloc("pro_emit", 216, sizeof(double));
   adjust_beam();
   probe_beam = clone_command(current_beam);
@@ -6132,6 +5017,8 @@ void pro_emit(struct in_cmd* cmd)
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
+  printf("guess: %d %f %f\n",guess_flag, guess_orbit[0],guess_orbit[1]);
+  if (guess_flag) copy_double(guess_orbit, orbit0, 6);
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
   free(tt);
   if (error == 0)
@@ -6291,6 +5178,7 @@ void pro_input(char* statement)
                 }
              }
            else process();
+           if (stop_flag)  return;
            *sem = ';';
           }
         sem++;
@@ -6466,10 +5354,14 @@ void pro_twiss()
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
   char *filename, *name, *table_name, *sector_name;
-  int i, j, l, lp, pos, k = 1, ks, w_file, beta_def;
+  double tol, tol_keep;
+  int i, j, l, lp, k_orb, u_orb, pos, k = 1, ks, w_file, beta_def;
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
+  /*
+         start command decoding
+  */
   pos = name_list_pos("sequence", nl);
   if(nl->inform[pos]) /* sequence specified */
     {
@@ -6533,21 +5425,35 @@ void pro_twiss()
     {
      if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
     }
-  current_sequ->start_node = j;
-  for (j = 0; j < 6; j++) orbit0[j] = zero;
-  for (j = 0; j < 6; j++) disp0[j] = zero;
-  for (j = 0; j < 36; j++) oneturnmat[j] = zero;
-  if ((beta_def = twiss_input(current_twiss)) < 0)
+  if((pos = name_list_pos("useorbit", nl)) > -1 &&nl->inform[pos]) 
+    /* orbit specified */
     {
-     if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
-     else if (beta_def == -2) 
-         warning("betx or bety missing,", "Twiss ignored");
-     return;
+     if (current_sequ->orbits == NULL)  
+        warning("orbit not found, ignored: ", pl->parameters[pos]->string);
+     else
+       {
+        name = pl->parameters[pos]->string;
+        if ((u_orb = name_list_pos(name, current_sequ->orbits->names)) < 0)
+            warning("orbit not found, ignored: ", name);
+        else set_option("useorbit", &k);
+       }
     }
-  set_option("twiss_inval", &beta_def);
-  set_option("twiss_summ", &k);
-  pos = name_list_pos("chrom", nl);
-  set_option("twiss_chrom", &nl->inform[pos]);
+  pos = name_list_pos("keeporbit", nl);
+  if(nl->inform[pos]) /* orbit specified */
+    {
+     name = pl->parameters[pos]->string;
+     if (current_sequ->orbits == NULL)  
+       current_sequ->orbits = new_vector_list(10);
+     else if (current_sequ->orbits->curr == current_sequ->orbits->max)
+	      grow_vector_list(current_sequ->orbits);
+     if ((k_orb = name_list_pos(name, current_sequ->orbits->names)) < 0)
+       {
+        k_orb = add_to_name_list(permbuff(name), 0, 
+                                 current_sequ->orbits->names);
+        current_sequ->orbits->vectors[k_orb] = new_double_array(6);
+       }
+     set_option("keeporbit", &k);
+    }
   pos = name_list_pos("file", nl);
   if (nl->inform[pos])
     {
@@ -6560,6 +5466,30 @@ void pro_twiss()
      w_file = 1;
     }
   else w_file = 0;
+  tol_keep = get_variable("twiss_tol");
+  pos = name_list_pos("tolerance", nl);
+  if (nl->inform[pos])
+    {
+     tol = command_par_value("tolerance", current_twiss);
+    }
+  /*
+             end of command decoding
+  */
+  current_sequ->start_node = j;
+  zero_double(orbit0, 6);
+  zero_double(disp0, 6);
+  zero_double(oneturnmat, 36);
+  if ((beta_def = twiss_input(current_twiss)) < 0)
+    {
+     if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
+     else if (beta_def == -2) 
+         warning("betx or bety missing,", "Twiss ignored");
+     return;
+    }
+  set_option("twiss_inval", &beta_def);
+  set_option("twiss_summ", &k);
+  pos = name_list_pos("chrom", nl);
+  set_option("twiss_chrom", &nl->inform[pos]);
   set_option("twiss_save", &k);
   set_twiss_deltas(current_twiss);
   adjust_beam();
@@ -6576,6 +5506,15 @@ void pro_twiss()
      reset_sector(current_sequ, 0);
      set_sector();
     }
+  if (get_option("useorbit"))
+      copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
+  else if (guess_flag)
+    {
+     for (i = 0; i < 6; i++)
+       {
+        if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
+       }
+    }
   for (i = 0; i < twiss_deltas->curr; i++)
     {
      twiss_table = make_table(table_name, "twiss", twiss_table_cols, 
@@ -6590,6 +5529,8 @@ void pro_twiss()
      twiss_(oneturnmat, disp0, tarr->i);
      if ((twiss_success = get_option("twiss_success")))
        {
+        if (get_option("keeporbit"))  copy_double(orbit0, 
+                        current_sequ->orbits->vectors[k_orb]->a, 6);
         fill_twiss_header(twiss_table);
         if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
         if (w_file) out_table(table_name, twiss_table, filename);
@@ -6602,6 +5543,7 @@ void pro_twiss()
     }
   tarr = delete_int_array(tarr);
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);
+  /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);
   k = 0;
@@ -6610,7 +5552,10 @@ void pro_twiss()
   set_option("rmatrix", &k);
   set_option("centre", &k);
   set_option("twiss_sector", &k);
+  set_option("keeporbit", &k);
+  set_option("useorbit", &k);
   set_option("info", &keep_info);
+  set_variable("twiss_tol", &tol_keep);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
 }
@@ -6742,14 +5687,6 @@ struct table* read_table(struct in_cmd* cmd)
   return NULL;
 }
 
-int remove_colon(char** toks, int number, int start)
-     /* removes colon behind declarative part for MAD-8 compatibility */
-{
-  int i, k = start;
-  for (i = start; i < number; i++)  if (*toks[i] != ':') toks[k++] = toks[i];
-  return k;
-}
-
 void remove_from_command_list(char* label, struct command_list* list)
 {
   int i;
@@ -6828,12 +5765,6 @@ void remove_upto(char* string, char* s1)
      while (*ps1 != '\0') *string++ = *ps1++;
      *string = '\0';
     }
-}
-
-void replace(char* buf, char in, char out)
-{
-  int j, l = strlen(buf);
-  for (j = 0; j < l; j++)  if (buf[j] == in)  buf[j] = out;
 }
 
 void replace_one(struct node* node, struct element* el)
@@ -6963,6 +5894,13 @@ void reset_sector(struct sequence* sequ, int val)
 int restart_sequ()
 {
   current_node = current_sequ->range_start;
+  return 1;
+}
+
+int retreat_node()
+{
+  if (current_node == current_sequ->range_start)  return 0;
+  current_node = current_node->previous;
   return 1;
 }
 
@@ -7652,6 +6590,10 @@ void set_defaults(char* string) /* reset options, beam etc. to defaults */
 	if (plot_options != NULL) delete_command(plot_options);
         plot_options = clone_command(defined_commands->commands[pos]);
        }
+     else if (strcmp(string, "threader") == 0)
+       {
+        threader_par = clone_command(defined_commands->commands[pos]);
+       }
      else if (strcmp(string, "beam") == 0)
        {
         current_beam = clone_command(defined_commands->commands[pos]);
@@ -7886,6 +6828,36 @@ int mysplit(char* buf, struct char_p_array* list)
     if(*list->p[j] == '\"' || *list->p[j] == '\'') /* quote */
         replace(list->p[j], '@', ' ');
   return list->curr;
+}
+
+void save_beam(struct sequence* sequ, FILE* file)
+{
+  struct command* comm;
+  char beam_buff[AUX_LG];
+  int i, def = 0;
+  if ((comm = find_command(sequ->name, beam_list)) == NULL)
+    {
+     if (default_beam_saved == 0)
+       {
+	def = default_beam_saved = 1;
+        comm = find_command("default_beam", beam_list);
+       }
+    }
+  if (comm != NULL)
+    {
+     beam_buff[0] = '\0';
+     strcat(beam_buff, "beam");
+     for (i = 0; i < comm->par->curr; i++)
+       {
+        if (comm->par_names->inform[i])
+	  {
+	   if (strcmp(comm->par_names->names[i], "sequence") != 0
+               || def == 0)
+            export_comm_par(comm->par->parameters[i], beam_buff);
+	  }
+       }
+     write_nice(beam_buff, file);
+    }
 }
 
 int set_enable(char* type, struct in_cmd* cmd)
@@ -8273,66 +7245,6 @@ int simple_logic_expr(int nit, char* toks[])
   return logex;
 }
 
-int square_to_colon(char* string)
-{
-  char* t;
-  int k = strlen(string);
-  if ((t = strchr(string, '[')) == NULL)
-    {
-     string[k++] = ':'; string[k++] = '1'; string[k] = '\0';
-    }
-  else
-    {
-     *t = ':';
-     if ((t = strchr(string, ']')) == NULL)  return 0;
-     else *t = '\0';
-    }
-  return strlen(string);
-}
-
-char* stolower(char* s)  /* converts string to lower in place */
-{
-  char *c = s;
-  int j;
-  for (j = 0; j < strlen(s); j++) 
-    {
-     *c = (char) tolower((int) *c); c++;
-    }
-  return s;
-}
-
-void stolower_nq(char* s)  
-        /* converts string to lower in place outside quotes */
-{
-  char *c = s;
-  int j, toggle = 0;
-  char quote = ' '; /* just to suit the compiler */
-  for (j = 0; j < strlen(s); j++) 
-    {
-     if (toggle)
-       {
-	if (*c == quote) toggle = 0;
-       }
-     else if (*c == '\"' || *c == '\'')
-       {
-	toggle = 1; quote = *c;
-       }
-     else *c = (char) tolower((int) *c); 
-     c++;
-    }
-}
-
-char* stoupper(char* s)  /* converts string to upper in place */
-{
-  char *c = s;
-  int j;
-  for (j = 0; j < strlen(s); j++) 
-    {
-     *c = (char) toupper((int) *c); c++;
-    }
-  return s;
-}
-
 void store_beta0(struct in_cmd* cmd)
 {
   int k = cmd->decl_start - 1;
@@ -8515,8 +7427,7 @@ void store_comm_par_vector(char* parameter, double* val, struct command* cmd)
      cp = cmd->par->parameters[i];
      if (cp->double_array != NULL)
        {
-        for (i = 0; i < cp->double_array->curr; i++) 
-	  cp->double_array->a[i] = val[i];
+	copy_double(val, cp->double_array->a, cp->double_array->curr);
         if (cp->expr_list != NULL) 
             cp->expr_list = delete_expr_list(cp->expr_list);
        }
@@ -8614,6 +7525,20 @@ void store_select(struct in_cmd* cmd)
         cmd->clone_flag = 1; /* do not drop */
        }
     }
+  else if (strcmp(flag_name, "save") == 0) 
+    {
+     if (log_val("clear", cmd->clone)) 
+       {
+        save_select->curr = 0;
+       }
+     else
+       {
+	if (save_select->curr == save_select->max) 
+            grow_command_list(save_select);
+        save_select->commands[save_select->curr++] = cmd->clone;
+        cmd->clone_flag = 1; /* do not drop */
+       }
+    }
   else if (strcmp(flag_name, "sectormap") == 0) 
     {
      if (sector_ranges == NULL)   sector_ranges = new_node_list(10000);
@@ -8653,13 +7578,27 @@ void store_select(struct in_cmd* cmd)
     }
 }
 
+void store_node_value(char* par, double* value)  
+/* stores value for parameter par at current node */
+{
+  char lpar[NAME_L];
+  mycpy(lpar, par);
+  if (strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
+  else if (strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
+  else if (strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;
+  else if (strcmp(lpar, "other_bv") == 0) current_node->other_bv = *value;
+  else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
+  else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
+  else if (strcmp(lpar, "enable") == 0) current_node->enable = *value;
+}
+
 void store_node_vector(char* par, int* length, double* vector)  
 /* stores vector at node */
 {
-  int j;
   char lpar[NAME_L];
   mycpy(lpar, par);
-  if (strcmp(lpar, "orbit_ref") == 0)
+  if (strcmp(lpar, "orbit0") == 0)  copy_double(vector, orbit0, 6);
+  else if (strcmp(lpar, "orbit_ref") == 0)
     {
      if (current_node->orbit_ref)
        {
@@ -8667,16 +7606,33 @@ void store_node_vector(char* par, int* length, double* vector)
              grow_double_array(current_node->orbit_ref);
        }
      else current_node->orbit_ref = new_double_array(*length);
-     for (j = 0; j < *length; j++) current_node->orbit_ref->a[j] = vector[j];
+     copy_double(vector, current_node->orbit_ref->a, *length);
      current_node->orbit_ref->curr = *length;
     }
 }
 
-int string_cnt(char c, int n, char* toks[])
+void store_orbit(struct command* comm, double* orbit)
 {
-  int i, k = 0;
-  for (i = 0; i < n; i++) if(*toks[i] == c) k++;
-  return k;
+  struct name_list* nl = comm->par_names;
+  if (nl->inform[name_list_pos("x", nl)]) 
+      orbit[0] = command_par_value("x",comm);
+  if (nl->inform[name_list_pos("px", nl)]) 
+      orbit[1] = command_par_value("px",comm);
+  if (nl->inform[name_list_pos("y", nl)]) 
+      orbit[2] = command_par_value("y",comm);
+  if (nl->inform[name_list_pos("py", nl)]) 
+      orbit[3] = command_par_value("py",comm);
+  if (nl->inform[name_list_pos("t", nl)]) 
+      orbit[4] = command_par_value("t",comm);
+  if (nl->inform[name_list_pos("pt", nl)]) 
+      orbit[5] = command_par_value("pt",comm);
+}
+
+void store_threader(struct in_cmd* cmd)
+{
+  threader_par = cmd->clone;
+  cmd->clone_flag = 1;
+  dump_command(threader_par);
 }
 
 void string_to_table(char* table, char* name, char* string)
@@ -8700,57 +7656,6 @@ void string_to_table(char* table, char* name, char* string)
        t->s_cols[pos][t->curr] = tmpbuff(current_node->name);
      else t->s_cols[pos][t->curr] = tmpbuff(c_dummy);
     }
-}
-
-char* strip(char* name)
-     /* strip ':' and following off */
-{
-  char* p;
-  strcpy(tmp_key, name);
-  if ((p = strchr(tmp_key, ':')) != NULL) *p = '\0';
-  return tmp_key;
-}
- 
-void supp_char(char c, char* string)
-{
-  char* cp = string;
-  while (*string != '\0')
-    {
-     if (*string != c)  *cp++ = *string;
-     string++;
-    }
-  *cp = '\0';
-}
-
-int supp_lt(char* inbuf, int flag) 
-         /* suppress leading, trailing blanks and replace some special char.s*/
-{
-  int l = strlen(inbuf), i, j;
-  replace(inbuf, '\x9', ' '); /* tab */
-  replace(inbuf, '\xd', ' '); /* Windows e-o-l */
-  if (flag == 0)  replace(inbuf, '\n', ' '); /* e-o-l */
-  supp_tb(inbuf); /* suppress trailing blanks */
-  if ((l = strlen(inbuf)) > 0)
-    {
-     for (j = 0; j < l; j++) if (inbuf[j] != ' ') break; /* leading blanks */
-     if (j > 0) 
-       {
-        for (i = 0; i < l - j; i++) inbuf[i] = inbuf[i+j];
-        inbuf[i] = '\0';
-       }
-    }
-  return strlen(inbuf);
-}
-
-char* supp_tb(char* string) /* suppress trailing blanks in string */
-{
-  int l = strlen(string), j;
-  for (j = l-1; j >= 0; j--)
-    {
-     if (string[j] != ' ') break;
-     string[j] = '\0';
-    }
-  return string;
 }
 
 int table_length(char* table)
@@ -8863,17 +7768,6 @@ void time_stamp(char* place)
   fprintf(prt_file, "sec.s since start: %d   since last call: %d\n", k, l);
 }
 
-double tgrndm(double cut)
-{
-  double ret = zero;
-  if (cut > zero)
-    {
-     ret = grndm();
-     while (fabs(ret) > fabs(cut))  ret = grndm();
-    }
-  return ret;
-}
-
 char* tmpbuff(char* string)
      /* buffers string in a temporary (i.e. allocated) buffer */
 {
@@ -8886,7 +7780,7 @@ char* tmpbuff(char* string)
 void track_dynap(struct in_cmd* cmd)
 {
   char rout_name[] = "track_dynap";
-  int j, e_flag, flag = 2, izero = 0,
+  int e_flag, flag = 2, izero = 0,
       turns = command_par_value("turns", cmd->clone),
       npart = stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
@@ -8914,8 +7808,8 @@ void track_dynap(struct in_cmd* cmd)
   probe_beam = clone_command(current_beam);
   adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
   adjust_rfc(); /* sets freq in rf-cavities from probe */
-  for (j = 0; j < 6; j++) orbit0[j] = zero;
-  for (j = 0; j < 36; j++) oneturnmat[j] = zero;
+  zero_double(orbit0, 6);
+  zero_double(oneturnmat, 36);
   if (get_option("onepass") == 0) 
     {
       tmrefo_(&izero,orbit0,orbit,oneturnmat); 
@@ -9061,11 +7955,11 @@ void track_pteigen(double* eigen)
 void track_run(struct in_cmd* cmd)
 {
   char rout_name[] = "track_run";
-  int j, e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
+  int e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
   double d_dummy, *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5, 
-    *buf6, *buf7, *buf8;
+    *buf6;
   struct table* t;
   int turns = command_par_value("turns", cmd->clone);
   if (track_is_on == 0)
@@ -9083,8 +7977,8 @@ void track_run(struct in_cmd* cmd)
   probe_beam = clone_command(current_beam);
   adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
   adjust_rfc(); /* sets freq in rf-cavities from probe */
-  for (j = 0; j < 6; j++) orbit0[j] = zero;
-  for (j = 0; j < 36; j++) oneturnmat[j] = zero;
+  zero_double(orbit0, 6);
+  zero_double(oneturnmat, 36);
   if (get_option("onepass") == 0) 
     {
       tmrefo_(&izero,orbit0,orbit,oneturnmat); 
@@ -9296,17 +8190,19 @@ void update_beam(struct command* comm)
    ey->eyn
    current->npart
    et->sigt->sige
-   where any item to the left takes precendence over the others
+   where any item to the left takes precendence over the others;
+   for ions, the input energy is multiplied by the charge, and the
+   mass is the "nucleon" number times the average nucleon mass "nmass". 
 */
 {
   struct name_list* nlc = comm->par_names;
   struct command_parameter_list* plc = comm->par;
   struct command_parameter_list* pl = current_beam->par;
-  int i, pos, lp;
+  int pos, lp;
   char* name = blank;
   double energy = 0, beta = 0, gamma = 0, charge = 0, freq0 = 0, bcurrent = 0, 
          npart = 0, mass = 0, pc = 0, ex, exn, ey, eyn, alfa, circ = one, 
-         arad = 0;
+         arad = 0, nucleon = 1;
   pos = name_list_pos("particle", nlc);
   if (nlc->inform[pos])  /* parameter has been read */
     {
@@ -9335,6 +8231,22 @@ void update_beam(struct command* comm)
 	  }
        }
     }
+  else name = pl->parameters[pos]->string;
+  if (strcmp(name, "ion") == 0)
+    {
+     pos = name_list_pos("mass", nlc);
+     if (nlc->inform[pos]) mass = command_par_value("mass", comm);
+     else 
+       {
+        pos = name_list_pos("nucleon", nlc);
+        if (nlc->inform[pos]) nucleon = command_par_value("nucleon", comm);
+        else nucleon = command_par_value("nucleon", current_beam);
+        mass = nucleon * get_variable("nmass");
+       }
+     pos = name_list_pos("charge", nlc);
+     if (nlc->inform[pos]) charge = command_par_value("charge", comm);
+     else charge = command_par_value("charge", current_beam);
+    }
   if (mass == zero) mass = command_par_value("mass", current_beam);
   if (charge == zero) charge = command_par_value("charge", current_beam);
   arad = ten_m_16 * charge * charge * get_variable("qelect") 
@@ -9342,6 +8254,7 @@ void update_beam(struct command* comm)
   if ((pos = name_list_pos("energy", nlc)) > -1 && nlc->inform[pos])
     {
      energy = command_par_value("energy", comm);
+     if (strcmp(name, "ion") == 0) energy *= fabs(charge);
      if (energy <= mass) fatal_error("energy must be","> mass");
      pc = sqrt(energy*energy - mass*mass);
      gamma = energy / mass;
@@ -9350,6 +8263,7 @@ void update_beam(struct command* comm)
   else if((pos = name_list_pos("pc", nlc)) > -1 && nlc->inform[pos])
     {
      pc = command_par_value("pc", comm);
+     if (strcmp(name, "ion") == 0) pc *= fabs(charge);
      energy = sqrt(pc*pc + mass*mass);
      gamma = energy / mass;
      beta = pc / energy;
@@ -9373,6 +8287,7 @@ void update_beam(struct command* comm)
   else
     {
      energy = command_par_value("energy", current_beam);
+     if (strcmp(name, "ion") == 0) energy *= fabs(charge);
      if (energy <= mass) fatal_error("energy must be","> mass");
      pc = sqrt(energy*energy - mass*mass);
      gamma = energy / mass;
@@ -9457,13 +8372,11 @@ void update_beam(struct command* comm)
   if (nlc->inform[pos])
     pl->parameters[pos]->double_value = plc->parameters[pos]->double_value;
   pos = name_list_pos("pdamp", nlc);
-  if (nlc->inform[pos])
-    {
-     for (i = 0; i < 3; i++) pl->parameters[pos]->double_array->a[i] =
-				plc->parameters[pos]->double_array->a[i];
-    }
+  if (nlc->inform[pos]) copy_double(plc->parameters[pos]->double_array->a, 
+                                    pl->parameters[pos]->double_array->a, 3);
   store_comm_par_value("mass", mass, current_beam);
   store_comm_par_value("charge", charge, current_beam);
+  store_comm_par_value("nucleon", nucleon, current_beam);
   store_comm_par_value("energy", energy, current_beam);
   store_comm_par_value("pc", pc, current_beam);
   store_comm_par_value("gamma", gamma, current_beam);
@@ -9671,7 +8584,6 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
   struct table* t;
 
   mycpy(c_dummy, table);
-  if (strcmp("twiss", "c_dummy") == 0) t = twiss_table;
   if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
@@ -9682,236 +8594,7 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
      if (t->columns->inform[j] < 3) t->d_cols[j][t->curr] = vals[j-c_pos];
 }
 
-double vdot(int* n, double* v1, double* v2)
-{
-  int i;
-  double dot = 0;
-  for (i = 0; i < *n; i++)  dot += v1[i] * v2[i];
-  return dot;
-}
-
-double vmod(int* n, double* v)
-{
-  int i;
-  double mod = 0;
-  for (i = 0; i < *n; i++)  mod += v[i] * v[i];
-  return sqrt(mod);
-}
-
 void warning(char* t1, char* t2) 
 {
   if (get_option("warn")) printf("++++++ warning: %s %s\n",t1,t2);
-}
-
-void write_elems(struct el_list* ell, FILE* file)
-{
-  int i;
-  for (i = 0; i < ell->curr; i++) export_element(ell->elem[i], ell, file);
-}
-
-void write_elems_8(struct el_list* ell, FILE* file)
-{
-  int i;
-  for (i = 0; i < ell->curr; i++) export_elem_8(ell->elem[i], ell, file);
-}
-
-void write_nice(char* string, FILE* file)
-{
-  int n, pos, ssc;
-  char *c = string;
-  char k;
-  strcat(string, ";");
-  n = strlen(string);
-  while (n > LINE_FILL)
-    {
-     for (pos = LINE_FILL; pos > 10; pos--)
-       {
-	k = c[pos];
-	if (strchr(" ,+-*/", k))  break;
-       }
-     c[pos] = '\0';
-     fprintf(file, "%s\n", c);
-     c[pos] = k;
-     ssc = (int) &c[pos] - (int) c;
-     n -= ssc;
-     c = &c[pos];
-    }
-  fprintf(file, "%s\n", c);
-}
-
-void write_nice_8(char* string, FILE* file)
-{
-  int n, pos, comma, ssc;
-  char *c = string;
-  char k;
-  strcat(string, ";");
-  n = strlen(string);
-  while (n > LINE_F_MAD8)
-    {
-     comma = 0;
-     for (pos = LINE_F_MAD8; pos > 10; pos--)
-       {
-	k = c[pos];
-	if (strchr(" ,+-*/", k))  break;
-       }
-     c[pos] = '\0';
-     fprintf(file, "%s &\n", c);
-     c[pos] = k;
-     ssc = (int) &c[pos] - (int) c;
-     n -= ssc;
-     c = &c[pos];
-    }
-  fprintf(file, "%s\n", c);
-}
-
-void write_sequs(struct sequence_list* sql, FILE* file)
-{
-  /* exports sequences in order of their nest level, flat first etc. */
-  int i, j, max_nest = 0;
-  for (i = 0; i < sql->curr; i++)  
-    if(sql->sequs[i]->nested > max_nest) max_nest = sql->sequs[i]->nested;
-  for (j = 0; j <= max_nest; j++)
-    {
-     for (i = 0; i < sql->curr; i++)  
-       if(sql->sequs[i]->nested == j) export_sequence(sql->sequs[i], file);
-    }
-}
-
-void write_vars(struct var_list* varl, FILE* file)
-{
-  int i;
-  for (i = 0; i < varl->curr; i++) 
-    {
-     export_variable(varl->vars[i], file);
-    }
-}
-
-void write_vars_8(struct var_list* varl, FILE* file)
-{
-  int i;
-  for (i = 0; i < varl->curr; i++) 
-    {
-     export_var_8(varl->vars[i], file);
-    }
-}
-
-void write_table(struct table* t, char* filename)
-     /* writes rows with columns listed in row and col */
-{
-  char l_name[NAME_L];
-  char sys_name[200];
-  char* pc;
-  struct int_array* col = t->col_out; 
-  struct int_array* row = t->row_out;
-  int i, j, k, tmp;
-  time_t now;
-  struct tm* tm;
-#ifndef _WIN32
-  struct utsname u;
-  i = uname(&u); /* get system name */
-  strcpy(sys_name, u.sysname);
-#endif
-#ifdef _WIN32
-  strcpy(sys_name, "Windows");
-#endif
-  time(&now);    /* get system time */
-  tm = localtime(&now); /* split system time */
-  if (strcmp(filename, "terminal") == 0) out_file = stdout;
-  else if ((out_file = fopen(filename, "w")) == NULL)
-      warning("cannot open output file:", filename);
-  if (t != NULL)
-    {
-     strcpy(l_name, t->name);
-     fprintf(out_file, 
-      "@ NAME             %%%02ds \"%s\"\n", strlen(t->name), 
-     stoupper(l_name));
-
-     strcpy(l_name, t->type);
-     fprintf(out_file, 
-      "@ TYPE             %%%02ds \"%s\"\n", strlen(t->type), 
-     stoupper(l_name));
-
-     if (t->header != NULL)
-       {
-	for (j = 0; j < t->header->curr; j++) 
-	   fprintf(out_file, "%s\n", t->header->p[j]);
-       }
-     if (title != NULL)
-        fprintf(out_file, 
-         "@ TITLE            %%%02ds \"%s\"\n", strlen(title), title);
-
-     fprintf(out_file, 
-      "@ ORIGIN           %%%02ds \"%s %s\"\n", 
-       strlen(myversion)+strlen(sys_name)+1, myversion, sys_name);
-
-     fprintf(out_file, 
-      "@ DATE             %%08s \"%02d/%02d/%02d\"\n", 
-       tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
-
-     fprintf(out_file, 
-      "@ TIME             %%08s \"%02d.%02d.%02d\"\n", 
-       tm->tm_hour, tm->tm_min, tm->tm_sec);
-     fprintf(out_file, "* ");
-
-     for (i = 0; i < col->curr; i++)
-       {
-	strcpy(l_name, t->columns->names[col->i[i]]); 
-        fprintf(out_file, "%-18s ", stoupper(l_name));
-       }
-     fprintf(out_file, "\n");
-
-     fprintf(out_file, "$ ");
-     for (i = 0; i < col->curr; i++) 
-       {
-	if (t->columns->inform[col->i[i]] == 1) 
-            fprintf(out_file, "%%hd          ");
-	else if (t->columns->inform[col->i[i]] == 2) 
-            fprintf(out_file, "%%le                ");
-	else if (t->columns->inform[col->i[i]] == 3) 
-            fprintf(out_file, "%%s                 ");
-       }
-     fprintf(out_file, "\n");
-
-     for (j = 0; j < row->curr; j++)
-       {
-	if (row->i[j])
-	  {
-           if (t->l_head[j] != NULL)
-             {
-	      for (k = 0; k < t->l_head[j]->curr; k++) 
-	         fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
-	     }
-	   for (i = 0; i < col->curr; i++)
-	     {
-	      if (t->columns->inform[col->i[i]] == 1)
-		{
-		 tmp = t->d_cols[col->i[i]][j];
-                 fprintf(out_file, " %-18d", tmp);
-		}
-	      else if (t->columns->inform[col->i[i]] == 2)
-                  fprintf(out_file, " %-18.10g", t->d_cols[col->i[i]][j]);
-	      else if (t->columns->inform[col->i[i]] == 3)
-	        {
-	         strcpy(c_dummy, t->s_cols[col->i[i]][j]);
-                 stoupper(c_dummy); 
-                 pc = strip(c_dummy); /* remove :<occ_count> */
-                 k = strlen(pc);
-                 pc[k++] = '\"'; pc[k] = '\0';
-                 fprintf(out_file, " \"%-18s", pc);
-	        }
-	     }
-           fprintf(out_file, "\n");
-	  }
-       }
-     if (strcmp(filename, "terminal") != 0) fclose(out_file);
-    }
-}
-
-int zero_string(char* string) /* returns 1 if string defaults to '0', else 0 */
-{
-  int i, l = strlen(string);
-  char c;
-  for (i = 0; i < l; i++)  
-    if ((c = string[i]) != '0' && c != ' ' && c != '.') return 0;
-  return 1;
 }

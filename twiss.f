@@ -9,6 +9,7 @@
       include 'twissl.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
+      integer i
       integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
      &ddisp0(6),r0mat(2,2),zero,one,two,get_value
@@ -22,7 +23,8 @@
       summ=0
       eflag=0
       inval=0
-      call get_orbit0(orbit0)
+      i = 6
+      call get_node_vector('orbit0 ', i, orbit0)
       call m66one(rt)
       call m66one(rw)
       call dzero(tt,216)
@@ -90,14 +92,14 @@
       if (inval.ne.0) then
 
 !---- Get transfer matrix.
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0)
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
         if(eflag.ne.0) go to 900
 
 !---- Initial values from periodic solution.
       else
         call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
         if(eflag.ne.0) go to 900
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0)
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
         if(eflag.ne.0) go to 900
         call twcpin(rt,disp0,r0mat,eflag)
         if(eflag.ne.0) go to 900
@@ -122,7 +124,10 @@
 
 !---- Print summary
       if(summ.ne.0) call tw_summ(rt,tt)
-
+      if (get_option('keeporbit ') .ne. 0)  then
+         i = 6
+         call store_node_vector('orbit0 ', i, opt_fun0(9))
+      endif
       call set_option('twiss_success ', ione)
       goto 9999
  900  call set_option('twiss_success ', izero)
@@ -141,7 +146,7 @@
 
       call dzero(orbit0,6)
 !---- Get transfer matrix.
-      call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0)
+      call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,0)
       end
       subroutine tmrefo(kobs,orbit0,orbit,rt)
       implicit none
@@ -165,7 +170,7 @@
 !---- Get closed orbit and coupled transfer matrix.
       call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
       call set_option('bbd_flag ', ione)
-      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs)
+      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,0)
       call set_option('bbd_flag ', izero)
       end
       subroutine twinifun(opt_fun0,rt)
@@ -279,7 +284,7 @@
       include 'twissl.fi'
       include 'twissotm.fi'
       integer case,i,flag
-      double precision opt_fun(*),position,twopi,tmp,get_variable,      &
+      double precision opt_fun(*),position,twopi,opt5,opt8,get_variable,&
      &zero
       parameter(zero=0d0)
 
@@ -288,45 +293,23 @@
       if (flag .ne. 0)  then
       if(case.eq.1) then
         opt_fun(2)=position
-        call double_to_table(table_name,'s '     ,opt_fun(2 ))
-        call double_to_table(table_name,'betx '  ,opt_fun(3 ))
-        call double_to_table(table_name,'alfx '  ,opt_fun(4 ))
-        tmp = opt_fun(5) / twopi
-        call double_to_table(table_name,'mux '   ,tmp)
-        call double_to_table(table_name,'bety '  ,opt_fun(6 ))
-        call double_to_table(table_name,'alfy '  ,opt_fun(7 ))
-        tmp = opt_fun(8) / twopi
-        call double_to_table(table_name,'muy '   ,tmp)
-        call double_to_table(table_name,'x '     ,opt_fun(9 ))
-        call double_to_table(table_name,'px '    ,opt_fun(10))
-        call double_to_table(table_name,'y '     ,opt_fun(11))
-        call double_to_table(table_name,'py '    ,opt_fun(12))
-        call double_to_table(table_name,'t '     ,opt_fun(13))
-        call double_to_table(table_name,'pt '    ,opt_fun(14))
-        call double_to_table(table_name,'dx '    ,opt_fun(15))
-        call double_to_table(table_name,'dpx '   ,opt_fun(16))
-        call double_to_table(table_name,'dy '    ,opt_fun(17))
-        call double_to_table(table_name,'dpy '   ,opt_fun(18))
-        call double_to_table(table_name,'r11    ',opt_fun(29))
-        call double_to_table(table_name,'r12    ',opt_fun(30))
-        call double_to_table(table_name,'r21    ',opt_fun(31))
-        call double_to_table(table_name,'r22    ',opt_fun(32))
-        call double_to_table(table_name,'energy ',opt_fun(33))
+        opt5 = opt_fun(5)
+        opt_fun(5)= opt_fun(5) / twopi
+        opt8 = opt_fun(8)
+        opt_fun(8)= opt_fun(8) / twopi
+        i = 17
+        call vector_to_table(table_name, 's ', i, opt_fun(2))
+        i = 5
+        call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
         if(rmatrix) then
           i = 36
           call vector_to_table(table_name, 're11 ', i, opt_fun(34))
         endif
+        opt_fun(5)= opt5
+        opt_fun(8)= opt8
       elseif(case.eq.2) then
-        call double_to_table(table_name,'wx '    ,opt_fun(19))
-        call double_to_table(table_name,'phix '  ,opt_fun(20))
-        call double_to_table(table_name,'dmux '  ,opt_fun(21))
-        call double_to_table(table_name,'wy '    ,opt_fun(22))
-        call double_to_table(table_name,'phiy '  ,opt_fun(23))
-        call double_to_table(table_name,'dmuy '  ,opt_fun(24))
-        call double_to_table(table_name,'ddx '   ,opt_fun(25))
-        call double_to_table(table_name,'ddpx '  ,opt_fun(26))
-        call double_to_table(table_name,'ddy '   ,opt_fun(27))
-        call double_to_table(table_name,'ddpy '  ,opt_fun(28))
+        i = 10
+        call vector_to_table(table_name, 'wx ', i, opt_fun(19))
       endif
 
 !---- Augment table twiss
@@ -348,21 +331,22 @@
 !                          betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.   *
 !   rt(6,6)      (double)  transfer matrix.                            *
 !   tt(6,6,6)    (double)  second order terms.                         *
-!   eflag        (integer) error flag.                                 *
+!   eflag        (integer) error flag (0: OK, else != 0)               *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,m66sta,pflag
-      integer eflag,i,k,irank,itra,itmax,get_option
-      parameter(itmax=10)
+      integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on
+      parameter(itmax=20)
       double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,err,&
      &orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
-     &zero,one,ten6m
-      parameter(zero=0d0,one=1d0,ten6m=1d-6)
+     &zero,one,get_variable
+      parameter(zero=0d0,one=1d0)
       equivalence(a(1,1),b(1,1),as(1,1),bs(1,1))
 
 !---- Initialize.
+      thr_on = get_option('threader ')
       pflag = get_option('twiss_print ') .ne. 0
       deltap = get_value('probe ','deltap ')
-      cotol = ten6m
+      cotol = get_variable('twiss_tol ')
       eflag = 0
 !---- Initialize guess.
       call dcopy(guess,orbit0,6)
@@ -371,7 +355,7 @@
       do itra = 1, itmax
 
 !---- Track orbit and transfer matrix.
-        call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0)
+        call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
         if (eflag.ne.0)  return
 !---- Solve for dynamic case.
         if (.not.m66sta(rt)) then
@@ -414,7 +398,9 @@
         print '(''orbit: '', 1p,6e14.6)', orbit0
         endif
         if (err.lt.cotol) then
-          call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0)
+          save_opt=get_option('keeporbit ')
+          call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,&
+     &    0)
           opt_fun0(9 )=orbit0(1)
           opt_fun0(10)=orbit0(2)
           opt_fun0(11)=orbit0(3)
@@ -446,7 +432,8 @@
       print *, 'Singular matrix occurred during closed orbit search.'
       eflag = 1
  999  end
-      subroutine tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs)
+      subroutine tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
+     &thr_on)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -462,20 +449,43 @@
 !   tt(6,6,6) (double)  second order terms.                            *
 !   eflag     (integer) error flag.                                    *
 !   kobs      (integer) if > 0, stop at node with this obs. point #    *
+!   save      (integer) if > 0, save orbit at all BPMs                 *
+!   thr_on    (integer) if > 0, use threader                           *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissa.fi'
       include 'twissc.fi'
       include 'bb.fi'
+      include 'name_len.fi'
       logical fsec,ftrk,fmap
-      integer eflag,i,j,code,restart_sequ,advance_node,node_al_errors,  &
-     &n_align,kobs,nobs
+      character * 28 tmptxt, tmptxt2
+      character * 2 ptxt(2)
+      character*(name_len) el_name(2)
+      integer eflag,j,code,restart_sequ,advance_node,node_al_errors,    &
+     &n_align,kobs,nobs,node,save,pnode,thr_on,get_option,ccode,pcode,  &
+     &get_vector,i,err,old,kpro,corr_pick(2),enable,occ_cnt(2),lastnb,  &
+     &rep_cnt(2),max_rep
       double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6),el,ek(6),   &
      &re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
-     &get_value,parvec(26),orb_limit,zero
-      parameter(orb_limit=1d1,zero=0d0)
+     &get_value,parvec(26),orb_limit,zero,vector(10),reforb(6),         &
+     &restsum(2),restorb(6,2),restm(6,6,2),restt(6,6,6,2),cmatr(6,6,2), &
+     &pmatr(6,6),dorb(6),cick
+      parameter(orb_limit=1d1,zero=0d0,ccode=15,pcode=18)
+      parameter(max_rep=100)
+      data ptxt / 'x-','y-'/
 
-!---- Initialize.
+!---- Initialize
+!---- corr_pick stores for both projection the last pickup used by the
+!     threader in order to avoid corrections in front of it when
+!     restarting.
+      do j = 1, 2
+        corr_pick(j) = 0
+        rep_cnt(j) = 0
+      enddo
+      if (thr_on .gt. 0)  then
+        j = get_vector('threader ', 'vector ', vector)
+        if (j .lt. 3) thr_on = 0
+      endif
       betas = get_value('probe ','beta ')
       gammas= get_value('probe ','gamma ')
       call dzero(tt,216)
@@ -489,11 +499,28 @@
       parvec(7)=get_value('probe ','gamma ')
       bbd_cnt=0
       bbd_flag=1
-
-      i = restart_sequ()
+!--- start
+      node = restart_sequ()
  10   continue
-      bbd_pos=i
+      bbd_pos=node
       code = node_value('mad8_type ')
+      if (code .ge. ccode-1 .and. code .le. ccode+1)  then
+!--- kicker
+        if (thr_on .gt. 0)  then
+!--- threader is on - keep position,orbit,matrix,and tensor for restart
+          restsum(j) = suml
+          if (code .le. ccode) then
+            call dcopy(orbit,restorb(1,1),6)
+            call dcopy(rt,restm(1,1,1),36)
+            call dcopy(tt,restt(1,1,1,1),216)
+          endif
+          if (code .ge. ccode) then
+            call dcopy(orbit,restorb(1,2),6)
+            call dcopy(rt,restm(1,1,2),36)
+            call dcopy(tt,restt(1,1,1,2),216)
+          endif
+        endif
+      endif
       el = node_value('l ')
       nobs = node_value('obs_point ')
       n_align = node_al_errors(al_errors)
@@ -513,6 +540,90 @@
         call m66mpy(re,rt,rt)
       endif
       if (kobs.gt.0.and.kobs.eq.nobs) return
+      if (code .ge. ccode-1 .and. code .le. ccode+1)  then
+!--- kicker
+        if (thr_on .gt. 0)  then
+!--- threader is on
+!--- keep matrix
+          if (code .le. ccode) then
+            call dcopy(rt,cmatr(1,1,1),36)
+            j = name_len
+            call element_name(el_name(1),j)
+            occ_cnt(1) = node_value('occ_cnt ')
+          endif
+          if (code .ge. ccode) then
+            call dcopy(rt,cmatr(1,1,2),36)
+            j = name_len
+            call element_name(el_name(2),j)
+            occ_cnt(2) = node_value('occ_cnt ')
+          endif
+        endif
+      elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then
+!--- monitor
+        enable = node_value('enable ')
+        if (save .gt. 0 .and. enable .gt. 0) then
+          j = 6
+          call store_node_vector('orbit_ref ', j, orbit)
+        endif
+        if (thr_on .gt. 0 .and. enable .gt. 0) then
+!--- threader is on - test for overflow w.r.t. stored orbit
+          call dzero(reforb,6)
+          j = 6
+          call get_node_vector('orbit_ref ', j, reforb)
+          do kpro = 1, 2
+            if (kpro .eq. 1 .and. code .le. pcode                       &
+     &      .or. kpro .eq. 2 .and. code .ge. pcode)  then
+              j = 2*kpro-1
+              dorb(j) = orbit(j) - reforb(j)
+              if (abs(dorb(j)) .gt. vector(kpro)                        &
+     &        .and. node .ge. corr_pick(kpro))  then
+!--- reset count if new pickup
+                if (node .gt. corr_pick(kpro)) rep_cnt(kpro) = 0
+!--- check for max. repitition
+                rep_cnt(kpro) = rep_cnt(kpro) + 1
+                if (rep_cnt(kpro) .gt. max_rep)  then
+                  write(tmptxt, '(i6)') max_rep
+                  call fort_warn('threader: pickup skipped after',      &
+     &            tmptxt(:6)//' correction attempts')
+                  goto 20
+                endif
+!--- keep matrix
+                call dcopy(rt,pmatr,36)
+                old = node
+                call tmthrd(kpro,dorb,cmatr(1,1,kpro),pmatr,vector,node,&
+     &          cick,err)
+                if (err .eq. 0)  then
+                  corr_pick(kpro) = old
+                  write(tmptxt, '(1p,6g14.6)') cick
+                  tmptxt2 = el_name(kpro)
+                  write(tmptxt2(lastnb(el_name(kpro))+1:),              &
+     &            '(''['',i3,'']'')') occ_cnt(kpro)
+                  call fort_info(                                       &
+     &            'threader: '//tmptxt2(:lastnb(tmptxt2))//' total '    &
+     &            //ptxt(kpro)//'kick:', tmptxt)
+*--- restore restart values
+                  suml = restsum(kpro)
+                  call dcopy(restorb(1,kpro),orbit,6)
+                  call dcopy(restm(1,1,kpro),rt,36)
+                  call dcopy(restt(1,1,1,kpro),tt,216)
+                  goto 20
+                else
+                  write(tmptxt, '(i6)') old
+                  if (err .eq. 1)  then
+                    call fort_warn(                                     &
+     &              'threader: no corrector before pickup at node ',    &
+     &              tmptxt)
+                  elseif (err .eq. 2)  then
+                    call fort_warn('threader: kicker is at start',      &
+     &              'of sequence')
+                  endif
+                endif
+              endif
+            endif
+          enddo
+        endif
+      endif
+ 20   continue
 !---- Test for overflow.
       do j = 1, 6
         if (abs(orbit(j)).ge.orb_limit) then
@@ -521,10 +632,89 @@
         endif
       enddo
       if (advance_node().ne.0)  then
-        i=i+1
+        node=node+1
         goto 10
       endif
       bbd_flag=0
+  999 end
+      subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
+      implicit none
+*----------------------------------------------------------------------*
+* Purpose:
+*   Correct orbit position at bpm in first pass (threader)
+* Input:
+*   kpro       (integer) projection (1 = x, 2 = y)
+*   dorb       (d.p.)    difference orbit at pickup
+*   cmatr      (d.p.)    transfer matrix up to preceding corrector
+*   pmatr      (d.p.)    transfer matrix up to current pickup
+*   thrvec     (d.p.)    threader parameter vector (see madxdict.h)
+* Input/Output:
+*   node       (integer) current node
+* Output:
+* cick         (d.p.)    kick value applied
+* error        (integer) 0: OK, else aborted
+*----------------------------------------------------------------------*
+      integer error,node,kpro
+      integer i,j,npick,advance_node,ccode
+      integer both,code,icorr,itp,lc,lc1,lc2,retreat_node,ncorr
+      double precision thrvec(3),dorb(6),cmatr(6,6),pmatr(6,6)
+      double precision cick,d,tol1min,node_value,atemp(6,6)
+      parameter (tol1min = 1.d-2,ccode=15)
+
+*--- keep position of current pickup
+      npick = node
+*--- look for one preceding corrector of correct (MAD-8) type
+      both = ccode
+      itp = both + (-1)**kpro
+      lc = 2 * (kpro - 1)
+      lc1 = lc + 1
+      lc2 = lc + 2
+      icorr = 0
+ 10   continue
+      if (retreat_node() .eq. 0)  then
+        error = 1
+        do i = node+1,npick
+          j = advance_node()
+        enddo
+        node = npick
+        goto 999
+      endif
+      node = node - 1
+      code = node_value('mad8_type ')
+      if (code .eq. itp .or. code .eq. both)  then
+        icorr = icorr + 1
+        ncorr = node
+      endif
+      if (icorr .eq. 0) goto 10
+*--- transport matrix from kicker to pickup
+      call m66inv(cmatr,atemp)
+      call m66mpy(pmatr,atemp,atemp)
+      if (abs(atemp(lc1,lc2)) .lt. tol1min) then
+*--- kicker does not change orbit at pickup - try again
+        icorr = 0
+        goto 10
+      endif
+*--- now we got one good corrector - get kick with attenuation factor
+      cick = -thrvec(3)*dorb(2*kpro-1)/atemp(lc1,lc2)
+*--- add kick to kicker strengths
+      if (kpro .eq. 1)  then
+        cick = node_value('dipole_bv ') * cick + node_value('chkick ')
+        call store_node_value('chkick ', cick)
+      else
+        cick = node_value('dipole_bv ') * cick + node_value('cvkick ')
+        call store_node_value('cvkick ', cick)
+      endif
+*--- set node for restart in front of kicker
+      if (retreat_node() .eq. 0)  then
+        error = 2
+        do i = node+1,npick
+          j = advance_node()
+        enddo
+        node = npick
+        goto 999
+      endif
+      node = node -1
+      error = 0
   999 end
       subroutine twcpin(rt,disp0,r0mat,eflag)
       implicit none
@@ -1733,9 +1923,9 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
+      include 'twtrr.fi'
       logical ftrk,fmap,cplxy,dorad
-      integer nd,n_ferr,node_fd_errors,maxmul
-      parameter(maxmul=20)
+      integer nd,n_ferr,node_fd_errors
       double precision orbit(6),f_errors(0:50),ek(6),re(6,6),te(6,6,6), &
      &rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,el,tilt,e1,  &
      &e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct,st,hx,hy,   &
@@ -2481,7 +2671,6 @@
           xkick=zero
           ykick=zero
         endif
-
 !---- Sum up total kicks.
         dpx = xkick / (one + deltap)
         dpy = ykick / (one + deltap)
@@ -2540,9 +2729,9 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
+      include 'twtrr.fi'
       logical fsec,ftrk,fmap
-      integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors,maxmul
-      parameter(maxmul=20)
+      integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors
       double precision orbit(6),f_errors(0:50),re(6,6),te(6,6,6),x,y,   &
      &dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,         &
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),              &
@@ -2563,8 +2752,8 @@
 !---- Multipole components.
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
-      call node_vector('knl ',nn,normal)
-      call node_vector('ksl ',ns,skew)
+      call get_node_vector('knl ',nn,normal)
+      call get_node_vector('ksl ',ns,skew)
       call dzero(vals,2*(maxmul+1))
       do iord = 0, nn
         vals(1,iord) = normal(iord)
@@ -2572,13 +2761,12 @@
       do iord = 0, ns
         vals(2,iord) = skew(iord)
       enddo
-
 !---- Field error vals.
       call dzero(field,2*(maxmul+1))
       if (n_ferr .gt. 0) then
         call dcopy(f_errors,field,n_ferr)
       endif
-      nd = 2 * max(nn, ns, n_ferr/2)
+      nd = 2 * max(nn, ns, n_ferr/2-1)
 
 !---- Dipole error.
       dbr = bv0 * field(1,0) / (one + deltap)

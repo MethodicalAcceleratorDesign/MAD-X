@@ -18,7 +18,6 @@
 #define LINE_FILL 70        /* max. line length -2 for "save" output */
 #define LINE_F_MAD8 70      /* the same, for mad-8 format */
 #define LINE_MAX 78         /* for SXF output */
-#define ELEM_OUT 1000       /* character buffer for writing one element */
 #define MAX_RAND 1000000000 /* for random generator */
 #define NR_RAND 55          /* for random generator */
 #define NJ_RAND 24          /* for random generator */

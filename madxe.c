@@ -263,9 +263,9 @@ void error_efcomp(struct in_cmd* cmd)
 
          if(strcmp(nextnode->base_name,"multipole") == 0) {
            if(rrr > 0 ) {
-              node_vector("knl",&lvec,nvec);
+              get_node_vector("knl",&lvec,nvec);
            } else {
-              node_vector("ksl",&lvec,nvec);
+              get_node_vector("ksl",&lvec,nvec);
            }
            if (get_option("debug")) {
              for(i=0;i<4;i++) {

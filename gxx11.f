@@ -2,15 +2,15 @@
       implicit none
       integer i,icol,ierr,np
       real fx,fy,xs,ys
-************************************************************************
-*
-*   Purpose: Fill area plot with viewport emulation for HIGZ
-*
-*--- Input
-*    NP, x, y: as for GFA
-*   Author: H. Grote / CERN                        date: Nov. 30, 1993
-*                                              last mod: Nov. 30, 1993
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Fill area plot with viewport emulation for HIGZ
+!
+!--- Input
+!    NP, x, y: as for GFA
+!   Author: H. Grote / CERN                        date: Nov. 30, 1993
+!                                              last mod: Nov. 30, 1993
+!***********************************************************************
       real x(*), y(*)
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
@@ -33,7 +33,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -53,7 +53,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -62,21 +62,21 @@
       common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
      &yvp(madim2+1)
       save /gxcax2/
- 
+
       real w(4), v(4)
- 
-*--- set proper colour index
+
+!--- set proper colour index
       call jqlctp(i)
       if (i .ne. 2)  then
         call jslctp(2)
         call jqplci(ierr, icol)
         call gxscol(icol)
       endif
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
-*--- get current window
+!--- get current window
       call jqnt(1, ierr, w, v)
-*--- transform
+!--- transform
       xs = w(2) - w(1)
       fx = vpfacx / xs
       ys = w(4) - w(3)
@@ -86,22 +86,22 @@
         yvp(i) = w(3) + ys * (vploc(3) + fy * (y(i) - w(3)))
       enddo
       call gfa(np, xvp, yvp)
-*--- set flag for clear permission
+!--- set flag for clear permission
       iclear = 1
       end
       subroutine gvpl(np, x, y)
       implicit none
       integer i,icol,ierr,iloop,ilow,n,np,nup
       real fx,fy,xs,ys
-************************************************************************
-*
-*   Purpose: Plot polyline and emulate viewports for HIGZ or X11
-*
-*--- Input
-*   np, x, y: as for GPL
-*   Author: H. Grote / CERN                        date: Nov. 18, 1992
-*                                           last mod: May 13, 1993
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Plot polyline and emulate viewports for HIGZ or X11
+!
+!--- Input
+!   np, x, y: as for GPL
+!   Author: H. Grote / CERN                        date: Nov. 18, 1992
+!                                           last mod: May 13, 1993
+!***********************************************************************
       real x(*), y(*)
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
@@ -124,7 +124,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -144,7 +144,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -153,20 +153,20 @@
       common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
      &yvp(madim2+1)
       save /gxcax2/
- 
+
       real w(4), v(4)
-*--- set proper colour index
+!--- set proper colour index
       call jqlctp(i)
       if (i .ne. 2)  then
         call jslctp(2)
         call jqplci(ierr, icol)
         call gxscol(icol)
       endif
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
-*--- get current window
+!--- get current window
       call jqnt(1, ierr, w, v)
-*--- transform
+!--- transform
       xs = w(2) - w(1)
       fx = vpfacx / xs
       ys = w(4) - w(3)
@@ -182,22 +182,22 @@
         enddo
         call gpl(n, xvp, yvp)
       enddo
-*--- set flag for clear permission
+!--- set flag for clear permission
       iclear = 1
       end
       subroutine gvpm(np, x, y)
       implicit none
       integer i,icol,ierr,iloop,n,np,nup
       real fx,fy,xs,ys
-************************************************************************
-*
-*   Purpose: Plot marker symbol and emulate viewports for HIGZ or X11
-*
-*--- Input
-*   np, x, y: as for GPM
-*   Author: H. Grote / CERN                        date: Nov. 18, 1992
-*                                           last mod: May 13, 1993
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Plot marker symbol and emulate viewports for HIGZ or X11
+!
+!--- Input
+!   np, x, y: as for GPM
+!   Author: H. Grote / CERN                        date: Nov. 18, 1992
+!                                           last mod: May 13, 1993
+!***********************************************************************
       real x(*), y(*)
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
@@ -220,7 +220,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -240,7 +240,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -249,21 +249,21 @@
       common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
      &yvp(madim2+1)
       save /gxcax2/
- 
+
       real w(4), v(4)
- 
-*--- set proper colour index
+
+!--- set proper colour index
       call jqlctp(i)
       if (i .ne. 2)  then
         call jslctp(2)
         call jqpmci(ierr, icol)
         call gxscol(icol)
       endif
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
-*--- get current window
+!--- get current window
       call jqnt(1, ierr, w, v)
-*--- transform
+!--- transform
       xs = w(2) - w(1)
       fx = vpfacx / xs
       ys = w(4) - w(3)
@@ -276,24 +276,24 @@
           xvp(n) = w(1) + xs * (vploc(1) + fx * (x(i) - w(1)))
           yvp(n) = w(3) + ys * (vploc(3) + fy * (y(i) - w(3)))
         enddo
-        call gpm(n, xvp, yvp)
+        call gxwpm(n, xvp, yvp)
       enddo
-*--- set flag for clear permission
+!--- set flag for clear permission
       iclear = 1
       end
       subroutine gvtx(x, y, s)
       implicit none
       integer i,icol,ierr
       real chh,chux,chuy,fx,fy,hfac,x,xs,y,ys
-************************************************************************
-*
-*   Purpose: Plot text and emulate viewports for HIGZ or X11
-*
-*--- Input
-*   x, y, s: as for GTX
-*   Author: H. Grote / CERN                        date: Nov. 18, 1992
-*                                           last mod: May 13, 1993
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Plot text and emulate viewports for HIGZ or X11
+!
+!--- Input
+!   x, y, s: as for GTX
+!   Author: H. Grote / CERN                        date: Nov. 18, 1992
+!                                           last mod: May 13, 1993
+!***********************************************************************
       character * (*) s
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
@@ -316,7 +316,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -336,7 +336,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -345,24 +345,24 @@
       common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
      &yvp(madim2+1)
       save /gxcax2/
- 
+
       real w(4), v(4)
- 
-*--- set proper colour index
+
+!--- set proper colour index
       call jqlctp(i)
       if (i .ne. 2)  then
         call jslctp(2)
         call jqtxci(ierr, icol)
         call gxscol(icol)
       endif
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
-*--- get current window
+!--- get current window
       call jqnt(1, ierr, w, v)
-*--- get current character height and text orientation
+!--- get current character height and text orientation
       call jqchh(ierr, chh)
       call jqchup(ierr, chux, chuy)
-*--- transform
+!--- transform
       xs = w(2) - w(1)
       fx = vpfacx / xs
       ys = w(4) - w(3)
@@ -377,32 +377,32 @@
       yvp(1) = w(3) + ys * (vploc(3) + fy * (y - w(3)))
       call gtx(xvp(1), yvp(1), s)
       call jschh(chh)
-*--- set flag for clear permission
+!--- set flag for clear permission
       iclear = 1
       end
       subroutine gxarng(nopt,rmini,rmaxi,rmin,rmax,nint)
       implicit none
       integer nint,nopt
       real rmax,rmaxi,rmin,rmini
-************************************************************************
-*
-*   Purpose: calculates axis ranges
-*
-*--- Input
-*   nopt         =0: normal
-*              =1: start or terminate axis at 0. if possible
-*              =2: centre axis around 0.
-*   rmini        minimum (x or y) value to consider
-*   rmaxi        maximum (x or y) value to consider
-*--- Output
-*   rmin         lower end of axis
-*   rmax         upper end of axis
-*   nint         no. of intervals as returned by GXSCAL
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Aug. 8, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: calculates axis ranges
+!
+!--- Input
+!   nopt         =0: normal
+!              =1: start or terminate axis at 0. if possible
+!              =2: centre axis around 0.
+!   rmini        minimum (x or y) value to consider
+!   rmaxi        maximum (x or y) value to consider
+!--- Output
+!   rmin         lower end of axis
+!   rmax         upper end of axis
+!   nint         no. of intervals as returned by GXSCAL
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Aug. 8, 1988
+!
+!***********************************************************************
       nint=10
       if(rmini.ge.rmaxi) then
         rmin=rmini
@@ -411,7 +411,7 @@
         if(nopt.eq.0) then
           call gxscal(rmini,rmaxi,rmin,rmax,nint)
         elseif(nopt.eq.1) then
-*--- start or terminate at 0.
+!--- start or terminate at 0.
           if(rmini.gt.0.) then
             call gxscal(0.,rmaxi,rmin,rmax,nint)
           elseif(rmaxi.lt.0.) then
@@ -429,16 +429,16 @@
       end
       subroutine gxasku
       implicit none
-************************************************************************
-*
-*   Purpose: asks user interactively for plot options
-*
-*   must be called before GXINIT if at all
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: asks user interactively for plot options
+!
+!   must be called before GXINIT if at all
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -460,7 +460,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -480,13 +480,13 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
       logical intrac
- 
+
       call gxundf
       if (intrac())  then
         call gxask1
@@ -496,16 +496,16 @@
       subroutine gxask1
       implicit none
       integer ierr
-************************************************************************
-*
-*   Purpose: asks user interactively plot window
-*
-*   called by GXASKU
-*
-*   Author: H. Grote / CERN                        date: May 13, 1993
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: asks user interactively plot window
+!
+!   called by GXASKU
+!
+!   Author: H. Grote / CERN                        date: May 13, 1993
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -527,7 +527,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -547,15 +547,15 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
       character sline*80
       logical affirm
- 
-*--- Input and Output unit definition
+
+!--- Input and Output unit definition
       if(lnunit.ne.lundef)  call gxsvar('INUNIT',miunit,0.,' ')
       if(lounit.ne.lundef)  call gxsvar('IOUNIT',mounit,0.,' ')
       write(iounit,10000)
@@ -586,16 +586,16 @@
       implicit none
       integer iamx,iamy,ierr,ifirst,ilast
       real xax,yax
-************************************************************************
-*
-*   Purpose: asks user interactively for Postscript file
-*
-*   called by GXASKU
-*
-*   Author: H. Grote / CERN                        date: May 13, 1993
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: asks user interactively for Postscript file
+!
+!   called by GXASKU
+!
+!   Author: H. Grote / CERN                        date: May 13, 1993
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -617,7 +617,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -637,7 +637,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -645,7 +645,7 @@
       character sline*80
       character * 60 gxform, sform
       logical affirm
- 
+
       if (lpseps .ne. lundef)  then
         write(iounit,10040)
         call gxrdtx(inunit,sline,ierr)
@@ -685,7 +685,7 @@
         inmeta = 0
       else
         inmeta = mtmeta
-*--- paper size (only if not set already)
+!--- paper size (only if not set already)
         if(lmetax.ne.lundef.or.lmetay.ne.lundef)  then
           iamx = mxsize
           iamy = mysize
@@ -744,79 +744,79 @@
       real a1,a1b,a2,alp,amxx,axlow,axpos,axup,chhigh,chwdth,cthigh,    &
      &cuhigh,diff,diffe,diffn,fcw,fwc,hxf,pfact,ptick,sgspac,sk,space,  &
      &sphlin,sphlog,spmlog,spwlin,spwlog,tickl,wbused,wsused
-************************************************************************
-*
-*   Purpose: plots an axis with tick marks, numbers, and title
-*
-*-- Input
-*   type        'X' for an x-axis, 'Y' for a y-axis
-*   axlow       lower end of axis in current world coords.
-*   axup        upper end of axis in current world coords.
-*   axpos       position of axis in the other coordinate
-*   ipos        =0: AXPOS value given in normalized dev. coord. [0.,1.]
-*            =1: AXPOS value given in current world coords.
-*   fmt         (floating point) format for axis labels (=numbers)
-*            including the brackets, e.g. '(F6.3)'. If blank,
-*            a reasonable default is used.
-*   textin      axis title (trailing blanks will be suppressed)
-*   sepchr      will start a new line when encountered in TEXT
-*   iparm       axis parameters:
-*   1        0 = linear scaling
-*         1 = logarithmic scale
-*+++ if the user scale makes no sense, scaling is switched to automatic
-*
-*   2        if = 0, no tick marks. If < 0, the number of intervals
-*         will be chosen automatically.
-*         if linear scaling and > 0, no. of major tick mark intervals
-*         (labels are only written at major tick marks).
-*         if log. scaling and <> 0, major tick marks at the powers of
-*         ten in the scale, i.e. at all integer values.
-*
-*   3        0 no labels (scale numbers), 1 hor. labels, 2 vertical
-*
-*   4        odd for tick mark below (x-axis) or at left (y axis),
-*         even for above resp. at right.
-*         if = 0, no ticks
-*
-*   5        as 4, but for labels (=scale numbers)
-*
-*   6        as 4, but for the axis text (title)
-*         the text is written horizontally for x-, vertically for y-axes
-*
-*   7        character height in normalized pixels
-*
-*   8        tick mark length in normalized pixels
-*         a normalized pixel is defined as follows: imagine your
-*         default (square) screen (device) area devided into
-*         1000 x 1000 pixels, i.e. one pixel is 0.001 x 0.001 in NDC
-*
-*   9        Linear scaling: no. of extra intervals with half-size ticks
-*         between main ticks
-*         log. scaling: if > 0 : flag that extra ticks are to be
-*         plotted at the positions log(2), log(3),..., log(9)
-*
-*   10       =1 : adjust axis titles at left, =2 centre, =3 adjust
-*         them at right. If the string '<#>' is found inside a line,
-*         the text to the left of it will always be left adjusted,
-*         the text to the right of it right adjusted.
-*
-*   11       text font for axis labels, default = 1 (see GKS for details)
-*
-*   12       if 0 (default) no minor labels at minor ticks
-*         for log. scale, if > 0 yes
-*
-*   13       if > 0 and not > 1000: character height for axis text, else
-*         parameter 7 is used
-*
-*-- Output
-*   ierr        =0: everything OK
-*            =-1: AXLOW.GE.AXUP
-*            else the corresponding GKS error
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Feb. 3, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots an axis with tick marks, numbers, and title
+!
+!-- Input
+!   type        'X' for an x-axis, 'Y' for a y-axis
+!   axlow       lower end of axis in current world coords.
+!   axup        upper end of axis in current world coords.
+!   axpos       position of axis in the other coordinate
+!   ipos        =0: AXPOS value given in normalized dev. coord. [0.,1.]
+!            =1: AXPOS value given in current world coords.
+!   fmt         (floating point) format for axis labels (=numbers)
+!            including the brackets, e.g. '(F6.3)'. If blank,
+!            a reasonable default is used.
+!   textin      axis title (trailing blanks will be suppressed)
+!   sepchr      will start a new line when encountered in TEXT
+!   iparm       axis parameters:
+!   1        0 = linear scaling
+!         1 = logarithmic scale
+!+++ if the user scale makes no sense, scaling is switched to automatic
+!
+!   2        if = 0, no tick marks. If < 0, the number of intervals
+!         will be chosen automatically.
+!         if linear scaling and > 0, no. of major tick mark intervals
+!         (labels are only written at major tick marks).
+!         if log. scaling and <> 0, major tick marks at the powers of
+!         ten in the scale, i.e. at all integer values.
+!
+!   3        0 no labels (scale numbers), 1 hor. labels, 2 vertical
+!
+!   4        odd for tick mark below (x-axis) or at left (y axis),
+!         even for above resp. at right.
+!         if = 0, no ticks
+!
+!   5        as 4, but for labels (=scale numbers)
+!
+!   6        as 4, but for the axis text (title)
+!         the text is written horizontally for x-, vertically for y-axes
+!
+!   7        character height in normalized pixels
+!
+!   8        tick mark length in normalized pixels
+!         a normalized pixel is defined as follows: imagine your
+!         default (square) screen (device) area devided into
+!         1000 x 1000 pixels, i.e. one pixel is 0.001 x 0.001 in NDC
+!
+!   9        Linear scaling: no. of extra intervals with half-size ticks
+!         between main ticks
+!         log. scaling: if > 0 : flag that extra ticks are to be
+!         plotted at the positions log(2), log(3),..., log(9)
+!
+!   10       =1 : adjust axis titles at left, =2 centre, =3 adjust
+!         them at right. If the string '<#>' is found inside a line,
+!         the text to the left of it will always be left adjusted,
+!         the text to the right of it right adjusted.
+!
+!   11       text font for axis labels, default = 1 (see GKS for details)
+!
+!   12       if 0 (default) no minor labels at minor ticks
+!         for log. scale, if > 0 yes
+!
+!   13       if > 0 and not > 1000: character height for axis text, else
+!         parameter 7 is used
+!
+!-- Output
+!   ierr        =0: everything OK
+!            =-1: AXLOW.GE.AXUP
+!            else the corresponding GKS error
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Feb. 3, 1993
+!
+!***********************************************************************
       character*(*)  textin,fmt,type,sepchr
       integer iparm(*)
       character   stext*240,text*240,sltext*40,                         &
@@ -826,9 +826,9 @@
      &alogv(10)
       logical xaxis,linscl, labflg
       save alogv, ifircl, ihoral, iveral, slog
-*--- horizontal and vertical alignment as function of orientation (I),
-*   position above or below etc. (J) and axis (x or y) (K), e.g.
-*   iveral(1,2,1) vertical alignment for horizontal labels above an x axis
+!--- horizontal and vertical alignment as function of orientation (I),
+!   position above or below etc. (J) and axis (x or y) (K), e.g.
+!   iveral(1,2,1) vertical alignment for horizontal labels above an x axis
       data ihoral/2,3,2,1,3,2,1,2/
       data iveral/1,3,5,3,3,5,3,1/
       data slog/'1','2','3','4','5','6','7','8','9'/
@@ -852,26 +852,26 @@
       enddo
       space=0.
       if(ifircl.eq.0)  then
-*--- set logarithms
+!--- set logarithms
         do i=1,10
           alogv(i)=log10(float(i))
         enddo
         ifircl=1
       endif
-*
-*--- check for reasonable axis range
-*
+!
+!--- check for reasonable axis range
+!
       if(axlow.ge.axup)  then
         ierr=-1
         goto 999
       endif
-*
-*--- get current user settings and keep them
+!
+!--- get current user settings and keep them
       call gxsave(isave,rsave,ierr)
       if(ierr.ne.0) goto 999
-*
-*--- get Input parameters
-*
+!
+!--- get Input parameters
+!
       stsep=sepchr
       xaxis=type(:1).eq.'X'
       if(xaxis)  then
@@ -882,7 +882,7 @@
       linscl=iparm(1).eq.0
       intv=iparm(2)
       if(intv.lt.0)  then
-*--- choose number of intervals automatically if linear
+!--- choose number of intervals automatically if linear
         if(linscl)  then
           call gxdint(axlow,axup,intv)
         else
@@ -893,7 +893,7 @@
       fmtloc=fmt
       call gxival(fmtloc,ival)
       if(ival.eq.0 .and. linscl)  then
-*--- use reasonable default as format
+!--- use reasonable default as format
         call gxdfmt(axlow,axup,intv,ival,iscloc,fmtloc)
       else
         iscloc = 0
@@ -924,17 +924,17 @@
       else
         k1=3
         k2=1
-*--- apply expansion factor to tick marks if y axis
+!--- apply expansion factor to tick marks if y axis
         call gxqrvp(hxf)
         tickl=hxf*tickl
       endif
-*
-*--- transform into normalized window
-*
+!
+!--- transform into normalized window
+!
       if(isave(1).ne.0)  then
-*--- rsave(1...4) contains the window
-*   fwc converts a length along the axis from world to NDC
-*   fcw does the inverse of FWC
+!--- rsave(1...4) contains the window
+!   fwc converts a length along the axis from world to NDC
+!   fcw does the inverse of FWC
         fcw=(rsave(k1+1)-rsave(k1))
         fwc=1./fcw
         cnt(k1)=fwc*(axlow-rsave(k1))
@@ -954,21 +954,21 @@
         cnt(k2)=axpos
       endif
       cnt(k2+1)=cnt(k2)
-*
-*--- set line style
-*
+!
+!--- set line style
+!
       call gxspmt
-*
-*   set font and precision
-*
+!
+!   set font and precision
+!
       call jstxfp(ifont,2)
-*
-*--- plot a line for the axis
-*
+!
+!--- plot a line for the axis
+!
       call gvpl(2,cnt(1),cnt(3))
-*
-*--- plot tick marks, labels, and title
-*
+!
+!--- plot tick marks, labels, and title
+!
       tick(k2)=cnt(k2)
       tick(k2+1)=cnt(k2+1)
       tetick(k2)=cnt(k2)
@@ -977,7 +977,7 @@
       alabl(k2+1)=cnt(k2+1)
       if(intv.gt.0)  then
         if(itick.eq.2) then
-*--- plot tick marks above x-axis, or to the right of y-axis
+!--- plot tick marks above x-axis, or to the right of y-axis
           tick(k2+1)=cnt(k2)+tickl
           tetick(k2+1)=cnt(k2)+.5*tickl
         else
@@ -990,11 +990,11 @@
           diffe=diffn/max(ietick,1)
           if(tickl.gt.0.) then
             do i=0,intv
-*--- tick marks
+!--- tick marks
               tick(k1)=cnt(k1)+diffn*i
               tick(k1+1)=tick(k1)
               call gvpl(2,tick(1),tick(3))
-*--- extra ticks
+!--- extra ticks
               if(i.lt.intv) then
                 do ie=1,ietick-1
                   tetick(k1)=tick(k1)+ie*diffe
@@ -1005,7 +1005,7 @@
             enddo
           endif
         elseif(tickl.gt.0.) then
-*--- log scale
+!--- log scale
           ialow=axlow
           if(axlow.lt.float(ialow))  ialow=ialow-1
           ialow=sign(min(abs(ialow),99),ialow)
@@ -1013,7 +1013,7 @@
           if(axup.lt.float(iaup))  iaup=iaup-1
           iaup=sign(min(abs(iaup),99),iaup)
           ia=ialow
-*--- start loop
+!--- start loop
    40     continue
           do i=1,9
             alp=ia+alogv(i)
@@ -1028,16 +1028,16 @@
           enddo
           ia=ia+1
           goto 40
-*--- end loop
+!--- end loop
    60     continue
         endif
-*--- labels
+!--- labels
         if(ilbort.eq.0.or.ilabl.eq.0.or.cuhigh.eq.0.) then
           alabl(k2)=tick(k2)
           alabl(k2+1)=alabl(k2)
         else
           labflg = .true.
-*--- set correct character height (viewports !), get width
+!--- set correct character height (viewports !), get width
           call gxschf(1,ilbort,cuhigh,chhigh,chwdth)
           space=.5*chhigh
           if(iaxort.eq.ilbort) then
@@ -1054,23 +1054,23 @@
             spmlog=chhigh
           endif
           if(ilabl.eq.2) then
-*--- plot labels above x-axis, or to the right of y-axis
+!--- plot labels above x-axis, or to the right of y-axis
             alabl(k2)=max(tick(k2),tick(k2+1))+space
             alabl(k2+1)=alabl(k2)+sphlin
           else
             alabl(k2)=min(tick(k2),tick(k2+1))-space
             alabl(k2+1)=alabl(k2)-sphlin
           endif
-*--- set text alignment
+!--- set text alignment
           call jstxal(ihoral(ilbort,ilabl,iaxort),                      &
      &    iveral(ilbort,ilabl,iaxort))
           if(linscl)  then
-*--- linear scale
+!--- linear scale
             intrep=spwlin/diffn+.99999
             amxx=max(abs(axlow),abs(axup))
             pfact = 10.**(-iscloc)
             do i=0,intv,intrep
-*--- centered figures
+!--- centered figures
               ptick=axlow+diff*i
               alabl(k1)=cnt(k1)+diffn*i
               if(abs(ptick)/amxx.lt.1.e-5)  then
@@ -1082,49 +1082,49 @@
               call gxstx(alabl(1),alabl(3),sltext(ifirst:ilast))
             enddo
           else
-*---  log scale
-*   impfl = 0 if power of ten to be plotted with first minor label,
-*   else > 0
+!---  log scale
+!   impfl = 0 if power of ten to be plotted with first minor label,
+!   else > 0
             impfl=iaup-ialow
-*--- islbl = 0 if no secondary label to be plotted else 1
+!--- islbl = 0 if no secondary label to be plotted else 1
             if(ietick.eq.0.or.islpc.eq.0)  then
               islbl=0
             else
               islbl=1
             endif
-*--- wbused = half space used by major label in WC
+!--- wbused = half space used by major label in WC
             wbused=spwlog*fcw
-*--- wsused = half space used by minor label in WC
+!--- wsused = half space used by minor label in WC
             wsused=2.*spmlog*fcw
             ia=ialow
-*--- interval which is free for major labels
+!--- interval which is free for major labels
             a1b=ialow-1000.
-*--- start loop
+!--- start loop
    80       continue
-*--- interval which is free for minor labels
+!--- interval which is free for minor labels
             a1=ia+wbused
             a2=ia+1.-wbused
             do i=1,9
-*--- label position in WC
+!--- label position in WC
               alp=ia+alogv(i)
               if(alp.gt.axup) goto 100
               if(alp.ge.axlow)  then
-*--- label position in NDC
+!--- label position in NDC
                 alabl(k1)=(alp-rsave(k1))*fwc
                 if(i.eq.1.and.alp.ge.a1b+wbused) then
-*--- major label (at integers)
+!--- major label (at integers)
                   call gxppow(alabl,ia)
                   a1b=alp+wbused
                 else
                   if(islbl.ne.0.and.alp.ge.a1+wsused .and.alp.le.       &
      &            a2-wsused) then
-*--- minor label (at 2, 3, ..., 9)
+!--- minor label (at 2, 3, ..., 9)
                     call gxstx(alabl(1),alabl(3),slog(i))
                     a1=a1+wsused
                   endif
                   if(impfl.eq.0) then
                     impfl=1
-*--- plot power of ten between first and second minor label
+!--- plot power of ten between first and second minor label
                     alabl(k1)=alabl(k1)                                 &
      &              +.5*(min(axup,alp+alogv(i+1))-alp)*fwc
                     call gxppow(alabl,ia)
@@ -1139,7 +1139,7 @@
           endif
         endif
       endif
-*--- axis title
+!--- axis title
       call gxpnbl(textin, ifirst, ilast)
       if (iscloc .ne. 0 .and. labflg)  then
         ispchl = max(1, index(textin(:ilast), stsep))
@@ -1160,7 +1160,7 @@
       endif
       call gxpnbl(text,ifirst,ilast)
       if(ifirst.ne.0.and.itext.ne.0.and.cuhigh.gt.0.)  then
-*--- set correct character height (viewports !), get width
+!--- set correct character height (viewports !), get width
         call gxschf(1,iaxort,cthigh,chhigh,chwdth)
         if(xaxis)  then
           sgspac=-1.75 * chhigh
@@ -1182,7 +1182,7 @@
           atext(k2)=min(tick(k2),tick(k2+1),alabl(k2),alabl(k2+1))      &
      &    - 2.5 * space
         endif
-*--- get number of separation characters
+!--- get number of separation characters
         call gxchct(text(ifirst:ilast),stsep,nchct)
         nlines=nchct+1
         if(xaxis)  then
@@ -1190,7 +1190,7 @@
         else
           if(itext.eq.1)  atext(k2)=atext(k2)-1.5*nlines*chhigh
         endif
-*--- write line by line
+!--- write line by line
         irf=1
   110   continue
         isp=index(text(irf:ilast),stsep)
@@ -1208,7 +1208,7 @@
             call jstxal(naxal,1)
             if(ifs.gt.0)  call gxtx(atext(1),atext(3),stext(:ils))
           else
-*--- split line into left and right adjusted part
+!--- split line into left and right adjusted part
             l1=in-1
             l2=in+3
             if(l1.gt.0)  then
@@ -1233,28 +1233,28 @@
           goto 110
         endif
       endif
-*
-*--- restore user settings
-*
+!
+!--- restore user settings
+!
       call gxrest(isave,rsave)
   999 end
       subroutine gxchct(stext,sch,n)
       implicit none
       integer ilast,irf,isp,n
-************************************************************************
-*
-*   Purpose: counts number of given characters in a string
-*
-*--- Input
-*   stext      string
-*   sch        special character
-*--- Output
-*   n          number of occurences
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: counts number of given characters in a string
+!
+!--- Input
+!   stext      string
+!   sch        special character
+!--- Output
+!   n          number of occurences
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       character stext*(*),sch*1
       n=0
       irf=1
@@ -1269,14 +1269,14 @@
       end
       subroutine gxclos
       implicit none
-************************************************************************
-*
-*   Purpose: close terminal workstation
-*
-*   Author: H. Grote / CERN                        date: Feb. 26, 1988
-*                                           last mod: Feb. 26, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: close terminal workstation
+!
+!   Author: H. Grote / CERN                        date: Feb. 26, 1988
+!                                           last mod: Feb. 26, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -1298,7 +1298,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -1318,7 +1318,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -1326,22 +1326,22 @@
       call gxundf
       if(lacttm.eq.lundef)  then
         if(interm.gt.0)  then
-          call gdawk(interm)
-          call gclwk(interm)
+          call wdawk(interm)
+          call wclwk(interm)
           lacttm=0
         endif
       endif
       end
       subroutine gxclrw
       implicit none
-************************************************************************
-*
-*   Purpose: clears open workstations, sets new picture name
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: March 2, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: clears open workstations, sets new picture name
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: March 2, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -1363,7 +1363,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -1383,19 +1383,19 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
- 
+
       call gxundf
       if(iclear .ne. 0) then
         call gclrwk(0, 1)
         iclear = 0
         if (iepsop .eq. 2)  then
           call gxopps(0, 0)
-          call gclwk(inmeta)
+          call wclwk(inmeta)
           close(imetps)
           iepsop = -iepsop
         endif
@@ -1405,34 +1405,34 @@
       implicit none
       integer i,ierror,n,npoint
       real xx,yy,yy1d,yy2d
-************************************************************************
-*
-*   new (internal) double precision version 29.1.88
-*
-*   calculates a third order natural spline through function values
-*   yy(i), i=1,...,NPOINT, at knots XX(I) (XX(I+1) > XX(I))
-*
-*---  Input
-*   npoint  number of knots and dimension of XX, YY, YY1D, YY2D
-*          minimum value = 3
-*   xx(i)   x values,  XX(I) < XX(I+1)  for all I
-*   yy(i)   function values
-*
-*---  Output
-*   yy1d(i) first derivative of third order pol. in interval I,
-*          at point XX(I)
-*   yy2d(i) second derivative
-*   ierror  0 if everything OK, else number of the first x value found
-*          that is smaller or equal to the previous one, or -1 if NPOINT < 3
-*
-*++++++ warning: all first and second derivatives set to zero if the
-*    condition XX(I+1) > XX(I) is not fulfilled for I = [1,n-1] (IERROR > 0)
-*
-*--- remark: very near to routine SPLIN3 in CERN library, E209
-*
-*   Author hG                         13.11.86   last mod. 29.1.88
-*
-************************************************************************
+!***********************************************************************
+!
+!   new (internal) double precision version 29.1.88
+!
+!   calculates a third order natural spline through function values
+!   yy(i), i=1,...,NPOINT, at knots XX(I) (XX(I+1) > XX(I))
+!
+!---  Input
+!   npoint  number of knots and dimension of XX, YY, YY1D, YY2D
+!          minimum value = 3
+!   xx(i)   x values,  XX(I) < XX(I+1)  for all I
+!   yy(i)   function values
+!
+!---  Output
+!   yy1d(i) first derivative of third order pol. in interval I,
+!          at point XX(I)
+!   yy2d(i) second derivative
+!   ierror  0 if everything OK, else number of the first x value found
+!          that is smaller or equal to the previous one, or -1 if NPOINT < 3
+!
+!++++++ warning: all first and second derivatives set to zero if the
+!    condition XX(I+1) > XX(I) is not fulfilled for I = [1,n-1] (IERROR > 0)
+!
+!--- remark: very near to routine SPLIN3 in CERN library, E209
+!
+!   Author hG                         13.11.86   last mod. 29.1.88
+!
+!***********************************************************************
       dimension xx(*),yy(*),yy1d(*),yy2d(*)
       double precision zero,half,one,three,third,dfac,dx1,dx2,dy1,dy2,  &
      &dd,dyx1,dyx2,divdif,alf,bet
@@ -1444,19 +1444,19 @@
       yy2d(1)=0.
       yy2d(n)=0.
       yy1d(1)=0.
-*
-*--- method: see long write-up of E209. Basically, the second
-*   derivatives are found first from the solution of N-2 equations.
-*   the first and last second order derivative are set to zero (hence
-*   natural spline). The equations form a three-diagonal matrix.
-*   in a first pass, all but the latest unknown are
-*   eliminated, in the second pass all are then calculated by going
-*   backwards.
-*--- yy1d serves temporarily as intermediate storage for the factors
-*   in the first pass of this process.
-*
+!
+!--- method: see long write-up of E209. Basically, the second
+!   derivatives are found first from the solution of N-2 equations.
+!   the first and last second order derivative are set to zero (hence
+!   natural spline). The equations form a three-diagonal matrix.
+!   in a first pass, all but the latest unknown are
+!   eliminated, in the second pass all are then calculated by going
+!   backwards.
+!--- yy1d serves temporarily as intermediate storage for the factors
+!   in the first pass of this process.
+!
       if(n.eq.3)  then
-*--- only three points - direct solution
+!--- only three points - direct solution
         dx1=xx(2)-xx(1)
         if(dx1.le.zero)  then
           ierror=2
@@ -1496,9 +1496,9 @@
           divdif=dd*(dyx2-dyx1)
           alf=half*dd*dx1
           bet=half-alf
-*
-*--- the following IF is only necessary for splines other than natural
-*
+!
+!--- the following IF is only necessary for splines other than natural
+!
           if(i.eq.2)  then
             divdif=divdif-third*alf*yy2d(1)
           elseif(i.eq.n-1)  then
@@ -1508,17 +1508,17 @@
           yy1d(i)=-dfac*bet
           yy2d(i)=dfac*(three*divdif-alf*yy2d(i-1))
         enddo
-*
-*--- now the last unknown derivative, YY2D(N-1), has been calculated.
-*   the others follow from going up the system.
+!
+!--- now the last unknown derivative, YY2D(N-1), has been calculated.
+!   the others follow from going up the system.
         do i=n-2,1,-1
           dd=yy1d(i)
           yy2d(i)=dd*yy2d(i+1)+yy2d(i)
         enddo
-*
-*--- now the first derivatives from a direct equation (not the one
-*   given in the E-209 writeup - it can be simplified)
-*
+!
+!--- now the first derivatives from a direct equation (not the one
+!   given in the E-209 writeup - it can be simplified)
+!
         do i=1,n-1
           dx2=xx(i+1)-xx(i)
           dyx2=(yy(i+1)-yy(i))/dx2
@@ -1528,16 +1528,16 @@
         dyx2=(yy(n)-yy(n-1))/dx2
         yy1d(n)=dyx2+dx2*third*(yy2d(n)+half*yy2d(n-1))
       else
-*
-*--- n < 3: error exit as well
+!
+!--- n < 3: error exit as well
         ierror=-1
         goto 40
       endif
       goto 999
    40 continue
-*
-*--- error condition: all first and second derivatives to zero
-*
+!
+!--- error condition: all first and second derivatives to zero
+!
       do i=1,n
         yy1d(i)=0.
         yy2d(i)=0.
@@ -1547,27 +1547,27 @@
       implicit none
       integer i,npoint
       real gxcubv,x,xx,yy,yy1d,yy2d
-************************************************************************
-*
-*   new (internal) double precision version
-*
-*   calculates the value of a third order spline at X. The routine
-*   gxcubi must be called beforehand.
-*
-*---  Input
-*   x       abscissa value. For X outside [XX(1),XX(npoint)], a linear
-*          extrapolation is performed.
-*   npoint  number of knots and dimension of XX, YY, YY1D, YY2D
-*          minimum value = 3
-*   xx(i)   x values,  XX(I) < XX(I+1)  for all I
-*   yy(i)   function values
-*   yy1d(i) first derivative of third order pol. in interval I,
-*          at point XX(I), from GXCUBI
-*   yy2d(i) second derivative, from GXCUBI
-*
-*   Author hG                         13.11.86   last mod. 29.1.88
-*
-************************************************************************
+!***********************************************************************
+!
+!   new (internal) double precision version
+!
+!   calculates the value of a third order spline at X. The routine
+!   gxcubi must be called beforehand.
+!
+!---  Input
+!   x       abscissa value. For X outside [XX(1),XX(npoint)], a linear
+!          extrapolation is performed.
+!   npoint  number of knots and dimension of XX, YY, YY1D, YY2D
+!          minimum value = 3
+!   xx(i)   x values,  XX(I) < XX(I+1)  for all I
+!   yy(i)   function values
+!   yy1d(i) first derivative of third order pol. in interval I,
+!          at point XX(I), from GXCUBI
+!   yy2d(i) second derivative, from GXCUBI
+!
+!   Author hG                         13.11.86   last mod. 29.1.88
+!
+!***********************************************************************
       dimension xx(*),yy(*),yy1d(*),yy2d(*)
       double precision half,dx,h2,h3,h4,h5,h6
       save half
@@ -1591,8 +1591,8 @@
         h5=half*h6
         h3=h5/3.d0
         gxcubv=((h3*dx+h2)*dx+yy1d(i))*dx+yy(i)
-*   first derivative in X  = (H5*DX+H4)*DX+YY1D(I)
-*   second    "      "  "  = H6*DX+H4
+!   first derivative in X  = (H5*DX+H4)*DX+YY1D(I)
+!   second    "      "  "  = H6*DX+H4
       endif
       end
       subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
@@ -1600,38 +1600,38 @@
       implicit none
       integer ibar,ic,ierr,isplin,isym,j,kset,line,nset,mark
       real dum1,dum2,fsx,fsy,xs,ys
-************************************************************************
-*
-*   Purpose: plots curves into an existing frame, clips
-*
-*--- Input
-*   nset       number of curves (=ordered sets of (x,y) pairs) to plot
-*   nptval(i)  number of points ((x,y) pairs) in set I
-*   ipxval(i)  first x value of set I in array XVAL
-*   ipyval(i)  first y value of set I in array YVAL
-*   icvref(i)  number of the parameter set to be used for curve I. This value
-*            will be forced into [1,MAXSET].
-*            The x and y axis reference numbers of set I will be taken
-*            from this parameter set. All x and y axes with the
-*            corresponding reference numbers will be (scaled if automatic)
-*            and plotted together with set I.
-*            If no x resp. y axis exists with the reference number
-*            from the parameter set, the curve will be plotted with
-*            automatic scaling, but without x resp. y axis.
-*   xval       array containing the x values for all sets
-*   yval       array containing the y values for all sets
-*   window(j,I) GKS window (J=1...4) to be used with curve I. These values
-*            can be obtained from routines GXFRAM or GXFRM1
-*   actwin(j,I) active window (J=1...4) to clip curve I. These values
-*            can be obtained from routine GXFRM1
-*--- Output
-*   ierr       0 if everything OK, else GKS error, or
-*            1 : GXINIT not called (initialization)
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: Dec. 9, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots curves into an existing frame, clips
+!
+!--- Input
+!   nset       number of curves (=ordered sets of (x,y) pairs) to plot
+!   nptval(i)  number of points ((x,y) pairs) in set I
+!   ipxval(i)  first x value of set I in array XVAL
+!   ipyval(i)  first y value of set I in array YVAL
+!   icvref(i)  number of the parameter set to be used for curve I. This value
+!            will be forced into [1,MAXSET].
+!            The x and y axis reference numbers of set I will be taken
+!            from this parameter set. All x and y axes with the
+!            corresponding reference numbers will be (scaled if automatic)
+!            and plotted together with set I.
+!            If no x resp. y axis exists with the reference number
+!            from the parameter set, the curve will be plotted with
+!            automatic scaling, but without x resp. y axis.
+!   xval       array containing the x values for all sets
+!   yval       array containing the y values for all sets
+!   window(j,I) GKS window (J=1...4) to be used with curve I. These values
+!            can be obtained from routines GXFRAM or GXFRM1
+!   actwin(j,I) active window (J=1...4) to clip curve I. These values
+!            can be obtained from routine GXFRM1
+!--- Output
+!   ierr       0 if everything OK, else GKS error, or
+!            1 : GXINIT not called (initialization)
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: Dec. 9, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -1653,7 +1653,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -1673,7 +1673,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -1683,17 +1683,17 @@
       real wn(4),ac(4),xx(2),yy(2),rsave(20)
       integer isave(20)
       character s*1
-*
-*--- get current user settings and keep them
+!
+!--- get current user settings and keep them
       call gxsave(isave,rsave,ierr)
       if(ierr.ne.0)  goto 999
-*--- set reasonable defaults for plot style
+!--- set reasonable defaults for plot style
       call gxspmt
-*--- loop over curves
+!--- loop over curves
       do ic=1,nset
-*--- get curve parameter set ref.
+!--- get curve parameter set ref.
         kset=max(1,min(maxset,icvref(ic)))
-*--- get curve plot parameters
+!--- get curve plot parameters
         line=icvpar(4,kset)
         ibar=icvpar(7,kset)
         isplin=icvpar(5,kset)
@@ -1703,41 +1703,41 @@
         else
           isym=icvpar(9,kset)
         endif
-*--- set window
+!--- set window
         do j=1,4
           ac(j)=actwin(j,kset)
           wn(j)=window(j,kset)
         enddo
         call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
         call jselnt(inormt)
-*
-*--- plot curves
-*
-*   color index and line thickness
+!
+!--- plot curves
+!
+!   color index and line thickness
         if(line.ne.0.or.ibar.ne.0) then
           call jsplci(icvpar(6,kset))
           call jslwsc(float(icvpar(3,kset)))
         endif
         if(line.ne.0) then
-*   polyline style
+!   polyline style
           call jsln(line)
           if(isplin.eq.0)  then
-*   plot polyline
+!   plot polyline
             call gxpl(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)),ac)
           else
-*   smooth with a third order spline
+!   smooth with a third order spline
             call gxplt1(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)),   &
      &      ac)
           endif
         endif
         if(mark.ne.0) then
-*   set marker type
+!   set marker type
           call jsmk(mark)
-*   plot marker at point positions
+!   plot marker at point positions
           call gxpm(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)),ac)
         endif
         if(ibar.ne.0) then
-*   vertical bars to lower x axis position (whether x axis plotted or not)
+!   vertical bars to lower x axis position (whether x axis plotted or not)
           yy(1)=axwndy(1,kset)
           call jsln(1)
           do j=0,nptval(ic)-1
@@ -1748,13 +1748,13 @@
           enddo
         endif
         if(isym.ne.0) then
-*--- center character on point
+!--- center character on point
           call jstxal(2,3)
-*--- set character height
+!--- set character height
           call gxschf(1,1,0.001*icvpar(10,kset),dum1,dum2)
-*--- get plot character
+!--- get plot character
           s=splotc(kset:kset)
-*--- set ndc because of character sizes  (curves with different scales)
+!--- set ndc because of character sizes  (curves with different scales)
           call jswn(inormt,0.,1.,0.,1.)
           call jselnt(inormt)
           fsx=1./(wn(2)-wn(1))
@@ -1766,7 +1766,7 @@
           enddo
         endif
       enddo
-*--- restore previous settings
+!--- restore previous settings
       call gxrest(isave,rsave)
   999 end
       subroutine gxcurv(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
@@ -1774,36 +1774,36 @@
       implicit none
       integer ibar,ic,ierr,isplin,isym,j,kset,line,nset,mark
       real dum1,dum2,fsx,fsy,xs,ys
-************************************************************************
-*
-*   Purpose: plots curves into an existing frame
-*
-*--- Input
-*   nset       number of curves (=ordered sets of (x,y) pairs) to plot
-*   nptval(i)  number of points ((x,y) pairs) in set I
-*   ipxval(i)  first x value of set I in array XVAL
-*   ipyval(i)  first y value of set I in array YVAL
-*   icvref(i)  number of the parameter set to be used for curve I. This value
-*            will be forced into [1,MAXSET].
-*            The x and y axis reference numbers of set I will be taken
-*            from this parameter set. All x and y axes with the
-*            corresponding reference numbers will be (scaled if automatic)
-*            and plotted together with set I.
-*            If no x resp. y axis exists with the reference number
-*            from the parameter set, the curve will be plotted with
-*            automatic scaling, but without x resp. y axis.
-*   xval       array containing the x values for all sets
-*   yval       array containing the y values for all sets
-*   window(j,I) GKS window (J=1...4) to be used with curve I. These values
-*            can be obtained from routine GXFRAM
-*--- Output
-*   ierr       0 if everything OK, else GKS error, or
-*            1 : GXINIT not called (initialization)
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: March 7, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots curves into an existing frame
+!
+!--- Input
+!   nset       number of curves (=ordered sets of (x,y) pairs) to plot
+!   nptval(i)  number of points ((x,y) pairs) in set I
+!   ipxval(i)  first x value of set I in array XVAL
+!   ipyval(i)  first y value of set I in array YVAL
+!   icvref(i)  number of the parameter set to be used for curve I. This value
+!            will be forced into [1,MAXSET].
+!            The x and y axis reference numbers of set I will be taken
+!            from this parameter set. All x and y axes with the
+!            corresponding reference numbers will be (scaled if automatic)
+!            and plotted together with set I.
+!            If no x resp. y axis exists with the reference number
+!            from the parameter set, the curve will be plotted with
+!            automatic scaling, but without x resp. y axis.
+!   xval       array containing the x values for all sets
+!   yval       array containing the y values for all sets
+!   window(j,I) GKS window (J=1...4) to be used with curve I. These values
+!            can be obtained from routine GXFRAM
+!--- Output
+!   ierr       0 if everything OK, else GKS error, or
+!            1 : GXINIT not called (initialization)
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: March 7, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -1825,7 +1825,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -1845,7 +1845,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -1855,17 +1855,17 @@
       real wn(4),xx(2),yy(2),rsave(20)
       integer isave(20)
       character s*1
-*
-*--- get current user settings and keep them
+!
+!--- get current user settings and keep them
       call gxsave(isave,rsave,ierr)
       if(ierr.ne.0)  goto 999
-*--- set reasonable defaults for plot style
+!--- set reasonable defaults for plot style
       call gxspmt
-*--- loop over curves
+!--- loop over curves
       do ic=1,nset
-*--- get curve parameter set ref.
+!--- get curve parameter set ref.
         kset=max(1,min(maxset,icvref(ic)))
-*--- get curve plot parameters
+!--- get curve plot parameters
         line=icvpar(4,kset)
         ibar=icvpar(7,kset)
         isplin=icvpar(5,kset)
@@ -1875,39 +1875,39 @@
         else
           isym=icvpar(9,kset)
         endif
-*--- set window
+!--- set window
         do j=1,4
           wn(j)=window(j,kset)
         enddo
         call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
         call jselnt(inormt)
-*
-*--- plot curves
-*
-*   color index and line width
+!
+!--- plot curves
+!
+!   color index and line width
         if(line.ne.0.or.ibar.ne.0) then
           call jsplci(icvpar(6,kset))
           call jslwsc(float(icvpar(3,kset)))
         endif
         if(line.ne.0) then
-*   polyline style
+!   polyline style
           call jsln(line)
           if(isplin.eq.0)  then
-*   plot polyline
+!   plot polyline
             call gvpl(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)))
           else
-*   smooth with a third order spline
+!   smooth with a third order spline
             call gxplts(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)))
           endif
         endif
         if(mark.ne.0) then
-*   set marker type
+!   set marker type
           call jsmk(mark)
-*   plot marker at point positions
+!   plot marker at point positions
           call gvpm(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)))
         endif
         if(ibar.ne.0) then
-*   vertical bars to lower x axis position (whether x axis plotted or not)
+!   vertical bars to lower x axis position (whether x axis plotted or not)
           yy(1)=axwndy(1,kset)
           call jsln(1)
           do j=0,nptval(ic)-1
@@ -1918,13 +1918,13 @@
           enddo
         endif
         if(isym.ne.0) then
-*--- center character on point
+!--- center character on point
           call jstxal(2,3)
-*--- set character height
+!--- set character height
           call gxschf(1,1,0.001*icvpar(10,kset),dum1,dum2)
-*--- get plot character
+!--- get plot character
           s=splotc(kset:kset)
-*--- set ndc because of character sizes  (curves with different scales)
+!--- set ndc because of character sizes  (curves with different scales)
           call jswn(inormt,0.,1.,0.,1.)
           call jselnt(inormt)
           fsx=1./(wn(2)-wn(1))
@@ -1936,29 +1936,29 @@
           enddo
         endif
       enddo
-*--- restore previous settings
+!--- restore previous settings
       call gxrest(isave,rsave)
   999 end
       subroutine gxdfmt(axlow,axup,intv,ival,iscal,fmt)
       implicit none
       integer i,i1,i2,ii,intv,iscal,ival,j,mform
       real axl,axlow,axu,axup,fact,step,up,x,y
-************************************************************************
-*
-*   Purpose: calculates reasonable format for axis labels
-*
-*--- Input
-*   axlow, aXUP  axis range
-*   intv         no. of intervals, or 0 if not known
-*--- Output
-*   ival         length of format (e.g. 8 for F8.2)
-*   iscal        power of 10 extracted from axlow and axup
-*   fmt          format in correct form, e.g. '(F8.2)'
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Feb. 25, 1991
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: calculates reasonable format for axis labels
+!
+!--- Input
+!   axlow, aXUP  axis range
+!   intv         no. of intervals, or 0 if not known
+!--- Output
+!   ival         length of format (e.g. 8 for F8.2)
+!   iscal        power of 10 extracted from axlow and axup
+!   fmt          format in correct form, e.g. '(F8.2)'
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Feb. 25, 1991
+!
+!***********************************************************************
       character fmt *(*)
       parameter (mform=8)
       character form(mform)*8
@@ -1986,7 +1986,7 @@
       axu = fact * axup
       y=axu-axl
       if (intv .gt. 0)  then
-*--- get all digits of step if possible
+!--- get all digits of step if possible
         step = y / intv
         do  i1 = 0, 4
           if (step .ge. 0.99                                            &
@@ -2033,32 +2033,32 @@
       subroutine gxdfvm(sin,sout,nml)
       implicit none
       integer i1,i2,i3,i4,jb1,jb2,nml
-************************************************************************
-*
-*   Purpose: returns the VM filename (fn ft fm)
-*
-*--- Input
-*   sin        ruser Input - either fn, or fn ft, or fn ft fm
-*--- Output
-*   sout       complete fn ft fm filename
-*   nml        last character of file name in SIN
-*
-*   Author: H. Grote / CERN                        date: April 7, 1988
-*                                           last mod: April 7, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns the VM filename (fn ft fm)
+!
+!--- Input
+!   sin        ruser Input - either fn, or fn ft, or fn ft fm
+!--- Output
+!   sout       complete fn ft fm filename
+!   nml        last character of file name in SIN
+!
+!   Author: H. Grote / CERN                        date: April 7, 1988
+!                                           last mod: April 7, 1988
+!
+!***********************************************************************
       character *(*)  sin,sout
       character*20 sloc
       call gxpnbl(sin,i1,i2)
       if(i1.eq.0)  then
-*--- user Input is totally blank
+!--- user Input is totally blank
         sloc='GXMETA   METAFILE A'
         nml=1
         goto 500
       endif
       jb1=index(sin(i1:i2),' ')
       if(jb1.eq.0)  then
-*--- user Input is one piece
+!--- user Input is one piece
         sloc=sin(i1:i2)
         sloc(9:)=' METAFILE A'
         nml=i2
@@ -2070,10 +2070,10 @@
       jb2=index(sin(i3:i2),' ')
       nml=jb1-1
       if(jb2.eq.0)  then
-*--- user Input two pieces
+!--- user Input two pieces
         sloc=sin(i1:i2)//' A'
       else
-*--- user Input three pieces
+!--- user Input three pieces
         sloc=sin(i1:i2)
       endif
   500 sout=sloc
@@ -2082,19 +2082,19 @@
       implicit none
       integer i,intv,mrange
       real axlow,axup,d,dn,x
-************************************************************************
-*
-*   Purpose: calculates reasonable number of axis intervals
-*
-*--- Input
-*   axlow, aXUP  axis range
-*--- Output
-*   intv         number of intervals
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: calculates reasonable number of axis intervals
+!
+!--- Input
+!   axlow, aXUP  axis range
+!--- Output
+!   intv         number of intervals
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       parameter (mrange=10)
       integer iv(mrange)
       real rangl(mrange)
@@ -2117,19 +2117,19 @@
       subroutine gxeopn(string,number)
       implicit none
       integer number
-************************************************************************
-*
-*   Purpose: transfers unit number to common block for files opened
-*         externally
-*
-*--- Input
-*   string  (character) option :
-*         'mETA' for metafile, 'ERROR' for error file
-*   number  unit number
-*
-*   Author: H. Grote / CERN                        date: Dec. 21, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: transfers unit number to common block for files opened
+!         externally
+!
+!--- Input
+!   string  (character) option :
+!         'mETA' for metafile, 'ERROR' for error file
+!   number  unit number
+!
+!   Author: H. Grote / CERN                        date: Dec. 21, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -2151,7 +2151,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -2171,7 +2171,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -2192,23 +2192,23 @@
       integer i,ierr,ifont,imode,ip,ipos,isel,istr,iwid,j,k,kbit,kword, &
      &lx,ly,np
       real width
-************************************************************************
-*
-*   Purpose: returns the polygon for a character
-*
-*--- Input:
-*   imode    =0: give character widths only, else give all
-*   ch       character
-*   ifont    font (only 1 or -13)
-*--- Output:
-*   width    character width
-*   np       # points in polygon
-*   ipen     0 for pen up, 1 for pen down
-*   x        x coordinates
-*   y        y coordinates
-*   ierr     =0: OK, =1: wrong font, =2: character not found
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns the polygon for a character
+!
+!--- Input:
+!   imode    =0: give character widths only, else give all
+!   ch       character
+!   ifont    font (only 1 or -13)
+!--- Output:
+!   width    character width
+!   np       # points in polygon
+!   ipen     0 for pen up, 1 for pen down
+!   x        x coordinates
+!   y        y coordinates
+!   ierr     =0: OK, =1: wrong font, =2: character not found
+!
+!***********************************************************************
       character * 1 ch
       real x(*), y(*)
       integer ipen(*)
@@ -2465,7 +2465,7 @@
      &1140933825,1153647685,1137066695,  25575816,1108034316,1141654795,&
      &1191659526,1225148935,1250577036/
       data (ichcod(j,2),j= 571,652) / 82 * 0 /
- 
+
       chstr(1)(61:61) = '\\'
       chstr(2)(59:59) = '\\'
       if (ifont .eq. 1)  then
@@ -2517,38 +2517,38 @@
       character*60 function gxform(string)
       implicit none
       integer i,ipt,kmant,l,n
-*
-*   creates the correct format for Input variables  contained  in  a
-*   character  variable  in  free format (blank characters acting as
-*   separators !). It accepts I,F,E,D,L, and A format variables, the
-*   latter  without  any  quotes,   being   just   those   character
-*   combinations  which  cannot  be  attributed  to any of the other
-*   formats.
-*
-*   gxform overcomes the short-coming of FORTRAN77 to not allow  free
-*   format  READ  statements  from  internal  files,  i.e. character
-*   variables.  If STRING is a character variable, then
-*
-*   read(strING,*)  N,A,etc.
-*
-*   is  not  legal  ANSI  FORTRAN  (although   supported   by   some
-*   compilers).  In this case one can use
-*
-*   read(strING,GXFORM(STRING))  N,A,etc.
-*
-*   which is legal. GXFORM has to be  declared  CHARACTER*60  in  the
-*   calling routine.
-*
-*   Input
-*   string    character type Input line
-*   Output
-*   gxform    FORMAT, e.g. (I4,A12,L4,F8.3,I3,E12.4,D24.8)
-*
-*   restrictions: the maximum length of the complete  format  is  60
-*   characters.
-*
-*   Author    HG      4.3.86   last mod.: 9.6.86
-*
+!
+!   creates the correct format for Input variables  contained  in  a
+!   character  variable  in  free format (blank characters acting as
+!   separators !). It accepts I,F,E,D,L, and A format variables, the
+!   latter  without  any  quotes,   being   just   those   character
+!   combinations  which  cannot  be  attributed  to any of the other
+!   formats.
+!
+!   gxform overcomes the short-coming of FORTRAN77 to not allow  free
+!   format  READ  statements  from  internal  files,  i.e. character
+!   variables.  If STRING is a character variable, then
+!
+!   read(strING,*)  N,A,etc.
+!
+!   is  not  legal  ANSI  FORTRAN  (although   supported   by   some
+!   compilers).  In this case one can use
+!
+!   read(strING,GXFORM(STRING))  N,A,etc.
+!
+!   which is legal. GXFORM has to be  declared  CHARACTER*60  in  the
+!   calling routine.
+!
+!   Input
+!   string    character type Input line
+!   Output
+!   gxform    FORMAT, e.g. (I4,A12,L4,F8.3,I3,E12.4,D24.8)
+!
+!   restrictions: the maximum length of the complete  format  is  60
+!   characters.
+!
+!   Author    HG      4.3.86   last mod.: 9.6.86
+!
       character string*(*),stemp*1,sfchar*1,form*80
       logical count,realfl,expfl,number
       form='(A1)'
@@ -2592,14 +2592,14 @@
           endif
         else
           if(.not.count) then
-*--- first character of a new variable
+!--- first character of a new variable
             if(stemp.eq.'.') then
-*--- could be floating, or logical
+!--- could be floating, or logical
               if(index(string(i:),'.T.').eq.1.or.                       &
      &        index(string(i:),'.F.').eq.1.or.                          &
      &        index(string(i:),'.TRUE.').eq.1.or.                       &
      &        index(string(i:),'.FALSE.').eq.1) then
- 
+
                 sfchar='L'
               elseif(index('0123456789',string(i+1:i+1)).ne.0) then
                 number=.true.
@@ -2635,36 +2635,36 @@
       implicit none
       integer i,iaxr,iayr,ierr,ix,j,jc,kset,ncurv
       real axpos,d,fx,fy
-************************************************************************
-*
-*   Purpose: plots one frame with several axes, returns GKS windows
-*
-*--- Input
-*   ncurv      number of curves (=ordered sets of (x,y) pairs) to plot
-*   nptval(i)  number of points ((x,y) pairs) in set I
-*   ipxval(i)  first x value of set I in array XVAL
-*   ipyval(i)  first y value of set I in array YVAL
-*   icvref(i)  number of the parameter set to be used for curve I. This value
-*            will be forced into [1,MAXSET].
-*            The x and y axis reference numbers of set I will be taken
-*            from this parameter set. All x and y axes with the
-*            corresponding reference numbers will be (scaled if automatic)
-*            and plotted together with set I.
-*            If no x resp. y axis exists with the reference number
-*            from the parameter set, the curve will be plotted with
-*            automatic scaling, but without x resp. y axis.
-*   xval       array containing the x values for all sets
-*   yval       array containing the y values for all sets
-*--- Output
-*   window(j,I) GKS window (J=1...4) to be used with curve I. These values
-*            are used by routine GXCURV
-*   ierr       0 if everything OK, else GKS error, or
-*            1 : GXINIT not called (initialization)
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots one frame with several axes, returns GKS windows
+!
+!--- Input
+!   ncurv      number of curves (=ordered sets of (x,y) pairs) to plot
+!   nptval(i)  number of points ((x,y) pairs) in set I
+!   ipxval(i)  first x value of set I in array XVAL
+!   ipyval(i)  first y value of set I in array YVAL
+!   icvref(i)  number of the parameter set to be used for curve I. This value
+!            will be forced into [1,MAXSET].
+!            The x and y axis reference numbers of set I will be taken
+!            from this parameter set. All x and y axes with the
+!            corresponding reference numbers will be (scaled if automatic)
+!            and plotted together with set I.
+!            If no x resp. y axis exists with the reference number
+!            from the parameter set, the curve will be plotted with
+!            automatic scaling, but without x resp. y axis.
+!   xval       array containing the x values for all sets
+!   yval       array containing the y values for all sets
+!--- Output
+!   window(j,I) GKS window (J=1...4) to be used with curve I. These values
+!            are used by routine GXCURV
+!   ierr       0 if everything OK, else GKS error, or
+!            1 : GXINIT not called (initialization)
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -2686,7 +2686,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -2706,7 +2706,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -2716,57 +2716,57 @@
       integer ixax(mxaxs),iyax(myaxs),ixaref(maxset),iyaref(maxset),    &
      &ilpar(30)
       real wn(4)
-*
+!
       do i=1,30
         ilpar(i)=0
       enddo
       ierr=0
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
-*--- set reasonable defaults for plot style
+!--- set reasonable defaults for plot style
       call gxspmt
-*--- set axis flags to "not plotted"
+!--- set axis flags to "not plotted"
       do i=1,mxaxs
         ixax(i)=0
       enddo
       do i=1,myaxs
         iyax(i)=0
       enddo
-*--- set axis curve references to "not set"
+!--- set axis curve references to "not set"
       do i=1,maxset
         ixaref(i)=0
         iyaref(i)=0
       enddo
-*--- get x and y axis reference numbers
+!--- get x and y axis reference numbers
       do i=1,ncurv
         kset=max(1,min(maxset,icvref(i)))
         ixaref(kset)=icvpar(1,kset)
         iyaref(kset)=icvpar(2,kset)
       enddo
-*--- get all window values for x
+!--- get all window values for x
       call gxprwn(1,ncurv,icvref,nptval,ipxval,ipxval,xval,xval,        &
      &mxaxs,ixaref,ixapar,rangex,axwndx)
-*--- get all window values for y
+!--- get all window values for y
       call gxprwn(2,ncurv,icvref,nptval,ipxval,ipyval,xval,yval,        &
      &myaxs,iyaref,iyapar,rangey,axwndy)
-*--- get the window in NDC into which the plot has to fit, depending on
-*   axis positions, labels, tick marks, etc.
+!--- get the window in NDC into which the plot has to fit, depending on
+!   axis positions, labels, tick marks, etc.
       call gxmarg(ixaref,iyaref,axwndx,axwndy,actwnd)
-*--- identical x and y ratios if requested
+!--- identical x and y ratios if requested
       if(isqflg.gt.0)  then
         d=min(actwnd(2)-actwnd(1),actwnd(4)-actwnd(3))
         actwnd(2)=actwnd(1)+d
         actwnd(4)=actwnd(3)+d
       endif
-*--- set window factors
+!--- set window factors
       fx=1./(actwnd(2)-actwnd(1))
       fy=1./(actwnd(4)-actwnd(3))
-*--- loop over curve sets, plot axes
+!--- loop over curve sets, plot axes
       ix=0
       do kset=1,maxset
         iaxr=ixaref(kset)
         if(iaxr.eq.0) goto 100
-*--- get window according to margin
+!--- get window according to margin
         wn(1)=(actwnd(2)*axwndx(1,kset)-actwnd(1)*axwndx(2,kset))*fx
         wn(2)=((1.-actwnd(1))*axwndx(2,kset)- (1.-actwnd(2))*axwndx     &
      &  (1,kset))*fx
@@ -2775,22 +2775,22 @@
      &  (1,kset))*fy
         call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
         call jselnt(inormt)
-*--- keep
+!--- keep
         do j=1,4
           window(j,kset)=wn(j)
         enddo
-*--- plot x axes
+!--- plot x axes
         do i=1,mxaxs
           if(ixapar(21,i).eq.iaxr) then
             if(ixax(i).eq.0) then
               ixax(i)=1
-*--- x axis no. 1 and 2 at bottom, 3 and 4 at top of frame
+!--- x axis no. 1 and 2 at bottom, 3 and 4 at top of frame
               if(i.le.2) then
                 axpos=axwndy(1,kset)
               else
                 axpos=axwndy(2,kset)
               endif
-*--- set parameters, get interval number if scaling automatic
+!--- set parameters, get interval number if scaling automatic
               do jc=1,mpaxs
                 ilpar(jc)=ixapar(jc,i)
               enddo
@@ -2801,27 +2801,27 @@
             endif
           endif
         enddo
-*--- plot y axes
+!--- plot y axes
         iayr=iyaref(kset)
         do i=1,myaxs
           if(iyapar(21,i).eq.iayr) then
             if(iyax(i).eq.0) then
               iyax(i)=1
-*--- y axis 1 at left,annotation at left, 2 at left, ann. at right,
-*   3 at right, ann. at left, 4 at right, ann. at right
+!--- y axis 1 at left,annotation at left, 2 at left, ann. at right,
+!   3 at right, ann. at left, 4 at right, ann. at right
               if(i.le.2) then
                 axpos=axwndx(1,kset)
               else
                 axpos=axwndx(2,kset)
               endif
-*--- set parameters, get interval number if scaling automatic
+!--- set parameters, get interval number if scaling automatic
               do jc=1,mpaxs
                 ilpar(jc)=iyapar(jc,i)
               enddo
               ilpar(2)=iyapar(19,i)
               call gxaxis('Y',axwndy(1,kset),axwndy(2,kset), axpos,     &
      &        1,syform(i), sytext(i),sdefnl,ilpar,ierr)
- 
+
               if(ierr.ne.0) goto 999
             endif
           endif
@@ -2833,39 +2833,39 @@
      &window,actwin,ierr)
       implicit none
       integer i,iaxr,iayr,ierr,ix,j,jc,kset,ncurv
-************************************************************************
-*
-*   Purpose: plots one frame with several axes, returns GKS and active
-*         windows.
-*
-*--- Input
-*   ncurv      number of curves (=ordered sets of (x,y) pairs) to plot
-*   nptval(i)  number of points ((x,y) pairs) in set I
-*   ipxval(i)  first x value of set I in array XVAL
-*   ipyval(i)  first y value of set I in array YVAL
-*   icvref(i)  number of the parameter set to be used for curve I. This value
-*            will be forced into [1,MAXSET].
-*            The x and y axis reference numbers of set I will be taken
-*            from this parameter set. All x and y axes with the
-*            corresponding reference numbers will be (scaled if automatic)
-*            and plotted together with set I.
-*            If no x resp. y axis exists with the reference number
-*            from the parameter set, the curve will be plotted with
-*            automatic scaling, but without x resp. y axis.
-*   xval       array containing the x values for all sets
-*   yval       array containing the y values for all sets
-*--- Output
-*   window(j,I) GKS window (J=1...4) to be used with curve I. These values
-*            are used by routines GXCURV and GXCRV1.
-*   actwin(j,I) active window (J=1...4) used to clip curve I. These values
-*            are used by routine GXCRV1.
-*   ierr       0 if everything OK, else GKS error, or
-*            1 : GXINIT not called (initialization)
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots one frame with several axes, returns GKS and active
+!         windows.
+!
+!--- Input
+!   ncurv      number of curves (=ordered sets of (x,y) pairs) to plot
+!   nptval(i)  number of points ((x,y) pairs) in set I
+!   ipxval(i)  first x value of set I in array XVAL
+!   ipyval(i)  first y value of set I in array YVAL
+!   icvref(i)  number of the parameter set to be used for curve I. This value
+!            will be forced into [1,MAXSET].
+!            The x and y axis reference numbers of set I will be taken
+!            from this parameter set. All x and y axes with the
+!            corresponding reference numbers will be (scaled if automatic)
+!            and plotted together with set I.
+!            If no x resp. y axis exists with the reference number
+!            from the parameter set, the curve will be plotted with
+!            automatic scaling, but without x resp. y axis.
+!   xval       array containing the x values for all sets
+!   yval       array containing the y values for all sets
+!--- Output
+!   window(j,I) GKS window (J=1...4) to be used with curve I. These values
+!            are used by routines GXCURV and GXCRV1.
+!   actwin(j,I) active window (J=1...4) used to clip curve I. These values
+!            are used by routine GXCRV1.
+!   ierr       0 if everything OK, else GKS error, or
+!            1 : GXINIT not called (initialization)
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -2887,7 +2887,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -2907,7 +2907,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -2917,57 +2917,57 @@
       integer ixax(mxaxs),iyax(myaxs),ixaref(maxset),iyaref(maxset),    &
      &ilpar(30)
       real wn(4),axpos,d,fx,fy
-*
+!
       do i=1,30
         ilpar(i)=0
       enddo
       ierr=0
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
-*--- set reasonable defaults for plot style
+!--- set reasonable defaults for plot style
       call gxspmt
-*--- set axis flags to "not plotted"
+!--- set axis flags to "not plotted"
       do i=1,mxaxs
         ixax(i)=0
       enddo
       do i=1,myaxs
         iyax(i)=0
       enddo
-*--- set axis curve references to "not set"
+!--- set axis curve references to "not set"
       do i=1,maxset
         ixaref(i)=0
         iyaref(i)=0
       enddo
-*--- get x and y axis reference numbers
+!--- get x and y axis reference numbers
       do i=1,ncurv
         kset=max(1,min(maxset,icvref(i)))
         ixaref(kset)=icvpar(1,kset)
         iyaref(kset)=icvpar(2,kset)
       enddo
-*--- get all window values for x
+!--- get all window values for x
       call gxprwn(1,ncurv,icvref,nptval,ipxval,ipxval,xval,xval,        &
      &mxaxs,ixaref,ixapar,rangex,axwndx)
-*--- get all window values for y
+!--- get all window values for y
       call gxprwn(2,ncurv,icvref,nptval,ipxval,ipyval,xval,yval,        &
      &myaxs,iyaref,iyapar,rangey,axwndy)
-*--- get the window in NDC into which the plot has to fit, depending on
-*   axis positions, labels, tick marks, etc.
+!--- get the window in NDC into which the plot has to fit, depending on
+!   axis positions, labels, tick marks, etc.
       call gxmarg(ixaref,iyaref,axwndx,axwndy,actwnd)
-*--- identical x and y ratios if requested
+!--- identical x and y ratios if requested
       if(isqflg.gt.0)  then
         d=min(actwnd(2)-actwnd(1),actwnd(4)-actwnd(3))
         actwnd(2)=actwnd(1)+d
         actwnd(4)=actwnd(3)+d
       endif
-*--- set window factors
+!--- set window factors
       fx=1./(actwnd(2)-actwnd(1))
       fy=1./(actwnd(4)-actwnd(3))
-*--- loop over curve sets, plot axes
+!--- loop over curve sets, plot axes
       ix=0
       do kset=1,maxset
         iaxr=ixaref(kset)
         if(iaxr.eq.0) goto 100
-*--- get window according to margin
+!--- get window according to margin
         wn(1)=(actwnd(2)*axwndx(1,kset)-actwnd(1)*axwndx(2,kset))*fx
         wn(2)=((1.-actwnd(1))*axwndx(2,kset)- (1.-actwnd(2))*axwndx     &
      &  (1,kset))*fx
@@ -2976,27 +2976,27 @@
      &  (1,kset))*fy
         call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
         call jselnt(inormt)
-*--- keep
+!--- keep
         do j=1,4
           window(j,kset)=wn(j)
         enddo
-*--- active window in user coordiantes
+!--- active window in user coordiantes
         actwin(1,kset)=wn(1)+(wn(2)-wn(1))*actwnd(1)
         actwin(2,kset)=wn(1)+(wn(2)-wn(1))*actwnd(2)
         actwin(3,kset)=wn(3)+(wn(4)-wn(3))*actwnd(3)
         actwin(4,kset)=wn(3)+(wn(4)-wn(3))*actwnd(4)
-*--- plot x axes
+!--- plot x axes
         do i=1,mxaxs
           if(ixapar(21,i).eq.iaxr) then
             if(ixax(i).eq.0) then
               ixax(i)=1
-*--- x axis no. 1 and 2 at bottom, 3 and 4 at top of frame
+!--- x axis no. 1 and 2 at bottom, 3 and 4 at top of frame
               if(i.le.2) then
                 axpos=axwndy(1,kset)
               else
                 axpos=axwndy(2,kset)
               endif
-*--- set parameters, get interval number if scaling automatic
+!--- set parameters, get interval number if scaling automatic
               do jc=1,mpaxs
                 ilpar(jc)=ixapar(jc,i)
               enddo
@@ -3007,27 +3007,27 @@
             endif
           endif
         enddo
-*--- plot y axes
+!--- plot y axes
         iayr=iyaref(kset)
         do i=1,myaxs
           if(iyapar(21,i).eq.iayr) then
             if(iyax(i).eq.0) then
               iyax(i)=1
-*--- y axis 1 at left,annotation at left, 2 at left, ann. at right,
-*   3 at right, ann. at left, 4 at right, ann. at right
+!--- y axis 1 at left,annotation at left, 2 at left, ann. at right,
+!   3 at right, ann. at left, 4 at right, ann. at right
               if(i.le.2) then
                 axpos=axwndx(1,kset)
               else
                 axpos=axwndx(2,kset)
               endif
-*--- set parameters, get interval number if scaling automatic
+!--- set parameters, get interval number if scaling automatic
               do jc=1,mpaxs
                 ilpar(jc)=iyapar(jc,i)
               enddo
               ilpar(2)=iyapar(19,i)
               call gxaxis('Y',axwndy(1,kset),axwndy(2,kset), axpos,     &
      &        1,syform(i), sytext(i),sdefnl,ilpar,ierr)
- 
+
               if(ierr.ne.0) goto 999
             endif
           endif
@@ -3037,23 +3037,23 @@
   999 end
       subroutine gxinit
       implicit none
-      integer idummy,ierr
-************************************************************************
-*
-*   Purpose: initializes GKS PLOT package
-*
-*   the default is to open the plot package for metafile writing only.
-*   the corresponding parameters (unit number, file name, status, paper
-*   width and length) can be set by calls to gxsvar beforehand.
-*
-*   for interactive usage (plot Output on screen) it is mandatory to
-*   call gxaSKU before calling GXINIT. Parameters can be modified after
-*   the gxasKU call (but before the GXINIT call) by calling gxsvar.
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+      integer ierr
+!***********************************************************************
+!
+!   Purpose: initializes GKS PLOT package
+!
+!   the default is to open the plot package for metafile writing only.
+!   the corresponding parameters (unit number, file name, status, paper
+!   width and length) can be set by calls to gxsvar beforehand.
+!
+!   for interactive usage (plot Output on screen) it is mandatory to
+!   call gxaSKU before calling GXINIT. Parameters can be modified after
+!   the gxasKU call (but before the GXINIT call) by calling gxsvar.
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -3075,7 +3075,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -3095,7 +3095,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -3121,14 +3121,14 @@
       if (ltotin .ne. lundef)  then
         print '(/'' GXPLOT-X11 '',F5.2,'' initialized''/)',versio
       endif
-*--- reset open flag for .eps files
+!--- reset open flag for .eps files
       iepsop = 0
       iepscf = 0
       iclear = 0
       ipage = 0
-      call gopks(ierrun, idummy)
+      call wopks
       call gxundf
-*--- set default options
+!--- set default options
       call gxsdef('OPTINIT',0)
       if(interm.ne.0)  then
         itermt = 1
@@ -3136,13 +3136,13 @@
         itermt = 0
       endif
       if (ltseop .ne. lundef .or. itseop .eq. 0)  then
-        if (itermt .ne. 0)  call gopwk(interm, mconid, itermt)
+        if (itermt .ne. 0)  call wopwk(interm)
       endif
       wxfact=1.
       wyfact=1.
       wfact=1.
       if(inmeta .ne. 0)  then
-*--- orientation (portrait or landscape)
+!--- orientation (portrait or landscape)
         if (xmetaf .gt. ymetaf) then
           ipstyp = 115
         else
@@ -3182,21 +3182,21 @@
           iepsop = -2
         endif
       endif
-*--- activate workstations
+!--- activate workstations
       if (ltseop .ne. lundef .or. itseop .eq. 0)  then
         if(interm.gt.0) then
-          call gacwk(interm)
+          call wacwk(interm)
           lacttm=lundef
         endif
       endif
-*--- set default window and viewport, aspect source flags,
-*   norm. transf. number
+!--- set default window and viewport, aspect source flags,
+!   norm. transf. number
       call gxsdef('DEVICE',0)
-*--- axis default values
+!--- axis default values
       call gxsdef('AXIS',0)
-*--- curve defaults
+!--- curve defaults
       call gxsdef('CURVE',0)
-*--- set flag that GXINIT has been called
+!--- set flag that GXINIT has been called
       ltotin=lundef
 10000 format(//' GKS error number =',i4,' returned for terminal',       &
      &' device =',i8,'  STOP')
@@ -3204,19 +3204,19 @@
       subroutine gxival(string,ivalex)
       implicit none
       integer i,ifnd,ivalex,n
-************************************************************************
-*
-*   Purpose: extracts a positive integer from a string
-*
-*--- Input
-*   string    arbitrary character string
-*--- Output
-*   ivalex    first integer found in string (terminated by any
-*           non-numeric character, including blank)
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Sept. 8, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: extracts a positive integer from a string
+!
+!--- Input
+!   string    arbitrary character string
+!--- Output
+!   ivalex    first integer found in string (terminated by any
+!           non-numeric character, including blank)
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Sept. 8, 1987
+!
+!***********************************************************************
       character *(*) string
       character snumer*10
       save snumer
@@ -3239,22 +3239,22 @@
      &nchct,nint,nref
       real add,ahi,alo,fact,gap,gapt,hgap,hgapt,hwid,hwidt,txf,vgap,    &
      &vgapt,vwid,vwidt,xf
-************************************************************************
-*
-*   Purpose: calculates window margins from axes specifications
-*
-*--- Input
-*   ixref      x axis reference numbers of curve sets
-*   iyref      y axis reference numbers of curve sets
-*   wnx(2,i)   lower and upper x value, curve set I
-*   wny(2,i)   lower and upper y value, curve set I
-*--- Output
-*   active     (1...4) = window in NDC that can be used for curves
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: March 3, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: calculates window margins from axes specifications
+!
+!--- Input
+!   ixref      x axis reference numbers of curve sets
+!   iyref      y axis reference numbers of curve sets
+!   wnx(2,i)   lower and upper x value, curve set I
+!   wny(2,i)   lower and upper y value, curve set I
+!--- Output
+!   active     (1...4) = window in NDC that can be used for curves
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: March 3, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -3276,7 +3276,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -3296,7 +3296,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -3309,9 +3309,9 @@
       logical flag
       character fmt*20,text*300,fmtloc*60
       save fact
-*--- fact includes one character height plus the gap of half that height
+!--- fact includes one character height plus the gap of half that height
       data fact/.0015/
-*--- get viewport ratio
+!--- get viewport ratio
       call gxqrvp(xf)
       do i=1,4
         border(i)=0.
@@ -3323,10 +3323,10 @@
         nref=0
         do kset=1,maxset
           if(iax.eq.1) then
-*--- x axis
+!--- x axis
             iaxr=ixref(kset)
           else
-*--- y axis
+!--- y axis
             iaxr=iyref(kset)
           endif
           if(iaxr.eq.0) goto 70
@@ -3343,51 +3343,51 @@
           do i=1,nax
             add=0.
             if(iax.eq.1) then
-*--- x axis
+!--- x axis
               if(iaxr.ne.ixapar(21,i)) goto 60
               ind=(4-i)/2
               k=4-ind
               fmt=sxform(i)
               text=sxtext(i)
-*--- tick mark expansion
+!--- tick mark expansion
               txf=1.
               do j=1,mpaxs
                 iapar(j)=ixapar(j,i)
               enddo
             else
-*--- y axis
+!--- y axis
               if(iaxr.ne.iyapar(21,i)) goto 60
               ind=(4-i)/2
               k=2-ind
               fmt=syform(i)
               text=sytext(i)
-*--- tick mark expansion
+!--- tick mark expansion
               txf=xf
               do j=1,mpaxs
                 iapar(j)=iyapar(j,i)
               enddo
             endif
             gap=fact*iapar(7)
-*--- use separate character height for axis text if specified
+!--- use separate character height for axis text if specified
             if(iapar(13).gt.0.and.iapar(13).le.1000)  then
               gapt=fact*iapar(13)
             else
               gapt=gap
             endif
-*--- get character height and width for hor. and vert. text
+!--- get character height and width for hor. and vert. text
             call gxschf(0,1,gap,hgap,hwid)
             call gxschf(0,2,gap,vgap,vwid)
             call gxschf(0,1,gapt,hgapt,hwidt)
             call gxschf(0,2,gapt,vgapt,vwidt)
-*--- tick marks
+!--- tick marks
             if(iapar(2).ne.0.and.iapar(4).ne.0) then
               if(mod(iapar(4),2).eq.ind) add=add+txf*fact*iapar(8)
             endif
-*--- labels
+!--- labels
             if(iapar(3).ne.0.and.iapar(5).ne.0) then
               flag=mod(iapar(5),2).eq.ind
               if(iapar(1).eq.0)  then
-*--- linear scale - use format if given by user, else calculate
+!--- linear scale - use format if given by user, else calculate
                 call gxival(fmt,ival)
                 if(ival.eq.0) then
                   if(iax.eq.1)  then
@@ -3402,37 +3402,37 @@
                   call gxdfmt(alo,ahi,intv,ival,iscal,fmtloc)
                 endif
               else
-*--- log. scale - use powers of 10
+!--- log. scale - use powers of 10
                 ival=5
               endif
               if(iax.eq.iapar(3)) then
-*--- labels parallel to axis
+!--- labels parallel to axis
                 if(iax.eq.1) then
                   if(flag) add=add+hgap
-*--- keep minimum border for labels on perpendicular axes
+!--- keep minimum border for labels on perpendicular axes
                   bmin(iax)=max(bmin(iax),.5*ival*hwid)
                 else
                   if(flag) add=add+vgap
                   bmin(iax)=max(bmin(iax),.5*ival*vwid)
                 endif
               else
-*--- labels perpendicular to axis
+!--- labels perpendicular to axis
                 if(iax.eq.1) then
                   if(flag) add=add+ival*vwid
-*--- keep minimum border for labels on perpendicular axes
+!--- keep minimum border for labels on perpendicular axes
                   bmin(iax)=max(bmin(iax),.5*vgap)
                 else
                   if(flag) add=add+ival*hwid
-*--- keep minimum border for labels on perpendicular axes
+!--- keep minimum border for labels on perpendicular axes
                   bmin(iax)=max(bmin(iax),.5*hgap)
                 endif
               endif
             endif
-*--- text - always parallel to axis
+!--- text - always parallel to axis
             call gxpnbl(text,ifirst,ilast)
             if(iapar(6).ne.0.and.mod(iapar(6),2).eq.ind                 &
      &      .and.ifirst.ne.0)  then
-*--- add space for one line and extra space for each line separator
+!--- add space for one line and extra space for each line separator
               call gxchct(text(ifirst:ilast),sdefnl,nchct)
               if(iax.eq.1) then
                 add=add+(nchct+1)*hgapt
@@ -3441,7 +3441,7 @@
                 add=add+(nchct+1)*vgapt
               endif
             endif
-*--- take largest margin
+!--- take largest margin
             border(k)=max(border(k),add)
    60       continue
           enddo
@@ -3451,7 +3451,7 @@
       do i=1,3,2
         active(i)=max(border(i),bmin((i+1)/2))
         active(i+1)=1.-max(border(i+1),bmin((i+1)/2))
-*--- protect against too large borders
+!--- protect against too large borders
         if(active(i).ge.active(i+1))  then
           active(i)=.4
           active(i+1)=.6
@@ -3460,14 +3460,14 @@
   999 end
       subroutine gxopen
       implicit none
-************************************************************************
-*
-*   Purpose: open  terminal workstation
-*
-*   Author: H. Grote / CERN                        date: Feb. 26, 1988
-*                                           last mod: Feb. 26, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: open  terminal workstation
+!
+!   Author: H. Grote / CERN                        date: Feb. 26, 1988
+!                                           last mod: Feb. 26, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -3489,7 +3489,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -3509,7 +3509,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -3517,8 +3517,8 @@
       call gxundf
       if(lacttm.ne.lundef)  then
         if(interm.gt.0)  then
-          call gopwk(interm, mconid, itermt)
-          call gacwk(interm)
+          call wopwk(interm)
+          call wacwk(interm)
           lacttm=lundef
         endif
         call gxclrw
@@ -3527,19 +3527,19 @@
       subroutine gxopps(iun, ityp)
       implicit none
       integer imun,ityp,iun
-************************************************************************
-*
-*   Purpose: open or close .ps or .eps Output unit
-*
-*--- Input
-*   iun       +- utput unit number, if = 0: close
-*   ityp      type of Output: 113 = eps,
-*           else ps with 114 = portrait, 115 = landscape
-*
-*   Author: H. Grote / CERN                        date: Apr.  6, 1995
-*                                           last mod: Apr. 27, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: open or close .ps or .eps Output unit
+!
+!--- Input
+!   iun       +- utput unit number, if = 0: close
+!   ityp      type of Output: 113 = eps,
+!           else ps with 114 = portrait, 115 = landscape
+!
+!   Author: H. Grote / CERN                        date: Apr.  6, 1995
+!                                           last mod: Apr. 27, 1995
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -3561,7 +3561,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -3581,7 +3581,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -3593,34 +3593,34 @@
      &ierr)
       implicit none
       integer ierr,ncurv
-************************************************************************
-*
-*   Purpose: plots one frame with several curves and axes
-*
-*--- Input
-*   ncurv      number of curves (=ordered sets of (x,y) pairs) to plot
-*   nptval(i)  number of points ((x,y) pairs) in set I
-*   ipxval(i)  first x value of set I in array XVAL
-*   ipyval(i)  first y value of set I in array YVAL
-*   icvref(i)  number of the parameter set to be used for curve I. This value
-*            will be forced into [1,MAXSET].
-*            The x and y axis reference numbers of set I will be taken
-*            from this parameter set. All x and y axes with the
-*            corresponding reference numbers will be (scaled if automatic)
-*            and plotted together with set I.
-*            If no x resp. y axis exists with the reference number
-*            from the parameter set, the curve will be plotted with
-*            automatic scaling, but without x resp. y axis.
-*   xval       array containing the x values for all sets
-*   yval       array containing the y values for all sets
-*--- Output
-*   ierr       0 if everything OK, else GKS error, or
-*            1 : GXINIT not called (initialization)
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots one frame with several curves and axes
+!
+!--- Input
+!   ncurv      number of curves (=ordered sets of (x,y) pairs) to plot
+!   nptval(i)  number of points ((x,y) pairs) in set I
+!   ipxval(i)  first x value of set I in array XVAL
+!   ipyval(i)  first y value of set I in array YVAL
+!   icvref(i)  number of the parameter set to be used for curve I. This value
+!            will be forced into [1,MAXSET].
+!            The x and y axis reference numbers of set I will be taken
+!            from this parameter set. All x and y axes with the
+!            corresponding reference numbers will be (scaled if automatic)
+!            and plotted together with set I.
+!            If no x resp. y axis exists with the reference number
+!            from the parameter set, the curve will be plotted with
+!            automatic scaling, but without x resp. y axis.
+!   xval       array containing the x values for all sets
+!   yval       array containing the y values for all sets
+!--- Output
+!   ierr       0 if everything OK, else GKS error, or
+!            1 : GXINIT not called (initialization)
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -3642,7 +3642,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -3662,50 +3662,50 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
       integer nptval(*),ipxval(*),ipyval(*),icvref(*)
       real xval(*),yval(*)
-*
+!
       call gxundf
-*--- exit if not initialized
+!--- exit if not initialized
       if(ltotin.ne.lundef)  then
         ierr=1
         goto 999
       endif
-*--- clear work station(s) if requested
+!--- clear work station(s) if requested
       if(iclflg.gt.0)  call gxclrw
-*--- plot frame
+!--- plot frame
       call gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,          &
      &cvwnwd,ierr)
-*--- plot curves
+!--- plot curves
       call gxcurv(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,          &
      &cvwnwd,ierr)
-*
-*--- wait for <CR> if interactive
-*
+!
+!--- wait for <CR> if interactive
+!
       call gxwait
   999 end
       subroutine gxplts(np,xp,yp)
       implicit none
       integer i,ierror,j,k,nextra,np
       real d,gxcubv,screen,selem,sg,sl,step,xmax,xmin
-************************************************************************
-*
-*   Purpose: plots a smoothed polyline (3rd order cubic splines)
-*
-*--- Input
-*   np         number of points
-*   xp         x values
-*   yp         y values
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a smoothed polyline (3rd order cubic splines)
+!
+!--- Input
+!   np         number of points
+!   xp         x values
+!   yp         y values
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       real xp(*),yp(*)
       integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
      &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
@@ -3723,10 +3723,10 @@
       save /gxcax1/
       logical curlfl
       save screen, selem
-*--- screen is the dimension of a reasonable screen, SELEM the length
-*   of a curve piece such that it looks smooth
+!--- screen is the dimension of a reasonable screen, SELEM the length
+!   of a curve piece such that it looks smooth
       data screen/30./, selem/.2/
-*
+!
       if(np.le.2.or.np.gt.madim1) goto 70
       xmin=xp(1)
       xmax=xp(1)
@@ -3739,13 +3739,13 @@
       enddo
       if(xmax.eq.xmin) goto 999
       if(curlfl)  then
-*--- y is not a unique function of x - spline x and y independetly
-*   as function of s
+!--- y is not a unique function of x - spline x and y independetly
+!   as function of s
         s(1)=0.
         do i=2,np
           s(i)=s(i-1)+sqrt((xp(i)-xp(i-1))**2+(yp(i)-yp(i-1))**2)
         enddo
-*--- step at which extra points should occur
+!--- step at which extra points should occur
         step=s(np)*selem/screen
         call gxcubi(np,s,xp,yy1d(1,1),yy2d(1,1),ierror)
         if(ierror.ne.0) goto 70
@@ -3755,7 +3755,7 @@
         p(1,1)=xp(1)
         p(1,2)=yp(1)
         do i=2,np
-*--- number of extra points to be plotted
+!--- number of extra points to be plotted
           nextra=(s(i)-s(i-1))/step
           d=(s(i)-s(i-1))/(nextra+1)
           do j=1,nextra
@@ -3769,7 +3769,7 @@
           p(k,2)=yp(i)
         enddo
       else
-*--- step at which extra points should occur
+!--- step at which extra points should occur
         step=(xmax-xmin)*selem/screen
         call gxcubi(np,xp,yp,yy1d,yy2d,ierror)
         if(ierror.ne.0) goto 70
@@ -3777,7 +3777,7 @@
         p(1,1)=xp(1)
         p(1,2)=yp(1)
         do i=2,np
-*--- number of extra points to be plotted
+!--- number of extra points to be plotted
           nextra=abs(xp(i)-xp(i-1))/step
           d=(xp(i)-xp(i-1))/(nextra+1)
           do j=1,nextra
@@ -3793,29 +3793,29 @@
       call gvpl(k,p(1,1),p(1,2))
       goto 999
    70 continue
-*
-*--- error condition - not enough, too many, or identical points
-*
+!
+!--- error condition - not enough, too many, or identical points
+!
       call gvpl(np,xp,yp)
   999 end
       subroutine gxplt1(np,xp,yp,ac)
       implicit none
       integer i,ierror,j,k,k1,nextra,np
       real d,gxcubv,screen,selem,sg,sl,step,xmax,xmin
-************************************************************************
-*
-*   Purpose: plots a smoothed polyline (3rd order cubic splines), clips
-*
-*--- Input
-*   np         number of points
-*   xp         x values
-*   yp         y values
-*   ac         active window for clipping ---> routine GXPL
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a smoothed polyline (3rd order cubic splines), clips
+!
+!--- Input
+!   np         number of points
+!   xp         x values
+!   yp         y values
+!   ac         active window for clipping ---> routine GXPL
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       real xp(*),yp(*),ac(4)
       integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
      &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
@@ -3833,10 +3833,10 @@
       save /gxcax1/
       logical curlfl
       save screen, selem
-*--- screen is the dimension of a reasonable screen, SELEM the length
-*   of a curve piece such that it looks smooth
+!--- screen is the dimension of a reasonable screen, SELEM the length
+!   of a curve piece such that it looks smooth
       data screen/30./, selem/.2/
-*
+!
       if(np.le.2.or.np.gt.madim1) goto 70
       xmin=xp(1)
       xmax=xp(1)
@@ -3849,13 +3849,13 @@
       enddo
       if(xmax.eq.xmin) goto 999
       if(curlfl)  then
-*--- y is not a unique function of x - spline x and y independetly
-*   as function of s
+!--- y is not a unique function of x - spline x and y independetly
+!   as function of s
         s(1)=0.
         do i=2,np
           s(i)=s(i-1)+sqrt((xp(i)-xp(i-1))**2+(yp(i)-yp(i-1))**2)
         enddo
-*--- step at which extra points should occur
+!--- step at which extra points should occur
         step=s(np)*selem/screen
         call gxcubi(np,s,xp,yy1d(1,1),yy2d(1,1),ierror)
         if(ierror.ne.0) goto 70
@@ -3865,7 +3865,7 @@
         p(1,1)=xp(1)
         p(1,2)=yp(1)
         do i=2,np
-*--- number of extra points to be plotted
+!--- number of extra points to be plotted
           nextra=(s(i)-s(i-1))/step
           d=(s(i)-s(i-1))/(nextra+1)
           do j=1,nextra
@@ -3879,7 +3879,7 @@
           p(k,2)=yp(i)
         enddo
       else
-*--- step at which extra points should occur
+!--- step at which extra points should occur
         step=(xmax-xmin)*selem/screen
         call gxcubi(np,xp,yp,yy1d,yy2d,ierror)
         if(ierror.ne.0) goto 70
@@ -3888,7 +3888,7 @@
         p(1,1)=xp(1)
         p(1,2)=yp(1)
         do i=2,np
-*--- number of extra points to be plotted
+!--- number of extra points to be plotted
           nextra=abs(xp(i)-xp(i-1))/step
           d=(xp(i)-xp(i-1))/(nextra+1)
           do j=1,nextra
@@ -3897,7 +3897,7 @@
             p(k,2)=gxcubv(p(k,1),np,xp,yp,yy1d,yy2d)
           enddo
           if (k .eq. madim1)  then
-*--- flush buffer
+!--- flush buffer
             call gxpl(k, p(1,1), p(1,2), ac)
             k1 = k
             p(1,1) = p(k,1)
@@ -3912,29 +3912,29 @@
       if (k .gt. 1)  call gxpl(k,p(1,1),p(1,2),ac)
       goto 999
    70 continue
-*
-*--- error condition - not enough, too many, or identical points
-*
+!
+!--- error condition - not enough, too many, or identical points
+!
       call gxpl(np,xp,yp,ac)
   999 end
       subroutine gxpl(n,x,y,ac)
       implicit none
       integer i,ilow,j,k,n
       real xtol,ytol
-************************************************************************
-*
-*   Purpose: plots a polyline, clips at active window.
-*
-*--- Input:
-*   n          no. of points
-*   x          x positions
-*   y          y positions
-*   ac         active window
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: Dec. 9, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a polyline, clips at active window.
+!
+!--- Input:
+!   n          no. of points
+!   x          x positions
+!   y          y positions
+!   ac         active window
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: Dec. 9, 1988
+!
+!***********************************************************************
       real x(*),y(*),ac(4)
       integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
      &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
@@ -3951,7 +3951,7 @@
       common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
      &yvp(madim2+1)
       save /gxcax2/
- 
+
       xtol = toleps * (ac(2) - ac(1))
       ytol = toleps * (ac(4) - ac(3))
       if (n .gt. 1)  then
@@ -3986,23 +3986,23 @@
       implicit none
       integer i,j,k,kp
       real t,xc,xtol,yc,ytol
-************************************************************************
-*
-*   Purpose: returns two points inside or on border of active window
-*
-*--- Input:
-*   xin        x positions of Input points
-*   yin        y positions of Input points
-*   ac         active window
-*--- Output
-*   xout       x positions of Output points
-*   yout       y positions of Output points
-*   kp         no. of points to plot (2 if OK, else less)
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: Dec. 3, 1992
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns two points inside or on border of active window
+!
+!--- Input:
+!   xin        x positions of Input points
+!   yin        y positions of Input points
+!   ac         active window
+!--- Output
+!   xout       x positions of Output points
+!   yout       y positions of Output points
+!   kp         no. of points to plot (2 if OK, else less)
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: Dec. 3, 1992
+!
+!***********************************************************************
       integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
      &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
      &mxsize,myaxs,mypix,mysize
@@ -4016,7 +4016,7 @@
       parameter (mnormt = 2, madim2 = 100)
       real ac(4), xin(2), yin(2), xout(2), yout(2)
       real x(2), y(2), xr(4), yr(4)
- 
+
       xtol = toleps * (ac(2) - ac(1))
       ytol = toleps * (ac(4) - ac(3))
       kp = 0
@@ -4033,7 +4033,7 @@
       enddo
       if (kp .lt. 2)  then
         if (kp .eq. 0)  then
-*--- both outside
+!--- both outside
           do  i = 1, 2
             x(i) = xin(i)
             y(i) = yin(i)
@@ -4044,7 +4044,7 @@
           x(2) = xin(3-j)
           y(2) = yin(3-j)
         endif
-*--- treat four cases = four sides of ac: low, up, left, right
+!--- treat four cases = four sides of ac: low, up, left, right
         k = 0
         if (abs(y(2) - y(1)) .gt. ytol)  then
           t = (ac(3) - y(1)) / (y(2) - y(1))
@@ -4111,20 +4111,20 @@
       implicit none
       integer i,iloop,k,n,nup
       real xerr,yerr
-************************************************************************
-*
-*   Purpose: plots a marker symbol if inside active window.
-*
-*--- Input:
-*   n          no. of marker symbols
-*   x          x positions
-*   y          y positions
-*   ac         active window
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: Dec. 9, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a marker symbol if inside active window.
+!
+!--- Input:
+!   n          no. of marker symbols
+!   x          x positions
+!   y          y positions
+!   ac         active window
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: Dec. 9, 1988
+!
+!***********************************************************************
       real x(*),y(*),ac(4)
       integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
      &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
@@ -4162,43 +4162,43 @@
       subroutine gxpmsw(n,x,y,ac)
       implicit none
       integer n
-************************************************************************
-*
-*   Purpose: plots a software (!) marker symbol if inside active window.
-*         this is necessary where the scaling of hardware symbols
-*         does not work (e.g. Apollo with GTS-GRAL).
-*         only symbols 1 to 5 (.+*ox) are supported.
-*
-*--- Input:
-*   n          no. of marker symbols
-*   x          x positions
-*   y          y positions
-*   ac         active window
-*
-*   Author: H. Grote / CERN                          date: May 11, 1989
-*                                               last mod: July 10, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a software (!) marker symbol if inside active window.
+!         this is necessary where the scaling of hardware symbols
+!         does not work (e.g. Apollo with GTS-GRAL).
+!         only symbols 1 to 5 (.+*ox) are supported.
+!
+!--- Input:
+!   n          no. of marker symbols
+!   x          x positions
+!   y          y positions
+!   ac         active window
+!
+!   Author: H. Grote / CERN                          date: May 11, 1989
+!                                               last mod: July 10, 1995
+!
+!***********************************************************************
       real x(*),y(*),ac(4)
       call gxpm(n,x,y,ac)
       end
       subroutine gxpnbl(string,ifirst,ilast)
       implicit none
       integer i,ifirst,ilast
-************************************************************************
-*
-*   Purpose: returns position of first and last non-blank in STRING
-*
-*--- Input
-*   string     character string
-*--- Output
-*   ifirst     first non-blank in string, or 0 if only blanks
-*   ilast      last non-blank
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns position of first and last non-blank in STRING
+!
+!--- Input
+!   string     character string
+!--- Output
+!   ifirst     first non-blank in string, or 0 if only blanks
+!   ilast      last non-blank
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       character *(*)  string
       ifirst=0
       ilast=0
@@ -4220,18 +4220,18 @@
       subroutine gxppow(alabl,ipower)
       implicit none
       integer i1,i2,ipower
-************************************************************************
-*
-*   Purpose: plots a power of ten as label
-*
-*--- Input
-*   alabl      text coordinates
-*   ipower     power to plot
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 8, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a power of ten as label
+!
+!--- Input
+!   alabl      text coordinates
+!   ipower     power to plot
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 8, 1988
+!
+!***********************************************************************
       real alabl(4)
       character sdumm*10
       if(ipower.eq.0)  then
@@ -4251,31 +4251,31 @@
       integer i,iadd,iauto,iaxr,ic,icurv,ifl,ip,ipc,iscalf,ixy,j,k,kset,&
      &nax,ncrv,nextop,npint,npt,nref,nx
       real rmax,rmaxi,rmaxt,rmin,rmini,rmint,tolo
-************************************************************************
-*
-*   Purpose: calculates all window values for either x or y
-*
-*--- Input
-*   ixy        flag: 1 = x, 2 = y (only valid x points for y range)
-*   ncrv       number of curves (=ordered sets of (x,y) pairs) to plot
-*   icvref(i)  curve set for curve I
-*   nptval(i)  number of points ((x,y) pairs) in set I
-*   ipcval(i)  first x value of set I in array VAL (for range check)
-*   ipval(i)   first x or y value of set I in array VAL
-*   cval       array containing the x values for all sets (range check)
-*   val        array containing the x or y values for all sets
-*   nax        max. no. of x or y axes
-*   iaref(i)   axis reference number of set I. All x or y axes with
-*            this reference number will be scaled if automatic.
-*   iapar(j,K) axis parameters of x or y axis K
-*   range(j,K) lower and upper limit of axis K
-*--- Output
-*   wn(j,i)    lower and upper window values for set I
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Nov. 18, 1994
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: calculates all window values for either x or y
+!
+!--- Input
+!   ixy        flag: 1 = x, 2 = y (only valid x points for y range)
+!   ncrv       number of curves (=ordered sets of (x,y) pairs) to plot
+!   icvref(i)  curve set for curve I
+!   nptval(i)  number of points ((x,y) pairs) in set I
+!   ipcval(i)  first x value of set I in array VAL (for range check)
+!   ipval(i)   first x or y value of set I in array VAL
+!   cval       array containing the x values for all sets (range check)
+!   val        array containing the x or y values for all sets
+!   nax        max. no. of x or y axes
+!   iaref(i)   axis reference number of set I. All x or y axes with
+!            this reference number will be scaled if automatic.
+!   iapar(j,K) axis parameters of x or y axis K
+!   range(j,K) lower and upper limit of axis K
+!--- Output
+!   wn(j,i)    lower and upper window values for set I
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Nov. 18, 1994
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -4297,7 +4297,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -4317,7 +4317,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -4327,25 +4327,25 @@
       real cval(*), val(*), range(2,*), wn(2,*)
       real rng(2)
       integer iref(mxaxs+myaxs)
-*
-*--- nref counts the number of axis reference numbers
+!
+!--- nref counts the number of axis reference numbers
       nref=0
       do icurv=1,ncrv
         kset=max(1,min(maxset,icvref(icurv)))
         iaxr=iaref(kset)
-*--- check whether there are axes with this ref. number
+!--- check whether there are axes with this ref. number
         do j=1,nref
           if(iaxr.eq.iref(j)) goto 80
         enddo
-*--- not yet in list
+!--- not yet in list
         nref=nref+1
         iref(nref)=iaxr
-*--- loop over related axes for scaling etc.
-*--- nextop gives the highest option for zero adjustment
+!--- loop over related axes for scaling etc.
+!--- nextop gives the highest option for zero adjustment
         nextop=0
-*--- iscalf gives the highest scaling type request
+!--- iscalf gives the highest scaling type request
         iscalf=0
-*--- iauto is 0 for automatic, 1 for hand scaling
+!--- iauto is 0 for automatic, 1 for hand scaling
         iauto=0
         do i=1,nax
           if(iapar(21,i).eq.iaxr) then
@@ -4355,7 +4355,7 @@
           endif
         enddo
         if(iauto.ne.0)  then
-*--- hand scaling requested - get extrema of all ranges given
+!--- hand scaling requested - get extrema of all ranges given
           ifl=0
           do i=1,nax
             if(iapar(21,i).eq.iaxr) then
@@ -4371,23 +4371,23 @@
             endif
           enddo
           if(ifl.eq.0) then
-*--- no valid range found - use automatic scaling
+!--- no valid range found - use automatic scaling
             iauto=0
           endif
         endif
         if(iauto.eq.0) then
-*--- find minima and maxima of coordinates
+!--- find minima and maxima of coordinates
           ifl=0
           do ic=icurv,ncrv
             k=max(1,min(maxset,icvref(ic)))
             if(iaxr.eq.iaref(k)) then
-*--- find min. and max. x or y values
+!--- find min. and max. x or y values
               npt=nptval(ic)
               ip=ipval(ic)
               ipc = ipcval(ic)
               iadd = 0
               if (ixy .eq. 2)  then
-*--- take only y values paired with valid x values
+!--- take only y values paired with valid x values
                 tolo = toleps * (axwndx(2,kset) - axwndx(1,kset))
                 do  j = 0, npt - 1
                   if (cval(ipc+j) .ge. axwndx(1, kset) - tolo           &
@@ -4417,35 +4417,35 @@
             endif
           enddo
         endif
-*   nx counts the axes belonging to IAXR
+!   nx counts the axes belonging to IAXR
         nx=0
         do i=1,nax
-*--- keep interval number as given by user
+!--- keep interval number as given by user
           iapar(19,i)=iapar(2,i)
           if(iapar(21,i).eq.iaxr) then
             nx=nx+1
             if(iauto.eq.0) then
-*--- automatic scaling of this axis requested
+!--- automatic scaling of this axis requested
               call gxarng(nextop,rmini,rmaxi,rmin,rmax,npint)
               if(iapar(2,i).lt.0)  iapar(19,i)=npint
             else
-*--- hand scaling
+!--- hand scaling
               rmin=rng(1)
               rmax=rng(2)
               if(nextop.eq.1) then
-*--- start or end axis at 0. if possible
+!--- start or end axis at 0. if possible
                 if(rmin.gt.0.) then
                   rmin=0.
                 elseif(rmax.lt.0.) then
                   rmax=0.
                 endif
               elseif(nextop.eq.2) then
-*--- make axis symmetric around 0.
+!--- make axis symmetric around 0.
                 rmax=max(abs(rmin),abs(rmax))
                 rmin=-rmax
               endif
             endif
-*--- keep overall min. and max.
+!--- keep overall min. and max.
             if(nx.eq.1) then
               rmint=rmin
               rmaxt=rmax
@@ -4456,10 +4456,10 @@
           endif
         enddo
         if(nx.eq.0) then
-*--- no axis found for this ref. number - automatic scale
+!--- no axis found for this ref. number - automatic scale
           call gxarng(0,rmini,rmaxi,rmint,rmaxt,npint)
         endif
-*--- set windows
+!--- set windows
         do ic=icurv,ncrv
           k=max(1,min(maxset,icvref(ic)))
           if(iaref(k).eq.iaxr) then
@@ -4473,27 +4473,27 @@
       subroutine gxqaxs(type,naxis,npar,ipar,range,stext,sform)
       implicit none
       integer i,naxis,npar
-************************************************************************
-*
-*   Purpose: returns axis parameters
-*
-*--- Input
-*   type     'X' for an x-axis, 'Y' for a y-axis
-*   naxis    axis number
-*--- Output
-*   npar     no. of axis parameters in IPAR
-*          or = 0 if NAXIS and/or TYPE are wrong, in which case the other
-*          Output parameters will not be set
-*   ipar     parameter list
-*   range(1) lower axis limit
-*      (2) upper axis limit
-*   stext    axis text
-*   sform    axis label format, e.g. '(F6.2)'
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns axis parameters
+!
+!--- Input
+!   type     'X' for an x-axis, 'Y' for a y-axis
+!   naxis    axis number
+!--- Output
+!   npar     no. of axis parameters in IPAR
+!          or = 0 if NAXIS and/or TYPE are wrong, in which case the other
+!          Output parameters will not be set
+!   ipar     parameter list
+!   range(1) lower axis limit
+!      (2) upper axis limit
+!   stext    axis text
+!   sform    axis label format, e.g. '(F6.2)'
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -4515,7 +4515,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -4535,7 +4535,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -4573,21 +4573,21 @@
       subroutine gxqcrv(nset,npar,ipar,symb)
       implicit none
       integer i,npar,nset
-************************************************************************
-*
-*   Purpose: inquire curve set parameters
-*
-*--- Input
-*   nset    curve set number
-*--- Output
-*   npar     number of curve set parameters returned in IPAR
-*   ipar     parameter list
-*   symb     plot symbol
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: inquire curve set parameters
+!
+!--- Input
+!   nset    curve set number
+!--- Output
+!   npar     number of curve set parameters returned in IPAR
+!   ipar     parameter list
+!   symb     plot symbol
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -4609,7 +4609,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -4629,7 +4629,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -4649,23 +4649,23 @@
       implicit none
       integer ict,ierr
       real xf
-************************************************************************
-*
-*   Purpose: inquire view port ratio (y to x extension)
-*
-*--- Output
-*   xf       expansion factor
-*
-*   Author: H. Grote / CERN                        date: March 2, 1988
-*                                           last mod: March 2, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: inquire view port ratio (y to x extension)
+!
+!--- Output
+!   xf       expansion factor
+!
+!   Author: H. Grote / CERN                        date: March 2, 1988
+!                                           last mod: March 2, 1988
+!
+!***********************************************************************
       real w(4),v(4)
       xf=1.
-*--- get current norm. transf. number
+!--- get current norm. transf. number
       call jqcntn(ierr,ict)
       if(ierr.ne.0) goto 999
-*--- get current window and viewport
+!--- get current window and viewport
       call jqnt(ict,ierr,w,v)
       if(ierr.ne.0) goto 999
       if(v(2).gt.v(1).and.v(4).gt.v(3))  then
@@ -4676,64 +4676,64 @@
       implicit none
       integer intv
       real realv
-************************************************************************
-*
-*   Purpose: returns values of certain variables in common GXCOMM
-*
-*--- Input:
-*   name     name of the variable (character):
-*   = itermt   terminal workstation type (default = MTERMT)
-*   = interm   terminal workstation number (default  = MTTERM if
-*            GXASKU called, 0 otherwise for batch)
-*            if = 0, no graphics display on terminal
-*   = inmeta   metafile workstation number  (default = MTMETA)
-*            if = 0, no metafile written
-*   = ierrun   GKS error file unit number (default = MERRUN)
-*   = imetun   metafile unit  (default = METAUN)
-*   = inunit   terminal or default READ unit (default = 5)
-*   = iounit   terminal or default PRINT unit (default = 6)
-*   = isfflg   =0 (default) for square, 1 for full screen area
-*   = isqflg   =0 (default) for independent window optimization in x and y,
-*             =1 for an identical window range in x and y.
-*         this means that if:
-*                            ISFFLG=0, ISQFLG=1
-*                            and the viewport has not been tampered with
-*                            and the x and y scales are identical
-*         then
-*            (on a plotter) a circle will be plotted as a circle (!)
-*                            if GXPLOT is called
-*   = iwtflg   if = 0 (default), no action.
-*         if = 1 (set by GXASKU if interactive), GXPLOT will wait for some
-*         Input from the keyboard (e.g. <CR>) before returning so that you
-*         can look at the picture. The waiting routine GXWAIT can be called
-*         separately.
-*   = iclflg   =0 : no action; = 1 (default): causes a "clear workstations"
-*         at the end of GXPLOT. This is simply done by
-*         if(INTERM.GT.0)  CALL GCLRWK(INTERM,0)
-*         if(INMETA.GT.0)  CALL GCLRWK(INMETA,0)
-*         in case you want to do it separately.
-*   = inormt   normalization transformation number (default=MNORMT)
-*   = ipseps   .ps (1), .eps (2), else no Output
-*   = idinit   treat first GXINIT call as dummy if not zero
-*   = nxpix    x size of window in pixels (X11)
-*   = nypix    y size of window in pixels (X11)
-*   = xmetaf   paper length in cm for metafile plotting
-*   = ymetaf   paper width in cm for metafile plotting
-*            if either XMETAF or YMETAF = 0. (default), then the
-*            default square will be plotted
-*   = serrnm   GKS error file name (default GXFERR)
-*   = smetnm   Metafile name (default GXMETA)
-*   = sdefnl   new line start default in axis titles
-*
-*--- Output:
-*   intv     integer value if the variable is INTEGER
-*   realv    real value if the variable is REAL
-*   charv    if the variable is CHARACTER
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: May 12, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns values of certain variables in common GXCOMM
+!
+!--- Input:
+!   name     name of the variable (character):
+!   = itermt   terminal workstation type (default = MTERMT)
+!   = interm   terminal workstation number (default  = MTTERM if
+!            GXASKU called, 0 otherwise for batch)
+!            if = 0, no graphics display on terminal
+!   = inmeta   metafile workstation number  (default = MTMETA)
+!            if = 0, no metafile written
+!   = ierrun   GKS error file unit number (default = MERRUN)
+!   = imetun   metafile unit  (default = METAUN)
+!   = inunit   terminal or default READ unit (default = 5)
+!   = iounit   terminal or default PRINT unit (default = 6)
+!   = isfflg   =0 (default) for square, 1 for full screen area
+!   = isqflg   =0 (default) for independent window optimization in x and y,
+!             =1 for an identical window range in x and y.
+!         this means that if:
+!                            ISFFLG=0, ISQFLG=1
+!                            and the viewport has not been tampered with
+!                            and the x and y scales are identical
+!         then
+!            (on a plotter) a circle will be plotted as a circle (!)
+!                            if GXPLOT is called
+!   = iwtflg   if = 0 (default), no action.
+!         if = 1 (set by GXASKU if interactive), GXPLOT will wait for some
+!         Input from the keyboard (e.g. <CR>) before returning so that you
+!         can look at the picture. The waiting routine GXWAIT can be called
+!         separately.
+!   = iclflg   =0 : no action; = 1 (default): causes a "clear workstations"
+!         at the end of GXPLOT. This is simply done by
+!         if(INTERM.GT.0)  CALL GCLRWK(INTERM,0)
+!         if(INMETA.GT.0)  CALL GCLRWK(INMETA,0)
+!         in case you want to do it separately.
+!   = inormt   normalization transformation number (default=MNORMT)
+!   = ipseps   .ps (1), .eps (2), else no Output
+!   = idinit   treat first GXINIT call as dummy if not zero
+!   = nxpix    x size of window in pixels (X11)
+!   = nypix    y size of window in pixels (X11)
+!   = xmetaf   paper length in cm for metafile plotting
+!   = ymetaf   paper width in cm for metafile plotting
+!            if either XMETAF or YMETAF = 0. (default), then the
+!            default square will be plotted
+!   = serrnm   GKS error file name (default GXFERR)
+!   = smetnm   Metafile name (default GXMETA)
+!   = sdefnl   new line start default in axis titles
+!
+!--- Output:
+!   intv     integer value if the variable is INTEGER
+!   realv    real value if the variable is REAL
+!   charv    if the variable is CHARACTER
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: May 12, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -4755,7 +4755,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -4775,7 +4775,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -4848,17 +4848,17 @@
       subroutine gxqwac(wact)
       implicit none
       integer i
-************************************************************************
-*
-*   Purpose: returns current active user area (inside frame) in NDC
-*
-*--- Output
-*   wact     active window in NDC
-*
-*   Author: H. Grote / CERN                        date: Dec 17, 1987
-*                                           last mod: Dec 17, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: returns current active user area (inside frame) in NDC
+!
+!--- Output
+!   wact     active window in NDC
+!
+!   Author: H. Grote / CERN                        date: Dec 17, 1987
+!                                           last mod: Dec 17, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -4880,7 +4880,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -4900,7 +4900,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -4913,20 +4913,20 @@
       subroutine gxrdtx(lrunit,sline,ierr)
       implicit none
       integer ierr,lrunit
-************************************************************************
-*
-*   reads a character string from LRUNIT, recovers from
-*   empty carriage return under VM (string = blank).
-*
-*--- Input
-*   lrunit       Input unit
-*--- Output
-*   sline        string read, or blank if <CR>
-*   ierr         = 0 if no error, else = 1
-*
-*   Author hG  11.2.86
-*
-************************************************************************
+!***********************************************************************
+!
+!   reads a character string from LRUNIT, recovers from
+!   empty carriage return under VM (string = blank).
+!
+!--- Input
+!   lrunit       Input unit
+!--- Output
+!   sline        string read, or blank if <CR>
+!   ierr         = 0 if no error, else = 1
+!
+!   Author hG  11.2.86
+!
+!***********************************************************************
       character sline*(*)
       ierr=0
       sline=' '
@@ -4936,40 +4936,40 @@
   999 end
       subroutine gxrest(isave,rsave)
       implicit none
-************************************************************************
-*
-*   Purpose: restores GKS settings
-*
-*--- Input
-*   isave     integer list of saved values  (GXINIT def. in brackets)
-*       1   norm. transf. number  (1)
-*       2   line style             (1)
-*       3,4 hor. and vert. text alignment  (0,0)
-*       5,6 font and precision  (1,0)
-*         7 text colour index   (1)
-*         8 marker colour index (1)
-*         9 polyline colour index (1)
-*        10 marker type           (3)
-*        11 text path             (0)
-*        12 fill area interior style (0)
-*        13 fill area style index  (if interior style = 2)
-*   rsave     floating list of saved values
-*       1-4 window               (0.,1.,0.,1.)
-*       5-8 viewport             (0.,1.,0.,WFACT)
-*       9   character height   (0.01)
-*     10,11 character up vector  (0.,1.)
-*        12 line width scale factor  (1.)
-*        13 marker scale factor      (1.)
-*        14 character spacing factor (0.)
-*        15 character expansion factor (1.)
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: March 7, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: restores GKS settings
+!
+!--- Input
+!   isave     integer list of saved values  (GXINIT def. in brackets)
+!       1   norm. transf. number  (1)
+!       2   line style             (1)
+!       3,4 hor. and vert. text alignment  (0,0)
+!       5,6 font and precision  (1,0)
+!         7 text colour index   (1)
+!         8 marker colour index (1)
+!         9 polyline colour index (1)
+!        10 marker type           (3)
+!        11 text path             (0)
+!        12 fill area interior style (0)
+!        13 fill area style index  (if interior style = 2)
+!   rsave     floating list of saved values
+!       1-4 window               (0.,1.,0.,1.)
+!       5-8 viewport             (0.,1.,0.,WFACT)
+!       9   character height   (0.01)
+!     10,11 character up vector  (0.,1.)
+!        12 line width scale factor  (1.)
+!        13 marker scale factor      (1.)
+!        14 character spacing factor (0.)
+!        15 character expansion factor (1.)
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: March 7, 1988
+!
+!***********************************************************************
       integer isave(*)
       real    rsave(*)
-*
+!
       if(isave(1).ne.0)  then
         call jselnt(isave(1))
         call jswn(isave(1),rsave(1),rsave(2),rsave(3),rsave(4))
@@ -4984,7 +4984,7 @@
       call jstxp(isave(11))
       call jsfais(isave(12))
       call jsfasi(isave(13))
-*
+!
       call jschh(rsave(9))
       call jschup(rsave(10),rsave(11))
       call jslwsc(rsave(12))
@@ -4995,41 +4995,41 @@
       subroutine gxsave(isave,rsave,ierr)
       implicit none
       integer ierr
-************************************************************************
-*
-*   Purpose: saves current GKS settings
-*
-*--- Output
-*   isave     integer list of saved values
-*       1   norm. transf. number
-*       2   line style
-*       3,4 hor. and vert. text alignment
-*       5,6 font and precision
-*         7 text colour index
-*         8 marker colour index
-*         9 polyline colour index
-*        10 marker type
-*        11 text path
-*        12 fill area interior style
-*        13 fill area style index  (if interior style = 2)
-*   rsave     floating list of saved values
-*       1-4 window               (0.,1.,0.,1.)
-*       5-8 viewport             (0.,1.,0.,WFACT)
-*       9   character height   (0.01)
-*     10,11 character up vector  (0.,1.)
-*        12 line width scale factor  (1.)
-*        13 marker scale factor      (1.)
-*        14 character spacing factor (0.)
-*        15 character expansion factor (1.)
-*   ierr      0 if OK, or GKS error number
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: March 7, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: saves current GKS settings
+!
+!--- Output
+!   isave     integer list of saved values
+!       1   norm. transf. number
+!       2   line style
+!       3,4 hor. and vert. text alignment
+!       5,6 font and precision
+!         7 text colour index
+!         8 marker colour index
+!         9 polyline colour index
+!        10 marker type
+!        11 text path
+!        12 fill area interior style
+!        13 fill area style index  (if interior style = 2)
+!   rsave     floating list of saved values
+!       1-4 window               (0.,1.,0.,1.)
+!       5-8 viewport             (0.,1.,0.,WFACT)
+!       9   character height   (0.01)
+!     10,11 character up vector  (0.,1.)
+!        12 line width scale factor  (1.)
+!        13 marker scale factor      (1.)
+!        14 character spacing factor (0.)
+!        15 character expansion factor (1.)
+!   ierr      0 if OK, or GKS error number
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: March 7, 1988
+!
+!***********************************************************************
       integer isave(*)
       real    rsave(*)
-*
+!
       call jqcntn(ierr,isave(1))
       if(ierr.ne.0) goto 999
       call jqln(ierr,isave(2))
@@ -5052,7 +5052,7 @@
       if(ierr.ne.0) goto 999
       call jqfasi(ierr,isave(13))
       if(ierr.ne.0) goto 999
-*
+!
       call jqnt(isave(1),ierr,rsave(1),rsave(5))
       if(ierr.ne.0) goto 999
       call jqchh(ierr,rsave(9))
@@ -5071,27 +5071,27 @@
       subroutine gxsaxs(type,naxis,npar,ipar,range,stext,sform)
       implicit none
       integer i,naxis,npar
-************************************************************************
-*
-*   Purpose: set axis parameters
-*
-*--- Input
-*   type     'X' for an x-axis, 'Y' for a y-axis
-*   naxis    axis number
-*   npar     parameters 1 to NPAR will be taken from IPAR
-*   ipar     parameter list
-*   range(1) lower axis limit
-*      (2) upper axis limit
-*   stext    axis text - only plotted if first character not blank
-*   sform    axis label format, e.g. '(F6.2)'
-*
-*----------- REMARK.
-*          no action if TYPE and/or NAXIS are wrong.
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: set axis parameters
+!
+!--- Input
+!   type     'X' for an x-axis, 'Y' for a y-axis
+!   naxis    axis number
+!   npar     parameters 1 to NPAR will be taken from IPAR
+!   ipar     parameter list
+!   range(1) lower axis limit
+!      (2) upper axis limit
+!   stext    axis text - only plotted if first character not blank
+!   sform    axis label format, e.g. '(F6.2)'
+!
+!----------- REMARK.
+!          no action if TYPE and/or NAXIS are wrong.
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -5113,7 +5113,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -5133,7 +5133,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -5169,25 +5169,25 @@
       implicit none
       integer i,icase,idistl,mrange,n1,n2,nint,niv
       real x1,x2,xhi,xlo,xmax,xmin
-************************************************************************
-*
-*   Purpose: for a given arbitrary interval, finds the nearest interval
-*         in round numbers and a good subdivision
-*
-*--- Input:
-*   xmin          lower corner of interval
-*   xmax          upper corner of interval
-*
-*--- Output:
-*   xlo           lower corner of (possibly) extended interval, round
-*   xhi           upper corner (dito)
-*   nint          proposed number of intervals (zero will be precisely
-*               on the limit of a subinterval if included in range)
-*
-*   Author: H. Grote / CERN                        date: Sept. 7, 1987
-*   last modification:                                   Jan. 12, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: for a given arbitrary interval, finds the nearest interval
+!         in round numbers and a good subdivision
+!
+!--- Input:
+!   xmin          lower corner of interval
+!   xmax          upper corner of interval
+!
+!--- Output:
+!   xlo           lower corner of (possibly) extended interval, round
+!   xhi           upper corner (dito)
+!   nint          proposed number of intervals (zero will be precisely
+!               on the limit of a subinterval if included in range)
+!
+!   Author: H. Grote / CERN                        date: Sept. 7, 1987
+!   last modification:                                   Jan. 12, 1988
+!
+!***********************************************************************
       parameter (mrange=10)
       integer iv(mrange+1)
       double precision rangl(mrange+1)
@@ -5198,10 +5198,10 @@
       data rangl/1.d0,1.2d0,1.6d0,2.d0,2.5d0,3.d0,4.d0,5.d0,            &
      &6.d0,8.d0,10.d0/
       data ztol1,err1/5.d-4,1.d-8/
-*
-*--- prepare Input data: consider only the case of at least one positive
-*   value. a boundary too near to zero will be set to zero.
-*
+!
+!--- prepare Input data: consider only the case of at least one positive
+!   value. a boundary too near to zero will be set to zero.
+!
       x1=min(xmin,xmax)
       x2=max(xmin,xmax)
       if(x1.eq.x2)  then
@@ -5233,9 +5233,9 @@
         xhigh=-xlow
         xlow=0.d0
       endif
-*
-*--- choose a reasonable (round) distance
-*
+!
+!--- choose a reasonable (round) distance
+!
       distl=log10(xhigh-xlow)
       idistl=distl
       if(distl.lt.0.d0)  idistl=idistl-1
@@ -5247,9 +5247,9 @@
    20 continue
       dist=rangl(i)*distr
       if(xlow.eq.0.d0)  then
-*
-*--- first case: one of the boundary values is zero
-*
+!
+!--- first case: one of the boundary values is zero
+!
         nint=iv(i)
         if(icase.eq.1)  then
           xlo=0.
@@ -5259,10 +5259,10 @@
           xhi=0.
         endif
       elseif(xlow.lt.0.d0)  then
-*
-*--- second case: zero is included in interval and should therefore come
-*   to coincide with a subinterval boundary
-*
+!
+!--- second case: zero is included in interval and should therefore come
+!   to coincide with a subinterval boundary
+!
         niv=iv(i)
         sdist=dist/niv
         n1=abs(xlow)/sdist+1.d0-ztol1
@@ -5271,9 +5271,9 @@
         xlo=-n1*sdist
         xhi=n2*sdist
       else
-*
-*--- both boundaries are below or above zero
-*
+!
+!--- both boundaries are below or above zero
+!
         niv=iv(i)
         sdist=dist/niv
         n1=xlow/sdist+ztol1
@@ -5294,23 +5294,23 @@
       implicit none
       integer ierr,iffo,imode,iort,ippr
       real ch,chhxf,chret,chwid,hxf,xf
-************************************************************************
-*
-*   Purpose: set character height and orientation with correct scales
-*
-*--- Input
-*   imode    if 0, inquire only. If > 0, set height and exp. factor
-*   iort     text orientation: 1 horizontal, 2 vertical
-*   ch       character height for a standard viewport
-*--- Output
-*   chret    character height actually set
-*   chwid    character width
-*
-*   Author: H. Grote / CERN                          date: March 2, 1988
-*                                                last mod: May 16,  1995
-*
-************************************************************************
-*--- set height expansion factor if font
+!***********************************************************************
+!
+!   Purpose: set character height and orientation with correct scales
+!
+!--- Input
+!   imode    if 0, inquire only. If > 0, set height and exp. factor
+!   iort     text orientation: 1 horizontal, 2 vertical
+!   ch       character height for a standard viewport
+!--- Output
+!   chret    character height actually set
+!   chwid    character width
+!
+!   Author: H. Grote / CERN                          date: March 2, 1988
+!                                                last mod: May 16,  1995
+!
+!***********************************************************************
+!--- set height expansion factor if font
       call jqtxfp(ierr, iffo, ippr)
       if (imode .eq. 0 .and. iffo .lt. 0)  then
         chhxf = 1.5
@@ -5336,17 +5336,17 @@
       subroutine gxscol(icol)
       implicit none
       integer icol
-************************************************************************
-*
-*   Purpose: set foreground colour
-*
-*--- Input
-*   icol     requested colour
-*
-*   Author: H. Grote / CERN                        date: Apr. 7, 1995
-*                                           last mod: Apr. 7, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: set foreground colour
+!
+!--- Input
+!   icol     requested colour
+!
+!   Author: H. Grote / CERN                        date: Apr. 7, 1995
+!                                           last mod: Apr. 7, 1995
+!
+!***********************************************************************
       integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
      &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
      &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
@@ -5374,20 +5374,20 @@
       subroutine gxscrv(nset,npar,ipar,symb)
       implicit none
       integer i,npar,nset
-************************************************************************
-*
-*   Purpose: set curve set parameters
-*
-*--- Input
-*   nset     curve set number
-*   npar     parameters 1 to NPAR will be taken from IPAR
-*   ipar     parameter list
-*   symb     plot symbol
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: set curve set parameters
+!
+!--- Input
+!   nset     curve set number
+!   npar     parameters 1 to NPAR will be taken from IPAR
+!   ipar     parameter list
+!   symb     plot symbol
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -5409,7 +5409,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -5429,7 +5429,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -5446,26 +5446,26 @@
       subroutine gxsdef(sitem,item)
       implicit none
       integer i,i1,i2,item,j,k
-************************************************************************
-*
-*   Purpose: sets undefined variables or restores default values
-*
-*--- Input
-*   sitem    selects the set of values to be defined:
-*          'OPTION' for GKS options other than curves and axes: defaults
-*          'OPTINI' as for OPTION, but only undefined values are set
-*          'CURVE'  for curve set ITEM: set defaults
-*          'AXIS'   for both x and y axis no. ITEM: set defaults
-*          'XAXIS'  for x axis no. ITEM
-*          'YAXIS'  for y axis no. ITEM
-*          'DEVICE' for viewport: set defaults
-*   item     curve set or axis number. If = 0 , all curve sets or axes
-*   iflag    if = 0, define only undefined. if = 1, reset to defaults
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: sets undefined variables or restores default values
+!
+!--- Input
+!   sitem    selects the set of values to be defined:
+!          'OPTION' for GKS options other than curves and axes: defaults
+!          'OPTINI' as for OPTION, but only undefined values are set
+!          'CURVE'  for curve set ITEM: set defaults
+!          'AXIS'   for both x and y axis no. ITEM: set defaults
+!          'XAXIS'  for x axis no. ITEM
+!          'YAXIS'  for y axis no. ITEM
+!          'DEVICE' for viewport: set defaults
+!   item     curve set or axis number. If = 0 , all curve sets or axes
+!   iflag    if = 0, define only undefined. if = 1, reset to defaults
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -5487,7 +5487,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -5507,7 +5507,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -5554,14 +5554,14 @@
      &-99,0,0/
       data icvdef/1,1,1,1,0,1,0,0,0,10/
       data rxdef/0.,0./, rydef/0.,0./
- 
+
       call gxundf
       titem=sitem
-*------------------------------------------------
-*
-*    options
-*
-*------------------------------------------------
+!------------------------------------------------
+!
+!    options
+!
+!------------------------------------------------
       if(titem(:6).eq.'OPTION'.or.titem(:6).eq.'OPTINI')  then
         defaul=titem(:6).eq.'OPTION'
         spsnam = ' '
@@ -5654,7 +5654,7 @@
         endif
         if(lttime.ne.lundef.or.defaul) then
           lttime=lundef
-*--- wait time for Higz in sec.
+!--- wait time for Higz in sec.
           wttime=0.5
         endif
         icucol = 1
@@ -5664,23 +5664,23 @@
           enddo
           colour(k) = col(k)
         enddo
-*------------------------------------------------
-*
-*    device
-*
-*------------------------------------------------
+!------------------------------------------------
+!
+!    device
+!
+!------------------------------------------------
       elseif(titem(:6).eq.'DEVICE') then
-*--- set normalization transformation
+!--- set normalization transformation
         call jselnt(inormt)
         do  i = 1, 4
           vptdef(i) = vpdef(i)
         enddo
         call gxsvpt(vp)
-*------------------------------------------------
-*
-*    curve sETS
-*
-*------------------------------------------------
+!------------------------------------------------
+!
+!    curve sETS
+!
+!------------------------------------------------
       elseif(titem(:5).eq.'CURVE') then
         if(item.eq.0) then
           i1=1
@@ -5695,11 +5695,11 @@
           enddo
         enddo
         splotc(i1:i2)=spldef(i1:i2)
-*------------------------------------------------
-*
-*    axes
-*
-*------------------------------------------------
+!------------------------------------------------
+!
+!    axes
+!
+!------------------------------------------------
       else
         xaxis=titem(:3).eq.'XAX'.or.titem(:4).eq.'AXIS'
         yaxis=titem(:3).eq.'YAX'.or.titem(:4).eq.'AXIS'
@@ -5752,25 +5752,25 @@
       subroutine gxsfop(fnparm,status,ierr)
       implicit none
       integer ierr,ifirst,lgth
-************************************************************************
-*
-*   Purpose: opens the metafile or error file unit
-*
-*--- Input
-*   fnparm    selection parameter: starting 'MET' for metafile,
-*           'ERR' for error file, 'PSF' for Postscript, 'EPS' for
-*           encapsulated Postscript
-*   status    if ne ' ' then the unit will be opened with this,
-*           else 'UNKNOWN' will be used as default
-*--- Output
-*   ierr      =0 if everything OK
-*           =1 if FNPARM invalid
-*           =2 if the corresponding unit is not defined
-*
-*   Author: H. Grote / CERN                        date: Sept. 9, 1987
-*                                           last mod: May 12, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: opens the metafile or error file unit
+!
+!--- Input
+!   fnparm    selection parameter: starting 'MET' for metafile,
+!           'ERR' for error file, 'PSF' for Postscript, 'EPS' for
+!           encapsulated Postscript
+!   status    if ne ' ' then the unit will be opened with this,
+!           else 'UNKNOWN' will be used as default
+!--- Output
+!   ierr      =0 if everything OK
+!           =1 if FNPARM invalid
+!           =2 if the corresponding unit is not defined
+!
+!   Author: H. Grote / CERN                        date: Sept. 9, 1987
+!                                           last mod: May 12, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -5792,7 +5792,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -5812,7 +5812,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -5840,7 +5840,7 @@
       call gxundf
       sub=fnparm
       ierr=0
-*--- choose positive unit number (see higz)
+!--- choose positive unit number (see higz)
       imetps = abs(imetun)
       if(status(:1).eq.' ')  then
         stat='UNKNOWN'
@@ -5908,14 +5908,14 @@
       end
       subroutine gxspmt
       implicit none
-************************************************************************
-*
-*   Purpose: sets defaults for line style, marker, text, and colour
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: sets defaults for line style, marker, text, and colour
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       call jschup(0.,1.)
       call jsln(1)
       call jstxal(0,0)
@@ -5929,68 +5929,68 @@
       implicit none
       integer intv
       real realv
-************************************************************************
-*
-*   Purpose: sets selected variables for plotting (in common GXCOMM)
-*
-*--- Input:
-*   name     name of the variable (character):
-*   = itermt   terminal workstation type (default = MTERMT)
-*   = interm   terminal workstation number (default  = MTTERM if
-*            GXASKU called, 0 otherwise for batch)
-*            if = 0, no graphics display on terminal
-*   = inmeta   metafile workstation number  (default = MTMETA)
-*            if = 0, no metafile written
-*   = iczebr   call (with any value) sets to LUNDEF (no more MZEBRA
-*             call)
-*   = wttime   Higz wait time in sec. before plotting into a window
-*   = ierrun   GKS error file unit number (default = MERRUN)
-*   = imetun   metafile unit  (default = METAUN)
-*   = inunit   terminal or default READ unit (default = 5)
-*   = iounit   terminal or default PRINT unit (default = 6)
-*   = isfflg   =0 (default) for square, 1 for full screen area
-*   = isqflg   =0 (default) for independent window optimization
-*             in x and y,
-*             =1 for an identical window range in x and y.
-*         this means that if:
-*                            ISFFLG=0, ISQFLG=1
-*                            and the viewport has not been tampered
-*                            with and the x and y scales are identical
-*         then
-*            (on a plotter) a circle will be plotted as a circle (!)
-*                            if GXPLOT is called
-*   = iwtflg   if = 0 (default), no action.
-*         if = 1 (set by GXASKU if interactive), GXPLOT will wait
-*         for some Input from the keyboard (e.g. <CR>) before
-*         returning so that you can look at the picture. The
-*         waiting routine GXWAIT can be called separately.
-*   = iclflg   =0 : no action; = 1 (default): causes a
-*         "clear workstations"
-*         at the end of GXPLOT. This is simply done by
-*         if(INTERM.GT.0)  CALL GCLRWK(INTERM,0)
-*         if(INMETA.GT.0)  CALL GCLRWK(INMETA,0)
-*         in case you want to do it separately.
-*   = inormt   normalization transformation number (default=MNORMT)
-*   = ipseps   .ps (1), .eps (2), else no Output
-*   = idinit   treat first GXINIT call as dummy if not zero
-*   = nxpix    x size of window in pixels (X11)
-*   = nypix    y size of window in pixels (X11)
-*   = xmetaf   paper length in cm for metafile plotting
-*   = ymetaf   paper width in cm for metafile plotting
-*            if either XMETAF or YMETAF = 0. (default), then the
-*            default square will be plotted
-*   = serrnm   GKS error file name (default GXFERR)
-*   = smetnm   Metafile name (default GXMETA)
-*   = sdefnl   new line start default in axis titles
-*
-*   intv     integer value if the variable is INTEGER
-*   realv    real value if the variable is REAL
-*   charv    if the variable is CHARACTER
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: May 24, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: sets selected variables for plotting (in common GXCOMM)
+!
+!--- Input:
+!   name     name of the variable (character):
+!   = itermt   terminal workstation type (default = MTERMT)
+!   = interm   terminal workstation number (default  = MTTERM if
+!            GXASKU called, 0 otherwise for batch)
+!            if = 0, no graphics display on terminal
+!   = inmeta   metafile workstation number  (default = MTMETA)
+!            if = 0, no metafile written
+!   = iczebr   call (with any value) sets to LUNDEF (no more MZEBRA
+!             call)
+!   = wttime   Higz wait time in sec. before plotting into a window
+!   = ierrun   GKS error file unit number (default = MERRUN)
+!   = imetun   metafile unit  (default = METAUN)
+!   = inunit   terminal or default READ unit (default = 5)
+!   = iounit   terminal or default PRINT unit (default = 6)
+!   = isfflg   =0 (default) for square, 1 for full screen area
+!   = isqflg   =0 (default) for independent window optimization
+!             in x and y,
+!             =1 for an identical window range in x and y.
+!         this means that if:
+!                            ISFFLG=0, ISQFLG=1
+!                            and the viewport has not been tampered
+!                            with and the x and y scales are identical
+!         then
+!            (on a plotter) a circle will be plotted as a circle (!)
+!                            if GXPLOT is called
+!   = iwtflg   if = 0 (default), no action.
+!         if = 1 (set by GXASKU if interactive), GXPLOT will wait
+!         for some Input from the keyboard (e.g. <CR>) before
+!         returning so that you can look at the picture. The
+!         waiting routine GXWAIT can be called separately.
+!   = iclflg   =0 : no action; = 1 (default): causes a
+!         "clear workstations"
+!         at the end of GXPLOT. This is simply done by
+!         if(INTERM.GT.0)  CALL GCLRWK(INTERM,0)
+!         if(INMETA.GT.0)  CALL GCLRWK(INMETA,0)
+!         in case you want to do it separately.
+!   = inormt   normalization transformation number (default=MNORMT)
+!   = ipseps   .ps (1), .eps (2), else no Output
+!   = idinit   treat first GXINIT call as dummy if not zero
+!   = nxpix    x size of window in pixels (X11)
+!   = nypix    y size of window in pixels (X11)
+!   = xmetaf   paper length in cm for metafile plotting
+!   = ymetaf   paper width in cm for metafile plotting
+!            if either XMETAF or YMETAF = 0. (default), then the
+!            default square will be plotted
+!   = serrnm   GKS error file name (default GXFERR)
+!   = smetnm   Metafile name (default GXMETA)
+!   = sdefnl   new line start default in axis titles
+!
+!   intv     integer value if the variable is INTEGER
+!   realv    real value if the variable is REAL
+!   charv    if the variable is CHARACTER
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: May 24, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6012,7 +6012,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6032,7 +6032,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -6135,14 +6135,14 @@
       subroutine gxstep
       implicit none
       integer ierr
-************************************************************************
-*
-*   Purpose: opens .eps file
-*
-*   Author: H. Grote / CERN                        date: May 12, 1993
-*                                           last mod: May 12, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: opens .eps file
+!
+!   Author: H. Grote / CERN                        date: May 12, 1993
+!                                           last mod: May 12, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6164,7 +6164,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6184,12 +6184,12 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
- 
+
       if (iepsop .eq. -1)  then
         call gxsfop('PSFILE','UNKNOWN',ierr)
       else
@@ -6203,18 +6203,18 @@
      &ivert,k,lch,np
       real chsize,chux,chuy,cosa,enorm,exfact,sina,wid,width,xcoord,    &
      &xmult,xpch,xshift,ycoord,ymult,ypch,yshift
-************************************************************************
-*
-*   Purpose: writes a software character string for fonts 1, -13
-*
-*--- Input:
-*   xpch     x position
-*   ypch     y position
-*   ch       string
-*
-*   Author: H. Grote / CERN                        date: Dec. 14, 1990
-*                                           last mod: May 13, 1993
-***********************************************************************
+!***********************************************************************
+!
+!   Purpose: writes a software character string for fonts 1, -13
+!
+!--- Input:
+!   xpch     x position
+!   ypch     y position
+!   ch       string
+!
+!   Author: H. Grote / CERN                        date: Dec. 14, 1990
+!                                           last mod: May 13, 1993
+!**********************************************************************
       character * (*) ch
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
@@ -6237,7 +6237,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6257,7 +6257,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -6276,20 +6276,20 @@
       do i=1,20
         rsave(i)=0.
       enddo
-*--- keep (e)ps flag
+!--- keep (e)ps flag
       ipstmp = ipseps
-*--- open .eps file if requested
+!--- open .eps file if requested
       if (iepsop .lt. 0) call gxstep
       call jqtxfp(ie, ifont, iprec)
       if (ie .ne. 0) goto 999
-*--- start mod 7.6.96
-*    always write .ps or .eps file with a font, sw-characters only
-*    on screen
+!--- start mod 7.6.96
+!    always write .ps or .eps file with a font, sw-characters only
+!    on screen
       if (ifont .ne. 1 .and. ifont .ne. -13)  then
         call gvtx(xpch, ypch, ch)
         goto 999
       else
-*--- switch terminal off, write file
+!--- switch terminal off, write file
         inttmp = interm
         interm = 0
         if (ifont .eq. 1)  then
@@ -6301,9 +6301,9 @@
         call gvtx(xpch, ypch, ch)
         call jstxfp(ifont, 2)
         interm = inttmp
-*--- switch output file off
+!--- switch output file off
         ipseps = 0
-*--- end mod 7.6.96
+!--- end mod 7.6.96
       endif
       call gxsave(isave, rsave, ierr)
       call jsln(1)
@@ -6337,7 +6337,7 @@
           k = 0
           do i = 1, np
             if (ipen(i) .eq. 0)  then
-*--- pen up
+!--- pen up
               if (k .gt. 1)  call gvpl(k, xpl, ypl)
               k = 1
             else
@@ -6361,24 +6361,24 @@
       implicit none
       integer i
       real fdx,fdy
-************************************************************************
-*
-*   Purpose: sets workstation viewport. This needs a separate routine
-*         because of the screen size ratio (see below).
-*
-*--- Input
-*   vp       xlow, xup, ylow, yup of viewport.
-*          the factor of the screen ratio WFACT is applied to the
-*          gSVP call directly. The biggest possible screen size
-*          (square or full) is therefore always obtained with
-*          vP = (0.,1.,0.,1.) .
-*          in addition, if a metafile viewport other than the default
-*          is specified, this overrides the screen values.
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Nov 5, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: sets workstation viewport. This needs a separate routine
+!         because of the screen size ratio (see below).
+!
+!--- Input
+!   vp       xlow, xup, ylow, yup of viewport.
+!          the factor of the screen ratio WFACT is applied to the
+!          gSVP call directly. The biggest possible screen size
+!          (square or full) is therefore always obtained with
+!          vP = (0.,1.,0.,1.) .
+!          in addition, if a metafile viewport other than the default
+!          is specified, this overrides the screen values.
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Nov 5, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6400,7 +6400,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6420,7 +6420,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -6438,16 +6438,16 @@
       end
       subroutine gxswnd(window)
       implicit none
-************************************************************************
-*
-*   Purpose: sets the window for INORMT
-*
-*--- Input
-*   window    vector of length four (xlow, xup, ylow, yup)
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: June 16, 1987
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: sets the window for INORMT
+!
+!--- Input
+!   window    vector of length four (xlow, xup, ylow, yup)
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: June 16, 1987
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6469,7 +6469,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6489,7 +6489,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -6499,14 +6499,14 @@
       end
       subroutine gxterm
       implicit none
-************************************************************************
-*
-*   Purpose: terminates GKS PLOT package
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: terminates GKS PLOT package
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6528,7 +6528,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6548,24 +6548,24 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
- 
+
       call gxundf
       if(ltotin.eq.lundef)  then
         if(interm.gt.0.and.lacttm.eq.lundef)  then
-          call gdawk(interm)
-          call gclwk(interm)
+          call wdawk(interm)
+          call wclwk(interm)
         endif
         if(inmeta.gt.0)  then
           if (iepsop .gt. 0)  then
             call gxopps(0, 0)
           endif
         endif
-        call gclks
+        call wclks
         if (iepsop .eq. 1 .or. iepsop .eq. 2)  then
           close(imetps)
           iepsop = - iepsop
@@ -6575,11 +6575,11 @@
       end
       subroutine gxtint
       implicit none
-************************************************************************
-*
-*   set defaults for a few variables - first routine to call
-*
-************************************************************************
+!***********************************************************************
+!
+!   set defaults for a few variables - first routine to call
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6601,7 +6601,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6621,7 +6621,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -6680,43 +6680,43 @@
      &iprec,ivert,ivertu,k,kfpos,l,last,ln,lnk,mchar,mfont,ms
       real ax,axup,ay,ayup,cang,chf,chh,chux,chuy,chxp,crf,ctf,cwf,cxl, &
      &cyl,f,falign,sang,sq,t,x,xlift,xt,y,ylift,yt
-************************************************************************
-*
-*   Purpose: plots mixture of Roman and Greek text, superscripts
-*         and subscripts. Arguments exactly as GTX.
-*
-*--- Input:
-*   xt       text x position (as for GTX)
-*   yt       text y position (as for GTX)
-*   text     text (as for GTX)
-*          strings included in <G>...<G> appear as Greek,
-*          strings included in <!>...<!> appear as superscripts,
-*          strings included in <?>...<?> as subscripts.
-*          example:  TEXT='<G>a<!>b<!><G>'
-*          gives "alpha to the power of beta"
-*
-*   Author: H. Grote / CERN                        date: June 7, 1988
-*                                           last mod: May 13, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots mixture of Roman and Greek text, superscripts
+!         and subscripts. Arguments exactly as GTX.
+!
+!--- Input:
+!   xt       text x position (as for GTX)
+!   yt       text y position (as for GTX)
+!   text     text (as for GTX)
+!          strings included in <G>...<G> appear as Greek,
+!          strings included in <!>...<!> appear as superscripts,
+!          strings included in <?>...<?> as subscripts.
+!          example:  TEXT='<G>a<!>b<!><G>'
+!          gives "alpha to the power of beta"
+!
+!   Author: H. Grote / CERN                        date: June 7, 1988
+!                                           last mod: May 13, 1993
+!
+!***********************************************************************
       parameter (ms=3,mchar=95,mfont=2)
       character text*(*),search(ms)*3,schar*(mchar),stemp*1
       integer ls(ms),is(ms)
       logical toggle(ms)
       real chgtsw(mchar,mfont)
       save crf, is, ls, chf, schar
-*--- set roman as default font
-*   data ifdEF/1/
+!--- set roman as default font
+!   data ifdEF/1/
       data crf/.5/
       data is/0,0,-13/
       data ls/3,3,3/
       data search/'<!>','<?>','<G>'/
       data chf/1.5/
-*--- list all possible keybord characters
+!--- list all possible keybord characters
       data schar/                                                       &
      &' 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@&
      &#$%~&*()_+-={}[]:"|;''$><,.?,./'/
-*--- character widths for Roman and Greek fonts.
+!--- character widths for Roman and Greek fonts.
       data chgtsw/.7273,.9091,.9091,.9091,.9091,.9091,.9091,.9091,.9091,&
      &.9091,.9091,.8182,.9545,.9545,.9545,.8636,.8182,.9545,1.,.3636,   &
      &.7273,.9545,.7727,1.0909,1.,1.,.9545,1.,.9545,.9091,              &
@@ -6750,12 +6750,12 @@
           ipk=i
         endif
       enddo
-*--- call normal text routine if no special characters
+!--- call normal text routine if no special characters
       if(ipk.eq.0)  then
         call gxstx(xt,yt,text)
         goto 999
       endif
-*--- start processing
+!--- start processing
       call jqtxfp(ierr,ifont,iprec)
       if(ierr.ne.0) goto 999
       ifdef=ifont
@@ -6781,18 +6781,18 @@
         ivert=ivertu
       endif
       call jstxal(1,5)
-*--- total character spacing in y direction
+!--- total character spacing in y direction
       cyl=chf*chh
-*--- alignment factor from vertical alignment definition
+!--- alignment factor from vertical alignment definition
       falign=.5*(ivert-5)
-*--- x and y displacement in case of superscript
+!--- x and y displacement in case of superscript
       axup=-.5*cyl*sang
       ayup=.5*cyl*cang
-*--- set initial starting point
+!--- set initial starting point
       x=xt
       y=yt
       do ipass=1,2
-*--- reset to defaults
+!--- reset to defaults
         ip=ipk
         ln=lnk
         k=0
@@ -6803,9 +6803,9 @@
         ylift=0.
         ctf=1.
         kfpos=1
-*
-*--- loop over text
-*
+!
+!--- loop over text
+!
    30   if(k.ge.last) goto 70
         if(ip.eq.0)  then
           l=last
@@ -6885,7 +6885,7 @@
         y=yt+f*(yt-y)+ay
       enddo
    90 continue
-*--- restore defaults
+!--- restore defaults
       call jstxal(ihoru,ivertu)
       call jstxfp(ifont,iprec)
       call jschh(chh)
@@ -6893,20 +6893,20 @@
       subroutine gxtx1(x,y,s,ac)
       implicit none
       real x,y
-************************************************************************
-*
-*   Purpose: plots a text if reference point inside active window.
-*
-*--- Input:
-*   x          x position
-*   y          y position
-*   s          text
-*   ac         active window
-*
-*   Author: H. Grote / CERN                        date: Dec. 9, 1988
-*                                           last mod: Dec. 9, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plots a text if reference point inside active window.
+!
+!--- Input:
+!   x          x position
+!   y          y position
+!   s          text
+!   ac         active window
+!
+!   Author: H. Grote / CERN                        date: Dec. 9, 1988
+!                                           last mod: Dec. 9, 1988
+!
+!***********************************************************************
       real ac(4)
       character *(*)  s
       if(x.ge.ac(1).and.x.le.ac(2).and.y.ge.ac(3).and.y.le.ac(4))       &
@@ -6915,14 +6915,14 @@
       subroutine gxundf
       implicit none
       integer ifirst
-************************************************************************
-*
-*   Purpose: sets an integer for testing undefined variables
-*
-*   Author: H. Grote / CERN                        date: April 7, 1988
-*                                           last mod: April 7, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: sets an integer for testing undefined variables
+!
+!   Author: H. Grote / CERN                        date: April 7, 1988
+!                                           last mod: April 7, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -6944,7 +6944,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -6964,7 +6964,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -6982,15 +6982,15 @@
       end
       subroutine gxwait
       implicit none
-************************************************************************
-*
-*   Purpose: waits for Input from keyboard  (e.g. <CR>) if interactive
-*   allows emergency stop when entering STOP
-*
-*   Author: H. Grote / CERN                        date: June 16, 1987
-*                                           last mod: Feb. 26, 1988
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: waits for Input from keyboard  (e.g. <CR>) if interactive
+!   allows emergency stop when entering STOP
+!
+!   Author: H. Grote / CERN                        date: June 16, 1987
+!                                           last mod: Feb. 26, 1988
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7012,7 +7012,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7032,7 +7032,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7043,21 +7043,20 @@
         call gxclrw
       endif
       end
-      subroutine gxwclr(iun, ityp)
+      subroutine gxwclr()
       implicit none
-      integer ityp,iun
-************************************************************************
-*
-*   Purpose: write .ps page end (clear)
-*
-*--- Input
-*   iun       not used
-*   ityp      not used
-*
-*   Author: H. Grote / CERN                          date: Apr. 27, 1995
-*                                                last mod: Apr. 27, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: write .ps page end (clear)
+!
+!--- Input
+!   iun       not used
+!   ityp      not used
+!
+!   Author: H. Grote / CERN                          date: Apr. 27, 1995
+!                                                last mod: Apr. 27, 1995
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7079,7 +7078,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7099,7 +7098,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7132,19 +7131,19 @@
       implicit none
       integer i,iday,ihour,iii,imonth,isec,ittp,ityp,iun,iyear,l,minute
       real fsc
-************************************************************************
-*
-*   Purpose: write .ps or .eps file prologue or epilogue
-*
-*--- Input
-*   iun       Output unit number, if = 0: epilogue, > 0: prologue
-*   ityp      type of Output: 113 = eps,
-*           else ps with 114 = portrait, 115 = landscape
-*
-*   Author: H. Grote / CERN                        date: Apr. 27, 1995
-*                                           last mod: Apr. 27, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: write .ps or .eps file prologue or epilogue
+!
+!--- Input
+!   iun       Output unit number, if = 0: epilogue, > 0: prologue
+!   ityp      type of Output: 113 = eps,
+!           else ps with 114 = portrait, 115 = landscape
+!
+!   Author: H. Grote / CERN                        date: Apr. 27, 1995
+!                                           last mod: Apr. 27, 1995
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7166,7 +7165,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7186,7 +7185,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7251,19 +7250,19 @@
      &'     {$GX11psDict begin /$GX11psEnteredState save def} def',     &
      &'/$GX11psEnd {$GX11psEnteredState restore end} def',              &
      &'%%EndProlog' /
- 
+
       if (iun .gt. 0)  then
-*--- prologue
+!--- prologue
         fsc = 1. / msfact
         do  i = 1, mhead
           pshead(i) = head(i)
         enddo
-*        call datime(idate, itime)
-*        call datesp(idate, iyear, imonth, iday)
-*        call timesp(itime, ihour, minute)
+!        call datime(idate, itime)
+!        call datesp(idate, iyear, imonth, iday)
+!        call timesp(itime, ihour, minute)
         call mydtime(iyear, imonth, iday, ihour, minute, isec)
         if (ityp .eq. 113)  then
-*--- eps
+!--- eps
           eppro(2)(10:) = spsnam
           write(eppro(3)(25:28), '(f4.2)')  versio
           write(eppro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
@@ -7284,7 +7283,7 @@
         endif
         iutlps = iun
         ittp = ityp
-*--- write prologue
+!--- write prologue
         if (ittp .eq. 113)  then
           do  i = 1, meppro
             call gxpnbl(eppro(i), iii, l)
@@ -7311,7 +7310,7 @@
         endif
       else
         if (ittp .eq. 113)  then
-*--- write epilogue
+!--- write epilogue
           do  i = 1, mepep
             call gxpnbl(epepi(i), iii, l)
             write(iutlps, '(a)')  epepi(i)(:l)
@@ -7332,20 +7331,20 @@
       implicit none
       integer i,i1,i2,ierr,ifill,iforl,iii,k,kadd,l,np
       real f1,f2,r,v1,v2
-************************************************************************
-*
-*   Purpose: write polyline into .ps or .eps file
-*
-*--- Input
-*   np      number of points
-*   xp      x coordinates
-*   yp      y coordinates
-*   ifill   fill area request: 0 = no, 1 = yes
-*
-*   Author: H. Grote / CERN                        date: Apr. 27, 1995
-*                                              last mod: May  23, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: write polyline into .ps or .eps file
+!
+!--- Input
+!   np      number of points
+!   xp      x coordinates
+!   yp      y coordinates
+!   ifill   fill area request: 0 = no, 1 = yes
+!
+!   Author: H. Grote / CERN                        date: Apr. 27, 1995
+!                                              last mod: May  23, 1995
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7367,7 +7366,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7387,7 +7386,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7418,7 +7417,7 @@
       data eloc / 'col-1 s' /
       data formt1 /'('' n'', 2ix, '' m'')'/
       data formt2 /'(2ix, '' l'')'/
- 
+
       if (istotx .gt. 0)  then
         write(iutlps, '(a)')  stortx(:istotx)
         istotx = 0
@@ -7458,7 +7457,7 @@
       do  i = 2, np
         v1 = xp(i) - rx11pr(1)
         v2 = yp(i) - rx11pr(3)
- 
+
         if (k + 16 .gt. mline)  then
           call gxpnbl(sline, iii, l)
           write(iutlps, '(a)')  sline(:l)
@@ -7495,19 +7494,19 @@
       integer i,ifill,ip,is,j,n,np
       real sq21,xf,xmf,xms,xmsm,xmsq,xmsqm,xpsf,xs,xsm,xsq,xsqm,yf,ymf, &
      &yms,ymsm,ymsq,ymsqm,ys,ysm,ysq,ysqm
-************************************************************************
-*
-*   Purpose: plot marker symbol on display and/or PostScript output
-*
-*--- Input
-*   np      number of marker symbols
-*   xp      x coordinates
-*   yp      y coordinates
-*
-*   Author: H. Grote / CERN                        date: July 6, 1995
-*                                              last mod: July 6, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: plot marker symbol on display and/or PostScript output
+!
+!--- Input
+!   np      number of marker symbols
+!   xp      x coordinates
+!   yp      y coordinates
+!
+!   Author: H. Grote / CERN                        date: July 6, 1995
+!                                              last mod: July 6, 1995
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7529,7 +7528,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7549,7 +7548,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7601,7 +7600,7 @@
      &2, 2, 2, 2,                                                       &
      &9, 0, 0, 0,                                                       &
      &2, 2, 0, 0 /
- 
+
       call gxqvar('XMETAF', i, xmf, dum)
       call gxqvar('YMETAF', i, ymf, dum)
       if (xmf .ne. 0.)  then
@@ -7643,19 +7642,19 @@
       integer i,i1,i11,i2,i22,ia,iang1,iangle,ie,ifont,ifos,ihl,iii,    &
      &iprec,ivl,k,lf,lint,lt,lt1,lt2,lt3,mltx,mltx2
       real chh,f1,f2,v1,v2,x,xp,xup,y,yp,yup
-************************************************************************
-*
-*   Purpose: write text with predefined font .ps or .eps file
-*
-*--- Input
-*   xp      x coordinate
-*   yp      y coordinate
-*   txin    text
-*
-*   Author: H. Grote / CERN                        date: May 10, 1995
-*                                              last mod: May 10, 1995
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: write text with predefined font .ps or .eps file
+!
+!--- Input
+!   xp      x coordinate
+!   yp      y coordinate
+!   txin    text
+!
+!   Author: H. Grote / CERN                        date: May 10, 1995
+!                                              last mod: May 10, 1995
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7677,7 +7676,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7697,7 +7696,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7731,12 +7730,12 @@
      &'/Courier-Bold',  '/Courier-BoldOblique', '/Symbol' /
       data ifosiz / 1030, 1000, 1025, 930, 930,                         &
      &930, 930, 1205, 1205, 1170, 1165, 1005 /
- 
+
       if (istotx .gt. 0)  then
         write(iutlps, '(a)')  stortx(:istotx)
         istotx = 0
       endif
-*--- copy text to local, treat ()
+!--- copy text to local, treat ()
       txlc = ' '
       call gxpnbl(txin, iii, lint)
       lt = 0
@@ -7782,7 +7781,7 @@
         f1 = msfact * (ibbox(4) - ibbox(2)) / (rx11pr(2) - rx11pr(1))
         f2 = msfact * (ibbox(3) - ibbox(1)) / (rx11pr(4) - rx11pr(3))
       endif
-*--- horizontal alignment - uses font width from font def.
+!--- horizontal alignment - uses font width from font def.
       if (ihl .gt. 1)  then
         write(iutlps, '(a)')  '/xs 0 def'
         write(iutlps, '(a, a, a)')  '(', txlc(:lt), ')'
@@ -7838,17 +7837,17 @@
       k = k + 2
       write(iutlps, '(a)')  sline(:k)
       end
-      subroutine gxzhgz(string, ar1, ar2, i1, i2, i3, r1, r2, r3, r4)
+      subroutine gxzhgz(string,ar1,ar2,i1,i2,r1,r2,r3,r4)
       implicit none
       integer i,ierr,iz
-************************************************************************
-*
-*   Purpose: contains entries for set and inquire routines
-*
-*   Author: H. Grote / CERN                        date: April 30, 1993
-*                                           last mod: April 30, 1993
-*
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: contains entries for set and inquire routines
+!
+!   Author: H. Grote / CERN                        date: April 30, 1993
+!                                           last mod: April 30, 1993
+!
+!***********************************************************************
       integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
      &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
      &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
@@ -7870,7 +7869,7 @@
      &madim1 = 500, toleps = 1.e-5,                                     &
      &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
       parameter (mnormt = 2, madim2 = 100)
-*
+!
       common / gxcomi /                                                 &
      &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
      &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
@@ -7890,7 +7889,7 @@
       common / gxcomc /                                                 &
      &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
      &syform(myaxs), splotc, stortx, sdefnl
-*
+!
       character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
@@ -7914,45 +7913,41 @@
       character spsnam * 256, colour * 16, pshead * 60
       save / gx11c /
       real    ar1(*), ar2(*)
-      integer i1, i2, i3, ivals(14)
+      integer i1, i2, ivals(14)
       real    r1, r2, r3, r4, rvals(14)
       save    ivals, rvals
       character *(*) string
       character * 100 strloc
       data ivals / 0, 0, 0, 0, 1, 2, 0, 0, 0, 0,                        &
      &0, 1, 1, 0 /
-*   ivals(1)       marker type
-*     (2)       fill area interior style
-*     (3)       horizontal text alignment
-*     (4)       vertical text alignment
-*     (5)       text font
-*     (6)       text precision
-*     (7)       marker colour index
-*     (8)       metafile status (0 closed, 1 open)
-*     (9)       text colour index
-*    (10)       free
-*    (11)       polyline colour index
-*    (12)       polyline style
-*    (13)       current normalisation transformation number
-*    (14)       last call type: 0 undef., 1 line, 2 text, 3 marker
- 
+!   ivals(1)       marker type
+!     (2)       fill area interior style
+!     (3)       horizontal text alignment
+!     (4)       vertical text alignment
+!     (5)       text font
+!     (6)       text precision
+!     (7)       marker colour index
+!     (8)       metafile status (0 closed, 1 open)
+!     (9)       text colour index
+!    (10)       free
+!    (11)       polyline colour index
+!    (12)       polyline style
+!    (13)       current normalisation transformation number
+!    (14)       last call type: 0 undef., 1 line, 2 text, 3 marker
+
       data rvals / 0., 1., 0.01, 0., 1., 0., 1., 0., 1., 0.,            &
      &1., 1., 1., 1. /
-*   rvals(1-2)  chup vector
-*     3         character height
-*     4-7       window
-*     8-11      viewport
-*     12        character expansion factor
-*     13        line width scale factor
-*     14        marker scale factor
+!   rvals(1-2)  chup vector
+!     3         character height
+!     4-7       window
+!     8-11      viewport
+!     12        character expansion factor
+!     13        line width scale factor
+!     14        marker scale factor
       entry jselnt(i1)
-      entry gselnt(i1)
       entry jsfasi(i1)
-      entry gsfasi(i1)
       entry jswkwn(i1, r1, r2, r3, r4)
-      entry gswkwn(i1, r1, r2, r3, r4)
       entry jswkvp(i1, r1, r2, r3, r4)
-      entry gswkvp(i1, r1, r2, r3, r4)
       goto 999
       entry jqmk(ierr, i1)
       ierr = 0
@@ -8036,45 +8031,18 @@
       entry jqcntn(ierr, i1)
       ierr = 0
       i1 = ivals(13)
-*--- dummies
+!--- dummies
       entry jqtxp(i1, i2)
       entry jqchsp(i1, r1)
       entry jqfasi(i1, i2)
       entry jstxp(i1)
       entry jschsp(r1)
       goto 999
-*   only x11
-      entry gclwk(i1)
-      entry jclwk(i1)
-      call wclwk(i1)
-      goto 999
-      entry gclks
-      entry jclks
-      call wclks
-      goto 999
-      entry gacwk(i1)
-      entry jacwk(i1)
-      call wacwk(i1)
-      goto 999
-      entry gdawk(i1)
-      entry jdawk(i1)
-      call wdawk(i1)
-      goto 999
       entry gclrwk(i1, i2)
-      entry jclrwk(i1, i2)
       if (interm .gt. 0)  call wclrwk(i1, i2)
-      if (ipseps .eq. 1)  call gxwclr(i1, i2)
-      goto 999
-      entry gopks(i1, i2)
-      entry jopks(i1, i2)
-      call wopks(i1, i2)
-      goto 999
-      entry gopwk(i1, i2, i3)
-      entry jopwk(i1, i2, i3)
-      call wopwk(i1, i2, i3)
+      if (ipseps .eq. 1)  call gxwclr()
       goto 999
       entry gtx(r1, r2, string)
-      entry jtx(r1, r2, string)
       if (interm .gt. 0)  then
         strloc = string
         call wtx(r1, r2, strloc)
@@ -8082,7 +8050,6 @@
       if (ipseps .ne. 0)  call gxwtx(r1, r2, string)
       goto 999
       entry gfa(i1, ar1, ar2)
-      entry jfa(i1, ar1, ar2)
       if (interm .gt. 0)  then
         if (ivals(2) .eq. 0)  then
           call wpl(i1, ar1, ar2)
@@ -8093,40 +8060,30 @@
       if (ipseps .ne. 0)  call gxwpl(i1, ar1, ar2, ivals(2))
       goto 999
       entry gpl(i1, ar1, ar2)
-      entry jpl(i1, ar1, ar2)
       if (interm .gt. 0)  call wpl(i1, ar1, ar2)
       if (ipseps .ne. 0)  call gxwpl(i1, ar1, ar2, 0)
       goto 999
-      entry gpm(i1, ar1, ar2)
-      call gxwpm(i1, ar1, ar2)
-      goto 999
-      entry gsmk(i1)
       entry jsmk(i1)
       ivals(1) = i1
       ix11pr(4) = i1
       goto 999
-      entry gsfais(i1)
       entry jsfais(i1)
       ivals(2) = i1
       goto 999
-      entry gstxal(i1, i2)
       entry jstxal(i1, i2)
       ivals(3) = i1
       ivals(4) = i2
       ix11pr(1) = i1
       ix11pr(2) = i2
       goto 999
-      entry gstxfp(i1, i2)
       entry jstxfp(i1, i2)
       ivals(5) = i1
       ivals(6) = i2
       goto 999
-      entry gspmci(i1)
       entry jspmci(i1)
       ivals(7) = i1
       ivals(14) = 0
       goto 999
-      entry gschup(r1, r2)
       entry jschup(r1, r2)
       rvals(1) = r1
       rvals(2) = r2
@@ -8139,16 +8096,13 @@
       rx11pr(7) = r1
       goto 999
       entry jstxci(i1)
-      entry gstxci(i1)
       ivals(9) = i1
       ivals(14) = 0
       goto 999
       entry jsmksc(r1)
-      entry gsmksc(r1)
       rvals(14) = r1
       rx11pr(8) = r1
       goto 999
-      entry gswn(i1, r1, r2, r3, r4)
       entry jswn(i1, r1, r2, r3, r4)
       rvals(4) = r1
       rvals(5) = r2
@@ -8170,26 +8124,21 @@
       endif
       if (interm .gt. 0)  call wswn(r1, fxpix, r3, fypix)
       goto 999
-      entry gsplci(i1)
       entry jsplci(i1)
       ivals(11) = i1
       ivals(14) = 0
       goto 999
-      entry gslwsc(r1)
       entry jslwsc(r1)
       rvals(13) = r1
       goto 999
-      entry gsln(i1)
       entry jsln(i1)
       ivals(12) = i1
       iz = i1 - 1
       if (interm .gt. 0)  call wsetls(iz)
       goto 999
-      entry gslctp(i1)
       entry jslctp(i1)
       ivals(14) = i1
       goto 999
-      entry gqlctp(i1)
       entry jqlctp(i1)
       i1 = ivals(14)
       goto 999
@@ -8197,15 +8146,15 @@
       subroutine wacwk(iw)
       implicit none
       integer iw
-************************************************************************
-*
-*   Purpose: Activate workstation
-*
-*--- Input
-*   iw       workstation number
-*   Author: H. Grote / CERN                        date: Jan. 25, 1994
-*                                           last mod: Jan. 25, 1994
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Activate workstation
+!
+!--- Input
+!   iw       workstation number
+!   Author: H. Grote / CERN                        date: Jan. 25, 1994
+!                                           last mod: Jan. 25, 1994
+!***********************************************************************
       integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
      &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
      &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
@@ -8230,26 +8179,26 @@
       end
       subroutine wclks
       implicit none
-************************************************************************
-*
-*   Purpose: Close X11 package
-*
-*   Author: H. Grote / CERN                        date: Jan. 25, 1994
-*                                           last mod: Jan. 25, 1994
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Close X11 package
+!
+!   Author: H. Grote / CERN                        date: Jan. 25, 1994
+!                                           last mod: Jan. 25, 1994
+!***********************************************************************
       end
       subroutine wclwk(iw)
       implicit none
       integer iw
-************************************************************************
-*
-*   Purpose: Close workstation
-*
-*--- Input
-*   iw       workstation number
-*   Author: H. Grote / CERN                        date: Jan. 25, 1994
-*                                           last mod: Jan. 25, 1994
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Close workstation
+!
+!--- Input
+!   iw       workstation number
+!   Author: H. Grote / CERN                        date: Jan. 25, 1994
+!                                           last mod: Jan. 25, 1994
+!***********************************************************************
       integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
      &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
      &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
@@ -8279,15 +8228,15 @@
       subroutine wdawk(iw)
       implicit none
       integer iw
-************************************************************************
-*
-*   Purpose: Deactivate workstation
-*
-*--- Input
-*   iw       workstation number
-*   Author: H. Grote / CERN                        date: Jan. 25, 1994
-*                                           last mod: Jan. 25, 1994
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Deactivate workstation
+!
+!--- Input
+!   iw       workstation number
+!   Author: H. Grote / CERN                        date: Jan. 25, 1994
+!                                           last mod: Jan. 25, 1994
+!***********************************************************************
       integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
      &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
      &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
@@ -8310,19 +8259,19 @@
         ix11tf(iw) = 0
       endif
       end
-      subroutine wopks(ieu, idum)
+      subroutine wopks
       implicit none
-      integer i,idum,ieu
-************************************************************************
-*
-*   Purpose: Open X11 package
-*
-*--- Input
-*   ieu      error file unit (not used)
-*   idum     dummy
-*   Author: H. Grote / CERN                        date: Jan. 25, 1994
-*                                           last mod: Jan. 25, 1994
-************************************************************************
+      integer i
+!***********************************************************************
+!
+!   Purpose: Open X11 package
+!
+!--- Input
+!   ieu      error file unit (not used)
+!   idum     dummy
+!   Author: H. Grote / CERN                        date: Jan. 25, 1994
+!                                           last mod: Jan. 25, 1994
+!***********************************************************************
       integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
      &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
      &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
@@ -8341,7 +8290,7 @@
       common / gx11c / spsnam, colour(mcolor), pshead(mhead)
       character spsnam * 256, colour * 16, pshead * 60
       save / gx11c /
-*--- preset workstations to inactive and closed
+!--- preset workstations to inactive and closed
       do  i = 1, mx11tf
         ix11tf(i) = 0
         ix11op(i) = 0
@@ -8352,21 +8301,21 @@
       character * 1 sus
       affirm = sus.eq.'y'.or.sus.eq.'Y'.or.sus.eq.'o'.or.sus.eq.'O'
       end
-      subroutine wopwk(iw, icont, it)
+      subroutine wopwk(iw)
       implicit none
-      integer icont,it,iw,ix,iy
+      integer iw,ix,iy
       real r
-************************************************************************
-*
-*   Purpose: Open workstation
-*
-*--- Input
-*   iw       workstation number
-*   icont    dummy
-*   it       dummy
-*   Author: H. Grote / CERN                        date: Jan. 25, 1994
-*                                           last mod: Jan. 25, 1994
-************************************************************************
+!***********************************************************************
+!
+!   Purpose: Open workstation
+!
+!--- Input
+!   iw       workstation number
+!   icont    dummy
+!   it       dummy
+!   Author: H. Grote / CERN                        date: Jan. 25, 1994
+!                                           last mod: Jan. 25, 1994
+!***********************************************************************
       integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
      &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
      &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
