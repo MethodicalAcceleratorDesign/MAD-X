@@ -154,11 +154,19 @@
           code = code_buf(nlm+1)
         endif
         if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
-          print*,"code: ",code," el: ",el
+          print*," "
+          print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
           sum = node_value('name ')
-          call aafail('TRRUN',                                          &
-     &    '----element with length found : CONVERT STRUCTURE WITH '//   &
-     &    'MAKETHIN')
+          print*," "
+          print*,"Track dies nicely"
+          print*,"Thick lenses will get nowhere"
+          print*,"MAKETHIN will save you"
+          print*," "
+          print*," "
+          stop
+!          call aafail('TRRUN',                                          &
+!     &    '----element with length found : CONVERT STRUCTURE WITH '//   &
+!     &    'MAKETHIN')
         endif
         if (switch .eq. 1) then
           nobs = node_value('obs_point ')
