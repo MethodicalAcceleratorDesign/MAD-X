@@ -1192,13 +1192,13 @@ C       write(*,*) '=> ',i,cb(i)
 !X    write(*,*) RHO(J),A(K,J)
 !X    write(*,*) 'H: ',H
 
-          if(h.lt.reps7) then
+          if(abs(h).lt.reps7) then
             write(*,*) 'Correction process aborted'
             write(*,*) 'during ',k,'th iteration'
             write(*,*) 'Last r.m.s.: ',rmss(k-1)
             write(*,*) 'Last p-t-p.: ',ptop(k-1)
             write(*,*) 'Division by zero expected'
-            write(*,*) 'Probably two kickers too close'
+            write(*,*) 'Probably two kickers too close: ',h
             write(*,*) 'SUSPECTED KICKER: ',J,'  '
             write(*,*) conm(ipiv(j))
             ifail = -1
