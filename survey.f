@@ -1,4 +1,4 @@
-!  Routines for the survey command in MADX / A. Verdier (October 2001)
+!  Routines for the survey command in MADX / A. Verdier (started October 2001)
       subroutine survey
       implicit none
 !----------------------------------------------------------------------*
@@ -22,7 +22,7 @@
       double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
      &theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
      &node_value,el,suml,get_value,costhe,sinthe,cosphi,sinphi,cospsi,  &
-     &sinpsi,tilt
+     &sinpsi,tilt,globaltilt
 
 !---- Retrieve command attributes.
       v0(1)=  get_value('survey ','x0 ')
@@ -65,14 +65,12 @@
       suml = suml + el
 !**  Compute the coordinates at each point
       call sutrak(v, w, ve, we)
+!**  Compute globaltilt HERE : it's the value at the entrance
+      globaltilt=psi+tilt
 !**  Compute the survey angles at each point
       call suangl(w, theta, phi, psi)
 !**  Fill the survey table
-!      print *,"theta=",theta, "  phi=",phi,"  psi=" ,psi,"  tilt=",tilt
-      call sufill(suml,v, theta, phi, psi,tilt)
-! Test :
-!      print *,suml,"    ",el,"      ",theta,"      ", phi,"     ", psi,
-!     +v(1),v(2),v(3)
+      call sufill(suml,v, theta, phi, psi,globaltilt)
       if (advance_node().ne.0)  goto 10
 !---- end of loop over elements  ***********************************
 
@@ -103,11 +101,12 @@
 !   PHI       (real)    Elevation angle.                               *
 !   PSI       (real)    Roll angle.                                    *
 !----------------------------------------------------------------------*
-      double precision arg,theta,phi,psi,w(3,3),proxim,thetaint,psiint
+      double precision arg,theta,phi,psi,w(3,3),proxim,thetaint
 
       arg = sqrt(w(2,1)**2 + w(2,2)**2)
       phi = atan2(w(2,3), arg)
-!      print *,"SUANGL:  phi =",phi,"  arg=",arg,"   w23 =",w(2,3)
+!      print *,"SUANGL: phi =",phi," arg=",arg,"  w23 =",w(2,3),
+!     &"  w22 =",w(2,2),"  w21 =",w(2,1)
        if (arg .gt. 1.0e-20) then
         theta = proxim(atan2(w(1,3), w(3,3)), theta)
         psi = proxim(atan2(w(2,1), w(2,2)), psi)
@@ -171,7 +170,7 @@
       integer code,nn,ns,maxmul
       parameter(maxmul=20)
       double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
-     &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul),angv
+     &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul)       &
      &,zero,one,get_variable
       parameter(zero=0d0,one=1d0)
 !---- Branch on subprocess code.
@@ -261,19 +260,14 @@
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
       call node_vector('knl ',nn,normal)
-      call node_vector('ksl ',ns,skew)
+!      call node_vector('ksl ',ns,skew)
 !      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
-!     *,skew(0)
 !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
       angle = normal(0)*node_value('dipole_bv ')
-      angv = skew(0)
-      if(angle.eq.zero) then
+      if (abs(angle) .lt. 1d-13) then
         tilt = zero
-        if(angv.ne.zero) then
-          tilt = get_variable('twopi ')*0.25
-        endif
       else
-        tilt = asin(angv/sqrt(angv*angv+angle*angle))
+        tilt =  node_value('tilt ')
       endif
 ! As el=0, there is no dx and no ds
       dx = zero
@@ -284,20 +278,14 @@
    20 continue
 !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
       angle = node_value('angle ')*node_value('dipole_bv ')
-      angv = node_value('k0s ')*el*node_value('dipole_bv ')
-      if (angle .eq. zero) then
+!      print *,"SUELEM dipole : angle =",angle
+      if (abs(angle) .lt. 1d-13) then
         dx = zero
         ds = el
         tilt = zero
-           if(angv.ne.zero) then
-!****  tilt not obvious !!!!
-           tilt = -get_variable('twopi ')*0.25*angv/abs(angv)
-           angle = angv
-           dx = el * (cos(angle)-one)/angle
-           ds = el * sin(angle)/angle
-           endif
       else
-        tilt = asin(angv/sqrt(angv*angv+angle*angle))
+        tilt =  node_value('tilt ')
+!      print *,"SUELEM dipole : tilt =",tilt," length= ",el
         dx = el * (cos(angle)-one)/angle
         ds = el * sin(angle)/angle
       endif
@@ -346,7 +334,7 @@
 !-----------------  end of suelem subroutine --------------------------
 
 !**********************************************************************
-      subroutine sufill(suml,v, theta, phi, psi,tilt)
+      subroutine sufill(suml,v, theta, phi, psi,globaltilt)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -358,9 +346,8 @@
 !----------------------------------------------------------------------*
       integer code,nn
       double precision ang,el,v(3),theta,phi,psi,node_value,suml,
-     &normal(20),tilt,globaltilt
+     &normal(20),globaltilt
 
-      globaltilt=psi+tilt
       el = node_value('l ')
       call string_to_table('survey ', 'name ', 'name ')
       call double_to_table('survey ', 's ',suml )
