@@ -694,7 +694,7 @@ struct node* copy_thin(struct node* thick_node)
 {
   struct node* thin_node = NULL;
 
-  thin_node = clone_node(thick_node);
+  thin_node = clone_node(thick_node, 0);
   thin_node->length=0;
   thin_node->p_elem->length=0;
   /* if we have a non zero length then an lrad has to be created */

@@ -856,10 +856,9 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 
 void complete_twiss_table(struct table* t)
 {
-  int i, j, mult, n, pos, h_length = 33; /* change adding header lines ! */
-  double el, val, dtmp;
+  int i, j, mult, n;
+  double el, val;
   struct node* c_node;
-  struct table* s;
   char tmp[16];
 
   if (t == NULL) return;
@@ -894,130 +893,6 @@ void complete_twiss_table(struct table* t)
 	  }
         t->d_cols[j][i] = val;
        }
-    }
-  /* ATTENTION: if you add header lines, augment h_length accordingly */
-  if (t->header == NULL)  t->header = new_char_p_array(h_length);
-  strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dummy, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp), 
-          stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "mass");
-  sprintf(c_dummy, "@ MASS             %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "charge");
-  sprintf(c_dummy, "@ CHARGE           %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "energy");
-  sprintf(c_dummy, "@ ENERGY           %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "pc");
-  sprintf(c_dummy, "@ PC               %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "gamma");
-  sprintf(c_dummy, "@ GAMMA            %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "kbunch");
-  sprintf(c_dummy, "@ KBUNCH           %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dummy, "@ BCURRENT         %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "sige");
-  sprintf(c_dummy, "@ SIGE             %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "sigt");
-  sprintf(c_dummy, "@ SIGT             %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "npart");
-  sprintf(c_dummy, "@ NPART            %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "ex");
-  sprintf(c_dummy, "@ EX               %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "ey");
-  sprintf(c_dummy, "@ EY               %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  dtmp = get_value("beam", "et");
-  sprintf(c_dummy, "@ ET               %%le  %22.12g", dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-  if ((pos = name_list_pos("summ", table_register->names)) > -1)
-    {
-     s = table_register->tables[pos];
-     pos = name_list_pos("length", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ LENGTH           %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("alfa", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ ALFA             %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("gammatr", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ GAMMATR          %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("q1", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ Q1               %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("q2", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ Q2               %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("dq1", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DQ1              %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("dq2", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DQ2              %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("dxmax", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DXMAX            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("dymax", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DYMAX            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("xcomax", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCMAX            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("ycomax", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCMAX            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("betxmax", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ BETXMAX          %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("betymax", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ BETYMAX          %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("xcorms", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCRMS            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("ycorms", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCRMS            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("dxrms", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DXRMS            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("dyrms", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DYRMS            %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     pos = name_list_pos("deltap", s->columns);
-     dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DELTAP           %%le  %22.12g", dtmp);
-     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
     }
 }
 
@@ -1498,17 +1373,18 @@ int double_from_table(char* table, char* name, int* row, double* val)
   return 0;
 }
 
-void down_unit(char* file_name)
+int down_unit(char* file_name)
 {
   FILE* new;
   if ((new = fopen(file_name, "r")) == NULL)
     {
      if (interactive) warning("cannot open input file:", file_name);
      else             fatal_error("cannot open input file:", file_name);
-     return;
+     return 0;
     }
   if (in->curr+1 == in->max) grow_in_buff_list(in);
   in->input_files[++in->curr] = new;
+  return 1;
 }
 
 void dump_char_array(struct char_array* a)
@@ -1631,6 +1507,7 @@ void dump_expression(struct expression* ex)
 void dump_exp_sequ(struct sequence* sequ, int level)
 {
   struct node* c_node;
+  int j;
   double suml = zero;
   puts("+++++++++ dump expanded sequence +++++++++");
   c_node = sequ->ex_start;
@@ -1640,6 +1517,20 @@ void dump_exp_sequ(struct sequence* sequ, int level)
      if (level > 2)
        {
         dump_node(c_node);
+        if (c_node->p_al_err != NULL)
+	  {
+	   puts("alignment errors:");
+           for (j = 0; j < c_node->p_al_err->curr; j++) 
+	     printf("%e ", c_node->p_al_err->a[j]);
+           printf("\n");
+	  }
+        if (c_node->p_fd_err != NULL)
+	  {
+	   puts("field errors:");
+           for (j = 0; j < c_node->p_fd_err->curr; j++) 
+	     printf("%e ", c_node->p_fd_err->a[j]);
+           printf("\n");
+	  }
         if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
        }
      else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
@@ -1879,10 +1770,10 @@ int element_vector(struct element* el, char* par, double* vector)
   struct expr_list* ell;
   if ((i = name_list_pos(par, el->def->par_names)) > -1)
     {
-     if ((ell = el->def->par->parameters[i]->expr_list) != NULL
-         && (da = el->def->par->parameters[i]->double_array) != NULL)
+     if ((da = el->def->par->parameters[i]->double_array) != NULL)
        {
-        update_vector(ell, da);
+	if ((ell = el->def->par->parameters[i]->expr_list) != NULL)
+           update_vector(ell, da);
         l = da->curr;
         for (j = 0; j < l; j++) vector[j] = da->a[j];
        }
@@ -2196,8 +2087,7 @@ void exec_call(struct in_cmd* cmd)
   int top = in->curr;
   if (nl->inform[pos])
     { 
-     down_unit(pl->parameters[pos]->string);
-     main_input(top);
+     if (down_unit(pl->parameters[pos]->string))  main_input(top);
     }
   else warning("call without filename:", "ignored");
 }
@@ -2558,7 +2448,7 @@ void exec_save(struct in_cmd* cmd)
         sequ = sql->sequs[pos];
         all_node_pos(sequ);
         sequ->ex_nodes = new_node_list(2*sequ->nodes->curr);
-        expand_sequence(sequ);
+        expand_sequence(sequ, 0);
         export_sequ_8(sequ, out_file);
         sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
        }
@@ -2771,7 +2661,7 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   struct sequence* nodesequ = node->p_sequ;
   struct node *p, *q = nodesequ->start;
   int i;
-  p = clone_node(q);
+  p = clone_node(q, 0);
   if ((i = name_list_pos(p->p_elem->name, occ_list)) < 0)
       i = add_to_name_list(p->p_elem->name, 1, occ_list);
   else strcpy(p->name, compound(p->p_elem->name, ++occ_list->inform[i]));
@@ -2783,7 +2673,7 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   while (p != NULL)
     {
      if (q == nodesequ->end) break;
-     p->next = clone_node(q->next);
+     p->next = clone_node(q->next, 0);
      p->next->previous = p;
      p = p->next; 
      q = q->next;
@@ -2801,7 +2691,7 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   return p;
 }
 
-void expand_curr_sequ()
+void expand_curr_sequ(int flag)
 {
   if (current_sequ->ex_start != NULL)
     {
@@ -2817,7 +2707,7 @@ void expand_curr_sequ()
      make_occ_list(current_sequ);
      all_node_pos(current_sequ);
      current_sequ->ex_nodes = new_node_list(2*current_sequ->nodes->curr);
-     expand_sequence(current_sequ);
+     expand_sequence(current_sequ, flag);
      current_sequ->n_nodes = 
        add_drifts(current_sequ->ex_start, current_sequ->ex_end);
     }
@@ -2830,15 +2720,17 @@ void expand_curr_sequ()
     }
 }
 
-void expand_sequence(struct sequence* sequ)
+void expand_sequence(struct sequence* sequ, int flag)
 {
+  /* Transfers errors from original nodes if flag != 0; 
+     this is needed for SXF input  */
   struct node *p, *q = sequ->start;
-  p = sequ->ex_start = clone_node(sequ->start);
+  p = sequ->ex_start = clone_node(sequ->start, 0);
   add_to_node_list(p, 0, sequ->ex_nodes);
   while (p != NULL)
     {
      if (q == sequ->end) break;
-     p->next = clone_node(q->next);
+     p->next = clone_node(q->next, flag);
      p->next->previous = p;
      p = p->next;
      q = q->next;
@@ -3269,6 +3161,29 @@ void fatal_error(char* t1, char* t2)
   printf("+=+=+= fatal: %s %s\n",t1,t2); exit(1);
 }
 
+void fill_beta0(struct command* beta0, struct node* node)
+{
+  /* makes uses of fact that beta0 and twiss_table have the same variables
+     at the same place (+2)  up to energy inclusive */
+  struct command_parameter_list* pl = beta0->par;
+  struct name_list* nl = beta0->par_names;
+  int i = -1, pos;
+  if (twiss_table == NULL) return;
+  for (pos = 0; pos < twiss_table->curr; pos++)
+    {
+     if (twiss_table->p_nodes[pos] == node)  break;
+    }
+  if (pos < twiss_table->curr)
+    {
+     do
+       {
+	i++;
+	pl->parameters[i]->double_value = twiss_table->d_cols[i+3][pos];
+       }
+     while (strcmp(nl->names[i], "energy") != 0);
+    }
+}
+
 void fill_constraint_list(int type /* 1 node, 2 sequence */, 
                           struct command* cd, struct constraint_list* cl)
 {
@@ -3427,26 +3342,137 @@ void fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell,
     }
 }
 
-void fill_beta0(struct command* beta0, struct node* node)
+void fill_twiss_header(struct table* t)
 {
-  /* makes uses of fact that beta0 and twiss_table have the same variables
-     at the same place (+2)  up to energy inclusive */
-  struct command_parameter_list* pl = beta0->par;
-  struct name_list* nl = beta0->par_names;
-  int i = -1, pos;
-  if (twiss_table == NULL) return;
-  for (pos = 0; pos < twiss_table->curr; pos++)
+  int i, pos, h_length = 33; /* change adding header lines ! */
+  double dtmp;
+  struct table* s;
+  char tmp[16];
+
+  if (t == NULL) return;
+  /* ATTENTION: if you add header lines, augment h_length accordingly */
+  if (t->header == NULL)  t->header = new_char_p_array(h_length);
+  strcpy(tmp, t->org_sequ->name);
+  sprintf(c_dummy, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp), 
+          stoupper(tmp));
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  i = get_string("beam", "particle", tmp);
+  sprintf(c_dummy, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "mass");
+  sprintf(c_dummy, "@ MASS             %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "charge");
+  sprintf(c_dummy, "@ CHARGE           %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "energy");
+  sprintf(c_dummy, "@ ENERGY           %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "pc");
+  sprintf(c_dummy, "@ PC               %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "gamma");
+  sprintf(c_dummy, "@ GAMMA            %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "kbunch");
+  sprintf(c_dummy, "@ KBUNCH           %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "bcurrent");
+  sprintf(c_dummy, "@ BCURRENT         %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "sige");
+  sprintf(c_dummy, "@ SIGE             %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "sigt");
+  sprintf(c_dummy, "@ SIGT             %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "npart");
+  sprintf(c_dummy, "@ NPART            %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "ex");
+  sprintf(c_dummy, "@ EX               %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "ey");
+  sprintf(c_dummy, "@ EY               %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "et");
+  sprintf(c_dummy, "@ ET               %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  if ((pos = name_list_pos("summ", table_register->names)) > -1)
     {
-     if (twiss_table->p_nodes[pos] == node)  break;
-    }
-  if (pos < twiss_table->curr)
-    {
-     do
-       {
-	i++;
-	pl->parameters[i]->double_value = twiss_table->d_cols[i+3][pos];
-       }
-     while (strcmp(nl->names[i], "energy") != 0);
+     s = table_register->tables[pos];
+     pos = name_list_pos("length", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ LENGTH           %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("alfa", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ ALFA             %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("gammatr", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ GAMMATR          %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("q1", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ Q1               %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("q2", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ Q2               %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("dq1", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DQ1              %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("dq2", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DQ2              %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("dxmax", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DXMAX            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("dymax", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DYMAX            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("xcomax", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ XCMAX            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("ycomax", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ YCMAX            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("betxmax", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ BETXMAX          %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("betymax", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ BETYMAX          %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("xcorms", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ XCRMS            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("ycorms", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ YCRMS            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("dxrms", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DXRMS            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("dyrms", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DYRMS            %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("deltap", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ DELTAP           %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
     }
 }
 
@@ -3942,7 +3968,7 @@ int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
 
 int get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
 {
-  int i, n, pos;
+  int i, n;
   char* c[2];
   struct node* c_node;
   char tmp[NAME_L];
@@ -4141,7 +4167,7 @@ int get_table_range(char* range, struct table* table, int* rows)
   return n;
 }
 
-int get_stmt(FILE* file)
+int get_stmt(FILE* file, int supp_flag)
      /* Returns complete command(s) in in->buffers[inbuf_level] */
      /* return value:  0   no more input */
      /*                >0  OK */
@@ -4189,7 +4215,7 @@ int get_stmt(FILE* file)
        {
         if (mystrstr(&ca->c[ca->curr], "*/") == NULL)
 	  {
-	   *c_st = '\0'; ca->curr += supp_lt(&ca->c[ca->curr]);
+	   *c_st = '\0'; ca->curr += supp_lt(&ca->c[ca->curr], supp_flag);
            in_comment = 1; goto next;
 	  }
         else remove_range(&ca->c[ca->curr], "/*", "*/");
@@ -4200,7 +4226,7 @@ int get_stmt(FILE* file)
        }
      curl_level += char_cnt('{', &ca->c[ca->curr]) 
        - char_cnt('}', &ca->c[ca->curr]);
-     if ((ca->curr += supp_lt(&ca->c[ca->curr])) == 0) go_cond = 1;
+     if ((ca->curr += supp_lt(&ca->c[ca->curr], supp_flag)) == 0) go_cond = 1;
      else if ((go_cond = curl_level) == 0)
        go_cond = ca->c[ca->curr-1] == ';' || ca->c[ca->curr-1] == end ? 0 : 1;
     } 
@@ -4597,7 +4623,7 @@ void main_input(int top)
   while (in_stop == 0)
     {
      if (interactive && in->curr == 0) puts("X: ==>");
-     if (return_flag || get_stmt(in->input_files[in->curr]) == 0)
+     if (return_flag || get_stmt(in->input_files[in->curr], 0) == 0)
        {
         if (in->curr == 0) return;
         fclose(in->input_files[in->curr--]);
@@ -6323,6 +6349,7 @@ void pro_twiss()
      twiss_(oneturnmat, disp0, tarr->i);
      if ((twiss_success = get_option("twiss_success")))
        {
+        fill_twiss_header(twiss_table);
         complete_twiss_table(twiss_table);
         if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
         if (w_file) out_table(table_name, twiss_table, filename);
@@ -6894,7 +6921,7 @@ void seq_cycle(struct in_cmd* cmd)
         sprintf(c_dummy, "%s$_p_", node->name);
 	if (strchr(node->previous->name, '$') == NULL)
 	  {
-	   clone = clone_node(node);
+	   clone = clone_node(node, 0);
            strcpy(clone->name, c_dummy);
            link_in_front(clone, node);
 	  }
@@ -6983,7 +7010,7 @@ void seq_flatten(struct sequence* sequ)
   make_occ_list(sequ);
   all_node_pos(sequ);
   sequ->ex_nodes = new_node_list(2*sequ->nodes->curr);
-  expand_sequence(sequ);
+  expand_sequence(sequ, 0);
   sequ->nested = 0;
   nl = sequ->nodes;
   sequ->nodes = sequ->ex_nodes;
@@ -8423,12 +8450,13 @@ void supp_char(char c, char* string)
   *cp = '\0';
 }
 
-int supp_lt(char* inbuf) /* suppress leading, trailing blanks */
+int supp_lt(char* inbuf, int flag) 
+         /* suppress leading, trailing blanks and replace some special char.s*/
 {
   int l = strlen(inbuf), i, j;
   replace(inbuf, '\x9', ' '); /* tab */
   replace(inbuf, '\xd', ' '); /* Windows e-o-l */
-  replace(inbuf, '\n', ' '); /* e-o-l */
+  if (flag == 0)  replace(inbuf, '\n', ' '); /* e-o-l */
   supp_tb(inbuf); /* suppress trailing blanks */
   if ((l = strlen(inbuf)) > 0)
     {
@@ -9301,7 +9329,7 @@ void use_sequ(struct in_cmd* cmd)
         pos = name_list_pos("range", nl);
         if (nl->inform[pos])  /* parameter has been read */
            current_range = tmpbuff(pl->parameters[pos]->string);
-        expand_curr_sequ();        
+        expand_curr_sequ(0);        
        }
      else warning("unknown sequence skipped:", name);
     }

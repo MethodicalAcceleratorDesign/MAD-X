@@ -114,8 +114,10 @@ struct name_list* clone_name_list(struct name_list* p)
   return clone;
 }
 
-struct node* clone_node(struct node* p)
+struct node* clone_node(struct node* p, int flag)
 {
+  /* Transfers errors from original nodes if flag != 0; 
+     this is needed for SXF input  */
   struct node* clone = new_node(p->name);
   strcpy(clone->name,p->name);
   clone->base_name = p->base_name;
@@ -129,6 +131,11 @@ struct node* clone_node(struct node* p)
   clone->p_elem = p->p_elem;
   clone->p_sequ = p->p_sequ;
   clone->savebeta = p->savebeta;
+  if (flag)
+    {
+     clone->p_al_err = p->p_al_err;
+     clone->p_fd_err = p->p_fd_err;
+    }
   return clone;
 }
 
@@ -477,6 +484,25 @@ struct var_list* delete_var_list(struct var_list* varl)
   if (varl->vars != NULL) free(varl->vars);
   free(varl);
   return NULL;
+}
+
+double find_value(char* name, int ntok, char** toks)
+     /* returns value found in construct "name = value", or INVALID */
+{
+  double val = INVALID;
+  int j;
+  for (j = 0; j < ntok; j++)
+    {
+     if (strcmp(toks[j], name) == 0)
+       {
+	if (j+2 < ntok && *toks[j+1] == '=')
+	  {
+	   sscanf(toks[j+2], "%lf", &val);
+           break;
+	  }
+       }
+    }
+  return val;
 }
 
 void grow_char_array( /* doubles array size */

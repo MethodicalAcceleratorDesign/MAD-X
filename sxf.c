@@ -1,7 +1,4 @@
-/* extract SXF file from mad-X */
-/* #define _call_tree_ */
-
-
+/* extract SXF file from mad-X, or read SXF file into mad-X */
 void pro_sxf(struct in_cmd* cmd)
      /* controls reading and writing of SXF format files */
 {
@@ -27,12 +24,9 @@ void pro_sxf(struct in_cmd* cmd)
   if (filename == NULL) filename = permbuff("dummy");
   if (strcmp(cmd->tok_list->p[0], "sxfread") == 0)
     {
-     if ((inout = fopen(filename, "r")) == NULL)
-       {
-        warning("cannot open input file: ", filename);
-        return;
-       }
-     sxf_read(cmd->clone, inout);
+     if (down_unit(filename) == 0)  return;
+     sxf_read(cmd->clone);
+     fclose(in->input_files[in->curr--]);
     }
   else if (strcmp(cmd->tok_list->p[0], "sxfwrite") == 0)
     {
@@ -45,11 +39,316 @@ void pro_sxf(struct in_cmd* cmd)
     }
 }
 
-void sxf_read(struct command* comm, FILE* in)
+void sxf_read(struct command* comm)
      /* reads an expanded sequence including errors from an SXF file */
 {
-  puts("entered sxfread");
+  struct sequence* keep_sequ = current_sequ;
+  int n, rcode, echo, err, izero = 0, count = 0;
+  FILE* in_file = in->input_files[in->curr];
+  char *p, *pp;
+  if (fgets(l_dummy, AUX_LG, in_file) == NULL)
+    {
+     warning("SXF input file empty,"," ignored");
+     return;
+    }
+  if ((rcode = version_header(l_dummy)) == 0)
+    {
+     warning("SXF header missing or wrong,"," ignored");
+     return;
+    }
+  sequ_is_on = 1;
+  echo = get_option("echo");
+  set_option("echo", &izero);
+  n = get_stmt(in_file, 1);
+  replace(in->buffers[in->curr]->c_a->c, ',', ' ');
+  replace(in->buffers[in->curr]->c_a->c, '\n', ' ');
+  p = strtok(in->buffers[in->curr]->c_a->c, ";");
+  while(p)
+    {
+     pp = &p[strlen(p)+1];
+     if ((err = sxf_decin(p, count++)) == -1)
+       {
+        warning("No sequence name found, ", "ignored");
+        goto term;
+       }
+     else if (err == 1)  break;
+     p = strtok(pp, ";");
+    }
+  if (current_sequ->length == zero)
+    {
+     warning("No endsequence with length found, ", "ignored");
+     current_sequ = keep_sequ;
+     goto term;
+    }
+  add_to_sequ_list(current_sequ, sequences);
+  if (attach_beam(current_sequ) == 0)
+     fatal_error("USE - sequence without beam:", current_sequ->name);
+  current_sequ->beam = current_beam;
+  current_range = tmpbuff("#s/#e");
+  expand_curr_sequ(1);        
+ term:
+  set_option("echo", &echo);
+  sequ_is_on = 0;
+  return;
 }
+
+int sxf_decin(char* p, int count) /* decode one SXF input item, store */
+{
+  int j, n, ntok, pos, rs, re;
+  char** toks = tmp_p_array->p;
+  struct command* clone;
+  struct element* el;
+  double at, vec[FIELD_MAX];
+
+  tmp_p_array->curr = 0;
+  pre_split(p, l_dummy, 0);
+  ntok = mysplit(l_dummy, tmp_p_array);
+  ntok = join_prefix("-", ntok, toks);
+  if (count == 0)
+    {
+     if (ntok < 2 || strcmp(toks[1], "sequence") != 0) return -1;
+     else current_sequ = new_sequence(toks[0], 0);
+     if (occ_list == NULL) 
+           occ_list = new_name_list(10000);  /* for occurrence count */
+     else occ_list->curr = 0;
+     current_sequ->cavities = new_el_list(100);
+     pos = name_list_pos("marker", defined_commands->list);
+     clone = clone_command(defined_commands->commands[pos]);
+     sprintf(c_dummy, "%s$start", current_sequ->name);
+     el = make_element(c_dummy, "marker", clone, 0);
+     make_elem_node(el, 1);
+     current_sequ->start = current_node;
+     for (j = 3; j < ntok; j++) /* push first element down */
+       {
+	toks[j-3] = toks[j];
+       }
+     ntok -= 3;
+    }
+  else if (strcmp(toks[0], "endsequence") == 0)
+    {
+     current_sequ->length = find_value("at", ntok, toks);
+     pos = name_list_pos("marker", defined_commands->list);
+     clone = clone_command(defined_commands->commands[pos]);
+     sprintf(c_dummy, "%s$end", current_sequ->name);
+     el = make_element(c_dummy, "marker", clone, 0);
+     make_elem_node(el, 1);
+     current_node->at_value = current_sequ->length;
+     current_sequ->end = current_node;
+     current_sequ->start->previous = current_sequ->end;
+     current_sequ->end->next = current_sequ->start;
+     return 1;
+    }
+  if ((pos = name_list_pos(toks[1], defined_commands->list)) < 0)
+  	  fatal_error("element type not found:", toks[1]);
+  clone = clone_command(defined_commands->commands[pos]);
+  sxf_fill_command(clone, ntok, toks);
+  el = make_element(toks[0], toks[1], clone, sequ_is_on+1);
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
+      find_element(el->name, current_sequ->cavities) == NULL)
+    add_to_el_list(el, 0, current_sequ->cavities, 0);
+  add_to_name_list(el->name, 1, occ_list);
+  make_elem_node(el, 1);
+  if ((at = find_value("at", ntok, toks)) == INVALID)
+	  fatal_error("element without position:", toks[0]);
+  current_node->at_value = at;
+  for (n = 0; n < ntok; n++)  if(strcmp("align.dev", toks[n]) == 0) break;
+  if (n < ntok)
+    {
+     get_bracket_t_range(toks, '{', '}', n, ntok, &rs, &re);
+     if (rs < n) fatal_error("alignment errors empty:", toks[0]);
+     n = sxf_align_fill(rs, re, ntok, toks, vec);
+     current_node->p_al_err = new_double_array(n);
+     current_node->p_al_err->curr = n;
+     for (j = 0; j < n; j++) current_node->p_al_err->a[j] = vec[j];
+    }
+  for (n = 0; n < ntok; n++)  if(strcmp("body.dev", toks[n]) == 0) break;
+  if (n < ntok)
+    {
+     get_bracket_t_range(toks, '{', '}', n, ntok, &rs, &re);
+     if (rs < n) fatal_error("field errors empty:", toks[0]);
+     for (j = 0; j < FIELD_MAX; j++) vec[j] = zero;
+     n = sxf_field_fill(rs, re, ntok, toks, vec);
+     current_node->p_fd_err = new_double_array(n);
+     current_node->p_fd_err->curr = n;
+     for (j = 0; j < n; j++) current_node->p_fd_err->a[j] = vec[j];
+    }
+  return 0;
+}
+
+int join_prefix(char* prefix, int ntok, char** toks)
+     /* joins two tokens into one if the first is the "prefix" */
+{
+  int j, k;
+  for (j = 0; j < ntok; j++)
+    {
+     if (strcmp(toks[j], prefix) == 0 && j+1 < ntok)
+       {
+	strcat(toks[j], toks[j+1]);
+        for (k = j+1; k < ntok-1; k++)  toks[k] = toks[k+1];
+        ntok--;
+       }
+    }
+  return ntok;
+}
+
+void sxf_fill_command(struct command* comm, int ntok, char** toks)
+{
+  struct name_list* nl = comm->par_names;
+  struct command_parameter_list* pl = comm->par;
+  int n, pos, rs, re;
+  double length = zero;
+
+  if ((pos = name_list_pos("l", nl)) > -1)
+    {
+     if (strstr(toks[1], "bend"))  length = find_value("arc", ntok, toks);
+     else                          length = find_value("l", ntok, toks);
+     if (length == INVALID) length = zero;
+     pl->parameters[pos]->double_value = length;
+    }
+  for (n = 0; n < ntok; n++)  if(strcmp("body", toks[n]) == 0) break;
+  if (n < ntok)
+    {
+     get_bracket_t_range(toks, '{', '}', n, ntok, &rs, &re);
+     if (rs < n) fatal_error("element body empty:", toks[0]);
+     sxf_body_fill(comm, rs, re, ntok, toks, length);
+    }
+}
+
+int sxf_align_fill(int start, int end, int ntok, char** toks, double* vec)
+{
+  int cnt = 0, j, rss, res;
+
+  if (strcmp(toks[start+1], "al") == 0)
+    {
+     get_bracket_t_range(toks, '[', ']', start+3, ntok, &rss, &res);
+     if (rss == start+3)  /* square bracket found */
+       {
+	rss++; res--;
+        for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
+       }
+    }
+  return cnt;
+}
+
+int sxf_field_fill(int start, int end, int ntok, char** toks, double* vec)
+{
+  int cnt[2], i, j, k, rss, res;
+
+  for (k = 0; k < 2; k++)
+    {
+     cnt[k] = 0;
+     for (i = start+1; i < end; i++)
+       {
+        if ((k == 0 && strcmp(toks[i], "kl") == 0) ||
+            (k == 1 && strcmp(toks[i], "kls") == 0))
+          {
+           get_bracket_t_range(toks, '[', ']', i+2, ntok, &rss, &res);
+           if (rss == i+2)  /* square bracket found */
+             {
+	       rss++; res--; cnt[k] = k;
+              for (j = rss; j <= res; j++) 
+		{
+                 sscanf(toks[j], "%lf", &vec[cnt[k]]);
+                 cnt[k] += 2;
+		}
+	     }
+          }
+       }
+    }
+  return (cnt[0] < cnt[1] ? cnt[1]-1 : cnt[0]-1);
+}
+
+void sxf_body_fill(struct command* comm, int start, int end, int ntok,
+                   char** toks, double length)
+{
+  struct name_list* nl = comm->par_names;
+  struct command_parameter_list* pl = comm->par;
+  int cnt, j, k, pos, rss, res, skew;
+  double vec[20];
+
+  /* scan for magnet strengths first - special format */
+  for (skew = 0; skew < 2; skew++)
+    {
+     for (k = start+1; k < end; k++) 
+       {
+	 if      (skew == 0 && strcmp("kl", toks[k]) == 0)  break;
+         else if (skew == 1 && strcmp("kls", toks[k]) == 0) break;
+       }
+     if (k < end)
+       {
+        get_bracket_t_range(toks, '[', ']', k, ntok, &rss, &res);
+        if (rss == k + 2)  /* square bracket found */
+          {
+	   rss++; res--;
+          }
+        else rss = res = k+2;
+        cnt = 0;
+        for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
+        if (strstr(toks[1], "bend"))
+          {
+	   if (length == zero) fatal_error("bend without length:", toks[0]);
+           if (skew == 0) pos = name_list_pos("k0", nl);
+           else           pos = name_list_pos("k0s", nl);
+           pl->parameters[pos]->double_value = vec[0] / length;
+          }
+        else if (strstr(toks[1], "quad"))
+          {
+	   if (length == zero) fatal_error("quad without length:", toks[0]);
+           if (skew == 0)  pos = name_list_pos("k1", nl);
+           else            pos = name_list_pos("k1s", nl);
+           pl->parameters[pos]->double_value = vec[1] / length;
+          }
+        else if (strstr(toks[1], "sext"))
+          {
+	   if (length == zero) fatal_error("sextupole without length:", 
+                                            toks[0]);
+           if (skew == 0)  pos = name_list_pos("k2", nl);
+           else            pos = name_list_pos("k2s", nl);
+           pl->parameters[pos]->double_value = vec[2] / length;
+          }
+        else if (strstr(toks[1], "oct"))
+          {
+	   if (length == zero) fatal_error("octupole without length:", 
+                                            toks[0]);
+           if (skew == 0)  pos = name_list_pos("k3", nl);
+           else            pos = name_list_pos("k3s", nl);
+           pl->parameters[pos]->double_value = vec[3] / length;
+          }
+        else if (strstr(toks[1], "kick"))
+          {
+           if (skew == 0)  pos = name_list_pos("hkick", nl);
+           else            pos = name_list_pos("vkick", nl);
+           pl->parameters[pos]->double_value = vec[0];
+          }
+        else if (strstr(toks[1], "multi"))
+          {
+           if (skew == 0)  pos = name_list_pos("knl", nl);
+           else            pos = name_list_pos("ksl", nl);
+           while(pl->parameters[pos]->double_array->max < cnt)
+	     grow_double_array(pl->parameters[pos]->double_array);
+           for (j = 0; j < cnt; j++) 
+	     {
+              pl->parameters[pos]->double_array->a[j] = vec[j];
+	     }
+           pl->parameters[pos]->double_array->curr = cnt;
+           pl->parameters[pos]->expr_list 
+              = delete_expr_list(pl->parameters[pos]->expr_list);
+	  }
+       }
+    }
+  /* now all the other parameters */
+  for (k = start+1; k < end; k++) 
+    {
+     if (isalpha(*toks[k]) && strstr(toks[k], "kl") == NULL)
+       {
+	if ((pos = name_list_pos(toks[k], nl)) < 0)
+	    warning("unknown input parameter skipped: ", toks[k]);
+        else if (k+2 < end && *toks[k+1] == '=' && *toks[k+2] != '[')
+           sscanf(toks[k+2], "%lf", &pl->parameters[pos]->double_value);
+       }
+    }
+}
+        
 
 void sxf_write(struct command* comm, FILE* out)
      /* writes the currently USEd sequence in SXF format to a file */
@@ -97,6 +396,23 @@ void sxf_rtag()
      lower(tag_type[j]); lower(tag_code[j]); 
     }
   if (tag_cnt > 0)  tag_flag = 2;
+}
+
+int get_token_list                 /* returns no. of tokens */
+                   (char* text,    /* input: blank separated tokens */
+                    char** tokens, /* output: token pointer list */
+                    int max_tok)   /* length of tokens */
+{
+  char* p;
+  int count = 0;
+
+  p = strtok(text," =;\n");
+  while (p != NULL && count < max_tok)
+    {
+     tokens[count++] = p;
+     p = strtok(NULL," =;\n");
+    }
+  return count;
 }
 
 void put_line(FILE* out, char* s)
@@ -238,7 +554,6 @@ void fill_dump(FILE* out, int flag, char* label, double* values, int count,
                int inc)
 {
   int j;
-  double temp;
 
   if (flag == 0) sprintf(c_dummy, " %s = ", label);
   else           sprintf(c_dummy, " %s = [", label);
@@ -351,4 +666,17 @@ void r_indent()
      exit(1);
     }
   indent = b_indent[--b_level];
+}
+
+int version_header (char* line)            /* processes and checks header */
+{
+  int j = 0;
+  char* header[] = {"//", "sxf", "version", "1.0"};
+  char* token_list[10];
+  if(get_token_list(line, token_list, 10) != 4) return 0;
+  for (j = 0; j < 3; j++)
+    {
+     if (strcmp(header[j], stolower(token_list[j])) != 0) return 0;
+    }
+  return 1;
 }

@@ -111,7 +111,7 @@ char sxf_table_names[][TABLE_KEY] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 61; /* last column filled by twiss_complete */
+int twiss_fill_end = 61; /* last standard column filled by twiss_complete */
 int twiss_table_types[] =
 {
 3, 3, 2, 2, 2,

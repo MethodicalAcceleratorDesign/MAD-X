@@ -97,7 +97,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
      /* fprintf(prt_file, "%s %s\n", "call TWISS from matching: sequence=", 
                match_sequs->sequs[i]->name); */
      current_twiss = local_twiss[i]->clone;
-     if (get_option("varylength") != zero) expand_curr_sequ();
+     if (get_option("varylength") != zero) expand_curr_sequ(0);
      pro_twiss(); 
      if (twiss_success)
        {
@@ -186,7 +186,7 @@ void match_end(struct in_cmd* cmd)
   struct node* c_node;
   /* OB 5.3.2002: write out all final constraint values and vary parameters */
   penalty = zero;
-  if (get_option("varylength") != zero) expand_curr_sequ();
+  if (get_option("varylength") != zero) expand_curr_sequ(0);
   pro_twiss(); 
   current_const = 0;
   set_option("match_summary", &print_match_summary);
