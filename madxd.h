@@ -108,7 +108,7 @@ int is_expr_start(char c) {return (strchr("-+(",c) || is_operand(c));}
 int mymax(int a, int b) {return (a > b ? a : b);}
 int mymin(int a, int b) {return (a < b ? a : b);}
 int str_pos(const char s[], char c) 
-{int i; for (i = 0; i < strlen(s); i++) if (s[i] == c) return i; return -1;}
+{unsigned int i; for (i = 0; i < strlen(s); i++) if (s[i] == c) return i; return -1;}
 
 /* Fortran routines called from C */
 extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
