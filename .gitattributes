@@ -88,6 +88,7 @@
 /sxf.c -text
 /timel.c -text
 /timest.f90 -text
+/timex.f90 -text
 /touschek.F -text
 /track.fi -text
 /trrun.F -text
