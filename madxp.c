@@ -1229,12 +1229,13 @@ void exec_beam(struct in_cmd* cmd, int flag)
   struct command_parameter_list* pl = cmd->clone->par;
   struct name_list* nl = cmd->clone->par_names;
   int pos = name_list_pos("sequence", nl);
+  int bpos = name_list_pos("sequence", current_beam->par_names);
   if (nl->inform[pos])
     {
      name = pl->parameters[pos]->string;
      if ((current_beam = find_command(name, beam_list)) == NULL)
        {
-      set_defaults("beam");
+        set_defaults("beam");
         add_to_command_list(name, current_beam, beam_list, 0);
        }
     }
@@ -1243,14 +1244,10 @@ void exec_beam(struct in_cmd* cmd, int flag)
      name = name_def;
      current_beam = find_command(name, beam_list);
     }
-  current_beam->par->parameters[pos]->string = permbuff(name);
+  current_beam->par->parameters[bpos]->string = permbuff(name);
   current_beam->beam_def = 1;
   if (flag == 0) update_beam(cmd->clone);
-  else if (flag == 1)
-    {
-     set_defaults("beam");
-     add_to_command_list(name, current_beam, beam_list, 0);
-    }
+  else if (flag == 1)  set_defaults("beam");
   current_beam = keep_beam;
 }
 
@@ -2464,7 +2461,7 @@ if (final_message == 0)
     {
       final_message = 1;
 #ifdef _FULL
-      if (plots_made) 
+      if (plots_made)
 	{
 	  gxterm_();
 	}
@@ -4220,7 +4217,7 @@ void update_beam(struct command* comm)
   int pos, lp;
   char* name = blank;
   double energy = 0, beta = 0, gamma = 0, charge = 0, freq0 = 0, bcurrent = 0,
-         npart = 0, mass = 0, pc = 0, ex, exn, ey, eyn, alfa, circ = one,
+         npart = 0, mass = 0, pc = 0, ex, exn, ey, eyn, alfa, circ = 0,
          arad = 0;
   pos = name_list_pos("particle", nlc);
   if (nlc->inform[pos])  /* parameter has been read */
