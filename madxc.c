@@ -655,26 +655,41 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
      rst = get_variable("n");
      fprintf(fddata,"%d %d %e %e %e %e %e %e\n",ip,rst,cprp(monvec,imon),cprp(resvec,imon),crms(monvec,imon),crms(resvec,imon),copk(monvec,imon),copk(resvec,imon));
   }
+
   if(print_correct_opt > 0) {
-  printf("CORRECTION SUMMARY:   \n\n");                                    
-  printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",crms(monvec,imon),crms(resvec,imon));
-  printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",cprp(monvec,imon),cprp(resvec,imon));
+     printf("CORRECTION SUMMARY:   \n\n");                                    
+     printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",crms(monvec,imon),crms(resvec,imon));
+     printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",cprp(monvec,imon),cprp(resvec,imon));
+  }
+
   if(print_correct_opt > 1) {
   printf("Monitor:  Before:     After:    Difference:\n");                                    
   printf("           (mm)        (mm)         (mm)   \n");                                    
+  }
+
   for(i=0;i<imon;i++) {
-    printf("%s   %-4.3f     %-4.3f     %-4.3f\n",m[nm[i]].p_node->name,monvec[i],resvec[i],resvec[i]-monvec[i]);
+    if(print_correct_opt > 1) {
+      printf("%s   %-4.3f     %-4.3f     %-4.3f\n",m[nm[i]].p_node->name,monvec[i],resvec[i],resvec[i]-monvec[i]);
+    }
     m[nm[i]].val.after[ip-1] = resvec[i];
     pro_correct_fill_mon_table(ip,m[nm[i]].p_node->name,monvec[i],resvec[i]);
   }
-  printf("Max strength: %e\n",copk(corvec,icor));
-  printf("Corrector:  Before:     After:    Difference:\n");                                    
-  printf("             (mrad)     (mrad)       (mrad)  \n");                                    
-  for(i=0;i<icor;i++) {
-  if(fddata != NULL) {
-     fprintf(fcdata,"%s %e\n",c[nc[i]].p_node->name,corvec[nx[i]-1]);
+
+  if(print_correct_opt > 1) {
+     printf("Max strength: %e\n",copk(corvec,icor));
+     printf("Corrector:  Before:     After:    Difference:\n");     
+     printf("             (mrad)     (mrad)       (mrad)  \n");  
   }
-    printf("%s %-3.6f %-3.6f %-3.6f\n",c[nc[i]].p_node->name,c[nc[i]].val.before[ip-1],corvec[nx[i]-1],corvec[nx[i]-1]-c[nc[i]].val.before[ip-1]);
+
+  for(i=0;i<icor;i++) {
+    if(fddata != NULL) {
+       fprintf(fcdata,"%s %e\n",c[nc[i]].p_node->name,corvec[nx[i]-1]);
+    }
+
+    if(print_correct_opt > 1) {
+      printf("%s %-3.6f %-3.6f %-3.6f\n",c[nc[i]].p_node->name,c[nc[i]].val.before[ip-1],corvec[nx[i]-1],corvec[nx[i]-1]-c[nc[i]].val.before[ip-1]);
+    }
+
     c[nc[i]].val.after[ip-1] = corvec[nx[i]-1];
     if(ip == 1) {
       c[nc[i]].p_node->chkick = 0.001*corvec[nx[i]-1];
@@ -682,8 +697,6 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
       c[nc[i]].p_node->cvkick = 0.001*corvec[nx[i]-1];
     }
     pro_correct_fill_corr_table(ip,c[nc[i]].p_node->name,c[nc[i]].val.before[ip-1],corvec[nx[i]-1]);
-  }
-  }
   }
 }
 
