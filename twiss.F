@@ -1868,12 +1868,13 @@
       integer code
       logical fsec, ftrk, fmap, bend
       double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
-      double precision theta, zero, st, ct, tmp
+      double precision theta,st,ct,tmp,plot_tilt,zero
       parameter (zero = 0.d0)
 !---- Initialization
       call dzero(ek,6)
       call m66one(re)
       call dzero(te,216)
+      plot_tilt=zero
       fmap=.false.
       bend = code .eq. 2 .or. code .eq. 3
       el = node_value('l ')
@@ -1921,7 +1922,7 @@
 
 !---- Quadrupole.
    50 continue
-      call tmquad(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Sextupole.
@@ -2054,21 +2055,26 @@
       call dzero(tw,216)
 
 !---- Test for non-zero length.
+
       fmap = el .ne. zero
       if (fmap) then
         call dzero(f_errors,maxferr+1)
         n_ferr = node_fd_errors(f_errors)
         bv0 = node_value('dipole_bv ')
         bvk = node_value('other_bv ')
-        arad = get_value('probe ','arad ')
-        deltap = get_value('probe ','deltap ')
-        gamma = get_value('probe ','gamma ')
-        dorad = get_value('probe ','radiate ') .ne. zero
-        an = bv0 * node_value('angle ')
+        if (ftrk) then
+          arad = get_value('probe ','arad ')
+          deltap = get_value('probe ','deltap ')
+          gamma = get_value('probe ','gamma ')
+          dorad = get_value('probe ','radiate ') .ne. zero
+        endif  
+        an = bv0 * node_value('angle ') * el/node_value('l ')
         tilt = -node_value('tilt ')
         e1 = bv0 * node_value('e1 ')
         e2 = bv0 * node_value('e2 ')
+
 !--- bvk applied further down
+
         sk1 = node_value('k1 ')
         sk2 = node_value('k2 ')
         h1 = node_value('h1 ')
@@ -2135,6 +2141,7 @@
           if(centre_bttk) call twbttk(re,te)
         endif
 !---- End
+
         call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
 !---- Fringe fields.
@@ -2161,7 +2168,7 @@
           call tmtrak(ek,re,te,orbit,orbit)
 
 !---- Half radiation effects at exit.
-          if (dorad) then
+          if (ftrk .and. dorad) then
             x =   orbit(1) * ct + orbit(3) * st
             y = - orbit(1) * st + orbit(3) * ct
             hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                &
@@ -3419,7 +3426,7 @@
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
       end
-      subroutine tmquad(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
       implicit none
 #ifdef _WIN32
       include 'win32calls.fi'
@@ -3430,6 +3437,7 @@
 ! Input:                                                               *
 !   fsec      (logical) if true, return second order terms.            *
 !   ftrk      (logical) if true, track orbit.                          *
+!   plot_tilt (double)  external tilt needed for plot                  *
 ! Input/output:                                                        *
 !   orbit(6)  (double)  closed orbit.                                  *
 ! Output:                                                              *
@@ -3445,7 +3453,7 @@
       integer i,j,n_ferr,node_fd_errors
       double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
      &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
-     &bvk,field(2,0:1),node_value,get_value,zero,one,two,three
+     &bvk,field(2,0:1),node_value,get_value,plot_tilt,zero,one,two,three
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -3472,6 +3480,7 @@
       sk1 = sk1 + bvk * field(1,1)/el
       sk1s = sk1s + bvk * field(2,1)/el
       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
+      tilt=tilt+plot_tilt
       arad = get_value('probe ','arad ')
       gamma = get_value('probe ','gamma ')
       deltap = get_value('probe ','deltap ')
@@ -3479,7 +3488,7 @@
       sk1 = sk1 / (one + deltap)
 
 !---- Half radiation effect at exit.
-      if (dorad) then
+      if (dorad.and.ftrk) then
         rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
      &  orbit(3)**2)
         pt = orbit(6)
@@ -3499,7 +3508,7 @@
       call qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
 !---- Half radiation effect at exit.
-      if (dorad) then
+      if (dorad.and.ftrk) then
         rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
      &  orbit(3)**2)
         pt = orbit(6)
@@ -3608,6 +3617,7 @@
       endif
 
 !---- Apply tilt.
+
       if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
 !---- Track orbit.
