@@ -1,0 +1,8 @@
+      integer bunch
+      double precision circ,clight,arad,freq0,alpha,amass,charge,en0,   &
+     &gammas,gamma,ex,ey,et,sigt,sige,betas,beta,parnum,currnt,sigx,    &
+     &sigy,alfa
+      common /machin/ circ,clight,arad,freq0,alpha
+      common /beamdb/ amass,charge,en0,gammas,gamma,ex,ey,et,sigt,sige, &
+     &betas,beta,parnum,currnt,sigx,sigy,alfa
+      common /beamdbi/ bunch

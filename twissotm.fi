@@ -1,0 +1,2 @@
+      double precision rotm
+      common/twissotm/ rotm(6,6)

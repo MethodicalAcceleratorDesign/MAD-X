@@ -1,0 +1,5 @@
+      integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max
+      parameter(bbd_max=200)
+      double precision bb_kick
+      common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos
+      common/bbr/bb_kick(2,bbd_max)

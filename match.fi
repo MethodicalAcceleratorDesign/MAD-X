@@ -1,0 +1,4 @@
+      integer icovar,ilevel
+      double precision edm,fmin
+      common / matchr / edm,fmin
+      common / matchi / icovar,ilevel

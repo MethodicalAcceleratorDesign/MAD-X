@@ -1,0 +1,3 @@
+      double precision dynapfrac,dktrturns,xend,pxend,yend,pyend
+      common / dynaptable1 / dynapfrac,dktrturns,xend,pxend,yend,pyend, &
+     &tend,ptend,smear,yapunov

@@ -1,0 +1,4 @@
+      double precision arad,betas,beti,gammas,dtbyds,deltas
+      common / trackd / arad,betas,beti,gammas,dtbyds,deltas
+      logical dodamp,dorad,dorand
+      common / trackl / dodamp,dorad,dorand

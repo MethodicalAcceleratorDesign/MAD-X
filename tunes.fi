@@ -1,0 +1,2 @@
+      double precision x0,y0,tunx,tuny,dtune
+      common / tunes / x0,y0,tunx,tuny,dtune
