@@ -383,6 +383,7 @@ int get_select_ex_ranges(struct sequence*,struct command_list*,
 int get_select_ranges(struct sequence*,struct command_list*,
                       struct node_list*);
 void get_select_t_ranges(struct command_list*, struct table*);
+int get_sub_range(char*, struct sequence*, struct node**);
 void get_sxf_names();
 int square_to_colon(char*);
 int get_stmt(FILE*);

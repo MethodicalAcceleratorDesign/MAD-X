@@ -3940,6 +3940,55 @@ int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
   return n;
 }
 
+int get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
+{
+  int i, n, pos;
+  char* c[2];
+  struct node* c_node;
+  char tmp[NAME_L];
+  if (sequ == NULL) return 0;
+  strcpy(c_dummy, range); stolower(c_dummy);
+  c[0] = strtok(c_dummy, "/");
+  if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
+    n = 1;
+  else n = 2;
+  for (i = 0; i < n; i++)
+    {
+     if (*c[i] == '#')
+       {
+	if (strncmp(c[i], "#s", 2) == 0) nodes[i] = sequ->range_start;
+	else if (strncmp(c[i], "#e", 2) == 0) nodes[i] = sequ->range_end;
+        else
+	  {
+	   warning("illegal expand range ignored:", range);
+           return 0;
+	  }
+       }
+     else
+       {
+	strcpy(tmp, c[i]);
+        if (square_to_colon(tmp) == 0)
+	  {
+	   warning("illegal expand range ignored:", range);
+           return 0;
+	  }
+        c_node = sequ->range_start;
+        while(c_node)
+	  {
+	   if (strcmp(c_node->name, tmp) == 0) break;
+           if ((c_node = c_node->next) == sequ->range_end)
+	     {
+	      warning("illegal expand range ignored:", range);
+              return 0;
+	     }
+	  }
+	nodes[i] = c_node;
+       }
+    }
+  if (n == 1) nodes[1] = nodes[0];
+  return n;
+}
+
 void get_sxf_names()
 {
   int i = 0;
@@ -6212,7 +6261,7 @@ void pro_twiss()
   use_range[1] = current_sequ->range_end;
   if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
     {
-     if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
+     if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
        {
 	current_sequ->range_start = nodes[0];
 	current_sequ->range_end = nodes[1];
