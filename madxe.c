@@ -472,11 +472,27 @@ void pro_error_make_efield_table()
   nend = mysequ->ex_end;
 
       while (nanf != nend) {
-        if((nanf->sel_err == 1) && (nanf->p_fd_err != NULL)) {
+        if(nanf->sel_err == 1) {
            string_to_table("efield","name",nanf->name);
 /* */
-           for (j=1; j < ttb->num_cols; j++) {
-                ttb->d_cols[j][ttb->curr] = nanf->p_fd_err->a[j-1];
+                  /*
+           printf("=> %s %e %e %e\n",nanf->name,nanf->p_fd_err,nanf->p_al_err);
+                  */
+           if(nanf->p_al_err != NULL) {
+              for (j=1; j <= ALIGN_MAX; j++) {
+                 ttb->d_cols[j][ttb->curr] = nanf->p_al_err->a[j-1];
+                  /*
+                 printf("Align: %d %e\n",j,ttb->d_cols[j][ttb->curr]);
+                  */
+              }
+           }
+           if(nanf->p_fd_err != NULL) {
+              for (j=1; j < ttb->num_cols-ALIGN_MAX; j++) {
+                 ttb->d_cols[j+ALIGN_MAX][ttb->curr] = nanf->p_fd_err->a[j-1];
+                  /*
+                 printf("Field: %d %e\n",j,ttb->d_cols[j][ttb->curr]);
+                  */
+              }
            }
 /* */
            augment_count("efield");
