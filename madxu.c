@@ -508,7 +508,7 @@ struct char_p_array* delete_char_p_array(struct char_p_array* pa, int flag)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", pa->name);
   if (flag)
     {
-     for (i = 0; i < pa->curr; i++)  if (pa->p[i]) free(pa->p[i]);
+     for (i = 0; i < pa->curr; i++)  free(pa->p[i]);
     }
   if (pa->p != NULL)  free(pa->p);
   free(pa);

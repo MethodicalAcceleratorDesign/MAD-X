@@ -2346,7 +2346,7 @@ void expand_line(struct char_p_array* l_buff)
               for (k = 1; k <= add; k++)
 		{
 		 for (j = pos+1; j <= pos+number; j++) 
-		   l_buff->p[j+k*number] = l_buff->p[j];
+		   l_buff->p[j+k*number] = tmpbuff(l_buff->p[j]);
 		}
               for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
 		{
@@ -2414,8 +2414,7 @@ void expand_line(struct char_p_array* l_buff)
   n = 0;
   for (i = 0; i < l_buff->curr; i++) 
     {
-     if (isalpha(*l_buff->p[i]))  l_buff->p[n++] = l_buff->p[i];
-     /*     else free(l_buff->p[i]);*/
+     if (isalpha(*l_buff->p[i])) l_buff->p[n++] = l_buff->p[i];
     }
   l_buff->curr = n;
   lbpos = delete_int_array(lbpos);
@@ -2966,7 +2965,6 @@ void madx_init()
   selected_elements = new_el_list(10000);
   tmp_p_array = new_char_p_array(1000);
   tmp_l_array = new_char_p_array(1000);
-  line_buffer = new_char_p_array(1000);
   sxf_list = new_name_list(50);
   deco_init();
   get_defined_constants();
@@ -4191,15 +4189,7 @@ void make_sequ_from_line(char* name)
   struct element* el;
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
-  for (j = 0; j < line_buffer->curr; j++)
-    {
-     if (line_buffer->p[j])  
-       {
-        free(line_buffer->p[j]);
-        line_buffer->p[j] = NULL;
-       }
-    }
-  line_buffer->curr = 0;
+  line_buffer = new_char_p_array(1000);
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
   current_sequ = new_sequence(name, 0); /* node positions = centre */
@@ -4225,6 +4215,7 @@ void make_sequ_from_line(char* name)
   current_sequ->end = current_node;
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
+  if(line_buffer) delete_char_p_array(line_buffer,1);
 }
 
 void make_sequ_node(struct sequence* sequ, int occ_cnt)
