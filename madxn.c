@@ -31,7 +31,7 @@ void adjust_beam()
      /* adjusts beam parameters to current beta, gamma, bcurrent, npart */
 {
   struct name_list* nl = current_beam->par_names;
-  double circ = one, freq0, alfa, beta, gamma, bcurrent, npart = 0;
+  double circ = one, freq0, alfa, beta, gamma, bcurrent = zero, npart = 0;
   if (current_sequ != NULL && current_sequ->length != zero)
       circ = current_sequ->length;
   beta = command_par_value("beta", current_beam);
@@ -1729,7 +1729,7 @@ int result_from_normal(char* name_var, int* order, double* val)
         -3 row    does not exist
      */
 {
-  int row,j,k,found,pos;
+  int row,k,found,pos;
   char string[AUX_LG],n_var[AUX_LG];
   double d_val;
   struct table* t;
@@ -1933,13 +1933,12 @@ void exec_plot(struct in_cmd* cmd)
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
   int size_plot_title = tsm1, size_version = tsm1;
   int *title_length = &size_plot_title, *version_length = &size_version;
-  int res_sys;
-  char* pt = title, *haxis_name, *vaxis_name, *file_name;
+  char* pt = title, *haxis_name = NULL, *vaxis_name = NULL, *file_name = NULL;
   char* particle_list;
-  struct name_list* nl_plot;
-  struct command_parameter_list* pl_plot;
+  struct name_list* nl_plot = NULL;
+  struct command_parameter_list* pl_plot = NULL;
   char *table_name, *last_twiss_table, *trackfile;
-  char track_file_name[NAME_L], ps_file_name[NAME_L], touch_cmd[NAME_L];
+  char track_file_name[NAME_L], ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;
 
@@ -1972,7 +1971,9 @@ void exec_plot(struct in_cmd* cmd)
 	{
 	  if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
 		haxis_name = pl_plot->parameters[pos]->call_def->string;
-	  s_haxis = strcmp(haxis_name,"s"); 
+	  else
+	    fatal_error("PLOT ","- no haxis:");
+	  s_haxis = strcmp(haxis_name,"s");
 	}
 
       /* get table_name & track_flag */
@@ -2020,6 +2021,8 @@ void exec_plot(struct in_cmd* cmd)
 	    file_name = "madx";	  
 	}
     }
+  else
+      fatal_error("Plot "," - non existing command");
 
   /* If table name is "track" use the gnuplot package */
 
@@ -2225,7 +2228,7 @@ void exec_savebeta()
 
 void exec_sodd(struct in_cmd* cmd)
 {
-  struct name_list* nl_sodd;
+  struct name_list* nl_sodd = NULL;
   int ierr,pos,nosixtrack;
 
   /* use correct beam for sequence to be plotted - HG 031127 */
@@ -2249,6 +2252,8 @@ void exec_sodd(struct in_cmd* cmd)
     {
       nl_sodd = this_cmd->clone->par_names;
     }
+  else
+    fatal_error("SODD "," - No existing command");
 
   pos = name_list_pos("nosixtrack", nl_sodd);
   nosixtrack = nl_sodd->inform[pos];
@@ -2313,7 +2318,7 @@ void select_ptc_normal(struct in_cmd* cmd)
   struct command_parameter_list* pl;
   struct table* t;
   int pos; 
-  int i, j, jj, err, curr, arr_size, max_rows = 101, current_idx = 0;
+  int i, j, jj, curr, max_rows = 101;
   int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
   char names[PTC_NAMES_L][5]= 
@@ -2337,10 +2342,10 @@ void select_ptc_normal(struct in_cmd* cmd)
   t = table_register->tables[pos];
 
   /* initialise order array */
-  order[0] = 0.0;
-  order[1] = 0.0;
-  order[2] = 0.0;
-  order[3] = 0.0;
+  order[0] = zero;
+  order[1] = zero;
+  order[2] = zero;
+  order[3] = zero;
   if (t->curr < max_rows)
     {
       for (j = 0; j < PTC_NAMES_L; j++)
@@ -2961,7 +2966,7 @@ void get_select_t_ranges(struct command_list* select,
   int rows[2];
   struct name_list* nl;
   struct command_parameter_list* pl;
-  int i, j, k, pos;
+  int i, pos;
   s_range->curr = 0; e_range->curr = 0;
   if (select != NULL)
   {
@@ -3990,7 +3995,7 @@ void pro_ibs(struct in_cmd* cmd)
   struct command* keep_beam = current_beam;
   struct name_list* nl = current_ibs->par_names;
   struct command_parameter_list* pl = current_ibs->par;
-  char *filename, *table_name;
+  char *filename = NULL, *table_name = NULL;
   int pos, w_file;
 
   if (twiss_table == NULL)
@@ -4036,7 +4041,7 @@ void pro_touschek(struct in_cmd* cmd)
   struct command* keep_beam = current_beam;
   struct name_list* nl = current_touschek->par_names;
   struct command_parameter_list* pl = current_touschek->par;
-  char *filename, *table_name;
+  char *filename = NULL, *table_name = NULL;
   int pos, w_file;
 
   if (twiss_table == NULL)
@@ -4165,7 +4170,7 @@ void pro_survey(struct in_cmd* cmd)
 {
   struct name_list* nl = current_survey->par_names;
   struct command_parameter_list* pl = current_survey->par;
-  char *filename, *table_name;
+  char *filename = NULL, *table_name;
   int pos, w_file;
   int iarc = 1, keep;
   if (current_sequ == NULL)
@@ -4249,7 +4254,7 @@ void pro_ptc_twiss()
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
-  char *filename, *table_name;
+  char *filename = NULL, *table_name;
   int j,l ,pos, w_file;
   /*
          start command decoding
@@ -4317,9 +4322,9 @@ void pro_twiss()
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
-  char *filename, *name, *table_name, *sector_name;
+  char *filename = NULL, *name, *table_name, *sector_name;
   double tol,tol_keep;
-  int i, j, l, lp, k_orb, u_orb, pos, k = 1, ks, w_file, beta_def;
+  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k = 1, ks, w_file, beta_def;
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
@@ -4546,14 +4551,14 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
   struct table* twiss_tb;
-  struct table* keep_table;
-  char *filename, *name, *table_name, *sector_name;
+  struct table* keep_table = NULL;
+  char *filename = NULL, *name, *table_name, *sector_name;
   char *table_embedded_name;
   double tol,tol_keep;
   double betx,bety,alfx,mux,alfy,muy,x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,
          phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
          r11,r12,r21,r22,s;
-  int i, jt, l, lp, k_orb, u_orb, pos, k = 1; 
+  int i, jt, l, lp, k_orb = 0, u_orb = 0, pos, k = 1; 
   int ks, w_file, beta_def, err = 0, inval = 1;
   int keep_info = get_option("info");
 
@@ -4823,6 +4828,9 @@ void pro_embedded_twiss(struct command* current_global_twiss)
 	    }
 	}
 
+      if(twiss_deltas->curr <= 0)
+	fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
+      
       for (i = 0; i < twiss_deltas->curr; i++)
 	{
 	  twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
@@ -5620,7 +5628,7 @@ void seq_move(struct in_cmd* cmd)
      /* executes move command */
 {
   char *name, *from_name;
-  double at, by, to, from;
+  double at, by, to, from = zero;
   int any = 0, k;
   struct node *node;
   struct element* el;
@@ -7205,7 +7213,7 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
         starting with column whose name is in "col";
         The table count is increased separately with "augment_count" */
 {
-  int j, pos, c_pos, last;
+  int j, pos, c_pos, last = 0;
   struct table* t;
 
   mycpy(c_dummy, table);

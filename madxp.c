@@ -537,9 +537,9 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   struct expression* expr = NULL;
   struct command_parameter* lp = cmd->cmd_def->par->parameters[pos];
   struct command_parameter* clp = cmd->clone->par->parameters[pos];
-  int j, k, ks, i = start, e_type, ival, end, e_end, tot_end, c_type = 0,
+  int j, k, ks, i = start, e_type, ival, end, e_end, tot_end = 0, c_type = 0,
       val_type = 0, cnt = 0, con_flag = 0;
-  double val;
+  double val = zero;
   if (lp->type < 10)
     {
      if (lp->type == 0)
@@ -1049,7 +1049,7 @@ void enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
 {
   struct variable* var;
   struct expression* expr = NULL;
-  int k, end, type, name_pos, start = cmd->decl_start, val_type;
+  int k, end, type = 0, name_pos = 0, start = cmd->decl_start, val_type = 0;
   double val = 0;
   char comm[NAME_L];
   char par[NAME_L];
@@ -2418,7 +2418,7 @@ int logic_expr(int nit, char* toks[])
               0 for false
               1 for true */
   int i = 0, k;
-  char c;
+  char c = ' ';
 
   for (i = 0; i < nit; i++)
     {
@@ -3083,7 +3083,7 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
      /* inserts blanks between tokens */
      /* fill_flag != 0 makes a 0 to be inserted into an empty "()" */
 {
-  char c, cp, cpnb = ' ', quote;
+  char c, cp = ' ', cpnb = ' ', quote = ' ';
   int k, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
   int left_b = 0, in_num = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
   for (k = 0; k < sl; k++)
@@ -4482,4 +4482,3 @@ void warning(char* t1, char* t2)
 {
   if (get_option("warn")) printf("++++++ warning: %s %s\n",t1,t2);
 }
-
