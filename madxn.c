@@ -8331,7 +8331,6 @@ void update_beam(struct command* comm)
    et->sigt->sige
    where any item to the left takes precendence over the others;
    for ions, the input energy is multiplied by the charge, and the
-   mass is the "nucleon" number times the average nucleon mass "nmass".
 */
 {
   struct name_list* nlc = comm->par_names;
@@ -8341,7 +8340,7 @@ void update_beam(struct command* comm)
   char* name = blank;
   double energy = 0, beta = 0, gamma = 0, charge = 0, freq0 = 0, bcurrent = 0,
          npart = 0, mass = 0, pc = 0, ex, exn, ey, eyn, alfa, circ = one,
-         arad = 0, nucleon = 1;
+         arad = 0;
   pos = name_list_pos("particle", nlc);
   if (nlc->inform[pos])  /* parameter has been read */
     {
@@ -8375,13 +8374,6 @@ void update_beam(struct command* comm)
     {
      pos = name_list_pos("mass", nlc);
      if (nlc->inform[pos]) mass = command_par_value("mass", comm);
-     else
-       {
-        pos = name_list_pos("nucleon", nlc);
-        if (nlc->inform[pos]) nucleon = command_par_value("nucleon", comm);
-        else nucleon = command_par_value("nucleon", current_beam);
-        mass = nucleon * get_variable("nmass");
-       }
      pos = name_list_pos("charge", nlc);
      if (nlc->inform[pos]) charge = command_par_value("charge", comm);
      else charge = command_par_value("charge", current_beam);
@@ -8393,7 +8385,6 @@ void update_beam(struct command* comm)
   if ((pos = name_list_pos("energy", nlc)) > -1 && nlc->inform[pos])
     {
      energy = command_par_value("energy", comm);
-     if (strcmp(name, "ion") == 0) energy *= fabs(charge);
      if (energy <= mass) fatal_error("energy must be","> mass");
      pc = sqrt(energy*energy - mass*mass);
      gamma = energy / mass;
@@ -8402,7 +8393,6 @@ void update_beam(struct command* comm)
   else if((pos = name_list_pos("pc", nlc)) > -1 && nlc->inform[pos])
     {
      pc = command_par_value("pc", comm);
-     if (strcmp(name, "ion") == 0) pc *= fabs(charge);
      energy = sqrt(pc*pc + mass*mass);
      gamma = energy / mass;
      beta = pc / energy;
@@ -8426,7 +8416,6 @@ void update_beam(struct command* comm)
   else
     {
      energy = command_par_value("energy", current_beam);
-     if (strcmp(name, "ion") == 0) energy *= fabs(charge);
      if (energy <= mass) fatal_error("energy must be","> mass");
      pc = sqrt(energy*energy - mass*mass);
      gamma = energy / mass;
@@ -8515,7 +8504,6 @@ void update_beam(struct command* comm)
                                     pl->parameters[pos]->double_array->a, 3);
   store_comm_par_value("mass", mass, current_beam);
   store_comm_par_value("charge", charge, current_beam);
-  store_comm_par_value("nucleon", nucleon, current_beam);
   store_comm_par_value("energy", energy, current_beam);
   store_comm_par_value("pc", pc, current_beam);
   store_comm_par_value("gamma", gamma, current_beam);
