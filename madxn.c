@@ -2591,6 +2591,7 @@ void fill_beta0(struct command* beta0, struct node* node)
        {
       i++;
       pl->parameters[i]->double_value = twiss_table->d_cols[i+3][pos];
+      if (strstr(nl->names[i], "mu")) pl->parameters[i]->double_value *= twopi;
        }
      while (strcmp(nl->names[i], "energy") != 0);
     }
