@@ -59,6 +59,8 @@
 ! it is called by the routine peplot in this file.
 !----------------------------------------------------------------------*
 
+      implicit none
+
       include 'plot.fi'
 
 !--- type definition of the routine arguments
@@ -350,6 +352,9 @@
 !
 ! it is called by the routine exec_plot in file madxn.c after pesopt.
 !----------------------------------------------------------------------*
+
+      implicit none
+
       include 'plot.fi'
       include 'plot_b.fi'
       include 'plot_c.fi'
@@ -643,6 +648,8 @@
 ! it is called by the routine pecurv in this file.
 !----------------------------------------------------------------------*
 
+      implicit none
+
       include 'plot.fi'
 
 !--- type definition of the routine arguments
@@ -850,6 +857,9 @@
 !                                                                      *
 ! it is called by the routines pemima, peplot and pesopt in this file. *
 !----------------------------------------------------------------------*
+
+      implicit none
+
       include 'plot.fi'
       include 'plot_b.fi'
 
@@ -1379,6 +1389,8 @@
 !     it is called by the routine pefill in this file.
 !----------------------------------------------------------------------*
 
+      implicit none
+
       include 'plot.fi'
       include 'plot_b.fi'
       include 'plot_math.fi'
@@ -1583,6 +1595,9 @@
 !                                                                      *
 ! it is called by the routine exec_plot in file madxn.c after pefill.  *
 !----------------------------------------------------------------------*
+
+      implicit none     
+
       include 'plot.fi'
       include 'plot_b.fi'
 
@@ -1694,6 +1709,8 @@
 !
 ! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
+
+      implicit none
 
       include 'plot.fi'
       include 'plot_b.fi'
@@ -2056,6 +2073,8 @@
 ! it is called by the routine peplot in this file.
 !----------------------------------------------------------------------*
 
+      implicit none
+
       include 'plot.fi'
 
 !--- type definition of the routine arguments
@@ -2186,6 +2205,9 @@
 !
 ! it is called by the routine exec_plot in file madxn.c
 !----------------------------------------------------------------------*
+
+      implicit none
+
       include 'plot.fi'
       include 'plot_b.fi'
 
@@ -2582,6 +2604,8 @@
 ! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
 
+      implicit none
+
       include 'plot.fi'
       include 'plot_b.fi'
 
@@ -2663,6 +2687,9 @@
 !
 ! it is called by the routine exec_plot in file madxn.c after pemima.
 !----------------------------------------------------------------------*
+
+      implicit none
+
       include 'plot.fi'
       include 'plot_b.fi'
 

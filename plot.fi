@@ -1,4 +1,3 @@
-      implicit none
 
 !--- m_adble is the number of different types of elements
       integer mtype, m_adble
