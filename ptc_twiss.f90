@@ -16,35 +16,30 @@ subroutine ptc_twiss(lhc,icav)
   suml=zero
 
   icase = get_value('ptc ','icase ')
-  if(icase==4) then
+  select case(icase)
+  CASE(4)
      default=default+only_4d+NOCAVITY
      mynpa=4
-  elseif(icase==5) then
+  CASE(5)
      default=default+delta
      mynpa=5
-  else
-     mynpa=6
-  endif
+  CASE DEFAULT
+     default=default+only_4d+NOCAVITY
+     mynpa=4
+  END SELECT
   if(mynpa==6.and.icav==0) then
      default=default+delta
      mynpa=5
   endif
 
   default=default+time
+
   CALL UPDATE_STATES
   call print(default,6)
 
   x(:)=zero
   call find_orbit(lhc,x,1,default)
   print*,"Closed orbit: ",x
-!  current=>LHC%start
-!  suml=zero
-!  do i=1,LHC%n
-!     call track(lhc,x,i,i+1,default)
-!     suml=suml+current%MAG%P%ld
-!     write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml
-!     current=>current%next
-!  enddo
 
   no = get_value('ptc ','no ')
 

@@ -1,16 +1,18 @@
-subroutine ptc_input(lhc,icav)
+subroutine ptc_input(lhc,icav,EXCEPTION)
   use madx_keywords
   implicit none
-  logical(lp) particle,doneit
-  integer, parameter :: imul=20,nt0=20000,length=16
-  integer i,j,code,nt,icount,icav,exception,nn,ns,nd
-  integer restart_sequ,advance_node,method,nst,n_ferr,node_fd_errors
   include 'twtrr.fi'
+  logical(lp) particle,doneit,exact
+  integer ipause, mypause
+  integer i,j,code,nt,icount,icav,nn,ns,nd,kindi,EXCEPTION
+  integer restart_sequ,advance_node,method,nst,n_ferr,node_fd_errors
+  integer, parameter :: imul=20,nt0=20000,length=16
   real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
   real(dp) f_errors(0:50),aperture(100),normal(0:maxmul),skew(0:maxmul),field(2,0:maxmul)
   real(kind(1d0)) get_value,node_value
   character(length) name
   character(24) aptype
+  character(20) keymod
   type(layout) lhc
   type(keywords) key
   !---------------------------------------------------------------
@@ -31,14 +33,34 @@ subroutine ptc_input(lhc,icav)
   with_patch=.false.
   mad=.true. ! permanent
   madlength=.false.
+
   method = get_value('ptc ','method ')
+
+  kindi = get_value('ptc ','kindi ')
+  select case(kindi)
+  CASE(1)
+     keymod="DRIFT_KICK       "
+  CASE(2)
+     keymod="MATRIX_KICK      "
+  CASE(3)
+     keymod="DELTA_MATRIX_KICK"
+     method=2
+  CASE(4)
+     keymod="BEND_KICK        "
+  CASE DEFAULT
+     EXCEPTION=1
+     ipause=mypause(444)
+     RETURN
+  END SELECT
+
+  exact = get_value('ptc ','exact ') .ne. 0
+  if(exact.and.kindi.ne.3) EXACT_MODEL = .true.
+
   print*,'method: ',method
   nst = get_value('ptc ','nst ')
   print*,'nst: ',nst
   metd = method
   nstd = nst
-
-  print*,"Fortran tiny",tiny(one)
 
   call Set_Up(LHC)
  
@@ -68,10 +90,8 @@ subroutine ptc_input(lhc,icav)
   code=node_value('mad8_type ')
   call element_name(name,length)
   key%list%name=name
-  key%model="DELTA_MATRIX_KICK"
-!tilt will come
-! key%tiltd=tilt
-!misalignment
+  key%model=keymod
+
   nn=24
   call node_string('apertype ',aptype,nn)
   call get_node_vector('aperture ',nn,aperture)

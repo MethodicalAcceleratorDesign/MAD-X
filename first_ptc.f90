@@ -2,22 +2,22 @@ subroutine ttwm()
   !--- PTC entry point
   USE madx_keywords
   implicit none
-  logical(lp) ok
-  integer iii,kindi,icav,blah
-  real(dp) beta0,get_value
+  integer iii,icav
+  integer :: EXCEPTION=0
+  real(dp) beta0
+  real(kind(1d0)) get_value
   type(layout) LHC
   iii=0
   print77=.false.
   read77 =.false.
   print*,"Now PTC"
-  kindi=get_value('ptc ','kindi ')
-  print*,kindi
-  if(kindi==2) kindi=kind2
-  if(kindi==6) kindi=kind6
-  if(kindi==7) kindi=kind7
 
-  call ptc_input(lhc,icav)
-  call ptc_twiss(lhc,icav)
+  call ptc_input(lhc,icav,EXCEPTION)
+  if(EXCEPTION.eq.1) then
+     call fort_warn('wrong magnet type KINDI which must be: ','1, 2, 3')
+     return
+  endif
+  if(get_value('ptc ','ptc_twiss ') .ne. 0) call ptc_twiss(lhc,icav)
   call kill(lhc)
   call kill_tpsa
   call nul_coef(SECTOR_B)
