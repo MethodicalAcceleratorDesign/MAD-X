@@ -1053,6 +1053,8 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
       strcpy(tag_aperture.name,t_name);
       strcat(tag_aperture.name,"_AP");
       if ((aper_param = return_param_recurse("aperture", p->p_elem))) {
+        if (aper_param->expr_list != NULL) 
+	  update_vector(aper_param->expr_list, aper_param->double_array);
 	j=3; 
 	if (aper_param->double_array->curr<3) j=aper_param->double_array->curr;
 	for(i=0;i<j;i++) {
