@@ -5030,7 +5030,8 @@ void out_table(char* tname, struct table* t, char* filename)
          grow_int_array(t->row_out);
   t->row_out->curr = t->curr;
   if ((scl = find_command_list(tname, table_select)) != NULL
-       && scl->curr > 0) prepare_table_file(t, scl);
+       && scl->curr > 0 && par_present("full", NULL, scl) == 0) 
+          prepare_table_file(t, scl);
   else
     {
      for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
