@@ -920,6 +920,9 @@ char* match_range[2];            /* HG 12.11.2002   */
 char* myfree_caller = none;      /* for routine name in myfree calls */
 char* track_filename;            /* track module file name start */
 char* track_fileext;             /* track module file name extension */
+/* E. T. d'Amico 11 june 2004 */
+char track_plot_filename[NAME_L] = "madx_track";            /* plot module: output postscript file name in track mode */
+/* end additions */
 
 double pi, twopi, degrad, raddeg, e, clight, hbar;
 double penalty;
@@ -954,6 +957,8 @@ int add_error_opt = 0;      /* ADD error option, set with eoption */
 int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
 /* E. T. d'Amico 13 may 2004 */
 int embedded_flag = 0;              /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
+/* E. T. d'Amico 10 june 2004 */
+int trkplot_flag = 0;              /* flag (= 1 from the moment a plot in tracking mode is requested, reset to 0 at madx end) */
 /* end additions */
 
 int print_correct_opt = 1;  /* PRINT options for orbit correction */
