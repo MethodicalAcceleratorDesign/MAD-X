@@ -1559,9 +1559,15 @@ void dump_command_parameter(struct command_parameter* par)
     case 12:
     if (par->double_array != NULL)
       {
-       for (i = 0; i < par->double_array->curr; i++)
-	if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
-	par->double_array->a[i] = expression_value(par->expr_list->list[i], 2);
+       if (par->expr_list != NULL)
+	 {
+          for (i = 0; i < par->double_array->curr; i++)
+	    {
+	     if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
+	         par->double_array->a[i] 
+                 = expression_value(par->expr_list->list[i], 2);
+	    }
+	 }
        fprintf(prt_file, "double array: ");
        for (i = 0; i < par->double_array->curr; i++) 
             fprintf(prt_file, "%e ", par->double_array->a[i]);
@@ -2259,6 +2265,10 @@ void exec_command()
         else if (strcmp(p->cmd_def->module, "correct") == 0)
 	  {
            pro_correct(p);
+	  }
+        else if (strcmp(p->cmd_def->module, "emit") == 0) 
+	  {
+	   pro_emit(p);
 	  }
         else if (strcmp(p->cmd_def->module, "error") == 0)
 	  {
@@ -5550,6 +5560,60 @@ void print_command_parameter(struct command_parameter* par)
     }
 }
 
+void print_global(double delta)
+{
+  char tmp[NAME_L], trad[4];
+  double alfa = get_value("probe", "alfa");
+  double freq0 = get_value("probe", "freq0");
+  double gamma = get_value("probe", "gamma");
+  double beta = get_value("probe", "beta");
+  double circ = get_value("probe", "circ");
+  double bcurrent = get_value("probe", "bcurrent");
+  double npart = get_value("probe", "npart");
+  double energy = get_value("probe", "energy");
+  int kbunch = get_value("probe", "kbunch");
+  int rad = get_value("probe", "radiate");
+  double gamtr = zero, t0 = zero, eta;
+  get_string("probe", "particle", tmp);
+  if (rad) strcpy(trad, "T");
+  else     strcpy(trad, "F");
+  if (alfa > zero) gamtr = sqrt(one / alfa);
+  else if (alfa < zero) gamtr = sqrt(-one / alfa);
+  if (freq0 > zero) t0 = one / freq0;
+  eta = alfa - one / (gamma*gamma);
+  puts(" ");
+  printf(" Global parameters for %ss, radiate = %s:\n\n",
+         tmp, trad);
+  printf(" C         %16.8g m          f0        %16.8g MHz\n",circ, freq0);
+  printf(" T0        %16.8g musecs     alfa      %16.8e \n", t0, alfa);
+  printf(" eta       %16.8e            gamma(tr) %16.8g \n", eta, gamtr);
+  printf(" Bcurrent  %16.8g A/bunch    Kbunch    %16d \n", bcurrent, kbunch);
+  printf(" Npart     %16.8g /bunch     Energy    %16.8g GeV \n", npart,energy);
+  printf(" gamma     %16.8g            beta      %16.8g\n", gamma, beta);
+}
+
+void print_rfc()
+{
+  double freq0, harmon, freq;
+  int i, n = current_sequ->cavities->curr;
+  struct element* el;
+  if (n == 0)  return;
+  freq0 = command_par_value("freq0", probe_beam);
+  printf("\n RF system: \n");
+  printf(" Cavity                    length[m]  voltage[MV]              lag          freq[MHz]         harmon\n");
+  for (i = 0; i < n; i++)
+    {
+     el = current_sequ->cavities->elem[i];
+     if ((harmon = el_par_value("harmon", el)) > zero)
+       {
+	freq = freq0 * harmon;
+        printf(" %-16s  %14.6g  %14.6g  %14.6g  %18.10g  %12.0f\n",
+               el->name, el->length, el_par_value("volt", el),
+               el_par_value("lag", el), freq, harmon);
+       }
+    }
+}
+
 void print_table(struct table* t)
 {
   int i, j, k, l, n, tmp, wpl = 4;
@@ -5674,6 +5738,69 @@ void process()  /* steering routine: processes one command */
         else this_cmd = delete_in_cmd(this_cmd);
        }
     }
+}
+
+void pro_emit(struct in_cmd* cmd)
+{
+  struct command* emit = cmd->clone;
+  double e_deltap, e_tol, u0;
+  int j, error, keep;
+  double* tt;
+  double emit_v[3], nemit_v[3], bmax[9], gmax[9], dismax[4], tunes[3],
+    sig_v[4], pdamp[3];
+  char tmp[16];
+
+  if (current_sequ == NULL || current_sequ->ex_start == NULL)
+    {
+     warning("sequence not active,", "EMIT ignored");
+     return;
+    }
+  fprintf(prt_file, "enter EMIT module\n");
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("EMIT - sequence without beam:", current_sequ->name);
+  e_deltap = command_par_value("deltap", emit);
+  e_tol = command_par_value("tol", emit);
+  keep = get_option("twiss_print");
+  j = 0;
+  set_option("twiss_print", &j);
+  for (j = 0; j < 6; j++) orbit0[j] = zero;
+  for (j = 0; j < 6; j++) disp0[j] = zero;
+  for (j = 0; j < 36; j++) oneturnmat[j] = zero;
+  tt = (double*) mycalloc("pro_emit", 216, sizeof(double));
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
+  tmrefe_(oneturnmat); /* one-turn linear transfer map */
+  adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
+  print_global(e_deltap);
+  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
+  free(tt);
+  if (error == 0)
+    {
+     current_node = current_sequ->ex_start;
+     emit_(&e_deltap, &e_tol, orbit0, disp0, oneturnmat, &u0, emit_v, nemit_v,
+           bmax, gmax, dismax, tunes, sig_v, pdamp);
+     if (e_deltap == zero)
+       {
+        store_comm_par_value("ex", emit_v[0], current_beam);
+        store_comm_par_value("exn", nemit_v[0], current_beam);
+        store_comm_par_value("ey", emit_v[1], current_beam);
+        store_comm_par_value("eyn", nemit_v[1], current_beam);
+        store_comm_par_value("et", emit_v[2], current_beam);
+        store_comm_par_value("sigt", sig_v[2], current_beam);
+        store_comm_par_value("sige", sig_v[3], current_beam);
+        store_comm_par_value("u0", u0, current_beam);
+        store_comm_par_value("qs", tunes[2], current_beam);
+        store_comm_par_vector("pdamp", pdamp, current_beam);
+       }
+     else 
+       {
+	sprintf(tmp, "%14.6f", e_deltap);
+        warning("EMIT: beam not updated, non-zero deltap: ", tmp);
+       }     
+     print_rfc();
+    }
+  set_option("twiss_print", &keep);
 }
 
 void pro_ibs(struct in_cmd* cmd)
@@ -7974,6 +8101,23 @@ void store_comm_par_value(char* parameter, double val, struct command* cmd)
     }
 }
 
+void store_comm_par_vector(char* parameter, double* val, struct command* cmd)
+{
+  struct command_parameter* cp;
+  int i;
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
+    {
+     cp = cmd->par->parameters[i];
+     if (cp->double_array != NULL)
+       {
+        for (i = 0; i < cp->double_array->curr; i++) 
+	  cp->double_array->a[i] = val[i];
+        if (cp->expr_list != NULL) 
+            cp->expr_list = delete_expr_list(cp->expr_list);
+       }
+    }
+}
+
 void store_savebeta(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
@@ -8607,8 +8751,7 @@ void track_tables_dump()
 
 void track_track(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
-  int pos,k=0;
+  int k=0;
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
     {

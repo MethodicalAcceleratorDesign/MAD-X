@@ -858,7 +858,7 @@
         write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
   910   format('Unable to find eigenvalues for matrix:'/                &
      &  (6f12.6))
-        call aafail('LADEIG','Unable to find eigenvalues for matrix')
+        call aafail('LASEIG',' Unable to find eigenvalues for matrix')
         go to 999
       endif
 !---- Normalize the eigenvectors.
@@ -951,7 +951,7 @@
         write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
   910   format('Unable to find eigenvalues for matrix:'/                &
      &  (6f12.6))
-        call aafail('LADEIG','Unable to find eigenvalues for matrix')
+        call aafail('LADEIG',' Unable to find eigenvalues for matrix')
         go to 9999
       endif
 !---- Normalize the eigenvectors.
@@ -1506,3 +1506,4 @@
         endif
       enddo
  9999 end
+

@@ -115,7 +115,10 @@ extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
                    double*, double*);
 extern void mtgeti_(int*, double*, double*);
 extern void collect_(int*, double*, double*); /* OB 13.2.2002 */
+extern void emit_(double*, double*, double*, double*, double*, double*,
+double*, double*, double*, double*, double*, double*, double*, double*);
 extern void fortinit_();
+extern void getclor_(double*, double*, double*, int*);
 extern void gxterm_();
 extern void haveit_(double *,double *,double *,double *,int *,int *,
 int *,double *,double *,double *,double *,double *,double *);
@@ -504,12 +507,15 @@ void prepare_table_file(struct table*, struct command_list*);
 void pre_split(char*, char*, int);
 void print_command(struct command*);
 void print_command_parameter(struct command_parameter*);
+void print_global(double);
+void print_rfc();
 void print_table(struct table*);
 void print_value(struct in_cmd*);
 void pro_match(struct in_cmd*);
 void pro_node(int, double);
 void process();
 void pro_correct(struct in_cmd*);
+void pro_emit(struct in_cmd*);
 void pro_error(struct in_cmd*);
 void pro_ibs(struct in_cmd*);
 void pro_input(char*);
@@ -571,6 +577,7 @@ void store_beta0(struct in_cmd*);
 void store_command_def(char*);
 struct command_parameter* store_comm_par_def(char**, int, int);
 void store_comm_par_value(char*, double, struct command*);
+void store_comm_par_vector(char*, double*, struct command*);
 void store_savebeta(struct in_cmd*);
 void store_select(struct in_cmd*);
 int string_cnt(char, int, char**);
@@ -803,7 +810,7 @@ char  tmp_key[NAME_L],
 
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.06";
+char myversion[] = "MAD-X 1.07";
 char one_string[] = "1";
 
 char* aux_char_pt;               /* for debug purposes */

@@ -350,8 +350,8 @@
 !   tt(6,6,6)    (double)  second order terms.                         *
 !   eflag        (integer) error flag.                                 *
 !----------------------------------------------------------------------*
-      logical fsec,ftrk,m66sta
-      integer eflag,i,k,irank,itra,itmax
+      logical fsec,ftrk,m66sta,pflag
+      integer eflag,i,k,irank,itra,itmax,get_option
       parameter(itmax=10)
       double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,err,&
      &orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
@@ -360,6 +360,7 @@
       equivalence(a(1,1),b(1,1),as(1,1),bs(1,1))
 
 !---- Initialize.
+      pflag = get_option('twiss_print ') .ne. 0
       deltap = get_value('probe ','deltap ')
       cotol = ten6m
       eflag = 0
@@ -406,11 +407,14 @@
         endif
 
 !---- Message and convergence test.
+        if (pflag)  then
         print *, ' '
         print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '', &
      &  1p,e14.6)',itra,err,deltap
         print '(''orbit: '', 1p,6e14.6)', orbit0
+        endif
         if (err.lt.cotol) then
+          call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0)
           opt_fun0(9 )=orbit0(1)
           opt_fun0(10)=orbit0(2)
           opt_fun0(11)=orbit0(3)
@@ -1567,7 +1571,7 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
-      integer code
+      integer i,j,code
       logical fsec, ftrk, fmap
       double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
 
@@ -1896,6 +1900,9 @@
      &cg2=21d0/60480d0,ch0=one/fvty6,ch1=14d0/4032d0,ch2=147d0/443520d0)
 
 !---- Initialize.
+      call dzero(ek, 6)
+      call m66one(re)
+      if (fsec) call dzero(te, 216)
       beta = get_value('probe ','beta ')
       gamma = get_value('probe ','gamma ')
       dtbyds = get_value('probe ','dtbyds ')
@@ -2174,6 +2181,8 @@
      &tanedg,te(6,6,6),zero,one
       parameter(zero=0d0,one=1d0)
 
+      call m66one(re)
+      if (fsec) call dzero(te, 216)
 !---- Linear terms.
       tanedg = tan(edge)
       secedg = one / cos(edge)
@@ -3579,6 +3588,9 @@
       parameter(zero=0d0,two=2d0,three=3d0)
 
 !---- Initialize.
+      call dzero(ek, 6)
+      call m66one(re)
+      if (fsec) call dzero(te, 216)
       fmap = dl .ne. zero
       dtbyds = get_value('probe ', 'dtbyds ')
       gamma = get_value('probe ', 'gamma ')
@@ -3678,7 +3690,6 @@
       rfl = node_value('lag ')
       deltap = get_value('probe ','deltap ')
       pc = get_value('probe ','pc ')
-
 !---- Cavity is excited, use full map.
       if (rfv .ne. zero) then
 
@@ -3689,7 +3700,6 @@
         c0 =   vrf * sin(phirf)
         c1 = - vrf * cos(phirf) * omega
         c2 = - vrf * sin(phirf) * omega**2 * half
-
 !---- Transfer map.
         fmap = .true.
         if (ftrk) then
