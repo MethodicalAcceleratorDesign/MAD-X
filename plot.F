@@ -525,7 +525,7 @@
 !--- Initialise
 
       ftrk = .false.
-      e2 = 0d0
+      e2 = 0.0d0
       do i = 1, 6
         do j = 1, 6
           am(j,i) = zero
@@ -797,7 +797,7 @@
             ieltyp(nelmach) = pltyp
           endif
           if (machp .and. j .gt. nrrang(1) .and. currleng .gt. zero     &
-     &    .and. ipparm(2,1) .gt. 0 .and. step .gt. zero)  then
+     &    .and. splinef .gt. 0 .and. step .gt. zero)  then
             nint = currleng / step
             if (nint .lt. 2) nint = 2
             call peintp(crow, nint, pltyp, proc_n, adble, ierr)
@@ -2838,6 +2838,8 @@
       double precision plot_option
       character * 400 char_a, version
       character * 10 tmp_a
+
+      splinef = 0
       ierr = 0
       nivaxs = 0
       nivvar = 0
@@ -2990,9 +2992,15 @@
       tmp_a = 'style '
       call comm_para(tmp_a, nint, ndble, k, ipparm(1,1), d_arr,         &
      &char_a, char_l)
+
       tmp_a = 'spline '
       call comm_para(tmp_a, nint, ndble, k, ipparm(2,1), d_arr,         &
      &char_a, char_l)
+      if (ipparm(2,1) .eq. 1) print *,'SPLINE attribute is obsolete, the&
+     & interpolation is done by default.'
+      ipparm(2,1) = 1
+      splinef = ipparm(2,1)
+
       tmp_a = 'bars '
       call comm_para(tmp_a, nint, ndble, k, ipparm(3,1), d_arr,         &
      &char_a, char_l)
@@ -3009,7 +3017,6 @@
         ipparm(4,i) = ipparm(4,1)
         ipparm(5,i) = ipparm(5,1)
       enddo
-      splinef = ipparm(2,1)
 
       char_a = ' '
       tmp_a = 'vaxis '
