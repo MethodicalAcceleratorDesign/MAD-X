@@ -120,7 +120,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
      current_twiss = local_twiss[i]->clone;
      if (get_option("varylength") != zero) match_prepare_varypos();
 
-     if (get_option("rmatrix") != zero) fprintf(prt_file, "%s %s\n", "call TWISS with RMATRIX");
+     if (get_option("rmatrix") != zero) fprintf(prt_file, "%s\n", "call TWISS with RMATRIX");
 
      pro_twiss();
      if (twiss_success)
