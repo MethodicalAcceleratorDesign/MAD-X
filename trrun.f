@@ -23,7 +23,7 @@
 !   code_buf    int(nelem)  local mad-8 code storage                   *
 !   l_buf       dp(nelem)   local length storage                       *
 !----------------------------------------------------------------------*
-      logical onepass,onetable,last_out,info
+      logical onepass,onetable,last_out,info,aperflag
       integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
      &nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
@@ -40,6 +40,7 @@
       data tol_a,char_a / 'tolerance ', ' ' /
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt' /
 
+      aperflag = .false.
       e_flag = 0
       last_out = .false.   ! flag to avoid double entry of last line
       onepass = get_option('onepass ') .ne. zero
@@ -137,7 +138,7 @@
         endif
 !-------- Track through element
         call ttmap(code,el,z,jmax,sum,turn,part_id, last_turn,          &
-     &  last_pos, last_orbit)
+     &  last_pos, last_orbit,aperflag,tolerance)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
@@ -234,7 +235,7 @@
       enddo
  999  end
       subroutine ttmap(code,el,track,ktrack,sum,turn,part_id, last_turn,&
-     &last_pos, last_orbit)
+     &last_pos, last_orbit,aperflag,tolerance)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -246,9 +247,13 @@
 !   NUMBER(*) (integer) Number of current track.                       *
 !   KTRACK    (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
-      integer turn,code,ktrack,part_id(*),last_turn(*)
+      logical aperflag
+      integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk
       double precision apx,apy,el,sum,node_value,track(6,*),last_pos(*),&
-     &last_orbit(6,*),parvec(26),get_value
+     &last_orbit(6,*),parvec(26),get_value,aperture(100),one,
+     &tolerance(6)
+      character*24 aptype
+      parameter(one=1d0)
 
 !-- switch on element type
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
@@ -288,8 +293,48 @@
 
 !---- Multipole.
    80 continue
+!____ Test aperture. Aperflag should be read in the TRACK command
+      aperflag = .true.
+      if(aperflag) then
+      nn=24
+      call node_string('apertype ',aptype,nn)
+      call node_vector('aperture ',nn,aperture)
+!      print *, " TYPE ",aptype,
+!     &"values  x y lhc",aperture(1),aperture(2),aperture(3)
+        if(aptype.eq.'ellipse') then
+        apx = aperture(1)
+        apy = aperture(2)
+        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)
+        else if(aptype.eq.'circle') then
+        apx = aperture(1)
+         if(apx.eq.0.0) then
+         apx = tolerance(1)
+         endif
+        apy = apx
+!        print *,"circle, radius= ",apx
+        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)
+        else if(aptype.eq.'rectangle') then
+        apx = aperture(1)
+        apy = aperture(2)
+        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)
+        else if(aptype.eq.'lhcscreen') then
+!        print *, "LHC screen start, Xrect= ",
+!     &  aperture(1),"  Yrect= ",aperture(2),"  Rcirc= ",aperture(3)
+        apx = aperture(3)
+        apy = aperture(3)
+        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)
+        apx = aperture(1)
+        apy = aperture(2)
+        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)       
+!        print *, "LHC screen end"
+        endif
+      endif
       call ttmult(track,ktrack)
-
       go to 500
 
 !---- Solenoid.
@@ -324,16 +369,10 @@
       call ttcorr(el, track, ktrack)
       go to 500
 
-!---- Element aperture.
-!      call node_vector('knl ',nn,normal)
-
 !---- Elliptic aperture.
   200 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-      print *,"---------  TTMAP  ------"
-      print *,"---------"
-      print *,"elliptic collim, apertures = " , apx,apy
       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack)
       go to 500
@@ -342,11 +381,6 @@
   210 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-      print *," "
-      print *," "
-      print *,"--------- TTMAP  ------"
-      print *,"---------"
-      print *,"Rectangular collim, apertures (X,Y) = " , apx,apy
       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack)
       go to 500
@@ -1211,6 +1245,7 @@
       integer i,j,n,turn,part_id(*),jmax,last_turn(*)
       double precision sum,z(6,*),tolerance(6),last_pos(*),             &
      &last_orbit(6,*)
+      character*14 aptype
 
       n = 1
  10   continue
@@ -1223,25 +1258,26 @@
  20   continue
       n = i
       call trkill(n, turn, sum, jmax, part_id,                          &
-     &last_turn, last_pos, last_orbit, z)
+     &last_turn, last_pos, last_orbit, z,aptype)
       goto 10
       end
 
-
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
-     &last_turn, last_pos, last_orbit, z)
+     &last_turn, last_pos, last_orbit, z,aptype)
       implicit none
-      integer i,j,n,turn,part_id(*),jmax,last_turn(*)
+      integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*)
+      character*14 aptype
 
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
       do j = 1, 6
         last_orbit(j,part_id(n)) = z(j,n)
       enddo
-      print *," "
-      print *,"particle #",part_id(n),"    killed in turn ",turn,
-     &"   at element    X=",
+
+      print *,"particle #",part_id(n)," lost turn ",turn,
+     &"  at pos. s =",sum,"   aperture =",aptype
+      print *,"   X=",
      &z(1,n),"  Y=",z(3,n)
 
       do i = n+1, jmax
@@ -1252,7 +1288,6 @@
       enddo
       jmax = jmax - 1
       end
-
 
       subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0)
       implicit none
@@ -1339,10 +1374,11 @@
 !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
 !   ntrk      (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
-      integer flag,turn,part_id(*),last_turn(*),ntrk,i,n
+      integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
      &one
       parameter(one=1d0)
+      character*24 aptype
 
       n = 1
  10   continue
@@ -1354,11 +1390,10 @@
      &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy))         &
      &  then
           n = i
-      print *," "
-      print *," "
-      print *,"--------- TRCOLL  ------"
+          nn=24
+          call node_string('apertype ',aptype,nn)
           call trkill(n, turn, sum, ntrk, part_id,                      &
-     &    last_turn, last_pos, last_orbit, z)
+     &    last_turn, last_pos, last_orbit, z,aptype)
            goto 10
         endif
       enddo
