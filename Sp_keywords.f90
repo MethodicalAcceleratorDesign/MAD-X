@@ -110,7 +110,10 @@ contains
        IF(KEY%MAD8) THEN
           ! MADX does some massaging of e1 and e2 for compatibility with mad8
           ! PTC stays with MAD8
-          KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))
+          IF(KEY%LIST%B0/=ZERO) THEN
+             KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))
+          ENDIF
+!          KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))
           KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
           KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
           BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)

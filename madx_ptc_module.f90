@@ -304,6 +304,7 @@ CONTAINS
        key%list%b0=node_value('angle ')
        !     key%list%k(1)=node_value('k0 ') 
        key%list%k(2)=node_value('k1 ') 
+       key%list%k(3)=node_value('k2 ')
        !     key%list%k(3)=node_value('k2 ') 
        !     key%list%ks(1)=node_value('k0s ') 
        !     key%list%ks(2)=node_value('k1s ') 
@@ -324,6 +325,7 @@ CONTAINS
        key%magnet="sbend"
        key%list%b0=node_value('angle ')
        key%list%k(2)=node_value('k1 ')
+       key%list%k(3)=node_value('k2 ')
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
@@ -524,7 +526,7 @@ CONTAINS
     call my_state(icase,deltap,deltap0,mynpa)
 
     CALL UPDATE_STATES
-    call print(default,6)
+!    call print(default,6)
 
     x(:)=zero
     if(icase.eq.5) x(5)=deltap
@@ -719,6 +721,9 @@ CONTAINS
     deltap0 = get_value('ptc_track ','deltap ')
     call my_state(icase,deltap,deltap0,mynpa)
 
+    CALL UPDATE_STATES
+!    call print(default,6)
+
     x0(:)=zero
     if(icase.eq.5) x0(5)=deltap
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
@@ -735,6 +740,7 @@ CONTAINS
     c_%watch_user=.true.
     do i=1,turns
        call track(my_ring,x,1,default)
+       call PRODUCE_APERTURE_FLAG(flag_index)
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
           Write(6,*) "ptc_track unstable (tracking)-programs continues "
@@ -742,6 +748,7 @@ CONTAINS
           goto 100
        endif
     enddo
+    c_%watch_user=.false.
     print*,"  End Coordinates: ",x
     return
 100 continue
