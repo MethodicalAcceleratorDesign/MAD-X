@@ -1696,7 +1696,7 @@
 !     &el," angv = ",angv," bv =",node_value('dipole_bv ')
       go to 490
 
-!---- Rotation around S-axis. SPECIAL CASE 
+!---- Rotation around S-axis. SPECIAL CASE
   120 continue
       print *,"SROT"
       tilt = node_value('angle ')
@@ -1930,11 +1930,11 @@
       character*1 c
       inquire(err=5,iostat=ios,unit=i,opened=ostat,exist=fexist)
       if (.not.ostat.or..not.fexist) return
-      inquire(err=6,iostat=ios,unit=i,access=faccess,
+      inquire(err=6,iostat=ios,unit=i,access=faccess,                   &
      &form=fform,name=fname)
       close (unit=i,err=7,iostat=ios)
 !     write (*,*) 'Re-opening ',i,' ',faccess,fform,fname
-      open(err=8,iostat=ios,unit=i,access=faccess,form=fform,
+      open(err=8,iostat=ios,unit=i,access=faccess,form=fform,           &
      &file=fname,status='old')
       if (option) then
         if (fform.eq.'FORMATTED') then
@@ -1944,28 +1944,28 @@
  2        read (i,err=10,iostat=ios,end=1) a
           go to 2
         endif
- 4      backspace i 
+ 4      backspace i
  1      continue
       endif
-      return    
+      return
  100  format (a1)
- 5    write (*,*) 
+ 5    write (*,*)                                                       &
      &' F77FLUSH 1st INQUIRE FAILED with IOSTAT ',ios,' on UNIT ',i
       stop
- 6    write (*,*) 
+ 6    write (*,*)                                                       &
      &' F77FLUSH 2nd INQUIRE FAILED with IOSTAT ', ios,' on UNIT ',i
       stop
- 7    write (*,*) 
+ 7    write (*,*)                                                       &
      &' F77FLUSH CLOSE FAILED with IOSTAT ',ios,' on UNIT ',i
       stop
- 8    write (*,*)
+ 8    write (*,*)                                                       &
      &' F77FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
       stop
- 9    write (*,*)
+ 9    write (*,*)                                                       &
      &' F77FLUSH FORMATTED READ FAILED with IOSTAT ',ios,' on UNIT ',i
       stop
- 10   write (*,*)
-     &' F77FLUSH UNFORMATTED READ FAILED with IOSTAT ',ios,
+ 10   write (*,*)                                                       &
+     &' F77FLUSH UNFORMATTED READ FAILED with IOSTAT ',ios,             &
      &' on UNIT ',i
       stop
       end
