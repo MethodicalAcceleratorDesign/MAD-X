@@ -1,3 +1,13 @@
+MODULE ptc_results
+  USE madx_keywords
+  implicit none
+  integer :: number_variables = 6
+  integer :: order = 20
+  character(len = 2), dimension(6) :: ptc_variables = (/'x ','xp','y ','yp','z ','dp'/)
+  character(len = 2) :: ptc_var
+  type(real_8) y(6)
+  type(normalform) n
+END MODULE ptc_results
 MODULE madx_ptc_module
   USE madx_keywords
   implicit none
@@ -743,14 +753,237 @@ CONTAINS
 
   END subroutine ptc_twiss
 
-  subroutine ptc_normal()
+  FUNCTION double_from_ptc(var, column)
+    USE ptc_results
+    implicit none
+    real(dp) double_from_ptc 
+    real(dp) :: d_val = 0.0
+    character (len = *) var
+    integer :: column(*)
+    integer j,k,n1,n2,nn,var_length,ptc_variable_length,ind(6),ord(3)
+    integer double_from_table, string_from_table
+    logical var_check
+    character, dimension(4) :: s_val
+
+    double_from_ptc = 0.0
+    var_length = LEN(ptc_var)
+    do j = 1 , number_variables
+       ptc_variable_length = LEN(ptc_variables(j))
+       if (var_length .NE. ptc_variable_length) THEN
+          print *,"No such a variable"
+          RETURN
+       ENDIF
+       var_check = .false.
+       do k = 1, var_length
+          if (ptc_variables(j)(k:k) .NE. ptc_var(k:k)) EXIT
+          var_check = .true.
+       enddo
+       if (var_check) EXIT
+    enddo
+    if (.NOT. var_check) THEN
+       print *,"No such a variable"
+       RETURN
+    ENDIF
+    nn = 0
+    do k = 1 , number_variables
+       ind(k) = column(k)
+       nn = nn + ind(k)
+    enddo
+    if (nn > order) THEN
+       print *,"The order is larger than ",order
+       RETURN
+    ENDIF
+    k = string_from_table("normal_results ", "name ", 1, s_val)
+    k = double_from_table("normal_results ", "order1 ", 1, d_val)
+    ord(1) = INT(d_val)
+    k = double_from_table("normal_results ", "order2 ", 1, d_val)
+    ord(2) = INT(d_val)
+    k = double_from_table("normal_results ", "order3 ", 1, d_val)
+    ord(3) = INT(d_val)
+    double_from_ptc = y(j)%t.sub.ind
+  END FUNCTION double_from_ptc
+
+  FUNCTION double_from_ptc_normal(name_var,row)
+    USE ptc_results
+    implicit none
+    integer row
+    real(dp) double_from_ptc_normal, d_val 
+    integer idx
+    integer j,k,ind(6)
+    integer double_from_table
+    character(len = 4)  name_var
+    character(len = 2)  name_var1
+    character(len = 3)  name_var2    
+    logical :: name_l = .false.
+
+    double_from_ptc_normal = 0.0
+    name_var1 = name_var
+    SELECT CASE (name_var1)
+    CASE ("dx")
+       do j = 1,4
+          ind(j) = 0
+       enddo
+       k = double_from_table("normal_results ", "order1 ", row, d_val)
+       ind(5) = int(d_val)
+       if (ind(5) == 0) ind(5) = 1
+       ind(6) = 0
+       d_val = n%A1%V(1).sub.ind
+    CASE ('dy')
+       do j = 1,4
+          ind(j) = 0
+       enddo
+       k = double_from_table("normal_results ", "order1 ", row, d_val)
+       ind(5) = int(d_val)
+       if (ind(5) == 0) ind(5) = 1
+       ind(6) = 0
+       d_val = n%A1%V(3).sub.ind
+    CASE ('qx')
+       do j = 1,6
+          ind(j) = 0
+       enddo
+       d_val = n%dhdj%V(3).sub.ind
+    CASE ('qy')
+       do j = 1,6
+          ind(j) = 0
+       enddo
+       d_val = n%dhdj%V(4).sub.ind
+    CASE DEFAULT
+       name_l = .true.
+    END SELECT
+    if (name_l) then
+       name_l = .false.
+       name_var2 = name_var
+       SELECT CASE (name_var2)
+       CASE ('dpx')
+          do j = 1,4
+             ind(j) = 0
+          enddo
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(5) = int(d_val)
+          if (ind(5) == 0) ind(5) = 1
+          ind(6) = 0
+          d_val = n%A1%V(2).sub.ind
+       CASE ('dpy')
+          do j = 1,4
+             ind(j) = 0
+          enddo
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(5) = int(d_val)
+          if (ind(5) == 0) ind(5) = 1
+          ind(6) = 0
+          d_val = n%A1%V(4).sub.ind
+       CASE ('qpx')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          do j = 1,4
+             ind(j) = 0
+          enddo
+          ind(5) = int(d_val)
+          if (ind(5) == 0) ind(5) = 1
+          ind(6) = 0
+          d_val = n%dhdj%V(3).sub.ind
+       CASE ('qpy')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          do j = 1,6
+             ind(j) = 0
+          enddo
+          ind(5) = int(d_val)
+          if (ind(5) == 0) ind(5) = 1
+          ind(6) = 0
+          d_val = n%dhdj%V(4).sub.ind
+       CASE DEFAULT
+          name_l = .true.
+       END SELECT
+    endif
+    if (name_l) then
+       SELECT CASE (name_var)
+       CASE ('anhx')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          do j = 1,2
+             ind(j) =  int(d_val)
+          enddo
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          do j = 3,4
+             ind(j) = int(d_val)
+          enddo
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(5) = int(d_val)
+          ind(6) = 0
+          d_val = n%dhdj%V(3).sub.ind
+       CASE ('anhy')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          do j = 1,2
+             ind(j) = int(d_val)
+          enddo
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          do j = 3,4
+             ind(j) = int(d_val)
+          enddo
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(5) = int(d_val)
+          ind(6) = 0
+          d_val = n%dhdj%V(4).sub.ind
+       CASE DEFAULT
+          print *,"Error in the table normal_results"
+       END SELECT
+    endif
+    double_from_ptc_normal = d_val/(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+  END FUNCTION double_from_ptc_normal
+
+  RECURSIVE FUNCTION FACTORIAL (N) &
+       RESULT (FACTORIAL_RESULT)
+    INTEGER :: N, FACTORIAL_RESULT
+    
+    IF (N <= 0 ) THEN
+       FACTORIAL_RESULT = 1
+    ELSE
+       FACTORIAL_RESULT = N * FACTORIAL (N-1)
+    END IF
+  END FUNCTION FACTORIAL
+
+
+
+  SUBROUTINE display_table_results()
+    implicit none
+    integer, external :: select_ptc_idx, string_from_table, double_from_table 
+    character(len = 4) name_var
+    integer row,k
+    integer :: ord(3)
+    real(dp) d_val
+
+    print *,"Variable name  Order 1  order 2  order 3        Value      "
+    do row = 1 , select_ptc_idx()
+       k = string_from_table("normal_results ", "name ", row, name_var)
+       k = double_from_table("normal_results ", "order1 ", row, d_val)
+       ord(1) = int(d_val)
+       k = double_from_table("normal_results ", "order2 ", row, d_val)
+       ord(2) = int(d_val)
+       k = double_from_table("normal_results ", "order3 ", row, d_val)
+       ord(3) = int(d_val)
+       k = double_from_table("normal_results ", "value ", row, d_val)
+       WRITE(*,100) name_var,ord(1),ord(2),ord(3),d_val
+    enddo
+100 FORMAT(3X,A4,14X,I1,8X,I1,8X,I1,5X,f25.18)
+  END SUBROUTINE display_table_results
+
+  SUBROUTINE ptc_normal()
+    USE ptc_results
     implicit none
     logical(lp) closed_orbit,normal
     integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
+    integer j, jj, k, n_rows, row
+    integer,external :: select_ptc_idx, minimum_acceptable_order, & 
+         string_from_table, double_from_table, result_from_normal
+
+    character(len = 4), parameter, dimension(10) :: &
+         names = (/'dx##','dpx#','dy##','dpy#','qx##','qpx#','qy##','qpy#','anhx','anhy'/)
     real(dp) x(6),deltap0,deltap
-    type(real_8) y(6)
+    !type(real_8) y(6)
+    integer :: column(6) = (/1,0,0,0,0,0/)
+    integer :: ord(3) 
+    real(dp) val_ptc,d_val
     real(kind(1d0)) get_value
-    type(normalform) n
+    character(len = 4) name_var
+
     !------------------------------------------------------------------------------
 
     if(universe.le.0) then
@@ -801,6 +1034,27 @@ CONTAINS
        n=y
        write(19,'(/a/)') 'Disperion, First and Higher Orders'
        call daprint(n%A1,19)
+
+!------ get values and store them in the table 'normal_results' ---------
+
+       n_rows = select_ptc_idx()
+       if (no <> minimum_acceptable_order()) then  
+          print *,"The minimum required order is ",minimum_acceptable_order(), &
+               "while the 'no' attribute in the command ptc_normal is ",no  
+       endif
+       if (no < minimum_acceptable_order()) then
+          print *,"ptc_normal failed. MAD-X continues."
+          stop
+       endif
+       if (n_rows > 0) then
+          do row = 1,n_rows
+             k = string_from_table("normal_results ", "name ", row, name_var)
+             val_ptc = double_from_ptc_normal(name_var,row)
+             call double_to_table_row("normal_results ", "value ", row, val_ptc)
+          enddo
+       endif
+!------------------------------------------------------------------------
+
        write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
        !  call daprint(n%A_t,19)
        !  call daprint(n%A,19)

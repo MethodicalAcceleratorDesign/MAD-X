@@ -6,6 +6,8 @@
 #define comment_to_table      comment_to_table_
 #define comm_para             comm_para_
 #define double_from_table     double_from_table_
+#define string_from_table     string_from_table_ /* ETDA 8 nov 2004 */
+#define double_to_table_row   double_to_table_row_ /* ETDA 11 nov 2004 */
 #define double_table          double_table_    /* ETDA 25 aug 2004 */
 #define double_to_table       double_to_table_
 
@@ -62,17 +64,19 @@
 #define vector_to_table       vector_to_table_
 #define vdot                  vdot_
 #define vmod                  vmod_
-#define w_ptc_create_universe w_ptc_create_universe_
-#define w_ptc_create_layout   w_ptc_create_layout_
-#define w_ptc_move_to_layout  w_ptc_move_to_layout_
-#define w_ptc_input           w_ptc_input_
-#define w_ptc_align           w_ptc_align_
-#define w_ptc_twiss           w_ptc_twiss_
-#define w_ptc_normal          w_ptc_normal_
-#define w_ptc_track           w_ptc_track_
-#define w_ptc_end             w_ptc_end_
-#define cf77flush             cf77flush_
-
+#define w_ptc_create_universe   w_ptc_create_universe_
+#define w_ptc_create_layout     w_ptc_create_layout_
+#define w_ptc_move_to_layout    w_ptc_move_to_layout_
+#define w_ptc_input             w_ptc_input_
+#define w_ptc_align             w_ptc_align_
+#define w_ptc_twiss             w_ptc_twiss_
+#define w_ptc_normal            w_ptc_normal_
+#define w_ptc_track             w_ptc_track_
+#define w_ptc_end               w_ptc_end_
+#define cf77flush               cf77flush_
+#define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
+#define result_from_normal      result_from_normal_ /* ETDA 11 nov 2004 */
+#define minimum_acceptable_order minimum_acceptable_order_ /* ETDA 17 nov 2004 */
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
 int is_operator(char c) {return (strchr("-+*/^", c) ? 1 : 0);}
@@ -139,7 +143,10 @@ int char_from_table(char*, char*, int*, char*); /* OB 2.4.2002 */
 void comment_to_table(char*, char*, int*);
 void comm_para(char*, int*, int*, int*, int*, double*, char*, int*);
 int double_from_table(char*, char*, int*, double*);
+int string_from_table(char*, char*, int*, char*);
 void double_to_table(char*, char*, double*);
+void double_to_table_row(char*, char*, int*, double*); /* ETDA 11 nov 2004 */
+int result_from_normal(char*, int*, double*); /* ETDA 11 nov 2004 */
 void element_name(char*, int*);
 double frndm();
 double get_aperture(struct node*, char*);
@@ -183,6 +190,8 @@ void vector_to_table(char*, char*, int*, double*);
 int interp_node(int *nint);
 int reset_interpolation(int *nint);
 int embedded_twiss();
+int select_ptc_idx(); /* 10 nov 2004 */
+int minimum_acceptable_order(); /* 17 nov 2004 */
 /* end additions */
 
 /* C routines called from C */
@@ -858,6 +867,9 @@ struct table* twiss_table_beam2;  /* current twiss table beam2 */
 /* E. T. d'Amico 2 feb 2004 */
 struct table* embedded_twiss_table;        /* current twiss table */
 /* end additions */
+/* E. T. d'Amico 5 nov 2004 */
+struct table* normal_results;     /* ptc table containing the selected high order functions (such as dx,qx,anhx etc.) */
+/* end additions */
 
 struct table* survey_table;       /* current survey table */
 struct table* corr_table;         /* corrector table after orbit correction */
@@ -921,7 +933,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 2.12";
+char myversion[] = "MAD-X 2.13";
 char one_string[] = "1";
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
@@ -974,7 +986,12 @@ int embedded_flag = 0;              /* flag (= 1 when entering routine pro_embed
 /* E. T. d'Amico 10 june 2004 */
 int trkplot_flag = 0;              /* flag (= 1 from the moment a plot in tracking mode is requested, reset to 0 at madx end) */
 /* end additions */
-
+/* E. T. d'Amico 5 nov 2004 */
+int select_ptc_table_idx = 1;      /* counter for the select ptc table (set to 1 at beginning of MAD-X - It allows multiple calls to select_ptc_normal commands) */
+/* end additions */
+/* E. T. d'Amico 17 nov 2004 */
+int min_order = 1;      /* minimum required order */
+/* end additions */
 int print_correct_opt = 1;  /* PRINT options for orbit correction */
 int debug_correct_opt = 0;  /* DEBUG options for orbit correction */
 int assign_start = 0;       /* flag for multiple assign statements */
