@@ -17,6 +17,15 @@ LIBX=/usr/X11R6/lib/libX11.a
 GLIB=/afs/cern.ch/group/si/slap/lib
 GPUB=/afs/cern.ch/group/si/slap/bin
 
+
+ifeq ($(OSTYPE),darwin)
+# allows running of madx under Macinstosh System 10
+# -fno-second-underscore  is old, do not use for more recent gnu compilers
+# better no optimization (safer for 2.95.2 compiler, no problem for 3.1) 
+# include headers for gxx11c
+  GCCP_FLAGS=-g -Wall -I /usr/X11R6/include/
+endif
+
 default: madx
 
 # files
@@ -62,3 +71,7 @@ gxx11.o: gxx11.f
 
 gxx11c.o: gxx11c.c
 	$(CC) $(GCCP_FLAGS) -c -o gxx11c.o gxx11c.c
+
+clean:
+	rm -f *.o
+	rm -f core
