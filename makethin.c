@@ -713,8 +713,14 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
     if (el_par_value("l",thick_node->p_elem)==zero) /* if it's already thin copy it directly*/
     {
       seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
-    } else { /* we have to slim it down a bit...*/
-      if (strcmp(thick_node->base_name,"marker") == 0      ||
+    }
+    else if(strcmp(thick_node->base_name,"matrix") == 0)
+    { /*hbu. Take matrix as it is, including any length */
+      seq_diet_add(thick_node,thin_sequ);
+    }
+    else
+    { /* we have to slim it down a bit...*/
+      if (strcmp(thick_node->base_name,"marker") == 0    ||
         strcmp(thick_node->base_name,"hmonitor") == 0    ||
         strcmp(thick_node->base_name,"vmonitor") == 0    ||
         strcmp(thick_node->base_name,"monitor") == 0     ||
