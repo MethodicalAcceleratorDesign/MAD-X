@@ -1,12 +1,13 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+! See file A_SCRATCH_SIZE.F90
+
 module S_extend_poly
   USE polymorphic_complextaylor
   IMPLICIT NONE
   integer,private,parameter::ndd=6
   private real_8REAL6,REAL6real_8,env_8map,real_8REAL_8,env_8benv
-  private alloc6,kill6,print6,PRINTenv
+  private print6,PRINTenv
   private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8,scdadd,daddsc
   LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
@@ -16,9 +17,7 @@ module S_extend_poly
   LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
-
   REAL(dp),TARGET   :: absolute_aperture=1e3_dp
-
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE REAL_8REAL6
      MODULE PROCEDURE REAL6REAL_8
@@ -44,16 +43,6 @@ module S_extend_poly
      MODULE PROCEDURE PRINT6
      MODULE PROCEDURE PRINTenv
   END  INTERFACE
-
-  !  INTERFACE ALLOC
-  !     MODULE PROCEDURE ALLOC6
-  !     MODULE PROCEDURE ALLOCenv6
-  !  END  INTERFACE
-
-  !  INTERFACE KILL
-  !     MODULE PROCEDURE KILL6
-  !     MODULE PROCEDURE killenv6
-  !  END  INTERFACE
 
 
 
@@ -97,15 +86,15 @@ CONTAINS
     INTEGER I,B
     I=0
     B=1
-    IF(.NOT.c_%CHECK_STABLE)         THEN;  I=B+I ; ENDIF; B=B*2;
-       IF(.NOT.c_%CHECK_MADX_APERTURE)  THEN;  I=B+I ; ENDIF; B=B*2;
-          IF(.NOT.c_%check_iteration)      THEN;  I=B+I ; ENDIF; B=B*2;
-             IF(.NOT.c_%check_interpolate_x)  THEN;  I=B+I ; ENDIF; B=B*2;
-                IF(.NOT.c_%check_interpolate_y)  THEN;  I=B+I ; ENDIF; B=B*2;
-                   IF(.NOT.c_%check_x_min)          THEN;  I=B+I ; ENDIF; B=B*2;
-                      IF(.NOT.c_%check_x_max)          THEN;  I=B+I ; ENDIF; B=B*2;
-                         IF(.NOT.c_%check_y_min)          THEN;  I=B+I ; ENDIF; B=B*2;
-                            IF(.NOT.c_%check_y_max)          THEN;  I=B+I ; ENDIF; B=B*2;
+    IF(.NOT.c_%CHECK_STABLE)         THEN;   I=B+I ;    ENDIF; B=B*2;
+       IF(.NOT.c_%CHECK_MADX_APERTURE)  THEN;   I=B+I ;    ENDIF; B=B*2;
+          IF(.NOT.c_%check_iteration)      THEN;   I=B+I ;    ENDIF; B=B*2;
+             IF(.NOT.c_%check_interpolate_x)  THEN;   I=B+I ;    ENDIF; B=B*2;
+                IF(.NOT.c_%check_interpolate_y)  THEN;   I=B+I ;    ENDIF; B=B*2;
+                   IF(.NOT.c_%check_x_min)          THEN;   I=B+I ;    ENDIF; B=B*2;
+                      IF(.NOT.c_%check_x_max)          THEN;   I=B+I ;    ENDIF; B=B*2;
+                         IF(.NOT.c_%check_y_min)          THEN;   I=B+I ;    ENDIF; B=B*2;
+                            IF(.NOT.c_%check_y_max)          THEN;   I=B+I ;    ENDIF; B=B*2;
 
                              END   SUBROUTINE PRODUCE_APERTURE_FLAG
 
@@ -228,22 +217,6 @@ CONTAINS
                              END SUBROUTINE killenv6
 
 
-
-                             SUBROUTINE  alloc6(S1)
-                               implicit none
-                               type (real_8),INTENT(INout)::S1(ndd)
-
-                               call alloc(s1,ndd)
-
-                             END SUBROUTINE alloc6
-
-                             SUBROUTINE  kill6(S1)
-                               implicit none
-                               type (real_8),INTENT(INout)::S1(ndd)
-
-                               call kill(s1,ndd)
-
-                             END SUBROUTINE kill6
 
 
 
@@ -466,7 +439,8 @@ CONTAINS
                              subroutine print_b(b,nmul,in,mf)
                                implicit none
                                type(B_CYL) b
-                               integer i,nmul,mf,in
+                               integer i,nmul,mf,in,no
+
 
                                do i=1,b%n_mono
                                   if(in==1.and.abs(b%a_x(nmul,i))>eps_extend_poly)write(mf,*) b%i(i),b%j(i),b%a_x(nmul,i)
@@ -503,6 +477,7 @@ CONTAINS
                                   enddo
                                enddo
 
+
                                k=0
                                m=no-1
                                do a=m,1,-1
@@ -510,23 +485,19 @@ CONTAINS
                                      k=k+1
                                      b%i(k)=a
                                      b%j(k)=j
-                                     !  write(6,*) K,b%i(k),b%j(k)
                                   enddo
                                   k=k+1
                                   b%i(k)=a
                                   b%j(k)=0
-                                  !  write(6,*) K,b%i(k),b%j(k)
                                enddo
                                do j=m,1,-1
                                   k=k+1
                                   b%i(k)=0
                                   b%j(k)=j
-                                  !   write(6,*) K,b%i(k),b%j(k)
                                enddo
                                k=k+1
                                b%i(k)=0
                                b%j(k)=0
-                               !  write(6,*) K,b%i(k),b%j(k)
 
                              end subroutine make_coef
 
@@ -695,8 +666,6 @@ CONTAINS
                                enddo
 
                                do i=1,no
-                                  !write(16,*) " Skew  da/dx ",  i
-                                  !call daprint(da(i,1),16)
                                   do j=1,b_sol%n_mono
                                      jd(1)=b_sol%i(j)
                                      jd(2)=b_sol%j(j)
@@ -711,9 +680,6 @@ CONTAINS
                                      call pek(da(i,1),jd,b_sol%a_x(i,j))
                                      if(abs(b_sol%a_x(i,j))<eps_extend_poly) b_sol%a_x(i,j)=zero
                                   enddo
-                                  !call print_b(b_sol,i,1,16)
-                                  !write(16,*) " Skew  da/dy ",  i
-                                  !call daprint(da(i,2),16)
                                   do j=1,b_sol%n_mono
                                      jd(1)=b_sol%i(j)
                                      jd(2)=b_sol%j(j)
@@ -728,9 +694,6 @@ CONTAINS
                                      call pek(da(i,2),jd,b_sol%a_y(i,j))
                                      if(abs(b_sol%a_y(i,j))<eps_extend_poly) b_sol%a_y(i,j)=zero
                                   enddo
-                                  !call print_b(b_sol,i,2,16)
-                                  !write(16,*) " Normal  db/dx ",  i
-                                  !call daprint(db(i,1),16)
                                   do j=1,b_sol%n_mono
                                      jd(1)=b_sol%i(j)
                                      jd(2)=b_sol%j(j)
@@ -745,9 +708,6 @@ CONTAINS
                                      call pek(db(i,1),jd,b_sol%b_x(i,j))
                                      if(abs(b_sol%b_x(i,j))<eps_extend_poly) b_sol%b_x(i,j)=zero
                                   enddo
-                                  !call print_b(b_sol,i,3,16)
-                                  !write(16,*) " Normal  db/dy ",  i
-                                  !call daprint(db(i,2),16)
                                   do j=1,b_sol%n_mono
                                      jd(1)=b_sol%i(j)
                                      jd(2)=b_sol%j(j)
@@ -762,7 +722,6 @@ CONTAINS
                                      call pek(db(i,2),jd,b_sol%b_y(i,j))
                                      if(abs(b_sol%b_y(i,j))<eps_extend_poly) b_sol%b_y(i,j)=zero
                                   enddo
-                                  !call print_b(b_sol,i,4,16)
                                enddo
 
                                call kill(y0)

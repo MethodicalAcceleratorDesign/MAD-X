@@ -1,6 +1,6 @@
 * text=auto !eol
 /Makefile -text
-/Sb_extend_poly.f90 -text
+/Sa_extend_poly.f90 -text
 /Sc_1_pol_template.f90 -text
 /Sc_2_pol_template.f90 -text
 /Sd_euclidean.f90 -text
