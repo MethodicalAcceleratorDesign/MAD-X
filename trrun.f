@@ -1373,27 +1373,23 @@
 !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
 !   ntrk      (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
-      integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
+      integer flag,turn,part_id(*),last_turn(*),ntrk,i,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
      &one
       parameter(one=1d0)
       character*24 aptype
-
-      n = 1
- 10   continue
-      do i = n, ntrk
+!*****  Cleaned by HB/AV 9.10.02
+      do i = 1, ntrk
 !---- Is particle outside aperture?
         if (flag .eq. 1                                                 &
      &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one            &
      &  .or. flag .eq. 2                                                &
      &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy))         &
      &  then
-          n = i
           nn=24
           call node_string('apertype ',aptype,nn)
-          call trkill(n, turn, sum, ntrk, part_id,                      &
+          call trkill(i, turn, sum, ntrk, part_id,                      &
      &    last_turn, last_pos, last_orbit, z,aptype)
-           goto 10
         endif
       enddo
       end
