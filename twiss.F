@@ -2669,6 +2669,7 @@
       bv0 = node_value('dipole_bv ')
       deltap = get_value('probe ','deltap ')
       arad = get_value('probe ','arad ')
+      arad = get_value('probe ','arad ')
       gamma = get_value('probe ','gamma ')
       dorad = get_value('probe ','radiate ') .ne. zero
 
@@ -2757,13 +2758,14 @@
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'twtrr.fi'
-      logical fsec,ftrk,fmap
+      logical fsec,ftrk,fmap,dorad
       integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors,get_option
       double precision orbit(6),f_errors(0:maxferr),re(6,6),te(6,6,6),x,&
      &y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),              &
-     &skew(0:maxmul),node_value,get_value,bv0,bvk,zero,one,two
-      parameter(zero=0d0,one=1d0,two=2d0)
+     &skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bv0,bvk,  &
+     &dpxr,dpyr,zero,one,two,three
+      parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
       call dzero(f_errors,maxferr+1)
@@ -2772,6 +2774,9 @@
       bvk = node_value('other_bv ')
 !---- Multipole length for radiation.
       elrad = node_value('lrad ')
+      dorad = get_value('probe ','radiate ') .ne. zero
+      arad = get_value('probe ','arad ')
+      gammas= get_value('probe ','gamma ')
       deltap = get_value('probe ', 'deltap ')
       beta = get_value('probe ','beta ')
       fmap = .true.
@@ -2830,6 +2835,18 @@
         dpx = dbr + (dr * x - di * y)
         dpy = dbi + (di * x + dr * y)
 
+
+*---- Radiation effects at entrance.
+        if (dorad  .and.  elrad .ne. zero) then
+          dpxr = dpx + dipr
+          dpyr = dpy + dipi
+          rfac = arad * gammas**3 * (dpxr**2+dpyr**2) / (three*elrad)
+          pt = orbit(6)
+          orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
+          orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
+          orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+        endif
+
 !---- Track orbit.
         orbit(2) = orbit(2) - dpx + dipr * (deltap + bi*orbit(6))
         orbit(4) = orbit(4) + dpy - dipi * (deltap + bi*orbit(6))
@@ -2839,6 +2856,14 @@
         orbit(2) = orbit(2)-dipr*dipr/elrad*x
         orbit(4) = orbit(4)-dipi*dipi/elrad*y
       endif
+
+*---- Radiation effects at exit.
+        if (dorad  .and.  elrad .ne. zero) then
+          pt = orbit(6)
+          orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
+          orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
+          orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+        endif
 
 !---- Orbit not wanted.
       else
