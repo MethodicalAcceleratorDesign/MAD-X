@@ -29,21 +29,24 @@ void pro_correct(struct in_cmd* cmd)
 void correct_correct(struct in_cmd* cmd)
 {
   int ix, im, ip, it;
-  int j,err,nnnseq;
+  int i,j,err,nnnseq;
   int imon, icor;
   int ncorr, nmon;
   int niter;
   int resout;
   int twism;
-  int ifail;
+  struct timeb tp;
+  int ifail, sflag, svdflg;
   float  rms;
   double tmp1, tmp2, tmp3, tmp4;
   char    *clist, *mlist;    /* file names for monitor and corrector output */ 
-  double  *dmat;             /* response matrix, double precision */
+  double  *dmat = {NULL};    /* response matrix, double precision */
   double  *corvec, *monvec;  /* vectors to hold measured orbit and correctors */
   double  *resvec;           /* vector to hold corrected orbit */
   char    *conm;             /* vector to hold corrector names (for MICADO) */
+  int     *sing;             /* array to store pointer to singular correctors */
   static int     *nm, *nx, *nc;
+  struct id_mic  *corl;
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct_gettables(ip);
@@ -88,9 +91,10 @@ void correct_correct(struct in_cmd* cmd)
   }
 
   /* allocate vectors used by correction algorithms */
-  nx = (int *)mycalloc("correct_correct_nx",ncorr,sizeof(int));
-  nc = (int *)mycalloc("correct_correct_nc",ncorr,sizeof(int));
-  nm = (int *)mycalloc("correct_correct_nm",nmon,sizeof(int));
+  nx  = (int *)mycalloc("correct_correct_nx",ncorr,sizeof(int));
+  nc  = (int *)mycalloc("correct_correct_nc",ncorr,sizeof(int));
+  nm  = (int *)mycalloc("correct_correct_nm",nmon,sizeof(int));
+  sing = (int *)mycalloc("correct_correct_sing",ncorr*2,sizeof(int));
   corvec = (double *)mycalloc("correct_correct_corvec",ncorr,sizeof(double));
   monvec = (double *)mycalloc("correct_correct_monvec",nmon,sizeof(double));
   resvec = (double *)mycalloc("correct_correct_resvec",nmon,sizeof(double));
@@ -103,31 +107,61 @@ void correct_correct(struct in_cmd* cmd)
   icor = ix%10000; imon  = ix/10000;
   printf("%d monitors and %d correctors enabled\n",imon,icor);
 
-  ncorr = icor;
-  nmon = imon;
+  corl = correct_orbit->cor_table;
+
   /* set up response matrix for ring or line */
   if(strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
-    dmat = (double *)pro_correct_response_ring(ip,ncorr,nmon); } 
+    if(dmat != NULL) free(dmat);
+    /* icor and imon used to set up correct matrix size !! */
+    dmat = (double *)pro_correct_response_ring(ip,icor,imon); 
+    if((svdflg = command_par_value("cond",cmd->clone)) == 1) {
+       printf("SVD conditioning requested ...\n");
+       /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */                
+       sflag=c_svddec(dmat,imon,icor,sing);
+       /* printf("Time after svd-cond:  %-6.3f\n",fextim());     */               
+       /* printf("sflag: %d\n",sflag); */
+       for(ix=0;ix<sflag;ix++) {
+         corl[nx[sing[2*ix+0]]].enable = 0;
+         printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
+                 corl[nx[sing[2*ix+0]]].p_node->name);
+       }
+       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
+       icor = ix%10000; imon  = ix/10000;
+       printf("After SVD conditioning:             \n");
+       printf("%d monitors and %d correctors enabled\n\n",imon,icor);
+       if(dmat != NULL) free(dmat);
+       /* icor and imon used to set up correct matrix size !! */
+       dmat = (double *)pro_correct_response_ring(ip,icor,imon); 
+       sflag=c_svddec(dmat,imon,icor,sing);
+       printf("Found %d singular values\n",sflag);
+    }
+  } 
   else if(strcmp("line",command_par_string("flag",cmd->clone)) == 0) {
+    if(dmat != NULL) free(dmat);
     dmat = (double *)pro_correct_response_line(ip,ncorr,nmon); } 
-  else { printf("INVALID MACHINE TYPE\n"); exit(-1);}
+  else { printf("INVALID MACHINE TYPE\n"); exit(-1);
+  }
 
   if (get_option("debug")) {
     pro_correct_prtwiss();
     pro_correct_write_cocu_table();
   }
 
-/*
-  ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-  icor = ix%10000; imon  = ix/10000;
-  printf("%d monitors and %d correctors enabled\n",imon,icor);
-*/
+  /* LSQ correction, use all available correctors */
+  if(strcmp("lsq",command_par_string("mode",cmd->clone)) == 0) {
+    /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
+    /* printf("Time before lsq:  %-6.3f\n",fextim());   */                 
+    c_haveit(dmat,monvec,corvec,resvec,nx,imon,icor);
+    /* printf("Time after lsq:  %-6.3f\n",fextim());    */                
+    pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+  }
 
   /* SVD correction, use all available correctors */
-  /* if NCORR not set, use all available correctors */
   if(strcmp("svd",command_par_string("mode",cmd->clone)) == 0) {
     /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
-    c_haveit(dmat,monvec,corvec,resvec,nx,imon,icor);
+    /* printf("Time before svd-corr:  %-6.3f\n",fextim());   */                 
+       sflag=c_svdcorr(dmat,monvec,corvec,resvec,nx,imon,icor);
+    /* printf("Time after svd-corr:  %-6.3f\n",fextim());    */                
     pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
   }
 
@@ -136,6 +170,7 @@ void correct_correct(struct in_cmd* cmd)
 
   /* MICADO correction, get desired number of correctors from command */
   if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
+    printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
           printf("Requested %d correctors (???) set to %d\n",niter,icor);
           niter = icor;
@@ -153,7 +188,9 @@ void correct_correct(struct in_cmd* cmd)
     
     rms  = 1000.0*command_par_value("error",cmd->clone);
     /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
+    /* printf("Time before micado:  %-6.3f\n",fextim());  */                  
     ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
+    /* printf("Time after micado:  %-6.3f\n",fextim());   */                 
     if(ifail != 0) {
        printf("MICADO correction completed with error code %d\n\n",ifail);
     }
@@ -168,9 +205,9 @@ void correct_correct(struct in_cmd* cmd)
   if ((mlist = command_par_string("mlist",cmd->clone)) != NULL) {
     out_table("mon",mon_table,mlist);
   }
-
+  free(nm);
   free(dmat);
-  free(nx); free(nc); free(nm);
+  free(nx); free(nc); 
   free(corvec); free(monvec); free(resvec);
   free(conm);
   return;
@@ -803,6 +840,14 @@ void correct_option(struct in_cmd* cmd)
       if (debug)  fprintf(prt_file, "print option set\n");
       print_correct_opt = val;
  }
+ val = command_par_value("debug", cmd->clone);
+ if(val == 0) {
+      if (debug)  fprintf(prt_file, "debug option not set\n");
+      debug_correct_opt = 0;
+ }else {
+      if (debug)  fprintf(prt_file, "debug option set\n");
+      debug_correct_opt = val;
+ }
 
 }
 
@@ -919,17 +964,8 @@ int c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resve
   
   micit_(dmat,conm,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter,ny,ax,cinx,xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,&ifail);
 
-  free(ny);
-  free(ax);
-  free(cinx);
-  free(xinx);
-  free(resx);
-  free(rho);
-  free(ptop);
-  free(rmss);
-  free(xrms);
-  free(xptp);
-  free(xiter);
+  free(ny); free(ax); free(cinx); free(xinx); free(resx); free(rho); 
+  free(ptop); free(rmss); free(xrms); free(xptp); free(xiter);
 /*
 */
 
@@ -940,23 +976,74 @@ void c_haveit(double *dmat,double *monvec,double *corvec,double *resvec,int *nx,
 {
   double *cb,*xmeas,*xres,*y,*z,*xd;
 
-  cb   =(double *)mycalloc("c_haveit_cb",icor,sizeof(float));
-  xmeas=(double *)mycalloc("c_haveit_xmeas",imon,sizeof(float));
-  xres =(double *)mycalloc("c_haveit_xres",imon,sizeof(float));
-  y    =(double *)mycalloc("c_haveit_y",icor*imon,sizeof(float));
-  z    =(double *)mycalloc("c_haveit_z",icor*icor,sizeof(float));
-  xd   =(double *)mycalloc("c_haveit_xd",icor,sizeof(float));
+  cb   =(double *)mycalloc("c_haveit_cb",icor,sizeof(double));
+  xmeas=(double *)mycalloc("c_haveit_xmeas",imon,sizeof(double));
+  xres =(double *)mycalloc("c_haveit_xres",imon,sizeof(double));
+  y    =(double *)mycalloc("c_haveit_y",icor*imon,sizeof(double));
+  z    =(double *)mycalloc("c_haveit_z",icor*icor,sizeof(double));
+  xd   =(double *)mycalloc("c_haveit_xd",icor,sizeof(double));
 
   haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor,cb,xmeas,xres,y,z,xd);
 
-  free(cb);   
-  free(xmeas);
-  free(xres); 
-  free(y);    
-  free(z);    
-  free(xd);   
+  free(cb); free(xmeas); free(xres); free(y);  free(z); free(xd);   
 
   return;
+}
+
+int  c_svddec(double *dmat, int imon, int icor, int *sing)
+{
+  int    i;
+  int    flag;
+  int    dbg;
+
+  double *s, *u, *v, *w, *ut, *vt, *wt;
+
+  s   =(double *)mycalloc("c_svddec_s",icor*imon,sizeof(double));
+  u   =(double *)mycalloc("c_svddec_u",icor*imon,sizeof(double));
+  v   =(double *)mycalloc("c_svddec_v",icor*imon,sizeof(double));
+  w   =(double *)mycalloc("c_svddec_w",icor*imon,sizeof(double));
+  ut  =(double *)mycalloc("c_svddec_ut",icor*imon,sizeof(double));
+  vt  =(double *)mycalloc("c_svddec_vt",icor*imon,sizeof(double));
+  wt  =(double *)mycalloc("c_svddec_wt",icor*imon,sizeof(double));
+
+  dbg = debug_correct_opt;
+
+  if(imon >= icor ) {
+      svddec_m_(dmat,s,u,v,w,ut,vt,wt,&imon,&icor,&flag,sing,&dbg);             
+  } else {
+      svddec_c_(dmat,s,u,v,w,ut,vt,wt,&imon,&icor,&flag,sing,&dbg);             
+  }
+  free(s); free(u); free(v); free(w); free(ut); free(vt); free(wt);
+
+  return(flag);
+}
+
+int  c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int imon, int icor)
+{
+  int    i;
+  int    flag;
+  int    dbg;
+
+  double *s, *u, *v, *w, *ut, *vt, *wt;
+
+  s   =(double *)mycalloc("c_svdcorr_s",icor*imon,sizeof(double));
+  u   =(double *)mycalloc("c_svdcorr_u",icor*imon,sizeof(double));
+  v   =(double *)mycalloc("c_svdcorr_v",icor*imon,sizeof(double));
+  w   =(double *)mycalloc("c_svdcorr_w",icor*imon,sizeof(double));
+  ut  =(double *)mycalloc("c_svdcorr_ut",icor*imon,sizeof(double));
+  vt  =(double *)mycalloc("c_svdcorr_vt",icor*imon,sizeof(double));
+  wt  =(double *)mycalloc("c_svdcorr_wt",icor*imon,sizeof(double));
+
+  dbg = debug_correct_opt;
+
+  if(imon >= icor ) {
+      svdcorr_m_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,nx,&imon,&icor,&flag,&dbg);             
+  } else {
+      svdcorr_c_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,nx,&imon,&icor,&flag,&dbg);             
+  }
+  free(s); free(u); free(v); free(w); free(ut); free(vt); free(wt);
+
+  return(flag);
 }
 
 void   f_ctof(int *j, char *string, int *nel)
@@ -977,4 +1064,16 @@ void   f_ctof(int *j, char *string, int *nel)
     }
     }
         *j = i;
+}
+float fextim()
+{
+    struct timeb tp;
+    float mytime;
+
+    ftime(&tp);
+
+    mytime = (float)(tp.time%10000) + 0.001*tp.millitm;
+    /* printf("Time now:  %-6.3f\n",mytime);    */              
+
+    return(mytime);
 }

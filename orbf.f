@@ -1,5 +1,4 @@
       subroutine setup(resp,a,im,ic,nm,nc)
-      implicit none
 ! ****************************************************
 !                                                    *
 !    Set DOUBLE PRECISION (A)                        *
@@ -9,6 +8,7 @@
 !     Author: WFH  05.02.02                          *
 !                                                    *
 ! ****************************************************
+      implicit none
       integer im,ic,nm,nc
       double precision resp,a(nm, nc)
 
@@ -20,6 +20,13 @@
 
       subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
      &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
+! ****************************************************
+!                                                    *
+!    Driving routine for MICADO correction           *
+!                                                    *
+!     Author: WFH  05.02.02                          *
+!                                                    *
+! ****************************************************
 
       implicit none
       integer im,ic,iter,i,j,nx(ic),ny(ic)
@@ -62,6 +69,13 @@
       return
       end
       subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
+! ****************************************************
+!                                                    *
+!    Driving routine for LSQ correction              *
+!                                                    *
+!     Author: WFH  05.02.02                          *
+!                                                    *
+! ****************************************************
       implicit none
       integer im,ic,nx(ic),i,j
       double precision a(im,ic),xin(im),cin(ic),res(im),cb(ic),         &
@@ -76,15 +90,607 @@
       do  i = 1,im
         res(i) = zero
       enddo
+
 !     write(*,*) '==> ',res
       write(*,*) ' '
       write(*,*) 'start LEAST SQUARES correction with all correctors'
       write(*,*) ' '
       call solsql(im,ic,a,xin,res,cin,cb,xmeas,xres,y,z,xd)
- 6001 format(1X,'Corrector: ',I2,' strength: ',F12.8)
+ 6001 format(1X,'Corrector: ',I4,'   strength: ',F12.8)
+      write(*,*) ' '
+      write(*,*) 'end LEAST SQUARES correction with all correctors'
+      write(*,*) ' '
       do  i = 1,ic
-!         write(*,6001) i,cin(i)
+c         write(*,*) i,cin(i)
+          nx(i) = i
+      enddo
+      return
+      end
+      subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                    im,ic,iflag,sing,dbg)
+! ****************************************************
+!                                                    *
+!    Performs SVD and analysis for matrix with more  *
+!    monitors than correctors.                       *
+!                                                    *
+!     Author: WFH  12.09.02                          *
+!                                                    *
+! ****************************************************
+      implicit none
+      integer im,ic,nx(ic),i,j,jj,ii 
+      integer iflag,sing(2,ic)
+      double precision a(im,ic)
+      double precision svdmat(im,ic)
+      double precision umat(im,ic), utmat(ic,im)
+      double precision vmat(im,ic), vtmat(ic,im)
+      double precision wmat(im,ic), wtmat(ic,im)
+      double precision rv1(ic),wvec(ic)
+      double precision wvmat(im,ic),uwvmat(im,ic)
+      double precision svdtest(10,3)
+      double precision ddum, rat, zero, sngval, sngcut         
+      integer amater, svdmx, svdnx, svdnm
+      integer sortw(ic)
+      integer nsing
+      logical matu, matv, tst
+      integer dbg
+      parameter(zero = 0d0)
+      parameter(nsing = 5)
+      parameter(sngcut = 50.)
+      parameter(sngval = 2.0000)
+      data svdtest/3,8,8,8,4,9,9,2,8,8,
+     &             4,1,7,2,6,1,6,4,6,2,
+     &             1,9,7,2,2,6,9,8,3,5/
+
+      MATU = .TRUE.
+      MATV = .TRUE.
+      tst  = .TRUE.
+      tst  = .FALSE.
+      iflag = 0
+
+      if(tst) then
+         im = 10
+         ic = 3
+      endif
+
+      SVDNM = max(ic,im)
+      svdmx = im
+      svdnx = ic
+
+      do  i = 1,im
+        do  j = 1,ic
+            svdmat(i,j) = a(i,j)
+            if(tst) svdmat(i,j) = svdtest(i,j)
+            wvmat(i,j) = 0.0
+            uwvmat(i,j) = 0.0
+        enddo
+      enddo
+      
+      if(dbg.eq.1) then
+          write(*,*) 'A0:'
+      do  j = 1,im
+          write(*,6003) (svdmat(j,i),i=1,ic)
+      enddo
+      endif
+      call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
+     &         matv,vmat,amater,rv1)
+ 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+ 6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+ 6003 format(16(2X,F7.2))
+ 6004 format(16(2X,F7.2))
+      if(amater.ne.0) then
+        write(*,*) 'end SVD with error code: ',amater                       
+      endif
+      if(dbg.eq.1) then
+      do  i = 1,ic
+          write(*,*) i,wvec(I)
+          write(*,6001) i,wvec(I)
+          wmat(i,i) = wvec(i)
+      enddo
+      endif
+      call rvord(wvec,sortw,ic)
+      if(dbg.eq.1) then
+      do  i = 1,ic
+          write(*,*) i,sortw(i),wvec(sortw(i))
+      enddo
+      endif
+      do  i = 1,ic
+          do  j = 1,im
+              vtmat(i,j) = vmat(j,i)
+          enddo
+      enddo
+      do  ii = 1,min(nsing,ic)
+          i = sortw(ii)
+          if(abs(wvec(i)).lt.sngval) then
+             if(dbg.eq.1) then
+             do  j = 1,ic
+                write(*,6002) i,j,vmat(j,i)
+             enddo
+             endif
+             do  j = 1,ic-1
+                do  jj = j+1,ic
+                if(abs(vmat(j,i)).gt.1.0E-4) then
+                   rat = abs(vmat(j,i) - vmat(jj,i))
+                   rat = rat/abs(abs(vmat(j,i)) - abs(vmat(jj,i)))
+                   if(rat.gt.sngcut) then
+                      if(dbg.eq.1) then
+                      write(*,*) 'dependent pair: ',j,jj,rat
+                      endif
+                      if(iflag.lt.ic) then
+                         iflag = iflag + 1
+                         sing(1,iflag) =  j - 1
+                         sing(2,iflag) = jj - 1
+                      endif
+                   endif
+                endif
+                enddo
+             enddo
+          endif
+      enddo
+
+      if(dbg.eq.1) then
+          write(*,*) 'A1:'
+      do  j = 1,im
+          write(*,6003) (svdmat(j,i),i=1,ic)
+      enddo
+      write(*,*) ' '
+
+          write(*,*) 'Va:'
+      do  j = 1,ic
+          write(*,6004) (vmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'Vt:'
+      do  j = 1,ic
+          write(*,6004) (vtmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'W:'
+      do  j = 1,im
+          write(*,6004) (wmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'U:'
+      do  j = 1,im
+          write(*,6004) (umat(j,i),i=1,im)
+      enddo
+      call dmmlt(ic,ic,ic,wmat,wmat(1,2),wmat(2,1),
+     &                    vtmat,vtmat(1,2),vtmat(2,1),
+     &                    wvmat,wvmat(1,2),wvmat(2,1),ddum)
+      call dmmlt(im,ic,ic,umat,umat(1,2),umat(2,1),
+     &                    wvmat,wvmat(1,2),wvmat(2,1),
+     &                    uwvmat,uwvmat(1,2),uwvmat(2,1),ddum)
+          write(*,*) 'UWV:'
+      do  j = 1,im
+          write(*,6003) (uwvmat(j,i),i=1,ic)
+      enddo
+      endif
+      return
+      end
+      subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                    im,ic,iflag,sing,dbg)
+! ****************************************************
+!                                                    *
+!    Performs SVD and analysis for matrix with more  *
+!    correctors than monitors.                       *
+!                                                    *
+!     Author: WFH  12.09.02                          *
+!                                                    *
+! ****************************************************
+      implicit none
+      integer im,ic,nx(ic),i,j,jj,ii
+      integer iflag,sing(2,ic)
+      double precision a(im,ic)
+      double precision svdmat(ic,im)
+      double precision umat(ic,im), utmat(im,ic)
+      double precision vmat(ic,im), vtmat(im,ic)
+      double precision wmat(ic,im), wtmat(im,ic)
+      double precision rv1(ic),wvec(ic)
+      double precision wvmat(ic,im),uwvmat(ic,im)
+      double precision ddum, rat, zero, sngcut, sngval
+      integer sortw(ic)
+      integer amater, svdmx, svdnx, svdnm
+      integer nsing
+      logical matu, matv
+      integer dbg
+      parameter(zero = 0d0)
+      parameter(nsing = 5)
+      parameter(sngcut = 50.)
+      parameter(sngval = 2.0000)
+
+      MATU = .TRUE.
+      MATV = .TRUE.
+      iflag = 0
+
+c     im = 10
+c     ic = 3
+      SVDNM = max(ic,im)
+      svdmx = ic
+      svdnx = im
+
+      do  i = 1,im
+        do  j = 1,ic
+            svdmat(j,i) = a(i,j)
+c           svdmat(i,j) = a(i,j)
+            wvmat(i,j) = 0.0
+            uwvmat(i,j) = 0.0
+        enddo
+      enddo
+
+ 8373 continue
+      
+      if(dbg.eq.1) then
+          write(*,*) 'A0:'
+      do  j = 1,ic
+          write(*,6003) (svdmat(j,i),i=1,im)
+      enddo
+      endif
+      call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
+     &         matv,vmat,amater,rv1)
+ 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+ 6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+ 6003 format(16(2X,F7.2))
+ 6004 format(16(2X,F7.2))
+      if(amater.ne.0) then
+        write(*,*) 'end SVD with error code: ',amater                       
+      endif
+      if(dbg.eq.1) then
+      do  i = 1,im
+          write(*,*) i,wvec(I)
+          write(*,6001) i,wvec(I)
+          wmat(i,i) = wvec(i)
+      enddo
+      endif
+      call rvord(wvec,sortw,im)
+      if(dbg.eq.1) then
+      do  i = 1,im
+          write(*,*) i,sortw(i),wvec(sortw(i))
+      enddo
+      endif
+      do  i = 1,im
+          do  j = 1,ic
+              vtmat(i,j) = vmat(j,i)
+          enddo
+      enddo
+      do  ii = 1,min(nsing,im)
+          i = sortw(ii)
+          if(abs(wvec(i)).lt.sngval) then
+             if(dbg.eq.1) then
+             do  j = 1,ic
+                write(*,6002) i,j,umat(j,i)
+             enddo
+             endif
+             do  j = 1,ic-1
+                do  jj = j+1,ic
+                if(abs(umat(j,i)).gt.1.0E-4) then
+                   rat = abs(umat(j,i) - umat(jj,i))
+                   rat = rat/abs(abs(umat(j,i)) - abs(umat(jj,i)))
+                   if(rat.gt.sngcut) then
+                      if(dbg.eq.1) then
+                      write(*,*) 'dependent pair: ',j,jj,rat
+                      endif
+                      if(iflag.lt.ic) then
+                         iflag = iflag + 1
+                         sing(1,iflag) =  j - 1
+                         sing(2,iflag) = jj - 1
+                      endif
+                   endif
+                endif
+                enddo
+             enddo
+          endif
+      enddo
+
+      if(dbg.eq.1) then
+          write(*,*) 'A1:'
+      do  j = 1,ic
+          write(*,6003) (svdmat(j,i),i=1,im)
+      enddo
+      write(*,*) ' '
+
+          write(*,*) 'Va:'
+      do  j = 1,ic
+          write(*,6004) (vmat(j,i),i=1,im)
+      enddo
+          write(*,*) 'Vt:'
+      do  j = 1,im
+          write(*,6004) (vtmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'W:'
+      do  j = 1,im
+          write(*,6004) (wmat(j,i),i=1,im)
+      enddo
+          write(*,*) 'U:'
+      do  j = 1,ic
+          write(*,6004) (umat(j,i),i=1,im)
+      enddo
+      call dmmlt(im,im,im,wmat,wmat(1,2),wmat(2,1),
+     &                    vtmat,vtmat(1,2),vtmat(2,1),
+     &                    wvmat,wvmat(1,2),wvmat(2,1),ddum)
+      call dmmlt(ic,im,im,umat,umat(1,2),umat(2,1),
+     &                    wvmat,wvmat(1,2),wvmat(2,1),
+     &                    uwvmat,uwvmat(1,2),uwvmat(2,1),ddum)
+          write(*,*) 'UWV:'
+      do  j = 1,ic
+          write(*,6003) (uwvmat(j,i),i=1,im)
+      enddo
+      endif
+      return
+      end
+      subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                       xin,xc,xout,nx,im,ic,iflag,dbg)
+! ******************************************************
+!                                                      *
+!    Performs SVD and correction for matrix with more  *
+!    monitors than correctors.                         *
+!                                                      *
+!     Author: WFH  12.09.02                            *
+!                                                      *
+! ******************************************************
+      implicit none
+      integer im,ic,nx(ic),i,j,jj,ii 
+      integer iflag
+      double precision a(im,ic)
+      double precision svdmat(im,ic)
+      double precision umat(im,ic), utmat(ic,im)
+      double precision vmat(im,ic), vtmat(ic,im)
+      double precision wmat(im,ic), wtmat(ic,im)
+      double precision rv1(ic),wvec(ic)
+      double precision xin(im),xa(im),xb(im),xc(ic),xpred(im)
+      double precision xout(im)
+      integer amater, svdmx, svdnx, svdnm
+      integer sortw(ic)
+      logical matu, matv, tst
+      integer dbg
+
+      MATU = .TRUE.
+      MATV = .TRUE.
+      tst  = .TRUE.
+      tst  = .FALSE.
+      iflag = 0
+      write(*,*) ' '
+      write(*,*) 'start SVD correction using ',ic,' correctors'
+      write(*,*) ' '
+
+      SVDNM = max(ic,im)
+      svdmx = im
+      svdnx = ic
+
+      do  i = 1,ic
+         nx(i) = i                             
+      enddo
+
+      do  i = 1,im
+        do  j = 1,ic
+            svdmat(i,j) = a(i,j)
+        enddo
+      enddo
+      
+      if(dbg.eq.1) then
+          write(*,*) 'A0:'
+      do  j = 1,im
+          write(*,6003) (svdmat(j,i),i=1,ic)
+      enddo
+      endif
+      call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
+     &         matv,vmat,amater,rv1)
+ 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+ 6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+ 6003 format(16(2X,F7.2))
+ 6004 format(16(2X,F7.2))
+      if(amater.ne.0) then
+        write(*,*) 'end SVD with error code: ',amater                       
+      endif
+      do  i = 1,ic
+          if(dbg.eq.1) then
+             write(*,*) i,wvec(I)
+             write(*,6001) i,wvec(I)
+          endif
+          wmat(i,i) = wvec(i)
+          if(abs(wvec(I)).gt.1.0001) then
+                 wtmat(i,i) = 1/wvec(i)
+          else
+                 wtmat(i,i) = 0.0
+          endif
+      enddo
+      if(dbg.eq.1) then
+      call rvord(wvec,sortw,ic)
+      do  i = 1,ic
+          write(*,*) i,sortw(i),wvec(sortw(i))
+      enddo
+      endif
+      do  i = 1,ic
+          do  j = 1,im
+              vtmat(i,j) = vmat(j,i)
+              utmat(i,j) = umat(j,i)
+          enddo
+      enddo
+
+      if(dbg.eq.1) then
+          write(*,*) 'A1:'
+      do  j = 1,im
+          write(*,6003) (svdmat(j,i),i=1,ic)
+      enddo
+      write(*,*) ' '
+
+          write(*,*) 'Va:'
+      do  j = 1,ic
+          write(*,6004) (vmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'Vt:'
+      do  j = 1,ic
+          write(*,6004) (vtmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'W:'
+      do  j = 1,im
+          write(*,6004) (wmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'Wt:'
+      do  j = 1,ic
+          write(*,6004) (wtmat(j,i),i=1,im)
+      enddo
+          write(*,*) 'U:'
+      do  j = 1,im
+          write(*,6004) (umat(j,i),i=1,im)
+      enddo
+          write(*,*) 'Ut:'
+      do  j = 1,im
+          write(*,6004) (utmat(j,i),i=1,im)
+      enddo
+      endif
+      call dmmpy(im,im,utmat(1,1),utmat(1,2),utmat(2,1),
+     &           xin(1),xin(2),xa(1),xa(2))
+      call dmmpy(ic,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),
+     &           xa(1),xa(2),xb(1),xb(2))
+      call dmmpy(ic,ic,vmat(1,1),vmat(1,2),vmat(2,1),
+     &           xb(1),xb(2),xc(1),xc(2))
+      call dmmpy(im,ic,svdmat(1,1),svdmat(1,2),svdmat(2,1),
+     &           xc(1),xc(2),xpred(1),xpred(2))
+      if(dbg.eq.1) then
+      write(*,*) xc
+      write(*,*) xpred
+      endif
+      do  i = 1,im
+          xout(i) = xin(i) - xpred(i)
+      enddo
+      do  i = 1,ic
+          xc(i) = -xc(i)
+      enddo
+      return
+      end
+      subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                       xin,xc,xout,nx,im,ic,iflag,dbg)
+! ******************************************************
+!                                                      *
+!    Performs SVD and correction for matrix with more  *
+!    correctors than monitors.                         *
+!                                                      *
+!     Author: WFH  12.09.02                            *
+!                                                      *
+! ******************************************************
+      implicit none
+      integer im,ic,nx(ic),i,j,jj,ii
+      integer iflag
+      double precision a(im,ic)
+      double precision svdmat(ic,im)
+      double precision umat(ic,im), utmat(im,ic)
+      double precision vmat(ic,im), vtmat(im,ic)
+      double precision wmat(ic,im), wtmat(im,ic)
+      double precision rv1(ic),wvec(ic)
+      double precision xin(im),xa(im),xb(im),xc(ic),xpred(im)
+      double precision xout(im)
+      integer sortw(ic)
+      integer amater, svdmx, svdnx, svdnm
+      logical matu, matv
+      integer dbg
+
+      MATU = .TRUE.
+      MATV = .TRUE.
+      iflag = 0
+      write(*,*) ' '
+      write(*,*) 'start SVD correction using ',ic,' correctors'
+      write(*,*) ' '
+
+      SVDNM = max(ic,im)
+      svdmx = ic
+      svdnx = im
+
+      do  i = 1,im
+        do  j = 1,ic
+            svdmat(j,i) = a(i,j)
+        enddo
+      enddo
+      do  i = 1,ic
         nx(i) = i
+      enddo
+
+ 8373 continue
+      
+      if(dbg.eq.1) then
+          write(*,*) 'A0:'
+      do  j = 1,ic
+          write(*,6003) (svdmat(j,i),i=1,im)
+      enddo
+      endif
+      call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
+     &         matv,vmat,amater,rv1)
+ 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+ 6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+ 6003 format(16(2X,F7.2))
+ 6004 format(16(2X,F7.2))
+      if(amater.ne.0) then
+        write(*,*) 'end SVD with error code: ',amater                       
+      endif
+      do  i = 1,im
+          if(dbg.eq.1) then
+             write(*,*) i,wvec(I)
+             write(*,6001) i,wvec(I)
+          endif
+          wmat(i,i) = wvec(i)
+          if(abs(wvec(i)).gt.1.0001) then
+               wtmat(i,i) = 1/wvec(i)
+          else
+               wtmat(i,i) = 0.0
+          endif
+      enddo
+      if(dbg.eq.1) then
+      call rvord(wvec,sortw,im)
+      do  i = 1,im
+          write(*,*) i,sortw(i),wvec(sortw(i))
+      enddo
+      endif
+      do  i = 1,im
+          do  j = 1,ic
+              vtmat(i,j) = vmat(j,i)
+              utmat(i,j) = umat(j,i)
+          enddo
+      enddo
+
+      if(dbg.eq.1) then
+          write(*,*) 'A1:'
+      do  j = 1,ic
+          write(*,6003) (svdmat(j,i),i=1,im)
+      enddo
+      write(*,*) ' '
+
+          write(*,*) 'Va:'
+      do  j = 1,im
+          write(*,6004) (vmat(j,i),i=1,im)
+      enddo
+          write(*,*) 'Vt:'
+      do  j = 1,im
+          write(*,6004) (vtmat(j,i),i=1,im)
+      enddo
+          write(*,*) 'W:'
+      do  j = 1,ic
+          write(*,6004) (wmat(j,i),i=1,im)
+      enddo
+          write(*,*) 'Wt:'
+      do  j = 1,im
+          write(*,6004) (wtmat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'U:'
+      do  j = 1,ic
+          write(*,6004) (umat(j,i),i=1,ic)
+      enddo
+          write(*,*) 'Ut:'
+      do  j = 1,ic
+          write(*,6004) (utmat(j,i),i=1,ic)
+      enddo
+      endif
+      call dmmpy(im,im,vtmat(1,1),vtmat(1,2),vtmat(2,1),
+     &           xin(1),xin(2),xa(1),xa(2))
+      call dmmpy(ic,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),
+     &           xa(1),xa(2),xb(1),xb(2))
+      call dmmpy(ic,ic,umat(1,1),umat(1,2),umat(2,1),
+     &           xb(1),xb(2),xc(1),xc(2))
+      call dmmpy(im,ic,a(1,1),a(1,2),a(2,1),
+     &           xc(1),xc(2),xpred(1),xpred(2))
+      if(dbg.eq.1) then
+         write(*,*) xc
+         write(*,*) xpred
+      endif
+      do  i = 1,im
+          xout(i) = xin(i) - xpred(i)
+      enddo
+      do  i = 1,ic
+          xc(i) = -xc(i)
       enddo
       return
       end
@@ -108,15 +714,18 @@
         xmeas(i) = orb0(i)
         xres(i)  = zero
       enddo
-
-!----------------------------------------------------------------
-!     set up response matrix xad and vector dmeas with test values
-!----------------------------------------------------------------
+      do  i = 1,m
+        do  j = 1,n
+C          write(*,*) i,j,xad(i,j)
+        enddo
+      enddo
 
       call lstsql(m,n,xad,xmeas,cb,xres,ifail,y,z,xd)
+      write(*,*) 'IFAIL from lstsql: ',ifail
 
       do i=1,n
         xinc(i) = cb(i)
+C       write(*,*) i,cb(i)
       enddo
       do j = 1,m
         orbr(j) = xres(j) + xmeas(j)
@@ -146,7 +755,7 @@
         enddo
       enddo
 
-      call dmmlt(n,m,n,y(1,1),y(1,2),y(2,1),x(1,1),x(1,2),x(2,1),z(1,1),&
+      call dmmlt(n,m,n,y,y(1,2),y(2,1),x,x(1,2),x(2,1),z,
      &z(1,2),z(2,1),dw)
 
       call dinv(n,z,n,w,ifail)
@@ -157,6 +766,7 @@
 
       do i=1,n
         cb(i)=-cb(i)
+C       write(*,*) '=> ',i,cb(i)
       enddo
 
       call dmmpy(m,n,x(1,1),x(1,2),x(2,1),cb(1),cb(2),xpred(1),xpred(2))
@@ -1216,6 +1826,405 @@ c           write(61,53)
           lxki     =  lxki + ix
         enddo
         lxii  =  lxii + ix + jx
+      enddo
+      return
+      end
+CDECK  ID>, SVD.
+      SUBROUTINE SVD(NM,M,N,A,W,MATU,U,MATV,V,IERR,RV1)
+c
+      integer i,j,k,l,m,n,ii,i1,kk,k1,ll,l1,mn,nm,its,ierr
+      double precision a(nm,n),w(n),u(nm,n),v(nm,n),rv1(n)
+      double precision c,f,g,h,s,x,y,z,tst1,tst2,scale,pythag
+      logical matu,matv
+c
+c ------------------------------------------------------------------
+c     this subroutine is a translation of the algol procedure svd,
+c     NUM. MATH. 14, 403-420(1970) by golub and reinsch.
+c     handbook for auto. comp., vol 2 -linear algebra, 134-151(1971).
+c
+c     this subroutine determines the singular value decomposition
+c          t
+c     a=usv  of a real m by n rectangular matrix.  householder
+c     bidiagonalization and a variant of the qr algorithm are used.
+c
+c     on input
+c
+c        nm must be set to the row dimension of two-dimensional
+c          array parameters as declared in the calling program
+c          dimension statement.  note that nm must be at least
+c          as large as the maximum of m and n.
+c
+c        m is the number of rows of a (and u).
+c
+c        n is the number of columns of a (and u) and the order of v.
+c
+c        a contains the rectangular input matrix to be decomposed.
+c
+c        matu should be set to .true. if the u matrix in the
+c          decomposition is desired, and to .false. otherwise.
+c
+c        matv should be set to .true. if the v matrix in the
+c          decomposition is desired, and to .false. otherwise.
+c
+c     on output
+c
+c        a is unaltered (unless overwritten by u or v).
+c
+c        w contains the n (non-negative) singular values of a (the
+c          diagonal elements of s).  they are unordered.  if an
+c          error exit is made, the singular values should be correct
+c          for indices ierr+1,ierr+2,...,n.
+c
+c        u contains the matrix u (orthogonal column vectors) of the
+c          decomposition if matu has been set to .true.  otherwise
+c          u is used as a temporary array.  u may coincide with a.
+c          if an error exit is made, the columns of u corresponding
+c          to indices of correct singular values should be correct.
+c
+c        v contains the matrix v (orthogonal) of the decomposition if
+c          matv has been set to .true.  otherwise v is not referenced.
+c          v may also coincide with a if u is not needed.  if an error
+c          exit is made, the columns of v corresponding to indices of
+c          correct singular values should be correct.
+c
+c        ierr is set to
+c          zero       for normal return,
+c          k          if the k-th singular value has not been
+c                     determined after 30 iterations.
+c
+c        rv1 is a temporary storage array.
+c
+c     calls pythag for  dsqrt(a*a + b*b) .
+c
+c     questions and comments should be directed to burton s. garbow,
+c     mathematics and computer science div, argonne national laboratory
+c
+c     this version dated august 1983.
+c ------------------------------------------------------------------
+c
+      ierr = 0
+c
+      do 100 i = 1, m
+         do 100 j = 1, n
+            u(i,j) = a(i,j)
+  100 continue
+c     .......... householder reduction to bidiagonal form ..........
+      g = 0.0d0
+      scale = 0.0d0
+      x = 0.0d0
+c
+      do 300 i = 1, n
+         l = i + 1
+         rv1(i) = scale * g
+         g = 0.0d0
+         s = 0.0d0
+         scale = 0.0d0
+         if (i .gt. m) go to 210
+c
+         do 120 k = i, m
+  120    scale = scale + dabs(u(k,i))
+c
+         if (scale .eq. 0.0d0) go to 210
+c
+         do 130 k = i, m
+            u(k,i) = u(k,i) / scale
+            s = s + u(k,i)**2
+  130    continue
+c
+         f = u(i,i)
+         g = -dsign(dsqrt(s),f)
+         h = f * g - s
+         u(i,i) = f - g
+         if (i .eq. n) go to 190
+c
+         do 150 j = l, n
+            s = 0.0d0
+c
+            do 140 k = i, m
+  140       s = s + u(k,i) * u(k,j)
+c
+            f = s / h
+c
+            do 150 k = i, m
+               u(k,j) = u(k,j) + f * u(k,i)
+  150    continue
+c
+  190    do 200 k = i, m
+  200    u(k,i) = scale * u(k,i)
+c
+  210    w(i) = scale * g
+         g = 0.0d0
+         s = 0.0d0
+         scale = 0.0d0
+         if (i .gt. m .or. i .eq. n) go to 290
+c
+         do 220 k = l, n
+  220    scale = scale + dabs(u(i,k))
+c
+         if (scale .eq. 0.0d0) go to 290
+c
+         do 230 k = l, n
+            u(i,k) = u(i,k) / scale
+            s = s + u(i,k)**2
+  230    continue
+c
+         f = u(i,l)
+         g = -dsign(dsqrt(s),f)
+         h = f * g - s
+         u(i,l) = f - g
+c
+         do 240 k = l, n
+  240    rv1(k) = u(i,k) / h
+c
+         if (i .eq. m) go to 270
+c
+         do 260 j = l, m
+            s = 0.0d0
+c
+            do 250 k = l, n
+  250       s = s + u(j,k) * u(i,k)
+c
+            do 260 k = l, n
+               u(j,k) = u(j,k) + s * rv1(k)
+  260    continue
+c
+  270    do 280 k = l, n
+  280    u(i,k) = scale * u(i,k)
+c
+  290    x = dmax1(x,dabs(w(i))+dabs(rv1(i)))
+  300 continue
+c     .......... accumulation of right-hand transformations ..........
+      if (.not. matv) go to 410
+c     .......... for i=n step -1 until 1 do -- ..........
+      do 400 ii = 1, n
+         i = n + 1 - ii
+         if (i .eq. n) go to 390
+         if (g .eq. 0.0d0) go to 360
+c
+         do 320 j = l, n
+c     .......... double division avoids possible underflow ..........
+  320    v(j,i) = (u(i,j) / u(i,l)) / g
+c
+         do 350 j = l, n
+            s = 0.0d0
+c
+            do 340 k = l, n
+  340       s = s + u(i,k) * v(k,j)
+c
+            do 350 k = l, n
+               v(k,j) = v(k,j) + s * v(k,i)
+  350    continue
+c
+  360    do 380 j = l, n
+            v(i,j) = 0.0d0
+            v(j,i) = 0.0d0
+  380    continue
+c
+  390    v(i,i) = 1.0d0
+         g = rv1(i)
+         l = i
+  400 continue
+c     .......... accumulation of left-hand transformations ..........
+  410 if (.not. matu) go to 510
+c     ..........for i=min(m,n) step -1 until 1 do -- ..........
+      mn = n
+      if (m .lt. n) mn = m
+c
+      do 500 ii = 1, mn
+         i = mn + 1 - ii
+         l = i + 1
+         g = w(i)
+         if (i .eq. n) go to 430
+c
+         do 420 j = l, n
+  420    u(i,j) = 0.0d0
+c
+  430    if (g .eq. 0.0d0) go to 475
+         if (i .eq. mn) go to 460
+c
+         do 450 j = l, n
+            s = 0.0d0
+c
+            do 440 k = l, m
+  440       s = s + u(k,i) * u(k,j)
+c     .......... double division avoids possible underflow ..........
+            f = (s / u(i,i)) / g
+c
+            do 450 k = i, m
+               u(k,j) = u(k,j) + f * u(k,i)
+  450    continue
+c
+  460    do 470 j = i, m
+  470    u(j,i) = u(j,i) / g
+c
+         go to 490
+c
+  475    do 480 j = i, m
+  480    u(j,i) = 0.0d0
+c
+  490    u(i,i) = u(i,i) + 1.0d0
+  500 continue
+c     .......... diagonalization of the bidiagonal form ..........
+  510 tst1 = x
+c     .......... for k=n step -1 until 1 do -- ..........
+      do 700 kk = 1, n
+         k1 = n - kk
+         k = k1 + 1
+         its = 0
+c     .......... test for splitting.
+c                for l=k step -1 until 1 do -- ..........
+  520    do 530 ll = 1, k
+            l1 = k - ll
+            l = l1 + 1
+            tst2 = tst1 + dabs(rv1(l))
+            if (tst2 .eq. tst1) go to 565
+c     .......... rv1(1) is always zero, so there is no exit
+c                through the bottom of the loop ..........
+            tst2 = tst1 + dabs(w(l1))
+            if (tst2 .eq. tst1) go to 540
+  530    continue
+c     .......... cancellation of rv1(l) if l greater than 1 ..........
+  540    c = 0.0d0
+         s = 1.0d0
+c
+         do 560 i = l, k
+            f = s * rv1(i)
+            rv1(i) = c * rv1(i)
+            tst2 = tst1 + dabs(f)
+            if (tst2 .eq. tst1) go to 565
+            g = w(i)
+            h = pythag(f,g)
+            w(i) = h
+            c = g / h
+            s = -f / h
+            if (.not. matu) go to 560
+c
+            do 550 j = 1, m
+               y = u(j,l1)
+               z = u(j,i)
+               u(j,l1) = y * c + z * s
+               u(j,i) = -y * s + z * c
+  550       continue
+c
+  560    continue
+c     .......... test for convergence ..........
+  565    z = w(k)
+         if (l .eq. k) go to 650
+c     .......... shift from bottom 2 by 2 minor ..........
+         if (its .eq. 30) go to 1000
+         its = its + 1
+         x = w(l)
+         y = w(k1)
+         g = rv1(k1)
+         h = rv1(k)
+         f = 0.5d0 * (((g + z) / h) * ((g - z) / y) + y / h - h / y)
+         g = pythag(f,1.0d0)
+         f = x - (z / x) * z + (h / x) * (y / (f + dsign(g,f)) - h)
+c     .......... next qr transformation ..........
+         c = 1.0d0
+         s = 1.0d0
+c
+         do 600 i1 = l, k1
+            i = i1 + 1
+            g = rv1(i)
+            y = w(i)
+            h = s * g
+            g = c * g
+            z = pythag(f,h)
+            rv1(i1) = z
+            c = f / z
+            s = h / z
+            f = x * c + g * s
+            g = -x * s + g * c
+            h = y * s
+            y = y * c
+            if (.not. matv) go to 575
+c
+            do 570 j = 1, n
+               x = v(j,i1)
+               z = v(j,i)
+               v(j,i1) = x * c + z * s
+               v(j,i) = -x * s + z * c
+  570       continue
+c
+  575       z = pythag(f,h)
+            w(i1) = z
+c     .......... rotation can be arbitrary if z is zero ..........
+            if (z .eq. 0.0d0) go to 580
+            c = f / z
+            s = h / z
+  580       f = c * g + s * y
+            x = -s * g + c * y
+            if (.not. matu) go to 600
+c
+            do 590 j = 1, m
+               y = u(j,i1)
+               z = u(j,i)
+               u(j,i1) = y * c + z * s
+               u(j,i) = -y * s + z * c
+  590       continue
+c
+  600    continue
+c
+         rv1(l) = 0.0d0
+         rv1(k) = f
+         w(k) = x
+         go to 520
+c     .......... convergence ..........
+  650    if (z .ge. 0.0d0) go to 700
+c     .......... w(k) is made non-negative ..........
+         w(k) = -z
+         if (.not. matv) go to 700
+c
+         do 690 j = 1, n
+  690    v(j,k) = -v(j,k)
+c
+  700 continue
+c
+      go to 1001
+c     .......... set error -- no convergence to a
+c                singular value after 30 iterations ..........
+ 1000 ierr = k
+ 1001 return
+      end
+CDECK  ID>, PYTHAG. 
+      DOUBLE PRECISION FUNCTION PYTHAG(A,B)
+      double precision a,b
+c
+c     finds dsqrt(a**2+b**2) without overflow or destructive underflow
+c
+      double precision p,r,s,t,u
+      p = dmax1(dabs(a),dabs(b))
+      if (p .eq. 0.0d0) go to 20
+      r = (dmin1(dabs(a),dabs(b))/p)**2
+   10 continue
+         t = 4.0d0 + r
+         if (t .eq. 4.0d0) go to 20
+         s = r/t
+         u = 1.0d0 + 2.0d0*s
+         p = u*p
+         r = (s/u)**2 * r
+      go to 10
+   20 pythag = p
+      return
+      end
+      subroutine rvord(inv,outv,n)
+      double precision   inv(n), ws(n)
+      double precision   maxv, minv
+      integer  outv(n), n
+      do  i = 1,n
+          ws(i) = inv(i)
+      enddo
+
+      do  j = 1,n
+         jmax = 1
+         do  i = 1,n
+            if(ws(i).gt.ws(jmax)) then
+                 jmax = i
+            endif
+         enddo
+         outv(n-j+1) = jmax
+         ws(jmax) = 0.0
       enddo
       return
       end
