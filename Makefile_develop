@@ -7,8 +7,8 @@
 # parameters
 
 f95=f95
-GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM
-GCCP_FLAGS_MPARS=-g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
+GCC_FLAGS=-c -g -Wall -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL 
 f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
 #f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
@@ -45,61 +45,61 @@ default: madx
 # files
 
 madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
-	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
+	$(CC) $(GCCP_FLAGS_MPARS) madxp.c
 
 madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
-	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
+	$(CC) $(GCCP_FLAGS) -o madxpf.o madxp.c
 
 twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
-	$(FC) $(FCP) -c -o twissp.o twiss.F
+	$(FC) $(FCP) -o twissp.o twiss.F
 
 ptc_dummy.o: ptc_dummy.F
-	$(FC) $(FCP) -c -o ptc_dummy.o ptc_dummy.F
+	$(FC) $(FCP) -o ptc_dummy.o ptc_dummy.F
 
 surveyp.o: survey.F
-	$(FC) $(FCP) -c -o surveyp.o survey.F
+	$(FC) $(FCP) -o surveyp.o survey.F
 
 utilp.o: util.F twiss0.fi twtrr.fi
-	$(FC) $(FCP) -c -o utilp.o util.F
+	$(FC) $(FCP) -o utilp.o util.F
 
 dynapp.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
-	$(FC) $(FCP) -c -o dynapp.o dynap.F
+	$(FC) $(FCP) -o dynapp.o dynap.F
 
 ibsdbp.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
-	$(FC) $(FCP) -c -o ibsdbp.o ibsdb.F
+	$(FC) $(FCP) -o ibsdbp.o ibsdb.F
 
 plotp.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
-	$(FC) $(FCP) -c -o plotp.o plot.F
+	$(FC) $(FCP) -o plotp.o plot.F
 
 soddp.o: sodd.F
-	$(FC) $(FCP) -c -o soddp.o sodd.F
+	$(FC) $(FCP) -o soddp.o sodd.F
 
 trrunp.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
-	$(FC) $(FCP) -c -o trrunp.o trrun.F
+	$(FC) $(FCP) -o trrunp.o trrun.F
 
 orbfp.o: orbf.F
-	$(FC) $(FCP) -c -o orbfp.o orbf.F
+	$(FC) $(FCP) -o orbfp.o orbf.F
 
 emitp.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
-	$(FC) $(FCP) -c -o emitp.o emit.F
+	$(FC) $(FCP) -o emitp.o emit.F
 
 matchp.o: match.F name_len.fi match.fi 
-	$(FC) $(FCP) -c -o matchp.o match.F
+	$(FC) $(FCP) -o matchp.o match.F
 
 matchsap.o: matchsa.F
-	$(FC) $(FCP) -c -o matchsap.o matchsa.F
+	$(FC) $(FCP) -o matchsap.o matchsa.F
 
 touschekp.o: touschek.F
-	$(FC) $(FCP) -c -o touschekp.o touschek.F
+	$(FC) $(FCP) -o touschekp.o touschek.F
 
 gxx11p.o: gxx11.F
-	$(FC) $(FCP) -c -o gxx11p.o gxx11.F
+	$(FC) $(FCP) -o gxx11p.o gxx11.F
 
 gxx11c.o: gxx11c.c
-	$(CC) $(GCCP_FLAGS) -c -o gxx11c.o gxx11c.c
+	$(CC) $(GCCP_FLAGS) -o gxx11c.o gxx11c.c
 
 resindexp.o: resindex.F resindex.fi
-	$(FC) $(FCP) -c -o resindexp.o resindex.F
+	$(FC) $(FCP) -o resindexp.o resindex.F
 
 .F.o:
 	$(f95) $(FFLAGS77) $<	
@@ -218,10 +218,10 @@ wrap.o: madx_ptc_module.o wrap.f90
 	$(f95) $(f95_FLAGS) wrap.f90
 
 timest.o: timest.f90
-	$(f95) $(f95_FLAGS) -c -o timest.o timest.f90
+	$(f95) $(f95_FLAGS) -o timest.o timest.f90
 
 timex.o: timex.f90
-	$(f95) $(f95_FLAGS) -c -o timex.o timex.f90
+	$(f95) $(f95_FLAGS) -o timex.o timex.f90
 
 #Parser only
 mpars: madxm.F madxp.o
