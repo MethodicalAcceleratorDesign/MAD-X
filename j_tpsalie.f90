@@ -23,7 +23,6 @@ module tpsalie
   !private push1pol,allocTAYLORS,KILLTAYLORS
   integer,private::NO,ND,ND2,NP,NDPT,NV
   logical(lp),private::old
-
   !frs real(dp),private::eps=c_1e_9
   integer::nrmax=400
   private mul_PBf_t,mul_VECf_t,mul_VECf_MAP,mul_PBf_MAP
