@@ -340,7 +340,17 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
        fatal_error("ORBIT table for correction requested, but not provided:",orbtab);
     }
   } else {
-       orbin_table = twiss_table;
+       if((orbin_table = twiss_table) == NULL) {
+         printf("FATAL ERROR:\n");
+         printf("You request the ORBIT from a non-existing TWISS table\n");
+         printf("You MUST run TWISS before trying to correct the orbit\n");
+         printf("MAD-X stops\n");
+         exit(81);
+       } else {
+         if (get_option("debug")) {
+            printf("TWISS table: %ld\n",twiss_table);
+         }
+       }
        pps = -1;
   }
 
@@ -367,7 +377,17 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
        fatal_error("MODEL table for correction requested, but not provided:",modtab);
     }
   } else {
-       model_table = twiss_table;
+       if((model_table = twiss_table) == NULL) {
+         printf("FATAL ERROR:\n");
+         printf("You request the MODEL from a non-existing TWISS table\n");
+         printf("You MUST run TWISS before trying to correct the orbit\n");
+         printf("MAD-X stops\n");
+         exit(81);
+       } else {
+         if (get_option("debug")) {
+            printf("TWISS table: %ld\n",twiss_table);
+         }
+       }
        ppt = -1;
   }
 
