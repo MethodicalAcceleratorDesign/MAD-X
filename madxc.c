@@ -1,3 +1,31 @@
+void pro_correct(struct in_cmd* cmd)
+{
+  if (strcmp(cmd->tok_list->p[0], "correct") == 0)
+    {
+     correct_correct(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "usekick") == 0)
+    {
+     correct_usekick(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0)
+    {
+     correct_usemonitor(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)
+    {
+     correct_getorbit(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)
+    {
+     correct_putorbit(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "coption") == 0)
+    {
+     correct_option(cmd);
+    }
+}
+
 void correct_correct(struct in_cmd* cmd)
 {
   int ix, im, ip, it;
@@ -124,6 +152,37 @@ void correct_correct(struct in_cmd* cmd)
   free(corvec); free(monvec); free(resvec);
   free(conm);
   return;
+}
+
+void pro_correct_option(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  int i, debug;
+  int val, pos, seed;
+
+  if ((debug=get_option("debug")))  {
+     fprintf(prt_file, "in coption routine\n");
+     for(i=0;i<cmd->tok_list->curr;i++) {
+        fprintf(prt_file, "command(s): %s\n",cmd->tok_list->p[i]);
+     }
+  }
+  if ((pos = name_list_pos("seed", nl)) > -1)
+    {
+     if (nl->inform[pos]) 
+       {
+        seed = command_par_value("seed", cmd->clone);
+        init55(seed);
+       }
+    }
+ val = command_par_value("print", cmd->clone);
+ if(val == 0) {
+      if (debug)  fprintf(prt_file, "print option not set\n");
+      print_correct_opt = 0;
+ }else {
+      if (debug)  fprintf(prt_file, "print option set\n");
+      print_correct_opt = val;
+ }
+
 }
 
 int pro_correct_getcommands(struct in_cmd* cmd)
@@ -265,7 +324,23 @@ int pro_correct_getorbit(struct in_cmd* cmd)
              printf("Monitor %s disabled\n",m->p_node->name);
           }
     }
+   
+    /* scaling error should come first, monitor alignment not scaled ... */
+    pos = name_list_pos("monscale", nl);
+    if(nl->inform[pos] > 0) {
+      if((command_par_value("monscale",cmd->clone)) == 1) {                
+        if(m->p_node->p_al_err != NULL) {
+          if (get_option("debug")) {
+            printf("m-list: %d %s %s\n",m->id_ttb,m->p_node->name,m->p_node->base_name); 
+            printf("scales: %e %e \n",m->p_node->p_al_err->a[12], m->p_node->p_al_err->a[13]);
+          }
+          m->val.before[0] = m->val.before[0]*(1.0 + m->p_node->p_al_err->a[12]);
+          m->val.before[1] = m->val.before[1]*(1.0 + m->p_node->p_al_err->a[13]);
+        }
+      }
+    }
     
+    /* monitor misalignment after all other reading manipulations ! */
     pos = name_list_pos("monerror", nl);
     if(nl->inform[pos] > 0) {
       if((command_par_value("monerror",cmd->clone)) == 1) {                
@@ -576,13 +651,15 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
   m = correct_orbit->mon_table;
   c = correct_orbit->cor_table;
 
-  printf("CORRECTION SUMMARY:   \n\n");                                    
-  printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",crms(monvec,imon),crms(resvec,imon));
-  printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",cprp(monvec,imon),cprp(resvec,imon));
   if(fddata != NULL) {
      rst = get_variable("n");
      fprintf(fddata,"%d %d %e %e %e %e %e %e\n",ip,rst,cprp(monvec,imon),cprp(resvec,imon),crms(monvec,imon),crms(resvec,imon),copk(monvec,imon),copk(resvec,imon));
   }
+  if(print_correct_opt > 0) {
+  printf("CORRECTION SUMMARY:   \n\n");                                    
+  printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",crms(monvec,imon),crms(resvec,imon));
+  printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",cprp(monvec,imon),cprp(resvec,imon));
+  if(print_correct_opt > 1) {
   printf("Monitor:  Before:     After:    Difference:\n");                                    
   printf("           (mm)        (mm)         (mm)   \n");                                    
   for(i=0;i<imon;i++) {
@@ -605,6 +682,8 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
       c[nc[i]].p_node->cvkick = 0.001*corvec[nx[i]-1];
     }
     pro_correct_fill_corr_table(ip,c[nc[i]].p_node->name,c[nc[i]].val.before[ip-1],corvec[nx[i]-1]);
+  }
+  }
   }
 }
 
@@ -653,6 +732,76 @@ int pro_correct_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, dou
   };
   return(10000*imon + icor);
 }
+void correct_option(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  int i, debug;
+  int val, pos, seed;
+
+  if ((debug=get_option("debug")))  {
+     fprintf(prt_file, "in coption routine\n");
+     for(i=0;i<cmd->tok_list->curr;i++) {
+        fprintf(prt_file, "command(s): %s\n",cmd->tok_list->p[i]);
+     }
+  }
+  if ((pos = name_list_pos("seed", nl)) > -1)
+    {
+     if (nl->inform[pos]) 
+       {
+        seed = command_par_value("seed", cmd->clone);
+        init55(seed);
+       }
+    }
+ val = command_par_value("print", cmd->clone);
+ if(val == 0) {
+      if (debug)  fprintf(prt_file, "print option not set\n");
+      print_correct_opt = 0;
+ }else {
+      if (debug)  fprintf(prt_file, "print option set\n");
+      print_correct_opt = val;
+ }
+
+}
+
+void correct_getorbit(struct in_cmd* cmd)
+{
+}
+
+void correct_putorbit(struct in_cmd* cmd)
+{
+  int i;
+  struct name_list* nl;
+  char* filename = command_par_string("file", cmd->clone);
+  char* table_name;
+  current_twiss = clone_command(find_command("twiss", defined_commands));
+  nl = current_twiss->par_names;
+  for (i = 0; i < nl->curr; i++) nl->inform[i] = 0;
+  pro_twiss();
+  table_name = permbuff("orbit");
+  orbit_table = make_table(table_name, orbit_table_cols, 
+  		     orbit_table_types, current_sequ->n_nodes);
+  add_to_table_list(orbit_table, table_register);
+  fill_orbit_table(orbit_table, twiss_table);
+  out_table("orbit", orbit_table, filename);
+  current_twiss = delete_command(current_twiss);
+}
+
+void correct_usekick(struct in_cmd* cmd)
+{
+  char temp[12];
+  int count = set_enable("kicker", cmd);
+  sprintf(temp, "%d", count);
+  put_info(temp, "corrector(s) affected");
+}
+
+void correct_usemonitor(struct in_cmd* cmd)
+{
+  char temp[12];
+  int count = set_enable("monitor", cmd);
+  sprintf(temp, "%d", count);
+  put_info(temp, "monitor(s) affected");
+}
+
 
 double crms(double *r, int m)
 {
