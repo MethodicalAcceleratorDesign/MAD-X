@@ -22,7 +22,7 @@ LIBX="-L/usr/X11R6/lib" -lX11 -ldl
 GLIB=/afs/cern.ch/group/si/slap/lib
 GPUB=/afs/cern.ch/group/si/slap/bin
 #g77 link option
-FP=-Wl,-Bstatic
+FP=-static
 #NAG f95 link option
 FOPT=-Bstatic -unsharedf95
 
