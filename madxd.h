@@ -798,7 +798,7 @@ char  tmp_key[NAME_L],
 
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.04";
+char myversion[] = "MAD-X 1.05";
 char one_string[] = "1";
 
 char* aux_char_pt;               /* for debug purposes */
