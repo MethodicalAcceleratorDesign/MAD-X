@@ -430,7 +430,7 @@ struct table* delete_table(struct table* t)
   if (t->header != NULL) t->header = delete_char_p_array(t->header, 1);
   if (t->col_out != NULL) t->col_out = delete_int_array(t->col_out);
   if (t->row_out != NULL) t->row_out = delete_int_array(t->row_out);
-  t->node_nm = delete_char_p_array(t->node_nm, 0);
+  if (t->node_nm != NULL) t->node_nm = delete_char_p_array(t->node_nm, 0);
   for (i = 0; i < t->curr; i++)
     {
      if (t->l_head[i] != NULL) 
@@ -1308,17 +1308,19 @@ struct node* new_sequ_node(struct sequence* sequ, int occ_cnt)
   return p;
 }
 
-struct table* new_table(char* name, int rows, struct name_list* cols)
+struct table* new_table(char* name, char* type, int rows, 
+                        struct name_list* cols)
 {
   char rout_name[] = "new_table";
   int i, n = cols->curr;
   struct table* t 
      = (struct table*) mycalloc(rout_name,1, sizeof(struct table));
   strcpy(t->name, name);
+  strcpy(t->type, type);
   t->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", "table");
   t->columns = cols;
-  t->num_cols = n;
+  t->num_cols = t->org_cols = n;
   t->s_cols = (char***) mycalloc(rout_name,n, sizeof(char**));
   t->d_cols = (double**) mycalloc(rout_name,n, sizeof(double*));
   t->max = ++rows; /* +1 because of separate augment_count */

@@ -323,13 +323,13 @@ int  pro_correct_gettables(int iplane)
     correct_orbit = (struct orb_cor*)mycalloc("pro_correct_gettables",1, sizeof(struct orb_cor));
   }
   if(corr_table == NULL) {
-    corr_table = make_table("corr", corr_table_cols,                     
+    corr_table = make_table("corr", "corr", corr_table_cols,                     
 			    corr_table_types, 5000);
     add_to_table_list(corr_table, table_register);
     pro_correct_make_corr_table();
   }
   if(mon_table == NULL) {
-    mon_table = make_table("mon", mon_table_cols,                     
+    mon_table = make_table("mon", "mon", mon_table_cols,                     
 			   mon_table_types, 5000);
     add_to_table_list(mon_table, table_register);
     pro_correct_make_mon_table();
@@ -1002,7 +1002,7 @@ void correct_putorbit(struct in_cmd* cmd)
   for (i = 0; i < nl->curr; i++) nl->inform[i] = 0;
   pro_twiss();
   table_name = permbuff("orbit");
-  orbit_table = make_table(table_name, orbit_table_cols, 
+  orbit_table = make_table(table_name, "orbit", orbit_table_cols, 
   		     orbit_table_types, current_sequ->n_nodes);
   add_to_table_list(orbit_table, table_register);
   fill_orbit_table(orbit_table, twiss_table);

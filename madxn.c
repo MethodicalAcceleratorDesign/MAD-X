@@ -2,10 +2,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include <sys/types.h>
+#include <sys/types.h>
 #ifndef _WIN32
-  #include <sys/utsname.h>
-  #include <unistd.h>
+#include <sys/utsname.h>
+#include <unistd.h>
 #endif
 #include <sys/timeb.h>
 #include <ctype.h>
@@ -160,7 +160,7 @@ double act_value(int pos, struct name_list* chunks)
         val = command_par_value(par, current_beam);
        }
      else if ((el = find_element(comm, element_list)) != NULL)
-	 val = command_par_value(par, el->def);
+	 val = el_par_value(par, el);
      else if ((cmd = find_command(comm, stored_commands)) != NULL)
 	 val = command_par_value(par, cmd);
      else if ((cmd = find_command(comm, beta0_list)) != NULL)
@@ -202,6 +202,44 @@ int add_drifts(struct node* c_node, struct node* end)
      c_node = c_node->next;
     }
   return cnt;
+}
+
+void add_table_vars(struct name_list* cols, struct command_list* select)
+     /* 1: adds user selected variables to table - always type 2 = double
+        2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
+{
+  int i, j, k, n, pos;
+  char* var_name;
+  char tmp[12];
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  for (i = 0; i < select->curr; i++)
+    {
+     nl = select->commands[i]->par_names;
+     pl = select->commands[i]->par;
+     pos = name_list_pos("column", nl);
+     if (nl->inform[pos])
+       {
+	for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+	  {
+	   var_name = pl->parameters[pos]->m_string->p[j]; 
+	   if (strcmp(var_name, "apertype") == 0)
+	     {
+	      if ((n = aperture_count(current_sequ)) > 0)
+		{
+                 add_to_name_list(tmpbuff("apertype"), 3, cols);
+                 for (k = 0; k < n; k++)
+		   {
+		    sprintf(tmp, "aper_%d", k+1);
+                    add_to_name_list(tmpbuff(tmp), 2, cols);
+		   }
+		}
+	     }
+	   else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
+              add_to_name_list(tmpbuff(var_name), 2, cols);
+	  }
+       }
+    }
 }
 
 void add_to_command_list(char* label, struct command* comm, 
@@ -344,7 +382,7 @@ void add_to_table_list(struct table* t, struct table_list* tl)
   if ((pos = name_list_pos(t->name, tl->names)) < 0)
     {
      if (tl->curr == tl->max) grow_table_list(tl);
-     j = add_to_name_list(permbuff(t->name), 0, tl->names);
+     j = add_to_name_list(tmpbuff(t->name), 0, tl->names);
      tl->tables[tl->curr++] = t;
     }
   else 
@@ -376,6 +414,28 @@ void add_to_var_list( /* adds variable to alphabetic variable list */
      if (varl->curr == varl->max) grow_var_list(varl);
      j = add_to_name_list(permbuff(var->name), flag, varl->list);
      varl->vars[varl->curr++] = var;
+    }
+}
+
+void add_vars_to_table(struct table* t)
+     /* fills user-defined variables into current table_row) */
+{
+  int i;
+  char* p;
+
+  for (i = t->org_cols; i < t->num_cols; i++)
+    {
+     if (t->columns->inform[i] < 3)
+       {
+	if (strstr(t->columns->names[i], "aper_"))
+          t->d_cols[i][t->curr] 
+          = get_aperture(current_node, t->columns->names[i]);
+        else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
+       }
+     else if ((p = command_par_string(t->columns->names[i], 
+		  current_node->p_elem->def)) == NULL)
+          t->s_cols[i][t->curr] = tmpbuff("none");
+     else t->s_cols[i][t->curr] = tmpbuff(p);
     }
 }
 
@@ -521,8 +581,7 @@ char* alias(char* par_string) /* returns main parameter for alias */
 
 void all_node_pos(struct sequence* sequ)
 {
-  struct node* node;
-  node = sequ->start;
+  struct node* node = sequ->start;
   while (node != NULL)
     {
      if (node->p_elem != NULL)
@@ -539,6 +598,32 @@ void all_node_pos(struct sequence* sequ)
     }
 }
 
+int aperture_count(struct sequence* sequ)
+     /* returns max. number of aperture parameters needed for sequence */
+{
+  int i = 0, n = 0;
+  char* p;
+  struct node* node = sequ->start;
+  while (node != NULL)
+    {
+     if ((p = command_par_string("apertype", node->p_elem->def)))
+       {
+	while(aperture_types[i][0] != ' ')
+	  {
+	   if (strcmp(p, aperture_types[i]) == 0)
+	     {
+	      if (n < aperture_npar[i]) n = aperture_npar[i];
+              break;
+	     }
+           i++;
+	  }
+       }
+     if (node == sequ->end) break; 
+     node = node->next;
+    }
+  return n;
+}
+
 int attach_beam(struct sequence* sequ)
 {
   if ((current_beam = find_command(sequ->name, beam_list)) == NULL)
@@ -546,7 +631,7 @@ int attach_beam(struct sequence* sequ)
   return current_beam->beam_def;
 }
 
-void augment_count(char* table) /* increase table occ. by 1 */
+void augment_count(char* table) /* increase table occ. by 1, fill missing */
 {
   int pos;
   struct table* t;
@@ -554,6 +639,8 @@ void augment_count(char* table) /* increase table occ. by 1 */
   if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
+  if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
+  if (t->num_cols > t->org_cols)  add_vars_to_table(t);
   if (++t->curr == t->max) grow_table(t);
   t->node_nm->curr = t->curr;
 }
@@ -862,37 +949,35 @@ void complete_twiss_table(struct table* t)
   char tmp[16];
 
   if (t == NULL) return;
-  for (i = 0; i < t->curr; i++)
+  i = t->curr;
+  c_node = current_node;
+  mult = strcmp(c_node->base_name, "multipole") == 0 ? 1 : 0;
+  t->s_cols[0][i] = tmpbuff(c_node->name);
+  t->s_cols[1][i] = tmpbuff(c_node->base_name);
+  t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
+  for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
     {
-     c_node = t->p_nodes[i];
-     mult = strcmp(c_node->base_name, "multipole") == 0 ? 1 : 0;
-     t->s_cols[0][i] = tmpbuff(c_node->name);
-     t->s_cols[1][i] = tmpbuff(c_node->base_name);
-     t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
-     for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
+     el = c_node->length;
+     if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
+     else if(mult) 
        {
-	el = c_node->length;
-        if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
-        else if(mult) 
-	  {
-           val = mult_par(twiss_table_cols[j], c_node->p_elem);
-           if (strstr(twiss_table_cols[j], "k0")) val *= c_node->dipole_bv;
-           else val *= c_node->other_bv; 
-	  }
-        else
-	  {
-	   strcpy(tmp, twiss_table_cols[j]);
-           n = strlen(tmp) - 1;
-           if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l') 
-               tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
-           val = el_par_value(tmp, c_node->p_elem);
-           if ((strstr(tmp, "k0") || strstr(tmp, "kick"))&& c_node->dipole_bv) 
-               val *= c_node->dipole_bv;
-           else if(c_node->other_bv) val *= c_node->other_bv; 
-           if (strstr(tmp,"kick") == NULL && el != zero) val *= el;
-	  }
-        t->d_cols[j][i] = val;
+        val = mult_par(twiss_table_cols[j], c_node->p_elem);
+        if (strstr(twiss_table_cols[j], "k0")) val *= c_node->dipole_bv;
+        else val *= c_node->other_bv; 
        }
+     else
+       {
+	strcpy(tmp, twiss_table_cols[j]);
+        n = strlen(tmp) - 1;
+        if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l') 
+            tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
+        val = el_par_value(tmp, c_node->p_elem);
+        if ((strstr(tmp, "k0") || strstr(tmp, "kick"))&& c_node->dipole_bv) 
+            val *= c_node->dipole_bv;
+        else if(c_node->other_bv) val *= c_node->other_bv; 
+        if (strstr(tmp,"kick") == NULL && el != zero) val *= el;
+       }
+     t->d_cols[j][i] = val;
     }
 }
 
@@ -952,7 +1037,9 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
   else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
   else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
+  else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
   else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
+  else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
   else if (strcmp(toks[k], "option")      == 0) exec_option();
   else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
@@ -1083,7 +1170,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   struct command_parameter* lp = cmd->cmd_def->par->parameters[pos];
   struct command_parameter* clp = cmd->clone->par->parameters[pos];
   int j, k, ks, i = start, e_type, ival, end, e_end, tot_end, c_type = 0,
-      val_type = 0, cnt = 0;
+      val_type = 0, cnt = 0, con_flag;
   double val;
   if (lp->type < 10)
     {
@@ -1169,6 +1256,11 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
        }
      else if (lp->type == 4)  /* one constraint */
        {
+	if (i+1 < number && *toks[i+1] == ':')
+	  {
+	   con_flag = 1; i++;
+	  }
+        else con_flag = 0; /* if != zero, := or :< or :> */
 	if (i+2 < number)
 	  {
 	   if (*toks[i+1] == '=') c_type = 4;
@@ -1205,6 +1297,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
      if (clp->c_type == 1 && c_type == 2) clp->c_type = 3; /* min present */
      else if (clp->c_type == 2 && c_type == 1) clp->c_type = 3; /* max */
      else clp->c_type = c_type;
+     if (con_flag == 0)  expr = NULL;
      switch(c_type)
        {
        case 1:
@@ -1636,12 +1729,12 @@ void dynap_tables_create(struct in_cmd* cmd)
   int npart = stored_track_start->curr;
 
   struct table* t;
-  t = make_table("tracksumm", tracksumm_table_cols, 
+  t = make_table("tracksumm", "tracksumm", tracksumm_table_cols, 
   		 tracksumm_table_types, 2*stored_track_start->curr);
   add_to_table_list(t, table_register);
-  t = make_table("dynap", dynap_table_cols, dynap_table_types, 10);
+  t = make_table("dynap", "dynap", dynap_table_cols, dynap_table_types, 10);
   add_to_table_list(t, table_register);
-  t = make_table("dynaptune", dynaptune_table_cols, 
+  t = make_table("dynaptune", "dynaptune", dynaptune_table_cols, 
                  dynaptune_table_types, npart);
   add_to_table_list(t, table_register);
 }
@@ -1698,7 +1791,9 @@ double element_value(struct node* node, char* par)
 
 double el_par_value(char* par, struct element* el)
 {
-  double val = zero, angle, l, k0;
+  int k = 0, n;
+  char tmp[8];
+  double val = zero, angle, l, k0, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
   int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
   if (fact != zero || strcmp(el->base_type->name, "sbend") == 0)
@@ -1732,7 +1827,19 @@ double el_par_value(char* par, struct element* el)
     }
   else if (strcmp(par, "rhoinv") == 0) val = zero;
   else if (strcmp(par, "blen") == 0) val = zero;
-  else if (mult && strcmp(par, "l") == 0) val = zero;
+  else if (mult)
+    {
+     if (strcmp(par, "l") == 0) val = zero;
+     else if (par[0] == 'k' && isdigit(par[1]) && par[strlen(par)-1] == 'l')
+       /* single component requested for multipole */
+       {
+	if (strchr(par, 's')) strcpy(tmp, "ksl");
+	else                  strcpy(tmp, "knl");
+	sscanf(&par[1], "%d", &k);
+        if ((n = element_vector(el, tmp, vec)) > k)  val = vec[k];
+       }
+     else val = command_par_value(par, el->def);
+    }
   else val = command_par_value(par, el->def);
   if (val == zero && strcmp(el->base_type->name, "hkicker") == 0)
     {
@@ -2200,6 +2307,53 @@ void exec_command()
     }
 }
 
+void exec_create_table(struct in_cmd* cmd)
+     /* makes a user defined table */
+{
+  struct table* t;
+  int* t_types;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct char_p_array* m;
+  char** t_c;
+  int j, pos = name_list_pos("table", nl);
+  char* name = NULL;
+  if (nl->inform[pos] == 0)
+    {
+     warning("no table name:", "ignored");
+     return;
+    }
+  if ((name = pl->parameters[pos]->string) == NULL)
+    {
+     warning("no table name: ", "ignored");
+     return;
+    }
+  if ((pos = name_list_pos(name, table_register->names)) > -1)
+    {
+     warning("table already exists: ", "ignored");
+     return;
+    }
+  pos = name_list_pos("column", nl);
+  if (nl->inform[pos] == 0)
+    {
+     warning("table without columns: ", "ignored");
+     return;
+    }
+  m = pl->parameters[pos]->m_string; 
+  t_types = malloc(m->curr*sizeof(int));
+  t_c = malloc((m->curr+1)*sizeof(char*));
+  for (j = 0; j < m->curr; j++) 
+    {
+     t_types[j] = 2; /* type double */
+     t_c[j] = permbuff(m->p[j]);
+    }
+  t_c[m->curr] = blank;
+  t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
+  t->org_cols = 0;  /* all entries are "added" */
+  add_to_table_list(t, table_register);
+  free(t_c); free(t_types);
+}
+
 void exec_dump(struct in_cmd* cmd)
 {
   struct table* t;
@@ -2288,6 +2442,33 @@ void exec_help(struct in_cmd* cmd)
         else puts("no help for this command - try help; (no arguments)");
        }
     }
+}
+
+void exec_fill_table(struct in_cmd* cmd)
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("table", nl);
+  char* name = NULL;
+  if (nl->inform[pos] == 0)
+    {
+     warning("no table name:", "ignored");
+     return;
+    }
+  if ((name = pl->parameters[pos]->string) == NULL)
+    {
+     warning("no table name: ", "ignored");
+     return;
+    }
+  if ((pos = name_list_pos(name, table_register->names)) > -1)
+    {
+     t = table_register->tables[pos];
+     add_vars_to_table(t);
+     if (++t->curr == t->max) grow_table(t);
+    }
+  else warning("table not found: ", "ignored");
+     return;
 }
 
 void exec_macro(struct in_cmd* cmd, int pos)
@@ -2693,6 +2874,8 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
 
 void expand_curr_sequ(int flag)
 {
+  struct node* c_node;
+  int j;
   if (current_sequ->ex_start != NULL)
     {
      current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
@@ -2710,6 +2893,15 @@ void expand_curr_sequ(int flag)
      expand_sequence(current_sequ, flag);
      current_sequ->n_nodes = 
        add_drifts(current_sequ->ex_start, current_sequ->ex_end);
+     if (current_sequ->all_nodes != NULL) free(current_sequ->all_nodes);
+     current_sequ->all_nodes 
+        = (struct node**) malloc(current_sequ->n_nodes * sizeof(struct node*));
+     c_node = current_sequ->ex_start;
+     for (j = 0; j < current_sequ->n_nodes; j++)
+       {
+	current_sequ->all_nodes[j] = c_node;
+        c_node = c_node->next;
+       }
     }
   set_node_bv(current_sequ); /* set bv factors for all nodes */
   if (current_range) set_range(current_range, current_sequ);
@@ -3184,7 +3376,7 @@ void fill_beta0(struct command* beta0, struct node* node)
     }
 }
 
-void fill_constraint_list(int type /* 1 node, 2 sequence */, 
+void fill_constraint_list(int type /* 1 node, 2 global */, 
                           struct command* cd, struct constraint_list* cl)
 {
   struct command_parameter_list* pl = cd->par;
@@ -3683,6 +3875,17 @@ void get_bracket_t_range(char* toks[], char lb, char rb,
        }
     }
   *rs = start - 1;
+}
+
+double get_aperture(struct node* node, char* par)
+{
+  int i, k, n = strlen(par);
+  double val = zero, vec[100];
+  for (i = 0; i < n; i++)  if(isdigit(par[i])) break;
+  if (i == n) return val;
+  sscanf(&par[i], "%d", &k); k--;
+  if ((n = element_vector(node->p_elem, "aperture", vec)) > k)  val = vec[k];
+  return val;
 }
 
 void get_disp0(double* disp)
@@ -4647,22 +4850,29 @@ struct constraint* make_constraint(int type, struct command_parameter* par)
   switch(par->c_type)
     {
     case 1: /* minimum */
-      if (par->min_expr == NULL) new->c_min = par->c_min;
-      else new->c_min = expression_value(par->min_expr, 2);
-      break;
-    case 2: /* maximum */
-      if (par->max_expr == NULL) new->c_max = par->c_max;
-      else new->c_max = expression_value(par->max_expr, 2);
-      break;
     case 3: /* both */
       if (par->min_expr == NULL) new->c_min = par->c_min;
-      else new->c_min = expression_value(par->min_expr, 2);
+      else 
+	{
+         new->c_min = expression_value(par->min_expr, 2);
+         new->ex_c_min = par->min_expr;
+	}
+      if (par->c_type == 1) break;
+    case 2: /* maximum */
       if (par->max_expr == NULL) new->c_max = par->c_max;
-      else new->c_max = expression_value(par->max_expr, 2);
+      else 
+	{
+         new->c_max = expression_value(par->max_expr, 2);
+         new->ex_c_max = par->max_expr;
+	}
       break;
     case 4: /* value */
       if (par->expr == NULL) new->value = par->double_value;
-      else new->value = expression_value(par->expr, 2);
+      else 
+	{
+         new->value = expression_value(par->expr, 2);
+         new->ex_value = par->expr;
+	}
     }
   if (type == 1) new->weight = command_par_value(new->name, current_weight);
   else           new->weight = command_par_value(new->name, current_gweight);
@@ -4848,17 +5058,21 @@ char* make_string_variable(char* string)
   return var->name;
 }
 
-struct table* make_table(char* name, char table_cols[][TABLE_KEY], 
+struct table* make_table(char* name, char* type, char** table_cols, 
                          int* table_types, int rows)
 {
   struct table* t;
   struct name_list *cols;
+  struct command_list* scl;
   int i, n = 0;
   while (*table_cols[n] != ' ') {n++;}
   cols = new_name_list(n);
   for (i = 0; i < n; i++) 
        add_to_name_list(table_cols[i], table_types[i], cols);
-  t = new_table(name, rows, cols);
+  if ((scl = find_command_list(name, table_select)) != NULL && scl->curr > 0) 
+          add_table_vars(cols, scl);
+  t = new_table(name, type, rows, cols);
+  t->org_cols = n;
   return t;
 }
 
@@ -5000,9 +5214,12 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
   strncpy(name, c_c->name, ncp);
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
   *type = c_c->type;
-  *value = c_c->value;
-  *c_min = c_c->c_min;
-  *c_max = c_c->c_max;
+  if (c_c->ex_value == NULL) *value = c_c->value;
+  else                       *value = expression_value(c_c->ex_value,2);
+  if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
+  else                       *c_min = expression_value(c_c->ex_c_min,2);
+  if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
+  else                       *c_max = expression_value(c_c->ex_c_max,2);
   *weight = c_c->weight;
   return ++current_node->con_cnt;
 }
@@ -5023,9 +5240,12 @@ int next_global(char* name, int* name_l, int* type, double* value,
   strncpy(name, c_c->name, ncp);
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
   *type = c_c->type;
-  *value = c_c->value;
-  *c_min = c_c->c_min;
-  *c_max = c_c->c_max;
+  if (c_c->ex_value == NULL) *value = c_c->value;
+  else                       *value = expression_value(c_c->ex_value,2);
+  if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
+  else                       *c_min = expression_value(c_c->ex_c_min,2);
+  if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
+  else                       *c_max = expression_value(c_c->ex_c_max,2);
   *weight = c_c->weight;
   return ++current_sequ->con_cnt;
 }
@@ -5124,6 +5344,21 @@ void node_string(char* key, char* string, int* l)
   nbl = *l - ncp;
   for (i = 0; i < ncp; i++) string[i] = p[i];
   for (i = 0; i < nbl; i++) string[ncp+i] = ' ';
+}
+
+double spec_node_value(char* par, int* number)  
+/* returns value for parameter par of specified node (start = 1 !!) */
+{
+  double value = zero;
+  struct node* node = current_node;
+  int n = *number + current_sequ->start_node - 1;
+  if (0 <= n && n < current_sequ->n_nodes)
+    {
+     current_node = current_sequ->all_nodes[n];
+     value = node_value(par);
+     current_node = node;
+    }
+  return value;
 }
 
 double node_value(char* par)  
@@ -5961,7 +6196,7 @@ void pro_ibs(struct in_cmd* cmd)
       if (w_file)
 	{
          table_name = permbuff("ibs");
-         ibs_table = make_table(table_name, ibs_table_cols, 
+         ibs_table = make_table(table_name, "ibs", ibs_table_cols, 
 			     ibs_table_types, current_sequ->n_nodes);
          add_to_table_list(ibs_table, table_register);
 	}
@@ -6177,7 +6412,7 @@ void pro_survey(struct in_cmd* cmd)
        table_name = pl->parameters[pos]->call_def->string;
     }
   else table_name = permbuff("survey");
-  survey_table = make_table(table_name, survey_table_cols, 
+  survey_table = make_table(table_name, "survey", survey_table_cols, 
                             survey_table_types, current_sequ->n_nodes);
   add_to_table_list(survey_table, table_register);
   survey_();
@@ -6294,6 +6529,11 @@ void pro_twiss()
        }
      else warning("illegal range ignored:", pl->parameters[pos]->string);
     }
+  for (j = 0; j < current_sequ->n_nodes; j++)
+    {
+     if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
+    }
+  current_sequ->start_node = j;
   for (j = 0; j < 6; j++) orbit0[j] = zero;
   for (j = 0; j < 6; j++) disp0[j] = zero;
   for (j = 0; j < 36; j++) oneturnmat[j] = zero;
@@ -6325,7 +6565,7 @@ void pro_twiss()
   adjust_beam();
   probe_beam = clone_command(current_beam);
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
-  summ_table = make_table("summ", summ_table_cols, summ_table_types,
+  summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types,
                           twiss_deltas->curr+1);
   add_to_table_list(summ_table, table_register);
   l = strlen(table_name);
@@ -6338,8 +6578,9 @@ void pro_twiss()
     }
   for (i = 0; i < twiss_deltas->curr; i++)
     {
-     twiss_table = make_table(table_name, twiss_table_cols, 
+     twiss_table = make_table(table_name, "twiss", twiss_table_cols, 
                             twiss_table_types, current_sequ->n_nodes);
+     twiss_table->dynamic = 1; /* flag for table row access to current row */
      add_to_table_list(twiss_table, table_register);
      current_sequ->tw_table = twiss_table;
      twiss_table->org_sequ = current_sequ;
@@ -6350,7 +6591,6 @@ void pro_twiss()
      if ((twiss_success = get_option("twiss_success")))
        {
         fill_twiss_header(twiss_table);
-        complete_twiss_table(twiss_table);
         if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
         if (w_file) out_table(table_name, twiss_table, filename);
        }
@@ -6472,7 +6712,7 @@ struct table* read_table(struct in_cmd* cmd)
 	     {
 	      delete_name_list(tnl); return NULL;
 	     }
-           t = new_table(type, 500, tnl);
+           t = new_table(type, "input", 500, tnl);
 	  }
 	for (i = 0; i < tnl->curr; i++)
 	  {
@@ -7723,6 +7963,7 @@ void set_range(char* range, struct sequence* sequ)
 void set_selected_columns(struct table* t, struct command_list* select)
 {
   int i, j, pos, k, n = 0;
+  char* p;
   struct name_list* nl;
   struct command_parameter_list* pl;
   if (par_present("column", NULL, select) == 0)
@@ -7754,16 +7995,28 @@ void set_selected_columns(struct table* t, struct command_list* select)
 		      }
 		   }
 		}
-              else
+	      else if (strcmp(pl->parameters[pos]->m_string->p[j], 
+                       "apertype") == 0)
 		{
 	         for (k = 0; k < t->num_cols; k++)
 		   {
-		    if (strcmp(pl->parameters[pos]->m_string->p[j], 
-                      t->columns->names[k]) == 0) break;
+		    if (strncmp("aper", t->columns->names[k], 4) == 0)
+		      {
+                       if (k <  t->num_cols 
+                           && int_in_array(k, n, t->col_out->i) == 0) 
+                              t->col_out->i[n++] = k;
+		      }
 		   }
-                 if (k <  t->num_cols 
-                     && int_in_array(k, n, t->col_out->i) == 0) 
-                         t->col_out->i[n++] = k;
+		}
+              else
+		{
+		 p = pl->parameters[pos]->m_string->p[j];
+		 if ((k = name_list_pos(p, t->columns)) > -1)
+		   {
+                    if (k <  t->num_cols 
+                        && int_in_array(k, n, t->col_out->i) == 0) 
+                            t->col_out->i[n++] = k;
+		   }
 		}
 	     }
 	  }
@@ -8400,6 +8653,25 @@ void store_select(struct in_cmd* cmd)
     }
 }
 
+void store_node_vector(char* par, int* length, double* vector)  
+/* stores vector at node */
+{
+  int j;
+  char lpar[NAME_L];
+  mycpy(lpar, par);
+  if (strcmp(lpar, "orbit_ref") == 0)
+    {
+     if (current_node->orbit_ref)
+       {
+	while (*length > current_node->orbit_ref->max) 
+             grow_double_array(current_node->orbit_ref);
+       }
+     else current_node->orbit_ref = new_double_array(*length);
+     for (j = 0; j < *length; j++) current_node->orbit_ref->a[j] = vector[j];
+     current_node->orbit_ref->curr = *length;
+    }
+}
+
 int string_cnt(char c, int n, char* toks[])
 {
   int i, k = 0;
@@ -8538,7 +8810,7 @@ int table_row(struct table* table, char* name)
 double table_value()
 {
   double val = zero;
-  int ntok, pos, col, row = 0;
+  int ntok, pos, col, row;
   char** toks;
   struct table* table;
   if (current_variable != NULL && current_variable->string != NULL)
@@ -8554,8 +8826,10 @@ double table_value()
 	   table = table_register->tables[pos];
            if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1)
 	     {
-              if (ntok > 2)  /* find row - else first */
+              if (ntok > 2)  /* find row - else current (dynamic), or 0 */
 	        row = table_row(table, toks[1]);
+              else if (table->dynamic)  row = table->curr;
+              else row = 0;
               val = table->d_cols[col][row];
 	     }
 	  }
@@ -8872,12 +9146,12 @@ void track_tables_create(struct in_cmd* cmd)
   int i, j;
   char tab_name[NAME_L];
   struct table* t;
-  t = make_table("tracksumm", tracksumm_table_cols, 
+  t = make_table("tracksumm", "tracksumm", tracksumm_table_cols, 
   		 tracksumm_table_types, 2*stored_track_start->curr);
   add_to_table_list(t, table_register);
   if (get_option("onetable"))
     {
-     t = make_table("trackone", trackone_table_cols, 
+     t = make_table("trackone", "trackone", trackone_table_cols, 
   		 trackone_table_types, stored_track_start->curr*TRACK_ROWS);
      add_to_table_list(t, table_register);
     }
@@ -8888,7 +9162,7 @@ void track_tables_create(struct in_cmd* cmd)
         for (j = 0; j < stored_track_start->curr; j++) /* open tables */
           {
            sprintf(tab_name, "track.obs%04d.p%04d", i+1, j+1);
-           t = make_table(tab_name, track_table_cols, 
+           t = make_table(tab_name, "trackobs", track_table_cols, 
   		     track_table_types, TRACK_ROWS);
            add_to_table_list(t, table_register);
 	  }
@@ -9549,7 +9823,12 @@ void write_table(struct table* t, char* filename)
     {
      strcpy(l_name, t->name);
      fprintf(out_file, 
-      "@ TYPE             %%%02ds \"%s\"\n", strlen(t->name), 
+      "@ NAME             %%%02ds \"%s\"\n", strlen(t->name), 
+     stoupper(l_name));
+
+     strcpy(l_name, t->type);
+     fprintf(out_file, 
+      "@ TYPE             %%%02ds \"%s\"\n", strlen(t->type), 
      stoupper(l_name));
 
      if (t->header != NULL)

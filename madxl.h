@@ -24,8 +24,8 @@
 #define NJ_RAND 24          /* for random generator */
 #define ND_RAND 21          /* for random generator */
 #define MATCH_WORK 10       /* no. of work spaces in matching */
-#define TABLE_KEY 16        /* max. table keyword is TABLE_KEY-1 */
 #define TRACK_ROWS 1200     /* initial length of track tables */
+#define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
 
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
@@ -42,7 +42,7 @@ const int s_match[] = /* position of first token of command below */
 
 const int t_match[] = /* order in which the commands are matched */
 {0, 1, 16, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-const char cmd_match_base[][TABLE_KEY] = 
+const char* cmd_match_base[] = 
 { /*  0 */ "@cmd", 
   /*  1 */ "@name", ":", "@cmd", 
   /*  2 */ "int", "const", "@name", "=",
@@ -61,6 +61,19 @@ const char cmd_match_base[][TABLE_KEY] =
   /* 15 */ "@name", "@name",
   /* 16 */ "shared", "@name", ":", "@cmd"};
 
+/* aperture types and # of parameters, needed for twiss table */
+
+char* aperture_types[] =
+{
+"circle", "ellipse", "rectangle", "lhcscreen", "marguerite",
+" "  /* blank terminates */
+};
+
+int aperture_npar[] =
+{
+1, 2, 2, 3, 2
+};
+
 /* table descriptors: type 1 = int, type 2 = double, type 3 = string;
    internally, however, int are stored as double */
 
@@ -70,7 +83,7 @@ int survey_table_types[] =
 2, 2, 2, 2, 2, 2
 };
 
-char survey_table_cols[][TABLE_KEY] =
+char* survey_table_cols[] =
 {
 "name", "s", "l", "angle", "x",
 "y", "z", "theta", "phi", "psi", "globaltilt",
@@ -86,7 +99,7 @@ int efield_table_types[] =
 2, 2, 2
 };
 
-char efield_table_cols[][TABLE_KEY] =
+char* efield_table_cols[] =
 {
 "name", 
 "k0l", "k0sl", "k1l", "k1sl", 
@@ -97,7 +110,7 @@ char efield_table_cols[][TABLE_KEY] =
 " "  /* blank terminates */
 };
 
-char sxf_table_names[][TABLE_KEY] =
+char* sxf_table_names[] =
 {
 "l","k0","k0s","k1","k1s",
 "e1","e2","k2","k2s","h1",
@@ -137,7 +150,7 @@ int twiss_table_types[] =
 2
 };
 
-char twiss_table_cols[][TABLE_KEY] =
+char* twiss_table_cols[] =
 {
 "name", "keyword", "s", "betx", "alfx", 
 "mux", "bety", "alfy", "muy", "x", 
@@ -168,7 +181,7 @@ int ibs_table_types[] =
   3, 2, 2, 2, 2, 2
 };
 
-char ibs_table_cols[][TABLE_KEY] =
+char* ibs_table_cols[] =
 {
   "name", "s", "dels", "tli", "txi", "tyi",
 " "  /* blank terminates */
@@ -179,7 +192,7 @@ int mon_table_types[] =
 3, 2, 2, 2, 2
 };
 
-char mon_table_cols[][TABLE_KEY] =
+char* mon_table_cols[] =
 {
   "name", "x(old)", "y(old)", "x(new)", "y(new)",
 " "  /* blank terminates */
@@ -190,13 +203,13 @@ int corr_table_types[] =
 3, 2, 2, 2, 2
 };
 
-char corr_table_cols[][TABLE_KEY] =
+char* corr_table_cols[] =
 {
   "name", "px(old)", "py(old)", "px(correction)", "py(correction)",
 " "  /* blank terminates */
 };
 
-char inverted_mag_forces[][TABLE_KEY] =
+char* inverted_mag_forces[] =
 {
 "angle", "k0", "k0s", "kick", "hkick", "vkick", 
 "k1", "k1s", "k2", "k2s", "k3", "k3s", "k4", "k4s",
@@ -208,7 +221,7 @@ int orbit_table_types[] =
   3, 2, 2, 1,
 };
 
-char orbit_table_cols[][TABLE_KEY] =
+char* orbit_table_cols[] =
 {
   "name", "x", "y", "status",
 " "  /* blank terminates */
@@ -220,7 +233,7 @@ int special_comm_cnt[] =
 0
 };
 
-char special_comm_desc[][TABLE_KEY] = /* ">?" = skip from start including char. at ? */
+char* special_comm_desc[] = /* ">?" = skip from start including char. at ? */
 {
   "if(", "else{", "elseif(", "while(", ">:macro", ">:line",
 " "  /* blank terminates , line must remain last */
@@ -234,7 +247,7 @@ int summ_table_types[] =
 2, 2, 2, 2
 };
 
-char summ_table_cols[][TABLE_KEY] =
+char* summ_table_cols[] =
 {
 "length", "orbit5", "alfa", "gammatr", "q1",
 "dq1", "betxmax", "dxmax", "dxrms", "xcomax",
@@ -248,7 +261,7 @@ int trackone_table_types[] =
 1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 
-char trackone_table_cols[][TABLE_KEY] =
+char* trackone_table_cols[] =
 {
 "number", "turn", "x", "px", "y", "py", "t", "pt", "s",
 " "  /* blank terminates */
@@ -259,7 +272,7 @@ int track_table_types[] =
 1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 
-char track_table_cols[][TABLE_KEY] =
+char* track_table_cols[] =
 {
 "number", "turn", "x", "px", "y", "py", "t", "pt", "s",
 " "  /* blank terminates */
@@ -270,7 +283,7 @@ int tracksumm_table_types[] =
 1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 
-char tracksumm_table_cols[][TABLE_KEY] =
+char* tracksumm_table_cols[] =
 {
 "number", "turn", "x", "px", "y", "py", "t", "pt", "s",
 " "  /* blank terminates */
@@ -283,7 +296,7 @@ int dynap_table_types[] =
 2,2,2,2,2
 };
 
-char dynap_table_cols[][TABLE_KEY] =
+char* dynap_table_cols[] =
 {
 "dynapfrac", "dktrturns", "xend", "pxend", "yend",
 "pyend", "tend", "wxmin", "wxmax", "wymin", "wymax",
@@ -296,7 +309,7 @@ int dynaptune_table_types[] =
   2,2,2,2,2
 };
 
-char dynaptune_table_cols[][TABLE_KEY] =
+char* dynaptune_table_cols[] =
 {
 "x", "y", "tunx", "tuny", "dtune",
 " "  /* blank terminates */

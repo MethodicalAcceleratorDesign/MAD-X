@@ -107,11 +107,14 @@ struct constraint /* contains one constraint */
                                 /* 2 maximum */
                                 /* 3 both 1 + 2 */
                                 /* 4 value */
+  int stamp;
   double value,
          c_min,
          c_max,
          weight;
-  int stamp;
+  struct expression   *ex_value,
+                      *ex_c_min,
+                      *ex_c_max;
 };
 
 struct constraint_list /* contains list of constraints */
@@ -294,6 +297,7 @@ struct node                /* the sequence is a linked list of nodes */
   struct command* savebeta; /* pointer to savebeta command if any */
   struct constraint_list* cl; /* pointer to constraint list during match */
   struct double_array* obs_orbit; /* for track observation point */
+  struct double_array* orbit_ref; /* for threader orbit + cum. matrix */
 };
 
 struct node_list /* contains list of node pointers sorted by name */
@@ -326,11 +330,13 @@ struct sequence
   struct command* beam;         /* pointer to beam attached */
   /* expanded sequence */
   int n_nodes;                  /* number of nodes when expanded */
+  int start_node;               /* first node of current range in all_nodes */
   struct node* ex_start;        /* first node in expanded sequence */
   struct node* ex_end;          /* last node in expanded sequence */
   struct node* range_start;     /* first node of current range in sequence */
   struct node* range_end;       /* last node of current range in sequence */
-  struct node_list* ex_nodes;   /* alphabetic list of nodes */
+  struct node** all_nodes;      /* sequential list off all nodes */
+  struct node_list* ex_nodes;   /* alphabetic list of nodes (no drifts) */
   struct table* tw_table;       /* pointer to latest twiss table created */
   struct constraint_list* cl;   /* pointer to constraint list during match */
 };
@@ -347,10 +353,13 @@ struct sequence_list /* contains list of sequence pointers sorted by name */
 
 struct table
 {
-  char name[NAME_L];
+  char name[NAME_L],
+       type[NAME_L];            /* like "twiss", "survey" etc. */
   int  max,                     /* max. # rows */
        curr,                    /* current # rows */
-       num_cols,                /* # columns - fixed */
+       num_cols,                /* total # columns - fixed */
+       org_cols,                /* original # columns from definition */
+       dynamic,                 /* if != 0, values taken from current row */
        origin;                  /* 0 if created in job, 1 if read */
   struct char_p_array* header;  /* extra lines for file header */
   struct int_array* col_out;    /* column no.s to be written (in this order) */

@@ -44,7 +44,7 @@ void error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
 //  if(efield_table == NULL) {
-       efield_table = make_table("efield", efield_table_cols,
+       efield_table = make_table("efield", "efield", efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
        pro_error_make_efield_table();

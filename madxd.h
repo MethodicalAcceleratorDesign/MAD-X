@@ -40,6 +40,8 @@
 #define set_option            set_option__
 #define set_value             set_value__
 #define set_variable          set_variable__
+#define spec_node_value       spec_node_value__
+#define store_node_vector     store_node_vector__
 #define string_to_table       string_to_table__
 #define table_length          table_length__
 #define table_org             table_org__
@@ -91,6 +93,8 @@
 #define set_option            set_option_
 #define set_value             set_value_
 #define set_variable          set_variable_
+#define spec_node_value       spec_node_value_
+#define store_node_vector     store_node_vector_
 #define string_to_table       string_to_table_
 #define table_length          table_length_
 #define table_org             table_org_
@@ -159,6 +163,7 @@ extern void twiss_(double*, double*, int*);
 int advance_node();
 int advance_to_pos(char*, int*);
 char* alias(char*);
+int aperture_count(struct sequence*);
 void augment_count(char*);
 int char_from_table(char*, char*, int*, char*); /* OB 2.4.2002 */
 void comment_to_table(char*, char*, int*);
@@ -167,6 +172,7 @@ int double_from_table(char*, char*, int*, double*);
 void double_to_table(char*, char*, double*);
 void element_name(char*, int*);
 double frndm();
+double get_aperture(struct node*, char*);
 void get_disp0(double*);
 int get_option(char*);
 void get_orbit0(double*);
@@ -193,6 +199,8 @@ int restart_sequ();
 void sequence_name(char*, int*);
 void set_value(char*, char*, double*);
 void set_variable(char*, double*);
+double spec_node_value(char*, int*);
+void store_node_vector(char*, int*, double*);
 void string_to_table(char*, char*, char*);
 int table_length(char*);
 int table_org(char*);
@@ -203,6 +211,7 @@ void vector_to_table(char*, char*, int*, double*);
 double act_value(int, struct name_list*);
 int act_special(int, char*);
 int add_drifts(struct node*, struct node*);
+void add_table_vars(struct name_list*, struct command_list*);
 void add_to_command_list(char*, struct command*, struct command_list*, int);
 void add_to_command_list_list(char*, struct command_list*, 
                               struct command_list_list*);
@@ -214,6 +223,7 @@ void add_to_node_list(struct node*, int, struct node_list*);
 void add_to_sequ_list(struct sequence*, struct sequence_list*);
 void add_to_table_list(struct table*, struct table_list*);
 void add_to_var_list(struct variable*, struct var_list*, int);
+void add_vars_to_table(struct table*);
 void adjust_beam();
 void all_node_pos(struct sequence*);
 int attach_beam(struct sequence*);
@@ -251,6 +261,7 @@ void correct_usekick(struct in_cmd*);
 void correct_usemonitor(struct in_cmd*);
 void correct_option(struct in_cmd* cmd);
 int pro_correct_filter(int iplane, double sigcut);
+int pro_correct_getcorrs(struct in_cmd* cmd);
 void deco_init();
 int decode_command();
 int decode_par(struct in_cmd*, int, int, int, int);
@@ -317,8 +328,10 @@ void exec_assign(struct in_cmd*);
 void exec_beam(struct in_cmd*, int);
 void exec_call(struct in_cmd*);
 void exec_command();
+void exec_create_table(struct in_cmd*);
 void exec_dump(struct in_cmd*);
 void exec_dumpsequ(struct in_cmd*);
+void exec_fill_table(struct in_cmd*);
 void exec_help(struct in_cmd*);
 void exec_macro(struct in_cmd*, int);
 void exec_option();
@@ -436,7 +449,7 @@ struct table* make_optics_table(struct table*);
 void make_sequ_from_line(char*);
 void make_sequ_node(struct sequence*, int);
 char* make_string_variable(char*);
-struct table* make_table(char*, char tc[][TABLE_KEY], int*, int);
+struct table* make_table(char*, char*, char**, int*, int);
 void makethin(struct in_cmd*);
 void match_action(struct in_cmd*);
 void match_cell(struct in_cmd*);
@@ -492,7 +505,7 @@ struct node_list* new_node_list(int);
 struct sequence* new_sequence(char*, int);
 struct sequence_list* new_sequence_list(int);
 struct node* new_sequ_node(struct sequence*, int);
-struct table* new_table(char*, int, struct name_list*);
+struct table* new_table(char*, char*, int, struct name_list*);
 struct table_list* new_table_list(int);
 struct variable* new_variable(char*, double, int, int, struct expression*,
                               char*);
