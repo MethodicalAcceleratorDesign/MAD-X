@@ -117,6 +117,13 @@ extern void fortinit_();
 extern void gxterm_();
 extern void haveit_(double *,double *,double *,double *,int *,int *,
 int *,double *,double *,double *,double *,double *,double *);
+extern void testit_(double *,double *,double *,double *,int *,int *,
+int *,double *,double *,double *,double *,double *,double *);
+extern void svdcorr_m_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *);
+extern void svdcorr_c_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *);
+extern void svddec_c_(double *,double *,double *,double *,double *,double *,double *,double *,int *,int *, int *, int *, int *);
+extern void svddec_m_(double *,double *,double *,double *,double *,double *,double *,double *,int *,int *, int *, int *, int *);
+
 extern void ibs_();
 extern void micit_(double *,char *,double *,double *,double *,int *,float *,
 int *,int *,int *,int *,float *,float *,float *,float *,float *,
@@ -617,6 +624,7 @@ void pro_correct_make_mon_table();
 void pro_correct_fill_mon_table(int ip ,char *name, double old, double new);
 int pro_correct_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, double *monvec,char *conm);
 double crms(double *r, int m);
+float  fextim();
 
 
 double* pro_correct_response_ring(int ip, int nc, int nm);
@@ -625,6 +633,8 @@ double* pro_correct_response_line(int ip, int nc, int nm);
 /* C wrapper to allocate memory for Fortran77 */
 int c_micit(double *,char *,double *,double *,double *,int *,float,int,int,int);
 void c_haveit(double *,double *,double *,double *,int *,int,int);
+int  c_svddec(double *,int,int,int *);
+int  c_svdcorr(double *, double *, double *, double *, int *, int , int );
 
 /* define error routines */
 double cprp(double *r, int m);
@@ -824,6 +834,7 @@ const double ten_m_19 = 1.e-19;
 
 int add_error_opt = 0;      /* ADD error option, set with eoption */
 int print_correct_opt = 1;  /* PRINT options for orbit correction */
+int debug_correct_opt = 0;  /* DEBUG options for orbit correction */
 int assign_start = 0;       /* flag for multiple assign statements */
 int aux_count = 0;          /* for debug purposes */
 int beam_info = -1;         /* flag to print beam information once */
