@@ -1007,6 +1007,7 @@
 !   rt(6,6)   (double)  transfer matrix.                               *
 !   tt(6,6,6) (double)  second order terms.                            *
 !----------------------------------------------------------------------*
+      logical stabx,staby
       integer i,k,j,fundim
       parameter(fundim=69)
       double precision rt(6,6),tt(6,6,6),disp0(6),ddisp0(6),rtp(6,6),   &
@@ -1016,20 +1017,18 @@
       include 'twissc.fi'
 
 !---- Initialization
-      betx=zero
-      alfx=zero
-      amux=zero
-      bety=zero
-      alfy=zero
-      amuy=zero
-      dmux=zero
-      dmuy=zero
-      wx  =zero
-      phix=zero
-      dmux=zero
-      wy  =zero
-      phiy=zero
-      dmuy=zero
+      betx   =opt_fun0(3 )
+      alfx   =opt_fun0(4 )
+      amux   =opt_fun0(5 )
+      bety   =opt_fun0(6 )
+      alfy   =opt_fun0(7 )
+      amuy   =opt_fun0(8 )
+      wx     =opt_fun0(19)
+      phix   =opt_fun0(20)
+      dmux   =opt_fun0(21)
+      wy     =opt_fun0(22)
+      phiy   =opt_fun0(23)
+      dmuy   =opt_fun0(24)
 
 !---- Initial dispersion.
       call twdisp(rt,rt(1,6),disp0)
@@ -1059,31 +1058,37 @@
 
 !---- Horizontal motion.
       cosmux = (rt(1,1) + rt(2,2)) / two
-      sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
-      if (sinmu2.lt.0) sinmu2 = eps
-      sinmux = sign(sqrt(sinmu2), rt(1,2))
-      betx = rt(1,2) / sinmux
-      alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
-      bx = rtp(1,2) / rt(1,2) +                                         &
-     &(rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
-      ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                     &
-     &alfx * rtp(1,2) / rt(1,2)
-      wx = sqrt(bx**2 + ax**2)
-      if (wx.gt.eps) phix = atan2(ax,bx)
+      stabx = abs(cosmux) .lt. one
+      if (stabx) then
+        sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
+        if (sinmu2.lt.0) sinmu2 = eps
+        sinmux = sign(sqrt(sinmu2), rt(1,2))
+        betx = rt(1,2) / sinmux
+        alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
+        bx = rtp(1,2) / rt(1,2) +                                       &
+     &       (rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
+        ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                   &
+     &       alfx * rtp(1,2) / rt(1,2)
+        wx = sqrt(bx**2 + ax**2)
+        if (wx.gt.eps) phix = atan2(ax,bx)
+      endif
 
 !---- Vertical motion.
       cosmuy = (rt(3,3) + rt(4,4)) / two
-      sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
-      if (sinmu2.lt.0) sinmu2 = eps
-      sinmuy = sign(sqrt(sinmu2), rt(3,4))
-      bety = rt(3,4) / sinmuy
-      alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
-      by = rtp(3,4) / rt(3,4) +                                         &
-     &(rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
-      ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                     &
-     &alfy * rtp(3,4) / rt(3,4)
-      wy = sqrt(by**2 + ay**2)
-      if (wy.gt.eps) phiy = atan2(ay,by)
+      staby = abs(cosmuy) .lt. one
+      if (staby) then
+        sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
+        if (sinmu2.lt.0) sinmu2 = eps
+        sinmuy = sign(sqrt(sinmu2), rt(3,4))
+        bety = rt(3,4) / sinmuy
+        alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
+        by = rtp(3,4) / rt(3,4) +                                       &
+     &       (rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
+        ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                   &
+     &       alfy * rtp(3,4) / rt(3,4)
+        wy = sqrt(by**2 + ay**2)
+        if (wy.gt.eps) phiy = atan2(ay,by)
+      endif
 
 !---- Fill optics function array
       opt_fun0(19)=wx
@@ -1134,6 +1139,7 @@
       disp(4)  =opt_fun0(18)
       disp(5)  =zero
       disp(6)  =one
+      call dzero(te,216)
 
 !---- Initial values for chromatic functions.
       opt_fun(19)=wx
@@ -1168,7 +1174,6 @@
       n_align = node_al_errors(al_errors)
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)
-        call dzero(te,216)
         call twbttk(re,te)
       endif
       if(centre) centre_bttk=.true.
@@ -1180,7 +1185,6 @@
       endif
       if (n_align.ne.0)  then
         call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
-        call dzero(te,216)
         call twbttk(re,te)
       endif
       if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero)
