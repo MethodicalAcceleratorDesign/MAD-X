@@ -1,3 +1,5 @@
+/* FS & TdA 15.03.2004: fix missing myfree of p_loc in routine grow_table */
+/* TdA 15.03.2004: 2 new routines for plotting "interp_node" and "reset_interpolation" */
 int add_drifts(struct node* c_node, struct node* end)
 {
   struct node *d1;
