@@ -877,16 +877,16 @@
 !---- Give message, if unstable.
       eflag = 0
       if (stabx+staby.lt.2) then
+        eflag = 1
         if (staby.ne.0) then
-          write (msg, 910) 1,deltap
+          write (msg, 910) 1,deltap,cosmux,cosmuy
           call aawarn('TWCPIN: ',msg)
         else if (stabx.ne.0) then
-          write (msg, 910) 2,deltap
+          write (msg, 910) 2,deltap,cosmux,cosmuy
           call aawarn('TWCPIN: ',msg)
         else
-          write (msg, 920) deltap
+          write (msg, 920) deltap,cosmux,cosmuy
           call aawarn('TWCPIN: ',msg)
-          eflag = 1
         endif
       endif
       opt_fun0(3)=betx0
@@ -904,9 +904,10 @@
       opt_fun0(31)=r0mat(2,1)
       opt_fun0(32)=r0mat(2,2)
 
-  910 format('Mode ',i1,' is unstable  for delta(p)/p =',f12.6)
-  920 format('Both modes are unstable for delta(p)/p = ',f12.6)
-
+  910 format('Mode ',i1,' is unstable  for delta(p)/p =',f12.6,
+     &', cosmux = ',f12.6,', cosmuy = ',f12.6)
+  920 format('Both modes are unstable for delta(p)/p = ',f12.6,
+     &', cosmux = ',f12.6,', cosmuy = ',f12.6)
  9999 end
       subroutine twdisp(rt,vect,disp)
 
