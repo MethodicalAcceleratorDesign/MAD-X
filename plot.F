@@ -562,7 +562,6 @@
                call store_node_value('e2 ', zero)
             endif
             if (pos .eq. 3) call store_node_value('e2 ', e2s)
-            e2s = 0d0
             call tmbend(.false.,orbit,fmap,dstp,ek,am,te)
          else
 
