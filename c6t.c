@@ -2544,7 +2544,7 @@ int my_table_row(struct table* table, char* name)
      if (j < table->curr) 
        {
 	 ret = j+1;
-	 last_row = j;
+	 last_row = j+1;
        }
     }
   return ret;
