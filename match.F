@@ -1,14 +1,15 @@
       subroutine mtgetc(num,vect,dvect)
-* This is exactly equivalent to mtgeti but this version is used for calling
-* from C.
-*
-* This seems to be the only way deal with the problem that originally the
-* subroutine mtgeti was called both from C and from Fortran.
-* Because madX is setup with Linux-specific name-mangling, the adjustments
-* made with the !DEC$ ATTRIBUTES do not seem able to cope with such a case.
-* Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ
-*
-*
+!----------------------------------------------------------------------*
+! This is exactly equivalent to mtgeti but this version is used for    *
+! calling from C.                                                      *
+!                                                                      *
+! This seems to be the only way deal with the problem that originally  *
+! the subroutine mtgeti was called both from C and from Fortran.       *
+! Because madX is setup with Linux-specific name-mangling, the         *
+! adjustments made with the !DEC_dollar ATTRIBUTES do not seem able to *
+! cope with such a case.                                               *
+! Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ                    *
+!----------------------------------------------------------------------*
       implicit none
       integer  num
       double precision vect(*),dvect(*)
@@ -16,9 +17,9 @@
       end
 
       subroutine mtgeti(num,vect,dvect)
-* This subroutine should only be called from Fortran.  There is an
-* equivalent mtgetc for the occasions when it needs to be called from C.
-* Modified at 10:38:56 on 8 Apr 2003 by JMJ
+! This subroutine should only be called from Fortran.  There is an
+! equivalent mtgetc for the occasions when it needs to be called from C.
+! Modified at 10:38:56 on 8 Apr 2003 by JMJ
       implicit none
 
 
@@ -186,7 +187,7 @@
 
         goto 30
       endif
-c      if (psum) write(*,831) fsum
+!      if (psum) write(*,831) fsum
   830 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8)
   832 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8,3x,e16.8)
   831 format(//,'Final Penalty Function = ',e16.8,//)
@@ -524,8 +525,8 @@ c      if (psum) write(*,831) fsum
       if (iter .eq. 1) delta = min(delta,pnorm)
 
 !---- Evaluate the function at X + P and calculate its norm.
-! 23.5.2002: Oliver Bruening: inserted a routine that checks for minimum and
-!                             maximum values of the parameters:
+! 23.5.2002: Oliver Bruening: inserted a routine that checks for
+!                       minimum and maximum values of the parameters:
       call mtlimit(n,wa2,ireset)
       call fcn(m,n,wa2,wa4,iflag)
       calls = calls + 1
