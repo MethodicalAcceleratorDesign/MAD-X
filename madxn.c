@@ -2,10 +2,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
+// #include <sys/types.h>
 #ifndef _WIN32
-#include <sys/utsname.h>
-#include <sys/unistd.h> //hbu
+  #include <sys/utsname.h>
+  #include <unistd.h>
 #endif
 #include <sys/timeb.h>
 #include <ctype.h>
