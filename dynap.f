@@ -93,11 +93,15 @@
 !   dtune     (real)    : tune error                                   *
 !----------------------------------------------------------------------*
       include 'tunes.fi'
-
+      double precision tx_tmp, ty_tmp
+      tx_tmp = tunx
+      if (tunx .gt. 0.5d0)  tx_tmp = 1.d0 - tunx
+      ty_tmp = tuny
+      if (tuny .gt. 0.5d0)  ty_tmp = 1.d0 - tuny
       call double_to_table('dynaptune ', 'x '    , x0)
       call double_to_table('dynaptune ', 'y '    , y0)
-      call double_to_table('dynaptune ', 'tunx ', tunx)
-      call double_to_table('dynaptune ', 'tuny ', tuny)
+      call double_to_table('dynaptune ', 'tunx ', tx_tmp)
+      call double_to_table('dynaptune ', 'tuny ', ty_tmp)
       call double_to_table('dynaptune ', 'dtune ', dtune )
 
       write(*,*) ' tunes = ', tunx, tuny, dtune

@@ -317,7 +317,7 @@ int myregex(char* pattern, char* string)
        if (l == 3)  return 0;
        if (mypat[l-4] != '\\') mypat[l-3] = '\0';
       }
-     else mypat[l-1] = '\0'; dollar = 1;
+     else {mypat[l-1] = '\0'; dollar = 1;}
     }
   else if (l > 1 && strncmp(&mypat[l-2], ".*", 2) == 0)
     {

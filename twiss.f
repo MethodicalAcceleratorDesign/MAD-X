@@ -85,7 +85,7 @@
       inval=get_option('twiss_inval ')
 !--- flags for writing cumulative or lumped matrices
       rmatrix=get_value('twiss ','rmatrix ').ne.zero
-      sectormap=get_value('twiss ','sectormap ').ne.zero
+      sectormap=get_option('twiss_sector ').ne.zero
 !---- Initial values from command attributes.
       if (inval.ne.0) then
 

@@ -850,7 +850,7 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 
 void complete_twiss_table(struct table* t)
 {
-  int i, j, mult, pos, h_length = 30;
+  int i, j, mult, pos, h_length = 32; /* change when you add lines ! */
   double el, val, dtmp;
   struct node* c_node;
   struct table* s;
@@ -913,6 +913,12 @@ void complete_twiss_table(struct table* t)
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "kbunch");
   sprintf(c_dummy, "@ KBUNCH           %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "bcurrent");
+  sprintf(c_dummy, "@ BCURRENT         %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "sige");
+  sprintf(c_dummy, "@ SIGE             %%le  %22.12g", dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "npart");
   sprintf(c_dummy, "@ NPART            %%le  %22.12g", dtmp);
@@ -3462,7 +3468,6 @@ void ftoi_array(struct double_array* da, struct int_array* ia)
 
 void madx_finish()
 {
-  if (sec_file)  fclose(sec_file);
   if (plots_made) gxterm_();
   if (get_option("trace")) time_stamp("end");
   printf("\n  ++++++++++++++++++++++++++++++++\n");
@@ -3990,9 +3995,9 @@ int get_table_range(char* range, struct table* table, int* rows)
 {
   int i, n;
   char* c[2];
-  char tmp[NAME_L];
+  char tmp[NAME_L], dumtex[3*NAME_L];;
   rows[0] = rows[1] = 0;
-  mycpy(c_dummy, range); stolower(c_dummy);
+  mycpy(c_dummy, range); stolower(c_dummy); strcpy(dumtex, c_dummy); 
   c[0] = strtok(c_dummy, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
@@ -4005,7 +4010,7 @@ int get_table_range(char* range, struct table* table, int* rows)
 	else if (strncmp(c[i], "#e", 2) == 0) rows[i] = table->curr - 1;
         else
 	  {
-	   warning("illegal table range ignored:", range);
+	   warning("illegal table range ignored:", dumtex);
            return 0;
 	  }
        }
@@ -4014,12 +4019,12 @@ int get_table_range(char* range, struct table* table, int* rows)
 	strcpy(tmp, c[i]);
         if (square_to_colon(tmp) == 0)
 	  {
-	   warning("illegal table range ignored:", range);
+	   warning("illegal table range ignored:", dumtex);
            return 0;
 	  }
         if ((rows[i] = char_p_pos(tmp, table->node_nm)) < 0)
           {
-	   warning("illegal table range ignored:", range);
+	   warning("illegal table range ignored:", dumtex);
            return 0;
           }
        }
@@ -5973,7 +5978,7 @@ void pro_twiss()
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
-  char *filename, *name, *table_name;
+  char *filename, *name, *table_name, *sector_name;
   int i, j, l, lp, pos, k = 1, w_file, beta_def;
   pos = name_list_pos("sequence", nl);
   if(nl->inform[pos]) /* sequence specified */
@@ -6010,6 +6015,15 @@ void pro_twiss()
       table_name = pl->parameters[pos]->call_def->string;
     }
   else table_name = "twiss";
+  pos = name_list_pos("sectormap", nl);
+  if(nl->inform[pos]) 
+    {
+     set_option("twiss_sector", &k);
+     if ((sector_name = pl->parameters[pos]->string) == NULL)
+      sector_name = pl->parameters[pos]->call_def->string;
+     if ((sec_file = fopen(sector_name, "w")) == NULL)
+             fatal_error("cannot open output file:", sector_name);
+    }
   for (j = 0; j < 6; j++) orbit0[j] = zero;
   for (j = 0; j < 6; j++) disp0[j] = zero;
   for (j = 0; j < 36; j++) oneturnmat[j] = zero;
@@ -6068,6 +6082,10 @@ void pro_twiss()
        }
      else puts("Twiss failed");
     }
+  if (sec_file)  
+    {
+     fclose(sec_file); sec_file = NULL;
+    }
   tarr = delete_int_array(tarr);
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);
   current_beam = keep_beam;
@@ -6077,6 +6095,7 @@ void pro_twiss()
   set_option("chrom", &k);
   set_option("rmatrix", &k);
   set_option("centre", &k);
+  set_option("twiss_sector", &k);
 }
 
 void put_info(char* t1, char* t2) 
@@ -6593,11 +6612,6 @@ void scan_in_cmd(struct in_cmd* cmd)
 void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
 {
   int i;
-  if (sec_file == NULL)
-    {
-     if ((sec_file = fopen("sectormap", "w")) == NULL)
-             fatal_error("cannot open output file:", "sectormap");
-    }
   fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
   for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]);
   fprintf(sec_file,"\n");
@@ -7630,11 +7644,15 @@ void set_sector()
 {
   int i, flag;
   if (sector_select->curr == 0) reset_sector(current_sequ, 1);
-  else if ((flag = 
-      get_select_ex_ranges(current_sequ, sector_select, sector_ranges)) != 0)
+  else 
     {
-     for (i = 0; i < sector_ranges->curr; i++)
-          sector_ranges->nodes[i]->sel_sector = 1;
+     sector_ranges->curr = 0; sector_ranges->list->curr = 0; 
+     if ((flag = 
+      get_select_ex_ranges(current_sequ, sector_select, sector_ranges)) != 0)
+       {
+        for (i = 0; i < sector_ranges->curr; i++)
+              sector_ranges->nodes[i]->sel_sector = 1;
+       }
     }
 }
 
@@ -8511,7 +8529,7 @@ void track_run(struct in_cmd* cmd)
          buf4, buf5, &e_flag, ibuf3, buf6);
   t = 
   table_register->tables[name_list_pos("tracksumm", table_register->names)];
-  print_table(t);
+  if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
   /* free buffers */
   free(ibuf1); free(ibuf2); free(ibuf3); 
