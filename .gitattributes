@@ -50,6 +50,7 @@
 /l_complex_taylor.f90 -text
 /m_real_polymorph.f90 -text
 /madx.h -text
+/madx_ptc_module.f90 -text
 /madxc.c -text
 /madxd.h -text
 /madxdict.h -text
@@ -88,3 +89,4 @@
 /util.F -text
 /win32calls.fi -text
 /wmaxmin0.fi -text
+/wrap.f90 -text
