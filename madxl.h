@@ -29,7 +29,6 @@
 #define ND_RAND 21          /* for random generator */
 #define MATCH_WORK 10       /* no. of work spaces in matching */
 #define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
-#define MAXARRAY 1000       /* max. length of apex tables in aperture module*/
 
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
@@ -69,40 +68,17 @@ const char* cmd_match_base[] =
 
 char* aperture_types[] =
 {
-"circle", "ellipse", "rectangle", "lhcscreen", 
-"marguerite", "rectellipse", "racetrack",
+"circle", "ellipse", "rectangle", "lhcscreen", "marguerite", "rectellipse",
 " "  /* blank terminates */
 };
 
-/*added 4, 3 and "racetrack" here, IW */
-
 int aperture_npar[] =
 {
-1, 2, 2, 3, 
-2, 4, 3
+1, 2, 2, 3, 2
 };
 
 /* table descriptors: type 1 = int, type 2 = double, type 3 = string;
    internally, however, int are stored as double */
-
-int ap_table_types[] =
-{
-3, 2, 3,
-2, 2, 2,
-2, 2, 2, 2,
-2, 2, 2,
-2, 2, 2, 2, 2, 2, 2,
-};
-
-char* ap_table_cols[] =
-{
-"name", "n1", "apertype",
-"rtol", "xtol", "ytol",
-"ap1", "ap2", "ap3", "ap4",
-"on_ap", "on_elem", "spec",
-"s", "betx", "bety", "dx", "dy", "x", "y",
-" "  /* blank terminates */
-};
 
 int survey_table_types[] =
 {
@@ -194,8 +170,7 @@ int twiss_table_types[] =
 2, 2, 2,
 2, 2, 2,
 2, 2, 2,
-2, 2, 2,
-2
+2, 2, 2
 };
 
 char* twiss_table_cols[] =
@@ -233,7 +208,6 @@ char* twiss_table_cols[] =
 "mu1", "mu2", "mu3",
 "disp1", "disp2", "disp3",
 "disp4", "disp5", "disp6",
-"n1",
 " "  /* blank terminates */
 };
 

@@ -1,13 +1,3 @@
-struct aper_node		/* aperture limit node */
-{
-  char name[NAME_L];
-  double n1;
-  double s;
-  char apertype[NAME_L];
-  double aperture[4];
-  double aper_tol[3];
-};
-
 struct char_array           /* dynamic array of char */
 {
   int stamp;

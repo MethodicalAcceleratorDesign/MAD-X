@@ -1340,9 +1340,10 @@ void exec_command()
           pro_ibs(p);
         }
 	else if (strcmp(p->cmd_def->module, "aperture") == 0)
-	{
-		pro_aperture(p);
-	}
+        {
+          current_twiss = p->clone;
+          pro_ivar();
+        }
         else if (strcmp(p->cmd_def->module, "touschek") == 0)
         {
           current_touschek = p->clone;
