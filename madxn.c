@@ -2152,7 +2152,7 @@ void exec_plot(struct in_cmd* cmd)
 {
   int i, j, k, ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
   int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0; 
-  int title_size = 114, tsm1 = title_size - 1, tsm2 = title_size - 2;
+  int tsm1 = TITLE_SIZE - 1, tsm2 = TITLE_SIZE - 2;
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
   int size_plot_title = tsm1, size_version = tsm1;
   int *title_length = &size_plot_title, *version_length = &size_version;
@@ -2163,7 +2163,7 @@ void exec_plot(struct in_cmd* cmd)
   struct command_parameter_list* pl_plot;
   char *table_name, *last_twiss_table;
   char track_file_name[NAME_L], ps_file_name[NAME_L], trkplot_file_name[NAME_L];
-  char plot_title[title_size], version[title_size];
+  char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu, *gpups;
 
   /* use correct beam for sequence to be plotted - HG 031127 */
