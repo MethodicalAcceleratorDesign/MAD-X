@@ -1229,14 +1229,12 @@ void   f_ctof(int *j, char *string, int *nel)
 #include <sys/time.h>	/* for gettimeofday */
 float fextim()
 {
-   #if ( __GNUC__==2 && __GNUC_MINOR__ > 94 ) || __GNUC__ > 2 //hbu  
-gettimeofday available
+   #if ( __GNUC__==2 && __GNUC_MINOR__ > 94 ) || __GNUC__ > 2 //hbu  gettimeofday available
      float mytime;
      struct timeval tp;
      struct timezone tzp;
      gettimeofday(&tp,&tzp);
-     mytime = (double)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; // seconds 
-from epoch, modulo 10 000
+     mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; // seconds from epoch, modulo 10 000
    #else // use old ftime
      struct timeb tp;
      float mytime;
