@@ -1241,7 +1241,7 @@
       enddo
       print *," "
       print *,"particle #",part_id(n),"    killed in turn ",turn,
-     &"   at element", ,"  X=",
+     &"   at element    X=",
      &z(1,n),"  Y=",z(3,n)
 
       do i = n+1, jmax
