@@ -1,3 +1,4 @@
+/*  15/03/2004 - FS drop printing of nonexisting variable */
 void pro_correct(struct in_cmd* cmd)
 {
   if (strcmp(cmd->tok_list->p[0], "correct") == 0)
