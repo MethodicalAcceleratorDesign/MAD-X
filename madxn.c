@@ -1867,8 +1867,8 @@ void exec_command()
         }
       else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
         {
-	  current_twiss = p->clone;
-	  pro_ptc_twiss();
+          current_twiss = p->clone;
+          pro_ptc_twiss();
         }
       else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
         {
@@ -5498,7 +5498,7 @@ void pro_ptc_twiss()
   if(nl->inform[pos]) /* table name specified - overrides save */
     {
       if ((table_name = pl->parameters[pos]->string) == NULL)
-	table_name = pl->parameters[pos]->call_def->string;
+      table_name = pl->parameters[pos]->call_def->string;
     }
   else table_name = "ptc_twiss";
   pos = name_list_pos("file", nl);
@@ -5520,7 +5520,7 @@ void pro_ptc_twiss()
   tarr = new_int_array(l+1);
   conv_char(table_name, tarr);
   twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-			   twiss_table_types, current_sequ->n_nodes);
+           twiss_table_types, current_sequ->n_nodes);
   twiss_table->dynamic = 1;
   add_to_table_list(twiss_table, table_register);
   current_sequ->tw_table = twiss_table;
@@ -6844,6 +6844,7 @@ void set_command_par_value(char* parameter, struct command* cmd, double val)
        {
         cp->double_value = val;
         if (cp->expr != NULL) cp->expr = delete_expression(cp->expr);
+        cmd->par_names->inform[i] = 1; /* mark as set */
        }
     }
 }
@@ -7843,6 +7844,7 @@ void store_node_value(char* par, double* value)
 /* stores value for parameter par at current node */
 {
   char lpar[NAME_L];
+  double fact, val, angle = zero;
   mycpy(lpar, par);
   if (strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
   else if (strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
@@ -7854,7 +7856,10 @@ void store_node_value(char* par, double* value)
   else if (strcmp(lpar, "e2") == 0)
     {
       struct element* el = current_node->p_elem;
-      store_comm_par_value("e2",*value,el->def);
+      fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
+      angle = command_par_value("angle", el->def);
+      val = *value - fact * angle / two;
+      store_comm_par_value("e2",val,el->def);
     }
 }
 
