@@ -199,8 +199,6 @@
           go to 10
         endif
 !--- end of loop over nodes
-        call ttcheck(turn, sum, part_id, last_turn, last_pos,           &
-     &  last_orbit, z, maxaper, jmax)
         if (switch .eq. 1)  then
           if (mod(turn, ffile) .eq. 0)  then
             if (turn .eq. turns)  last_out = .true.
@@ -296,79 +294,66 @@
       include 'twiss0.fi'
       include 'name_len.fi'
       include 'twtrr.fi'
-      logical aperflag
-      integer turn,code,ktrack,part_id(*),last_turn(*),nn
-      integer get_option
+      logical aperflag,bend
+      integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
+     &get_option
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
-     &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
-     &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max)
+     &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,   &
+     &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
+     &st,theta                                                          &
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
 !---- Drift space
       if(code.eq.1) then
-      call ttdrf(el,track,ktrack)
-      go to 500
+         call ttdrf(el,track,ktrack)
+      go to 502
       endif
 !---- Collimator with elliptic aperture.
       if(code.eq.20) then
-      apx = node_value('xsize ')
-      apy = node_value('ysize ')
-      if(apx.eq.zero) then
+       apx = node_value('xsize ')
+       apy = node_value('ysize ')
+        if(apx.eq.zero) then
         apx=maxaper(1)
-      endif
-      if(apy.eq.zero) then
+        endif
+        if(apy.eq.zero) then
         apy=maxaper(3)
-      endif
-      call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
-     &last_pos, last_orbit, track, ktrack,al_errors)
-      go to 500
+        endif
+       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,          &
+     & last_pos, last_orbit, track, ktrack,al_errors)
+      go to 502
       endif
 !---- Collimator with rectangular aperture.
       if(code.eq.21) then
-      apx = node_value('xsize ')
-      apy = node_value('ysize ')
-      if(apx.eq.zero) then
-        apx=maxaper(1)
+       apx = node_value('xsize ')
+       apy = node_value('ysize ')
+        if(apx.eq.zero) then
+         apx=maxaper(1)
+        endif
+        if(apy.eq.zero) then
+         apy=maxaper(3)
+        endif
+       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
+     & last_pos, last_orbit, track, ktrack,al_errors)
+       go to 502
       endif
-      if(apy.eq.zero) then
-        apy=maxaper(3)
-      endif
-      call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
-     &last_pos, last_orbit, track, ktrack,al_errors)
-      go to 500
-      endif
-!---- Beam-beam,  standard 4D
+!---- Beam-beam,  standard 4D, no aperture
       if(code.eq.22) then
-      parvec(5)=get_value('probe ', 'arad ')
-      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-      parvec(7)=get_value('probe ','gamma ')
-      call ttbb(track, ktrack, parvec)
-      go to 500
+       parvec(5)=get_value('probe ', 'arad ')
+       parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+       parvec(7)=get_value('probe ','gamma ')
+       call ttbb(track, ktrack, parvec)
+       go to 502
       endif
-      go to 501
-
-!---- Bending magnet. OBSOLETE, to be kept for go to 
-   20 continue
-   30 continue
-!---- Arbitrary matrix. OBSOLETE, to be kept for go to 
-   40 continue
-!---- Quadrupole. OBSOLETE, to be kept for go to 
-   50 continue
-!---- Sextupole. OBSOLETE, to be kept for go to 
-   60 continue
-!---- Octupole. OBSOLETE, to be kept for go to 
-   70 continue
-      go to 500
 
 !____ Test aperture. ALL ELEMENTS BUT DRIFTS
- 501  aperflag = get_option('aperture ') .ne. 0
+      aperflag = get_option('aperture ') .ne. 0
       if(aperflag) then
         nn=24
         call node_string('apertype ',aptype,nn)
         call dzero(aperture,maxnaper)
         call get_node_vector('aperture ',nn,aperture)
-!        print *, " TYPE ",aptype,
+!        print *, " TYPE ",aptype
 !     &  "values  x y lhc",aperture(1),aperture(2),aperture(3)
 !------------  ellipse case ----------------------------------
         if(aptype.eq.'ellipse') then
@@ -379,11 +364,13 @@
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
           apx = aperture(1)
+        print *,"radius of circle in element",apx
           if(apx.eq.zero) then
             apx = maxaper(1)
+        print *,"radius of circle by default",apx
           endif
           apy = apx
-!        print *,"circle, radius= ",apx
+        print *,"circle, radius= ",apx
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
      &    last_pos, last_orbit, track, ktrack,al_errors)
 !------------  rectangle case ----------------------------------
@@ -413,18 +400,47 @@
      &    last_pos, last_orbit, track, ktrack,al_errors)
         endif
       endif
+!----  END OF IF(APERFLAG)  ----------------
+      bend = code .eq. 2 .or. code .eq. 3
+      if (.not. bend)  then
+        theta = node_value('tilt ')
+        if (theta .ne. zero)  then
+!--- rotate trajectory before entry
+          st = sin(theta)
+          ct = cos(theta)
+          do jtrk = 1,ktrack
+          tmp = track(1,jtrk)
+          track(1,jtrk) = ct * tmp + st * track(3,jtrk)
+          track(3,jtrk) = ct * track(3,jtrk) - st * tmp
+          tmp = track(2,jtrk)
+          track(2,jtrk) = ct * tmp + st * track(4,jtrk)
+          track(4,jtrk) = ct * track(4,jtrk) - st * tmp
+          enddo
+        endif
+      endif
 !-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
 !-- 500 has been specified at the relevant places in go to below
+!-- code =1 for drift, treated above, go to 500 directly
+
       go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
      &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
      &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
+!---- Bending magnet. OBSOLETE, to be kept for go to 
+   20 continue
+   30 continue
+!---- Arbitrary matrix. OBSOLETE, to be kept for go to 
+   40 continue
+!---- Quadrupole. OBSOLETE, to be kept for go to 
+   50 continue
+!---- Sextupole. OBSOLETE, to be kept for go to 
+   60 continue
+!---- Octupole. OBSOLETE, to be kept for go to 
+   70 continue
 !     monitors, beam instrument. 
   170 continue
   180 continue
   190 continue
-  240 continue
-      call ttdrf(el,track,ktrack)
       go to 500
    80 continue
       call ttmult(track,ktrack,dxt,dyt)
@@ -449,27 +465,24 @@
   130 continue
 !        call ttyrot(track, ktrack)
       go to 500
-
 !---- Correctors.
   140 continue
   150 continue
   160 continue
       call ttcorr(el, track, ktrack)
       go to 500
-
-
 !---- Lump.
   230 continue
       go to 500
-
+!---- ??
+  240 continue
+      go to 500
 !---- Marker.
   250 continue
       go to 500
-
 !---- General bend (dipole, quadrupole, and skew quadrupole).
   260 continue
       go to 500
-
 !---- LCAV cavity.
   270 continue
 !        call ttlcav(el, track, ktrack)
@@ -478,14 +491,24 @@
   280 continue
   290 continue
   300 continue
-      go to 500
-
   310 continue
-      go to 500
 
-!---- Accumulate length.
   500 continue
-      sum = sum + el
+      if (.not. bend)  then
+        if (theta .ne. zero)  then
+!--- rotate trajectory at exit
+          do jtrk = 1,ktrack
+          tmp = track(1,jtrk)
+          track(1,jtrk) = ct * tmp - st * track(3,jtrk)
+          track(3,jtrk) = ct * track(3,jtrk) + st * tmp
+          tmp = track(2,jtrk)
+          track(2,jtrk) = ct * tmp - st * track(4,jtrk)
+          track(4,jtrk) = ct * track(4,jtrk) + st * tmp
+          enddo
+        endif
+      endif
+!---- Accumulate length.
+ 502  sum = sum + el
       return
       end
 
@@ -1285,30 +1308,6 @@
           endif
         enddo
       endif
-      end
-
-      subroutine ttcheck(turn, sum, part_id, last_turn, last_pos,       &
-     &last_orbit, z, maxaper, jmax)
-      implicit none
-      include 'name_len.fi'
-      integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
-      double precision sum,z(6,*),maxaper(6),last_pos(*),last_orbit(6,*)
-      character*(name_len) aptype
-      n = 1
- 10   continue
-      do i = n, jmax
-        do j = 1, 6
-          if (abs(z(j,i)) .gt. maxaper(j))  goto 20
-        enddo
-      enddo
-      return
- 20   continue
-      n = i
-      nn=14
-      call node_string('apertype ',aptype,nn)
-      call trkill(n, turn, sum, jmax, part_id,                          &
-     &last_turn, last_pos, last_orbit, z,aptype)
-      goto 10
       end
 
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
