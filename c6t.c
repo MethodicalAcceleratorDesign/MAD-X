@@ -1760,6 +1760,7 @@ void pro_elem(struct node* cnode)
   char t_key[KEY_LENGTH];
   char ap_name[255];
   struct c6t_element *tag_element;
+  double tmp_vk,tmp_hk;
 
   tag_aperture.apply=0;
   /* do the fiddly conversion but skip element if not needed */
@@ -1772,9 +1773,14 @@ void pro_elem(struct node* cnode)
   else if (strcmp(cnode->base_name, "quadrupole") == 0) mod_quadrupole(current_element);
   else if (strcmp(cnode->base_name, "sextupole") == 0) mod_sextupole(current_element);
   else if (strcmp(cnode->base_name, "rfcavity") == 0) mod_rfcavity(current_element);
-
-  if (cnode->chkick>zero) current_element->value[12] += cnode->chkick;
-  if (cnode->cvkick>zero) current_element->value[13] += cnode->cvkick;
+  if (strstr(cnode->base_name, "kicker")) {
+    if (cnode->p_elem) {
+      tmp_hk = el_par_value("hkick",cnode->p_elem); current_element->value[12] += tmp_hk;
+      tmp_vk = el_par_value("vkick",cnode->p_elem); current_element->value[13] += tmp_vk;
+    }
+    current_element->value[12] += cnode->chkick;
+    current_element->value[13] += cnode->cvkick;
+  }
 
   strcpy(current_element->org_name, current_element->name);
   current_element->occ_cnt = cnode->occ_cnt;
