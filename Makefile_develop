@@ -58,6 +58,9 @@ ibsdbp.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
 plotp.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
 	$(FC) $(FCP) -c -o plotp.o plot.F
 
+soddp.o: sodd.F
+	$(FC) $(FCP) -c -o soddp.o sodd.F
+
 trrunp.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
 	$(FC) $(FCP) -c -o trrunp.o trrun.F
 
@@ -200,9 +203,9 @@ wrap.o: madx_ptc_module.o wrap.f90
 
 madx: \
 	madxnp.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o utilp.o matchp.o matchsap.o touschekp.o \
-	plotp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o
+	plotp.o soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o timel.o
 	$(FC) $(FP) -o madx madxm.F madxnp.o twissp.o ptc_dummy.o surveyp.o matchp.o matchsap.o touschekp.o \
-	plotp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o $(LIBX) -lm -lc
+	plotp.o soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o timel.o $(LIBX) -lm -lc
 
 madxdev: \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
@@ -216,7 +219,7 @@ madxdev: \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	madx_ptc_module.o wrap.o \
 	madxm.o madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o matchsa.o touschek.o dynap.o \
-	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o
+	plot.o sodd.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o
 	$(f95) $(FOPT) -o madxdev madxm.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
@@ -229,7 +232,7 @@ madxdev: \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	madx_ptc_module.o wrap.o \
 	madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o matchsa.o touschek.o dynap.o \
-	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o $(LIBX) -lm -lc
+	plot.o sodd.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o $(LIBX) -lm -lc
 
 clean:
 	rm -f *.o
