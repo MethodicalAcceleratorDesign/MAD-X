@@ -49,6 +49,16 @@ struct thin_lookup
 };
 struct thin_lookup *my_list = NULL;
 
+/* this structure is used to store a lookup table of thick to thin
+   sequence conversions already done */
+struct thin_sequ_lookup 
+{
+  struct sequence *thick_sequ;
+  struct sequence *thin_sequ;
+  struct thin_sequ_lookup *next;
+};
+struct thin_sequ_lookup *my_sequ_list = NULL;
+
 /* this is used when choosing the style of slicing */
 char* thin_style = NULL;
 char collim_style[] = "collim";
@@ -103,7 +113,6 @@ struct element* get_thin(struct element* thick_elem, int slice)
 	cur = cur->next;
       }
   }
-  
   return NULL;
 }
 
@@ -123,6 +132,42 @@ void put_thin(struct element* thick_elem, struct element* thin_elem, int slice)
     cur->next = p;
   } else {
     my_list = p;
+  }
+  return;
+}
+
+/* Has this sequence already been dieted? returns NULL for NO.*/
+struct sequence* get_thin_sequ(struct sequence* thick_sequ)
+{
+  struct thin_sequ_lookup *cur;
+  if (my_sequ_list) {
+    cur = my_sequ_list;
+    while (cur) 
+      {
+	if (cur->thick_sequ == thick_sequ) {
+	  return cur->thin_sequ;
+	}
+	cur = cur->next;
+      }
+  }
+  return NULL;
+}
+
+/* Enter a newly dieted element */
+void put_thin_sequ(struct sequence* thick_sequ, struct sequence* thin_sequ)
+{
+  struct thin_sequ_lookup *p,*cur;
+  char rout_name[] = "makethin:put_thin_sequ";
+  p = (struct thin_sequ_lookup*) mycalloc(rout_name,1, sizeof(struct thin_sequ_lookup));
+  p->thick_sequ = thick_sequ;
+  p->thin_sequ = thin_sequ;
+  p->next = NULL;
+  if (my_sequ_list) {
+    cur = my_sequ_list;
+    while (cur->next) {cur = cur->next;} 
+    cur->next = p;
+  } else {
+    my_sequ_list = p;
   }
   return;
 }
@@ -422,7 +467,7 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
   kn_param   = return_param_recurse("knl",thick_elem);
   ks_param   = return_param_recurse("ksl",thick_elem);
   if (kn_param) {kn_param = clone_command_parameter(kn_param); knl_flag++;}
-  if (ks_param) {ks_param = clone_command_parameter(kn_param); ksl_flag++;}
+  if (ks_param) {ks_param = clone_command_parameter(ks_param); ksl_flag++;}
 
   /* translate k0,k1,k2,k3,angle */
   if ((kparam[0] || kparam[1] || kparam[2] || kparam[3] || angle_param
@@ -658,7 +703,8 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
 	strcmp(thick_node->base_name,"kicker") == 0      ||
 	strcmp(thick_node->base_name,"rfcavity") == 0
       ) { 
-      seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
+	seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
+/*  	delete_node(thick_node); */
       /* special cavity list stuff */
       if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
 	  find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
@@ -673,14 +719,12 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
 	       strcmp(thick_node->base_name,"rcollimator") == 0 ||
 	       strcmp(thick_node->base_name,"ecollimator") == 0
 	       ) {
-      if (return_param_recurse("l",thick_node->p_elem) || thick_node->length > 0){	
 	seq_diet_add_elem(thick_node,thin_sequ);
-      } else { /* no length do a straight copy then */
-      	seq_diet_add(thick_node,thin_sequ);
-      }
+/*  	delete_node(thick_node); */
     } else {
       fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
       seq_diet_add(copy_thin(thick_node),thin_sequ);
+/*        delete_node(thick_node); */
     }
   } else if (thick_node->p_sequ) { /* this is a sequence to split and add */
     seq_diet_add_sequ(thick_node,seq_diet(thick_node->p_sequ),thin_sequ);
@@ -696,8 +740,11 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
   struct node *thick_node = NULL;
   struct sequence* thin_sequ;
   char name[128];
-  int i;
+  int pos;
 
+  /* first check to see if it had been already sliced */
+  if ((thin_sequ=get_thin_sequ(thick_sequ))) return thin_sequ;
+  
   strcpy(name,thick_sequ->name);
   fprintf(prt_file, "makethin: slicing sequence : %s\n",name);
   thin_sequ = new_sequence(name, thick_sequ->ref_flag);
@@ -720,11 +767,16 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
   thin_sequ->end->next = thin_sequ->start;
   /* now we have to move the pointer in the sequences list 
      to point to our thin sequence */
-  for (i=0; i < sequences->curr; i++){
-    if (strcmp(sequences->sequs[i]->name,name)==0) 
-      {sequences->sequs[i]=thin_sequ;}
+  if ((pos = name_list_pos(name, sequences->list)) < 0) {
+    fatal_error("unknown sequence sliced:", name);
+  } else {
+    sequences->sequs[pos]= thin_sequ; 
+    /* delete_sequence(thick_sequ) */
   }
-  /*  add_to_sequ_list(thin_sequ, sequences); */
+
+  /* add to list of sequences sliced */
+  put_thin_sequ(thick_sequ,thin_sequ);
+
   return thin_sequ;
 }
 
@@ -814,8 +866,10 @@ double teapot_at_shift(int slices,int slice_no)
 double collim_at_shift(int slices,int slice_no)
 {
   double at = 0;
-  if (slices==2) {
-    at = ((double) 2*(slice_no-1))/((double) 2*(slices-1))-0.5;
+  if (slices==1) {
+    at = 0.0;
+  } else {
+    at = (slice_no-1.0)/(slices-1.0)-0.5;
   }
   return at;
 }
