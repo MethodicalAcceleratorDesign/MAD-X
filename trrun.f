@@ -1,6 +1,5 @@
-      subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn,   &
-     &last_pos, z, last_orbit, eigen, coords, e_flag, code_buf, l_buf,  &
-     &dxt, dyt)
+      subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
+     &last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -30,9 +29,9 @@
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
      &int_arr(1),tot_segm,code_buf(*)
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
-     &al_errors(8),z(6,*),eigen(6,6),sum,node_value,one,get_variable,   &
-     &last_pos(*),last_orbit(6,*),tolerance(6),get_value,zero,          &
-     &obs_orb(6),coords(6,0:turns,*),l_buf(*),dxt(*), dyt(*)
+     &al_errors(8),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one,  &
+     &get_variable,last_pos(*),last_orbit(6,*),tolerance(6),get_value,  &
+     &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
       parameter(zero=0d0,one=1d0)
       character*12 tol_a, char_a
       double precision spos !hbu
@@ -146,8 +145,8 @@
           endif
         endif
 !-------- Track through element
-        call ttmap(code,el,z,jmax,sum,turn,part_id, last_turn,          &
-     &  last_pos, last_orbit,aperflag,tolerance, dxt, dyt)
+        call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
+     &  last_pos, last_orbit,aperflag,tolerance)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
@@ -251,8 +250,8 @@
         call augment_count('tracksumm ')
       enddo
  999  end
-      subroutine ttmap(code,el,track,ktrack,sum,turn,part_id, last_turn,&
-     &last_pos, last_orbit,aperflag,tolerance, dxt, dyt)
+      subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
+     &last_turn,last_pos, last_orbit,aperflag,tolerance)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -267,9 +266,9 @@
       logical aperflag
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk
       integer get_option
-      double precision apx,apy,el,sum,node_value,track(6,*),last_pos(*),&
-     &last_orbit(6,*),parvec(26),get_value,aperture(100),one,
-     &tolerance(6), zero, dxt(*), dyt(*)
+      double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
+     &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
+     &aperture(100),one,tolerance(6), zero
       character*24 aptype
       parameter(zero = 0.d0, one=1d0)
 
@@ -356,7 +355,7 @@
 !        print *, "LHC screen end"
         endif
       endif
-      call ttmult(track, ktrack, dxt, dyt)
+      call ttmult(track,ktrack,dxt,dyt)
       go to 500
 
 !---- Solenoid.
@@ -472,13 +471,13 @@
 !----------------------------------------------------------------------*
       logical first
       integer iord,jtrk,nd,nord,ktrack,j,                               &
-     &n_ferr,nn,ns,node_fd_errors,maxmul,mbatch
-      parameter(maxmul=20)
+     &n_ferr,nn,ns,node_fd_errors
+      include 'twtrr.fi'
       double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
      &f_errors(0:50),field(2,0:maxmul),vals(2,0:maxmul),ordinv(maxmul), &
-     &track(6,*),dxt(*),dyt(*),normal(0:maxmul),skew(0:maxmul)          &
-     &,bv0,bvk,node_value,zero,one,two,three,half
+     &track(6,*),dxt(*),dyt(*),normal(0:maxmul),skew(0:maxmul),         &
+     &bv0,bvk,node_value,zero,one,two,three,half
       include 'track.fi'
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
       save first,ordinv
