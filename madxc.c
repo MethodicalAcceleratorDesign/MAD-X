@@ -597,7 +597,7 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
     m->val.before[1] = da2[11][m->id_ttb[1]]*1000.;
     } else {
       printf("BIG SHIT .... \n");
-      exit;
+      exit(-10);
     }
 
     pos = name_list_pos("monon", nl);
@@ -1623,7 +1623,7 @@ int pro_correct_filter(int iplane, double sigcut)
   double xsig, ysig;
   double xmea, ymea;
   double xlim, ylim;
-  double xn, yn;
+  double xn;
   double *dmat;
 
   ttb = model_table;
@@ -1649,7 +1649,7 @@ int pro_correct_filter(int iplane, double sigcut)
           xmea += xn;
         if (get_option("debug")) {
           printf("==> %s %-4.3f %-4.3f \n",m->p_node->name,bx_m,m->val.before[ip]);
-          printf("==> %-4.3f %-4.3f\n",xn,yn);
+          printf("==> %-4.3f \n",xn);
         }
         im++;
       }
@@ -2244,11 +2244,8 @@ double copk(double *r, int m)
 
   return(xpk);
 }
-#ifdef _WIN32
-        unsigned int locf(iadr)            /* changed from locf_ by JMJ, 8/4/2003 */
-#else
-        unsigned int locf_(iadr)            /* changed from locf_ by JMJ, 8/4/2003 */
-#endif
+
+unsigned int locf_(iadr)           
 #define NADUPW 4   /* Number of ADdress Units Per Word */
 #define LADUPW 2   /* Logarithm base 2 of ADdress Units Per Word */
      char *iadr;
