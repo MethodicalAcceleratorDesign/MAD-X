@@ -115,7 +115,7 @@ CONTAINS
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
     real(dp) f_errors(0:50),aperture(100),normal(0:maxmul),skew(0:maxmul),field(2,0:maxmul)
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
-    character(length) name,horname,tabname
+    character(length) name
     character(name_len) aptype
     type(keywords) key
     character(20)       keymod0,keymod1
@@ -476,7 +476,7 @@ CONTAINS
     integer restart_sequ,advance_node
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
-!---------------------------------------------------------------
+    !---------------------------------------------------------------
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -500,7 +500,7 @@ CONTAINS
     type(real_8) y(6)
     type(twiss) tw
     type(fibre), POINTER :: current
-!------------------------------------------------------------------------------
+    !------------------------------------------------------------------------------
 
     if(universe.le.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -513,7 +513,7 @@ CONTAINS
 
     nda=0
     suml=zero
-    
+
     icase = get_value('ptc_twiss ','icase ')
     deltap0 = get_value('ptc_twiss ','deltap ')
     call my_state(icase,deltap,deltap0,mynpa)
@@ -555,6 +555,7 @@ CONTAINS
     enddo
     call kill(tw)
     CALL kill(y)
+    call f90flush(20,.false.)
 
   END subroutine ptc_twiss
 
@@ -565,7 +566,7 @@ CONTAINS
     real(dp) x(6),deltap0,deltap
     type(real_8) y(6)
     type(normalform) n
-!------------------------------------------------------------------------------
+    !------------------------------------------------------------------------------
 
     if(universe.le.0) then
        call fort_warn('return from ptc_normal: ',' no universe created')
@@ -611,6 +612,8 @@ CONTAINS
        call kill(n)
     endif
     CALL kill(y)
+    call f90flush(18,.false.)
+    call f90flush(19,.false.)
 
   END subroutine ptc_normal
 
@@ -621,8 +624,7 @@ CONTAINS
     logical(lp) closed_orbit
     character*12 char_a
     data char_a / ' ' /
-    type(fibre), POINTER :: current
-!------------------------------------------------------------------------------
+    !------------------------------------------------------------------------------
 
     if(universe.le.0) then
        call fort_warn('return from ptc_track: ',' no universe created')
@@ -646,7 +648,7 @@ CONTAINS
     endif
 
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
-    
+
     x(:)=x(:)+x0(:)
     print*,"  Initial Coordinates: ", x
     turns = get_value('ptc_track ','turns ')
@@ -674,7 +676,7 @@ CONTAINS
     deallocate(s_b)
   end subroutine ptc_end
 
- subroutine zerotwiss(s1,i)
+  subroutine zerotwiss(s1,i)
     implicit none
     type(twiss), intent(inout)::s1
     integer, intent(in)::i
@@ -720,8 +722,8 @@ CONTAINS
        if(.not.s1%nf) then
           s1%nf=.true.
           do i=1,nd2
-  
-           s1%junk%v(i)=s2(i)
+
+             s1%junk%v(i)=s2(i)
           enddo
           s1%n=s1%junk
           s1%a1=s1%n%a1
@@ -752,8 +754,8 @@ CONTAINS
        enddo
        do j1=1,2
           ii=2*j1
-  
-        iii=2*j1-1
+
+          iii=2*j1-1
           s1%disp(iii)=rdd(ii-1,1)*dicu(1)+rdd(ii-1,2)*dicu(2)+rdd(ii-1,3)*dicu(3)+rdd(ii-1,4)*dicu(4)+rdd(ii-1,5)
           s1%disp(ii)=rdd(ii,1)*dicu(1)+rdd(ii,2)*dicu(2)+rdd(ii,3)*dicu(3)+rdd(ii,4)*dicu(4)+rdd(ii,5)
        enddo
@@ -1042,7 +1044,45 @@ CONTAINS
 
     CALL UPDATE_STATES
     call print(default,6)
-  
+
   end subroutine my_state
+
+  subroutine f90flush(i,option)
+    implicit none
+    integer i,ios
+    logical ostat, fexist,option
+    character*20 faction,faccess,fform,fwstat
+    character*255 fname
+    inquire(err=1,iostat=ios,&
+         unit=i,opened=ostat,exist=fexist,write=fwstat)
+    if (.not.ostat.or..not.fexist.or.fwstat.ne.'YES') return
+    inquire(err=2,iostat=ios,&
+         unit=i,action=faction,access=faccess,&
+         form=fform,name=fname)
+    close (unit=i,err=3)
+    !     write (*,*) 'Re-opening ',i,' ',faction,faccess,fform,fname
+    if (option) then
+       open(err=4,iostat=ios,&
+            unit=i,action=faction,access=faccess,form=fform,&
+            file=fname,status='old',position='append')
+    else
+       open(err=4,iostat=ios,&
+            unit=i,action=faction,access=faccess,form=fform,&
+            file=fname,status='old',position='rewind')
+    endif
+    return    
+1   write (*,*)&
+         ' F90FLUSH 1st INQUIRE FAILED with IOSTAT ',ios,' on UNIT ',i
+    stop
+2   write (*,*)&
+         ' F90FLUSH 2nd INQUIRE FAILED with IOSTAT ', ios,' on UNIT ',i
+    stop
+3   write (*,*)&
+         ' F90FLUSH CLOSE FAILED with IOSTAT ',ios,' on UNIT ',i
+    stop
+4   write (*,*)&
+         ' F90FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
+    stop
+  end subroutine f90flush
 
 END MODULE madx_ptc_module
