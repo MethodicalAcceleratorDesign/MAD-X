@@ -2077,6 +2077,7 @@ c           write(61,53)
 CDECK  ID>, SVD.
       SUBROUTINE SVD(NM,M,N,A,W,MATU,U,MATV,V,IERR,RV1)
 c
+      implicit  none
       integer i,j,k,l,m,n,ii,i1,kk,k1,ll,l1,mn,nm,its,ierr
       double precision a(nm,n),w(n),u(nm,n),v(nm,n),rv1(n)
       double precision c,f,g,h,s,x,y,z,tst1,tst2,scale,pythag
@@ -2434,6 +2435,7 @@ c                singular value after 30 iterations ..........
       end
 CDECK  ID>, PYTHAG.
       DOUBLE PRECISION FUNCTION PYTHAG(A,B)
+      implicit  none
       double precision a,b
 c
 c     finds dsqrt(a**2+b**2) without overflow or destructive underflow
@@ -2454,9 +2456,12 @@ c
       return
       end
       subroutine rvord(inv,outv,ws,n)
+c     implicit   none
+      integer    n
       double precision   inv(n), ws(n)
       double precision   maxv, minv
-      integer  outv(n), n
+      integer  i,j,jmax
+      integer  outv(n)
       do  i = 1,n
           ws(i) = inv(i)
       enddo
