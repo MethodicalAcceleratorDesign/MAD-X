@@ -2219,7 +2219,7 @@
       integer i, j, k, notitle, noversi, nivaxs,inter_setplot
       character * (mcnam) sdum(1)
       integer nint, ndble, int_arr(szcompar), char_l(szcompar)
-      integer plot_style,plot_symbol
+      integer plot_style(szcompar),plot_symbol(szcompar)
       double precision d_arr(szcompar)
       double precision plot_option
       character * (szchara) char_a, version
@@ -2417,13 +2417,13 @@
      &               char_a, char_l)
       call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,     &
      &               char_a, char_l)
-      if (plot_style + plot_symbol .eq. 0) then
+      if (plot_style(1) + plot_symbol(1) .eq. 0) then
         print *,'Warning: style & symbol attributes will make plot invis&
      &ible. Thus style is set to 1.'
-        plot_style = 1
+        plot_style(1) = 1
       endif
-      ipparm(1,1) = plot_style
-      ipparm(4,1) = plot_symbol
+      ipparm(1,1) = plot_style(1)
+      ipparm(4,1) = plot_symbol(1)
 
       char_a = ' '
       call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr,       &
