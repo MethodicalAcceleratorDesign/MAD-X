@@ -274,7 +274,8 @@
       call node_vector('ksl ',ns,skew)
 !      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
 !     *,skew(0)
-      angle = normal(0)
+!--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
+      angle = normal(0)*node_value('dipole_bv ')
       fskw = skew(0)
       if(angle.eq.0.0) then
       tilt = 0.0
@@ -288,7 +289,9 @@
 
 !---- Any kind of  bend. 
    20 continue
-      angle = node_value('angle ')
+!--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
+      angle = node_value('angle ')*node_value('dipole_bv ')
+!      print *," BV = ",node_value('dipole_bv ')
       fskw = node_value('k0s ')
 !      print *,tilt
       if (angle .eq. 0.0) then
