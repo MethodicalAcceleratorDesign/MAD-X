@@ -6,18 +6,22 @@
 
 # parameters
 
-FCP=-O3 -fno-second-underscore -funroll-loops -I.
-FCM=-O2 -fno-second-underscore -funroll-loops -I.
-FCDB=-g -O0 -fno-second-underscore
-FC=g77
 f95=f95
 GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM
-GCCP_FLAGS_MPARS=-g -O3 -funroll-loops -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL 
 f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
 #f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
 FFLAGS77=-gline -g90 -c -fpp -maxcontin=24 -nan -ieee=full
 #FFLAGS77=-g90 -c -fpp -O4 -maxcontin=24 -w=unused -ieee=full
+
+#FC=g77
+FC=f95
+#FCP=-O3 -fno-second-underscore -funroll-loops -I.
+FCP=$(f95_FLAGS)
+#FCM=-O2 -fno-second-underscore -funroll-loops -I.
+#FCDB=-g -O0 -fno-second-underscore
+
 CC=gcc
 FOPT=-Bstatic
 FP=-static
