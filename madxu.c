@@ -1313,7 +1313,7 @@ void export_el_par_8(struct command_parameter* par, char* string)
          strcat(string, par->name);
          strcat(string, "=");
          strcat(string, par->string);
-	}
+      }
       break;
     case 11:
     case 12:
@@ -2801,14 +2801,14 @@ void print_table(struct table* t)
         n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
         fprintf(prt_file, "\n");
         for (i = wpl*k; i < n; i++)
-	   {
+         {
             if (t->columns->inform[i] == 1)
                fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
             else if (t->columns->inform[i] == 2)
                fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
             else if (t->columns->inform[i] == 3)
                fprintf(prt_file, v_format("%S "), t->columns->names[i]);
-	   }
+         }
         fprintf(prt_file, "\n");
         for (j = 0; j < t->curr; j++)
           {
@@ -2981,7 +2981,7 @@ void supp_mul_char(char c, char* string)
     {
      if (*string != c)
        {
-	*cp++ = *string; cnt = 0;
+      *cp++ = *string; cnt = 0;
        }
      else if (cnt++ == 0) *cp++ = *string;
      string++;
@@ -3060,21 +3060,21 @@ char* v_format(char* string)
     {
      if ((int)p > (int)q)
        {
-	t = p; t--;
+      t = p; t--;
         if (*t == '%')
-	  {
+        {
            c = *p;
            strncat(var_form, q, (int)p - (int)q);
            if (c == 'N')
-	      {
-	       sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
-	       p++;
-	      }
+            {
+             sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
+             p++;
+            }
            else if (c == 'F')  strcat(var_form, float_format);
            else if (c == 'S')  strcat(var_form, string_format);
            else if (c == 'I')  strcat(var_form, int_format);
            q = p; q++;
-	  }
+        }
        }
      s = ++p;
     }
@@ -3296,7 +3296,7 @@ void write_table(struct table* t, char* filename)
                   fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
             else if (t->columns->inform[col->i[i]] == 3)
               {
-	       *c_dummy = '\"';
+             *c_dummy = '\"';
                strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
                stoupper(c_dummy);
                pc = strip(c_dummy); /* remove :<occ_count> */
