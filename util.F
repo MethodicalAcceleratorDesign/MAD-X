@@ -1914,7 +1914,8 @@
 !   KTRACK    (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
       integer i,itrack,ktrack
-      double precision ek(6),re(36),se(36),te(36,6),temp(6),track(6,*)
+      double precision ek(6),re(36),te(36,6),temp(6),track(6,*)
+!      double precision se(36)
 
       do itrack = 1, ktrack
 !        do i = 1, 36
@@ -1940,7 +1941,7 @@
       integer i,ios
       real a
       logical ostat, fexist,option
-      character*20 faction,faccess,fform
+      character*20 faccess,fform
       character*255 fname
       character*1 c
       inquire(err=5,iostat=ios,unit=i,opened=ostat,exist=fexist)
