@@ -4982,9 +4982,12 @@ void process()  /* steering routine: processes one command */
          exec_command();
          if (stop_flag)
          {
-            if (this_cmd->clone != NULL)
-                this_cmd->clone = delete_command(this_cmd->clone);
-            this_cmd = delete_in_cmd(this_cmd);
+	   if (this_cmd)
+	     {
+              if (this_cmd->clone != NULL)
+                  this_cmd->clone = delete_command(this_cmd->clone);
+              this_cmd = delete_in_cmd(this_cmd);
+	     }
             return;
          }
          break;
@@ -7703,7 +7706,7 @@ void store_set(struct command* comm, int flag)
         else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
        }
     }
-  if (poss > -1 && nl->inform[poss])
+  if (flag != 0 && poss > -1 && nl->inform[poss])
     {
      n++;
      name = comm->par->parameters[poss]->string;
