@@ -4,7 +4,7 @@
 /Sb_1_pol_template.f90 -text
 /Sb_2_pol_template.f90 -text
 /Sc_euclidean.f90 -text
-/Se_frame.f90 -text
+/Sd_frame.f90 -text
 /Sf_status.f90 -text
 /Sg_0_fitted.f90 -text
 /Sg_1_template_my_kind.f90 -text
