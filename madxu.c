@@ -136,7 +136,16 @@ void add_to_el_list( /* adds element to alphabetic element list */
      else
        {
         if (flag > 0) put_info("element redefined:", (*el)->name);
-        if (flag >= 0 && ell == element_list) delete_element(ell->elem[pos]);
+        if (flag >= 0 && ell == element_list)
+          {
+           for (j = 0; j < ell->curr; j++) /* set existing pointers to new */
+             {
+              if (ell->elem[j] != ell->elem[pos]
+                  && ell->elem[j]->parent == ell->elem[pos])
+                    ell->elem[j]->parent = *el;
+             }
+           delete_element(ell->elem[pos]);
+          }
         ell->elem[pos] = *el;
        }
     }
