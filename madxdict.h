@@ -250,6 +250,7 @@ char command_def[] =
 "quit: control none 0 0; "
 " "
 "readtable: control none 0 0 "
+"table = [s, none], "
 "file = [s, none]; "
 " "
 "readmytable: correct correct 0 0 "
