@@ -324,12 +324,11 @@ CONTAINS
           key%list%fint=fint
           if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
        else
-          key%list%kill_ent_fringe=my_true
           if(fintx.gt.zero) then
              key%list%fint=fintx
+             key%list%kill_ent_fringe=my_true
           else
              key%list%fint=zero
-             key%list%kill_exi_fringe=my_true
           endif
        endif
        key%list%h1=node_value('h1 ')
@@ -358,18 +357,16 @@ CONTAINS
           key%list%fint=fint
           if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
        else
-          key%list%kill_ent_fringe=my_true
           if(fintx.gt.zero) then
              key%list%fint=fintx
+             key%list%kill_ent_fringe=my_true
           else
              key%list%fint=zero
-             key%list%kill_exi_fringe=my_true
           endif
        endif
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-       nn=name_len
     case(5) ! PTC accepts mults
        key%magnet="quadrupole"
        key%list%k(2)=node_value('k1 ')  ! other mul
@@ -492,7 +489,8 @@ CONTAINS
     case default
        print*,"Element: ",name," not implemented"
        stop
-100 end select
+    end select
+100 continue
     call create_fibre(my_ring%end,key,EXCEPTION)
     if(advance_node().ne.0)  goto 10
 
@@ -533,8 +531,8 @@ CONTAINS
   subroutine ptc_twiss(tab_name)
     implicit none
     include 'twissa.fi'
-    logical(lp) closed_orbit
-    integer i,no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
+    logical(lp) closed_orbit,initial_matrix
+    integer i,ii,no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
     integer ioptfun,iii,restart_sequ,advance_node
     integer tab_name(*)
     real(dp) opt_fun(36)
@@ -542,6 +540,8 @@ CONTAINS
     type(real_8) y(6)
     type(twiss) tw
     type(fibre), POINTER :: current
+    integer, allocatable :: J(:) 
+    real(dp) r,re(6,6)
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
 
@@ -578,20 +578,71 @@ CONTAINS
     call alloc(y)
     y=npara
     Y=X
-    c_%watch_user=.true.
-    call track(my_ring,y,1,default)
-    call PRODUCE_APERTURE_FLAG(flag_index)
-    if(flag_index/=0) then
-       call ANALYSE_APERTURE_FLAG(flag_index,why)
-       Write(6,*) "ptc_twiss unstable (map production)-programs continues "
-       Write(6,*) why ! See produce aperture flag routine in sd_frame
-       c_%watch_user=.false.
-       CALL kill(y)
-       return
+
+    initial_matrix = get_value('ptc_twiss ','initial_matrix ') .ne. 0
+    if(initial_matrix) then
+       re(1,1) = get_value('ptc_twiss ','re11 ')
+       re(1,2) = get_value('ptc_twiss ','re12 ')
+       re(1,3) = get_value('ptc_twiss ','re13 ')
+       re(1,4) = get_value('ptc_twiss ','re14 ')
+       re(1,5) = get_value('ptc_twiss ','re16 ')
+       re(1,6) = get_value('ptc_twiss ','re15 ')
+       re(2,1) = get_value('ptc_twiss ','re21 ')
+       re(2,2) = get_value('ptc_twiss ','re22 ')
+       re(2,3) = get_value('ptc_twiss ','re23 ')
+       re(2,4) = get_value('ptc_twiss ','re24 ')
+       re(2,5) = get_value('ptc_twiss ','re26 ')
+       re(2,6) = get_value('ptc_twiss ','re25 ')
+       re(3,1) = get_value('ptc_twiss ','re31 ')
+       re(3,2) = get_value('ptc_twiss ','re32 ')
+       re(3,3) = get_value('ptc_twiss ','re33 ')
+       re(3,4) = get_value('ptc_twiss ','re34 ')
+       re(3,5) = get_value('ptc_twiss ','re36 ')
+       re(3,6) = get_value('ptc_twiss ','re35 ')
+       re(4,1) = get_value('ptc_twiss ','re41 ')
+       re(4,2) = get_value('ptc_twiss ','re42 ')
+       re(4,3) = get_value('ptc_twiss ','re43 ')
+       re(4,4) = get_value('ptc_twiss ','re44 ')
+       re(4,5) = get_value('ptc_twiss ','re46 ')
+       re(4,6) = get_value('ptc_twiss ','re45 ')
+       re(5,1) = get_value('ptc_twiss ','re61 ')
+       re(5,2) = get_value('ptc_twiss ','re62 ')
+       re(5,3) = get_value('ptc_twiss ','re63 ')
+       re(5,4) = get_value('ptc_twiss ','re64 ')
+       re(5,5) = get_value('ptc_twiss ','re66 ')
+       re(5,6) = get_value('ptc_twiss ','re65 ')
+       re(6,1) = get_value('ptc_twiss ','re51 ')
+       re(6,2) = get_value('ptc_twiss ','re52 ')
+       re(6,3) = get_value('ptc_twiss ','re53 ')
+       re(6,4) = get_value('ptc_twiss ','re54 ')
+       re(6,5) = get_value('ptc_twiss ','re56 ')
+       re(6,6) = get_value('ptc_twiss ','re55 ')
+       call liepeek(iia,icoast)
+       allocate(j(iia(2)))
+       j(:)=0
+       do i = 1,iia(2)
+          do ii = 1,iia(2)
+             j(ii)=1
+             r=re(i,ii)-(y(i)%T.sub.j)
+             y(i)%T=y(i)%T+(r.mono.j)
+             j(ii)=0
+          enddo
+       enddo
+    else
+       c_%watch_user=.true.
+       call track(my_ring,y,1,default)
+       call PRODUCE_APERTURE_FLAG(flag_index)
+       if(flag_index/=0) then
+          call ANALYSE_APERTURE_FLAG(flag_index,why)
+          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
+          Write(6,*) why ! See produce aperture flag routine in sd_frame
+          c_%watch_user=.false.
+          CALL kill(y)
+          return
+       endif
     endif
     call alloc(tw)
     tw=y
-
     y=npara
     Y=X
     current=>MY_RING%start
