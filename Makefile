@@ -30,7 +30,7 @@ GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM
 # NAG alternative
 #f95_FLAGS=-c -O4 -maxcontin=24 -w=unused
 # LF95 default f95 compiler options
-f95_FLAGS=-O -c
+f95_FLAGS= --o1 --tp -c
 
 # NAG f95 compiler options to compile f77 code
 #FFLAGS77=-gline -g90 -c -maxcontin=24 -nan
@@ -38,7 +38,7 @@ f95_FLAGS=-O -c
 #FFLAGS77=-gline -g90 -c -maxcontin=24 -nan -ieee=full
 #FFLAGS77=-g90 -c -O4 -maxcontin=24 -w=unused
 # LF95 f95 compiler options to compile f77 code
-FFLAGS77=-O -c
+FFLAGS77= --o1 --tp -c
 
 # NAG f95 link options
 #f95_FOPT=
@@ -73,6 +73,7 @@ util_f77.o util.o: util.F twiss0.fi twtrr.fi
 dynap_f77.o dynap.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
 ibsdb_f77.o ibsdb.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
 plot_f77.o plot.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
+sodd_f77.o sodd.o: sodd.F
 trrun_f77.o trrun.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
 emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
 match_f77.o match.o: match.F name_len.fi match.fi 
@@ -146,7 +147,7 @@ madxdev_objects = madxm.o $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxnp.o gxx11c.o epause.o timel.o usleep.o \
 	$(madx_objectsf95)
 madxdev: $(madxdev_objects)
-	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext) -lm -lc
+	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext)
 
 clean:
 	rm -f *.o
