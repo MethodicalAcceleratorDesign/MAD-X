@@ -7,6 +7,13 @@
 #define comm_para             comm_para_
 #define double_from_table     double_from_table_
 #define double_to_table       double_to_table_
+
+/* added by E. T. d'Amico on jan. 21st, 2004 */
+#define interp_node           interp_node_
+#define reset_interpolation   reset_interpolation_
+#define embedded_twiss        embedded_twiss_
+/* end additions */
+
 #define element_name          element_name_
 #define frndm                 frndm_
 #define madx                  madx_
@@ -92,6 +99,7 @@ extern void svddec_m_(double *,double *,double *,double *,double *,double *,doub
 extern void svddec_c_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *, int *);
 
 extern void ibs_();
+extern void touschek_();
 extern void micit_(double *,char *,double *,double *,double *,int *,float *,
 int *,int *,int *,int *,float *,float *,float *,float *,float *,
 float *,float *,float *,float *,float *,int *);
@@ -151,6 +159,7 @@ int node_al_errors(double*);
 int node_fd_errors(double*);
 void node_string(char*, char*, int*);
 double node_value(char*);
+void store_node_value(char* par, double* value);
 double plot_option(char*);
 void reset_count(char*);
 int restart_sequ();
@@ -165,6 +174,12 @@ int table_length(char*);
 int table_org(char*);
 void table_range(char*, char*, int*);
 void vector_to_table(char*, char*, int*, double*);
+
+/* added by E. T. d'Amico */
+int interp_node(int *nint);
+int reset_interpolation(int *nint);
+int embedded_twiss();
+/* end additions */
 
 /* C routines called from C */
 double act_value(int, struct name_list*);
@@ -504,6 +519,7 @@ void pro_correct(struct in_cmd*);
 void pro_emit(struct in_cmd*);
 void pro_error(struct in_cmd*);
 void pro_ibs(struct in_cmd*);
+void pro_touschek(struct in_cmd*);
 void pro_input(char*);
 void pro_sxf(struct in_cmd*);
 void pro_survey(struct in_cmd*);
@@ -732,6 +748,7 @@ struct command* plot_options = NULL;    /* current plot options */
 struct command* current_error = NULL;   /* current error command */
 struct command* current_correct = NULL; /* current correct command */
 struct command* current_ibs = NULL;     /* current ibs command */
+struct command* current_touschek = NULL;/* current touschek command */
 struct command* current_survey = NULL;  /* current survey command */
 struct command* current_ptc = NULL;     /* current ptc command */
 struct command* current_twiss = NULL;   /* current twiss command */
@@ -786,6 +803,7 @@ struct int_array* e_range;    /* ends of ranges */
 
 struct in_cmd* this_cmd;      /* contains command just read */
 struct in_cmd* local_twiss[2] = {NULL, NULL}; /* OB 1.2.2002 */
+struct in_cmd* embedded_twiss_cmd = NULL;/* current plot command (ETdA 30.1.2004)*/
 
 struct in_cmd_list* buffered_cmds;
 
@@ -810,8 +828,14 @@ struct sequence_list* sequences;    /* pointer to sequence list */
 struct sequence_list* match_sequs;  /* pointer to sequence list for match */
 
 struct table* ibs_table;          /* current ibs table */
+struct table* touschek_table;     /* current touschek table */
 struct table* summ_table;         /* current twiss summary table */
 struct table* twiss_table;        /* current twiss table */
+
+/* E. T. d'Amico 2 feb 2004 */
+struct table* embedded_twiss_table;        /* current twiss table */
+/* end additions */
+
 struct table* survey_table;       /* current survey table */
 struct table* corr_table;         /* corrector table after orbit correction */
 struct table* mon_table;          /* monitor table after orbit correction */
@@ -898,6 +922,11 @@ const double ten_m_16 = 1.e-16;
 const double ten_m_19 = 1.e-19;
 
 int add_error_opt = 0;      /* ADD error option, set with eoption */
+
+/* E. T. d'Amico 25 feb 2004 */
+int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
+/* end additions */
+
 int print_correct_opt = 1;  /* PRINT options for orbit correction */
 int debug_correct_opt = 0;  /* DEBUG options for orbit correction */
 int assign_start = 0;       /* flag for multiple assign statements */

@@ -51,10 +51,10 @@
 !   IERR     (integer)  0 if OK, else GXPLOT error
 !
 ! calls the routines peiact and pegacn in this file.
-! calls the routines gxsave, gxswnd, gxpnbl, jsln, jsplci,  gxpl,
+! calls the routines gxsave, gxswnd, gxpnbl, jsln, jsplci,  gxpl, 
 !                    gxplt1, gvpl, jsmk, gxpmsw, jspmci, jschh, jstxal,
-!                    gxqrvp, jschxp, gxtx, jstxci, gxrest
-!                    defined in file gxx11.F.
+!                    gxqrvp, jschxp, gxtx, jstxci, gxrest  
+!                    defined in file gxx11.F. 
 !
 ! it is called by the routine peplot in this file.
 !----------------------------------------------------------------------*
@@ -79,16 +79,15 @@
      &kf, kl, npt, j, iecub
       integer   istyl, ipbar, isave(20)
       character symloc*1
-      data winnor /0., 1., 0., 1./
-
-!--- Initialisation of local variables
-
-      save act
-      iecub = 0
 
 !--- Output initialisation
 
       ierr = 0
+
+!--- Initialisation of local variables
+
+      data winnor /0., 1., 0., 1./
+      iecub = 0
 
 !--- Routine body
 
@@ -303,7 +302,7 @@
 
 !--- plot annotation string
 
-        call gxtx (xpos, ypos, spname(kft:klt))
+        call gxtx (xpos, ypos, spname(kft:klt))    
 
 !--- connect to curve
 
@@ -331,152 +330,9 @@
       call gxrest (isave, rsave)
   999 continue
       end
+
 !***********************************************************************
-
-      subroutine peelma(pos, itp, temp, dstp, am)
-!----------------------------------------------------------------------*
-! purpose:
-!   return 4x6 element matrix
-! input:
-!   pos         (int)   position: 1 entry, 2 body, 3 exit
-!   itp         (int)   type:
-!                       1 straight sbend,
-!                       7 vert. sbend,
-!                       21 straight rbend,
-!                       27 vert. rbend,
-!                       2 foc. quad,
-!                       3 defoc. quad
-!                         else drift
-!   temp        (d.p.)  element parameters
-!       1    l      [m]
-!       2    rhoinv [1/m]
-!       3    e1
-!       4    e2
-!       5    h1
-!       6    h2
-!       7    tilt
-!       8    ks
-!       9    hgap [m]
-!      10    fint [Tm]
-!      11    angle = K_0*l
-!      12    lrad
-!      13    k0 or k0*l (l=0)
-!      14    k0s or k0s*l
-!      15    k1 or k1*l (l=0)
-!      16    k1s or k1s*l
-!      17    k2 or k2*l
-!      18    k2s  etc.
-!   dstp        (d.p.)  sublength
-! output:
-!   am          (d.p.)  matrix
-!
-! calls the function node_value and the routine store_node_value
-! defined in file madxn.c.
-! calls the functions tmbend, tmquad and tmfoc
-! defined in the file Twiss.F.
-!
-! it is called by the routine peintp in this file.
-!----------------------------------------------------------------------*
-
-      implicit none
-      include 'plot_c.fi'
-      include 'plot_math.fi'
-      include 'twissl.fi'
-
-!--- type definition of the routine arguments
-
-      integer pos, itp
-      double precision temp(*), dstp, am(6,6)
-
-!--- type definitions of local variables
-
-      double precision rk2, cangle, sangle, tilt, d, f, e2_read
-      double precision ek(6), te(6,6,6), orbit(6), am2(6,6)
-      integer i, j, k
-      logical drift, bend, quad, fmap,ftrk,cecptk,cebttk
-
-!--- definitions of function primitives
-
-      double precision node_value
-
-!--- Output initialisation
-
-      do i = 1, 6
-        do j = 1, 6
-          am(j,i) = zero
-        enddo
-        am(i,i) = one
-      enddo
-
-!--- Initialise
-
-      ftrk = .false.
-      do i = 1, 6
-        do j = 1, 6
-          am2(j,i) = zero
-        enddo
-        am2(i,i) = one
-        orbit(i) = zero
-        ek(i) = zero
-      enddo
-
-!--- Routine body
-
-!---  save values of centre_cptk & centre_bttk and set them to .false.
-
-      cecptk = centre_cptk
-      cebttk = centre_bttk
-      centre_cptk = .false.
-      centre_bttk = .false.
-
-!--- treat quads with non-zero tilt, and bends with non-zero tilt
-!    different from pi/2 as drifts
-
-      k = mod(itp, 20)
-      bend = k .eq. 1 .or. k .eq. 7
-      quad = itp .eq. 2 .or. itp .eq. 3
-      drift = itp .eq. 0 .or. .not. (bend .or. quad)
-      if (drift)  then
-        am(1,2) = dstp
-        am(3,4) = dstp
-      else
-         if (bend) then
-           e2_read = zero
-            if (pos .eq. 1) then
-               e2s = node_value('e2 ')
-               call store_node_value('e2 ', e2_read)
-            endif
-            if (pos .eq. 3) call store_node_value('e2 ', e2s)
-            call tmbend(.false.,orbit,fmap,dstp,ek,am,te)
-         else
-
-!--- quad -------------------------------------------
-
-            rk2  = temp(15)
-            tilt = temp(7)
-            call tmquad(.false.,.false.,tilt,orbit,fmap,dstp,ek,am,te)
-            call tmfoc(dstp, rk2, cangle, sangle, d, f)
-            am2(1,1) = cangle
-            am2(2,2) = cangle
-            am2(1,2) = sangle
-            am2(2,1) = -rk2 * sangle
-            rk2 = -rk2
-            call tmfoc(dstp, rk2, cangle, sangle, d, f)
-            am2(3,3) = cangle
-            am2(4,4) = cangle
-            am2(3,4) = sangle
-            am2(4,3) = -rk2 * sangle
-         endif
-      endif
-
-!---  restore values of centre_cptk & centre_bttk
-
-      centre_cptk = cecptk
-      centre_bttk = cebttk
-
-      end
-!***********************************************************************
-
+ 
       subroutine pefill(ierr)
 
 #ifdef _WIN32
@@ -514,6 +370,7 @@
 
       integer double_from_table, advance_to_pos, restart_sequ
       integer lastnb, table_length
+      integer advance_node
 
 !--- codes see in peschm
 
@@ -534,18 +391,18 @@
         nqval(j) = 0
       enddo
       do j = 1 , maxseql
-        ieltyp(j) = 0
+	ieltyp(j) = 0
       enddo
 
 !--- Initialisation of variables in common peaddr
 
       do i = 1 , maxseql
-        estart(i) = 0.0
-        eend(i) = 0.0
-        do j = 1 , mxcurv
-          qhval(i,j) = 0.0
-          qvval(i,j) = 0.0
-        enddo
+	estart(i) = 0.0
+	eend(i) = 0.0
+	do j = 1 , mxcurv
+	  qhval(i,j) = 0.0
+	  qvval(i,j) = 0.0
+	enddo
       enddo
 
 !--- Initialisation of variables in common e2save
@@ -563,7 +420,6 @@
       pltyp = 0
       pos_flag = 3
       machp = itbv .ne. 0
-
       do i=1,mxplot
         p(i)=0
       enddo
@@ -632,59 +488,63 @@
         step = (d_val1 - d_val) / (maxpnt / 2)
       endif
       fact = pos_flag - 1
+
       j = restart_sequ()
+
       do j = nrrang(1), nrrang(2)
-        if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0)        &
-     &  goto 10
-        k = double_from_table(tabname, horname, j, currpos)
-        if (itbv .eq. 1)  then
-          currtyp = node_value('mad8_type ')
-          if (currtyp .le. mtype) pltyp = ilist(currtyp)
+         crow = j
+         k = double_from_table(tabname, horname, j, currpos)
+         if (itbv .eq. 1)  then
+            currtyp = node_value('mad8_type ')
+            if (currtyp .le. mtype) pltyp = ilist(currtyp)
 
 !--- get element parameters
 
-          call pelfill(currtyp, j, ndble, adble)
-          currleng = adble(1)
+            call pelfill(currtyp, j, ndble, adble)
+            currleng = adble(1)
 
 !--- sbend, rbend
 
-          if (mod(pltyp,20) .eq. 1 .and. adble(7) .ne. zero)            &
-     &    pltyp = pltyp + 6
+            if (mod(pltyp,20) .eq. 1 .and. adble(7) .ne. zero)            &
+     &           pltyp = pltyp + 6
 
 !--- quad
 
-          if (pltyp .eq. 2 .and. min(adble(15), adble(16)) .lt. zero)   &
-     &    pltyp = 3
+            if (pltyp .eq. 2 .and. min(adble(15), adble(16)) .lt. zero)   &
+     &           pltyp = 3
 
 !--- sext
 
-          if (pltyp .eq. 10 .and. min(adble(17), adble(18)) .lt. zero)  &
-     &    pltyp = 11
+            if (pltyp .eq. 10 .and. min(adble(17), adble(18)) .lt. zero)  &
+     &           pltyp = 11
 
 !--- oct
 
-          if (pltyp .eq. 12 .and. min(adble(19), adble(20)) .lt. zero)  &
-     &    pltyp = 13
-          if (pltyp .gt. 0 .and. machp)  then
-            nelmach = nelmach + 1
-            estart(nelmach) = currpos - fact * half * currleng
-            eend(nelmach)   = estart(nelmach) + currleng
-            ieltyp(nelmach) = pltyp
-          endif
-          if (machp .and. j .gt. nrrang(1) .and. currleng .gt. zero     &
-     &    .and. splinef .gt. 0 .and. step .gt. zero)  then
+            if (pltyp .eq. 12 .and. min(adble(19), adble(20)) .lt. zero)  &
+     &           pltyp = 13
+
+            if (pltyp .gt. 0 .and. machp)  then
+               nelmach = nelmach + 1
+               estart(nelmach) = currpos - fact * half * currleng
+               eend(nelmach)   = estart(nelmach) + currleng
+               ieltyp(nelmach) = pltyp
+            endif
             nint = currleng / step
             if (nint .lt. 2) nint = 2
-            call peintp(crow, nint, pltyp, proc_n, adble, ierr)
-            if (ierr .eq. 1)  then
-              ierr = 0
-              print *, 'Warning: plot buffer full, plot truncated'
-              goto 100
-            elseif (ierr .ne. 0)  then
-              goto 999
+            if (machp .and. j .gt. nrrang(1) .and. currleng .gt. zero     &
+     &          .and. splinef .gt. 0 .and. step .gt. zero)  then
+
+               call peintp(crow, nint, pltyp, proc_n, adble, ierr)
+
+               if (ierr .eq. 1)  then
+                  ierr = 0
+                  print *, 'Warning: plot buffer full, plot truncated'
+                  goto 100
+               elseif (ierr .ne. 0)  then
+                  goto 999
+               endif
             endif
-          endif
-        endif
+         endif
         do l = 1, nivvar
           if (nqval(l) .eq. maxseql)  then
             print *, 'Warning: plot buffer full, plot truncated'
@@ -710,7 +570,10 @@
             endif
           endif
         enddo
-        crow = j
+ 
+        k = advance_node()
+
+        if (itbv .eq. 1 .and. k .eq. 0) goto 10
       enddo
    10 continue
   100 continue
@@ -1327,7 +1190,7 @@
      &0, 0, 40, 40,                                                     &
      &0, 55, 55,                                                        &
      &0, 0,                                                             &
-     &0, 0, 0, 0 /
+     &0, 0, 0, 0 /                                                      
 
 !--- Routine body
 
@@ -1465,224 +1328,228 @@
 
 
 !----------------------------------------------------------------------*
-! purpose:
-!   interpolate variables plotted against s
-! input:
-!   crow        (int)   table row number at start of element
-!   nint        (int)   number of interpolation intervals
-!   type        (int)   (local) element type
-!   proc        (int)   original process flags
-!   step        (d.p.)  max. dist. between two successive hor. values
-!   telpar      (d.p.)  temporary element parameters
-! output:
-!   ierr        (int)   0 if ok, else > 0
-!   the results are stored in qhval and qvval
-!
-! calls the functions double_from_table and get_value
-! defined in file madxn.c.
-! calls the function peelma in this file.
-!
-! it is called by the routine pefill in this file.
+!     purpose:
+!     interpolate variables plotted against s
+!     input:
+!     crow        (int)   table row number at start of element
+!     nint        (int)   number of interpolation intervals
+!     type        (int)   (local) element type
+!     proc        (int)   original process flags
+!     step        (d.p.)  max. dist. between two successive hor. values
+!     telpar      (d.p.)  temporary element parameters
+!     output:
+!     ierr        (int)   0 if ok, else > 0
+!     the results are stored in qhval and qvval
+!     
+!     calls the functions double_from_table and get_value 
+!     defined in file madxn.c.
+!     calls the function peelma in this file.
+!     
+!     it is called by the routine pefill in this file.
 !----------------------------------------------------------------------*
 
       include 'plot.fi'
       include 'plot_b.fi'
       include 'plot_math.fi'
 
-!--- type definition of the routine arguments
+!---  type definition of the routine arguments
 
-      integer crow, nint, type, proc(2,*), ierr
+      integer crow, nint, type, proc(2,*), ierr 
       double precision telpar(*)
 
-!--- type definitions of local variables
+!---  type definitions of local variables
 
-      integer mat
-      double precision tw1(mintpl), dmu, step, am(6,6)
-      double precision ex, ey, bx0, ax0, ux0, dx0, dpx0,                &
-     &by0, ay0, uy0, dy0, dpy0, x0, px0, y0, py0, xn0, yn0
-      double precision bx1, ax1, ux1, dx1, dpx1,                        &
-     &by1, ay1, uy1, dy1, dpy1, x1, px1, y1, py1, xn1, pxn1, yn1, pyn1
-      double precision s0, dstp, gamx, gamy
-      real currdp
+      double precision tw1(mintpl)
+      double precision ex, ey, betx,bety,dx
+      double precision xn1, pxn1, yn1, pyn1
+      double precision s_elem, s_incr, s, dstp, gamx, gamy
+      double precision length
       integer i, j, k, ipc
-      logical elmflg
 
-      equivalence       (bx1, tw1(1)), (ax1, tw1(2)), (ux1, tw1(3)),    &
-     &(dx1, tw1(4)), (dpx1, tw1(5)),                                    &
-     &(by1, tw1(6)), (ay1, tw1(7)), (uy1, tw1(8)),                      &
-     &(dy1, tw1(9)), (dpy1, tw1(10)), (x1,tw1(11)),                     &
-     &(px1, tw1(12)), (y1, tw1(13)), (py1, tw1(14)),                    &
-     &(xn1,tw1(15)), (pxn1, tw1(16)),                                   &
-     &(yn1, tw1(17)), (pyn1, tw1(18))
-
-
-!--- definitions of function primitives
+!---  definitions of function primitives
 
       integer double_from_table
+      integer interp_node
+      integer reset_interpolation
+      integer embedded_twiss
+      integer restart_sequ
       double precision get_value
+      double precision node_value
 
-!--- Output initialisation
+!---  Output initialisation
 
       ierr = 0
 
-!--- Initialisation of local variables
+!---  Initialisation of local variables
 
-      mat = 1
-      currdp = 0.0
+      length = telpar(1)
 
-!--- Routine body
+!---  Routine body
 
-      if (telpar(1) .eq. zero)  goto 999
-      step = telpar(1) / nint
+      if (crow .eq. 1) then
+         k = double_from_table('twiss ', 'x ', 1, tw1(11))
+         k = double_from_table('twiss ', 'px ', 1, tw1(12))
+         k = double_from_table('twiss ', 'betx ', 1, tw1(1))
+         k = double_from_table('twiss ', 'alfx ', 1, tw1(2))
+         k = double_from_table('twiss ', 'mux ', 1, tw1(3))
+         k = double_from_table('twiss ', 'dx ', 1, tw1(4))
+         k = double_from_table('twiss ', 'dpx ', 1, tw1(5))
+         k = double_from_table('twiss ', 'y ', 1, tw1(13))
+         k = double_from_table('twiss ', 'py ', 1, tw1(14))
+         k = double_from_table('twiss ', 'bety ', 1, tw1(6))
+         k = double_from_table('twiss ', 'alfy ', 1, tw1(7))
+         k = double_from_table('twiss ', 'muy ', 1, tw1(8))
+         k = double_from_table('twiss ', 'dy ', 1, tw1(9))
+         k = double_from_table('twiss ', 'dpy ', 1, tw1(10))
+         k = double_from_table('twiss ', 's ', 1, s_incr)
+         s = 0.0
+         ex = get_value('beam ','ex ')
+         ey = get_value('beam ','ey ')
+
+!---  xn, pxn, yn, pyn
+
+         if (ex * tw1(1).eq. zero)  then
+            xn1 = zero
+         else
+            xn1 = tw1(11) / sqrt(ex*abs(tw1(1)))
+         endif
+         if (ey * tw1(6) .eq. zero)  then
+            yn1 = zero
+         else
+            yn1 = tw1(13) / sqrt(ey*abs(tw1(6)))
+         endif
+         pxn1 = tw1(12) * gamx
+         pyn1 = tw1(14) * gamy
+         tw1(15) = xn1
+         tw1(16) = pxn1
+         tw1(17) = yn1
+         tw1(18) = pyn1
+
+!---  loop over variables, interpolate those with codes
+
+         do j = 1, nivvar
+            ipc = mod(proc(2,j), 100)
+            if (ipc .gt. 0)  then
+               if (nqval(j) .eq. maxseql)  then
+                  ierr = 1
+                  goto 999
+               endif
+               ipparm(2,j) = 1
+               nqval(j) = nqval(j) + 1
+               qhval(nqval(j),j) = s
+               if (proc(1,j) .gt. 0)  then
+                  qvval(nqval(j), j) = sqrt(abs(tw1(ipc)))
+               else
+                  qvval(nqval(j), j) = tw1(ipc)
+               endif
+            else
+               ipparm(2,j) = 0
+            endif
+         enddo
+         goto 999
+      endif
+      if (length .eq. zero)  goto 999
+      k = double_from_table('twiss ', 's ', crow - 1, s_elem)
+      k = double_from_table('twiss ', 'betx ', crow - 1, betx)
+      k = double_from_table('twiss ', 'bety ', crow - 1, bety)
+      k = double_from_table('twiss ', 'dx ', crow - 1, dx)
 
 !---  set flag for correct interpolation
 
-      elmflg = .false.
-      do i = 1, nivvar
-        elmflg = elmflg .or. proc_flag(2,i) .gt. 0
-      enddo
-      if (elmflg)  then
-        k = double_from_table(tabname, 'x ', crow, x0)
-        k = double_from_table(tabname, 'px ', crow, px0)
-        k = double_from_table(tabname, 'betx ', crow, bx0)
-        k = double_from_table(tabname, 'alfx ', crow, ax0)
-        k = double_from_table(tabname, 'mux ', crow, ux0)
-        k = double_from_table(tabname, 'dx ', crow, dx0)
-        k = double_from_table(tabname, 'dpx ', crow, dpx0)
-        k = double_from_table(tabname, 'y ', crow, y0)
-        k = double_from_table(tabname, 'py ', crow, py0)
-        k = double_from_table(tabname, 'bety ', crow, by0)
-        k = double_from_table(tabname, 'alfy ', crow, ay0)
-        k = double_from_table(tabname, 'muy ', crow, uy0)
-        k = double_from_table(tabname, 'dy ', crow, dy0)
-        k = double_from_table(tabname, 'dpy ', crow, dpy0)
-        k = double_from_table(tabname, 's ', crow, s0)
-        ex = get_value('beam ','ex ')
-        ey = get_value('beam ','ey ')
 
-!--- xn, pxn, yn, pyn
+!---  get intermediate s values, and interpolate twiss parameters
 
-        if (ex * bx0 .eq. zero)  then
-          xn0 = zero
-        else
-          xn0 = x0 / sqrt(ex*abs(bx0))
-        endif
-        if (ey * by0 .eq. zero)  then
-          yn0 = zero
-        else
-          yn0 = y0 / sqrt(ey*abs(by0))
-        endif
-        if (bx0 .ne. zero)  then
-          gamx = (one + ax0**2) / bx0
-        else
-          gamx = zero
-        endif
-        if (by0 .ne. zero)  then
-          gamy = (one + ay0**2) / by0
-        else
-          gamy = zero
-        endif
+      k = interp_node(nint)
+      k = embedded_twiss()
+      do i = 1, nint
+         k = double_from_table('embedded_twiss_table ',                 &  
+     &                         'x ', i, tw1(11))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'px ', i, tw1(12))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'betx ', i, tw1(1))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'alfx ', i, tw1(2))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'mux ', i, tw1(3))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'dx ', i, tw1(4))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'dpx ', i, tw1(5))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'y ', i, tw1(13))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'py ', i, tw1(14))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'bety ', i, tw1(6))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'alfy ', i, tw1(7))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'muy ', i, tw1(8))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'dy ', i, tw1(9))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         'dpy ', i, tw1(10))
+         k = double_from_table('embedded_twiss_table ',                 &
+     &                         's ', i, s_incr)
+         s = s_elem + s_incr
+         ex = get_value('beam ','ex ')
+         ey = get_value('beam ','ey ')
 
-!--- get intermediate s values, and interpolate twiss parameters
+!---  xn, pxn, yn, pyn
 
-        do i = 1, nint
-        if (i .gt. 1) mat = 2
-          if (i .eq. nint)  mat = 3
-          dstp = i * step
-
-!--- element matrices 6x6: entry, body, exit
-
-          call peelma(mat, type, telpar, dstp, am(1,1))
-
-!--- interpolate twiss parameters
-
-!    beta_x, beta_y
-
-          bx1 = -two * am(1,1) * am(1,2) * ax0                          &
-     &    + am(1,1)**2 * bx0 + am(1,2)**2 * gamx
-          by1 = -two * am(3,3) * am(3,4) * ay0                          &
-     &    + am(3,3)**2 * by0 + am(3,4)**2 * gamy
-
-!--- alfa_x, alfa_y
-
-          ax1 = (am(1,1) * am(2,2) + am(1,2) * am(2,1))                 &
-     &    * ax0 - am(1,1) * am(2,1) * bx0                               &
-     &    - am(1,2) * am(2,2) * gamx
-          ay1 = (am(3,3) * am(4,4) + am(3,4) * am(4,3))                 &
-     &    * ay0 - am(3,3) * am(4,3) * by0                               &
-     &    - am(3,4) * am(4,4) * gamy
-
-!--- mu_x, mu_y
-
-          dmu = atan2(am(1,2), bx0 * am(1,1)                            &
-     &    - ax0 * am(1,2))
-          if (dmu .lt. zero)  dmu = dmu + twopi
-          ux1 = ux0 + dmu / twopi
-          dmu = atan2(am(3,4), by0 * am(3,3)                            &
-     &    - ay0 * am(3,4))
-          if (dmu .lt. zero)  dmu = dmu + twopi
-          uy1 = uy0 + dmu / twopi
-
-!--- d-x, d-y
-
-          dx1 = am(1,1) * dx0 + am(1,2) * dpx0 + am(1,6)
-          dy1 = am(3,3) * dy0 + am(3,4) * dpy0 + am(3,6)
-
-!--- d'-x, d'-y
-
-          dpx1 = am(2,1) * dx0 + am(2,2) * dpx0 + am(2,6)
-          dpy1 = am(4,3) * dy0 + am(4,4) * dpy0 + am(4,6)
-
-!--- x, px, y, py
-
-          x1 = am(1,1) * x0 + am(1,2) * px0                             &
-     &    + am(1,6) * currdp
-          y1 = am(3,3) * y0 + am(3,4) * py0                             &
-     &    + am(3,6) * currdp
-          px1 = am(2,1) * x0 + am(2,2) * px0                            &
-     &    + am(2,6) * currdp
-          py1 = am(4,3) * y0 + am(4,4) * py0                            &
-     &    + am(4,6) * currdp
-
-!--- xn, pxn, yn, pyn
-
-          if (ex * bx1.eq. zero)  then
+         if (ex * tw1(1).eq. zero)  then
             xn1 = zero
-          else
-            xn1 = x1 / sqrt(ex*abs(bx1))
-          endif
-          if (ey * by1 .eq. zero)  then
+         else
+            xn1 = tw1(11) / sqrt(ex*abs(tw1(1)))
+         endif
+         if (ey * tw1(6) .eq. zero)  then
             yn1 = zero
-          else
-            yn1 = y1 / sqrt(ey*abs(by1))
-          endif
-          pxn1 = px1 * gamx
-          pyn1 = py1 * gamy
+         else
+            yn1 = tw1(13) / sqrt(ey*abs(tw1(6)))
+         endif
+         if (tw1(1) .ne. zero)  then
+            gamx = (one + tw1(2)**2) / tw1(1)
+         else
+            gamx = zero
+         endif
+         if (tw1(6) .ne. zero)  then
+            gamy = (one + tw1(7)**2) / tw1(6)
+         else
+            gamy = zero
+         endif
+         pxn1 = tw1(12) * gamx
+         pyn1 = tw1(14) * gamy
+         tw1(15) = xn1
+         tw1(16) = pxn1
+         tw1(17) = yn1
+         tw1(18) = pyn1
 
-!--- loop over variables, interpolate those with codes
+!---  loop over variables, interpolate those with codes
 
-          do j = 1, nivvar
+         do j = 1, nivvar
             ipc = mod(proc(2,j), 100)
             if (ipc .gt. 0)  then
-              if (nqval(j) .eq. maxseql)  then
-                ierr = 1
-                goto 999
-              endif
-              ipparm(2,j) = 1
-              nqval(j) = nqval(j) + 1
-              qhval(nqval(j),j) = s0 + dstp
-              if (proc(1,j) .gt. 0)  then
-                qvval(nqval(j), j) = sqrt(abs(tw1(ipc)))
-              else
-                qvval(nqval(j), j) = tw1(ipc)
-              endif
+               if (nqval(j) .eq. maxseql)  then
+                  ierr = 1
+                  goto 999
+               endif
+               ipparm(2,j) = 1
+               nqval(j) = nqval(j) + 1
+               qhval(nqval(j),j) = s
+               if (proc(1,j) .gt. 0)  then
+                  qvval(nqval(j), j) = sqrt(abs(tw1(ipc)))
+               else
+                  qvval(nqval(j), j) = tw1(ipc)
+               endif
             else
-              ipparm(2,j) = 0
+               ipparm(2,j) = 0
             endif
-          enddo
-        enddo
-      endif
-  999 end
+         enddo
+      enddo
+      k = reset_interpolation(nint)
+
+ 999  end
 !***********************************************************************
 
 
@@ -1905,7 +1772,7 @@
 ! calls the routines pegetn, pecurv and peschm in this file.
 ! calls the routines gxsdef, gxsvar, jslwsc, gxsvpt, gxpnbl, gxqaxs,
 !                    gxsaxs, iaxseq, gxqcrv, gxscrv, axlabel, gxfrm1,
-!                    gxswnd  defined in file gxx11.F.
+!                    gxswnd  defined in file gxx11.F. 
 !
 ! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
@@ -1930,8 +1797,8 @@
       character sdum(mxdep)*(mcnam)
       character * 1 ssymb
       real prmach, symch, tmpval, yvtop, fdum, chh
-      real vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
-      integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4)
+      real vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8) 
+      integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4) 
       integer lastnb, iaxseq(4)
       integer idum, k1dum, k2dum, k3dum, i, npar, ivvar, nvax, ivax,    &
      &ierr, vdum(2), j
@@ -2443,7 +2310,7 @@
       toptitle = ' '
       do i = 1 , mxcurv
          sname(i) = ' '
-      enddo
+      enddo   
 
 !--- Initialisation of variables in common peotcl
 
@@ -2703,7 +2570,7 @@
 !
 !--- Input
 !   n_str      number of sub-strings
-!   char_l     number of characters of each sub-string
+!   char_l     number of characters of each sub-string  
 !   char_a     character string
 !--- Output
 !   cahr_buf   sub_strings
@@ -2749,7 +2616,7 @@
 ! defined in file madxn.c.
 ! calls the function intrac defined in file madxu.c.
 ! calls the routines gxtint, gxsvar, gxasku, gxinit, gxclos
-! defined in file gxx11.F
+! defined in file gxx11.F 
 !
 ! it is called by the routine plotit in this file.
 !----------------------------------------------------------------------*
@@ -2845,21 +2712,24 @@
 !--- type definitions of local variables
 
       character * (mfile) plpnam
+      integer plot_No
 
 !--- Initialisation of local variables
 
       save plpnam
+      save plot_No
 
 !--- Routine body
-
+	
       if (initfl .eq. 0)  then
 
 !--- overall initialization
-
+         plot_No = 0
         call plginit
         plpnam = plfnam
       endif
-
+      plot_No = plot_No + 1
+      print *,"plot number = ",plot_No
       if (plpnam .ne. plfnam)  then
         call gxsvar ('SMETNM', 0, 0., plfnam)
 

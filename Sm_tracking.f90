@@ -367,10 +367,10 @@ contains
     ! DIRECTIONAL VARIABLE
     C%MAG%P%DIR=>C%DIR
     if(present(charge)) then
-     C%MAG%P%CHARGE=>CHARGE
+       C%MAG%P%CHARGE=>CHARGE
     else
-     charge1=1
-     C%MAG%P%CHARGE=>CHARGE1
+       charge1=1
+       C%MAG%P%CHARGE=>CHARGE1
     endif
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
@@ -537,10 +537,10 @@ contains
     ! DIRECTIONAL VARIABLE AND CHARGE IS PASSED TO THE ELEMENT
     C%MAGP%P%DIR=>C%DIR
     if(present(charge)) then
-     C%MAGP%P%CHARGE=>CHARGE
+       C%MAGP%P%CHARGE=>CHARGE
     else
-     charge1=1
-     C%MAGP%P%CHARGE=>CHARGE1
+       charge1=1
+       C%MAGP%P%CHARGE=>CHARGE1
     endif
     !
 
@@ -729,10 +729,10 @@ contains
     ! DIRECTIONAL VARIABLE
     C%MAGP%P%DIR=>C%DIR
     if(present(charge)) then
-     C%MAGP%P%CHARGE=>CHARGE
+       C%MAGP%P%CHARGE=>CHARGE
     else
-     charge1=1
-     C%MAGP%P%CHARGE=>CHARGE1
+       charge1=1
+       C%MAGP%P%CHARGE=>CHARGE1
     endif
     !
 

@@ -2163,7 +2163,7 @@ CONTAINS
     IF(EL%KIND==KIND3) THEN
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
-      CALL SETFAMILY(ELP)
+       CALL SETFAMILY(ELP)
        ELP%K3%thin_h_foc=EL%K3%thin_h_foc
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
@@ -2365,7 +2365,7 @@ CONTAINS
     IF(EL%KIND==KIND3) THEN
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
-      CALL SETFAMILY(ELP)
+       CALL SETFAMILY(ELP)
        ELP%K3%thin_h_foc=EL%K3%thin_h_foc
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
@@ -2557,7 +2557,7 @@ CONTAINS
     IF(EL%KIND==KIND3) THEN
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
-      CALL SETFAMILY(ELP)
+       CALL SETFAMILY(ELP)
        ELP%K3%thin_h_foc=EL%K3%thin_h_foc
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle

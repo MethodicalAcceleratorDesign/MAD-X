@@ -673,7 +673,8 @@ int pro_correct_filter(int iplane, double sigcut)
           xmea += xn;
         if (get_option("debug")) {
           printf("==> %s %-4.3f %-4.3f \n",m->p_node->name,bx_m,m->val.before[ip]);
-          printf("==> %-4.3f %-4.3f\n",xn,yn);
+	  /*          printf("==> %-4.3f %-4.3f\n",xn,yn); frs 18.02.2004 */
+          printf("==> %-4.3f \n",xn);
         }
         im++;
       }

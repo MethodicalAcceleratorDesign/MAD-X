@@ -1825,7 +1825,7 @@ void grow_table(struct table* t) /* doubles number of rows */
     }
   delete_char_p_array(t_loc, 0);
   myfree(rout_name, pa_loc);
-  t->node_nm->curr = t->curr; myfree(rout_name, t_loc);
+  t->node_nm->curr = t->curr; myfree(rout_name, p_loc);
   for (j = 0; j < t->num_cols; j++)
     {
      if ((s_loc = t->s_cols[j]) != NULL)
@@ -3326,4 +3326,201 @@ int zero_string(char* string) /* returns 1 if string defaults to '0', else 0 */
   for (i = 0; i < l; i++)
     if ((c = string[i]) != '0' && c != ' ' && c != '.') return 0;
   return 1;
+}
+
+int interp_node(int *nint)
+{
+
+  /* Creates interpolating nodes for the plotting routine */
+
+  struct node *first_node, *body, *last, *clone;
+  struct element* el;
+  int j, number_nodes;
+  double bv, bvk, angle, e1, e2;
+  double zero = 0.0, length, step, numint;
+  char *elem_name;
+  int bend_flag = 0;
+
+  numint = (double)*nint;
+  number_nodes = *nint - 1;
+
+
+  /* Set up length, angle and e2 of the first slice 
+    (first node in the original sequence) */
+
+  first_node = current_node;
+  el = first_node->p_elem;
+  elem_name = el->base_type->name;
+  rbend = (strcmp(elem_name, "rbend") == 0);
+  bend_flag = (strcmp(elem_name, "sbend")*(rbend-1) == 0);
+
+  if (bend_flag)
+    {
+      angle = command_par_value("angle", el->def);
+      e1 = command_par_value("e1", el->def);
+      e2 = command_par_value("e2", el->def);
+      if (rbend)
+	{
+	  e1 = e1 + angle / two;
+	  e2 = e2 + angle / two;
+	  strcpy(elem_name,"sbend");
+	}
+      angle = angle/numint;
+      store_node_value("angle",&angle);
+      store_node_value("e1",&e1);
+      store_node_value("e2",&zero);
+     }
+  length = first_node->length;
+  step = length/numint;
+  bv = node_value("dipole_bv");
+  bvk = node_value("other_bv");
+  first_node->length = step;
+
+  /* Set first_node in range_start of the sequence */
+
+  current_sequ->range_start = first_node;
+
+  /* clone the current node */
+
+  clone = clone_node(first_node,0);
+  if (bend_flag)
+    {
+      clone->p_elem = clone_element(first_node->p_elem);
+      clone->p_elem->def = clone_command(first_node->p_elem->def);
+    }
+
+  /* Reset to first node */
+
+  current_node = first_node;
+
+  /* advance to next node */
+
+  current_node = current_node->next;
+
+  /* set last node in the range to the current node */
+
+  current_sequ->range_end = current_node; 
+
+
+  /* insert nint - 1 nodes in between the two main nodes */ 
+
+  for (j = 1; j <= number_nodes; j++)
+    {
+      link_in_front(clone,current_node);
+      current_node = current_node->previous;
+      current_node->previous->next = current_node;
+      store_node_value("angle",&angle);
+      store_node_value("dipole_bv",&bv);
+      store_node_value("other_bv",&bvk);
+      if (bend_flag)
+	{
+	  if (j == 1)
+	    store_node_value("e2",&e2);
+	  else
+	    store_node_value("e2",&zero);
+	  store_node_value("e1",&zero);
+	}
+      clone = clone_node(first_node,0);
+     if (bend_flag)
+	{
+	  clone->p_elem = clone_element(first_node->p_elem);
+	  clone->p_elem->def = clone_command(first_node->p_elem->def);
+	}
+    }
+
+  current_node = current_node->previous;
+
+  return 0;
+}
+
+int reset_interpolation(int *nint)
+{
+  struct node *c_node, *second_node;
+  int j,bend_flag = 0;
+  double angle,length,e1,e2,numint;
+  char elem_name[NAME_L] = "rbend";
+
+  /* Deletes the interpolating nodes expanded by the routine interp_node */
+
+  numint = (double)*nint;
+
+  /* reset first and last node in the sequence range */
+
+  current_sequ->range_start = current_sequ->ex_start;
+  current_sequ->range_end = current_sequ->ex_end;
+
+  /* reset current_node at first node */
+
+  for (j = 1; j <= *nint ; j++)
+    current_node = current_node->previous; 
+
+  /* reset length of first node */
+
+  length = numint*current_node->length;  
+  current_node->length = length;
+
+  /* resets angle and saves e1 if the element is a bending magnet */
+
+  bend_flag = (strcmp(current_node->p_elem->base_type->name, "sbend") == 0 | rbend);
+  if (bend_flag)
+    {
+      angle = numint*node_value("angle");
+      store_node_value("angle",&angle);
+      e1 = node_value("e1");
+    }
+
+  /* advance to nint-th  node (second node in original sequence) */
+
+  for (j = 1; j <= *nint; j++)
+      advance_node();
+  second_node = current_node;
+
+  /* back to the last interpolated node */
+
+  retreat_node();
+
+  /* saves e2 if the element is a bending magnet */
+
+  if (bend_flag)
+    e2 = node_value("e2");
+
+  /* delete the interpolating nodes */ 
+
+  for (j = 2; j <= *nint; j++)
+    {
+      c_node = current_node;
+
+      retreat_node();
+      if (bend_flag)
+	{
+	  c_node->p_elem->def = delete_command(c_node->p_elem->def);
+	  c_node->p_elem = delete_element(c_node->p_elem);
+	}
+       delete_node(c_node);
+    }
+
+  /* current_node points now to the first node of the original sequence */
+  /* sets next pointer of first node to second node of original sequence */
+
+  current_node->next = second_node;
+
+  /* sets pointer of second node to first node of original sequence */
+
+  current_node->next->previous = current_node;
+
+  /* Updates the values of e1 and e2 and stores them in first node */
+
+  if (bend_flag)
+    {
+      if (rbend)
+	{
+	  strcpy(current_node->p_elem->base_type->name,"rbend");
+	  e1 = e1 - angle / two;
+	  e2 = e2 - angle / two;
+	}
+    store_node_value("e1",&e1);
+    store_node_value("e2",&e2);
+    }
+
+  return 0;
 }

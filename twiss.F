@@ -906,7 +906,7 @@
       opt_fun0(31)=r0mat(2,1)
       opt_fun0(32)=r0mat(2,2)
 
-  910 format('Mode ',i1,' is unstable  for delta(p)/p =',f12.6,         &
+  910 format('Mode ',i1,' is unstable for delta(p)/p =',f12.6,          &
      &', cosmux = ',f12.6,', cosmuy = ',f12.6)
   920 format('Both modes are unstable for delta(p)/p = ',f12.6,         &
      &', cosmux = ',f12.6,', cosmuy = ',f12.6)
@@ -981,7 +981,7 @@
      &al_errors(align_max),bv0,bvk,sumloc,pos0,node_value,get_value,    &
      &zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
-      character*120 msg
+      character*130 msg
 
 !---- Initialization
       currpos=zero
@@ -1155,8 +1155,8 @@
       endif
 
   910 format('TWISS uses the RF system or synchrotron radiation ',      &
-     &'only to find the closed orbit.'/                                 &
-     &'for optical calculations it ignores both.')
+     &'only to find the closed orbit, for optical calculations it ',    &
+     $'ignores both.')
 
       end
       subroutine twcptk(re,orbit)
@@ -1422,7 +1422,7 @@
      &al_errors(align_max),deltap,el,betas,gammas,node_value,get_value, &
      &zero,one
       parameter(zero=0d0,one=1d0)
-      character*120 msg
+      character*130 msg
 
 !---- If save requested reset table
       save=get_option('twiss_save ')
@@ -1519,11 +1519,11 @@
         call aawarn('TWCHGO: ',msg)
       endif
 
-  910 format('TWISS found transverse coupling for delta(p)/p =',f12.6/  &
-     &'chromatic functions may be wrong.'/' ')
+  910 format('TWISS found transverse coupling for delta(p)/p =',f12.6,  &
+     &'chromatic functions may be wrong.')
   920 format('TWISS uses the RF system or synchrotron radiation ',      &
-     &'only to find the closed orbit.'/                                 &
-     &'for optical calculations it ignores both.')
+     &'only to find the closed orbit, for optical calculations it ',    &
+     &'ignores both.')
 
       end
       subroutine twbttk(re,te)

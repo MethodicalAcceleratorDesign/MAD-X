@@ -800,9 +800,9 @@ contains
 
     call PRODUCE_APERTURE_FLAG(FIND_ORBIT_flag)
     if(.not.c_%stable_da) then
-     c_%stable_da=.true.
+       c_%stable_da=.true.
     endif
-!   resets Da on its own here only
+    !   resets Da on its own here only
 
   END function  FIND_ORBIT_flag
 
@@ -939,12 +939,12 @@ contains
     X=FIX
 
     DO I=1,TURNS0
-!       CALL TRACK(RING,X,LOC,STAT)
-trackflag=TRACK_flag(RING,X,LOC,STAT)
-if(trackflag/=0) then
-    c_%APERTURE_FLAG=APERTURE
-    return
-endif
+       !       CALL TRACK(RING,X,LOC,STAT)
+       trackflag=TRACK_flag(RING,X,LOC,STAT)
+       if(trackflag/=0) then
+          c_%APERTURE_FLAG=APERTURE
+          return
+       endif
        if(.not.check_stable) then
           w_p=0
           w_p%nc=1

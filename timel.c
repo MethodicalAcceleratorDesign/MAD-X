@@ -6,9 +6,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#ifndef HZ
 #define HZ 60.;
-#endif
 
 struct tms tps;
 static float timlim;

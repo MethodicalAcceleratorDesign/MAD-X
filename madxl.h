@@ -219,6 +219,17 @@ char* ibs_table_cols[] =
 " "  /* blank terminates */
 };
 
+int touschek_table_types[] =
+{
+  3, 2, 2, 2, 2, 2
+};
+
+char* touschek_table_cols[] =
+{
+  "name", "s", "dels", "tli", "txi", "tyi",
+" "  /* blank terminates */
+};
+
 int mon_table_types[] =
 {
 3, 2, 2, 2, 2

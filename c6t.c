@@ -114,7 +114,7 @@ void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
 void att_undefined(struct c6t_element*);
 void clean_c6t_element(struct c6t_element*);
-struct c6t_element* create_aperture(char* ,char* ,int , int , struct double_array*);
+struct c6t_element* create_aperture(char* ,char* ,double , double , struct double_array*);
 void concat_drifts();
 void conv_elem();
 void c6t_finish();
@@ -895,7 +895,7 @@ void clean_c6t_element(struct c6t_element* cleanme)
   for(i=0; i<cleanme->n_values; i++) { cleanme->value[i]=0; }
 }
 
-struct c6t_element* create_aperture(char* name,char* type,int a, int b, struct double_array* p_al_err)
+struct c6t_element* create_aperture(char* name,char* type,double a, double b, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
   aper_element = new_c6t_element(4,name,"aperture");
