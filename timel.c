@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-##fixing HZ unconditional
+/* fixing HZ unconditional */
 #define HZ 60.;
 
 struct tms tps;
