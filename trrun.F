@@ -32,7 +32,7 @@
       integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
      &nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
-     &int_arr(1),tot_segm,code_buf(*),jtrk
+     &int_arr(1),tot_segm,code_buf(*)
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
      &al_errors(align_max),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,         &
      &node_value,one,                                                   &
@@ -53,13 +53,14 @@
 
       if(fsecarb) then
         write (msg,*) 'Second order terms of arbitrary Matrix not '//   &
-     &  'allowed for tracking.'
+     &'allowed for tracking.'
         call aawarn('trrun: ',msg)
         return
       endif
       aperflag = .false.
       e_flag = 0
-      last_out = .false.   ! flag to avoid double entry of last line
+! flag to avoid double entry of last line
+      last_out = .false.
       onepass = get_option('onepass ') .ne. 0
       onetable = get_option('onetable ') .ne. 0
       info = get_option('info ') * get_option('warn ') .gt. 0
@@ -70,7 +71,8 @@
       else
         ffile = 1
       endif
-      segment = 0        ! for one_table case
+! for one_table case
+      segment = 0
       tot_segm = turns / ffile + 1
       if (mod(turns, ffile) .ne. 0) tot_segm = tot_segm + 1
       call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
@@ -110,7 +112,7 @@
           call track_pteigen(eigen)
 !hbu add s, node id and name
           call tt_putone(jmax, 0, tot_segm, segment, part_id,           &
-     &    z, orbit0,spos,nlm,el_name)
+     &z, orbit0,spos,nlm,el_name)
         else
           do i = 1, jmax
 !hbu
@@ -180,13 +182,13 @@
         endif
 !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
-     &  last_pos, last_orbit,aperflag,maxaper,al_errors)
+     &last_pos, last_orbit,aperflag,maxaper,al_errors)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
             do i = 1, jmax
               call tmali2(el,z(1,i), al_errors, betas, gammas,          &
-     &        z(1,i), re)
+     &z(1,i), re)
             enddo
           endif
         endif
@@ -195,7 +197,7 @@
           call dzero(obs_orb,6)
           call get_node_vector('obs_orbit ', lobs, obs_orb)
           if (lobs .lt. 6)                                              &
-     &    call aafail('TRACK', 'obs. point orbit not found')
+     &call aafail('TRACK', 'obs. point orbit not found')
           if (onetable)  then
 !hbu
             spos=sum
@@ -203,12 +205,12 @@
             call element_name(el_name,len(el_name))
 !hbu
             call tt_putone(jmax, turn, tot_segm, segment, part_id,      &
-     &      z, obs_orb,spos,nlm,el_name)
+     &z, obs_orb,spos,nlm,el_name)
           else
             do i = 1, jmax
 !hbu add spos
               call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
-     &        spos)
+     &spos)
             enddo
           endif
         endif
@@ -225,7 +227,7 @@
               spos=sum
 !hbu spos added
               call tt_putone(jmax, turn, tot_segm, segment, part_id,    &
-     &        z, orbit0,spos,nlm,el_name)
+     &z, orbit0,spos,nlm,el_name)
             else
               do i = 1, jmax
 !hbu
@@ -241,7 +243,7 @@
           enddo
         endif
         if (jmax .eq. 0 .or. (switch .gt. 1 .and. jmax .lt. j_tot))     &
-     &  goto 20
+     &goto 20
         if (switch .eq. 2 .and. info) then
           if (mod(turn,100) .eq. 0) print *, 'turn :', turn
         endif
@@ -270,7 +272,7 @@
             call element_name(el_name,len(el_name))
 !hbu spos added
             call tt_putone(jmax, turn, tot_segm, segment, part_id,      &
-     &      z, orbit0,spos,nlm,el_name)
+     &z, orbit0,spos,nlm,el_name)
           else
             do i = 1, jmax
 !hbu
@@ -345,7 +347,7 @@
           apy=maxaper(3)
         endif
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
-     &  last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
         go to 502
       endif
 !---- Collimator with rectangular aperture.
@@ -359,7 +361,7 @@
           apy=maxaper(3)
         endif
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
-     &  last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
         go to 502
       endif
 !---- Beam-beam,  standard 4D, no aperture
@@ -385,7 +387,7 @@
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
           apx = aperture(1)
@@ -397,13 +399,13 @@
           apy = apx
 !        print *,"circle, radius= ",apx
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !------------  rectangle case ----------------------------------
         else if(aptype.eq.'rectangle') then
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !------------  LHC screen case ----------------------------------
         else if(aptype.eq.'lhcscreen') then
 !        print *, "LHC screen start, Xrect= ",
@@ -414,7 +416,7 @@
 !JMJ!     this tests whether the particle is outside the circumscribing
 !JMJ!     circle.
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !JMJ!
 !JMJ!     This tests whether particles are outside the space bounded by
 !JMJ!     two or four lines intersecting the circle.
@@ -432,26 +434,26 @@
           if(aperture(1).gt.0.) apx = aperture(1)
           if(aperture(2).gt.0.) apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !        print *, "LHC screen end"
 !------------  marguerite case ----------------------------------
         else if(aptype.eq.'marguerite') then
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !------------  rectellipse case ----------------------------------
         else if(aptype.eq.'rectellipse') then
 !*****         test ellipse
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !*****         test rectangle
           apx = aperture(3)
           apy = aperture(4)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-     &    last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, ktrack,al_errors)
 !       print*, " test apertures"
 !       print*, "      apx=",apx, " apy=",apy," apxell=",apxell,
 !     &         " apyell=",apyell
@@ -483,8 +485,8 @@
 !      print *,"   CODE    ",code
       go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
-     &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
-     &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
+     &500, 500, 230, 240, 250, 260, 270, 280, 290, 310,                 &
+     &310, 310, 300, 310, 310, 310, 310, 310, 310, 310), code
 !---- Bending magnet. OBSOLETE, to be kept for go to
    20 continue
    30 continue
@@ -644,7 +646,7 @@
       do iord = 1, nd/2
         do j = 1, 2
           field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     &    / (one + deltas)
+     &/ (one + deltas)
           if (field(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
@@ -665,9 +667,9 @@
       else
         do jtrk = 1,ktrack
           dxt(jtrk) =                                                   &
-     &    field(1,nord)*track(1,jtrk) - field(2,nord)*track(3,jtrk)
+     &field(1,nord)*track(1,jtrk) - field(2,nord)*track(3,jtrk)
           dyt(jtrk) =                                                   &
-     &    field(1,nord)*track(3,jtrk) + field(2,nord)*track(1,jtrk)
+     &field(1,nord)*track(3,jtrk) + field(2,nord)*track(1,jtrk)
         enddo
 
         do iord = nord - 1, 1, -1
@@ -698,7 +700,7 @@
         if (dodamp) then
           do jtrk = 1,ktrack
             curv = sqrt((dipr + dxt(jtrk))**2 +                         &
-     &      (dipi + dyt(jtrk))**2) / elrad
+     &(dipi + dyt(jtrk))**2) / elrad
 
             if (dorand) then
               call trphot(elrad,curv,rfac,deltas)
@@ -735,11 +737,11 @@
 !---- Apply multipole effect including dipole.
       do jtrk = 1,ktrack
         track(2,jtrk) = track(2,jtrk) -                                 &
-     &  (dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
+     &(dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
         track(4,jtrk) = track(4,jtrk) +                                 &
-     &  (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
+     &(dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
         track(5,jtrk) = track(5,jtrk)                                   &
-     &  - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
+     &- (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
       enddo
 
 !---- Radiation loss at exit.
@@ -749,7 +751,7 @@
         if (dodamp) then
           do jtrk = 1,ktrack
             curv = sqrt((dipr + dxt(jtrk))**2 +                         &
-     &      (dipi + dyt(jtrk))**2) / elrad
+     &(dipi + dyt(jtrk))**2) / elrad
 
             if (dorand) then
               call trphot(elrad,curv,rfac,deltas)
@@ -998,7 +1000,7 @@
         track(1,itrack) = track(1,itrack) + ttt*px
         track(3,itrack) = track(3,itrack) + ttt*py
         track(5,itrack) = track(5,itrack)                               &
-     &  + el*(beti + pt * dtbyds) - (beti+pt)*ttt
+     &+ el*(beti + pt * dtbyds) - (beti+pt)*ttt
       enddo
       end
       subroutine ttrf(track,ktrack)
@@ -1163,17 +1165,17 @@
       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(2, n_ferr))
       if (code.eq.14) then
         xkick=bv0*(node_value('kick ')+node_value('chkick ')+           &
-     &  field(1)/div)
+     &field(1)/div)
         ykick=zero
       else if (code.eq.15) then
         xkick=bv0*(node_value('hkick ')+node_value('chkick ')+          &
-     &  field(1)/div)
+     &field(1)/div)
         ykick=bv0*(node_value('vkick ')+node_value('cvkick ')+          &
-     &  field(2)/div)
+     &field(2)/div)
       else if(code.eq.16) then
         xkick=zero
         ykick=bv0*(node_value('kick ')+node_value('cvkick ')+           &
-     &  field(2)/div)
+     &field(2)/div)
       else
         xkick=zero
         ykick=zero
@@ -1231,7 +1233,7 @@
         track(1,itrack) = track(1,itrack) + px * d
         track(3,itrack) = track(3,itrack) + py * d
         track(5,itrack) = track(5,itrack) + d * bi2gi2 * pt -           &
-     &  bil2 * (px**2 + py**2 + bi2gi2*pt**2) + el*pt*dtbyds
+     &bil2 * (px**2 + py**2 + bi2gi2*pt**2) + el*pt*dtbyds
 
 !---- Half kick at exit.
         track(2,itrack) = px + half * dpx
@@ -1598,17 +1600,17 @@
       do i = n, ntrk
 !---- Is particle outside aperture?
         if (flag .eq. 1.and.((z(1,i)-al_errors(11))/apx)**2             &
-     &  +((z(3,i)-al_errors(12)) / apy)**2 .gt. one) then
+     &+((z(3,i)-al_errors(12)) / apy)**2 .gt. one) then
           go to 99
         else if(flag .eq. 2                                             &
-     &    .and. (abs(z(1,i)-al_errors(11)) .gt. apx                     &
-     &  .or. abs(z(3,i)-al_errors(12)) .gt. apy)) then
+     &.and. (abs(z(1,i)-al_errors(11)) .gt. apx                         &
+     &.or. abs(z(3,i)-al_errors(12)) .gt. apy)) then
           go to 99
 !***  Introduction of marguerite : two ellipses
         else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)) / apx)**2      &
-     &    + ((z(3,i)-al_errors(12)) / apy)**2 .gt. one .and.            &
-     &    ((z(1,i)-al_errors(11)) / apy)**2 +                           &
-     &  ((z(3,i)-al_errors(12)) / apx)**2 .gt. one) then
+     &+ ((z(3,i)-al_errors(12)) / apy)**2 .gt. one .and.                &
+     &((z(1,i)-al_errors(11)) / apy)**2 +                               &
+     &((z(3,i)-al_errors(12)) / apx)**2 .gt. one) then
           go to 99
         endif
         go to 98
@@ -1616,7 +1618,7 @@
         nn=name_len
         call node_string('apertype ',aptype,nn)
         call trkill(n, turn, sum, ntrk, part_id,                        &
-     &  last_turn, last_pos, last_orbit, z,aptype)
+     &last_turn, last_pos, last_orbit, z,aptype)
         goto 10
  98     continue
       enddo
@@ -1692,9 +1694,9 @@
             if (itype(k) .ne. 0) zgiv = .true.
             if (itype(k+6) .ne. 0) zngiv = .true.
             zstart(k) = track(k)                                        &
-     &      + sqrt(ex) * (eigen(k,1) * zn(1) + eigen(k,2) * zn(2))      &
-     &      + sqrt(ey) * (eigen(k,3) * zn(3) + eigen(k,4) * zn(4))      &
-     &      + sqrt(et) * (eigen(k,5) * zn(5) + eigen(k,6) * zn(6))
+     &+ sqrt(ex) * (eigen(k,1) * zn(1) + eigen(k,2) * zn(2))            &
+     &+ sqrt(ey) * (eigen(k,3) * zn(3) + eigen(k,4) * zn(4))            &
+     &+ sqrt(et) * (eigen(k,5) * zn(5) + eigen(k,6) * zn(6))
           enddo
           if (switch .gt. 1)  then
 !--- keep initial coordinates for dynap
@@ -1758,7 +1760,7 @@
 !                 track , trajectory coordinates
 !----------------------------------------------------------------------*
       integer ktrack,itrack
-      double precision fint,el,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),    &
+      double precision fint,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),       &
      &track(6,*),node_value,zero,one
       parameter(zero=0d0,one=1d0)
 
@@ -1768,7 +1770,7 @@
       bv0 = node_value('dipole_bv ')
       e1 = bv0 * node_value('e1 ')
 !--- bvk applied further down
-      h = one/node_value('rho ')
+      h = node_value('h ')
       hgap = node_value('hgap ')
       fint = node_value('fint ')
       corr = (h + h) * hgap * fint

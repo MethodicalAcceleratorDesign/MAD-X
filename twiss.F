@@ -408,14 +408,14 @@
         if (pflag)  then
           print *, ' '
           print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: ''&
-     &    ,                                                             &
-     &    1p,e14.6)',itra,err,deltap
+     &,                                                                 &
+     &1p,e14.6)',itra,err,deltap
           print '(''orbit: '', 1p,6e14.6)', orbit0
         endif
         if (err.lt.cotol) then
           save_opt=get_option('keeporbit ')
           call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,&
-     &    0)
+     &0)
           opt_fun0(9 )=orbit0(1)
           opt_fun0(10)=orbit0(2)
           opt_fun0(11)=orbit0(3)
@@ -591,11 +591,11 @@
           call get_node_vector('orbit_ref ', j, reforb)
           do kpro = 1, 2
             if (kpro .eq. 1 .and. code .le. pcode                       &
-     &      .or. kpro .eq. 2 .and. code .ge. pcode)  then
+     &.or. kpro .eq. 2 .and. code .ge. pcode)  then
               j = 2*kpro-1
               dorb(j) = orbit(j) - reforb(j)
               if (abs(dorb(j)) .gt. vector(kpro)                        &
-     &        .and. node .ge. corr_pick(kpro))  then
+     &.and. node .ge. corr_pick(kpro))  then
 !--- reset count if new pickup
                 if (node .gt. corr_pick(kpro)) rep_cnt(kpro) = 0
 !--- check for max. repitition
@@ -603,7 +603,7 @@
                 if (rep_cnt(kpro) .gt. max_rep)  then
                   write(tmptxt1, '(i6)') max_rep
                   call fort_warn('threader: pickup skipped after',      &
-     &            tmptxt1(:6)//' correction attempts')
+     &tmptxt1(:6)//' correction attempts')
                   goto 20
                 endif
 !--- keep matrix
@@ -613,20 +613,20 @@
                 call element_name(p_name,j)
                 poc_cnt = node_value('occ_cnt ')
                 call tmthrd(kpro,dorb,cmatr(1,1,kpro),pmatr,vector,node,&
-     &          cick,err)
+     &cick,err)
                 if (err .eq. 0)  then
                   corr_pick(kpro) = old
                   write(tmptxt1, '(1p,6g14.6)') cick
                   tmptxt2 = c_name(kpro)
                   write(tmptxt2(lastnb(c_name(kpro))+1:),               &
-     &            '(''['',i2,'']'')') coc_cnt(kpro)
+     &'(''['',i2,'']'')') coc_cnt(kpro)
                   tmptxt3 = p_name
                   write(tmptxt3(lastnb(p_name)+1:),                     &
-     &            '(''['',i2,'']'')') poc_cnt
+     &'(''['',i2,'']'')') poc_cnt
                   call fort_info(                                       &
-     &            '-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))     &
-     &            // '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total ' &
-     &            //ptxt(kpro)//'kick:', tmptxt1)
+     &'-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))                 &
+     &// '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total '             &
+     &//ptxt(kpro)//'kick:', tmptxt1)
 !--- restore restart values
                   suml = restsum(kpro)
                   call dcopy(restorb(1,kpro),orbit,6)
@@ -637,11 +637,11 @@
                   write(tmptxt1, '(i6)') old
                   if (err .eq. 1)  then
                     call fort_warn(                                     &
-     &              'threader: no corrector before pickup at node ',    &
-     &              tmptxt1)
+     &'threader: no corrector before pickup at node ',                  &
+     &tmptxt1)
                   elseif (err .eq. 2)  then
                     call fort_warn('threader: kicker is at start',      &
-     &              'of sequence')
+     &'of sequence')
                   endif
                 endif
               endif
@@ -919,7 +919,7 @@
         enddo
       else
         call aawarn('TWDISP: ',                                         &
-     &  'Unable to compute dispersion --- dispersion set to zero.')
+     &'Unable to compute dispersion --- dispersion set to zero.')
         call dzero(disp,4)
       endif
 
@@ -1326,9 +1326,9 @@
         betx = rt(1,2) / sinmux
         alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
         bx = rtp(1,2) / rt(1,2) +                                       &
-     &  (rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
+     &(rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
         ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                   &
-     &  alfx * rtp(1,2) / rt(1,2)
+     &alfx * rtp(1,2) / rt(1,2)
         wx = sqrt(bx**2 + ax**2)
         if (wx.gt.eps) phix = atan2(ax,bx)
       endif
@@ -1343,9 +1343,9 @@
         bety = rt(3,4) / sinmuy
         alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
         by = rtp(3,4) / rt(3,4) +                                       &
-     &  (rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
+     &(rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
         ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                   &
-     &  alfy * rtp(3,4) / rt(3,4)
+     &alfy * rtp(3,4) / rt(3,4)
         wy = sqrt(by**2 + ay**2)
         if (wy.gt.eps) phiy = atan2(ay,by)
       endif
@@ -1514,7 +1514,7 @@
 !---- Synchrotron integrals before element.
       if(.not.centre_bttk) then
         curlyh = disp(1)**2 * (one + alfx**2) / betx                    &
-     &  + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
+     &+ two*disp(1)*disp(2)*alfx + disp(2)**2*betx
         synch_1 = synch_1 + disp(1) * rhoinv * blen/two
         synch_2 = synch_2 + rhoinv**2 * blen/two
         synch_3 = synch_3 + abs(rhoinv**3) * blen/two
@@ -1650,7 +1650,7 @@
 !---- Synchrotron integrals after element.
       if(.not.centre_bttk) then
         curlyh = disp(1)**2 * (one + alfx**2) / betx                    &
-     &  + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
+     &+ two*disp(1)*disp(2)*alfx + disp(2)**2*betx
         synch_1 = synch_1 + disp(1) * rhoinv * blen/two
         synch_2 = synch_2 + rhoinv**2 * blen/two
         synch_3 = synch_3 + abs(rhoinv**3) * blen/two
@@ -1712,14 +1712,14 @@
         bx0 = wx * cos(phix)
         ax0 = wx * sin(phix)
         xix = dmux + frt(1,2) * (frt(1,2) * ax0 - tb * bx0) / t2        &
-     &  + (frt(1,1) * frtp(1,2) - frt(1,2) * frtp(1,1)) / betx
+     &+ (frt(1,1) * frtp(1,2) - frt(1,2) * frtp(1,1)) / betx
         xix = xix / twopi
         tb = frt(3,3) * bety - frt(3,4) * alfy
         t2 = tb**2 + frt(3,4)**2
         by0 = wy * cos(phiy)
         ay0 = wy * sin(phiy)
         xiy = dmuy + frt(3,4) * (frt(3,4) * ay0 - tb * by0) / t2        &
-     &  + (frt(3,3) * frtp(3,4) - frt(3,4) * frtp(3,3)) / bety
+     &+ (frt(3,3) * frtp(3,4) - frt(3,4) * frtp(3,3)) / bety
         xiy = xiy / twopi
         alfa  =zero
         gamtr =zero
@@ -1852,8 +1852,8 @@
 !---- Select element type.
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
-     &210, 220, 230, 240, 250, 260,  10, 280, 290, 300,                 &
-     &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
+     &210, 220, 230, 240, 250, 260,  10, 280, 290, 310,                 &
+     &310, 310, 300, 310, 310, 310, 310, 310, 310, 310), code
 
 !---- Drift space, monitor, collimator, or beam instrument.
    10 continue
@@ -1953,7 +1953,8 @@
 !---- Reserved.
   280 continue
   290 continue
-  300 continue
+      go to 500
+  300 call tmdpdg(ftrk,orbit,fmap,re)
       go to 500
 
 !---- User-defined elements.
@@ -2067,10 +2068,10 @@
           x =   orbit(1) * ct + orbit(3) * st
           y = - orbit(1) * st + orbit(3) * ct
           hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                  &
-     &    sk2*(x**2 - y**2)/two
+     &sk2*(x**2 - y**2)/two
           hy = sks * x - sk1*y - sk2*x*y
           rfac = (arad * gamma**3 * el / three)                         &
-     &    * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+     &* (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
           pt = orbit(6)
           orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
           orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -2137,10 +2138,10 @@
             x =   orbit(1) * ct + orbit(3) * st
             y = - orbit(1) * st + orbit(3) * ct
             hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                &
-     &      sk2*(x**2 - y**2)/two
+     &sk2*(x**2 - y**2)/two
             hy = sks * x - sk1*y - sk2*x*y
             rfac = (arad * gamma**3 * el / three)                       &
-     &      * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+     &* (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
             pt = orbit(6)
             orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
             orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -2273,10 +2274,10 @@
         t226 = xs6 * (three*sx*fx + dx**2)
         t266 = xs6 * (sx*dx**2 - two*cx*gx)
         t516 = h * xs6 * (three*dx*fx - four*gx) +                      &
-     &  (sk1/two) * (fx + sx*dx)
+     &(sk1/two) * (fx + sx*dx)
         t526 = h * xs6 * (dx**3 - two*sx*gx) + (sk1/two) * dx**2
         t566 = h * xs6 * (three*hx - two*dx*gx) +                       &
-     &  (sk1/two) * gx - fx
+     &(sk1/two) * gx - fx
         t1 = (sk1/two) * (dx**2 - sx*fx) - dx
         t2 = (sk1/two) * (el*dx - fx)
         t5 = fx - sk1 * (gx - fx*dx / two)
@@ -2293,15 +2294,15 @@
         te(2,2,6) = (- h2*t226 + (sk1/four) * el * sx) * bi
         te(2,6,6) = (- h**2*t266 + h*t2) * bi2 - h2 * sx * bi2gi2
         te(5,1,1) = (h2*xs6 * (sx*dx + three*fx) -                      &
-     &  (sk1/four) * (el - cx*sx)) * bi
+     &(sk1/four) * (el - cx*sx)) * bi
         te(5,1,2) = (h2*xs6*dx**2 + (sk1/four)*sx**2) * bi
         te(5,2,2) = (h*xs6*gx - sk1 * (fx - sx*dx) / four - sx/two) * bi
         te(5,1,6) = h2 * ((t516 - sk1 * (el*dx - fx) / two) * bi2 +     &
-     &  sx * bi2gi2)
+     &sx * bi2gi2)
         te(5,2,6) = h2 * ((t526 - sk1 * (dx**2 - sx*fx) / two) * bi2 +  &
-     &  dx * bi2gi2)
+     &dx * bi2gi2)
         te(5,6,6) = (h**2 * (t566 + t5) * bi2 +                         &
-     &  (three/two) * (h**2*fx - el) * bi2gi2) * bi
+     &(three/two) * (h**2*fx - el) * bi2gi2) * bi
 
 !---- Mixed terms.
         y2ksq = four * yksq
@@ -2374,7 +2375,7 @@
           re(5,1) = re(5,1) - dh * t516 * bi
           re(5,2) = re(5,2) - dh * (t526 - dx) * bi
           re(5,6) = re(5,6) -                                           &
-     &    dh * h * ((two*t566 + t5) * bi2 + fx * bi2gi2)
+     &dh * h * ((two*t566 + t5) * bi2 + fx * bi2gi2)
           re(3,3) = re(3,3) - dh * t336
           re(3,4) = re(3,4) - dh * t346
           re(4,3) = re(4,3) - dh * t436
@@ -2491,15 +2492,15 @@
 !---- Sum over S of TB(I,S,K) * EA(S).
           do i = 1, 6
             es(i,k) = tb(i   ,k) * ea(1) + tb(i+ 6,k) * ea(2)           &
-     &      + tb(i+12,k) * ea(3) + tb(i+18,k) * ea(4)                   &
-     &      + tb(i+24,k) * ea(5) + tb(i+30,k) * ea(6)
+     &+ tb(i+12,k) * ea(3) + tb(i+18,k) * ea(4)                         &
+     &+ tb(i+24,k) * ea(5) + tb(i+30,k) * ea(6)
           enddo
 
 !---- Sum over S of TB(I,J,S) * RA(S,K).
           do ij = 1, 36
             ts(ij,k) = tb(ij,1) * ra(1,k) + tb(ij,2) * ra(2,k)          &
-     &      + tb(ij,3) * ra(3,k) + tb(ij,4) * ra(4,k)                   &
-     &      + tb(ij,5) * ra(5,k) + tb(ij,6) * ra(6,k)
+     &+ tb(ij,3) * ra(3,k) + tb(ij,4) * ra(4,k)                         &
+     &+ tb(ij,5) * ra(5,k) + tb(ij,6) * ra(6,k)
           enddo
         enddo
 
@@ -2508,32 +2509,32 @@
 
 !---- Zero-order terms.
           ew(k) = eb(k) + (rb(k,1) + es(k,1)) * ea(1)                   &
-     &    + (rb(k,2) + es(k,2)) * ea(2)                                 &
-     &    + (rb(k,3) + es(k,3)) * ea(3)                                 &
-     &    + (rb(k,4) + es(k,4)) * ea(4)                                 &
-     &    + (rb(k,5) + es(k,5)) * ea(5)                                 &
-     &    + (rb(k,6) + es(k,6)) * ea(6)
+     &+ (rb(k,2) + es(k,2)) * ea(2)                                     &
+     &+ (rb(k,3) + es(k,3)) * ea(3)                                     &
+     &+ (rb(k,4) + es(k,4)) * ea(4)                                     &
+     &+ (rb(k,5) + es(k,5)) * ea(5)                                     &
+     &+ (rb(k,6) + es(k,6)) * ea(6)
 
 !---- First-order terms.
           do j = 1, 6
             rw(j,k) = (rb(j,1) + two * es(j,1)) * ra(1,k)               &
-     &      + (rb(j,2) + two * es(j,2)) * ra(2,k)                       &
-     &      + (rb(j,3) + two * es(j,3)) * ra(3,k)                       &
-     &      + (rb(j,4) + two * es(j,4)) * ra(4,k)                       &
-     &      + (rb(j,5) + two * es(j,5)) * ra(5,k)                       &
-     &      + (rb(j,6) + two * es(j,6)) * ra(6,k)
+     &+ (rb(j,2) + two * es(j,2)) * ra(2,k)                             &
+     &+ (rb(j,3) + two * es(j,3)) * ra(3,k)                             &
+     &+ (rb(j,4) + two * es(j,4)) * ra(4,k)                             &
+     &+ (rb(j,5) + two * es(j,5)) * ra(5,k)                             &
+     &+ (rb(j,6) + two * es(j,6)) * ra(6,k)
           enddo
 
 !---- Second-order terms.
           do j = k, 6
             do i = 1, 6
               tw(i,j,k) =                                               &
-     &        + (rb(i,1)+two*es(i,1))*ta(1,j,k) + ts(i   ,j)*ra(1,k)    &
-     &        + (rb(i,2)+two*es(i,2))*ta(2,j,k) + ts(i+ 6,j)*ra(2,k)    &
-     &        + (rb(i,3)+two*es(i,3))*ta(3,j,k) + ts(i+12,j)*ra(3,k)    &
-     &        + (rb(i,4)+two*es(i,4))*ta(4,j,k) + ts(i+18,j)*ra(4,k)    &
-     &        + (rb(i,5)+two*es(i,5))*ta(5,j,k) + ts(i+24,j)*ra(5,k)    &
-     &        + (rb(i,6)+two*es(i,6))*ta(6,j,k) + ts(i+30,j)*ra(6,k)
+     &+ (rb(i,1)+two*es(i,1))*ta(1,j,k) + ts(i   ,j)*ra(1,k)            &
+     &+ (rb(i,2)+two*es(i,2))*ta(2,j,k) + ts(i+ 6,j)*ra(2,k)            &
+     &+ (rb(i,3)+two*es(i,3))*ta(3,j,k) + ts(i+12,j)*ra(3,k)            &
+     &+ (rb(i,4)+two*es(i,4))*ta(4,j,k) + ts(i+18,j)*ra(4,k)            &
+     &+ (rb(i,5)+two*es(i,5))*ta(5,j,k) + ts(i+24,j)*ra(5,k)            &
+     &+ (rb(i,6)+two*es(i,6))*ta(6,j,k) + ts(i+30,j)*ra(6,k)
               tw(i,k,j) = tw(i,j,k)
             enddo
           enddo
@@ -2548,14 +2549,14 @@
 
 !---- Zero-order terms.
           ew(k) = eb(k) + rb(k,1) * ea(1) + rb(k,2) * ea(2)             &
-     &    + rb(k,3) * ea(3) + rb(k,4) * ea(4)                           &
-     &    + rb(k,5) * ea(5) + rb(k,6) * ea(6)
+     &+ rb(k,3) * ea(3) + rb(k,4) * ea(4)                               &
+     &+ rb(k,5) * ea(5) + rb(k,6) * ea(6)
 
 !---- First-order terms.
           do j = 1, 6
             rw(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)             &
-     &      + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                     &
-     &      + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
+     &+ rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
+     &+ rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
           enddo
         enddo
       endif
@@ -2698,17 +2699,17 @@
         code = node_value('mad8_type ')
         if(code.eq.14) then
           xkick=bv0*(node_value('kick ')+node_value('chkick ')+         &
-     &    field(1)/div)
+     &field(1)/div)
           ykick=zero
         else if(code.eq.15) then
           xkick=bv0*(node_value('hkick ')+node_value('chkick ')+        &
-     &    field(1)/div)
+     &field(1)/div)
           ykick=bv0*(node_value('vkick ')+node_value('cvkick ')+        &
-     &    field(2)/div)
+     &field(2)/div)
         else if(code.eq.16) then
           xkick=zero
           ykick=bv0*(node_value('kick ')+node_value('cvkick ')+         &
-     &    field(2)/div)
+     &field(2)/div)
         else
           xkick=zero
           ykick=zero
@@ -2780,7 +2781,7 @@
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
      &skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bv0,bvk,  &
      &dpxr,dpyr,zero,one,two,three
-      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+      double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -2830,7 +2831,7 @@
       do iord = 1, nd/2
         do j = 1, 2
           field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     &    / (one + deltap)
+     &/ (one + deltap)
           if (field(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
@@ -3495,7 +3496,7 @@
 !---- Half radiation effect at exit.
       if (dorad.and.ftrk) then
         rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
-     &  orbit(3)**2)
+     &orbit(3)**2)
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -3523,7 +3524,7 @@
 !---- Half radiation effect at exit.
       if (dorad.and.ftrk) then
         rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
-     &  orbit(3)**2)
+     &orbit(3)**2)
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -3873,7 +3874,7 @@
 !---- Half radiation effects at entrance.
       if (ftrk .and. dorad) then
         rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit(3)  &
-     &  **2)**2 / twelve
+     &**2)**2 / twelve
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -3902,7 +3903,7 @@
       if (ftrk) then
         if (dorad) then
           rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit   &
-     &    (3)**2)**2 / twelve
+     &(3)**2)**2 / twelve
           pt = orbit(6)
           orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
           orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -4251,7 +4252,7 @@
         call dcopy(ek,ek00,6)
         call dcopy(re,re00,36)
         call dcopy(te,te00,216)
-        if(centre_cptk) then 
+        if(centre_cptk) then
           call dcopy(orbit,orbit0,6)
           call twcptk(re,orbit0)
         endif
@@ -4479,8 +4480,8 @@
       do i2 = 1, 6
         do i1 = 1, 6
           rw(i1,i2) = rb(i1,1) * ra(1,i2) + rb(i1,2) * ra(2,i2)         &
-     &    + rb(i1,3) * ra(3,i2) + rb(i1,4) * ra(4,i2)                   &
-     &    + rb(i1,5) * ra(5,i2) + rb(i1,6) * ra(6,i2)
+     &+ rb(i1,3) * ra(3,i2) + rb(i1,4) * ra(4,i2)                       &
+     &+ rb(i1,5) * ra(5,i2) + rb(i1,6) * ra(6,i2)
         enddo
       enddo
 
@@ -4489,20 +4490,20 @@
         do i3 = 1, 6
           do i1 = 1, 36
             ts(i1,i3) = tb(i1,1) * ra(1,i3) + tb(i1,2) * ra(2,i3)       &
-     &      + tb(i1,3) * ra(3,i3) + tb(i1,4) * ra(4,i3)                 &
-     &      + tb(i1,5) * ra(5,i3) + tb(i1,6) * ra(6,i3)
+     &+ tb(i1,3) * ra(3,i3) + tb(i1,4) * ra(4,i3)                       &
+     &+ tb(i1,5) * ra(5,i3) + tb(i1,6) * ra(6,i3)
           enddo
         enddo
         do i2 = 1, 6
           do i3 = i2, 6
             do i1 = 1, 6
               tw(i1,i2,i3) =                                            &
-     &        rb(i1,1) * ta(1,i2,i3) + rb(i1,2) * ta(2,i2,i3)           &
-     &        + rb(i1,3) * ta(3,i2,i3) + rb(i1,4) * ta(4,i2,i3)         &
-     &        + rb(i1,5) * ta(5,i2,i3) + rb(i1,6) * ta(6,i2,i3)         &
-     &        + ts(i1,   i2) * ra(1,i3) + ts(i1+ 6,i2) * ra(2,i3)       &
-     &        + ts(i1+12,i2) * ra(3,i3) + ts(i1+18,i2) * ra(4,i3)       &
-     &        + ts(i1+24,i2) * ra(5,i3) + ts(i1+30,i2) * ra(6,i3)
+     &rb(i1,1) * ta(1,i2,i3) + rb(i1,2) * ta(2,i2,i3)                   &
+     &+ rb(i1,3) * ta(3,i2,i3) + rb(i1,4) * ta(4,i2,i3)                 &
+     &+ rb(i1,5) * ta(5,i2,i3) + rb(i1,6) * ta(6,i2,i3)                 &
+     &+ ts(i1,   i2) * ra(1,i3) + ts(i1+ 6,i2) * ra(2,i3)               &
+     &+ ts(i1+12,i2) * ra(3,i3) + ts(i1+18,i2) * ra(4,i3)               &
+     &+ ts(i1+24,i2) * ra(5,i3) + ts(i1+30,i2) * ra(6,i3)
               tw(i1,i3,i2) = tw(i1,i2,i3)
             enddo
           enddo
@@ -4749,7 +4750,7 @@
      &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
      &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
      &orbit0(6),three,ten3m,explim
-      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+      double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
 !     if x > explim, exp(-x) is outside machine limits.
@@ -4821,11 +4822,11 @@
 !---- first-order effects.
               rho4 = rho2 * rho2
               phixx = fk * (- exkc * (xs*xs - ys*ys) / rho4             &
-     &        + exk * xs*xs / (rho2 * sx2))
+     &+ exk * xs*xs / (rho2 * sx2))
               phixy = fk * (- exkc * two * xs * ys / rho4               &
-     &        + exk * xs*ys / (rho2 * sx2))
+     &+ exk * xs*ys / (rho2 * sx2))
               phiyy = fk * (+ exkc * (xs*xs - ys*ys) / rho4             &
-     &        + exk * ys*ys / (rho2 * sx2))
+     &+ exk * ys*ys / (rho2 * sx2))
               re(2,1) = phixx
               re(2,3) = phixy
               re(4,1) = phixy
@@ -4835,17 +4836,17 @@
               if (fsec) then
                 rho6 = rho4 * rho2
                 phixxx = fk*xs * (+ exkc * (xs*xs - three*ys*ys) / rho6 &
-     &          - exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)      &
-     &          - exk * xs*xs / (two * rho2 * sx2**2))
+     &- exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
+     &- exk * xs*xs / (two * rho2 * sx2**2))
                 phixxy = fk*ys * (+ exkc * (three*xs*xs - ys*ys) / rho6 &
-     &          - exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)      &
-     &          - exk * xs*xs / (two * rho2 * sx2**2))
+     &- exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
+     &- exk * xs*xs / (two * rho2 * sx2**2))
                 phixyy = fk*xs * (- exkc * (xs*xs - three*ys*ys) / rho6 &
-     &          + exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)      &
-     &          - exk * ys*ys / (two * rho2 * sx2**2))
+     &+ exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
+     &- exk * ys*ys / (two * rho2 * sx2**2))
                 phiyyy = fk*ys * (- exkc * (three*xs*xs - ys*ys) / rho6 &
-     &          + exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)      &
-     &          - exk * ys*ys / (two * rho2 * sx2**2))
+     &+ exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
+     &- exk * ys*ys / (two * rho2 * sx2**2))
                 te(2,1,1) = phixxx
                 te(2,1,3) = phixxy
                 te(2,3,1) = phixxy
@@ -4912,10 +4913,10 @@
 
 !---- first-order effects.
             phixx = (two / r2) * (- (xs * phix + ys * phiy)             &
-     &      + fk * (one - (sy / sx) * exk))
+     &+ fk * (one - (sy / sx) * exk))
             phixy = (two / r2) * (- (xs * phiy - ys * phix))
             phiyy = (two / r2) * (+ (xs * phix + ys * phiy)             &
-     &      - fk * (one - (sx / sy) * exk))
+     &- fk * (one - (sx / sy) * exk))
             re(2,1) = phixx
             re(2,3) = phixy
             re(4,1) = phixy
@@ -4924,11 +4925,11 @@
 !---- second-order effects.
             if (fsec) then
               phixxx = (- phix - (xs * phixx + ys * phixy)              &
-     &        + fk * xs * sy * exk / sx**3) / r2
+     &+ fk * xs * sy * exk / sx**3) / r2
               phixxy = (- phiy - (xs * phixy - ys * phixx)) / r2
               phixyy = (+ phix - (xs * phiyy - ys * phixy)) / r2
               phiyyy = (+ phiy + (xs * phixy + ys * phiyy)              &
-     &        - fk * ys * sx * exk / sy**3) / r2
+     &- fk * ys * sx * exk / sy**3) / r2
               te(2,1,1) = phixxx
               te(2,1,3) = phixxy
               te(2,3,1) = phixxy
@@ -5091,4 +5092,41 @@
       call m66one(srmat)
       call dzero(stmat, 216)
 
+      end
+      subroutine tmdpdg(ftrk,orbit,fmap,rw)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose: computes the effect of the dipole edge                      *
+! Input:                                                               *
+!   ftrk         (logical) if true, track orbit.                       *
+! Output:                                                              *
+!   fmap      (logical) if true, element has a map.                    *
+!   rw(6,6)      (double)  transfer matrix.                            *
+!----------------------------------------------------------------------*
+      logical ftrk,fmap
+      double precision fint,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),       &
+     &orbit(6),node_value,zero,one
+      parameter(zero=0d0,one=1d0)
+
+      call m66one(rw)
+
+      bv0 = node_value('dipole_bv ')
+      e1 = bv0 * node_value('e1 ')
+!--- bvk applied further down
+      h = node_value('h ')
+      hgap = node_value('hgap ')
+      fint = node_value('fint ')
+      corr = (h + h) * hgap * fint
+      fmap = h .ne. zero .and. ( e1 .ne. zero .or. corr .ne. zero )
+      if (.not. fmap) return
+!          print*,"------------------------------------------ "
+!---- Fringe fields effects computed from the TWISS routine tmfrng
+!     tmfrng returns the matrix elements rw(used) and tw(unused)
+!     No radiation effects as it is a pure thin lens with no lrad
+      call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
+      if (ftrk) then
+        orbit(2) = orbit(2) + rw(2,1) * orbit(1)
+        orbit(4) = orbit(4) + rw(4,3) * orbit(3)
+      endif
+      return
       end
