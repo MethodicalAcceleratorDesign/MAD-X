@@ -118,7 +118,7 @@ int *,double *,double *,double *,double *,double *,double *);
 extern void ibs_();
 extern void micit_(double *,char *,double *,double *,double *,int *,float *,
 int *,int *,int *,int *,float *,float *,float *,float *,float *,
-float *,float *,float *,float *,float *);
+float *,float *,float *,float *,float *,int *);
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*,double*, double*, double*, double*,
                     double*, double*, double*, double*, double*); 
@@ -616,7 +616,7 @@ double* pro_correct_response_ring(int ip, int nc, int nm);
 double* pro_correct_response_line(int ip, int nc, int nm);
 
 /* C wrapper to allocate memory for Fortran77 */
-void c_micit(double *,char *,double *,double *,double *,int *,float,int,int,int);
+int c_micit(double *,char *,double *,double *,double *,int *,float,int,int,int);
 void c_haveit(double *,double *,double *,double *,int *,int,int);
 
 /* define error routines */
@@ -753,7 +753,9 @@ struct var_list* variable_list;
 
 struct orb_cor* correct_orbit; /* information and links for orbit correction */
 
-struct table* efield_table;       /* field errors in table form  */
+double corrl;                  /* global limit for orbit corrector strength  */
+
+struct table* efield_table;    /* field errors in table form  */
 FILE* fddata;
 FILE* fcdata;
 FILE* ftdata;
