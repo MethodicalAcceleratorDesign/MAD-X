@@ -138,7 +138,7 @@ extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*); 
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
-                    double*, double*); 
+                    double*, double*, double*); 
 extern void mtsimp_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*); 
 extern void pefill_(int*);
