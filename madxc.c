@@ -1,290 +1,6 @@
-void pro_correct(struct in_cmd* cmd)
-{
-  if (strcmp(cmd->tok_list->p[0], "correct") == 0)
-    {
-     correct_correct(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "usekick") == 0)
-    {
-     correct_usekick(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0)
-    {
-     correct_usemonitor(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)
-    {
-     correct_getorbit(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)
-    {
-     correct_putorbit(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "coption") == 0)
-    {
-     correct_option(cmd);
-    }
-}
-
-
-void correct_correct(struct in_cmd* cmd)
-/* Steering routine for orbit corrections */
-{
-  char rout_name[] = "correct_correct";
-
-  char  *orbtab1, *orbtab2;
-  
-
-  /* Call for one or two ring orbit correction */
-  if(command_par_value("tworing",cmd->clone)) {
-           if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) == NULL) {
-              fatal_error("Two beam correction requested but no table supplied for beam 1",orbtab1);
-           }
-           if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) == NULL) {
-              fatal_error("Two beam correction requested but no table supplied for beam 2",orbtab2);
-           }
-           printf("Want to use orbits from: %s and : %s\n",orbtab1,orbtab2);
-           correct_correct2(cmd);
-  }  else {
-           printf("Want to correct orbit of a single ring\n");                    
-           if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) != NULL) {
-              warning(" "," ");
-              warning("Single beam correction requested but beam 1 table supplied:",orbtab1);
-              warning("Requested table ignored:",orbtab1);
-              warning(" "," ");
-           }
-           if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) != NULL) {
-              warning(" "," ");
-              warning("Single beam correction requested but beam 2 table supplied:",orbtab2);
-              warning("Requested table ignored:",orbtab2);
-              warning(" "," ");
-           }
-           correct_correct1(cmd);
-  }
-}
-
-
-void correct_correct2(struct in_cmd* cmd)
-/* Steering routine for orbit corrections of two beams */
-{
-  struct name_list* spos = sequences->list;
-  char rout_name[] = "correct_correct2";
-
-  struct table *twb1;
-  struct table *twb2;
-
-  int ix, im, ip, it, idrop;
-  int i,j,err,nnnseq;
-  int pos;
-  int imon, icor;
-  int ncorr, nmon;
-  int niter;
-  int resout;
-  int twism;
-  struct timeb tp;
-  int ifail, sflag, svdflg;
-  float  rms;
-  double rrms;
-  double tmp1, tmp2, tmp3, tmp4;
-  double  sigcut;            /* number of sigmas (normalized) for filter cut */
-  char    *clist, *mlist;    /* file names for monitor and corrector output */
-  char    clist1[100], clist2[100];   /* file names for corrector output ring 1 and ring 2 */
-  double  *dmat = {NULL};    /* response matrix, double precision */
-  double  *corvec, *monvec;  /* vectors to hold measured orbit and correctors */
-  double  *resvec;           /* vector to hold corrected orbit */
-  char    *conm;             /* vector to hold corrector names (for MICADO) */
-  int     *sing;             /* array to store pointer to singular correctors */
-  static int     *nm, *nx, *nc;
-  struct id_mic2  *c, *m;
-
-  strcpy(clist1,"\0");
-  strcpy(clist2,"\0");
-
-  printf("for two beam orbit corrections ...\n");
-  ip = pro_correct_getcommands(cmd);
-  im = correct2_gettables(ip,cmd);
-  ncorr = im%10000; nmon  = im/10000;
-  printf("%d monitors and %d correctors found in input\n",nmon,ncorr);
-  if(nmon == 0) {
-    printf("No monitor found in input, no correction done\n");
-    return;
-  }
-  if(ncorr == 0) {
-    printf("No corrector found in input, no correction done\n");
-    return;
-  }
-
-
-
-  /* For debugging set output buffer to zero */
-  if (get_option("debug"))  setbuf(stdout,NULL);
-
-
-  /* Prepare file descriptors for the output */
-  if((resout = command_par_value("resout",cmd->clone)) > 0) {
-     if(fddata == NULL) {
-        if((fddata = fopen("corr.out","w")) == NULL)
-           exit(99);
-     }
-     if(fcdata == NULL) {
-        if((fcdata = fopen("stren.out","w")) == NULL)
-           exit(99);
-     }
-     if(fgdata == NULL) {
-        if((fgdata = fopen("plot.orb","w")) == NULL)
-           exit(99);
-     }
-  }
-
-
-  /* If only Twiss summary is required prepare and write it */
-  if((twism = command_par_value("twissum",cmd->clone)) > 0) {
-     if(ftdata == NULL) {
-        if((ftdata = fopen("twiss.summ","w")) == NULL)
-           exit(99);
-     }
-     j = 1;
-     if((nnnseq = get_variable("n")) == 0) {
-         nnnseq = twism;
-     }
-     err = double_from_table("summ", "xcomax",&j,&tmp1);
-     err = double_from_table("summ", "xcorms",&j,&tmp2);
-     err = double_from_table("summ", "ycomax",&j,&tmp3);
-     err = double_from_table("summ", "ycorms",&j,&tmp4);
-     fprintf(ftdata," T: %d %e %e %e %e\n",nnnseq,tmp1,tmp2,tmp3,tmp4);
-     return;
-  }
-
-  /* allocate vectors used by correction algorithms */
-  nx  = (int *)mycalloc("correct_correct2_nx",ncorr,sizeof(int));
-  nc  = (int *)mycalloc("correct_correct2_nc",ncorr,sizeof(int));
-  nm  = (int *)mycalloc("correct_correct2_nm",nmon,sizeof(int));
-  sing = (int *)mycalloc("correct_correct2_sing",ncorr*2,sizeof(int));
-  corvec = (double *)mycalloc("correct_correct2_corvec",ncorr,sizeof(double));
-  monvec = (double *)mycalloc("correct_correct2_monvec",nmon,sizeof(double));
-  resvec = (double *)mycalloc("correct_correct2_resvec",nmon,sizeof(double));
-  conm = (char *)mycalloc("correct_correct2_conm",ncorr*16,sizeof(char));
-
-  /* get original settings of correctors from input Twiss-table */
-  it = pro_correct2_getcorrs(cmd);
-  /* get input orbit, default is from input Twiss-table */
-  it = pro_correct2_getorbit(cmd);
-
-
-  /* find and prepare enabled correctors and monitors, may be repeated */
-  ix = pro_correct2_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-  icor = ix%10000; imon  = ix/10000;
-  printf("%d monitors and %d correctors enabled\n",imon,icor);
-
-
-    if (get_option("debug")) {
-  for (i=0;i<icor;i++) {
-    printf("C: %d %d \n",nx[i],nc[i]);
-  }
-  for (i=0;i<imon;i++) {
-    printf("M: %d %e \n",nm[i],monvec[i]);
-  }
-  }
-
-  if(strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
-    if(dmat != NULL) myfree(rout_name,dmat);
-    /* icor and imon used to set up correct matrix size !! */
-    dmat = (double *)pro_correct2_response_ring(ip,icor,imon);
-  }
-  else { printf("INVALID MACHINE TYPE\n"); exit(-1);
-  }
-
-  /* MICADO correction, get desired number of correctors from command */
-  corrl = command_par_value("corrlim",cmd->clone);
-  set_variable("corrlim",&corrl);
-  if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
-    printf("enter MICADO correction ...\n");
-    if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
-          printf("Requested %d correctors (???) set to %d\n",niter,icor);
-          niter = icor;
-    }
-    else if((niter = command_par_value("ncorr",cmd->clone)) < 0) {
-          printf("Requested %d correctors (???) set to 0\n",niter);
-          niter = 0;
-    }
-    else if((niter = command_par_value("ncorr",cmd->clone)) > icor) {
-          printf("Fewer correctors available than requested by ncorr\n");
-          printf("you want %d,  you get %d\n",niter,icor);
-          printf("ncorr reset to %d\n",icor);
-          niter = icor;
-    }
-    rms  = 1000.0*command_par_value("error",cmd->clone);
-    /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
-    /* printf("Time before micado:  %-6.3f\n",fextim());  */
-    ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
-    printf("Back from micado %d\n",ifail);
-    rrms = crms(monvec,imon);
-    printf("RMS before %e\n",rrms);
-    rrms = crms(resvec,imon);
-    printf("RMS after  %e\n",rrms);
-    for (i=0; i<nmon; i++) {
-       fprintf(fgdata,"%e %e \n",monvec[i],resvec[i]);
-    }
-/*
-    for (i=0; i<nmon; i++) {
-       printf("monvec: %d %e \n",i,monvec[i]);
-    }
-    printf("\n");
-    for (i=0; i<nmon; i++) {
-       printf("resvec: %d %e \n",i,resvec[i]);
-    }
-    m = correct_orbit12->mon_table;
-    for (i=0; i<nmon; i++) {
-       printf("resvec: %s %e \n",m[nm[i]].p_node->name,resvec[i]);
-    }
-    printf("\n");
-    for (i=0; i<ncorr; i++) {
-       printf("corvec: %d %e \n",i,corvec[i]);
-    }
-    printf("\n");
-*/
-
-    c = correct_orbit12->cor_table;
-    for(i=0;i<icor;i++) {
-       printf("%s %e\n",c[nc[i]].p_node->name,corvec[nx[i]-1]);
-    }
-    printf("\n");
- 
-    /* printf("Time after micado:  %-6.3f\n",fextim());   */
-    if(ifail != 0) {
-       printf("MICADO correction completed with error code %d\n\n",ifail);
-    }
-    if(ifail == 0) {
-       pro_correct2_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
-    }
-  }
- 
-  /* write corrector output to tfs table */
-  if ((clist = command_par_string("clist",cmd->clone)) != NULL) {
-    strcat(clist1,clist);
-    strcat(clist1,"_1");
-    strcat(clist2,clist);
-    strcat(clist2,"_2");
-    out_table("corr1",corr_table1,clist1);
-    out_table("corr2",corr_table2,clist2);
-  }
-
-  /* write monitor output to tfs table */
-  if ((mlist = command_par_string("mlist",cmd->clone)) != NULL) {
-    out_table("mon",mon_table,mlist);
-  }
-
-
-  /* Clean up at the end of the module */
-   
-  myfree(rout_name,nm);myfree(rout_name,dmat);myfree(rout_name,nx);
-  myfree(rout_name,nc);myfree(rout_name,corvec);
-  myfree(rout_name,monvec);myfree(rout_name,resvec); myfree(rout_name,conm);
-   
-  return;
-
-}
-
+void setupi_(int*, int*, int*, int*, int*, int*);
+void primat_(int*, int*, int*);
+void prdmat_(double*, int*, int*);
 int  correct2_gettables(int iplane, struct in_cmd* cmd)
 {
 
@@ -508,20 +224,20 @@ int  correct2_gettables(int iplane, struct in_cmd* cmd)
   mon_l12--; mon_l12->next = NULL;
   cor_l12--; cor_l12->next = NULL;
 
-  printf("mons and corrs (beam 1)   : %ld %ld\n",cntm1, cntc1);
-  printf("mons and corrs (beam 2)   : %ld %ld\n",cntm2, cntc2);
-  printf("mons and corrs (beam 1+2) : %ld %ld\n",cntm12, cntc12);
+  printf("mons and corrs (beam 1)   : %ld %ld\n",(long int)cntm1, (long int)cntc1);
+  printf("mons and corrs (beam 2)   : %ld %ld\n",(long int)cntm2, (long int)cntc2);
+  printf("mons and corrs (beam 1+2) : %ld %ld\n",(long int)cntm12, (long int)cntc12);
 
     if (get_option("debug")) {
      prt = correct_orbit12->mon_table;
      while(prt != NULL) {
-       printf("Monitors beam12: %s %ld %ld\n",prt->p_node->name,prt->id_ttb[0],prt->id_ttb[1]);
+       printf("Monitors beam12: %s %ld %ld\n",prt->p_node->name,(long int)prt->id_ttb[0],(long int)prt->id_ttb[1]);
        prt = prt->next;
      }
 
      prt = correct_orbit12->cor_table;
      while(prt != NULL) {
-       printf("Correctors beam12: %s %ld %ld\n",prt->p_node->name,prt->id_ttb[0],prt->id_ttb[1]);
+       printf("Correctors beam12: %s %ld %ld\n",prt->p_node->name,(long int)prt->id_ttb[0],(long int)prt->id_ttb[1]);
        prt = prt->next;
      }
     }
@@ -569,12 +285,15 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
 {
   struct name_list* nl;
   int i;
-  int pos, pps, ppt;
+  int pos;
   struct id_mic2 *m;  /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
   double xlimit;
 
+/*
+  int pps, ppt;
+*/
   da1 = twiss_table_beam1->d_cols;
   da2 = twiss_table_beam2->d_cols;
 
@@ -626,8 +345,10 @@ int pro_correct2_getcorrs(struct in_cmd* cmd)
   struct id_mic2 *c;  /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
-  double xlimit;
 
+/*
+  double xlimit;
+*/
   da1 = twiss_table_beam1->d_cols;
   da2 = twiss_table_beam2->d_cols;
 
@@ -700,13 +421,308 @@ int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, do
   return(10000*imon + icor);
 }
 
+void pro_correct(struct in_cmd* cmd)
+{
+  if (strcmp(cmd->tok_list->p[0], "correct") == 0)
+    {
+     correct_correct(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "usekick") == 0)
+    {
+     correct_usekick(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0)
+    {
+     correct_usemonitor(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)
+    {
+     correct_getorbit(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)
+    {
+     correct_putorbit(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "coption") == 0)
+    {
+     correct_option(cmd);
+    }
+}
+
+
+void correct_correct(struct in_cmd* cmd)
+/* Steering routine for orbit corrections */
+{
+/*
+  char rout_name[] = "correct_correct";
+*/
+  char  *orbtab1, *orbtab2;
+  
+
+  /* Call for one or two ring orbit correction */
+  if(command_par_value("tworing",cmd->clone)) {
+           if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) == NULL) {
+              fatal_error("Two beam correction requested but no table supplied for beam 1",orbtab1);
+           }
+           if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) == NULL) {
+              fatal_error("Two beam correction requested but no table supplied for beam 2",orbtab2);
+           }
+           printf("Want to use orbits from: %s and : %s\n",orbtab1,orbtab2);
+           correct_correct2(cmd);
+  }  else {
+           printf("Want to correct orbit of a single ring\n");                    
+           if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) != NULL) {
+              warning(" "," ");
+              warning("Single beam correction requested but beam 1 table supplied:",orbtab1);
+              warning("Requested table ignored:",orbtab1);
+              warning(" "," ");
+           }
+           if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) != NULL) {
+              warning(" "," ");
+              warning("Single beam correction requested but beam 2 table supplied:",orbtab2);
+              warning("Requested table ignored:",orbtab2);
+              warning(" "," ");
+           }
+           correct_correct1(cmd);
+  }
+}
+
+
+void correct_correct2(struct in_cmd* cmd)
+/* Steering routine for orbit corrections of two beams */
+{
+  char rout_name[] = "correct_correct2";
+
+/*
+  struct name_list* spos = sequences->list;
+  struct table *twb1;
+  struct table *twb2;
+  int idrop;
+  int pos;
+  struct timeb tp;
+  int sflag, svdflg;
+  double  sigcut;   
+  struct id_mic2  *m;
+*/
+
+  int ix, im, ip, it;
+  int i,j,err,nnnseq;
+  int imon, icor;
+  int ncorr, nmon;
+  int niter;
+  int resout;
+  int twism;
+  int ifail;
+  float  rms;
+  double rrms;
+  double tmp1, tmp2, tmp3, tmp4;
+  char    *clist, *mlist;    /* file names for monitor and corrector output */
+  char    clist1[100], clist2[100];   /* file names for corrector output ring 1 and ring 2 */
+  double  *dmat = {NULL};    /* response matrix, double precision */
+  double  *corvec, *monvec;  /* vectors to hold measured orbit and correctors */
+  double  *resvec;           /* vector to hold corrected orbit */
+  char    *conm;             /* vector to hold corrector names (for MICADO) */
+  int     *sing;             /* array to store pointer to singular correctors */
+  static int     *nm, *nx, *nc;
+  struct id_mic2  *c;
+
+  strcpy(clist1,"\0");
+  strcpy(clist2,"\0");
+
+  printf("for two beam orbit corrections ...\n");
+  ip = pro_correct_getcommands(cmd);
+  im = correct2_gettables(ip,cmd);
+  ncorr = im%10000; nmon  = im/10000;
+  printf("%d monitors and %d correctors found in input\n",nmon,ncorr);
+  if(nmon == 0) {
+    printf("No monitor found in input, no correction done\n");
+    return;
+  }
+  if(ncorr == 0) {
+    printf("No corrector found in input, no correction done\n");
+    return;
+  }
+
+
+
+  /* For debugging set output buffer to zero */
+  if (get_option("debug"))  setbuf(stdout,NULL);
+
+
+  /* Prepare file descriptors for the output */
+  if((resout = command_par_value("resout",cmd->clone)) > 0) {
+     if(fddata == NULL) {
+        if((fddata = fopen("corr.out","w")) == NULL)
+           exit(99);
+     }
+     if(fcdata == NULL) {
+        if((fcdata = fopen("stren.out","w")) == NULL)
+           exit(99);
+     }
+     if(fgdata == NULL) {
+        if((fgdata = fopen("plot.orb","w")) == NULL)
+           exit(99);
+     }
+  }
+
+
+  /* If only Twiss summary is required prepare and write it */
+  if((twism = command_par_value("twissum",cmd->clone)) > 0) {
+     if(ftdata == NULL) {
+        if((ftdata = fopen("twiss.summ","w")) == NULL)
+           exit(99);
+     }
+     j = 1;
+     if((nnnseq = get_variable("n")) == 0) {
+         nnnseq = twism;
+     }
+     err = double_from_table("summ", "xcomax",&j,&tmp1);
+     err = double_from_table("summ", "xcorms",&j,&tmp2);
+     err = double_from_table("summ", "ycomax",&j,&tmp3);
+     err = double_from_table("summ", "ycorms",&j,&tmp4);
+     fprintf(ftdata," T: %d %e %e %e %e\n",nnnseq,tmp1,tmp2,tmp3,tmp4);
+     return;
+  }
+
+  /* allocate vectors used by correction algorithms */
+  nx  = (int *)mycalloc("correct_correct2_nx",ncorr,sizeof(int));
+  nc  = (int *)mycalloc("correct_correct2_nc",ncorr,sizeof(int));
+  nm  = (int *)mycalloc("correct_correct2_nm",nmon,sizeof(int));
+  sing = (int *)mycalloc("correct_correct2_sing",ncorr*2,sizeof(int));
+  corvec = (double *)mycalloc("correct_correct2_corvec",ncorr,sizeof(double));
+  monvec = (double *)mycalloc("correct_correct2_monvec",nmon,sizeof(double));
+  resvec = (double *)mycalloc("correct_correct2_resvec",nmon,sizeof(double));
+  conm = (char *)mycalloc("correct_correct2_conm",ncorr*16,sizeof(char));
+
+  /* get original settings of correctors from input Twiss-table */
+  it = pro_correct2_getcorrs(cmd);
+  /* get input orbit, default is from input Twiss-table */
+  it = pro_correct2_getorbit(cmd);
+
+
+  /* find and prepare enabled correctors and monitors, may be repeated */
+  ix = pro_correct2_getactive(ip, nm, nx, nc, corvec, monvec, conm);
+  icor = ix%10000; imon  = ix/10000;
+  printf("%d monitors and %d correctors enabled\n",imon,icor);
+
+
+    if (get_option("debug")) {
+  for (i=0;i<icor;i++) {
+    printf("C: %d %d \n",nx[i],nc[i]);
+  }
+  for (i=0;i<imon;i++) {
+    printf("M: %d %e \n",nm[i],monvec[i]);
+  }
+  }
+
+  if(strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
+    if(dmat != NULL) myfree(rout_name,dmat);
+    /* icor and imon used to set up correct matrix size !! */
+    dmat = (double *)pro_correct2_response_ring(ip,icor,imon);
+  }
+  else { printf("INVALID MACHINE TYPE\n"); exit(-1);
+  }
+
+  /* MICADO correction, get desired number of correctors from command */
+  corrl = command_par_value("corrlim",cmd->clone);
+  set_variable("corrlim",&corrl);
+  if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
+    printf("enter MICADO correction ...\n");
+    if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
+          printf("Requested %d correctors (\?\?\?) set to %d\n",niter,icor);
+          niter = icor;
+    }
+    else if((niter = command_par_value("ncorr",cmd->clone)) < 0) {
+          printf("Requested %d correctors (\?\?\?) set to 0\n",niter);
+          niter = 0;
+    }
+    else if((niter = command_par_value("ncorr",cmd->clone)) > icor) {
+          printf("Fewer correctors available than requested by ncorr\n");
+          printf("you want %d,  you get %d\n",niter,icor);
+          printf("ncorr reset to %d\n",icor);
+          niter = icor;
+    }
+    rms  = 1000.0*command_par_value("error",cmd->clone);
+    /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
+    /* printf("Time before micado:  %-6.3f\n",fextim());  */
+    ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
+    printf("Back from micado %d\n",ifail);
+    rrms = crms(monvec,imon);
+    printf("RMS before %e\n",rrms);
+    rrms = crms(resvec,imon);
+    printf("RMS after  %e\n",rrms);
+    for (i=0; i<nmon; i++) {
+       fprintf(fgdata,"%e %e \n",monvec[i],resvec[i]);
+    }
+/*
+    for (i=0; i<nmon; i++) {
+       printf("monvec: %d %e \n",i,monvec[i]);
+    }
+    printf("\n");
+    for (i=0; i<nmon; i++) {
+       printf("resvec: %d %e \n",i,resvec[i]);
+    }
+    m = correct_orbit12->mon_table;
+    for (i=0; i<nmon; i++) {
+       printf("resvec: %s %e \n",m[nm[i]].p_node->name,resvec[i]);
+    }
+    printf("\n");
+    for (i=0; i<ncorr; i++) {
+       printf("corvec: %d %e \n",i,corvec[i]);
+    }
+    printf("\n");
+*/
+
+    c = correct_orbit12->cor_table;
+    for(i=0;i<icor;i++) {
+       printf("%s %e\n",c[nc[i]].p_node->name,corvec[nx[i]-1]);
+    }
+    printf("\n");
+ 
+    /* printf("Time after micado:  %-6.3f\n",fextim());   */
+    if(ifail != 0) {
+       printf("MICADO correction completed with error code %d\n\n",ifail);
+    }
+    if(ifail == 0) {
+       pro_correct2_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+    }
+  }
+ 
+  /* write corrector output to tfs table */
+  if ((clist = command_par_string("clist",cmd->clone)) != NULL) {
+    strcat(clist1,clist);
+    strcat(clist1,"_1");
+    strcat(clist2,clist);
+    strcat(clist2,"_2");
+    out_table("corr1",corr_table1,clist1);
+    out_table("corr2",corr_table2,clist2);
+  }
+
+  /* write monitor output to tfs table */
+  if ((mlist = command_par_string("mlist",cmd->clone)) != NULL) {
+    out_table("mon",mon_table,mlist);
+  }
+
+
+  /* Clean up at the end of the module */
+   
+  myfree(rout_name,nm);myfree(rout_name,dmat);myfree(rout_name,nx);
+  myfree(rout_name,nc);myfree(rout_name,corvec);
+  myfree(rout_name,monvec);myfree(rout_name,resvec); myfree(rout_name,conm);
+   
+  return;
+
+}
+
 double* pro_correct2_response_ring(int ip, int nc, int nm)
 {
   int    ic, im;
   struct id_mic2 *m, *c;  /* access to tables for monitors and correctors */
-
+/*
   struct table *ttb1;
   struct table *ttb2;
+  int    c1p, c2p;
+*/
   double **da1;
   double **da2;
   double bx_c,by_c,pix_c,piy_c;
@@ -716,7 +732,7 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
   double respx, respy;
   double *dmat;
   int  *imat;
-  int    mp, c1p, c2p;
+  int    mp;
   int    i_zero, i_one;
   int icb;
   int    i, j;
@@ -996,13 +1012,12 @@ void correct_correct1(struct in_cmd* cmd)
 {
   char rout_name[] = "correct_correct";
   int ix, im, ip, it, idrop;
-  int i,j,err,nnnseq;
+  int j,err,nnnseq;
   int imon, icor;
   int ncorr, nmon;
   int niter;
   int resout;
   int twism;
-  struct timeb tp;
   int ifail, sflag, svdflg;
   float  rms;
   double tmp1, tmp2, tmp3, tmp4;
@@ -1166,11 +1181,11 @@ void correct_correct1(struct in_cmd* cmd)
   if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
     printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
-          printf("Requested %d correctors (???) set to %d\n",niter,icor);
+          printf("Requested %d correctors (\?\?\?) set to %d\n",niter,icor);
           niter = icor;
     }
     else if((niter = command_par_value("ncorr",cmd->clone)) < 0) {
-          printf("Requested %d correctors (???) set to 0\n",niter);
+          printf("Requested %d correctors (\?\?\?) set to 0\n",niter);
           niter = 0;
     }
     else if((niter = command_par_value("ncorr",cmd->clone)) > icor) {
@@ -1314,7 +1329,7 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
          exit(81);
        } else {
          if (get_option("debug")) {
-            printf("TWISS table: %ld\n",twiss_table);
+            printf("TWISS table: %ld\n",(long int)twiss_table);
          }
        }
        pps = -1;
@@ -1351,7 +1366,7 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
          exit(81);
        } else {
          if (get_option("debug")) {
-            printf("TWISS table: %ld\n",twiss_table);
+            printf("TWISS table: %ld\n",(long int)twiss_table);
          }
        }
        ppt = -1;
@@ -1361,7 +1376,7 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
 
        if (get_option("debug")) {
             printf("The tables are: %ld %ld %ld %ld\n",
-                    orbin_table,twiss_table,target_table,model_table);
+                   (long int) orbin_table,(long int)twiss_table,(long int)target_table,(long int)model_table);
        }
 
   if(correct_orbit == NULL) {
@@ -1430,7 +1445,7 @@ int pro_correct_getorbit(struct in_cmd* cmd)
   struct name_list* nl;
   int i;
   char *tartab;
-  int pos, pps, ppt;
+  int pos;
   struct id_mic *m;  /* access to tables for monitors and correctors */
   struct table *ttb;
   struct table *tar;
@@ -1614,17 +1629,15 @@ void pro_correct_write_cocu_table()
 int pro_correct_filter(int iplane, double sigcut)
 {
   int    ic, im, ip, icnt;
-  struct id_mic *m, *c;  /* access to tables for monitors and correctors */
+  struct id_mic *m;  /* access to tables for monitors and correctors */
 
   struct table *ttb;
   static char  pl[2] = "xy";
   double **da1;
-  double bx_m,by_m;
-  double xsig, ysig;
+  double bx_m;
+  double xsig;
   double xmea, ymea;
-  double xlim, ylim;
   double xn;
-  double *dmat;
 
   ttb = model_table;
   da1 = ttb->d_cols;
@@ -1866,7 +1879,6 @@ void pro_correct_make_corr_table()
 void pro_correct2_make_corr_table()
 {
   struct id_mic2 *ttb;
-  int j;
   static char atm[5][4] = {"hmon","vmon","hkic","vkic","kick"};
 
   ttb = correct_orbit12->cor_table;
@@ -1910,7 +1922,6 @@ void pro_correct_make_mon_table()
 void pro_correct2_make_mon_table()
 {
   struct id_mic2 *ttb;
-  int j;
   static char atm[3][4] = {"hmon","vmon","moni"};
 
   ttb = correct_orbit12->mon_table;
@@ -2309,7 +2320,6 @@ void c_haveit(double *dmat,double *monvec,double *corvec,double *resvec,int *nx,
 int  c_svddec(double *dmat, int imon, int icor, int *sing)
 {
   char rout_name[] = "c_svddev";
-  int    i;
   int    flag;
   int    dbg;
 
@@ -2347,7 +2357,6 @@ int  c_svddec(double *dmat, int imon, int icor, int *sing)
 int  c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int imon, int icor)
 {
   char rout_name[] = "c_svdcorr";
-  int    i;
   int    flag;
   int    dbg;
 

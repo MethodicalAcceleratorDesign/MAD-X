@@ -1,3 +1,5 @@
+void mtsa_(int*, int*, double*, int*, int*, double*, double*, int*, int*,
+           double*, int*, double*, double*, double*, double*, double*);
 void match_action(struct in_cmd* cmd)
 {
   int i;
