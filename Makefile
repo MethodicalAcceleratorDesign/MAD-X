@@ -48,8 +48,8 @@ plotp.o: plot.f
 trrunp.o: trrun.f
 	$(FC) $(FCP) -c -o trrunp.o trrun.f
 
-orbfp.o: orbf.f
-	$(FC) $(FCP) -c -o orbfp.o orbf.f
+orbfp.o: orbf.fpp
+	$(FC) $(FCP) -c -o orbfp.o orbf.fpp
 
 matchp.o: match.f
 	$(FC) $(FCP) -c -o matchp.o match.f
