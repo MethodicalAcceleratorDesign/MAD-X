@@ -176,7 +176,7 @@ int corr_table_types[] =
 
 char corr_table_cols[][TABLE_KEY] =
 {
-  "name", "px(old)", "py(old)", "px(new)", "py(new)",
+  "name", "px(old)", "py(old)", "px(correction)", "py(correction)",
 " "  /* blank terminates */
 };
 
