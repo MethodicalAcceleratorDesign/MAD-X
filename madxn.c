@@ -2128,8 +2128,13 @@ void exec_option()
 
 void exec_plot(struct in_cmd* cmd)
 {
-  int ierr, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
-  char* pt = title;
+  int ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
+  int nointerp = 0, s_haxis = 1;
+  char* pt = title, *haxis_name;
+  struct command* emit = cmd->clone;
+  struct name_list* nl_plot;
+  struct command_parameter_list* pl_plot;
+  char *table_name, *last_twiss_table;
 
   /* use correct beam for sequence to be plotted - HG 031127 */
   struct command* keep_beam = current_beam;
@@ -2137,6 +2142,39 @@ void exec_plot(struct in_cmd* cmd)
      fatal_error("TWISS - sequence without beam:", current_sequ->name);
   /* end part1 of HG 031127 */
 
+  /* Check table name is the same as in the last twiss command */
+  if (this_cmd != NULL && this_cmd->clone != NULL)
+    {
+      nl_plot = this_cmd->clone->par_names;
+      pl_plot = this_cmd->clone->par;
+      pos = name_list_pos("nointerp", nl_plot);
+      nointerp = nl_plot->inform[pos];
+      pos = name_list_pos("haxis", nl_plot);
+      if(nl_plot->inform[pos]) 
+	{
+	  if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
+		haxis_name = pl_plot->parameters[pos]->call_def->string;
+	  s_haxis = strcmp(haxis_name,"s"); 
+	}
+
+      if(nointerp == 0 && s_haxis == 0) 
+	{
+	  pos = name_list_pos("table", nl_plot);
+	  if(nl_plot->inform[pos]) /* table name specified - overrides save */
+	    {
+	      if ((table_name = pl_plot->parameters[pos]->string) == NULL)
+		table_name = pl_plot->parameters[pos]->call_def->string;
+	    }
+	  else table_name = "twiss";
+	  last_twiss_table = current_sequ->tw_table->name;
+	  if(strcmp(table_name,last_twiss_table) != 0)
+	    {
+	      printf("Table attribute in plot command is obsolete. Table name is automatically changed to %s \n",last_twiss_table );
+	      if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
+		pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
+	    }
+	}
+    }
   embedded_twiss_cmd = cmd;
 
  /* <JMJ 7/11/2002> The following ifndef exclusion is a quick fix so that
@@ -2990,9 +3028,9 @@ void madx_finish()
   if (final_message == 0)
     {
      final_message = 1;
-#ifndef _WIN32
+ /* should work with Lahey on windows 24.03.2004 */
      if (plots_made) gxterm_();
-#endif
+
      if (get_option("trace")) time_stamp("end");
      printf("\n  ++++++++++++++++++++++++++++++++\n");
      printf("  + %s finished normally +\n", myversion);
@@ -5845,12 +5883,15 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
+  struct table* twiss_tb;
+  struct table* keep_table;
   char *filename, *name, *table_name, *sector_name, *string;
+  char *table_embedded_name;
   double tol,tol_keep;
   double betx,bety,alfx,mux,alfy,muy,x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,
          phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
          r11,r12,r21,r22,s;
-  int i, j, l, lp, k_orb, u_orb, pos, k = 1; 
+  int i, j, jt, l, lp, k_orb, u_orb, pos, k = 1; 
   int ks, w_file, beta_def, err = 0, inval = 1;
   int keep_info = get_option("info");
 
@@ -5880,8 +5921,10 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   if(get_option("twiss_print")) fprintf(prt_file, "enter Twiss module\n");
   if (attach_beam(current_sequ) == 0)
     fatal_error("TWISS - sequence without beam:", current_sequ->name);
-  pos = name_list_pos("table", nl);
-  table_name = "embedded_twiss_table";
+
+  table_name = current_sequ->tw_table->name;
+  table_embedded_name = "embedded_twiss_table";
+
   if ((ks = get_value(current_command->name,"sectormap")) != 0)
     {
      set_option("twiss_sector", &k);
@@ -5895,8 +5938,10 @@ void pro_embedded_twiss(struct command* current_global_twiss)
      if ((sec_file = fopen(sector_name, "w")) == NULL)
           fatal_error("cannot open output file:", sector_name);
     }
+
   use_range[0] = current_sequ->range_start;
   use_range[1] = current_sequ->range_end;
+
   if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
     {
      if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
@@ -5906,9 +5951,22 @@ void pro_embedded_twiss(struct command* current_global_twiss)
        }
      else warning("illegal range ignored:", pl->parameters[pos]->string);
     }
+
   for (j = 0; j < current_sequ->n_nodes; j++)
     {
      if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
+    }
+
+  /* Find index to the twiss table */
+
+  if((pos = name_list_pos(table_name, table_register->names)) > -1)
+    {
+      twiss_tb = table_register->tables[pos];
+      if (twiss_tb->origin ==1) return; /* table is read, has no node pointers */
+      for (jt = 0; jt < twiss_tb->curr; jt++)
+	{
+	  if (twiss_tb->p_nodes[jt] == current_sequ->range_start) break;
+	}
     }
   if((pos = name_list_pos("useorbit", nl)) > -1 &&nl->inform[pos])
     /* orbit specified */
@@ -5922,15 +5980,6 @@ void pro_embedded_twiss(struct command* current_global_twiss)
             warning("orbit not found, ignored: ", name);
         else set_option("useorbit", &k);
        }
-    }
-  pos = name_list_pos("centre", nl);
-  if(nl->inform[pos]) 
-    set_option("centre", &k);
-  else
-    {
-      k = 0;
-      set_option("centre", &k);
-      k = 1;
     }
   pos = name_list_pos("keeporbit", nl);
   if(nl->inform[pos]) /* orbit specified */
@@ -5997,42 +6046,43 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   /* Read Twiss parameters */
 
   current_twiss = current_global_twiss;
-   
-  /*j is the row number of previous element*/
-  if (j <= 0) err = 1;
+
+  /*jt is the row number of previous element*/
+
+  if (jt <= 0) err = 1;
   if (err == 0)
     { 
-      err = double_from_table("twiss", "betx", &j, &betx);
-      err = double_from_table("twiss", "bety", &j, &bety);
-      err = double_from_table("twiss", "alfx", &j, &alfx);
-      err = double_from_table("twiss", "mux", &j, &mux);
-      err = double_from_table("twiss", "alfy", &j, &alfy);
-      err = double_from_table("twiss", "muy", &j, &muy);
-      err = double_from_table("twiss", "x", &j, &x);
-      err = double_from_table("twiss", "px", &j, &px);
-      err = double_from_table("twiss", "y", &j, &y);
-      err = double_from_table("twiss", "py", &j, &py);
-      err = double_from_table("twiss", "t", &j, &t);
-      err = double_from_table("twiss", "pt", &j, &pt);
-      err = double_from_table("twiss", "dx", &j, &dx);
-      err = double_from_table("twiss", "dpx", &j, &dpx);
-      err = double_from_table("twiss", "dy", &j, &dy);
-      err = double_from_table("twiss", "dpy", &j, &dpy);
-      err = double_from_table("twiss", "wx", &j, &wx);
-      err = double_from_table("twiss", "phix", &j, &phix);
-      err = double_from_table("twiss", "dmux", &j, &dmux);
-      err = double_from_table("twiss", "wy", &j, &wy);
-      err = double_from_table("twiss", "phiy", &j, &phiy);
-      err = double_from_table("twiss", "dmuy", &j, &dmuy);
-      err = double_from_table("twiss", "ddx", &j, &ddx);
-      err = double_from_table("twiss", "ddpx", &j, &ddpx);
-      err = double_from_table("twiss", "ddy", &j, &ddy);
-      err = double_from_table("twiss", "ddpy", &j, &ddpy);
-      err = double_from_table("twiss", "r11",&j, &r11);
-      err = double_from_table("twiss", "r12",&j, &r12);
-      err = double_from_table("twiss", "r21",&j, &r21);
-      err = double_from_table("twiss", "r22",&j, &r22);
-      err = double_from_table("twiss", "s",&j, &s);
+      err = double_from_table(table_name, "betx", &jt, &betx);
+      err = double_from_table(table_name, "bety", &jt, &bety);
+      err = double_from_table(table_name, "alfx", &jt, &alfx);
+      err = double_from_table(table_name, "mux", &jt, &mux);
+      err = double_from_table(table_name, "alfy", &jt, &alfy);
+      err = double_from_table(table_name, "muy", &jt, &muy);
+      err = double_from_table(table_name, "x", &jt, &x);
+      err = double_from_table(table_name, "px", &jt, &px);
+      err = double_from_table(table_name, "y", &jt, &y);
+      err = double_from_table(table_name, "py", &jt, &py);
+      err = double_from_table(table_name, "t", &jt, &t);
+      err = double_from_table(table_name, "pt", &jt, &pt);
+      err = double_from_table(table_name, "dx", &jt, &dx);
+      err = double_from_table(table_name, "dpx", &jt, &dpx);
+      err = double_from_table(table_name, "dy", &jt, &dy);
+      err = double_from_table(table_name, "dpy", &jt, &dpy);
+      err = double_from_table(table_name, "wx", &jt, &wx);
+      err = double_from_table(table_name, "phix", &jt, &phix);
+      err = double_from_table(table_name, "dmux", &jt, &dmux);
+      err = double_from_table(table_name, "wy", &jt, &wy);
+      err = double_from_table(table_name, "phiy", &jt, &phiy);
+      err = double_from_table(table_name, "dmuy", &jt, &dmuy);
+      err = double_from_table(table_name, "ddx", &jt, &ddx);
+      err = double_from_table(table_name, "ddpx", &jt, &ddpx);
+      err = double_from_table(table_name, "ddy", &jt, &ddy);
+      err = double_from_table(table_name, "ddpy", &jt, &ddpy);
+      err = double_from_table(table_name, "r11",&jt, &r11);
+      err = double_from_table(table_name, "r12",&jt, &r12);
+      err = double_from_table(table_name, "r21",&jt, &r21);
+      err = double_from_table(table_name, "r22",&jt, &r22);
+      err = double_from_table(table_name, "s",&jt, &s);
 
   /* Store these Twiss parameters as initial values */
 
@@ -6104,9 +6154,9 @@ void pro_embedded_twiss(struct command* current_global_twiss)
       summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types,
                           twiss_deltas->curr+1);
       add_to_table_list(summ_table, table_register);
-      l = strlen(table_name);
+      l = strlen(table_embedded_name);
       tarr = new_int_array(l+1);
-      conv_char(table_name, tarr);
+      conv_char(table_embedded_name, tarr);
       if (get_option("twiss_sector"))
 	{
 	  reset_sector(current_sequ, 0);
@@ -6125,13 +6175,14 @@ void pro_embedded_twiss(struct command* current_global_twiss)
 
       for (i = 0; i < twiss_deltas->curr; i++)
 	{
-	  twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+	  twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
                             twiss_table_types, current_sequ->n_nodes);
 
 	  twiss_table->dynamic = 1; /* flag for table row access to current row */
 
 	  add_to_table_list(twiss_table, table_register);
-
+	  
+	  keep_table = current_sequ->tw_table;
 	  current_sequ->tw_table = twiss_table;
 
 	  twiss_table->org_sequ = current_sequ;
@@ -6149,7 +6200,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
                         current_sequ->orbits->vectors[k_orb]->a, 6);
 	      fill_twiss_header(twiss_table);
 	      if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-	      if (w_file) out_table(table_name, twiss_table, filename);
+	      if (w_file) out_table(table_embedded_name, twiss_table, filename);
 	    }
 	  else warning("Twiss failed: ", "MAD-X continues");
 
@@ -6171,7 +6222,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   set_option("couple", &k);
   set_option("chrom", &k);
   set_option("rmatrix", &k);
-  /* set_option("centre", &k);*/
+  /* set_option("centre", &k); */
   set_option("twiss_sector", &k);
   set_option("keeporbit", &k);
   set_option("useorbit", &k);
@@ -6179,7 +6230,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   set_variable("twiss_tol", &tol_keep);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
-
+  current_sequ->tw_table = keep_table;
 }
 
 int embedded_twiss()
