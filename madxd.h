@@ -757,7 +757,7 @@ void aper_read_twiss(char*, int*, double*, double*, double*,
 			double*, double*, double*, double*);
 int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
 void aper_trim_ws(char*, int);
-void aper_write_table(char*, double*, double*, double*, double*,
+void aper_write_table(char*, double*, double*, double*, double*, double*, double*,
 			   char*, double*, double*, double*, double*,
 			   double*, double*, double*, double*, double*,
 			   double*, double*, double*, double*, double*, char*);
