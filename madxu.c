@@ -130,7 +130,7 @@ void add_to_el_list( /* adds element to alphabetic element list */
     {
      if (flag > 1)
        {
-        warning("element re-definition inside sequence ignored:", (*el)->name);
+        warning("implicit element re-definition ignored:", (*el)->name);
         *el = ell->elem[pos];
        }
      else
