@@ -499,8 +499,8 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
 
   thin_elem = make_thin_elem(thick_elem->name, thin_elem_parent,
                         return_param("at",thick_elem),return_param("from",thick_elem),
-			length_param,kn_param,ks_param,return_param("apertype",thick_elem),
-			return_param("aperture",thick_elem),return_param("bv",thick_elem),
+			length_param,kn_param,ks_param,return_param_recurse("apertype",thick_elem),
+			return_param_recurse("aperture",thick_elem),return_param("bv",thick_elem),
 		        slices,slice_no);
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
