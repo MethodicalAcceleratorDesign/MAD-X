@@ -7,7 +7,7 @@ MODULE S_FIBRE_BUNDLE
   ! Implementation of abstract data type as a linked layout
   IMPLICIT NONE
 
-  PRIVATE kill_layout
+  PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   private null_it0
   private move_to_p,move_to_name,move_to_name2,move_from_to_name
@@ -17,6 +17,7 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE INDEX
   logical(lp),TARGET :: with_chart=.true.
   logical(lp),TARGET :: with_patch=.true.
+  logical(lp),TARGET :: use_info=.false.
   private zero_fibre
 
   INTEGER :: INDEX=0
@@ -29,6 +30,15 @@ MODULE S_FIBRE_BUNDLE
      logical(lp) PARENT_CHART
      logical(lp) PARENT_MAG
   END TYPE FIBRE_CLONE
+
+  type info
+     !     character(nlp),pointer :: name
+     real(sp),pointer :: s
+     real(sp),pointer ::  beta(:)
+     real(sp),pointer ::  fix0(:)
+     real(sp),pointer ::  fix(:)
+     real(sp), pointer:: pos(:)
+  END type info
 
   TYPE FIBRE
      !  BELOW ARE THE DATA CARRIED BY THE NODE
@@ -47,6 +57,7 @@ MODULE S_FIBRE_BUNDLE
      TYPE (FIBRE),POINTER ::  PARENT_PATCH
      TYPE (FIBRE),POINTER ::  PARENT_CHART
      TYPE (FIBRE),POINTER ::  PARENT_MAG
+     type(info),pointer ::i
   END TYPE FIBRE
 
   TYPE LAYOUT
@@ -66,14 +77,21 @@ MODULE S_FIBRE_BUNDLE
      TYPE (FIBRE), POINTER :: END_GROUND ! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
   END TYPE LAYOUT
 
+
   INTERFACE kill
      MODULE PROCEDURE kill_layout
      MODULE PROCEDURE dealloc_fibre
+     MODULE PROCEDURE kill_info
   END INTERFACE
 
   INTERFACE alloc
      MODULE PROCEDURE set_up
      MODULE PROCEDURE alloc_fibre
+     MODULE PROCEDURE alloc_info
+  END INTERFACE
+
+  INTERFACE copy
+     MODULE PROCEDURE copy_info
   END INTERFACE
 
   INTERFACE append
@@ -103,6 +121,44 @@ MODULE S_FIBRE_BUNDLE
 
 CONTAINS
 
+  SUBROUTINE alloc_info( c ) ! Does the full allocation of fibre and initialization of internal variables
+    implicit none
+    type(info),pointer:: c
+
+    !     allocate(c%name); c%name=' ';
+    allocate(c%s) ;c%s=0.d0;
+    allocate(c%beta(40));c%beta=0.d0;
+    allocate(c%fix(6));c%fix=0.d0;
+    allocate(c%fix0(6));c%fix0=0.d0;
+    allocate(c%pos(2));c%pos=0.d0;
+
+  end SUBROUTINE alloc_info
+
+  SUBROUTINE copy_info( c,d ) ! Does the full allocation of fibre and initialization of internal variables
+    implicit none
+    type(info) c,d
+
+    !     d%name=c%name
+    d%s=c%s
+    d%beta=c%beta
+    d%fix=c%fix
+    d%fix0=c%fix0
+    d%pos=c%pos
+
+  end SUBROUTINE copy_info
+
+  SUBROUTINE kill_info( c ) ! Does the full allocation of fibre and initialization of internal variables
+    implicit none
+    type(info),pointer:: c
+
+    !     deallocate(c%name)
+    deallocate(c%s)
+    deallocate(c%fix)
+    deallocate(c%fix0)
+    deallocate(c%beta)
+    deallocate(c%pos)
+
+  end SUBROUTINE kill_info
 
   SUBROUTINE kill_mad_like( L )  ! Destroys a layout
     implicit none
@@ -158,6 +214,7 @@ CONTAINS
     current%magp=>el%magp
     current%CHART=>el%CHART
     current%PATCH=>el%PATCH
+    if(use_info) current%i=>el%i
     current%dir=>el%dir
     current%P0C=>el%P0C
     current%BETA0=>el%BETA0
@@ -211,6 +268,7 @@ CONTAINS
     call copy(el%mag,current%mag)
     if(associated(current%CHART)) call copy(el%CHART,current%CHART)
     if(associated(current%patch))call copy(el%PATCH,current%PATCH)
+    if(use_info.and.associated(current%patch)) call copy(el%i,current%i)
     current%dir=el%dir
     current%P0C=el%P0C
     current%BETA0=el%BETA0
@@ -259,7 +317,7 @@ CONTAINS
 
 
 
-  SUBROUTINE move_to_p( L,current,i ) ! Moves current to the k^th position
+  SUBROUTINE move_to_p( L,current,i ) ! Moves current to the i^th position
     implicit none
     TYPE (fibre), POINTER :: Current
     TYPE (layout) L
@@ -586,6 +644,7 @@ CONTAINS
     current%magp=>el%magp
     current%CHART=>el%CHART
     current%PATCH=>el%PATCH
+    if(use_info) current%i=>el%i
     ALLOCATE(current%DIR);ALLOCATE(current%P0C);ALLOCATE(current%BETA0);
     current%dir=el%dir
     current%P0C=el%P0C
@@ -658,6 +717,10 @@ CONTAINS
     type(fibre),pointer:: c
     CALL ALLOCATE_FIBRE(C)
     CALL ALLOCATE_DATA_FIBRE(C)
+    if(use_info) then
+       allocate(c%i)
+       call alloc(c%i)
+    endif
     c%DIR=1
     c%P0C=zero
     c%BETA0=zero
@@ -680,6 +743,10 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
+       IF(ASSOCIATED(c%i).and.use_info) THEN
+          call kill(c%i);
+          deallocate(c%i);
+       ENDIF
        IF(ASSOCIATED(c%mag).AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
           c%mag=-1;
           deallocate(c%mag);  ! AIMIN CHANGES FOR MS4.0

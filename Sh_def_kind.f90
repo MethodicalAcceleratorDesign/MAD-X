@@ -1678,6 +1678,9 @@ contains
     real(dp) PZ
     INTEGER J
 
+
+    CALL DTILTD(EL%P,EL%P%dir,X)     ! Missing per Schmidt/MAD-X July 2003
+
     X1=X(1)
     X3=X(3)
 
@@ -1711,6 +1714,7 @@ contains
     X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
     X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
 
+    CALL DTILTD(EL%P,-EL%P%dir,X)     ! Missing per Schmidt/MAD-X July 2003
 
   END SUBROUTINE KICKTR
 
@@ -1726,6 +1730,8 @@ contains
     CALL ALLOC(BBYTW)
     CALL ALLOC(BBXTW)
     CALL ALLOC(BBYTWT)
+
+    CALL DTILTD(EL%P,EL%P%dir,X)     ! Missing per Schmidt/MAD-X July 2003
 
     X1=X(1)
     X3=X(3)
@@ -1761,6 +1767,7 @@ contains
     X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
     X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
 
+    CALL DTILTD(EL%P,-EL%P%dir,X)     ! Missing per Schmidt/MAD-X July 2003
 
 
     CALL KILL(X1)
@@ -1786,6 +1793,7 @@ contains
     CALL ALLOC(BBYTWT)
     CALL ALLOC(X,6)
 
+    CALL DTILTD(EL%P,EL%P%dir,Y)     ! Missing per Schmidt/MAD-X July 2003
     X=Y
 
     X1=X(1)
@@ -1823,6 +1831,9 @@ contains
     X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
 
     Y=X
+
+    CALL DTILTD(EL%P,-EL%P%dir,Y)     ! Missing per Schmidt/MAD-X July 2003
+
     CALL KILL(X,6)
     CALL KILL(X1)
     CALL KILL(X3)
@@ -11548,6 +11559,7 @@ contains
     ENDIF
     X(2)=X(2)-YL*DIR*BBYTW
     X(4)=X(4)+YL*DIR*BBXTW
+
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF

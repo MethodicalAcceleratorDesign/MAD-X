@@ -12,15 +12,17 @@ module complex_taylor
   private subs,cscsub,dscsub,csubsc,dsubsc,iscsub,isubsc,scsub,subsc,unarySUB
   private EQUAL,cequaldacon,Dequaldacon,equaldacon,Iequaldacon,ctEQUAL,tcEQUAL
   private pow,powr,POWR8  !,DAABSEQUAL,AABSEQUAL 2002.10.17
-  private alloccomplex   !,printcomplex ,killcomplex
+  private alloccomplex,A_OPT,K_OPT   !,printcomplex ,killcomplex
   private logtpsat,exptpsat,abstpsat,dcost,dsint,datant,tant,dasint,dacost
   private dcosht,dsinht,dtanht,dsqrtt
   private getdiff,getdATRA,GETORDER,CUTORDER,getchar ,dputchar,dputint
   private check,set_in_complex   !, assc
-  private dimagt,drealt,dcmplxt
-  private GETCHARnd2,GETintnd2
+  private dimagt,drealt,dcmplxt,CEQUAL,DEQUAL,REQUAL
+  private GETCHARnd2,GETintnd2,GETint
   private CFUC,CFURES
-  integer,private::NO,ND,ND2,NP,NDPT,NV,lastmaster
+  !  completing tpsa.f90
+  private datantt,dasintt,dacostt,full_abstpsat
+  integer,private::NO,ND,ND2,NP,NDPT,NV           !,lastmaster 2002.12.13
   logical(lp),private::old
 
 
@@ -28,6 +30,9 @@ module complex_taylor
      MODULE PROCEDURE EQUAL
      MODULE PROCEDURE ctEQUAL
      MODULE PROCEDURE tcEQUAL
+     MODULE PROCEDURE CEQUAL
+     MODULE PROCEDURE DEQUAL
+     MODULE PROCEDURE REQUAL
      !     MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
      !     MODULE PROCEDURE AABSEQUAL    ! remove 2002.10.17
      MODULE PROCEDURE cequaldacon
@@ -36,6 +41,9 @@ module complex_taylor
      MODULE PROCEDURE Iequaldacon
   end  INTERFACE
 
+  INTERFACE full_abs
+     MODULE PROCEDURE full_abstpsat
+  END INTERFACE
   INTERFACE abs
      MODULE PROCEDURE abstpsat
   END INTERFACE
@@ -130,6 +138,7 @@ module complex_taylor
   INTERFACE OPERATOR (.SUB.)
      MODULE PROCEDURE GETORDER
      MODULE PROCEDURE getchar
+     MODULE PROCEDURE GETint
   END INTERFACE
 
   INTERFACE OPERATOR (.CUT.)
@@ -190,12 +199,14 @@ module complex_taylor
 
   INTERFACE alloc
      MODULE PROCEDURE alloccomplex
+     MODULE PROCEDURE a_opt
      MODULE PROCEDURE alloccomplexn
   END INTERFACE
 
 
   INTERFACE kill
      MODULE PROCEDURE killcomplex
+     MODULE PROCEDURE k_opt
      MODULE PROCEDURE killcomplexn
   END INTERFACE
 
@@ -239,23 +250,29 @@ module complex_taylor
 
   INTERFACE datan
      MODULE PROCEDURE datant
+     MODULE PROCEDURE datantt
   END INTERFACE
   INTERFACE atan
      MODULE PROCEDURE datant
+     MODULE PROCEDURE datantt
   END INTERFACE
 
   INTERFACE dasin
      MODULE PROCEDURE dasint
+     MODULE PROCEDURE dasintt
   END INTERFACE
   INTERFACE asin
      MODULE PROCEDURE dasint
+     MODULE PROCEDURE dasintt
   END INTERFACE
 
   INTERFACE dacos
      MODULE PROCEDURE dacost
+     MODULE PROCEDURE dacostt
   END INTERFACE
   INTERFACE acos
      MODULE PROCEDURE dacost
+     MODULE PROCEDURE dacostt
   END INTERFACE
 
   INTERFACE dtan
@@ -356,7 +373,7 @@ contains
     localmaster=master
 
 
-    call ass0(dimagt)
+    call ass(dimagt)    !2002.12.25
 
     dimagt=s1%i
 
@@ -371,7 +388,7 @@ contains
     localmaster=master
 
 
-    call ass0(drealt)
+    call ass(drealt)    !2002.12.25
 
     drealt=s1%r
 
@@ -418,40 +435,45 @@ contains
 
   END FUNCTION GETintnd2
 
+
+
   FUNCTION dputchar( S1, S2 )
     implicit none
     TYPE (complextaylor) dputchar
     complex(dp) , INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
-    CHARACTER (LEN = LNV)  resul
-    integer j(lnv),i,nd2par
+    !    CHARACTER (LEN = LNV)  resul
+    !    integer j(lnv),i,nd2par
 
     integer localmaster
     localmaster=master
 
     call ass(dputchar)
 
-    resul = trim(ADJUSTL (s2))
-
-    do i=1,lnv
-       j(i)=0
-    enddo
-
-    nd2par= len(trim(ADJUSTL (s2)))
-    !frs    do i=1,len(trim(ADJUSTL (s2)))
-    do i=1,nd2par
-       CALL  CHARINT(RESUL(I:I),J(I))
-       if(i>nv) then
-          if(j(i)>0) then
-             call var(dputchar,cmplx(zero,zero,kind=dp),0,0)
-             return
-          endif
-       endif
-    enddo
-
-
-    call var(dputchar,cmplx(zero,zero,kind=dp),0,0)
-    call pok(dputchar,j,s1)
+    !    resul = trim(ADJUSTL (s2))
+    !
+    !    do i=1,lnv
+    !       j(i)=0
+    !    enddo
+    !
+    !    nd2par= len(trim(ADJUSTL (s2)))
+    !    !frs    do i=1,len(trim(ADJUSTL (s2)))
+    !    do i=1,nd2par
+    !       CALL  CHARINT(RESUL(I:I),J(I))
+    !       if(i>nv) then
+    !          if(j(i)>0) then
+    !             call var(dputchar,cmplx(zero,zero,kind=dp),0,0)
+    !             return
+    !          endif
+    !       endif
+    !   enddo
+    !
+    !
+    !    call var(dputchar,cmplx(zero,zero,kind=dp),0,0)
+    !    call pok(dputchar,j,s1)
+    !
+    dputchar%r= real(S1,kind=dp).mono.S2
+    dputchar%i= aimag(S1).mono.S2
 
 
     master=localmaster
@@ -463,37 +485,40 @@ contains
     TYPE (complextaylor) dputint
     complex(dp) , INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2(:)
-    integer j(lnv),i,nd2par
+    !   integer j(lnv),i,nd2par
 
     integer localmaster
     localmaster=master
 
     call ass(dputint)
 
-
-    do i=1,lnv
-       j(i)=0
-    enddo
-
-    nd2par=size(s2)
-    do i=1,nd2par
-       J(I)=s2(i)
-    enddo
+    !    do i=1,lnv
+    !       j(i)=0
+    !    enddo!
+    !
+    !    nd2par=size(s2)
+    !    do i=1,nd2par
+    !       J(I)=s2(i)
+    !    enddo
 
     !frs    do i=1,len(trim(ADJUSTL (s2)))
-    do i=1,nd2par
-       if(i>nv) then
-          if(j(i)>0) then
-             call var(dputint,cmplx(zero,zero,kind=dp),0,0)
-             return
-          endif
-       endif
-    enddo
+    !    do i=1,nd2par
+    !       if(i>nv) then
+    !          if(j(i)>0) then
+    !             call var(dputint,cmplx(zero,zero,kind=dp),0,0)
+    !             return
+    !          endif
+    !!       endif
+    !    enddo
+    !
 
 
+    !   call var(dputint,cmplx(zero,zero,kind=dp),0,0)
+    !    call pok(dputint,j,s1)
 
-    call var(dputint,cmplx(zero,zero,kind=dp),0,0)
-    call pok(dputint,j,s1)
+
+    dputint%r= real(S1,kind=dp).mono.S2
+    dputint%i= aimag(S1).mono.S2
 
 
     master=localmaster
@@ -553,6 +578,22 @@ contains
 
     master=localmaster
   END FUNCTION GETchar
+
+  FUNCTION GETint( S1, S2 )   ! 2002.12.20
+    implicit none
+    complex(dp) GETint
+    TYPE (complextaylor), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2(:)
+    real(dp) r1,r2
+
+
+    r1=S1%r.sub.s2
+    r2=S1%i.sub.s2
+
+    GETint=cmplx(r1,r2,kind=dp)
+
+
+  END FUNCTION GETint
 
 
   FUNCTION POW( S1, R2 )
@@ -669,17 +710,58 @@ contains
     call alloctpsa(s2%i)
   END SUBROUTINE alloccomplex
 
-  SUBROUTINE  alloccomplexn(S2,n)
+  SUBROUTINE  alloccomplexn(S2,K)
     implicit none
     type (complextaylor),INTENT(INOUT),dimension(:)::S2
-    integer, intent(in) :: n
-    integer i
-    do i=1,n
-       call alloctpsa(s2(i)%r)
-       call alloctpsa(s2(i)%i)
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
+
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call alloctpsa(s2(j)%r)
+       call alloctpsa(s2(j)%i)
     enddo
 
   END SUBROUTINE alloccomplexn
+
+  SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (complextaylor),INTENT(INout)::S1,S2
+    type (complextaylor),optional, INTENT(INout):: s3,s4,s5,s6,s7,s8,s9,s10
+    call alloc(s1)
+    call alloc(s2)
+    if(present(s3)) call alloc(s3)
+    if(present(s4)) call alloc(s4)
+    if(present(s5)) call alloc(s5)
+    if(present(s6)) call alloc(s6)
+    if(present(s7)) call alloc(s7)
+    if(present(s8)) call alloc(s8)
+    if(present(s9)) call alloc(s9)
+    if(present(s10))call alloc(s10)
+  END SUBROUTINE A_opt
+
+  SUBROUTINE  K_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (complextaylor),INTENT(INout)::S1,S2
+    type (complextaylor),optional, INTENT(INout):: s3,s4,s5,s6,s7,s8,s9,s10
+    call KILL(s1)
+    call KILL(s2)
+    if(present(s3)) call KILL(s3)
+    if(present(s4)) call KILL(s4)
+    if(present(s5)) call KILL(s5)
+    if(present(s6)) call KILL(s6)
+    if(present(s7)) call KILL(s7)
+    if(present(s8)) call KILL(s8)
+    if(present(s9)) call KILL(s9)
+    if(present(s10))call KILL(s10)
+  END SUBROUTINE K_opt
 
   SUBROUTINE  printcomplex(S2,i)
     implicit none
@@ -705,14 +787,23 @@ contains
     call killTPSA(s2%i)
   END SUBROUTINE killcomplex
 
-  SUBROUTINE  killcomplexn(S2,n)
+  SUBROUTINE  killcomplexn(S2,K)
     implicit none
     type (complextaylor),INTENT(INOUT),dimension(:)::S2
-    integer, intent(in) :: n
-    integer i
-    do i=1,n
-       call killtpsa(s2(i)%r)
-       call killtpsa(s2(i)%i)
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
+
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call killtpsa(s2(j)%r)
+       call killtpsa(s2(j)%i)
     enddo
 
   END SUBROUTINE killcomplexn
@@ -1106,13 +1197,10 @@ contains
     implicit none
     type (complextaylor),INTENT(inOUT)::S2
     type (complextaylor),INTENT(IN)::S1
-    integer localmaster
-    localmaster=master
     call check_snake
-    master=0
+    !    master=0
     S2%R=S1%R
     S2%I=S1%I
-    master=localmaster
 
   END SUBROUTINE EQUAL
 
@@ -1120,13 +1208,10 @@ contains
     implicit none
     type (complextaylor),INTENT(inOUT)::S2
     type (taylor),INTENT(IN)::S1
-    integer localmaster
-    localmaster=master
     call check_snake
-    master=0
+
     S2%R=S1
     S2%I=zero
-    master=localmaster
 
   END SUBROUTINE ctEQUAL
 
@@ -1134,71 +1219,54 @@ contains
     implicit none
     type (complextaylor),INTENT(in)::S2
     type (taylor),INTENT(inout)::S1
-    integer localmaster
-    localmaster=master
     call check_snake
-    master=0
+    !    master=0
     S1=S2%R
-    master=localmaster
 
   END SUBROUTINE tcEQUAL
 
 
-  !  SUBROUTINE  DAABSEQUAL(R1,S2)
-  !    implicit none
-  !    type (complextaylor),INTENT(in)::S2
-  !    real(dp), INTENT(inout)::R1
-  !    real(dp) rr,ri
-  !    integer localmaster
-  !    localmaster=master
-  !    call check_snake
-  !
-  !    master=0
-  !
-  !    rr=s2%r
-  !    ri=s2%i
-  !
-  !    r1=rr+ri
-  !
-  !    master=localmaster
-  !
-  !  END SUBROUTINE DAABSEQUAL
-  !
-  !  SUBROUTINE  AABSEQUAL(R1,S2)
-  !    implicit none
-  !    type (complextaylor),INTENT(in)::S2
-  !    REAL(SP), INTENT(inout)::R1
-  !    REAL(SP) rr,ri
-  !    integer localmaster
-  !    if(real_warning) call real_stop
-  !    localmaster=master
-  !    call check_snake
-  !
-  !    master=0
-  !
-  !    rr=s2%r
-  !    ri=s2%i
-  !
-  !    r1=rr+ri
-  !
-  !    master=localmaster
-  !
-  !  END SUBROUTINE AABSEQUAL
+  SUBROUTINE  CEQUAL(R1,S2)          ! 2002.12.22
+    implicit none
+    type (complextaylor),INTENT(IN)::S2
+    COMPLEX(dp), INTENT(inOUT)::R1
+    call check_snake
+
+    R1=S2.SUB.'0'
+  END SUBROUTINE CEQUAL
+
+  SUBROUTINE  DEQUAL(R1,S2)     ! 2002.12.22
+    implicit none
+    type (complextaylor),INTENT(IN)::S2
+    real(dp), INTENT(inOUT)::R1
+    call check_snake
+
+    R1=S2.SUB.'0'
+  END SUBROUTINE DEQUAL
+
+  SUBROUTINE  REQUAL(R1,S2)   ! 2002.12.22
+    implicit none
+    type (complextaylor),INTENT(IN)::S2
+    REAL(SP), INTENT(inOUT)::R1
+
+    if(real_warning) call real_stop
+    call check_snake
+
+    R1=S2.SUB.'0'
+
+  END SUBROUTINE REQUAL
 
 
   SUBROUTINE  CEQUALDACON(S2,R1)
     implicit none
     type (complextaylor),INTENT(inout)::S2
     complex(dp), INTENT(IN)::R1
-    integer localmaster
-    localmaster=master
     call check_snake
 
-    master=0
+    !    master=0
 
     S2%R=REAL(R1,kind=DP)
     S2%I=aimag(R1)
-    master=localmaster
 
   END SUBROUTINE CEQUALDACON
 
@@ -1206,15 +1274,11 @@ contains
     implicit none
     type (complextaylor),INTENT(inout)::S2
     real(dp) , INTENT(IN)::R1
-    integer localmaster
-    localmaster=master
     call check_snake
 
-    master=0
 
     S2%R=R1
     S2%I=zero
-    master=localmaster
 
   END SUBROUTINE dEQUALDACON
 
@@ -1222,16 +1286,12 @@ contains
     implicit none
     type (complextaylor),INTENT(inout)::S2
     real(sp) , INTENT(IN)::R1
-    integer localmaster
     if(real_warning) call real_stop
-    localmaster=master
-    call check_snake
 
-    master=0
+    call check_snake
 
     S2%R=REAL(R1,kind=DP)
     S2%I=zero
-    master=localmaster
 
   END SUBROUTINE EQUALDACON
 
@@ -1239,15 +1299,11 @@ contains
     implicit none
     type (complextaylor),INTENT(inout)::S2
     integer , INTENT(IN)::R1
-    integer localmaster
-    localmaster=master
     call check_snake
 
-    master=0
 
     S2%R=REAL(R1,kind=DP)
     S2%I=zero
-    master=localmaster
 
   END SUBROUTINE iEQUALDACON
 
@@ -1717,15 +1773,27 @@ contains
     call kill(ss)
   END subroutine logtpsa
 
+  FUNCTION full_abstpsat( S1 )
+    implicit none
+    real(dp) full_abstpsat ,r1,r2
+    TYPE (complextaylor), INTENT (IN) :: S1
+
+
+    r1=full_abs(s1%r) ! 2002.10.17
+    r2=full_abs(s1%i)
+    full_abstpsat=r1+r2
+    !abstpsat=SQRT((s1%r.sub.'0')**2+(s1%i.sub.'0')**2)
+
+  END FUNCTION full_abstpsat
+
   FUNCTION abstpsat( S1 )
     implicit none
     real(dp) abstpsat ,r1,r2
     TYPE (complextaylor), INTENT (IN) :: S1
 
-    r1=abs(s1%r) ! 2002.10.17
+    r1=abs(s1%r) ! 2002.10.17    etienne crap
     r2=abs(s1%i)
     abstpsat=SQRT(r1**2+r2**2)
-    !abstpsat=SQRT((s1%r.sub.'0')**2+(s1%i.sub.'0')**2)
 
   END FUNCTION abstpsat
 
@@ -1766,6 +1834,44 @@ contains
     master=localmaster
   END FUNCTION datant
 
+  FUNCTION datantt( S1 )
+    implicit none
+    TYPE (taylor) datantt
+    TYPE (complextaylor) temp
+    TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
+    call ass(datantt)
+    call alloc(temp)
+
+    temp%r=s1
+    temp=atan(temp)
+    datantt=temp%r
+    call kill(temp)
+
+    master=localmaster
+  END FUNCTION datantt
+
+  FUNCTION dasintt( S1 )
+    implicit none
+    TYPE (taylor) dasintt
+    TYPE (complextaylor) temp
+    TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
+    call ass(dasintt)
+    call alloc(temp)
+
+    temp%r=s1
+    temp=asin(temp)
+    dasintt=temp%r
+    call kill(temp)
+
+    master=localmaster
+  END FUNCTION dasintt
+
   FUNCTION dasint( S1 )
     implicit none
     TYPE (complextaylor) dasint,temp
@@ -1787,6 +1893,24 @@ contains
     master=localmaster
   END FUNCTION dasint
 
+  FUNCTION dacostt( S1 )
+    implicit none
+    TYPE (taylor) dacostt
+    TYPE (complextaylor) temp
+    TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
+    call ass(dacostt)
+    call alloc(temp)
+
+    temp%r=s1
+    temp=acos(temp)
+    dacostt=temp%r
+    call kill(temp)
+
+    master=localmaster
+  END FUNCTION dacostt
 
   FUNCTION dacost( S1 )
     implicit none
@@ -1995,10 +2119,10 @@ contains
   subroutine assc(s1)
     implicit none
     TYPE (complextaylor) s1
-    lastmaster=master
+    !  lastmaster=master  ! 2002.12.13
 
     select case(master)
-    case(1:ndumt-1)
+    case(0:ndumt-1)
        master=master+1
     case(ndumt)
        w_p=0
@@ -2007,6 +2131,7 @@ contains
        w_p%fc='(1((1X,A72),/))'
        CALL WRITE_E(100)
     end select
+    !    write(26,*) " complex  taylor ",master
 
     call ass0(s1%r)
     call ass0(s1%i)
@@ -2015,44 +2140,13 @@ contains
   end subroutine ASSc
 
 
-  subroutine check_snake
-    implicit none
-    master=master+1
-    select case (master)
-    case(1:ndumt)
-       if(oldscheme) then
-          if(iass0user(master)>ndumuser(master)) then
-             call ndum_warning_user
-          endif
-          iass0user(master)=0
-       else
-          if(iass0user(master)>scratchda(master)%n.or.scratchda(master)%n>newscheme_max) then
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1((1X,A72),/))'
-             w_p%fi='(3((1X,i4)))'
-             w_p%c(1)= "iass0user(master),scratchda(master)%n,newscheme_max"
-             w_p=(/iass0user(master),scratchda(master)%n,newscheme_max/)
-             call write_e
-             call ndum_warning_user
-          endif
-          iass0user(master)=0
-       endif
-    case(ndumt+1)
-       w_p=0
-       w_p%nc=1
-       w_p=(/"Should not be here"/)
-       w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(101)
-    end select
-    master=master-1
-  end subroutine check_snake
 
   subroutine KILL_TPSA
     IMPLICIT NONE
     call KILL(varc1)
     call KILL(varc2)
     CALL KILL_BERZ_ETIENNE   ! IN TPSALIE_ANALISYS
+    first_time=.true.
   END subroutine KILL_TPSA
 
   subroutine init_map_c(NO1,ND1,NP1,NDPT1,log)

@@ -14,6 +14,7 @@ MODULE S_TRACKING
   PRIVATE TRACK_LAYOUT_FLAG_R1,TRACK_LAYOUT_FLAG_P1,TRACK_LAYOUT_FLAG_S1
   PRIVATE MIS_FIBR,MIS_FIBP,MIS_FIBS
   PRIVATE TRACK_FIBRE_R,TRACK_FIBRE_P,TRACK_FIBRE_S
+  private TRACK_LAYOUT_POINT_R1
   TYPE UPDATING
      logical(lp) UPDATE
   END TYPE UPDATING
@@ -32,6 +33,7 @@ MODULE S_TRACKING
      MODULE PROCEDURE TRACK_FIBRE_R
      MODULE PROCEDURE TRACK_FIBRE_P
      MODULE PROCEDURE TRACK_FIBRE_S
+     MODULE PROCEDURE TRACK_LAYOUT_POINT_R1  ! track one fibre
   END INTERFACE
 
   !  INTERFACE FIND_ORBIT
@@ -88,8 +90,8 @@ contains
     INTEGER, INTENT(IN):: II1
     INTEGER II2
 
-    CHECK_MADX_APERTURE=.true.
-    CHECK_STABLE=.true.
+
+    CALL RESET_APERTURE_FLAG
 
     IF(R%CLOSED) THEN
        II2=II1+R%N
@@ -108,8 +110,7 @@ contains
     INTEGER, INTENT(IN):: II1
     INTEGER II2
 
-    CHECK_MADX_APERTURE=.true.
-    CHECK_STABLE=.true.
+    CALL RESET_APERTURE_FLAG
 
     IF(R%CLOSED) THEN
        II2=II1+R%N
@@ -128,8 +129,9 @@ contains
     INTEGER, INTENT(IN):: II1
     INTEGER II2
 
-    CHECK_MADX_APERTURE=.true.
-    CHECK_STABLE=.true.
+
+    CALL RESET_APERTURE_FLAG
+
     IF(R%CLOSED) THEN
        II2=II1+R%N
     ELSE
@@ -150,8 +152,8 @@ contains
     INTEGER J
     TYPE (fibre), POINTER :: C
 
-    CHECK_MADX_APERTURE=.true.
-    CHECK_STABLE=.true.
+
+    CALL RESET_APERTURE_FLAG
 
     call move_to(r,c,MOD_N(I1,R%N))
 
@@ -179,8 +181,9 @@ contains
 
     TYPE (FIBRE), POINTER :: C
 
-    CHECK_MADX_APERTURE=.true.
-    CHECK_STABLE=.true.
+
+    CALL RESET_APERTURE_FLAG
+
     CALL MOVE_TO(R,C,MOD_N(I1,R%N))
 
 
@@ -212,9 +215,8 @@ contains
     TYPE (fibre), POINTER :: C
 
 
-    CHECK_MADX_APERTURE=.true.
-    CHECK_STABLE=.true.
 
+    CALL RESET_APERTURE_FLAG
 
     ! new stuff with kind=3
     IF(k%para_in ) knob=.true.
@@ -391,6 +393,7 @@ contains
     nullify(C%MAG%P%DIR)
     nullify(C%MAG%P%CHARGE)
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
        CHECK_STABLE=.false.
        lost_fibre=>c
     endif
@@ -409,6 +412,7 @@ contains
     TYPE (FIBRE), POINTER :: CN
     REAL(DP), POINTER :: P0,B0
 
+    IF(.NOT.CHECK_STABLE) return
 
     ! NEW STUFF WITH KIND=3: KNOB OF FPP IS SET TO TRUE IF NECESSARY
     IF(K%PARA_IN ) KNOB=.TRUE.
@@ -535,6 +539,12 @@ contains
     KNOB=.FALSE.
     ! END NEW STUFF WITH KIND=3
 
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_P"
+       CHECK_STABLE=.false.
+       lost_fibre=>c
+    endif
+
   END SUBROUTINE TRACK_FIBRE_P
 
 
@@ -556,6 +566,8 @@ contains
     TYPE(REAL_8) XR(6),X1,X3
     real(dp) V(6)
     INTEGER I,J,M,N
+
+    IF(.NOT.CHECK_STABLE) return
 
     ! new stuff with kind=3
     IF(k%para_in ) knob=.true.
@@ -683,6 +695,12 @@ contains
     nullify(C%MAGP%P%CHARGE)
     C%MAGP=DEFAULT
 
+
+    if(abs(x(1)%v)+abs(x(3)%v)>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_S"
+       CHECK_STABLE=.false.
+       lost_fibre=>c
+    endif
 
     ! new stuff with kind=3
     knob=.FALSE.

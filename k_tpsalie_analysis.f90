@@ -207,6 +207,9 @@ contains
     TYPE (damap) one_map ,junk
     TYPE (damap), INTENT (IN) :: S2
     TYPE (onelieexponent), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
     call checkdamap(s2)
     call assdamap(one_map)
 
@@ -219,6 +222,7 @@ contains
     one_map=junk*s2
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION one_map
 
@@ -227,6 +231,9 @@ contains
     TYPE (damap) map_one,junk
     TYPE (damap), INTENT (IN) :: S2
     TYPE (onelieexponent), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
     call checkdamap(s2)
     call assdamap(map_one)
 
@@ -236,9 +243,10 @@ contains
 
     junk=s1
 
-    map_one=junk*s2
+    map_one=s2*junk   ! 2002.12.6
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION map_one
 
@@ -248,6 +256,9 @@ contains
     TYPE (damap) df_map ,junk
     TYPE (damap), INTENT (IN) :: S2
     TYPE (dragtfinn), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
     call checkdamap(s2)
     call assdamap(df_map)
 
@@ -260,6 +271,7 @@ contains
     df_map=junk*s2
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION df_map
 
@@ -268,6 +280,9 @@ contains
     TYPE (damap) map_df,junk
     TYPE (damap), INTENT (IN) :: S2
     TYPE (dragtfinn), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
     call checkdamap(s2)
     call assdamap(map_df)
 
@@ -277,9 +292,10 @@ contains
 
     junk=s1
 
-    map_df=junk*s2
+    map_df=s2*junk    ! 2002.12.6
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION map_df
 
@@ -288,6 +304,9 @@ contains
     TYPE (damap) fd_map ,junk
     TYPE (damap), INTENT (IN) :: S2
     TYPE (reversedragtfinn), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
     call checkdamap(s2)
     call assdamap(fd_map)
 
@@ -300,6 +319,7 @@ contains
     fd_map=junk*s2
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION fd_map
 
@@ -308,6 +328,9 @@ contains
     TYPE (damap) map_fd ,junk
     TYPE (damap), INTENT (IN) :: S2
     TYPE (reversedragtfinn), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
     call checkdamap(s2)
     call assdamap(map_fd)
 
@@ -317,9 +340,10 @@ contains
 
     junk=s1
 
-    map_fd=junk*s2
+    map_fd=s2*junk   ! 2002.12.6
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION map_fd
 
@@ -329,6 +353,7 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
+    call check_snake
     call alloc(junk)
     zero_(:)=zero
     if(old) then
@@ -353,6 +378,7 @@ contains
             & s2%A1%v%i,s2%normal%linear%v%i,s2%normal%nonlinear%v%i,s2%NORD,s2%jtune)
        !S2%a1=S2%a%CONSTANT
        !     S2%a%linear=S2%a%CONSTANT
+
        s2%normal%linear=(s2%normal%linear).sub.1
        S2%normal%pb=S2%normal%nonlinear
        S2%a%pb=S2%a%nonlinear
@@ -388,6 +414,7 @@ contains
     S2%A_T=ZERO_
     CALL KILL(JUNK)
 
+
   END SUBROUTINE normalMAP
 
   SUBROUTINE  ONEEXPMAP(S2,S1)
@@ -395,6 +422,7 @@ contains
     type (ONELIEEXPONENT),INTENT(inOUT)::S2
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
+    call check_snake
     call alloc(junk)
     if(old) then
        if(s2%VECTOR%V(1)%i==0) call crap1("ONEEXPMAP 1") ! call allocw(s2%VECTOR%V(1))
@@ -421,6 +449,7 @@ contains
        S2%pb=S2%VECTOR
        CALL KILL(JUNK)
     endif
+
   END SUBROUTINE ONEEXPMAP
 
 
@@ -430,6 +459,7 @@ contains
     type (damap),INTENT(inout)::S1
     type (damap) JUNK
     call alloc(junk)
+    call check_snake
     junk=1
     s1=texp(s2%vector,junk)
     !     s1=s2%constant
@@ -445,6 +475,7 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
+    call check_snake
     call alloc(junk)
     ZERO_(:)=zero
     if(old) then
@@ -472,6 +503,7 @@ contains
        S2%pb=S2%nonlinear
        CALL KILL(JUNK)
     endif
+
   END SUBROUTINE revdfMAP
 
 
@@ -481,6 +513,7 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
+    call check_snake
     call alloc(junk)
     ZERO_(:)=zero
     if(old) then
@@ -505,6 +538,7 @@ contains
     implicit none
     type (vecfield),INTENT(IN)::S2
     type (vecresonance),INTENT(inOUT)::S1
+    call check_snake
     if(old) then
        if(S1%cos%v(1)%i==0) call crap1("resovec 1")  !call allocw(s1%cos%v(1))
        call ctorflo(s2%v%i,S1%cos%v%i,S1%sin%v%i)
@@ -513,12 +547,14 @@ contains
        call newctorflo(s2%v%j,S1%cos%v%j,S1%sin%v%j)
     endif
     s1%ifac=s2%ifac
+
   END SUBROUTINE resovec
 
   SUBROUTINE  vecreso(S2,S1)
     implicit none
     type (vecfield),INTENT(inout)::S2
     type (vecresonance),INTENT(in)::S1
+    call check_snake
     if(old) then
        if(S2%v(1)%i==0) call crap1("vecreso 1")  !call allocw(s2%v(1))
        call RTOCflo(S1%cos%v%i,S1%sin%v%i,s2%v%i)
@@ -533,6 +569,7 @@ contains
     implicit none
     type (pbfield),INTENT(IN)::S2
     type (pbresonance),INTENT(inOUT)::S1
+    call check_snake
     if(old) then
        if(S1%cos%h%i==0) call crap1("respb 1")  !call allocw(s1%cos%h)
        call ctor(s2%h%i,S1%cos%h%i,S1%sin%h%i)
@@ -541,12 +578,15 @@ contains
        call newctor(s2%h%j,S1%cos%h%j,S1%sin%h%j)
     endif
     s1%ifac=s2%ifac
+
+
   END SUBROUTINE respb
 
   SUBROUTINE  pbres(S2,S1)
     implicit none
     type (pbfield),INTENT(inOUT)::S2
     type (pbresonance),INTENT(IN)::S1
+    call check_snake
     if(old) then
        if(s2%h%i==0) call crap1("respb 1")
        call RTOC(S1%cos%h%i,S1%sin%h%i,s2%h%i)
@@ -561,6 +601,7 @@ contains
     implicit none
     type (taylor),INTENT(IN)::S2
     type (taylorresonance),INTENT(inOUT)::S1
+    call check_snake
     if(old) then
        if(S1%cos%i==0)  call crap1("resta 1")  !call allocw(s1%cos)
        call ctor(s2%i,S1%cos%i,S1%sin%i)
@@ -574,6 +615,7 @@ contains
     implicit none
     type (taylor),INTENT(inOUT)::S2
     type (taylorresonance),INTENT(IN)::S1
+    call check_snake
     if(old) then
        if(s2%i==0)  call crap1("tares 1")  !call allocw(s2)
        call RTOC(S1%cos%i,S1%sin%i,s2%i)
@@ -589,6 +631,7 @@ contains
     type (damap),INTENT(inOUT)::S1
     TYPE (DAMAP) ID
     integer no1
+    call check_snake
     no1=no
     call alloc(ID)
     if(old) then
@@ -610,6 +653,7 @@ contains
     type (damap),INTENT(inOUT)::S1
     TYPE (DAMAP) ID
     integer no1
+    call check_snake
     no1=no
     call alloc(ID)
     if(old) then
@@ -691,6 +735,7 @@ contains
     type(onelieexponent) one_
     real(dp) zero_(ndim2)
     integer i,j,jn(lnv),k
+    call check_snake
     call alloc(w)
     call alloc(t)
     call alloc(one_)
@@ -753,6 +798,7 @@ contains
     call kill(one_)
     call kill(t)
     call kill(w)
+
   END SUBROUTINE EQUALgenMAP
 
   SUBROUTINE  EQUALMAPgen(S1,S2)
@@ -761,6 +807,7 @@ contains
     type (damap),INTENT(inout)::S1
     type (damap)  w
     integer i,jn(lnv)
+    call check_snake
     call alloc(w)
 
     do i=1,lnv
@@ -789,6 +836,7 @@ contains
     implicit none
     type (genfield),INTENT(inOUT)::S2
     type (genfield),INTENT(IN)::S1
+    call check_snake
     if(old) then
        if(s2%h%i==0) call crap1("EQUALgengen 1")  ! call etall1(s2%h%i)
        CALL dacop(S1%h%i,S2%h%i)
@@ -1075,47 +1123,6 @@ contains
   END SUBROUTINE killREVdf
 
 
-  !SUBROUTINE  rotsymp(S1,tunes)
-  !
-  !     type (damap),INTENT(IN)::S1
-  !     real(dp),INTENT(IN),dimension(:)::tunes
-  !     real(dp) ang(ndim),ra(ndim)
-  !     integer i
-  !     do i=1,nd
-  !     ra(i)=zero
-  !     ang(i)=tunes(i)*twopi
-  !     enddo
-  !if(old) then
-  !     do i=1,nd
-  !     call ROTFLO(S1%v%i,ANG,RA)
-  !    enddo
-  !else
-  !     do i=1,nd
-  !     call NEWROTFLO(S1%v%J,ANG,RA)
-  !    enddo
-  !endif
-  !END SUBROUTINE rotsymp
-
-  !SUBROUTINE  rotf(S1,tunes,ra)
-  !
-  !     type (damap),INTENT(IN)::S1
-  !     real(dp),INTENT(IN),dimension(:)::tunes,ra
-  !     real(dp) ang(ndim)
-  !     integer i
-  !     do i=1,nd
-  !     ang(i)=tunes(i)*twopi
-  !     enddo
-  !if(old) then
-  !     do i=1,nd
-  !     call ROTFLO(S1%v%i,ANG,RA)
-  !    enddo
-  !else
-  !     do i=1,nd
-  !     call NEWROTFLO(S1%v%J,ANG,RA)
-  !    enddo
-  !endif
-  !END SUBROUTINE rotf
-
 
   SUBROUTINE  DAPRINTonelie(S1,MFILE)
     implicit none
@@ -1255,9 +1262,8 @@ contains
     endif
     warnda=.true.
 
-    FIRSTSCHEME=OLDSCHEME
 
-    master=1
+    master=0  !  master=1   2002.12.25
 
 
     old=log1
@@ -1269,7 +1275,7 @@ contains
     NV=ND2+NP
     newprint=.false.
     if(old) then
-       call LIEINIT(NO1,NV,ND1,NDPT1,0,0)
+       call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
        w_p=0
        w_p%nc=1
        w_p=(/" Berz's Package  "/)
@@ -1304,7 +1310,7 @@ contains
     w_p=(/NO,ND,ND2,NP,NDPT,NV/)
     call write_i
     CALL ASSIGN
-    CALL ASSIGNMAP
+    !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
 
@@ -1341,9 +1347,8 @@ contains
        call kill(varf2)
     endif
     warnda=.true.
-    FIRSTSCHEME=OLDSCHEME
 
-    master=1
+    master=0  !  master=1   2002.12.25
 
     old=log1
     nd1=0
@@ -1357,7 +1362,7 @@ contains
     newprint=.false.
 
     if(old) then
-       call LIEINIT(NO1,NV,ND1,NDPT1,0,0)
+       call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
        w_p=0
        w_p%nc=1
        w_p=(/" Berz's Package  "/)
@@ -1383,7 +1388,7 @@ contains
 
 
     CALL ASSIGN
-    CALL ASSIGNMAP
+    !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
   end subroutine init_tpsa
@@ -1395,7 +1400,7 @@ contains
     implicit none
 
     CALL DEASSIGN
-    CALL DEASSIGNMAP
+    !    CALL DEASSIGNMAP
     IF(.NOT.OLD) then
        CALL DE_initialize_da
     endif
@@ -1439,7 +1444,7 @@ contains
     real(dp) stn(ndim),radn(ndim),angn(ndim)
     integer i,j,jj(lnv)
     character(6) ind_stoc(ndim2)
-
+    call check_snake
     st(:)=zero;rad(:)=zero;ang(:)=zero;
     stn(:)=zero;radn(:)=zero;angn(:)=zero;
     do i=1,ndim2
@@ -1578,7 +1583,7 @@ contains
 
     IF(S2%STOCHASTIC) THEN
        !       norm=s2%bij ! 2002.10.17
-       norm=abs(s2%bij) ! 2002.10.17
+       norm=full_abs(s2%bij) ! 2002.10.17
 
        bijn=s2%bij/norm
        id=1

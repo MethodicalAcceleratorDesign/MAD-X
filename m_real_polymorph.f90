@@ -5,7 +5,7 @@ module polymorphic_taylor
   use complex_taylor
   implicit none
   logical(lp),private,parameter::t=.true.,f=.false.
-  integer,private::NO,ND,ND2,NP,NDPT,NV,lastmaster
+  integer,private::NO,ND,ND2,NP,NDPT,NV          !,lastmaster   ! 2002.12.13
   INTEGER,PRIVATE::NMAX=100
   !  real(dp),PRIVATE::EPS=c_1d_6
   integer ent,exi
@@ -15,7 +15,7 @@ module polymorphic_taylor
        m31=m3+ms*m1,m32=m3+ms*m2,m33=m3+ms*m3
   logical(lp),private::old
   private resetpoly,resetpolyn ,resetpoly0,resetpolyn0 ,allocpoly,allocpolyn,resetpoly_R,resetpoly_Rn
-  PRIVATE K_OPT,A_OPT
+  PRIVATE K_OPT,A_OPT,e_OPT,ke_OPT
   private allocenv,allocenvn,resetenv,resetenvn
   private equal,Dequaldacon,equaldacon,iequaldacon ,realEQUAL,singleequal
   private taylorEQUAL,EQUALtaylor,complexreal_8
@@ -37,7 +37,7 @@ module polymorphic_taylor
   private neq,dneqsc,dscneq,neqsc,scneq,ineqsc,iscneq
   PRIVATE GETCHARnd2,GETintnd2,getchar,GETint,GETORDER,CUTORDER
   private  real_8ENV,ENVreal_8 ,RADTAYLORENV_8, ENV_8RADTAYLOR ,beamENV_8,normal_p
-  private datan2dr,dcosdr,dsindr,dtandr,datandr
+  private absoftdatan2dr,absoftdcosdr,absoftdsindr,absoftdtandr,absoftdatandr
   !complex stuff
   private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt
   private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT
@@ -104,21 +104,21 @@ module polymorphic_taylor
 
   INTERFACE dtand
      MODULE PROCEDURE dtandt
-     MODULE PROCEDURE dtandr   ! for non PC absoft
+     MODULE PROCEDURE absoftdtandr   ! for non PC absoft
   END INTERFACE
   INTERFACE tand
      MODULE PROCEDURE dtandt
-     MODULE PROCEDURE dtandr  ! for non PC
+     MODULE PROCEDURE absoftdtandr  ! for non PC
   END INTERFACE
 
 
   INTERFACE dcosd
      MODULE PROCEDURE dcosdt
-     MODULE PROCEDURE dcosdr  ! for non PC absoft
+     MODULE PROCEDURE absoftdcosdr  ! for non PC absoft
   END INTERFACE
   INTERFACE cosd
      MODULE PROCEDURE dcosdt
-     MODULE PROCEDURE dcosdr  ! for non PC
+     MODULE PROCEDURE absoftdcosdr  ! for non PC
   END INTERFACE
 
 
@@ -137,11 +137,11 @@ module polymorphic_taylor
 
   INTERFACE dsind
      MODULE PROCEDURE dsindt
-     MODULE PROCEDURE dsindr  ! for non PC absoft
+     MODULE PROCEDURE absoftdsindr  ! for non PC absoft
   END INTERFACE
   INTERFACE sind
      MODULE PROCEDURE dsindt
-     MODULE PROCEDURE dsindr  ! for non PC
+     MODULE PROCEDURE absoftdsindr  ! for non PC
   END INTERFACE
 
 
@@ -193,20 +193,20 @@ module polymorphic_taylor
 
   INTERFACE datan2d
      MODULE PROCEDURE datan2dt
-     MODULE PROCEDURE datan2dr      ! for non PC absoft
+     MODULE PROCEDURE absoftdatan2dr      ! for non PC absoft
   END INTERFACE
   INTERFACE atan2d
      MODULE PROCEDURE datan2dt
-     MODULE PROCEDURE datan2dr      ! for non PC
+     MODULE PROCEDURE absoftdatan2dr      ! for non PC
   END INTERFACE
 
   INTERFACE datand
      MODULE PROCEDURE datandt
-     MODULE PROCEDURE datandr    ! for non PC  absoft
+     MODULE PROCEDURE absoftdatandr    ! for non PC  absoft
   END INTERFACE
   INTERFACE atand
      MODULE PROCEDURE datandt
-     MODULE PROCEDURE datandr   ! for non PC
+     MODULE PROCEDURE absoftdatandr   ! for non PC
   END INTERFACE
 
   INTERFACE dasin
@@ -280,16 +280,19 @@ module polymorphic_taylor
      MODULE PROCEDURE A_OPT    !allocpoly   !
      MODULE PROCEDURE allocpolyn  !
      !radiation
-     MODULE PROCEDURE allocenv   !
+     MODULE PROCEDURE e_opt   !
+     !     MODULE PROCEDURE allocenv   !
      MODULE PROCEDURE allocenvn   !
   END INTERFACE
+
   INTERFACE kill
      MODULE PROCEDURE K_OPT    !resetpoly0   !
+     MODULE PROCEDURE Ke_OPT    !resetpoly0   !
      MODULE PROCEDURE resetpolyn0  !
      MODULE PROCEDURE resetpoly_R
      MODULE PROCEDURE resetpoly_RN
      !radiation
-     MODULE PROCEDURE resetenv   !
+     !     MODULE PROCEDURE resetenv   !
      MODULE PROCEDURE resetenvn   !
   END INTERFACE
 
@@ -1793,7 +1796,7 @@ contains
     case(m1,m3)
        full_abst=abs(s1%r)
     case(m2)
-       full_abst=abs(s1%t)    ! 2002.10.17
+       full_abst=full_abs(s1%t)    ! 2002.10.17
     case default
        w_p=0
        w_p%nc=2
@@ -1882,12 +1885,12 @@ contains
     end select
   END FUNCTION dtandt
 
-  FUNCTION dtandr( S1 )
+  FUNCTION absoftdtandr( S1 )
     implicit none
-    real(dp) dtandr
+    real(dp) absoftdtandr
     real(dp), INTENT (IN) :: S1
-    dtandr=tan(s1*DEG_TO_RAD_)
-  END FUNCTION dtandr
+    absoftdtandr=tan(s1*DEG_TO_RAD_)
+  END FUNCTION absoftdtandr
 
   FUNCTION dcost( S1 )
     implicit none
@@ -1965,12 +1968,12 @@ contains
     end select
   END FUNCTION dcosdt
 
-  FUNCTION dcosdr( S1 )
+  FUNCTION absoftdcosdr( S1 )
     implicit none
-    real(dp) dcosdr
+    real(dp) absoftdcosdr
     real(dp) , INTENT (IN) :: S1
-    dcosdr=cos(s1*DEG_TO_RAD_ )
-  END FUNCTION dcosdr
+    absoftdcosdr=cos(s1*DEG_TO_RAD_ )
+  END FUNCTION absoftdcosdr
 
 
   FUNCTION dsint( S1 )
@@ -2049,12 +2052,12 @@ contains
     end select
   END FUNCTION dsindt
 
-  FUNCTION dsindr( S1 )
+  FUNCTION absoftdsindr( S1 )
     implicit none
-    real(dp) dsindr
+    real(dp) absoftdsindr
     real(dp) , INTENT (IN) :: S1
-    dsindr=sin(s1*DEG_TO_RAD_ )
-  END FUNCTION dsindr
+    absoftdsindr=sin(s1*DEG_TO_RAD_ )
+  END FUNCTION absoftdsindr
 
 
   FUNCTION dlogt( S1 )
@@ -3682,14 +3685,22 @@ contains
   END SUBROUTINE resetpoly
 
 
-  SUBROUTINE  resetpolyn(S2,n)
+  SUBROUTINE  resetpolyn(S2,K)
     implicit none
     type (real_8),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly(s2(j))
     enddo
 
 
@@ -3713,22 +3724,30 @@ contains
 
   END SUBROUTINE resetpoly_R
 
-  SUBROUTINE  resetpoly_RN(S2,FL,N)
+  SUBROUTINE  resetpoly_RN(S2,FL,K)
     implicit none
     type (real_8),INTENT(INOUT),dimension(:)::S2
     logical(lp),INTENT(IN)::FL
 
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly_R(s2(i),FL)
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly_R(s2(j),FL)
     enddo
 
 
   END SUBROUTINE resetpoly_RN
 
-  SUBROUTINE  resetpoly_R31(S2)  !   STAYS REAL
+  SUBROUTINE  resetpoly_R31(S2)  !   STAYS REAL FOR PTC
     implicit none
     integer ipause, mypauses
     type (real_8),INTENT(INOUT)::S2
@@ -3744,15 +3763,23 @@ contains
     ENDIF
   END SUBROUTINE resetpoly_R31
 
-  SUBROUTINE  resetpoly_R31N(S2,N)
+  SUBROUTINE  resetpoly_R31N(S2,K)
     implicit none
     type (real_8),INTENT(INOUT),dimension(:)::S2
 
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly_R31(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly_R31(s2(j))
     enddo
 
 
@@ -3790,6 +3817,23 @@ contains
   END SUBROUTINE K_OPT
 
 
+  SUBROUTINE  Ke_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (env_8),INTENT(INout)::S1
+    type (env_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
+    call resetenv(s1)
+    if(present(s2)) call resetenv(s2)
+    if(present(s3)) call resetenv(s3)
+    if(present(s4)) call resetenv(s4)
+    if(present(s5)) call resetenv(s5)
+    if(present(s6)) call resetenv(s6)
+    if(present(s7)) call resetenv(s7)
+    if(present(s8)) call resetenv(s8)
+    if(present(s9)) call resetenv(s9)
+    if(present(s10))call resetenv(s10)
+  END SUBROUTINE Ke_OPT
+
+
 
 
 
@@ -3808,14 +3852,22 @@ contains
 
   END SUBROUTINE kill_c
 
-  SUBROUTINE  resetpolyn0(S2,n)
+  SUBROUTINE  resetpolyn0(S2,K)
     implicit none
     type (real_8),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly0(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly0(s2(j))
     enddo
 
 
@@ -3859,14 +3911,22 @@ contains
 
   END SUBROUTINE alloc_c
 
-  SUBROUTINE  allocpolyn(S2,n)
+  SUBROUTINE  allocpolyn(S2,K)
     implicit none
     type (real_8),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call allocpoly(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call allocpoly(s2(j))
     enddo
 
 
@@ -3910,7 +3970,7 @@ contains
     integer ipause, mypauses
     type (real_8),INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
 
     if(s1%kind==0) then
@@ -3932,11 +3992,11 @@ contains
              S2%R=S1%R
              !        master=localmaster  ! added because of knob problems 2001.9.19
           case(m2)
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !  2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
           case(m3)
              s2%r=S1%r  ! Knob stays a knob and real stays real 2002.10.9
              ! line=  " You are putting kind=3 (TPSA) into another kind=3"
@@ -3957,22 +4017,22 @@ contains
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !  2002.12.26 master=0
 
              S2%t=S1%t
 
-             master=localmaster
+             !             master=localmaster
           case(m3)
              if(.not.s2%alloc) then
                 call alloc(s2%t)
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !  2002.12.26 master=0
              if(knob) then
                 call varfk1(S1)
                 S2%t=varf1
@@ -3980,7 +4040,7 @@ contains
                 S2%R=S1%R
                 s2%kind=1
              endif
-             master=localmaster
+             !             master=localmaster
           end select
        endif
 
@@ -4007,11 +4067,11 @@ contains
              if(.not.s2%alloc) then
                 call alloc(s2%t)
              endif
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !  2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
              s2%kind=2
              s2%alloc=t
           else
@@ -4024,6 +4084,7 @@ contains
              w_p%c(4)= " at your own insane risk "
              w_p%c(5)= " Etienne Forest/Frank Schmidt"
              CALL WRITE_E(778)
+             w_p%nc=sqrt(-float(w_p%nc))
           endif
        endif    ! end of what is s1
 
@@ -4035,24 +4096,24 @@ contains
     implicit none
     complex(dp) ,INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
 
     select case(S1%kind)
     case(m1)
        S2=S1%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%t.sub.'0'
-       master=localmaster
+       !       master=localmaster
     case(m3)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%r
-       master=localmaster
+       !       master=localmaster
     case default
        w_p=0
        w_p%nc=2
@@ -4072,24 +4133,24 @@ contains
     implicit none
     real(dp),INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
 
     select case(S1%kind)
     case(m1)
        S2=S1%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%t.sub.'0'
-       master=localmaster
+       !       master=localmaster
     case(m3)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%r
-       master=localmaster
+       !       master=localmaster
     case default
        w_p=0
        w_p%nc=2
@@ -4107,24 +4168,24 @@ contains
     implicit none
     real(sp),INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
 
     select case(S1%kind)
     case(m1)
        S2=S1%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%t.sub.'0'
-       master=localmaster
+       !       master=localmaster
     case(m3)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%r
-       master=localmaster
+       !       master=localmaster
     case default
        w_p=0
        w_p%nc=2
@@ -4144,29 +4205,29 @@ contains
     implicit none
     type (taylor),INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
 
     select case(S1%kind)
     case(m1)
        S2=S1%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%t
-       master=localmaster
+       !       master=localmaster
     case(m3)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        if(knob) then
           call varfk1(S1)
           S2=varf1
        else
           S2=S1%R
        endif
-       master=localmaster
+       !       master=localmaster
     case default
        w_p=0
        w_p%nc=2
@@ -4185,16 +4246,16 @@ contains
     integer ipause, mypauses
     type (real_8),INTENT(inOUT)::S2
     type (taylor),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     IF(S2%KIND==3.and.(.not.setknob)) THEN  ! 2002.10.9
        line=  "Forbidden in EQUALtaylor: s2 is a knob "
        ipause=mypauses(0,line)
     ENDIF
 
-    localmaster=master
+    !    localmaster=master
     call check_snake
-    master=0
+    !  2002.12.26 master=0
     if(s2%kind/=3) then
        if(.not.s2%alloc) then
           call alloc(s2%t)
@@ -4205,7 +4266,7 @@ contains
     else
        s2%r=S1.sub.'0' ! 2002.10.9
     endif
-    master=localmaster
+    !    master=localmaster
 
   END SUBROUTINE EQUALtaylor
 
@@ -4214,16 +4275,16 @@ contains
     integer ipause, mypauses
     type (real_8),INTENT(inOUT)::S2
     type (universal_taylor),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     IF(S2%KIND==M3) THEN
        line=  "Forbidden in real_8univ: s2 is a knob "
        ipause=mypauses(0,line)
     ENDIF
 
-    localmaster=master
-    call check_snake
-    master=0
+    !    localmaster=master
+    !    call check_snake
+    !  2002.12.26 master=0
     if(.not.s2%alloc) then
        call alloc(s2%t)
        s2%alloc=t
@@ -4231,7 +4292,7 @@ contains
     S2%t=S1
     s2%KIND=2
 
-    master=localmaster
+    !    master=localmaster
   END SUBROUTINE real_8univ
 
   SUBROUTINE  univreal_8(S2,S1)   ! new sagan
@@ -4239,28 +4300,28 @@ contains
     integer ipause, mypauses
     type (universal_taylor),INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     select case(S1%kind)
     case(m1)
        S2=S1%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        S2=S1%t
-       master=localmaster
+       !       master=localmaster
     case(m3)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !  2002.12.26 master=0
        if(knob) then
           call varfk1(S1)
           S2=varf1
        else
           S2=S1%R
        endif
-       master=localmaster
+       !       master=localmaster
     case default
        w_p=0
        w_p%nc=2
@@ -4334,16 +4395,16 @@ contains
     type (real_8),INTENT(inOUT),dimension(:)::S2
     integer,INTENT(IN)::R1
     integer i
-    integer localmaster
+    !    integer localmaster
 
-    localmaster=master
-    call check_snake
-    master=0
+    !    localmaster=master
+    !    call check_snake
+    !  2002.12.26 master=0
     do i=1,r1
        call resetpoly(s2(i))
        s2(i)%i=i
     enddo
-    master=localmaster
+    !    master=localmaster
   END SUBROUTINE iequaldaconn
 
 
@@ -4455,23 +4516,21 @@ contains
     implicit none
     TYPE (real_8) s1
     integer ipause,mypauses
-    lastmaster=master
-
+    ! lastmaster=master  ! 2002.12.13
 
     select case(master)
-    case(1:ndumt-1)
+    case(0:ndumt-1)
        master=master+1
     case(ndumt)
        line=  " cannot indent anymore "
        ipause=mypauses(0,line)
     end select
-
+    !    write(26,*) " real polymorph  ",master
 
     call ass0(s1%t)
     s1%alloc=t
     s1%kind=2
     s1%i=0
-
 
   end subroutine ASSp
 
@@ -4571,12 +4630,12 @@ contains
     end select
   END FUNCTION datanDt
 
-  FUNCTION datanDr( S1 )
+  FUNCTION absoftdatanDr( S1 )
     implicit none
-    real(dp) datanDr
+    real(dp) absoftdatanDr
     real(dp), INTENT (IN) :: S1
-    datanDr=atan(s1)*RAD_TO_DEG_
-  END FUNCTION datanDr
+    absoftdatanDr=atan(s1)*RAD_TO_DEG_
+  END FUNCTION absoftdatanDr
 
   FUNCTION datan2t( S2,S1 )
     implicit none
@@ -5069,12 +5128,12 @@ contains
 
   END FUNCTION datan2dt
 
-  FUNCTION datan2dr( S2,S1 )
+  FUNCTION absoftdatan2dr( S2,S1 )
     implicit none
-    real(dp) datan2dr
+    real(dp) absoftdatan2dr
     real(dp), INTENT (IN) :: S2,S1
-    datan2dr=ATAN2(S2,S1)*RAD_TO_DEG_
-  END FUNCTION datan2dr
+    absoftdatan2dr=ATAN2(S2,S1)*RAD_TO_DEG_
+  END FUNCTION absoftdatan2dr
 
   FUNCTION dasint( S1 )
     implicit none
@@ -5313,6 +5372,7 @@ contains
     type (real_8),INTENT(IN),dimension(:)::S1
     integer i
 
+    call check_snake
 
     do i=1,nd2
        s2%v(i)=s1(i)          !%t
@@ -5326,6 +5386,9 @@ contains
     type (damap)  t
     integer i
     call alloc(t)
+
+    call check_snake
+
     do i=1,nd2
        t%v(i)=s1(i)          !%t
     enddo
@@ -5341,6 +5404,8 @@ contains
     type (real_8),INTENT(inout),dimension(:)::S1
     integer i
 
+    call check_snake
+
     do i=1,nd2
        s1(i)=s2%v(i)
     enddo
@@ -5355,6 +5420,7 @@ contains
     type (real_8),INTENT(IN),dimension(:)::S1
     integer i
 
+    call check_snake
 
     do i=1,nd2
        s2(i)%v=s1(i)          !%t
@@ -5367,6 +5433,7 @@ contains
     type (real_8),INTENT(inout),dimension(:)::S1
     integer i
 
+    call check_snake
 
     do i=1,nd2
        s1(i)=s2(i)%v
@@ -5379,6 +5446,7 @@ contains
     type (RADTAYLOR),INTENT(IN),dimension(:)::S1
     integer i,J
 
+    call check_snake
 
     do i=1,nd2
        s2(i)%v=s1(i)%V          !%t
@@ -5397,6 +5465,8 @@ contains
     type (RADTAYLOR),INTENT(inout),dimension(:)::S1
     integer i,J
 
+    call check_snake
+
     do i=1,nd2
        s1(i)%V= s2(i)%v         !%t
     enddo
@@ -5413,14 +5483,15 @@ contains
     type (env_8),INTENT(INOUT)::S2
     integer i
 
-    call reset(s2%v)
+    call resetpoly(s2%v)
     do i=1,nd2
-       call reset(s2%e(i))
-       call reset(s2%sigma0(i))
-       call reset(s2%sigmaf(i))
+       call resetpoly(s2%e(i))
+       call resetpoly(s2%sigma0(i))
+       call resetpoly(s2%sigmaf(i))
     enddo
 
   END SUBROUTINE resetenv
+
 
   SUBROUTINE  allocenv(S2)
     implicit none
@@ -5436,32 +5507,91 @@ contains
 
   END SUBROUTINE allocenv
 
-
-  SUBROUTINE  allocenvn(S2,n)
+  SUBROUTINE  allocenvn(S2,K)
     implicit none
     type (env_8),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call allocenv(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call allocenv(s2(j))
     enddo
 
 
   END SUBROUTINE allocenvn
 
-  SUBROUTINE  resetenvn(S2,n)
+  SUBROUTINE  e_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (env_8),INTENT(INout)::S1
+    type (env_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
+    call allocenv(s1)
+    if(present(s2)) call allocenv(s2)
+    if(present(s3)) call allocenv(s3)
+    if(present(s4)) call allocenv(s4)
+    if(present(s5)) call allocenv(s5)
+    if(present(s6)) call allocenv(s6)
+    if(present(s7)) call allocenv(s7)
+    if(present(s8)) call allocenv(s8)
+    if(present(s9)) call allocenv(s9)
+    if(present(s10))call allocenv(s10)
+  END SUBROUTINE e_opt
+
+
+  !  SUBROUTINE  allocenvn(S2,n)
+  !    implicit none
+  !    type (env_8),INTENT(INOUT),dimension(:)::S2
+  !    integer, INTENT(IN)::n
+  !    integer i
+  !
+  !    do i=1,n
+  !       call allocenv(s2(i))
+  !    enddo
+
+  !  END SUBROUTINE allocenvn
+
+  SUBROUTINE  resetenvn(S2,K)
     implicit none
     type (env_8),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetenv(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetenv(s2(j))
     enddo
 
 
   END SUBROUTINE resetenvn
+
+  !  SUBROUTINE  resetenvn(S2,n)
+  !    implicit none
+  !    type (env_8),INTENT(INOUT),dimension(:)::S2
+  !    integer, INTENT(IN)::n
+  !    integer i
+  !
+  !    do i=1,n
+  !       call resetenv(s2(i))
+  !    enddo
+  !
+  !
+  !  END SUBROUTINE resetenvn
+
+
 
   SUBROUTINE  beamENV_8(S2,SENV_8)
     implicit none
@@ -5470,6 +5600,8 @@ contains
     type (ENV_8),INTENT(IN)::SENV_8(ndim2)
 
     call alloc(s1,nd2)
+
+    call check_snake
 
     S1=SENV_8
 
@@ -5490,6 +5622,12 @@ contains
     if(knob) then
        if(s2%i>=0.and.s2%i<=nv)  then
           call var(varf1,S2%R,S2%S,s2%i)
+       elseif(knob_numerical) then
+          if(s2%i==knob_i) then
+             call var(varf1,S2%R+knob_eps(knob_i),zero,0)
+          else
+             call var(varf1,S2%R,zero,0)
+          endif
        else
           w_p=0
           w_p%nc=2
@@ -5504,6 +5642,7 @@ contains
        call var(varf1,S2%R,zero,0)
     endif
 
+
   end SUBROUTINE  varfk1
 
   SUBROUTINE  varfk2(S2)
@@ -5514,6 +5653,12 @@ contains
     if(knob) then
        if(s2%i>=0.and.s2%i<=nv)  then
           call var(varf2,S2%R,S2%S,s2%i)
+       elseif(knob_numerical) then
+          if(s2%i==knob_i) then
+             call var(varf2,S2%R+knob_eps(knob_i),zero,0)
+          else
+             call var(varf2,S2%R,zero,0)
+          endif
        else
           w_p=0
           w_p%nc=2

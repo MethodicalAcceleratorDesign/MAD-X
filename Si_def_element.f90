@@ -11,6 +11,7 @@ MODULE S_DEF_ELEMENT
   logical(lp),PARAMETER::BERZ=.TRUE.,ETIENNE=.NOT.BERZ
   logical(lp) :: USE_TPSAFIT=.TRUE.  ! USE GLOBAL ARRAY INSTEAD OF PERSONAL ARRAY
   logical(lp), target :: set_tpsafit=.false.
+  real(dp) , target :: scale_tpsafit=1.0_dp
   real(dp), target :: tpsafit(lnv) !   used for fitting with tpsa in conjunction with pol_block
   PRIVATE copy_el_elp,copy_elp_el,copy_el_el
   PRIVATE cop_el_elp,cop_elp_el,cop_el_el
@@ -28,6 +29,7 @@ MODULE S_DEF_ELEMENT
   logical(lp),TARGET :: ALWAYS_FRINGE=.FALSE.
   logical(lp),TARGET :: FEED_P0C=.FALSE.
   !  logical(lp) :: isomorphism_MIS=.TRUE.  !Not needed anymore always should be true
+  private put_aperture_el,put_aperture_elp
 
   TYPE MUL_BLOCK
      ! stuff for setting multipole
@@ -180,6 +182,11 @@ MODULE S_DEF_ELEMENT
   INTERFACE null_ELEment
      MODULE PROCEDURE null_EL                               ! need upgrade
      MODULE PROCEDURE null_ELp                              ! need upgrade
+  end  INTERFACE
+
+  INTERFACE put_aperture
+     MODULE PROCEDURE put_aperture_el                               ! need upgrade
+     MODULE PROCEDURE put_aperture_elp                              ! need upgrade
   end  INTERFACE
 
 
@@ -611,7 +618,7 @@ CONTAINS
                 s2%AN(I)%KIND=3
                 DONEIT=.TRUE.
                 IF(S1%SET_TPSAFIT) THEN
-                   s2%aN(I)%R=s2%aN(I)%R+s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
+                   s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
                 ENDIF
              ENDIF
              IF(S1%IBN(I)>0) THEN
@@ -620,7 +627,7 @@ CONTAINS
                 s2%BN(I)%KIND=3
                 DONEIT=.TRUE.
                 IF(S1%SET_TPSAFIT) THEN
-                   s2%BN(I)%R=s2%BN(I)%R+s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
+                   s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
                 ENDIF
              ENDIF
           ENDDO
@@ -635,7 +642,7 @@ CONTAINS
                 s2%VOLT%KIND=3
                 DONEIT=.TRUE.
                 IF(S1%SET_TPSAFIT) THEN
-                   s2%VOLT%R=s2%VOLT%R+s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
+                   s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
                 ENDIF
              ENDIF
              IF(S1%IFREQ>0) THEN
@@ -643,7 +650,7 @@ CONTAINS
                 s2%FREQ%S=S1%SFREQ
                 s2%FREQ%KIND=3
                 IF(S1%SET_TPSAFIT) THEN
-                   s2%FREQ%R=s2%FREQ%R+s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+                   s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
                 ENDIF
                 DONEIT=.TRUE.
              ENDIF
@@ -653,7 +660,7 @@ CONTAINS
                 s2%PHAS%KIND=3
                 DONEIT=.TRUE.
                 IF(S1%SET_TPSAFIT) THEN
-                   s2%PHAS%R=s2%PHAS%R+s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+                   s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
                 ENDIF
              ENDIF
           ENDIF
@@ -665,7 +672,7 @@ CONTAINS
                 s2%B_SOL%KIND=3
                 DONEIT=.TRUE.
                 IF(S1%SET_TPSAFIT) THEN
-                   s2%B_SOL%R=s2%B_SOL%R+s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
+                   s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
                 ENDIF
              ENDIF
           ENDIF
@@ -2080,6 +2087,7 @@ CONTAINS
        CALL KILL(EL%FINT);DEALLOCATE(EL%FINT);
        CALL KILL(EL%HGAP);DEALLOCATE(EL%HGAP);
        CALL KILL(EL%H1);DEALLOCATE(EL%H1);
+       CALL KILL(EL%H2);DEALLOCATE(EL%H2);
        CALL KILL(EL%thin_h_foc);DEALLOCATE(EL%thin_v_foc);
        CALL KILL(EL%thin_h_angle);DEALLOCATE(EL%thin_v_angle);
        DEALLOCATE(EL%MIS);DEALLOCATE(EL%EXACTMIS);
@@ -2825,6 +2833,52 @@ CONTAINS
 
 
   END SUBROUTINE find_energy
+
+  subroutine put_aperture_el(el,kind,r,x,y)
+    implicit none
+    real(dp),intent(in):: r(:),x,y
+    integer,intent(in):: kind
+    type(element),intent(inout):: el
+
+    if(.not.associated(el%p%aperture)) call alloc(el%p%aperture)
+    el%p%aperture%x=x
+    el%p%aperture%y=y
+    el%p%aperture%r=r
+    el%p%aperture%kind=kind
+  end  subroutine put_aperture_el
+
+  subroutine put_aperture_elp(el,kind,r,x,y)
+    implicit none
+    real(dp),intent(in):: r(:),x,y
+    integer,intent(in):: kind
+    type(elementp),intent(inout):: el
+
+    if(.not.associated(el%p%aperture)) call alloc(el%p%aperture)
+    el%p%aperture%x=x
+    el%p%aperture%y=y
+    el%p%aperture%r=r
+    el%p%aperture%kind=kind
+  end  subroutine put_aperture_elp
+
+  subroutine remove_aperture_el(el)
+    implicit none
+    type(element),intent(inout):: el
+
+    if(associated(el%p%aperture)) then
+       CALL kill(el%p%APERTURE)
+       DEALLOCATE(el%p%APERTURE);
+    endif
+  end  subroutine remove_aperture_el
+
+  subroutine remove_aperture_elp(el)
+    implicit none
+    type(elementp),intent(inout):: el
+
+    if(associated(el%p%aperture)) then
+       CALL kill(el%p%APERTURE)
+       DEALLOCATE(el%p%APERTURE);
+    endif
+  end  subroutine remove_aperture_elp
 
 
 END MODULE S_DEF_ELEMENT

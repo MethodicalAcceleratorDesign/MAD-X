@@ -7,8 +7,8 @@ module S_fitting
   PRIVATE lattice_fit_TUNE_L,lattice_fit_L   !,LAGRANGE
   PRIVATE THINLENS_L_B,THINLENS_L_L,THINLENS_L_2
   PRIVATE FIND_ORBIT_LAYOUT,FIND_ORBIT_M_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
-  real(dp), pointer :: Harmonic_number
   logical(lp), PRIVATE :: VERBOSE = .false.
+
 
   INTERFACE lattice_fit_TUNE
      ! LINKED
@@ -595,19 +595,25 @@ contains
 
   end SUBROUTINE THINLENS_L_2
 
-  SUBROUTINE FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE)  ! Finds orbit with TPSA in State or compatible state
+  SUBROUTINE FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE,TURNS)  ! Finds orbit with TPSA in State or compatible state
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: RING
-    real(dp)  FIX(6),DIX(6),xdix,xdix0,tiny,L_design,freq
+    INTEGER, OPTIONAL:: TURNS
+    real(dp)  FIX(6),DIX(6),xdix,xdix0,tiny,freq
     TYPE(REAL_8) X(6)
     TYPE(DAMAP) MX,SX,SXI,IS
     integer NO1,ND2,I,IU,LOC,ITE,npara
     TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
     TYPE (fibre), POINTER :: C
-
+    logical(lp) APERTURE
+    INTEGER TURNS0
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
+    TURNS0=1
+    IF(PRESENT(TURNS)) TURNS0=TURNS
     Nullify(C);
-    L_design=0.d0
+
     if(.not.ring%closed) then
        w_p=0
        w_p%nc=1
@@ -672,9 +678,7 @@ contains
           endif
           i=i+1
        enddo
-       if(freq/=0.d0.and.associated(Harmonic_number)) then
-          L_design=Harmonic_number*clight/freq
-       else
+       if(freq==0.d0) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -701,10 +705,25 @@ contains
        X(I)=FIX(I)
     ENDDO
 
+    DO I=1,TURNS0
+       CALL TRACK(RING,X,LOC,STAT)
+       if(.not.check_stable) then
+          CALL KILL(X,6)
+          CALL KILL(MX)
+          CALL KILL(SX)
+          CALL KILL(SXI)
+          CALL KILL(IS)
+          w_p=0
+          w_p%nc=1
+          w_p%fc='((1X,a72))'
+          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",1
+          call write_i
 
-    CALL TRACK(RING,X,LOC,STAT)
+          return
+       endif
+    ENDDO
 
-    x(6)=x(6)-L_design
+
     IS=1
     MX=X
     SX=MX-IS
@@ -750,31 +769,39 @@ contains
     CALL KILL(SX)
     CALL KILL(SXI)
     CALL KILL(IS)
+    c_%APERTURE_FLAG=APERTURE
 
   END SUBROUTINE FIND_ORBIT_LAYOUT
 
 
-  SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,LOC,STATE,eps) ! Finds orbit without TPSA in State or compatible state
+  SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: RING
     real(dp) , intent(inOUT) :: FIX(6)
     INTEGER , intent(in) :: LOC
+    INTEGER, OPTIONAL::TURNS
     real(dp) , optional,intent(in) :: eps
     TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
 
-    real(dp)  DIX(6),xdix,xdix0,tiny,l_design,freq
+    real(dp)  DIX(6),xdix,xdix0,tiny,freq
     real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
     integer NO1,ND2,I,IU,ITE,ier,j
     TYPE (fibre), POINTER :: C
+    logical(lp) APERTURE
+    INTEGER TURNS0
+    TURNS0=1
+    IF(PRESENT(TURNS)) TURNS0=TURNS
 
-    l_design=0.d0
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
+
 
     if(.not.present(eps)) then
        if(.not.present(STATE)) then
-          call FIND_ORBIT_LAYOUT(RING,FIX,LOC)
+          call FIND_ORBIT_LAYOUT(RING,FIX,LOC,TURNS=TURNS0)
        else
-          call FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE)
+          call FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE,TURNS=TURNS0)
        endif
        return
     endif
@@ -846,9 +873,7 @@ contains
           endif
           i=i+1
        enddo
-       if(freq/=0.d0.and.associated(Harmonic_number)) then
-          L_design=Harmonic_number*clight/freq
-       else
+       if(freq==0.d0) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -865,17 +890,39 @@ contains
 
     X=FIX
 
-    CALL TRACK(RING,X,LOC,STAT)
+    DO I=1,TURNS0
+       CALL TRACK(RING,X,LOC,STAT)
+       if(.not.check_stable) then
+          w_p=0
+          w_p%nc=1
+          w_p%fc='((1X,a72))'
+          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",2
+          call write_i
 
-    x(6)=x(6)-L_design
+          return
+       endif
+
+    ENDDO
+
 
 
     DO J=1,ND2
 
        Y=FIX
        Y(J)=FIX(J)+EPS
-       CALL TRACK(RING,Y,LOC,STAT)
-       y(6)=y(6)-L_design
+       DO I=1,TURNS0
+          CALL TRACK(RING,Y,LOC,STAT)
+          if(.not.check_stable) then
+             w_p=0
+             w_p%nc=1
+             w_p%fc='((1X,a72))'
+             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
+             call write_i
+
+             return
+          endif
+       ENDDO
+
        do i=1,ND2
           MX(I,J)=(Y(i)-X(i))/eps
        enddo
@@ -936,11 +983,213 @@ contains
        GOTO 3
 
     endif
+    c_%APERTURE_FLAG=APERTURE
 
   END SUBROUTINE FIND_ORBIT_LAYOUT_noda
 
+  SUBROUTINE FIND_ORBIT_polymorph_noda(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: RING
+    real(dp) , intent(inOUT) :: FIX(6)
+    INTEGER , intent(in) :: LOC
+    INTEGER, OPTIONAL::TURNS
+    real(dp) , optional,intent(in) :: eps
+    TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
+    TYPE(INTERNAL_STATE) stat
 
-  SUBROUTINE FIND_ORBIT_M_LAYOUT(RING,X,LOC,STATE) ! Finds orbit and linear Map with TPSA in State or compatible state
+    real(dp)  DIX(6),xdix,xdix0,tiny,freq
+    real(dp) MX(6,6),sxi(6,6),SX(6,6)
+    type(real_8) X(6),Y(6)
+    integer NO1,ND2,I,IU,ITE,ier,j
+    TYPE (fibre), POINTER :: C
+    logical(lp) APERTURE
+    INTEGER TURNS0
+    TURNS0=1
+    IF(PRESENT(TURNS)) TURNS0=TURNS
+
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
+
+
+
+    if(.not.present(eps)) then
+       if(.not.present(STATE)) then
+          call FIND_ORBIT_LAYOUT(RING,FIX,LOC,TURNS=TURNS0)
+       else
+          call FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE,TURNS=TURNS0)
+       endif
+       return
+    endif
+
+
+    Nullify(C);
+
+    if(.not.ring%closed) then
+       w_p=0
+       w_p%nc=1
+       w_p%fc='((1X,a72))'
+       w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
+       call write_e(100)
+    endif
+    dix(:)=zero
+    tiny=c_1d_40
+    xdix0=c_1d4*DEPS_tracking
+    NO1=1
+    if(.not.present(STATE)) then
+       IF(default%NOCAVITY) THEN
+          !    ND1=2
+          stat=default+only_4d
+       ELSE
+          !   ND1=3
+          STAT=default
+          C=>RING%START
+          do i=1,RING%n
+             if(C%magp%kind==kind4) goto 101
+             C=>C%NEXT
+          enddo
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72))'
+          w_p%c(1)=" No Cavity in the Line "
+          w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
+          call write_e(101)
+       ENDIF
+    else
+       IF(STATE%NOCAVITY) THEN
+          ND2=4
+          STAT=STATE+only_4d
+       ELSE
+          ND2=6
+          STAT=STATE
+          C=>RING%START
+          do i=1,RING%n
+             if(C%magp%kind==kind4) goto 101
+             C=>C%NEXT
+          enddo
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72))'
+          w_p%c(1)=" No Cavity in the Line "
+          w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
+          call write_e(112)
+       ENDIF
+    endif
+101 continue
+
+
+    if(stat%totalpath.and.(.not.stat%nocavity)) then
+       C=>RING%START
+       freq=0.d0
+       i=1
+       do while(i<=RING%n.and.freq==0.d0)
+          c=>c%next
+          if(associated(c%magp%freq)) then
+             freq=c%magp%freq
+          endif
+          i=i+1
+       enddo
+       if(freq==0.d0) then
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72,/),(1X,a72))'
+          w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
+          w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
+          call write_E(113)
+       endif
+    endif
+
+
+    call alloc(x)
+    call alloc(y)
+3   continue
+
+    X=FIX
+
+    DO I=1,TURNS0
+       CALL TRACK(RING,X,LOC,STAT)
+    ENDDO
+
+
+
+    DO J=1,ND2
+
+       Y=FIX
+       Y(J)=FIX(J)+EPS
+       DO I=1,TURNS0
+          CALL TRACK(RING,Y,LOC,STAT)
+       ENDDO
+       do i=1,ND2
+          MX(I,J)=(Y(i)-X(i))/eps
+       enddo
+
+    ENDDO
+
+
+    SX=MX;
+    DO I=1,6
+       SX(I,I)=MX(I,I)-one
+    ENDDO
+
+    DO I=1,ND2
+       DIX(I)=FIX(I)-X(I)
+    enddo
+
+    CALL matinv(SX,SXI,ND2,6,ier)
+    IF(IER==132)  then
+       w_p=0
+       w_p%nc=1
+       w_p%fc='((1X,a72))'
+       w_p%c(1)=" Inversion failed in FIND_ORBIT_LAYOUT_noda"
+       call write_e(333)
+       return
+    endif
+
+    do i=1,6
+       x(i)=zero
+    enddo
+    do i=1,nd2
+       do j=1,nd2
+          x(i)=sxi(i,j)*dix(j)+x(i)
+       enddo
+    enddo
+    dix=x
+    DO  I=1,ND2
+       FIX(I)=FIX(I)+DIX(I)
+    ENDDO
+
+    xdix=zero
+    do iu=1,ND2
+       xdix=abs(dix(iu))+xdix
+    enddo
+    w_p=0
+    w_p%nc=1
+    w_p%fc='((1X,a72))'
+    write(w_p%c(1),'(a22,g20.14)') " Convergence Factor = ",xdix
+    if(verbose) call write_i
+    if(xdix.gt.deps_tracking) then
+       ite=1
+    else
+       if(xdix.ge.xdix0.or.xdix<=tiny) then
+          ite=0
+       else
+          ite=1
+          xdix0=xdix
+       endif
+    endif
+    if(ite.eq.1)  then
+       GOTO 3
+
+    endif
+    c_%APERTURE_FLAG=APERTURE
+    call kill(x)
+    call kill(y)
+
+  END SUBROUTINE FIND_ORBIT_polymorph_noda
+
+
+
+
+  SUBROUTINE FIND_ORBIT_M_LAYOUT(RING,X,LOC,STATE,TURNS) ! Finds orbit and linear Map with TPSA in State or compatible state
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: RING
     TYPE(REAL_8),INTENT(INOUT):: X(6)
@@ -948,9 +1197,16 @@ contains
     TYPE(DAMAP) MX,SX,SXI,IS
     integer NO1,ND2,I,IU,LOC,ITE,npara
     TYPE(INTERNAL_STATE) , optional, intent(in) :: STATE      !_in
+    INTEGER,OPTIONAL :: TURNS
     TYPE(INTERNAL_STATE)  STAT
     !   TYPE(INTERNAL_STATE) state
     TYPE(fibre), POINTER :: C
+    logical(lp) APERTURE
+    INTEGER TURNS0
+    TURNS0=1
+    IF(PRESENT(TURNS)) TURNS0=TURNS
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
     Nullify(C);
 
     if(.not.ring%closed) then
@@ -1009,8 +1265,9 @@ contains
     ENDDO
 
 
-
-    CALL TRACK(RING,X,LOC,stat)
+    DO I=1,TURNS0
+       CALL TRACK(RING,X,LOC,STAT)
+    ENDDO
 
     IS=1
     MX=X
@@ -1060,6 +1317,7 @@ contains
     CALL KILL(SX)
     CALL KILL(SXI)
     CALL KILL(IS)
+    c_%APERTURE_FLAG=aperture
 
   END SUBROUTINE FIND_ORBIT_M_LAYOUT
 
@@ -1077,6 +1335,9 @@ contains
     type(internal_state),optional, intent(in)::STATE
     type(internal_state) sss
     TYPE (fibre), POINTER :: C
+    logical(lp) APERTURE
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
 
     Nullify(C);
 
@@ -1277,6 +1538,7 @@ contains
     CALL kill(MX)
 
 
+    c_%APERTURE_FLAG=APERTURE
 
   END SUBROUTINE FIND_ENV_LAYOUT
 
@@ -1292,6 +1554,10 @@ contains
     TYPE(REAL_8) Y(6)
     TYPE(DAMAP) ID
     TYPE(NORMALFORM) NORMAL
+    logical(lp) APERTURE
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
+
 
     CALL ALLOC(Y)
     CALL ALLOC(ID)
@@ -1301,12 +1567,36 @@ contains
     y=FIX
 
     CALL TRACK(RING,Y,LOC,STATE)
+    if(.not.check_stable) then
+       w_p=0
+       w_p%nc=1
+       w_p%fc='((1X,a72))'
+       write(w_p%c(1),'(a16)') " find_ENVELOPE 1"
+       call write_i
+       CALL KILL(NORMAL)
+       CALL KILL(ID)
+       CALL KILL(Y)
+
+       return
+    endif
     normal= y
     y=normal%a1+FIX
 
     a1=y
     ys=y
     CALL TRACK(RING,Ys,loc,STATE)
+    if(.not.check_stable) then
+       w_p=0
+       w_p%nc=1
+       w_p%fc='((1X,a72))'
+       write(w_p%c(1),'(a16)') " find_ENVELOPE 2"
+       call write_i
+       CALL KILL(NORMAL)
+       CALL KILL(ID)
+       CALL KILL(Y)
+
+       return
+    endif
 
     y=YS
     id=y
@@ -1318,6 +1608,8 @@ contains
     CALL KILL(NORMAL)
     CALL KILL(ID)
     CALL KILL(Y)
+    c_%APERTURE_FLAG=APERTURE
+
 
   END SUBROUTINE find_ENVELOPE
 

@@ -21,16 +21,19 @@ module definition
   !  scratch variables
   INTEGER iassdoluser(ndumt)
   integer DUMMY,temp
-  integer DUMuser(ndumt,ndummax)
   integer iass0user(ndumt)
   integer,parameter::ndim2=2*ndim
   integer,parameter::mmmmmm1=1,mmmmmm2=2,mmmmmm3=3,mmmmmm4=4
-  type (taylorlow) DUMluser(ndumt,ndummax)
   type (taylorlow) DUMMYl,templ             !,DUMl(ndum)
   private NDC,NDC2,NDT,IREF,itu,idpr,iflow,jtune,nres,ifilt
   private nplane,idsta,ista
   private xintex,dsta,sta,angle,rad,ps,rads,mx
+  ! numerical differentiation by knobs
+  logical(lp) :: knob_numerical=.false.
+  real(dp) ::  knob_eps(lnv)=1.e-6_dp
+  integer ::  knob_i =0
 
+  !
   TYPE taylor
      ! integer is a pointer in old da-package of Berz
      INTEGER I
@@ -81,10 +84,10 @@ module definition
      type (REAL_8) sigmaf(ndim2)
   END TYPE ENV_8
 
-  type dummapping
-     integer  d(ndim2)
-     TYPE (TAYLORLOW) e(ndim2)
-  end type dummapping
+  !  type dummapping
+  !     integer  d(ndim2)
+  !     TYPE (TAYLORLOW) e(ndim2)
+  !  end type dummapping
 
 
 

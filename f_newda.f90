@@ -28,7 +28,7 @@ module newda
   PUBLIC NEWDAREA,OLDDAREA,NEWDAPRI,OLDDAPRI,NEWDAEPS,NEWDAABS,NEWDATRA
   PUBLIC ALLOCNEWDA,KILLNEWDAS,NEWDAFUN,NEWDADIV,NEWDAPOI,NEWDADIC,NEWDACDI,NEWDACAD
   PUBLIC NEWDACSU,NEWDASUC,NEWDASHIFT,NEWDARAN,NEWDACFUR,NEWDACFUI,OLDDAPRI77,OLDDAREA77
-  PUBLIC NEWDANCD,NEWPPUSH1,DE_INITIALIZE_DA
+  PUBLIC NEWDANCD,NEWPPUSH1,DE_INITIALIZE_DA,nullnewda
 
 
   INTERFACE NEWDADAL
@@ -97,7 +97,7 @@ contains
        ENDIF
 
     ELSE
-       if(warnda) THEN
+       if(warnda.AND.PACKING) THEN
           LINE=  " pow NOT ALLOCATED "
           IPAUSE=MYPAUSES(3,LINE)
        ENDIF
@@ -270,6 +270,15 @@ contains
 
   end subroutine initialize_da
 
+  subroutine nullnewda(A)
+    implicit none
+    type (taylorlow) A
+    nullify(A%R)
+    nullify(A%id)
+    nullify(A%NZ)
+    nullify(A%yes)
+    nullify(A%m)
+  end subroutine nullnewda
 
   subroutine allocnewda(A)
     implicit none
@@ -2509,9 +2518,20 @@ contains
     integer J(LNV)
     real(dp) cfac
     INTEGER I
-    real(dp) fun
-    external  fun
+    !    real(dp) fun
+    !    external  fun
     type (taylorlow) INA,INC
+
+    interface
+       !       real(kind(one)) function fun(abc)
+       function fun(abc)
+         use precision_constants
+         implicit none
+         real(dp) fun
+         integer,dimension(:)::abc
+       end function fun
+    end interface
+
 
     if(checkass) then
        IF (.NOT. ASSOCIATED(INA%R)) THEN
@@ -2571,9 +2591,19 @@ contains
     integer J(LNV)
     real(dp) cfac
     INTEGER I
-    complex(dp) fun
-    external  fun
+    !    complex(dp) fun
+    !    external  fun
     type (taylorlow) INA,INC
+
+    interface
+       !       complex(kind(one)) function fun(abc)
+       function fun(abc)
+         use precision_constants
+         implicit none
+         complex(dp) fun
+         integer,dimension(:)::abc
+       end function fun
+    end interface
 
     if(checkass) then
        IF (.NOT. ASSOCIATED(INA%R)) THEN
@@ -2633,9 +2663,18 @@ contains
     integer J(LNV)
     real(dp) cfac
     INTEGER I
-    complex(dp) fun
-    external  fun
+    !    complex(dp) fun
+    !    external  fun
     type (taylorlow) INA,INC
+    interface
+       !       complex(kind(one)) function fun(abc)
+       function fun(abc)
+         use precision_constants
+         implicit none
+         complex(dp) fun
+         integer,dimension(:)::abc
+       end function fun
+    end interface
 
     if(checkass) then
        IF (.NOT. ASSOCIATED(INA%R)) THEN

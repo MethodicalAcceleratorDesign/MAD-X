@@ -79,7 +79,7 @@ module S_status
   INTEGER,PARAMETER::NMAX=20
   TYPE INTERNAL_STATE
      LOGICAL(lp) TOTALPATH,TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS
-     LOGICAL(lp) PARA_IN,ONLY_4D,DELTA
+     LOGICAL(lp) PARA_IN,ONLY_4D,DELTA  ! DA related
   END TYPE INTERNAL_STATE
   TYPE(INTERNAL_STATE), target ::  DEFAULT
   TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME,EXACTMIS
@@ -403,29 +403,26 @@ CONTAINS
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(2)
-          IF(ABS(X(1))>E%X) THEN
+       CASE(2)  ! RECTANGLE + ELLIPSE (CIRCLE)
+          IF((ABS(X(1))>E%X).OR.(ABS(X(3))>E%Y).OR.(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-          IF(ABS(X(3))>E%Y) THEN
+       CASE(3)
+          IF(ABS(X(1))>E%X.OR.ABS(X(3))>E%Y) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(3)  ! SQUARE + ELLIPSE
-          IF((ABS(X(3))>E%Y).OR.(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
-             CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
-          ENDIF
-       CASE(4) ! MARGUERITE
+       CASE(5) ! MARGUERITE
           IF((X(1)**2/E%R(2)**2+X(3)**2/E%R(1)**2>ONE).OR.  &
                (X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(5) ! PILES OF POINTS
+       CASE(4) ! PILES OF POINTS
           STOP 222
-
+       CASE DEFAULT
+          STOP 223
        END SELECT
     ENDIF
 

@@ -23,8 +23,8 @@ subroutine ptc_input(lhc,icav,EXCEPTION)
   beta0=e0f/ENERGY
   particle=.false.
   if(abs(pma-pmae)/pmae<02) particle=.true.
-  oldscheme=.false.
-  !oldscheme=.true.
+  !valid October 2002: oldscheme=.false.
+  !!valid October 2002: oldscheme=.true.
   CALL MAKE_STATES(PARTICLE)
 
   with_external_frame=.false.

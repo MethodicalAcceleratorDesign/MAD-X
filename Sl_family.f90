@@ -9,7 +9,7 @@ MODULE S_FAMILY
   PRIVATE SURVEY_EXIST_PLANAR_L_new ,SURVEY_EXIST_PLANAR_ij_new,survey_one
   PRIVATE COPY_LAYOUT,COPY_LAYOUT_I,kill_para_L
   private fibre_WORK,fibre_POL,fibre_BL,ADDP_ANBN,WORK_fibre,BL_fibre
-  PRIVATE TRANS_D,rot_a,COPY_LAYOUT_ij
+  PRIVATE TRANS_D,rot_a,COPY_LAYOUT_ij,put_aperture_fib,remove_aperture_fib
 
 
   INTERFACE EL_TO_ELP
@@ -37,6 +37,16 @@ MODULE S_FAMILY
   INTERFACE ADD
      MODULE PROCEDURE ADDP_ANBN
   END INTERFACE
+
+  INTERFACE put_aperture
+     MODULE PROCEDURE put_aperture_fib                               ! need upgrade
+  end  INTERFACE
+
+  INTERFACE remove_aperture
+     MODULE PROCEDURE remove_aperture_fib                               ! need upgrade
+  end  INTERFACE
+
+
 
   INTERFACE assignment (=)
      ! linked
@@ -198,6 +208,28 @@ CONTAINS
 
   END SUBROUTINE ADDP_ANBN
 
+
+  subroutine put_aperture_fib(el,kind,r,x,y)
+    implicit none
+    real(dp),intent(in):: r(:),x,y
+    integer,intent(in):: kind
+    type(fibre),intent(inout):: el
+
+    call put_aperture(el%mag,kind,r,x,y)
+    call put_aperture(el%magp,kind,r,x,y)
+
+  end  subroutine put_aperture_fib
+
+  subroutine remove_aperture_fib(el)
+    implicit none
+    type(fibre),intent(inout):: el
+
+    call remove_aperture_el(el%mag)
+    call remove_aperture_elp(el%magp)
+
+  end  subroutine remove_aperture_fib
+
+
   SUBROUTINE  fibre_WORK(S2,S1) ! Changes the Energy of the fibre and turns the energy patch on
     implicit none
     type (WORK),INTENT(IN):: S1
@@ -243,7 +275,8 @@ CONTAINS
           s2%mag%D(I)=S1(I);   s2%magp%D(I)=S1(I);
           s2%mag%R(I)=S1(3+I); s2%magp%R(I)=S1(3+I);
        ENDDO
-
+       S2%CHART%D_IN=0.0_dp;S2%CHART%D_out=0.0_dp;
+       S2%CHART%ANG_IN=0.0_dp;S2%CHART%ANG_OUT=0.0_dp;
        s2%mag%mis=.true.
        s2%magp%mis=.true.
 

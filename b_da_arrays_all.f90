@@ -7,7 +7,7 @@ module da_arrays
   use scratch_size
   implicit none
   integer lda,lea,lia,lst
-  integer,parameter::lno=120,lnv=40,lnomax=8,lnvmax=9,lstmax=800500,ldamax=3000,leamax=5000,liamax=50000
+  integer,parameter::lno=120,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=3000,leamax=5000,liamax=50000
   logical(lp) :: reallocate = .true.
   logical(lp) :: notallocated = .true.
   logical(lp),parameter::etiennefix=.true.
@@ -26,9 +26,10 @@ module da_arrays
   integer nst,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
-  integer,TARGET :: lda_used =2000
+  integer,TARGET :: lda_used =1000
   logical,TARGET :: escape_da =.false.
-  logical,TARGET :: check_da =.true.
+  logical,TARGET :: check_da =.false.
+  real(dp),target ::  da_absolute_aperture=1.0e6_dp
 
 contains
 
@@ -238,14 +239,9 @@ contains
     do i=1,min(nvt,no)
        lea = (lea*(mm+i))/i
     enddo
-    ldamin=2+no + 2+ 4 + nd2t*(2+ndum)      ! (2+ no)daini  + varf +varc + assignmap(tpsalie.f90)
+    ldamin=2+no + 2+ 4  !+ nd2t*(2+ndum)      ! (2+ no)daini  + varf +varc + assignmap(tpsalie.f90)
 
 
-    IF(OLDSCHEME) then
-       do i=1,ndumt
-          ldamin=ndumuser(i) +ldamin
-       enddo
-    endif
     ldamin=ldamin+2        !  2 + sum of ndumuser  in assign tpsa.f90
 
 

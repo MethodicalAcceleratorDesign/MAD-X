@@ -2257,6 +2257,10 @@ CONTAINS
        nullify(s22%BETA0);allocate(s22%BETA0);
        nullify(s22%PARENT_LAYOUT);nullify(s22%PARENT_PATCH);
        nullify(s22%PARENT_CHART);nullify(s22%PARENT_MAG);
+       if(use_info) then
+          allocate(s22%i);
+          call alloc(s22%i)
+       endif
     ENDIF
 
     IF(.NOT.MADX) then
@@ -2376,7 +2380,16 @@ CONTAINS
 
     ! machida stuff here
     if(S2%KIND==kindfitted) then
+       if(point_at.and.first_fitted) then
+          point_at=.false.
+          call POINTERS_D(s2%bend%d)
+          point_at=.true.
+       endif
        call read(s2%bend%d,brho,file_fitted)
+       s2%bend%xmin=s2%bend%d%x(1) !/10.d0
+       s2%bend%xmax=s2%bend%d%x(2) !*10.d0
+       s2%bend%ymin=s2%bend%d%y(1) !*10.d0
+       s2%bend%ymax=s2%bend%d%y(2) !*10.d0
     endif
 
     if(S2%KIND==KIND10) then
@@ -2449,43 +2462,49 @@ CONTAINS
   end SUBROUTINE  clean_up
 
   subroutine set_pointers
-    use da_arrays
     implicit none
-    c_dollar%total_da_size => total_da_size
-    c_dollar%lda_used => lda_used
-    c_dollar%real_warning => real_warning
-    c_dollar%ROOT_CHECK => ROOT_CHECK
-    c_dollar%CHECK_STABLE => CHECK_STABLE
-    c_dollar%CHECK_MADX_APERTURE => CHECK_MADX_APERTURE
-    c_dollar%ROOT_CHECK => ROOT_CHECK
-    c_dollar%APERTURE_FLAG => APERTURE_FLAG
-    c_dollar%absolute_aperture => absolute_aperture
-    c_dollar%hyperbolic_aperture => hyperbolic_aperture
-    c_dollar%with_external_frame => with_external_frame
-    c_dollar%with_internal_frame => with_internal_frame
-    c_dollar%with_chart => with_chart
-    c_dollar%with_patch => with_patch
-    c_dollar%NEW_METHOD => NEW_METHOD
-    c_dollar%MADTHICK => MADKIND2
-    c_dollar%MADTHIN_NORMAL => MADKIND3N
-    c_dollar%MADTHIN_SKEW => MADKIND3S
-    c_dollar%NSTD => NSTD
-    c_dollar%METD => METD
-    c_dollar%MADLENGTH => MADLENGTH
-    c_dollar%MAD => MAD
-    c_dollar%EXACT_MODEL => EXACT_MODEL
-    c_dollar%ALWAYS_EXACTMIS => ALWAYS_EXACTMIS
-    c_dollar%ALWAYS_FRINGE => ALWAYS_FRINGE
-    c_dollar%FIBRE_DIR => FIBRE_DIR
-    c_dollar%FIBRE_flip => FIBRE_flip
-    c_dollar%SECTOR_NMUL => SECTOR_NMUL
-    c_dollar%electron => electron
-    c_dollar%massfactor => muon
-    c_dollar%stoch_in_rec => stoch_in_rec
-    c_dollar%FEED_P0C => FEED_P0C
-    c_dollar%ALWAYS_EXACT_PATCHING => ALWAYS_EXACT_PATCHING
-    c_dollar%check_da => check_da
-    c_dollar%ALWAYS_EXACT_PATCHING => ALWAYS_EXACT_PATCHING
+    call set_da_pointers
+
+    c_%ROOT_CHECK => ROOT_CHECK
+    c_%CHECK_STABLE => CHECK_STABLE
+    c_%CHECK_MADX_APERTURE => CHECK_MADX_APERTURE
+    c_%ROOT_CHECK => ROOT_CHECK
+    c_%APERTURE_FLAG => APERTURE_FLAG
+    c_%absolute_aperture => absolute_aperture
+    c_%check_iteration => check_iteration
+    c_%check_interpolate_x => check_interpolate_x
+    c_%check_interpolate_y => check_interpolate_y
+    c_%check_x_min => check_x_min
+    c_%check_x_max => check_x_max
+    c_%check_y_min => check_y_min
+    c_%check_y_max => check_y_max
+    c_%hyperbolic_aperture => hyperbolic_aperture
+
+
+
+    c_%with_external_frame => with_external_frame
+    c_%with_internal_frame => with_internal_frame
+    c_%with_chart => with_chart
+    c_%with_patch => with_patch
+    c_%NEW_METHOD => NEW_METHOD
+    c_%MADTHICK => MADKIND2
+    c_%MADTHIN_NORMAL => MADKIND3N
+    c_%MADTHIN_SKEW => MADKIND3S
+    c_%NSTD => NSTD
+    c_%METD => METD
+    c_%MADLENGTH => MADLENGTH
+    c_%MAD => MAD
+    c_%EXACT_MODEL => EXACT_MODEL
+    c_%ALWAYS_EXACTMIS => ALWAYS_EXACTMIS
+    c_%ALWAYS_FRINGE => ALWAYS_FRINGE
+    c_%FIBRE_DIR => FIBRE_DIR
+    c_%FIBRE_flip => FIBRE_flip
+    c_%SECTOR_NMUL => SECTOR_NMUL
+    c_%electron => electron
+    c_%massfactor => muon
+    c_%stoch_in_rec => stoch_in_rec
+    c_%FEED_P0C => FEED_P0C
+    c_%ALWAYS_EXACT_PATCHING => ALWAYS_EXACT_PATCHING
 
   end subroutine set_pointers
 
@@ -2773,12 +2792,12 @@ CONTAINS
   !  MACHIDA FITTED
 
 
-  FUNCTION  AIBAL(NAME,R1,file,T)
+  FUNCTION  AIBAL(NAME,file,R1,T)
     implicit none
     type (EL_LIST) AIBAL
     CHARACTER(*), INTENT(IN):: NAME,file
     type (TILTING),optional, INTENT(IN):: T
-    real(dp) , INTENT(IN):: R1
+    real(dp) , optional, INTENT(IN):: R1
     real(dp) x1,x2,x3,x4,x5,x6,R,ANG
     integer mf
 
@@ -2797,10 +2816,10 @@ CONTAINS
 
     ang=(x2-x1)*DEG_TO_RAD_
 
-    if(r1<=zero) then
+    if(.not.present(r1)) then
        r=x3
     else
-       r=r1;
+       r=r1
     endif
 
 
@@ -2848,10 +2867,10 @@ CONTAINS
     type (layout),INTENT(IN)::S1
     INTEGER I
     !    real(dp) gamma0I,gamBET
-    TYPE (fibre), POINTER :: C,fitted
-    logical(lp) firstfitted
-    Nullify(C);Nullify(fitted);
-    firstfitted=.true.
+    TYPE (fibre), POINTER :: C!,fitted
+    !   logical(lp) firstfitted
+    Nullify(C);!Nullify(fitted);
+    !   firstfitted=.true.
     CALL SET_UP(R)
     !    R%ENERGY=ENERGY
     !    R%KINETIC=KINETIC
@@ -2865,30 +2884,36 @@ CONTAINS
     c=>s1%start
     DO I=1,S1%N
 
-       if((c%mag%kind==kindfitted.and.point_at).and.(.not.firstfitted)) then
-          CALL APPEND( R, C )
-          !          call APPEND_EMPTY(R)
-          !          allocate(R%LAST%CHART);
-          !          R%LAST%CHART=0
-          !          R%LAST%MAG=>fitted%MAG
-          !          R%LAST%MAGP=>fitted%MAGP
-          R%LAST%MAG%BEND%D =>fitted%MAG%BEND%D
-          R%LAST%MAGP%BEND%D=>fitted%MAGP%BEND%D
-       else
-          CALL APPEND( R, C )
-       endif
+       !       if((c%mag%kind==kindfitted.and.point_at).and.(.not.firstfitted)) then
+       !          CALL APPEND( R, C )
+       !          R%LAST%MAG%BEND%D =>fitted%MAG%BEND%D
+       !          R%LAST%MAGP%BEND%D=>fitted%MAGP%BEND%D
+       !       else
+       CALL APPEND( R, C )
+       !       endif
 
-       if(c%mag%kind==kindfitted.and.point_at.and.firstfitted) then  ! fitted magnets
-          fitted=>r%last                                            ! one family permitted
-          firstfitted=.false.
-          COPY_FIT=.FALSE.
-          deallocate(r%last%magp%bend%d)
-          r%last%magp%bend%d=>r%last%mag%bend%d
-       endif
+       !      if(c%mag%kind==kindfitted.and.point_at.and.firstfitted) then  ! fitted magnets
+       !         fitted=>r%last                                            ! one family permitted
+       !         firstfitted=.false.
+       !         COPY_FIT=.FALSE.
+       !         deallocate(r%last%magp%bend%d)
+       !         r%last%magp%bend%d=>r%last%mag%bend%d
+       !      endif
 
        !       R%CIRCUMFERENCE       = R%CIRCUMFERENCE+ C%MAG%P%LD
        c=>c%next
     ENDDO
+
+
+    if(use_info) then
+       c=>R%start
+       c%i%s=0.d0
+       do i=1,R%n
+          if(i<R%n.and.use_info) c%next%i%s=c%i%s+c%mag%p%ld
+
+          c=>c%next
+       enddo
+    endif
 
   END SUBROUTINE EQUAL_L
 
@@ -3106,7 +3131,7 @@ CONTAINS
     implicit none
     TYPE (layout) makeitc
     TYPE (layout), INTENT (IN) :: S1
-    type(fibre), pointer ::c
+    type(fibre), pointer ::c,d
     integer i
     nullify(c)
     call Set_Up_MAD(makeitc)

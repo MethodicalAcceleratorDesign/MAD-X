@@ -9,8 +9,8 @@ module polymorphic_complextaylor
        m21=m2+ms*m1,m22=m2+ms*m2,m23=m2+ms*m3,                         &
        m31=m3+ms*m1,m32=m3+ms*m2,m33=m3+ms*m3
   logical(lp),private,parameter::t=.true.,f=.false.
-  integer,private::NO,ND,ND2,NP,NDPT,NV
-  logical(lp),private::old
+  integer,target,private::NO,ND,ND2,NP,NDPT,NV
+  logical(lp),private,TARGET::old
   private set_in_poly,init_map_cp,init_tpsa_cp
   private equal ,Dequaldacon,cequaldacon,equaldacon,iequaldacon
   private EQUALRP,complexEQUAL,EQUALcomplext,complextEQUAL
@@ -46,6 +46,8 @@ module polymorphic_complextaylor
   INTERFACE kill
      MODULE PROCEDURE K_OPT  !resetpoly0
      MODULE PROCEDURE resetpolyn0
+     MODULE PROCEDURE resetpoly_R  !
+     MODULE PROCEDURE resetpoly_Rn
   END INTERFACE
 
   INTERFACE daprint
@@ -64,6 +66,10 @@ module polymorphic_complextaylor
   END INTERFACE
 
   INTERFACE dreal
+     MODULE PROCEDURE drealt
+  END INTERFACE
+
+  INTERFACE real
      MODULE PROCEDURE drealt
   END INTERFACE
 
@@ -242,23 +248,54 @@ module polymorphic_complextaylor
 
 contains
 
+  subroutine set_da_pointers
+    use da_arrays
+    implicit none
+    c_%total_da_size => total_da_size
+    c_%lda_used => lda_used
+    c_%real_warning => real_warning
+    c_%check_da => check_da
+    c_%escape_da => escape_da
+    c_%no => no
+    c_%nv => nv
+    c_%nd => nd
+    c_%nd2 => nd2
+    c_%np => np
+    c_%ndpt => ndpt
+    c_%OLD => OLD
+    c_%da_absolute_aperture=>da_absolute_aperture
+  end subroutine set_da_pointers
 
   subroutine init_map_cp(NO1,ND1,NP1,NDPT1,PACKAGE)
     implicit none
-    integer NO1,ND1,NP1,NDPT1
-    logical(lp) PACKAGE
-    call init_map_p(NO1,ND1,NP1,NDPT1,PACKAGE)
-    call set_in_poly(PACKAGE)
-    call set_in_polyp(PACKAGE)
+    integer NO1,ND1,NP1
+    integer,optional ::  NDPT1
+    logical(lp),optional :: PACKAGE
+    logical(lp) PACKAGE1
+    integer ndptt
+    package1=.true.
+    ndptt=0
+    if(present(PACKAGE)) PACKAGE1=PACKAGE
+    if(present(ndpt1)) ndptt=ndpt1
+    W_P=>W_I                   ! default output, comment out if necessary
+    call set_da_pointers
+    call init_map_p(NO1,ND1,NP1,ndptt,PACKAGE1)
+    call set_in_poly(PACKAGE1)
+    call set_in_polyp(PACKAGE1)
   end subroutine  init_map_cp
 
   subroutine init_tpsa_cp(NO1,NP1,PACKAGE)
     implicit none
     integer NO1,NP1
-    logical(lp) PACKAGE
-    call init_tpsa_p(NO1,NP1,PACKAGE)
-    call set_in_poly(PACKAGE)
-    call set_in_polyp(PACKAGE)
+    logical(lp),optional :: PACKAGE
+    logical(lp) PACKAGE1
+    package1=.true.
+    if(present(PACKAGE)) PACKAGE1=PACKAGE
+    W_P=>W_I                  ! default output, comment out if necessary
+    call set_da_pointers
+    call init_tpsa_p(NO1,NP1,PACKAGE1)
+    call set_in_poly(PACKAGE1)
+    call set_in_polyp(PACKAGE1)
   end subroutine  init_tpsa_cp
 
 
@@ -291,14 +328,22 @@ contains
 
   END SUBROUTINE resetpoly
 
-  SUBROUTINE  resetpolyn(S2,n)
+  SUBROUTINE  resetpolyn(S2,K)
     implicit none
     type (double_complex),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly(s2(j))
     enddo
 
   END SUBROUTINE resetpolyn
@@ -349,14 +394,22 @@ contains
     if(present(s10))call resetpoly0(s10)
   END SUBROUTINE K_OPT
 
-  SUBROUTINE  resetpolyn0(S2,n)
+  SUBROUTINE  resetpolyn0(S2,K)
     implicit none
     type (double_complex),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly0(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly0(s2(j))
     enddo
 
   END SUBROUTINE resetpolyn0
@@ -378,16 +431,24 @@ contains
 
   END SUBROUTINE resetpoly_R
 
-  SUBROUTINE  resetpoly_RN(S2,FL,N)
+  SUBROUTINE  resetpoly_RN(S2,FL,K)
     implicit none
     type (double_complex),INTENT(INOUT),dimension(:)::S2
     logical(lp),INTENT(IN)::FL
 
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call resetpoly_R(s2(i),FL)
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call resetpoly_R(s2(j),FL)
     enddo
 
 
@@ -409,14 +470,22 @@ contains
 
   END SUBROUTINE allocpoly
 
-  SUBROUTINE  allocpolyn(S2,n)
+  SUBROUTINE  allocpolyn(S2,K)
     implicit none
     type (double_complex),INTENT(INOUT),dimension(:)::S2
-    integer, INTENT(IN)::n
-    integer i
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
 
-    do i=1,n
-       call allocpoly(s2(i))
+    if(present(k)) then
+       I=LBOUND(S2,DIM=1)
+       N=LBOUND(S2,DIM=1)+K-1
+    else
+       I=LBOUND(S2,DIM=1)
+       N=UBOUND(S2,DIM=1)
+    endif
+
+    DO   J=I,N
+       call allocpoly(s2(j))
     enddo
 
   END SUBROUTINE allocpolyn
@@ -455,7 +524,7 @@ contains
     integer ipause, mypauses
     type (double_complex),INTENT(inOUT)::S2
     type (double_complex),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     if(s1%kind==0) then
        line=" You are putting kind=0  into something"
@@ -472,11 +541,11 @@ contains
           case(m1)
              S2%R=S1%R
           case(m2)
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
           case(m3)
              s2%r=S1%r ! Knob stays a knob and real stays real 2002.10.9
              !             w_p=0
@@ -502,11 +571,11 @@ contains
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
 
 
           case(m3)
@@ -515,9 +584,9 @@ contains
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              if(knob) then
                 call varck1(s1)
                 S2%t=varc1
@@ -528,7 +597,7 @@ contains
              !         call varkind3(S1)
              !         S2%t=S1%t
              !         call unvarkind3(S1)
-             master=localmaster
+             !             master=localmaster
           end select
        endif
 
@@ -573,7 +642,7 @@ contains
     integer ipause, mypauses
     type (double_complex),INTENT(inOUT)::S2
     type (REAL_8),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     if(s1%kind==0) then
        line=" You are putting kind=0  into something"
@@ -590,11 +659,11 @@ contains
           case(m1)
              S2%R=S1%R
           case(m2)
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
           case(m3)
              s2%r=S1%r ! Knob stays a knob and real stays real 2002.10.9
              !             w_p=0
@@ -623,20 +692,20 @@ contains
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
           case(m3)
              if(.not.s2%alloc) then
                 call alloc(s2%t)
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              if(knob) then
                 call varfk1(s1)
                 S2%t=varf1
@@ -644,7 +713,7 @@ contains
                 s2%r=S1%r
                 s2%kind=1
              endif
-             master=localmaster
+             !             master=localmaster
           end select
        endif
 
@@ -689,7 +758,7 @@ contains
     integer ipause, mypauses
     type (REAL_8),INTENT(inOUT)::S2
     type (double_complex),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     if(s1%kind==0) then
        line=" You are putting kind=0  into something"
@@ -706,11 +775,11 @@ contains
           case(m1)
              S2%R=S1%R
           case(m2)
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
           case(m3)
              s2%r=S1%r ! Knob stays a knob and real stays real 2002.10.9
              !             w_p=0
@@ -739,20 +808,20 @@ contains
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              S2%t=S1%t
-             master=localmaster
+             !             master=localmaster
           case(m3)
              if(.not.s2%alloc) then
                 call alloc(s2%t)
                 s2%alloc=t
              endif
              s2%kind=2
-             localmaster=master
+             !             localmaster=master
              call check_snake
-             master=0
+             !2002.12.26 master=0
              if(knob) then
                 call varck1(s1)
                 S2%t=varc1
@@ -760,7 +829,7 @@ contains
                 S2%r=s1%r
                 s2%kind=1
              endif
-             master=localmaster
+             !             master=localmaster
           end select
        endif
     else        !   S2 does not exist
@@ -979,18 +1048,18 @@ contains
     implicit none
     complex(dp) ,INTENT(inout)::S2
     type (double_complex),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
 
     select case(S1%kind)
     case(m1)
        S2=S1%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !2002.12.26 master=0
        S2=S1%t.sub.'0'
-       master=localmaster
+       !       master=localmaster
     case(m3)
        S2=S1%r
     case default
@@ -1011,15 +1080,15 @@ contains
     integer ipause, mypauses
     type (double_complex),INTENT(inOUT)::S2
     type (complextaylor),INTENT(IN)::S1
-    integer localmaster
+    !    integer localmaster
 
     if(s2%kind==3.and.(.not.setknob)) then
        line= " You are putting something  into a knob kind=3"
        ipause=mypauses(0,line)
     endif
-    localmaster=master
+    !    localmaster=master
     call check_snake
-    master=0
+    !2002.12.26 master=0
     if(s2%kind/=3) then
        if(.not.s2%alloc) then
           call alloc(s2%t)
@@ -1030,7 +1099,7 @@ contains
     else
        s2%r=S1.sub.'0' ! 2002.10.9
     endif
-    master=localmaster
+    !    master=localmaster
 
 
   END SUBROUTINE EQUALcomplext
@@ -1039,7 +1108,7 @@ contains
     implicit none
     type (double_complex),INTENT(in)::S2
     type (complextaylor),INTENT(inout)::S1
-    integer localmaster
+    !    integer localmaster
 
 
 
@@ -1047,22 +1116,22 @@ contains
     case(m1)
        S1=S2%R
     case(m2)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !2002.12.26 master=0
        S1=S2%t
-       master=localmaster
+       !       master=localmaster
     case(m3)
-       localmaster=master
+       !       localmaster=master
        call check_snake
-       master=0
+       !2002.12.26 master=0
        if(knob) then
           call varck2(s2)
           S1=varc2
        else
           S1=S2%R
        endif
-       master=localmaster
+       !       master=localmaster
     case default
        w_p=0
        w_p%nc=2
@@ -1075,10 +1144,6 @@ contains
     end select
 
   END SUBROUTINE complextEQUAL
-
-
-
-
 
   SUBROUTINE  Dequaldacon(S2,R1)
     implicit none
@@ -4365,14 +4430,14 @@ contains
     integer ipause,mypauses
 
     select case(master)
-    case(1:ndumt-1)
+    case(0:ndumt-1)
        master=master+1
     case(ndumt+1)
        line=" cannot indent anymore "
        ipause=mypauses(0,line)
     end select
 
-
+    !    write(26,*) "  complex polymorph ",master
     call ass0(s1%t%r)
     call ass0(s1%t%i)
     !call assc(s1%t)
@@ -4386,19 +4451,19 @@ contains
 
   end subroutine asscp
 
-  subroutine asscp0
-    implicit none
-    integer ipause,mypauses
+  !  subroutine asscp0
+  !    implicit none
+  !    integer ipause,mypauses!
 
-    select case(master)
-    case(1:ndumt-1)
-       master=master+1
-    case(ndumt+1)
-       line=" cannot indent anymore "
-       ipause=mypauses(0,line)
-    end select
+  !    select case(master)
+  !    case(0:ndumt-1)
+  !       master=master+1
+  !    case(ndumt+1)
+  !       line=" cannot indent anymore "
+  !       ipause=mypauses(0,line)
+  !    end select
 
-  end subroutine asscp0
+  !  end subroutine asscp0
 
 
 

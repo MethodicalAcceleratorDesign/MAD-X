@@ -17,11 +17,12 @@ MODULE TPSA
   private div,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
   private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd
   private  unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
-  private allocda,KILLda,dexpt,dcost,dsint,dsqrtt,datant,dtant
-  PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_snake,dsinHt,dCOSHt
+  private allocda,KILLda,A_OPT,K_opt
+  priVATE dexpt,dcost,dsint,dsqrtt,dtant
+  PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,dsinHt,dCOSHt
   PRIVATE DEQUAL,REQUAL
   !  PUBLIC VAR,ASS
-  private pbbra,full_absT
+  private pbbra,full_absT,asstaylor
   PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
   private FILL_R ! new sagan
 
@@ -29,7 +30,6 @@ MODULE TPSA
   integer NP,NO,ND,ND2,NDPT,NV
   private old
   logical(lp) old
-  logical(lp) :: FIRSTSCHEME=.true.
   logical(lp),target  :: real_warning =.true.
 
   PRIVATE null_it,Set_Up,de_Set_Up,LINE_L,RING_L,kill_DALEVEL,dealloc_DASCRATCH,set_up_level
@@ -185,17 +185,20 @@ MODULE TPSA
 
 
   INTERFACE ass
-     MODULE PROCEDURE ass0
+     !     MODULE PROCEDURE ass0         ! 2002.12.25    ass0 should be commented
+     MODULE PROCEDURE asstaylor   !2000.12.25
   END INTERFACE
 
   INTERFACE alloc
      MODULE PROCEDURE allocda
+     MODULE PROCEDURE A_OPT
      MODULE PROCEDURE allocdas
   END INTERFACE
 
   INTERFACE KILL
      MODULE PROCEDURE KILLda
      MODULE PROCEDURE KILLdas
+     MODULE PROCEDURE K_opt
   END INTERFACE
 
   INTERFACE alloctpsa
@@ -292,13 +295,6 @@ MODULE TPSA
   END INTERFACE
 
 
-  INTERFACE datan
-     MODULE PROCEDURE datant
-  END INTERFACE
-  INTERFACE atan
-     MODULE PROCEDURE datant
-  END INTERFACE
-
   INTERFACE dtan
      MODULE PROCEDURE dtant
   END INTERFACE
@@ -335,12 +331,15 @@ CONTAINS
     implicit none
     TYPE (TAYLOR) unaryADD
     TYPE (TAYLOR), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(unaryADD)
 
     unaryADD=s1
 
+    master=localmaster
 
   END FUNCTION unaryADD
 
@@ -348,6 +347,8 @@ CONTAINS
     implicit none
     TYPE (TAYLOR) unarySUB
     TYPE (TAYLOR), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(unarySUB)
@@ -361,8 +362,7 @@ CONTAINS
        !  call newdacmu(s1%j,-one,templ)
        !  call newdacop(templ,unarySUB%j)
     endif
-
-
+    master=localmaster
 
   END FUNCTION unarySUB
 
@@ -370,6 +370,7 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(IN)::S1
     type (TAYLOR),INTENT(inOUT):: s2
+
     if(old) then
        call mtree((/s1%i/),1,(/s2%i/),1)
     else
@@ -391,20 +392,63 @@ CONTAINS
        s1%i=0
        call etall1(s1%i)
     else
+       call nullnewda(s1%j)
        call allocnewda(s1%j)
     endif
   END SUBROUTINE allocda
 
+  SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (taylor),INTENT(INout)::S1,S2
+    type (taylor),optional, INTENT(INout):: s3,s4,s5,s6,s7,s8,s9,s10
+    call allocda(s1)
+    call allocda(s2)
+    if(present(s3)) call allocda(s3)
+    if(present(s4)) call allocda(s4)
+    if(present(s5)) call allocda(s5)
+    if(present(s6)) call allocda(s6)
+    if(present(s7)) call allocda(s7)
+    if(present(s8)) call allocda(s8)
+    if(present(s9)) call allocda(s9)
+    if(present(s10))call allocda(s10)
+  END SUBROUTINE A_opt
 
-  SUBROUTINE  allocdaS(S1,I)
+  SUBROUTINE  K_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (taylor),INTENT(INout)::S1,S2
+    type (taylor),optional, INTENT(INout):: s3,s4,s5,s6,s7,s8,s9,s10
+    call KILLDA(s1)
+    call KILLDA(s2)
+    if(present(s3)) call KILLDA(s3)
+    if(present(s4)) call KILLDA(s4)
+    if(present(s5)) call KILLDA(s5)
+    if(present(s6)) call KILLDA(s6)
+    if(present(s7)) call KILLDA(s7)
+    if(present(s8)) call KILLDA(s8)
+    if(present(s9)) call KILLDA(s9)
+    if(present(s10))call KILLDA(s10)
+  END SUBROUTINE K_opt
+
+
+  SUBROUTINE  ALLOCDAS(S1,k)
     implicit none
     type (TAYLOR),INTENT(INOUT),dimension(:)::S1
-    INTEGER,INTENT(IN)::I
-    INTEGER J
-    DO   J=1,I
-       CALL ALLOCDA(S1(j))
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
+
+    if(present(k)) then
+       I=LBOUND(S1,DIM=1)
+       N=LBOUND(S1,DIM=1)+K-1
+    else
+       I=LBOUND(S1,DIM=1)
+       N=UBOUND(S1,DIM=1)
+    endif
+
+    DO   J=I,N
+       CALL allocDA(S1(j))
     ENDDO
-  END SUBROUTINE allocdaS
+
+  END SUBROUTINE ALLOCDAS
 
   SUBROUTINE  KILLda(S1)
     implicit none
@@ -417,12 +461,21 @@ CONTAINS
 
   END SUBROUTINE KILLda
 
-  SUBROUTINE  KILLDAS(S1,I)
+  SUBROUTINE  KILLDAS(S1,k)
     implicit none
     type (TAYLOR),INTENT(INOUT),dimension(:)::S1
-    INTEGER,INTENT(IN)::I
-    INTEGER J
-    DO   J=1,I
+    INTEGER,optional,INTENT(IN)::k
+    INTEGER J,i,N
+
+    if(present(k)) then
+       I=LBOUND(S1,DIM=1)
+       N=LBOUND(S1,DIM=1)+K-1
+    else
+       I=LBOUND(S1,DIM=1)
+       N=UBOUND(S1,DIM=1)
+    endif
+
+    DO   J=I,N
        CALL KILLDA(S1(j))
     ENDDO
 
@@ -447,35 +500,6 @@ CONTAINS
        call newdacop(S1%j,S2%j)
     endif
   END SUBROUTINE EQUAL
-
-
-
-  !  SUBROUTINE  DAABSEQUAL(R1,S2)
-  !    implicit none
-  !    type (TAYLOR),INTENT(IN)::S2
-  !    real(dp), INTENT(inOUT)::R1
-  !    call check_snake
-  !
-  !    if(old) then
-  !       CALL DAABS(S2%I,R1)
-  !    else
-  !       CALL newDAABS(S2%j,R1)
-  !    endif
-  !  END SUBROUTINE DAABSEQUAL
-  !
-  !  SUBROUTINE  AABSEQUAL(R1,S2)
-  !    implicit none
-  !    type (TAYLOR),INTENT(IN)::S2
-  !    REAL(SP), INTENT(inOUT)::R1
-  !    real(dp) R2
-  !    if(real_warning) call real_stop
-  !    call check_snake
-  !
-  !    if(real_warning) call real_stop
-  !    r2=s2
-  !    R1=R2  ! 2002.10.17
-  !
-  !  END SUBROUTINE AABSEQUAL
 
   SUBROUTINE  DEQUAL(R1,S2)
     implicit none
@@ -503,11 +527,9 @@ CONTAINS
     type (TAYLOR),INTENT(IN)::S2
     real(dp) DAABSEQUAL
 
-    if(old) then
-       CALL DAABS(S2%I,DAABSEQUAL)
-    else
-       CALL newDAABS(S2%j,DAABSEQUAL)
-    endif
+
+    DAABSEQUAL=abs(S2.sub.'0')
+
   END function DAABSEQUAL
 
 
@@ -515,8 +537,6 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(inOUT)::S2
     real(dp), INTENT(IN)::R1
-
-    call check_snake
 
     if(old) then
        if(s2%i==0)  call crap1("DEQUALDACON 1") !call allocw(s2)
@@ -566,6 +586,8 @@ CONTAINS
     implicit none
     TYPE (taylor) dexpt
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dexpt)
@@ -579,6 +601,7 @@ CONTAINS
        !  call newdacop(templ,dexpt%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dexpt
 
@@ -604,6 +627,8 @@ CONTAINS
     implicit none
     TYPE (taylor) dtant
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dtant)
@@ -620,6 +645,7 @@ CONTAINS
        call newdadiv(dtant%j,templ,dtant%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dtant
 
@@ -627,6 +653,10 @@ CONTAINS
     implicit none
     TYPE (taylor) dcost
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
+
+
 
     call check(s1)
     call ass(dcost)
@@ -640,6 +670,7 @@ CONTAINS
        !  call newdacop(templ,dcost%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dcost
 
@@ -647,6 +678,8 @@ CONTAINS
     implicit none
     TYPE (taylor) dsint
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dsint)
@@ -659,6 +692,7 @@ CONTAINS
        !  call newdacop(templ,dsint%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dsint
 
@@ -666,6 +700,8 @@ CONTAINS
     implicit none
     TYPE (taylor) dsinHt
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dsinHt)
@@ -675,6 +711,7 @@ CONTAINS
     else
        call newdafun('SINH',s1%j,dsinHt%j)
     endif
+    master=localmaster
 
   END FUNCTION dsinHt
 
@@ -682,6 +719,8 @@ CONTAINS
     implicit none
     TYPE (taylor) DCOSHT
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(DCOSHT)
@@ -692,6 +731,7 @@ CONTAINS
        call newdafun('COSH',s1%j,DCOSHT%j)
     endif
 
+    master=localmaster
 
   END FUNCTION DCOSHT
 
@@ -700,6 +740,8 @@ CONTAINS
     implicit none
     TYPE (taylor) dlogt
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dlogt)
@@ -712,6 +754,7 @@ CONTAINS
        !  call newdacop(templ,dlogt%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dlogt
 
@@ -719,6 +762,8 @@ CONTAINS
     implicit none
     TYPE (taylor) dsqrtt
     TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dsqrtt)
@@ -732,33 +777,16 @@ CONTAINS
        !call newdacop(templ,dsqrtt%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dsqrtt
-
-  FUNCTION dATANT( S1 )
-    implicit none
-    TYPE (taylor) dATANT
-    TYPE (taylor), INTENT (IN) :: S1
-
-    call check(s1)
-    call ass(dATANT)
-    if(old) then
-       call dafun('ATAN ',s1%i,temp)
-       call dacop(temp,dATANT%i)
-    else
-       call newdafun('ATAN ',s1%j,dATANT%j)
-       !call newdafun('ATAN ',s1%j,templ)
-       !call newdacop(templ,dATANT%j)
-    endif
-
-
-  END FUNCTION dATANT
-
 
   FUNCTION mul( S1, S2 )
     implicit none
     TYPE (taylor) mul
     TYPE (taylor), INTENT (IN) :: S1, S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call check(s2)
@@ -773,6 +801,7 @@ CONTAINS
        !  call newdacop(templ,mul%j)
     endif
 
+    master=localmaster
 
   END FUNCTION mul
 
@@ -780,6 +809,8 @@ CONTAINS
     implicit none
     TYPE (taylor) pbbra
     TYPE (taylor), INTENT (IN) :: S1, S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call check(s2)
@@ -793,6 +824,7 @@ CONTAINS
        call newdacop(templ,pbbra%j)
     endif
 
+    master=localmaster
 
   END FUNCTION pbbra
 
@@ -801,6 +833,8 @@ CONTAINS
     TYPE (taylor) GETORDER
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(GETORDER)
@@ -812,6 +846,7 @@ CONTAINS
        CALL NEWTAKE(S1%J,S2,TEMPL)
        call NEWdacop(tempL,GETORDER%J)
     endif
+    master=localmaster
 
   END FUNCTION GETORDER
 
@@ -824,6 +859,8 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     INTEGER I
+    integer localmaster
+    localmaster=master
     call check(s1)
     call ass(CUTORDER)
 
@@ -840,6 +877,7 @@ CONTAINS
           CALL NEWDASUB(CUTORDER%J,TEMPL,CUTORDER%J)
        ENDDO
     endif
+    master=localmaster
 
   END FUNCTION CUTORDER
 
@@ -852,6 +890,8 @@ CONTAINS
     CHARACTER(*)  , INTENT (IN) ::  S2
     CHARACTER (LEN = LNV)  resul
     integer j(lnv),i
+    integer localmaster
+    localmaster=master
 
     call ass(dputchar)
 
@@ -879,6 +919,7 @@ CONTAINS
 
     call var(dputchar,zero,0)
     CALL pok(dputchar,j,s1)
+    master=localmaster
 
   END FUNCTION dputchar
 
@@ -888,6 +929,8 @@ CONTAINS
     real(dp), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2(:)
     integer j(lnv),i
+    integer localmaster
+    localmaster=master
 
     call ass(dputint)
 
@@ -916,6 +959,7 @@ CONTAINS
 
     call var(dputint,zero,0)
     CALL pok(dputint,j,s1)
+    master=localmaster
 
   END FUNCTION dputint
 
@@ -928,7 +972,6 @@ CONTAINS
     integer j(lnv),i
 
     call check(s1)
-
 
     resul = trim(ADJUSTL (s2))
 
@@ -961,7 +1004,6 @@ CONTAINS
     integer j(lnv),i
 
     call check(s1)
-
 
 
     do i=1,lnv
@@ -1036,6 +1078,8 @@ CONTAINS
     TYPE (taylor) GETdiff
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(GETdiff)
@@ -1047,6 +1091,7 @@ CONTAINS
        CALL NEWdader(S2,S1%J,TEMPL)
        call NEWdacop(tempL,GETdiff%J)
     endif
+    master=localmaster
 
   END FUNCTION GETdiff
 
@@ -1055,6 +1100,8 @@ CONTAINS
     TYPE (taylor) GETdatra
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(GETdatra)
@@ -1066,6 +1113,7 @@ CONTAINS
        CALL NEWdatra(S2,S1%J,TEMPL)
        call NEWdacop(tempL,GETdatra%J)
     endif
+    master=localmaster
 
   END FUNCTION GETdatra
 
@@ -1075,6 +1123,8 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(POW)
@@ -1103,6 +1153,7 @@ CONTAINS
        ENDIF
        call newdacop(templ,POW%j)
     endif
+    master=localmaster
   END FUNCTION POW
 
   FUNCTION POWR8( S1, R2 )
@@ -1110,6 +1161,8 @@ CONTAINS
     TYPE (taylor) POWR8
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: R2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(POWR8)
@@ -1126,6 +1179,7 @@ CONTAINS
        !  CALL NEWDAFUN('EXP ',TEMPL,TEMPL)
        !  call newdacop(TEMPL,POWR8%J)
     endif
+    master=localmaster
   END FUNCTION POWR8
 
   FUNCTION POWR( S1, R2 )
@@ -1133,6 +1187,8 @@ CONTAINS
     TYPE (taylor) POWR
     TYPE (taylor), INTENT (IN) :: S1
     REAL(SP), INTENT (IN) :: R2
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1150,6 +1206,7 @@ CONTAINS
        !  CALL NEWDAFUN('EXP ',TEMPL,TEMPL)
        !  call newdacop(TEMPL,POWR%J)
     endif
+    master=localmaster
   END FUNCTION POWR
 
 
@@ -1159,6 +1216,8 @@ CONTAINS
     TYPE (taylor) dmulsc
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dmulsc)
@@ -1172,7 +1231,7 @@ CONTAINS
        ! call newdacop(templ,dmulsc%j)
     endif
 
-
+    master=localmaster
   END FUNCTION dmulsc
 
   FUNCTION mulsc( S1, sc )
@@ -1180,6 +1239,8 @@ CONTAINS
     TYPE (taylor) mulsc
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1193,9 +1254,7 @@ CONTAINS
        ! call newdacmu(s1%j,REAL(sc,kind=DP),templ)
        ! call newdacop(templ,mulsc%j)
     endif
-
-
-
+    master=localmaster
   END FUNCTION mulsc
 
   FUNCTION imulsc( S1, sc )
@@ -1203,6 +1262,8 @@ CONTAINS
     TYPE (taylor) imulsc
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(imulsc)
@@ -1217,7 +1278,7 @@ CONTAINS
        !  call newdacop(templ,imulsc%j)
     endif
 
-
+    master=localmaster
   END FUNCTION imulsc
 
   FUNCTION dscmul( sc,S1 )
@@ -1225,6 +1286,8 @@ CONTAINS
     TYPE (taylor) dscmul
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dscmul)
@@ -1238,6 +1301,7 @@ CONTAINS
        !  call newdacop(templ,dscmul%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dscmul
 
@@ -1246,6 +1310,8 @@ CONTAINS
     TYPE (taylor) scmul
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1261,6 +1327,7 @@ CONTAINS
        !  call newdacop(templ,scmul%j)
     endif
 
+    master=localmaster
 
   END FUNCTION scmul
 
@@ -1269,6 +1336,8 @@ CONTAINS
     TYPE (taylor) iscmul
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(iscmul)
@@ -1282,6 +1351,7 @@ CONTAINS
        !  call newdacop(templ,iscmul%j)
     endif
 
+    master=localmaster
 
   END FUNCTION iscmul
 
@@ -1289,6 +1359,8 @@ CONTAINS
     implicit none
     TYPE (taylor) div
     TYPE (taylor), INTENT (IN) :: S1, S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call check(s2)
@@ -1303,8 +1375,7 @@ CONTAINS
        call newdacop(templ,div%j)
     endif
 
-
-
+    master=localmaster
   END FUNCTION div
 
   FUNCTION dscdiv( sc,S1 )
@@ -1312,6 +1383,8 @@ CONTAINS
     TYPE (taylor) dscdiv
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dscdiv)
@@ -1325,6 +1398,7 @@ CONTAINS
        !  call newdacop(templ,dscdiv%j)
     endif
 
+    master=localmaster
 
   END FUNCTION dscdiv
 
@@ -1333,6 +1407,8 @@ CONTAINS
     TYPE (taylor) scdiv
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1348,7 +1424,7 @@ CONTAINS
        !  call newdacop(templ,scdiv%j)
     endif
 
-
+    master=localmaster
   END FUNCTION scdiv
 
   FUNCTION iscdiv( sc,S1 )
@@ -1356,6 +1432,8 @@ CONTAINS
     TYPE (taylor) iscdiv
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(iscdiv)
@@ -1370,7 +1448,7 @@ CONTAINS
     endif
 
 
-
+    master=localmaster
   END FUNCTION iscdiv
 
   FUNCTION ddivsc( S1, sc )
@@ -1378,6 +1456,8 @@ CONTAINS
     TYPE (taylor) ddivsc
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(ddivsc)
@@ -1391,6 +1471,7 @@ CONTAINS
        !  call newdacdi(s1%j,sc,templ)
        !  call newdacop(templ,ddivsc%j)
     endif
+    master=localmaster
 
   END FUNCTION ddivsc
 
@@ -1399,6 +1480,8 @@ CONTAINS
     TYPE (taylor) divsc
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1412,7 +1495,7 @@ CONTAINS
        !  call newdacdi(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,divsc%j)
     endif
-
+    master=localmaster
 
   END FUNCTION divsc
 
@@ -1422,6 +1505,8 @@ CONTAINS
     TYPE (taylor) idivsc
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(idivsc)
@@ -1435,7 +1520,7 @@ CONTAINS
        !  call newdacdi(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,idivsc%j)
     endif
-
+    master=localmaster
 
   END FUNCTION idivsc
 
@@ -1444,6 +1529,8 @@ CONTAINS
     implicit none
     TYPE (taylor) add
     TYPE (taylor), INTENT (IN) :: S1, S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call check(s2)
@@ -1461,7 +1548,7 @@ CONTAINS
        !  call newdacop(templ,add%j)
     endif
 
-
+    master=localmaster
 
   END FUNCTION add
 
@@ -1470,6 +1557,8 @@ CONTAINS
     TYPE (taylor) daddsc
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(daddsc)
@@ -1482,7 +1571,7 @@ CONTAINS
        !  call newdacad(s1%j,sc,templ)
        !  call newdacop(templ,daddsc%j)
     endif
-
+    master=localmaster
 
   END FUNCTION daddsc
 
@@ -1491,6 +1580,8 @@ CONTAINS
     TYPE (taylor) addsc
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1505,7 +1596,7 @@ CONTAINS
        !  call newdacad(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,addsc%j)
     endif
-
+    master=localmaster
 
   END FUNCTION addsc
 
@@ -1514,6 +1605,8 @@ CONTAINS
     TYPE (taylor) iaddsc
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(iaddsc)
@@ -1526,7 +1619,7 @@ CONTAINS
        !  call newdacad(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,iaddsc%j)
     endif
-
+    master=localmaster
 
   END FUNCTION iaddsc
 
@@ -1535,6 +1628,8 @@ CONTAINS
     TYPE (taylor) dscadd
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dscadd)
@@ -1547,8 +1642,7 @@ CONTAINS
        !  call newdacad(s1%j,sc,templ)
        !  call newdacop(templ,dscadd%j)
     endif
-
-
+    master=localmaster
 
   END FUNCTION dscadd
 
@@ -1557,6 +1651,8 @@ CONTAINS
     TYPE (taylor) scadd
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1571,7 +1667,7 @@ CONTAINS
        ! call newdacop(templ,scadd%j)
     endif
 
-
+    master=localmaster
 
   END FUNCTION scadd
 
@@ -1580,6 +1676,8 @@ CONTAINS
     TYPE (taylor) iscadd
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(iscadd)
@@ -1593,7 +1691,7 @@ CONTAINS
        ! call newdacad(s1%j,REAL(sc,kind=DP),templ)
        ! call newdacop(templ,iscadd%j)
     endif
-
+    master=localmaster
 
   END FUNCTION iscadd
 
@@ -1601,6 +1699,8 @@ CONTAINS
     implicit none
     TYPE (taylor) subs
     TYPE (taylor), INTENT (IN) :: S1, S2
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call check(s2)
@@ -1616,7 +1716,7 @@ CONTAINS
        !call newdasub(s1%j,s2%j,templ)
        !call newdacop(templ,subs%j)
     endif
-
+    master=localmaster
 
   END FUNCTION subs
 
@@ -1625,6 +1725,8 @@ CONTAINS
     TYPE (taylor) dsubsc
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dsubsc)
@@ -1638,6 +1740,7 @@ CONTAINS
        !  call newdacop(templ,dsubsc%j)
     endif
 
+    master=localmaster
 
 
   END FUNCTION dsubsc
@@ -1647,6 +1750,8 @@ CONTAINS
     TYPE (taylor) subsc
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1660,7 +1765,7 @@ CONTAINS
        !  call newdacsu(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,subsc%j)
     endif
-
+    master=localmaster
 
   END FUNCTION subsc
 
@@ -1669,6 +1774,8 @@ CONTAINS
     TYPE (taylor) isubsc
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(isubsc)
@@ -1681,6 +1788,7 @@ CONTAINS
        !  call newdacsu(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,isubsc%j)
     endif
+    master=localmaster
 
   END FUNCTION isubsc
 
@@ -1689,6 +1797,8 @@ CONTAINS
     TYPE (taylor) dscsub
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(dscsub)
@@ -1701,7 +1811,7 @@ CONTAINS
        !  call newdasuc(s1%j,sc,templ)
        !  call newdacop(templ,dscsub%j)
     endif
-
+    master=localmaster
 
   END FUNCTION dscsub
 
@@ -1710,6 +1820,8 @@ CONTAINS
     TYPE (taylor) scsub
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     if(real_warning) call real_stop
     call check(s1)
@@ -1723,7 +1835,7 @@ CONTAINS
        ! call newdasuc(s1%j,REAL(sc,kind=DP),templ)
        ! call newdacop(templ,scsub%j)
     endif
-
+    master=localmaster
 
   END FUNCTION scsub
 
@@ -1732,6 +1844,8 @@ CONTAINS
     TYPE (taylor) iscsub
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
+    integer localmaster
+    localmaster=master
 
     call check(s1)
     call ass(iscsub)
@@ -1744,8 +1858,7 @@ CONTAINS
        !  call newdasuc(s1%j,REAL(sc,kind=DP),templ)
        !  call newdacop(templ,iscsub%j)
     endif
-
-
+    master=localmaster
 
   END FUNCTION iscsub
 
@@ -1786,30 +1899,7 @@ CONTAINS
        CALL allocnewda(DUMMYl)
        call allocnewda(templ)
     endif
-    IF(OLDSCHEME) THEN
-       if(old) then
-          do i=1,ndumt
-             if(ndumuser(i)>ndummax) then
-                w_p=0
-                w_p%nc=1
-                write(w_p%c(1),'(a10,1x,i4,1x,a10)') "ndumuser(", int(i),  ")>ndummax "
-                w_p%fc='(1((1X,A72),/))'
-                CALL WRITE_E(111)
-             endif
-             do j=1,ndumuser(i)
-                CALL ETALL1(DUMuser(i,j))
-             enddo
-          enddo
-       else
-          do i=1,ndumt
-             do j=1,ndumuser(i)
-                CALL allocnewda(DUMluser(i,j))
-             enddo
-          enddo
-       endif
-    ELSE
-       CALL set_up_level
-    ENDIF
+    CALL set_up_level
   end subroutine ASSIGN
 
   subroutine DEASSIGN
@@ -1826,56 +1916,57 @@ CONTAINS
        CALL KILLnewdaS(DUMMYl)
        call KILLnewdaS(templ)
     endif
-    IF(FIRSTSCHEME) THEN
-       if(old) then
-          if(dummy/=0) then
-             do i=1,ndumt
-                do j=1,ndumuser(i)
-                   CALL dadal1(DUMuser(i,j))
-                enddo
-             enddo
-          endif
-       else
-          do i=1,ndumt
-             do j=1,ndumuser(i)
-                CALL KILLnewdaS(DUMluser(i,j))
-             enddo
-          enddo
-       endif
-    ELSE  ! NEW SCHEME
-       do i=1,ndumt
-          CALL kill_DALEVEL(scratchda(I))
-       ENDDO
-    ENDIF
+    do i=1,ndumt
+       CALL kill_DALEVEL(scratchda(I))
+    ENDDO
   end subroutine DEASSIGN
 
+  subroutine ASStaylor(s1)
+    implicit none
+    TYPE (taylor) s1
+    !  lastmaster=master  ! 2002.12.13
+
+    select case(master)
+    case(0:ndumt-1)
+       master=master+1
+    case(ndumt)
+       master=sqrt(-dble(master))
+       w_p=0
+       w_p%nc=1
+       w_p=(/" cannot indent anymore "/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(100)
+    end select
+    !    write(26,*) "   taylor ",master
+    call ass0(s1)
+
+  end subroutine ASStaylor
 
   subroutine ass0(s1)
     implicit none
+    integer ipause, mypause
     TYPE (taylor) s1
+
+    IF(MASTER>NDUMT.or.master==0) THEN
+       WRITE(6,*) "more scratch level needed ",master,NDUMT
+       ipause=mypause(123)
+       write(6,*) 1/sqrt(-dble(1000+master))
+       stop 123
+    ENDIF
+
     if(.not.no_ndum_check) iass0user(master)=iass0user(master)+1
 
-    if(oldscheme) then
-       iassdoluser(master)=iassdoluser(master)+1
-       if(iassdoluser(master).eq.ndumuser(master)+1) iassdoluser(master)=1
-       if(old) then
-          s1%i=dumuser(master,iassdoluser(master))
-       else
-          s1%j=dumluser(master,iassdoluser(master))
-       endif
+    if(iass0user(master)>scratchda(master)%n) then
+       call INSERT_DA( scratchda(master) )
+    ELSE
+       scratchda(master)%PRESENT=>scratchda(master)%PRESENT%NEXT
+    ENDIF
+    if(old) then
+       s1%i=scratchda(master)%PRESENT%T%i
     else
-       if(iass0user(master)>scratchda(master)%n) then
-          call INSERT_DA( scratchda(master) )
-       ELSE
-          scratchda(master)%PRESENT=>scratchda(master)%PRESENT%NEXT
-       ENDIF
-       if(old) then
-          s1%i=scratchda(master)%PRESENT%T%i
-       else
-          s1%j=scratchda(master)%PRESENT%T%j
-       endif
-
+       s1%j=scratchda(master)%PRESENT%T%j
     endif
+
 
   end subroutine ASS0
 
@@ -1883,34 +1974,13 @@ CONTAINS
     implicit none
     integer ipause,II(0:1)
 
-    if(oldscheme) then
-       w_p=0
-       w_p%nc=13
-       w_p%fc='(13((1X,A72),/))'
 
-       write(w_p%c(1),'(a18,1x,i4)') "Master variable = ", master
-       write(w_p%c(2),'(a20,1x,i4)') "Number of Scratch = ", NDUMUSER(master)
-
-       w_p%c(3)= " *****************************************************************"
-       w_p%c(4)= " *  In User's new overloaded code                                *"
-       w_p%c(5)= " *  line maybe be too big in overloaded code                     *"
-       w_p%c(6)= " *  you can disconnect this check if you think things are fine   *"
-       w_p%c(7)= " *  Set global variable no_ndum_check=.true.                     *"
-       w_p%c(8)= " *****************************************************************"
-       w_p%c(9)= "  "
-       w_p%c(10)= " You may also increase the number "
-       write(w_p%c(11),'(a31,1x,i4)') " of scratch variables at level ",master
-       write(w_p%c(12),'(a4,1x,i4)') " to ",iass0user(master)
-       w_p%c(13)= "    "
-       CALL WRITE_E(0)
-    else
-       w_p=0
-       w_p%nc=3
-       w_p%fc='(3((1X,A72),/))'
-       w_p%c(1)=  " *****************************************************************"
-       w_p%c(2)=  " *  Should never be here in New Linked List Scheme               *"
-       w_p%c(3)=  " *****************************************************************"
-    endif
+    w_p=0
+    w_p%nc=3
+    w_p%fc='(3((1X,A72),/))'
+    w_p%c(1)=  " *****************************************************************"
+    w_p%c(2)=  " *  Should never be here in New Linked List Scheme               *"
+    w_p%c(3)=  " *****************************************************************"
     w_p=0
     w_p%nc=1
     w_p%fc='(1(1X,A72),/))'
@@ -2029,23 +2099,35 @@ CONTAINS
   END SUBROUTINE pok000
 
 
-  SUBROUTINE  tran(S1,r1,R2)
+  SUBROUTINE  tAYLOR_ran(S1,r1,R2)
     implicit none
     real(dp),INTENT(in)::R1
     real(dp),INTENT(inout)::R2
     type (taylor),INTENT(inout)::S1
     if(old) then
-       if(s1%i==0) call crap1("tran  1" )  ! call etall1(s1%i)
+       if(s1%i==0) call crap1("tAYLOR_ran  1" )  ! call etall1(s1%i)
        call daran(s1%i,r1,R2)
     else
-       if(.NOT. ASSOCIATED(s1%j%r))call crap1("tran  2" )  !  call newetall(s1%j,1)
+       if(.NOT. ASSOCIATED(s1%j%r))call crap1("tAYLOR_ran  2" )  !  call newetall(s1%j,1)
 
        call newdaran(s1%j,r1,R2)
     endif
 
-  END SUBROUTINE tran
+  END SUBROUTINE tAYLOR_ran
 
-
+  SUBROUTINE  intd_taylor(S1,S2,factor)
+    implicit none
+    type (taylor),INTENT(inOUT)::S2
+    type (taylor),INTENT(IN)::S1(:)
+    real(dp),INTENT(IN):: factor
+    if(old) then
+       if(s1(1)%i==0) call crap1("intd_taylor 1")  !call etall1(s2%h%i)
+       CALL intd(S1%i,s2%i,factor)
+    else
+       if(.NOT. ASSOCIATED(s1(1)%j%r)) call crap1("intd_taylor 2")  !call etall1(s2%h%i)
+       CALL newintd(S1%j,s2%j,factor)
+    endif
+  END SUBROUTINE intd_taylor
 
   SUBROUTINE  CFU000(S2,FUN,S1)
     implicit none
@@ -2095,7 +2177,7 @@ CONTAINS
 
   END SUBROUTINE CFUI
 
-  SUBROUTINE  tpsaeps(r1)
+  SUBROUTINE  taylor_eps(r1)
     implicit none
     real(dp),INTENT(INOUT)::r1
     if(old) then
@@ -2104,7 +2186,8 @@ CONTAINS
        CALL newDAeps(r1)
     endif
 
-  END SUBROUTINE tpsaeps
+  END SUBROUTINE taylor_eps
+
 
 
   SUBROUTINE  pri(S1,MFILE)
@@ -2182,6 +2265,9 @@ CONTAINS
     CHARACTER(*)  , INTENT (IN) ::  S2
     CHARACTER (LEN = LNV)  resul
     integer i,k
+    integer localmaster
+
+    localmaster=master
     ndel=0
     call check(s1)
     call ass(GETCHARnd2)
@@ -2232,6 +2318,7 @@ CONTAINS
     GETCHARnd2=junk
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION GETCHARnd2
 
@@ -2241,6 +2328,8 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer , INTENT (IN) ::  S2(:)
     integer i,k,nt
+    integer localmaster
+    localmaster=master
     call check(s1)
     call ass(GETintnd2)
 
@@ -2289,9 +2378,52 @@ CONTAINS
     GETintnd2=junk
 
     call kill(junk)
+    master=localmaster
 
   END FUNCTION GETintnd2
 
+
+  SUBROUTINE  taylor_cycle(S1,N,VALUE,J)
+    implicit none
+    type (taylor),INTENT(IN)::S1
+    integer, intent(inout):: n
+    integer,optional, intent(inout)::J(:)
+    real(dp), OPTIONAL, intent(inout):: value
+    INTEGER ipresent,ILLA,I
+    real(dp) VALUE0
+    IF(OLD) THEN
+       IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
+          call dacycle(S1%i,N,value,illa,J)
+       ELSE
+          call dacycle(S1%i,ipresent,value0,N)
+       ENDIF
+    ELSE
+       IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
+          ILLA=0
+          DO i=1,SIZE(S1%J%R)
+             IF(PACKING) THEN
+                IF(S1%J%YES(I))      ILLA=ILLA+1
+             ELSE
+                IF(S1%J%R(I)/=zero)  ILLA=ILLA+1
+             ENDIF
+             IF(ILLA==N) EXIT
+          ENDDO
+          VALUE=S1%J%R(ILLA)
+          N=N+1
+       ELSE
+          N=0
+          DO i=1,SIZE(S1%J%R)
+             IF(PACKING) THEN
+                IF(S1%J%YES(I)) N=N+1
+             ELSE
+                IF(S1%J%R(I)/=zero)  N=N+1
+             ENDIF
+          ENDDO
+       ENDIF
+
+    ENDIF
+
+  END SUBROUTINE taylor_cycle
 
 
   SUBROUTINE  null_0(S2,S1)
@@ -2302,6 +2434,7 @@ CONTAINS
        NULLIFY(S2%N,S2%NV,S2%C,S2%J)
     ELSEIF(S1==-1) THEN
        DEALLOCATE(S2%N,S2%NV,S2%C,S2%J)
+       NULLIFY(S2%N,S2%NV,S2%C,S2%J)
     ENDIF
   END SUBROUTINE null_0
 
@@ -2344,6 +2477,8 @@ CONTAINS
     type (TAYLOR), intent(in):: s1
     INTEGER inoc,invc,ipoc,k,n,I,J(LNV)
     logical(lp) DOIT
+
+    call check_snake
 
     if(old) then
        if(s1%i==0)  call crap1("FILL_N 1")
@@ -2446,31 +2581,31 @@ CONTAINS
 
   END SUBROUTINE REFILL_N
 
-  subroutine check_snake    !Checks equal signs only in defined in TPSA.f90
+  subroutine check_snake
     implicit none
+    master=master+1
     select case (master)
-    case(1)
-       if(oldscheme) then
-          if(iass0user(master)>ndumuser(master)) then
-             call ndum_warning_user
-          endif
-          iass0user(master)=0
-       else
-          if(iass0user(master)>scratchda(master)%n.or.scratchda(master)%n>newscheme_max) then
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1((1X,A72),/))'
-             w_p%fi='(3((1X,i4)))'
-             w_p%c(1)= "iass0user(master),scratchda(master)%n,newscheme_max"
-             w_p=(/iass0user(master),scratchda(master)%n,newscheme_max/)
-             call write_e
-             call ndum_warning_user
-          endif
-          iass0user(master)=0
+    case(1:ndumt)
+       if(iass0user(master)>scratchda(master)%n.or.scratchda(master)%n>newscheme_max) then
+          w_p=0
+          w_p%nc=1
+          w_p%fc='(1((1X,A72),/))'
+          w_p%fi='(3((1X,i4)))'
+          w_p%c(1)= "iass0user(master),scratchda(master)%n,newscheme_max"
+          w_p=(/iass0user(master),scratchda(master)%n,newscheme_max/)
+          call write_e
+          call ndum_warning_user
        endif
-
+       iass0user(master)=0
+    case(ndumt+1:)
+       w_p=0
+       w_p%nc=1
+       w_p=(/"Should not be here"/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(101)
     end select
-  end  subroutine check_snake
+    master=master-1
+  end subroutine check_snake
 
   subroutine crap1(STRING)
     implicit none
@@ -2660,7 +2795,7 @@ CONTAINS
   SUBROUTINE report_level
     implicit none
     integer i
-    if((.not.oldscheme).and.associated(scratchda(1)%n)) then
+    if(associated(scratchda(1)%n)) then
        do i=1,ndumt
           w_p=0
           w_p%nc=1
@@ -2668,12 +2803,6 @@ CONTAINS
           write(w_p%c(1),'(a6,1x,i4,a5,1x,i4,1x,a7)') "Level ",i, " has ",scratchda(i)%n, "Taylors"
           call write_e
        enddo
-    else
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72)))'
-       w_p%c(1)="There is nothing to report on the levels"
-       call write_e
     endif
   END   SUBROUTINE report_level
 

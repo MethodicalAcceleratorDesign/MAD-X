@@ -30,10 +30,10 @@ module lielib_berz
 
 contains
 
-  subroutine lieinit(no1,nv1,nd1,ndpt1,iref1,nis)
+  subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
     implicit none
     !! Lieinit initializes AD Package and Lielib
-    integer i,iref1,nd1,ndc1,ndpt1,nis,no1,nv1
+    integer i,iref1,nd1,ndc1,ndpt1,no1,nv1      !,nis
     real(dp),dimension(ndim)::ang,ra,st
     integer ipause,mypauses
 
@@ -48,11 +48,11 @@ contains
     nv=nv1
     nd=nd1
     nd2=2*nd1
-    do i=1,100
-       is(i)=0
-    enddo
+    !    do i=1,100
+    !       is(i)=0
+    !    enddo
     call daini(no,nv,nd2,0)
-    if(nis.gt.0)call etallnom(is,nis,'$$IS      ')
+    !    if(nis.gt.0)call etallnom(is,nis,'$$IS      ')
     if(ndpt1.eq.0) then
        ndpt=0
        ndt=0
@@ -239,6 +239,7 @@ contains
     integer,dimension(:)::x
     real(dp),dimension(ntt)::xf,xii
     real(dp),dimension(:)::xi,xff
+    if(c_%escape_da) return
 
     do i=1,nv
        xii(i)=xi(i)
@@ -261,6 +262,7 @@ contains
     integer i,nt
     integer,dimension(ntt)::ie,iv
     integer,dimension(:)::x,y
+    if(c_%escape_da) return
 
     nt=nv-nd2
     if(nt.gt.0) then
@@ -287,6 +289,7 @@ contains
     integer,dimension(:)::x
     real(dp),dimension(ntt)::xf,xii
     real(dp),dimension(:)::xi
+    if(c_%escape_da) return
 
     do i=1,nd2
        xii(i)=xi(i)
@@ -306,6 +309,7 @@ contains
     integer,dimension(:)::x
     real(dp),dimension(ntt)::xf,xii
     real(dp),dimension(:)::xi,xff
+    if(c_%escape_da) return
 
     do i=1,nd2
        xii(i)=xi(i)
@@ -325,6 +329,7 @@ contains
     integer,dimension(:)::x
     real(dp),dimension(ntt)::xf,xii
     real(dp),dimension(:)::xi,xff
+    if(c_%escape_da) return
 
     do i=1,nd1
        xii(i)=xi(i)
@@ -347,6 +352,7 @@ contains
     integer i,nt
     integer,dimension(ntt)::ie,iv
     integer,dimension(:)::x,y,z
+    if(c_%escape_da) return
 
     nt=nv-nd2
     if(nt.gt.0) then
@@ -374,6 +380,7 @@ contains
     integer,dimension(ntt)::ie,iv
     integer,dimension(1)::h1,rh1
     integer,dimension(:)::y
+    if(c_%escape_da) return
 
     nt=nv-nd2
     if(nt.gt.0) then
@@ -402,6 +409,7 @@ contains
     integer j,k,b1,b2
     integer,dimension(:)::h,rh,y
     integer,dimension(ndim2)::yi,ht
+    if(c_%escape_da) return
 
     call etallnom(yi,nd2  ,'YI        ')
     call etallnom(ht,nd2  ,'HT        ')
@@ -434,6 +442,7 @@ contains
     !  Y= AoXoAI
     integer,dimension(:)::x,y,a,ai
     integer,dimension(ndim2)::w,v
+    if(c_%escape_da) return
 
     call etallnom(w,nd2  ,'W         ')
     call etallnom(v,nd2  ,'V         ')
@@ -452,6 +461,7 @@ contains
     !  X=IDENTITY
     integer i
     integer,dimension(:)::x
+    if(c_%escape_da) return
 
     !*DAEXT(NO,NV) X(NDIM2)
     do i=1,nd2
@@ -465,6 +475,7 @@ contains
     integer i,nt
     integer,dimension(ntt)::ie1,ie2,iv1,iv2
     integer,dimension(:)::x,y
+    if(c_%escape_da) return
 
     nt=nv-nd2
     if(nt.gt.0) then
@@ -500,6 +511,7 @@ contains
     integer i,nt
     integer,dimension(ntt)::ie1,ie2,iv1,iv2
     integer,dimension(:)::x,y,jj
+    if(c_%escape_da) return
 
     nt=nv-nd2
     if(nt.gt.0) then
@@ -536,6 +548,7 @@ contains
     integer,dimension(ntt)::jd
     integer,dimension(:)::v
     real(dp),dimension(:)::x
+    if(c_%escape_da) return
 
     do i=1,ntt
        jd(i)=0
@@ -551,6 +564,7 @@ contains
     integer,dimension(ntt)::jd
     integer,dimension(:)::v
     real(dp),dimension(:)::x
+    if(c_%escape_da) return
 
     do i=1,ntt
        jd(i)=0
@@ -565,6 +579,7 @@ contains
     integer i,jj
     integer,dimension(:)::v
     integer,dimension(ntt)::jd
+    if(c_%escape_da) return
 
     do i=1,ntt
        jd(i)=0
@@ -579,6 +594,7 @@ contains
     integer i,jj
     integer,dimension(:)::v
     real(dp),dimension(:)::x
+    if(c_%escape_da) return
 
     do i=1,jj
        call davar(v(i),x(i),i)
@@ -591,6 +607,7 @@ contains
     integer,dimension(:)::b,c
     integer,dimension(4)::t
     real(dp),external::f1,f2
+    if(c_%escape_da) return
 
     call etall(t,4)
 
@@ -611,6 +628,7 @@ contains
     integer i,m,h,ht,b1,b2,b3
     integer,dimension(ntt)::j
     real(dp) r
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(b2)
@@ -664,6 +682,7 @@ contains
     integer,dimension(:)::h,ht
     integer,dimension(ntt)::j
     integer,dimension(ndim2)::x
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(b2)
@@ -687,6 +706,7 @@ contains
     ! clear a map : a vector of nd2 polynomials
     integer i
     integer,dimension(:)::h
+    if(c_%escape_da) return
 
     do i=1,nd2
        call daclr(h(i))
@@ -698,6 +718,7 @@ contains
     !    H goes into HT  (nd2 array)
     integer i
     integer,dimension(:)::h,ht
+    if(c_%escape_da) return
 
     do i=1,nd2
        call dacop(h(i),ht(i))
@@ -709,6 +730,7 @@ contains
     integer i
     integer,dimension(:)::h,ht
     real(dp) sca
+    if(c_%escape_da) return
 
     do i=1,nd2
        call dacmu(h(i),sca,ht(i))
@@ -721,6 +743,7 @@ contains
     integer,dimension(:)::h,ht,hr
     integer,dimension(ndim2)::b
     real(dp) rh,rt
+    if(c_%escape_da) return
 
     call etallnom(b,nd2  ,'B         ')
 
@@ -738,6 +761,7 @@ contains
     integer,dimension(:)::h
     integer,dimension(ntt)::j
     real(dp) rx,xipo
+    if(c_%escape_da) return
 
     do i=1,ntt
        j(i)=0
@@ -755,6 +779,7 @@ contains
     !  print a map
     integer i,mfile,n1,n2
     integer,dimension(:)::h
+    if(c_%escape_da) return
 
     if(mfile.le.0) return
     do i=n1,n2
@@ -767,6 +792,7 @@ contains
     integer i,ic
     !      INTEGER J(NTT)
     integer,dimension(:)::j
+    if(c_%escape_da) return
 
     filtres=one
     ic=0
@@ -787,6 +813,7 @@ contains
     !     \VEC{H}.GRAD X =Y
     integer i,x,y,b1,b2,b3
     integer,dimension(:)::h
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(b2)
@@ -811,6 +838,7 @@ contains
     integer i
     integer,dimension(:)::h,x,y
     integer,dimension(ndim2)::b1,b2
+    if(c_%escape_da) return
 
     call etall(b1,nd2)
     call etall(b2,nd2)
@@ -837,6 +865,7 @@ contains
     integer,dimension(:)::v
     integer,dimension(ndim2)::x
     real(dp) sca
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(b2)
@@ -870,6 +899,7 @@ contains
     integer i,h1,b1,h
     integer,dimension(:)::v
     real(dp) sca
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(h)
@@ -890,6 +920,7 @@ contains
     integer i,nrmax,x,y,b1,b2,b3,b4
     integer,dimension(:)::h
     real(dp) coe,eps,r,rbefore
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(b2)
@@ -952,6 +983,7 @@ contains
     integer,dimension(:)::x,w,h
     integer,dimension(ndim2)::v
     real(dp) eps
+    if(c_%escape_da) return
 
     call etall1(b0 )
     call etallnom(v,nd2  ,'V         ')
@@ -976,6 +1008,7 @@ contains
     integer,dimension(:)::h
     integer,dimension(ndim2)::bm,b0
     real(dp) eps,sca
+    if(c_%escape_da) return
 
     call etallnom(bm,nd2  ,'BM        ')
     call etallnom(b0,nd2  ,'B0        ')
@@ -1021,6 +1054,7 @@ contains
     integer i,ifac,nrmax,nrmin
     integer,dimension(:)::x,w,h
     real(dp) sca
+    if(c_%escape_da) return
 
     do i=1,nd2
        call facflo(h,x(i),w(i),nrmin,nrmax,sca,ifac)
@@ -1036,6 +1070,7 @@ contains
     integer,dimension(:)::x,w
     integer,dimension(ndim2)::v
     real(dp) sca
+    if(c_%escape_da) return
 
     nrmi=nrmin-1
     nrma=nrmax-1
@@ -1053,6 +1088,7 @@ contains
     integer i,j,t1,t2
     integer,dimension(:)::h,x,y
     integer,dimension(ndim2)::t3
+    if(c_%escape_da) return
 
     call etall1(t1)
     call etall1(t2)
@@ -1082,6 +1118,7 @@ contains
     implicit none
     ! ETPOI TAKES THE POISSON BRACKET OF TWO FUNCTIONS
     integer i,h,x,y,t1,t2,t3
+    if(c_%escape_da) return
 
     call etall1(t1)
     call etall1(t2)
@@ -1115,6 +1152,7 @@ contains
     integer non,h,x,y
     integer,dimension(ndim2)::v
     real(dp) eps
+    if(c_%escape_da) return
 
     call etall(v,nd2)
     call difd(h,v,-one)
@@ -1131,6 +1169,7 @@ contains
     integer,dimension(:)::x,w
     integer,dimension(ndim2)::v
     real(dp) eps
+    if(c_%escape_da) return
 
     call etall1(b0)
     call etallnom(v,nd2  ,'V         ')
@@ -1145,6 +1184,7 @@ contains
     call dadal1(b0)
     return
   end subroutine expnd2
+
   subroutine flofacg(xy,h,epsone)
     implicit none
     ! GENERAL ONE EXPONENT FACTORIZATION
@@ -1154,6 +1194,7 @@ contains
     integer,dimension(ndim2)::x,v,w,t,z
     integer,dimension(ntt)::jj
     real(dp) eps,epsone,r,xn,xnbefore,xnorm,xnorm1,xx
+    if(c_%escape_da) return
 
     jj(1)=1
     !
@@ -1198,7 +1239,7 @@ contains
           call etcom(x,w,x)
           !  END OF  order in W
 
-          do kk=1,10
+          do kk=1,3   !10
              call etcom(h,w,w)
              call dalind(z,one,w,xintex(kk),z)
           enddo
@@ -1246,6 +1287,7 @@ contains
     integer k
     integer,dimension(:)::xy,x,h
     integer,dimension(ndim2)::v,w
+    if(c_%escape_da) return
 
     call etallnom(v,nd2  ,'V         ')
     call etallnom(w,nd2  ,'W         ')
@@ -1278,6 +1320,7 @@ contains
     integer h
     integer,dimension(:)::xy,x
     integer,dimension(ndim2)::v
+    if(c_%escape_da) return
 
     call etall(v,nd2)
 
@@ -1295,6 +1338,7 @@ contains
     integer isi,nord,ft,h
     integer,dimension(:)::x,a1,a2,xy
     integer,dimension(ndim2)::hf,ftf
+    if(c_%escape_da) return
 
     call etall(ftf,nd2)
     call etall(hf,nd2)
@@ -1311,6 +1355,7 @@ contains
     implicit none
     integer ik
     real(dp),dimension(ndim)::psq,radsq
+    if(c_%escape_da) return
 
     do ik=1,nd
        psq(ik)=ps(ik)
@@ -1323,6 +1368,7 @@ contains
     implicit none
     integer idprint,ik
     integer,dimension(ndim)::nplan
+    if(c_%escape_da) return
 
     do ik=1,nd
        nplane(ik)=nplan(ik)
@@ -1334,6 +1380,7 @@ contains
   subroutine idprset(idprint)
     implicit none
     integer idprint
+    if(c_%escape_da) return
 
     idpr=idprint
 
@@ -1345,6 +1392,7 @@ contains
     integer,dimension(ndim2)::a1i,a2i
     integer,dimension(:)::x,a1,a2,ft,xy,h
     real(dp),dimension(ndim)::angle,rad,st,p
+    if(c_%escape_da) return
 
     call etallnom(a1i,nd2  ,'A1I       ')
     call etallnom(a2i,nd2  ,'A2I       ')
@@ -1436,6 +1484,7 @@ contains
     integer,dimension(:)::xy,a1,a1i
     integer,dimension(ndim2)::x,w,v,rel
     real(dp) xic
+    if(c_%escape_da) return
 
     call etallnom(x,nd2  ,  'X         ')
     call etallnom(w,nd2  ,  'W         ')
@@ -1520,6 +1569,7 @@ contains
     integer i,ic
     !      INTEGER J(NTT)
     integer,dimension(:)::j
+    if(c_%escape_da) return
 
     transver=one
     ic=0
@@ -1536,6 +1586,7 @@ contains
     integer,dimension(ndim2)::w,v,rel,roi,b1,b5,b6,b9
     integer,dimension(:)::x,h,ft
     real(dp),dimension(ndim)::ang,ra
+    if(c_%escape_da) return
 
     call etallnom(w,nd2  ,'W         ')
     call etallnom(v,nd2  ,'V         ')
@@ -1601,6 +1652,7 @@ contains
     integer,dimension(:)::h,ft
     integer,dimension(ndim2)::br,bi,c,ci
     integer,dimension(2)::t1,t2
+    if(c_%escape_da) return
 
     call etall(br,nd2)
     call etall(bi,nd2)
@@ -1654,6 +1706,7 @@ contains
     integer,dimension(:)::j
     integer,dimension(ndim)::jj,jp
     real(dp) ad,ans,as,ex,exh
+    if(c_%escape_da) return
 
     xgam=zero
     ad=zero
@@ -1696,6 +1749,7 @@ contains
     !      INTEGER J(NTT),JJ(NDIM),JP(NDIM)
     integer,dimension(:)::j
     integer,dimension(ndim)::jj,jp
+    if(c_%escape_da) return
 
     xgbm=zero
     ad=zero
@@ -1739,6 +1793,7 @@ contains
     !      INTEGER J(NTT),JJ(NDIM)
     integer,dimension(:)::j
     integer,dimension(ndim)::jj
+    if(c_%escape_da) return
 
     filt=one
 
@@ -1778,6 +1833,7 @@ contains
     !      INTEGER J(NTT)
     integer,dimension(:)::j
     real(dp) fil
+    if(c_%escape_da) return
 
     fil=filt(j)
     if(fil.gt.half) then
@@ -1794,6 +1850,7 @@ contains
     integer i,bb1,bb2
     integer,dimension(:)::h,t
     integer,dimension(ndim2)::b1,b2
+    if(c_%escape_da) return
 
     call etall(b1,nd2)
     call etall(b2,nd2)
@@ -1835,6 +1892,7 @@ contains
     integer,dimension(:)::h
     real(dp) r1,r2
     real(dp),dimension(ndim)::ang,ra,st
+    if(c_%escape_da) return
 
     do i=1,nd
        st(i)=two*sta(i)-one
@@ -1881,6 +1939,7 @@ contains
     integer,dimension(:)::ro
     real(dp) ch,sh,sim,xx
     real(dp),dimension(ndim)::co,si,ang,ra
+    if(c_%escape_da) return
 
     call daclrd(ro)
     do i=1,nd-ndc
@@ -1931,6 +1990,7 @@ contains
     integer,dimension(ntt)::j
     integer,dimension(:)::roi
     real(dp),dimension(ndim)::co,si,ang,ra
+    if(c_%escape_da) return
 
     do i=1,10
        j(i)=0
@@ -1982,7 +2042,7 @@ contains
   subroutine hyper(a,ch,sh)
     implicit none
     real(dp) a,ch,sh,x,xi
-
+    if(c_%escape_da) return
     !   USED IN ROTIFLO AND ROTFLO
     x=EXP(a)
     xi=one/x
@@ -1996,6 +2056,7 @@ contains
     !   C1------> R2+I R1
     integer c1,r2,i2,b1,b2
     integer,dimension(ndim2)::x
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etall1(b2)
@@ -2015,6 +2076,7 @@ contains
     implicit none
     !  INVERSE OF CTOR
     integer c2,r1,i1,b1
+    if(c_%escape_da) return
 
     call etall1(b1)
 
@@ -2027,6 +2089,7 @@ contains
     implicit none
     ! FLOW CTOR
     integer,dimension(:)::dr,di,c
+    if(c_%escape_da) return
 
     call ctord(c,dr,di)
     call resvec(dr,di,dr,di)
@@ -2038,6 +2101,7 @@ contains
     ! FLOW RTOC
     integer,dimension(:)::dr,di,c
     integer,dimension(ndim2)::er,ei
+    if(c_%escape_da) return
 
     call etall(er,nd2)
     call etall(ei,nd2)
@@ -2057,6 +2121,7 @@ contains
     ! ROUTINE USEFUL IN INTERMEDIATE FLOW CHANGE OF BASIS
     integer i
     integer,dimension(:)::c,ci,cr
+    if(c_%escape_da) return
 
     do i=1,nd2
        call ctor(c(i),cr(i),ci(i))
@@ -2068,6 +2133,7 @@ contains
     !  INVERSE OF CTORD
     integer i
     integer,dimension(:)::c,ci,cr
+    if(c_%escape_da) return
 
     do i=1,nd2
        call rtoc(cr(i),ci(i),c(i))
@@ -2080,6 +2146,7 @@ contains
     integer i
     integer,dimension(:)::dr,di,ci,cr
     integer,dimension(2)::tr,ti
+    if(c_%escape_da) return
 
     call etall(tr,2)
     call etall(ti,2)
@@ -2121,6 +2188,7 @@ contains
     integer i
     integer,dimension(:)::c,ci,f,fi
     integer,dimension(ndim2)::e,ei
+    if(c_%escape_da) return
 
     call etall(e,nd2)
     call etall(ei,nd2)
@@ -2154,6 +2222,7 @@ contains
     ! TAKES THE COMPLEX CONJUGATE IN RESONANCE BASIS OF A POLYNOMIAL
     integer dr,di,ci,cr
     integer,dimension(ndim2)::x
+    if(c_%escape_da) return
 
     call etall(x,nd2)
 
@@ -2176,6 +2245,7 @@ contains
     real(dp) ch,r,shm
     real(dp),dimension(ndim2,ndim2)::cr,sa,sai,cm
     real(dp),dimension(ndim)::st,q,a
+    if(c_%escape_da) return
 
     do i=1,ntt
        jx(i)=0
@@ -2220,7 +2290,7 @@ contains
           shm=cr(2*i-1,2*i)/a(i)
           !       CH=CH+SQRT(CH**2-one)
           !       q(i)=LOG(CH)
-          q(i)=-LOG(ch+shm)
+          q(i)=-LOG(ch+shm)   ! half integer ???? blows up
           !       IF(cr(2*i-1,2*i).gt.zero) Q(I)=-Q(I)
           a(i)=LOG(a(i))
        endif
@@ -2249,6 +2319,7 @@ contains
 
     return
   end subroutine midbflo
+
   subroutine mapflol(sa,sai,cr,cm,st)
     implicit none
     !---- FROM TRACKING CODE
@@ -2259,6 +2330,7 @@ contains
     real(dp),dimension(ndim2,ndim2)::cr,xj,sa,sai,cm,w,vr,vi,s1
     real(dp),dimension(ndim)::x,xx,st
     real(dp),dimension(ndim2)::rr,ri,p
+    if(c_%escape_da) return
 
     n1=0
     !     frank/etienne
@@ -2434,10 +2506,12 @@ contains
 
     return
   end subroutine mapflol
+
   subroutine mulnd2(rt,r)
     implicit none
     integer i,ia,j
     real(dp),dimension(ndim2,ndim2)::rt,r,rtt
+    if(c_%escape_da) return
 
     do i=1,nd2
        do j=1,nd2
@@ -2459,12 +2533,14 @@ contains
     enddo
     return
   end subroutine mulnd2
+
   subroutine movearou(rt)
     implicit none
     !      integer ipause, mypause
     integer i,ic,j
     real(dp) xr,xrold
     real(dp),dimension(ndim2,ndim2)::rt,rto,xy,xz,yz,xyz,xzy,s
+    if(c_%escape_da) return
 
     do i=1,nd2
        do j=1,nd2
@@ -2596,6 +2672,7 @@ contains
     integer i,j,k
     real(dp) xr
     real(dp),dimension(ndim2,ndim2)::rt,xy,rto
+    if(c_%escape_da) return
 
     do i=1,nd2
        do j=1,nd2
@@ -2633,6 +2710,7 @@ contains
     !- CHANGES INSIDE  MAPNORMF
     integer i,nn,ipause,mypauses
     real(dp),dimension(ndim)::ang,ra,st
+    if(c_%escape_da) return
 
     if(iref.gt.0) then
        w_p=0
@@ -2691,6 +2769,7 @@ contains
     integer i
     !      INTEGER J(NTT)
     integer,dimension(:)::j
+    if(c_%escape_da) return
 
     dlie=zero
     do i=1,nd
@@ -2704,6 +2783,7 @@ contains
     implicit none
     integer i,lie,mo
     integer,dimension(:)::j
+    if(c_%escape_da) return
 
     lie=0
     do i=1,nd-ndc
@@ -2732,6 +2812,7 @@ contains
   subroutine cpart(h,ch)
     implicit none
     integer h,ch
+    if(c_%escape_da) return
 
     call dacfu(h,rext,ch)
     return
@@ -2740,6 +2821,7 @@ contains
     implicit none
     integer f1,f2,b1
     integer,dimension(ndim2)::x
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etallnom(x,nd2  ,'X         ')
@@ -2755,6 +2837,7 @@ contains
     implicit none
     integer f1,f2,b1
     integer,dimension(ndim2)::x
+    if(c_%escape_da) return
 
     call etall1(b1)
     call etallnom(x,nd2  ,'X         ')
@@ -2771,6 +2854,7 @@ contains
     integer i
     integer,dimension(:)::x
     integer,dimension(ndim2)::rel
+    if(c_%escape_da) return
 
     call etallnom(rel,nd2  ,'REL       ')
 
@@ -2788,6 +2872,7 @@ contains
     integer i
     integer,dimension(:)::x
     integer,dimension(ndim2)::rel
+    if(c_%escape_da) return
 
     call etallnom(rel,nd2  ,'REL       ')
 
@@ -2805,6 +2890,7 @@ contains
     integer i
     integer,dimension(:)::x
     integer,dimension(ndim2)::rel
+    if(c_%escape_da) return
 
     call etallnom(rel,nd2  ,'REL       ')
 
@@ -2844,6 +2930,7 @@ contains
     real(dp),dimension(ndim2)::reval,aieval,ort
     real(dp),dimension(ndim2,ndim2)::revec,aievec,fm,aa,vv
     INTEGER IPAUSE,MYPAUSES
+    if(c_%escape_da) return
 
     !  copy matrix to temporary storage (the matrix aa is destroyed)
     do i=1,nd2-ndc2
@@ -2928,6 +3015,7 @@ contains
     real(dp),dimension(nm,n)::a
     real(dp),dimension(igh)::ort
     real(dp) f,g,h,scale
+    if(c_%escape_da) return
 
     la = igh - 1
     kp1 = low + 1
@@ -3042,6 +3130,7 @@ contains
     real(dp),dimension(igh)::ort
     real(dp),dimension(nm,igh)::a
     real(dp),dimension(nm,n)::z
+    if(c_%escape_da) return
 
     !     ********** initialize z to identity matrix **********
     do i = 1, n
@@ -3160,6 +3249,7 @@ contains
     real(dp) p,q,r,s,t,w,x,y,ra,sa,vi,vr,zz,norm,z3r,z3i
     real(dp),dimension(n)::wr,wi
     real(dp),dimension(nm,n)::h,z
+    if(c_%escape_da) return
 
     !     ********** machep is a machine dependent parameter specifying
     !                the relative precision of floating point arithmetic.
@@ -3532,6 +3622,7 @@ contains
     !
     integer flip
     real(dp) a,b,c,d,e,f,s,t,cc,dd,ee,ff,temp
+    if(c_%escape_da) return
 
     flip = 0
     cc = c
@@ -3590,6 +3681,7 @@ contains
     integer kp,kq,lp,lq,jp,jq,i
     real(dp) qq,pq,qp,pp
     real(dp),dimension(2*n,2*n)::m
+    if(c_%escape_da) return
 
     !
     do kp=2,2*n,2

@@ -31,7 +31,6 @@ module precision_constants
   integer,parameter::sp=kind(1e0)
   integer,parameter::dp=selected_real_kind(2*precision(1e0_sp))
   !  linked list for scratch variables of TPSA
-  logical(lp) :: oldscheme=.false.
   integer  :: newscheme_max =200
 
   !Numbers double
@@ -198,12 +197,29 @@ module precision_constants
      ! Da stuff
      real(dp),POINTER :: total_da_size !  in megabytes
      integer,POINTER :: lda_used       !  maximum number of da variables in Berz's
+     logical(lp),POINTER  :: OLD    ! = true  = bERZ
      logical(lp),POINTER  :: real_warning  ! = true
+     integer,POINTER :: no       ! order of da
+     integer,POINTER :: nv       ! number of variables
+     integer,POINTER :: nd       ! degrees of freedom
+     integer,POINTER :: nd2      ! phase space dimension
+     integer,POINTER :: np       ! number of parameters
+     integer,POINTER :: ndpt     ! constant energy variable position is different from zero
+     REAL(dp),POINTER     :: da_absolute_aperture  ! in case one tracks with da.
      !
+
      LOGICAL(lp),POINTER  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
      LOGICAL(lp),POINTER  :: CHECK_STABLE !=.TRUE. particle status
      LOGICAL(lp),POINTER  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
      LOGICAL(lp),POINTER  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done
+     LOGICAL(lp),POINTER  :: check_iteration       ! checks iteration in fitted magnet
+     LOGICAL(lp),POINTER  :: check_interpolate_x       ! check if lost by being outside the interpolation region
+     LOGICAL(lp),POINTER  :: check_interpolate_y      ! check if lost by being outside the interpolation region
+     LOGICAL(lp),POINTER  :: check_x_min     ! check if lost by aperture fitted now
+     LOGICAL(lp),POINTER  :: check_x_max     ! check if lost by aperture fitted now
+     LOGICAL(lp),POINTER  :: check_y_min     ! check if lost by aperture fitted now
+     LOGICAL(lp),POINTER  :: check_y_max     ! check if lost by aperture fitted now
+
      REAL(dp),POINTER     :: absolute_aperture     !=1e3_dp generic aperture check
      real(dp),POINTER :: hyperbolic_aperture  ! controls crashes in exponentials
 
@@ -244,7 +260,7 @@ module precision_constants
      character*120 message
   end TYPE CONTROL
 
-  type(control) c_dollar
+  type(control) c_
 
   type(info_window),TARGET:: w_i
   type(info_window),TARGET:: w_ii
@@ -275,6 +291,11 @@ module precision_constants
 
 
 contains
+
+  !  SUBROUTINE check_stability(c)
+  !    IMPLICIT NONE
+
+  !  end   SUBROUTINE check_stability
 
   ! Symplectic integrator routines setting coefficients
 
@@ -439,8 +460,7 @@ end module precision_constants
 
 module scratch_size
   implicit none
-  integer,parameter::ndum=5,ndumt=6,ndummax=100 ! ndum is used only for dummy maps now
-  integer :: ndumuser(ndumt)=(/72,99,22,22,22,22/)
+  integer,parameter::ndumt=10                   !  Number of scratch level
 end module scratch_size
 
 module file_handler
