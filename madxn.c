@@ -21,6 +21,7 @@
 #include "madxdict.h"
 
 /* JMJ 7/11/2002 moved this here from c6t.c */
+/* FS & TdA 15.03.2004 plot upgrade, bugs correction, ptc_twiss upgrade, touschek preparation */
 #include "c6t.h"
 
 void madx()
