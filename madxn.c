@@ -749,10 +749,15 @@ void complete_twiss_table(struct table* t)
         if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l') 
             tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
         val = el_par_value(tmp, c_node->p_elem);
-        if ((strstr(tmp, "k0") || strstr(tmp, "kick"))&& c_node->dipole_bv) 
-            val *= c_node->dipole_bv;
-        else if(c_node->other_bv) val *= c_node->other_bv; 
-        if (strstr(tmp,"kick") == NULL && el != zero) val *= el;
+        if ((strstr(tmp, "k0"))) {} /* do nothing */ 
+	else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0) 
+                 val *= c_node->dipole_bv;
+        else if(strcmp(tmp, "tilt")) val *= c_node->other_bv; 
+        if (el != zero)
+	  {
+           if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
+               && strcmp(tmp, "tilt")) val *= el;
+	  }
        }
      t->d_cols[j][i] = val;
     }
@@ -1326,40 +1331,19 @@ double el_par_value(char* par, struct element* el)
 {
   int k = 0, n;
   char tmp[8];
-  double val = zero, angle = zero, tilt = zero, l, k0, k0s, vec[100];
+  double val = zero, angle = zero, l, k0, k0s, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
-  int noang = 0, mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
-  if (fact != zero || strcmp(el->base_type->name, "sbend") == 0)
+  int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
+  if (fact != zero || strcmp(el->base_type->name, "sbend") == 0) /* bend */
     {
      if ((l = command_par_value("l", el->def)) == zero) 
         fatal_error("bend with zero length:",el->name);
-     if ((angle = command_par_value("angle", el->def)) == zero)
-       {
-	noang = 1;
-        k0 = command_par_value("k0", el->def);
-        k0s = command_par_value("k0s", el->def);
-        angle = l * sqrt(k0*k0+k0s*k0s);
-        if (k0 < zero) 
-	  {
-	   angle = -angle; tilt = -atan2(k0s, fabs(k0));
-	  }
-        else tilt = atan2(k0s,k0);
-       }
-     else tilt = command_par_value("tilt", el->def);
+     angle = command_par_value("angle", el->def);
      if (strcmp(par, "angle") == 0)  val = angle;
-     else if (strcmp(par, "tilt") == 0)  val = tilt;
-     else if (strcmp(par, "k0") == 0)
-       {
-        if ((k0 = command_par_value("k0", el->def)) == zero && noang == 0)
-           k0 = cos(tilt) * angle / l;
-        val = k0;
-       }
-     else if (strcmp(par, "k0s") == 0)
-       {
-        if ((k0s = command_par_value("k0s", el->def)) == zero && noang == 0)
-           k0s = sin(tilt) * angle / l;
-        val = k0s;
-       }
+     else if (strcmp(par, "tilt") == 0)
+        val = command_par_value("tilt", el->def);
+     else if (strcmp(par, "k0") == 0) k0 = command_par_value("k0", el->def);
+     else if (strcmp(par, "k0s") == 0) k0s = command_par_value("k0s", el->def);
      else if (strcmp(par, "l") == 0)
        {
         if (fact != zero && get_option("rbarc") && angle != zero)
@@ -1374,9 +1358,10 @@ double el_par_value(char* par, struct element* el)
      else if (strcmp(par, "blen") == 0) val = l;
      else val = command_par_value(par, el->def);
     }
+  /* all elements except bends */
   else if (strcmp(par, "rhoinv") == 0) val = zero;
   else if (strcmp(par, "blen") == 0) val = zero;
-  else if (mult)
+  else if (mult)  /* multipole */
     {
      if (strcmp(par, "l") == 0) val = zero;
      else if (par[0] == 'k' && isdigit(par[1]) && par[strlen(par)-1] == 'l')
@@ -1390,6 +1375,7 @@ double el_par_value(char* par, struct element* el)
      else val = command_par_value(par, el->def);
     }
   else val = command_par_value(par, el->def);
+  /* extra code for kickers */
   if (val == zero && strcmp(el->base_type->name, "hkicker") == 0)
     {
      if (strcmp(par,"hkick") == 0) 
