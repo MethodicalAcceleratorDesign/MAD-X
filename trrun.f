@@ -23,13 +23,15 @@
 !   code_buf    int(nelem)  local mad-8 code storage                   *
 !   l_buf       dp(nelem)   local length storage                       *
 !----------------------------------------------------------------------*
+      include 'twiss0.fi'
       logical onepass,onetable,last_out,info,aperflag
       integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
      &nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
      &int_arr(1),tot_segm,code_buf(*)
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
-     &al_errors(14),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one, &
+     &al_errors(align_max),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,         &
+     &node_value,one,                                                   &
      &get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
      &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
       parameter(zero=0d0,one=1d0)
@@ -50,8 +52,8 @@
       aperflag = .false.
       e_flag = 0
       last_out = .false.   ! flag to avoid double entry of last line
-      onepass = get_option('onepass ') .ne. zero
-      onetable = get_option('onetable ') .ne. zero
+      onepass = get_option('onepass ') .ne. 0
+      onetable = get_option('onetable ') .ne. 0
       info = get_option('info ') * get_option('warn ') .gt. 0
       if(onepass) call m66one(rt)
       call trbegn(rt,eigen)
@@ -150,6 +152,7 @@
         endif
 !--------  Misalignment at beginning of element (from twissfs.f)
         if (code .ne. 1)  then
+          call dzero(al_errors, align_max)
           n_align = node_al_errors(al_errors)
           if (n_align .ne. 0)  then
             do i = 1, jmax
@@ -339,13 +342,13 @@
 !---- Multipole.
    80 continue
 !____ Test aperture.
-      aperflag = get_option('aperture ') .ne. zero
+      aperflag = get_option('aperture ') .ne. 0
       if(aperflag) then
         nn=24
         call node_string('apertype ',aptype,nn)
         call get_node_vector('aperture ',nn,aperture)
-!      print *, " TYPE ",aptype,
-!     &"values  x y lhc",aperture(1),aperture(2),aperture(3)
+!        print *, " TYPE ",aptype,
+!     &  "values  x y lhc",aperture(1),aperture(2),aperture(3)
 !------------  ellipse case ----------------------------------
         if(aptype.eq.'ellipse') then
           apx = aperture(1)
@@ -355,7 +358,7 @@
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
           apx = aperture(1)
-          if(apx.eq.0.0) then
+          if(apx.eq.zero) then
             apx = maxaper(1)
           endif
           apy = apx
@@ -428,10 +431,10 @@
   200 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-      if(apx.eq.0.0) then
+      if(apx.eq.zero) then
         apx=maxaper(1)
       endif
-      if(apy.eq.0.0) then
+      if(apy.eq.zero) then
         apy=maxaper(3)
       endif
       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
@@ -442,10 +445,10 @@
   210 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-      if(apx.eq.0.0) then
+      if(apx.eq.zero) then
         apx=maxaper(1)
       endif
-      if(apy.eq.0.0) then
+      if(apy.eq.zero) then
         apy=maxaper(3)
       endif
       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
@@ -524,7 +527,7 @@
         enddo
         first = .false.
       endif
-
+      call dzero(f_errors, 51)
       n_ferr = node_fd_errors(f_errors)
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
@@ -998,6 +1001,7 @@
       gammas = get_value('probe ','gamma ')
       dtbyds = get_value('probe ','dtbyds ')
       code = node_value('mad8_type ')
+      call dzero(f_errors, 51)
       n_ferr = node_fd_errors(f_errors)
       dorad = get_value('probe ','radiate ') .ne. 0
       dodamp = get_option('damp ') .ne. 0

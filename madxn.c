@@ -1326,7 +1326,7 @@ double el_par_value(char* par, struct element* el)
 {
   int k = 0, n;
   char tmp[8];
-  double sq, val = zero, angle = zero, tilt = zero, l, k0, k0s, vec[100];
+  double val = zero, angle = zero, tilt = zero, l, k0, k0s, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
   int noang = 0, mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
   if (fact != zero || strcmp(el->base_type->name, "sbend") == 0)
@@ -1338,11 +1338,12 @@ double el_par_value(char* par, struct element* el)
 	noang = 1;
         k0 = command_par_value("k0", el->def);
         k0s = command_par_value("k0s", el->def);
-        if ((sq = sqrt(k0*k0+k0s*k0s)) > zero)
+        angle = l * sqrt(k0*k0+k0s*k0s);
+        if (k0 < zero) 
 	  {
-           tilt = asin(k0s/sq);
-	   angle = l * sq;
+	   angle = -angle; tilt = -atan2(k0s, fabs(k0));
 	  }
+        else tilt = atan2(k0s,k0);
        }
      else tilt = command_par_value("tilt", el->def);
      if (strcmp(par, "angle") == 0)  val = angle;
