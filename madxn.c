@@ -27,7 +27,7 @@ void madx()
 {
 #ifdef _CATCH_MEM
 /* provide a termination routine for access to memory outside scope */
-  if (signal(SIGSEGV, termination_handler) == SIG_IGN) 
+  if (signal(SIGSEGV, termination_handler) == SIG_IGN)
      signal(SIGSEGV, SIG_IGN);
 #endif
   madx_start();
@@ -843,6 +843,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
   else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
   else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
   else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
@@ -1844,7 +1845,8 @@ void exec_command()
          current_error = p->clone;
          pro_error(p);
         }
-        else if (strcmp(p->cmd_def->module, "sxf") == 0)
+	else if (strcmp(p->cmd_def->module, "ptc") == 0) ttwm_();
+	else if (strcmp(p->cmd_def->module, "sxf") == 0)
         {
            pro_sxf(p);
         }
@@ -1862,7 +1864,6 @@ void exec_command()
          current_twiss = p->clone;
          pro_twiss();
         }
-        /* else if (strcmp(p->cmd_def->module, "ptc") == 0) ttwm_(); */
       }
     }
 }
@@ -2305,7 +2306,7 @@ void exec_show(struct in_cmd* cmd)
         else if ((var = find_variable(toks[i], variable_list)))
           {
          if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
-           else fprintf(prt_file, "%s = %-18.10g ;\n", toks[i], var->value);
+           else fprintf(prt_file, v_format("%s = %F ;\n"), toks[i], var->value);
           }
         else fprintf(prt_file, "%s not found\n", toks[i]);
        }
@@ -2480,7 +2481,7 @@ void expand_curr_sequ(int flag)
   char rout_name[] = "expand_curr_sequ";
   struct node* c_node;
   int j;
-  if (current_sequ->l_expr) current_sequ->length = current_sequ->end->at_value 
+  if (current_sequ->l_expr) current_sequ->length = current_sequ->end->at_value
     = current_sequ->end->position = expression_value(current_sequ->l_expr, 2);
   if (current_sequ->ex_start != NULL)
     {
@@ -2602,8 +2603,7 @@ void fill_constraint_list(int type /* 1 node, 2 global */,
   struct name_list* nl = cd->par_names;
   struct constraint* l_cons;
   int j;
-
-  for (j = 0; j < pl->curr; j++) /* the loop goes over all atributes of the constraint command -> see dictinary */
+  for (j = 0; j < pl->curr; j++)
     {
      if (nl->inform[j] && pl->parameters[j]->type == 4)
       {
@@ -2771,129 +2771,130 @@ void fill_twiss_header(struct table* t)
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
   strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dummy, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp),
+  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""), strlen(tmp),
           stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
+  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""),
+          i, stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "mass");
-  sprintf(c_dummy, "@ MASS             %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ MASS             %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "charge");
-  sprintf(c_dummy, "@ CHARGE           %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ CHARGE           %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "energy");
-  sprintf(c_dummy, "@ ENERGY           %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ ENERGY           %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "pc");
-  sprintf(c_dummy, "@ PC               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ PC               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "gamma");
-  sprintf(c_dummy, "@ GAMMA            %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ GAMMA            %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "kbunch");
-  sprintf(c_dummy, "@ KBUNCH           %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ KBUNCH           %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dummy, "@ BCURRENT         %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ BCURRENT         %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "sige");
-  sprintf(c_dummy, "@ SIGE             %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ SIGE             %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "sigt");
-  sprintf(c_dummy, "@ SIGT             %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ SIGT             %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "npart");
-  sprintf(c_dummy, "@ NPART            %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ NPART            %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "ex");
-  sprintf(c_dummy, "@ EX               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ EX               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "ey");
-  sprintf(c_dummy, "@ EY               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ EY               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "et");
-  sprintf(c_dummy, "@ ET               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ ET               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   if ((pos = name_list_pos("summ", table_register->names)) > -1)
     {
      s = table_register->tables[pos];
      pos = name_list_pos("length", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ LENGTH           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ LENGTH           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("alfa", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ ALFA             %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ ALFA             %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("orbit5", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ ORBIT5           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ ORBIT5           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("gammatr", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ GAMMATR          %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ GAMMATR          %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("q1", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ Q1               %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ Q1               %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("q2", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ Q2               %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ Q2               %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dq1", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DQ1              %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DQ1              %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dq2", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DQ2              %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DQ2              %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dxmax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DXMAX            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DXMAX            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dymax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DYMAX            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DYMAX            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("xcomax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCOMAX           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ XCOMAX           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("ycomax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCOMAX           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ YCOMAX           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("betxmax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ BETXMAX          %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ BETXMAX          %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("betymax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ BETYMAX          %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ BETYMAX          %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("xcorms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCORMS           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ XCORMS           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("ycorms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCORMS           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ YCORMS           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dxrms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DXRMS            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DXRMS            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dyrms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DYRMS            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DYRMS            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("deltap", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DELTAP           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DELTAP           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
     }
 }
@@ -3008,6 +3009,7 @@ void madx_init()
   set_defaults("option");
   set_defaults("beam");
   add_to_command_list("default_beam", current_beam, beam_list, 0);
+  set_defaults("set");
   set_defaults("setplot");
   set_defaults("threader");
   table_register = new_table_list(10);
@@ -4853,7 +4855,7 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
 {
   char c, cp, cpnb = ' ', quote;
   int k, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
-  int left_b = 0, in_num = 0, c_digit = 0, f_equal = 0, comm_cnt = 0;
+  int left_b = 0, in_num = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
   for (k = 0; k < sl; k++)
    {
     c = inbuf[k];
@@ -4984,9 +4986,12 @@ void process()  /* steering routine: processes one command */
          exec_command();
          if (stop_flag)
          {
-            if (this_cmd->clone != NULL)
-                this_cmd->clone = delete_command(this_cmd->clone);
-            this_cmd = delete_in_cmd(this_cmd);
+	   if (this_cmd)
+	     {
+              if (this_cmd->clone != NULL)
+                  this_cmd->clone = delete_command(this_cmd->clone);
+              this_cmd = delete_in_cmd(this_cmd);
+	     }
             return;
          }
          break;
@@ -5087,7 +5092,8 @@ void pro_emit(struct in_cmd* cmd)
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
-  printf("guess: %d %f %f\n",guess_flag, guess_orbit[0],guess_orbit[1]);
+  printf(v_format("guess: %I %F %F\n"),
+         guess_flag, guess_orbit[0],guess_orbit[1]);
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
   myfree(rout_name, tt);
@@ -5111,7 +5117,7 @@ void pro_emit(struct in_cmd* cmd)
        }
      else
        {
-      sprintf(tmp, "%14.6f", e_deltap);
+      sprintf(tmp, v_format("%F"), e_deltap);
         warning("EMIT: beam not updated, non-zero deltap: ", tmp);
        }
      print_rfc();
@@ -5287,7 +5293,6 @@ void pro_match(struct in_cmd* cmd)
     }
   else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 ||
            strcmp(cmd->tok_list->p[0], "lmdif") == 0 ||
-           strcmp(cmd->tok_list->p[0], "siman") == 0 ||
            strcmp(cmd->tok_list->p[0], "simplex") == 0)
     {
      match_action(cmd);
@@ -5429,7 +5434,7 @@ void pro_twiss()
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
   char *filename, *name, *table_name, *sector_name;
-  double tol, tol_keep;
+  double tol_keep;
   int i, j, l, lp, k_orb, u_orb, pos, k = 1, ks, w_file, beta_def;
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
@@ -5442,9 +5447,8 @@ void pro_twiss()
     {
      name = pl->parameters[pos]->string;
      if ((lp = name_list_pos(name, sequences->list)) > -1)
-       {
-      current_sequ = sequences->sequs[lp];
-       }
+        current_sequ = sequences->sequs[lp];
+
      else
        {
         warning("unknown sequence ignored:", name);
@@ -5545,9 +5549,10 @@ void pro_twiss()
   pos = name_list_pos("tolerance", nl);
   if (nl->inform[pos])
     {
-     tol = command_par_value("tolerance", current_twiss);
+     tol_keep = command_par_value("tolerance", current_twiss);
     }
-  /*
+  set_variable("twiss_tol", &tol_keep);
+ /*
              end of command decoding
   */
   current_sequ->start_node = j;
@@ -5630,7 +5635,6 @@ void pro_twiss()
   set_option("keeporbit", &k);
   set_option("useorbit", &k);
   set_option("info", &keep_info);
-  set_variable("twiss_tol", &tol_keep);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
 }
@@ -5814,7 +5818,7 @@ int remove_one(struct node* node)
      remove_from_name_list(node->p_elem->name, occ_list);
     }
   else --occ_list->inform[pos];
-  myfree(rout_name, node);
+  /* myfree(rout_name, node); */
   return 1;
 }
 
@@ -6182,13 +6186,16 @@ void seq_cycle(struct in_cmd* cmd)
      sprintf(c_dummy, "%s:1", name);
      if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
        {
-      node = edit_sequ->nodes->nodes[pos];
-        sprintf(c_dummy, "%s$_p_", node->name);
-      if (strchr(node->previous->name, '$') == NULL)
+        node = edit_sequ->nodes->nodes[pos];
+        sprintf(c_dummy, "%s_p_", strip(node->name));
+      if (strstr(node->previous->name, "_p_") == NULL)
         {
          clone = clone_node(node, 0);
-           strcpy(clone->name, c_dummy);
-           link_in_front(clone, node);
+         clone->p_elem = clone_element(node->p_elem);
+         strcpy(clone->p_elem->name, c_dummy);
+         add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
+         element_list, 1);
+         link_in_front(clone, node);
         }
         edit_sequ->start = node;
         edit_sequ->end = node->previous;
@@ -6682,6 +6689,8 @@ void set_defaults(char* string) /* reset options, beam etc. to defaults */
       if (options != NULL) delete_command(options);
         options = clone_command(defined_commands->commands[pos]);
        }
+     else if (strcmp(string, "set") == 0)
+       store_set(defined_commands->commands[pos], 0);
      else if (strcmp(string, "setplot") == 0)
        {
       if (plot_options != NULL) delete_command(plot_options);
@@ -7467,7 +7476,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
          }
        }
        break;
-     case 3:
+     case 3: /* string */
        if (start <= end)
        {
           get_bracket_t_range(toks, '{', '}', start, end, &s_start, &s_end);
@@ -7678,6 +7687,46 @@ void store_select(struct in_cmd* cmd)
         scl->commands[scl->curr++] = cmd->clone;
         cmd->clone_flag = 1; /* do not drop */
        }
+    }
+}
+
+void store_set(struct command* comm, int flag)
+{
+  char* p;
+  char* name;
+  struct command_parameter* cp;
+  struct name_list* nl = comm->par_names;
+  int i, lp, n = 0, posf = name_list_pos("format", nl),
+         poss = name_list_pos("sequence", nl);
+  if (flag == 0 || (posf > -1 && nl->inform[posf]))
+    {
+     n++;
+     cp = comm->par->parameters[posf];
+     for (i = 0; i < cp->m_string->curr; i++)
+       {
+        p = noquote(cp->m_string->p[i]);
+        if (strchr(p, 's')) strcpy(string_format, p);
+        else if (strpbrk(p, "id")) strcpy(int_format, p);
+        else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
+       }
+    }
+  if (flag != 0 && poss > -1 && nl->inform[poss])
+    {
+     n++;
+     name = comm->par->parameters[poss]->string;
+     if ((lp = name_list_pos(name, sequences->list)) > -1
+         && sequences->sequs[lp]->ex_start != NULL)
+        current_sequ = sequences->sequs[lp];
+     else
+       {
+        warning("ignoring unknown or unused sequence:", name);
+        return;
+       }
+    }
+  if (n == 0)
+    {
+     warning("no parameter specified,", "ignored");
+     return;
     }
 }
 
@@ -7958,12 +8007,12 @@ void track_dynap(struct in_cmd* cmd)
   if (get_option("dynap_dump")) dynap_tables_dump();
   */
   /* free buffers */
-  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); 
+  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2);
   myfree(rout_name, ibuf3); myfree(rout_name, buf1); myfree(rout_name, buf2);
-  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt); 
-  myfree(rout_name, buf3); myfree(rout_name, buf4); myfree(rout_name, buf5); 
-  myfree(rout_name, buf6); myfree(rout_name, buf7); myfree(rout_name, buf8); 
-  myfree(rout_name, buf9); myfree(rout_name, buf10); 
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
+  myfree(rout_name, buf3); myfree(rout_name, buf4); myfree(rout_name, buf5);
+  myfree(rout_name, buf6); myfree(rout_name, buf7); myfree(rout_name, buf8);
+  myfree(rout_name, buf9); myfree(rout_name, buf10);
   myfree(rout_name, buf11);
 }
 
@@ -8031,32 +8080,32 @@ void track_pteigen(double* eigen)
     {
      t = table_register->tables[pos];
      if (t->header == NULL)  t->header = new_char_p_array(45);
-     sprintf(c_dummy, "@ XC               %%le  %22.12g", orbit0[0]);
+     sprintf(c_dummy, v_format("@ XC               %%le  %F"), orbit0[0]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ PXC              %%le  %22.12g", orbit0[1]);
+     sprintf(c_dummy, v_format("@ PXC              %%le  %F"), orbit0[1]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ YC               %%le  %22.12g", orbit0[2]);
+     sprintf(c_dummy, v_format("@ YC               %%le  %F"), orbit0[2]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ PYC              %%le  %22.12g", orbit0[3]);
+     sprintf(c_dummy, v_format("@ PYC              %%le  %F"), orbit0[3]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ TC               %%le  %22.12g", orbit0[4]);
+     sprintf(c_dummy, v_format("@ TC               %%le  %F"), orbit0[4]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ PTC              %%le  %22.12g", orbit0[5]);
+     sprintf(c_dummy, v_format("@ PTC              %%le  %F"), orbit0[5]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      tmp = get_value("beam", "ex");
-     sprintf(c_dummy, "@ EX               %%le  %22.12g", tmp);
+     sprintf(c_dummy, v_format("@ EX               %%le  %F"), tmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      tmp = get_value("beam", "ey");
-     sprintf(c_dummy, "@ EY               %%le  %22.12g", tmp);
+     sprintf(c_dummy, v_format("@ EY               %%le  %F"), tmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      tmp = get_value("beam", "et");
-     sprintf(c_dummy, "@ ET               %%le  %22.12g", tmp);
+     sprintf(c_dummy, v_format("@ ET               %%le  %F"), tmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      for (i = 0; i < 6; i++)
        {
         for (j = 0; j < 6; j++)
         {
-         sprintf(c_dummy, "@ E%d%d              %%le  %22.12g",
+         sprintf(c_dummy, v_format("@ E%d%d              %%le  %F"),
                    i+1, j+1, eigen[6*j+i]);
            t->header->p[t->header->curr++] = tmpbuff(c_dummy);
         }
@@ -8117,8 +8166,8 @@ void track_run(struct in_cmd* cmd)
   if (get_option("track_dump")) track_tables_dump();
   /* free buffers */
   myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); myfree(rout_name, ibuf3);
-  myfree(rout_name, buf1); myfree(rout_name, buf2); 
-  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt); 
+  myfree(rout_name, buf1); myfree(rout_name, buf2);
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
   myfree(rout_name, buf3);
   myfree(rout_name, buf4); myfree(rout_name, buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
@@ -8231,7 +8280,8 @@ void track_track(struct in_cmd* cmd)
   set_option("onetable", &k);
   track_deltap=get_value(current_command->name,"deltap");
   set_variable("track_deltap", &track_deltap);
-  if(track_deltap != 0) fprintf(prt_file, "track_deltap: %f\n",track_deltap);
+  if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
+                                track_deltap);
   curr_obs_points = 1;  /* default: always observe at machine end */
   pos = name_list_pos("file", nl);
   if (nl->inform[pos]) set_option("track_dump", &one);
@@ -8311,7 +8361,6 @@ void update_beam(struct command* comm)
    et->sigt->sige
    where any item to the left takes precendence over the others;
    for ions, the input energy is multiplied by the charge, and the
-   mass is the "nucleon" number times the average nucleon mass "nmass".
 */
 {
   struct name_list* nlc = comm->par_names;
@@ -8321,7 +8370,7 @@ void update_beam(struct command* comm)
   char* name = blank;
   double energy = 0, beta = 0, gamma = 0, charge = 0, freq0 = 0, bcurrent = 0,
          npart = 0, mass = 0, pc = 0, ex, exn, ey, eyn, alfa, circ = one,
-         arad = 0, nucleon = 1;
+         arad = 0;
   pos = name_list_pos("particle", nlc);
   if (nlc->inform[pos])  /* parameter has been read */
     {
@@ -8355,13 +8404,6 @@ void update_beam(struct command* comm)
     {
      pos = name_list_pos("mass", nlc);
      if (nlc->inform[pos]) mass = command_par_value("mass", comm);
-     else
-       {
-        pos = name_list_pos("nucleon", nlc);
-        if (nlc->inform[pos]) nucleon = command_par_value("nucleon", comm);
-        else nucleon = command_par_value("nucleon", current_beam);
-        mass = nucleon * get_variable("nmass");
-       }
      pos = name_list_pos("charge", nlc);
      if (nlc->inform[pos]) charge = command_par_value("charge", comm);
      else charge = command_par_value("charge", current_beam);
@@ -8373,7 +8415,6 @@ void update_beam(struct command* comm)
   if ((pos = name_list_pos("energy", nlc)) > -1 && nlc->inform[pos])
     {
      energy = command_par_value("energy", comm);
-     if (strcmp(name, "ion") == 0) energy *= fabs(charge);
      if (energy <= mass) fatal_error("energy must be","> mass");
      pc = sqrt(energy*energy - mass*mass);
      gamma = energy / mass;
@@ -8382,7 +8423,6 @@ void update_beam(struct command* comm)
   else if((pos = name_list_pos("pc", nlc)) > -1 && nlc->inform[pos])
     {
      pc = command_par_value("pc", comm);
-     if (strcmp(name, "ion") == 0) pc *= fabs(charge);
      energy = sqrt(pc*pc + mass*mass);
      gamma = energy / mass;
      beta = pc / energy;
@@ -8406,7 +8446,6 @@ void update_beam(struct command* comm)
   else
     {
      energy = command_par_value("energy", current_beam);
-     if (strcmp(name, "ion") == 0) energy *= fabs(charge);
      if (energy <= mass) fatal_error("energy must be","> mass");
      pc = sqrt(energy*energy - mass*mass);
      gamma = energy / mass;
@@ -8495,7 +8534,6 @@ void update_beam(struct command* comm)
                                     pl->parameters[pos]->double_array->a, 3);
   store_comm_par_value("mass", mass, current_beam);
   store_comm_par_value("charge", charge, current_beam);
-  store_comm_par_value("nucleon", nucleon, current_beam);
   store_comm_par_value("energy", energy, current_beam);
   store_comm_par_value("pc", pc, current_beam);
   store_comm_par_value("gamma", gamma, current_beam);
