@@ -846,10 +846,11 @@
  9999 end
       subroutine getclor(orbit0, rt, tt, error)
       implicit none
+      include 'twiss0.fi'
       double precision orbit0(6), rt(6,6), tt(6,6,6)
-      double precision opt(20)
+      double precision opt(fundim)
       integer error
       call m66one(rt)
-      call dzero(opt,20)
+      call dzero(opt,fundim)
       call tmclor(orbit0, .true., .true., opt, rt, tt, error)
       end

@@ -86,7 +86,9 @@ struct expression* clone_expression(struct expression* p)
 struct expr_list* clone_expr_list(struct expr_list* p)
 {
   int i;
-  struct expr_list* clone = new_expr_list(p->curr);
+  struct expr_list* clone;
+  if (p == NULL)  return NULL;
+  clone = new_expr_list(p->curr);
   for (i = 0; i < p->curr; i++) clone->list[i] = clone_expression(p->list[i]);
   clone->curr = p->curr;
   return clone;
