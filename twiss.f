@@ -447,12 +447,13 @@
 !   kobs      (integer) if > 0, stop at node with this obs. point #    *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,fmap
+      include 'twiss0.fi'
       integer eflag,i,j,code,restart_sequ,advance_node,node_al_errors,  &
      &n_align,kobs,nobs,fundim
       parameter(fundim=69)
       double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6),el,ek(6),   &
-     &re(6,6),te(6,6,6),al_errors(8),betas,gammas,node_value,get_value, &
-     &parvec(26),orb_limit,zero
+     &re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
+     &get_value,parvec(26),orb_limit,zero
       parameter(orb_limit=1d1,zero=0d0)
       include 'twissa.fi'
       include 'twissc.fi'
@@ -695,12 +696,13 @@
 !   rt(6,6)   (double)  one turn transfer matrix.                      *
 !----------------------------------------------------------------------*
       logical fmap,cplxy,cplxt,dorad
+      include 'twiss0.fi'
       integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
      &node_al_errors,n_align,fundim
       parameter(fundim=69)
       double precision rt(6,6),ek(6),re(6,6),rwi(6,6),rc(6,6),te(6,6,6),&
-     &el,orbit(6),position,betas,gammas,al_errors(8),bv0,bvk,pos0,      &
-     &node_value,get_value,zero,one,two
+     &el,orbit(6),position,betas,gammas,al_errors(align_max),bv0,bvk,   &
+     &pos0,node_value,get_value,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*120 msg
       include 'twissl.fi'
@@ -1108,11 +1110,13 @@
 !   Track Chromatic functions.                                         *
 !----------------------------------------------------------------------*
       logical fmap,cplxy,cplxt,dorad
+      include 'twiss0.fi'
       integer i,code,save,restart_sequ,advance_node,get_option,n_align, &
      &node_al_errors,fundim
       parameter(fundim=69)
-      double precision orbit(6),ek(6),re(6,6),te(6,6,6),al_errors(8),   &
-     &deltap,el,betas,gammas,node_value,get_value,zero,one
+      double precision orbit(6),ek(6),re(6,6),te(6,6,6),                &
+     &al_errors(align_max),deltap,el,betas,gammas,node_value,get_value, &
+     &zero,one
       parameter(zero=0d0,one=1d0)
       character*120 msg
       include 'twissl.fi'
@@ -3850,15 +3854,16 @@
 !   TRANSPORT map for orbit displacement at entry of an element.       *
 ! Input:                                                               *
 !   orb1(6)   (real)    Orbit before misalignment.                     *
-!   errors(6) (real)    alignment errors                               *
+!   errors(align_max) (real)    alignment errors                       *
 !   betas     (real)    current beam beta                              *
 !   gammas    (real)    current beam gamma                             *
 ! Output:                                                              *
 !   orb2(6)   (real)    Orbit after misalignment.                      *
 !   rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.      *
 !----------------------------------------------------------------------*
+      include 'twiss0.fi'
       double precision ds,dx,dy,phi,psi,rm(6,6),s2,the,betas, gammas,   &
-     &w(3,3),orb1(6),orb2(6),orbt(6),errors(6)
+     &w(3,3),orb1(6),orb2(6),orbt(6),errors(align_max)
 
 !---- Build rotation matrix and compute additional drift length.
       dx  = errors(1)
@@ -3910,16 +3915,17 @@
 !   TRANSPORT map for orbit displacement at exit of an element.        *
 ! Input:                                                               *
 !   orb1(6)   (real)    Orbit before misalignment.                     *
-!   errors(6) (real)    alignment errors                               *
+!   errors(align_max) (real)    alignment errors                       *
 !   betas     (real)    current beam beta                              *
 !   gammas    (real)    current beam gamma                             *
 ! Output:                                                              *
 !   orb2(6)   (real)    Orbit after misalignment.                      *
 !   rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.      *
 !----------------------------------------------------------------------*
+      include 'twiss0.fi'
       double precision ds,dx,dy,el,phi,psi,s2,the,                      &
      &orb1(6),orb2(6),rm(6,6),v(3),ve(3),w(3,3),we(3,3),orbt(6),        &
-     &errors(6),betas,gammas
+     &errors(align_max),betas,gammas
 
 !---- Misalignment rotation matrix w.r.t. entrance system.
       dx  = errors(1)
