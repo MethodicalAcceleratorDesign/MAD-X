@@ -52,7 +52,15 @@
 #define vector_to_table       vector_to_table_
 #define vdot                  vdot_
 #define vmod                  vmod_
-#define ttwm                  ttwm_
+#define w_ptc_create_universe   w_ptc_create_universe_
+#define w_ptc_create_layout     w_ptc_create_layout_
+#define w_ptc_move_to_layout    w_ptc_move_to_layout_
+#define w_ptc_input             w_ptc_input_
+#define w_ptc_align             w_ptc_align_
+#define w_ptc_twiss             w_ptc_twiss_
+#define w_ptc_normal            w_ptc_normal_
+#define w_ptc_track             w_ptc_track_
+#define w_ptc_end               w_ptc_end_
 #endif
 
 /* short utility routines */
@@ -585,7 +593,15 @@ void track_start(struct command*);
 void track_tables_create(struct in_cmd*);
 void track_tables_dump();
 void track_track(struct in_cmd*);
-void ttwm();
+void w_ptc_create_universe();
+void w_ptc_create_layout();
+void w_ptc_move_to_layout();
+void w_ptc_input();
+void w_ptc_align();
+void w_ptc_twiss();
+void w_ptc_normal();
+void w_ptc_track();
+void w_ptc_end();
 int twiss_input(struct command*);
 void update_beam();
 void update_element(struct element*, struct command*);
@@ -715,6 +731,7 @@ struct command* current_error = NULL;   /* current error command */
 struct command* current_correct = NULL; /* current correct command */
 struct command* current_ibs = NULL;     /* current ibs command */
 struct command* current_survey = NULL;  /* current survey command */
+struct command* current_ptc = NULL;     /* current ptc command */
 struct command* current_twiss = NULL;   /* current twiss command */
 struct command* current_command = NULL; /* current command clone */
 struct command* current_gweight = NULL; /* current gweight clone */
@@ -840,7 +857,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.12";
+char myversion[] = "MAD-X 2.00";
 char one_string[] = "1";
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
