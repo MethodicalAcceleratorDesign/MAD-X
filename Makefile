@@ -28,7 +28,8 @@ f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan
 #f95_FLAGS=-c -O4 -maxcontin=24 -w=unused
 
 # f95 compiler options to compile f77 code
-FFLAGS77=-gline -g90 -c -maxcontin=24 -nan -ieee=full
+#FFLAGS77=-gline -g90 -c -maxcontin=24 -nan -ieee=full
+FFLAGS77=-gline -g90 -c -maxcontin=24 -nan
 #FFLAGS77=-g90 -c -O4 -maxcontin=24 -w=unused
 
 # libraries
@@ -48,14 +49,15 @@ madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c madx.h madxl.h madxd.h 
 	$(CC) $(GCCP_FLAGS) -c -o madxnp.o madxn.c
 
 # fortran code dependencies on header files fi
-twiss_f77.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
-util_f77.o: util.F twiss0.fi twtrr.fi
-dynap_f77.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
-ibsdb_f77.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
-plot_f77.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
-trrun_f77.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
-emit_f77.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
-match_f77.o: match.F name_len.fi match.fi 
+twiss_f77.o twiss.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
+util_f77.o util.o: util.F twiss0.fi twtrr.fi
+dynap_f77.o dynap.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
+ibsdb_f77.o ibsdb.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
+plot_f77.o plot.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
+trrun_f77.o trrun.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
+emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
+match_f77.o match.o: match.F name_len.fi match.fi 
+touchek_f77.o touchek.o: touchek.F
 
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
