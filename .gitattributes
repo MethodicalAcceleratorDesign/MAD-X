@@ -42,6 +42,7 @@
 /gxx11.F -text
 /gxx11c.c -text
 /gxx11ps.F -text
+/gxx11psc.c -text
 /h_definition.f90 -text
 /i_tpsa.f90 -text
 /ibsdb.F -text
