@@ -9,6 +9,7 @@
 * Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ
 *
 *
+      implicit none
       integer  num
       double precision vect(*),dvect(*)
       call mtgeti(num,vect,dvect)
