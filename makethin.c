@@ -240,8 +240,8 @@ struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
     if ((kn_param->expr_list->list[i]!=NULL && zero_string(kn_param->expr_list->list[i]->string)==0) 
 	|| kn_param->double_array->a[i]!=0) {
       last_non_zero=i;
-      if (kl_flag == 0) {
-	if (((length_param->expr) || (kn_param->expr_list->list[i])) && angle_conversion==0) {
+      if (kl_flag == 0 && angle_conversion==0) {
+	if ((length_param->expr) || (kn_param->expr_list->list[i])) {
 	  kn_param->expr_list->list[i] =
 	    compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
 			  "*",length_param->expr,length_param->double_value);      
