@@ -3,7 +3,10 @@ void pro_error(struct in_cmd* cmd)
 
  if (strcmp(cmd->tok_list->p[0], "eoption") == 0)
      {
-      error_eoption(cmd); return;
+      error_eoption(cmd); 
+      cmd->clone_flag = 1; /* do not drop */
+      current_eopt = cmd->clone;
+      return;
      }
   if (get_option("debug")) fprintf(prt_file, "enter ERROR module\n");
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
