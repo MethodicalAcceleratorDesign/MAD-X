@@ -184,10 +184,10 @@
       parameter(maxmul=20)
       double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
      &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul),angv
-     &,one,get_variable
-      parameter(one=1d0)
+     &,zero,one,get_variable
+      parameter(zero=0d0,one=1d0)
 !---- Branch on subprocess code.
-      tilt = 0.0
+      tilt = zero
       code = node_value('mad8_type ')
       go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
@@ -278,17 +278,17 @@
 !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
       angle = normal(0)*node_value('dipole_bv ')
       angv = skew(0)
-      if(angle.eq.0.0) then
-      tilt = 0.0
-        if(angv.ne.0.0) then
-        tilt = get_variable('twopi ')*0.25
+      if(angle.eq.zero) then
+        tilt = zero
+        if(angv.ne.zero) then
+          tilt = get_variable('twopi ')*0.25
         endif
       else
-      tilt = atan2(angv,angle)
+        tilt = asin(angv/sqrt(angv*angv+angle*angle))
       endif
 ! As el=0, there is no dx and no ds
-        dx = 0.0
-        ds = 0.0
+      dx = zero
+      ds = zero
       go to 490
 
 !---- Any kind of  bend. 
@@ -296,12 +296,13 @@
 !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
       angle = node_value('angle ')*node_value('dipole_bv ')
 !      print *," BV = ",node_value('dipole_bv ')
+      print *,node_value('k0s '),el,node_value('dipole_bv ')
       angv = node_value('k0s ')*el*node_value('dipole_bv ')
-      if (angle .eq. 0.0) then
-        dx = 0.0
+      if (angle .eq. zero) then
+        dx = zero
         ds = el
-        tilt = 0.0
-           if(angv.ne.0.0) then
+        tilt = zero
+           if(angv.ne.zero) then
            tilt = get_variable('twopi ')*0.25
            dx = - el * (cos(angv)-one)/angv
            ds =  el * sin(angv)/angv
