@@ -966,7 +966,7 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
       maxks=ks_param->double_array->curr;
     }
     if (maxkn > maxks) {j=maxkn;} else {j=maxks;}
-    i=j*2+12;
+    i=j*2+12+1;
     c6t_elem = new_c6t_element(i,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
@@ -1666,8 +1666,9 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
 	s_pole = i; cnt++;
        }
     }
-  if (cnt == 1)
+  if ((cnt == 1) || (el->value[12]!=zero))
     {
+      if (el->value[12]!=zero) { s_pole=12; cnt=1; }
      if ((new_el_t = (s_pole-12)/2) == 0)  el->nc_pos = s_pole;
      else
        {
