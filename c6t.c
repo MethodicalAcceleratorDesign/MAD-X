@@ -1,3 +1,5 @@
+/* 10/07/2002 - MH fixed missing mcdo bug, caused by recursion up 
+   element tree to unexpanded double_array */
 /* 20/06/2002 - MH fixed double declarations and memory leaks because the 
    original c6t was only ment to be run once - but not this one! */
 /* 19/06/2002 - MH found last 'bug' in rhic sequence... due to micron
@@ -753,10 +755,16 @@ void c6t_finish()
     for(j=0; j<types.member[i]->curr; j++) {
       if (types.member[i]->elem[j]->value) 
 	free(types.member[i]->elem[j]->value);
-      if (types.member[i]->elem[j]->p_al_err) 
+      if (types.member[i]->elem[j]->p_al_err) {
+	if (types.member[i]->elem[j]->p_al_err->a_dble)
+	  free(types.member[i]->elem[j]->p_al_err->a_dble);
 	free(types.member[i]->elem[j]->p_al_err);
-      if (types.member[i]->elem[j]->p_fd_err) 
+      }
+      if (types.member[i]->elem[j]->p_fd_err) {
+	if (types.member[i]->elem[j]->p_fd_err->a_dble)
+	  free(types.member[i]->elem[j]->p_fd_err->a_dble);
 	free(types.member[i]->elem[j]->p_fd_err);
+      }
       free(types.member[i]->elem[j]);
       types.member[i]->elem[j]=NULL;
     }
@@ -793,6 +801,11 @@ void c6t_init()
 
   if (virgin_c6t) {
     p_err_zero = make_obj("zero_errors", 0, FIELD_MAX, 0, 0);
+    for (j = 0; j < FIELD_MAX; j++)
+      {
+	p_err_zero->a_dble[j]=0.0;
+      }
+
     for (j = 0; j < N_TYPES; j++)
       {
 	t_info[j] = (struct type_info*) mymalloc(rout_name,sizeof(struct type_info));
@@ -845,6 +858,7 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
   struct c6t_element* c6t_elem = NULL;
   char t_name[255];
   char* cp;
+  int index=-1;
 
   strcpy(t_name, p->name);
   if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';
@@ -889,10 +903,18 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
 /*          if (fabs(c6t_elem->value[0]) <= eps_6) c6t_elem->value[0] = 0.0; */
    } else if ((strcmp(p->base_name,"multipole") == 0)) {
     maxkn=0;maxks=0;
-    if ((kn_param = return_param_recurse("knl",p->p_elem))) maxkn=kn_param->double_array->curr;
-    if ((ks_param = return_param_recurse("ksl",p->p_elem))) maxks=ks_param->double_array->curr;
+/*      if ((kn_param = return_param_recurse("knl",p->p_elem))) maxkn=kn_param->double_array->curr; */
+/*      if ((ks_param = return_param_recurse("ksl",p->p_elem))) maxks=ks_param->double_array->curr; */
+    if ((index = name_list_pos("knl",p->p_elem->def->par_names))>-1) {
+      kn_param = p->p_elem->def->par->parameters[index];
+      maxkn=kn_param->double_array->curr;
+    }
+    if ((index = name_list_pos("ksl",p->p_elem->def->par_names))>-1) {
+      ks_param = p->p_elem->def->par->parameters[index];
+      maxks=ks_param->double_array->curr;
+    }
     if (maxkn > maxks) {j=maxkn;} else {j=maxks;}
-    i=j*2+12-1;
+    i=j*2+12;
     c6t_elem = new_c6t_element(i,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
@@ -1517,6 +1539,9 @@ void post_multipoles() /* post equiv. treatment of multipoles */
                strcpy(tmp_name, eln->p_fd_err->key);
                p = eln->p_fd_err;
                eln->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
+	       /* first initialise */
+               for (i = 0; i < el->nf_err; i++) 
+		 eln->p_fd_err->a_dble[i] = 0.0; 
                for (i = 0; i < eln->nf_err; i++) 
 		   eln->p_fd_err->a_dble[i] = p->a_dble[i];
                eln->nf_err = el->nf_err;
