@@ -296,6 +296,10 @@ CONTAINS
     case(1,11,20,21)
        key%magnet="drift"
     case(2) ! PTC accepts mults
+       if(l.eq.zero) then
+          key%magnet="marker"
+          goto 100
+       endif
        key%magnet="rbend"
        key%list%b0=node_value('angle ')
        !     key%list%k(1)=node_value('k0 ') 
@@ -313,6 +317,10 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
+       if(l.eq.zero) then
+          key%magnet="marker"
+          goto 100
+       endif
        key%magnet="sbend"
        key%list%b0=node_value('angle ')
        key%list%k(2)=node_value('k1 ')
@@ -446,7 +454,7 @@ CONTAINS
     case default
        print*,"Element: ",name," not implemented"
        stop
-    end select
+100 end select
     call create_fibre(my_ring%end,key,EXCEPTION)
     if(advance_node().ne.0)  goto 10
 
