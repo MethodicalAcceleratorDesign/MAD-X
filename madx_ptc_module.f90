@@ -117,7 +117,7 @@ CONTAINS
     real(dp) f_errors(0:50),aperture(100),normal(0:maxmul)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
-    real(dp) fint,fintx,div
+    real(dp) fint,fintx,div,muonfactor
     real(kind(1d0)) get_value,node_value
     character(length) name
     character(name_len) aptype
@@ -135,8 +135,17 @@ CONTAINS
     e0f=sqrt(ENERGY**2-pma**2)
     print*,'mad-X, energy, k. energy, pma, momentum: ',energy,energy-pma,pma,e0f
     beta0=e0f/ENERGY
-    particle=.false.
-    if(abs(pma-pmae)/pmae<02) particle=.true.
+    if(abs(pma-pmae)/pmae<c_0_002) then
+       particle=.true.
+       CALL MAKE_STATES(PARTICLE)
+    elseif(abs(pma-pmap)/pmap<c_0_002) then
+       particle=.false.
+       CALL MAKE_STATES(PARTICLE)
+    else
+       muonfactor=pma/pmae
+       CALL MAKE_STATES(muonfactor)
+    endif
+
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
     CALL MAKE_STATES(PARTICLE)
