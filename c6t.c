@@ -41,6 +41,8 @@
 *                                                                      *
 *---------------------------------------------------------------------*/
 
+/* 17.08.2004 - FS fix print-out of special f34 file needed as input file
+                   for the sodd program. */
 /* 15/03/2004 - FS fixing faulty variable passing to "create_aperture" */
 /* 01/07/2003 - FS added the "arbitrary matrix" element */
 /* 21/03/2003 - FS fixed segmentation fault which was due to a faulty
@@ -1129,8 +1131,9 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     }
 
     /* name used has to be without occ_cnt as this is added
-       (only 1) in tab_name_code */
-    c6t_elem->twtab_row = table_row(current_sequ->tw_table,t_name);
+       (only 1) in tab_name_code 
+       !!! fixed FS 17.08.2004 !!! */
+    c6t_elem->twtab_row = my_table_row(current_sequ->tw_table,t_name);
   }
 
   return c6t_elem;
@@ -2296,7 +2299,7 @@ void write_f16_errors()
 
 void write_f34_special()
 {
-  int i, j, jt, n, flags[FIELD_MAX];
+  int i, j, n, flags[FIELD_MAX];
   double values[FIELD_MAX];
   char* t_list[NT34];
   char t_name[NAME_L];
@@ -2313,7 +2316,6 @@ void write_f34_special()
   if (special_flag == 0)  return;
 
   current_element = first_in_sequ;
-  jt=1;
   while (current_element != NULL)
     {
      for (i = 0; i < NT34; i++)
@@ -2326,15 +2328,15 @@ void write_f34_special()
            {
             strcpy(t_name, current_element->name);
             if ((cp = strchr(t_name, '+')) != NULL) *cp = '\0';
-            if ((err=double_from_table("twiss","s",&jt,&spos)))
+            if ((err=double_from_table("twiss","s",&(current_element->twtab_row),&spos)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","betx",&jt,&betx)))
+            if ((err=double_from_table("twiss","betx",&(current_element->twtab_row),&betx)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","bety",&jt,&bety)))
+            if ((err=double_from_table("twiss","bety",&(current_element->twtab_row),&bety)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","mux",&jt,&mux)))
+            if ((err=double_from_table("twiss","mux",&(current_element->twtab_row),&mux)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","muy",&jt,&muy)))
+            if ((err=double_from_table("twiss","muy",&(current_element->twtab_row),&muy)))
        printf ("Not found double_from table = %i\n",err);
               fprintf(f34,
               " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
@@ -2343,18 +2345,17 @@ void write_f34_special()
         }
        }
      current_element = current_element->next;
-     jt++;
     }
-   if (jt > 0) {
-    if ((err=double_from_table("twiss","s",&jt,&spos)))
+  if (last_in_sequ->twtab_row > 0) {
+    if ((err=double_from_table("twiss","s",&(last_in_sequ->twtab_row),&spos)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","betx",&jt,&betx)))
+    if ((err=double_from_table("twiss","betx",&(last_in_sequ->twtab_row),&betx)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","bety",&jt,&bety)))
+    if ((err=double_from_table("twiss","bety",&(last_in_sequ->twtab_row),&bety)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","mux",&jt,&mux)))
+    if ((err=double_from_table("twiss","mux",&(last_in_sequ->twtab_row),&mux)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","muy",&jt,&muy)))
+    if ((err=double_from_table("twiss","muy",&(last_in_sequ->twtab_row),&muy)))
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
@@ -2523,4 +2524,28 @@ void write_struct()
      fprintf(f2,"\n");
     }
   fprintf(f2, "NEXT\n");
+}
+
+int my_table_row(struct table* table, char* name)
+{
+  int i, j, ret = 0;
+  char t_name[255];
+  char* cp;
+  for (i = 0; i < table->num_cols; i++)
+     if(table->columns->inform[i] == 3) break;
+  if (i < table->num_cols && last_row < table->curr)
+    {
+     for (j = last_row; j < table->curr; j++)
+       {
+	 strcpy(t_name, table->s_cols[i][j]);
+	 if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';    
+	 if (strcmp(name, t_name) == 0) break;
+       }
+     if (j < table->curr) 
+       {
+	 ret = j+1;
+	 last_row = j;
+       }
+    }
+  return ret;
 }

@@ -1,6 +1,9 @@
 #define BASE_TYPES 100    /* maximum no. of element types allowed */
 #define EL_COUNT   100    /* initial length of element type list */
 
+int my_table_row(struct table*, char*);
+int last_row = 0;
+
 /* MADX name     : circle, ellipse, rectangle, lhcscreen */
 /* internal code :    1       2         3          4     */
 struct aper_struct {
