@@ -459,6 +459,9 @@
       if (el .eq. zero.and.code .ne. 10) goto 500
       betas = get_value('probe ','beta ')
       gammas = get_value('probe ','gamma ')
+!---- Prepare data.
+      bv0 = node_value('dipole_bv ')
+      bvk = node_value('other_bv ')
 !---- Switch on element type.
       go to (500,  20,  30, 500,  50,  60,  70,  80, 500, 100,          &
      &500, 500, 500, 140, 150, 160, 500, 500, 500, 500,                 &
@@ -470,9 +473,6 @@
    20 continue
    30 continue
 
-!---- Prepare data.
-      bv0 = node_value('dipole_bv ')
-      bvk = node_value('other_bv ')
 ! FRS 16.11.2004 This is still in the intermediate spirit of k0&k0s
 !      an = node_value('angle ')
 !      sk0 = an / el
