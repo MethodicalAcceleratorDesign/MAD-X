@@ -427,7 +427,7 @@ CONTAINS
     REAL(DP),INTENT(IN):: OMEGA(3),ANG(3)
     TYPE(MAGNET_FRAME), POINTER::P
     REAL(DP) D(3),OMEGAT(3)
-    INTEGER I,IORDER,I11,I22,J
+    INTEGER IORDER
     INTEGER, OPTIONAL :: ORDER
     REAL(DP), OPTIONAL, INTENT(IN):: BASIS(3,3)
     REAL(DP)  BASIST(3,3)
@@ -510,7 +510,7 @@ CONTAINS
     real(dp), INTENT(IN):: ANG(3)
     real(dp) TEMP(3,3),exii(3,3),enti(3,3),T(3),R(3,3),basist(3,3)
     real(dp), optional, INTENT(IN):: basis(3,3)
-    INTEGER I,j,k,l
+    INTEGER I,j,k
     ! Definition
     !  ENT(1,i) is the local x-vector
     !  ENT(2,i) is the local y-vector

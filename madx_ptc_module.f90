@@ -114,7 +114,7 @@ CONTAINS
     integer, parameter :: imul=20,nt0=20000,length=16
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
     real(dp) f_errors(0:50),aperture(100),normal(0:maxmul),skew(0:maxmul),field(2,0:maxmul)
-    real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
+    real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap,fint,fintx
     character(length) name
     character(name_len) aptype
     type(keywords) key
@@ -313,7 +313,25 @@ CONTAINS
        key%list%t1=node_value('e1 ')-node_value('angle ')/two
        key%list%t2=node_value('e2 ')-node_value('angle ')/two
        key%list%hgap=node_value('hgap ')
-       key%list%fint=node_value('fint ')
+!       key%list%fint=node_value('fint ')
+       fint=node_value('fint ')
+       fintx=node_value('fintx ')
+       if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
+         print*," The fint and fintx must be the same at each end or each might be zero"
+         stop
+       endif
+       if(fint.gt.zero) then
+          key%list%fint=fint
+          if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
+       else
+          key%list%kill_ent_fringe=my_true
+          if(fintx.gt.zero) then
+             key%list%fint=fintx
+          else
+             key%list%fint=zero
+             key%list%kill_exi_fringe=my_true
+          endif
+       endif
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
@@ -329,7 +347,25 @@ CONTAINS
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
-       key%list%fint=node_value('fint ')
+!       key%list%fint=node_value('fint ')
+       fint=node_value('fint ')
+       fintx=node_value('fintx ')
+       if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
+         print*," The fint and fintx must be the same at each end or each might be zero"
+         stop
+       endif
+       if(fint.gt.zero) then
+          key%list%fint=fint
+          if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
+       else
+          key%list%kill_ent_fringe=my_true
+          if(fintx.gt.zero) then
+             key%list%fint=fintx
+          else
+             key%list%fint=zero
+             key%list%kill_exi_fringe=my_true
+          endif
+       endif
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')

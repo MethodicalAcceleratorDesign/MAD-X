@@ -104,21 +104,21 @@ module polymorphic_taylor
 
   INTERFACE dtand
      MODULE PROCEDURE dtandt
-     MODULE PROCEDURE absoftdtandr   ! for non PC absoft
+ !    MODULE PROCEDURE absoftdtandr   ! for non PC absoft
   END INTERFACE
   INTERFACE tand
      MODULE PROCEDURE dtandt
-     MODULE PROCEDURE absoftdtandr  ! for non PC
+!     MODULE PROCEDURE absoftdtandr  ! for non PC
   END INTERFACE
 
 
   INTERFACE dcosd
      MODULE PROCEDURE dcosdt
-     MODULE PROCEDURE absoftdcosdr  ! for non PC absoft
+ !    MODULE PROCEDURE absoftdcosdr  ! for non PC absoft
   END INTERFACE
   INTERFACE cosd
      MODULE PROCEDURE dcosdt
-     MODULE PROCEDURE absoftdcosdr  ! for non PC
+!     MODULE PROCEDURE absoftdcosdr  ! for non PC
   END INTERFACE
 
 
@@ -137,11 +137,11 @@ module polymorphic_taylor
 
   INTERFACE dsind
      MODULE PROCEDURE dsindt
-     MODULE PROCEDURE absoftdsindr  ! for non PC absoft
+ !    MODULE PROCEDURE absoftdsindr  ! for non PC absoft
   END INTERFACE
   INTERFACE sind
      MODULE PROCEDURE dsindt
-     MODULE PROCEDURE absoftdsindr  ! for non PC
+!     MODULE PROCEDURE absoftdsindr  ! for non PC
   END INTERFACE
 
 
@@ -193,20 +193,20 @@ module polymorphic_taylor
 
   INTERFACE datan2d
      MODULE PROCEDURE datan2dt
-     MODULE PROCEDURE absoftdatan2dr      ! for non PC absoft
+ !    MODULE PROCEDURE absoftdatan2dr      ! for non PC absoft
   END INTERFACE
   INTERFACE atan2d
      MODULE PROCEDURE datan2dt
-     MODULE PROCEDURE absoftdatan2dr      ! for non PC
+  !   MODULE PROCEDURE absoftdatan2dr      ! for non PC
   END INTERFACE
 
   INTERFACE datand
      MODULE PROCEDURE datandt
-     MODULE PROCEDURE absoftdatandr    ! for non PC  absoft
+ !    MODULE PROCEDURE absoftdatandr    ! for non PC  absoft
   END INTERFACE
   INTERFACE atand
      MODULE PROCEDURE datandt
-     MODULE PROCEDURE absoftdatandr   ! for non PC
+!     MODULE PROCEDURE absoftdatandr   ! for non PC
   END INTERFACE
 
   INTERFACE dasin
@@ -4298,7 +4298,6 @@ contains
 
   SUBROUTINE  univreal_8(S2,S1)   ! new sagan
     implicit none
-    integer ipause, mypauses
     type (universal_taylor),INTENT(inOUT)::S2
     type (real_8),INTENT(IN)::S1
     !    integer localmaster

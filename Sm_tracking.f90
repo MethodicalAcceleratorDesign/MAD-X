@@ -91,7 +91,6 @@ contains
     TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
     INTEGER, INTENT(IN):: II1
-    INTEGER II2
 
 
     call track(R,X,II1,k,X_IN)
@@ -351,13 +350,13 @@ contains
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
-    INTEGER, target, INTENT(IN) :: CHARGE
+    INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch,PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
-
+    integer,target :: charge1
     IF(.NOT.CHECK_STABLE) return
 
     IF(PRESENT(X_IN)) then
@@ -367,7 +366,12 @@ contains
 
     ! DIRECTIONAL VARIABLE
     C%MAG%P%DIR=>C%DIR
-    C%MAG%P%CHARGE=>CHARGE
+    if(present(charge)) then
+     C%MAG%P%CHARGE=>CHARGE
+    else
+     charge1=1
+     C%MAG%P%CHARGE=>CHARGE1
+    endif
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
     C%MAG=K
@@ -512,12 +516,13 @@ contains
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     TYPE(REAL_8), INTENT(INOUT):: X(6)
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
-    INTEGER, TARGET, INTENT(IN) :: CHARGE
+    INTEGER, optional,TARGET, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) OU,PATCH,PATCHT,PATCHG,PATCHE
     TYPE (FIBRE), POINTER :: CN
     REAL(DP), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
+    integer,target :: charge1
 
     IF(.NOT.CHECK_STABLE) return
 
@@ -531,7 +536,12 @@ contains
 
     ! DIRECTIONAL VARIABLE AND CHARGE IS PASSED TO THE ELEMENT
     C%MAGP%P%DIR=>C%DIR
-    C%MAGP%P%CHARGE=>CHARGE
+    if(present(charge)) then
+     C%MAGP%P%CHARGE=>CHARGE
+    else
+     charge1=1
+     C%MAGP%P%CHARGE=>CHARGE1
+    endif
     !
 
     ! PASSING THE STATE K TO THE ELEMENT
@@ -697,7 +707,7 @@ contains
     TYPE(ENV_8), INTENT(INOUT):: X(6)
     TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(REAL_8)  Y(6)
-    INTEGER, target, INTENT(IN) :: CHARGE
+    INTEGER, optional,target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch,PATCHT,PATCHG,PATCHE
     !    TYPE(UPDATING), optional,intent(in):: UPDATE
@@ -708,6 +718,7 @@ contains
     TYPE(REAL_8) XR(6),X1,X3
     real(dp) V(6)
     INTEGER I,J,M,N
+    integer,target :: charge1
 
     IF(.NOT.CHECK_STABLE) return
 
@@ -717,7 +728,12 @@ contains
 
     ! DIRECTIONAL VARIABLE
     C%MAGP%P%DIR=>C%DIR
-    C%MAGP%P%CHARGE=>CHARGE
+    if(present(charge)) then
+     C%MAGP%P%CHARGE=>CHARGE
+    else
+     charge1=1
+     C%MAGP%P%CHARGE=>CHARGE1
+    endif
     !
 
     C%MAGP=K

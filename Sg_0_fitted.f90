@@ -846,7 +846,7 @@ CONTAINS
     real(dp) , intent(inout)::x(6)
     real(dp) k1(6),xt(6),hc,rho,dz,DAL,ds
     real(dp) af(3),az(3),ax(3),m(2,2),mi(2,2),dif(2),t(2),det,bf(3),XI,ZETA
-    integer  i,j,k,NF,KNF,it,ia
+    integer  i,j,NF,KNF,it,ia
     real(dp) norm, norm0,rhob0
     logical(lp) doit
     logical(lp):: DONEITT
@@ -1015,7 +1015,7 @@ CONTAINS
     type(real_8) k1(6),af(3),az(3),ax(3),dif(2),t(2),xt(6),bf(3)
     real(dp) hc,rho,dz,ds
     real(dp) m(2,2),mi(2,2),det
-    integer  i,j,k,NF,KNF,it,ia
+    integer  i,j,NF,KNF,it,ia
     real(dp) norm, norm0
     logical(lp) doit
     logical(lp):: DONEITT
@@ -1412,8 +1412,8 @@ CONTAINS
     implicit none
     type(DATA_MAGNET) b
     integer, intent(in) :: i,posx,posy
-    integer j,ix,iy,co(3),pos(3),k
-    real(dp) r0,b0(3),x0,y0,rho
+    integer j,ix,iy
+    real(dp) x0,y0,rho
 
     if(b%read_in)   then
        write(6,*) " This is forbidden since already the data was read in for the fitted magnet"
@@ -2229,7 +2229,6 @@ CONTAINS
 
     real(dp), intent(in):: x(6)
     type(FITTED_MAGNET), intent(in) :: b
-    real(dp) :: s=c_1_2
 
     che=.false.
 
@@ -2362,7 +2361,7 @@ CONTAINS
     implicit none
     type(DATA_MAGNET) d
     real(dp) b_fun
-    integer  x(3),error,pos(3),ind,t(3),i
+    integer  x(3),error,pos(3),ind,t(3)
 
     error=0
 
@@ -2506,7 +2505,7 @@ CONTAINS
     real(dp) , intent(inout)::x(6)
     real(dp) k1(6),xt(6),hc,rho,dz,DAL,ds
     real(dp) bf(3),XI,ZETA,rhob0
-    integer  i,j,k,NF,KNF
+    integer  i,j,NF,KNF
     real(dp) theta_half
 
     IF(.NOT.CHECK_STABLE) return
@@ -2598,7 +2597,7 @@ CONTAINS
     real(dp) hc,rho,dz,DAL,ds
     type(real_8)  k1(6),xt(6),bf(3)
 
-    integer  i,j,k,NF,KNF
+    integer  i,j,NF,KNF
     real(dp) theta_half
 
     call alloc(k1,6)
@@ -2690,7 +2689,7 @@ CONTAINS
     real(dp) , intent(inout)::x(6)
     real(dp) k1(6),k2(6),k3(6),k4(6),xt(6),hc,rho,dz,DAL,ds
     real(dp) bf(3),XI,ZETA,rhob0
-    integer  i,j,k,NF,KNF
+    integer  i,j,NF,KNF
     real(dp) theta_half
 
     IF(.NOT.CHECK_STABLE) return
@@ -2782,7 +2781,7 @@ CONTAINS
     real(dp) hc,rho,dz,DAL,ds
     type(real_8)  k1(6),k2(6),k3(6),k4(6),xt(6),bf(3)
 
-    integer  i,j,k,NF,KNF
+    integer  i,j,NF,KNF
     real(dp) theta_half
 
     call alloc(k1,6)

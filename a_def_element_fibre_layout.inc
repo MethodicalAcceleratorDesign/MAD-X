@@ -15,7 +15,6 @@ TYPE ELEMENT
    real(dp),   DIMENSION(:), POINTER:: AN,BN         !Multipole component
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
-   real(dp),   POINTER:: thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
    !
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E       ! Cavity information
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
@@ -62,7 +61,6 @@ TYPE ELEMENTP
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !MULTIPOLE COMPONENT
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
-   TYPE(REAL_8),   POINTER:: thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
    !
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS ! CAVITY INFORMATION
    real(dp), POINTER :: DELTA_E     ! CAVITY ENERGY GAIN

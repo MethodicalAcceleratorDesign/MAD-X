@@ -203,6 +203,7 @@ contains
     ENDDO
 
     allocate(x_in%RAY(6,-6:X_IN%nst+6))
+    allocate(x_in%E)
     allocate(x_in%E%L(-1:X_IN%nst))
     allocate(x_in%POS(4))
 
@@ -470,7 +471,7 @@ contains
   SUBROUTINE SURVEY_INNER_MAG(e_in) !  Tracks the chart through a magnet
     IMPLICIT NONE
     TYPE(INNER_FRAME), INTENT(INOUT):: e_in
-    REAL(DP) ENT(3,3),A(3),MID(3,3),O(3),EXI(3,3),B(3),D(3)
+    REAL(DP) ENT(3,3),A(3),MID(3,3),O(3),D(3)
     LOGICAL(LP) DONE
     INTEGER NST,I,start
     REAL(DP) LH,HA,ANG(3),ANGH,RHO

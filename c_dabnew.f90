@@ -223,7 +223,7 @@ contains
     !frs if(eps.le.zero) eps=c_1d_38
     !      if(EPS.le.zero) eps=c_1d_90
     !frs epsmac=c_1d_7
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nv.eq.0) return
 
     call alloc_all(no,nv,nd2t)
@@ -1477,7 +1477,7 @@ contains
     !
     integer i,illc,ilmc,inc,inoc,invc,ipoc
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
     !
     do i=ipoc,ipoc+ilmc-1
@@ -1505,7 +1505,7 @@ contains
     !
     integer ia,ib,illa,ina,inb,ipoa,ipob
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     ipob = idapo(inb)
     ipoa = idapo(ina)
     illa = idall(ina)
@@ -1597,7 +1597,7 @@ contains
     integer idaadd,inb,inc,ipoc
     integer ipob
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1634,7 +1634,7 @@ contains
     integer inc,ipoc,inb
     integer ipob
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1672,7 +1672,7 @@ contains
     integer ina,inb,inc,incc,ind,ine,inoc,invc
     real(dp) coe1,coe2
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call daall1(incc,'$$DAJUNK$$',inoc,invc)
     call damul(ina,inb,incc)
     call damul(inc,ind,ine)
@@ -1698,7 +1698,7 @@ contains
     integer ina,inb,inc,incc,ipoc,ipoa,ipob,i
     real(dp) ccipoa,ccipob
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoa=idapo(ina)
        ipob=idapo(inb)
@@ -1753,7 +1753,7 @@ contains
     integer,dimension(0:lno)::ipno,noff
     real(dp) ccia,ccipoa,ccipob
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoa=idapo(ina)
        ipob=idapo(inb)
@@ -1848,7 +1848,7 @@ contains
     integer idadiv,inb,ina,inc,ipoc,ipoa,ipob,i
     real(dp) ck,ck1
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        !         minv = min(inva,invb)
        ipoa = idapo(ina)
@@ -1887,7 +1887,7 @@ contains
     !
     !     CASE OF FIRST ORDER ONLY
     !     ************************
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1936,7 +1936,7 @@ contains
     integer,dimension(0:lno)::ipno,noff
     real(dp) ccia,ccipoa
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2039,7 +2039,7 @@ contains
     integer,parameter,dimension(lnv)::jjx=0
     real(dp) ckon,const
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dacop(ina,inb)
     if(nomax.eq.1) then
        cc(idapo(inb)) = cc(idapo(inb)) + ckon
@@ -2064,7 +2064,7 @@ contains
     integer,parameter,dimension(lnv)::jjx=0
     real(dp) ckon,const
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dacop(ina,inb)
     !
     if(nomax.eq.1) then
@@ -2093,7 +2093,7 @@ contains
     integer i,ina,inb,ipoa,ipob
     real(dp) ckon
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     ipob=idapo(inb)
     ipoa=idapo(ina)
     if(nomax.eq.1) then
@@ -2123,7 +2123,7 @@ contains
     integer ipoa,i,ina,inc,incc,ipoc
     real(dp) ckon
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        !         minv = min(inva,invb)
        ipoa = idapo(ina)
@@ -2167,7 +2167,7 @@ contains
          ipob,ipause,mypauses
     real(dp) ckon
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        !         minv = min(inva,invb)
        ipoa = idapo(ina)
@@ -2218,10 +2218,10 @@ contains
     integer i,ina,inb,ipoa,ipob,ipause,mypauses
     real(dp) ckon
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(ckon==zero) then
        if(check_da) then
-          escape_da=.true.
+          stable_da=.false.
           c_%message='constant part zero in dacdi'
           return
        else
@@ -2254,13 +2254,13 @@ contains
     !
     !-----------------------------------------------------------------------------
     !
-    integer i,idadic,ina,inc,ipoa,ipoc,ipause,mypauses
+    integer i,idadic,ina,inc,ipoa,ipoc
     real(dp) ckon,ck
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     ipoa = idapo(ina)
     if(cc(ipoa)==zero) then
-       if(check_da) escape_da=.true.
+       if(check_da) stable_da=.false.
        c_%message='constant part zero in dadic'
        return
     endif
@@ -2315,7 +2315,7 @@ contains
     integer idacma,ina,inb,inc,ipoc,ipob,ipoa,i
     real(dp) bfac
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2352,7 +2352,7 @@ contains
     !
     integer  ipob,ipoa,i
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2399,7 +2399,7 @@ contains
          ipause,mypauses
     real(dp) afac,bfac,ccc,copf
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2561,7 +2561,7 @@ contains
     integer ina,inc,incc
     character(4) cf
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(ina.eq.inc) then
        !       call dainf(inc,inoc,invc,ipoc,ilmc,illc)
        incc=0
@@ -2589,7 +2589,7 @@ contains
     !
     integer i,ina,inc,ind,inon,ipow,iscr,lfun,no,ipause,mypauses
     integer,parameter,dimension(lnv)::jjx=0
-    real(dp) a0,a1,a2,a3,a4,a5,ca,e1,e2,ea,era,p,ra,sa,scr,t
+    real(dp) a0,ca,ea,ra,sa
     real(dp),dimension(0:lno)::xf
     character(4) cf,cfh
     character(26) abcs,abcc
@@ -2597,7 +2597,7 @@ contains
     data abcs /'abcdefghijklmnopqrstuvwxyz'/
     data abcc /'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(cf(1:1).eq.' ') then
        cfh(1:3) = cf(2:4)
        cfh(1:4) = ' '
@@ -2650,7 +2650,7 @@ contains
        if(a0.eq.0) then
           if(check_da) then
              c_%message="a0.eq.0 for INV in dafun"
-             escape_da=.true.
+             stable_da=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2673,7 +2673,7 @@ contains
        if(a0.le.0) then
           if(check_da) then
              c_%message="a0.le.0 for SQRT in dafun"
-             escape_da=.true.
+             stable_da=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2698,7 +2698,7 @@ contains
        if(a0>hyperbolic_aperture) then
           if(check_da) then
              c_%message="a0>hyperbolic_aperture for EXP in dafun"
-             escape_da=.true.
+             stable_da=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2722,7 +2722,7 @@ contains
        if(a0.le.0) then
           if(check_da) then
              c_%message="a0.le.0 for LOG in dafun"
-             escape_da=.true.
+             stable_da=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2768,7 +2768,7 @@ contains
        if(a0>hyperbolic_aperture) then
           if(check_da) then
              c_%message="a0>hyperbolic_aperture for SINH in dafun"
-             escape_da=.true.
+             stable_da=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2792,7 +2792,7 @@ contains
        if(a0>hyperbolic_aperture) then
           if(check_da) then
              c_%message="a0>hyperbolic_aperture for COSH in dafun"
-             escape_da=.true.
+             stable_da=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2854,7 +2854,7 @@ contains
     integer i,illa,ilma,ina,inoa,inva,ipoa
     real(dp) anorm
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     !
     anorm = zero
@@ -2880,7 +2880,7 @@ contains
     integer i,ia,ib,ic,ij,illc,ilmc,inoc,invc,ipoc
     integer,dimension(lnv)::monx
     integer,dimension(:)::ma,mb,mc
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     if(ma(1).eq.mc(1).or.mb(1).eq.mc(1)) then
        call dainf(mc(1),inoc,invc,ipoc,ilmc,illc)
@@ -2921,7 +2921,7 @@ contains
     integer,dimension(lno)::icc
     integer,dimension(:)::ma,mb,mc
     real(dp) ccf
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     !ETIENNE
     !
@@ -3011,7 +3011,7 @@ contains
     integer,dimension(0:lno)::jv
     integer,dimension(:)::mb,mc
     real(dp) apek,bbijj,chkjj
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     !     CONSISTENCY CHECKS
     !     ******************
@@ -3207,7 +3207,7 @@ contains
     integer i,ic,iv,jc,jl,jv,mf
     integer,dimension(:)::mc
     character(20) line
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     if(mf.le.0) return
     write(mf,*) 0,0,jc+1,0,line
@@ -3247,7 +3247,7 @@ contains
     real(dp),dimension(lno+1)::xm
     real(dp),dimension(lno)::xt
     real(dp),dimension(:)::xf,xi
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     do i=1,ic
        xt(i)=xi(i)
@@ -3271,7 +3271,7 @@ contains
     enddo
     do i=1,nvmax
        if(abs(xf(i))>da_absolute_aperture.and.check_da) then
-          escape_da=.TRUE.
+          stable_da=.false.
           write(6,*) "unstable in ppush ",i,xf(i)
        endif
     enddo
@@ -3293,7 +3293,7 @@ contains
     real(dp),dimension(:)::xi
     real(dp),dimension(lno)::xt
     real(dp),dimension(lno+1)::xm
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     do i=1,nvmax
        xt(i)=xi(i)
@@ -3315,7 +3315,7 @@ contains
 
 
     if(abs(xf)>da_absolute_aperture.and.check_da) then
-       escape_da=.TRUE.
+       stable_da=.false.
        write(6,*) "unstable in ppush1 ", xf
        write(6,*) xi(1:nvmax)
     endif
@@ -3335,7 +3335,7 @@ contains
     integer,dimension(lnv)::jj,ml
     integer,dimension(:)::ma,mb
     real(dp),dimension(lnv)::x
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     do i=1,lnv
        jj(i)=0
@@ -3384,7 +3384,7 @@ contains
     integer,dimension(:)::ma,mb
     real(dp),dimension(lnv,lnv)::aa,ai
     real(dp) amjj,amsjj,prod
-    if(escape_da) return
+    if((.not.stable_da)) return
     !
     call dainf(ma(1),inoa,inva,ipoa,ilma,illa)
     call dainf(mb(1),inob,invb,ipob,ilmb,illb)
@@ -3444,7 +3444,7 @@ contains
     !
     if(ier.eq.132) then
        if(check_da) then
-          escape_da=.true.
+          stable_da=.false.
           c_%message='ERROR IN ROUTINE DAINV, ier=132 in matinv'
           call dadal(ml,ia)
           call dadal(ms,ia)
@@ -3467,7 +3467,7 @@ contains
           if(i.eq.j) prod = prod - one
           if(abs(prod).gt.c_100*epsmac) then
              if(check_da) then
-                escape_da=.true.
+                stable_da=.false.
                 c_%message='ERROR IN ROUTINE DAINV, abs(prod).gt.c_100*epsmac '
                 call dadal(ml,ia)
                 call dadal(ms,ia)
@@ -3547,7 +3547,7 @@ contains
     real(dp),dimension(nmx,nmx)::a,ai
     real(dp),dimension(nmax,nmax)::aw
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
 
     aw(1:n,1:n) = a(1:n,1:n)
 
@@ -3585,7 +3585,7 @@ contains
     real(dp),dimension(np,np)::a
     real(dp),dimension(nmax)::vv
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     ier=0
     d=one
     do i=1,n
@@ -3669,7 +3669,7 @@ contains
     real(dp),dimension(np,np)::a
     real(dp),dimension(nmx)::b
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     ii = 0
     do i=1,n
        ll = indx(i)
@@ -3713,7 +3713,7 @@ contains
     integer,dimension(:)::ma,mb,jx
     real(dp),dimension(lnv)::x
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     do i=1,lnv
        jj(i)=0
     enddo
@@ -3759,7 +3759,7 @@ contains
     integer,dimension(lnv)::jj,mn,mi,me
     integer,dimension(:)::ma,mb,jind
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ma(1),inoa,inva,ipoa,ilma,illa)
     !
 
@@ -3812,7 +3812,7 @@ contains
     !
     integer idif,illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
        incc=0
@@ -3841,7 +3841,7 @@ contains
     integer,dimension(lnv)::jd
     real(dp) rr,x,xdivi
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
     !
@@ -3928,7 +3928,7 @@ contains
     !-----------------------------------------------------------------------------
     !
     integer i,ina,inb,inc, n,is(4)
-    if(escape_da) return
+    if((.not.stable_da)) return
 
     !
     is = 0
@@ -3973,7 +3973,7 @@ contains
     integer illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     complex(dp),external::fun
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
        incc=0
@@ -4014,7 +4014,7 @@ contains
        end function fun
     end interface
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
     !
@@ -4083,7 +4083,7 @@ contains
     integer illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     real(dp),external::fun
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
        incc=0
@@ -4111,7 +4111,7 @@ contains
     integer illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     complex(dp),external::fun
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
        incc=0
@@ -4152,7 +4152,7 @@ contains
        end function fun
     end interface
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
     !
@@ -4235,7 +4235,7 @@ contains
        end function fun
     end interface
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
     !
@@ -4485,7 +4485,7 @@ contains
          ik,inc,ipause,mypauses
     integer,dimension(lnv)::j,jd
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     inb=0
     if(ina.lt.1.or.ina.gt.nda) then
        write(line,'(a22,i8)') 'ERROR IN DAPRI, INA = ',ina
@@ -4768,7 +4768,7 @@ contains
     !
     !etienne
     if(check_da) then
-       escape_da=.true.
+       stable_da=.false.
        return
     endif
     stop
@@ -5008,7 +5008,7 @@ contains
          ilmc,ina,inc,inoa,inoc,inva,invc,ipoa,ipoc,jj,ipause,mypauses
     real(dp) x,xdivi
     !
-    if(escape_da) return
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
     !
@@ -5308,7 +5308,7 @@ contains
     !
     !-----------------------------------------------------------------------------
     !
-    integer i,ii,illa,ilma,ina,inoa,inva,iout,ipoa,ipresent
+    integer ii,illa,ilma,ina,inoa,inva,iout,ipoa,ipresent
     integer,optional,dimension(:)::j
     real(dp) value
     !

@@ -585,7 +585,7 @@ CONTAINS
     !  SECTOR_B AND SECTOR_NMUL FOR TYPE TEAPOT
     IF(SECTOR_NMUL>0.and.firsttime_coef) THEN
        global_verbose=.false.
-       if(firsttime_coef) then
+       if(firsttime_coef.or.(.not.allocated(S_B))) then
           !          SECTOR_B%firsttime=0   !slightly unsafe
           ALLOCATE(S_B(SECTOR_NMUL_MAX))
           DO I=1,SECTOR_NMUL_MAX
@@ -836,7 +836,6 @@ CONTAINS
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
     INTEGER, INTENT(IN):: NO1,NP1
-    INTEGER ND1,NDEL,NDPT1
     INTEGER, INTENT(OUT)::    ND2,NPARA
 
     call init(STATE,NO1,NP1,my_true,ND2,NPARA)

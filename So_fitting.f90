@@ -604,8 +604,11 @@ contains
     TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
     TYPE (fibre), POINTER :: C
-    logical(lp) APERTURE
+    logical(lp) APERTURE,c_da
     INTEGER TURNS0
+    c_%stable_da=.true.
+    c_da=c_%check_da
+    c_%check_da=.true.
     APERTURE=c_%APERTURE_FLAG
     c_%APERTURE_FLAG=.false.
     TURNS0=1
@@ -717,7 +720,7 @@ contains
 
     DO I=1,TURNS0
        CALL TRACK(RING,X,LOC,STAT)
-       if(.not.check_stable) then
+       if(.not.check_stable.or.(.not.c_%stable_da)) then
           CALL KILL(X,6)
           CALL KILL(MX)
           CALL KILL(SX)
@@ -779,9 +782,32 @@ contains
     CALL KILL(SX)
     CALL KILL(SXI)
     CALL KILL(IS)
+    c_%check_da=c_da
     c_%APERTURE_FLAG=APERTURE
 
   END SUBROUTINE FIND_ORBIT_LAYOUT
+
+  integer function FIND_ORBIT_flag(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: RING
+    real(dp) , intent(inOUT) :: FIX(6)
+    INTEGER , intent(in) :: LOC
+    INTEGER, OPTIONAL::TURNS
+    real(dp) , optional, intent(in) :: eps
+    TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
+
+    call find_orbit(RING,FIX,LOC,STATE,eps,TURNS)
+
+    call PRODUCE_APERTURE_FLAG(FIND_ORBIT_flag)
+    if(.not.c_%stable_da) then
+     c_%stable_da=.true.
+    endif
+!   resets Da on its own here only
+
+  END function  FIND_ORBIT_flag
+
+
+
 
 
   SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
@@ -799,8 +825,9 @@ contains
     integer NO1,ND2,I,IU,ITE,ier,j
     TYPE (fibre), POINTER :: C
     logical(lp) APERTURE
-    INTEGER TURNS0
+    INTEGER TURNS0,trackflag
     TURNS0=1
+    trackflag=0
     IF(PRESENT(TURNS)) TURNS0=TURNS
     freq=zero
     APERTURE=c_%APERTURE_FLAG
@@ -912,7 +939,12 @@ contains
     X=FIX
 
     DO I=1,TURNS0
-       CALL TRACK(RING,X,LOC,STAT)
+!       CALL TRACK(RING,X,LOC,STAT)
+trackflag=TRACK_flag(RING,X,LOC,STAT)
+if(trackflag/=0) then
+    c_%APERTURE_FLAG=APERTURE
+    return
+endif
        if(.not.check_stable) then
           w_p=0
           w_p%nc=1
@@ -1013,12 +1045,12 @@ contains
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     TYPE(layout),INTENT(inOUT):: RING
-    real(dp)  FIX(6),DIX(6),xdix,xdix0,mat(6,6),flu(6,6)
+    real(dp)  FIX(6),DIX(6),xdix0,mat(6,6),flu(6,6)
     TYPE(REAL_8) X(6)
     TYPE(ENV_8),INTENT(INOUT)::YS(6)
     TYPE(DAMAP) MX,SX,SXI,IS
     type(beamenvelope) env
-    integer NO1,ND2,ND1 ,I,IU,LOC,ITE ,J
+    integer NO1,ND2,ND1 ,I,LOC ,J
     INTEGER  JJ(LNV)
     real(dp),optional, intent(inout)::emit(3)
     type(internal_state),optional, intent(in)::STATE

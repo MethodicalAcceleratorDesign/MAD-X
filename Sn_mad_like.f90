@@ -31,7 +31,7 @@ module Mad_like
   logical(lp),TARGET ::FIBRE_flip=.true.
   !  logical(lp) :: FIBRE_SURVEY=.true.
   INTEGER,TARGET ::FIBRE_DIR=1
-  real(dp),PRIVATE::ENERGY,P0C,BRHO,KINETIC,gamma0I,gamBET,beta0
+  real(dp),PRIVATE::ENERGY,P0C,BRHO,KINETIC,gamma0I,gamBET,beta0,MC2
   !real(dp),PRIVATE::TOTAL_EPS
   character(80) file_fitted
   !  type(layout),save::mad_list
@@ -1114,8 +1114,8 @@ CONTAINS
           SOLTILT%KIND=KIND5
        else
           SOLTILT%KIND=KIND17
-          SOLTILT%nmul=2
-          SOLTILT%METHOD=2
+!          SOLTILT%nmul=2
+!          SOLTILT%METHOD=2
        endif
     ENDIF
     IF(PRESENT(t)) then
@@ -1758,7 +1758,6 @@ CONTAINS
     type (EL_LIST) TRUERECTILT_MADX
     type (EL_LIST),optional, INTENT(IN)::list
     CHARACTER(*), INTENT(IN):: NAME
-    real(dp)  L,ANGLE
     type (TILTING),INTENT(IN):: T
     real(dp) ANGE,SPE
     real(dp) LM1,ANG1,ANGI1,e1,e2
@@ -2617,10 +2616,12 @@ CONTAINS
        s2%hgap=s1%hgap
        s2%h1=s1%h1
        s2%h2=s1%h2
-       s2%thin_h_foc=s1%thin_h_foc
-       s2%thin_v_foc=s1%thin_v_foc
-       s2%thin_h_angle=s1%thin_h_angle
-       s2%thin_v_angle=s1%thin_v_angle
+       IF(S2%KIND==KIND3) THEN
+        s2%K3%thin_h_foc=s1%thin_h_foc
+        s2%K3%thin_v_foc=s1%thin_v_foc
+        s2%K3%thin_h_angle=s1%thin_h_angle
+        s2%K3%thin_v_angle=s1%thin_v_angle
+       ENDIF
        if(s1%APERTURE_KIND/=0) then
           call alloc(s2%p%aperture)
           s2%p%aperture%kind = -s1%APERTURE_KIND
@@ -2899,9 +2900,9 @@ CONTAINS
 
   end SUBROUTINE  GET_GAM
 
-  SUBROUTINE  GET_ONE(ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)
+  SUBROUTINE  GET_ONE(MASS,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)
     implicit none
-    real(dp) ,optional,INTENT(OUT)::ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+    real(dp) ,optional,INTENT(OUT)::ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet,MASS
     real(dp)  ENE,kin,BRHOin,BET,P0CC,GAMI,GAMB
 
     call GET_ENERGY(ENE,KIN,BRHOin,BET,P0CC)
@@ -2914,6 +2915,7 @@ CONTAINS
     if(present(P0C)) P0C=P0CC
     if(present(gamma0I)) gamma0I=GAMI
     if(present(gambet)) gambet=GAMB
+    if(present(MASS)) MASS=mc2
 
   end SUBROUTINE  GET_ONE
 
@@ -3005,7 +3007,7 @@ CONTAINS
 
     gamma0I=XMC2*BETA0/P0C
     GAMBET=(XMC2/P0C)**2
-
+    MC2=XMC2
   END SUBROUTINE Set_mad_v
 
   !  MACHIDA FITTED
@@ -3086,9 +3088,9 @@ CONTAINS
     type (layout),INTENT(IN)::S1
     INTEGER I
     !    real(dp) gamma0I,gamBET
-    TYPE (fibre), POINTER :: C,fitted
+    TYPE (fibre), POINTER :: C   !,fitted
     !   logical(lp) firstfitted
-    Nullify(C);Nullify(fitted);
+    Nullify(C);    !Nullify(fitted);
     !   firstfitted=.true.
     CALL SET_UP(R)
     !    R%ENERGY=ENERGY
@@ -3350,7 +3352,7 @@ CONTAINS
     implicit none
     TYPE (layout) makeitc
     TYPE (layout), INTENT (IN) :: S1
-    type(fibre), pointer ::c,d
+    type(fibre), pointer ::c
     integer i
     nullify(c)
     call Set_Up_MAD(makeitc)

@@ -255,7 +255,7 @@ contains
     c_%lda_used => lda_used
     c_%real_warning => real_warning
     c_%check_da => check_da
-    c_%escape_da => escape_da
+    c_%stable_da => stable_da
     c_%no => no
     c_%nv => nv
     c_%nd => nd

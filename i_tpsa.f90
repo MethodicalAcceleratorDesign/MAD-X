@@ -1890,7 +1890,7 @@ CONTAINS
 
   subroutine ASSIGN
     implicit none
-    integer i,j
+    integer i
     do i=1,ndumt
        iassdoluser(i)=0
        iass0user(i)=0
@@ -1907,7 +1907,7 @@ CONTAINS
 
   subroutine DEASSIGN
     implicit none
-    integer i,j
+    integer i
     do i=1,ndumt
        iassdoluser(i)=0
        iass0user(i)=0
@@ -2330,7 +2330,7 @@ CONTAINS
     TYPE (taylor) GETintnd2,junk
     TYPE (taylor), INTENT (IN) :: S1
     integer , INTENT (IN) ::  S2(:)
-    integer i,k,nt
+    integer i,k
     integer localmaster
     localmaster=master
     call check(s1)
@@ -2459,8 +2459,7 @@ CONTAINS
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     real (dp), intent(in):: s1
-    INTEGER inoc,invc,ipoc,k,n,I,J(LNV)
-    logical(lp) DOIT
+    INTEGER n,J(LNV)
 
 
     IF(ASSOCIATED(S2%N)) S2=-1
@@ -2544,7 +2543,7 @@ CONTAINS
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(IN)::S2
     type (TAYLOR), intent(inOUT):: s1
-    INTEGER IPAUSE,MYPAUSE,I,K,J(LNV)
+    INTEGER I,K,J(LNV)
     logical(lp) DOIT
 
     if(old) then

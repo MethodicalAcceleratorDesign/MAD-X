@@ -7,7 +7,9 @@ module da_arrays
   use scratch_size
   implicit none
   integer lda,lea,lia,lst
-  integer,parameter::lno=120,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=3000,leamax=5000,liamax=50000
+!  integer,parameter::lno=120,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=3000,leamax=5000,liamax=50000
+!  integer,parameter::lno=120,lnv=100,lnomax=8,lnvmax=9,lstmax=20050000,ldamax=10000,leamax=100000,liamax=5000000
+  integer,parameter::lno=120,lnv=100,lnomax=8,lnvmax=9,lstmax=40000000,ldamax=100000,leamax=1000000,liamax=50000000
   logical(lp) :: reallocate = .true.
   logical(lp) :: notallocated = .true.
   logical(lp),parameter::etiennefix=.true.
@@ -27,7 +29,7 @@ module da_arrays
   real(dp) facint(0:lno)
   integer nhole
   integer,TARGET :: lda_used =1000
-  logical,TARGET :: escape_da =.false.
+  logical,TARGET :: stable_da =.true.
   logical,TARGET :: check_da =.false.
   real(dp),target ::  da_absolute_aperture=1.0e6_dp
 

@@ -170,7 +170,7 @@ contains
 
   subroutine zero_key(key)
     implicit none
-    
+
     type(keywords) , intent(out):: key
     real h
     key%magnet="DRIFT"

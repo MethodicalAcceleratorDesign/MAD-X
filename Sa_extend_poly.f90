@@ -72,6 +72,7 @@ CONTAINS
     c_%check_x_max =.TRUE.
     c_%check_y_min =.TRUE.
     c_%check_y_max =.TRUE.
+    c_%stable_da =.true.
 
   END   SUBROUTINE RESET_APERTURE_FLAG
 
@@ -132,6 +133,10 @@ CONTAINS
     ENDIF
     B=B*2
     IF(.NOT.c_%check_y_max) THEN
+       I=B+I
+    ENDIF
+    B=B*2
+    IF(.not.c_%stable_da) THEN
        I=B+I
     ENDIF
     B=B*2
@@ -494,7 +499,7 @@ contains
   subroutine print_b(b,nmul,in,mf)
     implicit none
     type(B_CYL) b
-    integer i,nmul,mf,in,no
+    integer i,nmul,mf,in
 
 
     do i=1,b%n_mono

@@ -30,6 +30,7 @@ MODULE S_DEF_KIND
   PRIVATE EDGER_TRUE_PARALLEL,EDGEP_TRUE_PARALLEL,EDGES_TRUE_PARALLEL
 
   PRIVATE ZEROR_KTK,ZEROP_KTK,ZEROR_STREX,ZEROP_STREX,ZEROR_CAV4,ZEROP_CAV4
+  PRIVATE ZEROR_KICKT3,ZEROP_KICKT3
   PRIVATE ALLOCKTK,KILLKTK
   PRIVATE GETMATR,GETMATD,GETMATS,GETMAT
   PRIVATE PUSHKTKR,PUSHKTKD,PUSHKTKS,PUSHKTK
@@ -347,6 +348,8 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE ZEROP_CAV_TRAV
      MODULE PROCEDURE ZEROR_SOL
      MODULE PROCEDURE ZEROP_SOL
+     MODULE PROCEDURE ZEROR_KICKT3
+     MODULE PROCEDURE ZEROP_KICKT3
   END INTERFACE
 
 
@@ -1142,7 +1145,7 @@ contains
     REAL(DP),INTENT(INOUT):: X(6)
     TYPE(CAV4),INTENT(INOUT):: EL
     integer, intent(in) :: i
-    REAL(DP) C1,S1,V,O,F
+    REAL(DP) C1,S1,V,O
 
     IF(EL%P%NOCAVITY) RETURN
 
@@ -1200,7 +1203,6 @@ contains
     TYPE(REAL_8)  X(6)
     TYPE(CAV4P),INTENT(INOUT):: EL
     integer, intent(in) :: i
-    integer k
 
     CALL ALLOC(X)
     X=Y
@@ -1301,9 +1303,9 @@ contains
     TYPE(CAV4P),INTENT(INOUT):: EL
 
     CALL ALLOC(X,6)
-
+    X=Y
     CALL KICKCAV(EL,YL,X)
-
+    Y=X
     CALL KILL(X,6)
 
   END SUBROUTINE KICKCAVS
@@ -1456,17 +1458,6 @@ contains
     X1=X(1)
     X3=X(3)
 
-    if(EL%P%TIME) then
-       PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
-    else
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
-    endif
-
     IF(EL%P%NMUL>=1) THEN
        BBYTW=EL%BN(EL%P%NMUL)
        BBXTW=EL%AN(EL%P%NMUL)
@@ -1484,16 +1475,51 @@ contains
 
     IF(PRESENT(MID)) THEN
        CALL XMID(MID,X,0)
+       if(EL%P%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
+       else
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
+       endif
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
+
        CALL XMID(MID,X,1)
+
+       if(EL%P%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
+       else
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
+       endif
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
        CALL XMID(MID,X,1)
     ELSE
+      if(EL%P%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
+       else
+          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
+       endif
+
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
     ENDIF
+
+
 
 
   END SUBROUTINE KICKTR
@@ -1516,18 +1542,6 @@ contains
     X1=X(1)
     X3=X(3)
 
-    if(EL%P%TIME) then
-       call alloc(pz)
-       PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
-       call kill(pz)
-    else
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
-    endif
 
     IF(EL%P%NMUL>=1) THEN
        BBYTW=EL%BN(EL%P%NMUL)
@@ -1546,13 +1560,52 @@ contains
 
     IF(PRESENT(MID)) THEN
        CALL XMID(MID,X,0)
+       if(EL%P%TIME) then
+          call alloc(pz)
+          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
+          call kill(pz)
+       else
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
+       endif
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
+
        CALL XMID(MID,X,1)
+
+       if(EL%P%TIME) then
+          call alloc(pz)
+          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
+          call kill(pz)
+       else
+          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
+       endif
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
        CALL XMID(MID,X,1)
     ELSE
+       if(EL%P%TIME) then
+          call alloc(pz)
+          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
+          call kill(pz)
+       else
+          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
+          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
+       endif
+
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
     ENDIF
@@ -1591,13 +1644,13 @@ contains
     if(EL%P%TIME) then
        call alloc(pz)
        PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
+       X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
+       X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
        X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
        call kill(pz)
     else
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
+       X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
+       X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
        X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
     endif
 
@@ -1629,6 +1682,9 @@ contains
     CALL KILL(BBYTWT)
 
   END SUBROUTINE KICKTS
+
+
+
 
   SUBROUTINE MULTIPOLE_FRINGER(EL,AN,BN,K,X)
     IMPLICIT NONE
@@ -2413,7 +2469,6 @@ contains
 
   SUBROUTINE EDGEP(EL,BN,H1,H2,FINT,HGAP,I,X)
     IMPLICIT NONE
-    logical(lp) :: doneitt=.true.
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8),INTENT(IN)::FINT,HGAP,H1,H2
     TYPE(REAL_8),INTENT(IN),dimension(:)::BN
@@ -4772,7 +4827,7 @@ contains
     TYPE(REAL_8) DK,DK2,DK4,DK5,DK6,DKT
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL ALLOC(DK)
+    CALL ALLOC(DKT)
     DKT=EL%L/EL%P%NST
     CALL ALLOC(EL)
     CALL GETMATSOL(EL,X)
@@ -4871,7 +4926,7 @@ contains
        call write_e(357)
     END SELECT
 
-    CALL KILL(DK)
+    CALL KILL(DKT)
 
   END SUBROUTINE INTSOLP
 
@@ -4885,7 +4940,7 @@ contains
 
 
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL ALLOC(DK)
+    CALL ALLOC(DKT)
     DKT=EL%L/EL%P%NST
     CALL ALLOC(EL)
     CALL GETMATSOL(EL,X)
@@ -4984,79 +5039,10 @@ contains
        call write_e(357)
     END SELECT
 
+    CALL KILL(DKT)
+
   END SUBROUTINE INTSOLS
 
-  SUBROUTINE ALLOCSOL(EL)
-    IMPLICIT NONE
-    TYPE(SOLTP), INTENT(INOUT)::EL
-    INTEGER I,J
-
-    DO I=1,4
-       DO J=1,4
-          CALL ALLOC(EL%MAT(I,J))
-       ENDDO
-    ENDDO
-
-    DO I=0,10
-       CALL ALLOC(EL%LXY(I))
-    ENDDO
-
-  END SUBROUTINE ALLOCSOL
-
-  SUBROUTINE KILLSOL(EL)
-    IMPLICIT NONE
-    TYPE(SOLTP), INTENT(INOUT)::EL
-    INTEGER I,J
-
-    DO I=1,4
-       DO J=1,4
-          CALL KILL(EL%MAT(I,J))
-       ENDDO
-    ENDDO
-
-    DO I=0,10
-       CALL KILL(EL%LXY(I))
-    ENDDO
-
-  END SUBROUTINE KILLSOL
-
-  SUBROUTINE ZEROr_SOL(EL,I)
-    IMPLICIT NONE
-    TYPE(SOLT), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%MAT)) then
-          deallocate(EL%MAT)
-          deallocate(EL%LXY)
-       endif
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%MAT)
-       NULLIFY(EL%LXY)
-    endif
-
-  END SUBROUTINE ZEROr_SOL
-
-  SUBROUTINE ZEROP_SOL(EL,I)
-    IMPLICIT NONE
-    TYPE(SOLTP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k,j
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%MAT)) then
-          deallocate(EL%MAT)
-          deallocate(EL%LXY)
-       endif
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%MAT)
-       NULLIFY(EL%LXY)
-    endif
-
-  END SUBROUTINE ZEROP_SOL
 
   SUBROUTINE SYMPINTSOLTR(EL,X,MID)
     IMPLICIT NONE
@@ -6729,214 +6715,6 @@ contains
   END SUBROUTINE SYMPINTKTKS
 
 
-  SUBROUTINE ZEROr_mon(EL,I)
-    IMPLICIT NONE
-    TYPE(MON), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%x)) deallocate(EL%x)
-       if(ASSOCIATED(EL%y)) deallocate(EL%y)
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%x)
-       NULLIFY(EL%y)
-
-    endif
-
-
-  END SUBROUTINE ZEROr_mon
-
-  SUBROUTINE ZEROP_mon(EL,I)
-    IMPLICIT NONE
-    TYPE(MONP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k,j
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%x)) deallocate(EL%x)
-       if(ASSOCIATED(EL%y)) deallocate(EL%y)
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%x)
-       NULLIFY(EL%y)
-
-    endif
-
-  END SUBROUTINE ZEROP_mon
-
-  SUBROUTINE ZEROr_RCOL(EL,I)
-    IMPLICIT NONE
-    TYPE(RCOL), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%A)
-
-    endif
-
-
-  END SUBROUTINE ZEROr_RCOL
-
-  SUBROUTINE ZEROP_RCOL(EL,I)
-    IMPLICIT NONE
-    TYPE(RCOLP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k,j
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%A)
-
-    endif
-
-  END SUBROUTINE ZEROP_RCOL
-
-
-  SUBROUTINE ZEROr_ECOL(EL,I)
-    IMPLICIT NONE
-    TYPE(ECOL), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%A)
-
-    endif
-
-  END SUBROUTINE ZEROr_ECOL
-
-  SUBROUTINE ZEROP_ECOL(EL,I)
-    IMPLICIT NONE
-    TYPE(ECOLP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k,j
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%A)
-
-    endif
-
-  END SUBROUTINE ZEROP_ECOL
-
-
-  SUBROUTINE ZEROr_KTK(EL,I)
-    IMPLICIT NONE
-    TYPE(KTK), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%MATX)) then
-          deallocate(EL%MATX)
-          deallocate(EL%LX)
-       endif
-       if(ASSOCIATED(EL%MATY)) then
-          deallocate(EL%MATY)
-          deallocate(EL%LY)
-       endif
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%MATX)
-       NULLIFY(EL%MATY)
-       NULLIFY(EL%LX)
-       NULLIFY(EL%LY)
-    endif
-
-  END SUBROUTINE ZEROr_KTK
-
-  SUBROUTINE ZEROP_KTK(EL,I)
-    IMPLICIT NONE
-    TYPE(KTKP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k,j
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%MATX)) then
-          deallocate(EL%MATX)
-          deallocate(EL%LX)
-       endif
-       if(ASSOCIATED(EL%MATY)) then
-          deallocate(EL%MATY)
-          deallocate(EL%LY)
-       endif
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%MATX)
-       NULLIFY(EL%MATY)
-       NULLIFY(EL%LX)
-       NULLIFY(EL%LY)
-
-    endif
-
-  END SUBROUTINE ZEROP_KTK
-
-  SUBROUTINE ALLOCKTK(EL)
-    IMPLICIT NONE
-    TYPE(KTKP), INTENT(INOUT)::EL
-    INTEGER I,J
-
-    DO I=1,2
-       DO J=1,3
-          CALL ALLOC(EL%MATX(I,J))
-          CALL ALLOC(EL%MATY(I,J))
-       ENDDO
-    ENDDO
-
-    DO I=1,6
-       CALL ALLOC(EL%LX(I))
-    ENDDO
-    DO I=1,3
-       CALL ALLOC(EL%LY(I))
-    ENDDO
-
-  END SUBROUTINE ALLOCKTK
-
-  SUBROUTINE KILLKTK(EL)
-    IMPLICIT NONE
-    TYPE(KTKP), INTENT(INOUT)::EL
-    INTEGER I,J
-
-    DO I=1,2
-       DO J=1,3
-          CALL KILL(EL%MATX(I,J))
-          CALL KILL(EL%MATY(I,J))
-       ENDDO
-    ENDDO
-
-    DO I=1,6
-       CALL KILL(EL%LX(I))
-    ENDDO
-    DO I=1,3
-       CALL KILL(EL%LY(I))
-    ENDDO
-
-  END SUBROUTINE KILLKTK
 
 !!!! *************************************************************** !!!!
 !!!! *                 End of the slow thick element               * !!!!
@@ -7411,7 +7189,8 @@ contains
 
     DO I=1,4
        DO J=1,4
-          CALL KILL(HX(I,J));CALL KILL(HY(I,J))
+          CALL KILL(HX(I,J))
+          CALL KILL(HY(I,J))
        ENDDO
     ENDDO
     CALL KILL(DH)
@@ -8541,149 +8320,6 @@ contains
 
   END SUBROUTINE SYMPINTTKT7S
 
-  SUBROUTINE ZEROr_TKT7(EL,I)
-    IMPLICIT NONE
-    TYPE(TKTF), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%MATX)) then
-          deallocate(EL%MATX)
-       endif
-       if(ASSOCIATED(EL%MATY)) then
-          deallocate(EL%MATY)
-       endif
-       if(ASSOCIATED(EL%LX)) then
-          deallocate(EL%LX)
-       endif
-       if(ASSOCIATED(EL%RMATX)) then
-          deallocate(EL%RMATX)
-       endif
-       if(ASSOCIATED(EL%RMATY)) then
-          deallocate(EL%RMATY)
-       endif
-       if(ASSOCIATED(EL%RLX)) then
-          deallocate(EL%RLX)
-       endif
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%MATX)
-       NULLIFY(EL%MATY)
-       NULLIFY(EL%LX)
-       NULLIFY(EL%RMATX)
-       NULLIFY(EL%RMATY)
-       NULLIFY(EL%RLX)
-    endif
-
-  END SUBROUTINE ZEROr_TKT7
-
-  SUBROUTINE ZEROP_TKT7(EL,I)
-    IMPLICIT NONE
-    TYPE(TKTFP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    integer k,j
-
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%MATX)) then
-          DO K=1,2
-             DO J=1,3
-                CALL KILL(EL%MATX(K,J))   ! not used, will be used locally only
-             ENDDO
-          ENDDO
-          deallocate(EL%MATX)
-       endif
-       if(ASSOCIATED(EL%MATY)) then
-          DO K=1,2
-             DO J=1,3
-                CALL KILL(EL%MATY(K,J))   ! not used, will be used locally only
-             ENDDO
-          ENDDO
-          deallocate(EL%MATY)
-       endif
-
-       if(ASSOCIATED(EL%LX)) then
-          DO J=1,3
-             CALL KILL(EL%LX(J))   ! not used, will be used locally only
-          ENDDO
-          deallocate(EL%LX)
-       endif
-       if(ASSOCIATED(EL%RMATX)) then
-          DO K=1,2
-             DO J=1,3
-                CALL KILL(EL%RMATX(K,J))   ! not used, will be used locally only
-             ENDDO
-          ENDDO
-          deallocate(EL%RMATX)
-       endif
-       if(ASSOCIATED(EL%RMATY)) then
-          DO K=1,2
-             DO J=1,3
-                CALL KILL(EL%RMATY(K,J))   ! not used, will be used locally only
-             ENDDO
-          ENDDO
-          deallocate(EL%RMATY)
-       endif
-
-       if(ASSOCIATED(EL%RLX)) then
-          DO J=1,3
-             CALL KILL(EL%RLX(J))   ! not used, will be used locally only
-          ENDDO
-          deallocate(EL%RLX)
-       endif
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%MATX)
-       NULLIFY(EL%MATY)
-       NULLIFY(EL%LX)
-       NULLIFY(EL%RMATX)
-       NULLIFY(EL%RMATY)
-       NULLIFY(EL%RLX)
-
-    endif
-
-  END SUBROUTINE ZEROP_TKT7
-
-  SUBROUTINE ALLOCTKT7(EL)
-    IMPLICIT NONE
-    TYPE(TKTFP), INTENT(INOUT)::EL
-    INTEGER I,J
-
-    DO I=1,2
-       DO J=1,3
-          CALL ALLOC(EL%MATX(I,J))
-          CALL ALLOC(EL%MATY(I,J))
-          CALL ALLOC(EL%RMATX(I,J))
-          CALL ALLOC(EL%RMATY(I,J))
-       ENDDO
-    ENDDO
-
-    DO I=1,3
-       CALL ALLOC(EL%LX(I))
-       CALL ALLOC(EL%RLX(I))
-    ENDDO
-
-  END SUBROUTINE ALLOCTKT7
-
-  SUBROUTINE KILLTKT7(EL)
-    IMPLICIT NONE
-    TYPE(TKTFP), INTENT(INOUT)::EL
-    INTEGER I,J
-
-    DO I=1,2
-       DO J=1,3
-          CALL KILL(EL%MATX(I,J))
-          CALL KILL(EL%MATY(I,J))
-          CALL KILL(EL%RMATX(I,J))
-          CALL KILL(EL%RMATY(I,J))
-       ENDDO
-    ENDDO
-    DO I=1,3
-       CALL KILL(EL%LX(I))
-       CALL KILL(EL%RLX(I))
-    ENDDO
-
-  END SUBROUTINE KILLTKT7
 
   SUBROUTINE EXPR7(H,MATOUT,LX)
     IMPLICIT NONE
@@ -10276,150 +9912,6 @@ contains
 
   END SUBROUTINE GETANBNP
 
-  SUBROUTINE ZEROr_teapot(EL,I)
-    IMPLICIT NONE
-    TYPE(TEAPOT), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%bf_x)) then
-          deallocate(EL%bf_x)
-       endif
-       if(ASSOCIATED(EL%bf_y)) then
-          deallocate(EL%bf_y)
-       endif
-       if(ASSOCIATED(EL%DRIFTKICK)) then
-          deallocate(EL%DRIFTKICK)
-       endif
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%bf_x)
-       NULLIFY(EL%bf_y)
-       NULLIFY(EL%DRIFTKICK)
-    endif
-
-  END SUBROUTINE ZEROr_teapot
-
-  SUBROUTINE ZEROP_teapot(EL,I)
-    IMPLICIT NONE
-    TYPE(TEAPOTP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%bf_x)) then
-          CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
-          deallocate(EL%bf_x)
-       endif
-       if(ASSOCIATED(EL%bf_Y)) then
-          CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
-          deallocate(EL%bf_Y)
-       endif
-       if(ASSOCIATED(EL%DRIFTKICK)) then
-          deallocate(EL%DRIFTKICK)
-       endif
-
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%bf_x)
-       NULLIFY(EL%bf_Y)
-       NULLIFY(EL%DRIFTKICK)
-
-    endif
-
-  END SUBROUTINE ZEROP_teapot
-
-  SUBROUTINE ZEROR_CAV4(EL,I)
-    IMPLICIT NONE
-    TYPE(CAV4), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%N_BESSEL)) then
-          deallocate(EL%N_BESSEL)
-       endif
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%N_BESSEL)
-    endif
-
-  END SUBROUTINE ZEROR_CAV4
-
-  SUBROUTINE ZEROP_CAV4(EL,I)
-    IMPLICIT NONE
-    TYPE(CAV4P), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%N_BESSEL)) then
-          deallocate(EL%N_BESSEL)
-       endif
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%N_BESSEL)
-    endif
-
-  END SUBROUTINE ZEROP_CAV4
-
-
-  SUBROUTINE ZEROr_STREX(EL,I)
-    IMPLICIT NONE
-    TYPE(STREX), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%DRIFTKICK)) then
-          deallocate(EL%DRIFTKICK)
-       endif
-       if(ASSOCIATED(EL%LIKEMAD)) then
-          deallocate(EL%LIKEMAD)
-       endif
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%DRIFTKICK)
-       NULLIFY(EL%LIKEMAD)
-    endif
-
-  END SUBROUTINE ZEROr_STREX
-
-  SUBROUTINE ZEROP_STREX(EL,I)
-    IMPLICIT NONE
-    TYPE(STREXP), INTENT(INOUT)::EL
-    INTEGER, INTENT(IN)::I
-    !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%DRIFTKICK)) then
-          deallocate(EL%DRIFTKICK)
-       endif
-       if(ASSOCIATED(EL%LIKEMAD)) then
-          deallocate(EL%LIKEMAD)
-       endif
-       NULLIFY(EL%LIKEMAD)
-    elseif(i==0)       then          ! nullifies
-
-       NULLIFY(EL%DRIFTKICK)
-    endif
-
-  END SUBROUTINE ZEROP_STREX
-
-
-  SUBROUTINE ALLOCTEAPOT(EL)
-    IMPLICIT NONE
-    TYPE(TEAPOTP), INTENT(INOUT)::EL
-
-    CALL ALLOC(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
-    CALL ALLOC(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
-
-  END SUBROUTINE ALLOCTEAPOT
-
-  SUBROUTINE KILLTEAPOT(EL)
-    IMPLICIT NONE
-    TYPE(TEAPOTP), INTENT(INOUT)::EL
-
-    CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
-    CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
-
-  END SUBROUTINE KILLTEAPOT
-
 
 
 
@@ -11467,6 +10959,8 @@ contains
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
+       CALL ALLOC(DH)
+       CALL ALLOC(D)
        DH=EL%L/two/EL%P%NST
        D=EL%L/EL%P%NST
        DD=EL%P%LD/two/EL%P%NST
@@ -12261,7 +11755,6 @@ contains
     IMPLICIT NONE
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
-    LOGICAL(LP) EXACT
 
     !    EXACT=.TRUE.
     !       CALL ROT_XY(EL%PHAS,X,EXACT)
@@ -14266,7 +13759,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(CAV_TRAV),INTENT(INOUT):: EL
     integer, intent(in) :: i
-    real(dp) C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI
+    real(dp) C1,S1,C2,S2,V,O,Z0,CPSI,SPSI
     integer eps1,eps2
 
     IF(EL%P%NOCAVITY) RETURN
@@ -14376,7 +13869,6 @@ contains
     TYPE(REAL_8)  X(6)
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     integer, intent(in) :: i
-    integer k
 
     CALL ALLOC(X)
     X=Y
@@ -14429,7 +13921,9 @@ contains
     TYPE(REAL_8) X(6)
 
     CALL ALLOC(X,6)
+    X=Y
     CALL DRIFT(DH,DD,EL,Z0,I,X)
+    Y=X
     CALL KILL(X,6)
 
   END SUBROUTINE DRIFT_CAVS
@@ -14545,9 +14039,9 @@ contains
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
 
     CALL ALLOC(X,6)
-
+    X=Y
     CALL KICKCAV(EL,YL,Z0,X)
-
+    Y=X
     CALL KILL(X,6)
   END SUBROUTINE KICKCAVS_TRAV
 
@@ -14588,6 +14082,625 @@ contains
     endif
 
   END SUBROUTINE ZEROP_CAV_TRAV
+
+
+  SUBROUTINE ZEROr_SOL(EL,I)
+    IMPLICIT NONE
+    TYPE(SOLT), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%MAT)) then
+          deallocate(EL%MAT)
+          deallocate(EL%LXY)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%MAT)
+       NULLIFY(EL%LXY)
+    endif
+
+  END SUBROUTINE ZEROr_SOL
+
+  SUBROUTINE ZEROP_SOL(EL,I)
+    IMPLICIT NONE
+    TYPE(SOLTP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k,j
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%MAT)) then
+          deallocate(EL%MAT)
+          deallocate(EL%LXY)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%MAT)
+       NULLIFY(EL%LXY)
+    endif
+
+  END SUBROUTINE ZEROP_SOL
+
+  SUBROUTINE ZEROr_mon(EL,I)
+    IMPLICIT NONE
+    TYPE(MON), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%x)) deallocate(EL%x)
+       if(ASSOCIATED(EL%y)) deallocate(EL%y)
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%x)
+       NULLIFY(EL%y)
+
+    endif
+
+
+  END SUBROUTINE ZEROr_mon
+
+  SUBROUTINE ZEROP_mon(EL,I)
+    IMPLICIT NONE
+    TYPE(MONP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k,j
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%x)) deallocate(EL%x)
+       if(ASSOCIATED(EL%y)) deallocate(EL%y)
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%x)
+       NULLIFY(EL%y)
+
+    endif
+
+  END SUBROUTINE ZEROP_mon
+
+  SUBROUTINE ZEROr_RCOL(EL,I)
+    IMPLICIT NONE
+    TYPE(RCOL), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%A)) THEN
+          CALL KILL(EL%A)
+          deallocate(EL%A)
+       ENDIF
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%A)
+
+    endif
+
+
+  END SUBROUTINE ZEROr_RCOL
+
+  SUBROUTINE ZEROP_RCOL(EL,I)
+    IMPLICIT NONE
+    TYPE(RCOLP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k,j
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%A)) THEN
+          CALL KILL(EL%A)
+          deallocate(EL%A)
+       ENDIF
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%A)
+
+    endif
+
+  END SUBROUTINE ZEROP_RCOL
+
+
+  SUBROUTINE ZEROr_ECOL(EL,I)
+    IMPLICIT NONE
+    TYPE(ECOL), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%A)) THEN
+          CALL KILL(EL%A)
+          deallocate(EL%A)
+       ENDIF
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%A)
+
+    endif
+
+  END SUBROUTINE ZEROr_ECOL
+
+  SUBROUTINE ZEROP_ECOL(EL,I)
+    IMPLICIT NONE
+    TYPE(ECOLP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k,j
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%A)) THEN
+          CALL KILL(EL%A)
+          deallocate(EL%A)
+       ENDIF
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%A)
+
+    endif
+
+  END SUBROUTINE ZEROP_ECOL
+
+
+  SUBROUTINE ZEROr_KTK(EL,I)
+    IMPLICIT NONE
+    TYPE(KTK), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%MATX)) then
+          deallocate(EL%MATX)
+          deallocate(EL%LX)
+       endif
+       if(ASSOCIATED(EL%MATY)) then
+          deallocate(EL%MATY)
+          deallocate(EL%LY)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%MATX)
+       NULLIFY(EL%MATY)
+       NULLIFY(EL%LX)
+       NULLIFY(EL%LY)
+    endif
+
+  END SUBROUTINE ZEROr_KTK
+
+  SUBROUTINE ZEROP_KTK(EL,I)
+    IMPLICIT NONE
+    TYPE(KTKP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k,j
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%MATX)) then
+          deallocate(EL%MATX)
+          deallocate(EL%LX)
+       endif
+       if(ASSOCIATED(EL%MATY)) then
+          deallocate(EL%MATY)
+          deallocate(EL%LY)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%MATX)
+       NULLIFY(EL%MATY)
+       NULLIFY(EL%LX)
+       NULLIFY(EL%LY)
+
+    endif
+
+  END SUBROUTINE ZEROP_KTK
+
+  SUBROUTINE ALLOCKTK(EL)
+    IMPLICIT NONE
+    TYPE(KTKP), INTENT(INOUT)::EL
+    INTEGER I,J
+
+    DO I=1,2
+       DO J=1,3
+          CALL ALLOC(EL%MATX(I,J))
+          CALL ALLOC(EL%MATY(I,J))
+       ENDDO
+    ENDDO
+
+    DO I=1,6
+       CALL ALLOC(EL%LX(I))
+    ENDDO
+    DO I=1,3
+       CALL ALLOC(EL%LY(I))
+    ENDDO
+
+  END SUBROUTINE ALLOCKTK
+
+  SUBROUTINE KILLKTK(EL)
+    IMPLICIT NONE
+    TYPE(KTKP), INTENT(INOUT)::EL
+    INTEGER I,J
+
+    DO I=1,2
+       DO J=1,3
+          CALL KILL(EL%MATX(I,J))
+          CALL KILL(EL%MATY(I,J))
+       ENDDO
+    ENDDO
+
+    DO I=1,6
+       CALL KILL(EL%LX(I))
+    ENDDO
+    DO I=1,3
+       CALL KILL(EL%LY(I))
+    ENDDO
+
+  END SUBROUTINE KILLKTK
+
+  SUBROUTINE ZEROr_TKT7(EL,I)
+    IMPLICIT NONE
+    TYPE(TKTF), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%MATX)) then
+          deallocate(EL%MATX)
+       endif
+       if(ASSOCIATED(EL%MATY)) then
+          deallocate(EL%MATY)
+       endif
+       if(ASSOCIATED(EL%LX)) then
+          deallocate(EL%LX)
+       endif
+       if(ASSOCIATED(EL%RMATX)) then
+          deallocate(EL%RMATX)
+       endif
+       if(ASSOCIATED(EL%RMATY)) then
+          deallocate(EL%RMATY)
+       endif
+       if(ASSOCIATED(EL%RLX)) then
+          deallocate(EL%RLX)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%MATX)
+       NULLIFY(EL%MATY)
+       NULLIFY(EL%LX)
+       NULLIFY(EL%RMATX)
+       NULLIFY(EL%RMATY)
+       NULLIFY(EL%RLX)
+    endif
+
+  END SUBROUTINE ZEROr_TKT7
+
+  SUBROUTINE ZEROP_TKT7(EL,I)
+    IMPLICIT NONE
+    TYPE(TKTFP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    integer k,j
+
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%MATX)) then
+          DO K=1,2
+             DO J=1,3
+                CALL KILL(EL%MATX(K,J))   ! not used, will be used locally only
+             ENDDO
+          ENDDO
+          deallocate(EL%MATX)
+       endif
+       if(ASSOCIATED(EL%MATY)) then
+          DO K=1,2
+             DO J=1,3
+                CALL KILL(EL%MATY(K,J))   ! not used, will be used locally only
+             ENDDO
+          ENDDO
+          deallocate(EL%MATY)
+       endif
+
+       if(ASSOCIATED(EL%LX)) then
+          DO J=1,3
+             CALL KILL(EL%LX(J))   ! not used, will be used locally only
+          ENDDO
+          deallocate(EL%LX)
+       endif
+       if(ASSOCIATED(EL%RMATX)) then
+          DO K=1,2
+             DO J=1,3
+                CALL KILL(EL%RMATX(K,J))   ! not used, will be used locally only
+             ENDDO
+          ENDDO
+          deallocate(EL%RMATX)
+       endif
+       if(ASSOCIATED(EL%RMATY)) then
+          DO K=1,2
+             DO J=1,3
+                CALL KILL(EL%RMATY(K,J))   ! not used, will be used locally only
+             ENDDO
+          ENDDO
+          deallocate(EL%RMATY)
+       endif
+
+       if(ASSOCIATED(EL%RLX)) then
+          DO J=1,3
+             CALL KILL(EL%RLX(J))   ! not used, will be used locally only
+          ENDDO
+          deallocate(EL%RLX)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%MATX)
+       NULLIFY(EL%MATY)
+       NULLIFY(EL%LX)
+       NULLIFY(EL%RMATX)
+       NULLIFY(EL%RMATY)
+       NULLIFY(EL%RLX)
+
+    endif
+
+  END SUBROUTINE ZEROP_TKT7
+
+  SUBROUTINE ALLOCTKT7(EL)
+    IMPLICIT NONE
+    TYPE(TKTFP), INTENT(INOUT)::EL
+    INTEGER I,J
+
+    DO I=1,2
+       DO J=1,3
+          CALL ALLOC(EL%MATX(I,J))
+          CALL ALLOC(EL%MATY(I,J))
+          CALL ALLOC(EL%RMATX(I,J))
+          CALL ALLOC(EL%RMATY(I,J))
+       ENDDO
+    ENDDO
+
+    DO I=1,3
+       CALL ALLOC(EL%LX(I))
+       CALL ALLOC(EL%RLX(I))
+    ENDDO
+
+  END SUBROUTINE ALLOCTKT7
+
+  SUBROUTINE KILLTKT7(EL)
+    IMPLICIT NONE
+    TYPE(TKTFP), INTENT(INOUT)::EL
+    INTEGER I,J
+
+    DO I=1,2
+       DO J=1,3
+          CALL KILL(EL%MATX(I,J))
+          CALL KILL(EL%MATY(I,J))
+          CALL KILL(EL%RMATX(I,J))
+          CALL KILL(EL%RMATY(I,J))
+       ENDDO
+    ENDDO
+    DO I=1,3
+       CALL KILL(EL%LX(I))
+       CALL KILL(EL%RLX(I))
+    ENDDO
+
+  END SUBROUTINE KILLTKT7
+
+  SUBROUTINE ZEROr_teapot(EL,I)
+    IMPLICIT NONE
+    TYPE(TEAPOT), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%bf_x)) then
+          deallocate(EL%bf_x)
+       endif
+       if(ASSOCIATED(EL%bf_y)) then
+          deallocate(EL%bf_y)
+       endif
+       if(ASSOCIATED(EL%DRIFTKICK)) then
+          deallocate(EL%DRIFTKICK)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%bf_x)
+       NULLIFY(EL%bf_y)
+       NULLIFY(EL%DRIFTKICK)
+    endif
+
+  END SUBROUTINE ZEROr_teapot
+
+  SUBROUTINE ZEROP_teapot(EL,I)
+    IMPLICIT NONE
+    TYPE(TEAPOTP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%bf_x)) then
+          CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
+          deallocate(EL%bf_x)
+       endif
+       if(ASSOCIATED(EL%bf_Y)) then
+          CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
+          deallocate(EL%bf_Y)
+       endif
+       if(ASSOCIATED(EL%DRIFTKICK)) then
+          deallocate(EL%DRIFTKICK)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%bf_x)
+       NULLIFY(EL%bf_Y)
+       NULLIFY(EL%DRIFTKICK)
+
+    endif
+
+  END SUBROUTINE ZEROP_teapot
+
+  SUBROUTINE ZEROR_CAV4(EL,I)
+    IMPLICIT NONE
+    TYPE(CAV4), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%N_BESSEL)) then
+          deallocate(EL%N_BESSEL)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%N_BESSEL)
+    endif
+
+  END SUBROUTINE ZEROR_CAV4
+
+  SUBROUTINE ZEROP_CAV4(EL,I)
+    IMPLICIT NONE
+    TYPE(CAV4P), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%N_BESSEL)) then
+          deallocate(EL%N_BESSEL)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%N_BESSEL)
+    endif
+
+  END SUBROUTINE ZEROP_CAV4
+
+  SUBROUTINE ZEROR_KICKT3(EL,I)
+    IMPLICIT NONE
+    TYPE(KICKT3), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%thin_h_foc)) then
+          deallocate(EL%thin_h_foc)
+          deallocate(EL%thin_v_foc)
+          deallocate(EL%thin_h_angle)
+          deallocate(EL%thin_v_angle)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+          NULLIFY(EL%thin_h_foc)
+          NULLIFY(EL%thin_v_foc)
+          NULLIFY(EL%thin_h_angle)
+          NULLIFY(EL%thin_v_angle)
+    endif
+
+  END SUBROUTINE ZEROR_KICKT3
+
+  SUBROUTINE ZEROP_KICKT3(EL,I)
+    IMPLICIT NONE
+    TYPE(KICKT3P), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%thin_h_foc)) then
+          CALL KILL(EL%thin_h_foc)
+          CALL KILL(EL%thin_v_foc)
+          CALL KILL(EL%thin_h_angle)
+          CALL KILL(EL%thin_v_angle)
+
+          deallocate(EL%thin_h_foc)
+          deallocate(EL%thin_v_foc)
+          deallocate(EL%thin_h_angle)
+          deallocate(EL%thin_v_angle)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+          NULLIFY(EL%thin_h_foc)
+          NULLIFY(EL%thin_v_foc)
+          NULLIFY(EL%thin_h_angle)
+          NULLIFY(EL%thin_v_angle)
+    endif
+
+  END SUBROUTINE ZEROP_KICKT3
+
+
+  SUBROUTINE ZEROr_STREX(EL,I)
+    IMPLICIT NONE
+    TYPE(STREX), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%DRIFTKICK)) then
+          deallocate(EL%DRIFTKICK)
+       endif
+       if(ASSOCIATED(EL%LIKEMAD)) then
+          deallocate(EL%LIKEMAD)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%DRIFTKICK)
+       NULLIFY(EL%LIKEMAD)
+    endif
+
+  END SUBROUTINE ZEROr_STREX
+
+  SUBROUTINE ZEROP_STREX(EL,I)
+    IMPLICIT NONE
+    TYPE(STREXP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%DRIFTKICK)) then
+          deallocate(EL%DRIFTKICK)
+       endif
+       if(ASSOCIATED(EL%LIKEMAD)) then
+          deallocate(EL%LIKEMAD)
+       endif
+       NULLIFY(EL%LIKEMAD)
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%DRIFTKICK)
+    endif
+
+  END SUBROUTINE ZEROP_STREX
+
+
+  SUBROUTINE ALLOCTEAPOT(EL)
+    IMPLICIT NONE
+    TYPE(TEAPOTP), INTENT(INOUT)::EL
+
+    CALL ALLOC(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
+    CALL ALLOC(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
+
+  END SUBROUTINE ALLOCTEAPOT
+
+  SUBROUTINE KILLTEAPOT(EL)
+    IMPLICIT NONE
+    TYPE(TEAPOTP), INTENT(INOUT)::EL
+
+    CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
+    CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
+
+  END SUBROUTINE KILLTEAPOT
+  SUBROUTINE ALLOCSOL(EL)
+    IMPLICIT NONE
+    TYPE(SOLTP), INTENT(INOUT)::EL
+    INTEGER I,J
+
+    DO I=1,4
+       DO J=1,4
+          CALL ALLOC(EL%MAT(I,J))
+       ENDDO
+    ENDDO
+
+    DO I=0,10
+       CALL ALLOC(EL%LXY(I))
+    ENDDO
+
+  END SUBROUTINE ALLOCSOL
+
+  SUBROUTINE KILLSOL(EL)
+    IMPLICIT NONE
+    TYPE(SOLTP), INTENT(INOUT)::EL
+    INTEGER I,J
+
+    DO I=1,4
+       DO J=1,4
+          CALL KILL(EL%MAT(I,J))
+       ENDDO
+    ENDDO
+
+    DO I=0,10
+       CALL KILL(EL%LXY(I))
+    ENDDO
+
+  END SUBROUTINE KILLSOL
+
 
 
 END MODULE S_DEF_KIND

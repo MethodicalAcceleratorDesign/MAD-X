@@ -262,7 +262,7 @@ module precision_constants
      logical(lp),pointer :: FEED_P0C   !=.FALSE.  work takes p0c instead of energy
      logical(lp),pointer :: ALWAYS_EXACT_PATCHING  !=.TRUE. patching done correctly
      ! used to output horror messages
-     logical,pointer :: escape_da !=.false.  interrupts DA if check_da is true
+     logical,pointer :: stable_da !=.true.  interrupts DA if check_da is true
      logical,pointer :: check_da  !=.true.
      logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK  !=.true.
      real(dp),pointer :: phase0 ! default phase in cavity

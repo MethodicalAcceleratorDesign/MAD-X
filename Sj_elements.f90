@@ -217,7 +217,6 @@ contains
     !  Show a user want to add a magnet with corckscrew survey
     !  his survey would have to be "caught" in this interface
 
-
     SELECT CASE(EL%KIND)
     case(kind0:KINDUSER2)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)

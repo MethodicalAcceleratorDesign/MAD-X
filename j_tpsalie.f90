@@ -264,7 +264,7 @@ contains
     TYPE (taylor) mul_PBf_t
     TYPE (PBfield), INTENT (IN) :: S1
     TYPE (taylor)  , INTENT (IN) :: S2
-    integer localmaster,i,J
+    integer localmaster
     localmaster=master
     call ass(mul_PBf_t)
 
@@ -1047,7 +1047,6 @@ contains
     TYPE (PBFIELD) CUTORDERPB
     TYPE (PBFIELD), INTENT (IN) :: S1
     INTEGER, INTENT (IN) :: S2
-    INTEGER I
     integer localmaster
     localmaster=master
 
@@ -2207,7 +2206,6 @@ contains
     implicit none
     type (radTAYLOR),INTENT(inOUT)::S2
     type (TAYLOR),INTENT(IN)::S1
-    integer localmaster
     call check_snake
 
     !     if(iass0>ndum) then

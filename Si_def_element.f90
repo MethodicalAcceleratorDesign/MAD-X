@@ -698,15 +698,21 @@ CONTAINS
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
     CASE(KIND3)
-       if(.not.ASSOCIATED(EL%K3))ALLOCATE(EL%K3)
+       if(.not.ASSOCIATED(EL%K3)) THEN
+          ALLOCATE(EL%K3)
+          el%K3=0
+       ELSE
+          el%K3=-1
+          el%K3=0
+       ENDIF
        EL%K3%P=>EL%P
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%K3%AN=>EL%AN
        EL%K3%BN=>EL%BN
-       EL%K3%thin_h_foc=>EL%thin_h_foc
-       EL%K3%thin_v_foc=>EL%thin_v_foc
-       EL%K3%thin_h_angle=>EL%thin_h_angle
-       EL%K3%thin_v_angle=>EL%thin_v_angle
+       ALLOCATE(EL%K3%thin_h_foc);EL%K3%thin_h_foc=0
+       ALLOCATE(EL%K3%thin_v_foc);EL%K3%thin_v_foc=0
+       ALLOCATE(EL%K3%thin_h_angle);EL%K3%thin_h_angle=0
+       ALLOCATE(EL%K3%thin_v_angle);EL%K3%thin_v_angle=0
     CASE(KIND4)
        if(.not.ASSOCIATED(EL%C4)) THEN
           ALLOCATE(EL%C4)
@@ -741,7 +747,7 @@ CONTAINS
        EL%CAV21%DELTA_E=>EL%DELTA_E
        EL%CAV21%THIN=>EL%THIN
        ALLOCATE(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
-       ALLOCATE(EL%CAV21%DPHAS);EL%CAV21%DPHAS=0
+       ALLOCATE(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -1045,15 +1051,21 @@ CONTAINS
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
     CASE(KIND3)
-       if(.not.ASSOCIATED(EL%K3))ALLOCATE(EL%K3)
+       if(.not.ASSOCIATED(EL%K3)) THEN
+          ALLOCATE(EL%K3)
+          el%K3=0
+       ELSE
+          el%K3=-1
+          el%K3=0
+       ENDIF
        EL%K3%P=>EL%P
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%K3%AN=>EL%AN
        EL%K3%BN=>EL%BN
-       EL%K3%thin_h_foc=>EL%thin_h_foc
-       EL%K3%thin_v_foc=>EL%thin_v_foc
-       EL%K3%thin_h_angle=>EL%thin_h_angle
-       EL%K3%thin_v_angle=>EL%thin_v_angle
+       ALLOCATE(EL%K3%thin_h_foc);CALL ALLOC(EL%K3%thin_h_foc);EL%K3%thin_h_foc=ZERO
+       ALLOCATE(EL%K3%thin_v_foc);CALL ALLOC(EL%K3%thin_v_foc);EL%K3%thin_v_foc=ZERO
+       ALLOCATE(EL%K3%thin_h_angle);CALL ALLOC(EL%K3%thin_h_angle);EL%K3%thin_h_angle=ZERO
+       ALLOCATE(EL%K3%thin_v_angle);CALL ALLOC(EL%K3%thin_v_angle);EL%K3%thin_v_angle=ZERO
     CASE(KIND4)
        if(.not.ASSOCIATED(EL%C4)) THEN
           ALLOCATE(EL%C4)
@@ -1706,8 +1718,6 @@ CONTAINS
     nullify(EL%AN);nullify(EL%BN);
     nullify(EL%FINT);nullify(EL%HGAP);
     nullify(EL%H1);nullify(EL%H2);
-    nullify(EL%thin_h_foc);nullify(EL%thin_v_foc);
-    nullify(EL%thin_h_angle);nullify(EL%thin_v_angle);
     nullify(EL%VOLT);nullify(EL%FREQ);nullify(EL%PHAS);nullify(EL%DELTA_E);
     nullify(EL%B_SOL);
     nullify(EL%THIN);
@@ -1749,8 +1759,6 @@ CONTAINS
     nullify(EL%AN);nullify(EL%BN);
     nullify(EL%FINT);nullify(EL%HGAP);
     nullify(EL%H1);nullify(EL%H2);
-    nullify(EL%thin_h_foc);nullify(EL%thin_v_foc);
-    nullify(EL%thin_h_angle);nullify(EL%thin_v_angle);
     nullify(EL%VOLT);nullify(EL%FREQ);nullify(EL%PHAS);nullify(EL%DELTA_E);
     nullify(EL%B_SOL);
     nullify(EL%THIN);
@@ -1803,10 +1811,6 @@ CONTAINS
        IF(ASSOCIATED(EL%HGAP)) DEALLOCATE(EL%HGAP)
        IF(ASSOCIATED(EL%H1)) DEALLOCATE(EL%H1)
        IF(ASSOCIATED(EL%H2)) DEALLOCATE(EL%H2)
-       IF(ASSOCIATED(EL%thin_h_foc)) DEALLOCATE(EL%thin_h_foc)
-       IF(ASSOCIATED(EL%thin_v_foc)) DEALLOCATE(EL%thin_v_foc)
-       IF(ASSOCIATED(EL%thin_h_angle)) DEALLOCATE(EL%thin_h_angle)
-       IF(ASSOCIATED(EL%thin_v_angle)) DEALLOCATE(EL%thin_v_angle)
        IF(ASSOCIATED(EL%VOLT)) DEALLOCATE(EL%VOLT)
        IF(ASSOCIATED(EL%FREQ)) DEALLOCATE(EL%FREQ)
        IF(ASSOCIATED(EL%PHAS)) DEALLOCATE(EL%PHAS)
@@ -1903,11 +1907,6 @@ CONTAINS
        ALLOCATE(EL%HGAP);EL%HGAP=zero;
        ALLOCATE(EL%H1);EL%H1=zero;
        ALLOCATE(EL%H2);EL%H2=zero;
-       ALLOCATE(EL%thin_h_foc);EL%thin_h_foc=zero;
-       ALLOCATE(EL%thin_v_foc);EL%thin_v_foc=zero;
-       ALLOCATE(EL%thin_h_angle);EL%thin_h_angle=zero;
-       ALLOCATE(EL%thin_v_angle);EL%thin_v_angle=zero;
-
 
     ENDIF
 
@@ -2030,10 +2029,6 @@ CONTAINS
        CALL KILL(EL%HGAP);DEALLOCATE(EL%HGAP);
        CALL KILL(EL%H1);DEALLOCATE(EL%H1);
        CALL KILL(EL%H2);DEALLOCATE(EL%H2);
-       CALL KILL(EL%thin_h_foc);DEALLOCATE(EL%thin_h_foc);
-       CALL KILL(EL%thin_v_foc);DEALLOCATE(EL%thin_v_foc);
-       CALL KILL(EL%thin_h_angle);DEALLOCATE(EL%thin_h_angle);
-       CALL KILL(EL%thin_v_angle);DEALLOCATE(EL%thin_v_angle);
        DEALLOCATE(EL%MIS);DEALLOCATE(EL%EXACTMIS);
 
        call kill(EL%P)        ! call kill(EL%P)    ! AIMIN MS 4.0
@@ -2073,14 +2068,9 @@ CONTAINS
        ALLOCATE(EL%HGAP);CALL ALLOC(EL%HGAP);EL%HGAP=zero;
        ALLOCATE(EL%H1);CALL ALLOC(EL%H1);EL%H1=zero;
        ALLOCATE(EL%H2);CALL ALLOC(EL%H2);EL%H2=zero;
-       ALLOCATE(EL%thin_h_foc);CALL ALLOC(EL%thin_h_foc);EL%thin_h_foc=zero;
-       ALLOCATE(EL%thin_v_foc);CALL ALLOC(EL%thin_v_foc);EL%thin_v_foc=zero;
-       ALLOCATE(EL%thin_h_angle);CALL ALLOC(EL%thin_h_angle);EL%thin_h_angle=zero;
-       ALLOCATE(EL%thin_v_angle);CALL ALLOC(EL%thin_v_angle);EL%thin_v_angle=zero;
     ENDIF
 
   END SUBROUTINE ZERO_ELP
-
 
   SUBROUTINE cop_el_elp(EL,ELP)
     IMPLICIT NONE
@@ -2120,10 +2110,7 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
-    ELP%thin_h_foc=EL%thin_h_foc
-    ELP%thin_v_foc=EL%thin_v_foc
-    ELP%thin_h_angle=EL%thin_h_angle
-    ELP%thin_v_angle=EL%thin_v_angle
+
 
 
     IF(EL%P%NMUL>0) THEN
@@ -2172,7 +2159,16 @@ CONTAINS
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
     ENDIF
-    IF(EL%KIND==KIND3) CALL SETFAMILY(ELP)
+
+    IF(EL%KIND==KIND3) THEN
+       if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
+       ELP%K3=0
+      CALL SETFAMILY(ELP)
+       ELP%K3%thin_h_foc=EL%K3%thin_h_foc
+       ELP%K3%thin_v_foc=EL%K3%thin_v_foc
+       ELP%K3%thin_h_angle=EL%K3%thin_h_angle
+       ELP%K3%thin_v_angle=EL%K3%thin_v_angle
+    ENDIF
 
 
     IF(EL%KIND==KIND4) THEN         !
@@ -2319,10 +2315,7 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
-    ELP%thin_h_foc=EL%thin_h_foc
-    ELP%thin_v_foc=EL%thin_v_foc
-    ELP%thin_h_angle=EL%thin_h_angle
-    ELP%thin_v_angle=EL%thin_v_angle
+
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
           DEALLOCATE(ELP%AN );DEALLOCATE(ELP%BN )
@@ -2369,7 +2362,16 @@ CONTAINS
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
     ENDIF
 
-    IF(EL%KIND==KIND3) CALL SETFAMILY(ELP)
+    IF(EL%KIND==KIND3) THEN
+       if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
+       ELP%K3=0
+      CALL SETFAMILY(ELP)
+       ELP%K3%thin_h_foc=EL%K3%thin_h_foc
+       ELP%K3%thin_v_foc=EL%K3%thin_v_foc
+       ELP%K3%thin_h_angle=EL%K3%thin_h_angle
+       ELP%K3%thin_v_angle=EL%K3%thin_v_angle
+    ENDIF
+
 
     IF(EL%KIND==KIND4) THEN         !
        if(.not.ASSOCIATED(ELP%C4)) ALLOCATE(ELP%C4)
@@ -2506,10 +2508,7 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
-    ELP%thin_h_foc=EL%thin_h_foc
-    ELP%thin_v_foc=EL%thin_v_foc
-    ELP%thin_h_angle=EL%thin_h_angle
-    ELP%thin_v_angle=EL%thin_v_angle
+
 
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
@@ -2555,7 +2554,16 @@ CONTAINS
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
     ENDIF
 
-    IF(EL%KIND==KIND3) CALL SETFAMILY(ELP)
+    IF(EL%KIND==KIND3) THEN
+       if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
+       ELP%K3=0
+      CALL SETFAMILY(ELP)
+       ELP%K3%thin_h_foc=EL%K3%thin_h_foc
+       ELP%K3%thin_v_foc=EL%K3%thin_v_foc
+       ELP%K3%thin_h_angle=EL%K3%thin_h_angle
+       ELP%K3%thin_v_angle=EL%K3%thin_v_angle
+    ENDIF
+
 
     IF(EL%KIND==KIND4) THEN         !
        if(.not.ASSOCIATED(ELP%C4)) ALLOCATE(ELP%C4)
@@ -2687,10 +2695,6 @@ CONTAINS
     CALL resetpoly_R31(ELP%HGAP)         ! SHARED BY EVERYONE
     CALL resetpoly_R31(ELP%H1)         ! SHARED BY EVERYONE
     CALL resetpoly_R31(ELP%H2)         ! SHARED BY EVERYONE
-    CALL resetpoly_R31(ELP%thin_h_foc)         ! SHARED BY EVERYONE
-    CALL resetpoly_R31(ELP%thin_v_foc)         ! SHARED BY EVERYONE
-    CALL resetpoly_R31(ELP%thin_h_angle)         ! SHARED BY EVERYONE
-    CALL resetpoly_R31(ELP%thin_v_angle)         ! SHARED BY EVERYONE
 
     IF(ELP%P%NMUL>0) THEN             ! SHARED BY A LOT
        DO I=1,ELP%P%NMUL
@@ -2705,6 +2709,13 @@ CONTAINS
        CALL resetpoly_R31(ELP%FREQ )
        CALL resetpoly_R31(ELP%PHAS )
        !      CALL resetpoly_R31(ELP%P0C )
+    ENDIF
+
+    IF(ELP%KIND==KIND3) THEN
+       CALL resetpoly_R31(ELP%K3%thin_h_foc)
+       CALL resetpoly_R31(ELP%K3%thin_v_foc)
+       CALL resetpoly_R31(ELP%K3%thin_h_angle )
+       CALL resetpoly_R31(ELP%K3%thin_v_angle)
     ENDIF
 
     IF(ELP%KIND==KIND21) THEN
