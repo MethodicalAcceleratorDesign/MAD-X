@@ -814,6 +814,7 @@ struct int_array* oper;       /* Polish: operator references */
 struct int_array* func;       /* Polish: function references */
 struct int_array* s_range;    /* starts of ranges */
 struct int_array* e_range;    /* ends of ranges */
+struct int_array* match_i_work[MATCH_WORK];  /* int work space for matching */
 
 struct in_cmd* this_cmd;      /* contains command just read */
 struct in_cmd* local_twiss[2] = {NULL, NULL}; /* OB 1.2.2002 */
