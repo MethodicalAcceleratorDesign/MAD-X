@@ -56,8 +56,8 @@ void error_ealign(struct in_cmd* cmd)
   struct node *nextnode;
   int i;
   int chcount[3] = {0,0,0};
-  double val[ALIGN_MAX] = {0,0,0,0,0,0,0,0,0,0,0,0};
-  static char att[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey"};
+  double val[ALIGN_MAX] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  static char att[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey","mscalx","mscaly"};
 
   struct command_parameter_list* pl = current_error->par;
   struct sequence* mysequ = current_sequ;
@@ -109,7 +109,8 @@ void error_eprint(struct in_cmd* cmd)
 {
   struct node *ndexe;
   struct node *nextnode;
-  static char pln_alig[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey"};
+  static char pln_alig[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey","mscalx","mscaly"};
+  static float alig_fact[ALIGN_MAX] = {1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1.0,1.0};
 
   int i;
   struct sequence* mysequ = current_sequ;
@@ -126,12 +127,13 @@ void error_eprint(struct in_cmd* cmd)
        if(nextnode->p_al_err != NULL) {
          fprintf(prt_file, "\n\nAlignment errors for element %s \n",nextnode->name);
          fprintf(prt_file,"\nDisplacements in [mm], rotations in [mrad] \n");
-         fprintf(prt_file," %6s %10s %12s %10s %10s %10s %10s %10s %10s %10s %10s %10s\n",
+         fprintf(prt_file," %6s %10s %12s %10s %10s %10s %10s %10s %10s %10s %10s %10s %10s %10s\n",
                   pln_alig[0], pln_alig[1],pln_alig[2],pln_alig[3],
                   pln_alig[4], pln_alig[5],pln_alig[6],pln_alig[7],
-                  pln_alig[8], pln_alig[9],pln_alig[10],pln_alig[11]);
+                  pln_alig[8], pln_alig[9],pln_alig[10],pln_alig[11],
+                  pln_alig[12],pln_alig[13]);
          for(i=0;i<nextnode->p_al_err->curr;i++) {
-            fprintf(prt_file, "%10.6f ",1000.0*nextnode->p_al_err->a[i]);
+            fprintf(prt_file, "%10.6f ",alig_fact[i]*nextnode->p_al_err->a[i]);
          }
          fprintf(prt_file, "\n");
        }
