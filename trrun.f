@@ -30,7 +30,7 @@
      &int_arr(1),tot_segm,code_buf(*)
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
      &al_errors(8),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one,  &
-     &get_variable,last_pos(*),last_orbit(6,*),tolerance(6),get_value,  &
+     &get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
      &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
       parameter(zero=0d0,one=1d0)
       character*12 tol_a, char_a
@@ -39,7 +39,7 @@
       character*16 el_name !hbu
       include 'track.fi'
       include 'bb.fi'
-      data tol_a,char_a / 'tolerance ', ' ' /
+      data tol_a,char_a / 'maxaper ', ' ' /
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / !hbu
 
       aperflag = .false.
@@ -61,8 +61,8 @@
       call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
 !--- jmax may be reduced by particle loss - keep number in j_tot
       j_tot = jmax
-!--- get vector of six coordinate tolerances (both RUN and DYNAP)
-      call comm_para(tol_a, nint, ndble, nchar, int_arr, tolerance,     &
+!--- get vector of six coordinate maxapers (both RUN and DYNAP)
+      call comm_para(tol_a, nint, ndble, nchar, int_arr, maxaper,       &
      &char_a, char_l)
 !--- set particle id
       do k=1,jmax
@@ -146,7 +146,7 @@
         endif
 !-------- Track through element
         call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
-     &  last_pos, last_orbit,aperflag,tolerance)
+     &  last_pos, last_orbit,aperflag,maxaper)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
@@ -179,7 +179,7 @@
         endif
 !--- end of loop over nodes
         call ttcheck(turn, sum, part_id, last_turn, last_pos,           &
-     &  last_orbit, z, tolerance, jmax)
+     &  last_orbit, z, maxaper, jmax)
         if (switch .eq. 1)  then
           if (mod(turn, ffile) .eq. 0)  then
             if (turn .eq. turns)  last_out = .true.
@@ -251,7 +251,7 @@
       enddo
  999  end
       subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
-     &last_turn,last_pos, last_orbit,aperflag,tolerance)
+     &last_turn,last_pos, last_orbit,aperflag,maxaper)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -268,7 +268,7 @@
       integer get_option
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
      &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
-     &aperture(100),one,tolerance(6), zero
+     &aperture(100),one,maxaper(6), zero
       character*24 aptype
       parameter(zero = 0.d0, one=1d0)
 
@@ -328,7 +328,7 @@
         else if(aptype.eq.'circle') then
         apx = aperture(1)
           if(apx.eq.0.0) then
-          apx = tolerance(1)
+          apx = maxaper(1)
           endif
         apy = apx
 !        print *,"circle, radius= ",apx
@@ -401,10 +401,10 @@
       apx = node_value('xsize ')
       apy = node_value('ysize ')
        if(apx.eq.0.0) then
-       apx=tolerance(1)
+       apx=maxaper(1)
        endif
        if(apy.eq.0.0) then
-       apy=tolerance(3)
+       apy=maxaper(3)
        endif
       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack)
@@ -415,10 +415,10 @@
       apx = node_value('xsize ')
       apy = node_value('ysize ')
        if(apx.eq.0.0) then
-       apx=tolerance(1)
+       apx=maxaper(1)
        endif
        if(apy.eq.0.0) then
-       apy=tolerance(3)
+       apy=maxaper(3)
        endif
       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack)
@@ -1261,17 +1261,17 @@
       end
 
       subroutine ttcheck(turn, sum, part_id, last_turn, last_pos,       &
-     &last_orbit, z, tolerance, jmax)
+     &last_orbit, z, maxaper, jmax)
       implicit none
       integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
-      double precision sum,z(6,*),tolerance(6),last_pos(*),             &
+      double precision sum,z(6,*),maxaper(6),last_pos(*),               &
      &last_orbit(6,*)
       character*14 aptype
       n = 1
  10   continue
       do i = n, jmax
         do j = 1, 6
-          if (abs(z(j,i)) .gt. tolerance(j))  goto 20
+          if (abs(z(j,i)) .gt. maxaper(j))  goto 20
         enddo
       enddo
       return
