@@ -1,3 +1,4 @@
+set INCLUDE=C:\PROGRA~1\Microsoft Visual Studio\VC98\Include
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 madxp.c
 cl -c /Zm1000 -D_WIN32 gxx11psc.c
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp plot.F
