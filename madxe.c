@@ -141,7 +141,7 @@ void error_eprint(struct in_cmd* cmd)
        if(nextnode->p_fd_err != NULL) {
          mycount++;
          if(mycount <= 50000) {
-         fprintf(prt_file,"%s %d\n",nextnode->name,nextnode->p_fd_err);
+         fprintf(prt_file,"%s %d\n",nextnode->name,(int)nextnode->p_fd_err);
          fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
          fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
   /*     for(i=0;i<nextnode->p_fd_err->curr;i++) { */

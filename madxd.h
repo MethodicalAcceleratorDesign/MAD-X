@@ -367,6 +367,7 @@ void get_select_t_ranges(struct command_list*, struct table*);
 int square_to_colon(char*);
 int get_stmt(FILE*);
 int get_table_range(char*, struct table* t, int*);
+void grow_char_array(struct char_array*);
 void grow_char_p_array(struct char_p_array*);
 void grow_command_list(struct command_list*);
 void grow_command_list_list(struct command_list_list*);
@@ -399,7 +400,7 @@ void link_in_front(struct node*, struct node*);
 int loc_expr(char**, int, int, int*);
 int logic_expr(int, char**);
 int log_val(char*, struct command*);
-void main_input();
+void main_input(int);
 struct constraint* make_constraint(int, struct command_parameter*);
 struct element* make_element(char*, char*, struct command*, int);
 void make_elem_node(struct element*, int);
@@ -632,6 +633,25 @@ void error_esave(struct in_cmd* cmd);
 void f_ctof(int *j, char *string, int *nel);
 void pro_error_make_efield_table();
 
+/* regular expression match routines */
+
+struct reg_token* add_tok(char, struct reg_token*);
+int char_count(char, char*);
+struct reg_token* convert_pattern(char*, int, int*);
+void dump_tokens(struct reg_token*);
+void edit_tokens(struct reg_token*, char*, char*, int);
+void fill_list(char, char, struct r_char_array*);
+struct reg_token* flag(struct reg_token*, int*);
+void grow_r_char_array(struct r_char_array*);
+int list_count(struct r_char_array*, int, char*);
+struct reg_token* make_dot(struct reg_token*);
+struct reg_token* make_list(struct reg_token*, char*, int, int);
+int match_all(struct reg_token*, char*);
+char* match_token(struct reg_token*, char*);
+int myregex(char*, char*);
+void myregend(char*, struct reg_token*);
+int new_comb(struct reg_token*);
+
 /* Global structure variables by type (alphabetic) */
 
 struct char_array_list* char_buff; /* buffer for all sorts of strings */
@@ -756,7 +776,7 @@ char  tmp_key[NAME_L],
 
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 1.00";
+char myversion[] = "MAD-X 1.03";
 char one_string[] = "1";
 
 char* aux_char_pt;               /* for debug purposes */
@@ -823,6 +843,7 @@ int print_match_summary = 0;/* OB 6.3.2002:
 			       activate the print option in the 
 			       'mtgeti' and 'collect' routines */
 int quote_toggle = 0;       /* for quote strings on input */
+int return_flag = 0;        /* 1 when "return" read */
 int scrap_count = 0;        /* running counter to make things unique */
 int seqedit_install = 0;    /* counter for seqedit installs */
 int seqedit_move = 0;       /* counter for seqedit moves */

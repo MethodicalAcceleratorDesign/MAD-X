@@ -236,6 +236,7 @@ char command_def[] =
 " "
 "use: control none 0 0 "
 "period   = [s, none, none], "
+"sequence = [s, none, none], "
 "range    = [s, #s/#e, none]; "
 " "
 "value: control none 0 0 "

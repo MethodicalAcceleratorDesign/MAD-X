@@ -692,9 +692,9 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
 
     c[nc[i]].val.after[ip-1] = corvec[nx[i]-1];
     if(ip == 1) {
-      c[nc[i]].p_node->chkick = 0.001*corvec[nx[i]-1];
+      c[nc[i]].p_node->chkick += 0.001*corvec[nx[i]-1];
     } else if (ip == 2) {
-      c[nc[i]].p_node->cvkick = 0.001*corvec[nx[i]-1];
+      c[nc[i]].p_node->cvkick += 0.001*corvec[nx[i]-1];
     }
     pro_correct_fill_corr_table(ip,c[nc[i]].p_node->name,c[nc[i]].val.before[ip-1],corvec[nx[i]-1]);
   }

@@ -35,7 +35,6 @@ struct command                     /* holds one command */
   int link_type;                       /* 0 none, 1 start, 2 end of group */
   int mad8_type;                       /* 0 none, else mad-8 element code */
   int beam_def;                        /* beam commands: 1 if defined */
-  regex_t* reg_pattern;                /* for regular expressions */
   struct name_list* par_names;         /* names + input flag of parameters */
   struct command_parameter_list* par;  /* parameter pointer list */
 };

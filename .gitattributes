@@ -16,6 +16,8 @@
 /madxl.h -text
 /madxm.f -text
 /madxn.c -text
+/madxreg.c -text
+/madxreg.h -text
 /madxu.c -text
 /makethin.c -text
 /match.f -text

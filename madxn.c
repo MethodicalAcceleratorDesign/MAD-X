@@ -6,11 +6,11 @@
 #include <sys/utsname.h>
 #include <ctype.h>
 #include <math.h>
-#include <regex.h>
 #include <time.h>
 #include <unistd.h>
 #include "madxl.h"
 #include "madx.h"
+#include "madxreg.h"
 #include "madxd.h"
 #include "madxdict.h"
 
@@ -18,24 +18,32 @@ void madx()
 {
   madx_start();
   madx_init();
-  main_input();
+  main_input(0);
   madx_finish();
 }
 
 int act_special(int type, char* statement)
      /* acts on special commands (IF{..} etc.) */
 {
-  char loc_buff[IN_BUFF_SIZE];
-  char loc_w[IN_BUFF_SIZE];
-  int cnt_1, start_2, rs, re, level = pro->curr;
+  char* loc_buff = NULL;
+  char* loc_w = NULL;
+  int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
+  int ret_val = 0;
   struct char_p_array* logic = new_char_p_array(1000);
   int logex = 0;
   char *cp = statement;
+  if (ls < IN_BUFF_SIZE) ls = IN_BUFF_SIZE;
   if (level == pro->max) grow_in_buff_list(pro);
   if (pro->buffers[level] == NULL)
-     pro->buffers[level] = new_in_buffer(IN_BUFF_SIZE);
+     pro->buffers[level] = new_in_buffer(ls);
+  else
+    {
+     while(pro->buffers[level]->c_a->max < ls)
+       grow_char_array(pro->buffers[level]->c_a);
+    }
   if (type == 5) /* macro */ return make_macro(statement);
   else if (type == 6) /* line */ return make_line(statement);
+  loc_buff = (char*) malloc(ls);  loc_w = (char*) malloc(ls);
   get_bracket_range(statement, '{', '}', &rs, &re);
   if (re < 0) fatal_error("missing '{' or '}' in statement:",statement); 
   cnt_1 = rs; start_2 = rs + 1;
@@ -46,7 +54,11 @@ int act_special(int type, char* statement)
     case 1:  /* if */
      pro->buffers[level]->flag = 0;
     case 3:  /* else if */
-     if (pro->buffers[level]->flag < 0)  return -1;
+     if (pro->buffers[level]->flag < 0)  
+       {
+	ret_val = -1;
+        break;
+       }
      if (pro->buffers[level]->flag == 0)
        {
         pre_split(l_dummy, loc_w, 0);
@@ -66,7 +78,11 @@ int act_special(int type, char* statement)
        }
      break;
     case 2: /* else */
-     if (pro->buffers[level]->flag < 0)  return -1;
+     if (pro->buffers[level]->flag < 0)
+       {
+	ret_val = -1;
+        break;
+       }
      if (pro->buffers[level]->flag == 0) 
        {
 	pro->curr++;
@@ -90,10 +106,12 @@ int act_special(int type, char* statement)
      pro->curr--;
      break;
     default:
-      return -1;
+      ret_val = -1;
     }
+  if (loc_buff != NULL) free(loc_buff);
+  if (loc_w != NULL) free(loc_w);
   delete_char_p_array(logic, 0);
-  return 0;
+  return ret_val;
 }
 
 double act_value(int pos, struct name_list* chunks)
@@ -228,15 +246,18 @@ void add_to_el_list( /* adds element to alphabetic element list */
   /*  flag < 0: do not delete if already present, do not warn */
   /*       = 0: delete, but do not warn */
   /*       = 1: delete & warn */
-  /*       = 2: fatal error if already present */
+  /*       = 2: warn and ignore if already present */
   int pos, j;
   if ((pos = name_list_pos(el->name, ell->list)) > -1)
     {
      if (flag > 1) 
-       fatal_error("element re-definition inside sequence:", el->name);
-     else if (flag > 0) put_info("element redefined:", el->name);
-     if (flag >= 0 && ell == element_list) delete_element(ell->elem[pos]);
-     ell->elem[pos] = el;
+       warning("element re-definition inside sequence ignored:", el->name);
+     else 
+       {
+        if (flag > 0) put_info("element redefined:", el->name);
+        if (flag >= 0 && ell == element_list) delete_element(ell->elem[pos]);
+        ell->elem[pos] = el;
+       }
     }
   else
     {
@@ -828,11 +849,11 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 
 void complete_twiss_table(struct table* t)
 {
-  int i, j, mult, pos;
+  int i, j, mult, pos, h_length = 30;
   double el, val, dtmp;
   struct node* c_node;
   struct table* s;
-  char tmp[12];
+  char tmp[16];
   char* p;
   if (t == NULL) return;
   for (i = 0; i < t->curr; i++)
@@ -865,7 +886,12 @@ void complete_twiss_table(struct table* t)
         t->d_cols[j][i] = val;
        }
     }
-  if (t->header == NULL)  t->header = new_char_p_array(29);
+  /* ATTENTION: if you add header lines, augment h_length accordingly */
+  if (t->header == NULL)  t->header = new_char_p_array(h_length);
+  strcpy(tmp, t->org_sequ->name);
+  sprintf(c_dummy, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp), 
+          stoupper(tmp));
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   i = get_string("beam", "particle", tmp);
   sprintf(c_dummy, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
@@ -1730,7 +1756,7 @@ void enter_element(struct in_cmd* cmd)
        }
      nl = cmd->clone->par_names;
      pl = cmd->clone->par;
-     if ((pos = name_list_pos("bv", nl)) > -1)
+     if (el != parent && (pos = name_list_pos("bv", nl)) > -1)
        {
         if (nl->inform[pos]) el->bv = command_par_value("bv", cmd->clone);
         else if ((comm = find_command(el->parent->name, defined_commands)) 
@@ -2141,11 +2167,13 @@ void exec_call(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   struct name_list* nl = cmd->clone->par_names;
   int pos = name_list_pos("file", nl);
+  int top = in->curr;
   if (nl->inform[pos])
     { 
      down_unit(pl->parameters[pos]->string);
+     main_input(top);
     }
-  else warning("call with filename:", "ignored");
+  else warning("call without filename:", "ignored");
 }
 
 void exec_command()
@@ -2175,11 +2203,7 @@ void exec_command()
          || strcmp(cmd_name, "exit") == 0)  madx_finish();
      else if (strcmp(cmd_name, "help") == 0) exec_help(p);
      else if (strcmp(cmd_name, "show") == 0) exec_show(p);
-     else if (strcmp(cmd_name, "return") == 0)
-       {
-	if (in->curr == 0)  madx_finish();
-        else fclose(in->input_files[in->curr--]);
-       }
+     else if (strcmp(cmd_name, "return") == 0)  return_flag = 1;
      else if (strcmp(cmd_name, "resplot") == 0)
        { 
         plot_options = delete_command(plot_options);
@@ -2548,22 +2572,25 @@ void exec_show(struct in_cmd* cmd)
   int i, pos, n = cmd->tok_list->curr;
   for (i = 1; i < n; i++)
     {
-     if (strncmp(toks[i], "beam", 4) == 0) show_beam(toks[i]);
-     else if ((pos = name_list_pos(toks[i], defined_commands->list)) > -1)
+     if (strcmp(toks[i],","))
        {
-	if (strcmp(toks[i], "option") == 0) dump_command(options);
-	else dump_command(defined_commands->commands[pos]);
+        if (strncmp(toks[i], "beam", 4) == 0) show_beam(toks[i]);
+        else if ((pos = name_list_pos(toks[i], defined_commands->list)) > -1)
+          {
+	   if (strcmp(toks[i], "option") == 0) dump_command(options);
+	   else dump_command(defined_commands->commands[pos]);
+          }
+        else if ((pos = name_list_pos(toks[i], beta0_list->list)) > -1)
+	   dump_command(beta0_list->commands[pos]);
+        else if ((el = find_element(toks[i], element_list)) != NULL)
+	   dump_element(el);
+        else if ((var = find_variable(toks[i], variable_list)))
+          {
+	   if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
+           else fprintf(prt_file, "%s = %-18.10g ;\n", toks[i], var->value);
+          }
+        else fprintf(prt_file, "%s not found\n", toks[i]);
        }
-     else if ((pos = name_list_pos(toks[i], beta0_list->list)) > -1)
-	dump_command(beta0_list->commands[pos]);
-     else if ((el = find_element(toks[i], element_list)) != NULL)
-	dump_element(el);
-     else if ((var = find_variable(toks[i], variable_list)))
-       {
-	if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
-        else fprintf(prt_file, "%s = %-18.10g ;\n", toks[i], var->value);
-       }
-     else fprintf(prt_file, "%s not found\n", toks[i]);
     }
 
 }
@@ -3428,6 +3455,8 @@ void ftoi_array(struct double_array* da, struct int_array* ia)
 
 #include "madxc.c"
 
+#include "madxreg.c"
+
 void madx_finish()
 {
   if (plots_made) gxterm_();
@@ -4004,6 +4033,7 @@ int get_stmt(FILE* file)
   do /* read lines until complete statement(s) */
     {
     next:
+     if (ca->max - ca->curr < MAX_LINE) grow_char_array(ca);
      if (fgets(&ca->c[ca->curr], ca->max - ca->curr, file) == NULL) return 0;
      if (get_option("echo")) puts(&ca->c[ca->curr]);
      c_cc = mystrstr(&ca->c[ca->curr], "//");
@@ -4436,16 +4466,18 @@ int log_val(char* name, struct command* cmd)
   else return 0;
 }
 
-void main_input()
+void main_input(int top)
      /* loops over input until end of execution */
 {
   while (in_stop == 0)
     {
      if (interactive && in->curr == 0) puts("X: ==>");
-     if (get_stmt(in->input_files[in->curr]) == 0)
+     if (return_flag || get_stmt(in->input_files[in->curr]) == 0)
        {
         if (in->curr == 0) return;
-        else fclose(in->input_files[in->curr--]);
+        fclose(in->input_files[in->curr--]);
+        return_flag = 0;
+        if (in->curr == top) return;
        }
      else 
        {
@@ -5039,12 +5071,10 @@ int par_out_flag(char* base_name, char* par_name)
 
 int pass_select(char* element, struct command* sc)
 {
-  char rout_name[] = "pass_select";
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
   struct element* el = find_element(strip(element), element_list);
   int pos, in = 0, any = 0;
-  int flags = REG_EXTENDED|REG_NOSUB;
   char *class, *pattern;
   if (el == NULL) return 0;
   pos = name_list_pos("class", nl);
@@ -5060,17 +5090,8 @@ int pass_select(char* element, struct command* sc)
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
     {
      any = 1;
-     if (sc->reg_pattern == NULL)
-       {
-        pattern = stolower(pl->parameters[pos]->string);
-        sc->reg_pattern = (regex_t*) mymalloc(rout_name,sizeof(regex_t));
-        if (regcomp(sc->reg_pattern, pattern, flags))
-          {
-	   warning("invalid pattern ignored:", pattern);
-           return 1;
-          }
-       }
-     if(regexec(sc->reg_pattern, el->name, (size_t) 0, NULL, 0) == 0)  in = 1;
+     pattern = stolower(pl->parameters[pos]->string);
+     if(myregex(pattern, el->name) == 0)  in = 1;
     }
   if (any == 0) return 1;
   else return in;
@@ -8816,6 +8837,7 @@ void use_sequ(struct in_cmd* cmd)
   if (sequ_is_on)
      fatal_error("no endsequence yet for sequence:", current_sequ->name);
   pos = name_list_pos("period", nl);
+  if (nl->inform[pos] == 0) pos = name_list_pos("sequence", nl);
   if (nl->inform[pos])  /* parameter has been read */
     {
      if (current_range != NULL)

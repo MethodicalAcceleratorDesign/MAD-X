@@ -8,6 +8,7 @@
 #define INVALID 1.e20       /* used for erroneous value requests */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
 #define MAX_D_ITEM 30000    /* storage for doubles */
+#define MAX_LINE 20000      /* max. input line length */
 #define MAX_LOOP 100        /* max. count for (possibly circular) calls */
 #define MAX_COND 100        /* max. nesting level for "if" and "while" */
 #define CHAR_BUFF_SIZE 100000 /* size of each dynamic char_buff member */

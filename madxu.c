@@ -175,10 +175,6 @@ struct command* delete_command(struct command* cmd)
      fprintf(stamp_file, "d_c double delete --> %s\n", cmd->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", cmd->name);
   if (cmd->par != NULL)  delete_command_parameter_list(cmd->par);
-  if (cmd->reg_pattern != NULL) 
-    {
-     regfree(cmd->reg_pattern); free(cmd->reg_pattern);
-    }
   if (cmd->par_names != NULL) delete_name_list(cmd->par_names);
   free(cmd);
   return NULL; 
@@ -479,6 +475,19 @@ struct var_list* delete_var_list(struct var_list* varl)
   if (varl->vars != NULL) free(varl->vars);
   free(varl);
   return NULL;
+}
+
+void grow_char_array( /* doubles array size */
+		 struct char_array* p)
+{
+  char rout_name[] = "grow_char_array";
+  char* p_loc = p->c;
+  int j, new = 2*p->max;
+
+  p->max = new;
+  p->c = (char*) mymalloc(rout_name, new);
+  for (j = 0; j < p->curr; j++) p->c[j] = p_loc[j];
+  free(p_loc);
 }
 
 void grow_char_p_array( /* doubles array size */
