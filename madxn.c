@@ -1982,8 +1982,6 @@ void exec_plot(struct in_cmd* cmd)
 	{
 	  if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
 		haxis_name = pl_plot->parameters[pos]->call_def->string;
-	  else
-	    fatal_error("PLOT ","- no haxis:");
 	  s_haxis = strcmp(haxis_name,"s");
 	}
 
