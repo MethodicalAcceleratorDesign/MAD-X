@@ -11,11 +11,34 @@
 ! ****************************************************
       implicit none
 
-      integer im,ic,nm,nc
+      integer im,ic,nm,nc    ! here we are
       double precision resp,a(nm, nc)
 
 !     write(*,*) 'in setup: ',resp, im+1, ic+1
       a(im+1,ic+1) = resp
+
+      return
+      end
+
+      subroutine setupi(resp,a,im,ic,nm,nc)
+
+! ****************************************************
+!                                                    *
+!    Set INTEGER (A)                                 *
+!    matrix in FORTRAN storage format                *
+!    RESP comes from "C" routine                     *
+!                                                    *
+!     Author: WFH  05.02.02                          *
+!                                                    *
+! ****************************************************
+      implicit none
+
+      integer im,ic,nm,nc
+      integer resp,a(nm, nc)
+
+!     write(*,*) 'in setupi: ',resp, im+1, ic+1
+      a(im+1,ic+1) = resp
+!     write(*,*) 'done in setupi'
 
       return
       end
@@ -694,9 +717,9 @@ c           svdmat(i,j) = a(i,j)
 
       if(dbg.eq.1) then
           write(*,*) 'A0:'
-      do  j = 1,im
+        do  j = 1,im
           write(*,6003) (svdmat(j,i),i=1,ic)
-      enddo
+        enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
      &         matv,vmat,amater,ws)
@@ -719,12 +742,14 @@ c           svdmat(i,j) = a(i,j)
                  wtmat(i,i) = 0.0
           endif
       enddo
+
       if(dbg.eq.1) then
-      call rvord(wvec,sortw,ws,ic)
-      do  i = 1,ic
-          write(*,*) i,sortw(i),wvec(sortw(i))
-      enddo
+        call rvord(wvec,sortw,ws,ic)
+        do  i = 1,ic
+            write(*,*) i,sortw(i),wvec(sortw(i))
+        enddo
       endif
+
       do  i = 1,ic
           do  j = 1,im
               vtmat(i,j) = vmat(j,i)
@@ -733,37 +758,38 @@ c           svdmat(i,j) = a(i,j)
       enddo
 
       if(dbg.eq.1) then
-          write(*,*) 'A1:'
-      do  j = 1,im
-          write(*,6003) (svdmat(j,i),i=1,ic)
-      enddo
-      write(*,*) ' '
-
-          write(*,*) 'Va:'
-      do  j = 1,ic
-          write(*,6004) (vmat(j,i),i=1,ic)
-      enddo
-          write(*,*) 'Vt:'
-      do  j = 1,ic
-          write(*,6004) (vtmat(j,i),i=1,ic)
-      enddo
-          write(*,*) 'W:'
-      do  j = 1,im
-          write(*,6004) (wmat(j,i),i=1,ic)
-      enddo
-          write(*,*) 'Wt:'
-      do  j = 1,ic
-          write(*,6004) (wtmat(j,i),i=1,im)
-      enddo
-          write(*,*) 'U:'
-      do  j = 1,im
-          write(*,6004) (umat(j,i),i=1,im)
-      enddo
-          write(*,*) 'Ut:'
-      do  j = 1,im
-          write(*,6004) (utmat(j,i),i=1,im)
-      enddo
+             write(*,*) 'A1:'
+         do  j = 1,im
+             write(*,6003) (svdmat(j,i),i=1,ic)
+         enddo
+         write(*,*) ' '
+   
+             write(*,*) 'Va:'
+         do  j = 1,ic
+             write(*,6004) (vmat(j,i),i=1,ic)
+         enddo
+             write(*,*) 'Vt:'
+         do  j = 1,ic
+             write(*,6004) (vtmat(j,i),i=1,ic)
+         enddo
+             write(*,*) 'W:'
+         do  j = 1,im
+             write(*,6004) (wmat(j,i),i=1,ic)
+         enddo
+             write(*,*) 'Wt:'
+         do  j = 1,ic
+             write(*,6004) (wtmat(j,i),i=1,im)
+         enddo
+             write(*,*) 'U:'
+         do  j = 1,im
+             write(*,6004) (umat(j,i),i=1,im)
+         enddo
+             write(*,*) 'Ut:'
+         do  j = 1,im
+             write(*,6004) (utmat(j,i),i=1,im)
+         enddo
       endif
+
       call dmmpy(im,im,utmat(1,1),utmat(1,2),utmat(2,1),
      &           xin(1),xin(2),xa(1),xa(2))
       call dmmpy(ic,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),
@@ -773,17 +799,20 @@ c           svdmat(i,j) = a(i,j)
       call dmmpy(im,ic,svdmat(1,1),svdmat(1,2),svdmat(2,1),
      &           xc(1),xc(2),xpred(1),xpred(2))
       if(dbg.eq.1) then
-      write(*,*) xc
-      write(*,*) xpred
+        write(*,*) xc
+        write(*,*) xpred
       endif
+
       do  i = 1,im
           xout(i) = xin(i) - xpred(i)
       enddo
       do  i = 1,ic
           xc(i) = -xc(i)
       enddo
+
       return
       end
+
       subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
      &                       xin,xc,xout,xa,xb,xpred,ws,wvec,
      &                       sortw,nx,im,ic,iflag,dbg)
@@ -835,10 +864,11 @@ c           svdmat(i,j) = a(i,j)
 
       if(dbg.eq.1) then
           write(*,*) 'A0:'
-      do  j = 1,ic
-          write(*,6003) (svdmat(j,i),i=1,im)
-      enddo
+          do  j = 1,ic
+            write(*,6003) (svdmat(j,i),i=1,im)
+          enddo
       endif
+
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
      &         matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
@@ -861,11 +891,12 @@ c           svdmat(i,j) = a(i,j)
           endif
       enddo
       if(dbg.eq.1) then
-      call rvord(wvec,sortw,ws,im)
-      do  i = 1,im
+        call rvord(wvec,sortw,ws,im)
+        do  i = 1,im
           write(*,*) i,sortw(i),wvec(sortw(i))
-      enddo
+        enddo
       endif
+
       do  i = 1,im
           do  j = 1,ic
               vtmat(i,j) = vmat(j,i)
@@ -874,37 +905,38 @@ c           svdmat(i,j) = a(i,j)
       enddo
 
       if(dbg.eq.1) then
-          write(*,*) 'A1:'
-      do  j = 1,ic
-          write(*,6003) (svdmat(j,i),i=1,im)
-      enddo
-      write(*,*) ' '
-
-          write(*,*) 'Va:'
-      do  j = 1,im
-          write(*,6004) (vmat(j,i),i=1,im)
-      enddo
-          write(*,*) 'Vt:'
-      do  j = 1,im
-          write(*,6004) (vtmat(j,i),i=1,im)
-      enddo
-          write(*,*) 'W:'
-      do  j = 1,ic
-          write(*,6004) (wmat(j,i),i=1,im)
-      enddo
-          write(*,*) 'Wt:'
-      do  j = 1,im
-          write(*,6004) (wtmat(j,i),i=1,ic)
-      enddo
-          write(*,*) 'U:'
-      do  j = 1,ic
-          write(*,6004) (umat(j,i),i=1,ic)
-      enddo
-          write(*,*) 'Ut:'
-      do  j = 1,ic
-          write(*,6004) (utmat(j,i),i=1,ic)
-      enddo
+             write(*,*) 'A1:'
+         do  j = 1,ic
+             write(*,6003) (svdmat(j,i),i=1,im)
+         enddo
+         write(*,*) ' '
+   
+             write(*,*) 'Va:'
+         do  j = 1,im
+             write(*,6004) (vmat(j,i),i=1,im)
+         enddo
+             write(*,*) 'Vt:'
+         do  j = 1,im
+             write(*,6004) (vtmat(j,i),i=1,im)
+         enddo
+             write(*,*) 'W:'
+         do  j = 1,ic
+             write(*,6004) (wmat(j,i),i=1,im)
+         enddo
+             write(*,*) 'Wt:'
+         do  j = 1,im
+             write(*,6004) (wtmat(j,i),i=1,ic)
+         enddo
+             write(*,*) 'U:'
+         do  j = 1,ic
+             write(*,6004) (umat(j,i),i=1,ic)
+         enddo
+             write(*,*) 'Ut:'
+         do  j = 1,ic
+             write(*,6004) (utmat(j,i),i=1,ic)
+         enddo
       endif
+
       call dmmpy(im,im,vtmat(1,1),vtmat(1,2),vtmat(2,1),
      &           xin(1),xin(2),xa(1),xa(2))
 c     write(*,*) 'xa: ',xa
@@ -916,16 +948,19 @@ c     write(*,*) 'xb: ',xb
 c     write(*,*) 'xc: ',xc
       call dmmpy(im,ic,a(1,1),a(1,2),a(2,1),
      &           xc(1),xc(2),xpred(1),xpred(2))
+
       if(dbg.eq.1) then
          write(*,*) xc
          write(*,*) xpred
       endif
+
       do  i = 1,im
           xout(i) = xin(i) - xpred(i)
       enddo
       do  i = 1,ic
           xc(i) = -xc(i)
       enddo
+
       return
       end
 !CDECK  ID>, SOLSQL.
@@ -2460,3 +2495,28 @@ c
       enddo
       return
       end
+
+      subroutine primat(a,nc,nm)
+
+      integer nm,nc
+      integer a(nc, nm)
+
+      do  102  I = 1,nc
+          write(*,*) (a(i,j),j=1,nm)
+  102 continue
+
+      return
+      end
+
+      subroutine prdmat(a,nc,nm)
+
+      integer nm,nc
+      double precision a(nc, nm)
+
+      do  102  I = 1,nc
+          write(*,*) (a(i,j),j=1,nm)
+  102 continue
+
+      return
+      end
+
