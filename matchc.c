@@ -96,6 +96,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
      /* fprintf(prt_file, "%s %s\n", "call TWISS from matching: sequence=", 
                match_sequs->sequs[i]->name); */
      current_twiss = local_twiss[i]->clone;
+     if (get_option("varylength") != zero) expand_curr_sequ();
      pro_twiss(); 
      if (twiss_success)
        {
@@ -184,6 +185,7 @@ void match_end(struct in_cmd* cmd)
   struct node* c_node;
   /* OB 5.3.2002: write out all final constraint values and vary parameters */
   penalty = zero;
+  if (get_option("varylength") != zero) expand_curr_sequ();
   pro_twiss(); 
   current_const = 0;
   set_option("match_summary", &print_match_summary);
@@ -315,6 +317,7 @@ void match_match(struct in_cmd* cmd)
   struct command* comm;
   struct command_parameter* cp;
   struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
   struct sequence* sequ;
   int i, j, pos, n, tpos;
   int izero = 0;
@@ -360,6 +363,10 @@ void match_match(struct in_cmd* cmd)
        }
     }
   else match_sequs->sequs[match_sequs->curr++] = current_sequ;
+  pos = name_list_pos("vlength", nl);
+  if(nl->inform[pos]) i = pl->parameters[pos]->double_value;
+  else i = 0;
+  set_option("varylength", &i);
   /* START CHK-SEQ; OB 1.2.2002 */
   current_match = cmd->clone;
   pos = name_list_pos("sequence", nl);

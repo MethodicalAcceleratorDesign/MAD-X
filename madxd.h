@@ -309,6 +309,7 @@ void exec_print(struct in_cmd*);
 void exec_save(struct in_cmd*);
 void exec_savebeta();
 void exec_show(struct in_cmd*);
+void expand_curr_sequ();
 void expand_line(struct char_p_array*);
 struct node* expand_node(struct node*, struct sequence*, struct sequence*, 
                          double);
@@ -760,6 +761,7 @@ char one_string[] = "1";
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
 char* current_link_group;
+char* current_range;             /* currently used range, or NULL */
 char* title = NULL;
 char* match_seqs[2];             /* OB 23.1.2002   */
 char* match_beta[2];             /* OB 23.1.2002   */

@@ -2760,6 +2760,35 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   return p;
 }
 
+void expand_curr_sequ()
+{
+  if (current_sequ->ex_start != NULL)
+    {
+     current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
+     current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
+    }
+  if (current_sequ->ex_start == NULL)
+    {
+     use_count++;
+     if (occ_list == NULL) 
+        occ_list = new_name_list(10000);  /* for occurrence count */
+     else occ_list->curr = 0;
+     make_occ_list(current_sequ);
+     all_node_pos(current_sequ);
+     current_sequ->ex_nodes = new_node_list(2*current_sequ->nodes->curr);
+     expand_sequence(current_sequ);
+     current_sequ->n_nodes = 
+       add_drifts(current_sequ->ex_start, current_sequ->ex_end);
+    }
+  set_node_bv(current_sequ); /* set bv factors for all nodes */
+  if (current_range) set_range(current_range, current_sequ);
+  else
+    {
+     current_sequ->range_start = current_sequ->ex_start;
+     current_sequ->range_end = current_sequ->ex_end;
+    }
+}
+
 void expand_sequence(struct sequence* sequ)
 {
   struct node *p, *q = sequ->start;
@@ -8847,6 +8876,10 @@ void use_sequ(struct in_cmd* cmd)
   pos = name_list_pos("period", nl);
   if (nl->inform[pos])  /* parameter has been read */
     {
+     if (current_range != NULL)
+       {
+	free(current_range); current_range = NULL;
+       }
      name = pl->parameters[pos]->string;
      if ((pos = name_list_pos(name, line_list->list)) > -1) 
        make_sequ_from_line(name); remove_from_name_list(name, line_list->list);
@@ -8856,33 +8889,10 @@ void use_sequ(struct in_cmd* cmd)
         if (attach_beam(current_sequ) == 0)
            fatal_error("USE - sequence without beam:", current_sequ->name);
         current_sequ->beam = current_beam;
-        if (current_sequ->ex_start != NULL)
-	  {
-           current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
-           current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
-	  }
-        if (current_sequ->ex_start == NULL)
-          {
-	   use_count++;
-           if (occ_list == NULL) 
-                occ_list = new_name_list(10000);  /* for occurrence count */
-           else occ_list->curr = 0;
-	   make_occ_list(current_sequ);
-           all_node_pos(current_sequ);
-           current_sequ->ex_nodes = new_node_list(2*current_sequ->nodes->curr);
-           expand_sequence(current_sequ);
-           current_sequ->n_nodes = 
-               add_drifts(current_sequ->ex_start, current_sequ->ex_end);
-	  }
-        set_node_bv(current_sequ); /* set bv factors for all nodes */
         pos = name_list_pos("range", nl);
         if (nl->inform[pos])  /* parameter has been read */
-	   set_range(pl->parameters[pos]->string, current_sequ);
-        else
-	  {
-	   current_sequ->range_start = current_sequ->ex_start;
-	   current_sequ->range_end = current_sequ->ex_end;
-	  }
+           current_range = tmpbuff(pl->parameters[pos]->string);
+        expand_curr_sequ();        
        }
      else warning("unknown sequence skipped:", name);
     }
