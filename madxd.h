@@ -1,4 +1,4 @@
-#ifndef _WIN32
+/* should work unchanged on _win32 using Lahey */
 #define advance_node          advance_node_
 #define advance_to_pos        advance_to_pos_
 #define augment_count         augment_count_
@@ -68,7 +68,6 @@
 #define w_ptc_normal            w_ptc_normal_
 #define w_ptc_track             w_ptc_track_
 #define w_ptc_end               w_ptc_end_
-#endif
 
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}

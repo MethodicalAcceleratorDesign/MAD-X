@@ -6499,9 +6499,6 @@
       end
       subroutine gxterm
 
-#ifdef _WIN32
-      !DEC$ ATTRIBUTES C, ALIAS:'_gxterm_' :: gxterm
-#endif
 
       implicit none
 !***********************************************************************

@@ -2,10 +2,6 @@
       subroutine twiss(rt,disp0,tab_name)
 
       implicit none
-#ifdef _WIN32
-      !DEC$ ATTRIBUTES C, ALIAS:'_twiss_' :: twiss
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TWISS command: Track linear lattice parameters.                    *
@@ -142,9 +138,6 @@
  9999 end
       subroutine tmrefe(rt)
       implicit none
-#ifdef _WIN32
-      !DEC$ ATTRIBUTES C, ALIAS:'_tmrefe_' :: tmrefe
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -164,10 +157,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-      !DEC$ ATTRIBUTES C, ALIAS:'_tmrefo_' :: tmrefo
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Transfer matrix w.r.t. ideal orbit for one period.                 *
@@ -194,9 +183,6 @@
       subroutine twinifun(opt_fun0,rt)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -293,9 +279,6 @@
       subroutine twfill(case,opt_fun,position,flag)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -348,9 +331,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -472,9 +452,6 @@
       subroutine tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      &thr_on)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -688,9 +665,6 @@
   999 end
       subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:
@@ -772,9 +746,6 @@
       subroutine twcpin(rt,disp0,r0mat,eflag)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Initial values for linear coupling parameters.                     *
@@ -915,9 +886,6 @@
       subroutine twdisp(rt,vect,disp)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -960,9 +928,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track Twiss parameters with optional output, version with coupling.*
@@ -1162,9 +1127,6 @@
       end
       subroutine twcptk(re,orbit)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track coupled lattice functions.                                   *
@@ -1298,9 +1260,6 @@
       subroutine twbtin(rt,tt)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Initial values of Chromatic functions.                             *
@@ -1405,9 +1364,6 @@
       subroutine twchgo
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track Chromatic functions.                                         *
@@ -1530,9 +1486,6 @@
       subroutine twbttk(re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track lattice functions, including chromatic effects.              *
@@ -1708,9 +1661,6 @@
       subroutine tw_summ(rt,tt)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Compute summary data for TWISS and OPTICS commands.                *
@@ -1849,9 +1799,6 @@
       subroutine tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
 !   transport map for a complete element.                              *
@@ -2026,9 +1973,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for sector bending magnets                           *
@@ -2199,9 +2143,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for a sector dipole without fringe fields.           *
@@ -2694,9 +2635,6 @@
       subroutine tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for orbit correctors.                                *
@@ -2804,9 +2742,6 @@
       subroutine tmmult(fsec,ftrk,orbit,fmap,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for thin multipole.                                  *
@@ -2966,9 +2901,6 @@
       subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for octupole element.                                *
@@ -3140,9 +3072,6 @@
       end
       subroutine tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 ! Purpose:                                                             *
 !   TRANSPORT map for arbitrary element.                               *
 ! Input:                                                               *
@@ -3445,9 +3374,6 @@
       end
       subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for quadrupole element.                              *
@@ -3538,9 +3464,6 @@
       subroutine qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for quadrupole element.                              *
@@ -3644,9 +3567,6 @@
       subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for electrostatic separator.                         *
@@ -3711,9 +3631,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for electrostatic separator.                         *
@@ -3819,9 +3736,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for sextupole element.                               *
@@ -3914,9 +3828,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for sextupole element.                               *
@@ -4030,9 +3941,6 @@
       subroutine tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for solenoid element, no centre option.              *
@@ -4139,9 +4047,6 @@
       subroutine tmsrot(ftrk,orbit,fmap,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for rotation about S-axis.                           *
@@ -4189,9 +4094,6 @@
       subroutine tmyrot(ftrk,orbit,fmap,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for rotation about Y-axis.                           *
@@ -4240,9 +4142,6 @@
       subroutine tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for drift space, no centre option.                   *
@@ -4330,9 +4229,6 @@
       subroutine tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   TRANSPORT map for RF cavity.                                       *
@@ -4416,9 +4312,6 @@
       subroutine tmcat(fsec,rb,tb,ra,ta,rd,td)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Concatenate two TRANSPORT maps.                                    *
@@ -4480,9 +4373,6 @@
       subroutine tmtrak(ek,re,te,orb1,orb2)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track orbit and change reference for RE matrix.                    *
@@ -4693,9 +4583,6 @@
       subroutine tmbb(fsec,ftrk,orbit,fmap,re,te)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
 !   transport map for beam-beam element.                               *
@@ -4921,9 +4808,6 @@
       end
       subroutine ccperrf(xx, yy, wx, wy)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
 !   modification of wwerf, double precision complex error function,    *
@@ -5022,9 +4906,6 @@
 !   Further input in twissotm.fi                                       *
 !----------------------------------------------------------------------*
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
       include 'twissotm.fi'
       integer i, k, l
       double precision sum1, sum2, pos, orbit(6)

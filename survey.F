@@ -4,10 +4,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-      !DEC$ ATTRIBUTES C, ALIAS:'_survey_' :: survey
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Execute SURVEY command.                                            *
@@ -165,9 +161,6 @@
 
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   writes the survey output in the table "survey"                     *

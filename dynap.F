@@ -4,10 +4,6 @@
       implicit none
 
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-      !DEC$ ATTRIBUTES C, ALIAS:'_dynap_' :: dynap
-#endif
 
       integer turns,npart
       double precision eigen(6,6),coords(6,0:turns,*),get_value
@@ -43,9 +39,6 @@
       subroutine dynapfill()
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -97,9 +90,6 @@
       subroutine dynaptunefill
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -133,9 +123,6 @@
      &turnnumber,dq)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -246,9 +233,6 @@
       subroutine fft(data, nn, isign)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Computes the FFT                                                   *
@@ -325,9 +309,6 @@
       double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -391,9 +372,6 @@
       double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -471,9 +449,6 @@
      &nturn)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:
@@ -538,9 +513,6 @@
       subroutine wmaxmin(track,eigen,znt)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *

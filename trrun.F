@@ -2,10 +2,6 @@
      &last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-      !DEC$ ATTRIBUTES C, ALIAS:'_trrun_' :: trrun
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !          Interface RUN and DYNAP command to tracking routine         *
@@ -302,9 +298,6 @@
       subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -581,9 +574,6 @@
 
       subroutine ttmult(track, ktrack, dxt, dyt)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -793,9 +783,6 @@
       end
       subroutine trphot(el,curv,rfac,deltap)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -933,9 +920,6 @@
       end
       subroutine ttdrf(el,track,ktrack)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -966,9 +950,6 @@
       subroutine ttrf(track,ktrack)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1084,9 +1065,6 @@
       end
       subroutine ttcorr(el,track,ktrack)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Track particle through an orbit corrector.                         *
@@ -1240,9 +1218,6 @@
       end
       subroutine dpoissn (amu,n,ierror)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 !    POISSON GENERATOR                                                 *
 !    CODED FROM LOS ALAMOS REPORT      LA-5061-MS                      *
@@ -1280,9 +1255,6 @@
       subroutine ttbb(track,ktrack,parvec)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! purpose:                                                             *
 !   track a set of particle through a beam-beam interaction region.    *
@@ -1417,9 +1389,6 @@
 
 !hbu--- kill particle:  print, modify part_id list
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
       include 'name_len.fi'
       integer i,j,n,turn,part_id(*),jmax,last_turn(*)
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*)
@@ -1455,9 +1424,6 @@
 
 !hbu added spos, ielem, el_name
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 !--- purpose: enter all particle coordinates in one table              *
 !    input:                                                            *
@@ -1511,9 +1477,6 @@
 
 !hbu added spos
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 !--- purpose: enter particle coordinates in table                      *
 !    input:                                                            *
@@ -1550,9 +1513,6 @@
      &last_pos, last_orbit, z, ntrk,al_errors)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   test for collimator aperture limits.                               *
@@ -1610,9 +1570,6 @@
 
       subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Define initial conditions for all particles to be tracked          *
@@ -1716,9 +1673,6 @@
       end
       subroutine trbegn(rt,eigen)
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Initialize tracking mode; TRACK command execution.                 *

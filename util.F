@@ -1,9 +1,6 @@
       subroutine fort_info(t1, t2)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
       character *(*) t1, t2
       integer get_option
@@ -13,9 +10,6 @@
       subroutine fort_warn(t1, t2)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 
       character *(*) t1, t2
@@ -37,10 +31,6 @@
 !   error       (int)   error flag (0: OK, else != 0)
 !----------------------------------------------------------------------*
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-      !DEC$ ATTRIBUTES C, ALIAS:'_getclor_' :: getclor
-#endif
 
       include 'twiss0.fi'
       double precision orbit0(6), rt(6,6), tt(6,6,6)
@@ -859,9 +849,6 @@
 !   to this angle                                                      *
 !----------------------------------------------------------------------*
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
       double precision x,y,twopi,get_variable
 
       twopi=get_variable('twopi ')
@@ -1569,9 +1556,6 @@
       subroutine suelem(el, ve, we,tilt)
 
       implicit none
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *

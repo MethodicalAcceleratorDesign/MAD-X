@@ -9,9 +9,6 @@
 * Subroutine added at 10:38:56 on 8 Apr 2003 by JMJ
 *
 *
-#ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtgetc_' :: mtgetc
-#endif
       integer  num
       double precision vect(*),dvect(*)
       call mtgeti(num,vect,dvect)
@@ -23,9 +20,6 @@
 * Modified at 10:38:56 on 8 Apr 2003 by JMJ
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
       logical psum
       integer num,j,next_vary,get_option,name_l
@@ -73,9 +67,6 @@
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
       integer num,j,next_vary,name_l,ireset
       parameter(name_l=24)
@@ -115,10 +106,6 @@
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-	!DEC$ ATTRIBUTES C, ALIAS:'_collect_' :: collect
-#endif
 
       logical fprt,local,psum
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
@@ -211,9 +198,6 @@ c      if (psum) write(*,831) fsum
       subroutine mtfcn(nf,nx,x,fval,iflag)
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -243,9 +227,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
       integer num,j,next_vary,name_l
       parameter(name_l=24)
@@ -263,9 +244,6 @@ c      if (psum) write(*,831) fsum
       end
       subroutine mtlmdf(ncon,nvar,tol,calls,call_lim,vect,dvect,fun_vec,&
      &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,xold)
-#ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtlmdf_' :: mtlmdf
-#endif
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -305,9 +283,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -762,9 +737,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -903,9 +875,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1288,9 +1257,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtmigr_' :: mtmigr
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1335,9 +1301,6 @@ c      if (psum) write(*,831) fsum
      &covar, wa,work_1,work_2,work_3,work_4,work_5,work_6)
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1574,9 +1537,6 @@ c      if (psum) write(*,831) fsum
       implicit none
 
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Build covariance matrix.                                           *
@@ -1675,9 +1635,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1780,9 +1737,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1960,9 +1914,6 @@ c      if (psum) write(*,831) fsum
 
       implicit none
 
-#ifdef _WIN32
-	!DEC$ ATTRIBUTES C, ALIAS:'_mtsimp_' :: mtsimp
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1998,9 +1949,6 @@ c      if (psum) write(*,831) fsum
      &fsim,wa)
       implicit none
 
-#ifdef _WIN32
-	include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *

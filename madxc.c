@@ -1172,11 +1172,8 @@ double copk(double *r, int m)
 
   return(xpk);
 }
-#ifdef _WIN32
-        unsigned int locf(iadr)            /* changed from locf_ by JMJ, 8/4/2003 */
-#else
+/* unsigned int locf(iadr) changed by FS 24.03.2004 */            /* changed from locf_ by JMJ, 8/4/2003 */
         unsigned int locf_(iadr)            /* changed from locf_ by JMJ, 8/4/2003 */
-#endif
 #define NADUPW 4   /* Number of ADdress Units Per Word */
 #define LADUPW 2   /* Logarithm base 2 of ADdress Units Per Word */
      char *iadr;

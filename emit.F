@@ -2,10 +2,6 @@
      &nemit_v, bmax, gmax, dismax, tunes, sig_v, pdamp)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-      !DEC$ ATTRIBUTES C, ALIAS:'_emit_' :: emit
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -184,9 +180,6 @@
      &u0, emit_v, nemit_v, tunes, sig_v, pdamp)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -400,9 +393,6 @@
       subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
       implicit none
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !---------------------------------------------------------------------*
 ! Purpose:                                                            *
