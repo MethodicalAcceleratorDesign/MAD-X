@@ -244,6 +244,7 @@ void match_end(struct in_cmd* cmd)
     }
   vary_cnt = 0;
   match_is_on = 0;
+  match_sequs->curr = 0;
   current_call_lim = 0;
   current_calls = 0;
   total_const = 0;
