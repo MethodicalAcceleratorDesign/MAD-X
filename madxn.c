@@ -8127,7 +8127,7 @@ void track_tables_create(struct in_cmd* cmd)
   int turns = command_par_value("turns", cmd->clone);
   int ffile = command_par_value("ffile", cmd->clone);
   if (ffile <= 0) ffile = 1;
-  t_size = turns / ffile + 2;
+  t_size = turns / ffile + 10;
   t = make_table("tracksumm", "tracksumm", tracksumm_table_cols, 
   		 tracksumm_table_types, 2*stored_track_start->curr);
   add_to_table_list(t, table_register);
