@@ -86,7 +86,8 @@ sodd_f77.o sodd.o: sodd.F
 trrun_f77.o trrun.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
 emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
 match_f77.o match.o: match.F name_len.fi match.fi 
-touchek_f77.o touchek.o: touchek.F
+touschek_f77.o touschek.o: touschek.F
+resindex_f77.o resindex.o: resindex.F resindex.fi
 
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
