@@ -214,16 +214,11 @@ subroutine ptc_input(lhc,icav,EXCEPTION)
      key%list%bsol=node_value('ks ')
   case(10)
      key%magnet="rfcavity"
+     icav=1
      key%list%volt=node_value('volt ')
-     if(abs(node_value('lag ')).eq.half) then
-        key%list%freq0=c_1d6*node_value('freq ')
-        key%list%lag=-(node_value('lag ')+half)
-     elseif(abs(node_value('lag ')).eq.zero) then
-        key%list%freq0=-c_1d6*node_value('freq ')
-        key%list%lag=-(node_value('lag ')+half)
-     endif
-! Gymnastic needed since PTC expects MAD8 convention
-     if(node_value('harmon ').ne.zero) key%list%freq0=key%list%freq0/node_value('harmon ')
+     key%list%freq0=c_1d6*node_value('freq ')
+     key%list%lag=node_value('lag ')
+     key%list%harmon=one
 !  case(11)
 !     key%magnet="elseparator"
 !     key%list%volt=node_value('ex ')

@@ -2076,14 +2076,16 @@ CONTAINS
        LAG1=LIST%LAG
        FREQ01=LIST%FREQ0
        HARMON1=LIST%HARMON
-       if(.NOT.(LIST%delta_e/=0.0_dp.and.volt1/=0.0_dp)) then
-          volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
-       else
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          w_p%c(1)= "Use either volt or deltae"
-          call write_e(101)
+       if(LIST%delta_e/=0.0_dp) then
+          if(volt1==0.0_dp) then
+             volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
+          else
+             w_p=0
+             w_p%nc=1
+             w_p%fc='((1X,a72))'
+             w_p%c(1)= "Use either volt or deltae"
+             call write_e(101)
+          endif
        endif
     else
        RFCAVITYL=0

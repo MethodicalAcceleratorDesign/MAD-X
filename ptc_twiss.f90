@@ -26,6 +26,8 @@ subroutine ptc_twiss(lhc,icav)
      default=default+delta
      deltap=deltap0
      mynpa=5
+  CASE(6)
+     mynpa=6
   CASE DEFAULT
      default=default+only_4d+NOCAVITY
      mynpa=4
@@ -64,7 +66,9 @@ subroutine ptc_twiss(lhc,icav)
      suml=suml+current%MAG%P%ld
      tw=y
      write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%beta(1,1),tw%beta(1,2),tw%beta(2,1),tw%beta(2,2),&
-tw%disp(1),tw%disp(3)
+!     write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),tw%beta(1,3),&
+!tw%beta(2,1),tw%beta(2,2),&
+     tw%disp(1),tw%disp(3)
      current=>current%next
   enddo
   call kill(tw)

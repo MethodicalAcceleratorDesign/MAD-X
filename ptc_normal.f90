@@ -23,6 +23,8 @@ subroutine ptc_normal(lhc,icav)
      default=default+delta
      deltap=deltap0
      mynpa=5
+  CASE(6)
+     mynpa=6
   CASE DEFAULT
      default=default+only_4d+NOCAVITY
      mynpa=4
