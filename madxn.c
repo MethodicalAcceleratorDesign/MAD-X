@@ -196,7 +196,7 @@ void aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbe
 
 struct aper_node* aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt)
 {
-  int stop=0, nint=1, jslice=1, err, ext_pipe=0, first, ap=1;
+  int stop=0, nint=1, jslice=1, err, first, ap=1;
   int true_flag, true_node=0, offs_flag, offs_node=0, do_survey=0;
   int truepos, true_cnt, offspos, offs_cnt;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
@@ -218,7 +218,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY], newhalox[MAXARRAY], newhaloy[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
-  char *halofile, *pipefile, *truefile, *offsfile;
+  char *halofile, *truefile, *offsfile;
   char refnode[NAME_L];
   char apertype[NAME_L];
   char name[NAME_L];
@@ -227,7 +227,6 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   struct aper_node* lim_pt = &limit_node;
   struct aper_e_d true_tab[E_D_MAX];
   struct aper_e_d offs_tab[E_D_MAX];
-  int i,j;
   setbuf(stdout,(char*)NULL);
   
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
@@ -5018,6 +5017,143 @@ int embedded_twiss()
 }
 
 struct table* read_table(struct in_cmd* cmd)
+     /* reads and stores TFS table */
+{
+  struct table* t = NULL;
+  struct char_p_array* tcpa = NULL;
+  struct name_list* tnl = NULL;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("file", nl);
+  int i, k, error = 0;
+  char *cc, *filename, *type = NULL, *tmp, *name;
+
+  char* namtab;
+
+  if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
+       printf("Want to make named table: %s\n",namtab);
+  } else {
+       if (get_option("debug")) {
+         printf("No table name requested\n");
+         printf("Use default name (i.e. name from file) \n");
+       }
+       namtab = NULL;
+  }
+
+  if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
+    {
+     if ((tab_file = fopen(filename, "r")) == NULL)
+       {
+        warning("cannot open file:", filename); return NULL;
+       }
+    }
+  else
+    {
+     warning("no filename,","ignored"); return NULL;
+    }
+  while (fgets(l_dummy, AUX_LG, tab_file))
+    {
+     cc = strtok(l_dummy, " \"\n");
+     if (*cc == '@')
+       {
+       if ((tmp = strtok(NULL, " \"\n")) != NULL
+              && strcmp(tmp, "TYPE") == 0)
+        {
+         if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
+           {
+            if ((name = strtok(NULL, " \"\n")) != NULL)
+                  type = permbuff(stolower(name));
+           }
+        }
+       }
+     else if (*cc == '*' && tnl == NULL)
+       {
+      tnl = new_name_list(20);
+        while ((tmp = strtok(NULL, " \"\n")) != NULL)
+            add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
+       }
+     else if (*cc == '$' && tcpa == NULL)
+       {
+      if (tnl == NULL)
+        {
+         warning("formats before names","skipped"); return NULL;
+        }
+      tcpa = new_char_p_array(20);
+        while ((tmp = strtok(NULL, " \"\n")) != NULL)
+        {
+         if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
+           if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+           else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+           else                              tnl->inform[tcpa->curr] = 2;
+           tcpa->p[tcpa->curr++] = permbuff(tmp);
+        }
+       }
+     else
+       {
+        if(t == NULL)
+          {
+         if (type == NULL)
+           {
+            warning("TFS table without type,","skipped"); error = 1;
+           }
+         else if (tcpa == NULL)
+           {
+            warning("TFS table without formats,","skipped"); error = 1;
+           }
+         else if (tnl == NULL)
+           {
+            warning("TFS table without column names,","skipped"); error = 1;
+           }
+         else if (tnl->curr == 0)
+           {
+            warning("TFS table: empty column name list,","skipped");
+              error = 1;
+           }
+         else if (tnl->curr != tcpa->curr)
+           {
+            warning("TFS table: number of names and formats differ,",
+                       "skipped");
+              error = 1;
+           }
+           if (error)
+           {
+            delete_name_list(tnl); return NULL;
+           }
+           if(namtab != NULL) {
+             t = new_table(namtab, type,    500, tnl);
+           } else {
+             t = new_table(type, type,    500, tnl);
+           }
+        }
+      for (i = 0; i < tnl->curr; i++)
+        {
+         if (t->curr == t->max) grow_table(t);
+         tmp = tcpa->p[i];
+           if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+           else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
+           {
+            sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+           }
+           else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
+           if (i+1 < tnl->curr)
+           {
+              if ((cc =strtok(NULL, " \"\n")) == NULL)
+              {
+               warning("incomplete table line starting with:", l_dummy);
+                 return NULL;
+              }
+           }
+        }
+        t->curr++;
+       }
+    }
+  fclose(tab_file);
+  t->origin = 1;
+  add_to_table_list(t, table_register);
+  return NULL;
+}
+
+struct table* read_his_table(struct in_cmd* cmd)
      /* reads and stores TFS table */
 {
   struct table* t = NULL;
