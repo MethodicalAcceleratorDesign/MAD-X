@@ -840,6 +840,7 @@ char* track_fileext;             /* track module file name extension */
 double pi, twopi, degrad, raddeg, e, clight, hbar;
 double penalty;
 double match_tol;
+double sxf_suml;
 double orbit0[6];
 double disp0[6];
 double track_deltap=0;

@@ -46,6 +46,7 @@ void sxf_read(struct command* comm)
   int n, rcode, echo, err, izero = 0, count = 0;
   FILE* in_file = in->input_files[in->curr];
   char *p, *pp;
+  sxf_suml = zero;
   if (fgets(l_dummy, AUX_LG, in_file) == NULL)
     {
      warning("SXF input file empty,"," ignored");
@@ -80,6 +81,8 @@ void sxf_read(struct command* comm)
      current_sequ = keep_sequ;
      goto term;
     }
+  printf("SXF -- sequence %s: declared length = %e; element l_sum = %e\n",
+         current_sequ->name, current_sequ->length, sxf_suml);
   add_to_sequ_list(current_sequ, sequences);
   if (attach_beam(current_sequ) == 0)
      fatal_error("USE - sequence without beam:", current_sequ->name);
@@ -148,8 +151,9 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
   add_to_name_list(el->name, 1, occ_list);
   make_elem_node(el, 1);
-  if ((at = find_value("at", ntok, toks)) == INVALID)
-        fatal_error("element without position:", toks[0]);
+  sxf_suml += el->length / 2;
+  if ((at = find_value("at", ntok, toks)) == INVALID) at = sxf_suml;
+  sxf_suml += el->length / 2;
   current_node->at_value = at;
   for (n = 0; n < ntok; n++)  if(strcmp("align.dev", toks[n]) == 0) break;
   if (n < ntok)
@@ -200,8 +204,12 @@ void sxf_fill_command(struct command* comm, int ntok, char** toks)
 
   if ((pos = name_list_pos("l", nl)) > -1)
     {
-     if (strstr(toks[1], "bend"))  length = find_value("arc", ntok, toks);
-     else                          length = find_value("l", ntok, toks);
+     if (strstr(toks[1], "bend"))  
+     {
+      if ((length = find_value("arc", ntok, toks)) == INVALID)
+          length = find_value("l", ntok, toks);
+     }
+     else length = find_value("l", ntok, toks);
      if (length == INVALID) length = zero;
      pl->parameters[pos]->double_value = length;
     }
