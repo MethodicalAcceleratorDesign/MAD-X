@@ -1668,9 +1668,10 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
 	s_pole = i; cnt++;
        }
     }
-  if ((cnt == 1) || (el->value[12]!=zero))
+  if ((cnt == 1) || (el->value[12]!=zero) || (el->value[13]!=zero))
     {
       if (el->value[12]!=zero) { s_pole=12; cnt=1; }
+      if (el->value[13]!=zero) { s_pole=13; cnt=1; }
      if ((new_el_t = (s_pole-12)/2) == 0)  el->nc_pos = s_pole;
      else
        {
