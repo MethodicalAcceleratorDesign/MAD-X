@@ -3340,6 +3340,7 @@ void install_one(struct element* el, char* from_name, double at_value,
   node->at_value = at_value;
   node->at_expr = at_expr;
   node->from_name = from_name;
+  set_command_par_value("at", el->def, position);
   insert_elem(edit_sequ, node);
 }
 
