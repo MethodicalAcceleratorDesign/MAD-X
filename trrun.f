@@ -327,9 +327,9 @@
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
         apx = aperture(1)
-         if(apx.eq.0.0) then
-         apx = tolerance(1)
-         endif
+          if(apx.eq.0.0) then
+          apx = tolerance(1)
+          endif
         apy = apx
 !        print *,"circle, radius= ",apx
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
@@ -353,6 +353,12 @@
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
      &  last_pos, last_orbit, track, ktrack)       
 !        print *, "LHC screen end"
+!------------  marguerite case ----------------------------------
+        else if(aptype.eq.'marguerite') then
+        apx = aperture(1)
+        apy = aperture(2)
+        call trcoll(3, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)
         endif
       endif
       call ttmult(track,ktrack,dxt,dyt)
@@ -1412,17 +1418,25 @@
       do i = n, ntrk
 !---- Is particle outside aperture?
         if (flag .eq. 1                                                 &
-     &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one            &
-     &  .or. flag .eq. 2                                                &
-     &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy))         &
-     &  then
-          n = i
+     &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one) then      &
+        go to 99
+        else if(flag .eq. 2                                             &
+     &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy)) then    &
+        go to 99
+!***  Introduction of marguerite : two ellipses
+        else if(flag .eq. 3                                             &
+     &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one .and.      &
+     &   (z(1,i) / apy)**2 + (z(3,i) / apx)**2 .gt. one) then           &
+        go to 99
+        endif
+        go to 98
+ 99       n = i
           nn=24
           call node_string('apertype ',aptype,nn)
           call trkill(n, turn, sum, ntrk, part_id,                      &
      &    last_turn, last_pos, last_orbit, z,aptype)
            goto 10
-        endif
+ 98     continue   
       enddo
       end
       subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
