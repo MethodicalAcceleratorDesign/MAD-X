@@ -7745,7 +7745,7 @@ void store_node_value(char* par, double* value)
   else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
   else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
   else if (strcmp(lpar, "enable") == 0) current_node->enable = *value;
-  else if (strcmp(lpar, "e2") == 0) 
+  else if (strcmp(lpar, "e2") == 0)
     {
       struct element* el = current_node->p_elem;
       store_comm_par_value("e2",*value,el->def);
