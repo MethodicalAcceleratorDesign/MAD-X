@@ -1226,15 +1226,26 @@ void   f_ctof(int *j, char *string, int *nel)
     }
         *j = i;
 }
+#include <sys/time.h>	/* for gettimeofday */
 float fextim()
 {
-    struct timeb tp;
-    float mytime;
+   #if ( __GNUC__==2 && __GNUC_MINOR__ > 94 ) || __GNUC__ > 2 //hbu  
+gettimeofday available
+     float mytime;
+     struct timeval tp;
+     struct timezone tzp;
+     gettimeofday(&tp,&tzp);
+     mytime = (double)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; // seconds 
+from epoch, modulo 10 000
+   #else // use old ftime
+     struct timeb tp;
+     float mytime;
 
-    ftime(&tp);
+     ftime(&tp);
 
-    mytime = (float)(tp.time%10000) + 0.001*tp.millitm;
-    /* printf("Time now:  %-6.3f\n",mytime);    */              
+     mytime = (float)(tp.time%10000) + 0.001*tp.millitm;
+   #endif
+     /* printf("Time now:  %-6.3f\n",mytime);    */
 
-    return(mytime);
+     return(mytime);
 }
