@@ -324,20 +324,31 @@
       call ttcorr(el, track, ktrack)
       go to 500
 
+!---- Element aperture.
+!      call node_vector('knl ',nn,normal)
+
 !---- Elliptic aperture.
   200 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-!      call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
-!     &last_pos, last_orbit, track, ktrack)
+      print *,"---------  TTMAP  ------"
+      print *,"---------"
+      print *,"elliptic collim, apertures = " , apx,apy
+      call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
+     &last_pos, last_orbit, track, ktrack)
       go to 500
 
 !---- Rectangular aperture.
   210 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
-!      call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
-!     &last_pos, last_orbit, track, ktrack)
+      print *," "
+      print *," "
+      print *,"--------- TTMAP  ------"
+      print *,"---------"
+      print *,"Rectangular collim, apertures (X,Y) = " , apx,apy
+      call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
+     &last_pos, last_orbit, track, ktrack)
       go to 500
 
 !---- Beam-beam.
@@ -1215,6 +1226,8 @@
      &last_turn, last_pos, last_orbit, z)
       goto 10
       end
+
+
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
      &last_turn, last_pos, last_orbit, z)
       implicit none
@@ -1226,6 +1239,11 @@
       do j = 1, 6
         last_orbit(j,part_id(n)) = z(j,n)
       enddo
+      print *," "
+      print *,"particle #",part_id(n),"    killed in turn ",turn,
+     &"   at element", ,"  X=",
+     &z(1,n),"  Y=",z(3,n)
+
       do i = n+1, jmax
         part_id(i-1) = part_id(i)
         do j = 1, 6
@@ -1234,6 +1252,8 @@
       enddo
       jmax = jmax - 1
       end
+
+
       subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0)
       implicit none
 !----------------------------------------------------------------------*
@@ -1334,9 +1354,12 @@
      &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy))         &
      &  then
           n = i
+      print *," "
+      print *," "
+      print *,"--------- TRCOLL  ------"
           call trkill(n, turn, sum, ntrk, part_id,                      &
      &    last_turn, last_pos, last_orbit, z)
-          goto 10
+           goto 10
         endif
       enddo
       end
