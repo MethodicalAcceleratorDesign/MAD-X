@@ -1762,7 +1762,7 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       integer i,j,code
-      logical fsec, ftrk, fmap
+      logical fsec, ftrk, fmap, bend
       double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
       double precision theta, zero, st, ct, tmp
       parameter (zero = 0.d0)
@@ -1771,18 +1771,21 @@
       call m66one(re)
       call dzero(te,216)
       fmap=.false.
+      bend = code .eq. 2 .or. code .eq. 3
       el = node_value('l ')
-      theta = node_value('tilt ')
-      if (theta .ne. zero)  then
+      if (.not. bend)  then
+        theta = node_value('tilt ')
+        if (theta .ne. zero)  then
 !--- rotate orbit before entry
-        st = sin(theta)
-        ct = cos(theta)
-        tmp = orbit(1)
-        orbit(1) = ct * tmp + st * orbit(3)
-        orbit(3) = ct * orbit(3) - st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp + st * orbit(4)
-        orbit(4) = ct * orbit(4) - st * tmp
+          st = sin(theta)
+          ct = cos(theta)
+          tmp = orbit(1)
+          orbit(1) = ct * tmp + st * orbit(3)
+          orbit(3) = ct * orbit(3) - st * tmp
+          tmp = orbit(2)
+          orbit(2) = ct * tmp + st * orbit(4)
+          orbit(4) = ct * orbit(4) - st * tmp
+        endif
       endif
 !---- Select element type.
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
@@ -1895,15 +1898,17 @@
 
 !---- End of element calculation;
   500 continue
-      if (theta .ne. zero)  then
-        call tmtilt(.true., -theta, ek, re, te)
+      if (.not. bend)  then
+        if (theta .ne. zero)  then
+          call tmtilt(.true., -theta, ek, re, te)
 !--- rotate orbit at exit
-        tmp = orbit(1)
-        orbit(1) = ct * tmp - st * orbit(3)
-        orbit(3) = ct * orbit(3) + st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp - st * orbit(4)
-        orbit(4) = ct * orbit(4) + st * tmp
+          tmp = orbit(1)
+          orbit(1) = ct * tmp - st * orbit(3)
+          orbit(3) = ct * orbit(3) + st * tmp
+          tmp = orbit(2)
+          orbit(2) = ct * tmp - st * orbit(4)
+          orbit(4) = ct * orbit(4) + st * tmp
+        endif
       endif
       end
       subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
@@ -1948,19 +1953,8 @@
         deltap = get_value('probe ','deltap ')
         gamma = get_value('probe ','gamma ')
         dorad = get_value('probe ','radiate ') .ne. zero
-        an = node_value('angle ')
-        sk0 = an / el
-        sk0s = node_value('k0s ')
-        if (sk0s .eq. zero)  then
-          tilt = zero
-        else
-          tilt = asin(sk0s/sqrt(sk0**2 + sk0s**2))
-          sk0 = sqrt(sk0**2 + sk0s**2)
-          an = sk0 * el
-        endif
-        an = bv0 * an
-        sk0 = bv0 * sk0
-        sk0s = bv0 * sk0s
+        an = bv0 * node_value('angle ')
+        tilt = -node_value('tilt ')
         e1 = bv0 * node_value('e1 ')
         e2 = bv0 * node_value('e2 ')
 !--- bvk applied further down
@@ -2304,47 +2298,6 @@
           ek(2) = ek(2) - dh**2 * t266
           ek(5) = ek(5) + dh**2 * t566 * bi
         endif
-      endif
-
-      end
-      subroutine tmfoc(el,sk1,c,s,d,f)
-      implicit none
-!----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Compute linear focussing functions.                                *
-! Input:                                                               *
-!   el        (double)  element length.                                *
-!   sk1       (double)  quadrupole strength.                           *
-! Output:                                                              *
-!   c         (double)  cosine-like function.             c(k,l)       *
-!   s         (double)  sine-like function.               s(k,l)       *
-!   d         (double)  dispersion function.              d(k,l)       *
-!   f         (double)  integral of dispersion function.  f(k,l)       *
-!----------------------------------------------------------------------*
-      double precision c,d,el,f,qk,qkl,qkl2,s,sk1,zero,one,two,six,     &
-     &twelve,twty,thty,foty2
-      parameter(zero=0d0,one=1d0,two=2d0,six=6d0,twelve=12d0,twty=20d0, &
-     &thty=30d0,foty2=42d0)
-
-!---- Initialize.
-      qk = sqrt(abs(sk1))
-      qkl = qk * el
-      qkl2 = sk1 * el**2
-      if (abs(qkl2) .le. 1e-2) then
-        c = (one - qkl2 * (one - qkl2 / twelve) /  two)
-        s = (one - qkl2 * (one - qkl2 / twty) /  six) * el
-        d = (one - qkl2 * (one - qkl2 / thty) / twelve) * el**2 / two
-        f = (one - qkl2 * (one - qkl2 / foty2) / twty) * el**3 / six
-      else
-        if (qkl2 .gt. zero) then
-          c = cos(qkl)
-          s = sin(qkl) / qk
-        else
-          c = cosh(qkl)
-          s = sinh(qkl) / qk
-        endif
-        d = (one - c) / sk1
-        f = (el  - s) / sk1
       endif
 
       end

@@ -1812,3 +1812,44 @@
       i = 1
    20 lastnb = i
       end
+      subroutine tmfoc(el,sk1,c,s,d,f)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Compute linear focussing functions.                                *
+! Input:                                                               *
+!   el        (double)  element length.                                *
+!   sk1       (double)  quadrupole strength.                           *
+! Output:                                                              *
+!   c         (double)  cosine-like function.             c(k,l)       *
+!   s         (double)  sine-like function.               s(k,l)       *
+!   d         (double)  dispersion function.              d(k,l)       *
+!   f         (double)  integral of dispersion function.  f(k,l)       *
+!----------------------------------------------------------------------*
+      double precision c,d,el,f,qk,qkl,qkl2,s,sk1,zero,one,two,six,     &
+     &twelve,twty,thty,foty2
+      parameter(zero=0d0,one=1d0,two=2d0,six=6d0,twelve=12d0,twty=20d0, &
+     &thty=30d0,foty2=42d0)
+
+!---- Initialize.
+      qk = sqrt(abs(sk1))
+      qkl = qk * el
+      qkl2 = sk1 * el**2
+      if (abs(qkl2) .le. 1e-2) then
+        c = (one - qkl2 * (one - qkl2 / twelve) /  two)
+        s = (one - qkl2 * (one - qkl2 / twty) /  six) * el
+        d = (one - qkl2 * (one - qkl2 / thty) / twelve) * el**2 / two
+        f = (one - qkl2 * (one - qkl2 / foty2) / twty) * el**3 / six
+      else
+        if (qkl2 .gt. zero) then
+          c = cos(qkl)
+          s = sin(qkl) / qk
+        else
+          c = cosh(qkl)
+          s = sinh(qkl) / qk
+        endif
+        d = (one - c) / sk1
+        f = (el  - s) / sk1
+      endif
+
+      end

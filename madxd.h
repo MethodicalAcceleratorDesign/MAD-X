@@ -240,6 +240,7 @@ struct name_list* delete_name_list(struct name_list*);
 struct node* delete_node(struct node*);
 struct node* delete_node_ring(struct node*);
 struct node_list* delete_node_list(struct node_list*);
+struct sequence* delete_sequence(struct sequence*);
 struct sequence_list* delete_sequence_list(struct sequence_list*);
 struct variable* delete_variable(struct variable*);
 struct var_list* delete_var_list(struct var_list*);

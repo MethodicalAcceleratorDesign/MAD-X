@@ -190,7 +190,6 @@ void match_end(struct in_cmd* cmd)
   pro_twiss(); 
   current_const = 0;
   set_option("match_summary", &print_match_summary);
-
   if (twiss_success && print_match_summary == 1)
     {
       fprintf(prt_file, "\n");
@@ -394,6 +393,7 @@ void match_match(struct in_cmd* cmd)
 	    tnl = local_twiss[i]->cmd_def->par_names;
 	    tpos = name_list_pos("sequence", tnl);
 	    local_twiss[i]->cmd_def->par->parameters[tpos]->string = match_seqs[i];
+	    local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
 	    /* END defining a TWISS input command for each sequence */
 	  }
 	else
@@ -414,6 +414,7 @@ void match_match(struct in_cmd* cmd)
       tnl = local_twiss[0]->cmd_def->par_names;
       tpos = name_list_pos("sequence", tnl);
       local_twiss[0]->cmd_def->par->parameters[tpos]->string = current_sequ->name;
+      local_twiss[0]->cmd_def->par_names->inform[tpos] = 1;
      /* END defining a TWISS input command for default sequence */
     }
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
@@ -427,7 +428,9 @@ void match_match(struct in_cmd* cmd)
     {
       for (j = 0; j < local_twiss[i]->cmd_def->par->curr; j++)
 	{
-	  local_twiss[i]->cmd_def->par_names->inform[j] = 0;
+         tnl = local_twiss[i]->cmd_def->par_names;
+         tpos = name_list_pos("sequence", tnl);
+	 if (j != tpos) local_twiss[i]->cmd_def->par_names->inform[j] = 0;
 	}
     }
 
@@ -472,6 +475,42 @@ void match_match(struct in_cmd* cmd)
        }
     }
   /* END CHK-RANGE; OB 12.11.2002 */
+
+  /* START CHK-USEORBIT; HG 28.1.2003 */
+  pos = name_list_pos("useorbit", nl);
+  if(nl->inform[pos]) /* useorbit specified */
+    {
+     cp = cmd->clone->par->parameters[pos];
+     for (i = 0; i < cp->m_string->curr; i++) 
+       {
+	/* START adding useorbit to TWISS input command for each sequence */
+	tnl = local_twiss[i]->cmd_def->par_names;
+	tpos = name_list_pos("useorbit", tnl);
+	local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+	local_twiss[i]->cmd_def->par->parameters[tpos]->string 
+               = buffer(cp->m_string->p[i]);
+	/* END adding range to TWISS input command for each sequence */
+       }
+    }
+  /* END CHK-USEORBIT; HG 28.1.2003 */
+
+  /* START CHK-KEEPORBIT; HG 28.1.2003 */
+  pos = name_list_pos("keeporbit", nl);
+  if(nl->inform[pos]) /* keeporbit specified */
+    {
+     cp = cmd->clone->par->parameters[pos];
+     for (i = 0; i < cp->m_string->curr; i++) 
+       {
+	/* START adding keeporbit to TWISS input command for each sequence */
+	tnl = local_twiss[i]->cmd_def->par_names;
+	tpos = name_list_pos("keeporbit", tnl);
+	local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+	local_twiss[i]->cmd_def->par->parameters[tpos]->string 
+               = buffer(cp->m_string->p[i]);
+	/* END adding range to TWISS input command for each sequence */
+       }
+    }
+  /* END CHK-KEEPORBIT; HG 28.1.2003 */
 
   /* START CHK-ENTRIES of TYPE DOUBLE-REAL; OB 23.1.2002 */
   for (j = 0; j < nl->curr; j++)

@@ -207,6 +207,15 @@ void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
 {
   int i;
   for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  return;
+  for (i = 0; i < sql->curr; i++) 
+    {
+     if (strcmp(sql->sequs[i]->name, sequ->name) == 0) 
+       {
+        sql->sequs[i] = sequ;
+        sql->list->names[i] = sequ->name;
+        return;
+       }
+    }
   if (sql->curr == sql->max) grow_sequence_list(sql);
   sql->sequs[sql->curr++] = sequ;
   add_to_name_list(sequ->name, 0, sql->list);
@@ -731,6 +740,23 @@ struct node_list* delete_node_list(struct node_list* l)
   if (l->nodes != NULL)  free(l->nodes);
   if (l->list != NULL)  delete_name_list(l->list);
   free(l);
+  return NULL;
+}
+
+struct sequence* delete_sequence(struct sequence* sequ)
+{
+  if (sequ->ex_start != NULL)
+    {
+     sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
+     sequ->ex_start = delete_node_ring(sequ->ex_start);
+     sequ->orbits = delete_vector_list(sequ->orbits);
+     free(sequ->all_nodes);
+    }
+  if (sequ->l_expr) sequ->l_expr = delete_expression(sequ->l_expr);
+  sequ->nodes = delete_node_list(sequ->nodes);
+  sequ->start = delete_node_ring(sequ->start);
+  if (sequ->cavities) sequ->cavities = delete_el_list(sequ->cavities);
+  free(sequ);
   return NULL;
 }
 

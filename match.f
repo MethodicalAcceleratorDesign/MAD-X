@@ -1,5 +1,6 @@
       subroutine mtgeti(num,vect,dvect)
       implicit none
+      logical psum
       integer num,j,next_vary,get_option,name_l
       parameter(name_l=24)
       double precision get_variable,vect(*),dvect(*),c_min,c_max,step,  &
@@ -10,6 +11,7 @@
       include 'name_len.fi'
       character*(name_len) name
 
+      psum=get_option('match_summary ') .ne. 0
  1    continue
       j = next_vary(name,name_l,c_min,c_max,step)
       if (j .ne. 0)  then
@@ -29,8 +31,7 @@
         else
           dval = step
         endif
-        if(get_option("match_summary").eq.1)                            &
-     &  write(*,830) name,val,c_min,c_max
+        if(psum) write(*,830) name,val,c_min,c_max
         vect(j) = val
         dvect(j) = dval
         goto 1
@@ -74,7 +75,7 @@
       end
       subroutine collect(ncon,fsum,fvect)
       implicit none
-      logical fprt,local
+      logical fprt,local,psum
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,double_from_table,    &
      &char_from_table,name_l
@@ -85,6 +86,7 @@
 
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
+      psum=get_option('match_summary ') .ne. 0
       call table_range('twiss ','#s/#e ',range)
       if(local) then
         j=restart_sequ()
@@ -111,13 +113,13 @@
             ncon=ncon+1
             fvect(ncon)=f_val
             fsum=fsum+f_val**2
-            if(get_option("match_summary").eq.1.and.type.eq.4)          &
+            if(psum.and.type.eq.4)                                      &
      &      write(*,830) node_name,name,type,value,val,f_val**2
-            if(get_option("match_summary").eq.1.and.type.eq.2)          &
+            if(psum.and.type.eq.2)                                      &
      &      write(*,830) node_name,name,type,c_max,val,f_val**2
-            if(get_option("match_summary").eq.1.and.type.eq.1)          &
+            if(psum.and.type.eq.1)                                      &
      &      write(*,830) node_name,name,type,c_min,val,f_val**2
-            if(get_option("match_summary").eq.1.and.type.eq.3)          &
+            if(psum.and.type.eq.3)                                      &
      &      write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
             goto 20
           endif
@@ -145,14 +147,13 @@
         fvect(ncon)=f_val
         fsum=fsum+f_val**2
 
-        if(get_option("match_summary").eq.1)                            &
+        if(psum)                                                        &
      &  write(*,830) "Global constraint:      ",name,type,value,val,    &
      &  f_val**2
 
         goto 30
       endif
-      if (get_option("match_summary").eq.1)                             &
-     &write(*,831) fsum
+      if (psum) write(*,831) fsum
   830 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8)
   832 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8,3x,e16.8)
   831 format(//,'Final Penalty Function = ',e16.8)

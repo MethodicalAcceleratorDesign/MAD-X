@@ -1326,24 +1326,39 @@ double el_par_value(char* par, struct element* el)
 {
   int k = 0, n;
   char tmp[8];
-  double val = zero, angle, l, k0, vec[100];
+  double sq, val = zero, angle = zero, tilt = zero, l, k0, k0s, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
-  int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
+  int noang = 0, mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
   if (fact != zero || strcmp(el->base_type->name, "sbend") == 0)
     {
      if ((l = command_par_value("l", el->def)) == zero) 
         fatal_error("bend with zero length:",el->name);
      if ((angle = command_par_value("angle", el->def)) == zero)
-        angle = l * command_par_value("k0", el->def);
+       {
+	noang = 1;
+        k0 = command_par_value("k0", el->def);
+        k0s = command_par_value("k0s", el->def);
+        if ((sq = sqrt(k0*k0+k0s*k0s)) > zero)
+	  {
+           tilt = asin(k0s/sq);
+	   angle = l * sq;
+	  }
+       }
+     else tilt = command_par_value("tilt", el->def);
      if (strcmp(par, "angle") == 0)  val = angle;
+     else if (strcmp(par, "tilt") == 0)  val = tilt;
      else if (strcmp(par, "k0") == 0)
        {
-        if ((k0 = command_par_value("k0", el->def)) == zero)
-          k0 = angle / l;
+        if ((k0 = command_par_value("k0", el->def)) == zero && noang == 0)
+           k0 = cos(tilt) * angle / l;
         val = k0;
        }
      else if (strcmp(par, "k0s") == 0)
-       val = command_par_value("k0s", el->def);
+       {
+        if ((k0s = command_par_value("k0s", el->def)) == zero && noang == 0)
+           k0s = sin(tilt) * angle / l;
+        val = k0s;
+       }
      else if (strcmp(par, "l") == 0)
        {
         if (fact != zero && get_option("rbarc") && angle != zero)
@@ -4178,6 +4193,7 @@ void make_sequ_from_line(char* name)
   char** tmp = NULL;
   int pos = name_list_pos(name, line_list->list);
   int spos;
+  struct sequence* old_sequ = NULL;
   struct macro* line;
   int mpos = name_list_pos("marker", defined_commands->list);
   struct command* clone = clone_command(defined_commands->commands[mpos]);
@@ -4187,13 +4203,11 @@ void make_sequ_from_line(char* name)
   line_buffer->curr = 0;
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
-  if ((spos = name_list_pos(name, sequences->list)) >= 0)
-       current_sequ = sequences->sequs[spos];
-  else
-    {
-     current_sequ = new_sequence(name, 0); /* node positions = centre */
-     add_to_sequ_list(current_sequ, sequences);
-    }
+  current_sequ = new_sequence(name, 0); /* node positions = centre */
+  if ((spos = name_list_pos(name, sequences->list)) >= 0) 
+    old_sequ = sequences->sequs[spos];
+  add_to_sequ_list(current_sequ, sequences);
+  if (old_sequ) old_sequ = delete_sequence(old_sequ);
   if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
   else current_sequ->cavities = new_el_list(100);
   if (occ_list == NULL) 
@@ -4201,6 +4215,7 @@ void make_sequ_from_line(char* name)
   else occ_list->curr = 0;
   sprintf(c_dummy, "%s$start", current_sequ->name);
   el = make_element(c_dummy, "marker", clone, 0);
+  current_node = NULL;
   make_elem_node(el, 1);
   current_sequ->start = current_node;
   current_sequ->length = line_nodes(line_buffer);
@@ -8564,7 +8579,7 @@ void use_sequ(struct in_cmd* cmd)
        }
      name = pl->parameters[pos]->string;
      if ((pos = name_list_pos(name, line_list->list)) > -1) 
-       make_sequ_from_line(name); remove_from_name_list(name, line_list->list);
+       make_sequ_from_line(name); 
      if ((lp = name_list_pos(name, sequences->list)) > -1)
        {
 	current_sequ = sequences->sequs[lp];

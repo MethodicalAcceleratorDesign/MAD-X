@@ -1680,7 +1680,7 @@
       integer double_from_table
       double precision telpar(*)
       double precision get_value
-      double precision tw0(mintpl), tw1(mintpl), dmu, step, am(6,6,3)
+      double precision tw0(mintpl), tw1(mintpl), dmu, step, am(6,6)
       double precision ex, ey, bx0, ax0, ux0, dx0, dpx0,                &
      &by0, ay0, uy0, dy0, dpy0, x0, px0, y0, py0, xn0, pxn0, yn0, pyn0
       double precision bx1, ax1, ux1, dx1, dpx1,                        &
@@ -1699,17 +1699,13 @@
      &(px1, tw1(12)), (y1, tw1(13)), (py1, tw1(14)),                    &
      &(xn1,tw1(15)), (pxn1, tw1(16)),                                   &
      &(yn1, tw1(17)), (pyn1, tw1(18))
-      double precision s0, gamx, gamy
+      double precision s0, dstp, gamx, gamy
       integer i, j, k, ipc
       logical elmflg
 
       ierr = 0
       if (telpar(1) .eq. zero)  goto 999
       step = telpar(1) / nint
-!--- element matrices 6x6: entry, body, exit
-      do i = 1, 3
-        call peelma(i, type, telpar, step, am(1,1,i))
-      enddo
 !---  set flag for correct interpolation
       elmflg = .false.
       do i = 1, nivvar
@@ -1730,6 +1726,7 @@
         k = double_from_table(tabname, 'muy ', crow, uy0)
         k = double_from_table(tabname, 'dy ', crow, dy0)
         k = double_from_table(tabname, 'dpy ', crow, dpy0)
+        k = double_from_table(tabname, 's ', crow, s0)
         ex = get_value('beam ','ex ')
         ey = get_value('beam ','ey ')
 !--- xn, pxn, yn, pyn
@@ -1743,7 +1740,6 @@
         else
           yn0 = y0 / sqrt(ey*abs(by0))
         endif
-        s0 = qhval(nqval(1),1)
         if (bx0 .ne. zero)  then
           gamx = (one + ax0**2) / bx0
         else
@@ -1763,43 +1759,46 @@
           else
             mat = 2
           endif
+          dstp = i * step
+!--- element matrices 6x6: entry, body, exit
+          call peelma(mat, type, telpar, dstp, am(1,1))
 !--- interpolate twiss parameters
 !    beta_x, beta_y
-          bx1 = -two * am(1,1,mat) * am(1,2,mat) * ax0                  &
-     &    + am(1,1,mat)**2 * bx0 + am(1,2,mat)**2 * gamx
-          by1 = -two * am(3,3,mat) * am(3,4,mat) * ay0                  &
-     &    + am(3,3,mat)**2 * by0 + am(3,4,mat)**2 * gamy
+          bx1 = -two * am(1,1) * am(1,2) * ax0                          &
+     &    + am(1,1)**2 * bx0 + am(1,2)**2 * gamx
+          by1 = -two * am(3,3) * am(3,4) * ay0                          &
+     &    + am(3,3)**2 * by0 + am(3,4)**2 * gamy
 !--- alfa_x, alfa_y
-          ax1 = (am(1,1,mat) * am(2,2,mat) + am(1,2,mat) * am(2,1,mat)) &
-     &    * ax0 - am(1,1,mat) * am(2,1,mat) * bx0                       &
-     &    - am(1,2,mat) * am(2,2,mat) * gamx
-          ay1 = (am(3,3,mat) * am(4,4,mat) + am(3,4,mat) * am(4,3,mat)) &
-     &    * ay0 - am(3,3,mat) * am(4,3,mat) * by0                       &
-     &    - am(3,4,mat) * am(4,4,mat) * gamy
+          ax1 = (am(1,1) * am(2,2) + am(1,2) * am(2,1))                 &
+     &    * ax0 - am(1,1) * am(2,1) * bx0                               &
+     &    - am(1,2) * am(2,2) * gamx
+          ay1 = (am(3,3) * am(4,4) + am(3,4) * am(4,3))                 &
+     &    * ay0 - am(3,3) * am(4,3) * by0                               &
+     &    - am(3,4) * am(4,4) * gamy
 !--- mu_x, mu_y
-          dmu = atan2(am(1,2,mat), bx0 * am(1,1,mat)                    &
-     &    - ax0 * am(1,2,mat))
+          dmu = atan2(am(1,2), bx0 * am(1,1)                            &
+     &    - ax0 * am(1,2))
           if (dmu .lt. zero)  dmu = dmu + twopi
           ux1 = ux0 + dmu / twopi
-          dmu = atan2(am(3,4,mat), by0 * am(3,3,mat)                    &
-     &    - ay0 * am(3,4,mat))
+          dmu = atan2(am(3,4), by0 * am(3,3)                            &
+     &    - ay0 * am(3,4))
           if (dmu .lt. zero)  dmu = dmu + twopi
           uy1 = uy0 + dmu / twopi
 !--- d-x, d-y
-          dx1 = am(1,1,mat) * dx0 + am(1,2,mat) * dpx0 + am(1,6,mat)
-          dy1 = am(3,3,mat) * dy0 + am(3,4,mat) * dpy0 + am(3,6,mat)
+          dx1 = am(1,1) * dx0 + am(1,2) * dpx0 + am(1,6)
+          dy1 = am(3,3) * dy0 + am(3,4) * dpy0 + am(3,6)
 !--- d'-x, d'-y
-          dpx1 = am(2,1,mat) * dx0 + am(2,2,mat) * dpx0 + am(2,6,mat)
-          dpy1 = am(4,3,mat) * dy0 + am(4,4,mat) * dpy0 + am(4,6,mat)
+          dpx1 = am(2,1) * dx0 + am(2,2) * dpx0 + am(2,6)
+          dpy1 = am(4,3) * dy0 + am(4,4) * dpy0 + am(4,6)
 !--- x, px, y, py
-          x1 = am(1,1,mat) * x0 + am(1,2,mat) * px0                     &
-     &    + am(1,6,mat) * currdp
-          y1 = am(3,3,mat) * y0 + am(3,4,mat) * py0                     &
-     &    + am(3,6,mat) * currdp
-          px1 = am(2,1,mat) * x0 + am(2,2,mat) * px0                    &
-     &    + am(2,6,mat) * currdp
-          py1 = am(4,3,mat) * y0 + am(4,4,mat) * py0                    &
-     &    + am(4,6,mat) * currdp
+          x1 = am(1,1) * x0 + am(1,2) * px0                             &
+     &    + am(1,6) * currdp
+          y1 = am(3,3) * y0 + am(3,4) * py0                             &
+     &    + am(3,6) * currdp
+          px1 = am(2,1) * x0 + am(2,2) * px0                            &
+     &    + am(2,6) * currdp
+          py1 = am(4,3) * y0 + am(4,4) * py0                            &
+     &    + am(4,6) * currdp
 !--- xn, pxn, yn, pyn
           if (ex * bx1.eq. zero)  then
             xn1 = zero
@@ -1823,7 +1822,7 @@
               endif
               ipparm(2,j) = 1
               nqval(j) = nqval(j) + 1
-              qhval(nqval(j),j) = s0 + i * step
+              qhval(nqval(j),j) = s0 + dstp
               if (proc(1,j) .gt. 0)  then
                 qvval(nqval(j), j) = sqrt(abs(tw1(ipc)))
               else
@@ -1832,9 +1831,6 @@
             else
               ipparm(2,j) = 0
             endif
-          enddo
-          do j = 1, mintpl
-            tw0(j) = tw1(j)
           enddo
         enddo
       endif
