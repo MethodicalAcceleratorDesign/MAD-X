@@ -525,6 +525,7 @@
 !--- Initialise
 
       ftrk = .false.
+      e2 = 0d0
       do i = 1, 6
         do j = 1, 6
           am(j,i) = zero
@@ -2850,6 +2851,9 @@
         vmima(1,i) = 1.e20
         vmima(2,i) = -1.e20
         nvvar(i) = 0
+      enddo
+      do i = 1, 100
+        d_arr(i)=0d0
       enddo
       char_a = ' '
       tmp_a = 'notitle '

@@ -2050,6 +2050,7 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
+      deltap=zero
       call dzero(ek0,6)
       call m66one(rw)
       call dzero(tw,216)
@@ -2979,6 +2980,7 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
 
 !---- Initialize.
+      deltap = zero
       fmap = el .ne. zero
       if (.not. fmap) return
       call dzero(f_errors,maxferr+1)
