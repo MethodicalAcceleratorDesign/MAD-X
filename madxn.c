@@ -8672,6 +8672,28 @@ void track_dynap(struct in_cmd* cmd)
   double *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5, *buf6,
     *buf7, *buf8, *buf9, *buf10, *buf11;
   struct table* t;
+  int kopt01,kopt02;
+
+
+    kopt02=0;
+    kopt01 = get_value("dynap","damp");
+    if (kopt01 == 0) {
+     kopt02=1;
+     fprintf(prt_file, "damp is on\n");}
+     set_option("damp", &kopt02);
+
+
+
+    kopt02=0;
+    kopt01 = get_value("dynap","quantum");
+    if (kopt01 == 0) {
+     kopt02=1;
+     fprintf(prt_file, "quantum is on\n");}
+     set_option("quantum", &kopt02);
+
+
+
+
   if (track_is_on == 0)
     {
      warning("track_dynap: no TRACK command seen yet", "ignored");
@@ -8998,6 +9020,18 @@ void track_track(struct in_cmd* cmd)
   if ((k = get_value(current_command->name,"onepass")) != 0)
      fprintf(prt_file, "one pass is on\n");
   set_option("onepass", &k);
+
+
+  if ((k = get_value(current_command->name,"damp")) != 0)
+     fprintf(prt_file, "damp is on\n");
+  set_option("damp", &k);
+  if ((k = get_value(current_command->name,"quantum")) != 0)
+     fprintf(prt_file, "quantum is on\n");
+  set_option("quantum", &k);
+
+
+
+
   if ((k = get_value(current_command->name,"aperture")) != 0)
      fprintf(prt_file, "aperture tracking is on\n");
   set_option("aperture", &k);
