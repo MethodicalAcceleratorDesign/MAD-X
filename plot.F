@@ -369,8 +369,8 @@
               call gxplt1 (npt, xreal, yreal, actwin)
               if (ilb .gt. 0) then
 !--- get y pos. on curve for label
-                call gxcubi (npt, xreal, yreal, yy1d, yy2d, iecub)
-                ywpos = gxcubv (xwpos, npt, xreal, yreal, yy1d, yy2d)
+!                call gxcubi (npt, xreal, yreal, yy1d, yy2d, iecub)
+!                ywpos = gxcubv (xwpos, npt, xreal, yreal, yy1d, yy2d)
                 ilb   = -2
               endif
             endif
@@ -505,6 +505,7 @@
 !   am          (d.p.)  matrix
 !----------------------------------------------------------------------*
       implicit none
+      include 'twissl.fi'
       integer mcnam, maxpnt
       parameter (mcnam = 16, maxpnt = 500)
 
@@ -513,20 +514,39 @@
       parameter         (zero = 0.d0, eps = 1.d-5)
       parameter         (one = 1.d0, two = 2.d0, twopi = two * pi)
       integer pos, itp
-      double precision temp(*), dstp, am(6,6), re(6,6), rd(6,6)
-      double precision eleng, elang, elak1, rhoi, rk2, fpr, cangle,     &
-     &sangle, d, f, e1, e2, edge, tanedg
-      integer i, j, k
-      logical           drift, bend, quad
+      double precision temp(*), dstp, am(6,6)
 
+      double precision e2, rk2, cangle, sangle, tilt, d, f 
+      double precision ek(6), te(6,6,6), orbit(6), am2(6,6)
+      double precision node_value
+      integer i, j, k
+      logical drift, bend, quad, fmap,ftrk,cecptk,cebttk
+
+!--- Initialise
+
+      ftrk = .false.
       do i = 1, 6
         do j = 1, 6
           am(j,i) = zero
+          am2(j,i) = zero
         enddo
         am(i,i) = one
+        am2(i,i) = one
+        orbit(i) = zero
       enddo
+
+!---  save values of centre_cptk & centre_bttk and set them to .false.
+
+      cecptk = centre_cptk
+      cebttk = centre_bttk
+      centre_cptk = .false.
+      centre_bttk = .false.
+
+!--- End of initialisation
+
 !--- treat quads with non-zero tilt, and bends with non-zero tilt
 !    different from pi/2 as drifts
+
       k = mod(itp, 20)
       bend = k .eq. 1 .or. k .eq. 7
       quad = itp .eq. 2 .or. itp .eq. 3
@@ -535,69 +555,41 @@
         am(1,2) = dstp
         am(3,4) = dstp
       else
-        if (k .eq. 7)  then
-          fpr = -one
-        else
-          fpr = one
-        endif
-        eleng = temp(1)
-        e1    = temp(3)
-        e2    = temp(4)
-        elang = temp(11)
-        elak1 = temp(15)
-        if (itp. gt. 20)  then
-!--- rbend
-          e1 = e1 + elang / two
-          e2 = e2 + elang / two
-        endif
-        do i = 0, 2, 2
-          rhoi = ((one + fpr) / two) * elang / eleng
-          rk2  = rhoi**2 + fpr * elak1
-          if (rk2 .ne. zero)  then
+         if (bend) then
+            if (pos .eq. 1) then
+              e2 = node_value('e2 ')
+              call store_node_value('e2 ', zero)
+            endif  
+            if (pos .eq. 3) call store_node_value('e2 ', e2)
+            call tmbend(.false.,orbit,fmap,dstp,ek,am,te)
+         else
+
+!--- quad -------------------------------------------
+
+            rk2  = temp(15)
+            tilt = temp(7)
+            call tmquad(.false.,.false.,tilt,orbit,fmap,dstp,ek,am,te)
             call tmfoc(dstp, rk2, cangle, sangle, d, f)
-            am(i+1,i+1) = cangle
-            am(i+2,i+2) = cangle
-            am(i+1,i+2) = sangle
-            am(i+2,i+1) = -rk2 * sangle
-            am(i+1,6)   = rhoi * d
-            am(i+2,6)   = am(i+1,i+2) * rhoi
-          else
-            am(i+1,i+1) = one
-            am(i+2,i+2) = one
-            am(i+1,i+2) = dstp
-          endif
-          fpr = -fpr
-        enddo
-        if (pos .ne. 2)  then
-!--- fringe field effects
-          do i = 1, 6
-            do j = 1, 6
-              re(j,i) = zero
-            enddo
-            re(i,i) = one
-          enddo
-          if (pos .eq. 1)  then
-            edge = e1
-          else
-            edge = e2
-          endif
-          tanedg = tan(edge)
-          rhoi = elang / eleng
-          re(2,1) = + rhoi * tanedg
-          re(4,3) = - rhoi * tanedg
-          if (pos .eq. 1)  then
-            call pecat1(re, am, rd)
-          else
-            call pecat1(am, re, rd)
-          endif
-          do i = 1, 6
-            do j = 1, 6
-              am(j,i) = rd(j,i)
-            enddo
-          enddo
-        endif
+            am2(1,1) = cangle
+            am2(2,2) = cangle
+            am2(1,2) = sangle
+            am2(2,1) = -rk2 * sangle
+            rk2 = -rk2
+            call tmfoc(dstp, rk2, cangle, sangle, d, f)
+            am2(3,3) = cangle
+            am2(4,4) = cangle
+            am2(3,4) = sangle
+            am2(4,3) = -rk2 * sangle
+         endif   
       endif
+   
+!---  restore values of centre_cptk & centre_bttk 
+
+      centre_cptk = cecptk
+      centre_bttk = cebttk
+
       end
+ 
       subroutine pefill(ierr)
 
 #ifdef _WIN32
@@ -1713,7 +1705,9 @@
      &(yn1, tw1(17)), (pyn1, tw1(18))
       double precision s0, dstp, gamx, gamy
       integer i, j, k, ipc
+      integer jrp,jcp
       logical elmflg
+      double precision bxx0,byy0
 
       ierr = 0
       if (telpar(1) .eq. zero)  goto 999
@@ -1741,6 +1735,7 @@
         k = double_from_table(tabname, 's ', crow, s0)
         ex = get_value('beam ','ex ')
         ey = get_value('beam ','ey ')
+
 !--- xn, pxn, yn, pyn
         if (ex * bx0 .eq. zero)  then
           xn0 = zero
@@ -1763,6 +1758,7 @@
           gamy = zero
         endif
 !--- get intermediate s values, and interpolate twiss parameters
+
         do i = 1, nint
           if (i .eq. 1)  then
             mat = 1
@@ -1774,12 +1770,14 @@
           dstp = i * step
 !--- element matrices 6x6: entry, body, exit
           call peelma(mat, type, telpar, dstp, am(1,1))
+
 !--- interpolate twiss parameters
 !    beta_x, beta_y
           bx1 = -two * am(1,1) * am(1,2) * ax0                          &
      &    + am(1,1)**2 * bx0 + am(1,2)**2 * gamx
           by1 = -two * am(3,3) * am(3,4) * ay0                          &
      &    + am(3,3)**2 * by0 + am(3,4)**2 * gamy
+
 !--- alfa_x, alfa_y
           ax1 = (am(1,1) * am(2,2) + am(1,2) * am(2,1))                 &
      &    * ax0 - am(1,1) * am(2,1) * bx0                               &
@@ -1847,6 +1845,7 @@
         enddo
       endif
   999 end
+
       subroutine pelfill(tabname, type, row, n, a)
 
 #ifdef _WIN32
@@ -1912,13 +1911,16 @@
 !          else
 !            a(11) = tmp2
 !          endif
-          j = double_from_table(tabname, 'angle ' , row, tmp1)
-          j = double_from_table(tabname, 'tilt ' , row, tmp2)
-          if (abs(tmp2) .ne. 0.d0) then
-            a(11) = cos(tmp2) * tmp1
-          else
-            a(11) = tmp1
-          endif
+
+          a(11) = node_value('angle ')
+          a(7) = node_value('tilt ')
+          a(3) = node_value('e1 ')
+          a(4) = node_value('e2 ')
+!          if (abs(tmp2) .ne. 0.d0) then
+!            a(11) = cos(tmp2) * tmp1
+!          else
+!            a(11) = tmp1
+!          endif
         endif
         if (n .ge. 15)                                                  &
      &  j = double_from_table(tabname, 'k1l ' , row, a(15))
