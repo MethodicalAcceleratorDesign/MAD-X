@@ -721,6 +721,7 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
     else
     { /* we have to slim it down a bit...*/
       if (strcmp(thick_node->base_name,"marker") == 0    ||
+        strcmp(thick_node->base_name,"instrument") == 0  ||
         strcmp(thick_node->base_name,"hmonitor") == 0    ||
         strcmp(thick_node->base_name,"vmonitor") == 0    ||
         strcmp(thick_node->base_name,"monitor") == 0     ||
