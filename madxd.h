@@ -62,15 +62,16 @@
 #define vector_to_table       vector_to_table_
 #define vdot                  vdot_
 #define vmod                  vmod_
-#define w_ptc_create_universe   w_ptc_create_universe_
-#define w_ptc_create_layout     w_ptc_create_layout_
-#define w_ptc_move_to_layout    w_ptc_move_to_layout_
-#define w_ptc_input             w_ptc_input_
-#define w_ptc_align             w_ptc_align_
-#define w_ptc_twiss             w_ptc_twiss_
-#define w_ptc_normal            w_ptc_normal_
-#define w_ptc_track             w_ptc_track_
-#define w_ptc_end               w_ptc_end_
+#define w_ptc_create_universe w_ptc_create_universe_
+#define w_ptc_create_layout   w_ptc_create_layout_
+#define w_ptc_move_to_layout  w_ptc_move_to_layout_
+#define w_ptc_input           w_ptc_input_
+#define w_ptc_align           w_ptc_align_
+#define w_ptc_twiss           w_ptc_twiss_
+#define w_ptc_normal          w_ptc_normal_
+#define w_ptc_track           w_ptc_track_
+#define w_ptc_end             w_ptc_end_
+#define cf77flush             cf77flush_
 
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
