@@ -789,7 +789,7 @@ void mycpy(char* sout, char* sin)
   int l = 1;
 
   p = sin;  q = sout;
-  while (*p > ' ' && *p <= '~' && l < NAME_L)  
+  while (*p > ' ' && *p <= '~' && l < 2*NAME_L)  
       {
        *q++ = *p++;  l++;
       }
