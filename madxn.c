@@ -5811,7 +5811,7 @@ int remove_one(struct node* node)
      remove_from_name_list(node->p_elem->name, occ_list);
     }
   else --occ_list->inform[pos];
-  myfree(rout_name, node);
+  /* myfree(rout_name, node); */
   return 1;
 }
 
