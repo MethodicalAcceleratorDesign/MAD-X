@@ -7124,7 +7124,10 @@
       character spsnam * 256, colour * 16, pshead * 60
       save / gx11c /
       write(iutlps, '(a)')  'gs showpage gr'
-      call flush(iutlps)
+      endfile(iutlps)
+      backspace(iutlps)
+!      call flush(iutlps)
+      
       ipage = ipage + 1
       stortx = '%%Page: number'
       write(stortx(15:20), '(i6)')  ipage
