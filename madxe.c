@@ -118,15 +118,18 @@ void error_eprint(struct in_cmd* cmd)
   int i;
   struct sequence* mysequ = current_sequ;
   int mycount;
+  int fll;
 
   ndexe = mysequ->ex_end;
   nextnode = mysequ->ex_start;
 
   mycount = 0;
+ 
+  fll = command_par_value("full", cmd->clone);
 
   while (nextnode != ndexe) {
 
- //   if(nextnode->sel_err == 1) {
+    if((nextnode->sel_err == 1) || (fll > 0) ){
        if(nextnode->p_al_err != NULL) {
          fprintf(prt_file, "\n\nAlignment errors for element %s \n",nextnode->name);
          fprintf(prt_file,"\nDisplacements in [mm], rotations in [mrad] \n");
@@ -139,25 +142,39 @@ void error_eprint(struct in_cmd* cmd)
             fprintf(prt_file, "%10.6f ",alig_fact[i]*nextnode->p_al_err->a[i]);
          }
          fprintf(prt_file, "\n");
+       } else {
+         fprintf(prt_file, "\n\nAlignment errors for element %s \n",nextnode->name);
+         fprintf(prt_file,"\nDisplacements in [mm], rotations in [mrad] \n");
+         fprintf(prt_file," %6s %10s %12s %10s %10s %10s %10s %10s %10s %10s %10s %10s %10s %10s\n",
+                  pln_alig[0], pln_alig[1],pln_alig[2],pln_alig[3],
+                  pln_alig[4], pln_alig[5],pln_alig[6],pln_alig[7],
+                  pln_alig[8], pln_alig[9],pln_alig[10],pln_alig[11],
+                  pln_alig[12],pln_alig[13]);
+         fprintf(prt_file, "\n");
        }
 
        if(nextnode->p_fd_err != NULL) {
          mycount++;
          if(mycount <= 50000) {
-         fprintf(prt_file,"%s %d\n",nextnode->name,(int)nextnode->p_fd_err);
-         fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
-         fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
-  /*     for(i=0;i<nextnode->p_fd_err->curr;i++) { */
-         for(i=0;i<22;i++) {
-            fprintf(prt_file, "%8d          %8e      %8e\n",i/2,
-                   1000*nextnode->p_fd_err->a[i],
-                   1000*nextnode->p_fd_err->a[i+1]);
-            i++;
+           fprintf(prt_file,"%s %d\n",nextnode->name,(int)nextnode->p_fd_err);
+           fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
+           fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
+           for(i=0;i<22;i++) {
+              fprintf(prt_file, "%8d          %8e      %8e\n",i/2,
+                     1000*nextnode->p_fd_err->a[i],
+                     1000*nextnode->p_fd_err->a[i+1]);
+              i++;
+           }
+           fprintf(prt_file, "\n");
          }
-         fprintf(prt_file, "\n");
+       } else {
+         mycount++;
+         if(mycount <= 50000) {
+           fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
+           fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
          }
        }
-//    }
+    }
 
       nextnode = nextnode->next;
   }
