@@ -7,6 +7,7 @@ MODULE ptc_results
   character(len = 2) :: ptc_var
   type(real_8) y(6)
   type(normalform) n
+type (pbresonance) pbr
 END MODULE ptc_results
 MODULE madx_ptc_module
   USE madx_keywords
@@ -799,7 +800,7 @@ CONTAINS
     USE ptc_results
     implicit none
     integer row
-    real(dp) double_from_ptc_normal, d_val 
+    real(dp) double_from_ptc_normal, d_val, d_val1, d_val2 
     integer idx
     integer j,k,ind(6)
     integer double_from_table
@@ -829,12 +830,12 @@ CONTAINS
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
        d_val = n%A1%V(3).sub.ind
-    CASE ('qx')
+    CASE ('q1')
        do j = 1,6
           ind(j) = 0
        enddo
        d_val = n%dhdj%V(3).sub.ind
-    CASE ('qy')
+    CASE ('q2')
        do j = 1,6
           ind(j) = 0
        enddo
@@ -864,7 +865,7 @@ CONTAINS
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(4).sub.ind
-       CASE ('qpx')
+       CASE ('dq1')
           k = double_from_table("normal_results ", "order1 ", row, d_val)
           do j = 1,4
              ind(j) = 0
@@ -873,7 +874,7 @@ CONTAINS
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
-       CASE ('qpy')
+       CASE ('dq2')
           k = double_from_table("normal_results ", "order1 ", row, d_val)
           do j = 1,6
              ind(j) = 0
@@ -914,6 +915,52 @@ CONTAINS
           ind(5) = int(d_val)
           ind(6) = 0
           d_val = n%dhdj%V(4).sub.ind
+       CASE ('hamc')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(1) = int(d_val)
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          ind(2) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(3) = int(d_val)
+          k = double_from_table("normal_results ", "order4 ", row, d_val)
+          ind(4) = int(d_val)
+          ind(5) = 0
+          ind(6) = 0
+          d_val = pbr%cos%h.sub.ind
+          double_from_ptc_normal = d_val   
+          RETURN
+       CASE ('hams')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(1) = int(d_val)
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          ind(2) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(3) = int(d_val)
+          k = double_from_table("normal_results ", "order4 ", row, d_val)
+          ind(4) = int(d_val)
+          ind(5) = 0
+          ind(6) = 0
+          d_val = pbr%sin%h.sub.ind
+          double_from_ptc_normal = d_val   
+          RETURN
+       CASE ('hama')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(1) = int(d_val)
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          ind(2) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(3) = int(d_val)
+          k = double_from_table("normal_results ", "order4 ", row, d_val)
+          ind(4) = int(d_val)
+          ind(5) = 0
+          ind(6) = 0
+          d_val1 = pbr%cos%h.sub.ind
+          d_val2 = pbr%sin%h.sub.ind
+          double_from_ptc_normal = SQRT(d_val1**2 + d_val2**2)   
+          RETURN
+       CASE ('haml')
+          double_from_ptc_normal = 0.0D0
+          RETURN
        CASE DEFAULT
           print *,"Error in the table normal_results"
        END SELECT
@@ -962,16 +1009,16 @@ CONTAINS
     implicit none
     logical(lp) closed_orbit,normal
     integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
-    integer j, jj, k, n_rows, row
+    integer i, ii, j, jj, k, l, starti
+    integer n_rows, row, n_haml, nres, mynres, n1, n2 
     integer,external :: select_ptc_idx, minimum_acceptable_order, & 
          string_from_table, double_from_table, result_from_normal
-
-    character(len = 4), parameter, dimension(10) :: &
-         names = (/'dx##','dpx#','dy##','dpy#','qx##','qpx#','qy##','qpy#','anhx','anhy'/)
     real(dp) x(6),deltap0,deltap
     !type(real_8) y(6)
     integer :: column(6) = (/1,0,0,0,0,0/)
-    integer :: ord(3) 
+    integer :: ord(3), indexa(4) 
+    integer :: row_haml(101)
+    integer :: index1(1000,2)
     real(dp) val_ptc,d_val
     real(kind(1d0)) get_value
     character(len = 4) name_var
@@ -1023,8 +1070,80 @@ CONTAINS
     normal = get_value('ptc_normal ','normal ') .ne. 0
     if(normal) then
        call alloc(n)
+
+!------ Find the number of occurences of the attribute 'haml' 
+
+       n_rows = select_ptc_idx()
+       n_haml = 0
+       if (n_rows > 0) then
+          do row = 1,n_rows
+             k = string_from_table("normal_results ", "name ", row, name_var)
+             if (name_var .eq. 'haml') then
+                n_haml = n_haml + 1
+                row_haml(n_haml) = row
+             endif
+          enddo
+          if (n_haml > 0) then
+             call alloc(pbr)
+             do j =1,n_haml
+                row = row_haml(j)
+                k = double_from_table("normal_results ", "value ", row, d_val)
+                mynres = int(d_val)
+                row = row_haml(j) - 3*mynres + 2
+                starti = 1
+                if (j .eq. 1) then
+                   k = double_from_table("normal_results ", "order1 ", row, d_val)
+                   indexa(1) = int(d_val)
+                   k = double_from_table("normal_results ", "order2 ", row, d_val)
+                   indexa(2) = int(d_val)
+                   k = double_from_table("normal_results ", "order3 ", row, d_val)
+                   indexa(3) = int(d_val)
+                   k = double_from_table("normal_results ", "order4 ", row, d_val)
+                   indexa(4) = int(d_val)
+                   index1(1,1) = indexa(1) - indexa(2)
+                   index1(1,2) = indexa(3) - indexa(4)
+                   n%m(1,1)= index1(1,1)
+                   n%m(2,1)= index1(1,2)
+                   if(ndim2.eq.6) n%m(3,1)= indexa(3)
+                   nres = 1
+                   starti = 2
+                endif
+!============ nres is the number of resonances to be set
+
+                if (mynres .ge. starti) then
+                   do i = starti,mynres
+                      ii = row + 3*(i-1)
+                      k = double_from_table("normal_results ", "order1 ", ii, d_val)
+                      indexa(1) = int(d_val)
+                      k = double_from_table("normal_results ", "order2 ", ii, d_val)
+                      indexa(2) = int(d_val)
+                      k = double_from_table("normal_results ", "order3 ", ii, d_val)
+                      indexa(3) = int(d_val)
+                      k = double_from_table("normal_results ", "order4 ", ii, d_val)
+                      indexa(4) = int(d_val)
+                      n1 = indexa(1) - indexa(2)
+                      n2 = indexa(3) - indexa(4)
+                      do l = 1,nres
+                         if (n1 .eq. index1(l,1) .and. n2 .eq. index1(l,2)) goto 100
+                      enddo
+                      nres = nres + 1
+                      index1(nres,1) = n1
+                      index1(nres,2) = n2
+                      n%m(1,nres)= n1
+                      n%m(2,nres)= n2
+                      if(ndim2.eq.6) n%m(3,nres)= indexa(3)
+100                   continue
+                   enddo
+                endif
+             enddo
+             n%nres = nres
+          endif
+       endif
+!------------------------------------------------------------------------
+
        n=y
-       write(19,'(/a/)') 'Disperion, First and Higher Orders'
+       if (n_haml > 0) pbr = n%normal%pb
+       write(19,'(/a/)') 'Dispersion, First and Higher Orders'
        call daprint(n%A1,19)
 
 !------ get values and store them in the table 'normal_results' ---------
@@ -1042,15 +1161,20 @@ CONTAINS
           do row = 1,n_rows
              k = string_from_table("normal_results ", "name ", row, name_var)
              val_ptc = double_from_ptc_normal(name_var,row)
-             call double_to_table_row("normal_results ", "value ", row, val_ptc)
+             if (name_var .ne. 'haml') call double_to_table_row("normal_results ", "value ", row, val_ptc)
           enddo
        endif
+
 !------------------------------------------------------------------------
 
        write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
        !  call daprint(n%A_t,19)
        !  call daprint(n%A,19)
+
        call daprint(n%dhdj,19)
+
+!       call daprint(pbr,19)
+       if (n_haml > 0) call kill(pbr)
        call kill(n)
     endif
     CALL kill(y)

@@ -1497,6 +1497,8 @@ int result_from_normal(char* name_var, int* order, double* val)
 	  if ((int)d_val != order[1]) found = 0;
 	  k = double_from_table("normal_results","order3", &row, &d_val);
 	  if ((int)d_val != order[2]) found = 0;
+	  k = double_from_table("normal_results","order4", &row, &d_val);
+	  if ((int)d_val != order[3]) found = 0;
 	}
       if (found == 1) break;
     }
@@ -2055,12 +2057,13 @@ void select_ptc_normal(struct in_cmd* cmd)
   struct command_parameter_list* pl;
   struct table* t;
   int pos; 
-  int i, j, err, curr, arr_size, max_rows = 101, current_idx = 0;
+  int i, j, jj, err, curr, arr_size, max_rows = 101, current_idx = 0;
+  int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
   char names[PTC_NAMES_L][5]= 
-    {"dx","dpx","dy","dpy","qx","qy","qpx","qpy","anhx","anhy"};
+    {"dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml"};
   int min_req_order;
-  double order[3];
+  double order[4],n1,n2,n3,n4;
 
   nl = this_cmd->clone->par_names;
   pl = this_cmd->clone->par;
@@ -2078,9 +2081,10 @@ void select_ptc_normal(struct in_cmd* cmd)
   t = table_register->tables[pos];
 
   /* initialise order array */
-  order[0] = 0;
-  order[1] = 0;
-  order[2] = 0;
+  order[0] = 0.0;
+  order[1] = 0.0;
+  order[2] = 0.0;
+  order[3] = 0.0;
   if (t->curr < max_rows)
     {
       for (j = 0; j < PTC_NAMES_L; j++)
@@ -2091,21 +2095,75 @@ void select_ptc_normal(struct in_cmd* cmd)
 	  if (pos > -1 && nl->inform[pos])
 	    {
 	      curr = pl->parameters[pos]->m_string->curr;
+	      if (curr > 4) 
+		printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
 	      for (i = 0; i < curr; i++)
 		{
 		  order_list = pl->parameters[pos]->m_string->p[i];
 		  order[i] = (double)atoi(order_list);
 		}
-	      if (curr > 3) 
-		printf("Too many values for the attribute %s. Only the first three are retained.\n",names[j]);
-	      string_to_table("normal_results", "name", names[j]);
-	      double_to_table("normal_results", "order1", &order[0]);
-	      double_to_table("normal_results", "order2", &order[1]);
-	      double_to_table("normal_results", "order3", &order[2]);
-	      augment_count("normal_results");
-	      min_req_order = order[0]+order[1]+order[2];
-	      if (j >= 9) min_req_order += order[0]+order[1];
-	      if (j >= 7) min_req_order += 1;
+
+	      if (j == 10)
+		{
+		  min_req_order = order[0]+order[1]+order[2];
+		  mynres = 0;
+		  skew = 0;
+		  mynorder = (int)order[0];
+		  if (mynorder < 0) skew = 1;
+		  mynorder = abs(mynorder);
+		  myn1 = (int)order[1];
+		  myn2 = (int)order[2];
+		  min_req_order = mynorder;
+		  res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
+		  if (mynres > 0)
+		    {
+		      for (jj = 0; jj < mynres; jj++)
+			{
+			  n1 = (double)indexa[0][jj];
+			  n2 = (double)indexa[1][jj];
+			  n3 = (double)indexa[2][jj];
+			  n4 = (double)indexa[3][jj];
+			  string_to_table("normal_results", "name", "hamc");
+			  double_to_table("normal_results", "order1", &n1);
+			  double_to_table("normal_results", "order2", &n2);
+			  double_to_table("normal_results", "order3", &n3);
+			  double_to_table("normal_results", "order4", &n4);
+			  augment_count("normal_results");
+			  string_to_table("normal_results", "name", "hams");
+			  double_to_table("normal_results", "order1", &n1);
+			  double_to_table("normal_results", "order2", &n2);
+			  double_to_table("normal_results", "order3", &n3);
+			  double_to_table("normal_results", "order4", &n4);
+			  augment_count("normal_results");			  
+			  string_to_table("normal_results", "name", "hama");
+			  double_to_table("normal_results", "order1", &n1);
+			  double_to_table("normal_results", "order2", &n2);
+			  double_to_table("normal_results", "order3", &n3);
+			  double_to_table("normal_results", "order4", &n4);
+			  augment_count("normal_results");			  			  
+			}
+		    }
+		  string_to_table("normal_results", "name", "haml");
+		  double_to_table("normal_results", "order1", &order[0]);
+		  double_to_table("normal_results", "order2", &order[1]);
+		  double_to_table("normal_results", "order3", &order[2]);
+		  double_to_table("normal_results", "order4", &order[3]);
+		  n1 = (double)mynres;
+		  double_to_table("normal_results", "value", &n1);
+		  augment_count("normal_results");
+		}
+	      else
+		{
+		  string_to_table("normal_results", "name", names[j]);
+		  double_to_table("normal_results", "order1", &order[0]);
+		  double_to_table("normal_results", "order2", &order[1]);
+		  double_to_table("normal_results", "order3", &order[2]);
+		  double_to_table("normal_results", "order4", &order[3]);
+		  augment_count("normal_results");
+		  min_req_order = order[0]+order[1]+order[2];
+		  if (j >= 9) min_req_order += order[0]+order[1];
+		  if (j >= 7) min_req_order += 1;
+		}
 	      if (min_order < min_req_order) min_order = min_req_order;
 	    } 
 	}
