@@ -2938,26 +2938,21 @@
      &double_to_write)
       implicit none
       integer j,table_type,int_to_write(11)
-      double precision double_to_write(11)
-      character table_name*(*)
-
-      integer k,table_type_index(11)
-
-      integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-      double precision val
       integer kk,double_from_table
-      common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-
-      data table_type_index/0,0,0,0,1,0,0,2,3,0,4/
-
+      integer k,table_type_index(11)
+      integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
       integer tab_types_5(5),tab_types_8(8),tab_types_9(9),             &
      &tab_types_11(11)
+      double precision val
+      double precision double_to_write(11)
+      character table_name*(*)
+      character*13  name_5(5),name_8(8),name_9(9),name_11(11)
+      common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
+      data table_type_index/0,0,0,0,1,0,0,2,3,0,4/
       data tab_types_5/1,1,2,1,1/
       data tab_types_8/1,2,2,2,1,1,1,1/
       data tab_types_9/1,1,2,2,2,1,1,1,1/
       data tab_types_11/1,1,1,2,2,2,2,1,1,1,1/
-
-      character*13  name_5(5),name_8(8),name_9(9),name_11(11)
       data name_5/'mpor\0','plane/mpor2\0','detune\0','H_inv_order\0',  &
      &'V_inv_order\0'/
       data name_8/'mpor\0','cos \0','sin\0','amp\0','j\0','k\0','l\0',  &
