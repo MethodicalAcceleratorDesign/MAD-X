@@ -12,6 +12,11 @@
 /* question 1: change BEAM defaults to those of MAD8 */
 /* question 2: att_lcavity ? */
 /* #define _call_tree_ */
+
+/* JMJ, 7/11/2002 commenting out the following
+to see if it helps  for Visual Fortran .... 
+ already in madxn.c 
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +24,13 @@
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
+
+  and I moved 
 #include "c6t.h"
+  to madxn.c
+
+*/
+
 
 /*---------------------------------------------------------------------*
 *                                                                      *

@@ -17,6 +17,9 @@
 #include "madxd.h"
 #include "madxdict.h"
 
+/* JMJ 7/11/2002 moved this here from c6t.c */ 
+#include "c6t.h"
+
 void madx()
 {
   madx_start();
@@ -2429,6 +2432,7 @@ void exec_plot(struct in_cmd* cmd)
 {
   int ierr, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
   char* pt = title;
+  /*
   if (nt && current_sequ != NULL) title = current_sequ->name;
   pesopt_(&ierr);
   if (ierr == 0) pefill_(&ierr);
@@ -2439,6 +2443,7 @@ void exec_plot(struct in_cmd* cmd)
      plots_made = 1;
     }
   if (nt) title = pt;
+*/
 }
 
 void exec_print(struct in_cmd* cmd)
