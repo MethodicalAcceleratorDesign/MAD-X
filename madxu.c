@@ -1307,10 +1307,13 @@ void export_el_par_8(struct command_parameter* par, char* string)
       }
       break;
     case 3:
-      strcat(string, ",");
-      strcat(string, par->name);
-      strcat(string, "=");
-      strcat(string, par->string);
+      if (par->string)
+        {
+         strcat(string, ",");
+         strcat(string, par->name);
+         strcat(string, "=");
+         strcat(string, par->string);
+	}
       break;
     case 11:
     case 12:
@@ -1414,6 +1417,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
          strcat(c_dummy, ", from = ");
            strcat(c_dummy, c_node->from_name);
           }
+        export_el_def(c_node->p_elem, c_dummy);
         write_nice(c_dummy, file);
        }
      if (c_node == sequ->end)  break;
@@ -1465,6 +1469,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
          strcat(c_dummy, ", from = ");
            strcat(c_dummy, c_node->from_name);
           }
+        export_el_def_8(c_node->p_elem, c_dummy);
         write_nice_8(c_dummy, file);
        }
      if (c_node == sequ->end)  break;
@@ -2796,14 +2801,14 @@ void print_table(struct table* t)
         n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
         fprintf(prt_file, "\n");
         for (i = wpl*k; i < n; i++)
-         {
+	   {
             if (t->columns->inform[i] == 1)
                fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
             else if (t->columns->inform[i] == 2)
                fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
             else if (t->columns->inform[i] == 3)
                fprintf(prt_file, v_format("%S "), t->columns->names[i]);
-         }
+	   }
         fprintf(prt_file, "\n");
         for (j = 0; j < t->curr; j++)
           {
@@ -2967,6 +2972,23 @@ int supp_lt(char* inbuf, int flag)
   return strlen(inbuf);
 }
 
+void supp_mul_char(char c, char* string)
+     /* reduces multiple occurrences of c in string to 1 occurrence */
+{
+  char* cp = string;
+  int cnt = 0;
+  while (*string != '\0')
+    {
+     if (*string != c)
+       {
+	*cp++ = *string; cnt = 0;
+       }
+     else if (cnt++ == 0) *cp++ = *string;
+     string++;
+    }
+  *cp = '\0';
+}
+
 char* supp_tb(char* string) /* suppress trailing blanks in string */
 {
   int l = strlen(string), j;
@@ -3038,21 +3060,21 @@ char* v_format(char* string)
     {
      if ((int)p > (int)q)
        {
-      t = p; t--;
+	t = p; t--;
         if (*t == '%')
-        {
+	  {
            c = *p;
            strncat(var_form, q, (int)p - (int)q);
            if (c == 'N')
-            {
-             sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
-             p++;
-            }
+	      {
+	       sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
+	       p++;
+	      }
            else if (c == 'F')  strcat(var_form, float_format);
            else if (c == 'S')  strcat(var_form, string_format);
            else if (c == 'I')  strcat(var_form, int_format);
            q = p; q++;
-        }
+	  }
        }
      s = ++p;
     }
@@ -3085,6 +3107,7 @@ void write_nice(char* string, FILE* file)
   int n, pos, ssc;
   char *c = string;
   char k;
+  supp_mul_char(' ', string);
   strcat(string, ";");
   n = strlen(string);
   while (n > LINE_FILL)
@@ -3109,6 +3132,7 @@ void write_nice_8(char* string, FILE* file)
   int n, pos, comma, ssc;
   char *c = string;
   char k;
+  supp_mul_char(' ', string);
   strcat(string, ";");
   n = strlen(string);
   while (n > LINE_F_MAD8)
@@ -3272,7 +3296,7 @@ void write_table(struct table* t, char* filename)
                   fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
             else if (t->columns->inform[col->i[i]] == 3)
               {
-             *c_dummy = '\"';
+	       *c_dummy = '\"';
                strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
                stoupper(c_dummy);
                pc = strip(c_dummy); /* remove :<occ_count> */

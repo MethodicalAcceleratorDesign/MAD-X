@@ -576,6 +576,7 @@ int string_cnt(char, int, char**);
 char* strip(char*);
 void supp_char(char, char*);
 int supp_lt(char*, int);
+void supp_mul_char(char, char*);
 char* supp_tb(char*);
 double table_value();
 int table_row(struct table*, char*);
