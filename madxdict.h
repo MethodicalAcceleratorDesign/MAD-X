@@ -89,7 +89,7 @@ char command_def[] =
 "aperture: aperture none 0 0 "
 "file     = [s, none, none], "		 /* output file with aperture table */
 "halofile = [s, none, none], "	 	 /* input file w/halo polygon coordinates */
-"pipefile = [s, none, none], "	 	 /* input file w/pipe polygon coordinates */
+/* "pipefile = [s, none, none], " */	 /* input file w/pipe polygon coordinates */
 "range    = [s, #s/#e, none], " 	 /* range */
 "exn      = [r, 3.75e-6], " 		 /* norm. emit */
 "eyn      = [r, 3.75e-6], " 		 /* norm. emit */
@@ -104,9 +104,9 @@ char command_def[] =
 "halo     = [r, {6., 8.4, 7.3, 7.3}], "  /* halo parameters: n, r, h, v */
 "interval = [r, 1.], "			 /* length in meters between measurements */
 "spec     = [r, 0.], "			 /* aperture spec, for plotting only */
-"notsimple= [l, false, true], "		 /* use if beam pipe is not a simply connex */
+"notsimple = [l, false, true], "		 /* use if beam pipe is not a simply connex */
 "trueprofile = [s, none, none], "	 /* read discrete displacements from this file */
-"offsetelem  = [s, none, none]; "	 /* read off-axis data from this file */
+"offsetelem = [s, none, none]; "	 /* read off-axis data from this file */
 " "
 "assign: control none 0 0 "
 "echo     = [s, terminal, none]; "

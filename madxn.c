@@ -227,13 +227,15 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   struct aper_node* lim_pt = &limit_node;
   struct aper_e_d true_tab[E_D_MAX];
   struct aper_e_d offs_tab[E_D_MAX];
+  int i,j;
   setbuf(stdout,(char*)NULL);
   
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
 
   /* read command parameters */
   halofile = command_par_string("halofile", this_cmd->clone);
-  pipefile = command_par_string("pipefile", this_cmd->clone);
+  /* removed IW 240205 */
+/*  pipefile = command_par_string("pipefile", this_cmd->clone); */
   exn = command_par_value("exn", this_cmd->clone);
   eyn = command_par_value("eyn", this_cmd->clone);
   dqf = command_par_value("dqf", this_cmd->clone);
@@ -271,9 +273,10 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   else aper_fill_quads(halox, haloy, halo_q_length, &halolength);
   
   /* check for externally given pipe polygon */
-  pipelength = aper_external_file(pipefile, pipex, pipey);
-  if ( pipelength > -1) ext_pipe=1;
-  
+/* changed this recently, IW 240205 */  
+/*  pipelength = aper_external_file(pipefile, pipex, pipey);
+  if ( pipelength > -1) ext_pipe=1; */
+
   /* get initial twiss parameters, from start of first element in range */
   aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &betx, &bety, &dx, &dy);
   (*tw_cnt)++;
@@ -308,7 +311,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 	}
 	else on_elem=1;
 	
-	if (offs_flag && strcmp(refnode, name) == 0) do_survey=1;
+	if (offs_flag && (strcmp(refnode, name) == 0)) do_survey=1;
 
 	/* read data for tol displacement of halo */
 	get_node_vector("aper_tol",&ntol,aper_tol);
@@ -321,8 +324,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 	else r=xshift=yshift=0;
 
 	/*read aperture data and make polygon tables for beam pipe*/
-	if (ext_pipe == 0)
-		ap=aper_bs(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
+	/* IW 250205 */
+/*	if (ext_pipe == 0) */
+	ap=aper_bs(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
 	
 	if (ap == 0 || first == 1)
 	{
@@ -389,8 +393,8 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 		/* do survey */
 		if (do_survey)
 		{
-			aper_surv(surv_init, nint); printf("\nsurvey! name: %s",name);
-			
+			aper_surv(surv_init, nint);
+
 			offs_node=aper_tab_search(offs_cnt, offs_tab, name, &offspos);
 			if (offs_node)
 			{
@@ -434,13 +438,10 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 			}
 			
 			/* survey adjustments */
-			if (offs_node)
-			{
-				elem_x=xa*s*s+xb*s+xc;
-				elem_y=ya*s*s+yb*s+yc;
-				x+=(surv_x-elem_x);
-				y+=(surv_y-elem_y);
-			}
+			if (offs_node) { elem_x=xa*s*s+xb*s+xc;
+					 elem_y=ya*s*s+yb*s+yc;
+					 x+=(surv_x-elem_x);
+					 y+=(surv_y-elem_y);    }
 			
 			/* discrete adjustments */
 			if (true_node) { x+=true_tab[truepos].tab[jslice][1]; 
@@ -743,7 +744,14 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 		
 		aper_fill_quads(pipex, pipey, quarterlength, pipelength);
 	}
-  }	
+  }
+  
+  else if (strlen(apertype))
+  {
+	*pipelength = aper_external_file(apertype, pipex, pipey);
+	*ap1 = *ap2 = *ap3 = *ap4 = 0;
+	if (*pipelength > -1) err=0; else err=-1;
+  }
 
   else
   {
@@ -802,7 +810,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
   {
   	if((e_d_pt = fopen(e_d_name,"r")) == NULL)
 	{
-		printf("\n%s file does not exist!\n",e_d_name);
+		printf("\nFile does not exist: %s\n",e_d_name);
 	}
 	else
 	{
@@ -825,9 +833,10 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
 			}
 			else i = fscanf(e_d_pt, "%s", refnode);
 		
+		stolower(refnode);
 		strcat(refnode, ":1");
 		}
-		printf("\nrefnode: %s",refnode);
+		printf("\nReference node: %s",refnode);
 		/* end reading reference node */
 
 		i=0;
@@ -840,6 +849,8 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
 				fgets(comment, 100, e_d_pt);
 				i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
 			}
+			
+			stolower(e_d_tab[*cnt].name);
 			
 			if (i != EOF)
 			{
@@ -865,7 +876,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
 			}
 		}
 		
-		printf("\nUsing extra displacements from \"%s\"\n",e_d_name);
+		printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
 		e_d_flag=1; fclose(e_d_pt);
 		(*cnt)--;
 	}
@@ -883,13 +894,13 @@ int aper_external_file(char *file, double tablex[], double tabley[])
   {
 	if ((filept=fopen(file, "r")) == NULL)
 	{
-		fatal_error("Can not find file: ", file);
+		warning("Can not find file: ", file);
+		return -1;
 	}
 	
 	/*start making table*/
 	while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i]))
 	{
-		printf("Reading coordinates... %d: xcor = %f and ycor = %f\n", i, tablex[i], tabley[i]);
 		i++;
 		if (i >= MAXARRAY)
 		{
@@ -3881,8 +3892,7 @@ void pro_aperture(struct in_cmd* cmd)
 	tw_cnt++;
 	if (tw_cnt > tw_cp->curr)
 	{
-		warning("Could not find range start in Twiss table",
-						"Aperture command ignored.");
+		warning("Could not find range start in Twiss table", "Aperture command ignored.");
 		return;
 	}
 	char_from_table(tw_cp->name, "name", &tw_cnt, tw_name);
