@@ -308,6 +308,15 @@
         apy = aperture(2)
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
      &  last_pos, last_orbit, track, ktrack)
+!------------  marguerite case ----------------------------------
+! Marguerite is defined as the union of two equal ellipses rotated by pi/2
+! the parameters are apx = horizontal half axis of the horizontal ellipse
+!                    apy = vertical half axis of the horizontal ellipse
+        else if(aptype.eq.'marguerite') then
+        apx = aperture(1)
+        apy = aperture(2)
+        call trcoll(3, apx, apy, turn, sum, part_id, last_turn,      
+     &  last_pos, last_orbit, track, ktrack)
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
         apx = aperture(1)
@@ -1262,6 +1271,10 @@
       goto 10
       end
 
+!----------------------------------------------------------------------*
+!--- purpose: kills particle n, removes it from the list and rebuilt the 
+!--- list without it. 
+
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
      &last_turn, last_pos, last_orbit, z,aptype)
       implicit none
@@ -1373,26 +1386,36 @@
 !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
 !   ntrk      (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
-      integer flag,turn,part_id(*),last_turn(*),ntrk,i,nn
+      integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
      &one
       parameter(one=1d0)
       character*24 aptype
-!*****  Cleaned by HB/AV 9.10.02
-      do i = 1, ntrk
+
+      n = 1
+ 10   continue
+      do i = n, ntrk
 !---- Is particle outside aperture?
         if (flag .eq. 1                                                 &
      &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one            &
      &  .or. flag .eq. 2                                                &
-     &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy))         &
+     &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy)          &
+     &  .or. flag .eq. 3                                                &
+     &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one
+     &  .and. (z(1,i) / apy)**2 + (z(3,i) / apx)**2 .gt. one)
      &  then
+          n = i
           nn=24
           call node_string('apertype ',aptype,nn)
-          call trkill(i, turn, sum, ntrk, part_id,                      &
+!--  Note trkill modifies the list of particles. Particle n is removed
+!--  and particle n+1 becomes particle n
+          call trkill(n, turn, sum, ntrk, part_id,                      &
      &    last_turn, last_pos, last_orbit, z,aptype)
+           goto 10
         endif
       enddo
       end
+
       subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
       implicit none
 !----------------------------------------------------------------------*
