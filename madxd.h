@@ -383,6 +383,7 @@ int get_select_ex_ranges(struct sequence*,struct command_list*,
 int get_select_ranges(struct sequence*,struct command_list*,
                       struct node_list*);
 void get_select_t_ranges(struct command_list*, struct table*);
+void get_sxf_names();
 int square_to_colon(char*);
 int get_stmt(FILE*);
 int get_table_range(char*, struct table* t, int*);
@@ -519,6 +520,7 @@ void pro_emit(struct in_cmd*);
 void pro_error(struct in_cmd*);
 void pro_ibs(struct in_cmd*);
 void pro_input(char*);
+void pro_sxf(struct in_cmd*);
 void pro_survey(struct in_cmd*);
 void pro_track(struct in_cmd*);
 void pro_twiss();
@@ -681,6 +683,30 @@ int myregex(char*, char*);
 void myregend(char*, struct reg_token*);
 int new_comb(struct reg_token*);
 
+/* SXF module routines */
+
+int  all_blank(char*);
+char* bpad(char*, int);
+void fill_dump(FILE*, int, char*, double*, int, int);
+void pro_elem_sxf(FILE*);
+void put_line(FILE*, char*);
+void accu_line(FILE*, char*);
+int kl_trans(char*, char*, double*, int*);
+void r_indent();
+void s_indent(int);
+void sxf_init();
+void sxf_out();
+void sxf_rtag();
+void sxf_read(struct command*, FILE*);
+void sxf_write(struct command*, FILE*);
+char* tag_spec(char*);
+void reset_line(FILE*);
+void write_body(FILE*);
+void write_align(FILE*, struct double_array*);
+void write_elend(FILE*);
+void write_field(FILE*, struct double_array*);
+void write_elstart(FILE*);
+
 /* Global structure variables by type (alphabetic) */
 
 struct char_array_list* char_buff; /* buffer for all sorts of strings */
@@ -701,7 +727,7 @@ struct command* current_command = NULL; /* current command clone */
 struct command* current_gweight = NULL; /* current gweight clone */
 struct command* current_weight = NULL;  /* current weight clone */
 struct command* current_match = NULL;   /* OB 23.1.2002: current match comm. */
-struct command* current_eopt  = NULL;   /* current eoption command */
+struct command* current_eopt  = NULL;   /* to keep eoption command */
 
 struct command_list* beam_list;         /* list of all beam commands */
 struct command_list* beta0_list;        /* list of user defined beta0s */
@@ -755,6 +781,7 @@ struct macro_list* macro_list;
 struct name_list* expr_chunks;
 struct name_list* inverted_forces;
 struct name_list* occ_list;
+struct name_list* sxf_list;
 
 struct node* prev_node;
 struct node* current_node = NULL;
@@ -813,7 +840,6 @@ char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 1.07";
 char one_string[] = "1";
-
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
 char* current_link_group;
@@ -895,6 +921,30 @@ int use_count = 0;          /* incremented by 1 every time use is executed */
 int vary_cnt = 0;           /* counter for vary commands */
 int watch_flag = 0;         /* produces debug output when != 0 */
 int stamp_flag = 0;         /* checks for double delete when != 0 */
+
+int           na_err,              /* current no. of alignment errors */
+              nf_err,              /* current no. of field errors */
+              indent = 0,          /* current indentation count */
+              b_level = 0,         /* current brace level */
+              sxf_elem_cnt = 0,    /* element count */
+              tag_flag = 0,        /* if > 0, tag = parent name written */
+              tag_cnt = 0,         /* if > 0, tag = specified type code 
+                                      written for selected types only */
+              sxf_align_cnt = 0,       /* element with align errors count */
+              sxf_field_cnt = 0,       /* element with field errors count */
+              occnt_add = 0,       /* flag for element name modification */ 
+              b_indent[100],       /* list of indents */
+              add_indent[] = {1, 2, 2, 4, 7, 7, 7, 7, 7, 7};
+
+double        sequ_length,         /* length of  sequence */
+              sequ_start, 
+              sequ_end,
+              al_errors[ALIGN_MAX],
+              fd_errors[FIELD_MAX];
+
+char          line[LINE_MAX],
+              tag_type[MAX_TAG][16],
+              tag_code[MAX_TAG][16];
 
 time_t last_time;
 time_t start_time;

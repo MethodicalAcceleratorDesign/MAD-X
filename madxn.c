@@ -2260,7 +2260,7 @@ void exec_command()
 	    pro_ibs(p);
 	  }
         else if (strcmp(p->cmd_def->module, "makethin") == 0) makethin(p);
-         else if (strcmp(p->cmd_def->module, "match") == 0) 
+        else if (strcmp(p->cmd_def->module, "match") == 0) 
 	  {
 	   current_match = p->clone; /* OB 23.1.2002 */
            pro_match(p);
@@ -2278,12 +2278,16 @@ void exec_command()
 	   current_error = p->clone;
 	   pro_error(p);
 	  }
+        else if (strcmp(p->cmd_def->module, "sxf") == 0) 
+	  {
+           pro_sxf(p);
+	  }
         else if (strcmp(p->cmd_def->module, "survey") == 0)
 	  {
 	   current_survey = p->clone;
            pro_survey(p);
 	  }
-         else if (strcmp(p->cmd_def->module, "track") == 0) 
+        else if (strcmp(p->cmd_def->module, "track") == 0) 
 	  {
            pro_track(p);
 	  }
@@ -3484,6 +3488,8 @@ void ftoi_array(struct double_array* da, struct int_array* ia)
 
 #include "madxreg.c"
 
+#include "sxf.c"
+
 void madx_finish()
 {
   if (plots_made) gxterm_();
@@ -3537,10 +3543,12 @@ void madx_init()
   tmp_l_array = new_char_p_array(1000);
   line_buffer = new_char_p_array(1000);
   inverted_forces = new_name_list(10);
+  sxf_list = new_name_list(50);
   deco_init();
   get_defined_constants();
   get_defined_commands();
   get_inverted_forces();
+  get_sxf_names();
   pi = get_variable("pi");
   twopi = two * pi;
   degrad = 180 / pi;
@@ -3911,6 +3919,15 @@ int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
     }
   if (n == 1) nodes[1] = nodes[0];
   return n;
+}
+
+void get_sxf_names()
+{
+  int i = 0;
+  while (sxf_table_names[i][0] != ' ')
+    {
+     add_to_name_list(sxf_table_names[i++], 0, sxf_list);
+    }
 }
 
 void init55(int seed)

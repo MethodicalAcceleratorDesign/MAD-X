@@ -11,10 +11,13 @@
 #define MAX_LINE 20000      /* max. input line length */
 #define MAX_LOOP 100        /* max. count for (possibly circular) calls */
 #define MAX_COND 100        /* max. nesting level for "if" and "while" */
+#define MAX_TYPE 11         /* for SXF output */
+#define MAX_TAG 50          /* for SXF output */
 #define CHAR_BUFF_SIZE 100000 /* size of each dynamic char_buff member */
 #define IN_BUFF_SIZE 500000 /* size of buffer for command groups */
 #define LINE_FILL 70        /* max. line length -2 for "save" output */
 #define LINE_F_MAD8 70      /* the same, for mad-8 format */
+#define LINE_MAX 78         /* for SXF output */
 #define ELEM_OUT 1000       /* character buffer for writing one element */
 #define MAX_RAND 1000000000 /* for random generator */
 #define NR_RAND 55          /* for random generator */
@@ -92,6 +95,19 @@ char efield_table_cols[][TABLE_KEY] =
 "k7l", "k7sl", "k8l", "k8sl", "k9l", 
 "k9sl", "k10l", "k10sl",
 " "  /* blank terminates */
+};
+
+char sxf_table_names[][TABLE_KEY] =
+{
+"l","k0","k0s","k1","k1s",
+"e1","e2","k2","k2s","h1",
+"h2","hgap","fint","k3","k3s",
+"lrad","knl","ksl","ks","volt",
+"lag","freq","harmon","betrf","pg",
+"shunt","tfill","eloss","ex","ey",
+"hkick","vkick","xsize","ysize","sigx",
+"sigy","xma","yma","charge",
+" " /* blank terminates */
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */

@@ -31,6 +31,7 @@
 /physcons.fi -text
 /plot.f -text
 /survey.f -text
+/sxf.c -text
 /track.fi -text
 /trrun.f -text
 /tunes.fi -text

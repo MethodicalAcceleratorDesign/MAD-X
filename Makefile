@@ -33,7 +33,7 @@ utilp.o: util.f
 dynapp.o: dynap.f
 	$(FC) $(FCP) -c -o dynapp.o dynap.f
 
-madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
+madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
 	$(CC) $(GCCP_FLAGS) -c -o madxnp.o madxn.c
 
 madx: madxnp.o twissp.o surveyp.o orbfp.o emitp.o utilp.o matchp.o dynapp.o plotp.o ibsdbp.o trrunp.o gxx11.o gxx11c.o
