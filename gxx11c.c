@@ -2,6 +2,7 @@
  
 #define _HPUX_SOURCE
 #include <stdio.h>
+#include <stdlib.h> //hbu for getenv
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <time.h>
