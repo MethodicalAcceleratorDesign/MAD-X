@@ -2315,14 +2315,14 @@
 
       if(ptc_flag) then
         call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr,    &
-     &                 char_a, char_l)
+     &  char_a, char_l)
         if (k .gt. 0) tabname = char_a
       else
 
 !--- else normal twiss treatment : any table - for hor = s plot machine
 
         call comm_para('table ', nint, ndble, k, int_arr, d_arr,        &
-     &                  char_a, char_l)
+     &  char_a, char_l)
         if (k .gt. 0) tabname = char_a
       endif
 
@@ -2427,15 +2427,15 @@
 
       if (.not. ptc_flag) then
         call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr,       &
-     &                   char_a,char_l)
+     &  char_a,char_l)
         if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action t&
-     & aken, use interpolate attribute instead.'
+     &  aken, use interpolate attribute instead.'
 
         ipparm(2,1) = 0
         inter_setplot = plot_option('interpolate ')
         if (inter_setplot .eq. 0) then
           call comm_para('interpolate ', nint, ndble, k, ipparm(2,1),   &
-     &                     d_arr,char_a, char_l)
+     &    d_arr,char_a, char_l)
         else
           ipparm(2,1) = inter_setplot
         endif
@@ -2447,7 +2447,7 @@
 
       char_a = ' '
       call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr,          &
-     &                   char_a, char_l)
+     &char_a, char_l)
       if (k .gt. 0)  then
         nivaxs = 1
         nivvar = min(k, mxcurv)
@@ -2458,7 +2458,7 @@
       else
         char_a = ' '
         call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &  char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2474,7 +2474,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &  char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2489,7 +2489,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &  char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2504,7 +2504,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &  char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar

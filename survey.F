@@ -114,8 +114,8 @@
 
 !*****  old procedure commented as incompatiblr with YROT
 !      if (arg .gt. 1.0e-20) then
-        theta = proxim(atan2(w(1,3), w(3,3)), theta)
-        psi = proxim(atan2(w(2,1), w(2,2)), psi)
+      theta = proxim(atan2(w(1,3), w(3,3)), theta)
+      psi = proxim(atan2(w(2,1), w(2,2)), psi)
 !      else
 !        theta = atan2(w(1,3), w(3,3))
 !        psi = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
