@@ -10,7 +10,7 @@
 /emit.fi -text
 /gxx11.f -text
 /gxx11c.c -text
-/ibsdb.f -text
+/ibsdb.F -text
 /ibsdb.fi -text
 /madx.h -text
 /madxc.c -text
