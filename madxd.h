@@ -196,6 +196,10 @@ int minimum_acceptable_order(); /* 17 nov 2004 */
 /* end additions */
 
 /* C routines called from C */
+/* Aperture functions start */
+
+/* Aperture functions end */
+
 double act_value(int, struct name_list*);
 int act_special(int, char*);
 int add_drifts(struct node*, struct node*);
@@ -529,6 +533,7 @@ void print_global(double);
 void print_rfc();
 void print_table(struct table*);
 void print_value(struct in_cmd*);
+void pro_aperture(struct in_cmd*);
 void pro_match(struct in_cmd*);
 void pro_node(int, double);
 void process();
@@ -536,8 +541,6 @@ void pro_correct(struct in_cmd*);
 void pro_emit(struct in_cmd*);
 void pro_error(struct in_cmd*);
 void pro_ibs(struct in_cmd*);
-void pro_ivar();
-void ivar();
 void pro_touschek(struct in_cmd*);
 void pro_input(char*);
 void pro_sxf(struct in_cmd*);
@@ -732,6 +735,34 @@ int myregex(char*, char*);
 void myregend(char*, struct reg_token*);
 int new_comb(struct reg_token*);
 
+
+/* Aperture module routines */
+void aper_adj_quad(double, double, double, double*, double*);
+void aper_adj_halo_si(double, double, double, double, double, double*, 
+		   double*, int, double*, double*);
+int aper_bs(char*, double*, double*, double*, double*, int*, double*, double*);
+double aper_calc(double, double, double*, double*, double*, 
+		      int, double*, double*, int, double);
+int aper_chk_inside(double, double, double*, double*, double, int);
+int aper_external_file(char*, double*, double*);
+void aper_header(struct table*, struct aper_node*);
+void aper_fill_quads(double*, double*, int, int*);
+void aper_intersect(double, double, double, double, double, double, 
+		   double, double, int, int,double*, double*);
+int aper_linepar(double, double, double, double, double*, double*);
+int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
+double aper_online(double, double, double, double, double, double, double);
+void aper_race(double, double, double, double, double*, double*);
+void aper_read_twiss(char*, int*, double*, double*, double*,
+			double*, double*, double*, double*);
+void aper_trim_ws(char*, int);
+void aper_write_table(char*, double*, double*, double*, double*,
+			   char*, double*, double*, double*, double*,
+			   double*, double*, double*, double*, double*,
+			   double*, double*, double*, double*, double*, char*);
+struct aper_node* aperture(char*, struct node**, struct table*, int*);
+
+
 /* SXF module routines */
 
 int  all_blank(char*);
@@ -857,6 +888,7 @@ struct sequence* edit_sequ;     /* pointer to sequence being edited */
 struct sequence_list* sequences;    /* pointer to sequence list */
 struct sequence_list* match_sequs;  /* pointer to sequence list for match */
 
+struct table* aperture_table;	  /* current aperture table */
 struct table* ibs_table;          /* current ibs table */
 struct table* touschek_table;     /* current touschek table */
 struct table* summ_table;         /* current twiss summary table */
@@ -936,6 +968,7 @@ char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 2.13";
 char one_string[] = "1";
+char aptwfile[NAME_L] = "none";	 /* IW 05.11.2004 */
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
 char* current_link_group;
