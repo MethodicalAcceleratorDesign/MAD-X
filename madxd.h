@@ -610,7 +610,7 @@ void store_comm_par_value(char*, double, struct command*);
 void store_comm_par_vector(char*, double*, struct command*);
 void store_orbit(struct command*, double*);
 void store_savebeta(struct in_cmd*);
-void store_select(struct in_cmd*);
+void store_select(struct in_cmd*, int);
 void store_set(struct command*, int);
 void store_threader(struct in_cmd*);
 int string_cnt(char, int, char**);

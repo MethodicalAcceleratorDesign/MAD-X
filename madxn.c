@@ -2270,6 +2270,21 @@ void expand_line(struct char_p_array* l_buff)
         l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
        }
     }
+  /* get bracket pointers including new ones */
+  level = b_cnt = 0;
+  for (i = 0; i < l_buff->curr; i++)
+    {
+     if (*l_buff->p[i] == '(')
+       {
+        lbpos->i[b_cnt] = i;
+        b_level->i[b_cnt++] = level++;
+       }
+     else if (*l_buff->p[i] == ')')  level--;
+    }
+  for (i = 0; i < b_cnt; i++)
+     get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
+                         l_buff->curr-1, &dummy, &rbpos->i[i]);
+  lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
   /* now loop over level from highest down to zero, invert if '-' */
   for (level = l_max; level >= 0; level--)
     {
@@ -5499,76 +5514,95 @@ void seq_replace(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
+  struct node** rep_nodes = NULL;
+  struct element** rep_els = NULL;
   struct node *node, *c_node;
   char* name;
   struct element* el;
-  int any = 0, k, pos = name_list_pos("element", nl);
+  int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-    {
-     if (strcmp(name, "selected") == 0)
+   {
+    if (strcmp(name, "selected") == 0)
+     {
+      if (seqedit_select->curr == 0)
        {
-        if (seqedit_select->curr == 0)
-          {
-           warning("no active select commands:", "ignored"); return;
-          }
+        warning("no active select commands:", "ignored"); return;
+       }
+      else
+       {
+        pos = name_list_pos("by", nl);
+        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+         {
+          if ((el = find_element(name, element_list)) == NULL)
+           {
+            warning("ignoring unknown 'by' element:",name);
+            return;
+           }
+         }
         else
-          {
-           pos = name_list_pos("by", nl);
-           if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-              {
-               if ((el = find_element(name, element_list)) == NULL)
-        {
-                  warning("ignoring unknown 'by' element:",name);
-                  return;
-        }
-            }
-           else
-           {
-              warning("'by' missing, ","ignored");
-              return;
-           }
-         if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
+         {
+          warning("'by' missing, ","ignored");
+          return;
+         }
+	rep_nodes = (struct node**)
+        mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
+	rep_els = (struct element**) 
+        mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
+        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
                == 0) any = 1;
-           c_node = edit_sequ->start;
-           while (c_node != NULL)
+        c_node = edit_sequ->start;
+        while (c_node != NULL)
+         {
+          if (any || name_list_pos(c_node->name, selected_ranges->list) > -1)
            {
-            if (any
-                  || name_list_pos(c_node->name, selected_ranges->list) > -1)
-       {
-        name = NULL;
-        for (k = 0; k < seqedit_select->curr; k++)
-          {
-           if (c_node->p_elem != NULL) name = c_node->p_elem->name;
-                    if (name != NULL && strchr(name, '$') == NULL &&
-               pass_select(name,
+            name = NULL;
+            for (k = 0; k < seqedit_select->curr; k++)
+             {
+              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
+              if (name != NULL && strchr(name, '$') == NULL &&
+                  pass_select(name,
                           seqedit_select->commands[k])) break;
-          }
-                 if (k < seqedit_select->curr) replace_one(c_node, el);
-       }
-               if (c_node == edit_sequ->end) break;
-               c_node = c_node->next;
+             }
+            if (k < seqedit_select->curr) 
+	     {
+	      rep_els[rep_cnt] = el;
+              rep_nodes[rep_cnt++] = c_node;
+	     }
            }
-        }
+          if (c_node == edit_sequ->end) break;
+          c_node = c_node->next;
+         }
        }
-     else
+     }
+    else
+     {
+      rep_nodes = (struct node**)
+      mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
+      rep_els = (struct element**) 
+      mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
+      strcpy(c_dummy, name);
+      square_to_colon(c_dummy);
+      if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
        {
-        strcpy(c_dummy, name);
-        square_to_colon(c_dummy);
-        if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
-          {
-         node = edit_sequ->nodes->nodes[pos];
-           pos = name_list_pos("by", nl);
-           if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-              {
-               if ((el = find_element(name, element_list)) != NULL)
-               replace_one(node, el);
-               else warning("ignoring unknown 'by' element: ",name);
-            }
-           else warning("'by' missing, ","ignored");
-          }
-        else warning("ignored because of unknown element: ", name);
+        node = edit_sequ->nodes->nodes[pos];
+        pos = name_list_pos("by", nl);
+        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+         {
+          if ((el = find_element(name, element_list)) != NULL)
+	   {
+	    rep_els[rep_cnt] = el;
+            rep_nodes[rep_cnt++] = node;
+	   }
+          else warning("ignoring unknown 'by' element: ",name);
+         }
+        else warning("'by' missing, ","ignored");
        }
-    }
+      else warning("ignored because of unknown element: ", name);
+     }
+    for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
+    if (rep_nodes) myfree("seq_replace", rep_nodes);
+    if (rep_els)   myfree("seq_replace", rep_els);
+   }
   else  warning("no element specified, ","ignored");
 }
 
@@ -6048,7 +6082,7 @@ void store_savebeta(struct in_cmd* cmd)
     }
 }
 
-void store_select(struct in_cmd* cmd)
+void store_select(struct in_cmd* cmd, int type)
 {
   char* flag_name;
   struct name_list* nl = cmd->clone->par_names;
@@ -6073,6 +6107,7 @@ void store_select(struct in_cmd* cmd)
       if (seqedit_select->curr == seqedit_select->max)
             grow_command_list(seqedit_select);
         seqedit_select->commands[seqedit_select->curr++] = cmd->clone;
+        cmd->clone->select_type = type; /* store select/deselect switch */
         cmd->clone_flag = 1; /* do not drop */
        }
     }

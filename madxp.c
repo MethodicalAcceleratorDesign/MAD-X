@@ -433,7 +433,8 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
-  else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "select")      == 0) store_select(cmd, 0);
+  else if (strcmp(toks[k], "deselect")    == 0) store_select(cmd, 1);
 #endif
 #ifndef _FULL
   puts("++++++++++++++ command skipped in parser version");
@@ -2799,6 +2800,7 @@ int pass_select(char* name, struct command* sc)
   struct command_parameter_list* pl = sc->par;
   struct element* el = find_element(strip(name), element_list);
   int pos, in = 0, any = 0;
+  int toggle = sc->select_type;  /* 0 for select, 1 for deselect commands */
   char *class, *pattern;
   pos = name_list_pos("class", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
@@ -2808,7 +2810,7 @@ int pass_select(char* name, struct command* sc)
        {
         class = pl->parameters[pos]->string;
         in = belongs_to_class(el, class);
-        if (in == 0) return 0;
+        if (in == 0) return toggle;
        }
     }
   any = in = 0;
@@ -2819,8 +2821,8 @@ int pass_select(char* name, struct command* sc)
      pattern = stolower(pl->parameters[pos]->string);
      if(myregex(pattern, strip(name)) == 0)  in = 1;
     }
-  if (any == 0) return 1;
-  else return in;
+  if (any == 0) return 1 - toggle;
+  else return abs(in - toggle);
 }
 
 int pass_select_list(char* name, struct command_list* cl)

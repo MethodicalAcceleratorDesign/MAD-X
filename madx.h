@@ -41,6 +41,7 @@ struct command                     /* holds one command */
   char module[NAME_L];                 /* name of module it belongs to */
   char group[NAME_L];                  /* command group it belongs to */
   int stamp;
+  int select_type;                     /* 0 select, 1 deselect */
   int link_type;                       /* 0 none, 1 start, 2 end of group */
   int mad8_type;                       /* 0 none, else mad-8 element code */
   int beam_def;                        /* beam commands: 1 if defined */
