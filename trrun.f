@@ -857,7 +857,7 @@
       twopi=get_variable('twopi ')
 
 !---- Fetch data.
-!      el = node_value('l ')
+      el = node_value('l ')
 !      el1 = node_value('l ')
       rfv = node_value('volt ')
       rff = node_value('freq ')
