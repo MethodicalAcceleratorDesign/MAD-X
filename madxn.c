@@ -6157,6 +6157,9 @@ void pro_twiss()
   struct node *nodes[2], *use_range[2];
   char *filename, *name, *table_name, *sector_name;
   int i, j, l, lp, pos, k = 1, ks, w_file, beta_def;
+  int keep_info = get_option("info");
+  i = keep_info * get_option("twiss_print");
+  set_option("info", &i);
   pos = name_list_pos("sequence", nl);
   if(nl->inform[pos]) /* sequence specified */
     {
@@ -6291,6 +6294,7 @@ void pro_twiss()
   set_option("rmatrix", &k);
   set_option("centre", &k);
   set_option("twiss_sector", &k);
+  set_option("info", &keep_info);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
 }
@@ -8862,6 +8866,7 @@ void track_track(struct in_cmd* cmd)
   k = get_value(current_command->name,"onetable");
   set_option("onetable", &k);
   track_deltap=get_value(current_command->name,"deltap");
+  set_variable("track_deltap", &track_deltap);
   if(track_deltap != 0) fprintf(prt_file, "track_deltap: %f\n",track_deltap);
   curr_obs_points = 1;  /* default: always observe at machine end */
   pos = name_list_pos("file", nl);
