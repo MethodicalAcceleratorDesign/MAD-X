@@ -3135,6 +3135,7 @@
       integer ipseps, iset, nint, ndble, k, int_arr(100), char_l(100)
       double precision plot_option
       double precision d_arr(100)
+      real tmpval
       character * 40 char_a
       character * 8 tmp_a
       data iset / 0 /
@@ -3166,6 +3167,11 @@
       endif
 !--- reduce window size (only X11)
       call gxsvar('NYPIX', 670, 0., ' ')
+!--- set bounding box (only X11)
+      tmpval=plot_option('xsize ')
+      call gxsvar('XMETAF', 0, tmpval, ' ')
+      tmpval=plot_option('ysize ')
+      call gxsvar('YMETAF', 0, tmpval, ' ')
 !--- inhibit initial X-Window (only X11)
       call gxsvar('ITSEOP', 1, 0., ' ')
       call gxinit
