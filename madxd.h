@@ -847,6 +847,9 @@ char* current_range;             /* currently used range, or NULL */
 char* title = NULL;
 char* match_seqs[2];             /* OB 23.1.2002   */
 char* match_beta[2];             /* OB 23.1.2002   */
+char* match_range[2];            /* HG 12.11.2002   */
+char* track_filename;            /* track module file name start */
+char* track_fileext;             /* track module file name extension */
 
 double pi, twopi, degrad, raddeg, e, clight, hbar;
 double penalty;
@@ -895,6 +898,7 @@ int loop_cnt = 0;           /* used to detect infinite loops */
 int match_calls = 0;        /* command call limit in match */
 int match_is_on = 0;        /* true when inside match command */
 int match_num_beta = 0;     /* OB 23.1.2002 */
+int match_num_range = 0;    /* HG 12.11.2002 */
 int match_num_seqs = 0;     /* OB 23.1.2002 */
 int mig_strategy;           /* migrad strategy (match) */
 int new_name_count = 0;     /* to make internal names */

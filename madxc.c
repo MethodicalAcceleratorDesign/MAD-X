@@ -1149,11 +1149,13 @@ int  c_svddec(double *dmat, int imon, int icor, int *sing)
 
   dbg = debug_correct_opt;
 
+#ifdef _ORBDBG_
   if(imon >= icor ) {
       svddec_m_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,&imon,&icor,&flag,sing,&dbg);  
   } else {
       svddec_c_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,&imon,&icor,&flag,sing,&dbg);   
   }
+#endif
   free(s); free(u); free(v); free(w); free(ut); free(vt); free(wt);
   free(ws); free(wv); free(sw);
 
@@ -1188,6 +1190,7 @@ int  c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int
 
   dbg = debug_correct_opt;
 
+#ifdef _ORBDBG_
   if(imon >= icor ) {
       svdcorr_m_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,
                  xa,xb,xp,ws,wv,sw,
@@ -1197,6 +1200,7 @@ int  c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int
                  xa,xb,xp,ws,wv,sw,
                  nx,&imon,&icor,&flag,&dbg);             
   }
+#endif
   free(s); free(u); free(v); free(w); free(ut); free(vt); free(wt);
   free(sw); free(xa); free(xb); free(xp); free(ws); free(wv);
 

@@ -1574,14 +1574,26 @@
       integer i,j,code
       logical fsec, ftrk, fmap
       double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
-
+      double precision theta, zero, st, ct, tmp
+      parameter (zero = 0.d0)
 !---- Initialization
       call dzero(ek,6)
       call m66one(re)
       call dzero(te,216)
       fmap=.false.
       el = node_value('l ')
-
+      theta = node_value('tilt ')
+      if (theta .ne. zero)  then
+!--- rotate orbit before entry
+        st = sin(theta)
+        ct = cos(theta)
+        tmp = orbit(1)
+        orbit(1) = ct * tmp + st * orbit(3)
+        orbit(3) = ct * orbit(3) - st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp + st * orbit(4)
+        orbit(4) = ct * orbit(4) - st * tmp
+      endif
 !---- Select element type.
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
@@ -1693,7 +1705,16 @@
 
 !---- End of element calculation;
   500 continue
-
+      if (theta .ne. zero)  then
+        call tmtilt(.true., -theta, ek, re, te)
+!--- rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+      endif
       end
       subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
       implicit none

@@ -856,12 +856,12 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 
 void complete_twiss_table(struct table* t)
 {
-  int i, j, mult, pos, h_length = 32; /* change when you add lines ! */
+  int i, j, mult, n, pos, h_length = 33; /* change adding header lines ! */
   double el, val, dtmp;
   struct node* c_node;
   struct table* s;
   char tmp[16];
-  char* p;
+
   if (t == NULL) return;
   for (i = 0; i < t->curr; i++)
     {
@@ -880,10 +880,12 @@ void complete_twiss_table(struct table* t)
            if (strstr(twiss_table_cols[j], "k0")) val *= c_node->dipole_bv;
            else val *= c_node->other_bv; 
 	  }
-       else
+        else
 	  {
 	   strcpy(tmp, twiss_table_cols[j]);
-           if ((p=strchr(tmp, 'l')) != 0) *p = '\0'; /* suppress trailing l */
+           n = strlen(tmp) - 1;
+           if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l') 
+               tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
            val = el_par_value(tmp, c_node->p_elem);
            if ((strstr(tmp, "k0") || strstr(tmp, "kick"))&& c_node->dipole_bv) 
                val *= c_node->dipole_bv;
@@ -925,6 +927,9 @@ void complete_twiss_table(struct table* t)
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "sige");
   sprintf(c_dummy, "@ SIGE             %%le  %22.12g", dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  dtmp = get_value("beam", "sigt");
+  sprintf(c_dummy, "@ SIGT             %%le  %22.12g", dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "npart");
   sprintf(c_dummy, "@ NPART            %%le  %22.12g", dtmp);
@@ -1202,7 +1207,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   struct expression* expr = NULL;
   struct command_parameter* lp = cmd->cmd_def->par->parameters[pos];
   struct command_parameter* clp = cmd->clone->par->parameters[pos];
-  int j, i = start, e_type, ival, end, e_end, tot_end, c_type = 0,
+  int j, k, ks, i = start, e_type, ival, end, e_end, tot_end, c_type = 0,
       val_type = 0, cnt = 0;
   double val;
   if (lp->type < 10)
@@ -1361,16 +1366,18 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
                 break;
               tot_end = j - 1;
 	     }
-           while (start < j)
+           ks = start;
+           for (k = start; k < j; k++)
 	     {
-	      if (*toks[start] != ',')
+	      if ((k+1 == j || *toks[k+1] == ','))
 		{
                  if (cnt == clp->m_string->max)
 		   grow_char_p_array(clp->m_string);
-                 clp->m_string->p[cnt++] = permbuff(toks[start]);
+                 clp->m_string->p[cnt++] 
+                 = permbuff(noquote(join(&toks[ks], k+1-ks)));
                  clp->m_string->curr = cnt;
+                 ks = k + 2;  k++;
 		}
-              start++;
 	     }
 	  }
         else 
@@ -6147,6 +6154,7 @@ void pro_twiss()
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
+  struct node *nodes[2], *use_range[2];
   char *filename, *name, *table_name, *sector_name;
   int i, j, l, lp, pos, k = 1, ks, w_file, beta_def;
   pos = name_list_pos("sequence", nl);
@@ -6196,6 +6204,17 @@ void pro_twiss()
      else  sector_name = pl->parameters[pos]->call_def->string;
      if ((sec_file = fopen(sector_name, "w")) == NULL)
           fatal_error("cannot open output file:", sector_name);
+    }
+  use_range[0] = current_sequ->range_start;
+  use_range[1] = current_sequ->range_end;
+  if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
+    {
+     if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
+       {
+	current_sequ->range_start = nodes[0];
+	current_sequ->range_end = nodes[1];
+       }
+     else warning("illegal range ignored:", pl->parameters[pos]->string);
     }
   for (j = 0; j < 6; j++) orbit0[j] = zero;
   for (j = 0; j < 6; j++) disp0[j] = zero;
@@ -6272,6 +6291,8 @@ void pro_twiss()
   set_option("rmatrix", &k);
   set_option("centre", &k);
   set_option("twiss_sector", &k);
+  current_sequ->range_start = use_range[0];
+  current_sequ->range_end = use_range[1];
 }
 
 void put_info(char* t1, char* t2) 
@@ -6757,6 +6778,7 @@ void scan_in_cmd(struct in_cmd* cmd)
   for (i = 0; i < nl->curr; i++) nl->inform[i] = 0; /* set when read */
   n = cmd->tok_list->curr;
   i = cmd->decl_start;
+  cmd->tok_list->p[n] = blank;
   while (i < n)
     {
      log = 0;
@@ -8798,18 +8820,22 @@ void track_tables_dump()
   int j;
   for (j = 0; j < table_register->names->curr; j++)
     {
-     if (strstr(table_register->names->names[j], "track.obs"))
-        out_table("track", table_register->tables[j], 
-                  table_register->names->names[j]);
-     else if (strcmp(table_register->names->names[j], "trackone") == 0)
-        out_table("track", table_register->tables[j], 
-                  table_register->names->names[j]);
+     if (strstr(table_register->names->names[j], "track.obs")
+         || strcmp(table_register->names->names[j], "trackone") == 0)
+       {
+        strcpy(l_work, track_filename);
+        strcat(l_work, &table_register->names->names[j][5]);
+        strcat(l_work, track_fileext);
+        out_table("track", table_register->tables[j], l_work);
+       }
     }
 }
 
 void track_track(struct in_cmd* cmd)
 {
-  int k=0;
+  int k=0, pos, one = 1;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
     {
@@ -8838,6 +8864,24 @@ void track_track(struct in_cmd* cmd)
   track_deltap=get_value(current_command->name,"deltap");
   if(track_deltap != 0) fprintf(prt_file, "track_deltap: %f\n",track_deltap);
   curr_obs_points = 1;  /* default: always observe at machine end */
+  pos = name_list_pos("file", nl);
+  if (nl->inform[pos]) set_option("track_dump", &one);
+  if ((track_filename = pl->parameters[pos]->string) == NULL)
+    {
+     if (pl->parameters[pos]->call_def != NULL)
+     track_filename = pl->parameters[pos]->call_def->string;
+     else track_filename = permbuff("dummy");
+    }
+  track_filename = permbuff(track_filename);
+  track_fileext = NULL;
+  pos = name_list_pos("extension", nl);
+  if ((track_fileext = pl->parameters[pos]->string) == NULL)
+    {
+     if (pl->parameters[pos]->call_def != NULL)
+     track_fileext = pl->parameters[pos]->call_def->string;
+     if (track_fileext == NULL)  track_fileext = permbuff("\0");
+    }
+  track_fileext = permbuff(track_fileext);
 }
 
 int twiss_input(struct command* tw)

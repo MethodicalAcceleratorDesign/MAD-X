@@ -451,6 +451,26 @@ void match_match(struct in_cmd* cmd)
     }
   /* END CHK-BETA0; OB 23.1.2002 */
 
+  /* START CHK-RANGE; HG 12.11.2002 */
+  pos = name_list_pos("range", nl);
+  if(nl->inform[pos]) /* range specified */
+    {
+     cp = cmd->clone->par->parameters[pos];
+     match_num_range = cp->m_string->curr;
+     for (i = 0; i < match_num_range; i++) 
+       {
+	match_range[i] = buffer(cp->m_string->p[i]);
+	/* START adding range to TWISS input command for each sequence */
+	tnl = local_twiss[i]->cmd_def->par_names;
+	tpos = name_list_pos("range", tnl);
+	local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+	local_twiss[i]->cmd_def->par->parameters[tpos]->string 
+               = match_range[i];
+	/* END adding range to TWISS input command for each sequence */
+       }
+    }
+  /* END CHK-RANGE; OB 12.11.2002 */
+
   /* START CHK-ENTRIES of TYPE DOUBLE-REAL; OB 23.1.2002 */
   for (j = 0; j < nl->curr; j++)
     {

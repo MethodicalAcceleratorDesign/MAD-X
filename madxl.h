@@ -111,7 +111,7 @@ char sxf_table_names[][TABLE_KEY] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 60; /* last column filled by twiss_complete */
+int twiss_fill_end = 61; /* last column filled by twiss_complete */
 int twiss_table_types[] =
 {
 3, 3, 2, 2, 2,
@@ -126,7 +126,7 @@ int twiss_table_types[] =
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
-2, 3,
+2, 2, 3,
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
 2, 2, 2, 2, 2,
@@ -151,7 +151,7 @@ char twiss_table_cols[][TABLE_KEY] =
 "k4sl", "k5l", "k5sl", "k6l", "k6sl", 
 "k7l", "k7sl", "k8l", "k8sl", "k9l", 
 "k9sl", "k10l", "k10sl", "ks", "hkick", 
-"vkick", "parent",
+"vkick", "tilt", "parent",
 "re11", "re12", "re13", "re14", "re15",
 "re16", "re21", "re22", "re23", "re24",
 "re25", "re26", "re31", "re32", "re33",
