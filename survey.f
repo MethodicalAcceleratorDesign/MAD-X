@@ -37,24 +37,14 @@
       phi =  phi0
       psi =  psi0
 
-!---- Set up initial V and W.
+!---- Set up initial V and W. 
       suml = 0
       sums = 0.
-      costhe = cos(theta0)
-      sinthe = sin(theta0)
-      cosphi = cos(phi0)
-      sinphi = sin(phi0)
-      cospsi = cos(psi0)
-      sinpsi = sin(psi0)
-      w0(1,1) = + costhe * cospsi - sinthe * sinphi * sinpsi
-      w0(1,2) = - costhe * sinpsi - sinthe * sinphi * cospsi
-      w0(1,3) =                     sinthe * cosphi
-      w0(2,1) =                              cosphi * sinpsi
-      w0(2,2) =                              cosphi * cospsi
-      w0(2,3) =                              sinphi
-      w0(3,1) = - sinthe * cospsi - costhe * sinphi * sinpsi
-      w0(3,2) = + sinthe * sinpsi - costhe * sinphi * cospsi
-      w0(3,3) =                     costhe * cosphi
+      call sumtrx(theta0, phi0, psi0, w0)
+      theta = theta0
+      phi = phi0
+      psi = psi0
+
 !---- (replaces SUCOPY)
       do j = 1, 3
         v(j) = v0(j)
@@ -78,6 +68,7 @@
 !**  Compute the survey angles at each point
       call suangl(w, theta, phi, psi)
 !**  Fill the survey table
+!      print *,"theta=",theta, "  phi=",phi,"  psi=" ,psi,"  tilt=",tilt
       call sufill(suml,v, theta, phi, psi,tilt)
 ! Test :
 !      print *,suml,"    ",el,"      ",theta,"      ", phi,"     ", psi,
@@ -116,16 +107,13 @@
 
       arg = sqrt(w(2,1)**2 + w(2,2)**2)
       phi = atan2(w(2,3), arg)
-      psiint = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
-      if (arg .gt. 1.0e-20) then
-        thetaint = proxim(atan2(w(1,3), w(3,3)), theta)
-        psiint = proxim(atan2(w(2,1), w(2,2)), psi)
-      else
-        psiint = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
-        thetaint=theta
-      endif
-      theta=thetaint
-      psi=psiint
+!      print *,"SUANGL:  phi =",phi,"  arg=",arg,"   w23 =",w(2,3)
+       if (arg .gt. 1.0e-20) then
+        theta = proxim(atan2(w(1,3), w(3,3)), theta)
+        psi = proxim(atan2(w(2,1), w(2,2)), psi)
+       else
+        psi = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
+       endif
       end
 !-----------------  end of suangl  subroutine -------------------------
 !
@@ -188,6 +176,7 @@
       parameter(zero=0d0,one=1d0)
 !---- Branch on subprocess code.
       tilt = zero
+      angle = zero
       code = node_value('mad8_type ')
       go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
@@ -295,26 +284,25 @@
    20 continue
 !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
       angle = node_value('angle ')*node_value('dipole_bv ')
-!      print *," BV = ",node_value('dipole_bv ')
-      print *,node_value('k0s '),el,node_value('dipole_bv ')
       angv = node_value('k0s ')*el*node_value('dipole_bv ')
       if (angle .eq. zero) then
         dx = zero
         ds = el
         tilt = zero
            if(angv.ne.zero) then
-           tilt = get_variable('twopi ')*0.25
-           dx = - el * (cos(angv)-one)/angv
-           ds =  el * sin(angv)/angv
+!****  tilt not obvious !!!!
+           tilt = -get_variable('twopi ')*0.25*angv/abs(angv)
            angle = angv
+           dx = el * (cos(angle)-one)/angle
+           ds = el * sin(angle)/angle
            endif
       else
-! el corrected 18.09.02 // identical to mad8(sector bend)
-        tilt = atan2(angv,angle)
+        tilt = asin(angv/sqrt(angv*angv+angle*angle))
         dx = el * (cos(angle)-one)/angle
         ds = el * sin(angle)/angle
       endif
-!      print *," *****  TILT = ",tilt,"   length= ",el
+!      print *,"SUELEM dipole : tilt =",tilt," length= ",
+!     &el," angv = ",angv," bv =",node_value('dipole_bv ')
       go to 490
 
 !---- Rotation around S-axis.
@@ -349,7 +337,7 @@
       we(3,1) = sinthe * cospsi
       we(1,2) = we(2,1)
       we(2,2) = costhe * sinpsi*sinpsi + cospsi*cospsi
-      we(3,2) = - sinthe * sinpsi
+      we(3,2) =  sinthe * sinpsi
       we(1,3) = - we(3,1)
       we(2,3) = - we(3,2)
       we(3,3) = costhe
