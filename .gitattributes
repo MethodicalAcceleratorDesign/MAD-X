@@ -71,6 +71,7 @@
 /orbf.F -text
 /physcons.fi -text
 /plot.F -text
+/ptc_dummy.F -text
 /survey.F -text
 /sxf.c -text
 /timel.c -text
