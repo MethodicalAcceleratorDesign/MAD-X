@@ -67,7 +67,7 @@
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 26          /* no. of valid element types */
+#define N_TYPES 27          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -79,6 +79,7 @@ void add_to_ellist(struct c6t_element*);
 void app_factor(double, double*, int);
 void arr_print(double*, int);
 void assign_att();
+void att_aperture(struct c6t_element*);
 void att_beambeam(struct c6t_element*);
 void att_colli(struct c6t_element*);
 void att_decapole(struct c6t_element*);
@@ -98,6 +99,8 @@ void att_sbend(struct c6t_element*);
 void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
 void att_undefined(struct c6t_element*);
+void clean_c6t_element(struct c6t_element*);
+struct c6t_element* create_aperture(char* ,char* ,int , int );
 void concat_drifts();
 void conv_elem();
 void c6t_finish();
@@ -159,6 +162,7 @@ void write_blocks();
 void write_c6t_element(struct c6t_element*);
 void write_f16_errors();
 void write_f8_errors();
+void write_f3_aper();
 void write_f3aux();
 void write_f3_entry(char*, struct c6t_element*);
 void write_f3_mult(struct c6t_element*);
@@ -168,6 +172,7 @@ void write_struct();
 /* routines used from makethin.c */
 double el_par_value_recurse(char*, struct element*);
 struct command_parameter* return_param_recurse(char*, struct element* );
+struct command_parameter* return_param(char* , struct element* );
 
 struct li_list types;
 
@@ -184,12 +189,14 @@ struct c6t_element* prev_element;
 struct c6t_element* current_element = NULL;
 struct c6t_element* debug_element = NULL;
 struct c6t_el_list* split_list = NULL;
+struct aper_struct tag_aperture;
 
 struct object *p_err_zero;  /* pointer to error object with all zeroes */
               
 char el_info[N_TYPES][60] = /* see type_info definition */
 /*           l=0 l>0,normal l>0,skew ->drift make_k*l split */
-{"beambeam    2       2       2       0       0       0",
+{"aperture    2       2       2       0       0       0",
+"beambeam     2       2       2       0       0       0",
 "beamint      0       1       1       1       0       0",
 "drift        0       1       1       0       0       0",
 "decapole     2       2       2       0       1       2", 
@@ -235,6 +242,7 @@ int           block_count = 0,     /* current block count for naming */
               f34_cnt = 0,         /* f34 write count */
               special_flag = 1,    /* produce special output file from twiss */
               cavall_flag = 0,     /* if 0 lump all cavities into first */
+              aperture_flag = 0,   /* if 1 insert apertures into structure */
               radius_flag = 0,     /* change the default reference radius */
               split_flag = 0,      /* if 1 keep zero multipoles after split */
               multi_type = -1,     /* is set to multipole type if any found */
@@ -255,7 +263,7 @@ const double eps_9 = 1.e-9;
 const double eps_12 = 1.e-12;
 double ref_def = 0.017;
 
-FILE *f2, *f3, *f3aux, *f8, *f16, *f34;
+FILE *f2, *f3, *f3aux, *f3aper, *f8, *f16, *f34;
 
 void conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
 {
@@ -263,8 +271,8 @@ void conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD
   puts("  +   c6t version 2.0        +");
   puts("  ++++++++++++++++++++++++++++\n");
 
-  get_args(mycmd);
   c6t_init();
+  get_args(mycmd);
   process_c6t();
   printf("\nc6t terminated - total number of elements: %d\n", elem_cnt);
   printf("                    with alignment errors: %d\n", align_cnt);
@@ -385,7 +393,8 @@ void assign_att()
       el = types.member[i]->elem[j];
       if (el->flag > 0 && el->equiv == el)  /* all others ignored */
        {
-    	 if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
+    	 if (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
+	 else if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
     	 else if (strcmp(el->base_name, "decapole") == 0) att_decapole(el);
     	 else if (strcmp(el->base_name, "drift") == 0) att_drift(el);
     	 else if (strcmp(el->base_name, "ecollimator") == 0) att_colli(el);
@@ -407,6 +416,14 @@ void assign_att()
        }
      }
    }
+}
+
+void att_aperture(struct c6t_element* el)
+{
+  el->out_1 = 3;
+  el->out_2 = 1e-8;
+  el->out_3 = 0.0;
+  el->out_4 = 0.0;
 }
 
 void att_beambeam(struct c6t_element* el)
@@ -835,6 +852,7 @@ void c6t_init()
   f16_cnt = 0;         /* f16 write count */
   f34_cnt = 0;         /* f34 write count */
   special_flag = 1;    /* produce special output file from twiss */
+  aperture_flag = 0;   /* if 1 insert apertures into structure */
   cavall_flag = 0;     /* if 0 lump all cavities into first */
   radius_flag = 0;     /* change the default reference radius */
   split_flag = 0;      /* if 1 keep zero multipoles after split */
@@ -851,9 +869,27 @@ void clean_c6t_element(struct c6t_element* cleanme)
   for(i=0; i<cleanme->n_values; i++) { cleanme->value[i]=0; }
 }
 
+struct c6t_element* create_aperture(char* name,char* type,int a, int b)
+{
+  struct c6t_element* aper_element;
+  aper_element = new_c6t_element(4,name,"aperture");
+  clean_c6t_element(aper_element);
+  strcpy(aper_element->org_name,name);
+  aper_element->value[0] = 0.0;
+  aper_element->value[1] = a;
+  aper_element->value[2] = b;
+  if (strcmp(type,"RE")==0) {
+    aper_element->value[3] = 1;
+  } else {
+    aper_element->value[3] = 2;
+  }
+  aper_element->keep_in=1;
+  return aper_element;
+}
+
 struct c6t_element* convert_madx_to_c6t(struct node* p)
 {
-  struct command_parameter *kn_param = NULL,*ks_param = NULL;
+  struct command_parameter *kn_param = NULL,*ks_param = NULL,*aper_param = NULL;
   int i,j,maxkn,maxks;
   struct c6t_element* c6t_elem = NULL;
   char t_name[255];
@@ -992,8 +1028,24 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     for (j = 0; j < c6t_elem->n_values; j++) 
       if (fabs(c6t_elem->value[j]) < eps_12) 
 	c6t_elem->value[j] = 0.0;
-
-    /* name used has to be without occ_cnt as this is added (only 1) in tab_name_code */
+    /* check to see if this has an aperture assigned, check for aperture flag */
+    if ((aperture_flag) 
+	&& (aper_param = return_param_recurse("apertype", p->p_elem))) {
+      tag_aperture.apply=1;
+      strcpy(tag_aperture.style,aper_param->string);
+      strcpy(tag_aperture.name,t_name);
+      strcat(tag_aperture.name,"_AP");
+      if ((aper_param = return_param_recurse("aperture", p->p_elem))) {
+	j=3; 
+	if (aper_param->double_array->curr<3) j=aper_param->double_array->curr;
+	for(i=0;i<j;i++) {
+	  tag_aperture.value[i] = aper_param->double_array->a[i];
+	}
+      }
+    }
+    
+    /* name used has to be without occ_cnt as this is added 
+       (only 1) in tab_name_code */
     c6t_elem->twtab_row = table_row(current_sequ->tw_table,t_name);
   }
 
@@ -1154,6 +1206,8 @@ struct block* get_block_equiv(struct block* current)
 void get_args(struct in_cmd* my_cmd)
 {
   double tmp_ref_def;
+  if ((aperture_flag = command_par_value("aperture", my_cmd->clone)))
+    put_info("c6t - aperture flag selected","");
   if ((cavall_flag = command_par_value("cavall", my_cmd->clone)))
     put_info("c6t - cavall flag selected","");
   if ((split_flag = command_par_value("split", my_cmd->clone)))
@@ -1360,8 +1414,7 @@ void lower(char* s)
 
 struct c6t_element* make_c6t_element(struct node* p)
 {
-  struct c6t_element* tmp_element;
-
+  struct c6t_element *tmp_element;
   if ((tmp_element = convert_madx_to_c6t(p))) {
     prev_element = current_element;
     current_element = tmp_element;
@@ -1678,6 +1731,7 @@ void process_c6t()  /* steering routine */
   write_f16_errors();
   write_f34_special();
   write_f3aux();
+  write_f3_aper();
   write_f8_errors();
 }
 
@@ -1687,7 +1741,10 @@ void pro_elem(struct node* cnode)
 {
   int i;
   char t_key[KEY_LENGTH];
+  char ap_name[255];
+  struct c6t_element *tag_element;
 
+  tag_aperture.apply=0;
   /* do the fiddly conversion but skip element if not needed */
   if (make_c6t_element(cnode) == NULL) return;
 
@@ -1734,6 +1791,44 @@ void pro_elem(struct node* cnode)
     for (i=0;i<cnode->p_al_err->curr;i++)
       current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
   }
+  /* add aperture element if necessary */
+  if (tag_aperture.apply==1) {
+    if (strstr(tag_aperture.style,"circle")!=NULL) {
+      tag_element = create_aperture(tag_aperture.name,"EL",
+				    tag_aperture.value[0],tag_aperture.value[0]);
+    } else if (strstr(tag_aperture.style,"ellipse")!=NULL) {
+      tag_element = create_aperture(tag_aperture.name,"EL",
+				    tag_aperture.value[0],tag_aperture.value[1]);
+    } else if (strstr(tag_aperture.style,"rectangle")!=NULL) {
+      tag_element = create_aperture(tag_aperture.name,"RE",
+				    tag_aperture.value[0],tag_aperture.value[1]);
+    } else if (strstr(tag_aperture.style,"lhcscreen")!=NULL) {
+      strcpy(ap_name,tag_aperture.name); strcat(ap_name,"1");
+      tag_element = create_aperture(ap_name,"EL",
+				    tag_aperture.value[0],tag_aperture.value[0]);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
+      prev_element = current_element;
+      current_element = tag_element;
+      current_element->position = cnode->position;
+      add_to_ellist(current_element);
+
+      strcpy(ap_name,tag_aperture.name); strcat(ap_name,"2");
+      tag_element = create_aperture(ap_name,"RE",
+				    tag_aperture.value[1],tag_aperture.value[2]);
+    } else {
+      warning("general aperture element not supported in sixtrack",tag_aperture.name);
+    }
+
+    tag_element->previous = current_element;
+    tag_element->next = current_element->next;
+    current_element->next = tag_element;
+    prev_element = current_element;
+    current_element = tag_element;
+    current_element->position = cnode->position;
+    add_to_ellist(current_element);
+  }
 }
 
 void read_sequ()
@@ -1743,7 +1838,7 @@ void read_sequ()
   cnode=current_sequ->ex_start;
   while(cnode && cnode!=current_sequ->ex_end)
     {
-      pro_elem(cnode);
+      if (strstr(cnode->name,"$")==NULL) pro_elem(cnode);
       cnode=cnode->next;
     }
   sequ_end = current_sequ->ex_end->position;
@@ -2150,6 +2245,31 @@ void write_f34_special()
   fprintf(f34, 
 	  " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
 	  spos,"end_marker",100,zero,betx,bety,mux,muy);
+}
+
+void write_f3_aper()
+{
+  int f3aper_cnt = 0;
+  current_element = first_in_sequ;
+  while (current_element != NULL)
+    {
+      if (strstr(current_element->name,"_AP")!=NULL
+	  && (current_element->equiv == current_element)) {
+	if (f3aper_cnt++ == 0) {
+	  f3aper  = fopen("fc.3.aper", "w");
+	  fprintf(f3aper,"LIMI\n");
+	}
+	if (current_element->value[3] == 1) {
+	  fprintf(f3aper,"%s %s %f %f\n",current_element->name,"RE",
+		 current_element->value[1], current_element->value[2]);
+	} else {
+	  fprintf(f3aper,"%s %s %f %f\n",current_element->name,"EL",
+		 current_element->value[1], current_element->value[2]);	
+	}
+      }
+     current_element = current_element->next;
+    }
+  if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
 }
 
 void write_f3_entry(char* option, struct c6t_element* el)
