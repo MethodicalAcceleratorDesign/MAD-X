@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
+#include <sys/timeb.h>
 #include <unistd.h>
 #include "madxl.h"
 #include "madx.h"
