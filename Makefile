@@ -36,44 +36,44 @@ default: madx
 
 # files
 
-twissp.o: twiss.f
-	$(FC) $(FCP) -c -o twissp.o twiss.f
+twissp.o: twiss.F
+	$(FC) $(FCP) -c -o twissp.o twiss.F
 
-surveyp.o: survey.f
-	$(FC) $(FCP) -c -o surveyp.o survey.f
+surveyp.o: survey.F
+	$(FC) $(FCP) -c -o surveyp.o survey.F
 
-utilp.o: util.f
-	$(FC) $(FCP) -c -o utilp.o util.f
+utilp.o: util.F
+	$(FC) $(FCP) -c -o utilp.o util.F
 
-dynapp.o: dynap.f
-	$(FC) $(FCP) -c -o dynapp.o dynap.f
+dynapp.o: dynap.F
+	$(FC) $(FCP) -c -o dynapp.o dynap.F
 
 madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
 	$(CC) $(GCCP_FLAGS) -c -o madxnp.o madxn.c
 
 madx: madxnp.o twissp.o surveyp.o orbfp.o emitp.o utilp.o matchp.o dynapp.o plotp.o ibsdbp.o trrunp.o gxx11.o gxx11c.o
-	$(FC) $(FP) -o madx madxm.f madxnp.o twissp.o matchp.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o emitp.o utilp.o gxx11.o gxx11c.o $(LIBX) -lm -lc
+	$(FC) $(FP) -o madx madxm.F madxnp.o twissp.o matchp.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o emitp.o utilp.o gxx11.o gxx11c.o $(LIBX) -lm -lc
 
-ibsdbp.o: ibsdb.f
-	$(FC) $(FCP) -c -o ibsdbp.o ibsdb.f
+ibsdbp.o: ibsdb.F
+	$(FC) $(FCP) -c -o ibsdbp.o ibsdb.F
 
-plotp.o: plot.f
-	$(FC) $(FCP) -c -o plotp.o plot.f
+plotp.o: plot.F
+	$(FC) $(FCP) -c -o plotp.o plot.F
 
-trrunp.o: trrun.f
-	$(FC) $(FCP) -c -o trrunp.o trrun.f
+trrunp.o: trrun.F
+	$(FC) $(FCP) -c -o trrunp.o trrun.F
 
-orbfp.o: orbf.fpp
-	$(FC) $(FCP) -c -o orbfp.o orbf.fpp
+orbfp.o: orbf.F
+	$(FC) $(FCP) -c -o orbfp.o orbf.F
 
-emitp.o: emit.f
-	$(FC) $(FCP) -c -o emitp.o emit.f
+emitp.o: emit.F
+	$(FC) $(FCP) -c -o emitp.o emit.F
 
-matchp.o: match.f
-	$(FC) $(FCP) -c -o matchp.o match.f
+matchp.o: match.F
+	$(FC) $(FCP) -c -o matchp.o match.F
 
-gxx11.o: gxx11.f
-	$(FC) $(FCP) -c -o gxx11.o gxx11.f
+gxx11.o: gxx11.F
+	$(FC) $(FCP) -c -o gxx11.o gxx11.F
 
 gxx11c.o: gxx11c.c
 	$(CC) $(GCCP_FLAGS) -c -o gxx11c.o gxx11c.c
