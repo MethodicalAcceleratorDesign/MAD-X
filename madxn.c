@@ -2743,7 +2743,7 @@ void fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell,
 void fill_twiss_header(struct table* t)
      /* puts beam parameters etc. at start of twiss table */
 {
-  int i, pos, h_length = 33; /* change adding header lines ! */
+  int i, pos, h_length = 34; /* change adding header lines ! */
   double dtmp;
   struct table* s;
   char tmp[16];
@@ -2808,6 +2808,10 @@ void fill_twiss_header(struct table* t)
      dtmp = s->d_cols[pos][0];
      sprintf(c_dummy, "@ ALFA             %%le  %22.12g", dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+     pos = name_list_pos("orbit5", s->columns);
+     dtmp = s->d_cols[pos][0];
+     sprintf(c_dummy, "@ ORBIT5           %%le  %22.12g", dtmp);
+     t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("gammatr", s->columns);
      dtmp = s->d_cols[pos][0];
      sprintf(c_dummy, "@ GAMMATR          %%le  %22.12g", dtmp);
@@ -2838,11 +2842,11 @@ void fill_twiss_header(struct table* t)
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("xcomax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCMAX            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, "@ XCOMAX           %%le  %22.12g", dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("ycomax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCMAX            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, "@ YCOMAX           %%le  %22.12g", dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("betxmax", s->columns);
      dtmp = s->d_cols[pos][0];
@@ -2854,11 +2858,11 @@ void fill_twiss_header(struct table* t)
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("xcorms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCRMS            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, "@ XCORMS           %%le  %22.12g", dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("ycorms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCRMS            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, "@ YCORMS           %%le  %22.12g", dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dxrms", s->columns);
      dtmp = s->d_cols[pos][0];
@@ -5582,7 +5586,7 @@ void pro_twiss()
         if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
         if (w_file) out_table(table_name, twiss_table, filename);
        }
-     else puts("Twiss failed");
+     else warning("Twiss failed: ", "MAD-X continues");
     }
   if (sec_file)  
     {

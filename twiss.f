@@ -1727,7 +1727,6 @@
 
 !---- Fill summary table
       call double_to_table('summ ','length ' ,suml)
-      call double_to_table('summ ','deltap ' ,deltap)
       call double_to_table('summ ','orbit5 ' ,orbit5)
       call double_to_table('summ ','alfa '   ,alfa)
       call double_to_table('summ ','gammatr ',gamtr)
@@ -1745,6 +1744,7 @@
       call double_to_table('summ ','dyrms '  ,sigdy)
       call double_to_table('summ ','ycomax ' ,ycomax)
       call double_to_table('summ ','ycorms ' ,sigyco)
+      call double_to_table('summ ','deltap ' ,deltap)
 
 !---- Augment table summ
       call augment_count('summ ')
