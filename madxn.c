@@ -6902,6 +6902,7 @@ void seq_install(struct in_cmd* cmd)
 	  {
 	   el = clone_element(cl);
            strcpy(el->name, name_e);
+           add_to_el_list(el, cl->def->mad8_type, element_list, 1);
 	  }
        }
      else if ((el = find_element(name_e, element_list)) == NULL)
