@@ -1844,6 +1844,11 @@ void exec_command()
           current_ibs = p->clone;
           pro_ibs(p);
         }
+	else if (strcmp(p->cmd_def->module, "aperture") == 0)
+        {
+          current_twiss = p->clone;
+          pro_ivar();
+        }
         else if (strcmp(p->cmd_def->module, "touschek") == 0)
         {
           current_touschek = p->clone;
@@ -5175,7 +5180,60 @@ void process()  /* steering routine: processes one command */
        }
     }
 }
+void pro_ivar()
+     /* calls the Ivar's aperture module */
+{
+  struct name_list* nl = current_twiss->par_names;
+  struct command_parameter_list* pl = current_twiss->par;
+  struct int_array* tarr;
+  struct node *nodes[2], *use_range[2];
+  char *filename, *table_name;
+  double tol,tol_keep;
+  int j,l ,pos, w_file;
+  /*
+         start command decoding
+  */
 
+  pos = name_list_pos("table", nl);
+  if(nl->inform[pos]) /* table name specified - overrides save */
+    {
+      if ((table_name = pl->parameters[pos]->string) == NULL)
+      table_name = pl->parameters[pos]->call_def->string;
+    }
+  else table_name = "ivar_aperture";
+  pos = name_list_pos("file", nl);
+  if (nl->inform[pos])
+    {
+     if ((filename = pl->parameters[pos]->string) == NULL)
+       {
+        if (pl->parameters[pos]->call_def != NULL)
+        filename = pl->parameters[pos]->call_def->string;
+       }
+     if (filename == NULL) filename = permbuff("dummy");
+     w_file = 1;
+    }
+  else w_file = 0;
+ /*
+             end of command decoding
+  */
+  l = strlen(table_name);
+  tarr = new_int_array(l+1);
+  conv_char(table_name, tarr);
+  twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+           twiss_table_types, current_sequ->n_nodes);
+  twiss_table->dynamic = 1;
+  add_to_table_list(twiss_table, table_register);
+  current_sequ->tw_table = twiss_table;
+  twiss_table->org_sequ = current_sequ;
+  twiss_table->curr= 0;
+  current_node = current_sequ->ex_start;
+
+  ivar();
+}
+void ivar()
+{
+  printf("ivar subroutine is called \n");
+}
 void pro_emit(struct in_cmd* cmd)
      /* calls the emit module */
 {
@@ -5912,6 +5970,10 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   int ks, w_file, beta_def, err = 0, inval = 1;
   int keep_info = get_option("info");
 
+  /* Set embedded_flag */
+
+  embedded_flag = 1;
+
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
   /*
@@ -6230,6 +6292,10 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   set_option("info", &keep_info);
   set_variable("twiss_tol", &tol_keep);
   current_sequ->tw_table = keep_table;
+
+  /* Reset embedded_flag */
+
+  embedded_flag = 0;
 }
 
 int embedded_twiss()
@@ -8470,8 +8536,15 @@ void store_node_value(char* par, double* value)
 
   else if (strcmp(lpar, "e1") == 0) store_comm_par_value("e1",*value,el->def);
   else if (strcmp(lpar, "e2") == 0) store_comm_par_value("e2",*value,el->def);
-  else if (strcmp(lpar, "angle") == 0)
-           store_comm_par_value("angle",*value,el->def);
+  else if (strcmp(lpar, "angle") == 0) store_comm_par_value("angle",*value,el->def);
+
+  /* added by E. T. d'Amico 12 may 2004 */
+
+  else if (strcmp(lpar, "h1") == 0) store_comm_par_value("h1",*value,el->def);
+  else if (strcmp(lpar, "h2") == 0) store_comm_par_value("h2",*value,el->def);
+  else if (strcmp(lpar, "fint") == 0) store_comm_par_value("fint",*value,el->def);
+  else if (strcmp(lpar, "fintx") == 0) store_comm_par_value("fintx",*value,el->def);
+  else if (strcmp(lpar, "hgap") == 0) store_comm_par_value("hgap",*value,el->def);
 
   /* end of additions */
 }

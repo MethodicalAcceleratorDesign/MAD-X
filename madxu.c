@@ -3348,8 +3348,8 @@ int interp_node(int *nint)
   struct node *first_node, *body, *last, *clone;
   struct element* el;
   int j, number_nodes;
-  double bv, bvk, angle, e1, e2;
-  double zero = 0.0, length, step, numint;
+  double bv, bvk, angle, e1, e2, h1, h2, fint, fintx, hgap;
+  double zero = 0.0, minus_one = -1.0, length, step, numint;
   char *elem_name;
   int bend_flag = 0;
 
@@ -3371,6 +3371,12 @@ int interp_node(int *nint)
       angle = command_par_value("angle", el->def);
       e1 = command_par_value("e1", el->def);
       e2 = command_par_value("e2", el->def);
+      h1 = command_par_value("h1", el->def);
+      h2 = command_par_value("h2", el->def);
+      fint = command_par_value("fint", el->def);
+      fintx_plot = command_par_value("fintx", el->def);
+      hgap = command_par_value("hgap", el->def);
+
       if (rbend)
 	{
 	  e1 = e1 + angle / two;
@@ -3381,6 +3387,11 @@ int interp_node(int *nint)
       store_node_value("angle",&angle);
       store_node_value("e1",&e1);
       store_node_value("e2",&zero);
+      store_node_value("h1",&h1);
+      store_node_value("h2",&zero);
+      store_node_value("fint",&fint);
+      store_node_value("fintx",&zero);
+      store_node_value("hgap",&hgap);
      }
   length = first_node->length;
   step = length/numint;
@@ -3427,10 +3438,26 @@ int interp_node(int *nint)
       if (bend_flag)
 	{
 	  if (j == 1)
-	    store_node_value("e2",&e2);
+	    {
+	      store_node_value("e2",&e2);
+	      store_node_value("h2",&h2);
+	      store_node_value("hgap",&hgap);
+	      if (fintx_plot < zero) 
+		store_node_value("fintx",&fint);
+	      else
+		store_node_value("fintx",&fintx_plot);
+	      store_node_value("fint",&zero);
+	    }
 	  else
-	    store_node_value("e2",&zero);
+	    {
+	      store_node_value("e2",&zero);
+	      store_node_value("h2",&zero);
+	      store_node_value("fint",&zero);
+	      store_node_value("fintx",&minus_one);
+	      store_node_value("hgap",&zero);
+	    }
 	  store_node_value("e1",&zero);
+	  store_node_value("h1",&zero);
 	}
       clone = clone_node(first_node,0);
      if (bend_flag)
@@ -3449,7 +3476,7 @@ int reset_interpolation(int *nint)
 {
   struct node *c_node, *second_node;
   int j,bend_flag = 0;
-  double angle,length,e1,e2,numint;
+  double angle,length,e1,e2,numint, h1, h2, fint, fintx, hgap;
   char elem_name[NAME_L] = "rbend";
 
   /* Deletes the interpolating nodes expanded by the routine interp_node */
@@ -3479,6 +3506,10 @@ int reset_interpolation(int *nint)
       angle = numint*node_value("angle");
       store_node_value("angle",&angle);
       e1 = node_value("e1");
+      h1 = node_value("h1");
+      fint = node_value("fint");
+      fintx = fintx_plot;
+      hgap = node_value("hgap");
     }
 
   /* advance to nint-th  node (second node in original sequence) */
@@ -3494,7 +3525,10 @@ int reset_interpolation(int *nint)
   /* saves e2 if the element is a bending magnet */
 
   if (bend_flag)
-    e2 = node_value("e2");
+    {
+      e2 = node_value("e2");
+      h2 = node_value("h2");
+    }
 
   /* delete the interpolating nodes */ 
 
@@ -3532,7 +3566,19 @@ int reset_interpolation(int *nint)
 	}
     store_node_value("e1",&e1);
     store_node_value("e2",&e2);
+    store_node_value("h1",&h1);
+    store_node_value("h2",&h2);
+    store_node_value("fint",&fint);
+    store_node_value("fintx",&fintx_plot);
+    store_node_value("hgap",&hgap);
     }
 
   return 0;
+}
+int embedded_plot()
+     /* returns the embedded_flag */
+{
+  int ret;
+  ret = embedded_flag;
+  return ret;
 }

@@ -12,6 +12,8 @@
 #define interp_node           interp_node_
 #define reset_interpolation   reset_interpolation_
 #define embedded_twiss        embedded_twiss_
+/* added by E. T. d'Amico on jan. 21stmay 19th, 2004 */
+#define embedded_plot         embedded_plot_
 /* end additions */
 
 #define element_name          element_name_
@@ -520,6 +522,8 @@ void pro_correct(struct in_cmd*);
 void pro_emit(struct in_cmd*);
 void pro_error(struct in_cmd*);
 void pro_ibs(struct in_cmd*);
+void pro_ivar();
+void ivar();
 void pro_touschek(struct in_cmd*);
 void pro_input(char*);
 void pro_sxf(struct in_cmd*);
@@ -924,6 +928,9 @@ double disp0[6];
 double sxf_suml = 0;
 double track_deltap=0;
 double oneturnmat[36];
+/* E. T. d'Amico 13 may 2004 */
+double fintx_plot;              /* to save the value of fintx for the reset_interpolation routine */
+/* end additions */
 
 const double zero = 0;
 const double one = 1;
@@ -944,6 +951,8 @@ int add_error_opt = 0;      /* ADD error option, set with eoption */
 
 /* E. T. d'Amico 25 feb 2004 */
 int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
+/* E. T. d'Amico 13 may 2004 */
+int embedded_flag = 0;              /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
 /* end additions */
 
 int print_correct_opt = 1;  /* PRINT options for orbit correction */
