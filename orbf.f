@@ -107,6 +107,7 @@ c         write(*,*) i,cin(i)
       return
       end
       subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                    ws,wvec,sortw,
      &                    im,ic,iflag,sing,dbg)
 ! ****************************************************
 !                                                    *
@@ -117,17 +118,237 @@ c         write(*,*) i,cin(i)
 !                                                    *
 ! ****************************************************
       implicit none
-      integer im,ic,nx(ic),i,j,jj,ii 
+      integer im,ic,i,j,jj,ii 
       integer iflag,sing(2,ic)
       double precision a(im,ic)
       double precision svdmat(im,ic)
       double precision umat(im,ic), utmat(ic,im)
       double precision vmat(im,ic), vtmat(ic,im)
       double precision wmat(im,ic), wtmat(ic,im)
-      double precision rv1(ic),wvec(ic)
+      double precision wvec(ic)
+      double precision svdtest(10,3)
+      double precision ddum, rat, zero, sngval, sngcut         
+      double precision ws(ic)
+      integer amater, svdmx, svdnx, svdnm
+      integer sortw(ic)
+      integer nsing
+      logical matu, matv
+      integer dbg
+      parameter(zero = 0d0)
+      parameter(nsing = 5)
+      parameter(sngcut = 50.)
+      parameter(sngval = 2.0000)
+      data svdtest/3,8,8,8,4,9,9,2,8,8,
+     &             4,1,7,2,6,1,6,4,6,2,
+     &             1,9,7,2,2,6,9,8,3,5/
+
+      MATU = .TRUE.
+      MATV = .TRUE.
+      iflag = 0
+
+      SVDNM = max(ic,im)
+      svdmx = im
+      svdnx = ic
+
+      do  i = 1,im
+        do  j = 1,ic
+            svdmat(i,j) = a(i,j)
+        enddo
+      enddo
+      
+      if(dbg.eq.1) then
+          write(*,*) 'A0:'
+      do  j = 1,im
+          write(*,6003) (svdmat(j,i),i=1,ic)
+      enddo
+      endif
+      call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
+     &         matv,vmat,amater,ws)
+ 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+ 6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+ 6003 format(16(2X,F7.2))
+ 6004 format(16(2X,F7.2))
+      if(amater.ne.0) then
+        write(*,*) 'end SVD with error code: ',amater                       
+      endif
+      if(dbg.eq.1) then
+      do  i = 1,ic
+          write(*,*) i,wvec(I)
+          write(*,6001) i,wvec(I)
+          wmat(i,i) = wvec(i)
+      enddo
+      endif
+      call rvord(wvec,sortw,ws,ic)
+      if(dbg.eq.1) then
+      do  i = 1,ic
+          write(*,*) i,sortw(i),wvec(sortw(i))
+      enddo
+      endif
+      do  ii = 1,min(nsing,ic)
+          i = sortw(ii)
+          if(abs(wvec(i)).lt.sngval) then
+             if(dbg.eq.1) then
+             do  j = 1,ic
+                write(*,6002) i,j,vmat(j,i)
+             enddo
+             endif
+             do  j = 1,ic-1
+                do  jj = j+1,ic
+                if(abs(vmat(j,i)).gt.1.0E-4) then
+                   rat = abs(vmat(j,i) - vmat(jj,i))
+                   rat = rat/abs(abs(vmat(j,i)) - abs(vmat(jj,i)))
+                   if(rat.gt.sngcut) then
+                      IF(DBG.EQ.1) THEN
+                      write(*,*) 'dependent pair: ',j,jj,rat
+                      ENDIF
+                      if(iflag.lt.ic) then
+                         iflag = iflag + 1
+                         sing(1,iflag) =  j - 1
+                         sing(2,iflag) = jj - 1
+                      endif
+                   endif
+                endif
+                enddo
+             enddo
+          endif
+      enddo
+
+      return
+      end
+      subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                    ws,wvec,sortw,
+     &                    im,ic,iflag,sing,dbg)
+! ****************************************************
+!                                                    *
+!    Performs SVD and analysis for matrix with more  *
+!    correctors than monitors.                       *
+!                                                    *
+!     Author: WFH  12.09.02                          *
+!                                                    *
+! ****************************************************
+      implicit none
+      integer im,ic,i,j,jj,ii
+      integer iflag,sing(2,ic)
+      double precision a(im,ic)
+      double precision svdmat(ic,im)
+      double precision umat(ic,im), utmat(im,ic)
+      double precision vmat(ic,im), vtmat(im,ic)
+      double precision wmat(ic,im), wtmat(im,ic)
+      double precision wvec(ic)
+      double precision ddum, rat, zero, sngcut, sngval
+      double precision ws(ic)
+      integer sortw(ic)
+      integer amater, svdmx, svdnx, svdnm
+      integer nsing
+      logical matu, matv
+      integer dbg
+      parameter(zero = 0d0)
+      parameter(nsing = 5)
+      parameter(sngcut = 50.)
+      parameter(sngval = 2.0000)
+
+      MATU = .TRUE.
+      MATV = .TRUE.
+      iflag = 0
+
+c     im = 10
+c     ic = 3
+      SVDNM = max(ic,im)
+      svdmx = ic
+      svdnx = im
+
+      do  i = 1,im
+        do  j = 1,ic
+            svdmat(j,i) = a(i,j)
+c           svdmat(i,j) = a(i,j)
+        enddo
+      enddo
+
+ 8373 continue
+      
+      if(dbg.eq.1) then
+          write(*,*) 'A0:'
+      do  j = 1,ic
+          write(*,6003) (svdmat(j,i),i=1,im)
+      enddo
+      endif
+      call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
+     &         matv,vmat,amater,ws)
+ 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+ 6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+ 6003 format(16(2X,F7.2))
+ 6004 format(16(2X,F7.2))
+      if(amater.ne.0) then
+        write(*,*) 'end SVD with error code: ',amater                       
+      endif
+      if(dbg.eq.1) then
+      do  i = 1,im
+          write(*,*) i,wvec(I)
+          write(*,6001) i,wvec(I)
+          wmat(i,i) = wvec(i)
+      enddo
+      endif
+      call rvord(wvec,sortw,ws,im)
+      if(dbg.eq.1) then
+      do  i = 1,im
+          write(*,*) i,sortw(i),wvec(sortw(i))
+      enddo
+      endif
+      do  ii = 1,min(nsing,im)
+          i = sortw(ii)
+          if(abs(wvec(i)).lt.sngval) then
+             if(dbg.eq.1) then
+             do  j = 1,ic
+                write(*,6002) i,j,umat(j,i)
+             enddo
+             endif
+             do  j = 1,ic-1
+                do  jj = j+1,ic
+                if(abs(umat(j,i)).gt.1.0E-4) then
+                   rat = abs(umat(j,i) - umat(jj,i))
+                   rat = rat/abs(abs(umat(j,i)) - abs(umat(jj,i)))
+                   if(rat.gt.sngcut) then
+                      if(dbg.eq.1) then
+                      write(*,*) 'dependent pair: ',j,jj,rat
+                      endif
+                      if(iflag.lt.ic) then
+                         iflag = iflag + 1
+                         sing(1,iflag) =  j - 1
+                         sing(2,iflag) = jj - 1
+                      endif
+                   endif
+                endif
+                enddo
+             enddo
+          endif
+      enddo
+
+      return
+      end
+#ifdef _ORBDBG_
+      subroutine svddec_m_dbg(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+     &                    im,ic,iflag,sing,dbg)
+! ****************************************************
+!                                                    *
+!    Performs SVD and analysis for matrix with more  *
+!    monitors than correctors.                       *
+!                                                    *
+!     Author: WFH  12.09.02                          *
+!                                                    *
+! ****************************************************
+      implicit none
+      integer im,ic,i,j,jj,ii 
+      integer iflag,sing(2,ic)
+      double precision a(im,ic)
+      double precision svdmat(im,ic)
+      double precision umat(im,ic), utmat(ic,im)
+      double precision vmat(im,ic), vtmat(ic,im)
+      double precision wmat(im,ic), wtmat(ic,im)
+      double precision wvec(ic)
       double precision wvmat(im,ic),uwvmat(im,ic)
       double precision svdtest(10,3)
       double precision ddum, rat, zero, sngval, sngcut         
+      double precision ws(ic)
       integer amater, svdmx, svdnx, svdnm
       integer sortw(ic)
       integer nsing
@@ -172,7 +393,7 @@ c         write(*,*) i,cin(i)
       enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
-     &         matv,vmat,amater,rv1)
+     &         matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -187,7 +408,7 @@ c         write(*,*) i,cin(i)
           wmat(i,i) = wvec(i)
       enddo
       endif
-      call rvord(wvec,sortw,ic)
+      call rvord(wvec,sortw,ws,ic)
       if(dbg.eq.1) then
       do  i = 1,ic
           write(*,*) i,sortw(i),wvec(sortw(i))
@@ -212,9 +433,9 @@ c         write(*,*) i,cin(i)
                    rat = abs(vmat(j,i) - vmat(jj,i))
                    rat = rat/abs(abs(vmat(j,i)) - abs(vmat(jj,i)))
                    if(rat.gt.sngcut) then
-                      if(dbg.eq.1) then
+                      IF(DBG.EQ.1) THEN
                       write(*,*) 'dependent pair: ',j,jj,rat
-                      endif
+                      ENDIF
                       if(iflag.lt.ic) then
                          iflag = iflag + 1
                          sing(1,iflag) =  j - 1
@@ -263,7 +484,9 @@ c         write(*,*) i,cin(i)
       endif
       return
       end
-      subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
+#endif
+#ifdef _ORBDBG_
+      subroutine svddec_c_dbg(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
      &                    im,ic,iflag,sing,dbg)
 ! ****************************************************
 !                                                    *
@@ -274,16 +497,17 @@ c         write(*,*) i,cin(i)
 !                                                    *
 ! ****************************************************
       implicit none
-      integer im,ic,nx(ic),i,j,jj,ii
+      integer im,ic,i,j,jj,ii
       integer iflag,sing(2,ic)
       double precision a(im,ic)
       double precision svdmat(ic,im)
       double precision umat(ic,im), utmat(im,ic)
       double precision vmat(ic,im), vtmat(im,ic)
       double precision wmat(ic,im), wtmat(im,ic)
-      double precision rv1(ic),wvec(ic)
+      double precision wvec(ic)
       double precision wvmat(ic,im),uwvmat(ic,im)
       double precision ddum, rat, zero, sngcut, sngval
+      double precision ws(ic)
       integer sortw(ic)
       integer amater, svdmx, svdnx, svdnm
       integer nsing
@@ -322,7 +546,7 @@ c           svdmat(i,j) = a(i,j)
       enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
-     &         matv,vmat,amater,rv1)
+     &         matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -337,7 +561,7 @@ c           svdmat(i,j) = a(i,j)
           wmat(i,i) = wvec(i)
       enddo
       endif
-      call rvord(wvec,sortw,im)
+      call rvord(wvec,sortw,ws,im)
       if(dbg.eq.1) then
       do  i = 1,im
           write(*,*) i,sortw(i),wvec(sortw(i))
@@ -413,8 +637,10 @@ c           svdmat(i,j) = a(i,j)
       endif
       return
       end
+#endif
       subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
-     &                       xin,xc,xout,nx,im,ic,iflag,dbg)
+     &                       xin,xc,xout,xa,xb,xpred,ws,wvec,
+     &                       sortw,nx,im,ic,iflag,dbg)
 ! ******************************************************
 !                                                      *
 !    Performs SVD and correction for matrix with more  *
@@ -424,25 +650,22 @@ c           svdmat(i,j) = a(i,j)
 !                                                      *
 ! ******************************************************
       implicit none
-      integer im,ic,nx(ic),i,j,jj,ii 
+      integer im,ic,nx(ic),i,j 
       integer iflag
       double precision a(im,ic)
       double precision svdmat(im,ic)
       double precision umat(im,ic), utmat(ic,im)
       double precision vmat(im,ic), vtmat(ic,im)
       double precision wmat(im,ic), wtmat(ic,im)
-      double precision rv1(ic),wvec(ic)
-      double precision xin(im),xa(im),xb(im),xc(ic),xpred(im)
-      double precision xout(im)
+      double precision xin(im),xout(im),xc(ic)
+      double precision xa(im),xb(im),xpred(im),ws(ic),wvec(ic)
       integer amater, svdmx, svdnx, svdnm
       integer sortw(ic)
-      logical matu, matv, tst
+      logical matu, matv
       integer dbg
 
       MATU = .TRUE.
       MATV = .TRUE.
-      tst  = .TRUE.
-      tst  = .FALSE.
       iflag = 0
       write(*,*) ' '
       write(*,*) 'start SVD correction using ',ic,' correctors'
@@ -469,7 +692,7 @@ c           svdmat(i,j) = a(i,j)
       enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
-     &         matv,vmat,amater,rv1)
+     &         matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -490,7 +713,7 @@ c           svdmat(i,j) = a(i,j)
           endif
       enddo
       if(dbg.eq.1) then
-      call rvord(wvec,sortw,ic)
+      call rvord(wvec,sortw,ws,ic)
       do  i = 1,ic
           write(*,*) i,sortw(i),wvec(sortw(i))
       enddo
@@ -555,7 +778,8 @@ c           svdmat(i,j) = a(i,j)
       return
       end
       subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,
-     &                       xin,xc,xout,nx,im,ic,iflag,dbg)
+     &                       xin,xc,xout,xa,xb,xpred,ws,wvec,
+     &                       sortw,nx,im,ic,iflag,dbg)
 ! ******************************************************
 !                                                      *
 !    Performs SVD and correction for matrix with more  *
@@ -565,20 +789,20 @@ c           svdmat(i,j) = a(i,j)
 !                                                      *
 ! ******************************************************
       implicit none
-      integer im,ic,nx(ic),i,j,jj,ii
+      integer im,ic,nx(ic),i,j
       integer iflag
       double precision a(im,ic)
       double precision svdmat(ic,im)
       double precision umat(ic,im), utmat(im,ic)
       double precision vmat(ic,im), vtmat(im,ic)
       double precision wmat(ic,im), wtmat(im,ic)
-      double precision rv1(ic),wvec(ic)
-      double precision xin(im),xa(im),xb(im),xc(ic),xpred(im)
-      double precision xout(im)
+      double precision xin(im),xout(im),xc(ic)
+      double precision xa(im),xpred(im),ws(ic),wvec(ic)
       integer sortw(ic)
       integer amater, svdmx, svdnx, svdnm
       logical matu, matv
       integer dbg
+      double precision xb(2000)
 
       MATU = .TRUE.
       MATV = .TRUE.
@@ -609,7 +833,7 @@ c           svdmat(i,j) = a(i,j)
       enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,
-     &         matv,vmat,amater,rv1)
+     &         matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -630,7 +854,7 @@ c           svdmat(i,j) = a(i,j)
           endif
       enddo
       if(dbg.eq.1) then
-      call rvord(wvec,sortw,im)
+      call rvord(wvec,sortw,ws,im)
       do  i = 1,im
           write(*,*) i,sortw(i),wvec(sortw(i))
       enddo
@@ -676,10 +900,13 @@ c           svdmat(i,j) = a(i,j)
       endif
       call dmmpy(im,im,vtmat(1,1),vtmat(1,2),vtmat(2,1),
      &           xin(1),xin(2),xa(1),xa(2))
-      call dmmpy(ic,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),
+c     write(*,*) 'xa: ',xa
+      call dmmpy(im,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),
      &           xa(1),xa(2),xb(1),xb(2))
-      call dmmpy(ic,ic,umat(1,1),umat(1,2),umat(2,1),
+c     write(*,*) 'xb: ',xb
+      call dmmpy(ic,im,umat(1,1),umat(1,2),umat(2,1),
      &           xb(1),xb(2),xc(1),xc(2))
+c     write(*,*) 'xc: ',xc
       call dmmpy(im,ic,a(1,1),a(1,2),a(2,1),
      &           xc(1),xc(2),xpred(1),xpred(2))
       if(dbg.eq.1) then
@@ -2208,7 +2435,7 @@ c
    20 pythag = p
       return
       end
-      subroutine rvord(inv,outv,n)
+      subroutine rvord(inv,outv,ws,n)
       double precision   inv(n), ws(n)
       double precision   maxv, minv
       integer  outv(n), n
