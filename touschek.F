@@ -1,4 +1,4 @@
-      subroutine touchek
+      subroutine touschek
       implicit none
 
 #ifdef _WIN32
