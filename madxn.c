@@ -8466,7 +8466,7 @@ void track_dynap(struct in_cmd* cmd)
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
   double *buf1, *buf2, *buf3, *buf4, *buf5, *buf6, *buf7, *buf8, *buf9,
-         *buf10, *buf11;
+         *buf10, *buf11, *buf12, *buf13;
   struct table* t;
   if (track_is_on == 0)
     {
@@ -8511,8 +8511,10 @@ void track_dynap(struct in_cmd* cmd)
   buf9 = (double*) mymalloc(rout_name, 2*turns*sizeof(double));
   buf10 = (double*) mymalloc(rout_name, turns*sizeof(double));
   buf11 = (double*) mymalloc(rout_name, turns*sizeof(double));
+  buf12 = (double*) mymalloc(rout_name, npart*sizeof(double));
+  buf13 = (double*) mymalloc(rout_name, npart*sizeof(double));
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2, buf3,
-         buf4, buf5, &e_flag, ibuf3, buf6);
+         buf4, buf5, &e_flag, ibuf3, buf6, buf12, buf13);
   t = 
   table_register->tables[name_list_pos("tracksumm", table_register->names)];
   print_table(t);
@@ -8531,6 +8533,7 @@ void track_dynap(struct in_cmd* cmd)
   free(ibuf1); free(ibuf2); free(ibuf3); 
   free(buf1); free(buf2); free(buf3); free(buf4); free(buf5); free(buf6);
   free(buf7); free(buf8); free(buf9); free(buf10); free(buf11);
+  free(buf12); free(buf13);
 }
 
 void track_end(struct in_cmd* cmd)
@@ -8635,7 +8638,7 @@ void track_run(struct in_cmd* cmd)
   int j, e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
-  double d_dummy, *buf1, *buf2, *buf3, *buf4, *buf5, *buf6;
+  double d_dummy, *buf1, *buf2, *buf3, *buf4, *buf5, *buf6, *buf7, *buf8;
   struct table* t;
   int turns = command_par_value("turns", cmd->clone);
   if (track_is_on == 0)
@@ -8671,15 +8674,18 @@ void track_run(struct in_cmd* cmd)
   buf4 = (double*) mymalloc(rout_name,36*sizeof(double));
   buf5 = &d_dummy;
   buf6 = (double*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
+  buf7 = (double*) mymalloc(rout_name,npart*sizeof(double));
+  buf8 = (double*) mymalloc(rout_name,npart*sizeof(double));
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2, buf3,
-         buf4, buf5, &e_flag, ibuf3, buf6);
+         buf4, buf5, &e_flag, ibuf3, buf6, buf7, buf8);
   t = 
   table_register->tables[name_list_pos("tracksumm", table_register->names)];
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
   /* free buffers */
   free(ibuf1); free(ibuf2); free(ibuf3); 
-  free(buf1); free(buf2); free(buf3); free(buf4); free(buf6);
+  free(buf1); free(buf2); free(buf3); free(buf4); free(buf6); free(buf7);
+  free(buf8);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 

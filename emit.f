@@ -432,7 +432,7 @@
       double precision  corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
       double precision  tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
       double precision  h2, hcb2, hcbbs2, tedg2, fact2, fact2x, rfac2
-      double precision  rfac2x, rfac2y, bi2gi2, bbi, betas, gammas
+      double precision  rfac2x, rfac2y, bi2gi2, betas, gammas
       double precision  get_value, e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
       double precision  f1, f2, f1s, f2s, twon, str, st, pi, clight
       double precision  r1sq, r2sq, fh1, fh2, dr, di, drt, hcb
