@@ -31,7 +31,7 @@
 /orbf.fpp -text
 /physcons.fi -text
 /plot.f -text
-/survey.f -text
+/survey.F -text
 /sxf.c -text
 /track.fi -text
 /trrun.f -text
