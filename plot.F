@@ -361,14 +361,18 @@
       include 'plot_math.fi'
 
       integer ierr
-      integer i,j,k,l,new1,new2,currtyp,nint,crow,pltyp,pos_flag
+      integer i,j,k,l,new1,new2,currtyp,crow,pltyp,pos_flag
       integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
+      integer nint, ndble, char_l(szcompar)
+      integer plot_style,plot_symbol
       double precision fact, d_val, d_val1
       double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
      &currk2l, currk2sl, currk3l, currk3sl
+      double precision d_arr(szcompar)
       real tval, step
       logical machp, rselect
       character*120 msg
+      character * (szchara) char_a
 
 !--- definitions of function primitives
 
@@ -437,6 +441,19 @@
       enddo
 
 !--- Routine body
+
+!--- Check that STYLE & SYMBOL are both non zero
+
+      call comm_para('style ', nint, ndble, k, plot_style, d_arr,          &
+     &               char_a, char_l)
+      call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,         &
+     &               char_a, char_l)
+      if (plot_style + plot_symbol .eq. 0) then
+        print *,'Warning: style & symbol attributes will make plot invis&
+     &ible. Thus style is set to 1.'
+        plot_style = 1
+      endif
+      ipparm(1,1) = plot_style
 
 !--- No interpolation if centre option is set
 
@@ -2408,8 +2425,6 @@
       enddo
 
       char_a = ' '
-      call comm_para('style ', nint, ndble, k, ipparm(1,1), d_arr,      &
-     &char_a, char_l)
       call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr,       &
      &char_a, char_l)
 
