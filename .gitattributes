@@ -71,6 +71,7 @@
 /orbf.F -text
 /physcons.fi -text
 /plot.F -text
+/plot.fi -text
 /plot_b.fi -text
 /plot_c.fi -text
 /plot_math.fi -text
