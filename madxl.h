@@ -202,7 +202,7 @@ int mon_table_types[] =
 
 char* mon_table_cols[] =
 {
-  "name", "x(old)", "y(old)", "x(new)", "y(new)",
+  "name", "x.old", "y.old", "x.new", "y.new",
 " "  /* blank terminates */
 };
 
@@ -213,7 +213,7 @@ int corr_table_types[] =
 
 char* corr_table_cols[] =
 {
-  "name", "px(old)", "py(old)", "px(correction)", "py(correction)",
+  "name", "px.old", "py.old", "px.correction", "py.correction",
 " "  /* blank terminates */
 };
 
