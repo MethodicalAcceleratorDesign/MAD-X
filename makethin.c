@@ -30,7 +30,6 @@
    a check on inform[] where needed. */
 /* 19/11/2001 - MH - Initial version 1.0 of the slicer */
 /* M. Hayes                                            */
- 
 /* prototyping *******************************************************/
 
 struct element* create_thin_obj(struct element*,int slice_no);
@@ -433,6 +432,9 @@ struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
   }
   thin_elem->length = 0;
   thin_elem->bv = el_par_value("bv",thin_elem);
+  if (thin_elem_parent && thin_elem_parent->bv) {
+    thin_elem->bv = thin_elem_parent->bv;
+  }
   return thin_elem;
 }
 
