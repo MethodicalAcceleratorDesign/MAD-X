@@ -1393,6 +1393,10 @@ void exec_command()
         {
           w_ptc_normal_();
         }
+      else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)
+        {
+          select_ptc_normal(p);
+        }
       else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
         {
           w_ptc_track_();
@@ -2556,6 +2560,7 @@ void madx_init()
   zero_double(guess_orbit,6);
   zero_double(oneturnmat, 36);
   set_option("twiss_print", &ione);
+  select_ptc_table_idx = 0;
 }
 
 void madx_start()
@@ -4167,14 +4172,17 @@ double table_value()
 int tab_name_code(char* name, char* t_name)
      /* returns 1 if name corresponds to t_name, else 0 */
 {
-  char tmp[NAME_L];
+  char tmp[2*NAME_L];
   char *p, *n = one_string;
   strcpy(tmp, name);
   if ((p = strstr(tmp, "->")) != NULL)
     {
      *p = '\0'; p = strstr(name, "->"); p++; n = ++p;
     }
-  strcat(tmp, ":"); strcat(tmp, n);
+  if (strchr(t_name, ':'))
+  {
+   strcat(tmp, ":"); strcat(tmp, n);
+  }
   return (strcmp(tmp, t_name) == 0 ? 1 : 0);
 }
 

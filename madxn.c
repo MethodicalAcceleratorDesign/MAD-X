@@ -245,6 +245,7 @@ struct double_array* command_par_array(char* parameter, struct command* cmd)
 int command_par_vector(char* parameter, struct command* cmd, double* vector)
      /* returns the length of, and an updated command parameter vector
         if found, else 0 */
+
 {
   struct command_parameter* cp;
   int i;
@@ -479,6 +480,22 @@ void double_to_table(char* table, char* name, double* val)
       && t->columns->inform[pos] < 3) t->d_cols[pos][t->curr] = *val;
 }
 
+void double_to_table_row(char* table, char* name, int* row, double* val)
+     /* puts val at current position in column with name "name".
+        The table count is increased separately with "augment_count" */
+{
+  int pos;
+  struct table* t;
+
+  mycpy(c_dummy, table);
+  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else return;
+  mycpy(c_dummy, name);
+  if ((pos = name_list_pos(c_dummy, t->columns)) >= 0
+      && t->columns->inform[pos] < 3) t->d_cols[pos][*row-1] = *val;
+}
+
 int double_from_table(char* table, char* name, int* row, double* val)
      /* returns val at position row in column with name "name".
         function value return:
@@ -500,6 +517,71 @@ int double_from_table(char* table, char* name, int* row, double* val)
   if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
   *val = t->d_cols[pos][*row-1];
+  return 0;
+}
+
+int string_from_table(char* table, char* name, int* row, char* string)
+     /* returns val at position row in column with name "name".
+        function value return:
+        0  OK
+        -1 table  does not exist
+        -2 column does not exist
+        -3 row    does not exist
+  struct command_parameter* cp;
+  struct double_array* arr = NULL;
+     */
+{
+  int pos,l;
+  struct table* t;
+
+  mycpy(c_dummy, table);
+  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else return -1;
+  mycpy(c_dummy, name);
+  if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
+  if (*row > t->curr)  return -3;
+  l = strlen(t->s_cols[pos][*row-1]);
+  mycpy(string, t->s_cols[pos][*row-1]);
+  return 0;
+}
+
+int result_from_normal(char* name_var, int* order, double* val)
+     /* returns value of table normal_results corresponding to the given variable name
+	and to the given orders
+        function value return:
+        0  OK
+        -1 table  does not exist
+        -2 column does not exist
+        -3 row    does not exist
+     */
+{
+  int row,j,k,found;
+  char string[AUX_LG],n_var[AUX_LG];
+  double d_val;
+
+  *val = zero;
+  found = 0;
+  mycpy(n_var, name_var);
+  for (row = 1; row <= select_ptc_table_idx; row++)
+    {
+      k = string_from_table("normal_results","name", &row, string);
+      if (k != 0) return k;
+      if (strcmp(string,n_var) == 0) 
+	{
+	  found = 1;
+	  k = double_from_table("normal_results","order1", &row, &d_val);
+	  if ((int)d_val != order[0]) found = 0;
+	  k = double_from_table("normal_results","order2", &row, &d_val);
+	  if ((int)d_val != order[1]) found = 0;
+	  k = double_from_table("normal_results","order3", &row, &d_val);
+	  if ((int)d_val != order[2]) found = 0;
+	}
+      if (found == 1) break;
+    }
+  if (found == 1)
+  k = double_from_table("normal_results","value", &row, &d_val);		     
+  *val = d_val;
   return 0;
 }
 
@@ -672,12 +754,13 @@ void exec_plot(struct in_cmd* cmd)
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
   int size_plot_title = tsm1, size_version = tsm1;
   int *title_length = &size_plot_title, *version_length = &size_version;
+  int res_sys;
   char* pt = title, *haxis_name, *vaxis_name, *file_name;
   char* particle_list;
   struct name_list* nl_plot;
   struct command_parameter_list* pl_plot;
-  char *table_name, *last_twiss_table;
-  char track_file_name[NAME_L], ps_file_name[NAME_L];
+  char *table_name, *last_twiss_table, *trackfile;
+  char track_file_name[NAME_L], ps_file_name[NAME_L], touch_cmd[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;
 
@@ -760,6 +843,10 @@ void exec_plot(struct in_cmd* cmd)
 
   if (track_flag) 
     {
+
+      /* get track file name */
+
+      trackfile = command_par_string("trackfile", this_cmd->clone);
 
       /* get particle */
 
@@ -849,21 +936,28 @@ void exec_plot(struct in_cmd* cmd)
       fprintf(gpu,"set title %s\n",plot_title);
       fprintf(gpu,"set xlabel '%s'\n",haxis_name);
       fprintf(gpu,"set ylabel '%s'\n",vaxis_name);
-      fprintf(gpu,"plot ");
       for (j = 0; j < curr; j++)
 	{
-	  sprintf(track_file_name,"track.obs%04d.p%04d", 1, part_idx[j]);
-	  fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
-	  if (nolegend)
-	    fprintf(gpu,"notitle with points %d ",part_idx[j]); 
+	  printf("j = %d \n",j);
+	  sprintf(track_file_name, "%s.obs%04d.p%04d", trackfile, 1, part_idx[j]);
+	  if (fopen(track_file_name,"r") == NULL)
+	    printf("file %s does not exist \n",track_file_name);
 	  else
-	    fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
-	  if (j < curr - 1)
 	    {
-	      if (multiple == 0)
-		fprintf(gpu,"\nplot ");
+	      if (j == 0) fprintf(gpu,"plot ");
 	      else
-		fprintf(gpu,", \\\n     ");	
+		{
+		  if (multiple == 0)
+		    fprintf(gpu,"\nplot ");
+		  else
+		    fprintf(gpu,", \\\n     ");	
+		}
+	      fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
+	      if (nolegend)
+		fprintf(gpu,"notitle with points %d ",part_idx[j]); 
+	      else
+		fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
+
 	    }
 	}
       fclose(gpu);
@@ -1030,6 +1124,76 @@ void exec_sodd(struct in_cmd* cmd)
   /* end of part 2 of HG 031127 */
 }
 
+void select_ptc_normal(struct in_cmd* cmd)
+     /* sets up all columns of the table normal_results except the last one (value) */
+{
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  int pos; 
+  int i, j, err, curr, arr_size, max_rows = 101, current_idx = 0;
+  char* order_list;
+  char names[PTC_NAMES_L][5]= 
+    {"dx","dpx","dy","dpy","qx","qy","qpx","qpy","anhx","anhy"};
+  int min_req_order;
+  double order[3];
+
+  nl = this_cmd->clone->par_names;
+  pl = this_cmd->clone->par;
+  if (select_ptc_table_idx == 0)
+    {
+      /* initialise table */
+      normal_results = make_table("normal_results", "normal_res", normal_res_cols,
+                   normal_res_types, max_rows);
+      normal_results->dynamic = 1;
+      add_to_table_list(normal_results, table_register);
+      reset_count("normal_results");
+      min_order = 1;
+    }
+
+  /* initialise order array */
+  order[0] = 0;
+  order[1] = 0;
+  order[2] = 0;
+  if (select_ptc_table_idx < max_rows)
+    {
+      for (j = 0; j < PTC_NAMES_L; j++)
+	{
+	  /* Treat each ptc variable */
+	  
+	  pos = name_list_pos(names[j], nl);
+	  if (pos > -1 && nl->inform[pos])
+	    {
+	      curr = pl->parameters[pos]->m_string->curr;
+	      for (i = 0; i < curr; i++)
+		{
+		  order_list = pl->parameters[pos]->m_string->p[i];
+		  order[i] = (double)atoi(order_list);
+		}
+	      if (curr > 3) 
+		printf("Too many values for the attribute %s. Only the first three are retained.\n",names[j]);
+	      string_to_table("normal_results", "name", names[j]);
+	      double_to_table("normal_results", "order1", &order[0]);
+	      double_to_table("normal_results", "order2", &order[1]);
+	      double_to_table("normal_results", "order3", &order[2]);
+	      augment_count("normal_results");
+	      select_ptc_table_idx += 1;
+	      min_req_order = order[0]+order[1]+order[2];
+	      if (j >= 9) min_req_order += order[0]+order[1];
+	      if (j >= 7) min_req_order += 1;
+	      if (min_order < min_req_order) min_order = min_req_order;
+	    } 
+	}
+    }
+  printf("The minimum required order is %d \n",min_order);
+}
+int select_ptc_idx()
+{
+   return select_ptc_table_idx;
+}
+int minimum_acceptable_order()
+{
+  return min_order;
+}
 void expand_line(struct char_p_array* l_buff)
      /* expands a beam line, applies rep. count and inversion */
 {
@@ -3592,7 +3756,8 @@ struct table* read_table(struct in_cmd* cmd)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-           if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = tmpbuff(cc);
+           if (strcmp(tmp,"%s") == 0)
+              t->s_cols[i][t->curr] = tmpbuff(stolower(cc));
            else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
            {
             sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
