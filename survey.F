@@ -38,16 +38,17 @@
 
 !---- Initialise the angles
       theta = theta0
-      phi =  phi0
-      psi =  psi0
+      phi = phi0
+      psi = psi0
 
 !---- Set up initial V and W.
       suml = zero
       sums = zero
       call sumtrx(theta0, phi0, psi0, w0)
-      theta = theta0
-      phi = phi0
-      psi = psi0
+!      theta = theta0
+!      phi =  phi0
+!      psi =  psi0
+
 
 !---- (replaces SUCOPY)
       do j = 1, 3
