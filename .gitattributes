@@ -82,6 +82,7 @@
 /plot_c.fi -text
 /plot_math.fi -text
 /ptc_dummy.F -text
+/sodd.F -text
 /survey.F -text
 /sxf.c -text
 /timel.c -text
