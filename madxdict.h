@@ -201,7 +201,9 @@ char command_def[] =
 "noline   = [l, false, true], "
 "notitle  = [l, false, true], "
 "noversion  = [l, false, true], "
+"ptc  = [l, false, true], "
 "table    = [s, twiss], "
+"ptc_table    = [s, ptc_twiss], "
 "title    = [s, none], "
 "param    = [s, none], "
 "range    = [s, #s/#e, none], "
@@ -1558,8 +1560,8 @@ char command_def[] =
 "track: track track 1 0 "
 "deltap   = [r, 0], "
 "onepass  = [l, false, true], "
-/* "damp     = [l, false, true], " */
-/* "quantum  = [l, false, true], " */
+"damp     = [l, false, true], "
+"quantum  = [l, false, true], "
 "dump     = [l, false, true], "
 /* "fast     = [l, false, true], " */
 "aperture = [l, false, true], "
@@ -1572,8 +1574,8 @@ char command_def[] =
 "fastune  = [l, false,true], "
 "lyapunov = [r, 1.e-7], "
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
-/* "damp     = [l, true], " */
-/* "quantum  = [l, true], " */
+"damp     = [l, true], "
+"quantum  = [l, true], "
 "orbit    = [l, true]; "
 " "
 "endtrack: track track 2 0 ; "
