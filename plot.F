@@ -337,9 +337,6 @@
  
       subroutine pefill(ierr)
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 
 !----------------------------------------------------------------------*
@@ -1361,9 +1358,6 @@
 
       subroutine peintp(crow, nint, proc, length, ierr)
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 
 !----------------------------------------------------------------------*
@@ -1688,9 +1682,6 @@
 
       subroutine peplot
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 
 !----------------------------------------------------------------------*
@@ -2187,9 +2178,6 @@
 
       subroutine pesopt(ierr)
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:
@@ -2560,9 +2548,6 @@
 
       subroutine plginit
 
-#ifdef _WIN32
-      include 'win32calls.fi'
-#endif
 
 !----------------------------------------------------------------------*
 ! Purpose:

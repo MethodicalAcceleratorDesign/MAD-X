@@ -2182,8 +2182,8 @@ void exec_plot(struct in_cmd* cmd)
      does not try to do X11 graphics. However this has the consequence that
        the program will not make Postscript files.  HG needs to separate these things.
   </JMJ 7/11/2002> */
+  /*FS 27.03.2004 works now on Windows using gxx11ps.F and gxx11psc.c courtesy HG */
 
-#ifndef _WIN32
   if (nt && current_sequ != NULL) title = current_sequ->name;
   pesopt_(&ierr);
   if (ierr == 0)
@@ -2198,7 +2198,7 @@ void exec_plot(struct in_cmd* cmd)
      plots_made = 1;
     }
   if (nt) title = pt;
-#endif
+
   /* part 2 of HG 031127 */
   current_beam = keep_beam;
   /* end of part 2 of HG 031127 */
