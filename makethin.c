@@ -740,6 +740,7 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
         strcmp(thick_node->base_name,"quadrupole") == 0  ||
         strcmp(thick_node->base_name,"sextupole") == 0   ||
         strcmp(thick_node->base_name,"octupole") == 0    ||
+        strcmp(thick_node->base_name,"solenoid") == 0    || /*hbu */
         strcmp(thick_node->base_name,"multipole") == 0
         || /* special spliting required. */
         strcmp(thick_node->base_name,"rcollimator") == 0 ||
