@@ -645,7 +645,6 @@
           if (field(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
-
 !---- Pure dipole: only quadrupole kicks according to lrad.
       if (nord .eq. 0) then
         do jtrk = 1,ktrack
@@ -682,8 +681,8 @@
         enddo
         if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
           do jtrk = 1,ktrack
-            dxt(jtrk) = dxt(jtrk) + dipr*dipr/elrad
-            dyt(jtrk) = dyt(jtrk) + dipi*dipi/elrad
+            dxt(jtrk) = dxt(jtrk) + dipr*dipr*track(1,jtrk)/elrad
+            dyt(jtrk) = dyt(jtrk) + dipi*dipi*track(3,jtrk)/elrad
           enddo
         endif
       endif
