@@ -1949,6 +1949,7 @@ void exec_plot(struct in_cmd* cmd)
   struct command_parameter_list* pl_plot = NULL;
   char *table_name, *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
+  char old_ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;
 
@@ -2109,21 +2110,26 @@ void exec_plot(struct in_cmd* cmd)
 	}
 
       /* build-up the gnuplot command file */
-
-      if (trkplot_flag == 0) 
-	{
 	  mycpy(track_plot_filename,file_name);
 	  sprintf(ps_file_name,track_plot_filename);
 	  strcat(ps_file_name,".ps");
+
+      if (trkplot_flag == 0) 
+	{
 	  gpu = fopen("gnu_plot.cmd","w");
-	  fprintf(gpu,"set output '%s'\n",ps_file_name);
 	  fprintf(gpu,"set terminal postscript color\n");
 	  fprintf(gpu,"set pointsize 0.48\n");
+	  fprintf(gpu,"set output '%s'\n",ps_file_name);
+          strcpy(old_ps_file_name,ps_file_name);
 	}
       else
 	{
 	  gpu = fopen("gnu_plot.cmd","a");
 	  fprintf(gpu,"\n");
+          if (strcmp(old_ps_file_name,ps_file_name)!=0) {
+            fprintf(gpu,"set output '%s'\n",ps_file_name);
+            strcpy(old_ps_file_name,ps_file_name);
+          }
 	}
 
       fprintf(gpu,"set title %s\n",plot_title);
@@ -2146,6 +2152,7 @@ void exec_plot(struct in_cmd* cmd)
 		    fprintf(gpu,", \\\n     ");	
 		}
 	      fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
+              printf("%s",track_file_name);
 	      if (nolegend)
 		fprintf(gpu,"notitle with points %d ",part_idx[j]); 
 	      else
