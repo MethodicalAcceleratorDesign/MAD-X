@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#ifndef _WINDOWS_
 #include <sys/utsname.h>
+#endif
 #include <sys/timeb.h>
 #include <ctype.h>
 #include <math.h>
@@ -44,7 +46,8 @@ int act_special(int type, char* statement)
     }
   if (type == 5) /* macro */ return make_macro(statement);
   else if (type == 6) /* line */ return make_line(statement);
-  loc_buff = (char*) malloc(ls);  loc_w = (char*) malloc(ls);
+  loc_buff = (char*) mymalloc("act_special", ls);  
+  loc_w = (char*) mymalloc("act_special", ls);
   get_bracket_range(statement, '{', '}', &rs, &re);
   if (re < 0) fatal_error("missing '{' or '}' in statement:",statement); 
   cnt_1 = rs; start_2 = rs + 1;
@@ -3293,9 +3296,9 @@ void fill_expr_var_list(struct el_list* ell,
   struct int_array* deco = expr->polish;
   for (i = 0; i < deco->curr; i++)   /* decoding loop */
     {
-      if ((k = deco->i[i]) > 4 && (kc = k / 100000) == 1)
+      if ((k = deco->i[i]) > 4 && (kc = k / 100000000) == 1)
        {
-	k -= 100000 * kc;  strcpy(name, expr_chunks->names[k]);
+	k -= 100000000 * kc;  strcpy(name, expr_chunks->names[k]);
 	if ((p = strstr(name, "->")) != NULL)
 	  {
 	   *p = '\0';
@@ -3489,7 +3492,12 @@ void madx_finish()
 void madx_init()
 {
   int j, ione = 1;
+#ifdef _WINDOWS_
+  interactive = 1;
+#endif
+#ifndef _WINDOWS_
   interactive = intrac();
+#endif
   init55(123456789);          /* random generator */
   if (watch_flag == 1)  debug_file = fopen("madx.debug", "w"); 
   else if (watch_flag == 2)  debug_file = stdout; 
@@ -5165,14 +5173,14 @@ int polish_expr(int c_item, char** item)   /* split input */
         expression in Polish notation of length deco->curr,
         coded as 0-, 1+, 2*, 3/, 4^ (power),
         6 evaluate function
-        100000 + n = variable n (refers to vars), 
-        200000 + n = function n (refers to functs),
-        400000 + n = real n (refers to doubles)
+        100000000 + n = variable n (refers to vars), 
+        200000000 + n = function n (refers to functs),
+        400000000 + n = real n (refers to doubles)
   -- Example: suppose a, b are variables 0 and 4, exp is function 3:
      then     3 * a * q[l] * q[k1] / exp((b - 1.57)^2) + 1.57
      would result in
-     400000 100000 2 100001 2 100002 2 
-     100003 400001 0 400002 3 200003 3 400001 1
+     400000000 100000000 2 100000001 2 100000002 2 
+     100000003 400000001 0 400000002 3 200000003 3 400000001 1
      where 3 = real 0, 1.57 = real 1, 2 = real 2
            a = vars 0, q[l] vars 1, q[k1] vars 2, exp functs 3
      */    
@@ -5193,13 +5201,13 @@ int polish_expr(int c_item, char** item)   /* split input */
       {
       case 1:                              /* variable */
           if (l_deco == deco->max) grow_int_array(deco);
-          deco->i[l_deco++] = 100000 + d_var->i[i];
+          deco->i[l_deco++] = 100000000 + d_var->i[i];
           break;
       case 3:                              /* constant */
           if (l_deco == deco->max) grow_int_array(deco);
           if (l_double == doubles->max) grow_double_array(doubles);
           doubles->a[l_double] = cat_doubles->a[i];
-          deco->i[l_deco++] = 400000 + l_double++;
+          deco->i[l_deco++] = 400000000 + l_double++;
           doubles->curr = l_double;
           break;
       case 4:
@@ -5220,7 +5228,7 @@ int polish_expr(int c_item, char** item)   /* split input */
 	 else
 	   {
             if (l_deco == deco->max) grow_int_array(deco);
-            deco->i[l_deco++] = 200000 + func->i[i];  /* function */
+            deco->i[l_deco++] = 200000000 + func->i[i];  /* function */
 	   }
           break;
       case 6:      /*  '(' */
@@ -5259,6 +5267,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
 {
   int i, k, kc, c_stack = -1;
   double stack[MAX_ITEM];
+  char tmp[20];
 
   if (++polish_cnt > MAX_LOOP)
      fatal_error("circular call in expression","evaluation");
@@ -5300,7 +5309,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
        }
      else
        {
-        kc = k / 100000;  k -= 100000 * kc;
+        kc = k / 100000000;  k -= 100000000 * kc;
         switch(kc)
 	 {
 	 case 1:            /* variable */
@@ -5372,7 +5381,10 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
               }
 	     break;
           default:
-             fatal_error("polish_value","illegal type in Polish decoding");
+	    /* if you get here, then most likely someone has created
+               more than 100000000 double precision numbers */
+	     sprintf(tmp, "%d", k-1);
+             fatal_error("illegal type in Polish decoding: ", tmp);
              exit(1);
 	 }
        }
@@ -9349,14 +9361,21 @@ void write_table(struct table* t, char* filename)
      /* writes rows with columns listed in row and col */
 {
   char l_name[NAME_L];
+  char sys_name[200];
   char* pc;
   struct int_array* col = t->col_out; 
   struct int_array* row = t->row_out;
   int i, j, k, tmp;
   time_t now;
-  struct utsname u;
   struct tm* tm;
+#ifndef _WINDOWS_
+  struct utsname u;
   i = uname(&u); /* get system name */
+  strcpy(sys_name, u.sysname);
+#endif
+#ifdef _WINDOWS_
+  strcpy(sys_name, "Windows");
+#endif
   time(&now);    /* get system time */
   tm = localtime(&now); /* split system time */
   if (strcmp(filename, "terminal") == 0) out_file = stdout;
@@ -9380,7 +9399,7 @@ void write_table(struct table* t, char* filename)
 
      fprintf(out_file, 
       "@ ORIGIN           %%%02ds \"%s %s\"\n", 
-       strlen(myversion)+strlen(u.sysname)+1, myversion, u.sysname);
+       strlen(myversion)+strlen(sys_name)+1, myversion, sys_name);
 
      fprintf(out_file, 
       "@ DATE             %%08s \"%02d/%02d/%02d\"\n", 
