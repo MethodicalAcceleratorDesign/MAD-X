@@ -87,20 +87,20 @@ int aperture_npar[] =
 
 int ap_table_types[] =
 {
-3, 2, 3,
-2, 2, 2,
+3, 2, 2, 2, 3,
 2, 2, 2, 2,
 2, 2, 2,
 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2
 };
 
 char* ap_table_cols[] =
 {
-"name", "n1", "apertype",
+"name", "n1", "n1x_m", "n1y_m", "apertype",
+"aper_1", "aper_2", "aper_3", "aper_4",
 "rtol", "xtol", "ytol",
-"ap1", "ap2", "ap3", "ap4",
-"on_ap", "on_elem", "spec",
 "s", "betx", "bety", "dx", "dy", "x", "y",
+"on_ap", "on_elem", "spec",
 " "  /* blank terminates */
 };
 
