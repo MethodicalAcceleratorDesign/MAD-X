@@ -8525,8 +8525,8 @@ void track_dynap(struct in_cmd* cmd)
   buf9 = (double*) mymalloc(rout_name, 2*turns*sizeof(double));
   buf10 = (double*) mymalloc(rout_name, turns*sizeof(double));
   buf11 = (double*) mymalloc(rout_name, turns*sizeof(double));
-  trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf_dxt, buf_dyt, 
-	 buf1, buf2, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
+  trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
+	buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
   t = 
   table_register->tables[name_list_pos("tracksumm", table_register->names)];
   print_table(t);
@@ -8542,9 +8542,8 @@ void track_dynap(struct in_cmd* cmd)
   if (get_option("dynap_dump")) dynap_tables_dump();
   */
   /* free buffers */
-  free(ibuf1); free(ibuf2); free(buf_dxt); free(buf_dyt); free(buf3); 
-  free(ibuf3); 
-  free(buf1); free(buf2); free(buf3); free(buf4); free(buf5); free(buf6);
+  free(ibuf1); free(ibuf2); free(buf3); free(ibuf3); free(buf1); free(buf2);
+  free(buf_dxt); free(buf_dyt); free(buf3); free(buf4); free(buf5); free(buf6);
   free(buf7); free(buf8); free(buf9); free(buf10); free(buf11);
 }
 
@@ -8570,6 +8569,7 @@ void track_end(struct in_cmd* cmd)
      c_node = c_node->next;
     }
   track_is_on = 0;
+  fprintf(prt_file, "exit TRACK module\n\n");
 }
 
 void track_observe(struct in_cmd* cmd)
@@ -8689,15 +8689,16 @@ void track_run(struct in_cmd* cmd)
   buf4 = (double*) mymalloc(rout_name,36*sizeof(double));
   buf5 = &d_dummy;
   buf6 = (double*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
-  trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf_dxt, buf_dyt,
-	 buf1, buf2, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
+  trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
+	 buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
   t = 
   table_register->tables[name_list_pos("tracksumm", table_register->names)];
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
   /* free buffers */
-  free(ibuf1); free(ibuf2); free(buf_dxt); free(buf_dyt); free(ibuf3); 
-  free(buf1); free(buf2); free(buf3); free(buf4); free(buf6);
+  free(ibuf1); free(ibuf2); free(ibuf3); 
+  free(buf1); free(buf2); free(buf_dxt); free(buf_dyt); free(buf3); 
+  free(buf4); free(buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 
