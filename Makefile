@@ -40,14 +40,17 @@ f95_FLAGS= --o1 --tp -c
 # LF95 f95 compiler options to compile f77 code
 FFLAGS77= --o1 --tp -c
 
+# g77 link options
+FP=-Wl,-Bstatic
+
 # NAG f95 link options
 #f95_FOPT=
 # LF95 f95 link options
-f95_FOPT="--staticlink"
+f95_FOPT=-static
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
-LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/"
+LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl
 
 # NAG f95 lib extension
 #LIBX_ext= -lgcc
@@ -59,6 +62,7 @@ ifeq ($(OSTYPE),darwin)
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
   GCCP_FLAGS=-g -O3 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
+  FP=
 endif
 
 default: madx

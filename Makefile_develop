@@ -18,16 +18,21 @@ f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
 FFLAGS77=-gline -g90 -c -fpp -maxcontin=24 -nan -ieee=full
 #FFLAGS77=-g90 -c -fpp -O4 -maxcontin=24 -w=unused -ieee=full
 CC=gcc
-LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/"
+LIBX="-L/usr/X11R6/lib" -lX11 -ldl
 GLIB=/afs/cern.ch/group/si/slap/lib
 GPUB=/afs/cern.ch/group/si/slap/bin
-
+#g77 link option
+FP=-Wl,-Bstatic
+#NAG f95 link option
+FOPT=-Bstatic -unsharedf95
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
   GCCP_FLAGS=-g -O3 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
+  FP=
+  FOPT=-unsharedf95
 endif
 
 default: madx
