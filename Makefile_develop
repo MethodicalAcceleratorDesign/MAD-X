@@ -19,7 +19,10 @@ f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
 FFLAGS77=-gline -g90 -c -fpp -maxcontin=24 -nan -ieee=full
 #FFLAGS77=-g90 -c -fpp -O4 -maxcontin=24 -w=unused -ieee=full
 CC=gcc
-LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/"
+FOPT=-Bstatic
+FP=-static
+
+LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 GLIB=/afs/cern.ch/group/si/slap/lib
 GPUB=/afs/cern.ch/group/si/slap/bin
 
@@ -221,7 +224,7 @@ madx: \
 	madxpf.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o utilp.o matchp.o matchsap.o touschekp.o \
 	plotp.o soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o timel.o
 	$(FC) $(FP) -o madx madxm.F madxpf.o twissp.o ptc_dummy.o surveyp.o matchp.o matchsap.o touschekp.o \
-	plotp.o soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o timel.o $(LIBX) -lm -lc
+	plotp.o soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o timel.o $(LIBX) -lgcc -lm -lc
 
 madxdev: \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
