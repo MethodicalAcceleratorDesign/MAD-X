@@ -65,7 +65,7 @@ const char* cmd_match_base[] =
 
 char* aperture_types[] =
 {
-"circle", "ellipse", "rectangle", "lhcscreen", "marguerite",
+"circle", "ellipse", "rectangle", "lhcscreen", "marguerite", "rectellipse",
 " "  /* blank terminates */
 };
 
