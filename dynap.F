@@ -217,7 +217,7 @@
           templyap = zero
           do j = 1, 6
             templyap = templyap +                                       &
-     &      ((coords(j,i,k) - coords(j,i,k+1)) / deltax)**2
+     &((coords(j,i,k) - coords(j,i,k+1)) / deltax)**2
           end do
           distvect(i) = sqrt(templyap)
 !            write(*,*) distvect(i)
@@ -470,9 +470,9 @@
 !        dq(ilogd+mf) = log(distvect(mf))
 !        dq(in+mf)    = mf
 !        dq(ilogn+mf) = log(dq(in+mf))
-        onelog(mf) = dlog(distvect(mf))
+        onelog(mf) = log(distvect(mf))
         turnnumber(mf)    = real(mf)
-!        turnlog(mf) = dlog(dble(turnnumber(mf)))
+!        turnlog(mf) = log(dble(turnnumber(mf)))
       enddo
 
 !---- Loglog fit over 3 subsequent periods of NPOINT = NTURN/4 TURNS
@@ -534,11 +534,11 @@
       do kq = 1, 5, 2
         kp = kq + 1
         znt(kq) = eigen(2,kp) * track(1) - eigen(1,kp) * track(2)       &
-     &  + eigen(4,kp) * track(3) - eigen(3,kp) * track(4)               &
-     &  + eigen(6,kp) * track(5) - eigen(5,kp) * track(6)
+     &+ eigen(4,kp) * track(3) - eigen(3,kp) * track(4)                 &
+     &+ eigen(6,kp) * track(5) - eigen(5,kp) * track(6)
         znt(kp) = eigen(1,kq) * track(2) - eigen(2,kq) * track(1)       &
-     &  + eigen(3,kq) * track(4) - eigen(4,kq) * track(3)               &
-     &  + eigen(5,kq) * track(6) - eigen(6,kq) * track(5)
+     &+ eigen(3,kq) * track(4) - eigen(4,kq) * track(3)                 &
+     &+ eigen(5,kq) * track(6) - eigen(6,kq) * track(5)
       enddo
 
 !---- Convert to amplitudes (and phases: not computed).

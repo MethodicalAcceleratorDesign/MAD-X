@@ -23,8 +23,8 @@
       do k = 1, 6
         do j = 1, 6
           rd(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)               &
-     &    + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                       &
-     &    + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
+     &+ rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
+     &+ rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
         enddo
       enddo
       end
@@ -164,7 +164,7 @@
 !--- avoid identical points
 
           if ((xreal(npt) - xval(j))**2 +                               &
-     &    (yreal(npt) - yval(j))**2 .gt. xmd) then
+     &(yreal(npt) - yval(j))**2 .gt. xmd) then
             npt        = npt + 1
             xreal(npt) = xval(j)
             yreal(npt) = yval(j)
@@ -174,8 +174,8 @@
 !--- plot - get first curve annotation position
 
             if (ilb .eq. 0)                                             &
-     &      call pegacn(ncc, window, act, xreal, yreal, npt, usex,      &
-     &      xwpos, xpos, ypos, ilb)
+     &call pegacn(ncc, window, act, xreal, yreal, npt, usex,            &
+     &xwpos, xpos, ypos, ilb)
             if (interf .eq. 0 .or. npt .eq. 2 .or. ispli .ne. 0) then
 
 !--- no spline
@@ -186,8 +186,8 @@
 !--- get y pos. on curve for label
 
                 ywpos = yreal(ilb - 1) + (yreal(ilb) - yreal(ilb-1))    &
-     &          * (xwpos  - xreal(ilb - 1))                             &
-     &          / (xreal(ilb) - xreal(ilb - 1))
+     &* (xwpos  - xreal(ilb - 1))                                       &
+     &/ (xreal(ilb) - xreal(ilb - 1))
                 ilb = -2
               endif
             else
@@ -276,8 +276,8 @@
             xaux = wsclx * (xval(j) - window(1))
             yaux = wscly * (yval(j) - window(3))
             if (xaux .gt. act(1) .and. xaux .lt. act(2)                 &
-     &      .and. yaux .gt. act(3) .and. yaux .lt. act(4))              &
-     &      call gxtx (xaux, yaux, symloc)
+     &.and. yaux .gt. act(3) .and. yaux .lt. act(4))                    &
+     &call gxtx (xaux, yaux, symloc)
           enddo
         endif
       endif
@@ -363,15 +363,13 @@
       integer ierr
       integer i,j,k,l,new1,new2,currtyp,crow,pltyp,pos_flag
       integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
-      integer nint, ndble, char_l(szcompar)
+      integer nint
       double precision fact, d_val, d_val1
       double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
      &currk2l, currk2sl, currk3l, currk3sl
-      double precision d_arr(szcompar)
       real tval, step
       logical machp, rselect
       character*120 msg
-      character * (szchara) char_a
 
 !--- definitions of function primitives
 
@@ -457,7 +455,7 @@
           print *, 'Warning: table ', tabname, ' not found'
         elseif (k .eq. -2)  then
           print *, 'Warning: hor. variable ', horname,                  &
-     &    ' not in table ', tabname
+     &' not in table ', tabname
         else
           print *, 'Warning: table ', tabname, ' is empty'
         endif
@@ -470,8 +468,8 @@
         k = double_from_table(tabname, sname(l), 1, d_val)
         if (k .lt. 0)  then
           print *, 'Warning: vertical variable: ',                      &
-     &    sname(l)(:lastnb(sname(l))), ' not in table ',                &
-     &    tabname
+     &sname(l)(:lastnb(sname(l))), ' not in table ',                    &
+     &tabname
           ierr = 1
           goto 999
         endif
@@ -512,7 +510,7 @@
       do j = nrrang(1), nrrang(2)
         crow = j
         if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0)        &
-     &  goto 10
+     &goto 10
         k = double_from_table(tabname, horname, j, currpos)
 
         if (itbv .eq. 1)  then
@@ -523,7 +521,7 @@
 
           currleng = node_value('l ')
           if (currleng .gt. 0.d0 .and. currtyp .gt. 1                   &
-     &    .and. currtyp .lt. 8) then
+     &.and. currtyp .lt. 8) then
             currtilt = node_value('tilt ')
             k = double_from_table(tabname, 'k1l ' , j, currk1l)
             currk1l = currk1l/currleng
@@ -542,22 +540,22 @@
 !--- sbend, rbend
 
           if (mod(pltyp,20) .eq. 1 .and. currtilt .ne. zero)            &
-     &    pltyp = pltyp + 6
+     &pltyp = pltyp + 6
 
 !--- quad
 
           if (pltyp .eq. 2 .and. min(currk1l, currk1sl) .lt. zero)      &
-     &    pltyp = 3
+     &pltyp = 3
 
 !--- sext
 
           if (pltyp .eq. 10 .and. min(currk2l, currk2sl) .lt. zero)     &
-     &    pltyp = 11
+     &pltyp = 11
 
 !--- oct
 
           if (pltyp .eq. 12 .and. min(currk3l, currk3sl) .lt. zero)     &
-     &    pltyp = 13
+     &pltyp = 13
 
 !--- Compute the start & end position
 
@@ -571,8 +569,8 @@
 !--- Interpolation if required
 
           if (machp .and. j .gt. nrrang(1) .and. currleng .gt. zero     &
-     &    .and. interf .gt. 0 .and. step .gt. zero .and. .not. ptc_flag)&
-     &    then
+     &.and. interf .gt. 0 .and. step .gt. zero .and. .not. ptc_flag)    &
+     &then
 
             nint = currleng / step
             if (nint .lt. 2) nint = 2
@@ -601,7 +599,7 @@
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
             endif
           elseif (itbv .eq. 0 .or. currpos - qhval(nqval(l),l)          &
-     &    .gt. 0.1d0 * step) then
+     &.gt. 0.1d0 * step) then
             nqval(l) = nqval(l) + 1
             qhval(nqval(l),l) = currpos
             k = double_from_table(tabname, sname(l), j, d_val)
@@ -712,9 +710,9 @@
 !--- annot. pos. in NDC
 
         xpos = act(1) +                                                 &
-     &  0.125 * usex * (iposx - .5) * (act(2) - act(1))
+     &0.125 * usex * (iposx - .5) * (act(2) - act(1))
         ypos = act(4) -                                                 &
-     &  usex * (0.05 * (act(4) - act(3)) + 0.03 * (iposy - 1))
+     &usex * (0.05 * (act(4) - act(3)) + 0.03 * (iposy - 1))
 
 !---- annot. position in world coord.
 
@@ -745,14 +743,14 @@
           if (xwpos .gt. xreal(i-1) .and. xwpos .le. xreal(i)) ilb = i
           do j = 1, 2
             d = (xdiag(2,j) - xdiag(1,j)) * (yreal(i-1) - yreal(i)) -   &
-     &      (ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
+     &(ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
             if (abs(d) .lt. eps) goto 30
             t = (xreal(i-1) - xdiag(1,j)) * (yreal(i-1) - yreal(i)) -   &
-     &      (yreal(i-1) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
+     &(yreal(i-1) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
             t = t / d
             if (t .lt. 0. .or. t .gt. 1.) goto 30
             t = (xdiag(2,j) - xdiag(1,j)) * (yreal(i-1) - ydiag(1,j)) - &
-     &      (ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xdiag(1,j))
+     &(ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xdiag(1,j))
             t = t / d
             if (t .ge. 0. .and. t .le. 1.) goto 20
    30       continue
@@ -1499,35 +1497,35 @@
       k = embedded_twiss()
       do i = 1, nint
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'x ', i, tw1(11))
+     &'x ', i, tw1(11))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'px ', i, tw1(12))
+     &'px ', i, tw1(12))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'betx ', i, tw1(1))
+     &'betx ', i, tw1(1))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'alfx ', i, tw1(2))
+     &'alfx ', i, tw1(2))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'mux ', i, tw1(3))
+     &'mux ', i, tw1(3))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'dx ', i, tw1(4))
+     &'dx ', i, tw1(4))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'dpx ', i, tw1(5))
+     &'dpx ', i, tw1(5))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'y ', i, tw1(13))
+     &'y ', i, tw1(13))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'py ', i, tw1(14))
+     &'py ', i, tw1(14))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'bety ', i, tw1(6))
+     &'bety ', i, tw1(6))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'alfy ', i, tw1(7))
+     &'alfy ', i, tw1(7))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'muy ', i, tw1(8))
+     &'muy ', i, tw1(8))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'dy ', i, tw1(9))
+     &'dy ', i, tw1(9))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  'dpy ', i, tw1(10))
+     &'dpy ', i, tw1(10))
         k = double_from_table('embedded_twiss_table ',                  &
-     &  's ', i, s_incr)
+     &'s ', i, s_incr)
         s = s_elem + s_incr
         ex = get_value('beam ','ex ')
         ey = get_value('beam ','ey ')
@@ -2017,8 +2015,8 @@
 !--- call curve plot routine with simple arrays and flags
 
         call pecurv (ivvar, slocn, chh, qascl,                          &
-     &  symch * qsscl, ipparm(1,ivvar), nqval(ivvar), qhval(1,ivvar),   &
-     &  qvval(1,ivvar), window(1,nvax), actwin(1,nvax), ierr)
+     &symch * qsscl, ipparm(1,ivvar), nqval(ivvar), qhval(1,ivvar),     &
+     &qvval(1,ivvar), window(1,nvax), actwin(1,nvax), ierr)
         if (ierr .ne. 0) goto 150
       enddo
       if (fpmach)  then
@@ -2319,14 +2317,14 @@
 
       if(ptc_flag) then
         call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr,    &
-     &                 char_a, char_l)
+     &char_a, char_l)
         if (k .gt. 0) tabname = char_a
       else
 
 !--- else normal twiss treatment : any table - for hor = s plot machine
 
         call comm_para('table ', nint, ndble, k, int_arr, d_arr,        &
-     &                  char_a, char_l)
+     &char_a, char_l)
         if (k .gt. 0) tabname = char_a
       endif
 
@@ -2350,7 +2348,7 @@
       if (notitle .eq. 0)  then
         char_a = ' '
         call comm_para('title ', nint, ndble, k, int_arr, d_arr,        &
-     &  char_a, char_l)
+     &char_a, char_l)
         if (k .eq. 0) then
           call get_title(char_a, k)
         else
@@ -2414,9 +2412,9 @@
 !--- Check that STYLE & SYMBOL are both non zero
 
       call comm_para('style ', nint, ndble, k, plot_style, d_arr,       &
-     &               char_a, char_l)
+     &char_a, char_l)
       call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,     &
-     &               char_a, char_l)
+     &char_a, char_l)
       if (plot_style(1) + plot_symbol(1) .eq. 0) then
         print *,'Warning: style & symbol attributes will make plot invis&
      &ible. Thus style is set to 1.'
@@ -2440,15 +2438,15 @@
 
       if (.not. ptc_flag) then
         call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr,       &
-     &                   char_a,char_l)
+     &char_a,char_l)
         if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action t&
-     & aken, use interpolate attribute instead.'
+     &aken, use interpolate attribute instead.'
 
         ipparm(2,1) = 0
         inter_setplot = plot_option('interpolate ')
         if (inter_setplot .eq. 0) then
           call comm_para('interpolate ', nint, ndble, k, ipparm(2,1),   &
-     &                     d_arr,char_a, char_l)
+     &d_arr,char_a, char_l)
         else
           ipparm(2,1) = inter_setplot
         endif
@@ -2460,7 +2458,7 @@
 
       char_a = ' '
       call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr,          &
-     &                   char_a, char_l)
+     &char_a, char_l)
       if (k .gt. 0)  then
         nivaxs = 1
         nivvar = min(k, mxcurv)
@@ -2471,7 +2469,7 @@
       else
         char_a = ' '
         call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2487,7 +2485,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2502,7 +2500,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2517,7 +2515,7 @@
         endif
         char_a = ' '
         call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr,       &
-     &                     char_a, char_l)
+     &char_a, char_l)
         if (k .gt. 0)  then
           if (nivvar+k .gt. mxcurv) then
             print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2547,7 +2545,7 @@
 
       do j = 1, nivvar
         call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j),       &
-     &  sdum(1))
+     &sdum(1))
         if (slabl(j) .eq. 'rbetx')  then
           sname(j) = 'betx'
           proc_flag(1,j) = 1

@@ -495,7 +495,6 @@
       end
       subroutine gxask1
       implicit none
-      integer ierr
 !***********************************************************************
 !
 !   Purpose: asks user interactively plot window
@@ -552,8 +551,6 @@
      &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
      &sdefnl*1
       save /gxcomc/
-      character sline*80
-      logical affirm
 
 !--- Input and Output unit definition
       if(lnunit.ne.lundef)  call gxsvar('INUNIT',miunit,0.,' ')
@@ -654,10 +651,10 @@
                 smetnm = 'gxx11'
                 call gxpnbl(smetnm, ifirst, ilast)
                 write(iounit,10100) smetnm(ifirst:ilast),               &
-     &          smetnm(ifirst:ilast)
+     &smetnm(ifirst:ilast)
                 call gxrdtx(inunit,sline,ierr)
                 if(sline(1:1).ne.' ')                                   &
-     &          call gxsvar('SMETNM',0,0.,sline)
+     &call gxsvar('SMETNM',0,0.,sline)
                 lmetnm = lundef
               endif
             endif
@@ -1050,7 +1047,7 @@
           endif
 !--- set text alignment
           call jstxal(ihoral(ilbort,ilabl,iaxort),                      &
-     &    iveral(ilbort,ilabl,iaxort))
+     &iveral(ilbort,ilabl,iaxort))
           if(linscl)  then
 !--- linear scale
             intrep=spwlin/diffn+.99999
@@ -1104,7 +1101,7 @@
                   a1b=alp+wbused
                 else
                   if(islbl.ne.0.and.alp.ge.a1+wsused .and.alp.le.       &
-     &            a2-wsused) then
+     &a2-wsused) then
 !--- minor label (at 2, 3, ..., 9)
                     call gxstx(alabl(1),alabl(3),slog(i))
                     a1=a1+wsused
@@ -1113,7 +1110,7 @@
                     impfl=1
 !--- plot power of ten between first and second minor label
                     alabl(k1)=alabl(k1)                                 &
-     &              +.5*(min(axup,alp+alogv(i+1))-alp)*fwc
+     &+.5*(min(axup,alp+alogv(i+1))-alp)*fwc
                     call gxppow(alabl,ia)
                     a1=a1+spwlog
                   endif
@@ -1164,10 +1161,10 @@
         endif
         if(itext.eq.2)  then
           atext(k2)=max(tick(k2),tick(k2+1),alabl(k2),alabl(k2+1))      &
-     &    +space
+     &+space
         else
           atext(k2)=min(tick(k2),tick(k2+1),alabl(k2),alabl(k2+1))      &
-     &    - 2.5 * space
+     &- 2.5 * space
         endif
 !--- get number of separation characters
         call gxchct(text(ifirst:ilast),stsep,nchct)
@@ -1714,7 +1711,7 @@
           else
 !   smooth with a third order spline
             call gxplt1(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)),   &
-     &      ac)
+     &ac)
           endif
         endif
         if(mark.ne.0) then
@@ -1977,7 +1974,7 @@
         step = y / intv
         do  i1 = 0, 4
           if (step .ge. 0.99                                            &
-     &    .and. step - int(step + 0.5) .lt. 0.01)  goto 2
+     &.and. step - int(step + 0.5) .lt. 0.01)  goto 2
           step = 10. * step
         enddo
     2   step = y / intv + abs(axl) - int(abs(axl))
@@ -1988,7 +1985,7 @@
     4   i = max(i1, i2)
         ii = abs(log10(x)) + 1.001
         if (axl .lt. 0.)                                                &
-     &  ii = max( max(log10(x), log10(-axl) + 1.) + 1.001, 2.001)
+     &ii = max( max(log10(x), log10(-axl) + 1.) + 1.001, 2.001)
         if (i + ii .ge. 9)  then
           i = 1
           goto 30
@@ -2583,9 +2580,9 @@
             if(stemp.eq.'.') then
 !--- could be floating, or logical
               if(index(string(i:),'.T.').eq.1.or.                       &
-     &        index(string(i:),'.F.').eq.1.or.                          &
-     &        index(string(i:),'.TRUE.').eq.1.or.                       &
-     &        index(string(i:),'.FALSE.').eq.1) then
+     &index(string(i:),'.F.').eq.1.or.                                  &
+     &index(string(i:),'.TRUE.').eq.1.or.                               &
+     &index(string(i:),'.FALSE.').eq.1) then
 
                 sfchar='L'
               elseif(index('0123456789',string(i+1:i+1)).ne.0) then
@@ -2756,10 +2753,10 @@
 !--- get window according to margin
         wn(1)=(actwnd(2)*axwndx(1,kset)-actwnd(1)*axwndx(2,kset))*fx
         wn(2)=((1.-actwnd(1))*axwndx(2,kset)- (1.-actwnd(2))*axwndx     &
-     &  (1,kset))*fx
+     &(1,kset))*fx
         wn(3)=(actwnd(4)*axwndy(1,kset)-actwnd(3)*axwndy(2,kset))*fy
         wn(4)=((1.-actwnd(3))*axwndy(2,kset)- (1.-actwnd(4))*axwndy     &
-     &  (1,kset))*fy
+     &(1,kset))*fy
         call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
         call jselnt(inormt)
 !--- keep
@@ -2783,7 +2780,7 @@
               enddo
               ilpar(2)=ixapar(19,i)
               call gxaxis('X',axwndx(1,kset), axwndx(2,kset),axpos,     &
-     &        1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
+     &1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
               if(ierr.ne.0) goto 999
             endif
           endif
@@ -2807,7 +2804,7 @@
               enddo
               ilpar(2)=iyapar(19,i)
               call gxaxis('Y',axwndy(1,kset),axwndy(2,kset), axpos,     &
-     &        1,syform(i), sytext(i),sdefnl,ilpar,ierr)
+     &1,syform(i), sytext(i),sdefnl,ilpar,ierr)
 
               if(ierr.ne.0) goto 999
             endif
@@ -2957,10 +2954,10 @@
 !--- get window according to margin
         wn(1)=(actwnd(2)*axwndx(1,kset)-actwnd(1)*axwndx(2,kset))*fx
         wn(2)=((1.-actwnd(1))*axwndx(2,kset)- (1.-actwnd(2))*axwndx     &
-     &  (1,kset))*fx
+     &(1,kset))*fx
         wn(3)=(actwnd(4)*axwndy(1,kset)-actwnd(3)*axwndy(2,kset))*fy
         wn(4)=((1.-actwnd(3))*axwndy(2,kset)- (1.-actwnd(4))*axwndy     &
-     &  (1,kset))*fy
+     &(1,kset))*fy
         call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
         call jselnt(inormt)
 !--- keep
@@ -2989,7 +2986,7 @@
               enddo
               ilpar(2)=ixapar(19,i)
               call gxaxis('X',axwndx(1,kset), axwndx(2,kset),axpos,     &
-     &        1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
+     &1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
               if(ierr.ne.0) goto 999
             endif
           endif
@@ -3013,7 +3010,7 @@
               enddo
               ilpar(2)=iyapar(19,i)
               call gxaxis('Y',axwndy(1,kset),axwndy(2,kset), axpos,     &
-     &        1,syform(i), sytext(i),sdefnl,ilpar,ierr)
+     &1,syform(i), sytext(i),sdefnl,ilpar,ierr)
 
               if(ierr.ne.0) goto 999
             endif
@@ -3379,10 +3376,10 @@
                 if(ival.eq.0) then
                   if(iax.eq.1)  then
                     call gxscal(wnx(1,kset),wnx(2,kset),alo,ahi,        &
-     &              nint)
+     &nint)
                   else
                     call gxscal(wny(1,kset),wny(2,kset),alo,ahi,        &
-     &              nint)
+     &nint)
                   endif
                   intv = iapar(2)
                   if (intv .le. 0)  call gxdint(alo,ahi,intv)
@@ -3418,7 +3415,7 @@
 !--- text - always parallel to axis
             call gxpnbl(text,ifirst,ilast)
             if(iapar(6).ne.0.and.mod(iapar(6),2).eq.ind                 &
-     &      .and.ifirst.ne.0)  then
+     &.and.ifirst.ne.0)  then
 !--- add space for one line and extra space for each line separator
               call gxchct(text(ifirst:ilast),sdefnl,nchct)
               if(iax.eq.1) then
@@ -4378,8 +4375,8 @@
                 tolo = toleps * (axwndx(2,kset) - axwndx(1,kset))
                 do  j = 0, npt - 1
                   if (cval(ipc+j) .ge. axwndx(1, kset) - tolo           &
-     &            .and. cval(ipc+j) .le. axwndx(2, kset) + tolo)        &
-     &            then
+     &.and. cval(ipc+j) .le. axwndx(2, kset) + tolo)                    &
+     &then
                     iadd = j
                     goto 32
                   endif
@@ -4396,7 +4393,7 @@
                   rmini=min(rmini,val(ip+j))
                   rmaxi=max(rmaxi,val(ip+j))
                 elseif (cval(ipc+j) .ge. axwndx(1, kset)                &
-     &          .and. cval(ipc+j) .le. axwndx(2, kset))  then
+     &.and. cval(ipc+j) .le. axwndx(2, kset))  then
                   rmini=min(rmini,val(ip+j))
                   rmaxi=max(rmaxi,val(ip+j))
                 endif
@@ -5352,7 +5349,7 @@
       common / gx11c / spsnam, colour(mcolor), pshead(mhead)
       character spsnam * 256, colour * 16, pshead * 60
       save / gx11c /
-      character chst * 16
+!      character chst * 16
       icucol = max(1, mod(icol - 1, mcolor) + 1)
       end
       subroutine gxscrv(nset,npar,ipar,symb)
@@ -6317,7 +6314,7 @@
         yshift = - chsize * yfact(ivert)
         do ich = 1, lch
           call gxfchr(1, ch(ich:ich), ifont, wid, np, ipen, xp, yp,     &
-     &    ierr)
+     &ierr)
           k = 0
           do i = 1, np
             if (ipen(i) .eq. 0)  then
@@ -7247,18 +7244,18 @@
           eppro(2)(10:) = spsnam
           write(eppro(3)(25:28), '(f4.2)')  versio
           write(eppro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
-     &    iyear, imonth, iday
+     &iyear, imonth, iday
           write(eppro(4)(26:33), '(i2.2,'':'',i2.2)')                   &
-     &    ihour, minute
+     &ihour, minute
           eppro(5)(16:24) = orient(iorips)
           write(eppro(6)(15:30), '(4i4)')  ibbox
         else
           pspro(2)(10:) = spsnam
           write(pspro(3)(25:28), '(f4.2)')  versio
           write(pspro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
-     &    iyear, imonth, iday
+     &iyear, imonth, iday
           write(pspro(4)(26:33), '(i2.2,'':'',i2.2)')                   &
-     &    ihour, minute
+     &ihour, minute
           pspro(5)(16:24) = orient(iorips)
           write(pspro(6)(15:30), '(4i4)')  ibbox
         endif
@@ -7454,7 +7451,7 @@
           i1 = msfact * ibbox(3) - i1
         endif
         iforl =                                                         &
-     &  max(log10(float(abs(i1)+1))+3., log10(float(abs(i2)+1))+3.)
+     &max(log10(float(abs(i1)+1))+3., log10(float(abs(i2)+1))+3.)
         write(formt2(4:4), '(i1)') iforl
         kadd = 2 * (iforl + 1)
         write(sline(k+1:k+kadd), formt2)  i1, i2
@@ -7781,7 +7778,7 @@
       k = k + 2
       if (ihl .gt. 1)  then
         sline(k+1:) =                                                   &
-     &  tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
+     &tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
         k = k + lt1 + lt2 + lt3
       endif
       sline(k+1:) = ' 0 0 m'
@@ -7795,7 +7792,7 @@
       lt2 = 2
       if (ihl .gt. 1)  then
         sline(k+1:) =                                                   &
-     &  tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
+     &tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
         k = k + lt1 + lt2 + lt3
       endif
       ia = -iangle
@@ -7891,7 +7888,6 @@
       real    r1, r2, r3, r4, rvals(14)
       save    ivals, rvals
       character *(*) string
-      character * 100 strloc
       data ivals / 0, 0, 0, 0, 1, 2, 0, 0, 0, 0,                        &
      &0, 1, 1, 0 /
 !   ivals(1)       marker type
@@ -8182,7 +8178,7 @@
       common / gx11c / spsnam, colour(mcolor), pshead(mhead)
       character spsnam * 256, colour * 16, pshead * 60
       save / gx11c /
-      if (iw .gt. 0 .and. iw. le. mx11tf)  then
+      if (iw .gt. 0 .and. iw .le. mx11tf)  then
         ix11tf(iw) = 1
       endif
       end
@@ -8257,7 +8253,7 @@
       common / gx11c / spsnam, colour(mcolor), pshead(mhead)
       character spsnam * 256, colour * 16, pshead * 60
       save / gx11c /
-      if (iw .gt. 0 .and. iw. le. mx11tf)  then
+      if (iw .gt. 0 .and. iw .le. mx11tf)  then
         ix11tf(iw) = 0
       endif
       end
@@ -8305,8 +8301,9 @@
       end
       subroutine wopwk(iw, icont, it)
       implicit none
-      integer icont,it,iw,ix,iy
-      real r
+      integer icont,it,iw
+!      integer ix,iy
+!      real r
 !***********************************************************************
 !
 !   Purpose: Open workstation

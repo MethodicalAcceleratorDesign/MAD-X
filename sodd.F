@@ -252,7 +252,6 @@
 
       integer detun,disto1,disto2,prend,prblup
       integer nint, ndble, k, int_arr(szcompar), char_l(szcompar)
-      integer j
       double precision d_arr(szcompar)
       character * (szchara) char_a
 
@@ -356,14 +355,14 @@
 
         prend = 0
         call comm_para('print_at_end ', nint, ndble, k, int_arr, d_arr, &
-     &  char_a, char_l)
+     &char_a, char_l)
         if (nint .gt. 0) prend = int_arr(1)
 
 !--- get prblup
 
         prblup = 0
         call comm_para('print_all ', nint, ndble, k, int_arr, d_arr,    &
-     &  char_a, char_l)
+     &char_a, char_l)
         if (nint .gt. 0) prblup = int_arr(1)
 
         iu_on = prend + prblup*2
@@ -375,31 +374,31 @@
         write(6,*) ' Print_out at end of structure '
         if(detun.eq.1) then
           open(70,file='detune_1_end',form='formatted',status='unknown',&
-     &    iostat=ier)
+     &iostat=ier)
           if(ier.ne.0) call prror(0,16,70)
           write(70,10070)
           open(72,file='detune_2_end',form='formatted',status='unknown',&
-     &    iostat=ier)
+     &iostat=ier)
           if(ier.ne.0) call prror(0,16,72)
           write(72,10072)
         endif
         if(disto1.eq.1) then
           open(74,file='distort_1_F_end',form='formatted',              &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,74)
           write(74,10074)
           open(75,file='distort_1_H_end',form='formatted',              &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,75)
           write(75,10074)
         endif
         if(disto2.eq.1) then
           open(78,file='distort_2_F_end',form='formatted',              &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,78)
           write(78,10078)
           open(79,file='distort_2_H_end',form='formatted',              &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,79)
           write(79,10078)
         endif
@@ -408,21 +407,21 @@
         write(6,*) ' Print_out at each multipole '
         if(detun.eq.1) then
           open(71,file='detune_1_all',form='formatted',                 &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,71)
           write(71,10070)
           open(73,file='detune_2_all',form='formatted',                 &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,73)
           write(73,10072)
         endif
         if(disto1.eq.1) then
           open(76,file='distort_1_F_all',form='formatted',              &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,76)
           write(76,10076)
           open(77,file='distort_1_H_all',form='formatted',              &
-     &    status='unknown',iostat=ier)
+     &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,77)
           write(77,10076)
         endif
@@ -497,8 +496,8 @@
       integer i,ia,iaa,iah,iamin,ib,ic,id,ih1,ii,imu,imuty,j,jj,jstep,k,&
      &k1,k2,k3,l,l0,l1,l2,l3,m,mh,mmul,mmul2,mmult,mmultf,mmultw,       &
      &mmultx,nblz
-      double precision betdx,betdxi,dble,dcos,fac,facd0,facd1,phix,phiy,&
-     &pieni,sigde,sinar,tij
+      double precision betdx,betdxi,fac,facd0,facd1,phix,phiy,pieni,    &
+     &sigde,sinar,tij
       integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
      &iu_on,n1,n2
       double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
@@ -552,7 +551,7 @@
         iah=ia/2
         if(ityc(ia).gt.0) then
           write(6,10000) 'Structure has: ',ityc(ia),' single ',         &
-     &    comment(ia)
+     &comment(ia)
           ih1=ia/2-1
           do i=1,ityc(ia)
             fac=-two/dble(ia)*bstr(ia,i)
@@ -561,12 +560,12 @@
               jj=j-1
               sigde=-sigde
               det1(1,j)=sigde*fac*cosav(jj)*cosav(iah-jj)*dble(iah-jj)* &
-     &        fact(ia,1+jj*2)*beta(1,ia,i)**(iah-jj)*beta(2,ia,i)**jj
+     &fact(ia,1+jj*2)*beta(1,ia,i)**(iah-jj)*beta(2,ia,i)**jj
               det(1,ia,iah-j,jj)=det(1,ia,iah-j,jj)+det1(1,j)
               if(j.eq.iah) then
                 sigde=-sigde
                 det1(2,iah)=sigde*fac*dble(iah)*cosav(iah)*             &
-     &          beta(2,ia,i)**iah
+     &beta(2,ia,i)**iah
                 det(2,ia,0,iah-1)=det(2,ia,0,iah-1)+det1(2,iah)
               endif
             enddo
@@ -625,16 +624,16 @@
               do ii=1,ityc(ic)
                 do k=1,icc
                   betdxi(k)=(beta(1,ic,ii)**betexp(k,1))*               &
-     &            (beta(2,ic,ii)**betexp(k,2))
+     &(beta(2,ic,ii)**betexp(k,2))
                 enddo
                 do jj=1,ityc(id)
                   if(ii.eq.1.and.jj.eq.1) then
                     if(ia.ne.ib) then
                       write(6,10050) 'Pairs of: ',ityc(ic),comment(ic), &
-     &                ' and: ',ityc(id),comment(id)
+     &' and: ',ityc(id),comment(id)
                     else
                       write(6,10060) 'Quadratic Effect of: ',           &
-     &                ityc(ic),comment(ic)
+     &ityc(ic),comment(ic)
                     endif
                   endif
 !--Phase Differences
@@ -646,12 +645,12 @@
                   do i=ia+iaa,0,-2
                     do j=i-ia,ia-i,2
                       if(i.ne.0.or.j.gt.0) then
-                        sinar=dsin(dble(i)*qx+dble(j)*qy)
+                        sinar=sin(dble(i)*qx+dble(j)*qy)
                         if(abs(sinar).gt.pieni) then
-                          tij(i,j)=dcos(dble(i)*phix+dble(j)*phiy)/sinar
+                          tij(i,j)=cos(dble(i)*phix+dble(j)*phiy)/sinar
                         else
                           write(6,*) '  Warning: Results for detuning ',&
-     &                    'probably wrong; sinar= ',sinar
+     &'probably wrong; sinar= ',sinar
                           tij(i,j)=zero
                         endif
                       endif
@@ -665,8 +664,8 @@
                     k3=ihv(k)
                     if(k3.eq.1.or.(k3.eq.2.and.k1.eq.0)) then
                       betdx(k)=betdxi(k)*                               &
-     &                (beta(1,id,jj)**betexp(k,3))*                     &
-     &                (beta(2,id,jj)**betexp(k,4))
+     &(beta(1,id,jj)**betexp(k,3))*                                     &
+     &(beta(2,id,jj)**betexp(k,4))
                       facd1=zero
                       l0=icd(k)
                       do l=1,l0
@@ -674,10 +673,10 @@
                         l2=itij(k,l,2)
                         l3=itij(k,l,3)
                         facd1=facd1+fac4(k,l)*(tij(l2,l3)+              &
-     &                  dble(l1)*tij(l2,-l3))
+     &dble(l1)*tij(l2,-l3))
                       enddo
                       det(k3,ic,k1,k2)=det(k3,ic,k1,k2)+facd0*          &
-     &                fac2(k)*facd1*betdx(k)
+     &fac2(k)*facd1*betdx(k)
                     endif
                   enddo
                   do i=ia+iaa,0,-2
@@ -735,8 +734,7 @@
       integer data_size
       double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
      &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-     &qy,sbeta,sign,two,zero,amp,val
-      integer double_from_table,k
+     &qy,sbeta,sign,two,zero,amp
       real tlim,time0,time1,time2,time3,time4
       real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
       character*16 strn,table_name
@@ -863,7 +861,7 @@
                   factb(1,ia,ib)=factb1
                   factb(2,ia,ib)=factb2
                   fact0(ia,ib)=signii*fpre*fact(iia,id1)*               &
-     &            fact(ic,id11)
+     &fact(ic,id11)
                   if(id.gt.0.and.ie.gt.0) then
                     ib=ib+1
                     ifacta(1,ia,ib)=ie
@@ -875,7 +873,7 @@
                     factb(1,ia,ib)=factb1
                     factb(2,ia,ib)=factb2
                     fact0(ia,ib)=signii*fpre*fact(iia,id1)*             &
-     &              fact(ic,id11)
+     &fact(ic,id11)
                   endif
                 endif
                 id12=1
@@ -894,7 +892,7 @@
                     factb(1,ia,ib)=factb1
                     factb(2,ia,ib)=factb2
                     fact0(ia,ib)=signii*fpre*fact(iia,id1)*             &
-     &              fact(ic,id11)*fact(id,id12)
+     &fact(ic,id11)*fact(id,id12)
                     if(if.gt.0.and.ie.gt.0) then
                       ib=ib+1
                       ifacta(1,ia,ib)=ie
@@ -906,7 +904,7 @@
                       factb(1,ia,ib)=factb1
                       factb(2,ia,ib)=factb2
                       fact0(ia,ib)=signii*fpre*fact(iia,id1)*           &
-     &                fact(ic,id11)*fact(id,id12)
+     &fact(ic,id11)*fact(id,id12)
                     endif
                   endif
                 enddo
@@ -925,25 +923,25 @@
           if(ii.eq.2) ia=-iia
           if(ityc(ia).gt.0) then
             write(6,10100) 'First Order Contribution of: ',             &
-     &      ityc(ia),comment(ia)
+     &ityc(ia),comment(ia)
             do i=1,ityc(ia)
               do j=1,ivar(ia)
 !--Factor of Machine Parameters
                 fact1(j)=bstr(ia,i)*fact0(ia,j)*                        &
-     &          beta(1,ia,i)**factb(1,ia,j)*beta(2,ia,i)**factb(2,ia,j)
+     &beta(1,ia,i)**factb(1,ia,j)*beta(2,ia,i)**factb(2,ia,j)
 !--Phase Factor
-                tc=dsin(ifacta(1,ia,j)*(phi(1,ia,i)-qx)+                &
-     &          ifacta(2,ia,j)*(phi(2,ia,i)-qy))
-                ts=dcos(ifacta(1,ia,j)*(phi(1,ia,i)-qx)+                &
-     &          ifacta(2,ia,j)*(phi(2,ia,i)-qy))
+                tc=sin(ifacta(1,ia,j)*(phi(1,ia,i)-qx)+                 &
+     &ifacta(2,ia,j)*(phi(2,ia,i)-qy))
+                ts=cos(ifacta(1,ia,j)*(phi(1,ia,i)-qx)+                 &
+     &ifacta(2,ia,j)*(phi(2,ia,i)-qy))
 !--Generating Function Calculation
-                sinar=dsin(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy)
+                sinar=sin(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy)
                 if(abs(sinar).gt.pieni) then
                   dstc(j)=fact1(j)*tc/sinar
                   dsts(j)=fact1(j)*ts/sinar
                 else
                   write(6,*) '  Warning: Results for distortion ',      &
-     &            'function probably wrong; sinar= ',sinar
+     &'function probably wrong; sinar= ',sinar
                   dstc(j)=zero
                   dsts(j)=zero
                 endif
@@ -958,8 +956,8 @@
                 do j=1,data_size
                   amp = dsqrt(dstc(j)*dstc(j)+dsts(j)*dsts(j))
                   write(76,10000) ia,i,j,etl(ia,i),dstc(j),dsts(j),amp, &
-     &            ifact4(1,ia,j),ifact4(2,ia,j),                        &
-     &            ifact4(3,ia,j),ifact4(4,ia,j)
+     &ifact4(1,ia,j),ifact4(2,ia,j),                                    &
+     &ifact4(3,ia,j),ifact4(4,ia,j)
                   data_size = ivar(ia)
                   int_to_write(1) = ia
                   int_to_write(2) = i
@@ -973,7 +971,7 @@
                   int_to_write(10) = ifact4(3,ia,j)
                   int_to_write(11) = ifact4(4,ia,j)
                   call write_table(table_name,11,int_to_write,          &
-     &            double_to_write)
+     &double_to_write)
                   j76 = j76 + 1
                   call augment_count(table_name)
                 enddo
@@ -984,17 +982,17 @@
                 data_size = ivar(ia)
                 call fit_table(table_name,data_size,table_size_77)
                 do j=1,data_size
-                  facc=one-dcos(two*(ifacta(1,ia,j)*qx+                 &
-     &            ifacta(2,ia,j)*qy))
-                  facs=dsin(two*(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy))
+                  facc=one-cos(two*(ifacta(1,ia,j)*qx+                  &
+     &ifacta(2,ia,j)*qy))
+                  facs=sin(two*(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy))
                   hmc=facc*dstc(j)+facs*dsts(j)
                   hms=facc*dsts(j)-facs*dstc(j)
                   double_to_write(5)=hmc
                   double_to_write(6)=hms
                   amp = dsqrt(hmc*hmc+hms*hms)
                   write(77,10000) ia,i,j,etl(ia,i),double_to_write(5),  &
-     &            double_to_write(6),amp,ifact4(1,ia,j),ifact4(2,ia,j), &
-     &            ifact4(3,ia,j),ifact4(4,ia,j)
+     &double_to_write(6),amp,ifact4(1,ia,j),ifact4(2,ia,j),             &
+     &ifact4(3,ia,j),ifact4(4,ia,j)
                   int_to_write(1) = ia
                   int_to_write(2) = i
                   int_to_write(3) = j
@@ -1005,7 +1003,7 @@
                   int_to_write(10) = ifact4(3,ia,j)
                   int_to_write(11) = ifact4(4,ia,j)
                   call write_table(table_name,11,int_to_write,          &
-     &            double_to_write)
+     &double_to_write)
                   j77 = j77 + 1
                   call augment_count(table_name)
                 enddo
@@ -1019,13 +1017,13 @@
               call fit_table(table_name,data_size,table_size_74)
               do j=1,data_size
                 amp = sqrt(distc(ia,j)*distc(ia,j)+dists(ia,j)*         &
-     &          dists(ia,j))
+     &dists(ia,j))
                 write(6,10040) distc(ia,j),dists(ia,j),amp,             &
-     &          ifact4(1,ia,j),ifact4(2,ia,j),ifact4(3,ia,j),           &
-     &          ifact4(4,ia,j)
+     &ifact4(1,ia,j),ifact4(2,ia,j),ifact4(3,ia,j),                     &
+     &ifact4(4,ia,j)
                 write(74,10010) ia,distc(ia,j),dists(ia,j),amp,         &
-     &          ifact4(1,ia,j),ifact4(2,ia,j),ifact4(3,ia,j),           &
-     &          ifact4(4,ia,j)
+     &ifact4(1,ia,j),ifact4(2,ia,j),ifact4(3,ia,j),                     &
+     &ifact4(4,ia,j)
                 int_to_write(1) = ia
                 double_to_write(2) = distc(ia,j)
                 double_to_write(3) = dists(ia,j)
@@ -1035,7 +1033,7 @@
                 int_to_write(7) = ifact4(3,ia,j)
                 int_to_write(8) = ifact4(4,ia,j)
                 call write_table(table_name,8,int_to_write,             &
-     &          double_to_write)
+     &double_to_write)
                 j74 = j74 + 1
                 call augment_count(table_name)
               enddo
@@ -1045,19 +1043,19 @@
               data_size = ivar(ia)
               call fit_table(table_name,data_size,table_size_75)
               do j=1,data_size
-                facc=one-dcos(two*(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy))
-                facs=dsin(two*(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy))
+                facc=one-cos(two*(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy))
+                facs=sin(two*(ifacta(1,ia,j)*qx+ifacta(2,ia,j)*qy))
                 hamc(ia,j)=facc*distc(ia,j)+facs*dists(ia,j)
                 hams(ia,j)=facc*dists(ia,j)-facs*distc(ia,j)
                 double_to_write(2)=hamc(ia,j)
                 double_to_write(3)=hams(ia,j)
                 amp = sqrt(hamc(ia,j)*hamc(ia,j)+hams(ia,j)*hams(ia,j))
                 write(6,10040) double_to_write(2),double_to_write(3),   &
-     &          amp,ifact4(1,ia,j),ifact4(2,ia,j),                      &
-     &          ifact4(3,ia,j),ifact4(4,ia,j)
+     &amp,ifact4(1,ia,j),ifact4(2,ia,j),                                &
+     &ifact4(3,ia,j),ifact4(4,ia,j)
                 write(75,10010) ia,double_to_write(2),                  &
-     &          double_to_write(3),amp,ifact4(1,ia,j),ifact4(2,ia,j),   &
-     &          ifact4(3,ia,j),ifact4(4,ia,j)
+     &double_to_write(3),amp,ifact4(1,ia,j),ifact4(2,ia,j),             &
+     &ifact4(3,ia,j),ifact4(4,ia,j)
                 int_to_write(1) = ia
                 double_to_write(4) = amp
                 int_to_write(5) = ifact4(1,ia,j)
@@ -1065,7 +1063,7 @@
                 int_to_write(7) = ifact4(3,ia,j)
                 int_to_write(8) = ifact4(4,ia,j)
                 call write_table(table_name,8,int_to_write,             &
-     &          double_to_write)
+     &double_to_write)
                 j75 = j75 + 1
                 call augment_count(table_name)
               enddo
@@ -1098,10 +1096,9 @@
       integer i,ia,ia0,ib,ib0,ic,ic0,ic00,ica,ica2,id,id0,id00,ide,     &
      &ii,imax,imuty,itij0,jj,k,k1,k2,l,l0,l3,l4,ll3,ll4,m,mde,mh,mmul,  &
      &mmul2,mmult,mmultf,mmultw,mmultx,nblz,num
-      double precision arg,argij,betdx,betdxi,dabs,dcos,dl12q,dl34q,    &
-     &efact,ephix1,ephiy1,esin34,etrgij,facc,facd0,facd1,               &
-     &facd10,facp,facs,ffff,phix1,phix2,phix20,phiy1,phiy2,phiy20,pieni,&
-     &resamp,sin34,spij,trgij
+      double precision arg,argij,betdx,betdxi,dl12q,dl34q,efact,ephix1, &
+     &ephiy1,esin34,etrgij,facc,facd0,facd1,facd10,facp,facs,ffff,phix1,&
+     &phix2,phix20,phiy1,phiy2,phiy20,pieni,sin34,spij,trgij
       integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
      &iu_on,n1,n2
       integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
@@ -1250,7 +1247,7 @@
 !--Beta term of first set of multipoles
                 do k=1,icc
                   betdxi(k)=(beta(1,ic,ii)**betexp(k,1))*               &
-     &            (beta(2,ic,ii)**betexp(k,2))
+     &(beta(2,ic,ii)**betexp(k,2))
                 enddo
                 do jj=1,ityc(id)
                   facd0=two*bstr(ic,ii)*bstr(id,jj)
@@ -1262,22 +1259,22 @@
                   do k=1,icc
 !--Beta term of second set of multipoles multiplied to first
                     betdx(k)=betdxi(k)*                                 &
-     &              (beta(1,id,jj)**betexp(k,3))*                       &
-     &              (beta(2,id,jj)**betexp(k,4))
+     &(beta(1,id,jj)**betexp(k,3))*                                     &
+     &(beta(2,id,jj)**betexp(k,4))
                     l0=icd(k)
 !--Cosine and sine part of driving term
                     do l=1,l0
                       if(isig(k,l).eq.1) then
                         dl12q=itij(k,l,1)*qx+itij(k,l,2)*qy
-                        if(dabs(dl12q).lt.pieni) dl12q=pieni
+                        if(abs(dl12q).lt.pieni) dl12q=pieni
                         l3=itij(k,l,3)-itij(k,l,4)
                         l4=itij(k,l,5)-itij(k,l,6)
                         dl34q=l3*qx+l4*qy
-                        if(dabs(dl34q).lt.pieni) dl34q=pieni
-                        sin34=dsin(dl34q)
+                        if(abs(dl34q).lt.pieni) dl34q=pieni
+                        sin34=sin(dl34q)
                         phix1=-qx
                         phiy1=-qy
-                        trgij=dsin(dl12q)
+                        trgij=sin(dl12q)
                         if(phi(1,id,jj).eq.phi(1,ic,ii)) then
                           phix2=phi(1,id,jj)+qx
                           phiy2=phi(2,id,jj)+qy
@@ -1286,11 +1283,11 @@
                           phiy2=phi(2,id,jj)-spij*qy
                         endif
                         arg=l3*phix1+l4*phiy1+itij(k,l,1)*              &
-     &                  phix2+itij(k,l,2)*phiy2
+     &phix2+itij(k,l,2)*phiy2
                         facp=fac4(k,l)*facd0*fac2(k)*                   &
-     &                  betdx(k)/trgij/sin34
-                        facd10(k,l,1)=facd10(k,l,1)+facp*dsin(arg)
-                        facd10(k,l,2)=facd10(k,l,2)+facp*dcos(arg)
+     &betdx(k)/trgij/sin34
+                        facd10(k,l,1)=facd10(k,l,1)+facp*sin(arg)
+                        facd10(k,l,2)=facd10(k,l,2)+facp*cos(arg)
                       endif
                     enddo
                   enddo
@@ -1330,13 +1327,13 @@
               l0=icd(k)
               do l=1,l0
                 dl12q=itij(k,l,1)*qx+itij(k,l,2)*qy
-                if(dabs(dl12q).lt.pieni) dl12q=pieni
-                etrgij=dsin(dl12q)
+                if(abs(dl12q).lt.pieni) dl12q=pieni
+                etrgij=sin(dl12q)
                 ll3(k,l)=itij(k,l,3)-itij(k,l,4)
                 ll4(k,l)=itij(k,l,5)-itij(k,l,6)
                 dl34q=ll3(k,l)*qx+ll4(k,l)*qy
-                if(dabs(dl34q).lt.pieni) dl34q=pieni
-                esin34=dsin(dl34q)
+                if(abs(dl34q).lt.pieni) dl34q=pieni
+                esin34=sin(dl34q)
                 efact(k,l)=fac4(k,l)/etrgij/esin34
               enddo
             enddo
@@ -1344,7 +1341,7 @@
 !--Beta term of first set of multipoles
               do k=1,icc
                 betdxi(k)=(beta(1,ic,ii)**betexp(k,1))*                 &
-     &          (beta(2,ic,ii)**betexp(k,2))
+     &(beta(2,ic,ii)**betexp(k,2))
               enddo
               do jj=1,ityc(id)
                 facd0=bstr(ic,ii)*bstr(id,jj)
@@ -1352,10 +1349,10 @@
                 if(ii.eq.1.and.jj.eq.1) then
                   if(ic.ne.id) then
                     write(6,10090) 'Pairs of: ',ityc(ic),comment(ic),   &
-     &              ' and: ',ityc(id),comment(id)
+     &' and: ',ityc(id),comment(id)
                   else
                     write(6,10100) 'Quadratic Effect of: ',             &
-     &              ityc(ic),comment(ic)
+     &ityc(ic),comment(ic)
                   endif
                 endif
 !--Phase Differences (phix2,phiy2) of secondary resonances change
@@ -1370,8 +1367,8 @@
                 do k=1,icc
 !--Beta term of second set of multipoles multiplied to first
                   betdx(k)=betdxi(k)*                                   &
-     &            (beta(1,id,jj)**betexp(k,3))*                         &
-     &            (beta(2,id,jj)**betexp(k,4))
+     &(beta(1,id,jj)**betexp(k,3))*                                     &
+     &(beta(2,id,jj)**betexp(k,4))
                   ffff=facd0*fac2(k)*betdx(k)
                   l0=icd(k)
                   num=0
@@ -1382,47 +1379,47 @@
 !--Cosine and sine part of driving term
                     do l=1,l0
                       arg=ll3(k,l)*ephix1+ll4(k,l)*ephiy1+              &
-     &                itij(k,l,1)*phix20+itij(k,l,2)*phiy20
+     &itij(k,l,1)*phix20+itij(k,l,2)*phiy20
                       facp=ffff*efact(k,l)
-                      facd1(k,l,1)=facd1(k,l,1)+facp*dsin(arg)
-                      facd1(k,l,2)=facd1(k,l,2)+facp*dcos(arg)
+                      facd1(k,l,1)=facd1(k,l,1)+facp*sin(arg)
+                      facd1(k,l,2)=facd1(k,l,2)+facp*cos(arg)
                     enddo
                   else
                     do l=1,l0
                       if(isig(k,l).eq.0) then
                         arg=ll3(k,l)*ephix1+ll4(k,l)*ephiy1+            &
-     &                  itij(k,l,1)*phix20+itij(k,l,2)*phiy20
+     &itij(k,l,1)*phix20+itij(k,l,2)*phiy20
                         facp=ffff*efact(k,l)
-                        facd1(k,l,1)=facd1(k,l,1)+facp*dsin(arg)
-                        facd1(k,l,2)=facd1(k,l,2)+facp*dcos(arg)
+                        facd1(k,l,1)=facd1(k,l,1)+facp*sin(arg)
+                        facd1(k,l,2)=facd1(k,l,2)+facp*cos(arg)
                       else
                         dl12q=itij(k,l,1)*qx+itij(k,l,2)*qy
-                        if(dabs(dl12q).lt.pieni) dl12q=pieni
+                        if(abs(dl12q).lt.pieni) dl12q=pieni
                         l3=itij(k,l,3)-itij(k,l,4)
                         l4=itij(k,l,5)-itij(k,l,6)
                         dl34q=l3*qx+l4*qy
-                        if(dabs(dl34q).lt.pieni) dl34q=pieni
-                        sin34=dsin(dl34q)
+                        if(abs(dl34q).lt.pieni) dl34q=pieni
+                        sin34=sin(dl34q)
                         phix1=-qx
                         phiy1=-qy
-                        trgij=dsin(dl12q)
+                        trgij=sin(dl12q)
                         phix2=phi(1,id,jj)
                         phiy2=phi(2,id,jj)
                         if(ic.eq.id.and.phi(1,id,jj).eq.phi(1,ic,ii))   &
-     &                  then
-                          trgij=trgij/dcos(dl12q)
+     &then
+                          trgij=trgij/cos(dl12q)
                         else
                           phix2=phix2-spij*qx
                           phiy2=phiy2-spij*qy
                         endif
                         arg=l3*phix1+l4*phiy1+itij(k,l,1)*              &
-     &                  phix2+itij(k,l,2)*phiy2
+     &phix2+itij(k,l,2)*phiy2
                         facp=fac4(k,l)*facd0*fac2(k)*                   &
-     &                  betdx(k)/trgij/sin34
+     &betdx(k)/trgij/sin34
 !--Factor 2 comes from trigonometric functions
                         if(ic.eq.id) facp=two*facp
-                        facd1(k,l,1)=facd1(k,l,1)+facp*dsin(arg)
-                        facd1(k,l,2)=facd1(k,l,2)+facp*dcos(arg)
+                        facd1(k,l,1)=facd1(k,l,1)+facp*sin(arg)
+                        facd1(k,l,2)=facd1(k,l,2)+facp*cos(arg)
                       endif
                     enddo
                   endif
@@ -1433,8 +1430,8 @@
             ica=0
             do k1=1,mmultx
               do k2=1,mmult
-                if(dabs(facd1(k1,k2,1)).gt.pieni.or.                    &
-     &          dabs(facd1(k1,k2,2)).gt.pieni) then
+                if(abs(facd1(k1,k2,1)).gt.pieni.or.                     &
+     &abs(facd1(k1,k2,2)).gt.pieni) then
                   ica=ica+1
                   if(ica.gt.mmultf) call prror(3,10,mmultf)
                   facd2(1,ica)=facd1(k1,k2,1)
@@ -1451,8 +1448,8 @@
             if(ide.eq.1) then
               do k1=1,mmultx
                 do k2=1,mmult
-                  if(dabs(facd10(k1,k2,1)).gt.pieni.or.                 &
-     &            dabs(facd10(k1,k2,2)).gt.pieni) then
+                  if(abs(facd10(k1,k2,1)).gt.pieni.or.                  &
+     &abs(facd10(k1,k2,2)).gt.pieni) then
                     ica=ica+1
                     if(ica.gt.mmultf) call prror(3,10,mmultf)
                     facd2(1,ica)=facd10(k1,k2,1)
@@ -1470,9 +1467,9 @@
             do k1=1,ica
               do k2=k1+1,ica
                 if(ifacd2(1,k2).eq.ifacd2(1,k1).and.                    &
-     &          ifacd2(2,k2).eq.ifacd2(2,k1).and.                       &
-     &          ifacd2(3,k2).eq.ifacd2(3,k1).and.                       &
-     &          ifacd2(4,k2).eq.ifacd2(4,k1)) then
+     &ifacd2(2,k2).eq.ifacd2(2,k1).and.                                 &
+     &ifacd2(3,k2).eq.ifacd2(3,k1).and.                                 &
+     &ifacd2(4,k2).eq.ifacd2(4,k1)) then
                   facd2(1,k1)=facd2(1,k1)+facd2(1,k2)
                   facd2(2,k1)=facd2(2,k1)+facd2(2,k2)
                   facd2(1,k2)=zero
@@ -1486,8 +1483,8 @@
             ica2=0
 !--Collect the final total of ica2 non-zero resonance terms
             do k1=1,ica
-              if(dabs(facd2(1,k1)).gt.pieni.or.                         &
-     &        dabs(facd2(2,k1)).gt.pieni) then
+              if(abs(facd2(1,k1)).gt.pieni.or.                          &
+     &abs(facd2(2,k1)).gt.pieni) then
                 ica2=ica2+1
                 if(ica2.ne.k1) then
                   facd2(1,ica2)=facd2(1,k1)
@@ -1509,19 +1506,19 @@
             call fit_table(table_name,data_size,table_size_78)
             do k1=1,data_size
               argij=two*((ifacd2(1,k1)-ifacd2(2,k1))*qx+                &
-     &        (ifacd2(3,k1)-ifacd2(4,k1))*qy)
-              facc=one-dcos(argij)
-              facs=dsin(argij)
+     &(ifacd2(3,k1)-ifacd2(4,k1))*qy)
+              facc=one-cos(argij)
+              facs=sin(argij)
               ham(1,k1)=facc*facd2(1,k1)+facs*facd2(2,k1)
               ham(2,k1)=facc*facd2(2,k1)-facs*facd2(1,k1)
               double_to_write(5)=dsqrt(facd2(1,k1)*facd2(1,k1)+         &
-     &        facd2(2,k1)*facd2(2,k1))
+     &facd2(2,k1)*facd2(2,k1))
               write(6,10080) facd2(1,k1),facd2(2,k1),double_to_write(5),&
-     &        ifacd2(1,k1),ifacd2(2,k1),ifacd2(3,k1),ifacd2(4,k1)
+     &ifacd2(1,k1),ifacd2(2,k1),ifacd2(3,k1),ifacd2(4,k1)
               if(iu_on.eq.1.or.iu_on.eq.3)                              &
-     &        write(78,10110) ic,id,facd2(1,k1),facd2(2,k1),            &
-     &        double_to_write(5),ifacd2(1,k1),ifacd2(2,k1),             &
-     &        ifacd2(3,k1),ifacd2(4,k1)
+     &write(78,10110) ic,id,facd2(1,k1),facd2(2,k1),                    &
+     &double_to_write(5),ifacd2(1,k1),ifacd2(2,k1),                     &
+     &ifacd2(3,k1),ifacd2(4,k1)
               int_to_write(1) = ic
               int_to_write(2) = id
               double_to_write(3) = facd2(1,k1)
@@ -1531,7 +1528,7 @@
               int_to_write(8) = ifacd2(3,k1)
               int_to_write(9) = ifacd2(4,k1)
               call write_table(table_name,9,int_to_write,               &
-     &        double_to_write)
+     &double_to_write)
               j78 = j78 + 1
               call augment_count(table_name)
               facd2(1,k1)=zero
@@ -1543,13 +1540,13 @@
             call fit_table(table_name,data_size,table_size_79)
             do k1=1,data_size
               double_to_write(5)=dsqrt(ham(1,k1)*ham(1,k1)+             &
-     &        ham(2,k1)*ham(2,k1))
+     &ham(2,k1)*ham(2,k1))
               write(6,10080) ham(1,k1),ham(2,k1),double_to_write(5),    &
-     &        ifacd2(1,k1),ifacd2(2,k1),ifacd2(3,k1),ifacd2(4,k1)
+     &ifacd2(1,k1),ifacd2(2,k1),ifacd2(3,k1),ifacd2(4,k1)
               if(iu_on.eq.1.or.iu_on.eq.3)                              &
-     &        write(79,10110) ic,id,ham(1,k1),ham(2,k1),                &
-     &        double_to_write(5),ifacd2(1,k1),ifacd2(2,k1),             &
-     &        ifacd2(3,k1),ifacd2(4,k1)
+     &write(79,10110) ic,id,ham(1,k1),ham(2,k1),                        &
+     &double_to_write(5),ifacd2(1,k1),ifacd2(2,k1),                     &
+     &ifacd2(3,k1),ifacd2(4,k1)
               int_to_write(1) = ic
               int_to_write(2) = id
               double_to_write(3) = ham(1,k1)
@@ -1559,7 +1556,7 @@
               int_to_write(8) = ifacd2(3,k1)
               int_to_write(9) = ifacd2(4,k1)
               call write_table(table_name,9,int_to_write,               &
-     &        double_to_write)
+     &double_to_write)
               j79 = j79 + 1
               call augment_count(table_name)
               do ii=1,4
@@ -1609,8 +1606,8 @@
      &ijnu,ijnu1,imuty,ipl,iti,ivoff,jj,jj1,jj11,jjend,jjj,jjj1,k,k1,kk,&
      &l,l1,m,mend,mexp,mh,mij,mm,mmul,mmul2,mmult,mmultf,mmultw,mmultx, &
      &n,nblz,nend,nexp,nij,nn
-      double precision betl,betxp,dble,fac,fac1,fac3,fcc2,fcc4,pieni,   &
-     &signii,signjj
+      double precision betl,betxp,fac,fac1,fac3,fcc2,fcc4,pieni,signii, &
+     &signjj
       integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
      &iu_on,n1,n2
       double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
@@ -1739,10 +1736,10 @@
 !--Finding Double Appearance
               do ijnu1=1,ijnu-1
                 if(                                                     &
-     &          betl(ijnu1,1).eq.betl(ijnu,3).and.                      &
-     &          betl(ijnu1,2).eq.betl(ijnu,4).and.                      &
-     &          betl(ijnu1,3).eq.betl(ijnu,1).and.                      &
-     &          betl(ijnu1,4).eq.betl(ijnu,2)) then
+     &betl(ijnu1,1).eq.betl(ijnu,3).and.                                &
+     &betl(ijnu1,2).eq.betl(ijnu,4).and.                                &
+     &betl(ijnu1,3).eq.betl(ijnu,1).and.                                &
+     &betl(ijnu1,4).eq.betl(ijnu,2)) then
                   ido=0
                   if2=if2+1
                   if(if2.gt.2) call prror(1,13,if2)
@@ -1767,8 +1764,8 @@
                     nexp=nij-(n-1)*2
                     nn=(m-1)*nend+n
                     fcc4(if2,ijnu,nn)=                                  &
-     &              fac3*fact(ii1,ii11+n)*fact(jj1,jj11+n)*             &
-     &              dble(nexp)*(one/dble(ii1)+one/dble(jj1))/two
+     &fac3*fact(ii1,ii11+n)*fact(jj1,jj11+n)*                           &
+     &dble(nexp)*(one/dble(ii1)+one/dble(jj1))/two
                     if(mexp.ne.0) then
                       iti(if2,ijnu,nn,1)=-1
                       iti(if2,ijnu,nn,2)=mexp
@@ -1790,10 +1787,10 @@
 !--Finding Double Appearance
               do ijnu1=1,ijnu-1
                 if(                                                     &
-     &          betl(ijnu1,1).eq.betl(ijnu,3).and.                      &
-     &          betl(ijnu1,2).eq.betl(ijnu,4).and.                      &
-     &          betl(ijnu1,3).eq.betl(ijnu,1).and.                      &
-     &          betl(ijnu1,4).eq.betl(ijnu,2)) then
+     &betl(ijnu1,1).eq.betl(ijnu,3).and.                                &
+     &betl(ijnu1,2).eq.betl(ijnu,4).and.                                &
+     &betl(ijnu1,3).eq.betl(ijnu,1).and.                                &
+     &betl(ijnu1,4).eq.betl(ijnu,2)) then
                   ido=0
                   if2=if2+1
                   if(if2.gt.2) call prror(1,13,if2)
@@ -1811,7 +1808,7 @@
                 betxp(if2,ijnu,3)=betl(ijnu,3)
                 betxp(if2,ijnu,4)=betl(ijnu,4)
                 fcc2(if2,ijnu)=fac1*dble(k1*iii*jjj)/                   &
-     &          dble(2**(k1+l1))
+     &dble(2**(k1+l1))
 !--Terms Iy**n where n>0
                 if(ii1.ne.0.and.jj1.ne.0) then
                   do n=1,nend
@@ -1821,8 +1818,8 @@
                       mexp=mij-(m-1)*2
                       mm=(n-1)*mend+m
                       fcc4(if2,ijnu,mm)=                                &
-     &                fac3*fact(iii,iii1+m)*fact(jjj,jjj1+m)*           &
-     &                dble(mexp)*(one/dble(iii)+one/dble(jjj))/two
+     &fac3*fact(iii,iii1+m)*fact(jjj,jjj1+m)*                           &
+     &dble(mexp)*(one/dble(iii)+one/dble(jjj))/two
                       if(abs(fcc4(if2,ijnu,mm)).gt.pieni) then
                         if(nexp.ne.0) then
                           iti(if2,ijnu,mm,1)=1
@@ -1841,8 +1838,8 @@
                   do m=1,mend
                     mexp=mij-(m-1)*2
                     fcc4(if2,ijnu,m)=                                   &
-     &              fact(iii,iii1+m)*fact(jjj,jjj1+m)*                  &
-     &              dble(mexp)*(one/dble(iii)+one/dble(jjj))/two
+     &fact(iii,iii1+m)*fact(jjj,jjj1+m)*                                &
+     &dble(mexp)*(one/dble(iii)+one/dble(jjj))/two
                     if(abs(fcc4(if2,ijnu,m)).gt.pieni) then
                       iti(if2,ijnu,m,1)=0
                       iti(if2,ijnu,m,2)=mexp
@@ -1859,10 +1856,10 @@
 !--Finding Double Appearance
               do ijnu1=1,ijnu-1
                 if(                                                     &
-     &          betl(ijnu1,1).eq.betl(ijnu,3).and.                      &
-     &          betl(ijnu1,2).eq.betl(ijnu,4).and.                      &
-     &          betl(ijnu1,3).eq.betl(ijnu,1).and.                      &
-     &          betl(ijnu1,4).eq.betl(ijnu,2)) then
+     &betl(ijnu1,1).eq.betl(ijnu,3).and.                                &
+     &betl(ijnu1,2).eq.betl(ijnu,4).and.                                &
+     &betl(ijnu1,3).eq.betl(ijnu,1).and.                                &
+     &betl(ijnu1,4).eq.betl(ijnu,2)) then
                   ido=0
                   if2=if2+1
                   if(if2.gt.2) call prror(1,13,if2)
@@ -1883,8 +1880,8 @@
                 do n=1,nend
                   nexp=nij-(n-1)*2
                   fcc4(if2,ijnu,n)=                                     &
-     &            fact(ii1,ii11+n)*fact(jj1,jj11+n)*                    &
-     &            dble(nexp)*(one/dble(ii1)+one/dble(jj1))/two
+     &fact(ii1,ii11+n)*fact(jj1,jj11+n)*                                &
+     &dble(nexp)*(one/dble(ii1)+one/dble(jj1))/two
                   iti(if2,ijnu,n,1)=0
                   iti(if2,ijnu,n,2)=0
                   iti(if2,ijnu,n,3)=nexp
@@ -1908,7 +1905,7 @@
                 fac3=fact(ii1,ii11+n)*fact(jj1,jj11+n)
                 nexp=nij-(n-1)*2
                 fcc4(if2,ijnu,n)=fac3*                                  &
-     &          (one/dble(iii)+one/dble(jjj))/two
+     &(one/dble(iii)+one/dble(jjj))/two
                 if(nexp.ne.0) then
                   iti(if2,ijnu,n,1)=1
                   iti(if2,ijnu,n,2)=1
@@ -1937,8 +1934,8 @@
             do n=1,nend
               nexp=nij-(n-1)*2
               fcc4(if2,ijnu,n)=                                         &
-     &        fact(ii1,ii11+n)*fact(jj1,jj11+n)*                        &
-     &        dble(nexp)*(one/dble(ii1)+one/dble(jj1))/two
+     &fact(ii1,ii11+n)*fact(jj1,jj11+n)*                                &
+     &dble(nexp)*(one/dble(ii1)+one/dble(jj1))/two
               iti(if2,ijnu,n,1)=0
               iti(if2,ijnu,n,2)=0
               iti(if2,ijnu,n,3)=nexp
@@ -2169,18 +2166,18 @@
 !--(l1) sums over the 3-4 possible sign combinations
                 do l1=1,nsig
                   faca=sign(l1,1)*fac11*fac21-                          &
-     &            sign(l1,2)*fac12*fac22
+     &sign(l1,2)*fac12*fac22
                   if(k41.eq.0) faca=-sign(l1,2)*fac12*fac22
                   if(k42.eq.0) faca=sign(l1,1)*fac11*fac21
 !--Condition 1 & 5 clear
 !--2 Condition avoids duplication of l1 by l2
 !--3 Condition avoids duplication of l1 by l3
 !--4 Condition avoids duplication of l1 with any other
-                  if((dabs(faca).gt.pieni).and.                         &
-     &            (l1.ne.2.or.k41.ne.0).and.                            &
-     &            (l1.ne.3.or.k42.ne.0).and.                            &
-     &            (l1.ne.4.or.(k41.ne.0.and.k42.ne.0)).and.             &
-     &            ((k41+k42).ge.1)) then
+                  if((abs(faca).gt.pieni).and.                          &
+     &(l1.ne.2.or.k41.ne.0).and.                                        &
+     &(l1.ne.3.or.k42.ne.0).and.                                        &
+     &(l1.ne.4.or.(k41.ne.0.and.k42.ne.0)).and.                         &
+     &((k41+k42).ge.1)) then
 !--(k3,k4) plane with no differentiation nn=1 vertical nn=2 horizontal
 !--((ido3+3),(ido4+3)) allow for constant term in the
 !--undifferentiated part
@@ -2207,25 +2204,25 @@
 !--and the resonance should be written in descending order starting
 !--with the horizontal one
                         if(                                             &
-     &                  (k42s.ne.0.or.k44.ne.0).and.                    &
-     &                  (k412s.gt.0.or.k434s.gt.0).and.                 &
-     &                  ((nn.eq.1.and.k412s1.ge.k412s2).or.             &
-     &                  (nn.eq.2.and.k434s1.ge.k434s2))) then
+     &(k42s.ne.0.or.k44.ne.0).and.                                      &
+     &(k412s.gt.0.or.k434s.gt.0).and.                                   &
+     &((nn.eq.1.and.k412s1.ge.k412s2).or.                               &
+     &(nn.eq.2.and.k434s1.ge.k434s2))) then
 !--Program check: finds duplicated cases
                           do k5=1,ica
                             if(                                         &
-     &                      iti(nn,ijnu,k5,icol1).eq.k42s.and.          &
-     &                      iti(nn,ijnu,k5,icol2).eq.k44.and.           &
-     &                      iti(nn,ijnu,k5,icol3).eq.k412s1.and.        &
-     &                      iti(nn,ijnu,k5,icol4).eq.k412s2.and.        &
-     &                      iti(nn,ijnu,k5,icol5).eq.k434s1.and.        &
-     &                      iti(nn,ijnu,k5,icol6).eq.k434s2             &
-     &                      ) call prror(3,9,2)
+     &iti(nn,ijnu,k5,icol1).eq.k42s.and.                                &
+     &iti(nn,ijnu,k5,icol2).eq.k44.and.                                 &
+     &iti(nn,ijnu,k5,icol3).eq.k412s1.and.                              &
+     &iti(nn,ijnu,k5,icol4).eq.k412s2.and.                              &
+     &iti(nn,ijnu,k5,icol5).eq.k434s1.and.                              &
+     &iti(nn,ijnu,k5,icol6).eq.k434s2                                   &
+     &) call prror(3,9,2)
                           enddo
                           ica=ica+1
                           if(ica.gt.mmult) call prror(3,5,mmult)
                           fcc4(nn,ijnu,ica)=faca*                       &
-     &                    fact(ido3,1+k3/2)*fact(ido4,1+k4/2)
+     &fact(ido3,1+k3/2)*fact(ido4,1+k4/2)
                           iti(nn,ijnu,ica,icol1)=k42s
                           iti(nn,ijnu,ica,icol2)=k44
                           iti(nn,ijnu,ica,icol3)=k412s1
@@ -2459,7 +2456,7 @@
           endif
           if(ich1.eq.3.and.ch(jj:jj).eq.' ') then
             ch1(1:200)=ch(1:ich2-1)//''''//ch(ich2:jj-1)//''''//        &
-     &      ch(jj:200)//' / '
+     &ch(jj:200)//' / '
             goto 210
           endif
         enddo
@@ -2514,7 +2511,6 @@
       integer table_size_70,table_size_71,table_size_72,table_size_73,  &
      &table_size_74,table_size_75,table_size_76,table_size_77,          &
      &table_size_78,table_size_79
-      integer jd
       character*16 strn,table_name
       character*18 comment
       parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
@@ -2571,10 +2567,10 @@
           enddo
           do i=ih1-1,0,-1
             write(71,10040) ic,2,                                       &
-     &      det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)/pi2,i+1,ih1-i-1
+     &det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)/pi2,i+1,ih1-i-1
             int_to_write(2) = 2
             double_to_write(3) = det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)&
-     &      /pi2
+     &/pi2
             int_to_write(4) = i+1
             int_to_write(5) = ih1-i-1
             call write_table(table_name,5,int_to_write,double_to_write)
@@ -2616,13 +2612,13 @@
         write(6,10020)
         do i=ih1-1,0,-1
           write(6,10010) det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)/pi2,   &
-     &    i+1,ih1-i-1
+     &i+1,ih1-i-1
           if(iu_on.eq.1.or.iu_on.eq.3) then
             write(70,10040) ic,2,det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)&
-     &      /pi2,i+1,ih1-i-1
+     &/pi2,i+1,ih1-i-1
             int_to_write(2) = 2
             double_to_write(3) = det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)&
-     &      /pi2
+     &/pi2
             int_to_write(4) = i+1
             int_to_write(5) = ih1-i-1
             call write_table(table_name,5,int_to_write,double_to_write)
@@ -2677,14 +2673,14 @@
         endif
         do i=ih1-1,0,-1
           write(6,10010) det(1,ic,i,ih1-i)*dble(ih1-i)/                 &
-     &    dble(i+1)/pi2,i+1,ih1-i-1
+     &dble(i+1)/pi2,i+1,ih1-i-1
           if(iu_on.eq.1.or.iu_on.eq.3) then
             write(73,10040) ic,id,                                      &
-     &      det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)/pi2,i+1,ih1-i-1
+     &det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)/pi2,i+1,ih1-i-1
             int_to_write(1) = ic
             int_to_write(2) = id
             double_to_write(3) = det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)&
-     &      /pi2
+     &/pi2
             int_to_write(4) = i+1
             int_to_write(5) = ih1-i-1
             call write_table(table_name,5,int_to_write,double_to_write)
@@ -2695,7 +2691,7 @@
         write(6,10010) det(2,ic,0,ih1)/pi2,0,ih1
         if(iu_on.eq.1.or.iu_on.eq.3) then
           write(73,10040) ic,id,                                        &
-     &    det(2,ic,0,ih1)/pi2,0,ih1
+     &det(2,ic,0,ih1)/pi2,0,ih1
           double_to_write(3) = det(2,ic,0,ih1)/pi2
           int_to_write(4) = 0
           int_to_write(5) = ih1
@@ -2733,8 +2729,8 @@
 !--
 !---------------------------------------------------------------------
       implicit none
-      integer iabs,ic,icase,idum1,idum2,idum3,idum4,idum5,idum6,im,im1, &
-     &is,is0,k0,k1,k2,k3,k4,l2,l4,m,mh,mmul,mmul2,mmult,mmultf,mmultw,  &
+      integer ic,icase,idum1,idum2,idum3,idum4,idum5,idum6,im,im1,is,   &
+     &is0,k0,k1,k2,k3,k4,l2,l4,m,mh,mmul,mmul2,mmult,mmultf,mmultw,     &
      &mmultx,nblz
       double precision dum1,dum2,dum3,dum4,pieni
       integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
@@ -2778,9 +2774,9 @@
                 l4=k3-k4
                 do m=1,ic
                   if(icase.eq.2.and.                                    &
-     &            k2.eq.ifact4(1,im1,m).and.l2.eq.ifact4(2,im1,m)       &
-     &            .and.k4.eq.ifact4(3,im1,m).and.                       &
-     &            l4.eq.ifact4(4,im1,m)) then
+     &k2.eq.ifact4(1,im1,m).and.l2.eq.ifact4(2,im1,m)                   &
+     &.and.k4.eq.ifact4(3,im1,m).and.                                   &
+     &l4.eq.ifact4(4,im1,m)) then
                     is0=is0+1
                     dum1=fact0(im1,is0)
                     dum2=factb(1,im1,is0)
@@ -2811,8 +2807,8 @@
                     ifact4(4,im1,m)=idum6
                   endif
                   if(icase.eq.3.and.                                    &
-     &            k2.eq.ifacd2(1,m).and.l2.eq.ifacd2(2,m)               &
-     &            .and.k4.eq.ifacd2(3,m).and.l4.eq.ifacd2(4,m)) then
+     &k2.eq.ifacd2(1,m).and.l2.eq.ifacd2(2,m)                           &
+     &.and.k4.eq.ifacd2(3,m).and.l4.eq.ifacd2(4,m)) then
                     is=is+1
                     dum1=facd2(1,is)
                     dum2=facd2(2,is)
@@ -2904,7 +2900,7 @@
 
       subroutine fit_table(table_name,data_size,tab_size)
       implicit none
-      integer data_size,tab_size,j,ll
+      integer data_size,tab_size,ll
       character table_name*(*)
       character*16 tab_name
 
@@ -2937,13 +2933,11 @@
       subroutine write_table(table_name,table_type,int_to_write,        &
      &double_to_write)
       implicit none
-      integer j,table_type,int_to_write(11)
-      integer kk,double_from_table
+      integer table_type,int_to_write(11)
       integer k,table_type_index(11)
       integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
       integer tab_types_5(5),tab_types_8(8),tab_types_9(9),             &
      &tab_types_11(11)
-      double precision val
       double precision double_to_write(11)
       character table_name*(*)
       character*13  name_5(5),name_8(8),name_9(9),name_11(11)
@@ -2968,7 +2962,7 @@
           call double_to_table(table_name,name_5(k),double_to_write(k))
         else
           call double_to_table(table_name,name_5(k),                    &
-     &    dble(int_to_write(k)))
+     &dble(int_to_write(k)))
         endif
       enddo
       go to 1000
@@ -2978,7 +2972,7 @@
           call double_to_table(table_name,name_8(k),double_to_write(k))
         else
           call double_to_table(table_name,name_8(k),                    &
-     &    dble(int_to_write(k)))
+     &dble(int_to_write(k)))
         endif
       enddo
       go to 1000
@@ -2988,7 +2982,7 @@
           call double_to_table(table_name,name_9(k),double_to_write(k))
         else
           call double_to_table(table_name,name_9(k),                    &
-     &    dble(int_to_write(k)))
+     &dble(int_to_write(k)))
         endif
       enddo
       goto 1000
@@ -2998,7 +2992,7 @@
           call double_to_table(table_name,name_11(k),double_to_write(k))
         else
           call double_to_table(table_name,name_11(k),                   &
-     &    dble(int_to_write(k)))
+     &dble(int_to_write(k)))
         endif
       enddo
 

@@ -67,7 +67,7 @@
       else
         call ladeig(rt, reval, aival, em)
         stabt = reval(5)**2 + aival(5)**2 .le. tol  .and.               &
-     &  reval(6)**2 + aival(6)**2 .le. tol
+     &reval(6)**2 + aival(6)**2 .le. tol
 !        print '('' Static map, eigenvalues:'',(/1X,2E15.8))',
 !     +    (reval(i), aival(i), i = 1, 6)
       endif
@@ -256,7 +256,7 @@
         pdamp(3) = alj(3) * sal
 !---- Emittances.
         clg = ((55.d0 * hbar * clight) / (96.d0 * sqrt(three)))         &
-     &  * ((arad * gammas**5) / amass)
+     &* ((arad * gammas**5) / amass)
         ex = clg * sum(1) / alj(1)
         ey = clg * sum(2) / alj(2)
         et = clg * sum(3) / alj(3)
@@ -320,20 +320,20 @@
         write (iqpr2, 930) qx, qy, qs
         if (frad) write (iqpr2, 940) tune
         write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3),          &
-     &  ((gstar(j,k), j = 1, 3), k = 1, 3),                             &
-     &  ((bmax(j,k), j = 1, 3), k = 1, 3),                              &
-     &  ((gmax(j,k), j = 1, 3), k = 1, 3)
+     &((gstar(j,k), j = 1, 3), k = 1, 3),                               &
+     &((bmax(j,k), j = 1, 3), k = 1, 3),                                &
+     &((gmax(j,k), j = 1, 3), k = 1, 3)
         if (frad) then
           write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3),            &
-     &    expr, eypr, etpr
+     &expr, eypr, etpr
         endif
       else
         write (iqpr2, 920) 1, 2
         write (iqpr2, 930) qx, qy
         write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2),          &
-     &  ((gstar(j,k), j = 1, 2), k = 1, 2),                             &
-     &  ((bmax(j,k), j = 1, 2), k = 1, 2),                              &
-     &  ((gmax(j,k), j = 1, 2), k = 1, 2)
+     &((gstar(j,k), j = 1, 2), k = 1, 2),                               &
+     &((bmax(j,k), j = 1, 2), k = 1, 2),                                &
+     &((gmax(j,k), j = 1, 2), k = 1, 2)
       endif
 
 !---- RF system.
@@ -381,11 +381,11 @@
       do j = 1, 6
         do k = 1, 6
           sigma(j,k) =                                                  &
-     &    ex * (em(j,1) * em(k,1) + em(j,2) * em(k,2)) +                &
-     &    ey * (em(j,3) * em(k,3) + em(j,4) * em(k,4))
+     &ex * (em(j,1) * em(k,1) + em(j,2) * em(k,2)) +                    &
+     &ey * (em(j,3) * em(k,3) + em(j,4) * em(k,4))
           if (stabt) then
             sigma(j,k) = sigma(j,k) +                                   &
-     &      et * (em(j,5) * em(k,5) + em(j,6) * em(k,6))
+     &et * (em(j,5) * em(k,5) + em(j,6) * em(k,6))
           endif
         enddo
       enddo
@@ -436,7 +436,7 @@
       equivalence       (x2, o2(1)), (px2, o2(2))
       equivalence       (y2, o2(3)), (py2, o2(4))
       equivalence       (t2, o2(3)), (pt2, o2(4))
-      double precision  el, node_value, sk0, sk0s, tilt, bv0, bvk
+      double precision  el, node_value, tilt, bv0, bvk
       double precision  edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
       double precision  corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
       double precision  tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
@@ -449,14 +449,14 @@
       double precision  xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
       double precision  sk3, rfac, rfacx, rfacy
       double precision  get_variable, fh
-
+!      double precision  sk0, sk0s
       if (code .eq. 8)  then
 !--- multipole
         el = node_value('lrad ')
       else
         el = node_value('l ')
       endif
-      if (el. eq. zero.and.code .ne. 10) goto 500
+      if (el .eq. zero.and.code .ne. 10) goto 500
       betas = get_value('probe ','beta ')
       gammas = get_value('probe ','gamma ')
 !---- Switch on element type.
@@ -590,9 +590,9 @@
         e5sq1 = e1(5,ir)**2 + e1(5,ii)**2
         e5sq2 = e2(5,ir)**2 + e2(5,ii)**2
         e5sqs1 = two * (e1(5,ir) * (bi2gi2*e1(6,ir) - hbi*e1(1,ir))     &
-     &  + e1(5,ii) * (bi2gi2*e1(6,ii) - hbi*e1(1,ii)))
+     &+ e1(5,ii) * (bi2gi2*e1(6,ii) - hbi*e1(1,ii)))
         e5sqs2 = two * (e2(5,ir) * (bi2gi2*e2(6,ir) - hbi*e2(1,ir))     &
-     &  + e2(5,ii) * (bi2gi2*e2(6,ii) - hbi*e2(1,ii)))
+     &+ e2(5,ii) * (bi2gi2*e2(6,ii) - hbi*e2(1,ii)))
 
 !---- Integrand and its derivative w.r.t. S.
         f1 = hcb1 * e5sq1
@@ -602,7 +602,7 @@
 
 !---- Actual integration.
         sum(i) = sum(i) + half * el * (f1 + f2) -                       &
-     &  el**2 * (f2s - f1s) / twelve
+     &el**2 * (f2s - f1s) / twelve
       enddo
       go to 77
 
@@ -724,7 +724,7 @@
       do iord = 0, nd/2
         do j = 1, 2
           field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     &    / (one + deltap)
+     &/ (one + deltap)
           if (field(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
@@ -798,17 +798,17 @@
       if (n_ferr .gt. 0) call dcopy(f_errors, ferror, min(2, n_ferr))
       if(code.eq.14) then
         xkick=bv0*(node_value('kick ')+node_value('chkick ')+           &
-     &  ferror(1))
+     &ferror(1))
         ykick=zero
       else if(code.eq.15) then
         xkick=bv0*(node_value('hkick ')+node_value('chkick ')+          &
-     &  ferror(1))
+     &ferror(1))
         ykick=bv0*(node_value('vkick ')+node_value('cvkick ')+          &
-     &  ferror(2))
+     &ferror(2))
       else if(code.eq.16) then
         xkick=zero
         ykick=bv0*(node_value('kick ')+node_value('cvkick ')+           &
-     &  ferror(2))
+     &ferror(2))
       else
         xkick=zero
         ykick=zero
