@@ -2899,6 +2899,11 @@
         orbit(2) = orbit(2) - dpx + dipr * (deltap + bi*orbit(6))
         orbit(4) = orbit(4) + dpy - dipi * (deltap + bi*orbit(6))
         orbit(5) = orbit(5) - (dipr*x + dipi*y) * bi
+!---- Add the missing focussing component of thin dipoles for co
+      if(elrad.gt.zero) then
+        orbit(2) = orbit(2)-dipr*dipr/elrad*x
+        orbit(4) = orbit(4)-dipi*dipi/elrad*y
+      endif
 
 !---- Orbit not wanted.
       else
@@ -2920,6 +2925,11 @@
         re(2,3) = + di
         re(4,1) = + di
         re(4,3) = + dr
+      endif
+!---- Add the missing focussing component of thin dipoles
+      if(elrad.gt.zero) then
+        re(2,1)=re(2,1)-dipr*dipr/elrad
+        re(4,1)=re(4,1)-dipi*dipi/elrad
       endif
       re(2,6) = + dipr * bi
       re(4,6) = - dipi * bi
