@@ -2451,6 +2451,7 @@ void exec_save(struct in_cmd* cmd)
      warning("cannot open output file:", filename);
      return;
     }
+  warning("SAVE makes all previous USE invalid !", " ");
   pos = name_list_pos("sequence", nl);
   clp = cmd->clone->par->parameters[pos];
   if (nl->inform[pos] == 0)  /* no sequence given, all sequences saved */
@@ -2529,6 +2530,7 @@ void exec_save(struct in_cmd* cmd)
   sql = delete_sequence_list(sql);
   ell = delete_el_list(ell);
   varl = delete_var_list(varl);
+  current_sequ = NULL;
 }
 
 void exec_savebeta()
