@@ -5,7 +5,7 @@ MODULE madx_ptc_module
   integer :: universe=0,index=0,EXCEPTION=0
   integer ipause
   integer,external :: mypause
-  real(kind(1d0)),external :: get_value,node_value
+  real(kind(1d0)) get_value,node_value
   type(layout),pointer :: MY_RING
   type(mad_universe) m_u
   integer, private, parameter :: ndd=ndim2,mynreso=20
@@ -83,6 +83,7 @@ CONTAINS
 
   subroutine ptc_move_to_layout()
     implicit none
+    real(kind(1d0)) get_value
     integer my_index
 
     if(universe.le.0) then
@@ -115,6 +116,7 @@ CONTAINS
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
     real(dp) f_errors(0:50),aperture(100),normal(0:maxmul),skew(0:maxmul),field(2,0:maxmul)
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap,fint,fintx
+    real(kind(1d0)) get_value,node_value
     character(length) name
     character(name_len) aptype
     type(keywords) key
@@ -537,6 +539,7 @@ CONTAINS
     integer tab_name(*)
     real(dp) opt_fun(36)
     real(dp) x(6),suml,deltap0,deltap
+    real(kind(1d0)) get_value
     type(real_8) y(6)
     type(twiss) tw
     type(fibre), POINTER :: current
@@ -723,6 +726,7 @@ CONTAINS
     integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
     real(dp) x(6),deltap0,deltap
     type(real_8) y(6)
+    real(kind(1d0)) get_value
     type(normalform) n
     !------------------------------------------------------------------------------
 
@@ -790,6 +794,7 @@ CONTAINS
     implicit none
     integer i,nint,ndble,nchar,int_arr(1),char_l,mynpa,icase,turns,flag_index,why(9)
     real(dp) x0(6),x(6),deltap0,deltap
+    real(kind(1d0)) get_value
     logical(lp) closed_orbit
     character*12 char_a
     data char_a / ' ' /
