@@ -1196,7 +1196,8 @@ c          write(*,*) step, c_min, val, s_fact
       print *, text, ' variable values: ', x
       end
       subroutine mtmigr(ncon,nvar,strategy,tol,calls,call_lim,vect,     &
-     &dvect,fun_vect,w_iwa1,w_iwa2,w_iwa3,w_iwa4,w_iwa5,w_iwa6,w_iwa7)
+     &dvect,fun_vect,w_iwa1,w_iwa2,w_iwa3,w_iwa4,w_iwa5,w_iwa6,w_iwa7,  &
+     &w_iwa8)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1216,7 +1217,8 @@ c          write(*,*) step, c_min, val, s_fact
 ! icovar: functionality still unclear  HG 28.2.02
 ! ilevel: print level
       double precision tol,vect(*),dvect(*),fun_vect(*),w_iwa1(*),      &
-     &w_iwa2(*),w_iwa3(*),w_iwa4(*),w_iwa5(*),w_iwa6(*),w_iwa7(*)
+     &w_iwa2(*),w_iwa3(*),w_iwa4(*),w_iwa5(*),w_iwa6(*),w_iwa7(*),      &
+     &w_iwa8(*)
       include 'match.fi'
       external mtfcn
 
@@ -1233,11 +1235,11 @@ c          write(*,*) step, c_min, val, s_fact
       call mtgeti(nvar, vect, dvect)
       call mtmig1(mtfcn, ncon, nvar,  strategy, tol, calls, call_lim,   &
      &vect, dvect, fun_vect, w_iwa1, w_iwa2, w_iwa3, w_iwa4, w_iwa5,    &
-     &w_iwa6, w_iwa7)
+     &w_iwa6, w_iwa7, w_iwa8)
 
  9999 end
       subroutine mtmig1(fcn,nf,nx,strategy,tol,calls,call_lim,x,dx,fvec,&
-     &covar, wa,work_1,work_2,work_3,work_4,work_5)
+     &covar, wa,work_1,work_2,work_3,work_4,work_5,work_6)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1262,7 +1264,8 @@ c          write(*,*) step, c_min, val, s_fact
 ! ilevel: print level
       double precision covar(nx,nx),d,delgam,dgi,dx(nx),fvec(nf),gdel,  &
      &gssq,gvg,sum,vdot,vgi,wa(nx,7),x(nx),tol,work_1(nx),work_2(nx),   &
-     &work_3(nx),work_4(*),work_5(*),zero,one,two,half,epsmch,eps1,eps2
+     &work_3(nx),work_4(*),work_5(*),work_6(*),zero,one,two,half,epsmch,&
+     &eps1,eps2
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0,epsmch=1d-16,       &
      &eps1=1d-3,eps2=1d-4)
       include 'match.fi'
@@ -1288,7 +1291,7 @@ c          write(*,*) step, c_min, val, s_fact
       if (strategy .eq. 2  .or.  strategy.gt.2 .and. icovar.lt.2) then
         call mthess(fcn, nf, nx, calls, covar, x,                       &
      &  wa(1,mgrd), wa(1,mg2), fvec, wa(1,mvg), work_1, work_2, work_3, &
-     &  work_4, work_5)
+     &  work_4, work_5,work_6)
         npsdf = 0
       else
         call mtderi(fcn, nf, nx, calls, x, wa(1,mgrd), wa(1,mg2), fvec)
@@ -1345,7 +1348,7 @@ c          write(*,*) step, c_min, val, s_fact
         if (gdel .ge. zero) then
           if (npsdf .eq. 0) then
             call symsol(covar, nx, eflag, work_1, work_2, work_3)
-            call mtpsdf(covar, nx, work_4, work_5)
+            call mtpsdf(covar,nx,work_4,work_5,work_6)
             call symsol(covar, nx, eflag, work_1, work_2, work_3)
             npsdf = 1
             go to 200
@@ -1413,7 +1416,7 @@ c          write(*,*) step, c_min, val, s_fact
           icovar = 0
           if (npsdf .eq. 1) go to 500
           call symsol(covar, nx, eflag, work_1, work_2, work_3)
-          call mtpsdf(covar, nx, work_4, work_5)
+          call mtpsdf(covar,nx,work_4,work_5,work_6)
           call symsol(covar, nx, eflag, work_1, work_2, work_3)
           npsdf = 1
           go to 300
@@ -1452,7 +1455,7 @@ c          write(*,*) step, c_min, val, s_fact
         print *, 'verify'
         call mthess(fcn, nf, nx, calls, covar, x,                       &
      &  wa(1,mgrd), wa(1,mg2), fvec, wa(1,mvg), work_1, work_2, work_3, &
-     &  work_4, work_5)
+     &  work_4, work_5,work_6)
         npsdf = 0
         if (edm .gt. eps1 * tol) go to 100
       endif
@@ -1468,7 +1471,7 @@ c          write(*,*) step, c_min, val, s_fact
   830 format('call:',I8,3x,'Penalty function = ',e16.8)
       end
       subroutine mthess(fcn,nf,nx,calls,covar,x,grd,g2,fvec,wa,work_1,  &
-     &work_2,work_3,work_4,work_5)
+     &work_2,work_3,work_4,work_5,work_6)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1495,7 +1498,8 @@ c          write(*,*) step, c_min, val, s_fact
 ! ilevel: print level
       double precision eps,f1,f2,fij,vdot,xs1,xs2,xsave,xstep,          &
      &covar(nx,nx),x(nx),grd(nx),g2(nx),wa(nx,2),fvec(nf),work_1(nx),   &
-     &work_2(nx),work_3(nx),work_4(*),work_5(*),zero,one,two,half,epsmch
+     &work_2(nx),work_3(nx),work_4(*),work_5(*),work_6(*),zero,one,two, &
+     &half,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0,epsmch=1d-16)
       include 'match.fi'
       external fcn
@@ -1559,7 +1563,7 @@ c          write(*,*) step, c_min, val, s_fact
       call mtputi(nx, x)
 
 !---- Ensure positive definiteness and invert.
-      call mtpsdf(covar, nx, work_4, work_5)
+      call mtpsdf(covar,nx,work_4,work_5,work_6)
       call symsol(covar, nx, eflag, work_1, work_2, work_3)
 
       end
@@ -1624,7 +1628,7 @@ c          write(*,*) step, c_min, val, s_fact
       call mtputi(nx, x)
 
       end
-      subroutine mtpsdf(covar,nx,work_4,work_5)
+      subroutine mtpsdf(covar,nx,work_4,work_5,work_6)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1634,7 +1638,7 @@ c          write(*,*) step, c_min, val, s_fact
 !----------------------------------------------------------------------*
       integer i,j,nval,nx
       double precision add,pmax,pmin,covar(nx,nx),work_4(nx,nx),        &
-     &work_5(nx),one,eps,epsmch
+     &work_5(nx),work_6(nx),one,eps,epsmch
       parameter(one=1d0,eps=1d-3,epsmch=1d-16)
 
 !---- Copy matrix and find eigenvalues.
@@ -1643,7 +1647,7 @@ c          write(*,*) step, c_min, val, s_fact
           work_4(j,i) = covar(j,i)
         enddo
       enddo
-      call symeig(work_4, nx, nx, work_5, nval)
+      call symeig(work_4,nx,nx,work_5,nval,work_6)
 
 !---- Enforce positive definiteness.
       pmin = work_5(1)
