@@ -34,7 +34,7 @@ default: madx
 
 # files
 
-twissp.o: twiss.F
+twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
 	$(FC) $(FCP) -c -o twissp.o twiss.F
 
 ptc_dummy.o: ptc_dummy.F
@@ -43,31 +43,31 @@ ptc_dummy.o: ptc_dummy.F
 surveyp.o: survey.F
 	$(FC) $(FCP) -c -o surveyp.o survey.F
 
-utilp.o: util.F
+utilp.o: util.F twiss0.fi twtrr.fi
 	$(FC) $(FCP) -c -o utilp.o util.F
 
-dynapp.o: dynap.F
+dynapp.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
 	$(FC) $(FCP) -c -o dynapp.o dynap.F
 
 madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c madx.h madxl.h madxd.h madxdict.h makethin.c c6t.c c6t.h
 	$(CC) $(GCCP_FLAGS) -c -o madxnp.o madxn.c
 
-ibsdbp.o: ibsdb.F
+ibsdbp.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
 	$(FC) $(FCP) -c -o ibsdbp.o ibsdb.F
 
-plotp.o: plot.F
+plotp.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
 	$(FC) $(FCP) -c -o plotp.o plot.F
 
-trrunp.o: trrun.F
+trrunp.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
 	$(FC) $(FCP) -c -o trrunp.o trrun.F
 
 orbfp.o: orbf.F
 	$(FC) $(FCP) -c -o orbfp.o orbf.F
 
-emitp.o: emit.F
+emitp.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
 	$(FC) $(FCP) -c -o emitp.o emit.F
 
-matchp.o: match.F
+matchp.o: match.F name_len.fi match.fi 
 	$(FC) $(FCP) -c -o matchp.o match.F
 
 matchsap.o: matchsa.F
