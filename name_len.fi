@@ -1,0 +1,2 @@
+      integer name_len
+      parameter(name_len=24)

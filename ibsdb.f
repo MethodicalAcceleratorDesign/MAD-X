@@ -77,7 +77,8 @@
       implicit none
       integer i,lg,code,get_string,restart_sequ,advance_node
       double precision get_value,node_value,el,rfv,rff,rfl,deltap
-      character * 24 sequ_name,el_name
+      include 'name_len.fi'
+      character * (name_len) sequ_name,el_name
 
       lg = get_string('sequence ', 'name ', sequ_name)
       if (lg .gt. 0) print *, 'sequence name: ', sequ_name(:lg)

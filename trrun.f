@@ -35,8 +35,9 @@
       parameter(zero=0d0,one=1d0)
       character*12 tol_a, char_a
       double precision spos !hbu
+      include 'name_len.fi'
       character*4 vec_names(7) !hbu
-      character*16 el_name !hbu
+      character*(name_len) el_name !hbu
       include 'track.fi'
       include 'bb.fi'
       data tol_a,char_a / 'maxaper ', ' ' /
@@ -269,7 +270,8 @@
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
      &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
      &aperture(100),one,maxaper(6), zero
-      character*24 aptype
+      include 'name_len.fi'
+      character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
 !-- switch on element type
@@ -1266,7 +1268,8 @@
       integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
       double precision sum,z(6,*),maxaper(6),last_pos(*),               &
      &last_orbit(6,*)
-      character*14 aptype
+      include 'name_len.fi'
+      character*(name_len) aptype
       n = 1
  10   continue
       do i = n, jmax
@@ -1290,8 +1293,9 @@
       implicit none
       integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*)
-      character*14 aptype
-      character*16 el_name !hbu
+      include 'name_len.fi'
+      character*(name_len) aptype
+      character*(name_len) el_name !hbu
 
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
@@ -1332,7 +1336,8 @@
       double precision z(6,*),orbit0(6),tmp,tt,ss
       character*80 table,comment !hbu was *36 allow longer info
       integer ielem !hbu
-      character*16 el_name !hbu name of element
+      include 'name_len.fi'
+      character*(name_len) el_name !hbu name of element
       double precision spos !hbu
       character*4 vec_names(7) !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / !hbu
@@ -1411,7 +1416,8 @@
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
      &one
       parameter(one=1d0)
-      character*24 aptype
+      include 'name_len.fi'
+      character*(name_len) aptype
 
       n = 1
  10   continue

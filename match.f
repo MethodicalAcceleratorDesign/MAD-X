@@ -7,7 +7,8 @@
       parameter(s_fact=5d-1)
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
-      character*24 name
+      include 'name_len.fi'
+      character*(name_len) name
 
  1    continue
       j = next_vary(name,name_l,c_min,c_max,step)
@@ -46,7 +47,8 @@ c          write(*,*) step, c_min, val, s_fact
       parameter(s_fact=5d-1)
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
-      character*24 name
+      include 'name_len.fi'
+      character*(name_len) name
 
  1    continue
       j = next_vary(name,name_l,c_min,c_max,step)
@@ -78,7 +80,8 @@ c          write(*,*) step, c_min, val, s_fact
      &char_from_table,name_l
       parameter(name_l=24)
       double precision fsum,fvect(*),val,value,c_min,c_max,weight,f_val
-      character*24 name,node_name
+      include 'name_len.fi'
+      character*(name_len) name,node_name
 
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
@@ -188,7 +191,8 @@ c          write(*,*) step, c_min, val, s_fact
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,s_fact
       parameter(s_fact=5d-1)
-      character*24 name
+      include 'name_len.fi'
+      character*(name_len) name
 
  1    continue
       j=next_vary(name,name_l,c_min,c_max,step)
