@@ -1,6 +1,5 @@
 * text=auto !eol
 /Makefile -text
-/Makefile_here -text
 /bb.fi -text
 /c6t.c -text
 /c6t.h -text
