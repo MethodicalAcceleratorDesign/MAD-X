@@ -30,6 +30,7 @@
 #define MATCH_WORK 10       /* no. of work spaces in matching */
 #define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
 #define MAXARRAY 1000       /* max. length of apex tables in aperture module*/
+#define E_D_MAX 100         /* max. length of extra displacement tables */
 
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",

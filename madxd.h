@@ -749,8 +749,9 @@ void aper_adj_halo_si(double, double, double, double, double, double*,
 int aper_bs(char*, double*, double*, double*, double*, int*, double*, double*);
 double aper_calc(double, double, double*, double*, double*, 
 		 int, double*, double*, double*, double*,
-		 double*, double*, int, double, double);
+		 double*, double*, int, double);
 int aper_chk_inside(double, double, double*, double*, double, int);
+int aper_e_d_read(char*, struct aper_e_d*, int*, char*);
 int aper_external_file(char*, double*, double*);
 void aper_fill_quads(double*, double*, int, int*);
 void aper_header(struct table*, struct aper_node*);
@@ -762,6 +763,8 @@ void aper_race(double, double, double, double, double*, double*);
 void aper_read_twiss(char*, int*, double*, double*, double*,
 			double*, double*, double*, double*);
 int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
+void aper_surv(double*, int);
+int aper_tab_search(int, struct aper_e_d*, char*, int*);
 void aper_trim_ws(char*, int);
 void aper_write_table(char*, double*, double*, double*, double*, double*, double*,
 			   char*, double*, double*, double*, double*,

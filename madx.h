@@ -8,6 +8,13 @@ struct aper_node		/* aperture limit node */
   double aper_tol[3];
 };
 
+struct aper_e_d			/* element displacement */
+{
+  char name[NAME_L];		/* element name */
+  int curr;			/* # of rows */
+  double tab[E_D_MAX][3];	/* the table of read values */
+};
+
 struct char_array           /* dynamic array of char */
 {
   int stamp;
