@@ -437,6 +437,23 @@
           apy = aperture(2)
           call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
      &    last_pos, last_orbit, track, ktrack,al_errors)
+!------------  rectellipse case ----------------------------------
+        else if(aptype.eq.'rectellipse') then
+!*****         test ellipse
+          apx = aperture(1)
+          apy = aperture(2)
+          call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
+!*****         test rectangle
+          apx = aperture(3)
+          apy = aperture(4)
+          call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
+     &    last_pos, last_orbit, track, ktrack,al_errors)
+!       print*, " test apertures"
+!       print*, "      apx=",apx, " apy=",apy," apxell=",apxell,
+!     &         " apyell=",apyell
+!          call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
+!     &    last_pos, last_orbit, track, ktrack,al_errors)
         endif
       endif
 !----  END OF IF(APERFLAG)  ----------------
@@ -1574,8 +1591,8 @@
  98     continue
       enddo
       end
-      subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
 
+      subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
       implicit none
 #ifdef _WIN32
       include 'win32calls.fi'
