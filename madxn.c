@@ -4851,7 +4851,7 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
 {
   char c, cp, cpnb = ' ', quote;
   int k, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
-  int left_b = 0, in_num = 0, c_digit = 0, f_equal = 0, comm_cnt = 0;
+  int left_b = 0, in_num = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
   for (k = 0; k < sl; k++)
    {
     c = inbuf[k];
