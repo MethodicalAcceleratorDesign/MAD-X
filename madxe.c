@@ -40,12 +40,12 @@ void pro_error(struct in_cmd* cmd)
 void error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
-    if(efield_table == NULL) {
+//  if(efield_table == NULL) {
        efield_table = make_table("efield", efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
        pro_error_make_efield_table();
-    }
+//  }
     ef_table_file = command_par_string("file",cmd->clone);
     out_table("efield",efield_table,ef_table_file);
 }
@@ -56,8 +56,8 @@ void error_ealign(struct in_cmd* cmd)
   struct node *nextnode;
   int i;
   int chcount[3] = {0,0,0};
-  double val[10] = {0,0,0,0,0,0,0,0,0,0};
-  static char att[8][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey"};
+  double val[ALIGN_MAX] = {0,0,0,0,0,0,0,0,0,0,0,0};
+  static char att[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey"};
 
   struct command_parameter_list* pl = current_error->par;
   struct sequence* mysequ = current_sequ;
@@ -79,7 +79,7 @@ void error_ealign(struct in_cmd* cmd)
               chcount[1]++;
           }
         }
-          for(i=0;i<8;i++){
+          for(i=0;i<ALIGN_MAX;i++){
                val[i] = pl->parameters[i]->double_value;
                if(pl->parameters[i]->expr != NULL) {
                   if(pl->parameters[i]->expr->status != 1) {
@@ -109,7 +109,7 @@ void error_eprint(struct in_cmd* cmd)
 {
   struct node *ndexe;
   struct node *nextnode;
-  static char pln_alig[8][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey"};
+  static char pln_alig[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey"};
 
   int i;
   struct sequence* mysequ = current_sequ;
@@ -125,10 +125,11 @@ void error_eprint(struct in_cmd* cmd)
  //   if(nextnode->sel_err == 1) {
        if(nextnode->p_al_err != NULL) {
          fprintf(prt_file, "\n\nAlignment errors for element %s \n",nextnode->name);
-         fprintf(prt_file, "\nDisplacements in [mm], rotations in [mrad] \n");
-         fprintf(prt_file, " %6s %10s %12s %10s %10s %10s %10s %10s\n",
+         fprintf(prt_file,"\nDisplacements in [mm], rotations in [mrad] \n");
+         fprintf(prt_file," %6s %10s %12s %10s %10s %10s %10s %10s %10s %10s %10s %10s\n",
                   pln_alig[0], pln_alig[1],pln_alig[2],pln_alig[3],
-                  pln_alig[4], pln_alig[5],pln_alig[6],pln_alig[7]);
+                  pln_alig[4], pln_alig[5],pln_alig[6],pln_alig[7],
+                  pln_alig[8], pln_alig[9],pln_alig[10],pln_alig[11]);
          for(i=0;i<nextnode->p_al_err->curr;i++) {
             fprintf(prt_file, "%10.6f ",1000.0*nextnode->p_al_err->a[i]);
          }
@@ -138,6 +139,7 @@ void error_eprint(struct in_cmd* cmd)
        if(nextnode->p_fd_err != NULL) {
          mycount++;
          if(mycount <= 50000) {
+         fprintf(prt_file,"%s %d\n",nextnode->name,nextnode->p_fd_err);
          fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
          fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
   /*     for(i=0;i<nextnode->p_fd_err->curr;i++) { */
@@ -460,8 +462,7 @@ void pro_error_make_efield_table()
   nend = mysequ->ex_end;
 
       while (nanf != nend) {
-        if(nanf->p_fd_err != NULL) {
-//      if(nanf->sel_err == 1) {
+        if((nanf->sel_err == 1) && (nanf->p_fd_err != NULL)) {
            string_to_table("efield","name",nanf->name);
 /* */
            for (j=1; j < ttb->num_cols; j++) {
