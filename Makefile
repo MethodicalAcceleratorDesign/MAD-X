@@ -38,8 +38,6 @@ madxnp.o: madxn.c madxu.c madxe.c madxc.c matchc.c madx.h madxl.h madxd.h madxdi
 
 madx: madxnp.o twissp.o surveyp.o orbfp.o utilp.o matchp.o dynapp.o plotp.o ibsdbp.o trrunp.o $(GLIB)/gxx11.o $(GLIB)/gxx11c.o
 	$(FC) $(FP) -o madx madxm.f madxnp.o twissp.o matchp.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o utilp.o $(GLIB)/gxx11.o $(GLIB)/gxx11c.o $(LIBX) -lm -lc
-	cp madx $(GPUB)
-	rm madx
 
 ibsdbp.o: ibsdb.f
 	$(FC) $(FCP) -c -o ibsdbp.o ibsdb.f
