@@ -2101,9 +2101,13 @@ void exec_plot(struct in_cmd* cmd)
 #ifndef _WIN32
   if (nt && current_sequ != NULL) title = current_sequ->name;
   pesopt_(&ierr);
-  if (ierr == 0) pefill_(&ierr);
   if (ierr == 0)
     {
+     adjust_beam();
+     probe_beam = clone_command(current_beam);
+     adjust_probe(zero); /* sets correct gamma, beta, etc. */
+     adjust_rfc(); /* sets freq in rf-cavities from probe */
+     pefill_(&ierr);
      pemima_();
      plotit_(&plots_made);
      plots_made = 1;
@@ -7689,6 +7693,11 @@ void store_node_value(char* par, double* value)
   else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
   else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
   else if (strcmp(lpar, "enable") == 0) current_node->enable = *value;
+  else if (strcmp(lpar, "e2") == 0) 
+    {
+      struct element* el = current_node->p_elem;
+      store_comm_par_value("e2",*value,el->def);
+    }
 }
 
 void store_node_vector(char* par, int* length, double* vector)
