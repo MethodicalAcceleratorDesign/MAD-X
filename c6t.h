@@ -45,6 +45,7 @@ struct c6t_element
   double* value;           /* element strength etc. values */
   struct object* p_al_err; /* pointer to alignment error object */
   struct object* p_fd_err; /* pointer to field error object */
+  int tilt_err;            /* allow write_f8 to dump tilt as well */
 };
 
 struct c6t_el_list /* contains list of element pointers */
