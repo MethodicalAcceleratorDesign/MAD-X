@@ -229,40 +229,34 @@ char summ_table_cols[][TABLE_KEY] =
 
 int trackone_table_types[] =
 {
-1, 1, 2, 2, 2, 2,
-2, 2
+1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 
 char trackone_table_cols[][TABLE_KEY] =
 {
-"turn", "number", "x", "px", "y", "py",
-"t", "pt",
+"number", "turn", "x", "px", "y", "py", "t", "pt", "s",
 " "  /* blank terminates */
 };
 
 int track_table_types[] =
 {
-1, 2, 2, 2, 2,
-2, 2
+1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 
 char track_table_cols[][TABLE_KEY] =
 {
-"turn", "x", "px", "y", "py",
-"t", "pt",
+"number", "turn", "x", "px", "y", "py", "t", "pt", "s",
 " "  /* blank terminates */
 };
 
 int tracksumm_table_types[] =
 {
-1, 1, 2, 2, 2, 2,
-2, 2
+1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 
 char tracksumm_table_cols[][TABLE_KEY] =
 {
-"number", "turn", "x", "px", "y", "py",
-"t", "pt",
+"number", "turn", "x", "px", "y", "py", "t", "pt", "s",
 " "  /* blank terminates */
 };
 
