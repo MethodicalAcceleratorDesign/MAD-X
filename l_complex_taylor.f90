@@ -19,7 +19,7 @@ module complex_taylor
   private set_in_complex   !, assc  !check,
   private dimagt,drealt,dcmplxt,CEQUAL,DEQUAL,REQUAL
   private GETCHARnd2,GETintnd2,GETint
-  private CFUC,CFURES
+  private CFUC,CFURES,varco,varco1
   !  completing tpsa.f90
   private datantt,dasintt,dacostt,full_abstpsat
   integer,private::NO,ND,ND2,NP,NDPT,NV           !,lastmaster 2002.12.13
@@ -41,31 +41,168 @@ module complex_taylor
      MODULE PROCEDURE Iequaldacon
   end  INTERFACE
 
-  INTERFACE full_abs
-     MODULE PROCEDURE full_abstpsat
-  END INTERFACE
-  INTERFACE abs
-     MODULE PROCEDURE abstpsat
-  END INTERFACE
-  INTERFACE dabs
-     MODULE PROCEDURE abstpsat
-  END INTERFACE
-
-  INTERFACE OPERATOR (*)
-     MODULE PROCEDURE mul
-     MODULE PROCEDURE tmul
-     MODULE PROCEDURE mult
-     MODULE PROCEDURE  cscmul
-     MODULE PROCEDURE  ctmul
-     MODULE PROCEDURE  dscmul
-     MODULE PROCEDURE  cmulsc
-     MODULE PROCEDURE  cmult
-     MODULE PROCEDURE  dmulsc
-     MODULE PROCEDURE mulsc
-     MODULE PROCEDURE scmul
-     MODULE PROCEDURE imulsc
-     MODULE PROCEDURE iscmul
-  END INTERFACE
+  !@     <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="684" height="445">
+  !@       <tr>
+  !@         <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +</b>&nbsp;&nbsp;&nbsp; </font></span></td>
+  !@         <td width="193" height="40" align="center" colspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="288" height="40" align="center" colspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="95" height="82" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="88" height="39" align="center">
+  !@         <p>
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></p>
+  !@         </td>
+  !@         <td width="105" height="42" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(dp)</font></span></td>
+  !@         <td width="88" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="101" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@         <td width="100" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="109" align="center" rowspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></td>
+  !@         <td width="84" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#ADD" style="text-decoration: none; font-weight: 700">ADD</a></font></td>
+  !@         <td width="105" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CADDSC" style="text-decoration: none; font-weight: 700">CADDSC</a></font></td>
+  !@         <td width="92" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#ADDT" style="text-decoration: none; font-weight: 700">
+  !@         ADDT</a></font></td>
+  !@         <td width="102" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DADDSC" style="text-decoration: none; font-weight: 700">DADDSC</a></font></td>
+  !@         <td width="99" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#ADDSC" style="text-decoration: none; font-weight: 700">ADDSC</a></font></td>
+  !@         <td width="94" height="53" align="center"><font size="2">
+  !@         <a href="l_complex_taylor.htm#IADDSC" style="text-decoration: none; font-weight: 700">
+  !@         IADDSC</a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CSCADD" style="text-decoration: none; font-weight: 700">CSCADD</a></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="92" height="55" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CADDT" style="text-decoration: none; font-weight: 700">
+  !@         CADDT</a></font></td>
+  !@         <td width="102" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="99" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="171" align="center" rowspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="84" height="50" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#TADD" style="text-decoration: none; font-weight: 700">TADD</a></font></td>
+  !@         <td width="105" height="50" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CTADD" style="text-decoration: none; font-weight: 700">CTADD</a></font></td>
+  !@         <td width="92" height="50" align="center">
+  !@            <span style="text-transform: uppercase; ">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#ADD" style="text-decoration: none; font-style:italic">
+  !@         <font color="#FF0000">add</font></a></font></span></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase; ">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#DADDSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">daddsc</font></a></font></span></td>
+  !@            <td width="78" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#ADDSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">ADDSC</font></a></font></td>
+  !@            <td width="56" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <font color="#FF0000">&nbsp;&nbsp; </font>
+  !@            <a href="i_tpsa.htm#IADDSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">IADDSC</font></a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DSCADD" style="text-decoration: none; font-weight: 700">DSCADD</a></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase; ">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#DSCADD" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">dscadd</font></a></font></span></td>
+  !@         <td width="102" height="55" align="center"><b>F90</b></td>
+  !@         <td width="99" height="55" align="center"><b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@         <td width="84" height="52" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#SCADD" style="text-decoration: none; font-weight: 700">
+  !@         SCADD</a></font></td>
+  !@         <td width="105" height="52" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#SCADD" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">SCADD</font></a></font></td>
+  !@         <td width="102" height="52" align="center"><b>F90</b></td>
+  !@         <td width="99" height="52" align="center"><b>F90</b></td>
+  !@         <td width="94" height="52" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="78" height="56" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@         <td width="84" height="61" align="center"><font size="2">
+  !@         <a href="l_complex_taylor.htm#ISCADD" style="text-decoration: none; font-weight: 700">ISCADD</a></font></td>
+  !@         <td width="105" height="61" align="center"><b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#ISCADD" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">ISCADD</font></a></font></td>
+  !@         <td width="102" height="61" align="center"><b>F90</b></td>
+  !@         <td width="99" height="61" align="center"><b>F90</b></td>
+  !@         <td width="94" height="61" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@     </table>
+  !@
 
   INTERFACE OPERATOR (+)
      MODULE PROCEDURE add
@@ -84,23 +221,170 @@ module complex_taylor
      MODULE PROCEDURE iscadd
   END INTERFACE
 
+  !@     <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber2" width="684" height="445">
+  !@       <tr>
+  !@         <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  !@         -</b>&nbsp;&nbsp; </font></span></td>
+  !@         <td width="193" height="40" align="center" colspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="288" height="40" align="center" colspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="95" height="82" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="88" height="39" align="center">
+  !@         <p>
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></p>
+  !@         </td>
+  !@         <td width="105" height="42" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(dp)</font></span></td>
+  !@         <td width="88" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="101" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@         <td width="100" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="109" align="center" rowspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></td>
+  !@         <td width="84" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="l_complex_taylor.htm#SUBS">SUBS</a></font></td>
+  !@         <td width="105" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="l_complex_taylor.htm#CSUBSC">CSUBSC</a></font></td>
+  !@         <td width="92" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="l_complex_taylor.htm#SUBT">SUBT</a></font></td>
+  !@         <td width="102" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DSUBSC" style="text-decoration: none; font-weight:700">DSUBSC</a></font></td>
+  !@         <td width="99" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#SUBSC" style="text-decoration: none; font-weight:700">SUBSC</a></font></td>
+  !@         <td width="94" height="53" align="center"><font size="2">
+  !@         <a href="l_complex_taylor.htm#ISUBSC" style="text-decoration: none; font-weight:700">ISUBSC</a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@          <ahref="l_complex_taylor.htm#CSCSUB" style="text-decoration: none; font-weight:700">
+  !@          <font size="2">
+  !@         <a href="l_complex_taylor.htm#CSCSUB" style="text-decoration: none; font-weight: 700">CSCSUB</a></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="92" height="55" align="center">
+  !@         <ahref="l_complex_taylor.htm#CSUBT" style="text-decoration: none">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CSUBT" style="text-decoration: none"><b>CSUBT</b></a></a></font></td>
+  !@         <td width="102" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="99" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="171" align="center" rowspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="84" height="50" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#TSUB" style="text-decoration: none; font-weight:700">TSUB</a></font></td>
+  !@         <td width="105" height="50" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="l_complex_taylor.htm#CTSUB">
+  !@         CTSUB</a></font></td>
+  !@         <td width="92" height="50" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#SUBS">
+  !@         <font color="#FF0000">SUBS</font></a></font></span></td>
+  !@            <td width="77" height="20" align="center">
+  !@             <span style="text-transform: uppercase">
+  !@             <font face="Times New Roman" size="2">
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#DSUBSC">
+  !@            <font color="#FF0000">dSUBsc</font></a></font></span></td>
+  !@            <td width="78" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#SUBSC">
+  !@             <font color="#FF0000">SUBSC</font></a></font></td>
+  !@            <td width="56" height="20" align="center">
+  !@             <font size="2" face="Times New Roman">
+  !@            <font color="#FF0000">&nbsp;&nbsp;
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="#F
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <ahref="l_complex_taylor.htm#DSCSUB" style="text-decoration: none; font-weight:700">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DSCSUB" style="text-decoration: none; font-weight: 700">DSCSUB</a></a></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#DSCSUB">
+  !@            <font color="#FF0000">dscSUB</font></a></font></span></td>
+  !@         <td width="102" height="55" align="center"><b>F90</b></td>
+  !@         <td width="99" height="55" align="center"><b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@         <td width="84" height="52" align="center">
+  !@         <ahref="l_complex_taylor.htm#SCSUB" style="text-decoration: none; font-weight:700">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#SCSUB" style="text-decoration: none; font-weight: 700">SCSUB</a></a></font></td>
+  !@         <td width="105" height="52" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#SCSUB">
+  !@            <font color="#FF0000">SCSUB</font></a></font></td>
+  !@         <td width="102" height="52" align="center"><b>F90</b></td>
+  !@         <td width="99" height="52" align="center"><b>F90</b></td>
+  !@         <td width="94" height="52" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="78" height="56" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@         <td width="84" height="61" align="center">
+  !@         <ahref="l_complex_taylor.htm#ISCSUB" style="text-decoration: none; font-weight:700"><font size="2">
+  !@          <a href="l_complex_taylor.htm#ISCSUB" style="text-decoration: none; font-weight: 700">ISCSUB</a></font></td>
+  !@         <td width="105" height="61" align="center"><b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#ISCSUB" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">ISCSUB</font></a></font></td>
+  !@         <td width="102" height="61" align="center"><b>F90</b></td>
+  !@         <td width="99" height="61" align="center"><b>F90</b></td>
+  !@         <td width="94" height="61" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@     </table>
 
-
-  INTERFACE OPERATOR (/)
-     MODULE PROCEDURE div
-     MODULE PROCEDURE divt
-     MODULE PROCEDURE tdiv
-     MODULE PROCEDURE ctdiv
-     MODULE PROCEDURE cdivt
-     MODULE PROCEDURE ddivsc
-     MODULE PROCEDURE cdivsc
-     MODULE PROCEDURE dscdiv
-     MODULE PROCEDURE cscdiv
-     MODULE PROCEDURE divsc
-     MODULE PROCEDURE scdiv
-     MODULE PROCEDURE idivsc
-     MODULE PROCEDURE iscdiv
-  END INTERFACE
 
   INTERFACE OPERATOR (-)
      MODULE PROCEDURE unarySUB
@@ -119,12 +403,376 @@ module complex_taylor
      MODULE PROCEDURE iscsub
   END INTERFACE
 
+  !@     <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber3" width="684" height="445">
+  !@       <tr>
+  !@         <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+  !@         *&nbsp;&nbsp; </font></span></td>
+  !@         <td width="193" height="40" align="center" colspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="288" height="40" align="center" colspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="95" height="82" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="88" height="39" align="center">
+  !@         <p>
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></p>
+  !@         </td>
+  !@         <td width="105" height="42" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(dp)</font></span></td>
+  !@         <td width="88" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="101" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@         <td width="100" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="109" align="center" rowspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></td>
+  !@         <td width="84" height="53" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#MUL" style="text-decoration: none">MUL</a></font></b></td>
+  !@         <td width="105" height="53" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#CMULSC" style="text-decoration: none">CMULSC</a></font></b></td>
+  !@         <td width="92" height="53" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#MULT" style="text-decoration: none">MULT</a></font></b></td>
+  !@         <td width="102" height="53" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#DMULSC" style="text-decoration: none">DMULSC</a></font></b></td>
+  !@         <td width="99" height="53" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#MULSC" style="text-decoration: none">MULSC</a></font></b></td>
+  !@         <td width="94" height="53" align="center"><b><font size="2">
+  !@         <a href="l_complex_taylor.htm#IMULSC" style="text-decoration: none">IMULSC</a></font></b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#CSCMUL" style="text-decoration: none">CSCMUL</a></font></b></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="92" height="55" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#CMULT" style="text-decoration: none">CMULT</a></font></b></td>
+  !@         <td width="102" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="99" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="171" align="center" rowspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="84" height="50" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#TMUL" style="text-decoration: none">TMUL</a></font></b></td>
+  !@         <td width="105" height="50" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#CTMUL" style="text-decoration: none">CTMUL</a></font></b></td>
+  !@         <td width="92" height="50" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#MUL" style="text-decoration: none; font-style:italic">
+  !@         <font color="#FF0000">MUL</font></a></font></span></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#DMULSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">dMULsc</font></a></font></span></td>
+  !@            <td width="78" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#MULSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">MULSC</font></a></font></td>
+  !@            <td width="56" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <font color="#FF0000">&nbsp;&nbsp; </font>
+  !@            <a href="i_tpsa.htm#IMULSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">IMULSC</font></a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#DSCMUL" style="text-decoration: none">DSCMUL</a></font></b></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#DSCMUL" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">dscMUL</font></a></font></span></td>
+  !@         <td width="102" height="55" align="center"><b>F90</b></td>
+  !@         <td width="99" height="55" align="center"><b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@         <td width="84" height="52" align="center">
+  !@         <b>
+  !@         <font size="2"><a href="l_complex_taylor.htm#SCMUL" style="text-decoration: none">SCMUL</a></font></b></td>
+  !@         <td width="105" height="52" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#SCMUL" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">SCMUL</font></a></font></td>
+  !@         <td width="102" height="52" align="center"><b>F90</b></td>
+  !@         <td width="99" height="52" align="center"><b>F90</b></td>
+  !@         <td width="94" height="52" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="78" height="56" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@         <td width="84" height="61" align="center"><b><font size="2">
+  !@         <a href="l_complex_taylor.htm#ISCMUL" style="text-decoration: none">ISCMUL</a></font></b></td>
+  !@         <td width="105" height="61" align="center"><b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2" face="Times New Roman">
+  !@            <a href="i_tpsa.htm#ISCMUL" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">ISCMUL</font></a></font></td>
+  !@         <td width="102" height="61" align="center"><b>F90</b></td>
+  !@         <td width="99" height="61" align="center"><b>F90</b></td>
+  !@         <td width="94" height="61" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@    </table>
+
+
+  INTERFACE OPERATOR (*)
+     MODULE PROCEDURE mul
+     MODULE PROCEDURE tmul
+     MODULE PROCEDURE mult
+     MODULE PROCEDURE  cscmul
+     MODULE PROCEDURE  ctmul
+     MODULE PROCEDURE  dscmul
+     MODULE PROCEDURE  cmulsc
+     MODULE PROCEDURE  cmult
+     MODULE PROCEDURE  dmulsc
+     MODULE PROCEDURE mulsc
+     MODULE PROCEDURE scmul
+     MODULE PROCEDURE imulsc
+     MODULE PROCEDURE iscmul
+  END INTERFACE
+
+  !@     <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber4" width="684" height="445">
+  !@       <tr>
+  !@         <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+  !@         /&nbsp; </font></span></td>
+  !@         <td width="193" height="40" align="center" colspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="288" height="40" align="center" colspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="95" height="82" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="88" height="39" align="center">
+  !@         <p>
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></p>
+  !@         </td>
+  !@         <td width="105" height="42" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(dp)</font></span></td>
+  !@         <td width="88" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="101" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@         <td width="100" height="39" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="109" align="center" rowspan="2">
+  !@         <font size="2">COMPLEX</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX TAYLOR</font></span></td>
+  !@         <td width="84" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DIV" style="text-decoration: none; font-weight:700">DIV</a></font></td>
+  !@         <td width="105" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CDIVSC" style="text-decoration: none; font-weight:700">CDIVSC</a></font></td>
+  !@         <td width="92" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DIVT" style="text-decoration: none; font-weight:700">DIVT</a></font></td>
+  !@         <td width="102" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DDIVSC" style="text-decoration: none; font-weight:700">DDIVSC</a></font></td>
+  !@         <td width="99" height="53" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DIVSC" style="text-decoration: none; font-weight:700">DIVSC</a></font></td>
+  !@         <td width="94" height="53" align="center"><font size="2">
+  !@         <a href="l_complex_taylor.htm#IDIVSC" style="text-decoration: none; font-weight:700">IDIVSC</a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@          <font size="2">
+  !@          <a href="l_complex_taylor.htm#CSCDIV" style="text-decoration: none; font-weight:700">CSCDIV</a></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="92" height="55" align="center">
+  !@          <font size="2">
+  !@          <a href="l_complex_taylor.htm#CDIVT" style="text-decoration: none; font-weight:700">CDIVT</a></font></td>
+  !@         <td width="102" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="99" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="171" align="center" rowspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="39" height="54" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">TAYLOR</font></span></td>
+  !@         <td width="84" height="50" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#TDIV" style="text-decoration: none; font-weight:700">TDIV</a></font></td>
+  !@         <td width="105" height="50" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#CTDIV" style="text-decoration: none; font-weight:700">CTDIV</a></font></td>
+  !@         <td width="92" height="50" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#DIV" style="text-decoration: none; font-style:italic">
+  !@         <font color="#FF0000">div</font></a></font></span></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@             <font face="Times New Roman" size="2">
+  !@             <a href="i_tpsa.htm#DDIVSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">dDIVsc</font></a></font></span></td>
+  !@            <td width="78" height="20" align="center">
+  !@            <font size="2">
+  !@            <a href="i_tpsa.htm#DIVSC" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">DIVSC</font></a></font></td>
+  !@            <td width="56" height="20" align="center">
+  !@            <font size="2">
+  !@             <font color="#FF0000">&nbsp;&nbsp;&nbsp;&nbsp; </font>
+  !@             <a href="i_tpsa.htm#IDIVSC" style="text-decoration: none; font-style:italic">
+  !@             <font color="#FF0000">IDIVSC</font></a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2">
+  !@         <a href="l_complex_taylor.htm#DSCDIV" style="text-decoration: none; font-weight:700">DSCDIV</a></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <span style="text-transform: uppercase">
+  !@            <font face="Times New Roman" size="2">
+  !@            <a href="i_tpsa.htm#DSCDIV" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">dscDIV</font></a></font></span></td>
+  !@         <td width="102" height="55" align="center"><b>F90</b></td>
+  !@         <td width="99" height="55" align="center"><b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="56" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@         <td width="84" height="52" align="center">
+  !@          <font size="2">
+  !@          <a href="l_complex_taylor.htm#SCDIV" style="text-decoration: none; font-weight:700">SCDIV</a></font></td>
+  !@         <td width="105" height="52" align="center">
+  !@         <b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2">
+  !@             <a href="i_tpsa.htm#SCDIV" style="text-decoration: none; font-style:italic">
+  !@            <font color="#FF0000">SCDIV</font></a></font></td>
+  !@         <td width="102" height="52" align="center"><b>F90</b></td>
+  !@         <td width="99" height="52" align="center"><b>F90</b></td>
+  !@         <td width="94" height="52" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="78" height="56" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@         <td width="84" height="61" align="center"><font size="2">
+  !@         <a href="l_complex_taylor.htm#ISCDIV" style="text-decoration: none; font-weight:700">
+  !@         ISCDIV</a></font></td>
+  !@         <td width="105" height="61" align="center"><b>F90</b></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <font size="2">
+  !@             <a href="i_tpsa.htm#ISCDIV" style="text-decoration: none; font-style:italic">
+  !@             <font color="#FF0000">ISCDIV</font></a></font></td>
+  !@         <td width="102" height="61" align="center"><b>F90</b></td>
+  !@         <td width="99" height="61" align="center"><b>F90</b></td>
+  !@         <td width="94" height="61" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@     </table>
+
+
+  INTERFACE OPERATOR (/)
+     MODULE PROCEDURE div
+     MODULE PROCEDURE divt
+     MODULE PROCEDURE tdiv
+     MODULE PROCEDURE ctdiv
+     MODULE PROCEDURE cdivt
+     MODULE PROCEDURE ddivsc
+     MODULE PROCEDURE cdivsc
+     MODULE PROCEDURE dscdiv
+     MODULE PROCEDURE cscdiv
+     MODULE PROCEDURE divsc
+     MODULE PROCEDURE scdiv
+     MODULE PROCEDURE idivsc
+     MODULE PROCEDURE iscdiv
+  END INTERFACE
 
 
   INTERFACE OPERATOR (**)
      MODULE PROCEDURE POW
      MODULE PROCEDURE POWR
      MODULE PROCEDURE POWR8
+  END INTERFACE
+
+  ! New Operators
+
+  INTERFACE OPERATOR (.var.)
+     MODULE PROCEDURE varco
+     MODULE PROCEDURE varco1
+  END INTERFACE
+
+  INTERFACE OPERATOR (.mono.)
+     MODULE PROCEDURE dputint     !@1 Accepts J(nv) </br>
+     MODULE PROCEDURE dputchar  !@1 Accepts String such as '12 </br>
   END INTERFACE
 
   INTERFACE OPERATOR (.d.)
@@ -145,16 +793,17 @@ module complex_taylor
      MODULE PROCEDURE CUTORDER
   END INTERFACE
 
-  INTERFACE OPERATOR (.mono.)
-     MODULE PROCEDURE dputchar
-     MODULE PROCEDURE dputint
-  END INTERFACE
 
   INTERFACE OPERATOR (.PAR.)
      MODULE PROCEDURE getcharnd2
      MODULE PROCEDURE GETintnd2
   END INTERFACE
 
+  ! Intrinsic Routines
+
+  INTERFACE aimag
+     MODULE PROCEDURE dimagt
+  END INTERFACE
   INTERFACE dimag
      MODULE PROCEDURE dimagt
   END INTERFACE
@@ -162,68 +811,24 @@ module complex_taylor
   INTERFACE dble
      MODULE PROCEDURE drealt
   END INTERFACE
-
-  INTERFACE aimag
-     MODULE PROCEDURE dimagt
-  END INTERFACE
-
   INTERFACE dreal
      MODULE PROCEDURE drealt
   END INTERFACE
 
-  INTERFACE ass
-     MODULE PROCEDURE assc
+  INTERFACE cmplx
+     MODULE PROCEDURE dcmplxt
   END INTERFACE
-
-  INTERFACE var
-     MODULE PROCEDURE varc
-     MODULE PROCEDURE varcC
-  END INTERFACE
-
-  INTERFACE shiftda
-     MODULE PROCEDURE shiftc
-  END INTERFACE
-
-  INTERFACE pok
-     MODULE PROCEDURE pokc
-  END INTERFACE
-
-  INTERFACE pek
-     MODULE PROCEDURE pekc
-  END INTERFACE
-
-  INTERFACE CFU
-     MODULE PROCEDURE CFUC
-     MODULE PROCEDURE CFURES
-  END INTERFACE
-
-  INTERFACE alloc
-     MODULE PROCEDURE alloccomplex
-     MODULE PROCEDURE a_opt
-     MODULE PROCEDURE alloccomplexn
+  INTERFACE dcmplx
+     MODULE PROCEDURE dcmplxt
   END INTERFACE
 
 
-  INTERFACE kill
-     MODULE PROCEDURE killcomplex
-     MODULE PROCEDURE k_opt
-     MODULE PROCEDURE killcomplexn
-  END INTERFACE
 
-  INTERFACE daprint
-     MODULE PROCEDURE printcomplex
+  INTERFACE abs
+     MODULE PROCEDURE abstpsat
   END INTERFACE
-
-  INTERFACE dainput
-     MODULE PROCEDURE inputcomplex
-  END INTERFACE
-
-  INTERFACE print
-     MODULE PROCEDURE printcomplex
-  END INTERFACE
-
-  INTERFACE read
-     MODULE PROCEDURE inputcomplex
+  INTERFACE dabs
+     MODULE PROCEDURE abstpsat
   END INTERFACE
 
   INTERFACE log
@@ -239,51 +844,46 @@ module complex_taylor
      MODULE PROCEDURE logtpsat
   END INTERFACE
 
-  INTERFACE dcmplx
-     MODULE PROCEDURE dcmplxt
-  END INTERFACE
 
-  INTERFACE cmplx
-     MODULE PROCEDURE dcmplxt
-  END INTERFACE
-
-
-  INTERFACE datan
-     MODULE PROCEDURE datant
-     MODULE PROCEDURE datantt
-  END INTERFACE
   INTERFACE atan
      MODULE PROCEDURE datant
      MODULE PROCEDURE datantt
   END INTERFACE
-
-  INTERFACE dasin
-     MODULE PROCEDURE dasint
-     MODULE PROCEDURE dasintt
+  INTERFACE datan
+     MODULE PROCEDURE datant
+     MODULE PROCEDURE datantt
   END INTERFACE
+
   INTERFACE asin
      MODULE PROCEDURE dasint
      MODULE PROCEDURE dasintt
   END INTERFACE
-
-  INTERFACE dacos
-     MODULE PROCEDURE dacost
-     MODULE PROCEDURE dacostt
+  INTERFACE dasin
+     MODULE PROCEDURE dasint
+     MODULE PROCEDURE dasintt
   END INTERFACE
+
   INTERFACE acos
      MODULE PROCEDURE dacost
      MODULE PROCEDURE dacostt
   END INTERFACE
-
-  INTERFACE dtan
-     MODULE PROCEDURE tant
+  INTERFACE dacos
+     MODULE PROCEDURE dacost
+     MODULE PROCEDURE dacostt
   END INTERFACE
 
   INTERFACE tan
      MODULE PROCEDURE tant
   END INTERFACE
+  INTERFACE dtan
+     MODULE PROCEDURE tant
+  END INTERFACE
 
 
+
+  INTERFACE cos
+     MODULE PROCEDURE dcost
+  END INTERFACE
   INTERFACE cdcos
      MODULE PROCEDURE dcost
   END INTERFACE
@@ -293,11 +893,11 @@ module complex_taylor
   INTERFACE dcos
      MODULE PROCEDURE dcost
   END INTERFACE
-  INTERFACE cos
-     MODULE PROCEDURE dcost
+
+
+  INTERFACE sin
+     MODULE PROCEDURE dsint
   END INTERFACE
-
-
   INTERFACE cdsin
      MODULE PROCEDURE dsint
   END INTERFACE
@@ -305,9 +905,6 @@ module complex_taylor
      MODULE PROCEDURE dsint
   END INTERFACE
   INTERFACE dsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE sin
      MODULE PROCEDURE dsint
   END INTERFACE
 
@@ -332,12 +929,14 @@ module complex_taylor
   INTERFACE dcosh
      MODULE PROCEDURE dcosht
   END INTERFACE
+
   INTERFACE sinh
      MODULE PROCEDURE dsinht
   END INTERFACE
   INTERFACE dsinh
      MODULE PROCEDURE dsinht
   END INTERFACE
+
   INTERFACE tanh
      MODULE PROCEDURE dtanht
   END INTERFACE
@@ -345,22 +944,91 @@ module complex_taylor
      MODULE PROCEDURE dtanht
   END INTERFACE
 
+  INTERFACE sqrt
+     MODULE PROCEDURE dsqrtt
+  END INTERFACE
   INTERFACE dsqrt
      MODULE PROCEDURE dsqrtt
   END INTERFACE
   INTERFACE cdsqrt
      MODULE PROCEDURE dsqrtt
   END INTERFACE
-  INTERFACE sqrt
-     MODULE PROCEDURE dsqrtt
+
+  ! End Intrinsic Routines
+
+  ! Non-intrisic Functions
+
+  !  INTERFACE var
+  !     MODULE PROCEDURE varc
+  !     MODULE PROCEDURE varcC
+  !  END INTERFACE
+  !
+  INTERFACE shiftda
+     MODULE PROCEDURE shiftc
+  END INTERFACE
+
+  INTERFACE pok
+     MODULE PROCEDURE pokc
+  END INTERFACE
+
+  INTERFACE pek
+     MODULE PROCEDURE pekc
+  END INTERFACE
+
+  INTERFACE CFU
+     MODULE PROCEDURE CFUC
+     MODULE PROCEDURE CFURES
+  END INTERFACE
+
+  INTERFACE full_abs
+     MODULE PROCEDURE full_abstpsat
   END INTERFACE
 
 
+  ! i/o
 
-  INTERFACE init_complex
-     MODULE PROCEDURE init_map_c
-     MODULE PROCEDURE init_tpsa_c
+  INTERFACE daprint
+     MODULE PROCEDURE printcomplex
   END INTERFACE
+
+  INTERFACE print
+     MODULE PROCEDURE printcomplex
+  END INTERFACE
+
+  INTERFACE read
+     MODULE PROCEDURE inputcomplex
+  END INTERFACE
+
+  INTERFACE dainput
+     MODULE PROCEDURE inputcomplex
+  END INTERFACE
+
+  ! end of /o
+
+  ! Constructors  and Destructors
+
+  INTERFACE alloc
+     MODULE PROCEDURE alloccomplex
+     MODULE PROCEDURE a_opt
+     MODULE PROCEDURE alloccomplexn
+  END INTERFACE
+
+
+  INTERFACE kill
+     MODULE PROCEDURE killcomplex
+     MODULE PROCEDURE k_opt
+     MODULE PROCEDURE killcomplexn
+  END INTERFACE
+
+  ! end Constructors  and Destructors
+
+  ! managing
+
+  INTERFACE ass
+     MODULE PROCEDURE assc
+  END INTERFACE
+
+  ! end managing
 
 
 contains
@@ -524,6 +1192,51 @@ contains
     master=localmaster
 
   END FUNCTION dputint
+
+
+
+  FUNCTION varco(s1,s2)
+    implicit none
+    TYPE (complextaylor) varco
+    complex(dp) , INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2(2)
+
+    integer localmaster
+    localmaster=master
+
+    call ass(varco)
+
+
+
+    varco%r=REAL(s1,kind=DP).var.s2(1)
+    varco%i=aimag(s1).var.s2(2)
+
+    master=localmaster
+
+  END FUNCTION varco
+
+
+  FUNCTION varco1(s1,s2)
+    implicit none
+    TYPE (complextaylor) varco1
+    complex(dp) , INTENT (IN) :: S1(2)
+    integer  , INTENT (IN) ::  S2(2)
+
+    integer localmaster
+    localmaster=master
+
+    call ass(varco1)
+
+
+
+    varco1=s1(1)+s1(2)*((one.mono.s2(1))+i_*(one.mono.s2(2)))
+
+    master=localmaster
+
+  END FUNCTION varco1
+
+
+
 
   FUNCTION GETORDER( S1, S2 )
     implicit none
@@ -2141,7 +2854,7 @@ contains
 
 
 
-  subroutine KILL_TPSA
+  subroutine KILL_TPSA()
     IMPLICIT NONE
     call KILL(varc1)
     call KILL(varc2)
@@ -2196,28 +2909,43 @@ contains
     i_ =cmplx(zero,one,kind=dp)
   end  subroutine set_in_complex
 
-  SUBROUTINE  VARcC(S1,R1,R2,I1,I2)
-    implicit none
-    INTEGER,INTENT(IN)::I1,I2
-    complex(dp),INTENT(IN)::R1
-    real(dp),INTENT(IN)::R2
-    type (complextaylor),INTENT(INOUT)::S1
-
-    call var001(s1%r,REAL(R1,kind=DP),R2,i1)
-    call var001(s1%i,aimag(R1),R2,i2)
-
-  END SUBROUTINE VARcC
-
-  SUBROUTINE  VARc(S1,R1,I1,I2)
-    implicit none
-    INTEGER,INTENT(IN)::I1,I2
-    complex(dp),INTENT(IN)::R1
-    type (complextaylor),INTENT(INOUT)::S1
-
-    call var000(s1%r,REAL(R1,kind=DP),i1)
-    call var000(s1%i,aimag(R1),i2)
-
-  END SUBROUTINE VARc
+  !  SUBROUTINE  VARcC(S1,R1,R2,I1,I2)
+  !    implicit none
+  !    INTEGER,INTENT(IN)::I1,I2
+  !    complex(dp),INTENT(IN)::R1
+  !    complex(dp),INTENT(IN)::R2                ! big change
+  !    type (complextaylor),INTENT(INOUT)::S1
+  !    integer localmaster
+  !    localmaster=master
+  !
+  !      s1=r1+r2*((one.mono.i1) + i_*    (one.mono.i2) )
+  !!     s1%r=(/REAL(R1,kind=DP),R2/).var.i1
+  !!     s1%i=(/aimag(R1),R2/).var.i2
+  !!    call var001(s1%r,REAL(R1,kind=DP),R2,i1)
+  !!    call var001(s1%i,aimag(R1),R2,i2)
+  !    master=localmaster
+  !
+  !
+  !
+  !  END SUBROUTINE VARcC
+  !
+  !  SUBROUTINE  VARc(S1,R1,I1,I2)
+  !    implicit none
+  !    INTEGER,INTENT(IN)::I1,I2
+  !    complex(dp),INTENT(IN)::R1
+  !    type (complextaylor),INTENT(INOUT)::S1
+  !
+  !    integer localmaster
+  !    localmaster=master
+  !
+  !     s1%r=REAL(R1,kind=DP).var.i1
+  !     s1%i=aimag(R1).var.i2
+  !!    call var000(s1%r,REAL(R1,kind=DP),i1)
+  !!    call var000(s1%i,aimag(R1),i2)
+  !    master=localmaster
+  !
+  !
+  !  END SUBROUTINE VARc
 
 
   SUBROUTINE  shiftc(S1,S2,s)

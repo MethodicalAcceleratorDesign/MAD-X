@@ -4,11 +4,6 @@ module tree_element_MODULE
 
   PRIVATE track_TREE,track_TREEP,KILL_TREE
 
-  type  tree_element
-     real(dp) ,  DIMENSION(:), POINTER :: CC
-     integer,  DIMENSION(:), POINTER :: JL,JV
-     INTEGER,POINTER :: N,ND2
-  end  type tree_element
 
 
   INTERFACE track
@@ -191,7 +186,7 @@ CONTAINS
        do i=1,c_%nd2
           read(mfile,'(a200)') line
           read(mfile,'(a200)') line
-          do while(line(4:6)/='---')
+          do while(line(14:16)/='---')
              read(line,*)  k1,x,k2,js
              s1%v(i)=s1%v(i)+(x.mono.js)
              read(mfile,'(a200)') line

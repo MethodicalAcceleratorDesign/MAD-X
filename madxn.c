@@ -8880,6 +8880,13 @@ void track_observe(struct in_cmd* cmd)
      nodes[0]->obs_point = ++curr_obs_points;
      nodes[0]->obs_orbit = new_double_array(6);
      nodes[0]->obs_orbit->curr = 6;
+     adjust_beam();
+     if (probe_beam) probe_beam = delete_command(probe_beam);
+     probe_beam = clone_command(current_beam);
+     adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
+     adjust_rfc(); /* sets freq in rf-cavities from probe */
+     zero_double(orbit0, 6);
+     zero_double(oneturnmat, 36);
      if (get_option("onepass") == 0)
        {
         tmrefo_(&curr_obs_points,orbit0,nodes[0]->obs_orbit->a,oneturnmat);

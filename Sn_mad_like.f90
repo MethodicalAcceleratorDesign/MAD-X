@@ -41,6 +41,7 @@ module Mad_like
   type(tree_element),PRIVATE :: mad_tree_REV,mad_tree_rad_REV
   LOGICAL(LP) MAD_TREE_DELTAMAP
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
+  INTEGER, PRIVATE, TARGET :: NPARA
 
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
@@ -2425,8 +2426,9 @@ CONTAINS
        nullify(s22%dir);allocate(s22%dir);
        !     nullify(s22%P0C);allocate(s22%P0C);
        !    nullify(s22%BETA0);allocate(s22%BETA0);
-       nullify(s22%PARENT_LAYOUT);nullify(s22%PARENT_PATCH);
-       nullify(s22%PARENT_CHART);nullify(s22%PARENT_MAG);
+       nullify(s22%PARENT_LAYOUT);
+       !       nullify(s22%PARENT_PATCH);
+       !       nullify(s22%PARENT_CHART);nullify(s22%PARENT_MAG);
        NULLIFY(S22%I)
        if(use_info) then
           allocate(s22%i);
@@ -2711,7 +2713,7 @@ CONTAINS
   subroutine set_pointers
     implicit none
     call set_da_pointers
-
+    c_%NPARA => NPARA
     c_%ROOT_CHECK => ROOT_CHECK
     c_%CHECK_STABLE => CHECK_STABLE
     c_%CHECK_MADX_APERTURE => CHECK_MADX_APERTURE
@@ -2757,6 +2759,7 @@ CONTAINS
     c_%OLD_IMPLEMENTATION_OF_SIXTRACK => OLD_IMPLEMENTATION_OF_SIXTRACK
     c_%wedge_coeff => wedge_coeff
     c_%MAD8_WEDGE => MAD8_WEDGE
+    c_%phase0 => phase0
 
   end subroutine set_pointers
 
@@ -3065,9 +3068,11 @@ CONTAINS
     integer mf,no,n_map
     real(dp) ld,ang
     type(damap) m,mr,id,id2
-    INTEGER I,ndpt,time,timefac
-    type(taylor) beta
+    INTEGER I,ndpt,time,timefac,K
+    type(taylor) beta,gamma
+    INTEGER  JS(6)
     Taylor_maptilt=0
+    JS=0
 
     IF(PRESENT(FILE)) THEN
        mf=NEWFILE
@@ -3078,7 +3083,7 @@ CONTAINS
        ENDIF
 
        call init(NO,3,0,0)
-       call alloc(m,mr,id,id2); call alloc(beta);
+       call alloc(m,mr,id,id2); call alloc(beta,gamma);
        IF(MAD_TREE_DELTAMAP) THEN   !
           !  ndpt=6 is changed
           id=1
@@ -3090,9 +3095,30 @@ CONTAINS
           id%v(6)=id%v(6)*timefac
 
 
+
           ! $$$$$$$$$$$$$$$$$
           call  dainput_SPECIAL6(m,mf,time); m=id**(-1).o.m.o.id ;
-          if(time==1) then
+
+          if(time==2) then   ! make it like time==1   COSY INFINITY MAP
+             id2=1
+             gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
+             id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
+             id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
+             id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
+
+
+             m=id2**(-1).o.m.o.id2 ;
+             DO K=0,NO
+                JS(5)=K
+                M%V(6)=M%V(6)-((M%V(6).SUB.JS).MONO.JS)
+             ENDDO
+             id2%v(5)=(one.mono.'00001')
+             BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
+             m%v(6)=m%v(6)+ LD*(ONE/BETA-ONE/BETA0)
+          endif
+
+
+          if(time==1.or.time==2) then
              id2=1
              id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
              m=id2**(-1).o.m.o.id2 ;
@@ -3108,6 +3134,25 @@ CONTAINS
 
           if(n_map>=2) then
              call  dainput_SPECIAL6(mr,mf,time); mr=id**(-1).o.mr.o.id ;
+
+             if(time==2) then   ! make it like time==1   COSY INFINITY MAP
+                id2=1
+                gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
+                id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
+                id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
+                id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
+
+
+                m=id2**(-1).o.m.o.id2 ;
+                DO K=0,NO
+                   JS(5)=K
+                   MR%V(6)=MR%V(6)-((MR%V(6).SUB.JS).MONO.JS)
+                ENDDO
+                id2%v(5)=(one.mono.'00001')
+                BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
+                MR%v(6)=MR%v(6)+ LD*(ONE/BETA-ONE/BETA0)
+             endif
+
              if(time==1) then
                 id2=1
                 id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
@@ -3134,7 +3179,7 @@ CONTAINS
              call SET_TREE(mad_tree_rad,M)
           endif
        ENDIF ! MAD_TREE_DELTAMAP
-       call kill(m,mr,id,id2); call kill(beta);
+       call kill(m,mr,id,id2); call kill(beta,gamma);
 
        mf=CLOSEFILE
 
@@ -3155,7 +3200,7 @@ CONTAINS
        ENDIF
 
        call init(NO,3,0,0)
-       call alloc(m,mr,id,id2); call alloc(beta);
+       call alloc(m,mr,id,id2); call alloc(beta,gamma);
        IF(MAD_TREE_DELTAMAP) THEN   !
           !  ndpt=6 is changed
           id=1
@@ -3170,6 +3215,25 @@ CONTAINS
           ! $$$$$$$$$$$$$$$$$
 
           call  dainput_SPECIAL6(m,mf,time); m=id**(-1).o.m.o.id ;
+
+          if(time==2) then   ! make it like time==1   COSY INFINITY MAP
+             id2=1
+             gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
+             id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
+             id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
+             id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
+
+
+             m=id2**(-1).o.m.o.id2 ;
+             DO K=0,NO
+                JS(5)=K
+                M%V(6)=M%V(6)-((M%V(6).SUB.JS).MONO.JS)
+             ENDDO
+             id2%v(5)=(one.mono.'00001')
+             BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
+             m%v(6)=m%v(6)+ LD*(ONE/BETA-ONE/BETA0)
+          endif
+
           if(time==1) then
              id2=1
              id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
@@ -3186,6 +3250,25 @@ CONTAINS
 
           if(n_map>=2) then
              call  dainput_SPECIAL6(mr,mf,time); mr=id**(-1).o.mr.o.id ;
+
+             if(time==2) then   ! make it like time==1   COSY INFINITY MAP
+                id2=1
+                gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
+                id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
+                id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
+                id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
+
+
+                m=id2**(-1).o.m.o.id2 ;
+                DO K=0,NO
+                   JS(5)=K
+                   MR%V(6)=MR%V(6)-((MR%V(6).SUB.JS).MONO.JS)
+                ENDDO
+                id2%v(5)=(one.mono.'00001')
+                BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
+                MR%v(6)=MR%v(6)+ LD*(ONE/BETA-ONE/BETA0)
+             endif
+
              if(time==1) then
                 id2=1
                 id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
@@ -3212,7 +3295,7 @@ CONTAINS
              call SET_TREE(mad_tree_rad_rev,M)
           endif
        ENDIF ! MAD_TREE_DELTAMAP
-       call kill(m,mr,id,id2); call kill(beta);
+       call kill(m,mr,id,id2); call kill(beta,gamma);
 
        mf=CLOSEFILE
 
@@ -3399,6 +3482,7 @@ CONTAINS
     NULLIFY( L % end )       ! layout is empty at first
     NULLIFY( L % start )       ! layout is empty at first
     NULLIFY( L % start_ground )       ! layout is empty at first
+    NULLIFY( L % PARENT_UNIVERSE )       ! layout is empty at first
   END SUBROUTINE Set_Up_MAD
 
 
@@ -3422,6 +3506,7 @@ CONTAINS
     Nullify(C);
 
     CALL SET_UP(R)
+
     c=>s1%start
     DO I=1,S1%N
        call APPEND_mad_like(R,C)

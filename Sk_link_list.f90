@@ -11,20 +11,17 @@ MODULE S_FIBRE_BUNDLE
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
   private move_to_p,move_to_name,move_to_name2,move_from_to_name
+
   PRIVATE FIND_PATCH_p,FIND_PATCH_0
   PRIVATE INDEX
+  private FIND_POS_in_universe, FIND_POS_in_layout
+
   logical(lp),TARGET :: with_chart=.true.
   logical(lp),TARGET :: with_patch=.true.
   logical(lp),TARGET :: use_info=.false.
   private zero_fibre
   INTEGER :: INDEX=0
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
-
-  TYPE MAD_UNIVERSE
-     INTEGER,  POINTER :: N     ! NUMBERS OF LAYOUT
-     TYPE (LAYOUT), POINTER :: END
-     TYPE (LAYOUT), POINTER :: START
-  END TYPE MAD_UNIVERSE
 
 
 
@@ -60,6 +57,10 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE FIND_PATCH_0
   END INTERFACE
 
+  INTERFACE FIND_pos
+     MODULE PROCEDURE FIND_POS_in_layout
+     MODULE PROCEDURE FIND_POS_in_universe
+  END INTERFACE
 
 
 
@@ -182,6 +183,8 @@ CONTAINS
     !    current%BETA0=el%BETA0
 
     current%PARENT_LAYOUT=>L
+    current%mag%PARENT_FIBRE=>current
+    current%magp%PARENT_FIBRE=>current
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
@@ -201,7 +204,7 @@ CONTAINS
 
 
 
-  SUBROUTINE FIND_POS(L, C,i )  ! Finds the location "i" of the fibre C in layout L
+  SUBROUTINE FIND_POS_in_layout(L, C,i )  ! Finds the location "i" of the fibre C in layout L
     implicit none
     INTEGER, INTENT(INOUT) :: I
     logical(lp) doneit
@@ -218,7 +221,7 @@ CONTAINS
     ENDDO
 
     CALL RING_L(L,doneit)
-  END SUBROUTINE FIND_POS
+  END SUBROUTINE FIND_POS_in_layout
 
 
 
@@ -446,13 +449,15 @@ CONTAINS
   END SUBROUTINE Set_Up
 
 
+
+
   SUBROUTINE de_Set_Up( L ) ! deallocates layout content
     implicit none
     TYPE (layout) L
     deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);deallocate(L%HARMONIC_NUMBER);
     deallocate(L%INDEX);    deallocate(L%CHARGE);
     deallocate(L%NTHIN);deallocate(L%THIN);
-    deallocate(L%n);
+    deallocate(L%n);          !deallocate(L%parent_universe)   left out
   END SUBROUTINE de_Set_Up
 
 
@@ -475,8 +480,9 @@ CONTAINS
     nullify(L%START )
     nullify(L%START_GROUND )! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
     nullify(L%END_GROUND )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
-    nullify(L%NEXT )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
-    nullify(L%PREVIOUS )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+    !   nullify(L%NEXT )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+    !   nullify(L%PREVIOUS )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+    !  nullify(L%parent_universe ) ! left out
     !  else
     !    w_p=0
     !    w_p%nc=1
@@ -526,36 +532,36 @@ CONTAINS
     TYPE (fibre),POINTER :: el
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET:: L
-    type(fibre), pointer :: p
+    !    type(fibre), pointer :: p
     logical(lp) doneit
-    nullify(p);
+    !    nullify(p);
     CALL LINE_L(L,doneit)
     L%N=L%N+1
     CALL ALLOCATE_FIBRE(Current);
-
+    if(with_patch) ALLOCATE(Current%PATCH);
 
     !  FINDING THE VERY ORIGINAL FIBRE  RECURSIVELY
-    p=>el
-    do while(associated(p))
-       CURRENT%PARENT_MAG=>P
-       p=>P%PARENT_MAG
-    enddo
-    p=>el
-    do while(associated(p))
-       CURRENT%PARENT_PATCH=>P
-       p=>P%PARENT_PATCH
-    enddo
-    p=>el
-    do while(associated(p))
-       CURRENT%PARENT_CHART=>P
-       p=>P%PARENT_CHART
-    enddo
+    !    p=>el
+    !    do while(associated(p))
+    !       CURRENT%PARENT_MAG=>P
+    !       p=>P%PARENT_MAG
+    !    enddo
+    !    p=>el
+    !    do while(associated(p))
+    !       CURRENT%PARENT_PATCH=>P
+    !       p=>P%PARENT_PATCH
+    !    enddo
+    !    p=>el
+    !    do while(associated(p))
+    !       CURRENT%PARENT_CHART=>P
+    !       p=>P%PARENT_CHART
+    !    enddo
     !  END OF FINDING THE VERY ORIGINAL FIBRE
     CURRENT%PARENT_LAYOUT=>EL%PARENT_LAYOUT
     current%mag=>el%mag
     current%magp=>el%magp
     current%CHART=>el%CHART
-    current%PATCH=>el%PATCH
+    current%PATCH=0   ! new patches always belong to fibre  ! this was the error Weishi
     if(use_info) current%i=>el%i
     ALLOCATE(current%DIR)   !;ALLOCATE(current%P0C);ALLOCATE(current%BETA0);
     current%dir=el%dir
@@ -602,8 +608,9 @@ CONTAINS
     nullify(Current%dir); !nullify(Current%P0C);nullify(Current%BETA0);
     nullify(Current%magp);nullify(Current%mag);nullify(Current%CHART);nullify(Current%PATCH);
     nullify(current%next);nullify(current%previous);
-    nullify(current%PARENT_LAYOUT);nullify(current%PARENT_PATCH);
-    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
+    nullify(current%PARENT_LAYOUT);
+    !    nullify(current%PARENT_PATCH);
+    !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
 
   SUBROUTINE ALLOCATE_FIBRE(CURRENT)   ! allocates and nullifies current's content
@@ -659,19 +666,19 @@ CONTAINS
           call kill(c%i);
           deallocate(c%i);
        ENDIF
-       IF(ASSOCIATED(c%mag).AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+       IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
           c%mag=-1;
           deallocate(c%mag);
        ENDIF
-       IF(ASSOCIATED(c%magP).AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+       IF(ASSOCIATED(c%magP)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
           c%magp=-1;
           deallocate(c%magP);
        ENDIF
-       IF(ASSOCIATED(c%CHART).AND.(.NOT.ASSOCIATED(c%PARENT_CHART))) THEN
+       IF(ASSOCIATED(c%CHART)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_CHART))) THEN
           C%CHART=-1
           deallocate(c%CHART);
        ENDIF
-       IF(ASSOCIATED(c%PATCH).AND.(.NOT.ASSOCIATED(c%PARENT_PATCH))) THEN
+       IF(ASSOCIATED(c%PATCH)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_PATCH))) THEN
           C%PATCH=-1
           deallocate(c%PATCH);
        ENDIF
@@ -759,7 +766,7 @@ CONTAINS
   END SUBROUTINE switch_to_kind7
 
   !  EUCLIDEAN ROUTINES
-  SUBROUTINE FIND_PATCH_P(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH) ! COMPUTES PATCHES
+  SUBROUTINE FIND_PATCH_P(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE), INTENT(INOUT) :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
@@ -769,13 +776,19 @@ CONTAINS
     REAL(DP), POINTER,DIMENSION(:)::A,B
     INTEGER, INTENT(IN) ::  DIR
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  ENERGY_PATCH
+    REAL(DP), OPTIONAL, INTENT(IN) ::  PREC
     INTEGER A_YZ,A_XZ
     LOGICAL(LP) ENE,DOIT,DISCRETE
+    INTEGER LOC,I,PATCH_NEEDED
+    REAL(DP) NORM
+    PATCH_NEEDED=1
 
     DISCRETE=.FALSE.
     IF(PRESENT(EL2_NEXT)) THEN
+       LOC=-1
        EL2=>EL2_NEXT
     ELSE
+       LOC=1
        EL2=>EL1%NEXT
     ENDIF
     ENE=.FALSE.
@@ -814,6 +827,31 @@ CONTAINS
        ENDIF                     !   1
 
        CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
+
+       IF(PRESENT(PREC)) THEN
+          NORM=ZERO
+          DO I=1,3
+             NORM=NORM+ABS(D(I))
+          ENDDO
+          IF(NORM<=PREC) THEN
+             D=ZERO
+             PATCH_NEEDED=PATCH_NEEDED+1
+          ENDIF
+          NORM=ZERO
+          DO I=1,3
+             NORM=NORM+ABS(ANG(I))
+          ENDDO
+          IF(NORM<=PREC) THEN
+             ANG=ZERO
+             PATCH_NEEDED=PATCH_NEEDED+1
+          ENDIF
+          IF(PATCH_NEEDED==3) THEN
+             PATCH_NEEDED=0
+          ELSE
+             PATCH_NEEDED=1
+          ENDIF
+       ENDIF
+
        A_XZ=1;A_YZ=1;
 
        IF(ANG(1)/TWOPI<-0.25D0) THEN
@@ -843,16 +881,41 @@ CONTAINS
           EL2%PATCH%A_XZ=A_XZ
           EL2%PATCH%A_D=D
           EL2%PATCH%A_ANG=ANG
-          EL2%PATCH%PATCH=.TRUE.
-          EL2%PATCH%ENERGY=ENE
+          SELECT CASE(EL2%PATCH%PATCH)
+          CASE(0,1)
+             EL2%PATCH%PATCH=1*PATCH_NEEDED
+          CASE(2,3)
+             EL2%PATCH%PATCH=3*PATCH_NEEDED
+          END SELECT
+          IF(ENE) THEN
+             SELECT CASE(EL2%PATCH%ENERGY)
+             CASE(0,1)
+                EL2%PATCH%ENERGY=1
+             CASE(2,3)
+                EL2%PATCH%ENERGY=3
+             END SELECT
+          ENDIF
+
        ELSEIF(DIR==-1) THEN
 
           EL1%PATCH%B_YZ=A_YZ    !  BUG WAS EL2
           EL1%PATCH%B_XZ=A_XZ    !
           EL1%PATCH%B_D=D
           EL1%PATCH%B_ANG=ANG
-          EL1%PATCH%PATCH=.TRUE.
-          EL1%PATCH%ENERGY=ENE
+          SELECT CASE(EL1%PATCH%PATCH)
+          CASE(0,2)
+             EL1%PATCH%PATCH=2*PATCH_NEEDED
+          CASE(1,3)
+             EL1%PATCH%PATCH=3*PATCH_NEEDED
+          END SELECT
+          IF(ENE) THEN
+             SELECT CASE(EL2%PATCH%ENERGY)
+             CASE(0,2)
+                EL1%PATCH%ENERGY=2
+             CASE(1,3)
+                EL1%PATCH%ENERGY=3
+             END SELECT
+          ENDIF
        ENDIF
     ELSE ! NO FRAME
 
@@ -867,7 +930,14 @@ CONTAINS
        IF(DIR==1) THEN
 
           IF(ASSOCIATED(EL2%PATCH)) THEN
-             EL2%PATCH%ENERGY=ENE
+             IF(ENE) THEN
+                SELECT CASE(EL2%PATCH%ENERGY)
+                CASE(0,1)
+                   EL2%PATCH%ENERGY=1
+                CASE(2,3)
+                   EL2%PATCH%ENERGY=3
+                END SELECT
+             ENDIF
           ELSE
              W_P=0
              W_P%NC=1
@@ -879,7 +949,14 @@ CONTAINS
        ELSEIF(DIR==-1) THEN
 
           IF(ASSOCIATED(EL2%PATCH)) THEN
-             EL1%PATCH%ENERGY=ENE
+             IF(ENE) THEN
+                SELECT CASE(EL2%PATCH%ENERGY)
+                CASE(0,2)
+                   EL1%PATCH%ENERGY=2
+                CASE(1,3)
+                   EL1%PATCH%ENERGY=3
+                END SELECT
+             ENDIF
           ELSE
              W_P=0
              W_P%NC=1
@@ -899,14 +976,16 @@ CONTAINS
        CALL WRITE_I
     ENDIF
 
+
   END SUBROUTINE FIND_PATCH_P
 
-  SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH) ! COMPUTES PATCHES
+  SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE), INTENT(INOUT) :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
     TYPE (FIBRE),POINTER :: EL2
     REAL(DP)  D(3),ANG(3)
+    REAL(DP), OPTIONAL :: PREC
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  NEXT,ENERGY_PATCH
     INTEGER DIR
     LOGICAL(LP) ENE,NEX
@@ -927,7 +1006,7 @@ CONTAINS
     endif
     DIR=-1  ; IF(NEX) DIR=1;
     D=ZERO;ANG=ZERO;
-    CALL FIND_PATCH(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE)
+    CALL FIND_PATCH(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC)
 
 
   END SUBROUTINE FIND_PATCH_0
@@ -940,7 +1019,9 @@ CONTAINS
     TYPE (MAD_UNIVERSE) L
     CALL NULLIFY_UNIVERSE(L)
     ALLOCATE(L%n);
+    ALLOCATE(L%SHARED);
     L%N=0;
+    L%SHARED=0;
   END SUBROUTINE Set_Up_UNIVERSE
 
   SUBROUTINE kill_UNIVERSE( L )  ! Destroys a layout
@@ -958,6 +1039,21 @@ CONTAINS
     call de_Set_Up_UNIVERSE(L)
   END SUBROUTINE kill_UNIVERSE
 
+  SUBROUTINE FIND_POS_in_universe(C,i )  ! Finds the location "i" of the fibre C in layout L
+    implicit none
+    INTEGER, INTENT(INOUT) :: I
+    logical(lp) doneit
+    TYPE (layout), POINTER :: C
+    TYPE (layout), POINTER :: P
+    NULLIFY(P);
+    P=>C
+    I=0
+    DO WHILE(ASSOCIATED(P))
+       I=I+1
+       P=>P%PREVIOUS
+    ENDDO
+
+  END SUBROUTINE FIND_POS_in_universe
 
 
   SUBROUTINE MOVE_TO_LAYOUT_I( L,current,i ) ! Moves current to the i^th position
@@ -982,12 +1078,14 @@ CONTAINS
     implicit none
     TYPE (MAD_UNIVERSE) L
     deallocate(L%n);
+    deallocate(L%SHARED);
   END SUBROUTINE de_Set_Up_UNIVERSE
 
   SUBROUTINE nullIFY_UNIVERSE( L ) ! Nullifies layout content,i
     implicit none
     TYPE (MAD_UNIVERSE), intent(inout) :: L
     nullify(L%N)
+    nullify(L%SHARED)
 
     nullify(L%END )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
     nullify(L%START )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
@@ -1004,19 +1102,51 @@ CONTAINS
 
     allocate(current)
     CALL SET_UP(current)
+    current%parent_universe=>L
 
-    if(L%N==1) current%next=> L%start
-
+    if(L%N==1) then
+       L%start=>current
+       L%end=>current
+       nullify(current%previous)
+       nullify(current%next)
+       return
+    endif
     Current % previous => L % end  ! point it to next fibre
-    if(L%N>1)  THEN
-       L % end % next => current      !
-    ENDIF
+    L % end % next => current      !
 
     L % end => Current
-    if(L%N==1) L%start=> Current
 
   END SUBROUTINE APPEND_EMPTY_LAYOUT
 
 
+  SUBROUTINE locate_in_universe(F,i_tot,i,j)
+    IMPLICIT NONE
+    integer i_tot,i,j
+    integer k
+    TYPE(FIBRE),pointer ::  F
+    TYPE(layout),pointer ::  L
+
+
+    call FIND_POS(f%mag%PARENT_FIBRE%parent_layout, f%mag%PARENT_FIBRE,j )
+
+    call FIND_POS( f%mag%PARENT_FIBRE%parent_layout,i )
+
+    i_tot=0
+
+    L=>f%mag%PARENT_FIBRE%parent_layout%parent_universe%START
+
+    do k=1,i-1
+       i_tot= L%N+I_TOT
+       L=>L%NEXT
+    enddo
+
+    I_TOT=I_ToT+ J
+
+
+
+  END SUBROUTINE locate_in_universe
+
+
 
 END MODULE S_FIBRE_BUNDLE
+

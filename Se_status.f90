@@ -113,7 +113,7 @@ module S_status
   private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
-  PRIVATE B2PERPR,B2PERPP
+  PRIVATE B2PERPR,B2PERPP,S_init_berz0
 
   type work
      real(dp) beta0,energy,kinetic,p0c,brho,gamma0I,gambet
@@ -211,6 +211,7 @@ module S_status
 
   INTERFACE init
      MODULE PROCEDURE s_init
+     MODULE PROCEDURE S_init_berz0
      MODULE PROCEDURE S_init_berz
   END INTERFACE
 
@@ -831,7 +832,26 @@ CONTAINS
 
     ND2=ND1*2
     NPARA=ND2+NDEL
+    C_%NPARA=NPARA
+
   END  subroutine S_init
+
+  subroutine S_init_berz0(STATE,NO1,NP1)
+    implicit none
+    TYPE (INTERNAL_STATE),OPTIONAL, INTENT(IN):: STATE
+    INTEGER, OPTIONAL, INTENT(IN):: NO1,NP1
+    INTEGER   ND2,NPARA,NO2,NP2
+    TYPE (INTERNAL_STATE)   STATE2
+    STATE2=DEFAULT
+    NO2=1;NP2=0;
+    IF(PRESENT(STATE))      STATE2=STATE
+    IF(PRESENT(NO1))      NO2=NO1
+    IF(PRESENT(NP1))      NP2=NP1
+
+    call init(STATE2,NO2,NP2,my_true,ND2,NPARA)
+    C_%NPARA=NPARA
+    C_%ND2=ND2
+  END  subroutine S_init_berz0
 
   subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
     implicit none
@@ -840,7 +860,7 @@ CONTAINS
     INTEGER, INTENT(OUT)::    ND2,NPARA
 
     call init(STATE,NO1,NP1,my_true,ND2,NPARA)
-
+    C_%NPARA=NPARA
   END  subroutine S_init_berz
 
   SUBROUTINE MAKE_METHOD(N)

@@ -10,6 +10,7 @@ module S_fitting
   logical(lp), PRIVATE :: VERBOSE = .false.
 
 
+
   INTERFACE lattice_fit_TUNE
      ! LINKED
      MODULE PROCEDURE lattice_fit_TUNE_L
@@ -35,6 +36,8 @@ module S_fitting
   END INTERFACE
 
 contains
+
+
 
   subroutine toggle_verbose
     implicit none
@@ -681,7 +684,7 @@ contains
                 freq=c%magp%freq
              ENDIF
           endif
-          XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
+          XDIX=XDIX+c%magP%P%LD/c%mag%P%BETA0
           c=>c%next
           i=i+1
        enddo

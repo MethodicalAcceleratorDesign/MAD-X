@@ -13,6 +13,36 @@ module S_FRAME
   REAL(DP), public :: GLOBAL_origin(3)= (/0,0,0/)
   integer :: ccc=0
 
+  TYPE MAGNET_FRAME
+     REAL(DP), POINTER,DIMENSION(:,:)::   ENT
+     REAL(DP), POINTER,DIMENSION(:)  ::   A
+     REAL(DP), POINTER,DIMENSION(:,:)::   EXI
+     REAL(DP), POINTER,DIMENSION(:)  ::   B
+     REAL(DP), POINTER,DIMENSION(:,:)::   MID
+     REAL(DP), POINTER,DIMENSION(:)  ::   O
+  END TYPE MAGNET_FRAME
+
+  TYPE PATCH
+     INTEGER(2), POINTER:: PATCH    ! IF TRUE, SPACIAL PATCHES NEEDED
+     INTEGER, POINTER :: A_YZ,A_XZ   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
+     INTEGER, POINTER :: B_YZ,B_XZ   ! FOR ROTATION OF PI AT EXIT = -1    , DEFAULT = 1
+     REAL(DP),DIMENSION(:), POINTER:: A_D,B_D      !ENTRACE AND EXIT TRANSLATIONS  A_D(3)
+     REAL(DP),DIMENSION(:), POINTER:: A_ANG,B_ANG   !ENTRACE AND EXIT ROTATIONS    A_ANG(3)
+     INTEGER(2), POINTER:: ENERGY   ! IF TRUE, ENERGY PATCHES NEEDED
+     INTEGER(2), POINTER:: TIME     ! IF TRUE, TIME PATCHES NEEDED
+     REAL(DP), POINTER:: A_T,B_T     ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
+  END TYPE PATCH
+
+  TYPE CHART
+     type(magnet_frame), pointer :: f
+     !     real(dp), POINTER:: A_XY
+     !     real(dp), POINTER:: L
+     !     real(dp), POINTER:: ALPHA
+     !  FIBRE MISALIGNMENTS
+     real(dp),dimension(:),  POINTER::   D_IN,ANG_IN
+     real(dp),dimension(:),  POINTER::   D_OUT,ANG_OUT
+  END TYPE CHART
+
 
   INTERFACE assignment (=)
      MODULE PROCEDURE ZERO_CHART
@@ -53,36 +83,6 @@ module S_FRAME
      MODULE PROCEDURE equal_f
   end  INTERFACE
 
-
-  TYPE MAGNET_FRAME
-     REAL(DP), POINTER,DIMENSION(:,:)::   ENT
-     REAL(DP), POINTER,DIMENSION(:)  ::   A
-     REAL(DP), POINTER,DIMENSION(:,:)::   EXI
-     REAL(DP), POINTER,DIMENSION(:)  ::   B
-     REAL(DP), POINTER,DIMENSION(:,:)::   MID
-     REAL(DP), POINTER,DIMENSION(:)  ::   O
-  END TYPE MAGNET_FRAME
-
-  TYPE PATCH
-     LOGICAL(LP), POINTER:: PATCH    ! IF TRUE, SPACIAL PATCHES NEEDED
-     INTEGER, POINTER :: A_YZ,A_XZ   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
-     INTEGER, POINTER :: B_YZ,B_XZ   ! FOR ROTATION OF PI AT EXIT = -1    , DEFAULT = 1
-     REAL(DP),DIMENSION(:), POINTER:: A_D,B_D      !ENTRACE AND EXIT TRANSLATIONS  A_D(3)
-     REAL(DP),DIMENSION(:), POINTER:: A_ANG,B_ANG   !ENTRACE AND EXIT ROTATIONS    A_ANG(3)
-     LOGICAL(LP), POINTER:: ENERGY   ! IF TRUE, ENERGY PATCHES NEEDED
-     LOGICAL(LP), POINTER:: TIME     ! IF TRUE, TIME PATCHES NEEDED
-     REAL(DP), POINTER:: A_T,B_T     ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
-  END TYPE PATCH
-
-  TYPE CHART
-     type(magnet_frame), pointer :: f
-     !     real(dp), POINTER:: A_XY
-     !     real(dp), POINTER:: L
-     !     real(dp), POINTER:: ALPHA
-     !  FIBRE MISALIGNMENTS
-     real(dp),dimension(:),  POINTER::   D_IN,ANG_IN
-     real(dp),dimension(:),  POINTER::   D_OUT,ANG_OUT
-  END TYPE CHART
 
 CONTAINS
 
@@ -236,9 +236,9 @@ CONTAINS
        F%B_D=zero
        F%A_ANG=zero
        F%B_ANG=zero
-       f%patch=.false.
-       f%ENERGY=.false.
-       f%TIME=.false.
+       f%patch=0
+       f%ENERGY=0
+       f%TIME=0
     ELSEIF(R==-1) THEN
        DEALLOCATE(F%A_D,F%B_D,F%A_ANG,F%B_ANG)
        DEALLOCATE(F%A_T,F%B_T)

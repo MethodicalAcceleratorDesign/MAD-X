@@ -12,90 +12,13 @@ module tpsalie_analysis
   private  resta,tares,alloctares,killtares
   private allocgen,KILLgen   !,ASSgen   ,ADDID,IDADD
   private equalgengen,EQUALgenMAP,EQUALMAPgen,pushgen
-
   !private rotf,rotsymp
   integer,private::NO,ND,ND2,NP,NDPT,NV
   logical(lp),private::old,imaxflag
-
-
-
+  !
+  !
+  !
   private NRESO
-
-  TYPE DRAGTFINN
-     real(dp)  constant(ndim2)
-     type (damap) Linear
-     type (vecfield) nonlinear
-     type (pbfield)  pb
-  END TYPE DRAGTFINN
-
-  TYPE ONELIEEXPONENT
-     !     real(dp)  CONSTANT(NDIM2),
-     real(dp) EPS
-     type (vecfield) VECTOR
-     type (pbfield)  pb
-  END TYPE ONELIEEXPONENT
-
-  TYPE reversedragtfinn
-     real(dp)  CONSTANT(NDIM2)
-     type (damap) Linear
-     type (vecfield) nonlinear
-     type (pbfield)  pb
-  END TYPE reversedragtfinn
-
-  TYPE normalform
-     type (damap) A_t
-     type (damap) A1
-     type (reversedragtfinn) A
-     type (dragtfinn) NORMAL
-     type (damap) DHDJ
-     real(dp) TUNE(NDIM),DAMPING(NDIM)
-     integer nord,jtune
-     integer NRES,M(NDIM,NRESO),PLANE(NDIM)
-     logical(lp) AUTO
-  END TYPE normalform
-
-  TYPE genfield
-     type (taylor) h
-     type (damap) m
-     type (taylor) d(ndim,ndim)
-     type (damap) linear
-     type (damap) lineart
-     type (damap) mt
-     real(dp) constant(ndim2)
-     integer ifac,imax
-     logical(lp) linear_in
-  END TYPE genfield
-
-
-
-  TYPE pbresonance
-     type (pbfield)  cos,sin
-     integer ifac
-  END TYPE pbresonance
-
-  TYPE vecresonance
-     type (vecfield)  cos,sin
-     integer ifac
-  END TYPE vecresonance
-
-  TYPE taylorresonance
-     type (taylor)  cos,sin
-  END TYPE taylorresonance
-
-
-  TYPE beamenvelope
-     ! radiation normalization
-     type (damap) transpose    ! Transpose of map which acts on polynomials
-     type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
-     TYPE (pbresonance) bijnr   !  Equilibrium beam sizes in resonance basis
-     type (taylor) sij0  !  equilibrium beam sizes
-     real(dp) emittance(3),tune(3),damping(3)
-     logical(lp) AUTO,STOCHASTIC
-     real(dp)  KICK(3)
-     type (damap) STOCH
-  END TYPE beamenvelope
-
-
 
   INTERFACE init_tpsalie
      MODULE PROCEDURE init_map
@@ -1124,18 +1047,19 @@ contains
 
 
 
-  SUBROUTINE  DAPRINTonelie(S1,MFILE)
+  SUBROUTINE  DAPRINTonelie(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (ONELIEEXPONENT),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
 
     write(mfile,*) s1%eps, " Convergence Test Number"
     !do i=1,nd2
     !write(mfile,*) s1%constant(i)
     !enddo
 
-    CALL DAPRINT(s1%VECTOR,MFILE)
-    CALL DAPRINT(s1%pb,MFILE)
+    CALL DAPRINT(s1%VECTOR,MFILE,DEPS)
+    CALL DAPRINT(s1%pb,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTonelie
 
@@ -1155,12 +1079,13 @@ contains
   END SUBROUTINE DAreadonelie
 
 
-  SUBROUTINE  DAPRINTvecres(S1,MFILE)
+  SUBROUTINE  DAPRINTvecres(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (vecresonance),INTENT(IN)::S1
-    CALL DAPRINT(s1%cos,MFILE)
-    CALL DAPRINT(s1%sin,MFILE)
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    CALL DAPRINT(s1%cos,MFILE,DEPS)
+    CALL DAPRINT(s1%sin,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTvecres
 
@@ -1173,16 +1098,17 @@ contains
 
   END SUBROUTINE DAreadvecres
 
-  SUBROUTINE  DAPRINTdf(S1,MFILE)
+  SUBROUTINE  DAPRINTdf(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (dragtfinn),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
     integer i
     do i=1,nd2
        write(mfile,*) s1%constant(i)
     enddo
-    CALL DAPRINT(s1%linear,MFILE)
-    CALL DAPRINT(s1%nonlinear,MFILE)
+    CALL DAPRINT(s1%linear,MFILE,DEPS)
+    CALL DAPRINT(s1%nonlinear,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTdf
 
@@ -1199,16 +1125,17 @@ contains
 
   END SUBROUTINE dareaddf
 
-  SUBROUTINE  DAPRINTrevdf(S1,MFILE)
+  SUBROUTINE  DAPRINTrevdf(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (reversedragtfinn),INTENT(inout)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
     integer i
     do i=1,nd2
        write(mfile,*) s1%constant(i)
     enddo
-    CALL DAPRINT(s1%linear,MFILE)
-    CALL DAPRINT(s1%nonlinear,MFILE)
+    CALL DAPRINT(s1%linear,MFILE,DEPS)
+    CALL DAPRINT(s1%nonlinear,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTrevdf
 
@@ -1225,12 +1152,13 @@ contains
 
   END SUBROUTINE DAreadrevdf
 
-  SUBROUTINE  DAPRINTpbres(S1,MFILE)
+  SUBROUTINE  DAPRINTpbres(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (pbresonance),INTENT(IN)::S1
-    CALL DAPRINT(s1%cos,MFILE)
-    CALL DAPRINT(s1%sin,MFILE)
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    CALL DAPRINT(s1%cos,MFILE,DEPS)
+    CALL DAPRINT(s1%sin,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTpbres
 
@@ -1318,7 +1246,7 @@ contains
 
 
 
-  subroutine KILL_BERZ_ETIENNE
+  subroutine KILL_BERZ_ETIENNE()
     implicit none
 
     call kill(varf1)
@@ -1396,7 +1324,7 @@ contains
 
 
 
-  subroutine DATERMINATE
+  subroutine DATERMINATE()
     implicit none
 
     CALL DEASSIGN

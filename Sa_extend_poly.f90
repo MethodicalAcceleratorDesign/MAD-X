@@ -150,11 +150,14 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
 
-    IF(X<=ZERO.AND.ROOT_CHECK) THEN
+    IF((X<ZERO).AND.ROOT_CHECK) THEN
        ROOT=ONE
        CHECK_STABLE=.FALSE.
-    ELSE
+    ELSEIF(X>=ZERO) THEN
        ROOT=SQRT(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ROOT=ONE
+       CHECK_STABLE=.FALSE.
     ENDIF
 
   END FUNCTION ROOT
@@ -163,11 +166,14 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
 
-    IF(ABS(X)>ONE.AND.ROOT_CHECK) THEN
+    IF((ABS(X)>ONE).AND.ROOT_CHECK) THEN
        ARCSIN=ZERO
        CHECK_STABLE=.FALSE.
-    ELSE
+    ELSEIF(ABS(X)<=ONE) THEN
        ARCSIN=ASIN(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ARCSIN=ZERO
+       CHECK_STABLE=.FALSE.
     ENDIF
 
   END FUNCTION ARCSIN
@@ -177,11 +183,14 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
 
-    IF(ABS(X)>hyperbolic_aperture.AND.ROOT_CHECK) THEN
+    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
        SINEHX_X=ZERO
        CHECK_STABLE=.FALSE.
-    ELSE
+    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
        sinehx_x = sinhx_x(x)
+    ELSE      !  IF X IS NOT A NUMBER
+       sinehx_x=ZERO
+       CHECK_STABLE=.FALSE.
     ENDIF
 
   END FUNCTION SINEHX_X
@@ -190,11 +199,14 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
 
-    IF(ABS(X)>hyperbolic_aperture.AND.ROOT_CHECK) THEN
+    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
        COSEH=ONE
        CHECK_STABLE=.FALSE.
-    ELSE
+    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
        COSEH=COSH(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       COSEH=ONE
+       CHECK_STABLE=.FALSE.
     ENDIF
 
   END FUNCTION COSEH
@@ -203,14 +215,33 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
 
-    IF(ABS(X)>hyperbolic_aperture.AND.ROOT_CHECK) THEN
+    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
        SINEH=ZERO
        CHECK_STABLE=.FALSE.
-    ELSE
+    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
        SINEH=SINH(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       SINEH=ZERO
+       CHECK_STABLE=.FALSE.
     ENDIF
 
   END FUNCTION SINEH
+
+  REAL(DP) FUNCTION  arctan(X) ! REPLACES SINH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+
+    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
+       arctan=ZERO
+       CHECK_STABLE=.FALSE.
+    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
+       arctan=atan(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       arctan=ZERO
+       CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION arctan
 
 
   ! Some polymorphism
@@ -443,10 +474,13 @@ CONTAINS
     do i=nd2+1,ndd
        localmaster=master
        call ass(daddsc(i))
-       daddsc(i)=s2(i)
+       if(nd2==4.and.c_%npara==5) then
+          daddsc(i)=s2(i)+(one.mono.'00001')
+       else
+          daddsc(i)=s2(i)
+       endif
        master=localmaster
     enddo
-
 
   END FUNCTION daddsc
 
@@ -468,7 +502,11 @@ CONTAINS
     do i=nd2+1,ndd
        localmaster=master
        call ass(scdadd(i))
-       scdadd(i)=s2(i)
+       if(nd2==4.and.c_%npara==5) then
+          scdadd(i)=s2(i)+(one.mono.'00001')
+       else
+          scdadd(i)=s2(i)
+       endif
        master=localmaster
     enddo
 
@@ -648,7 +686,8 @@ contains
     y0%v(2)=zero
 
     z0=zero
-    call var(z,z0,1,2)
+    !    call var(z,z0,1,2)
+    z=z0.var.(/1,2/)
     !z%i=-z%i
 
 
@@ -966,8 +1005,14 @@ contains
     call alloc(tr(1))
     call alloc(tr(2))
 
-    g=( ((f.d.1).d.1) +((f.d.2).d.2 ))
-    g=(f.d.1)-(one.mono.'1')*g
+    !    g=( ((f.d.1).d.1) +((f.d.2).d.2 ))
+    !    g=(f.d.1)-(one.mono.'1')*g
+
+    !    work around a possible compiler bug on the SUN => no logical explanation!
+    g%r=((f%r.d.1).d.1) + ((f%r.d.2).d.2)
+    g%i=((f%i.d.1).d.1) + ((f%i.d.2).d.2)
+    g%r=(f%r.d.1)-(one.mono.'1')*g%r
+    g%i=(f%i.d.1)-(one.mono.'1')*g%i
 
     t(1)=g%r
     t(2)=g%i

@@ -352,7 +352,8 @@ contains
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    logical(lp) ou,patch,PATCHT,PATCHG,PATCHE
+    logical(lp) ou,patch
+    INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
@@ -379,18 +380,18 @@ contains
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
     ELSE
-       PATCHT=.FALSE. ; PATCHE=.FALSE. ;PATCHG=.FALSE.;
+       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,-6)
        X_IN%POS(1)=X_IN%nst
     endif
 
-    IF(PATCHE) THEN
+    IF(PATCHE/=0.AND.PATCHE/=2) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
-          IF(.NOT.CN%PATCH%ENERGY) THEN     ! No need to patch IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
 
@@ -410,7 +411,7 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-5)
 
     ! The chart frame of reference is located here implicitely
-    IF(PATCHG) THEN
+    IF(PATCHG/=0.AND.PATCHG/=2) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        X(3)=C%PATCH%A_XZ*X(3);X(4)=C%PATCH%A_YZ*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
@@ -420,8 +421,12 @@ contains
        CALL TRANS(C%PATCH%A_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
-    IF(PATCHT) THEN
-       X(6)=X(6)-C%PATCH%a_T
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
+       if(k%TIME) then
+          X(6)=X(6)+C%PATCH%a_T/C%MAG%P%BETA0
+       else
+          X(6)=X(6)+C%PATCH%a_T
+       endif
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
@@ -454,12 +459,16 @@ contains
     CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHT) THEN
-       X(6)=X(6)-C%PATCH%b_T
+    IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
+       if(k%TIME) then
+          X(6)=X(6)+C%PATCH%b_T/C%MAG%P%BETA0
+       else
+          X(6)=X(6)+C%PATCH%b_T
+       endif
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHG) THEN
+    IF(PATCHG/=0.AND.PATCHG/=1) THEN
        X(3)=C%PATCH%B_YZ*X(3);X(4)=C%PATCH%B_YZ*X(4);
        CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        X(1)=C%PATCH%B_XZ*X(1);X(2)=C%PATCH%B_XZ*X(2);
@@ -471,7 +480,7 @@ contains
 
     ! The CHART frame of reference is located here implicitely
 
-    IF(PATCHE) THEN
+    IF(PATCHE/=0.AND.PATCHE/=1) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
@@ -522,7 +531,8 @@ contains
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
     INTEGER, optional,TARGET, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    logical(lp) OU,PATCH,PATCHT,PATCHG,PATCHE
+    logical(lp) OU,PATCH
+    INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (FIBRE), POINTER :: CN
     REAL(DP), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
@@ -554,18 +564,18 @@ contains
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
     ELSE
-       PATCHT=.FALSE. ; PATCHE=.FALSE. ;PATCHG=.FALSE.;
+       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
     ! ENERGY PATCH
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,-6)
        X_IN%POS(1)=X_IN%nst
     endif
-    IF(PATCHE) THEN
+    IF(PATCHE/=0.AND.PATCHE/=2) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
-          IF(.NOT.CN%PATCH%ENERGY) THEN     ! NO NEED TO PATCH IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAGP%P%P0C
              B0=>CN%MAGP%P%BETA0
 
@@ -586,7 +596,7 @@ contains
 
 
     ! POSITION PATCH
-    IF(PATCHG) THEN
+    IF(PATCHG/=0.AND.PATCHG/=2) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        X(3)=C%PATCH%A_XZ*X(3);X(4)=C%PATCH%A_YZ*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
@@ -597,8 +607,12 @@ contains
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     ! TIME PATCH
-    IF(PATCHT) THEN
-       X(6)=X(6)-C%PATCH%A_T
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
+       if(k%TIME) then
+          X(6)=X(6)+C%PATCH%A_T/C%MAGP%P%BETA0
+       else
+          X(6)=X(6)+C%PATCH%A_T
+       endif
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
@@ -636,13 +650,17 @@ contains
 
     !EXIT PATCH
     ! TIME PATCH
-    IF(PATCHT) THEN
-       X(6)=X(6)-C%PATCH%B_T
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
+       if(k%TIME) then
+          X(6)=X(6)+C%PATCH%b_T/C%MAGP%P%BETA0
+       else
+          X(6)=X(6)+C%PATCH%b_T
+       endif
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     ! POSITION PATCH
-    IF(PATCHG) THEN
+    IF(PATCHG/=0.AND.PATCHG/=1) THEN
        X(3)=C%PATCH%B_YZ*X(3);X(4)=C%PATCH%B_YZ*X(4);
        CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        X(1)=C%PATCH%B_XZ*X(1);X(2)=C%PATCH%B_XZ*X(2);
@@ -653,7 +671,7 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     ! ENERGY PATCH
-    IF(PATCHE) THEN
+    IF(PATCHE/=0.AND.PATCHE/=1) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
@@ -716,7 +734,8 @@ contains
     TYPE(REAL_8)  Y(6)
     INTEGER, optional,target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    logical(lp) ou,patch,PATCHT,PATCHG,PATCHE
+    logical(lp) ou,patch
+    INTEGER(2) PATCHT,PATCHG,PATCHE
     !    TYPE(UPDATING), optional,intent(in):: UPDATE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
@@ -748,19 +767,19 @@ contains
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
     ELSE
-       PATCHT=.FALSE. ; PATCHE=.FALSE. ;PATCHG=.FALSE.;
+       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
 
     !   IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-6)
 
-    IF(PATCHE) THEN
+    IF(PATCHE/=0.AND.PATCHE/=2) THEN
        CALL ALLOC(Y)
        Y=X
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
-          IF(.NOT.CN%PATCH%ENERGY) THEN   ! No need to patch IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
 
@@ -786,7 +805,7 @@ contains
 
 
 
-    IF(PATCHG) THEN
+    IF(PATCHG/=0.AND.PATCHG/=2) THEN
        CALL ALLOC(Y)
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        Y=X
@@ -804,10 +823,14 @@ contains
     !       IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
 
 
-    IF(PATCHT) THEN      ! PATCHE BEFORE! 2003.9.18 BUG
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
        CALL ALLOC(Y)
        Y=X
-       Y(6)=Y(6)-C%PATCH%a_T
+       if(k%TIME) then
+          Y(6)=Y(6)+C%PATCH%A_T/C%MAGP%P%BETA0
+       else
+          Y(6)=Y(6)+C%PATCH%A_T
+       endif
        X=Y
        CALL KILL(Y)
     ENDIF
@@ -836,16 +859,20 @@ contains
     CALL DTILTD(C%DIR,C%MAGP%P%TILTD,2,X)
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHT) THEN  ! PATCHE BEFORE! 2003.9.18  bug
+    IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
        CALL ALLOC(Y)
        Y=X
-       Y(6)=Y(6)-C%PATCH%b_T
+       if(k%TIME) then
+          Y(6)=Y(6)+C%PATCH%b_T/C%MAGP%P%BETA0
+       else
+          Y(6)=Y(6)+C%PATCH%b_T
+       endif
        X=Y
        CALL KILL(Y)
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHG) THEN
+    IF(PATCHG/=0.AND.PATCHG/=1) THEN
        CALL ALLOC(Y)
        Y=X
        Y(3)=C%PATCH%B_YZ*Y(3);Y(4)=C%PATCH%B_YZ*Y(4);
@@ -861,7 +888,7 @@ contains
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHE) THEN
+    IF(PATCHE/=0.AND.PATCHE/=1) THEN
        CALL ALLOC(Y)
        Y=X
        NULLIFY(P0);NULLIFY(B0);

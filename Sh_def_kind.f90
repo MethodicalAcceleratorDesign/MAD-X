@@ -100,7 +100,7 @@ MODULE S_DEF_KIND
   logical(lp) ,TARGET :: OLD_IMPLEMENTATION_OF_SIXTRACK=.TRUE.
   real(dp), target :: phase0=-pi
   real(dp), target :: wedge_coeff(2)
-  logical(dp), target :: MAD8_WEDGE=.TRUE.
+  logical(lp), target :: MAD8_WEDGE=.TRUE.
   ! stochastic radiation in straigth
 
   !include "def_all_kind.f90"
@@ -2163,7 +2163,7 @@ contains
     D(3,3)= TIME_FAC/PZ
 
     !    FI0=(B*XP/(one+yp**2)-B2* ( ONE + XP**2*(TWO+YP**2) )/PZ)
-    FI0= ATAN((XP/(one+yp**2)))    !-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )   *PZ
+    FI0= arctan((XP/(one+yp**2)))    !-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )   *PZ
     CO2=B/COS(FI0)**2
     CO1=CO2/(ONE+(XP/(one+yp**2))**2 )
 
@@ -4154,13 +4154,17 @@ contains
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: mid
 
     IF(EL%P%DIR==1) THEN
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
 
   END SUBROUTINE SYMPINTSOLR
@@ -4172,13 +4176,17 @@ contains
     TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
 
     IF(EL%P%DIR==1) THEN
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
 
   END SUBROUTINE SYMPINTSOLP
@@ -4189,13 +4197,17 @@ contains
     TYPE(SOL5P),INTENT(INOUT):: EL
 
     IF(EL%P%DIR==1) THEN
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
 
   END SUBROUTINE SYMPINTSOLS
@@ -5088,15 +5100,24 @@ contains
     TYPE(SOLT),INTENT(INOUT):: EL
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: mid
 
+
     IF(EL%P%DIR==1) THEN
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
+
+
+
+
 
   END SUBROUTINE SYMPINTSOLTR
 
@@ -5107,14 +5128,19 @@ contains
     TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
 
     IF(EL%P%DIR==1) THEN
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTESOL(EL,X,MID)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
+
 
   END SUBROUTINE SYMPINTSOLTP
 
@@ -5124,13 +5150,17 @@ contains
     TYPE(SOLTP),INTENT(INOUT):: EL
 
     IF(EL%P%DIR==1) THEN
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+       CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
 
   END SUBROUTINE SYMPINTSOLTS

@@ -206,4 +206,367 @@ contains
 
   end subroutine zero_key
 
+  !  Printing universes
+
+  subroutine print_universe(universe,style,time_patch_i,print_mis)
+    implicit none
+    type(mad_universe) universe
+    INTEGER N,J,I,i_tot,i_L,POS, NU,nb,style,dirb,dira
+    TYPE(LAYOUT), POINTER :: REC,rec1
+    TYPE(FIBRE), POINTER :: P
+    TYPE(MAGNET_CHART), POINTER :: MC
+    REAL(DP) MASS,BRHO
+    CHARACTER*11 FILER
+    CHARACTER*100 NUT,nut0
+    INTEGER MINIMAL,MINIMAL_RICH_AT_PATCHES,ROOT_ONLY,ROOT_PLUS_PATCHES
+    LOGICAL(LP) FRAME,PATCH,TIME_PATCH,time_patch_i,check,printmis
+    LOGICAL(LP), optional :: print_mis
+
+    printmis=.false.
+
+    if(present(print_mis)) printmis=print_mis
+
+    TIME_PATCH=TIME_PATCH_i
+
+    CALL GET_ONE(MASS=MASS)
+
+    MINIMAL=0     !  PATCHES ONLY AT SKELETON MALFORMATION   ELSEWHERE      MAD8 SURVEY ASSUMED
+    MINIMAL_RICH_AT_PATCHES=1  !  PATCHES AND NECESSARY FRAMES T SKELETON MALFORMATION  ELSEWHERE MAD8 IN BETWEEN
+    ROOT_ONLY=2                !  NO PATCHES, ONLY FRAMES  EVERYWHERE
+    ROOT_PLUS_PATCHES=3   !  EVERYTHING!
+
+    FRAME=.FALSE.
+    IF(STYLE>=1) FRAME=.TRUE.
+    PATCH=.TRUE.
+    IF(ROOT_ONLY/=2) PATCH=.FALSE.
+
+    FILER='real_system'
+
+    open(unit=40,file='real_magnet.txt')
+    rec=>universe%start
+    n=0
+
+    write(40,195) " CHARGE = ",1," MASS = ",MASS
+
+    do j=1,universe%SHARED
+
+       p=>rec%start; MC=>P%MAG%P;
+       do i=1,rec%n
+          n=n+1
+          write(40,210) 'Magnet # = ', n,' for etienne: layout # = ',j,' position in layout = ',i,' name = ',P%MAG%NAME
+          write(40,211) "SKELETON ARC LENGTH = ",   MC%LD,' ANGLE = ',MC%LD*MC%B0,' ROLL = ',MC%TILTD,  ' P0C = ',MC%P0C
+          if(p%mag%mis) then
+             write(40,209) " MISALIGNEMENTS D AND R = ",p%mag%D,p%mag%R
+          else
+             write(40,*) " MISALIGNEMENTS NO PRESENT "
+          endif
+          write(40,*) " "
+          p=>p%next;MC=>P%MAG%P;
+       enddo
+       rec=>rec%next
+
+    enddo
+
+    close(40)
+
+209 FORMAT(A16,6(1x,E15.8))
+210 FORMAT(a11,i4,A25,i4,a22,i4,a8,A16)
+    !211 FORMAT(A40,E15.8 ,1x,E15.8 ,1x,E15.8 ,1x,E15.8 )
+211 FORMAT(A22,E15.8 ,A9,E15.8 ,A8,E15.8, A7,E15.8 )
+
+204 FORMAT(A15,i2)
+202 FORMAT(A15,I2)
+200 FORMAT(A16,3(E15.8,1X))
+201 FORMAT(A50,2(I4,1X))
+203 FORMAT(A23,E15.8)
+199 FORMAT(A6,I4)
+197 FORMAT(A16,I4,A24,A16)
+198 FORMAT(A59,3(1X,I4))
+196 FORMAT(A30,I4,A13,I4,A13,I4 )
+195 FORMAT(A10,I4,A8,E15.8)
+194 FORMAT(A36,3(1X,I2))
+
+
+    WRITE(nut0,'(I4,a6,i4)') UNIVERSE%N-UNIVERSE%SHARED,'_style',style
+
+    nb=0
+    nut=' '
+    do i=1,LEN_TRIM(NUT0)
+       if(nut0(i:i)/=' ') then
+          nb=nb+1
+          nut(nb:nb)=nut0(i:i)
+       endif
+    enddo
+
+    rec1=>rec
+    check=.true.
+
+    DO NU=1,UNIVERSE%N-UNIVERSE%SHARED
+       p=>rec1%start;
+       do i=1,rec1%n
+          if(p%patch%patch+p%patch%energy/=0) then
+             check=.false.
+             exit
+          endif
+          p=>p%next
+       enddo
+       if(.not.check) exit
+       rec1=>rec1%next
+    ENDDO
+
+
+
+    DO NU=1,UNIVERSE%N-UNIVERSE%SHARED
+
+       open(unit=40,file=FILER//NUT(1:NB)//'.txt')
+       WRITE(40,*) " STYLE OF FILE = ",STYLE
+       p=>rec%start;
+       IF(TIME_PATCH.or.check) THEN
+          write(40,'(a72)') "THIS BEAM LINE    --> CAN <--         BE TRACKED WITH RELATIVE TIME OR PATH LENGTH"
+          write(40,'(a72)') " BECAUSE THE TIME PATCHES ARE EITHER SET OR NOT NEEDED (STANDARD MAD8 SKELETON)   "
+       ELSE
+          write(40,'(a72)') "THIS BEAM LINE    --> CANNOT <--      BE TRACKED WITH RELATIVE TIME OR PATH LENGTH"
+          write(40,'(a72)') " BECAUSE THE TIME PATCHES ARE NOT SET AND ARE NEEDED. (MAD8 SKELETON IS DEFORMED) "
+       ENDIF
+       write(40,*) "  "
+       write(40,'(a40)') "POSITION OF THE ORIGIN OF THIS BEAM LINE"
+       CALL PRINT_INITIAL_FRAME(P,40)
+
+       write(40,'(a90)') "******************************************************************************************"
+       write(40,'(a90)') "******************************************************************************************"
+       write(40,'(a90)') "******************************************************************************************"
+
+
+       do i=1,rec%n
+          write(40,*) " "
+          write(40,197) " FIBRE NUMBER = ", i," NAME OF MAGNET IN IT = ",p%mag%name
+          call locate_in_universe(P,i_tot,i_L,POS)
+          write(40,196)  " POSITION IN REAL MAGNET FILE ", i_tot, " BEAM LINE # ", I_L, " MAGNET # ",POS
+
+          dirb=0;dira=0;
+          if(associated(P%PREVIOUS)) dirb=P%PREVIOUS%DIR
+          if(associated(P%NEXT))     dira=P%NEXT%DIR
+          WRITE(40,198) " PROPAGATION DIRECTION OF PREVIOUS, PRESENT AND NEXT FIBRE ",dirb,P%DIR,dira
+
+          write(40,194) " PATCHES FLAGS (ENERGY,TIME,FRAMES) ", p%patch%energy,p%patch%TIME,p%patch%patch
+
+
+          if(p%patch%energy/=0) WRITE(40,204)   " ENERGY FLAG = ", P%PATCH%ENERGY
+          ! TIME PATCHES
+          select case(p%patch%TIME)
+          case(1)
+             IF(TIME_PATCH) THEN
+                WRITE(40,204) "  TIME FLAG  = ",P%PATCH%TIME
+                WRITE(40,203) " TIME PATCH ENTRANCE = ",P%PATCH%A_T
+             ENDIF
+
+          case(2)
+             IF(TIME_PATCH) THEN
+                WRITE(40,204) "  TIME FLAG  = ",P%PATCH%TIME
+                WRITE(40,203) " TIME PATCH EXIT     = ",P%PATCH%B_T
+             ENDIF
+          case(3)
+             IF(TIME_PATCH) THEN
+                WRITE(40,204) "  TIME FLAG  = ",P%PATCH%TIME
+                WRITE(40,203) " TIME PATCH ENTRANCE = ",P%PATCH%A_T
+                WRITE(40,203) " TIME PATCH EXIT     = ",P%PATCH%B_T
+             ENDIF
+          END SELECT
+
+
+
+          ! GEOMETRICAL PATCHES
+          select case(p%patch%patch)
+          CASE(0)
+
+             IF(STYLE==ROOT_ONLY.OR.STYLE==ROOT_PLUS_PATCHES) THEN
+                write(40,'(a90)')    "##########################################################################################"
+                CALL PRINT_INITIAL_FRAME(P,40)
+                write(40,'(a90)')    "##########################################################################################"
+             ENDIF
+          case(1)
+             IF(FRAME) THEN
+                write(40,*) "**************** EXIT FRAME OF THE PREVIOUS FIBRE ********************"
+                CALL PRINT_INITIAL_FRAME(P%PREVIOUS,40)
+                write(40,*) "**********************************************************************"
+                write(40,*) "*********************** FRAME OF THE FIBRE ***************************"
+                CALL PRINT_INITIAL_FRAME(P,40)
+                write(40,*) "**********************************************************************"
+             ENDIF
+             IF(PATCH) THEN
+                write(40,*)  "$$$$$$$$$$$$$$$$$$$ ALMOST MINIMALIST TYPE OF INFORMATION $$$$$$$$$$$$$$$$$$"
+                WRITE(40,*)  " FRONTAL PATCH NEEDED"
+                WRITE(40,200)   " TRANSLATION = ",P%PATCH%A_D
+                WRITE(40,200)   "   ROTATION  = ",P%PATCH%A_ANG
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_YZ,P%PATCH%A_XZ
+                write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+             ENDIF
+          case(2)
+             IF(FRAME) THEN
+                write(40,*) "*********************** FRAME OF THE FIBRE ***************************"
+                CALL PRINT_INITIAL_FRAME(P,40)
+                write(40,*) "**********************************************************************"
+                write(40,*) "**************** ENTRANCE FRAME OF THE NEXT FIBRE ********************"
+                CALL PRINT_INITIAL_FRAME(P%NEXT,40)
+                write(40,*) "**********************************************************************"
+             ENDIF
+             IF(PATCH) THEN
+                write(40,*)  "$$$$$$$$$$$$$$$$$$$ ALMOST MINIMALIST TYPE OF INFORMATION $$$$$$$$$$$$$$$$$$"
+                WRITE(40,*)  " EXIT PATCH NEEDED"
+                WRITE(40,200)   " TRANSLATION = ",P%PATCH%B_D
+                WRITE(40,200)   "   ROTATION  = ",P%PATCH%B_ANG
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_YZ,P%PATCH%B_XZ
+                write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+             ENDIF
+          case(3)
+             IF(FRAME) THEN
+                write(40,*) "**************** ENTRANCE FRAME OF THE NEXT FIBRE ********************"
+                CALL PRINT_INITIAL_FRAME(P%PREVIOUS,40)
+                write(40,*) "*********************** FRAME OF THE FIBRE ***************************"
+                CALL PRINT_INITIAL_FRAME(P,40)
+                write(40,*) "**************** ENTRANCE FRAME OF THE NEXT FIBRE ********************"
+                CALL PRINT_INITIAL_FRAME(P%NEXT,40)
+                write(40,*) "**********************************************************************"
+             ENDIF
+             IF(PATCH) THEN
+                write(40,*)  "$$$$$$$$$$$$$$$$$$$ ALMOST MINIMALIST TYPE OF INFORMATION $$$$$$$$$$$$$$$$$$"
+                WRITE(40,*)  " FRONTAL PATCH NEEDED"
+                WRITE(40,200)   " TRANSLATION = ",P%PATCH%A_D
+                WRITE(40,200)   "   ROTATION  = ",P%PATCH%A_ANG
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_YZ,P%PATCH%A_XZ
+                WRITE(40,*)  " EXIT PATCH NEEDED"
+                WRITE(40,200)   " TRANSLATION = ",P%PATCH%B_D
+                WRITE(40,200)   "   ROTATION  = ",P%PATCH%B_ANG
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_YZ,P%PATCH%B_XZ
+                write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+             ENDIF
+          END SELECT
+          if(printmis) then
+             if(P%mag%mis) then
+                CALL PRINT_INITIAL_FRAME_mag(p,40)
+             endif
+          endif
+
+
+
+
+          p=>p%next
+       enddo
+       close(40)
+
+       rec=>rec%next
+    ENDDO
+
+  END subroutine print_universe
+
+
+  SUBROUTINE PRINT_INITIAL_FRAME(F,MF)
+    IMPLICIT NONE
+    INTEGER MF
+    TYPE(FIBRE) F
+    IF(F%DIR==1) THEN
+       WRITE(MF,*) F%CHART%F%A
+       WRITE(MF,*) F%CHART%F%ENT
+    ELSE
+       WRITE(MF,*) F%CHART%F%B
+       WRITE(MF,*) F%CHART%F%EXI
+    ENDIF
+
+  END SUBROUTINE PRINT_INITIAL_FRAME
+
+  SUBROUTINE PRINT_INITIAL_FRAME_mag(F,MF)
+    IMPLICIT NONE
+    INTEGER MF
+    TYPE(FIBRE) F
+
+209 FORMAT(A25,6(1x,E15.8))
+    Write(mf,*) " &&&&&&&&&&&&&   Misalignment Information  &&&&&&&&&&&&&  "
+    Write(mf,*) "  See Routine MIS_FIBR for actual ordering of Euclidean operators  "
+    IF(F%DIR==1) THEN
+       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_IN,f%CHART%ANG_IN
+       Write(mf,*) " Front Frame "
+       WRITE(MF,*) F%mag%p%F%A
+       WRITE(MF,*) F%mag%p%F%ENT
+       Write(mf,*) " Back Frame "
+       WRITE(MF,*) F%mag%p%F%B
+       WRITE(MF,*) F%mag%p%F%EXI
+       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_out,f%CHART%ANG_out
+    ELSE
+       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_out,f%CHART%ANG_out
+       Write(mf,*) " Back Frame (Reverse Propagator)"
+       WRITE(MF,*) F%mag%p%F%B
+       WRITE(MF,*) F%mag%p%F%EXI
+       Write(mf,*) " Front Frame (Reverse Propagator) "
+       WRITE(MF,*) F%mag%p%F%A
+       WRITE(MF,*) F%mag%p%F%ENT
+       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_IN,f%CHART%ANG_IN
+    ENDIF
+    Write(mf,*) " &&&&&&&&&&&&&   End Misalignment Information  &&&&&&&&&&&&&  "
+
+  END SUBROUTINE PRINT_INITIAL_FRAME_mag
+
+  SUBROUTINE SURVEY_nikolai(basis,OMEGA,b0,ld,roll,DIR,ent,a,mid,o,exi,b)
+    ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
+    IMPLICIT NONE
+
+    INTEGER, INTENT(IN) ::DIR
+    REAL(DP) ENT(3,3),EXI(3,3),HA,D(3),BASIS(3,3),OMEGA(3),Ang(3),N(3),out(3,3),a(3),b(3),mid(3,3),o(3)
+    real(dp) angle,roll,lc,ld,b0
+
+    INTEGER I,J
+
+
+    angle=ld*b0
+    HA=DIR*angle/TWO
+    if(angle==zero) then
+       lc=ld
+    else
+       lc=two*ld/angle*sin(angle/two)
+    endif
+
+    D=ZERO
+    D(3)=DIR*LC/TWO
+    IF(DIR==1) THEN
+       Ang=ZERO;Ang(3)=roll  ;
+       CALL GEO_ROT(basis,ENT    ,Ang  ,basis)
+       Ang=ZERO;Ang(2)=HA ;
+       CALL GEO_ROT(ENT     ,MID ,Ang     ,ENT)
+       CALL GEO_ROT(MID,EXI     , Ang     ,MID)
+
+       Ang=ZERO;Ang(3)=-roll ;
+       CALL GEO_ROT(EXI     ,out ,Ang,EXI)
+
+       O=OMEGA
+       CALL GEO_TRA(O,MID,D,1)
+       B=O
+       CALL GEO_TRA(B,MID,D,1)
+
+       a=OMEGA
+       ent=basis
+       exi=out
+    ELSE
+       Ang=ZERO;Ang(3)=roll  ;
+       CALL GEO_ROT(basis,EXI      ,Ang  ,basis)
+       Ang=ZERO;Ang(2)=HA ;
+       CALL GEO_ROT(EXI     ,MID ,Ang     ,EXI)
+       CALL GEO_ROT(MID,ENT     , Ang     ,MID)
+
+       Ang=ZERO;A(3)=-roll ;
+       CALL GEO_ROT(ENT     ,out ,Ang ,ENT)
+
+       O=OMEGA
+       CALL GEO_TRA(O,MID,D,1)
+       A=O
+       CALL GEO_TRA(A,MID,D,1)
+
+       b=OMEGA
+       exi=basis
+       ent=out
+
+
+    ENDIf
+
+  END SUBROUTINE SURVEY_nikolai
+
+
 end module madx_keywords

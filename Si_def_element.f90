@@ -756,6 +756,10 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%S5%AN=>EL%AN
        EL%S5%BN=>EL%BN
+       EL%S5%FINT=>EL%FINT
+       EL%S5%HGAP=>EL%HGAP
+       EL%S5%H1=>EL%H1
+       EL%S5%H2=>EL%H2
        EL%S5%B_SOL=>EL%B_SOL
     CASE(KIND6)
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
@@ -951,6 +955,10 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,2)
        EL%S17%AN=>EL%AN
        EL%S17%BN=>EL%BN
+       EL%S17%FINT=>EL%FINT
+       EL%S17%HGAP=>EL%HGAP
+       EL%S17%H1=>EL%H1
+       EL%S17%H2=>EL%H2
        EL%S17%B_SOL=>EL%B_SOL
        nullify(EL%S17%MAT);ALLOCATE(EL%S17%MAT(4,4));
        nullify(EL%S17%LXY);ALLOCATE(EL%S17%LXY(0:10));
@@ -1139,6 +1147,10 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%S5%AN=>EL%AN
        EL%S5%BN=>EL%BN
+       EL%S5%FINT=>EL%FINT
+       EL%S5%HGAP=>EL%HGAP
+       EL%S5%H1=>EL%H1
+       EL%S5%H2=>EL%H2
        EL%S5%B_SOL=>EL%B_SOL
     CASE(KIND6)
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
@@ -1336,6 +1348,10 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,2)
        EL%S17%AN=>EL%AN
        EL%S17%BN=>EL%BN
+       EL%S17%FINT=>EL%FINT
+       EL%S17%HGAP=>EL%HGAP
+       EL%S17%H1=>EL%H1
+       EL%S17%H2=>EL%H2
        EL%S17%B_SOL=>EL%B_SOL
        nullify(EL%S17%MAT);ALLOCATE(EL%S17%MAT(4,4));
        nullify(EL%S17%LXY);ALLOCATE(EL%S17%LXY(0:10));
@@ -1803,6 +1819,7 @@ CONTAINS
     nullify(EL%U1);
     nullify(EL%U2);
     nullify(EL%P);
+    nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_EL
 
   SUBROUTINE null_ELp(EL)
@@ -1845,6 +1862,7 @@ CONTAINS
     nullify(EL%U1);
     nullify(EL%U2);
     nullify(EL%P);
+    nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_ELp
 
 
@@ -1946,6 +1964,9 @@ CONTAINS
           DEALLOCATE(EL%U2)
        ENDIF
 
+       IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+          DEALLOCATE(EL%PARENT_FIBRE)
+       ENDIF
 
 
     elseif(I>=0)       then
@@ -2087,6 +2108,9 @@ CONTAINS
           DEALLOCATE(EL%U2)
        ENDIF
 
+       IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+          DEALLOCATE(EL%PARENT_FIBRE)
+       ENDIF
 
 
        DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);
@@ -2375,6 +2399,9 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%U2,ELP%U2)
     ENDIF
+    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
+    ENDIF
 
 
   END SUBROUTINE copy_el_elp
@@ -2584,6 +2611,9 @@ CONTAINS
        CALL COPY(EL%U2,ELP%U2)
     ENDIF
 
+    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
+    ENDIF
 
 
   END SUBROUTINE copy_elp_el
@@ -2791,6 +2821,9 @@ CONTAINS
        CALL COPY(EL%U2,ELP%U2)
     ENDIF
 
+    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
+    ENDIF
 
 
   END SUBROUTINE copy_el_el

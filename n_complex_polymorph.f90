@@ -24,81 +24,23 @@ module polymorphic_complextaylor
   private div,cdivsc,cscdiv,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
   private POW,POWR,POWR8
   private dexpt,dcost,dsint,dlogt,dsqrtt,abst
-  PRIVATE dimagt,drealt,dcmplxt
-
+  PRIVATE dimagt,drealt,dcmplxt,GETint,GETORDER,CUTORDER,getchar,GETCHARnd2,GETintnd2
+  !
   private asscp
   private line
   character(120) line
 
+  ! Starts the Taylor series Package
   INTERFACE init
-     MODULE PROCEDURE init_map_cp
-     MODULE PROCEDURE init_tpsa_cp
-  END INTERFACE
-
-  INTERFACE reset
-     MODULE PROCEDURE resetpoly
-     MODULE PROCEDURE resetpolyn
-  END INTERFACE
-  INTERFACE alloc
-     MODULE PROCEDURE A_OPT !allocpoly
-     MODULE PROCEDURE allocpolyn
-  END INTERFACE
-  INTERFACE kill
-     MODULE PROCEDURE K_OPT  !resetpoly0
-     MODULE PROCEDURE resetpolyn0
-     MODULE PROCEDURE resetpoly_R  !
-     MODULE PROCEDURE resetpoly_Rn
-  END INTERFACE
-
-
-  INTERFACE daprint
-     MODULE PROCEDURE printpoly
-  END INTERFACE
-  INTERFACE print
-     MODULE PROCEDURE printpoly
-  END INTERFACE
-
-  INTERFACE morph
-     MODULE PROCEDURE polymorpht
-  END INTERFACE
-
-  INTERFACE dimag
-     MODULE PROCEDURE dimagt
-  END INTERFACE
-
-  INTERFACE aimag
-     MODULE PROCEDURE dimagt
-  END INTERFACE
-
-  INTERFACE dreal
-     MODULE PROCEDURE drealt
-  END INTERFACE
-
-  INTERFACE real
-     MODULE PROCEDURE drealt
-  END INTERFACE
-
-  INTERFACE dble
-     MODULE PROCEDURE drealt
-  END INTERFACE
-
-  INTERFACE dcmplx
-     MODULE PROCEDURE dcmplxt
-  END INTERFACE
-
-  INTERFACE cmplx
-     MODULE PROCEDURE dcmplxt
-  END INTERFACE
-
-  INTERFACE ass
-     MODULE PROCEDURE asscp
+     MODULE PROCEDURE init_tpsa_cp    !@1 &nbsp; Initializes a pure TPSA package
+     MODULE PROCEDURE init_map_cp     !@1 &nbsp; Initializes a Lie/Differential Algebraic Package
   END INTERFACE
 
 
   INTERFACE assignment (=)
-     MODULE PROCEDURE EQUAL         !2002.10.9
+     MODULE PROCEDURE EQUAL
      MODULE PROCEDURE complexEQUAL
-     MODULE PROCEDURE EQUALcomplext  !2002.10.9
+     MODULE PROCEDURE EQUALcomplext
      MODULE PROCEDURE complextEQUAL
      MODULE PROCEDURE EQUALRP  !2002.10.9
      MODULE PROCEDURE RPEQUAL !2002.10.9
@@ -108,75 +50,162 @@ module polymorphic_complextaylor
      MODULE PROCEDURE cequaldacon
   end  INTERFACE
 
+  ! Operators
+  !@     <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="684" height="445">
+  !@       <tr>
+  !@         <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +</b>&nbsp;&nbsp;&nbsp; </font></span></td>
+  !@         <td width="176" height="34" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">&nbsp;COMPLEX</font></span></td>
+  !@         <td width="306" height="42" align="center" colspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="94" height="84" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="84" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@         <td width="92" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="105" height="42" align="center">
+  !@         <font size="2">REAL_8</font></td>
+  !@         <td width="102" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@         <td width="99" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="108" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX</font></span></td>
+  !@         <td width="39" height="53" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@         <td width="84" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#ADD">ADD</a></font></td>
+  !@         <td width="92" height="53" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CADDSC">CADDSC</a></span></font></td>
+  !@         <td width="105" height="53" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#ADDP">ADDP</a></span></font></td>
+  !@         <td width="102" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DADDSC">DADDSC</a></font></td>
+  !@         <td width="99" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#ADDSC">ADDSC</a></font></td>
+  !@         <td width="94" height="53" align="center"><font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#IADDSC">IADDSC</a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="50" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="84" height="50" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CSCADD">CSCADD</a></span></font></td>
+  !@         <td width="92" height="50" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="50" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CPSCADD">CPSCADD</a></span></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@            <td width="78" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@            <td width="56" height="20" align="center">
+  !@            <b>&nbsp;&nbsp;&nbsp; F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="167" align="center" rowspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL_8</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#PADD">PADD</a></span></font></td>
+  !@         <td width="92" height="55" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CPADDSC">CPADDSC</a></span></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <font color="#FF0000" size="2"><i>
+  !@         <a href="m_real_polymorph.htm#ADD" style="text-decoration: none">
+  !@         <font color="#FF0000">ADD</font></a></i></font></td>
+  !@         <td width="102" height="55" align="center">
+  !@         <i><font size="2" color="#FF0000">
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#DADDSC">
+  !@         <font color="#FF0000">DADDSC</font></a></font></i></td>
+  !@         <td width="99" height="55" align="center">
+  !@         <i><font size="2" color="#FF0000">
+  !@         <a href="m_real_polymorph.htm#ADDSC" style="text-decoration: none">
+  !@         <font color="#FF0000">ADDSC</font></a></font></i></td>
+  !@         <td width="94" height="55" align="center"><i>
+  !@         <font size="2" color="#FF0000">
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#IADDSC">
+  !@         <font color="#FF0000">IADDSC</font></a></font></i></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DSCADD">DSCADD</a></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a href="m_real_polymorph.htm#DSCADD" style="text-decoration: none">
+  !@         <font color="#FF0000">DSCADD</font></a></i></font></td>
+  !@         <td width="102" height="55" align="center"><b>F90</b></td>
+  !@         <td width="99" height="55" align="center"><b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="52" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@         <td width="84" height="52" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#SCADD">SCADD</a></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="52" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a href="m_real_polymorph.htm#SCADD" style="text-decoration: none">
+  !@         <font color="#FF0000">SCADD</font></a></i></font></td>
+  !@         <td width="102" height="52" align="center"><b>F90</b></td>
+  !@         <td width="99" height="52" align="center"><b>F90</b></td>
+  !@         <td width="94" height="52" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="78" height="61" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@         <td width="84" height="61" align="center"><font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#ISCADD">ISCADD</a></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="61" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a href="m_real_polymorph.htm#ISCADD" style="text-decoration: none">
+  !@         <font color="#FF0000">ISCADD</font></a></i></font></td>
+  !@         <td width="102" height="61" align="center"><b>F90</b></td>
+  !@         <td width="99" height="61" align="center"><b>F90</b></td>
+  !@         <td width="94" height="61" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@     </table>
 
-  INTERFACE dexp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-  INTERFACE exp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-  INTERFACE cexp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-  INTERFACE cdexp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-
-  INTERFACE cdcos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-  INTERFACE dcos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-  INTERFACE cos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-  INTERFACE ccos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-
-  INTERFACE cdsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE ccsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE dsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE sin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-
-  INTERFACE dlog
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-  INTERFACE log
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-  INTERFACE cdlog
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-  INTERFACE clog
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-
-  INTERFACE dsqrt
-     MODULE PROCEDURE dsqrtt
-  END INTERFACE
-  INTERFACE cdsqrt
-     MODULE PROCEDURE dsqrtt
-  END INTERFACE
-  INTERFACE sqrt
-     MODULE PROCEDURE dsqrtt
-  END INTERFACE
-
-  INTERFACE abs
-     MODULE PROCEDURE abst
-  END INTERFACE
-  INTERFACE dabs
-     MODULE PROCEDURE abst
-  END INTERFACE
 
 
   INTERFACE OPERATOR (+)
@@ -196,6 +225,168 @@ module polymorphic_complextaylor
      MODULE PROCEDURE iscadd
   end  INTERFACE
 
+  !@     <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber4" width="684" height="445">
+  !@       <tr>
+  !@         <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+  !@         -&nbsp;&nbsp; </font></span></td>
+  !@         <td width="176" height="34" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">&nbsp;COMPLEX</font></span></td>
+  !@         <td width="306" height="42" align="center" colspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="94" height="84" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="84" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@         <td width="92" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="105" height="42" align="center">
+  !@         <font size="2">REAL_8</font></td>
+  !@         <td width="102" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@         <td width="99" height="45" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="108" align="center" rowspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX</font></span></td>
+  !@         <td width="39" height="53" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@         <td width="84" height="53" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#SUBS">SUSB</a></span></font></td>
+  !@         <td width="92" height="53" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CSUBSC">CSUBSC</a></span></font></td>
+  !@         <td width="105" height="53" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#SUBP">SUBP</a></span></font></td>
+  !@         <td width="102" height="53" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DSUBSC">DSUBSC</a></font></td>
+  !@         <td width="99" height="53" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#SUBSC">
+  !@         SUBSC</a></span></font></td>
+  !@         <td width="94" height="53" align="center"><font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#ISUBSC">ISUBSC</a></font></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="50" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@         <td width="84" height="50" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CSCSUB">
+  !@         CSCSUB</a></span></font></td>
+  !@         <td width="92" height="50" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="50" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CPSCSUB">
+  !@         CPSCSUB</a></span></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@            <td width="78" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@            <td width="56" height="20" align="center">
+  !@            <b>&nbsp;&nbsp;&nbsp; F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="167" align="center" rowspan="3">
+  !@         <font size="2">REAL</font></td>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL_8</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#PSUB">PSUB</a></span></font></td>
+  !@         <td width="92" height="55" align="center">
+  !@         <font size="2"><span style="font-weight: 700">
+  !@         <a style="text-decoration: none" href="n_complex_polymorph.htm#CPSUBSC">CPSUBSC</a></span></font></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#SUBS">
+  !@         <font color="#FF0000">SUBS</font></a></i></font></td>
+  !@         <td width="102" height="55" align="center">
+  !@         <i><font size="2" color="#FF0000">
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#DSUBSC">
+  !@         <font color="#FF0000">DSUBSC</font></a></font></i></td>
+  !@         <td width="99" height="55" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#SUBSC">
+  !@         <font color="#FF0000">SUBSC</font></a></i></font></td>
+  !@         <td width="94" height="55" align="center"><i>
+  !@         <font size="2" color="#FF0000">
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#ISUBSC">
+  !@         <font color="#FF0000">ISUBSC</font></a></font></i></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="55" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@         <td width="84" height="55" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DSCSUB">
+  !@         DSCSUB</a></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="55" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#DSCSUB">
+  !@         <font color="#FF0000">DSCSUB</font></a></i></font></td>
+  !@         <td width="102" height="55" align="center"><b>F90</b></td>
+  !@         <td width="99" height="55" align="center"><b>F90</b></td>
+  !@         <td width="94" height="55" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="39" height="52" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@         <td width="84" height="52" align="center">
+  !@         <font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#SCSUB">
+  !@         SCSUB</a></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="52" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#SCSUB">
+  !@         <font color="#FF0000">SCSUB</font></a></i></font></td>
+  !@         <td width="102" height="52" align="center"><b>F90</b></td>
+  !@         <td width="99" height="52" align="center"><b>F90</b></td>
+  !@         <td width="94" height="52" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="78" height="61" align="center" colspan="2">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@         <td width="84" height="61" align="center"><font size="2">
+  !@         <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#ISCSUB">
+  !@         ISCSUB</a></font></td>
+  !@            <td width="77" height="20" align="center">
+  !@            <b>F90</b></td>
+  !@         <td width="105" height="61" align="center">
+  !@         <font size="2" color="#FF0000"><i>
+  !@         <a style="text-decoration: none" href="m_real_polymorph.htm#ISCSUB">
+  !@         <font color="#FF0000">ISCSUB</font></a></i></font></td>
+  !@         <td width="102" height="61" align="center"><b>F90</b></td>
+  !@         <td width="99" height="61" align="center"><b>F90</b></td>
+  !@         <td width="94" height="61" align="center"><b>F90</b></td>
+  !@       </tr>
+  !@     </table>
+
   INTERFACE OPERATOR (-)
      MODULE PROCEDURE unarySUB
      MODULE PROCEDURE subs
@@ -213,6 +404,169 @@ module polymorphic_complextaylor
      MODULE PROCEDURE iscsub
   END INTERFACE
 
+  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber5" width="684" height="445">
+  !@      <tr>
+  !@        <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+  !@        *&nbsp;&nbsp;&nbsp; </font></span></td>
+  !@        <td width="176" height="34" align="center" colspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">&nbsp;COMPLEX</font></span></td>
+  !@        <td width="306" height="42" align="center" colspan="3">
+  !@        <font size="2">REAL</font></td>
+  !@        <td width="94" height="84" align="center" rowspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="84" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@        <td width="92" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@        <td width="105" height="42" align="center">
+  !@        <font size="2">REAL_8</font></td>
+  !@        <td width="102" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@        <td width="99" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="108" align="center" rowspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">COMPLEX</font></span></td>
+  !@        <td width="39" height="53" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@        <td width="84" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#MUL">MUL</a></span></font></td>
+  !@        <td width="92" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CMULSC">CMULSC</a></span></font></td>
+  !@        <td width="105" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#MULP">MULP</a></span></font></td>
+  !@        <td width="102" height="53" align="center">
+  !@        <font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DMULSC">DMULSC</a></font></td>
+  !@        <td width="99" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#MULSC">
+  !@        MULSC</a></span></font></td>
+  !@        <td width="94" height="53" align="center"><font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#IMULSC">IMULSC</a></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="50" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@        <td width="84" height="50" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CSCMUL">
+  !@        CSCMUL</a></span></font></td>
+  !@        <td width="92" height="50" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="50" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CPSCMUL">
+  !@        CPSCMUL</a></span></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@           <td width="78" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@           <td width="56" height="20" align="center">
+  !@           <b>&nbsp;&nbsp;&nbsp; F90</b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="167" align="center" rowspan="3">
+  !@        <font size="2">REAL</font></td>
+  !@        <td width="39" height="55" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL_8</font></span></td>
+  !@        <td width="84" height="55" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#PMUL">PMUL</a></span></font></td>
+  !@        <td width="92" height="55" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CPMULSC">CPMULSC</a></span></font></td>
+  !@        <td width="105" height="55" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#MUL">
+  !@        <font color="#FF0000">MUL</font></a></i></font></td>
+  !@        <td width="102" height="55" align="center">
+  !@        <i><font size="2" color="#FF0000">
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#DMULSC">
+  !@        <font color="#FF0000">DMULSC</font></a></font></i></td>
+  !@        <td width="99" height="55" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#MULSC">
+  !@        <font color="#FF0000">MULSC</font></a></i></font></td>
+  !@        <td width="94" height="55" align="center"><i>
+  !@        <font size="2" color="#FF0000">
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#IMULSC">
+  !@        <font color="#FF0000">IMULSC</font></a></font></i></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="55" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@        <td width="84" height="55" align="center">
+  !@        <font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DSCMUL">
+  !@        DSCMUL</a></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="55" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#DSCMUL">
+  !@        <font color="#FF0000">DSCMUL</font></a></i></font></td>
+  !@        <td width="102" height="55" align="center"><b>F90</b></td>
+  !@        <td width="99" height="55" align="center"><b>F90</b></td>
+  !@        <td width="94" height="55" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="52" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@        <td width="84" height="52" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#SCMUL">
+  !@        SCMUL</a></span></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="52" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#SCMUL">
+  !@        <font color="#FF0000">SCMUL</font></a></i></font></td>
+  !@        <td width="102" height="52" align="center"><b>F90</b></td>
+  !@        <td width="99" height="52" align="center"><b>F90</b></td>
+  !@        <td width="94" height="52" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="78" height="61" align="center" colspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@        <td width="84" height="61" align="center"><font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#ISCMUL">
+  !@        ISCMUL</a></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="61" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#ISCMUL">
+  !@        <font color="#FF0000">ISCMUL</font></a></i></font></td>
+  !@        <td width="102" height="61" align="center"><b>F90</b></td>
+  !@        <td width="99" height="61" align="center"><b>F90</b></td>
+  !@        <td width="94" height="61" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@    </table>
+
+
   INTERFACE OPERATOR (*)
      MODULE PROCEDURE mul
      MODULE PROCEDURE pmul
@@ -228,6 +582,169 @@ module polymorphic_complextaylor
      MODULE PROCEDURE imulsc
      MODULE PROCEDURE iscmul
   END INTERFACE
+
+  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber6" width="684" height="445">
+  !@      <tr>
+  !@        <td width="78" height="84" align="center" rowspan="2" colspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="4"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  !@        /</b> &nbsp;&nbsp;&nbsp; </font></span></td>
+  !@        <td width="176" height="34" align="center" colspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">&nbsp;COMPLEX</font></span></td>
+  !@        <td width="306" height="42" align="center" colspan="3">
+  !@        <font size="2">REAL</font></td>
+  !@        <td width="94" height="84" align="center" rowspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="84" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@        <td width="92" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@        <td width="105" height="42" align="center">
+  !@        <font size="2">REAL_8</font></td>
+  !@        <td width="102" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">rEAL(DP)</font></span></td>
+  !@        <td width="99" height="45" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="108" align="center" rowspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">COMPLEX</font></span></td>
+  !@        <td width="39" height="53" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">DOUBLE COMPLEX</font></span></td>
+  !@        <td width="84" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#DIV">DIV</a></span></font></td>
+  !@        <td width="92" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CDIVSC">CDIVSC</a></span></font></td>
+  !@        <td width="105" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#DIVP">DIVP</a></span></font></td>
+  !@        <td width="102" height="53" align="center">
+  !@        <font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DDIVSC">DDIVSC</a></font></td>
+  !@        <td width="99" height="53" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#DIVSC">
+  !@        DIVSC</a></span></font></td>
+  !@        <td width="94" height="53" align="center"><font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#IDIVSC">IDIVSC</a></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="50" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">COMPLEX(DP)</font></span></td>
+  !@        <td width="84" height="50" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CSCDIV">
+  !@        CSCDIV</a></span></font></td>
+  !@        <td width="92" height="50" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="50" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CPSCDIV">
+  !@        CPSCDIV</a></span></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@           <td width="78" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@           <td width="56" height="20" align="center">
+  !@           <b>&nbsp;&nbsp;&nbsp; F90</b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="167" align="center" rowspan="3">
+  !@        <font size="2">REAL</font></td>
+  !@        <td width="39" height="55" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL_8</font></span></td>
+  !@        <td width="84" height="55" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#PDIV">PDIV</a></span></font></td>
+  !@        <td width="92" height="55" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#CPDIVSC">CPDIVSC</a></span></font></td>
+  !@        <td width="105" height="55" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#DIV">
+  !@        <font color="#FF0000">DIV</font></a></i></font></td>
+  !@        <td width="102" height="55" align="center">
+  !@        <i><font size="2" color="#FF0000">
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#DDIVSC">
+  !@        <font color="#FF0000">DDIVSC</font></a></font></i></td>
+  !@        <td width="99" height="55" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#DIVSC">
+  !@        <font color="#FF0000">DIVSC</font></a></i></font></td>
+  !@        <td width="94" height="55" align="center"><i>
+  !@        <font size="2" color="#FF0000">
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#IDIVSC">
+  !@        <font color="#FF0000">IDIVSC</font></a></font></i></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="55" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL(DP)</font></span></td>
+  !@        <td width="84" height="55" align="center">
+  !@        <font size="2">
+  !@        <a style="text-decoration: none; font-weight: 700" href="n_complex_polymorph.htm#DSCDIV">
+  !@        DSCDIV</a></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="55" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#DSCDIV">
+  !@        <font color="#FF0000">DSCDIV</font></a></i></font></td>
+  !@        <td width="102" height="55" align="center"><b>F90</b></td>
+  !@        <td width="99" height="55" align="center"><b>F90</b></td>
+  !@        <td width="94" height="55" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="39" height="52" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">REAL(SP)</font></span></td>
+  !@        <td width="84" height="52" align="center">
+  !@        <font size="2"><span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#SCDIV">
+  !@        SCDIV</a></span></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="52" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#SCDIV">
+  !@        <font color="#FF0000">SCDIV</font></a></i></font></td>
+  !@        <td width="102" height="52" align="center"><b>F90</b></td>
+  !@        <td width="99" height="52" align="center"><b>F90</b></td>
+  !@        <td width="94" height="52" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="78" height="61" align="center" colspan="2">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="2">Integer</font></span></td>
+  !@        <td width="84" height="61" align="center"><font size="2">
+  !@        <span style="font-weight: 700">
+  !@        <a style="text-decoration: none" href="n_complex_polymorph.htm#ISCDIV">
+  !@        ISCDIV</a></span></font></td>
+  !@           <td width="77" height="20" align="center">
+  !@           <b>F90</b></td>
+  !@        <td width="105" height="61" align="center">
+  !@        <font size="2" color="#FF0000"><i>
+  !@        <a style="text-decoration: none" href="m_real_polymorph.htm#ISCDIV">
+  !@        <font color="#FF0000">ISCDIV</font></a></i></font></td>
+  !@        <td width="102" height="61" align="center"><b>F90</b></td>
+  !@        <td width="99" height="61" align="center"><b>F90</b></td>
+  !@        <td width="94" height="61" align="center"><b>F90</b></td>
+  !@      </tr>
+  !@    </table>
 
   INTERFACE OPERATOR (/)
      MODULE PROCEDURE div
@@ -251,7 +768,169 @@ module polymorphic_complextaylor
      MODULE PROCEDURE POWR8
   END INTERFACE
 
+  ! New Operators
+
+  INTERFACE OPERATOR (.SUB.)
+     MODULE PROCEDURE GETORDER
+     MODULE PROCEDURE getchar
+     MODULE PROCEDURE GETint
+  END INTERFACE
+
+  INTERFACE OPERATOR (.CUT.)
+     MODULE PROCEDURE CUTORDER
+  END INTERFACE
+
+  INTERFACE OPERATOR (.PAR.)
+     MODULE PROCEDURE getcharnd2
+     MODULE PROCEDURE GETintnd2
+  END INTERFACE
+
+
+
+
+  ! Intrinsic Functions
+
+  INTERFACE aimag
+     MODULE PROCEDURE dimagt
+  END INTERFACE
+  INTERFACE dimag
+     MODULE PROCEDURE dimagt
+  END INTERFACE
+
+
+  INTERFACE real
+     MODULE PROCEDURE drealt
+  END INTERFACE
+  INTERFACE dreal
+     MODULE PROCEDURE drealt
+  END INTERFACE
+  INTERFACE dble
+     MODULE PROCEDURE drealt
+  END INTERFACE
+
+
+  INTERFACE cmplx
+     MODULE PROCEDURE dcmplxt
+  END INTERFACE
+  INTERFACE dcmplx
+     MODULE PROCEDURE dcmplxt
+  END INTERFACE
+
+
+  INTERFACE exp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+  INTERFACE dexp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+  INTERFACE cexp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+  INTERFACE cdexp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+
+  INTERFACE cos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+  INTERFACE cdcos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+  INTERFACE dcos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+  INTERFACE ccos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+
+  INTERFACE sin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+  INTERFACE cdsin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+  INTERFACE ccsin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+  INTERFACE dsin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+
+  INTERFACE log
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+  INTERFACE dlog
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+  INTERFACE cdlog
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+  INTERFACE clog
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+
+  INTERFACE sqrt
+     MODULE PROCEDURE dsqrtt
+  END INTERFACE
+  INTERFACE dsqrt
+     MODULE PROCEDURE dsqrtt
+  END INTERFACE
+  INTERFACE cdsqrt
+     MODULE PROCEDURE dsqrtt
+  END INTERFACE
+
+  INTERFACE abs
+     MODULE PROCEDURE abst
+  END INTERFACE
+  INTERFACE dabs
+     MODULE PROCEDURE abst
+  END INTERFACE
+
+  ! Non Intrinsic Functions
+  INTERFACE morph
+     MODULE PROCEDURE polymorpht
+  END INTERFACE
+
+
+  ! i/o
+
+  INTERFACE daprint
+     MODULE PROCEDURE printpoly
+  END INTERFACE
+  INTERFACE print
+     MODULE PROCEDURE printpoly
+  END INTERFACE
+
+
+  ! Constructors and Destructors
+  INTERFACE alloc
+     MODULE PROCEDURE A_OPT !allocpoly
+     MODULE PROCEDURE allocpolyn
+  END INTERFACE
+
+  INTERFACE kill
+     MODULE PROCEDURE K_OPT  !resetpoly0
+     MODULE PROCEDURE resetpolyn0
+     MODULE PROCEDURE resetpoly_R  !
+     MODULE PROCEDURE resetpoly_Rn
+  END INTERFACE
+
+  INTERFACE reset
+     MODULE PROCEDURE resetpoly
+     MODULE PROCEDURE resetpolyn
+  END INTERFACE
+  ! end Constructors and Destructors
+
+
+  ! managing
+
+  INTERFACE ass
+     MODULE PROCEDURE asscp
+  END INTERFACE
+
+
 contains
+
 
   FUNCTION polymorpht( S1 )
     implicit none
@@ -266,7 +945,7 @@ contains
   END FUNCTION polymorpht
 
 
-  subroutine set_da_pointers
+  subroutine set_da_pointers()
     use da_arrays
     implicit none
     c_%total_da_size => total_da_size
@@ -302,16 +981,16 @@ contains
     call set_in_polyp(PACKAGE1)
   end subroutine  init_map_cp
 
-  subroutine init_tpsa_cp(NO1,NP1,PACKAGE)
+  subroutine init_tpsa_cp(NO1,NV1,PACKAGE)
     implicit none
-    integer NO1,NP1
+    integer NO1,NV1
     logical(lp),optional :: PACKAGE
     logical(lp) PACKAGE1
     package1=.true.
     if(present(PACKAGE)) PACKAGE1=PACKAGE
     W_P=>W_I                  ! default output, comment out if necessary
     call set_da_pointers
-    call init_tpsa_p(NO1,NP1,PACKAGE1)
+    call init_tpsa_p(NO1,NV1,PACKAGE1)
     call set_in_poly(PACKAGE1)
     call set_in_polyp(PACKAGE1)
   end subroutine  init_tpsa_cp
@@ -379,6 +1058,199 @@ contains
     s2%s=one
 
   END SUBROUTINE resetpoly0
+
+  !  FUNCTION GETchar( S1, S2 )
+  !    implicit none
+  !    complex(dp) GETchar
+  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    CHARACTER(*)  , INTENT (IN) ::  S2
+  !
+  !    if(s1%kind==m2) then
+  !       GETchar=s1%t.sub.s2   !  CHANGE
+  !    else
+  !       GETchar=s1
+  !    endif
+  !
+  !  END FUNCTION GETchar
+  !
+  !
+  !  FUNCTION GETint( S1, S2 )
+  !    implicit none
+  !    complex(dp) GETint
+  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    integer  , INTENT (IN) ::  S2(:)
+  !    !  integer localmaster
+  !
+  !    if(s1%kind==m2) then
+  !       ! GETchar%t=s1%t.sub.s2   !  OLD
+  !       GETint=s1%t.sub.s2   !  CHANGE
+  !    else
+  !       GETint=s1
+  !    endif
+  !
+  !  END FUNCTION GETint
+  !
+  !  FUNCTION GETORDER( S1, S2 )
+  !    implicit none
+  !    TYPE (double_complex) GETORDER
+  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    integer  , INTENT (IN) ::  S2
+  !
+  !    if(s1%kind==m2) then
+  !       localmaster=master
+  !       call ass(GETORDER)
+  !       GETORDER%t=s1%t.sub.s2
+  !       master=localmaster
+  !    else
+  !       GETORDER=s1
+  !    endif
+  !
+  !  END FUNCTION GETORDER
+  !
+  !
+  !  FUNCTION CUTORDER( S1, S2 )
+  !    implicit none
+  !    TYPE (double_complex) CUTORDER
+  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    integer  , INTENT (IN) ::  S2
+  !
+  !    if(s1%kind==m2) then
+  !       localmaster=master
+  !       call ass(CUTORDER)
+  !       CUTORDER%t=s1%t.CUT.s2
+  !       master=localmaster
+  !    else
+  !       CUTORDER=s1
+  !    endif
+  !
+  !  END FUNCTION CUTORDER
+
+  FUNCTION GETCHARnd2( S1, S2 )
+    implicit none
+    TYPE (double_complex) GETCHARnd2
+    TYPE (double_complex), INTENT (IN) :: S1
+    CHARACTER(*)  , INTENT (IN) ::  S2
+    integer localmaster
+
+    if(s1%kind==m2) then
+       localmaster=master
+       call ass(GETCHARnd2)
+       GETCHARnd2%t=s1%t.par.s2
+       master=localmaster
+    else
+       GETCHARnd2=s1
+    endif
+
+  END FUNCTION GETCHARnd2
+
+  FUNCTION GETintnd2( S1, S2 )
+    implicit none
+    TYPE (double_complex) GETintnd2
+    TYPE (double_complex), INTENT (IN) :: S1
+    integer, INTENT (IN) ::  S2(:)
+    integer localmaster
+
+    if(s1%kind==m2) then
+       localmaster=master
+       call ass(GETintnd2)
+       GETintnd2%t=s1%t.par.s2
+       master=localmaster
+    else
+       GETintnd2=s1
+    endif
+
+  END FUNCTION GETintnd2
+
+
+  FUNCTION GETchar( S1, S2 )
+    implicit none
+    complex(dp) GETchar
+    TYPE (double_complex), INTENT (IN) :: S1
+    CHARACTER(*)  , INTENT (IN) ::  S2
+    integer i,j
+    !  integer localmaster
+
+    GETchar=zero
+    if(s1%kind==m2) then
+       ! GETchar%t=s1%t.sub.s2   !  OLD
+       GETchar=s1%t.sub.s2   !  CHANGE
+    elseif(s1%kind==m1) then
+       GETchar=s1
+       do i=1,len_trim(s2)
+          CALL  CHARINT(s2(i:i),j)
+          if(j/=0) then
+             GETchar=zero
+             exit
+          endif
+       enddo
+
+    endif
+
+  END FUNCTION GETchar
+
+  FUNCTION GETint( S1, S2 )
+    implicit none
+    complex(dp) GETint
+    TYPE (double_complex), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2(:)
+    integer i
+
+    GETint=zero
+    if(s1%kind==m2) then
+       GETint=s1%t.sub.s2   !  CHANGE
+    elseif(s1%kind==m1) then
+       GETint=s1
+       do i=1,size(s2)
+          if(S2(i)/=0) then
+             GETint=zero
+             exit
+          endif
+       enddo
+
+    endif
+
+  END FUNCTION GETint
+
+  FUNCTION GETORDER( S1, S2 )
+    implicit none
+    TYPE (double_complex) GETORDER
+    TYPE (double_complex), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
+    integer localmaster
+
+    GETORDER=zero
+    if(s1%kind==m2) then
+       localmaster=master
+       call ass(GETORDER)
+       GETORDER%t=s1%t.sub.s2
+       master=localmaster
+    elseif(s1%kind==m1) then
+       if(s2==0) GETORDER=s1
+    endif
+
+  END FUNCTION GETORDER
+
+
+  FUNCTION CUTORDER( S1, S2 )
+    implicit none
+    TYPE (double_complex) CUTORDER
+    TYPE (double_complex), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
+    integer localmaster
+
+    if(s1%kind==m2) then
+       localmaster=master
+       call ass(CUTORDER)
+       CUTORDER%t=s1%t.CUT.s2
+       master=localmaster
+    else
+       CUTORDER=s1
+    endif
+
+  END FUNCTION CUTORDER
+
+
+
 
   SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
     implicit none
@@ -629,7 +1501,8 @@ contains
              s2%kind=1
           elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
              call alloc(s2%t)
-             call var(s2%t,S1%R,S2%S,s2%i,s2%j)
+             s2%t=(/S1%R,S2%S/).var.(/s2%i,s2%j/)
+             !             call var(s2%t,S1%R,S2%S,s2%i,s2%j)
              !      s2%i=0
              !      s2%j=0
              s2%kind=2
@@ -745,7 +1618,8 @@ contains
              s2%kind=1
           elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
              call alloc(s2%t)
-             call var(s2%t,cmplx(S1%R,zero,kind=dp),S2%S,s2%i,s2%j)
+             s2%t=(/cmplx(S1%R,zero,kind=dp),S2%S/).var.(/s2%i,s2%j/)
+             !             call var(s2%t,cmplx(S1%R,zero,kind=dp),S2%S,s2%i,s2%j)
              !      s2%i=0
              !      s2%j=0
              s2%kind=2
@@ -860,7 +1734,8 @@ contains
              s2%kind=1
           elseif((s2%i>0.and.s2%i<=nv))  then
              call alloc(s2%t)
-             call var(s2%t,REAL(S1%R,kind=DP),S2%S,s2%i)
+             s2%t=(/REAL(S1%R,kind=DP),S2%S/).var.s2%i
+             !             call var(s2%t,REAL(S1%R,kind=DP),S2%S,s2%i)
              !      s2%i=0
              s2%kind=2
              s2%alloc=t
@@ -1200,7 +2075,8 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          call var(s2%t,cmplx(R1,zero,kind=dp),s2%s,s2%i,s2%j)
+          s2%t=(/cmplx(R1,zero,kind=dp),s2%s/).var.(/s2%i,s2%j/)
+          !          call var(s2%t,cmplx(R1,zero,kind=dp),s2%s,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
           s2%kind=2
@@ -1250,7 +2126,8 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          call var(s2%t,cmplx(REAL(R1,kind=DP),zero,kind=dp),S2%S,s2%i,s2%j)
+          s2%t=(/cmplx(REAL(R1,kind=DP),zero,kind=dp),S2%S/).var.(/s2%i,s2%j/)
+          !          call var(s2%t,cmplx(REAL(R1,kind=DP),zero,kind=dp),S2%S,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
           s2%kind=2
@@ -1299,7 +2176,8 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          call var(s2%t,cmplx(REAL(R1,kind=DP),zero,kind=dp),s2%s,s2%i,s2%j)
+          s2%t=(/cmplx(REAL(R1,kind=DP),zero,kind=dp),s2%s/).var.(/s2%i,s2%j/)
+          !          call var(s2%t,cmplx(REAL(R1,kind=DP),zero,kind=dp),s2%s,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
           s2%kind=2
@@ -1349,7 +2227,8 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          call var(s2%t,R1,s2%s,s2%i,s2%j)
+          s2%t=(/R1,s2%s/).var.(/s2%i,s2%j/)
+          !          call var(s2%t,R1,s2%s,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
           s2%kind=2
@@ -4491,7 +5370,8 @@ contains
 
     if(knob) then
        if((s2%i>=0.and.s2%i<=nv).and.(s2%j>=0.and.s2%j<=nv))  then
-          call var(varc1,S2%R,S2%S,s2%i,s2%j)
+          varc1=(/S2%R,S2%S/).var.(/s2%i,s2%j/)
+          !          call var(varc1,S2%R,S2%S,s2%i,s2%j)
        else
           w_p=0
           w_p%nc=2
@@ -4502,8 +5382,9 @@ contains
           call write_e(0)
        endif
     else ! Not a knob
-       call alloc(s2%t)
-       call var(varc1,S2%R,S2%S,0,0)
+       !       call alloc(s2%t)     looks like bug ! removed 2004
+       varc1=(/S2%R,S2%S/).var.(/0,0/)
+       !       call var(varc1,S2%R,S2%S,0,0)
     endif
 
   end SUBROUTINE  varck1
@@ -4514,7 +5395,8 @@ contains
 
     if(knob) then
        if((s2%i>=0.and.s2%i<=nv).and.(s2%j>=0.and.s2%j<=nv))  then
-          call var(varc2,S2%R,S2%S,s2%i,s2%j)
+          varc2=(/S2%R,S2%S/).var.(/s2%i,s2%j/)
+          !          call var(varc2,S2%R,S2%S,s2%i,s2%j)
        else
           w_p=0
           w_p%nc=2
@@ -4525,7 +5407,8 @@ contains
           call write_e(0)
        endif
     else ! Not a knob
-       call var(varc2,S2%R,S2%S,0,0)
+       varc2=(/S2%R,S2%S/).var.(/0,0/)
+       !       call var(varc2,S2%R,S2%S,0,0)
     endif
 
   end SUBROUTINE  varck2

@@ -80,6 +80,8 @@ TYPE SOL5
    real(dp), POINTER ::L
    real(dp), POINTER ::B_SOL
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
+   real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
 END  TYPE SOL5
 
 TYPE SOL5P
@@ -87,6 +89,8 @@ TYPE SOL5P
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8), POINTER ::L
    TYPE(REAL_8), POINTER ::B_SOL
+   TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
 END  TYPE SOL5P
 
 TYPE SOLT
@@ -97,6 +101,8 @@ TYPE SOLT
    real(dp),  DIMENSION(:,:), POINTER :: MAT    !LINEAR MATRIX
    !frs     real(dp),  DIMENSION(:), POINTER :: LXY(:)
    real(dp),  DIMENSION(:), POINTER :: LXY
+   real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
 END  TYPE SOLT
 
 TYPE SOLTP
@@ -107,6 +113,8 @@ TYPE SOLTP
    TYPE(REAL_8),  DIMENSION(:,:), POINTER :: MAT
    !frs     TYPE(REAL_8), DIMENSION(:), POINTER :: lxy(:)
    TYPE(REAL_8), DIMENSION(:), POINTER :: lxy
+   TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
 END  TYPE SOLTP
 
 

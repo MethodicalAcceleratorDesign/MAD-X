@@ -27,60 +27,7 @@ module tpsalie
   integer::nrmax=400
   private mul_PBf_t,mul_VECf_t,mul_VECf_MAP,mul_PBf_MAP
 
-  TYPE DAMAP
-     TYPE (TAYLOR) V(NDIM2)    ! Ndim2=6 but allocated to nd2=2,4,6
-  END TYPE DAMAP
 
-  TYPE vecfield
-     type (taylor) v(ndim2)
-     integer ifac
-  END TYPE vecfield
-
-  TYPE pbfield
-     type (taylor) h
-     integer ifac
-  END TYPE pbfield
-
-
-
-  TYPE tree
-     type (taylor) branch(ndim2)
-  END TYPE tree
-
-  !Radiation
-  TYPE radtaylor
-     type (taylor) v
-     type (taylor) e(ndim2)
-  END TYPE radtaylor
-
-
-  INTERFACE ASSDAMAP
-     MODULE PROCEDURE ASSVEC
-     MODULE PROCEDURE ASSMAP
-     MODULE PROCEDURE ASSPB
-     MODULE PROCEDURE asstaylor
-  END INTERFACE
-
-  INTERFACE texp
-     MODULE PROCEDURE explieflo ! flow on maps
-     MODULE PROCEDURE expliepb  ! pb on maps
-     MODULE PROCEDURE expflot    ! flow on taylor
-     MODULE PROCEDURE exppb     ! pb on taylor
-  END INTERFACE
-
-  INTERFACE exp
-     MODULE PROCEDURE explieflo ! flow on maps
-     MODULE PROCEDURE expliepb  ! pb on maps
-     MODULE PROCEDURE expflot    ! flow on taylor
-     MODULE PROCEDURE exppb     ! pb on taylor
-  END INTERFACE
-
-  INTERFACE checkdamap
-     MODULE PROCEDURE checkmap
-     MODULE PROCEDURE checkpb
-     MODULE PROCEDURE checkvec
-     MODULE PROCEDURE checktaylor
-  END INTERFACE
 
 
   INTERFACE assignment (=)
@@ -105,29 +52,6 @@ module tpsalie
      !radiation
      MODULE PROCEDURE radEQUAL
      MODULE PROCEDURE EQUALrad
-  end  INTERFACE
-
-  INTERFACE full_abs
-     MODULE PROCEDURE DABSMAP
-  END INTERFACE
-
-  INTERFACE OPERATOR (.SUB.)
-     MODULE PROCEDURE GETORDERVEC
-     MODULE PROCEDURE GETORDERMAP
-     MODULE PROCEDURE GETORDERPB
-  end  INTERFACE
-
-  INTERFACE OPERATOR (.CUT.)
-     MODULE PROCEDURE CUTORDER
-     MODULE PROCEDURE CUTORDERPB
-     MODULE PROCEDURE CUTORDERVEC
-  END INTERFACE
-
-  INTERFACE OPERATOR (.o.)
-     MODULE PROCEDURE concator
-     MODULE PROCEDURE trxtaylorc
-     MODULE PROCEDURE trxpbc
-     MODULE PROCEDURE trxflowc
   end  INTERFACE
 
   INTERFACE OPERATOR (*)
@@ -159,7 +83,6 @@ module tpsalie
 
 
 
-
   INTERFACE OPERATOR (+)
      MODULE PROCEDURE ADDMAP
   END INTERFACE
@@ -173,6 +96,27 @@ module tpsalie
      MODULE PROCEDURE POWMAP
   END INTERFACE
 
+  INTERFACE OPERATOR (.SUB.)
+     MODULE PROCEDURE GETORDERVEC
+     MODULE PROCEDURE GETORDERMAP
+     MODULE PROCEDURE GETORDERPB
+  end  INTERFACE
+
+  INTERFACE OPERATOR (.CUT.)
+     MODULE PROCEDURE CUTORDER
+     MODULE PROCEDURE CUTORDERPB
+     MODULE PROCEDURE CUTORDERVEC
+  END INTERFACE
+
+  INTERFACE OPERATOR (.o.)
+     MODULE PROCEDURE concator
+     MODULE PROCEDURE trxtaylorc
+     MODULE PROCEDURE trxpbc
+     MODULE PROCEDURE trxflowc
+  end  INTERFACE
+
+
+  ! i/o
 
   INTERFACE DAinput
      MODULE PROCEDURE DAREADTAYLORS
@@ -207,6 +151,29 @@ module tpsalie
      MODULE PROCEDURE DAPRINTTAYLOR
      MODULE PROCEDURE DAPRINTpb
   END INTERFACE
+
+  ! Exponential of Lie Operators
+
+  INTERFACE texp
+     MODULE PROCEDURE explieflo ! flow on maps
+     MODULE PROCEDURE expliepb  ! pb on maps
+     MODULE PROCEDURE expflot    ! flow on taylor
+     MODULE PROCEDURE exppb     ! pb on taylor
+  END INTERFACE
+
+  INTERFACE exp
+     MODULE PROCEDURE explieflo ! flow on maps
+     MODULE PROCEDURE expliepb  ! pb on maps
+     MODULE PROCEDURE expflot    ! flow on taylor
+     MODULE PROCEDURE exppb     ! pb on taylor
+  END INTERFACE
+
+  INTERFACE full_abs
+     MODULE PROCEDURE DABSMAP
+  END INTERFACE
+
+
+  ! Constructors and Destructors
 
   INTERFACE alloc
      MODULE PROCEDURE A_OPT_damap
@@ -245,6 +212,7 @@ module tpsalie
      MODULE PROCEDURE KILLrad
      MODULE PROCEDURE KILLrads
   END INTERFACE
+
   INTERFACE KILLTPSA
      MODULE PROCEDURE KILLmap
      MODULE PROCEDURE KILLvec
@@ -255,6 +223,23 @@ module tpsalie
      MODULE PROCEDURE KILLrads
   END INTERFACE
 
+  ! Management routines
+
+  INTERFACE ASSDAMAP
+     MODULE PROCEDURE ASSVEC
+     MODULE PROCEDURE ASSMAP
+     MODULE PROCEDURE ASSPB
+     MODULE PROCEDURE asstaylor
+  END INTERFACE
+
+  ! Checking routines
+
+  INTERFACE checkdamap
+     MODULE PROCEDURE checkmap
+     MODULE PROCEDURE checkpb
+     MODULE PROCEDURE checkvec
+     MODULE PROCEDURE checktaylor
+  END INTERFACE
 
 
 contains
@@ -627,58 +612,63 @@ contains
 
   END SUBROUTINE DAREAPB
 
-  SUBROUTINE  DAPRINTMAP(S1,MFILE)
+  SUBROUTINE  DAPRINTMAP(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (damap),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
     INTEGER I
 
     DO I=1,ND2
-       CALL PRI(s1%V(I),MFILE)
+       CALL PRI(s1%V(I),MFILE,DEPS)
     ENDDO
   END SUBROUTINE DAPRINTMAP
 
-  SUBROUTINE  DAPRINTTAYLORS(S1,MFILE)
+  SUBROUTINE  DAPRINTTAYLORS(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (TAYLOR),INTENT(IN)::S1(NDIM2)
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
     INTEGER I
 
     DO I=1,ND2
-       CALL PRI(s1(i),MFILE)
+       CALL PRI(s1(i),MFILE,DEPS)
     ENDDO
   END SUBROUTINE DAPRINTTAYLORS
 
-  SUBROUTINE  DAPRINTVEC(S1,MFILE)
+  SUBROUTINE  DAPRINTVEC(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (VECFIELD),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
     INTEGER I
 
-    write(mfile,*) s1%ifac,' Type of factorization represented'
+    write(mfile,*) s1%ifac,' Factorization represented'
     DO I=1,ND2
-       CALL PRI(s1%V(I),MFILE)
+       CALL PRI(s1%V(I),MFILE,DEPS)
     ENDDO
 
   END SUBROUTINE DAPRINTVEC
 
 
-  SUBROUTINE  DAPRINTPB(S1,MFILE)
+  SUBROUTINE  DAPRINTPB(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (PBFIELD),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
 
-    write(mfile,*) s1%ifac,' Type of factorization represented'
-    CALL PRI(s1%H,MFILE)
+    write(mfile,*) s1%ifac,' Factorization represented'
+    CALL PRI(s1%H,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTPB
 
-  SUBROUTINE  DAPRINTTAYLOR(S1,MFILE)
+  SUBROUTINE  DAPRINTTAYLOR(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (TAYLOR),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
 
-    CALL PRI(s1,MFILE)
+    CALL PRI(s1,MFILE,DEPS)
 
   END SUBROUTINE DAPRINTTAYLOR
 

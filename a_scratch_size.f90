@@ -208,6 +208,7 @@ module precision_constants
      integer,POINTER :: nd2      ! phase space dimension
      integer,POINTER :: np       ! number of parameters
      integer,POINTER :: ndpt     ! constant energy variable position is different from zero
+     integer,POINTER :: NPARA     ! PARAMETER LOCATION IN PTC
      REAL(dp),POINTER     :: da_absolute_aperture  ! in case one tracks with da.
      !
 
@@ -256,7 +257,7 @@ module precision_constants
      INTEGER, pointer :: SECTOR_NMUL_MAX     != 10 maxwell equations is solved to order 10 in exact sectors
      INTEGER, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
      real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
-     logical(dp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
+     logical(lp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
 
 
 

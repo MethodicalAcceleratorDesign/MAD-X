@@ -19,8 +19,8 @@ MODULE TPSA
   private  unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
   private allocda,KILLda,A_OPT,K_opt
   priVATE dexpt,dcost,dsint,dsqrtt,dtant
-  PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,dsinHt,dCOSHt
-  PRIVATE DEQUAL,REQUAL
+  PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_j,dsinHt,dCOSHt
+  PRIVATE DEQUAL,REQUAL,varf,varf001  !,CHARINT
   !  PUBLIC VAR,ASS
   private pbbra,full_absT,asstaylor
   PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
@@ -56,12 +56,390 @@ MODULE TPSA
      MODULE PROCEDURE REFILL_N
   end  INTERFACE
 
-  INTERFACE abs
-     MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
+  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber2" width="400" height="135">
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">+</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@         <td width="77" height="20" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="1">
+  !@         Real(dp)</font></span></td>
+  !@         <td width="78" height="20" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@         <td width="56" height="20" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@       </tr>
+  !@       <tr>
+  !@         <td width="77" height="20" align="center">
+  !@         <span style="text-transform: uppercase">
+  !@         <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@         <td width="77" height="20" align="center">
+  !@         <span style="text-transform: uppercase; font-weight:700">
+  !@         <font face="Times New Roman" size="1">
+  !@         <a href="i_tpsa.htm#ADD" style="text-decoration: none">add</a></font></span></td>
+  !@         <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase; font-weight:700">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DADDSC" style="text-decoration: none">daddsc</a></font></span></td>
+  !@        <td width="78" height="20" align="center"><b>
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#ADDSC" style="text-decoration: none">ADDSC</a></font></b></td>
+  !@        <td width="56" height="20" align="center"><b>
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#IADDSC" style="text-decoration: none">
+  !@        IADDSC</a></font></b></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase; font-weight:700">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DSCADD" style="text-decoration: none">dscadd</a></font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="77" height="20" align="center"><b>
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#SCADD" style="text-decoration: none">SCADD</a></font></b></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@        <td width="77" height="20" align="center"><b>
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#ISCADD" style="text-decoration: none">
+  !@        ISCADD</a></font></b></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@     </table>
+  INTERFACE OPERATOR (+)
+     MODULE PROCEDURE unaryADD  !@2 This is a unary operation
+     MODULE PROCEDURE add
+     MODULE PROCEDURE daddsc
+     MODULE PROCEDURE dscadd
+     MODULE PROCEDURE addsc
+     MODULE PROCEDURE scadd
+     MODULE PROCEDURE iaddsc
+     MODULE PROCEDURE iscadd
   END INTERFACE
 
-  INTERFACE dabs
-     MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
+
+
+
+  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="135">
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">-</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#SUBS" style="text-decoration: none; font-weight: 700">SUBS</a></font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DSUBSC" style="text-decoration: none; font-weight: 700">dSUBsc</a></font></span></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#SUBSC" style="text-decoration: none; font-weight: 700">SUBSC</a></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#ISUBSC" style="text-decoration: none; font-weight: 700">ISUBSC</a></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DSCSUB" style="text-decoration: none; font-weight: 700">dscSUB</a></font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#SCSUB" style="text-decoration: none; font-weight: 700">
+  !@        SCSUB</a></font></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#ISCSUB" style="text-decoration: none; font-weight: 700">
+  !@        ISCSUB</a></font></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@     </table>
+  INTERFACE OPERATOR (-)
+     MODULE PROCEDURE unarySUB
+     MODULE PROCEDURE subs
+     MODULE PROCEDURE dsubsc
+     MODULE PROCEDURE dscsub
+     MODULE PROCEDURE subsc
+     MODULE PROCEDURE scsub
+     MODULE PROCEDURE isubsc
+     MODULE PROCEDURE iscsub
+  END INTERFACE
+
+
+
+  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="134">
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">*</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#MUL" style="text-decoration: none; font-weight:700">MUL</a></font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DMULSC" style="text-decoration: none; font-weight:700">dMULsc</a></font></span></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#MULSC" style="text-decoration: none; font-weight:700">MULSC</a></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#IMULSC" style="text-decoration: none; font-weight:700">IMULSC</a></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="19" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="77" height="19" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DSCMUL" style="text-decoration: none; font-weight:700">dscMUL</a></font></span></td>
+  !@        <td width="77" height="19" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="19" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="19" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#SCMUL" style="text-decoration: none; font-weight:700">
+  !@        SCMUL</a></font></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="77" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="1" face="Times New Roman">
+  !@        <a href="i_tpsa.htm#ISCMUL" style="text-decoration: none; font-weight:700">
+  !@        ISCMUL</a></font></td>
+  !@        <td width="77" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="78" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="56" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@     </table>
+
+  INTERFACE OPERATOR (*)
+     MODULE PROCEDURE mul
+     MODULE PROCEDURE dmulsc
+     MODULE PROCEDURE dscmul
+     MODULE PROCEDURE mulsc
+     MODULE PROCEDURE scmul
+     MODULE PROCEDURE imulsc
+     MODULE PROCEDURE iscmul
+  END INTERFACE
+
+  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="135">
+  !@      <tr>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">/</font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DIV" style="text-decoration: none; font-weight: 700">div</a></font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DDIVSC" style="text-decoration: none; font-weight: 700">dDIVsc</a></font></span></td>
+  !@        <td width="0" height="20" align="center"><font size="1">
+  !@        <a href="i_tpsa.htm#DIVSC" style="text-decoration: none; font-weight: 700">DIVSC</a></font></td>
+  !@        <td width="0" height="20" align="center"><font size="1">
+  !@        <a href="i_tpsa.htm#IDIVSC" style="text-decoration: none; font-weight: 700">
+  !@        IDIVSC</a></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        Real(dp)</font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">
+  !@        <a href="i_tpsa.htm#DSCDIV" style="text-decoration: none; font-weight: 700">dscDIV</a></font></span></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
+  !@        <td width="0" height="20" align="center"><font size="1">
+  !@        <a href="i_tpsa.htm#SCDIV" style="text-decoration: none; font-weight: 700">
+  !@        SCDIV</a></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@      <tr>
+  !@        <td width="0" height="20" align="center">
+  !@        <span style="text-transform: uppercase">
+  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
+  !@        <td width="0" height="20" align="center"><font size="1">
+  !@        <a href="i_tpsa.htm#ISCDIV" style="text-decoration: none; font-weight: 700">
+  !@        ISCDIV</a></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@        <td width="0" height="20" align="center">
+  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
+  !@      </tr>
+  !@    </table>
+
+  INTERFACE OPERATOR (/)
+     MODULE PROCEDURE div
+     MODULE PROCEDURE ddivsc
+     MODULE PROCEDURE dscdiv
+     MODULE PROCEDURE divsc
+     MODULE PROCEDURE scdiv
+     MODULE PROCEDURE idivsc
+     MODULE PROCEDURE iscdiv
   END INTERFACE
 
 
@@ -69,6 +447,24 @@ MODULE TPSA
      MODULE PROCEDURE POW
      MODULE PROCEDURE POWR
      MODULE PROCEDURE POWR8
+  END INTERFACE
+
+
+  ! New Operators
+
+  INTERFACE OPERATOR (.mono.)
+     MODULE PROCEDURE dputint0   !@1 &nbsp; single integer
+     MODULE PROCEDURE dputint    !@1 &nbsp; Accepts J(nv)
+     MODULE PROCEDURE dputchar   !@1 &nbsp; Accepts String such as '12'
+  END INTERFACE
+
+  INTERFACE OPERATOR (.var.)
+     MODULE PROCEDURE varf        !@1 &nbsp; replaces var (overloads DAVAR)
+     MODULE PROCEDURE varf001       !@1 replaces var001
+  END INTERFACE
+
+  INTERFACE OPERATOR (.d.)
+     MODULE PROCEDURE getdiff    !@1 takes derivatives
   END INTERFACE
 
   INTERFACE OPERATOR (.SUB.)
@@ -86,15 +482,6 @@ MODULE TPSA
      MODULE PROCEDURE CUTORDER
   END INTERFACE
 
-  INTERFACE OPERATOR (.mono.)
-     MODULE PROCEDURE dputchar
-     MODULE PROCEDURE dputint
-  END INTERFACE
-
-  INTERFACE OPERATOR (.d.)
-     MODULE PROCEDURE getdiff
-  END INTERFACE
-
   INTERFACE OPERATOR (.K.)
      MODULE PROCEDURE getdATRA    ! Used internally primarily
   END INTERFACE
@@ -103,73 +490,13 @@ MODULE TPSA
      MODULE PROCEDURE pbbra
   END INTERFACE
 
-  INTERFACE OPERATOR (*)
-     MODULE PROCEDURE mul
-     MODULE PROCEDURE dmulsc
-     MODULE PROCEDURE dscmul
-     MODULE PROCEDURE mulsc
-     MODULE PROCEDURE scmul
-     MODULE PROCEDURE imulsc
-     MODULE PROCEDURE iscmul
+  ! intrisic functions overloaded
+
+  INTERFACE abs
+     MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
   END INTERFACE
-
-  INTERFACE OPERATOR (/)
-     MODULE PROCEDURE div
-     MODULE PROCEDURE ddivsc
-     MODULE PROCEDURE dscdiv
-     MODULE PROCEDURE divsc
-     MODULE PROCEDURE scdiv
-     MODULE PROCEDURE idivsc
-     MODULE PROCEDURE iscdiv
-  END INTERFACE
-
-  INTERFACE OPERATOR (+)
-     MODULE PROCEDURE unaryADD
-     MODULE PROCEDURE add
-     MODULE PROCEDURE daddsc
-     MODULE PROCEDURE dscadd
-     MODULE PROCEDURE addsc
-     MODULE PROCEDURE scadd
-     MODULE PROCEDURE iaddsc
-     MODULE PROCEDURE iscadd
-  END INTERFACE
-
-  INTERFACE OPERATOR (-)
-     MODULE PROCEDURE unarySUB
-     MODULE PROCEDURE subs
-     MODULE PROCEDURE dsubsc
-     MODULE PROCEDURE dscsub
-     MODULE PROCEDURE subsc
-     MODULE PROCEDURE scsub
-     MODULE PROCEDURE isubsc
-     MODULE PROCEDURE iscsub
-  END INTERFACE
-
-
-  INTERFACE pek
-     MODULE PROCEDURE pek000 ! not private
-  END INTERFACE
-
-  INTERFACE pok
-     MODULE PROCEDURE pok000  ! not private
-  END INTERFACE
-
-  INTERFACE shiftda
-     MODULE PROCEDURE shift000  ! not private
-  END INTERFACE
-
-  INTERFACE var
-     MODULE PROCEDURE var000  ! not private
-     MODULE PROCEDURE var001  ! not private
-  END INTERFACE
-
-  INTERFACE cfu
-     MODULE PROCEDURE cfu000  ! not private
-  END INTERFACE
-
-
-  INTERFACE full_abs
-     MODULE PROCEDURE full_absT
+  INTERFACE dabs
+     MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
   END INTERFACE
 
   INTERFACE exp
@@ -252,10 +579,35 @@ MODULE TPSA
      MODULE PROCEDURE dtant
   END INTERFACE
 
-  ! management routines
-  INTERFACE ass
-     MODULE PROCEDURE asstaylor   !2000.12.25
+  ! Non-intrisic Functions
+
+  INTERFACE pek
+     MODULE PROCEDURE pek000 ! not private
   END INTERFACE
+
+  INTERFACE pok
+     MODULE PROCEDURE pok000  ! not private
+  END INTERFACE
+
+  INTERFACE shiftda
+     MODULE PROCEDURE shift000  ! not private
+  END INTERFACE
+
+  !  INTERFACE var
+  !     MODULE PROCEDURE var000  ! not private
+  !     MODULE PROCEDURE var001  ! not private
+  !  END INTERFACE
+
+  INTERFACE cfu
+     MODULE PROCEDURE cfu000  ! not private
+  END INTERFACE
+
+  INTERFACE full_abs
+     MODULE PROCEDURE full_absT
+  END INTERFACE
+
+
+  ! Constructors and Destructors
 
   INTERFACE alloc
      MODULE PROCEDURE allocda
@@ -277,7 +629,14 @@ MODULE TPSA
      MODULE PROCEDURE KILLda
   END INTERFACE
 
-  ! end of management
+
+  ! management routines
+
+  INTERFACE ass
+     MODULE PROCEDURE asstaylor   !2000.12.25
+  END INTERFACE
+
+
 
 CONTAINS
 
@@ -863,8 +1222,6 @@ CONTAINS
 
   END FUNCTION CUTORDER
 
-
-
   FUNCTION dputchar( S1, S2 )
     implicit none
     TYPE (taylor) dputchar
@@ -891,7 +1248,8 @@ CONTAINS
        CALL  CHARINT(RESUL(I:I),J(I))
        if(i>nv) then
           if(j(i)>0) then
-             call var(dputchar,zero,0)
+             dputchar=0.d0
+             !             call var(dputchar,zero,0)
              return
           endif
        endif
@@ -899,7 +1257,8 @@ CONTAINS
 
 
 
-    call var(dputchar,zero,0)
+    dputchar=0.d0
+    !    call var(dputchar,zero,0)
     CALL pok(dputchar,j,s1)
     master=localmaster
 
@@ -931,19 +1290,51 @@ CONTAINS
     do i=1,nd2par
        if(i>nv) then
           if(j(i)>0) then
-             call var(dputint,zero,0)
+             !             call var(dputint,zero,0)
+             dputint=0.d0
              return
           endif
        endif
     enddo
 
 
-
-    call var(dputint,zero,0)
+    dputint=0.d0
+    !    call var(dputint,zero,0)
     CALL pok(dputint,j,s1)
     master=localmaster
 
   END FUNCTION dputint
+
+  FUNCTION dputint0( S1, S2 )
+    implicit none
+    TYPE (taylor) dputint0
+    real(dp), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
+    integer j(lnv),i
+    integer localmaster
+    localmaster=master
+
+    call ass(dputint0)
+
+    j=0
+    if(s2>nv) then
+       dputint0=S1
+       return
+    endif
+
+
+    dputint0=0.d0
+    !    call var(dputint0,zero,s2)
+
+    j(s2)=1
+    CALL pok(dputint0,j,s1)
+
+    master=localmaster
+
+  END FUNCTION dputint0
+
+
+
 
   FUNCTION GETchar( S1, S2 )
     implicit none
@@ -1009,49 +1400,6 @@ CONTAINS
 
   END FUNCTION GETint
 
-
-  SUBROUTINE CHARINT(A,I)
-    IMPLICIT NONE
-    INTEGER I
-    CHARACTER(1) A
-
-    i=-1
-    IF(A=='1') I=1
-    IF(A=='2') I=2
-    IF(A=='3') I=3
-    IF(A=='4') I=4
-    IF(A=='5') I=5
-    IF(A=='6') I=6
-    IF(A=='7') I=7
-    IF(A=='8') I=8
-    IF(A=='9') I=9
-    IF(A=='0') I=0
-    if(i==-1) ndel=1
-    IF(A=='a') I=1
-    IF(A=='b') I=2
-    IF(A=='c') I=3
-    IF(A=='d') I=4
-    IF(A=='e') I=5
-    IF(A=='f') I=6
-    IF(A=='g') I=7
-    IF(A=='h') I=8
-    IF(A=='i') I=9
-    IF(A==' ') I=0
-    IF(A=='o') I=0
-    IF(A=='A') I=1
-    IF(A=='B') I=2
-    IF(A=='C') I=3
-    IF(A=='D') I=4
-    IF(A=='E') I=5
-    IF(A=='F') I=6
-    IF(A=='G') I=7
-    IF(A=='H') I=8
-    IF(A=='I') I=9
-    IF(A=='O') I=0
-
-
-
-  END SUBROUTINE CHARINT
 
 
 
@@ -1867,168 +2215,114 @@ CONTAINS
   !    endif
   !  end subroutine check
   !
-  subroutine ASSIGN()
-    implicit none
-    integer i
-    do i=1,ndumt
-       iassdoluser(i)=0
-       iass0user(i)=0
-    enddo
-    if(old) then
-       CALL ETALL1(DUMMY)
-       call etall1(temp)
-    else
-       CALL allocnewda(DUMMYl)
-       call allocnewda(templ)
-    endif
-    CALL set_up_level
-  end subroutine ASSIGN
-
-  subroutine DEASSIGN()
-    implicit none
-    integer i
-    do i=1,ndumt
-       iassdoluser(i)=0
-       iass0user(i)=0
-    enddo
-    if(old) then
-       CALL DADAL1(DUMMY)
-       call DADAL1(temp)
-    else
-       CALL KILLnewdaS(DUMMYl)
-       call KILLnewdaS(templ)
-    endif
-    do i=1,ndumt
-       CALL kill_DALEVEL(scratchda(I))
-    ENDDO
-  end subroutine DEASSIGN
-
-  subroutine ASStaylor(s1)
-    implicit none
-    TYPE (taylor) s1
-    !  lastmaster=master  ! 2002.12.13
-
-    select case(master)
-    case(0:ndumt-1)
-       master=master+1
-    case(ndumt)
-       master=sqrt(-dble(master))
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
-    end select
-    !    write(26,*) "   taylor ",master
-    call ass0(s1)
-
-  end subroutine ASStaylor
-
-  subroutine ass0(s1)
-    implicit none
-    integer ipause, mypause
-    TYPE (taylor) s1
-
-    IF(MASTER>NDUMT.or.master==0) THEN
-       WRITE(6,*) "more scratch level needed ",master,NDUMT
-       ipause=mypause(123)
-       write(6,*) 1/sqrt(-dble(1000+master))
-       stop 123
-    ENDIF
-
-    if(.not.no_ndum_check) iass0user(master)=iass0user(master)+1
-
-    if(iass0user(master)>scratchda(master)%n) then
-       call INSERT_DA( scratchda(master) )
-    ELSE
-       scratchda(master)%PRESENT=>scratchda(master)%PRESENT%NEXT
-    ENDIF
-    if(old) then
-       s1%i=scratchda(master)%PRESENT%T%i
-    else
-       s1%j=scratchda(master)%PRESENT%T%j
-    endif
-
-
-  end subroutine ASS0
-
-  SUBROUTINE  ndum_warning_user()
-    implicit none
-    integer ipause,II(0:1)
-
-
-    w_p=0
-    w_p%nc=3
-    w_p%fc='(3((1X,A72),/))'
-    w_p%c(1)=  " *****************************************************************"
-    w_p%c(2)=  " *  Should never be here in New Linked List Scheme               *"
-    w_p%c(3)=  " *****************************************************************"
-    w_p=0
-    w_p%nc=1
-    w_p%fc='(1(1X,A72),/))'
-    w_p%c(1)= " do you want a crash? "
-    call write_e
-    call read(ipause)
-    ii(2000*ipause)=0
-
-  end SUBROUTINE  ndum_warning_user
-
 
   !  These are new general TPSA-Routines
 
-  SUBROUTINE  VAR000(S1,R1,I1)
+
+
+  FUNCTION varf( S1, S2 )
     implicit none
-    INTEGER,INTENT(IN)::I1
-    real(dp),INTENT(IN)::R1
-    type (taylor),INTENT(INOUT)::S1
+    TYPE (taylor) varf
+    real(dp), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
+    integer localmaster
+    localmaster=master
 
-    if(old) then
-       if(s1%i==0) call crap1("VAR000  1" )  !call  etall1(s1%i)
-       if(i1.ne.0) then
-          CALL DAVAR(s1%i,R1,I1)
-       else
-          CALL DACON(s1%i,R1)
-       endif
-    else
-       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("VAR000  2" ) !call newetall(s1%j,1)
+    call ass(varf)
 
-       if(i1.ne.0) then
-          CALL NEWDAVAR(s1%J,R1,I1)
-       else
-          CALL NEWDACON(s1%j,R1)
-       endif
-    endif
+    varf=S1 + (one.mono.S2)
 
-  END SUBROUTINE VAR000
+    master=localmaster
 
-  SUBROUTINE  VAR001(S1,R1,R2,I1)
+  END FUNCTION varf
+
+  FUNCTION varf001( S1, S2 )
     implicit none
-    INTEGER,INTENT(IN)::I1
-    real(dp),INTENT(IN)::R1,R2
-    type (taylor),INTENT(INOUT)::S1
+    TYPE (taylor) varf001
+    real(dp), INTENT (IN) :: S1(2)
+    integer  , INTENT (IN) ::  S2
+    integer localmaster
+    localmaster=master
 
-    if(old) then
-       if(s1%i==0)  call crap1("VAR001  1" ) !etall1(s1%i)
-       if(i1.ne.0) then
-          CALL DAVAR(s1%i,zero,I1)
-          CALL DACMU(s1%i,R2,TEMP)
-          CALL DACAD(TEMP,R1,s1%i)
-       else
-          CALL DACON(s1%i,R1)
-       endif
-    else
-       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("VAR001  2" )  !call newetall(s1%j,1)
+    call ass(varf001)
 
-       if(i1.ne.0) then
-          CALL NEWDAVAR(s1%J,zero,I1)
-          CALL NEWDACMU(s1%J,R2,TEMPL)
-          CALL NEWDACAD(TEMPL,R1,s1%J)
-       else
-          CALL NEWDACON(s1%j,R1)
-       endif
-    endif
+    varf001=S1(1) + (s1(2).mono.S2)
 
-  END SUBROUTINE VAR001
+    master=localmaster
+
+  END FUNCTION varf001
+
+
+  !  SUBROUTINE  VAR000(S1,R1,I1)
+  !    implicit none
+  !    INTEGER,INTENT(IN)::I1
+  !    real(dp),INTENT(IN)::R1
+  !    type (taylor),INTENT(INOUT)::S1
+  !    integer localmaster
+  !    localmaster=master
+  !
+
+  !    s1=r1+ (one.mono.i1)
+
+  !    master=localmaster
+
+  !    if(old) then
+  !       if(s1%i==0) call crap1("VAR000  1" )  !call  etall1(s1%i)
+  !       if(i1.ne.0) then
+  !          CALL DAVAR(s1%i,R1,I1)
+  !       else
+  !          CALL DACON(s1%i,R1)
+  !       endif
+  !    else
+  !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("VAR000  2" ) !call newetall(s1%j,1)
+  !
+  !       if(i1.ne.0) then
+  !          CALL NEWDAVAR(s1%J,R1,I1)
+  !       else
+  !          CALL NEWDACON(s1%j,R1)
+  !       endif
+  !    endif
+
+  !  END SUBROUTINE VAR000
+
+  !  SUBROUTINE  VAR001(S1,R1,R2,I1)
+  !    implicit none
+  !    INTEGER,INTENT(IN)::I1
+  !    real(dp),INTENT(IN)::R1,R2
+  !    type (taylor),INTENT(INOUT)::S1!
+
+  !    integer localmaster
+  !    localmaster=master
+
+
+  !    s1=r1+ R2*(one.mono.i1)
+
+  !    master=localmaster
+
+
+
+  !    if(old) then
+  !       if(s1%i==0)  call crap1("VAR001  1" ) !etall1(s1%i)
+  !       if(i1.ne.0) then
+  !          CALL DAVAR(s1%i,zero,I1)
+  !          CALL DACMU(s1%i,R2,TEMP)
+  !          CALL DACAD(TEMP,R1,s1%i)
+  !       else
+  !          CALL DACON(s1%i,R1)
+  !       endif
+  !    else
+  !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("VAR001  2" )  !call newetall(s1%j,1)
+  !
+  !       if(i1.ne.0) then
+  !          CALL NEWDAVAR(s1%J,zero,I1)
+  !          CALL NEWDACMU(s1%J,R2,TEMPL)
+  !          CALL NEWDACAD(TEMPL,R1,s1%J)
+  !       else
+  !          CALL NEWDACON(s1%j,R1)
+  !       endif
+  !    endif
+  !
+  !   END SUBROUTINE VAR001
 
   SUBROUTINE  shift000(S1,S2,s)
     implicit none
@@ -2081,31 +2375,6 @@ CONTAINS
     endif
 
   END SUBROUTINE pok000
-
-  function check_j(j)
-    implicit none
-    integer check_j
-    INTEGER,INTENT(in),dimension(:)::j
-    integer i,no
-
-    check_j=0
-
-    no=0
-    do i=1,size(j)
-       no=j(i)+no
-    enddo
-
-    if(no>c_%no) then
-       check_j=no
-       return
-    endif
-
-    do i=c_%nv+1,size(j)
-       if(j(i)/=0) then
-          check_j=-i
-       endif
-    enddo
-  end function check_j
 
   SUBROUTINE  tAYLOR_ran(S1,r1,R2)
     implicit none
@@ -2197,74 +2466,6 @@ CONTAINS
   END SUBROUTINE taylor_eps
 
 
-
-  SUBROUTINE  pri(S1,MFILE)
-    implicit none
-    INTEGER,INTENT(IN)::MFILE
-    type (TAYLOR),INTENT(IN)::S1
-
-    if(old) then
-       if(print77) then
-          CALL DAPRI77(s1%i,MFILE)
-       else
-          CALL DAPRI(s1%i,MFILE)
-       endif
-    else
-       if(newprint) then
-          CALL newDAPRI(s1%j,MFILE)
-       else
-          if(print77) then
-             CALL oldDAPRI77(s1%j,MFILE)
-          else
-             CALL oldDAPRI(s1%j,MFILE)
-          endif
-       endif
-    endif
-
-  END SUBROUTINE pri
-
-  SUBROUTINE  REA(S1,MFILE)
-    implicit none
-    INTEGER,INTENT(in)::MFILE
-    type (TAYLOR),INTENT(IN)::S1
-
-    if(old) then
-       if(s1%i==0)call crap1("REA  1" ) !  call etall1(s1%i)
-
-       if(read77) then
-          CALL DAREA77(s1%i,MFILE)
-       else
-          CALL DAREA(s1%i,MFILE)
-       endif
-    else
-       if(.NOT. ASSOCIATED(s1%j%r))call crap1("REA  2" ) ! call newetall(s1%j,1)
-       if(newread) then
-          CALL newDAREA(s1%j,MFILE)
-       else
-          if(read77) then
-             CALL oldDAREA77(s1%j,MFILE)
-          else
-             CALL oldDAREA(s1%j,MFILE)
-          endif
-       endif
-    endif
-
-  END SUBROUTINE REA
-
-
-  function filter(j)
-    implicit none
-    real(dp) filter
-    integer i
-    integer,dimension(:)::j
-
-    filter=one
-    !do i=1,nd2+ndel
-    do i=1,nd2par
-       if(jfil(i)/=j(i)) filter=zero
-    enddo
-
-  end  function filter
 
   FUNCTION GETCHARnd2( S1, S2 )
     implicit none
@@ -2433,6 +2634,186 @@ CONTAINS
 
   END SUBROUTINE taylor_cycle
 
+  subroutine check_snake()
+    implicit none
+    master=master+1
+    select case (master)
+    case(1:ndumt)
+       if(iass0user(master)>scratchda(master)%n.or.scratchda(master)%n>newscheme_max) then
+          w_p=0
+          w_p%nc=1
+          w_p%fc='(1((1X,A72),/))'
+          w_p%fi='(3((1X,i4)))'
+          w_p%c(1)= "iass0user(master),scratchda(master)%n,newscheme_max"
+          w_p=(/iass0user(master),scratchda(master)%n,newscheme_max/)
+          call write_e
+          call ndum_warning_user
+       endif
+       iass0user(master)=0
+    case(ndumt+1:)
+       w_p=0
+       w_p%nc=1
+       w_p=(/"Should not be here"/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(101)
+    end select
+    master=master-1
+  end subroutine check_snake
+
+  ! functions used inside other routines
+
+  SUBROUTINE CHARINT(A,I)
+    IMPLICIT NONE
+    INTEGER I
+    CHARACTER(1) A
+
+    i=-1
+    IF(A=='1') I=1
+    IF(A=='2') I=2
+    IF(A=='3') I=3
+    IF(A=='4') I=4
+    IF(A=='5') I=5
+    IF(A=='6') I=6
+    IF(A=='7') I=7
+    IF(A=='8') I=8
+    IF(A=='9') I=9
+    IF(A=='0') I=0
+    if(i==-1) ndel=1
+    IF(A=='a') I=1
+    IF(A=='b') I=2
+    IF(A=='c') I=3
+    IF(A=='d') I=4
+    IF(A=='e') I=5
+    IF(A=='f') I=6
+    IF(A=='g') I=7
+    IF(A=='h') I=8
+    IF(A=='i') I=9
+    IF(A==' ') I=0
+    IF(A=='o') I=0
+    IF(A=='A') I=1
+    IF(A=='B') I=2
+    IF(A=='C') I=3
+    IF(A=='D') I=4
+    IF(A=='E') I=5
+    IF(A=='F') I=6
+    IF(A=='G') I=7
+    IF(A=='H') I=8
+    IF(A=='I') I=9
+    IF(A=='O') I=0
+
+
+
+  END SUBROUTINE CHARINT
+
+
+  function check_j(j)
+    implicit none
+    integer check_j
+    INTEGER,INTENT(in),dimension(:)::j
+    integer i,no
+
+    check_j=0
+
+    no=0
+    do i=1,size(j)
+       no=j(i)+no
+    enddo
+
+    if(no>c_%no) then
+       check_j=no
+       return
+    endif
+
+    do i=c_%nv+1,size(j)
+       if(j(i)/=0) then
+          check_j=-i
+       endif
+    enddo
+  end function check_j
+
+
+
+  function filter(j)
+    implicit none
+    real(dp) filter
+    integer i
+    integer,dimension(:)::j
+
+    filter=one
+    !do i=1,nd2+ndel
+    do i=1,nd2par
+       if(jfil(i)/=j(i)) filter=zero
+    enddo
+
+  end  function filter
+
+  !  i/o routines
+
+  SUBROUTINE  pri(S1,MFILE,DEPS)
+    implicit none
+    INTEGER,INTENT(IN)::MFILE
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    type (TAYLOR),INTENT(IN)::S1
+    REAL(DP) PREC
+
+    IF(PRESENT(DEPS)) THEN
+       PREC=-ONE
+       CALL taylor_eps(PREC)
+       CALL taylor_eps(DEPS)
+    ENDIF
+
+    if(old) then
+       if(print77) then
+          CALL DAPRI77(s1%i,MFILE)
+       else
+          CALL DAPRI(s1%i,MFILE)
+       endif
+    else
+       if(newprint) then
+          CALL newDAPRI(s1%j,MFILE)
+       else
+          if(print77) then
+             CALL oldDAPRI77(s1%j,MFILE)
+          else
+             CALL oldDAPRI(s1%j,MFILE)
+          endif
+       endif
+    endif
+
+    IF(PRESENT(DEPS))  CALL taylor_eps(PREC)
+
+  END SUBROUTINE pri
+
+  SUBROUTINE  REA(S1,MFILE)
+    implicit none
+    INTEGER,INTENT(in)::MFILE
+    type (TAYLOR),INTENT(IN)::S1
+
+    if(old) then
+       if(s1%i==0)call crap1("REA  1" ) !  call etall1(s1%i)
+
+       if(read77) then
+          CALL DAREA77(s1%i,MFILE)
+       else
+          CALL DAREA(s1%i,MFILE)
+       endif
+    else
+       if(.NOT. ASSOCIATED(s1%j%r))call crap1("REA  2" ) ! call newetall(s1%j,1)
+       if(newread) then
+          CALL newDAREA(s1%j,MFILE)
+       else
+          if(read77) then
+             CALL oldDAREA77(s1%j,MFILE)
+          else
+             CALL oldDAREA(s1%j,MFILE)
+          endif
+       endif
+    endif
+
+  END SUBROUTINE REA
+
+
+  ! Universal Taylor Routines   (Sagan's Stuff)
 
   SUBROUTINE  null_0(S2,S1)
     implicit none
@@ -2588,31 +2969,12 @@ CONTAINS
 
   END SUBROUTINE REFILL_N
 
-  subroutine check_snake()
-    implicit none
-    master=master+1
-    select case (master)
-    case(1:ndumt)
-       if(iass0user(master)>scratchda(master)%n.or.scratchda(master)%n>newscheme_max) then
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1((1X,A72),/))'
-          w_p%fi='(3((1X,i4)))'
-          w_p%c(1)= "iass0user(master),scratchda(master)%n,newscheme_max"
-          w_p=(/iass0user(master),scratchda(master)%n,newscheme_max/)
-          call write_e
-          call ndum_warning_user
-       endif
-       iass0user(master)=0
-    case(ndumt+1:)
-       w_p=0
-       w_p%nc=1
-       w_p=(/"Should not be here"/)
-       w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(101)
-    end select
-    master=master-1
-  end subroutine check_snake
+  ! End of Universal Taylor Routines
+
+
+
+
+  ! Warning Routines
 
   subroutine crap1(STRING)
     implicit none
@@ -2627,6 +2989,46 @@ CONTAINS
 
   end subroutine crap1
 
+  SUBROUTINE real_stop()
+    implicit none
+    integer i(1),j
+
+    w_p=0
+    w_p%nc=3
+    w_p%c(1)=" You are using a kind(one) "
+    w_p%c(2)=" set real_warning to false to permit this "
+    w_p%c(3)=" write 1 to continue or -1 for a crash "
+    w_p%fc='(3((1X,A60),/))'
+    CALL WRITE_E
+    call read(j)
+    i(j)=0
+    real_warning=.false.
+
+  END   SUBROUTINE real_stop
+
+
+  SUBROUTINE  ndum_warning_user()
+    implicit none
+    integer ipause,II(0:1)
+
+
+    w_p=0
+    w_p%nc=3
+    w_p%fc='(3((1X,A72),/))'
+    w_p%c(1)=  " *****************************************************************"
+    w_p%c(2)=  " *  Should never be here in New Linked List Scheme               *"
+    w_p%c(3)=  " *****************************************************************"
+    w_p=0
+    w_p%nc=1
+    w_p%fc='(1(1X,A72),/))'
+    w_p%c(1)= " do you want a crash? "
+    call write_e
+    call read(ipause)
+    ii(2000*ipause)=0
+
+  end SUBROUTINE  ndum_warning_user
+
+  ! End of  Warning Routines
 
   ! linked list of da for scratch levels
 
@@ -2813,21 +3215,97 @@ CONTAINS
     endif
   END   SUBROUTINE report_level
 
-  SUBROUTINE real_stop()
+  ! end linked list of da for scratch levels
+
+  ! Assignments Routines
+
+  subroutine ASSIGN()
     implicit none
-    integer i(1),j
+    integer i
+    do i=1,ndumt
+       iassdoluser(i)=0
+       iass0user(i)=0
+    enddo
+    if(old) then
+       CALL ETALL1(DUMMY)
+       call etall1(temp)
+    else
+       CALL allocnewda(DUMMYl)
+       call allocnewda(templ)
+    endif
+    CALL set_up_level
+  end subroutine ASSIGN
 
-    w_p=0
-    w_p%nc=3
-    w_p%c(1)=" You are using a kind(one) "
-    w_p%c(2)=" set real_warning to false to permit this "
-    w_p%c(3)=" write 1 to continue or -1 for a crash "
-    w_p%fc='(3((1X,A60),/))'
-    CALL WRITE_E
-    call read(j)
-    i(j)=0
-    real_warning=.false.
+  subroutine DEASSIGN()
+    implicit none
+    integer i
+    do i=1,ndumt
+       iassdoluser(i)=0
+       iass0user(i)=0
+    enddo
+    if(old) then
+       CALL DADAL1(DUMMY)
+       call DADAL1(temp)
+    else
+       CALL KILLnewdaS(DUMMYl)
+       call KILLnewdaS(templ)
+    endif
+    do i=1,ndumt
+       CALL kill_DALEVEL(scratchda(I))
+    ENDDO
+  end subroutine DEASSIGN
 
-  END   SUBROUTINE real_stop
+  subroutine ASStaylor(s1)
+    implicit none
+    TYPE (taylor) s1
+    !  lastmaster=master  ! 2002.12.13
+
+    select case(master)
+    case(0:ndumt-1)
+       master=master+1
+    case(ndumt)
+       master=sqrt(-dble(master))
+       w_p=0
+       w_p%nc=1
+       w_p=(/" cannot indent anymore "/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(100)
+    end select
+    !    write(26,*) "   taylor ",master
+    call ass0(s1)
+
+  end subroutine ASStaylor
+
+  subroutine ass0(s1)
+    implicit none
+    integer ipause, mypause
+    TYPE (taylor) s1
+
+    IF(MASTER>NDUMT.or.master==0) THEN
+       WRITE(6,*) "more scratch level needed ",master,NDUMT
+       ipause=mypause(123)
+       write(6,*) 1/sqrt(-dble(1000+master))
+       stop 123
+    ENDIF
+
+    if(.not.no_ndum_check) iass0user(master)=iass0user(master)+1
+
+    if(iass0user(master)>scratchda(master)%n) then
+       call INSERT_DA( scratchda(master) )
+    ELSE
+       scratchda(master)%PRESENT=>scratchda(master)%PRESENT%NEXT
+    ENDIF
+    if(old) then
+       s1%i=scratchda(master)%PRESENT%T%i
+    else
+       s1%j=scratchda(master)%PRESENT%T%j
+    endif
+
+
+  end subroutine ASS0
+
+
+  ! Assignments Routines
+
 
 END MODULE  tpsa

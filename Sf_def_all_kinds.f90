@@ -307,6 +307,7 @@ contains
 
 
   SUBROUTINE SURVEY_CHART(C,P,DIR,MAGNETFRAME,E_IN)
+    !changed
     ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
     IMPLICIT NONE
     TYPE(CHART), TARGET ,OPTIONAL, INTENT(INOUT):: C
@@ -393,17 +394,19 @@ contains
        !          A(I)=C%ANG_IN(I)
 
        A=C%ANG_IN
-       D=F%A-OMEGA
-       CALL GEO_ROT(F%ENT,D,A,1,BASIS)
-       F%A=OMEGA+D
+       call ROT_FRAME(f,OMEGA,a,1,BASIS)
 
-       D=F%O-OMEGA
-       CALL GEO_ROT(F%MID,D,A,1,BASIS)
-       F%O=OMEGA+D
+       !       D=F%A-OMEGA
+       !       CALL GEO_ROT(F%ENT,D,A,1,BASIS)
+       !       F%A=OMEGA+D
 
-       D=F%B-OMEGA
-       CALL GEO_ROT(F%EXI,D,A,1,BASIS)
-       F%B=OMEGA+D
+       !       D=F%O-OMEGA
+       !       CALL GEO_ROT(F%MID,D,A,1,BASIS)
+       !       F%O=OMEGA+D
+
+       !       D=F%B-OMEGA
+       !       CALL GEO_ROT(F%EXI,D,A,1,BASIS)
+       !       F%B=OMEGA+D
 
        BASIS=F%ENT
 
@@ -428,6 +431,7 @@ contains
 
        ! CHECKING HERE THE CONSISTANCY
        ENT=F%EXI
+       BASIS=F%EXI
        A=C%ANG_OUT
        OMEGA=F%B
        D=F%B-OMEGA   ! D=0 OF COURSE
@@ -445,16 +449,13 @@ contains
           ENDDO
        ENDDO
 
-       IF(N(2)/=ZERO) N(2)=N(2)/( ABS(CL%F%B(1))+ABS(CL%F%B(2))+ABS(CL%F%B(3)) )
+       !       IF(N(2)<EPS_FITTED) N(2)=N(2)/( ABS(CL%F%B(1))+ABS(CL%F%B(2))+ABS(CL%F%B(3)) )
 
        IF(N(1)>EPS_FITTED.OR.N(2)>EPS_FITTED) THEN
-          WRITE(6,*) "INCOSISTANCY IN SURVEY_CHART "
+          WRITE(6,*) "INCONSISTANCY IN SURVEY_CHART "
           WRITE(6,*) N(1),N(2)
        ENDIF
        !
-
-
-
 
 
        IF(ASSOCIATED(P%F)) THEN
