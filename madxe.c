@@ -176,6 +176,7 @@ void error_efcomp(struct in_cmd* cmd)
   int    lvec;
   int    flgmgt = 0;
   int chcount[3] = {0,0,0};
+  char rout_name[] = "error_efcomp";
   double norfac; /* factor for normalization at reference radius */
   int    n;     /* order of reference multipole */
   double rr, rrr;    /* reference radius for multipole error */
@@ -381,7 +382,7 @@ void error_efcomp(struct in_cmd* cmd)
   fprintf(prt_file, "Replaced field errors for %d elements\n",chcount[1]);
   if(chcount[2] != 0)
   fprintf(prt_file, "Added field errors to %d elements\n",chcount[2]);
-  free(nvec);
+  myfree(rout_name,nvec);
 
 }
 
