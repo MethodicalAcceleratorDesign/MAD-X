@@ -701,6 +701,7 @@ struct command* current_command = NULL; /* current command clone */
 struct command* current_gweight = NULL; /* current gweight clone */
 struct command* current_weight = NULL;  /* current weight clone */
 struct command* current_match = NULL;   /* OB 23.1.2002: current match comm. */
+struct command* current_eopt  = NULL;   /* current eoption command */
 
 struct command_list* beam_list;         /* list of all beam commands */
 struct command_list* beta0_list;        /* list of user defined beta0s */
