@@ -478,19 +478,19 @@ void pro_error_make_efield_table()
                   /*
            printf("=> %s %e %e %e\n",nanf->name,nanf->p_fd_err,nanf->p_al_err);
                   */
-           if(nanf->p_al_err != NULL) {
-              for (j=1; j <= ALIGN_MAX; j++) {
-                 ttb->d_cols[j][ttb->curr] = nanf->p_al_err->a[j-1];
+           if(nanf->p_fd_err != NULL) {
+              for (j=1; j <= EFIELD_TAB; j++) {
+                 ttb->d_cols[j][ttb->curr] = nanf->p_fd_err->a[j-1];
                   /*
-                 printf("Align: %d %e\n",j,ttb->d_cols[j][ttb->curr]);
+                 printf("Field: %d %e\n",j,ttb->d_cols[j][ttb->curr]);
                   */
               }
            }
-           if(nanf->p_fd_err != NULL) {
-              for (j=1; j < ttb->num_cols-ALIGN_MAX; j++) {
-                 ttb->d_cols[j+ALIGN_MAX][ttb->curr] = nanf->p_fd_err->a[j-1];
+           if(nanf->p_al_err != NULL) {
+              for (j=1; j < ttb->num_cols-EFIELD_TAB; j++) {
+                 ttb->d_cols[j+EFIELD_TAB][ttb->curr] = nanf->p_al_err->a[j-1];
                   /*
-                 printf("Field: %d %e\n",j,ttb->d_cols[j][ttb->curr]);
+                 printf("Align: %d %e\n",j,ttb->d_cols[j][ttb->curr]);
                   */
               }
            }
