@@ -1,0 +1,2 @@
+      integer align_max
+      parameter(align_max=12)
