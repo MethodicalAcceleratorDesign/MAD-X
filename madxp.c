@@ -2560,7 +2560,6 @@ void madx_init()
   zero_double(guess_orbit,6);
   zero_double(oneturnmat, 36);
   set_option("twiss_print", &ione);
-  select_ptc_table_idx = 0;
 }
 
 void madx_start()

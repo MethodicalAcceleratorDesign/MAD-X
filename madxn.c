@@ -556,14 +556,18 @@ int result_from_normal(char* name_var, int* order, double* val)
         -3 row    does not exist
      */
 {
-  int row,j,k,found;
+  int row,j,k,found,pos;
   char string[AUX_LG],n_var[AUX_LG];
   double d_val;
+  struct table* t;
+
+  pos = name_list_pos("normal_results", table_register->names);
+  t = table_register->tables[pos];
 
   *val = zero;
   found = 0;
   mycpy(n_var, name_var);
-  for (row = 1; row <= select_ptc_table_idx; row++)
+  for (row = 1; row <= t->curr; row++)
     {
       k = string_from_table("normal_results","name", &row, string);
       if (k != 0) return k;
@@ -1129,6 +1133,7 @@ void select_ptc_normal(struct in_cmd* cmd)
 {
   struct name_list* nl;
   struct command_parameter_list* pl;
+  struct table* t;
   int pos; 
   int i, j, err, curr, arr_size, max_rows = 101, current_idx = 0;
   char* order_list;
@@ -1139,7 +1144,7 @@ void select_ptc_normal(struct in_cmd* cmd)
 
   nl = this_cmd->clone->par_names;
   pl = this_cmd->clone->par;
-  if (select_ptc_table_idx == 0)
+  if ((pos = name_list_pos("normal_results", table_register->names)) <= -1)
     {
       /* initialise table */
       normal_results = make_table("normal_results", "normal_res", normal_res_cols,
@@ -1147,14 +1152,16 @@ void select_ptc_normal(struct in_cmd* cmd)
       normal_results->dynamic = 1;
       add_to_table_list(normal_results, table_register);
       reset_count("normal_results");
+      pos = name_list_pos("normal_results", table_register->names);
       min_order = 1;
     }
+  t = table_register->tables[pos];
 
   /* initialise order array */
   order[0] = 0;
   order[1] = 0;
   order[2] = 0;
-  if (select_ptc_table_idx < max_rows)
+  if (t->curr < max_rows)
     {
       for (j = 0; j < PTC_NAMES_L; j++)
 	{
@@ -1176,7 +1183,6 @@ void select_ptc_normal(struct in_cmd* cmd)
 	      double_to_table("normal_results", "order2", &order[1]);
 	      double_to_table("normal_results", "order3", &order[2]);
 	      augment_count("normal_results");
-	      select_ptc_table_idx += 1;
 	      min_req_order = order[0]+order[1]+order[2];
 	      if (j >= 9) min_req_order += order[0]+order[1];
 	      if (j >= 7) min_req_order += 1;
@@ -1188,7 +1194,16 @@ void select_ptc_normal(struct in_cmd* cmd)
 }
 int select_ptc_idx()
 {
-   return select_ptc_table_idx;
+  struct table* t;
+  int pos; 
+
+  if ((pos = name_list_pos("normal_results", table_register->names)) > -1)
+    {
+      t = table_register->tables[pos];
+      return t->curr;
+    }
+  else
+    return pos;
 }
 int minimum_acceptable_order()
 {

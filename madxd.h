@@ -75,6 +75,7 @@
 #define w_ptc_end               w_ptc_end_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
+#define min_order               min_order_       /* ETDA 17 nov 2004 */
 #define result_from_normal      result_from_normal_ /* ETDA 11 nov 2004 */
 #define minimum_acceptable_order minimum_acceptable_order_ /* ETDA 17 nov 2004 */
 /* short utility routines */
@@ -985,9 +986,6 @@ int rbend = 0;              /* flag (= 1 when the element is a rectangular bendi
 int embedded_flag = 0;              /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
 /* E. T. d'Amico 10 june 2004 */
 int trkplot_flag = 0;              /* flag (= 1 from the moment a plot in tracking mode is requested, reset to 0 at madx end) */
-/* end additions */
-/* E. T. d'Amico 5 nov 2004 */
-int select_ptc_table_idx = 1;      /* counter for the select ptc table (set to 1 at beginning of MAD-X - It allows multiple calls to select_ptc_normal commands) */
 /* end additions */
 /* E. T. d'Amico 17 nov 2004 */
 int min_order = 1;      /* minimum required order */
