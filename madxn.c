@@ -2127,6 +2127,11 @@ void exec_plot(struct in_cmd* cmd)
 {
   int ierr, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
   char* pt = title;
+  /* use correct beam for sequence to be plotted - HG 031127 */
+  struct command* keep_beam = current_beam;
+  if (attach_beam(current_sequ) == 0)
+     fatal_error("TWISS - sequence without beam:", current_sequ->name);
+  /* end part1 of HG 031127 */
 
  /* <JMJ 7/11/2002> The following ifndef exclusion is a quick fix so that
      the WIN32 version
@@ -2150,6 +2155,9 @@ void exec_plot(struct in_cmd* cmd)
     }
   if (nt) title = pt;
 #endif
+  /* part 2 of HG 031127 */
+  current_beam = keep_beam;
+  /* end of part 2 of HG 031127 */
 }
 
 void exec_print(struct in_cmd* cmd)
