@@ -349,7 +349,7 @@
 !____ Test aperture. ALL ELEMENTS BUT DRIFTS
       aperflag = get_option('aperture ') .ne. 0
       if(aperflag) then
-        nn=24
+        nn=name_len
         call node_string('apertype ',aptype,nn)
         call dzero(aperture,maxnaper)
         call get_node_vector('aperture ',nn,aperture)
@@ -364,13 +364,13 @@
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
           apx = aperture(1)
-        print *,"radius of circle in element",apx
+!        print *,"radius of circle in element",apx
           if(apx.eq.zero) then
             apx = maxaper(1)
-        print *,"radius of circle by default",apx
+!        print *,"radius of circle by default",apx
           endif
           apy = apx
-        print *,"circle, radius= ",apx
+!        print *,"circle, radius= ",apx
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
      &    last_pos, last_orbit, track, ktrack,al_errors)
 !------------  rectangle case ----------------------------------
@@ -421,7 +421,7 @@
 !-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
 !-- 500 has been specified at the relevant places in go to below
 !-- code =1 for drift, treated above, go to 500 directly
-
+!      print *,"   CODE    ",code
       go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
      &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
@@ -950,12 +950,12 @@
       phirf = rfl * twopi
       dl    = el * half
       bi2gi2 = one / (betas * gammas) ** 2
-
 !---- Loop for all particles.
       do itrack = 1, ktrack
         pt = track(6,itrack)
         pt = pt + vrf * sin(phirf - omega * track(5,itrack))
         track(6,itrack) = pt
+!      print *," pt ",pt, "   track(5,itrack)",track(5,itrack)
       enddo
 
 !*---- If there were wakefields, track the wakes and then the 2nd half
@@ -1481,7 +1481,7 @@
         endif
         go to 98
  99     n = i
-        nn=24
+        nn=name_len
         call node_string('apertype ',aptype,nn)
         call trkill(n, turn, sum, ntrk, part_id,                        &
      &  last_turn, last_pos, last_orbit, z,aptype)
