@@ -1845,8 +1845,43 @@ void exec_command()
          current_error = p->clone;
          pro_error(p);
         }
-	else if (strcmp(p->cmd_def->module, "ptc") == 0) ttwm_();
-	else if (strcmp(p->cmd_def->module, "sxf") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_create_universe") == 0)
+        {
+          w_ptc_create_universe_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
+        {
+          w_ptc_create_layout_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
+        {
+          w_ptc_move_to_layout_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_input") == 0)
+        {
+          w_ptc_input_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_align") == 0)
+        {
+          w_ptc_align_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
+        {
+          w_ptc_twiss_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
+        {
+          w_ptc_normal_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
+        {
+          w_ptc_track_();
+        }
+      else if (strcmp(p->cmd_def->module, "ptc_end") == 0)
+        {
+          w_ptc_end_();
+        }
+      else if (strcmp(p->cmd_def->module, "sxf") == 0)
         {
            pro_sxf(p);
         }
@@ -3695,6 +3730,18 @@ int get_string(char* name, char* par, char* string)
           }
        }
     }
+  /*else if (strcmp(c_dummy, "ptc") == 0)
+    {
+      mycpy(c_dummy, par);
+      if (current_ptc != NULL) nl = current_ptc->par_names;
+      if (nl != NULL )
+      {
+        if ((p = command_par_string(c_dummy, current_ptc)) != NULL)
+          {
+            strcpy(string, p); length = strlen(p);
+          }
+      }
+    }  */
   else if (strcmp(c_dummy, "twiss") == 0)
     {
      mycpy(c_dummy, par);
@@ -4987,12 +5034,12 @@ void process()  /* steering routine: processes one command */
          exec_command();
          if (stop_flag)
          {
-	   if (this_cmd)
-	     {
+         if (this_cmd)
+           {
               if (this_cmd->clone != NULL)
                   this_cmd->clone = delete_command(this_cmd->clone);
               this_cmd = delete_in_cmd(this_cmd);
-	     }
+           }
             return;
          }
          break;
@@ -5558,7 +5605,7 @@ void pro_twiss()
   */
   current_sequ->start_node = j;
   zero_double(orbit0, 6);
-  zero_double(disp0, 6);
+  /*  zero_double(disp0, 6);*/
   zero_double(oneturnmat, 36);
   if ((beta_def = twiss_input(current_twiss)) < 0)
     {
