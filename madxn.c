@@ -6179,13 +6179,16 @@ void seq_cycle(struct in_cmd* cmd)
      sprintf(c_dummy, "%s:1", name);
      if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
        {
-      node = edit_sequ->nodes->nodes[pos];
-        sprintf(c_dummy, "%s$_p_", node->name);
-      if (strchr(node->previous->name, '$') == NULL)
+        node = edit_sequ->nodes->nodes[pos];
+        sprintf(c_dummy, "%s_p_", strip(node->name));
+      if (strstr(node->previous->name, "_p_") == NULL)
         {
          clone = clone_node(node, 0);
-           strcpy(clone->name, c_dummy);
-           link_in_front(clone, node);
+         clone->p_elem = clone_element(node->p_elem);
+         strcpy(clone->p_elem->name, c_dummy);
+         add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type, 
+         element_list, 1);
+         link_in_front(clone, node);
         }
         edit_sequ->start = node;
         edit_sequ->end = node->previous;
