@@ -29,7 +29,7 @@
 
       call trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,       &
      &turnnumber,dq)
-      call dynapfill()
+!      call dynapfill()
 
       write(*,*) ' end dynap '
 
@@ -132,7 +132,7 @@
       double precision eigen(6,6),coords(6,0:turns,*),distvect(turns),  &
      &zn(turns,6),znt(6),track(6),tend,ptend,smear,yapunov,fitlyap,     &
      &templyap,tunx1,tunx2,tuny1,tuny2,tuneabt,tuneabt2,zero,one,two,   &
-     &onelog(turns), turnnumber(turns),dq(2*turns)
+     &onelog(turns), turnnumber(turns),dq(2*turns), dphi(3)
       parameter(zero=0d0,one=1d0,two=2d0)
       include 'deltra.fi'
       include 'wmaxmin0.fi'
@@ -149,10 +149,18 @@
       wymin = zero
       wxymin = zero
 
+!--- distance for second particle with x add-on
+!        deltax = get_value('dynap ', 'lyapunov ')
+!        jend = 2
+!        z(1,jend) = z(1,1) + deltax
+!        do k = 2, 6
+!          z(k,jend) = z(k,1)
+!        enddo
+
 !---- compute minimum and maximum amplitudes
 !     and normalized coordinates
 !     for all particles
-      do k = 1, npart
+      do k = 1, npart, 2
         x0 = coords(1,0,k)
         y0 = coords(3,0,k)
         do i = 1, turns
@@ -205,26 +213,41 @@
             tunx2 = tuneabt2(zn, ix, initt, nturnhalf, turns, dq)
             tuny2 = tuneabt2(zn, iy, initt, nturnhalf, turns, dq)
           endif
+          if (abs(tunx1-tunx).gt.0.4) tunx1 = 1-tunx1
+          if (abs(tunx2-tunx).gt.0.4) tunx2 = 1-tunx2
+          if (abs(tuny1-tuny).gt.0.4) tuny1 = 1-tuny1
+          if (abs(tuny2-tuny).gt.0.4) tuny2 = 1-tuny2
           dtune = sqrt((tunx2 - tunx1)**2 + (tuny2 - tuny1)**2)
+          write(*,*) tunx1,tunx2, ' ',tuny1,tuny2
           call dynaptunefill
         endif
-      enddo
 
-!---- Lyapunov exponent calculation over second half of tracking.
-      if (npart .gt. 1) then
-        k=1
+!---- Lyapunov exponent calculation
+
+!        open(50,file="lyapunov.data")
+
         do i = 1, turns
-          templyap = zero
           do j = 1, 6
+            track(j) = coords(j,i,k+1)
+!          write(*,*) track(j)
+          end do
+          call wmaxmin(track,eigen,znt)
+          templyap = zero
+          do j = 1, 3
+            dphi(j) =  atan2(znt(2*j),znt(2*j-1))                       &
+     &-atan2(zn(i,2*j),zn(i,2*j-1))
             templyap = templyap +                                       &
-     &((coords(j,i,k) - coords(j,i,k+1)) / deltax)**2
+     &(dphi(j))**2
           end do
           distvect(i) = sqrt(templyap)
+!          write(50,*) i,distvect(i)
 !            write(*,*) distvect(i)
         end do
+!        write(*,*) ' templyap =', templyap
         yapunov = fitlyap(distvect,onelog,turnnumber,turns)
-      endif
+        call dynapfill()
 
+      enddo
       end
 
 !-----------------  end of trdynrun subroutine --------------------------
@@ -464,7 +487,7 @@
       double precision onelog(*),turnnumber(*),fitlyap1,fitlyap2,       &
      &fitlyap3,deltalog1,deltalog2,deltalog3,distvect(*),slopexy,zero,  &
      &one,dlmax
-      parameter(zero=0d0,one=1d0,dlmax=1d-1)
+      parameter(zero=0d0,one=1d0,dlmax=1d-5)
 
       do mf = 1, nturn
 !        dq(ilogd+mf) = log(distvect(mf))
