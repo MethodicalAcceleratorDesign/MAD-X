@@ -597,8 +597,8 @@
       include 'twtrr.fi'
       include 'track.fi'
       logical first
-      integer iord,jtrk,nd,nord,ktrack,j,                               &
-     &n_ferr,nn,ns,node_fd_errors
+      integer iord,jtrk,nd,nord,ktrack,j,n_ferr,nn,ns,node_fd_errors,   &
+     &get_option
       double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
      &f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
@@ -663,7 +663,7 @@
           dyt(jtrk) = zero
         enddo
 !----------- introduction of dipole focusing 
-         if(elrad.gt.zero) then
+         if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
            do jtrk = 1,ktrack
            dxt(jtrk) =  dipr*dipr*track(1,jtrk)/elrad
            dyt(jtrk) =  dipi*dipi*track(3,jtrk)/elrad
@@ -690,7 +690,7 @@
           dxt(jtrk) = dxt(jtrk) / (one + deltas)
           dyt(jtrk) = dyt(jtrk) / (one + deltas)
         enddo
-          if(elrad.gt.zero) then
+          if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
            do jtrk = 1,ktrack
            dxt(jtrk) = dxt(jtrk) + dipr*dipr/elrad
            dyt(jtrk) = dyt(jtrk) + dipi*dipi/elrad

@@ -172,6 +172,7 @@ char command_def[] =
 "reset    = [l, false, true], "
 "debug    = [l, false, true], "
 "rbarc    = [l, true, true], "
+"thin_foc = [l, true, true], "
 "sympl    = [l, true, true], "
 "tell     = [l, false, true], "
 "threader = [l, false, true], "

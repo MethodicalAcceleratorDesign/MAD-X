@@ -2822,7 +2822,7 @@
       include 'twissl.fi'
       include 'twtrr.fi'
       logical fsec,ftrk,fmap
-      integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors
+      integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors,get_option
       double precision orbit(6),f_errors(0:maxferr),re(6,6),te(6,6,6),x,&
      &y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),              &
@@ -2899,7 +2899,7 @@
         orbit(4) = orbit(4) + dpy - dipi * (deltap + bi*orbit(6))
         orbit(5) = orbit(5) - (dipr*x + dipi*y) * bi
 !---- Add the missing focussing component of thin dipoles for co
-      if(elrad.gt.zero) then
+      if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
         orbit(2) = orbit(2)-dipr*dipr/elrad*x
         orbit(4) = orbit(4)-dipi*dipi/elrad*y
       endif
@@ -2926,7 +2926,7 @@
         re(4,3) = + dr
       endif
 !---- Add the missing focussing component of thin dipoles
-      if(elrad.gt.zero) then
+      if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
         re(2,1)=re(2,1)-dipr*dipr/elrad
         re(4,1)=re(4,1)-dipi*dipi/elrad
       endif
@@ -5038,7 +5038,7 @@
             sum1 = sum1 + stmat(i,k,l) * sorb(l)
           enddo
           sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-          srmat(i,k) = srmat(i,k) - 2.d0 * sum1
+!          srmat(i,k) = srmat(i,k) - 2.d0 * sum1
         enddo
         ek(i) = sum2
       enddo
