@@ -229,6 +229,8 @@ void control(struct in_cmd*);
 void conv_char(char*, struct int_array*);
 void conv_sixtrack(struct in_cmd*);
 void correct_correct(struct in_cmd*);
+void correct_correct1(struct in_cmd*);
+void correct_correct2(struct in_cmd*);
 void correct_getorbit(struct in_cmd*);
 void correct_putorbit(struct in_cmd*);
 void correct_usekick(struct in_cmd*);
@@ -650,20 +652,27 @@ int zero_string(char*);
 void pro_correct(struct in_cmd* cmd);
 int  pro_correct_getcommands(struct in_cmd* cmd);
 int  pro_correct_gettables(int ip, struct in_cmd* cmd);
+int  pro_correct2_gettables(int ip, struct in_cmd* cmd);
 int  pro_correct_getorbit(struct in_cmd* cmd);
 void pro_correct_prtwiss();
 void pro_correct_write_cocu_table();
 void pro_correct_fill_corr_table(int ip , char *name, double old, double new);
+void pro_correct2_fill_corr_table(int b, int ip , char *name, double old, double new);
 void pro_correct_make_corr_table();
+void pro_correct2_make_corr_table();
 void pro_correct_write_results(double *monvec, double *resvec, double *corvec, int *nx, int *nc, int *nm, int imon, int icor, int ip);
+void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, int *nx, int *nc, int *nm, int imon, int icor, int ip);
 void pro_correct_make_mon_table();
+void pro_correct2_make_mon_table();
 void pro_correct_fill_mon_table(int ip ,char *name, double old, double new);
+void pro_correct2_fill_mon_table(int ip ,char *name, double old, double new);
 int pro_correct_getactive(int ip, int *nm, int *nx, int *nc, double *corvec, double *monvec,char *conm);
 double crms(double *r, int m);
 float  fextim();
 
 
 double* pro_correct_response_ring(int ip, int nc, int nm);
+double* pro_correct2_response_ring(int ip, int nc, int nm);
 double* pro_correct_response_line(int ip, int nc, int nm);
 
 /* C wrapper to allocate memory for Fortran77 */
@@ -832,6 +841,9 @@ struct table* ibs_table;          /* current ibs table */
 struct table* touschek_table;     /* current touschek table */
 struct table* summ_table;         /* current twiss summary table */
 struct table* twiss_table;        /* current twiss table */
+struct table* twiss_table_beam1;  /* current twiss table beam1 */
+struct table* twiss_table_beam2;  /* current twiss table beam2 */
+
 
 /* E. T. d'Amico 2 feb 2004 */
 struct table* embedded_twiss_table;        /* current twiss table */
@@ -839,6 +851,8 @@ struct table* embedded_twiss_table;        /* current twiss table */
 
 struct table* survey_table;       /* current survey table */
 struct table* corr_table;         /* corrector table after orbit correction */
+struct table* corr_table1;        /* corrector table after orbit correction, beam 1 for two rings */
+struct table* corr_table2;        /* corrector table after orbit correction, beam 2 for two rings */
 struct table* mon_table;          /* monitor table after orbit correction */
 struct table* orbit_table;        /* orbit positions at monitors */
 
@@ -853,7 +867,10 @@ struct table_list* table_register; /* contains all tables */
 struct variable* current_variable = NULL; /* set by act_value (table access) */
 struct var_list* variable_list;
 
-struct orb_cor* correct_orbit; /* information and links for orbit correction */
+struct orb_cor*  correct_orbit;   /* information and links for orbit correction */
+struct orb_cor2* correct_orbit1;  /* information and links for orbit correction */
+struct orb_cor2* correct_orbit2;  /* information and links for orbit correction */
+struct orb_cor2* correct_orbit12; /* information and links for orbit correction */
 
 double corrl;                  /* global limit for orbit corrector strength  */
 
@@ -861,6 +878,7 @@ struct table* efield_table;    /* field errors in table form  */
 FILE* fddata;
 FILE* fcdata;
 FILE* ftdata;
+FILE* fgdata;
 
 FILE* debug_file;              /* for debug output */
 FILE* stamp_file;              /* for debug output */
