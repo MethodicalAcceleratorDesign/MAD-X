@@ -13,7 +13,7 @@ FC=g77
 GCC_FLAGS=-g -Wall -fno-second-underscore
 GCCP_FLAGS=-g -O3 -funroll-loops -fno-second-underscore
 CC=gcc
-LIBX=/usr/X11R6/lib/libX11.a
+LIBX="-L/usr/X11R6/lib" -lX11
 GLIB=/afs/cern.ch/group/si/slap/lib
 GPUB=/afs/cern.ch/group/si/slap/bin
 
