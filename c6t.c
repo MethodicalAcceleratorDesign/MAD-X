@@ -1,3 +1,4 @@
+/* 01/07/2003 - FS added the "arbitrary matrix" element */
 /* 21/03/2003 - FS fixed segmentation fault which was due to a faulty
    free-ing of object that had already been freed before */
 /* 10/07/2002 - MH fixed missing mcdo bug, caused by recursion up
@@ -177,6 +178,7 @@ void write_f16_errors();
 void write_f8_errors();
 void write_f3_aper();
 void write_f3aux();
+void write_f3_matrix();
 void write_f3_entry(char*, struct c6t_element*);
 void write_f3_mult(struct c6t_element*);
 void write_f34_special();
@@ -250,6 +252,7 @@ int           block_count = 0,     /* current block count for naming */
               field_cnt = 0,       /* element with field errors count */
               f3_cnt = 0,          /* f3 write flag */
               f3aux_cnt = 0,       /* f3aux write flag */
+              f3_matrix_cnt = 0,   /* f3_matrix write flag */
               f8_cnt = 0,          /* f8 write count */
               f16_cnt = 0,         /* f16 write count */
               f34_cnt = 0,         /* f34 write count */
@@ -276,7 +279,7 @@ const double eps_9 = 1.e-9;
 const double eps_12 = 1.e-12;
 double ref_def = 0.017;
 
-FILE *f2, *f3, *f3aux, *f3aper, *f8, *f16, *f34;
+FILE *f2, *f3, *f3aux, *f3matrix, *f3aper, *f8, *f16, *f34;
 
 void conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
 {
@@ -503,6 +506,10 @@ void att_marker(struct c6t_element* el)
 
 void att_matrix(struct c6t_element* el)
 {
+  el->out_1 = 22;
+  el->out_2 = 0;
+  el->out_3 = 0;
+  el->out_4 = el->value[0];
 }
 
 void att_multipole(struct c6t_element* el)
@@ -866,6 +873,7 @@ void c6t_init()
   field_cnt = 0;       /* element with field errors count */
   f3_cnt = 0;          /* f3 write flag */
   f3aux_cnt = 0;       /* f3aux write flag */
+  f3_matrix_cnt = 0;   /* f3_matrix write flag */
   f8_cnt = 0;          /* f8 write count */
   f16_cnt = 0;         /* f16 write count */
   f34_cnt = 0;         /* f34 write count */
@@ -933,7 +941,7 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
       (strcmp(p->base_name,"vkicker") == 0)    ||
       (strcmp(p->base_name,"hkicker") == 0)    ||
       (strcmp(p->base_name,"kicker") == 0)) {
-    c6t_elem = new_c6t_element(19,t_name,p->base_name);
+    c6t_elem = new_c6t_element(20,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
 
@@ -984,6 +992,53 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
       if (i<maxkn) {c6t_elem->value[i*2+12] = kn_param->double_array->a[i]; }
       if (i<maxks) {c6t_elem->value[i*2+13] = ks_param->double_array->a[i]; }
     }
+  } else if ((strcmp(p->base_name,"matrix") == 0)) {
+    c6t_elem = new_c6t_element(43,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+    c6t_elem->value[1] = el_par_value_recurse("kick1",p->p_elem);
+    c6t_elem->value[2] = el_par_value_recurse("kick2",p->p_elem);
+    c6t_elem->value[3] = el_par_value_recurse("kick3",p->p_elem);
+    c6t_elem->value[4] = el_par_value_recurse("kick4",p->p_elem);
+    c6t_elem->value[5] = el_par_value_recurse("kick5",p->p_elem);
+    c6t_elem->value[6] = el_par_value_recurse("kick6",p->p_elem);
+    c6t_elem->value[7] = el_par_value_recurse("rm11",p->p_elem);
+    c6t_elem->value[8] = el_par_value_recurse("rm12",p->p_elem);
+    c6t_elem->value[9] = el_par_value_recurse("rm13",p->p_elem);
+    c6t_elem->value[10] = el_par_value_recurse("rm14",p->p_elem);
+    c6t_elem->value[11] = el_par_value_recurse("rm15",p->p_elem);
+    c6t_elem->value[12] = el_par_value_recurse("rm16",p->p_elem);
+    c6t_elem->value[13] = el_par_value_recurse("rm21",p->p_elem);
+    c6t_elem->value[14] = el_par_value_recurse("rm22",p->p_elem);
+    c6t_elem->value[15] = el_par_value_recurse("rm23",p->p_elem);
+    c6t_elem->value[16] = el_par_value_recurse("rm24",p->p_elem);
+    c6t_elem->value[17] = el_par_value_recurse("rm25",p->p_elem);
+    c6t_elem->value[18] = el_par_value_recurse("rm26",p->p_elem);
+    c6t_elem->value[19] = el_par_value_recurse("rm31",p->p_elem);
+    c6t_elem->value[20] = el_par_value_recurse("rm32",p->p_elem);
+    c6t_elem->value[21] = el_par_value_recurse("rm33",p->p_elem);
+    c6t_elem->value[22] = el_par_value_recurse("rm34",p->p_elem);
+    c6t_elem->value[23] = el_par_value_recurse("rm35",p->p_elem);
+    c6t_elem->value[24] = el_par_value_recurse("rm36",p->p_elem);
+    c6t_elem->value[25] = el_par_value_recurse("rm41",p->p_elem);
+    c6t_elem->value[26] = el_par_value_recurse("rm42",p->p_elem);
+    c6t_elem->value[27] = el_par_value_recurse("rm43",p->p_elem);
+    c6t_elem->value[28] = el_par_value_recurse("rm44",p->p_elem);
+    c6t_elem->value[29] = el_par_value_recurse("rm45",p->p_elem);
+    c6t_elem->value[30] = el_par_value_recurse("rm46",p->p_elem);
+    c6t_elem->value[31] = el_par_value_recurse("rm51",p->p_elem);
+    c6t_elem->value[32] = el_par_value_recurse("rm52",p->p_elem);
+    c6t_elem->value[33] = el_par_value_recurse("rm53",p->p_elem);
+    c6t_elem->value[34] = el_par_value_recurse("rm54",p->p_elem);
+    c6t_elem->value[35] = el_par_value_recurse("rm55",p->p_elem);
+    c6t_elem->value[36] = el_par_value_recurse("rm56",p->p_elem);
+    c6t_elem->value[37] = el_par_value_recurse("rm61",p->p_elem);
+    c6t_elem->value[38] = el_par_value_recurse("rm62",p->p_elem);
+    c6t_elem->value[39] = el_par_value_recurse("rm63",p->p_elem);
+    c6t_elem->value[40] = el_par_value_recurse("rm64",p->p_elem);
+    c6t_elem->value[41] = el_par_value_recurse("rm65",p->p_elem);
+    c6t_elem->value[42] = el_par_value_recurse("rm66",p->p_elem);
   } else if ((strcmp(p->base_name,"rfcavity") == 0)) {
     c6t_elem = new_c6t_element(11,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
@@ -1761,6 +1816,7 @@ void process_c6t()  /* steering routine */
   write_f16_errors();
   write_f34_special();
   write_f3aux();
+  write_f3_matrix();
   write_f3_aper();
   write_f8_errors();
 }
@@ -2324,12 +2380,6 @@ void write_f3_aper()
   if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
 }
 
-void write_f3_entry(char* option, struct c6t_element* el)
-{
-  if (f3_cnt++ == 0)     f3  = fopen("fc.3", "w");
-  if (strcmp(option, "multipole") == 0) write_f3_mult(el);
-}
-
 void write_f3aux()
 {
   double aux_val[4] = {-1.e20, -1.e20, -1.e20, -1.e20};
@@ -2375,6 +2425,37 @@ void write_f3aux()
      fprintf(f3aux, "SXD%12.5f\n", aux_val[3]);
      fprintf(f3aux, "NEXT\n");
     }
+}
+
+void write_f3_matrix()
+{
+  int i, i_max = 43;
+  current_element = first_in_sequ;
+  while (current_element != NULL)
+    {
+      if (strcmp(current_element->base_name, "matrix") == 0)
+	{
+	  if (f3_matrix_cnt++ == 0)     
+	    {
+	      f3matrix  = fopen("fc.3", "w");
+	      fprintf(f3matrix,"TROM\n");
+	      fprintf(f3matrix,"%-16s\n",current_element->name);
+	    }
+	  for (i = 1; i < i_max; i++)
+	    {
+	      fprintf(f3matrix,"%23.15e", current_element->value[i]);
+	      if (i%3 == 0) fprintf(f3matrix,"\n");
+	    }
+	  fprintf(f3matrix,"NEXT\n");
+	}
+      current_element = current_element->next;
+    }
+}
+
+void write_f3_entry(char* option, struct c6t_element* el)
+{
+  if (f3_cnt++ == 0)     f3  = fopen("fc.3", "w");
+  if (strcmp(option, "multipole") == 0) write_f3_mult(el);
 }
 
 void write_f3_mult(struct c6t_element* el)
