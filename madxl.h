@@ -1,3 +1,4 @@
+/* preparation of Touschek */
 /* defined constants for word lengths etc. */
 #define ALIGN_MAX 14        /* alignment error array length */
 #define EFIELD_TAB 22       /* field error array length for ESAVE table */
