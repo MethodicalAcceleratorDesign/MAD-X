@@ -2296,7 +2296,7 @@ void write_f16_errors()
 
 void write_f34_special()
 {
-  int i, j, n, flags[FIELD_MAX];
+  int i, j, jt, n, flags[FIELD_MAX];
   double values[FIELD_MAX];
   char* t_list[NT34];
   char t_name[NAME_L];
@@ -2313,6 +2313,7 @@ void write_f34_special()
   if (special_flag == 0)  return;
 
   current_element = first_in_sequ;
+  jt=1;
   while (current_element != NULL)
     {
      for (i = 0; i < NT34; i++)
@@ -2325,15 +2326,15 @@ void write_f34_special()
            {
             strcpy(t_name, current_element->name);
             if ((cp = strchr(t_name, '+')) != NULL) *cp = '\0';
-            if ((err=double_from_table("twiss","s",&(current_element->twtab_row),&spos)))
+            if ((err=double_from_table("twiss","s",&jt,&spos)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","betx",&(current_element->twtab_row),&betx)))
+            if ((err=double_from_table("twiss","betx",&jt,&betx)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","bety",&(current_element->twtab_row),&bety)))
+            if ((err=double_from_table("twiss","bety",&jt,&bety)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","mux",&(current_element->twtab_row),&mux)))
+            if ((err=double_from_table("twiss","mux",&jt,&mux)))
        printf ("Not found double_from table = %i\n",err);
-            if ((err=double_from_table("twiss","muy",&(current_element->twtab_row),&muy)))
+            if ((err=double_from_table("twiss","muy",&jt,&muy)))
        printf ("Not found double_from table = %i\n",err);
               fprintf(f34,
               " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
@@ -2342,17 +2343,18 @@ void write_f34_special()
         }
        }
      current_element = current_element->next;
+     jt++;
     }
-  if (last_in_sequ->twtab_row > 0) {
-    if ((err=double_from_table("twiss","s",&(last_in_sequ->twtab_row),&spos)))
+   if (jt > 0) {
+    if ((err=double_from_table("twiss","s",&jt,&spos)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","betx",&(last_in_sequ->twtab_row),&betx)))
+    if ((err=double_from_table("twiss","betx",&jt,&betx)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","bety",&(last_in_sequ->twtab_row),&bety)))
+    if ((err=double_from_table("twiss","bety",&jt,&bety)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","mux",&(last_in_sequ->twtab_row),&mux)))
+    if ((err=double_from_table("twiss","mux",&jt,&mux)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","muy",&(last_in_sequ->twtab_row),&muy)))
+    if ((err=double_from_table("twiss","muy",&jt,&muy)))
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
