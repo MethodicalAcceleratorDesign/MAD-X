@@ -60,7 +60,7 @@
 !---        pemima, peplot and pesopt.
 !--- nelmach set in routine pefill, used in routines pefill, peplot. 
 !--- numax set in routine pemima, used in routines pemima, peplot.
-!--- splinef set in routine pesopt, used in routines pecurv, pefill.
+!--- interf set in routine pesopt, used in routines pecurv, pefill.
 !--- noline set in routine pesopt, used in routines pefill, pesopt.
 !--- nqval set in routine pefill and peintp, used in routines pefill, 
 !---        peintp, pemima and peplot.
@@ -74,11 +74,11 @@
 !---           and pesopt.
 !--- ieltyp set in routine pefill, used in routine psplot.
 
-      common / peaddi / itbv, nivvar, nelmach, numax, splinef, noline,  &
+      common / peaddi / itbv, nivvar, nelmach, numax, interf, noline,   &
      &                  nqval(mxcurv), nvvar(4), nrrang(2),             &
      &                  proc_flag(2, mxcurv), ipparm(mpparm,mxcurv),    &
      &                  naxref(mxcurv), ieltyp(maxseql)
-      integer itbv, nivvar, nelmach, numax, splinef, noline,            &
+      integer itbv, nivvar, nelmach, numax, interf, noline,             &
      &        nqval, nvvar, nrrang, proc_flag,                          &
      &        ipparm, naxref, ieltyp
 

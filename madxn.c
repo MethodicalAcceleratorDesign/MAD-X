@@ -5939,24 +5939,6 @@ void pro_embedded_twiss(struct command* current_global_twiss)
           fatal_error("cannot open output file:", sector_name);
     }
 
-  use_range[0] = current_sequ->range_start;
-  use_range[1] = current_sequ->range_end;
-
-  if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
-    {
-     if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
-       {
-      current_sequ->range_start = nodes[0];
-      current_sequ->range_end = nodes[1];
-       }
-     else warning("illegal range ignored:", pl->parameters[pos]->string);
-    }
-
-  for (j = 0; j < current_sequ->n_nodes; j++)
-    {
-     if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
-    }
-
   /* Find index to the twiss table */
 
   if((pos = name_list_pos(table_name, table_register->names)) > -1)
@@ -6056,8 +6038,10 @@ void pro_embedded_twiss(struct command* current_global_twiss)
       err = double_from_table(table_name, "bety", &jt, &bety);
       err = double_from_table(table_name, "alfx", &jt, &alfx);
       err = double_from_table(table_name, "mux", &jt, &mux);
+      mux = mux*twopi;
       err = double_from_table(table_name, "alfy", &jt, &alfy);
       err = double_from_table(table_name, "muy", &jt, &muy);
+      muy = muy*twopi;
       err = double_from_table(table_name, "x", &jt, &x);
       err = double_from_table(table_name, "px", &jt, &px);
       err = double_from_table(table_name, "y", &jt, &y);
@@ -6228,8 +6212,6 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   set_option("useorbit", &k);
   set_option("info", &keep_info);
   set_variable("twiss_tol", &tol_keep);
-  current_sequ->range_start = use_range[0];
-  current_sequ->range_end = use_range[1];
   current_sequ->tw_table = keep_table;
 }
 
