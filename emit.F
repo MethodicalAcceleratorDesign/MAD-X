@@ -225,6 +225,10 @@
       parameter (iqpr2 = 6, four = 4.d0)
       parameter (ten3p = 1.0d3, tenp6 = 1.0d6, tenp9 = 1.0d9)
 
+      call dzero(sigma,36)
+      ex=zero
+      ey=zero
+      et=zero
       twopi=get_variable('twopi ')
       clight = get_variable('clight ')
       hbar = get_variable('hbar ')
