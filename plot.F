@@ -2726,7 +2726,7 @@
       save plot_No
 
 !--- Routine body
-	
+      
       if (initfl .eq. 0)  then
 
 !--- overall initialization
