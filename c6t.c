@@ -100,7 +100,7 @@ void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
 void att_undefined(struct c6t_element*);
 void clean_c6t_element(struct c6t_element*);
-struct c6t_element* create_aperture(char* ,char* ,int , int );
+struct c6t_element* create_aperture(char* ,char* ,int , int , struct double_array*);
 void concat_drifts();
 void conv_elem();
 void c6t_finish();
@@ -869,7 +869,7 @@ void clean_c6t_element(struct c6t_element* cleanme)
   for(i=0; i<cleanme->n_values; i++) { cleanme->value[i]=0; }
 }
 
-struct c6t_element* create_aperture(char* name,char* type,int a, int b)
+struct c6t_element* create_aperture(char* name,char* type,int a, int b, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
   aper_element = new_c6t_element(4,name,"aperture");
@@ -884,6 +884,15 @@ struct c6t_element* create_aperture(char* name,char* type,int a, int b)
     aper_element->value[3] = 2;
   }
   aper_element->keep_in=1;
+  /* alignment errors of aperture are to be copied toalignment errors of element */
+  if (p_al_err && p_al_err->curr>11) {
+    align_cnt++;
+    aper_element->na_err = p_al_err->curr;
+    aper_element->p_al_err = make_obj("ALDUM",0,ALIGN_MAX,0,0);
+    aper_element->p_al_err->c_dble = p_al_err->curr;
+    aper_element->p_al_err->a_dble[0] = p_al_err->a[10];
+    aper_element->p_al_err->a_dble[1] = p_al_err->a[11];
+  }
   return aper_element;
 }
 
@@ -1795,17 +1804,17 @@ void pro_elem(struct node* cnode)
   if (tag_aperture.apply==1) {
     if (strstr(tag_aperture.style,"circle")!=NULL) {
       tag_element = create_aperture(tag_aperture.name,"EL",
-				    tag_aperture.value[0],tag_aperture.value[0]);
+				    tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
     } else if (strstr(tag_aperture.style,"ellipse")!=NULL) {
       tag_element = create_aperture(tag_aperture.name,"EL",
-				    tag_aperture.value[0],tag_aperture.value[1]);
+				    tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
     } else if (strstr(tag_aperture.style,"rectangle")!=NULL) {
       tag_element = create_aperture(tag_aperture.name,"RE",
-				    tag_aperture.value[0],tag_aperture.value[1]);
+				    tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
     } else if (strstr(tag_aperture.style,"lhcscreen")!=NULL) {
       strcpy(ap_name,tag_aperture.name); strcat(ap_name,"1");
       tag_element = create_aperture(ap_name,"EL",
-				    tag_aperture.value[0],tag_aperture.value[0]);
+				    tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
       tag_element->previous = current_element;
       tag_element->next = current_element->next;
       current_element->next = tag_element;
@@ -1816,7 +1825,7 @@ void pro_elem(struct node* cnode)
 
       strcpy(ap_name,tag_aperture.name); strcat(ap_name,"2");
       tag_element = create_aperture(ap_name,"RE",
-				    tag_aperture.value[1],tag_aperture.value[2]);
+				    tag_aperture.value[1],tag_aperture.value[2],cnode->p_al_err);
     } else {
       warning("general aperture element not supported in sixtrack",tag_aperture.name);
     }
