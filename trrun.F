@@ -7,7 +7,7 @@
 !          Interface RUN and DYNAP command to tracking routine         *
 !                                                                      *
 !-- Input:                                                             *
-!   switch  (int)         1: RUN, 2: DYNAP fastune, 3: dynap aperture  *
+!   switch  (int)         1: RUN, 2: DYNAP fastune                     *
 !   turns   (int)         number of turns to track                     *
 !   orbit0  (dp. array)   start of closed orbit                        *
 !   rt      (dp. matrix)  one-turn matrix                              *
@@ -1642,7 +1642,7 @@
 !----------------------------------------------------------------------*
       include 'bb.fi'
       logical zgiv,zngiv
-      integer j,jend,k,kp,kq,next_start,itype(23),switch,turns
+      integer j,jend,k,kp,kq,next_start,itype(23),switch,turns,jt
       double precision phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
      &ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
      &ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
@@ -1655,9 +1655,16 @@
       ex = get_value('probe ','ex ')
       ey = get_value('probe ','ey ')
       et = get_value('probe ','et ')
+!-----get x add-on for lyaponuv calculation from dynap table
+        deltax = get_value('dynap ', 'lyapunov ')
  1    continue
-      j  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
-      if (j .ne. 0)  then
+      jt  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
+      if (switch.gt.1) then
+      j = 2*jt-1 
+      else
+      j = jt 
+      endif 
+      if (j .ne. -1)  then
         if (switch .lt. 3 .or. j .eq. 1)  then
           jend = j
 !---- Get start coordinates
@@ -1714,18 +1721,24 @@
           do k = 1, 6
             z(k,j) = orbit0(k) + zstart(k)
           enddo
+          if (switch.gt.1) then
+          do k = 1, 6
+            z(k,j+1) = z(k,j) 
+          enddo
+            z(1,j+1) = z(1,j) + deltax
+          endif 
         endif
         goto 1
       endif
-      if (switch .eq. 3)  then
+c      if (switch .eq. 3)  then
 !--- create second particle with x add-on
-        deltax = get_value('dynap ', 'lyapunov ')
-        jend = 2
-        z(1,jend) = z(1,1) + deltax
-        do k = 2, 6
-          z(k,jend) = z(k,1)
-        enddo
-      endif
+c        deltax = get_value('dynap ', 'lyapunov ')
+c        jend = 2
+c        z(1,jend) = z(1,1) + deltax
+c        do k = 2, 6
+c          z(k,jend) = z(k,1)
+c        enddo
+c      endif
       end
       subroutine trbegn(rt,eigen)
       implicit none
