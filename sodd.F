@@ -301,7 +301,7 @@ C---------------------------------------------------------------------
 	if (nint .gt. 0) disto2 = int_arr(1)
 
 	iprog = detun + disto1*2 + disto2*4
-	if(iprog.le.0.or.iprog.gt.7) call error(0,14,iprog)
+	if(iprog.le.0.or.iprog.gt.7) call prror(0,14,iprog)
 	if(iprog.eq.1.or.iprog.eq.3.or.iprog.eq.5.or.iprog.eq.7)
      &     write(6,*) ' Program <DETUNE> will be executed '
       if(iprog.eq.2.or.iprog.eq.3.or.iprog.eq.6.or.iprog.eq.7)
@@ -320,7 +320,7 @@ C---------------------------------------------------------------------
         n1=n2
         n2=n3
       endif
-      if(abs(n1).gt.mmul.or.abs(n2).gt.mmul) call error(0,15,mmul)
+      if(abs(n1).gt.mmul.or.abs(n2).gt.mmul) call prror(0,15,mmul)
 
 !--- get etl1 & etl2 (start position & stop position)
 
@@ -375,31 +375,31 @@ C---------------------------------------------------------------------
 	if(detun.eq.1) then
 	  open(70,file='detune_1_end',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,70)
+	  if(ier.ne.0) call prror(0,16,70)
 	  write(70,10070)
 	  open(72,file='detune_2_end',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,72)
+	  if(ier.ne.0) call prror(0,16,72)
 	  write(72,10072)
 	endif
 	if(disto1.eq.1) then
 	  open(74,file='distort_1_F_end',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,74)
+	  if(ier.ne.0) call prror(0,16,74)
 	  write(74,10074)
 	  open(75,file='distort_1_H_end',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,75)
+	  if(ier.ne.0) call prror(0,16,75)
 	  write(75,10074)
 	endif
 	if(disto2.eq.1) then
 	  open(78,file='distort_2_F_end',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,78)
+	  if(ier.ne.0) call prror(0,16,78)
 	  write(78,10078)
 	  open(79,file='distort_2_H_end',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,79)
+	  if(ier.ne.0) call prror(0,16,79)
 	  write(79,10078)
 	endif
       endif
@@ -408,27 +408,27 @@ C---------------------------------------------------------------------
 	if(detun.eq.1) then
 	  open(71,file='detune_1_all',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,71)
+	  if(ier.ne.0) call prror(0,16,71)
 	  write(71,10070)
 	  open(73,file='detune_2_all',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,73)
+	  if(ier.ne.0) call prror(0,16,73)
 	  write(73,10072)
 	endif
 	if(disto1.eq.1) then
 	  open(76,file='distort_1_F_all',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,76)
+	  if(ier.ne.0) call prror(0,16,76)
 	  write(76,10076)
 	  open(77,file='distort_1_H_all',form='formatted',status='unknown',
      &         iostat=ier)
-	  if(ier.ne.0) call error(0,16,77)
+	  if(ier.ne.0) call prror(0,16,77)
 	  write(77,10076)
 	endif
       endif
       open(34,file='fc.34',form='formatted',status='unknown',
      &recl=8192,iostat=ier)
-      if(ier.ne.0) call error(0,16,34)
+      if(ier.ne.0) call prror(0,16,34)
 C-----------------------------------------------------------------------
 C  Initialisation
 C-----------------------------------------------------------------------
@@ -1428,7 +1428,7 @@ C--Collect a total of ica non-zero terms
                 if(dabs(facd1(k1,k2,1)).gt.pieni.or.
      &          dabs(facd1(k1,k2,2)).gt.pieni) then
                   ica=ica+1
-                  if(ica.gt.mmultf) call error(3,10,mmultf)
+                  if(ica.gt.mmultf) call prror(3,10,mmultf)
                   facd2(1,ica)=facd1(k1,k2,1)
                   facd2(2,ica)=facd1(k1,k2,2)
                   facd1(k1,k2,1)=zero
@@ -1446,7 +1446,7 @@ C--Collect also the additional detuning induced terms
                   if(dabs(facd10(k1,k2,1)).gt.pieni.or.
      &            dabs(facd10(k1,k2,2)).gt.pieni) then
                     ica=ica+1
-                    if(ica.gt.mmultf) call error(3,10,mmultf)
+                    if(ica.gt.mmultf) call prror(3,10,mmultf)
                     facd2(1,ica)=facd10(k1,k2,1)
                     facd2(2,ica)=facd10(k1,k2,2)
                     facd10(k1,k2,1)=zero
@@ -1735,13 +1735,13 @@ C--Finding Double Appearance
      &            betl(ijnu1,4).eq.betl(ijnu,2)) then
                   ido=0
                   if2=if2+1
-                  if(if2.gt.2) call error(1,13,if2)
+                  if(if2.gt.2) call prror(1,13,if2)
                   fcc2(if2,ijnu1)=two*fcc2(if2,ijnu1)
                 endif
               enddo
               if(ido.eq.1) then
                 if2=if2+1
-                if(if2.gt.2) call error(1,13,if2)
+                if(if2.gt.2) call prror(1,13,if2)
                 ihw(if2,ijnu)=1
                 ipl(if2,ijnu,1)=k1
                 ipl(if2,ijnu,2)=l1
@@ -1786,13 +1786,13 @@ C--Finding Double Appearance
      &          betl(ijnu1,4).eq.betl(ijnu,2)) then
                   ido=0
                   if2=if2+1
-                  if(if2.gt.2) call error(1,13,if2)
+                  if(if2.gt.2) call prror(1,13,if2)
                   fcc2(if2,ijnu1)=two*fcc2(if2,ijnu1)
                 endif
               enddo
               if(ido.eq.1) then
                 if2=if2+1
-                if(if2.gt.2) call error(1,13,if2)
+                if(if2.gt.2) call prror(1,13,if2)
                 ihw(if2,ijnu)=1
                 ipl(if2,ijnu,1)=k1-1
                 ipl(if2,ijnu,2)=l
@@ -1855,13 +1855,13 @@ C--Finding Double Appearance
      &          betl(ijnu1,4).eq.betl(ijnu,2)) then
                   ido=0
                   if2=if2+1
-                  if(if2.gt.2) call error(1,13,if2)
+                  if(if2.gt.2) call prror(1,13,if2)
                   fcc2(if2,ijnu1)=two*fcc2(if2,ijnu1)
                 endif
               enddo
               if(ido.eq.1) then
                 if2=if2+1
-                if(if2.gt.2) call error(1,13,if2)
+                if(if2.gt.2) call prror(1,13,if2)
                 ihw(if2,ijnu)=1
                 ipl(if2,ijnu,1)=k1
                 ipl(if2,ijnu,2)=l1
@@ -1885,7 +1885,7 @@ C--
 C--Vertical Term for uneven Multipoles
 C--
               if2=if2+1
-              if(if2.gt.2) call error(1,13,if2)
+              if(if2.gt.2) call prror(1,13,if2)
               ihw(if2,ijnu)=2
               ipl(if2,ijnu,1)=0
               ipl(if2,ijnu,2)=l-1
@@ -1915,7 +1915,7 @@ C--Vertical Term for even Multipoles
 C--
           else if(ivoff.eq.0) then
             if2=if2+1
-            if(if2.gt.2) call error(1,13,if2)
+            if(if2.gt.2) call prror(1,13,if2)
             ihw(if2,ijnu)=2
             ipl(if2,ijnu,1)=0
             ipl(if2,ijnu,2)=l1-1
@@ -1943,7 +1943,7 @@ C--Write out Parameters properly
           if(abs(fcc2(nn,kk)).gt.pieni) then
             id=0
             ic=ic+1
-            if(ic.gt.mmultx) call error(1,6,mmultx)
+            if(ic.gt.mmultx) call prror(1,6,mmultx)
             ihv(ic)=ihw(nn,kk)
             iplane(ic,1)=ipl(nn,kk,1)
             iplane(ic,2)=ipl(nn,kk,2)
@@ -1955,7 +1955,7 @@ C--Write out Parameters properly
             do mm=1,mmult
               if(abs(fcc4(nn,kk,mm)).gt.pieni) then
                 id=id+1
-                if(id.gt.mmult) call error(1,7,mmult)
+                if(id.gt.mmult) call prror(1,7,mmult)
                 itij(ic,id,1)=iti(nn,kk,mm,1)
                 itij(ic,id,2)=iti(nn,kk,mm,2)
                 itij(ic,id,3)=iti(nn,kk,mm,3)
@@ -2065,7 +2065,7 @@ C--Prefactor II (signs, binominal coefficients)
           jjj=ib-jj1
 C--(iii,jjj)=>Exponent of the first variable x
           ijnu=(ii-1)*jjend+jj
-          if(ijnu.gt.mmultx) call error(3,6,mmultx)
+          if(ijnu.gt.mmultx) call prror(3,6,mmultx)
 C--inju=># of current case treated of a total of (iiend*jjend)
           betl(ijnu,1)=dble(iii)/two
           betl(ijnu,2)=dble(ii1)/two
@@ -2210,10 +2210,10 @@ C--Program check: finds duplicated cases
      &                      iti(nn,ijnu,k5,icol4).eq.k412s2.and.
      &                      iti(nn,ijnu,k5,icol5).eq.k434s1.and.
      &                      iti(nn,ijnu,k5,icol6).eq.k434s2
-     &                      ) call error(3,9,2)
+     &                      ) call prror(3,9,2)
                           enddo
                           ica=ica+1
-                          if(ica.gt.mmult) call error(3,5,mmult)
+                          if(ica.gt.mmult) call prror(3,5,mmult)
                           fcc4(nn,ijnu,ica)=faca*
      &                    fact(ido3,1+k3/2)*fact(ido4,1+k4/2)
                           iti(nn,ijnu,ica,icol1)=k42s
@@ -2240,7 +2240,7 @@ C--Write out Parameters properly
           if(abs(fcc2(nn,kk)).gt.pieni) then
             id=0
             ic=ic+1
-            if(ic.gt.mmultx) call error(3,6,mmultx)
+            if(ic.gt.mmultx) call prror(3,6,mmultx)
             betexp(ic,1)=betl(kk,1)
             betexp(ic,2)=betl(kk,2)
             betexp(ic,3)=betl(kk,3)
@@ -2249,7 +2249,7 @@ C--Write out Parameters properly
             do mm=1,mmult
               if(abs(fcc4(nn,kk,mm)).gt.pieni) then
                 id=id+1
-                if(id.gt.mmult) call error(3,7,mmult)
+                if(id.gt.mmult) call prror(3,7,mmult)
                 if(isiga(nn,kk,mm).eq.1) then
                   isig(ic,id)=1
                   isiga(nn,kk,mm)=0
@@ -2464,7 +2464,7 @@ C---------------------------------------------------------------------
           if(abs(str).ge.pieni.and.itype.ge.n1.and.itype.le.n2) then
             ityc(itype)=ityc(itype)+1
             isize=ityc(itype)
-            if(isize.gt.nblz) call error(3,3,nblz)
+            if(isize.gt.nblz) call prror(3,3,nblz)
             etl(itype,isize)=et
             strn(itype,isize)=name
             bstr(itype,isize)=str
@@ -2477,11 +2477,11 @@ C---------------------------------------------------------------------
           endif
         endif
       enddo
-      call error(3,4,num)
+      call prror(3,4,num)
  5    continue
       write(6,*) ' Qx= ',qx/pi,' Qy= ',qy/pi
       return
- 900  call error(3,1,ndum)
+ 900  call prror(3,1,ndum)
       end
 	subroutine detwri(icase,imu,ih1)
 C---------------------------------------------------------------------
@@ -2831,7 +2831,7 @@ C---------------------------------------------------------------------
       enddo
       return
       end
-      subroutine error(ipro,ier,num)
+      subroutine prror(ipro,ier,num)
       implicit none
       integer ier,ipro,num
 C-----------------------------------------------------------------------
