@@ -46,6 +46,7 @@ struct c6t_element
   struct object* p_al_err; /* pointer to alignment error object */
   struct object* p_fd_err; /* pointer to field error object */
   int tilt_err;            /* allow write_f8 to dump tilt as well */
+  int do_not_free;         /* avoid free crash */
 };
 
 struct c6t_el_list /* contains list of element pointers */
@@ -161,7 +162,7 @@ struct object
   int* a_int;             /* integer array */
   double* a_dble;         /* d.p. array */
   char* a_char;           /* string */
-  struct object* parent;   /* pointer to parent object */
+  struct object* parent;  /* pointer to parent object */
   struct object** p_obj;  /* object pointer array */
   char** names;           /* name pointers into a_char */
 };

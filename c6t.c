@@ -1,3 +1,5 @@
+/* 21/03/2003 - FS fixed segmentation fault which was due to a faulty 
+   free-ing of object that had already been freed before */
 /* 10/07/2002 - MH fixed missing mcdo bug, caused by recursion up 
    element tree to unexpanded double_array */
 /* 20/06/2002 - MH fixed double declarations and memory leaks because the 
@@ -783,15 +785,19 @@ void c6t_finish()
     for(j=0; j<types.member[i]->curr; j++) {
       if (types.member[i]->elem[j]->value) 
 	free(types.member[i]->elem[j]->value);
-      if (types.member[i]->elem[j]->p_al_err) {
+      if (types.member[i]->elem[j]->p_al_err &&
+	  types.member[i]->elem[j]->do_not_free != 1) {
 	if (types.member[i]->elem[j]->p_al_err->a_dble)
 	  free(types.member[i]->elem[j]->p_al_err->a_dble);
 	free(types.member[i]->elem[j]->p_al_err);
+	types.member[i]->elem[j]->p_al_err = NULL;
       }
-      if (types.member[i]->elem[j]->p_fd_err) {
+      if (types.member[i]->elem[j]->p_fd_err &&
+	  types.member[i]->elem[j]->do_not_free != 1) {
 	if (types.member[i]->elem[j]->p_fd_err->a_dble)
 	  free(types.member[i]->elem[j]->p_fd_err->a_dble);
 	free(types.member[i]->elem[j]->p_fd_err);
+	types.member[i]->elem[j]->p_fd_err = NULL;
       }
       free(types.member[i]->elem[j]);
       types.member[i]->elem[j]=NULL;
@@ -1583,6 +1589,7 @@ struct c6t_element* new_c6t_element(int size, char* name, char* base)
   strcpy(p->base_name, base);
   p->value = (double*) mycalloc(rout_name,++size,sizeof(double));
   p->n_values = size;
+  p->do_not_free = 0;
   return p;
 }
 
@@ -1677,6 +1684,7 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
        {
 	get_next_name(tmp_name, t_list[new_el_t][0]);
         new_el = new_c6t_element(s_pole+1, tmp_name, t_list[new_el_t]);
+	new_el->do_not_free = 1;
         for (i = 0; i <= s_pole; i++) new_el->value[i] = el->value[i];
         for (i = 12; i <= s_pole; i++) el->value[i] = 0;
         new_el->flag = s_pole > 13 ? 2 : 1; new_el->npole_sign = 1;
