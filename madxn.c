@@ -1479,6 +1479,7 @@ int get_select_ranges(struct sequence* sequ, struct command_list* select,
   struct name_list* nl;
   struct command_parameter_list* pl;
   char* name;
+  char full_range[] = "#s/#e";
   int i, k, pos;
   struct node* c_node;
   struct node* nodes[2];
@@ -1488,17 +1489,16 @@ int get_select_ranges(struct sequence* sequ, struct command_list* select,
      pl = select->commands[i]->par;
      pos = name_list_pos("range", nl);
      if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-       {
         name = pl->parameters[pos]->string;
-        if ((k = get_range(name, sequ, nodes)) > 0)
+     else name = full_range;
+     if ((k = get_range(name, sequ, nodes)) > 0)
+      {
+       c_node = nodes[0];
+       while (c_node != NULL)
         {
-         c_node = nodes[0];
-           while (c_node != NULL)
-           {
-            add_to_node_list(c_node, 0, s_ranges);
-              if (c_node == nodes[1]) break;
-              c_node = c_node->next;
-           }
+         add_to_node_list(c_node, 0, s_ranges);
+         if (c_node == nodes[1]) break;
+         c_node = c_node->next;
         }
        }
     }
@@ -1511,7 +1511,7 @@ void get_select_t_ranges(struct command_list* select, struct table* t)
   int rows[2];
   struct name_list* nl;
   struct command_parameter_list* pl;
-  int i, pos, any = 0;
+  int i, pos;
   s_range->curr = 0; e_range->curr = 0;
   while (s_range->max < select->curr) grow_int_array(s_range);
   while (e_range->max < select->curr) grow_int_array(e_range);
@@ -1520,31 +1520,18 @@ void get_select_t_ranges(struct command_list* select, struct table* t)
      nl = select->commands[i]->par_names;
      pl = select->commands[i]->par;
      pos = name_list_pos("range", nl);
-     if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-       {
-      if (get_table_range(pl->parameters[pos]->string, t, rows))
-        {
-         any = 1;
-         if (rows[0] <= rows[1])
+     if (pos > -1 && nl->inform[pos]  /* parameter has been read */
+	 && get_table_range(pl->parameters[pos]->string, t, rows)
+         && (rows[0] <= rows[1]))
            {
-              s_range->i[s_range->curr++] = rows[0];
-              e_range->i[e_range->curr++] = rows[1];
+            s_range->i[s_range->curr++] = rows[0];
+            e_range->i[e_range->curr++] = rows[1];
            }
-         else
+      else
            {
-              s_range->i[s_range->curr++] = 0;
-              e_range->i[e_range->curr++] = t->curr - 1;
+            s_range->i[s_range->curr++] = 0;
+            e_range->i[e_range->curr++] = t->curr - 1;
            }
-        }
-       }
-    }
-  if (any == 0)
-    {
-     for (i = 0; i < select->curr; i++)
-       {
-        s_range->i[s_range->curr++] = 0;
-        e_range->i[e_range->curr++] = t->curr - 1;
-       }
     }
 }
 
