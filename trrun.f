@@ -24,6 +24,9 @@
 !   l_buf       dp(nelem)   local length storage                       *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
+      include 'name_len.fi'
+      include 'track.fi'
+      include 'bb.fi'
       logical onepass,onetable,last_out,info,aperflag
       integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
      &nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
@@ -38,13 +41,10 @@
       character*12 tol_a, char_a
 !hbu
       double precision spos
-      include 'name_len.fi'
 !hbu
       character*4 vec_names(7)
 !hbu
       character*(name_len) el_name
-      include 'track.fi'
-      include 'bb.fi'
       data tol_a,char_a / 'maxaper ', ' ' /
 !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
@@ -174,6 +174,7 @@
         endif
         nlm = nlm+1
         if (nobs .gt. 0)  then
+          call dzero(obs_orb,6)
           call get_node_vector('obs_orbit ', lobs, obs_orb)
           if (lobs .lt. 6)                                              &
      &    call aafail('TRACK', 'obs. point orbit not found')
@@ -293,13 +294,14 @@
 !   KTRACK    (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
+      include 'name_len.fi'
+      include 'twtrr.fi'
       logical aperflag
       integer turn,code,ktrack,part_id(*),last_turn(*),nn
       integer get_option
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
      &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
-     &aperture(100),one,maxaper(6), zero,al_errors(align_max)
-      include 'name_len.fi'
+     &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max)
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
@@ -346,6 +348,7 @@
       if(aperflag) then
         nn=24
         call node_string('apertype ',aptype,nn)
+        call dzero(aperture,maxnaper)
         call get_node_vector('aperture ',nn,aperture)
 !        print *, " TYPE ",aptype,
 !     &  "values  x y lhc",aperture(1),aperture(2),aperture(3)
@@ -506,16 +509,16 @@
 !   dxt       (double)  local buffer                                   *
 !   dyt       (double)  local buffer                                   *
 !----------------------------------------------------------------------*
+      include 'twtrr.fi'
+      include 'track.fi'
       logical first
       integer iord,jtrk,nd,nord,ktrack,j,                               &
      &n_ferr,nn,ns,node_fd_errors
-      include 'twtrr.fi'
       double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
-     &f_errors(0:50),field(2,0:maxmul),vals(2,0:maxmul),ordinv(maxmul), &
-     &track(6,*),dxt(*),dyt(*),normal(0:maxmul),skew(0:maxmul),         &
-     &bv0,bvk,node_value,zero,one,two,three,half
-      include 'track.fi'
+     &f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
+     &ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
+     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
       save first,ordinv
       data first / .true. /
@@ -527,7 +530,7 @@
         enddo
         first = .false.
       endif
-      call dzero(f_errors, 51)
+      call dzero(f_errors, maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
@@ -842,10 +845,10 @@
 ! Output:                                                              *
 !   EL        (double)    Length of quadrupole.                        *
 !----------------------------------------------------------------------*
+      include 'track.fi'
       integer itrack,ktrack
       double precision el,pt,px,py,track(6,*),ttt,one,two
       parameter(one=1d0,two=2d0)
-      include 'track.fi'
 
 ! picked from trturn in madx.ss
       do  itrack = 1, ktrack
@@ -985,12 +988,13 @@
 ! Output:                                                              *
 !   EL        (double)    Length of quadrupole.                        *
 !----------------------------------------------------------------------*
+      include 'twtrr.fi'
       logical dorad,dodamp,dorand
       integer itrack,ktrack,n_ferr,node_fd_errors,code,bv0,i,get_option
       double precision bi2gi2,bil2,curv,d,dpx,dpy,el,pt,px,py,rfac,rpt, &
      &rpx,rpy,track(6,*),xkick,ykick,deltas,arad,betas,gammas,dtbyds,   &
-     &div,f_errors(0:50),field(2),get_variable,get_value,node_value,    &
-     &zero,one,two,three,half
+     &div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
+     &node_value,zero,one,two,three,half
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
 
 !---- Initialize.
@@ -1001,7 +1005,7 @@
       gammas = get_value('probe ','gamma ')
       dtbyds = get_value('probe ','dtbyds ')
       code = node_value('mad8_type ')
-      call dzero(f_errors, 51)
+      call dzero(f_errors, maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       dorad = get_value('probe ','radiate ') .ne. 0
       dodamp = get_option('damp ') .ne. 0
@@ -1172,6 +1176,7 @@
 !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
 !   ktrack    (integer) number of tracks.                              *
 !----------------------------------------------------------------------*
+      include 'bb.fi'
       logical bborbit
       integer ktrack,itrack,ipos,get_option
       double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
@@ -1180,7 +1185,6 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
 !     if x > explim, exp(-x) is outside machine limits.
-      include 'bb.fi'
 
 !---- initialize.
       bborbit = get_option('bborbit ') .ne. 0
@@ -1295,9 +1299,9 @@
       subroutine ttcheck(turn, sum, part_id, last_turn, last_pos,       &
      &last_orbit, z, maxaper, jmax)
       implicit none
+      include 'name_len.fi'
       integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
       double precision sum,z(6,*),maxaper(6),last_pos(*),last_orbit(6,*)
-      include 'name_len.fi'
       character*(name_len) aptype
       n = 1
  10   continue
@@ -1320,9 +1324,9 @@
      &last_turn, last_pos, last_orbit, z,aptype)
 !hbu--- kill particle:  print, modify part_id list
       implicit none
+      include 'name_len.fi'
       integer i,j,n,turn,part_id(*),jmax,last_turn(*)
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*)
-      include 'name_len.fi'
       character*(name_len) aptype
 !hbu
       character*(name_len) el_name
@@ -1365,13 +1369,13 @@
 !    z (double (6,*))       particle orbits                            *
 !    orbit0 (double array)  reference orbit                            *
 !----------------------------------------------------------------------*
+      include 'name_len.fi'
       integer i,j,npart,turn,tot_segm,segment,part_id(*),length
       double precision z(6,*),orbit0(6),tmp,tt,ss
 !hbu was *36 allow longer info
       character*80 table,comment
 !hbu
       integer ielem
-      include 'name_len.fi'
 !hbu name of element
       character*(name_len) el_name
 !hbu
@@ -1460,11 +1464,11 @@
 !   ntrk      (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
+      include 'name_len.fi'
       integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
      &one,al_errors(align_max)
       parameter(one=1d0)
-      include 'name_len.fi'
       character*(name_len) aptype
 
       n = 1
@@ -1511,6 +1515,7 @@
 !   z(6,jend) - Transformed cartesian coordinates incl. c.o.           *
 !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
 !----------------------------------------------------------------------*
+      include 'bb.fi'
       logical zgiv,zngiv
       integer j,jend,k,kp,kq,next_start,itype(23),switch,turns
       double precision phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
@@ -1518,7 +1523,6 @@
      &ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
       parameter(zero=0d0)
       character*120 msg(2)
-      include 'bb.fi'
 
 !---- Initialise orbit, emittances and eigenvectors etc.
       j = 0

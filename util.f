@@ -1650,8 +1650,6 @@
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
       call get_node_vector('knl ',nn,normal)
-!      call get_node_vector('ksl ',ns,skew)
-!      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
 !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
       angle = normal(0)*node_value('dipole_bv ')
       if (abs(angle) .lt. 1d-13) then
@@ -1801,8 +1799,6 @@
 !
 !----------------------------------------------------------------------*
       implicit none
-      integer mcnam, maxpnt
-      parameter (mcnam = 16, maxpnt = 500)
 
       character *(*) t
       integer i

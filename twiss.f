@@ -24,6 +24,7 @@
       eflag=0
       inval=0
       i = 6
+      call dzero(orbit0,6)
       call get_node_vector('orbit0 ', i, orbit0)
       call m66one(rt)
       call m66one(rw)
@@ -483,6 +484,7 @@
         rep_cnt(j) = 0
       enddo
       if (thr_on .gt. 0)  then
+        call dzero(vector,10)
         j = get_vector('threader ', 'vector ', vector)
         if (j .lt. 3) thr_on = 0
       endif
@@ -1931,11 +1933,11 @@
       include 'twtrr.fi'
       logical ftrk,fmap,cplxy,dorad
       integer nd,n_ferr,node_fd_errors
-      double precision orbit(6),f_errors(0:50),ek(6),re(6,6),te(6,6,6), &
-     &rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,el,tilt,e1,  &
-     &e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct,st,hx,hy,   &
-     &rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,sk0,sk0s,bv0, &
-     &bvk,el0,orbit0(6),zero,one,two,three
+      double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
+     &te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
+     &el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
+     &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,sk0, &
+     &sk0s,bv0,bvk,el0,orbit0(6),zero,one,two,three
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -1946,6 +1948,7 @@
 !---- Test for non-zero length.
       fmap = el .ne. zero
       if (fmap) then
+        call dzero(f_errors,maxferr+1)
         n_ferr = node_fd_errors(f_errors)
         bv0 = node_value('dipole_bv ')
         bvk = node_value('other_bv ')
@@ -2579,14 +2582,16 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i, n_ferr,code,node_fd_errors
-      double precision orbit(6),f_errors(0:50),ek(6),re(6,6),te(6,6,6), &
-     &deltap,gamma,arad,el,rfac,pt,xkick,ykick,dpx,dpy,node_value,      &
-     &get_value,bv0,field(2),div,zero,one,three,half
+      double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
+     &te(6,6,6),deltap,gamma,arad,el,rfac,pt,xkick,ykick,dpx,dpy,       &
+     &node_value,get_value,bv0,field(2),div,zero,one,three,half
       parameter(zero=0d0,one=1d0,three=3d0,half=5d-1)
 
 !---- Initialize.
+      call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       if (el .eq. zero)  then
         div = one
@@ -2685,13 +2690,14 @@
       include 'twtrr.fi'
       logical fsec,ftrk,fmap
       integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors
-      double precision orbit(6),f_errors(0:50),re(6,6),te(6,6,6),x,y,   &
-     &dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,         &
+      double precision orbit(6),f_errors(0:maxferr),re(6,6),te(6,6,6),x,&
+     &y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),              &
      &skew(0:maxmul),node_value,get_value,bv0,bvk,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
 
 !---- Initialize.
+      call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
@@ -2831,17 +2837,19 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
+      include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
-      double precision orbit(6),f_errors(0:50),ek(6),re(6,6),te(6,6,6), &
-     &rw(6,6),tw(6,6,6),deltap,el,sk3,sk3l,rfac,arad,gamma,pt,octr,octi,&
-     &posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,field(2,0:3), &
-     &el0,orbit0(6),zero,one,two,three,four,six
+      double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
+     &te(6,6,6),rw(6,6),tw(6,6,6),deltap,el,sk3,sk3l,rfac,arad,gamma,pt,&
+     &octr,octi,posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,    &
+     &field(2,0:3),el0,orbit0(6),zero,one,two,three,four,six
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
 
 !---- Initialize.
       fmap = el .ne. zero
       if (.not. fmap) return
+      call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       bvk = node_value('other_bv ')
 !---- Set up half octupole strength.
@@ -2999,17 +3007,19 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
+      include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
-      double precision orbit(6),orbit0(6),f_errors(0:50),ek(6),re(6,6), &
-     &te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s,bvk,     &
-     &field(2,0:1),node_value,get_value,zero,one,two,three
+      double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
+     &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
+     &bvk,field(2,0:1),node_value,get_value,zero,one,two,three
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
       fmap = el .ne. zero
       if (.not. fmap) return
 !---- Field error.
+      call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       do i = 0, 1
         do j = 1, 2
@@ -3348,17 +3358,19 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
+      include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
-      double precision orbit(6),orbit0(6),f_errors(0:50),ek(6),re(6,6), &
-     &te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s,bvk,     &
-     &field(2,0:2),node_value,get_value,zero,one,two,three,twelve
+      double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
+     &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s, &
+     &bvk,field(2,0:2),node_value,get_value,zero,one,two,three,twelve
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
 
 !---- Initialize.
       fmap = el .ne. zero
       if (.not. fmap) return
 !---- Field error.
+      call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
       do i = 0, 2
         do j = 1,2
