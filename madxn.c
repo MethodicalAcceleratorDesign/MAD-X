@@ -2229,7 +2229,23 @@ void exec_save(struct in_cmd* cmd)
   for (pos = 0; pos < sqo->curr; pos++)
     {
      sequ = sqo->sequs[pos];
-     fill_sequ_list(sequ, sql);
+     add_to_sequ_list(sequ, sql);
+/* check for inserted sequences, flatten if necessary  - HG 23.3.04 */
+     c_node = sequ->start;
+     while(c_node != NULL)
+       {
+        if (c_node->p_sequ != NULL)
+	 {
+          warning("structured sequence flattened:", sequ->name);
+          seq_edit_ex(sequ);
+          seq_flatten(edit_sequ);
+          seq_end_ex();
+          break;
+	 }
+        if (c_node == sequ->end) break;
+        c_node = c_node->next;
+       }
+/* end mod - HG 23.3.04 */
      if (beam_save)
        {
         if (mad8 == 0) save_beam(sequ, out_file); /* only mad-X */
@@ -2770,20 +2786,6 @@ void fill_par_var_list(struct el_list* ell,
       if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
            fill_expr_var_list(ell, par->expr_list->list[i], varl);
       break;
-    }
-}
-
-void fill_sequ_list(struct sequence* sequ, struct sequence_list* sql)
-     /* puts all sequences depending on sequ into a sequ_list, recursively */
-{
-  struct node* c_node;
-  add_to_sequ_list(sequ, sql);
-  c_node = sequ->start;
-  while(c_node != NULL)
-    {
-     if (c_node->p_sequ != NULL) fill_sequ_list(c_node->p_sequ, sql);
-     if (c_node == sequ->end) break;
-     c_node = c_node->next;
     }
 }
 
@@ -6897,24 +6899,27 @@ void seq_edit(struct in_cmd* cmd)
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
     {
      if ((pos = name_list_pos(name, sequences->list)) >= 0)
-        {
-         edit_is_on = 1;
-           seqedit_install = seqedit_move = seqedit_remove = 0;
-         edit_sequ = sequences->sequs[pos];
-           if (edit_sequ->ex_start != NULL)
-           {
-              edit_sequ->ex_nodes = delete_node_list(edit_sequ->ex_nodes);
-              edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
-           }
-           if (occ_list == NULL)
-               occ_list = new_name_list(10000);  /* for occurrence count */
-           else occ_list->curr = 0;
-           resequence_nodes(edit_sequ);
-           all_node_pos(edit_sequ);
-        }
+         seq_edit_ex(sequences->sequs[pos]);
      else warning("unknown sequence:", "ignored");
     }
   else warning("seqedit without sequence:", "ignored");
+}
+
+void seq_edit_ex(struct sequence* seq)
+{
+ edit_sequ = seq;
+ edit_is_on = 1;
+ seqedit_install = seqedit_move = seqedit_remove = 0;
+ if (edit_sequ->ex_start != NULL)
+ {
+    edit_sequ->ex_nodes = delete_node_list(edit_sequ->ex_nodes);
+    edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
+ }
+ if (occ_list == NULL)
+     occ_list = new_name_list(10000);  /* for occurrence count */
+ else occ_list->curr = 0;
+ resequence_nodes(edit_sequ);
+ all_node_pos(edit_sequ);
 }
 
 void seq_end(struct in_cmd* cmd)
@@ -6927,6 +6932,11 @@ void seq_end(struct in_cmd* cmd)
   put_info("seqedit - number of elements moved:     ", tmp);
   sprintf(tmp, "%d", seqedit_remove);
   put_info("seqedit - number of elements removed:   ", tmp);
+  seq_end_ex();
+}
+
+void seq_end_ex()
+{
   occ_list->curr = 0;
   resequence_nodes(edit_sequ);
   selected_ranges->curr = 0;

@@ -345,7 +345,6 @@ void fill_expr_var_list(struct el_list*,
 void fill_orbit_table(struct table*, struct table*);
 void fill_par_var_list(struct el_list*,
                        struct command_parameter*, struct var_list*);
-void fill_sequ_list(struct sequence*, struct sequence_list*);
 void fill_sequ_var_list(struct sequence_list*, struct el_list*,
                         struct var_list*);
 void fill_twiss_header(struct table*);
@@ -548,8 +547,10 @@ void scan_in_cmd(struct in_cmd*);
 void sector_out(double*, double*, double*, double*);
 void seq_cycle(struct in_cmd*);
 void seq_edit(struct in_cmd*);
+void seq_edit_ex(struct sequence*);
 void seq_edit_main(struct in_cmd*);
 void seq_end(struct in_cmd*);
+void seq_end_ex();
 void seq_flatten(struct sequence*);
 void seq_install(struct in_cmd*);
 void seq_move(struct in_cmd*);
