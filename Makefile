@@ -7,7 +7,10 @@
 # compilers
 CC=gcc
 FC=g77
-f95=f95
+# NAG for testing 
+#f95=f95
+# LF95 for production
+f95=lf95
 
 # default fortran compiler options
 FCP=-O3 -fno-second-underscore -funroll-loops -I.
@@ -22,18 +25,34 @@ GCCP_FLAGS=-g -O3 -funroll-loops -fno-second-underscore -D_CATCH_MEM
 # alternative for development
 GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM
 
-# default f95 compiler options
-f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan
-# alternative
+# NAG default f95 compiler options
+#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan
+# NAG alternative
 #f95_FLAGS=-c -O4 -maxcontin=24 -w=unused
+# LF95 default f95 compiler options
+f95_FLAGS=-O -c
 
-# f95 compiler options to compile f77 code
+# NAG f95 compiler options to compile f77 code
+#FFLAGS77=-gline -g90 -c -maxcontin=24 -nan
+# NAG f95 alternatives for development and debug
 #FFLAGS77=-gline -g90 -c -maxcontin=24 -nan -ieee=full
-FFLAGS77=-gline -g90 -c -maxcontin=24 -nan
 #FFLAGS77=-g90 -c -O4 -maxcontin=24 -w=unused
+# LF95 f95 compiler options to compile f77 code
+FFLAGS77=-O -c
+
+# NAG f95 link options
+#f95_FOPT=
+# LF95 f95 link options
+f95_FOPT="--staticlink"
 
 # libraries
-LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
+#LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
+LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/"
+
+# NAG f95 lib extension
+#LIBX_ext= -lgcc
+# LF95 f95 lib extension
+LIBX_ext=
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
@@ -118,7 +137,7 @@ wrap.o: madx_ptc_module.o wrap.f90
 # madx_objectsf77: madxnp.o gxx11c.o  + all *.F except for gxx11ps.F (windows special). Append f77 to distinguish from objects compiled with f95
 madx_objectsf77 = madxnp.o gxx11c.o $(filter-out gxx11ps_f77.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 madx: $(madx_objectsf77) ; 
-	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lm -lc
+	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o, $(patsubst %.F,%.o,$(wildcard *.F)))
@@ -127,7 +146,7 @@ madxdev_objects = madxm.o $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxnp.o gxx11c.o epause.o timel.o usleep.o \
 	$(madx_objectsf95)
 madxdev: $(madxdev_objects)
-	$(f95) $(FOPT) -o $@ $(madxdev_objects) $(LIBX) -lm -lc
+	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext) -lm -lc
 
 clean:
 	rm -f *.o
