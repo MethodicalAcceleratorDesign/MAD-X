@@ -135,7 +135,8 @@ wrap.o: madx_ptc_module.o wrap.f90
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $<
 
-# madx_objectsf77: madxnp.o gxx11c.o  + all *.F except for gxx11ps.F (windows special). Append f77 to distinguish from objects compiled with f95
+# madx_objectsf77: madxnp.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90). 
+# Append f77 to distinguish from objects compiled with f95
 madx_objectsf77 = madxnp.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 madx: $(madx_objectsf77) ; 
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
@@ -144,7 +145,7 @@ madx: $(madx_objectsf77) ;
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxdev_objects. All *.f90 , some c and F
 madxdev_objects = madxm.o $(patsubst %.f90,%.o,$(wildcard *.f90)) \
-	madxnp.o gxx11c.o epause.o timel.o usleep.o \
+	madxnp.o gxx11c.o epause.o usleep.o \
 	$(madx_objectsf95)
 madxdev: $(madxdev_objects)
 	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext)
