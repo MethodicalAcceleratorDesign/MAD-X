@@ -22,7 +22,7 @@
       double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
      &theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
      &node_value,el,suml,get_value,costhe,sinthe,cosphi,sinphi,cospsi,  &
-     &sinpsi
+     &sinpsi,tilt
 
 !---- Retrieve command attributes.
       v0(1)=  get_value('survey ','x0 ')
@@ -71,14 +71,14 @@
 !      print *,"code   ", code 
 !**** el is the arc length for all bends  ********
       el = node_value('l ')
-      call suelem(el, ve, we)
+      call suelem(el, ve, we,tilt)
       suml = suml + el
 !**  Compute the coordinates at each point
       call sutrak(v, w, ve, we)
 !**  Compute the survey angles at each point
       call suangl(w, theta, phi, psi)
 !**  Fill the survey table
-      call sufill(suml,v, theta, phi, psi)
+      call sufill(suml,v, theta, phi, psi,tilt)
 ! Test :
 !      print *,suml,"    ",el,"      ",theta,"      ", phi,"     ", psi,
 !     +v(1),v(2),v(3)
@@ -163,7 +163,7 @@
 !
 !
 !**********************************************************************
-      subroutine suelem(el, ve, we)
+      subroutine suelem(el, ve, we,tilt)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -183,10 +183,11 @@
       integer code,nn,ns,maxmul
       parameter(maxmul=20)
       double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
-     &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul),fskw
-     &,one
+     &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul),angv
+     &,one,get_variable
       parameter(one=1d0)
 !---- Branch on subprocess code.
+      tilt = 0.0
       code = node_value('mad8_type ')
       go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
@@ -259,7 +260,7 @@
       we(2,1) = 0
       we(3,1) = 0
       we(1,2) = 0
-      we(2,2) = 1
+      we(2,2) = one
       we(3,2) = 0
       we(1,3) = 0
       we(2,3) = 0
@@ -274,13 +275,16 @@
       call node_vector('ksl ',ns,skew)
 !      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
 !     *,skew(0)
-!--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
+!-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
       angle = normal(0)*node_value('dipole_bv ')
-      fskw = skew(0)
+      angv = skew(0)
       if(angle.eq.0.0) then
       tilt = 0.0
+        if(angv.ne.0.0) then
+        tilt = get_variable('twopi ')*0.25
+        endif
       else
-      tilt = asin(fskw/sqrt(fskw*fskw+angle*angle))
+      tilt = atan2(angv,angle)
       endif
 ! As el=0, there is no dx and no ds
         dx = 0.0
@@ -292,18 +296,24 @@
 !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
       angle = node_value('angle ')*node_value('dipole_bv ')
 !      print *," BV = ",node_value('dipole_bv ')
-      fskw = node_value('k0s ')
-!      print *,tilt
+      angv = node_value('k0s ')*el*node_value('dipole_bv ')
       if (angle .eq. 0.0) then
         dx = 0.0
         ds = el
         tilt = 0.0
+           if(angv.ne.0.0) then
+           tilt = get_variable('twopi ')*0.25
+           dx = - el * (cos(angv)-one)/angv
+           ds =  el * sin(angv)/angv
+           angle = angv
+           endif
       else
 ! el corrected 18.09.02 // identical to mad8(sector bend)
+        tilt = atan2(angv,angle)
         dx = el * (cos(angle)-one)/angle
         ds = el * sin(angle)/angle
-        tilt = asin(fskw/sqrt(fskw*fskw+angle*angle))
       endif
+!      print *," *****  TILT = ",tilt,"   length= ",el
       go to 490
 
 !---- Rotation around S-axis.
@@ -337,8 +347,8 @@
       we(2,1) = (costhe - one) * cospsi * sinpsi
       we(3,1) = sinthe * cospsi
       we(1,2) = we(2,1)
-      we(2,2) = costhe * sinpsi**2 + cospsi**2
-      we(3,2) = sinthe * sinpsi
+      we(2,2) = costhe * sinpsi*sinpsi + cospsi*cospsi
+      we(3,2) = - sinthe * sinpsi
       we(1,3) = - we(3,1)
       we(2,3) = - we(3,2)
       we(3,3) = costhe
@@ -347,7 +357,7 @@
 !-----------------  end of suelem subroutine --------------------------
 
 !**********************************************************************
-      subroutine sufill(suml,v, theta, phi, psi)
+      subroutine sufill(suml,v, theta, phi, psi,tilt)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -359,8 +369,9 @@
 !----------------------------------------------------------------------*
       integer code,nn
       double precision ang,el,v(3),theta,phi,psi,node_value,suml,
-     &normal(20)
+     &normal(20),tilt,globaltilt
 
+      globaltilt=psi+tilt
       el = node_value('l ')
       call string_to_table('survey ', 'name ', 'name ')
       call double_to_table('survey ', 's ',suml )
@@ -371,6 +382,7 @@
       call double_to_table('survey ', 'theta ',theta)
       call double_to_table('survey ', 'phi ',phi)
       call double_to_table('survey ', 'psi ',psi)
+      call double_to_table('survey ', 'globaltilt ',globaltilt)
 
       code = node_value('mad8_type ')
       if(code.eq.2.or.code.eq.3) then
