@@ -68,6 +68,7 @@
       j = restart_sequ()
  10   continue
       code = node_value('mad8_type ')
+!      print *,"code   ", code 
 !**** el is the arc length for all bends  ********
       el = node_value('l ')
       call suelem(el, ve, we)
@@ -179,10 +180,10 @@
 ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
 !   Added LCAVITY element at ISP 27                                    *
 !----------------------------------------------------------------------*
-      integer code
+      integer code,nn,ns
       double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
-     &ve(3),we(3,3),node_value,el
-
+     &ve(3),we(3,3),node_value,el,normal(0:20),skew(0:20),fskw,one
+      parameter(one=1d0)
 !---- Branch on subprocess code.
       code = node_value('mad8_type ')
       go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
@@ -242,9 +243,6 @@
 !---- Beam instrument.
   240 continue
 
-!---- Multipoles.
-   80 continue
-
 !---- Lump.
   230 continue
 
@@ -255,7 +253,7 @@
       ve(1) = 0
       ve(2) = 0
       ve(3) = el
-      we(1,1) = 1
+      we(1,1) = one
       we(2,1) = 0
       we(3,1) = 0
       we(1,2) = 0
@@ -263,19 +261,40 @@
       we(3,2) = 0
       we(1,3) = 0
       we(2,3) = 0
-      we(3,3) = 1
+      we(3,3) = one
       go to 500
 
-!---- Any kind of  bend.
+!---- multipoles , introduced  17.09.02 / AV
+   80 continue
+      call node_vector('knl ',nn,normal)
+      call node_vector('ksl ',ns,skew)
+!      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
+!     *,skew(0)
+      angle = normal(0)
+      fskw = skew(0)
+      if(angle.eq.0.0) then
+      tilt = 0.0
+      else
+      tilt = asin(fskw/sqrt(fskw*fskw+angle*angle))
+      endif
+! As el=0, there is no dx and no ds
+        dx = 0.0
+        ds = 0.0
+      go to 490
+
+!---- Any kind of  bend. 
    20 continue
       angle = node_value('angle ')
-      tilt = node_value('tilt ')
+      fskw = node_value('k0s ')
+      tilt = asin(fskw/sqrt(fskw*fskw+angle*angle))
+!      print *,tilt
       if (angle .eq. 0.0) then
         dx = 0.0
         ds = el
       else
-        dx = - el * sin(angle / 2.0)
-        ds = + el * cos(angle / 2.0)
+! el corrected 18.09.02 // identical to mad8(sector bend)
+        dx = el * (cos(angle)-one)/angle
+        ds = el * sin(angle)/angle
       endif
       go to 490
 
@@ -297,7 +316,6 @@
       we(3,3) = + we(1,1)
       go to 500
 
-
 !---- Common for bends and multipoles: Displacement and rotation matrix.
   490 continue
       cospsi = cos(tilt)
@@ -306,9 +324,9 @@
       sinthe = sin(angle)
       ve(1) = dx * cospsi
       ve(2) = dx * sinpsi
-      ve(3) = el
-      we(1,1) = costhe * cospsi**2 + sinpsi**2
-      we(2,1) = (costhe - 1.0) * cospsi * sinpsi
+      ve(3) = ds
+      we(1,1) = costhe * cospsi*cospsi + sinpsi*sinpsi
+      we(2,1) = (costhe - one) * cospsi * sinpsi
       we(3,1) = sinthe * cospsi
       we(1,2) = we(2,1)
       we(2,2) = costhe * sinpsi**2 + cospsi**2
@@ -331,8 +349,9 @@
 !   V(3)     (real)    Coordinate at the end of the element            *
 ! theta, phi, psi(real) : the survey angles                            *
 !----------------------------------------------------------------------*
-      integer code
-      double precision ang,el,v(3),theta,phi,psi,node_value,suml
+      integer code,nn
+      double precision ang,el,v(3),theta,phi,psi,node_value,suml,
+     &normal(20)
 
       el = node_value('l ')
       call string_to_table('survey ', 'name ', 'name ')
@@ -346,8 +365,11 @@
       call double_to_table('survey ', 'psi ',psi)
 
       code = node_value('mad8_type ')
-      if(code.eq.20) then
+      if(code.eq.2.or.code.eq.3) then
         ang = node_value('angle ')
+      else if(code.eq.8) then
+      call node_vector('knl ',nn,normal)
+        ang = normal(1)
       else
         ang = 0
       endif
