@@ -3,7 +3,7 @@ void pro_error(struct in_cmd* cmd)
 
  if (strcmp(cmd->tok_list->p[0], "eoption") == 0)
      {
-      error_eoption(cmd); 
+      error_eoption(cmd);
       cmd->clone_flag = 1; /* do not drop */
       current_eopt = cmd->clone;
       return;
@@ -178,7 +178,7 @@ void error_efcomp(struct in_cmd* cmd)
   int chcount[3] = {0,0,0};
   double norfac; /* factor for normalization at reference radius */
   int    n;     /* order of reference multipole */
-  double rr;    /* reference radius for multipole error */
+  double rr, rrr;    /* reference radius for multipole error */
   struct double_array *ptr;
   double *nvec;
   double ref_str;
@@ -247,7 +247,8 @@ void error_efcomp(struct in_cmd* cmd)
                if (get_option("debug"))
                fprintf(prt_file, "order  is %d\n",n);
              } else if (i==1) {
-               rr = val[i];
+               rrr = val[i];
+               rr  = fabs(rrr);
                /* debug printout */
                if (get_option("debug"))
                fprintf(prt_file, "radius is %f\n",val[i]);
@@ -261,7 +262,11 @@ void error_efcomp(struct in_cmd* cmd)
            fprintf(prt_file, "original length is %f\n",nlength);
 
          if(strcmp(nextnode->base_name,"multipole") == 0) {
-           node_vector("knl",&lvec,nvec);
+           if(rrr > 0 ) {
+              node_vector("knl",&lvec,nvec);
+           } else {
+              node_vector("ksl",&lvec,nvec);
+           }
            if (get_option("debug")) {
              for(i=0;i<4;i++) {
                 fprintf(prt_file, "original field = %d is %f\n",i,nvec[i]);
@@ -330,7 +335,7 @@ void error_efcomp(struct in_cmd* cmd)
                    nextnode->p_fd_err->a[2*j+1]  = ptr->a[j];
                    }
                  } else if(i==2) {
-                   if(rr < 1.0E-6) {
+                   if(fabs(rr) < 1.0E-6) {
                       printf("++++++ error: trying to assign relative field errors \n");
                       printf("       with no or zero reference radius specified\n");
                       exit(-1);
@@ -346,7 +351,7 @@ void error_efcomp(struct in_cmd* cmd)
                    nextnode->p_fd_err->a[2*j]    = ptr->a[j]*ref_str*norfac;
                    }
                  } else if(i==3) {
-                   if(rr < 1.0E-6) {
+                   if(fabs(rr) < 1.0E-6) {
                       printf("++++++ error: trying to assign relative field errors \n");
                       printf("       with no or zero reference radius specified\n");
                       exit(-1);
