@@ -2,7 +2,6 @@
 !Copyright (C) Etienne Forest and Frank Schmidt
 ! See file a_scratch_size
 module tpsalie_analysis
-  !  use tpsa
   use tpsalie
   implicit none
   private allocvecres,allocpbres,allocONELIE,allocdf,allocfd,allocnormal
@@ -17,6 +16,7 @@ module tpsalie_analysis
   !private rotf,rotsymp
   integer,private::NO,ND,ND2,NP,NDPT,NV
   logical(lp),private::old,imaxflag
+
 
 
   private NRESO

@@ -8,7 +8,7 @@ module polymorphic_taylor
   integer,private::NO,ND,ND2,NP,NDPT,NV          !,lastmaster   ! 2002.12.13
   INTEGER,PRIVATE::NMAX=100
   !  real(dp),PRIVATE::EPS=c_1d_6
-  integer ent,exi
+  ! integer ent,exi
   integer,private,parameter::m1=mmmmmm1,m2=mmmmmm2,m3=mmmmmm3,ms=mmmmmm4
   integer,private,parameter:: m11=m1+ms*m1,m12=m1+ms*m2,m13=m1+ms*m3,  &
        m21=m2+ms*m1,m22=m2+ms*m2,m23=m2+ms*m3,                         &
@@ -3838,19 +3838,19 @@ contains
 
 
 
-  SUBROUTINE  kill_c(k)
-    implicit none
-    integer ipause, mypauses
-    integer k
+  !  SUBROUTINE  kill_c(k)
+  !    implicit none
+  !    integer ipause, mypauses
+  !    integer k
 
-    call dallsta(exi)   ! Etienne checking routine
-    if(exi/=ent) then
-       write(line,'(3(1x,i8))')  ent,exi,k
-       ipause=mypauses(1999,line)
-       k=k*10000
-    endif
+  !    call dallsta(exi)   ! Etienne checking routine
+  !    if(exi/=ent) then
+  !       write(line,'(3(1x,i8))')  ent,exi,k
+  !       ipause=mypauses(1999,line)
+  !       k=k*10000
+  !    endif
 
-  END SUBROUTINE kill_c
+  !  END SUBROUTINE kill_c
 
   SUBROUTINE  resetpolyn0(S2,K)
     implicit none
@@ -3903,13 +3903,13 @@ contains
     if(present(s10))call allocpoly(s10)
   END SUBROUTINE A_opt
 
-  SUBROUTINE  alloc_c
-    implicit none
-    ! Etienne checking routine
-    call dallsta(ent)
+  ! SUBROUTINE  alloc_c
+  !   implicit none
+  ! Etienne checking routine
+  !   call dallsta(ent)
 
 
-  END SUBROUTINE alloc_c
+  !  END SUBROUTINE alloc_c
 
   SUBROUTINE  allocpolyn(S2,K)
     implicit none
@@ -4059,6 +4059,7 @@ contains
              s2%kind=2
              s2%alloc=t
           else
+             write(6,*) "EQUAL IN m_POLYMORPH ",s2%i
              stop 777
           endif
 
