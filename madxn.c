@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#ifndef _WINDOWS_
+#ifndef _WIN32
 #include <sys/utsname.h>
+#include <unistd.h>
 #endif
 #include <sys/timeb.h>
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
-#include <unistd.h>
 #include "madxl.h"
 #include "madx.h"
 #include "madxreg.h"
@@ -2503,7 +2503,8 @@ void exec_save(struct in_cmd* cmd)
      c_node = sql->sequs[i]->start;
      while (c_node != NULL)
        {
-  	if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL)
+  	if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
+            && strcmp(el->base_type->name, "drift") != 0)
   	     {
   	      if (el->def_type != 0) el = el->parent;
               while (el->base_type != el)
@@ -3085,7 +3086,8 @@ void export_sequence(struct sequence* sequ, FILE* file)
   while(c_node != NULL)
     {
      *c_dummy = '\0';
-     if (strchr(c_node->name, '$') == NULL)
+     if (strchr(c_node->name, '$') == NULL 
+         && strcmp(c_node->base_name, "drift") != 0)
        {
         if ((el = c_node->p_elem) != NULL)
           {
@@ -3133,7 +3135,8 @@ void export_sequ_8(struct sequence* sequ, FILE* file)
   while(c_node != NULL)
     {
      *c_dummy = '\0';
-     if (strchr(c_node->name, '$') == NULL)
+     if (strchr(c_node->name, '$') == NULL
+         && strcmp(c_node->base_name, "drift") != 0)
        {
         if ((el = c_node->p_elem) != NULL)
           {
@@ -3494,10 +3497,10 @@ void madx_finish()
 void madx_init()
 {
   int j, ione = 1;
-#ifdef _WINDOWS_
+#ifdef _WIN32
   interactive = 1;
 #endif
-#ifndef _WINDOWS_
+#ifndef _WIN32
   interactive = intrac();
 #endif
   init55(123456789);          /* random generator */
@@ -5116,10 +5119,6 @@ int par_out_flag(char* base_name, char* par_name)
   if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
   if (strcmp(base_name, "multipole") == 0 
       && strcmp(par_name,"l") == 0) return 0;
-  if (strcmp(base_name, "sbend") == 0 
-      && strcmp(par_name,"k0") == 0) return 0;
-  if (strcmp(base_name, "rbend") == 0 
-      && strcmp(par_name,"k0") == 0) return 0;
   if (strcmp(base_name, "rcollimator") == 0 
       && strcmp(par_name,"lrad") == 0) return 0;
   if (strcmp(base_name, "ecollimator") == 0 
@@ -8023,7 +8022,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
     {
      case 0:
        jj = 0;
-       for (j = 0; j <= min((end - start),2); j++)
+       for (j = 0; j <= mymin((end - start),2); j++)
 	 {
           if (strcmp(toks[start+j], "true") == 0)  pl[jj]->double_value = 1;
           jj++; j++; /* skip , */
@@ -9249,7 +9248,7 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
   else return;
   mycpy(c_dummy, col);
   if ((c_pos = name_list_pos(c_dummy, t->columns)) > -1)
-  last = min(c_pos + *nval, t->num_cols);
+  last = mymin(c_pos + *nval, t->num_cols);
   for (j = c_pos; j < last; j++)
      if (t->columns->inform[j] < 3) t->d_cols[j][t->curr] = vals[j-c_pos];
 }
@@ -9291,7 +9290,7 @@ void write_nice(char* string, FILE* file)
 {
   int n, pos, ssc;
   char *c = string;
-  char k, add[2];
+  char k;
   strcat(string, ";");
   n = strlen(string);
   while (n > LINE_FILL)
@@ -9302,11 +9301,11 @@ void write_nice(char* string, FILE* file)
 	if (strchr(" ,+-*/", k))  break;
        }
      c[pos] = '\0';
-     add[0] = k; add[1] = '\0';
-     fprintf(file, "%s%s\n", c, add);
+     fprintf(file, "%s\n", c);
+     c[pos] = k;
      ssc = (int) &c[pos] - (int) c;
      n -= ssc;
-     c = &c[pos+1];
+     c = &c[pos];
     }
   fprintf(file, "%s\n", c);
 }
@@ -9315,7 +9314,7 @@ void write_nice_8(char* string, FILE* file)
 {
   int n, pos, comma, ssc;
   char *c = string;
-  char k, add[2];
+  char k;
   strcat(string, ";");
   n = strlen(string);
   while (n > LINE_F_MAD8)
@@ -9327,11 +9326,11 @@ void write_nice_8(char* string, FILE* file)
 	if (strchr(" ,+-*/", k))  break;
        }
      c[pos] = '\0';
-     add[0] = k; add[1] = '\0';
-     fprintf(file, "%s%s &\n", c, add);
+     fprintf(file, "%s &\n", c);
+     c[pos] = k;
      ssc = (int) &c[pos] - (int) c;
      n -= ssc;
-     c = &c[pos+1];
+     c = &c[pos];
     }
   fprintf(file, "%s\n", c);
 }
@@ -9378,12 +9377,12 @@ void write_table(struct table* t, char* filename)
   int i, j, k, tmp;
   time_t now;
   struct tm* tm;
-#ifndef _WINDOWS_
+#ifndef _WIN32
   struct utsname u;
   i = uname(&u); /* get system name */
   strcpy(sys_name, u.sysname);
 #endif
-#ifdef _WINDOWS_
+#ifdef _WIN32
   strcpy(sys_name, "Windows");
 #endif
   time(&now);    /* get system time */

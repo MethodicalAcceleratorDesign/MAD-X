@@ -105,8 +105,8 @@
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
 int is_operator(char c) {return (strchr("-+*/^", c) ? 1 : 0);}
 int is_expr_start(char c) {return (strchr("-+(",c) || is_operand(c));}
-int max(int a, int b) {return (a > b ? a : b);}
-int min(int a, int b) {return (a < b ? a : b);}
+int mymax(int a, int b) {return (a > b ? a : b);}
+int mymin(int a, int b) {return (a < b ? a : b);}
 int str_pos(const char s[], char c) 
 {int i; for (i = 0; i < strlen(s); i++) if (s[i] == c) return i; return -1;}
 
