@@ -59,7 +59,7 @@ subroutine ptc_twiss(lhc,icav)
      call track(lhc,y,i,i+1,default)
      suml=suml+current%MAG%P%ld
      tw=y
-     write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%beta(1,1),tw%beta(1,2)
+     write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%beta(1,1),tw%beta(1,2),tw%beta(2,1),tw%beta(2,2)
      current=>current%next
   enddo
   call kill(tw)
