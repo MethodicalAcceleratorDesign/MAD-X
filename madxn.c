@@ -4347,8 +4347,8 @@ int in_spec_list(char* string)
      /* checks for presence of special commands IF() etc. */
 {
   char* cp;
-  int i = 0;
-  strcpy(c_dummy, string); stolower(c_dummy);
+  int i = 0, n = mymin((int)strlen(string), 100);
+  strncpy(c_dummy, string, n); c_dummy[n] = '\0'; stolower(c_dummy);
   supp_char(' ', c_dummy);
   while (special_comm_cnt[i])
     {
@@ -5700,7 +5700,7 @@ void print_value(struct in_cmd* cmd)
     {
       nitem = end + 1 - s_start;
       if (polish_expr(nitem, &toks[s_start]) == 0)
-         fprintf(prt_file, "%s = %-18.10g ;\n", 
+         fprintf(prt_file, "%s = %-22.14g ;\n", 
                  spec_join(&toks[s_start], nitem), polish_value(deco));
       else warning("invalid expression:", spec_join(&toks[s_start], nitem));
       s_start = end+1;
