@@ -1,6 +1,7 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+! See file A_SCRATCH_SIZE.F90
+
 module Mad_like
   USE S_TRACKING
   !USE file_handler
@@ -11,7 +12,7 @@ module Mad_like
   PRIVATE SEXTTILT,OCTUTILT
   private HKICKTILT,VKICKTILT,GKICKTILT
   private GBTILT,SBTILT,pottilt,Set_mad_v
-  PRIVATE RFCAVITYL,SMITILT,CHECKSMI
+  PRIVATE RFCAVITYL,SMITILT,CHECKSMI,TWCAVITYL
   PRIVATE rectaETILT,recttilt
   PRIVATE B1,A1,A2,B2,A3,B3,A4,B4,A5,A6,A7,A8,A9,A10,B5,B6,B7,B8,B9,B10,BLTILT
   private fac
@@ -49,6 +50,9 @@ module Mad_like
      LOGICAL(LP) APERTURE_ON
      INTEGER APERTURE_KIND
      REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
+     LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE,PERMFRINGE
+     REAL(DP) DPHAS,PSI
+     INTEGER N_BESSEL
      !     logical(lp) in,out
   END TYPE EL_LIST
 
@@ -282,6 +286,10 @@ module Mad_like
 
   INTERFACE RFCAVITY
      MODULE PROCEDURE RFCAVITYL
+  end  INTERFACE
+
+  INTERFACE TWCAVITY
+     MODULE PROCEDURE TWCAVITYL
   end  INTERFACE
 
   INTERFACE ELSEPARATOR
@@ -649,6 +657,14 @@ CONTAINS
        s2%thin_h_angle=zero
        s2%thin_v_angle=zero
        s2%APERTURE_ON=.FALSE.
+       s2%KILL_ENT_FRINGE=.FALSE.
+       s2%KILL_EXI_FRINGE=.FALSE.
+       s2%BEND_FRINGE=.FALSE.
+       s2%PERMFRINGE=.FALSE.
+       s2%DPHAS=ZERO
+       s2%PSI=ZERO
+       s2%N_BESSEL=0
+
        s2%APERTURE_KIND=0
        S2%APERTURE_R=absolute_aperture
        S2%APERTURE_X=absolute_aperture
@@ -675,7 +691,7 @@ CONTAINS
     IF(PRESENT(K1)) K11=K1
 
     IF(PRESENT(LIST)) THEN   !
-       SMITILT=0    !  SPECIAL SINCE SMI CAN ONLY BE A SINGLE POLE
+       SMITILT=LIST    !  SPECIAL SINCE SMI CAN ONLY BE A SINGLE POLE
        SMITILT%L=zero
        SMITILT%LD=zero
        SMITILT%LC=zero
@@ -693,7 +709,6 @@ CONTAINS
              NN=-I
           ENDIF
        ENDDO
-
 
        IF(NN>=1.AND.NN<=10) THEN
           SMITILT%K(NN)=K11/fac(nN)
@@ -969,6 +984,8 @@ CONTAINS
        l1=list%L
        K11=LIST%K(1)
        K21=LIST%KS(1)
+
+
     else
        GKICKTILT=0
     endif
@@ -1335,7 +1352,7 @@ CONTAINS
 
     POTTILT%KIND=KIND10
     POTTILT%K(1)=POTTILT%B0
-    POTTILT%nmul=SECTOR_B%NMUL
+    POTTILT%nmul=SECTOR_NMUL
 
   END FUNCTION POTTILT
 
@@ -1505,7 +1522,10 @@ CONTAINS
     type (TILTING)T
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) L1,LM,ANG1,E11,E22
-    LIKEMAD=.TRUE.
+
+    IF(EXACT_MODEL) LIKEMAD=.true.
+
+    !    LIKEMAD=.TRUE.                       ! etienne check it  out
     L1=zero
 
     LM=LIST%L
@@ -1547,7 +1567,6 @@ CONTAINS
           else
              RECTTILT_MADX%T1=ANG1/two+E11    !one
              RECTTILT_MADX%T2=ANG1/two+E22    !zero
-
              !             RECTTILT_MADX%T1=one   !wrong???
              !             RECTTILT_MADX%T2=zero
           endif
@@ -2115,6 +2134,88 @@ CONTAINS
 
   END FUNCTION RFCAVITYL
 
+  FUNCTION  TWCAVITYL(NAME,L,VOLT,LAG,HARMON,REV_FREQ,DELTAE,LIST)
+    implicit none
+    type (EL_LIST) TWCAVITYL
+    TYPE(EL_LIST),optional, INTENT(IN):: LIST
+    CHARACTER(*), INTENT(IN):: NAME
+    real(dp) ,optional, INTENT(IN):: L,VOLT,LAG,REV_FREQ,DELTAE
+    INTEGER,optional, INTENT(IN):: HARMON
+    real(dp)  L1,VOLT1,LAG1,FREQ01
+    INTEGER  HARMON1
+    L1=zero
+    VOLT1=zero
+    LAG1=zero
+    FREQ01=zero
+    HARMON1=1
+    IF(PRESENT(L)) L1=L
+    IF(PRESENT(VOLT)) THEN
+       VOLT1=VOLT
+       IF(PRESENT(DELTAE)) THEN
+          w_p=0
+          w_p%nc=1
+          w_p%fc='((1X,a72))'
+          w_p%c(1)= "Use either volt or deltae"
+          call write_e(100)
+       ENDIF
+    elseIF(PRESENT(DELTAE)) THEN
+       volt1=DELTAE*p0c
+    endif
+    IF(PRESENT(LAG)) LAG1=LAG
+    IF(PRESENT(HARMON)) HARMON1=HARMON
+    IF(PRESENT(REV_FREQ)) FREQ01=REV_FREQ
+
+    if(present(list)) then
+       TWCAVITYL=list
+       l1=list%L
+       VOLT1=LIST%VOLT
+       LAG1=LIST%LAG
+       FREQ01=LIST%FREQ0
+       HARMON1=LIST%HARMON
+       if(LIST%delta_e/=0.0_dp) then
+          if(volt1==0.0_dp) then
+             volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
+          else
+             w_p=0
+             w_p%nc=1
+             w_p%fc='((1X,a72))'
+             w_p%c(1)= "Use either volt or deltae"
+             call write_e(101)
+          endif
+       endif
+    else
+       TWCAVITYL=0
+    endif
+    IF(L1==ZERO) THEN
+       WRITE(6,*) " TWCAVITY MUST HAVE A LENGTH "
+       STOP 555
+    ENDIF
+
+    TWCAVITYL%L=L1
+    TWCAVITYL%LD=L1
+    TWCAVITYL%LC=L1
+    TWCAVITYL%KIND=KIND21
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       call write_i
+       TWCAVITYL%NAME=NAME(1:16)
+    ELSE
+       TWCAVITYL%NAME=NAME
+    ENDIF
+    TWCAVITYL%VOLT=VOLT1
+    TWCAVITYL%LAG=LAG1
+    TWCAVITYL%HARMON=HARMON1
+    TWCAVITYL%FREQ0=FREQ01
+    !   RFCAVITYL%P0C=P0C
+    TWCAVITYL%DELTA_E=zero
+
+  END FUNCTION TWCAVITYL
+
+
 
   FUNCTION  ELSESTILT(NAME,L,E,T,LIST)
     implicit none
@@ -2242,6 +2343,8 @@ CONTAINS
     type(element),pointer :: s2
     type(elementp), pointer :: s2p
     type(fibre), pointer::el
+    TYPE(MAGNET_FRAME),  POINTER :: FAKE
+
     nullify(el);
     THICKKICKTEMP=.FALSE.
 
@@ -2255,10 +2358,11 @@ CONTAINS
        nullify(s22%CHART);nullify(s22%PATCH);
        allocate(s22%CHART);allocate(s22%PATCH);
        nullify(s22%dir);allocate(s22%dir);
-       nullify(s22%P0C);allocate(s22%P0C);
-       nullify(s22%BETA0);allocate(s22%BETA0);
+       !     nullify(s22%P0C);allocate(s22%P0C);
+       !    nullify(s22%BETA0);allocate(s22%BETA0);
        nullify(s22%PARENT_LAYOUT);nullify(s22%PARENT_PATCH);
        nullify(s22%PARENT_CHART);nullify(s22%PARENT_MAG);
+       NULLIFY(S22%I)
        if(use_info) then
           allocate(s22%i);
           call alloc(s22%i)
@@ -2273,8 +2377,8 @@ CONTAINS
     ! CALL ALLOCATE_DATA_FIBRE(S22)  !ONLY ALLOWED ON POINTERS
     IF(.NOT.MADX_MAGNET_ONLY) THEN
        s22%dir=FIBRE_DIR    ! ALL THAT SHIT ALREADY EXISTS
-       s22%P0C=P0C
-       s22%BETA0=BETA0
+       !     s22%P0C=P0C
+       !     s22%BETA0=BETA0
        s22%CHART=0
        s22%PATCH=0
     ENDIF
@@ -2304,8 +2408,15 @@ CONTAINS
     IF(.NOT.DONE) S2 = S1%NMUL
 
     S2%P%B0=S1%B0
+    if(S2%P%B0/=0.d0) S2%P%bend_fringe=.true.
     S2%KIND=S1%KIND; S2%P%METHOD=S1%METHOD ;        S2%P%NST=S1%NST ;
     S2%NAME=S1%NAME        ;S2%VORNAME=S1%VORNAME ;S2%L =S1%L ;S2%P%LD=S1%LD;S2%P%LC=S1%LC;
+
+    S2%PERMFRINGE=S1%PERMFRINGE
+    S2%P%KILL_EXI_FRINGE=S1%KILL_EXI_FRINGE
+    S2%P%KILL_ENT_FRINGE=S1%KILL_ENT_FRINGE
+    S2%P%BEND_FRINGE=S1%BEND_FRINGE
+
     DO I=1,S2%P%NMUL
        S2 %BN(I)=flip*S1%K(I) ;S2 %AN(I)=flip*S1%KS(I)
     ENDDO
@@ -2330,6 +2441,23 @@ CONTAINS
        else
           S2%volt=S2%volt/S2%L
        endif
+    endif
+
+    if(s1%kind==kind21) then
+       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%DELTA_E,S2%THIN)
+       S2%volt=flip*S1%volt
+       S2%freq=S1%freq0*S1%harmon
+       S2%phas=-S1%lag
+       !      S2%p0c=S1%p0c
+       !frs
+       S2%DELTA_E=S1%DELTA_E
+       S2%THIN=.FALSE.
+       IF(S2%L==zero) then
+          S2%THIN=.TRUE.
+       else
+          S2%volt=S2%volt/S2%L
+       endif
+
     endif
 
     if(s1%kind==kind15) then
@@ -2366,7 +2494,13 @@ CONTAINS
 
     CALL SETFAMILY(S2)
 
-
+    IF(S2%KIND==KIND4) THEN
+       S2%C4%N_BESSEL=S1%N_BESSEL
+    ENDIF
+    IF(S2%KIND==KIND21) THEN
+       s2%CAV21%DPHAS=s1%DPHAS
+       s2%CAV21%PSI=s1%PSI
+    ENDIF
 
     if(LIKEMAD) then
        if(S2%KIND/=KIND16) then
@@ -2377,6 +2511,7 @@ CONTAINS
           call write_e(kind16)
        endif
        s2%k16%likemad=LIKEMAD
+       S2%KIND=KIND20
        LIKEMAD=.false.
     endif
 
@@ -2399,7 +2534,7 @@ CONTAINS
        IF(madkind2==kind6.or.madkind2==kind7)   S2%TP10%DRIFTKICK=.FALSE.   ! 2002.11.04
     endif
 
-    if(S2%KIND==KIND16) then
+    if(S2%KIND==KIND16.OR.S2%KIND==KIND20) then
        IF(S2%P%B0/=0.AND.(.NOT.DRIFT_KICK)) THEN
           S2%K16%DRIFTKICK=.FALSE.
        ELSE
@@ -2434,14 +2569,26 @@ CONTAINS
     call copy(s2,s2p)
     ! end of machida stuff here
     ! Default survey stuff here
-    s22%CHART%A_XY=s2%P%tilTd      ! THAT SHIT SHOULD NOT BE CHANGED NORMALLY
-    s22%CHART%L=s2%P%LC
-    s22%CHART%ALPHA=s2%P%LD*s2%P%B0
+    !         s22%CHART%A_XY=s2%P%tilTd      ! THAT SHIT SHOULD NOT BE CHANGED NORMALLY
+    !         s22%CHART%L=s2%P%LC
+    !         s22%CHART%ALPHA=s2%P%LD*s2%P%B0
     IF(.NOT.MADX_MAGNET_ONLY) THEN      ! THIS SHOULD BE DONE MANUALLY IF NECESSARY
        if(associated(s22%chart%f)) then
           s22%chart%f%ent=1
+          !           s22%chart=1
+          s22%chart=0
+          CALL SURVEY_no_patch(S22)
+       else
+          call alloc(fake)
+          FAKE%ENT=GLOBAL_FRAME
+          FAKE%MID=GLOBAL_FRAME
+          FAKE%EXI=GLOBAL_FRAME
+          FAKE%A=GLOBAL_ORIGIN
+          FAKE%O=GLOBAL_ORIGIN
+          FAKE%B=GLOBAL_ORIGIN
+          CALL SURVEY_no_patch(S22,fake=fake)
+          call kill(fake)
        endif
-       CALL SURVEY(S22)
     ENDIF
 
     IF(.NOT.MADX) THEN
@@ -2498,15 +2645,18 @@ CONTAINS
     c_%MAD => MAD
     c_%EXACT_MODEL => EXACT_MODEL
     c_%ALWAYS_EXACTMIS => ALWAYS_EXACTMIS
-    c_%ALWAYS_FRINGE => ALWAYS_FRINGE
+    c_%HIGHEST_FRINGE => HIGHEST_FRINGE
     c_%FIBRE_DIR => FIBRE_DIR
     c_%FIBRE_flip => FIBRE_flip
     c_%SECTOR_NMUL => SECTOR_NMUL
+    c_%SECTOR_NMUL_MAX => SECTOR_NMUL_MAX
     c_%electron => electron
     c_%massfactor => muon
     c_%stoch_in_rec => stoch_in_rec
     c_%FEED_P0C => FEED_P0C
     c_%ALWAYS_EXACT_PATCHING => ALWAYS_EXACT_PATCHING
+    c_%OLD_IMPLEMENTATION_OF_SIXTRACK => OLD_IMPLEMENTATION_OF_SIXTRACK
+    c_%phase0 => phase0
 
   end subroutine set_pointers
 
@@ -2869,9 +3019,9 @@ CONTAINS
     type (layout),INTENT(IN)::S1
     INTEGER I
     !    real(dp) gamma0I,gamBET
-    TYPE (fibre), POINTER :: C!,fitted
+    TYPE (fibre), POINTER :: C,fitted
     !   logical(lp) firstfitted
-    Nullify(C);!Nullify(fitted);
+    Nullify(C);Nullify(fitted);
     !   firstfitted=.true.
     CALL SET_UP(R)
     !    R%ENERGY=ENERGY

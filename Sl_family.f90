@@ -1,15 +1,17 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+! See file A_SCRATCH_SIZE.F90
+
 MODULE S_FAMILY
-  use S_FIBRE_BUNDLE
+  USE S_FIBRE_BUNDLE
   IMPLICIT NONE
 
   ! LINKED LIST
-  PRIVATE SURVEY_EXIST_PLANAR_L_new ,SURVEY_EXIST_PLANAR_ij_new,survey_one
-  PRIVATE COPY_LAYOUT,COPY_LAYOUT_I,kill_para_L
-  private fibre_WORK,fibre_POL,fibre_BL,ADDP_ANBN,WORK_fibre,BL_fibre
-  PRIVATE TRANS_D,rot_a,COPY_LAYOUT_ij,put_aperture_fib,remove_aperture_fib
+  PRIVATE SURVEY_EXIST_PLANAR_L_NEW ,SURVEY_EXIST_PLANAR_IJ,MISALIGN_FIBRE_EQUAL,SURVEY_FIB ,SURVEY_EXIST_PLANAR_I  
+!,SURVEY_NO_PATCH
+  PRIVATE COPY_LAYOUT,COPY_LAYOUT_I,KILL_PARA_L
+  PRIVATE FIBRE_WORK,FIBRE_POL,FIBRE_BL,ADDP_ANBN,WORK_FIBRE,BL_FIBRE
+  PRIVATE TRANS_D,COPY_LAYOUT_IJ,PUT_APERTURE_FIB,REMOVE_APERTURE_FIB
 
 
   INTERFACE EL_TO_ELP
@@ -23,72 +25,84 @@ MODULE S_FAMILY
   END INTERFACE
 
   INTERFACE SURVEY
-     ! link list
-     MODULE PROCEDURE SURVEY_one
-     MODULE PROCEDURE SURVEY_EXIST_PLANAR_L_new
-     MODULE PROCEDURE SURVEY_EXIST_PLANAR_IJ_new
+     ! LINK LIST
+     !     MODULE PROCEDURE SURVEY_NO_PATCH            ! NO PATCH
+     MODULE PROCEDURE SURVEY_EXIST_PLANAR_L_NEW  ! ORDINARY SURVEY STARTING AT POSITION 1
+     MODULE PROCEDURE SURVEY_FIB
+     MODULE PROCEDURE SURVEY_EXIST_PLANAR_IJ
+     MODULE PROCEDURE SURVEY_EXIST_PLANAR_I
+11 END INTERFACE
+
+  INTERFACE TRACK
+     ! LINK LIST
+     MODULE PROCEDURE SURVEY_FIB
+     MODULE PROCEDURE SURVEY_EXIST_PLANAR_IJ
+     MODULE PROCEDURE SURVEY_EXIST_PLANAR_I
   END INTERFACE
 
-
-  INTERFACE kill_para
-     MODULE PROCEDURE kill_para_L
+  INTERFACE KILL_PARA
+     MODULE PROCEDURE KILL_PARA_L
   END INTERFACE
 
   INTERFACE ADD
      MODULE PROCEDURE ADDP_ANBN
   END INTERFACE
 
-  INTERFACE put_aperture
-     MODULE PROCEDURE put_aperture_fib                               ! need upgrade
-  end  INTERFACE
+  INTERFACE PUT_APERTURE
+     MODULE PROCEDURE PUT_APERTURE_FIB                               ! NEED UPGRADE
+  END  INTERFACE
 
-  INTERFACE remove_aperture
-     MODULE PROCEDURE remove_aperture_fib                               ! need upgrade
-  end  INTERFACE
+  INTERFACE REMOVE_APERTURE
+     MODULE PROCEDURE REMOVE_APERTURE_FIB                               ! NEED UPGRADE
+  END  INTERFACE
 
 
 
-  INTERFACE assignment (=)
-     ! linked
-     MODULE PROCEDURE scan_for_polymorphs
-     MODULE PROCEDURE fibre_WORK
-     MODULE PROCEDURE misalign_fibre
-     MODULE PROCEDURE fibre_POL
-     MODULE PROCEDURE fibre_BL
-     MODULE PROCEDURE BL_fibre
-     MODULE PROCEDURE WORK_fibre
-  end  INTERFACE
+  INTERFACE ASSIGNMENT (=)
+     ! LINKED
+     MODULE PROCEDURE SCAN_FOR_POLYMORPHS
+     MODULE PROCEDURE FIBRE_WORK
+     MODULE PROCEDURE MISALIGN_FIBRE_EQUAL
+     MODULE PROCEDURE FIBRE_POL
+     MODULE PROCEDURE FIBRE_BL
+     MODULE PROCEDURE BL_FIBRE
+     MODULE PROCEDURE WORK_FIBRE
+  END  INTERFACE
 
   INTERFACE EQUAL
      ! LINKED
      MODULE PROCEDURE COPY_LAYOUT
-  end  INTERFACE
+  END  INTERFACE
 
-  INTERFACE copy
+  INTERFACE COPY
      ! LINKED
      MODULE PROCEDURE COPY_LAYOUT_I
-     MODULE PROCEDURE COPY_LAYOUT_ij
-  end  INTERFACE
+     MODULE PROCEDURE COPY_LAYOUT_IJ
+  END  INTERFACE
 
   INTERFACE TRANS
      ! LINKED
      MODULE PROCEDURE TRANS_D
-  end  INTERFACE
+  END  INTERFACE
 
   INTERFACE TRANSLATE
      ! LINKED
      MODULE PROCEDURE TRANS_D
-  end  INTERFACE
+  END  INTERFACE
 
-  INTERFACE rotate
+  INTERFACE ROTATE
      ! LINKED
-     MODULE PROCEDURE rot_a
-  end  INTERFACE
+     MODULE PROCEDURE ROT_LAYOUT
+     MODULE PROCEDURE ROT_FIBRE
+     MODULE PROCEDURE ROT_FRAME
+  END  INTERFACE
 
-  INTERFACE rotation
+  INTERFACE ROTATION
      ! LINKED
-     MODULE PROCEDURE rot_a
-  end  INTERFACE
+     MODULE PROCEDURE ROT_LAYOUT
+     MODULE PROCEDURE ROT_FIBRE
+     MODULE PROCEDURE ROT_FRAME
+  END  INTERFACE
 
 
 
@@ -96,111 +110,111 @@ CONTAINS
 
   !NEW
 
-  subroutine LOCATE_FIBRE(R,PIN,I)
-    implicit none
-    type(layout), intent(in) :: r
-    type(fibre), pointer:: p,PIN
-    integer, intent(inOUT) :: i
-    p=>r%start
-    do i=1,r%n
+  SUBROUTINE LOCATE_FIBRE(R,PIN,I)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    TYPE(FIBRE), POINTER:: P,PIN
+    INTEGER, INTENT(INOUT) :: I
+    P=>R%START
+    DO I=1,R%N
        IF(ASSOCIATED(PIN,P) ) EXIT
-       p=>p%next
-    enddo
-  end subroutine LOCATE_FIBRE
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE LOCATE_FIBRE
 
-  subroutine get_length(R,L)
-    implicit none
-    type(layout), intent(in) :: r
-    real(dp), intent(out) :: L
-    type(fibre), pointer:: p
-    integer i
-    p=>r%start
-    L=0.d0
-    do i=1,r%n
-       L=L+p%mag%p%ld
-       p=>p%next
-    enddo
-  end subroutine get_length
+  SUBROUTINE GET_LENGTH(R,L)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    REAL(DP), INTENT(OUT) :: L
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    L=0.D0
+    DO I=1,R%N
+       L=L+P%MAG%P%LD
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE GET_LENGTH
 
-  subroutine get_freq(R,freq)
-    implicit none
-    type(layout), intent(in) :: r
-    real(dp), intent(out) :: freq
-    type(fibre), pointer:: p
-    integer i
-    p=>r%start
-    freq=0.d0
-    do i=1,r%n
-       if(associated(p%mag%freq)) then
-          if(p%mag%freq/=0.D0) THEN
-             FREQ=p%mag%freq
+  SUBROUTINE GET_FREQ(R,FREQ)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    REAL(DP), INTENT(OUT) :: FREQ
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    FREQ=0.D0
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             FREQ=P%MAG%FREQ
           ENDIF
-       endif
-       p=>p%next
-    enddo
-  end subroutine get_freq
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE GET_FREQ
 
-  subroutine get_ALL(R,freq,VOLT,PHAS)
-    implicit none
-    type(layout), intent(in) :: r
-    real(dp), intent(out) :: freq,VOLT,PHAS
-    type(fibre), pointer:: p
-    integer i
-    p=>r%start
-    freq=0.d0;VOLT=0.D0;PHAS=0.D0;
-    do i=1,r%n
-       if(associated(p%mag%freq)) then
-          if(p%mag%freq/=0.D0) THEN
-             FREQ=twopi*p%mag%freq/CLIGHT
-             VOLT=-P%MAG%volt*c_1d_3/P%MAG%P%P0C
+  SUBROUTINE GET_ALL(R,FREQ,VOLT,PHAS)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    REAL(DP), INTENT(OUT) :: FREQ,VOLT,PHAS
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    FREQ=0.D0;VOLT=0.D0;PHAS=0.D0;
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             FREQ=TWOPI*P%MAG%FREQ/CLIGHT
+             VOLT=-P%MAG%VOLT*C_1D_3/P%MAG%P%P0C
              PHAS=P%MAG%PHAS
           ENDIF
-       endif
-       p=>p%next
-    enddo
-  end subroutine get_ALL
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE GET_ALL
 
-  subroutine set_freq(R,freq)
-    implicit none
-    type(layout), intent(inout) :: r
-    real(dp), intent(in) :: freq
-    type(fibre), pointer:: p
-    integer i
-    p=>r%start
-    do i=1,r%n
-       if(associated(p%mag%freq)) then
-          if(p%mag%freq/=0.D0) THEN
-             p%mag%freq=freq
-             p%magp%freq=freq
+  SUBROUTINE SET_FREQ(R,FREQ)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT) :: R
+    REAL(DP), INTENT(IN) :: FREQ
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             P%MAG%FREQ=FREQ
+             P%MAGP%FREQ=FREQ
           ENDIF
-       endif
-       p=>p%next
-    enddo
-  end subroutine set_freq
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE SET_FREQ
 
-  subroutine add_freq(R,freq)
-    implicit none
-    type(layout), intent(inout) :: r
-    real(dp), intent(in) :: freq
-    type(fibre), pointer:: p
-    integer i
-    p=>r%start
-    do i=1,r%n
-       if(associated(p%mag%freq)) then
-          if(p%mag%freq/=0.D0) THEN
-             p%mag%freq=p%mag%freq+freq
-             p%magp%freq=p%magp%freq+freq
+  SUBROUTINE ADD_FREQ(R,FREQ)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT) :: R
+    REAL(DP), INTENT(IN) :: FREQ
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             P%MAG%FREQ=P%MAG%FREQ+FREQ
+             P%MAGP%FREQ=P%MAGP%FREQ+FREQ
           ENDIF
-       endif
-       p=>p%next
-    enddo
-  end subroutine add_freq
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE ADD_FREQ
 
   !END NEW
-  SUBROUTINE ADDP_ANBN(EL,NM,F,V) ! Extends the ADD routines from the Element(p) to the fibre
+  SUBROUTINE ADDP_ANBN(EL,NM,F,V) ! EXTENDS THE ADD ROUTINES FROM THE ELEMENT(P) TO THE FIBRE
     IMPLICIT NONE
-    TYPE(fibre), INTENT(INOUT) ::EL
-    real(dp), INTENT(IN) ::V
+    TYPE(FIBRE), INTENT(INOUT) ::EL
+    REAL(DP), INTENT(IN) ::V
     INTEGER, INTENT(IN) ::NM,F
 
     CALL ADD(EL%MAG,NM,F,V)
@@ -209,429 +223,715 @@ CONTAINS
   END SUBROUTINE ADDP_ANBN
 
 
-  subroutine put_aperture_fib(el,kind,r,x,y)
-    implicit none
-    real(dp),intent(in):: r(:),x,y
-    integer,intent(in):: kind
-    type(fibre),intent(inout):: el
+  SUBROUTINE PUT_APERTURE_FIB(EL,KIND,R,X,Y)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN):: R(:),X,Y
+    INTEGER,INTENT(IN):: KIND
+    TYPE(FIBRE),INTENT(INOUT):: EL
 
-    call put_aperture(el%mag,kind,r,x,y)
-    call put_aperture(el%magp,kind,r,x,y)
+    CALL PUT_APERTURE(EL%MAG,KIND,R,X,Y)
+    CALL PUT_APERTURE(EL%MAGP,KIND,R,X,Y)
 
-  end  subroutine put_aperture_fib
+  END  SUBROUTINE PUT_APERTURE_FIB
 
-  subroutine remove_aperture_fib(el)
-    implicit none
-    type(fibre),intent(inout):: el
+  SUBROUTINE REMOVE_APERTURE_FIB(EL)
+    IMPLICIT NONE
+    TYPE(FIBRE),INTENT(INOUT):: EL
 
-    call remove_aperture_el(el%mag)
-    call remove_aperture_elp(el%magp)
+    CALL REMOVE_APERTURE_EL(EL%MAG)
+    CALL REMOVE_APERTURE_ELP(EL%MAGP)
 
-  end  subroutine remove_aperture_fib
+  END  SUBROUTINE REMOVE_APERTURE_FIB
 
 
-  SUBROUTINE  fibre_WORK(S2,S1) ! Changes the Energy of the fibre and turns the energy patch on
-    implicit none
-    type (WORK),INTENT(IN):: S1
-    TYPE(fibre),INTENT(inOUT):: S2
+  SUBROUTINE  FIBRE_WORK(S2,S1) ! CHANGES THE ENERGY OF THE FIBRE AND TURNS THE ENERGY PATCH ON
+    IMPLICIT NONE
+    TYPE (WORK),INTENT(IN):: S1
+    TYPE(FIBRE),INTENT(INOUT):: S2
 
-    s2%mag=s1
-    s2%magp=s1
-    s2%PATCH%energy=.true.
+    S2%MAG=S1
+    S2%MAGP=S1
+    ! S2%PATCH%ENERGY=.TRUE.
 
-  END SUBROUTINE fibre_WORK
+  END SUBROUTINE FIBRE_WORK
 
-  SUBROUTINE  WORK_fibre(S2,S1)  ! Sucks the energy out of a fibre by loking at ELEMENT
-    implicit none
-    type (fibre),INTENT(IN):: S1
-    TYPE(work),INTENT(inOUT):: S2
+  SUBROUTINE  WORK_FIBRE(S2,S1)  ! SUCKS THE ENERGY OUT OF A FIBRE BY LOKING AT ELEMENT
+    IMPLICIT NONE
+    TYPE (FIBRE),INTENT(IN):: S1
+    TYPE(WORK),INTENT(INOUT):: S2
 
-    s2=s1%mag
-    if(abs(s1%mag%p%p0c-s1%magp%p%p0c)>c_1d_10) then
-       w_p=0
-       w_p%nc=3
-       w_p%fc='(2(1X,a72,/),(1X,a72))'
-       w_p%c(1)=" Beware : Element and ElementP seem to have "
-       w_p%c(2)=" different reference energies!"
-       write(w_p%c(3),'(1x,g20.14,1x,g20.14)')  s1%mag%p%p0c,s1%magp%p%p0c
-       call write_e(100)
-    endif
-
-  END SUBROUTINE WORK_fibre
-
-  SUBROUTINE  misalign_fibre(S2,S1) ! Misaligns full fibre; fills in chart and Magnet_chart
-    use rotation_mis
-    implicit none
-    real(dp),INTENT(IN):: S1(6)
-    TYPE(fibre),INTENT(inOUT):: S2
-    integer i
-
-    if(ASSOCIATED(S2%CHART)) THEN
-       IF(.NOT.ASSOCIATED(s2%mag%D) ) ALLOCATE(s2%mag%D(3))
-       IF(.NOT.ASSOCIATED(s2%mag%R) ) ALLOCATE(s2%mag%R(3))
-       IF(.NOT.ASSOCIATED(s2%magp%D)) ALLOCATE(s2%magp%D(3))
-       IF(.NOT.ASSOCIATED(s2%magp%R)) ALLOCATE(s2%magp%R(3))
-       DO I=1,3
-          s2%mag%D(I)=S1(I);   s2%magp%D(I)=S1(I);
-          s2%mag%R(I)=S1(3+I); s2%magp%R(I)=S1(3+I);
-       ENDDO
-       S2%CHART%D_IN=0.0_dp;S2%CHART%D_out=0.0_dp;
-       S2%CHART%ANG_IN=0.0_dp;S2%CHART%ANG_OUT=0.0_dp;
-       s2%mag%mis=.true.
-       s2%magp%mis=.true.
-
-       ! add code here
-       CALL FACTORIZE_ROTATION(S1,S2%CHART%L,S2%CHART%ALPHA,S2%CHART%D_IN,   &
-            & S2%CHART%ANG_IN,S2%CHART%D_OUT,S2%CHART%ANG_OUT)
-       !
-       CALL ADJUST_INTERNAL(S2)
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       write(w_p%c(1),'(1x,a39,1x,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
-       call write_e(100)
+    S2=S1%MAG
+    IF(ABS(S1%MAG%P%P0C-S1%MAGP%P%P0C)>C_1D_10) THEN
+       W_P=0
+       W_P%NC=3
+       W_P%FC='(2(1X,A72,/),(1X,A72))'
+       W_P%C(1)=" BEWARE : ELEMENT AND ELEMENTP SEEM TO HAVE "
+       W_P%C(2)=" DIFFERENT REFERENCE ENERGIES!"
+       WRITE(W_P%C(3),'(1X,G20.14,1X,G20.14)')  S1%MAG%P%P0C,S1%MAGP%P%P0C
+       CALL WRITE_E(100)
     ENDIF
 
-  END SUBROUTINE misalign_fibre
+  END SUBROUTINE WORK_FIBRE
 
-  SUBROUTINE  ADJUST_INTERNAL(S2) ! Adjusts frames of magnet_chart on the basis of the misalignments
+  SUBROUTINE  MISALIGN_FIBRE_EQUAL(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     IMPLICIT NONE
-    TYPE(fibre),INTENT(inOUT):: S2
-    if(associated(S2%mag%p%f)) then
-       CALL COPY_INTERNAL(S2)
-       CALL GEO_ROT(S2%mag%p%f%ent,S2%CHART%ANG_IN,1)
-       CALL GEO_TRA(S2%mag%p%f%A,S2%CHART%f%ent,S2%CHART%D_IN,1)
-       CALL GEO_TRA(S2%mag%p%f%B,S2%CHART%f%exi,S2%CHART%d_out,-1)
-       CALL GEO_ROT(S2%mag%p%f%EXI,S2%CHART%ANG_out,-1)
-       CALL GEO_AVE(S2%mag%p%f%ENT,S2%mag%p%f%A,S2%mag%p%f%EXI,   S2%mag%p%f%b,S2%mag%p%f%MID,S2%mag%p%f%o)
+    REAL(DP),INTENT(IN):: S1(6)
+    TYPE(FIBRE),INTENT(INOUT):: S2
 
-       CALL GEO_ROT(S2%magP%p%f%ent,S2%CHART%ANG_IN,1)
-       CALL GEO_TRA(S2%magP%p%f%A,S2%CHART%f%ent,S2%CHART%D_IN,1)
-       CALL GEO_TRA(S2%magP%p%f%B,S2%CHART%f%exi,S2%CHART%d_out,-1)
-       CALL GEO_ROT(S2%magP%p%f%EXI,S2%CHART%ANG_out,-1)
-       CALL GEO_AVE(S2%magP%p%f%ENT,S2%magp%p%f%A,S2%magP%p%f%EXI,S2%magp%p%f%b,S2%magP%p%f%MID,S2%magp%p%f%o)
-    endif
-  END SUBROUTINE  ADJUST_INTERNAL
+    CALL MISALIGN_FIBRE(S2,S1)
+
+  END SUBROUTINE  MISALIGN_FIBRE_EQUAL
 
 
-  SUBROUTINE  COPY_INTERNAL(S2) ! Puts the frames of the chart into those of the magnet_chart
+  SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     IMPLICIT NONE
-    TYPE(fibre),INTENT(inOUT):: S2
-
-    if(associated(S2%mag%p%f)) then
-       S2%mag%p%f%mid(:,:) = S2%CHART%f%mid(:,:)
-       S2%mag%p%f%o(:)     = S2%CHART%f%o(:)
-       S2%mag%p%f%ent(:,:) = S2%CHART%f%ent(:,:)
-       S2%mag%p%f%a(:)     = S2%CHART%f%a(:)
-       S2%mag%p%f%exi(:,:) = S2%CHART%f%exi(:,:)
-       S2%mag%p%f%b(:)     = S2%CHART%f%b(:)
-       S2%magP%p%f%mid(:,:) = S2%CHART%f%mid(:,:)
-       S2%magP%p%f%o(:)     = S2%CHART%f%o(:)
-       S2%magP%p%f%ent(:,:) = S2%CHART%f%ent(:,:)
-       S2%magP%p%f%a(:)     = S2%CHART%f%a(:)
-       S2%magP%p%f%exi(:,:) = S2%CHART%f%exi(:,:)
-       S2%magP%p%f%b(:)     = S2%CHART%f%b(:)
-    endif
-  END SUBROUTINE  COPY_INTERNAL
-
-
-
-  ! new routines to change layout
-
-  SUBROUTINE  Trans_D(R,D) ! Translates a layout
-    implicit none
-    type (LAYOUT),INTENT(INOUT):: R
-    real(dp),INTENT(IN):: D(3)
-    TYPE(FIBRE), POINTER::P
+    REAL(DP),INTENT(IN):: S1(6)
+    REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
+    TYPE(FIBRE),INTENT(INOUT):: S2
+    REAL(DP) ANGLE(3),T_GLOBAL(3)
+    TYPE(MAGNET_FRAME), POINTER :: F,F0,F_BASIS
+    TYPE(MAGNET_FRAME),  POINTER :: FAKE
+    REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
     INTEGER I
 
+    CALL ALLOC(FAKE)
+
+    FAKE%ENT=GLOBAL_FRAME
+    FAKE%MID=GLOBAL_FRAME
+    FAKE%EXI=GLOBAL_FRAME
+    FAKE%A=GLOBAL_ORIGIN
+    FAKE%O=GLOBAL_ORIGIN
+    FAKE%B=GLOBAL_ORIGIN
+
+
+
+    IF(ASSOCIATED(S2%CHART)) THEN
+       IF(.NOT.ASSOCIATED(S2%MAG%D) ) ALLOCATE(S2%MAG%D(3))
+       IF(.NOT.ASSOCIATED(S2%MAG%R) ) ALLOCATE(S2%MAG%R(3))
+       IF(.NOT.ASSOCIATED(S2%MAGP%D)) ALLOCATE(S2%MAGP%D(3))
+       IF(.NOT.ASSOCIATED(S2%MAGP%R)) ALLOCATE(S2%MAGP%R(3))
+       DO I=1,3
+          S2%MAG%D(I)=S1(I);   S2%MAGP%D(I)=S1(I);
+          S2%MAG%R(I)=S1(3+I); S2%MAGP%R(I)=S1(3+I);
+       ENDDO
+       S2%CHART%D_IN=0.0_DP;S2%CHART%D_OUT=0.0_DP;
+       S2%CHART%ANG_IN=0.0_DP;S2%CHART%ANG_OUT=0.0_DP;
+       S2%MAG%MIS=.TRUE.
+       S2%MAGP%MIS=.TRUE.
+
+       ! ADD CODE HERE
+       CALL ALLOC(F)
+       CALL ALLOC(F0)
+       CALL SURVEY_NO_PATCH(S2,FAKE=FAKE,MAGNETFRAME=F)
+       ! MOVE THE ORIGINAL INTERNAL CHART F
+       F0=F
+       ANGLE=S2%MAG%R
+       IF(PRESENT(BASIS)) THEN
+          BASIST=BASIS
+       ELSE
+          BASIST=F0%MID
+       ENDIF
+       IF(PRESENT(OMEGA)) THEN
+          OMEGAT=OMEGA
+       ELSE
+          OMEGAT=F0%O
+       ENDIF
+
+       CALL ROT_FRAME(F,OMEGAT,ANGLE,1,BASIS=BASIST)
+
+       IF(PRESENT(BASIS)) THEN   ! MUST ROTATE THAT FRAME AS WELL FOR CONSISTENCY IN DEFINITION WHAT A MISALIGNMENT IS IN PTC
+          CALL   GEO_ROT(BASIST,ANGLE,1)
+       ELSE
+          BASIST=F%MID    ! ALREADY ROTATED
+       ENDIF
+
+       CALL CHANGE_BASIS(S2%MAG%D,BASIST,T_GLOBAL,GLOBAL_FRAME)
+
+
+       F%A=F%A+T_GLOBAL
+       F%O=F%O+T_GLOBAL
+       F%B=F%B+T_GLOBAL
+
+
+
+
+
+
+       CALL COMPUTE_ENTRANCE_ANGLE(F0%ENT,F%ENT,S2%CHART%ANG_IN)
+       CALL COMPUTE_ENTRANCE_ANGLE(F%EXI,F0%EXI,S2%CHART%ANG_OUT)
+
+       D_IN=F%A-F0%A
+       D_OUT=F0%B-F%B
+
+       !        WRITE(6,*) " IN GLOBAL BASIS D_IN AND D_OUT"
+
+       !        WRITE(6,*) D_IN
+       !        WRITE(6,*) D_OUT
+
+       CALL CHANGE_BASIS(D_IN,GLOBAL_FRAME,S2%CHART%D_IN,F%ENT)
+       CALL CHANGE_BASIS(D_OUT,GLOBAL_FRAME,S2%CHART%D_OUT,F0%EXI)
+
+       !        WRITE(6,*) " IN LOCAL  BASIS D_IN AND D_OUT AS WELL AS ANGLES"
+       !       WRITE(6,*) " ***************************************"
+       !      WRITE(6,*) S2%CHART%ANG_IN
+       !      WRITE(6,*) S2%CHART%ANG_OUT
+       !      WRITE(6,*) S2%CHART%D_IN
+       !      WRITE(6,*) S2%CHART%D_OUT
+
+       !      WRITE(6,*) " ***************************************"
+
+       CALL KILL(F)
+       CALL KILL(F0)
+       CALL SURVEY_NO_PATCH(S2,FAKE=FAKE)
+    ELSE
+       W_P=0
+       W_P%NC=1
+       W_P%FC='((1X,A72))'
+       WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
+       CALL WRITE_E(100)
+    ENDIF
+    CALL KILL(FAKE)
+  END SUBROUTINE MISALIGN_FIBRE
+
+  SUBROUTINE  MAD_MISALIGN_FIBRE(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN):: S1(6)
+    TYPE(FIBRE),INTENT(INOUT):: S2
+    REAL(DP) ENT(3,3),T(3),MAD_ANGLE(3),T_GLOBAL(3),ANGLE(3),MIS(6)
+    ent=S2%CHART%F%ent
+    T(1)=S1(1);T(2)=S1(2);T(3)=S1(3);
+    MAD_ANGLE(1)=-S1(4)
+    MAD_ANGLE(2)=-S1(5)
+    MAD_ANGLE(3)=S1(6)
+
+    CALL CHANGE_BASIS(T,ENT,T_GLOBAL,GLOBAL_FRAME)
+    ANGLE=ZERO; ANGLE(3)=MAD_ANGLE(3)
+    CALL GEO_ROT(ENT,ENT,ANGLE,ENT)
+    ANGLE=ZERO; ANGLE(1)=MAD_ANGLE(1)
+    CALL GEO_ROT(ENT,ENT,ANGLE,ENT)
+    ANGLE=ZERO; ANGLE(2)=MAD_ANGLE(2)
+    CALL GEO_ROT(ENT,ENT,ANGLE,ENT)
+
+    CALL CHANGE_BASIS(T_GLOBAL,GLOBAL_FRAME,T,ENT)
+    CALL COMPUTE_ENTRANCE_ANGLE(S2%CHART%F%ent,ENT,ANGLE)
+    MIS(1:3)=T
+    MIS(4:6)=ANGLE
+    call MISALIGN_FIBRE(S2,MIS,S2%CHART%F%A,S2%CHART%F%ent)
+
+  END SUBROUTINE MAD_MISALIGN_FIBRE
+
+  ! NEW ROUTINES TO CHANGE LAYOUT
+
+  SUBROUTINE  TRANS_D(R,D,I1,I2,ORDER,BASIS) ! TRANSLATES A LAYOUT
+    IMPLICIT NONE
+    TYPE (LAYOUT),INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER I,I11,I22,J
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER,I1,I2
     ! THIS ROUTINE TRANSLATE THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
     ! GLOBAL FRAME TO DEFINE D
 
     P=>R%START
 
-    DO I=1,R%N
-       if(.not.associated(p%parent_chart)) then  ! Only translates original otherwise
-          ! they will translate more than once
-
-          IF(ASSOCIATED(P%CHART)) THEN
-             if(associated(P%CHART%f)) then
-                P%CHART%f%A=P%CHART%f%A+D
-                P%CHART%f%B=P%CHART%f%B+D
-                P%CHART%f%O=P%CHART%f%O+D
-
-                if(associated(P%MAG%p%f)) then
-                   P%MAG%p%f%A=P%MAG%p%f%A+D
-                   P%MAG%p%f%B=P%MAG%p%f%B+D
-                   P%MAG%p%f%O=P%MAG%p%f%O+D
-                   P%MAGP%p%f%A=P%MAGP%p%f%A+D
-                   P%MAGP%p%f%B=P%MAGP%p%f%B+D
-                   P%MAGP%p%f%O=P%MAGP%p%f%O+D
-                endif
-             endif
-          ENDIF
-
-       endif
+    I11=1
+    I22=R%N
+    IF(PRESENT(I1))  I11=I1
+    IF(PRESENT(I2))  I22=I2
+    DO I=1,I11-1
        P=>P%NEXT
     ENDDO
 
 
-  END SUBROUTINE Trans_D
+    DO I=1,I22-I11+1
+       CALL TRANS_F(P,D,ORDER,BASIS)
+       P=>P%NEXT
+    ENDDO
 
-  SUBROUTINE  ROT_A(R,OMEGA,A) ! Rotates a layout around OMEGA by A(3)  in standard PTC order
-    implicit none
-    type (LAYOUT),INTENT(INOUT):: R
-    real(dp),INTENT(IN):: OMEGA(3),A(3)
+
+  END SUBROUTINE TRANS_D
+
+  SUBROUTINE  TRANS_F(R,D,ORDER,BASIS) ! TRANSLATES A LAYOUT
+    IMPLICIT NONE
+    TYPE (FIBRE),TARGET,INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
     TYPE(FIBRE), POINTER::P
-    real(dp) D(3)
-    INTEGER I
+    INTEGER I,IORDER,I11,I22,J
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    REAL(DP) DD(3)
+    ! THIS ROUTINE TRANSLATE THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
+    ! GLOBAL FRAME TO DEFINE D
+
+    P=>R
+
+    IORDER=1
+    DD=D
+    IF(PRESENT(ORDER)) IORDER=ORDER
+    IF(PRESENT(BASIS)) THEN
+       CALL CHANGE_BASIS(D,BASIS,DD,GLOBAL_FRAME)
+    ENDIF
+
+
+
+    IF(.NOT.ASSOCIATED(P%PARENT_CHART)) THEN  ! ONLY TRANSLATES ORIGINAL OTHERWISE
+       ! THEY WILL TRANSLATE MORE THAN ONCE
+
+       IF(ASSOCIATED(P%CHART)) THEN
+          IF(ASSOCIATED(P%CHART%F)) THEN
+             CALL TRANS_FRAME(P%CHART%F,D,ORDER,BASIS)
+
+             IF(ASSOCIATED(P%MAG%P%F)) THEN
+                CALL TRANS_FRAME(P%MAG%P%F,D,ORDER,BASIS)
+                P%MAGP%P%F=P%MAG%P%F
+             ENDIF
+          ENDIF
+       ENDIF
+
+    ENDIF
+
+
+  END SUBROUTINE TRANS_F
+
+
+  SUBROUTINE  TRANS_FRAME(R,D,ORDER,BASIS) ! TRANSLATES A LAYOUT
+    IMPLICIT NONE
+    TYPE (MAGNET_FRAME),TARGET, INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
+    INTEGER I,IORDER,I11,I22,J
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    REAL(DP) DD(3)
+    TYPE(MAGNET_FRAME), POINTER :: P
+    ! THIS ROUTINE TRANSLATE THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
+    ! GLOBAL FRAME TO DEFINE D
+
+    P=>R
+
+    IORDER=1
+    DD=D
+    IF(PRESENT(ORDER)) IORDER=ORDER
+    IF(PRESENT(BASIS)) THEN
+       CALL CHANGE_BASIS(D,BASIS,DD,GLOBAL_FRAME)
+    ENDIF
+
+
+
+    P%A=P%A+IORDER*DD
+    P%B=P%B+IORDER*DD
+    P%O=P%O+IORDER*DD
+
+
+
+  END SUBROUTINE TRANS_FRAME
+
+
+  SUBROUTINE  ROT_LAYOUT(R,OMEGA,Ang,I1,I2,ORDER,BASIS) ! ROTATES A LAYOUT AROUND OMEGA BY A(3)  IN STANDARD PTC ORDER
+    ! INVERSE => ORDER=-1   USING GLOBAL FRAME
+    IMPLICIT NONE
+    TYPE (LAYOUT),INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: OMEGA(3),Ang(3)
+    TYPE(FIBRE), POINTER::P
+    REAL(DP) D(3),OMEGAT(3)
+    INTEGER I,IORDER,I11,I22,J
+    INTEGER, OPTIONAL :: ORDER,I1,I2
+    REAL(DP), OPTIONAL, INTENT(IN):: BASIS(3,3)
+    real(dp) basist(3,3)
     ! THIS ROUTINE ROTATES THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
     ! GLOBAL FRAME TO DEFINE THE ANGLES A(3) AND THE POINT OMEGA AROUND WHICH THE
     ! ROTATION HAPPENS
-
+    ! OMEGA DEFINED IN THAT BASIS
+    ! ANGLE AS WELL
+    OMEGAT=OMEGA
     P=>R%START
+    IORDER=1
+    I11=1
+    I22=R%N
+    IF(PRESENT(ORDER)) IORDER=ORDER
+    IF(PRESENT(I1))  I11=I1
+    IF(PRESENT(I2))  I22=I2
 
-    DO I=1,R%N
-       if(.not.associated(p%parent_chart)) then  ! Only rotates original otherwise
-          IF(ASSOCIATED(P%CHART)) THEN
-             if(associated(P%CHART%f)) then
-                ! they will rotate more than once
-                D=P%CHART%f%A-OMEGA
-                CALL GEO_ROT(D,A)
-                P%CHART%f%A=OMEGA+D
-
-                D=P%CHART%f%O-OMEGA
-                CALL GEO_ROT(D,A)
-                P%CHART%f%O=OMEGA+D
-
-                D=P%CHART%f%B-OMEGA
-                CALL GEO_ROT(D,A)
-                P%CHART%f%B=OMEGA+D
+    BASIST=GLOBAL_FRAME            ! NECESSARY SINCE BASIS CAN CHANGE DURING THE CALCULATION ASSUMING A POINTER IS PASSED
+    IF(PRESENT(BASIS)) BASIST=BASIS
 
 
-                CALL GEO_ROT(P%CHART%f%ENT,A,1)
-                CALL GEO_ROT(P%CHART%f%MID,A,1)
-                CALL GEO_ROT(P%CHART%f%EXI,A,1)
-
-
-                if(associated(P%MAG%p%f)) then
-                   D=P%MAG%p%f%A-OMEGA
-                   CALL GEO_ROT(D,A)
-                   P%MAG%p%f%A=OMEGA+D; P%MAGP%p%f%A=P%MAG%p%f%A
-                   D=P%MAG%p%f%O-OMEGA
-                   CALL GEO_ROT(D,A)
-                   P%MAG%p%f%O=OMEGA+D; P%MAGP%p%f%O=P%MAG%p%f%O
-                   D=P%MAG%p%f%B-OMEGA
-                   CALL GEO_ROT(D,A)
-                   P%MAG%p%f%B=OMEGA+D; P%MAGP%p%f%B=P%MAG%p%f%B
-
-                   CALL GEO_ROT(P%MAG%p%f%ENT,A,1)
-                   CALL GEO_ROT(P%MAG%p%f%MID,A,1)
-                   CALL GEO_ROT(P%MAG%p%f%EXI,A,1)
-                   CALL GEO_ROT(P%MAGP%p%f%ENT,A,1)
-                   CALL GEO_ROT(P%MAGP%p%f%MID,A,1)
-                   CALL GEO_ROT(P%MAGP%p%f%EXI,A,1)
-                endif
-             endif
-          ENDIF
-       endif
-
+    DO I=1,I11-1
        P=>P%NEXT
     ENDDO
 
-  END SUBROUTINE ROT_A
 
-  SUBROUTINE  ROTATE_FIBRE(EL1,EL0)
-    ! PUTS EL1 AT THE END OF EL0 FOR SURVEY PURPOSES. EL0 AND EL1 MUST HAVE SAME EL%DIR (Standard Survey)
-    implicit none
-    type (FIBRE),INTENT(INOUT):: EL1,EL0
+    DO I=1,I22-I11+1
+       CALL ROT_FIBRE(P,OMEGA,Ang,ORDER,BASIST)
+       P=>P%NEXT
+    ENDDO
 
-    ! PUTS EL1 AT THE END OF EL0 FOR SURVEY PURPOSES. EL0 AND EL1 MUST HAVE SAME EL%DIR
-    IF(ASSOCIATED(EL0%CHART).AND.ASSOCIATED(EL1%CHART)) THEN
-       CALL ROTATE_C(EL1%CHART,EL0%CHART,EL0%DIR)
-       CALL ADJUST_INTERNAL(EL1)
-    ENDIF
-  END SUBROUTINE  ROTATE_FIBRE
+  END SUBROUTINE ROT_LAYOUT
 
-  !
-
-
-  SUBROUTINE  fibre_BL(S2,S1) ! Puts a new multipole block into Fibre. Extends element(p) routines to fibres
-    implicit none
-    type (MUL_BLOCK),INTENT(IN):: S1
-    TYPE(fibre),INTENT(inOUT):: S2
-
-    s2%mag=s1
-    s2%magp=s1
-
-  END   SUBROUTINE  fibre_BL
-
-  SUBROUTINE  BL_fibre(S2,S1) ! Sucks the multipole out looking at element
-    implicit none
-    type (fibre),INTENT(IN):: S1
-    TYPE(MUL_BLOCK),INTENT(inOUT):: S2
-
-    s2=s1%mag
-
-
-  END   SUBROUTINE  BL_fibre
-
-
-  SUBROUTINE SURVEY_EXIST_PLANAR_IJ_new(PLAN,I1,I2) ! standard survey from fibre #i1 to #i2
+  SUBROUTINE  ROT_FIBRE(R,OMEGA,Ang,ORDER,BASIS) ! ROTATES A FIBRE AROUND OMEGA BY A(3)  IN STANDARD PTC ORDER
+    ! INVERSE => ORDER=-1   USING GLOBAL FRAME
     IMPLICIT NONE
-    TYPE(layout), INTENT(INOUT):: PLAN
-    TYPE (fibre), POINTER :: C
+    TYPE (FIBRE),TARGET,INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: OMEGA(3),Ang(3)
+    TYPE(FIBRE), POINTER::P
+    REAL(DP) D(3),OMEGAT(3)
+    INTEGER I,IORDER,I11,I22,J
+    INTEGER, OPTIONAL :: ORDER
+    REAL(DP), OPTIONAL, INTENT(IN):: BASIS(3,3)
+    real(dp) basist(3,3)
+    ! THIS ROUTINE ROTATES THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
+    ! GLOBAL FRAME TO DEFINE THE ANGLES A(3) AND THE POINT OMEGA AROUND WHICH THE
+    ! ROTATION HAPPENS
+    ! OMEGA DEFINED IN THAT BASIS
+    ! ANGLE AS WELL
+    OMEGAT=OMEGA
+    P=>R
+    IORDER=1
+    IF(PRESENT(ORDER)) IORDER=ORDER
+    BASIST=GLOBAL_FRAME            ! NECESSARY SINCE BASIS CAN CHANGE DURING THE CALCULATION ASSUMING A POINTER IS PASSED
+    IF(PRESENT(BASIS)) BASIST=BASIS
+
+
+
+
+    IF(.NOT.ASSOCIATED(P%PARENT_CHART)) THEN  ! ONLY ROTATES ORIGINAL OTHERWISE
+       IF(ASSOCIATED(P%CHART)) THEN
+          IF(ASSOCIATED(P%CHART%F)) THEN
+             ! THEY WILL ROTATE MORE THAN ONCE
+             CALL ROT_FRAME(P%CHART%F, OMEGAT,Ang,IORDER,BASIST)
+
+
+             IF(ASSOCIATED(P%MAG%P%F)) THEN
+
+                CALL ROT_FRAME(P%MAG%P%F, OMEGAT,Ang,IORDER,BASIST)
+                P%MAGP%P%F=P%MAG%P%F
+             ENDIF
+          ENDIF
+       ENDIF
+    ENDIF
+
+
+  END SUBROUTINE ROT_FIBRE
+
+
+
+
+
+
+  SUBROUTINE  FIBRE_BL(S2,S1) ! PUTS A NEW MULTIPOLE BLOCK INTO FIBRE. EXTENDS ELEMENT(P) ROUTINES TO FIBRES
+    IMPLICIT NONE
+    TYPE (MUL_BLOCK),INTENT(IN):: S1
+    TYPE(FIBRE),INTENT(INOUT):: S2
+
+    S2%MAG=S1
+    S2%MAGP=S1
+
+  END   SUBROUTINE  FIBRE_BL
+
+  SUBROUTINE  BL_FIBRE(S2,S1) ! SUCKS THE MULTIPOLE OUT LOOKING AT ELEMENT
+    IMPLICIT NONE
+    TYPE (FIBRE),INTENT(IN):: S1
+    TYPE(MUL_BLOCK),INTENT(INOUT):: S2
+
+    S2=S1%MAG
+
+
+  END   SUBROUTINE  BL_FIBRE
+
+
+  SUBROUTINE SURVEY_EXIST_PLANAR_IJ(PLAN,I1,I2,ENT,A) ! STANDARD SURVEY FROM FIBRE #I1 TO #I2
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT):: PLAN
+    TYPE (FIBRE), POINTER :: C
+    TYPE (PATCH), POINTER :: P
+    REAL(DP),OPTIONAL, INTENT(INOUT) :: A(3),ENT(3,3)
     INTEGER , INTENT(IN)::I1,I2
     INTEGER I
+    REAL(DP) ANG(3),TRA(3),D(3)
+    LOGICAL(LP) SEL
+    REAL(DP) AT(3),ENTT(3,3),NORM
 
 
-    nullify(C);
+    NULLIFY(C);
 
-    CALL move_to( plan,C,i1)
-
-    !if(first) then
-    ! c%CHART=1
-    ! call survey(c)
-    !endif
+    CALL MOVE_TO(PLAN,C,MOD_N(I1,PLAN%N))
 
 
-    c=>plan%START
-    DO I=i1,i2-1
-       CALL ROTATE_FIBRE(c%NEXT,c)
-       c=>c%NEXT
+    IF((PRESENT(ENT).AND.(.NOT.PRESENT(A))).OR.(PRESENT(A).AND.(.NOT.PRESENT(ENT)))) THEN
+       W_P=0
+       W_P%NC=2
+       W_P%FC='(2(1X,A72,/),(1X,A72))'
+       W_P%C(1)=" BEWARE : ENT AND A  "
+       W_P%C(2)=" MUST BOTH BE PRESENT OR ABSENT"
+       CALL WRITE_E(100)
+    ELSEIF(PRESENT(ENT)) THEN
+       ENTT=ENT
+       AT=A
+    ELSE
+       IF(ASSOCIATED(C%CHART%F)) THEN
+          IF(C%DIR==1) THEN
+             ENTT=C%CHART%F%ENT
+             AT=C%CHART%F%A
+          ELSE
+             ENTT=C%CHART%F%EXI
+             AT=C%CHART%F%B
+          ENDIF
+       ELSE
+          write(6,*) " No charts "
+          STOP 888
+       ENDIF
+       IF(ASSOCIATED(C%PATCH)) THEN
+          P=>C%PATCH
+          IF(P%PATCH) THEN
+             NORM=ZERO
+             DO I=1,3
+                NORM=NORM+ABS(P%A_ANG(I))
+                NORM=NORM+ABS(P%A_D(I))
+             ENDDO
+             NORM=NORM+ABS(P%A_YZ-1)+ABS(P%A_XZ-1)
+             IF(NORM/=ZERO) THEN
+                W_P=0
+                W_P%NC=3
+                W_P%FC='(2(1X,A72,/),(1X,A72))'
+                W_P%C(1)=" THERE IS A FRONTAL PATCH IN FIRST FIBRE OF THE SURVEY"
+                W_P%C(2)=" AND THAT PATCH IS NOT IDENTITY. ITS NORM IS:"
+                WRITE(W_P%C(3),'(1X,G20.14)')  NORM
+                CALL WRITE_E(100)
+             ENDIF
+          ENDIF
+       ENDIF
+
+    ENDIF
+
+
+
+    I=I1
+
+    DO  WHILE(I<I2.AND.ASSOCIATED(C))
+
+       CALL TRACK(C,ENTT,AT)
+
+       C=>C%NEXT
+       I=I+1
     ENDDO
 
 
+    IF(PRESENT(ENT)) THEN
+       ENT=ENTT
+       A=AT
+    ENDIF
+    !   DO I=I1,I2
 
-  END SUBROUTINE SURVEY_EXIST_PLANAR_IJ_new
-
-  SUBROUTINE SURVEY_EXIST_PLANAR_L_new(PLAN) ! Calls above routine from fibre #1 to #plan%n : Standard Survey
-    IMPLICIT NONE
-    TYPE(layout), INTENT(INOUT):: PLAN
-
-    call survey(plan,1,plan%n)
-
-  END SUBROUTINE SURVEY_EXIST_PLANAR_L_new
+    !    CALL TRACK(C,ENTT,AT)
+    !      C=>C%NEXT
+    !   ENDDO
 
 
-  SUBROUTINE SURVEY_one(C) ! Surveys a single element fills in chart and magnet_chart; locates origin at the entrance or exit
+
+  END SUBROUTINE SURVEY_EXIST_PLANAR_IJ
+
+
+  SUBROUTINE SURVEY_FIB(C,ENT,A,MAGNETFRAME,E_IN) 
+! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
     IMPLICIT NONE
     TYPE(FIBRE), TARGET , INTENT(INOUT):: C
-    TYPE (CHART), POINTER :: BL,CL
-    TYPE (CHART), TARGET :: CHART_i
-    INTEGER J
-    real(dp) NORM
+    TYPE (CHART), POINTER :: CL
+    TYPE(MAGNET_FRAME), OPTIONAL :: MAGNETFRAME
+    TYPE(MAGNET_FRAME), POINTER :: FAKE
+    TYPE(INNER_FRAME), OPTIONAL :: E_IN
+    REAL(DP), INTENT(INOUT)  :: ENT(3,3),A(3)
+    REAL(DP) D(3),ANG(3)
+    INTEGER I
+    LOGICAL(LP) SEL
+    TYPE (PATCH), POINTER :: P
+
+    NULLIFY(FAKE)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-6)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-5)
+
+    SEL=.FALSE.
+    IF(ASSOCIATED(C%CHART)) THEN
+       SEL=.FALSE.
+       IF(ASSOCIATED(C%CHART%F)) SEL=.TRUE.
+    ENDIF
+
+    !        IF(.NOT.SEL) THEN !
+    CALL ALLOC(FAKE)
+    !        ENDIF
+
+    IF(ASSOCIATED(C%PATCH)) THEN
+       P=>C%PATCH
+       IF(P%PATCH) THEN
+          ANG=ZERO
+          ANG=P%A_ANG ; IF(P%A_YZ<0) ANG(1)=ANG(1)+PI ; IF(P%A_XZ<0) ANG(2)=ANG(2)+PI ;
+          D=ZERO
+          CALL GEO_ROT(ENT,D,ANG,1,ENT)
+
+          CALL GEO_TRA(A,ENT,P%A_D,1)
+
+       ENDIF
+    ENDIF
+
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-4)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-3)
+
+    IF(SEL) THEN
+       IF(C%DIR==1) THEN
+          C%CHART%F%ENT=ENT
+          C%CHART%F%A=A
+       ELSE
+          C%CHART%F%EXI=ENT
+          C%CHART%F%B=A
+       ENDIF
+    ELSE
+       IF(C%DIR==1) THEN
+          FAKE%ENT=ENT
+          FAKE%A=A
+       ELSE
+          FAKE%EXI=ENT
+          FAKE%B=A
+       ENDIF
+    ENDIF
 
 
-    Nullify(BL);Nullify(CL);
+    CALL SURVEY_NO_PATCH(C,FAKE=FAKE,E_IN=E_IN)
 
 
+    IF(SEL) THEN
+       IF(C%DIR==1) THEN
+          ENT=C%CHART%F%EXI
+          A=C%CHART%F%B
+       ELSE
+          ENT=C%CHART%F%ENT
+          A=C%CHART%F%A
+       ENDIF
+    ELSE
+       IF(C%DIR==1) THEN
+          ENT=FAKE%EXI
+          A=FAKE%B
+       ELSE
+          ENT=FAKE%ENT
+          A=FAKE%A
+       ENDIF
+    ENDIF
 
-    IF(.NOT.ASSOCIATED(C%CHART)) RETURN
-
-    CHART_i=1
-
-    CL=> C%CHART  ! CHART OF ELEMENT 1
-    CL=1
-    BL=> CHART_i
-
-
-    if(c%dir==1) then
-       CL%A_XY=C%MAG%P%tilTd  ! GO CHARTLY
-       CL%L=C%MAG%P%LC
-       CL%ALPHA=C%MAG%P%LD*C%MAG%P%B0
-       if(associated(C%CHART%f)) then     !!!! doing survey
-          !              CL%ALPHA=CL%A_XZ
-          CALL ROTATE_V( BL,CL,1)
-
-          CL%f%O(:)=half*(CL%f%A(:)+CL%f%B(:))
-
-          CL%f%MID(:,:)=CL%f%ENT(:,:)
-          DO J=1,3
-             CL%f%MID(1,J)=(CL%f%ENT(1,J)+CL%f%EXI(1,J))
-             CL%f%MID(3,J)=(CL%f%ENT(3,J)+CL%f%EXI(3,J))
-          ENDDO
-          NORM=zero
-          DO J=1,3
-             NORM=CL%f%MID(1,J)**2+NORM
-          ENDDO
-          NORM=SQRT(NORM)
-          DO J=1,3
-             CL%f%MID(1,J)=CL%f%MID(1,J)/NORM
-          ENDDO
-          NORM=zero
-          DO J=1,3
-             NORM=CL%f%MID(3,J)**2+NORM
-          ENDDO
-          NORM=SQRT(NORM)
-          DO J=1,3
-             CL%f%MID(3,J)=CL%f%MID(3,J)/NORM
-          ENDDO
-
-          CALL ADJUST_INTERNAL(C)
-       endif  !!!! doing survey
-
-    else
-       CL%A_XY=C%MAG%P%tilTd  ! GO CHARTLY
-       CL%L=C%MAG%P%LC
-       CL%ALPHA=C%MAG%P%LD*C%MAG%P%B0
-       !              CL%ALPHA=CL%A_XZ
-       if(associated(C%CHART%f)) then     !!!! doing survey
-          CALL ROTATE_V( BL,CL,-1)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST-3)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST-2)
 
 
-          CL%f%O(:)=half*(CL%f%A(:)+CL%f%B(:))
+    IF(ASSOCIATED(C%PATCH)) THEN
+       IF(P%PATCH) THEN
+          ANG=ZERO
+          ANG=P%B_ANG ; IF(P%B_YZ<0) ANG(1)=ANG(1)+PI ; IF(P%B_XZ<0) ANG(2)=ANG(2)+PI ;
+          D=ZERO
+          CALL GEO_ROT(ENT,D,ANG,1,ENT)
 
-          CL%f%MID(:,:)=CL%f%ENT(:,:)
-          DO J=1,3
-             CL%f%MID(1,J)=(CL%f%ENT(1,J)+CL%f%EXI(1,J))
-             CL%f%MID(3,J)=(CL%f%ENT(3,J)+CL%f%EXI(3,J))
-          ENDDO
-          NORM=zero
-          DO J=1,3
-             NORM=CL%f%MID(1,J)**2+NORM
-          ENDDO
-          NORM=SQRT(NORM)
-          DO J=1,3
-             CL%f%MID(1,J)=CL%f%MID(1,J)/NORM
-          ENDDO
-          NORM=zero
-          DO J=1,3
-             NORM=CL%f%MID(3,J)**2+NORM
-          ENDDO
-          NORM=SQRT(NORM)
-          DO J=1,3
-             CL%f%MID(3,J)=CL%f%MID(3,J)/NORM
-          ENDDO
+          CALL GEO_TRA(A,ENT,P%B_D,1)
 
-          CALL ADJUST_INTERNAL(C)
-       endif    !!!! doing survey
+       ENDIF
+    ENDIF
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST-1)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST)
+    IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-7)
 
-    endif
+    !        IF(.NOT.SEL) THEN
+    CALL KILL(FAKE)
+    !        ENDIF
+
+  END SUBROUTINE SURVEY_FIB
 
 
 
 
-  END SUBROUTINE SURVEY_one
+
+  SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW(PLAN,ENT,A) ! CALLS ABOVE ROUTINE FROM FIBRE #1 TO #PLAN%N : STANDARD SURVEY
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT):: PLAN
+    REAL(DP),OPTIONAL, INTENT(INOUT) :: A(3),ENT(3,3)
+
+    CALL TRACK(PLAN,1,ENT,A)
+
+  END SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW
+
+  SUBROUTINE SURVEY_EXIST_PLANAR_I(PLAN,I1,ENT,A) ! STANDARD SURVEY FROM FIBRE #I1 TO #I2
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT):: PLAN
+    REAL(DP),OPTIONAL, INTENT(INOUT) :: A(3),ENT(3,3)
+    INTEGER , INTENT(IN)::I1
+    INTEGER I2
+    I2=PLAN%N+I1
+
+    CALL TRACK(PLAN,I1,I2,ENT,A)
+
+  END SUBROUTINE SURVEY_EXIST_PLANAR_I
+
+  SUBROUTINE SURVEY_NO_PATCH(C,FAKE,MAGNETFRAME,E_IN) 
+! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
+    IMPLICIT NONE
+    TYPE(FIBRE), TARGET , INTENT(INOUT):: C
+    TYPE (CHART), POINTER :: CL
+    TYPE(MAGNET_FRAME), OPTIONAL :: FAKE,MAGNETFRAME
+    TYPE(INNER_FRAME), OPTIONAL :: E_IN
+    TYPE(MAGNET_FRAME), POINTER :: F
+    REAL(DP) ENT(3,3),EXI(3,3),HA,D(3),A(3)
+    INTEGER I
+    TYPE (CHART) C_FAKE
+    LOGICAL(LP) WITH_EXTERNAL_FRAME_TEMP,SEL
+
+    IF(.NOT.ASSOCIATED(C%CHART).AND.(.NOT.PRESENT(FAKE))) THEN
+       RETURN
+    ENDIF
+
+    WITH_EXTERNAL_FRAME_TEMP=WITH_EXTERNAL_FRAME
+    WITH_EXTERNAL_FRAME=.TRUE.
+
+    SEL=.FALSE.
+    IF(ASSOCIATED(C%CHART)) THEN
+       SEL=.FALSE.
+       IF(ASSOCIATED(C%CHART%F)) SEL=.TRUE.
+    ENDIF
 
 
-  SUBROUTINE COPY_LAYOUT(R2,R1) ! copy standard layout only
+    IF(SEL) THEN
+       CALL TRACK(C%CHART,C%MAG,C%DIR,MAGNETFRAME,E_IN)
+    ELSE
+       C_FAKE=1
+       C_FAKE%F=FAKE
+       CALL TRACK(C_FAKE,C%MAG,C%DIR,MAGNETFRAME,E_IN)
+       FAKE=C_FAKE%F
+
+       C_FAKE=-1
+    ENDIF
+
+    IF(ASSOCIATED(C%MAGP%P%F)) THEN
+       C%MAGP%P%F=C%MAG%P%F
+    ENDIF
+
+    WITH_EXTERNAL_FRAME=WITH_EXTERNAL_FRAME_TEMP
+
+    RETURN
+
+  END SUBROUTINE SURVEY_NO_PATCH
+
+
+
+
+  SUBROUTINE COPY_LAYOUT(R2,R1) ! COPY STANDARD LAYOUT ONLY
     IMPLICIT  NONE
-    TYPE(layout), INTENT(INOUT):: R1
-    TYPE(layout), INTENT(inOUT):: R2
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
-    logical(lp) :: doneitt=.true.
-    nullify(C)
+    TYPE(LAYOUT), INTENT(INOUT):: R1
+    TYPE(LAYOUT), INTENT(INOUT):: R2
+    TYPE (FIBRE), POINTER :: C
+    LOGICAL(LP) DONEIT
+    LOGICAL(LP) :: DONEITT=.TRUE.
+    NULLIFY(C)
 
-    CALL LINE_L(R1,doneit)
+    CALL LINE_L(R1,DONEIT)
 
 
-    IF(ASSOCIATED(R2%N)) CALL kill(R2)
+    IF(ASSOCIATED(R2%N)) CALL KILL(R2)
     CALL SET_UP(R2)
 
-    R2%CLOSED=.false.
+    R2%CLOSED=.FALSE.
     R2%NTHIN=R1%NTHIN
     R2%THIN=R1%THIN
 
@@ -640,150 +940,152 @@ CONTAINS
        CALL APPEND(R2,C)
        C=>C%NEXT
     ENDDO
-    R2%lastpos=R2%N
-    r2%LAST=>r2%end
+    R2%LASTPOS=R2%N
+    R2%LAST=>R2%END
 
     R2%CLOSED=R1%CLOSED
-    CALL RING_L(R2,doneitt)
-    CALL RING_L(R1,doneit)
+    CALL RING_L(R2,DONEITT)
+    CALL RING_L(R1,DONEIT)
 
   END SUBROUTINE COPY_LAYOUT
 
-  SUBROUTINE COPY_LAYOUT_ij(R1,i,j,R2)  ! copy pieces of a standard layout from fibre #i to #j
+  SUBROUTINE COPY_LAYOUT_IJ(R1,I,J,R2)  ! COPY PIECES OF A STANDARD LAYOUT FROM FIBRE #I TO #J
     IMPLICIT  NONE
-    TYPE(layout), INTENT(INOUT):: R1
-    TYPE(layout), INTENT(inOUT):: R2
-    integer, INTENT(in):: i,j
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
-    logical(lp) :: doneitt=.true.
-    integer k
-    nullify(C)
+    TYPE(LAYOUT), INTENT(INOUT):: R1
+    TYPE(LAYOUT), INTENT(INOUT):: R2
+    INTEGER, INTENT(IN):: I,J
+    TYPE (FIBRE), POINTER :: C
+    LOGICAL(LP) DONEIT
+    LOGICAL(LP) :: DONEITT=.TRUE.
+    INTEGER K
+    NULLIFY(C)
 
-    CALL LINE_L(R1,doneit)
+    CALL LINE_L(R1,DONEIT)
 
 
-    IF(ASSOCIATED(R2%N)) CALL kill(R2)
+    IF(ASSOCIATED(R2%N)) CALL KILL(R2)
     CALL SET_UP(R2)
 
-    R2%CLOSED=.false.
+    R2%CLOSED=.FALSE.
     R2%NTHIN=R1%NTHIN
     R2%THIN=R1%THIN
 
-    call move_to(r1,c,i)
-    k=i
-    DO WHILE(ASSOCIATED(C).and.k<=j)
+    CALL MOVE_TO(R1,C,I)
+    K=I
+    DO WHILE(ASSOCIATED(C).AND.K<=J)
        CALL APPEND(R2,C)
-       !    CALL APPEND(R2,C%mag)
-       !    CALL EQUAL(R2%end%CHART,C%CHART)
+       !    CALL APPEND(R2,C%MAG)
+       !    CALL EQUAL(R2%END%CHART,C%CHART)
        C=>C%NEXT
-       k=k+1
+       K=K+1
     ENDDO
-    R2%lastpos=R2%N
-    r2%LAST=>r2%end
+    R2%LASTPOS=R2%N
+    R2%LAST=>R2%END
 
     R2%CLOSED=R1%CLOSED
-    CALL RING_L(R2,doneitt)
-    CALL RING_L(R1,doneit)
+    CALL RING_L(R2,DONEITT)
+    CALL RING_L(R1,DONEIT)
 
-  END SUBROUTINE COPY_LAYOUT_ij
-
-
+  END SUBROUTINE COPY_LAYOUT_IJ
 
 
-  SUBROUTINE COPY_LAYOUT_I(R1,R2) ! Copies in the copy order rather than the Layout order
+
+
+  SUBROUTINE COPY_LAYOUT_I(R1,R2) ! COPIES IN THE COPY ORDER RATHER THAN THE LAYOUT ORDER
     IMPLICIT  NONE
-    TYPE(layout), INTENT(INOUT):: R1
-    TYPE(layout), INTENT(inOUT):: R2
+    TYPE(LAYOUT), INTENT(INOUT):: R1
+    TYPE(LAYOUT), INTENT(INOUT):: R2
 
     CALL EQUAL(R2,R1)
 
   END SUBROUTINE COPY_LAYOUT_I
 
-  SUBROUTINE KILL_para_L(R)  ! Resets all the parameters in a layout : remove polymorphic knobs
+  SUBROUTINE KILL_PARA_L(R)  ! RESETS ALL THE PARAMETERS IN A LAYOUT : REMOVE POLYMORPHIC KNOBS
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
+    TYPE(LAYOUT),INTENT(INOUT):: R
+    TYPE (FIBRE), POINTER :: C
+    LOGICAL(LP) DONEIT
 
-    nullify(C)
+    NULLIFY(C)
 
-    CALL LINE_L(R,doneit)
+    CALL LINE_L(R,DONEIT)
 
     C=>R%START
 
     DO WHILE(ASSOCIATED(C))
-       CALL reset31(C%MAGP)
+       CALL RESET31(C%MAGP)
        C=>C%NEXT
     ENDDO
-    CALL RING_L(R,doneit)
-  END       SUBROUTINE KILL_para_L
+    CALL RING_L(R,DONEIT)
+  END       SUBROUTINE KILL_PARA_L
 
-  SUBROUTINE  fibre_POL(S2,S1)    !  Set polymorph in a fibre unconditionally
-    implicit none
-    type (POL_BLOCK),INTENT(IN):: S1
-    TYPE(FIBRE),INTENT(inOUT):: S2
+  SUBROUTINE  FIBRE_POL(S2,S1)    !  SET POLYMORPH IN A FIBRE UNCONDITIONALLY
+    IMPLICIT NONE
+    TYPE (POL_BLOCK),INTENT(IN):: S1
+    TYPE(FIBRE),INTENT(INOUT):: S2
     S2%MAGP=S1
-  END SUBROUTINE  fibre_POL
+  END SUBROUTINE  FIBRE_POL
 
-  SUBROUTINE scan_for_polymorphs(R,B)   !  Set polymorph in a full layout only if the magnet is a primitive parent
+  SUBROUTINE SCAN_FOR_POLYMORPHS(R,B)   !  SET POLYMORPH IN A FULL LAYOUT ONLY IF THE MAGNET IS A PRIMITIVE PARENT
     IMPLICIT  NONE
-    TYPE(layout), INTENT(inOUT):: R
+    TYPE(LAYOUT), INTENT(INOUT):: R
     TYPE(POL_BLOCK), INTENT(IN):: B
 
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
+    TYPE (FIBRE), POINTER :: C
+    LOGICAL(LP) DONEIT
 
-    nullify(C)
-    CALL LINE_L(R,doneit)
+    NULLIFY(C)
+    CALL LINE_L(R,DONEIT)
     C=>R%START
 
     DO WHILE(ASSOCIATED(C))
        IF(.NOT.ASSOCIATED(C%PARENT_MAG)) THEN
-          C%MAGP=b
+          C%MAGP=B
        ENDIF
        C=>C%NEXT
     ENDDO
-    CALL RING_L(R,doneit)
+    CALL RING_L(R,DONEIT)
 
-  END SUBROUTINE scan_for_polymorphs
+  END SUBROUTINE SCAN_FOR_POLYMORPHS
 
-  SUBROUTINE EL_TO_ELP_L(R)  ! Copy all primitives ELEMENT into ELEMENTP
+  SUBROUTINE EL_TO_ELP_L(R)  ! COPY ALL PRIMITIVES ELEMENT INTO ELEMENTP
     IMPLICIT  NONE
-    TYPE(layout), INTENT(INOUT):: R
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
-    nullify(C)
-    CALL LINE_L(R,doneit)
+    TYPE(LAYOUT), INTENT(INOUT):: R
+    TYPE (FIBRE), POINTER :: C
+    LOGICAL(LP) DONEIT
+    NULLIFY(C)
+    CALL LINE_L(R,DONEIT)
 
     C=>R%START
-    do   WHILE(ASSOCIATED(C))
+    DO   WHILE(ASSOCIATED(C))
        IF(.NOT.ASSOCIATED(C%PARENT_MAG)) CALL COPY(C%MAG,C%MAGP)
        C=>C%NEXT
     ENDDO
 
-    CALL RING_L(R,doneit)
+    CALL RING_L(R,DONEIT)
 
   END SUBROUTINE EL_TO_ELP_L
 
-  SUBROUTINE ELP_TO_EL_L(R) ! Copy all primitives ELEMENTP into ELEMENT
+  SUBROUTINE ELP_TO_EL_L(R) ! COPY ALL PRIMITIVES ELEMENTP INTO ELEMENT
     IMPLICIT  NONE
-    TYPE(layout), INTENT(INOUT):: R
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
-    nullify(C)
+    TYPE(LAYOUT), INTENT(INOUT):: R
+    TYPE (FIBRE), POINTER :: C
+    LOGICAL(LP) DONEIT
+    NULLIFY(C)
 
-    CALL LINE_L(R,doneit)
+    CALL LINE_L(R,DONEIT)
     C=>R%START
-    do   WHILE(ASSOCIATED(C))
+    DO   WHILE(ASSOCIATED(C))
 
        IF(.NOT.ASSOCIATED(C%PARENT_MAG)) CALL COPY(C%MAGP,C%MAG)
 
        C=>C%NEXT
     ENDDO
 
-    CALL RING_L(R,doneit)
+    CALL RING_L(R,DONEIT)
   END SUBROUTINE ELP_TO_EL_L
+
+
 
 
 END  MODULE        S_FAMILY

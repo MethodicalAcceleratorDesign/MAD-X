@@ -1,6 +1,7 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+! See file A_SCRATCH_SIZE.F90
+
 MODULE S_DEF_ELEMENT
   USE fitted_MAG
   USE S_DEF_KIND
@@ -26,7 +27,6 @@ MODULE S_DEF_ELEMENT
   logical(lp), PRIVATE :: VERBOSE = .FALSE.
   logical(lp), PRIVATE :: GEN = .TRUE.
   logical(lp),TARGET :: ALWAYS_EXACTMIS=.TRUE.
-  logical(lp),TARGET :: ALWAYS_FRINGE=.FALSE.
   logical(lp),TARGET :: FEED_P0C=.FALSE.
   !  logical(lp) :: isomorphism_MIS=.TRUE.  !Not needed anymore always should be true
   private put_aperture_el,put_aperture_elp
@@ -38,103 +38,7 @@ MODULE S_DEF_ELEMENT
   END TYPE MUL_BLOCK
 
 
-  TYPE ELEMENT
-     INTEGER, POINTER :: KIND
-     ! common stuff to all element
-     type(MAGNET_CHART), pointer :: P
-     CHARACTER(nlp), POINTER ::  NAME    ! Identification
-     CHARACTER(vp), POINTER ::  VORNAME    ! Identification
-     !
-     logical(lp), POINTER ::  PERMFRINGE
-     !
-     ! Length is common although certain things like Markers should not have a length
-     ! Well let us say it is zero
-     real(dp), POINTER ::  L                               ! Length of integration often same as LD
-     !
-     real(dp),   DIMENSION(:), POINTER:: AN,BN         !Multipole component
-     real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
-     real(dp),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
-     real(dp),   POINTER:: thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
-     !
-     real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E       ! Cavity information
-     real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
-     logical(lp), POINTER :: THIN
-     !  misalignements and rotation
-     logical(lp), POINTER ::  MIS,EXACTMIS
-     real(dp),  DIMENSION(:), POINTER ::d,r                             !  Misalignements
-     !storage  space
-     !integer  twiss                                                            !
-     ! TYPES OF MAGNETS
-     TYPE(FITTED_MAGNET), POINTER :: BEND               ! Machida's magnet
-     TYPE(DRIFT1), POINTER :: D0               ! DRIFT
-     TYPE(DKD2), POINTER :: K2               ! INTEGRATOR
-     TYPE(KICKT3), POINTER :: K3               !  THIN KICK
-     TYPE(CAV4), POINTER :: C4               ! CAVITY
-     TYPE(SOL5), POINTER :: S5               ! CAVITY
-     TYPE(KTK), POINTER :: T6               ! INTEGRATOR   thick slow
-     TYPE(TKTF), POINTER :: T7               ! INTEGRATOR   thick fast
-     TYPE(NSMI), POINTER :: S8               ! NORMAL SMI
-     TYPE(SSMI), POINTER :: S9               ! SKEW SMI
-     TYPE(TEAPOT), POINTER :: TP10                ! sector teapot
-     TYPE(MON), POINTER :: MON14              ! MONITOR OR INSTRUMENT
-     TYPE(ESEPTUM), POINTER :: SEP15              ! MONITOR OR INSTRUMENT
-     TYPE(STREX), POINTER :: K16               ! EXACT STRAIGHT INTEGRATOR
-     TYPE(SOLT), POINTER :: S17               ! SOLENOID SIXTRACK STYLE
-     TYPE(RCOL), POINTER :: RCOL18             ! RCOLLIMATOR
-     TYPE(ECOL), POINTER :: ECOL19             ! ECOLLIMATOR
-     TYPE(USER1), POINTER :: U1                ! USER DEFINED
-     TYPE(USER2), POINTER :: U2                ! USER DEFINED
-  END TYPE  ELEMENT
-
-
-  TYPE ELEMENTP
-     INTEGER, POINTER :: KIND ! WHAT IT IS
-     logical(lp), POINTER :: KNOB ! FALSE IF NO KNOB
-     CHARACTER(nlp), POINTER ::  NAME    ! Identification
-     CHARACTER(vp), POINTER ::  VORNAME    ! Identification
-     logical(lp), POINTER ::  PERMFRINGE
-     !
-     !
-     !
-     TYPE(REAL_8), POINTER ::  L    ! LENGTH OF INTEGRATION OFTEN SAME AS LD, CAN BE ZERO
-     TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !MULTIPOLE COMPONENT
-     TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
-     TYPE(REAL_8),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
-     TYPE(REAL_8),   POINTER:: thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
-     !
-     TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS ! CAVITY INFORMATION
-     real(dp), POINTER :: DELTA_E     ! CAVITY ENERGY GAIN
-     !
-     TYPE(REAL_8), POINTER :: B_SOL
-     logical(lp), POINTER :: THIN
-
-     !  MISALIGNEMENTS AND ROTATION
-     logical(lp), POINTER ::  MIS,EXACTMIS
-     real(dp),  DIMENSION(:), POINTER :: D,R
-
-     TYPE(MAGNET_CHART), POINTER :: P
-
-     ! TYPES OF POLYMORPHIC MAGNETS
-     TYPE(FITTED_MAGNETP), POINTER :: BEND    ! MACHIDA'S FITTED MAGNET
-     TYPE(DRIFT1P), POINTER :: D0             ! DRIFT
-     TYPE(DKD2P), POINTER :: K2               ! INTEGRATOR
-     TYPE(KICKT3P), POINTER :: K3             ! THIN KICK
-     TYPE(CAV4P), POINTER :: C4               ! DRIFT
-     TYPE(SOL5P), POINTER :: S5               ! CAVITY
-     TYPE(KTKP), POINTER :: T6                ! INTEGRATOR
-     TYPE(TKTFP), POINTER :: T7               ! INTEGRATOR   THICK FAST
-     TYPE(NSMIP), POINTER :: S8               ! NORMAL SMI
-     TYPE(SSMIP), POINTER :: S9               ! SKEW SMI
-     TYPE(TEAPOTP), POINTER :: TP10           ! SECTOR BEND WITH CYLINDRICAL GEOMETRY
-     TYPE(MONP), POINTER :: MON14              ! MONITOR OR INSTRUMENT
-     TYPE(ESEPTUMP), POINTER :: SEP15              ! MONITOR OR INSTRUMENT
-     TYPE(STREXP), POINTER :: K16               ! EXACT STRAIGHT INTEGRATOR
-     TYPE(SOLTP), POINTER :: S17               ! SOLENOID SIXTRACK STYLE
-     TYPE(RCOLP), POINTER :: RCOL18             ! RCOLLIMATOR
-     TYPE(ECOLP), POINTER :: ECOL19             ! ECOLLIMATOR
-     TYPE(USER1P), POINTER :: U1                ! USER DEFINED
-     TYPE(USER2P), POINTER :: U2                ! USER DEFINED
-  END TYPE  ELEMENTP
+  ! Old home for element and elementp, now in sh_def_kind
 
 
 
@@ -267,13 +171,13 @@ CONTAINS
     real(dp),INTENT(IN):: S1
 
     !    S2%energy=-(S2%energy+s1)
-    VERBOSE = .FALSE.
+    !  VERBOSE = .FALSE.
     IF(FEED_P0C) THEN
        call find_energy(s2,P0C=S1+S2%P0C)
     ELSE
        call find_energy(s2,ENERGY=S1+S2%energy)
     ENDIF
-    VERBOSE = .TRUE.
+    !  VERBOSE = .TRUE.
   END SUBROUTINE work_r
 
 
@@ -347,7 +251,7 @@ CONTAINS
     type (WORK),INTENT(inOUT):: S1
     TYPE(ELEMENT),INTENT(IN):: S2
 
-    S1=0
+    S1=S1%rescale
     !    S1%P0C=-S2%P%P0C
     !  VERBOSE = .FALSE.
     call find_energy(s1,P0C=S2%P%P0C)
@@ -360,7 +264,7 @@ CONTAINS
     type (WORK),INTENT(inOUT):: S1
     TYPE(ELEMENTP),INTENT(IN):: S2
 
-    S1=0
+    S1=S1%rescale
     !    S1%P0C=-S2%P%P0C
     !  VERBOSE = .FALSE.
     call find_energy(s1,P0C=S2%P%P0C)
@@ -664,6 +568,36 @@ CONTAINS
                 ENDIF
              ENDIF
           ENDIF
+          IF(S2%KIND==KIND21) THEN    ! CAVITY
+             DONEIT=.FALSE.                     ! NOT USED HERE
+             IF(S1%IVOLT>0) THEN
+                s2%VOLT%I=S1%IVOLT+S1%NPARA
+                s2%VOLT%S=S1%SVOLT
+                s2%VOLT%KIND=3
+                DONEIT=.TRUE.
+                IF(S1%SET_TPSAFIT) THEN
+                   s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
+                ENDIF
+             ENDIF
+             IF(S1%IFREQ>0) THEN
+                s2%FREQ%I=S1%IFREQ+S1%NPARA
+                s2%FREQ%S=S1%SFREQ
+                s2%FREQ%KIND=3
+                IF(S1%SET_TPSAFIT) THEN
+                   s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+                ENDIF
+                DONEIT=.TRUE.
+             ENDIF
+             IF(S1%IPHAS>0) THEN
+                s2%PHAS%I=S1%IPHAS+S1%NPARA
+                s2%PHAS%S=S1%SPHAS
+                s2%PHAS%KIND=3
+                DONEIT=.TRUE.
+                IF(S1%SET_TPSAFIT) THEN
+                   s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+                ENDIF
+             ENDIF
+          ENDIF
           IF(S2%KIND==KIND5) THEN    ! SOLENOID
              DONEIT=.FALSE.
              IF(S1%IB_SOL>0) THEN
@@ -763,10 +697,6 @@ CONTAINS
        EL%K2%HGAP=>EL%HGAP
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
-       EL%K2%thin_h_foc=>EL%thin_h_foc
-       EL%K2%thin_v_foc=>EL%thin_v_foc
-       EL%K2%thin_h_angle=>EL%thin_h_angle
-       EL%K2%thin_v_angle=>EL%thin_v_angle
     CASE(KIND3)
        if(.not.ASSOCIATED(EL%K3))ALLOCATE(EL%K3)
        EL%K3%P=>EL%P
@@ -793,7 +723,25 @@ CONTAINS
        !       EL%C4%P0C=>EL%P0C
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
-       ALLOCATE(EL%C4%FRINGE);EL%C4%FRINGE=.FALSE.
+       ALLOCATE(EL%C4%N_BESSEL);EL%C4%N_BESSEL=0
+    CASE(KIND21)
+       if(.not.ASSOCIATED(EL%CAV21)) THEN
+          ALLOCATE(EL%CAV21)
+          el%CAV21=0
+       ELSE
+          el%CAV21=-1
+          el%CAV21=0
+       ENDIF
+       EL%CAV21%P=>EL%P
+       EL%CAV21%L=>EL%L
+       EL%CAV21%VOLT=>EL%VOLT
+       EL%CAV21%FREQ=>EL%FREQ
+       EL%CAV21%PHAS=>EL%PHAS
+       !       EL%C4%P0C=>EL%P0C
+       EL%CAV21%DELTA_E=>EL%DELTA_E
+       EL%CAV21%THIN=>EL%THIN
+       ALLOCATE(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
+       ALLOCATE(EL%CAV21%DPHAS);EL%CAV21%DPHAS=0
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -834,10 +782,6 @@ CONTAINS
        EL%T6%HGAP=>EL%HGAP
        EL%T6%H1=>EL%H1
        EL%T6%H2=>EL%H2
-       EL%T6%thin_h_foc=>EL%thin_h_foc
-       EL%T6%thin_v_foc=>EL%thin_v_foc
-       EL%T6%thin_h_angle=>EL%thin_h_angle
-       EL%T6%thin_v_angle=>EL%thin_v_angle
        nullify(EL%T6%MATX);ALLOCATE(EL%T6%MATX(2,3));
        nullify(EL%T6%MATY);ALLOCATE(EL%T6%MATY(2,3));
        nullify(EL%T6%LX);ALLOCATE(EL%T6%LX(6));
@@ -874,10 +818,6 @@ CONTAINS
        EL%T7%HGAP=>EL%HGAP
        EL%T7%H1=>EL%H1
        EL%T7%H2=>EL%H2
-       EL%T7%thin_h_foc=>EL%thin_h_foc
-       EL%T7%thin_v_foc=>EL%thin_v_foc
-       EL%T7%thin_h_angle=>EL%thin_h_angle
-       EL%T7%thin_v_angle=>EL%thin_v_angle
        nullify(EL%T7%MATX);ALLOCATE(EL%T7%MATX(2,3));
        nullify(EL%T7%MATY);ALLOCATE(EL%T7%MATY(2,3));
        nullify(EL%T7%LX);ALLOCATE(EL%T7%LX(3));
@@ -927,7 +867,7 @@ CONTAINS
        ENDIF
        EL%TP10%P=>EL%P
        EL%TP10%L=>EL%L
-       IF(EL%P%NMUL==0.OR.EL%P%NMUL/=SECTOR_B%NMUL)       THEN
+       IF(EL%P%NMUL==0.OR.EL%P%NMUL>SECTOR_NMUL_MAX)       THEN
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,A72,/,1X,A72))'
@@ -941,12 +881,8 @@ CONTAINS
        EL%TP10%HGAP=>EL%HGAP
        EL%TP10%H1=>EL%H1
        EL%TP10%H2=>EL%H2
-       EL%TP10%thin_h_foc=>EL%thin_h_foc
-       EL%TP10%thin_v_foc=>EL%thin_v_foc
-       EL%TP10%thin_h_angle=>EL%thin_h_angle
-       EL%TP10%thin_v_angle=>EL%thin_v_angle
-       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(SECTOR_B%N_MONO))
-       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(SECTOR_B%N_MONO))
+       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
+       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        call GETANBN(EL%TP10)
     CASE(KIND11:KIND14)
@@ -967,7 +903,7 @@ CONTAINS
        EL%SEP15%L=>EL%L
        EL%SEP15%VOLT=>EL%VOLT
        EL%SEP15%PHAS=>EL%PHAS
-    CASE(KIND16)
+    CASE(KIND16,KIND20)
        if(.not.ASSOCIATED(EL%K16)) THEN
           ALLOCATE(EL%K16)
           el%K16=0
@@ -984,10 +920,6 @@ CONTAINS
        EL%K16%HGAP=>EL%HGAP
        EL%K16%H1=>EL%H1
        EL%K16%H2=>EL%H2
-       EL%K16%thin_h_foc=>EL%thin_h_foc
-       EL%K16%thin_v_foc=>EL%thin_v_foc
-       EL%K16%thin_h_angle=>EL%thin_h_angle
-       EL%K16%thin_v_angle=>EL%thin_v_angle
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
     CASE(KIND17)
@@ -1112,10 +1044,6 @@ CONTAINS
        EL%K2%HGAP=>EL%HGAP
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
-       EL%K2%thin_h_foc=>EL%thin_h_foc
-       EL%K2%thin_v_foc=>EL%thin_v_foc
-       EL%K2%thin_h_angle=>EL%thin_h_angle
-       EL%K2%thin_v_angle=>EL%thin_v_angle
     CASE(KIND3)
        if(.not.ASSOCIATED(EL%K3))ALLOCATE(EL%K3)
        EL%K3%P=>EL%P
@@ -1142,7 +1070,25 @@ CONTAINS
        !       EL%C4%P0C=>EL%P0C
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
-       ALLOCATE(EL%C4%FRINGE);EL%C4%FRINGE=.FALSE.
+       ALLOCATE(EL%C4%N_BESSEL);EL%C4%N_BESSEL=0
+    CASE(KIND21)
+       if(.not.ASSOCIATED(EL%CAV21)) THEN
+          ALLOCATE(EL%CAV21)
+          el%CAV21=0
+       ELSE
+          el%CAV21=-1
+          el%CAV21=0
+       ENDIF
+       EL%CAV21%P=>EL%P
+       EL%CAV21%L=>EL%L
+       EL%CAV21%VOLT=>EL%VOLT
+       EL%CAV21%FREQ=>EL%FREQ
+       EL%CAV21%PHAS=>EL%PHAS
+       !       EL%C4%P0C=>EL%P0C
+       EL%CAV21%DELTA_E=>EL%DELTA_E
+       EL%CAV21%THIN=>EL%THIN
+       ALLOCATE(EL%CAV21%PSI);CALL ALLOC(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
+       ALLOCATE(EL%CAV21%DPHAS);CALL ALLOC(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -1183,10 +1129,6 @@ CONTAINS
        EL%T6%HGAP=>EL%HGAP
        EL%T6%H1=>EL%H1
        EL%T6%H2=>EL%H2
-       EL%T6%thin_h_foc=>EL%thin_h_foc
-       EL%T6%thin_v_foc=>EL%thin_v_foc
-       EL%T6%thin_h_angle=>EL%thin_h_angle
-       EL%T6%thin_v_angle=>EL%thin_v_angle
        nullify(EL%T6%MATX);ALLOCATE(EL%T6%MATX(2,3));
        nullify(EL%T6%MATY);ALLOCATE(EL%T6%MATY(2,3));
        nullify(EL%T6%LX);ALLOCATE(EL%T6%LX(6));
@@ -1223,10 +1165,6 @@ CONTAINS
        EL%T7%HGAP=>EL%HGAP
        EL%T7%H1=>EL%H1
        EL%T7%H2=>EL%H2
-       EL%T7%thin_h_foc=>EL%thin_h_foc
-       EL%T7%thin_v_foc=>EL%thin_v_foc
-       EL%T7%thin_h_angle=>EL%thin_h_angle
-       EL%T7%thin_v_angle=>EL%thin_v_angle
        nullify(EL%T7%MATX);  ALLOCATE(EL%T7%MATX(2,3));
        nullify(EL%T7%MATY);  ALLOCATE(EL%T7%MATY(2,3));
        nullify(EL%T7%LX);    ALLOCATE(EL%T7%LX(3));
@@ -1277,7 +1215,7 @@ CONTAINS
        ENDIF
        EL%TP10%P=>EL%P
        EL%TP10%L=>EL%L
-       IF(EL%P%NMUL==0.OR.EL%P%NMUL/=SECTOR_B%NMUL)       THEN
+       IF(EL%P%NMUL==0.OR.EL%P%NMUL>SECTOR_NMUL_MAX)       THEN
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,A72,/,1X,A72))'
@@ -1291,12 +1229,8 @@ CONTAINS
        EL%TP10%HGAP=>EL%HGAP
        EL%TP10%H1=>EL%H1
        EL%TP10%H2=>EL%H2
-       EL%TP10%thin_h_foc=>EL%thin_h_foc
-       EL%TP10%thin_v_foc=>EL%thin_v_foc
-       EL%TP10%thin_h_angle=>EL%thin_h_angle
-       EL%TP10%thin_v_angle=>EL%thin_v_angle
-       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(SECTOR_B%N_MONO))
-       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(SECTOR_B%N_MONO))
+       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
+       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        CALL ALLOC(EL%TP10)
        call GETANBN(EL%TP10)
@@ -1318,7 +1252,7 @@ CONTAINS
        EL%SEP15%L=>EL%L
        EL%SEP15%VOLT=>EL%VOLT
        EL%SEP15%PHAS=>EL%PHAS
-    CASE(KIND16)
+    CASE(KIND16,KIND20)
        if(.not.ASSOCIATED(EL%K16)) THEN
           ALLOCATE(EL%K16)
           el%K16=0
@@ -1335,10 +1269,6 @@ CONTAINS
        EL%K16%HGAP=>EL%HGAP
        EL%K16%H1=>EL%H1
        EL%K16%H2=>EL%H2
-       EL%K16%thin_h_foc=>EL%thin_h_foc
-       EL%K16%thin_v_foc=>EL%thin_v_foc
-       EL%K16%thin_h_angle=>EL%thin_h_angle
-       EL%K16%thin_v_angle=>EL%thin_v_angle
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
     CASE(KIND17)
@@ -1570,10 +1500,6 @@ CONTAINS
        case(kind3)
           EL%K3%AN=>EL%AN
           EL%K3%BN=>EL%BN
-          EL%K3%thin_h_foc=>EL%thin_h_foc
-          EL%K3%thin_v_foc=>EL%thin_v_foc
-          EL%K3%thin_h_angle=>EL%thin_h_angle
-          EL%K3%thin_v_angle=>EL%thin_v_angle
        case(kind5)
           EL%S5%AN=>EL%AN
           EL%S5%BN=>EL%BN
@@ -1596,7 +1522,7 @@ CONTAINS
        EL%TP10%AN=>EL%AN
        EL%TP10%BN=>EL%BN
        call GETANBN(EL%TP10)
-    CASE(KIND16)
+    CASE(KIND16,KIND20)
        EL%K16%AN=>EL%AN
        EL%K16%BN=>EL%BN
     CASE(KINDuser1)
@@ -1684,10 +1610,6 @@ CONTAINS
        case(kind3)
           EL%K3%AN=>EL%AN
           EL%K3%BN=>EL%BN
-          EL%K3%thin_h_foc=>EL%thin_h_foc
-          EL%K3%thin_v_foc=>EL%thin_v_foc
-          EL%K3%thin_h_angle=>EL%thin_h_angle
-          EL%K3%thin_v_angle=>EL%thin_v_angle
        case(kind5)
           EL%S5%AN=>EL%AN
           EL%S5%BN=>EL%BN
@@ -1710,7 +1632,7 @@ CONTAINS
        EL%TP10%AN=>EL%AN
        EL%TP10%BN=>EL%BN
        call GETANBN(EL%TP10)
-    CASE(KIND16)
+    CASE(KIND16,KIND20)
        EL%K16%AN=>EL%AN
        EL%K16%BN=>EL%BN
     CASE(KINDuser1)
@@ -1797,6 +1719,7 @@ CONTAINS
     nullify(EL%K16);
     nullify(EL%K3);
     nullify(EL%C4);
+    nullify(EL%CAV21);
     nullify(EL%S5);
     nullify(EL%T6);
     nullify(EL%S17);
@@ -1839,6 +1762,7 @@ CONTAINS
     nullify(EL%K16);
     nullify(EL%K3);
     nullify(EL%C4);
+    nullify(EL%CAV21);
     nullify(EL%S5);
     nullify(EL%T6);
     nullify(EL%S17);
@@ -1915,6 +1839,10 @@ CONTAINS
           EL%C4=-1
           DEALLOCATE(EL%C4)   ! MONITOR
        ENDIF
+       IF(ASSOCIATED(EL%CAV21)) THEN
+          EL%CAV21=-1
+          DEALLOCATE(EL%CAV21)   ! MONITOR
+       ENDIF
        IF(ASSOCIATED(EL%TP10)) then
           EL%TP10=-1
           DEALLOCATE(EL%TP10)   ! SECTOR TEAPOT
@@ -1965,7 +1893,7 @@ CONTAINS
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
 
-       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=ALWAYS_FRINGE;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
+       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);ALLOCATE(EL%EXACTMIS);EL%MIS=.FALSE.;EL%EXACTMIS=ALWAYS_EXACTMIS;
        EL=DEFAULT;
@@ -2020,6 +1948,20 @@ CONTAINS
           IF(ASSOCIATED(EL%DELTA_E)) DEALLOCATE(EL%DELTA_E)
           IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
        ENDIF
+
+       IF(ASSOCIATED(EL%CAV21)) THEN
+          EL%CAV21=-1
+          DEALLOCATE(EL%CAV21)       ! CAVITY
+          CALL KILL(EL%VOLT)
+          CALL KILL(EL%FREQ)
+          CALL KILL(EL%PHAS)
+          IF(ASSOCIATED(EL%VOLT)) DEALLOCATE(EL%VOLT)
+          IF(ASSOCIATED(EL%FREQ)) DEALLOCATE(EL%FREQ)
+          IF(ASSOCIATED(EL%PHAS)) DEALLOCATE(EL%PHAS)
+          IF(ASSOCIATED(EL%DELTA_E)) DEALLOCATE(EL%DELTA_E)
+          IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
+       ENDIF
+
        IF(ASSOCIATED(EL%S5)) THEN
           DEALLOCATE(EL%S5)       ! solenoid
           !          CALL KILL(EL%B_SOL)    ! sagan
@@ -2121,8 +2063,7 @@ CONTAINS
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
-       ALLOCATE(EL%PERMFRINGE);
-       EL%PERMFRINGE=ALWAYS_FRINGE;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
+       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);CALL ALLOC(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);ALLOCATE(EL%EXACTMIS);EL%MIS=.FALSE.;EL%EXACTMIS=ALWAYS_EXACTMIS;
        EL=DEFAULT;
@@ -2226,13 +2167,12 @@ CONTAINS
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
     IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
-    IF(EL%KIND==KIND16) THEN
+    IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
     ENDIF
     IF(EL%KIND==KIND3) CALL SETFAMILY(ELP)
-
 
 
     IF(EL%KIND==KIND4) THEN         !
@@ -2249,7 +2189,25 @@ CONTAINS
        ELP%DELTA_E = EL%DELTA_E               ! DELTA_E IS real(dp)
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
-       ELP%C4%FRINGE = EL%C4%FRINGE
+       ELP%C4%N_BESSEL = EL%C4%N_BESSEL
+    ENDIF
+
+    IF(EL%KIND==KIND21) THEN         !
+       if(.not.ASSOCIATED(ELP%CAV21)) ALLOCATE(ELP%CAV21)
+       ELP%CAV21=0
+       if(.not.ASSOCIATED(ELP%VOLT)) ALLOCATE(ELP%VOLT,ELP%FREQ,ELP%PHAS,ELP%DELTA_E       )
+       if(.not.ASSOCIATED(ELP%THIN)) ALLOCATE(ELP%THIN       )
+       CALL ALLOC( ELP%VOLT)
+       CALL ALLOC( ELP%FREQ)
+       CALL ALLOC( ELP%PHAS)
+       ELP%VOLT = EL%VOLT
+       ELP%FREQ = EL%FREQ
+       ELP%PHAS = EL%PHAS
+       ELP%DELTA_E = EL%DELTA_E               ! DELTA_E IS real(dp)
+       ELP%THIN = EL%THIN
+       CALL SETFAMILY(ELP)
+       ELP%CAV21%PSI = EL%CAV21%PSI
+       ELP%CAV21%DPHAS = EL%CAV21%DPHAS
     ENDIF
 
 
@@ -2405,7 +2363,7 @@ CONTAINS
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
 
     IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
-    IF(EL%KIND==KIND16) THEN
+    IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
@@ -2424,7 +2382,22 @@ CONTAINS
        ELP%DELTA_E = EL%DELTA_E
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
-       ELP%C4%FRINGE = EL%C4%FRINGE
+       ELP%C4%N_BESSEL = EL%C4%N_BESSEL
+    ENDIF
+
+    IF(EL%KIND==KIND21) THEN         !
+       if(.not.ASSOCIATED(ELP%CAV21)) ALLOCATE(ELP%CAV21)
+       ELP%CAV21=0
+       if(.not.ASSOCIATED(ELP%VOLT)) ALLOCATE(ELP%VOLT,ELP%FREQ,ELP%PHAS,ELP%DELTA_E       )
+       if(.not.ASSOCIATED(ELP%THIN)) ALLOCATE(ELP%THIN       )
+       ELP%VOLT = EL%VOLT
+       ELP%FREQ = EL%FREQ
+       ELP%PHAS = EL%PHAS
+       ELP%DELTA_E = EL%DELTA_E
+       ELP%THIN = EL%THIN
+       CALL SETFAMILY(ELP)
+       ELP%CAV21%PSI = EL%CAV21%PSI
+       ELP%CAV21%DPHAS = EL%CAV21%DPHAS
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -2576,7 +2549,7 @@ CONTAINS
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
 
     IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
-    IF(EL%KIND==KIND16) THEN
+    IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
@@ -2595,7 +2568,22 @@ CONTAINS
        ELP%DELTA_E = EL%DELTA_E
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
-       ELP%C4%FRINGE = EL%C4%FRINGE
+       ELP%C4%N_BESSEL = EL%C4%N_BESSEL
+    ENDIF
+
+    IF(EL%KIND==KIND21) THEN         !
+       if(.not.ASSOCIATED(ELP%CAV21)) ALLOCATE(ELP%CAV21)
+       ELP%CAV21=0
+       if(.not.ASSOCIATED(ELP%VOLT)) ALLOCATE(ELP%VOLT,ELP%FREQ,ELP%PHAS,ELP%DELTA_E       )
+       if(.not.ASSOCIATED(ELP%THIN)) ALLOCATE(ELP%THIN       )
+       ELP%VOLT = EL%VOLT
+       ELP%FREQ = EL%FREQ
+       ELP%PHAS = EL%PHAS
+       ELP%DELTA_E = EL%DELTA_E
+       ELP%THIN = EL%THIN
+       CALL SETFAMILY(ELP)
+       ELP%CAV21%PSI = EL%CAV21%PSI
+       ELP%CAV21%DPHAS = EL%CAV21%DPHAS
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -2717,6 +2705,14 @@ CONTAINS
        CALL resetpoly_R31(ELP%FREQ )
        CALL resetpoly_R31(ELP%PHAS )
        !      CALL resetpoly_R31(ELP%P0C )
+    ENDIF
+
+    IF(ELP%KIND==KIND21) THEN
+       CALL resetpoly_R31(ELP%VOLT)
+       CALL resetpoly_R31(ELP%FREQ )
+       CALL resetpoly_R31(ELP%PHAS )
+       CALL resetpoly_R31(ELP%CAV21%PSI )
+       CALL resetpoly_R31(ELP%CAV21%DPHAS )
     ENDIF
 
     IF(ELP%KIND==KIND15) THEN          ! NEW 2002.11.16

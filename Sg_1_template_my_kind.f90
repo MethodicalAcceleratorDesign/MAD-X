@@ -1,8 +1,9 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+! See file A_SCRATCH_SIZE.F90
+
 module USER_kind1
-  use S_status
+  use S_def_all_kinds
   private INTR,INTP,INTS,ZEROr_user1,ZEROp_user1
   private ALLOC_user1,KILL_user1,POINTERS_user1R,POINTERS_user1P
   private copy_el_elp ,copy_elp_el ,copy_el_el
@@ -13,24 +14,6 @@ module USER_kind1
   !   dr8_b = USER_1("dr8_b",c_4d_1)
   !   dr8_b%U1%internal=c_1_5e0
   !
-
-  TYPE USER1
-     TYPE(MAGNET_CHART), POINTER :: P
-     real(dp), POINTER ::L      !  MUST ALWAYS BE THERE
-     real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component (OPTIONAL)
-     !   ADD INTERNAL STUFF HERE AS POINTERS
-     !           .........
-     real(dp), POINTER ::INTERNAL           ! INTERNAL IS AN EXAMPLE
-  END  TYPE USER1
-
-  TYPE USER1P
-     TYPE(MAGNET_CHART), POINTER :: P
-     TYPE(REAL_8), POINTER ::L                             !  MUST ALWAYS BE THERE
-     TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component (OPTIONAL but always defined)
-     !   ADD INTERNAL STUFF HERE AS POINTERS
-     TYPE(REAL_8), POINTER ::INTERNAL        ! INTERNAL is an example of a variable specific to user1p
-  END  TYPE USER1P
-
   INTERFACE TRACK
      MODULE PROCEDURE INTR
      MODULE PROCEDURE INTP
@@ -78,11 +61,12 @@ module USER_kind1
 
 contains
 
-  SUBROUTINE INTR(EL,X)
+  SUBROUTINE INTR(EL,X,MID)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     INTEGER IPAUSE,MYPAUSE
     TYPE(USER1),INTENT(IN):: EL
+    TYPE(WORM),OPTIONAL,INTENT(INOUT):: mid
 
     WRITE(6,*) "USER1 NOT DEFINED "
     IPAUSE=MYPAUSE(111)
@@ -95,22 +79,24 @@ contains
 
 
 
-  SUBROUTINE INTP(EL,X)
+  SUBROUTINE INTP(EL,X,MID)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     INTEGER IPAUSE,MYPAUSE
     TYPE(USER1P),INTENT(IN):: EL
+    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
 
     WRITE(6,*) "USER1P NOT DEFINED "
     IPAUSE=MYPAUSE(112)
 
   END SUBROUTINE INTP
 
-  SUBROUTINE INTS(EL,X)
+  SUBROUTINE INTS(EL,X,MID)
     IMPLICIT NONE
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     INTEGER IPAUSE,MYPAUSE
     TYPE(USER1P),INTENT(IN):: EL
+    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
 
     WRITE(6,*) "USER1P NOT DEFINED "
     IPAUSE=MYPAUSE(113)
