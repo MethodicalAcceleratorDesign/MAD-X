@@ -209,7 +209,7 @@
 !   sig_v      (real)   sigx, sigy, sigt, sige
 !----------------------------------------------------------------------*
       include 'emit.fi'
-      integer j,j1,j2,k,k1,k2,nline,iqpr2
+      integer j,j1,j2,k,k1,k2,iqpr2
       double precision arad,gammas,clg,etpr,expr,eypr,f0,sal,en0
       double precision amass, clight, hbar, freq0, u0, betas
       double precision ten3p,tenp6,tenp9,three,twopi,one,two,zero,four
@@ -434,7 +434,7 @@
       double precision  vals(2,0:maxmul), field(2,0:maxmul)
       double precision  f_errors(0:50)
       double precision  o1(6), e1(6,6), o2(6), e2(6,6)
-      double precision  an2, x1, y1, t1, x2, y2, t2, px1, py1, pt1
+      double precision  x1, y1, t1, x2, y2, t2, px1, py1, pt1
       double precision  px2, py2, pt2
       equivalence       (x1, o1(1)), (px1, o1(2))
       equivalence       (y1, o1(3)), (py1, o1(4))
@@ -446,7 +446,7 @@
       double precision  edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
       double precision  corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
       double precision  tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
-      double precision  h2, hcb2, hcbbs2, tedg2, fact2, fact2x, rfac2
+      double precision  h2, hcb2, tedg2, fact2, fact2x, rfac2
       double precision  rfac2x, rfac2y, bi2gi2, betas, gammas
       double precision  get_value, e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
       double precision  f1, f2, f1s, f2s, twon, str, st, pi, clight

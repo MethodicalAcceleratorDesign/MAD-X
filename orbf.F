@@ -2459,7 +2459,6 @@ c
       implicit   none
       integer    n
       double precision   inv(n), ws(n)
-      double precision   maxv, minv
       integer  i,j,jmax
       integer  outv(n)
       do  i = 1,n

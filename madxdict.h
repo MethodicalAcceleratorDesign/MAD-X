@@ -286,6 +286,8 @@ char command_def[] =
 "split    = [l, false, true], "
 "radius   = [r, 1]; "
 " "
+"ptc: ptc none 0 0; "
+" "
 "correct: correct correct 0 0 "
 "error    = [r, 1.e-5], "
 "ncorr    = [i, 0], "

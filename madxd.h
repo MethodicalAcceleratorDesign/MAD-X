@@ -52,6 +52,7 @@
 #define vector_to_table       vector_to_table_
 #define vdot                  vdot_
 #define vmod                  vmod_
+#define ttwm                  ttwm_
 #endif
 
 /* short utility routines */
@@ -584,6 +585,7 @@ void track_start(struct command*);
 void track_tables_create(struct in_cmd*);
 void track_tables_dump();
 void track_track(struct in_cmd*);
+void ttwm();
 int twiss_input(struct command*);
 void update_beam();
 void update_element(struct element*, struct command*);

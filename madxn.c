@@ -1845,7 +1845,8 @@ void exec_command()
          current_error = p->clone;
          pro_error(p);
         }
-        else if (strcmp(p->cmd_def->module, "sxf") == 0)
+	else if (strcmp(p->cmd_def->module, "ptc") == 0) ttwm_();
+	else if (strcmp(p->cmd_def->module, "sxf") == 0)
         {
            pro_sxf(p);
         }
@@ -1863,7 +1864,6 @@ void exec_command()
          current_twiss = p->clone;
          pro_twiss();
         }
-        /* else if (strcmp(p->cmd_def->module, "ptc") == 0) ttwm_(); */
       }
     }
 }

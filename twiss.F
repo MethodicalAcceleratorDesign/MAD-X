@@ -503,9 +503,9 @@
       character * 2 ptxt(2)
       character*(name_len) c_name(2), p_name
       integer eflag,j,code,restart_sequ,advance_node,node_al_errors,    &
-     &n_align,kobs,nobs,node,save,pnode,thr_on,get_option,ccode,pcode,  &
-     &get_vector,i,err,old,kpro,corr_pick(2),enable,coc_cnt(2),lastnb,  &
-     &rep_cnt(2),max_rep,poc_cnt
+     &n_align,kobs,nobs,node,save,thr_on,ccode,pcode,get_vector,err,old,&
+     &kpro,corr_pick(2),enable,coc_cnt(2),lastnb,rep_cnt(2),max_rep,    &
+     &poc_cnt
       double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6),el,ek(6),   &
      &re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
      &get_value,parvec(26),orb_limit,zero,vector(10),reforb(6),         &
@@ -711,7 +711,7 @@
       integer i,j,npick,advance_node,ccode
       integer both,code,icorr,itp,lc,lc1,lc2,retreat_node,ncorr
       double precision thrvec(3),dorb(6),cmatr(6,6),pmatr(6,6)
-      double precision cick,d,tol1min,node_value,atemp(6,6)
+      double precision cick,tol1min,node_value,atemp(6,6)
       parameter (tol1min = 1.d-2,ccode=15)
 
 !--- keep position of current pickup
@@ -1852,7 +1852,7 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
-      integer i,j,code
+      integer code
       logical fsec, ftrk, fmap, bend
       double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
       double precision theta, zero, st, ct, tmp
@@ -2031,8 +2031,8 @@
       double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
      &te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
      &el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
-     &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,sk0, &
-     &sk0s,bv0,bvk,el0,orbit0(6),zero,one,two,three
+     &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bv0, &
+     &bvk,el0,orbit0(6),zero,one,two,three
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -3122,7 +3122,7 @@
       include 'track.fi'
       logical fsec,ftrk,fmap
       integer i1,i2,i3
-      double precision el,orbit(6),ek(6),re(6,6),te(6,6,6),node_value,  &
+      double precision orbit(6),el,ek(6),re(6,6),te(6,6,6),node_value,  &
      &test,zero
       parameter(zero=0d0)
 
