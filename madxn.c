@@ -2600,6 +2600,8 @@ void exec_show(struct in_cmd* cmd)
         else if ((pos = name_list_pos(toks[i], defined_commands->list)) > -1)
           {
 	   if (strcmp(toks[i], "option") == 0) dump_command(options);
+	   else if (strcmp(toks[i], "eoption") == 0 && current_eopt != NULL)
+	     dump_command(current_eopt);
 	   else dump_command(defined_commands->commands[pos]);
           }
         else if ((pos = name_list_pos(toks[i], beta0_list->list)) > -1)
