@@ -99,7 +99,7 @@
       subroutine fcnsa(n,x,f)
       implicit none
       integer iflag,nf,n
-      double precision f,x(n),fvec(nf),vmod
+      double precision f,x(n),fvec(1000),vmod
       common/forsa/nf
       iflag=0
       call mtfcn(nf,n,x,fvec,iflag)
@@ -715,7 +715,7 @@
 !                                                      0 <= KL <= 30081
       real s,t
       real U(97), C, CD, CM
-      integer IJ,KL,i,j,k,l,ii,jj,ll,m,lines
+      integer IJ,KL,i,j,k,l,ii,jj,m
       integer I97, J97
       common /raset1/ U, C, CD, CM, I97, J97
       if( IJ .lt. 0  .or.  IJ .gt. 31328  .or.                          &
