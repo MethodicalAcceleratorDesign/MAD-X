@@ -3065,8 +3065,11 @@
       do j = 1, nivvar
         call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j),       &
      &  sdum(1))
-        if (slabl(j)(1:1) .eq. 'r')  then
-          sname(j) = slabl(j)(2:)
+        if (slabl(j) .eq. 'rbetx')  then
+          sname(j) = 'betx'
+          proc_flag(1,j) = 1
+        else if (slabl(j) .eq. 'rbety')  then
+          sname(j) = 'bety'
           proc_flag(1,j) = 1
         else
           sname(j) = slabl(j)
