@@ -1803,6 +1803,17 @@ void grow_sequence_list(struct sequence_list* l)
   myfree(rout_name, sloc);
 }
 
+void double_table(char* table)
+{
+  int pos;
+  struct table* t;
+
+  mycpy(c_dummy, table);
+  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else return;
+  grow_table(t);
+}
 void grow_table(struct table* t) /* doubles number of rows */
 {
   char rout_name[] = "grow_table";
@@ -1812,6 +1823,7 @@ void grow_table(struct table* t) /* doubles number of rows */
   double* d_loc;
   struct node** p_loc = t->p_nodes;
   struct char_p_array** pa_loc = t->l_head;
+
   t->max = new;
   t->p_nodes = (struct node**) mycalloc(rout_name,new, sizeof(struct node*));
   t->l_head

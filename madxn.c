@@ -862,6 +862,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
   else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
+  else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
   else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
   else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
   else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
@@ -1238,7 +1239,6 @@ void double_to_table(char* table, char* name, double* val)
 {
   int pos;
   struct table* t;
-
   mycpy(c_dummy, table);
   if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
     t = table_register->tables[pos];
@@ -2340,7 +2340,7 @@ void exec_plot(struct in_cmd* cmd)
 	  sprintf(track_file_name,"track.obs%04d.p%04d", 1, part_idx[j]);
 	  fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
 	  if (nolegend)
-	    fprintf(gpu,"notitle with points %d ",part_idx[j],part_idx[j]); 
+	    fprintf(gpu,"notitle with points %d ",part_idx[j]); 
 	  else
 	    fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
 	  if (j < curr - 1)
@@ -2600,6 +2600,89 @@ void exec_show(struct in_cmd* cmd)
        }
     }
 
+}
+
+void exec_sodd(struct in_cmd* cmd)
+{
+  struct name_list* nl_sodd;
+  int ierr,pos,nosixtrack;
+
+  /* use correct beam for sequence to be plotted - HG 031127 */
+  struct command* keep_beam = current_beam;
+
+
+  if (attach_beam(current_sequ) == 0)
+     fatal_error("TWISS - sequence without beam:", current_sequ->name);
+  /* end part1 of HG 031127 */
+
+ /* <JMJ 7/11/2002> The following ifndef exclusion is a quick fix so that
+     the WIN32 version
+     does not try to do X11 graphics. However this has the consequence that
+       the program will not make Postscript files.  HG needs to separate these things.
+  </JMJ 7/11/2002> */
+  /*FS 27.03.2004 works now on Windows using gxx11ps.F and gxx11psc.c courtesy HG */
+
+      /* get nosixtrack */
+
+  if (this_cmd != NULL && this_cmd->clone != NULL)
+    {
+      nl_sodd = this_cmd->clone->par_names;
+    }
+
+  pos = name_list_pos("nosixtrack", nl_sodd);
+  nosixtrack = nl_sodd->inform[pos];
+  if(nosixtrack == 0) 
+    {
+      printf("Build-up of input file fc.34 by call to program sixtrack. \n");
+      conv_sixtrack(cmd);
+      fclose(f34);
+      printf("input file fc.34 is ready. \n");
+    }
+  sodd_table_70 = make_table("detune_1_end", "sodd_detune_5", sodd_detune_5_cols,
+           sodd_detune_5_types, 2);
+  sodd_table_70->dynamic = 1;
+  add_to_table_list(sodd_table_70, table_register);
+  sodd_table_71 = make_table("detune_1_all", "sodd_detune_5", sodd_detune_5_cols,
+           sodd_detune_5_types, 2);
+  sodd_table_71->dynamic = 1;
+  add_to_table_list(sodd_table_71, table_register);
+  sodd_table_72 = make_table("detune_2_end", "sodd_detune_5", sodd_detune_5_cols,
+           sodd_detune_5_types, 2);
+  sodd_table_72->dynamic = 1;
+  add_to_table_list(sodd_table_72, table_register);
+  sodd_table_73 = make_table("detune_2_all", "sodd_detune_5", sodd_detune_5_cols,
+           sodd_detune_5_types, 2);
+  sodd_table_73->dynamic = 1;
+  add_to_table_list(sodd_table_73, table_register);
+  sodd_table_74 = make_table("distort_1_F_end", "sodd_distort1_8", sodd_distort1_8_cols,
+           sodd_distort1_8_types, 2);
+  sodd_table_74->dynamic = 1;
+  add_to_table_list(sodd_table_74, table_register);
+  sodd_table_75 = make_table("distort_1_H_end", "sodd_distort1_8", sodd_distort1_8_cols,
+           sodd_distort1_8_types, 2);
+  sodd_table_75->dynamic = 1;
+  add_to_table_list(sodd_table_75, table_register);
+  sodd_table_76 = make_table("distort_1_F_all", "sodd_distort1_11", sodd_distort1_11_cols,
+           sodd_distort1_11_types, 2);
+  sodd_table_76->dynamic = 1;
+  add_to_table_list(sodd_table_76, table_register);
+  sodd_table_77 = make_table("distort_1_H_all", "sodd_distort1_11", sodd_distort1_11_cols,
+           sodd_distort1_11_types, 2);
+  sodd_table_77->dynamic = 1;
+  add_to_table_list(sodd_table_77, table_register);
+  sodd_table_78 = make_table("distort_2_F_end", "sodd_distort2_9", sodd_distort2_9_cols,
+           sodd_distort2_9_types, 2);
+  sodd_table_78->dynamic = 1;
+  add_to_table_list(sodd_table_78, table_register);
+  sodd_table_79 = make_table("distort_2_H_end", "sodd_distort2_9", sodd_distort2_9_cols,
+           sodd_distort2_9_types, 2);
+  sodd_table_79->dynamic = 1;
+  add_to_table_list(sodd_table_79, table_register);
+  soddin_(&ierr);
+
+  /* part 2 of HG 031127 */
+  current_beam = keep_beam;
+  /* end of part 2 of HG 031127 */
 }
 
 void expand_line(struct char_p_array* l_buff)
@@ -6036,7 +6119,7 @@ void pro_twiss()
  /*
              end of command decoding
   */
-  current_sequ->start_node = j;
+
   zero_double(orbit0, 6);
   /*  zero_double(disp0, 6); */
   zero_double(oneturnmat, 36);
@@ -6138,7 +6221,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   double betx,bety,alfx,mux,alfy,muy,x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,
          phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
          r11,r12,r21,r22,s;
-  int i, j, jt, l, lp, k_orb, u_orb, pos, k = 1; 
+  int i, jt, l, lp, k_orb, u_orb, pos, k = 1; 
   int ks, w_file, beta_def, err = 0, inval = 1;
   int keep_info = get_option("info");
 
@@ -6253,7 +6336,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
  /*
              end of command decoding
   */
-  current_sequ->start_node = j;
+
   zero_double(orbit0, 6);
   /*  zero_double(disp0, 6); */
   zero_double(oneturnmat, 36);

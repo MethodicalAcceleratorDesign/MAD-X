@@ -6,6 +6,7 @@
 #define comment_to_table      comment_to_table_
 #define comm_para             comm_para_
 #define double_from_table     double_from_table_
+#define double_table          double_table_    /* ETDA 25 aug 2004 */
 #define double_to_table       double_to_table_
 
 /* added by E. T. d'Amico on jan. 21st, 2004 */
@@ -118,6 +119,7 @@ extern void pesopt_(int*);
 extern void plotit_(int*);
 extern void setup_(double *respx,double *dmat,int *im,
 int *ic, int *nm, int*nc);
+extern void soddin_(int*);
 extern void survey_();
 extern void tmrefe_(double*);
 extern void tmrefo_(int*,double*,double*,double*);
@@ -321,6 +323,7 @@ void exec_print(struct in_cmd*);
 void exec_save(struct in_cmd*);
 void exec_savebeta();
 void exec_show(struct in_cmd*);
+void exec_sodd(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
 void expand_curr_sequ(int);
 void expand_line(struct char_p_array*);
@@ -860,7 +863,16 @@ struct table* corr_table1;        /* corrector table after orbit correction, bea
 struct table* corr_table2;        /* corrector table after orbit correction, beam 2 for two rings */
 struct table* mon_table;          /* monitor table after orbit correction */
 struct table* orbit_table;        /* orbit positions at monitors */
-
+struct table* sodd_table_70;      /* sodd output table detune_1_end */
+struct table* sodd_table_71;      /* sodd output table detune_1_all */
+struct table* sodd_table_72;      /* sodd output table detune_2_end */
+struct table* sodd_table_73;      /* sodd output table detune_2_all */
+struct table* sodd_table_74;      /* sodd output table distort_1_F_end */
+struct table* sodd_table_75;      /* sodd output table distort_1_H_end */
+struct table* sodd_table_76;      /* sodd output table distort_1_F_all */
+struct table* sodd_table_77;      /* sodd output table distort_1_H_all */
+struct table* sodd_table_78;      /* sodd output table distort_2_F_end */
+struct table* sodd_table_79;      /* sodd output table distort_2_F_all */
 struct table* target_table = NULL;       /* current target table */
 struct table* model_table = NULL;        /* current model table */
 struct table* orbin_table = NULL;        /* current orbit table */

@@ -221,6 +221,50 @@ char* ibs_table_cols[] =
 " "  /* blank terminates */
 };
 
+int sodd_detune_5_types[] =
+{
+  1, 1, 2, 1, 1
+};
+
+char* sodd_detune_5_cols[] =
+{
+  "mpor", "plane/mpor2", "detune", "H_inv_order", "V_inv_order", 
+" "  /* blank terminates */
+};
+
+int sodd_distort1_8_types[] =
+{
+  2, 2, 2, 2, 2, 2, 2, 2
+};
+
+char* sodd_distort1_8_cols[] =
+{
+  "mpor", "cos", "sin", "amp", "j", "k", "l", "m",
+" "  /* blank terminates */
+};
+
+int sodd_distort1_11_types[] =
+{
+  1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1
+};
+
+char* sodd_distort1_11_cols[] =
+{
+  "mpor", "app", "res", "pos", "cos", "sin", "amp", "j", "k", "l", "m",
+" "  /* blank terminates */
+};
+
+int sodd_distort2_9_types[] =
+{
+  1, 1, 2, 2, 2, 1, 1, 1, 1
+};
+
+char* sodd_distort2_9_cols[] =
+{
+  "mpor", "mpor2", "cos", "sin", "amp", "j", "k", "l", "m",
+" "  /* blank terminates */
+};
+
 int touschek_table_types[] =
 {
   3, 2, 2, 2, 2, 2
