@@ -29,7 +29,7 @@
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
      &int_arr(1),tot_segm,code_buf(*)
       double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
-     &al_errors(14),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one,  &
+     &al_errors(14),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,node_value,one, &
      &get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
      &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
       parameter(zero=0d0,one=1d0)
@@ -147,7 +147,7 @@
         endif
 !-------- Track through element
         call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
-     &  last_pos, last_orbit,aperflag,maxaper)
+     &  last_pos, last_orbit,aperflag,maxaper,al_errors)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
@@ -252,7 +252,7 @@
       enddo
  999  end
       subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
-     &last_turn,last_pos, last_orbit,aperflag,maxaper)
+     &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -264,12 +264,13 @@
 !   NUMBER(*) (integer) Number of current track.                       *
 !   KTRACK    (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
+      include 'twiss0.fi'
       logical aperflag
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk
       integer get_option
       double precision apx,apy,el,sum,node_value,track(6,*),dxt(*),     &
      &dyt(*),last_pos(*),last_orbit(6,*),parvec(26),get_value,          &
-     &aperture(100),one,maxaper(6), zero
+     &aperture(100),one,maxaper(6), zero,al_errors(align_max)
       include 'name_len.fi'
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
@@ -325,7 +326,7 @@
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack)
+     &  last_pos, last_orbit, track, ktrack,al_errors)
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
         apx = aperture(1)
@@ -335,13 +336,13 @@
         apy = apx
 !        print *,"circle, radius= ",apx
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack)
+     &  last_pos, last_orbit, track, ktrack,al_errors)
 !------------  rectangle case ----------------------------------
         else if(aptype.eq.'rectangle') then
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack)
+     &  last_pos, last_orbit, track, ktrack,al_errors)
 !------------  LHC screen case ----------------------------------
         else if(aptype.eq.'lhcscreen') then
 !        print *, "LHC screen start, Xrect= ",
@@ -349,18 +350,18 @@
         apx = aperture(3)
         apy = aperture(3)
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack)
+     &  last_pos, last_orbit, track, ktrack,al_errors)
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack)       
+     &  last_pos, last_orbit, track, ktrack,al_errors)       
 !        print *, "LHC screen end"
 !------------  marguerite case ----------------------------------
         else if(aptype.eq.'marguerite') then
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(3, apx, apy, turn, sum, part_id, last_turn,      
-     &  last_pos, last_orbit, track, ktrack)
+     &  last_pos, last_orbit, track, ktrack,al_errors)
         endif
       endif
       call ttmult(track,ktrack,dxt,dyt)
@@ -398,7 +399,7 @@
       call ttcorr(el, track, ktrack)
       go to 500
 
-!---- Elliptic aperture.
+!---- Collimator with elliptic aperture. 
   200 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
@@ -409,10 +410,10 @@
        apy=maxaper(3)
        endif
       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
-     &last_pos, last_orbit, track, ktrack)
+     &last_pos, last_orbit, track, ktrack,al_errors)
       go to 500
 
-!---- Rectangular aperture.
+!---- Collimator with rectangular aperture.
   210 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
@@ -423,7 +424,7 @@
        apy=maxaper(3)
        endif
       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
-     &last_pos, last_orbit, track, ktrack)
+     &last_pos, last_orbit, track, ktrack,al_errors)
       go to 500
 
 !---- Beam-beam.
@@ -1392,7 +1393,7 @@
       call augment_count(table)
       end
       subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
-     &last_pos, last_orbit, z, ntrk)
+     &last_pos, last_orbit, z, ntrk,al_errors)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -1412,9 +1413,10 @@
 !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
 !   ntrk      (integer) number of surviving tracks.                    *
 !----------------------------------------------------------------------*
+      include 'twiss0.fi'
       integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
-     &one
+     &one,al_errors(align_max)
       parameter(one=1d0)
       include 'name_len.fi'
       character*(name_len) aptype
@@ -1423,16 +1425,18 @@
  10   continue
       do i = n, ntrk
 !---- Is particle outside aperture?
-        if (flag .eq. 1                                                 &
-     &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one) then      &
+        if (flag .eq. 1.and.((z(1,i)-al_errors(11))/apx)**2             &
+     &  +((z(3,i)-al_errors(12)) / apy)**2 .gt. one) then
         go to 99
         else if(flag .eq. 2                                             &
-     &  .and. (abs(z(1,i)) .gt. apx .or. abs(z(3,i)) .gt. apy)) then    &
+     &  .and. (abs(z(1,i)-al_errors(11)) .gt. apx                       &
+     &  .or. abs(z(3,i)-al_errors(12)) .gt. apy)) then 
         go to 99
 !***  Introduction of marguerite : two ellipses
-        else if(flag .eq. 3                                             &
-     &  .and. (z(1,i) / apx)**2 + (z(3,i) / apy)**2 .gt. one .and.      &
-     &   (z(1,i) / apy)**2 + (z(3,i) / apx)**2 .gt. one) then           &
+        else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)) / apx)**2      &
+     &   + ((z(3,i)-al_errors(12)) / apy)**2 .gt. one .and.             &
+     &   ((z(1,i)-al_errors(11)) / apy)**2 +                            & 
+     &   ((z(3,i)-al_errors(12)) / apx)**2 .gt. one) then
         go to 99
         endif
         go to 98
