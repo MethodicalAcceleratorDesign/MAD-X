@@ -272,8 +272,8 @@
       call dzero(skew,maxmul+1)
       call node_vector('knl ',nn,normal)
       call node_vector('ksl ',ns,skew)
-      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
-     *,skew(0)
+!      print *,"mult ",code,"  angle",normal(0),"  skew ",ns
+!     *,skew(0)
       angle = normal(0)
       fskw = skew(0)
       if(angle.eq.0.0) then
@@ -290,15 +290,16 @@
    20 continue
       angle = node_value('angle ')
       fskw = node_value('k0s ')
-      tilt = asin(fskw/sqrt(fskw*fskw+angle*angle))
 !      print *,tilt
       if (angle .eq. 0.0) then
         dx = 0.0
         ds = el
+        tilt = 0.0
       else
 ! el corrected 18.09.02 // identical to mad8(sector bend)
         dx = el * (cos(angle)-one)/angle
         ds = el * sin(angle)/angle
+        tilt = asin(fskw/sqrt(fskw*fskw+angle*angle))
       endif
       go to 490
 
