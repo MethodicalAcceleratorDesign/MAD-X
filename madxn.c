@@ -6118,7 +6118,7 @@ void pro_twiss()
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
   char *filename, *name, *table_name, *sector_name;
-  int i, j, l, lp, pos, k = 1, w_file, beta_def;
+  int i, j, l, lp, pos, k = 1, ks, w_file, beta_def;
   pos = name_list_pos("sequence", nl);
   if(nl->inform[pos]) /* sequence specified */
     {
@@ -6154,14 +6154,18 @@ void pro_twiss()
       table_name = pl->parameters[pos]->call_def->string;
     }
   else table_name = "twiss";
-  pos = name_list_pos("sectormap", nl);
-  if(nl->inform[pos]) 
+  if ((ks = get_value(current_command->name,"sectormap")) != 0)
     {
      set_option("twiss_sector", &k);
-     if ((sector_name = pl->parameters[pos]->string) == NULL)
-      sector_name = pl->parameters[pos]->call_def->string;
+     pos = name_list_pos("sectorfile", nl);
+     if(nl->inform[pos]) 
+       {
+        if ((sector_name = pl->parameters[pos]->string) == NULL)
+         sector_name = pl->parameters[pos]->call_def->string;
+       }
+     else  sector_name = pl->parameters[pos]->call_def->string;
      if ((sec_file = fopen(sector_name, "w")) == NULL)
-             fatal_error("cannot open output file:", sector_name);
+          fatal_error("cannot open output file:", sector_name);
     }
   for (j = 0; j < 6; j++) orbit0[j] = zero;
   for (j = 0; j < 6; j++) disp0[j] = zero;
@@ -6200,8 +6204,11 @@ void pro_twiss()
   l = strlen(table_name);
   tarr = new_int_array(l+1);
   conv_char(table_name, tarr);
-  reset_sector(current_sequ, 0);
-  set_sector();
+  if (get_option("twiss_sector"))
+    {
+     reset_sector(current_sequ, 0);
+     set_sector();
+    }
   for (i = 0; i < twiss_deltas->curr; i++)
     {
      twiss_table = make_table(table_name, twiss_table_cols, 
