@@ -2498,6 +2498,8 @@ c
 
       subroutine primat(a,nc,nm)
 
+      implicit   none
+      integer i, j
       integer nm,nc
       integer a(nc, nm)
 
@@ -2510,6 +2512,8 @@ c
 
       subroutine prdmat(a,nc,nm)
 
+      implicit   none
+      integer i, j
       integer nm,nc
       double precision a(nc, nm)
 
@@ -2519,4 +2523,5 @@ c
 
       return
       end
+
 
