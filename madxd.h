@@ -253,6 +253,8 @@ void correct_usemonitor(struct in_cmd*);
 void correct_option(struct in_cmd* cmd);
 int pro_correct_filter(int iplane, double sigcut);
 int pro_correct_getcorrs(struct in_cmd* cmd);
+void correct_readcorr(struct in_cmd* cmd);
+void correct_setcorr(struct in_cmd* cmd);
 void deco_init();
 int decode_command();
 int decode_par(struct in_cmd*, int, int, int, int);
@@ -529,6 +531,7 @@ void print_global(double);
 void print_rfc();
 void print_table(struct table*);
 void print_value(struct in_cmd*);
+void pro_aperture(struct in_cmd*);
 void pro_match(struct in_cmd*);
 void pro_node(int, double);
 void process();
@@ -536,8 +539,6 @@ void pro_correct(struct in_cmd*);
 void pro_emit(struct in_cmd*);
 void pro_error(struct in_cmd*);
 void pro_ibs(struct in_cmd*);
-void pro_ivar();
-void ivar();
 void pro_touschek(struct in_cmd*);
 void pro_input(char*);
 void pro_sxf(struct in_cmd*);
@@ -547,6 +548,7 @@ void pro_twiss();
 void pro_ptc_twiss();
 void put_info(char*, char*);
 struct table* read_table(struct in_cmd*);
+struct table* read_my_table(struct in_cmd*);
 int remove_colon(char**, int, int);
 void remove_from_command_list(char*, struct command_list*);
 int remove_from_name_list(char*, struct name_list*);
@@ -672,6 +674,7 @@ int  pro_correct_getcommands(struct in_cmd* cmd);
 int  pro_correct_gettables(int ip, struct in_cmd* cmd);
 int  pro_correct2_gettables(int ip, struct in_cmd* cmd);
 int  pro_correct_getorbit(struct in_cmd* cmd);
+int  pro_correct_getorbit_ext(struct in_cmd* cmd);
 void pro_correct_prtwiss();
 void pro_correct_write_cocu_table();
 void pro_correct_fill_corr_table(int ip , char *name, double old, double new);
@@ -710,6 +713,7 @@ void error_efcomp(struct in_cmd* cmd);
 void error_eoption(struct in_cmd* cmd);
 void error_eprint(struct in_cmd* cmd);
 void error_esave(struct in_cmd* cmd);
+void error_seterr(struct in_cmd* cmd);
 void f_ctof(int *j, char *string, int *nel);
 void pro_error_make_efield_table();
 
@@ -732,8 +736,34 @@ int myregex(char*, char*);
 void myregend(char*, struct reg_token*);
 int new_comb(struct reg_token*);
 
-/* SXF module routines */
+/* Aperture module routines */
+void aper_adj_quad(double, double, double, double*, double*);
+void aper_adj_halo_si(double, double, double, double, double, double*, 
+		   double*, int, double*, double*);
+int aper_bs(char*, double*, double*, double*, double*, int*, double*, double*);
+double aper_calc(double, double, double*, double*, double*, 
+		 int, double*, double*, double*, double*,
+		 double*, double*, int, double, double);
+int aper_chk_inside(double, double, double*, double*, double, int);
+int aper_external_file(char*, double*, double*);
+void aper_fill_quads(double*, double*, int, int*);
+void aper_header(struct table*, struct aper_node*);
+void aper_intersect(double, double, double, double, double, double, 
+		   double, double, int, int,double*, double*);
+int aper_linepar(double, double, double, double, double*, double*);
+double aper_online(double, double, double, double, double, double, double);
+void aper_race(double, double, double, double, double*, double*);
+void aper_read_twiss(char*, int*, double*, double*, double*,
+			double*, double*, double*, double*);
+int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
+void aper_trim_ws(char*, int);
+void aper_write_table(char*, double*, double*, double*, double*,
+			   char*, double*, double*, double*, double*,
+			   double*, double*, double*, double*, double*,
+			   double*, double*, double*, double*, double*, char*);
+struct aper_node* aperture(char*, struct node**, struct table*, int*);
 
+/* SXF module routines */
 int  all_blank(char*);
 char* bpad(char*, int);
 void fill_dump(FILE*, int, char*, double*, int, int);
@@ -857,6 +887,7 @@ struct sequence* edit_sequ;     /* pointer to sequence being edited */
 struct sequence_list* sequences;    /* pointer to sequence list */
 struct sequence_list* match_sequs;  /* pointer to sequence list for match */
 
+struct table* aperture_table;	  /* current aperture table */
 struct table* ibs_table;          /* current ibs table */
 struct table* touschek_table;     /* current touschek table */
 struct table* summ_table;         /* current twiss summary table */
@@ -936,6 +967,7 @@ char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 2.13";
 char one_string[] = "1";
+char aptwfile[NAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
 char* current_link_group;
