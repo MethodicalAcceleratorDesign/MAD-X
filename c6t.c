@@ -936,7 +936,7 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[3] = el_par_value_recurse("e2",p->p_elem);
     c6t_elem->value[4] = el_par_value_recurse("h1",p->p_elem);
     c6t_elem->value[5] = el_par_value_recurse("h2",p->p_elem);
-    c6t_elem->value[6] = 0.0; /* old tilt */
+    c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[7] = el_par_value_recurse("k0s",p->p_elem);
     c6t_elem->value[8] = el_par_value_recurse("hgap",p->p_elem);
     c6t_elem->value[9] = el_par_value_recurse("fint",p->p_elem);
@@ -970,7 +970,8 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem = new_c6t_element(i,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
-    c6t_elem->value[0]  = el_par_value_recurse("l",p->p_elem);
+    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+    c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[11] = el_par_value_recurse("lrad",p->p_elem);
     for (i=0; i<j; i++){
       if (i<maxkn) {c6t_elem->value[i*2+12] = kn_param->double_array->a[i]; }
@@ -1540,7 +1541,7 @@ void mod_sextupole(struct c6t_element* p)
 {
   supp_small_comp(p); 
   /* supress tilt angle (not component !) */
-  p->value[6] = zero;
+/*    p->value[6] = zero; */
 }
 
 void multi_loop()
@@ -1806,6 +1807,12 @@ void pro_elem(struct node* cnode)
     current_element->p_al_err->c_dble = cnode->p_al_err->curr;
     for (i=0;i<cnode->p_al_err->curr;i++)
       current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+  }
+  /* if we have a tilt set the flag */
+  if (current_element->n_values >= 7 && current_element->value[6] > zero) {
+    current_element->tilt_err = 1;
+  } else {
+    current_element->tilt_err = 0;
   }
   /* add aperture element if necessary */
   if (tag_aperture.apply==1) {
@@ -2139,19 +2146,29 @@ void write_blocks()
 
 void write_f8_errors()
 {
+  double tiltval;
   if (align_cnt == 0)  return;
   current_element = first_in_sequ;
   while (current_element != NULL)
     {
-     if (current_element->na_err > 0)
-       {
-        if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-        fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
-	       1000*current_element->p_al_err->a_dble[0],
-	       1000*current_element->p_al_err->a_dble[1],
-	       1000*current_element->p_al_err->a_dble[5]);
-       }
-     current_element = current_element->next;
+      if (current_element->tilt_err > 0) {
+	tiltval = current_element->value[6]; 
+      } else {tiltval=0.0;}
+      if (current_element->na_err > 0)
+	{
+	  if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
+	  fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+		  1000*current_element->p_al_err->a_dble[0],
+		  1000*current_element->p_al_err->a_dble[1],
+		  1000*(current_element->p_al_err->a_dble[5]+tiltval));
+	} else if (current_element->tilt_err > 0) {
+	  if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
+	  fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+		  0.0,
+		  0.0,
+		  1000*tiltval);
+	}
+      current_element = current_element->next;
     }
 }
 
