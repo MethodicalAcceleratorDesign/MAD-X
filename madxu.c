@@ -116,32 +116,33 @@ void add_to_constraint_list(struct constraint* cs, struct constraint_list* cl)
 }
 
 void add_to_el_list( /* adds element to alphabetic element list */
-		 struct element* el, int inf, struct el_list* ell, int flag)
+		 struct element** el, int inf, struct el_list* ell, int flag)
      /* inf is entered in the namelist */
      /*  flag < 0: do not delete if already present, do not warn */
      /*       = 0: delete, but do not warn */
      /*       = 1: delete & warn */
-     /*       = 2: warn and ignore if already present */
+     /*       = 2: warn and ignore if already present - resets *el to old */
 {
   int pos, j;
-  if ((pos = name_list_pos(el->name, ell->list)) > -1)
+  if ((pos = name_list_pos((*el)->name, ell->list)) > -1)
     {
      if (flag > 1)
        {
-        fatal_error("element re-definition inside sequence:", el->name);
+        warning("element re-definition inside sequence ignored:", (*el)->name);
+        *el = ell->elem[pos];
        }
      else 
        {
-        if (flag > 0) put_info("element redefined:", el->name);
+        if (flag > 0) put_info("element redefined:", (*el)->name);
         if (flag >= 0 && ell == element_list) delete_element(ell->elem[pos]);
-        ell->elem[pos] = el;
+        ell->elem[pos] = *el;
        }
     }
   else
     {
      if (ell->curr == ell->max) grow_el_list(ell);
-     j = add_to_name_list(permbuff(el->name), inf, ell->list);
-     ell->elem[ell->curr++] = el;
+     j = add_to_name_list(permbuff((*el)->name), inf, ell->list);
+     ell->elem[ell->curr++] = *el;
     }
 }
 

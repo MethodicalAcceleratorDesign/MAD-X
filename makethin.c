@@ -728,7 +728,7 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
 	/* special cavity list stuff */
 	if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
 	    find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
-	  add_to_el_list(thin_node->p_elem, 0, thin_sequ->cavities, 0);
+	  add_to_el_list(&thin_node->p_elem, 0, thin_sequ->cavities, 0);
       } else if (strcmp(thick_node->base_name,"rbend") == 0       ||
 		 strcmp(thick_node->base_name,"sbend") == 0       ||
 		 strcmp(thick_node->base_name,"quadrupole") == 0  ||
@@ -838,6 +838,7 @@ void makethin(struct in_cmd* cmd)
   	  {
   	   thick_sequ = sequences->sequs[pos2];
 	   thin_sequ = seq_diet(thick_sequ);
+           remove_from_name_list(thin_sequ->name, line_list->list);
   	  }
      else warning("unknown sequence ignored:", name);
     }

@@ -145,7 +145,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   el = make_element(toks[0], toks[1], clone, sequ_is_on+1);
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
-    add_to_el_list(el, 0, current_sequ->cavities, 0);
+    add_to_el_list(&el, 0, current_sequ->cavities, 0);
   add_to_name_list(el->name, 1, occ_list);
   make_elem_node(el, 1);
   if ((at = find_value("at", ntok, toks)) == INVALID)

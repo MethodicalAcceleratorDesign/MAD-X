@@ -1446,7 +1446,7 @@ void enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   double at;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
-    add_to_el_list(el, 0, current_sequ->cavities, 0);
+    add_to_el_list(&el, 0, current_sequ->cavities, 0);
   if (nl->inform[name_list_pos("at", nl)] == 0)
     fatal_error("element reference without 'at':", 
                 join(cmd->tok_list->p, cmd->tok_list->curr));
@@ -2196,7 +2196,7 @@ void exec_save(struct in_cmd* cmd)
   	         if (el->def_type != 0) el = el->parent;
               while (el->base_type != el)
   	           {
-                 add_to_el_list(el, 0, ell, 0);
+                 add_to_el_list(&el, 0, ell, 0);
   	            el = el->parent;
   	           }
   	        }
@@ -2652,7 +2652,7 @@ void fill_expr_var_list(struct el_list* ell,
 	  {
 	   *p = '\0';
            if ((el = find_element(name, element_list)) != NULL)
-              add_to_el_list(el, 0, ell, 0);
+              add_to_el_list(&el, 0, ell, 0);
 	  }
         else if ((var = find_variable(name, variable_list)) != NULL)
 	  {
@@ -3270,7 +3270,7 @@ struct element* get_drift(double length)
   clone = clone_command(bt->def);
   store_comm_par_value("l", length, clone);
   p = make_element(key, "drift", clone, 0);
-  add_to_el_list(p, 1, drift_list, 0);
+  add_to_el_list(&p, 1, drift_list, 0);
   return p;
 }
 
@@ -3881,7 +3881,7 @@ void install_one(struct element* el, char* from_name, double at_value,
   int i, occ = 1;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)
-    add_to_el_list(el, 0, edit_sequ->cavities, 0);
+    add_to_el_list(&el, 0, edit_sequ->cavities, 0);
   if ((i = name_list_pos(el->name, occ_list)) < 0)
     i = add_to_name_list(el->name, occ, occ_list);
   else occ = ++occ_list->inform[i];
@@ -3906,7 +3906,7 @@ double line_nodes(struct char_p_array* flat)
        fatal_error("line contains unknown element:", flat->p[j]);
      if (strcmp(el->base_type->name, "rfcavity") == 0 &&
          find_element(el->name, current_sequ->cavities) == NULL)
-       add_to_el_list(el, 0, current_sequ->cavities, 0);
+       add_to_el_list(&el, 0, current_sequ->cavities, 0);
      pos += el->length / 2;
      k = 1;
      if ((i = name_list_pos(el->name, occ_list)) < 0)
@@ -4075,7 +4075,7 @@ struct element* make_element(char* name, char* parent,
   el->def = def;
   if (strcmp(name, parent) == 0)  /* basic element type like drift etc. */
     {
-     add_to_el_list(el, def->mad8_type, base_type_list, 1);
+     add_to_el_list(&el, def->mad8_type, base_type_list, 1);
      el->parent = el->base_type = el;
     }
   else 
@@ -4084,7 +4084,7 @@ struct element* make_element(char* name, char* parent,
        fatal_error("unknown class type:", parent);
      el->base_type = el->parent->base_type;
     }
-  add_to_el_list(el, def->mad8_type, element_list, flag);
+  add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
 }
 
@@ -5833,7 +5833,7 @@ void replace_one(struct node* node, struct element* el)
   node->length = el->length;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)
-    add_to_el_list(el, 0, edit_sequ->cavities, 0);
+    add_to_el_list(&el, 0, edit_sequ->cavities, 0);
 }
 
 void replace_lines(struct macro* org, int replace, char** reps)
@@ -6269,6 +6269,7 @@ void seq_flatten(struct sequence* sequ)
      if (c_node == sequ->end) break;
      c_node = c_node->next;
     }
+  remove_from_name_list(sequ->name, line_list->list);
 }
 
 void seq_install(struct in_cmd* cmd)
@@ -6297,7 +6298,7 @@ void seq_install(struct in_cmd* cmd)
 	  {
 	   el = clone_element(cl);
            strcpy(el->name, name_e);
-           add_to_el_list(el, cl->def->mad8_type, element_list, 1);
+           add_to_el_list(&el, cl->def->mad8_type, element_list, 1);
 	  }
        }
      else if ((el = find_element(name_e, element_list)) == NULL)
@@ -7099,7 +7100,7 @@ void set_selected_elements()
 	      if (selected_elements->list->inform[pos] < slice)
 		selected_elements->list->inform[pos] = slice;
 	     }
-           else add_to_el_list(el, slice, selected_elements, 0);
+           else add_to_el_list(&el, slice, selected_elements, 0);
            break;
           }
        }

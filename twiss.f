@@ -459,13 +459,13 @@
       include 'bb.fi'
       include 'name_len.fi'
       logical fsec,ftrk,fmap
-      character * 28 tmptxt, tmptxt2
+      character * 28 tmptxt1, tmptxt2, tmptxt3
       character * 2 ptxt(2)
-      character*(name_len) el_name(2)
+      character*(name_len) c_name(2), p_name
       integer eflag,j,code,restart_sequ,advance_node,node_al_errors,    &
      &n_align,kobs,nobs,node,save,pnode,thr_on,get_option,ccode,pcode,  &
-     &get_vector,i,err,old,kpro,corr_pick(2),enable,occ_cnt(2),lastnb,  &
-     &rep_cnt(2),max_rep
+     &get_vector,i,err,old,kpro,corr_pick(2),enable,coc_cnt(2),lastnb,  &
+     &rep_cnt(2),max_rep,poc_cnt
       double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6),el,ek(6),   &
      &re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
      &get_value,parvec(26),orb_limit,zero,vector(10),reforb(6),         &
@@ -550,14 +550,14 @@
           if (code .le. ccode) then
             call dcopy(rt,cmatr(1,1,1),36)
             j = name_len
-            call element_name(el_name(1),j)
-            occ_cnt(1) = node_value('occ_cnt ')
+            call element_name(c_name(1),j)
+            coc_cnt(1) = node_value('occ_cnt ')
           endif
           if (code .ge. ccode) then
             call dcopy(rt,cmatr(1,1,2),36)
             j = name_len
-            call element_name(el_name(2),j)
-            occ_cnt(2) = node_value('occ_cnt ')
+            call element_name(c_name(2),j)
+            coc_cnt(2) = node_value('occ_cnt ')
           endif
         endif
       elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then
@@ -584,25 +584,32 @@
 !--- check for max. repitition
                 rep_cnt(kpro) = rep_cnt(kpro) + 1
                 if (rep_cnt(kpro) .gt. max_rep)  then
-                  write(tmptxt, '(i6)') max_rep
+                  write(tmptxt1, '(i6)') max_rep
                   call fort_warn('threader: pickup skipped after',      &
-     &            tmptxt(:6)//' correction attempts')
+     &            tmptxt1(:6)//' correction attempts')
                   goto 20
                 endif
 !--- keep matrix
                 call dcopy(rt,pmatr,36)
                 old = node
+                j = name_len
+                call element_name(p_name,j)
+                poc_cnt = node_value('occ_cnt ')
                 call tmthrd(kpro,dorb,cmatr(1,1,kpro),pmatr,vector,node,&
      &          cick,err)
                 if (err .eq. 0)  then
                   corr_pick(kpro) = old
-                  write(tmptxt, '(1p,6g14.6)') cick
-                  tmptxt2 = el_name(kpro)
-                  write(tmptxt2(lastnb(el_name(kpro))+1:),              &
-     &            '(''['',i3,'']'')') occ_cnt(kpro)
+                  write(tmptxt1, '(1p,6g14.6)') cick
+                  tmptxt2 = c_name(kpro)
+                  write(tmptxt2(lastnb(c_name(kpro))+1:),               &
+     &            '(''['',i2,'']'')') coc_cnt(kpro)
+                  tmptxt3 = p_name
+                  write(tmptxt3(lastnb(p_name)+1:),                     &
+     &            '(''['',i2,'']'')') poc_cnt
                   call fort_info(                                       &
-     &            'threader: '//tmptxt2(:lastnb(tmptxt2))//' total '    &
-     &            //ptxt(kpro)//'kick:', tmptxt)
+     &            '-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))     &
+     &            // '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total ' &
+     &            //ptxt(kpro)//'kick:', tmptxt1)
 *--- restore restart values
                   suml = restsum(kpro)
                   call dcopy(restorb(1,kpro),orbit,6)
@@ -610,11 +617,11 @@
                   call dcopy(restt(1,1,1,kpro),tt,216)
                   goto 20
                 else
-                  write(tmptxt, '(i6)') old
+                  write(tmptxt1, '(i6)') old
                   if (err .eq. 1)  then
                     call fort_warn(                                     &
      &              'threader: no corrector before pickup at node ',    &
-     &              tmptxt)
+     &              tmptxt1)
                   elseif (err .eq. 2)  then
                     call fort_warn('threader: kicker is at start',      &
      &              'of sequence')

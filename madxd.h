@@ -164,7 +164,7 @@ void add_to_command_list(char*, struct command*, struct command_list*, int);
 void add_to_command_list_list(char*, struct command_list*, 
                               struct command_list_list*);
 void add_to_constraint_list(struct constraint*, struct constraint_list*);
-void add_to_el_list(struct element*, int, struct el_list*, int);
+void add_to_el_list(struct element**, int, struct el_list*, int);
 void add_to_macro_list(struct macro*, struct macro_list*);
 int add_to_name_list(char*, int, struct name_list*);
 void add_to_node_list(struct node*, int, struct node_list*);
