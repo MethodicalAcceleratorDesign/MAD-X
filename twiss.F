@@ -1791,6 +1791,11 @@
       call double_to_table('summ ','ycomax ' ,ycomax)
       call double_to_table('summ ','ycorms ' ,sigyco)
       call double_to_table('summ ','deltap ' ,deltap)
+      call double_to_table('summ ','synch_1 ' ,synch_1)
+      call double_to_table('summ ','synch_2 ' ,synch_2)
+      call double_to_table('summ ','synch_3 ' ,synch_3)
+      call double_to_table('summ ','synch_4 ' ,synch_4)
+      call double_to_table('summ ','synch_5 ' ,synch_5)
 
 !---- Augment table summ
       call augment_count('summ ')
