@@ -924,7 +924,7 @@ void dump_command_parameter(struct command_parameter* par)
         par->double_value = expression_value(par->expr, 2);
        }
      k = par->double_value;
-     fprintf(prt_file, "integer: %d\n", k);
+     fprintf(prt_file, v_format("integer: %I\n"), k);
      break;
     case 2:
      if (par->expr != NULL)
@@ -932,7 +932,7 @@ void dump_command_parameter(struct command_parameter* par)
         dump_expression(par->expr);
         par->double_value = expression_value(par->expr, 2);
        }
-     fprintf(prt_file, "double value: %e\n", par->double_value);
+     fprintf(prt_file, v_format("double value: %F\n"), par->double_value);
      break;
     case 11:
     case 12:
@@ -949,7 +949,7 @@ void dump_command_parameter(struct command_parameter* par)
        }
        fprintf(prt_file, "double array: ");
        for (i = 0; i < par->double_array->curr; i++)
-            fprintf(prt_file, "%e ", par->double_array->a[i]);
+            fprintf(prt_file, v_format("%e "), par->double_array->a[i]);
        fprintf(prt_file, "\n");
       }
      break;
@@ -963,8 +963,9 @@ void dump_command_parameter(struct command_parameter* par)
 
 void dump_constraint(struct constraint* c)
 {
-  fprintf(prt_file, "name: %s type: %d value: %e min: %e max: %e weight: %e\n",
-         c->name, c->type, c->value, c->c_min, c->c_max, c->weight);
+  fprintf(prt_file, 
+          v_format("name: %s type: %I value: %F min: %F max: %F weight: %F\n"),
+          c->name, c->type, c->value, c->c_min, c->c_max, c->weight);
 }
 
 void dump_constraint_list(struct constraint_list* cl)
@@ -978,7 +979,8 @@ void dump_constraint_list(struct constraint_list* cl)
 
 void dump_element(struct element* el)
 {
-  fprintf(prt_file, "+++ dumping element %s  parent %s\n", el->name, el->parent->name);
+  fprintf(prt_file, v_format("+++ dumping element %S  parent %S\n"), 
+          el->name, el->parent->name);
   dump_command(el->def);
 }
 
@@ -991,7 +993,8 @@ void dump_el_list(struct el_list* ell)
 void dump_expression(struct expression* ex)
 {
  ex->value = expression_value(ex, 2);
- fprintf(prt_file, "expression: %s :: value: %e\n", ex->string, ex->value);
+ fprintf(prt_file, v_format("expression: %s :: value: %F\n"), 
+         ex->string, ex->value);
 }
 
 void dump_exp_sequ(struct sequence* sequ, int level)
@@ -1012,25 +1015,25 @@ void dump_exp_sequ(struct sequence* sequ, int level)
         {
          puts("alignment errors:");
            for (j = 0; j < c_node->p_al_err->curr; j++)
-           printf("%e ", c_node->p_al_err->a[j]);
+           printf(v_format("%F "), c_node->p_al_err->a[j]);
            printf("\n");
         }
         if (c_node->p_fd_err != NULL)
         {
          puts("field errors:");
            for (j = 0; j < c_node->p_fd_err->curr; j++)
-           printf("%e ", c_node->p_fd_err->a[j]);
+           printf(v_format("%e "), c_node->p_fd_err->a[j]);
            printf("\n");
         }
         if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
        }
      else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-       fprintf(prt_file, "%s: at = %f  flag = %d\n", c_node->name,
+       fprintf(prt_file, v_format("%S: at = %F  flag = %I\n"), c_node->name,
               c_node->position, c_node->enable);
      if (c_node == sequ->ex_end)  break;
      c_node = c_node->next;
     }
-  fprintf(prt_file, "=== sum of node length: %f\n", suml);
+  fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
 }
 
 void dump_in_cmd(struct in_cmd* p_inp)
@@ -1050,7 +1053,7 @@ void dump_int_array(struct int_array* ia)
   fprintf(prt_file, "dump integer array, length: %d\n", ia->curr);
   for (i = 0; i < ia->curr; i++)
     {
-     fprintf(prt_file, "%d ", ia->i[i]);
+     fprintf(prt_file, v_format("%d "), ia->i[i]);
      if ((i+1)%10 == 0) fprintf(prt_file, "\n");
     }
   if (ia->curr%10 != 0) fprintf(prt_file, "\n");
@@ -1077,7 +1080,8 @@ void dump_name_list(struct name_list* nl)
   puts(" ");
   for (i = 0; i < nl->curr; i++)
     {
-     fprintf(prt_file, "%-16s %d\n", nl->names[nl->index[i]], nl->inform[nl->index[i]]);
+     fprintf(prt_file, v_format("%S %I\n"), 
+             nl->names[nl->index[i]], nl->inform[nl->index[i]]);
     }
 }
 
@@ -1087,9 +1091,9 @@ void dump_node(struct node* node)
   char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL";
   if (node->previous != NULL) strcpy(pname, node->previous->name);
   if (node->next != NULL) strcpy(nname, node->next->name);
-  fprintf(prt_file, "name: %s  occ: %d base: %s  position: %f\n", node->name,
-          node->occ_cnt, node->base_name, node->position);
-  fprintf(prt_file, "  names of - previous: %s  next: %s\n",
+  fprintf(prt_file, v_format("name: %S  occ: %I base: %S  position: %F\n"), 
+          node->name, node->occ_cnt, node->base_name, node->position);
+  fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
          pname, nname);
   if (node->cl != NULL)  for (i = 0; i < node->cl->curr; i++)
         dump_constraint(node->cl->constraints[i]);
@@ -1099,7 +1103,7 @@ void dump_sequ(struct sequence* c_sequ, int level)
 {
   struct node* c_node;
   double suml = zero;
-  fprintf(prt_file, "+++ dump sequence: %s\n", c_sequ->name);
+  fprintf(prt_file, v_format("+++ dump sequence: %S\n"), c_sequ->name);
   c_node = c_sequ->start;
   while(c_node != NULL)
     {
@@ -1110,11 +1114,12 @@ void dump_sequ(struct sequence* c_sequ, int level)
         if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
        }
      else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-       fprintf(prt_file, "%s: at = %f\n", c_node->name, c_node->position);
+       fprintf(prt_file, v_format("%S: at = %F\n"), 
+               c_node->name, c_node->position);
      if (c_node == c_sequ->end)  break;
      c_node = c_node->next;
     }
-  fprintf(prt_file, "=== sum of node length: %f\n", suml);
+  fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
 }
 
 void dump_variable(struct variable* v)
@@ -1164,9 +1169,9 @@ void export_comm_par(struct command_parameter* par, char* string)
       {
        if (par->type == 1)
          {
-          k = par->double_value; sprintf(num, "%d", k);
+          k = par->double_value; sprintf(num, v_format("%I"), k);
          }
-         else sprintf(num, "%-23.15g", par->double_value);
+         else sprintf(num, v_format("%F"), par->double_value);
          strcat(string, supp_tb(num));
       }
       break;
@@ -1198,9 +1203,9 @@ void export_comm_par(struct command_parameter* par, char* string)
          {
           if (par->type == 11)
             {
-             k = par->double_array->a[i]; sprintf(num, "%d", k);
+             k = par->double_array->a[i]; sprintf(num, v_format("%I"), k);
             }
-            else sprintf(num, "%-23.15g", par->double_array->a[i]);
+            else sprintf(num, v_format("%F"), par->double_array->a[i]);
             strcat(string, supp_tb(num));
          }
       }
@@ -1295,9 +1300,9 @@ void export_el_par_8(struct command_parameter* par, char* string)
       {
        if (par->type == 1)
          {
-          k = par->double_value; sprintf(num, "%d", k);
+          k = par->double_value; sprintf(num, v_format("%I"), k);
          }
-         else sprintf(num, "%-23.15g", par->double_value);
+         else sprintf(num, v_format("%F"), par->double_value);
          strcat(string, supp_tb(num));
       }
       break;
@@ -1339,7 +1344,7 @@ void export_el_par_8(struct command_parameter* par, char* string)
             {
              k = par->double_array->a[i]; sprintf(num, "%d", k);
             }
-            else sprintf(num, "%-23.15g", par->double_array->a[i]);
+            else sprintf(num, v_format("%F"), par->double_array->a[i]);
           strcat(string, tmp);
             strcat(string, supp_tb(num));
             if (vtilt) strcat(string, tmpt);
@@ -1375,7 +1380,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
   if (sequ->l_expr != NULL) strcat(c_dummy, sequ->l_expr->string);
   else
     {
-     sprintf(num, "%-23.15g", sequ->length);
+     sprintf(num, v_format("%F"), sequ->length);
      strcat(c_dummy, supp_tb(num));
     }
   write_nice(c_dummy, file);
@@ -1401,7 +1406,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
         if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
         else
           {
-           sprintf(num, "%-23.15g", c_node->at_value);
+           sprintf(num, v_format("%F"), c_node->at_value);
            strcat(c_dummy, supp_tb(num));
           }
         if (c_node->from_name != NULL)
@@ -1452,7 +1457,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
         if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
         else
           {
-           sprintf(num, "%-23.15g", c_node->at_value);
+           sprintf(num, v_format("%F"), c_node->at_value);
            strcat(c_dummy, supp_tb(num));
           }
         if (c_node->from_name != NULL)
@@ -1467,7 +1472,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
     }
   strcpy(c_dummy, sequ->name);
   strcat(c_dummy, "_end: marker, at = ");
-  sprintf(num, "%-23.15g", sequ->length);
+  sprintf(num, v_format("%F"), sequ->length);
   strcat(c_dummy,num);
   write_nice_8(c_dummy, file);
   strcpy(c_dummy, "endsequence");
@@ -1492,7 +1497,8 @@ void export_variable(struct variable* var, FILE* file)
     }
   else
     {
-     sprintf(c_join, "%-23.15g", var->value); strcat(c_dummy, supp_tb(c_join));
+     sprintf(c_join, v_format("%F"), var->value); 
+     strcat(c_dummy, supp_tb(c_join));
     }
   write_nice(c_dummy, file);
 }
@@ -1517,11 +1523,13 @@ void export_var_8(struct variable* var, FILE* file)
   if (var->expr != NULL) strcat(c_dummy, var->expr->string);
   else if (var->val_type == 0)
     {
-     k = var->value; sprintf(c_join, "%d", k); strcat(c_dummy, c_join);
+     k = var->value; sprintf(c_join, v_format("%I"), k); 
+     strcat(c_dummy, c_join);
     }
   else
     {
-     sprintf(c_join, "%-23.15g", var->value); strcat(c_dummy, supp_tb(c_join));
+     sprintf(c_join, v_format("%F"), var->value); 
+     strcat(c_dummy, supp_tb(c_join));
     }
   write_nice_8(c_dummy, file);
 }
@@ -1998,7 +2006,7 @@ void* mymalloc(char* caller, size_t size)
   if ((p = malloc(l_size)) == NULL)
     fatal_error("memory overflow, called from routine:", caller);
   i_p = (int*) p; *i_p = FREECODE;
-  return ((char*)p+sizeof(int));
+  return (p+sizeof(int));
 }
 
 char* mystrchr(char* string, char c)
@@ -2696,10 +2704,10 @@ void print_command_parameter(struct command_parameter* par)
      break;
     case 1:
      k = par->double_value;
-     fprintf(prt_file, "%s = %d, ", par->name, k);
+     fprintf(prt_file, v_format("%s = %I, "), par->name, k);
      break;
     case 2:
-     fprintf(prt_file, "%s = %e, ", par->name, par->double_value);
+     fprintf(prt_file, v_format("%s = %F, "), par->name, par->double_value);
      break;
     case 11:
     case 12:
@@ -2707,7 +2715,7 @@ void print_command_parameter(struct command_parameter* par)
       {
        fprintf(prt_file, "double array: ");
        for (i = 0; i < par->double_array->curr; i++)
-            fprintf(prt_file, "%e, ", par->double_array->a[i]);
+            fprintf(prt_file, v_format("%F, "), par->double_array->a[i]);
        fprintf(prt_file, "\n");
       }
      break;
@@ -2740,12 +2748,15 @@ void print_global(double delta)
   puts(" ");
   printf(" Global parameters for %ss, radiate = %s:\n\n",
          tmp, trad);
-  printf(" C         %16.8g m          f0        %16.8g MHz\n",circ, freq0);
-  printf(" T0        %16.8g musecs     alfa      %16.8e \n", t0, alfa);
-  printf(" eta       %16.8e            gamma(tr) %16.8g \n", eta, gamtr);
-  printf(" Bcurrent  %16.8g A/bunch    Kbunch    %16d \n", bcurrent, kbunch);
-  printf(" Npart     %16.8g /bunch     Energy    %16.8g GeV \n", npart,energy);
-  printf(" gamma     %16.8g            beta      %16.8g\n", gamma, beta);
+  printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
+  printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
+  printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
+  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), 
+                  bcurrent, kbunch);
+  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), 
+                  npart,energy);
+  printf(v_format(" gamma     %F            beta      %F\n"), 
+                  gamma, beta);
 }
 
 void print_rfc()
@@ -2757,14 +2768,15 @@ void print_rfc()
   if (n == 0)  return;
   freq0 = command_par_value("freq0", probe_beam);
   printf("\n RF system: \n");
-  printf(" Cavity                    length[m]  voltage[MV]              lag          freq[MHz]         harmon\n");
+  printf(v_format(" %S %NFs %NFs %NFs %NFs %NFs\n"),
+  "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
   for (i = 0; i < n; i++)
     {
      el = current_sequ->cavities->elem[i];
      if ((harmon = el_par_value("harmon", el)) > zero)
        {
       freq = freq0 * harmon;
-        printf(" %-16s  %14.6g  %14.6g  %14.6g  %18.10g  %12.0f\n",
+        printf(v_format(" %S %F %F %F %F %F\n"),
                el->name, el->length, el_par_value("volt", el),
                el_par_value("lag", el), freq, harmon);
        }
@@ -2784,21 +2796,28 @@ void print_table(struct table* t)
         n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
         fprintf(prt_file, "\n");
         for (i = wpl*k; i < n; i++)
-           fprintf(prt_file, "%18s ", t->columns->names[i]);
+	   {
+            if (t->columns->inform[i] == 1)
+               fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
+            else if (t->columns->inform[i] == 2)
+               fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
+            else if (t->columns->inform[i] == 3)
+               fprintf(prt_file, v_format("%S "), t->columns->names[i]);
+	   }
         fprintf(prt_file, "\n");
         for (j = 0; j < t->curr; j++)
           {
          for (i = wpl*k; i < n; i++)
            {
             if (t->columns->inform[i] == 1)
-       {
+                {
                  tmp = t->d_cols[i][j];
-                 fprintf(prt_file, "%18d ", tmp);
-       }
+                 fprintf(prt_file, v_format("%I "), tmp);
+                }
             else if (t->columns->inform[i] == 2)
-                  fprintf(prt_file, "%18.10e ", t->d_cols[i][j]);
+                  fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
             else if (t->columns->inform[i] == 3)
-                  fprintf(prt_file, "%18s ", t->s_cols[i][j]);
+                  fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
            }
            fprintf(prt_file, "\n");
         }
@@ -2815,7 +2834,7 @@ void print_value(struct in_cmd* cmd)
     {
       nitem = end + 1 - s_start;
       if (polish_expr(nitem, &toks[s_start]) == 0)
-         fprintf(prt_file, "%s = %-22.14g ;\n",
+         fprintf(prt_file, v_format("%s = %F ;\n"),
                  spec_join(&toks[s_start], nitem), polish_value(deco));
       else warning("invalid expression:", spec_join(&toks[s_start], nitem));
       s_start = end+1;
@@ -2999,6 +3018,48 @@ double vmod(int* n, double* v)
   return sqrt(mod);
 }
 
+int v_length(char* form)
+{
+  int ret = 0;
+  if      (form[1] == 'I') sscanf(int_format, "%d", &ret);
+  else if (form[1] == 'F') sscanf(float_format, "%d", &ret);
+  return ret;
+}
+
+char* v_format(char* string)
+/* copies string to gloval variable var_form
+   replacing  %S, %I, and %F by the user defined formats;
+   %NF and %NI are replaced by the field lengths (!) of the defined formats */
+{
+  char *p, *q = string, *s = string, *t;
+  char c;
+  *var_form = '\0';
+  while ((p = strpbrk(s, "NIFS")))
+    {
+     if ((int)p > (int)q)
+       {
+	t = p; t--;
+        if (*t == '%')
+	  {
+           c = *p;
+           strncat(var_form, q, (int)p - (int)q);
+           if (c == 'N')
+	      {
+	       sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
+	       p++;
+	      }
+           else if (c == 'F')  strcat(var_form, float_format);
+           else if (c == 'S')  strcat(var_form, string_format);
+           else if (c == 'I')  strcat(var_form, int_format);
+           q = p; q++;
+	  }
+       }
+     s = ++p;
+    }
+  strcat(var_form, q);
+  return var_form;
+}
+
 void write_elems(struct el_list* ell, struct command_list* cl, FILE* file)
 {
   int i;
@@ -3170,19 +3231,24 @@ void write_table(struct table* t, char* filename)
      for (i = 0; i < col->curr; i++)
        {
       strcpy(l_name, t->columns->names[col->i[i]]);
-        fprintf(out_file, "%-18s ", stoupper(l_name));
-       }
+      if (t->columns->inform[col->i[i]] == 1)
+        fprintf(out_file, v_format("%NIs "), stoupper(l_name));
+      else if (t->columns->inform[col->i[i]] == 2)
+         fprintf(out_file, v_format("%NFs "), stoupper(l_name));
+      else if (t->columns->inform[col->i[i]] == 3)
+         fprintf(out_file, v_format("%S "), stoupper(l_name));
+      }
      fprintf(out_file, "\n");
 
      fprintf(out_file, "$ ");
      for (i = 0; i < col->curr; i++)
        {
       if (t->columns->inform[col->i[i]] == 1)
-            fprintf(out_file, "%%hd          ");
+            fprintf(out_file, v_format("%NIs "),"%hd");
       else if (t->columns->inform[col->i[i]] == 2)
-            fprintf(out_file, "%%le                ");
+            fprintf(out_file, v_format("%NFs "),"%le");
       else if (t->columns->inform[col->i[i]] == 3)
-            fprintf(out_file, "%%s                 ");
+            fprintf(out_file, v_format("%S "),"%s");
        }
      fprintf(out_file, "\n");
 
@@ -3198,20 +3264,21 @@ void write_table(struct table* t, char* filename)
          for (i = 0; i < col->curr; i++)
            {
             if (t->columns->inform[col->i[i]] == 1)
-       {
-        tmp = t->d_cols[col->i[i]][j];
-                 fprintf(out_file, " %-18d", tmp);
-       }
+              {
+               tmp = t->d_cols[col->i[i]][j];
+               fprintf(out_file, v_format(" %I"), tmp);
+              }    
             else if (t->columns->inform[col->i[i]] == 2)
-                  fprintf(out_file, " %-18.10g", t->d_cols[col->i[i]][j]);
+                  fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
             else if (t->columns->inform[col->i[i]] == 3)
               {
-               strcpy(c_dummy, t->s_cols[col->i[i]][j]);
-                 stoupper(c_dummy);
-                 pc = strip(c_dummy); /* remove :<occ_count> */
-                 k = strlen(pc);
-                 pc[k++] = '\"'; pc[k] = '\0';
-                 fprintf(out_file, " \"%-18s", pc);
+	       *c_dummy = '\"';
+               strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
+               stoupper(c_dummy);
+               pc = strip(c_dummy); /* remove :<occ_count> */
+               k = strlen(pc);
+               pc[k++] = '\"'; pc[k] = '\0';
+               fprintf(out_file, v_format(" %S "), pc);
               }
            }
            fprintf(out_file, "\n");

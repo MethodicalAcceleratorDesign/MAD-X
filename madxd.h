@@ -560,6 +560,7 @@ void store_comm_par_vector(char*, double*, struct command*);
 void store_orbit(struct command*, double*);
 void store_savebeta(struct in_cmd*);
 void store_select(struct in_cmd*);
+void store_set(struct command*, int);
 void store_threader(struct in_cmd*);
 int string_cnt(char, int, char**);
 char* strip(char*);
@@ -593,6 +594,8 @@ void use_sequ(struct in_cmd*);
 double variable_value(struct variable*);
 double vdot(int*, double*, double*);
 int version_header(char*);
+int v_length(char*);
+char* v_format(char*);
 double vmod(int*, double*);
 void warning(char*, char*);
 void write_elems(struct el_list*, struct command_list*, FILE*);
@@ -823,13 +826,16 @@ FILE* tab_file;                /* for table input */
 /* Global simple variables by type */
 
 char quote;                       /* current open single or double quote */
-char  tmp_key[NAME_L],
-      c_dummy[AUX_LG],
-      c_join[AUX_LG],
-      l_dummy[AUX_LG],
-      work[AUX_LG],
-      l_work[AUX_LG];
-
+char tmp_key[NAME_L],
+     c_dummy[AUX_LG],
+     c_join[AUX_LG],
+     l_dummy[AUX_LG],
+     work[AUX_LG],
+     l_work[AUX_LG],
+     int_format[20],             /* current integer format */
+     float_format[20],           /* current float format */
+     string_format[20];          /* current string format */
+char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 1.12";

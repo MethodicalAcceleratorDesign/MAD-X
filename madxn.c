@@ -843,6 +843,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
   else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
   else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
   else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
@@ -2301,7 +2302,7 @@ void exec_show(struct in_cmd* cmd)
         else if ((var = find_variable(toks[i], variable_list)))
           {
          if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
-           else fprintf(prt_file, "%s = %-18.10g ;\n", toks[i], var->value);
+           else fprintf(prt_file, v_format("%s = %F ;\n"), toks[i], var->value);
           }
         else fprintf(prt_file, "%s not found\n", toks[i]);
        }
@@ -2766,129 +2767,130 @@ void fill_twiss_header(struct table* t)
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
   strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dummy, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp),
+  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""), strlen(tmp),
           stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
+  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""), 
+          i, stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "mass");
-  sprintf(c_dummy, "@ MASS             %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ MASS             %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "charge");
-  sprintf(c_dummy, "@ CHARGE           %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ CHARGE           %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "energy");
-  sprintf(c_dummy, "@ ENERGY           %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ ENERGY           %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "pc");
-  sprintf(c_dummy, "@ PC               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ PC               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "gamma");
-  sprintf(c_dummy, "@ GAMMA            %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ GAMMA            %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "kbunch");
-  sprintf(c_dummy, "@ KBUNCH           %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ KBUNCH           %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dummy, "@ BCURRENT         %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ BCURRENT         %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "sige");
-  sprintf(c_dummy, "@ SIGE             %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ SIGE             %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "sigt");
-  sprintf(c_dummy, "@ SIGT             %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ SIGT             %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "npart");
-  sprintf(c_dummy, "@ NPART            %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ NPART            %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "ex");
-  sprintf(c_dummy, "@ EX               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ EX               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "ey");
-  sprintf(c_dummy, "@ EY               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ EY               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   dtmp = get_value("beam", "et");
-  sprintf(c_dummy, "@ ET               %%le  %22.12g", dtmp);
+  sprintf(c_dummy, v_format("@ ET               %%le  %F"), dtmp);
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   if ((pos = name_list_pos("summ", table_register->names)) > -1)
     {
      s = table_register->tables[pos];
      pos = name_list_pos("length", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ LENGTH           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ LENGTH           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("alfa", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ ALFA             %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ ALFA             %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("orbit5", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ ORBIT5           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ ORBIT5           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("gammatr", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ GAMMATR          %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ GAMMATR          %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("q1", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ Q1               %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ Q1               %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("q2", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ Q2               %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ Q2               %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dq1", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DQ1              %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DQ1              %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dq2", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DQ2              %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DQ2              %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dxmax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DXMAX            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DXMAX            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dymax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DYMAX            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DYMAX            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("xcomax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCOMAX           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ XCOMAX           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("ycomax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCOMAX           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ YCOMAX           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("betxmax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ BETXMAX          %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ BETXMAX          %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("betymax", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ BETYMAX          %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ BETYMAX          %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("xcorms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ XCORMS           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ XCORMS           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("ycorms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ YCORMS           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ YCORMS           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dxrms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DXRMS            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DXRMS            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("dyrms", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DYRMS            %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DYRMS            %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      pos = name_list_pos("deltap", s->columns);
      dtmp = s->d_cols[pos][0];
-     sprintf(c_dummy, "@ DELTAP           %%le  %22.12g", dtmp);
+     sprintf(c_dummy, v_format("@ DELTAP           %%le  %F"), dtmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
     }
 }
@@ -3003,6 +3005,7 @@ void madx_init()
   set_defaults("option");
   set_defaults("beam");
   add_to_command_list("default_beam", current_beam, beam_list, 0);
+  set_defaults("set");
   set_defaults("setplot");
   set_defaults("threader");
   table_register = new_table_list(10);
@@ -5082,7 +5085,8 @@ void pro_emit(struct in_cmd* cmd)
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
-  printf("guess: %d %f %f\n",guess_flag, guess_orbit[0],guess_orbit[1]);
+  printf(v_format("guess: %I %F %F\n"),
+         guess_flag, guess_orbit[0],guess_orbit[1]);
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
   myfree(rout_name, tt);
@@ -5106,7 +5110,7 @@ void pro_emit(struct in_cmd* cmd)
        }
      else
        {
-      sprintf(tmp, "%14.6f", e_deltap);
+      sprintf(tmp, v_format("%F"), e_deltap);
         warning("EMIT: beam not updated, non-zero deltap: ", tmp);
        }
      print_rfc();
@@ -6676,6 +6680,8 @@ void set_defaults(char* string) /* reset options, beam etc. to defaults */
       if (options != NULL) delete_command(options);
         options = clone_command(defined_commands->commands[pos]);
        }
+     else if (strcmp(string, "set") == 0) 
+       store_set(defined_commands->commands[pos], 0);
      else if (strcmp(string, "setplot") == 0)
        {
       if (plot_options != NULL) delete_command(plot_options);
@@ -7461,7 +7467,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
          }
        }
        break;
-     case 3:
+	case 3: /* string */
        if (start <= end)
        {
           get_bracket_t_range(toks, '{', '}', start, end, &s_start, &s_end);
@@ -7672,6 +7678,30 @@ void store_select(struct in_cmd* cmd)
         scl->commands[scl->curr++] = cmd->clone;
         cmd->clone_flag = 1; /* do not drop */
        }
+    }
+}
+
+void store_set(struct command* comm, int flag)
+{
+  char* p;
+  struct command_parameter* cp;
+  struct name_list* nl = comm->par_names;
+  int i, pos = name_list_pos("format", nl);
+  if (flag == 0 || nl->inform[pos])
+    {
+     cp = comm->par->parameters[pos];
+     for (i = 0; i < cp->m_string->curr; i++)
+       {
+        p = noquote(cp->m_string->p[i]);
+        if (strchr(p, 's')) strcpy(string_format, p);
+        else if (strpbrk(p, "id")) strcpy(int_format, p);
+        else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
+       }
+    }
+  else
+    {
+     warning("no parameter specified", "ignored");
+     return;
     }
 }
 
@@ -8020,32 +8050,32 @@ void track_pteigen(double* eigen)
     {
      t = table_register->tables[pos];
      if (t->header == NULL)  t->header = new_char_p_array(45);
-     sprintf(c_dummy, "@ XC               %%le  %22.12g", orbit0[0]);
+     sprintf(c_dummy, v_format("@ XC               %%le  %F"), orbit0[0]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ PXC              %%le  %22.12g", orbit0[1]);
+     sprintf(c_dummy, v_format("@ PXC              %%le  %F"), orbit0[1]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ YC               %%le  %22.12g", orbit0[2]);
+     sprintf(c_dummy, v_format("@ YC               %%le  %F"), orbit0[2]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ PYC              %%le  %22.12g", orbit0[3]);
+     sprintf(c_dummy, v_format("@ PYC              %%le  %F"), orbit0[3]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ TC               %%le  %22.12g", orbit0[4]);
+     sprintf(c_dummy, v_format("@ TC               %%le  %F"), orbit0[4]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-     sprintf(c_dummy, "@ PTC              %%le  %22.12g", orbit0[5]);
+     sprintf(c_dummy, v_format("@ PTC              %%le  %F"), orbit0[5]);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      tmp = get_value("beam", "ex");
-     sprintf(c_dummy, "@ EX               %%le  %22.12g", tmp);
+     sprintf(c_dummy, v_format("@ EX               %%le  %F"), tmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      tmp = get_value("beam", "ey");
-     sprintf(c_dummy, "@ EY               %%le  %22.12g", tmp);
+     sprintf(c_dummy, v_format("@ EY               %%le  %F"), tmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      tmp = get_value("beam", "et");
-     sprintf(c_dummy, "@ ET               %%le  %22.12g", tmp);
+     sprintf(c_dummy, v_format("@ ET               %%le  %F"), tmp);
      t->header->p[t->header->curr++] = tmpbuff(c_dummy);
      for (i = 0; i < 6; i++)
        {
         for (j = 0; j < 6; j++)
         {
-         sprintf(c_dummy, "@ E%d%d              %%le  %22.12g",
+         sprintf(c_dummy, v_format("@ E%d%d              %%le  %F"),
                    i+1, j+1, eigen[6*j+i]);
            t->header->p[t->header->curr++] = tmpbuff(c_dummy);
         }
@@ -8220,7 +8250,8 @@ void track_track(struct in_cmd* cmd)
   set_option("onetable", &k);
   track_deltap=get_value(current_command->name,"deltap");
   set_variable("track_deltap", &track_deltap);
-  if(track_deltap != 0) fprintf(prt_file, "track_deltap: %f\n",track_deltap);
+  if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
+                                track_deltap);
   curr_obs_points = 1;  /* default: always observe at machine end */
   pos = name_list_pos("file", nl);
   if (nl->inform[pos]) set_option("track_dump", &one);
