@@ -25,7 +25,7 @@
 /match.f -text
 /match.fi -text
 /matchc.c -text
-/orbf.f -text
+/orbf.fpp -text
 /physcons.fi -text
 /plot.f -text
 /survey.f -text
