@@ -1902,6 +1902,16 @@ double grndm()
   return xi1*zzr;
 }
 
+int inbounds(char* p, int n, char**p_list)
+/* checks whether pointer p is inside one of the ranges in p_list,
+   returns 1 for yes, 0 for no */
+{
+  int j;
+  for (j = 0; j < n; j++)
+      if (p > p_list[j] && p < p_list[++j]) return 1;
+  return 0;
+}
+ 
 void init55(int seed)
      /* initializes random number algorithm */
 {

@@ -402,6 +402,7 @@ void grow_vector_list(struct vector_list*);
 double hidden_node_pos(char*, struct sequence*);
 void init55(int);
 void irngen();
+int inbounds(char*, int, char**);
 int in_spec_list(char*);
 int int_in_array(int, int, int*);
 void insert_elem(struct sequence*, struct node*);

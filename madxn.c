@@ -493,24 +493,41 @@ int char_from_table(char* table, char* name, int* row, char* val)
 void check_table(char* string)
      /* replaces argument of "table" if any by a string variable */
 {
-  char *pt, *pl, *pr, *sv;
-  int start = 0;
-  while (strstr(&string[start], "table") != NULL)
+  char *pa, *pb, *pt, *pl, *pr, *sv, *quote;
+  char* qpos[1000];
+  int npos = 0, start = 0;
+  pa = string;
+  while (*pa) /* find all strings in quotes, keep positions */
     {
-     strcpy(c_join, &string[start]);
-     pt = strstr(c_join, "table");
-     if ((pl = strchr(pt, '(')) == NULL) return;
-     if ((pr = strchr(pl, ')')) == NULL) return;
-     *pl = '\0';
-     *pr = '\0';
-     sv = make_string_variable(++pl);
-     string[start] ='\0';
-     strcat(string, c_join);
-     strcat(string, " ( ");
-     strcat(string, sv);
-     strcat(string, " ) ");
-     start = strlen(string);
-     strcat(string, ++pr);
+     if (*pa == '\'' || *pa == '\"')
+       {
+	quote = pa;
+	qpos[npos++] = pa++;
+        if (!(pa = strchr(pa, *quote))) return; /* quote string not closed */
+        qpos[npos++] = pa;
+       }
+     pa++;
+    }
+  pa = string;
+  while ((pb = strstr(pa, "table")) != NULL)
+    {
+     if (!inbounds(pb, npos, qpos))
+       {
+        strcpy(c_join, pa);
+        pt = strstr(c_join, "table");
+        if ((pl = strchr(pt, '(')) == NULL) return;
+        if ((pr = strchr(pl, ')')) == NULL) return;
+        *pl = '\0';
+        *pr = '\0';
+        sv = make_string_variable(++pl);
+        *pa ='\0';
+        strcat(string, c_join);
+        strcat(string, " ( ");
+        strcat(string, sv);
+        strcat(string, " ) ");
+        strcat(string, ++pr);
+       }
+     pa = ++pb;
     }
 }
 
