@@ -33,9 +33,10 @@ module S_status
   integer, parameter :: KIND19 =ST+19
   integer, parameter :: KIND20 =ST+20     !  MADLIKE wedges on RBEND
   integer, parameter :: KIND21 =ST+21     !  travelling wave cavity
-  integer, parameter :: KINDFITTED = KIND20+2
-  integer, parameter :: KINDUSER1 = KIND20+3
-  integer, parameter :: KINDUSER2 = KIND20+4
+  integer, parameter :: KIND22 =ST+22     !  travelling wave cavity
+  integer, parameter :: KINDFITTED = KIND22+1
+  integer, parameter :: KINDUSER1 = KIND22+2
+  integer, parameter :: KINDUSER2 = KIND22+3
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6

@@ -8,6 +8,7 @@ module S_def_all_kinds
   private XMIDR,XMIDP,GMIDR,GMIDP
   include "a_def_all_kind.inc"
   include "a_def_user1.inc"
+  !  include "a_def_arbitrary.inc"
   include "a_def_user2.inc"
   include "a_def_element_fibre_layout.inc"
   private ALLOC_midr,ALLOC_midp,KILL_midr,KILL_midP
@@ -18,6 +19,7 @@ module S_def_all_kinds
      REAL(DP), POINTER :: FRAME(:,:,:)
      type(fibre), POINTER :: F
      REAL(DP),POINTER :: L(:)
+     logical(LP),POINTER :: DO_SURVEY
   END TYPE INNER_FRAME
 
 
@@ -105,7 +107,7 @@ contains
           ENDDO
        ENDDO
     ELSE
-       WRITE(6,*) "ERROR IN GRAME "
+       WRITE(6,*) "ERROR IN GFRAME "
        WRITE(6,*) I,SIZE(E_IN%ORIGIN,2)
        STOP 345
     ENDIF
@@ -209,6 +211,8 @@ contains
 
     allocate(x_in%E%FRAME(3,3,-7:X_IN%nst+6))
     allocate(x_in%E%ORIGIN(3,-7:X_IN%nst+6))
+    ALLOCATE(x_in%E%DO_SURVEY)
+    x_in%E%DO_SURVEY=.TRUE.
     x_in%nst=0
     x_in%POS=0
     x_in%RAY=zero
@@ -248,6 +252,8 @@ contains
           call alloc(x_in%RAY(I,J))
        ENDDO
     ENDDO
+    ALLOCATE(x_in%E%DO_SURVEY)
+    x_in%E%DO_SURVEY=.TRUE.
     x_in%nst=0
     x_in%E%L=zero
     x_in%E%FRAME=zero
@@ -268,8 +274,8 @@ contains
     DEallocate(x_in%E%FRAME)
     DEallocate(x_in%E%ORIGIN)
     DEallocate(x_in%E%L)
+    DEallocate(x_in%E%DO_SURVEY)
     DEallocate(x_in%E)
-
 
   END SUBROUTINE KILL_midr
 
@@ -293,6 +299,7 @@ contains
     DEallocate(x_in%E%FRAME)
     DEallocate(x_in%E%ORIGIN)
     DEallocate(x_in%E%L)
+    DEallocate(x_in%E%DO_SURVEY)
     DEallocate(x_in%E)
 
 
@@ -316,9 +323,6 @@ contains
 
     CL=> C  ! CHART OF ELEMENT 1
 
-    ! CL%A_XY=P%TILTD  ! GO CHARTLY
-    ! CL%L=P%LC
-    ! CL%ALPHA=DIR*P%LD*P%B0
     HA=DIR*P%LD*P%B0/TWO
     D=ZERO
     D(3)=DIR*P%LC/TWO
@@ -465,7 +469,6 @@ contains
     CALL KILL(F)
 
 
-
   END SUBROUTINE SURVEY_CHART
 
   SUBROUTINE SURVEY_INNER_MAG(e_in) !  Tracks the chart through a magnet
@@ -476,6 +479,7 @@ contains
     INTEGER NST,I,start
     REAL(DP) LH,HA,ANG(3),ANGH,RHO
     TYPE(MAGNET_CHART), POINTER :: P
+
     NST=E_IN%NST-6
     DONE=.FALSE.
     start=nst*(1-(1+E_IN%F%dir)/2)
@@ -483,125 +487,249 @@ contains
     P=>E_IN%F%MAG%P
     !E_IN%L
 
-    !     CALL GFRAME(E_IN,ENT,A,-1)
-    IF(ASSOCIATED(E_IN%F%CHART)) THEN
-       IF(ASSOCIATED(E_IN%F%CHART%F)) THEN
-          MID=E_IN%F%CHART%F%MID
-          O=E_IN%F%CHART%F%O
+    IF(E_IN%DO_SURVEY) THEN   !  DOING THE SURVEY
+
+       !     CALL GFRAME(E_IN,ENT,A,-1)
+       IF(ASSOCIATED(E_IN%F%CHART)) THEN
+          IF(ASSOCIATED(E_IN%F%CHART%F)) THEN
+             MID=E_IN%F%CHART%F%MID
+             O=E_IN%F%CHART%F%O
+             DONE=.TRUE.
+          ENDIF
+       ENDIF
+
+       IF(ASSOCIATED(E_IN%F%MAG%P%F)) THEN
+          MID= P%F%MID
+          O  = P%F%O
           DONE=.TRUE.
        ENDIF
-    ENDIF
 
-    IF(ASSOCIATED(E_IN%F%MAG%P%F)) THEN
-       MID= P%F%MID
-       O  = P%F%O
-       DONE=.TRUE.
-    ENDIF
-
-    IF(.NOT.DONE) THEN
-       WRITE(6,*) "ERROR IN SURVEY_INNER_MAG, NO FRAME WHATSOEVER "
-       STOP 330
-    ENDIF
-
-    SELECT CASE(E_IN%F%MAG%KIND)
-
-    CASE(KIND0)
-       CALL XFRAME(E_IN,MID,O,0)
-       E_IN%L(0)=zero +E_IN%L(-1)
-       IF(NST/=0) THEN
-          WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+       IF(.NOT.DONE) THEN
+          WRITE(6,*) "ERROR IN SURVEY_INNER_MAG, NO FRAME WHATSOEVER "
           STOP 330
        ENDIF
-    CASE(KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21)
-       LH=P%LC/TWO
-       A=O
-       D=ZERO;D(3)=-LH
-       CALL GEO_TRA(A,MID,D,1)
-       CALL XFRAME(E_IN,MID,A,start)
 
-       HA=P%LC/NST
-       E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
-       D=ZERO;D(3)=HA
-       DO I=1,NST
-          start=start+E_IN%F%dir
-          E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-          CALL GEO_TRA(A,MID,D,1)
-          CALL XFRAME(E_IN,MID,A,start)
-       ENDDO
-    CASE(KIND2,KIND6:KIND7,KIND10)
-       IF(P%B0==ZERO) THEN
+       SELECT CASE(E_IN%F%MAG%KIND)
+
+       CASE(KIND0)
+          CALL XFRAME(E_IN,MID,O,0)
+          E_IN%L(0)=zero +E_IN%L(-1)
+          IF(NST/=0) THEN
+             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+             STOP 330
+          ENDIF
+       CASE(KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21)
           LH=P%LC/TWO
           A=O
           D=ZERO;D(3)=-LH
           CALL GEO_TRA(A,MID,D,1)
           CALL XFRAME(E_IN,MID,A,start)
+
           HA=P%LC/NST
+          E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
           D=ZERO;D(3)=HA
-          E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
           DO I=1,NST
              start=start+E_IN%F%dir
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
              CALL GEO_TRA(A,MID,D,1)
              CALL XFRAME(E_IN,MID,A,start)
           ENDDO
-       ELSE
-          RHO=ONE/P%B0
-          ANG=ZERO; D=ZERO;
+       CASE(KIND2,KIND6:KIND7,KIND10)
+          IF(P%B0==ZERO) THEN
+             LH=P%LC/TWO
+             A=O
+             D=ZERO;D(3)=-LH
+             CALL GEO_TRA(A,MID,D,1)
+             CALL XFRAME(E_IN,MID,A,start)
+             HA=P%LC/NST
+             D=ZERO;D(3)=HA
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+                CALL GEO_TRA(A,MID,D,1)
+                CALL XFRAME(E_IN,MID,A,start)
+             ENDDO
+          ELSE
+             RHO=ONE/P%B0
+             ANG=ZERO; D=ZERO;
+             LH=P%LC/TWO
+             A=O
+             D(3)=-LH
+             ANGH=P%LD*P%B0/two
+             ANG(2)=-ANGH
+             CALL GEO_TRA(A,MID,D,1)
+             O=A
+             CALL GEO_ROT(MID,ENT      ,ANG  ,MID)
+             CALL XFRAME(E_IN,ENT,A,start)
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+
+             ANG(2)=TWO*ANGH/NST
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+                HA=ANGH-I*ANG(2)
+                CALL GEO_ROT(ENT,ENT      ,ANG  ,MID)
+                D=ZERO
+                D(1)=RHO*(COS(ha)-COS(ANGH))
+                D(3)=P%LC/TWO-sin(ha)*rho
+                A=O
+                CALL GEO_TRA(A,MID,D,1)
+                CALL XFRAME(E_IN,ENT,A,start)
+             ENDDO
+
+          ENDIF
+
+       CASE(KIND16)
+          ANGH=P%LD*P%B0/two
           LH=P%LC/TWO
           A=O
-          D(3)=-LH
-          ANGH=P%LD*P%B0/two
-          ANG(2)=-ANGH
+          D=ZERO;D(3)=-LH
           CALL GEO_TRA(A,MID,D,1)
-          O=A
-          CALL GEO_ROT(MID,ENT      ,ANG  ,MID)
-          CALL XFRAME(E_IN,ENT,A,start)
-          E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+          ANG=ZERO;ANG(2)=-(ANGH-P%EDGE(1))
+          CALL GEO_ROT(MID,MID      ,ANG  ,MID)
 
-          ANG(2)=TWO*ANGH/NST
+          CALL XFRAME(E_IN,MID,A,start)
+          HA=E_IN%F%MAG%L/NST
+          E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+          D=ZERO;D(3)=HA
           DO I=1,NST
              start=start+E_IN%F%dir
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-             HA=ANGH-I*ANG(2)
-             CALL GEO_ROT(ENT,ENT      ,ANG  ,MID)
-             D=ZERO
-             D(1)=RHO*(COS(ha)-COS(ANGH))
-             D(3)=P%LC/TWO-sin(ha)*rho
-             A=O
              CALL GEO_TRA(A,MID,D,1)
-             CALL XFRAME(E_IN,ENT,A,start)
+             CALL XFRAME(E_IN,MID,A,start)
           ENDDO
 
-       ENDIF
+       CASE(KIND22)   ! single map
+          IF(P%B0==ZERO) THEN
+             LH=P%LC/TWO
+             A=O
+             D=ZERO;D(3)=-LH
+             CALL GEO_TRA(A,MID,D,1)
+             CALL XFRAME(E_IN,MID,A,start)
+             HA=P%LC/NST
+             D=ZERO;D(3)=HA
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+                CALL GEO_TRA(A,MID,D,1)
+                CALL XFRAME(E_IN,MID,A,start)
+             ENDDO
+          ELSE
+             RHO=ONE/P%B0
+             ANG=ZERO; D=ZERO;
+             LH=P%LC/TWO
+             A=O
+             D(3)=-LH
+             ANGH=P%LD*P%B0/two
+             ANG(2)=-ANGH
+             CALL GEO_TRA(A,MID,D,1)
+             O=A
+             CALL GEO_ROT(MID,ENT      ,ANG  ,MID)
+             CALL XFRAME(E_IN,ENT,A,start)
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
 
-    CASE(KIND16)
-       ANGH=P%LD*P%B0/two
-       LH=P%LC/TWO
-       A=O
-       D=ZERO;D(3)=-LH
-       CALL GEO_TRA(A,MID,D,1)
-       ANG=ZERO;ANG(2)=-(ANGH-P%EDGE(1))
-       CALL GEO_ROT(MID,MID      ,ANG  ,MID)
+             ANG(2)=TWO*ANGH/NST
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+                HA=ANGH-I*ANG(2)
+                CALL GEO_ROT(ENT,ENT      ,ANG  ,MID)
+                D=ZERO
+                D(1)=RHO*(COS(ha)-COS(ANGH))
+                D(3)=P%LC/TWO-sin(ha)*rho
+                A=O
+                CALL GEO_TRA(A,MID,D,1)
+                CALL XFRAME(E_IN,ENT,A,start)
+             ENDDO
 
-       CALL XFRAME(E_IN,MID,A,start)
-       HA=E_IN%F%MAG%L/NST
-       E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-       D=ZERO;D(3)=HA
-       DO I=1,NST
-          start=start+E_IN%F%dir
+          ENDIF
+
+       CASE DEFAULT
+
+
+
+          Write(6,*)"KIND = ",  E_IN%F%MAG%KIND," NOT SUPPORTED IN SURVEY_INNER_MAG "
+          STOP 778
+
+       END  SELECT
+
+
+
+    ELSE    ! NOT  DOING THE SURVEY
+
+
+
+
+       SELECT CASE(E_IN%F%MAG%KIND)
+
+       CASE(KIND0)
+          E_IN%L(0)=zero +E_IN%L(-1)
+          IF(NST/=0) THEN
+             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+             STOP 330
+          ENDIF
+       CASE(KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21)
+          E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
+          DO I=1,NST
+             start=start+E_IN%F%dir
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+          ENDDO
+       CASE(KIND2,KIND6:KIND7,KIND10)
+          IF(P%B0==ZERO) THEN
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             ENDDO
+          ELSE
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             ENDDO
+
+          ENDIF
+
+       CASE(KIND16)
           E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-          CALL GEO_TRA(A,MID,D,1)
-          CALL XFRAME(E_IN,MID,A,start)
-       ENDDO
+          DO I=1,NST
+             start=start+E_IN%F%dir
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+          ENDDO
 
-    CASE DEFAULT
+       CASE(KIND22)   ! single map
+          IF(P%B0==ZERO) THEN
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             ENDDO
+          ELSE
+             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+
+             DO I=1,NST
+                start=start+E_IN%F%dir
+                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
+             ENDDO
+
+          ENDIF
+
+       CASE DEFAULT
 
 
 
-       Write(6,*)"KIND = ",  E_IN%F%MAG%KIND," NOT SUPPORTED IN SURVEY_INNER_MAG "
-       STOP 778
+          Write(6,*)"KIND = ",  E_IN%F%MAG%KIND," NOT SUPPORTED IN SURVEY_INNER_MAG "
+          STOP 778
 
-    END  SELECT
+       END  SELECT
+
+
+    ENDIF
+
+
 
     E_IN%L(-1)=E_IN%L(-1)+P%Ld
 
@@ -612,3 +740,4 @@ contains
 
 
 end module S_def_all_kinds
+

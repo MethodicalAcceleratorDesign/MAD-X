@@ -40,7 +40,7 @@ module polymorphic_taylor
   private absoftdatan2dr,absoftdcosdr,absoftdsindr,absoftdtandr,absoftdatandr
   !complex stuff
   private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt
-  private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT
+  private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT,polymorpht
   ! end complex stuff
   private printpoly
   private line
@@ -296,6 +296,9 @@ module polymorphic_taylor
      MODULE PROCEDURE resetenvn   !
   END INTERFACE
 
+  INTERFACE morph
+     MODULE PROCEDURE polymorpht
+  END INTERFACE
 
 
   INTERFACE daprint
@@ -450,6 +453,20 @@ module polymorphic_taylor
   END INTERFACE
 
 contains
+
+  FUNCTION polymorpht( S1 )
+    implicit none
+    TYPE (real_8) polymorpht
+    TYPE (complextaylor), INTENT (IN) :: S1
+    integer localmaster
+
+    localmaster=master
+    call ass(polymorpht)
+    polymorpht%t= s1
+    master=localmaster
+
+  END FUNCTION polymorpht
+
 
   FUNCTION GETCHARnd2( S1, S2 )
     implicit none

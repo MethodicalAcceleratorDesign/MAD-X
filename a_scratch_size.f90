@@ -255,6 +255,11 @@ module precision_constants
 
      INTEGER, pointer :: SECTOR_NMUL_MAX     != 10 maxwell equations is solved to order 10 in exact sectors
      INTEGER, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
+     real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
+     logical(dp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
+
+
+
      LOGICAL(lp), pointer:: electron     !  electron if true otherwise proton
      real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true
      ! global on the fly

@@ -111,9 +111,8 @@ contains
           ! MADX does some massaging of e1 and e2 for compatibility with mad8
           ! PTC stays with MAD8
           IF(KEY%LIST%B0/=ZERO) THEN
-             KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))
+             KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))    !  ld is computed
           ENDIF
-          !          KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))
           KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
           KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
           BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
@@ -146,6 +145,16 @@ contains
        BLANK=RCOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("ECOLLIMATOR    ")
        BLANK=ECOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+    CASE("TAYLORMAP      ")
+       IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
+          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
+       ELSEIF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev==' ') THEN
+          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,t=tilt.is.KEY%tiltd)
+       ELSEIF(KEY%LIST%file==' '.and.KEY%LIST%file_rev/=' ') THEN
+          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
+       ELSE
+          BLANK=TAYLOR_MAP(KEY%LIST%NAME,t=tilt.is.KEY%tiltd)
+       ENDIF
     CASE DEFAULT
        WRITE(6,*) " "
        WRITE(6,*) " THE MAGNET"

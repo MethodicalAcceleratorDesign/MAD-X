@@ -7,7 +7,7 @@ module dabnew
   use da_arrays
   implicit none
   private
-  !public dp
+  public ppushstore,ppushprint,ppushGETN
   public bran
   PUBLIC DAINI,DANOT,DAALLNO,DAVAR,DAALL1,PPUSH,MTREE,DADAL,DACCT,DADER,DASQR
   PUBLIC DAMUL,DAADD,DACOP,DAINV,DAPIN,DAPEK,DAPOK,DACFU,DASUB,DACON,DADAL1
@@ -15,15 +15,11 @@ module dabnew
   PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR,DAPOI
   PUBLIC DACFUI,DAPRI77,DAREA77,DAINF,GET_C_J,PPUSH1,KILL_BERZ,DALLSTA,dacycle
   public count_da
-  !integer,public::idao
-  !  integer,public,dimension(100)::is
-  !integer,public,dimension(100)::iscrri
-  !real(dp),public,dimension(100)::rs
+
   integer,private,parameter::nmax=400,lsw=1
   real(dp),private,parameter::tiny=c_1d_20
   character(120) line
-  !  integer,dimension(lnv)::jjx
-  !  data jjx / lnv*0 /  ! flat zero here
+
 contains
   !******************************************************************************
   !                                                                             *
@@ -283,7 +279,7 @@ contains
        !
 50     jl    = jl + jd
        !
-
+       
        !old
        !      IF(JL.EQ.0) THEN
        !old
@@ -3247,6 +3243,54 @@ contains
     enddo
     return
   end subroutine ppushprint
+  !
+  subroutine ppushstore(mc,nd,coef,ml,mv)
+    implicit none
+    !
+    integer i,ic,iv,jc,jl,jv,ntot,nd
+    integer,dimension(:), intent(in)::mc
+    integer,dimension(:), intent(out)::ml,mv
+    real(dp),dimension(:),intent(out)::coef
+    character(20) line
+    !
+    jc=0
+    jl=0;jv=0;
+    ic=2*nd
+    ntot=idall(mc(1))*ic
+    do i=1,ic
+       jc=1+jc
+       ml(jc)=0
+       mv(jc)=0
+       coef(jc)=cc(idapo(mc(i)))
+       !       write(mf,*) jc,jl,jv,cc(idapo(mc(i)))
+    enddo
+
+    do i=1,idall(mc(1))-1
+       jl = i1(idapo(mc(1))+i)
+       jv = i2(idapo(mc(1))+i)
+       !      xx = xm(jl)*xi(jv)
+       !      xm(jl+1) = xx
+       do iv=1,ic
+          jc=1+jc
+          ml(jc)=jl
+          mv(jc)=jv
+          coef(jc)=cc(idapo(mc(iv))+i)
+
+          !         write(mf,*) jc,jl,jv,cc(idapo(mc(iv))+i)
+          !        xf(iv) = xf(iv) + cc(idapo(mc(iv))+i) * xx
+       enddo
+    enddo
+    return
+  end subroutine ppushstore
+
+  subroutine ppushGETN(mc,ND,ntot)
+    implicit none
+    !
+    integer ntot,ND
+    integer,dimension(:), intent(inout)::mc
+    !
+    ntot=idall(mc(1))*2*nd
+  end subroutine ppushGETN
   !
 
   subroutine ppush(mc,ic,xi,xf)

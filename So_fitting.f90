@@ -1342,7 +1342,7 @@ contains
     TYPE(fibre),INTENT(INOUT):: f
     TYPE(real_8) y(6)
     TYPE(internal_state), intent(in):: state
-    integer,target :: charge
+    integer,optional,target :: charge
     real(dp) kf,x(6),xdix,xdix0,tiny
     integer ite
     tiny=c_1d_40

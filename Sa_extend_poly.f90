@@ -3,7 +3,7 @@
 ! See file A_SCRATCH_SIZE.F90
 
 module S_extend_poly
-  USE polymorphic_complextaylor
+  USE tree_element_MODULE
   IMPLICIT NONE
   integer,private,parameter::ndd=6
   private real_8REAL6,REAL6real_8,env_8map,real_8REAL_8,env_8benv

@@ -50,11 +50,16 @@ module polymorphic_complextaylor
      MODULE PROCEDURE resetpoly_Rn
   END INTERFACE
 
+
   INTERFACE daprint
      MODULE PROCEDURE printpoly
   END INTERFACE
   INTERFACE print
      MODULE PROCEDURE printpoly
+  END INTERFACE
+
+  INTERFACE morph
+     MODULE PROCEDURE polymorpht
   END INTERFACE
 
   INTERFACE dimag
@@ -247,6 +252,19 @@ module polymorphic_complextaylor
   END INTERFACE
 
 contains
+
+  FUNCTION polymorpht( S1 )
+    implicit none
+    TYPE (double_complex) polymorpht
+    TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+
+    localmaster=master
+    call ass(polymorpht)
+    polymorpht%t= s1
+    master=localmaster
+  END FUNCTION polymorpht
+
 
   subroutine set_da_pointers
     use da_arrays

@@ -572,7 +572,7 @@ contains
   SUBROUTINE  DAREADTAYLORS(S1,MFILE)
     implicit none
     INTEGER,INTENT(in)::MFILE
-    type (TAYLOR),INTENT(IN)::S1(NDIM2)
+    type (TAYLOR),INTENT(INOUT)::S1(NDIM2)
     INTEGER I
 
     DO I=1,ND2
@@ -584,7 +584,7 @@ contains
   SUBROUTINE  DAREADTAYLOR(S1,MFILE)
     implicit none
     INTEGER,INTENT(in)::MFILE
-    type (TAYLOR),INTENT(IN)::S1
+    type (TAYLOR),INTENT(INOUT)::S1
 
     CALL REA(s1,MFILE)
 
@@ -593,7 +593,7 @@ contains
   SUBROUTINE  DAREADMAP(S1,MFILE)
     implicit none
     INTEGER,INTENT(in)::MFILE
-    type (damap),INTENT(in)::S1
+    type (damap),INTENT(INOUT)::S1
     INTEGER I
 
     DO I=1,ND2

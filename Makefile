@@ -74,7 +74,8 @@ k_tpsalie_analysis.o: j_tpsalie.o k_tpsalie_analysis.f90
 l_complex_taylor.o: k_tpsalie_analysis.o l_complex_taylor.f90
 m_real_polymorph.o: l_complex_taylor.o m_real_polymorph.f90
 n_complex_polymorph.o: m_real_polymorph.o n_complex_polymorph.f90
-Sa_extend_poly.o: n_complex_polymorph.o Sa_extend_poly.f90
+o_tree_element.o: n_complex_polymorph.o o_tree_element.f90
+Sa_extend_poly.o: o_tree_element.o Sa_extend_poly.f90
 Sb_1_pol_template.o: Sa_extend_poly.o Sb_1_pol_template.f90
 Sb_2_pol_template.o: Sb_1_pol_template.o Sb_2_pol_template.f90
 Sc_euclidean.o: Sb_2_pol_template.o Sc_euclidean.f90
@@ -116,12 +117,11 @@ wrap.o: madx_ptc_module.o wrap.f90
 
 # madx_objectsf77: madxnp.o gxx11c.o  + all *.F except for gxx11ps.F (windows special). Append f77 to distinguish from objects compiled with f95
 madx_objectsf77 = madxnp.o gxx11c.o $(filter-out gxx11ps_f77.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
-
-# madx_objectsf95 all *.F without madxm.F, ptc_dummy.F
-madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 madx: $(madx_objectsf77) ; 
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lm -lc
 
+# madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
+madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxdev_objects. All *.f90 , some c and F
 madxdev_objects = madxm.o $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxnp.o gxx11c.o epause.o timel.o usleep.o \

@@ -669,9 +669,10 @@ CONTAINS
 
 
 
-  SUBROUTINE SETFAMILYR(EL)
+  SUBROUTINE SETFAMILYR(EL,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT) ::EL
+    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
 
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -975,6 +976,34 @@ CONTAINS
        EL%ECOL19%P=>EL%P
        EL%ECOL19%L=>EL%L
        nullify(EL%ECOL19%A);ALLOCATE(EL%ECOL19%A);CALL ALLOC(EL%ECOL19%A)
+    CASE(KIND22)
+       if(.not.ASSOCIATED(EL%M22)) THEN
+          ALLOCATE(EL%M22)
+          el%M22=0
+       ELSE
+          el%M22=-1
+          el%M22=0
+       ENDIF
+       EL%M22%P=>EL%P
+       !       CALL NULL_TREE(EL%M22%T)
+       allocate(EL%M22%DELTAMAP)
+       EL%M22%DELTAMAP=.TRUE.
+       if(NTOT/=0) then
+          allocate(EL%M22%T)
+          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
+       endif
+       if(NTOT_rad/=0) then
+          allocate(EL%M22%T_rad)
+          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
+       endif
+       if(NTOT_REV/=0) then
+          allocate(EL%M22%T_REV)
+          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
+       endif
+       if(NTOT_rad_REV/=0) then
+          allocate(EL%M22%T_rad_REV)
+          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
+       endif
     CASE(KINDUSER1)
        if(.not.ASSOCIATED(EL%U1)) THEN
           ALLOCATE(EL%U1)
@@ -1022,9 +1051,11 @@ CONTAINS
     END SELECT
   END SUBROUTINE SETFAMILYR
 
-  SUBROUTINE SETFAMILYP(EL)
+
+  SUBROUTINE SETFAMILYP(EL,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENTP), INTENT(INOUT) ::EL
+    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
 
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1330,6 +1361,33 @@ CONTAINS
        EL%ECOL19%P=>EL%P
        EL%ECOL19%L=>EL%L
        nullify(EL%ECOL19%A);ALLOCATE(EL%ECOL19%A);CALL ALLOC(EL%ECOL19%A)
+    CASE(KIND22)
+       if(.not.ASSOCIATED(EL%M22)) THEN
+          ALLOCATE(EL%M22)
+          el%M22=0
+       ELSE
+          el%M22=-1
+          el%M22=0
+       ENDIF
+       EL%M22%P=>EL%P
+       allocate(EL%M22%DELTAMAP)
+       EL%M22%DELTAMAP=.TRUE.
+       if(NTOT/=0) then
+          allocate(EL%M22%T)
+          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
+       endif
+       if(NTOT_rad/=0) then
+          allocate(EL%M22%T_rad)
+          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
+       endif
+       if(NTOT_REV/=0) then
+          allocate(EL%M22%T_REV)
+          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
+       endif
+       if(NTOT_rad_REV/=0) then
+          allocate(EL%M22%T_rad_REV)
+          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
+       endif
     CASE(KINDUSER1)
        if(.not.ASSOCIATED(EL%U1)) THEN
           ALLOCATE(EL%U1)
@@ -1732,6 +1790,7 @@ CONTAINS
     nullify(EL%CAV21);
     nullify(EL%S5);
     nullify(EL%T6);
+    nullify(EL%M22);
     nullify(EL%S17);
     nullify(EL%T7);
     nullify(EL%S8);
@@ -1773,6 +1832,7 @@ CONTAINS
     nullify(EL%CAV21);
     nullify(EL%S5);
     nullify(EL%T6);
+    nullify(EL%M22);
     nullify(EL%S17);
     nullify(EL%T7);
     nullify(EL%S8);
@@ -1830,6 +1890,10 @@ CONTAINS
        IF(ASSOCIATED(EL%T6)) THEN
           EL%T6=-1
           DEALLOCATE(EL%T6)   ! thick sixtrack
+       ENDIF
+       IF(ASSOCIATED(EL%M22)) THEN
+          EL%M22=-1
+          DEALLOCATE(EL%M22)   ! thick sixtrack
        ENDIF
        IF(ASSOCIATED(EL%S17)) THEN
           EL%S17=-1
@@ -1970,6 +2034,10 @@ CONTAINS
           EL%T6=-1
           DEALLOCATE(EL%T6)       ! INTEGRATOR
        endif
+       IF(ASSOCIATED(EL%M22)) then
+          EL%M22=-1
+          DEALLOCATE(EL%M22)       ! INTEGRATOR
+       endif
        IF(ASSOCIATED(EL%S17)) then
           EL%S17=-1
           DEALLOCATE(EL%S17)       ! INTEGRATOR
@@ -2099,7 +2167,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT),INTENT(IN)::  EL
     TYPE(ELEMENTP),INTENT(inOUT)::  ELP
-    INTEGER I,J
+    INTEGER I,J,k,l
 
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
@@ -2224,6 +2292,21 @@ CONTAINS
 
     IF(EL%KIND==KIND6) CALL SETFAMILY(ELP)
 
+    IF(EL%KIND==KIND22) THEN
+       i=0;j=0;k=0;l=0;
+       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
+       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
+       if(associated(EL%M22%T)) k=EL%M22%T%N
+       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
+       CALL SETFAMILY(ELP,k,l,i,j,6)
+       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
+
+       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
+       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
+       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
+       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
+    ENDIF
+
     IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
@@ -2304,7 +2387,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENTP),INTENT(IN)::  EL
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
-    INTEGER I,J
+    INTEGER I,J,k,l
 
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
@@ -2418,6 +2501,21 @@ CONTAINS
 
     IF(EL%KIND==KIND6) CALL SETFAMILY(ELP)
 
+    IF(EL%KIND==KIND22) THEN
+       i=0;j=0;k=0;l=0;
+       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
+       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
+       if(associated(EL%M22%T)) k=EL%M22%T%N
+       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
+       CALL SETFAMILY(ELP,k,l,i,j,6)
+       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
+
+       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
+       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
+       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
+       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
+    ENDIF
+
     IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
@@ -2496,7 +2594,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT),INTENT(IN)::  EL
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
-    INTEGER I,J
+    INTEGER I,J,k,l
 
 
     ELP%PERMFRINGE=EL%PERMFRINGE
@@ -2609,6 +2707,21 @@ CONTAINS
     ENDIF
 
     IF(EL%KIND==KIND6) CALL SETFAMILY(ELP)
+
+    IF(EL%KIND==KIND22) THEN
+       i=0;j=0;k=0;l=0;
+       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
+       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
+       if(associated(EL%M22%T)) k=EL%M22%T%N
+       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
+       CALL SETFAMILY(ELP,k,l,i,j,6)
+       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
+
+       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
+       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
+       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
+       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
+    ENDIF
 
     IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.

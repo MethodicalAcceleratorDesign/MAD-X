@@ -16,7 +16,7 @@ module Mad_like
   PRIVATE rectaETILT,recttilt
   PRIVATE B1,A1,A2,B2,A3,B3,A4,B4,A5,A6,A7,A8,A9,A10,B5,B6,B7,B8,B9,B10,BLTILT
   private fac
-  private AIBAL,USER_1L,USER_2L
+  private AIBAL,USER_1L,USER_2L,Taylor_maptilt
   PRIVATE MONIT,HMONIT,VMONIT,INSTRUMEN
   PRIVATE RCOLIT,ECOLIT
   ! linked
@@ -37,6 +37,10 @@ module Mad_like
   !  type(layout),save::mad_list
   type(layout),private::mad_list
   LOGICAL(LP) :: CURVED_ELEMENT=.FALSE.  !  TO SET UP BEND_FRINGE CORRECTLY FOR EXACT
+  type(tree_element), PRIVATE :: mad_tree,mad_tree_rad
+  type(tree_element),PRIVATE :: mad_tree_REV,mad_tree_rad_REV
+  LOGICAL(LP) MAD_TREE_DELTAMAP
+  REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
 
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
@@ -45,6 +49,8 @@ module Mad_like
      real(dp) tilt
      real(dp) FINT,hgap,h1,h2,X_COL,Y_COL
      real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
+     CHARACTER(120) file
+     CHARACTER(120) file_rev
      CHARACTER(nlp) NAME
      CHARACTER(vp) VORNAME
      INTEGER KIND,nmul,nst,method
@@ -314,6 +320,10 @@ module Mad_like
      !    MODULE PROCEDURE AIBATILT
   end  INTERFACE
 
+  !  Taylor map
+  INTERFACE Taylor_map
+     MODULE PROCEDURE  Taylor_maptilt
+  end  INTERFACE
 
 
 
@@ -649,6 +659,8 @@ CONTAINS
        S2%nst=nstd
        s2%NAME=' '
        s2%VORNAME=' '
+       s2%file=' '
+       s2%file_rev=' '
        s2%FINT=half
        s2%hgap=zero
        s2%h1=zero
@@ -1111,7 +1123,7 @@ CONTAINS
     ELSE
        SOLTILT%K(2)=KQ/FAC(2)    ! MAD FACTOR
        if(madkind2==kind2) then
-          SOLTILT%KIND=KIND5 ! special fix by Etienne 04.02.2004
+          SOLTILT%KIND=KIND5
        else
           SOLTILT%KIND=KIND17
           !          SOLTILT%nmul=2
@@ -2396,6 +2408,7 @@ CONTAINS
     type(elementp), pointer :: s2p
     type(fibre), pointer::el
     TYPE(MAGNET_FRAME),  POINTER :: FAKE
+    integer ntot,ntot_rad,ntot_REV,ntot_rad_REV
 
     nullify(el);
     THICKKICKTEMP=.FALSE.
@@ -2546,9 +2559,27 @@ CONTAINS
        THICKKICKTEMP=.TRUE.
     endif
 
+    ntot=0; ntot_rad=0; ntot_REV=0 ; ntot_rad_REV=0;
+    if(S2%KIND==KIND22) then
+       IF(ASSOCIATED(mad_tree%CC)) ntot=mad_tree%n
+       IF(ASSOCIATED(mad_tree_rad%CC)) ntot_rad=mad_tree_rad%n
+       IF(ASSOCIATED(mad_tree_REV%CC)) ntot_REV=mad_tree_REV%n
+       IF(ASSOCIATED(mad_tree_RAD_REV%CC)) ntot_rad_REV=mad_tree_RAD_REV%n
+    endif
 
+    CALL SETFAMILY(S2,ntot,ntot_rad,ntot_REV,ntot_rad_REV,6)
 
-    CALL SETFAMILY(S2)
+    IF(S2%KIND==KIND22) THEN
+       S2%M22%DELTAMAP=MAD_TREE_DELTAMAP
+       if(associated(s2%m22%t)) call copy_tree(mad_tree,s2%m22%t)
+       call KILL(mad_tree)
+       if(associated(s2%m22%t_rad)) call copy_tree(mad_tree_rad,s2%m22%t_rad)
+       call KILL(mad_tree_rad)
+       if(associated(s2%m22%t_rev)) call copy_tree(mad_tree_rev,s2%m22%t_rev)
+       call KILL(mad_tree_rev)
+       if(associated(s2%m22%t_rad_rev)) call copy_tree(mad_tree_rad_rev,s2%m22%t_rad_rev)
+       call KILL(mad_tree_rad_rev)
+    ENDIF
 
     IF(S2%KIND==KIND4) THEN
        S2%C4%N_BESSEL=S1%N_BESSEL
@@ -2724,7 +2755,8 @@ CONTAINS
     c_%FEED_P0C => FEED_P0C
     c_%ALWAYS_EXACT_PATCHING => ALWAYS_EXACT_PATCHING
     c_%OLD_IMPLEMENTATION_OF_SIXTRACK => OLD_IMPLEMENTATION_OF_SIXTRACK
-    c_%phase0 => phase0
+    c_%wedge_coeff => wedge_coeff
+    c_%MAD8_WEDGE => MAD8_WEDGE
 
   end subroutine set_pointers
 
@@ -2739,7 +2771,20 @@ CONTAINS
     integer met,ns
     logical(lp) all
 
+    IF(MAD8_WEDGE) THEN
+       WEDGE_COEFF(1)=ONE+ONE/FOUR
+       WEDGE_COEFF(2)=TWO-HALF
+    ELSE
+       WEDGE_COEFF(1)=ONE
+       WEDGE_COEFF(2)=ONE
+    ENDIF
+
     call set_pointers
+
+    CALL NULL_TREE(mad_tree)
+    CALL NULL_TREE(mad_tree_rad)
+    CALL NULL_TREE(mad_tree_REV)
+    CALL NULL_TREE(mad_tree_rad_REV)
 
 
     ns=nstd
@@ -3011,6 +3056,202 @@ CONTAINS
   END SUBROUTINE Set_mad_v
 
   !  MACHIDA FITTED
+  FUNCTION  Taylor_maptilt(NAME,file,file_rev,T)
+    implicit none
+    type (EL_LIST) Taylor_maptilt
+    CHARACTER(*), INTENT(IN):: NAME
+    CHARACTER(*),optional, INTENT(IN):: file,file_rev
+    type (TILTING),optional, INTENT(IN):: T
+    integer mf,no,n_map
+    real(dp) ld,ang
+    type(damap) m,mr,id,id2
+    INTEGER I,ndpt,time,timefac
+    type(taylor) beta
+    Taylor_maptilt=0
+
+    IF(PRESENT(FILE)) THEN
+       mf=NEWFILE
+       open(unit=mf,file=file)
+       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP   ! number of maps (1,2), no, ld=design length
+       IF(MAD_TREE_DELTAMAP) THEN
+          read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
+       ENDIF
+
+       call init(NO,3,0,0)
+       call alloc(m,mr,id,id2); call alloc(beta);
+       IF(MAD_TREE_DELTAMAP) THEN   !
+          !  ndpt=6 is changed
+          id=1
+          if(ndpt==6) then
+             id%v(5)=(one.mono.'000001')
+             id%v(6)=-(one.mono.'00001')
+          endif
+          id%v(5)=id%v(5)*timefac
+          id%v(6)=id%v(6)*timefac
+
+
+          ! $$$$$$$$$$$$$$$$$
+          call  dainput_SPECIAL6(m,mf,time); m=id**(-1).o.m.o.id ;
+          if(time==1) then
+             id2=1
+             id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
+             m=id2**(-1).o.m.o.id2 ;
+             id2%v(5)=one.mono.'00001'
+             BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
+             m%v(6)=m%v(6)-((m%v(6).sub.'000001').mono.'000001')
+             m%v(6)=beta*(m%v(6)- LD*(ONE/BETA-ONE/BETA0) )
+             m%v(6)=m%v(6)+(one.mono.'000001')
+          endif
+
+
+          call SET_TREE(mad_tree,M)
+
+          if(n_map>=2) then
+             call  dainput_SPECIAL6(mr,mf,time); mr=id**(-1).o.mr.o.id ;
+             if(time==1) then
+                id2=1
+                id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
+                mr=id2**(-1).o.mr.o.id2 ;
+                id2%v(5)=one.mono.'00001'
+                BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
+                mr%v(6)=mr%v(6)-((mr%v(6).sub.'000001').mono.'000001')
+                mr%v(6)=beta*(mr%v(6)- LD*(ONE/BETA-ONE/BETA0) )
+                mr%v(6)=mr%v(6)+(one.mono.'000001')
+             endif
+
+             call SET_TREE(mad_tree_rad,Mr)
+          else
+             call SET_TREE(mad_tree_rad,M)
+          endif
+
+       ELSE  ! MAD_TREE_DELTAMAP
+          call  dainput_SPECIAL6(m,mf,time);
+          call SET_TREE(mad_tree,M)
+          if(n_map==2) then
+             call  dainput_SPECIAL6(mr,mf,time);
+             call SET_TREE(mad_tree_rad,Mr)
+          else
+             call SET_TREE(mad_tree_rad,M)
+          endif
+       ENDIF ! MAD_TREE_DELTAMAP
+       call kill(m,mr,id,id2); call kill(beta);
+
+       mf=CLOSEFILE
+
+       MAD_TREE_LD=LD   ! put here for the logic of PRESENT(FILE_REV)==false
+       MAD_TREE_ANGLE=ANG
+
+    ELSE  ! PRESENT FILE
+       LD=MAD_TREE_LD
+       ANG=MAD_TREE_ANGLE
+    ENDIF
+
+    IF(PRESENT(FILE_REV)) THEN
+       mf=NEWFILE
+       open(unit=mf,file=FILE_REV)
+       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP   ! number of maps (1,2), no, ld=design length
+       IF(MAD_TREE_DELTAMAP) THEN
+          read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
+       ENDIF
+
+       call init(NO,3,0,0)
+       call alloc(m,mr,id,id2); call alloc(beta);
+       IF(MAD_TREE_DELTAMAP) THEN   !
+          !  ndpt=6 is changed
+          id=1
+          if(ndpt==6) then
+             id%v(5)=(one.mono.'000001')
+             id%v(6)=-(one.mono.'00001')
+          endif
+          id%v(5)=id%v(5)*timefac
+          id%v(6)=id%v(6)*timefac
+
+
+          ! $$$$$$$$$$$$$$$$$
+
+          call  dainput_SPECIAL6(m,mf,time); m=id**(-1).o.m.o.id ;
+          if(time==1) then
+             id2=1
+             id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
+             m=id2**(-1).o.m.o.id2 ;
+             id2%v(5)=one.mono.'00001'
+             BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
+             m%v(6)=m%v(6)-((m%v(6).sub.'000001').mono.'000001')
+             m%v(6)=beta*(m%v(6)- LD*(ONE/BETA-ONE/BETA0) )
+             m%v(6)=m%v(6)+(one.mono.'000001')
+          endif
+
+
+          call SET_TREE(mad_tree_rev,M)
+
+          if(n_map>=2) then
+             call  dainput_SPECIAL6(mr,mf,time); mr=id**(-1).o.mr.o.id ;
+             if(time==1) then
+                id2=1
+                id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
+                mr=id2**(-1).o.mr.o.id2 ;
+                id2%v(5)=one.mono.'00001'
+                BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
+                mr%v(6)=mr%v(6)-((mr%v(6).sub.'000001').mono.'000001')
+                mr%v(6)=beta*(mr%v(6)- LD*(ONE/BETA-ONE/BETA0) )
+                mr%v(6)=mr%v(6)+(one.mono.'000001')
+             endif
+
+             call SET_TREE(mad_tree_rad_rev,Mr)
+          else
+             call SET_TREE(mad_tree_rad_rev,M)
+          endif
+
+       ELSE  ! MAD_TREE_DELTAMAP
+          call  dainput_SPECIAL6(m,mf,time);
+          call SET_TREE(mad_tree_rev,M)
+          if(n_map==2) then
+             call  dainput_SPECIAL6(mr,mf,time);
+             call SET_TREE(mad_tree_rad_rev,Mr)
+          else
+             call SET_TREE(mad_tree_rad_rev,M)
+          endif
+       ENDIF ! MAD_TREE_DELTAMAP
+       call kill(m,mr,id,id2); call kill(beta);
+
+       mf=CLOSEFILE
+
+    ELSE  ! PRESENT FILE
+       LD=MAD_TREE_LD
+       ANG=MAD_TREE_ANGLE
+    ENDIF
+
+    IF(ang/=zero) THEN
+       Taylor_maptilt%LC=two*SIN(ANG/two)*ld/ang
+       Taylor_maptilt%B0=ang/ld                     !COS(ANG/two)/R
+       Taylor_maptilt%ld= ld
+    ELSE
+       Taylor_maptilt%LC=ld
+       Taylor_maptilt%B0=zero                      !COS(ANG/two)/R
+       Taylor_maptilt%ld= ld
+    ENDIF
+
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:nlp)
+       call write_i
+       Taylor_maptilt%NAME=NAME(1:nlp)
+    ELSE
+       Taylor_maptilt%NAME=NAME
+    ENDIF
+
+    Taylor_maptilt%KIND=kind22
+    IF(PRESENT(t)) then
+       IF(T%NATURAL) THEN
+          Taylor_maptilt%tilt=t%tilt(1)
+       ELSE
+          Taylor_maptilt%tilt=t%tilt(0)
+       ENDIF
+    ENDIF
+  END FUNCTION Taylor_maptilt
 
 
   FUNCTION  AIBAL(NAME,file,R1,T)

@@ -494,8 +494,12 @@ contains
     endif
 
     IF(PRESENT(X_IN))  THEN
-       CALL GFRAME(X_IN%E,ENT,A,-7)
-       CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
+       IF(X_IN%E%DO_SURVEY) THEN
+          CALL GFRAME(X_IN%E,ENT,A,-7)
+          CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
+       ELSE
+          CALL SURVEY_INNER_MAG(X_IN%E)
+       ENDIF
     ENDIF
 
     C%MAG=DEFAULT
@@ -672,10 +676,13 @@ contains
     endif
 
     IF(PRESENT(X_IN))  THEN
-       CALL GFRAME(X_IN%E,ENT,A,-7)
-       CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
+       IF(X_IN%E%DO_SURVEY) THEN
+          CALL GFRAME(X_IN%E,ENT,A,-7)
+          CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
+       ELSE
+          CALL SURVEY_INNER_MAG(X_IN%E)
+       ENDIF
     ENDIF
-
 
 
     ! ELEMENT IS RESTAURED TO THE DEFAULT STATE

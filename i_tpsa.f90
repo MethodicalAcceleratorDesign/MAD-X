@@ -36,28 +36,8 @@ MODULE TPSA
   private insert_da,append_da
 
 
-  !    scratch levels of DA using linked list
+  type(dalevel) scratchda(ndumt)   !scratch levels of DA using linked list
 
-  type dascratch
-     type(taylor), pointer :: t
-     TYPE (dascratch),POINTER :: PREVIOUS
-     TYPE (dascratch),POINTER :: NEXT
-  end type dascratch
-
-  TYPE dalevel
-     INTEGER,  POINTER :: N     ! TOTAL ELEMENT IN THE CHAIN
-     !
-     logical(lp),POINTER ::CLOSED
-     TYPE (dascratch), POINTER :: PRESENT
-     TYPE (dascratch), POINTER :: END
-     TYPE (dascratch), POINTER :: START
-     TYPE (dascratch), POINTER :: START_GROUND ! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
-     TYPE (dascratch), POINTER :: END_GROUND ! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
-  END TYPE dalevel
-
-  type(dalevel) scratchda(ndumt)
-
-  !   end of  scratch levels of DA using linked list
 
 
   INTERFACE assignment (=)
@@ -97,6 +77,10 @@ MODULE TPSA
      MODULE PROCEDURE GETint
   END INTERFACE
 
+  INTERFACE OPERATOR (.PAR.)
+     MODULE PROCEDURE getcharnd2
+     MODULE PROCEDURE GETintnd2
+  END INTERFACE
 
   INTERFACE OPERATOR (.CUT.)
      MODULE PROCEDURE CUTORDER
@@ -184,8 +168,92 @@ MODULE TPSA
   END INTERFACE
 
 
+  INTERFACE full_abs
+     MODULE PROCEDURE full_absT
+  END INTERFACE
+
+  INTERFACE exp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+  INTERFACE dexp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+  INTERFACE cexp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+  INTERFACE cdexp
+     MODULE PROCEDURE dexpt
+  END INTERFACE
+
+  INTERFACE cos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+  INTERFACE cdcos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+  INTERFACE dcos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+  INTERFACE ccos
+     MODULE PROCEDURE dcost
+  END INTERFACE
+
+  INTERFACE cosH
+     MODULE PROCEDURE dcosHt
+  END INTERFACE
+  INTERFACE dcosH
+     MODULE PROCEDURE dcosHt
+  END INTERFACE
+
+  INTERFACE sin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+  INTERFACE cdsin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+  INTERFACE ccsin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+  INTERFACE dsin
+     MODULE PROCEDURE dsint
+  END INTERFACE
+
+  INTERFACE sinH
+     MODULE PROCEDURE dsinHt
+  END INTERFACE
+  INTERFACE dsinH
+     MODULE PROCEDURE dsinHt
+  END INTERFACE
+
+  INTERFACE log
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+  INTERFACE dlog
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+  INTERFACE cdlog
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+  INTERFACE clog
+     MODULE PROCEDURE dlogt
+  END INTERFACE
+
+  INTERFACE sqrt
+     MODULE PROCEDURE dsqrtt
+  END INTERFACE
+  INTERFACE dsqrt
+     MODULE PROCEDURE dsqrtt
+  END INTERFACE
+
+  INTERFACE tan
+     MODULE PROCEDURE dtant
+  END INTERFACE
+  INTERFACE dtan
+     MODULE PROCEDURE dtant
+  END INTERFACE
+
+  ! management routines
   INTERFACE ass
-     !     MODULE PROCEDURE ass0         ! 2002.12.25    ass0 should be commented
      MODULE PROCEDURE asstaylor   !2000.12.25
   END INTERFACE
 
@@ -209,111 +277,10 @@ MODULE TPSA
      MODULE PROCEDURE KILLda
   END INTERFACE
 
+  ! end of management
 
-
-  INTERFACE full_abs
-     MODULE PROCEDURE full_absT
-  END INTERFACE
-
-  INTERFACE dexp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-  INTERFACE exp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-  INTERFACE cexp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-  INTERFACE cdexp
-     MODULE PROCEDURE dexpt
-  END INTERFACE
-
-  INTERFACE cdcos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-  INTERFACE dcos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-  INTERFACE cos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-  INTERFACE ccos
-     MODULE PROCEDURE dcost
-  END INTERFACE
-
-  INTERFACE dcosH
-     MODULE PROCEDURE dcosHt
-  END INTERFACE
-  INTERFACE cosH
-     MODULE PROCEDURE dcosHt
-  END INTERFACE
-
-  INTERFACE cdsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE ccsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE dsin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-  INTERFACE sin
-     MODULE PROCEDURE dsint
-  END INTERFACE
-
-  INTERFACE dsinH
-     MODULE PROCEDURE dsinHt
-  END INTERFACE
-  INTERFACE sinH
-     MODULE PROCEDURE dsinHt
-  END INTERFACE
-
-  INTERFACE dlog
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-  INTERFACE log
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-  INTERFACE cdlog
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-  INTERFACE clog
-     MODULE PROCEDURE dlogt
-  END INTERFACE
-
-  INTERFACE dsqrt
-     MODULE PROCEDURE dsqrtt
-  END INTERFACE
-  INTERFACE sqrt
-     MODULE PROCEDURE dsqrtt
-  END INTERFACE
-
-  ! NEW
-  INTERFACE OPERATOR (.PAR.)
-     MODULE PROCEDURE getcharnd2
-     MODULE PROCEDURE GETintnd2
-  END INTERFACE
-
-
-  INTERFACE dtan
-     MODULE PROCEDURE dtant
-  END INTERFACE
-  INTERFACE tan
-     MODULE PROCEDURE dtant
-  END INTERFACE
-
-
-  INTERFACE SET_UP0
-     MODULE PROCEDURE SET_UP
-  END INTERFACE
-
-  !  PUT HERE D'AMICO
-  INTERFACE mul_damico_taylor
-     MODULE PROCEDURE mul
-  END INTERFACE
-
-  ! END HERE D'AMICO
 CONTAINS
+
 
 
 
@@ -349,7 +316,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(unaryADD)
 
     unaryADD=s1
@@ -365,7 +332,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(unarySUB)
 
     ! unarySUB=(-one)*s1
@@ -604,7 +571,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dexpt)
 
     if(old) then
@@ -625,7 +592,7 @@ CONTAINS
     real(dp) FULL_ABST
     TYPE (taylor), INTENT (IN) :: S1
 
-    call check(s1)
+    !    call check(s1)
 
     if(old) then
        CALL DAABS(S1%I,FULL_ABST)
@@ -645,7 +612,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dtant)
 
     if(old) then
@@ -673,7 +640,7 @@ CONTAINS
 
 
 
-    call check(s1)
+    !    call check(s1)
     call ass(dcost)
 
     if(old) then
@@ -696,7 +663,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dsint)
     if(old) then
        call dafun('SIN ',s1%i,temp)
@@ -718,7 +685,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dsinHt)
     if(old) then
        call dafun('SINH',s1%i,temp)
@@ -737,7 +704,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(DCOSHT)
     if(old) then
        call dafun('COSH',s1%i,temp)
@@ -758,7 +725,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dlogt)
     if(old) then
        call dafun('LOG ',s1%i,temp)
@@ -780,7 +747,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dsqrtt)
 
     if(old) then
@@ -803,8 +770,8 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
-    call check(s2)
+    !    call check(s1)
+    !    call check(s2)
     call ass(mul)
 
     if(old) then
@@ -827,8 +794,8 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
-    call check(s2)
+    !    call check(s1)
+    !    call check(s2)
     call ass(pbbra)
 
     if(old) then
@@ -851,7 +818,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(GETORDER)
 
     if(old) then
@@ -876,7 +843,7 @@ CONTAINS
     INTEGER I
     integer localmaster
     localmaster=master
-    call check(s1)
+    !    call check(s1)
     call ass(CUTORDER)
 
     if(old) then
@@ -986,7 +953,7 @@ CONTAINS
     CHARACTER (LEN = LNV)  resul
     integer j(lnv),i
 
-    call check(s1)
+    !    call check(s1)
 
     resul = trim(ADJUSTL (s2))
 
@@ -1018,7 +985,7 @@ CONTAINS
     integer , INTENT (IN) ::  S2(:)
     integer j(lnv),i
 
-    call check(s1)
+    !    call check(s1)
 
 
     do i=1,lnv
@@ -1096,7 +1063,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(GETdiff)
 
     if(old) then
@@ -1118,7 +1085,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(GETdatra)
 
     if(old) then
@@ -1141,7 +1108,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(POW)
 
     if(old) then
@@ -1179,7 +1146,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(POWR8)
 
     if(old) then
@@ -1206,7 +1173,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(POWR)
 
     if(old) then
@@ -1234,7 +1201,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dmulsc)
 
     if(old) then
@@ -1258,7 +1225,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(mulsc)
 
     if(old) then
@@ -1280,7 +1247,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(imulsc)
 
 
@@ -1304,7 +1271,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dscmul)
 
     if(old) then
@@ -1329,7 +1296,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(scmul)
 
 
@@ -1354,7 +1321,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(iscmul)
 
     if(old) then
@@ -1377,8 +1344,8 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
-    call check(s2)
+    !    call check(s1)
+    !    call check(s2)
     call ass(div)
 
     if(old) then
@@ -1401,7 +1368,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dscdiv)
 
     if(old) then
@@ -1426,7 +1393,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(scdiv)
 
 
@@ -1450,7 +1417,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(iscdiv)
 
     if(old) then
@@ -1474,7 +1441,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(ddivsc)
 
 
@@ -1499,7 +1466,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(divsc)
 
     if(old) then
@@ -1523,7 +1490,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(idivsc)
 
 
@@ -1547,8 +1514,8 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
-    call check(s2)
+    !    call check(s1)
+    !    call check(s2)
     call ass(add)
 
 
@@ -1575,7 +1542,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(daddsc)
 
     if(old) then
@@ -1599,7 +1566,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(addsc)
 
 
@@ -1623,7 +1590,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(iaddsc)
 
     if(old) then
@@ -1646,7 +1613,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dscadd)
 
     if(old) then
@@ -1670,7 +1637,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(scadd)
 
     if(old) then
@@ -1694,7 +1661,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(iscadd)
 
 
@@ -1717,8 +1684,8 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
-    call check(s2)
+    !    call check(s1)
+    !    call check(s2)
     call ass(subs)
 
 
@@ -1743,7 +1710,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dsubsc)
 
     if(old) then
@@ -1769,7 +1736,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(subsc)
 
     if(old) then
@@ -1792,7 +1759,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(isubsc)
 
     if(old) then
@@ -1815,7 +1782,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(dscsub)
 
     if(old) then
@@ -1839,7 +1806,7 @@ CONTAINS
     localmaster=master
 
     if(real_warning) call real_stop
-    call check(s1)
+    !    call check(s1)
     call ass(scsub)
 
     if(old) then
@@ -1862,7 +1829,7 @@ CONTAINS
     integer localmaster
     localmaster=master
 
-    call check(s1)
+    !    call check(s1)
     call ass(iscsub)
 
     if(old) then
@@ -1877,30 +1844,30 @@ CONTAINS
 
   END FUNCTION iscsub
 
-  subroutine check(s1)
-    implicit none
-    TYPE (taylor) s1
-    if(.not.checkass) return
-    if(old) then
-       if(s1%i==0) then
-          w_p=0
-          w_p%nc=1
-          w_p=(/"Should not be here: Assign variables"/)
-          w_p%fc='(1((1X,A72),/))'
-          CALL WRITE_E(100)
-       endif
-    else
-       IF (.NOT. ASSOCIATED(s1%j%r)) then
-          w_p=0
-          w_p%nc=1
-          w_p=(/"Should not be here: Assign variables"/)
-          w_p%fc='(1((1X,A72),/))'
-          CALL WRITE_E(101)
-       endif
-    endif
-  end subroutine check
-
-  subroutine ASSIGN
+  !  subroutine check(s1)
+  !    implicit none
+  !    TYPE (taylor) s1
+  !    if(.not.checkass) return
+  !    if(old) then
+  !       if(s1%i==0) then
+  !          w_p=0
+  !          w_p%nc=1
+  !          w_p=(/"Should not be here: Assign variables"/)
+  !          w_p%fc='(1((1X,A72),/))'
+  !          CALL WRITE_E(100)
+  !       endif
+  !    else
+  !       IF (.NOT. ASSOCIATED(s1%j%r)) then
+  !          w_p=0
+  !          w_p%nc=1
+  !          w_p=(/"Should not be here: Assign variables"/)
+  !          w_p%fc='(1((1X,A72),/))'
+  !          CALL WRITE_E(101)
+  !       endif
+  !    endif
+  !  end subroutine check
+  !
+  subroutine ASSIGN()
     implicit none
     integer i
     do i=1,ndumt
@@ -1917,7 +1884,7 @@ CONTAINS
     CALL set_up_level
   end subroutine ASSIGN
 
-  subroutine DEASSIGN
+  subroutine DEASSIGN()
     implicit none
     integer i
     do i=1,ndumt
@@ -1985,7 +1952,7 @@ CONTAINS
 
   end subroutine ASS0
 
-  SUBROUTINE  ndum_warning_user
+  SUBROUTINE  ndum_warning_user()
     implicit none
     integer ipause,II(0:1)
 
@@ -2102,6 +2069,8 @@ CONTAINS
     INTEGER,INTENT(in),dimension(:)::j
     real(dp),INTENT(in)::R1
     type (taylor),INTENT(inout)::S1
+
+    if(check_j(j)/=0) return
     if(old) then
        if(s1%i==0) call crap1("pok000 1" )  ! call etall1(s1%i)
        CALL DApok(s1%i,j,r1)
@@ -2113,6 +2082,30 @@ CONTAINS
 
   END SUBROUTINE pok000
 
+  function check_j(j)
+    implicit none
+    integer check_j
+    INTEGER,INTENT(in),dimension(:)::j
+    integer i,no
+
+    check_j=0
+
+    no=0
+    do i=1,size(j)
+       no=j(i)+no
+    enddo
+
+    if(no>c_%no) then
+       check_j=no
+       return
+    endif
+
+    do i=c_%nv+1,size(j)
+       if(j(i)/=0) then
+          check_j=-i
+       endif
+    enddo
+  end function check_j
 
   SUBROUTINE  tAYLOR_ran(S1,r1,R2)
     implicit none
@@ -2284,7 +2277,7 @@ CONTAINS
 
     localmaster=master
     ndel=0
-    call check(s1)
+    !    call check(s1)
     call ass(GETCHARnd2)
 
     call alloc(junk)
@@ -2345,7 +2338,7 @@ CONTAINS
     integer i,k
     integer localmaster
     localmaster=master
-    call check(s1)
+    !    call check(s1)
     call ass(GETintnd2)
 
     call alloc(junk)
@@ -2595,7 +2588,7 @@ CONTAINS
 
   END SUBROUTINE REFILL_N
 
-  subroutine check_snake
+  subroutine check_snake()
     implicit none
     master=master+1
     select case (master)
@@ -2635,7 +2628,7 @@ CONTAINS
   end subroutine crap1
 
 
-  ! linked list
+  ! linked list of da for scratch levels
 
   SUBROUTINE Set_Up( L ) ! Sets up a layout: gives a unique negative index
     implicit none
@@ -2792,7 +2785,7 @@ CONTAINS
     ENDIF
   end SUBROUTINE dealloc_DASCRATCH
 
-  SUBROUTINE set_up_level
+  SUBROUTINE set_up_level()
     implicit none
     integer i
     do i=1,ndumt
@@ -2806,7 +2799,7 @@ CONTAINS
 
   end   SUBROUTINE set_up_level
 
-  SUBROUTINE report_level
+  SUBROUTINE report_level()
     implicit none
     integer i
     if(associated(scratchda(1)%n)) then
@@ -2820,7 +2813,7 @@ CONTAINS
     endif
   END   SUBROUTINE report_level
 
-  SUBROUTINE real_stop
+  SUBROUTINE real_stop()
     implicit none
     integer i(1),j
 

@@ -84,12 +84,24 @@ module definition
      type (REAL_8) sigmaf(ndim2)
   END TYPE ENV_8
 
-  !  type dummapping
-  !     integer  d(ndim2)
-  !     TYPE (TAYLORLOW) e(ndim2)
-  !  end type dummapping
+  !    scratch levels of DA using linked list
 
+  type dascratch
+     type(taylor), pointer :: t
+     TYPE (dascratch),POINTER :: PREVIOUS
+     TYPE (dascratch),POINTER :: NEXT
+  end type dascratch
 
+  TYPE dalevel
+     INTEGER,  POINTER :: N     ! TOTAL ELEMENT IN THE CHAIN
+     !
+     logical(lp),POINTER ::CLOSED
+     TYPE (dascratch), POINTER :: PRESENT
+     TYPE (dascratch), POINTER :: END
+     TYPE (dascratch), POINTER :: START
+     TYPE (dascratch), POINTER :: START_GROUND ! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
+     TYPE (dascratch), POINTER :: END_GROUND ! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+  END TYPE dalevel
 
 
 end module definition

@@ -16,7 +16,7 @@ module complex_taylor
   private logtpsat,exptpsat,abstpsat,dcost,dsint,datant,tant,dasint,dacost
   private dcosht,dsinht,dtanht,dsqrtt
   private getdiff,getdATRA,GETORDER,CUTORDER,getchar ,dputchar,dputint
-  private check,set_in_complex   !, assc
+  private set_in_complex   !, assc  !check,
   private dimagt,drealt,dcmplxt,CEQUAL,DEQUAL,REQUAL
   private GETCHARnd2,GETintnd2,GETint
   private CFUC,CFURES

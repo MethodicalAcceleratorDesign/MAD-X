@@ -91,18 +91,20 @@ MODULE S_DEF_KIND
   PRIVATE KICKCAVR_TRAV,KICKCAVP_TRAV,KICKCAVS_TRAV,FRINGECAVR_TRAV,FRINGECAVP_TRAV,FRINGECAVS_TRAV
   PRIVATE ZEROR_CAV_TRAV,ZEROP_CAV_TRAV
   PRIVATE A_TRAVR,A_TRAVP,A_TRAVS,A_TRAV,DRIFT_CAVR,DRIFT_CAVP,DRIFT_CAVS
+  PRIVATE MARTINR,MARTINP,MARTINS,ZERO_MARTIN
+
 
   INTEGER,PRIVATE :: NMAXI=10000
   logical(lp) :: SPEED=.TRUE.
   integer,TARGET :: HIGHEST_FRINGE=2
   logical(lp) ,TARGET :: OLD_IMPLEMENTATION_OF_SIXTRACK=.TRUE.
   real(dp), target :: phase0=-pi
+  real(dp), target :: wedge_coeff(2)
+  logical(dp), target :: MAD8_WEDGE=.TRUE.
   ! stochastic radiation in straigth
 
   !include "def_all_kind.f90"
   ! New home for element and elementp
-
-
 
   INTERFACE TRACK
      MODULE PROCEDURE DRFTR   ! MID DEFINED AS 1/2 L
@@ -167,6 +169,10 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE SYMPINTSOLTR
      MODULE PROCEDURE SYMPINTSOLTP
      MODULE PROCEDURE SYMPINTSOLTS
+     ! TAYLOR MAP
+     MODULE PROCEDURE MARTINR
+     MODULE PROCEDURE MARTINP
+     MODULE PROCEDURE MARTINS
   END INTERFACE
 
   INTERFACE DRIFT
@@ -328,6 +334,7 @@ MODULE S_DEF_KIND
 
 
   INTERFACE ASSIGNMENT (=)
+     MODULE PROCEDURE ZERO_MARTIN
      MODULE PROCEDURE ZEROr_KTK                 ! need upgrade
      MODULE PROCEDURE ZEROP_KTK                  ! need upgrade
      MODULE PROCEDURE ZEROr_TKT7                 ! need upgrade
@@ -10393,6 +10400,8 @@ contains
     TYPE(REAL_8) X1,X3,BX,BY,BTX,BTY,X5,B(3),B2
     INTEGER J,M,A,K,DIR
 
+    real(dp) junk
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
     CALL ALLOC(X1,X3,BX,BY,BTX,BTY,X5,B2)
@@ -10410,7 +10419,8 @@ contains
     BX=zero
     BY=zero
 
-
+    ! x1=1.d0.mono.'1'
+    ! x3=1.d0.mono.'01'
     k=0
     m=EL%P%nmul-1
     do a=m,1,-1
@@ -10452,8 +10462,16 @@ contains
     !     bx=bx+EL%BF_X(k)*x1**sector_b%i(k)*x3**sector_b%j(k)
     !     by=by+EL%BF_y(k)*x1**sector_b%i(k)*x3**sector_b%j(k)
     !    enddo
-
-
+    ! junk=el%p%b0
+    ! write(16,*)"el%p%b0 = ", junk
+    ! call print(bx,16)
+    ! call print(by,16)
+    ! B(1)=BY/morph(one+(1.d0.mono.'1')*EL%P%B0)
+    ! B(2)=-Bx/morph(one+(1.d0.mono.'1')*EL%P%B0)
+    ! write(16,*) "******************************"
+    ! call print(b(1),16)
+    ! call print(b(2),16)
+    ! stop 999
 
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
@@ -11167,22 +11185,38 @@ contains
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) then
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+             x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
        ELSE
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL SINTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
 
        IF(EL%P%EDGE(2)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
+          IF(EL%P%FRINGE) then
+             x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
        ENDIF
@@ -11194,22 +11228,38 @@ contains
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) then
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+             x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
        ELSE
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL SINTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
 
        IF(EL%P%EDGE(1)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
+          IF(EL%P%FRINGE) then
+             x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
        ENDIF
@@ -11227,28 +11277,45 @@ contains
     TYPE(TEAPOTP),INTENT(INOUT):: EL
     TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
 
+
     IF(EL%P%DIR==1) THEN
 
        IF(EL%P%EDGE(1)/=zero) THEN
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) then
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+             x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
        ELSE
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL SINTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
 
        IF(EL%P%EDGE(2)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
+          IF(EL%P%FRINGE) then
+             x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
        ENDIF
@@ -11260,29 +11327,44 @@ contains
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) then
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+             x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
        ELSE
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL SINTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
 
        IF(EL%P%EDGE(1)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
+          IF(EL%P%FRINGE) then
+             x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+             x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+          ELSEIF(MAD8_WEDGE) THEN
+             x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
+             x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+          endif
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
        ENDIF
 
 
     ENDIF
-
 
   END SUBROUTINE SSYMPINTP
 
@@ -11291,7 +11373,9 @@ contains
     logical(lp) :: doneitt=.true.
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     TYPE(TEAPOTP),INTENT(INOUT):: EL
+    TYPE(real_8)  XR(6)
 
+    CALL ALLOC(XR)
 
     IF(EL%P%DIR==1) THEN
 
@@ -11299,22 +11383,46 @@ contains
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) then
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+             XR=X
+             XR(2)=XR(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*XR(1)**2-wedge_coeff(2)*XR(3)**2*half)
+             XR(4)=XR(4)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*XR(1)*XR(3))
+             X=XR
+          ELSEIF(MAD8_WEDGE) THEN
+             XR=X
+             XR(2)=XR(2)+EL%P%EDGE(1)*el%bn(2)*(XR(1)**2-XR(3)**2)
+             XR(4)=XR(4)-EL%P%EDGE(1)*el%bn(2)*(TWO*XR(1)*XR(3))
+             X=XR
+          endif
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
        ELSE
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE)  CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL SINTE(EL,X)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
 
        IF(EL%P%EDGE(2)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
+          IF(EL%P%FRINGE) then
+             XR=X
+             XR(2)=XR(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*XR(1)**2-wedge_coeff(2)*XR(3)**2*half)
+             XR(4)=XR(4)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*XR(1)*XR(3))
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+             X=XR
+          ELSEIF(MAD8_WEDGE) THEN
+             XR=X
+             XR(2)=XR(2)+EL%P%EDGE(2)*el%bn(2)*(XR(1)**2-XR(3)**2)
+             XR(4)=XR(4)-EL%P%EDGE(2)*el%bn(2)*(TWO*XR(1)*XR(3))
+             X=XR
+          endif
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
        ENDIF
@@ -11326,22 +11434,46 @@ contains
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) then
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
+             XR=X
+             XR(2)=XR(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*XR(1)**2-wedge_coeff(2)*XR(3)**2*half)
+             XR(4)=XR(4)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*XR(1)*XR(3))
+             X=XR
+          ELSEIF(MAD8_WEDGE) THEN
+             XR=X
+             XR(2)=XR(2)-EL%P%EDGE(2)*el%bn(2)*(XR(1)**2-XR(3)**2)
+             XR(4)=XR(4)+EL%P%EDGE(2)*el%bn(2)*(TWO*XR(1)*XR(3))
+             X=XR
+          endif
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
        ELSE
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL SINTE(EL,X)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
 
        IF(EL%P%EDGE(1)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
+          IF(EL%P%FRINGE) then
+             XR=X
+             XR(2)=XR(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*XR(1)**2-wedge_coeff(2)*XR(3)**2*half)
+             XR(4)=XR(4)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*XR(1)*XR(3))
+             X=XR
+             CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
+          ELSEIF(MAD8_WEDGE) THEN
+             XR=X
+             XR(2)=XR(2)-EL%P%EDGE(1)*el%bn(2)*(XR(1)**2-XR(3)**2)
+             XR(4)=XR(4)+EL%P%EDGE(1)*el%bn(2)*(TWO*XR(1)*XR(3))
+             X=XR
+          endif
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
        ENDIF
@@ -11349,12 +11481,179 @@ contains
 
     ENDIF
 
-
-
+    CALL KILL(XR)
 
   END SUBROUTINE SSYMPINTS
 
   !  monitor stuff
+
+  SUBROUTINE MARTINR(EL,X,MID)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(MARTIN),INTENT(INOUT):: EL
+    real(dp) L0,BETA
+
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+
+    L0=X(6)
+
+    if(EL%P%TIME.and.EL%DELTAMAP) then
+       X(5)=(TWO*X(5)/EL%P%BETA0+X(5)**2)/(SQRT(ONE+TWO*X(5)/ EL%P%BETA0+X(5)**2  )+ONE)
+    endif
+
+    IF(EL%P%RADIATION) THEN
+       IF(EL%P%DIR==1) THEN
+          IF(ASSOCIATED(EL%T_RAD)) THEN
+             CALL TRACK(EL%T_RAD,X)
+          ELSE
+             WRITE(6,*) " No forward radiating Taylor map provided "
+             stop 996
+          ENDIF
+       ELSE
+          IF(ASSOCIATED(EL%T_RAD_REV)) THEN
+             CALL TRACK(EL%T_RAD_REV,X)
+          ELSE
+             WRITE(6,*) " No reverse radiating Taylor map provided "
+             stop 998
+          ENDIF
+       ENDIF
+    ELSE
+       IF(EL%P%DIR==1) THEN
+          IF(ASSOCIATED(EL%T)) THEN
+             CALL TRACK(EL%T,X)
+          ELSE
+             WRITE(6,*) " No forward Taylor map provided "
+             stop 997
+          ENDIF
+       ELSE
+          IF(ASSOCIATED(EL%T_REV)) THEN
+             CALL TRACK(EL%T_REV,X)
+          ELSE
+             WRITE(6,*) " No reverse Taylor map provided "
+             stop 999
+          ENDIF
+       ENDIF
+    ENDIF
+
+    if(EL%P%TIME) then
+       IF(EL%DELTAMAP) THEN
+          X(5)=(TWO*X(5)+X(5)**2)/(SQRT(ONE/EL%P%BETA0**2+TWO*X(5)+X(5)**2  )+ONE/EL%P%BETA0)
+          BETA=SQRT(ONE+TWO*X(5)/EL%P%BETA0+X(5)**2  )/(one/EL%P%BETA0+x(5))
+          X(6)=(X(6)-L0)/beta+ EL%P%LD*(ONE/BETA-(1-EL%P%TOTALPATH)*ONE/EL%P%BETA0)+L0
+       ELSE
+          X(6)=X(6)+(EL%P%LD*EL%P%TOTALPATH)/EL%P%BETA0
+       ENDIF
+    ELSE
+       X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD
+    endif
+
+
+    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+
+  END SUBROUTINE MARTINR
+
+  SUBROUTINE MARTINP(EL,X,MID)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(MARTIN),INTENT(INOUT):: EL
+    TYPE(REAL_8) L0,BETA
+
+    CALL ALLOC(L0,BETA)
+
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    L0=X(6)
+
+    if(EL%P%TIME.and.EL%DELTAMAP) then
+       X(5)=(TWO*X(5)/EL%P%BETA0+X(5)**2)/(SQRT(ONE+TWO*X(5)/ EL%P%BETA0+X(5)**2  )+ONE)
+    endif
+
+    IF(EL%P%RADIATION) THEN
+       IF(EL%P%DIR==1) THEN
+          IF(ASSOCIATED(EL%T_RAD)) THEN
+             CALL TRACK(EL%T_RAD,X)
+          ELSE
+             WRITE(6,*) " No forward radiating Taylor map provided "
+             stop 996
+          ENDIF
+       ELSE
+          IF(ASSOCIATED(EL%T_RAD_REV)) THEN
+             CALL TRACK(EL%T_RAD_REV,X)
+          ELSE
+             WRITE(6,*) " No reverse radiating Taylor map provided "
+             stop 998
+          ENDIF
+       ENDIF
+    ELSE
+       IF(EL%P%DIR==1) THEN
+          IF(ASSOCIATED(EL%T)) THEN
+             CALL TRACK(EL%T,X)
+          ELSE
+             WRITE(6,*) " No forward Taylor map provided "
+             stop 997
+          ENDIF
+       ELSE
+          IF(ASSOCIATED(EL%T_REV)) THEN
+             CALL TRACK(EL%T_REV,X)
+          ELSE
+             WRITE(6,*) " No reverse Taylor map provided "
+             stop 999
+          ENDIF
+       ENDIF
+    ENDIF
+
+    WRITE(6,*) " EL%P%TIME , EL%DELTAMAP,EL%P%LD ",EL%P%TIME , EL%DELTAMAP ,EL%P%LD
+    if(EL%P%TIME) then
+       IF(EL%DELTAMAP) THEN
+          X(5)=(TWO*X(5)+X(5)**2)/(SQRT(ONE/EL%P%BETA0**2+TWO*X(5)+X(5)**2  )+ONE/EL%P%BETA0)
+          BETA=SQRT(ONE+TWO*X(5)/EL%P%BETA0+X(5)**2  )/(one/EL%P%BETA0+x(5))
+          X(6)=(X(6)-L0)/beta+ EL%P%LD*(ONE/BETA-(1-EL%P%TOTALPATH)*ONE/EL%P%BETA0)+L0
+       ELSE
+          X(6)=X(6)+(EL%P%LD*EL%P%TOTALPATH)/EL%P%BETA0
+       ENDIF
+    ELSE
+       X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD
+    endif
+
+    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+
+    CALL KILL(L0,BETA)
+
+  END SUBROUTINE MARTINP
+
+  SUBROUTINE MARTINS(EL,Y)
+    IMPLICIT NONE
+    TYPE(ENV_8),INTENT(INOUT):: Y(6)
+    TYPE(MARTIN),INTENT(INOUT):: EL
+    TYPE(REAL_8) X(6)
+    INTEGER I,J
+
+    CALL ALLOC(X)
+    X=Y
+
+    CALL TRACK(EL,X)
+
+    Y=X
+
+    IF(EL%P%DIR==1) THEN
+       do i=1,6
+          do j=1,6
+             y(I)%E(J)=y(I)%E(J)+EL%E(I,J)
+          enddo
+       enddo
+    ELSE
+       do i=1,6
+          do j=1,6
+             y(I)%E(J)=y(I)%E(J)+EL%E_REV(I,J)
+          enddo
+       enddo
+    ENDIF
+
+
+    CALL KILL(X)
+
+  END SUBROUTINE MARTINS
 
   SUBROUTINE MONTR(EL,X,MID)
     IMPLICIT NONE
@@ -12823,24 +13122,26 @@ contains
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL  WEDGE(ANGH,X,EL1=EL)
 
        ELSE
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
           CALL  WEDGE(ANGH,X,EL1=EL)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
        ENDIF
 
@@ -12854,23 +13155,25 @@ contains
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL  WEDGE(ANGH,X,EL1=EL)
        ELSE
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
           CALL  WEDGE(ANGH,X,EL1=EL)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
        ENDIF
 
@@ -12897,24 +13200,26 @@ contains
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL  WEDGE(ANGH,X,EL1=EL)
 
        ELSE
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
           CALL  WEDGE(ANGH,X,EL1=EL)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
        ENDIF
 
@@ -12928,23 +13233,25 @@ contains
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL  WEDGE(ANGH,X,EL1=EL)
        ELSE
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTE(EL,X,MID)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
           CALL  WEDGE(ANGH,X,EL1=EL)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
        ENDIF
 
@@ -12969,24 +13276,26 @@ contains
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL  WEDGE(ANGH,X,EL1=EL)
 
        ELSE
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL INTE(EL,X)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
           CALL  WEDGE(ANGH,X,EL1=EL)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
        ENDIF
 
@@ -13000,23 +13309,25 @@ contains
           CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H2,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
           CALL  WEDGE(ANGH,X,EL1=EL)
        ELSE
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
 
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL INTE(EL,X)
-       IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
           CALL  WEDGE(ANGH,X,EL1=EL)
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
        ELSE
+          IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
        ENDIF
 
@@ -13261,6 +13572,7 @@ contains
     ENDIF
 
   END SUBROUTINE wedger
+
 
   SUBROUTINE wedgeP(A,X,EL1,EL2)
     IMPLICIT NONE
@@ -14267,6 +14579,54 @@ contains
     endif
 
   END SUBROUTINE ZEROP_ECOL
+
+
+  SUBROUTINE ZERO_MARTIN(EL,I)
+    IMPLICIT NONE
+    TYPE(MARTIN), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%T)) then
+          CALL KILL(EL%T)
+          deallocate(EL%T)
+       endif
+       if(ASSOCIATED(EL%T_RAD)) then
+          CALL KILL(EL%T_RAD)
+          deallocate(EL%T_RAD)
+       endif
+       if(ASSOCIATED(EL%T_REV)) then
+          CALL KILL(EL%T_REV)
+          deallocate(EL%T_REV)
+       endif
+       if(ASSOCIATED(EL%T_RAD_REV)) then
+          CALL KILL(EL%T_RAD_REV)
+          deallocate(EL%T_RAD_REV)
+       endif
+
+       if(ASSOCIATED(EL%DELTAMAP)) then
+          deallocate(EL%DELTAMAP)
+       endif
+       if(ASSOCIATED(EL%E)) then
+          deallocate(EL%E)
+       endif
+       if(ASSOCIATED(EL%E_REV)) then
+          deallocate(EL%E_REV)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%T)
+       NULLIFY(EL%T_RAD)
+       NULLIFY(EL%DELTAMAP)
+       NULLIFY(EL%T_REV)
+       NULLIFY(EL%T_RAD_REV)
+       NULLIFY(EL%DELTAMAP)
+       NULLIFY(EL%E)
+       NULLIFY(EL%E_REV)
+    endif
+
+  END SUBROUTINE ZERO_MARTIN
 
 
   SUBROUTINE ZEROr_KTK(EL,I)
