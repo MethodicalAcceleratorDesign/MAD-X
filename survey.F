@@ -67,6 +67,7 @@
 !**** el is the arc length for all bends  ********
       el = node_value('l ')
       call suelem(el, ve, we,tilt)
+!      print *,"el, tilt", el, tilt
       suml = suml + el
 !**  Compute the coordinates at each point
       call sutrak(v, w, ve, we)

@@ -1569,6 +1569,8 @@
 ! Local links:                                                         *
 !   LSEQ                Beam lines sequence for a lump.                *
 !----------------------------------------------------------------------*
+! Modified: 17-FEB-2005, F. Tecker                                     *
+!   Return tilt also for elements other than BENDs and MULTIPOLEs      *
 ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
 !   Added LCAVITY element at ISP 27                                    *
 !----------------------------------------------------------------------*
@@ -1587,18 +1589,12 @@
      &210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &
      &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
 
+!---- elements without tilt attribute
 !---- Drift space.
    10 continue
+
 !---- Arbitrary matrix.
    40 continue
-!---- Quadrupole.
-   50 continue
-
-!---- Sextupole.
-   60 continue
-
-!---- Octupole.
-   70 continue
 
 !---- Solenoid.
    90 continue
@@ -1606,22 +1602,10 @@
 !---- RF cavity.
   100 continue
 
-!---- Electrostatic separator.
-  110 continue
-
-!---- Kickers.
-  140 continue
-  150 continue
-  160 continue
-
 !---- Monitors.
   170 continue
   180 continue
   190 continue
-
-!---- Apertures.
-  200 continue
-  210 continue
 
 !---- Marker.
   250 continue
@@ -1631,13 +1615,11 @@
 
 !---- lcavity
   270 continue
+
 !---- Reserved.
   280 continue
   290 continue
   300 continue
-
-!---- Beam instrument.
-  240 continue
 
 !---- Lump.
   230 continue
@@ -1645,7 +1627,43 @@
 !---- User-defined elements.
   310 continue
 
-!****** end of straight elements ***************
+!     not necessary to distinguish between elements with or w/o tilt attribute
+!     see below (FT 17.2.05)
+!     goto 400
+
+
+!---- elements with tilt attribute
+!---- Quadrupole.
+   50 continue
+
+!---- Sextupole.
+   60 continue
+
+!---- Octupole.
+   70 continue
+
+!---- Electrostatic separator.
+  110 continue
+
+!---- Kickers.
+  140 continue
+  150 continue
+  160 continue
+
+!---- Apertures.
+  200 continue
+  210 continue
+
+!---- Beam instrument.
+  240 continue
+
+!---- get tilt attribute
+!---- checked to work for elements without this attribute (FT 17.2.05)
+!---- OK with F.Sschmidt
+      tilt =  node_value('tilt ')
+
+!---- calculate matrix for straight elements
+  400 continue
       ve(1) = zero
       ve(2) = zero
       ve(3) = el
@@ -1659,6 +1677,7 @@
       we(2,3) = zero
       we(3,3) = one
       go to 500
+!****** end of straight elements ***************
 
 !---- multipoles , introduced  17.09.02 / AV
    80 continue
