@@ -121,10 +121,10 @@ extern void haveit_(double *,double *,double *,double *,int *,int *,
 int *,double *,double *,double *,double *,double *,double *);
 extern void testit_(double *,double *,double *,double *,int *,int *,
 int *,double *,double *,double *,double *,double *,double *);
-extern void svdcorr_m_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *);
-extern void svdcorr_c_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *);
-extern void svddec_c_(double *,double *,double *,double *,double *,double *,double *,double *,int *,int *, int *, int *, int *);
-extern void svddec_m_(double *,double *,double *,double *,double *,double *,double *,double *,int *,int *, int *, int *, int *);
+extern void svdcorr_m_(double *,double *, double *,double *,double *, double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *,int *, int *, int *);
+extern void svdcorr_c_(double *,double *, double *,double *,double *, double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *,int *, int *, int *);
+extern void svddec_m_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *, int *);
+extern void svddec_c_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *, int *);
 
 extern void ibs_();
 extern void micit_(double *,char *,double *,double *,double *,int *,float *,
@@ -247,6 +247,7 @@ void correct_putorbit(struct in_cmd*);
 void correct_usekick(struct in_cmd*);
 void correct_usemonitor(struct in_cmd*);
 void correct_option(struct in_cmd* cmd);
+int pro_correct_filter(int iplane, double sigcut);
 void deco_init();
 int decode_command();
 int decode_par(struct in_cmd*, int, int, int, int);
