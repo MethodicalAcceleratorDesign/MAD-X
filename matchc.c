@@ -88,7 +88,7 @@ void match_action(struct in_cmd* cmd)
      iseed = 1;
      iprint = 0;
      match_work[0] = new_double_array(total_vars+1);
-     match_work[1] = new_double_array(total_vars+1);
+     match_i_work[1] = new_int_array(total_vars+1);
      match_work[2] = new_double_array(total_vars+1);
      match_work[3] = new_double_array(total_vars+1);
      match_work[4] = new_double_array(total_vars+1);
@@ -98,7 +98,7 @@ void match_action(struct in_cmd* cmd)
      mtsa_(&total_const, &total_vars,
 	   &match_tol, &current_calls, &current_call_lim,
            vary_vect->a, fun_vect->a,&iseed,&iprint,
-           match_work[0]->a, match_work[1]->a, match_work[2]->a,
+           match_work[0]->a, match_i_work[1]->i, match_work[2]->a,
            match_work[3]->a, match_work[4]->a, match_work[5]->a,
            match_work[6]->a);
     }
