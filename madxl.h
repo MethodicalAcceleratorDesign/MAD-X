@@ -67,13 +67,13 @@ const char cmd_match_base[][TABLE_KEY] =
 int survey_table_types[] =
 {
 3, 2, 2, 2, 2,
-2, 2, 2, 2, 2
+2, 2, 2, 2, 2, 2
 };
 
 char survey_table_cols[][TABLE_KEY] =
 {
 "name", "s", "l", "angle", "x",
-"y", "z", "theta", "phi", "psi",
+"y", "z", "theta", "phi", "psi", "globaltilt",
 " "  /* blank terminates */
 };
 
