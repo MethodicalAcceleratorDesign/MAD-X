@@ -2006,7 +2006,7 @@ void* mymalloc(char* caller, size_t size)
   if ((p = malloc(l_size)) == NULL)
     fatal_error("memory overflow, called from routine:", caller);
   i_p = (int*) p; *i_p = FREECODE;
-  return (p+sizeof(int));
+  return (void *)((char*)p+sizeof(int));
 }
 
 char* mystrchr(char* string, char c)
