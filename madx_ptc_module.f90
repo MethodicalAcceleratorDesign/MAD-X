@@ -114,8 +114,10 @@ CONTAINS
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: imul=20,nt0=20000,length=16
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
-    real(dp) f_errors(0:50),aperture(100),normal(0:maxmul),skew(0:maxmul),field(2,0:maxmul)
-    real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap,fint,fintx
+    real(dp) f_errors(0:50),aperture(100),normal(0:maxmul)
+    real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
+    real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
+    real(dp) fint,fintx,div
     real(kind(1d0)) get_value,node_value
     character(length) name
     character(name_len) aptype
@@ -384,6 +386,7 @@ CONTAINS
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
+       call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        call dzero(normal,maxmul+1)
        call dzero(skew,maxmul+1)
@@ -442,16 +445,27 @@ CONTAINS
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
     case(14,15,16) ! PTC accepts mults
+       call dzero(f_errors,maxferr+1)
+       n_ferr = node_fd_errors(f_errors)
+       do i = 1, 2
+          fieldk(i) = zero
+       enddo
+       if (n_ferr .gt. 0) call dcopy(f_errors, fieldk, min(2, n_ferr))
+       if (l .eq. zero)  then
+          div = one
+       else
+          div = l
+       endif
        if(code.eq.14) then
           key%magnet="hkicker"
-          key%list%k(1)=node_value('kick ')
+          key%list%k(1)=node_value('kick ')+node_value('chkick ')+fieldk(1)/div
        else if(code.eq.15) then
           key%magnet="kicker"
-          key%list%k(1)=node_value('hkick ')
-          key%list%ks(1)=node_value('vkick ')
+          key%list%k(1)=node_value('hkick ')+node_value('chkick ')+fieldk(1)/div
+          key%list%ks(1)=node_value('vkick ')+node_value('cvkick ')+fieldk(2)/div
        else if(code.eq.16) then
           key%magnet="vkicker"
-          key%list%ks(1)=node_value('kick ')
+          key%list%ks(1)=node_value('kick ')+node_value('cvkick ')+fieldk(2)/div
        endif
        key%tiltd=node_value('tilt ')
     case(17)
