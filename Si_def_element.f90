@@ -2088,8 +2088,10 @@ CONTAINS
        CALL KILL(EL%HGAP);DEALLOCATE(EL%HGAP);
        CALL KILL(EL%H1);DEALLOCATE(EL%H1);
        CALL KILL(EL%H2);DEALLOCATE(EL%H2);
-       CALL KILL(EL%thin_h_foc);DEALLOCATE(EL%thin_v_foc);
-       CALL KILL(EL%thin_h_angle);DEALLOCATE(EL%thin_v_angle);
+       CALL KILL(EL%thin_h_foc);DEALLOCATE(EL%thin_h_foc);
+       CALL KILL(EL%thin_v_foc);DEALLOCATE(EL%thin_v_foc);
+       CALL KILL(EL%thin_h_angle);DEALLOCATE(EL%thin_h_angle);
+       CALL KILL(EL%thin_v_angle);DEALLOCATE(EL%thin_v_angle);
        DEALLOCATE(EL%MIS);DEALLOCATE(EL%EXACTMIS);
 
        call kill(EL%P)        ! call kill(EL%P)    ! AIMIN MS 4.0
