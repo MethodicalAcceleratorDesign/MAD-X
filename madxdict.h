@@ -142,6 +142,7 @@ char command_def[] =
 " "
 "option: control none 0 0 "
 "bborbit  = [l, false, true], "
+"debug    = [l, false, true], "
 "echo     = [l, true, true], "
 "info     = [l, true, true], "
 "reset    = [l, false, true], "
