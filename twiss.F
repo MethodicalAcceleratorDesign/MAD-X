@@ -1122,7 +1122,7 @@
 
   910 format('TWISS uses the RF system or synchrotron radiation ',      &
      &'only to find the closed orbit, for optical calculations it ',    &
-     $'ignores both.')
+     &'ignores both.')
 
       end
       subroutine twcptk(re,orbit)
@@ -2017,7 +2017,7 @@
           deltap = get_value('probe ','deltap ')
           gamma = get_value('probe ','gamma ')
           dorad = get_value('probe ','radiate ') .ne. zero
-        endif  
+        endif
         an = bv0 * node_value('angle ') * el/node_value('l ')
         tilt = -node_value('tilt ')
         e1 = bv0 * node_value('e1 ')
@@ -2852,10 +2852,10 @@
         orbit(4) = orbit(4) + dpy - dipi * (deltap + bi*orbit(6))
         orbit(5) = orbit(5) - (dipr*x + dipi*y) * bi
 !---- Add the missing focussing component of thin dipoles for co
-      if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
-        orbit(2) = orbit(2)-dipr*dipr/elrad*x
-        orbit(4) = orbit(4)-dipi*dipi/elrad*y
-      endif
+        if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
+          orbit(2) = orbit(2)-dipr*dipr/elrad*x
+          orbit(4) = orbit(4)-dipi*dipi/elrad*y
+        endif
 
 !---- Radiation effects at exit.
         if (dorad  .and.  elrad .ne. zero) then
