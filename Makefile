@@ -37,8 +37,8 @@ default: madx
 twissp.o: twiss.F
 	$(FC) $(FCP) -c -o twissp.o twiss.F
 
-ttwm_dump.o: ttwm_dum.F
-	$(FC) $(FCP) -c -o ttwm_dump.o ttwm_dum.F
+ptc_dummy.o: ptc_dummy.F
+	$(FC) $(FCP) -c -o ptc_dummy.o ptc_dummy.F
 
 surveyp.o: survey.F
 	$(FC) $(FCP) -c -o surveyp.o survey.F
@@ -127,28 +127,30 @@ m_real_polymorph.o: l_complex_taylor.o m_real_polymorph.f90
 n_complex_polymorph.o: m_real_polymorph.o n_complex_polymorph.f90
 	$(f95) $(f95_FLAGS) n_complex_polymorph.f90
 
-Sa_rotation_mis.o: n_complex_polymorph.o Sa_rotation_mis.f90
-	$(f95) $(f95_FLAGS) Sa_rotation_mis.f90
+Sa_extend_poly.o: n_complex_polymorph.o Sa_extend_poly.f90
+	$(f95) $(f95_FLAGS) Sa_extend_poly.f90
 
-Sb_extend_poly.o: Sa_rotation_mis.o Sb_extend_poly.f90
-	$(f95) $(f95_FLAGS) Sb_extend_poly.f90
+Sb_1_pol_template.o: Sa_extend_poly.o Sb_1_pol_template.f90
+	$(f95) $(f95_FLAGS) Sb_1_pol_template.f90
 
-Sc_1_pol_template.o: Sb_extend_poly.o Sc_1_pol_template.f90
-	$(f95) $(f95_FLAGS) Sc_1_pol_template.f90
+Sb_2_pol_template.o: Sb_1_pol_template.o Sb_2_pol_template.f90
+	$(f95) $(f95_FLAGS) Sb_2_pol_template.f90
 
-Sc_2_pol_template.o: Sc_1_pol_template.o Sc_2_pol_template.f90
-	$(f95) $(f95_FLAGS) Sc_2_pol_template.f90
+Sc_euclidean.o: Sb_2_pol_template.o Sc_euclidean.f90
+	$(f95) $(f95_FLAGS) Sc_euclidean.f90
 
-Sd_euclidean.o: Sc_2_pol_template.o Sd_euclidean.f90
-	$(f95) $(f95_FLAGS) Sd_euclidean.f90
+Sd_frame.o: Sc_euclidean.o Sd_frame.f90
+	$(f95) $(f95_FLAGS) Sd_frame.f90
 
-Se_frame.o: Sd_euclidean.o Se_frame.f90
-	$(f95) $(f95_FLAGS) Se_frame.f90
+Se_status.o: Sd_frame.o Se_status.f90
+	$(f95) $(f95_FLAGS) Se_status.f90
 
-Sf_status.o: Se_frame.o Sf_status.f90
-	$(f95) $(f95_FLAGS) Sf_status.f90
+Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90 \
+	a_def_all_kind.inc a_def_user1.inc a_def_user2.inc \
+	a_def_element_fibre_layout.inc
+	$(f95) $(f95_FLAGS) Sf_def_all_kinds.f90
 
-Sg_0_fitted.o: Sf_status.o Sg_0_fitted.f90
+Sg_0_fitted.o: Sf_def_all_kinds.o Sg_0_fitted.f90
 	$(f95) $(f95_FLAGS) Sg_0_fitted.f90
 
 Sg_1_template_my_kind.o: Sg_0_fitted.o Sg_1_template_my_kind.f90
@@ -181,42 +183,32 @@ Sn_mad_like.o: Sm_tracking.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 	$(f95) $(f95_FLAGS) So_fitting.f90
 
-zza_keywords.o: So_fitting.o zza_keywords.f90
-	$(f95) $(f95_FLAGS) zza_keywords.f90
+Sp_keywords.o: So_fitting.o Sp_keywords.f90
+	$(f95) $(f95_FLAGS) Sp_keywords.f90
 
-first_ptc.o: zza_keywords.o first_ptc.f90
-	$(f95) $(f95_FLAGS) first_ptc.f90
+madx_ptc_module.o: Sp_keywords.o madx_ptc_module.f90
+	$(f95) $(f95_FLAGS) madx_ptc_module.f90
 
-ptc_input.o: zza_keywords.o ptc_input.f90
-	$(f95) $(f95_FLAGS) ptc_input.f90
+wrap.o: madx_ptc_module.o wrap.f90
+	$(f95) $(f95_FLAGS) wrap.f90
 
-set_para.o: zza_keywords.o set_para.f90
-	$(f95) $(f95_FLAGS) set_para.f90
-
-ptc_normal.o: zza_keywords.o ptc_normal.f90
-	$(f95) $(f95_FLAGS) ptc_normal.f90
-
-u1_twiss.o: zza_keywords.o u1_twiss.f90
-	$(f95) $(f95_FLAGS) u1_twiss.f90
-
-ptc_twiss.o: u1_twiss.o ptc_twiss.f90
-	$(f95) $(f95_FLAGS) ptc_twiss.f90
-
-madx: madxnp.o twissp.o ttwm_dump.o surveyp.o orbfp.o emitp.o utilp.o matchp.o matchsap.o dynapp.o plotp.o ibsdbp.o trrunp.o gxx11p.o gxx11c.o
-	$(FC) $(FP) -o madx madxm.F madxnp.o twissp.o ttwm_dump.o matchp.o matchsap.o ibsdbp.o plotp.o trrunp.o dynapp.o surveyp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o $(LIBX) -lm -lc
+madx: \
+	madxnp.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o utilp.o matchp.o matchsap.o dynapp.o \
+	plotp.o ibsdbp.o trrunp.o gxx11p.o gxx11c.o
+	$(FC) $(FP) -o madx madxm.F madxnp.o twissp.o ptc_dummy.o matchp.o matchsap.o ibsdbp.o plotp.o \
+	trrunp.o dynapp.o surveyp.o orbfp.o emitp.o utilp.o gxx11p.o gxx11c.o $(LIBX) -lm -lc
 
 madxdev: \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
 	m_real_polymorph.o n_complex_polymorph.o  \
-	Sa_rotation_mis.o Sb_extend_poly.o Sc_1_pol_template.o Sc_2_pol_template.o \
-	Sd_euclidean.o Se_frame.o Sf_status.o Sg_0_fitted.o \
+	Sa_extend_poly.o Sb_1_pol_template.o Sb_2_pol_template.o \
+	Sc_euclidean.o Sd_frame.o Se_status.o Sf_def_all_kinds.o Sg_0_fitted.o \
 	Sg_1_template_my_kind.o Sg_2_template_my_kind.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
-	Sm_tracking.o Sn_mad_like.o So_fitting.o zza_keywords.o \
-	first_ptc.o ptc_input.o u1_twiss.o set_para.o ptc_twiss.o \
-	ptc_normal.o \
+	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
+	madx_ptc_module.o wrap.o \
 	madxm.o madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o matchsa.o dynap.o \
 	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o
 	$(f95) $(FOPT) -o madxdev madxm.o \
@@ -224,12 +216,12 @@ madxdev: \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
 	m_real_polymorph.o n_complex_polymorph.o  \
-	Sa_rotation_mis.o Sb_extend_poly.o Sc_1_pol_template.o Sc_2_pol_template.o \
-	Sd_euclidean.o Se_frame.o Sf_status.o Sg_0_fitted.o \
+	Sa_extend_poly.o Sb_1_pol_template.o Sb_2_pol_template.o \
+	Sc_euclidean.o Sd_frame.o Se_status.o Sf_def_all_kinds.o Sg_0_fitted.o \
 	Sg_1_template_my_kind.o Sg_2_template_my_kind.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
-	Sm_tracking.o Sn_mad_like.o So_fitting.o zza_keywords.o \
-	first_ptc.o ptc_input.o u1_twiss.o set_para.o ptc_twiss.o ptc_normal.o \
+	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
+	madx_ptc_module.o wrap.o \
 	madxnp.o twiss.o survey.o orbf.o emit.o util.o 	match.o matchsa.o dynap.o \
 	plot.o ibsdb.o trrun.o 	gxx11.o gxx11c.o epause.o timel.o usleep.o $(LIBX) -lm -lc
 
