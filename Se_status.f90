@@ -1,6 +1,6 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+! See file A_SCRATCH_SIZE.F90
 module S_status
   use s_frame
   USE S_extend_poly
@@ -31,9 +31,11 @@ module S_status
   integer, parameter :: KIND17 =ST+17
   integer, parameter :: KIND18 =ST+18
   integer, parameter :: KIND19 =ST+19
-  integer, parameter :: KINDFITTED = ST+20
-  integer, parameter :: KINDUSER1 = ST+21
-  integer, parameter :: KINDUSER2 = ST+22
+  integer, parameter :: KIND20 =ST+20     !  MADLIKE wedges on RBEND
+  integer, parameter :: KIND21 =ST+21     !  travelling wave cavity
+  integer, parameter :: KINDFITTED = KIND20+2
+  integer, parameter :: KINDUSER1 = KIND20+3
+  integer, parameter :: KINDUSER2 = KIND20+4
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6
@@ -46,6 +48,7 @@ module S_status
   character(6) ind_stoc(ndim2)
   !  Making PTC leaner is false
   LOGICAL(lp),TARGET   :: with_internal_frame = .true.
+  !LOGICAL(lp),TARGET   :: use_external_tilt = .true.
   !
 
   integer, target :: MADKIND2=KIND2
@@ -58,7 +61,9 @@ module S_status
   LOGICAL(lp), target :: MAD=.false.
   LOGICAL(lp), target :: EXACT_MODEL = .false.
   INTEGER, target:: NSTD,METD
-  TYPE(B_CYL) SECTOR_B
+  ! TYPE(B_CYL) SECTOR_B
+  INTEGER,TARGET :: SECTOR_NMUL_MAX=10
+  TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
   INTEGER, target :: SECTOR_NMUL = 4
   real(dp) CRAD,CFLUC
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
@@ -71,7 +76,8 @@ module S_status
   LOGICAL(lp) :: firsttime_coef=.true.
 
   PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt
-  PRIVATE DTILTR,DTILTP,DTILTS
+  !PRIVATE DTILTR,DTILTP,DTILTS
+  PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL,DTILTS_EXTERNAL
   PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P,CHECK_APERTURE_S
   LOGICAL(lp), target:: electron
   real(dp), target :: muon=one
@@ -103,7 +109,7 @@ module S_status
        &(f,f,f,t,f,f,f,t,f)
   TYPE (INTERNAL_STATE), PARAMETER :: DELTA0   = INTERNAL_STATE &
        &(f,f,f,t,f,f,f,t,t)
-  private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
+  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
   PRIVATE B2PERPR,B2PERPP
@@ -154,7 +160,7 @@ module S_status
      !
      INTEGER, POINTER :: TOTALPATH                    !
      LOGICAL(lp), POINTER :: EXACT,RADIATION,NOCAVITY     !       STATE
-     LOGICAL(lp), POINTER :: FRINGE,TIME                  !
+     LOGICAL(lp), POINTER :: FRINGE,KILL_ENT_FRINGE,KILL_EXI_FRINGE,TIME, bend_fringe                  !
      !
      INTEGER, POINTER :: METHOD,NST                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA
      INTEGER, POINTER :: NMUL                         ! NUMBER OF MULTIPOLE
@@ -204,6 +210,7 @@ module S_status
 
   INTERFACE init
      MODULE PROCEDURE s_init
+     MODULE PROCEDURE S_init_berz
   END INTERFACE
 
   INTERFACE print
@@ -225,12 +232,20 @@ module S_status
      MODULE PROCEDURE B2PERPP
   END INTERFACE
 
-  INTERFACE DTILTD
-     MODULE PROCEDURE DTILTR
-     MODULE PROCEDURE DTILTP       ! DESIGN TILT
-     MODULE PROCEDURE DTILTS
-  END INTERFACE
+  !  INTERFACE DTILTD
+  !     MODULE PROCEDURE DTILTR
+  !     MODULE PROCEDURE DTILTP       ! DESIGN TILT
+  !     MODULE PROCEDURE DTILTS
+  !     MODULE PROCEDURE DTILTR_EXTERNAL
+  !     MODULE PROCEDURE DTILTP_EXTERNAL       ! EXTERNAL
+  !     MODULE PROCEDURE DTILTS_EXTERNAL
+  !  END INTERFACE
 
+  INTERFACE DTILTD
+     MODULE PROCEDURE DTILTR_EXTERNAL
+     MODULE PROCEDURE DTILTP_EXTERNAL       ! EXTERNAL
+     MODULE PROCEDURE DTILTS_EXTERNAL
+  END INTERFACE
 
 
 
@@ -277,7 +292,7 @@ CONTAINS
     nullify(P%EDGE)
     nullify(P%TOTALPATH)
     nullify(P%EXACT);nullify(P%RADIATION);nullify(P%NOCAVITY);
-    nullify(P%FRINGE);nullify(P%TIME);
+    nullify(P%FRINGE);nullify(P%KILL_ENT_FRINGE);nullify(P%KILL_EXI_FRINGE);nullify(P%bend_fringe);nullify(P%TIME);
     nullify(P%METHOD);nullify(P%NST);
     nullify(P%NMUL);
     nullify(P%F);
@@ -303,13 +318,18 @@ CONTAINS
     ALLOCATE(P%EDGE(2));P%EDGE(1)=zero;P%EDGE(2)=zero;
     ALLOCATE(P%TOTALPATH); ! PART OF A STATE INITIALIZED BY EL=DEFAULT
     ALLOCATE(P%EXACT);ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
-    ALLOCATE(P%FRINGE);ALLOCATE(P%TIME);
+    ALLOCATE(P%FRINGE);ALLOCATE(P%KILL_ENT_FRINGE);ALLOCATE(P%KILL_EXI_FRINGE);ALLOCATE(P%bend_fringe);ALLOCATE(P%TIME);
     ALLOCATE(P%METHOD);ALLOCATE(P%NST);P%METHOD=2;P%NST=1;
     ALLOCATE(P%NMUL);P%NMUL=0;
     !   ALLOCATE(P%TRACK);P%TRACK=.TRUE.;
+    P%KILL_ENT_FRINGE=.FALSE.
+    P%KILL_EXI_FRINGE=.FALSE.
+    P%bend_fringe=.false.
     if(with_internal_frame) then
        call alloc(p%f)
     endif
+    ! if(junk) ccc=ccc+1
+
   end subroutine alloc_p
 
 
@@ -333,12 +353,13 @@ CONTAINS
     DEALLOCATE(P%EDGE);
     DEALLOCATE(P%TOTALPATH);
     DEALLOCATE(P%EXACT);DEALLOCATE(P%RADIATION);DEALLOCATE(P%NOCAVITY);
-    DEALLOCATE(P%FRINGE);DEALLOCATE(P%TIME);
+    DEALLOCATE(P%FRINGE);DEALLOCATE(P%KILL_ENT_FRINGE);DEALLOCATE(P%KILL_EXI_FRINGE);DEALLOCATE(P%bend_fringe);DEALLOCATE(P%TIME);
     DEALLOCATE(P%METHOD);DEALLOCATE(P%NST);
     DEALLOCATE(P%NMUL)
     !    CALL NULL_P(P)
     DEALLOCATE(P)
     nullify(p);
+    ! if(junk) ccc=ccc-1
   end subroutine dealloc_p
 
   SUBROUTINE  equal_A(elp,el)
@@ -367,6 +388,10 @@ CONTAINS
     elp%TIME=el%TIME
     elp%NOCAVITY=el%NOCAVITY
     elp%FRINGE=el%FRINGE
+    elp%KILL_ENT_FRINGE=el%KILL_ENT_FRINGE
+    elp%KILL_EXI_FRINGE=el%KILL_EXI_FRINGE
+    elp%bend_fringe=el%bend_fringe
+
     elp%LD=el%LD
     elp%LC=el%LC
     elp%TILTD=el%TILTD
@@ -508,8 +533,9 @@ CONTAINS
     MYTYPE(kind13)=" VERTICAL MONITOR "
     MYTYPE(kind14)=" INSTRUMENT "
     MYTYPE(kind15)=" ELECTRIC SEPTUM "
-    !                   123456789012345678901234
-    MYTYPE(kind16)=" STRAIGHT EXACT (BEND) "
+    !               123456789012345678901234
+    MYTYPE(kind16)=" TRUE PARAELLEL  BEND  "
+    MYTYPE(kind20)=" STRAIGHT EXACT (BEND) "
     MYTYPE(kind17)=" SOLENOID SIXTRACK"
     MYTYPE(KINDFITTED)=" FITTED "
     MYTYPE(KINDUSER1)=" USER_1 "
@@ -529,48 +555,58 @@ CONTAINS
        MADFAC(I)=(I-1)*MADFAC(I-1)
     ENDDO
 
-    w_p=0
-    w_p%nc=1
-    w_p%fc='(2((1X,A72,/)))'
-    w_p%c(1) = " RBEND ARE READ DIFFERENTLY DEPENDING ON VARIABLE MADLENGTH"
-    IF(MADLENGTH) THEN
-       w_p%c(2) = " INPUT OF CARTESIAN LENGTH FOR RBEND  "
-    ELSE
-       w_p%c(2) = " INPUT OF POLAR LENGTH FOR RBEND  "
-    ENDIF
-    CALL WRITE_I
+    !    w_p=0
+    !    w_p%nc=1
+    !    w_p%fc='(2((1X,A72,/)))'
+    !    w_p%c(1) = " RBEND ARE READ DIFFERENTLY DEPENDING ON VARIABLE MADLENGTH"
+    !    IF(MADLENGTH) THEN
+    !       w_p%c(2) = " INPUT OF CARTESIAN LENGTH FOR RBEND  "
+    !    ELSE
+    !       w_p%c(2) = " INPUT OF POLAR LENGTH FOR RBEND  "
+    !    ENDIF
+    !    CALL WRITE_I
 
     NSTD=1
     METD=2
     electron=PARTICLE
-    w_p=0
-    w_p%nc=1
-    w_p%fc='(1((1X,A72)))'
-    IF(ELECTRON) THEN
-       w_p%c(1) = " THIS IS A ELECTRON (POSITRON ACTUALLY) "
-    ELSE
-       w_p%c(1) = " THIS IS A PROTON "
-    ENDIF
+    !    w_p=0
+    !    w_p%nc=1
+    !    w_p%fc='(1((1X,A72)))'
+    !    IF(ELECTRON) THEN
+    !       w_p%c(1) = " THIS IS A ELECTRON (POSITRON ACTUALLY) "
+    !    ELSE
+    !       w_p%c(1) = " THIS IS A PROTON "
+    !    ENDIF
     tilt%natural=.true.
     tilt%tilt(0)=zero
     do i=1,nmax
        tilt%tilt(i)=pih/i
     enddo
     !  SECTOR_B AND SECTOR_NMUL FOR TYPE TEAPOT
-    IF(SECTOR_NMUL>0) THEN
+    IF(SECTOR_NMUL>0.and.firsttime_coef) THEN
+       global_verbose=.false.
        if(firsttime_coef) then
-          SECTOR_B%firsttime=0   !slightly unsafe
+          !          SECTOR_B%firsttime=0   !slightly unsafe
+          ALLOCATE(S_B(SECTOR_NMUL_MAX))
+          DO I=1,SECTOR_NMUL_MAX
+             if(i==SECTOR_NMUL_MAX)     global_verbose=.true.
+             S_B(I)%firsttime=0
+             call nul_coef(S_B(I))
+             call make_coef(S_B(I),I)
+             call curvebend(S_B(I),I)
+          ENDDO
        endif
-       call nul_coef(SECTOR_B)
-       call make_coef(SECTOR_B,SECTOR_NMUL)
-       call curvebend(SECTOR_B,SECTOR_NMUL)
-       w_p=1
-       w_p%nc=1
-       w_p%fc='(1((1X,A34)))'
-       w_p%fI='(2((1X,I4)),/)'
-       W_P=(/SECTOR_NMUL,sector_b%n_mono/)
-       w_p%c(1) = " Small Machine Sector Bend Order ="
-       CALL WRITE_I
+       !       call nul_coef(SECTOR_B)
+       !       call make_coef(SECTOR_B,SECTOR_NMUL)
+       !       call curvebend(SECTOR_B,SECTOR_NMUL)
+       !       w_p=1
+       !       w_p%nc=1
+       !       w_p%fc='(1((1X,A34)))'
+       !       w_p%fI='(2((1X,I4)),/)'
+       !       W_P=(/SECTOR_NMUL,sector_b%n_mono/)
+       !       w_p%c(1) = " Small Machine Sector Bend Order ="
+       !       CALL WRITE_I
+       firsttime_coef=.FALSE.
     ENDIF
 
     call clear_states
@@ -796,6 +832,17 @@ CONTAINS
     NPARA=ND2+NDEL
   END  subroutine S_init
 
+  subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
+    implicit none
+    TYPE (INTERNAL_STATE), INTENT(IN):: STATE
+    INTEGER, INTENT(IN):: NO1,NP1
+    INTEGER ND1,NDEL,NDPT1
+    INTEGER, INTENT(OUT)::    ND2,NPARA
+
+    call init(STATE,NO1,NP1,my_true,ND2,NPARA)
+
+  END  subroutine S_init_berz
+
   SUBROUTINE MAKE_METHOD(N)
     IMPLICIT NONE
     integer I,J,N
@@ -994,75 +1041,78 @@ CONTAINS
     RETURN
   END       SUBROUTINE B2PERPP
 
-  SUBROUTINE DTILTR(EL,I,X)
+  SUBROUTINE DTILTR_EXTERNAL(DIR,TILTD,I,X)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    INTEGER,INTENT(IN):: I
-    TYPE(MAGNET_CHART),INTENT(IN):: EL
+    INTEGER,INTENT(IN):: I,DIR
+    REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
-    IF(EL%TILTD==zero) RETURN
+
+
+    IF(TILTD==zero) RETURN
     IF(I==1) THEN
-       ys=COS(EL%DIR*el%tiltd)*x(1)+SIN(EL%DIR*el%tiltd)*x(3)
-       x(3)=COS(EL%DIR*el%tiltd)*x(3)-SIN(EL%DIR*el%tiltd)*x(1)
+       ys=COS(DIR*TILTD)*x(1)+SIN(DIR*TILTD)*x(3)
+       x(3)=COS(DIR*TILTD)*x(3)-SIN(DIR*TILTD)*x(1)
        x(1)=ys
-       ys=COS(EL%DIR*el%tiltd)*x(2)+SIN(EL%DIR*el%tiltd)*x(4)
-       x(4)=COS(EL%DIR*el%tiltd)*x(4)-SIN(EL%DIR*el%tiltd)*x(2)
+       ys=COS(DIR*TILTD)*x(2)+SIN(DIR*TILTD)*x(4)
+       x(4)=COS(DIR*TILTD)*x(4)-SIN(DIR*TILTD)*x(2)
        x(2)=ys
     ELSE
-       ys=COS(EL%DIR*el%tiltd)*x(1)-SIN(EL%DIR*el%tiltd)*x(3)
-       x(3)=COS(EL%DIR*el%tiltd)*x(3)+SIN(EL%DIR*el%tiltd)*x(1)
+       ys=COS(DIR*TILTD)*x(1)-SIN(DIR*TILTD)*x(3)
+       x(3)=COS(DIR*TILTD)*x(3)+SIN(DIR*TILTD)*x(1)
        x(1)=ys
-       ys=COS(EL%DIR*el%tiltd)*x(2)-SIN(EL%DIR*el%tiltd)*x(4)
-       x(4)=COS(EL%DIR*el%tiltd)*x(4)+SIN(EL%DIR*el%tiltd)*x(2)
+       ys=COS(DIR*TILTD)*x(2)-SIN(DIR*TILTD)*x(4)
+       x(4)=COS(DIR*TILTD)*x(4)+SIN(DIR*TILTD)*x(2)
        x(2)=ys
     ENDIF
 
-  END SUBROUTINE DTILTR
+  END SUBROUTINE DTILTR_EXTERNAL
 
-  SUBROUTINE DTILTP(EL,I,X)
+  SUBROUTINE DTILTP_EXTERNAL(DIR,TILTD,I,X)
     IMPLICIT NONE
-    TYPE(MAGNET_CHART),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    INTEGER,INTENT(IN):: I
+    INTEGER,INTENT(IN):: I,DIR
+    REAL(DP),INTENT(IN) :: TILTD
     TYPE(REAL_8) YS
 
-    IF(EL%TILTD==zero) RETURN
+    IF(TILTD==zero) RETURN
     CALL ALLOC(YS)
 
     IF(I==1) THEN
-       ys=COS(EL%DIR*el%tiltd)*x(1)+SIN(EL%DIR*el%tiltd)*x(3)
-       x(3)=COS(EL%DIR*el%tiltd)*x(3)-SIN(EL%DIR*el%tiltd)*x(1)
+       ys=COS(DIR*TILTD)*x(1)+SIN(DIR*TILTD)*x(3)
+       x(3)=COS(DIR*TILTD)*x(3)-SIN(DIR*TILTD)*x(1)
        x(1)=ys
-       ys=COS(EL%DIR*el%tiltd)*x(2)+SIN(EL%DIR*el%tiltd)*x(4)
-       x(4)=COS(EL%DIR*el%tiltd)*x(4)-SIN(EL%DIR*el%tiltd)*x(2)
+       ys=COS(DIR*TILTD)*x(2)+SIN(DIR*TILTD)*x(4)
+       x(4)=COS(DIR*TILTD)*x(4)-SIN(DIR*TILTD)*x(2)
        x(2)=ys
     ELSE
-       ys=COS(EL%DIR*el%tiltd)*x(1)-SIN(EL%DIR*el%tiltd)*x(3)
-       x(3)=COS(EL%DIR*el%tiltd)*x(3)+SIN(EL%DIR*el%tiltd)*x(1)
+       ys=COS(DIR*TILTD)*x(1)-SIN(DIR*TILTD)*x(3)
+       x(3)=COS(DIR*TILTD)*x(3)+SIN(DIR*TILTD)*x(1)
        x(1)=ys
-       ys=COS(EL%DIR*el%tiltd)*x(2)-SIN(EL%DIR*el%tiltd)*x(4)
-       x(4)=COS(EL%DIR*el%tiltd)*x(4)+SIN(EL%DIR*el%tiltd)*x(2)
+       ys=COS(DIR*TILTD)*x(2)-SIN(DIR*TILTD)*x(4)
+       x(4)=COS(DIR*TILTD)*x(4)+SIN(DIR*TILTD)*x(2)
        x(2)=ys
     ENDIF
     CALL KILL(YS)
 
-  END SUBROUTINE DTILTP
+  END SUBROUTINE DTILTP_EXTERNAL
 
-  SUBROUTINE DTILTS(EL,I,Y)
+  SUBROUTINE DTILTS_EXTERNAL(DIR,TILTD,I,Y)
     IMPLICIT NONE
-    TYPE(MAGNET_CHART),INTENT(IN):: EL
     TYPE(ENV_8),INTENT(INOUT):: Y(6)
-    INTEGER,INTENT(IN):: I
+    INTEGER,INTENT(IN):: I,DIR
+    REAL(DP),INTENT(IN) :: TILTD
     TYPE(REAL_8) X(6)
 
-    IF(EL%TILTD==0) RETURN
+    IF(TILTD==zero) RETURN
 
     CALL ALLOC(X)
     X=Y
-    CALL DTILTD(EL,I,X)
+    CALL DTILTD(DIR,TILTD,I,X)
     Y=X
     CALL KILL(X)
 
-  END SUBROUTINE DTILTS
+  END SUBROUTINE DTILTS_EXTERNAL
 
 end module S_status
+
