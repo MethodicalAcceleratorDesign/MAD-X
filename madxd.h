@@ -967,7 +967,7 @@ char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 2.13";
 char one_string[] = "1";
-char aptwfile[NAME_L] = "dummy"; /* IW 02.12.2004 */
+char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
 char* current_link_group;
