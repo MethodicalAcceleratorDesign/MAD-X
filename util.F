@@ -1566,8 +1566,6 @@
 
       subroutine suelem(el, ve, we,tilt)
 
-
-
       implicit none
 #ifdef _WIN32
       include 'win32calls.fi'
@@ -1662,17 +1660,17 @@
   310 continue
 
 !****** end of straight elements ***************
-      ve(1) = 0
-      ve(2) = 0
+      ve(1) = zero
+      ve(2) = zero
       ve(3) = el
       we(1,1) = one
-      we(2,1) = 0
-      we(3,1) = 0
-      we(1,2) = 0
+      we(2,1) = zero
+      we(3,1) = zero
+      we(1,2) = zero
       we(2,2) = one
-      we(3,2) = 0
-      we(1,3) = 0
-      we(2,3) = 0
+      we(3,2) = zero
+      we(1,3) = zero
+      we(2,3) = zero
       we(3,3) = one
       go to 500
 
@@ -1712,22 +1710,42 @@
 !     &el," angv = ",angv," bv =",node_value('dipole_bv ')
       go to 490
 
-!---- Rotation around S-axis.
+!---- Rotation around S-axis. SPECIAL CASE 
   120 continue
-!        call ucopy(q(lcelm+meangr), angle, mwflt)
-      we(1,1) = cos(angle)
-      we(2,1) = sin(angle)
-      we(1,2) = - we(2,1)
-      we(2,2) = + we(1,1)
+      print *,"SROT"
+      tilt = node_value('angle ')
+      ve(1) = zero
+      ve(2) = zero
+      ve(3) = zero
+      we(1,1) =  cos(tilt)
+      we(2,1) =  sin(tilt)
+      we(3,1) = zero
+      we(1,2) = -sin(tilt)
+      we(2,2) = cos(tilt)
+      we(3,2) = zero
+      we(1,3) = zero
+      we(2,3) = zero
+      we(3,3) = one
       go to 500
 
-!---- Rotation around Y-axis.
+!---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
   130 continue
-      angle=0
-      we(1,1) = cos(angle)
-      we(3,1) = sin(angle)
-      we(1,3) = - we(3,1)
-      we(3,3) = + we(1,1)
+      print *,"YROT"
+      dx = node_value('angle ')
+      print *,"angle",dx
+      tilt = zero
+      ve(1) = zero
+      ve(2) = zero
+      ve(3) = zero
+      we(1,1) =  cos(dx)
+      we(2,1) = zero
+      we(3,1) = sin(dx)
+      we(1,2) = zero
+      we(2,2) = zero
+      we(3,2) = one
+      we(1,3) = -sin(dx)
+      we(2,3) = zero
+      we(3,3) = cos(dx)
       go to 500
 
 !---- Common for bends and multipoles: Displacement and rotation matrix.
