@@ -202,8 +202,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, ex, ey, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, minratio, n1, nr, length;
+  double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
-  double node_s, node_x, node_y, node_betx, node_bety, node_dx, node_dy, node_n1;
+  double node_s, node_n1;
   double aper_tol[3], ap1, ap2, ap3, ap4;
   double dispx, dispy, cox, coy, tolx, toly;
   double dispxadj, dispyadj, coxadj, coyadj, tolxadj, tolyadj;
@@ -255,10 +256,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   /* get initial twiss parameters, from start of first element in range */
   aper_read_twiss(current_sequ->tw_table->name, &tw_cnt[1], &s_end, &x, &y, &betx, &bety, &dx, &dy);
   tw_cnt[1]++;
-
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
   
-  /* calculate normal+parasitic disp. */
+  /* calculate initial normal+parasitic disp. */
   dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
   dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
 
@@ -281,7 +281,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 	node_string("apertype", apertype, &namelen);
 	aper_trim_ws(apertype, NAME_L);
 	
-	if (!strncasecmp("drift",name,5))
+	if (!strncmp("drift",name,5))
 	{
 		on_elem=-999999;
 	}
@@ -303,17 +303,16 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 	else if (aper_bs(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey))
 	{
 		/* if no pipe can be built, the n1 is set to inf and twiss parms read for reference*/
-		n1=999999; on_ap=-999999;
+		n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999;
 
 		aper_read_twiss(current_sequ->tw_table->name, &tw_cnt[1], &s_end, 
 		                 &x, &y, &betx, &bety, &dx, &dy);
-		
-		aper_write_table(name, &n1, &r, &xshift, &yshift, apertype, 
+		aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype, 
 		                     &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, 
 				     &s_end, &x, &y, &betx, &bety, &dx, &dy, table);
 		on_ap=1;
 
-		tw_cp->d_cols[tw_cnt[0]][tw_cnt[1]]=n1;
+		tw_cp->d_cols[tw_cnt[0]][tw_cnt[1]-1]=n1;
 		tw_cnt[1]++;
 
 		/* calc disp and adj halo to have ready for next node */
@@ -369,39 +368,36 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 					  halolength,haloxadj,haloyadj,newhalox,newhaloy,
 					  pipex,pipey,pipelength,minratio,notsimple);
 				
-				if (ratio < minratio)
-				{
-					minratio=ratio;
-					/*should also retrieve direction of minratio,
-					and vertical + horizontal aperture*/
-				}
+				/* save slice minimum ratio */
+				if (ratio < minratio) minratio=ratio;
+
 			}
 			
 			nr=minratio*halo[1];
 			n1=nr/(halo[1]/halo[0]); /* ratio r/n = 1.4 */
-			aper_write_table(name, &n1, &r, &xshift, &yshift, apertype, 
+			
+			n1x_m=n1*bbeat*sqrt(betx*ex);
+			n1y_m=n1*bbeat*sqrt(bety*ey);
+			
+			aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype, 
 			                     &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr, 
 					     &x, &y, &betx, &bety, &dx, &dy, table);
 		
+			/* save node minimum n1 */
 			if (n1 < node_n1)
 			{
-				node_n1=n1;
-				node_s=s_curr; node_x=x; node_y=y; node_betx=betx; node_bety=bety; 
-				node_dx=dx; node_dy=dy;			
+				node_n1=n1; node_s=s_curr;
 			}
+				
 		}
-
-		minimum="MIN_PREVIOUS";
-		aper_write_table(minimum, &node_n1, &r, &xshift, &yshift, apertype, 
-		                     &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, 
-				     &node_s, &node_x, &node_y, &node_betx, &node_bety, 
-				     &node_dx, &node_dy, table);
 
 		i=reset_interpolation(&nint);
 
-		tw_cp->d_cols[tw_cnt[0]][tw_cnt[1]]=node_n1;
+		/* insert minimum node value into Twiss table */
+		tw_cp->d_cols[tw_cnt[0]][tw_cnt[1]-1]=node_n1;
 		tw_cnt[1]++;
 
+		/* save range minimum n1 */
 		if (node_n1 < lim_pt->n1)
 		{
 			strcpy(lim_pt->name,name);
@@ -541,7 +537,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 
   (*ap1)=(*ap2)=(*ap3)=(*ap4)=0;
   
-  if (!strcasecmp(apertype,"circle"))
+  if (!strcmp(apertype,"circle"))
   {
 	*ap3=get_aperture(current_node, "var1"); /*radius circle*/
 
@@ -553,7 +549,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 	else err = -1;
   }
 
-  else if (!strcasecmp(apertype,"ellipse"))
+  else if (!strcmp(apertype,"ellipse"))
   {
   	*ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
 	*ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
@@ -564,7 +560,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 	if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
   
-  else if (!strcasecmp(apertype,"rectangle"))
+  else if (!strcmp(apertype,"rectangle"))
   {
   	*ap1 = get_aperture(current_node, "var1"); /*half width rect*/
 	*ap2 = get_aperture(current_node, "var2"); /*half height rect*/
@@ -575,7 +571,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 	if (!err) aper_fill_quads(pipey, pipey, quarterlength, pipelength);
   }
   
-  else if (!strcasecmp(apertype,"lhcscreen"))
+  else if (!strcmp(apertype,"lhcscreen"))
   {
   	*ap1=get_aperture(current_node, "var1"); /*half width rect*/
 	*ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -587,12 +583,12 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 	if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
   
-  else if (!strcasecmp(apertype,"marguerite"))
+  else if (!strcmp(apertype,"marguerite"))
   {
   	printf("\nApertype %s not yet supported.", apertype);
   }
   
-  else if (!strcasecmp(apertype,"rectellipse"))
+  else if (!strcmp(apertype,"rectellipse"))
   {
   	*ap1=get_aperture(current_node, "var1"); /*half width rect*/
 	*ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -612,7 +608,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 	if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
   
-  else if (!strcasecmp(apertype,"racetrack"))
+  else if (!strcmp(apertype,"racetrack"))
   {
   	*ap1=get_aperture(current_node, "var1"); /*half width rect*/
 	*ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -1015,7 +1011,7 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
 
   dangle=(pi/2-(alfa+theta))/napex;
 
-  if (isnan(dangle) || dangle<0)
+  if (!((0 < dangle) && (dangle < pi/2)))
   {
 	return -1;
   }
@@ -1052,22 +1048,25 @@ void aper_trim_ws(char* string, int len)
   if (c<len) string[c+1]=' '; /*adds a ws to avoid two \0 in a row*/
 }
 
-void aper_write_table(char* name, double* n1, double* rtol, double* xtol, double* ytol, 
-                          char* apertype, double* ap1, double* ap2, double* ap3,double* ap4,
+void aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m, 
+			  double* rtol, double* xtol, double* ytol, 
+                          char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
 			  double* on_ap, double* on_elem, double* spec,double* s, 
 			  double* x, double* y, double* betx, double* bety,double* dx, double* dy, 
 			  char *table)
 {
   string_to_table(table, "name", name);
   double_to_table(table, "n1", n1);
+  double_to_table(table, "n1x_m", n1x_m);
+  double_to_table(table, "n1y_m", n1y_m);
   double_to_table(table, "rtol", rtol);
   double_to_table(table, "xtol", xtol);
   double_to_table(table, "ytol", ytol);
   string_to_table(table, "apertype", apertype);
-  double_to_table(table, "ap1", ap1);
-  double_to_table(table, "ap2", ap2);
-  double_to_table(table, "ap3", ap3);
-  double_to_table(table, "ap4", ap4);
+  double_to_table(table, "aper_1", ap1);
+  double_to_table(table, "aper_2", ap2);
+  double_to_table(table, "aper_3", ap3);
+  double_to_table(table, "aper_4", ap4);
   double_to_table(table, "on_ap", on_ap);
   double_to_table(table, "on_elem", on_elem);
   double_to_table(table, "spec", spec);
@@ -3471,6 +3470,7 @@ void pro_aperture(struct in_cmd* cmd)
   struct table* tw_cp;
   char *file, *range, tw_name[NAME_L], *table="aperture";
   int tw_cnt[2]={0,0};
+  double ddummy;
   setbuf(stdout,(char *)NULL);
 
   if (current_sequ != NULL && current_sequ->length != zero)
@@ -3505,7 +3505,7 @@ void pro_aperture(struct in_cmd* cmd)
   current_node = use_range[0];
 
   tw_cp=current_sequ->tw_table;
-  while (strcasecmp(tw_cp->columns->names[tw_cnt[0]],"n1"))
+  while (strcmp(tw_cp->columns->names[tw_cnt[0]],"n1"))
   {
 	tw_cnt[0]++;
   }
@@ -3513,7 +3513,7 @@ void pro_aperture(struct in_cmd* cmd)
   tw_cnt[1]++; /* has to start at 1 to get correct val from char_from_table function */
   char_from_table(tw_cp->name, "name", &tw_cnt[1], tw_name);
   aper_trim_ws(tw_name, NAME_L);
-  while (strcasecmp(tw_name,current_node->name))
+  while (strcmp(tw_name,current_node->name))
   {
 	tw_cnt[1]++;
 	char_from_table(tw_cp->name, "name", &tw_cnt[1], tw_name);
