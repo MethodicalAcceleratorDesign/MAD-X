@@ -34,11 +34,135 @@ void pro_error(struct in_cmd* cmd)
           {
            error_eprint(cmd);
           }
+ else if (strcmp(cmd->tok_list->p[0], "seterr") == 0)
+          {
+           error_seterr(cmd);
+          }
  else if (strcmp(cmd->tok_list->p[0], "esave") == 0)
           {
            error_esave(cmd);
           }
 }
+
+
+void error_seterr(struct in_cmd* cmd)
+{
+
+/* read the errors from a named table  and stores
+   them in the nodes of the sequence.       
+   Subsequent Twiss will use them correctly.
+   ===> Must be preceded by a call to "read_table"
+   ===> (unless table exists in memory !)
+*/
+
+  struct name_list* nl = cmd->clone->par_names;
+  int i, ix, iy, debug;
+  int val, pos, seed;
+  int j;
+
+  struct node *ndexe;
+  struct node *nextnode;
+
+  char     name[NAME_L];
+  char   slname[NAME_L];
+
+  char     nname[NAME_L];
+  char   slnname[NAME_L];
+
+  char*    namtab;
+  int      t1;
+
+  struct   table  *err;
+
+  double   xold, xnew, yold, ynew;
+
+/* set up pointers to current sequence for later use */
+  struct sequence* mysequ = current_sequ;
+  nextnode = mysequ->ex_start;
+  ndexe = mysequ->ex_end;
+
+/* printf("Pointers: %d %d %d\n",mysequ,nextnode,ndexe); */
+
+  if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
+       printf("Want to use named table: %s\n",namtab);
+       if ((t1 = name_list_pos(namtab, table_register->names)) > -1) {
+          printf("The table ==> %s <=== was found \n",namtab);
+       } else {
+          /* fatal_error("Error table requested, but not existing:",namtab); */
+          /* exit(-77); */ 
+          printf("No such error table in memory: %s\n",namtab);
+       }
+
+  } else {
+       if (get_option("debug")) {
+         printf("No table name requested\n");
+         printf("Use default name\n");
+       }
+       strcpy(namtab,"error");
+  }
+ 
+  err = table_register->tables[t1];
+
+
+  i = 1; /* watch out ! i is the ROW number, not the C index !!! */
+  ix=0;
+  while(ix == 0) {
+      ix =   str_from_table(namtab, "name", &i, name);
+      if(ix == 0) {
+             stolower(name);
+             strcpy(slname,strip(name));
+             supp_tb(slname);
+          nextnode = mysequ->ex_start;
+          while (nextnode != ndexe) {
+            
+             strcpy(nname,nextnode->name);
+             stolower(nname);
+             strcpy(slnname,strip(nname));
+             supp_tb(slnname);
+          
+/*
+             printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
+             printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); 
+*/
+       
+             if(strcmp(slname,slnname) == 0) {
+
+//              printf("O.K.:  %s in sequence and input table\n",slname);
+                /*
+                ===>  now we have the match of the elements ..
+                */
+
+                /* We have now the input and the node, generate array and selection flag */
+                nextnode->sel_err = 1;
+                nextnode->p_fd_err = new_double_array(FIELD_MAX);
+                nextnode->p_fd_err->curr = FIELD_MAX;
+                nextnode->p_al_err = new_double_array(ALIGN_MAX);
+                nextnode->p_al_err->curr = ALIGN_MAX;
+
+                for (j = 1; j < EFIELD_TAB; j++) {
+             //   printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]);
+                  nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
+                }
+                for (j = 1; j < err->num_cols-EFIELD_TAB; j++) {
+             //   printf("ealign errors: %d %e\n",j,err->d_cols[j+EFIELD_TAB][i-1]);
+                  nextnode->p_al_err->a[j-1] = err->d_cols[j+EFIELD_TAB][i-1];
+                }
+                
+
+                nextnode = ndexe;
+             } else {
+                nextnode = nextnode->next;
+             }
+          }
+    
+      } 
+        i++;
+  }
+
+
+return;
+}
+
 
 void error_esave(struct in_cmd* cmd)
 {
@@ -156,7 +280,7 @@ void error_eprint(struct in_cmd* cmd)
        if(nextnode->p_fd_err != NULL) {
          mycount++;
          if(mycount <= 50000) {
-           fprintf(prt_file,"%s %d\n",nextnode->name,(int)nextnode->p_fd_err);
+           /* fprintf(prt_file,"%s %d\n",nextnode->name,(int)nextnode->p_fd_err); */
            fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
            fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
            for(i=0;i<22;i++) {
@@ -191,6 +315,7 @@ void error_efcomp(struct in_cmd* cmd)
   struct node *nextnode;
   int i,j,k;
   int    lvec;
+  int    hyst;
   int    flgmgt = 0;
   int chcount[3] = {0,0,0};
   char rout_name[] = "error_efcomp";
@@ -198,13 +323,19 @@ void error_efcomp(struct in_cmd* cmd)
   int    n;     /* order of reference multipole */
   double rr, rrr;    /* reference radius for multipole error */
   struct double_array *ptr;
+  struct double_array *pcoef;
+  double h_co_n[FIELD_MAX/2][4];
+  double h_co_s[FIELD_MAX/2][4];
+  double *hco_n;
+  double *hco_s;
   double *nvec;
+  double deer;  
   double ref_str;
   double ref_len;
   double nlength;
   double nvec0, nvec1, nvec2, nvec3;
-  double val[2] = {0,0};
-  static char atts[2][7] = {"order","radius"};
+  double val[3] = {0,0,0};
+  static char atts[3][7] = {"order","radius","hyster"};
   static char attv[4][7] = {"dkn","dks","dknr","dksr"};
   int         iattv[4] = {0,0,0,0};
   struct sequence* mysequ = current_sequ;
@@ -220,7 +351,7 @@ void error_efcomp(struct in_cmd* cmd)
 /*
     i = 0;
     while((cmd->tok_list->p[i]) != NULL) {
-      for(k=0;k<4;k++) {
+      for(k=0;k<6;k++) {
           if(strcmp(cmd->tok_list->p[i],attv[k]) == 0) {
              iattv[k] = 1;
           }
@@ -228,13 +359,23 @@ void error_efcomp(struct in_cmd* cmd)
     i++;
     }
 */
-    for(k=0; k<4; k++) {
+    for(k=0; k<6; k++) {
          pos = name_list_pos(attv[k],nl);
          if(nl->inform[pos] > 0) {
              if (get_option("debug"))
              fprintf(prt_file, "set iattv %d for %s to 1\n",iattv[k],attv[k]);
              iattv[k] = 1;
          }
+    }
+    hco_n = &h_co_n[0][0];
+    for(j=0;j<FIELD_MAX*2;j++) {
+       *hco_n = 0.0;           
+       hco_n++;
+    }
+    hco_s = &h_co_s[0][0];
+    for(j=0;j<FIELD_MAX*2;j++) {
+       *hco_s = 0.0;           
+       hco_s++;
     }
 
   while (nextnode != ndexe) { /*loop over elements and get strengths in vector*/
@@ -256,8 +397,8 @@ void error_efcomp(struct in_cmd* cmd)
           fprintf(prt_file, "field for %s %s %d\n",
                  nextnode->name,nextnode->base_name,nextnode->sel_err);
 
-/* now get order (n) and radius (rr) from command, if any */
-          for(i=0;i<2;i++){
+/* now get order (n), radius (rr) and hyster flag (hyst) from command, if any */
+          for(i=0;i<3;i++){
              val[i] = command_par_value(atts[i],cmd->clone);
              if(i==0) {
                n = val[i];
@@ -270,8 +411,44 @@ void error_efcomp(struct in_cmd* cmd)
                /* debug printout */
                if (get_option("debug"))
                fprintf(prt_file, "radius is %f\n",val[i]);
+             } else if (i==2) {
+               hyst = val[i];
+               /* debug printout */
+               if (get_option("debug"))
+               fprintf(prt_file, "hyster flag is %d\n",val[i]);
              }
           }
+
+/* now get coefficients for time memory effects in magnets */
+          pcoef = command_par_array("hcoeffn",cmd->clone);
+          hco_n = &h_co_n[0][0];
+          if(pcoef != NULL) {
+             for(j=0;j<pcoef->curr;j++) {
+                *hco_n = pcoef->a[j];
+                hco_n++;
+             }
+             if (get_option("debug")) {
+               for(j=0;j<FIELD_MAX/2;j++) {
+                printf("COEFF: %d %e %e %e %e\n",j,h_co_n[j][0],h_co_n[j][1],h_co_n[j][2],h_co_n[j][3]);
+               }
+             }
+          }
+
+          pcoef = command_par_array("hcoeffs",cmd->clone);
+          hco_s = &h_co_s[0][0];
+          if(pcoef != NULL) {
+             for(j=0;j<pcoef->curr;j++) {
+                *hco_s = pcoef->a[j];
+                hco_s++;
+             }
+             if (get_option("debug")) {
+               for(j=0;j<FIELD_MAX/2;j++) {
+                printf("COEFF: %d %e %e %e %e\n",j,h_co_s[j][0],h_co_s[j][1],h_co_s[j][2],h_co_s[j][3]);
+               }
+             }
+          }
+
+
 /* get length of node and check if magnet */
            ref_str = 0.0;
            nlength = node_value("l");
@@ -335,23 +512,35 @@ void error_efcomp(struct in_cmd* cmd)
 
          /* normal components -> 2j, skew components 2j+1 */
          if(flgmgt == 1) {
-           for(i=0;i<4;i++)  {
+
+           for(i=0;i<6;i++)  {   /* loop over possible commands */
+
              if (get_option("debug")) fprintf(prt_file, "%s %d\n",attv[i],iattv[i]);
+
              ptr = command_par_array(attv[i],cmd->clone);
-             if((ptr != NULL) && (iattv[i] == 1)) {
-               for(j=0;j<ptr->curr;j++){
+             if((ptr != NULL) && (iattv[i] == 1))  { /* command [i] found ? */
+
+
+               for(j=0;j<ptr->curr;j++)  { /* loop over all parameters */
+
+                 /* start field error assignment */
+                 /* NORMAL COMPONENTS, ABSOLUTE ERRORS */
                  if(i==0)  {
                    if(add_error_opt == 1) {
                       nextnode->p_fd_err->a[2*j]   += ptr->a[j];
                    } else {
                       nextnode->p_fd_err->a[2*j]    = ptr->a[j];
                    }
+
+                 /* SKEW COMPONENTS, ABSOLUTE ERRORS */
                  } else if(i==1) {
                    if(add_error_opt == 1) {
                    nextnode->p_fd_err->a[2*j+1] += ptr->a[j];
                    } else {
                    nextnode->p_fd_err->a[2*j+1]  = ptr->a[j];
                    }
+
+                 /* NORMAL COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
                  } else if(i==2) {
                    if(fabs(rr) < 1.0E-6) {
                       printf("++++++ error: trying to assign relative field errors \n");
@@ -359,15 +548,27 @@ void error_efcomp(struct in_cmd* cmd)
                       exit(-1);
                    }
                    norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
+
+                   /* if flag for hysteresis correction is set, use coefficients for correction */
+                   deer = 0.0;
+                   if(hyst == 1) {
+                      deer = h_co_n[j][3]*pow(ref_str,3) + h_co_n[j][2]*pow(ref_str,2) + 
+                             h_co_n[j][1]*pow(ref_str,1) + h_co_n[j][0];
+                      if (get_option("debug")) 
+                      printf("after correction (n): %d %e %e %e %e\n",
+                              j,ref_str,ptr->a[j],deer,(ptr->a[j] + deer));
+                   }
 /*
                    if (get_option("debug"))
                    fprintf(prt_file, "norm(n): %d %d %f %f\n",n,j,rr,norfac);
 */
                    if(add_error_opt == 1) {
-                   nextnode->p_fd_err->a[2*j]   += ptr->a[j]*ref_str*norfac;
+                   nextnode->p_fd_err->a[2*j]   += (ptr->a[j]+deer)*ref_str*norfac;
                    } else {
-                   nextnode->p_fd_err->a[2*j]    = ptr->a[j]*ref_str*norfac;
+                   nextnode->p_fd_err->a[2*j]    = (ptr->a[j]+deer)*ref_str*norfac;
                    }
+
+                 /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
                  } else if(i==3) {
                    if(fabs(rr) < 1.0E-6) {
                       printf("++++++ error: trying to assign relative field errors \n");
@@ -375,16 +576,26 @@ void error_efcomp(struct in_cmd* cmd)
                       exit(-1);
                    }
                    norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
+
+                   /* if flag for hysteresis correction is set, use coefficients for correction */
+                   deer = 0.0;
+                   if(hyst == 1) {
+                      deer = h_co_s[j][3]*pow(ref_str,3) + h_co_s[j][2]*pow(ref_str,2) + 
+                             h_co_s[j][1]*pow(ref_str,1) + h_co_s[j][0];
+                      if (get_option("debug")) 
+                      printf("after correction (s): %d %e %e %e %e\n",
+                              j,ref_str,ptr->a[j],deer,(ptr->a[j] + deer));
+                   }
 /*
                    if (get_option("debug"))
                    fprintf(prt_file, "norm(s): %d %d %f %f\n",n,j,rr,norfac);
 */
                    if(add_error_opt == 1) {
-                   nextnode->p_fd_err->a[2*j+1] += ptr->a[j]*ref_str*norfac;
+                   nextnode->p_fd_err->a[2*j+1] += (ptr->a[j]+deer)*ref_str*norfac;
                    } else {
-                   nextnode->p_fd_err->a[2*j+1]  = ptr->a[j]*ref_str*norfac;
+                   nextnode->p_fd_err->a[2*j+1]  = (ptr->a[j]+deer)*ref_str*norfac;
                    }
-                 }
+                 } /*  end  of field error assignment */
 
                }
             }
