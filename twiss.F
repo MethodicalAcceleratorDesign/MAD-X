@@ -1996,6 +1996,7 @@
      &el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
      &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bv0, &
      &bvk,el0,orbit0(6),zero,one,two,three
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -2074,6 +2075,10 @@
 !---- Body of the dipole.
 !---- centre option
         if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(ek,ek00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
           el0=el/two
           call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
 !---- Fringe fields.
@@ -2086,9 +2091,14 @@
             cplxy = .true.
           endif
 !---- Track orbit.
-          if (ftrk) call tmtrak(ek,re,te,orbit,orbit0)
+          call dcopy(orbit,orbit0,6)
+          if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
           if(centre_cptk) call twcptk(re,orbit0)
           if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(ek00,ek,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
         endif
 !---- End
 
@@ -2762,9 +2772,10 @@
       integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors,get_option
       double precision orbit(6),f_errors(0:maxferr),re(6,6),te(6,6,6),x,&
      &y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
-     &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),              &
+     &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
      &skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bv0,bvk,  &
      &dpxr,dpyr,zero,one,two,three
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -2919,8 +2930,19 @@
         endif
       endif
 !---- centre option
-      if(centre_cptk) call twcptk(re,orbit)
-      if(centre_bttk) call twbttk(re,te)
+      if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
+        if(centre_cptk) then
+          call dcopy(orbit,orbit0,6)
+          call twcptk(re,orbit0)
+        endif
+        if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
+      endif
 
       end
       subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
@@ -2949,6 +2971,7 @@
      &te(6,6,6),rw(6,6),tw(6,6,6),deltap,el,sk3,sk3l,rfac,arad,gamma,pt,&
      &octr,octi,posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,    &
      &field(2,0:3),el0,orbit0(6),zero,one,two,three,four,six
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
 
 !---- Initialize.
@@ -3034,12 +3057,20 @@
 !---- Concatenate with drift map.
 !---- centre option
         if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(ek,ek00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
           el0=el/two
           call dcopy(orbit,orbit0,6)
           call tmdrf0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
           call tmcat(fsec,re,te,rw,tw,re,te)
           if(centre_cptk) call twcptk(re,orbit0)
           if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(ek00,ek,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
         endif
         call tmdrf0(fsec,ftrk,orbit,fmap,el,ek,re,te)
         call tmcat(fsec,re,te,rw,tw,re,te)
@@ -3422,6 +3453,7 @@
       double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
      &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
      &bvk,field(2,0:1),node_value,get_value,plot_tilt,zero,one,two,three
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
@@ -3467,11 +3499,19 @@
 
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
         el0=el/two
         call dcopy(orbit,orbit0,6)
         call qdbody(fsec,ftrk,tilt,sk1,orbit0,el0,ek,re,te)
         if(centre_cptk) call twcptk(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
       endif
       call qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
@@ -3612,6 +3652,7 @@
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
      &get_value,zero,one,two,ten3m
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,ten3m=1d-3)
 
 !---- Initialize.
@@ -3642,11 +3683,19 @@
       ekick  = efield * ten3m * charge / (pc * (one + deltap))
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
         el0=el/two
         call dcopy(orbit,orbit0,6)
         call spbody(fsec,ftrk,tilt,ekick,orbit0,el0,ek,re,te)
         if(centre_cptk) call twcptk(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
       endif
       call spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
 
@@ -3783,6 +3832,7 @@
       double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
      &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s, &
      &bvk,field(2,0:2),node_value,get_value,zero,one,two,three,twelve
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
 
 !---- Initialize.
@@ -3827,11 +3877,19 @@
 
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
         el0=el/two
         call dcopy(orbit,orbit0,6)
         call sxbody(fsec,ftrk,tilt,sk2,orbit0,el0,ek,re,te)
         if(centre_cptk) call twcptk(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
       endif
       call sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
@@ -3950,15 +4008,24 @@
       logical fsec,ftrk,fmap
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &el,el0,two
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(two=2d0)
 
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
         el0=el/two
         call dcopy(orbit,orbit0,6)
         call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
         if(centre_cptk) call twcptk(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
       endif
       call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
@@ -4088,7 +4155,8 @@
       include 'twissl.fi'
       logical ftrk,fmap,cplxy
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),theta,ct,st,    &
-     &node_value,zero
+     &orbit0(6),node_value,zero
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0)
 
 !---- Initialize.
@@ -4112,9 +4180,21 @@
 !---- Track orbit.
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 !---- centre option
-      if(centre_cptk) call twcptk(re,orbit)
-      if(centre_bttk) call twbttk(re,te)
-
+      if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
+        if(centre_cptk) then
+          call dcopy(orbit,orbit0,6)
+          call twcptk(re,orbit0)
+        endif
+        if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
+      endif
       end
       subroutine tmyrot(ftrk,orbit,fmap,ek,re,te)
 
@@ -4136,7 +4216,8 @@
       include 'twissl.fi'
       logical ftrk,fmap
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),phi,cosphi,     &
-     &sinphi,tanphi,beta,node_value,get_value,zero,one
+     &orbit0(6),sinphi,tanphi,beta,node_value,get_value,zero,one
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0)
 
 !---- Initialize.
@@ -4160,8 +4241,21 @@
 !---- Track orbit.
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 !---- centre option
-      if(centre_cptk) call twcptk(re,orbit)
-      if(centre_bttk) call twbttk(re,te)
+      if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
+        if(centre_cptk) then 
+          call dcopy(orbit,orbit0,6)
+          call twcptk(re,orbit0)
+        endif
+        if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
+      endif
 
       end
       subroutine tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
@@ -4238,15 +4332,24 @@
       logical fsec,ftrk,fmap
       double precision dl,dl0,orbit(6),orbit0(6),ek(6),re(6,6),         &
      &te(6,6,6),two
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(two=2d0)
 
 !---- centre option
       if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
         dl0=dl/two
         call dcopy(orbit,orbit0,6)
         call tmdrf0(fsec,ftrk,orbit0,fmap,dl0,ek,re,te)
         if(centre_cptk) call twcptk(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
       endif
       call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
@@ -4275,6 +4378,7 @@
      &rw(6,6),tw(6,6,6),el,rfv,rff,rfl,dl,omega,vrf,phirf,pc,deltap,c0, &
      &c1,c2,ek0(6),ten6p,clight,node_value,get_value,twopi,get_variable,&
      &zero,one,two,half,ten3m
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
      &ten3m=1d-3)
 
@@ -4320,9 +4424,19 @@
           call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
           call tmcat(fsec,re,te,rw,tw,re,te)
           if(centre_cptk.or.centre_bttk) then
-            call dcopy(orbit,orbit0,6)
-            if(centre_cptk) call twcptk(re,orbit0)
+            call dcopy(orbit,orbit00,6)
+            call dcopy(ek,ek00,6)
+            call dcopy(re,re00,36)
+            call dcopy(te,te00,216)
+            if(centre_cptk) then
+              call dcopy(orbit,orbit0,6)
+              call twcptk(re,orbit0)
+            endif
             if(centre_bttk) call twbttk(re,te)
+            call dcopy(orbit00,orbit,6)
+            call dcopy(ek00,ek,6)
+            call dcopy(re00,re,36)
+            call dcopy(te00,te,216)
           endif
           call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
           call tmcat(fsec,rw,tw,re,te,re,te)
@@ -4629,7 +4743,8 @@
      &xm,ym,sx2,sy2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,    &
      &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
      &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
-     &three,ten3m,explim
+     &orbit0(6),three,ten3m,explim
+      double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
 !     if x > explim, exp(-x) is outside machine limits.
@@ -4826,8 +4941,19 @@
           re(4,3) = fk / (sy * (sx + sy))
         endif
 !---- centre option
-        if(centre_cptk) call twcptk(re,orbit)
-        if(centre_bttk) call twbttk(re,te)
+        if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
+          if(centre_cptk) then
+            call dcopy(orbit,orbit0,6)
+            call twcptk(re,orbit0)
+          endif
+          if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
+        endif
       endif
 
       end
