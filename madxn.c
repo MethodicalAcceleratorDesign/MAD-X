@@ -8956,7 +8956,7 @@ void track_dynap(struct in_cmd* cmd)
   if (get_option("dynap_dump")) dynap_tables_dump();
   */
   /* free buffers */
-  free(ibuf1); free(ibuf2); free(buf3); free(ibuf3); free(buf1); free(buf2);
+  free(ibuf1); free(ibuf2); free(ibuf3); free(buf1); free(buf2);
   free(buf_dxt); free(buf_dyt); free(buf3); free(buf4); free(buf5); free(buf6);
   free(buf7); free(buf8); free(buf9); free(buf10); free(buf11);
 }
