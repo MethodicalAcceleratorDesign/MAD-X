@@ -301,11 +301,13 @@
       call node_vector('aperture ',nn,aperture)
 !      print *, " TYPE ",aptype,
 !     &"values  x y lhc",aperture(1),aperture(2),aperture(3)
+!------------  ellipse case ----------------------------------
         if(aptype.eq.'ellipse') then
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
      &  last_pos, last_orbit, track, ktrack)
+!------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
         apx = aperture(1)
          if(apx.eq.0.0) then
@@ -315,11 +317,13 @@
 !        print *,"circle, radius= ",apx
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,      
      &  last_pos, last_orbit, track, ktrack)
+!------------  rectangle case ----------------------------------
         else if(aptype.eq.'rectangle') then
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,      
      &  last_pos, last_orbit, track, ktrack)
+!------------  LHC screen case ----------------------------------
         else if(aptype.eq.'lhcscreen') then
 !        print *, "LHC screen start, Xrect= ",
 !     &  aperture(1),"  Yrect= ",aperture(2),"  Rcirc= ",aperture(3)
@@ -344,7 +348,7 @@
 
 !---- RF cavity.
   100 continue
-      call ttrf(el,track,ktrack)
+      call ttrf(track,ktrack)
       go to 500
 
 !---- Electrostatic separator.
@@ -373,6 +377,12 @@
   200 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
+       if(apx.eq.0.0) then
+       apx=tolerance(1)
+       endif
+       if(apy.eq.0.0) then
+       apy=tolerance(3)
+       endif
       call trcoll(1, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack)
       go to 500
@@ -381,6 +391,12 @@
   210 continue
       apx = node_value('xsize ')
       apy = node_value('ysize ')
+       if(apx.eq.0.0) then
+       apx=tolerance(1)
+       endif
+       if(apy.eq.0.0) then
+       apy=tolerance(3)
+       endif
       call trcoll(2, apx, apy, turn, sum, part_id, last_turn,           &
      &last_pos, last_orbit, track, ktrack)
       go to 500
@@ -424,6 +440,7 @@
       sum = sum + el
       return
       end
+
       subroutine ttmult(track,ktrack)
       implicit none
 !----------------------------------------------------------------------*
@@ -788,7 +805,7 @@
      &  + el*(beti + pt * dtbyds) - (beti+pt)*ttt
       enddo
       end
-      subroutine ttrf(el,track,ktrack)
+      subroutine ttrf(track,ktrack)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -818,7 +835,7 @@
 
 !---- Fetch data.
 !      el = node_value('l ')
-      el1 = node_value('l ')
+!      el1 = node_value('l ')
       rfv = node_value('volt ')
       rff = node_value('freq ')
       rfl = node_value('lag ')
@@ -828,6 +845,8 @@
       betas = get_value('probe ','beta ')
       gammas= get_value('probe ','gamma ')
       dtbyds = get_value('probe ','dtbyds ')
+
+!      print *,"RF cav.  volt=",rfv, "  freq.",rff
 
 !*---- Get the longitudinal wakefield filename (parameter #17).
 !      if (iq(lcelm+melen+15*mcsiz-2) .eq. 61) then
@@ -861,32 +880,11 @@
       dl    = el * half
       bi2gi2 = one / (betas * gammas) ** 2
 
-!---- Use EL1 rather than EL for the length.
-      dl = el1 * half
-      beti = one / betas
 !---- Loop for all particles.
       do itrack = 1, ktrack
-
-!---- Drift to centre.
-        px = track(2,itrack)
-        py = track(4,itrack)
         pt = track(6,itrack)
-        ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
-        track(1,itrack) = track(1,itrack) + dl*ttt*px
-        track(3,itrack) = track(3,itrack) + dl*ttt*py
-        track(5,itrack) = track(5,itrack)                               &
-     &  + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
-
-!---- Acceleration.
         pt = pt + vrf * sin(phirf - omega * track(5,itrack))
         track(6,itrack) = pt
-
-!---- Drift to end.
-        ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
-        track(1,itrack) = track(1,itrack) + dl*ttt*px
-        track(3,itrack) = track(3,itrack) + dl*ttt*py
-        track(5,itrack) = track(5,itrack)                               &
-     &  + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
       enddo
 
 !*---- If there were wakefields, track the wakes and then the 2nd half
@@ -1237,16 +1235,15 @@
           endif
         enddo
       endif
-
       end
+
       subroutine ttcheck(turn, sum, part_id, last_turn, last_pos,       &
      &last_orbit, z, tolerance, jmax)
       implicit none
-      integer i,j,n,turn,part_id(*),jmax,last_turn(*)
+      integer i,j,n,turn,part_id(*),jmax,last_turn(*),nn
       double precision sum,z(6,*),tolerance(6),last_pos(*),             &
      &last_orbit(6,*)
       character*14 aptype
-
       n = 1
  10   continue
       do i = n, jmax
@@ -1257,6 +1254,8 @@
       return
  20   continue
       n = i
+      nn=14
+      call node_string('apertype ',aptype,nn)
       call trkill(n, turn, sum, jmax, part_id,                          &
      &last_turn, last_pos, last_orbit, z,aptype)
       goto 10
@@ -1277,8 +1276,7 @@
 
       print *,"particle #",part_id(n)," lost turn ",turn,
      &"  at pos. s =",sum,"   aperture =",aptype
-      print *,"   X=",
-     &z(1,n),"  Y=",z(3,n)
+      print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
 
       do i = n+1, jmax
         part_id(i-1) = part_id(i)
