@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
+#include <sys/timeb.h>
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
-#include <sys/timeb.h>
 #include <unistd.h>
 #include "madxl.h"
 #include "madx.h"
@@ -4655,10 +4655,12 @@ void make_sequ_from_line(char* name)
   char** tmp = NULL;
   int pos = name_list_pos(name, line_list->list);
   int spos;
-  struct macro* line = line_list->macros[pos];
+  struct macro* line;
   int mpos = name_list_pos("marker", defined_commands->list);
   struct command* clone = clone_command(defined_commands->commands[mpos]);
   struct element* el;
+  if (pos < 0) fatal_error("unknown line: ", name);
+  line = line_list->macros[pos];
   line_buffer->curr = 0;
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
@@ -4967,14 +4969,31 @@ int node_fd_errors(double* errors)
     }
 }
 
+void node_string(char* key, char* string, int* l)
+     /* returns current node string value for "key" in Fortran format */
+     /* l is max. allowed length in string */
+{
+  char tmp[2*NAME_L];
+  char* p;
+  int i, l_p, nbl, ncp = 0;
+  mycpy(tmp, key);
+  if ((p = command_par_string(tmp, current_node->p_elem->def)))
+    {
+     l_p = strlen(p);
+     ncp = l_p < *l ? l_p : *l;
+    }
+  nbl = *l - ncp;
+  for (i = 0; i < ncp; i++) string[i] = p[i];
+  for (i = 0; i < nbl; i++) string[ncp+i] = ' ';
+}
+
 double node_value(char* par)  
 /* returns value for parameter par of current element */
 {
   double value;
   char lpar[NAME_L];
   mycpy(lpar, par);
-  if (strcmp(lpar, "name") == 0) puts(current_node->name);
-  else if (strcmp(lpar, "l") == 0) value = current_node->length;
+  if (strcmp(lpar, "l") == 0) value = current_node->length;
   else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;
   else if (strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
   else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
@@ -5701,15 +5720,23 @@ void pro_ibs(struct in_cmd* cmd)
 void pro_input(char* statement)
 {
   /* processes one special (IF() etc.), or one normal statement after input */
-  int type, code, nnb;
+  int type, code, nnb, ktmp;
   char* sem;
   int rs, re, start = 0, l = strlen(statement);
   while (start < l)
     {
      if ((type = in_spec_list(&statement[start]))) 
        {
-        if (type == 6) 
-          get_bracket_range(&statement[start], '(', ')', &rs, &re);
+        if (type == 6)
+	  { 
+           get_bracket_range(&statement[start], '(', ')', &rs, &re);
+           ktmp = re+1;
+           if (re > rs && strchr(&statement[ktmp], ':')) /* formal arg.s */
+	     {
+              get_bracket_range(&statement[ktmp], '(', ')', &rs, &re);
+              rs += ktmp; re += ktmp;
+	     }
+	  }
         else get_bracket_range(&statement[start], '{', '}', &rs, &re);
         if (re > rs)
           {
@@ -5796,7 +5823,8 @@ void pro_match(struct in_cmd* cmd)
     }
   else if (strcmp(cmd->tok_list->p[0], "cell") == 0)
     {
-     match_cell(cmd);
+     warning("CELL command no longer valid, ","use MATCH");
+     return;
     }
   else if (match_is_on == 0)
     {
@@ -6289,17 +6317,26 @@ void replace_one(struct node* node, struct element* el)
     add_to_el_list(el, 0, edit_sequ->cavities, 0);
 }
 
-void replace_lines(struct macro* line, int replace, char** reps)
+void replace_lines(struct macro* org, int replace, char** reps)
 {
   int i, j, k, l, n, pos; 
-  int mf = replace < line->n_formal ? replace : line->n_formal;
+  int mf = replace < org->n_formal ? replace : org->n_formal;
   char* p;
-  if (line->tokens == NULL) fatal_error("line not split:", line->name);
+  struct macro* line;
+  if (org->tokens == NULL) fatal_error("line not split:", org->name);
+  line = clone_macro(org);
+  for (j = 0; j < mf; j++)
+    {
+     for (i = 0; i < line->tokens->curr; i++)
+       {
+        p = line->tokens->p[i];
+        if (isalpha(*p) && strcmp(line->formal->p[j], p) == 0)  
+          line->tokens->p[i] = reps[j];
+       }
+    }
   for (i = 0; i < line->tokens->curr; i++)
     {
      p = line->tokens->p[i];
-     for (j = 0; j < mf; j++) 
-       if (isalpha(*p) && strcmp(line->formal->p[j], p) == 0)  p = reps[j];
      if (isalpha(*p) && (pos = name_list_pos(p, line_list->list)) > -1)
        {
 	if (*line->tokens->p[i+1] == '(') /* formal arguments */

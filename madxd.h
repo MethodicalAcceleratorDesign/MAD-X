@@ -29,6 +29,7 @@
 #define next_vary             next_vary__
 #define node_al_errors        node_al_errors__
 #define node_fd_errors        node_fd_errors__
+#define node_string           node_string__
 #define node_value            node_value__
 #define node_vector           node_vector__
 #define plot_option           plot_option__
@@ -79,6 +80,7 @@
 #define next_vary             next_vary_
 #define node_al_errors        node_al_errors_
 #define node_fd_errors        node_fd_errors_
+#define node_string           node_string_
 #define node_value            node_value_
 #define node_vector           node_vector_
 #define plot_option           plot_option_
@@ -179,6 +181,7 @@ int next_start(double*,double*,double*,double*,double*,double*,double*,
 int next_vary(char*, int*, double*, double*, double*);
 int node_al_errors(double*);
 int node_fd_errors(double*);
+void node_string(char*, char*, int*);
 double node_value(char*);
 void node_vector(char*, int*, double*);
 double plot_option(char*);
@@ -226,6 +229,7 @@ struct element* clone_element(struct element*);
 struct expression* clone_expression(struct expression*);
 struct expr_list* clone_expr_list(struct expr_list*);
 struct int_array* clone_int_array(struct int_array*);
+struct macro* clone_macro(struct macro*);
 struct name_list* clone_name_list(struct name_list*);
 struct node* clone_node(struct node*);
 void copy_name_list(struct name_list*, struct name_list*);

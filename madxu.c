@@ -1172,6 +1172,22 @@ struct macro* new_macro(int n_formal, int length, int p_length)
   return m;
 }
 
+struct macro* clone_macro(struct macro* org)
+{
+  int i;
+  struct macro* clone 
+    = new_macro(org->n_formal, org->body->curr, org->tokens->curr);
+  if (org->body->curr > 0) strcpy(clone->body->c, org->body->c);
+  clone->body->curr = org->body->curr;
+  for (i = 0; i < org->tokens->curr; i++)
+    clone->tokens->p[i] = org->tokens->p[i];
+  clone->tokens->curr = org->tokens->curr;
+  for (i = 0; i < org->n_formal; i++)
+    clone->formal->p[i] = org->formal->p[i];
+  clone->n_formal = org->n_formal;
+  return clone;
+}
+
 struct macro_list* new_macro_list(int length)
 {
   char rout_name[] = "new_macro_list";
