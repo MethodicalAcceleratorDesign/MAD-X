@@ -2126,14 +2126,15 @@ void enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
 void exec_assign(struct in_cmd* cmd)
 {
   char* p;
+  char tmp[FNAME_L];
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("echo", nl);
   if (prt_file != stdout)  fclose(prt_file);
   if (nl->inform[pos])
     { 
-     p = pl->parameters[pos]->string;
-     if (strcmp(stolower(p), "terminal") == 0)  prt_file = stdout;
+      p = pl->parameters[pos]->string; strcpy(tmp, p);
+     if (strcmp(stolower(tmp), "terminal") == 0)  prt_file = stdout;
      else 
        {
 	if (assign_start == 0)
@@ -2297,7 +2298,7 @@ void exec_dump(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
-  char *f, filename[NAME_L];
+  char *f, filename[FNAME_L];
   if (nl->inform[pos] == 0)
     {
      warning("dump without table name:", "ignored");
@@ -2892,7 +2893,7 @@ void export_el_def_8(struct element* el, char* string)
 void export_el_par(struct command_parameter* par, char* string)
 {
   int i, k, last;
-  char num[48];
+  char num[2*NAME_L];
   strcat(string, ",");
   strcat(string, par->name);
   switch(par->type)
@@ -2956,7 +2957,7 @@ void export_el_par_8(struct command_parameter* par, char* string)
   int i, k, lp, last, tilt = 0, vtilt = 0;
   char* const kskew[] = {"k1s", "k2s", "k3s", ""};
   char* const knorm[] = {"k1", "k2", "k3", ""};
-  char num[48], tmp[8], tmpt[8];
+  char num[2*NAME_L], tmp[8], tmpt[8];
   switch(par->type)
     {
     case 0: 
@@ -3042,7 +3043,7 @@ void export_el_par_8(struct command_parameter* par, char* string)
 
 void export_sequence(struct sequence* sequ, FILE* file)
 {
-  char num[48];
+  char num[2*NAME_L];
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
@@ -3109,7 +3110,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
 
 void export_sequ_8(struct sequence* sequ, FILE* file)
 {
-  char num[48];
+  char num[2*NAME_L];
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
@@ -3279,7 +3280,7 @@ void fill_expr_var_list(struct el_list* ell,
 {
   struct variable* var;
   struct element* el;
-  char name[48];
+  char name[2*NAME_L];
   char* p;
   int i, k, kc;
   struct int_array* deco = expr->polish;
@@ -3616,7 +3617,7 @@ void get_disp0(double* disp)
 
 char* get_new_name()
 {
-  char name[24] = "__";
+  char name[NAME_L] = "__";
   sprintf(&name[2], "%d", new_name_count++);
   strcat(name, "__");
   return permbuff(name);
@@ -3841,7 +3842,7 @@ int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
 {
   int i, n, pos;
   char* c[2];
-  char tmp[24];
+  char tmp[NAME_L];
   if (sequ == NULL) return 0;
   strcpy(c_dummy, range); stolower(c_dummy);
   c[0] = strtok(c_dummy, "/");
@@ -3929,7 +3930,7 @@ int get_range(char* range, struct sequence* sequ, struct node** nodes)
 {
   int i, n, pos;
   char* c[2];
-  char tmp[24];
+  char tmp[NAME_L];
   if (sequ == NULL) return 0;
   strcpy(c_dummy, range); stolower(c_dummy);
   c[0] = strtok(c_dummy, "/");
@@ -3987,7 +3988,7 @@ int get_table_range(char* range, struct table* table, int* rows)
 {
   int i, n;
   char* c[2];
-  char tmp[24];
+  char tmp[NAME_L];
   rows[0] = rows[1] = 0;
   mycpy(c_dummy, range); stolower(c_dummy);
   c[0] = strtok(c_dummy, "/");
@@ -4248,7 +4249,7 @@ double hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
 {
   double pos;
   struct node* c_node;
-  char tmp[24];
+  char tmp[NAME_L];
   int i;
   strcpy(tmp, name);
   square_to_colon(tmp);
@@ -8446,7 +8447,7 @@ void track_ripple(struct in_cmd* cmd)
 
 void track_start(struct command* comm)
 {
-  char name[80];
+  char name[FNAME_L];
   if (track_is_on == 0)
     {
      warning("track_start: no TRACK command seen yet", "ignored");
@@ -8462,7 +8463,7 @@ void track_start(struct command* comm)
 void track_tables_create(struct in_cmd* cmd)
 {
   int i, j;
-  char tab_name[24];
+  char tab_name[NAME_L];
   struct table* t;
   t = make_table("tracksumm", tracksumm_table_cols, 
   		 tracksumm_table_types, 2*stored_track_start->curr);
