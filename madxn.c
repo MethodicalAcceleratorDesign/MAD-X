@@ -1342,8 +1342,8 @@ double el_par_value(char* par, struct element* el)
      if (strcmp(par, "angle") == 0)  val = angle;
      else if (strcmp(par, "tilt") == 0)
         val = command_par_value("tilt", el->def);
-     else if (strcmp(par, "k0") == 0) k0 = command_par_value("k0", el->def);
-     else if (strcmp(par, "k0s") == 0) k0s = command_par_value("k0s", el->def);
+     else if (strcmp(par, "k0") == 0) val = command_par_value("k0", el->def);
+     else if (strcmp(par, "k0s") == 0) val = command_par_value("k0s", el->def);
      else if (strcmp(par, "l") == 0)
        {
         if (fact != zero && get_option("rbarc") && angle != zero)
