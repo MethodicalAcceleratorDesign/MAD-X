@@ -208,13 +208,6 @@ char* corr_table_cols[] =
 " "  /* blank terminates */
 };
 
-char* inverted_mag_forces[] =
-{
-"angle", "k0", "k0s", "kick", "hkick", "vkick", 
-"k1", "k1s", "k2", "k2s", "k3", "k3s", "k4", "k4s",
-" "  /* blank terminates */
-};
-
 int orbit_table_types[] =
 {
   3, 2, 2, 1,

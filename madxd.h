@@ -339,7 +339,6 @@ void get_bracket_t_range(char**, char, char, int, int, int*, int*);
 void get_defined_commands();
 void get_defined_constants();
 struct element* get_drift(double);
-void get_inverted_forces();
 char* get_new_name();
 double get_node_pos(struct node*, struct sequence*);
 int get_node_count(struct node*);
@@ -428,7 +427,6 @@ char* mystrchr(char*, char);
 char* mystrstr(char*, char*);
 void my_repl(char*, char*, char*, char*);
 int name_list_pos(char*, struct name_list*);
-int name_tab(char*, struct name_list*);
 struct in_buff_list* new_in_buff_list(int);
 struct char_array* new_char_array(int);
 struct char_array_list* new_char_array_list(int);
@@ -476,6 +474,7 @@ int pass_select_list(char*, struct command_list*);
 char* permbuff(char*);
 int polish_expr(int, char**);
 double polish_value(struct int_array*);
+int predef_const(struct variable*);
 void prepare_table_file(struct table*, struct command_list*);
 void pre_split(char*, char*, int);
 void print_command(struct command*);
@@ -764,7 +763,6 @@ struct macro_list* line_list;
 struct macro_list* macro_list;
 
 struct name_list* expr_chunks;
-struct name_list* inverted_forces;
 struct name_list* occ_list;
 struct name_list* sxf_list;
 
@@ -905,6 +903,7 @@ int seqedit_remove = 0;     /* counter for seqedit removes */
 int sequ_is_on = 0;         /* != 0 if inside current sequence decl. */
 int stamp_flag = 0;         /* checks for double delete when != 0 */
 int start_cnt = 0;          /* counter for start commands */
+int start_var = 0;          /* start of variables after predefined constants */
 int total_const = 0;        /* total no. of constraints in match */
 int total_vars = 0;         /* total no. of variables in match */
 int track_is_on = 0;        /* true when inside track command */

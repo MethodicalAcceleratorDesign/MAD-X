@@ -2599,6 +2599,13 @@ int par_out_flag(char* base_name, char* par_name)
   return 1;
 }
 
+int predef_var(struct variable* var)
+     /* return 1 for predefined variable, else 0 */
+{
+  int pos = name_list_pos(var->name, variable_list->list);
+  return (pos < start_var ? 1 : 0) ;
+}
+
 void print_command(struct command* cmd)
 {
   int i;
@@ -3006,8 +3013,9 @@ void write_vars(struct var_list* varl, struct command_list* cl, FILE* file)
   int i;
   for (i = 0; i < varl->curr; i++) 
     {
-     if (varl->vars[i]->type  && pass_select_list(varl->vars[i]->name, cl)) 
-         export_variable(varl->vars[i], file);
+     if (predef_var(varl->vars[i]) == 0  
+         && pass_select_list(varl->vars[i]->name, cl)) 
+            export_variable(varl->vars[i], file);
     }
 }
 
@@ -3016,8 +3024,9 @@ void write_vars_8(struct var_list* varl, struct command_list* cl, FILE* file)
   int i;
   for (i = 0; i < varl->curr; i++) 
     {
-     if (varl->vars[i]->type && pass_select_list(varl->vars[i]->name, cl)) 
-        export_var_8(varl->vars[i], file);
+     if (predef_var(varl->vars[i]) == 0 
+         && pass_select_list(varl->vars[i]->name, cl)) 
+            export_var_8(varl->vars[i], file);
     }
 }
 

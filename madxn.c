@@ -2961,12 +2961,10 @@ void madx_init()
   tmp_p_array = new_char_p_array(1000);
   tmp_l_array = new_char_p_array(1000);
   line_buffer = new_char_p_array(1000);
-  inverted_forces = new_name_list(10);
   sxf_list = new_name_list(50);
   deco_init();
   get_defined_constants();
   get_defined_commands();
-  get_inverted_forces();
   get_sxf_names();
   pi = get_variable("pi");
   twopi = two * pi;
@@ -3067,6 +3065,8 @@ void get_bracket_t_range(char* toks[], char lb, char rb,
 }
 
 double get_aperture(struct node* node, char* par)
+     /* returns aperture parameter 'i' where i is integer at the end of par;
+        e.g. aper_1 gives i = 1 etc. (count starts at 1) */
 {
   int i, k, n = strlen(par);
   double val = zero, vec[100];
@@ -3234,6 +3234,7 @@ void get_defined_constants()
      /* reads + stores the constants defined in madxdict.h */
   supp_char('\n', predef_constants);
   pro_input(predef_constants);
+  start_var = variable_list->curr;
 }
 
 struct element* get_drift(double length)
@@ -3272,16 +3273,8 @@ int get_node_count(struct node* node)
   return -1;
 }
 
-void get_inverted_forces()
-{
-  int i = 0;
-  while (inverted_mag_forces[i][0] != ' ')
-    {
-     add_to_name_list(inverted_mag_forces[i++], 0, inverted_forces);
-    }
-}
-
 double get_node_pos(struct node* node, struct sequence* sequ) /*recursive */
+     /* returns node position from declaration for expansion */
 {
   double fact = 0.5 * sequ->ref_flag; /* element half-length offset */
   double pos, from = 0;
@@ -3342,6 +3335,8 @@ void get_node_vector(char* par, int* length, double* vector)
 }
 
 int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
+     /* returns start and end node (nodes[0] and nodes[1])
+        of a range in the full expanded sequence */
 {
   int i, n, pos;
   char* c[2];
@@ -3388,6 +3383,8 @@ int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
 
 int get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
 {
+     /* returns start and end node (nodes[0] and nodes[1])
+        of a range between range_start and range_end of an expanded sequence */
   int i, n;
   char* c[2];
   struct node* c_node;
@@ -3436,6 +3433,7 @@ int get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
 }
 
 void get_sxf_names()
+     /* reads and stores names for SXF I/O from madxl.h */
 {
   int i = 0;
   while (sxf_table_names[i][0] != ' ')
@@ -3445,10 +3443,10 @@ void get_sxf_names()
 }
 
 double plot_option(char* name)
+  /* returns the value of setplot parameters */
 {
   double val = zero;
   int i;
-  /* returns the value of setplot parameters */
   mycpy(c_dummy, name);
   if (plot_options != NULL 
       && (i = name_list_pos(c_dummy, plot_options->par_names)) > -1) 
@@ -3457,6 +3455,8 @@ double plot_option(char* name)
 }
 
 int get_range(char* range, struct sequence* sequ, struct node** nodes)
+     /* returns start and end node (nodes[0] and nodes[1])
+        of a range in the non-expanded sequence */
 {
   int i, n, pos;
   char* c[2];
@@ -3502,6 +3502,7 @@ int get_range(char* range, struct sequence* sequ, struct node** nodes)
 }
 
 double get_refpos(struct sequence* sequ)
+     /* returns the position of a refpos element, or zero */
 {
   int i;
   if (sequ != NULL && sequ->refpos != NULL)
@@ -3515,6 +3516,8 @@ double get_refpos(struct sequence* sequ)
 }
 
 int get_table_range(char* range, struct table* table, int* rows)
+     /* returns start and end row (rows[0] and rows[1])
+        of a range in a table; 0 if not found, 1 (1 row) or 2 ( > 1) */
 {
   int i, n;
   char* c[2];
@@ -3702,6 +3705,7 @@ int get_string(char* name, char* par, char* string)
 }
 
 void get_title(char* tlt, int* l)
+     /* copies title from buffer into tl without trailing '\0' */
 {
   *l = 0;
   if (title != NULL)
@@ -3762,6 +3766,7 @@ int get_vector(char* name, char* par, double* vector)
 }
 
 void get_version(char* tlt, int* l)
+     /* returns version number */
 {
   time_t tmp;
   struct tm* tm;
@@ -3777,6 +3782,8 @@ void get_version(char* tlt, int* l)
 }
 
 double hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
+     /* (for 'from' calculation:) returns the position of a node
+        in the current or a sub-sequence (hence hidden) */
 {
   double pos;
   struct node* c_node;
@@ -3839,6 +3846,7 @@ int in_spec_list(char* string)
 }
 
 void insert_elem(struct sequence* sequ, struct node* node)
+     /* inserts an element in a sequence as function of its position */
 {
   struct node* c_node = sequ->start;
   while (c_node != NULL)
@@ -3851,6 +3859,7 @@ void insert_elem(struct sequence* sequ, struct node* node)
 
 void install_one(struct element* el, char* from_name, double at_value,
                  struct expression* at_expr, double position)
+     /* adds an element to a sequence */
 {
   struct node* node;
   int i, occ = 1;
@@ -3870,6 +3879,7 @@ void install_one(struct element* el, char* from_name, double at_value,
 }
 
 double line_nodes(struct char_p_array* flat)
+     /* creates a linked node list from a flat element list of a line */
 {
   int i, j, k;
   double pos = zero;
@@ -3894,6 +3904,7 @@ double line_nodes(struct char_p_array* flat)
 }
 
 void link_in_front(struct node* new, struct node* el)
+     /* links a node 'new' in front of a node 'el' */
 {
   el->previous->next = new;
   new->previous = el->previous; new->next = el;
@@ -3969,6 +3980,7 @@ int logic_expr(int nit, char* toks[])
 }
 
 int log_val(char* name, struct command* cmd)
+     /* returns 0 = flase, 1 = true for a logical command parameter */
 {
   struct name_list* nl = cmd->par_names;
   struct command_parameter_list* pl = cmd->par;
@@ -4001,6 +4013,7 @@ void main_input(int top)
 }
 
 struct constraint* make_constraint(int type, struct command_parameter* par)
+     /* makes + stores a constraint from command parameter */
 {
   struct constraint* new = new_constraint(par->c_type);
   strcpy(new->name, par->name);
@@ -4038,6 +4051,7 @@ struct constraint* make_constraint(int type, struct command_parameter* par)
 
 struct element* make_element(char* name, char* parent, 
                              struct command* def, int flag)
+     /* makes a new element from declaration, stores in list */
 {
   double length;
   struct element* el = new_element(name);
@@ -4059,6 +4073,7 @@ struct element* make_element(char* name, char* parent,
 }
 
 struct expression* make_expression(int n, char** toks)
+     /* makes an expression from a list of tokens */
 {
   struct expression* expr = NULL;
 
@@ -4069,6 +4084,7 @@ struct expression* make_expression(int n, char** toks)
 }
 
 void make_elem_node(struct element* el, int occ_cnt)
+     /* makes + links a new node at the end of the current sequence */
 {
   prev_node = current_node;
   current_node = new_elem_node(el, occ_cnt);
@@ -4139,6 +4155,7 @@ int make_macro(char* statement)
 }
 
 void make_occ_list(struct sequence* sequ)
+     /* makes the node occurrence list */
 {
   struct node* c_node = sequ->start;
   int i;
@@ -4197,6 +4214,7 @@ void make_sequ_from_line(char* name)
 }
 
 void make_sequ_node(struct sequence* sequ, int occ_cnt)
+     /* makes + links a node pointing to a sub-sequence */
 {
   prev_node = current_node;
   current_node = new_sequ_node(sequ, occ_cnt);
@@ -4208,6 +4226,7 @@ void make_sequ_node(struct sequence* sequ, int occ_cnt)
 }
 
 char* make_string_variable(char* string)
+     /* creates + stores a variable containing a character string */
 {
   char* name = get_new_name();
   struct variable* var = new_variable(name, zero, 3, 0, NULL, string);
@@ -4234,6 +4253,7 @@ struct table* make_table(char* name, char* type, char** table_cols,
 }
 
 double mult_par(char* par, struct element* el)
+     /* returns multipole parameter for par = "k0l" or "k0sl" etc. */
 {
   char tmp[12];
   char* p;
@@ -4255,14 +4275,8 @@ double mult_par(char* par, struct element* el)
   return val;
 }
 
-int name_tab(char* chunk, struct name_list* list)
-{
-  int i = name_list_pos(chunk, list);
-  if (i > -1) return i;
-  return add_to_name_list(chunk, 0, list);
-}
-
 int next_char(char c, char** toks, int start, int nitem)
+     /* returns the number of the token starting with c after token start */
 {
   int i;
   for (i = start; i < nitem; i++) if(*toks[i] == c)  return i;
@@ -4271,6 +4285,7 @@ int next_char(char c, char** toks, int start, int nitem)
 
 int next_constraint(char* name, int* name_l, int* type, double* value, 
                     double* c_min, double* c_max, double* weight)
+     /* returns the parameters of the next constraint; 0 = none, else count */
 {
   int i, ncp, nbl;
   struct constraint* c_c;
@@ -4297,6 +4312,8 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
 
 int next_global(char* name, int* name_l, int* type, double* value, 
                     double* c_min, double* c_max, double* weight)
+     /* returns the parameters of the next global constraint; 
+        0 = none, else count */
 {
   int i, ncp, nbl;
   struct constraint* c_c;
@@ -4324,6 +4341,8 @@ int next_global(char* name, int* name_l, int* type, double* value,
 int next_start(double* x,double* px,double* y,double* py,double* t,
                double* deltae,double* fx,double* phix,double* fy,double* phiy,
                double* ft,double* phit)
+     /* returns the parameters of the next particle to track;
+        0 = none, else count */
 {
   struct command* comm;
   if (start_cnt == stored_track_start->curr)
@@ -4348,6 +4367,8 @@ int next_start(double* x,double* px,double* y,double* py,double* t,
 
 int next_vary(char* name, int* name_l, 
                     double* lower, double* upper, double* step)
+     /* returns the next variable to be varied during match;
+        0 = none, else count */
 {
   int i, pos, ncp, nbl;
   double l_step;
@@ -4376,6 +4397,7 @@ int next_vary(char* name, int* name_l,
 }
 
 int node_al_errors(double* errors)
+     /* returns the alignment errors of a node */
 {
   if (current_node->p_al_err == NULL) return 0;
   else
@@ -4387,6 +4409,7 @@ int node_al_errors(double* errors)
 }
 
 int node_fd_errors(double* errors)
+     /* returns the field errors of a node */
 {
   if (current_node->p_fd_err == NULL) return 0;
   else
@@ -4450,6 +4473,7 @@ double node_value(char* par)
 }
 
 void out_table(char* tname, struct table* t, char* filename)
+     /* output of a table */
 {
   int j;
   struct command_list* scl;
@@ -4495,6 +4519,9 @@ int par_present(char* par, struct command* cmd, struct command_list* c_list)
 }
 
 int pass_select(char* name, struct command* sc)
+     /* checks name against class (if element) and pattern that may
+        (but need not) be contained in command sc;
+        0: does not pass, 1: passes */
 {
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
@@ -4525,6 +4552,7 @@ int pass_select(char* name, struct command* sc)
 }
 
 int pass_select_list(char* name, struct command_list* cl)
+     /* returns 0 (does not pass) or 1 (passes) for a list of selects */
 {
   int i, ret = 0;
   if (cl->curr == 0)  return 1;
@@ -4776,6 +4804,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
 }
 
 void prepare_table_file(struct table* t, struct command_list* scl)
+     /* prepares a table file for output */
 {
   int j;
   if (scl->curr != 0) set_selected_columns(t, scl);
@@ -4788,6 +4817,7 @@ void prepare_table_file(struct table* t, struct command_list* scl)
 }
 
 void pre_split(char* inbuf, char* outbuf, int fill_flag)
+     /* inserts blanks between tokens */
      /* fill_flag != 0 makes a 0 to be inserted into an empty "()" */
 {
   char c, cp, cpnb = ' ', quote;
@@ -4985,6 +5015,7 @@ void process()  /* steering routine: processes one command */
 }
 
 void pro_emit(struct in_cmd* cmd)
+     /* calls the emit module */
 {
   struct command* emit = cmd->clone;
   double e_deltap, e_tol, u0;
@@ -5050,8 +5081,8 @@ void pro_emit(struct in_cmd* cmd)
 }
 
 void pro_ibs(struct in_cmd* cmd)
-{
   /* control for IBS module */
+{
   struct command* keep_beam = current_beam;
   struct name_list* nl = current_ibs->par_names;
   struct command_parameter_list* pl = current_ibs->par;
@@ -5096,8 +5127,8 @@ void pro_ibs(struct in_cmd* cmd)
 }
 
 void pro_input(char* statement)
-{
   /* processes one special (IF() etc.), or one normal statement after input */
+{
   int type, code, nnb, ktmp;
   char* sem;
   int rs, re, start = 0, l = strlen(statement);
@@ -5193,6 +5224,7 @@ void pro_input(char* statement)
 }
 
 void pro_match(struct in_cmd* cmd)
+     /* controls the matching module */
 {
   /* OB 12.2.2002: changed the sequence of if statements so that MAD
                    can go through the whole matching sequence */
@@ -5267,6 +5299,7 @@ void pro_match(struct in_cmd* cmd)
 }
 
 void pro_survey(struct in_cmd* cmd)
+     /* calls survey module */
 {
   struct name_list* nl = current_survey->par_names;
   struct command_parameter_list* pl = current_survey->par;
@@ -5309,6 +5342,7 @@ void pro_survey(struct in_cmd* cmd)
 }
 
 void pro_track(struct in_cmd* cmd)
+     /* controls track module */
 {
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
     {
@@ -5347,6 +5381,7 @@ void pro_track(struct in_cmd* cmd)
 }
 
 void pro_twiss()
+     /* controls twiss module */
 {
   struct command* keep_beam = current_beam;
   struct name_list* nl = current_twiss->par_names;
@@ -5768,6 +5803,7 @@ void remove_upto(char* string, char* s1)
 }
 
 void replace_one(struct node* node, struct element* el)
+     /* replaces an existing node by a new one made from el */
 {
   int i, k = 1;
   remove_from_node_list(node, edit_sequ->nodes);
@@ -5785,6 +5821,7 @@ void replace_one(struct node* node, struct element* el)
 }
 
 void replace_lines(struct macro* org, int replace, char** reps)
+     /* replaces lines in line by elements - recursive */
 {
   int i, j, k, l, n, pos; 
   int mf = replace < org->n_formal ? replace : org->n_formal;
@@ -5830,6 +5867,7 @@ void replace_lines(struct macro* org, int replace, char** reps)
 }
 
 void resequence_nodes(struct sequence* sequ)
+     /* resequences occurrence list */
 {
   struct node* c_node = sequ->start;
   int i, cnt;
@@ -5862,6 +5900,7 @@ void reset_count(char* table) /* resets table counter to zero */
 }
 
 void reset_errors(struct sequence* sequ)
+     /* zeros the sel_err node flag for all nodes of an expanded sequence */
 {
   struct node* c_node;
   if (sequ != NULL && sequ->ex_start != NULL && sequ->ex_end != NULL)
@@ -5877,6 +5916,7 @@ void reset_errors(struct sequence* sequ)
 }
 
 void reset_sector(struct sequence* sequ, int val)
+     /* sets node->sel_sector = val for all nodes of an expanded sequence */
 {
   struct node* c_node;
   if (sequ != NULL && sequ->ex_start != NULL && sequ->ex_end != NULL)
@@ -5898,6 +5938,7 @@ int restart_sequ()
 }
 
 int retreat_node()
+     /* replaces current node by previous node; 0 = already at start, else 1 */
 {
   if (current_node == current_sequ->range_start)  return 0;
   current_node = current_node->previous;
@@ -5905,6 +5946,7 @@ int retreat_node()
 }
 
 double rfc_slope()
+     /* calculates the accumulated "slope" of all cavities */
 {
   double slope = zero, lag, volt, harmon, charge, pc;
   struct node* c_node = current_sequ->range_start;
@@ -6029,6 +6071,7 @@ int scan_expr(int c_item, char** item)   /* split input */
 }
 
 void scan_in_cmd(struct in_cmd* cmd)
+     /* reads a command into a clone of the original */
 {
   int cnt = 0, /* gives position in command (from 1) */
       i, k, log, n;
@@ -6066,6 +6109,7 @@ void scan_in_cmd(struct in_cmd* cmd)
 }
 
 void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
+     /* writes a sector map to sec_file */
 {
   int i;
   fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
@@ -6084,6 +6128,7 @@ void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
 }
 
 void seq_cycle(struct in_cmd* cmd)
+     /* cycles a sequence */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -6114,6 +6159,7 @@ void seq_cycle(struct in_cmd* cmd)
 }
 
 void seq_edit_main(struct in_cmd* cmd)
+     /* controls sequence editing */
 {
   int k = cmd->decl_start - 1;
   char** toks = cmd->tok_list->p;
@@ -6133,6 +6179,7 @@ void seq_edit_main(struct in_cmd* cmd)
 }
 
 void seq_edit(struct in_cmd* cmd)
+     /* executes seqedit command */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -6163,6 +6210,7 @@ void seq_edit(struct in_cmd* cmd)
 }
 
 void seq_end(struct in_cmd* cmd)
+     /* executes endedit command */
 {
   char tmp[8];
   sprintf(tmp, "%d", seqedit_install);
@@ -6179,6 +6227,7 @@ void seq_end(struct in_cmd* cmd)
 }
 
 void seq_flatten(struct sequence* sequ)
+     /* executes flatten command */
 {
   struct node* c_node;
   struct node_list* nl;
@@ -6207,6 +6256,7 @@ void seq_flatten(struct sequence* sequ)
 }
 
 void seq_install(struct in_cmd* cmd)
+     /* executes install command */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -6310,6 +6360,7 @@ void seq_install(struct in_cmd* cmd)
 }
 
 void seq_move(struct in_cmd* cmd)
+     /* executes move command */
 {
   char *name, *from_name;
   double at, by, to, from;
@@ -6410,6 +6461,7 @@ void seq_move(struct in_cmd* cmd)
 }
 
 void seq_reflect(struct in_cmd* cmd)
+     /* executes reflect command */
 {
   struct node *tmp, *c_node;
   c_node = edit_sequ->start;
@@ -6439,6 +6491,7 @@ void seq_reflect(struct in_cmd* cmd)
 }
 
 void seq_remove(struct in_cmd* cmd)
+     /* executes remove command */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -6497,6 +6550,7 @@ void seq_remove(struct in_cmd* cmd)
 }
 
 void seq_replace(struct in_cmd* cmd)
+     /* executes replace command */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -6632,6 +6686,7 @@ void set_command_par_value(char* parameter, struct command* cmd, double val)
 }
 
 void set_new_position(struct sequence* sequ)
+     /* sets a new node position for all nodes */
 {
   struct node* c_node = sequ->start;
   double zero_pos = c_node->position;
@@ -6654,6 +6709,7 @@ void set_new_position(struct sequence* sequ)
 }
 
 void set_node_bv(struct sequence* sequ)
+     /* sets bv flag for all nodes */
 {
   struct node* c_node = sequ->ex_start;
   double beam_bv;
@@ -6672,6 +6728,8 @@ void set_node_bv(struct sequence* sequ)
 }
 
 void set_option(char* str, int* opt)
+     /* sets an (old or new) option with name "str", 
+        value *opt (0 flase, 1 true) */
 {
   int i, j, k;
   char* bc;
