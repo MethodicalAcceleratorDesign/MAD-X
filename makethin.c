@@ -357,6 +357,7 @@ struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
 		    struct command_parameter *at_param,   struct command_parameter *from_param,
 		    struct command_parameter *length_param,
 		    struct command_parameter *kn_param,   struct command_parameter *ks_param,
+		    struct command_parameter *apertype_param,
 		    struct command_parameter *aper_param, struct command_parameter *bv_param,
 			       int slices, int slice_no)
 {
@@ -365,7 +366,7 @@ struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
   char *thin_name;
 
   /* set up new multipole command */
-  cmd = new_command(buffer("thin_multipole"), 9, 9, /* max num names, max num param */
+  cmd = new_command(buffer("thin_multipole"), 10, 10, /* max num names, max num param */
 		    buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
 
   cmd->par->parameters[cmd->par->curr] = new_command_parameter("magnet", 2);
@@ -405,6 +406,10 @@ struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
   if (ks_param) {
     cmd->par->parameters[cmd->par->curr] = ks_param;
     add_to_name_list("ksl",1,cmd->par_names); cmd->par->curr++;
+  }
+  if (apertype_param) {
+    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(apertype_param);
+    add_to_name_list("apertype",1,cmd->par_names); cmd->par->curr++;
   }
   if (aper_param) {
     cmd->par->parameters[cmd->par->curr] = clone_command_parameter(aper_param);
@@ -492,8 +497,8 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
 
   thin_elem = make_thin_elem(thick_elem->name, thin_elem_parent,
                         return_param("at",thick_elem),return_param("from",thick_elem),
-			length_param,kn_param,ks_param,
-			return_param("aper",thick_elem),return_param("bv",thick_elem),
+			length_param,kn_param,ks_param,return_param("apertype",thick_elem),
+			return_param("aperture",thick_elem),return_param("bv",thick_elem),
 		        slices,slice_no);
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
