@@ -64,7 +64,7 @@ int str_pos(const char s[], char c)
 /* Fortran routines called from C */
 extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
                    double*, double*);
-extern void mtgeti_(double*, double*);
+extern void mtgeti_(int*, double*, double*);
 extern void collect_(int*, double*, double*); /* OB 13.2.2002 */
 extern void emit_(double*, double*, double*, double*, double*, double*,
 double*, double*, double*, double*, double*, double*, double*, double*);
@@ -85,8 +85,8 @@ extern void micit_(double *,char *,double *,double *,double *,int *,float *,
 int *,int *,int *,int *,float *,float *,float *,float *,float *,
 float *,float *,float *,float *,float *,int *);
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
-                    double*, double*,double*, double*, double*, double*,
-                    double*, double*, double*, double*); 
+                    double*, double*, double*, double*, double*, double*,
+                    double*, double*, double*, double*, double*); 
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*); 

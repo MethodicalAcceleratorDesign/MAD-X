@@ -1,6 +1,6 @@
-      subroutine mtgeti(vect,dvect)
+      subroutine mtgeti(num,vect,dvect)
       implicit none
-      integer j,next_vary,get_option,name_l
+      integer num,j,next_vary,get_option,name_l
       parameter(name_l=24)
       double precision get_variable,vect(*),dvect(*),c_min,c_max,step,  &
      &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin
@@ -38,9 +38,9 @@
   830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
   831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
-      subroutine mtlimit(vect,ireset)
+      subroutine mtlimit(num,vect,ireset)
       implicit none
-      integer j,next_vary,name_l,ireset
+      integer num,j,next_vary,name_l,ireset
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,                        &
      &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin
@@ -179,15 +179,15 @@
       izero = 0
       ione = 1
 !---- Store parameter values in data structure.
-      call mtputi(x)
+      call mtputi(nx, x)
 
 !---- Compute matching functions.
       call mtcond(izero, nf, fval, iflag)
 
  9999 end
-      subroutine mtputi(vect)
+      subroutine mtputi(num,vect)
       implicit none
-      integer j,next_vary,name_l
+      integer num,j,next_vary,name_l
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,s_fact
       parameter(s_fact=5d-1)
@@ -202,7 +202,7 @@
       endif
       end
       subroutine mtlmdf(ncon,nvar,tol,calls,call_lim,vect,dvect,fun_vec,&
-     &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
+     &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,xold)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -223,20 +223,21 @@
 ! ilevel: print level
       double precision tol,vect(*),dvect(*),fun_vec(*),diag(*),         &
      &w_ifjac(*),w_qtf(*),w_iwa1(*),w_iwa2(*),w_iwa3(*),w_iwa4(*),one,  &
-     &xold(*)
+     &fval(*),xold(*)
       parameter(one=1d0)
       include 'match.fi'
       external mtfcn
 
       icovar = 0
       ilevel = 0
-      call mtgeti(vect,dvect)
+      call mtgeti(nvar,vect,dvect)
       call lmdif(mtfcn,ncon,nvar,calls,call_lim,vect,fun_vec,tol,diag,  &
-     &one,w_ifjac,ncon,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
+     &one,w_ifjac,ncon,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,   &
+     &xold)
 
  9999 end
       subroutine lmdif(fcn,m,n,calls,call_lim,x,fvec,epsfcn,diag,factor,&
-     &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,xold)
+     &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,fval,xold)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -329,11 +330,11 @@
       integer izero
       integer i,iflag,info,iter,j,l,ldfjac,level,m,n,calls,call_lim,    &
      &ipvt(n), ireset
-      double precision fmin_old,actred,delta,dirder,epsfcn,factor,fnorm,&
-     &fnorm1,ftol,gnorm,gtol,par,pnorm,prered,ratio,sum,temp,temp1,     &
-     &temp2,vmod,xnorm,xtol,x(n),xold(n),fvec(m),diag(n),fjac(ldfjac,n),&
-     &qtf(n),wa1(n),wa2(n),wa3(n),wa4(m),zero,one,two,p1,p25,p5,p75,p90,&
-     &p0001,epsil,epsmch
+      double precision fval(m),fmin_old,actred,delta,dirder,epsfcn,     &
+     &factor,fnorm,fnorm1,ftol,gnorm,gtol,par,pnorm,prered,ratio,sum,   &
+     &temp,temp1,temp2,vmod,xnorm,xtol,x(n),xold(n),fvec(m),diag(n),    &
+     &fjac(ldfjac,n),qtf(n),wa1(n),wa2(n),wa3(n),wa4(m),zero,one,two,   &
+     &p1,p25,p5,p75,p90,p0001,epsil,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,p1=0.1d0,p5=0.5d0,p25=0.25d0,  &
      &p75=0.75d0,p90=0.9d0,p0001=0.0001d0,epsil=1d-8,epsmch=1d-16)
       include 'match.fi'
@@ -479,7 +480,7 @@
 !---- Evaluate the function at X + P and calculate its norm.
 ! 23.5.2002: Oliver Bruening: inserted a routine that checks for minimum and
 !                             maximum values of the parameters:
-      call mtlimit(wa2,ireset)
+      call mtlimit(n,wa2,ireset)
       call fcn(m,n,wa2,wa4,iflag)
       calls = calls + 1
       if (iflag .ne. 0) then
@@ -599,7 +600,7 @@
       call fcn(m,n,xold,fvec,iflag)
       fnorm = vmod(m, fvec)
       fmin = fnorm**2
-!      call mtputi(xold)
+!      call mtputi(n,xold)
       write(*,830) calls,fmin
 
       if (ilevel .ge. 1) call mtprnt('last',n, x)
@@ -1235,7 +1236,7 @@
       endif
 
 !---- Call minimization routine.
-      call mtgeti(vect,dvect)
+      call mtgeti(nvar, vect, dvect)
       call mtmig1(mtfcn, ncon, nvar,  strategy, tol, calls, call_lim,   &
      &vect, dvect, fun_vect, w_iwa1, w_iwa2, w_iwa3, w_iwa4, w_iwa5,    &
      &w_iwa6, w_iwa7, w_iwa8)
@@ -1466,7 +1467,7 @@
 
 !---- Common exit point; final print-out.
   500 continue
-      call mtputi(x)
+      call mtputi(nx, x)
       if (ilevel .ge. 1) call mtprnt('final', nx, x)
 
       write(*,830) calls,fmin
@@ -1563,7 +1564,7 @@
       enddo
 
 !---- Restore original point.
-      call mtputi(x)
+      call mtputi(nx, x)
 
 !---- Ensure positive definiteness and invert.
       call mtpsdf(covar,nx,work_4,work_5,work_6)
@@ -1628,7 +1629,7 @@
         x(i) = xsave
       enddo
 
-      call mtputi(x)
+      call mtputi(nx, x)
 
       end
       subroutine mtpsdf(covar,nx,work_4,work_5,work_6)
@@ -1835,7 +1836,7 @@
         dx(i) = svmin * dx(i)
         x(i) = xsave(i) + dx(i)
       enddo
-      call mtputi(x)
+      call mtputi(nx, x)
 
 !---- Return Failure indication.
       iflag = 0
@@ -1869,7 +1870,7 @@
       endif
 
 !---- Call minimization routine.
-      call mtgeti(vect,dvect)
+      call mtgeti(nvar, vect, dvect)
       call mtsim1(mtfcn, ncon, nvar, calls, call_lim, tol,              &
      &vect, dvect, fun_vect, w_iwa1, w_iwa2, w_iwa3)
 
@@ -2159,7 +2160,7 @@
         x(i) = psim(i,jl)
       enddo
       fmin = fsim(jl)
-      call mtputi(x)
+      call mtputi(nx, x)
 
 !---- Check for necessity to restart after final change.
       if (calls + 3 * nx .lt. call_lim  .and.  nrstrt .eq. 0  .and.     &
