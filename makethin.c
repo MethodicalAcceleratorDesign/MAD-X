@@ -689,7 +689,7 @@ struct node* copy_thin(struct node* thick_node)
   thin_node->length=0;
   thin_node->p_elem->length=0;
   /* if we have a non zero length then an lrad has to be created */
-  if (el_par_value("l",thick_node->p_elem)) 
+  if (el_par_value("l",thick_node->p_elem)>zero) 
     { thin_node->p_elem = create_thin_obj(thick_node->p_elem,1); }
 
   return thin_node;
@@ -701,39 +701,44 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
 {
   struct node* thin_node;
   if (thick_node->p_elem) { /* this is an element to split and add */
-    if (strcmp(thick_node->base_name,"marker") == 0      ||
-	strcmp(thick_node->base_name,"hmonitor") == 0    ||
-	strcmp(thick_node->base_name,"vmonitor") == 0    ||
-	strcmp(thick_node->base_name,"monitor") == 0     ||
-	strcmp(thick_node->base_name,"vkicker") == 0     ||
-	strcmp(thick_node->base_name,"hkicker") == 0     ||
-	strcmp(thick_node->base_name,"kicker") == 0      ||
-	strcmp(thick_node->base_name,"rfcavity") == 0
-      ) { 
+    if (el_par_value("l",thick_node->p_elem)==zero) /* if it's already thin copy it directly*/
+    {
 	seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
-/*  	delete_node(thick_node); */
-      /* special cavity list stuff */
-      if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
-	  find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
-	add_to_el_list(thin_node->p_elem, 0, thin_sequ->cavities, 0);
-    } else if (strcmp(thick_node->base_name,"rbend") == 0       ||
-	       strcmp(thick_node->base_name,"sbend") == 0       ||
-	       strcmp(thick_node->base_name,"quadrupole") == 0  ||
-	       strcmp(thick_node->base_name,"sextupole") == 0   ||
-	       strcmp(thick_node->base_name,"octupole") == 0    ||
-	       strcmp(thick_node->base_name,"multipole") == 0   
-	       || /* special spliting required. */
-	       strcmp(thick_node->base_name,"rcollimator") == 0 ||
-	       strcmp(thick_node->base_name,"ecollimator") == 0
-	       ) {
+    } else { /* we have to slim it down a bit...*/
+      if (strcmp(thick_node->base_name,"marker") == 0      ||
+	  strcmp(thick_node->base_name,"hmonitor") == 0    ||
+	  strcmp(thick_node->base_name,"vmonitor") == 0    ||
+	  strcmp(thick_node->base_name,"monitor") == 0     ||
+	  strcmp(thick_node->base_name,"vkicker") == 0     ||
+	  strcmp(thick_node->base_name,"hkicker") == 0     ||
+	  strcmp(thick_node->base_name,"kicker") == 0      ||
+	  strcmp(thick_node->base_name,"rfcavity") == 0
+	  ) { 
+	seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
+	/*  	delete_node(thick_node); */
+	/* special cavity list stuff */
+	if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
+	    find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
+	  add_to_el_list(thin_node->p_elem, 0, thin_sequ->cavities, 0);
+      } else if (strcmp(thick_node->base_name,"rbend") == 0       ||
+		 strcmp(thick_node->base_name,"sbend") == 0       ||
+		 strcmp(thick_node->base_name,"quadrupole") == 0  ||
+		 strcmp(thick_node->base_name,"sextupole") == 0   ||
+		 strcmp(thick_node->base_name,"octupole") == 0    ||
+		 strcmp(thick_node->base_name,"multipole") == 0   
+		 || /* special spliting required. */
+		 strcmp(thick_node->base_name,"rcollimator") == 0 ||
+		 strcmp(thick_node->base_name,"ecollimator") == 0
+		 ) {
 	seq_diet_add_elem(thick_node,thin_sequ);
-/*  	delete_node(thick_node); */
-    } else if (strcmp(thick_node->base_name,"drift") == 0) {
-      /* ignore this as it makes no sense to slice */
-    } else {
-      fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
-      seq_diet_add(copy_thin(thick_node),thin_sequ);
-/*        delete_node(thick_node); */
+	/*  	delete_node(thick_node); */
+      } else if (strcmp(thick_node->base_name,"drift") == 0) {
+	/* ignore this as it makes no sense to slice */
+      } else {
+	fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
+	seq_diet_add(copy_thin(thick_node),thin_sequ);
+	/*        delete_node(thick_node); */
+      }
     }
   } else if (thick_node->p_sequ) { /* this is a sequence to split and add */
     seq_diet_add_sequ(thick_node,seq_diet(thick_node->p_sequ),thin_sequ);
