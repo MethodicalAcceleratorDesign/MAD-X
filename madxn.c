@@ -51,7 +51,7 @@ int act_special(int type, char* statement)
   char* loc_w = NULL;
   int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
   int ret_val = 0;
-  struct char_p_array* logic = new_char_p_array(1000);
+  struct char_p_array* logic;
   int logex = 0;
   char *cp = statement;
   if (ls < IN_BUFF_SIZE) ls = IN_BUFF_SIZE;
@@ -65,6 +65,7 @@ int act_special(int type, char* statement)
     }
   if (type == 5) /* macro */ return make_macro(statement);
   else if (type == 6) /* line */ return make_line(statement);
+  logic = new_char_p_array(1000);
   loc_buff = (char*) mymalloc("act_special", ls);  
   loc_w = (char*) mymalloc("act_special", ls);
   get_bracket_range(statement, '{', '}', &rs, &re);
@@ -948,7 +949,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   struct command_parameter* lp = cmd->cmd_def->par->parameters[pos];
   struct command_parameter* clp = cmd->clone->par->parameters[pos];
   int j, k, ks, i = start, e_type, ival, end, e_end, tot_end, c_type = 0,
-      val_type = 0, cnt = 0, con_flag;
+      val_type = 0, cnt = 0, con_flag = 0;
   double val;
   if (lp->type < 10)
     {
@@ -1331,7 +1332,7 @@ double el_par_value(char* par, struct element* el)
 {
   int k = 0, n;
   char tmp[8];
-  double val = zero, angle = zero, l, k0, k0s, vec[100];
+  double val = zero, angle = zero, l, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
   int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
   if (fact != zero || strcmp(el->base_type->name, "sbend") == 0) /* bend */
@@ -2412,7 +2413,10 @@ void expand_line(struct char_p_array* l_buff)
   /* finally remove all non-alpha tokens */
   n = 0;
   for (i = 0; i < l_buff->curr; i++) 
-    if (isalpha(*l_buff->p[i]))  l_buff->p[n++] = l_buff->p[i];
+    {
+     if (isalpha(*l_buff->p[i]))  l_buff->p[n++] = l_buff->p[i];
+     else free(l_buff->p[i]);
+    }
   l_buff->curr = n;
   lbpos = delete_int_array(lbpos);
   rbpos = delete_int_array(rbpos);
@@ -3579,7 +3583,7 @@ int get_stmt(FILE* file, int supp_flag)
     {
     next:
      if (ca->max - ca->curr < MAX_LINE) grow_char_array(ca);
-     if (fgets(&ca->c[ca->curr], ca->max - ca->curr, file) == NULL) return 0;
+     if (!fgets(&ca->c[ca->curr], MAX_LINE, file)) return 0;
      if (get_option("echo")) puts(&ca->c[ca->curr]);
      c_cc = mystrstr(&ca->c[ca->curr], "//");
      c_ex = mystrchr(&ca->c[ca->curr], '!');
@@ -4179,7 +4183,7 @@ void make_sequ_from_line(char* name)
 {
   char** tmp = NULL;
   int pos = name_list_pos(name, line_list->list);
-  int spos;
+  int j, spos;
   struct sequence* old_sequ = NULL;
   struct macro* line;
   int mpos = name_list_pos("marker", defined_commands->list);
@@ -4187,6 +4191,14 @@ void make_sequ_from_line(char* name)
   struct element* el;
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
+  for (j = 0; j < line_buffer->curr; j++)
+    {
+     if (line_buffer->p[j])  
+       {
+        free(line_buffer->p[j]);
+        line_buffer->p[j] = NULL;
+       }
+    }
   line_buffer->curr = 0;
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
@@ -4952,7 +4964,14 @@ void process()  /* steering routine: processes one command */
      switch (this_cmd->type)
        {
        case 0: /* executable commands */
-         exec_command(); if (stop_flag)  return;
+         exec_command(); 
+         if (stop_flag)
+	   {
+            if (this_cmd->clone != NULL)
+                this_cmd->clone = delete_command(this_cmd->clone);
+            this_cmd = delete_in_cmd(this_cmd);
+            return;
+	   }
          break;
        case 1: /* element definition */
          enter_element(this_cmd);
@@ -5863,9 +5882,10 @@ void replace_lines(struct macro* org, int replace, char** reps)
        {
         if (line_buffer->curr == line_buffer->max) 
             grow_char_p_array(line_buffer);
-        line_buffer->p[line_buffer->curr++] = p;
+        line_buffer->p[line_buffer->curr++] = tmpbuff(p);
        }
     }
+  delete_macro(line);
 }
 
 void resequence_nodes(struct sequence* sequ)
@@ -6649,11 +6669,13 @@ void set_defaults(char* string) /* reset options, beam etc. to defaults */
        }
      else if (strcmp(string, "threader") == 0)
        {
+	if (threader_par != NULL)  delete_command(threader_par); 
         threader_par = clone_command(defined_commands->commands[pos]);
        }
      else if (strcmp(string, "beam") == 0)
        {
-        current_beam = clone_command(defined_commands->commands[pos]);
+        if (current_beam == NULL) 
+          current_beam = clone_command(defined_commands->commands[pos]);
         beam_clone = clone_command(defined_commands->commands[pos]);
         for (i = 0; i < beam_clone->par_names->curr; i++)
           beam_clone->par_names->inform[i] = 1; /* mark as "read" */
@@ -7474,7 +7496,7 @@ void store_comm_par_value(char* parameter, double val, struct command* cmd)
     {
      cp = cmd->par->parameters[i];
      cp->type = 2;
-     cp->expr = NULL;
+     if(cp->expr != NULL) cp->expr = delete_expression(cp->expr);
      cp->double_value = val;
     }
 }
@@ -8101,13 +8123,18 @@ void track_tables_create(struct in_cmd* cmd)
   int i, j;
   char tab_name[NAME_L];
   struct table* t;
+  int t_size;
+  int turns = command_par_value("turns", cmd->clone);
+  int ffile = command_par_value("ffile", cmd->clone);
+  if (ffile <= 0) ffile = 1;
+  t_size = turns / ffile + 2;
   t = make_table("tracksumm", "tracksumm", tracksumm_table_cols, 
   		 tracksumm_table_types, 2*stored_track_start->curr);
   add_to_table_list(t, table_register);
   if (get_option("onetable"))
     {
      t = make_table("trackone", "trackone", trackone_table_cols, 
-  		 trackone_table_types, stored_track_start->curr*TRACK_ROWS);
+  		 trackone_table_types, stored_track_start->curr*t_size);
      add_to_table_list(t, table_register);
     }
   else
@@ -8118,7 +8145,7 @@ void track_tables_create(struct in_cmd* cmd)
           {
            sprintf(tab_name, "track.obs%04d.p%04d", i+1, j+1);
            t = make_table(tab_name, "trackobs", track_table_cols, 
-  		     track_table_types, TRACK_ROWS);
+  		     track_table_types, t_size);
            add_to_table_list(t, table_register);
 	  }
        }

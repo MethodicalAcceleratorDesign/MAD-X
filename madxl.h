@@ -1,7 +1,7 @@
 /* defined constants for word lengths etc. */
 #define ALIGN_MAX 14        /* alignment error array length */
-#define FIELD_MAX 42        /* field error array length */
 #define EFIELD_TAB 22       /* field error array length for ESAVE table */
+#define FIELD_MAX 42        /* field error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 24           /* internal name length */
 #define FNAME_L 240         /* for file names */
@@ -24,7 +24,6 @@
 #define NJ_RAND 24          /* for random generator */
 #define ND_RAND 21          /* for random generator */
 #define MATCH_WORK 10       /* no. of work spaces in matching */
-#define TRACK_ROWS 1200     /* initial length of track tables */
 #define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
 
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
@@ -105,14 +104,14 @@ int efield_table_types[] =
 char* efield_table_cols[] =
 {
 "name", 
+"dx", "dy", "ds", "dphi", "dtheta",
+"dpsi", "mrex", "mrey", "mredx", "mredy",
+"arex", "arey", "mscalx", "mscaly",
 "k0l", "k0sl", "k1l", "k1sl", 
 "k2l", "k2sl", "k3l", "k3sl", "k4l", 
 "k4sl", "k5l", "k5sl", "k6l", "k6sl", 
 "k7l", "k7sl", "k8l", "k8sl", "k9l", 
 "k9sl", "k10l", "k10sl",
-"dx", "dy", "ds", "dphi", "dtheta",
-"dpsi", "mrex", "mrey", "mredx", "mredy",
-"arex", "arey", "mscalx", "mscaly",
 " "  /* blank terminates */
 };
 
@@ -130,7 +129,9 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 61; /* last standard column filled by twiss_complete */
+int twiss_fill_end = 61; /* last standard column filled 
+                            by twiss_table_complete */
+/* warning: modify routine twiss_table_complete in case of changes */
 int twiss_table_types[] =
 {
 3, 3, 2, 2, 2,

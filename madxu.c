@@ -54,16 +54,16 @@ void add_table_vars(struct name_list* cols, struct command_list* select)
 	     {
 	      if ((n = aperture_count(current_sequ)) > 0)
 		{
-                 add_to_name_list(tmpbuff("apertype"), 3, cols);
+                 add_to_name_list(permbuff("apertype"), 3, cols);
                  for (k = 0; k < n; k++)
 		   {
 		    sprintf(tmp, "aper_%d", k+1);
-                    add_to_name_list(tmpbuff(tmp), 2, cols);
+                    add_to_name_list(permbuff(tmp), 2, cols);
 		   }
 		}
 	     }
 	   else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
-              add_to_name_list(tmpbuff(var_name), 2, cols);
+              add_to_name_list(permbuff(var_name), 2, cols);
 	  }
        }
     }
@@ -599,10 +599,11 @@ struct constraint_list* delete_constraint_list(struct constraint_list* cl)
 
 struct double_array* delete_double_array(struct double_array* a)
 {
-  if (a == NULL)  return NULL;
-  if (stamp_flag && a->stamp != 123456) 
-  if (a->a != NULL) free(a->a);
-  free(a);
+  if (a != NULL)
+    {
+     if (a->a != NULL) free(a->a);
+     free(a);
+    }
   return NULL;
 }
 
@@ -701,7 +702,7 @@ struct name_list* delete_name_list(struct name_list* l)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", l->name);
   if (l->index != NULL)  free(l->index);
   if (l->inform != NULL)  free(l->inform);
-  if (l->names != NULL)  free(l->names);
+  if (l->names != NULL)   free(l->names);
   free(l);
   return NULL;
 }
