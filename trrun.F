@@ -1664,7 +1664,7 @@
       else
       j = jt 
       endif 
-      if (j .ne. -1)  then
+      if (j .ne. -1 .and. j.ne.0)  then
         if (switch .lt. 3 .or. j .eq. 1)  then
           jend = j
 !---- Get start coordinates
