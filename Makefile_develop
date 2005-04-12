@@ -10,8 +10,8 @@ f95=f95
 GCC_FLAGS=-c -g -Wall -fno-second-underscore -D_CATCH_MEM
 GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL 
-f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
-#f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
+#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
+f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
 FFLAGS77=-gline -g90 -c -fpp -maxcontin=24 -nan -ieee=full
 #FFLAGS77=-g90 -c -fpp -O4 -maxcontin=24 -w=unused -ieee=full
 
@@ -24,7 +24,6 @@ FCP=$(f95_FLAGS)
 
 CC=gcc
 FOPT=-Bstatic
-FP=-Bstatic
 
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 GLIB=/afs/cern.ch/group/si/slap/lib
@@ -37,6 +36,7 @@ ifeq ($(OSTYPE),darwin)
 # include headers for gxx11c
   GCCP_FLAGS_MPARS=-g -O3 -c -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL 
+  FOPT=
 endif
 
 default: madx
@@ -224,7 +224,7 @@ timex.o: timex.f90
 
 #Parser only
 mpars: madxm.F madxp.o
-	$(FC) $(FP) -o mpars madxm.F madxp.o $(LIBX) -lm -lc
+	$(FC) $(FOPT) -o mpars madxm.F madxp.o $(LIBX) -lm -lc
 
 madx: \
 	madxpf.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o utilp.o matchp.o matchsap.o touschekp.o \
