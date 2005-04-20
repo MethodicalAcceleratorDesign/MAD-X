@@ -74,7 +74,8 @@ int act_special(int type, char* statement)
   if (re < 0) fatal_error("missing '{' or '}' in statement:",statement);
   cnt_1 = rs; start_2 = rs + 1;
   strcpy(loc_buff, statement); loc_buff[re] =  '\0';
-  strncpy(l_dummy, statement, cnt_1); l_dummy[cnt_1] = '\0';
+  while(aux_buff->max < cnt_1) grow_char_array(aux_buff);
+  strncpy(aux_buff->c, statement, cnt_1); aux_buff->c[cnt_1] = '\0';
   switch (type)
     {
     case 1:  /* if */
@@ -87,7 +88,7 @@ int act_special(int type, char* statement)
        }
      if (pro->buffers[level]->flag == 0)
        {
-        pre_split(l_dummy, loc_w, 0);
+        pre_split(aux_buff->c, loc_w, 0);
         mysplit(loc_w, tmp_l_array);
         get_bracket_t_range(tmp_l_array->p, '(', ')', 0, tmp_l_array->curr,
                           &rs, &re);
@@ -119,7 +120,7 @@ int act_special(int type, char* statement)
        }
      break;
     case 4: /* while */
-     pre_split(l_dummy, loc_w, 0);
+     pre_split(aux_buff->c, loc_w, 0);
      mysplit(loc_w, logic);
      get_bracket_t_range(logic->p, '(', ')', 0, logic->curr,
                           &rs, &re);
@@ -2245,36 +2246,36 @@ double get_value(char* name, char* par)
 {
   struct name_list* nl = NULL;
   mycpy(c_dummy, name);
-  mycpy(l_dummy, par);
+  mycpy(aux_buff->c, par);
   if (strcmp(c_dummy, "beam") == 0)
-     return command_par_value(l_dummy, current_beam);
+     return command_par_value(aux_buff->c, current_beam);
   else if (strcmp(c_dummy, "probe") == 0)
-     return command_par_value(l_dummy, probe_beam);
+     return command_par_value(aux_buff->c, probe_beam);
   else if (strcmp(c_dummy, "survey") == 0)
     {
      if (current_survey != NULL) nl = current_survey->par_names;
-     if (nl != NULL && nl->inform[name_list_pos(l_dummy, nl)])
-        return command_par_value(l_dummy, current_survey);
+     if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
+        return command_par_value(aux_buff->c, current_survey);
      else return zero;
     }
   else if (strcmp(c_dummy, "twiss") == 0)
     {
      if (current_twiss != NULL) nl = current_twiss->par_names;
-     if (nl != NULL && nl->inform[name_list_pos(l_dummy, nl)])
-        return command_par_value(l_dummy, current_twiss);
+     if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
+        return command_par_value(aux_buff->c, current_twiss);
      else return zero;
     }
   else if (strcmp(c_dummy, "sequence") == 0)
     {
-     if (strcmp(l_dummy, "l") == 0) return current_sequ->length;
-     else if (strcmp(l_dummy, "range_start") == 0)
+     if (strcmp(aux_buff->c, "l") == 0) return current_sequ->length;
+     else if (strcmp(aux_buff->c, "range_start") == 0)
         return (current_sequ->range_start->position
                 - 0.5 * current_sequ->range_start->length);
      else return INVALID;
     }
   else if (current_command != NULL
             && strcmp(c_dummy, current_command->name) == 0)
-     return command_par_value(l_dummy, current_command);
+     return command_par_value(aux_buff->c, current_command);
   else return INVALID;
 }
 
@@ -2505,6 +2506,7 @@ void madx_init()
   pro->curr = 1;
   char_buff = new_char_array_list(100);
   char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
+  aux_buff = new_char_array(AUX_LG);  /* temporary buffer for many purposes */
   drift_list = new_el_list(1000);
   variable_list = new_var_list(2000);
   comm_constraints = new_constraint_list(10);
@@ -2656,10 +2658,11 @@ int make_line(char* statement)
   char** toks = tmp_l_array->p;
   char *prs, *psem;
   int i, n, rs, re;
-  strcpy(l_dummy, statement);
-  if ((prs = strchr(l_dummy, '=')) == NULL) return -3;
+  while(strlen(statement) >= aux_buff->max) grow_char_array(aux_buff);
+  strcpy(aux_buff->c, statement);
+  if ((prs = strchr(aux_buff->c, '=')) == NULL) return -3;
   *prs = '\0'; prs++;
-  pre_split(l_dummy, l_work, 0);
+  pre_split(aux_buff->c, l_work, 0);
   mysplit(l_work, tmp_l_array);
   get_bracket_t_range(toks, '(', ')', 0, tmp_l_array->curr-1, &rs, &re);
   if ((n = re - rs - 1) < 0) n = 0; /* number of formal arguments if any */
@@ -2691,19 +2694,20 @@ int make_macro(char* statement)
   struct macro* m;
   char** toks = tmp_l_array->p;
   int i, n, rs, re, start_2;
-  strcpy(l_dummy, statement);
-  get_bracket_range(l_dummy, '{', '}', &rs, &re);
+  while(strlen(statement) >= aux_buff->max) grow_char_array(aux_buff);
+  strcpy(aux_buff->c, statement);
+  get_bracket_range(aux_buff->c, '{', '}', &rs, &re);
   start_2 = rs + 1;
-  l_dummy[rs] = '\0'; l_dummy[re] = '\0'; /* drop '{' and '}' */
-  pre_split(l_dummy, l_work, 0);
+  aux_buff->c[rs] = '\0'; aux_buff->c[re] = '\0'; /* drop '{' and '}' */
+  pre_split(aux_buff->c, l_work, 0);
   mysplit(l_work, tmp_l_array);
   get_bracket_t_range(toks, '(', ')', 0, tmp_l_array->curr-1, &rs, &re);
   if ((n = re - rs - 1) < 0) n = 0; /* number of formal arguments if any */
-  m = new_macro(n, strlen(&l_dummy[start_2]), 0);
+  m = new_macro(n, strlen(&aux_buff->c[start_2]), 0);
   strcpy(m->name, toks[0]); rs++;
   for (i = 0; i < n; i++) m->formal->p[i] = permbuff(toks[rs+i]);
   if (n > 0) m->formal->curr = n;
-  strcpy(m->body->c, &l_dummy[start_2]); m->body->curr = strlen(m->body->c);
+  strcpy(m->body->c, &aux_buff->c[start_2]); m->body->curr = strlen(m->body->c);
   add_to_macro_list(m, macro_list);
   return 0;
 }

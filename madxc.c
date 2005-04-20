@@ -2825,9 +2825,9 @@ struct table* read_my_table(struct in_cmd* cmd)
     {
      warning("no filename,","ignored"); return NULL;
     }
-  while (fgets(l_dummy, AUX_LG, tab_file))
+  while (fgets(aux_buff->c, aux_buff->max, tab_file))
     {
-     cc = strtok(l_dummy, " \"\n");
+     cc = strtok(aux_buff->c, " \"\n");
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
@@ -2913,7 +2913,7 @@ struct table* read_my_table(struct in_cmd* cmd)
            {
               if ((cc =strtok(NULL, " \"\n")) == NULL)
               {
-               warning("incomplete table line starting with:", l_dummy);
+               warning("incomplete table line starting with:", aux_buff->c);
                  return NULL;
               }
            }

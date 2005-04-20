@@ -3286,9 +3286,9 @@ int get_vector(char* name, char* par, double* vector)
         length is returned as function value (0 if not found) */
 {
   mycpy(c_dummy, name);
-  mycpy(l_dummy, par);
+  mycpy(aux_buff->c, par);
   if (strcmp(c_dummy, "threader") == 0)
-     return command_par_vector(l_dummy, threader_par, vector);
+     return command_par_vector(aux_buff->c, threader_par, vector);
   else return 0;
 }
 
@@ -5058,9 +5058,9 @@ struct table* read_table(struct in_cmd* cmd)
     {
      warning("no filename,","ignored"); return NULL;
     }
-  while (fgets(l_dummy, AUX_LG, tab_file))
+  while (fgets(aux_buff->c, aux_buff->max, tab_file))
     {
-     cc = strtok(l_dummy, " \"\n");
+     cc = strtok(aux_buff->c, " \"\n");
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
@@ -5146,7 +5146,7 @@ struct table* read_table(struct in_cmd* cmd)
            {
               if ((cc =strtok(NULL, " \"\n")) == NULL)
               {
-               warning("incomplete table line starting with:", l_dummy);
+               warning("incomplete table line starting with:", aux_buff->c);
                  return NULL;
               }
            }
@@ -5183,9 +5183,9 @@ struct table* read_his_table(struct in_cmd* cmd)
     {
      warning("no filename,","ignored"); return NULL;
     }
-  while (fgets(l_dummy, AUX_LG, tab_file))
+  while (fgets(aux_buff->c, aux_buff->max, tab_file))
     {
-     cc = strtok(l_dummy, " \"\n");
+     cc = strtok(aux_buff->c, " \"\n");
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
@@ -5268,7 +5268,7 @@ struct table* read_his_table(struct in_cmd* cmd)
            {
               if ((cc =strtok(NULL, " \"\n")) == NULL)
               {
-               warning("incomplete table line starting with:", l_dummy);
+               warning("incomplete table line starting with:", aux_buff->c);
                  return NULL;
               }
            }
@@ -6119,18 +6119,18 @@ void set_value(char* name, char* par, double* value)
      /* sets parameter value "par" for command or store "name" if present */
 {
   mycpy(c_dummy, name);
-  mycpy(l_dummy, par);
+  mycpy(aux_buff->c, par);
   if (strcmp(c_dummy, "beam") == 0)
-     set_command_par_value(l_dummy, current_beam, *value);
+     set_command_par_value(aux_buff->c, current_beam, *value);
   else if (strcmp(c_dummy, "probe") == 0)
-     set_command_par_value(l_dummy, probe_beam, *value);
+     set_command_par_value(aux_buff->c, probe_beam, *value);
   else if (strcmp(c_dummy, "survey") == 0)
-     set_command_par_value(l_dummy, current_survey, *value);
+     set_command_par_value(aux_buff->c, current_survey, *value);
   else if (strcmp(c_dummy, "twiss") == 0)
-     set_command_par_value(l_dummy, current_twiss, *value);
+     set_command_par_value(aux_buff->c, current_twiss, *value);
   else if (current_command != NULL
             && strcmp(c_dummy, current_command->name) == 0)
-     set_command_par_value(l_dummy, current_command, *value);
+     set_command_par_value(aux_buff->c, current_command, *value);
 }
 
 double sss_variable(char* name)

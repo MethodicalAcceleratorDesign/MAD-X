@@ -47,12 +47,12 @@ void sxf_read(struct command* comm)
   FILE* in_file = in->input_files[in->curr];
   char *p, *pp;
   sxf_suml = zero;
-  if (fgets(l_dummy, AUX_LG, in_file) == NULL)
+  if (fgets(aux_buff->c, aux_buff->max, in_file) == NULL)
     {
       warning("SXF input file empty,"," ignored");
       return;
     }
-  if ((rcode = version_header(l_dummy)) == 0)
+  if ((rcode = version_header(aux_buff->c)) == 0)
     {
       warning("SXF header missing or wrong,"," ignored");
       return;
@@ -104,8 +104,8 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   double at, vec[FIELD_MAX];
 
   tmp_p_array->curr = 0;
-  pre_split(p, l_dummy, 0);
-  ntok = mysplit(l_dummy, tmp_p_array);
+  pre_split(p, aux_buff->c, 0);
+  ntok = mysplit(aux_buff->c, tmp_p_array);
   ntok = join_prefix("-", ntok, toks);
   if (count == 0)
     {

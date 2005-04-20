@@ -810,8 +810,10 @@ void write_elstart(FILE*);
 void cf77flush();
 
 /* Global structure variables by type (alphabetic) */
+struct char_array* aux_buff;       /* temporary buffer for many purposes */
 
 struct char_array_list* char_buff; /* buffer for all sorts of strings */
+
 struct char_p_array* tmp_p_array;  /* temporary buffer for splits */
 struct char_p_array* tmp_l_array;  /* temporary buffer for special commands */
 struct char_p_array* line_buffer;  /* buffer for line expansion */
@@ -975,7 +977,6 @@ char quote;                       /* current open single or double quote */
 char tmp_key[NAME_L],
      c_dummy[AUX_LG],
      c_join[AUX_LG],
-     l_dummy[AUX_LG],
      work[AUX_LG],
      l_work[AUX_LG],
      int_format[20],             /* current integer format */
