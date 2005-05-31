@@ -1036,9 +1036,6 @@ int add_error_opt = 0;      /* ADD error option, set with eoption */
 int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
 /* E. T. d'Amico 13 may 2004 */
 int embedded_flag = 0;              /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
-/* E. T. d'Amico 10 june 2004 */
-int trkplot_flag = 0;              /* flag (= 1 from the moment a plot in tracking mode is requested, reset to 0 at madx end) */
-/* end additions */
 /* E. T. d'Amico 17 nov 2004 */
 int min_order = 1;      /* minimum required order */
 /* end additions */

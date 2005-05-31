@@ -1935,10 +1935,81 @@ void exec_fill_table(struct in_cmd* cmd)
      return;
 }
 
+
+/* Append the gnuplot ps file to the main ps file */
+void gnuplot_append(char *gplfilename, char *psfilename){
+  char line[1000];
+  FILE *newpsfile;
+  FILE *oldpsfile;
+  FILE *gplpsfile;
+  int np=0;
+  int page=0;
+  /* if psfilename does not exist rename it as psfilename and exit*/
+  newpsfile=fopen(psfilename,"r");
+  if( newpsfile==NULL) {
+    rename(gplfilename,psfilename);
+    return;
+  } else {
+    // the file has to be closed it is going to change
+    fclose(newpsfile);
+  };
+
+  // else append the gnuplot ps file to psfilename
+  // Save old value
+  rename(psfilename,"tmpoldplot.ps");
+  newpsfile=fopen(psfilename,"w");
+  oldpsfile=fopen("tmpoldplot.ps","r");
+  gplpsfile=fopen(gplfilename,"r");
+  //read old ps file and copy on the new ps file
+  while(fgets(line,1000,oldpsfile)!=NULL){
+    //don't print after %%Trailer
+    if (strncmp("%%Trailer",line,9)==0)  np=1;
+    // Count the pages and rewrite the line
+    if (strncmp("%%Page:",line,7)==0) {
+      page++;
+      fprintf(newpsfile,"%%%%Page: %d %d\n",page,page);
+    } else {
+      // write the lines
+      if(np==0) {
+         fprintf(newpsfile,"%s",line);
+      }
+    }
+  }
+  fclose(oldpsfile);
+  remove("tmpoldplot.ps");
+  //read gnuplot ps file and append on the final file
+  while(fgets(line,1000,gplpsfile)!=NULL){
+    //don't print after %%Trailer
+    if (strncmp("%%Trailer",line,9)==0)  np=1;
+    // Count the pages and rewrite the line
+    if (strncmp("%%Page:",line,7)==0) {
+      page++;
+      fprintf(newpsfile,"%%%%Page: %d %d\n",page,page);
+    } else {
+      if(np==0) {
+      // write the lines
+         fprintf(newpsfile,"%s",line);
+      }
+    }
+     // Print after prologue
+    if (strncmp("%%EndProlog",line,11)==0) np=0;
+  }
+  fclose(gplpsfile);
+  remove("tmpplot.ps");
+  // Print the trailer
+  fprintf(newpsfile,"%%%%Trailer\n");
+  fprintf(newpsfile,"%%%%DocumentFonts: Times-Roman\n");
+  fprintf(newpsfile,"%%%%Pages: %d\n",page);
+  fprintf(newpsfile,"%%%%EOF\n");
+  fclose(newpsfile);
+}
+
+
+
 void exec_plot(struct in_cmd* cmd)
 {
   int i, j, k, ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
-  int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0; 
+  int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0;
   int tsm1 = TITLE_SIZE - 1, tsm2 = TITLE_SIZE - 2;
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
   int size_plot_title = tsm1, size_version = tsm1;
@@ -1949,7 +2020,6 @@ void exec_plot(struct in_cmd* cmd)
   struct command_parameter_list* pl_plot = NULL;
   char *table_name, *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
-  char old_ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;
 
@@ -2114,23 +2184,10 @@ void exec_plot(struct in_cmd* cmd)
 	  sprintf(ps_file_name,track_plot_filename);
 	  strcat(ps_file_name,".ps");
 
-      if (trkplot_flag == 0) 
-	{
 	  gpu = fopen("gnu_plot.cmd","w");
 	  fprintf(gpu,"set terminal postscript color\n");
 	  fprintf(gpu,"set pointsize 0.48\n");
-	  fprintf(gpu,"set output '%s'\n",ps_file_name);
-          strcpy(old_ps_file_name,ps_file_name);
-	}
-      else
-	{
-	  gpu = fopen("gnu_plot.cmd","a");
-	  fprintf(gpu,"\n");
-          if (strcmp(old_ps_file_name,ps_file_name)!=0) {
-            fprintf(gpu,"set output '%s'\n",ps_file_name);
-            strcpy(old_ps_file_name,ps_file_name);
-          }
-	}
+	  fprintf(gpu,"set output '%s'\n","tmpplot.ps");
 
       fprintf(gpu,"set title %s\n",plot_title);
       fprintf(gpu,"set xlabel '%s'\n",haxis_name);
@@ -2161,7 +2218,12 @@ void exec_plot(struct in_cmd* cmd)
 	    }
 	}
       fclose(gpu);
-      trkplot_flag = 1;
+      /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
+      system("gnuplot 'gnu_plot.cmd'");
+      // Copy or append the gnuplot ps file in the target ps_file
+      gnuplot_append("tmpplot.ps",ps_file_name);
+      // Remove the gnuplot command
+      remove("gnu_plot.cmd");
     }
   else
 
@@ -6824,7 +6886,7 @@ void track_dynap(struct in_cmd* cmd)
   char rout_name[] = "track_dynap";
   int e_flag, flag = 2, izero = 0,
       turns = command_par_value("turns", cmd->clone),
-      npart = 2*stored_track_start->curr;
+      npart = stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
   double *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5, *buf6,

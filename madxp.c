@@ -2470,11 +2470,6 @@ if (final_message == 0)
 	{
 	  gxterm_();
 	}
-      if(trkplot_flag)
-	{
-	  system("gnuplot 'gnu_plot.cmd'");
-	  trkplot_flag = 0;
-	}
 #endif
       if (get_option("trace")) time_stamp("end");
       printf("\n  +++++++++++++++++++++++++++++++++++\n");
