@@ -463,6 +463,9 @@
         goto 999
       endif
       if (horname .eq. 'dpp') dpp_flag = .true.
+      !rdemaria 1/6/2005: if the horizzontal name is deltap don't plot
+      !momentum offset.
+      if(horname .eq. 'deltap') dpp_flag=.true.
       rselect = machp .and. hrange(2) .gt. hrange(1)
       do l = 1, nivvar
         k = double_from_table(tabname, sname(l), 1, d_val)
