@@ -1029,7 +1029,7 @@ void set_selected_elements()
           c_node = c_node->next;
         } /* end of while loop over nodes in range */
       } /* range_fl */
-	  else /* no range_fl */
+      else /* no range_fl */
       { for(j=0; j< element_list->curr; j++) /* loop over element_list */
         { el_j = element_list->elem[j];
           el_j_slice_pos = name_list_pos("slice",el_j->def->par_names);

@@ -175,22 +175,22 @@ void aper_adj_quad(double angle, double x, double y, double* xquad, double* yqua
   quadrant=angle/(pi/2)+1;
   switch (quadrant)
   {
-	case 1: *xquad=x; *yquad=y; break;
-	case 2: *xquad=-x; *yquad=y; break;
-	case 3: *xquad=-x; *yquad=-y; break;
-	case 4: *xquad=x; *yquad=-y; break;
+    case 1: *xquad=x; *yquad=y; break;
+    case 2: *xquad=-x; *yquad=y; break;
+    case 3: *xquad=-x; *yquad=-y; break;
+    case 4: *xquad=x; *yquad=-y; break;
   }
 }
 
-void aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat, 
+void aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
                  double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
 {
   int j;
 
   for (j=0;j<=halolength+1;j++)
   {
-  	haloxsi[j]=halox[j]*bbeat*sqrt(ex*betx);
-  	haloysi[j]=haloy[j]*bbeat*sqrt(ey*bety);
+    haloxsi[j]=halox[j]*bbeat*sqrt(ex*betx);
+    haloysi[j]=haloy[j]*bbeat*sqrt(ey*bety);
   }
 }
 
@@ -198,7 +198,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 {
   int stop=0, nint=1, jslice=1, err, first, ap=1;
   int true_flag, true_node=0, offs_flag, offs_node=0, do_survey=0;
-  int truepos, true_cnt, offspos, offs_cnt;
+  int truepos=0, true_cnt, offspos, offs_cnt;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
   double surv_init[6]={0, 0, 0, 0, 0, 0};
   double surv_x, surv_y, elem_x=0, elem_y=0;
@@ -212,7 +212,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double node_s=-1, node_n1=-1;
   double aper_tol[3], ap1, ap2, ap3, ap4;
   double dispx, dispy, tolx, toly;
-  double dispxadj, dispyadj, coxadj, coyadj, tolxadj, tolyadj;
+  double dispxadj=0, dispyadj=0, coxadj, coyadj, tolxadj=0, tolyadj=0;
   double angle, dangle, deltax, deltay;
   double xshift, yshift, r;
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
@@ -228,7 +228,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   struct aper_e_d true_tab[E_D_MAX];
   struct aper_e_d offs_tab[E_D_MAX];
   setbuf(stdout,(char*)NULL);
-  
+
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
 
   /* read command parameters */
@@ -266,13 +266,13 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1) ;
   else if (aper_rectellipse(&halo[2], &halo[3], &halo[1], &halo[1], &halo_q_length, halox, haloy))
   {
-  	warning("Not valid parameters for halo. ", "Unable to make polygon.");
-	return lim_pt;
+    warning("Not valid parameters for halo. ", "Unable to make polygon.");
+    return lim_pt;
   }
   else aper_fill_quads(halox, haloy, halo_q_length, &halolength);
-  
+
   /* check for externally given pipe polygon */
-/* changed this recently, IW 240205 */  
+/* changed this recently, IW 240205 */
 /*  pipelength = aper_external_file(pipefile, pipex, pipey);
   if ( pipelength > -1) ext_pipe=1; */
 
@@ -280,7 +280,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &betx, &bety, &dx, &dy);
   (*tw_cnt)++;
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
-  
+
   /* calculate initial normal+parasitic disp. */
   dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
   dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
@@ -290,224 +290,224 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
   while (!stop)
   {
-	strcpy(name,current_node->name);
-	aper_trim_ws(name, NAME_L);
+    strcpy(name,current_node->name);
+    aper_trim_ws(name, NAME_L);
 
-	/* the first node in a sequence can not be sliced, hence: */
-	if (current_sequ->range_start == current_node) first=1; else first=0;
-  
-	length=node_value("l");
-	err=double_from_table(current_sequ->tw_table->name, "s", tw_cnt, &s_end);
-	s_start=s_end-length;
-	s_curr=s_start;
+    /* the first node in a sequence can not be sliced, hence: */
+    if (current_sequ->range_start == current_node) first=1; else first=0;
 
-	node_string("apertype", apertype, &namelen);
-	aper_trim_ws(apertype, NAME_L);
-	
-	if (!strncmp("drift",name,5))
-	{
-		on_elem=-999999;
-	}
-	else on_elem=1;
-	
-	if (offs_flag && (strcmp(refnode, name) == 0)) do_survey=1;
+    length=node_value("l");
+    err=double_from_table(current_sequ->tw_table->name, "s", tw_cnt, &s_end);
+    s_start=s_end-length;
+    s_curr=s_start;
 
-	/* read data for tol displacement of halo */
-	get_node_vector("aper_tol",&ntol,aper_tol);
-	if (ntol == 3)
-	{
-		r = aper_tol[0];
-		xshift = aper_tol[1];
-		yshift = aper_tol[2];
-	}
-	else r=xshift=yshift=0;
+    node_string("apertype", apertype, &namelen);
+    aper_trim_ws(apertype, NAME_L);
 
-	/*read aperture data and make polygon tables for beam pipe*/
-	/* IW 250205 */
-/*	if (ext_pipe == 0) */
-	ap=aper_bs(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
-	
-	if (ap == 0 || first == 1)
-	{
-	/* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
-		n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
+    if (!strncmp("drift",name,5))
+    {
+        on_elem=-999999;
+    }
+    else on_elem=1;
 
-		aper_read_twiss(tw_cp->name, tw_cnt, &s_end, 
-		                 &x, &y, &betx, &bety, &dx, &dy);
-		aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype, 
-		                     &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, 
-				     &s_end, &x, &y, &betx, &bety, &dx, &dy, table);
-		on_ap=1;
-		
-		double_to_table_row(tw_cp->name, "n1", tw_cnt, &n1);
-		(*tw_cnt)++;
+    if (offs_flag && (strcmp(refnode, name) == 0)) do_survey=1;
 
-		/* calc disp and adj halo to have ready for next node */
-		dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
-		dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
+    /* read data for tol displacement of halo */
+    get_node_vector("aper_tol",&ntol,aper_tol);
+    if (ntol == 3)
+    {
+        r = aper_tol[0];
+        xshift = aper_tol[1];
+        yshift = aper_tol[2];
+    }
+    else r=xshift=yshift=0;
 
-		aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
-		
-		/*do survey to have ready init for next node */
-		if (do_survey)
-		{
-			rng_glob[0] = current_sequ->range_start;
-			rng_glob[1] = current_sequ->range_end;
-			current_sequ->range_start = current_sequ->range_end = current_node;
-			aper_surv(surv_init, nint);
-			double_from_table("survey","x",&nint, &surv_x);
-			double_from_table("survey","y",&nint, &surv_y);
-			current_sequ->range_start = rng_glob[0];
-			current_sequ->range_end = rng_glob[1];
-		}
-	}	
-	else
-	{
-		node_n1=999999;
-		true_node=0;
-		offs_node=0;
-		
-		/* calculate the number of slices per node */
-		if (true_flag == 0)
-		{
-			nint=length/interval;
-		}
-		else
-		{
-			true_node=aper_tab_search(true_cnt, true_tab, name, &truepos);
+    /*read aperture data and make polygon tables for beam pipe*/
+    /* IW 250205 */
+/*  if (ext_pipe == 0) */
+    ap=aper_bs(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
 
-			if (true_node)
-			{
-				nint=true_tab[truepos].curr;
-			}
-			else nint=length/interval;
-		}
-		 /* printf("\nname: %s, nint: %d",name,nint); */
+    if (ap == 0 || first == 1)
+    {
+    /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
+        n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
 
-		if (!nint) nint=1;
+        aper_read_twiss(tw_cp->name, tw_cnt, &s_end,
+                         &x, &y, &betx, &bety, &dx, &dy);
+        aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
+                             &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
+                     &s_end, &x, &y, &betx, &bety, &dx, &dy, table);
+        on_ap=1;
 
-		/* slice the node, call survey if necessary, make twiss for slices*/
-		err=interp_node(&nint);
+        double_to_table_row(tw_cp->name, "n1", tw_cnt, &n1);
+        (*tw_cnt)++;
 
-		/* do survey */
-		if (do_survey)
-		{
-			aper_surv(surv_init, nint);
+        /* calc disp and adj halo to have ready for next node */
+        dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
+        dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
 
-			offs_node=aper_tab_search(offs_cnt, offs_tab, name, &offspos);
-			if (offs_node)
-			{
-				xa=offs_tab[offspos].tab[0][0];
-				xb=offs_tab[offspos].tab[0][1];
-				xc=offs_tab[offspos].tab[0][2];
-				ya=offs_tab[offspos].tab[1][0];
-				yb=offs_tab[offspos].tab[1][1];
-				yc=offs_tab[offspos].tab[1][2];
-			}			
-		}
-	  	
-		err=embedded_twiss();
-	
-		/* Treat each slice, for all angles */
-		for (jslice=0;jslice<=nint;jslice++)
-	   	{
-			ratio=999999;
-			if (jslice) /*if jslice==0, parameters from previous node will be used*/
-			{
-				aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, 
-				                 &betx, &bety, &dx, &dy);
-				s_curr=s_start+s;
-				aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, 
-						 haloxsi, haloysi);
-				
-				/* calculate normal+parasitic disp.*/
-				dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
-				dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
-			
-				if (do_survey)
-				{
-					double_from_table("survey","x",&jslice, &surv_x);
-					double_from_table("survey","y",&jslice, &surv_y);
-				}
-			}
-			else
-			{
-				s_curr+=0.001; /*to get correct plot at start of elements*/
-				s=0; /*used to calc elem_x elem_y) */
-			}
-			
-			/* survey adjustments */
-			if (offs_node) { elem_x=xa*s*s+xb*s+xc;
-					 elem_y=ya*s*s+yb*s+yc;
-					 x+=(surv_x-elem_x);
-					 y+=(surv_y-elem_y);    }
-			
-			/* discrete adjustments */
-			if (true_node) { x+=true_tab[truepos].tab[jslice][1]; 
-					 y+=true_tab[truepos].tab[jslice][2]; }
-			
-			for (angle=0;angle<twopi;angle+=dangle)
-			{
-				/*adjust dispersion to worst-case for quadrant*/
-				aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
-				
-				/*calculate displacement co+tol for each angle*/
-				coxadj=cor*cos(angle); coyadj=cor*sin(angle);
-				aper_race(xshift,yshift,r,angle,&tolx,&toly);
-				aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
+        aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
-				/* add all displacements */
-				deltax=coxadj+tolxadj+bbeat*dispxadj*dp+x;
-				deltay=coyadj+tolyadj+bbeat*dispyadj*dp+y;
+        /*do survey to have ready init for next node */
+        if (do_survey)
+        {
+            rng_glob[0] = current_sequ->range_start;
+            rng_glob[1] = current_sequ->range_end;
+            current_sequ->range_start = current_sequ->range_end = current_node;
+            aper_surv(surv_init, nint);
+            double_from_table("survey","x",&nint, &surv_x);
+            double_from_table("survey","y",&nint, &surv_y);
+            current_sequ->range_start = rng_glob[0];
+            current_sequ->range_end = rng_glob[1];
+        }
+    }
+    else
+    {
+        node_n1=999999;
+        true_node=0;
+        offs_node=0;
 
-				/* send beta adjusted halo and its displacement to aperture calculation */
-				aper_calc(deltax,deltay,&ratio,haloxsi,haloysi,
-					  halolength,haloxadj,haloyadj,newhalox,newhaloy,
-					  pipex,pipey,pipelength,notsimple);
-			}
-			
-			nr=ratio*halo[1];
-			n1=nr/(halo[1]/halo[0]); /* ratio r/n = 1.4 */
-			
-			n1x_m=n1*bbeat*sqrt(betx*ex);
-			n1y_m=n1*bbeat*sqrt(bety*ey);
-			
-			aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype, 
-			                     &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr, 
-					     &x, &y, &betx, &bety, &dx, &dy, table);
-		
-			/* save node minimum n1 */
-			if (n1 < node_n1)
-			{
-				node_n1=n1; node_s=s_curr;
-			}
-		}
+        /* calculate the number of slices per node */
+        if (true_flag == 0)
+        {
+            nint=length/interval;
+        }
+        else
+        {
+            true_node=aper_tab_search(true_cnt, true_tab, name, &truepos);
 
-		err=reset_interpolation(&nint);
+            if (true_node)
+            {
+                nint=true_tab[truepos].curr;
+            }
+            else nint=length/interval;
+        }
+         /* printf("\nname: %s, nint: %d",name,nint); */
 
-		/* insert minimum node value into Twiss table */
-		double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);
-		(*tw_cnt)++;
+        if (!nint) nint=1;
 
-		/* save range minimum n1 */
-		if (node_n1 < lim_pt->n1)
-		{
-			strcpy(lim_pt->name,name);
-			lim_pt->n1=node_n1;
-			lim_pt->s=node_s;
-			strcpy(lim_pt->apertype,apertype);
-			lim_pt->aperture[0]=ap1;
-			lim_pt->aperture[1]=ap2;
-			lim_pt->aperture[2]=ap3;
-			lim_pt->aperture[3]=ap4;
-			lim_pt->aper_tol[0]=r;
-			lim_pt->aper_tol[1]=xshift;
-			lim_pt->aper_tol[2]=yshift;
-		}
-	}
+        /* slice the node, call survey if necessary, make twiss for slices*/
+        err=interp_node(&nint);
 
-	if (!strcmp(current_node->name,use_range[1]->name)) stop=1;
-	if (!advance_node()) stop=1;
+        /* do survey */
+        if (do_survey)
+        {
+            aper_surv(surv_init, nint);
+
+            offs_node=aper_tab_search(offs_cnt, offs_tab, name, &offspos);
+            if (offs_node)
+            {
+                xa=offs_tab[offspos].tab[0][0];
+                xb=offs_tab[offspos].tab[0][1];
+                xc=offs_tab[offspos].tab[0][2];
+                ya=offs_tab[offspos].tab[1][0];
+                yb=offs_tab[offspos].tab[1][1];
+                yc=offs_tab[offspos].tab[1][2];
+            }
+        }
+
+        err=embedded_twiss();
+
+        /* Treat each slice, for all angles */
+        for (jslice=0;jslice<=nint;jslice++)
+        {
+            ratio=999999;
+            if (jslice) /*if jslice==0, parameters from previous node will be used*/
+            {
+                aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y,
+                                 &betx, &bety, &dx, &dy);
+                s_curr=s_start+s;
+                aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength,
+                         haloxsi, haloysi);
+
+                /* calculate normal+parasitic disp.*/
+                dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
+                dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
+
+                if (do_survey)
+                {
+                    double_from_table("survey","x",&jslice, &surv_x);
+                    double_from_table("survey","y",&jslice, &surv_y);
+                }
+            }
+            else
+            {
+                s_curr+=0.001; /*to get correct plot at start of elements*/
+                s=0; /*used to calc elem_x elem_y) */
+            }
+
+            /* survey adjustments */
+            if (offs_node) { elem_x=xa*s*s+xb*s+xc;
+                     elem_y=ya*s*s+yb*s+yc;
+                     x+=(surv_x-elem_x);
+                     y+=(surv_y-elem_y);    }
+
+            /* discrete adjustments */
+            if (true_node) { x+=true_tab[truepos].tab[jslice][1];
+                     y+=true_tab[truepos].tab[jslice][2]; }
+
+            for (angle=0;angle<twopi;angle+=dangle)
+            {
+                /*adjust dispersion to worst-case for quadrant*/
+                aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
+
+                /*calculate displacement co+tol for each angle*/
+                coxadj=cor*cos(angle); coyadj=cor*sin(angle);
+                aper_race(xshift,yshift,r,angle,&tolx,&toly);
+                aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
+
+                /* add all displacements */
+                deltax=coxadj+tolxadj+bbeat*dispxadj*dp+x;
+                deltay=coyadj+tolyadj+bbeat*dispyadj*dp+y;
+
+                /* send beta adjusted halo and its displacement to aperture calculation */
+                aper_calc(deltax,deltay,&ratio,haloxsi,haloysi,
+                      halolength,haloxadj,haloyadj,newhalox,newhaloy,
+                      pipex,pipey,pipelength,notsimple);
+            }
+
+            nr=ratio*halo[1];
+            n1=nr/(halo[1]/halo[0]); /* ratio r/n = 1.4 */
+
+            n1x_m=n1*bbeat*sqrt(betx*ex);
+            n1y_m=n1*bbeat*sqrt(bety*ey);
+
+            aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
+                                 &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
+                         &x, &y, &betx, &bety, &dx, &dy, table);
+
+            /* save node minimum n1 */
+            if (n1 < node_n1)
+            {
+                node_n1=n1; node_s=s_curr;
+            }
+        }
+
+        err=reset_interpolation(&nint);
+
+        /* insert minimum node value into Twiss table */
+        double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);
+        (*tw_cnt)++;
+
+        /* save range minimum n1 */
+        if (node_n1 < lim_pt->n1)
+        {
+            strcpy(lim_pt->name,name);
+            lim_pt->n1=node_n1;
+            lim_pt->s=node_s;
+            strcpy(lim_pt->apertype,apertype);
+            lim_pt->aperture[0]=ap1;
+            lim_pt->aperture[1]=ap2;
+            lim_pt->aperture[2]=ap3;
+            lim_pt->aperture[3]=ap4;
+            lim_pt->aper_tol[0]=r;
+            lim_pt->aper_tol[1]=xshift;
+            lim_pt->aper_tol[2]=yshift;
+        }
+    }
+
+    if (!strcmp(current_node->name,use_range[1]->name)) stop=1;
+    if (!advance_node()) stop=1;
   }
 
 return lim_pt;
@@ -520,27 +520,27 @@ int aper_tab_search(int cnt, struct aper_e_d tab[], char* name, int* pos)
 
   while (i < cnt && found == 0)
   {
-	i++;
-	if (strcmp(name,tab[i].name) == 0) found=1;
+    i++;
+    if (strcmp(name,tab[i].name) == 0) found=1;
   }
   *pos=i;
-  
+
   return found;
 }
 
-double aper_calc(double p, double q, double* minhl, double halox[], double haloy[], 
+double aper_calc(double p, double q, double* minhl, double halox[], double haloy[],
                  int halolength,double haloxadj[],double haloyadj[],
-		 double newhalox[], double newhaloy[], double pipex[], double pipey[],
-		 int pipelength, double notsimple)
+         double newhalox[], double newhaloy[], double pipex[], double pipey[],
+         int pipelength, double notsimple)
 {
   int i=0, j=0, c=0, ver1, ver2;
   double dist_limit=0.0000000001;
   double a1, b1, a2, b2, xm, ym, h, l;
-  
+
   for (c=0;c<=halolength+1;c++)
   {
-	haloxadj[c]=halox[c]+p;
-	haloyadj[c]=haloy[c]+q;
+    haloxadj[c]=halox[c]+p;
+    haloyadj[c]=haloy[c]+q;
   }
 
   c=0;
@@ -548,92 +548,92 @@ double aper_calc(double p, double q, double* minhl, double halox[], double haloy
   /*if halo centre is inside beam pipe, calculate smallest H/L ratio*/
   if (aper_chk_inside(p, q, pipex, pipey, dist_limit, pipelength))
   {
-	if (notsimple)
-	{
-		/*Adds extra apexes first:*/
-		for (j=0;j<=halolength;j++)
-		{
-			newhalox[c]=haloxadj[j];
-			newhaloy[c]=haloyadj[j];
-			c++;
-			
-			for (i=0;i<=pipelength;i++)
-			{
-				/*Find a and b parameters for line*/
-				ver1=aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1);
-				ver2=aper_linepar(haloxadj[j], haloyadj[j],
-						  haloxadj[j+1], haloyadj[j+1], &a2, &b2);
-				
-				/*find meeting coordinates for infinitely long lines*/
-				aper_intersect(a1, b1, a2, b2, pipex[i], pipey[i], 
-				               haloxadj[j], haloyadj[j], ver1, ver2, &xm, &ym);
-				
-				/*eliminate intersection points not between line limits*/
-				if (-1 == aper_online(xm, ym, haloxadj[j], haloyadj[j],
-						      haloxadj[j+1], haloyadj[j+1], dist_limit)) /*halo line*/
-				{
-					if (-1 != aper_online(p, q, pipex[i], pipey[i], xm, ym, 
-					                      dist_limit))  /*test line*/
-					{
-						newhalox[c]=xm;
-						newhaloy[c]=ym;
-						c++;
-					}
-				}
-			}
-		}
-	
-		halolength=c-1;
-		for (j=0;j<=halolength;j++)
-		{
-			haloxadj[j]=newhalox[j];
-			haloyadj[j]=newhaloy[j];
-		}
-	
-	}
+    if (notsimple)
+    {
+        /*Adds extra apexes first:*/
+        for (j=0;j<=halolength;j++)
+        {
+            newhalox[c]=haloxadj[j];
+            newhaloy[c]=haloyadj[j];
+            c++;
 
-	/*Calculates smallest ratio:*/
-	for (i=0;i<=pipelength;i++)
-	{
-		for (j=0;j<=halolength;j++)
-		{
-			/*Find a and b parameters for line*/
-			ver1=aper_linepar(p, q, haloxadj[j], haloyadj[j], &a1, &b1);
-			ver2=aper_linepar(pipex[i], pipey[i], pipex[i+1], pipey[i+1], &a2, &b2);
+            for (i=0;i<=pipelength;i++)
+            {
+                /*Find a and b parameters for line*/
+                ver1=aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1);
+                ver2=aper_linepar(haloxadj[j], haloyadj[j],
+                          haloxadj[j+1], haloyadj[j+1], &a2, &b2);
 
-			/*find meeting coordinates for infinitely long lines*/
-			aper_intersect(a1, b1, a2, b2, haloxadj[j], haloyadj[j], 
-			             pipex[i], pipey[i], ver1, ver2, &xm, &ym);
-			
-			/*eliminate intersection points not between line limits*/
-			if (-1 == aper_online(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], 
-					      dist_limit)) /*pipe line*/
-			{
-				if (-1 != aper_online(p, q, haloxadj[j], haloyadj[j], xm, ym, 
-						      dist_limit))  /*test line*/
-				{
-					h=sqrt((xm-p)*(xm-p)+(ym-q)*(ym-q));
-					l=sqrt((haloxadj[j]-p)*(haloxadj[j]-p) 
-						+ (haloyadj[j]-q)*(haloyadj[j]-q));
-					if (h/l < *minhl)
-					{
-						*minhl=h/l;
-					}
-				}
-			}
-		}
-	}
+                /*find meeting coordinates for infinitely long lines*/
+                aper_intersect(a1, b1, a2, b2, pipex[i], pipey[i],
+                               haloxadj[j], haloyadj[j], ver1, ver2, &xm, &ym);
+
+                /*eliminate intersection points not between line limits*/
+                if (-1 == aper_online(xm, ym, haloxadj[j], haloyadj[j],
+                              haloxadj[j+1], haloyadj[j+1], dist_limit)) /*halo line*/
+                {
+                    if (-1 != aper_online(p, q, pipex[i], pipey[i], xm, ym,
+                                          dist_limit))  /*test line*/
+                    {
+                        newhalox[c]=xm;
+                        newhaloy[c]=ym;
+                        c++;
+                    }
+                }
+            }
+        }
+
+        halolength=c-1;
+        for (j=0;j<=halolength;j++)
+        {
+            haloxadj[j]=newhalox[j];
+            haloyadj[j]=newhaloy[j];
+        }
+
+    }
+
+    /*Calculates smallest ratio:*/
+    for (i=0;i<=pipelength;i++)
+    {
+        for (j=0;j<=halolength;j++)
+        {
+            /*Find a and b parameters for line*/
+            ver1=aper_linepar(p, q, haloxadj[j], haloyadj[j], &a1, &b1);
+            ver2=aper_linepar(pipex[i], pipey[i], pipex[i+1], pipey[i+1], &a2, &b2);
+
+            /*find meeting coordinates for infinitely long lines*/
+            aper_intersect(a1, b1, a2, b2, haloxadj[j], haloyadj[j],
+                         pipex[i], pipey[i], ver1, ver2, &xm, &ym);
+
+            /*eliminate intersection points not between line limits*/
+            if (-1 == aper_online(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1],
+                          dist_limit)) /*pipe line*/
+            {
+                if (-1 != aper_online(p, q, haloxadj[j], haloyadj[j], xm, ym,
+                              dist_limit))  /*test line*/
+                {
+                    h=sqrt((xm-p)*(xm-p)+(ym-q)*(ym-q));
+                    l=sqrt((haloxadj[j]-p)*(haloxadj[j]-p)
+                        + (haloyadj[j]-q)*(haloyadj[j]-q));
+                    if (h/l < *minhl)
+                    {
+                        *minhl=h/l;
+                    }
+                }
+            }
+        }
+    }
   }
   else /*if halo centre is outside of beam pipe*/
   {
-	*minhl=0;
-	return -1;
+    *minhl=0;
+    return -1;
   }
 
   return 0;
 }
 
-int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4, 
+int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
                int* pipelength, double pipex[], double pipey[])
 {
   int i, err, quarterlength=0;
@@ -644,118 +644,118 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 /* *ap2 = half height rectangle                                         */
 /* *ap3 = half horizontal axis ellipse                                  */
 /* *ap4 = half vertical axis ellipse                                    */
-/* 		returns 1 on success, 0 on failure			*/
+/*      returns 1 on success, 0 on failure          */
 
   (*ap1)=(*ap2)=(*ap3)=(*ap4)=0;
-  
+
   if (!strcmp(apertype,"circle"))
   {
-	*ap3=get_aperture(current_node, "var1"); /*radius circle*/
-	
-	*ap1 = *ap2 = *ap4 = *ap3;
+    *ap3=get_aperture(current_node, "var1"); /*radius circle*/
 
-	if (*ap3) /* check if r = 0, skip calc if r = 0 */
-	{
-		err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-		if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
-	}
-	else err = -1;
+    *ap1 = *ap2 = *ap4 = *ap3;
+
+    if (*ap3) /* check if r = 0, skip calc if r = 0 */
+    {
+        err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+        if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+    }
+    else err = -1;
   }
 
   else if (!strcmp(apertype,"ellipse"))
   {
-  	*ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
-	*ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
-	
-	*ap1 = *ap3; *ap2 = *ap4;
-	
-	err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-	if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+    *ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
+    *ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
+
+    *ap1 = *ap3; *ap2 = *ap4;
+
+    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
-  
+
   else if (!strcmp(apertype,"rectangle"))
   {
-  	*ap1 = get_aperture(current_node, "var1"); /*half width rect*/
-	*ap2 = get_aperture(current_node, "var2"); /*half height rect*/
-	
-	*ap3 = *ap4 = sqrt((*ap1) * (*ap1) + ((*ap2) * (*ap2)));
-	
-	err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-	if (!err) aper_fill_quads(pipey, pipey, quarterlength, pipelength);
+    *ap1 = get_aperture(current_node, "var1"); /*half width rect*/
+    *ap2 = get_aperture(current_node, "var2"); /*half height rect*/
+
+    *ap3 = *ap4 = sqrt((*ap1) * (*ap1) + ((*ap2) * (*ap2)));
+
+    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    if (!err) aper_fill_quads(pipey, pipey, quarterlength, pipelength);
   }
-  
+
   else if (!strcmp(apertype,"lhcscreen"))
   {
-  	*ap1=get_aperture(current_node, "var1"); /*half width rect*/
-	*ap2=get_aperture(current_node, "var2"); /*half height rect*/
-	*ap3=get_aperture(current_node, "var3"); /*radius circle*/
-	
-	(*ap4) = (*ap3);
-	
-	err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-	if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
+    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
+    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+
+    (*ap4) = (*ap3);
+
+    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
-  
+
   else if (!strcmp(apertype,"marguerite"))
   {
-  	printf("\nApertype %s not yet supported.", apertype);
-	err=-1;
+    printf("\nApertype %s not yet supported.", apertype);
+    err=-1;
   }
-  
+
   else if (!strcmp(apertype,"rectellipse"))
   {
-  	*ap1=get_aperture(current_node, "var1"); /*half width rect*/
-	*ap2=get_aperture(current_node, "var2"); /*half height rect*/
-	*ap3=get_aperture(current_node, "var3"); /*half hor axis ellipse*/
-	*ap4=get_aperture(current_node, "var4"); /*half ver axis ellipse*/
-	
-	if (*ap1==0) /*this will not be 0 in the future*/
-	{
-		*ap1=*ap3;
-	}
-	if (*ap2==0) /*this will not be 0 in the future*/
-	{
-		*ap2=*ap4;
-	}
+    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
+    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
+    *ap3=get_aperture(current_node, "var3"); /*half hor axis ellipse*/
+    *ap4=get_aperture(current_node, "var4"); /*half ver axis ellipse*/
 
-	err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-	if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+    if (*ap1==0) /*this will not be 0 in the future*/
+    {
+        *ap1=*ap3;
+    }
+    if (*ap2==0) /*this will not be 0 in the future*/
+    {
+        *ap2=*ap4;
+    }
+
+    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
-  
+
   else if (!strcmp(apertype,"racetrack"))
   {
-  	*ap1=get_aperture(current_node, "var1"); /*half width rect*/
-	*ap2=get_aperture(current_node, "var2"); /*half height rect*/
-	*ap3=get_aperture(current_node, "var3"); /*radius circle*/
-	
-	*ap4 = *ap3;
-	
-	err=aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
-	
-	if (!err)
-	{
-		/*displaces the quartercircle*/
-		for (i=0;i<=quarterlength;i++)
-		{
-			pipex[i] += (*ap1);
-			pipey[i] += (*ap2);
-		}
-		
-		aper_fill_quads(pipex, pipey, quarterlength, pipelength);
-	}
+    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
+    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
+    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+
+    *ap4 = *ap3;
+
+    err=aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
+
+    if (!err)
+    {
+        /*displaces the quartercircle*/
+        for (i=0;i<=quarterlength;i++)
+        {
+            pipex[i] += (*ap1);
+            pipey[i] += (*ap2);
+        }
+
+        aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+    }
   }
-  
+
   else if (strlen(apertype))
   {
-	*pipelength = aper_external_file(apertype, pipex, pipey);
-	*ap1 = *ap2 = *ap3 = *ap4 = 0;
-	if (*pipelength > -1) err=0; else err=-1;
+    *pipelength = aper_external_file(apertype, pipex, pipey);
+    *ap1 = *ap2 = *ap3 = *ap4 = 0;
+    if (*pipelength > -1) err=0; else err=-1;
   }
 
   else
   {
-	*pipelength = -1;
-	err=-1;
+    *pipelength = -1;
+    err=-1;
   }
 
 return err+1;
@@ -769,29 +769,29 @@ int aper_chk_inside(double p, double q, double pipex[], double pipey[], double d
   /*checks first whether p,q is exactly on a pipe coordinate*/
   for (i=0;i<=pipelength;i++)
   {
-  	if (-1 == aper_online(p, q, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit))
-	{
-		return 0;
-	}
+    if (-1 == aper_online(p, q, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit))
+    {
+        return 0;
+    }
   }
 
   /*calculates and adds up angle from centre between all coordinates*/
   for (i=0;i<=pipelength;i++)
   {
-  	n12=sqrt(((pipex[i]-p)*(pipex[i]-p) + (pipey[i]-q)*(pipey[i]-q)) 
+    n12=sqrt(((pipex[i]-p)*(pipex[i]-p) + (pipey[i]-q)*(pipey[i]-q))
                 * ((pipex[i+1]-p)*(pipex[i+1]-p) + (pipey[i+1]-q)*(pipey[i+1]-q)));
-    	
-	salfa=((pipex[i]-p)*(pipey[i+1]-q) - (pipey[i]-q)*(pipex[i+1]-p))/n12;
-	
-	calfa=((pipex[i]-p)*(pipex[i+1]-p) + (pipey[i]-q)*(pipey[i+1]-q))/n12;
-	
-	alfa += atan2(salfa, calfa);
+
+    salfa=((pipex[i]-p)*(pipey[i+1]-q) - (pipey[i]-q)*(pipex[i+1]-p))/n12;
+
+    calfa=((pipex[i]-p)*(pipex[i+1]-p) + (pipey[i]-q)*(pipey[i+1]-q))/n12;
+
+    alfa += atan2(salfa, calfa);
   }
-  
+
   /*returns yes to main if total angle is at least twopi*/
   if (sqrt(alfa*alfa)>=(twopi-dist_limit))
   {
-  	return 1;
+    return 1;
   }
 
 return 0;
@@ -804,81 +804,81 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
   char comment[100]="empty";
   char *strpt;
   FILE *e_d_pt;
-  
+
   if (e_d_name != NULL)
   {
-  	if((e_d_pt = fopen(e_d_name,"r")) == NULL)
-	{
-		printf("\nFile does not exist: %s\n",e_d_name);
-	}
-	else
-	{
-		/* part for reading reference node */
-		while (strncmp(comment,"reference:",10) && i != EOF)
-		{
-			/*fgets(buf, 100, e_d_pt);*/
-			i = fscanf(e_d_pt, "%s", comment);
-			stolower(comment);
-		}
-		
-		if (i == EOF) rewind(e_d_pt);
-		else
-		{
-			if (strlen(comment) != 10)
-			{
-				strpt=strchr(comment,':');
-				strpt++;
-				strcpy(refnode, strpt);
-			}
-			else i = fscanf(e_d_pt, "%s", refnode);
-		
-		stolower(refnode);
-		strcat(refnode, ":1");
-		}
-		printf("\nReference node: %s",refnode);
-		/* end reading reference node */
+    if((e_d_pt = fopen(e_d_name,"r")) == NULL)
+    {
+        printf("\nFile does not exist: %s\n",e_d_name);
+    }
+    else
+    {
+        /* part for reading reference node */
+        while (strncmp(comment,"reference:",10) && i != EOF)
+        {
+            /*fgets(buf, 100, e_d_pt);*/
+            i = fscanf(e_d_pt, "%s", comment);
+            stolower(comment);
+        }
 
-		i=0;
-		while (i != EOF && *cnt < E_D_MAX)
-		{
-			i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
-			/*next while-loop treats comments*/
-			while (e_d_tab[*cnt].name[0] == '!' && i != EOF)
-			{
-				fgets(comment, 100, e_d_pt);
-				i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
-			}
-			
-			stolower(e_d_tab[*cnt].name);
-			
-			if (i != EOF)
-			{
-				strcat(e_d_tab[*cnt].name, ":1");
-								
-				k=0; j=3;
-				while (j == 3 && k < E_D_MAX)
-				{
-					j=fscanf(e_d_pt, "%lf %lf %lf",	&e_d_tab[*cnt].tab[k][0],
-									&e_d_tab[*cnt].tab[k][1],
-									&e_d_tab[*cnt].tab[k][2]);
-					k++;
-					
-					if (e_d_tab[*cnt].curr == E_D_MAX) printf("\nToo many points of x,y displacement...\n");
-				}
-				
-				e_d_tab[*cnt].curr=k-2;
-				
-				(*cnt)++;
-				if (*cnt == E_D_MAX) printf("\nToo many special elements...\n");
-				
-				i=j;
-			}
-		}
-		
-		printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
-		e_d_flag=1; fclose(e_d_pt);
-		(*cnt)--;
-	}
+        if (i == EOF) rewind(e_d_pt);
+        else
+        {
+            if (strlen(comment) != 10)
+            {
+                strpt=strchr(comment,':');
+                strpt++;
+                strcpy(refnode, strpt);
+            }
+            else i = fscanf(e_d_pt, "%s", refnode);
+
+        stolower(refnode);
+        strcat(refnode, ":1");
+        }
+        printf("\nReference node: %s",refnode);
+        /* end reading reference node */
+
+        i=0;
+        while (i != EOF && *cnt < E_D_MAX)
+        {
+            i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
+            /*next while-loop treats comments*/
+            while (e_d_tab[*cnt].name[0] == '!' && i != EOF)
+            {
+                fgets(comment, 100, e_d_pt);
+                i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
+            }
+
+            stolower(e_d_tab[*cnt].name);
+
+            if (i != EOF)
+            {
+                strcat(e_d_tab[*cnt].name, ":1");
+
+                k=0; j=3;
+                while (j == 3 && k < E_D_MAX)
+                {
+                    j=fscanf(e_d_pt, "%lf %lf %lf", &e_d_tab[*cnt].tab[k][0],
+                                    &e_d_tab[*cnt].tab[k][1],
+                                    &e_d_tab[*cnt].tab[k][2]);
+                    k++;
+
+                    if (e_d_tab[*cnt].curr == E_D_MAX) printf("\nToo many points of x,y displacement...\n");
+                }
+
+                e_d_tab[*cnt].curr=k-2;
+
+                (*cnt)++;
+                if (*cnt == E_D_MAX) printf("\nToo many special elements...\n");
+
+                i=j;
+            }
+        }
+
+        printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
+        e_d_flag=1; fclose(e_d_pt);
+        (*cnt)--;
+    }
   }
 return e_d_flag;
 }
@@ -891,25 +891,25 @@ int aper_external_file(char *file, double tablex[], double tabley[])
 
   if (file != NULL)
   {
-	if ((filept=fopen(file, "r")) == NULL)
-	{
-		warning("Can not find file: ", file);
-		return -1;
-	}
-	
-	/*start making table*/
-	while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i]))
-	{
-		i++;
-		if (i >= MAXARRAY)
-		{
-			fatal_error("Memory full. ", "Number of coordinates exceeds set limit");
-		}
-	}
-	
-	tablex[i]=tablex[0];
-	tabley[i]=tabley[0];
-	fclose(filept);
+    if ((filept=fopen(file, "r")) == NULL)
+    {
+        warning("Can not find file: ", file);
+        return -1;
+    }
+
+    /*start making table*/
+    while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i]))
+    {
+        i++;
+        if (i >= MAXARRAY)
+        {
+            fatal_error("Memory full. ", "Number of coordinates exceeds set limit");
+        }
+    }
+
+    tablex[i]=tablex[0];
+    tabley[i]=tabley[0];
+    fclose(filept);
   }
   return i-1;
 }
@@ -921,34 +921,34 @@ void aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* hal
   /* receives two tables with coordinates for the first quadrant */
   /* and mirrors them across x and y axes                         */
 
-/*copying first quadrant coordinates to second quadrant*/  
+/*copying first quadrant coordinates to second quadrant*/
   for (j=quarterlength;j>=0;j--)
   {
-  	polyx[i]=polyx[j];
-	polyy[i]=polyy[j];
-	aper_adj_quad(pi/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
-	i++;
+    polyx[i]=polyx[j];
+    polyy[i]=polyy[j];
+    aper_adj_quad(pi/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
+    i++;
   }
 
-/*copying first quadrant coordinates to third quadrant*/  
+/*copying first quadrant coordinates to third quadrant*/
   for (j=0;j<=quarterlength;j++)
   {
-  	polyx[i]=polyx[j];
-	polyy[i]=polyy[j];
-	aper_adj_quad(pi, polyx[i], polyy[i], &polyx[i], &polyy[i]);
-	i++;
+    polyx[i]=polyx[j];
+    polyy[i]=polyy[j];
+    aper_adj_quad(pi, polyx[i], polyy[i], &polyx[i], &polyy[i]);
+    i++;
   }
 
-/*copying first quadrant coordinates to fourth quadrant*/  
+/*copying first quadrant coordinates to fourth quadrant*/
   for (j=quarterlength;j>=0;j--)
   {
-  	polyx[i]=polyx[j];
-	polyy[i]=polyy[j];
-	aper_adj_quad(pi*3/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
-	i++;
+    polyx[i]=polyx[j];
+    polyy[i]=polyy[j];
+    aper_adj_quad(pi*3/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
+    i++;
   }
-  
-  /*sets the last point equal to the first, to complete the shape. 
+
+  /*sets the last point equal to the first, to complete the shape.
     Necessary for compatibility with aper_calc function*/
   polyx[i]=polyx[0];
   polyy[i]=polyy[0];
@@ -967,7 +967,7 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp) h_length++;
-  
+
   /* beam properties */
   if (aper_t->header == NULL)  aper_t->header = new_char_p_array(h_length);
   strcpy(tmp, current_sequ->name);
@@ -988,7 +988,7 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   dtmp = get_value("beam", "gamma");
   sprintf(c_dummy, v_format("@ GAMMA            %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
-  
+
   /* aperture command properties */
   dtmp = command_par_value("exn", this_cmd->clone);
   sprintf(c_dummy, v_format("@ EXN              %%le  %F"), dtmp);
@@ -1018,101 +1018,101 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   dtmp = command_par_value("nco", this_cmd->clone);
   sprintf(c_dummy, v_format("@ # OF ANGLES      %%d   %F"), dtmp*4);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
-  
+
   /* if a filename with halo coordinates is given, need not show halo */
   stmp = command_par_string("halofile", this_cmd->clone);
   if (stmp)
   {
-  	sprintf(c_dummy, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
-	aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dummy, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
   }
   else
   {
-  	i = command_par_vector("halo", this_cmd->clone, vtmp);
-	sprintf(c_dummy, v_format("@ HALO SHAPE       %%le %g - %g - %g - %g"),
-	        vtmp[0],vtmp[1],vtmp[2],vtmp[3]);
-	aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+    i = command_par_vector("halo", this_cmd->clone, vtmp);
+    sprintf(c_dummy, v_format("@ HALO SHAPE       %%le %g - %g - %g - %g"),
+            vtmp[0],vtmp[1],vtmp[2],vtmp[3]);
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
   }
   /* show filename with pipe coordinates if given */
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp)
   {
-  	sprintf(c_dummy, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
-	aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dummy, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
   }
 
   sprintf(c_dummy, v_format(" "));
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
-  
+
   sprintf(c_dummy, v_format("@ APERTURE LIMIT: %s, n1: %g, apertype: %s, aperture: %g - %g - %g - %g, tolerance: %g  - %g - %g"),
                              lim->name,lim->n1,lim->apertype,
-			     lim->aperture[0],lim->aperture[1],lim->aperture[2],
-			     lim->aperture[3],lim->aper_tol[0],lim->aper_tol[1],lim->aper_tol[2]);
+                 lim->aperture[0],lim->aperture[1],lim->aperture[2],
+                 lim->aperture[3],lim->aper_tol[0],lim->aper_tol[1],lim->aper_tol[2]);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
-  
+
   sprintf(c_dummy, v_format(" "));
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
 }
 
-void aper_intersect(double a1, double b1, double a2, double b2, double x1, double y1, double x2, double y2, 
+void aper_intersect(double a1, double b1, double a2, double b2, double x1, double y1, double x2, double y2,
                   int ver1, int ver2, double *xm, double *ym)
 {
   if (ver1&&ver2&&x1==x2)
   {
-  	*xm=x2;
-	*ym=y2;
+    *xm=x2;
+    *ym=y2;
   }
   else if (ver1)
   {
-  	*xm=x1;
-	*ym=a2*x1+b2;
+    *xm=x1;
+    *ym=a2*x1+b2;
   }
   else if (ver2)
   {
-  	*xm=x2;
-	*ym=a1*x2+b1;
+    *xm=x2;
+    *ym=a1*x2+b1;
   }
   else
   {
-  	*xm=(b1-b2)/(a2-a1);
-	*ym=a1*(*xm)+b1;
+    *xm=(b1-b2)/(a2-a1);
+    *ym=a1*(*xm)+b1;
   }
 }
 
 int aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
 {
   int vertical=0;
-  
+
   *a=(y1-y2)/(x1-x2);
   *b=y1-(*a)*x1;
 
   if ((x1-x2) == 0)
   {
-  	vertical=1;
+    vertical=1;
   }
 
   return vertical;
 }
 
-double aper_online(double xm, double ym, double startx, double starty, 
+double aper_online(double xm, double ym, double startx, double starty,
               double endx, double endy, double dist_limit)
 {
   double cosfi=1;
-  
+
   if (sqrt((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) <= dist_limit)
   {
-  	cosfi=-1;
+    cosfi=-1;
   }
   else
   {
-  	cosfi=	((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) /
-		(sqrt((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) *
-		sqrt((xm-endx)*(xm-endx)+(ym-endy)*(ym-endy)));
+    cosfi=  ((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) /
+        (sqrt((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) *
+        sqrt((xm-endx)*(xm-endx)+(ym-endy)*(ym-endy)));
   }
-  
+
   if (cosfi <= -1+dist_limit)
   {
-  	cosfi=-1;
+    cosfi=-1;
   }
   return cosfi;
 }
@@ -1122,72 +1122,72 @@ void aper_race(double xshift, double yshift, double r, double angle, double* x, 
   double angle0, angle1, angle2, alfa, gamma, theta;
   int quadrant;
 
-  /* this function calculates the displacement of the beam centre 
+  /* this function calculates the displacement of the beam centre
      due to tolerance uncertainty for every angle */
 
   quadrant=angle/(pi/2)+1;
 
   if (xshift==0 && yshift==0 && r==0)
   {
-  	*x=0; *y=0;
+    *x=0; *y=0;
   }
   else
   {
-  	switch (quadrant) /*adjusting angle to first quadrant*/
-  	{
-		case 1: angle=angle; break;
-		case 2: angle=pi-angle; break;
-		case 3: angle=angle-pi; break;
-		case 4: angle=twopi-angle; break;
-	}
-  
-	if (angle==pi/2) /*in this case we should not use the tan()-function*/
-	{
-		*x=0;
-		*y=yshift+r;
-	}
-	else
-	{
-		angle0=atan(yshift/(xshift+r)); /*finding where arc starts and ends*/
-		angle1=atan((r+yshift)/xshift);
+    switch (quadrant) /*adjusting angle to first quadrant*/
+    {
+        case 1: angle=angle; break;
+        case 2: angle=pi-angle; break;
+        case 3: angle=angle-pi; break;
+        case 4: angle=twopi-angle; break;
+    }
 
-		/*different methods is needed, depending on angle*/
-		if (angle<=angle0+0.0000001)
-		{
-			*x=xshift+r;
-			*y=tan(angle)*(xshift+r);
-		}
-		else if (angle<angle1)
-		{
-			if (!xshift && !yshift)	angle2=0; /* if this is a circle, atan */
-			else angle2=atan(yshift/xshift);  /* can not be used */
-		
-			alfa=sqrt((angle-angle2)*(angle-angle2));
-			if (alfa<0.0000001)
-			{
-				/*sine rule can not be used if alfa==0*/
-				*x=cos(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
-				*y=sin(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
-			}
-			else
-			{
-				/*solving sine rule w.r.t. gamma*/
-				gamma=asin(sqrt(xshift*xshift+yshift*yshift)/r*sin(alfa)); 
-				theta=pi-(alfa+gamma); /*theta is the last corner in the triangle*/
-				*x=cos(angle)*r*sin(theta)/sin(alfa);
-				*y=sin(angle)*r*sin(theta)/sin(alfa);
-			}
-		}
-		else
-		{
-			*x=(r+yshift)/tan(angle);
-			*y=r+yshift;
-		}
-	}
+    if (angle==pi/2) /*in this case we should not use the tan()-function*/
+    {
+        *x=0;
+        *y=yshift+r;
+    }
+    else
+    {
+        angle0=atan(yshift/(xshift+r)); /*finding where arc starts and ends*/
+        angle1=atan((r+yshift)/xshift);
+
+        /*different methods is needed, depending on angle*/
+        if (angle<=angle0+0.0000001)
+        {
+            *x=xshift+r;
+            *y=tan(angle)*(xshift+r);
+        }
+        else if (angle<angle1)
+        {
+            if (!xshift && !yshift) angle2=0; /* if this is a circle, atan */
+            else angle2=atan(yshift/xshift);  /* can not be used */
+
+            alfa=sqrt((angle-angle2)*(angle-angle2));
+            if (alfa<0.0000001)
+            {
+                /*sine rule can not be used if alfa==0*/
+                *x=cos(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
+                *y=sin(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
+            }
+            else
+            {
+                /*solving sine rule w.r.t. gamma*/
+                gamma=asin(sqrt(xshift*xshift+yshift*yshift)/r*sin(alfa));
+                theta=pi-(alfa+gamma); /*theta is the last corner in the triangle*/
+                *x=cos(angle)*r*sin(theta)/sin(alfa);
+                *y=sin(angle)*r*sin(theta)/sin(alfa);
+            }
+        }
+        else
+        {
+            *x=(r+yshift)/tan(angle);
+            *y=r+yshift;
+        }
+    }
   }
 }
 
-void aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y, 
+void aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
                       double* betx, double* bety, double* dx, double* dy)
 {
   double_from_table(table, "s", jslice, s);
@@ -1199,15 +1199,15 @@ void aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
   double_from_table(table, "dy", jslice, dy);
 }
 
-int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, 
+int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
                      int* quarterlength, double tablex[], double tabley[])
 {
   double x, y, angle, alfa, theta, dangle, napex;
   int i=0;
-  
+
   /* Produces a table of only the first quadrant coordinates */
   /* aper_fill_quads() completes the polygon          */
-  	
+
   if (*quarterlength) napex=4;
   else napex=19;
 
@@ -1223,21 +1223,21 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
 
   if (!((0 < dangle) && (dangle < pi/2)))
   {
-	return -1;
+    return -1;
   }
 
   /*write coordinates for first quadrant*/
   /*need 0.4*dangle, else last point not added*/
-  for (angle=alfa;angle<=pi/2-(theta-0.4*dangle);angle+=dangle) 
+  for (angle=alfa;angle<=pi/2-(theta-0.4*dangle);angle+=dangle)
   {
-	tablex[i]=(*ap3)*cos(angle);
-	tabley[i]=(*ap4)*sin(angle);
-	i++;
-	
-	if (i >= MAXARRAY/4)
-	{
-		fatal_error("Memory full. ", "Number of coordinates exceeds set limit");
-	}
+    tablex[i]=(*ap3)*cos(angle);
+    tabley[i]=(*ap4)*sin(angle);
+    i++;
+
+    if (i >= MAXARRAY/4)
+    {
+        fatal_error("Memory full. ", "Number of coordinates exceeds set limit");
+    }
   }
 
   *quarterlength=i-1;
@@ -1255,10 +1255,10 @@ void aper_surv(double init[], int nint)
   /* table 'survey' which can be accessed from all functions. */
   /* init[0] = x0, init[1] = y0, init[2] = z0,                */
   /* init[3] = theta0, init[4] = phi0, init[5] = psi0         */
-  
+
   aper_survey = new_in_cmd(10);
   aper_survey->type = 0;
-  aper_survey->clone = aper_survey->cmd_def = 
+  aper_survey->clone = aper_survey->cmd_def =
     clone_command(find_command("survey",defined_commands));
   asnl = aper_survey->cmd_def->par_names;
   aspos = name_list_pos("table", asnl);
@@ -1291,7 +1291,7 @@ void aper_surv(double init[], int nint)
 
   current_survey=(aper_survey->clone);
   pro_survey(aper_survey);
-  
+
   double_from_table("survey","x",&nint, &init[0]);
   double_from_table("survey","y",&nint, &init[1]);
   double_from_table("survey","z",&nint, &init[2]);
@@ -1314,12 +1314,12 @@ void aper_trim_ws(char* string, int len)
   if (c<len) string[c+1]=' '; /*adds a ws to avoid two \0 in a row*/
 }
 
-void aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m, 
-			  double* rtol, double* xtol, double* ytol, 
+void aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
+              double* rtol, double* xtol, double* ytol,
                           char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
-			  double* on_ap, double* on_elem, double* spec,double* s, 
-			  double* x, double* y, double* betx, double* bety,double* dx, double* dy, 
-			  char *table)
+              double* on_ap, double* on_elem, double* spec,double* s,
+              double* x, double* y, double* betx, double* bety,double* dx, double* dy,
+              char *table)
 {
   string_to_table(table, "name", name);
   double_to_table(table, "n1", n1);
@@ -1731,7 +1731,7 @@ int string_from_table(char* table, char* name, int* row, char* string)
 
 int result_from_normal(char* name_var, int* order, double* val)
      /* returns value of table normal_results corresponding to the given variable name
-	and to the given orders
+    and to the given orders
         function value return:
         0  OK
         -1 table  does not exist
@@ -1754,22 +1754,22 @@ int result_from_normal(char* name_var, int* order, double* val)
     {
       k = string_from_table("normal_results","name", &row, string);
       if (k != 0) return k;
-      if (strcmp(string,n_var) == 0) 
-	{
-	  found = 1;
-	  k = double_from_table("normal_results","order1", &row, &d_val);
-	  if ((int)d_val != order[0]) found = 0;
-	  k = double_from_table("normal_results","order2", &row, &d_val);
-	  if ((int)d_val != order[1]) found = 0;
-	  k = double_from_table("normal_results","order3", &row, &d_val);
-	  if ((int)d_val != order[2]) found = 0;
-	  k = double_from_table("normal_results","order4", &row, &d_val);
-	  if ((int)d_val != order[3]) found = 0;
-	}
+      if (strcmp(string,n_var) == 0)
+    {
+      found = 1;
+      k = double_from_table("normal_results","order1", &row, &d_val);
+      if ((int)d_val != order[0]) found = 0;
+      k = double_from_table("normal_results","order2", &row, &d_val);
+      if ((int)d_val != order[1]) found = 0;
+      k = double_from_table("normal_results","order3", &row, &d_val);
+      if ((int)d_val != order[2]) found = 0;
+      k = double_from_table("normal_results","order4", &row, &d_val);
+      if ((int)d_val != order[3]) found = 0;
+    }
       if (found == 1) break;
     }
   if (found == 1)
-  k = double_from_table("normal_results","value", &row, &d_val);		     
+  k = double_from_table("normal_results","value", &row, &d_val);
   *val = d_val;
   return 0;
 }
@@ -1950,26 +1950,26 @@ void gnuplot_append(char *gplfilename, char *psfilename){
     rename(gplfilename,psfilename);
     return;
   } else {
-    // the file has to be closed it is going to change
+    /* the file has to be closed it is going to change */
     fclose(newpsfile);
   };
 
-  // else append the gnuplot ps file to psfilename
-  // Save old value
+  /* else append the gnuplot ps file to psfilename
+     Save old value */
   rename(psfilename,"tmpoldplot.ps");
   newpsfile=fopen(psfilename,"w");
   oldpsfile=fopen("tmpoldplot.ps","r");
   gplpsfile=fopen(gplfilename,"r");
-  //read old ps file and copy on the new ps file
+  /* read old ps file and copy on the new ps file */
   while(fgets(line,1000,oldpsfile)!=NULL){
-    //don't print after %%Trailer
+    /* don't print after %%Trailer */
     if (strncmp("%%Trailer",line,9)==0)  np=1;
-    // Count the pages and rewrite the line
+    /* Count the pages and rewrite the line */
     if (strncmp("%%Page:",line,7)==0) {
       page++;
       fprintf(newpsfile,"%%%%Page: %d %d\n",page,page);
     } else {
-      // write the lines
+      /* write the lines */
       if(np==0) {
          fprintf(newpsfile,"%s",line);
       }
@@ -1977,26 +1977,26 @@ void gnuplot_append(char *gplfilename, char *psfilename){
   }
   fclose(oldpsfile);
   remove("tmpoldplot.ps");
-  //read gnuplot ps file and append on the final file
+  /* read gnuplot ps file and append on the final file */
   while(fgets(line,1000,gplpsfile)!=NULL){
-    //don't print after %%Trailer
+    /* don't print after %%Trailer */
     if (strncmp("%%Trailer",line,9)==0)  np=1;
-    // Count the pages and rewrite the line
+    /* Count the pages and rewrite the line */
     if (strncmp("%%Page:",line,7)==0) {
       page++;
       fprintf(newpsfile,"%%%%Page: %d %d\n",page,page);
     } else {
       if(np==0) {
-      // write the lines
+      /* write the lines */
          fprintf(newpsfile,"%s",line);
       }
     }
-     // Print after prologue
+     /* Print after prologue */
     if (strncmp("%%EndProlog",line,11)==0) np=0;
   }
   fclose(gplpsfile);
   remove("tmpplot.ps");
-  // Print the trailer
+  /* Print the trailer */
   fprintf(newpsfile,"%%%%Trailer\n");
   fprintf(newpsfile,"%%%%DocumentFonts: Times-Roman\n");
   fprintf(newpsfile,"%%%%Pages: %d\n",page);
@@ -2048,64 +2048,64 @@ void exec_plot(struct in_cmd* cmd)
       /* get haxis_name & s_haxis flag */
 
       pos = name_list_pos("haxis", nl_plot);
-      if(nl_plot->inform[pos]) 
-	{
-	  if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
-		haxis_name = pl_plot->parameters[pos]->call_def->string;
-	  s_haxis = strcmp(haxis_name,"s");
-	}
+      if(nl_plot->inform[pos])
+    {
+      if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
+        haxis_name = pl_plot->parameters[pos]->call_def->string;
+      s_haxis = strcmp(haxis_name,"s");
+    }
 
       /* get table_name & track_flag */
 
       pos = name_list_pos("table", nl_plot);
       if(nl_plot->inform[pos]) /* table name specified */
-	{
-	  if ((table_name = pl_plot->parameters[pos]->string) == NULL)
-	    table_name = pl_plot->parameters[pos]->call_def->string;
-	  if(strcmp(table_name,"track") == 0)
-	    track_flag = 1;
-	}
-      else 
-	table_name = "twiss";
+    {
+      if ((table_name = pl_plot->parameters[pos]->string) == NULL)
+        table_name = pl_plot->parameters[pos]->call_def->string;
+      if(strcmp(table_name,"track") == 0)
+        track_flag = 1;
+    }
+      else
+    table_name = "twiss";
 
       /* check if table name is the same of the last twiss call if haxis is "s" and no interpolation */
 
-      if(nointerp == 0 && s_haxis == 0) 
-	{
-	  last_twiss_table = current_sequ->tw_table->name;
-	  if (strcmp(table_name,"aperture") != 0 )
-	  {	  
-	  	if(strcmp(table_name,last_twiss_table) != 0)
-		{
-			printf("Only allowed table attribute in plot command is \"aperture\". Else, table name is automatically changed to %s \n",last_twiss_table );
-			if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
-			 pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
-	    	}
-	  }
-	}
+      if(nointerp == 0 && s_haxis == 0)
+    {
+      last_twiss_table = current_sequ->tw_table->name;
+      if (strcmp(table_name,"aperture") != 0 )
+      {
+        if(strcmp(table_name,last_twiss_table) != 0)
+        {
+            printf("Only allowed table attribute in plot command is \"aperture\". Else, table name is automatically changed to %s \n",last_twiss_table );
+            if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
+             pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
+            }
+      }
+    }
 
       /* get file_name */
 
       pos = name_list_pos("file", nl_plot);
       if(nl_plot->inform[pos]) /* file name specified */
-	{
-	  if ((file_name = pl_plot->parameters[pos]->string) == NULL)
-	    file_name = pl_plot->parameters[pos]->call_def->string;
-	}
+    {
+      if ((file_name = pl_plot->parameters[pos]->string) == NULL)
+        file_name = pl_plot->parameters[pos]->call_def->string;
+    }
       else
-	{
-	  if (track_flag) 
-	    file_name = "madx_track";
-	  else
-	    file_name = "madx";	  
-	}
+    {
+      if (track_flag)
+        file_name = "madx_track";
+      else
+        file_name = "madx";
+    }
     }
   else
       fatal_error("Plot "," - non existing command");
 
   /* If table name is "track" use the gnuplot package */
 
-  if (track_flag) 
+  if (track_flag)
     {
 
       /* get track file name */
@@ -2117,10 +2117,10 @@ void exec_plot(struct in_cmd* cmd)
       pos = name_list_pos("particle", nl_plot);
       curr = pl_plot->parameters[pos]->m_string->curr;
       for (i = 0; i < curr; i++)
-	{
-	  particle_list = pl_plot->parameters[pos]->m_string->p[i];
-	  part_idx[i] = atoi(particle_list);
-	}
+    {
+      particle_list = pl_plot->parameters[pos]->m_string->p[i];
+      part_idx[i] = atoi(particle_list);
+    }
 
       /* get multiple */
 
@@ -2141,88 +2141,88 @@ void exec_plot(struct in_cmd* cmd)
 
       track_cols_length = sizeof(track_table_cols)/4 - 1;
       for (j = 0; j < track_cols_length; j++)
-	{
-	  if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
-	    haxis_idx = j + 1;
-	  if(strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
-	    vaxis_idx = j + 1;
-	}
+    {
+      if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
+        haxis_idx = j + 1;
+      if(strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
+        vaxis_idx = j + 1;
+    }
 
       /* build-up the title */
 
       for (j = 0; j < tsm1; j++)
-	{
-	  plot_title[j] = ' ';
-	  version[j] = ' ';
-	}
+    {
+      plot_title[j] = ' ';
+      version[j] = ' ';
+    }
       plot_title[tsm1] = '\0';
       version[tsm1] = '\0';
       get_title(plot_title,title_length);
       for (k = *title_length + 1; k > 0; k--)
-	{
-	  plot_title[k] = plot_title[k - 1];
-	}
+    {
+      plot_title[k] = plot_title[k - 1];
+    }
       plot_title[0]= '\"';
       if (noversion)
-	{
-	  plot_title[*title_length+1] =  '\"';
-	  plot_title[*title_length+2] =  '\0'; 
-	}
+    {
+      plot_title[*title_length+1] =  '\"';
+      plot_title[*title_length+2] =  '\0';
+    }
       else
-	{
-	  plot_title[tsm2] =  '\"';
-	  get_version(version,version_length);
-	  k = tsm2 - *version_length;
-	  for (j = k; j < tsm2; j +=1)
-	    {
-	      plot_title[j] = version[j - k];
-	    } 
-	}
+    {
+      plot_title[tsm2] =  '\"';
+      get_version(version,version_length);
+      k = tsm2 - *version_length;
+      for (j = k; j < tsm2; j +=1)
+        {
+          plot_title[j] = version[j - k];
+        }
+    }
 
       /* build-up the gnuplot command file */
-	  mycpy(track_plot_filename,file_name);
-	  sprintf(ps_file_name,track_plot_filename);
-	  strcat(ps_file_name,".ps");
+      mycpy(track_plot_filename,file_name);
+      sprintf(ps_file_name,track_plot_filename);
+      strcat(ps_file_name,".ps");
 
-	  gpu = fopen("gnu_plot.cmd","w");
-	  fprintf(gpu,"set terminal postscript color\n");
-	  fprintf(gpu,"set pointsize 0.48\n");
-	  fprintf(gpu,"set output '%s'\n","tmpplot.ps");
+      gpu = fopen("gnu_plot.cmd","w");
+      fprintf(gpu,"set terminal postscript color\n");
+      fprintf(gpu,"set pointsize 0.48\n");
+      fprintf(gpu,"set output '%s'\n","tmpplot.ps");
 
       fprintf(gpu,"set title %s\n",plot_title);
       fprintf(gpu,"set xlabel '%s'\n",haxis_name);
       fprintf(gpu,"set ylabel '%s'\n",vaxis_name);
       for (j = 0; j < curr; j++)
-	{
-	  printf("j = %d \n",j);
-	  sprintf(track_file_name, "%s.obs%04d.p%04d", trackfile, 1, part_idx[j]);
-	  if (fopen(track_file_name,"r") == NULL)
-	    printf("file %s does not exist \n",track_file_name);
-	  else
-	    {
-	      if (j == 0) fprintf(gpu,"plot ");
-	      else
-		{
-		  if (multiple == 0)
-		    fprintf(gpu,"\nplot ");
-		  else
-		    fprintf(gpu,", \\\n     ");	
-		}
-	      fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
+    {
+      printf("j = %d \n",j);
+      sprintf(track_file_name, "%s.obs%04d.p%04d", trackfile, 1, part_idx[j]);
+      if (fopen(track_file_name,"r") == NULL)
+        printf("file %s does not exist \n",track_file_name);
+      else
+        {
+          if (j == 0) fprintf(gpu,"plot ");
+          else
+        {
+          if (multiple == 0)
+            fprintf(gpu,"\nplot ");
+          else
+            fprintf(gpu,", \\\n     ");
+        }
+          fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
               printf("%s",track_file_name);
-	      if (nolegend)
-		fprintf(gpu,"notitle with points %d ",part_idx[j]); 
-	      else
-		fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
+          if (nolegend)
+        fprintf(gpu,"notitle with points %d ",part_idx[j]);
+          else
+        fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
 
-	    }
-	}
+        }
+    }
       fclose(gpu);
       /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
       system("gnuplot 'gnu_plot.cmd'");
-      // Copy or append the gnuplot ps file in the target ps_file
+      /* Copy or append the gnuplot ps file in the target ps_file */
       gnuplot_append("tmpplot.ps",ps_file_name);
-      // Remove the gnuplot command
+      /* Remove the gnuplot command */
       remove("gnu_plot.cmd");
     }
   else
@@ -2242,16 +2242,16 @@ void exec_plot(struct in_cmd* cmd)
       if (nt && current_sequ != NULL) title = current_sequ->name;
       pesopt_(&ierr);
       if (ierr == 0)
-	{
-	  adjust_beam();
-	  probe_beam = clone_command(current_beam);
-	  adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-	  adjust_rfc(); /* sets freq in rf-cavities from probe */
-	  pefill_(&ierr);
-	  pemima_();
-	  plotit_(&plots_made);
-	  plots_made = 1;
-	}
+    {
+      adjust_beam();
+      probe_beam = clone_command(current_beam);
+      adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
+      adjust_rfc(); /* sets freq in rf-cavities from probe */
+      pefill_(&ierr);
+      pemima_();
+      plotit_(&plots_made);
+      plots_made = 1;
+    }
       if (nt) title = pt;
     }
 
@@ -2334,7 +2334,7 @@ void exec_sodd(struct in_cmd* cmd)
 
   pos = name_list_pos("nosixtrack", nl_sodd);
   nosixtrack = nl_sodd->inform[pos];
-  if(nosixtrack == 0) 
+  if(nosixtrack == 0)
     {
       printf("Build-up of input file fc.34 by call to program sixtrack. \n");
       conv_sixtrack(cmd);
@@ -2394,11 +2394,11 @@ void select_ptc_normal(struct in_cmd* cmd)
   struct name_list* nl;
   struct command_parameter_list* pl;
   struct table* t;
-  int pos; 
+  int pos;
   int i, j, jj, curr, max_rows = 101;
   int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
-  char names[PTC_NAMES_L][5]= 
+  char names[PTC_NAMES_L][5]=
     {"dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml"};
   int min_req_order;
   double order[4],n1,n2,n3,n4;
@@ -2426,92 +2426,92 @@ void select_ptc_normal(struct in_cmd* cmd)
   if (t->curr < max_rows)
     {
       for (j = 0; j < PTC_NAMES_L; j++)
-	{
-	  /* Treat each ptc variable */
-	  
-	  pos = name_list_pos(names[j], nl);
-	  if (pos > -1 && nl->inform[pos])
-	    {
-	      curr = pl->parameters[pos]->m_string->curr;
-	      if (curr > 4) 
-		printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
-	      for (i = 0; i < curr; i++)
-		{
-		  order_list = pl->parameters[pos]->m_string->p[i];
-		  order[i] = (double)atoi(order_list);
-		}
+    {
+      /* Treat each ptc variable */
 
-	      if (j == 10)
-		{
-		  min_req_order = order[0]+order[1]+order[2];
-		  mynres = 0;
-		  skew = 0;
-		  mynorder = (int)order[0];
-		  if (mynorder < 0) skew = 1;
-		  mynorder = abs(mynorder);
-		  myn1 = (int)order[1];
-		  myn2 = (int)order[2];
-		  min_req_order = mynorder;
-		  res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
-		  if (mynres > 0)
-		    {
-		      for (jj = 0; jj < mynres; jj++)
-			{
-			  n1 = (double)indexa[0][jj];
-			  n2 = (double)indexa[1][jj];
-			  n3 = (double)indexa[2][jj];
-			  n4 = (double)indexa[3][jj];
-			  string_to_table("normal_results", "name", "hamc");
-			  double_to_table("normal_results", "order1", &n1);
-			  double_to_table("normal_results", "order2", &n2);
-			  double_to_table("normal_results", "order3", &n3);
-			  double_to_table("normal_results", "order4", &n4);
-			  augment_count("normal_results");
-			  string_to_table("normal_results", "name", "hams");
-			  double_to_table("normal_results", "order1", &n1);
-			  double_to_table("normal_results", "order2", &n2);
-			  double_to_table("normal_results", "order3", &n3);
-			  double_to_table("normal_results", "order4", &n4);
-			  augment_count("normal_results");			  
-			  string_to_table("normal_results", "name", "hama");
-			  double_to_table("normal_results", "order1", &n1);
-			  double_to_table("normal_results", "order2", &n2);
-			  double_to_table("normal_results", "order3", &n3);
-			  double_to_table("normal_results", "order4", &n4);
-			  augment_count("normal_results");			  			  
-			}
-		    }
-		  string_to_table("normal_results", "name", "haml");
-		  double_to_table("normal_results", "order1", &order[0]);
-		  double_to_table("normal_results", "order2", &order[1]);
-		  double_to_table("normal_results", "order3", &order[2]);
-		  double_to_table("normal_results", "order4", &order[3]);
-		  n1 = (double)mynres;
-		  double_to_table("normal_results", "value", &n1);
-		  augment_count("normal_results");
-		}
-	      else
-		{
-		  string_to_table("normal_results", "name", names[j]);
-		  double_to_table("normal_results", "order1", &order[0]);
-		  double_to_table("normal_results", "order2", &order[1]);
-		  double_to_table("normal_results", "order3", &order[2]);
-		  double_to_table("normal_results", "order4", &order[3]);
-		  augment_count("normal_results");
-		  min_req_order = order[0]+order[1]+order[2];
-		  if (j >= 9) min_req_order += order[0]+order[1];
-		  if (j >= 7) min_req_order += 1;
-		}
-	      if (min_order < min_req_order) min_order = min_req_order;
-	    } 
-	}
+      pos = name_list_pos(names[j], nl);
+      if (pos > -1 && nl->inform[pos])
+        {
+          curr = pl->parameters[pos]->m_string->curr;
+          if (curr > 4)
+        printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
+          for (i = 0; i < curr; i++)
+        {
+          order_list = pl->parameters[pos]->m_string->p[i];
+          order[i] = (double)atoi(order_list);
+        }
+
+          if (j == 10)
+        {
+          min_req_order = order[0]+order[1]+order[2];
+          mynres = 0;
+          skew = 0;
+          mynorder = (int)order[0];
+          if (mynorder < 0) skew = 1;
+          mynorder = abs(mynorder);
+          myn1 = (int)order[1];
+          myn2 = (int)order[2];
+          min_req_order = mynorder;
+          res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
+          if (mynres > 0)
+            {
+              for (jj = 0; jj < mynres; jj++)
+            {
+              n1 = (double)indexa[0][jj];
+              n2 = (double)indexa[1][jj];
+              n3 = (double)indexa[2][jj];
+              n4 = (double)indexa[3][jj];
+              string_to_table("normal_results", "name", "hamc");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+              string_to_table("normal_results", "name", "hams");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+              string_to_table("normal_results", "name", "hama");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+            }
+            }
+          string_to_table("normal_results", "name", "haml");
+          double_to_table("normal_results", "order1", &order[0]);
+          double_to_table("normal_results", "order2", &order[1]);
+          double_to_table("normal_results", "order3", &order[2]);
+          double_to_table("normal_results", "order4", &order[3]);
+          n1 = (double)mynres;
+          double_to_table("normal_results", "value", &n1);
+          augment_count("normal_results");
+        }
+          else
+        {
+          string_to_table("normal_results", "name", names[j]);
+          double_to_table("normal_results", "order1", &order[0]);
+          double_to_table("normal_results", "order2", &order[1]);
+          double_to_table("normal_results", "order3", &order[2]);
+          double_to_table("normal_results", "order4", &order[3]);
+          augment_count("normal_results");
+          min_req_order = order[0]+order[1]+order[2];
+          if (j >= 9) min_req_order += order[0]+order[1];
+          if (j >= 7) min_req_order += 1;
+        }
+          if (min_order < min_req_order) min_order = min_req_order;
+        }
+    }
     }
   printf("The minimum required order is %d \n",min_order);
 }
 int select_ptc_idx()
 {
   struct table* t;
-  int pos; 
+  int pos;
 
   if ((pos = name_list_pos("normal_results", table_register->names)) > -1)
     {
@@ -2793,7 +2793,7 @@ void fill_twiss_header(struct table* t)
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
   strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""), 
+  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dummy);
   i = get_string("beam", "particle", tmp);
@@ -3035,7 +3035,7 @@ int get_select_ranges(struct sequence* sequ, struct command_list* select,
   return s_ranges->curr;
 }
 
-void get_select_t_ranges(struct command_list* select, 
+void get_select_t_ranges(struct command_list* select,
                          struct command_list* deselect, struct table* t)
      /* makes a list of table rows that pass the range selection and
         subsequent deselection */
@@ -3053,7 +3053,7 @@ void get_select_t_ranges(struct command_list* select,
      pl = select->commands[i]->par;
      pos = name_list_pos("range", nl);
      if (pos > -1 && nl->inform[pos]  /* parameter has been read */
-	 && get_table_range(pl->parameters[pos]->string, t, rows)
+     && get_table_range(pl->parameters[pos]->string, t, rows)
          && (rows[0] <= rows[1]))
            {
             if (s_range->max == s_range->curr) grow_int_array(s_range);
@@ -3078,7 +3078,7 @@ void get_select_t_ranges(struct command_list* select,
      pl = deselect->commands[i]->par;
      pos = name_list_pos("range", nl);
      if (pos > -1 && nl->inform[pos]  /* parameter has been read */
-	 && get_table_range(pl->parameters[pos]->string, t, rows)
+     && get_table_range(pl->parameters[pos]->string, t, rows)
          && (rows[0] <= rows[1]))
            {
             if (sd_range->max == sd_range->curr) grow_int_array(sd_range);
@@ -3429,7 +3429,7 @@ int interp_node(int *nint)
   number_nodes = *nint - 1;
 
 
-  /* Set up length, angle and e2 of the first slice 
+  /* Set up length, angle and e2 of the first slice
     (first node in the original sequence) */
 
   first_node = current_node;
@@ -3450,11 +3450,11 @@ int interp_node(int *nint)
       hgap = command_par_value("hgap", el->def);
 
       if (rbend)
-	{
-	  e1 = e1 + angle / two;
-	  e2 = e2 + angle / two;
-	  strcpy(elem_name,"sbend");
-	}
+    {
+      e1 = e1 + angle / two;
+      e2 = e2 + angle / two;
+      strcpy(elem_name,"sbend");
+    }
       angle = angle/numint;
       store_node_value("angle",&angle);
       store_node_value("e1",&e1);
@@ -3494,10 +3494,10 @@ int interp_node(int *nint)
 
   /* set last node in the range to the current node */
 
-  current_sequ->range_end = current_node; 
+  current_sequ->range_end = current_node;
 
 
-  /* insert nint - 1 nodes in between the two main nodes */ 
+  /* insert nint - 1 nodes in between the two main nodes */
 
   for (j = 1; j <= number_nodes; j++)
     {
@@ -3508,35 +3508,35 @@ int interp_node(int *nint)
       store_node_value("dipole_bv",&bv);
       store_node_value("other_bv",&bvk);
       if (bend_flag)
-	{
-	  if (j == 1)
-	    {
-	      store_node_value("e2",&e2);
-	      store_node_value("h2",&h2);
-	      store_node_value("hgap",&hgap);
-	      if (fintx_plot < zero) 
-		store_node_value("fintx",&fint);
-	      else
-		store_node_value("fintx",&fintx_plot);
-	      store_node_value("fint",&zero);
-	    }
-	  else
-	    {
-	      store_node_value("e2",&zero);
-	      store_node_value("h2",&zero);
-	      store_node_value("fint",&zero);
-	      store_node_value("fintx",&minus_one);
-	      store_node_value("hgap",&zero);
-	    }
-	  store_node_value("e1",&zero);
-	  store_node_value("h1",&zero);
-	}
+    {
+      if (j == 1)
+        {
+          store_node_value("e2",&e2);
+          store_node_value("h2",&h2);
+          store_node_value("hgap",&hgap);
+          if (fintx_plot < zero)
+        store_node_value("fintx",&fint);
+          else
+        store_node_value("fintx",&fintx_plot);
+          store_node_value("fint",&zero);
+        }
+      else
+        {
+          store_node_value("e2",&zero);
+          store_node_value("h2",&zero);
+          store_node_value("fint",&zero);
+          store_node_value("fintx",&minus_one);
+          store_node_value("hgap",&zero);
+        }
+      store_node_value("e1",&zero);
+      store_node_value("h1",&zero);
+    }
       clone = clone_node(first_node,0);
      if (bend_flag)
-	{
-	  clone->p_elem = clone_element(first_node->p_elem);
-	  clone->p_elem->def = clone_command(first_node->p_elem->def);
-	}
+    {
+      clone->p_elem = clone_element(first_node->p_elem);
+      clone->p_elem->def = clone_command(first_node->p_elem->def);
+    }
     }
 
   current_node = current_node->previous;
@@ -3917,30 +3917,30 @@ void pro_aperture(struct in_cmd* cmd)
   double interval;
   setbuf(stdout,(char *)NULL);
 
-  embedded_twiss_cmd = cmd; 
+  embedded_twiss_cmd = cmd;
 
   /* check for valid sequence, beam and Twiss table */
   if (current_sequ != NULL && current_sequ->length != zero)
   {
-  	if (attach_beam(current_sequ) == 0)
-	{
-		fatal_error("Aperture module - sequence without beam:", 
-							current_sequ->name);
-	}
+    if (attach_beam(current_sequ) == 0)
+    {
+        fatal_error("Aperture module - sequence without beam:",
+                            current_sequ->name);
+    }
   }
   else fatal_error("Aperture module - no active sequence:", current_sequ->name);
 
   if (current_sequ->tw_table == NULL)
   {
-  	warning("No TWISS table present","Aperture command ignored");
-	return;
+    warning("No TWISS table present","Aperture command ignored");
+    return;
   }
 
   range = command_par_string("range", this_cmd->clone);
   if (get_ex_range(range, current_sequ, use_range) == 0)
   {
-  	warning("Illegal range.","Aperture command ignored");
-	return;
+    warning("Illegal range.","Aperture command ignored");
+    return;
   }
   current_node = use_range[0];
 
@@ -3950,20 +3950,20 @@ void pro_aperture(struct in_cmd* cmd)
   tw_cnt=1; /* table starts at 1 seen from char_from_table function */
   if (char_from_table(tw_cp->name, "name", &tw_cnt, tw_name) != 0)
   {
-  	warning("Erroneus Twiss table.","Aperture command ignored.");
-	return;
+    warning("Erroneus Twiss table.","Aperture command ignored.");
+    return;
   }
   aper_trim_ws(tw_name, NAME_L);
   while (strcmp(tw_name,current_node->name))
   {
-	tw_cnt++;
-	if (tw_cnt > tw_cp->curr)
-	{
-		warning("Could not find range start in Twiss table", "Aperture command ignored.");
-		return;
-	}
-	char_from_table(tw_cp->name, "name", &tw_cnt, tw_name);
-	aper_trim_ws(tw_name, NAME_L);
+    tw_cnt++;
+    if (tw_cnt > tw_cp->curr)
+    {
+        warning("Could not find range start in Twiss table", "Aperture command ignored.");
+        return;
+    }
+    char_from_table(tw_cp->name, "name", &tw_cnt, tw_name);
+    aper_trim_ws(tw_name, NAME_L);
   }
   tw_cnt--; /* jumps back to "real" value */
 
@@ -3975,24 +3975,24 @@ void pro_aperture(struct in_cmd* cmd)
   aperture_table=make_table(table, table, ap_table_cols, ap_table_types, rows);
   aperture_table->dynamic=1;
   add_to_table_list(aperture_table, table_register);
-  
+
   /* calculate apertures and fill table */
   limit_node = aperture(table, use_range, tw_cp, &tw_cnt);
 
   if (limit_node->n1 != -1)
   {
-  	printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n",
-	limit_node->name,limit_node->n1,limit_node->s);
-	file = command_par_string("file", this_cmd->clone);
-	if (file != NULL)
-	{
-		aper_header(aperture_table, limit_node);
-		out_table(table, aperture_table, file);
-	}
-	if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
+    printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n",
+    limit_node->name,limit_node->n1,limit_node->s);
+    file = command_par_string("file", this_cmd->clone);
+    if (file != NULL)
+    {
+        aper_header(aperture_table, limit_node);
+        out_table(table, aperture_table, file);
+    }
+    if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
   }
   else warning("Could not run aperture command.","Aperture command ignored");
-  
+
   /* set pointer to updated Twiss table */
   current_sequ->tw_table=tw_cp;
 }
@@ -4125,14 +4125,14 @@ void pro_touschek(struct in_cmd* cmd)
       warning("no TWISS table present","touschek command ignored");
   else
     {
-      
-     if(get_option("centre")) 
+
+     if(get_option("centre"))
        {
-	 printf("Yes centre on \n");
+     printf("Yes centre on \n");
        }
      else
        {
-	 printf("NO centre off \n");
+     printf("NO centre off \n");
        }
      if ((current_beam
           = find_command(twiss_table->org_sequ->name, beam_list)) == NULL)
@@ -4484,7 +4484,7 @@ void pro_twiss()
        }
     }
   pos = name_list_pos("centre", nl);
-  if(nl->inform[pos]) 
+  if(nl->inform[pos])
     set_option("centre", &k);
   else
     {
@@ -4635,7 +4635,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   double betx,bety,alfx,mux,alfy,muy,x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,
          phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
          r11,r12,r21,r22,s;
-  int i, jt, l, lp, k_orb = 0, u_orb = 0, pos, k = 1; 
+  int i, jt, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
   int ks, w_file, beta_def, err = 0, inval = 1;
   int keep_info = get_option("info");
 
@@ -4694,9 +4694,9 @@ void pro_embedded_twiss(struct command* current_global_twiss)
       twiss_tb = table_register->tables[pos];
       if (twiss_tb->origin ==1) return; /* table is read, has no node pointers */
       for (jt = 0; jt < twiss_tb->curr; jt++)
-	{
-	  if (twiss_tb->p_nodes[jt] == current_sequ->range_start) break;
-	}
+    {
+      if (twiss_tb->p_nodes[jt] == current_sequ->range_start) break;
+    }
     }
   if((pos = name_list_pos("useorbit", nl)) > -1 &&nl->inform[pos])
     /* orbit specified */
@@ -4781,7 +4781,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
 
   if (jt <= 0) err = 1;
   if (err == 0)
-    { 
+    {
       err = double_from_table(table_name, "betx", &jt, &betx);
       err = double_from_table(table_name, "bety", &jt, &bety);
       err = double_from_table(table_name, "alfx", &jt, &alfx);
@@ -4890,61 +4890,61 @@ void pro_embedded_twiss(struct command* current_global_twiss)
       tarr = new_int_array(l+1);
       conv_char(table_embedded_name, tarr);
       if (get_option("twiss_sector"))
-	{
-	  reset_sector(current_sequ, 0);
-	  set_sector();
-	}
+    {
+      reset_sector(current_sequ, 0);
+      set_sector();
+    }
 
       if (get_option("useorbit"))
-	copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
+    copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
       else if (guess_flag)
-	{
-	  for (i = 0; i < 6; i++)
-	    {
-	      if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
-	    }
-	}
+    {
+      for (i = 0; i < 6; i++)
+        {
+          if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
+        }
+    }
 
       if(twiss_deltas->curr <= 0)
-	fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
-      
+    fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
+
       for (i = 0; i < twiss_deltas->curr; i++)
-	{
-	  twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
+    {
+      twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
                             twiss_table_types, current_sequ->n_nodes);
 
-	  twiss_table->dynamic = 1; /* flag for table row access to current row */
+      twiss_table->dynamic = 1; /* flag for table row access to current row */
 
-	  add_to_table_list(twiss_table, table_register);
-	  
-	  keep_table = current_sequ->tw_table;
-	  current_sequ->tw_table = twiss_table;
+      add_to_table_list(twiss_table, table_register);
 
-	  twiss_table->org_sequ = current_sequ;
-	  adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
+      keep_table = current_sequ->tw_table;
+      current_sequ->tw_table = twiss_table;
 
-	  adjust_rfc(); /* sets freq in rf-cavities from probe */
-	  current_node = current_sequ->range_start;
-	  set_option("twiss_inval", &inval);
+      twiss_table->org_sequ = current_sequ;
+      adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
 
-	  twiss_(oneturnmat, disp0, tarr->i);
+      adjust_rfc(); /* sets freq in rf-cavities from probe */
+      current_node = current_sequ->range_start;
+      set_option("twiss_inval", &inval);
 
-	  if ((twiss_success = get_option("twiss_success")))
-	    {
-	      if (get_option("keeporbit"))  copy_double(orbit0,
+      twiss_(oneturnmat, disp0, tarr->i);
+
+      if ((twiss_success = get_option("twiss_success")))
+        {
+          if (get_option("keeporbit"))  copy_double(orbit0,
                         current_sequ->orbits->vectors[k_orb]->a, 6);
-	      fill_twiss_header(twiss_table);
-	      if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-	      if (w_file) out_table(table_embedded_name, twiss_table, filename);
-	    }
-	  else warning("Twiss failed: ", "MAD-X continues");
+          fill_twiss_header(twiss_table);
+          if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
+          if (w_file) out_table(table_embedded_name, twiss_table, filename);
+        }
+      else warning("Twiss failed: ", "MAD-X continues");
 
-	}
+    }
 
       if (sec_file)
-	{
-	  fclose(sec_file); sec_file = NULL;
-	}
+    {
+      fclose(sec_file); sec_file = NULL;
+    }
       tarr = delete_int_array(tarr);
       if (twiss_success && get_option("twiss_print")) print_table(summ_table);
     }
@@ -5491,11 +5491,11 @@ int reset_interpolation(int *nint)
   /* reset current_node at first node */
 
   for (j = 1; j <= *nint ; j++)
-    current_node = current_node->previous; 
+    current_node = current_node->previous;
 
   /* reset length of first node */
 
-  length = numint*current_node->length;  
+  length = numint*current_node->length;
   current_node->length = length;
 
   /* resets angle and saves e1 if the element is a bending magnet */
@@ -5530,7 +5530,7 @@ int reset_interpolation(int *nint)
       h2 = node_value("h2");
     }
 
-  /* delete the interpolating nodes */ 
+  /* delete the interpolating nodes */
 
   for (j = 2; j <= *nint; j++)
     {
@@ -5538,10 +5538,10 @@ int reset_interpolation(int *nint)
 
       retreat_node();
       if (bend_flag)
-	{
-	  c_node->p_elem->def = delete_command(c_node->p_elem->def);
-	  c_node->p_elem = delete_element(c_node->p_elem);
-	}
+    {
+      c_node->p_elem->def = delete_command(c_node->p_elem->def);
+      c_node->p_elem = delete_element(c_node->p_elem);
+    }
        delete_node(c_node);
     }
 
@@ -5559,11 +5559,11 @@ int reset_interpolation(int *nint)
   if (bend_flag)
     {
       if (rbend)
-	{
-	  strcpy(current_node->p_elem->base_type->name,"rbend");
-	  e1 = e1 - angle / two;
-	  e2 = e2 - angle / two;
-	}
+    {
+      strcpy(current_node->p_elem->base_type->name,"rbend");
+      e1 = e1 - angle / two;
+      e2 = e2 - angle / two;
+    }
     store_node_value("e1",&e1);
     store_node_value("e2",&e2);
     store_node_value("h1",&h1);
@@ -6063,9 +6063,9 @@ void seq_replace(struct in_cmd* cmd)
           warning("'by' missing, ","ignored");
           return;
          }
-	rep_nodes = (struct node**)
+    rep_nodes = (struct node**)
         mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
-	rep_els = (struct element**) 
+    rep_els = (struct element**)
         mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
         if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
                == 0) any = 1;
@@ -6082,11 +6082,11 @@ void seq_replace(struct in_cmd* cmd)
                   pass_select(name,
                           seqedit_select->commands[k])) break;
              }
-            if (k < seqedit_select->curr) 
-	     {
-	      rep_els[rep_cnt] = el;
+            if (k < seqedit_select->curr)
+         {
+          rep_els[rep_cnt] = el;
               rep_nodes[rep_cnt++] = c_node;
-	     }
+         }
            }
           if (c_node == edit_sequ->end) break;
           c_node = c_node->next;
@@ -6097,7 +6097,7 @@ void seq_replace(struct in_cmd* cmd)
      {
       rep_nodes = (struct node**)
       mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
-      rep_els = (struct element**) 
+      rep_els = (struct element**)
       mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
       strcpy(c_dummy, name);
       square_to_colon(c_dummy);
@@ -6108,10 +6108,10 @@ void seq_replace(struct in_cmd* cmd)
         if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
          {
           if ((el = find_element(name, element_list)) != NULL)
-	   {
-	    rep_els[rep_cnt] = el;
+       {
+        rep_els[rep_cnt] = el;
             rep_nodes[rep_cnt++] = node;
-	   }
+       }
           else warning("ignoring unknown 'by' element: ",name);
          }
         else warning("'by' missing, ","ignored");
@@ -6422,7 +6422,7 @@ void set_selected_errors()
     }
 }
 
-void set_selected_rows(struct table* t, struct command_list* select, 
+void set_selected_rows(struct table* t, struct command_list* select,
                        struct command_list* deselect)
 {
   int i, j;

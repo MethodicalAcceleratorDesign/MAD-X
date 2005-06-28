@@ -13,7 +13,7 @@ char predef_constants[] =
 "const clight = 299792458.; "
 "const qelect = 1.602176462e-19; "
 "const hbar = 6.58211889e-25; "
-"const erad = 2.817940325e-15; " 
+"const erad = 2.817940325e-15; "
 "const prad = erad*emass/pmass; ";
 
 
@@ -87,26 +87,26 @@ char command_def[] =
 "charge   = [r, 1]; "
 " "
 "aperture: aperture none 0 0 "
-"file     = [s, none, none], "		 /* output file with aperture table */
-"halofile = [s, none, none], "	 	 /* input file w/halo polygon coordinates */
-/* "pipefile = [s, none, none], " */	 /* input file w/pipe polygon coordinates */
-"range    = [s, #s/#e, none], " 	 /* range */
-"exn      = [r, 3.75e-6], " 		 /* norm. emit */
-"eyn      = [r, 3.75e-6], " 		 /* norm. emit */
+"file     = [s, none, none], "       /* output file with aperture table */
+"halofile = [s, none, none], "       /* input file w/halo polygon coordinates */
+/* "pipefile = [s, none, none], " */     /* input file w/pipe polygon coordinates */
+"range    = [s, #s/#e, none], "      /* range */
+"exn      = [r, 3.75e-6], "          /* norm. emit */
+"eyn      = [r, 3.75e-6], "          /* norm. emit */
 "dqf      = [r, 2.086], "                /* peak linear dispersion */
 "betaqfx  = [r, 170.25], "               /* beta x in standard qf */
-"dp       = [r, 0.0015], " 		 /* bucket edge at injection */
-"dparx    = [r, 0.273], " 		 /* fractional parasitic dispersion - horizontal */
-"dpary    = [r, 0.273], " 		 /* fractional parasitic dispersion - vertical */
-"cor      = [r, 0.004], " 		 /* maximum radial closed orbit */
-"bbeat    = [r, 1.1], " 		 /* beta beating coefficient applying to beam size*/
-"nco      = [i, 5], " 			 /* number of azimuth for radial scan */
+"dp       = [r, 0.0015], "       /* bucket edge at injection */
+"dparx    = [r, 0.273], "        /* fractional parasitic dispersion - horizontal */
+"dpary    = [r, 0.273], "        /* fractional parasitic dispersion - vertical */
+"cor      = [r, 0.004], "        /* maximum radial closed orbit */
+"bbeat    = [r, 1.1], "          /* beta beating coefficient applying to beam size*/
+"nco      = [i, 5], "            /* number of azimuth for radial scan */
 "halo     = [r, {6., 8.4, 7.3, 7.3}], "  /* halo parameters: n, r, h, v */
-"interval = [r, 1.], "			 /* length in meters between measurements */
-"spec     = [r, 0.], "			 /* aperture spec, for plotting only */
-"notsimple = [l, false, true], "		 /* use if beam pipe is not a simply connex */
-"trueprofile = [s, none, none], "	 /* read discrete displacements from this file */
-"offsetelem = [s, none, none]; "	 /* read off-axis data from this file */
+"interval = [r, 1.], "           /* length in meters between measurements */
+"spec     = [r, 0.], "           /* aperture spec, for plotting only */
+"notsimple = [l, false, true], "         /* use if beam pipe is not a simply connex */
+"trueprofile = [s, none, none], "    /* read discrete displacements from this file */
+"offsetelem = [s, none, none]; "     /* read off-axis data from this file */
 " "
 "assign: control none 0 0 "
 "echo     = [s, terminal, none]; "
@@ -1622,7 +1622,7 @@ char command_def[] =
 "ddpx     = [r, 0.0], "
 "ddy      = [r, 0.0], "
 "ddpy     = [r, 0.0], "
-"mvar1    = [r, 10.0], " 
+"mvar1    = [r, 10.0], "
 "mvar2    = [r, 10.0], "
 "mvar3    = [r, 10.0], "
 "mvar4    = [r, 10.0], "

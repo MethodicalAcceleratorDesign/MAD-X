@@ -1932,7 +1932,7 @@ int inbounds(char* p, int n, char**p_list)
       if (p > p_list[j] && p < p_list[++j]) return 1;
   return 0;
 }
- 
+
 void init55(int seed)
      /* initializes random number algorithm */
 {

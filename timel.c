@@ -29,18 +29,18 @@ float timl;
                    /*  local routine to start by default  */
 static void time_init()
 {
-	struct rlimit rlimit;
-	float  maxtime;
+    struct rlimit rlimit;
+    float  maxtime;
 
-	maxtime=deftim;
+    maxtime=deftim;
 
-	if (getrlimit(RLIMIT_CPU, &rlimit)==0) {
-		if ( rlimit.rlim_cur != RLIM_INFINITY )
-		   maxtime = (float) rlimit.rlim_cur;
-	}	
+    if (getrlimit(RLIMIT_CPU, &rlimit)==0) {
+        if ( rlimit.rlim_cur != RLIM_INFINITY )
+           maxtime = (float) rlimit.rlim_cur;
+    }
 
-	time_st(maxtime);
-	return;
+    time_st(maxtime);
+    return;
 }
 
 void timest_(timl)

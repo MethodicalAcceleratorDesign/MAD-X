@@ -70,7 +70,7 @@ const char* cmd_match_base[] =
 
 char* aperture_types[] =
 {
-"circle", "ellipse", "rectangle", "lhcscreen", 
+"circle", "ellipse", "rectangle", "lhcscreen",
 "marguerite", "rectellipse", "racetrack",
 " "  /* blank terminates */
 };
@@ -79,7 +79,7 @@ char* aperture_types[] =
 
 int aperture_npar[] =
 {
-1, 2, 2, 3, 
+1, 2, 2, 3,
 2, 4, 3
 };
 
@@ -256,7 +256,7 @@ int normal_res_types[] =
 
 char* normal_res_cols[] =
 {
-  "name", "order1", "order2", "order3", "order4", "value", 
+  "name", "order1", "order2", "order3", "order4", "value",
 " "  /* blank terminates */
 };
 
@@ -267,7 +267,7 @@ int sodd_detune_5_types[] =
 
 char* sodd_detune_5_cols[] =
 {
-  "mpor", "plane/mpor2", "detune", "H_inv_order", "V_inv_order", 
+  "mpor", "plane/mpor2", "detune", "H_inv_order", "V_inv_order",
 " "  /* blank terminates */
 };
 

@@ -49,7 +49,7 @@ void correct_correct(struct in_cmd* cmd)
   char rout_name[] = "correct_correct";
 */
   char  *orbtab1, *orbtab2;
-  
+
 
   /* Call for one or two ring orbit correction */
   if(command_par_value("tworing",cmd->clone)) {
@@ -62,7 +62,7 @@ void correct_correct(struct in_cmd* cmd)
            printf("Want to use orbits from: %s and : %s\n",orbtab1,orbtab2);
            correct_correct2(cmd);
   }  else {
-           printf("Want to correct orbit of a single ring\n");                    
+           printf("Want to correct orbit of a single ring\n");
            if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) != NULL) {
               warning(" "," ");
               warning("Single beam correction requested but beam 1 table supplied:",orbtab1);
@@ -93,7 +93,7 @@ void correct_correct2(struct in_cmd* cmd)
   int pos;
   struct timeb tp;
   int sflag, svdflg;
-  double  sigcut;         
+  double  sigcut;
 */
 
   int ix, im, ip, it;
@@ -272,7 +272,7 @@ void correct_correct2(struct in_cmd* cmd)
        printf("%s %e\n",c[nc[i]].p_node->name,corvec[nx[i]-1]);
     }
     printf("\n");
- 
+
     /* printf("Time after micado:  %-6.3f\n",fextim());   */
     if(ifail != 0) {
        printf("MICADO correction completed with error code %d\n\n",ifail);
@@ -281,7 +281,7 @@ void correct_correct2(struct in_cmd* cmd)
        pro_correct2_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
     }
   }
- 
+
   /* write corrector output to tfs table */
   if ((clist = command_par_string("clist",cmd->clone)) != NULL) {
     strcat(clist1,clist);
@@ -299,11 +299,11 @@ void correct_correct2(struct in_cmd* cmd)
 
 
   /* Clean up at the end of the module */
-   
+
   myfree(rout_name,nm);myfree(rout_name,dmat);myfree(rout_name,nx);
   myfree(rout_name,nc);myfree(rout_name,corvec);
   myfree(rout_name,monvec);myfree(rout_name,resvec); myfree(rout_name,conm);
-   
+
   return;
 
 }
@@ -326,7 +326,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   char* orbtab1;
   char* orbtab2;
 
-  int t1, t2;   
+  int t1, t2;
 
   int ebl1, ebl2;
 
@@ -371,10 +371,10 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   } else {
        fatal_error("Beam 1 and 2 orbit tables not found:",orbtab1);
   }
- 
+
 /* reserve space for orbit correction structures */
   if(correct_orbit12 == NULL) {
-    correct_orbit12 = (struct orb_cor2*)mycalloc("pro_correct2_gettables",1, 
+    correct_orbit12 = (struct orb_cor2*)mycalloc("pro_correct2_gettables",1,
                      sizeof(struct orb_cor2));
   }
 
@@ -396,7 +396,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 
   mon_l1 = correct_orbit12->mon_table;
   cor_l1 = correct_orbit12->cor_table;
- 
+
   for (j=0; j < b1->curr; j++) {
    if((strncmp(atm[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
       (strncmp(atm[2],      b1->p_nodes[j]->base_name,4) == 0))  {
@@ -422,7 +422,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l1->enable = b1->p_nodes[j]->enable;
         cor_l1->p_node = b1->p_nodes[j];
         cor_l1->p_node_s1 = b1->p_nodes[j];
-        cor_l1->p_node_s2 = NULL;            
+        cor_l1->p_node_s2 = NULL;
         if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
           if(iplane == 1) cor_l1->p_node_s1->chkick = 0.0;
           if(iplane == 2) cor_l1->p_node_s1->cvkick = 0.0;
@@ -463,7 +463,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l2->enable = b2->p_nodes[j]->enable;
         cor_l2->p_node = b2->p_nodes[j];
         cor_l2->p_node_s2 = b2->p_nodes[j];
-        cor_l2->p_node_s1 = NULL;            
+        cor_l2->p_node_s1 = NULL;
         if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
           if(iplane == 1) cor_l2->p_node_s2->chkick = 0.0;
           if(iplane == 2) cor_l2->p_node_s2->cvkick = 0.0;
@@ -516,7 +516,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l12->p_node_s2 = b2->p_nodes[cor_l12->id_ttb[1]];
         ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
         ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
-        cor_l12->enable = ebl1*ebl2;                  
+        cor_l12->enable = ebl1*ebl2;
         if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
           if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
           if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
@@ -564,7 +564,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
          }
        }
        prt = prt->next;
-       
+
      }
 */
 
@@ -614,7 +614,7 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
 
   m = correct_orbit12->mon_table;
 
-  
+
   posx = name_list_pos("x",twiss_table_beam1->columns);
   posy = name_list_pos("y",twiss_table_beam1->columns);
   pospx = name_list_pos("px",twiss_table_beam1->columns);
@@ -806,10 +806,10 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
               pix_c = da1[5][c->id_ttb[icb]];
               piy_c = da1[8][c->id_ttb[icb]];
            } else {
-              bx_c = 0.0;                    
-              by_c = 0.0;                     
-              pix_c = 0.0;                     
-              piy_c = 0.0;                         
+              bx_c = 0.0;
+              by_c = 0.0;
+              pix_c = 0.0;
+              piy_c = 0.0;
            }
          } else {
            correct_orbit12->qx0 = da2[5][twiss_table_beam2->curr-1];
@@ -822,10 +822,10 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
               pix_c = da2[5][c->id_ttb[icb]];
               piy_c = da2[8][c->id_ttb[icb]];
            } else {
-              bx_c = 0.0;                    
-              by_c = 0.0;                     
-              pix_c = 0.0;                     
-              piy_c = 0.0;                         
+              bx_c = 0.0;
+              by_c = 0.0;
+              pix_c = 0.0;
+              piy_c = 0.0;
            }
          }
 
@@ -836,8 +836,8 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
             printf("monitor flag: %d\n",m->enable);
               }
             if(m->enable == 1) {
-             if((m->id_ttb[icb] > 0) && (c->id_ttb[icb] > 0)) { 
-              if(m->id_ttb[icb] > 0) { 
+             if((m->id_ttb[icb] > 0) && (c->id_ttb[icb] > 0)) {
+              if(m->id_ttb[icb] > 0) {
                 if(icb == 0) {
                    mp = m->id_ttb[icb];
                    bx_m = da1[3][mp];
@@ -852,12 +852,12 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
                    piy_m = da2[8][mp];
                 }
               } else {
-                   bx_m = 0.0;        
-                   by_m = 0.0;        
-                   pix_m = 0.0;       
-                   piy_m = 0.0;         
+                   bx_m = 0.0;
+                   by_m = 0.0;
+                   pix_m = 0.0;
+                   piy_m = 0.0;
               }
-      
+
               respx = 0.0;
               respy = 0.0;
 
@@ -879,14 +879,14 @@ double* pro_correct2_response_ring(int ip, int nc, int nm)
                   if(icb != 0) { respy =  respy; }
                   setup_(&respy, dmat, &im, &ic, &nm, &nc);
               }
-              if((fabs(respy) > 0.000006) || (fabs(respx) > 0.000006)) { 
+              if((fabs(respy) > 0.000006) || (fabs(respx) > 0.000006)) {
                  if (get_option("debug"))  {
-                    printf("true %d %d",ic,im); 
+                    printf("true %d %d",ic,im);
                  }
                     setupi_(&i_one, imat, &im, &ic, &nm, &nc);
               } else {
                  if (get_option("debug"))  {
-                    printf("false "); 
+                    printf("false ");
                  }
                     setupi_(&i_zero, imat, &im, &ic, &nm, &nc);
               }
@@ -974,7 +974,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
     if(print_correct_opt > 1) {
       printf("%s %-3.6f %-3.6f %-3.6f\n",c[nc[i]].p_node->name,
                                          c[nc[i]].val.before[ip-1],
-                                         corvec[nx[i]-1]+c[nc[i]].val.before[ip-1], 
+                                         corvec[nx[i]-1]+c[nc[i]].val.before[ip-1],
                                          corvec[nx[i]-1]);
     }
 
@@ -1549,35 +1549,35 @@ int pro_correct_getorbit(struct in_cmd* cmd)
 
   m = correct_orbit->mon_table;
 
-  
-  if((posx = name_list_pos("x",ttb->columns)) < 0) { 
+
+  if((posx = name_list_pos("x",ttb->columns)) < 0) {
       fatal_error("orbit x not found in input table",", MAD-X terminates ");
   }
-  if((posy = name_list_pos("y",ttb->columns)) < 0) { 
+  if((posy = name_list_pos("y",ttb->columns)) < 0) {
       fatal_error("orbit y not found in input table",", MAD-X terminates ");
   }
   if (get_option("debug")) {
-    if((pospx = name_list_pos("px",ttb->columns)) < 0) { 
+    if((pospx = name_list_pos("px",ttb->columns)) < 0) {
         fatal_error("orbit px not found in input table",", MAD-X terminates ");
     }
-    if((pospy = name_list_pos("py",ttb->columns)) < 0) { 
+    if((pospy = name_list_pos("py",ttb->columns)) < 0) {
         fatal_error("orbit py not found in input table",", MAD-X terminates ");
     }
     printf("====c1===>  %d %d %d %d \n",posx,posy,pospx,pospy);
   }
 
   if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
-    if((tosx = name_list_pos("x",tar->columns)) < 0) { 
+    if((tosx = name_list_pos("x",tar->columns)) < 0) {
         fatal_error("target orbit x not found in table",", MAD-X terminates ");
     }
-    if((tosy = name_list_pos("y",tar->columns)) < 0) { 
+    if((tosy = name_list_pos("y",tar->columns)) < 0) {
         fatal_error("target orbit y not found in table",", MAD-X terminates ");
     }
     if (get_option("debug")) {
-      if((tospx = name_list_pos("px",tar->columns)) < 0) { 
+      if((tospx = name_list_pos("px",tar->columns)) < 0) {
           fatal_error("target orbit px not found in table",", MAD-X terminates ");
       }
-      if((tospy = name_list_pos("py",tar->columns)) < 0) { 
+      if((tospy = name_list_pos("py",tar->columns)) < 0) {
           fatal_error("target orbit px not found in table",", MAD-X terminates ");
       }
       printf("====c1===>  %d %d %d %d \n",tosx,tosy,tospx,tospy);
@@ -1689,35 +1689,35 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
 
   m = correct_orbit->mon_table;
 
-  
-  if((posx = name_list_pos("x",ttb->columns)) < 0) { 
+
+  if((posx = name_list_pos("x",ttb->columns)) < 0) {
       fatal_error("orbit x not found in input table",", MAD-X terminates ");
   }
-  if((posy = name_list_pos("y",ttb->columns)) < 0) { 
+  if((posy = name_list_pos("y",ttb->columns)) < 0) {
       fatal_error("orbit y not found in input table",", MAD-X terminates ");
   }
   if (get_option("debug")) {
-    if((pospx = name_list_pos("px",ttb->columns)) < 0) { 
+    if((pospx = name_list_pos("px",ttb->columns)) < 0) {
         warning("orbit px not found in input table",", MAD-X continues ");
     }
-    if((pospy = name_list_pos("py",ttb->columns)) < 0) { 
+    if((pospy = name_list_pos("py",ttb->columns)) < 0) {
         warning("orbit py not found in input table",", MAD-X continues ");
     }
     printf("====c1===>  %d %d %d %d \n",posx,posy,pospx,pospy);
   }
 
   if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
-    if((tosx = name_list_pos("x",tar->columns)) < 0) { 
+    if((tosx = name_list_pos("x",tar->columns)) < 0) {
         fatal_error("target orbit x not found in table",", MAD-X terminates ");
     }
-    if((tosy = name_list_pos("y",tar->columns)) < 0) { 
+    if((tosy = name_list_pos("y",tar->columns)) < 0) {
         fatal_error("target orbit y not found in table",", MAD-X terminates ");
     }
     if (get_option("debug")) {
-      if((tospx = name_list_pos("px",tar->columns)) < 0) { 
+      if((tospx = name_list_pos("px",tar->columns)) < 0) {
           warning("target orbit px not found in table",", MAD-X continues ");
       }
-      if((tospy = name_list_pos("py",tar->columns)) < 0) { 
+      if((tospy = name_list_pos("py",tar->columns)) < 0) {
           warning("target orbit px not found in table",", MAD-X continues ");
       }
       printf("====c1===>  %d %d %d %d \n",tosx,tosy,tospx,tospy);
@@ -2351,7 +2351,7 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
     if(print_correct_opt > 1) {
       printf("%s %-3.6f %-3.6f %-3.6f\n",c[nc[i]].p_node->name,
                                          c[nc[i]].val.before[ip-1],
-                                         corvec[nx[i]-1]+c[nc[i]].val.before[ip-1], 
+                                         corvec[nx[i]-1]+c[nc[i]].val.before[ip-1],
                                          corvec[nx[i]-1]);
     }
 
@@ -2548,7 +2548,7 @@ double copk(double *r, int m)
   return(xpk);
 }
 
-unsigned int locf_(iadr)           
+unsigned int locf_(iadr)
 #define NADUPW 4   /* Number of ADdress Units Per Word */
 #define LADUPW 2   /* Logarithm base 2 of ADdress Units Per Word */
      char *iadr;
@@ -2931,7 +2931,7 @@ void correct_setcorr(struct in_cmd* cmd)
 {
 
 /* read the correctors from named table  and stores
-   them in the nodes of the sequence at 
+   them in the nodes of the sequence at
    "->chkick" and "->cvkick". Subsequent Twiss will
    use them correctly.
    ===> Must be preceded by a call to "read_table"
@@ -2970,7 +2970,7 @@ void correct_setcorr(struct in_cmd* cmd)
           printf("The table ==> %s <=== was found \n",namtab);
        } else {
           /* fatal_error("Corrector table requested, but not existing:",namtab); */
-          /* exit(-77); */ 
+          /* exit(-77); */
           printf("No such corrector table in memory: %s\n",namtab);
        }
 
@@ -2993,25 +2993,25 @@ void correct_setcorr(struct in_cmd* cmd)
              strcpy(slname,strip(name));
              supp_tb(slname);
 
-          /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */   
+          /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */
           nextnode = mysequ->ex_start;
           while (nextnode != ndexe) {
              stolower(name);
              strcpy(slname,strip(name));
              supp_tb(slname);
-            
+
              strcpy(nname,nextnode->name);
              stolower(nname);
              strcpy(slnname,strip(nname));
              supp_tb(slnname);
-          
+
              /* printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
              printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); */
-       
+
              if(strcmp(slname,slnname) == 0) {
                 /*
                 printf("Corrector selection found: %s, %s %d\n",lname,nextnode->name,nextnode->sel_err);
-                printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);    
+                printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);
                 printf("corrs in sequence: %s %e %e\n",nextnode->name,nextnode->chkick,nextnode->cvkick);
                 */
                 nextnode->chkick += xnew;
@@ -3024,8 +3024,8 @@ void correct_setcorr(struct in_cmd* cmd)
                 nextnode = nextnode->next;
              }
           }
-    
-      } 
+
+      }
         i++;
   }
 
@@ -3038,7 +3038,7 @@ void correct_readcorr(struct in_cmd* cmd)
 {
 
 /* read the correctors from table "corr" and stores
-   them in the nodes of the sequence at 
+   them in the nodes of the sequence at
    "->chkick" and "->cvkick". Subsequent Twiss will
    use them correctly.
    ===> Must be preceded by a call to "read_table"
@@ -3078,30 +3078,30 @@ void correct_readcorr(struct in_cmd* cmd)
       ix = double_from_table("corr", "px.correction", &i, &xnew);
       ix = double_from_table("corr", "py.correction", &i, &ynew);
       if(ix == 0) {
-          /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */   
+          /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */
           nextnode = mysequ->ex_start;
           while (nextnode != ndexe) {
              strcpy(lname,name);
              stolower(lname);
              strcpy(slname,strip(lname));
              uslname = supp_tb(slname);
-            
+
              strcpy(nname,nextnode->name);
              strcpy(lnname,nname);
              stolower(lnname);
              strcpy(slnname,strip(lnname));
              uslnname = supp_tb(slnname);
-          
+
              /* printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
              printf("seq d in (1): %s %d %s %d\n",lnname,strlen(lnname),lname,strlen(lname));
              printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname));
-             printf("seq d in (3): %s %d %s %d\n",uslnname,strlen(uslnname),uslname,strlen(uslname)); 
+             printf("seq d in (3): %s %d %s %d\n",uslnname,strlen(uslnname),uslname,strlen(uslname));
              printf("compare: %s %d %s %d \n",uslname,strlen(uslname),uslnname,strlen(uslnname)); */
-       
+
              if(strcmp(uslname,uslnname) == 0) {
                 /*
                 printf("Corrector selection found: %s, %s %d\n",lname,nextnode->name,nextnode->sel_err);
-                printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);    
+                printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);
                 printf("corrs in sequence: %s %e %e\n",nextnode->name,nextnode->chkick,nextnode->cvkick);
                 */
                 nextnode->chkick += xnew;
@@ -3114,8 +3114,8 @@ void correct_readcorr(struct in_cmd* cmd)
                 nextnode = nextnode->next;
              }
           }
-    
-      } 
+
+      }
         i++;
   }
 

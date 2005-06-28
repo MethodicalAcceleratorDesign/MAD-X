@@ -594,7 +594,7 @@ void set_range(char*, struct sequence*);
 void set_selected_columns(struct table*, struct command_list*);
 void set_selected_elements();
 void set_selected_errors();
-void set_selected_rows(struct table*, struct command_list*, 
+void set_selected_rows(struct table*, struct command_list*,
                        struct command_list*);
 void set_twiss_deltas(struct command*);
 void set_sub_variable(char*, char*, struct in_cmd*);
@@ -751,32 +751,32 @@ int new_comb(struct reg_token*);
 
 /* Aperture module routines */
 void aper_adj_quad(double, double, double, double*, double*);
-void aper_adj_halo_si(double, double, double, double, double, double*, 
-		   double*, int, double*, double*);
+void aper_adj_halo_si(double, double, double, double, double, double*,
+           double*, int, double*, double*);
 int aper_bs(char*, double*, double*, double*, double*, int*, double*, double*);
-double aper_calc(double, double, double*, double*, double*, 
-		 int, double*, double*, double*, double*,
-		 double*, double*, int, double);
+double aper_calc(double, double, double*, double*, double*,
+         int, double*, double*, double*, double*,
+         double*, double*, int, double);
 int aper_chk_inside(double, double, double*, double*, double, int);
 int aper_e_d_read(char*, struct aper_e_d*, int*, char*);
 int aper_external_file(char*, double*, double*);
 void aper_fill_quads(double*, double*, int, int*);
 void aper_header(struct table*, struct aper_node*);
-void aper_intersect(double, double, double, double, double, double, 
-		   double, double, int, int,double*, double*);
+void aper_intersect(double, double, double, double, double, double,
+           double, double, int, int,double*, double*);
 int aper_linepar(double, double, double, double, double*, double*);
 double aper_online(double, double, double, double, double, double, double);
 void aper_race(double, double, double, double, double*, double*);
 void aper_read_twiss(char*, int*, double*, double*, double*,
-			double*, double*, double*, double*);
+            double*, double*, double*, double*);
 int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
 void aper_surv(double*, int);
 int aper_tab_search(int, struct aper_e_d*, char*, int*);
 void aper_trim_ws(char*, int);
 void aper_write_table(char*, double*, double*, double*, double*, double*, double*,
-			   char*, double*, double*, double*, double*,
-			   double*, double*, double*, double*, double*,
-			   double*, double*, double*, double*, double*, char*);
+               char*, double*, double*, double*, double*,
+               double*, double*, double*, double*, double*,
+               double*, double*, double*, double*, double*, char*);
 struct aper_node* aperture(char*, struct node**, struct table*, int*);
 
 /* SXF module routines */
@@ -908,7 +908,7 @@ struct sequence* edit_sequ;     /* pointer to sequence being edited */
 struct sequence_list* sequences;    /* pointer to sequence list */
 struct sequence_list* match_sequs;  /* pointer to sequence list for match */
 
-struct table* aperture_table;	  /* current aperture table */
+struct table* aperture_table;     /* current aperture table */
 struct table* ibs_table;          /* current ibs table */
 struct table* touschek_table;     /* current touschek table */
 struct table* summ_table;         /* current twiss summary table */
@@ -985,7 +985,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 2.13.12";
+char myversion[] = "MAD-X 2.13.13";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

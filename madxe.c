@@ -49,7 +49,7 @@ void error_seterr(struct in_cmd* cmd)
 {
 
 /* read the errors from a named table  and stores
-   them in the nodes of the sequence.       
+   them in the nodes of the sequence.
    Subsequent Twiss will use them correctly.
    ===> Must be preceded by a call to "read_table"
    ===> (unless table exists in memory !)
@@ -85,7 +85,7 @@ void error_seterr(struct in_cmd* cmd)
           printf("The table ==> %s <=== was found \n",namtab);
        } else {
           /* fatal_error("Error table requested, but not existing:",namtab); */
-          /* exit(-77); */ 
+          /* exit(-77); */
           printf("No such error table in memory: %s\n",namtab);
           /* try now, better a clean exit afterwards ... */
           exit(-77);
@@ -101,13 +101,13 @@ void error_seterr(struct in_cmd* cmd)
           printf("The default table ==> %s <=== was found \n",namtab);
        } else {
           /* fatal_error("Error table requested, but not existing:",namtab); */
-          /* exit(-77); */ 
+          /* exit(-77); */
           printf("No default error table in memory: %s\n",namtab);
           /* try now, better a clean exit afterwards ... */
           exit(-77);
        }
   }
- 
+
   err = table_register->tables[t1];
 
 
@@ -121,17 +121,17 @@ void error_seterr(struct in_cmd* cmd)
              supp_tb(slname);
           nextnode = mysequ->ex_start;
           while (nextnode != ndexe) {
-            
+
              strcpy(nname,nextnode->name);
              stolower(nname);
              strcpy(slnname,strip(nname));
              supp_tb(slnname);
-          
+
 /*
              printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
-             printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); 
+             printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname));
 */
-       
+
              if(strcmp(slname,slnname) == 0) {
 
 /*              printf("O.K.:  %s in sequence and input table\n",slname); */
@@ -154,15 +154,15 @@ void error_seterr(struct in_cmd* cmd)
              /*   printf("ealign errors: %d %e\n",j,err->d_cols[j+EFIELD_TAB][i-1]); */
                   nextnode->p_al_err->a[j-1] = err->d_cols[j+EFIELD_TAB][i-1];
                 }
-                
+
 
                 nextnode = ndexe;
              } else {
                 nextnode = nextnode->next;
              }
           }
-    
-      } 
+
+      }
         i++;
   }
 
@@ -255,7 +255,7 @@ void error_eprint(struct in_cmd* cmd)
   nextnode = mysequ->ex_start;
 
   mycount = 0;
- 
+
   fll = command_par_value("full", cmd->clone);
 
   while (nextnode != ndexe) {
@@ -337,7 +337,7 @@ void error_efcomp(struct in_cmd* cmd)
   double *hco_n;
   double *hco_s;
   double *nvec;
-  double deer;  
+  double deer;
   double ref_str;
   double ref_strn;
   double ref_len;
@@ -378,12 +378,12 @@ void error_efcomp(struct in_cmd* cmd)
     }
     hco_n = &h_co_n[0][0];
     for(j=0;j<FIELD_MAX*2;j++) {
-       *hco_n = 0.0;           
+       *hco_n = 0.0;
        hco_n++;
     }
     hco_s = &h_co_s[0][0];
     for(j=0;j<FIELD_MAX*2;j++) {
-       *hco_s = 0.0;           
+       *hco_s = 0.0;
        hco_s++;
     }
 
@@ -568,9 +568,9 @@ void error_efcomp(struct in_cmd* cmd)
                    /* if flag for hysteresis correction is set, use coefficients for correction */
                    deer = 0.0;
                    if(hyst == 1) {
-                      deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + 
+                      deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) +
                              h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
-                      if (get_option("debug")) 
+                      if (get_option("debug"))
                       printf("after correction (n): %d %e %e %e %e\n",
                               j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
                    }
@@ -596,9 +596,9 @@ void error_efcomp(struct in_cmd* cmd)
                    /* if flag for hysteresis correction is set, use coefficients for correction */
                    deer = 0.0;
                    if(hyst == 1) {
-                      deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + 
+                      deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) +
                              h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
-                      if (get_option("debug")) 
+                      if (get_option("debug"))
                       printf("after correction (s): %d %e %e %e %e\n",
                               j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
                    }

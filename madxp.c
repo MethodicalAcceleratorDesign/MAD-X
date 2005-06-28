@@ -297,8 +297,8 @@ void check_table(char* string)
     {
      if (*pa == '\'' || *pa == '\"')
        {
-	quote = pa;
-	qpos[npos++] = pa++;
+    quote = pa;
+    qpos[npos++] = pa++;
         if (!(pa = strchr(pa, *quote))) return; /* quote string not closed */
         qpos[npos++] = pa;
        }
@@ -1341,10 +1341,10 @@ void exec_command()
           current_ibs = p->clone;
           pro_ibs(p);
         }
-	else if (strcmp(p->cmd_def->module, "aperture") == 0)
-	{
-		pro_aperture(p);
-	}
+    else if (strcmp(p->cmd_def->module, "aperture") == 0)
+    {
+        pro_aperture(p);
+    }
         else if (strcmp(p->cmd_def->module, "touschek") == 0)
         {
           current_touschek = p->clone;
@@ -1583,13 +1583,13 @@ void exec_save(struct in_cmd* cmd)
      while(c_node != NULL)
        {
         if (c_node->p_sequ != NULL)
-	 {
+     {
           warning("structured sequence flattened:", sequ->name);
           seq_edit_ex(sequ);
           seq_flatten(edit_sequ);
           seq_end_ex();
           break;
-	 }
+     }
         if (c_node == sequ->end) break;
         c_node = c_node->next;
        }
@@ -2467,9 +2467,9 @@ if (final_message == 0)
       final_message = 1;
 #ifdef _FULL
       if (plots_made)
-	{
-	  gxterm_();
-	}
+    {
+      gxterm_();
+    }
 #endif
       if (get_option("trace")) time_stamp("end");
       printf("\n  +++++++++++++++++++++++++++++++++++\n");

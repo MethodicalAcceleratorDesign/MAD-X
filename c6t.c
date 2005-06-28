@@ -316,21 +316,21 @@ void add_c6t_drifts()
       el2 = current_element->value[0] / two;
       dl = current_element->position - el2 - pos;
       if (dl + eps_9 < zero)
-	{
-	  printf(
-		 "+=+=+= c6t fatal - negative drift in front of %s, length %f\n",
-		 current_element->name, dl);
-	  exit(1);
-	}
+    {
+      printf(
+         "+=+=+= c6t fatal - negative drift in front of %s, length %f\n",
+         current_element->name, dl);
+      exit(1);
+    }
       else if (dl > eps_9)
-	{
-	  af = get_next_name(c, 'd');
-	  d1 = new_c6t_element(1, c, "drift");
-	  d1->value[0] = dl; d1->flag = 1;
-	  link_c6t_in_front(d1, current_element);
-	  d1->position = pos + dl / two;
-	  if (af != 0)  add_to_ellist(d1);
-	}
+    {
+      af = get_next_name(c, 'd');
+      d1 = new_c6t_element(1, c, "drift");
+      d1->value[0] = dl; d1->flag = 1;
+      link_c6t_in_front(d1, current_element);
+      d1->position = pos + dl / two;
+      if (af != 0)  add_to_ellist(d1);
+    }
       pos = current_element->position + el2;
       current_element = current_element->next;
     }
@@ -344,7 +344,7 @@ void add_split_list(struct c6t_element* el)
     {
       split_list = (struct c6t_el_list*) mycalloc(rout_name,1, sizeof(struct c6t_el_list));
       split_list->elem =
-	(struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct elem*));
+    (struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct elem*));
       split_list->max = EL_COUNT;
     }
   else if (split_list->curr == split_list->max) grow_ellist(split_list);
@@ -353,7 +353,7 @@ void add_split_list(struct c6t_element* el)
 }
 
 void add_to_ellist( /* adds element to correct object list */
-		   struct c6t_element* p_elem)
+           struct c6t_element* p_elem)
 {
   int j;
   char rout_name[] = "c6t:add_to_ellist";
@@ -364,18 +364,18 @@ void add_to_ellist( /* adds element to correct object list */
   for (j = 0; j < types.curr; j++)
     {
       if (strcmp(types.member[j]->base_name, p_elem->base_name) == 0)
-	{
-	  if (types.member[j]->curr == types.member[j]->max)
+    {
+      if (types.member[j]->curr == types.member[j]->max)
             grow_ellist(types.member[j]);
-	  types.member[j]->elem[types.member[j]->curr++] = p_elem;
-	  return;
-	}
+      types.member[j]->elem[types.member[j]->curr++] = p_elem;
+      return;
+    }
     }
   /* type list does not exist - create */
   if (types.curr == BASE_TYPES)
     {
       printf("+++ fatal - %s overruns type buffer of %d types\n",
-	     p_elem->base_name, types.curr);
+         p_elem->base_name, types.curr);
       exit(1);
     }
   types.member[types.curr]
@@ -412,32 +412,32 @@ void assign_att()
   for (i = 0; i < types.curr; i++)  /* loop over base types */
     {
       for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
-	{
-	  el = types.member[i]->elem[j];
-	  if (el->flag > 0 && el->equiv == el)  /* all others ignored */
-	    {
-	      if (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
-	      else if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
-	      else if (strcmp(el->base_name, "decapole") == 0) att_decapole(el);
-	      else if (strcmp(el->base_name, "drift") == 0) att_drift(el);
-	      else if (strcmp(el->base_name, "ecollimator") == 0) att_colli(el);
-	      else if (strcmp(el->base_name, "hkicker") == 0) att_hkicker(el);
-	      else if (strcmp(el->base_name, "kicker") == 0) att_kicker(el);
-	      else if (strcmp(el->base_name, "lcavity") == 0) att_lcavity(el);
-	      else if (strcmp(el->base_name, "marker") == 0) att_marker(el);
-	      else if (strcmp(el->base_name, "matrix") == 0) att_matrix(el);
-	      else if (strcmp(el->base_name, "multipole") == 0) att_multipole(el);
-	      else if (strcmp(el->base_name, "octupole") == 0) att_octupole(el);
-	      else if (strcmp(el->base_name, "quadrupole") == 0) att_quadrupole(el);
-	      else if (strcmp(el->base_name, "rbend") == 0) att_rbend(el);
-	      else if (strcmp(el->base_name, "rcollimator") == 0) att_colli(el);
-	      else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
-	      else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
-	      else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
-	      else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
-	      else att_undefined(el);
-	    }
-	}
+    {
+      el = types.member[i]->elem[j];
+      if (el->flag > 0 && el->equiv == el)  /* all others ignored */
+        {
+          if (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
+          else if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
+          else if (strcmp(el->base_name, "decapole") == 0) att_decapole(el);
+          else if (strcmp(el->base_name, "drift") == 0) att_drift(el);
+          else if (strcmp(el->base_name, "ecollimator") == 0) att_colli(el);
+          else if (strcmp(el->base_name, "hkicker") == 0) att_hkicker(el);
+          else if (strcmp(el->base_name, "kicker") == 0) att_kicker(el);
+          else if (strcmp(el->base_name, "lcavity") == 0) att_lcavity(el);
+          else if (strcmp(el->base_name, "marker") == 0) att_marker(el);
+          else if (strcmp(el->base_name, "matrix") == 0) att_matrix(el);
+          else if (strcmp(el->base_name, "multipole") == 0) att_multipole(el);
+          else if (strcmp(el->base_name, "octupole") == 0) att_octupole(el);
+          else if (strcmp(el->base_name, "quadrupole") == 0) att_quadrupole(el);
+          else if (strcmp(el->base_name, "rbend") == 0) att_rbend(el);
+          else if (strcmp(el->base_name, "rcollimator") == 0) att_colli(el);
+          else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
+          else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
+          else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
+          else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
+          else att_undefined(el);
+        }
+    }
     }
 }
 
@@ -530,13 +530,13 @@ void att_multipole(struct c6t_element* el)
     {
       el->out_3 = el->rad_length;
       if (el->nc_pos == 12)
-	{
-	  el->out_2 = -el->value[12]; el->out_4 = -1;
-	}
+    {
+      el->out_2 = -el->value[12]; el->out_4 = -1;
+    }
       else if (el->nc_pos == 13)
-	{
-	  el->out_2 = el->value[13]; el->out_4 = -2;
-	}
+    {
+      el->out_2 = el->value[13]; el->out_4 = -2;
+    }
     }
 }
 
@@ -577,20 +577,20 @@ void att_rbend(struct c6t_element* el)
       el->out_2 = -el->value[1];
       if (el->value[14] == zero)  el->out_1 = 1;
       else
-	{
-	  el->out_1 = 6;
-	  el->out_3 = -el->value[14];
-	}
+    {
+      el->out_1 = 6;
+      el->out_3 = -el->value[14];
+    }
     }
   else if (el->value[13] != zero)
     {
       el->out_2 = el->value[1];
       if (el->value[15] == zero)  el->out_1 = 4;
       else
-	{
-	  el->out_1 = 4;
-	  el->out_3 = el->value[15];
-	}
+    {
+      el->out_1 = 4;
+      el->out_3 = el->value[15];
+    }
     }
   else el->out_1 = 0;
 }
@@ -619,10 +619,10 @@ void att_sbend(struct c6t_element* el)
       el->out_2 = -el->value[1];
       if (el->value[14] == zero)  el->out_1 = 3;
       else
-	{
-	  el->out_1 = 6;
-	  el->out_3 = -el->value[14];
-	}
+    {
+      el->out_1 = 6;
+      el->out_3 = -el->value[14];
+    }
     }
   else if (el->value[13] != zero)
     {
@@ -670,30 +670,30 @@ void block_it()
       if (prev_block == NULL) first_block = current_block;
       else                    prev_block->next = current_block;
       current_block->elements
-	= (struct c6t_el_list*) mycalloc(rout_name,1,sizeof(struct c6t_el_list));
+    = (struct c6t_el_list*) mycalloc(rout_name,1,sizeof(struct c6t_el_list));
       current_block->elements->elem
-	= (struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct c6t_element*));
+    = (struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct c6t_element*));
       current_block->elements->max = EL_COUNT;
       current_block->first = el;
       current_block->length = el->equiv->value[0];
       current_block->elements->elem[0] = el;
       current_block->elements->curr = 1;
       if (el->flag < 2)
-	{
-	  while (el->next != NULL && el->next->flag < 2)
-	    {
-	      el = el->next;
-	      current_block->length += el->equiv->value[0];
-	      if (current_block->elements->curr == current_block->elements->max)
-		grow_ellist(current_block->elements);
-	      current_block->elements->elem[current_block->elements->curr++]
-		= el;
-	    }
-	  current_element = el;
-	}
+    {
+      while (el->next != NULL && el->next->flag < 2)
+        {
+          el = el->next;
+          current_block->length += el->equiv->value[0];
+          if (current_block->elements->curr == current_block->elements->max)
+        grow_ellist(current_block->elements);
+          current_block->elements->elem[current_block->elements->curr++]
+        = el;
+        }
+      current_element = el;
+    }
       current_block->last = current_element;
       if (current_block->first == current_block->last &&
-	  current_block->last->flag >= 2)  current_block->flag = 0;
+      current_block->last->flag >= 2)  current_block->flag = 0;
       else current_block->flag = 1;
       current_block->equiv = get_block_equiv(current_block);
       current_element = current_element->next;
@@ -715,30 +715,30 @@ void concat_drifts()
       suml = current_element->value[0];
       pos = current_element->position - suml / two;
       if (strcmp(current_element->base_name, "drift") == 0)
-	{
-	  temp = current_element->next;
-	  while (temp != NULL && strcmp(temp->base_name, "drift") == 0)
-	    {
-	      suml += temp->value[0]; cnt++;
-	      temp = temp->next;
-	    }
-	}
+    {
+      temp = current_element->next;
+      while (temp != NULL && strcmp(temp->base_name, "drift") == 0)
+        {
+          suml += temp->value[0]; cnt++;
+          temp = temp->next;
+        }
+    }
       if (cnt > 0) /* actually concatenated something */
-	{
-	  flag = get_next_name(c, 'd');
-	  d1 = new_c6t_element(1, c, "drift");  d1->flag = 1;
-	  d1->value[0] = suml; d1->position = pos + suml / two;
-	  if (flag != 0) add_to_ellist(d1);
-	  temp = current_element->next;
-	  while (temp != NULL && strcmp(temp->base_name, "drift") == 0)
-	    {
-	      nk = temp->next;
-	      yank(temp);
-	      temp = nk;
-	    }
-	  if (current_element == first_in_sequ) first_in_sequ = d1;
-	  replace_c6t(current_element, d1); current_element = d1;
-	}
+    {
+      flag = get_next_name(c, 'd');
+      d1 = new_c6t_element(1, c, "drift");  d1->flag = 1;
+      d1->value[0] = suml; d1->position = pos + suml / two;
+      if (flag != 0) add_to_ellist(d1);
+      temp = current_element->next;
+      while (temp != NULL && strcmp(temp->base_name, "drift") == 0)
+        {
+          nk = temp->next;
+          yank(temp);
+          temp = nk;
+        }
+      if (current_element == first_in_sequ) first_in_sequ = d1;
+      replace_c6t(current_element, d1); current_element = d1;
+    }
       current_element = current_element->next;
     }
 }
@@ -752,41 +752,41 @@ void conv_elem()
   for (i = 0; i < types.curr; i++)  /* loop over base types */
     {
       for (j = 0; j < N_TYPES; j++)
-	{
-	  if (strcmp(types.member[i]->base_name, t_info[j]->name) == 0)
-	    {
-	      type = t_info[j]; break;
-	    }
-	}
+    {
+      if (strcmp(types.member[i]->base_name, t_info[j]->name) == 0)
+        {
+          type = t_info[j]; break;
+        }
+    }
       if (type == NULL)
         {
-	  printf("+=+=+= c6t fatal - type %s not defined\n",
-		 types.member[i]->base_name);
-	  exit(1);
+      printf("+=+=+= c6t fatal - type %s not defined\n",
+         types.member[i]->base_name);
+      exit(1);
         }
       nup = types.member[i]->curr;
       for (j = 0; j < nup; j++) /* loop over el. in type */
-	{
-	  el = types.member[i]->elem[j];
-	  if (type->flag_4 > 1)
-	    printf("+++ warning - treated as drift: %s\n", el->name);
-	  el->flag = get_flag(el, type);
-	  if (el->flag > 0)  /* all others ignored */
-	    {
-	      if (el->value[0] < eps_9)
-		{
-		  el->value[0] = zero;
-		  if (el->flag == 1)  el->flag = 0;
-		}
-	      if (el->flag > 0)
-		{
-		  el->c_drift = type->flag_4;
-		  el->force = type->flag_5;
-		  el->split = type->flag_6;
-		  if (el->split > 0) add_split_list(el);
-		}
-	    }
-	}
+    {
+      el = types.member[i]->elem[j];
+      if (type->flag_4 > 1)
+        printf("+++ warning - treated as drift: %s\n", el->name);
+      el->flag = get_flag(el, type);
+      if (el->flag > 0)  /* all others ignored */
+        {
+          if (el->value[0] < eps_9)
+        {
+          el->value[0] = zero;
+          if (el->flag == 1)  el->flag = 0;
+        }
+          if (el->flag > 0)
+        {
+          el->c_drift = type->flag_4;
+          el->force = type->flag_5;
+          el->split = type->flag_6;
+          if (el->split > 0) add_split_list(el);
+        }
+        }
+    }
     }
 }
 
@@ -799,20 +799,20 @@ void c6t_finish()
   for(i=0; i<types.curr; i++) {
     for(j=0; j<types.member[i]->curr; j++) {
       if (types.member[i]->elem[j]->value)
-	myfree(rout_name, types.member[i]->elem[j]->value);
+    myfree(rout_name, types.member[i]->elem[j]->value);
       if (types.member[i]->elem[j]->p_al_err &&
-	  types.member[i]->elem[j]->do_not_free != 1) {
-	if (types.member[i]->elem[j]->p_al_err->a_dble)
-	  myfree(rout_name, types.member[i]->elem[j]->p_al_err->a_dble);
-	myfree(rout_name, types.member[i]->elem[j]->p_al_err);
-	types.member[i]->elem[j]->p_al_err = NULL;
+      types.member[i]->elem[j]->do_not_free != 1) {
+    if (types.member[i]->elem[j]->p_al_err->a_dble)
+      myfree(rout_name, types.member[i]->elem[j]->p_al_err->a_dble);
+    myfree(rout_name, types.member[i]->elem[j]->p_al_err);
+    types.member[i]->elem[j]->p_al_err = NULL;
       }
       if (types.member[i]->elem[j]->p_fd_err &&
-	  types.member[i]->elem[j]->do_not_free != 1) {
-	if (types.member[i]->elem[j]->p_fd_err->a_dble)
-	  myfree(rout_name, types.member[i]->elem[j]->p_fd_err->a_dble);
-	myfree(rout_name, types.member[i]->elem[j]->p_fd_err);
-	types.member[i]->elem[j]->p_fd_err = NULL;
+      types.member[i]->elem[j]->do_not_free != 1) {
+    if (types.member[i]->elem[j]->p_fd_err->a_dble)
+      myfree(rout_name, types.member[i]->elem[j]->p_fd_err->a_dble);
+    myfree(rout_name, types.member[i]->elem[j]->p_fd_err);
+    types.member[i]->elem[j]->p_fd_err = NULL;
       }
       myfree(rout_name, types.member[i]->elem[j]);
       types.member[i]->elem[j]=NULL;
@@ -852,15 +852,15 @@ void c6t_init()
     p_err_zero = make_obj("zero_errors", 0, FIELD_MAX, 0, 0);
     for (j = 0; j < FIELD_MAX; j++)
       {
-	p_err_zero->a_dble[j]=0.0;
+    p_err_zero->a_dble[j]=0.0;
       }
 
     for (j = 0; j < N_TYPES; j++)
       {
-	t_info[j] = (struct type_info*) mymalloc(rout_name,sizeof(struct type_info));
-	sscanf(el_info[j],"%s%d%d%d%d%d%d",t_info[j]->name, &t_info[j]->flag_1,
-	       &t_info[j]->flag_2, &t_info[j]->flag_3, &t_info[j]->flag_4,
-	       &t_info[j]->flag_5, &t_info[j]->flag_6);
+    t_info[j] = (struct type_info*) mymalloc(rout_name,sizeof(struct type_info));
+    sscanf(el_info[j],"%s%d%d%d%d%d%d",t_info[j]->name, &t_info[j]->flag_1,
+           &t_info[j]->flag_2, &t_info[j]->flag_3, &t_info[j]->flag_4,
+           &t_info[j]->flag_5, &t_info[j]->flag_6);
       }
   }
   if (current_sequ == NULL)
@@ -1060,16 +1060,16 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[10] = el_par_value_recurse("tfill",p->p_elem);
     c6t_elem->value[11] = el_par_value_recurse("harmon",p->p_elem);
   } else if ((strcmp(p->base_name,"marker") == 0)   ||
-	     (strcmp(p->base_name,"instrument") == 0)    ||
-	     (strcmp(p->base_name,"hmonitor") == 0) ||
-	     (strcmp(p->base_name,"vmonitor") == 0) ||
-	     (strcmp(p->base_name,"monitor") == 0)) {
+         (strcmp(p->base_name,"instrument") == 0)    ||
+         (strcmp(p->base_name,"hmonitor") == 0) ||
+         (strcmp(p->base_name,"vmonitor") == 0) ||
+         (strcmp(p->base_name,"monitor") == 0)) {
     c6t_elem = new_c6t_element(0,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
   } else if ((strcmp(p->base_name,"rcollimator") == 0) ||
-	     (strcmp(p->base_name,"ecollimator") == 0)){
+         (strcmp(p->base_name,"ecollimator") == 0)){
     c6t_elem = new_c6t_element(13,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
@@ -1113,27 +1113,27 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
   if (c6t_elem) {
     for (j = 0; j < c6t_elem->n_values; j++)
       if (fabs(c6t_elem->value[j]) < eps_12)
-	c6t_elem->value[j] = 0.0;
+    c6t_elem->value[j] = 0.0;
     /* check to see if this has an aperture assigned, check for aperture flag */
     if ((aperture_flag)
-	&& (aper_param = return_param_recurse("apertype", p->p_elem))) {
+    && (aper_param = return_param_recurse("apertype", p->p_elem))) {
       tag_aperture.apply=1;
       strcpy(tag_aperture.style,aper_param->string);
       strcpy(tag_aperture.name,t_name);
       strcat(tag_aperture.name,"_AP");
       if ((aper_param = return_param_recurse("aperture", p->p_elem))) {
         if (aper_param->expr_list != NULL)
-	  update_vector(aper_param->expr_list, aper_param->double_array);
-	j=3;
-	if (aper_param->double_array->curr<3) j=aper_param->double_array->curr;
-	for(i=0;i<j;i++) {
-	  tag_aperture.value[i] = aper_param->double_array->a[i];
-	}
+      update_vector(aper_param->expr_list, aper_param->double_array);
+    j=3;
+    if (aper_param->double_array->curr<3) j=aper_param->double_array->curr;
+    for(i=0;i<j;i++) {
+      tag_aperture.value[i] = aper_param->double_array->a[i];
+    }
       }
     }
 
     /* name used has to be without occ_cnt as this is added
-       (only 1) in tab_name_code 
+       (only 1) in tab_name_code
        !!! fixed FS 17.08.2004 !!! */
     c6t_elem->twtab_row = my_table_row(current_sequ->tw_table,t_name);
   }
@@ -1183,8 +1183,8 @@ void dump_c6t_sequ(int level)
       if (level > 2)  dump_c6t_element(current_element);
       else if (level > 1)  gnu_file(current_element);
       else if (level > 0 && strcmp(current_element->base_name, "drift") != 0)
-	printf("%s: %s at = %f\n", current_element->name,
-	       current_element->equiv->name, current_element->position);
+    printf("%s: %s at = %f\n", current_element->name,
+           current_element->equiv->name, current_element->position);
       current_element = current_element->next;
     }
   printf("=== sum of element length: %f\n", suml);
@@ -1199,8 +1199,8 @@ void dump_types(int flag)
     {
       puts(types.member[i]->base_name);
       for (j = 0; j < types.member[i]->curr; j++)
-	printf("       %s  %f\n", types.member[i]->elem[j]->name,
-	       types.member[i]->elem[j]->value[0]);
+    printf("       %s  %f\n", types.member[i]->elem[j]->name,
+           types.member[i]->elem[j]->value[0]);
       if (flag > 0) dump_c6t_element(types.member[i]->elem[j]);
     }
 }
@@ -1213,26 +1213,26 @@ void equiv_elem()
   for (i = 0; i < types.curr; i++)  /* loop over base types */
     {
       for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
-	{
-	  el = types.member[i]->elem[j];
-	  if (el->flag > 0)  /* all others ignored */
-	    {
-	      if (el->equiv == el /* not yet equivalenced */
-		  && strcmp(el->base_name,"marker") != 0) /* do not touch markers */
-		{
-		  for (k = j+1; k < types.member[i]->curr; k++)
-		    {
-		      eln = types.member[i]->elem[k];
-		      if (eln->flag > 0
-			  && eln->equiv == eln
-			  && ident_el(el, eln) == 0
-			  && strcmp(eln->base_name,"marker") != 0
-			  && strstr(eln->base_name,"colli") == NULL)
-			eln->equiv = el;
-		    }
-		}
-	    }
-	}
+    {
+      el = types.member[i]->elem[j];
+      if (el->flag > 0)  /* all others ignored */
+        {
+          if (el->equiv == el /* not yet equivalenced */
+          && strcmp(el->base_name,"marker") != 0) /* do not touch markers */
+        {
+          for (k = j+1; k < types.member[i]->curr; k++)
+            {
+              eln = types.member[i]->elem[k];
+              if (eln->flag > 0
+              && eln->equiv == eln
+              && ident_el(el, eln) == 0
+              && strcmp(eln->base_name,"marker") != 0
+              && strstr(eln->base_name,"colli") == NULL)
+            eln->equiv = el;
+            }
+        }
+        }
+    }
     }
 }
 
@@ -1245,28 +1245,28 @@ int f34_values(struct c6t_element* el, int* flags, double* values)
       tmp[i] = zero;
       j = i + 12;
       if (j < el->n_values && el->value[j] != zero)
-	{
-	  if (el->value[0] != zero) tmp[i] += el->value[0] * el->value[j];
-	  else tmp[i] += el->value[j];
-	}
+    {
+      if (el->value[0] != zero) tmp[i] += el->value[0] * el->value[j];
+      else tmp[i] += el->value[j];
+    }
       if (i < el->nf_err && el->p_fd_err->a_dble[i] != zero)
-	tmp[i] += el->p_fd_err->a_dble[i];
+    tmp[i] += el->p_fd_err->a_dble[i];
     }
   for (i = 3; i < FIELD_MAX; i++)
     {
       if (tmp[i] != zero)
-	{
-	  np = i / 2 + 1;
-	  nd = 1; for (j = 2; j < np; j++)  nd *= j;
-	  pow = nd;
-	  pow = power_of(ten, 6-3*np) / pow;
-	  if (i%2 == 0)
-	    {
-	      flags[cnt] = np; if (el->npole_sign) pow = -pow;
-	    }
-	  else           flags[cnt] = -np;
-	  values[cnt++] = pow * tmp[i];
-	}
+    {
+      np = i / 2 + 1;
+      nd = 1; for (j = 2; j < np; j++)  nd *= j;
+      pow = nd;
+      pow = power_of(ten, 6-3*np) / pow;
+      if (i%2 == 0)
+        {
+          flags[cnt] = np; if (el->npole_sign) pow = -pow;
+        }
+      else           flags[cnt] = -np;
+      values[cnt++] = pow * tmp[i];
+    }
     }
   return cnt;
 }
@@ -1278,15 +1278,15 @@ struct block* get_block_equiv(struct block* current)
   while (p != current)
     {
       if (current->elements->curr == p->elements->curr)
-	{
-	  k = 0;
-	  for (i = 0; i < current->elements->curr; i++)
-	    {
-	      if (strcmp(current->elements->elem[i]->equiv->name,
-			 p->elements->elem[i]->equiv->name) == 0) k++;
-	    }
-	  if (k == current->elements->curr)  return p;
-	}
+    {
+      k = 0;
+      for (i = 0; i < current->elements->curr; i++)
+        {
+          if (strcmp(current->elements->elem[i]->equiv->name,
+             p->elements->elem[i]->equiv->name) == 0) k++;
+        }
+      if (k == current->elements->curr)  return p;
+    }
       p = p->next;
     }
   return p;
@@ -1316,7 +1316,7 @@ void get_error_refs(struct c6t_element* el)
   if (i+1 < el->n_values)
     {
       tmp = fabs(el->value[i]) > fabs(el->value[i+1]) ?
-	fabs(el->value[i]) : fabs(el->value[i+1]);
+    fabs(el->value[i]) : fabs(el->value[i+1]);
     }
   else if(i < el->n_values) tmp = fabs(el->value[i]);
   else tmp = 1;
@@ -1350,13 +1350,13 @@ struct c6t_element* get_from_ellist(char* name, char* type)
   for (i = 0; i < types.curr; i++)
     {
       if (strcmp(types.member[i]->base_name, type) == 0)
-	{
-	  for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
-	    {
-	      if (strcmp(types.member[i]->elem[j]->name, name) == 0)
-		return types.member[i]->elem[j];
-	    }
-	}
+    {
+      for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
+        {
+          if (strcmp(types.member[i]->elem[j]->name, name) == 0)
+        return types.member[i]->elem[j];
+        }
+    }
     }
   return NULL;
 }
@@ -1367,9 +1367,9 @@ void get_multi_refs()
   for (i = 0; i < types.curr; i++)  /* loop over base types */
     {
       if (strcmp(types.member[i]->base_name, "multipole") == 0)
-	{
-	  multi_type = i;  break;
-	}
+    {
+      multi_type = i;  break;
+    }
     }
 }
 
@@ -1401,7 +1401,7 @@ void gnu_file(struct c6t_element* el)
 }
 
 void grow_ellist( /* doubles object list size */
-		 struct c6t_el_list* p)
+         struct c6t_el_list* p)
 {
   struct c6t_element** p_loc = p->elem;
   int j, new = 2*p->max;
@@ -1428,17 +1428,17 @@ int ident_el(struct c6t_element* el1, struct c6t_element* el2)
     {
       s = fabs(el1->value[j]) + fabs(el2->value[j]);
       if (s > zero
-	  && fabs(el1->value[j] - el2->value[j])/s > tolerance) return 3;
+      && fabs(el1->value[j] - el2->value[j])/s > tolerance) return 3;
     }
   if (m != el1->n_values)
     {
       for (j = m; j < el1->n_values; j++)
-	if (el1->value[j] != zero) return 4;
+    if (el1->value[j] != zero) return 4;
     }
   else if (m != el2->n_values)
     {
       for (j = m; j < el2->n_values; j++)
-	if (el2->value[j] != zero) return 5;
+    if (el2->value[j] != zero) return 5;
     }
   return 0;
 }
@@ -1518,11 +1518,11 @@ struct c6t_element* make_c6t_element(struct node* p)
 /* this is taken from doom but all it does is malloc the structure and fill
    it in */
 struct object* make_obj(   /* creates a new object */
-			char* key,
-			int vlint,       /* length of integer array */
-			int vldble,      /* length of double array */
-			int vlchar,      /* length of char array */
-			int vlpobj)      /* length of object pointer array */
+            char* key,
+            int vlint,       /* length of integer array */
+            int vldble,      /* length of double array */
+            int vlchar,      /* length of char array */
+            int vlpobj)      /* length of object pointer array */
 {
   struct object* p;
   char rout_name[] = "c6t:make_obj";
@@ -1567,7 +1567,7 @@ void mod_errors()
   while (current_element != NULL)
     {
       if (current_element->nf_err > 0)
-	invert_normal(current_element->nf_err, current_element->p_fd_err->a_dble);
+    invert_normal(current_element->nf_err, current_element->p_fd_err->a_dble);
       current_element = current_element->next;
     }
 }
@@ -1623,14 +1623,14 @@ void multi_loop()
   for (i = 0; i < types.curr; i++)  /* loop over base types */
     {
       if (strcmp(types.member[i]->base_name, "multipole") == 0)
-	{
-	  nup = types.member[i]->curr;
-	  for (j = 0; j < nup; j++) /* loop over mutipoles */
-	    {
-	      el = types.member[i]->elem[j];
-	      pre_multipole(el);
-	    }
-	}
+    {
+      nup = types.member[i]->curr;
+      for (j = 0; j < nup; j++) /* loop over mutipoles */
+        {
+          el = types.member[i]->elem[j];
+          pre_multipole(el);
+        }
+    }
     }
 }
 
@@ -1666,31 +1666,31 @@ void post_multipoles() /* post equiv. treatment of multipoles */
   if (multi_type > -1) /* there are multipoles */
     {
       for (j = 0; j < types.member[multi_type]->curr; j++)
-	{
-	  el = types.member[multi_type]->elem[j]; eln = el->equiv;
-	  if (el->nf_err > 0)
-	    {
-	      eln->mult_order = el->mult_order;
-	      eln->ref_radius = el->ref_radius;
-	      if (eln->p_fd_err == NULL)
-		{
-		  eln->p_fd_err = p_err_zero;
-		  eln->nf_err = FIELD_MAX;
-		}
-	      if (eln->nf_err < el->nf_err)
-		{
-		  strcpy(tmp_name, eln->p_fd_err->key);
-		  p = eln->p_fd_err;
-		  eln->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
-		  /* first initialise */
-		  for (i = 0; i < el->nf_err; i++)
-		    eln->p_fd_err->a_dble[i] = 0.0;
-		  for (i = 0; i < eln->nf_err; i++)
-		    eln->p_fd_err->a_dble[i] = p->a_dble[i];
-		  eln->nf_err = el->nf_err;
-		}
-	    }
-	}
+    {
+      el = types.member[multi_type]->elem[j]; eln = el->equiv;
+      if (el->nf_err > 0)
+        {
+          eln->mult_order = el->mult_order;
+          eln->ref_radius = el->ref_radius;
+          if (eln->p_fd_err == NULL)
+        {
+          eln->p_fd_err = p_err_zero;
+          eln->nf_err = FIELD_MAX;
+        }
+          if (eln->nf_err < el->nf_err)
+        {
+          strcpy(tmp_name, eln->p_fd_err->key);
+          p = eln->p_fd_err;
+          eln->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
+          /* first initialise */
+          for (i = 0; i < el->nf_err; i++)
+            eln->p_fd_err->a_dble[i] = 0.0;
+          for (i = 0; i < eln->nf_err; i++)
+            eln->p_fd_err->a_dble[i] = p->a_dble[i];
+          eln->nf_err = el->nf_err;
+        }
+        }
+    }
     }
 }
 
@@ -1735,9 +1735,9 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
   for (i = 12; i < ndmax; i++)
     {
       if (el->value[i] != zero)
-	{
-	  s_pole = i; cnt++;
-	}
+    {
+      s_pole = i; cnt++;
+    }
     }
   if ((cnt == 1) || (el->value[12]!=zero) || (el->value[13]!=zero))
     {
@@ -1745,24 +1745,24 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
       if (el->value[13]!=zero) { s_pole=13; cnt=1; }
       if ((new_el_t = (s_pole-12)/2) == 0)  el->nc_pos = s_pole;
       else
-	{
-	  get_next_name(tmp_name, t_list[new_el_t][0]);
-	  new_el = new_c6t_element(s_pole+1, tmp_name, t_list[new_el_t]);
-	  new_el->do_not_free = 1;
-	  for (i = 0; i <= s_pole; i++) new_el->value[i] = el->value[i];
-	  for (i = 12; i <= s_pole; i++) el->value[i] = 0;
-	  new_el->flag = s_pole > 13 ? 2 : 1; new_el->npole_sign = 1;
-	  new_el->keep_in = el->keep_in;
-	  new_el->position = el->position;
-	  new_el->twtab_row = el->twtab_row;
-	  new_el->na_err = el->na_err; /* el->na_err = 0; */
-	  new_el->p_al_err = el->p_al_err; /*  el->p_al_err = NULL; */
-	  new_el->tilt_err = el->tilt_err; /*  keep tilt info */
-	  link_c6t_in_front(new_el, el);
-	  add_to_ellist(new_el);
-	  strcpy(tmp_name, el->name); strcpy(el->name, new_el->name);
-	  strcpy(new_el->name, tmp_name);
-	}
+    {
+      get_next_name(tmp_name, t_list[new_el_t][0]);
+      new_el = new_c6t_element(s_pole+1, tmp_name, t_list[new_el_t]);
+      new_el->do_not_free = 1;
+      for (i = 0; i <= s_pole; i++) new_el->value[i] = el->value[i];
+      for (i = 12; i <= s_pole; i++) el->value[i] = 0;
+      new_el->flag = s_pole > 13 ? 2 : 1; new_el->npole_sign = 1;
+      new_el->keep_in = el->keep_in;
+      new_el->position = el->position;
+      new_el->twtab_row = el->twtab_row;
+      new_el->na_err = el->na_err; /* el->na_err = 0; */
+      new_el->p_al_err = el->p_al_err; /*  el->p_al_err = NULL; */
+      new_el->tilt_err = el->tilt_err; /*  keep tilt info */
+      link_c6t_in_front(new_el, el);
+      add_to_ellist(new_el);
+      strcpy(tmp_name, el->name); strcpy(el->name, new_el->name);
+      strcpy(new_el->name, tmp_name);
+    }
     }
   for (i = 0; i < FIELD_MAX; i++) tmp_buff[i] = zero;
   low = cnt == 1 ? 2 : 0;
@@ -1785,18 +1785,18 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
     {
       el->nc_pos = s_pole > 13 ? 0 : s_pole;
       if (el->ref_delta == zero)
-	{
-	  el->ref_delta = c1p3;
-	  el->ref_radius = ref_def;
-	  el->mult_order = 1;
-	}
+    {
+      el->ref_delta = c1p3;
+      el->ref_radius = ref_def;
+      el->mult_order = 1;
+    }
       if (++last_nzero > el->nf_err)
-	{
-	  if (el->p_fd_err != NULL) strcpy(tmp_name, el->p_fd_err->key);
-	  else  sprintf(tmp_name,"%s_arfa", el->name);
-	  el->nf_err = last_nzero;
-	  el->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
-	}
+    {
+      if (el->p_fd_err != NULL) strcpy(tmp_name, el->p_fd_err->key);
+      else  sprintf(tmp_name,"%s_arfa", el->name);
+      el->nf_err = last_nzero;
+      el->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
+    }
       for (i = 0; i < el->nf_err; i++) el->p_fd_err->a_dble[i] = tmp_buff[i];
       for (i = 14; i < el->n_values; i++)  el->value[i] = zero;
     }
@@ -1900,71 +1900,71 @@ void pro_elem(struct node* cnode)
     current_element->tilt_err = 0;
   }
   /* add aperture element if necessary */
-  if (tag_aperture.apply==1) 
+  if (tag_aperture.apply==1)
     {
-      if (strstr(tag_aperture.style,"circle")!=NULL) 
-	{
-	  tag_element = create_aperture(tag_aperture.name,"EL",
-					tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
-	  tag_element->previous = current_element;
-	  tag_element->next = current_element->next;
-	  current_element->next = tag_element;
-	  prev_element = current_element;
-	  current_element = tag_element;
-	  current_element->position = cnode->position;
-	  add_to_ellist(current_element);
-	} 
-      else if (strstr(tag_aperture.style,"ellipse")!=NULL) 
-	{
-	  tag_element = create_aperture(tag_aperture.name,"EL",
-					tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
-	  tag_element->previous = current_element;
-	  tag_element->next = current_element->next;
-	  current_element->next = tag_element;
-	  prev_element = current_element;
-	  current_element = tag_element;
-	  current_element->position = cnode->position;
-	  add_to_ellist(current_element);
-	} 
-      else if (strstr(tag_aperture.style,"rectangle")!=NULL) 
-	{
-	  tag_element = create_aperture(tag_aperture.name,"RE",
-					tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
-	  tag_element->previous = current_element;
-	  tag_element->next = current_element->next;
-	  current_element->next = tag_element;
-	  prev_element = current_element;
-	  current_element = tag_element;
-	  current_element->position = cnode->position;
-	  add_to_ellist(current_element);
-	} 
-      else if (strstr(tag_aperture.style,"lhcscreen")!=NULL) 
-	{
-	  strcpy(ap_name,tag_aperture.name); strcat(ap_name,"1");
-	  tag_element = create_aperture(ap_name,"EL",
-					tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
-	  tag_element->previous = current_element;
-	  tag_element->next = current_element->next;
-	  current_element->next = tag_element;
-	  prev_element = current_element;
-	  current_element = tag_element;
-	  current_element->position = cnode->position;
-	  add_to_ellist(current_element);
-	  strcpy(ap_name,tag_aperture.name); strcat(ap_name,"2");
-	  tag_element = create_aperture(ap_name,"RE",
-					tag_aperture.value[1],tag_aperture.value[2],cnode->p_al_err);
-	  tag_element->previous = current_element;
-	  tag_element->next = current_element->next;
-	  current_element->next = tag_element;
-	  prev_element = current_element;
-	  current_element = tag_element;
-	  current_element->position = cnode->position;
-	  add_to_ellist(current_element);
-	} 
-      else 
-	{
-	  warning("general aperture element not supported in sixtrack",tag_aperture.name);
-	}
+      if (strstr(tag_aperture.style,"circle")!=NULL)
+    {
+      tag_element = create_aperture(tag_aperture.name,"EL",
+                    tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
+      prev_element = current_element;
+      current_element = tag_element;
+      current_element->position = cnode->position;
+      add_to_ellist(current_element);
+    }
+      else if (strstr(tag_aperture.style,"ellipse")!=NULL)
+    {
+      tag_element = create_aperture(tag_aperture.name,"EL",
+                    tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
+      prev_element = current_element;
+      current_element = tag_element;
+      current_element->position = cnode->position;
+      add_to_ellist(current_element);
+    }
+      else if (strstr(tag_aperture.style,"rectangle")!=NULL)
+    {
+      tag_element = create_aperture(tag_aperture.name,"RE",
+                    tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
+      prev_element = current_element;
+      current_element = tag_element;
+      current_element->position = cnode->position;
+      add_to_ellist(current_element);
+    }
+      else if (strstr(tag_aperture.style,"lhcscreen")!=NULL)
+    {
+      strcpy(ap_name,tag_aperture.name); strcat(ap_name,"1");
+      tag_element = create_aperture(ap_name,"EL",
+                    tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
+      prev_element = current_element;
+      current_element = tag_element;
+      current_element->position = cnode->position;
+      add_to_ellist(current_element);
+      strcpy(ap_name,tag_aperture.name); strcat(ap_name,"2");
+      tag_element = create_aperture(ap_name,"RE",
+                    tag_aperture.value[1],tag_aperture.value[2],cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
+      prev_element = current_element;
+      current_element = tag_element;
+      current_element->position = cnode->position;
+      add_to_ellist(current_element);
+    }
+      else
+    {
+      warning("general aperture element not supported in sixtrack",tag_aperture.name);
+    }
     }
 }
 
@@ -1995,17 +1995,17 @@ void remove_from_ellist(struct c6t_element* p_elem)
   for (i = 0; i < types.curr; i++)
     {
       if (strcmp(types.member[i]->base_name, p_elem->base_name) == 0)
-	{
-	  for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
-	    {
-	      if (types.member[i]->elem[j] == p_elem)
-		{
-		  types.member[i]->elem[j]
-		    = types.member[i]->elem[--types.member[i]->curr];
-		  return;
-		}
-	    }
-	}
+    {
+      for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
+        {
+          if (types.member[i]->elem[j] == p_elem)
+        {
+          types.member[i]->elem[j]
+            = types.member[i]->elem[--types.member[i]->curr];
+          return;
+        }
+        }
+    }
     }
 }
 
@@ -2025,13 +2025,13 @@ void split()
   if (split_list != NULL)
     {
       for (i = 0; i < split_list->curr; i++)
-	{
-	  el = split_list->elem[i];
-	  if (el->flag == 1
-	      && (split_flag != 0 || el->nf_err > 0)) split_special(el);
-	  else if (el->flag == 2 || el->flag == 3)  split_other(el);
-	  else if (el->split == 3)  split_kicker(el);
-	}
+    {
+      el = split_list->elem[i];
+      if (el->flag == 1
+          && (split_flag != 0 || el->nf_err > 0)) split_special(el);
+      else if (el->flag == 2 || el->flag == 3)  split_other(el);
+      else if (el->split == 3)  split_kicker(el);
+    }
     }
 }
 
@@ -2127,26 +2127,26 @@ void supp_elem()
     {
       el = current_element;
       if (el->value[0] == zero)  /* zero length */
-	{
-	  if (el->flag == 0)  yank(el);
-	  else if (el->keep_in == 0 && el->npole_sign == 0
-		   && (el->flag == 1 || el->flag > 4)
-		   && ident_zero(el) == 0) yank(el);
-	  else if (el->flag == 3) /* cavity */
-	    {
-	      cavity_count++;
-	      if (cavall_flag == 0 && cavity_count > 1) yank(el);
-	    }
-	}
+    {
+      if (el->flag == 0)  yank(el);
+      else if (el->keep_in == 0 && el->npole_sign == 0
+           && (el->flag == 1 || el->flag > 4)
+           && ident_zero(el) == 0) yank(el);
+      else if (el->flag == 3) /* cavity */
+        {
+          cavity_count++;
+          if (cavall_flag == 0 && cavity_count > 1) yank(el);
+        }
+    }
       else if(el->c_drift > 0)
-	{
-	  af = get_next_name(c, 'd');
-	  d1 = new_c6t_element(1, c, "drift");
-	  d1->value[0] = el->value[0];
-	  d1->flag = 1; d1->position = el->position;
-	  replace_c6t(el, d1);
-	  if (af != 0)  add_to_ellist(d1);
-	}
+    {
+      af = get_next_name(c, 'd');
+      d1 = new_c6t_element(1, c, "drift");
+      d1->value[0] = el->value[0];
+      d1->flag = 1; d1->position = el->position;
+      replace_c6t(el, d1);
+      if (af != 0)  add_to_ellist(d1);
+    }
       current_element = current_element->next;
     }
 }
@@ -2157,15 +2157,15 @@ void supp_small_comp(struct c6t_element* p)
   for (i = 12; i < p->n_values-1; i+=2)
     {
       if (fabs(p->value[i]) > fabs(p->value[i+1]))
-	{
-	  if (fabs(p->value[i+1]) / fabs(p->value[i]) < eps_6)
-	    p->value[i+1] = zero;
-	}
+    {
+      if (fabs(p->value[i+1]) / fabs(p->value[i]) < eps_6)
+        p->value[i+1] = zero;
+    }
       else if (fabs(p->value[i+1]) > fabs(p->value[i]))
-	{
-	  if (fabs(p->value[i]) / fabs(p->value[i+1]) < eps_6)
-	    p->value[i] = zero;
-	}
+    {
+      if (fabs(p->value[i]) / fabs(p->value[i+1]) < eps_6)
+        p->value[i] = zero;
+    }
     }
 }
 
@@ -2179,7 +2179,7 @@ void treat_split(struct c6t_element* el)
   else
     {
       if (el->force != 0)
-	app_factor(el->value[0], &el->value[12], el->n_values-12);
+    app_factor(el->value[0], &el->value[12], el->n_values-12);
       el->value[0] = zero; /* set element length to zero */
     }
 }
@@ -2203,9 +2203,9 @@ void write_all_el()
   while (current_element != NULL)
     {
       if (current_element->flag > 0
-	  && current_element == current_element->equiv
-	  && current_element->w_flag == 0)
-	write_c6t_element(current_element);
+      && current_element == current_element->equiv
+      && current_element->w_flag == 0)
+    write_c6t_element(current_element);
       current_element = current_element->next;
     }
   fprintf(f2, "NEXT\n");
@@ -2215,7 +2215,7 @@ void write_c6t_element(struct c6t_element* el)
 {
   if (strcmp(el->name, "CAV") != 0)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e\n",
-	    el->name, el->out_1, el->out_2, el->out_3, el->out_4);
+        el->name, el->out_1, el->out_2, el->out_3, el->out_4);
   el->w_flag = 1;
 }
 
@@ -2232,25 +2232,25 @@ void write_blocks()
   while (p != NULL)
     {
       if (p->equiv == p)
-	{
-	  if (p->flag != 0)
-	    {
-	      sprintf(p->name, "BLOC%d", ++nbct);
-	      fprintf(f2, "%-18s", p->name); lc++;
-	      for (i = 0; i < p->elements->curr; i++)
-		{
-		  if (lc++ == LINES_MAX)
-		    {
-		      fprintf(f2,"\n"); fprintf(f2,"                  "); lc = 2;
-		    }
-		  fprintf(f2, "%-18s",p->elements->elem[i]->equiv->name);
-		}
-	    }
-	  if (lc > 0)
-	    {
-	      fprintf(f2,"\n"); lc = 0;
-	    }
-	}
+    {
+      if (p->flag != 0)
+        {
+          sprintf(p->name, "BLOC%d", ++nbct);
+          fprintf(f2, "%-18s", p->name); lc++;
+          for (i = 0; i < p->elements->curr; i++)
+        {
+          if (lc++ == LINES_MAX)
+            {
+              fprintf(f2,"\n"); fprintf(f2,"                  "); lc = 2;
+            }
+          fprintf(f2, "%-18s",p->elements->elem[i]->equiv->name);
+        }
+        }
+      if (lc > 0)
+        {
+          fprintf(f2,"\n"); lc = 0;
+        }
+    }
       sum += p->length;
       p = p->next;
     }
@@ -2266,22 +2266,22 @@ void write_f8_errors()
   while (current_element != NULL)
     {
       if (current_element->tilt_err > 0) {
-	tiltval = current_element->value[6];
+    tiltval = current_element->value[6];
       } else {tiltval=0.0;}
       if (current_element->na_err > 0)
-	{
-	  if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-	  fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
-		  1000*current_element->p_al_err->a_dble[0],
-		  1000*current_element->p_al_err->a_dble[1],
-		  1000*(current_element->p_al_err->a_dble[5]+tiltval));
-	} else if (current_element->tilt_err > 0) {
-	  if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-	  fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
-		  0.0,
-		  0.0,
-		  1000*tiltval);
-	}
+    {
+      if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
+      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+          1000*current_element->p_al_err->a_dble[0],
+          1000*current_element->p_al_err->a_dble[1],
+          1000*(current_element->p_al_err->a_dble[5]+tiltval));
+    } else if (current_element->tilt_err > 0) {
+      if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
+      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+          0.0,
+          0.0,
+          1000*tiltval);
+    }
       current_element = current_element->next;
     }
 }
@@ -2295,35 +2295,35 @@ void write_f16_errors()
   while (current_element != NULL)
     {
       if (current_element->nf_err > 0 && current_element->ref_delta != zero)
-	{
-	  if (f16_cnt++ == 0)    f16 = fopen("fc.16", "w");
-	  if (current_element->equiv->f3_flag++ == 0)
-	    write_f3_entry("multipole", current_element->equiv);
-	  fprintf(f16,"%s\n", current_element->equiv->name);
-	  for (i = 0; i < current_element->nf_err; i++)
+    {
+      if (f16_cnt++ == 0)    f16 = fopen("fc.16", "w");
+      if (current_element->equiv->f3_flag++ == 0)
+        write_f3_entry("multipole", current_element->equiv);
+      fprintf(f16,"%s\n", current_element->equiv->name);
+      for (i = 0; i < current_element->nf_err; i++)
             tmp_buff[i] = current_element->p_fd_err->a_dble[i];
-	  for (i = current_element->nf_err; i < FIELD_MAX; i++)
+      for (i = current_element->nf_err; i < FIELD_MAX; i++)
             tmp_buff[i] = zero;
-	  factor = c1p3 / current_element->ref_delta;
-	  /* commented out because FIELD_MAX in MAD-X is larger than in original c6t */
-	  /*          for (i = 0; i < FIELD_MAX/2; i++) */
-	  for (i = 0; i < FIELD_MAX/2-1; i++)
-	    {
-	      fprintf(f16, "%23.15e", factor*tmp_buff[2*i]);
-	      factor *= current_element->ref_radius / (i+1);
-	      if ((i+1)%3 == 0) fprintf(f16,"\n");
-	    }
-	  if (i%3 != 0) fprintf(f16,"\n");
-	  factor = c1p3 / current_element->ref_delta;
-	  /*          for (i = 0; i < FIELD_MAX/2; i++) */
-	  for (i = 0; i < FIELD_MAX/2-1; i++)
-	    {
-	      fprintf(f16, "%23.15e", factor*tmp_buff[2*i+1]);
-	      factor *= current_element->ref_radius / (i+1);
-	      if ((i+1)%3 == 0) fprintf(f16,"\n");
-	    }
-	  if (i%3 != 0) fprintf(f16,"\n");
-	}
+      factor = c1p3 / current_element->ref_delta;
+      /* commented out because FIELD_MAX in MAD-X is larger than in original c6t */
+      /*          for (i = 0; i < FIELD_MAX/2; i++) */
+      for (i = 0; i < FIELD_MAX/2-1; i++)
+        {
+          fprintf(f16, "%23.15e", factor*tmp_buff[2*i]);
+          factor *= current_element->ref_radius / (i+1);
+          if ((i+1)%3 == 0) fprintf(f16,"\n");
+        }
+      if (i%3 != 0) fprintf(f16,"\n");
+      factor = c1p3 / current_element->ref_delta;
+      /*          for (i = 0; i < FIELD_MAX/2; i++) */
+      for (i = 0; i < FIELD_MAX/2-1; i++)
+        {
+          fprintf(f16, "%23.15e", factor*tmp_buff[2*i+1]);
+          factor *= current_element->ref_radius / (i+1);
+          if ((i+1)%3 == 0) fprintf(f16,"\n");
+        }
+      if (i%3 != 0) fprintf(f16,"\n");
+    }
       current_element = current_element->next;
     }
 }
@@ -2350,31 +2350,31 @@ void write_f34_special()
   while (current_element != NULL)
     {
       for (i = 0; i < NT34; i++)
-	{
-	  if (strcmp(current_element->base_name, t_list[i]) == 0)
-	    {
-	      n = f34_values(current_element, flags, values);
-	      if (f34_cnt++ == 0)    f34 = fopen("fc.34", "w");
-	      for (j = 0; j < n; j++)
-		{
-		  strcpy(t_name, current_element->name);
-		  if ((cp = strchr(t_name, '+')) != NULL) *cp = '\0';
-		  if ((err=double_from_table("twiss","s",&(current_element->twtab_row),&spos)))
-		    printf ("Not found double_from table = %i\n",err);
-		  if ((err=double_from_table("twiss","betx",&(current_element->twtab_row),&betx)))
-		    printf ("Not found double_from table = %i\n",err);
-		  if ((err=double_from_table("twiss","bety",&(current_element->twtab_row),&bety)))
-		    printf ("Not found double_from table = %i\n",err);
-		  if ((err=double_from_table("twiss","mux",&(current_element->twtab_row),&mux)))
-		    printf ("Not found double_from table = %i\n",err);
-		  if ((err=double_from_table("twiss","muy",&(current_element->twtab_row),&muy)))
-		    printf ("Not found double_from table = %i\n",err);
-		  fprintf(f34,
-			  " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
-			  spos,t_name,flags[j],values[j],betx,bety,mux,muy);
-		}
-	    }
-	}
+    {
+      if (strcmp(current_element->base_name, t_list[i]) == 0)
+        {
+          n = f34_values(current_element, flags, values);
+          if (f34_cnt++ == 0)    f34 = fopen("fc.34", "w");
+          for (j = 0; j < n; j++)
+        {
+          strcpy(t_name, current_element->name);
+          if ((cp = strchr(t_name, '+')) != NULL) *cp = '\0';
+          if ((err=double_from_table("twiss","s",&(current_element->twtab_row),&spos)))
+            printf ("Not found double_from table = %i\n",err);
+          if ((err=double_from_table("twiss","betx",&(current_element->twtab_row),&betx)))
+            printf ("Not found double_from table = %i\n",err);
+          if ((err=double_from_table("twiss","bety",&(current_element->twtab_row),&bety)))
+            printf ("Not found double_from table = %i\n",err);
+          if ((err=double_from_table("twiss","mux",&(current_element->twtab_row),&mux)))
+            printf ("Not found double_from table = %i\n",err);
+          if ((err=double_from_table("twiss","muy",&(current_element->twtab_row),&muy)))
+            printf ("Not found double_from table = %i\n",err);
+          fprintf(f34,
+              " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+              spos,t_name,flags[j],values[j],betx,bety,mux,muy);
+        }
+        }
+    }
       current_element = current_element->next;
     }
   if (last_in_sequ->twtab_row > 0) {
@@ -2390,8 +2390,8 @@ void write_f34_special()
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
-	  " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
-	  spos,"end_marker",100,zero,betx,bety,mux,muy);
+      " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+      spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
 void write_f3_aper()
@@ -2401,18 +2401,18 @@ void write_f3_aper()
   while (current_element != NULL)
     {
       if (strstr(current_element->name,"_AP")!=NULL
-	  && (current_element->equiv == current_element)) {
-	if (f3aper_cnt++ == 0) {
-	  f3aper  = fopen("fc.3.aper", "w");
-	  fprintf(f3aper,"LIMI\n");
-	}
-	if (current_element->value[3] == 1) {
-	  fprintf(f3aper,"%s %s %f %f\n",current_element->name,"RE",
-		  current_element->value[1], current_element->value[2]);
-	} else {
-	  fprintf(f3aper,"%s %s %f %f\n",current_element->name,"EL",
-		  current_element->value[1], current_element->value[2]);
-	}
+      && (current_element->equiv == current_element)) {
+    if (f3aper_cnt++ == 0) {
+      f3aper  = fopen("fc.3.aper", "w");
+      fprintf(f3aper,"LIMI\n");
+    }
+    if (current_element->value[3] == 1) {
+      fprintf(f3aper,"%s %s %f %f\n",current_element->name,"RE",
+          current_element->value[1], current_element->value[2]);
+    } else {
+      fprintf(f3aper,"%s %s %f %f\n",current_element->name,"EL",
+          current_element->value[1], current_element->value[2]);
+    }
       }
       current_element = current_element->next;
     }
@@ -2434,20 +2434,20 @@ void write_f3aux()
     {
       if (f3aux_cnt++ == 0)     f3aux  = fopen("fc.3.aux", "w");
       if (double_from_table("summ","alfa", &row, &tw_alfa) !=0)
-	printf("c6t warning: alfa not found in twiss\n");
+    printf("c6t warning: alfa not found in twiss\n");
       fprintf(f3aux, "SYNC\n");
       fprintf(f3aux,"%12.0f%10.6f%10.3f 0.%10.3f%12.6f  1\n",
-	      harmon, tw_alfa, total_voltage, sequ_length,
-	      c1p3*command_par_value("mass", current_beam));
+          harmon, tw_alfa, total_voltage, sequ_length,
+          c1p3*command_par_value("mass", current_beam));
       fprintf(f3aux,"      1.        1.\n");
       fprintf(f3aux, "NEXT\n");
       fprintf(f3aux, "BEAM\n");
       fprintf(f3aux, "%12.4e%14.6g%14.6g%12.4e%12.4e  1  0\n",
-	      command_par_value("npart", current_beam),
-	      0.25e6*command_par_value("exn", current_beam),
-	      0.25e6*command_par_value("eyn", current_beam),
-	      command_par_value("sigt", current_beam),
-	      command_par_value("sige", current_beam));
+          command_par_value("npart", current_beam),
+          0.25e6*command_par_value("exn", current_beam),
+          0.25e6*command_par_value("eyn", current_beam),
+          command_par_value("sigt", current_beam),
+          command_par_value("sige", current_beam));
       fprintf(f3aux, "NEXT\n");
     }
   if (aux_val[0] > -1.e10 && aux_val[1] > -1.e10)
@@ -2473,20 +2473,20 @@ void write_f3_matrix()
   while (current_element != NULL)
     {
       if (strcmp(current_element->base_name, "matrix") == 0)
-	{
-	  if (f3_matrix_cnt++ == 0)
-	    {
-	      f3matrix  = fopen("fc.3", "w");
-	      fprintf(f3matrix,"TROM\n");
-	      fprintf(f3matrix,"%-16s\n",current_element->name);
-	    }
-	  for (i = 1; i < i_max; i++)
-	    {
-	      fprintf(f3matrix,"%23.15e", current_element->value[i]);
-	      if (i%3 == 0) fprintf(f3matrix,"\n");
-	    }
-	  fprintf(f3matrix,"NEXT\n");
-	}
+    {
+      if (f3_matrix_cnt++ == 0)
+        {
+          f3matrix  = fopen("fc.3", "w");
+          fprintf(f3matrix,"TROM\n");
+          fprintf(f3matrix,"%-16s\n",current_element->name);
+        }
+      for (i = 1; i < i_max; i++)
+        {
+          fprintf(f3matrix,"%23.15e", current_element->value[i]);
+          if (i%3 == 0) fprintf(f3matrix,"\n");
+        }
+      fprintf(f3matrix,"NEXT\n");
+    }
       current_element = current_element->next;
     }
 }
@@ -2511,15 +2511,15 @@ void write_f3_mult(struct c6t_element* el)
     {
       eln = types.member[multi_type]->elem[j];
       if (eln->equiv == el)
-	{
-	  for (i = 0; i < eln->nf_err; i++)
-	    {
-	      if (eln->p_fd_err->a_dble[i] != zero)
-		{
-		  i_max = i; error_matrix[i] = 1.;
-		}
-	    }
-	}
+    {
+      for (i = 0; i < eln->nf_err; i++)
+        {
+          if (eln->p_fd_err->a_dble[i] != zero)
+        {
+          i_max = i; error_matrix[i] = 1.;
+        }
+        }
+    }
     }
   if (++i_max > 0)  i_max += i_max%2;
   for (i = 0; i < i_max; i++)
@@ -2544,9 +2544,9 @@ void write_struct()
       if (p->flag == 0) out = p->first->equiv->name;
       else              out = p->equiv->name;
       if (lc++ == LINES_MAX)
-	{
-	  fprintf(f2,"\n"); lc = 1;
-	}
+    {
+      fprintf(f2,"\n"); lc = 1;
+    }
       fprintf(f2, "%-18s", out);
       p = p->next;
     }
@@ -2567,16 +2567,16 @@ int my_table_row(struct table* table, char* name)
   if (i < table->num_cols && last_row < table->curr)
     {
       for (j = last_row; j < table->curr; j++)
-	{
-	  strcpy(t_name, table->s_cols[i][j]);
-	  if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';    
-	  if (strcmp(name, t_name) == 0) break;
-	}
-      if (j < table->curr) 
-	{
-	  ret = j+1;
-	  last_row = j+1;
-	}
+    {
+      strcpy(t_name, table->s_cols[i][j]);
+      if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';
+      if (strcmp(name, t_name) == 0) break;
+    }
+      if (j < table->curr)
+    {
+      ret = j+1;
+      last_row = j+1;
+    }
     }
   return ret;
 }

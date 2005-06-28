@@ -98,7 +98,7 @@ void match_action(struct in_cmd* cmd)
      match_work[6] = new_double_array(total_vars+1);
      fprintf(prt_file, "START SIMAN:\n\n");
      mtsa_(&total_const, &total_vars,
-	   &match_tol, &current_calls, &current_call_lim,
+       &match_tol, &current_calls, &current_call_lim,
            vary_vect->a, fun_vect->a,&iseed,&iprint,
            match_work[0]->a, match_i_work[1]->i, match_work[2]->a,
            match_work[3]->a, match_work[4]->a, match_work[5]->a,
@@ -226,9 +226,9 @@ void match_end(struct in_cmd* cmd)
       current_twiss = local_twiss[i]->clone;
       pro_twiss();
       if (twiss_success && print_match_summary == 1)
-	{
-	collect_(&current_const, &penalty, fun_vect->a);
-	}
+    {
+    collect_(&current_const, &penalty, fun_vect->a);
+    }
     }
   fprintf(prt_file, "\n\n");
 
@@ -239,7 +239,7 @@ void match_end(struct in_cmd* cmd)
   fprintf(prt_file, "-------------------------------------------------------------------------------\n");
   if (print_match_summary == 1)
     {
-/* drop first int* passed variable mtgetc_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); 05.02.2005 */     
+/* drop first int* passed variable mtgetc_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); 05.02.2005 */
       mtgetc_(vary_vect->a, vary_dvect->a); /* mtgeti->mtgetc JMJ, 8/4/2003 */
     }
   fprintf(prt_file, "\n");
@@ -629,7 +629,7 @@ void match_prepare_varypos()
 /* keeps constraints from nodes, reexpands, adds constraints to nodes */
 {
   struct node* node = current_sequ->ex_start;
-  struct constraint_list** tmplist = (struct constraint_list**) 
+  struct constraint_list** tmplist = (struct constraint_list**)
          malloc(current_sequ->n_nodes * sizeof(struct constraint_list*));
   int i = 0;
   while (node != NULL)

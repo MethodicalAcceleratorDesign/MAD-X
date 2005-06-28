@@ -17,7 +17,7 @@
   tg &= ~mask; tg |= so;
   *target = tg;
 }
- 
+
   void mydtime(int* year, int* month, int* day, int* hour, int* minute,
                int* sec)
 {
