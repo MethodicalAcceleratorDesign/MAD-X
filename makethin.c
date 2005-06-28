@@ -33,6 +33,14 @@
 /* M. Hayes                                            */
 /* prototyping *******************************************************/
 
+/* define bool like in C++ */
+#ifndef bool_for_c
+  #define bool_for_c
+  typedef unsigned char bool;
+  #define true 1
+  #define false 0
+#endif
+
 struct element* create_thin_obj(struct element*,int slice_no);
 struct sequence* seq_diet(struct sequence*);
 double at_shift(int ,int );
@@ -67,37 +75,36 @@ struct el_list *thin_select_list = NULL;
 
 /* code starts here **************************************************/
 
-/* this routine interfaces to the main mad-x code to return the number
-   of slices we have to use for an element */
-int get_slices(struct element* elem)
+void dump_slices(void)
+/* Loops over all current elements and prints the number of slices. Used for debug and info */
 {
-  int slices = 0,i;
-  if (thin_select_list) {
-    for(i=0; i < thin_select_list->curr; i++) {
-      if (elem==thin_select_list->elem[i]) {
-      slices = thin_select_list->list->inform[i]; break;
-      }
+  struct element* el_i;
+  int i,el_i_slice_pos,slices,n_elem_with_slice=0,n_elem_with_slice_gt_1=0;
+  printf("++++++ dump_slices");
+  for(i=0; i< element_list->curr; i++) /* loop over element_list */
+  { el_i = element_list->elem[i];
+    el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
+    if(el_i_slice_pos>0)
+    { n_elem_with_slice++;
+      slices=el_i->def->par->parameters[el_i_slice_pos]->double_value;
+      if(slices>1) n_elem_with_slice_gt_1++;
     }
   }
-  /* must always slice to thin */
-  if (slices==0) slices = 1;
+  printf("------ end of dump slices. There were %4d elements, %3d with slice numbers and %2d with slice numbers>1\n\n",element_list->curr,n_elem_with_slice,n_elem_with_slice_gt_1);
+}
+
+int get_slices_from_elem(struct element* elem)
+{
+  int elem_slice_pos=0,slices=1;
+  if(Verbose()) printf("    hbudebug verbose makethin.c get_slices_from_elem called for elem %s\n",elem->name);
+  elem_slice_pos = name_list_pos("slice",elem->def->par_names);
+  if(elem_slice_pos > 0)
+  { slices=elem->def->par->parameters[elem_slice_pos]->double_value;
+    if(Verbose()) printf("        hbudebug verbose makethin.c get_slices_from_elem slices=%d\n",slices);
+  }
+  if (slices==0) slices = 1; /* must always slice to thin */
   return slices;
 }
-
-int get_slices_recurse(struct element* elem)
-{
-  int slices =0,tmp_slices=0;
-  if (elem->parent != elem->parent->parent)
-    slices = get_slices_recurse(elem->parent);
-
-  tmp_slices = get_slices(elem->parent);
-  if ( slices < tmp_slices ) {
-    return tmp_slices;
-  } else {
-    return slices;
-  }
-}
-
 
 /* Has this element already been dieted? returns NULL for NO.*/
 struct element* get_thin(struct element* thick_elem, int slice)
@@ -237,32 +244,48 @@ struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
   int last_non_zero=-1,i;
   if (kn_param == NULL) return NULL;
 
-  for (i=0; i<kn_param->expr_list->curr; i++) {
+  if(Verbose()) printf("    hbudebug makethin.c verbose scale_and_slice line %d angle_conversion=%d\n",__LINE__,angle_conversion); /*hbu */
+  for (i=0; i<kn_param->expr_list->curr; i++)
+  {
     if ((kn_param->expr_list->list[i]!=NULL && zero_string(kn_param->expr_list->list[i]->string)==0)
-      || kn_param->double_array->a[i]!=0) {
+      || kn_param->double_array->a[i]!=0)
+    {
       last_non_zero=i;
-        if (kl_flag == 0 && (angle_conversion==0||i>0)) { /*hbu apply the angle_conversion==0 check only to zero order multipole */
-        if ((length_param->expr) || (kn_param->expr_list->list[i])) {
+      if (kl_flag == 0 && (angle_conversion==0||i>0)) /*hbu apply the angle_conversion==0 check only to zero order multipole */
+      {
+        if ((length_param->expr) || (kn_param->expr_list->list[i]))
+        {
           kn_param->expr_list->list[i] =
             compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
             "*",length_param->expr,length_param->double_value); /* multiply expression with length */
-        } else { /* multiply value with length */
+          if(Verbose()) { printf("    hbudebug verbose makethin.c scale_and_slice line %d angle_conversion=%d i=%d after multiply with length kn_param->expr_list->list[i]=",__LINE__,angle_conversion,i); Print_expression(kn_param->expr_list->list[i]); } /*hbu */
+        }
+        else
+        { /* multiply value with length */
           kn_param->double_array->a[i] =  kn_param->double_array->a[i] * length_param->double_value;
+          if(Verbose()) printf("    hbudebug verbose makethin.c scale_and_slice line %d angle_conversion=%d i=%d after multiply with length kn_param->double_array->a[i]=%le\n",__LINE__,angle_conversion,i,kn_param->double_array->a[i]); /*hbu */
         }
       }
-      if (slices > 1) { /* give the correct weight by slice (multiply with the inverse of the number of slices) */
-      if (kn_param->expr_list->list[i])  {
-        kn_param->expr_list->list[i] =
-          compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
-          "*",NULL,q_shift(slices,slice_no));
-      } else {
-        kn_param->double_array->a[i] =
+      if (slices > 1)
+      { /* give the correct weight by slice (multiply with the inverse of the number of slices) */
+        if (kn_param->expr_list->list[i])
+        {
+          kn_param->expr_list->list[i] =
+            compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
+            "*",NULL,q_shift(slices,slice_no));
+          if(Verbose()) { printf("    hbudebug verbose makethin.c scale_and_slice line %d angle_conversion=%d i=%d after weighting with slice number kn_param->expr_list->list[i]=",__LINE__,angle_conversion,i); Print_expression(kn_param->expr_list->list[i]); } /*hbu */
+        }
+        else
+        {
+          kn_param->double_array->a[i] =
           kn_param->double_array->a[i] *q_shift(slices,slice_no);
-      }
+          if(Verbose()) printf("    hbudebug verbose makethin.c scale_and_slice line %d angle_conversion=%d i=%d after weighting with slice number kn_param->double_array->a[i]=%le\n",__LINE__,angle_conversion,i,kn_param->double_array->a[i]); /*hbu */
+        }
       }
     }
   }
-  if (last_non_zero==-1) {
+  if (last_non_zero==-1)
+  {
     delete_command_parameter(kn_param); kn_param=NULL;
   }
   return kn_param;
@@ -286,6 +309,7 @@ int translate_k(struct command_parameter* *kparam,
   /* if we have a angle we ignore any given k0 */
   if (angle_param) {
     kparam[0] =  new_command_parameter("k0", 2);
+    if(Verbose()) { printf("    hbudebug verbose makethin.c translate_k line %d has angle_param\n",__LINE__); Print_command_parameter(kparam[0]); } /*hbu */
     angle_conversion=1; /* note we do not divide by length, just to multiply again afterwards */
     if (angle_param->expr) {
       kparam[0]->expr =  clone_expression(angle_param->expr);
@@ -299,12 +323,14 @@ int translate_k(struct command_parameter* *kparam,
     ks_param->expr_list->list[i] = NULL; ks_param->double_array->a[i] = 0;
     /* copy across the k's */
     if (kparam[i]) {
+      if(Verbose()) { printf("    hbudebug verbose makethin.c translate_k line %d has kparam  work on multipole  %d\n",__LINE__,i); Print_expr_list(kn_param->expr_list); } /*hbu */
       if (kparam[i]->expr) {
       kn_param->expr_list->list[i] = clone_expression(kparam[i]->expr);
       }
       kn_param->double_array->a[i] = kparam[i]->double_value;
     }
     if (ksparam[i]) {
+      if(Verbose()) { printf("    hbudebug verbose makethin.c translate_k line %d has ksparam work on multipole  %d\n",__LINE__,i); Print_expr_list(ks_param->expr_list); } /*hbu */
       if (ksparam[i]->expr) {
       ks_param->expr_list->list[i] = clone_expression(ksparam[i]->expr);
       }
@@ -315,6 +341,7 @@ int translate_k(struct command_parameter* *kparam,
     ks_param->expr_list->curr++; ks_param->double_array->curr++;
   }
 
+  if(Verbose()) printf("    hbudebug verbose makethin.c translate_k end line %d angle_conversion=%d\n",__LINE__,angle_conversion); /*hbu */
   return angle_conversion;
 }
 
@@ -498,7 +525,8 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
     angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
   }
 
-  slices = get_slices_recurse(thick_elem);
+  if(Verbose()) { printf("    hbudebug verbose makethin.c in create_thin_pole before get_slices_from_elem for thick_elem %s\n",thick_elem->name); Print_element(thick_elem); }  /*hbu */
+  slices = get_slices_from_elem(thick_elem);
 
   kn_param = scale_and_slice(kn_param,length_param,slices,slice_no,
              angle_conversion,knl_flag+ksl_flag);
@@ -564,7 +592,8 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
   } else {
     elem = create_thin_pole(node->p_elem,1); /* get info from first slice */
   }
-  slices = get_slices_recurse(node->p_elem);
+  if(Verbose()) { printf("    hbudebug verbose makethin.c in seq_diet_add_elem get_slices_from_elem for node->p_elem %s\n",node->p_elem->name); Print_element(node->p_elem); } /*hbu */
+  slices = get_slices_from_elem(node->p_elem); /*hbu June 2005 */
 
   at_param = return_param_recurse("at",elem);
   length_param = return_param_recurse("l",node->p_elem); /*get original length*/
@@ -604,6 +633,7 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
       if (at_expr) thin_node->at_expr = clone_expression(at_expr);
     }
     thin_node->at_value = at + length*at_shift(slices,i+1);
+    if(Verbose()) { printf("    hbudebug verbose makethin.c seq_diet_add_elem line %d thin_node=\n",__LINE__); Print_node(thin_node); } /*hbu */
 
     if (i==middle) seq_diet_add(new_marker(node,at,at_expr),to_sequ);
     seq_diet_add(thin_node,to_sequ);
@@ -666,8 +696,9 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
     cmd->par->parameters[length_i]->double_value = 0;
     cmd->par->parameters[length_i]->expr = NULL;
   }
+  if(Verbose()) { printf("    hbudebug verbose makethin.c in create_thin_obj get_slices_from_elem for thick_elem %s\n",thick_elem); Print_element(thick_elem); } /*hbu */
   if (strstr(thick_elem->base_type->name,"collimator")) {
-    slices = get_slices_recurse(thick_elem);
+    slices = get_slices_from_elem(thick_elem);
   }
   if (slices==1 && slice_no==1) {
     thin_name=buffer(thick_elem->name);
@@ -694,6 +725,7 @@ struct node* copy_thin(struct node* thick_node)
 {
   struct node* thin_node = NULL;
 
+  if(Verbose()) { printf("    hbudebug verbose makethin.c makethin copy_thin\n"); Print_node(thick_node); } /*hbu debug*/
   thin_node = clone_node(thick_node, 0);
   thin_node->length=0;
   thin_node->p_elem->length=0;
@@ -716,10 +748,12 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
     }
     else if(strcmp(thick_node->base_name,"matrix") == 0)
     { /*hbu. Take matrix as it is, including any length */
+      if(Verbose()) printf("    hbudebug verbose makethin.c seq_diet_node copy matrix as it is.\n"); /*hbu */
       seq_diet_add(thick_node,thin_sequ);
     }
     else
     { /* we have to slim it down a bit...*/
+      if(Verbose()) printf("    hbudebug verbose makethin.c seq_diet_node line %d slice %s\n",__LINE__,thick_node->base_name); /*hbu */
       if (strcmp(thick_node->base_name,"marker") == 0    ||
         strcmp(thick_node->base_name,"instrument") == 0  ||
         strcmp(thick_node->base_name,"hmonitor") == 0    ||
@@ -730,13 +764,13 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
         strcmp(thick_node->base_name,"kicker") == 0      ||
         strcmp(thick_node->base_name,"rfcavity") == 0
         ) {
-      seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
-      /*   delete_node(thick_node); */
-      /* special cavity list stuff */
-      if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
+        seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
+        /*   delete_node(thick_node); */
+        /* special cavity list stuff */
+        if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
           find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
         add_to_el_list(&thin_node->p_elem, 0, thin_sequ->cavities, 0);
-      } else if (strcmp(thick_node->base_name,"rbend") == 0       ||
+      } else if (strcmp(thick_node->base_name,"rbend") == 0 ||
         strcmp(thick_node->base_name,"sbend") == 0       ||
         strcmp(thick_node->base_name,"quadrupole") == 0  ||
         strcmp(thick_node->base_name,"sextupole") == 0   ||
@@ -747,14 +781,14 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
         strcmp(thick_node->base_name,"rcollimator") == 0 ||
         strcmp(thick_node->base_name,"ecollimator") == 0
         ) {
-      seq_diet_add_elem(thick_node,thin_sequ);
+        seq_diet_add_elem(thick_node,thin_sequ);
       /*   delete_node(thick_node); */
-      } else if (strcmp(thick_node->base_name,"drift") == 0) {
-      /* ignore this as it makes no sense to slice */
-      } else {
-      fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
-      seq_diet_add(copy_thin(thick_node),thin_sequ);
-      /*        delete_node(thick_node); */
+        } else if (strcmp(thick_node->base_name,"drift") == 0) {
+        /* ignore this as it makes no sense to slice */
+        } else {
+        fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
+        seq_diet_add(copy_thin(thick_node),thin_sequ);
+        /*        delete_node(thick_node); */
       }
     }
   } else if (thick_node->p_sequ) { /* this is a sequence to split and add */
@@ -762,6 +796,7 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
   } else { /* we have no idea what this is - serious error */
     fatal_error("node is not element or sequence",thick_node->base_name);
   }
+  if(Verbose()) printf("    hbudebug verbose makethin.c end of seq_diet_node line %d slice %s\n\n",__LINE__,thick_node->base_name); /*hbu */
 }
 
 /* slim down this sequence - this is the bit to be called recursively */
@@ -832,13 +867,19 @@ void makethin(struct in_cmd* cmd)
     }
   /* selection criteria */
   if (slice_select->curr > 0) {
-    set_selected_elements(); thin_select_list = selected_elements;
+    set_selected_elements();
+    thin_select_list = selected_elements;
   }
   if (thin_select_list == NULL) {
     warning("makethin: no selection list,","slicing all to one thin lens.");
   } else if (thin_select_list->curr == 0) {
-    warning("makethin: selection list empty,","slicing all to one thin lens.");
+    warning("makethin selection list empty,","slicing all to one thin lens.");
   }
+  if(Verbose()) /*hbu */
+  { printf("    hbudebug verbose makethin.c makethin el_list thin_select_list was prepared by set_selected_elements. el_list:\n"); /*hbu */
+    if(thin_select_list!=NULL) dump_el_list(thin_select_list); /*hbu */
+    printf("\n\n\n");
+  } /*hbu */
   pos = name_list_pos("sequence", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string))
     {
@@ -953,5 +994,84 @@ double q_shift(int slices,int slice_no)
   return 0;
 }
 
+void set_selected_elements()
+{ /*hbu June 2005.  New set_selected_elements */
+  struct element* el_j;
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  int i, j, pos_slice, pos_full, pos_range, slice, el_j_slice_pos;
+  bool full_fl,range_fl,slice_fl;
+  struct node* c_node;    /* for range check.  current node */
+  struct node* nodes[2];  /* for range check.  first and last in range */
+  /* Init curr and list->curr in global el_list structure.  selected_elements is passed to add_to_el_list and used at the end as thin_select_list
+    selected_elements  is only used in makethin (set here and read in and could be named thin_select_list
+  */
+  selected_elements->curr = 0;
+  selected_elements->list->curr = 0;  /* Reset list->curr in global el_list structure.   selected_elements is passed to add_to_el_list */
+  /* default is full sequence from start to end */
+  nodes[0] = current_sequ->ex_start;
+  nodes[1] = current_sequ->ex_end;
+  for (i = 0; i < slice_select->curr; i++) /* loop over "select,flag=makethin" commands */
+  { nl = slice_select->commands[i]->par_names;
+    pl = slice_select->commands[i]->par;
+    pos_full  = name_list_pos("full", nl);
+    full_fl   = pos_full  > -1 && nl->inform[pos_full];  /* selection with full */
+    pos_range = name_list_pos("range", nl);
+    range_fl  = pos_range > -1 && nl->inform[pos_range]; /* selection with range */
+    pos_slice = name_list_pos("slice", nl);              /* position of slice parameter in select command list */
+    slice_fl  = pos_slice > -1 && nl->inform[pos_slice]; /* selection with slice */
+    if (slice_fl) slice = pl->parameters[pos_slice]->double_value; /* Parameter has been read. Slice number from select command */
+    else slice = 1;
+    if(full_fl) /* use full sequence from start to end, the default */
+    { nodes[0] = current_sequ->ex_start;
+      nodes[1] = current_sequ->ex_end;
+      if(Verbose()) printf("    hbudebug verbose set_selected_elements full_fl use full current sequence from start at %s to end at %s\n",nodes[0]->p_elem->name,nodes[1]->p_elem->name);
+    }
+    if(range_fl)
+    { if (current_sequ == NULL || current_sequ->ex_start == NULL) /* check that there is an active sequence, otherwise crash in get_ex_range */
+      { warning("makethin range selection without active sequence,", "ignored");
+        return;
+      }
+      if( get_ex_range(pl->parameters[pos_range]->string, current_sequ, nodes) == 0) /* set start nodes[0] and end notes[1] depending on the range string */
+      { printf("    +++ warning, empty range");
+        continue;
+      }
+      else if(Verbose()) printf("    hbudebug verbose set_selected_elements use range selection %s which is elements from %s to %s\n",pl->parameters[pos_range]->string,nodes[0]->p_elem->name,nodes[1]->p_elem->name);
+    }
+    if(slice_fl) /* Set slice number in elements. Add to list of selected_elements */
+    { if(range_fl) /* now elements in the sequence in the range */
+      { c_node = nodes[0];
+        while (c_node != NULL) /* loop over nodes in range,  set slice number in elements */
+        { el_j = c_node->p_elem;
+          el_j_slice_pos = name_list_pos("slice",el_j->def->par_names); /* position of slice parameter in element list */
+          if (pass_select(el_j->name, slice_select->commands[i]) != 0) /* selection on class and pattern done in pass_select. element el_j selected */
+          { /* the element el_j passes the selection */
+            if(el_j_slice_pos > 0) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; /* Set the element slice number to the number of slices given in the select statement. */
+            if( name_list_pos(el_j->name, selected_elements->list) < 0) /* el_j not yet in selected_elements */
+            {
+              add_to_el_list(&el_j, slice, selected_elements, 0);
+            } /* new selection */
+          } /* selection */
+          if (c_node == nodes[1]) break; /* done with last node */
+          c_node = c_node->next;
+        } /* end of while loop over nodes in range */
+      } /* range_fl */
+	  else /* no range_fl */
+      { for(j=0; j< element_list->curr; j++) /* loop over element_list */
+        { el_j = element_list->elem[j];
+          el_j_slice_pos = name_list_pos("slice",el_j->def->par_names);
+          if (pass_select(el_j->name, slice_select->commands[i]) != 0) /* selection on class and pattern done in pass_select. element el_j selected */
+          { /* the element el_j passes the selection */
+            if(el_j_slice_pos > 0) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; /* Set the element slice number to the number of slices given in the select statement. */
+            if( name_list_pos(el_j->name, selected_elements->list) < 0) /* el_j not yet in selected_elements */
+            {
+              add_to_el_list(&el_j, slice, selected_elements, 0);
+            } /* new selection */
+          } /* selection */
+        } /* loop over element_list */
+      } /* range_fl */
+    } /* slice_fl */
+  } /* end of loop over select slice commands */
+}
 
 /*************************************************************************/
