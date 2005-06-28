@@ -6403,46 +6403,11 @@ void set_selected_columns(struct table* t, struct command_list* select)
                         && int_in_array(k, n, t->col_out->i) == 0)
                             t->col_out->i[n++] = k;
                   }
-              }         
+              }
            }
         }
        }
      t->col_out->curr = n;
-    }
-}
-
-void set_selected_elements()
-{
-  struct name_list* nl;
-  struct command* cd;
-  struct command_parameter_list* pl;
-  struct element* el;
-  int i, j, pos, slice;
-  selected_elements->curr = 0;
-  selected_elements->list->curr = 0;
-  for (j = 0; j < element_list->curr; j++)
-    {
-     el = element_list->elem[j];
-     for (i = 0; i < slice_select->curr; i++)
-       {
-        cd = slice_select->commands[i];
-        nl = cd->par_names;
-        pos = name_list_pos("slice", nl);
-        pl = cd->par;
-        if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-          slice = pl->parameters[pos]->double_value;
-        else slice = 1;
-        if (pass_select(el->name, cd) != 0)
-          {
-           if ((pos = name_list_pos(el->name, selected_elements->list)) > -1)
-           {
-            if (selected_elements->list->inform[pos] < slice)
-       selected_elements->list->inform[pos] = slice;
-           }
-           else add_to_el_list(&el, slice, selected_elements, 0);
-           break;
-          }
-       }
     }
 }
 
