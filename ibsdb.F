@@ -689,10 +689,6 @@
      &          chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*
      &          c2y ) / cprime
 
-      write(*,*) ' first ' 
-      write(*,*) tx1,tx2,ty1,ty2,chy
-c      stop 
-
       al(1)  = zero
 
       do iloop = 1, maxdec
