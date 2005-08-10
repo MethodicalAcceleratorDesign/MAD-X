@@ -234,7 +234,8 @@
      &hscrpt,hscwtd,s1,s2,salxb,salyb,sbxb,sbxinv,sbyb,sbyinv,sdpxb,    &
      &sdxb,taul,taux,tauy,tavl,tavlc,tavx,tavxc,tavy,tavyc,tlbar,tlidc, &
      &tlwtd,txbar,txidc,txwtd,tybar,tyidc,tywtd,wnorm,sdum,get_value,   &
-     &get_variable,zero,one,two,half
+     &get_variable,zero,one,two,half,dy,dy1,dy2,dybar,dywtd,hscrpty,    &
+     &hscwtdy,sdpyb,sdyb,dpy,dpy1,dpy2,dpybr,dpywtd,beteffy,alywtd
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0)
       include 'ibsdb.fi'
       include 'physcons.fi'
@@ -328,9 +329,13 @@
       tavyc  = zero
       dxwtd  = zero
       dpxwtd = zero
+      dywtd  = zero
+      dpywtd = zero
       bywtd  = zero
       alxwtd = zero
+      alywtd = zero
       hscwtd = zero
+      hscwtdy= zero
       wnorm  = zero
       sbxb   = zero
       sbyb   = zero
@@ -338,10 +343,10 @@
       salyb  = zero
       sdxb   = zero
       sdpxb  = zero
+      sdyb   = zero
+      sdpyb  = zero
       sbxinv = zero
       sbyinv = zero
-
-
 
 ! ****** Start new Twiss Table reading *****************
 !
@@ -363,6 +368,10 @@
       flag = double_from_table('twiss ', 'dx ', range(1), dx1)
       if (flag .ne. 0)  goto 102
       flag = double_from_table('twiss ', 'dpx ', range(1), dpx1)
+      if (flag .ne. 0)  goto 102
+      flag = double_from_table('twiss ', 'dy ', range(1), dy1)
+      if (flag .ne. 0)  goto 102
+      flag = double_from_table('twiss ', 'dpy ', range(1), dpy1)
       if (flag .ne. 0)  goto 102
 
 ! ************** Check if "ibs_table" required  ****************
@@ -388,6 +397,10 @@
         if (flag .ne. 0)  goto 102
         flag = double_from_table('twiss ', 'dpx ', i, dpx2)
         if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'dy ', i, dy2)
+        if (flag .ne. 0)  goto 102
+        flag = double_from_table('twiss ', 'dpy ', i, dpy2)
+        if (flag .ne. 0)  goto 102
         dels = s2-s1
 
         sdum = half * (s2 + s1)
@@ -412,6 +425,12 @@
         dpx    = half * (dpx2 + dpx1)
         sdpxb  = sdpxb + dpx * dels
 
+        dy     = half * (dy2 + dy1)
+        sdyb   = sdyb + dy * dels
+
+        dpy    = half * (dpy2 + dpy1)
+        sdpyb  = sdpyb + dpy * dels
+
 
 !*---- Calculate weighted average in region of non-zero DX's.
 !     These values are used to calculate "average" ring lifetimes
@@ -420,15 +439,22 @@
           wnorm  = wnorm + dels
           dxwtd  = dxwtd + dels * dx
           dpxwtd = dpxwtd + dels * dpx
+          dywtd  = dywtd + dels * dy
+          dpywtd = dpywtd + dels * dpy
           bywtd  = bywtd + dels / sqrt(betay)
           alxwtd = alxwtd + dels * alx
+          alywtd = alywtd + dels * aly
           hscrpt = betax * dpx**2 + two * alx * dx * dpx +              &
      &(one + alx**2) * dx**2 / betax
+          hscrpty = betay * dpy**2 + two * aly * dy * dpy +             &
+     &(one + aly**2) * dy**2 / betay
           hscwtd = hscwtd + dels * sqrt(hscrpt)
+          hscwtdy = hscwtdy + dels * sqrt(hscrpty)
         endif
 
 !---- TWSINT calculates the Bjorken/Mtingwa integral.
-        call twsint(betax, betay, alx, dx, dpx, txidc, tyidc, tlidc)
+        call twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, 
+     &              txidc, tyidc, tlidc)
 
 !---- Accumulate contributions.
         tavlc = tavlc + tlidc * dels
@@ -471,16 +497,26 @@
       alybar = salyb / s2
       dxbar  = sdxb / s2
       dpxbr  = sdpxb / s2
+      dybar  = sdyb / s2
+      dpybr  = sdpyb / s2
       bxinv  = sbxinv / s2
       byinv  = sbyinv / s2
 
       dxwtd  = dxwtd / wnorm
       dpxwtd = dpxwtd / wnorm
+      dywtd  = dywtd / wnorm
+      dpywtd = dpywtd / wnorm
       bywtd  = bywtd / wnorm
       bywtd  = one / bywtd**2
       alxwtd = alxwtd / wnorm
+      alywtd = alywtd / wnorm
       hscwtd = (hscwtd/wnorm)**2
       beteff = dxwtd**2 / hscwtd
+      if (hscwtdy.ne.0.d0) then 
+      beteffy = dywtd**2 / hscwtdy
+      else 
+      beteffy = bywtd 
+      endif 
 ! ********** Compute beam sizes with average betas ************
 
       sigx = sqrt(ex * bxbar)
@@ -492,17 +528,20 @@
 ! ************************************************************
 
 !---- Integral for averaged quantities.
-      call twsint(bxbar,bybar,alxbar,dxbar,dpxbr, txbar,tybar,tlbar)
+      call twsint(bxbar,bybar,alxbar,alybar, dxbar,dpxbr, 
+     &            dybar,dpybr,txbar,tybar,tlbar)
 
 !---- Integral for effective quantities.
-      call twsint(beteff,bywtd,alxwtd,dxwtd,dpxwtd, txwtd,tywtd,tlwtd)
+      call twsint(beteff,beteffy,alxwtd,alywtd,dxwtd,dpxwtd, 
+     &            dywtd,dpywtd,txwtd,tywtd,tlwtd)
 
 !---- Calculate the Coulomb logarithm.
       call twclog(bxbar, bybar, const)
 
 !---- Output (weighted) average values.
-      write (*, 940) bxbar, bybar, dxbar, alxbar, alybar, dpxbr,        &
-     &bxinv, byinv
+      write (*, 940) bxbar, bybar, dxbar, dybar, alxbar, alybar, 
+     & dpxbr, dpybr, 
+     & bxinv, byinv
 
 !---- Output averaged values.
       tavl   = tavlc * const / s2
@@ -521,8 +560,10 @@
      &27x,'(1/sec)',12x,'(1/sec)',12x,'(1/sec)'/' ')
   930 format(1x,i8,2x,a8,3x,3(1pe15.6,3x))
   940 format(' '/' Ring average values (m)'/' '/ 5x,'betx   = ',        &
-     &1pe13.5,4x, 'bety   = ',1pe13.5,4x,'Dx  = ',1pe12.5/              &
+     &1pe13.5,4x, 'bety   = ',1pe13.5,4x,'Dx  = ',1pe12.5,              &
+     &4x,'Dy  = ',1pe12.5/                                              &
      &5x,'alfx   = ',1pe13.5,4x,'alfy   = ',1pe13.5,4x,'Dpx = ',        &
+     &1pe12.5/5x,'Dpy = ',                                              &
      &1pe12.5/5x,'1/betx = ',1pe13.5,4x,'1/bety = ',1pe13.5)
   950 format(' '/5x,'(Weighted) average rates (1/sec):'/                &
      &5x,'Longitudinal= ',1p,e15.6/                                     &
@@ -535,10 +576,10 @@
 
       end
 ! *********************************************************************
-      subroutine twsint(betax, betay, alx, dx, dpx, txi, tyi, tli)
+      subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, 
+     &                  txi, tyi, tli)
 
       implicit none
-
 
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -546,8 +587,13 @@
 !   to calculate Bjorken/Mtingwa integrals (eqn. 3.4)                  *
 !   Particle Accelerators 13, 115 (1983)                               *
 !                                                                      *
-!   Equivalent expressions are found in Conte/Martini                  *
-!   Particle Accelerators 17, 1 (1985)                                 *
+!   The expressions found in Conte/Martini                             *
+!   Particle Accelerators 17, 1 (1985) contain two false               *
+!   terms in the expression for tau_x which have been corrected        *
+!   in this version of MADX;                                           *
+!   contributions from vertical dispersion were also added;            * 
+!   AB Note by Frank Zimmermann be published (2005)                    *
+!                                                                      *
 !                                                                      *
 !   Integrals are broken into decades to optimize speed.               *
 !                                                                      *
@@ -561,8 +607,11 @@
 !   BETAX     (real)    Horizontal beta.                               *
 !   BETAY     (real)    Vertical beta.                                 *
 !   ALX       (real)    Horizontal alpha.                              *
+!   ALY       (real)    Vertical alpha.                                *
 !   DX        (real)    Horizontal dispersion.                         *
 !   DPX       (real)    Derivative of horizontal dispersion.           *
+!   DY        (real)    Vertical dispersion.                           *
+!   DPY       (real)    Derivative of vertical dispersion.             *
 ! Output:                                                              *
 !   TXI       (real)    Horizontal rate / const.                       *
 !   TYI       (real)    Vertical rate / const.                         *
@@ -574,24 +623,29 @@
      &c1,c2,c3,ccy,chklog,cl,coeff(2),cof,cprime,cscale,cx,cy,dpx,dx,f, &
      &func,h,phi,polyl,polyx,polyy,r1,suml,sumx,sumy,td1,td2,term,tl1,  &
      &tl2,tli,tmpl,tmpx,tmpy,tx1,tx2,txi,ty1,ty2,tyi,zintl,zintx,zinty, &
-     &zero,one,two,three,six,tstlog,power,ten,test
+     &zero,one,two,three,six,tstlog,power,ten,test,dy,dpy,aly,phiy,c1y, &
+     &c2y,chy,four,onetominus20   
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,tstlog=74d0, &
-     &power=-two/three,ten=1d1,test=1d-7)
+     &power=-two/three,ten=1d1,test=1d-7,four=4d0,onetominus20=1d-20)
       include 'ibsdb.fi'
       include 'physcons.fi'
       data coeff / 2d0, 4d0 /
 
       phi    = dpx + (alx * dx / betax)
+      phiy   = dpy + (aly * dy / betay)
       am     = one
       c1     = (gammas * dx)**2 / (ex * betax)
+      c1y    = (gammas * dy)**2 / (ey * betay)
       c3     = betax / ex
       c2     = c3 * (gammas*phi)**2
       cx     = c1 + c2
       cl     = am * (gammas/sige)**2
       cy     = betay / ey
+      c2y    = cy * (gammas*phiy)**2
+      chy    = c1y + c2y
       r1     = three / cy
-      a      = cx + cl
-      b      = (c3 + cy) * (c1 + cl) + cy * c2
+      a      = cx + cl + chy 
+      b      = (c3 + cy) * (c1 + cl + c1y) + cy * c2 + c3 * c2y
 
 !---- Define CPRIME=C*CSCALE to try to keep the value.
 !     small enough for the VAX in single precision or
@@ -600,7 +654,7 @@
       cscale = one
       chklog = log10(c3) + log10(cy) + log10(c1 + cl)
       if (chklog .gt. tstlog) cscale = ten**(tstlog-chklog)
-      cprime = c3 * cy * cscale * (c1 + cl)
+      cprime = c3 * cy * cscale * (c1 + cl + c1y)
 
 !---- Split integral into decades, with NS steps per decade.
 !     variables to save integral segments
@@ -616,13 +670,28 @@
       td1    = (a + c3) * ccy
       td2    = one / (sqrt(ccy) * cscale * cy)
       tl1    = (two * a - cy - c3) / cprime
-      tl2    = (b - two * c3 * cy) / cprime
-      ty1    = (- a - c3 + two * cy) / cprime
-      ty2    = (b + cy * c3) / cprime - r1 / cscale
+      tl2    = (b - two * c3 * cy + c1y * (c3+cy) ) / cprime
+      ty1    = (- a - c3 + two * cy -chy - chy/cy*(c3 - 
+     &          two*gammas**2/sige**2) + two * chy * (cx +chy)/cy ) 
+     &         / cprime
+      ty2    = (b + cy * c3 +chy*(cy+chy)+chy*ey*(one/ey+betax
+     &           /(betay*ex))
+     &         *gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/
+     &          (betay*ex))* 
+     &         cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay
+     &         -c2y*(cy+c3+chy)) / cprime - r1 / cscale
       tx1    = (two * a * (cx - c3) - cy * cx -                         &
-     &c3 * (cy - cl - two * c3 - six * c2)) / cprime
-      tx2    = (c3 + cx) * ((b + c3 * cy) / cprime) -                   &
-     &six / cscale + three * c3 * cy * (cl / cprime)
+     &          c3 * (cy - cl - two * c3 )) / cprime
+      tx2    = (c3 + cx) * ((b + c3 * cy) / cprime)-                    &
+     &          six / cscale + three * c3 * cy * (cl / cprime)
+     &          + (- six*(c3*c2*cy) + six*c3*cy*c1y 
+     &          + (betay/ey+betax/ex)*chy*cx +
+     &          chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*
+     &          c2y ) / cprime
+
+      write(*,*) ' first ' 
+      write(*,*) tx1,tx2,ty1,ty2,chy
+c      stop 
 
       al(1)  = zero
 
@@ -634,8 +703,13 @@
 
 !---- Evaluate Simpson's rule summation for one interval.
 !     The integrand is calculated in the loop itself
-        term = sqrt((cy + aloop) * ccy) *                               &
-     &sqrt(aloop * ccy * aloop + td1 * aloop + td2)
+        if (abs(cy+aloop).gt.onetominus20) then 
+          term = sqrt((cy+aloop)*ccy)*sqrt(                                  &
+     & (alam*ccy*alam+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
+        else 
+          term = sqrt((cy+aloop)*ccy)*sqrt(                                  &
+     & (aloop*ccy*aloop+td1*aloop+td2))
+        endif 
         func = sqrt(aloop) / term**3
         polyl = tl1 * aloop + tl2
         polyx = tx1 * aloop + tx2
@@ -648,8 +722,13 @@
         do iiz = 1, ns
           alam = aloop + iiz * h
           cof = coeff(mod(iiz,2)+1)
-          term = sqrt((cy+alam)*ccy) *                                  &
-     &sqrt(alam*ccy*alam+td1*alam+td2)
+        if (abs(cy+alam).gt.onetominus20) then 
+          term = sqrt((cy+alam)*ccy)*sqrt(                                  &
+     & (alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
+        else 
+          term = sqrt((cy+alam)*ccy)*sqrt(                                  &
+     & (alam*ccy*alam+td1*alam+td2))
+        endif 
           f = sqrt(alam) / term**3
           polyl = tl1 * alam + tl2
           polyx = tx1 * alam + tx2
@@ -675,6 +754,7 @@
      &abs(tmpx/zintx) .lt. test .and.                                   &
      &abs(tmpy/zinty) .lt. test) goto 100
       enddo
+      write (*, *) tmpl,zintl, tmpx,zintx, tmpy,zinty, test  
       write (*, 910) maxdec
   910 format('Bjorken/Mtingwa integrals did not converge in ',          &
      &i3,' decades.')
