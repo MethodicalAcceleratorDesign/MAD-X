@@ -11,15 +11,15 @@ void pro_sxf(struct in_cmd* cmd)
   if (nl->inform[pos])
     {
       if ((filename = pl->parameters[pos]->string) == NULL)
-    {
-      if (pl->parameters[pos]->call_def != NULL)
-        filename = pl->parameters[pos]->call_def->string;
-    }
+	{
+	  if (pl->parameters[pos]->call_def != NULL)
+	    filename = pl->parameters[pos]->call_def->string;
+	}
     }
   else
     {
       if (pl->parameters[pos]->call_def != NULL)
-    filename = pl->parameters[pos]->call_def->string;
+	filename = pl->parameters[pos]->call_def->string;
     }
   if (filename == NULL) filename = permbuff("dummy");
   if (strcmp(cmd->tok_list->p[0], "sxfread") == 0)
@@ -31,10 +31,10 @@ void pro_sxf(struct in_cmd* cmd)
   else if (strcmp(cmd->tok_list->p[0], "sxfwrite") == 0)
     {
       if ((inout = fopen(filename, "w")) == NULL)
-    {
-      warning("cannot open output file: ", filename);
-      return;
-    }
+	{
+	  warning("cannot open output file: ", filename);
+	  return;
+	}
       sxf_write(cmd->clone, inout);
     }
 }
@@ -68,10 +68,10 @@ void sxf_read(struct command* comm)
     {
       pp = &p[strlen(p)+1];
       if ((err = sxf_decin(p, count++)) == -1)
-    {
-      warning("No sequence name found, ", "ignored");
-      goto term;
-    }
+	{
+	  warning("No sequence name found, ", "ignored");
+	  goto term;
+	}
       else if (err == 1)  break;
       p = strtok(pp, ";");
     }
@@ -112,7 +112,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
       if (ntok < 2 || strcmp(toks[1], "sequence") != 0) return -1;
       else current_sequ = new_sequence(toks[0], 0);
       if (occ_list == NULL)
-    occ_list = new_name_list(10000);  /* for occurrence count */
+	occ_list = new_name_list(10000);  /* for occurrence count */
       else occ_list->curr = 0;
       current_sequ->cavities = new_el_list(100);
       pos = name_list_pos("marker", defined_commands->list);
@@ -122,9 +122,9 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
       make_elem_node(el, 1);
       current_sequ->start = current_node;
       for (j = 3; j < ntok; j++) /* push first element down */
-    {
-      toks[j-3] = toks[j];
-    }
+	{
+	  toks[j-3] = toks[j];
+	}
       ntok -= 3;
     }
   else if (strcmp(toks[0], "endsequence") == 0)
@@ -186,11 +186,11 @@ int join_prefix(char* prefix, int ntok, char** toks)
   for (j = 0; j < ntok; j++)
     {
       if (strcmp(toks[j], prefix) == 0 && j+1 < ntok)
-    {
-      strcat(toks[j], toks[j+1]);
-      for (k = j+1; k < ntok-1; k++)  toks[k] = toks[k+1];
-      ntok--;
-    }
+	{
+	  strcat(toks[j], toks[j+1]);
+	  for (k = j+1; k < ntok-1; k++)  toks[k] = toks[k+1];
+	  ntok--;
+	}
     }
   return ntok;
 }
@@ -205,10 +205,10 @@ void sxf_fill_command(struct command* comm, int ntok, char** toks)
   if ((pos = name_list_pos("l", nl)) > -1)
     {
       if (strstr(toks[1], "bend"))
-    {
-      if ((length = find_value("arc", ntok, toks)) == INVALID)
-        length = find_value("l", ntok, toks);
-    }
+	{
+	  if ((length = find_value("arc", ntok, toks)) == INVALID)
+	    length = find_value("l", ntok, toks);
+	}
       else length = find_value("l", ntok, toks);
       if (length == INVALID) length = zero;
       pl->parameters[pos]->double_value = length;
@@ -230,10 +230,10 @@ int sxf_align_fill(int start, int end, int ntok, char** toks, double* vec)
     {
       get_bracket_t_range(toks, '[', ']', start+3, ntok, &rss, &res);
       if (rss == start+3)  /* square bracket found */
-    {
-      rss++; res--;
-      for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
-    }
+	{
+	  rss++; res--;
+	  for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
+	}
     }
   return cnt;
 }
@@ -246,22 +246,22 @@ int sxf_field_fill(int start, int end, int ntok, char** toks, double* vec)
     {
       cnt[k] = 0;
       for (i = start+1; i < end; i++)
-    {
-      if ((k == 0 && strcmp(toks[i], "kl") == 0) ||
-          (k == 1 && strcmp(toks[i], "kls") == 0))
-        {
-          get_bracket_t_range(toks, '[', ']', i+2, ntok, &rss, &res);
-          if (rss == i+2)  /* square bracket found */
-        {
-          rss++; res--; cnt[k] = k;
-          for (j = rss; j <= res; j++)
-            {
-              sscanf(toks[j], "%lf", &vec[cnt[k]]);
-              cnt[k] += 2;
-            }
-        }
-        }
-    }
+	{
+	  if ((k == 0 && strcmp(toks[i], "kl") == 0) ||
+	      (k == 1 && strcmp(toks[i], "kls") == 0))
+	    {
+	      get_bracket_t_range(toks, '[', ']', i+2, ntok, &rss, &res);
+	      if (rss == i+2)  /* square bracket found */
+		{
+		  rss++; res--; cnt[k] = k;
+		  for (j = rss; j <= res; j++)
+		    {
+		      sscanf(toks[j], "%lf", &vec[cnt[k]]);
+		      cnt[k] += 2;
+		    }
+		}
+	    }
+	}
     }
   return (cnt[0] < cnt[1] ? cnt[1]-1 : cnt[0]-1);
 }
@@ -278,82 +278,82 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
   for (skew = 0; skew < 2; skew++)
     {
       for (k = start+1; k < end; k++)
-    {
-      if      (skew == 0 && strcmp("kl", toks[k]) == 0)  break;
-      else if (skew == 1 && strcmp("kls", toks[k]) == 0) break;
-    }
+	{
+	  if      (skew == 0 && strcmp("kl", toks[k]) == 0)  break;
+	  else if (skew == 1 && strcmp("kls", toks[k]) == 0) break;
+	}
       if (k < end)
-    {
-      get_bracket_t_range(toks, '[', ']', k, ntok, &rss, &res);
-      if (rss == k + 2)  /* square bracket found */
-        {
-          rss++; res--;
-        }
-      else rss = res = k+2;
-      cnt = 0;
-      for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
-      if (strstr(toks[1], "bend"))
-        {
-          if (length == zero) fatal_error("bend without length:", toks[0]);
-          if (skew == 0) pos = name_list_pos("k0", nl);
-          else           pos = name_list_pos("k0s", nl);
-          pl->parameters[pos]->double_value = vec[0] / length;
-        }
-      else if (strstr(toks[1], "quad"))
-        {
-          if (length == zero) fatal_error("quad without length:", toks[0]);
-          if (skew == 0)  pos = name_list_pos("k1", nl);
-          else            pos = name_list_pos("k1s", nl);
-          pl->parameters[pos]->double_value = vec[1] / length;
-        }
-      else if (strstr(toks[1], "sext"))
-        {
-          if (length == zero) fatal_error("sextupole without length:",
-                          toks[0]);
-          if (skew == 0)  pos = name_list_pos("k2", nl);
-          else            pos = name_list_pos("k2s", nl);
-          pl->parameters[pos]->double_value = vec[2] / length;
-        }
-      else if (strstr(toks[1], "oct"))
-        {
-          if (length == zero) fatal_error("octupole without length:",
-                          toks[0]);
-          if (skew == 0)  pos = name_list_pos("k3", nl);
-          else            pos = name_list_pos("k3s", nl);
-          pl->parameters[pos]->double_value = vec[3] / length;
-        }
-      else if (strstr(toks[1], "kick"))
-        {
-          if (skew == 0)  pos = name_list_pos("hkick", nl);
-          else            pos = name_list_pos("vkick", nl);
-          pl->parameters[pos]->double_value = vec[0];
-        }
-      else if (strstr(toks[1], "multi"))
-        {
-          if (skew == 0)  pos = name_list_pos("knl", nl);
-          else            pos = name_list_pos("ksl", nl);
-          while(pl->parameters[pos]->double_array->max < cnt)
-        grow_double_array(pl->parameters[pos]->double_array);
-          for (j = 0; j < cnt; j++)
-        {
-          pl->parameters[pos]->double_array->a[j] = vec[j];
-        }
-          pl->parameters[pos]->double_array->curr = cnt;
-          pl->parameters[pos]->expr_list
-        = delete_expr_list(pl->parameters[pos]->expr_list);
-        }
-    }
+	{
+	  get_bracket_t_range(toks, '[', ']', k, ntok, &rss, &res);
+	  if (rss == k + 2)  /* square bracket found */
+	    {
+	      rss++; res--;
+	    }
+	  else rss = res = k+2;
+	  cnt = 0;
+	  for (j = rss; j <= res; j++) sscanf(toks[j], "%lf", &vec[cnt++]);
+	  if (strstr(toks[1], "bend"))
+	    {
+	      if (length == zero) fatal_error("bend without length:", toks[0]);
+	      if (skew == 0) pos = name_list_pos("k0", nl);
+	      else           pos = name_list_pos("k0s", nl);
+	      pl->parameters[pos]->double_value = vec[0] / length;
+	    }
+	  else if (strstr(toks[1], "quad"))
+	    {
+	      if (length == zero) fatal_error("quad without length:", toks[0]);
+	      if (skew == 0)  pos = name_list_pos("k1", nl);
+	      else            pos = name_list_pos("k1s", nl);
+	      pl->parameters[pos]->double_value = vec[1] / length;
+	    }
+	  else if (strstr(toks[1], "sext"))
+	    {
+	      if (length == zero) fatal_error("sextupole without length:",
+					      toks[0]);
+	      if (skew == 0)  pos = name_list_pos("k2", nl);
+	      else            pos = name_list_pos("k2s", nl);
+	      pl->parameters[pos]->double_value = vec[2] / length;
+	    }
+	  else if (strstr(toks[1], "oct"))
+	    {
+	      if (length == zero) fatal_error("octupole without length:",
+					      toks[0]);
+	      if (skew == 0)  pos = name_list_pos("k3", nl);
+	      else            pos = name_list_pos("k3s", nl);
+	      pl->parameters[pos]->double_value = vec[3] / length;
+	    }
+	  else if (strstr(toks[1], "kick"))
+	    {
+	      if (skew == 0)  pos = name_list_pos("hkick", nl);
+	      else            pos = name_list_pos("vkick", nl);
+	      pl->parameters[pos]->double_value = vec[0];
+	    }
+	  else if (strstr(toks[1], "multi"))
+	    {
+	      if (skew == 0)  pos = name_list_pos("knl", nl);
+	      else            pos = name_list_pos("ksl", nl);
+	      while(pl->parameters[pos]->double_array->max < cnt)
+		grow_double_array(pl->parameters[pos]->double_array);
+	      for (j = 0; j < cnt; j++)
+		{
+		  pl->parameters[pos]->double_array->a[j] = vec[j];
+		}
+	      pl->parameters[pos]->double_array->curr = cnt;
+	      pl->parameters[pos]->expr_list
+		= delete_expr_list(pl->parameters[pos]->expr_list);
+	    }
+	}
     }
   /* now all the other parameters */
   for (k = start+1; k < end; k++)
     {
       if (isalpha(*toks[k]) && strstr(toks[k], "kl") == NULL)
-    {
-      if ((pos = name_list_pos(toks[k], nl)) < 0)
-        warning("unknown input parameter skipped: ", toks[k]);
-      else if (k+2 < end && *toks[k+1] == '=' && *toks[k+2] != '[')
-        sscanf(toks[k+2], "%lf", &pl->parameters[pos]->double_value);
-    }
+	{
+	  if ((pos = name_list_pos(toks[k], nl)) < 0)
+	    warning("unknown input parameter skipped: ", toks[k]);
+	  else if (k+2 < end && *toks[k+1] == '=' && *toks[k+2] != '[')
+	    sscanf(toks[k+2], "%lf", &pl->parameters[pos]->double_value);
+	}
     }
 }
 
@@ -478,7 +478,7 @@ void write_elstart(FILE* out)
   if (current_node->occ_cnt > 1)  /* add count to name, print warning */
     {
       if (occnt_add++ == 0)
-    printf("+=+=+= SXF_ex warning - making names unique\n\n");
+	printf("+=+=+= SXF_ex warning - making names unique\n\n");
       strcpy(name, current_node->name); replace(name, ':', '.');
     }
   else strcpy(name, current_node->p_elem->name);
@@ -498,7 +498,7 @@ void write_elstart(FILE* out)
   if (current_node->length > zero)
     {
       if (strstr(current_node->base_name, "bend") == NULL)
-    sprintf(c_dummy, "l = %.12g", current_node->length);
+	sprintf(c_dummy, "l = %.12g", current_node->length);
       else sprintf(c_dummy, "arc = %.12g", current_node->length);
       put_line(out,c_dummy);
     }
@@ -587,24 +587,24 @@ void write_body(FILE* out)
   for (i = 0; i < eldef->par_names->curr; i++)
     {
       if (strcmp(eldef->par_names->names[i], "l") != 0
-      && (pos = name_list_pos(eldef->par_names->names[i], sxf_list)) > -1)
-    {
-      if ((nval = kl_trans(sxf_list->names[pos], out_name, val, &flag)) > 0)
-        {
-          if (set++ == 0)
-        {
-          put_line(out, "body = {"); s_indent(add_indent[4]);
-        }
-          fill_dump(out, flag, out_name, val, nval, 1);
-        }
-    }
+	  && (pos = name_list_pos(eldef->par_names->names[i], sxf_list)) > -1)
+	{
+	  if ((nval = kl_trans(sxf_list->names[pos], out_name, val, &flag)) > 0)
+	    {
+	      if (set++ == 0)
+		{
+		  put_line(out, "body = {"); s_indent(add_indent[4]);
+		}
+	      fill_dump(out, flag, out_name, val, nval, 1);
+	    }
+	}
     }
   if (strcmp(current_node->base_name, "beambeam") == 0)
     {
       if (set++ == 0)
         {
-      put_line(out, "body = {"); s_indent(add_indent[4]);
-    }
+	  put_line(out, "body = {"); s_indent(add_indent[4]);
+	}
       val[0] = command_par_value(npart,current_beam);
       fill_dump(out, flag, npart, val, 1, 1);
     }
@@ -622,15 +622,15 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
   if (strstr(name, "kick") != NULL)
     {
       if (strchr(name, 'v') == NULL)
-    {
-      corr = current_node->chkick;
-      strcpy(out_name, "kl");
-    }
+	{
+	  corr = current_node->chkick;
+	  strcpy(out_name, "kl");
+	}
       else
-    {
-      corr = current_node->cvkick;
-      strcpy(out_name, "kls");
-    }
+	{
+	  corr = current_node->cvkick;
+	  strcpy(out_name, "kls");
+	}
       val[0] = node_value(name) + corr;
       if (val[0] != zero)  return 1;
       else return 0;
@@ -639,19 +639,19 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
     {
       *flag = 1;
       if (strcmp(name, "knl") == 0 || strcmp(name, "ksl") == 0)
-    {
-      if (strchr(name, 's') == NULL)  strcpy(out_name, "kl");
-      else                            strcpy(out_name, "kls");
-      length = element_vector(current_node->p_elem, name, val);
-      if (length > 1 || val[0] != zero)   return length;
-      else return 0;
-    }
+	{
+	  if (strchr(name, 's') == NULL)  strcpy(out_name, "kl");
+	  else                            strcpy(out_name, "kls");
+	  length = element_vector(current_node->p_elem, name, val);
+	  if (length > 1 || val[0] != zero)   return length;
+	  else return 0;
+	}
       sscanf(&name[1], "%1d", &rep);
       for (j = 0; j < rep; j++)  val[j] = zero;
       if (strchr(name, 's') == NULL)  strcpy(out_name, "kl");
       else                            strcpy(out_name, "kls");
       if ((val[rep] = current_node->length * node_value(name)) != zero)
-    return (rep+1);
+	return (rep+1);
       else return 0;
     }
   else
@@ -659,7 +659,7 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
       strcpy(out_name, name);
       val[0] = node_value(name);
       if (strcmp(name, "e1") == 0 || strcmp(name, "e2") == 0)
-    val[0] = command_par_value(name, current_node->p_elem->def);
+	val[0] = command_par_value(name, current_node->p_elem->def);
       else val[0] = node_value(name);
       if (val[0] != zero)  return 1;
       else return 0;
