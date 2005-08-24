@@ -53,19 +53,19 @@
       parameter (mintpl = 18)
 
 !--- Definition of common / peaddi /
-!--- itbv set in routine pesopt, used in routines pemima, peplot 
+!--- itbv set in routine pesopt, used in routines pemima, peplot
 !---      and pesopt.
 !--- nivvar set in routine pesopt, used in routines pefill, peintp,
 !---        pemima, peplot and pesopt.
-!--- nelmach set in routine pefill, used in routines pefill, peplot. 
+!--- nelmach set in routine pefill, used in routines pefill, peplot.
 !--- numax set in routine pemima, used in routines pemima, peplot.
 !--- interf set in routine pesopt, used in routines pecurv, pefill.
 !--- noline set in routine pesopt, used in routines pefill, pesopt.
-!--- nqval set in routine pefill and peintp, used in routines pefill, 
+!--- nqval set in routine pefill and peintp, used in routines pefill,
 !---        peintp, pemima and peplot.
 !--- nvvar set in routine pesopt and pemima, used in routine pemima.
 !--- nrrang set in routine pefill, used in routine pesopt and pefill.
-!--- proc_flag set in routine pesopt, used in routine pefill, peintp 
+!--- proc_flag set in routine pesopt, used in routine pefill, peintp
 !---           and pesopt.
 !--- ipparm set in routine peintp and pesopt, used in routine peplot
 !---           and pesopt.
@@ -83,18 +83,18 @@
 
 !--- Definition of common / peaddr /
 !--- qascl set in routine pesopt, used in routine peplot.
-!--- qlscl set in routine pesopt, used in routine peplot. 
+!--- qlscl set in routine pesopt, used in routine peplot.
 !--- qsscl set in routine pesopt, used in routine peplot.
 !--- qtscl set in routine pesopt, used in routine peplot.
-!--- hrange set in routine pesopt, used in routines pefill, peplot. 
+!--- hrange set in routine pesopt, used in routines pefill, peplot.
 !--- vrange set in routine pesopt, used in routine peplot.
-!--- hmima set in routines pesopt and pemima, 
+!--- hmima set in routines pesopt and pemima,
 !---       used in routines peplot, pesopt and pemima.
-!--- vmima set in routines pesopt and pemima, 
+!--- vmima set in routines pesopt and pemima,
 !---       used in routines peplot and pemima.
-!--- qhval set in routines pefill and peintp, 
+!--- qhval set in routines pefill and peintp,
 !---       used in routines peplot, pefill and pemima.
-!--- qvval set in routines pefill and peintp, 
+!--- qvval set in routines pefill and peintp,
 !---       used in routines peplot, pefill and pemima.
 !--- estart set in routine pefill, and peintp,
 !---        used in routines peplot and pefill.
@@ -109,23 +109,23 @@
      &     hrange, vrange, hmima, vmima, qhval, qvval, estart, eend
 
 !--- Definition of common / peaddc /
-!--- horname set in routine pesopt, 
+!--- horname set in routine pesopt,
 !---         used in routines pefill, peplot and pesopt.
-!--- tabname set in routine pesopt, 
+!--- tabname set in routine pesopt,
 !---         used in routines pefill, peintp, pelfill and pesopt.
 !--- toptitle set in routine pesopt, used in routine peplot.
 !--- plfnam set in routine plginit, used in routines plotit and plginit.
 !--- axlabel set in routine pemima, used in routine peplot.
-!--- sname set in routine pesopt, 
+!--- sname set in routine pesopt,
 !---         used in routines pefill and pesopt.
-!--- slabl set in routine pesplit, 
+!--- slabl set in routine pesplit,
 !---         used in routines peplot, pemima and pesopt.
 
       common / peaddc / horname, tabname, toptitle, plfnam, axlabel(4), &
      &                  sname(mxcurv), slabl(mxcurv)
 
-      character * (mfile) plfnam 
-      character * (mcnam) horname, tabname, sname, slabl 
+      character * (mfile) plfnam
+      character * (mcnam) horname, tabname, sname, slabl
       character * (mxlabl) axlabel
       character * (mtitl) toptitle
 

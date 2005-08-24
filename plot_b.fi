@@ -1,9 +1,8 @@
 !--- Definition of common / peotcl /
-!--- fpmach set in routines pesopt and pefill, used in routine peplot 
-!--- ddp_flag set in routine pefill, used in routine peplot 
+!--- fpmach set in routines pesopt and pefill, used in routine peplot
+!--- ddp_flag set in routine pefill, used in routine peplot
 !--- ptc_flag set in routines pesopt, used in routine pefill
 
       common / peotcl / fpmach, dpp_flag, ptc_flag
       logical fpmach, dpp_flag, ptc_flag
       save   /peotcl/
-

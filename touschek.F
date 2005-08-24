@@ -361,9 +361,12 @@
 
 ! *********************************************************************
 !
-! $Id: touschek.F,v 1.5 2005-02-05 00:54:43 frs Exp $
+! $Id: touschek.F,v 1.6 2005-08-24 13:42:19 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.5  2005/02/05 00:54:43  frs
+! Fortran clean-up with mymod, f2c, lf95, f95
+!
 ! Revision 1.4  2005/01/31 09:13:53  frs
 ! Well tested touschek module
 !
@@ -403,7 +406,7 @@
      &0.1691565193950025381893120790D0,                                 &
      &0.1826034150449235888667636680D0,                                 &
      &0.1894506104550684962853967232D0/
-!                              
+!
       DATA X / 0.9602898564975362316835608686D0,                        &
      &0.7966664774136267395915539365D0,                                 &
      &0.5255324099163289858177390492D0,                                 &
@@ -465,9 +468,12 @@
 
 !********************************************************************
 !
-! $Id: touschek.F,v 1.5 2005-02-05 00:54:43 frs Exp $
+! $Id: touschek.F,v 1.6 2005-08-24 13:42:19 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.5  2005/02/05 00:54:43  frs
+! Fortran clean-up with mymod, f2c, lf95, f95
+!
 ! Revision 1.4  2005/01/31 09:13:53  frs
 ! Well tested touschek module
 !

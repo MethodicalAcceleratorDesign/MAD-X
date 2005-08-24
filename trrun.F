@@ -1660,10 +1660,10 @@
  1    continue
       jt  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
       if (switch.gt.1) then
-      j = 2*jt-1 
+      j = 2*jt-1
       else
-      j = jt 
-      endif 
+      j = jt
+      endif
       if (j .ne. -1 .and. j.ne.0)  then
         if (switch .lt. 3 .or. j .eq. 1)  then
           jend = j
@@ -1723,10 +1723,10 @@
           enddo
           if (switch.gt.1) then
           do k = 1, 6
-            z(k,j+1) = z(k,j) 
+            z(k,j+1) = z(k,j)
           enddo
             z(1,j+1) = z(1,j) + deltax
-          endif 
+          endif
         endif
         goto 1
       endif
