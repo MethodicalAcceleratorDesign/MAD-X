@@ -19,7 +19,7 @@ struct char_array           /* dynamic array of char */
 {
   int stamp;
   int  max,                     /* max. array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   char* c;
 };
 
@@ -28,7 +28,7 @@ struct char_array_list
   char name[NAME_L];
   int stamp;
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct char_array** ca;
 };
 
@@ -36,8 +36,8 @@ struct char_p_array           /* dynamic array of char pointers */
 {
   char name[NAME_L];
   int  max,                     /* max. array size */
-       curr,                    /* current occupation */
-       flag;                    /* ancillary flag */
+    curr,                    /* current occupation */
+    flag;                    /* ancillary flag */
   int stamp;
   char** p;
 };
@@ -59,7 +59,7 @@ struct command_list /* contains list of command pointers sorted by name */
 {
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;       /* index list of names */
   int stamp;
   struct command** commands;    /* command pointer list */
@@ -69,7 +69,7 @@ struct command_list_list /* contains list of command lists */
 {
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;       /* index list of names */
   struct command_list** command_lists;    /* command_list pointer list */
   int stamp;
@@ -104,7 +104,7 @@ struct command_parameter_list /* contains list of command parameter pointers */
   int stamp;
   char name[NAME_L];
   int  max,                             /* max. pointer array size */
-       curr;                            /* current occupation */
+    curr;                            /* current occupation */
   struct command_parameter** parameters;  /* command_parameter pointer list */
 };
 
@@ -125,20 +125,20 @@ struct constraint /* contains one constraint */
                                 /* 4 value */
   int stamp;
   double value,
-         c_min,
-         c_max,
-         weight;
+    c_min,
+    c_max,
+    weight;
   struct expression   *ex_value,
-                      *ex_c_min,
-                      *ex_c_max;
+    *ex_c_min,
+    *ex_c_max;
 };
 
 struct constraint_list /* contains list of constraints */
- {
+{
   int stamp;
   char name[NAME_L];
   int  max,                           /* max. pointer array size */
-       curr;                          /* current occupation */
+    curr;                          /* current occupation */
   struct constraint** constraints;    /* command pointer list */
 };
 
@@ -146,7 +146,7 @@ struct double_array        /* dynamic array of double */
 {
   int stamp;
   int  max,                     /* max. array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   double* a;
 };
 
@@ -171,7 +171,7 @@ struct el_list /* contains list of element pointers sorted by name */
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;       /* index list of names */
   struct element** elem;        /* element pointer list */
 };
@@ -181,7 +181,7 @@ struct expression
   char name[NAME_L];
   char* string;                 /* expression in string form */
   int status;                   /* status flag: 0 not evaluated
-                                                1 evaluated */
+				   1 evaluated */
   struct int_array* polish;     /* pointer to Polish notation, or NULL */
   double value;                 /* actual value */
   int stamp;
@@ -192,7 +192,7 @@ struct expr_list
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct expression** list;     /* expression pointer list */
 };
 
@@ -208,7 +208,7 @@ struct in_buff_list
 {
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation = call level */
+    curr;                    /* current occupation = call level */
   FILE** input_files;           /* input file pointers */
   int stamp;
   struct in_buffer** buffers;     /* in_buff pointer list */
@@ -237,7 +237,7 @@ struct in_cmd_list /* contains list of in_cmd pointers sorted by label */
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* labels;     /* index list of labels */
   struct in_cmd** in_cmds;      /* in_cmd pointer list */
 };
@@ -247,7 +247,7 @@ struct int_array           /* dynamic array of int */
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   int* i;
 };
 
@@ -266,7 +266,7 @@ struct macro_list
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;
   struct macro** macros;
 };
@@ -275,7 +275,7 @@ struct name_list /* contains list of index sorted names plus int inform. */
 {
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   int* index;                   /* index for alphabetic access */
   int* inform;                  /* array parallel to names with integer */
   int stamp;
@@ -320,7 +320,7 @@ struct node_list /* contains list of node pointers sorted by name */
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;       /* index list of node (!) names */
                                 /* node_name = el_name:occ_cnt */
   struct node** nodes;          /* node pointer list */
@@ -361,7 +361,7 @@ struct sequence_list /* contains list of sequence pointers sorted by name */
 {
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;       /* index list of names */
   struct sequence** sequs;      /* sequence pointer list */
   int stamp;
@@ -370,13 +370,13 @@ struct sequence_list /* contains list of sequence pointers sorted by name */
 struct table
 {
   char name[NAME_L],
-       type[NAME_L];            /* like "twiss", "survey" etc. */
+    type[NAME_L];            /* like "twiss", "survey" etc. */
   int  max,                     /* max. # rows */
-       curr,                    /* current # rows */
-       num_cols,                /* total # columns - fixed */
-       org_cols,                /* original # columns from definition */
-       dynamic,                 /* if != 0, values taken from current row */
-       origin;                  /* 0 if created in job, 1 if read */
+    curr,                    /* current # rows */
+    num_cols,                /* total # columns - fixed */
+    org_cols,                /* original # columns from definition */
+    dynamic,                 /* if != 0, values taken from current row */
+    origin;                  /* 0 if created in job, 1 if read */
   struct char_p_array* header;  /* extra lines for file header */
   struct int_array* col_out;    /* column no.s to be written (in this order) */
   struct int_array* row_out;    /* flag for row: 1 write, 0 don't */
@@ -395,7 +395,7 @@ struct table_list
 {
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* names;      /* index list of tables */
   struct table** tables;
   int stamp;
@@ -418,7 +418,7 @@ struct var_list /* contains list of variable pointers sorted by name */
   int stamp;
   char name[NAME_L];
   int  max,                     /* max. pointer array size */
-       curr;                    /* current occupation */
+    curr;                    /* current occupation */
   struct name_list* list;       /* index list of names */
   struct variable** vars;       /* variable pointer list */
 };
@@ -426,7 +426,7 @@ struct var_list /* contains list of variable pointers sorted by name */
 struct vector_list        /* contains named vectors */
 {
   int curr,
-      max;
+    max;
   struct name_list* names;
   struct double_array** vectors;
 };
@@ -435,41 +435,41 @@ struct vector_list        /* contains named vectors */
   start of corrector module structures
 */
 
-  struct val_mic {
-         double before[2];
-         double after[2];
-  };
+struct val_mic {
+  double before[2];
+  double after[2];
+};
 
-  struct id_mic {
-         int   id_ttb;
-         int   enable;
-         struct val_mic val;
-         struct node* p_node;
-         struct id_mic *next;
-         struct id_mic *previous;
-  };
+struct id_mic {
+  int   id_ttb;
+  int   enable;
+  struct val_mic val;
+  struct node* p_node;
+  struct id_mic *next;
+  struct id_mic *previous;
+};
 
-  struct id_mic2 {
-         int   id_ttb[2];
-         int   enable;
-         struct val_mic val;
-         struct node* p_node;
-         struct node* p_node_s1;
-         struct node* p_node_s2;
-         struct id_mic2 *next;
-         struct id_mic2 *previous;
-  };
+struct id_mic2 {
+  int   id_ttb[2];
+  int   enable;
+  struct val_mic val;
+  struct node* p_node;
+  struct node* p_node_s1;
+  struct node* p_node_s2;
+  struct id_mic2 *next;
+  struct id_mic2 *previous;
+};
 
-  struct orb_cor {
-         double qx0;
-         double qy0;
-         struct id_mic *cor_table;
-         struct id_mic *mon_table;
-  };
+struct orb_cor {
+  double qx0;
+  double qy0;
+  struct id_mic *cor_table;
+  struct id_mic *mon_table;
+};
 
-  struct orb_cor2 {
-         double qx0;
-         double qy0;
-         struct id_mic2 *cor_table;
-         struct id_mic2 *mon_table;
-  };
+struct orb_cor2 {
+  double qx0;
+  double qy0;
+  struct id_mic2 *cor_table;
+  struct id_mic2 *mon_table;
+};
