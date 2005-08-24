@@ -10,8 +10,8 @@ f95=f95
 GCC_FLAGS=-c -g -Wall -fno-second-underscore -D_CATCH_MEM
 GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL 
-#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
-f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
+f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan -ieee=full
+#f95_FLAGS=-c -O4 -maxcontin=24 -w=unused -ieee=full
 FFLAGS77=-gline -g90 -c -fpp -maxcontin=24 -nan -ieee=full
 #FFLAGS77=-g90 -c -fpp -O4 -maxcontin=24 -w=unused -ieee=full
 

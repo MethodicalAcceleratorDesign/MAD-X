@@ -13,14 +13,14 @@ FC=g77
 f95=lf95
 
 # default fortran compiler options
-FCP=-O3 -fno-second-underscore -funroll-loops -I.
+FCP=-O4 -fno-second-underscore -funroll-loops -I.
 
 # alternative for development and debug
 FCM=-O2 -fno-second-underscore -funroll-loops
 FCDB=-g -O0 -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O3 -funroll-loops -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -fno-second-underscore -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 
 # alternative for development
@@ -62,7 +62,7 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -O3 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
+  GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
   FP=
 endif
