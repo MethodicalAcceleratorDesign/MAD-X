@@ -983,6 +983,10 @@ void set_selected_elements()
   */
   selected_elements->curr = 0;
   selected_elements->list->curr = 0;  /* Reset list->curr in global el_list structure.   selected_elements is passed to add_to_el_list */
+  if (current_sequ == NULL || current_sequ->ex_start == NULL) /* check that there is an active sequence, otherwise crash in get_ex_range */
+  { warning("makethin selection without active sequence,", "ignored");
+	return;
+  }
   /* default is full sequence from start to end */
   nodes[0] = current_sequ->ex_start;
   nodes[1] = current_sequ->ex_end;
