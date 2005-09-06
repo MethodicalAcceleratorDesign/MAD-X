@@ -5,6 +5,7 @@
 /Sa_extend_poly.f90 -text
 /Sb_1_pol_template.f90 -text
 /Sb_2_pol_template.f90 -text
+/Sb_sagan_pol_arbitrary.f90 -text
 /Sc_euclidean.f90 -text
 /Sd_frame.f90 -text
 /Se_status.f90 -text
@@ -12,6 +13,7 @@
 /Sg_0_fitted.f90 -text
 /Sg_1_template_my_kind.f90 -text
 /Sg_2_template_my_kind.f90 -text
+/Sg_sagan_wiggler.f90 -text
 /Sh_def_kind.f90 -text
 /Si_def_element.f90 -text
 /Sj_elements.f90 -text
@@ -24,6 +26,7 @@
 /a_def_all_kind.inc -text
 /a_def_arbitrary.inc -text
 /a_def_element_fibre_layout.inc -text
+/a_def_sagan.inc -text
 /a_def_user1.inc -text
 /a_def_user2.inc -text
 /a_scratch_size.f90 -text
