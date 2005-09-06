@@ -34,10 +34,12 @@ subroutine w_ptc_normal()
   implicit none
   call ptc_normal()
 end subroutine w_ptc_normal
-subroutine w_ptc_track()
+subroutine w_ptc_track(max_obs)
   use madx_ptc_module
+  USE madx_ptc_track_run_module, ONLY: ptc_track_run
   implicit none
-  call ptc_track()
+  integer max_obs
+  call ptc_track_run(max_obs)
 end subroutine w_ptc_track
 subroutine w_ptc_end()
   use madx_ptc_module

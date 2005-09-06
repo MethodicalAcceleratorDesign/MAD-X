@@ -7,7 +7,7 @@ MODULE ptc_results
   character(len = 2) :: ptc_var
   type(real_8) y(6)
   type(normalform) n
-type (pbresonance) pbr
+  type (pbresonance) pbr
 END MODULE ptc_results
 MODULE madx_ptc_module
   USE madx_keywords
@@ -21,6 +21,7 @@ MODULE madx_ptc_module
   type(mad_universe) m_u
   integer, private, parameter :: ndd=ndim2,mynreso=20
   integer, private, dimension(4) :: iia,icoast
+  integer, private, allocatable :: J(:)
   integer, private :: NO,ND,ND2,NP,NDPT,NV,icount=0
   real(dp), private, dimension(ndim2,5) :: rdd
   real(dp), private, dimension(ndim2) :: dicu
@@ -29,7 +30,7 @@ MODULE madx_ptc_module
   character(len=5), private, dimension(5), parameter :: str5 = (/'10000','01000','00100','00010','00001'/)
   character(len=6), private, dimension(6), target :: str6 = (/'100000','010000','001000','000100','000001','000010'/)
   private zerotwiss,equaltwiss,alloctwiss,killtwiss
-
+  real(dp) :: mux_default=0.28, muy_default=0.31, muz_default=0.001
   type twiss
      type(damap) a1
      type(damap) a_t
@@ -125,7 +126,7 @@ CONTAINS
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: imul=20,nt0=20000,length=16
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
-    real(dp) f_errors(0:50),aperture(100),normal(0:maxmul)
+    real(dp) f_errors(0:50),aperture(maxnaper),normal(0:maxmul)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor
@@ -251,7 +252,7 @@ CONTAINS
        keymod1 = "DELTA_MATRIX_KICK"
     END SELECT
     if(keymod1.ne." ") then
-       key%model=keymod1 
+       key%model=keymod1
     else
        key%model=keymod0
     endif
@@ -282,28 +283,35 @@ CONTAINS
 
     nn=name_len
     call node_string('apertype ',aptype,nn)
+    call dzero(aperture,maxnaper)
     call get_node_vector('aperture ',nn,aperture)
-    if(.not.(aptype.eq."circle".and.aperture(1).eq.zero)) then
+    if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
+       c_%APERTURE_FLAG=.true.
        select case(aptype)
        case("circle")
+          key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(1)
-       case("ellipse") 
+       case("ellipse")
+          key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
        case("rectangular")
+          key%list%aperture_on=.true.
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
        case("lhcscreen")
+          key%list%aperture_on=.true.
           key%list%aperture_kind=3
           key%list%aperture_x=aperture(3)
           key%list%aperture_y=aperture(3)
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
        case("marguerite")
+          key%list%aperture_on=.true.
           key%list%aperture_kind=4
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
@@ -326,23 +334,23 @@ CONTAINS
        endif
        key%magnet="rbend"
        key%list%b0=node_value('angle ')
-       !     key%list%k(1)=node_value('k0 ') 
-       key%list%k(2)=node_value('k1 ') 
+       !     key%list%k(1)=node_value('k0 ')
+       key%list%k(2)=node_value('k1 ')
        key%list%k(3)=node_value('k2 ')
-       !     key%list%k(3)=node_value('k2 ') 
-       !     key%list%ks(1)=node_value('k0s ') 
-       !     key%list%ks(2)=node_value('k1s ') 
-       !     key%list%ks(3)=node_value('k2s ') 
+       !     key%list%k(3)=node_value('k2 ')
+       !     key%list%ks(1)=node_value('k0s ')
+       !     key%list%ks(2)=node_value('k1s ')
+       !     key%list%ks(3)=node_value('k2s ')
        ! Gymnastic needed since PTC expects MAD8 convention
        key%list%t1=node_value('e1 ')-node_value('angle ')/two
        key%list%t2=node_value('e2 ')-node_value('angle ')/two
        key%list%hgap=node_value('hgap ')
-!       key%list%fint=node_value('fint ')
+       !       key%list%fint=node_value('fint ')
        fint=node_value('fint ')
        fintx=node_value('fintx ')
        if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-         print*," The fint and fintx must be the same at each end or each might be zero"
-         stop
+          print*," The fint and fintx must be the same at each end or each might be zero"
+          stop
        endif
        if(fint.gt.zero) then
           key%list%fint=fint
@@ -370,12 +378,12 @@ CONTAINS
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
-!       key%list%fint=node_value('fint ')
+       !       key%list%fint=node_value('fint ')
        fint=node_value('fint ')
        fintx=node_value('fintx ')
        if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-         print*," The fint and fintx must be the same at each end or each might be zero"
-         stop
+          print*," The fint and fintx must be the same at each end or each might be zero"
+          stop
        endif
        if(fint.gt.zero) then
           key%list%fint=fint
@@ -451,7 +459,7 @@ CONTAINS
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
-       if(offset_deltap.ne.zero) then 
+       if(offset_deltap.ne.zero) then
           default=default+totalpath0
           freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one)
        endif
@@ -513,7 +521,7 @@ CONTAINS
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
-       if(offset_deltap.ne.zero) then 
+       if(offset_deltap.ne.zero) then
           default=default+totalpath0
           freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one)
        endif
@@ -564,21 +572,25 @@ CONTAINS
 
   END subroutine ptc_align
 
+
   subroutine ptc_twiss(tab_name)
     implicit none
     include 'twissa.fi'
-    logical(lp) closed_orbit,initial_matrix
-    integer i,ii,no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
-    integer ioptfun,iii,restart_sequ,advance_node
+    logical(lp) closed_orbit,beta_flg,betz_flg
+    integer k,i,ii,no,mynd2,npara,mynpa,nda,icase,flag_index,why(9),my_nv,nv_min
+    integer inval,ioptfun,iii,restart_sequ,advance_node,get_option
     integer tab_name(*)
     real(dp) opt_fun(36)
-    real(dp) x(6),suml,deltap0,deltap
+    real(dp) x(6),suml,deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy
     real(kind(1d0)) get_value
     type(real_8) y(6)
     type(twiss) tw
     type(fibre), POINTER :: current
-    integer, allocatable :: J(:) 
-    real(dp) r,re(6,6)
+    real(dp) r,re(6,6),d_val
+    logical(lp) initial_matrix_manual, initial_matrix_table
+    integer n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
+    integer row,double_from_table
+
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
 
@@ -599,7 +611,7 @@ CONTAINS
     call my_state(icase,deltap,deltap0,mynpa)
 
     CALL UPDATE_STATES
-!    call print(default,6)
+    !    call print(default,6)
 
     x(:)=zero
     if(icase.eq.5) x(5)=deltap
@@ -616,8 +628,43 @@ CONTAINS
     y=npara
     Y=X
 
-    initial_matrix = get_value('ptc_twiss ','initial_matrix ') .ne. 0
-    if(initial_matrix) then
+    beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
+    betz_flg = (get_value('ptc_twiss ','betz ').gt.0) .and. (npara.eq.6)
+
+    initial_matrix_manual = get_value('ptc_twiss ','initial_matrix_manual ') .ne. 0
+    initial_matrix_table = get_value('ptc_twiss ','initial_matrix_table ') .ne. 0
+    if(initial_matrix_table) then
+       k = double_from_table("map_table ", "nv ", 1, d_val)
+       if(k.ne.-1) then
+          call liepeek(iia,icoast)
+          my_nv=int(d_val)
+          nv_min=min(iia(2),my_nv)
+       else
+          initial_matrix_table=.false.
+       endif
+    endif
+    if(initial_matrix_table) then
+       x(:)=zero
+       allocate(j(iia(2)))
+       j(:)=0
+       do i = 1,my_nv
+          k   = double_from_table("map_table ", "coef ", i, d_val)
+          if(i.le.iia(2)) then
+             x(i)  = d_val-(y(i)%T.sub.j)
+          endif
+       enddo
+       do i = 1,nv_min
+          do ii = 1,nv_min
+             j(ii)  = 1
+             row    = i*my_nv+ii
+             k   = double_from_table("map_table ", "coef ", row, d_val)
+             d_val  = d_val-(y(i)%T.sub.j)
+             y(i)%T = y(i)%T+(d_val.mono.j)
+             j(ii)=0
+          enddo
+       enddo
+       deallocate(j)
+    elseif(initial_matrix_manual) then
        re(1,1) = get_value('ptc_twiss ','re11 ')
        re(1,2) = get_value('ptc_twiss ','re12 ')
        re(1,3) = get_value('ptc_twiss ','re13 ')
@@ -654,6 +701,14 @@ CONTAINS
        re(6,4) = get_value('ptc_twiss ','re54 ')
        re(6,5) = get_value('ptc_twiss ','re56 ')
        re(6,6) = get_value('ptc_twiss ','re55 ')
+       x(i)=zero
+       x(1)=get_value('ptc_twiss ','x ')
+       x(2)=get_value('ptc_twiss ','px ')
+       x(3)=get_value('ptc_twiss ','y ')
+       x(4)=get_value('ptc_twiss ','py ')
+       x(5)=get_value('ptc_twiss ','t ')
+       x(6)=get_value('ptc_twiss ','pt ')
+
        call liepeek(iia,icoast)
        allocate(j(iia(2)))
        j(:)=0
@@ -664,6 +719,99 @@ CONTAINS
              y(i)%T=y(i)%T+(r.mono.j)
              j(ii)=0
           enddo
+       enddo
+       deallocate(j)
+    elseif(beta_flg) then
+       betx = get_value('ptc_twiss ','betx ')
+       bety = get_value('ptc_twiss ','bety ')
+       alfx = get_value('ptc_twiss ','alfx ')
+       alfy = get_value('ptc_twiss ','alfy ')
+       dx   = get_value('ptc_twiss ','dx ')
+       dpx  = get_value('ptc_twiss ','dpx ')
+       dy   = get_value('ptc_twiss ','dy ')
+       dpy  = get_value('ptc_twiss ','dpy ')
+       mux  = get_value('ptc_twiss ','mux ')
+       muy  = get_value('ptc_twiss ','muy ')
+
+       x(i)=zero
+       x(1)=get_value('ptc_twiss ','x ')
+       x(2)=get_value('ptc_twiss ','px ')
+       x(3)=get_value('ptc_twiss ','y ')
+       x(4)=get_value('ptc_twiss ','py ')
+       x(5)=get_value('ptc_twiss ','t ')
+       x(6)=get_value('ptc_twiss ','pt ')
+
+       inval = get_option('twiss_inval ')
+       if(inval.eq.1) then
+          print*," Read BETA0 block in module ptc_twiss"
+       endif
+       if(mux.eq.zero.or.fraction(mux).eq.zero) mux=mux_default
+       if(muy.eq.zero.or.fraction(muy).eq.zero) muy=muy_default
+       re(1,1) = cos(twopi*mux)+alfx*sin(twopi*mux)
+       re(1,2) = betx*sin(twopi*mux)
+       re(1,3) = zero
+       re(1,4) = zero
+       re(1,5) = (one-re(1,1))*dx-re(1,2)*dpx
+       re(1,6) = zero
+       re(2,1) = -(one+alfx**2)*sin(twopi*mux)/betx
+       re(2,2) = cos(twopi*mux)-alfx*sin(twopi*mux)
+       re(2,3) = zero
+       re(2,4) = zero
+       re(2,5) = -re(2,1)*dx+(1-re(2,2))*dpx
+       re(2,6) = zero
+       re(3,1) = zero
+       re(3,2) = zero
+       re(3,3) = cos(twopi*muy)+alfy*sin(twopi*muy)
+       re(3,4) = bety*sin(twopi*muy)
+       re(3,5) = (1-re(3,3))*dy-re(3,4)*dpy
+       re(3,6) = zero
+       re(4,1) = zero
+       re(4,2) = zero
+       re(4,3) = -(1+alfy**2)*sin(twopi*muy)/bety
+       re(4,4) = cos(twopi*muy)-alfy*sin(twopi*muy)
+       re(4,5) = -re(4,3)*dy+(1-re(4,4))*dpy
+       re(4,6) = zero
+       re(5,1) = zero
+       re(5,2) = zero
+       re(5,3) = zero
+       re(5,4) = zero
+       re(5,5) = one
+       re(5,6) = zero
+       re(6,1) = zero
+       re(6,2) = zero
+       re(6,3) = zero
+       re(6,4) = zero
+       re(6,5) = zero
+       re(6,6) = one
+
+       if(betz_flg) then
+          betz = get_value('ptc_twiss ','betz ')
+          alfz = get_value('ptc_twiss ','alfz ')
+          muz  = get_value('ptc_twiss ','muz ')
+          if(muz.eq.zero.or.fraction(muz).eq.zero) muz=muz_default
+          re(1,5) = zero
+          re(2,5) = zero
+          re(3,5) = zero
+          re(4,5) = zero
+          re(6,6) = cos(twopi*muz)+alfz*sin(twopi*muz)
+          re(6,5) = betz*sin(twopi*muz)
+          re(5,6) = -(1+alfz**2)*sin(twopi*muz)/betz
+          re(5,5) = cos(twopi*muz)-alfz*sin(twopi*muz)
+       endif
+       call liepeek(iia,icoast)
+       allocate(j(iia(2)))
+       j(:)=0
+       do i = 1,iia(2)
+          do ii = 1,iia(2)
+             j(ii)=1
+             r=re(i,ii)-(y(i)%T.sub.j)
+             y(i)%T=y(i)%T+(r.mono.j)
+             j(ii)=0
+          enddo
+       enddo
+       deallocate(j)
+       do i=1,iia(2)
+          x(i) = 0
        enddo
     else
        c_%watch_user=.true.
@@ -678,6 +826,7 @@ CONTAINS
           return
        endif
     endif
+
     call alloc(tw)
     tw=y
     y=npara
@@ -698,6 +847,17 @@ CONTAINS
        tw=y
 
        call double_to_table(table_name, 's ', suml)
+
+       opt_fun(:)=zero
+       call liepeek(iia,icoast)
+       allocate(j(iia(2)))
+       j(:)=0
+       do ii=1,iia(2)
+          opt_fun(ii)=y(ii)%T.sub.j
+       enddo
+       deallocate(j)
+       ioptfun=6
+       call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
 
        opt_fun(1)=tw%beta(1,1)
        opt_fun(2)=tw%beta(1,2)
@@ -754,10 +914,11 @@ CONTAINS
 
   END subroutine ptc_twiss
 
+
   FUNCTION double_from_ptc(var, column)
     USE ptc_results
     implicit none
-    real(dp) double_from_ptc 
+    real(dp) double_from_ptc
     real(dp) :: d_val = 0.0
     character (len = *) var
     integer :: column(*)
@@ -800,13 +961,13 @@ CONTAINS
     USE ptc_results
     implicit none
     integer row
-    real(dp) double_from_ptc_normal, d_val, d_val1, d_val2 
+    real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
     integer idx
     integer j,k,ind(6)
     integer double_from_table
     character(len = 4)  name_var
     character(len = 2)  name_var1
-    character(len = 3)  name_var2    
+    character(len = 3)  name_var2
     logical :: name_l = .false.
 
     double_from_ptc_normal = 0.0
@@ -927,7 +1088,7 @@ CONTAINS
           ind(5) = 0
           ind(6) = 0
           d_val = pbr%cos%h.sub.ind
-          double_from_ptc_normal = d_val   
+          double_from_ptc_normal = d_val
           RETURN
        CASE ('hams')
           k = double_from_table("normal_results ", "order1 ", row, d_val)
@@ -941,7 +1102,7 @@ CONTAINS
           ind(5) = 0
           ind(6) = 0
           d_val = pbr%sin%h.sub.ind
-          double_from_ptc_normal = d_val   
+          double_from_ptc_normal = d_val
           RETURN
        CASE ('hama')
           k = double_from_table("normal_results ", "order1 ", row, d_val)
@@ -956,7 +1117,7 @@ CONTAINS
           ind(6) = 0
           d_val1 = pbr%cos%h.sub.ind
           d_val2 = pbr%sin%h.sub.ind
-          double_from_ptc_normal = SQRT(d_val1**2 + d_val2**2)   
+          double_from_ptc_normal = SQRT(d_val1**2 + d_val2**2)
           RETURN
        CASE ('haml')
           double_from_ptc_normal = 0.0D0
@@ -971,7 +1132,7 @@ CONTAINS
   RECURSIVE FUNCTION FACTORIAL (N) &
        RESULT (FACTORIAL_RESULT)
     INTEGER :: N, FACTORIAL_RESULT
-    
+
     IF (N <= 0 ) THEN
        FACTORIAL_RESULT = 1
     ELSE
@@ -983,7 +1144,7 @@ CONTAINS
 
   SUBROUTINE display_table_results()
     implicit none
-    integer, external :: select_ptc_idx, string_from_table, double_from_table 
+    integer, external :: select_ptc_idx, string_from_table, double_from_table
     character(len = 4) name_var
     integer row,k
     integer :: ord(3)
@@ -1007,19 +1168,20 @@ CONTAINS
   SUBROUTINE ptc_normal()
     USE ptc_results
     implicit none
-    logical(lp) closed_orbit,normal
+    logical(lp) closed_orbit,normal,maptable
     integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
-    integer i, ii, j, jj, k, l, starti
-    integer n_rows, row, n_haml, nres, mynres, n1, n2 
-    integer,external :: select_ptc_idx, minimum_acceptable_order, & 
+    integer i, ii, iii, j1, jj, ja(6), k, l, starti
+    integer,parameter :: i_map_coor=10
+    integer n_rows, row, n_haml, nres, mynres, n1, n2,map_term
+    integer,external :: select_ptc_idx, minimum_acceptable_order, &
          string_from_table, double_from_table, result_from_normal
-    real(dp) x(6),deltap0,deltap
+    real(dp) x(6),deltap0,deltap,map_coor(i_map_coor)
     !type(real_8) y(6)
     integer :: column(6) = (/1,0,0,0,0,0/)
-    integer :: ord(3), indexa(4) 
+    integer :: ord(3), indexa(4)
     integer :: row_haml(101)
     integer :: index1(1000,2)
-    real(dp) val_ptc,d_val
+    real(dp) val_ptc,d_val,coef
     real(kind(1d0)) get_value
     character(len = 4) name_var
 
@@ -1067,11 +1229,59 @@ CONTAINS
     endif
     c_%watch_user=.false.
     call daprint(y,18)
+
+    maptable = get_value('ptc_normal ','maptable ') .ne. 0
+    if(no.eq.1.and.maptable) then
+       map_term=42
+       call  make_map_table(map_term)
+       call liepeek(iia,icoast)
+       allocate(j(iia(2)))
+       ja(:)    = 0
+       j(:)     = 0
+       do iii=1,iia(2)
+          coef = y(iii)%T.sub.j
+          map_coor(1)=coef
+          map_coor(2)=iii
+          map_coor(3)=iia(2)
+          map_coor(4)=0
+          map_coor(5)=ja(1)
+          map_coor(6)=ja(2)
+          map_coor(7)=ja(3)
+          map_coor(8)=ja(4)
+          map_coor(9)=ja(5)
+          map_coor(10)=ja(6)
+          call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+          call augment_count("map_table ")
+       enddo
+       do i = 1,iia(2)
+          do ii = 1,iia(2)
+             j(ii) = 1
+             ja(ii) = j(ii)
+             coef = y(i)%T.sub.j
+             map_coor(1)=coef
+             map_coor(2)=i
+             map_coor(3)=iia(2)
+             map_coor(4)=no
+             map_coor(5)=ja(1)
+             map_coor(6)=ja(2)
+             map_coor(7)=ja(3)
+             map_coor(8)=ja(4)
+             map_coor(9)=ja(5)
+             map_coor(10)=ja(6)
+             call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+             call augment_count("map_table ")
+             j(:)  = 0
+             ja(ii) = j(ii)
+          enddo
+       enddo
+       deallocate(j)
+    endif
+
     normal = get_value('ptc_normal ','normal ') .ne. 0
     if(normal) then
        call alloc(n)
 
-!------ Find the number of occurences of the attribute 'haml' 
+       !------ Find the number of occurences of the attribute 'haml'
 
        n_rows = select_ptc_idx()
        n_haml = 0
@@ -1085,13 +1295,13 @@ CONTAINS
           enddo
           if (n_haml > 0) then
              call alloc(pbr)
-             do j =1,n_haml
-                row = row_haml(j)
+             do j1 =1,n_haml
+                row = row_haml(j1)
                 k = double_from_table("normal_results ", "value ", row, d_val)
                 mynres = int(d_val)
-                row = row_haml(j) - 3*mynres + 2
+                row = row_haml(j1) - 3*mynres + 2
                 starti = 1
-                if (j .eq. 1) then
+                if (j1 .eq. 1) then
                    k = double_from_table("normal_results ", "order1 ", row, d_val)
                    indexa(1) = int(d_val)
                    k = double_from_table("normal_results ", "order2 ", row, d_val)
@@ -1108,7 +1318,7 @@ CONTAINS
                    nres = 1
                    starti = 2
                 endif
-!============ nres is the number of resonances to be set
+                !============ nres is the number of resonances to be set
 
                 if (mynres .ge. starti) then
                    do i = starti,mynres
@@ -1139,19 +1349,19 @@ CONTAINS
              n%nres = nres
           endif
        endif
-!------------------------------------------------------------------------
+       !------------------------------------------------------------------------
 
        n=y
        if (n_haml > 0) pbr = n%normal%pb
        write(19,'(/a/)') 'Dispersion, First and Higher Orders'
        call daprint(n%A1,19)
 
-!------ get values and store them in the table 'normal_results' ---------
+       !------ get values and store them in the table 'normal_results' ---------
 
        n_rows = select_ptc_idx()
-       if (no .ne. minimum_acceptable_order()) then  
+       if (no .ne. minimum_acceptable_order()) then
           print *,"The minimum required order is ",minimum_acceptable_order(), &
-               "while the 'no' attribute in the command ptc_normal is ",no  
+               "while the 'no' attribute in the command ptc_normal is ",no
        endif
        if (no < minimum_acceptable_order()) then
           print *,"ptc_normal failed. MAD-X continues."
@@ -1165,7 +1375,7 @@ CONTAINS
           enddo
        endif
 
-!------------------------------------------------------------------------
+       !------------------------------------------------------------------------
 
        write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
        !  call daprint(n%A_t,19)
@@ -1173,7 +1383,7 @@ CONTAINS
 
        call daprint(n%dhdj,19)
 
-!       call daprint(pbr,19)
+       !       call daprint(pbr,19)
        if (n_haml > 0) call kill(pbr)
        call kill(n)
     endif
@@ -1186,13 +1396,15 @@ CONTAINS
   subroutine ptc_track()
     implicit none
     integer i,nint,ndble,nchar,int_arr(1),char_l,mynpa,icase,turns,flag_index,why(9)
+    integer j,next_start
     real(dp) x0(6),x(6),deltap0,deltap
+    real(dp)  xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
     real(kind(1d0)) get_value
     logical(lp) closed_orbit
     character*12 char_a
     data char_a / ' ' /
     !------------------------------------------------------------------------------
-
+  
     if(universe.le.0) then
        call fort_warn('return from ptc_track: ',' no universe created')
        return
@@ -1201,14 +1413,16 @@ CONTAINS
        call fort_warn('return from ptc_track: ',' no layout created')
        return
     endif
-
+  
     icase = get_value('ptc_track ','icase ')
+  
+  
     deltap0 = get_value('ptc_track ','deltap ')
     call my_state(icase,deltap,deltap0,mynpa)
-
+  
     CALL UPDATE_STATES
-!    call print(default,6)
-
+    call print(default,6)
+  
     x0(:)=zero
     if(icase.eq.5) x0(5)=deltap
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
@@ -1216,9 +1430,16 @@ CONTAINS
        call find_orbit(my_ring,x0,1,default,1d-7)
        print*,"Closed orbit: ",x0
     endif
-
+  
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
-
+  
+    j  =  next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)
+    print*,"dat1",j,xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
+    j  =  next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)
+    print*,"dat2",j,xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
+    j  =  next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)
+    print*,"dat3",j,xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
+  
     x(:)=x(:)+x0(:)
     print*,"  Initial Coordinates: ", x
     turns = get_value('ptc_track ','turns ')
@@ -1236,10 +1457,10 @@ CONTAINS
     c_%watch_user=.false.
     print*,"  End Coordinates: ",x
     return
-100 continue
+    100 continue
     c_%watch_user=.false.
-    print*,"  Last Coordinates: ",x," after: ",i," turn(s)" 
-
+    print*,"  Last Coordinates: ",x," after: ",i," turn(s)"
+  
   END subroutine ptc_track
 
   subroutine ptc_end()
@@ -1654,7 +1875,7 @@ CONTAINS
             unit=i,action=faction,access=faccess,form=fform,&
             file=fname,status='old',position='rewind')
     endif
-    return    
+    return
 1   write (*,*)&
          ' F90FLUSH 1st INQUIRE FAILED with IOSTAT ',ios,' on UNIT ',i
     stop
