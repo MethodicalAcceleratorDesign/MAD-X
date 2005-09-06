@@ -7,7 +7,7 @@
 # compilers
 CC=gcc
 FC=g77
-# NAG for testing 
+# NAG for testing
 #f95=f95
 # LF95 for production
 f95=lf95
@@ -27,17 +27,17 @@ GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM -D_FULL
 
 # NAG default f95 compiler options
-#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=24 -nan
+#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan
 # NAG alternative
-#f95_FLAGS=-c -O4 -maxcontin=24 -w=unused
+#f95_FLAGS=-c -O4 -maxcontin=100 -w=unused
 # LF95 default f95 compiler options
 f95_FLAGS= --o1 --tp -c
 
 # NAG f95 compiler options to compile f77 code
-#FFLAGS77=-gline -g90 -c -maxcontin=24 -nan
+#FFLAGS77=-gline -g90 -c -maxcontin=100 -nan
 # NAG f95 alternatives for development and debug
-#FFLAGS77=-gline -g90 -c -maxcontin=24 -nan -ieee=full
-#FFLAGS77=-g90 -c -O4 -maxcontin=24 -w=unused
+#FFLAGS77=-gline -g90 -c -maxcontin=100 -nan -ieee=full
+#FFLAGS77=-g90 -c -O4 -maxcontin=100 -w=unused
 # LF95 f95 compiler options to compile f77 code
 FFLAGS77= --o1 --tp -c
 
@@ -83,10 +83,10 @@ dynap_f77.o dynap.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
 ibsdb_f77.o ibsdb.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
 plot_f77.o plot.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
 sodd_f77.o sodd.o: sodd.F
-trrun_f77.o trrun.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi 
+trrun_f77.o trrun.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi
 emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
-match_f77.o match.o: match.F name_len.fi match.fi 
-touschek_f77.o touschek.o: touschek.F
+match_f77.o match.o: match.F name_len.fi match.fi
+touschek_f77.o touschek.o: touschek.F touschek.fi name_len.fi physcons.fi
 resindex_f77.o resindex.o: resindex.F resindex.fi
 
 # f90 dependencies
@@ -108,16 +108,17 @@ o_tree_element.o: n_complex_polymorph.o o_tree_element.f90
 Sa_extend_poly.o: o_tree_element.o Sa_extend_poly.f90
 Sb_1_pol_template.o: Sa_extend_poly.o Sb_1_pol_template.f90
 Sb_2_pol_template.o: Sb_1_pol_template.o Sb_2_pol_template.f90
-Sc_euclidean.o: Sb_2_pol_template.o Sc_euclidean.f90
+Sb_sagan_pol_arbitrary.o: Sb_2_pol_template.o Sb_sagan_pol_arbitrary.f90
+Sc_euclidean.o: Sb_sagan_pol_arbitrary.o Sc_euclidean.f90
 Sd_frame.o: Sc_euclidean.o Sd_frame.f90
-Se_status.o: Sd_frame.o Se_status.f90
-Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90 \
-	a_def_all_kind.inc a_def_user1.inc a_def_user2.inc \
-	a_def_element_fibre_layout.inc
+Se_status.o: Sd_frame.o Se_status.f90 a_def_all_kind.inc a_def_sagan.inc \
+	a_def_user1.inc a_def_user2.inc a_def_element_fibre_layout.inc
+Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
 Sg_0_fitted.o: Sf_def_all_kinds.o Sg_0_fitted.f90
 Sg_1_template_my_kind.o: Sg_0_fitted.o Sg_1_template_my_kind.f90
 Sg_2_template_my_kind.o: Sg_1_template_my_kind.o Sg_2_template_my_kind.f90
-Sh_def_kind.o: Sg_2_template_my_kind.o Sh_def_kind.f90
+Sg_sagan_wiggler.o: Sg_2_template_my_kind.o Sg_sagan_wiggler.f90
+Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
 Si_def_element.o: Sh_def_kind.o Si_def_element.f90
 Sj_elements.o: Si_def_element.o Sj_elements.f90
 Sk_link_list.o: Sj_elements.o Sk_link_list.f90
@@ -127,6 +128,8 @@ Sn_mad_like.o: Sm_tracking.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
 madx_ptc_module.o: Sp_keywords.o madx_ptc_module.f90
+madx_ptc_track_run.o: madx_ptc_module.o madx_ptc_track_run.f90
+user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 wrap.o: madx_ptc_module.o wrap.f90
 
 # implicit rule to compile with C
@@ -149,10 +152,10 @@ wrap.o: madx_ptc_module.o wrap.f90
 mpars: madxm.F madxp.o
 	$(FC) $(FP) -o mpars madxm.F madxp.o $(LIBX) -lm -lc
 
-# madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90). 
+# madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
 madx_objectsf77 = madxpf.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
-madx: $(madx_objectsf77) ; 
+madx: $(madx_objectsf77) ;
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
