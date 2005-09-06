@@ -41,7 +41,6 @@
 /e_define_newda.f90 -text
 /emit.F -text
 /emit.fi -text
-/epause.c -text
 /f_newda.f90 -text
 /g_newLielib.f90 -text
 /gxx11.F -text
@@ -109,7 +108,6 @@
 /twissotm.fi -text
 /twtrr.fi -text
 /user2_photon.f90 -text
-/usleep.c -text
 /util.F -text
 /win32calls.fi -text
 /wmaxmin0.fi -text
