@@ -250,7 +250,7 @@ madx: \
 madxdev: \
 	madxm.o madxpf.o twiss.o survey.o orbf.o emit.o util.o match.o \
 	matchsa.o touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o \
-	gxx11.o gxx11c.o resindex.o epause.o timest.o timex.o usleep.o \
+	gxx11.o gxx11c.o resindex.o timest.o timex.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
@@ -266,7 +266,7 @@ madxdev: \
 	$(f95) $(FOPT) -o madxdev madxm.o madxpf.o twiss.o survey.o \
 	orbf.o emit.o util.o match.o matchsa.o touschek.o dynap.o \
 	plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
-	epause.o timest.o timex.o usleep.o \
+	timest.o timex.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \

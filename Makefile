@@ -162,7 +162,7 @@ madx: $(madx_objectsf77) ;
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxdev_objects. All *.f90 , some c and F
 madxdev_objects = madxm.o $(patsubst %.f90,%.o,$(wildcard *.f90)) \
-	madxpf.o gxx11c.o epause.o usleep.o \
+	madxpf.o gxx11c.o \
 	$(madx_objectsf95)
 madxdev: $(madxdev_objects)
 	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext)
