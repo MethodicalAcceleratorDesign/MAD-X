@@ -453,8 +453,8 @@
         endif
 
 !---- TWSINT calculates the Bjorken/Mtingwa integral.
-        call twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, 
-     &              txidc, tyidc, tlidc)
+        call twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,           &
+     &txidc, tyidc, tlidc)
 
 !---- Accumulate contributions.
         tavlc = tavlc + tlidc * dels
@@ -512,11 +512,11 @@
       alywtd = alywtd / wnorm
       hscwtd = (hscwtd/wnorm)**2
       beteff = dxwtd**2 / hscwtd
-      if (hscwtdy.ne.0.d0) then 
-      beteffy = dywtd**2 / hscwtdy
-      else 
-      beteffy = bywtd 
-      endif 
+      if (hscwtdy.ne.0.d0) then
+        beteffy = dywtd**2 / hscwtdy
+      else
+        beteffy = bywtd
+      endif
 ! ********** Compute beam sizes with average betas ************
 
       sigx = sqrt(ex * bxbar)
@@ -528,20 +528,20 @@
 ! ************************************************************
 
 !---- Integral for averaged quantities.
-      call twsint(bxbar,bybar,alxbar,alybar, dxbar,dpxbr, 
-     &            dybar,dpybr,txbar,tybar,tlbar)
+      call twsint(bxbar,bybar,alxbar,alybar, dxbar,dpxbr,               &
+     &dybar,dpybr,txbar,tybar,tlbar)
 
 !---- Integral for effective quantities.
-      call twsint(beteff,beteffy,alxwtd,alywtd,dxwtd,dpxwtd, 
-     &            dywtd,dpywtd,txwtd,tywtd,tlwtd)
+      call twsint(beteff,beteffy,alxwtd,alywtd,dxwtd,dpxwtd,            &
+     &dywtd,dpywtd,txwtd,tywtd,tlwtd)
 
 !---- Calculate the Coulomb logarithm.
       call twclog(bxbar, bybar, const)
 
 !---- Output (weighted) average values.
-      write (*, 940) bxbar, bybar, dxbar, dybar, alxbar, alybar, 
-     & dpxbr, dpybr, 
-     & bxinv, byinv
+      write (*, 940) bxbar, bybar, dxbar, dybar, alxbar, alybar,        &
+     &dpxbr, dpybr,                                                     &
+     &bxinv, byinv
 
 !---- Output averaged values.
       tavl   = tavlc * const / s2
@@ -576,8 +576,8 @@
 
       end
 ! *********************************************************************
-      subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, 
-     &                  txi, tyi, tli)
+      subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
+     &txi, tyi, tli)
 
       implicit none
 
@@ -591,7 +591,7 @@
 !   Particle Accelerators 17, 1 (1985) contain two false               *
 !   terms in the expression for tau_x which have been corrected        *
 !   in this version of MADX;                                           *
-!   contributions from vertical dispersion were also added;            * 
+!   contributions from vertical dispersion were also added;            *
 !   AB Note by Frank Zimmermann be published (2005)                    *
 !                                                                      *
 !                                                                      *
@@ -624,7 +624,7 @@
      &func,h,phi,polyl,polyx,polyy,r1,suml,sumx,sumy,td1,td2,term,tl1,  &
      &tl2,tli,tmpl,tmpx,tmpy,tx1,tx2,txi,ty1,ty2,tyi,zintl,zintx,zinty, &
      &zero,one,two,three,six,tstlog,power,ten,test,dy,dpy,aly,phiy,c1y, &
-     &c2y,chy,four,onetominus20   
+     &c2y,chy,four,onetominus20
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,tstlog=74d0, &
      &power=-two/three,ten=1d1,test=1d-7,four=4d0,onetominus20=1d-20)
       include 'ibsdb.fi'
@@ -644,7 +644,7 @@
       c2y    = cy * (gammas*phiy)**2
       chy    = c1y + c2y
       r1     = three / cy
-      a      = cx + cl + chy 
+      a      = cx + cl + chy
       b      = (c3 + cy) * (c1 + cl + c1y) + cy * c2 + c3 * c2y
 
 !---- Define CPRIME=C*CSCALE to try to keep the value.
@@ -671,23 +671,23 @@
       td2    = one / (sqrt(ccy) * cscale * cy)
       tl1    = (two * a - cy - c3) / cprime
       tl2    = (b - two * c3 * cy + c1y * (c3+cy) ) / cprime
-      ty1    = (- a - c3 + two * cy -chy - chy/cy*(c3 - 
-     &          two*gammas**2/sige**2) + two * chy * (cx +chy)/cy ) 
-     &         / cprime
-      ty2    = (b + cy * c3 +chy*(cy+chy)+chy*ey*(one/ey+betax
-     &           /(betay*ex))
-     &         *gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/
-     &          (betay*ex))* 
-     &         cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay
-     &         -c2y*(cy+c3+chy)) / cprime - r1 / cscale
+      ty1    = (- a - c3 + two * cy -chy - chy/cy*(c3 -                 &
+     &two*gammas**2/sige**2) + two * chy * (cx +chy)/cy )               &
+     &/ cprime
+      ty2    = (b + cy * c3 +chy*(cy+chy)+chy*ey*(one/ey+betax          &
+     &/(betay*ex))                                                      &
+     &*gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/             &
+     &(betay*ex))*                                                      &
+     &cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay          &
+     &-c2y*(cy+c3+chy)) / cprime - r1 / cscale
       tx1    = (two * a * (cx - c3) - cy * cx -                         &
-     &          c3 * (cy - cl - two * c3 )) / cprime
+     &c3 * (cy - cl - two * c3 )) / cprime
       tx2    = (c3 + cx) * ((b + c3 * cy) / cprime)-                    &
-     &          six / cscale + three * c3 * cy * (cl / cprime)
-     &          + (- six*(c3*c2*cy) + six*c3*cy*c1y 
-     &          + (betay/ey+betax/ex)*chy*cx +
-     &          chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*
-     &          c2y ) / cprime
+     &six / cscale + three * c3 * cy * (cl / cprime)                    &
+     &+ (- six*(c3*c2*cy) + six*c3*cy*c1y                               &
+     &+ (betay/ey+betax/ex)*chy*cx +                                    &
+     &chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*           &
+     &c2y ) / cprime
 
       al(1)  = zero
 
@@ -699,13 +699,13 @@
 
 !---- Evaluate Simpson's rule summation for one interval.
 !     The integrand is calculated in the loop itself
-        if (abs(cy+aloop).gt.onetominus20) then 
-          term = sqrt((cy+aloop)*ccy)*sqrt(                                  &
-     & (alam*ccy*alam+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
-        else 
-          term = sqrt((cy+aloop)*ccy)*sqrt(                                  &
-     & (aloop*ccy*aloop+td1*aloop+td2))
-        endif 
+        if (abs(cy+aloop).gt.onetominus20) then
+          term = sqrt((cy+aloop)*ccy)*sqrt(                             &
+     &(alam*ccy*alam+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
+        else
+          term = sqrt((cy+aloop)*ccy)*sqrt(                             &
+     &(aloop*ccy*aloop+td1*aloop+td2))
+        endif
         func = sqrt(aloop) / term**3
         polyl = tl1 * aloop + tl2
         polyx = tx1 * aloop + tx2
@@ -718,13 +718,13 @@
         do iiz = 1, ns
           alam = aloop + iiz * h
           cof = coeff(mod(iiz,2)+1)
-        if (abs(cy+alam).gt.onetominus20) then 
-          term = sqrt((cy+alam)*ccy)*sqrt(                                  &
-     & (alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
-        else 
-          term = sqrt((cy+alam)*ccy)*sqrt(                                  &
-     & (alam*ccy*alam+td1*alam+td2))
-        endif 
+          if (abs(cy+alam).gt.onetominus20) then
+            term = sqrt((cy+alam)*ccy)*sqrt(                            &
+     &(alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
+          else
+            term = sqrt((cy+alam)*ccy)*sqrt(                            &
+     &(alam*ccy*alam+td1*alam+td2))
+          endif
           f = sqrt(alam) / term**3
           polyl = tl1 * alam + tl2
           polyx = tx1 * alam + tx2
@@ -750,7 +750,7 @@
      &abs(tmpx/zintx) .lt. test .and.                                   &
      &abs(tmpy/zinty) .lt. test) goto 100
       enddo
-      write (*, *) tmpl,zintl, tmpx,zintx, tmpy,zinty, test  
+      write (*, *) tmpl,zintl, tmpx,zintx, tmpy,zinty, test
       write (*, 910) maxdec
   910 format('Bjorken/Mtingwa integrals did not converge in ',          &
      &i3,' decades.')
