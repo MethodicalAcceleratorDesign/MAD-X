@@ -935,7 +935,7 @@ contains
   FUNCTION polymorpht( S1 )
     implicit none
     TYPE (double_complex) polymorpht
-    TYPE (taylor), INTENT (IN) :: S1
+    TYPE (complextaylor), INTENT (IN) :: S1
     integer localmaster
 
     localmaster=master
@@ -1131,15 +1131,27 @@ contains
     TYPE (double_complex), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
     integer localmaster
+    type(complextaylor) t
 
-    if(s1%kind==m2) then
-       localmaster=master
-       call ass(GETCHARnd2)
-       GETCHARnd2%t=s1%t.par.s2
-       master=localmaster
-    else
-       GETCHARnd2=s1
-    endif
+    localmaster=master
+    call ass(GETCHARnd2)
+    call alloc(t)
+    t=s1
+
+    t=t.par.s2
+    GETCHARnd2%t=t
+
+
+
+    call kill(t)
+    master=localmaster
+
+    !    if(s1%kind==m2) then
+    !       localmaster=master
+    !       call ass(GETCHARnd2)
+    !       GETCHARnd2%t=s1%t.par.s2
+    !       master=localmaster
+    !    endif
 
   END FUNCTION GETCHARnd2
 
@@ -1149,15 +1161,27 @@ contains
     TYPE (double_complex), INTENT (IN) :: S1
     integer, INTENT (IN) ::  S2(:)
     integer localmaster
+    type(complextaylor) t
 
-    if(s1%kind==m2) then
-       localmaster=master
-       call ass(GETintnd2)
-       GETintnd2%t=s1%t.par.s2
-       master=localmaster
-    else
-       GETintnd2=s1
-    endif
+    !    if(s1%kind==m2) then
+    !       localmaster=master
+    !       call ass(GETintnd2)
+    !       GETintnd2%t=s1%t.par.s2
+    !       master=localmaster
+    !    endif
+
+
+    localmaster=master
+    call ass(GETintnd2)
+    call alloc(t)
+    t=s1
+    t=t.par.s2
+    GETintnd2%t=t
+
+
+    call kill(t)
+
+    master=localmaster
 
   END FUNCTION GETintnd2
 
@@ -1218,15 +1242,18 @@ contains
     integer  , INTENT (IN) ::  S2
     integer localmaster
 
-    GETORDER=zero
+    localmaster=master
+    call ass(GETORDER)
+
     if(s1%kind==m2) then
-       localmaster=master
-       call ass(GETORDER)
        GETORDER%t=s1%t.sub.s2
-       master=localmaster
-    elseif(s1%kind==m1) then
-       if(s2==0) GETORDER=s1
+    else
+       GETORDER%kind=m1
+       GETORDER%r=zero
+       if(s2==0) GETORDER%r=s1%r
     endif
+
+    master=localmaster
 
   END FUNCTION GETORDER
 
@@ -1238,15 +1265,19 @@ contains
     integer  , INTENT (IN) ::  S2
     integer localmaster
 
+    localmaster=master
+    call ass(CUTORDER)
+
+    CUTORDER=zero
     if(s1%kind==m2) then
-       localmaster=master
-       call ass(CUTORDER)
+       cutorder%kind=m2
        CUTORDER%t=s1%t.CUT.s2
-       master=localmaster
-    else
-       CUTORDER=s1
+    elseif(s1%kind==m1) then
+       if(s2>=1) CUTORDER%r=s1%r
+       cutorder%kind=m1
     endif
 
+    master=localmaster
   END FUNCTION CUTORDER
 
 

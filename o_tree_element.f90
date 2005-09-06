@@ -20,7 +20,7 @@ module tree_element_MODULE
 CONTAINS
 
   SUBROUTINE COPY_TREE(T,U)
-    IMPLICIT NONE
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: U
 
@@ -38,7 +38,7 @@ CONTAINS
 
 
   SUBROUTINE NULL_TREE(T)
-    IMPLICIT NONE
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
 
     NULLIFY(T%CC,T%JL,T%JV,T%N,T%ND2)
@@ -47,7 +47,7 @@ CONTAINS
 
 
   SUBROUTINE ALLOC_TREE(T,N,ND2)
-    IMPLICIT NONE
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
     INTEGER , INTENT(IN) :: N,ND2
 
@@ -60,7 +60,7 @@ CONTAINS
   END SUBROUTINE ALLOC_TREE
 
   SUBROUTINE SET_TREE(T,MA)
-    IMPLICIT NONE
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
     TYPE(DAMAP), INTENT(INOUT) :: MA
     INTEGER N
@@ -82,7 +82,7 @@ CONTAINS
 
 
   SUBROUTINE KILL_TREE(T)
-    IMPLICIT NONE
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
 
 
@@ -92,82 +92,105 @@ CONTAINS
   END SUBROUTINE KILL_TREE
 
 
-  SUBROUTINE track_TREE(T,XI)
-    IMPLICIT NONE
+  SUBROUTINE track_TREE(T,XI,n)
+    use da_arrays
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     REAL(DP), INTENT(INOUT) :: XI(6)
-    REAL(DP) XT(6),XF(6),XM(7),XX
+    integer, optional, INTENT(IN) :: n
+    integer n1,k
+    REAL(DP) XT(lno),XF(6),XM(lno+1),XX
     INTEGER JC,I,IV
 
-    XT=0.0_DP
-    XF=0.0_DP
-    XM=0.0_DP
+    n1=1
+    if(present(n)) n1=n
+    do k=1,n1
+       if(.not.c_%CHECK_STABLE) return
+       XT=0.0_DP
+       XF=0.0_DP
+       XM=0.0_DP
 
-    do i=1,T%ND2
-       xt(i)=xi(i)
-    enddo
-    do i=1,T%ND2
-       xf(i) = T%cc(i)
-    enddo
-
-    XM(1) = one
-    JC=T%ND2
-
-    do i=1,(T%N-T%ND2)/T%ND2
-       !
-       xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
-       xm(T%jl(JC+1)+1) = xx
-       !
-       do iv=1,T%ND2
-          jc=jc+1
-          xf(iv) = xf(iv) + t%cc(jc) * xx
+       do i=1,T%ND2
+          xt(i)=xi(i)
        enddo
+       do i=1,T%ND2
+          xf(i) = T%cc(i)
+       enddo
+
+       XM(1) = one
+       JC=T%ND2
+       do i=1,(T%N-T%ND2)/T%ND2
+          !
+          xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
+          xm(T%jl(JC+1)+1) = xx
+          !
+          do iv=1,T%ND2
+             jc=jc+1
+             xf(iv) = xf(iv) + t%cc(jc) * xx
+          enddo
+       enddo
+       xi=xf
+
+       if(abs(xi(1))>c_%absolute_aperture.or.abs(xi(3))>c_%absolute_aperture) then
+          c_%CHECK_STABLE=.FALSE.
+       endif
     enddo
-    xi=xf
+
   END SUBROUTINE track_TREE
 
-  SUBROUTINE track_TREEP(T,XI)
-    IMPLICIT NONE
+  SUBROUTINE track_TREEP(T,XI,n)
+    use da_arrays
+    implicit none
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     TYPE(REAL_8), INTENT(INOUT) :: XI(6)
-    TYPE(REAL_8) XT(6),XF(6),XM(7),XX
+    integer, optional, INTENT(IN) :: n
+    integer n1,k
+    TYPE(REAL_8) XT(lno),XF(6),XM(lno+1),XX
     INTEGER JC,I,IV
 
-    CALL ALLOC(XT,6)
-    CALL ALLOC(XF,6)
-    CALL ALLOC(XM,7)
-    CALL ALLOC(XX)
+    n1=1
+    if(present(n)) n1=n
+    do k=1,n1
 
-    do i=1,T%ND2
-       xt(i)=xi(i)
-    enddo
-    do i=1,T%ND2
-       xf(i) = T%cc(i)
-    enddo
+       CALL ALLOC(XT,lno)
+       CALL ALLOC(XF,6)
+       CALL ALLOC(XM,lno+1)
+       CALL ALLOC(XX)
 
-    XM(1) = one
-    JC=T%ND2
 
-    do i=1,(T%N-T%ND2)/T%ND2
-       !
-       xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
-       xm(T%jl(JC+1)+1) = xx
-       !
-       do iv=1,T%ND2
-          jc=jc+1
-          xf(iv) = xf(iv) + t%cc(jc) * xx
+
+
+       do i=1,T%ND2
+          xt(i)=xi(i)
        enddo
+       do i=1,T%ND2
+          xf(i) = T%cc(i)
+       enddo
+
+       XM(1) = one
+       JC=T%ND2
+
+       do i=1,(T%N-T%ND2)/T%ND2
+          !
+          xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
+          xm(T%jl(JC+1)+1) = xx
+          !
+          do iv=1,T%ND2
+             jc=jc+1
+             xf(iv) = xf(iv) + t%cc(jc) * xx
+          enddo
+       enddo
+
+       do i=1,T%ND2
+          xI(i)=xF(i)
+       enddo
+
+       CALL KILL(XT,lno)
+       CALL KILL(XF,6)
+       CALL KILL(XM,lno+1)
+       CALL KILL(XX)
+
     enddo
-
-    do i=1,T%ND2
-       xI(i)=xF(i)
-    enddo
-
-    CALL KILL(XT,6)
-    CALL KILL(XF,6)
-    CALL KILL(XM,7)
-    CALL KILL(XX)
-
   END SUBROUTINE track_TREEP
 
 
@@ -175,7 +198,7 @@ CONTAINS
     implicit none
     INTEGER,INTENT(in)::MFILE,COSY
     type (damap),INTENT(INOUT)::S1
-    INTEGER I,js(6),k1,k2
+    INTEGER I,js(6),k1,k2,l,ncoef
     real(dp) x
     character*200 line
     S1=0
@@ -193,6 +216,15 @@ CONTAINS
           enddo
        enddo
 
+    CASE(-1)  ! sagan
+       do i=1,c_%nd2
+          read(mfile,*) ncoef
+          do l=1,ncoef
+             read(mfile,*)  x,js
+             s1%v(i)=s1%v(i)+(x.mono.js)
+          enddo
+       enddo
+
     CASE DEFAULT
 
        WRITE(6,*) " NOT SUPPORTED IN DAREADMAP_SPECIAL"
@@ -204,12 +236,125 @@ CONTAINS
   END SUBROUTINE dainput_SPECIAL6
 
 
+  SUBROUTINE symplectic(m,eps,nst)
+    implicit none
+    type(damap), INTENT(INOUT) :: m
+    type(onelieexponent) uno
+    type(damap) id
+    real(dp), optional :: eps
+    integer nst
+
+    call alloc(uno); call alloc(id);
+
+    if(present(eps))then
+       if(eps>zero) uno%eps=eps
+    endif
+    uno=m
+    id=1
+    uno%pb%h=uno%pb%h/nst
+    m=texp(uno%pb,id)
+
+    call kill(uno); call kill(id);
+
+
+  end SUBROUTINE symplectic
+
+  integer function number_mon(n,m)
+    implicit none
+    integer i,n,m
+
+    number_mon=1
+
+
+    do i=n+m,max(n,m)+1,-1
+
+       number_mon=number_mon*i
+    enddo
+
+    do i=2,min(n,m)
+       number_mon=number_mon/i
+    enddo
+
+  end  function number_mon
+
+  integer function pos_mon(ju,nv,nomax)
+    implicit none
+    integer ju(:),no,nv,nomax
+    integer i,k,nk
+
+    pos_mon=0
+    no=0
+    do i=1,nv
+       no=no+ju(i)
+    enddo
+
+    nk=no
+
+    if(nk>nomax) then
+       pos_mon=0
+       return
+    endif
+
+    do k=1,nv-1
+       if(ju(k)/=0) then
+          pos_mon=pos_mon+number_mon(nk,nv-k)-number_mon(nk-ju(k),nv-k)
+          nk=nk-ju(k)
+       endif
+    enddo
+    pos_mon=pos_mon+1
+
+    if(no>0) pos_mon=pos_mon+number_mon(no-1,nv)
+
+  end  function pos_mon
+
+  subroutine find_exp(p,ju,no,nv)
+    implicit none
+    integer ju(:),no,nv
+    integer i,k,nk,nvk,p,p0,p1,pg
+
+    ju=0
+
+    if(p==1) then
+       return
+    endif
+
+    if(p<=nv+1) then
+       ju(nv-p+2)=1
+       return
+    endif
+
+
+    do i=1,no
+       p1=number_mon(i,nv)
+       if(p1>=p) then
+          nk=i
+          exit
+       endif
+       p0=p1
+    enddo
+
+
+
+    nvk=nv-1
+    pg=p0
+    do while(nvk>0)
+
+       p1=pg
+       do i=0,nk
+          p1=number_mon(nk-i,nvk-1)+p1
+          if(p1>=p) then
+             nk=nk-i
+             ju(nv-nvk)=i
+             nvk=nvk-1
+             exit
+          endif
+          pg=p1
+       enddo
+    enddo
+    ju(nv)=nk
+  end subroutine find_exp
+
+
+
+
 end module tree_element_MODULE
-
-
-
-
-
-
-
-
