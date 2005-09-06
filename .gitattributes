@@ -24,7 +24,6 @@
 /So_fitting.f90 -text
 /Sp_keywords.f90 -text
 /a_def_all_kind.inc -text
-/a_def_arbitrary.inc -text
 /a_def_element_fibre_layout.inc -text
 /a_def_sagan.inc -text
 /a_def_user1.inc -text
