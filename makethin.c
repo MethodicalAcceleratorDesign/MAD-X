@@ -185,6 +185,50 @@ char* make_thin_name(char* e_name, int slice)
   return buffer(c_dummy);
 }
 
+struct expression* compound_expr(struct expression* e1, double v1,
+                      char* oper, struct expression* e2, double v2)
+/* make one out of two expressions, using oper to connect them
+hbu 9/2005 moved from madxn.c to makethin.c as only used here
+and increased precision   sprintf(tmp, "%e"  ->   sprintf(tmp, "%.14g" */
+{
+  char** toks = tmp_l_array->p;
+  struct expression* expr = NULL;
+  char tmp[30];
+  int n;
+  char lb[] = "(", rb[] = ")";
+  if (e1 != NULL || e2 != NULL)
+    {
+     if (e1 != NULL)
+       {
+        if (e2 != NULL)
+          {
+           toks[0] = lb; toks[1] = e1->string; toks[2] = rb;
+           toks[3] = oper;
+           toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
+          }
+        else
+          {
+         sprintf(tmp, "%.14g", v2); /* hbu */
+           toks[0] = lb; toks[1] = e1->string; toks[2] = rb;
+           toks[3] = oper;
+           toks[4] = lb; toks[5] = tmp; toks[6] = rb;
+          }
+       }
+     else
+       {
+      sprintf(tmp, "%.14g", v1);  /* hbu */
+        toks[0] = lb; toks[1] = tmp; toks[2] = rb;
+        toks[3] = oper;
+        toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
+       }
+     join(toks, 7);
+     pre_split(c_join, l_work, 0);
+     n = mysplit(l_work, tmp_l_array);
+     expr = make_expression(n, toks);
+    }
+  return expr;
+}
+
 /* scale an expression by a number - or leave it NULL */
 struct expression* scale_expr(struct expression* expr,double scale)
 {
