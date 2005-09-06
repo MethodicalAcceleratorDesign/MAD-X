@@ -7,7 +7,6 @@ module S_FRAME
   PRIVATE ZERO_CHART,COPY_CHART,COPY_CHART1,GEO_ROTA,GEO_ROTB
   PRIVATE COPY_PATCH,COPY_PATCH1,ZERO_PATCH,FIND_PATCH_b
   Private alloc_f,dealloc_f,equal_f
-  LOGICAL(lp),TARGET :: with_external_frame=.true.
   private make_rot_x,make_rot_y,make_rot_z,GEO_ROTAB_no_vec,GEO_ROTA_no_vec
   REAL(DP), public :: GLOBAL_FRAME(3,3)= RESHAPE((/1,0,0  ,0,1,0  ,0,0,1/),(/3,3/))
   REAL(DP), public :: GLOBAL_origin(3)= (/0,0,0/)
@@ -272,7 +271,7 @@ CONTAINS
        nullify(f%f)
        !       NULLIFY(    F%A_XY, F%L,    F%ALPHA)
        NULLIFY( F%d_in, F%ang_in,F%d_out,F%ang_out)
-       if(with_external_frame) call alloc(f%f)
+       call alloc(f%f)
        ALLOCATE(F%d_in(3),F%ang_in(3),F%d_out(3),F%ang_out(3))
        !      ALLOCATE(F%A_XY,F%L,F%ALPHA)
        !         F%L=zero
@@ -647,6 +646,24 @@ CONTAINS
 
 
   end subroutine check_frame
+
+  subroutine make_normal(n,s)
+    implicit none
+    real(dp) n(3),s
+    integer i
+
+    s=zero
+    do i=1,3
+       s=s+n(i)**2
+    enddo
+
+    if(s>EPS_FITTED) then
+       s=sqrt(s)
+       n=n/s
+    else
+       s=zero
+    endif
+  end subroutine make_normal
 
   SUBROUTINE COMPUTE_ENTRANCE_ANGLE(ENTL,ENTB,A) ! COMPUTES PTC'S ANGLES
     IMPLICIT NONE

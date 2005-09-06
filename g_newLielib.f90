@@ -11,6 +11,7 @@ MODULE LIELIB_ETIENNE
   PUBLIC NEWDIFD,NEWINTD,NEWETCCT,NEWTRXFLO,NEWTRX,NEWFACFLOD,NEWFACFLO,NEWRTOCFLO
   PUBLIC NEWEXPFLO,NEWDALIND,NEWETINV,NEWMAPNORMF,NEWDHDJFLO,NEWFLOFACG,NEWEXPFLOD
   PUBLIC NEWFLOFAC,NEWDACMUD,NEWCTORFLO,NEWCTOR,NEWRTOC,NEWETPIN,NEWLIEINIT,NEWCOMCFU
+  public newgetcct,NEWGETINV,newgtrx
   integer,PARAMETER::NDIM2=2*ndim,NTT=100
   character(120) line
 CONTAINS
@@ -106,6 +107,26 @@ CONTAINS
     CALL newdadal(Iv,Nv)
     RETURN
   END subroutine  newETCCT
+
+  SUBROUTINE newgetcct(X,Y,Z,n)
+    IMPLICIT none
+    integer i,n
+    type (taylorlow) iv(ntt)
+    type (taylorlow),dimension(:)::X,Y,Z
+
+    CALL newETALL(Iv,nv)
+    DO  I=N+1,NV
+       CALL newDAVAR(Iv(I),zero,I)
+    enddo
+    do  i=1,n
+       call newdacop(y(i),iv(i))
+    enddo
+    CALL newDACCT(X,N,IV,NV,Z,N)
+
+    CALL newdadal(Iv,Nv)
+    RETURN
+  END subroutine  newgetcct
+
   !  :RH: = Y :H: Y^-1 =  :HoY:
 
   subroutine newetmtree(y,x)
@@ -175,6 +196,32 @@ CONTAINS
 
     RETURN
   END subroutine  NEWTRX
+
+  SUBROUTINE NEWgTRX(H,RH,Y,n)
+    IMPLICIT none
+    integer i,n
+    type (taylorlow) h,RH,iv(ntt),HH(1),RHH(1)
+    type (taylorlow),dimension(:)::Y
+
+    CALL newETALL(HH,1)
+    CALL newETALL(RHH,1)
+    CALL NEWDACOP(H,HH(1))
+    CALL newETALL(Iv,nv)
+    DO  I=n+1,NV
+       CALL newDAVAR(Iv(I),zero,I)
+    enddo
+    do  i=1,n
+       call newdacop(y(i),iv(i))
+    enddo
+    CALL newDACCT(HH,1,IV,NV,RHH,1)
+    CALL NEWDACOP(RHH(1),RH)
+
+    CALL newdadal(Iv,Nv)
+    CALL newdadal(RHH,1)
+    CALL newdadal(HH,1)
+
+    RETURN
+  END subroutine  NEWgTRX
 
   !  *RH! = Y *H! Y^-1  CHANGE OF A VECTOR FLOW OPERATOR
 
@@ -303,6 +350,32 @@ CONTAINS
     RETURN
   END  SUBROUTINE NEWETPIN
   !- MORE EXTENSIONS OF BASIC BERZ'S PACKAGE
+
+  SUBROUTINE NEWgETINV(X,Y,n)
+    IMPLICIT NONE
+    integer I,n
+    type (taylorlow) IV1(ntt),IV2(ntt)
+
+    type (taylorlow),dimension(:)::X,Y
+
+    CALL NEWETALL(IV1,NV)
+    CALL NEWETALL(IV2,NV)
+    DO I=n+1,NV
+       CALL NEWDAVAR(IV1(I),zero,I)
+    enddo
+    do  i=1,n
+       CALL NEWDACOP(X(I),IV1(I))
+    ENDDO
+
+    CALL NEWDAINV(IV1,NV,IV2,NV)
+    do  i=1,n
+       CALL NEWDACOP(IV2(I),Y(I))
+    ENDDO
+
+    CALL NEWDADAL(IV2,NV)
+    CALL NEWDADAL(IV1,NV)
+    RETURN
+  END  SUBROUTINE NEWgETINV
 
   SUBROUTINE NEWDAPEK0(V,X,JJ)
     IMPLICIT NONE

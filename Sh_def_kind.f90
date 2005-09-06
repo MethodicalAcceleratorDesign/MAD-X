@@ -2126,10 +2126,11 @@ contains
     real(dp) D(3,3),FI(3),FI0,B,co1,co2
     integer i
 
-    if((.not.el%exact)) then
-       write(6,*) " Fringer should be called in exact magnets only "
-       stop 101
-    endif
+
+    !    if((.not.el%exact)) then
+    !     write(6,*) " Fringer should be called in exact magnets only "
+    !     stop 101
+    !    endif
 
     IF(.not.EL%BEND_FRINGE) RETURN
     IF(K==1.AND.EL%KILL_ENT_FRINGE) RETURN
@@ -2212,10 +2213,10 @@ contains
     integer i,J
     ! etienne
 
-    if((.not.el%exact)) then
-       write(6,*) " Fringep should be called in exact magnets only "
-       stop 102
-    endif
+    !    if((.not.el%exact)) then
+    !     write(6,*) " Fringep should be called in exact magnets only "
+    !     stop 102
+    !    endif
 
 
     IF((.not.EL%BEND_FRINGE).or.(.not.el%exact)) RETURN
@@ -11535,14 +11536,14 @@ contains
     IF(EL%P%RADIATION) THEN
        IF(EL%P%DIR==1) THEN
           IF(ASSOCIATED(EL%T_RAD)) THEN
-             CALL TRACK(EL%T_RAD,X)
+             CALL TRACK(EL%T_RAD,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No forward radiating Taylor map provided "
              stop 996
           ENDIF
        ELSE
           IF(ASSOCIATED(EL%T_RAD_REV)) THEN
-             CALL TRACK(EL%T_RAD_REV,X)
+             CALL TRACK(EL%T_RAD_REV,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No reverse radiating Taylor map provided "
              stop 998
@@ -11551,14 +11552,14 @@ contains
     ELSE
        IF(EL%P%DIR==1) THEN
           IF(ASSOCIATED(EL%T)) THEN
-             CALL TRACK(EL%T,X)
+             CALL TRACK(EL%T,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No forward Taylor map provided "
              stop 997
           ENDIF
        ELSE
           IF(ASSOCIATED(EL%T_REV)) THEN
-             CALL TRACK(EL%T_REV,X)
+             CALL TRACK(EL%T_REV,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No reverse Taylor map provided "
              stop 999
@@ -11591,7 +11592,6 @@ contains
     TYPE(REAL_8) L0,BETA
 
     CALL ALLOC(L0,BETA)
-
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
     L0=X(6)
 
@@ -11602,14 +11602,14 @@ contains
     IF(EL%P%RADIATION) THEN
        IF(EL%P%DIR==1) THEN
           IF(ASSOCIATED(EL%T_RAD)) THEN
-             CALL TRACK(EL%T_RAD,X)
+             CALL TRACK(EL%T_RAD,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No forward radiating Taylor map provided "
              stop 996
           ENDIF
        ELSE
           IF(ASSOCIATED(EL%T_RAD_REV)) THEN
-             CALL TRACK(EL%T_RAD_REV,X)
+             CALL TRACK(EL%T_RAD_REV,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No reverse radiating Taylor map provided "
              stop 998
@@ -11618,14 +11618,14 @@ contains
     ELSE
        IF(EL%P%DIR==1) THEN
           IF(ASSOCIATED(EL%T)) THEN
-             CALL TRACK(EL%T,X)
+             CALL TRACK(EL%T,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No forward Taylor map provided "
              stop 997
           ENDIF
        ELSE
           IF(ASSOCIATED(EL%T_REV)) THEN
-             CALL TRACK(EL%T_REV,X)
+             CALL TRACK(EL%T_REV,X,EL%P%NST)
           ELSE
              WRITE(6,*) " No reverse Taylor map provided "
              stop 999
@@ -11633,7 +11633,7 @@ contains
        ENDIF
     ENDIF
 
-    WRITE(6,*) " EL%P%TIME , EL%DELTAMAP,EL%P%LD ",EL%P%TIME , EL%DELTAMAP ,EL%P%LD
+    !    WRITE(6,*) " EL%P%TIME , EL%DELTAMAP,EL%P%LD ",EL%P%TIME , EL%DELTAMAP ,EL%P%LD
     if(EL%P%TIME) then
        IF(EL%DELTAMAP) THEN
           X(5)=(TWO*X(5)+X(5)**2)/(SQRT(ONE/EL%P%BETA0**2+TWO*X(5)+X(5)**2  )+ONE/EL%P%BETA0)
@@ -11880,92 +11880,182 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(ESEPTUM),INTENT(INOUT):: EL
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
-    real(dp) K,SH_X,SH,CH,CHM,PZ,E1,XT(2)
+    real(dp) K,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
     LOGICAL(LP) EXACT
 
-    EXACT=.TRUE.
+    !    if(EL%P%EXACT) THEN
+    if(.true.) then
+
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,0)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
 
 
+       if(EL%P%TIME) then
+          PZ=ROOT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=ROOT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
+          E1=one+X(5)
+       endif
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       SH=SINeH(ARG)
+       CH=COSeH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*TWO
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,1)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
 
 
-    K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
 
-    IF(PRESENT(MID)) THEN
-       !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-       CALL XMID(MID,X,0)
-       !             CALL ROT_XY(EL%PHAS,X,EXACT)
-    ENDIF
+       if(EL%P%TIME) then
+          PZ=ROOT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=ROOT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
+          E1=one+X(5)
+       endif
 
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       SH=SINeH(ARG)
+       CH=COSeH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*TWO
 
-    if(EL%P%TIME) then
-       PZ=ROOT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-       E1=one/EL%P%BETA0+X(5)
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,2)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
     else
-       PZ=ROOT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
-       E1=one+X(5)
+
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,0)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+
+       if(EL%P%TIME) then
+          PZ=root((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=(one+X(5)+K*X(3))
+          E1=one+X(5)
+       endif
+
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       SH=SINeH(ARG)
+       CH=COSeH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*TWO
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,1)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+
+       if(EL%P%TIME) then
+          PZ=root((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=(one+X(5)+K*X(3))
+          E1=one+X(5)
+       endif
+
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       SH=SINeH(ARG)
+       CH=COSeH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*TWO
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,2)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
     endif
-    K=(EL%L/two)*K/PZ
-    SH_X=(EL%L/two)*SINeHX_X(K)/PZ
-    SH=SINeH(K)
-    CH=COSeH(K)
-    K=K*half
-    CHM=(EL%L/two)*SINeHX_X(K)/PZ*SINeH(K)
-
-    X(1)=X(1)+X(2)*(EL%L/two)/PZ
-    XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
-    XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
-    X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
-
-    X(3)=XT(1)
-    X(4)=XT(2)
-
-    if(EL%P%TIME) then
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
-    else
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
-    endif
-
-    IF(PRESENT(MID)) THEN
-       !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-       CALL XMID(MID,X,1)
-       !             CALL ROT_XY(EL%PHAS,X,EXACT)
-    ENDIF
-
-
-    if(EL%P%TIME) then
-       PZ=ROOT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-       E1=one/EL%P%BETA0+X(5)
-    else
-       PZ=ROOT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
-       E1=one+X(5)
-    endif
-    K=(EL%L/two)*K/PZ
-    SH_X=(EL%L/two)*SINeHX_X(K)/PZ
-    SH=SINeH(K)
-    CH=COSeH(K)
-    K=K*half
-    CHM=(EL%L/two)*SINeHX_X(K)/PZ*SINeH(K)
-
-    X(1)=X(1)+X(2)*(EL%L/two)/PZ
-    XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
-    XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
-    X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
-
-    X(3)=XT(1)
-    X(4)=XT(2)
-
-    if(EL%P%TIME) then
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
-    else
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
-    endif
-
-    IF(PRESENT(MID)) THEN
-       !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-       CALL XMID(MID,X,2)
-       !             CALL ROT_XY(EL%PHAS,X,EXACT)
-    ENDIF
-
 
 
   END SUBROUTINE SEPR
@@ -11975,95 +12065,190 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
-    TYPE(REAL_8) K,SH_X,SH,CH,CHM,PZ,E1,XT(2)
+    TYPE(REAL_8) K,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
     LOGICAL(LP) EXACT
 
-    EXACT=.TRUE.
+    !    if(EL%P%EXACT) THEN
+    if(.true.) then
 
-    CALL ALLOC( K,SH_X,SH,CH,CHM,PZ,E1)
-    CALL ALLOC( XT,2)
+       CALL ALLOC( K,SH_X,SH,CH,CHM,PZ,E1)
+       CALL ALLOC( XT,2)
 
-    K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
-    IF(PRESENT(MID)) THEN
-       !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-       CALL XMID(MID,X,0)
-       !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,0)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+       if(EL%P%TIME) then
+          PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=SQRT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
+          E1=one+X(5)
+       endif
+
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       SH=SINH(ARG)
+       CH=COSH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=TWO*ARG
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,1)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+       if(EL%P%TIME) then
+          PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=SQRT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
+          E1=one+X(5)
+       endif
+
+
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       SH=SINH(ARG)
+       CH=COSH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=TWO*ARG
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,2)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+
+       CALL KILL( K,SH_X,SH,CH,CHM,PZ,E1,ARG)
+       CALL KILL( XT,2)
+    else
+
+       CALL ALLOC( K,SH_X,SH,CH,CHM,PZ,E1)
+       CALL ALLOC( XT,2)
+
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,0)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+       if(EL%P%TIME) then
+          PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=(one+X(5)+K*X(3))
+          E1=one+X(5)
+       endif
+
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       SH=SINH(ARG)
+       CH=COSH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=TWO*ARG
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,1)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+
+       K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+       if(EL%P%TIME) then
+          PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=one/EL%P%BETA0+X(5)
+       else
+          PZ=(one+X(5)+K*X(3))
+          E1=one+X(5)
+       endif
+
+
+       ARG=(EL%L/two)*K/PZ
+       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       SH=SINH(ARG)
+       CH=COSH(ARG)
+       ARG=ARG*half
+       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=TWO*ARG
+
+       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
+       XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
+       X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
+
+       X(3)=XT(1)
+       X(4)=XT(2)
+
+       if(EL%P%TIME) then
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+       else
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+       endif
+       IF(PRESENT(MID)) THEN
+          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+          CALL XMID(MID,X,2)
+          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+       ENDIF
+
+
+       CALL KILL( K,SH_X,SH,CH,CHM,PZ,E1,ARG)
+       CALL KILL( XT,2)
+
     ENDIF
-
-    if(EL%P%TIME) then
-       PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-       E1=one/EL%P%BETA0+X(5)
-    else
-       PZ=SQRT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
-       E1=one+X(5)
-    endif
-    K=(EL%L/two)*K/PZ
-    SH_X=(EL%L/two)*SINHX_X(K)/PZ
-    SH=SINH(K)
-    CH=COSH(K)
-    K=K*half
-    CHM=(EL%L/two)*SINHX_X(K)/PZ*SINH(K)
-
-    X(1)=X(1)+X(2)*(EL%L/two)/PZ
-    XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
-    XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
-    X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
-
-    X(3)=XT(1)
-    X(4)=XT(2)
-
-    if(EL%P%TIME) then
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
-    else
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
-    endif
-
-    IF(PRESENT(MID)) THEN
-       !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-       CALL XMID(MID,X,1)
-       !             CALL ROT_XY(EL%PHAS,X,EXACT)
-    ENDIF
-
-
-    if(EL%P%TIME) then
-       PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-       E1=one/EL%P%BETA0+X(5)
-    else
-       PZ=SQRT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
-       E1=one+X(5)
-    endif
-
-
-    K=(EL%L/two)*K/PZ
-    SH_X=(EL%L/two)*SINHX_X(K)/PZ
-    SH=SINH(K)
-    CH=COSH(K)
-    K=K*half
-    CHM=(EL%L/two)*SINHX_X(K)/PZ*SINH(K)
-
-    X(1)=X(1)+X(2)*(EL%L/two)/PZ
-    XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
-    XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
-    X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
-
-    X(3)=XT(1)
-    X(4)=XT(2)
-
-    if(EL%P%TIME) then
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
-    else
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
-    endif
-    IF(PRESENT(MID)) THEN
-       !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-       CALL XMID(MID,X,2)
-       !             CALL ROT_XY(EL%PHAS,X,EXACT)
-    ENDIF
-
-
-    CALL KILL( K,SH_X,SH,CH,CHM,PZ,E1)
-    CALL KILL( XT,2)
-
   END SUBROUTINE SEPP
 
   SUBROUTINE SEPS(EL,Y)
@@ -15125,5 +15310,3 @@ contains
 
 
 END MODULE S_DEF_KIND
-
-

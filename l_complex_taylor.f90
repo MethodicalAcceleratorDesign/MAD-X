@@ -18,7 +18,7 @@ module complex_taylor
   private getdiff,getdATRA,GETORDER,CUTORDER,getchar ,dputchar,dputint
   private set_in_complex   !, assc  !check,
   private dimagt,drealt,dcmplxt,CEQUAL,DEQUAL,REQUAL
-  private GETCHARnd2,GETintnd2,GETint
+  private GETCHARnd2,GETintnd2,GETint,getcharnd2s,GETintnd2s,GETintk
   private CFUC,CFURES,varco,varco1
   !  completing tpsa.f90
   private datantt,dasintt,dacostt,full_abstpsat
@@ -328,7 +328,7 @@ module complex_taylor
   !@            <td width="56" height="20" align="center">
   !@             <font size="2" face="Times New Roman">
   !@            <font color="#FF0000">&nbsp;&nbsp;
-  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="#F
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="#FF0000">ISU
   !@       </tr>
   !@       <tr>
   !@         <td width="39" height="56" align="center">
@@ -799,6 +799,12 @@ module complex_taylor
      MODULE PROCEDURE GETintnd2
   END INTERFACE
 
+  INTERFACE OPERATOR (<=)
+     MODULE PROCEDURE getcharnd2s
+     MODULE PROCEDURE GETintnd2s
+     MODULE PROCEDURE GETintk
+  END INTERFACE
+
   ! Intrinsic Routines
 
   INTERFACE aimag
@@ -963,9 +969,9 @@ module complex_taylor
   !     MODULE PROCEDURE varcC
   !  END INTERFACE
   !
-  INTERFACE shiftda
-     MODULE PROCEDURE shiftc
-  END INTERFACE
+  !  INTERFACE shiftda
+  !     MODULE PROCEDURE shiftc
+  !  END INTERFACE
 
   INTERFACE pok
      MODULE PROCEDURE pokc
@@ -1104,6 +1110,45 @@ contains
   END FUNCTION GETintnd2
 
 
+  FUNCTION GETCHARnd2s( S1, S2 )
+    implicit none
+    TYPE (complextaylor) GETCHARnd2s
+    TYPE (complextaylor), INTENT (IN) :: S1
+    CHARACTER(*)  , INTENT (IN) ::  S2
+
+    integer localmaster
+    localmaster=master
+
+    call ass(GETCHARnd2s)
+
+
+    GETCHARnd2s%r=s1%r<=s2
+    GETCHARnd2s%i=s1%i<=s2
+
+    master=localmaster
+
+
+  END FUNCTION GETCHARnd2s
+
+  FUNCTION GETintnd2s( S1, S2 )
+    implicit none
+    TYPE (complextaylor) GETintnd2s
+    TYPE (complextaylor), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2(:)
+
+    integer localmaster
+    localmaster=master
+
+    call ass(GETintnd2s)
+
+
+    GETintnd2s%r= s1%r<=s2
+    GETintnd2s%i= s1%i<=s2
+
+    master=localmaster
+
+
+  END FUNCTION GETintnd2s
 
   FUNCTION dputchar( S1, S2 )
     implicit none
@@ -1206,10 +1251,12 @@ contains
 
     call ass(varco)
 
+    varco%r=REAL(s1,kind=DP) + (one.mono.s2(1))
+    varco%i=aimag(s1) + (one.mono.s2(2))
 
 
-    varco%r=REAL(s1,kind=DP).var.s2(1)
-    varco%i=aimag(s1).var.s2(2)
+    !varco%r=REAL(s1,kind=DP).var.s2(1)
+    !varco%i=aimag(s1).var.s2(2)
 
     master=localmaster
 
@@ -2948,16 +2995,38 @@ contains
   !  END SUBROUTINE VARc
 
 
-  SUBROUTINE  shiftc(S1,S2,s)
+  !  SUBROUTINE  shiftc(S1,S2,s)
+  !    implicit none
+  !    INTEGER,INTENT(IN)::s
+  !    type (complextaylor),INTENT(IN)::S1
+  !    type (complextaylor),INTENT(inout)::S2
+  !
+  !    call shift000(S1%r,S2%r,s)
+  !    call shift000(S1%i,S2%i,s)
+
+  !  END SUBROUTINE shiftc
+
+  FUNCTION GETintk( S1, S2 )
     implicit none
-    INTEGER,INTENT(IN)::s
-    type (complextaylor),INTENT(IN)::S1
-    type (complextaylor),INTENT(inout)::S2
+    TYPE (complextaylor) GETintk
+    TYPE (complextaylor), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
 
-    call shift000(S1%r,S2%r,s)
-    call shift000(S1%i,S2%i,s)
+    integer localmaster
+    localmaster=master
 
-  END SUBROUTINE shiftc
+    call ass(GETintk)
+
+    GETintk%r=S1%r<=s2
+    GETintk%i=S1%i<=s2
+
+    !    call  shiftda(GETintk,GETintk, s2 )
+
+    master=localmaster
+
+
+  END FUNCTION GETintk
+
 
 
   SUBROUTINE  pekc(S1,J,R1)

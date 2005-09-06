@@ -6,11 +6,12 @@ module S_def_all_kinds
   use S_status
   implicit none
   private XMIDR,XMIDP,GMIDR,GMIDP
-  include "a_def_all_kind.inc"
-  include "a_def_user1.inc"
-  !  include "a_def_arbitrary.inc"
-  include "a_def_user2.inc"
-  include "a_def_element_fibre_layout.inc"
+  !  include "a_def_all_kind.inc"
+  !  include "a_def_sagan.inc"
+  !  include "a_def_user1.inc"
+  !!  include "a_def_arbitrary.inc"
+  !  include "a_def_user2.inc"
+  !  include "a_def_element_fibre_layout.inc"
   private ALLOC_midr,ALLOC_midp,KILL_midr,KILL_midP
 
   TYPE INNER_FRAME
@@ -70,6 +71,26 @@ module S_def_all_kinds
 
 contains
 
+  RECURSIVE SUBROUTINE GET_LENGTH(R,L)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    REAL(DP), INTENT(OUT) :: L
+    TYPE(FIBRE), POINTER:: P
+    REAL(DP) LG
+    INTEGER I
+    P=>R%START
+    L=0.D0
+    DO I=1,R%N
+       IF(P%MAG%KIND/=KIND23) THEN
+          L=L+P%MAG%P%LD
+       ELSE
+          CALL GET_LENGTH(P%MAG%G23,LG)
+          L=L+LG
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE GET_LENGTH
+
   SUBROUTINE XFRAME(E_IN,ENT,A,I)
     IMPLICIT NONE
     TYPE(INNER_FRAME), INTENT(INOUT):: E_IN
@@ -92,7 +113,7 @@ contains
   END SUBROUTINE XFRAME
 
 
-  SUBROUTINE GFRAME(E_IN,ENT,A,I)
+  SUBROUTINE G_FRAME(E_IN,ENT,A,I)
     IMPLICIT NONE
     TYPE(INNER_FRAME), INTENT(IN):: E_IN
     REAL(DP), INTENT(INOUT):: ENT(3,3),A(3)
@@ -111,7 +132,7 @@ contains
        WRITE(6,*) I,SIZE(E_IN%ORIGIN,2)
        STOP 345
     ENDIF
-  END SUBROUTINE GFRAME
+  END SUBROUTINE G_FRAME
 
   SUBROUTINE XMIDR(X_IN,X,I)
     IMPLICIT NONE
@@ -475,15 +496,16 @@ contains
   SUBROUTINE SURVEY_INNER_MAG(e_in) !  Tracks the chart through a magnet
     IMPLICIT NONE
     TYPE(INNER_FRAME), INTENT(INOUT):: e_in
-    REAL(DP) ENT(3,3),A(3),MID(3,3),O(3),D(3)
+    REAL(DP) ENT(3,3),A(3),MID(3,3),O(3),D(3),exi(3:3),b(3)
     LOGICAL(LP) DONE
-    INTEGER NST,I,start
+    INTEGER NST,I,start,j
     REAL(DP) LH,HA,ANG(3),ANGH,RHO
     TYPE(MAGNET_CHART), POINTER :: P
 
     NST=E_IN%NST-6
     DONE=.FALSE.
     start=nst*(1-(1+E_IN%F%dir)/2)
+
 
     P=>E_IN%F%MAG%P
     !E_IN%L
@@ -516,8 +538,33 @@ contains
           CALL XFRAME(E_IN,MID,O,0)
           E_IN%L(0)=zero +E_IN%L(-1)
           IF(NST/=0) THEN
-             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG at kind23"
              STOP 330
+          ENDIF
+       CASE(kind23)                 ! kind 23 layout
+          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
+
+          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+
+          if(E_IN%F%dir==1) then
+             CALL XFRAME(E_IN,P%F%ent,P%F%a,start)
+          else
+             CALL XFRAME(E_IN,P%F%exi,P%F%b,start)
+          endif
+
+          start=start+E_IN%F%dir
+
+          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+
+          if(E_IN%F%dir==1) then
+             CALL XFRAME(E_IN,P%F%exi,P%F%b,start)
+          else
+             CALL XFRAME(E_IN,P%F%ent,P%F%a,start)
+          endif
+
+          IF(NST/=1) THEN
+             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+             STOP 331
           ENDIF
        CASE(KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21)
           LH=P%LC/TWO
@@ -717,6 +764,20 @@ contains
              ENDDO
 
           ENDIF
+       CASE(kind23)                 ! kind 23 layout
+          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
+
+          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+
+
+          start=start+E_IN%F%dir
+
+          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+
+          IF(NST/=1) THEN
+             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+             STOP 331
+          ENDIF
 
        CASE DEFAULT
 
@@ -741,4 +802,3 @@ contains
 
 
 end module S_def_all_kinds
-

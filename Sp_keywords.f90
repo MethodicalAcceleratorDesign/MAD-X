@@ -42,7 +42,7 @@ contains
     type(el_list) blank
     character*255 magnet
     character*17 MODEL
-    INTEGER EXCEPTION,NSTD0,METD0
+    INTEGER EXCEPTION  !,NSTD0,METD0
     LOGICAL(LP) EXACT0,magnet0
     logical(lp) FIBRE_flip0,MAD0
     logical(lp) :: t=.true.,f=.false.
@@ -77,15 +77,15 @@ contains
     END SELECT
 
 
-    NSTD0=NSTD
-    METD0=METD
+    !    NSTD0=NSTD
+    !    METD0=METD
     EXACT0=EXACT_MODEL
     FIBRE_FLIP0= FIBRE_FLIP
     FIBRE_DIR0=FIBRE_DIR
     MAD0=MAD
 
-    NSTD=KEY%NSTEP
-    METD=KEY%METHOD
+    KEY%LIST%nst=KEY%NSTEP
+    KEY%LIST%method=KEY%METHOD
     EXACT_MODEL=KEY%EXACT
     FIBRE_FLIP = KEY%FIBRE_FLIP
     FIBRE_DIR  = KEY%FIBRE_DIR
@@ -145,6 +145,12 @@ contains
        BLANK=RCOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("ECOLLIMATOR    ")
        BLANK=ECOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+    CASE("USER_1         ")
+       BLANK=USER_1(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+    CASE("USER_2         ")
+       BLANK=USER_2(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+    CASE("WIGGLER        ")
+       BLANK=WIGGLER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("TAYLORMAP      ")
        IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
           BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
@@ -169,8 +175,8 @@ contains
 
     CALL SET_MADX_(f,f)
 
-    NSTD=NSTD0
-    METD=METD0
+    !    NSTD=NSTD0
+    !    METD=METD0
     EXACT_MODEL=EXACT0
     FIBRE_FLIP= FIBRE_FLIP0
     FIBRE_DIR=FIBRE_DIR0
@@ -182,7 +188,7 @@ contains
 
     type(keywords) , intent(out):: key
     real h
-    key%magnet="DRIFT"
+    key%magnet="CROTTE"
     select case(MADTHICK)
     CASE(drift_kick_drift)
        key%model="DRIFT_KICK       "
@@ -461,7 +467,7 @@ contains
 
 
   SUBROUTINE PRINT_INITIAL_FRAME(F,MF)
-    IMPLICIT NONE
+    implicit none
     INTEGER MF
     TYPE(FIBRE) F
     IF(F%DIR==1) THEN
@@ -475,7 +481,7 @@ contains
   END SUBROUTINE PRINT_INITIAL_FRAME
 
   SUBROUTINE PRINT_INITIAL_FRAME_mag(F,MF)
-    IMPLICIT NONE
+    implicit none
     INTEGER MF
     TYPE(FIBRE) F
 

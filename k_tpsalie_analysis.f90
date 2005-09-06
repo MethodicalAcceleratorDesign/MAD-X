@@ -8,11 +8,11 @@ module tpsalie_analysis
   private normalMAP,MAPrevdf,revdfMAP,MAPdf,dfMAP,respb,pbres,resovec,vecreso
   private ONEEXPMAP,killnormal,KILLdf,KILLREVdf,killpbres,KILLvecres,killONELIE
   private DAPRINTvecres,DAPRINTpbres,DAPRINTdf,DAPRINTrevdf
-  private df_map,fd_map,map_df,map_fd,one_map,map_one
+  private df_map,fd_map,map_df,map_fd,one_map,map_one,MAPnormal
   private  resta,tares,alloctares,killtares
   private allocgen,KILLgen   !,ASSgen   ,ADDID,IDADD
-  private equalgengen,EQUALgenMAP,EQUALMAPgen,pushgen
-  !private rotf,rotsymp
+  private EQUALgenMAP,EQUALMAPgen,pushgen
+  !private rotf,rotsymp,equalgengen
   integer,private::NO,ND,ND2,NP,NDPT,NV
   logical(lp),private::old,imaxflag
   !
@@ -28,6 +28,7 @@ module tpsalie_analysis
 
   INTERFACE assignment (=)
      MODULE PROCEDURE normalMAP
+     MODULE PROCEDURE MAPnormal
      MODULE PROCEDURE MAPrevdf
      MODULE PROCEDURE revdfMAP
      MODULE PROCEDURE MAPdf
@@ -40,7 +41,7 @@ module tpsalie_analysis
      MODULE PROCEDURE vecreso
      MODULE PROCEDURE MAPONEEXP
      MODULE PROCEDURE ONEEXPMAP
-     MODULE PROCEDURE EQUALgengen !  not ready
+     !     MODULE PROCEDURE EQUALgengen !  not ready
      MODULE PROCEDURE EQUALMAPgen !  not ready
      MODULE PROCEDURE EQUALgenMAP  !  not ready
      !radiation
@@ -340,6 +341,26 @@ contains
 
   END SUBROUTINE normalMAP
 
+  SUBROUTINE  MAPnormal(S1,S2)
+    implicit none
+    type (normalform),INTENT(in)::S2
+    type (damap),INTENT(INOUT)::S1
+    type (damap) JUNK,id
+    call check_snake
+
+    call alloc(JUNK,id)
+
+    id=1
+    id=texp(S2%normal%nonlinear,id)
+    junk=S2%a1*S2%a
+
+    s1=junk**(-1)*id*junk
+
+    call kill(JUNK,id)
+
+  END SUBROUTINE MAPnormal
+
+
   SUBROUTINE  ONEEXPMAP(S2,S1)
     implicit none
     type (ONELIEEXPONENT),INTENT(inOUT)::S2
@@ -355,7 +376,13 @@ contains
        !     ZERO_(I)=zero
        !     ENDDO
        !     JUNK=ZERO_
-       call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
+       IF(s2%eps==ZERO) THEN
+          S2%EPS=1000.0_DP*FULL_ABS(S1)
+          call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
+          S2%EPS=ZERO
+       ELSE
+          call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
+       ENDIF
        S2%pb=S2%VECTOR
        CALL KILL(JUNK)
     else
@@ -368,7 +395,13 @@ contains
        !     ZERO_(I)=zero
        !     ENDDO
        !     JUNK=ZERO_
-       call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
+       IF(s2%eps==ZERO) THEN
+          S2%EPS=1000.0_DP*FULL_ABS(S1)
+          call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
+          S2%EPS=ZERO
+       ELSE
+          call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
+       ENDIF
        S2%pb=S2%VECTOR
        CALL KILL(JUNK)
     endif
@@ -412,7 +445,6 @@ contains
        call dacmud(s2%nonlinear%V%i,-one,s2%nonlinear%V%i)
        !    S2%nonlinear=S2%nonlinear*S2%linear
        S2%pb=S2%nonlinear
-       CALL KILL(JUNK)
     else
        if(.NOT.ASSOCIATED(s2%linear%V(1)%j%r))  call crap1("revdfMAP 2")  !call allocw(s2%linear%V(1))
        JUNK=S1
@@ -424,8 +456,8 @@ contains
        call newdacmud(s2%nonlinear%V%j,-one,s2%nonlinear%V%j)
        !    S2%nonlinear=S2%nonlinear*S2%linear
        S2%pb=S2%nonlinear
-       CALL KILL(JUNK)
     endif
+    CALL KILL(JUNK)
 
   END SUBROUTINE revdfMAP
 
@@ -453,8 +485,8 @@ contains
        JUNK=ZERO_
        call newFLOFAC(JUNK%V%j,s2%linear%V%j,s2%nonlinear%V%j)
        S2%pb=S2%nonlinear
-       CALL KILL(JUNK)
     endif
+    CALL KILL(JUNK)
   END SUBROUTINE dfMAP
 
   SUBROUTINE  resovec(S1,S2)
@@ -470,6 +502,8 @@ contains
        call newctorflo(s2%v%j,S1%cos%v%j,S1%sin%v%j)
     endif
     s1%ifac=s2%ifac
+    s1%cos%ifac=s2%ifac
+    s1%sin%ifac=s2%ifac
 
   END SUBROUTINE resovec
 
@@ -501,6 +535,8 @@ contains
        call newctor(s2%h%j,S1%cos%h%j,S1%sin%h%j)
     endif
     s1%ifac=s2%ifac
+    s1%cos%ifac=s2%ifac
+    s1%sin%ifac=s2%ifac
 
 
   END SUBROUTINE respb
@@ -751,24 +787,26 @@ contains
        call newetpin(w%v%j,s1%v%j,jn)
     endif
 
+    s1=s1*s2%linear
+
     s1=s2%constant
     call kill(w)
   END SUBROUTINE EQUALMAPgen
 
-  SUBROUTINE  EQUALgengen(S2,S1)
-    implicit none
-    type (genfield),INTENT(inOUT)::S2
-    type (genfield),INTENT(IN)::S1
-    call check_snake
-    if(old) then
-       if(s2%h%i==0) call crap1("EQUALgengen 1")  ! call etall1(s2%h%i)
-       CALL dacop(S1%h%i,S2%h%i)
-    else
-       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALgengen 2")  ! call newetall(s2%h%J,1)
-       CALL NEWdacop(S1%h%J,S2%h%J)
-    endif
-    s2%ifac=s1%ifac
-  END SUBROUTINE EQUALgengen
+  !  SUBROUTINE  EQUALgengen(S2,S1)
+  !    implicit none
+  !    type (genfield),INTENT(inOUT)::S2
+  !    type (genfield),INTENT(IN)::S1
+  !    call check_snake
+  !    if(old) then
+  !       if(s2%h%i==0) call crap1("EQUALgengen 1")  ! call etall1(s2%h%i)
+  !       CALL dacop(S1%h%i,S2%h%i)
+  !    else
+  !       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALgengen 2")  ! call newetall(s2%h%J,1)
+  !       CALL NEWdacop(S1%h%J,S2%h%J)
+  !    endif
+  !    s2%ifac=s1%ifac
+  !  END SUBROUTINE EQUALgengen
 
 
   FUNCTION pushgen( S1, S2 )
@@ -922,7 +960,7 @@ contains
     type (ONELIEEXPONENT)  S2
     call allocTPSA(s2%VECTOR)
     call allocTPSA(s2%pb)
-    s2%EPS=c_1d_2
+    S2%EPS=ZERO
   END SUBROUTINE allocONELIE
 
 

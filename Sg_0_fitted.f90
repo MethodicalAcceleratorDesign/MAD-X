@@ -5,32 +5,38 @@
 module fitted_MAG
   USE S_def_all_kinds
   implicit none
-  PRIVATE read_d,get_adata2c_p
+  PRIVATE read_d
   PRIVATE POINTERS_user1R,POINTERS_user1P
   logical(lp) :: extrapolate =.true.
   INTEGER :: NX_0=0,NS_0=0,NY_0=0,fitted_order=1
   PRIVATE ALLOC_user1,KILL_user1,copy_el_elp,copy_elP_el,copy_el_el
   PRIVATE ZEROR_user1,ZEROP_user1,INTR,INTP,INTS   !POINTERS_D,
-  PRIVATE fx,px_to_xpr0_r,px_to_xpp0_r,px_to_xp_r
+  PRIVATE px_to_xpr0_r,px_to_xpp0_r,px_to_xp_r
   PRIVATE xp_to_px_r,xp_to_pxr0_r,xp_to_pxp0_r
-  PRIVATE track_interpol_1h_r_new,track_interpol_1h_p_new,track_interpol_1
+  !  PRIVATE track_interpol_1h_r_new,track_interpol_1h_p_new,track_interpol_1
   ! Vector potential stuff
-  PRIVATE get_adata2c_r,fxhp,px_to_xpr0_hr,px_to_xpr0_hp,xp_to_pxr0_hr   ,fxhr
+  PRIVATE px_to_xpr0_hr,px_to_xpr0_hp,xp_to_pxr0_hr
   !frs real(dp),private::eps_fitted=c_1d_11
-  private fxhpm,fxhrm, che, get_adatag,get_bdatag,get_adata,b_fun,get_bdev
+  private  che, get_adatag,get_bdatag,b_fun,get_bdev
   logical(lp)::point_at=.true.,first_fitted=.true.,COPY_FIT=.TRUE.
   logical(lp) , target ::  check_iteration=.true., check_interpolate_x = .true., check_interpolate_y = .true.
   logical(lp) :: midplane_enforcing=.true.,maxwell_enforcing=.true.
   integer pow(0:19,3)   !, private ::
   real(dp), private :: fac(0:3)
-  logical(lp) :: use_b=.false.
+  !  logical(lp) :: use_b=.false.
   REAL(DP) :: CHECKSIZE = 1.D30
   integer :: fitted_iteration =50
   integer :: er=0
-  private get_bdata2c_r,get_bdata2c_p,fxr,fxb,get_b_int_r,get_b_int_p
+  private fxr,fxb,get_b_int_r,get_b_int_p,fxp
   private track_interpol_4h_r_new_n,track_interpol_4h_p_new_n
   logical(lp) :: alloc_taylor=.false.,alloc_a=.false.
-
+  private nf
+  integer :: nf =1
+  integer :: junk=0
+  real(dp) :: Sb=1.80d0   ! gaussian beamlets
+  integer :: nxspeed=3,nyspeed=3
+  logical :: check_max_min =.false., beamlets=.true.
+  real(dp) max_min(4)
 
   type(data_magnet), target :: only_data
 
@@ -43,14 +49,8 @@ module fitted_MAG
      MODULE PROCEDURE read_d
   END INTERFACE
 
-  INTERFACE get_adata
-     MODULE PROCEDURE get_adata2c_r
-     MODULE PROCEDURE get_adata2c_p
-  END INTERFACE
 
   INTERFACE get_b
-     !    MODULE PROCEDURE get_bdata2c_r
-     !    MODULE PROCEDURE get_bdata2c_p
      MODULE PROCEDURE get_b_int_r
      MODULE PROCEDURE get_b_int_p
   END INTERFACE
@@ -86,10 +86,10 @@ module fitted_MAG
      MODULE PROCEDURE INTS
   END INTERFACE
 
-  INTERFACE track_interpol_1
-     MODULE PROCEDURE track_interpol_1h_r_new
-     MODULE PROCEDURE track_interpol_1h_p_new
-  END INTERFACE
+  !  INTERFACE track_interpol_1
+  !     MODULE PROCEDURE track_interpol_1h_r_new
+  !     MODULE PROCEDURE track_interpol_1h_p_new
+  !  END INTERFACE
 
   INTERFACE track_interpol_1_new
      MODULE PROCEDURE track_interpol_1h_r_new_n
@@ -101,13 +101,6 @@ module fitted_MAG
      MODULE PROCEDURE track_interpol_4h_p_new_n
   END INTERFACE
 
-
-  INTERFACE fx
-     MODULE PROCEDURE fxhr
-     MODULE PROCEDURE fxhp
-     MODULE PROCEDURE fxhrm
-     MODULE PROCEDURE fxhpm
-  END INTERFACE
 
   INTERFACE fxb
      MODULE PROCEDURE fxr
@@ -140,12 +133,13 @@ CONTAINS
        dd=>only_data
     else
        DD%NS=D%NS;DD%NX=D%NX;DD%NY=D%NY; dd%read_in=d%read_in
-
+       DD%hc=D%hc;
        DD%dtheta=D%dtheta;DD%dx=D%dx;DD%dy=D%dy;
 
        DD%theta=D%theta;DD%x=D%x;DD%y=D%Y;
 
        IF(COPY_FIT) THEN
+          IF(ASSOCIATED(D%grid)) DD%grid=D%grid
           IF(ASSOCIATED(D%B)) DD%B=D%B
           IF(ASSOCIATED(D%A)) DD%A=D%A
        ENDIF
@@ -161,9 +155,9 @@ CONTAINS
        d=>only_data
     else
 
-       NULLIFY(D%NS,D%NX,D%NY,d%read_in)
-       ALLOCATE(D%NS,D%NX,D%NY,d%read_in)
-       D%NS=NS_0;D%NX=NX_0;D%NY=NY_0; d%read_in=.false.
+       NULLIFY(D%NS,D%hc,D%NX,D%NY,d%read_in)
+       ALLOCATE(D%NS,D%hc,D%NX,D%NY,d%read_in)
+       D%NS=NS_0;D%NX=NX_0;D%NY=NY_0; D%hc=zero; d%read_in=.false.
        NULLIFY(D%dtheta,D%dx,D%dy)
        ALLOCATE(D%dtheta,D%dx,D%dy)
        D%dtheta=zero;D%dx=zero;D%dy=zero;
@@ -171,6 +165,11 @@ CONTAINS
        ALLOCATE(D%theta(2),D%x(2),D%y(2))
        D%theta=zero;D%x=zero;D%y=zero;
        NULLIFY(D%B)
+       IF(COPY_FIT) then
+          allocate(d%grid(NX_0,Ny_0,2))
+       endif
+
+
        IF(COPY_FIT.and.alloc_taylor) then
           ALLOCATE(D%B(3,0:19,NS_0,NX_0,NY_0))
        elseif(COPY_FIT.and..not.alloc_taylor) then
@@ -193,7 +192,7 @@ CONTAINS
     character(*)  filen
     INTEGER mf
     integer i,j,k
-    real(dp) x1,x2,x3
+    real(dp) x1,x2,x3,hc
     fac(0)=1.0_dp
     fac(1)=1.0_dp
     fac(2)=2.0_dp
@@ -201,7 +200,8 @@ CONTAINS
     mf=NEWFILE
     open(unit=mf,file=filen)
 
-    read(mf,*) d%ns,D%theta(1),d%theta(2),D%nx,D%x(1),D%x(2),d%ny,D%y(1),D%y(2)
+    read(mf,*) hc,d%ns,D%theta(1),d%theta(2),D%nx,D%x(1),D%x(2),d%ny,D%y(1),D%y(2)
+    d%hc=hc
     w_p=0
     w_p%nc=2
     w_p%fc='(1(1X,A120))'
@@ -212,8 +212,16 @@ CONTAINS
     write(w_p%c(2),'(3(1x,g16.10))') d%dtheta,d%dx,d%dy
     call WRITE_I
 
+    do i=1,d%nx
+       do j=1,d%ny
+          d%grid(i,j,1)=D%x(1)+(i-1)*d%dx
+          d%grid(i,j,2)=D%y(1)+(j-1)*d%dy
+       enddo
+    enddo
+
+
     do i=1,d%ns
-       read(mf,*) x1,x2,x3
+       read(mf,*) x1   !,x2,x3
        do j=1,d%nx
           do k=1,d%ny
              if(alloc_a) d%a(6,i,j,k)=zero
@@ -269,11 +277,11 @@ CONTAINS
     IMPLICIT NONE
     character(*)  filen
     INTEGER mf
-    real(dp) x1,x2,x3,x4,x5,x6
+    real(dp) x1,x2,x3,x4,x5,x6,hc
 
     mf=NEWFILE
     open(unit=mf,file=filen)
-    read(mf,*) ns_0,x1,x2,nx_0,x3,x4,ny_0,x5,x6
+    read(mf,*) hc,ns_0,x1,x2,nx_0,x3,x4,ny_0,x5,x6
     w_p=0
     w_p%nc=1
     w_p%fc='(1(1X,A120))'
@@ -296,13 +304,13 @@ CONTAINS
        IF(ASSOCIATED(EL%SCALE))  THEN
           deallocate(el%xmin,el%xmax,el%ymin,el%ymax)
           DEALLOCATE(EL%SCALE)
-          DEALLOCATE(EL%h)
           DEALLOCATE(EL%symplectic)
           if(.not.point_at) then
              DEALLOCATE(EL%D%NS,EL%D%NX,EL%D%NY,el%d%read_in)
              DEALLOCATE(EL%D%dtheta,EL%D%dx,EL%D%dY)
              DEALLOCATE(EL%D%theta,EL%D%x ,EL%D%Y)
              DEALLOCATE(EL%X)
+             IF(ASSOCIATED(EL%D%grid)) DEALLOCATE(EL%D%grid)
              IF(ASSOCIATED(EL%D%B)) DEALLOCATE(EL%D%B)
              IF(ASSOCIATED(EL%D%A)) DEALLOCATE(EL%D%A)
              DEALLOCATE(EL%D)
@@ -312,7 +320,6 @@ CONTAINS
        NULLIFY(EL%symplectic)
        NULLIFY(EL%SCALE)
        NULLIFY(el%xmin,el%xmax,el%ymin,el%ymax)
-       NULLIFY(EL%h)
        NULLIFY(EL%D)
        NULLIFY(EL%X)
        ! nullifies pointers
@@ -332,12 +339,12 @@ CONTAINS
           CALL KILL(EL)
           deallocate(el%xmin,el%xmax,el%ymin,el%ymax)
           DEALLOCATE(EL%SCALE)
-          DEALLOCATE(EL%h)
           DEALLOCATE(EL%symplectic)
           if(.not.point_at) then
-             DEALLOCATE(EL%D%NS,EL%D%NX,EL%D%NY,el%d%read_in)
+             DEALLOCATE(EL%D%NS,EL%D%NX,EL%D%NY,el%d%read_in,el%d%hc)
              DEALLOCATE(EL%D%dtheta,EL%D%dx,EL%D%dY)
              DEALLOCATE(EL%D%theta,EL%D%x ,EL%D%Y)
+             IF(ASSOCIATED(EL%D%grid)) DEALLOCATE(EL%D%grid)
              IF(ASSOCIATED(EL%D%A)) DEALLOCATE(EL%D%A)
              IF(ASSOCIATED(EL%D%B)) DEALLOCATE(EL%D%B)
              DEALLOCATE(EL%D)
@@ -348,7 +355,6 @@ CONTAINS
        NULLIFY(EL%symplectic)
        NULLIFY(EL%SCALE)
        NULLIFY(el%xmin,el%xmax,el%ymin,el%ymax)
-       NULLIFY(EL%h)
        NULLIFY(EL%D)
        ! And also zeroes for security ordinary variables
     endif
@@ -359,7 +365,6 @@ CONTAINS
     IMPLICIT NONE
     TYPE(FITTED_MAGNETP), INTENT(INOUT)::EL
     CALL ALLOC(EL%SCALE)
-    CALL ALLOC(EL%h)
     ! ALLOC INTERNAL POLYMORPHS IF ANY
   END SUBROUTINE ALLOC_user1
 
@@ -368,7 +373,6 @@ CONTAINS
     TYPE(FITTED_MAGNETP), INTENT(INOUT)::EL
 
     CALL KILL(EL%SCALE)
-    CALL KILL(EL%h)
     ! KILL INTERNAL POLYMORPHS IF ANY
 
   END SUBROUTINE KILL_user1
@@ -379,12 +383,10 @@ CONTAINS
 
     ALLOCATE(EL%SCALE)
     ALLOCATE(el%xmin,el%xmax,el%ymin,el%ymax)
-    ALLOCATE(EL%h)
     ALLOCATE(EL%symplectic)
     ALLOCATE(EL%D)
     ALLOCATE(EL%X(2,NS_0))
     CALL POINTERS_D(EL%D)
-    EL%h=0.0_dp
 
     ! ALLOCATE INTERNAL POINTERS IF ANY
 
@@ -396,7 +398,6 @@ CONTAINS
 
     ALLOCATE(EL%SCALE)
     ALLOCATE(el%xmin,el%xmax,el%ymin,el%ymax)
-    ALLOCATE(EL%h)
     ALLOCATE(EL%symplectic)
     ALLOCATE(EL%D)
     CALL POINTERS_D(EL%D)
@@ -410,7 +411,6 @@ CONTAINS
 
 
     CALL resetpoly_R31(EL%SCALE)
-    CALL resetpoly_R31(EL%h)
     ! CALL resetpoly_R31 ON ALL THE INTERNAL POLYMORPHS
 
   END SUBROUTINE reset_FITTED_MAGNETP
@@ -425,7 +425,6 @@ CONTAINS
     ELP%xmax    =EL%xmax
     ELP%ymin    =EL%ymin
     ELP%ymax    =EL%ymax
-    ELP%h    =EL%h
     ELP%SYMPLECTIC    =EL%SYMPLECTIC
     CALL COPY(EL%D,ELP%D)
 
@@ -447,7 +446,6 @@ CONTAINS
     ELP%ymax    =EL%ymax
 
     ELP%SCALE    =EL%SCALE
-    ELP%h    =EL%h
     ELP%SYMPLECTIC    =EL%SYMPLECTIC
     CALL COPY(EL%D,ELP%D)
     !  COPY CODING HERE NO ALLOCATION OF POINTERS OR POLYMORPH NEEDED
@@ -466,7 +464,6 @@ CONTAINS
     ELP%ymin    =EL%ymin
     ELP%ymax    =EL%ymax
     ELP%SCALE    =EL%SCALE
-    ELP%h    =EL%h
     ELP%SYMPLECTIC    =EL%SYMPLECTIC
     CALL COPY(EL%D,ELP%D)
     !  COPY CODING HERE NO ALLOCATION OF POINTERS
@@ -485,17 +482,17 @@ CONTAINS
 
     select case(el%p%method)
     case(1:2)
-       if(use_b) then
-          call track_interpol_1_new(el,x)
-       else
-          call track_interpol_1(el,x)
-       endif
+       !       if(use_b) then
+       call track_interpol_1_new(el,x)
+       !       else
+       !          call track_interpol_1(el,x)
+       !       endif
     case(4)
-       if(use_b) then
-          call track_interpol_4h_r_new(el,x)
-       else
-          stop 999
-       endif
+       !       if(use_b) then
+       call track_interpol_4h_r_new(el,x)
+       !       else
+       !          stop 999
+       !       endif
     case default
        w_p=0
        w_p%nc=1
@@ -516,17 +513,17 @@ CONTAINS
 
     select case(el%p%method)
     case(1:2)
-       if(use_b) then
-          call track_interpol_1_new(el,x)
-       else
-          call track_interpol_1(el,x)
-       endif
+       !       if(use_b) then
+       call track_interpol_1_new(el,x)
+       !       else
+       !          call track_interpol_1(el,x)
+       !       endif
     case(4)
-       if(use_b) then
-          call track_interpol_4h_r_new(el,x)
-       else
-          stop 999
-       endif
+       !       if(use_b) then
+       call track_interpol_4h_r_new(el,x)
+       !       else
+       !          stop 999
+       !       endif
     case default
        w_p=0
        w_p%nc=1
@@ -681,497 +678,7 @@ CONTAINS
   ! Hamiltonian shit
 
 
-  subroutine fxhr(f,x,a,az,ax,r,hcurv,p)
-    implicit none
 
-    real(dp)  d(2),BETA0,GAMMA0I
-    real(dp) ,intent(in) :: a(3),az(3),ax(3),r ,hcurv
-    type(MAGNET_CHART), intent(inout) :: p
-    real(dp) ,intent(inout) :: x(6)
-    real(dp), intent(out):: f(6)
-
-    if(p%time) then
-       beta0=p%beta0;GAMMA0I=p%GAMMA0I;
-    else
-       beta0=one;GAMMA0I=zero;
-    endif
-    x(1)=x(1)-r
-
-
-    d(1)=(one+hcurv*x(1))
-    d(2)=(one+2*x(5)/beta0+x(5)**2-(x(2)-a(1))**2-(x(4)-a(2))**2)
-    d(2)=root(d(2))
-    f(1)=d(1)*(x(2)-a(1))/d(2)
-    f(3)=d(1)*(x(4)-a(2))/d(2)
-
-    f(2)=hcurv*d(2)+(f(1)*ax(1))+az(1)
-    f(4)=(f(1)*ax(2))+az(2)
-    f(5)=0
-    f(6)=(one/beta0+x(5))*d(1)/d(2)
-
-
-    x(1)=x(1)+r
-  end subroutine fxhr
-
-
-
-
-  subroutine fxhrm(f,m,x,a,az,ax,r,hcurv,p)
-    implicit none
-
-    real(dp)  d(2),BETA0,GAMMA0I
-    real(dp) ,intent(in) :: a(3),az(3),ax(3),r ,hcurv
-    type(MAGNET_CHART), intent(in) :: p
-    real(dp) ,intent(inout) :: x(6)
-    real(dp), intent(out):: f(6),m(2,2)
-
-    if(p%time) then
-       beta0=p%beta0;GAMMA0I=p%GAMMA0I;
-    else
-       beta0=one;GAMMA0I=zero;
-    endif
-    x(1)=x(1)-r
-
-
-    d(1)=(one+hcurv*x(1))
-    d(2)=root(one+2*x(5)/beta0+x(5)**2-(x(2)-a(1))**2-(x(4)-a(2))**2)
-
-    f(1)=d(1)*(x(2)-a(1))/d(2)
-    f(3)=d(1)*(x(4)-a(2))/d(2)
-    f(2)=hcurv*d(2)+(f(1)*ax(1))+az(1)
-    f(4)=(f(1)*ax(2))+az(2)
-    f(5)=0
-    f(6)=(one/beta0+x(5))*d(1)/d(2)
-
-    m(1,1)=d(1)*(one+(x(2)-a(1))/d(2)**2)/d(2)
-    m(2,1)=m(1,1)*ax(2)
-    m(1,1)=m(1,1)*ax(1)-hcurv*(x(2)-a(1))/d(2)
-    m(2,2)=d(1)*(x(2)-a(1))*x(4)/d(2)**3
-    m(1,2)=-hcurv*ax(2)/d(2)+m(2,2)*ax(2)
-    m(2,2)=m(2,2)*ax(2)
-
-    x(1)=x(1)+r
-  end subroutine fxhrm
-
-  subroutine fxhp(f,x,a,az,ax,r,hcurv,p)
-    implicit none
-
-    real(dp) ,intent(in) :: r ,hcurv
-    type(real_8) ,intent(in) :: a(3),az(3),ax(3)
-    type(MAGNET_CHART), intent(in) :: p
-    type(real_8),intent(inout) :: x(6)
-    type(real_8), intent(out):: f(6)
-    type(real_8)   d(2)
-    real(dp)  BETA0,GAMMA0I
-
-    call alloc(d,2)
-
-
-    if(p%time) then
-       beta0=p%beta0;GAMMA0I=p%GAMMA0I;
-    else
-       beta0=one;GAMMA0I=zero;
-    endif
-    x(1)=x(1)-r
-
-
-    d(1)=(one+hcurv*x(1))
-    d(2)=SQRT(one+2*x(5)/beta0+x(5)**2-(x(2)-a(1))**2-(x(4)-a(2))**2)
-
-    f(1)=d(1)*(x(2)-a(1))/d(2)
-    f(3)=d(1)*(x(4)-a(2))/d(2)
-    f(2)=hcurv*d(2)+(f(1)*ax(1))+az(1)
-    f(4)=(f(1)*ax(2))+az(2)
-    f(5)=0
-    f(6)=(one/beta0+x(5))*d(1)/d(2)
-
-
-    x(1)=x(1)+r
-
-    call kill(d,2)
-  end subroutine fxhp
-
-  subroutine fxhpm(f,m,x,a,az,ax,r,hcurv,p)
-    implicit none
-
-    real(dp) ,intent(in) :: r ,hcurv
-    type(real_8) ,intent(in) :: a(3),az(3),ax(3)
-    type(MAGNET_CHART), intent(in) :: p
-    type(real_8),intent(inout) :: x(6)
-    type(real_8), intent(out):: f(6)
-    real(dp), intent(out):: m(2,2)
-    type(real_8)   d(2)
-    real(dp)  BETA0,GAMMA0I
-
-    call alloc(d,2)
-
-
-    if(p%time) then
-       beta0=p%beta0;GAMMA0I=p%GAMMA0I;
-    else
-       beta0=one;GAMMA0I=zero;
-    endif
-    x(1)=x(1)-r
-
-
-    d(1)=(one+hcurv*x(1))
-    d(2)=SQRT(one+2*x(5)/beta0+x(5)**2-(x(2)-a(1))**2-(x(4)-a(2))**2)
-
-    f(1)=d(1)*(x(2)-a(1))/d(2)
-    f(3)=d(1)*(x(4)-a(2))/d(2)
-    f(2)=hcurv*d(2)+(f(1)*ax(1))+az(1)
-    f(4)=(f(1)*ax(2))+az(2)
-    f(5)=0
-    f(6)=(one/beta0+x(5))*d(1)/d(2)
-
-    m(1,1)=d(1)*(one+(x(2)-a(1))/d(2)**2)/d(2)
-    m(2,1)=m(1,1)*ax(2)
-    m(1,1)=m(1,1)*ax(1)-hcurv*(x(2)-a(1))/d(2)
-    m(2,2)=d(1)*(x(2)-a(1))*x(4)/d(2)**3
-    m(1,2)=-hcurv*ax(2)/d(2)+m(2,2)*ax(2)
-    m(2,2)=m(2,2)*ax(2)
-
-    x(1)=x(1)+r
-
-    call kill(d,2)
-  end subroutine fxhpm
-
-
-
-
-
-  subroutine track_interpol_1h_r_new(bend,x)
-    implicit none
-    type(fitted_magnet), intent(inOUT):: bend
-    real(dp) , intent(inout)::x(6)
-    real(dp) k1(6),xt(6),hc,rho,dz,DAL,ds
-    real(dp) af(3),az(3),ax(3),m(2,2),mi(2,2),dif(2),t(2),det,bf(3),XI,ZETA
-    integer  i,j,NF,KNF,it,ia
-    real(dp) norm, norm0,rhob0
-    logical(lp) doit
-    logical(lp):: DONEITT
-    real(dp) bet,eps,gam,alph,rg,theta_half
-    IF(.NOT.CHECK_STABLE) return
-    DONEITT=.true.
-    theta_half=DEG_TO_RAD_*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
-    !  x(1)=x(1)+one/el%p%b0-el%d%x(1)
-
-    alph=bend%p%b0*bend%p%ld/2.0_dp
-
-    gam=atan(sin(alph)/(cos(alph)+bend%p%b0*bend%h)    )
-    eps=((bend%d%theta(2)-bend%d%theta(1))*DEG_TO_RAD_)/2.0_dp-gam
-    eps=-eps
-    bet=alph-gam
-    rg=(cos(alph)+bend%p%b0*bend%h)/cos(gam)/bend%p%b0
-
-    call ROT_XZ(bet,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-
-    hc=one/bend%D%X(1)
-    rho=bend%D%X(1)
-    rhob0=one/bend%p%b0
-    !  rotating
-    nf=bend%p%nst
-    x(1)=x(1)+rg
-    call ROT_XZ(eps,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-    !   x(1)=x(1)-rg
-    !    x(1)=x(1)+rho
-
-    ds=(bend%d%dtheta*DEG_TO_RAD_)*rho
-    DAL=bend%d%dtheta*DEG_TO_RAD_
-    ia=1
-    if(bend%symplectic) ia=0
-    !tot=zero
-    do i=1,bend%d%ns    -ia
-       dz=ds/nf
-       if((i==1.or.i==bend%d%ns).and.bend%symplectic) dz=dz/2.0_dp
-       DO KNF=1,NF
-          XI  =(X(1))*COS((I-1)*DAL-theta_half)-bend%h
-          ZETA=(X(1))*SIN((I-1)*DAL-theta_half)
-          BEND%X(1,I)=ATAN(ZETA/XI)
-          BEND%X(2,I)=SQRT(XI**2+ZETA**2)-RHOB0
-
-          !(pos,b,i,x,y,af,az,ax)
-
-          call get_adata(bend%d,i,x(1),x(3),af,az,ax,bf,bend%scale)
-          ! original formula for electrons (q<0)  now switch to proton
-
-
-          ! fxhr(f,x,a,az,ax,r,hcurv,p)
-          call fx(k1,x,af,az,ax,rho,hc,bend%p)
-          if(.not.CHECK_STABLE) return
-
-          if(bend%symplectic) then
-             do j=1,3
-                xt(2*j)=x(2*j)+dz*k1(2*j)         ! temporary
-                xt(2*j-1)=x(2*j-1)
-             enddo
-
-
-             norm0=c_1d10
-             doit=.true.
-
-             do it=1,fitted_iteration
-                call fx(k1,m,xt,af,az,ax,rho,hc,bend%p)
-                if(.not.check_stable) return
-                dif(1)=x(2)+dz*k1(2)-xt(2)
-                dif(2)=x(4)+dz*k1(4)-xt(4)
-
-                m=-dz*m;
-                m(1,1)=one+m(1,1);m(2,2)=one+m(2,2);
-                det=m(1,1)*m(2,2)-m(2,1)*m(1,2)
-                m=m/det;
-                mi(1,1)=m(2,2);mi(2,2)=m(1,1);mi(1,2)=-m(1,2);mi(2,1)=-m(2,1);
-                t(1)=mi(1,1)*dif(1)+mi(1,2)*dif(2)
-                t(2)=mi(2,1)*dif(1)+mi(2,2)*dif(2)
-                xt(2)=xt(2)+t(1);    xt(4)=xt(4)+t(2);
-                norm=abs(dif(1))+abs(dif(2))
-                if(norm>eps_fitted.and.doit) then
-                   norm0=norm
-                else
-                   doit=.false.
-                   if(norm>=norm0) goto 100
-                   norm0=norm
-                endif
-             enddo
-             !             w_p=0
-             !             w_p%nc=1
-             !             w_p%fc='(1(1X,A72))'
-             !             w_p%c(1)=  " Took more than 20 iterations "
-             !             call write_e(100)
-             check_iteration=.false.
-             check_stable=.false.
-             IF(.NOT.CHECK_STABLE) return
-100          continue
-
-             call fx(k1,xt,af,az,ax,rho,hc,bend%p)
-             if(.not.check_stable) return
-
-             x(5)=x(5)            ! temporary
-             x(6)=x(6)+dz*k1(6)    ! temporary
-             do j=1,2
-                x(2*j-1)=x(2*j-1)+dz*k1(2*j-1)         ! temporary
-                x(2*j) =xt(2*j)
-             enddo
-          else
-             if(bend%p%method==2) then
-                do j=1,6
-                   xt(j)=x(j)+dz*k1(j)         ! temporary
-                enddo
-                do j=1,6
-                   x(j)=x(j)+dz*k1(j)/2.0_DP         ! temporary
-                enddo
-                call get_adata(bend%d,i+1,xt(1),xt(3),af,az,ax,bf,bend%scale)
-
-                call fx(k1,xt,af,az,ax,rho,hc,bend%p)
-                do j=1,6
-                   x(j)=x(j)+dz*k1(j)/2.0_DP         ! temporary
-                enddo
-             else
-
-                do j=1,6
-                   x(j)=x(j)+dz*k1(j)         ! temporary
-                enddo
-
-             endif
-          endif
-
-          if(che(x,bend)) then
-             check_stable=.false.
-             return
-          endif
-          !        tot=tot+bend%dz
-
-
-       ENDDO
-    enddo
-    XI  =(X(1))*COS((bend%d%ns-1)*DAL-theta_half)-bend%h
-    ZETA=(X(1))*SIN((bend%d%ns-1)*DAL-theta_half)
-    BEND%X(1,bend%d%ns)=ATAN(ZETA/XI)
-    BEND%X(2,bend%d%ns)=SQRT(XI**2+ZETA**2)-RHOB0
-
-    !write(6,*) tot
-    i=bend%d%ns-1
-
-    !    x(1)=x(1)-rho
-
-
-    !   x(1)=x(1)+rg
-    call ROT_XZ(eps,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-    x(1)=x(1)-rg
-    call ROT_XZ(bet,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-
-    if(bend%P%TIME) then
-       X(6)=X(6)-(1-bend%P%TOTALPATH)*bend%P%LD/bend%P%BETA0
-    else
-       X(6)=X(6)-(1-bend%P%TOTALPATH)*bend%P%LD
-    endif
-
-  end subroutine track_interpol_1h_r_new
-
-  subroutine track_interpol_1h_p_new(bend,x)
-    implicit none
-    type(fitted_magnetp), intent(inOUT):: bend
-    type(real_8), intent(inout)::x(6)
-    type(real_8) k1(6),af(3),az(3),ax(3),dif(2),t(2),xt(6),bf(3)
-    real(dp) hc,rho,dz,ds
-    real(dp) m(2,2),mi(2,2),det
-    integer  i,j,NF,KNF,it,ia
-    real(dp) norm, norm0
-    logical(lp) doit
-    logical(lp):: DONEITT
-    real(dp) alph
-    TYPE(REAL_8) bet,eps,gam,rg
-    DONEITT=.true.
-    IF(.NOT.CHECK_STABLE) return
-
-    call alloc(bet,eps,gam,rg)
-    call alloc(k1,6);call alloc(af,3);call alloc(az,3);call alloc(ax,3);call alloc(bf,3);
-    call alloc(dif,2);call alloc(t,2);call alloc(xt,6);
-
-    alph=bend%p%b0*bend%p%ld/2.0_dp
-
-    gam=atan(sin(alph)/(cos(alph)+bend%p%b0*bend%h)    )
-    eps=((bend%d%theta(2)-bend%d%theta(1))*DEG_TO_RAD_)/2.0_dp-gam
-    eps=-eps
-    bet=alph-gam
-    rg=(cos(alph)+bend%p%b0*bend%h)/cos(gam)/bend%p%b0
-
-
-
-    call ROT_XZ(bet,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-
-    hc=one/bend%D%X(1)
-    rho=bend%D%X(1)
-    !    rhob0=one/bend%p%b0
-    !  rotating
-    nf=bend%p%nst
-    x(1)=x(1)+rg
-    call ROT_XZ(eps,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-    !   x(1)=x(1)-rg
-    !    x(1)=x(1)+rho
-
-
-
-    ds=(bend%d%dtheta*DEG_TO_RAD_)*rho
-
-    ia=1
-    if(bend%symplectic) ia=0
-
-    !tot=zero
-    do i=1,bend%d%ns   -ia
-       dz=ds/nf
-       if((i==1.or.i==bend%d%ns).and.bend%symplectic) dz=dz/2.0_dp
-       DO KNF=1,NF
-
-          call get_adata(bend%d,i,x(1),x(3),af,az,ax,bf,bend%scale)
-
-
-          call fx(k1,x,af,az,ax,rho,hc,bend%p)
-
-          if(bend%symplectic) then
-
-             do j=1,3
-                xt(2*j)=x(2*j)+dz*k1(2*j)         ! temporary
-                xt(2*j-1)=x(2*j-1)
-             enddo
-
-
-             norm0=c_1d10
-             doit=.true.
-
-             do it=1,fitted_iteration
-                call fx(k1,m,xt,af,az,ax,rho,hc,bend%p)
-                dif(1)=x(2)+dz*k1(2)-xt(2)
-                dif(2)=x(4)+dz*k1(4)-xt(4)
-
-                m=-dz*m;
-                m(1,1)=one+m(1,1);m(2,2)=one+m(2,2);
-                det=m(1,1)*m(2,2)-m(2,1)*m(1,2)
-                m=m/det;
-                mi(1,1)=m(2,2);mi(2,2)=m(1,1);mi(1,2)=-m(1,2);mi(2,1)=-m(2,1);
-                t(1)=mi(1,1)*dif(1)+mi(1,2)*dif(2)
-                t(2)=mi(2,1)*dif(1)+mi(2,2)*dif(2)
-                xt(2)=xt(2)+t(1);    xt(4)=xt(4)+t(2);
-                norm=abs(dif(1))+abs(dif(2))
-                if(norm>eps_fitted.and.doit) then
-                   norm0=norm
-                else
-                   doit=.false.
-                   if(norm>=norm0) goto 100
-                   norm0=norm
-                endif
-             enddo
-             !             w_p=0
-             !             w_p%nc=1
-             !             w_p%fc='(1(1X,A72))'
-             !             w_p%c(1)=  " Took more than 20 iterations "
-             !             call write_e(100)
-             check_iteration=.false.
-             check_stable=.false.
-100          continue
-
-             call fx(k1,xt,af,az,ax,rho,hc,bend%p)
-
-             x(5)=x(5)            ! temporary
-             x(6)=x(6)+dz*k1(6)    ! temporary
-             do j=1,2
-                x(2*j-1)=x(2*j-1)+dz*k1(2*j-1)         ! temporary
-                x(2*j) =xt(2*j)
-             enddo
-
-
-          else
-             if(bend%p%method==2) then
-                do j=1,6
-                   xt(j)=x(j)+dz*k1(j)         ! temporary
-                enddo
-                do j=1,6
-                   x(j)=x(j)+dz*k1(j)/TWO         ! temporary
-                enddo
-                call get_adata(bend%d,i+1,xt(1 ),xt(3),af,az,ax,bf,bend%scale)
-
-                call fx(k1,xt,af,az,ax,rho,hc,bend%p)
-                do j=1,6
-                   x(j)=x(j)+dz*k1(j)/2.0_DP         ! temporary
-                enddo
-             else
-                do j=1,6
-                   x(j)=x(j)+dz*k1(j)         ! temporary
-                enddo
-
-             endif
-          endif
-
-
-          !        tot=tot+bend%dz
-
-       ENDDO
-    enddo
-
-    !write(6,*) tot
-    i=bend%d%ns-1
-
-    !    x(1)=x(1)-rho
-
-    !   x(1)=x(1)+rg
-    call ROT_XZ(eps,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-    x(1)=x(1)-rg
-    call ROT_XZ(bet,X,bend%p%BETA0,DONEITT,bend%p%TIME)
-
-
-    if(bend%P%TIME) then
-       X(6)=X(6)-(1-bend%P%TOTALPATH)*bend%P%LD/bend%P%BETA0
-    else
-       X(6)=X(6)-(1-bend%P%TOTALPATH)*bend%P%LD
-    endif
-
-
-    call kill(bet,eps,gam,rg)
-
-    call kill(dif,2);call kill(t,2);call kill(xt,6);
-    call kill(k1,6);call kill(af,3);call kill(az,3);call kill(ax,3);call kill(bf,3);
-
-  end subroutine track_interpol_1h_p_new
 
   subroutine get_adatag(b,i,posx,posy)
     implicit none
@@ -1198,12 +705,21 @@ CONTAINS
     iy=(posy)
     x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
     y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-    !write(6,*) "R: x0,y0",x0,y0
-    rm=(x0-b%dx)/rho
-    rp=(x0+b%dx)/rho
+    if(b%hc>zero) then
+       !write(6,*) "R: x0,y0",x0,y0
+       rm=(x0-b%dx)*b%hc
+       rp=(x0+b%dx)*b%hc
+    else
+       rm=one
+       rp=one
+    endif
     !    rm2=(x0-b%dx)/rho
     !    rp2=(x0+b%dx)/rho
-    r0=x0/rho
+    if(b%hc>zero) then
+       r0=x0*b%hc
+    else
+       r0=one
+    endif
     !  first order
     if(fitted_order==1) then
        if(posx<2.or.posx>b%nx-1) then
@@ -1413,21 +929,15 @@ CONTAINS
     type(DATA_MAGNET) b
     integer, intent(in) :: i,posx,posy
     integer j,ix,iy
-    real(dp) x0,y0,rho
 
     if(b%read_in)   then
        write(6,*) " This is forbidden since already the data was read in for the fitted magnet"
        stop 222
     endif
-    rho=b%X(1)
-    !  posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
-    !  posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
 
     !  interpolate
     ix=(posx)
     iy=(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
 
 
 
@@ -1567,83 +1077,103 @@ CONTAINS
     integer ix,iy,k,j,l
     real(dp) posx,posy,x0,y0,rho,dx,dy,dz,f(3,-2:2,-2:2)
 
-    rho=b%X(1)
     posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
     posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
-    !
-    !   if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
-    !  interpolate
-    ix=int(posx)
-    iy=int(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
+    if(.not.beamlets) then
 
-    !  first order
+       rho=b%X(1)
+       !
+       !   if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
+       !  interpolate
+       ix=int(posx)
+       iy=int(posy)
+       x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
+       y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
 
-    if(fitted_order/=1.and.fitted_order/=2) stop 889
+       !  first order
 
-    if(posx<3.or.posx>b%nx-2) then
-       if(extrapolate) then
-          ix=3
-          if(posx>3) ix=b%nx-3
-          x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-       else
-          write(6,*) " check_interpolate_x ",x
-          check_interpolate_x=.false.
-          check_stable=.false.
+       if(fitted_order/=1.and.fitted_order/=2) stop 889
+
+       if(posx<3.or.posx>b%nx-2) then
+          if(extrapolate) then
+             ix=3
+             if(posx>3) ix=b%nx-3
+             x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
+          else
+             write(6,*) " check_interpolate_x ",x
+             check_interpolate_x=.false.
+             check_stable=.false.
+          endif
        endif
-    endif
 
-    if(posy<3.or.posy>b%ny-2) then
-       if(extrapolate) then
-          iy=3
-          if(posy>3) iy=b%ny-3
-          y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-       else
-          write(6,*) " check_interpolate_y ",y
-          check_interpolate_y=.false.
-          check_stable=.false.
+       if(posy<3.or.posy>b%ny-2) then
+          if(extrapolate) then
+             iy=3
+             if(posy>3) iy=b%ny-3
+             y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
+          else
+             write(6,*) " check_interpolate_y ",y
+             check_interpolate_y=.false.
+             check_stable=.false.
+          endif
        endif
-    endif
-    do k=1,3
-       do j=-2,2
-          do l=-2,2
-             f(k,j,l)=b%b(k,0,i,ix+j,iy+l)
+       do k=1,3
+          do j=-2,2
+             do l=-2,2
+                f(k,j,l)=b%b(k,0,i,ix+j,iy+l)
+             enddo
           enddo
        enddo
-    enddo
 
 
-    !az(n) grad az
-    !af(n)  a
-    !ax(n)  grad ax
+       !az(n) grad az
+       !af(n)  a
+       !ax(n)  grad ax
 
-    !    write(6,*) size(b%a,1),size(b%a,2),size(b%a,3),size(b%a,4)
-    !    write(6,*) i,ix,iy
-    !   pause 333
-    bf=zero;
-    dx=(x-x0)/(b%x(2)-b%x(1))*(b%nx-1)
-    dy=(y-y0)/(b%y(2)-b%y(1))*(b%ny-1)
-    dz=0.0_DP
-    do k=1,3
-       ! bf(k)=dx*(dx-one)/two*f(K,-1,0)+dy*(dy-one)/two*f(K,0,-1)+(ONE+DX*DY-DX**2-DY**2)*F(K,0,0)
-       ! bf(k)=  bf(k)+DX*(DX-TWO*DY+one)/TWO*F(K,1,0)+DY*(DY-TWO*DX+one)/TWO*F(K,0,1)+DX*DY*F(K,1,1)
+       !    write(6,*) size(b%a,1),size(b%a,2),size(b%a,3),size(b%a,4)
+       !    write(6,*) i,ix,iy
+       !   pause 333
+       bf=zero;
+       dx=(x-x0)/(b%x(2)-b%x(1))*(b%nx-1)
+       dy=(y-y0)/(b%y(2)-b%y(1))*(b%ny-1)
+       dz=0.0_DP
+       do k=1,3
+          ! bf(k)=dx*(dx-one)/two*f(K,-1,0)+dy*(dy-one)/two*f(K,0,-1)+(ONE+DX*DY-DX**2-DY**2)*F(K,0,0)
+          ! bf(k)=  bf(k)+DX*(DX-TWO*DY+one)/TWO*F(K,1,0)+DY*(DY-TWO*DX+one)/TWO*F(K,0,1)+DX*DY*F(K,1,1)
 
-       ! bf(k)=(one-dx-dy)*f(k,0,0)+dx*f(k,1,0)+dy*f(k,0,1)
-       bf(k)=(one-dx**2-dy**2)*f(k,0,0)+f(k,1,0)*(4*dx+3*dx**2-dx**3)/6+f(k,-1,0)*(-4*dx+3*dx**2+dx**3)/6
-       bf(k)= bf(k) +f(k,2,0)*(dx**3-dx)/12-f(k,-2,0)*(dx**3-dx)/12
-       bf(k)=bf(k) +f(k,0,1)*(4*dy+3*dy**2-dy**3)/6+f(k,0,-1)*(-4*dy+3*dy**2+dy**3)/6
-       bf(k)= bf(k) +f(k,0,2)*(dy**3-dy)/12-f(k,0,-2)*(dy**3-dy)/12
+          ! bf(k)=(one-dx-dy)*f(k,0,0)+dx*f(k,1,0)+dy*f(k,0,1)
+          bf(k)=(one-dx**2-dy**2)*f(k,0,0)+f(k,1,0)*(4*dx+3*dx**2-dx**3)/6+f(k,-1,0)*(-4*dx+3*dx**2+dx**3)/6
+          bf(k)= bf(k) +f(k,2,0)*(dx**3-dx)/12-f(k,-2,0)*(dx**3-dx)/12
+          bf(k)=bf(k) +f(k,0,1)*(4*dy+3*dy**2-dy**3)/6+f(k,0,-1)*(-4*dy+3*dy**2+dy**3)/6
+          bf(k)= bf(k) +f(k,0,2)*(dy**3-dy)/12-f(k,0,-2)*(dy**3-dy)/12
 
-       ! makes less symplectic  xy term only h**3 accurate
-       bf(k)=bf(k)+dx*dy*(2*f(k,0,0)+f(k,1,1)+f(k,-1,-1)-f(k,0,1)-f(k,1,0)-f(k,0,-1)-f(k,-1,0))/two
-       ! correction of f_xx and f_yy  ! f_xxxx and f_yyyy
-       bf(k)=bf(k)+(dx**2-dx**4)*(-6*f(k,0,0)+4*f(k,1,0)+4*f(k,-1,0)-f(k,2,0)-f(k,-2,0))/24.0_dp
-       bf(k)=bf(k)+(dy**2-dy**4)*(-6*f(k,0,0)+4*f(k,0,1)+4*f(k,0,-1)-f(k,0,2)-f(k,0,-2))/24.0_dp
+          ! makes less symplectic  xy term only h**3 accurate
+          bf(k)=bf(k)+dx*dy*(2*f(k,0,0)+f(k,1,1)+f(k,-1,-1)-f(k,0,1)-f(k,1,0)-f(k,0,-1)-f(k,-1,0))/two
+          ! correction of f_xx and f_yy  ! f_xxxx and f_yyyy
+          bf(k)=bf(k)+(dx**2-dx**4)*(-6*f(k,0,0)+4*f(k,1,0)+4*f(k,-1,0)-f(k,2,0)-f(k,-2,0))/24.0_dp
+          bf(k)=bf(k)+(dy**2-dy**4)*(-6*f(k,0,0)+4*f(k,0,1)+4*f(k,0,-1)-f(k,0,2)-f(k,0,-2))/24.0_dp
 
 
-    enddo
+       enddo
+    else   ! beamlets
 
+
+
+       bf=0.d0
+       do ix=1,b%nx
+          do iy=1,b%ny
+             !b=fitmag%magp%bend%d%b(i_b,0,i_s,l,k)/pi/sb**2*exp(-(x-grid(l,k,1))**2/dxb**2/sb**2-(y-grid(l,k,2))**2/dyb**2/sb**2) +b
+
+             if( (iabs(int(posx)-ix)<nxspeed).and.(iabs(int(posy)-iy)<nyspeed) ) then
+                dz=exp(-(x-b%grid(ix,iy,1))**2/b%dx**2/sb**2-(y-b%grid(ix,iy,2))**2/b%dy**2/sb**2)/pi/sb**2
+                bf(1)=real(b%b(1,0,i,ix,iy),kind=dp)*dz + bf(1)
+                bf(2)=real(b%b(2,0,i,ix,iy),kind=dp)*dz + bf(2)
+                bf(3)=real(b%b(3,0,i,ix,iy),kind=dp)*dz + bf(3)
+             endif
+          enddo
+       enddo
+
+    endif
 
     do k=1,3
        bf(k)=-scale*bf(k)
@@ -1664,82 +1194,103 @@ CONTAINS
 
     call alloc(dx,dy,dz)
 
-    rho=b%X(1)
     x=xx
     y=yy
 
     posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
     posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
-    !
-    if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
+    if(.not.beamlets) then
 
-    !  interpolate
-    ix=int(posx)
-    iy=int(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-    !    write(6,*) "R: x0,y0",x0,y0
-    !    write(6,*) "posx, posy",posx, posy
+       rho=b%X(1)
+       !
+       if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
+
+       !  interpolate
+       ix=int(posx)
+       iy=int(posy)
+       x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
+       y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
+       !    write(6,*) "R: x0,y0",x0,y0
+       !    write(6,*) "posx, posy",posx, posy
 
 
-    if(fitted_order/=1.and.fitted_order/=2) stop 889
+       if(fitted_order/=1.and.fitted_order/=2) stop 889
 
-    if(posx<3.or.posx>b%nx-2) then
-       if(extrapolate) then
-          ix=3
-          if(posx>3) ix=b%nx-3
-          x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-       else
-          write(6,*) " check_interpolate_x ",x
-          check_interpolate_x=.false.
-          check_stable=.false.
+       if(posx<3.or.posx>b%nx-2) then
+          if(extrapolate) then
+             ix=3
+             if(posx>3) ix=b%nx-3
+             x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
+          else
+             write(6,*) " check_interpolate_x ",x
+             check_interpolate_x=.false.
+             check_stable=.false.
+          endif
        endif
-    endif
 
-    if(posy<3.or.posy>b%ny-2) then
-       if(extrapolate) then
-          iy=3
-          if(posy>3) iy=b%ny-3
-          y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-       else
-          write(6,*) " check_interpolate_y ",y
-          check_interpolate_y=.false.
-          check_stable=.false.
+       if(posy<3.or.posy>b%ny-2) then
+          if(extrapolate) then
+             iy=3
+             if(posy>3) iy=b%ny-3
+             y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
+          else
+             write(6,*) " check_interpolate_y ",y
+             check_interpolate_y=.false.
+             check_stable=.false.
+          endif
        endif
-    endif
-    do k=1,3
-       do j=-2,2
-          do l=-2,2
-             f(k,j,l)=b%b(k,0,i,ix+j,iy+l)
+       do k=1,3
+          do j=-2,2
+             do l=-2,2
+                f(k,j,l)=b%b(k,0,i,ix+j,iy+l)
+             enddo
           enddo
        enddo
-    enddo
 
 
-    bf(1)=zero; bf(2)=zero; bf(3)=zero;
-    dx=(xx-x0)/(b%x(2)-b%x(1))*(b%nx-1)
-    dy=(yy-y0)/(b%y(2)-b%y(1))*(b%ny-1)
-    dz=0.0_DP
+       bf(1)=zero; bf(2)=zero; bf(3)=zero;
+       dx=(xx-x0)/(b%x(2)-b%x(1))*(b%nx-1)
+       dy=(yy-y0)/(b%y(2)-b%y(1))*(b%ny-1)
+       dz=0.0_DP
 
 
-    do k=1,3
-       ! bf(k)=dx*(dx-one)/two*f(K,-1,0)+dy*(dy-one)/two*f(K,0,-1)+(ONE+DX*DY-DX**2-DY**2)*F(K,0,0)
-       ! bf(k)=  bf(k)+DX*(DX-TWO*DY+one)/TWO*F(K,1,0)+DY*(DY-TWO*DX+one)/TWO*F(K,0,1)+DX*DY*F(K,1,1)
+       do k=1,3
+          ! bf(k)=dx*(dx-one)/two*f(K,-1,0)+dy*(dy-one)/two*f(K,0,-1)+(ONE+DX*DY-DX**2-DY**2)*F(K,0,0)
+          ! bf(k)=  bf(k)+DX*(DX-TWO*DY+one)/TWO*F(K,1,0)+DY*(DY-TWO*DX+one)/TWO*F(K,0,1)+DX*DY*F(K,1,1)
 
-       ! bf(k)=(one-dx-dy)*f(k,0,0)+dx*f(k,1,0)+dy*f(k,0,1)
+          ! bf(k)=(one-dx-dy)*f(k,0,0)+dx*f(k,1,0)+dy*f(k,0,1)
 
-       bf(k)=(one-dx**2-dy**2)*f(k,0,0)+f(k,1,0)*(4*dx+3*dx**2-dx**3)/6+f(k,-1,0)*(-4*dx+3*dx**2+dx**3)/6
-       bf(k)= bf(k) +f(k,2,0)*(dx**3-dx)/12-f(k,-2,0)*(dx**3-dx)/12
-       bf(k)=bf(k) +f(k,0,1)*(4*dy+3*dy**2-dy**3)/6+f(k,0,-1)*(-4*dy+3*dy**2+dy**3)/6
-       bf(k)= bf(k) +f(k,0,2)*(dy**3-dy)/12-f(k,0,-2)*(dy**3-dy)/12
+          bf(k)=(one-dx**2-dy**2)*f(k,0,0)+f(k,1,0)*(4*dx+3*dx**2-dx**3)/6+f(k,-1,0)*(-4*dx+3*dx**2+dx**3)/6
+          bf(k)= bf(k) +f(k,2,0)*(dx**3-dx)/12-f(k,-2,0)*(dx**3-dx)/12
+          bf(k)=bf(k) +f(k,0,1)*(4*dy+3*dy**2-dy**3)/6+f(k,0,-1)*(-4*dy+3*dy**2+dy**3)/6
+          bf(k)= bf(k) +f(k,0,2)*(dy**3-dy)/12-f(k,0,-2)*(dy**3-dy)/12
 
-       ! makes less symplectic  xy term only h**3 accurate
-       bf(k)=bf(k)+dx*dy*(2*f(k,0,0)+f(k,1,1)+f(k,-1,-1)-f(k,0,1)-f(k,1,0)-f(k,0,-1)-f(k,-1,0))/two
-       ! correction of f_xx and f_yy  ! f_xxxx and f_yyyy
-       bf(k)=bf(k)+(dx**2-dx**4)*(-6*f(k,0,0)+4*f(k,1,0)+4*f(k,-1,0)-f(k,2,0)-f(k,-2,0))/24.0_dp
-       bf(k)=bf(k)+(dy**2-dy**4)*(-6*f(k,0,0)+4*f(k,0,1)+4*f(k,0,-1)-f(k,0,2)-f(k,0,-2))/24.0_dp
+          ! makes less symplectic  xy term only h**3 accurate
+          bf(k)=bf(k)+dx*dy*(2*f(k,0,0)+f(k,1,1)+f(k,-1,-1)-f(k,0,1)-f(k,1,0)-f(k,0,-1)-f(k,-1,0))/two
+          ! correction of f_xx and f_yy  ! f_xxxx and f_yyyy
+          bf(k)=bf(k)+(dx**2-dx**4)*(-6*f(k,0,0)+4*f(k,1,0)+4*f(k,-1,0)-f(k,2,0)-f(k,-2,0))/24.0_dp
+          bf(k)=bf(k)+(dy**2-dy**4)*(-6*f(k,0,0)+4*f(k,0,1)+4*f(k,0,-1)-f(k,0,2)-f(k,0,-2))/24.0_dp
 
-    enddo
+       enddo
+
+    else   ! beamlets
+
+
+
+       bf(1)=0.d0;bf(2)=0.d0;bf(3)=0.d0;
+
+       do ix=1,b%nx
+          do iy=1,b%ny
+             if( (iabs(int(posx)-ix)<nxspeed).and.(iabs(int(posy)-iy)<nyspeed) ) then
+                dz=exp(-(xx-b%grid(ix,iy,1))**2/b%dx**2/sb**2-(yy-b%grid(ix,iy,2))**2/b%dy**2/sb**2)/pi/sb**2
+                bf(1)=real(b%b(1,0,i,ix,iy),kind=dp)*dz + bf(1)
+                bf(2)=real(b%b(2,0,i,ix,iy),kind=dp)*dz + bf(2)
+                bf(3)=real(b%b(3,0,i,ix,iy),kind=dp)*dz + bf(3)
+             endif
+          enddo
+       enddo
+
+    endif
 
 
 
@@ -1751,381 +1302,10 @@ CONTAINS
   end subroutine get_b_int_p
 
 
-  subroutine get_bdata2c_r(b,i,x,y,bf,scale)
-    implicit none
-    type(DATA_MAGNET) b
-    integer, intent(in) :: i
-    real(dp), intent(in) :: x,y,scale
-    real(dp), intent(out) :: bf(3)
-    integer ix,iy,k,j
-    real(dp) posx,posy,x0,y0,rho,dx,dy,dz
 
-    rho=b%X(1)
-    posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
-    posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
-    !
-    if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
-    !  interpolate
-    ix=int(posx)
-    iy=int(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-    !  first order
 
-    if(fitted_order/=1.and.fitted_order/=2) stop 889
-    if(posx<2.or.posx>b%nx-1) then
-       if(extrapolate) then
-          ix=2
-          if(posx>2) ix=b%nx-2
-          x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-       else
-          write(6,*) " check_interpolate_x ",x
-          check_interpolate_x=.false.
-          check_stable=.false.
-       endif
-    endif
 
-    if(posy<2.or.posy>b%ny-1) then
-       if(extrapolate) then
-          iy=2
-          if(posy>2) iy=b%ny-2
-          y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-       else
-          write(6,*) " check_interpolate_y ",y
-          check_interpolate_y=.false.
-          check_stable=.false.
-       endif
-    endif
 
-
-    !az(n) grad az
-    !af(n)  a
-    !ax(n)  grad ax
-
-    !    write(6,*) size(b%a,1),size(b%a,2),size(b%a,3),size(b%a,4)
-    !    write(6,*) i,ix,iy
-    !   pause 333
-    bf=zero;
-    dx=x-x0
-    dy=y-y0
-    dz=0.0_DP
-    do k=1,3
-       do j=0,19
-          bf(k)=b%b(k,j,i,ix,iy)*dx**pow(j,1)*dy**pow(j,2)*dz**pow(j,3) +bf(k)
-       enddo
-    enddo
-
-
-    do k=1,3
-       bf(k)=-scale*bf(k)
-    enddo
-
-  end subroutine get_bdata2c_r
-
-
-
-  subroutine get_bdata2c_p(b,i,xx,yy,bf,scale)
-    implicit none
-    type(DATA_MAGNET) b
-    integer, intent(in) :: i
-    type(real_8), intent(in) :: xx,yy,scale
-    real(dp)  x,y
-    type(real_8),  intent(out) :: bf(3)
-    integer ix,iy,k,j
-    real(dp) posx,posy,x0,y0,rho
-    type(real_8) dx,dy,dz
-
-    call alloc(dx,dy,dz)
-
-    rho=b%X(1)
-    x=xx
-    y=yy
-
-    posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
-    posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
-    !
-    if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
-
-    !  interpolate
-    ix=int(posx)
-    iy=int(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-    !    write(6,*) "R: x0,y0",x0,y0
-    !    write(6,*) "posx, posy",posx, posy
-
-
-    !  first order
-
-    if(fitted_order/=1.and.fitted_order/=2) stop 889
-    if(posx<2.or.posx>b%nx-1) then
-       if(extrapolate) then
-          ix=2
-          if(posx>2) ix=b%nx-2
-          x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-       else
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='(1(1X,A72))'
-          !             write(w_p%c(1),'(A9,1X,I4,1X,I4)') " ix,b%nx ",ix,b%nx
-          !             call write_e(2234)
-          write(6,*) " check_interpolate_x ",x
-          check_interpolate_x=.false.
-          check_stable=.false.
-       endif
-    endif
-
-    if(posy<2.or.posy>b%ny-1) then
-       if(extrapolate) then
-          iy=2
-          if(posy>2) iy=b%ny-2
-          y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-       else
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='(1(1X,A72))'
-          !             write(w_p%c(1),'(A9,1X,I4,1X,I4)') " iy,b%ny ",iy,b%ny
-          !             call write_e(2235)
-          write(6,*) " check_interpolate_y ",y
-          check_interpolate_y=.false.
-          check_stable=.false.
-       endif
-    endif
-
-    !az(n) grad az
-    !af(n)  a
-    !ax(n)  grad ax
-
-    !    write(6,*) size(b%a,1),size(b%a,2),size(b%a,3),size(b%a,4)
-    !    write(6,*) i,ix,iy
-    !   pause 333
-
-    bf(1)=zero; bf(2)=zero; bf(3)=zero;
-    dx=xx-x0
-    dy=yy-y0
-    dz=0.0_DP
-
-
-    do k=1,3
-       do j=0,19
-          bf(k)=b%b(k,j,i,ix,iy)*dx**pow(j,1)*dy**pow(j,2)*dz**pow(j,3) +bf(k)
-       enddo
-    enddo
-
-
-    do k=1,3
-       bf(k)=-scale*bf(k)
-    enddo
-
-    call kill(dx,dy,dz)
-  end subroutine get_bdata2c_p
-
-
-
-
-  subroutine get_adata2c_r(b,i,x,y,af,az,ax,bf,scale)
-    implicit none
-    type(DATA_MAGNET) b
-    integer, intent(in) :: i
-    real(dp), intent(in) :: x,y,scale
-    real(dp), intent(out) :: af(3),az(3),ax(3),bf(3)
-    integer ix,iy,k
-    real(dp) posx,posy,x0,y0,rho,dx,dy
-
-    rho=b%X(1)
-    posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
-    posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
-    !
-    if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
-
-    !  interpolate
-    ix=int(posx)
-    iy=int(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-    !    write(6,*) "R: x0,y0",x0,y0
-    !    write(6,*) "posx, posy",posx, posy
-
-
-    !  first order
-
-    if(fitted_order/=1.and.fitted_order/=2) stop 889
-    if(posx<2.or.posx>b%nx-1) then
-       if(extrapolate) then
-          ix=2
-          if(posx>2) ix=b%nx-2
-          x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-       else
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='(1(1X,A72))'
-          !             write(w_p%c(1),'(A9,1X,I4,1X,I4)') " ix,b%nx ",ix,b%nx
-          !             call write_e(2234)
-          write(6,*) " check_interpolate_x ",x
-          check_interpolate_x=.false.
-          check_stable=.false.
-       endif
-    endif
-
-    if(posy<2.or.posy>b%ny-1) then
-       if(extrapolate) then
-          iy=2
-          if(posy>2) iy=b%ny-2
-          y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-       else
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='(1(1X,A72))'
-          !             write(w_p%c(1),'(A9,1X,I4,1X,I4)') " iy,b%ny ",iy,b%ny
-          !             call write_e(2235)
-          write(6,*) " check_interpolate_y ",y
-          check_interpolate_y=.false.
-          check_stable=.false.
-       endif
-    endif
-
-    !az(n) grad az
-    !af(n)  a
-    !ax(n)  grad ax
-
-    !    write(6,*) size(b%a,1),size(b%a,2),size(b%a,3),size(b%a,4)
-    !    write(6,*) i,ix,iy
-    !   pause 333
-    az=zero;af=zero;ax=zero;
-    dx=x-x0
-    dy=y-y0
-
-    az(1)=-b%a(2,i,ix,iy)+b%a(4,i,ix,iy)*dy-b%a(5,i,ix,iy)*dx
-    az(2)= b%a(1,i,ix,iy)+b%a(4,i,ix,iy)*dx+b%a(5,i,ix,iy)*dy
-    af(1)=-b%a(3,i,ix,iy)*dy-b%a(6,i,ix,iy)*dx*dy-b%a(7,i,ix,iy)*dy**2/two
-    ax(1)=-b%a(6,i,ix,iy)*dy
-    ax(2)=-b%a(3,i,ix,iy)-b%a(6,i,ix,iy)*dx-b%a(7,i,ix,iy)*dy
-
-
-
-    af(1)=af(1)-b%a(8,i,ix,iy)*dx**2*dy-b%a(9,i,ix,iy)*dy**3/3.0_DP    -b%a(13,i,ix,iy)*dx*dy**2/2.0_DP
-    ax(1)=ax(1)-2.0_DP*b%a(8,i,ix,iy)*dx*dy                            -b%a(13,i,ix,iy)*dy**2/2.0_DP
-    ax(2)=ax(2)-b%a(8,i,ix,iy)*dx**2-b%a(9,i,ix,iy)*dy**2   -b%a(13,i,ix,iy)*dx*dy
-
-    az(1)=az(1)+b%a(10,i,ix,iy)*2.0_DP*dx*dy-b%a(12,i,ix,iy)*(dx**2-dy**2)/2.0_DP-b%a(5,i,ix,iy)*dx**2/2.0_dp/x0
-    az(2)=az(2)+b%a(10,i,ix,iy)*dx**2+b%a(11,i,ix,iy)*dy**2+b%a(12,i,ix,iy)*dx*dy
-
-
-
-    bf=0.0_DP
-    do k=1,3
-       af(k)=-scale*af(k)
-       az(k)=-scale*az(k)
-       ax(k)=-scale*ax(k)
-       bf(k)=-scale*bf(k)
-    enddo
-
-  end subroutine get_adata2c_r
-
-  subroutine get_adata2c_p(b,i,xx,yy,af,az,ax,bf,scale)
-    implicit none
-    type(DATA_MAGNET) b
-    integer, intent(in) :: i
-    type(real_8), intent(in) :: xx,yy,scale
-    type(real_8), intent(out) :: af(3),az(3),ax(3),bf(3)
-    integer ix,iy,k
-    real(dp) posx,posy,x0,y0,x,y,rho
-    type(real_8) dx,dy
-    !  second order
-    call alloc(dx,dy)
-
-    rho=b%X(1)
-    x=xx
-    y=yy
-    posx= (x-b%x(1))/(b%x(2)-b%x(1))*(b%nx-1)+one
-    posy= (y-b%y(1))/(b%y(2)-b%y(1))*(b%ny-1)+one
-
-    if(posy<(b%ny-1)/2+1.and.midplane_enforcing) posy=posy+one
-
-    !  interpolate
-    ix=int(posx)
-    iy=int(posy)
-    x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-    y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-    !write(6,*) "R: x0,y0",x0,y0
-
-    !  first order
-
-    if(fitted_order/=1.and.fitted_order/=2) stop 890
-    if(posx<2.or.posx>b%nx-1) then
-       if(extrapolate) then
-          ix=2
-          if(posx>2) ix=b%nx-2
-          x0=REAL((ix-1),kind=DP)/REAL((b%nx-1),kind=DP)*(b%x(2)-b%x(1))+b%x(1)
-       else
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='(1(1X,A72))'
-          !             write(w_p%c(1),'(A9,1X,I4,1X,I4)') " ix,b%nx ",ix,b%nx
-          !             call write_e(2234)
-          check_interpolate_x=.false.
-          check_stable=.false.
-       endif
-    endif
-
-    if(posy<2.or.posy>b%ny-1) then
-       if(extrapolate) then
-          iy=2
-          if(posy>2) iy=b%ny-2
-          y0=REAL((iy-1),kind=DP)/REAL((b%ny-1),kind=DP)*(b%y(2)-b%y(1))+b%y(1)
-       else
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='(1(1X,A72))'
-          !             write(w_p%c(1),'(A9,1X,I4,1X,I4)') " iy,b%ny ",iy,b%ny
-          !             call write_e(2234)
-          check_interpolate_y=.false.
-          check_stable=.false.
-       endif
-    endif
-
-
-    !az(n) grad az
-    !af(n)  a
-    !ax(n)  grad ax
-    af(1)=zero; af(2)=zero; af(3)=zero;
-    az(1)=zero; az(2)=zero; az(3)=zero;
-    ax(1)=zero; ax(2)=zero; ax(3)=zero;
-    dx=xx-x0
-    dy=yy-y0
-
-    az(1)=-b%a(2,i,ix,iy)+b%a(4,i,ix,iy)*dy-b%a(5,i,ix,iy)*dx
-    az(2)= b%a(1,i,ix,iy)+b%a(4,i,ix,iy)*dx+b%a(5,i,ix,iy)*dy
-    af(1)=-b%a(3,i,ix,iy)*dy-b%a(6,i,ix,iy)*dx*dy-b%a(7,i,ix,iy)*dy**2/two
-    ax(1)=-b%a(6,i,ix,iy)*dy
-    ax(2)=-b%a(3,i,ix,iy)-b%a(6,i,ix,iy)*dx-b%a(7,i,ix,iy)*dy
-
-
-
-    af(1)=af(1)-b%a(8,i,ix,iy)*dx**2*dy-b%a(9,i,ix,iy)*dy**3/3.0_DP    -b%a(13,i,ix,iy)*dx*dy**2/2.0_DP
-    ax(1)=ax(1)-2.0_DP*b%a(8,i,ix,iy)*dx*dy                            -b%a(13,i,ix,iy)*dy**2/2.0_DP
-    ax(2)=ax(2)-b%a(8,i,ix,iy)*dx**2-b%a(9,i,ix,iy)*dy**2   -b%a(13,i,ix,iy)*dx*dy
-
-    az(1)=az(1)+b%a(10,i,ix,iy)*2.0_DP*dx*dy-b%a(12,i,ix,iy)*(dx**2-dy**2)/2.0_DP-b%a(5,i,ix,iy)*dx**2/2.0_dp/x0
-    az(2)=az(2)+b%a(10,i,ix,iy)*dx**2+b%a(11,i,ix,iy)*dy**2+b%a(12,i,ix,iy)*dx*dy
-
-
-
-    bf(1)=0.0_DP
-    bf(2)=0.0_DP
-    bf(3)=0.0_DP
-
-    do k=1,3
-       af(k)=-scale*af(k)
-       az(k)=-scale*az(k)
-       ax(k)=-scale*ax(k)
-       bf(k)=-scale*bf(k)
-    enddo
-
-
-    call kill(dx,dy)
-
-  end subroutine get_adata2c_p
 
   subroutine px_to_xpr0_hr(x,rho,hc,af,p)         ! convert in drift
     implicit none
@@ -2229,13 +1409,27 @@ CONTAINS
 
     real(dp), intent(in):: x(6)
     type(FITTED_MAGNET), intent(in) :: b
-
+    !    real(dp) bb(4)
+    if(check_max_min) then
+       if(x(1) < max_min(1))  max_min(1)=x(1)
+       if(x(1) > max_min(2))  max_min(2)=x(1)
+       if(x(3) < max_min(3))  max_min(3)=x(3)
+       if(x(3) > max_min(4))  max_min(4)=x(3)
+    endif
     che=.false.
-
+    if(extrapolate) return
     if(x(1)<b%xmin) che=.true.
     if(x(1)>b%xmax) che=.true.
     if(x(3)<b%ymin) che=.true.
     if(x(3)>b%ymax) che=.true.
+    !     bb(1)=b%xmin
+    !     bb(2)=b%xmax
+    !     bb(3)=b%ymin
+    !     bb(4)=b%ymax
+    !    write(6,*) x(1)<b%xmin,x(1),bb(1)
+    !    write(6,*) x(1)>b%xmax,x(1),bb(2)
+    !    write(6,*) x(3)<b%ymin,x(3),bb(3)
+    !    write(6,*) x(3)>b%ymax,x(3),bb(4)
 
   end function che
 
@@ -2505,32 +1699,45 @@ CONTAINS
     real(dp) , intent(inout)::x(6)
     real(dp) k1(6),xt(6),hc,rho,dz,DAL,ds
     real(dp) bf(3),XI,ZETA,rhob0
-    integer  i,j,NF,KNF
+    integer  i,j,KNF
     real(dp) theta_half
+    !    TYPE(WORM), OPTIONAL, INTENT(INOUT):: MID
 
     IF(.NOT.CHECK_STABLE) return
-    theta_half=DEG_TO_RAD_*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
 
-    hc=one/bend%D%X(1)
+    theta_half=bend%d%hc*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
+
+    !    hc=one/bend%D%X(1)
+    hc=bend%D%hc
     rho=bend%D%X(1)
-    rhob0=one/bend%p%b0
-    !  rotating
-    nf=bend%p%nst
 
-    ds=(bend%d%dtheta*DEG_TO_RAD_)*rho
-    DAL=bend%d%dtheta*DEG_TO_RAD_
+    if(abs(bend%p%b0)/=0.d0) then
+       rhob0=one/bend%p%b0
+       DAL=bend%d%dtheta*bend%d%hc
+    endif
+    !  rotating
+
+    ds=bend%d%dtheta     !(bend%d%dtheta*DEG_TO_RAD_)*rho
+
 
     call px_to_xp_r(x,hc,bend%p)
     x(1)=x(1)+rho
 
+
     do i=1,bend%d%ns    -1
        dz=ds/nf
+       !     write(10,*) i*dz,x(1)
+       !     write(6,*) i*dz,x(1)
        DO KNF=1,NF
-          XI  =(X(1))*COS((I-1)*DAL-theta_half)-bend%h
-          ZETA=(X(1))*SIN((I-1)*DAL-theta_half)
-          BEND%X(1,I)=ATAN(ZETA/XI)
-          BEND%X(2,I)=SQRT(XI**2+ZETA**2)-RHOB0
-
+          if(abs(bend%p%b0)/=0.d0) then
+             XI  =(X(1))*COS((I-1)*DAL-theta_half)
+             ZETA=(X(1))*SIN((I-1)*DAL-theta_half)
+             BEND%X(1,I)=ATAN(ZETA/XI)
+             BEND%X(2,I)=SQRT(XI**2+ZETA**2)-RHOB0
+          else
+             BEND%X(1,I)=x(1)
+             BEND%X(2,I)=x(2)
+          endif
 
           call get_b(bend%d,i,x(1),x(3),bf,bend%scale)
           ! original formula for electrons (q<0)  now switch to proton
@@ -2570,11 +1777,12 @@ CONTAINS
 
        ENDDO
     enddo
-    XI  =(X(1))*COS((bend%d%ns-1)*DAL-theta_half)-bend%h
-    ZETA=(X(1))*SIN((bend%d%ns-1)*DAL-theta_half)
-    BEND%X(1,bend%d%ns)=ATAN(ZETA/XI)
-    BEND%X(2,bend%d%ns)=SQRT(XI**2+ZETA**2)-RHOB0
-
+    if(abs(bend%p%b0)/=0.d0) then
+       XI  =(X(1))*COS((bend%d%ns-1)*DAL-theta_half)
+       ZETA=(X(1))*SIN((bend%d%ns-1)*DAL-theta_half)
+       BEND%X(1,bend%d%ns)=ATAN(ZETA/XI)
+       BEND%X(2,bend%d%ns)=SQRT(XI**2+ZETA**2)-RHOB0
+    endif
     !write(6,*) tot
     i=bend%d%ns-1
 
@@ -2597,7 +1805,7 @@ CONTAINS
     real(dp) hc,rho,dz,DAL,ds
     type(real_8)  k1(6),xt(6),bf(3)
 
-    integer  i,j,NF,KNF
+    integer  i,j,KNF
     real(dp) theta_half
 
     call alloc(k1,6)
@@ -2605,16 +1813,19 @@ CONTAINS
     call alloc(bf,3)
 
     IF(.NOT.CHECK_STABLE) return
-    theta_half=DEG_TO_RAD_*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
 
-    hc=one/bend%D%X(1)
+    theta_half=bend%d%hc*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
+
+    !    hc=one/bend%D%X(1)
+    hc=bend%D%hc
     rho=bend%D%X(1)
-    !    rhob0=one/bend%p%b0
-    !  rotating
-    nf=bend%p%nst
 
-    ds=(bend%d%dtheta*DEG_TO_RAD_)*rho
-    DAL=bend%d%dtheta*DEG_TO_RAD_
+    !  rotating
+
+    ds=bend%d%dtheta     !(bend%d%dtheta*DEG_TO_RAD_)*rho
+
+    !    DAL=bend%d%dtheta*DEG_TO_RAD_
+    DAL=bend%d%dtheta*bend%d%hc
 
     call px_to_xp_r(x,hc,bend%p)
     x(1)=x(1)+rho
@@ -2622,7 +1833,6 @@ CONTAINS
     do i=1,bend%d%ns    -1
        dz=ds/nf
        DO KNF=1,NF
-
           call get_b(bend%d,i,x(1),x(3),bf,bend%scale)
           ! original formula for electrons (q<0)  now switch to proton
 
@@ -2689,33 +1899,42 @@ CONTAINS
     real(dp) , intent(inout)::x(6)
     real(dp) k1(6),k2(6),k3(6),k4(6),xt(6),hc,rho,dz,DAL,ds
     real(dp) bf(3),XI,ZETA,rhob0
-    integer  i,j,NF,KNF
+    integer  i,j,KNF
     real(dp) theta_half
 
     IF(.NOT.CHECK_STABLE) return
-    theta_half=DEG_TO_RAD_*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
 
-    hc=one/bend%D%X(1)
+    theta_half=bend%d%hc*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
+
+    !    hc=one/bend%D%X(1)
+    hc=bend%D%hc
     rho=bend%D%X(1)
-    rhob0=one/bend%p%b0
-    !  rotating
-    nf=bend%p%nst
 
-    ds=(bend%d%dtheta*DEG_TO_RAD_)*rho
-    DAL=bend%d%dtheta*DEG_TO_RAD_
+    if(abs(bend%p%b0)/=0.d0) then
+       rhob0=one/bend%p%b0
+       DAL=bend%d%dtheta*bend%d%hc
+    endif
+    !  rotating
+
+    ds=bend%d%dtheta     !(bend%d%dtheta*DEG_TO_RAD_)*rho
+
 
     call px_to_xp_r(x,hc,bend%p)
     x(1)=x(1)+rho
-
     do i=1,bend%d%ns-1,2
        dz=two*ds/nf
+
        DO KNF=1,NF
-          XI  =(X(1))*COS((I-1)*DAL-theta_half)-bend%h
-          ZETA=(X(1))*SIN((I-1)*DAL-theta_half)
-          BEND%X(1,I)=ATAN(ZETA/XI)
-          BEND%X(2,I)=SQRT(XI**2+ZETA**2)-RHOB0
-
-
+          if(abs(bend%p%b0)/=0.d0) then
+             XI  =(X(1))*COS((I-1)*DAL-theta_half)
+             ZETA=(X(1))*SIN((I-1)*DAL-theta_half)
+             BEND%X(1,I)=ATAN(ZETA/XI)
+             BEND%X(2,I)=SQRT(XI**2+ZETA**2)-RHOB0
+          else
+             BEND%X(1,I)=x(1)
+             BEND%X(2,I)=x(2)
+          endif
+          !   write(16,*) i,x(1)
           call get_b(bend%d,i,x(1),x(3),bf,bend%scale)
           ! original formula for electrons (q<0)  now switch to proton
           call fxb(k1,x,bf,rho,hc,bend%p)
@@ -2753,10 +1972,12 @@ CONTAINS
 
        ENDDO
     enddo
-    XI  =(X(1))*COS((bend%d%ns-1)*DAL-theta_half)-bend%h
-    ZETA=(X(1))*SIN((bend%d%ns-1)*DAL-theta_half)
-    BEND%X(1,bend%d%ns)=ATAN(ZETA/XI)
-    BEND%X(2,bend%d%ns)=SQRT(XI**2+ZETA**2)-RHOB0
+    if(abs(bend%p%b0)/=0.d0) then
+       XI  =(X(1))*COS((bend%d%ns-1)*DAL-theta_half)
+       ZETA=(X(1))*SIN((bend%d%ns-1)*DAL-theta_half)
+       BEND%X(1,bend%d%ns)=ATAN(ZETA/XI)
+       BEND%X(2,bend%d%ns)=SQRT(XI**2+ZETA**2)-RHOB0
+    endif
 
     !write(6,*) tot
     i=bend%d%ns-1
@@ -2781,7 +2002,7 @@ CONTAINS
     real(dp) hc,rho,dz,DAL,ds
     type(real_8)  k1(6),k2(6),k3(6),k4(6),xt(6),bf(3)
 
-    integer  i,j,NF,KNF
+    integer  i,j,KNF
     real(dp) theta_half
 
     call alloc(k1,6)
@@ -2792,23 +2013,27 @@ CONTAINS
     call alloc(bf,3)
 
     IF(.NOT.CHECK_STABLE) return
-    theta_half=DEG_TO_RAD_*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
 
-    hc=one/bend%D%X(1)
+    theta_half=bend%d%hc*(bend%d%theta(2)-bend%d%theta(1))/2.0_dp
+
+    !    hc=one/bend%D%X(1)
+    hc=bend%D%hc
     rho=bend%D%X(1)
-    !  rotating
-    nf=bend%p%nst
 
-    ds=(bend%d%dtheta*DEG_TO_RAD_)*rho
-    DAL=bend%d%dtheta*DEG_TO_RAD_
+    !  rotating
+
+    ds=bend%d%dtheta     !(bend%d%dtheta*DEG_TO_RAD_)*rho
+
+    !    DAL=bend%d%dtheta*DEG_TO_RAD_
+    DAL=bend%d%dtheta*bend%d%hc
 
     call px_to_xp_r(x,hc,bend%p)
     x(1)=x(1)+rho
 
     do i=1,bend%d%ns-1,2
+       if(junk==1) write(6,*) " Slice number ", i
        dz=two*ds/nf
        DO KNF=1,NF
-
 
           call get_b(bend%d,i,x(1),x(3),bf,bend%scale)
           ! original formula for electrons (q<0)  now switch to proton
@@ -2836,6 +2061,7 @@ CONTAINS
           enddo
 
           if(.not.CHECK_STABLE) return
+
 
 
           !        tot=tot+bend%dz
@@ -2866,6 +2092,6 @@ CONTAINS
 
   end subroutine track_interpol_4h_p_new_n
 
-
+  !
 
 end module fitted_MAG

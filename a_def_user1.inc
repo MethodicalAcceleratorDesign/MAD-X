@@ -16,4 +16,3 @@ TYPE USER1P
    !   ADD INTERNAL STUFF HERE AS POINTERS
    TYPE(REAL_8), POINTER ::INTERNAL        ! INTERNAL is an example of a variable specific to user1p
 END  TYPE USER1P
-

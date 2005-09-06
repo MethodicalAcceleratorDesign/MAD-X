@@ -9,12 +9,13 @@ module tpsalie
   private  TAYLORSMAP,DPEKMAP,DPOKMAP,zeroEQUALMAP,IdentityEQUALMAP
   private DABSMAP,EQUALMAP,EQUALVEC    !,EQUALMAPVEC,EQUALVECMAP
   private EQUALvecpb,EQUALpbpb,EQUALpbvec,EQUALpbda,EQUALdapb,CUTORDER,CUTORDERPB,CUTORDERVEC
-  private GETORDERVEC,GETORDERMAP,GETORDERPB,concator,pushtree,pushmap,concat,pushmatrixr,push1polslow
+  private GETORDERVEC,GETORDERMAP,GETORDERPB,concator,pushtree,concat,pushmatrixr,push1polslow
+  private pushmap
   private trxflow,trxpb,trxtaylor !,DMULMAPsc,MULMAPsc,IMULMAPsc,DMULVECsc,MULVECsc,IMULVECsc
   !  private DMULpbsc,MULpbsc,IMULpbsc
   private scDMULMAP,scMULMAP,scIMULMAP !,scDMULVEC,scMULVEC,scIMULVEC,scDMULpb,scMULpb,scIMULpb
   private ADDMAP   !,VECMAP,MAPVEC,VECPB,PBVEC
-  private SUBMAP,POWMAP,DAREADTAYLORS,DAREADMAP,DAREADVEC,DAREApb,DAREADTAYLOR
+  private SUBMAP,POWMAP,POWMAP_INV,DAREADTAYLORS,DAREADMAP,DAREADVEC,DAREApb,DAREADTAYLOR
   PRIVATE DAPRINTTAYLORS,DAPRINTMAP
   private DAPRINTVEC,DAPRINTTAYLOR,DAPRINTpb,allocmap,allocvec,allocpb,alloctree,allocrad,allocrads
   private KILLmap,KILLvec,KILLpb,KILLtree,killrad,killrads
@@ -28,13 +29,17 @@ module tpsalie
   private mul_PBf_t,mul_VECf_t,mul_VECf_MAP,mul_PBf_MAP
 
 
+  private A_OPT_gmap,k_OPT_gmap,allocgmap,KILLgmap,EQUALgMAP,IdentityEQUALgMAP,DAPRINTgMAP,concatorg
+  private assgmap,concatg,DPEKgMAP,DPOKgMAP,gPOWMAP,trxgtaylorc,trxgtaylor,gPOWMAPtpsa,GETORDERgMAP,CUTORDERg
 
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUALMAP
+     MODULE PROCEDURE EQUALgMAP
      MODULE PROCEDURE MAPTAYLORS
      MODULE PROCEDURE TAYLORSMAP
      MODULE PROCEDURE IdentityEQUALMAP
+     MODULE PROCEDURE IdentityEQUALgMAP
      MODULE PROCEDURE zeroEQUALMAP
      MODULE PROCEDURE MAPmatrixr
      MODULE PROCEDURE matrixMAPr
@@ -42,6 +47,8 @@ module tpsalie
      !     MODULE PROCEDURE ABSMAP
      MODULE PROCEDURE DPEKMAP
      MODULE PROCEDURE DPOKMAP
+     MODULE PROCEDURE DPEKgMAP
+     MODULE PROCEDURE DPOKgMAP
      MODULE PROCEDURE EQUALVEC
      MODULE PROCEDURE EQUALpbpb
      MODULE PROCEDURE EQUALpbda
@@ -60,16 +67,18 @@ module tpsalie
      MODULE PROCEDURE mul_PBf_t    !   Lines to be moved
      MODULE PROCEDURE mul_VECf_t   !   Lines to be moved
      MODULE PROCEDURE mul_VECf_MAP !   Lines to be moved
-     MODULE PROCEDURE pushmap
+     MODULE PROCEDURE pushmap   ! slow lnv
      MODULE PROCEDURE pushmatrixr
      MODULE PROCEDURE push1polslow
      MODULE PROCEDURE pushtree
 
      ! DA concatenation
      MODULE PROCEDURE concat
+     MODULE PROCEDURE concatg
      MODULE PROCEDURE trxflow
      MODULE PROCEDURE trxpb
      MODULE PROCEDURE trxtaylor
+     MODULE PROCEDURE trxgtaylor
 
 
      MODULE PROCEDURE DMULMAPsc
@@ -94,27 +103,36 @@ module tpsalie
 
   INTERFACE OPERATOR (**)
      MODULE PROCEDURE POWMAP
+     MODULE PROCEDURE gPOWMAP
+     MODULE PROCEDURE POWMAP_INV
   END INTERFACE
 
   INTERFACE OPERATOR (.SUB.)
      MODULE PROCEDURE GETORDERVEC
      MODULE PROCEDURE GETORDERMAP
+     MODULE PROCEDURE GETORDERgMAP
      MODULE PROCEDURE GETORDERPB
   end  INTERFACE
 
   INTERFACE OPERATOR (.CUT.)
      MODULE PROCEDURE CUTORDER
+     MODULE PROCEDURE CUTORDERg
      MODULE PROCEDURE CUTORDERPB
      MODULE PROCEDURE CUTORDERVEC
   END INTERFACE
 
   INTERFACE OPERATOR (.o.)
      MODULE PROCEDURE concator
+     MODULE PROCEDURE concatorg
      MODULE PROCEDURE trxtaylorc
-     MODULE PROCEDURE trxpbc
-     MODULE PROCEDURE trxflowc
+     MODULE PROCEDURE trxgtaylorc
+     !     MODULE PROCEDURE trxpbc
+     !     MODULE PROCEDURE trxflowc
   end  INTERFACE
 
+  INTERFACE OPERATOR (.oo.)
+     MODULE PROCEDURE gPOWMAPtpsa
+  end  INTERFACE
 
   ! i/o
 
@@ -139,6 +157,7 @@ module tpsalie
   INTERFACE DAprint
      MODULE PROCEDURE DAPRINTTAYLORS
      MODULE PROCEDURE DAPRINTMAP
+     MODULE PROCEDURE DAPRINTgMAP
      MODULE PROCEDURE DAPRINTVEC
      MODULE PROCEDURE DAPRINTTAYLOR
      MODULE PROCEDURE DAPRINTpb
@@ -147,6 +166,7 @@ module tpsalie
   INTERFACE print
      MODULE PROCEDURE DAPRINTTAYLORS
      MODULE PROCEDURE DAPRINTMAP
+     MODULE PROCEDURE DAPRINTgMAP
      MODULE PROCEDURE DAPRINTVEC
      MODULE PROCEDURE DAPRINTTAYLOR
      MODULE PROCEDURE DAPRINTpb
@@ -177,10 +197,12 @@ module tpsalie
 
   INTERFACE alloc
      MODULE PROCEDURE A_OPT_damap
+     MODULE PROCEDURE A_OPT_gmap
      MODULE PROCEDURE A_OPT_vecfield
      MODULE PROCEDURE A_OPT_pbfield
      MODULE PROCEDURE A_OPT_tree
      MODULE PROCEDURE allocmap
+     MODULE PROCEDURE allocgmap
      MODULE PROCEDURE allocvec
      MODULE PROCEDURE allocpb
      MODULE PROCEDURE alloctree
@@ -201,10 +223,12 @@ module tpsalie
 
   INTERFACE KILL
      MODULE PROCEDURE k_OPT_damap
+     MODULE PROCEDURE k_OPT_gmap
      MODULE PROCEDURE k_OPT_vecfield
      MODULE PROCEDURE k_OPT_pbfield
      MODULE PROCEDURE k_OPT_tree
      MODULE PROCEDURE KILLmap
+     MODULE PROCEDURE KILLgmap
      MODULE PROCEDURE KILLvec
      MODULE PROCEDURE KILLpb
      MODULE PROCEDURE KILLtree
@@ -228,6 +252,7 @@ module tpsalie
   INTERFACE ASSDAMAP
      MODULE PROCEDURE ASSVEC
      MODULE PROCEDURE ASSMAP
+     MODULE PROCEDURE ASSgMAP
      MODULE PROCEDURE ASSPB
      MODULE PROCEDURE asstaylor
   END INTERFACE
@@ -355,6 +380,24 @@ contains
 
   END SUBROUTINE allocmap
 
+  SUBROUTINE  allocgmap(S1,n)
+    implicit none
+    type (gmap),INTENT(INOUT)::S1
+    integer, optional :: n
+    integer m
+
+    m=nv
+    if(present(n)) m=n
+    s1%n=m
+
+    if(old) then
+       call etall(s1%v%i,s1%n)
+    else
+       call NEWetall(s1%v%j,s1%n)
+    endif
+
+  END SUBROUTINE allocgmap
+
 
   SUBROUTINE  allocvec(S1)
     implicit none
@@ -401,6 +444,16 @@ contains
        call newDADAL(s1%v%j,nd2)
     endif
   END SUBROUTINE KILLmap
+
+  SUBROUTINE  KILLgmap(S1)
+    implicit none
+    type (gmap),INTENT(INOUT)::S1
+    if(old) then
+       call DADAL(s1%v%i,s1%n)
+    else
+       call newDADAL(s1%v%j,s1%n)
+    endif
+  END SUBROUTINE KILLgmap
 
   SUBROUTINE  KILLvec(S1)
     implicit none
@@ -455,6 +508,44 @@ contains
     if(present(s9)) call KILL(s9)
     if(present(s10))call KILL(s10)
   END SUBROUTINE K_OPT_damap
+
+  SUBROUTINE  A_OPT_gmap(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10,n)
+    implicit none
+    type (gmap),INTENT(INout)::S1,S2
+    type (gmap),optional, INTENT(INout):: s3,s4,s5,s6,s7,s8,s9,s10
+    integer, optional :: n
+    integer m
+
+    m=nv
+    if(present(n)) m=n
+
+    call alloc(s1,n=m)
+    call alloc(s2,n=m)
+    if(present(s3)) call alloc(s3,n=m)
+    if(present(s4)) call alloc(s4,n=m)
+    if(present(s5)) call alloc(s5,n=m)
+    if(present(s6)) call alloc(s6,n=m)
+    if(present(s7)) call alloc(s7,n=m)
+    if(present(s8)) call alloc(s8,n=m)
+    if(present(s9)) call alloc(s9,n=m)
+    if(present(s10))call alloc(s10,n=m)
+  END SUBROUTINE A_OPT_gmap
+
+  SUBROUTINE  K_OPT_gmap(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (gmap),INTENT(INout)::S1,S2
+    type (gmap),optional, INTENT(INout):: s3,s4,s5,s6,s7,s8,s9,s10
+    call KILL(s1)
+    call KILL(s2)
+    if(present(s3)) call KILL(s3)
+    if(present(s4)) call KILL(s4)
+    if(present(s5)) call KILL(s5)
+    if(present(s6)) call KILL(s6)
+    if(present(s7)) call KILL(s7)
+    if(present(s8)) call KILL(s8)
+    if(present(s9)) call KILL(s9)
+    if(present(s10))call KILL(s10)
+  END SUBROUTINE K_OPT_gmap
 
   SUBROUTINE  A_OPT_vecfield(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
     implicit none
@@ -624,6 +715,18 @@ contains
     ENDDO
   END SUBROUTINE DAPRINTMAP
 
+  SUBROUTINE  DAPRINTgMAP(S1,MFILE,DEPS)
+    implicit none
+    INTEGER,INTENT(IN)::MFILE
+    type (gmap),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    INTEGER I
+
+    DO I=1,s1%n
+       CALL PRI(s1%V(I),MFILE,DEPS)
+    ENDDO
+  END SUBROUTINE DAPRINTgMAP
+
   SUBROUTINE  DAPRINTTAYLORS(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
@@ -714,6 +817,18 @@ contains
     endif
   END SUBROUTINE DPEKMAP
 
+  SUBROUTINE  DPEKgMAP(S2,S1)
+    implicit none
+    real(dp),INTENT(inOUT),dimension(:)::S2
+    type (gmap),INTENT(IN)::S1
+    call check_snake
+    if(old) then
+       CALL DAPEK0(S1%V%I,S2,s1%n)
+    else
+       CALL newDAPEK0(S1%V%J,S2,s1%n)
+    endif
+  END SUBROUTINE DPEKgMAP
+
   SUBROUTINE  DPOKMAP(S1,S2)
     implicit none
     real(dp),INTENT(IN),dimension(:)::S2
@@ -727,6 +842,18 @@ contains
     endif
   END SUBROUTINE DPOKMAP
 
+  SUBROUTINE  DPOKgMAP(S1,S2)
+    implicit none
+    real(dp),INTENT(IN),dimension(:)::S2
+    type (gmap),INTENT(inOUT)::S1
+    if(old) then
+       if(s1%V(1)%i==0) call crap1("DPOKMAP 1") !call allocw_old(s1%V(1))   !call etall(s1%V%i,ND2)
+       CALL DAPOK0(S1%V%I,S2,s1%n)
+    else
+       if(.NOT. ASSOCIATED(s1%V(1)%j%r))  call crap1("DPOKMAP 2") !  !call allocw_old(s1%V(1))  !call newetall(s1%V%j,ND2)
+       CALL NEWDAPOK0(S1%V%J,S2,s1%n)
+    endif
+  END SUBROUTINE DPOKgMAP
 
   SUBROUTINE  TREEMAP(S1,S2)
     implicit none
@@ -875,6 +1002,18 @@ contains
     enddo
   END SUBROUTINE EQUALMAP
 
+  SUBROUTINE  EQUALgMAP(S2,S1)
+    implicit none
+    type (gmap),INTENT(inOUT)::S2
+    type (gmap),INTENT(IN)::S1
+    integer i
+    call check_snake
+
+    do i=1,s1%n
+       s2%v(i)=s1%v(i)
+    enddo
+  END SUBROUTINE EQUALgMAP
+
 
 
   SUBROUTINE  IdentityEQUALMAP(S2,S1)
@@ -892,6 +1031,23 @@ contains
        IF(S1.EQ.0) CALL NEWDACLRD(S2%V%J)
     endif
   END SUBROUTINE IdentityEQUALMAP
+
+  SUBROUTINE  IdentityEQUALgMAP(S2,S1)
+    implicit none
+    type (gmap),INTENT(inOUT)::S2
+    integer,INTENT(IN)::S1
+    integer i
+
+    do i=1,s2%n
+       if(s1==1) then
+          s2%v(i)=one.mono.i
+       else
+          s2%v(i)=zero
+
+       endif
+    enddo
+
+  END SUBROUTINE IdentityEQUALgMAP
 
 
   SUBROUTINE  zeroEQUALMAP(S2,S1)
@@ -1032,6 +1188,25 @@ contains
 
   END FUNCTION CUTORDER
 
+  FUNCTION CUTORDERg( S1, S2 )
+    implicit none
+    TYPE (gmap) CUTORDERg
+    TYPE (gmap), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: S2
+    INTEGER I
+    integer localmaster
+    localmaster=master
+
+    call assdamap(CUTORDERg)
+
+    DO I=1,ND2
+       CUTORDERg%V(I)=(S1%V(I)).cut.S2
+    ENDDO
+
+    master=localmaster
+
+  END FUNCTION CUTORDERg
+
   FUNCTION CUTORDERPB( S1, S2 )
     implicit none
     TYPE (PBFIELD) CUTORDERPB
@@ -1045,6 +1220,7 @@ contains
 
     CUTORDERPB%H=(S1%H).cut.S2
     master=localmaster
+    CUTORDERPB%ifac=S1%ifac
 
   END FUNCTION CUTORDERPB
 
@@ -1063,6 +1239,7 @@ contains
     DO I=1,ND2
        CUTORDERVEC%V(I)=(S1%V(I)).cut.S2
     ENDDO
+    CUTORDERVEC%ifac=S1%ifac
     master=localmaster
 
   END FUNCTION CUTORDERVEC
@@ -1086,6 +1263,25 @@ contains
     master=localmaster
 
   END FUNCTION GETORDERMAP
+
+  FUNCTION GETORDERgMAP( S1, S2 )
+    implicit none
+    TYPE (gmap) GETORDERgMAP
+    TYPE (gmap), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: S2
+    INTEGER I
+    integer localmaster
+    localmaster=master
+
+    call assdamap(GETORDERgMAP)
+
+    DO I=1,ND2
+       GETORDERgMAP%V(I)=(S1%V(I)).SUB.S2
+    ENDDO
+
+    master=localmaster
+
+  END FUNCTION GETORDERgMAP
 
   FUNCTION GETORDERVEC( S1, S2 )
     implicit none
@@ -1188,6 +1384,7 @@ contains
     call kill(arbre)
   END FUNCTION pushmap
 
+
   FUNCTION push1pol( S1, S2 )
     implicit none
     TYPE (taylor), INTENT (IN) :: S1
@@ -1247,7 +1444,7 @@ contains
        zero_(i)=zero
     enddo
     t1=s1;t2=s2;
-    v1=s2
+    v1=s1     ! change oct 2004.10
     t1=zero_;t2=zero_;
     if(old) then
        call etcct(t1%v%i,t2%v%i,tempnew%v%i)
@@ -1262,6 +1459,43 @@ contains
     master=localmaster
 
   END FUNCTION concat
+
+  FUNCTION concatg(S1,S2)
+    implicit none
+    TYPE (gmap) concatg,t1,t2,tempnew
+    TYPE (gmap), INTENT (IN) :: S1, S2
+    real(dp) v1(lnv),zero_(lnv)
+    integer i
+    integer localmaster
+    localmaster=master
+    concatg%n=s1%n
+    call assdamap(concatg)
+    call alloc(t1,S1%n);call alloc(t2,S1%n);call alloc(tempnew,S1%n);
+
+
+    v1=zero
+    zero_=zero
+
+    t1=s1;t2=s2;
+    v1=s2
+    t1=zero_;t2=zero_;
+    if(old) then
+       call getcct(t1%v%i,t2%v%i,tempnew%v%i,s1%n)
+       do i=1,s1%n
+          call dacop(tempnew%v(i)%i,concatg%v(i)%i)
+       enddo
+    else
+       call NEWgetcct(t1%v%J,t2%v%J,tempnew%v%j,s1%n)
+       do i=1,s1%n
+          call newdacop(tempnew%v(i)%j,concatg%v(i)%j)
+       enddo
+    endif
+    concatg=v1
+
+    call kill(t1);call kill(t2);call kill(tempnew);
+    master=localmaster
+
+  END FUNCTION concatg
 
   FUNCTION concator( S1, S2 )
     implicit none
@@ -1287,6 +1521,34 @@ contains
     call kill(tempnew)
 
   END FUNCTION concator
+
+  FUNCTION concatorg( S1, S2 )
+    implicit none
+    TYPE (gmap) concatorg
+    TYPE (gmap), INTENT (IN) :: S1, S2
+    TYPE (gmap) tempnew
+    integer localmaster,i
+    localmaster=master
+    call alloc(tempnew)
+    concatorg%n=s1%n
+    call assdamap(concatorg)
+
+    if(old) then
+       call getcct(s1%v%i,s2%v%i,tempnew%v%i,s1%n)
+       do i=1,s1%n
+          call dacop(tempnew%v(i)%i,concatorg%v(i)%i)
+       enddo
+    else
+       call NEWgetcct(s1%v%J,s2%v%J,tempnew%v%j,s1%n)
+       do i=1,s1%n
+          call newdacop(tempnew%v(i)%j,concatorg%v(i)%j)
+       enddo
+    endif
+
+    master=localmaster
+    call kill(tempnew)
+
+  END FUNCTION concatorg
 
 
   FUNCTION trxflow(S2,S1)
@@ -1320,94 +1582,98 @@ contains
 
     call kill(s22,tempnew)
     master=localmaster
+    trxflow%IFAC=S1%IFAC
   END FUNCTION trxflow
 
-  FUNCTION trxflowc(S1, S2 )
-    implicit none
-    TYPE (vecfield) trxflowc
-    TYPE (vecfield), INTENT (IN) :: S1
-    TYPE (damap), INTENT (IN) ::  S2
-    TYPE (damap) tempnew
-    integer localmaster
-    localmaster=master
-
-    call alloc(tempnew)
-    call checkdamap(s1)
-    call checkdamap(s2)
-    call assdamap(trxflowc)
-
-    if(old) then
-       call trxflo(s1%v%i,tempnew%v%i,s2%v%i)
-       call dacopd(tempnew%v%i,trxflowc%v%i)
-    else
-       call NEWtrxflo(s1%v%J,tempnew%v%J,s2%v%J)
-       call NEWdacopd(tempnew%v%J,trxflowc%v%J)
-    endif
-
-    master=localmaster
-    call kill(tempnew)
-
-  END FUNCTION trxflowc
-
+  !  FUNCTION trxflowc(S1, S2 )
+  !    implicit none
+  !    TYPE (vecfield) trxflowc
+  !    TYPE (vecfield), INTENT (IN) :: S1
+  !    TYPE (damap), INTENT (IN) ::  S2
+  !    TYPE (damap) tempnew
+  !    integer localmaster
+  !    localmaster=master
+  !
+  !    call alloc(tempnew)
+  !    call checkdamap(s1)
+  !    call checkdamap(s2)
+  !    call assdamap(trxflowc)
+  !
+  !    if(old) then
+  !       call trxflo(s1%v%i,tempnew%v%i,s2%v%i)
+  !       call dacopd(tempnew%v%i,trxflowc%v%i)
+  !    else
+  !       call NEWtrxflo(s1%v%J,tempnew%v%J,s2%v%J)
+  !       call NEWdacopd(tempnew%v%J,trxflowc%v%J)
+  !    endif
+  !
+  !    master=localmaster
+  !    call kill(tempnew)
+  !
+  !  END FUNCTION trxflowc
+  !
 
   FUNCTION trxpb( S2, S1 )
     implicit none
     TYPE (pbfield) trxpb
     TYPE (pbfield), INTENT (IN) :: S1
     TYPE (damap), INTENT (IN) ::  S2
-    TYPE (damap) S22
-    real(dp) zero_(ndim2)
-    integer i
+    !    TYPE (damap) S22
+    !    real(dp) zero_(ndim2)
+    !    integer i
     integer localmaster
     localmaster=master
 
-    call alloc(s22)
+    !    call alloc(s22)
     call checkdamap(s1)
     call checkdamap(s2)
     call assdamap(trxpb)
 
-    do i=1,nd2
-       zero_(i)=zero
-    enddo
-    s22=s2
-    s22=zero_
 
-    if(old) then
-       call trx(s1%h%i,temp,s22%v%i)
-       call dacop(temp,trxpb%h%i)
-    else
-       call NEWtrx(s1%h%J,tempL,s22%v%J)
-       call NEWdacop(tempL,trxpb%h%J)
-    endif
+    trxpb%h=s1%h*s2
 
-    call kill(s22)
+    !    do i=1,nd2
+    !       zero_(i)=zero
+    !    enddo
+    !    s22=s2
+    !    s22=zero_
+
+    !    if(old) then
+    !       call trx(s1%h%i,temp,s22%v%i)
+    !       call dacop(temp,trxpb%h%i)
+    !    else
+    !       call NEWtrx(s1%h%J,tempL,s22%v%J)
+    !       call NEWdacop(tempL,trxpb%h%J)
+    !    endif
+    !    call kill(s22)
     master=localmaster
+    trxpb%ifac=S1%ifac
 
   END FUNCTION trxpb
 
-  FUNCTION trxpbc( S2, S1 )
-    implicit none
-    TYPE (pbfield) trxpbc
-    TYPE (pbfield), INTENT (IN) :: S1
-    TYPE (damap), INTENT (IN) ::  S2
-    integer localmaster
-    localmaster=master
-
-    call checkdamap(s1)
-    call checkdamap(s2)
-    call assdamap(trxpbc)
-
-    if(old) then
-       call trx(s1%h%i,temp,s2%v%i)
-       call dacop(temp,trxpbc%h%i)
-    else
-       call NEWtrx(s1%h%J,tempL,s2%v%J)
-       call NEWdacop(tempL,trxpbc%h%J)
-    endif
-
-    master=localmaster
-
-  END FUNCTION trxpbc
+  !  FUNCTION trxpbc( S2, S1 )
+  !    implicit none
+  !    TYPE (pbfield) trxpbc
+  !    TYPE (pbfield), INTENT (IN) :: S1
+  !    TYPE (damap), INTENT (IN) ::  S2
+  !    integer localmaster
+  !    localmaster=master
+  !
+  !    call checkdamap(s1)
+  !    call checkdamap(s2)
+  !    call assdamap(trxpbc)
+  !
+  !    if(old) then
+  !       call trx(s1%h%i,temp,s2%v%i)
+  !       call dacop(temp,trxpbc%h%i)
+  !    else
+  !       call NEWtrx(s1%h%J,tempL,s2%v%J)
+  !       call NEWdacop(tempL,trxpbc%h%J)
+  !    endif
+  !
+  !    master=localmaster
+  !
+  !  END FUNCTION trxpbc
 
   FUNCTION trxtaylor( S1, S2 )
     implicit none
@@ -1446,6 +1712,41 @@ contains
 
   END FUNCTION trxtaylor
 
+  FUNCTION trxgtaylor( S1, S2 )
+    implicit none
+    TYPE (taylor) trxgtaylor
+    TYPE (taylor), INTENT (IN) :: S1
+    TYPE (gmap), INTENT (IN) ::  S2
+    TYPE (gmap)  S22
+    real(dp) zero_(ndim2)
+    integer i
+    integer localmaster
+    localmaster=master
+
+    do i=1,nd2
+       zero_(i)=zero
+    enddo
+
+
+    call assdamap(trxgtaylor)
+
+    call alloc(s22,s2%n)
+
+    s22=s2
+    s22=zero_
+    if(old) then
+       call gtrx(s1%i,temp,s22%v%i,s2%n)
+       call dacop(temp,trxgtaylor%i)
+    else
+       call NEWgtrx(s1%J,tempL,s22%v%J,s2%n)
+       call NEWdacop(tempL,trxgtaylor%J)
+    endif
+
+    call kill(s22)
+    master=localmaster
+
+  END FUNCTION trxgtaylor
+
   FUNCTION trxtaylorc( S1, S2 )
     implicit none
     TYPE (taylor) trxtaylorc
@@ -1469,6 +1770,28 @@ contains
     master=localmaster
 
   END FUNCTION trxtaylorc
+
+  FUNCTION trxgtaylorc( S1, S2 )
+    implicit none
+    TYPE (taylor) trxgtaylorc
+    TYPE (taylor), INTENT (IN) :: S1
+    TYPE (gmap), INTENT (IN) ::  S2
+    integer localmaster
+    localmaster=master
+
+    call assdamap(trxgtaylorc)
+
+    if(old) then
+       call gtrx(s1%i,temp,s2%v%i,s2%n)
+       call dacop(temp,trxgtaylorc%i)
+    else
+       call NEWgtrx(s1%J,tempL,s2%v%J,s2%n)
+       call NEWdacop(tempL,trxgtaylorc%J)
+    endif
+
+    master=localmaster
+
+  END FUNCTION trxgtaylorc
 
 
 
@@ -1908,7 +2231,7 @@ contains
 
     R22=IABS(R2)
     DO I=1,R22
-       s11=s11*s1
+       s11=s1*s11
     ENDDO
 
     IF(R2.LT.0) THEN
@@ -1928,6 +2251,153 @@ contains
     master=localmaster
 
   END FUNCTION POWMAP
+
+  FUNCTION gPOWMAP( S1, R2 )
+    implicit none
+    TYPE (gmap) gPOWMAP
+    TYPE (gmap), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2
+    TYPE (gmap) S11
+    INTEGER I,R22
+    integer localmaster
+    localmaster=master
+
+    gPOWMAP%n=s1%n
+    call assdamap(gPOWMAP)
+
+    call alloc(s11,s1%n)
+
+    s11=1
+
+
+    R22=IABS(R2)
+    DO I=1,R22
+       s11=s11*s1
+    ENDDO
+
+    IF(R2.LT.0) THEN
+       if(old) then
+          CALL getinv(S11%v%i,S11%v%i,s11%n)
+       else
+          CALL newgetinv(S11%v%j,S11%v%j,s11%n)
+       endif
+    ENDIF
+
+    gpowmap=s11
+
+
+    ! powmap=junk
+    call kill(s11)
+
+    master=localmaster
+
+  END FUNCTION gPOWMAP
+
+  FUNCTION gPOWMAPtpsa( S1, R2 )
+    implicit none
+    TYPE (gmap) gPOWMAPtpsa
+    TYPE (gmap), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2
+    TYPE (gmap) S11,s0
+    INTEGER I,R22
+    integer localmaster
+    real(dp), allocatable :: v(:)
+
+    localmaster=master
+
+    gPOWMAPtpsa%n=s1%n
+    call assdamap(gPOWMAPtpsa)
+
+    call alloc(s11,s1%n)
+    call alloc(s0,s1%n)
+
+    s11=1
+
+
+    R22=IABS(R2)
+    DO I=1,R22
+       s11=s11.o.s1
+    ENDDO
+    allocate(v(s1%n))
+
+    DO I=1,s1%n
+       v(i)=s11%v(i).sub.'0'
+    ENDDO
+
+
+
+    IF(R2.LT.0) THEN
+       if(old) then
+          CALL getinv(S11%v%i,S11%v%i,s11%n)
+       else
+          CALL newgetinv(S11%v%j,S11%v%j,s11%n)
+       endif
+    ENDIF
+
+    do i=1,s1%n
+       s0%v(i)=(1.d0.mono.i)-v(i)
+       !s11%v(i)=s11%v(i)-(s11%v(i).sub.'0')
+    enddo
+
+    !     s0=s11.o.s0
+    s11=s11.o.s0
+
+    do i=1,s1%n
+       gPOWMAPtpsa%v(i)=s11%v(i) !+ (s0%v(i).sub.'0')
+    enddo
+
+
+
+
+
+
+    ! powmap=junk
+    call kill(s11,s0)
+    deallocate(v)
+
+    master=localmaster
+
+  END FUNCTION gPOWMAPtpsa
+
+  FUNCTION POWMAP_INV( S1, R2 )
+    implicit none
+    TYPE (damap) POWMAP_INV
+    TYPE (damap), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2(:)
+    TYPE (damap) S11
+    INTEGER I,jn(lnv)
+    integer localmaster
+    localmaster=master
+
+    do i=1,lnv
+       jn(i)=0
+    enddo
+    do i=1,nd2
+       jn(i)=R2(I)
+    enddo
+    call checkdamap(s1)
+
+    call assdamap(POWMAP_INV)
+
+    call alloc(s11)
+
+    if(old) then
+       if(s1%v(1)%i==0) call crap1("POWMAP_INV 2")  !call etall(s2%m%v%i,nd2)
+       call etpin(S1%V%i,S11%v%i,jn)
+    else
+       if(.NOT. ASSOCIATED(s1%v(1)%J%r)) call crap1("POWMAP_INV 4")  !call newetall(s2%m%v%J,nd2)
+       call newetpin(S1%v%j,s11%v%j,jn)
+    endif
+
+    POWMAP_INV=s11
+
+
+    ! powmap=junk
+    call kill(s11)
+
+    master=localmaster
+
+  END FUNCTION POWMAP_INV
 
 
   subroutine checkmap(s1)
@@ -2124,6 +2594,28 @@ contains
     enddo
 
   end subroutine assmap
+
+  subroutine assgmap(s1)
+    implicit none
+    TYPE (gmap) s1
+    integer i
+
+    select case(master)
+    case(0:ndumt-1)
+       master=master+1
+    case(ndumt)
+       w_p=0
+       w_p%nc=1
+       w_p=(/" cannot indent anymore "/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(100)
+    end select
+
+    do i=1,s1%n
+       call ass0(s1%v(i))
+    enddo
+
+  end subroutine assgmap
 
   !Radiation
   SUBROUTINE  allocrad(S1)

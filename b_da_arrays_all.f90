@@ -7,7 +7,7 @@ module da_arrays
   use scratch_size
   implicit none
   integer lda,lea,lia,lst
-  integer,parameter::lno=120,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=3000,leamax=5000,liamax=50000
+  integer,parameter::lno=200,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
   logical(lp) :: reallocate = .true.
   logical(lp) :: notallocated = .true.
   logical(lp),parameter::etiennefix=.true.
@@ -22,7 +22,7 @@ module da_arrays
   logical(lp), allocatable,dimension(:)::allvec                            !lda
 
   integer nda,ndamaxi
-  real(dp),TARGET :: total_da_size = 200.D0
+  real(dp),TARGET :: total_da_size = 300.D0
   integer nst,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole

@@ -7,6 +7,7 @@ module S_status
   use anbn
   USE S_pol_user1
   USE S_pol_user2
+  Use S_pol_sagan
   implicit none
 
   integer,private,parameter::ST=30
@@ -34,9 +35,11 @@ module S_status
   integer, parameter :: KIND20 =ST+20     !  MADLIKE wedges on RBEND
   integer, parameter :: KIND21 =ST+21     !  travelling wave cavity
   integer, parameter :: KIND22 =ST+22     !  travelling wave cavity
-  integer, parameter :: KINDFITTED = KIND22+1
-  integer, parameter :: KINDUSER1 = KIND22+2
-  integer, parameter :: KINDUSER2 = KIND22+3
+  integer, parameter :: KIND23 =ST+23     !  travelling wave cavity
+  integer, parameter :: KINDFITTED = KIND23+1
+  integer, parameter :: KINDUSER1 = KIND23+2
+  integer, parameter :: KINDUSER2 = KIND23+3
+  integer, parameter :: KINDwiggler = KIND23+4
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6
@@ -48,8 +51,6 @@ module S_status
   LOGICAL(lp),TARGET  :: NEW_METHOD=.FALSE.
   character(6) ind_stoc(ndim2)
   !  Making PTC leaner is false
-  LOGICAL(lp),TARGET   :: with_internal_frame = .true.
-  !LOGICAL(lp),TARGET   :: use_external_tilt = .true.
   !
 
   integer, target :: MADKIND2=KIND2
@@ -84,10 +85,12 @@ module S_status
   real(dp), target :: muon=one
   LOGICAL(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   INTEGER,PARAMETER::NMAX=20
-  TYPE INTERNAL_STATE
-     LOGICAL(lp) TOTALPATH,TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS
-     LOGICAL(lp) PARA_IN,ONLY_4D,DELTA  ! DA related
-  END TYPE INTERNAL_STATE
+  include "a_def_all_kind.inc"
+  include "a_def_sagan.inc"
+  include "a_def_user1.inc"
+  !!  include "a_def_arbitrary.inc"
+  include "a_def_user2.inc"
+  include "a_def_element_fibre_layout.inc"
   TYPE(INTERNAL_STATE), target ::  DEFAULT
   TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME,EXACTMIS
   TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA
@@ -113,66 +116,8 @@ module S_status
   private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
-  PRIVATE B2PERPR,B2PERPP,S_init_berz0
+  PRIVATE B2PERPR,B2PERPP !,S_init_berz0
 
-  type work
-     real(dp) beta0,energy,kinetic,p0c,brho,gamma0I,gambet
-     real(dp) mass
-     LOGICAL(lp) rescale
-  end type work
-
-
-  TYPE POL_BLOCK
-     CHARACTER(nlp) NAME
-     CHARACTER(vp) VORNAME
-     ! STUFF FOR SETTING MAGNET USING GLOBAL ARRAY TPSAFIT
-     real(dp),DIMENSION(:), POINTER :: TPSAFIT
-     LOGICAL(lp), POINTER ::  SET_TPSAFIT
-     ! STUFF FOR PARAMETER DEPENDENCE
-     INTEGER NPARA
-     INTEGER IAN(NMAX),IBN(NMAX)
-     real(dp) SAN(NMAX),SBN(NMAX)
-     INTEGER IVOLT, IFREQ,IPHAS
-     INTEGER IB_SOL
-     real(dp) SVOLT, SFREQ,SPHAS
-     real(dp) SB_SOL
-     ! User defined Functions
-     TYPE(POL_BLOCK1) USER1
-     TYPE(POL_BLOCK2) USER2
-  END TYPE POL_BLOCK
-
-  TYPE MADX_APERTURE
-     INTEGER,pointer ::  KIND   ! 1,2,3,4
-     REAL(DP),pointer :: R(:)
-     REAL(DP),pointer :: X,Y
-  END TYPE MADX_APERTURE
-
-  TYPE MAGNET_CHART
-     type(magnet_frame), pointer:: f
-     type(MADX_APERTURE), pointer:: APERTURE
-     integer,pointer :: charge  ! propagator
-     integer,pointer :: dir    ! propagator
-     real(dp), POINTER :: LD,B0,LC         !
-     real(dp), POINTER :: TILTD      ! INTERNAL FRAME
-     real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,P0C
-     !frs     real(dp),  DIMENSION(:), POINTER :: EDGE(:)      ! INTERNAL FRAME
-     real(dp),  DIMENSION(:), POINTER :: EDGE         ! INTERNAL FRAME
-
-     !
-     INTEGER, POINTER :: TOTALPATH                    !
-     LOGICAL(lp), POINTER :: EXACT,RADIATION,NOCAVITY     !       STATE
-     LOGICAL(lp), POINTER :: FRINGE,KILL_ENT_FRINGE,KILL_EXI_FRINGE,TIME, bend_fringe                  !
-     !
-     INTEGER, POINTER :: METHOD,NST                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA
-     INTEGER, POINTER :: NMUL                         ! NUMBER OF MULTIPOLE
-
-  END TYPE MAGNET_CHART
-
-
-  TYPE tilting
-     real(dp) tilt(0:nmax)
-     LOGICAL(lp) natural                 ! for mad-like
-  END TYPE tilting
   type(tilting) tilt
   private minu
   real(dp) MADFAC(NMAX)
@@ -211,7 +156,7 @@ module S_status
 
   INTERFACE init
      MODULE PROCEDURE s_init
-     MODULE PROCEDURE S_init_berz0
+     !     MODULE PROCEDURE S_init_berz0
      MODULE PROCEDURE S_init_berz
   END INTERFACE
 
@@ -327,9 +272,7 @@ CONTAINS
     P%KILL_ENT_FRINGE=.FALSE.
     P%KILL_EXI_FRINGE=.FALSE.
     P%bend_fringe=.false.
-    if(with_internal_frame) then
-       call alloc(p%f)
-    endif
+    call alloc(p%f)
     ! if(junk) ccc=ccc+1
 
   end subroutine alloc_p
@@ -633,39 +576,37 @@ CONTAINS
     type (INTERNAL_STATE),INTENT(INOUT)::S
     INTEGER MF
 
-    w_p=0
-    w_p%nc=16
-    w_p%fc='(16(1X,A72,/))'
-    w_p%c(1) = "************ State Summary ****************"
-    write(w_p%c(2),'((1X,a16,1x,i4,1x,a24))' ) "MADTHICK=>KIND =", MADKIND2,Mytype(MADKIND2)
+
+    write(mf,*) "************ State Summary ****************"
+    write(mf,'((1X,a16,1x,i4,1x,a24))' ) "MADTHICK=>KIND =", MADKIND2,Mytype(MADKIND2)
     if(MADLENGTH) then
-       w_p%c(3) = ' Rectangular Bend: input cartesian length '
+       write(mf,*) ' Rectangular Bend: input cartesian length '
     else
-       w_p%c(3) = ' Rectangular Bend: input arc length (rho alpha) '
+       write(mf,*) ' Rectangular Bend: input arc length (rho alpha) '
     endif
-    write(w_p%c(4),'((1X,a28,1x,i4))' ) ' Default integration method ',METD
-    write(w_p%c(5),'((1X,a28,1x,i4))' ) ' Default integration steps  ',NSTD
+    write(mf,'((1X,a28,1x,i4))' ) ' Default integration method ',METD
+    write(mf,'((1X,a28,1x,i4))' ) ' Default integration steps  ',NSTD
 
     If(electron) then
        if(muon==one)  then
-          w_p%c(6) = "This is an electron (positron actually) "
+          write(mf,*)"This is an electron (positron actually) "
        else
-          write(w_p%c(6),'((1X,a21,1x,G20.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
+          write(mf,'((1X,a21,1x,G20.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
        endif
     else
-       w_p%c(6) = "This is a proton "
+       write(mf,*) "This is a proton "
     endif
-    write(w_p%c(7), '((1X,a20,1x,a5))' )  "      EXACT_MODEL = ", CONV(EXACT_MODEL    )
-    write(w_p%c(8), '((1X,a20,1x,a5))' )  "      TOTALPATH   = ", CONV(S%TOTALPATH)
-    write(w_p%c(9), '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
-    write(w_p%c(10),'((1X,a20,1x,a5))' ) "      RADIATION   = ", CONV(S%RADIATION  )
-    write(w_p%c(11),'((1X,a20,1x,a5))' ) "      NOCAVITY    = ", CONV(S%NOCAVITY )
-    write(w_p%c(12),'((1X,a20,1x,a5))' ) "      TIME        = ", CONV(S%TIME )
-    write(w_p%c(13),'((1X,a20,1x,a5))' ) "      FRINGE      = ", CONV(S%FRINGE   )
-    write(w_p%c(14),'((1X,a20,1x,a5))' ) "      PARA_IN     = ", CONV(S%PARA_IN  )
-    write(w_p%c(15),'((1X,a20,1x,a5))' ) "      ONLY_4D     = ", CONV(S%ONLY_4D   )
-    write(w_p%c(16),'((1X,a20,1x,a5))' ) "      DELTA       = ", CONV(S%DELTA    )
-    CALL WRITE_I
+    write(mf, '((1X,a20,1x,a5))' )  "      EXACT_MODEL = ", CONV(EXACT_MODEL    )
+    write(mf, '((1X,a20,1x,a5))' )  "      TOTALPATH   = ", CONV(S%TOTALPATH)
+    write(mf, '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
+    write(mf,'((1X,a20,1x,a5))' ) "      RADIATION   = ", CONV(S%RADIATION  )
+    write(mf,'((1X,a20,1x,a5))' ) "      NOCAVITY    = ", CONV(S%NOCAVITY )
+    write(mf,'((1X,a20,1x,a5))' ) "      TIME        = ", CONV(S%TIME )
+    write(mf,'((1X,a20,1x,a5))' ) "      FRINGE      = ", CONV(S%FRINGE   )
+    write(mf,'((1X,a20,1x,a5))' ) "      PARA_IN     = ", CONV(S%PARA_IN  )
+    write(mf,'((1X,a20,1x,a5))' ) "      ONLY_4D     = ", CONV(S%ONLY_4D   )
+    write(mf,'((1X,a20,1x,a5))' ) "      DELTA       = ", CONV(S%DELTA    )
+    !   CALL WRITE_I
   end subroutine print_s
 
   FUNCTION CONV(LOG)
@@ -749,7 +690,7 @@ CONTAINS
     ENDIF
     IF(add%ONLY_4D) THEN
        add%TOTALPATH=  F
-       add%RADIATION  =  F
+!       add%RADIATION  =  F
        add%NOCAVITY =  T
     ENDIF
 
@@ -776,7 +717,7 @@ CONTAINS
     ENDIF
     IF(sub%ONLY_4D) THEN
        sub%TOTALPATH=  F
-       sub%RADIATION  =  F
+!       sub%RADIATION  =  F
        sub%NOCAVITY =  T
     ENDIF
 
@@ -836,7 +777,7 @@ CONTAINS
 
   END  subroutine S_init
 
-  subroutine S_init_berz0(STATE,NO1,NP1)
+  subroutine init_default(STATE,NO1,NP1)
     implicit none
     TYPE (INTERNAL_STATE),OPTIONAL, INTENT(IN):: STATE
     INTEGER, OPTIONAL, INTENT(IN):: NO1,NP1
@@ -851,7 +792,7 @@ CONTAINS
     call init(STATE2,NO2,NP2,my_true,ND2,NPARA)
     C_%NPARA=NPARA
     C_%ND2=ND2
-  END  subroutine S_init_berz0
+  END  subroutine init_default
 
   subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
     implicit none
@@ -1135,4 +1076,3 @@ CONTAINS
   END SUBROUTINE DTILTS_EXTERNAL
 
 end module S_status
-

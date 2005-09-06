@@ -17,6 +17,9 @@ MODULE S_TRACKING
   PRIVATE TRACK_FIBRE_R,TRACK_FIBRE_P,TRACK_FIBRE_S
   PRIVATE TRACK_LAYOUT_FLAG_R1f,TRACK_LAYOUT_FLAG_P1f,TRACK_LAYOUT_FLAG_S1f
   PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf,TRACK_LAYOUT_FLAG_Sf
+  ! old Sj_elements
+  PRIVATE TRACKR,TRACKP,TRACKS
+  ! END old Sj_elements
 
   ! TYPE UPDATING
   !    logical(lp) UPDATE
@@ -38,7 +41,15 @@ MODULE S_TRACKING
      MODULE PROCEDURE TRACK_FIBRE_R
      MODULE PROCEDURE TRACK_FIBRE_P
      MODULE PROCEDURE TRACK_FIBRE_S
+     ! old Sj_elements
+     !  INTERFACE TRACK
+     MODULE PROCEDURE TRACKR
+     MODULE PROCEDURE TRACKP
+     MODULE PROCEDURE TRACKS
+     !  END INTERFACE
+     ! END old Sj_elements
   END INTERFACE
+
 
   INTERFACE TRACK_FLAG
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_R1f
@@ -57,8 +68,233 @@ MODULE S_TRACKING
 
 
 contains
+  ! old Sj_elements
 
-  integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k,X_IN)
+
+  SUBROUTINE TRACKR(EL,X,MID,K)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(ELEMENT),INTENT(INOUT):: EL
+    TYPE(WORM),OPTIONAL, INTENT(INOUT):: MID
+    TYPE(INTERNAL_STATE) K
+
+    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    SELECT CASE(EL%KIND)
+    CASE(KIND0)
+       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    case(KIND1)
+       CALL TRACK(EL%D0,X,MID)
+    case(KIND2)
+       CALL TRACK(EL%K2,X,MID)
+    case(KIND3)
+       CALL TRACK(EL%K3,X,MID)
+    case(KIND4)
+       CALL TRACK(EL%C4,X,MID)
+    case(KIND5)
+       CALL TRACK(EL%S5,X,MID)
+    case(KIND6)
+       CALL TRACK(EL%T6,X,MID)
+    case(KIND7)
+       CALL TRACK(EL%T7,X,MID)
+    case(KIND8)
+       CALL TRACK(EL%S8,X,MID)
+    case(KIND9)
+       CALL TRACK(EL%S9,X,MID)
+    case(KIND10)
+       CALL TRACK(EL%TP10,X,MID)
+    CASE(KIND11:KIND14)
+       call TRACK(EL%MON14,X,MID)
+    CASE(KIND15)
+       call TRACK(EL%SEP15,X,MID)
+    CASE(KIND16,KIND20)
+       call TRACK(EL%K16,X,MID)
+    CASE(KIND17)
+       call TRACK(EL%S17,X,MID)
+    CASE(KIND18)
+       call TRACK(EL%RCOL18,X,MID)
+    CASE(KIND19)
+       call TRACK(EL%ECOL19,X,MID)
+    CASE(KIND21)
+       call TRACK(EL%CAV21,X,MID)
+    CASE(KIND22)
+       call TRACK(EL%M22,X,MID)
+    CASE(KIND23)
+       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+       if(el%p%dir==1) then
+          call TRACK(EL%G23,X,1,K)
+       else
+          call TRACK(EL%G23,X,EL%G23%N,0,K)
+       endif
+       IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    case(KINDFITTED)
+       call track(el%bend,x,MID)
+    case(KINDUSER1)
+       call TRACK(EL%U1,X,MID)
+    case(KINDUSER2)
+       call TRACK(EL%U2,X,MID)
+    case(KINDWIGGLER)
+       call TRACK(EL%WI,X,MID)
+    case default
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKR"
+       CALL WRITE_E(0)
+    END SELECT
+  END SUBROUTINE TRACKR
+
+  SUBROUTINE TRACKP(EL,X,MID,K)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(ELEMENTP),INTENT(INOUT):: EL
+    TYPE(WORM_8),OPTIONAL, INTENT(INOUT):: MID
+    TYPE(INTERNAL_STATE) K
+
+    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    SELECT CASE(EL%KIND)
+    CASE(KIND0)
+       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    case(KIND1)
+       CALL TRACK(EL%D0,X,MID)
+    case(KIND2)
+       CALL TRACK(EL%K2,X)
+    case(KIND3)
+       CALL TRACK(EL%K3,X,MID)
+    case(KIND4)
+       CALL TRACK(EL%C4,X,MID)
+    case(KIND5)
+       CALL TRACK(EL%S5,X,MID)
+    case(KIND6)
+       CALL TRACK(EL%T6,X,MID)
+    case(KIND7)
+       CALL TRACK(EL%T7,X,MID)
+    case(KIND8)
+       CALL TRACK(EL%S8,X,MID)
+    case(KIND9)
+       CALL TRACK(EL%S9,X,MID)
+    case(KIND10)
+       CALL TRACK(EL%TP10,X,MID)
+    CASE(KIND11:KIND14)
+       call TRACK(EL%MON14,X,MID)
+    CASE(KIND15)
+       call TRACK(EL%SEP15,X,MID)
+    CASE(KIND16,KIND20)
+       call TRACK(EL%K16,X,MID)
+    CASE(KIND17)
+       call TRACK(EL%S17,X,MID)
+    CASE(KIND18)
+       call TRACK(EL%RCOL18,X,MID)
+    CASE(KIND19)
+       call TRACK(EL%ECOL19,X,MID)
+    CASE(KIND21)
+       call TRACK(EL%CAV21,X,MID)
+    CASE(KIND22)
+       call TRACK(EL%M22,X,MID)
+    CASE(KIND23)
+       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+       if(el%p%dir==1) then
+          call TRACK(EL%G23,X,1,K)
+       else
+          call TRACK(EL%G23,X,EL%G23%N,0,K)
+       endif
+       IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    case(KINDFITTED)
+       call tracK(el%bend,x,MID)
+    case(KINDUSER1)
+       call TRACK(EL%U1,X,MID)
+    case(KINDUSER2)
+       call TRACK(EL%U2,X,MID)
+    case(KINDWIGGLER)
+       call TRACK(EL%WI,X,MID)
+    case default
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKP"
+       CALL WRITE_E(0)
+    END SELECT
+  END SUBROUTINE TRACKP
+
+  SUBROUTINE TRACKS(EL,X,MID,K)
+    IMPLICIT NONE
+    TYPE(ENV_8),INTENT(INOUT):: X(6)
+    TYPE(ELEMENTP),INTENT(INOUT):: EL
+    TYPE(INNER_ENV_8_DATA),OPTIONAL, INTENT(INOUT):: MID
+    TYPE(INTERNAL_STATE) K
+
+    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    SELECT CASE(EL%KIND)
+    CASE(KIND0)
+       !       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    case(KIND1)
+       CALL TRACK(EL%D0,X)
+    case(KIND2)
+       CALL TRACK(EL%K2,X)
+    case(KIND3)
+       CALL TRACK(EL%K3,X)
+    case(KIND4)
+       CALL TRACK(EL%C4,X)
+    case(KIND5)
+       CALL TRACK(EL%S5,X)
+    case(KIND6)
+       CALL TRACK(EL%T6,X)
+    case(KIND7)
+       CALL TRACK(EL%T7,X)
+    case(KIND8)
+       CALL TRACK(EL%S8,X)
+    case(KIND9)
+       CALL TRACK(EL%S9,X)
+    case(KIND10)
+       CALL TRACK(EL%TP10,X)
+    CASE(KIND11:KIND14)
+       call TRACK(EL%MON14,X)
+    CASE(KIND15)
+       call TRACK(EL%SEP15,X)
+    CASE(KIND16,KIND20)
+       call TRACK(EL%K16,X)
+    CASE(KIND17)
+       call TRACK(EL%S17,X)
+    CASE(KIND18)
+       call TRACK(EL%RCOL18,X)
+    CASE(KIND19)
+       call TRACK(EL%ECOL19,X)
+    CASE(KIND21)
+       call TRACK(EL%CAV21,X)
+    CASE(KIND22)
+       call TRACK(EL%M22,X)
+    CASE(KIND23)
+       if(el%p%dir==1) then
+          call TRACK(EL%G23,X,1,K)
+       else
+          call TRACK(EL%G23,X,EL%G23%N,0,K)
+       endif
+    case(KINDUSER1)
+       call TRACK(EL%U1,X)
+    case(KINDUSER2)
+       call TRACK(EL%U2,X)
+    case(KINDWIGGLER)
+       call TRACK(EL%WI,X)
+    case(KINDFITTED)
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       w_p%c(1)= "KINDFITTED not supported "
+       CALL WRITE_E(0)
+    case default
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKS"
+       CALL WRITE_E(0)
+    END SELECT
+
+
+
+  END SUBROUTINE TRACKS
+
+  ! END old Sj_elements
+
+  recursive integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k,X_IN)
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -71,7 +307,7 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_R1f
 
-  integer function TRACK_LAYOUT_FLAG_P1f(R,X,II1,k,X_IN)
+  recursive   integer function TRACK_LAYOUT_FLAG_P1f(R,X,II1,k,X_IN)
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(REAL_8), INTENT(INOUT):: X(6)
@@ -84,7 +320,7 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_P1f
 
-  integer function TRACK_LAYOUT_FLAG_S1f(R,X,II1,k,X_IN)
+  recursive   integer function TRACK_LAYOUT_FLAG_S1f(R,X,II1,k,X_IN)
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -98,7 +334,7 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_S1f
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
+  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -119,7 +355,7 @@ contains
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
   END SUBROUTINE TRACK_LAYOUT_FLAG_R1
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_P1(R,X,II1,k,X_IN) ! Tracks polymorphs from II1 to the end or back to II1 if closed
+  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_P1(R,X,II1,k,X_IN) ! Tracks polymorphs from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(REAL_8), INTENT(INOUT):: X(6)
@@ -141,7 +377,7 @@ contains
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_P1
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_S1(R,X,II1,k,X_IN) ! Tracks envelope from II1 to the end or back to II1 if closed
+  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_S1(R,X,II1,k,X_IN) ! Tracks envelope from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -163,7 +399,7 @@ contains
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
   END SUBROUTINE TRACK_LAYOUT_FLAG_S1
 
-  integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  recursive   integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -176,7 +412,7 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_Rf
 
-  integer function TRACK_LAYOUT_FLAG_Pf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  recursive   integer function TRACK_LAYOUT_FLAG_Pf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
@@ -187,7 +423,7 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_Pf
 
-  integer function TRACK_LAYOUT_FLAG_Sf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  recursive   integer function TRACK_LAYOUT_FLAG_Sf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -201,7 +437,7 @@ contains
   end  function TRACK_LAYOUT_FLAG_Sf
 
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -214,18 +450,35 @@ contains
 
     CALL RESET_APERTURE_FLAG
 
+
+
     call move_to(r,c,MOD_N(I1,R%N))
 
+    if(i2>i1) then
+       J=I1
 
-    J=I1
+       DO  WHILE(J<I2.AND.ASSOCIATED(C))
 
-    DO  WHILE(J<I2.AND.ASSOCIATED(C))
+          CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
-       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+          C=>C%NEXT
+          J=J+1
+       ENDDO
+    else
+       J=I1
 
-       C=>C%NEXT
-       J=J+1
-    ENDDO
+       DO  WHILE(J>I2.AND.ASSOCIATED(C))
+
+          c%dir=-c%dir
+          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+          c%dir=-c%dir
+
+          C=>C%previous
+          J=J-1
+       ENDDO
+
+    endif
+
 
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
@@ -233,7 +486,7 @@ contains
 
 
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_P(R,X,I1,I2,K,X_IN) ! TRACKS POLYMORPHS FROM I1 TO I2 IN STATE K
+  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_P(R,X,I1,I2,K,X_IN) ! TRACKS POLYMORPHS FROM I1 TO I2 IN STATE K
     IMPLICIT NONE
     TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
@@ -245,25 +498,38 @@ contains
 
     CALL RESET_APERTURE_FLAG
 
-    CALL MOVE_TO(R,C,MOD_N(I1,R%N))
+    call move_to(r,c,MOD_N(I1,R%N))
 
+    if(i2>i1) then
+       J=I1
 
-    J=I1
+       DO  WHILE(J<I2.AND.ASSOCIATED(C))
+          CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
-    DO  WHILE(J<I2.AND.ASSOCIATED(C))
+          C=>C%NEXT
+          J=J+1
+       ENDDO
+    else
+       J=I1
 
-       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+       DO  WHILE(J>I2.AND.ASSOCIATED(C))
 
-       C=>C%NEXT
-       J=J+1
-    ENDDO
+          c%dir=-c%dir
+          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+          c%dir=-c%dir
+
+          C=>C%previous
+          J=J-1
+       ENDDO
+
+    endif
 
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
     ! PATCHES
   END SUBROUTINE TRACK_LAYOUT_FLAG_P
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_S(R,X,I1,I2,k,X_IN) ! Tracks envelopes from i1 to i2 in state k
+  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_S(R,X,I1,I2,k,X_IN) ! Tracks envelopes from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -281,25 +547,40 @@ contains
 
     CALL RESET_APERTURE_FLAG
 
-    ! new stuff with kind=3
-    IF(k%para_in ) knob=.true.
-    ! end new stuff with kind=3
-
-
     call move_to(r,c,MOD_N(I1,R%N))
 
+    !    ! new stuff with kind=3
+    !    IF(k%para_in ) knob=.true.
+    !    ! end new stuff with kind=3
 
-    J=I1
 
-    DO  WHILE(J<I2.AND.ASSOCIATED(C))
-       CALL TRACK(C,X,K,R%CHARGE,X_IN)  !
+    if(i2>i1) then
+       J=I1
 
-       C=>C%NEXT
-       J=J+1
-    ENDDO
-    ! new stuff with kind=3
-    knob=.FALSE.
-    ! end new stuff with kind=3
+       DO  WHILE(J<I2.AND.ASSOCIATED(C))
+
+          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+
+          C=>C%NEXT
+          J=J+1
+       ENDDO
+    else
+       J=I1
+
+       DO  WHILE(J>I2.AND.ASSOCIATED(C))
+
+          c%dir=-c%dir
+          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+          c%dir=-c%dir
+
+          C=>C%previous
+          J=J-1
+       ENDDO
+
+    endif
+    !    ! new stuff with kind=3
+    !    knob=.FALSE.
+    !    ! end new stuff with kind=3
 
     ! Radiation
 
@@ -343,7 +624,7 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_S
 
 
-  SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
+  recursive   SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
@@ -363,7 +644,6 @@ contains
     IF(PRESENT(X_IN)) then
        X_IN%F=>c ; X_IN%E%F=>C; X_IN%NST=>X_IN%E%NST;
     endif
-
 
     ! DIRECTIONAL VARIABLE
     C%MAG%P%DIR=>C%DIR
@@ -391,6 +671,7 @@ contains
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
+          !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! No need to patch IF PATCHED BEFORE
           IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
@@ -444,7 +725,7 @@ contains
        X_IN%POS(2)=X_IN%nst
     endif
 
-    CALL TRACK(C%MAG,X,X_IN)
+    CALL TRACK(C%MAG,X,X_IN,K)
 
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,X_IN%nst+1)
@@ -504,7 +785,7 @@ contains
 
     IF(PRESENT(X_IN))  THEN
        IF(X_IN%E%DO_SURVEY) THEN
-          CALL GFRAME(X_IN%E,ENT,A,-7)
+          CALL G_FRAME(X_IN%E,ENT,A,-7)
           CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
        ELSE
           CALL SURVEY_INNER_MAG(X_IN%E)
@@ -517,12 +798,11 @@ contains
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
        if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
        CHECK_STABLE=.false.
-       lost_fibre=>c
     endif
-
+    lost_fibre=>c
   END SUBROUTINE TRACK_FIBRE_R
 
-  SUBROUTINE TRACK_FIBRE_P(C,X,K,CHARGE,X_IN)
+  recursive   SUBROUTINE TRACK_FIBRE_P(C,X,K,CHARGE,X_IN)
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
@@ -549,6 +829,7 @@ contains
     ! END NEW STUFF WITH KIND=3
 
     ! DIRECTIONAL VARIABLE AND CHARGE IS PASSED TO THE ELEMENT
+
     C%MAGP%P%DIR=>C%DIR
     if(present(charge)) then
        C%MAGP%P%CHARGE=>CHARGE
@@ -575,7 +856,8 @@ contains
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
-          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
+          !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! NO NEED TO PATCH IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0) THEN     ! NO NEED TO PATCH IF PATCHED BEFORE
              P0=>CN%MAGP%P%P0C
              B0=>CN%MAGP%P%BETA0
 
@@ -630,7 +912,7 @@ contains
     ! ************************************************************************
     !  THE ACTUAL MAGNET PROPAGATOR AS IT WOULD APPEAR IN A STANDARD CODE
 
-    CALL TRACK(C%MAGP,X,X_IN)
+    CALL TRACK(C%MAGP,X,X_IN,K)
     !
     ! ************************************************************************
     IF(PRESENT(X_IN)) then
@@ -695,7 +977,7 @@ contains
 
     IF(PRESENT(X_IN))  THEN
        IF(X_IN%E%DO_SURVEY) THEN
-          CALL GFRAME(X_IN%E,ENT,A,-7)
+          CALL G_FRAME(X_IN%E,ENT,A,-7)
           CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
        ELSE
           CALL SURVEY_INNER_MAG(X_IN%E)
@@ -718,13 +1000,13 @@ contains
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
        if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_P"
        CHECK_STABLE=.false.
-       lost_fibre=>c
     endif
+    lost_fibre=>c
 
   END SUBROUTINE TRACK_FIBRE_P
 
 
-  SUBROUTINE TRACK_FIBRE_S(C,X,K,CHARGE,X_IN)   !,UPDATE
+  recursive   SUBROUTINE TRACK_FIBRE_S(C,X,K,CHARGE,X_IN)   !,UPDATE
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
@@ -779,7 +1061,8 @@ contains
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
-          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
+          !          IF(.NOT.CN%PATCH%ENERGY) THEN   ! No need to patch IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0) THEN   ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
 
@@ -847,7 +1130,7 @@ contains
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-1)
 
-    CALL TRACK(C%MAGP,X,X_IN)
+    CALL TRACK(C%MAGP,X,X_IN,K)
 
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -918,8 +1201,8 @@ contains
     if(abs(x(1)%v)+abs(x(3)%v)>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
        if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_S"
        CHECK_STABLE=.false.
-       lost_fibre=>c
     endif
+    lost_fibre=>c
 
     ! new stuff with kind=3
     knob=.FALSE.

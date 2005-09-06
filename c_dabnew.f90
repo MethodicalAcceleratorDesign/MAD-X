@@ -1,6 +1,7 @@
 ! The Full Polymorphic Package
-! The module in this file is the property of Lawrence Berkeley National Laboratory
-! Its distribution and commercial usage are governed by the laws of the
+! The module in this file is, to the best of our knowledge,
+! the property of Lawrence Berkeley National Laboratory
+! Its distribution and commercial usage may therefore be governed by the laws of the
 ! United States of America
 
 module dabnew
@@ -279,7 +280,7 @@ contains
        !
 50     jl    = jl + jd
        !
-       
+
        !old
        !      IF(JL.EQ.0) THEN
        !old
@@ -558,6 +559,7 @@ contains
     integer,dimension(:)::ic
     real(dp) x
     character(10) c,ccc
+    if((.not.stable_da)) return
     !
     no=nomax
     nv=nvmax
@@ -662,6 +664,7 @@ contains
     logical(lp) incnda
     integer ind,ndanum,no,nv,ic,ipause,mypauses
     character(10) c,ccc
+    if((.not.stable_da)) return
     !
     no=nomax
     nv=nvmax
@@ -765,6 +768,7 @@ contains
     integer i,ind,l,ndanum,no,nv,ipause,mypauses
     integer,dimension(:)::ic
     character(10) c,ccc
+    if((.not.stable_da)) return
     !
     ind = 1
 
@@ -870,6 +874,7 @@ contains
     logical(lp) incnda
     integer ic,ind,ndanum,no,nv,ipause,mypauses
     character(10) c,ccc
+    if((.not.stable_da)) return
     !
     ind = 1
 
@@ -972,6 +977,7 @@ contains
     integer i,l,ipause,mypauses
     integer,dimension(:)::idal
     !
+    if((.not.stable_da)) return
     do i=l,1,-1
        if(idal(i).le.nomax+2.or.idal(i).gt.nda) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda
@@ -1010,6 +1016,7 @@ contains
     !
     integer idal,ipause,mypauses
     !
+    if((.not.stable_da)) return
     if(idal.le.nomax+2.or.idal.gt.nda) then
        write(line,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,nda
        ipause=mypauses(14,line)
@@ -1065,6 +1072,7 @@ contains
     integer i,ibase,ic1,ic2,illa,ilma,ina,inoa,inva,ipoa,ipause,mypauses
     real(dp) ckon
     !
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     !
     !
@@ -1125,6 +1133,7 @@ contains
     integer illa,ilma,ina,inoa,inva,ipoa
     real(dp) ckon
     !
+    if((.not.stable_da)) return
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     !
     !
@@ -1153,6 +1162,7 @@ contains
     !
     integer not,ipause,mypauses
     !
+    if((.not.stable_da)) return
     if(not.gt.nomax) then
        write(line,'(a15,i8,a17,i8)') 'ERROR, NOCUT = ',nocut,' EXCEEDS NOMAX = ',nomax
        ipause=mypauses(15,line)
@@ -1219,6 +1229,7 @@ contains
     integer,dimension(lnv)::jj
     real(dp) cjj
     !
+    if((.not.stable_da)) return
     jj=0
     do i=1,size(jv)
        jj(i)=jv(i)
@@ -1339,6 +1350,7 @@ contains
     integer,dimension(lnv)::jj
     real(dp) cjj
     !
+    if((.not.stable_da)) return
 
     jj=0
     do i=1,size(jv)
@@ -1834,7 +1846,13 @@ contains
           do ib = ioffb+1,ioffb+ipno(noib)
              !
              ic = ia2(i2ia+i2(ib)) + ia1(i1ia + i1(ib))
-             cc(ic) = cc(ic) + ccia*cc(ib)
+             ! Georg says maybe needs if(ic/=0)
+             if(ic/=0) then
+                cc(ic) = cc(ic) + ccia*cc(ib)
+             else
+                write(6,*) " Georg warn me about ic could be zero"
+                stop 999
+             endif
              !
           enddo
        enddo
@@ -4543,7 +4561,7 @@ contains
     !-----------------------------------------------------------------------------
     !
     integer i,ii,illa,ilma,ina,inoa,inva,ioa,iout,ipoa,inb,ishift,ich,&
-         ik,inc,ipause,mypauses
+         ik,inc,ipause,mypauses,k
     integer,dimension(lnv)::j,jd
     !
     if((.not.stable_da)) return
@@ -4573,8 +4591,11 @@ contains
           if(abs(cc(ii)).gt.eps) then
              !ETIENNE
 
+
+
              if(nomax.ne.1) then
                 call dancd(i1(ii),i2(ii),j)
+
                 iout = iout+1
              else
                 if(ii.eq.ipoa.and.ioa.eq.1) goto 100
@@ -4582,9 +4603,16 @@ contains
                 do i=1,lnv
                    j(i)=0
                 enddo
+
                 if(ii.ne.ipoa) j(ii-ipoa)=1
                 iout = iout+1
              endif
+             do k=1,ishift   ! put 2004 may
+                if(j(k)>0  ) then
+                   write(6,*) " trouble in dashift "
+                   stop 888
+                endif
+             enddo
              !
 
              !      WRITE(IUNIT,*) IOA,CC(II),(J(I),I=1,INVA)
@@ -4603,6 +4631,7 @@ contains
                          jd(ik-ishift)=j(ik)  !%%%%%%Etienne
                       enddo
                    endif
+
                    call dapok(inb,jd,cc(ii))
                 else
                    !       write(iunit,503) ioa,cc(ii),(j(i),i=1,inva)
@@ -4823,7 +4852,7 @@ contains
     !
     !-----------------------------------------------------------------------------
     !
-    integer istop,iunit
+    integer istop,iunit,I
     !integer,dimension(0:1)::i8
     character(10) c
     !
@@ -4832,6 +4861,8 @@ contains
        stable_da=.false.
        return
     endif
+    READ(*,*) I
+    I=SQRT(DBLE(I))
     stop
   end subroutine dadeb
   !
@@ -5412,11 +5443,12 @@ integer function mypause(i)
   w_p=1
   w_p=(/i/); w_p%fi='(1x,i4)'
   w_p%nc=1
-  w_p%c(1)=' PAUSE: ';w_p%fc='((A8,1x))'
+  w_p%c(1)=' ipause=mypause(0)  ';w_p%fc='((A8,1x))'
 
   call write_i
-  read(*,*)
+  read(*,*) I
   mypause=i
+  mypause=sqrt(dble(-i))
 end function mypause
 
 integer function mypauses(i,string)
@@ -5436,10 +5468,10 @@ integer function mypauses(i,string)
   call get_ncar(n)
   if(l>n) l=120
   w_p%c(1)=string(1:l)
-  w_p%c(2)=' PAUSE: ';w_p%fc='((A120,1x,/,a8,1x,))'
+  w_p%c(2)=' ipause=mypause(0)  ';w_p%fc='((A120,1x,/,a8,1x,))'
 
   call write_i
-  read(*,*)
+  read(*,*) I
   mypauses=i
   mypauses=sqrt(dble(-i))
 end function mypauses

@@ -34,10 +34,17 @@ module definition
   integer ::  knob_i =0
 
   !
+  TYPE sub_taylor
+     INTEGER j(lnv)
+     INTEGER min,max
+  END TYPE sub_taylor
+
+  !!&1
   TYPE taylor
      INTEGER I !@1  integer I is a pointer in old da-package of Berz
      type (taylorlow) j !@1   Taylorlow is an experimental type not supported
   END TYPE taylor
+  !!&1
 
   TYPE UNIVERSAL_TAYLOR
      INTEGER, POINTER:: N,NV    !  Number of coeeficients and number of variables
@@ -50,18 +57,22 @@ module definition
      type (taylor) i  !@1 Imaginary part
   END TYPE complextaylor
 
+  !&2
   ! this is a real polymorphic type
 
   TYPE REAL_8
-     TYPE (TAYLOR) T   !@1  USED IF TAYLOR
-     REAL(DP) R !@1    USED IF REAL
+     TYPE (TAYLOR) T      !@1  USED IF TAYLOR
+     REAL(DP) R           !@1    USED IF REAL
+     !&2
      INTEGER KIND  !@1  0,1,2,3 (1=REAL,2=TAYLOR,3=TAYLOR KNOB, 0=SPECIAL)
      INTEGER I   !@1   USED FOR KNOBS AND SPECIAL KIND=0
      REAL(DP) S   !@1   SCALING FOR KNOBS AND SPECIAL KIND=0
      LOGICAL(lp) :: ALLOC  !@1 IF TAYLOR IS ALLOCATED IN DA-PACKAGE
+     !&2
   END TYPE REAL_8
+  !&2
 
-  ! this is a real polymorphic type
+  ! this is a complex polymorphic type
 
   TYPE double_complex
      type (complextaylor) t
@@ -102,20 +113,28 @@ module definition
      TYPE (dascratch), POINTER :: END_GROUND ! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
   END TYPE dalevel
 
+  !&1
   TYPE DAMAP
-     TYPE (TAYLOR) V(NDIM2)    ! Ndim2=6 but allocated to nd2=2,4,6
+     TYPE (TAYLOR) V(ndim2)    ! Ndim2=6 but allocated to nd2=2,4,6 ! etienne_oct_2004
   END TYPE DAMAP
+  !&1
 
+  TYPE GMAP
+     TYPE (TAYLOR) V(lnv)    ! Ndim2=6 but allocated to nd2=2,4,6 ! etienne_oct_2004
+     integer N
+  END TYPE GMAP
+
+  !&4
   TYPE vecfield
-     type (taylor) v(ndim2)    !@1 <font face="Times New Roman">V<sub>i</sub>&#8706;<sub>i</sub></font> Operator
-     integer ifac              !@1 Type of Factorization 0,1,-1 (One exponent, Dragt-Finn, Reversed Dragt-Finn)
+     type (taylor) v(ndim2)          !@1 <font face="Times New Roman">V<sub>i</sub>&#8706;<sub>i</sub></font> Operator
+     integer ifac                    !@1 Type of Factorization 0,1,-1 (One exponent, Dragt-Finn, Reversed Dragt-Finn)
   END TYPE vecfield
 
   TYPE pbfield
      type (taylor) h
      integer ifac
   END TYPE pbfield
-
+  !&4
 
 
   TYPE tree
@@ -128,19 +147,13 @@ module definition
      type (taylor) e(ndim2)
   END TYPE radtaylor
 
+  !&5
   TYPE DRAGTFINN
      real(dp)  constant(ndim2)
      type (damap) Linear
      type (vecfield) nonlinear
      type (pbfield)  pb
   END TYPE DRAGTFINN
-
-  TYPE ONELIEEXPONENT
-     !     real(dp)  CONSTANT(NDIM2),
-     real(dp) EPS
-     type (vecfield) VECTOR
-     type (pbfield)  pb
-  END TYPE ONELIEEXPONENT
 
   TYPE reversedragtfinn
      real(dp)  CONSTANT(NDIM2)
@@ -149,18 +162,33 @@ module definition
      type (pbfield)  pb
   END TYPE reversedragtfinn
 
+  TYPE ONELIEEXPONENT
+     real(dp) EPS
+     type (vecfield) VECTOR
+     type (pbfield)  pb
+  END TYPE ONELIEEXPONENT
+
+  !&5
+
+  !&3
   TYPE normalform
-     type (damap) A_t
-     type (damap) A1
-     type (reversedragtfinn) A
-     type (dragtfinn) NORMAL
-     type (damap) DHDJ
+     type (damap) A_t   ! Total A  :  A_t= A1 o A
+     type (damap) A1    ! Dispersion
+     type (reversedragtfinn) A  ! Linear A and nonlinear A
+     type (dragtfinn) NORMAL    ! Normal is the Normal Form R
+     type (damap) DHDJ  ! Contains the tunes in convenient form: extracted from NORMAL (=R)
+     !         .
+     !         .
+     !         .
+     !         .
+     !&3
      real(dp) TUNE(NDIM),DAMPING(NDIM)
      integer nord,jtune
      integer NRES,M(NDIM,NRESO),PLANE(NDIM)
      logical(lp) AUTO
+     !&3
   END TYPE normalform
-
+  !&3
   TYPE genfield
      type (taylor) h
      type (damap) m
@@ -169,12 +197,14 @@ module definition
      type (damap) lineart
      type (damap) mt
      real(dp) constant(ndim2)
-     integer ifac,imax
-     logical(lp) linear_in
+     integer imax     !@1 imax=Maximum Number of Iteration (default=1000)
+     integer ifac     !@1 ifac = the map is raised to the power 1/ifac and iterated ifac times (default=1)
+     logical(lp) linear_in     !@1 Linear part is left in the map  (default=.false.)
   END TYPE genfield
 
 
 
+  !!&1
   TYPE pbresonance
      type (pbfield)  cos,sin
      integer ifac
@@ -188,7 +218,7 @@ module definition
   TYPE taylorresonance
      type (taylor)  cos,sin
   END TYPE taylorresonance
-
+  !!&1
 
   TYPE beamenvelope
      ! radiation normalization

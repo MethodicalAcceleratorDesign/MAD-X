@@ -12,7 +12,9 @@ MODULE S_FAMILY
   PRIVATE COPY_LAYOUT,COPY_LAYOUT_I,KILL_PARA_L
   PRIVATE FIBRE_WORK,FIBRE_POL,FIBRE_BL,ADDP_ANBN,WORK_FIBRE,BL_FIBRE
   PRIVATE TRANS_D,COPY_LAYOUT_IJ,PUT_APERTURE_FIB,REMOVE_APERTURE_FIB
-
+  ! old Sj_elements
+  PRIVATE SURVEY_mag
+  !END old Sj_elements
 
   INTERFACE EL_TO_ELP
      !LINKED
@@ -31,14 +33,20 @@ MODULE S_FAMILY
      MODULE PROCEDURE SURVEY_FIB
      MODULE PROCEDURE SURVEY_EXIST_PLANAR_IJ
      MODULE PROCEDURE SURVEY_EXIST_PLANAR_I
-11 END INTERFACE
-
-  INTERFACE TRACK
-     ! LINK LIST
-     MODULE PROCEDURE SURVEY_FIB
-     MODULE PROCEDURE SURVEY_EXIST_PLANAR_IJ
-     MODULE PROCEDURE SURVEY_EXIST_PLANAR_I
+     ! old Sj_elements
+     !     MODULE PROCEDURE SURVEY_mag  ! tracks a chart for survey
+     !END old Sj_elements
   END INTERFACE
+
+  !  INTERFACE TRACK
+  ! LINK LIST
+  !     MODULE PROCEDURE SURVEY_FIB
+  !     MODULE PROCEDURE SURVEY_EXIST_PLANAR_IJ
+  !     MODULE PROCEDURE SURVEY_EXIST_PLANAR_I
+  ! old Sj_elements
+  !     MODULE PROCEDURE SURVEY_mag  ! tracks a chart for survey
+  !END old Sj_elements
+  !  END INTERFACE
 
   INTERFACE KILL_PARA
      MODULE PROCEDURE KILL_PARA_L
@@ -108,7 +116,335 @@ MODULE S_FAMILY
 
 CONTAINS
 
+  ! old Sj_elements
+
+  RECURSIVE SUBROUTINE SURVEY_mag(C,el,dir,magnetframe,e_in) !  Tracks the chart through a magnet
+    IMPLICIT NONE
+    TYPE(CHART), TARGET ,optional, INTENT(INOUT):: C
+    type(element),intent(inout) :: el
+    TYPE(magnet_frame), OPTIONAL :: magnetframe
+    INTEGER, intent(in):: dir
+    TYPE(INNER_FRAME), OPTIONAL :: E_IN
+    real(dp) ent(3,3),a(3),d(3),s
+
+    !  All PTC magnet have the same convention for the internal frame
+    !  Show a user want to add a magnet with corckscrew survey
+    !  his survey would have to be "caught" in this interface
+
+    SELECT CASE(EL%KIND)
+    case(kind0:kind22,kindfitted:KINDWIGGLER)
+       call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
+
+    case(kind23)
+       call SURVEY_CHART_layout(C,el,DIR,MAGNETFRAME,E_IN)
+    case default
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported SURVEY_mag"
+       CALL WRITE_E(0)
+    END SELECT
+
+    ! RECURSIVE   SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW(PLAN,ENT,A) ! CALLS ABOVE ROUTINE FROM FIBRE #1 TO #PLAN%N : STANDARD SURVEY
+
+  end SUBROUTINE SURVEY_mag
+
+
+  SUBROUTINE SURVEY_CHART_layout(C,el,DIR,MAGNETFRAME,E_IN)
+    ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
+    IMPLICIT NONE
+    TYPE(CHART), TARGET ,OPTIONAL, INTENT(INOUT):: C
+    TYPE(element),INTENT(INOUT) :: el
+    TYPE(MAGNET_CHART),pointer :: P
+    TYPE (CHART), POINTER :: CL
+    TYPE(MAGNET_FRAME), OPTIONAL :: MAGNETFRAME
+    TYPE(INNER_FRAME), OPTIONAL :: E_IN
+    INTEGER, INTENT(IN) ::DIR
+    TYPE(MAGNET_FRAME), POINTER :: F
+    REAL(DP) ENT(3,3),EXI(3,3),HA,D(3),BASIS(3,3),OMEGA(3),A(3),N(3),A0(3)
+    REAL(DP) exi_test(3,3),b_test(3)
+    INTEGER I,J
+    CALL ALLOC(F)
+
+
+    CL=> C  ! CHART OF ELEMENT 1
+    P=>el%P
+
+    IF(ASSOCIATED(CL%F)) THEN     !!!! DOING SURVEY
+       IF(DIR==1) THEN
+          A=ZERO;A(3)=P%TILTD  ;
+          CALL GEO_ROT(CL%F%ENT,ENT      ,A  ,CL%F%ENT)
+
+          IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,CL%F%A,-2)
+
+          exi=ent
+          A0=CL%F%a
+
+          call SURVEY(el%g23,ent=exi,a=A0)
+          call locate_mid_frame(el%g23,C%f%mid,C%f%o,el%p%ld)
+          !          el%p%LC=SQRT( EL% )
+          exi_test=exi
+          b_test=A0
+          !          exi_test=el%g23%end%chart%f%exi
+          !          b_test=el%g23%end%chart%f%b
+          EXI=exi_test
+          A=ZERO;A(3)=-P%TILTD  ;
+          CALL GEO_ROT(exi_test     ,exi_test ,A,EXI)
+
+
+
+          IF(PRESENT(MAGNETFRAME) )THEN
+             MAGNETFRAME%a  = el%g23%start%chart%f%a
+             MAGNETFRAME%ent= el%g23%start%chart%f%ent
+             MAGNETFRAME%b  = el%g23%end%chart%f%b
+             MAGNETFRAME%exi= el%g23%end%chart%f%exi
+             MAGNETFRAME%o  = C%f%o
+             MAGNETFRAME%mid= C%f%mid
+          ENDIF
+
+
+
+          exi=ent
+          A0=CL%F%a
+
+
+          ! frontal misalignments
+          F%ENT=ENT
+          F%A=A0
+          BASIS=ENT
+          OMEGA=A0
+
+          A=C%ANG_IN
+          D=F%A-OMEGA
+          CALL GEO_ROT(F%ENT,D,A,1,BASIS)
+          F%A=OMEGA+D
+          basis=F%ENT
+          CALL GEO_TRA(F%A,BASIS,C%D_IN,1)
+
+
+          exi=F%ENT
+          A0=F%A
+
+          ! end frontal misalignments
+
+          ! Bare
+
+          call SURVEY(el%g23,ent=exi,a=A0)
+          call locate_mid_frame(el%g23,f%mid,f%o,el%p%ld)
+
+
+          f%exi=exi   !el%g23%END%CHART%F%EXI
+          f%b=A0      !el%g23%END%CHART%F%B
+          el%p%f=f
+          IF(PRESENT(E_IN) ) THEN
+             CALL XFRAME(E_IN,F%ENT,F%A,-1)
+             CALL XFRAME(E_IN,F%EXI,F%B,E_IN%nst-5)
+          endif
+          ! back misalignments to skeleton (not really necessary)
+
+          A=C%ANG_OUT
+
+          BASIS=el%g23%END%CHART%F%EXI
+          EXI=BASIS
+          OMEGA=el%g23%END%CHART%F%B
+          D=el%g23%END%CHART%F%B-OMEGA
+
+          CALL GEO_ROT(EXI,D,A,1,BASIS)
+
+          basis=EXI
+          CL%F%B=el%g23%END%CHART%F%B
+          CALL GEO_TRA(CL%F%B,BASIS,C%D_OUT,1)
+
+          ! end back misalignments
+
+
+
+
+          IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT=EXI,I=E_IN%nst-4)
+          A=ZERO;A(3)=-P%TILTD  ;
+
+          CALL GEO_ROT(EXI     ,CL%F%EXI ,A,EXI)
+
+
+          IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,A=CL%F%B,I=E_IN%nst-4)
+
+          OMEGA=CL%F%B
+          OMEGA=OMEGA-b_test
+          ent=exi_test-CL%F%exi
+          N=ZERO
+          DO I=1,3
+             N(2)=ABS(OMEGA(I))+N(2)
+             DO J=1,3
+                N(1)=ABS(ENT(I,J))+N(1)
+             ENDDO
+          ENDDO
+
+       ELSE
+
+
+          A=ZERO;A(3)=P%TILTD  ;
+          CALL GEO_ROT(CL%F%EXI,EXI      ,A  ,CL%F%EXI)
+          IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,EXI,CL%F%B,-2)
+          ent=exi
+          A0=CL%F%b
+
+          call SURVEY(el%g23,el%g23%n,0,ent=exi,a=A0)
+
+          call locate_mid_frame(el%g23,C%f%mid,C%f%o,el%p%ld)
+          exi_test=exi
+          b_test=A0
+          EXI=exi_test
+          A=ZERO;A(3)=-P%TILTD  ;
+          CALL GEO_ROT(exi_test     ,exi_test ,A,EXI)
+
+
+          IF(PRESENT(MAGNETFRAME) )THEN
+             MAGNETFRAME%a  = el%g23%start%chart%f%a
+             MAGNETFRAME%ent= el%g23%start%chart%f%ent
+             MAGNETFRAME%b  = el%g23%end%chart%f%b
+             MAGNETFRAME%exi= el%g23%end%chart%f%exi
+             MAGNETFRAME%o  = C%f%o
+             MAGNETFRAME%mid= C%f%mid
+          ENDIF
+
+
+
+          ! back misalignments from skeleton to magnet (not really necessary)
+          f%exi=ent
+          f%b=CL%F%b
+
+          basis=f%exi
+          CALL GEO_TRA(f%b,BASIS,C%D_OUT,-1)
+
+          A=C%ANG_OUT
+
+          OMEGA=f%b
+          D=zero
+
+          CALL GEO_ROT(f%exi,D,A,-1,BASIS)
+
+          exi=F%exi
+          A0=F%b
+          ! end back misalignments
+          IF(PRESENT(E_IN) ) THEN
+             CALL XFRAME(E_IN,F%EXI,F%B,-1)
+             CALL XFRAME(E_IN,F%ENT,F%A,E_IN%nst-5)
+          endif
+
+          !  a0 and exi are the entrance of the magnet
+
+          call SURVEY(el%g23,el%g23%n,0,ent=exi,a=A0)
+          call locate_mid_frame(el%g23,f%mid,f%o,el%p%ld)
+
+
+          f%ent=exi   !el%g23%END%CHART%F%EXI
+          f%a=A0      !el%g23%END%CHART%F%B
+          el%p%f=f
+
+          ! frontal misalignments
+          BASIS=f%ent
+          CL%F%A=F%A
+          CL%F%ENT=f%ent
+
+          CALL GEO_TRA(CL%F%A,BASIS,C%D_IN,-1)
+
+          OMEGA=CL%F%A
+
+          A=C%ANG_IN
+          D=CL%F%A-OMEGA
+          CALL GEO_ROT(CL%F%ENT,D,A,-1,BASIS)
+          F%A=OMEGA+D
+
+
+          exi=CL%F%ENT
+          A0=CL%F%A
+
+          ! end frontal misalignments
+
+          IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT=ENT,I=E_IN%nst-4)
+          A=ZERO;A(3)=-P%TILTD  ;
+          CALL GEO_ROT(EXI     ,CL%F%ENT ,A ,exi)
+
+          IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,A=CL%F%A,I=E_IN%nst-4)
+
+
+          OMEGA=CL%F%a
+          OMEGA=OMEGA-b_test
+          ent=exi_test-CL%F%ent
+          N=ZERO
+          DO I=1,3
+             N(2)=ABS(OMEGA(I))+N(2)
+             DO J=1,3
+                N(1)=ABS(ENT(I,J))+N(1)
+             ENDDO
+          ENDDO
+
+
+
+
+       ENDIF
+
+       IF(PRESENT(E_IN) ) THEN
+          call SURVEY_inner_mag(E_IN)
+       ENDIF
+
+
+       !       IF(N(2)<EPS_FITTED) N(2)=N(2)/( ABS(CL%F%B(1))+ABS(CL%F%B(2))+ABS(CL%F%B(3)) )
+
+       !       IF(N(1)>EPS_FITTED.OR.N(2)>EPS_FITTED) THEN
+       WRITE(6,*) "INCONSISTANCY IN SURVEY_CHART "
+       WRITE(6,*) N(1),N(2)
+       !       ENDIF
+       !
+
+
+
+
+
+    ENDIF  !!!! DOING SURVEY
+
+
+    CALL KILL(F)
+
+
+  END SUBROUTINE SURVEY_CHART_layout
+
+
+  ! END old Sj_elements
+
   !NEW
+
+  SUBROUTINE locate_mid_frame(R,mid,o,ld)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    TYPE(FIBRE), POINTER:: P
+    real(dp), intent(out) :: mid(3,3),o(3),ld
+    integer i
+
+
+    if(mod(R%N,2)==0) then
+       P=>R%START
+       DO I=1,R%N/2
+          P=>P%NEXT
+       ENDDO
+       mid=p%chart%f%ent
+       o=p%chart%f%a
+    else
+       P=>R%START
+       DO I=1,(R%N-1)/2
+          P=>P%NEXT
+       ENDDO
+       mid=p%chart%f%mid
+       o=p%chart%f%o
+    endif
+
+    call get_length(r,ld)
+
+
+
+
+
+  END SUBROUTINE locate_mid_frame
 
   SUBROUTINE LOCATE_FIBRE(R,PIN,I)
     IMPLICIT NONE
@@ -122,19 +458,6 @@ CONTAINS
     ENDDO
   END SUBROUTINE LOCATE_FIBRE
 
-  SUBROUTINE GET_LENGTH(R,L)
-    IMPLICIT NONE
-    TYPE(LAYOUT), INTENT(IN) :: R
-    REAL(DP), INTENT(OUT) :: L
-    TYPE(FIBRE), POINTER:: P
-    INTEGER I
-    P=>R%START
-    L=0.D0
-    DO I=1,R%N
-       L=L+P%MAG%P%LD
-       P=>P%NEXT
-    ENDDO
-  END SUBROUTINE GET_LENGTH
 
   SUBROUTINE GET_FREQ(R,FREQ)
     IMPLICIT NONE
@@ -284,24 +607,17 @@ CONTAINS
 
 
   SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
     TYPE(FIBRE),INTENT(INOUT):: S2
     REAL(DP) ANGLE(3),T_GLOBAL(3)
     TYPE(MAGNET_FRAME), POINTER :: F,F0
-    TYPE(MAGNET_FRAME),  POINTER :: FAKE
     REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
     INTEGER I
 
-    CALL ALLOC(FAKE)
 
-    FAKE%ENT=GLOBAL_FRAME
-    FAKE%MID=GLOBAL_FRAME
-    FAKE%EXI=GLOBAL_FRAME
-    FAKE%A=GLOBAL_ORIGIN
-    FAKE%O=GLOBAL_ORIGIN
-    FAKE%B=GLOBAL_ORIGIN
 
 
 
@@ -322,7 +638,7 @@ CONTAINS
        ! ADD CODE HERE
        CALL ALLOC(F)
        CALL ALLOC(F0)
-       CALL SURVEY_NO_PATCH(S2,FAKE=FAKE,MAGNETFRAME=F)
+       CALL SURVEY_NO_PATCH(S2,MAGNETFRAME=F)
        ! MOVE THE ORIGINAL INTERNAL CHART F
        F0=F
        ANGLE=S2%MAG%R
@@ -382,7 +698,9 @@ CONTAINS
 
        CALL KILL(F)
        CALL KILL(F0)
-       CALL SURVEY_NO_PATCH(S2,FAKE=FAKE)
+
+       CALL SURVEY_NO_PATCH(S2)
+
     ELSE
        W_P=0
        W_P%NC=1
@@ -390,7 +708,6 @@ CONTAINS
        WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
        CALL WRITE_E(100)
     ENDIF
-    CALL KILL(FAKE)
   END SUBROUTINE MISALIGN_FIBRE
 
   SUBROUTINE  MAD_MISALIGN_FIBRE(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
@@ -639,7 +956,7 @@ CONTAINS
   END   SUBROUTINE  BL_FIBRE
 
 
-  SUBROUTINE SURVEY_EXIST_PLANAR_IJ(PLAN,I1,I2,ENT,A) ! STANDARD SURVEY FROM FIBRE #I1 TO #I2
+  RECURSIVE SUBROUTINE SURVEY_EXIST_PLANAR_IJ(PLAN,I1,I2,ENT,A) ! STANDARD SURVEY FROM FIBRE #I1 TO #I2
     IMPLICIT NONE
     TYPE(LAYOUT), INTENT(INOUT):: PLAN
     TYPE (FIBRE), POINTER :: C
@@ -652,96 +969,165 @@ CONTAINS
 
     NULLIFY(C);
 
-    CALL MOVE_TO(PLAN,C,MOD_N(I1,PLAN%N))
+
+    if(i2>i1) then
+
+       CALL MOVE_TO(PLAN,C,MOD_N(I1,PLAN%N))
 
 
-    IF((PRESENT(ENT).AND.(.NOT.PRESENT(A))).OR.(PRESENT(A).AND.(.NOT.PRESENT(ENT)))) THEN
-       W_P=0
-       W_P%NC=2
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)=" BEWARE : ENT AND A  "
-       W_P%C(2)=" MUST BOTH BE PRESENT OR ABSENT"
-       CALL WRITE_E(100)
-    ELSEIF(PRESENT(ENT)) THEN
-       ENTT=ENT
-       AT=A
-    ELSE
-       IF(ASSOCIATED(C%CHART%F)) THEN
-          IF(C%DIR==1) THEN
-             ENTT=C%CHART%F%ENT
-             AT=C%CHART%F%A
-          ELSE
-             ENTT=C%CHART%F%EXI
-             AT=C%CHART%F%B
-          ENDIF
+       IF((PRESENT(ENT).AND.(.NOT.PRESENT(A))).OR.(PRESENT(A).AND.(.NOT.PRESENT(ENT)))) THEN
+          W_P=0
+          W_P%NC=2
+          W_P%FC='(2(1X,A72,/),(1X,A72))'
+          W_P%C(1)=" BEWARE : ENT AND A  "
+          W_P%C(2)=" MUST BOTH BE PRESENT OR ABSENT"
+          CALL WRITE_E(100)
+       ELSEIF(PRESENT(ENT)) THEN
+          ENTT=ENT
+          AT=A
        ELSE
-          write(6,*) " No charts "
-          STOP 888
-       ENDIF
-       IF(ASSOCIATED(C%PATCH)) THEN
-          P=>C%PATCH
-          IF(P%PATCH/=0) THEN
-             NORM=ZERO
-             DO I=1,3
-                NORM=NORM+ABS(P%A_ANG(I))
-                NORM=NORM+ABS(P%A_D(I))
-             ENDDO
-             NORM=NORM+ABS(P%A_YZ-1)+ABS(P%A_XZ-1)
-             IF(NORM/=ZERO) THEN
-                W_P=0
-                W_P%NC=3
-                W_P%FC='(2(1X,A72,/),(1X,A72))'
-                W_P%C(1)=" THERE IS A FRONTAL PATCH IN FIRST FIBRE OF THE SURVEY"
-                W_P%C(2)=" AND THAT PATCH IS NOT IDENTITY. ITS NORM IS:"
-                WRITE(W_P%C(3),'(1X,G20.14)')  NORM
-                CALL WRITE_E(100)
+          IF(ASSOCIATED(C%CHART%F)) THEN
+             IF(C%DIR==1) THEN
+                ENTT=C%CHART%F%ENT
+                AT=C%CHART%F%A
+             ELSE
+                ENTT=C%CHART%F%EXI
+                AT=C%CHART%F%B
+             ENDIF
+          ELSE
+             write(6,*) " No charts "
+             STOP 888
+          ENDIF
+          IF(ASSOCIATED(C%PATCH)) THEN
+             P=>C%PATCH
+             IF(P%PATCH/=0) THEN
+                NORM=ZERO
+                DO I=1,3
+                   NORM=NORM+ABS(P%A_ANG(I))
+                   NORM=NORM+ABS(P%A_D(I))
+                ENDDO
+                NORM=NORM+ABS(P%A_YZ-1)+ABS(P%A_XZ-1)
+                IF(NORM/=ZERO) THEN
+                   W_P=0
+                   W_P%NC=3
+                   W_P%FC='(2(1X,A72,/),(1X,A72))'
+                   W_P%C(1)=" THERE IS A FRONTAL PATCH IN FIRST FIBRE OF THE SURVEY"
+                   W_P%C(2)=" AND THAT PATCH IS NOT IDENTITY. ITS NORM IS:"
+                   WRITE(W_P%C(3),'(1X,G20.14)')  NORM
+                   CALL WRITE_E(100)
+                ENDIF
              ENDIF
           ENDIF
+
        ENDIF
 
-    ENDIF
+
+
+       I=I1
+
+       DO  WHILE(I<I2.AND.ASSOCIATED(C))
+
+          CALL survey(C,ENTT,AT)
+
+          C=>C%NEXT
+          I=I+1
+       ENDDO
+
+
+       IF(PRESENT(ENT)) THEN
+          ENT=ENTT
+          A=AT
+       ENDIF
+
+    elseif(i1>i2) then
+
+       CALL MOVE_TO(PLAN,C,MOD_N(I1,PLAN%N))
+
+
+       IF((PRESENT(ENT).AND.(.NOT.PRESENT(A))).OR.(PRESENT(A).AND.(.NOT.PRESENT(ENT)))) THEN
+          W_P=0
+          W_P%NC=2
+          W_P%FC='(2(1X,A72,/),(1X,A72))'
+          W_P%C(1)=" BEWARE : ENT AND A  "
+          W_P%C(2)=" MUST BOTH BE PRESENT OR ABSENT"
+          CALL WRITE_E(100)
+       ELSEIF(PRESENT(ENT)) THEN
+          ENTT=ENT
+          AT=A
+       ELSE
+          IF(ASSOCIATED(C%CHART%F)) THEN
+             IF(C%DIR==1) THEN
+                ENTT=C%CHART%F%ENT
+                AT=C%CHART%F%A
+             ELSE
+                ENTT=C%CHART%F%EXI
+                AT=C%CHART%F%B
+             ENDIF
+          ELSE
+             write(6,*) " No charts "
+             STOP 888
+          ENDIF
+          IF(ASSOCIATED(C%PATCH)) THEN
+             P=>C%PATCH
+             IF(P%PATCH/=0) THEN
+                NORM=ZERO
+                DO I=1,3
+                   NORM=NORM+ABS(P%A_ANG(I))
+                   NORM=NORM+ABS(P%A_D(I))
+                ENDDO
+                NORM=NORM+ABS(P%A_YZ-1)+ABS(P%A_XZ-1)
+                IF(NORM/=ZERO) THEN
+                   W_P=0
+                   W_P%NC=3
+                   W_P%FC='(2(1X,A72,/),(1X,A72))'
+                   W_P%C(1)=" THERE IS A FRONTAL PATCH IN FIRST FIBRE OF THE SURVEY"
+                   W_P%C(2)=" AND THAT PATCH IS NOT IDENTITY. ITS NORM IS:"
+                   WRITE(W_P%C(3),'(1X,G20.14)')  NORM
+                   CALL WRITE_E(100)
+                ENDIF
+             ENDIF
+          ENDIF
+
+       ENDIF
 
 
 
-    I=I1
+       I=I1
 
-    DO  WHILE(I<I2.AND.ASSOCIATED(C))
+       DO  WHILE(I>I2.AND.ASSOCIATED(C))
 
-       CALL TRACK(C,ENTT,AT)
+          c%dir=-c%dir
+          CALL survey(C,ENTT,AT)
+          c%dir=-c%dir
 
-       C=>C%NEXT
-       I=I+1
-    ENDDO
+          C=>C%previous
+          I=I-1
+       ENDDO
 
 
-    IF(PRESENT(ENT)) THEN
-       ENT=ENTT
-       A=AT
-    ENDIF
-    !   DO I=I1,I2
+       IF(PRESENT(ENT)) THEN
+          ENT=ENTT
+          A=AT
+       ENDIF
 
-    !    CALL TRACK(C,ENTT,AT)
-    !      C=>C%NEXT
-    !   ENDDO
-
+    endif
 
 
   END SUBROUTINE SURVEY_EXIST_PLANAR_IJ
 
 
-  SUBROUTINE SURVEY_FIB(C,ENT,A,E_IN)   !,MAGNETFRAME
+  recursive  SUBROUTINE SURVEY_FIB(C,ENT,A,E_IN)   !,MAGNETFRAME
+    !changed
     ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
     IMPLICIT NONE
     TYPE(FIBRE), TARGET , INTENT(INOUT):: C
     !    TYPE(MAGNET_FRAME), OPTIONAL :: MAGNETFRAME
-    TYPE(MAGNET_FRAME), POINTER :: FAKE
     TYPE(INNER_FRAME), OPTIONAL :: E_IN
     REAL(DP), INTENT(INOUT)  :: ENT(3,3),A(3)
     REAL(DP) D(3),ANG(3)
     LOGICAL(LP) SEL
     TYPE (PATCH), POINTER :: P
 
-    NULLIFY(FAKE)
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-6)
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-5)
 
@@ -752,7 +1138,6 @@ CONTAINS
     ENDIF
 
     !        IF(.NOT.SEL) THEN !
-    CALL ALLOC(FAKE)
     !        ENDIF
 
     IF(ASSOCIATED(C%PATCH)) THEN
@@ -771,44 +1156,24 @@ CONTAINS
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-4)
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-3)
 
-    IF(SEL) THEN
-       IF(C%DIR==1) THEN
-          C%CHART%F%ENT=ENT
-          C%CHART%F%A=A
-       ELSE
-          C%CHART%F%EXI=ENT
-          C%CHART%F%B=A
-       ENDIF
+    IF(C%DIR==1) THEN
+       C%CHART%F%ENT=ENT
+       C%CHART%F%A=A
     ELSE
-       IF(C%DIR==1) THEN
-          FAKE%ENT=ENT
-          FAKE%A=A
-       ELSE
-          FAKE%EXI=ENT
-          FAKE%B=A
-       ENDIF
+       C%CHART%F%EXI=ENT
+       C%CHART%F%B=A
     ENDIF
 
 
-    CALL SURVEY_NO_PATCH(C,FAKE=FAKE,E_IN=E_IN)
+    CALL SURVEY_NO_PATCH(C,E_IN=E_IN)
 
 
-    IF(SEL) THEN
-       IF(C%DIR==1) THEN
-          ENT=C%CHART%F%EXI
-          A=C%CHART%F%B
-       ELSE
-          ENT=C%CHART%F%ENT
-          A=C%CHART%F%A
-       ENDIF
+    IF(C%DIR==1) THEN
+       ENT=C%CHART%F%EXI
+       A=C%CHART%F%B
     ELSE
-       IF(C%DIR==1) THEN
-          ENT=FAKE%EXI
-          A=FAKE%B
-       ELSE
-          ENT=FAKE%ENT
-          A=FAKE%A
-       ENDIF
+       ENT=C%CHART%F%ENT
+       A=C%CHART%F%A
     ENDIF
 
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST-3)
@@ -830,9 +1195,6 @@ CONTAINS
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST)
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-7)
 
-    !        IF(.NOT.SEL) THEN
-    CALL KILL(FAKE)
-    !        ENDIF
 
   END SUBROUTINE SURVEY_FIB
 
@@ -840,16 +1202,18 @@ CONTAINS
 
 
 
-  SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW(PLAN,ENT,A) ! CALLS ABOVE ROUTINE FROM FIBRE #1 TO #PLAN%N : STANDARD SURVEY
+
+
+  RECURSIVE   SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW(PLAN,ENT,A) ! CALLS ABOVE ROUTINE FROM FIBRE #1 TO #PLAN%N : STANDARD SURVEY
     IMPLICIT NONE
     TYPE(LAYOUT), INTENT(INOUT):: PLAN
     REAL(DP),OPTIONAL, INTENT(INOUT) :: A(3),ENT(3,3)
 
-    CALL TRACK(PLAN,1,ENT,A)
+    CALL survey(PLAN,1,ENT,A)
 
   END SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW
 
-  SUBROUTINE SURVEY_EXIST_PLANAR_I(PLAN,I1,ENT,A) ! STANDARD SURVEY FROM FIBRE #I1 TO #I2
+  RECURSIVE   SUBROUTINE SURVEY_EXIST_PLANAR_I(PLAN,I1,ENT,A) ! STANDARD SURVEY FROM FIBRE #I1 TO #I2
     IMPLICIT NONE
     TYPE(LAYOUT), INTENT(INOUT):: PLAN
     REAL(DP),OPTIONAL, INTENT(INOUT) :: A(3),ENT(3,3)
@@ -857,25 +1221,24 @@ CONTAINS
     INTEGER I2
     I2=PLAN%N+I1
 
-    CALL TRACK(PLAN,I1,I2,ENT,A)
+    CALL survey(PLAN,I1,I2,ENT,A)
 
   END SUBROUTINE SURVEY_EXIST_PLANAR_I
 
-  SUBROUTINE SURVEY_NO_PATCH(C,FAKE,MAGNETFRAME,E_IN)
+
+  RECURSIVE     SUBROUTINE SURVEY_NO_PATCH(C,MAGNETFRAME,E_IN)
+    !changed
     ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
     IMPLICIT NONE
     TYPE(FIBRE), TARGET , INTENT(INOUT):: C
-    TYPE(MAGNET_FRAME), OPTIONAL :: FAKE,MAGNETFRAME
+    TYPE(MAGNET_FRAME), OPTIONAL :: MAGNETFRAME
     TYPE(INNER_FRAME), OPTIONAL :: E_IN
-    TYPE (CHART) C_FAKE
-    LOGICAL(LP) WITH_EXTERNAL_FRAME_TEMP,SEL
+    LOGICAL(LP) SEL
 
-    IF(.NOT.ASSOCIATED(C%CHART).AND.(.NOT.PRESENT(FAKE))) THEN
+    IF(.NOT.ASSOCIATED(C%CHART)) THEN
        RETURN
     ENDIF
 
-    WITH_EXTERNAL_FRAME_TEMP=WITH_EXTERNAL_FRAME
-    WITH_EXTERNAL_FRAME=.TRUE.
 
     SEL=.FALSE.
     IF(ASSOCIATED(C%CHART)) THEN
@@ -885,21 +1248,13 @@ CONTAINS
 
 
     IF(SEL) THEN
-       CALL TRACK(C%CHART,C%MAG,C%DIR,MAGNETFRAME,E_IN)
-    ELSE
-       C_FAKE=1
-       C_FAKE%F=FAKE
-       CALL TRACK(C_FAKE,C%MAG,C%DIR,MAGNETFRAME,E_IN)
-       FAKE=C_FAKE%F
-
-       C_FAKE=-1
+       CALL SURVEY_mag(C%CHART,C%MAG,C%DIR,MAGNETFRAME,E_IN)
     ENDIF
 
     IF(ASSOCIATED(C%MAGP%P%F)) THEN
        C%MAGP%P%F=C%MAG%P%F
     ENDIF
 
-    WITH_EXTERNAL_FRAME=WITH_EXTERNAL_FRAME_TEMP
 
     RETURN
 

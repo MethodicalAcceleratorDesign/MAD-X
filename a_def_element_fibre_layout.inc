@@ -1,3 +1,69 @@
+TYPE INTERNAL_STATE
+   LOGICAL(lp) TOTALPATH,TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS
+   LOGICAL(lp) PARA_IN,ONLY_4D,DELTA  ! DA related
+END TYPE INTERNAL_STATE
+
+type work
+   real(dp) beta0,energy,kinetic,p0c,brho,gamma0I,gambet
+   real(dp) mass
+   LOGICAL(lp) rescale
+end type work
+
+
+TYPE POL_BLOCK
+   CHARACTER(nlp) NAME
+   integer n_name
+   CHARACTER(vp) VORNAME
+   ! STUFF FOR SETTING MAGNET USING GLOBAL ARRAY TPSAFIT
+   real(dp),DIMENSION(:), POINTER :: TPSAFIT
+   LOGICAL(lp), POINTER ::  SET_TPSAFIT
+   ! STUFF FOR PARAMETER DEPENDENCE
+   INTEGER NPARA
+   INTEGER IAN(NMAX),IBN(NMAX)
+   real(dp) SAN(NMAX),SBN(NMAX)
+   INTEGER IVOLT, IFREQ,IPHAS
+   INTEGER IB_SOL
+   real(dp) SVOLT, SFREQ,SPHAS
+   real(dp) SB_SOL
+   ! User defined Functions
+   TYPE(POL_BLOCK_sagan) sagan
+   TYPE(POL_BLOCK1) USER1
+   TYPE(POL_BLOCK2) USER2
+END TYPE POL_BLOCK
+
+TYPE MADX_APERTURE
+   INTEGER,pointer ::  KIND   ! 1,2,3,4
+   REAL(DP),pointer :: R(:)
+   REAL(DP),pointer :: X,Y
+END TYPE MADX_APERTURE
+
+TYPE MAGNET_CHART
+   type(magnet_frame), pointer:: f
+   type(MADX_APERTURE), pointer:: APERTURE
+   integer,pointer :: charge  ! propagator
+   integer,pointer :: dir    ! propagator
+   real(dp), POINTER :: LD,B0,LC         !
+   real(dp), POINTER :: TILTD      ! INTERNAL FRAME
+   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,P0C
+   !frs     real(dp),  DIMENSION(:), POINTER :: EDGE(:)      ! INTERNAL FRAME
+   real(dp),  DIMENSION(:), POINTER :: EDGE         ! INTERNAL FRAME
+
+   !
+   INTEGER, POINTER :: TOTALPATH                    !
+   LOGICAL(lp), POINTER :: EXACT,RADIATION,NOCAVITY     !       STATE
+   LOGICAL(lp), POINTER :: FRINGE,KILL_ENT_FRINGE,KILL_EXI_FRINGE,TIME, bend_fringe                  !
+   !
+   INTEGER, POINTER :: METHOD,NST                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA
+   INTEGER, POINTER :: NMUL                         ! NUMBER OF MULTIPOLE
+
+END TYPE MAGNET_CHART
+
+
+TYPE tilting
+   real(dp) tilt(0:nmax)
+   LOGICAL(lp) natural                 ! for mad-like
+END TYPE tilting
+
 !   Element
 TYPE ELEMENT
    INTEGER, POINTER :: KIND
@@ -45,7 +111,9 @@ TYPE ELEMENT
    TYPE(CAV_TRAV), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
    TYPE(USER1), POINTER :: U1                ! USER DEFINED
    TYPE(USER2), POINTER :: U2                ! USER DEFINED
+   TYPE(SAGAN), POINTER :: WI                ! USER DEFINED
    TYPE(MARTIN), POINTER :: M22               ! TAYLOR MAP
+   TYPE(layout), POINTER :: g23
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
 END TYPE  ELEMENT
 
@@ -97,7 +165,9 @@ TYPE ELEMENTP
    TYPE(CAV_TRAVP), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
    TYPE(USER1P), POINTER :: U1                ! USER DEFINED
    TYPE(USER2P), POINTER :: U2                ! USER DEFINED
+   TYPE(SAGANP), POINTER :: WI                ! USER DEFINED
    TYPE(MARTIN), POINTER :: M22               ! TAYLOR MAP
+   TYPE(layout), POINTER :: g23
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
 END TYPE  ELEMENTP
 

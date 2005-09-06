@@ -32,7 +32,6 @@ module precision_constants
   integer,parameter::dp=selected_real_kind(2*precision(1e0_sp))
   !  linked list for scratch variables of TPSA
   integer  :: newscheme_max =200
-
   !Numbers double
   real(dp),parameter::zero=0e0_dp,one=1e0_dp,two=2e0_dp,three=3e0_dp,four=4e0_dp,five=5e0_dp
 
@@ -216,7 +215,7 @@ module precision_constants
      LOGICAL(lp),POINTER  :: CHECK_STABLE !=.TRUE. particle status
      LOGICAL(lp),POINTER  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
      LOGICAL(lp),POINTER  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done
-     LOGICAL(lp),POINTER  :: check_iteration       ! checks iteration in fitted magnet
+     LOGICAL(lp),POINTER  :: check_iteration       ! checks iteration in fitted magnet for symplectic tracking (not used)
      LOGICAL(lp),POINTER  :: check_interpolate_x       ! check if lost by being outside the interpolation region
      LOGICAL(lp),POINTER  :: check_interpolate_y      ! check if lost by being outside the interpolation region
      LOGICAL(lp),POINTER  :: check_x_min     ! check if lost by aperture fitted now
@@ -230,11 +229,6 @@ module precision_constants
      real(dp),POINTER :: hyperbolic_aperture  ! controls crashes in exponentials
 
      !
-     LOGICAL(lp),POINTER :: with_external_frame  !=.true. Frame of chart in fibre are allocated
-     LOGICAL(lp),POINTER   :: with_internal_frame != .true. position of actual magnet or magnetp
-     logical(lp),pointer :: with_chart    !=.true. exterminates charts completely if false
-     logical(lp),pointer :: with_patch    !=.true. if false exterminates patches completely (ptc totally emasculated)
-
      LOGICAL(lp),POINTER   :: NEW_METHOD ! new integration method exists
 
      ! influence fibre creation

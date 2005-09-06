@@ -209,7 +209,7 @@ contains
     TYPE(INTERNAL_STATE) STATE
     INTEGER I,SCRATCHFILE,ND2,NPARA,nt,more
     TYPE(TAYLOR) EQ(2)
-
+    logical want
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
 
@@ -225,13 +225,21 @@ contains
 
        R=POLY(i)
     ENDDO
-
-
-
+    want=.false.
+    if(.not.want)then
+       write(6,*) "do you want fixed point search ?  T or F "
+       read(5,*) want
+    endif
     CLOSED(:)=zero
+    !    more=-1
 100 continue
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_7)
+
+    if(want) then
+       CALL FIND_ORBIT(R,CLOSED,1,STATE,1.d-5)
+    else
+       closed=0.d0
+    endif
 
     CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
     CALL ALLOC(NORM)
@@ -256,7 +264,8 @@ contains
     rewind scratchfile
     nt=2
     do i=1,nt
-       call shiftda(eq(i),eq(i),NPARA)
+       !       call shiftda(eq(i),eq(i),NPARA)
+       eq(i)=eq(i)<=npara
        call daprint(eq(i),scratchfile)
     enddo
     SCRATCHFILE=CLOSEFILE
@@ -277,6 +286,7 @@ contains
     w_p%c(1)=" More =>  yes=1"
     call write_i
     call read(more)
+    !    more=more+1
     if(more==1) goto 100
     CALL ELP_TO_EL(R)
     CALL KILL_PARA(R)
@@ -346,7 +356,7 @@ contains
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
     do i=1,nt
-       call shiftda(eq(i),eq(i),NPARA)
+       eq(i)=eq(i)<=npara
        call daprint(eq(i),scratchfile)
     enddo
     SCRATCHFILE=CLOSEFILE
@@ -684,7 +694,7 @@ contains
                 freq=c%magp%freq
              ENDIF
           endif
-          XDIX=XDIX+c%magP%P%LD/c%mag%P%BETA0
+          XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
           c=>c%next
           i=i+1
        enddo
@@ -1398,11 +1408,15 @@ contains
     TYPE(fibre),INTENT(INOUT):: f
     TYPE(real_8) y(6)
     TYPE(internal_state), intent(in):: state
-    integer,target :: charge
+    integer,optional :: charge
+    integer, target ::  charge1
     real(dp) kf,x(6),xdix,xdix0,tiny
     integer ite
     tiny=c_1d_40
     xdix0=c_1d4*DEPS_tracking
+
+    charge1=1
+    if(present(charge)) charge1=charge
 
     Kf=ZERO
     write(6,'(A18,1(1X,g14.7))') " INITIAL PHASE IS ",    f%MAG%phas
@@ -1418,7 +1432,7 @@ contains
 3   continue
     X=ZERO
     Y=X
-    CALL TRACK(f,Y,+state,CHARGE)
+    CALL TRACK(f,Y,+state,CHARGE1)
     x=y
     write(6,'(A10,6(1X,g14.7))') " ORBIT IS ",x
     kf=-(y(5).sub.'0')/(y(5).sub.'1')

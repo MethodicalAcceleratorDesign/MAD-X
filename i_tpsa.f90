@@ -7,8 +7,8 @@ MODULE TPSA
   use definition
   use file_handler
   IMPLICIT NONE
-  integer,private::ndel ,nd2par
-  integer,private,dimension(lnv)::jfil
+  integer,private::ndel ,nd2par,nd2part,nd2partt
+  integer,private,dimension(lnv)::jfil,jfilt
 
   private equal,DAABSEQUAL,Dequaldacon ,equaldacon ,Iequaldacon  !,AABSEQUAL 2002.10.17
   private pow,powr,powr8,dlogt, GETORDER,CUTORDER,getchar,GETint
@@ -20,9 +20,11 @@ MODULE TPSA
   private allocda,KILLda,A_OPT,K_opt
   priVATE dexpt,dcost,dsint,dsqrtt,dtant
   PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_j,dsinHt,dCOSHt
+  private GETintnd2t
   PRIVATE DEQUAL,REQUAL,varf,varf001  !,CHARINT
   !  PUBLIC VAR,ASS
-  private pbbra,full_absT,asstaylor
+  private pbbra,full_absT,asstaylor,getcharnd2s,GETintnd2s,GETintk
+  private shiftda,shift000
   PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
   private FILL_R ! new sagan
 
@@ -476,6 +478,17 @@ MODULE TPSA
   INTERFACE OPERATOR (.PAR.)
      MODULE PROCEDURE getcharnd2
      MODULE PROCEDURE GETintnd2
+  END INTERFACE
+
+  INTERFACE OPERATOR (.part.)
+     MODULE PROCEDURE GETintnd2t
+  END INTERFACE
+
+
+  INTERFACE OPERATOR (<=)
+     MODULE PROCEDURE getcharnd2s
+     MODULE PROCEDURE GETintnd2s
+     MODULE PROCEDURE GETintk
   END INTERFACE
 
   INTERFACE OPERATOR (.CUT.)
@@ -1332,6 +1345,68 @@ CONTAINS
     master=localmaster
 
   END FUNCTION dputint0
+
+
+  FUNCTION GETCHARnd2s( S1, S2 )
+    implicit none
+    TYPE (taylor) GETCHARnd2s
+    TYPE (taylor), INTENT (IN) :: S1
+    CHARACTER(*)  , INTENT (IN) ::  S2
+
+    integer localmaster
+    localmaster=master
+
+    call ass(GETCHARnd2s)
+
+
+    GETCHARnd2s=s1.par.s2
+    call  shiftda(GETCHARnd2s,GETCHARnd2s, len(trim(ADJUSTR (s2) )))
+
+    master=localmaster
+
+
+  END FUNCTION GETCHARnd2s
+
+  FUNCTION GETintnd2s( S1, S2 )
+    implicit none
+    TYPE (taylor) GETintnd2s
+    TYPE (taylor), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2(:)
+
+    integer localmaster
+    localmaster=master
+
+    call ass(GETintnd2s)
+
+
+    GETintnd2s=s1.par.s2
+
+    call  shiftda(GETintnd2s,GETintnd2s, size(s2) )
+
+    master=localmaster
+
+
+  END FUNCTION GETintnd2s
+
+  FUNCTION GETintk( S1, S2 )
+    implicit none
+    TYPE (taylor) GETintk
+    TYPE (taylor), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
+
+    integer localmaster
+    localmaster=master
+
+    call ass(GETintk)
+
+
+
+    call  shiftda(s1,GETintk, s2 )
+
+    master=localmaster
+
+
+  END FUNCTION GETintk
 
 
 
@@ -2406,6 +2481,19 @@ CONTAINS
     endif
   END SUBROUTINE intd_taylor
 
+  SUBROUTINE  DIFd_taylor(S2,S1,factor)
+    implicit none
+    type (taylor),INTENT(in)::S2
+    type (taylor),INTENT(INOUT)::S1(:)
+    real(dp),INTENT(IN):: factor
+    if(old) then
+       CALL DIFD(S2%i,s1%i,factor)
+    else
+       CALL NEWDIFD(S2%j,s1%j,factor)
+    endif
+  END SUBROUTINE DIFd_taylor
+
+
   SUBROUTINE  CFU000(S2,FUN,S1)
     implicit none
     type (taylor),INTENT(INOUT)::S1
@@ -2591,6 +2679,68 @@ CONTAINS
 
   END FUNCTION GETintnd2
 
+  FUNCTION GETintnd2t( S1, S22 )
+    implicit none
+    TYPE (taylor) GETintnd2t,junk
+    TYPE (taylor), INTENT (IN) :: S1
+    type(sub_taylor), INTENT (IN) :: S22
+    integer s2(lnv)
+    integer i,k
+    integer localmaster
+    localmaster=master
+    !    call check(s1)
+    call ass(GETintnd2t)
+
+    call alloc(junk)
+
+    do i=1,lnv
+       jfilt(i)=0
+    enddo
+    s2=s22%j
+    nd2part=s22%min
+    nd2partt=s22%max
+    ndel=0
+    !frs get around compiler problem
+    !frs    do i=1,len(trim(ADJUSTR (s2)))
+    do i=nd2part,nd2partt
+       jfilt(I)=s2(i)
+       if(i>nv) then
+          if(jfilt(i)>0) then
+             GETintnd2t=zero
+             return
+          endif
+       endif
+
+    enddo
+
+    !do i=nd2+ndel+1,nv
+    do i=nd2partt+1,nv
+       if(jfilt(i)/=0) then
+          w_p=0
+          w_p%nc=1
+          w_p%fc='(1((1X,A72),/))'
+          w_p%c(1)=" error in GETintnd2t for .part_taylor. "
+          call write_e(0)
+          stop
+       endif
+    enddo
+
+    call cfu(s1,filter_part,junk)
+
+    !DO I=1,ND2+ndel
+    !    DO I=1,ND2par
+    !       DO K=1,jfilt(I)
+    !          JUNK=JUNK.K.I
+    !       ENDDO
+    !    ENDDO
+
+    GETintnd2t=junk
+
+    call kill(junk)
+    master=localmaster
+
+  END FUNCTION GETintnd2t
+
 
   SUBROUTINE  taylor_cycle(S1,N,VALUE,J)
     implicit none
@@ -2746,6 +2896,21 @@ CONTAINS
     enddo
 
   end  function filter
+
+  function filter_part(j)
+    implicit none
+    real(dp) filter_part
+    integer i
+    integer,dimension(:)::j
+    !    WRITE(6,*) jfilt(1:4)
+    !    WRITE(6,*)nd2part,nd2partt
+    filter_part=one
+    !do i=1,nd2+ndel
+    do i=nd2part,nd2partt
+       if(jfilt(i)/=j(i)) filter_part=zero
+    enddo
+
+  end  function filter_part
 
   !  i/o routines
 
@@ -3289,7 +3454,6 @@ CONTAINS
     ENDIF
 
     if(.not.no_ndum_check) iass0user(master)=iass0user(master)+1
-
     if(iass0user(master)>scratchda(master)%n) then
        call INSERT_DA( scratchda(master) )
     ELSE

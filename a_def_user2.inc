@@ -17,4 +17,3 @@ TYPE USER2P
    !           .........
    TYPE(REAL_8), POINTER ::INTERNAL        ! INTERNAL IS AN EXAMPLE
 END  TYPE USER2P
-

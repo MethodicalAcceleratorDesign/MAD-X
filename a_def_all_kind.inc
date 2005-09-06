@@ -281,9 +281,10 @@ END  TYPE STREXP
 
 TYPE DATA_MAGNET
    INTEGER, POINTER :: NS,NX,NY
-   real(dp), POINTER :: dtheta,dx,dy
+   real(dp), POINTER :: dtheta,dx,dy,hc
    real(dp), POINTER,DIMENSION(:)::x,y,theta
    REAL(sp),POINTER,DIMENSION(:,:,:,:,:)::B
+   REAL(dp),POINTER,DIMENSION(:,:,:)::grid
    real(sp),POINTER,DIMENSION(:,:,:,:):: A
    logical(lp),pointer :: read_in
 END TYPE DATA_MAGNET
@@ -292,7 +293,7 @@ TYPE FITTED_MAGNET
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp), POINTER ::L
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
-   real(dp), POINTER ::SCALE,h
+   real(dp), POINTER ::SCALE
    logical(lp), POINTER ::symplectic
    TYPE(DATA_MAGNET), POINTER:: D
    real(dp),  DIMENSION(:,:), POINTER :: X
@@ -305,7 +306,7 @@ TYPE FITTED_MAGNETP
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    logical(lp), POINTER ::symplectic
    !  SPECIAL POINTERS
-   TYPE(REAL_8), POINTER ::SCALE,h
+   TYPE(REAL_8), POINTER ::SCALE
    TYPE(DATA_MAGNET), POINTER:: D
    real(dp), POINTER ::xmin,xmax,ymin,ymax
 END  TYPE FITTED_MAGNETP
@@ -321,4 +322,3 @@ TYPE MARTIN
    real(dp),pointer :: E_REV(:,:)
    logical(lp), POINTER :: deltamap
 END  TYPE MARTIN
-

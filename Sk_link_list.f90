@@ -3,7 +3,8 @@
 ! See file A_SCRATCH_SIZE.F90
 
 MODULE S_FIBRE_BUNDLE
-  USE   S_ELEMENTS
+  USE S_DEF_ELEMENT
+  !  USE   S_ELEMENTS
   ! Implementation of abstract data type as a linked layout
   IMPLICIT NONE
 
@@ -16,8 +17,6 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE INDEX
   private FIND_POS_in_universe, FIND_POS_in_layout
 
-  logical(lp),TARGET :: with_chart=.true.
-  logical(lp),TARGET :: with_patch=.true.
   logical(lp),TARGET :: use_info=.false.
   private zero_fibre
   INTEGER :: INDEX=0
@@ -330,6 +329,7 @@ CONTAINS
 
     nullify(p)
     p=>l%last%next
+
     if(.not.associated(p)) goto 100
     do i=1,l%n-1
        if(p%mag%name==s1name) then
@@ -538,7 +538,7 @@ CONTAINS
     CALL LINE_L(L,doneit)
     L%N=L%N+1
     CALL ALLOCATE_FIBRE(Current);
-    if(with_patch) ALLOCATE(Current%PATCH);
+    ALLOCATE(Current%PATCH);
 
     !  FINDING THE VERY ORIGINAL FIBRE  RECURSIVELY
     !    p=>el
@@ -627,8 +627,8 @@ CONTAINS
     ALLOCATE(Current%dir); ! ALLOCATE(Current%P0C);ALLOCATE(Current%BETA0);
     ALLOCATE(Current%magp);ALLOCATE(Current%mag);
 
-    if(with_CHART) ALLOCATE(Current%CHART);
-    if(with_patch) ALLOCATE(Current%PATCH);
+    ALLOCATE(Current%CHART);
+    ALLOCATE(Current%PATCH);
   END SUBROUTINE ALLOCATE_DATA_FIBRE
 
   SUBROUTINE alloc_fibre( c ) ! Does the full allocation of fibre and initialization of internal variables
@@ -1120,7 +1120,7 @@ CONTAINS
 
 
   SUBROUTINE locate_in_universe(F,i_tot,i,j)
-    IMPLICIT NONE
+    implicit none
     integer i_tot,i,j
     integer k
     TYPE(FIBRE),pointer ::  F
@@ -1149,4 +1149,3 @@ CONTAINS
 
 
 END MODULE S_FIBRE_BUNDLE
-

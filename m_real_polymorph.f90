@@ -41,8 +41,9 @@ module polymorphic_taylor
   !complex stuff
   private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt
   private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT,polymorpht
+  ! PRIVATE EQUAL1D,EQUAL2D
   ! end complex stuff
-  private printpoly
+  private printpoly,printdouble,printsingle
   private line
   character(120) line
   !integer npol
@@ -59,6 +60,8 @@ module polymorphic_taylor
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL   ! 2002.10.9
+     !     MODULE PROCEDURE EQUAL1D  ! 2004.7.10
+     !     MODULE PROCEDURE EQUAL2D  ! 2004.7.10
      MODULE PROCEDURE complexreal_8
      MODULE PROCEDURE realEQUAL   !
      MODULE PROCEDURE singleequal
@@ -751,9 +754,13 @@ module polymorphic_taylor
 
   INTERFACE daprint
      MODULE PROCEDURE printpoly !
+     MODULE PROCEDURE printdouble
+     MODULE PROCEDURE printsingle
   END INTERFACE
   INTERFACE print
      MODULE PROCEDURE printpoly   !
+     MODULE PROCEDURE printdouble
+     MODULE PROCEDURE printsingle
   END INTERFACE
 
 
@@ -799,7 +806,7 @@ contains
   FUNCTION polymorpht( S1 )
     implicit none
     TYPE (real_8) polymorpht
-    TYPE (complextaylor), INTENT (IN) :: S1
+    TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
 
     localmaster=master
@@ -816,15 +823,27 @@ contains
     TYPE (real_8), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
     integer localmaster
+    type(taylor) t
 
-    if(s1%kind==m2) then
-       localmaster=master
-       call ass(GETCHARnd2)
-       GETCHARnd2%t=s1%t.par.s2
-       master=localmaster
-    else
-       GETCHARnd2=s1
-    endif
+    localmaster=master
+    call ass(GETCHARnd2)
+    call alloc(t)
+    t=s1
+
+    t=t.par.s2
+    GETCHARnd2%t=t
+
+
+
+    !       GETCHARnd2%kind=m2
+    !    if(s1%kind==m2) then
+    !       GETCHARnd2%t=s1%t.par.s2
+    !    else
+    !       GETCHARnd2%t=zero
+    !    endif
+
+    call kill(t)
+    master=localmaster
 
   END FUNCTION GETCHARnd2
 
@@ -834,15 +853,26 @@ contains
     TYPE (real_8), INTENT (IN) :: S1
     integer, INTENT (IN) ::  S2(:)
     integer localmaster
+    type(taylor) t
 
-    if(s1%kind==m2) then
-       localmaster=master
-       call ass(GETintnd2)
-       GETintnd2%t=s1%t.par.s2
-       master=localmaster
-    else
-       GETintnd2=s1
-    endif
+    localmaster=master
+    call ass(GETintnd2)
+    call alloc(t)
+    t=s1
+    !  if(s1%kind==m2) then
+    !      GETintnd2%t=s1%t.par.s2
+    !   else
+    !       GETintnd2%kind=m2
+    !       GETintnd2%t=zero
+    !
+    !  endif
+    t=t.par.s2
+    GETintnd2%t=t
+
+
+    call kill(t)
+
+    master=localmaster
 
   END FUNCTION GETintnd2
 
@@ -858,15 +888,6 @@ contains
     if(s1%kind==m2) then
        ! GETchar%t=s1%t.sub.s2   !  OLD
        GETchar=s1%t.sub.s2   !  CHANGE
-    elseif(s1%kind==m1) then
-       GETchar=s1
-       do i=1,len_trim(s2)
-          CALL  CHARINT(s2(i:i),j)
-          if(j/=0) then
-             GETchar=zero
-             exit
-          endif
-       enddo
 
     endif
 
@@ -901,17 +922,22 @@ contains
     TYPE (real_8), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2
     integer localmaster
+    localmaster=master
+    call ass(GETORDER)
 
     if(s1%kind==m2) then
-       localmaster=master
-       call ass(GETORDER)
        GETORDER%t=s1%t.sub.s2
-       master=localmaster
     else
-       GETORDER=s1
+       GETORDER%kind=m1
+       GETORDER%r=zero
+       if(s2==0) GETORDER%r=s1%r
     endif
 
+    master=localmaster
+
   END FUNCTION GETORDER
+
+
 
 
   FUNCTION CUTORDER( S1, S2 )
@@ -921,15 +947,19 @@ contains
     integer  , INTENT (IN) ::  S2
     integer localmaster
 
+    localmaster=master
+    call ass(CUTORDER)
+
     CUTORDER=zero
     if(s1%kind==m2) then
-       localmaster=master
-       call ass(CUTORDER)
+       cutorder%kind=m2
        CUTORDER%t=s1%t.CUT.s2
-       master=localmaster
     elseif(s1%kind==m1) then
-       if(s2==0) CUTORDER=s1
+       if(s2>=1) CUTORDER%r=s1%r
+       cutorder%kind=m1
     endif
+
+    master=localmaster
 
   END FUNCTION CUTORDER
 
@@ -4047,6 +4077,25 @@ contains
 
   END SUBROUTINE printpoly
 
+  SUBROUTINE  printdouble(S2,i)
+    implicit none
+    integer ipause, mypauses
+    real(dp),INTENT(INOUT)::S2
+    integer i
+
+    write(i,*)  s2
+
+  END SUBROUTINE printdouble
+
+  SUBROUTINE  printsingle(S2,i)
+    implicit none
+    integer ipause, mypauses
+    real(sp),INTENT(INOUT)::S2
+    integer i
+
+    write(i,*)  s2
+
+  END SUBROUTINE printsingle
 
   SUBROUTINE  resetpoly(S2)
     implicit none
@@ -4341,6 +4390,38 @@ contains
     NV=iia(2)
     i_ =cmplx(zero,one,kind=dp)
   end  subroutine set_in_polyp
+
+  SUBROUTINE  EQUAL2D(S2,S1)
+    implicit none
+    type (real_8),INTENT(inOUT)::S2(:,:)
+    type (real_8),INTENT(IN)::S1(:,:)
+    integer i,J,I1(2),I2(2)
+
+    I1(1)=LBOUND(S1,DIM=1)
+    I1(2)=LBOUND(S1,DIM=2)
+    I2(1)=LBOUND(S2,DIM=1)
+    I2(2)=LBOUND(S2,DIM=2)
+    do i=I1(1),UBOUND(S1,DIM=1)
+       do J=I1(2),UBOUND(S1,DIM=2)
+          S2(I-I1(1)+I2(1),J-I1(2)+I2(2))=S1(I,J)
+       ENDDO
+    ENDDO
+
+  end SUBROUTINE  EQUAL2D
+
+  SUBROUTINE  EQUAL1D(S2,S1)
+    implicit none
+    type (real_8),INTENT(inOUT)::S2(:)
+    type (real_8),INTENT(IN)::S1(:)
+    integer i,I1,I2
+
+    I1=LBOUND(S1,DIM=1)
+    I2=LBOUND(S2,DIM=1)
+    do i=I1,UBOUND(S1,DIM=1)
+       S2(I-I1+I2)=S1(I)
+    ENDDO
+
+  end SUBROUTINE  EQUAL1D
 
   SUBROUTINE  EQUAL(S2,S1)
     implicit none

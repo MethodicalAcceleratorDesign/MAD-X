@@ -40,6 +40,10 @@ module Mad_like
   type(tree_element), PRIVATE :: mad_tree,mad_tree_rad
   type(tree_element),PRIVATE :: mad_tree_REV,mad_tree_rad_REV
   LOGICAL(LP) MAD_TREE_DELTAMAP
+  logical(lp):: symplectic_print=.false.
+  logical(lp):: symplectify=.false.
+  integer :: symplectic_order = 0
+  REAL(DP) :: symplectic_eps = -one
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
   INTEGER, PRIVATE, TARGET :: NPARA
 
@@ -311,6 +315,10 @@ module Mad_like
   end  INTERFACE
   INTERFACE USER_2
      MODULE PROCEDURE USER_2L
+  end  INTERFACE
+
+  INTERFACE WIGGLER
+     MODULE PROCEDURE WIGGLERL
   end  INTERFACE
 
 
@@ -651,7 +659,7 @@ CONTAINS
        S2%BSOL=zero
        S2%volt=zero
        S2%freq0=zero
-       S2%harmon=zero
+       S2%harmon=one
        S2%DELTA_E=zero
        S2%lag=zero
        S2%KIND=0
@@ -1368,7 +1376,7 @@ CONTAINS
     endif
 
     POTTILT%KIND=KIND10
-    POTTILT%K(1)=POTTILT%B0
+    POTTILT%K(1)=POTTILT%B0+POTTILT%K(1)
     POTTILT%nmul=SECTOR_NMUL
 
   END FUNCTION POTTILT
@@ -1431,7 +1439,7 @@ CONTAINS
     ELSE
        GBTILT%NAME=NAME
     ENDIF
-    GBTILT%K(1)=GBTILT%B0   ! NEW IMPLEMENTATION FOR DIR=-1
+    GBTILT%K(1)=GBTILT%B0+GBTILT%K(1)   ! NEW IMPLEMENTATION FOR DIR=-1
     GBTILT%nmul=2
 
     GBTILT%KIND=MADKIND2
@@ -1493,7 +1501,7 @@ CONTAINS
        endif
        RECTTILT%L=L1
        RECTTILT%LC=L1
-       RECTTILT%K(1)=RECTTILT%B0
+       RECTTILT%K(1)=RECTTILT%B0+RECTTILT%K(1)
        if(LIKEMAD) then
           RECTTILT%T1=ANG1/two+E11    !one
           RECTTILT%T2=ANG1/two+E22    !zero
@@ -1515,7 +1523,7 @@ CONTAINS
           RECTTILT%LD=ANG1/RECTTILT%B0
        ENDIF
        RECTTILT%T1=ANG1/two+E11 ; RECTTILT%T2=ANG1/two+E22;
-       RECTTILT%K(1)=RECTTILT%B0 ! NEW IMPLEMENTATION FOR DIR=-1
+       RECTTILT%K(1)=RECTTILT%B0+RECTTILT%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
        RECTTILT%nmul=2   ! 0 before
     ENDIF
     !    ENDIF
@@ -1590,7 +1598,7 @@ CONTAINS
        endif
        RECTTILT_MADX%L=L1
        RECTTILT_MADX%LC=L1
-       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0
+       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0+RECTTILT_MADX%K(1)
        if(LIKEMAD) then
           RECTTILT_MADX%T1=ANG1/two+E11    !one
           RECTTILT_MADX%T2=ANG1/two+E22    !zero
@@ -1611,7 +1619,7 @@ CONTAINS
           RECTTILT_MADX%LD=ANG1/RECTTILT_MADX%B0
        ENDIF
        RECTTILT_MADX%T1=ANG1/two+E11 ; RECTTILT_MADX%T2=ANG1/two+E22;
-       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0 ! NEW IMPLEMENTATION FOR DIR=-1
+       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0+RECTTILT_MADX%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
        RECTTILT_MADX%nmul=2   ! 0 before
     ENDIF
     !    ENDIF
@@ -1726,7 +1734,7 @@ CONTAINS
              w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
              call write_i
           endif
-          rectaETILT%K(1)=rectaETILT%B0 ! NEW IMPLEMENTATION FOR DIR=-1
+          rectaETILT%K(1)=rectaETILT%B0+rectaETILT%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
           rectaETILT%nmul=2
           !         rectaETILT%T1=ANGI1/(ANG1/two)
           rectaETILT%T1=ANGI1
@@ -1734,7 +1742,7 @@ CONTAINS
 
           !         rectaETILT%T2=rectaETILT%LC*SIN(SPE)
        ELSE
-          rectaETILT%K(1)=rectaETILT%B0
+          rectaETILT%K(1)=rectaETILT%B0+rectaETILT%K(1)
           rectaETILT%L=rectaETILT%LD
           rectaETILT%T1=ANGI1 ; rectaETILT%T2=ANGE;
           rectaETILT%nmul=2   ! 0 before
@@ -1818,7 +1826,7 @@ CONTAINS
           w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
           call write_i
        endif
-       TRUERECTILT_MADX%K(1)=TRUERECTILT_MADX%B0 ! NEW IMPLEMENTATION FOR DIR=-1
+       TRUERECTILT_MADX%K(1)=TRUERECTILT_MADX%B0+TRUERECTILT_MADX%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
        TRUERECTILT_MADX%nmul=2
        !         rectaETILT%T1=ANGI1/(ANG1/two)
        TRUERECTILT_MADX%T1=ANGI1
@@ -1826,7 +1834,7 @@ CONTAINS
 
        !         rectaETILT%T2=rectaETILT%LC*SIN(SPE)
     ELSE
-       TRUERECTILT_MADX%K(1)=TRUERECTILT_MADX%B0
+       TRUERECTILT_MADX%K(1)=TRUERECTILT_MADX%B0+TRUERECTILT_MADX%K(1)
        TRUERECTILT_MADX%L=TRUERECTILT_MADX%LD
        TRUERECTILT_MADX%T1=ANGI1 ; TRUERECTILT_MADX%T2=ANGE;
        TRUERECTILT_MADX%nmul=2   ! 0 before
@@ -2122,6 +2130,24 @@ CONTAINS
 
   END FUNCTION mark
 
+  subroutine  guirder(f,cell)
+    implicit none
+    type (fibre) f
+    type (layout),target :: cell
+
+    f%MAG%G23=>CELL
+    f%MAGP%G23=>CELL
+    f%MAG%KIND=KIND23
+    f%MAGP%KIND=KIND23
+    f%MAG%p%nst=1
+    f%MAGP%p%nst=1
+    f%chart%f%ent=1
+    f%chart=0
+    CALL SURVEY_no_patch(f)
+
+
+  END  subroutine guirder
+
   FUNCTION  RFCAVITYL(NAME,L,VOLT,LAG,HARMON,REV_FREQ,DELTAE,LIST)
     implicit none
     type (EL_LIST) RFCAVITYL
@@ -2333,20 +2359,26 @@ CONTAINS
 
 
 
-
-
-
-
-  FUNCTION  USER_1L(NAME,L,T)
+  FUNCTION  USER_1L(NAME,L,T,list)
     implicit none
     type (EL_LIST) USER_1L
     type (TILTING),optional, INTENT(IN):: T
+    type (EL_LIST),optional, INTENT(IN):: LIST
     CHARACTER(*), INTENT(IN):: NAME
-    real(dp) , INTENT(IN):: L
-    USER_1L=0
-    USER_1L%L=L
-    USER_1L%LD=L
-    USER_1L%LC=L
+    real(dp) ,optional, INTENT(IN):: L
+
+    if(present(list)) then
+       USER_1L=list
+       USER_1L%L=list%L
+    elseif(present(L)) then
+       USER_1L=0
+       USER_1L%L=L
+       USER_1L%LD=L
+       USER_1L%LC=L
+    else
+       write(6,*) " Error neither L nor list is present in USER_1L"
+       stop 900
+    endif
     USER_1L%KIND=KINDUSER1
     IF(LEN(NAME)>nlp) THEN
        w_p=0
@@ -2368,16 +2400,27 @@ CONTAINS
     ENDIF
   END FUNCTION USER_1L
 
-  FUNCTION  USER_2L(NAME,L,T)
+
+  FUNCTION  USER_2L(NAME,L,T,list)
     implicit none
     type (EL_LIST) USER_2L
-    CHARACTER(*), INTENT(IN):: NAME
     type (TILTING),optional, INTENT(IN):: T
-    real(dp) , INTENT(IN):: L
-    USER_2L=0
-    USER_2L%L=L
-    USER_2L%LD=L
-    USER_2L%LC=L
+    type (EL_LIST),optional, INTENT(IN):: LIST
+    CHARACTER(*), INTENT(IN):: NAME
+    real(dp) ,optional, INTENT(IN):: L
+
+    if(present(list)) then
+       USER_2L=list
+       USER_2L%L=list%L
+    elseif(present(L)) then
+       USER_2L=0
+       USER_2L%L=L
+       USER_2L%LD=L
+       USER_2L%LC=L
+    else
+       write(6,*) " Error neither L nor list is present in USER_2L"
+       stop 900
+    endif
     USER_2L%KIND=KINDUSER2
     IF(LEN(NAME)>nlp) THEN
        w_p=0
@@ -2399,7 +2442,51 @@ CONTAINS
     ENDIF
   END FUNCTION USER_2L
 
+  FUNCTION  WIGGLERL(NAME,L,T,list)
+    implicit none
+    type (EL_LIST) WIGGLERL
+    type (TILTING),optional, INTENT(IN):: T
+    type (EL_LIST),optional, INTENT(IN):: LIST
+    CHARACTER(*), INTENT(IN):: NAME
+    real(dp) ,optional, INTENT(IN):: L
+
+    if(present(list)) then
+       WIGGLERL=list
+       WIGGLERL%L=list%L
+    elseif(present(L)) then
+       WIGGLERL=0
+       WIGGLERL%L=L
+       WIGGLERL%LD=L
+       WIGGLERL%LC=L
+    else
+       write(6,*) " Error neither L nor list is present in WIGGLERL"
+       stop 900
+    endif
+    WIGGLERL%KIND=KINDWIGGLER
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       call write_i
+       WIGGLERL%NAME=NAME(1:16)
+    ELSE
+       WIGGLERL%NAME=NAME
+    ENDIF
+    IF(PRESENT(t)) then
+       IF(T%NATURAL) THEN
+          WIGGLERL%tilt=t%tilt(1)
+       ELSE
+          WIGGLERL%tilt=t%tilt(0)
+       ENDIF
+    ENDIF
+  END FUNCTION WIGGLERL
+
+
+
   SUBROUTINE  EL_Q(s22,S1)
+    !changed
     implicit none
     type (fibre),target,INTENT(inOUT)::s22
     type (EL_LIST),INTENT(IN)::S1
@@ -2408,7 +2495,6 @@ CONTAINS
     type(element),pointer :: s2
     type(elementp), pointer :: s2p
     type(fibre), pointer::el
-    TYPE(MAGNET_FRAME),  POINTER :: FAKE
     integer ntot,ntot_rad,ntot_REV,ntot_rad_REV
 
     nullify(el);
@@ -2481,7 +2567,8 @@ CONTAINS
        CURVED_ELEMENT=.FALSE.
     ENDIF
     S2%KIND=S1%KIND; S2%P%METHOD=S1%METHOD ;        S2%P%NST=S1%NST ;
-    S2%NAME=S1%NAME        ;S2%VORNAME=S1%VORNAME ;S2%L =S1%L ;S2%P%LD=S1%LD;S2%P%LC=S1%LC;
+    S2%NAME=S1%NAME        ;S2%VORNAME=S1%VORNAME ;
+    S2%L =S1%L ;S2%P%LD=S1%LD;S2%P%LC=S1%LC;
 
     S2%PERMFRINGE=S1%PERMFRINGE
     S2%P%KILL_EXI_FRINGE=S1%KILL_EXI_FRINGE
@@ -2667,6 +2754,7 @@ CONTAINS
 
     s2p=0
     call copy(s2,s2p)
+
     ! end of machida stuff here
     ! Default survey stuff here
     !         s22%CHART%A_XY=s2%P%tilTd      ! THAT SHIT SHOULD NOT BE CHANGED NORMALLY
@@ -2678,16 +2766,6 @@ CONTAINS
           !           s22%chart=1
           s22%chart=0
           CALL SURVEY_no_patch(S22)
-       else
-          call alloc(fake)
-          FAKE%ENT=GLOBAL_FRAME
-          FAKE%MID=GLOBAL_FRAME
-          FAKE%EXI=GLOBAL_FRAME
-          FAKE%A=GLOBAL_ORIGIN
-          FAKE%O=GLOBAL_ORIGIN
-          FAKE%B=GLOBAL_ORIGIN
-          CALL SURVEY_no_patch(S22,fake=fake)
-          call kill(fake)
        endif
     ENDIF
 
@@ -2699,6 +2777,8 @@ CONTAINS
     madkick=.false.
 
   END SUBROUTINE EL_Q
+
+
 
 
 
@@ -2732,10 +2812,6 @@ CONTAINS
 
 
 
-    c_%with_external_frame => with_external_frame
-    c_%with_internal_frame => with_internal_frame
-    c_%with_chart => with_chart
-    c_%with_patch => with_patch
     c_%NEW_METHOD => NEW_METHOD
     c_%MADTHICK => MADKIND2
     c_%MADTHIN_NORMAL => MADKIND3N
@@ -2929,7 +3005,7 @@ CONTAINS
 
 
 
-  SUBROUTINE  GET_ENERGY(ENE,KIN,BRHOin,BET,P0CC)
+  SUBROUTINE GET_ENERGY(ENE,KIN,BRHOin,BET,P0CC)
     implicit none
     real(dp) ,INTENT(INOUT)::ENE,kin,BRHOin,BET,P0CC
     ENE=ENERGY
@@ -3065,7 +3141,7 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     CHARACTER(*),optional, INTENT(IN):: file,file_rev
     type (TILTING),optional, INTENT(IN):: T
-    integer mf,no,n_map
+    integer mf,no,n_map,nst
     real(dp) ld,ang
     type(damap) m,mr,id,id2
     INTEGER I,ndpt,time,timefac,K
@@ -3073,15 +3149,19 @@ CONTAINS
     INTEGER  JS(6)
     Taylor_maptilt=0
     JS=0
-
+    Taylor_maptilt%NST=1
     IF(PRESENT(FILE)) THEN
        mf=NEWFILE
        open(unit=mf,file=file)
-       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP   ! number of maps (1,2), no, ld=design length
+       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
+       Taylor_maptilt%NST=nst
        IF(MAD_TREE_DELTAMAP) THEN
           read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
        ENDIF
-
+       if(symplectic_order>0) no=symplectic_order
+       if(symplectify) then
+          if(symplectic_order>no) no=symplectic_order
+       endif
        call init(NO,3,0,0)
        call alloc(m,mr,id,id2); call alloc(beta,gamma);
        IF(MAD_TREE_DELTAMAP) THEN   !
@@ -3129,6 +3209,7 @@ CONTAINS
              m%v(6)=m%v(6)+(one.mono.'000001')
           endif
 
+          if(symplectify)call symplectic(m,symplectic_eps,nst)
 
           call SET_TREE(mad_tree,M)
 
@@ -3171,6 +3252,9 @@ CONTAINS
 
        ELSE  ! MAD_TREE_DELTAMAP
           call  dainput_SPECIAL6(m,mf,time);
+
+          if(symplectify)call symplectic(m,symplectic_eps,nst)
+
           call SET_TREE(mad_tree,M)
           if(n_map==2) then
              call  dainput_SPECIAL6(mr,mf,time);
@@ -3179,9 +3263,23 @@ CONTAINS
              call SET_TREE(mad_tree_rad,M)
           endif
        ENDIF ! MAD_TREE_DELTAMAP
+       mf=CLOSEFILE
+       if(symplectic_print) then
+          mf=NEWFILE
+          open(unit=mf,file=file)
+          write(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
+          Taylor_maptilt%NST=nst
+          IF(MAD_TREE_DELTAMAP) THEN
+             read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
+          ENDIF
+          call daprint(m,mf)
+
+          mf=CLOSEFILE
+       endif
+
+
        call kill(m,mr,id,id2); call kill(beta,gamma);
 
-       mf=CLOSEFILE
 
        MAD_TREE_LD=LD   ! put here for the logic of PRESENT(FILE_REV)==false
        MAD_TREE_ANGLE=ANG
@@ -3194,10 +3292,16 @@ CONTAINS
     IF(PRESENT(FILE_REV)) THEN
        mf=NEWFILE
        open(unit=mf,file=FILE_REV)
-       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP   ! number of maps (1,2), no, ld=design length
+       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
+       Taylor_maptilt%NST=nst
        IF(MAD_TREE_DELTAMAP) THEN
           read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
        ENDIF
+
+       if(symplectic_order>0) no=symplectic_order
+       if(symplectify) then
+          if(symplectic_order>no) no=symplectic_order
+       endif
 
        call init(NO,3,0,0)
        call alloc(m,mr,id,id2); call alloc(beta,gamma);
@@ -3246,6 +3350,8 @@ CONTAINS
           endif
 
 
+          if(symplectify)call symplectic(m,symplectic_eps,nst)
+
           call SET_TREE(mad_tree_rev,M)
 
           if(n_map>=2) then
@@ -3287,6 +3393,9 @@ CONTAINS
 
        ELSE  ! MAD_TREE_DELTAMAP
           call  dainput_SPECIAL6(m,mf,time);
+
+          if(symplectify)call symplectic(m,symplectic_eps,nst)
+
           call SET_TREE(mad_tree_rev,M)
           if(n_map==2) then
              call  dainput_SPECIAL6(mr,mf,time);
@@ -3295,9 +3404,20 @@ CONTAINS
              call SET_TREE(mad_tree_rad_rev,M)
           endif
        ENDIF ! MAD_TREE_DELTAMAP
+       mf=CLOSEFILE
+       if(symplectic_print) then
+          mf=NEWFILE
+          open(unit=mf,file=file)
+          write(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
+          IF(MAD_TREE_DELTAMAP) THEN
+             read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
+          ENDIF
+          call daprint(m,mf)
+
+          mf=CLOSEFILE
+       endif
        call kill(m,mr,id,id2); call kill(beta,gamma);
 
-       mf=CLOSEFILE
 
     ELSE  ! PRESENT FILE
        LD=MAD_TREE_LD
@@ -3343,7 +3463,7 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME,file
     type (TILTING),optional, INTENT(IN):: T
     real(dp) , optional, INTENT(IN):: R1
-    real(dp) x1,x2,x3,x4,x5,x6,R,ANG
+    real(dp) x1,x2,x3,x4,x5,x6,R,ANG,hc
     integer mf
 
     file_fitted=file
@@ -3351,35 +3471,34 @@ CONTAINS
 
     mf=NEWFILE
     open(unit=mf,file=file_fitted)
-    read(mf,*) ns_0,x1,x2,nx_0,x3,x4,ny_0,x5,x6
-    w_p=0
-    w_p%nc=1
-    w_p%fc='(1(1X,A120))'
-    write(w_p%c(1),'(3(1x,i4,2(1x,g16.10)))') ns_0,x1,x2,nx_0,x3,x4,ny_0,x5,x6
-    call write_i
+    read(mf,*) hc,ns_0,x1,x2,nx_0,x3,x4,ny_0,x5,x6
     close(mf)
 
-    ang=(x2-x1)*DEG_TO_RAD_
+    ang=hc*(x2-x1)
 
-    if(.not.present(r1)) then
-       r=x3
+    !    if(.not.present(r1)) then
+    !       r=x3
+    !    else
+    !       r=r1
+    !    endif
+
+
+    !    IF(ANG/=zero.AND.R/=zero) THEN
+    if(hc>0.d0) then
+       AIBAL%LC=two*SIN(ANG/two)/hc
     else
-       r=r1
+       AIBAL%LC=(x2-x1)
     endif
-
-
-    IF(ANG/=zero.AND.R/=zero) THEN
-       AIBAL%LC=two*SIN(ANG/two)*R
-       AIBAL%B0=one/R                      !COS(ANG/two)/R
-       AIBAL%LD=ANG/AIBAL%B0
-       AIBAL%L=AIBAL%LD
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A120))'
-       w_p%c(1)= " ROUTINE AIBAL: GIVE X OF FIRST DATA IN TOSCA FILE AND IDEAL ANGLE"
-       call write_e(1221)
-    ENDIF
+    AIBAL%B0=hc                     !COS(ANG/two)/R
+    AIBAL%LD=(x2-x1)
+    AIBAL%L=AIBAL%LD
+    !    ELSE
+    !       w_p=0
+    !       w_p%nc=1
+    !       w_p%fc='(1(1X,A120))'
+    !       w_p%c(1)= " ROUTINE AIBAL: GIVE X OF FIRST DATA IN TOSCA FILE AND IDEAL ANGLE"
+    !       call write_e(1221)
+    !    ENDIF
 
     IF(LEN(NAME)>nlp) THEN
        w_p=0
@@ -3393,6 +3512,7 @@ CONTAINS
        AIBAL%NAME=NAME
     ENDIF
 
+    AIBAL%nst=ns_0
     AIBAL%KIND=kindfitted
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN

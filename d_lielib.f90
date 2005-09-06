@@ -1,6 +1,7 @@
 ! The Full Polymorphic Package
-! The module in this file is the property of Lawrence Berkeley National Laboratory
-! Its distribution and commercial usage are governed by the laws of the
+! The module in this file is, to the best of our knowledge,
+! the property of Lawrence Berkeley National Laboratory
+! Its distribution and commercial usage may therefore be governed by the laws of the
 ! United States of America
 
 module lielib_berz
@@ -25,9 +26,9 @@ module lielib_berz
   !real(dp),private::epsplane
   !real(dp),private,dimension(ndim)::xplane
   !integer,public,parameter::ndim2=2*ndim,ntt=40
-  integer,private,parameter::ndim2=2*ndim,ntt=40
+  integer,private,parameter::ndim2=2*ndim,ntt=100
   character(120) line
-
+  public getcct,GETINV,gtrx
 contains
 
   subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
@@ -373,6 +374,36 @@ contains
     endif
     return
   end subroutine etcct
+
+  subroutine getcct(x,y,z,n)
+    implicit none
+    !  Z=XoY
+    integer i,nt,n
+    integer,dimension(ntt)::ie,iv
+    integer,dimension(:)::x,y,z
+    if(.not.c_%stable_da) return
+
+    nt=nv-n
+    if(nt.gt.0) then
+       call etallnom(ie,nt,'IE        ')
+       do i=n+1,nv
+          call davar(ie(i-n),zero,i)
+       enddo
+       do i=n+1,nv
+          iv(i)=ie(i-n)
+       enddo
+    endif
+    do i=1,n
+       iv(i)=y(i)
+    enddo
+    call dacct(x,n,iv,nv,z,n)
+    if(nt.gt.0) then
+       call dadal(ie,nt)
+    endif
+    return
+  end subroutine getcct
+
+
   subroutine trx(h,rh,y)
     implicit none
     !  :RH: = Y :H: Y^-1 =  :HoY:
@@ -403,6 +434,38 @@ contains
     endif
     return
   end subroutine trx
+
+  subroutine gtrx(h,rh,y,n)
+    implicit none
+    !  :RH: = Y :H: Y^-1 =  :HoY:
+    integer i,nt,h,rh,n
+    integer,dimension(ntt)::ie,iv
+    integer,dimension(1)::h1,rh1
+    integer,dimension(:)::y
+    if(.not.c_%stable_da) return
+
+    nt=nv-n
+    if(nt.gt.0) then
+       call etallnom(ie,nt,'IE        ')
+       do i=n+1,nv
+          call davar(ie(i-n),zero,i)
+       enddo
+       do i=n+1,nv
+          iv(i)=ie(i-n)
+       enddo
+    endif
+    do i=1,n
+       iv(i)=y(i)
+    enddo
+    h1(1)=h
+    rh1(1)=rh
+    call dacct(h1,1,iv,nv,rh1,1)
+    if(nt.gt.0) then
+       call dadal(ie,nt)
+    endif
+    return
+  end subroutine gtrx
+
   subroutine trxflo(h,rh,y)
     implicit none
     !  *RH* = Y *H* Y^-1  CHANGE OF A VECTOR FLOW OPERATOR
@@ -541,6 +604,42 @@ contains
     endif
     return
   end subroutine etpin
+  subroutine getinv(x,y,n)
+    implicit none
+    ! Y=X^-1
+    integer i,nt,n
+    integer,dimension(ntt)::ie1,ie2,iv1,iv2
+    integer,dimension(:)::x,y
+    if(.not.c_%stable_da) return
+
+    nt=nv-n
+    if(nt.gt.0) then
+       do i=1,nt
+          ie1(i)=0
+          ie2(i)=0
+       enddo
+       call etallnom(ie1,nt,'IE1       ')
+       call etallnom(ie2,nt,'IE2       ')
+       do i=n+1,nv
+          call davar(ie1(i-n),zero,i)
+       enddo
+       do i=n+1,nv
+          iv1(i)=ie1(i-n)
+          iv2(i)=ie2(i-n)
+       enddo
+    endif
+    do i=1,n
+       iv1(i)=x(i)
+       iv2(i)=y(i)
+    enddo
+
+    call dainv(iv1,nv,iv2,nv)
+    if(nt.gt.0) then
+       call dadal(ie2,nt)
+       call dadal(ie1,nt)
+    endif
+    return
+  end subroutine getinv
   subroutine dapek0(v,x,jj)
     implicit none
     !- MORE EXTENSIONS OF BASIC BERZ'S PACKAGE
@@ -1213,7 +1312,7 @@ contains
     enddo
     xnbefore=c_1d36
     more=.false.
-    eps=c_1d_9
+    eps=1.e-5_dp
     nrmax=1000
     xn=c_1d4
     do k=1,nrmax
@@ -2379,13 +2478,13 @@ contains
           CALL WRITE_i
 
           do j=1,nd2
-             xsu=xsu+abs(w(i,j))
+             xsu=xsu+abs(w(i,j)-XJ(I,J))
           enddo
        enddo
        w_p=0
        w_p%nc=1
        w_p%fc='((1X,A120))'
-       write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu-nd2)/xsu, ' %'
+       write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
        CALL WRITE_i
     endif
     call eig6(cr,rr,ri,vr,vi)
