@@ -80,12 +80,14 @@
 /name_len.fi -text
 /o_tree_element.f90 -text
 /orbf.F -text
+/photoni.inc -text
 /physcons.fi -text
 /plot.F -text
 /plot.fi -text
 /plot_b.fi -text
 /plot_c.fi -text
 /plot_math.fi -text
+/poisson.F -text
 /ptc_dummy.F -text
 /resindex.F -text
 /resindex.fi -text
@@ -107,6 +109,7 @@
 /twissl.fi -text
 /twissotm.fi -text
 /twtrr.fi -text
+/user2_photon.f90 -text
 /usleep.c -text
 /util.F -text
 /win32calls.fi -text
