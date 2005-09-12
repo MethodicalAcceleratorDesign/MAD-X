@@ -2588,11 +2588,13 @@ void madx_start()
   time(&start_time); /* initialize timing */
   tm = localtime(&start_time); /* split system time */
   last_time = start_time;
-  printf("\n  +++++++++++++++++++++++++++++++++++\n");
-  printf("  + %s %02d/%02d/%02d %02d.%02d.%02d +\n", myversion,
+  printf("\n  +++++++++++++++++++++++++++++++++++++++++++\n");
+  printf("  +              %s              +\n", myversion);
+  printf("  + %s      +\n",code_mod_date);
+  printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
-  printf("  +++++++++++++++++++++++++++++++++++\n");
+  printf("  +++++++++++++++++++++++++++++++++++++++++++\n");
 }
 
 void main_input(int top)

@@ -126,6 +126,7 @@ void add_to_el_list( /* adds element to alphabetic element list */
      /*       = 2: warn and ignore if already present - resets *el to old */
 {
   int pos, j;
+  struct node* p_node;
   if ((pos = name_list_pos((*el)->name, ell->list)) > -1)
     {
       if (flag > 1)
@@ -143,6 +144,15 @@ void add_to_el_list( /* adds element to alphabetic element list */
 		  if (ell->elem[j] != ell->elem[pos]
 		      && ell->elem[j]->parent == ell->elem[pos])
                     ell->elem[j]->parent = *el;
+		}
+              for (j = 0; j < sequences->curr; j++)
+		{
+		  p_node = sequences->sequs[j]->start;
+		  while (p_node != sequences->sequs[j]->end)
+		    {
+		      if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
+		      p_node = p_node->next;
+		    }
 		}
 	      delete_element(ell->elem[pos]);
 	    }
