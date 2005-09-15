@@ -96,14 +96,14 @@ extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
 extern void mtgetc_(double*, double*); /* mtgeti->mtgetc JMJ, 8/4/2003 */
 extern void collect_(int*, double*, double*); /* OB 13.2.2002 */
 extern void emit_(double*, double*, double*, double*, double*, double*,
-		  double*, double*, double*, double*, double*, double*, double*, double*);
+                  double*, double*, double*, double*, double*, double*, double*, double*);
 extern void fortinit_();
 extern void getclor_(double*, double*, double*, int*);
 extern void gxterm_();
 extern void haveit_(double *,double *,double *,double *,int *,int *,
-		    int *,double *,double *,double *,double *,double *,double *);
+                    int *,double *,double *,double *,double *,double *,double *);
 extern void testit_(double *,double *,double *,double *,int *,int *,
-		    int *,double *,double *,double *,double *,double *,double *);
+                    int *,double *,double *,double *,double *,double *,double *);
 extern void svdcorr_m_(double *,double *, double *,double *,double *, double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *,int *, int *, int *);
 extern void svdcorr_c_(double *,double *, double *,double *,double *, double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *,int *, int *, int *);
 extern void svddec_m_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *, int *);
@@ -112,8 +112,8 @@ extern void svddec_c_(double *,double *,double *,double *,double *,double *,doub
 extern void ibs_();
 extern void touschek_();
 extern void micit_(double *,char *,double *,double *,double *,int *,float *,
-		   int *,int *,int *,int *,float *,float *,float *,float *,float *,
-		   float *,float *,float *,float *,float *,int *);
+                   int *,int *,int *,int *,float *,float *,float *,float *,float *,
+                   float *,float *,float *,float *,float *,int *);
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*, double*, double*);
@@ -129,7 +129,7 @@ extern void pemima_();
 extern void pesopt_(int*);
 extern void plotit_(int*);
 extern void setup_(double *respx,double *dmat,int *im,
-		   int *ic, int *nm, int*nc);
+                   int *ic, int *nm, int*nc);
 extern void soddin_(int*);
 extern void survey_();
 extern void tmrefe_(double*);
@@ -373,6 +373,7 @@ void fill_par_var_list(struct el_list*,
 void fill_sequ_var_list(struct sequence_list*, struct el_list*,
                         struct var_list*);
 void fill_twiss_header(struct table*);
+void fill_twiss_header_ptc(struct table*, double);
 struct command* find_command(char*, struct command_list*);
 struct command_list* find_command_list(char*, struct command_list_list*);
 struct element* find_element(char*, struct el_list*);
@@ -759,31 +760,31 @@ int new_comb(struct reg_token*);
 /* Aperture module routines */
 void aper_adj_quad(double, double, double, double*, double*);
 void aper_adj_halo_si(double, double, double, double, double, double*,
-		      double*, int, double*, double*);
+                      double*, int, double*, double*);
 int aper_bs(char*, double*, double*, double*, double*, int*, double*, double*);
 double aper_calc(double, double, double*, double*, double*,
-		 int, double*, double*, double*, double*,
-		 double*, double*, int, double);
+                 int, double*, double*, double*, double*,
+                 double*, double*, int, double);
 int aper_chk_inside(double, double, double*, double*, double, int);
 int aper_e_d_read(char*, struct aper_e_d*, int*, char*);
 int aper_external_file(char*, double*, double*);
 void aper_fill_quads(double*, double*, int, int*);
 void aper_header(struct table*, struct aper_node*);
 void aper_intersect(double, double, double, double, double, double,
-		    double, double, int, int,double*, double*);
+                    double, double, int, int,double*, double*);
 int aper_linepar(double, double, double, double, double*, double*);
 double aper_online(double, double, double, double, double, double, double);
 void aper_race(double, double, double, double, double*, double*);
 void aper_read_twiss(char*, int*, double*, double*, double*,
-		     double*, double*, double*, double*);
+                     double*, double*, double*, double*);
 int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
 void aper_surv(double*, int);
 int aper_tab_search(int, struct aper_e_d*, char*, int*);
 void aper_trim_ws(char*, int);
 void aper_write_table(char*, double*, double*, double*, double*, double*, double*,
-		      char*, double*, double*, double*, double*,
-		      double*, double*, double*, double*, double*,
-		      double*, double*, double*, double*, double*, char*);
+                      char*, double*, double*, double*, double*,
+                      double*, double*, double*, double*, double*,
+                      double*, double*, double*, double*, double*, char*);
 struct aper_node* aperture(char*, struct node**, struct table*, int*);
 
 /* SXF module routines */
@@ -994,8 +995,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.00.02";
-char code_mod_date[] = "Code Modification Date: 13.09.2005";
+char myversion[] = "MAD-X 3.00.03";
+char code_mod_date[] = "Code Modification Date: 15.09.2005";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
@@ -1083,8 +1084,8 @@ int next_rand = 0;          /* for random generator */
 int plots_made = 0;         /* set to 1 if plots are made */
 int polish_cnt = 0;         /* used to detect infinite loops */
 int print_match_summary = 0;/* OB 6.3.2002:
-			       activate the print option in the
-			       'mtgeti' and 'collect' routines (mtgeti->mtgetc JMJ, 8/4/2003)    */
+                               activate the print option in the
+                               'mtgeti' and 'collect' routines (mtgeti->mtgetc JMJ, 8/4/2003)    */
 int quote_toggle = 0;       /* for quote strings on input */
 int return_flag = 0;        /* 1 when "return" read */
 int scrap_count = 0;        /* running counter to make things unique */
@@ -1111,7 +1112,7 @@ int           na_err,              /* current no. of alignment errors */
   sxf_elem_cnt = 0,    /* element count */
   tag_flag = 0,        /* if > 0, tag = parent name written */
   tag_cnt = 0,         /* if > 0, tag = specified type code
-			  written for selected types only */
+                          written for selected types only */
   sxf_align_cnt = 0,       /* element with align errors count */
   sxf_field_cnt = 0,       /* element with field errors count */
   stop_flag = 0,           /* 1 if stop condition */
