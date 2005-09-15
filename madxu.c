@@ -9,33 +9,33 @@ int add_drifts(struct node* c_node, struct node* end)
   pos = c_node->position
     - c_node->length / two;
   while (c_node != NULL)
+  {
+    cnt++;
+    el2 = c_node->length / two;
+    dl = c_node->position - el2 - pos;
+    if (dl + ten_m_6 < zero)
+    {
+      sprintf(c_dummy, "%s, length %e", c_node->name, dl);
+      fatal_error("negative drift in front of", c_dummy);
+    }
+    else if (dl > ten_m_6)
     {
       cnt++;
-      el2 = c_node->length / two;
-      dl = c_node->position - el2 - pos;
-      if (dl + ten_m_6 < zero)
-	{
-	  sprintf(c_dummy, "%s, length %e", c_node->name, dl);
-	  fatal_error("negative drift in front of", c_dummy);
-	}
-      else if (dl > ten_m_6)
-	{
-	  cnt++;
-	  drift = get_drift(dl);
-	  d1 = new_elem_node(drift, 0);
-	  link_in_front(d1, c_node);
-	  d1->position = pos + dl / two;
-	}
-      pos = c_node->position + el2;
-      if (c_node == end) break;
-      c_node = c_node->next;
+      drift = get_drift(dl);
+      d1 = new_elem_node(drift, 0);
+      link_in_front(d1, c_node);
+      d1->position = pos + dl / two;
     }
+    pos = c_node->position + el2;
+    if (c_node == end) break;
+    c_node = c_node->next;
+  }
   return cnt;
 }
 
 void add_table_vars(struct name_list* cols, struct command_list* select)
-     /* 1: adds user selected variables to table - always type 2 = double
-        2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
+  /* 1: adds user selected variables to table - always type 2 = double
+     2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
 {
   int i, j, k, n, pos;
   char* var_name;
@@ -43,272 +43,276 @@ void add_table_vars(struct name_list* cols, struct command_list* select)
   struct name_list* nl;
   struct command_parameter_list* pl;
   for (i = 0; i < select->curr; i++)
+  {
+    nl = select->commands[i]->par_names;
+    pl = select->commands[i]->par;
+    pos = name_list_pos("column", nl);
+    if (nl->inform[pos])
     {
-      nl = select->commands[i]->par_names;
-      pl = select->commands[i]->par;
-      pos = name_list_pos("column", nl);
-      if (nl->inform[pos])
-	{
-	  for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-	    {
-	      var_name = pl->parameters[pos]->m_string->p[j];
-	      if (strcmp(var_name, "apertype") == 0)
-		{
-		  if ((n = aperture_count(current_sequ)) > 0)
-		    {
-		      add_to_name_list(permbuff("apertype"), 3, cols);
-		      for (k = 0; k < n; k++)
-			{
-			  sprintf(tmp, "aper_%d", k+1);
-			  add_to_name_list(permbuff(tmp), 2, cols);
-			}
-		    }
-		}
-	      else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
-		add_to_name_list(permbuff(var_name), 2, cols);
-	    }
-	}
+      for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+      {
+        var_name = pl->parameters[pos]->m_string->p[j];
+        if (strcmp(var_name, "apertype") == 0)
+        {
+          if ((n = aperture_count(current_sequ)) > 0)
+          {
+            add_to_name_list(permbuff("apertype"), 3, cols);
+            for (k = 0; k < n; k++)
+            {
+              sprintf(tmp, "aper_%d", k+1);
+              add_to_name_list(permbuff(tmp), 2, cols);
+            }
+          }
+        }
+        else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
+          add_to_name_list(permbuff(var_name), 2, cols);
+      }
     }
+  }
 }
 
 void add_to_command_list(char* label, struct command* comm,
                          struct command_list* cl, int flag)
-     /* adds command comm to the command list cl */
-     /* flag for printing a warning */
+  /* adds command comm to the command list cl */
+  /* flag for printing a warning */
 {
   int pos, j;
   if ((pos = name_list_pos(label, cl->list)) > -1)
-    {
-      if (flag) put_info(label, "redefined");
-      if (cl != defined_commands && cl != stored_commands)
-	delete_command(cl->commands[pos]);
-      cl->commands[pos] = comm;
-    }
+  {
+    if (flag) put_info(label, "redefined");
+    if (cl != defined_commands && cl != stored_commands)
+      delete_command(cl->commands[pos]);
+    cl->commands[pos] = comm;
+  }
   else
-    {
-      if (cl->curr == cl->max) grow_command_list(cl);
-      j = add_to_name_list(permbuff(label), 0, cl->list);
-      cl->commands[cl->curr++] = comm;
-    }
+  {
+    if (cl->curr == cl->max) grow_command_list(cl);
+    j = add_to_name_list(permbuff(label), 0, cl->list);
+    cl->commands[cl->curr++] = comm;
+  }
 }
 
 void add_to_command_list_list(char* label, struct command_list* cl,
                               struct command_list_list* sl)
-     /* adds command list cl to comand-list list sl */
+  /* adds command list cl to comand-list list sl */
 {
   int pos, j;
   if ((pos = name_list_pos(label, sl->list)) > -1)
-    {
-      delete_command_list(sl->command_lists[pos]);
-      sl->command_lists[pos] = cl;
-    }
+  {
+    delete_command_list(sl->command_lists[pos]);
+    sl->command_lists[pos] = cl;
+  }
   else
-    {
-      if (sl->curr == sl->max) grow_command_list_list(sl);
-      j = add_to_name_list(permbuff(label), 0, sl->list);
-      sl->command_lists[sl->curr++] = cl;
-    }
+  {
+    if (sl->curr == sl->max) grow_command_list_list(sl);
+    j = add_to_name_list(permbuff(label), 0, sl->list);
+    sl->command_lists[sl->curr++] = cl;
+  }
 }
 
 void add_to_constraint_list(struct constraint* cs, struct constraint_list* cl)
-     /* add constraint cs to the constraint list cl */
+  /* add constraint cs to the constraint list cl */
 {
   if (cl->curr == cl->max) grow_constraint_list(cl);
   cl->constraints[cl->curr++] = cs;
 }
 
 void add_to_el_list( /* adds element to alphabetic element list */
-		    struct element** el, int inf, struct el_list* ell, int flag)
-     /* inf is entered in the namelist */
-     /*  flag < 0: do not delete if already present, do not warn */
-     /*       = 0: delete, but do not warn */
-     /*       = 1: delete & warn */
-     /*       = 2: warn and ignore if already present - resets *el to old */
+  struct element** el, int inf, struct el_list* ell, int flag)
+  /* inf is entered in the namelist */
+  /*  flag < 0: do not delete if already present, do not warn */
+  /*       = 0: delete, but do not warn */
+  /*       = 1: delete & warn */
+  /*       = 2: warn and ignore if already present - resets *el to old */
 {
   int pos, j;
   struct node* p_node;
   if ((pos = name_list_pos((*el)->name, ell->list)) > -1)
+  {
+    if (flag > 1)
     {
-      if (flag > 1)
-	{
-	  warning("implicit element re-definition ignored:", (*el)->name);
-	  *el = ell->elem[pos];
-	}
-      else
-	{
-	  if (flag > 0) put_info("element redefined:", (*el)->name);
-	  if (flag >= 0 && ell == element_list)
-	    {
-	      for (j = 0; j < ell->curr; j++) /* set existing pointers to new */
-		{
-		  if (ell->elem[j] != ell->elem[pos]
-		      && ell->elem[j]->parent == ell->elem[pos])
-                    ell->elem[j]->parent = *el;
-		}
-              for (j = 0; j < sequences->curr; j++)
-		{
-		  p_node = sequences->sequs[j]->start;
-		  while (p_node != sequences->sequs[j]->end)
-		    {
-		      if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
-		      p_node = p_node->next;
-		    }
-		}
-	      delete_element(ell->elem[pos]);
-	    }
-	  ell->elem[pos] = *el;
-	}
+      warning("implicit element re-definition ignored:", (*el)->name);
+      *el = ell->elem[pos];
     }
+    else
+    {
+      if (flag > 0) put_info("element redefined:", (*el)->name);
+      if (flag >= 0 && ell == element_list)
+      {
+        for (j = 0; j < ell->curr; j++) /* set existing pointers to new */
+        {
+          if (ell->elem[j] != ell->elem[pos]
+              && ell->elem[j]->parent == ell->elem[pos])
+            ell->elem[j]->parent = *el;
+        }
+        for (j = 0; j < sequences->curr; j++)
+        {
+          p_node = sequences->sequs[j]->start;
+          while (p_node != sequences->sequs[j]->end)
+          {
+            if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
+            p_node = p_node->next;
+          }
+        }
+        delete_element(ell->elem[pos]);
+      }
+      ell->elem[pos] = *el;
+    }
+  }
   else
-    {
-      if (ell->curr == ell->max) grow_el_list(ell);
-      j = add_to_name_list(permbuff((*el)->name), inf, ell->list);
-      ell->elem[ell->curr++] = *el;
-    }
+  {
+    if (ell->curr == ell->max) grow_el_list(ell);
+    j = add_to_name_list(permbuff((*el)->name), inf, ell->list);
+    ell->elem[ell->curr++] = *el;
+  }
 }
 
 void add_to_macro_list( /* adds macro to alphabetic macro list */
-		       struct macro* macro, struct macro_list* nll)
+  struct macro* macro, struct macro_list* nll)
 {
   int pos, j;
   if ((pos = name_list_pos(macro->name, nll->list)) > -1)
-    {
-      warning("macro redefined:", macro->name);
-      delete_macro(nll->macros[pos]);
-      nll->macros[pos] = macro;
-    }
+  {
+    warning("macro redefined:", macro->name);
+    delete_macro(nll->macros[pos]);
+    nll->macros[pos] = macro;
+  }
   else
-    {
-      if (nll->curr == nll->max) grow_macro_list(nll);
-      j = add_to_name_list(permbuff(macro->name), 0, nll->list);
-      nll->macros[nll->curr++] = macro;
-    }
+  {
+    if (nll->curr == nll->max) grow_macro_list(nll);
+    j = add_to_name_list(permbuff(macro->name), 0, nll->list);
+    nll->macros[nll->curr++] = macro;
+  }
 }
 
 int add_to_name_list(char* name, int inf, struct name_list* vlist)
-     /* adds name to alphabetic name list vlist */
-     /* inf is an integer kept with name */
+  /* adds name to alphabetic name list vlist */
+  /* inf is an integer kept with name */
 {
   int j, num, low = 0, mid, high = vlist->curr - 1, pos = 0, ret;
 
   if (name == NULL) return -1;
   if ((ret = name_list_pos(name, vlist)) < 0)
+  {
+    while (low <= high)
     {
-      while (low <= high)
-	{
-	  mid = (low + high) / 2;
-	  if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0)
-	    {high = mid - 1; pos = mid;}
-	  else if (num > 0) {low  = mid + 1; pos = low;}
-	}
-      ret = vlist->curr;
-      if (vlist->curr == vlist->max) grow_name_list(vlist);
-      for (j = vlist->curr; j > pos; j--) vlist->index[j] = vlist->index[j-1];
-      vlist->index[pos] = vlist->curr;
-      vlist->inform[vlist->curr] = inf;
-      vlist->names[vlist->curr++] = name;
+      mid = (low + high) / 2;
+      if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0)
+      {
+        high = mid - 1; pos = mid;
+      }
+      else if (num > 0) {
+        low  = mid + 1; pos = low;
+      }
     }
+    ret = vlist->curr;
+    if (vlist->curr == vlist->max) grow_name_list(vlist);
+    for (j = vlist->curr; j > pos; j--) vlist->index[j] = vlist->index[j-1];
+    vlist->index[pos] = vlist->curr;
+    vlist->inform[vlist->curr] = inf;
+    vlist->names[vlist->curr++] = name;
+  }
   else  vlist->inform[ret] = inf;
   return ret;
 }
 
 void add_to_node_list( /* adds node to alphabetic node list */
-		      struct node* node, int inf, struct node_list* nll)
+  struct node* node, int inf, struct node_list* nll)
 {
   int pos, j;
   if ((pos = name_list_pos(node->name, nll->list)) < 0)
-    {
-      if (nll->curr == nll->max) grow_node_list(nll);
-      j = add_to_name_list(node->name, inf, nll->list);
-      nll->nodes[nll->curr++] = node;
-    }
+  {
+    if (nll->curr == nll->max) grow_node_list(nll);
+    j = add_to_name_list(node->name, inf, nll->list);
+    nll->nodes[nll->curr++] = node;
+  }
 }
 
 void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
-     /* adds sequence sequ to sequence list sql */
+  /* adds sequence sequ to sequence list sql */
 {
   int i;
   for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  return;
   for (i = 0; i < sql->curr; i++)
+  {
+    if (strcmp(sql->sequs[i]->name, sequ->name) == 0)
     {
-      if (strcmp(sql->sequs[i]->name, sequ->name) == 0)
-	{
-	  sql->sequs[i] = sequ;
-	  sql->list->names[i] = sequ->name;
-	  return;
-	}
+      sql->sequs[i] = sequ;
+      sql->list->names[i] = sequ->name;
+      return;
     }
+  }
   if (sql->curr == sql->max) grow_sequence_list(sql);
   sql->sequs[sql->curr++] = sequ;
   add_to_name_list(sequ->name, 0, sql->list);
 }
 
 void add_to_table_list(struct table* t, struct table_list* tl)
-     /* adds table t to table list tl */
+  /* adds table t to table list tl */
 {
   int pos, j;
   if ((pos = name_list_pos(t->name, tl->names)) < 0)
-    {
-      if (tl->curr == tl->max) grow_table_list(tl);
-      j = add_to_name_list(tmpbuff(t->name), 0, tl->names);
-      tl->tables[tl->curr++] = t;
-    }
+  {
+    if (tl->curr == tl->max) grow_table_list(tl);
+    j = add_to_name_list(tmpbuff(t->name), 0, tl->names);
+    tl->tables[tl->curr++] = t;
+  }
   else
-    {
-      tl->tables[pos] = delete_table(tl->tables[pos]);
-      tl->tables[pos] = t;
-    }
+  {
+    tl->tables[pos] = delete_table(tl->tables[pos]);
+    tl->tables[pos] = t;
+  }
 }
 
 void add_to_var_list( /* adds variable to alphabetic variable list */
-		     struct variable* var, struct var_list* varl, int flag)
-     /* flag = 0: undefined reference in expression, 1: definition
-	2: separate list, do not drop variable */
+  struct variable* var, struct var_list* varl, int flag)
+  /* flag = 0: undefined reference in expression, 1: definition
+     2: separate list, do not drop variable */
 {
   int pos, j;
   if ((pos = name_list_pos(var->name, varl->list)) > -1)
+  {
+    if (flag == 1)
     {
-      if (flag == 1)
-	{
-	  if (varl->list->inform[pos] == 1)
-	    put_info(var->name, "redefined");
-	  else varl->list->inform[pos] = flag;
-	}
-      if (flag < 2) delete_variable(varl->vars[pos]);
-      varl->vars[pos] = var;
+      if (varl->list->inform[pos] == 1)
+        put_info(var->name, "redefined");
+      else varl->list->inform[pos] = flag;
     }
+    if (flag < 2) delete_variable(varl->vars[pos]);
+    varl->vars[pos] = var;
+  }
   else
-    {
-      if (varl->curr == varl->max) grow_var_list(varl);
-      j = add_to_name_list(permbuff(var->name), flag, varl->list);
-      varl->vars[varl->curr++] = var;
-    }
+  {
+    if (varl->curr == varl->max) grow_var_list(varl);
+    j = add_to_name_list(permbuff(var->name), flag, varl->list);
+    varl->vars[varl->curr++] = var;
+  }
 }
 
 void add_vars_to_table(struct table* t)
-     /* fills user-defined variables into current table_row) */
+  /* fills user-defined variables into current table_row) */
 {
   int i;
   char* p;
 
   for (i = t->org_cols; i < t->num_cols; i++)
+  {
+    if (t->columns->inform[i] < 3)
     {
-      if (t->columns->inform[i] < 3)
-	{
-	  if (strstr(t->columns->names[i], "aper_"))
-	    t->d_cols[i][t->curr]
-	      = get_aperture(current_node, t->columns->names[i]);
-	  else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
-	}
-      else if ((p = command_par_string(t->columns->names[i],
-				       current_node->p_elem->def)) == NULL)
-	t->s_cols[i][t->curr] = tmpbuff("none");
-      else t->s_cols[i][t->curr] = tmpbuff(p);
+      if (strstr(t->columns->names[i], "aper_"))
+        t->d_cols[i][t->curr]
+          = get_aperture(current_node, t->columns->names[i]);
+      else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
     }
+    else if ((p = command_par_string(t->columns->names[i],
+                                     current_node->p_elem->def)) == NULL)
+      t->s_cols[i][t->curr] = tmpbuff("none");
+    else t->s_cols[i][t->curr] = tmpbuff(p);
+  }
 }
 
 int char_cnt(char c, char* string)
-     /* returns number of occurrences of character c in string */
+  /* returns number of occurrences of character c in string */
 {
   int i, k = 0;
   for (i = 0; i < strlen(string); i++) if(string[i] == c) k++;
@@ -316,8 +320,8 @@ int char_cnt(char c, char* string)
 }
 
 int char_p_pos(char* name, struct char_p_array* p)
-     /* returns the position of name in character pointer array p,
-        or -1 if not found */
+  /* returns the position of name in character pointer array p,
+     or -1 if not found */
 {
   int i;
   for (i = 0; i < p->curr; i++) if (strcmp(name, p->p[i]) == 0) return i;
@@ -337,7 +341,7 @@ struct command* clone_command(struct command* p)
 {
   int i;
   struct command* clone = new_command(p->name, 0, p->par->curr,
-				      p->module, p->group, p->link_type,
+                                      p->module, p->group, p->link_type,
                                       p->mad8_type);
   copy_name_list(clone->par_names, p->par_names);
   clone->par->curr = p->par->curr;
@@ -352,7 +356,7 @@ struct command_parameter* clone_command_parameter(struct command_parameter* p)
   struct command_parameter* clone = new_command_parameter(p->name, p->type);
   clone->call_def = p->call_def;
   switch (p->type)
-    {
+  {
     case 4:
       clone->c_min = p->c_min;
       clone->c_max = p->c_max;
@@ -375,7 +379,7 @@ struct command_parameter* clone_command_parameter(struct command_parameter* p)
       break;
     case 13:
       clone->m_string = clone_char_p_array(p->m_string);
-    }
+  }
   return clone;
 }
 
@@ -474,15 +478,15 @@ struct node* clone_node(struct node* p, int flag)
   clone->p_sequ = p->p_sequ;
   clone->savebeta = p->savebeta;
   if (flag)
-    {
-      clone->p_al_err = p->p_al_err;
-      clone->p_fd_err = p->p_fd_err;
-    }
+  {
+    clone->p_al_err = p->p_al_err;
+    clone->p_fd_err = p->p_fd_err;
+  }
   return clone;
 }
 
 void conv_char(char* string, struct int_array* tint)
-     /*converts character string to integer array, using ascii code */
+  /*converts character string to integer array, using ascii code */
 {
   int i, l = strlen(string),
     n = (l < tint->max-1) ? l : tint->max-1;
@@ -491,14 +495,14 @@ void conv_char(char* string, struct int_array* tint)
 }
 
 void copy_double(double* source, double* target, int n)
-     /* copies n double precision values from source to target */
+  /* copies n double precision values from source to target */
 {
   int j;
   for (j = 0; j < n; j++)  target[j] = source[j];
 }
 
 void copy_name_list(struct name_list* out, struct name_list* in)
-     /* copies namelist in to namelist out */
+  /* copies namelist in to namelist out */
 {
   int i, l = in->curr > 0 ? in->curr : 1;
   while (out->max < l) grow_name_list(out);
@@ -518,7 +522,7 @@ struct char_array* delete_char_array(struct char_array* pa)
 }
 
 struct char_p_array* delete_char_p_array(struct char_p_array* pa, int flag)
-     /* flag = 0: delete only pointer array, = 1: delete char. buffers, too */
+  /* flag = 0: delete only pointer array, = 1: delete char. buffers, too */
 {
   char rout_name[] = "delete_char_p_array";
   int i;
@@ -527,9 +531,9 @@ struct char_p_array* delete_char_p_array(struct char_p_array* pa, int flag)
     fprintf(stamp_file, "d_c_p_a double delete --> %s\n", pa->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", pa->name);
   if (flag)
-    {
-      for (i = 0; i < pa->curr; i++)  myfree(rout_name, pa->p[i]);
-    }
+  {
+    for (i = 0; i < pa->curr; i++)  myfree(rout_name, pa->p[i]);
+  }
   if (pa->p != NULL)  myfree(rout_name, pa->p);
   myfree(rout_name, pa);
   return NULL;
@@ -591,12 +595,12 @@ delete_command_parameter_list(struct command_parameter_list* parl)
     fprintf(stamp_file, "d_c_p_l double delete --> %s\n", parl->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", parl->name);
   if (parl->parameters != NULL)
-    {
-      for (i = 0; i < parl->curr; i++)
-	if (parl->parameters[i] != NULL)
-	  parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
-      if (parl->parameters)  myfree(rout_name, parl->parameters);
-    }
+  {
+    for (i = 0; i < parl->curr; i++)
+      if (parl->parameters[i] != NULL)
+        parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
+    if (parl->parameters)  myfree(rout_name, parl->parameters);
+  }
   myfree(rout_name, parl);
   return NULL;
 }
@@ -627,10 +631,10 @@ struct double_array* delete_double_array(struct double_array* a)
 {
   char rout_name[] = "delete_double_array";
   if (a != NULL)
-    {
-      if (a->a != NULL) myfree(rout_name, a->a);
-      myfree(rout_name, a);
-    }
+  {
+    if (a->a != NULL) myfree(rout_name, a->a);
+    myfree(rout_name, a);
+  }
   return NULL;
 }
 
@@ -680,11 +684,11 @@ struct expr_list* delete_expr_list(struct expr_list* exprl)
     fprintf(stamp_file, "d_ex_l double delete --> %s\n", exprl->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", exprl->name);
   if (exprl->list != NULL)
-    {
-      for (i = 0; i < exprl->curr; i++)
-	if (exprl->list[i] != NULL)  delete_expression(exprl->list[i]);
-      myfree(rout_name, exprl->list);
-    }
+  {
+    for (i = 0; i < exprl->curr; i++)
+      if (exprl->list[i] != NULL)  delete_expression(exprl->list[i]);
+    myfree(rout_name, exprl->list);
+  }
   myfree(rout_name, exprl);
   return NULL;
 }
@@ -762,9 +766,9 @@ struct node* delete_node_ring(struct node* start)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", "node_ring");
   q = start->next;
   while (q != NULL && q != start)
-    {
-      p = q; q = q->next; delete_node(p);
-    }
+  {
+    p = q; q = q->next; delete_node(p);
+  }
   delete_node(start);
   return NULL;
 }
@@ -786,12 +790,12 @@ struct sequence* delete_sequence(struct sequence* sequ)
 {
   char rout_name[] = "delete_sequence";
   if (sequ->ex_start != NULL)
-    {
-      sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
-      sequ->ex_start = delete_node_ring(sequ->ex_start);
-      sequ->orbits = delete_vector_list(sequ->orbits);
-      myfree(rout_name, sequ->all_nodes);
-    }
+  {
+    sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
+    sequ->ex_start = delete_node_ring(sequ->ex_start);
+    sequ->orbits = delete_vector_list(sequ->orbits);
+    myfree(rout_name, sequ->all_nodes);
+  }
   if (sequ->l_expr) sequ->l_expr = delete_expression(sequ->l_expr);
   sequ->nodes = delete_node_list(sequ->nodes);
   sequ->start = delete_node_ring(sequ->start);
@@ -826,31 +830,31 @@ struct table* delete_table(struct table* t)
   if (t->row_out != NULL) t->row_out = delete_int_array(t->row_out);
   if (t->node_nm != NULL) t->node_nm = delete_char_p_array(t->node_nm, 0);
   for (i = 0; i < t->curr; i++)
-    {
-      if (t->l_head[i] != NULL)
-        t->l_head[i] = delete_char_p_array(t->l_head[i], 1);
-    }
+  {
+    if (t->l_head[i] != NULL)
+      t->l_head[i] = delete_char_p_array(t->l_head[i], 1);
+  }
   if (t->l_head)  myfree(rout_name, t->l_head);
   if (t->p_nodes) myfree(rout_name, t->p_nodes);
   if (t->d_cols)
-    {
-      for (i = 0; i < t->num_cols; i++)
-        if (t->columns->inform[i] < 3 && t->d_cols[i]) myfree(rout_name, t->d_cols[i]);
-      myfree(rout_name, t->d_cols);
-    }
+  {
+    for (i = 0; i < t->num_cols; i++)
+      if (t->columns->inform[i] < 3 && t->d_cols[i]) myfree(rout_name, t->d_cols[i]);
+    myfree(rout_name, t->d_cols);
+  }
   if (t->s_cols)
+  {
+    for (i = 0; i < t->num_cols; i++)
     {
-      for (i = 0; i < t->num_cols; i++)
-	{
-	  if (t->columns->inform[i] == 3 && t->s_cols[i])
-	    {
-	      for (j = 0; j < t->curr; j++)
-		if (t->s_cols[i][j]) myfree(rout_name, t->s_cols[i][j]);
-	      myfree(rout_name, t->s_cols[i]);
-	    }
-	}
-      myfree(rout_name, t->s_cols);
+      if (t->columns->inform[i] == 3 && t->s_cols[i])
+      {
+        for (j = 0; j < t->curr; j++)
+          if (t->s_cols[i][j]) myfree(rout_name, t->s_cols[i][j]);
+        myfree(rout_name, t->s_cols[i]);
+      }
     }
+    myfree(rout_name, t->s_cols);
+  }
   t->columns = delete_name_list(t->columns);
   myfree(rout_name, t);
   return NULL;
@@ -888,11 +892,11 @@ struct vector_list* delete_vector_list(struct vector_list* vector)
   int j;
   if (vector == NULL) return NULL;
   if (vector->names != NULL)
-    {
-      for (j = 0; j < vector->names->curr; j++)
-	if (vector->vectors[j]) delete_double_array(vector->vectors[j]);
-      delete_name_list(vector->names);
-    }
+  {
+    for (j = 0; j < vector->names->curr; j++)
+      if (vector->vectors[j]) delete_double_array(vector->vectors[j]);
+    delete_name_list(vector->names);
+  }
   if (vector->vectors != NULL) myfree(rout_name, vector->vectors);
   myfree(rout_name, vector);
   return NULL;
@@ -903,13 +907,13 @@ void dump_char_array(struct char_array* a)
   char* c = a->c;
   int n = 0, l_cnt = 60, k;
   while (n < a->curr)
-    {
-      k = a->curr - n; if (k > l_cnt) k = l_cnt;
-      strncpy(c_dummy, c, k);
-      c += k; n += k;
-      c_dummy[k] = '\0';
-      fprintf(prt_file, "%s\n", c_dummy);
-    }
+  {
+    k = a->curr - n; if (k > l_cnt) k = l_cnt;
+    strncpy(c_dummy, c, k);
+    c += k; n += k;
+    c_dummy[k] = '\0';
+    fprintf(prt_file, "%s\n", c_dummy);
+  }
 }
 
 void dump_char_p_array(struct char_p_array* p)
@@ -933,53 +937,53 @@ void dump_command_parameter(struct command_parameter* par)
   char logic[2][8] = {"false", "true"};
   fprintf(prt_file, "parameter: %s   ", par->name);
   switch (par->type)
-    {
+  {
     case 0:
       k = par->double_value;
       fprintf(prt_file, "logical: %s\n", logic[k]);
       break;
     case 1:
       if (par->expr != NULL)
-	{
-	  dump_expression(par->expr);
-	  par->double_value = expression_value(par->expr, 2);
-	}
+      {
+        dump_expression(par->expr);
+        par->double_value = expression_value(par->expr, 2);
+      }
       k = par->double_value;
       fprintf(prt_file, v_format("integer: %I\n"), k);
       break;
     case 2:
       if (par->expr != NULL)
-	{
-	  dump_expression(par->expr);
-	  par->double_value = expression_value(par->expr, 2);
-	}
+      {
+        dump_expression(par->expr);
+        par->double_value = expression_value(par->expr, 2);
+      }
       fprintf(prt_file, v_format("double value: %F\n"), par->double_value);
       break;
     case 11:
     case 12:
       if (par->double_array != NULL)
-	{
-	  if (par->expr_list != NULL)
-	    {
-	      for (i = 0; i < par->double_array->curr; i++)
-		{
-		  if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
-		    par->double_array->a[i]
-		      = expression_value(par->expr_list->list[i], 2);
-		}
-	    }
-	  fprintf(prt_file, "double array: ");
-	  for (i = 0; i < par->double_array->curr; i++)
-            fprintf(prt_file, v_format("%e "), par->double_array->a[i]);
-	  fprintf(prt_file, "\n");
-	}
+      {
+        if (par->expr_list != NULL)
+        {
+          for (i = 0; i < par->double_array->curr; i++)
+          {
+            if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
+              par->double_array->a[i]
+                = expression_value(par->expr_list->list[i], 2);
+          }
+        }
+        fprintf(prt_file, "double array: ");
+        for (i = 0; i < par->double_array->curr; i++)
+          fprintf(prt_file, v_format("%e "), par->double_array->a[i]);
+        fprintf(prt_file, "\n");
+      }
       break;
     case 3:
       fprintf(prt_file, "string: %s\n", par->string);
       break;
     case 13:
       dump_char_p_array(par->m_string);
-    }
+  }
 }
 
 void dump_constraint(struct constraint* c)
@@ -993,9 +997,9 @@ void dump_constraint_list(struct constraint_list* cl)
 {
   int i;
   for (i = 0; i < cl->curr; i++)
-    {
-      if (cl->constraints[i]) dump_constraint(cl->constraints[i]);
-    }
+  {
+    if (cl->constraints[i]) dump_constraint(cl->constraints[i]);
+  }
 }
 
 void dump_element(struct element* el)
@@ -1015,11 +1019,11 @@ void dump_expression(struct expression* ex)
 {
   ex->value = expression_value(ex, 2);
   fprintf(prt_file, v_format("expression: %s :: value: %F\n"),
-	  ex->string, ex->value);
+          ex->string, ex->value);
 }
 
 void dump_exp_sequ(struct sequence* sequ, int level)
-     /* executes the command dumpsequ, ... */
+  /* executes the command dumpsequ, ... */
 {
   struct node* c_node;
   int j;
@@ -1027,33 +1031,33 @@ void dump_exp_sequ(struct sequence* sequ, int level)
   puts("+++++++++ dump expanded sequence +++++++++");
   c_node = sequ->ex_start;
   while(c_node != NULL)
+  {
+    suml += c_node->length;
+    if (level > 2)
     {
-      suml += c_node->length;
-      if (level > 2)
-	{
-	  dump_node(c_node);
-	  if (c_node->p_al_err != NULL)
-	    {
-	      puts("alignment errors:");
-	      for (j = 0; j < c_node->p_al_err->curr; j++)
-		printf(v_format("%F "), c_node->p_al_err->a[j]);
-	      printf("\n");
-	    }
-	  if (c_node->p_fd_err != NULL)
-	    {
-	      puts("field errors:");
-	      for (j = 0; j < c_node->p_fd_err->curr; j++)
-		printf(v_format("%e "), c_node->p_fd_err->a[j]);
-	      printf("\n");
-	    }
-	  if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
-	}
-      else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-	fprintf(prt_file, v_format("%S: at = %F  flag = %I\n"), c_node->name,
-		c_node->position, c_node->enable);
-      if (c_node == sequ->ex_end)  break;
-      c_node = c_node->next;
+      dump_node(c_node);
+      if (c_node->p_al_err != NULL)
+      {
+        puts("alignment errors:");
+        for (j = 0; j < c_node->p_al_err->curr; j++)
+          printf(v_format("%F "), c_node->p_al_err->a[j]);
+        printf("\n");
+      }
+      if (c_node->p_fd_err != NULL)
+      {
+        puts("field errors:");
+        for (j = 0; j < c_node->p_fd_err->curr; j++)
+          printf(v_format("%e "), c_node->p_fd_err->a[j]);
+        printf("\n");
+      }
+      if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
     }
+    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
+      fprintf(prt_file, v_format("%S: at = %F  flag = %I\n"), c_node->name,
+              c_node->position, c_node->enable);
+    if (c_node == sequ->ex_end)  break;
+    c_node = c_node->next;
+  }
   fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
 }
 
@@ -1062,10 +1066,10 @@ void dump_in_cmd(struct in_cmd* p_inp)
   fprintf(prt_file, "%s: type =%d, sub_type = %d, decl_start = %d\n",
           p_inp->label, p_inp->type, p_inp->sub_type, p_inp->decl_start);
   if (p_inp->cmd_def != NULL)
-    {
-      fprintf(prt_file, "defining command: %s\n", p_inp->cmd_def->name);
-      /* dump_command(p_inp->cmd_def); */
-    }
+  {
+    fprintf(prt_file, "defining command: %s\n", p_inp->cmd_def->name);
+    /* dump_command(p_inp->cmd_def); */
+  }
 }
 
 void dump_int_array(struct int_array* ia)
@@ -1073,10 +1077,10 @@ void dump_int_array(struct int_array* ia)
   int i;
   fprintf(prt_file, "dump integer array, length: %d\n", ia->curr);
   for (i = 0; i < ia->curr; i++)
-    {
-      fprintf(prt_file, v_format("%d "), ia->i[i]);
-      if ((i+1)%10 == 0) fprintf(prt_file, "\n");
-    }
+  {
+    fprintf(prt_file, v_format("%d "), ia->i[i]);
+    if ((i+1)%10 == 0) fprintf(prt_file, "\n");
+  }
   if (ia->curr%10 != 0) fprintf(prt_file, "\n");
 }
 
@@ -1100,10 +1104,10 @@ void dump_name_list(struct name_list* nl)
   int i;
   puts(" ");
   for (i = 0; i < nl->curr; i++)
-    {
-      fprintf(prt_file, v_format("%S %I\n"),
-	      nl->names[nl->index[i]], nl->inform[nl->index[i]]);
-    }
+  {
+    fprintf(prt_file, v_format("%S %I\n"),
+            nl->names[nl->index[i]], nl->inform[nl->index[i]]);
+  }
 }
 
 void dump_node(struct node* node)
@@ -1115,7 +1119,7 @@ void dump_node(struct node* node)
   fprintf(prt_file, v_format("name: %S  occ: %I base: %S  position: %F\n"),
           node->name, node->occ_cnt, node->base_name, node->position);
   fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
-	  pname, nname);
+          pname, nname);
   if (node->cl != NULL)  for (i = 0; i < node->cl->curr; i++)
     dump_constraint(node->cl->constraints[i]);
 }
@@ -1127,19 +1131,19 @@ void dump_sequ(struct sequence* c_sequ, int level)
   fprintf(prt_file, v_format("+++ dump sequence: %S\n"), c_sequ->name);
   c_node = c_sequ->start;
   while(c_node != NULL)
+  {
+    suml += c_node->length;
+    if (level > 2)
     {
-      suml += c_node->length;
-      if (level > 2)
-	{
-	  dump_node(c_node);
-	  if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
-	}
-      else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-	fprintf(prt_file, v_format("%S: at = %F\n"),
-		c_node->name, c_node->position);
-      if (c_node == c_sequ->end)  break;
-      c_node = c_node->next;
+      dump_node(c_node);
+      if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
     }
+    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
+      fprintf(prt_file, v_format("%S: at = %F\n"),
+              c_node->name, c_node->position);
+    if (c_node == c_sequ->end)  break;
+    c_node = c_node->next;
+  }
   fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
 }
 
@@ -1149,34 +1153,34 @@ void dump_variable(struct variable* v)
 }
 
 void export_element(struct element* el, struct el_list* ell, FILE* file)
-     /* recursive to have parents always in front for MAD-8 */
+  /* recursive to have parents always in front for MAD-8 */
 {
   int pos = name_list_pos(el->name, ell->list);
   char out[AUX_LG];
   if (pos >= 0)
+  {
+    if (ell->list->inform[pos] == 0)  /* not yet written */
     {
-      if (ell->list->inform[pos] == 0)  /* not yet written */
-	{
-	  export_element(el->parent, ell, file);
-	  strcpy(out, el->name);
-	  strcat(out, ": ");
-	  strcat(out, el->parent->name);
-	  export_el_def(el, out);
-	  write_nice(out, file);
-	  ell->list->inform[pos] = 1;
-	}
+      export_element(el->parent, ell, file);
+      strcpy(out, el->name);
+      strcat(out, ": ");
+      strcat(out, el->parent->name);
+      export_el_def(el, out);
+      write_nice(out, file);
+      ell->list->inform[pos] = 1;
     }
+  }
 }
 
 void export_comm_par(struct command_parameter* par, char* string)
-     /* exports a command parameter */
+  /* exports a command parameter */
 {
   int i, k, last;
   char num[2*NAME_L];
   strcat(string, ",");
   strcat(string, par->name);
   switch(par->type)
-    {
+  {
     case 0:
       strcat(string, "=");
       if (par->double_value == zero) strcat(string, "false");
@@ -1187,113 +1191,113 @@ void export_comm_par(struct command_parameter* par, char* string)
       strcat(string, ":=");
       if (par->expr != NULL) strcat(string, par->expr->string);
       else
-	{
-	  if (par->type == 1)
-	    {
-	      k = par->double_value; sprintf(num, v_format("%I"), k);
-	    }
-	  else sprintf(num, v_format("%F"), par->double_value);
-	  strcat(string, supp_tb(num));
-	}
+      {
+        if (par->type == 1)
+        {
+          k = par->double_value; sprintf(num, v_format("%I"), k);
+        }
+        else sprintf(num, v_format("%F"), par->double_value);
+        strcat(string, supp_tb(num));
+      }
       break;
     case 3:
       if (par->string != NULL)
-	{
-	  strcat(string, "=");
-	  strcat(string, par->string);
-	}
+      {
+        strcat(string, "=");
+        strcat(string, par->string);
+      }
       break;
     case 11:
     case 12:
       strcat(string, ":=");
       for (last = par->double_array->curr-1; last > 0; last--)
-	{
-	  if (par->expr_list->list[last] != NULL)
-	    {
-	      if (zero_string(par->expr_list->list[last]->string) == 0) break;
-	    }
-	  else if (par->double_array->a[last] != zero) break;
-	}
+      {
+        if (par->expr_list->list[last] != NULL)
+        {
+          if (zero_string(par->expr_list->list[last]->string) == 0) break;
+        }
+        else if (par->double_array->a[last] != zero) break;
+      }
       strcat(string, "{");
       for (i = 0; i <= last; i++)
-	{
-	  if (i > 0) strcat(string, ",");
-	  if (par->expr_list->list[i] != NULL)
-            strcat(string, par->expr_list->list[i]->string);
-	  else
-	    {
-	      if (par->type == 11)
-		{
-		  k = par->double_array->a[i]; sprintf(num, v_format("%I"), k);
-		}
-	      else sprintf(num, v_format("%F"), par->double_array->a[i]);
-	      strcat(string, supp_tb(num));
-	    }
-	}
+      {
+        if (i > 0) strcat(string, ",");
+        if (par->expr_list->list[i] != NULL)
+          strcat(string, par->expr_list->list[i]->string);
+        else
+        {
+          if (par->type == 11)
+          {
+            k = par->double_array->a[i]; sprintf(num, v_format("%I"), k);
+          }
+          else sprintf(num, v_format("%F"), par->double_array->a[i]);
+          strcat(string, supp_tb(num));
+        }
+      }
       strcat(string, "}");
-    }
+  }
 }
 
 void export_elem_8(struct element* el, struct el_list* ell, FILE* file)
-     /* exports an element in mad-8 format */
-     /* recursive to have parents always in front for MAD-8 */
+  /* exports an element in mad-8 format */
+  /* recursive to have parents always in front for MAD-8 */
 {
   int pos = name_list_pos(el->name, ell->list);
   char out[AUX_LG];
   if (pos >= 0)
+  {
+    if (ell->list->inform[pos] == 0)  /* not yet written */
     {
-      if (ell->list->inform[pos] == 0)  /* not yet written */
-	{
-	  export_elem_8(el->parent, ell, file);
-	  strcpy(out, el->name);
-	  strcat(out, ": ");
-	  strcat(out, el->parent->name);
-	  export_el_def_8(el, out);
-	  write_nice_8(out, file);
-	  ell->list->inform[pos] = 1;
-	}
+      export_elem_8(el->parent, ell, file);
+      strcpy(out, el->name);
+      strcat(out, ": ");
+      strcat(out, el->parent->name);
+      export_el_def_8(el, out);
+      write_nice_8(out, file);
+      ell->list->inform[pos] = 1;
     }
+  }
 }
 
 void export_el_def(struct element* el, char* string)
-     /* exports an element definition in mad-X format */
+  /* exports an element definition in mad-X format */
 {
   int i;
   struct command* def = el->def;
   struct command_parameter* par;
   for (i = 0; i < def->par->curr; i++)
-    {
-      par = def->par->parameters[i];
-      if (def->par_names->inform[i]
-	  && par_out_flag(el->base_type->name, par->name))
-	export_comm_par(par, string);
-    }
+  {
+    par = def->par->parameters[i];
+    if (def->par_names->inform[i]
+        && par_out_flag(el->base_type->name, par->name))
+      export_comm_par(par, string);
+  }
 }
 
 void export_el_def_8(struct element* el, char* string)
-     /* exports an element definition in mad-8 format */
+  /* exports an element definition in mad-8 format */
 {
   int i;
   struct command* def = el->def;
   struct command_parameter* par;
   for (i = 0; i < def->par->curr; i++)
-    {
-      par = def->par->parameters[i];
-      if (def->par_names->inform[i]
-	  && par_out_flag(el->base_type->name, par->name))
-	export_el_par_8(par, string);
-    }
+  {
+    par = def->par->parameters[i];
+    if (def->par_names->inform[i]
+        && par_out_flag(el->base_type->name, par->name))
+      export_el_par_8(par, string);
+  }
 }
 
 void export_el_par_8(struct command_parameter* par, char* string)
-     /* exports an element parameter in mad-8 format */
+  /* exports an element parameter in mad-8 format */
 {
   int i, k, lp, last, tilt = 0, vtilt = 0;
   char* const kskew[] = {"k1s", "k2s", "k3s", ""};
   char* const knorm[] = {"k1", "k2", "k3", ""};
   char num[2*NAME_L], tmp[8], tmpt[8];
   switch(par->type)
-    {
+  {
     case 0:
       strcat(string, ",");
       strcat(string, par->name);
@@ -1306,80 +1310,80 @@ void export_el_par_8(struct command_parameter* par, char* string)
       strcat(string, ",");
       lp = 0;
       while (strlen(kskew[lp]))
+      {
+        if (strcmp(kskew[lp], par->name) == 0)
         {
-	  if (strcmp(kskew[lp], par->name) == 0)
-	    {
-	      strcat(string, knorm[lp]); tilt = 1; break;
-	    }
-	  lp++;
+          strcat(string, knorm[lp]); tilt = 1; break;
         }
+        lp++;
+      }
       if (tilt == 0) strcat(string, par->name);
       strcat(string, "=");
       if (par->expr != NULL && strcmp(par->name, "harmon") != 0)
-	strcat(string, par->expr->string);
+        strcat(string, par->expr->string);
       else
-	{
-	  if (par->type == 1)
-	    {
-	      k = par->double_value; sprintf(num, v_format("%I"), k);
-	    }
-	  else sprintf(num, v_format("%F"), par->double_value);
-	  strcat(string, supp_tb(num));
-	}
+      {
+        if (par->type == 1)
+        {
+          k = par->double_value; sprintf(num, v_format("%I"), k);
+        }
+        else sprintf(num, v_format("%F"), par->double_value);
+        strcat(string, supp_tb(num));
+      }
       break;
     case 3:
       if (par->string)
-        {
-	  strcat(string, ",");
-	  strcat(string, par->name);
-	  strcat(string, "=");
-	  strcat(string, par->string);
-	}
+      {
+        strcat(string, ",");
+        strcat(string, par->name);
+        strcat(string, "=");
+        strcat(string, par->string);
+      }
       break;
     case 11:
     case 12:
       vtilt = strcmp(par->name, "ks") == 0 ? 1 : 0;
       for (last = par->double_array->curr-1; last > 0; last--)
-	{
-	  if (par->expr_list->list[last] != NULL)
-	    {
-	      if (zero_string(par->expr_list->list[last]->string) == 0) break;
-	    }
-	  else if (par->double_array->a[last] != zero) break;
-	}
+      {
+        if (par->expr_list->list[last] != NULL)
+        {
+          if (zero_string(par->expr_list->list[last]->string) == 0) break;
+        }
+        else if (par->double_array->a[last] != zero) break;
+      }
       for (i = 0; i <= last; i++)
-	{
-	  if (par->expr_list->list[i] != NULL
-	      && !zero_string(par->expr_list->list[i]->string))
-	    {
-	      strcat(string, ",");
-	      sprintf(tmp, " k%dl =", i);
-	      sprintf(tmpt, ", t%d", i);
-	      strcat(string, tmp);
-	      strcat(string, par->expr_list->list[i]->string);
-	      if (vtilt) strcat(string, tmpt);
-	    }
-	  else if (par->double_array->a[i] != zero)
-	    {
-	      strcat(string, ",");
-	      sprintf(tmp, " k%dl =", i);
-	      sprintf(tmpt, ", t%d", i);
-	      if (par->type == 11)
-		{
-		  k = par->double_array->a[i]; sprintf(num, "%d", k);
-		}
-	      else sprintf(num, v_format("%F"), par->double_array->a[i]);
-	      strcat(string, tmp);
-	      strcat(string, supp_tb(num));
-	      if (vtilt) strcat(string, tmpt);
-	    }
-	}
-    }
+      {
+        if (par->expr_list->list[i] != NULL
+            && !zero_string(par->expr_list->list[i]->string))
+        {
+          strcat(string, ",");
+          sprintf(tmp, " k%dl =", i);
+          sprintf(tmpt, ", t%d", i);
+          strcat(string, tmp);
+          strcat(string, par->expr_list->list[i]->string);
+          if (vtilt) strcat(string, tmpt);
+        }
+        else if (par->double_array->a[i] != zero)
+        {
+          strcat(string, ",");
+          sprintf(tmp, " k%dl =", i);
+          sprintf(tmpt, ", t%d", i);
+          if (par->type == 11)
+          {
+            k = par->double_array->a[i]; sprintf(num, "%d", k);
+          }
+          else sprintf(num, v_format("%F"), par->double_array->a[i]);
+          strcat(string, tmp);
+          strcat(string, supp_tb(num));
+          if (vtilt) strcat(string, tmpt);
+        }
+      }
+  }
   if (tilt) strcat(string, ", tilt");
 }
 
 void export_sequence(struct sequence* sequ, FILE* file)
-     /* exports sequence in mad-X format */
+  /* exports sequence in mad-X format */
 {
   char num[2*NAME_L];
   struct element* el;
@@ -1391,65 +1395,65 @@ void export_sequence(struct sequence* sequ, FILE* file)
   strcat(c_dummy, sequ->name);
   strcat(c_dummy, ": sequence");
   if (sequ->ref_flag)
-    {
-      strcat(c_dummy, ", refer = ");
-      strcat(c_dummy, rpos[sequ->ref_flag+1]);
-    }
+  {
+    strcat(c_dummy, ", refer = ");
+    strcat(c_dummy, rpos[sequ->ref_flag+1]);
+  }
   if (sequ->refpos != NULL)
-    {
-      strcat(c_dummy, ", refpos = ");
-      strcat(c_dummy, sequ->refpos);
-    }
+  {
+    strcat(c_dummy, ", refpos = ");
+    strcat(c_dummy, sequ->refpos);
+  }
   strcat(c_dummy, ", l = ");
   if (sequ->l_expr != NULL) strcat(c_dummy, sequ->l_expr->string);
   else
-    {
-      sprintf(num, v_format("%F"), sequ->length);
-      strcat(c_dummy, supp_tb(num));
-    }
+  {
+    sprintf(num, v_format("%F"), sequ->length);
+    strcat(c_dummy, supp_tb(num));
+  }
   write_nice(c_dummy, file);
   while(c_node != NULL)
+  {
+    *c_dummy = '\0';
+    if (strchr(c_node->name, '$') == NULL
+        && strcmp(c_node->base_name, "drift") != 0)
     {
-      *c_dummy = '\0';
-      if (strchr(c_node->name, '$') == NULL
-	  && strcmp(c_node->base_name, "drift") != 0)
-	{
-	  if ((el = c_node->p_elem) != NULL)
-	    {
-	      if (c_node->p_elem->def_type)
-		{
-		  strcat(c_dummy, el->name);
-		  strcat(c_dummy, ": ");
-		  strcat(c_dummy, el->parent->name);
-		}
-	      else strcat(c_dummy, el->name);
-	    }
-	  else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
-	  else fatal_error("save error: node without link:", c_node->name);
-	  strcat(c_dummy, ", at = ");
-	  if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
-	  else
-	    {
-	      sprintf(num, v_format("%F"), c_node->at_value);
-	      strcat(c_dummy, supp_tb(num));
-	    }
-	  if (c_node->from_name != NULL)
-	    {
-	      strcat(c_dummy, ", from = ");
-	      strcat(c_dummy, c_node->from_name);
-	    }
-	  export_el_def(c_node->p_elem, c_dummy);
-	  write_nice(c_dummy, file);
-	}
-      if (c_node == sequ->end)  break;
-      c_node = c_node->next;
+      if ((el = c_node->p_elem) != NULL)
+      {
+        if (c_node->p_elem->def_type)
+        {
+          strcat(c_dummy, el->name);
+          strcat(c_dummy, ": ");
+          strcat(c_dummy, el->parent->name);
+        }
+        else strcat(c_dummy, el->name);
+      }
+      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
+      else fatal_error("save error: node without link:", c_node->name);
+      strcat(c_dummy, ", at = ");
+      if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
+      else
+      {
+        sprintf(num, v_format("%F"), c_node->at_value);
+        strcat(c_dummy, supp_tb(num));
+      }
+      if (c_node->from_name != NULL)
+      {
+        strcat(c_dummy, ", from = ");
+        strcat(c_dummy, c_node->from_name);
+      }
+      export_el_def(c_node->p_elem, c_dummy);
+      write_nice(c_dummy, file);
     }
+    if (c_node == sequ->end)  break;
+    c_node = c_node->next;
+  }
   strcpy(c_dummy, "endsequence");
   write_nice(c_dummy, file);
 }
 
 void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
-     /* exports sequence in mad-8 format */
+  /* exports sequence in mad-8 format */
 {
   char num[2*NAME_L];
   struct element* el;
@@ -1461,41 +1465,41 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   strcat(c_dummy, ": sequence");
   write_nice_8(c_dummy, file);
   while(c_node != NULL)
+  {
+    *c_dummy = '\0';
+    if (strchr(c_node->name, '$') == NULL
+        && strcmp(c_node->base_name, "drift") != 0)
     {
-      *c_dummy = '\0';
-      if (strchr(c_node->name, '$') == NULL
-	  && strcmp(c_node->base_name, "drift") != 0)
-	{
-	  if ((el = c_node->p_elem) != NULL)
-	    {
-	      if (c_node->p_elem->def_type)
-		{
-		  strcat(c_dummy, el->name);
-		  strcat(c_dummy, ": ");
-		  strcat(c_dummy, el->parent->name);
-		}
-	      else strcat(c_dummy, el->name);
-	    }
-	  else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
-	  else fatal_error("save error: node without link:", c_node->name);
-	  strcat(c_dummy, ", at = ");
-	  if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
-	  else
-	    {
-	      sprintf(num, v_format("%F"), c_node->at_value);
-	      strcat(c_dummy, supp_tb(num));
-	    }
-	  if (c_node->from_name != NULL)
-	    {
-	      strcat(c_dummy, ", from = ");
-	      strcat(c_dummy, c_node->from_name);
-	    }
-	  export_el_def_8(c_node->p_elem, c_dummy);
-	  write_nice_8(c_dummy, file);
-	}
-      if (c_node == sequ->end)  break;
-      c_node = c_node->next;
+      if ((el = c_node->p_elem) != NULL)
+      {
+        if (c_node->p_elem->def_type)
+        {
+          strcat(c_dummy, el->name);
+          strcat(c_dummy, ": ");
+          strcat(c_dummy, el->parent->name);
+        }
+        else strcat(c_dummy, el->name);
+      }
+      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
+      else fatal_error("save error: node without link:", c_node->name);
+      strcat(c_dummy, ", at = ");
+      if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
+      else
+      {
+        sprintf(num, v_format("%F"), c_node->at_value);
+        strcat(c_dummy, supp_tb(num));
+      }
+      if (c_node->from_name != NULL)
+      {
+        strcat(c_dummy, ", from = ");
+        strcat(c_dummy, c_node->from_name);
+      }
+      export_el_def_8(c_node->p_elem, c_dummy);
+      write_nice_8(c_dummy, file);
     }
+    if (c_node == sequ->end)  break;
+    c_node = c_node->next;
+  }
   strcpy(c_dummy, sequ->name);
   strcat(c_dummy, "_end: marker, at = ");
   sprintf(num, v_format("%F"), sequ->length);
@@ -1506,7 +1510,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
 }
 
 void export_variable(struct variable* var, FILE* file)
-     /* exports variable in mad-X format */
+  /* exports variable in mad-X format */
 {
   int k;
   *c_dummy = '\0';
@@ -1518,69 +1522,69 @@ void export_variable(struct variable* var, FILE* file)
   else               strcat(c_dummy, " := ");
   if (var->expr != NULL) strcat(c_dummy, var->expr->string);
   else if (var->val_type == 0)
-    {
-      k = var->value; sprintf(c_join, "%d", k); strcat(c_dummy, c_join);
-    }
+  {
+    k = var->value; sprintf(c_join, "%d", k); strcat(c_dummy, c_join);
+  }
   else
-    {
-      sprintf(c_join, v_format("%F"), var->value);
-      strcat(c_dummy, supp_tb(c_join));
-    }
+  {
+    sprintf(c_join, v_format("%F"), var->value);
+    strcat(c_dummy, supp_tb(c_join));
+  }
   write_nice(c_dummy, file);
 }
 
 void export_var_8(struct variable* var, FILE* file)
-     /* exports variable in mad-8 format */
+  /* exports variable in mad-8 format */
 {
   int k;
   *c_dummy = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
   if (var->type == 0)
-    {
-      strcat(c_dummy, var->name);
-      strcat(c_dummy, ": constant = ");
-    }
+  {
+    strcat(c_dummy, var->name);
+    strcat(c_dummy, ": constant = ");
+  }
   else
-    {
-      strcat(c_dummy, var->name);
-      if (var->type < 2) strcat(c_dummy, " = ");
-      else               strcat(c_dummy, " := ");
-    }
+  {
+    strcat(c_dummy, var->name);
+    if (var->type < 2) strcat(c_dummy, " = ");
+    else               strcat(c_dummy, " := ");
+  }
   if (var->expr != NULL) strcat(c_dummy, var->expr->string);
   else if (var->val_type == 0)
-    {
-      k = var->value; sprintf(c_join, v_format("%I"), k);
-      strcat(c_dummy, c_join);
-    }
+  {
+    k = var->value; sprintf(c_join, v_format("%I"), k);
+    strcat(c_dummy, c_join);
+  }
   else
-    {
-      sprintf(c_join, v_format("%F"), var->value);
-      strcat(c_dummy, supp_tb(c_join));
-    }
+  {
+    sprintf(c_join, v_format("%F"), var->value);
+    strcat(c_dummy, supp_tb(c_join));
+  }
   write_nice_8(c_dummy, file);
 }
 
 double find_value(char* name, int ntok, char** toks)
-     /* returns value found in construct "name = value", or INVALID */
+  /* returns value found in construct "name = value", or INVALID */
 {
   double val = INVALID;
   int j;
   for (j = 0; j < ntok; j++)
+  {
+    if (strcmp(toks[j], name) == 0)
     {
-      if (strcmp(toks[j], name) == 0)
-	{
-	  if (j+2 < ntok && *toks[j+1] == '=')
-	    {
-	      sscanf(toks[j+2], "%lf", &val);
-	      break;
-	    }
-	}
+      if (j+2 < ntok && *toks[j+1] == '=')
+      {
+        sscanf(toks[j+2], "%lf", &val);
+        break;
+      }
     }
+  }
   return val;
 }
 
 double frndm()
-     /* returns random number r with 0 <= r < 1 from flat distribution */
+  /* returns random number r with 0 <= r < 1 from flat distribution */
 {
   const double one = 1;
   double scale = one / MAX_RAND;
@@ -1589,7 +1593,7 @@ double frndm()
 }
 
 void ftoi_array(struct double_array* da, struct int_array* ia)
-     /* converts and copies double array into integer array */
+  /* converts and copies double array into integer array */
 {
   int i, l = da->curr;
   while (l >= ia->max)  grow_int_array(ia);
@@ -1598,7 +1602,7 @@ void ftoi_array(struct double_array* da, struct int_array* ia)
 }
 
 void grow_char_array( /* doubles array size */
-		     struct char_array* p)
+  struct char_array* p)
 {
   char rout_name[] = "grow_char_array";
   char* p_loc = p->c;
@@ -1611,7 +1615,7 @@ void grow_char_array( /* doubles array size */
 }
 
 void grow_char_p_array( /* doubles array size */
-		       struct char_p_array* p)
+  struct char_p_array* p)
 {
   char rout_name[] = "grow_char_p_array";
   char** p_loc = p->p;
@@ -1624,7 +1628,7 @@ void grow_char_p_array( /* doubles array size */
 }
 
 void grow_command_list( /* doubles list size */
-		       struct command_list* p)
+  struct command_list* p)
 {
   char rout_name[] = "grow_command_list";
   struct command** c_loc = p->commands;
@@ -1638,7 +1642,7 @@ void grow_command_list( /* doubles list size */
 }
 
 void grow_command_list_list( /* doubles list size */
-			    struct command_list_list* p)
+  struct command_list_list* p)
 {
   char rout_name[] = "grow_command_list_list";
   struct command_list** c_loc = p->command_lists;
@@ -1652,7 +1656,7 @@ void grow_command_list_list( /* doubles list size */
 }
 
 void grow_command_parameter_list( /* doubles list size */
-				 struct command_parameter_list* p)
+  struct command_parameter_list* p)
 {
   char rout_name[] = "grow_command_parameter_list";
   struct command_parameter** c_loc = p->parameters;
@@ -1666,7 +1670,7 @@ void grow_command_parameter_list( /* doubles list size */
 }
 
 void grow_constraint_list( /* doubles list size */
-			  struct constraint_list* p)
+  struct constraint_list* p)
 {
   char rout_name[] = "grow_constraint_list";
   struct constraint** c_loc = p->constraints;
@@ -1680,7 +1684,7 @@ void grow_constraint_list( /* doubles list size */
 }
 
 void grow_double_array( /* doubles array size */
-		       struct double_array* p)
+  struct double_array* p)
 {
   char rout_name[] = "grow_double_array";
   double* a_loc = p->a;
@@ -1693,7 +1697,7 @@ void grow_double_array( /* doubles array size */
 }
 
 void grow_el_list( /* doubles list size */
-		  struct el_list* p)
+  struct el_list* p)
 {
   char rout_name[] = "grow_el_list";
   struct element** e_loc = p->elem;
@@ -1706,7 +1710,7 @@ void grow_el_list( /* doubles list size */
 }
 
 void grow_expr_list( /* doubles list size */
-		    struct expr_list* p)
+  struct expr_list* p)
 {
   char rout_name[] = "grow_expr_list";
   struct expression** e_loc = p->list;
@@ -1719,7 +1723,7 @@ void grow_expr_list( /* doubles list size */
 }
 
 void grow_in_buff_list( /* doubles list size */
-		       struct in_buff_list* p)
+  struct in_buff_list* p)
 {
   char rout_name[] = "grow_in_buff_list";
   struct in_buffer** e_loc = p->buffers;
@@ -1736,7 +1740,7 @@ void grow_in_buff_list( /* doubles list size */
 }
 
 void grow_in_cmd_list( /* doubles list size */
-		      struct in_cmd_list* p)
+  struct in_cmd_list* p)
 {
   char rout_name[] = "grow_in_cmd_list";
   struct in_cmd** c_loc = p->in_cmds;
@@ -1750,7 +1754,7 @@ void grow_in_cmd_list( /* doubles list size */
 }
 
 void grow_int_array( /* doubles array size */
-		    struct int_array* p)
+  struct int_array* p)
 {
   char rout_name[] = "grow_int_array";
   int* i_loc = p->i;
@@ -1763,7 +1767,7 @@ void grow_int_array( /* doubles array size */
 }
 
 void grow_macro_list( /* doubles list size */
-		     struct macro_list* p)
+  struct macro_list* p)
 {
   char rout_name[] = "grow_macro_list";
   struct macro** n_loc = p->macros;
@@ -1775,7 +1779,7 @@ void grow_macro_list( /* doubles list size */
 }
 
 void grow_name_list( /* doubles list size */
-		    struct name_list* p)
+  struct name_list* p)
 {
   char rout_name[] = "grow_name_list";
   char** n_loc = p->names;
@@ -1788,18 +1792,18 @@ void grow_name_list( /* doubles list size */
   p->index = (int*) mycalloc(rout_name,new, sizeof(int));
   p->inform = (int*) mycalloc(rout_name,new, sizeof(int));
   for (j = 0; j < p->curr; j++)
-    {
-      p->names[j] = n_loc[j];
-      p->index[j] = l_ind[j];
-      p->inform[j] = l_inf[j];
-    }
+  {
+    p->names[j] = n_loc[j];
+    p->index[j] = l_ind[j];
+    p->inform[j] = l_inf[j];
+  }
   myfree(rout_name, n_loc);
   myfree(rout_name, l_ind);
   myfree(rout_name, l_inf);
 }
 
 void grow_node_list( /* doubles list size */
-		    struct node_list* p)
+  struct node_list* p)
 {
   char rout_name[] = "grow_node_list";
   struct node** n_loc = p->nodes;
@@ -1851,32 +1855,32 @@ void grow_table(struct table* t) /* doubles number of rows */
   t->node_nm = new_char_p_array(new);
 
   for (i = 0; i < t->curr; i++)
-    {
-      t->node_nm->p[i] = t_loc->p[i];
-      t->p_nodes[i] = p_loc[i];
-      t->l_head[i] = pa_loc[i];
-    }
+  {
+    t->node_nm->p[i] = t_loc->p[i];
+    t->p_nodes[i] = p_loc[i];
+    t->l_head[i] = pa_loc[i];
+  }
   delete_char_p_array(t_loc, 0);
   myfree(rout_name, pa_loc);
   t->node_nm->curr = t->curr; myfree(rout_name, p_loc);
   for (j = 0; j < t->num_cols; j++)
+  {
+    if ((s_loc = t->s_cols[j]) != NULL)
     {
-      if ((s_loc = t->s_cols[j]) != NULL)
-	{
-	  t->s_cols[j] = (char**) mycalloc(rout_name,new, sizeof(char*));
-	  for (i = 0; i < t->curr; i++) t->s_cols[j][i] = s_loc[i];
-	  myfree(rout_name, s_loc);
-	}
+      t->s_cols[j] = (char**) mycalloc(rout_name,new, sizeof(char*));
+      for (i = 0; i < t->curr; i++) t->s_cols[j][i] = s_loc[i];
+      myfree(rout_name, s_loc);
     }
+  }
   for (j = 0; j < t->num_cols; j++)
+  {
+    if ((d_loc = t->d_cols[j]) != NULL)
     {
-      if ((d_loc = t->d_cols[j]) != NULL)
-	{
-	  t->d_cols[j] = (double*) mycalloc(rout_name,new, sizeof(double));
-	  for (i = 0; i < t->curr; i++) t->d_cols[j][i] = d_loc[i];
-	  myfree(rout_name, d_loc);
-	}
+      t->d_cols[j] = (double*) mycalloc(rout_name,new, sizeof(double));
+      for (i = 0; i < t->curr; i++) t->d_cols[j][i] = d_loc[i];
+      myfree(rout_name, d_loc);
     }
+  }
 }
 
 void grow_table_list(struct table_list* tl)
@@ -1893,7 +1897,7 @@ void grow_table_list(struct table_list* tl)
 }
 
 void grow_var_list( /* doubles list size */
-		   struct var_list* p)
+  struct var_list* p)
 {
   char rout_name[] = "grow_var_list";
   struct variable** v_loc = p->vars;
@@ -1907,7 +1911,7 @@ void grow_var_list( /* doubles list size */
 }
 
 void grow_vector_list( /* doubles list size */
-		      struct vector_list* p)
+  struct vector_list* p)
 {
   char rout_name[] = "grow_vector_list";
   struct double_array** v_loc = p->vectors;
@@ -1922,20 +1926,20 @@ void grow_vector_list( /* doubles list size */
 }
 
 double grndm()
-     /* returns random number x from normal distribution */
+  /* returns random number x from normal distribution */
 {
   double xi1 = 2*frndm()-one, xi2=2*frndm()-one, zzr;
   while ((zzr = xi1*xi1+xi2*xi2) > one)
-    {
-      xi1 = 2*frndm()-one; xi2=2*frndm()-one;
-    }
+  {
+    xi1 = 2*frndm()-one; xi2=2*frndm()-one;
+  }
   zzr = sqrt(-2*log(zzr)/zzr);
   return xi1*zzr;
 }
 
 int inbounds(char* p, int n, char**p_list)
-     /* checks whether pointer p is inside one of the ranges in p_list,
-	returns 1 for yes, 0 for no */
+  /* checks whether pointer p is inside one of the ranges in p_list,
+     returns 1 for yes, 0 for no */
 {
   int j;
   for (j = 0; j < n; j++)
@@ -1944,46 +1948,46 @@ int inbounds(char* p, int n, char**p_list)
 }
 
 void init55(int seed)
-     /* initializes random number algorithm */
+  /* initializes random number algorithm */
 {
   int i, ii, k = 1, j = abs(seed)%MAX_RAND;
   irn_rand[NR_RAND-1] = j;
   for (i = 0; i < NR_RAND-1; i++)
-    {
-      ii = (ND_RAND*(i+1))%NR_RAND;
-      irn_rand[ii-1] = k;
-      if ((k = j - k) < 0) k += MAX_RAND;
-      j = irn_rand[ii-1];
-    }
+  {
+    ii = (ND_RAND*(i+1))%NR_RAND;
+    irn_rand[ii-1] = k;
+    if ((k = j - k) < 0) k += MAX_RAND;
+    j = irn_rand[ii-1];
+  }
   /* warm up */
   for (i = 0; i < 3; i++) irngen();
 }
 
 int intrac()
-     /* returns non-zero inf program is used interactively, else 0 */
+  /* returns non-zero inf program is used interactively, else 0 */
 {
   return ((int) isatty(0));
 }
 
 void irngen()
-     /* creates random number for frndm() */
+  /* creates random number for frndm() */
 {
   int i, j;
   for (i = 0; i < NJ_RAND; i++)
-    {
-      if ((j = irn_rand[i] - irn_rand[i+NR_RAND-NJ_RAND]) < 0) j += MAX_RAND;
-      irn_rand[i] = j;
-    }
+  {
+    if ((j = irn_rand[i] - irn_rand[i+NR_RAND-NJ_RAND]) < 0) j += MAX_RAND;
+    irn_rand[i] = j;
+  }
   for (i = NJ_RAND; i < NR_RAND; i++)
-    {
-      if ((j = irn_rand[i] - irn_rand[i-NJ_RAND]) < 0) j += MAX_RAND;
-      irn_rand[i] = j;
-    }
+  {
+    if ((j = irn_rand[i] - irn_rand[i-NJ_RAND]) < 0) j += MAX_RAND;
+    irn_rand[i] = j;
+  }
   next_rand = 0;
 }
 
 char* join(char** it_list, int n)
-     /* joins n character strings into one */
+  /* joins n character strings into one */
 {
   int j;
   *c_join = '\0';
@@ -1992,17 +1996,17 @@ char* join(char** it_list, int n)
 }
 
 char* join_b(char** it_list, int n)
-     /* joins n character strings into one, blank separated */
+  /* joins n character strings into one, blank separated */
 {
   char* target;
   int j, k = 0;
   target = c_join;
   for (j = 0; j < n; j++)
-    {
-      strcpy(&target[k], it_list[j]);
-      k += strlen(it_list[j]);
-      target[k++] = ' ';
-    }
+  {
+    strcpy(&target[k], it_list[j]);
+    k += strlen(it_list[j]);
+    target[k++] = ' ';
+  }
   target[k] = '\0';
   return target;
 }
@@ -2020,16 +2024,16 @@ void* mycalloc(char* caller, size_t nelem, size_t size)
 }
 
 void mycpy(char* sout, char* sin)
-     /* copies string, ends at any non-ascii character including 0 */
+  /* copies string, ends at any non-ascii character including 0 */
 {
   char *p, *q;
   int l = 1;
 
   p = sin;  q = sout;
   while (*p > ' ' && *p <= '~' && l < 2*NAME_L)
-    {
-      *q++ = *p++;  l++;
-    }
+  {
+    *q++ = *p++;  l++;
+  }
   *q = '\0';
 }
 
@@ -2039,9 +2043,9 @@ void myfree(char* rout_name, void* p)
   int* i_p = (int*) l_p;
   myfree_caller = rout_name;
   if (*i_p == FREECODE)
-    {
-      *i_p = 0; free(l_p);
-    }
+  {
+    *i_p = 0; free(l_p);
+  }
   myfree_caller = none;
 }
 
@@ -2058,74 +2062,74 @@ void* mymalloc(char* caller, size_t size)
 }
 
 char* mystrchr(char* string, char c)
-     /* returns strchr for character c, but only outside strings included
-        in single or double quotes */
+  /* returns strchr for character c, but only outside strings included
+     in single or double quotes */
 {
   char quote = ' '; /* only for the compiler */
   int toggle = 0;
   while (*string != '\0')
+  {
+    if (toggle)
     {
-      if (toggle)
-	{
-	  if (*string == quote) toggle = 0;
-	}
-      else if(*string == '\'' || *string == '\"')
-	{
-	  quote = *string; toggle = 1;
-	}
-      else if (*string == c) return string;
-      string++;
+      if (*string == quote) toggle = 0;
     }
+    else if(*string == '\'' || *string == '\"')
+    {
+      quote = *string; toggle = 1;
+    }
+    else if (*string == c) return string;
+    string++;
+  }
   return NULL;
 }
 
 char* mystrstr(char* string, char* s)
-     /* returns strstr for s, but only outside strings included
-        in single or double quotes */
+  /* returns strstr for s, but only outside strings included
+     in single or double quotes */
 {
   char quote = ' '; /* only for the compiler */
   int toggle = 0, n = strlen(s);
   if (n == 0)  return NULL;
   while (*string != '\0')
+  {
+    if (toggle)
     {
-      if (toggle)
-	{
-	  if (*string == quote) toggle = 0;
-	}
-      else if(*string == '\'' || *string == '\"')
-	{
-	  quote = *string; toggle = 1;
-	}
-      else if (strncmp(string, s, n) == 0) return string;
-      string++;
+      if (*string == quote) toggle = 0;
     }
+    else if(*string == '\'' || *string == '\"')
+    {
+      quote = *string; toggle = 1;
+    }
+    else if (strncmp(string, s, n) == 0) return string;
+    string++;
+  }
   return NULL;
 }
 
 void my_repl(char* in, char* out, char* string_in, char* string_out)
-     /* replaces all occurrences of "in" in string_in by "out"
-        in output string string_out */
+  /* replaces all occurrences of "in" in string_in by "out"
+     in output string string_out */
 {
   int n, add, l_in = strlen(in), l_out = strlen(out);
   char* cp;
   char tmp[8];
   while ((cp = strstr(string_in, in)) != NULL)
+  {
+    while (string_in != cp) *string_out++ = *string_in++;
+    string_in += l_in;
+    if (*out == '$')
     {
-      while (string_in != cp) *string_out++ = *string_in++;
-      string_in += l_in;
-      if (*out == '$')
-	{
-	  n = get_variable(&out[1]);
-	  sprintf(tmp,"%d", n); add = strlen(tmp);
-	  strncpy(string_out, tmp, add);
-	  string_out += add;
-	}
-      else
-	{
-	  strncpy(string_out, out, l_out);
-	  string_out += l_out;
-	}
+      n = get_variable(&out[1]);
+      sprintf(tmp,"%d", n); add = strlen(tmp);
+      strncpy(string_out, tmp, add);
+      string_out += add;
     }
+    else
+    {
+      strncpy(string_out, out, l_out);
+      string_out += l_out;
+    }
+  }
   strcpy(string_out, string_in);
 }
 
@@ -2133,12 +2137,12 @@ int name_list_pos(char* p, struct name_list* vlist)
 {
   int num, mid, low = 0, high = vlist->curr - 1;
   while (low <= high)
-    {
-      mid = (low + high) / 2;
-      if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
-      else if ( num > 0) low  = mid + 1;
-      else               return vlist->index[mid];
-    }
+  {
+    mid = (low + high) / 2;
+    if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
+    else if ( num > 0) low  = mid + 1;
+    else               return vlist->index[mid];
+  }
   return -1;
 }
 
@@ -2259,10 +2263,10 @@ struct command_parameter_list* new_command_parameter_list(int length)
   il->curr = 0;
   il->max = length;
   if (length > 0)
-    {
-      il->parameters = (struct command_parameter**)
-	mycalloc(rout_name,length, sizeof(struct command_parameter*));
-    }
+  {
+    il->parameters = (struct command_parameter**)
+      mycalloc(rout_name,length, sizeof(struct command_parameter*));
+  }
   return il;
 }
 
@@ -2355,11 +2359,11 @@ struct expression* new_expression(char* in_string, struct int_array* polish)
   strcpy(ex->string, in_string);
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ex->name);
   if (polish != NULL)
-    {
-      ex->polish = new_int_array(polish->curr);
-      ex->polish->curr = polish->curr;
-      for (j = 0; j < polish->curr; j++) ex->polish->i[j] = polish->i[j];
-    }
+  {
+    ex->polish = new_int_array(polish->curr);
+    ex->polish->curr = polish->curr;
+    for (j = 0; j < polish->curr; j++) ex->polish->i[j] = polish->i[j];
+  }
   return ex;
 }
 
@@ -2571,12 +2575,12 @@ struct table* new_table(char* name, char* type, int rows,
   t->d_cols = (double**) mycalloc(rout_name,n, sizeof(double*));
   t->max = ++rows; /* +1 because of separate augment_count */
   for (i = 0; i < n; i++)
-    {
-      if (cols->inform[i] < 3)
-        t->d_cols[i] = (double*) mycalloc(rout_name,rows, sizeof(double));
-      else if (cols->inform[i] == 3)
-        t->s_cols[i] = (char**) mycalloc(rout_name,rows, sizeof(char*));
-    }
+  {
+    if (cols->inform[i] < 3)
+      t->d_cols[i] = (double*) mycalloc(rout_name,rows, sizeof(double));
+    else if (cols->inform[i] == 3)
+      t->s_cols[i] = (char**) mycalloc(rout_name,rows, sizeof(char*));
+  }
   t->row_out = new_int_array(rows);
   t->col_out = new_int_array(n);
   t->node_nm = new_char_p_array(rows);
@@ -2635,9 +2639,9 @@ struct var_list* new_var_list(int length)
 }
 
 struct vector_list* new_vector_list(int length)
-     /* creates a name list and pointer list
-        for double arrays with initial length "length".
-     */
+  /* creates a name list and pointer list
+     for double arrays with initial length "length".
+  */
 {
   char rout_name[] = "new_vector_list";
   struct vector_list* vector
@@ -2651,42 +2655,42 @@ struct vector_list* new_vector_list(int length)
 }
 
 char next_non_blank(char* string)
-     /* returns next non-blank in string outside quotes, else blank */
+  /* returns next non-blank in string outside quotes, else blank */
 {
   int i, toggle = 0, l = strlen(string);
   char quote = ' ';
   for (i = 0; i < l; i++)
+  {
+    if (toggle)
     {
-      if (toggle)
-	{
-	  if (string[i] == quote)  toggle = 0;
-	}
-      else if (string[i] == '\'' || string[i] == '\"')
-	{
-	  quote = string[i]; toggle = 1;
-	}
-      else if (string[i] != ' ')  return string[i];
+      if (string[i] == quote)  toggle = 0;
     }
+    else if (string[i] == '\'' || string[i] == '\"')
+    {
+      quote = string[i]; toggle = 1;
+    }
+    else if (string[i] != ' ')  return string[i];
+  }
   return ' ';
 }
 
 int next_non_blank_pos(char* string)
-     /* returns position of next non-blank in string outside quotes, else -1 */
+  /* returns position of next non-blank in string outside quotes, else -1 */
 {
   int i, toggle = 0, l = strlen(string);
   char quote = ' ';
   for (i = 0; i < l; i++)
+  {
+    if (toggle)
     {
-      if (toggle)
-	{
-	  if (string[i] == quote)  toggle = 0;
-	}
-      else if (string[i] == '\'' || string[i] == '\"')
-	{
-	  quote = string[i]; toggle = 1;
-	}
-      else if (string[i] != ' ')  return i;
+      if (string[i] == quote)  toggle = 0;
     }
+    else if (string[i] == '\'' || string[i] == '\"')
+    {
+      quote = string[i]; toggle = 1;
+    }
+    else if (string[i] != ' ')  return i;
+  }
   return -1;
 }
 
@@ -2696,15 +2700,15 @@ char* noquote(char* string)
   char* d = c;
   char k;
   if (string != NULL)
+  {
+    k = *c;
+    if (k == '\"' || k == '\'')
     {
-      k = *c;
-      if (k == '\"' || k == '\'')
-	{
-	  d++;
-	  while (*d != k) *c++ = *d++;
-	  *c = '\0';
-	}
+      d++;
+      while (*d != k) *c++ = *d++;
+      *c = '\0';
     }
+  }
   return string;
 }
 
@@ -2722,7 +2726,7 @@ int par_out_flag(char* base_name, char* par_name)
 }
 
 int predef_var(struct variable* var)
-     /* return 1 for predefined variable, else 0 */
+  /* return 1 for predefined variable, else 0 */
 {
   int pos = name_list_pos(var->name, variable_list->list);
   return (pos < start_var ? 1 : 0) ;
@@ -2733,10 +2737,10 @@ void print_command(struct command* cmd)
   int i;
   fprintf(prt_file, "command: %s\n", cmd->name);
   for (i = 0; i < cmd->par->curr; i++)
-    {
-      print_command_parameter(cmd->par->parameters[i]);
-      if ((i+1)%3 == 0) fprintf(prt_file, "\n");
-    }
+  {
+    print_command_parameter(cmd->par->parameters[i]);
+    if ((i+1)%3 == 0) fprintf(prt_file, "\n");
+  }
   if (i%3 != 0) fprintf(prt_file, "\n");
 }
 
@@ -2745,7 +2749,7 @@ void print_command_parameter(struct command_parameter* par)
   int i, k;
   char logic[2][8] = {"false", "true"};
   switch (par->type)
-    {
+  {
     case 0:
       k = par->double_value;
       fprintf(prt_file, "%s = %s, ", par->name, logic[k]);
@@ -2760,16 +2764,16 @@ void print_command_parameter(struct command_parameter* par)
     case 11:
     case 12:
       if (par->double_array != NULL)
-	{
-	  fprintf(prt_file, "double array: ");
-	  for (i = 0; i < par->double_array->curr; i++)
-            fprintf(prt_file, v_format("%F, "), par->double_array->a[i]);
-	  fprintf(prt_file, "\n");
-	}
+      {
+        fprintf(prt_file, "double array: ");
+        for (i = 0; i < par->double_array->curr; i++)
+          fprintf(prt_file, v_format("%F, "), par->double_array->a[i]);
+        fprintf(prt_file, "\n");
+      }
       break;
     case 3:
       fprintf(prt_file, "%s = %s, ", par->name, par->string);
-    }
+  }
 }
 
 void print_global(double delta)
@@ -2800,15 +2804,15 @@ void print_global(double delta)
   printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
   printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
   printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"),
-	 bcurrent, kbunch);
+         bcurrent, kbunch);
   printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"),
-	 npart,energy);
+         npart,energy);
   printf(v_format(" gamma     %F            beta      %F\n"),
-	 gamma, beta);
+         gamma, beta);
 }
 
 void print_rfc()
-     /* prints the rf cavities present */
+  /* prints the rf cavities present */
 {
   double freq0, harmon, freq;
   int i, n = current_sequ->cavities->curr;
@@ -2817,60 +2821,60 @@ void print_rfc()
   freq0 = command_par_value("freq0", probe_beam);
   printf("\n RF system: \n");
   printf(v_format(" %S %NFs %NFs %NFs %NFs %NFs\n"),
-	 "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
+         "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
   for (i = 0; i < n; i++)
+  {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = el_par_value("harmon", el)) > zero)
     {
-      el = current_sequ->cavities->elem[i];
-      if ((harmon = el_par_value("harmon", el)) > zero)
-	{
-	  freq = freq0 * harmon;
-	  printf(v_format(" %S %F %F %F %F %F\n"),
-		 el->name, el->length, el_par_value("volt", el),
-		 el_par_value("lag", el), freq, harmon);
-	}
+      freq = freq0 * harmon;
+      printf(v_format(" %S %F %F %F %F %F\n"),
+             el->name, el->length, el_par_value("volt", el),
+             el_par_value("lag", el), freq, harmon);
     }
+  }
 }
 
 void print_table(struct table* t)
 {
   int i, j, k, l, n, tmp, wpl = 4;
   if (t != NULL)
+  {
+    fprintf(prt_file, "\n");
+    fprintf(prt_file, "++++++ table: %s\n", t->name);
+    l = (t->num_cols-1) / wpl + 1;
+    for (k = 0; k < l; k++)
     {
+      n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
       fprintf(prt_file, "\n");
-      fprintf(prt_file, "++++++ table: %s\n", t->name);
-      l = (t->num_cols-1) / wpl + 1;
-      for (k = 0; k < l; k++)
-	{
-	  n = wpl*(k+1) > t->num_cols ? t->num_cols : wpl*(k+1);
-	  fprintf(prt_file, "\n");
-	  for (i = wpl*k; i < n; i++)
-	    {
-	      if (t->columns->inform[i] == 1)
-		fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
-	      else if (t->columns->inform[i] == 2)
-		fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
-	      else if (t->columns->inform[i] == 3)
-		fprintf(prt_file, v_format("%S "), t->columns->names[i]);
-	    }
-	  fprintf(prt_file, "\n");
-	  for (j = 0; j < t->curr; j++)
-	    {
-	      for (i = wpl*k; i < n; i++)
-		{
-		  if (t->columns->inform[i] == 1)
-		    {
-		      tmp = t->d_cols[i][j];
-		      fprintf(prt_file, v_format("%I "), tmp);
-		    }
-		  else if (t->columns->inform[i] == 2)
-		    fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
-		  else if (t->columns->inform[i] == 3)
-		    fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
-		}
-	      fprintf(prt_file, "\n");
-	    }
-	}
+      for (i = wpl*k; i < n; i++)
+      {
+        if (t->columns->inform[i] == 1)
+          fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
+        else if (t->columns->inform[i] == 2)
+          fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
+        else if (t->columns->inform[i] == 3)
+          fprintf(prt_file, v_format("%S "), t->columns->names[i]);
+      }
+      fprintf(prt_file, "\n");
+      for (j = 0; j < t->curr; j++)
+      {
+        for (i = wpl*k; i < n; i++)
+        {
+          if (t->columns->inform[i] == 1)
+          {
+            tmp = t->d_cols[i][j];
+            fprintf(prt_file, v_format("%I "), tmp);
+          }
+          else if (t->columns->inform[i] == 2)
+            fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
+          else if (t->columns->inform[i] == 3)
+            fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
+        }
+        fprintf(prt_file, "\n");
+      }
     }
+  }
 }
 
 void print_value(struct in_cmd* cmd)
@@ -2879,19 +2883,19 @@ void print_value(struct in_cmd* cmd)
   int n = cmd->tok_list->curr - cmd->decl_start;
   int s_start = 0, end, type, nitem;
   while((type = loc_expr(toks, n, s_start, &end)) > 0)
-    {
-      nitem = end + 1 - s_start;
-      if (polish_expr(nitem, &toks[s_start]) == 0)
-	fprintf(prt_file, v_format("%s = %F ;\n"),
-		spec_join(&toks[s_start], nitem), polish_value(deco));
-      else warning("invalid expression:", spec_join(&toks[s_start], nitem));
-      s_start = end+1;
-      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
-    }
+  {
+    nitem = end + 1 - s_start;
+    if (polish_expr(nitem, &toks[s_start]) == 0)
+      fprintf(prt_file, v_format("%s = %F ;\n"),
+              spec_join(&toks[s_start], nitem), polish_value(deco));
+    else warning("invalid expression:", spec_join(&toks[s_start], nitem));
+    s_start = end+1;
+    if (s_start < n-1 && *toks[s_start] == ',') s_start++;
+  }
 }
 
 int remove_colon(char** toks, int number, int start)
-     /* removes colon behind declarative part for MAD-8 compatibility */
+  /* removes colon behind declarative part for MAD-8 compatibility */
 {
   int i, k = start;
   for (i = start; i < number; i++)  if (*toks[i] != ':') toks[k++] = toks[i];
@@ -2899,27 +2903,27 @@ int remove_colon(char** toks, int number, int start)
 }
 
 void replace(char* buf, char in, char out)
-     /* replaces character in by character out in string buf */
+  /* replaces character in by character out in string buf */
 {
   int j, l = strlen(buf);
   for (j = 0; j < l; j++)  if (buf[j] == in)  buf[j] = out;
 }
 
 int square_to_colon(char* string)
-     /* sets occurrence count behind colon, possibly replacing [] */
+  /* sets occurrence count behind colon, possibly replacing [] */
 {
   char* t;
   int k = strlen(string);
   if ((t = strchr(string, '[')) == NULL)
-    {
-      string[k++] = ':'; string[k++] = '1'; string[k] = '\0';
-    }
+  {
+    string[k++] = ':'; string[k++] = '1'; string[k] = '\0';
+  }
   else
-    {
-      *t = ':';
-      if ((t = strchr(string, ']')) == NULL)  return 0;
-      else *t = '\0';
-    }
+  {
+    *t = ':';
+    if ((t = strchr(string, ']')) == NULL)  return 0;
+    else *t = '\0';
+  }
   return strlen(string);
 }
 
@@ -2928,31 +2932,31 @@ char* stolower(char* s)  /* converts string to lower in place */
   char *c = s;
   int j;
   for (j = 0; j < strlen(s); j++)
-    {
-      *c = (char) tolower((int) *c); c++;
-    }
+  {
+    *c = (char) tolower((int) *c); c++;
+  }
   return s;
 }
 
 void stolower_nq(char* s)
-     /* converts string to lower in place outside quotes */
+  /* converts string to lower in place outside quotes */
 {
   char *c = s;
   int j, toggle = 0;
   char quote = ' '; /* just to suit the compiler */
   for (j = 0; j < strlen(s); j++)
+  {
+    if (toggle)
     {
-      if (toggle)
-	{
-	  if (*c == quote) toggle = 0;
-	}
-      else if (*c == '\"' || *c == '\'')
-	{
-	  toggle = 1; quote = *c;
-	}
-      else *c = (char) tolower((int) *c);
-      c++;
+      if (*c == quote) toggle = 0;
     }
+    else if (*c == '\"' || *c == '\'')
+    {
+      toggle = 1; quote = *c;
+    }
+    else *c = (char) tolower((int) *c);
+    c++;
+  }
 }
 
 char* stoupper(char* s)  /* converts string to upper in place */
@@ -2960,14 +2964,14 @@ char* stoupper(char* s)  /* converts string to upper in place */
   char *c = s;
   int j;
   for (j = 0; j < strlen(s); j++)
-    {
-      *c = (char) toupper((int) *c); c++;
-    }
+  {
+    *c = (char) toupper((int) *c); c++;
+  }
   return s;
 }
 
 int string_cnt(char c, int n, char* toks[])
-     /* returns number of strings in toks starting with character c */
+  /* returns number of strings in toks starting with character c */
 {
   int i, k = 0;
   for (i = 0; i < n; i++) if(*toks[i] == c) k++;
@@ -2975,7 +2979,7 @@ int string_cnt(char c, int n, char* toks[])
 }
 
 char* strip(char* name)
-     /* strip ':' and following off */
+  /* strip ':' and following off */
 {
   char* p;
   strcpy(tmp_key, name);
@@ -2984,19 +2988,19 @@ char* strip(char* name)
 }
 
 void supp_char(char c, char* string)
-     /* suppresses character c in string */
+  /* suppresses character c in string */
 {
   char* cp = string;
   while (*string != '\0')
-    {
-      if (*string != c)  *cp++ = *string;
-      string++;
-    }
+  {
+    if (*string != c)  *cp++ = *string;
+    string++;
+  }
   *cp = '\0';
 }
 
 int supp_lt(char* inbuf, int flag)
-     /* suppress leading, trailing blanks and replace some special char.s*/
+  /* suppress leading, trailing blanks and replace some special char.s*/
 {
   int l = strlen(inbuf), i, j;
   replace(inbuf, '\x9', ' '); /* tab */
@@ -3004,31 +3008,31 @@ int supp_lt(char* inbuf, int flag)
   if (flag == 0)  replace(inbuf, '\n', ' '); /* e-o-l */
   supp_tb(inbuf); /* suppress trailing blanks */
   if ((l = strlen(inbuf)) > 0)
+  {
+    for (j = 0; j < l; j++) if (inbuf[j] != ' ') break; /* leading blanks */
+    if (j > 0)
     {
-      for (j = 0; j < l; j++) if (inbuf[j] != ' ') break; /* leading blanks */
-      if (j > 0)
-	{
-	  for (i = 0; i < l - j; i++) inbuf[i] = inbuf[i+j];
-	  inbuf[i] = '\0';
-	}
+      for (i = 0; i < l - j; i++) inbuf[i] = inbuf[i+j];
+      inbuf[i] = '\0';
     }
+  }
   return strlen(inbuf);
 }
 
 void supp_mul_char(char c, char* string)
-     /* reduces multiple occurrences of c in string to 1 occurrence */
+  /* reduces multiple occurrences of c in string to 1 occurrence */
 {
   char* cp = string;
   int cnt = 0;
   while (*string != '\0')
+  {
+    if (*string != c)
     {
-      if (*string != c)
-	{
-	  *cp++ = *string; cnt = 0;
-	}
-      else if (cnt++ == 0) *cp++ = *string;
-      string++;
+      *cp++ = *string; cnt = 0;
     }
+    else if (cnt++ == 0) *cp++ = *string;
+    string++;
+  }
   *cp = '\0';
 }
 
@@ -3036,10 +3040,10 @@ char* supp_tb(char* string) /* suppress trailing blanks in string */
 {
   int l = strlen(string), j;
   for (j = l-1; j >= 0; j--)
-    {
-      if (string[j] != ' ') break;
-      string[j] = '\0';
-    }
+  {
+    if (string[j] != ' ') break;
+    string[j] = '\0';
+  }
   return string;
 }
 
@@ -3049,25 +3053,25 @@ void termination_handler(int signum)
     puts("+++ memory access outside program range, fatal +++");
   else
     printf("+++ illegal call to free memory from routine: %s +++\n",
-	   myfree_caller);
+           myfree_caller);
   puts("good bye");
   exit(1);
 }
 
 double tgrndm(double cut)
-     /* returns random variable from normal distribution cat at 'cut' sigmas */
+  /* returns random variable from normal distribution cat at 'cut' sigmas */
 {
   double ret = zero;
   if (cut > zero)
-    {
-      ret = grndm();
-      while (fabs(ret) > fabs(cut))  ret = grndm();
-    }
+  {
+    ret = grndm();
+    while (fabs(ret) > fabs(cut))  ret = grndm();
+  }
   return ret;
 }
 
 double vdot(int* n, double* v1, double* v2)
-     /* returns dot product of vectors v1 and v2 */
+  /* returns dot product of vectors v1 and v2 */
 {
   int i;
   double dot = 0;
@@ -3092,35 +3096,35 @@ int v_length(char* form)
 }
 
 char* v_format(char* string)
-     /* copies string to gloval variable var_form
-	replacing  %S, %I, and %F by the user defined formats;
-	%NF and %NI are replaced by the field lengths (!) of the defined formats */
+  /* copies string to gloval variable var_form
+     replacing  %S, %I, and %F by the user defined formats;
+     %NF and %NI are replaced by the field lengths (!) of the defined formats */
 {
   char *p, *q = string, *s = string, *t;
   char c;
   *var_form = '\0';
   while ((p = strpbrk(s, "NIFS")))
+  {
+    if ((int)p > (int)q)
     {
-      if ((int)p > (int)q)
-	{
-	  t = p; t--;
-	  if (*t == '%')
-	    {
-	      c = *p;
-	      strncat(var_form, q, (int)p - (int)q);
-	      if (c == 'N')
-		{
-		  sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
-		  p++;
-		}
-	      else if (c == 'F')  strcat(var_form, float_format);
-	      else if (c == 'S')  strcat(var_form, string_format);
-	      else if (c == 'I')  strcat(var_form, int_format);
-	      q = p; q++;
-	    }
-	}
-      s = ++p;
+      t = p; t--;
+      if (*t == '%')
+      {
+        c = *p;
+        strncat(var_form, q, (int)p - (int)q);
+        if (c == 'N')
+        {
+          sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
+          p++;
+        }
+        else if (c == 'F')  strcat(var_form, float_format);
+        else if (c == 'S')  strcat(var_form, string_format);
+        else if (c == 'I')  strcat(var_form, int_format);
+        q = p; q++;
+      }
     }
+    s = ++p;
+  }
   strcat(var_form, q);
   return var_form;
 }
@@ -3129,20 +3133,20 @@ void write_elems(struct el_list* ell, struct command_list* cl, FILE* file)
 {
   int i;
   for (i = 0; i < ell->curr; i++)
-    {
-      if (pass_select_list(ell->elem[i]->name, cl))
-        export_element(ell->elem[i], ell, file);
-    }
+  {
+    if (pass_select_list(ell->elem[i]->name, cl))
+      export_element(ell->elem[i], ell, file);
+  }
 }
 
 void write_elems_8(struct el_list* ell, struct command_list* cl, FILE* file)
 {
   int i;
   for (i = 0; i < ell->curr; i++)
-    {
-      if (pass_select_list(ell->elem[i]->name, cl))
-        export_elem_8(ell->elem[i], ell, file);
-    }
+  {
+    if (pass_select_list(ell->elem[i]->name, cl))
+      export_elem_8(ell->elem[i], ell, file);
+  }
 }
 
 void write_nice(char* string, FILE* file)
@@ -3154,19 +3158,19 @@ void write_nice(char* string, FILE* file)
   strcat(string, ";");
   n = strlen(string);
   while (n > LINE_FILL)
+  {
+    for (pos = LINE_FILL; pos > 10; pos--)
     {
-      for (pos = LINE_FILL; pos > 10; pos--)
-	{
-	  k = c[pos];
-	  if (strchr(" ,+-*/", k))  break;
-	}
-      c[pos] = '\0';
-      fprintf(file, "%s\n", c);
-      c[pos] = k;
-      ssc = (int) &c[pos] - (int) c;
-      n -= ssc;
-      c = &c[pos];
+      k = c[pos];
+      if (strchr(" ,+-*/", k))  break;
     }
+    c[pos] = '\0';
+    fprintf(file, "%s\n", c);
+    c[pos] = k;
+    ssc = (int) &c[pos] - (int) c;
+    n -= ssc;
+    c = &c[pos];
+  }
   fprintf(file, "%s\n", c);
 }
 
@@ -3179,20 +3183,20 @@ void write_nice_8(char* string, FILE* file)
   strcat(string, ";");
   n = strlen(string);
   while (n > LINE_F_MAD8)
+  {
+    comma = 0;
+    for (pos = LINE_F_MAD8; pos > 10; pos--)
     {
-      comma = 0;
-      for (pos = LINE_F_MAD8; pos > 10; pos--)
-	{
-	  k = c[pos];
-	  if (strchr(" ,+-*/", k))  break;
-	}
-      c[pos] = '\0';
-      fprintf(file, "%s &\n", c);
-      c[pos] = k;
-      ssc = (int) &c[pos] - (int) c;
-      n -= ssc;
-      c = &c[pos];
+      k = c[pos];
+      if (strchr(" ,+-*/", k))  break;
     }
+    c[pos] = '\0';
+    fprintf(file, "%s &\n", c);
+    c[pos] = k;
+    ssc = (int) &c[pos] - (int) c;
+    n -= ssc;
+    c = &c[pos];
+  }
   fprintf(file, "%s\n", c);
 }
 
@@ -3203,40 +3207,40 @@ void write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file)
   for (i = 0; i < sql->curr; i++)
     if(sql->sequs[i]->nested > max_nest) max_nest = sql->sequs[i]->nested;
   for (j = 0; j <= max_nest; j++)
-    {
-      for (i = 0; i < sql->curr; i++)
-	if(sql->sequs[i]->nested == j)
-	  {
-	    if (pass_select_list(sql->sequs[i]->name, cl))
-	      export_sequence(sql->sequs[i], file);
-	  }
-    }
+  {
+    for (i = 0; i < sql->curr; i++)
+      if(sql->sequs[i]->nested == j)
+      {
+        if (pass_select_list(sql->sequs[i]->name, cl))
+          export_sequence(sql->sequs[i], file);
+      }
+  }
 }
 
 void write_vars(struct var_list* varl, struct command_list* cl, FILE* file)
 {
   int i;
   for (i = 0; i < varl->curr; i++)
-    {
-      if (predef_var(varl->vars[i]) == 0
-	  && pass_select_list(varl->vars[i]->name, cl))
-	export_variable(varl->vars[i], file);
-    }
+  {
+    if (predef_var(varl->vars[i]) == 0
+        && pass_select_list(varl->vars[i]->name, cl))
+      export_variable(varl->vars[i], file);
+  }
 }
 
 void write_vars_8(struct var_list* varl, struct command_list* cl, FILE* file)
 {
   int i;
   for (i = 0; i < varl->curr; i++)
-    {
-      if (predef_var(varl->vars[i]) == 0
-	  && pass_select_list(varl->vars[i]->name, cl))
-	export_var_8(varl->vars[i], file);
-    }
+  {
+    if (predef_var(varl->vars[i]) == 0
+        && pass_select_list(varl->vars[i]->name, cl))
+      export_var_8(varl->vars[i], file);
+  }
 }
 
 void write_table(struct table* t, char* filename)
-     /* writes rows with columns listed in row and col */
+  /* writes rows with columns listed in row and col */
 {
   char l_name[NAME_L];
   char sys_name[200];
@@ -3258,105 +3262,105 @@ void write_table(struct table* t, char* filename)
   tm = localtime(&now); /* split system time */
   if (strcmp(filename, "terminal") == 0) out_file = stdout;
   else if ((out_file = fopen(filename, "w")) == NULL)
-    {
-      warning("cannot open output file:", filename); return;
-    }
+  {
+    warning("cannot open output file:", filename); return;
+  }
   if (t != NULL)
+  {
+    strcpy(l_name, t->name);
+    fprintf(out_file,
+            "@ NAME             %%%02ds \"%s\"\n", strlen(t->name),
+            stoupper(l_name));
+
+    strcpy(l_name, t->type);
+    fprintf(out_file,
+            "@ TYPE             %%%02ds \"%s\"\n", strlen(t->type),
+            stoupper(l_name));
+
+    if (t->header != NULL)
     {
-      strcpy(l_name, t->name);
-      fprintf(out_file,
-	      "@ NAME             %%%02ds \"%s\"\n", strlen(t->name),
-	      stoupper(l_name));
-
-      strcpy(l_name, t->type);
-      fprintf(out_file,
-	      "@ TYPE             %%%02ds \"%s\"\n", strlen(t->type),
-	      stoupper(l_name));
-
-      if (t->header != NULL)
-	{
-	  for (j = 0; j < t->header->curr; j++)
-	    fprintf(out_file, "%s\n", t->header->p[j]);
-	}
-      if (title != NULL)
-        fprintf(out_file,
-		"@ TITLE            %%%02ds \"%s\"\n", strlen(title), title);
-
-      fprintf(out_file,
-	      "@ ORIGIN           %%%02ds \"%s %s\"\n",
-	      strlen(myversion)+strlen(sys_name)+1, myversion, sys_name);
-
-      fprintf(out_file,
-	      "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
-	      tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
-
-      fprintf(out_file,
-	      "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
-	      tm->tm_hour, tm->tm_min, tm->tm_sec);
-      fprintf(out_file, "* ");
-
-      for (i = 0; i < col->curr; i++)
-	{
-	  strcpy(l_name, t->columns->names[col->i[i]]);
-	  if (t->columns->inform[col->i[i]] == 1)
-	    fprintf(out_file, v_format("%NIs "), stoupper(l_name));
-	  else if (t->columns->inform[col->i[i]] == 2)
-	    fprintf(out_file, v_format("%NFs "), stoupper(l_name));
-	  else if (t->columns->inform[col->i[i]] == 3)
-	    fprintf(out_file, v_format("%S "), stoupper(l_name));
-	}
-      fprintf(out_file, "\n");
-
-      fprintf(out_file, "$ ");
-      for (i = 0; i < col->curr; i++)
-	{
-	  if (t->columns->inform[col->i[i]] == 1)
-            fprintf(out_file, v_format("%NIs "),"%hd");
-	  else if (t->columns->inform[col->i[i]] == 2)
-            fprintf(out_file, v_format("%NFs "),"%le");
-	  else if (t->columns->inform[col->i[i]] == 3)
-            fprintf(out_file, v_format("%S "),"%s");
-	}
-      fprintf(out_file, "\n");
-
-      for (j = 0; j < row->curr; j++)
-	{
-	  if (row->i[j])
-	    {
-	      if (t->l_head[j] != NULL)
-		{
-		  for (k = 0; k < t->l_head[j]->curr; k++)
-		    fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
-		}
-	      for (i = 0; i < col->curr; i++)
-		{
-		  if (t->columns->inform[col->i[i]] == 1)
-		    {
-		      tmp = t->d_cols[col->i[i]][j];
-		      fprintf(out_file, v_format(" %I"), tmp);
-		    }
-		  else if (t->columns->inform[col->i[i]] == 2)
-		    fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
-		  else if (t->columns->inform[col->i[i]] == 3)
-		    {
-		      *c_dummy = '\"';
-		      strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
-		      stoupper(c_dummy);
-		      pc = strip(c_dummy); /* remove :<occ_count> */
-		      k = strlen(pc);
-		      pc[k++] = '\"'; pc[k] = '\0';
-		      fprintf(out_file, v_format(" %S "), pc);
-		    }
-		}
-	      fprintf(out_file, "\n");
-	    }
-	}
-      if (strcmp(filename, "terminal") != 0) fclose(out_file);
+      for (j = 0; j < t->header->curr; j++)
+        fprintf(out_file, "%s\n", t->header->p[j]);
     }
+    if (title != NULL)
+      fprintf(out_file,
+              "@ TITLE            %%%02ds \"%s\"\n", strlen(title), title);
+
+    fprintf(out_file,
+            "@ ORIGIN           %%%02ds \"%s %s\"\n",
+            strlen(myversion)+strlen(sys_name)+1, myversion, sys_name);
+
+    fprintf(out_file,
+            "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
+            tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
+
+    fprintf(out_file,
+            "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
+            tm->tm_hour, tm->tm_min, tm->tm_sec);
+    fprintf(out_file, "* ");
+
+    for (i = 0; i < col->curr; i++)
+    {
+      strcpy(l_name, t->columns->names[col->i[i]]);
+      if (t->columns->inform[col->i[i]] == 1)
+        fprintf(out_file, v_format("%NIs "), stoupper(l_name));
+      else if (t->columns->inform[col->i[i]] == 2)
+        fprintf(out_file, v_format("%NFs "), stoupper(l_name));
+      else if (t->columns->inform[col->i[i]] == 3)
+        fprintf(out_file, v_format("%S "), stoupper(l_name));
+    }
+    fprintf(out_file, "\n");
+
+    fprintf(out_file, "$ ");
+    for (i = 0; i < col->curr; i++)
+    {
+      if (t->columns->inform[col->i[i]] == 1)
+        fprintf(out_file, v_format("%NIs "),"%hd");
+      else if (t->columns->inform[col->i[i]] == 2)
+        fprintf(out_file, v_format("%NFs "),"%le");
+      else if (t->columns->inform[col->i[i]] == 3)
+        fprintf(out_file, v_format("%S "),"%s");
+    }
+    fprintf(out_file, "\n");
+
+    for (j = 0; j < row->curr; j++)
+    {
+      if (row->i[j])
+      {
+        if (t->l_head[j] != NULL)
+        {
+          for (k = 0; k < t->l_head[j]->curr; k++)
+            fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
+        }
+        for (i = 0; i < col->curr; i++)
+        {
+          if (t->columns->inform[col->i[i]] == 1)
+          {
+            tmp = t->d_cols[col->i[i]][j];
+            fprintf(out_file, v_format(" %I"), tmp);
+          }
+          else if (t->columns->inform[col->i[i]] == 2)
+            fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
+          else if (t->columns->inform[col->i[i]] == 3)
+          {
+            *c_dummy = '\"';
+            strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
+            stoupper(c_dummy);
+            pc = strip(c_dummy); /* remove :<occ_count> */
+            k = strlen(pc);
+            pc[k++] = '\"'; pc[k] = '\0';
+            fprintf(out_file, v_format(" %S "), pc);
+          }
+        }
+        fprintf(out_file, "\n");
+      }
+    }
+    if (strcmp(filename, "terminal") != 0) fclose(out_file);
+  }
 }
 
 void zero_double(double* a, int n)
-     /* sets first n values in double array a to zero */
+  /* sets first n values in double array a to zero */
 {
   int j;
   for (j = 0; j < n; j++)  a[j] = zero;

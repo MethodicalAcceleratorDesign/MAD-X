@@ -181,7 +181,7 @@ struct expression
   char name[NAME_L];
   char* string;                 /* expression in string form */
   int status;                   /* status flag: 0 not evaluated
-				   1 evaluated */
+            1 evaluated */
   struct int_array* polish;     /* pointer to Polish notation, or NULL */
   double value;                 /* actual value */
   int stamp;

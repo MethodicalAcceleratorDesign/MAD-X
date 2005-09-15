@@ -17,7 +17,7 @@ float deftim = 999.;
 
 /*  local routine called by timst, and time_init */
 static void time_st(timl)
-     float timl;
+  float timl;
 {
   times(&tps);
   timlim = timl;
@@ -34,7 +34,8 @@ static void time_init()
 
   maxtime=deftim;
 
-  if (getrlimit(RLIMIT_CPU, &rlimit)==0) {
+  if (getrlimit(RLIMIT_CPU, &rlimit)==0)
+  {
     if ( rlimit.rlim_cur != RLIM_INFINITY )
       maxtime = (float) rlimit.rlim_cur;
   }
@@ -44,11 +45,12 @@ static void time_init()
 }
 
 void timest_(timl)
-     float *timl;
+  float *timl;
 {
   float  maxtime;
 
-  if (tml_init != 0) {
+  if (tml_init != 0)
+  {
 
     maxtime = *timl;
     time_st(maxtime);
@@ -56,14 +58,16 @@ void timest_(timl)
   return;
 }
 void timex_(tx)
-     float *tx;
+  float *tx;
 {
   time_t timnow;
-  if (tml_init) {
+  if (tml_init)
+  {
     time_init();
     *tx = 0.;
   }
-  else {
+  else
+  {
     times(&tps);
     timnow = tps.tms_utime+tps.tms_cutime+tps.tms_stime+tps.tms_cstime;
     *tx = (float) (timnow - timstart) / HZ;
@@ -72,14 +76,16 @@ void timex_(tx)
 }
 
 void timed_(td)
-     float *td;
+  float *td;
 {
   time_t timnow;
-  if (tml_init) {
+  if (tml_init)
+  {
     time_init();
     *td = timlim;
   }
-  else {
+  else
+  {
     times(&tps);
     timnow = tps.tms_utime+tps.tms_cutime+tps.tms_stime+tps.tms_cstime;
     *td = (float) (timnow - timlast) / HZ;
@@ -89,14 +95,16 @@ void timed_(td)
 }
 
 void timel_(tl)
-     float *tl;
+  float *tl;
 {
   time_t timnow;
-  if (tml_init) {
+  if (tml_init)
+  {
     time_init();
     *tl = timlim;
   }
-  else {
+  else
+  {
     times(&tps);
     timnow = tps.tms_utime+tps.tms_cutime+tps.tms_stime+tps.tms_cstime;
     *tl = timlim - (float) (timnow - timstart) / HZ;
