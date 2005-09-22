@@ -317,12 +317,12 @@ char* sodd_distort2_9_cols[] =
 
 int touschek_table_types[] =
 {
-  3, 2, 2, 2, 2, 2
+  3, 2, 2, 2, 2
 };
 
 char* touschek_table_cols[] =
 {
-  "name", "s", "dels", "tli", "txi", "tyi",
+  "name", "s", "tli", "tliw", "tlitot",
   " "  /* blank terminates */
 };
 
