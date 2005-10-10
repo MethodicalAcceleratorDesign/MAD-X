@@ -10,10 +10,10 @@ f95=f95
 GCC_FLAGS=-c -g -Wall -fno-second-underscore -D_CATCH_MEM
 GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan -ieee=full
+f95_FLAGS=-gline -g -c -C=all -maxcontin=100 -nan -ieee=full
 #f95_FLAGS=-c -O4 -maxcontin=100 -w=unused -ieee=full
-FFLAGS77=-gline -g90 -c -fpp -maxcontin=100 -nan -ieee=stop
-#FFLAGS77=-g90 -c -fpp -O4 -maxcontin=100 -w=unused -ieee=full
+FFLAGS77=-gline -g -c -fpp -maxcontin=100 -nan -ieee=stop
+#FFLAGS77=-g -c -fpp -O4 -maxcontin=100 -w=unused -ieee=full
 
 #FC=g77
 FC=f95
@@ -40,10 +40,10 @@ default: madx
 
 # files
 
-madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS_MPARS) madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS) -o madxpf.o madxp.c
 
 twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
