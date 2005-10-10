@@ -174,12 +174,13 @@ void wclrwk(int *i1,int *i2)
 void wpl(int *np, float *xp, float *yp)
 {
   /* plot PolyLine of np points with coordinates (xp,yp) */
+  char rout_name[] = "wpl";
 
   XPoint          *points;
   int             i, k;
 
   /* polyline drawing */
-  points = (XPoint *) calloc(*np, sizeof(XPoint));
+  points = (XPoint *) mycalloc(rout_name,*np, sizeof(XPoint));
   for (i = 0;i < *np ;i++ )
   {
     points[i].x = (xp[i] - w_lx) * wx_fact + 0.5;
@@ -187,19 +188,20 @@ void wpl(int *np, float *xp, float *yp)
     points[i].y = myhint.height - k;
   }
   XDrawLines(mydisplay, mywindow, mygc[style], points, *np, 0);
-  free(points);
+  myfree(rout_name, points);
 
 }
 
 void wfa(int *np, float *xp, float *yp)
 {
   /* plot area-filled PolyLine of np points with coordinates (xp,yp) */
+  char rout_name[] = "wfa";
 
   XPoint          *points;
   int             i, k;
 
   /* polyline drawing */
-  points = (XPoint *) calloc(*np, sizeof(XPoint));
+  points = (XPoint *) mycalloc(rout_name,*np, sizeof(XPoint));
   for (i = 0;i < *np ;i++ )
   {
     points[i].x = (xp[i] - w_lx) * wx_fact + 0.5;
@@ -208,7 +210,7 @@ void wfa(int *np, float *xp, float *yp)
   }
   XFillPolygon(mydisplay, mywindow, mygc[style], points, *np,
                Nonconvex, 0);
-  free(points);
+  myfree(rout_name, points);
 
 }
 
