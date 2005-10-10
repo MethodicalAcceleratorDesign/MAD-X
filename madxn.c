@@ -1807,8 +1807,8 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
-  t_types = malloc(m->curr*sizeof(int));
-  t_c = malloc((m->curr+1)*sizeof(char*));
+  t_types = mymalloc(rout_name, m->curr*sizeof(int));
+  t_c = mymalloc(rout_name, (m->curr+1)*sizeof(char*));
   for (j = 0; j < m->curr; j++)
   {
     t_types[j] = 2; /* type double */

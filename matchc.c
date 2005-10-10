@@ -630,7 +630,7 @@ void match_prepare_varypos()
 {
   struct node* node = current_sequ->ex_start;
   struct constraint_list** tmplist = (struct constraint_list**)
-    malloc(current_sequ->n_nodes * sizeof(struct constraint_list*));
+    mymalloc("match_prepare_varypos",current_sequ->n_nodes * sizeof(struct constraint_list*));
   int i = 0;
   while (node != NULL)
   {
