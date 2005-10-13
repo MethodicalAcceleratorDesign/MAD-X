@@ -1,17 +1,18 @@
 struct reg_token* add_tok(char c, struct reg_token* rt)
 {
+  char rout_name[] = "add_tok";
   struct reg_token *rn = rt;
   if (rn->type == 1 || rn->type == 3 || rn->type == 4 || rn->rep == 1)
   {
-    rn = (struct reg_token*) calloc(1, sizeof(struct reg_token));
+    rn = (struct reg_token*) mycalloc(rout_name, 1, sizeof(struct reg_token));
     rt->next = rn; rn->previous = rt;
   }
   if (rn->type == 0)
   {
     rn->type = 2;
-    rn->simple = (struct r_char_array*) calloc(1,
+    rn->simple = (struct r_char_array*) mycalloc(rout_name, 1,
                                                sizeof(struct r_char_array));
-    rn->simple->chars = (char*) malloc(100);
+    rn->simple->chars = (char*) mymalloc(rout_name, 100);
     rn->simple->max = 100;
   }
   if (rn->simple->curr == rn->simple->max)  grow_r_char_array(rn->simple);
@@ -37,10 +38,11 @@ int char_count(char c, char* s)
 
 struct reg_token* convert_pattern(char* pattern, int dollar, int* error)
 {
+  char rout_name[] = "convert_pattern";
   struct reg_token *rt, *first_token;
   int i, j, k, toggle = 0, last = strlen(pattern);
   *error = 0;
-  first_token = rt = (struct reg_token*) calloc(1, sizeof(struct reg_token));
+  first_token = rt = (struct reg_token*) mycalloc(rout_name, 1, sizeof(struct reg_token));
   if (pattern[0] == '*') {*error = 1; return NULL;}
   for (i = 0; i < last; i++)
   {
@@ -117,6 +119,7 @@ void fill_list(char s, char e, struct r_char_array* a)
 
 struct reg_token* flag(struct reg_token* rt, int* err)
 {
+  char rout_name[] = "flag";
   struct reg_token *rn = rt;
   if (rt == NULL || rt->type == 0)
   {
@@ -131,7 +134,7 @@ struct reg_token* flag(struct reg_token* rt, int* err)
   {
     if (rt->simple->curr > 1)
     {
-      rn = (struct reg_token*) calloc(1, sizeof(struct reg_token));
+      rn = (struct reg_token*) mycalloc(rout_name, 1, sizeof(struct reg_token));
       rn->c = rt->simple->chars[--rt->simple->curr];
       rt->simple->chars[rt->simple->curr] = '\0';
       rn->type = 1;
@@ -141,7 +144,7 @@ struct reg_token* flag(struct reg_token* rt, int* err)
     {
       rt->type = 1;
       rt->c = rt->simple->chars[0];
-      free(rt->simple->chars); free(rt->simple); rt->simple = NULL;
+      myfree(rout_name, rt->simple->chars); myfree(rout_name, rt->simple); rt->simple = NULL;
     }
   }
   rn->rep = 1;
@@ -150,18 +153,20 @@ struct reg_token* flag(struct reg_token* rt, int* err)
 
 void grow_r_char_array(struct r_char_array* a)
 {
+  char rout_name[] = "grow_r_char_array";
   char* loc = a->chars;
   a->max *= 2;
-  a->chars = (char*) malloc(a->max);
+  a->chars = (char*) mymalloc(rout_name, a->max);
   strncpy(a->chars, loc, a->curr);
-  free(loc);
+  myfree(rout_name, loc);
 }
 
 struct reg_token* make_dot(struct reg_token* rt)
 {
+  char rout_name[] = "make_dot";
   struct reg_token *rn = rt;
   if (rn->type != 0) rn =
-                       (struct reg_token*) calloc(1, sizeof(struct reg_token));
+                       (struct reg_token*) mycalloc(rout_name, 1, sizeof(struct reg_token));
   rn->type = 4;
   if (rn != rt)
   {
@@ -173,17 +178,18 @@ struct reg_token* make_dot(struct reg_token* rt)
 struct reg_token* make_list(struct reg_token* rt, char* pattern,
                             int is, int ie)
 {
+  char rout_name[] = "make_list";
   int i;
   struct reg_token *rn = rt;
   if (rn->type != 0)
   {
-    rn = (struct reg_token*) calloc(1,
+    rn = (struct reg_token*) mycalloc(rout_name, 1,
                                     sizeof(struct reg_token));
     rt->next = rn; rn->previous = rt;
   }
   rn->type = 3;
-  rn->list = (struct r_char_array*) calloc(1, sizeof(struct r_char_array));
-  rn->list->chars = (char*) malloc(100);
+  rn->list = (struct r_char_array*) mycalloc(rout_name, 1, sizeof(struct r_char_array));
+  rn->list->chars = (char*) mymalloc(rout_name, 100);
   rn->list->max = 100;
   if (pattern[is] == '^')  /* invert list */
   {
@@ -278,35 +284,37 @@ char* match_token(struct reg_token* rt, char* p)
 
 void myregend(char* mypat, struct reg_token* start)
 {
+  char rout_name[] = "myregend";
   struct reg_token *rp, *aux;
-  if (mypat != NULL) free(mypat); mypat = NULL;
+  if (mypat != NULL) myfree(rout_name, mypat); mypat = NULL;
   rp = start;
   while (rp != NULL)
   {
     if (rp->simple != NULL)
     {
-      if (rp->simple->chars != NULL) free(rp->simple->chars);
-      free(rp->simple);
+      if (rp->simple->chars != NULL) myfree(rout_name, rp->simple->chars);
+      myfree(rout_name, rp->simple);
     }
     if (rp->list != NULL)
     {
-      if (rp->list->chars != NULL) free(rp->list->chars);
-      free(rp->list);
+      if (rp->list->chars != NULL) myfree(rout_name, rp->list->chars);
+      myfree(rout_name, rp->list);
     }
     aux = rp;
     rp = rp->next;
-    free(aux);
+    myfree(rout_name, aux);
   }
 }
 
 int myregex(char* pattern, char* string)
 {
   /* returns 0 if pattern = regex matches string, else 1 */
+  char rout_name[] = "myregex";
   char *mypat;
   struct reg_token *first_token;
   int error, j, l, dollar = 0, res = 0;
   if (pattern == NULL || (l = strlen(pattern)) == 0)  return 0;
-  mypat = (char*) malloc(strlen(pattern)+5);
+  mypat = (char*) mymalloc(rout_name, strlen(pattern)+5);
   strcpy(mypat, pattern);
 /* $ at end ? */
   if (mypat[l-1] == '$')
