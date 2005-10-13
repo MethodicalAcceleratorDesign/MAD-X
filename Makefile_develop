@@ -180,7 +180,7 @@ Sg_0_fitted.o: Sf_def_all_kinds.o Sg_0_fitted.f90
 	$(f95) $(f95_FLAGS) Sg_0_fitted.f90
 
 Sg_1_fitted.o: Sg_0_fitted.o Sg_1_fitted.f90
-	$(f95) $(f95_FLAGS) Sg_0_fitted.f90
+	$(f95) $(f95_FLAGS) Sg_1_fitted.f90
 
 Sg_1_template_my_kind.o: Sg_1_fitted.o Sg_1_template_my_kind.f90
 	$(f95) $(f95_FLAGS) Sg_1_template_my_kind.f90
