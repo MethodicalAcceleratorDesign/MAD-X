@@ -2928,7 +2928,7 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 {
   int i, pos, h_length = 39; /* change adding header lines ! */
   double dtmp;
-  struct table* s;
+/*  struct table* s; */
   char tmp[16];
 
   if (t == NULL) return;
