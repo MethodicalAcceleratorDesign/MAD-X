@@ -3,7 +3,7 @@ MODULE madx_ptc_track_run_module
   ! It contains variables which exchange data between
   ! SUBROUTINE ptc_track_run and called from it
   ! external subroutines calculating particle interactions
-  USE madx_ptc_module , ONLY: dp, lp, lnv, twopi, zero 
+  USE madx_ptc_module , ONLY: dp, lp, lnv, twopi, zero
   !                          ! shorts for <double precision>, <logical>, 0D0 etc.
   implicit none
   SAVE
@@ -13,17 +13,17 @@ MODULE madx_ptc_track_run_module
 
   !------------------------------------------------------------------!
   !  Variables from input files and probably corrected by this code: !
-  !------------------------------------------------------------------! 
+  !------------------------------------------------------------------!
   INTEGER, PUBLIC :: icase_PTC    ! Phase-space (4, 5 or 6) in input command
   !                               ! is NOT actul number of variables (mynpa - correct)
-  INTEGER, PUBLIC :: turns        ! The current turn and Total number of turns 
+  INTEGER, PUBLIC :: turns        ! The current turn and Total number of turns
 
   LOGICAL(lp), PUBLIC :: &
        closed_orbit, &          ! Switch to turn on closed orbit calculation
        element_by_element, &    ! element-by-element tracking (not over-one-turn one
        Radiation_PTC, &         ! Radiation is internally done by PTC
        Radiation_model1_FZ, &   ! Radiation according to model 1 (done by FZ)
-       Radiation_Energy_Loss, & !  
+       Radiation_Energy_Loss, & !
        Radiation_Quad, &
        Space_Charge, &
        beam_envelope, &
@@ -33,7 +33,7 @@ MODULE madx_ptc_track_run_module
   INTEGER :: Normal_Order_n0 ! The order of Normal Form ( Normal_Order_n0=1 => for Linear)
 
   integer :: ptc_ffile    ! periodicity of printing coordinates (every ffile-th turn)
-  !                       ! integer for keyword 'ffile' in 'ptc_track' command 
+  !                       ! integer for keyword 'ffile' in 'ptc_track' command
   logical :: ptc_onetable ! logical for keyword 'onetable'
   !                       ! in 'ptc_track' command
 
@@ -42,13 +42,13 @@ MODULE madx_ptc_track_run_module
   !--------------------------------------------------!
 
   INTEGER, PUBLIC :: mynpa, npara ! icase_PTC is NOT actul number of variables (mynpa - correct)
-  !                               ! out from PTC subr. <init> called in subr. 
-  !                               ! Get_map_from_NormalForm 
+  !                               ! out from PTC subr. <init> called in subr.
+  !                               ! Get_map_from_NormalForm
   INTEGER, PUBLIC :: i_th_turn  ! The current turn number
 
   Real (dp), public :: &
        Energy_rest_MeV, &    ! the rest and total energy of particles
-       Energy_total_MeV, &   ! 
+       Energy_total_MeV, &   !
        deltap                ! The relative momentum deviation for off-momentum particles (5D case)
 
   integer, PUBLIC :: &
@@ -56,22 +56,22 @@ MODULE madx_ptc_track_run_module
        j_tot_numb_starting_particles      ! "j_tot" saves initial number of particles
   !                                       ! meanining: <j_total_number_starting_particles>
 
-  integer, PUBLIC,allocatable :: jmax_all_turns_numb_part(:) ! save jmax for all turns including init. 
+  integer, PUBLIC,allocatable :: jmax_all_turns_numb_part(:) ! save jmax for all turns including init.
 
   INTEGER, allocatable :: particle_ID(:)     !(1:N_particle_max) ! => part_id (in TRRUN.F)
   INTEGER, allocatable :: part_ID_turns(:,:) ! save particle ID for every i-th turns (i_turn,j_part)
 
   integer :: tot_segm_one_table   ! for table printing (like in trrun)
-  integer :: segment_one_table    ! 
+  integer :: segment_one_table    !
 
-  real(dp), PUBLIC ::  x_coord_co(1:6)  ! Closed orbit  at Start of ring 
+  real(dp), PUBLIC ::  x_coord_co(1:6)  ! Closed orbit  at Start of ring
   !                                     ! => x0(1:6) in ptc_track; orbit0(1:6) in TRRUN.F
 
-  real(dp), PRIVATE, allocatable :: x_co_at_all_observ(:,:) 
-  !                                     ! to keep closed orbit at all observations for 
+  real(dp), PRIVATE, allocatable :: x_co_at_all_observ(:,:)
+  !                                     ! to keep closed orbit at all observations for
   !                                     ! <element_by_element> tracking
 
-  real(dp), PRIVATE, allocatable :: x_all_incl_co_at0(:,:,:) ! save x at START of the ring 
+  real(dp), PRIVATE, allocatable :: x_all_incl_co_at0(:,:,:) ! save x at START of the ring
   !                                               ! (1:6,0:turns,1:jmax_numb_particl_at_i_th_turn)
 
   logical, public :: ptc_track_debug=.False. !.TRUE.  .False.
@@ -79,31 +79,31 @@ MODULE madx_ptc_track_run_module
   logical :: last_table_line_out ! = last_out => flag to avoid double entry of last line
 
   INTEGER, ALLOCATABLE :: elem_number_at_observ(:)   ! the sequent number of a ring element at
-  !                                                  ! the observation point 
+  !                                                  ! the observation point
 
-  REAL(dp), allocatable :: sum_length_at_observ(:)   ! the sum length for the current observ. 
+  REAL(dp), allocatable :: sum_length_at_observ(:)   ! the sum length for the current observ.
   !                                                  ! point from the ring start
 
-  CHARACTER(24), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point  
-  !                                                  ! contrary to <character (16)> in c-code 
+  CHARACTER(24), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
+  !                                                  ! contrary to <character (16)> in c-code
 
 CONTAINS
 
   SUBROUTINE ptc_track_run(max_obs)
 
-    !USE MADX_PTC_MODULE ==================================================================! 
+    !USE MADX_PTC_MODULE ==================================================================!
     USE  madx_ptc_module, ONLY: universe, my_ring, default, index, c_                      !
-    !                                                                                      !  
+    !                                                                                      !
     USE  madx_ptc_module, ONLY: &  ! "LAYOUT type (ring) => double linked list,            !
          FIBRE, &                  !  whose nodes (elements=magnets) of type FIBRE"        !
-         NORMALFORM, & ! type for normalform                                               ! 
+         NORMALFORM, & ! type for normalform                                               !
          REAL_8, &     ! type for map                                                      !
          damap, &      ! type for diff algebra                                             !
          RADIATION, STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC           !
          BEAMENVELOPE, ENV_8        ! For beam envelope                                    !
     ! ======== functions ==================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
-         print, find_orbit, track,UPDATE_STATES, my_state, &                               ! 
+         print, find_orbit, track,UPDATE_STATES, my_state, &                               !
          PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &                                   !
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
@@ -129,7 +129,7 @@ CONTAINS
 
     integer ::flag_index_ptc_aperture, why_ptc_aperture(9)
 
-    real(dp) :: deltap0 
+    real(dp) :: deltap0
 
     ! INTEGER, parameter :: N_particle_max=1000, & ! boundary of particle arrays
     ! This parameter is not used anymore, instead allocatable arrays are used in
@@ -227,21 +227,21 @@ CONTAINS
     Call Call_my_state_and_update_states ! parameter "deltap" is defined now
     !                                    ! mynpa is changed to correct value
 
-    ! initialize the closed orbit coordinates  at START of the ring                        
-    x_coord_co(:)=zero                                       
+    ! initialize the closed orbit coordinates  at START of the ring
+    x_coord_co(:)=zero
     if (ptc_track_debug) print *, " x_coord_co(:)=zero = ",x_coord_co
 
-    ! Closed_orbit_at_START: 
-    IF(closed_orbit) CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6) 
+    ! Closed_orbit_at_START:
+    IF(closed_orbit) CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6)
 
     Normal_forms: IF(closed_orbit) THEN  !-----------------------!
        !                                                         !
        !                                                         !
        call Get_map_from_NormalForm &                            !
             (ptc_track_debug, Normal_Order_n0, x_coord_co, &     !
-            !INTENT:   IN,             IN,             IN        !
-            !               1=> Normal_Order_n0  for Linear      !
-       Map_Y, Normal_Form_N, A_t_map,   A_t_map_rev)             !
+                                !INTENT:   IN,             IN,             IN        !
+                                !               1=> Normal_Order_n0  for Linear      !
+            Map_Y, Normal_Form_N, A_t_map,   A_t_map_rev)             !
        !     OUT,     OUT,          OUT,       OUT               !
        !                                                         !
     END IF Normal_forms !----------------------------------------!
@@ -252,16 +252,16 @@ CONTAINS
 
     Call ffile_and_segm_for_switch !Int. proc. in this subr.(see below)
 
-    CALL Prepare_Observation_points (max_obs, x_coord_co) 
-    ! getting parameters  at observation points and 
+    CALL Prepare_Observation_points (max_obs, x_coord_co)
+    ! getting parameters  at observation points and
     ! finding the closed orbits at observations for element_by_element tracking
 
     ! START TRACKING WITH PTC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     change_default: IF(Radiation_PTC) THEN
        DEFAULT=DEFAULT+RADIATION
-       IF (Radiation_Quad) STOCH_IN_REC=.TRUE. 
+       IF (Radiation_Quad) STOCH_IN_REC=.TRUE.
        !element_by_element=.FALSE. ! make PTC one-turn tracking
-       print *, "################################################################" 
+       print *, "################################################################"
        print *, "The PTC parameter DEFAULT before the tracking with the turn-loop"
        call print(default,6)
        CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6)
@@ -300,7 +300,7 @@ CONTAINS
     last_orbit_of_lost_particle=zero
 
 
-    Call Particle_Interactions_Ini ! Int.subr. - intialize data for int.subr. Particle_Interactions  
+    Call Particle_Interactions_Ini ! Int.subr. - intialize data for int.subr. Particle_Interactions
 
     Call Init_info_for_tables       ! Int.subr. below in this subr.
 
@@ -377,8 +377,8 @@ CONTAINS
 
 
     Output_observ_with_PTC: IF((.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
-       debug_print_5: if (ptc_track_debug) then !----------------!                         !  
-          Print *, 'element_by_element=', element_by_element, &  !                         ! 
+       debug_print_5: if (ptc_track_debug) then !----------------!                         !
+          Print *, 'element_by_element=', element_by_element, &  !                         !
                ' Radiation_PTC=',Radiation_PTC                   !                         !
           Print *, ' Call Observation_with_PTC'                  !                         !
        end if debug_print_5 !------------------------------------!                         !
@@ -400,7 +400,7 @@ CONTAINS
           ENDIF mynpa_6 !------------------------------------------!             !  !
        ELSE !====================================================================!  !
           Print *, ' Warning !!!: Option BEAM_ENVELOPE require option Radiation' !  !
-          Print *, '              The code ignores BEAM_ENVELOPE option '        !  !      
+          Print *, '              The code ignores BEAM_ENVELOPE option '        !  !
        ENDIF Radiat_PTC !========================================================!  !
     ENDIF Beam_envelope_with_PTC !##################################################!
 
@@ -423,8 +423,8 @@ CONTAINS
     !   6) Int.p. is able to call other int.procedures of the same HOST ;
     !   7) the HOST does not have access to the local entities (declared
     !      inside int.p.) of any int.subroutine that it contains.
-    !   8) The absense of IMPLICIT NONE within int.proc, because one in the 
-    !      host applies to the intern. proc. as well  
+    !   8) The absense of IMPLICIT NONE within int.proc, because one in the
+    !      host applies to the intern. proc. as well
 
     ! Internal procedures are used for this ptc_track_run in order to
     ! use modified subroutines imported from trrun.F with the same names
@@ -491,7 +491,7 @@ CONTAINS
       ! ! exluded: "coord        = [r, {0,0,0,0,0,0}]; "
       !
       ! added by VKapin
-      !  
+      !
       ! "element_by_element = [l, false, true], " => element_by_element
       ! "radiation = [l, false, true], "  => radiation_PTC
       ! "radiation_model1 = [l, false, true], " => radiation_model1_FZ
@@ -690,7 +690,7 @@ CONTAINS
     !=============================================================================
 
     !=============================================================================
-    SUBROUTINE Find_Closed_Orbit 
+    SUBROUTINE Find_Closed_Orbit
       ! USE madx_ptc_module, ONLY: dp, zero, find_orbit, my_ring,default
       ! IMPLICIT NONE => in the host
       !====================================================================!
@@ -742,7 +742,7 @@ CONTAINS
       IF (.NOT. element_by_element) THEN
          Deallocate ( x_all_incl_co_at0, part_ID_turns)
       ELSE
-         Deallocate (x_co_at_all_observ) 
+         Deallocate (x_co_at_all_observ)
       END IF
 
       Deallocate (elem_number_at_observ, sum_length_at_observ, name_el_at_obsrv)
@@ -839,7 +839,7 @@ CONTAINS
       particle_ID=0
       IF (.NOT. element_by_element) THEN
          ALLOCATE (part_ID_turns(0:turns,jmax_numb_particl_at_i_th_turn))
-         part_ID_turns=0 
+         part_ID_turns=0
       END IF
 
       !--- set particle id
@@ -859,6 +859,7 @@ CONTAINS
     !=============================================================================
 
     SUBROUTINE Init_info_for_tables
+      implicit none
 
       !hbu--- init info for tables initial s position is 0
       !hbu initial s position is 0
@@ -1040,8 +1041,8 @@ CONTAINS
 
       n_temp=1 ! start particle loop with the first not-examined particle
 
-      Exam_all_particles: DO ! ====<=======<========DO Exam_all_particles ====<===<=======<======! 
-         !(instead of <10 continue> in trrun.f)                                                  ! 
+      Exam_all_particles: DO ! ====<=======<========DO Exam_all_particles ====<===<=======<======!
+         !(instead of <10 continue> in trrun.f)                                                  !
          !                                                                                       !
          Particle_loop: DO j_particle=n_temp, jmax_numb_particl_at_i_th_turn  !++++++++++++++!   !
             !                                                                                !   !
@@ -1075,7 +1076,7 @@ CONTAINS
             call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                              !   !
             if (ptc_track_debug) then                                                        !   !
                print*,"ready for printing aperture flag!!!!!!!",flag_index_ptc_aperture      !   !
-               print*,"real aperture flag: ",c_%aperture_flag                                !   !  
+               print*,"real aperture flag: ",c_%aperture_flag                                !   !
             end if                                                                           !   !
             ! Sa_extend_poly.f90:98:  SUBROUTINE PRODUCE_APERTURE_FLAG(I)                    !   !
             !                                                                                !   !
@@ -1124,7 +1125,7 @@ CONTAINS
       DO j_particle=1, jmax_numb_particl_at_i_th_turn
          do k_th_coord=1,6
             x_all_incl_co_at0(k_th_coord,i_th_turn,j_particle)= &
-                 x_coord_incl_co(k_th_coord,          j_particle) 
+                 x_coord_incl_co(k_th_coord,          j_particle)
          enddo
          part_ID_turns(i_th_turn,j_particle)=particle_ID(j_particle)
       ENDDO
@@ -1233,7 +1234,7 @@ CONTAINS
       character(24) :: name_curr_elem_24
       LOGICAL ::  Entry_not_exit
       REAL(dp) :: length_curr_elem
-      real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO 
+      real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
 
       x_coord_co_temp=zero
 
@@ -1376,7 +1377,7 @@ CONTAINS
          OBSERVATION_POINTS : IF (number_observation_point .GT. 1) THEN !##############!              !
             !                                                                          #              !
             if (mod(i_th_turn, ptc_ffile).EQ.0) then !:::: if(turn/ffile)=int ::::!    #              !
-               ! mod() => the remainder of (turn/ffile),                          !    #              !  
+               ! mod() => the remainder of (turn/ffile),                          !    #              !
                ! i_th_turn := the current turn number (not total "turns")         !    #              !
                ! ffile := the periodicity of printing coordinate                  !    #              !
                !          ("FFILE"is the  option of the "RUN" command             !    #              !
@@ -1401,7 +1402,7 @@ CONTAINS
                        i_th_turn, tot_segm_one_table,segment_one_table, &   !     !    #              *
                        particle_ID, x_coord_incl_co, &                      !     !    #              *
                        x_coord_co_temp, & ! x_coord_co, &                   !     !    #              *
-                       spos_current_position, i_current_elem, &             !     !    #              *            
+                       spos_current_position, i_current_elem, &             !     !    #              *
                        name_curr_elem_24)                                   !     !    #              *
                   ! purpose: enter all particle coordinates in one table    !     !    #              *
                   !                                                         !     !    #              *
@@ -1413,7 +1414,7 @@ CONTAINS
                        jmax_numb_particl_at_i_th_turn                   !   !     !    #              *
                      !hbu                                               !   !     !    #              *
                      call tt_puttab_coord &                             !   !     !    #              *
-                          (particle_ID(j_part),i_th_turn, &             !   !     !    #              *  
+                          (particle_ID(j_part),i_th_turn, &             !   !     !    #              *
                           number_observation_point, &                   !   !     !    #              *
                           x_coord_incl_co(1,j_part), &                  !   !     !    #              *
                           x_coord_co_temp, & ! x_coord_co, &            !   !     !    #              *
@@ -1450,7 +1451,7 @@ CONTAINS
     !=============================================================================
     SUBROUTINE Write_tables_after_total_turn
       ! segment of trrun.F
-      ! IMPLICIT NONE => in the host 
+      ! IMPLICIT NONE => in the host
 
       INTEGER :: j_th_part ! local
       if (ptc_track_debug) then
@@ -1517,8 +1518,8 @@ CONTAINS
     !==============================================================================
     SUBROUTINE Particle_Interactions_Ini
       !USE ptc_track_run_common, ONLY: &
-      !            Energy_rest_MeV, Energy_total_MeV 
-      ! IMPLICIT NONE => in the host 
+      !            Energy_rest_MeV, Energy_total_MeV
+      ! IMPLICIT NONE => in the host
 
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
 
@@ -1541,7 +1542,7 @@ CONTAINS
       !USE madx_ptc_track_run_common, ONLY: &
       !    Energy_rest_MeV, Energy_total_MeV
       ! USE madx_ptc_module, ONLY: dp
-      ! IMPLICIT NONE => in the host 
+      ! IMPLICIT NONE => in the host
 
       INTEGER, INTENT(IN)       :: i_current_elem
       CHARACTER(16), INTENT(IN) :: name_curr_elem !      current%MAG%    name
@@ -1581,7 +1582,7 @@ CONTAINS
          IF (B0_dipole.NE.0.0 .AND.Quadr_k .EQ.0.0 ) i_elem_type=1
          IF (B0_dipole.EQ.0.0 .AND.Quadr_k .NE.0.0 ) i_elem_type=2
          IF (B0_dipole.NE.0.0 .AND.Quadr_k .NE.0.0 ) i_elem_type=3
-         if (ptc_track_debug) Print *,'i_elem_type=',i_elem_type 
+         if (ptc_track_debug) Print *,'i_elem_type=',i_elem_type
 
          IF (i_elem_type .EQ. 0) RETURN
 
@@ -1603,7 +1604,7 @@ CONTAINS
             if (ptc_track_debug) Print *,'jmax_numb_particl_at_i_th_turn=', &
                  jmax_numb_particl_at_i_th_turn
             DO j_partic=1, jmax_numb_particl_at_i_th_turn
-               if (ptc_track_debug) Print *, 'j_partic=',j_partic                
+               if (ptc_track_debug) Print *, 'j_partic=',j_partic
                SQRT_X2_Y2=SQRT(x_coord_incl_co(1,j_partic)*x_coord_incl_co(1,j_partic)+ &
                     x_coord_incl_co(3,j_partic)*x_coord_incl_co(3,j_partic))
                !IF (SQRT_X2_Y2 .EQ. 0.0D0) EXIT
@@ -1649,9 +1650,9 @@ CONTAINS
 
       Space_Charge_Calculation: IF ( Space_Charge ) THEN
          ! Call Space_Charge
-         if (ptc_track_debug) Print *, '  i_current_elem=',i_current_elem, & 
+         if (ptc_track_debug) Print *, '  i_current_elem=',i_current_elem, &
               '  name_curr_elem=', name_curr_elem, &
-              '  sum_length=', sum_length 
+              '  sum_length=', sum_length
 
       ENDIF Space_Charge_Calculation
 
@@ -1662,7 +1663,7 @@ CONTAINS
 
     !==============================================================================
     SUBROUTINE Prepare_Observation_points (max_obs, x_coord_co_at_START)
-      ! getting parameters  at observation points and 
+      ! getting parameters  at observation points and
       ! finding the closed orbits at observations for element_by_element tracking
 
       ! USE  madx_ptc_module, ONLY: dp, my_ring, track, default
@@ -1672,11 +1673,11 @@ CONTAINS
       EXTERNAL             :: element_name
 
       integer, intent (IN) :: max_obs ! the maximum number of observation points >=1
-      ! one point at the end (beginning) plus 
+      ! one point at the end (beginning) plus
       ! the points given in input file by the command
       ! "ptc_observe,place=mark";
       REAL (dp), INTENT( IN) :: x_coord_co_at_START(1:6) ! C.O. at START of ring
-      real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO 
+      real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
 
       INTEGER :: iii_c_code, i_ring_element, number_obs, i_coord
 
@@ -1685,17 +1686,17 @@ CONTAINS
       REAL(dp) :: length_current_element_f90, length_current_element_c ! from two databases
 
       character (16) ::      name_16
-      integer, parameter  :: name_length_16 = 16 ! 16 
+      integer, parameter  :: name_length_16 = 16 ! 16
 
       debug_printing_1: if (ptc_track_debug) then
          Print *, 'Start subr. <Prepare_Observation_points> max_obs=', max_obs
-         Print *, 'x_coord_co_at_START=', x_coord_co_at_START 
+         Print *, 'x_coord_co_at_START=', x_coord_co_at_START
       endif debug_printing_1
       ! Define the number of element at observation point
 
       allocate(elem_number_at_observ(1:max_obs)); elem_number_at_observ=1
       allocate(sum_length_at_observ(1:max_obs)); sum_length_at_observ(:)=zero
-      allocate(name_el_at_obsrv(1:max_obs)); 
+      allocate(name_el_at_obsrv(1:max_obs));
       el_by_el_1: IF (element_by_element) THEN
          allocate(x_co_at_all_observ(1:6,1:max_obs)); x_co_at_all_observ(:,:)=zero
       ENDIF el_by_el_1
@@ -1718,10 +1719,10 @@ CONTAINS
 
          length_current_element_f90=current%MAG%P%ld
          length_current_element_c=node_value('l ')
-         Sum_length_S=Sum_length_S+length_current_element_f90 
+         Sum_length_S=Sum_length_S+length_current_element_f90
 
 
-         IF(number_obs.GT.0) THEN 
+         IF(number_obs.GT.0) THEN
             elem_number_at_observ(number_obs)= i_ring_element
             sum_length_at_observ(number_obs) = Sum_length_S
             call element_name(name_16,name_length_16)
@@ -1734,9 +1735,9 @@ CONTAINS
             ENDIF save_CO_for_el_by_el
 
          ENDIF
-         if (ptc_track_debug) then 
+         if (ptc_track_debug) then
             Print *, 'i_el ', i_ring_element,' num_obs=', number_obs
-            Print *, ' l_c_code=',length_current_element_c,' l_f90=', & 
+            Print *, ' l_c_code=',length_current_element_c,' l_f90=', &
                  length_current_element_f90, &
                  ' name_c=', name_16, ' &_f90=', current%MAG%name
          endif
@@ -1746,10 +1747,10 @@ CONTAINS
          ENDIF find_CO_for_el_by_el
 
          iii_c_code=advance_node() ! c-code go to the next node
-         current=>current%next     ! f90-code bring to the next mode 
+         current=>current%next     ! f90-code bring to the next mode
       ENDDO element_number
 
-      debug_print_2: if (ptc_track_debug) then 
+      debug_print_2: if (ptc_track_debug) then
          Print *, 'elem_number_at_observ(i_obs)= ', elem_number_at_observ
          Print *, 'sum_length_at_observ(i_obs)= ', sum_length_at_observ
          print_CO_for_el_by_el: IF (element_by_element) THEN
@@ -1758,7 +1759,7 @@ CONTAINS
                Print *, 'number_obs=', number_obs, &
                     ' elem_numb=', elem_number_at_observ(number_obs), &
                     ' name=', name_el_at_obsrv(number_obs)
-               Print *, (x_co_at_all_observ(i_coord,number_obs),i_coord=1,6)  
+               Print *, (x_co_at_all_observ(i_coord,number_obs),i_coord=1,6)
             END DO
          ENDIF  print_CO_for_el_by_el
       endif debug_print_2
@@ -1771,12 +1772,12 @@ CONTAINS
     SUBROUTINE Observation_with_PTC(max_obs, x_coord_co_at_START, Map_Y_obs)
       !USE  madx_ptc_module, ONLY: my_ring, kill, default, REAL_8, alloc,  & !BERZ,
       !                            assignment(=), track, lnv, zero,  & !print, sub,
-      !                            PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, & 
+      !                            PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &
       !                            fibre, daprint, operator(*), operator(.sub.)
       ! IMPLICIT NONE => in the host
 
       integer, intent (IN) :: max_obs ! the maximum number of observation points >=1
-      ! one point at the end (beginning) plus 
+      ! one point at the end (beginning) plus
       ! the points given in input file by the command
       ! "ptc_observe,place=mark";
       REAL (dp),     INTENT( IN) :: x_coord_co_at_START(1:6) ! => x0(1:6) in ptc_track at START
@@ -1801,7 +1802,7 @@ CONTAINS
       real(dp), allocatable ::  X_co_observe(:,:) ! (i_coord, i_obs_point)
       integer, allocatable :: J(:) ! for extracting CO from the map
       REAL(dp),  allocatable :: Temp_X_incl_co_at_obs(:,:)
-      Real(dp):: X_lnv_START(lnv), X_lnv_OBSRV(lnv) 
+      Real(dp):: X_lnv_START(lnv), X_lnv_OBSRV(lnv)
 
       segment_one_table=0 ! for Printing to tables
       last_table_line_out = .false.
@@ -1819,22 +1820,22 @@ CONTAINS
       ! nda=0; NormOrder=1 npara=0;mynd2=0;
       ! call init(default,NormOrder,nda,BERZ,mynd2,npara) - already known
       if (ptc_track_debug) then
-         write(31,*) 'Map_Y_obs IN: '; call daprint(Map_Y_obs,31);   
+         write(31,*) 'Map_Y_obs IN: '; call daprint(Map_Y_obs,31);
       endif
       Map_Y_obs=npara !mynpa
       Map_Y_obs=x_coord_co_at_START  ! Y=X
 
-      if (ptc_track_debug) then 
+      if (ptc_track_debug) then
          Print *, ' x_coord_co_at_START=', x_coord_co_at_START
-         write(32,*) 'Map_Y_obs=x_coord_co_at_START: '; call daprint(Map_Y_obs,32); 
+         write(32,*) 'Map_Y_obs=x_coord_co_at_START: '; call daprint(Map_Y_obs,32);
       endif
 
       Allocate (X_co_observe(1:6,1:max_obs), &
-           Temp_particle_ID(1:j_tot_numb_starting_particles)) 
+           Temp_particle_ID(1:j_tot_numb_starting_particles))
       X_co_observe(:,:)=zero; Temp_particle_ID=0
 
-      assign_co_at_start_ring: DO i_coord=1,mynpa 
-         X_co_observe(i_coord,1)=x_coord_co_at_START(i_coord)    
+      assign_co_at_start_ring: DO i_coord=1,mynpa
+         X_co_observe(i_coord,1)=x_coord_co_at_START(i_coord)
       END DO assign_co_at_start_ring
 
       CALL Alloc(Map_damap)
@@ -1881,7 +1882,7 @@ CONTAINS
          DO i_coord=1, mynpa
             X_co_temp(i_coord) = (Map_Y_obs(i_coord)%T.sub.J) ! take line with all zero-order
             if (ptc_track_debug) Print *,'CO extracted: i_coord=', i_coord, &
-                 ' X_co_temp(i_coord)=', X_co_temp(i_coord) 
+                 ' X_co_temp(i_coord)=', X_co_temp(i_coord)
          ENDDO
          deallocate(J)
          Save_co_in_X_co_observe: DO i_coord=1, mynpa !icase_PTC
@@ -1904,8 +1905,8 @@ CONTAINS
 
 
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
-               !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START 
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/REAL(8)
+               !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
+               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/double precision
                Read_START_coord: DO i_coord=1,mynpa
                   X_lnv_START(i_coord)= x_all_incl_co_at0(i_coord, i_turn_tmp, j_part_tmp) - &
                        x_coord_co_at_START(i_coord) ! X_out=M(x0,x)*x_in, where X=x0+x !
@@ -1913,14 +1914,14 @@ CONTAINS
                ! Transform from START to observation point
                X_lnv_OBSRV=Map_damap*X_lnv_START
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
-               !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START 
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/REAL(8)
+               !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
+               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/double precision
 
-               Loop_coord: DO i_coord=1,mynpa        
+               Loop_coord: DO i_coord=1,mynpa
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)%T*X_lnv_START(i_coord)
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)*X_lnv_START(i_coord)
                   !X_lnv_OBSRV(i_coord)=Map_damap*X_lnv_START(i_coord)
-                  if (ptc_track_debug) Print *, 'i_coord=',i_coord, & 
+                  if (ptc_track_debug) Print *, 'i_coord=',i_coord, &
                        'X_lnv_START/OBSRV=', X_lnv_START(i_coord), X_lnv_OBSRV(i_coord)
                   Temp_X_incl_co_at_obs(i_coord,j_part_tmp)= X_lnv_OBSRV(i_coord)
                ENDDO Loop_coord
@@ -1930,7 +1931,7 @@ CONTAINS
             ENDDO  Local_loop_for_particles
 
             ! Print coordinates at observation point
-            Debug_Print_4: IF (PTC_track_debug) THEN 
+            Debug_Print_4: IF (PTC_track_debug) THEN
                Print *, 'Before writing to tables i_obs=', i_obs_point
                Print *, ' X_co_temp=',  X_co_temp
             ENDIF  Debug_Print_4
@@ -1951,8 +1952,8 @@ CONTAINS
                   call tt_putone_coord( &                                    !    !     !       !
                        jmax_all_turns_numb_part(i_turn_tmp), i_turn_tmp, &   !    !     !       !
                        tot_segm_one_table, segment_one_table, &              !    !     !       !
-                       Temp_particle_ID, Temp_X_incl_co_at_obs, &            !    !     !       ! 
-                       X_co_temp, spos, &                                    !    !     !       !                
+                       Temp_particle_ID, Temp_X_incl_co_at_obs, &            !    !     !       !
+                       X_co_temp, spos, &                                    !    !     !       !
                        elem_number_at_observ(i_obs_point+1), &               !    !     !       !
                        name_el_at_obsrv(i_obs_point+1))                      !    !     R       !
                   ! purpose: enter all particle coordinates in one table     !    !     U       l
@@ -1965,7 +1966,7 @@ CONTAINS
                        jmax_all_turns_numb_part(i_turn_tmp)               !  !    !     !       !
                      !                                                    !  !    !     !       o
                      call tt_puttab_coord &                               !  !    !     !       v
-                          (Temp_particle_ID(j_part_tmp),i_turn_tmp, &     !  !    !     !       e 
+                          (Temp_particle_ID(j_part_tmp),i_turn_tmp, &     !  !    !     !       e
                           i_obs_point+1,                             &    !  !    !     !       r
                           Temp_X_incl_co_at_obs(1,j_part_tmp),       &    !  !    !     !       !
                           X_co_temp, sum_length_at_observ(i_obs_point+1)) !  !    !     !       !
@@ -1977,19 +1978,19 @@ CONTAINS
                !                                                                  !     !       n
             endif ! END :::: if(turn/ffile)=integer ::::::::::::::::::::::::::::::!     !       s
             !                                                                                   !
-            deALLOCATE( Temp_X_incl_co_at_obs)                                                  ! 
+            deALLOCATE( Temp_X_incl_co_at_obs)                                                  !
          ENDDO Local_loop_over_turns !==========================================================!
 
-         Jump_to_next_observation_point: DO i_dummy=i_from,i_till-1 
+         Jump_to_next_observation_point: DO i_dummy=i_from,i_till-1
             iii_c_code=advance_node() ! c-code go to the next node
-            current=>current%next     ! f90-code bring to the next mode 
+            current=>current%next     ! f90-code bring to the next mode
          END DO Jump_to_next_observation_point
-         ! 
+         !
       END DO obs_point_loop !####################################################################!
 
       DEALLOCATE( X_co_observe,  Temp_particle_ID)
 
-      CALL kill(Map_damap)           
+      CALL kill(Map_damap)
       !Call kill(Map_Y_obs)
     END SUBROUTINE Observation_with_PTC
     !==============================================================================
@@ -2147,13 +2148,13 @@ CONTAINS
       TYPE (REAL_8) :: A1(6), Y(6)
       ! REAL (dp)     :: x_coord_co(6)
 
-      Print *, ' Subr. beam_enevelope_with_PTC: ' 
+      Print *, ' Subr. beam_enevelope_with_PTC: '
       Print*, 'x_coord_co=', x_coord_co
       Print *, ' before Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default) '
 
       Y=x_coord_co ! new line at 2005018
 
-      Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default) 
+      Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default)
       Print *, ' after Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default) '
 
       ENV=YS
@@ -2166,7 +2167,7 @@ CONTAINS
       Print *, ' after CALL TRACK (my_ring, YS, 1,  +default) '
       ENV%SIJ0=YS
 
-      Print *, ' The equilibrium emittances are : ', ENV%EMITTANCE 
+      Print *, ' The equilibrium emittances are : ', ENV%EMITTANCE
 
     END SUBROUTINE beam_enevelope_with_PTC
     !==============================================================================
@@ -2184,7 +2185,7 @@ CONTAINS
       !
       ! USE madx_ptc_module, ONLY: dp, lnv, zero, twopi, &
       !                           operator(*), assignment(=)
-      ! IMPLICIT NONE => in the host subr. 
+      ! IMPLICIT NONE => in the host subr.
 
       !----------------------------------------------------------------------*
       ! Purpose:                                                             *
@@ -2305,7 +2306,7 @@ CONTAINS
             track_temp(10) = phiy_input                                       ! n   !   !
             track_temp(11) = ft_input                                         ! e   !   f
             track_temp(12) = phit_input                                         !   !   o
-            debug_print_4: if (ptc_track_debug) then !----!                     !   !   r                  
+            debug_print_4: if (ptc_track_debug) then !----!                     !   !   r
                Print *, 'track_temp(1:12)=',track_temp    !                     !   !   !
             end if debug_print_4 !------------------------!                     !   !   !
             !                                                                   !   !   !
@@ -2331,7 +2332,7 @@ CONTAINS
                !k                                                 !             !   !   !
                !k      phi = twopi * track(kq+7)       ! angle    !             !   !   !
                phi_n = twopi *  track_temp(kq+7)                  !             !   !   !
-               !                                                  !             !   !   ! 
+               !                                                  !             !   !   !
                !k    zn(kq) =   track(kq+6) * cos(phi) ! coord    !             !   !   !
                Z_norm_temp(kq) = track_temp(kq+6)*cos(phi_n)      !             !   !   !
                !                                                  !             !   !   !
@@ -2342,7 +2343,7 @@ CONTAINS
                !k                                                 !             !   !   !
             enddo polar_cart !------------------------------------!             !   !   !
             !k                                                                  !   p   !
-            debug_print_5:if (ptc_track_debug) then !------------------!        !   a   ! 
+            debug_print_5:if (ptc_track_debug) then !------------------!        !   a   !
                Print *,'Z_norm_temp(k_th_coord)=', Z_norm_temp(:mynpa) !        !   r   !
             end if debug_print_5 !-------------------------------------!        !   t   !
             !                                                                   !   i   !
@@ -2373,12 +2374,12 @@ CONTAINS
             z_start_sum(:)=zero                                                 !   !   !
             SumDO: DO k_th_coord = 1,mynpa ! not 6 !--------------------------! !   !   !
                IF (itype_non_zero_flag(k_th_coord).ne.0) zgiv_exist =.true.   ! !   !   !
-               IF (itype_non_zero_flag(k_th_coord+6).ne.0) zngiv_exist =.true.! !   !   ! 
+               IF (itype_non_zero_flag(k_th_coord+6).ne.0) zngiv_exist =.true.! !   !   !
                z_start_sum(k_th_coord)=track_temp(k_th_coord)+ &              ! !   !   !
                     Z_stdt_temp(k_th_coord)                                   ! !   !   !
             ENDDO SumDO !-----------------------------------------------------! !   !   !
             !                                                                   !   !   !
-            debug_print_7: if (ptc_track_debug) then !-----!                    !   !   ! 
+            debug_print_7: if (ptc_track_debug) then !-----!                    !   !   !
                Print *, 'z_start_sum=',  z_start_sum       !                    !   !   !
             end if debug_print_7 !-------------------------!                    !   !   !
             !                                                                   !   !   !
@@ -2415,8 +2416,8 @@ CONTAINS
                !k            z(k,j) = orbit0(k) + zstart(k)        !            !   !   !
                x_coord_incl_co(k_th_coord,             &           !            !   !   !
                     jmax_numb_particl_at_i_th_turn)=   &           !            !   !   !
-                    ! x_coord_co(k_th_coord)+track_temp(k_th_coord)!            !   !   !
-               x_coord_co(k_th_coord)+z_start_sum(k_th_coord)      !            !   !   !
+                                ! x_coord_co(k_th_coord)+track_temp(k_th_coord) !   !   !
+                    x_coord_co(k_th_coord)+z_start_sum(k_th_coord) !            !   !   !
             enddo current !----------------------------------------!            !   !   !
             !                                                                   !   !   !
             ! save already-read particles in the array                          !   !   !
@@ -2448,7 +2449,7 @@ CONTAINS
       Array_for_saving_all_particles: IF (.NOT.element_by_element) THEN !***********!
          ALLOCATE (x_all_incl_co_at0(1:6,0:turns,1:jmax_numb_particl_at_i_th_turn)) !
          x_all_incl_co_at0=zero                                                     !
-         DO j_th_particle=1,jmax_numb_particl_at_i_th_turn !===========!            ! 
+         DO j_th_particle=1,jmax_numb_particl_at_i_th_turn !===========!            !
             DO k_th_coord = 1, mynpa   !----------------------------!  !            !
                x_all_incl_co_at0(k_th_coord, 0, j_th_particle)=  &  !  !            !
                     x_coord_incl_co(k_th_coord,    j_th_particle)   !  !            !
@@ -2496,10 +2497,10 @@ CONTAINS
        Map_Y, Normal_Form_N, A_t_map, A_t_map_rev)
 
     USE  madx_ptc_module, ONLY: dp, real_8, normalform, damap,   &
-         my_ring, default, BERZ, daprint, & 
-         assignment(=), operator(**), & 
+         my_ring, default, BERZ, daprint, &
+         assignment(=), operator(**), &
          track, init, alloc, kill, &
-         PRODUCE_APERTURE_FLAG,  ANALYSE_APERTURE_FLAG       
+         PRODUCE_APERTURE_FLAG,  ANALYSE_APERTURE_FLAG
     ! USE ptc_results
     implicit none
 
@@ -2522,7 +2523,7 @@ CONTAINS
     ! no = 1 =>  Normal_Order_n0 (INPUT)
 
     call init(default,Normal_Order_n0,nda,BERZ,mynd2,npara)
-    if (ptc_track_debug) then 
+    if (ptc_track_debug) then
        Print *, 'aftercall init(default,Normal_Order_n0,nda,BERZ,mynd2,npara)'
        Print *, 'Normal_Order_n0,nda,mynd2,npara=', Normal_Order_n0,nda,mynd2,npara
     endif
@@ -2531,7 +2532,7 @@ CONTAINS
 
     Map_Y=npara ! y=npara
     Map_Y=x_coord_co  ! Y=X
-    IF (ptc_track_debug) call daprint(Map_Y,16); 
+    IF (ptc_track_debug) call daprint(Map_Y,16);
     !    c_%watch_user=.true.
 
     call track(my_ring,Map_Y,1,default)
@@ -2562,15 +2563,15 @@ CONTAINS
 
     A_t_map_rev=Normal_Form_N%A_t**(-1)
 
-    if (ptc_track_debug) then                                  
+    if (ptc_track_debug) then
        OPEN (UNIT=17,FILE='Normal_FORM_A.txt', STATUS='UNKNOWN')
-       write(17,'(/a/)') 'Map_Y: '; call daprint(Map_Y,17);   
+       write(17,'(/a/)') 'Map_Y: '; call daprint(Map_Y,17);
        write(17,'(/a/)') 'Linear Normal_Form_N%A: '; call daprint(Normal_Form_N%A,17);     !
        write(17,'(/a/)') 'Linear Normal_Form_N%A_t: '; call daprint(Normal_Form_N%A_t,17); !
-       write(17,'(/a/)') 'Linear A_t_map: '; call daprint(A_t_map,17);               !
-       write(17,'(/a/)') 'Linear A_t_map_rev: '; call daprint(A_t_map_rev,17);       !
-       Close (17)                                                 
-       ! CALL TEST_PTC_Normal(Normal_Form_N)                      
+       write(17,'(/a/)') 'Linear A_t_map: '; call daprint(A_t_map,17);                     !
+       write(17,'(/a/)') 'Linear A_t_map_rev: '; call daprint(A_t_map_rev,17);             !
+       Close (17)
+       ! CALL TEST_PTC_Normal(Normal_Form_N)
     end if
 
   END subroutine Get_map_from_NormalForm

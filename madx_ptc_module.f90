@@ -1404,7 +1404,7 @@ CONTAINS
     character*12 char_a
     data char_a / ' ' /
     !------------------------------------------------------------------------------
-  
+
     if(universe.le.0) then
        call fort_warn('return from ptc_track: ',' no universe created')
        return
@@ -1413,16 +1413,16 @@ CONTAINS
        call fort_warn('return from ptc_track: ',' no layout created')
        return
     endif
-  
+
     icase = get_value('ptc_track ','icase ')
-  
-  
+
+
     deltap0 = get_value('ptc_track ','deltap ')
     call my_state(icase,deltap,deltap0,mynpa)
-  
+
     CALL UPDATE_STATES
     call print(default,6)
-  
+
     x0(:)=zero
     if(icase.eq.5) x0(5)=deltap
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
@@ -1430,16 +1430,16 @@ CONTAINS
        call find_orbit(my_ring,x0,1,default,1d-7)
        print*,"Closed orbit: ",x0
     endif
-  
+
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
-  
+
     j  =  next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)
     print*,"dat1",j,xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
     j  =  next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)
     print*,"dat2",j,xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
     j  =  next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)
     print*,"dat3",j,xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
-  
+
     x(:)=x(:)+x0(:)
     print*,"  Initial Coordinates: ", x
     turns = get_value('ptc_track ','turns ')
@@ -1457,10 +1457,10 @@ CONTAINS
     c_%watch_user=.false.
     print*,"  End Coordinates: ",x
     return
-    100 continue
+100 continue
     c_%watch_user=.false.
     print*,"  Last Coordinates: ",x," after: ",i," turn(s)"
-  
+
   END subroutine ptc_track
 
   subroutine ptc_end()
