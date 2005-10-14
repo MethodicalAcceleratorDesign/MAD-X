@@ -2451,11 +2451,16 @@ CONTAINS
 
   END SUBROUTINE pok000
 
-  SUBROUTINE  tAYLOR_ran(S1,r1,R2)
+  SUBROUTINE  TAYLOR_ran(S1,r1,R2)
     implicit none
     real(dp),INTENT(in)::R1
     real(dp),INTENT(inout)::R2
     type (taylor),INTENT(inout)::S1
+    !
+    !     THIS SUBROUTINE FILLS THE DA VECTOR A WITH RANDOM ENTRIES.
+    !     FOR R1 > 0, THE VECTOR IS FILLED WITH REALS,
+    !     FOR R1 < 0, THE VECTOR IS FILLED WITH SINGLE DIGIT INTEGERS
+    !     ABS(R1) IS THE FILLING FACTOR
     if(old) then
        if(s1%i==0) call crap1("tAYLOR_ran  1" )  ! call etall1(s1%i)
        call daran(s1%i,r1,R2)
@@ -2465,7 +2470,7 @@ CONTAINS
        call newdaran(s1%j,r1,R2)
     endif
 
-  END SUBROUTINE tAYLOR_ran
+  END SUBROUTINE TAYLOR_ran
 
   SUBROUTINE  intd_taylor(S1,S2,factor)
     implicit none

@@ -107,7 +107,7 @@ module precision_constants
   !Sg_0_fitted.f90
   real(dp),PARAMETER::c_1d_11=1e-11_dp
   !Sg_0_fitted.f90
-  real(dp)::eps_def_kind=1e-5_dp
+  real(dp)::eps_def_kind=1e-9_dp
   !Sh_DEF_KIND.f90
   real(dp),PARAMETER::deps_tracking=1e-6_dp
   !Sm_tracking.f90
@@ -182,7 +182,7 @@ module precision_constants
   private read_d,read_int,read_int_a,read_d_a
   logical(lp), parameter:: my_true=.true.
   logical(lp), parameter:: my_false=.false.
-  logical(lp) :: global_verbose=.true.
+  logical(lp),target :: global_verbose=.true.
 
   type info_window
      character(3) adv
@@ -208,7 +208,11 @@ module precision_constants
      integer,POINTER :: np       ! number of parameters
      integer,POINTER :: ndpt     ! constant energy variable position is different from zero
      integer,POINTER :: NPARA     ! PARAMETER LOCATION IN PTC
+     integer,POINTER :: npara_fpp     ! PARAMETER LOCATION IN FPP
+     logical(lp),pointer :: knob
+     logical(lp), pointer :: setknob
      REAL(dp),POINTER     :: da_absolute_aperture  ! in case one tracks with da.
+
      !
 
      LOGICAL(lp),POINTER  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
@@ -266,6 +270,7 @@ module precision_constants
      logical,pointer :: check_da  !=.true.
      logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK  !=.true.
      real(dp),pointer :: phase0 ! default phase in cavity
+     logical(lp), pointer :: global_verbose
      character*120 message
   end TYPE CONTROL
 
@@ -581,6 +586,7 @@ CONTAINS
 
   SUBROUTINE  ZEROFILE
     implicit none
+    integer ipause, mypause
     integer i
 
     DO I=MFI,MFO
@@ -593,3 +599,48 @@ CONTAINS
 
 
 end module file_handler
+
+integer function mypause(i)
+  use precision_constants
+  implicit none
+  !
+  ! Replaces obsolescent feature pause
+  !
+  integer i
+  !
+  !  write (*,'(A,i6)') ' PAUSE: ',i
+  w_p=1
+  w_p=(/i/); w_p%fi='(1x,i4)'
+  w_p%nc=1
+  w_p%c(1)=' ipause=mypause(0)  ';w_p%fc='((A8,1x))'
+
+  ! call write_i
+  ! read(*,*) I
+  mypause=i
+  ! mypause=sqrt(dble(-i))
+end function mypause
+
+integer function mypauses(i,string)
+  use precision_constants
+  implicit none
+  !
+  ! Replaces obsolescent feature pause
+  !
+  integer i,l,n
+  character(*) string
+  !
+  !  write (*,'(A,i6)') ' PAUSE: ',i
+  w_p=1
+  w_p=(/i/); w_p%fi='(1x,i4)'
+  w_p%nc=2
+  l=len(string)
+  call get_ncar(n)
+  if(l>n) l=120
+  w_p%c(1)=string(1:l)
+  w_p%c(2)=' ipause=mypause(0)  ';w_p%fc='((A120,1x,/,a8,1x,))'
+
+  call write_i
+  read(*,*) I
+  mypauses=i
+  mypauses=sqrt(dble(-i))
+end function mypauses

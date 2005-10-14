@@ -959,7 +959,11 @@ contains
     c_%nd2 => nd2
     c_%np => np
     c_%ndpt => ndpt
+    c_%npara_fpp => npara_fpp
+    c_%knob => knob
+    c_%setknob => setknob
     c_%OLD => OLD
+    c_%global_verbose => global_verbose
     c_%da_absolute_aperture=>da_absolute_aperture
   end subroutine set_da_pointers
 
@@ -5400,22 +5404,9 @@ contains
     type (double_complex)  S2
 
     if(knob) then
-       if((s2%i>=0.and.s2%i<=nv).and.(s2%j>=0.and.s2%j<=nv))  then
-          varc1=(/S2%R,S2%S/).var.(/s2%i,s2%j/)
-          !          call var(varc1,S2%R,S2%S,s2%i,s2%j)
-       else
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,A72,/,1x,a72))'
-          w_p%fi='(1((1X,i4)))'
-          w_p%c(1)=  " Error in varck1 "
-          write(w_p%c(2),'(a8,i4,a8,i4 )') " s2%i = ", s2%i," s2%j = ", s2%J
-          call write_e(0)
-       endif
+       varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
     else ! Not a knob
-       !       call alloc(s2%t)     looks like bug ! removed 2004
        varc1=(/S2%R,S2%S/).var.(/0,0/)
-       !       call var(varc1,S2%R,S2%S,0,0)
     endif
 
   end SUBROUTINE  varck1
@@ -5425,21 +5416,9 @@ contains
     type (double_complex)  S2
 
     if(knob) then
-       if((s2%i>=0.and.s2%i<=nv).and.(s2%j>=0.and.s2%j<=nv))  then
-          varc2=(/S2%R,S2%S/).var.(/s2%i,s2%j/)
-          !          call var(varc2,S2%R,S2%S,s2%i,s2%j)
-       else
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,A72,/,1x,a72))'
-          w_p%fi='(1((1X,i4)))'
-          w_p%c(1)=  " Error in varck2 "
-          write(w_p%c(2),'(a8,i4,a8,i4 )') " s2%i = ", s2%i," s2%j = ", s2%J
-          call write_e(0)
-       endif
+       varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
     else ! Not a knob
        varc2=(/S2%R,S2%S/).var.(/0,0/)
-       !       call var(varc2,S2%R,S2%S,0,0)
     endif
 
   end SUBROUTINE  varck2

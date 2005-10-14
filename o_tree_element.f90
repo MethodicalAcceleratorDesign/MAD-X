@@ -20,7 +20,7 @@ module tree_element_MODULE
 CONTAINS
 
   SUBROUTINE COPY_TREE(T,U)
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: U
 
@@ -38,7 +38,7 @@ CONTAINS
 
 
   SUBROUTINE NULL_TREE(T)
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
 
     NULLIFY(T%CC,T%JL,T%JV,T%N,T%ND2)
@@ -47,7 +47,7 @@ CONTAINS
 
 
   SUBROUTINE ALLOC_TREE(T,N,ND2)
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
     INTEGER , INTENT(IN) :: N,ND2
 
@@ -60,7 +60,7 @@ CONTAINS
   END SUBROUTINE ALLOC_TREE
 
   SUBROUTINE SET_TREE(T,MA)
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
     TYPE(DAMAP), INTENT(INOUT) :: MA
     INTEGER N
@@ -82,7 +82,7 @@ CONTAINS
 
 
   SUBROUTINE KILL_TREE(T)
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
 
 
@@ -94,7 +94,7 @@ CONTAINS
 
   SUBROUTINE track_TREE(T,XI,n)
     use da_arrays
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     REAL(DP), INTENT(INOUT) :: XI(6)
     integer, optional, INTENT(IN) :: n
@@ -140,7 +140,7 @@ CONTAINS
 
   SUBROUTINE track_TREEP(T,XI,n)
     use da_arrays
-    implicit none
+    IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     TYPE(REAL_8), INTENT(INOUT) :: XI(6)
     integer, optional, INTENT(IN) :: n
@@ -237,7 +237,7 @@ CONTAINS
 
 
   SUBROUTINE symplectic(m,eps,nst)
-    implicit none
+    IMPLICIT NONE
     type(damap), INTENT(INOUT) :: m
     type(onelieexponent) uno
     type(damap) id
@@ -277,7 +277,7 @@ CONTAINS
 
   end  function number_mon
 
-  integer function pos_mon(ju,nv,nomax)
+  integer function pos_mon(ju,nomax,nv)
     implicit none
     integer ju(:),no,nv,nomax
     integer i,k,nk

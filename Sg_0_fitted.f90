@@ -1636,8 +1636,7 @@ CONTAINS
     f(4)=(c(1)*c(6)-c(3)*c(5))/d(3)
     f(5)=0
     d(2)=one+two*x(5)/beta0+x(5)**2
-    !   d(2)=SQRT((one+d(2)*gambet)/d(2)/gambet)
-    !   f(6)=d(2)*d(1)
+
 
     d(2)=gamma0I/beta0/d(2)
     f(6)=root((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
@@ -1956,6 +1955,7 @@ CONTAINS
 
           call get_b(bend%d,i+2,xt(1),xt(3),bf,bend%scale)
           call fxb(k4,xt,bf,rho,hc,bend%p)
+          if(junk==2) write(17,*) i+2,bf(2),xt(1)
           do j=1,6
              x(j)=x(j)+dz*(k1(j)+two*k2(j)+two*k3(j)+k4(j))/six     ! temporary
           enddo

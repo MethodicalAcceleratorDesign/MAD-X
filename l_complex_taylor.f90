@@ -328,7 +328,7 @@ module complex_taylor
   !@            <td width="56" height="20" align="center">
   !@             <font size="2" face="Times New Roman">
   !@            <font color="#FF0000">&nbsp;&nbsp;
-  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="#FF0000">ISU
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="#FF0000">I
   !@       </tr>
   !@       <tr>
   !@         <td width="39" height="56" align="center">
@@ -1523,12 +1523,14 @@ contains
     if(present(s10))call KILL(s10)
   END SUBROUTINE K_opt
 
-  SUBROUTINE  printcomplex(S2,i)
+  SUBROUTINE  printcomplex(S2,i,deps)
     implicit none
     type (complextaylor),INTENT(INOUT)::S2
     integer i
-    call daprint(s2%r,i)
-    call daprint(s2%i,i)
+    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+
+    call daprint(s2%r,i,deps)
+    call daprint(s2%i,i,deps)
   END SUBROUTINE printcomplex
 
   SUBROUTINE  inputcomplex(S2,i)
@@ -2953,7 +2955,7 @@ contains
     NP=iia(2)-nd2
     NDPT=icoast(4)
     NV=iia(2)
-    i_ =cmplx(zero,one,kind=dp)
+    !    i_ =cmplx(zero,one,kind=dp)
   end  subroutine set_in_complex
 
   !  SUBROUTINE  VARcC(S1,R1,R2,I1,I2)

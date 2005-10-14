@@ -7,6 +7,7 @@ type work
    real(dp) beta0,energy,kinetic,p0c,brho,gamma0I,gambet
    real(dp) mass
    LOGICAL(lp) rescale
+   integer power
 end type work
 
 

@@ -1140,58 +1140,6 @@ contains
     CALL ALLOC(IS)
     CALL ALLOC(YS,6)
     CALL FIND_ORBIT(RING,FIX,LOC,SSS,1.e-8_dp)
-    !GOTO 100
-    !3   continue
-    !    X=ND2
-    !    DO I=1,6
-    !       X(I)=FIX(I)
-    !    ENDDO
-    !
-    !
-    !
-    !    CALL TRACK(RING,X,LOC,SSS)
-    !
-    !    IS=1
-    !    MX=X
-    !    SX=MX-IS
-    !    DIX=SX
-    !    DO I=1,ND2
-    !       DIX(I)=FIX(I)-DIX(I)
-    !    enddo
-    !    IS=0
-    !    IS=DIX
-    !
-    !    SXI=SX**(-1)
-    !    SX=SXI.o.IS
-    !    DIX=SX
-    !    DO  I=1,ND2
-    !       FIX(I)=FIX(I)+DIX(I)
-    !    ENDDO
-    !
-    !    xdix=zero
-    !    do iu=1,ND2
-    !       xdix=abs(dix(iu))+xdix
-    !    enddo
-    !    w_p=0
-    !    w_p%nc=1
-    !    w_p%fc='((1X,a72))'
-    !    write(w_p%c(1),'(a22,g20.14)') " Convergence Factor = ",xdix
-    !    if(verbose) call write_i
-    !    if(xdix.gt.deps_tracking) then
-    !       ite=1
-    !    else
-    !       if(xdix.ge.xdix0) then
-    !          ite=0
-    !       else
-    !          ite=1
-    !          xdix0=xdix
-    !       endif
-    !    endif
-    !    if(ite.eq.1) then
-    !       GOTO 3
-    !    endif
-    !
-    !100 CONTINUE
     X=ND2
     DO I=1,6
        X(I)=FIX(I)
@@ -1403,23 +1351,80 @@ contains
 
   end SUBROUTINE fit_bare_bend
 
-  SUBROUTINE fit_bare_cavity(f,state,charge)
+  SUBROUTINE fit_bare_cavity(f,de_gev,phase_rel,time_patch,x,state,charge,max_iteration)
     IMPLICIT NONE
     TYPE(fibre),INTENT(INOUT):: f
     TYPE(real_8) y(6)
     TYPE(internal_state), intent(in):: state
     integer,optional :: charge
     integer, target ::  charge1
-    real(dp) kf,x(6),xdix,xdix0,tiny
-    integer ite
+    integer, optional ::  max_iteration
+    real(dp) kf,x(6),xdix,xdix0,tiny,de,xn(6),de_gev,x6
+    real(dp) DH,DD,beta0,phase_rel,time_patch
+    integer TOTALPATH
+    logical(lp) EXACT,TIME
+    integer ite,itemax,ic
+
+    itemax=100
+    if(present(max_iteration)) itemax=max_iteration
     tiny=c_1d_40
     xdix0=c_1d4*DEPS_tracking
-
+    de=de_gev/f%mag%p%p0c
     charge1=1
     if(present(charge)) charge1=charge
 
-    Kf=ZERO
-    write(6,'(A18,1(1X,g14.7))') " INITIAL PHASE IS ",    f%MAG%phas
+    If(f%mag%thin) then  ! no waste of time!!!
+       kf=-f%DIR*charge1*de_gev/f%mag%volt/1.0e-3_dp
+       if(kf>one) then
+          Write(6,*) " Fatal Error: voltage not high enough ",kf
+          stop
+       endif
+       f%mag%phas=asin(kf)-c_%phase0-twopi*f%mag%freq/clight*x(6)
+       f%magp%phas=f%mag%phas
+       phase_rel=f%mag%phas+twopi*f%mag%freq/clight*x(6)
+       time_patch=zero
+       return
+    endif
+    kf=-f%DIR*charge1*de_gev/f%mag%L/f%mag%volt/1.0e-3_dp
+    if(abs(kf)>one) then
+       Write(6,*) " Fatal Error: voltage not high enough ",kf
+       stop
+    endif
+
+    goto 1111
+    If(f%mag%p%nst==1.and.f%mag%p%method==2) then  ! no waste of time!!!
+       xn=x
+       DH=f%mag%l/two
+       DD=f%mag%p%ld/two
+       beta0=f%mag%P%beta0
+       TOTALPATH=1    !    always true inside cavity f%mag%P%TOTALPATH
+       exact=f%mag%P%EXACT
+       time=f%mag%P%TIME
+
+       CALL DRIFTR(DH,DD,beta0,TOTALPATH,EXACT,TIME,Xn)
+       x6=xn(6)
+       f%mag%phas=asin(kf)-c_%phase0-twopi*f%mag%freq/clight*x6
+       f%magp%phas=f%mag%phas
+       phase_rel=f%mag%phas+twopi*f%mag%freq/clight*x(6)
+       CALL DRIFTR(DH,DD,beta0,TOTALPATH,EXACT,TIME,Xn)
+       If(f%mag%p%nst==1.and.f%mag%p%method==2) then
+          time_patch=-XN(6)+X(6)
+          if(f%mag%P%TIME) then
+             time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD/f%mag%P%BETA0
+          else
+             time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD
+          endif
+          write(6,*) " returning "
+          return
+       endif
+
+    endif
+    ! one thin less nst=1 and method =2 also exact calculation
+
+1111 continue
+
+    !    Kf=ZERO
+    if(global_verbose) write(6,'(A18,1(1X,g14.7))') " INITIAL PHASE IS ",    f%MAG%phas
     f%MAGP%phas=f%MAGP%phas+Kf
     f%MAG%phas=f%MAG%phas+Kf
     f%MAGP%phas%KIND=3
@@ -1428,17 +1433,20 @@ contains
     CALL INIT(1,1,BERZ)
 
     CALL ALLOC(Y)
-
+    ic=0
 3   continue
-    X=ZERO
+
+    !    X=ZERO
     Y=X
     CALL TRACK(f,Y,+state,CHARGE1)
-    x=y
-    write(6,'(A10,6(1X,g14.7))') " ORBIT IS ",x
-    kf=-(y(5).sub.'0')/(y(5).sub.'1')
-    xdix=abs(y(5).sub.'0')
+    xn=y
+    if(global_verbose) write(6,'(A10,6(1X,g14.7))') " ORBIT IS ",xn
+    kf=(de+x(5)-(y(5).sub.'0'))/(y(5).sub.'1')
+    xdix=abs(de+x(5)-(y(5).sub.'0'))
     f%MAGP%phas=f%MAGP%phas+KF
     f%MAG%phas=f%MAG%phas+KF
+    !write(6,*) x(5),x(6)
+    !write(6,*) xn(5),xn(6)
 
     if(xdix.gt.deps_tracking) then
        ite=1
@@ -1450,18 +1458,72 @@ contains
           xdix0=xdix
        endif
     endif
+    ic=ic+1
+    if(ic==itemax) then
+       write(6,*) " Fatal Error Fitting phase in Cavity "
+       write(6,*) " reached  ",ic," Iterations "
+       stop 888
+    endif
     if(ite.eq.1) GOTO 3
 
     f%MAGP%phas%KIND=1
     f%MAGP%phas%I=0
 
-    write(6,'(A10,1(1X,g14.7))') " PHASE IS ",    f%MAG%phas
+    if(global_verbose) write(6,'(A10,1(1X,g14.7))') " PHASE IS ",    f%MAG%phas
 
     CALL KILL(Y)
 
+    phase_rel=f%mag%phas+twopi*f%mag%freq/clight*x(6)
+    time_patch=-XN(6)+X(6)
+    if(f%mag%P%TIME) then
+       time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD/f%mag%P%BETA0
+    else
+       time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD
+    endif
 
   end SUBROUTINE fit_bare_cavity
 
+
+  SUBROUTINE set_tw_cavity(f,de_gev,phase_rel,x,state,charge,energy)
+    IMPLICIT NONE
+    TYPE(fibre),INTENT(INOUT):: f
+    TYPE(internal_state), intent(in):: state
+    logical(lp),optional :: energy
+    logical(lp) ene
+    integer,optional :: charge
+    integer, target ::  charge1
+    real(dp) kf,x(6),de_gev,phase_rel
+
+    ene=.true.
+    if(f%mag%kind/=kind21) then
+       Write(6,*) " Fatal Error: not a TWCAVITY "
+       stop
+    endif
+    if(f%mag%cav21%psi/=zero) then
+       Write(6,*) " Warning: backwards wave present ",f%mag%cav21%psi
+    endif
+    f%mag%cav21%psi=zero   ! removing backward waves
+    f%magp%cav21%psi=zero   ! removing backward waves
+
+    charge1=1
+    if(present(charge)) charge1=charge
+    if(present(energy)) ene=energy
+
+    kf= -de_gev/1.0e-3_dp/f%mag%L/f%DIR/charge1
+    if(ene) then
+       f%mag%volt=kf
+       f%magp%volt=kf
+    else
+       f%mag%volt=sign(1.0_dp,kf*f%mag%volt)* f%mag%volt
+       f%magp%volt=f%mag%volt
+    endif
+
+    f%mag%phas=pi/two-twopi*f%mag%freq*x(6)/clight-c_%phase0
+    f%magp%phas=f%mag%phas
+    phase_rel=f%mag%phas+twopi*f%mag%freq*x(6)/clight
+
+
+  end SUBROUTINE set_tw_cavity
 
 
 

@@ -36,7 +36,7 @@ contains
   subroutine create_fibre(el,key,EXCEPTION,magnet_only)
     implicit none
     integer ipause, mypause
-    type(fibre), intent(inout)::el
+    type(fibre), target, intent(inout)::el
     logical(lp), optional :: magnet_only
     type(keywords) key
     type(el_list) blank

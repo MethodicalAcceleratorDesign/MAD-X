@@ -937,30 +937,32 @@ contains
 
   end SUBROUTINE  ELp_POL_SAGAN
 
-  SUBROUTINE  scale_SAGANR(S2,P0C_OLD,P0C_NEW)
+  SUBROUTINE  scale_SAGANR(S2,P0C_OLD,P0C_NEW,power)
     implicit none
     TYPE(SAGAN),INTENT(inOUT):: S2
     real(dp),INTENT(IN)::  P0C_OLD,P0C_NEW
+    integer, INTENT(IN):: power
     INTEGER I
     ! EXAMPLE
 
     !    S2%INTERNAL= S2%INTERNAL*P0C_OLD/P0C_NEW
     DO I=1,SIZE(S2%W%A)
-       S2%W%A(I)=S2%W%A(I)*P0C_OLD/P0C_NEW
+       S2%W%A(I)=S2%W%A(I)*(P0C_OLD/P0C_NEW)**power
     ENDDO
 
   end SUBROUTINE  scale_SAGANR
 
-  SUBROUTINE  scale_SAGANP(S2,P0C_OLD,P0C_NEW)
+  SUBROUTINE  scale_SAGANP(S2,P0C_OLD,P0C_NEW,power)
     implicit none
     TYPE(SAGANp),INTENT(inOUT):: S2
     real(dp),INTENT(IN)::  P0C_OLD,P0C_NEW
+    integer, INTENT(IN):: power
     INTEGER I
     ! EXAMPLE
 
     !    S2%INTERNAL= S2%INTERNAL*P0C_OLD/P0C_NEW
     DO I=1,SIZE(S2%W%A)
-       S2%W%A(I)=S2%W%A(I)*P0C_OLD/P0C_NEW
+       S2%W%A(I)=S2%W%A(I)*(P0C_OLD/P0C_NEW)**power
     ENDDO
 
   end SUBROUTINE  scale_SAGANP

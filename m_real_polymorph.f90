@@ -63,6 +63,7 @@ module polymorphic_taylor
      !     MODULE PROCEDURE EQUAL1D  ! 2004.7.10
      !     MODULE PROCEDURE EQUAL2D  ! 2004.7.10
      MODULE PROCEDURE complexreal_8
+     !zgoubi
      MODULE PROCEDURE realEQUAL   !
      MODULE PROCEDURE singleequal
      MODULE PROCEDURE taylorEQUAL    !taylor=real_8
@@ -803,6 +804,26 @@ module polymorphic_taylor
 
 contains
 
+  subroutine make_it_knob(k,i,s)
+    implicit none
+    TYPE (real_8), intent(inout) :: k
+    real(dp), optional :: s
+    integer, intent(in) :: i
+    k%s=one
+    if(present(s)) k%s=s
+    k%i=i
+    k%kind=3
+  end subroutine make_it_knob
+
+  subroutine kill_knob(k)
+    implicit none
+    TYPE (real_8), intent(inout) :: k
+    k%s=one
+    k%i=0
+    k%kind=1
+  end subroutine kill_knob
+
+
   FUNCTION polymorpht( S1 )
     implicit none
     TYPE (real_8) polymorpht
@@ -904,6 +925,7 @@ contains
     if(s1%kind==m2) then
        GETint=s1%t.sub.s2   !  CHANGE
     elseif(s1%kind==m1) then
+       !zgoubi
        GETint=s1
        do i=1,size(s2)
           if(S2(i)/=0) then
@@ -4388,7 +4410,7 @@ contains
     NP=iia(2)-nd2
     NDPT=icoast(4)
     NV=iia(2)
-    i_ =cmplx(zero,one,kind=dp)
+    !    i_ =cmplx(zero,one,kind=dp)
   end  subroutine set_in_polyp
 
   SUBROUTINE  EQUAL2D(S2,S1)
@@ -6082,30 +6104,9 @@ contains
     type (real_8),INTENT(IN)::  S2
 
     if(knob) then
-       if(s2%i>=0.and.s2%i<=nv)  then
-          varf1=(/S2%R,S2%S/).var.s2%i
-          !          call var(varf1,S2%R,S2%S,s2%i)
-       elseif(knob_numerical) then
-          if(s2%i==knob_i) then
-             varf1=(/S2%R+knob_eps(knob_i),zero/).var.0
-             !             call var(varf1,S2%R+knob_eps(knob_i),zero,0)
-          else
-             varf1=(/S2%R,zero/).var.0
-             !             call var(varf1,S2%R,zero,0)
-          endif
-       else
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,A72,/,1x,a72))'
-          w_p%fi='(2((1X,i4)))'
-          w_p%c(1)= " Error in varfk1 "
-          w_p%c(2)= "s2%kind   "
-          w_p=(/s2%kind  /)
-          call write_e(0)
-       endif
+       varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
     else ! Not a knob
        varf1=(/S2%R,zero/).var.0
-       !       call var(varf1,S2%R,zero,0)
     endif
 
 
@@ -6117,31 +6118,11 @@ contains
     type (real_8),INTENT(IN)::  S2
 
     if(knob) then
-       if(s2%i>=0.and.s2%i<=nv)  then
-          varf2=(/S2%R,S2%S/).var.s2%i
-          !          call var(varf2,S2%R,S2%S,s2%i)
-       elseif(knob_numerical) then
-          if(s2%i==knob_i) then
-             varf2=(/S2%R+knob_eps(knob_i),zero/).var.0
-             !             call var(varf2,S2%R+knob_eps(knob_i),zero,0)
-          else
-             varf2=(/S2%R,zero/).var.0
-             !            call var(varf2,S2%R,zero,0)
-          endif
-       else
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,A72,/,1x,a72))'
-          w_p%fi='(2((1X,i4)))'
-          w_p%c(1)= " Error in varfk2 "
-          w_p%c(2)= "s2%kind   "
-          w_p=(/s2%kind  /)
-          call write_e(0)
-       endif
+       varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
     else ! Not a knob
        varf2=(/S2%R,zero/).var.0
-       !       call var(varf2,S2%R,zero,0)
     endif
+
 
   end SUBROUTINE  varfk2
 

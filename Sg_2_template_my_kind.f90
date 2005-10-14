@@ -279,28 +279,30 @@ contains
 
   end SUBROUTINE  ELp_POL_USER2
 
-  SUBROUTINE  scale_user2R(S2,P0C_OLD,P0C_NEW)
+  SUBROUTINE  scale_user2R(S2,P0C_OLD,P0C_NEW,power)
     implicit none
     TYPE(USER2),INTENT(inOUT):: S2
     real(dp),INTENT(IN)::  P0C_OLD,P0C_NEW
-
+    integer,INTENT(IN)::  power
     ! EXAMPLE
 
-    S2%INTERNAL= S2%INTERNAL*P0C_OLD/P0C_NEW
+    S2%INTERNAL= S2%INTERNAL*(P0C_OLD/P0C_NEW)**power
 
 
   end SUBROUTINE  scale_user2R
 
-  SUBROUTINE  scale_user2P(S2,P0C_OLD,P0C_NEW)
+  SUBROUTINE  scale_user2P(S2,P0C_OLD,P0C_NEW,power)
     implicit none
     TYPE(USER2p),INTENT(inOUT):: S2
     real(dp),INTENT(IN)::  P0C_OLD,P0C_NEW
+    integer,INTENT(IN)::  power
 
     ! EXAMPLE
 
-    S2%INTERNAL= S2%INTERNAL*P0C_OLD/P0C_NEW
+    S2%INTERNAL= S2%INTERNAL*(P0C_OLD/P0C_NEW)**power
 
 
   end SUBROUTINE  scale_user2P
+
 
 end module USER_kind2

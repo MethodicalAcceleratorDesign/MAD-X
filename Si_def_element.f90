@@ -22,7 +22,7 @@ MODULE S_DEF_ELEMENT
   PRIVATE SETFAMILYR,SETFAMILYP
   PRIVATE ADDR_ANBN,ADDP_ANBN,bL_0,EL_BL,ELp_BL,COPY_BL,UNARYP_BL
   PRIVATE ELp_POL,bLPOL_0
-  PRIVATE work_0,work_LOGICAL,work_r,ELp_WORK,EL_WORK,WORK_EL,WORK_ELP,BL_EL,BL_ELP,unaryw_w
+  PRIVATE work_0,work_r,ELp_WORK,EL_WORK,WORK_EL,WORK_ELP,BL_EL,BL_ELP,unaryw_w
   PRIVATE ZERO_ANBN,ZERO_ANBN_R,ZERO_ANBN_P
   private null_EL,null_ELp
   logical(lp), PRIVATE :: VERBOSE = .FALSE.
@@ -111,7 +111,6 @@ MODULE S_DEF_ELEMENT
      MODULE PROCEDURE ELp_POL
      ! energy/mass retrieving
      MODULE PROCEDURE work_0
-     MODULE PROCEDURE work_LOGICAL
      MODULE PROCEDURE work_r
      MODULE PROCEDURE ELp_WORK
      MODULE PROCEDURE EL_WORK
@@ -130,31 +129,6 @@ CONTAINS
     type (work),INTENT(inOUT):: S2
     INTEGER,INTENT(IN):: S1
 
-    IF(S1==0) THEN
-       S2%BETA0=one
-       S2%energy=zero
-       S2%kinetic=zero
-       S2%p0c=zero
-       S2%brho=zero
-       S2%mass=zero
-       S2%gamma0I=zero
-       S2%gambet=zero
-       S2%rescale=.true.
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1)= " NOT DEFINED: ONLY WORK=0 PLEASE! "
-       call write_e(1001)
-    ENDIF
-
-  END SUBROUTINE work_0
-
-  SUBROUTINE  work_LOGICAL(S2,S1)
-    implicit none
-    type (work),INTENT(inOUT):: S2
-    logical(lp),INTENT(IN):: S1
-
     S2%BETA0=one
     S2%energy=zero
     S2%kinetic=zero
@@ -163,8 +137,16 @@ CONTAINS
     S2%mass=zero
     S2%gamma0I=zero
     S2%gambet=zero
-    S2%rescale=S1
-  END SUBROUTINE work_LOGICAL
+    if(s1/=0) then
+       S2%rescale=.true.
+       s2%power=s1
+    else
+       S2%rescale=.false.
+       s2%power=0
+    endif
+  END SUBROUTINE work_0
+
+
 
   SUBROUTINE  work_r(S2,S1)
     implicit none
@@ -200,24 +182,25 @@ CONTAINS
     if(s1%rescale) then
        if(s2%p%nmul/=0) then
           do i=1,s2%P%nmul
-             s2%bn(i)=s2%bn(i)*S2%P%P0C/S1%P0C
-             s2%an(i)=s2%an(i)*S2%P%P0C/S1%P0C
+             s2%bn(i)=s2%bn(i)*(S2%P%P0C/S1%P0C)**S1%power
+             s2%an(i)=s2%an(i)*(S2%P%P0C/S1%P0C)**S1%power
           enddo
           CALL ADD(s2,1,1,zero)
        endif
-       if(associated(s2%B_sol))  s2%B_sol=s2%B_sol*S2%P%P0C/S1%P0C
+       if(associated(s2%B_sol))  s2%B_sol=s2%B_sol*(S2%P%P0C/S1%P0C)**S1%power
 
-       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C)
-       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C)
-       if(s2%kind==KINDwiggler) call scale_sagan(s2%wi,S2%P%P0C,S1%P0C)
+       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C,S1%power)
+       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C,S1%power)
+       if(s2%kind==KINDwiggler) call scale_sagan(s2%wi,S2%P%P0C,S1%P0C,S1%power)
 
     endif
 
-    S2%P%BETA0=S1%BETA0
-    S2%P%GAMMA0I=S1%GAMMA0I
-    S2%P%GAMBET=S1%GAMBET
-    S2%P%P0C=S1%P0C
-
+    if(S1%power/=-1) then       ! just rescaling  -1=ramping
+       S2%P%BETA0=S1%BETA0
+       S2%P%GAMMA0I=S1%GAMMA0I
+       S2%P%GAMBET=S1%GAMBET
+       S2%P%P0C=S1%P0C
+    endif
 
   END SUBROUTINE ELp_WORK
 
@@ -230,22 +213,25 @@ CONTAINS
     if(s1%rescale) then
        if(s2%p%nmul/=0) then
           do i=1,s2%P%nmul
-             s2%bn(i)=s2%bn(i)*S2%P%P0C/S1%P0C
-             s2%an(i)=s2%an(i)*S2%P%P0C/S1%P0C
+             s2%bn(i)=s2%bn(i)*(S2%P%P0C/S1%P0C)**S1%power
+             s2%an(i)=s2%an(i)*(S2%P%P0C/S1%P0C)**S1%power
           enddo
           CALL ADD(s2,1,1,zero)
        endif
-       if(associated(s2%B_sol))  s2%B_sol=s2%B_sol*S2%P%P0C/S1%P0C
-       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C)
-       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C)
-       if(s2%kind==KINDwiggler) call scale_sagan(s2%wi,S2%P%P0C,S1%P0C)
+       if(associated(s2%B_sol))  s2%B_sol=s2%B_sol*(S2%P%P0C/S1%P0C)**S1%power
+       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C,S1%power)
+       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C,S1%power)
+       if(s2%kind==KINDwiggler) call scale_sagan(s2%wi,S2%P%P0C,S1%P0C,S1%power)
     endif
 
 
-    S2%P%BETA0=S1%BETA0
-    S2%P%GAMMA0I=S1%GAMMA0I
-    S2%P%GAMBET=S1%GAMBET
-    S2%P%P0C=S1%P0C
+    if(S1%power/=-1) then       ! just rescaling  -1=ramping
+       S2%P%BETA0=S1%BETA0
+       S2%P%GAMMA0I=S1%GAMMA0I
+       S2%P%GAMBET=S1%GAMBET
+       S2%P%P0C=S1%P0C
+    endif
+
 
   END SUBROUTINE EL_WORK
 
@@ -255,7 +241,8 @@ CONTAINS
     type (WORK),INTENT(inOUT):: S1
     TYPE(ELEMENT),INTENT(IN):: S2
 
-    S1=S1%rescale
+    S1=S1%POWER
+
     !    S1%P0C=-S2%P%P0C
     !  VERBOSE = .FALSE.
     call find_energy(s1,P0C=S2%P%P0C)
@@ -268,7 +255,8 @@ CONTAINS
     type (WORK),INTENT(inOUT):: S1
     TYPE(ELEMENTP),INTENT(IN):: S2
 
-    S1=S1%rescale
+    S1=S1%POWER
+
     !    S1%P0C=-S2%P%P0C
     !  VERBOSE = .FALSE.
     call find_energy(s1,P0C=S2%P%P0C)
@@ -364,6 +352,9 @@ CONTAINS
        s2%set_tpsafit=>set_tpsafit
     endif
 
+    if(s1>0) then
+       c_%npara_fpp=0   ! backwards compatible
+    endif
 
   END SUBROUTINE bLPOL_0
 
@@ -510,147 +501,307 @@ CONTAINS
        endif
        s2%knob=.TRUE.
 
-       IF(S1%NPARA>=4.AND.S1%NPARA<=6) THEN
-          DONEIT=.FALSE.
+       !       IF(S1%NPARA>=4.AND.S1%NPARA<=6) THEN
+       DONEIT=.FALSE.
 
-          !        IF(S1%CHECK_NMUL) THEN
-          S1NMUL=0
-          DO I=NMAX,1,-1
-             IF(s1%IAN(I)/=0.OR.s1%IBN(I)/=0)  THEN
-                S1NMUL=I
-                GOTO 100
-             ENDIF
-          ENDDO
-100       CONTINUE
-          !          CALL SET_FALSE(S1%CHECK_NMUL)
-          !        ENDIF
+       !        IF(S1%CHECK_NMUL) THEN
+       S1NMUL=0
+       DO I=NMAX,1,-1
+          IF(s1%IAN(I)/=0.OR.s1%IBN(I)/=0)  THEN
+             S1NMUL=I
+             GOTO 100
+          ENDIF
+       ENDDO
+100    CONTINUE
+       !          CALL SET_FALSE(S1%CHECK_NMUL)
+       !        ENDIF
 
-          IF(S1NMUL>S2%P%NMUL) then
-             CALL ADD(S2,S1NMUL,1,zero)  !etienne
-          endif
-          DO I=1,S1NMUL
-             IF(S1%IAN(I)>0) THEN
-                s2%AN(I)%I=S1%IAN(I)+S1%NPARA
-                s2%AN(I)%S=S1%SAN(I)
-                s2%AN(I)%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
-                ENDIF
-             ENDIF
-             IF(S1%IBN(I)>0) THEN
-                s2%BN(I)%I=S1%IBN(I)+S1%NPARA
-                s2%BN(I)%S=S1%SBN(I)
-                s2%BN(I)%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
-                ENDIF
-             ENDIF
-          ENDDO
-          IF(DONEIT.AND.S1%SET_TPSAFIT) THEN
-             CALL ADD(S2,1,1,zero)     !etienne
-          ENDIF
-          IF(S2%KIND==KIND4) THEN    ! CAVITY
-             DONEIT=.FALSE.                     ! NOT USED HERE
-             IF(S1%IVOLT>0) THEN
-                s2%VOLT%I=S1%IVOLT+S1%NPARA
-                s2%VOLT%S=S1%SVOLT
-                s2%VOLT%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
-                ENDIF
-             ENDIF
-             IF(S1%IFREQ>0) THEN
-                s2%FREQ%I=S1%IFREQ+S1%NPARA
-                s2%FREQ%S=S1%SFREQ
-                s2%FREQ%KIND=3
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
-                ENDIF
-                DONEIT=.TRUE.
-             ENDIF
-             IF(S1%IPHAS>0) THEN
-                s2%PHAS%I=S1%IPHAS+S1%NPARA
-                s2%PHAS%S=S1%SPHAS
-                s2%PHAS%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
-                ENDIF
+       IF(S1NMUL>S2%P%NMUL) then
+          CALL ADD(S2,S1NMUL,1,zero)  !etienne
+       endif
+       DO I=1,S1NMUL
+          IF(S1%IAN(I)>0) THEN
+             s2%AN(I)%I=S1%IAN(I)+S1%NPARA
+             s2%AN(I)%S=S1%SAN(I)
+             s2%AN(I)%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
              ENDIF
           ENDIF
-          IF(S2%KIND==KIND21) THEN    ! CAVITY
-             DONEIT=.FALSE.                     ! NOT USED HERE
-             IF(S1%IVOLT>0) THEN
-                s2%VOLT%I=S1%IVOLT+S1%NPARA
-                s2%VOLT%S=S1%SVOLT
-                s2%VOLT%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
-                ENDIF
-             ENDIF
-             IF(S1%IFREQ>0) THEN
-                s2%FREQ%I=S1%IFREQ+S1%NPARA
-                s2%FREQ%S=S1%SFREQ
-                s2%FREQ%KIND=3
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
-                ENDIF
-                DONEIT=.TRUE.
-             ENDIF
-             IF(S1%IPHAS>0) THEN
-                s2%PHAS%I=S1%IPHAS+S1%NPARA
-                s2%PHAS%S=S1%SPHAS
-                s2%PHAS%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
-                ENDIF
+          IF(S1%IBN(I)>0) THEN
+             s2%BN(I)%I=S1%IBN(I)+S1%NPARA
+             s2%BN(I)%S=S1%SBN(I)
+             s2%BN(I)%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
              ENDIF
           ENDIF
-          IF(S2%KIND==KIND5) THEN    ! SOLENOID
-             DONEIT=.FALSE.
-             IF(S1%IB_SOL>0) THEN
-                s2%B_SOL%I=S1%IB_SOL+S1%NPARA
-                s2%B_SOL%S=S1%SB_SOL
-                s2%B_SOL%KIND=3
-                DONEIT=.TRUE.
-                IF(S1%SET_TPSAFIT) THEN
-                   s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
-                ENDIF
-             ENDIF
-          ENDIF
-          IF(S2%KIND==kinduser1) THEN    ! new element
-             DONEIT=.FALSE.                     ! NOT USED HERE
-             call ELp_POL_user1(S2%u1,S1,DONEIT)
-          ENDIF
-          IF(S2%KIND==kinduser2) THEN    ! new element
-             DONEIT=.FALSE.                     ! NOT USED HERE
-             call ELp_POL_user2(S2%u2,S1,DONEIT)
-          ENDIF
-          IF(S2%KIND==KINDWIGGLER) THEN    ! new element
-             DONEIT=.FALSE.                     ! NOT USED HERE
-             call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
-          ENDIF
-
-
-
-
-       ELSE
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1((1X,A72)))'
-          write(w_p%c(1),'(A31,I4)')" NPARA MUST BE BETWEEN 4 AND 6 ", S1%NPARA
-          CALL WRITE_E(456)
+       ENDDO
+       IF(DONEIT.AND.S1%SET_TPSAFIT) THEN
+          CALL ADD(S2,1,1,zero)     !etienne
        ENDIF
+       IF(S2%KIND==KIND4) THEN    ! CAVITY
+          DONEIT=.FALSE.                     ! NOT USED HERE
+          IF(S1%IVOLT>0) THEN
+             s2%VOLT%I=S1%IVOLT+S1%NPARA
+             s2%VOLT%S=S1%SVOLT
+             s2%VOLT%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
+             ENDIF
+          ENDIF
+          IF(S1%IFREQ>0) THEN
+             s2%FREQ%I=S1%IFREQ+S1%NPARA
+             s2%FREQ%S=S1%SFREQ
+             s2%FREQ%KIND=3
+             IF(S1%SET_TPSAFIT) THEN
+                s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+             ENDIF
+             DONEIT=.TRUE.
+          ENDIF
+          IF(S1%IPHAS>0) THEN
+             s2%PHAS%I=S1%IPHAS+S1%NPARA
+             s2%PHAS%S=S1%SPHAS
+             s2%PHAS%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+             ENDIF
+          ENDIF
+       ENDIF
+       IF(S2%KIND==KIND21) THEN    ! CAVITY
+          DONEIT=.FALSE.                     ! NOT USED HERE
+          IF(S1%IVOLT>0) THEN
+             s2%VOLT%I=S1%IVOLT+S1%NPARA
+             s2%VOLT%S=S1%SVOLT
+             s2%VOLT%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
+             ENDIF
+          ENDIF
+          IF(S1%IFREQ>0) THEN
+             s2%FREQ%I=S1%IFREQ+S1%NPARA
+             s2%FREQ%S=S1%SFREQ
+             s2%FREQ%KIND=3
+             IF(S1%SET_TPSAFIT) THEN
+                s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+             ENDIF
+             DONEIT=.TRUE.
+          ENDIF
+          IF(S1%IPHAS>0) THEN
+             s2%PHAS%I=S1%IPHAS+S1%NPARA
+             s2%PHAS%S=S1%SPHAS
+             s2%PHAS%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+             ENDIF
+          ENDIF
+       ENDIF
+       IF(S2%KIND==KIND5) THEN    ! SOLENOID
+          DONEIT=.FALSE.
+          IF(S1%IB_SOL>0) THEN
+             s2%B_SOL%I=S1%IB_SOL+S1%NPARA
+             s2%B_SOL%S=S1%SB_SOL
+             s2%B_SOL%KIND=3
+             DONEIT=.TRUE.
+             IF(S1%SET_TPSAFIT) THEN
+                s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
+             ENDIF
+          ENDIF
+       ENDIF
+       IF(S2%KIND==kinduser1) THEN    ! new element
+          DONEIT=.FALSE.                     ! NOT USED HERE
+          call ELp_POL_user1(S2%u1,S1,DONEIT)
+       ENDIF
+       IF(S2%KIND==kinduser2) THEN    ! new element
+          DONEIT=.FALSE.                     ! NOT USED HERE
+          call ELp_POL_user2(S2%u2,S1,DONEIT)
+       ENDIF
+       IF(S2%KIND==KINDWIGGLER) THEN    ! new element
+          DONEIT=.FALSE.                     ! NOT USED HERE
+          call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
+       ENDIF
+
+
+
+
+       !       ELSE
+       !          w_p=0
+       !          w_p%nc=1
+       !          w_p%fc='(1((1X,A72)))'
+       !          write(w_p%c(1),'(A31,I4)')" NPARA MUST BE BETWEEN 4 AND 6 ", S1%NPARA
+       !          CALL WRITE_E(456)
+       !       ENDIF
     ENDIF
 
 
 
   END SUBROUTINE ELp_POL
+
+  SUBROUTINE  ELp_POL_force(S2,S1)
+    implicit none
+    type (POL_BLOCK),INTENT(IN):: S1
+    TYPE(ELEMENTP),INTENT(inOUT):: S2
+    INTEGER I,S1NMUL
+    logical(lp) DOIT,DONEIT                    !,checkname
+
+    IF(S2%P%NMUL>NMAX) THEN
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,A72)))'
+       write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
+       CALL WRITE_E(456)
+    ENDIF
+
+
+    DOIT=.TRUE.
+
+
+
+    s2%knob=.TRUE.
+
+    !       IF(S1%NPARA>=4.AND.S1%NPARA<=6) THEN
+    DONEIT=.FALSE.
+
+    S1NMUL=0
+    DO I=NMAX,1,-1
+       IF(s1%IAN(I)/=0.OR.s1%IBN(I)/=0)  THEN
+          S1NMUL=I
+          GOTO 100
+       ENDIF
+    ENDDO
+100 CONTINUE
+
+    IF(S1NMUL>S2%P%NMUL) then
+       CALL ADD(S2,S1NMUL,1,zero)  !etienne
+    endif
+    DO I=1,S1NMUL
+       IF(S1%IAN(I)>0) THEN
+          s2%AN(I)%I=S1%IAN(I)+S1%NPARA
+          s2%AN(I)%S=S1%SAN(I)
+          s2%AN(I)%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
+          ENDIF
+       ENDIF
+       IF(S1%IBN(I)>0) THEN
+          s2%BN(I)%I=S1%IBN(I)+S1%NPARA
+          s2%BN(I)%S=S1%SBN(I)
+          s2%BN(I)%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
+          ENDIF
+       ENDIF
+    ENDDO
+    IF(DONEIT.AND.S1%SET_TPSAFIT) THEN
+       CALL ADD(S2,1,1,zero)     !etienne
+    ENDIF
+    IF(S2%KIND==KIND4) THEN    ! CAVITY
+       DONEIT=.FALSE.                     ! NOT USED HERE
+       IF(S1%IVOLT>0) THEN
+          s2%VOLT%I=S1%IVOLT+S1%NPARA
+          s2%VOLT%S=S1%SVOLT
+          s2%VOLT%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
+          ENDIF
+       ENDIF
+       IF(S1%IFREQ>0) THEN
+          s2%FREQ%I=S1%IFREQ+S1%NPARA
+          s2%FREQ%S=S1%SFREQ
+          s2%FREQ%KIND=3
+          IF(S1%SET_TPSAFIT) THEN
+             s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+          ENDIF
+          DONEIT=.TRUE.
+       ENDIF
+       IF(S1%IPHAS>0) THEN
+          s2%PHAS%I=S1%IPHAS+S1%NPARA
+          s2%PHAS%S=S1%SPHAS
+          s2%PHAS%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+          ENDIF
+       ENDIF
+    ENDIF
+    IF(S2%KIND==KIND21) THEN    ! CAVITY
+       DONEIT=.FALSE.                     ! NOT USED HERE
+       IF(S1%IVOLT>0) THEN
+          s2%VOLT%I=S1%IVOLT+S1%NPARA
+          s2%VOLT%S=S1%SVOLT
+          s2%VOLT%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
+          ENDIF
+       ENDIF
+       IF(S1%IFREQ>0) THEN
+          s2%FREQ%I=S1%IFREQ+S1%NPARA
+          s2%FREQ%S=S1%SFREQ
+          s2%FREQ%KIND=3
+          IF(S1%SET_TPSAFIT) THEN
+             s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+          ENDIF
+          DONEIT=.TRUE.
+       ENDIF
+       IF(S1%IPHAS>0) THEN
+          s2%PHAS%I=S1%IPHAS+S1%NPARA
+          s2%PHAS%S=S1%SPHAS
+          s2%PHAS%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+          ENDIF
+       ENDIF
+    ENDIF
+    IF(S2%KIND==KIND5) THEN    ! SOLENOID
+       DONEIT=.FALSE.
+       IF(S1%IB_SOL>0) THEN
+          s2%B_SOL%I=S1%IB_SOL+S1%NPARA
+          s2%B_SOL%S=S1%SB_SOL
+          s2%B_SOL%KIND=3
+          DONEIT=.TRUE.
+          IF(S1%SET_TPSAFIT) THEN
+             s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
+          ENDIF
+       ENDIF
+    ENDIF
+    IF(S2%KIND==kinduser1) THEN    ! new element
+       DONEIT=.FALSE.                     ! NOT USED HERE
+       call ELp_POL_user1(S2%u1,S1,DONEIT)
+    ENDIF
+    IF(S2%KIND==kinduser2) THEN    ! new element
+       DONEIT=.FALSE.                     ! NOT USED HERE
+       call ELp_POL_user2(S2%u2,S1,DONEIT)
+    ENDIF
+    IF(S2%KIND==KINDWIGGLER) THEN    ! new element
+       DONEIT=.FALSE.                     ! NOT USED HERE
+       call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
+    ENDIF
+
+
+
+
+    !       ELSE
+    !          w_p=0
+    !          w_p%nc=1
+    !          w_p%fc='(1((1X,A72)))'
+    !          write(w_p%c(1),'(A31,I4)')" NPARA MUST BE BETWEEN 4 AND 6 ", S1%NPARA
+    !          CALL WRITE_E(456)
+    !       ENDIF
+
+
+
+  END SUBROUTINE ELp_POL_force
 
 
 
@@ -1952,7 +2103,15 @@ CONTAINS
        IF(ASSOCIATED(EL%d0)) DEALLOCATE(EL%d0)       ! drift
        IF(ASSOCIATED(EL%K2)) DEALLOCATE(EL%K2)       ! INTEGRATOR
        !       IF(ASSOCIATED(EL%K16)) DEALLOCATE(EL%K16)       ! INTEGRATOR
-       IF(ASSOCIATED(EL%K3)) DEALLOCATE(EL%K3)       !  THIN LENS
+       !       IF(ASSOCIATED(EL%K3)) DEALLOCATE(EL%K3)       !  THIN LENS
+       IF(ASSOCIATED(EL%K3)) then
+          IF(ASSOCIATED(EL%K3%thin_h_foc)) DEALLOCATE(EL%K3%thin_h_foc)
+          IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
+          IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
+          IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
+          DEALLOCATE(EL%K3)
+       endif
+
        IF(ASSOCIATED(EL%S5)) DEALLOCATE(EL%S5)       ! SOLENOID
        !       IF(ASSOCIATED(EL%T6)) DEALLOCATE(EL%T6)       ! INTEGRATOR
        !       IF(ASSOCIATED(EL%T7)) DEALLOCATE(EL%T7)       ! INTEGRATOR
@@ -2078,7 +2237,15 @@ CONTAINS
        IF(ASSOCIATED(EL%d0)) DEALLOCATE(EL%d0)       ! drift
        IF(ASSOCIATED(EL%K2)) DEALLOCATE(EL%K2)       ! INTEGRATOR
        !       IF(ASSOCIATED(EL%K16)) DEALLOCATE(EL%K16)       ! INTEGRATOR
-       IF(ASSOCIATED(EL%K3)) DEALLOCATE(EL%K3)       !  THIN LENS
+       !       IF(ASSOCIATED(EL%K3)) DEALLOCATE(EL%K3)       !  THIN LENS
+       IF(ASSOCIATED(EL%K3)) then
+          IF(ASSOCIATED(EL%K3%thin_h_foc)) DEALLOCATE(EL%K3%thin_h_foc)
+          IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
+          IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
+          IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
+          DEALLOCATE(EL%K3)
+       endif
+
        IF(ASSOCIATED(EL%C4)) THEN
           EL%C4=-1
           DEALLOCATE(EL%C4)       ! CAVITY

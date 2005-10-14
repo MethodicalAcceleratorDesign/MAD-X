@@ -582,6 +582,9 @@ CONTAINS
 
   END SUBROUTINE APPEND_POINT
 
+
+
+
   SUBROUTINE APPEND_EMPTY( L )  ! Creates an empty fibre to be filled later
     implicit none
     TYPE (fibre), POINTER :: Current
@@ -591,7 +594,7 @@ CONTAINS
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
-       L % end % next => current      !
+       L%end%next => current      !
     ENDIF
 
     L % end => Current
@@ -1026,15 +1029,18 @@ CONTAINS
 
   SUBROUTINE kill_UNIVERSE( L )  ! Destroys a layout
     implicit none
-    TYPE (LAYOUT), POINTER :: Current
+    TYPE (LAYOUT), POINTER :: Current,Current1
     TYPE (MAD_UNIVERSE) L
     nullify(current)
+    nullify(current1)
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
+       Current1 => L % end      ! end at the end
        L % end => Current % previous  ! update the end before disposing
        call kill_layout(Current)
        Current => L % end     ! alias of last fibre again
        L%N=L%N-1
+       deallocate(Current1)
     END DO
     call de_Set_Up_UNIVERSE(L)
   END SUBROUTINE kill_UNIVERSE
@@ -1120,7 +1126,7 @@ CONTAINS
 
 
   SUBROUTINE locate_in_universe(F,i_tot,i,j)
-    implicit none
+    IMPLICIT NONE
     integer i_tot,i,j
     integer k
     TYPE(FIBRE),pointer ::  F

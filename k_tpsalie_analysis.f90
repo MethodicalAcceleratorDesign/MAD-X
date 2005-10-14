@@ -14,7 +14,8 @@ module tpsalie_analysis
   private EQUALgenMAP,EQUALMAPgen,pushgen
   !private rotf,rotsymp,equalgengen
   integer,private::NO,ND,ND2,NP,NDPT,NV
-  logical(lp),private::old,imaxflag
+  logical(lp),private::old
+  logical(lp) imaxflag
   !
   !
   !
@@ -634,11 +635,13 @@ contains
     integer i,j
     call alloc(s1%h)
 
+    s1%eps=1.0e-6_dp
     s1%ifac=1
     s1%linear_in=.false.
     s1%imax=1000
     s1%constant(:)=zero
     imaxflag=.false.
+    s1%no_cut=no+1
     do i=1,nd
        do j=1,nd
           call alloc(s1%d(i,j))
@@ -665,6 +668,7 @@ contains
     integer i,j
     s1%ifac=0
     s1%imax=0
+    s1%no_cut=0
     do i=1,nd
        do j=1,nd
           call kill(s1%d(i,j))
@@ -742,6 +746,8 @@ contains
        call newetpin(w%v%j,s2%m%v%j,jn)
        call newintd(s2%m%v%j,s2%h%j,one)
     endif
+    ! Truncating to order no-1: not necessary completly but for self-conssitancy
+    s2%m=s2%m.cut.s2%no_cut
     do i=1,nd
        do j=1,nd
           t=  (s2%m%v(2*i)).d.(2*j)
@@ -815,7 +821,7 @@ contains
     TYPE (genfield), INTENT (IN) :: S1
     real(dp), intent(in),dimension(:)::s2
     real(dp) pushgen(lnv),s2t(nv)
-    real(dp) junk(lnv),junk2(lnv),et(ndim),de(ndim),eps,mt(ndim,ndim),MI(ndim,ndim)
+    real(dp) junk(lnv),junk2(lnv),et(ndim),de(ndim),mt(ndim,ndim),MI(ndim,ndim)
     real(dp) eb,e
     logical(lp) more
     integer i,j,k,imax,ier,ifac
@@ -834,7 +840,6 @@ contains
        do ifac=1,s1%ifac   ! ifac
 
           more=.true.
-          eps=c_1d_6
 
           eb=c_111110
 
@@ -873,7 +878,7 @@ contains
              enddo
 
              if(more) then
-                if(e>eps) then
+                if(e>S1%eps) then
                    eb=e
                 else
                    eb=e
@@ -1279,7 +1284,7 @@ contains
     !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
-
+    npara_fpp=nd2
   end subroutine init_map
 
 
@@ -1357,6 +1362,7 @@ contains
     !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
+    npara_fpp=0
   end subroutine init_tpsa
 
 

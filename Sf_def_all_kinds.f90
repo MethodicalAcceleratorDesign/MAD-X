@@ -489,7 +489,7 @@ contains
 
 
     CALL KILL(F)
-
+    IF(ASSOCIATED(F)) deallocate(f)
 
   END SUBROUTINE SURVEY_CHART
 

@@ -297,10 +297,39 @@ CONTAINS
        !       DEALLOCATE(F%A_XY,F%L,F%ALPHA)
        if(associated(f%f)) then
           call kill(f%f)
-          deallocate(f%f);
+          deallocate(f%f)
        endif
        NULLIFY(F%d_in,F%ang_in,F%d_out,F%ang_out,f%f)
        !       NULLIFY(F%A_XY,F%L,F%ALPHA)
+    ELSEIF(R==2) THEN   ! SPECIAL TRYING TO FIX FRANK'S MEMORY IN EL_Q
+       DEALLOCATE(F%d_in,F%ang_in,F%d_out,F%ang_out)
+       !       DEALLOCATE(F%A_XY,F%L,F%ALPHA)
+       if(associated(f%f)) then
+          call kill(f%f)
+          deallocate(f%f)
+       endif
+       NULLIFY(F%d_in,F%ang_in,F%d_out,F%ang_out,f%f)
+       call alloc(f%f)
+       ALLOCATE(F%d_in(3),F%ang_in(3),F%d_out(3),F%ang_out(3))
+       !      ALLOCATE(F%A_XY,F%L,F%ALPHA)
+       !         F%L=zero
+       !         F%ALPHA=zero
+       !         F%A_XY=zero
+       F%Ang_in=zero
+       F%d_in=zero
+       F%Ang_out=zero
+       F%d_out=zero
+       IF(associated(f%f)) THEN   ! R==1.and.
+          F%f%ENT=global_frame
+          F%f%EXI=global_frame
+          F%f%MID=global_frame
+          F%f%ENT=global_frame
+          F%f%EXI=global_frame
+          F%f%MID=global_frame
+          F%f%A=GLOBAL_origin
+          F%f%B=GLOBAL_origin
+          F%f%O=GLOBAL_origin
+       ENDIF
     ELSE
        w_p=1
        w_p%nc=1

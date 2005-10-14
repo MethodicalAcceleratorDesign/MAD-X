@@ -83,7 +83,7 @@ CONTAINS
 
     K=I
     B=1
-    r=0
+    r=-1
     DO WHILE (K>0.AND.B<=SIZE(R))
        R(B)=MOD(K,2)
        IF(MOD(K,2)==1) THEN

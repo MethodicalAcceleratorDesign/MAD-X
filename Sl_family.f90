@@ -12,6 +12,7 @@ MODULE S_FAMILY
   PRIVATE COPY_LAYOUT,COPY_LAYOUT_I,KILL_PARA_L
   PRIVATE FIBRE_WORK,FIBRE_POL,FIBRE_BL,ADDP_ANBN,WORK_FIBRE,BL_FIBRE
   PRIVATE TRANS_D,COPY_LAYOUT_IJ,PUT_APERTURE_FIB,REMOVE_APERTURE_FIB
+  private copy_fibre
   ! old Sj_elements
   PRIVATE SURVEY_mag
   !END old Sj_elements
@@ -24,6 +25,10 @@ MODULE S_FAMILY
   INTERFACE ELP_TO_EL
      !LINKED
      MODULE PROCEDURE ELP_TO_EL_L
+  END INTERFACE
+
+  INTERFACE copy
+     MODULE PROCEDURE copy_fibre
   END INTERFACE
 
   INTERFACE SURVEY
@@ -405,6 +410,7 @@ CONTAINS
 
 
     CALL KILL(F)
+    IF(ASSOCIATED(F)) deallocate(f)
 
 
   END SUBROUTINE SURVEY_CHART_layout
@@ -496,6 +502,80 @@ CONTAINS
        P=>P%NEXT
     ENDDO
   END SUBROUTINE GET_ALL
+
+  SUBROUTINE GET_ALL_mad_like(R,FREQ,VOLT,PHAS)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    REAL(DP), INTENT(OUT) :: FREQ,VOLT,PHAS
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    FREQ=0.D0;VOLT=0.D0;PHAS=0.D0;
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             FREQ=P%MAG%FREQ
+             VOLT=P%MAG%VOLT
+             PHAS=-P%MAG%PHAS
+          ENDIF
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  END SUBROUTINE GET_ALL_mad_like
+
+  SUBROUTINE locate_next_cav(R,di,P)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT) :: R
+    integer, INTENT(INout) :: di
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    di=1
+    if(associated(p)) P=>P%NEXT
+    DO I=1,R%N
+       if(associated(p)) then
+          IF(ASSOCIATED(P%MAG%FREQ)) THEN
+             IF(P%MAG%FREQ/=0.D0) THEN
+                exit
+             ENDIF
+          ENDIF
+          di=di+1
+          P=>P%NEXT
+       endif
+    ENDDO
+  END SUBROUTINE locate_next_cav
+
+  SUBROUTINE locate_all_cav(R,pos)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(INOUT) :: R
+    TYPE(FIBRE), POINTER:: P
+    INTEGER, allocatable, INTENT(INOUT) :: pos(:)
+    integer i,ic
+    ic=0
+    P=>r%start
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             ic=ic+1
+          ENDIF
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+    allocate(pos(ic))
+    pos=0
+    ic=0
+    P=>r%start
+    DO I=1,R%N
+       IF(ASSOCIATED(P%MAG%FREQ)) THEN
+          IF(P%MAG%FREQ/=0.D0) THEN
+             ic=ic+1
+             pos(ic)=i
+          ENDIF
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+
+  END SUBROUTINE locate_all_cav
+
 
   SUBROUTINE SET_FREQ(R,FREQ)
     IMPLICIT NONE
@@ -595,6 +675,16 @@ CONTAINS
     ENDIF
 
   END SUBROUTINE WORK_FIBRE
+
+  SUBROUTINE  copy_fibre(S1,S2)  ! copy full fibre
+    IMPLICIT NONE
+    TYPE (FIBRE),INTENT(IN):: S1
+    TYPE(FIBRE),INTENT(INOUT):: S2
+
+    call copy(s1%mag,s2%mag)
+    call copy(s1%mag,s2%magp)
+
+  END SUBROUTINE copy_fibre
 
   SUBROUTINE  MISALIGN_FIBRE_EQUAL(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     IMPLICIT NONE
@@ -698,6 +788,8 @@ CONTAINS
 
        CALL KILL(F)
        CALL KILL(F0)
+       IF(ASSOCIATED(F)) deallocate(f)
+       IF(ASSOCIATED(F0)) deallocate(f0)
 
        CALL SURVEY_NO_PATCH(S2)
 
@@ -1373,6 +1465,13 @@ CONTAINS
     TYPE(FIBRE),INTENT(INOUT):: S2
     S2%MAGP=S1
   END SUBROUTINE  FIBRE_POL
+
+  SUBROUTINE  EL_POL_force(S2,S1)    !  SET POLYMORPH IN A FIBRE UNCONDITIONALLY
+    IMPLICIT NONE
+    TYPE (POL_BLOCK),INTENT(IN):: S1
+    TYPE(FIBRE),INTENT(INOUT):: S2
+    call ELp_POL_force(S2%MAGP,S1)
+  END SUBROUTINE  EL_POL_force
 
   SUBROUTINE SCAN_FOR_POLYMORPHS(R,B)   !  SET POLYMORPH IN A FULL LAYOUT ONLY IF THE MAGNET IS A PRIMITIVE PARENT
     IMPLICIT  NONE

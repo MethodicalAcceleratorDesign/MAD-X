@@ -703,11 +703,7 @@ contains
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
-       if(k%TIME) then
-          X(6)=X(6)+C%PATCH%a_T/C%MAG%P%BETA0
-       else
-          X(6)=X(6)+C%PATCH%a_T
-       endif
+       X(6)=X(6)+C%PATCH%a_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
@@ -741,11 +737,7 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
-       if(k%TIME) then
-          X(6)=X(6)+C%PATCH%b_T/C%MAG%P%BETA0
-       else
-          X(6)=X(6)+C%PATCH%b_T
-       endif
+       X(6)=X(6)+C%PATCH%b_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -890,11 +882,7 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     ! TIME PATCH
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
-       if(k%TIME) then
-          X(6)=X(6)+C%PATCH%A_T/C%MAGP%P%BETA0
-       else
-          X(6)=X(6)+C%PATCH%A_T
-       endif
+       X(6)=X(6)+C%PATCH%A_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
@@ -933,11 +921,7 @@ contains
     !EXIT PATCH
     ! TIME PATCH
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
-       if(k%TIME) then
-          X(6)=X(6)+C%PATCH%b_T/C%MAGP%P%BETA0
-       else
-          X(6)=X(6)+C%PATCH%b_T
-       endif
+       X(6)=X(6)+C%PATCH%b_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -1109,11 +1093,7 @@ contains
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
        CALL ALLOC(Y)
        Y=X
-       if(k%TIME) then
-          Y(6)=Y(6)+C%PATCH%A_T/C%MAGP%P%BETA0
-       else
-          Y(6)=Y(6)+C%PATCH%A_T
-       endif
+       Y(6)=Y(6)+C%PATCH%A_T
        X=Y
        CALL KILL(Y)
     ENDIF
@@ -1145,11 +1125,7 @@ contains
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
        CALL ALLOC(Y)
        Y=X
-       if(k%TIME) then
-          Y(6)=Y(6)+C%PATCH%b_T/C%MAGP%P%BETA0
-       else
-          Y(6)=Y(6)+C%PATCH%b_T
-       endif
+       Y(6)=Y(6)+C%PATCH%b_T
        X=Y
        CALL KILL(Y)
     ENDIF

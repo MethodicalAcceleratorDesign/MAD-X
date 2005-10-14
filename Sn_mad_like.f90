@@ -2546,7 +2546,6 @@ CONTAINS
 
     DONE=.FALSE.
 
-
     DO I=NMAX,1,-1
        IF(S1%K(I)/=zero.or.S1%KS(I)/=zero) THEN
           if(I>=S1%NMUL) THEN
@@ -2764,7 +2763,7 @@ CONTAINS
        if(associated(s22%chart%f)) then
           s22%chart%f%ent=1
           !           s22%chart=1
-          s22%chart=0
+          s22%chart=2
           CALL SURVEY_no_patch(S22)
        endif
     ENDIF

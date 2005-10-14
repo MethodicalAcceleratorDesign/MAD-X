@@ -368,31 +368,31 @@ CONTAINS
     IF(CHECK_MADX_APERTURE.AND.APERTURE_FLAG) THEN
 
        SELECT CASE(E%KIND)
-       CASE(1)
+       CASE(1)  ! ellipse circles
           IF(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(2)  ! RECTANGLE + ELLIPSE (CIRCLE)
-          IF((ABS(X(1))>E%X).OR.(ABS(X(3))>E%Y).OR.(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
-             CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
-          ENDIF
-       CASE(3)
+       CASE(2)  ! rectangle
           IF(ABS(X(1))>E%X.OR.ABS(X(3))>E%Y) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(5) ! MARGUERITE
+       CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
+          IF((ABS(X(1))>E%X).OR.(ABS(X(3))>E%Y).OR.(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
+             CHECK_STABLE=.FALSE.
+             CHECK_MADX_APERTURE=.false.
+          ENDIF
+       CASE(4) ! MARGUERITE
           IF((X(1)**2/E%R(2)**2+X(3)**2/E%R(1)**2>ONE).OR.  &
                (X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(4) ! PILES OF POINTS
+       CASE(5) ! PILES OF POINTS
           STOP 222
        CASE DEFAULT
-          STOP 223
+          !   STOP 223
        END SELECT
     ENDIF
 
@@ -690,7 +690,7 @@ CONTAINS
     ENDIF
     IF(add%ONLY_4D) THEN
        add%TOTALPATH=  F
-!       add%RADIATION  =  F
+       add%RADIATION  =  F
        add%NOCAVITY =  T
     ENDIF
 
@@ -717,7 +717,7 @@ CONTAINS
     ENDIF
     IF(sub%ONLY_4D) THEN
        sub%TOTALPATH=  F
-!       sub%RADIATION  =  F
+       sub%RADIATION  =  F
        sub%NOCAVITY =  T
     ENDIF
 
@@ -774,6 +774,8 @@ CONTAINS
     ND2=ND1*2
     NPARA=ND2+NDEL
     C_%NPARA=NPARA
+    C_%ND2=ND2
+    C_%npara_fpp=NPARA
 
   END  subroutine S_init
 
@@ -792,6 +794,7 @@ CONTAINS
     call init(STATE2,NO2,NP2,my_true,ND2,NPARA)
     C_%NPARA=NPARA
     C_%ND2=ND2
+    C_%npara_fpp=NPARA
   END  subroutine init_default
 
   subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
@@ -802,6 +805,7 @@ CONTAINS
 
     call init(STATE,NO1,NP1,my_true,ND2,NPARA)
     C_%NPARA=NPARA
+    C_%npara_fpp=NPARA
   END  subroutine S_init_berz
 
   SUBROUTINE MAKE_METHOD(N)

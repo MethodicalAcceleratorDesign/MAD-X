@@ -13,9 +13,13 @@ module definition
   logical(lp) :: newread=.false. ,newprint =  .false. , first_time = .true.
   logical(lp) :: print77=.true. ,read77 =  .true.
   logical(lp) :: no_ndum_check = .false.
-  logical(lp),TARGET :: setknob = .false., knob=.true.
   logical(lp),TARGET :: insane_PTC = .false.
-  complex(dp) i_
+  logical(lp),TARGET :: setknob = .false. !@1 Real part of knobs cannot set
+  logical(lp),TARGET :: knob=.true. !@1 Knobs are effective
+  integer, target :: npara_fpp !@1 position of last non-parameter tpsa variable
+  !  complex(dp), parameter :: i_ = = cmplx(zero,one,kind=dp)
+  !  complex(dp)  :: i_ = (zero,one)    ! cmplx(zero,one,kind=dp)
+  complex(dp), parameter :: i_ = ( 0.0_dp,1.0_dp )    ! cmplx(zero,one,kind=dp)
   integer master
   integer,parameter::lnv=100
   !  scratch variables
@@ -90,7 +94,7 @@ module definition
   TYPE ENV_8
      type (REAL_8) v
      type (REAL_8) e(ndim2)
-     type (REAL_8) sigma0(ndim2)  !@2 added by yukiko nogiwa
+     type (REAL_8) sigma0(ndim2)  !@2
      type (REAL_8) sigmaf(ndim2)
   END TYPE ENV_8
 
@@ -196,10 +200,11 @@ module definition
      type (damap) linear
      type (damap) lineart
      type (damap) mt
-     real(dp) constant(ndim2)
+     real(dp) constant(ndim2),eps
      integer imax     !@1 imax=Maximum Number of Iteration (default=1000)
      integer ifac     !@1 ifac = the map is raised to the power 1/ifac and iterated ifac times (default=1)
      logical(lp) linear_in     !@1 Linear part is left in the map  (default=.false.)
+     integer no_cut   !@1 Original map is not symplectic on and above no_cut
   END TYPE genfield
 
 
@@ -228,8 +233,8 @@ module definition
      type (taylor) sij0  !  equilibrium beam sizes
      real(dp) emittance(3),tune(3),damping(3)
      logical(lp) AUTO,STOCHASTIC
-     real(dp)  KICK(3)
-     type (damap) STOCH
+     real(dp)  KICK(3)   ! fake kicks for tracking stochastically
+     type (damap) STOCH  ! Diagonalized of stochastic part of map for tracking stochastically
   END TYPE beamenvelope
 
 
