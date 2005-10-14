@@ -2,6 +2,7 @@
 /Makefile -text
 /Makefile.bat -text
 /Makefile_develop -text
+/Makefile_g95 -text
 /Sa_extend_poly.f90 -text
 /Sb_1_pol_template.f90 -text
 /Sb_2_pol_template.f90 -text
