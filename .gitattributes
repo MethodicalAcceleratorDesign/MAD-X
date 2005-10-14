@@ -11,6 +11,7 @@
 /Se_status.f90 -text
 /Sf_def_all_kinds.f90 -text
 /Sg_0_fitted.f90 -text
+/Sg_1_fitted.f90 -text
 /Sg_1_template_my_kind.f90 -text
 /Sg_2_template_my_kind.f90 -text
 /Sg_sagan_wiggler.f90 -text
