@@ -1201,8 +1201,8 @@
           call dcopy(rw,rc,36)
         else
           call m66inv(rw,rwi)
-          call m66mpy(rotm,rw,rc)
-          call m66mpy(rwi,rc,rc)
+          call m66mpy(rotm,rwi,rc)
+          call m66mpy(rw,rc,rc)
         endif
       endif
 
