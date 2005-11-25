@@ -203,6 +203,7 @@ char command_def[] =
 "info     = [l, true, true], "
 "reset    = [l, false, true], "
 "debug    = [l, false, true], "
+"verbose  = [l, false, true], " /*hbu */
 "rbarc    = [l, true, true], "
 "thin_foc = [l, true, true], "
 "sympl    = [l, true, true], "
@@ -868,7 +869,9 @@ char command_def[] =
 "type     = [s, none, none], "
 "magnet   = [i, 1],  "
 "l        = [r, 0],  "
+"lrad     = [r, 0],  " /* hbu */
 "ks       = [r, 0],  "
+"ksl      = [r, 0],  " /* hbu */
 "slice    = [i, 1],  "
 "apertype = [s, circle, circle], "
 "aperture = [r, {0}], "
@@ -1499,7 +1502,9 @@ char command_def[] =
 " "
 "makethin: makethin none 0 0 "
 "style    = [s, teapot, teapot], "
-"sequence = [s, none, none]; "
+"sequence = [s, none, none], "
+"makeconsistent = [l, false, true], " /*hbu */
+"minimizeparents = [l, true, false]; " /*hbu */
 " "
 "survey: survey none 0 0 "
 "x0       = [r, 0],   y0     = [r, 0], z0       = [r, 0], "
@@ -1612,9 +1617,11 @@ char command_def[] =
 "wy       = [c, 0], phiy     = [c, 0], dmuy     = [c, 0], "
 "ddx      = [c, 0], ddpx     = [c, 0], "
 "ddy      = [c, 0], ddpy     = [c, 0], "
+"r11      = [c, 0], r12      = [c, 0], "
+"r21      = [c, 0], r22      = [c, 0], "
+"energy   = [c, 0], "
 "mvar1    = [c, 0], mvar2    = [c, 0], "
 "mvar3    = [c, 0], mvar4    = [c, 0], "
-"energy   = [c, 0], "
 "re11     = [c, 1], re12     = [c, 0], re13     = [c, 0], "
 "re14     = [c, 0], re15     = [c, 0], re16     = [c, 0], "
 "re21     = [c, 0], re22     = [c, 1], re23     = [c, 0], "
@@ -1677,6 +1684,10 @@ char command_def[] =
 "mvar2    = [r, 10.0], "
 "mvar3    = [r, 10.0], "
 "mvar4    = [r, 10.0], "
+"r11      = [r, 1.0], "
+"r12      = [r, 1.0], "
+"r21      = [r, 1.0], "
+"r22      = [r, 1.0], "
 "energy   = [r, 0.0], "
 "circ     = [r, 0.0], "
 "i1       = [r, 0.0], "
