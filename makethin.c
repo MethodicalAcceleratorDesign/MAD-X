@@ -41,6 +41,7 @@ typedef unsigned char bool;
 #define false 0
 #endif
 
+/* forward declarations of some routines which are only used within makethin */
 struct element* create_thin_obj(struct element*,int slice_no);
 struct sequence* seq_diet(struct sequence*);
 double at_shift(int ,int );
@@ -75,12 +76,43 @@ struct el_list *thin_select_list = NULL;
 
 /* code starts here **************************************************/
 
+void force_consistent_slices(void)
+/* hbu 10/2005
+  loop over all elements and check that #slices of child and parent agree
+  if not, use the maximum for both
+*/
+{
+  struct element* el_i;
+  struct command_parameter *child,*parent;
+  int i,el_i_slice_pos,slices,slices_parent;
+  for(i=0; i< element_list->curr; i++) /* loop over element_list */
+  {
+    el_i = element_list->elem[i];
+    el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
+    if(el_i_slice_pos>0 && el_i->parent!=NULL && el_i != el_i->parent )
+    {
+      child=el_i->def->par->parameters[el_i_slice_pos];
+      parent=el_i->parent->def->par->parameters[el_i_slice_pos];
+      slices=child->double_value;
+      slices_parent=parent->double_value;
+      if(slices != slices_parent)
+      {
+        if(slices>slices_parent) slices_parent=slices; else slices=slices_parent;
+        child->double_value=slices;
+        parent->double_value=slices_parent;
+      }
+    }
+  }
+}
+
 void dump_slices(void)
 /* Loops over all current elements and prints the number of slices. Used for debug and info */
 {
   struct element* el_i;
-  int i,el_i_slice_pos,slices,n_elem_with_slice=0,n_elem_with_slice_gt_1=0;
+  int i,el_i_slice_pos,slices,slices_parent,n_elem_with_slice=0,n_elem_with_slice_gt_1=0;
+  char* parent_name;
   printf("++++++ dump_slices");
+  printf("            name #slices  derived from #slices\n");
   for(i=0; i< element_list->curr; i++) /* loop over element_list */
   {
     el_i = element_list->elem[i];
@@ -89,6 +121,14 @@ void dump_slices(void)
     {
       n_elem_with_slice++;
       slices=el_i->def->par->parameters[el_i_slice_pos]->double_value;
+      /* look also at parent if existing */
+      slices_parent=0;
+      parent_name="no parent";
+      if(el_i->parent!=NULL)
+      {
+        slices_parent=el_i->parent->def->par->parameters[el_i_slice_pos]->double_value;
+        parent_name=el_i->parent->name;
+      }
       if(slices>1) n_elem_with_slice_gt_1++;
     }
   }
@@ -290,6 +330,24 @@ double el_par_value_recurse(char* par, struct element* elem)
   return 0;
 }
 
+void add_cmd_parameter_clone(struct command* cmd,struct command_parameter *param,char* par_name,int inf) /*hbu add an identical copy (clone) of param to cmd */
+{
+  if(param)
+  {
+    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(param); /* set current to identical copy (clone) of param */
+    add_to_name_list(par_name,inf,cmd->par_names);
+	cmd->par->curr++;
+  }
+}
+
+void add_cmd_parameter_new(struct command* cmd,double par_value,char* par_name,int inf) /*hbu add a new param with one value to cmd */
+{
+  cmd->par->parameters[cmd->par->curr] = new_command_parameter(par_name, 2);
+  cmd->par->parameters[cmd->par->curr]->double_value = par_value;
+  add_to_name_list(par_name,inf,cmd->par_names);
+  cmd->par->curr++;
+}
+
 /* multiply the k by length and divide by slice */
 struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
                                           struct command_parameter *length_param,
@@ -297,43 +355,43 @@ struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
                                           int angle_conversion, int kl_flag)
 {
   int last_non_zero=-1,i;
+  struct expression *kn_i_expr;
+  double kn_i_val;
   if (kn_param == NULL) return NULL;
 
   for (i=0; i<kn_param->expr_list->curr; i++)
   {
-    if ((kn_param->expr_list->list[i]!=NULL && zero_string(kn_param->expr_list->list[i]->string)==0)
-        || kn_param->double_array->a[i]!=0)
+    kn_i_expr = kn_param->expr_list->list[i];
+    kn_i_val  = kn_param->double_array->a[i];
+    if ((kn_i_expr != NULL && zero_string(kn_i_expr->string)==0)  || kn_i_val!=0)
     {
       last_non_zero=i;
       if (kl_flag == 0 && (angle_conversion==0||i>0)) /*hbu apply the angle_conversion==0 check only to zero order multipole */
       {
-        if ((length_param->expr) || (kn_param->expr_list->list[i]))
+        if ((length_param->expr) || (kn_i_expr))
         {
-          kn_param->expr_list->list[i] =
-            compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
-                          "*",length_param->expr,length_param->double_value); /* multiply expression with length */
+          kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"*",length_param->expr,length_param->double_value); /* multiply expression with length */
         }
         else
         { /* multiply value with length */
-          kn_param->double_array->a[i] =  kn_param->double_array->a[i] * length_param->double_value;
+          kn_i_val *= length_param->double_value;
         }
       }
       if (slices > 1)
       { /* give the correct weight by slice (multiply with the inverse of the number of slices) */
-        if (kn_param->expr_list->list[i])
+        if (kn_i_expr)
         {
-          kn_param->expr_list->list[i] =
-            compound_expr(kn_param->expr_list->list[i],kn_param->double_array->a[i],
-                          "*",NULL,q_shift(slices,slice_no));
+          kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"*",NULL,q_shift(slices,slice_no));
         }
         else
         {
-          kn_param->double_array->a[i] =
-            kn_param->double_array->a[i] *q_shift(slices,slice_no);
+          kn_i_val *= q_shift(slices,slice_no);
         }
       }
     }
-  }
+    if(kn_i_expr) kn_param->expr_list->list[i] = kn_i_expr;
+    kn_param->double_array->a[i] = kn_i_val;
+  } /* for i ..*/
   if (last_non_zero==-1)
   {
     delete_command_parameter(kn_param); kn_param=NULL;
@@ -433,144 +491,53 @@ void seq_diet_add_sequ(struct node* thick_node, struct sequence* sub_sequ, struc
   return;
 }
 
-/* creates new magnetic elem -
-   NB all parameters are cloned - except for kn_param and ks_param
-   which have to be set up explicitly */
-
-struct element* make_thin_elem(char* name, struct element* thin_elem_parent,
-                               struct command_parameter *at_param,
-                               struct command_parameter *from_param,
-                               struct command_parameter *length_param,
-                               struct command_parameter *kn_param,
-                               struct command_parameter *ks_param,
-                               struct command_parameter *apertype_param,
-                               struct command_parameter *aper_param,
-                               struct command_parameter *bv_param,
-                               struct command_parameter *tilt_param,
-                               int slices, int slice_no)
+void add_lrad(struct command* cmd,struct command_parameter *length_param,int slices)
 {
-  struct command* cmd;
-  struct element* thin_elem = NULL;
-  char *thin_name;
-
-  /* set up new multipole command */
-  cmd = new_command(buffer("thin_multipole"), 11, 11, /* max num names, max num param */
-                    buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
-
-  cmd->par->parameters[cmd->par->curr] = new_command_parameter("magnet", 2);
-  cmd->par->parameters[cmd->par->curr]->double_value = 1;
-  add_to_name_list("magnet",0,cmd->par_names); cmd->par->curr++;
-
-  if (at_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(at_param);
-    add_to_name_list("at",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (from_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(from_param);
-    add_to_name_list("from",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (length_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = new_command_parameter("l", 2);
-    cmd->par->parameters[cmd->par->curr]->double_value = 0;
-    add_to_name_list("l",1,cmd->par_names); cmd->par->curr++;
-
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(length_param);
-    strcpy(cmd->par->parameters[cmd->par->curr]->name,"lrad");
-    if (slices > 1)
+  struct command_parameter *l_par;
+  if(length_param)
+  { add_cmd_parameter_new(cmd,0.,"l",1); /* new parameter l with value of 0 */
+    l_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(length_param); /* keep what was l */
+    strcpy(l_par->name,"lrad"); /* but rename to lrad and slice : */
+    if (slices > 1) /* divide numbers or expressions by the number of slices */
     {
-      if (cmd->par->parameters[cmd->par->curr]->expr)
-      {
-        cmd->par->parameters[cmd->par->curr]->expr =
-          compound_expr(cmd->par->parameters[cmd->par->curr]->expr,0.,"/",NULL,slices);
-      }
-      else
-      {
-        cmd->par->parameters[cmd->par->curr]->double_value =
-          cmd->par->parameters[cmd->par->curr]->double_value / slices;
-      }
+      if (l_par->expr) l_par->expr = compound_expr(l_par->expr,0.,"/",NULL,slices);
+      else l_par->double_value /= slices;
     }
-    add_to_name_list("lrad",1,cmd->par_names); cmd->par->curr++;
+    add_to_name_list("lrad",1,cmd->par_names);
+    cmd->par->curr++;
   }
-  if (kn_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = kn_param;
-    add_to_name_list("knl",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (ks_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = ks_param;
-    add_to_name_list("ksl",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (apertype_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(apertype_param);
-    add_to_name_list("apertype",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (aper_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(aper_param);
-    add_to_name_list("aperture",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (bv_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(bv_param);
-    add_to_name_list("bv",1,cmd->par_names); cmd->par->curr++;
-  }
-  if (tilt_param)
-  {
-    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(tilt_param);
-    add_to_name_list("tilt",1,cmd->par_names); cmd->par->curr++;
-  }
-/* create element with this command */
-  if (slices==1 && slice_no==1)
-  {
-    thin_name=buffer(name);
-  }
-  else
-  {
-    thin_name = make_thin_name(name,slice_no);
-  }
-
-  if (thin_elem_parent)
-  {
-    thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
-  }
-  else
-  {
-    thin_elem = make_element(thin_name,"multipole",cmd,-1);
-  }
-  thin_elem->length = 0;
-  thin_elem->bv = el_par_value("bv",thin_elem);
-  if (thin_elem_parent && thin_elem_parent->bv)
-  {
-    thin_elem->bv = thin_elem_parent->bv;
-  }
-  return thin_elem;
 }
 
-/* creates the thin magnetic element - recursively */
-struct element* create_thin_pole(struct element* thick_elem, int slice_no)
+/* creates the thin magnetic element - recursively for classes from which dericed (parent) */
+struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
 {
-  struct command_parameter *angle_param = NULL;
-  struct command_parameter *kparam[4], *ksparam[4];
-  struct command_parameter *length_param = NULL;
-  struct command_parameter *kn_param = NULL,*ks_param = NULL;
-  struct element* thin_elem_parent = NULL;
-  struct element* thin_elem = NULL;
+  struct command_parameter *angle_param, *length_param, *kparam[4], *ksparam[4], *kn_param, *ks_param, *at_param;
+  struct element *thin_elem_parent, *thin_elem;
+  struct command* cmd;
+  char *thin_name;
   int angle_conversion = 0;
-  int slices = 1;
+  int slices, minimizefl;
   int knl_flag = 0,ksl_flag = 0;
 
-  if (thick_elem == thick_elem->parent)
-  {
-    return NULL;
-  }
+  // next is new to handle parent with possibly different slice number than child
+  slices = get_slices_from_elem(thick_elem);
+  at_param = return_param("at",thick_elem);
+
+  if (thick_elem == thick_elem->parent) return NULL; /* no further parent to consider */
   else
   {
-    thin_elem_parent = create_thin_pole(thick_elem->parent,slice_no);
+    thin_elem_parent = create_thin_multipole(thick_elem->parent,slice_no); /* slice also the parent */
+  }
+
+  /* default should be to use minimizeparents */
+  minimizefl=get_option("minimizeparents") && !at_param;
+  if(minimizefl)
+  {
+    slice_no=slices=1; // do not slice this one
+  }
+  if(slice_no > slices && thick_elem!=thick_elem->parent ) /* check, but nor for base classes */
+  { printf("    *** warning in create_thin_multipole. Inconsistent child/parent slicing for %s  slice_no=%d exceeds slices=%d\n",
+      thick_elem->name,slice_no,slices);
   }
 
   /* check to see if we've already done this one */
@@ -583,12 +550,12 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
   kparam[1]    = return_param_recurse("k1",thick_elem);
   kparam[2]    = return_param_recurse("k2",thick_elem);
   kparam[3]    = return_param_recurse("k3",thick_elem);
-  ksparam[0]    = return_param_recurse("k0s",thick_elem);
-  ksparam[1]    = return_param_recurse("k1s",thick_elem);
-  ksparam[2]    = return_param_recurse("k2s",thick_elem);
-  ksparam[3]    = return_param_recurse("k3s",thick_elem);
-  kn_param   = return_param_recurse("knl",thick_elem);
-  ks_param   = return_param_recurse("ksl",thick_elem);
+  ksparam[0]   = return_param_recurse("k0s",thick_elem);
+  ksparam[1]   = return_param_recurse("k1s",thick_elem);
+  ksparam[2]   = return_param_recurse("k2s",thick_elem);
+  ksparam[3]   = return_param_recurse("k3s",thick_elem);
+  kn_param     = return_param_recurse("knl",thick_elem);
+  ks_param     = return_param_recurse("ksl",thick_elem);
   if (kn_param) {kn_param = clone_command_parameter(kn_param); knl_flag++;}
   if (ks_param) {ks_param = clone_command_parameter(ks_param); ksl_flag++;}
 
@@ -606,19 +573,133 @@ struct element* create_thin_pole(struct element* thick_elem, int slice_no)
     angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
   }
 
-  slices = get_slices_from_elem(thick_elem);
-
   kn_param = scale_and_slice(kn_param,length_param,slices,slice_no,
                              angle_conversion,knl_flag+ksl_flag);
   ks_param = scale_and_slice(ks_param,length_param,slices,slice_no,
                              angle_conversion,knl_flag+ksl_flag);
+  /* set up new multipole command */
+  cmd = new_command(buffer("thin_multipole"), 11, 11, /* max num names, max num param */
+                    buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
+  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
+  if(!minimizefl)
+  {
+    add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
+    add_cmd_parameter_clone(cmd,return_param("from",thick_elem),"from",1);
+    add_lrad(cmd,length_param,slices);
+    add_cmd_parameter_clone(cmd,kn_param,"knl",1);
+    add_cmd_parameter_clone(cmd,ks_param,"ksl",1);
+  }
+  add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
+  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
+  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  /* create element with this command */
+  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  else
+  {
+    thin_name = make_thin_name(thick_elem->name,slice_no);
+  }
+
+  if (thin_elem_parent)
+  {
+    thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
+  }
+  else
+  {
+    thin_elem = make_element(thin_name,"multipole",cmd,-1);
+  }
+  thin_elem->length = 0;
+  thin_elem->bv = el_par_value("bv",thin_elem);
+  if (thin_elem_parent && thin_elem_parent->bv)
+  {
+    thin_elem->bv = thin_elem_parent->bv;
+  }
+  put_thin(thick_elem,thin_elem,slice_no);
+  return thin_elem;
+}
+
+struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
+/*hbu create thin solenoid element, similar to create_thin_multipole */
+{
+  struct command_parameter *length_param, *ks_param, *at_param ,*ks_par;
+  struct element *thin_elem_parent, *thin_elem;
+  struct command* cmd;
+  char *thin_name;
+  int slices,minimizefl;
+
+  if (thick_elem == thick_elem->parent) return NULL;
+  else
+  {
+    thin_elem_parent = create_thin_solenoid(thick_elem->parent,slice_no); /*hbu move up to parent */
+  }
+  thin_elem = get_thin(thick_elem,slice_no);
+  if (thin_elem) return thin_elem; /* is already thin */
+  slices = get_slices_from_elem(thick_elem);
+  /* get parameters from the thick solenoid element */
+  length_param  = return_param_recurse("l",thick_elem);
+  ks_param      = return_param_recurse("ks",thick_elem);
+  at_param      = return_param("at",thick_elem);
+
+  minimizefl=get_option("minimizeparents") && !at_param;
+  if(minimizefl)
+  {
+    slice_no=slices=1; // do not slice this one
+  }
+
+  /* set up new solenoid command */
+  cmd = new_command(buffer("thin_solenoid"), 11, 11, /* max num names, max num param */
+                    buffer("element"), buffer("none"), 0, 9); /* 0 is link, solenoid is 9 */  /*hbu trial */
+  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
 
 
-  thin_elem = make_thin_elem(thick_elem->name, thin_elem_parent,
-                             return_param("at",thick_elem),return_param("from",thick_elem),
-                             length_param,kn_param,ks_param,return_param_recurse("apertype",thick_elem),
-                             return_param_recurse("aperture",thick_elem),return_param("bv",thick_elem),
-                             return_param("tilt",thick_elem),slices,slice_no);
+  if(!minimizefl)
+  {
+    add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
+    add_cmd_parameter_clone(cmd,return_param("from",thick_elem),"from",1);
+    add_lrad(cmd,length_param,slices);
+  }
+  add_cmd_parameter_clone(cmd,ks_param,"ks",1); /* keep ks */
+  if(!minimizefl)
+  {
+    if (length_param && ks_param) /* in addition provide   ksl = ks * l /slices */
+    {
+      ks_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(ks_param); /* start from clone of ks */
+      strcpy(ks_par->name,"ksl"); /* change name to ksl */
+      if (length_param->expr && ks_par->expr) /* first step is ks * l calculation, expression or value */
+      {
+        ks_par->expr = compound_expr(ks_par->expr,ks_par->double_value,"*",length_param->expr,length_param->double_value); /* multiply expression with length */
+      }
+      else ks_par->double_value *= length_param->double_value; /* multiply value with length */
+      if (slices > 1) /* 2nd step, divide by slices, expression or number */
+      {
+        if (ks_par->expr) ks_par->expr = compound_expr(ks_par->expr,0.,"/",NULL,slices);
+        else ks_par->double_value /= slices;
+      }
+      add_to_name_list("ksl",1,cmd->par_names);
+      cmd->par->curr++;
+    }
+  }
+  add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
+  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
+  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  /* create element with this command */
+  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  else thin_name = make_thin_name(thick_elem->name,slice_no);
+  if (thin_elem_parent)
+  {
+    thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
+  }
+  else
+  {
+    thin_elem = make_element(thin_name,"solenoid",cmd,-1);
+  }
+  thin_elem->length = 0;
+  thin_elem->bv = el_par_value("bv",thin_elem);
+  if (thin_elem_parent && thin_elem_parent->bv)
+  {
+    thin_elem->bv = thin_elem_parent->bv;
+  }
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
 }
@@ -674,9 +755,13 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
     old_thin_style = thin_style;
     thin_style = collim_style;
   }
+  else if (strstr(node->base_name,"solenoid"))
+  { 
+    elem = create_thin_solenoid(node->p_elem,1);  /* create the first thin solenoid slice */
+  }
   else
   {
-    elem = create_thin_pole(node->p_elem,1); /* get info from first slice */
+    elem = create_thin_multipole(node->p_elem,1); /* get info from first slice */
   }
   slices = get_slices_from_elem(node->p_elem); /*hbu June 2005 */
 
@@ -706,9 +791,13 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
     {
       elem = create_thin_obj(node->p_elem,i+1);
     }
+    else if (strstr(node->base_name,"solenoid"))
+    {
+      elem = create_thin_solenoid(node->p_elem,i+1);
+    }
     else
     {
-      elem = create_thin_pole(node->p_elem,i+1);
+      elem = create_thin_multipole(node->p_elem,i+1);
     }
     thin_node = new_elem_node(elem, node->occ_cnt);
     thin_node->length   = 0.0;
@@ -976,6 +1065,7 @@ void makethin(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   char *name = NULL;
   int pos,pos2;
+  int k=0;
 /*    time_t start; */
 
 /*    start = time(NULL); */
@@ -985,10 +1075,27 @@ void makethin(struct in_cmd* cmd)
     thin_style = buffer(pl->parameters[pos]->string);
     fprintf(prt_file, "makethin: style chosen : %s\n",thin_style);
   }
-  /* selection criteria */
+
+  /* first check makethin parameters which influence the selection */
+
+  pos = name_list_pos("minimizeparents", nl);
+  k = true; /* by default set minimizeparents to true */
+  if( pos > -1 && nl->inform[pos])
+  {
+    k=pl->parameters[pos]->double_value;
+  }
+  set_option("minimizeparents", &k);
+
+  pos = name_list_pos("makeconsistent", nl);
+  if( pos > -1 && nl->inform[pos])
+  {
+    k=pl->parameters[pos]->double_value;
+    set_option("makeconsistent", &k);
+  }
+
   if (slice_select->curr > 0)
   {
-    set_selected_elements();
+    set_selected_elements(); /* makethin selection */
     thin_select_list = selected_elements;
   }
   if (thin_select_list == NULL)
@@ -998,6 +1105,10 @@ void makethin(struct in_cmd* cmd)
   else if (thin_select_list->curr == 0)
   {
     warning("makethin selection list empty,","slicing all to one thin lens.");
+  }
+  if(get_option("makeconsistent"))
+  {
+    force_consistent_slices();
   }
   pos = name_list_pos("sequence", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string))
