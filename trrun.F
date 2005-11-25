@@ -511,7 +511,7 @@
       go to 500
 !---- Solenoid.
    90 continue
-!        call ttsol(el, track, ktrack)
+      call trsol(track, ktrack)
       go to 500
 !---- RF cavity.
   100 continue
@@ -1797,4 +1797,78 @@ c      endif
         track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
       enddo
       return
+      end
+
+      subroutine trsol(track,ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Track a set of particles through a thin solenoid.                  *
+! Input/output:                                                        *
+!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+!   KTRACK    (integer)   number of surviving tracks.                  *
+! Output:                                                              *
+!   EL        (double)    Length of solenoid.                          *
+!----------------------------------------------------------------------*
+      integer itrack,ktrack
+      double precision dtbyds,gamma,beta,deltap
+      double precision get_value, node_value
+      double precision el,track(6,*),one,two,elrad
+      double precision sk,skl,sks,sksl,cosTh,sinTh,Q,R,Z
+      double precision xf,yf,pxf,pyf,sigf,psigf
+      double precision onedp,fpsig,fppsig
+      parameter(one=1d0,two=2d0)
+!
+!---- Initialize.
+!      dtbyds  = get_value('probe ','dtbyds ')
+!      gamma   = get_value('probe ','gamma ')
+      beta    = get_value('probe ','beta ')
+!      deltap  = get_value('probe ','deltap ')
+!
+!---- Get solenoid parameters
+!      elrad   = node_value('lrad ')
+      sksl    = node_value('ksl ')
+      sks     = node_value('ks ')
+!
+!---- Set up strengths
+!      sk    = sks / two / (one + deltap)
+      sk    = sks / two
+      skl   = sksl / two
+!
+!---- Loop over particles
+!
+      do  itrack = 1, ktrack
+!
+!     Ripken formulae p.28 (3.35 and 3.36)
+        xf   = track(1,itrack)
+        yf   = track(3,itrack)
+        psigf= track(6,itrack)/beta
+!
+!     We do not use a constant deltap!!!!! WE use full 6D formulae!
+        onedp   = sqrt(one+2*psigf+(beta**2)*(psigf**2))
+        fpsig   = onedp - one
+        fppsig  = (one+(beta**2)*psigf)/onedp
+!
+!     Set up C,S, Q,R,Z
+        cosTh = cos(skl/onedp)
+        sinTh = sin(skl/onedp)
+        Q = -skl*sk/onedp
+        R = fppsig/(onedp**2)*skl*sk
+        Z = fppsig/(onedp**2)*skl
+!
+!
+        pxf  = track(2,itrack) + xf*Q
+        pyf  = track(4,itrack) + yf*Q
+        sigf = track(5,itrack)*beta - 0.5D0*(xf**2 + yf**2)*R
+
+!       Ripken formulae p.29 (3.37)
+!
+        track(1,itrack) =  xf*cosTh  + yf*sinTh
+        track(2,itrack) =  pxf*cosTh + pyf*sinTh
+        track(3,itrack) = -xf*sinTh  + yf*cosTh
+        track(4,itrack) = -pxf*sinTh + pyf*cosTh
+        track(5,itrack) =  (sigf + (xf*pyf - yf*pxf)*Z)/beta
+!        track(6,itrack) =  psigf*beta
+
+      enddo
       end
