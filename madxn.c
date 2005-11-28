@@ -772,7 +772,7 @@ int aper_chk_inside(double p, double q, double pipex[], double pipey[], double d
   int i;
   double n12, salfa, calfa, alfa=0;
 
-  /*checks first whether p,q is exactly on a pipe coordinate*/
+  /*checks first whether p,q is exact on a pipe coordinate*/
   for (i=0;i<=pipelength;i++)
   {
     if (-1 == aper_online(p, q, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit))
@@ -1858,7 +1858,7 @@ void exec_dump(struct in_cmd* cmd)
   pos = name_list_pos("file", nl);
   if (nl->inform[pos] == 0) strcpy(filename, "terminal");
   else if ((f = pl->parameters[pos]->string) == NULL
-           || *f == '0') strcpy(filename, name);
+           || *f == '\0') strcpy(filename, name);
   else strcpy(filename,f);
   if ((pos = name_list_pos(name, table_register->names)) > -1)
   {
@@ -2664,7 +2664,7 @@ void expand_curr_sequ(int flag)
   {
     use_count++;
     if (occ_list == NULL)
-      occ_list = new_name_list(10000);  /* for occurrence count */
+      occ_list = new_name_list("occ_list",10000);  /* for occurrence count */
     else occ_list->curr = 0;
     make_occ_list(current_sequ);
     all_node_pos(current_sequ);
@@ -2928,7 +2928,7 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 {
   int i, pos, h_length = 39; /* change adding header lines ! */
   double dtmp;
-/*  struct table* s; */
+  /*  struct table* s; */
   char tmp[16];
 
   if (t == NULL) return;
@@ -3777,7 +3777,7 @@ void make_sequ_from_line(char* name)
   if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
   else current_sequ->cavities = new_el_list(100);
   if (occ_list == NULL)
-    occ_list = new_name_list(10000);  /* for occurrence count */
+    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
   else occ_list->curr = 0;
   sprintf(c_dummy, "%s$start", current_sequ->name);
   el = make_element(c_dummy, "marker", clone, 0);
@@ -3803,7 +3803,7 @@ struct table* make_table(char* name, char* type, char** table_cols,
   struct command_list* scl;
   int i, n = 0;
   while (*table_cols[n] != ' ') {n++;}
-  cols = new_name_list(n);
+  cols = new_name_list("columns", n);
   for (i = 0; i < n; i++)
     add_to_name_list(table_cols[i], table_types[i], cols);
   if ((scl = find_command_list(name, table_select)) != NULL && scl->curr > 0)
@@ -5297,7 +5297,7 @@ struct table* read_table(struct in_cmd* cmd)
     }
     else if (*cc == '*' && tnl == NULL)
     {
-      tnl = new_name_list(20);
+      tnl = new_name_list("table_names", 20);
       while ((tmp = strtok(NULL, " \"\n")) != NULL)
         add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
     }
@@ -5424,7 +5424,7 @@ struct table* read_his_table(struct in_cmd* cmd)
     }
     else if (*cc == '*' && tnl == NULL)
     {
-      tnl = new_name_list(20);
+      tnl = new_name_list("table_names", 20);
       while ((tmp = strtok(NULL, " \"\n")) != NULL)
         add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
     }
@@ -6741,12 +6741,12 @@ void store_deselect(struct in_cmd* cmd)
   {
     if ((dscl = find_command_list(flag_name, table_deselect)) == NULL)
     {
-      dscl = new_command_list(10);
+      dscl = new_command_list("deselect", 10);
       add_to_command_list_list(flag_name, dscl, table_deselect);
     }
     if (log_val("clear", cmd->clone))
     {
-      dscl = new_command_list(10);
+      dscl = new_command_list("deselect", 10);
       add_to_command_list_list(flag_name, dscl, table_deselect);
     }
     else
@@ -6768,9 +6768,9 @@ void store_savebeta(struct in_cmd* cmd)
   if (log_val("clear", cmd->clone))
   {
     delete_command_list(savebeta_list);
-    savebeta_list = new_command_list(10);
+    savebeta_list = new_command_list("savebeta_list", 10);
     delete_command_list(beta0_list);
-    beta0_list = new_command_list(10);
+    beta0_list = new_command_list("beta0_list", 10);
   }
   else if (nl->inform[name_list_pos("place", nl)] == 0)
     warning("savebeta without place:", "ignored");
@@ -6807,7 +6807,7 @@ void store_select(struct in_cmd* cmd)
     if (log_val("clear", cmd->clone))
     {
       delete_command_list(seqedit_select);
-      seqedit_select = new_command_list(10);
+      seqedit_select = new_command_list("seqedit_select", 10);
     }
     else
     {
@@ -6822,7 +6822,7 @@ void store_select(struct in_cmd* cmd)
     if (log_val("clear", cmd->clone))
     {
       delete_command_list(error_select);
-      error_select = new_command_list(10);
+      error_select = new_command_list("error_select", 10);
       selected_ranges->curr = 0;
       selected_ranges->list->curr = 0;
       reset_errors(current_sequ);
@@ -6869,7 +6869,7 @@ void store_select(struct in_cmd* cmd)
     if (log_val("clear", cmd->clone))
     {
       delete_command_list(sector_select);
-      sector_select = new_command_list(10);
+      sector_select = new_command_list("sector_select", 10);
       sector_ranges->curr = 0;
       sector_ranges->list->curr = 0;
     }
@@ -6885,12 +6885,12 @@ void store_select(struct in_cmd* cmd)
   {
     if ((scl = find_command_list(flag_name, table_select)) == NULL)
     {
-      scl = new_command_list(10);
+      scl = new_command_list("select", 10);
       add_to_command_list_list(flag_name, scl, table_select);
     }
     if (log_val("clear", cmd->clone))
     {
-      scl = new_command_list(10);
+      scl = new_command_list("select", 10);
       add_to_command_list_list(flag_name, scl, table_select);
     }
     else
@@ -7158,6 +7158,7 @@ void ptc_track_end()
     if (c_node == current_sequ->ex_end)  break;
     c_node = c_node->next;
   }
+  curr_obs_points = 1;
   track_is_on = 0;
   fprintf(prt_file, "exit PTC_TRACK module\n\n");
 }
