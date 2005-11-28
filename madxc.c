@@ -2842,7 +2842,7 @@ struct table* read_my_table(struct in_cmd* cmd)
        }
      else if (*cc == '*' && tnl == NULL)
        {
-      tnl = new_name_list(20);
+      tnl = new_name_list("table_names", 20);
         while ((tmp = strtok(NULL, " \"\n")) != NULL)
             add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
        }
