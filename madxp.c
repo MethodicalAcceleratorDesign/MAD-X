@@ -539,7 +539,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   struct command_parameter* lp = cmd->cmd_def->par->parameters[pos];
   struct command_parameter* clp = cmd->clone->par->parameters[pos];
   int j, k, ks, i = start, e_type, ival, end, e_end, tot_end = 0, c_type = 0,
-    val_type = 0, cnt = 0, con_flag = 0;
+    val_type = 0, cnt = 0, con_flag = 0, t_num;
   double val = zero;
   if (lp->type < 10)
   {
@@ -590,7 +590,9 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
       {
         val_type = (*toks[i+1] == ':' && *toks[i+2] == '=') ? 1 : 0;
         start = val_type + i + 2;
-        if ((e_type = loc_expr(toks, number, start, &end)) == 0) return -i;
+        for (t_num = start; t_num < number; t_num++) if(*toks[t_num] == ',')
+            break;
+        if ((e_type = loc_expr(toks, t_num, start, &end)) == 0) return -i;
         tot_end = end;
         if (e_type == 1) /* simple number */
         {
@@ -638,7 +640,9 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
         if (c_type)
         {
           start = i + 2;
-          if ((e_type = loc_expr(toks, number, start, &end)) == 0)
+          for (t_num = start; t_num < number; t_num++) if(*toks[t_num] == ',')
+            break;
+          if ((e_type = loc_expr(toks, t_num, start, &end)) == 0)
             return -i;
           tot_end = end;
           if (e_type == 1) /* simple number */
@@ -785,7 +789,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
 void deco_init()
   /* initializes Polish decoding */
 {
-  expr_chunks = new_name_list(2000);
+  expr_chunks = new_name_list("expr_chunks", 2000);
   cat = new_int_array(MAX_ITEM);
   deco = new_int_array(MAX_ITEM);
   d_var = new_int_array(MAX_ITEM);
@@ -1032,7 +1036,7 @@ void enter_sequence(struct in_cmd* cmd)
       current_sequ->refpos = permbuff(pl->parameters[pos]->string);
     current_node = NULL;
     if (occ_list == NULL)
-      occ_list = new_name_list(10000);  /* for occurrence count */
+      occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
     else occ_list->curr = 0;
     if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
     else current_sequ->cavities = new_el_list(100);
@@ -2257,6 +2261,36 @@ void get_sxf_names()
   }
 }
 
+int get_val_num(char* in_string, int start, int end)
+{
+  int j, dot = 0, exp = 0, sign = 0;
+  char c;
+  for (j = start; j < end; j++)
+  {
+   c = in_string[j];
+   if(!isdigit(c))
+   {
+    if ((c = in_string[j]) == '.')
+    {
+     if (dot || exp) return (j - 1);
+     dot = 1;
+    }
+    else if (c == 'e') 
+     {
+      if (exp) return (j - 1);
+      else exp = j+1;
+     }
+     else if(strchr("+-", c))
+     {
+      if (exp != j || sign) return (j - 1);
+      sign = 1;
+     }
+     else return (j - 1);
+    }
+  }
+ return (j - 1);
+}
+
 double get_value(char* name, char* par)
   /* returns parameter value "par" for command or store "name" if present,
      else INVALID */
@@ -2417,7 +2451,7 @@ int loc_expr(char** items, int nit, int start, int* end)
         if (ltog < 0)  ltog = is_operator(c) ? 1 : 0;
         else if ((ltog == 0 && is_operator(c))
                  || (ltog != 0 && is_operand(c)))  ltog = 1 - ltog;
-        else break;
+        else return 0;
       }
       *end = i;
       if ((*end > start && ltog > 0) || (isalpha(c) || c == '_'))  e_type = 2;
@@ -2522,12 +2556,12 @@ void madx_init()
   drift_list = new_el_list(1000);
   variable_list = new_var_list(2000);
   comm_constraints = new_constraint_list(10);
-  beam_list = new_command_list(10);
-  stored_track_start = new_command_list(100);
+  beam_list = new_command_list("beam_list", 10);
+  stored_track_start = new_command_list("track_start", 100);
   table_deselect = new_command_list_list(10);
   table_select = new_command_list_list(10);
-  defined_commands = new_command_list(100);
-  stored_commands = new_command_list(500);
+  defined_commands = new_command_list("defined_commands", 100);
+  stored_commands = new_command_list("stored_commands", 500);
   line_list = new_macro_list(100);
   macro_list = new_macro_list(100);
   base_type_list = new_el_list(60);
@@ -2539,7 +2573,7 @@ void madx_init()
   selected_elements = new_el_list(10000);
   tmp_p_array = new_char_p_array(1000);
   tmp_l_array = new_char_p_array(1000);
-  sxf_list = new_name_list(50);
+  sxf_list = new_name_list("sxf_list", 50);
   deco_init();
   get_defined_constants();
   get_defined_commands();
@@ -2561,13 +2595,13 @@ void madx_init()
   set_defaults("setplot");
   set_defaults("threader");
   table_register = new_table_list(10);
-  beta0_list = new_command_list(10);
-  savebeta_list = new_command_list(10);
-  seqedit_select = new_command_list(10); /* for "select seqedit" commands */
-  error_select = new_command_list(10); /* for "select error" commands */
-  save_select = new_command_list(10); /* for "select save" commands */
-  slice_select = new_command_list(10); /* for "select makethin" commands */
-  sector_select = new_command_list(10); /* for "select sectormap" commands */
+  beta0_list = new_command_list("beta0_list", 10);
+  savebeta_list = new_command_list("savebeta_list", 10);
+  seqedit_select = new_command_list("seqedit_select", 10); /* for "select seqedit" commands */
+  error_select = new_command_list("error-select", 10); /* for "select error" commands */
+  save_select = new_command_list("save_select", 10); /* for "select save" commands */
+  slice_select = new_command_list("slice_select", 10); /* for "select makethin" commands */
+  sector_select = new_command_list("sector_select", 10); /* for "select sectormap" commands */
   s_range = new_int_array(10);
   e_range = new_int_array(10);
   sd_range = new_int_array(10);
@@ -3102,8 +3136,8 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
   /* fill_flag != 0 makes a 0 to be inserted into an empty "()" */
 {
   char c, cp = ' ', cpnb = ' ', quote = ' ';
-  int k, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
-  int left_b = 0, in_num = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
+  int j, k, kn, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
+  int left_b = 0, new_string = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
   for (k = 0; k < sl; k++)
   {
     c = inbuf[k];
@@ -3138,19 +3172,19 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
             outbuf[cout++] = ' ';
             left_b = 0;
           }
-          if (!(in_num > 0 && c_digit > 0 && strchr("ed",cp)) && cout > 0)
+          if (!(new_string > 0 && c_digit > 0 && strchr("ed",cp)) && cout > 0)
             outbuf[cout++] = ' ';
           outbuf[cout++] = c;
-          if (!(in_num > 0 && c_digit > 0 && strchr("ed",cp)))
+          if (!(new_string > 0 && c_digit > 0 && strchr("ed",cp)))
           {
             outbuf[cout++] = ' ';
-            in_num = 1;
+            new_string = 1;
           }
           break;
         case '(':
           rb_level++;
           left_b = 1;
-          in_num = 1;
+          new_string = 1;
           outbuf[cout++] = ' ';
           outbuf[cout++] = c;
           outbuf[cout++] = ' ';
@@ -3175,7 +3209,7 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
         case '|':
         case '&':
           left_b = 0;
-          in_num = 1;
+          new_string = 1;
           outbuf[cout++] = ' ';
           outbuf[cout++] = c;
           outbuf[cout++] = ' ';
@@ -3183,7 +3217,7 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
         case '=':
           f_equal = 1;
           left_b = 0;
-          in_num = 1;
+          new_string = 1;
           outbuf[cout++] = ' ';
           outbuf[cout++] = c;
           outbuf[cout++] = ' ';
@@ -3191,7 +3225,7 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
         case ',': /* kept behind first "=", or if not first "," */
           /* not kept inside round brackets before '=' */
           left_b = 0;
-          in_num = 1;
+          new_string = 1;
           outbuf[cout++] = ' ';
           if (f_equal || (comm_cnt && rb_level == 0))
           {
@@ -3202,18 +3236,27 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
           break;
         case ';':
           left_b = 0;
-          in_num = 1;
+          new_string = 1;
           outbuf[cout++] = ' ';
           break;
         default:
-          if (c != ' ')  left_b = 0;
-          if (cout > 0 || c != ' ') outbuf[cout++] = c;
-          c_digit += isdigit(c);
-          if (strchr(" ,=",c) || is_operator(c))
-          { in_num = 1; c_digit = 0; }
-          else  in_num =
-                  (isdigit(c) || c == '.'
-                   || (strchr("ed",c) && c_digit > 0)) ? in_num : 0;
+          if (c == ' ') outbuf[cout++] = c;
+          else
+	  {
+           left_b = 0;
+           if (new_string && (isdigit(c) || c == '.'))
+	   {
+	    kn = get_val_num(inbuf, k, sl);
+            for (j = k; j <= kn; j++) outbuf[cout++] = inbuf[j];
+            outbuf[cout++] = ' ';
+            k = kn;
+	   }
+	   else  
+	   {
+            new_string = 0;
+            if (cout > 0 || c != ' ') outbuf[cout++] = c;
+	   }
+	  }
       }
       cp = c; if (c != ' ') cpnb = c;
     }
@@ -3652,7 +3695,7 @@ void seq_edit_ex(struct sequence* seq)
     edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
   }
   if (occ_list == NULL)
-    occ_list = new_name_list(10000);  /* for occurrence count */
+    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
   else occ_list->curr = 0;
   resequence_nodes(edit_sequ);
   all_node_pos(edit_sequ);
@@ -3673,7 +3716,7 @@ void seq_flatten(struct sequence* sequ)
   struct node* c_node;
   struct node_list* nl;
   if (occ_list == NULL)
-    occ_list = new_name_list(10000);  /* for occurrence count */
+    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
   else occ_list->curr = 0;
   make_occ_list(sequ);
   all_node_pos(sequ);
@@ -3758,10 +3801,12 @@ void set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   char* p;
   struct element* el;
   struct command *command, *keep_beam = current_beam;
-  int end, start = cmd->decl_start;
-  int exp_type = loc_expr(cmd->tok_list->p, cmd->tok_list->curr,
-                          start, &end);
+  int end, start = cmd->decl_start, t_num, exp_type;
   double val = 0;
+  for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
+      if (*(cmd->tok_list->p[t_num]) == ',') break;
+  exp_type = loc_expr(cmd->tok_list->p, t_num,
+                          start, &end);
   if (exp_type == 1) /* literal constant */
     val = simple_double(cmd->tok_list->p, start, end);
   else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
@@ -3955,7 +4000,7 @@ void store_command_def(char* cmd_string)  /* processes command definition */
 struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
 {
   struct command_parameter *pl[2];
-  int i, j, jj, k, dummy, type, s_start, s_end, ss_end;
+  int i, j, jj, k, n, dummy, type, s_start, s_end, ss_end;
   char c = *toks[start];
 
   if (c == 'l')      type = 0;
@@ -3993,7 +4038,8 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
               pl[1]->double_array = pl[0]->double_array;
               break;
             }
-            if ((dummy = loc_expr(toks, end+1, start, &k)) > 1)
+            if ((n = next_char(',', toks, start, end+1)) < 0) n = end+1;
+            if ((dummy = loc_expr(toks, n, start, &k)) > 1)
             {
               if (polish_expr(k + 1 - start, &toks[start]) ==  0)
               {
