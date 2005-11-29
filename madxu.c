@@ -463,6 +463,18 @@ struct name_list* clone_name_list(struct name_list* p)
   return clone;
 }
 
+struct var_list* clone_var_list(struct var_list* vl)
+{
+  int i, l = vl->curr > 0 ? vl->curr : 1;
+  struct var_list* clone;
+  clone = new_var_list(l);
+  strcpy(clone->name, vl->name);
+  clone->list = clone_name_list(vl->list);
+  for (i = 0; i < vl->curr; i++) clone->vars[i] = vl->vars[i];
+  clone->curr = vl->curr;
+  return clone;
+}
+
 struct node* clone_node(struct node* p, int flag)
 {
   /* Transfers errors from original nodes if flag != 0;
@@ -2974,25 +2986,25 @@ void print_value(struct in_cmd* cmd)
   int j, s_start = 0, end, type, nitem;
   while (s_start < n)
   {
-   for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
-   if ((type = loc_expr(toks, j, s_start, &end)) > 0)
-   {
-    nitem = end + 1 - s_start;
-    if (polish_expr(nitem, &toks[s_start]) == 0)
-      fprintf(prt_file, v_format("%s = %F ;\n"),
-              spec_join(&toks[s_start], nitem), polish_value(deco));
-    else 
+    for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
+    if ((type = loc_expr(toks, j, s_start, &end)) > 0)
     {
-     warning("invalid expression:", spec_join(&toks[s_start], nitem));
-     return;
+      nitem = end + 1 - s_start;
+      if (polish_expr(nitem, &toks[s_start]) == 0)
+        fprintf(prt_file, v_format("%s = %F ;\n"),
+                spec_join(&toks[s_start], nitem), polish_value(deco));
+      else
+      {
+        warning("invalid expression:", spec_join(&toks[s_start], nitem));
+        return;
+      }
+      s_start = end+1;
+      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
     }
-    s_start = end+1;
-    if (s_start < n-1 && *toks[s_start] == ',') s_start++;
-   }
-    else 
+    else
     {
-     warning("invalid expression:", spec_join(&toks[s_start], nitem));
-     return;
+      warning("invalid expression:", spec_join(&toks[s_start], nitem));
+      return;
     }
   }
 }

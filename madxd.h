@@ -238,6 +238,7 @@ struct expr_list* clone_expr_list(struct expr_list*);
 struct int_array* clone_int_array(struct int_array*);
 struct macro* clone_macro(struct macro*);
 struct name_list* clone_name_list(struct name_list*);
+struct var_list* clone_var_list(struct var_list*);
 struct node* clone_node(struct node*, int);
 void copy_double(double*, double*, int);
 void copy_name_list(struct name_list*, struct name_list*);

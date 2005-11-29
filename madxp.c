@@ -591,7 +591,7 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
         val_type = (*toks[i+1] == ':' && *toks[i+2] == '=') ? 1 : 0;
         start = val_type + i + 2;
         for (t_num = start; t_num < number; t_num++) if(*toks[t_num] == ',')
-            break;
+          break;
         if ((e_type = loc_expr(toks, t_num, start, &end)) == 0) return -i;
         tot_end = end;
         if (e_type == 1) /* simple number */
@@ -1594,7 +1594,7 @@ void exec_save(struct in_cmd* cmd)
   sql = new_sequence_list(20);
   ell = new_el_list(10000);
   if (all_sequ == 0)  varl = new_var_list(2000);
-  else                varl = variable_list; /* write all variables */
+  else varl = clone_var_list(variable_list); /* write all variables */
   for (pos = 0; pos < sqo->curr; pos++)
   {
     sequ = sqo->sequs[pos];
@@ -2267,28 +2267,28 @@ int get_val_num(char* in_string, int start, int end)
   char c;
   for (j = start; j < end; j++)
   {
-   c = in_string[j];
-   if(!isdigit(c))
-   {
-    if ((c = in_string[j]) == '.')
+    c = in_string[j];
+    if(!isdigit(c))
     {
-     if (dot || exp) return (j - 1);
-     dot = 1;
-    }
-    else if (c == 'e') 
-     {
-      if (exp) return (j - 1);
-      else exp = j+1;
-     }
-     else if(strchr("+-", c))
-     {
-      if (exp != j || sign) return (j - 1);
-      sign = 1;
-     }
-     else return (j - 1);
+      if ((c = in_string[j]) == '.')
+      {
+        if (dot || exp) return (j - 1);
+        dot = 1;
+      }
+      else if (c == 'e')
+      {
+        if (exp) return (j - 1);
+        else exp = j+1;
+      }
+      else if(strchr("+-", c))
+      {
+        if (exp != j || sign) return (j - 1);
+        sign = 1;
+      }
+      else return (j - 1);
     }
   }
- return (j - 1);
+  return (j - 1);
 }
 
 double get_value(char* name, char* par)
@@ -3242,21 +3242,21 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
         default:
           if (c == ' ') outbuf[cout++] = c;
           else
-	  {
-           left_b = 0;
-           if (new_string && (isdigit(c) || c == '.'))
-	   {
-	    kn = get_val_num(inbuf, k, sl);
-            for (j = k; j <= kn; j++) outbuf[cout++] = inbuf[j];
-            outbuf[cout++] = ' ';
-            k = kn;
-	   }
-	   else  
-	   {
-            new_string = 0;
-            if (cout > 0 || c != ' ') outbuf[cout++] = c;
-	   }
-	  }
+          {
+            left_b = 0;
+            if (new_string && (isdigit(c) || c == '.'))
+            {
+              kn = get_val_num(inbuf, k, sl);
+              for (j = k; j <= kn; j++) outbuf[cout++] = inbuf[j];
+              outbuf[cout++] = ' ';
+              k = kn;
+            }
+            else
+            {
+              new_string = 0;
+              if (cout > 0 || c != ' ') outbuf[cout++] = c;
+            }
+          }
       }
       cp = c; if (c != ' ') cpnb = c;
     }
@@ -3804,9 +3804,9 @@ void set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   int end, start = cmd->decl_start, t_num, exp_type;
   double val = 0;
   for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
-      if (*(cmd->tok_list->p[t_num]) == ',') break;
+    if (*(cmd->tok_list->p[t_num]) == ',') break;
   exp_type = loc_expr(cmd->tok_list->p, t_num,
-                          start, &end);
+                      start, &end);
   if (exp_type == 1) /* literal constant */
     val = simple_double(cmd->tok_list->p, start, end);
   else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
