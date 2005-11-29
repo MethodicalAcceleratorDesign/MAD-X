@@ -112,7 +112,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     if (ntok < 2 || strcmp(toks[1], "sequence") != 0) return -1;
     else current_sequ = new_sequence(toks[0], 0);
     if (occ_list == NULL)
-      occ_list = new_name_list(10000);  /* for occurrence count */
+      occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
     else occ_list->curr = 0;
     current_sequ->cavities = new_el_list(100);
     pos = name_list_pos("marker", defined_commands->list);
