@@ -94,7 +94,7 @@ void add_to_command_list(char* label, struct command* comm,
 
 void add_to_command_list_list(char* label, struct command_list* cl,
                               struct command_list_list* sl)
-  /* adds command list cl to comand-list list sl */
+  /* adds command list cl to command-list list sl */
 {
   int pos, j;
   if ((pos = name_list_pos(label, sl->list)) > -1)
@@ -452,7 +452,10 @@ struct macro* clone_macro(struct macro* org)
 struct name_list* clone_name_list(struct name_list* p)
 {
   int i, l = p->curr > 0 ? p->curr : 1;
-  struct name_list* clone = new_name_list(l);
+  char name[2*NAME_L];
+  struct name_list* clone;
+  strcpy(name, p->name); strcat(name, "_clone");
+  clone = new_name_list(name, l);
   for (i = 0; i < p->curr; i++) clone->index[i] = p->index[i];
   for (i = 0; i < p->curr; i++) clone->inform[i] = p->inform[i];
   for (i = 0; i < p->curr; i++) clone->names[i] = p->names[i];
@@ -2190,32 +2193,34 @@ struct command* new_command(char* name, int nl_length, int pl_length,
                             char* module, char* group, int link, int mad_8)
 {
   char rout_name[] = "new_command";
+  char loc_name[2*NAME_L];
   struct command* new
     = (struct command*) mycalloc(rout_name,1, sizeof(struct command));
+  strcpy(loc_name, name); strcat(loc_name, "_param");
   new->stamp = 123456;
   strcpy(new->name, name);
-  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
+  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", loc_name);
   strcpy(new->module, module);
   strcpy(new->group, group);
   new->link_type = link;
   new->mad8_type = mad_8;
   if (nl_length == 0) nl_length = 1;
-  new->par_names = new_name_list(nl_length);
+  new->par_names = new_name_list(loc_name, nl_length);
   new->par = new_command_parameter_list(pl_length);
   return new;
 }
 
-struct command_list* new_command_list(int length)
+struct command_list* new_command_list(char* l_name, int length)
 {
   char rout_name[] = "new_command_list";
   struct command_list* il =
     (struct command_list*) mycalloc(rout_name,1, sizeof(struct command_list));
-  strcpy(il->name, "command_list");
+  strcpy(il->name, l_name);
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->list = new_name_list(length);
+  il->list = new_name_list(il->name, length);
   il->commands
     = (struct command**) mycalloc(rout_name,length, sizeof(struct command*));
   return il;
@@ -2232,7 +2237,7 @@ struct command_list_list* new_command_list_list(int length)
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->list = new_name_list(length);
+  il->list = new_name_list(il->name, length);
   il->command_lists
     = (struct command_list**)
     mycalloc(rout_name,length, sizeof(struct command_list*));
@@ -2330,7 +2335,7 @@ struct el_list* new_el_list(int length)
   strcpy(ell->name, "el_list");
   ell->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ell->name);
-  ell->list = new_name_list(length);
+  ell->list = new_name_list(ell->name, length);
   ell->elem
     = (struct element**) mycalloc(rout_name,length, sizeof(struct element*));
   ell->max = length;
@@ -2432,7 +2437,7 @@ struct in_cmd_list* new_in_cmd_list(int length)
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->labels = new_name_list(length);
+  il->labels = new_name_list(il->name, length);
   il->in_cmds
     = (struct in_cmd**) mycalloc(rout_name,length, sizeof(struct in_cmd*));
   return il;
@@ -2474,19 +2479,19 @@ struct macro_list* new_macro_list(int length)
   strcpy(nll->name, "macro_list");
   nll->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", nll->name);
-  nll->list = new_name_list(length);
+  nll->list = new_name_list(nll->name, length);
   nll->macros
     = (struct macro**) mycalloc(rout_name,length, sizeof(struct macro*));
   nll->max = length;
   return nll;
 }
 
-struct name_list* new_name_list(int length)
+struct name_list* new_name_list(char* list_name, int length)
 {
   char rout_name[] = "new_name_list";
   struct name_list* il =
     (struct name_list*) mycalloc(rout_name,1, sizeof(struct name_list));
-  strcpy(il->name, "name_list");
+  strcpy(il->name, list_name);
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->names = (char**) mycalloc(rout_name,length, sizeof(char*));
@@ -2514,7 +2519,7 @@ struct node_list* new_node_list(int length)
   strcpy(nll->name, "node_list");
   nll->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", nll->name);
-  nll->list = new_name_list(length);
+  nll->list = new_name_list(nll->name, length);
   nll->nodes
     = (struct node**) mycalloc(rout_name,length, sizeof(struct node*));
   nll->max = length;
@@ -2542,7 +2547,7 @@ struct sequence_list* new_sequence_list(int length)
   s->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", s->name);
   s->max = length;
-  s->list = new_name_list(length);
+  s->list = new_name_list(s->name, length);
   s->sequs
     = (struct sequence**) mycalloc(rout_name,length, sizeof(struct sequence*));
   return s;
@@ -2600,7 +2605,7 @@ struct table_list* new_table_list(int size)
   tl->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tl->name);
   tl->max = size;
-  tl->names = new_name_list(size);
+  tl->names = new_name_list(tl->name, size);
   tl->tables
     = (struct table**) mycalloc(rout_name,size, sizeof(struct table*));
   return tl;
@@ -2631,7 +2636,7 @@ struct var_list* new_var_list(int length)
   strcpy(var->name, "var_list");
   var->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", var->name);
-  var->list = new_name_list(length);
+  var->list = new_name_list(var->name, length);
   var->vars
     = (struct variable**) mycalloc(rout_name,length, sizeof(struct variable*));
   var->max = length;
@@ -2647,7 +2652,7 @@ struct vector_list* new_vector_list(int length)
   struct vector_list* vector
     = (struct vector_list*) mycalloc(rout_name,1, sizeof(struct vector_list));
   vector->max = length;
-  vector->names = new_name_list(length);
+  vector->names = new_name_list("vector_list", length);
   vector->vectors
     = (struct double_array**) mycalloc(rout_name, length,
                                        sizeof(struct double_array*));
@@ -2881,16 +2886,29 @@ void print_value(struct in_cmd* cmd)
 {
   char** toks = &cmd->tok_list->p[cmd->decl_start];
   int n = cmd->tok_list->curr - cmd->decl_start;
-  int s_start = 0, end, type, nitem;
-  while((type = loc_expr(toks, n, s_start, &end)) > 0)
+  int j, s_start = 0, end, type, nitem;
+  while (s_start < n)
   {
+   for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
+   if ((type = loc_expr(toks, j, s_start, &end)) > 0)
+   {
     nitem = end + 1 - s_start;
     if (polish_expr(nitem, &toks[s_start]) == 0)
       fprintf(prt_file, v_format("%s = %F ;\n"),
               spec_join(&toks[s_start], nitem), polish_value(deco));
-    else warning("invalid expression:", spec_join(&toks[s_start], nitem));
+    else 
+    {
+     warning("invalid expression:", spec_join(&toks[s_start], nitem));
+     return;
+    }
     s_start = end+1;
     if (s_start < n-1 && *toks[s_start] == ',') s_start++;
+   }
+    else 
+    {
+     warning("invalid expression:", spec_join(&toks[s_start], nitem));
+     return;
+    }
   }
 }
 
