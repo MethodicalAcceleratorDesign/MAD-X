@@ -2015,6 +2015,29 @@ char* join_b(char** it_list, int n)
 }
 
 void* mycalloc(char* caller, size_t nelem, size_t size)
+#ifdef _MEM_LEAKS
+{
+  /* calls calloc, checks for memory granted */
+  void* p;
+  int* i_p;
+  size_t l_size = nelem*size + sizeof(double);
+  if ((p = calloc(1, l_size)) == NULL)
+    fatal_error("memory overflow, called from routine:", caller);
+  mtable[-item_no]=p;
+  i_p = (int*) p;
+  *i_p++ = item_no;
+  *i_p = l_size;
+  fprintf(stderr,"ALLOCATE called by %s \n",caller);
+  fprintf(stderr,"[Allocated item %i (size %i)] \n",item_no,l_size);
+  if (item_no == -MTABLE_SIZE)
+  {
+    fatal_error("Too many allocs!!!", "MTABLE_SIZE");
+  }
+  item_no = item_no - 1;
+  return (void *)((char*)p+sizeof(double));
+}
+#endif
+#ifndef _MEM_LEAKS
 {
   /* calls calloc, checks for memory granted */
   void* p;
@@ -2025,7 +2048,7 @@ void* mycalloc(char* caller, size_t nelem, size_t size)
   i_p = (int*) p; *i_p = FREECODE;
   return ((char*)p+sizeof(double));
 }
-
+#endif
 void mycpy(char* sout, char* sin)
   /* copies string, ends at any non-ascii character including 0 */
 {
@@ -2041,6 +2064,45 @@ void mycpy(char* sout, char* sin)
 }
 
 void myfree(char* rout_name, void* p)
+#ifdef _MEM_LEAKS
+{
+  int my_size,my_item_no,myend,old_item_no;
+  char* l_p = (char*)p - sizeof(double);
+  int* i_p = (int*) l_p;
+  myfree_caller = rout_name;
+/* Look for the integer address (backwards) in mtable */
+  myend=-item_no-1;
+  old_item_no=0;
+  while (myend > 0)
+  {
+    if (mtable[myend] == i_p)
+    {
+      old_item_no=-myend;
+      mtable[myend]=NULL;
+      break;
+    }
+    else
+    {
+      myend=myend-1;
+    }
+  }
+  if ( old_item_no == 0)
+  {
+    fatal_error("Free memory error!!!, called from routine:", myfree_caller);
+  }
+  my_item_no = *i_p++;
+  my_size = *i_p;
+  if (my_item_no != old_item_no)
+  {
+    fatal_error("Memory item number discrepancy!!!:", myfree_caller);
+  }
+  fprintf(stderr,"DEALLOCATE called by %s \n",myfree_caller);
+  fprintf(stderr,"[Deallocated item %i (size %i)] \n",my_item_no,my_size);
+  free(l_p);
+  myfree_caller = none;
+}
+#endif
+#ifndef _MEM_LEAKS
 {
   char* l_p = (char*)p - sizeof(double);
   int* i_p = (int*) l_p;
@@ -2051,8 +2113,31 @@ void myfree(char* rout_name, void* p)
   }
   myfree_caller = none;
 }
-
+#endif
 void* mymalloc(char* caller, size_t size)
+#ifdef _MEM_LEAKS
+{
+  /* calls malloc, checks for memory granted */
+  void* p;
+  int* i_p;
+  size_t l_size = size + sizeof(double);
+  if ((p = malloc(l_size)) == NULL)
+    fatal_error("memory overflow, called from routine:", caller);
+  i_p = (int*) p;
+  mtable[-item_no]=i_p;
+  *i_p++ = item_no;
+  *i_p = l_size;
+  fprintf(stderr,"ALLOCATE called by %s \n",caller);
+  fprintf(stderr,"[Allocated item %i (size %i)] \n",item_no,l_size);
+  if (item_no == -MTABLE_SIZE)
+  {
+    fatal_error("Too many allocs!!!", "MTABLE_SIZE");
+  }
+  item_no = item_no - 1;
+  return (void *)((char*)p+sizeof(double));
+}
+#endif
+#ifndef _MEM_LEAKS
 {
   /* calls malloc, checks for memory granted */
   void* p;
@@ -2063,7 +2148,7 @@ void* mymalloc(char* caller, size_t size)
   i_p = (int*) p; *i_p = FREECODE;
   return (void *)((char*)p+sizeof(double));
 }
-
+#endif
 char* mystrchr(char* string, char c)
   /* returns strchr for character c, but only outside strings included
      in single or double quotes */
