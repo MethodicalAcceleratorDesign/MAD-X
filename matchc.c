@@ -663,7 +663,7 @@ void match_vary(struct in_cmd* cmd)
   int pos;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  if (stored_match_var == NULL) stored_match_var = new_command_list(100);
+  if (stored_match_var == NULL) stored_match_var = new_command_list("vary", 100);
   pos = name_list_pos("name", nl);
   if (nl->inform[pos])
   {
