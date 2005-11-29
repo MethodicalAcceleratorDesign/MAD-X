@@ -404,6 +404,7 @@ int get_select_ranges(struct sequence*,struct command_list*,
 void get_select_t_ranges(struct command_list*,
                          struct command_list*, struct table*);
 int get_sub_range(char*, struct sequence*, struct node**);
+int get_val_num(char*, int, int);
 int square_to_colon(char*);
 int get_stmt(FILE*, int);
 int get_table_range(char*, struct table* t, int*);
@@ -488,7 +489,7 @@ struct char_array* new_char_array(int);
 struct char_array_list* new_char_array_list(int);
 struct char_p_array* new_char_p_array(int);
 struct command* new_command(char*, int, int, char*, char*, int, int);
-struct command_list* new_command_list(int);
+struct command_list* new_command_list(char*, int);
 struct command_list_list* new_command_list_list(int);
 struct constraint* new_constraint(int);
 struct constraint_list* new_constraint_list(int);
@@ -505,7 +506,7 @@ struct expression* new_expression(char*, struct int_array*);
 struct int_array* new_int_array(int);
 struct macro* new_macro(int, int, int);
 struct macro_list* new_macro_list(int);
-struct name_list* new_name_list(int);
+struct name_list* new_name_list(char*, int);
 struct node* new_elem_node(struct element*, int);
 struct node* new_node(char*);
 struct node_list* new_node_list(int);
@@ -995,8 +996,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.00.03";
-char code_mod_date[] = "Code Modification Date: 15.09.2005";
+char myversion[] = "MAD-X 3.01.00";
+char code_mod_date[] = "Code Modification Date: 29.11.2005";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
