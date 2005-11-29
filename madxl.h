@@ -9,6 +9,11 @@
 #define PTC_NAMES_L 11      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004) */
 #define FNAME_L 240         /* for file names */
 #define FREECODE 380226     /* check-code to avoid multiple "free" */
+#ifdef _MEM_LEAKS
+#define MTABLE_SIZE 1000000
+  int item_no=-1;
+  int* mtable[MTABLE_SIZE];
+#endif
 #define AUX_LG 10000        /* for all sorts of ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
