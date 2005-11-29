@@ -701,7 +701,7 @@ CONTAINS
        re(6,4) = get_value('ptc_twiss ','re54 ')
        re(6,5) = get_value('ptc_twiss ','re56 ')
        re(6,6) = get_value('ptc_twiss ','re55 ')
-       x(i)=zero
+       x(:)=zero
        x(1)=get_value('ptc_twiss ','x ')
        x(2)=get_value('ptc_twiss ','px ')
        x(3)=get_value('ptc_twiss ','y ')
