@@ -151,11 +151,11 @@ char* efield_table_cols[] =
 
 char* sxf_table_names[] =
 {
-  "l","k0","k0s","k1","k1s",
+  "l","angle", "k0","k0s","k1","k1s",
   "e1","e2","k2","k2s","h1",
   "h2","hgap","fint","k3","k3s",
   "lrad","knl","ksl","ks","volt",
-  "lag","freq","harmon","betrf","pg",
+  "lag","harmon","betrf","pg",
   "shunt","tfill","eloss","ex","ey",
   "hkick","vkick","xsize","ysize","sigx",
   "sigy","xma","yma","charge",

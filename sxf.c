@@ -52,11 +52,13 @@ void sxf_read(struct command* comm)
     warning("SXF input file empty,"," ignored");
     return;
   }
-  if ((rcode = version_header(aux_buff->c)) == 0)
-  {
+  /*
+    if ((rcode = version_header(aux_buff->c)) == 0)
+    {
     warning("SXF header missing or wrong,"," ignored");
     return;
-  }
+    }
+  */
   sequ_is_on = 1;
   echo = get_option("echo");
   set_option("echo", &izero);
@@ -153,6 +155,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   make_elem_node(el, 1);
   sxf_suml += el->length / 2;
   if ((at = find_value("at", ntok, toks)) == INVALID) at = sxf_suml;
+  else sxf_suml = at;
   sxf_suml += el->length / 2;
   current_node->at_value = at;
   for (n = 0; n < ntok; n++)  if(strcmp("align.dev", toks[n]) == 0) break;
@@ -295,9 +298,12 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
       if (strstr(toks[1], "bend"))
       {
         if (length == zero) fatal_error("bend without length:", toks[0]);
-        if (skew == 0) pos = name_list_pos("k0", nl);
-        else           pos = name_list_pos("k0s", nl);
-        pl->parameters[pos]->double_value = vec[0] / length;
+        /*if (skew == 0) pos = name_list_pos("k0", nl);
+          else           pos = name_list_pos("k0s", nl);*/
+        /* nm printf("bend v[0] = %e; \n", vec[0]); */
+        pos = name_list_pos("angle", nl);
+        pl->parameters[pos]->double_value = vec[0];
+        /* pl->parameters[pos]->double_value = vec[0] / length; */
       }
       else if (strstr(toks[1], "quad"))
       {
@@ -485,16 +491,22 @@ void write_elstart(FILE* out)
   put_line(out, name); s_indent(add_indent[2]);
   sprintf(c_dummy, "%s {", current_node->base_name); put_line(out, c_dummy);
   s_indent(add_indent[3]);
-  if (tag_flag == 1 &&  current_node->p_elem != current_node->p_elem->parent)
-  {
+  /*
+    if (tag_flag == 1 &&  current_node->p_elem != current_node->p_elem->parent)
+    {
     sprintf(c_dummy, "tag = %s", current_node->p_elem->parent->name);
     put_line(out, c_dummy);
-  }
-  else if (tag_flag == 2 && (pc = tag_spec(current_node->base_name)) != NULL)
-  {
+    }
+    else if (tag_flag == 2 && (pc = tag_spec(current_node->base_name)) != NULL)
+    {
     sprintf(c_dummy, "tag = %s", pc);
     put_line(out,c_dummy);
-  }
+    }
+  */
+
+  sprintf(c_dummy, "tag = %s", current_node->p_elem->name);
+  put_line(out, c_dummy);
+
   if (current_node->length > zero)
   {
     if (strstr(current_node->base_name, "bend") == NULL)
@@ -502,6 +514,21 @@ void write_elstart(FILE* out)
     else sprintf(c_dummy, "arc = %.12g", current_node->length);
     put_line(out,c_dummy);
   }
+
+  /*
+    sprintf(c_dummy, "at = %.12g", current_node->position);
+    nm printf("%s l = %.12g at = %.12g, prev at= %.12g\n", current_node->name, current_node->length,
+    nm current_node->position, global_tmp_at);
+    if(current_node->position < global_tmp_at) {
+    printf("error: %s position (%.12g) < prev position (%.12g)\n",  current_node->name,
+    current_node->position, global_tmp_at);
+    sprintf(c_dummy, "at = %.12g", global_tmp_at);
+    }
+    else {
+    sprintf(c_dummy, "at = %.12g", current_node->position);
+    global_tmp_at = current_node->position;
+    }
+  */
   sprintf(c_dummy, "at = %.12g", current_node->position);
   put_line(out,c_dummy);
 }
@@ -584,11 +611,25 @@ void write_body(FILE* out)
   struct command* eldef;
   char npart[] = "npart";
   eldef = current_node->p_elem->def;
+
+  int    angle_flag = 0;
+  double angle      = node_value("angle");
+
+  /* printf(" %s, , angle = %e \n", current_node->name,  angle); */
   for (i = 0; i < eldef->par_names->curr; i++)
   {
+    /* nm printf("  i = %d, %s, value = %e\n", i, eldef->par_names->names[i], node_value(eldef->par_names->names[i])); */
+    double v = node_value(eldef->par_names->names[i]);
+    if(v == 0.0 && strcmp(eldef->par_names->names[i], "knl") != 0) continue;
+    /* nm printf("  i = %d, %s, angle = %e\n", i, eldef->par_names->names[i], angle); */
     if (strcmp(eldef->par_names->names[i], "l") != 0
         && (pos = name_list_pos(eldef->par_names->names[i], sxf_list)) > -1)
     {
+      /*
+      nm printf("kl_trans\n");
+      nm: ad hoc solution to avoid the SXF conceptual bug
+      if((nval = angle_kl_trans(angle, sxf_list->names[pos], out_name, val, &flag, &angle_flag)) > 0)
+      */
       if ((nval = kl_trans(sxf_list->names[pos], out_name, val, &flag)) > 0)
       {
         if (set++ == 0)
@@ -599,6 +640,8 @@ void write_body(FILE* out)
       }
     }
   }
+
+
   if (strcmp(current_node->base_name, "beambeam") == 0)
   {
     if (set++ == 0)
@@ -619,6 +662,15 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
   int j, length, rep;
   double corr;
   *flag = 0;
+
+  if (strstr(name, "angle") != NULL){
+    *flag = 1;
+    strcpy(out_name, "kl");
+    val[0] = node_value(name);
+    return 1;
+  }
+
+
   if (strstr(name, "kick") != NULL)
   {
     if (strchr(name, 'v') == NULL)
