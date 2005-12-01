@@ -529,15 +529,15 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
     thin_elem_parent = create_thin_multipole(thick_elem->parent,slice_no); /* slice also the parent */
   }
 
-  /* default should be to use minimizeparents */
-  minimizefl=get_option("minimizeparents") && !at_param;
+  minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; // do not slice this one
   }
-  if(slice_no > slices && thick_elem!=thick_elem->parent ) /* check, but nor for base classes */
-  { printf("    *** warning in create_thin_multipole. Inconsistent child/parent slicing for %s  slice_no=%d exceeds slices=%d\n",
+  if(slice_no > slices && thick_elem!=thick_elem->parent ) /* check, but not for base classes */
+  { printf("    *** warning in create_thin_multipole. Inconsistent child/parent slicing for %s  slice_no=%d exceeds slices=%d. Use 1 for parent.\n",
       thick_elem->name,slice_no,slices);
+	slice_no=1;
   }
 
   /* check to see if we've already done this one */
@@ -640,7 +640,7 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   ks_param      = return_param_recurse("ks",thick_elem);
   at_param      = return_param("at",thick_elem);
 
-  minimizefl=get_option("minimizeparents") && !at_param;
+  minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; // do not slice this one
@@ -826,8 +826,7 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
 /* creates the thin non-magnetic element - recursively */
 struct element* create_thin_obj(struct element* thick_elem, int slice_no)
 {
-  struct element* thin_elem_parent = NULL;
-  struct element* thin_elem = NULL;
+  struct element *thin_elem_parent = NULL , *thin_elem = NULL;
   struct command* cmd = NULL;
   struct command_parameter*  length_param= NULL;
   int length_i = -1,lrad_i = -1,slices=1;
@@ -1079,7 +1078,7 @@ void makethin(struct in_cmd* cmd)
   /* first check makethin parameters which influence the selection */
 
   pos = name_list_pos("minimizeparents", nl);
-  k = true; /* by default set minimizeparents to true */
+  /* k = true; */  /* Use this to set minimizeparents to true by default. */
   if( pos > -1 && nl->inform[pos])
   {
     k=pl->parameters[pos]->double_value;
@@ -1122,7 +1121,8 @@ void makethin(struct in_cmd* cmd)
     else warning("unknown sequence ignored:", name);
   }
   else warning("makethin without sequence:", "ignored");
-/*    fprintf(prt_file, "makethin: finished in %f seconds.\n",difftime(time(NULL),start)); */
+
+  /* fprintf(prt_file, "makethin: finished in %f seconds.\n",difftime(time(NULL),start)); */
   thin_select_list = NULL;
 }
 
