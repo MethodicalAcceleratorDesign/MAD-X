@@ -2753,12 +2753,12 @@ int str_from_table(char* table, char* name, int* row, char* val)
   struct table* t;
 
   strcpy(val,"No-Name");
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return -1;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
    strncpy(val,t->s_cols[pos][*row-1],NAME_L);
   while (strlen(val)<NAME_L) val[strlen(val)]=' ';
@@ -2780,8 +2780,8 @@ int str_from_tablet(struct table *t, char* name, int* row, char* val)
   int pos;
 
   strcpy(val,"No-Name");
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
    strncpy(val,t->s_cols[pos][*row-1],NAME_L);
   while (strlen(val)<NAME_L) val[strlen(val)]=' ';
