@@ -275,8 +275,8 @@ struct expression* compound_expr(struct expression* e1, double v1,
       toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
     }
     join(toks, 7);
-    pre_split(c_join, l_work, 0);
-    n = mysplit(l_work, tmp_l_array);
+    pre_split(c_join->c, l_wrk, 0);
+    n = mysplit(l_wrk->c, tmp_l_array);
     expr = make_expression(n, toks);
   }
   return expr;
@@ -336,7 +336,7 @@ void add_cmd_parameter_clone(struct command* cmd,struct command_parameter *param
   {
     cmd->par->parameters[cmd->par->curr] = clone_command_parameter(param); /* set current to identical copy (clone) of param */
     add_to_name_list(par_name,inf,cmd->par_names);
-	cmd->par->curr++;
+      cmd->par->curr++;
   }
 }
 
@@ -511,7 +511,7 @@ void add_lrad(struct command* cmd,struct command_parameter *length_param,int sli
 /* creates the thin magnetic element - recursively for classes from which dericed (parent) */
 struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
 {
-  struct command_parameter *angle_param, *length_param, *kparam[4], *ksparam[4], *kn_param, *ks_param, *at_param;
+  struct command_parameter *angle_param, *length_param, *kparam[4], *ksparam[4], *kn_param, *ks_param, *at_param, *fint_param;
   struct element *thin_elem_parent, *thin_elem;
   struct command* cmd;
   char *thin_name;
@@ -537,12 +537,19 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   if(slice_no > slices && thick_elem!=thick_elem->parent ) /* check, but not for base classes */
   { printf("    *** warning in create_thin_multipole. Inconsistent child/parent slicing for %s  slice_no=%d exceeds slices=%d. Use 1 for parent.\n",
       thick_elem->name,slice_no,slices);
-	slice_no=1;
+      slice_no=1;
   }
 
   /* check to see if we've already done this one */
   thin_elem = get_thin(thick_elem,slice_no);
   if (thin_elem) return thin_elem;
+
+  /* issue a warning in case of element parameter combinations not suitable for slicing */
+  fint_param   = return_param_recurse("fint",thick_elem);
+  if(fint_param)
+  { printf("    *** warning %s is a thick %s with fringe fields. These will be lost in the translation to a multipole. Use dipedge.\n",
+      thick_elem->name,thick_elem->parent->name);
+  }
 
   length_param = return_param_recurse("l",thick_elem);
   angle_param  = return_param_recurse("angle",thick_elem);
@@ -756,7 +763,7 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
     thin_style = collim_style;
   }
   else if (strstr(node->base_name,"solenoid"))
-  { 
+  {
     elem = create_thin_solenoid(node->p_elem,1);  /* create the first thin solenoid slice */
   }
   else
