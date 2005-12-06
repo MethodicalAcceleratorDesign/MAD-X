@@ -4013,31 +4013,34 @@
       include 'twissl.fi'
       logical fsec,ftrk,fmap
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
-     &el,el0,two
+     &el,el0,zero,two
       double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-      parameter(two=2d0)
+      parameter(zero=0d0,two=2d0)
 
+      if(el.eq.zero) then
+        call tmsol_th(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      else
 !---- centre option
-      if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(ek,ek00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
-        el0=el/two
-        call dcopy(orbit,orbit0,6)
-        call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
-        if(centre_cptk) call twcptk(re,orbit0)
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(ek00,ek,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
+        if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(ek,ek00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
+          el0=el/two
+          call dcopy(orbit,orbit0,6)
+          call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
+          if(centre_cptk) call twcptk(re,orbit0)
+          if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(ek00,ek,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
+        endif
+        call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       endif
-      call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       end
       subroutine tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
-
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -5096,6 +5099,7 @@
       subroutine tmdpdg(ftrk,orbit,fmap,rw)
       implicit none
 !----------------------------------------------------------------------*
+! dipedge element                                                      *
 ! Purpose: computes the effect of the dipole edge                      *
 ! Input:                                                               *
 !   ftrk         (logical) if true, track orbit.                       *
@@ -5129,4 +5133,67 @@
         orbit(4) = orbit(4) + rw(4,3) * orbit(3)
       endif
       return
+      end
+      subroutine tmsol_th(fsec,ftrk,orbit,fmap,el,ek,re,te)
+! Stolen from trrun.F courtesy Alex Koschick
+      implicit none
+!----------------------------------------------------------------------*
+!  Purpose:                                                            *
+!     TRANSPORT map for solenoid element, no centre option.            *
+!  Input:                                                              *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!  Input/output:                                                       *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
+!----------------------------------------------------------------------*
+      logical fsec,ftrk,fmap
+      double precision orbit(6),el,ek(6),re(6,6),te(6,6,6),deltap,      &
+     &get_value,node_value,sk,skl,sks,sksl,cosTh,sinTh,Q0,Q,zero,one,two
+      parameter(zero=0d0,one=1d0,two=2d0)
+
+      fmap=.true.
+
+!
+!---- Initialize.
+      deltap  = get_value('probe ','deltap ')
+!
+!---- Get solenoid parameters
+      sksl    = node_value('ksl ')
+      sks     = node_value('ks ')
+
+!---- Set up strengths
+      sk    = sks / two
+      skl   = sksl / two
+      Q0 = skl/(one+deltap)
+      cosTh = cos(Q0)
+      sinTh = sin(Q0)
+      Q = -sk*Q0
+
+!---- First-order terms.
+      re(1,1) = cosTh
+      re(2,2) = re(1,1)
+      re(3,3) = re(1,1)
+      re(4,4) = re(1,1)
+      re(1,3) = sinTh
+      re(2,4) = re(1,3)
+      re(3,1) = -re(1,3)
+      re(4,2) = -re(1,3)
+      re(2,1) = Q*re(1,1)
+      re(4,3) = Q*re(1,1)
+      re(4,1) = -Q*re(1,3)
+      re(2,3) = Q*re(1,3)
+      re(1,2) = zero
+      re(1,4) = zero
+      re(3,2) = zero
+      re(3,4) = zero
+
+!---- Track orbit.
+      if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
       end
