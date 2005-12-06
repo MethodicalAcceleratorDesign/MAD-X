@@ -7,7 +7,7 @@ MODULE ptc_results
   character(len = 2) :: ptc_var
   type(real_8) y(6)
   type(normalform) n
-  type (pbresonance) pbr
+  type (pbresonance) pbrg,pbrh
 END MODULE ptc_results
 MODULE madx_ptc_module
   USE madx_keywords
@@ -127,6 +127,7 @@ CONTAINS
     integer, parameter :: imul=20,nt0=20000,length=16
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
     real(dp) f_errors(0:50),aperture(maxnaper),normal(0:maxmul)
+    real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor
@@ -530,6 +531,16 @@ CONTAINS
        key%list%psi=node_value("psi ")
        key%list%harmon=one
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
+    case(35)
+       call dzero(patch_ang,3)
+       call dzero(patch_trans,3)
+       call get_node_vector('patch_ang ',3,patch_ang)
+       call get_node_vector('patch_trans ',3,patch_trans)
+!       do i=1,3
+!          key%list%ang(i)=patch_ang(i)
+!          key%list%trans(i)=patch_ang(i)
+!          key%patch%patch=2
+!       enddo
     case default
        print*,"Element: ",name," not implemented"
        stop
@@ -733,7 +744,7 @@ CONTAINS
        mux  = get_value('ptc_twiss ','mux ')
        muy  = get_value('ptc_twiss ','muy ')
 
-       x(i)=zero
+       x(:)=zero
        x(1)=get_value('ptc_twiss ','x ')
        x(2)=get_value('ptc_twiss ','px ')
        x(3)=get_value('ptc_twiss ','y ')
@@ -960,6 +971,7 @@ CONTAINS
   FUNCTION double_from_ptc_normal(name_var,row)
     USE ptc_results
     implicit none
+    logical name_l
     integer row
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
     integer idx
@@ -968,9 +980,10 @@ CONTAINS
     character(len = 4)  name_var
     character(len = 2)  name_var1
     character(len = 3)  name_var2
-    logical :: name_l = .false.
-
+    
+    name_l = .false.
     double_from_ptc_normal = 0.0
+
     name_var1 = name_var
     SELECT CASE (name_var1)
     CASE ("dx")
@@ -1087,7 +1100,7 @@ CONTAINS
           ind(4) = int(d_val)
           ind(5) = 0
           ind(6) = 0
-          d_val = pbr%cos%h.sub.ind
+          d_val = pbrh%cos%h.sub.ind
           double_from_ptc_normal = d_val
           RETURN
        CASE ('hams')
@@ -1101,7 +1114,7 @@ CONTAINS
           ind(4) = int(d_val)
           ind(5) = 0
           ind(6) = 0
-          d_val = pbr%sin%h.sub.ind
+          d_val = pbrh%sin%h.sub.ind
           double_from_ptc_normal = d_val
           RETURN
        CASE ('hama')
@@ -1115,15 +1128,61 @@ CONTAINS
           ind(4) = int(d_val)
           ind(5) = 0
           ind(6) = 0
-          d_val1 = pbr%cos%h.sub.ind
-          d_val2 = pbr%sin%h.sub.ind
+          d_val1 = pbrh%cos%h.sub.ind
+          d_val2 = pbrh%sin%h.sub.ind
           double_from_ptc_normal = SQRT(d_val1**2 + d_val2**2)
           RETURN
        CASE ('haml')
           double_from_ptc_normal = 0.0D0
           RETURN
+       CASE ('gnfc')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(1) = int(d_val)
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          ind(2) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(3) = int(d_val)
+          k = double_from_table("normal_results ", "order4 ", row, d_val)
+          ind(4) = int(d_val)
+          ind(5) = 0
+          ind(6) = 0
+          d_val = pbrg%cos%h.sub.ind
+          double_from_ptc_normal = d_val
+          RETURN
+       CASE ('gnfs')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(1) = int(d_val)
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          ind(2) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(3) = int(d_val)
+          k = double_from_table("normal_results ", "order4 ", row, d_val)
+          ind(4) = int(d_val)
+          ind(5) = 0
+          ind(6) = 0
+          d_val = pbrg%sin%h.sub.ind
+          double_from_ptc_normal = d_val
+          RETURN
+       CASE ('gnfa')
+          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          ind(1) = int(d_val)
+          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          ind(2) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, d_val)
+          ind(3) = int(d_val)
+          k = double_from_table("normal_results ", "order4 ", row, d_val)
+          ind(4) = int(d_val)
+          ind(5) = 0
+          ind(6) = 0
+          d_val1 = pbrg%cos%h.sub.ind
+          d_val2 = pbrg%sin%h.sub.ind
+          double_from_ptc_normal = SQRT(d_val1**2 + d_val2**2)
+          RETURN
+       CASE ('gnfu')
+          double_from_ptc_normal = 0.0D0
+          RETURN
        CASE DEFAULT
-          print *,"Error in the table normal_results"
+          print *,"--Error in the table normal_results-- Unknown input: ",name_var
        END SELECT
     endif
     double_from_ptc_normal = d_val/(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
@@ -1152,6 +1211,7 @@ CONTAINS
 
     print *,"Variable name  Order 1  order 2  order 3        Value      "
     do row = 1 , select_ptc_idx()
+       name_var=" "
        k = string_from_table("normal_results ", "name ", row, name_var)
        k = double_from_table("normal_results ", "order1 ", row, d_val)
        ord(1) = int(d_val)
@@ -1172,7 +1232,7 @@ CONTAINS
     integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
     integer i, ii, iii, j1, jj, ja(6), k, l, starti
     integer,parameter :: i_map_coor=10
-    integer n_rows, row, n_haml, nres, mynres, n1, n2,map_term
+    integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2,map_term
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
          string_from_table, double_from_table, result_from_normal
     real(dp) x(6),deltap0,deltap,map_coor(i_map_coor)
@@ -1285,16 +1345,20 @@ CONTAINS
 
        n_rows = select_ptc_idx()
        n_haml = 0
+       n_gnfu = 0
        if (n_rows > 0) then
           do row = 1,n_rows
+             name_var=" "
              k = string_from_table("normal_results ", "name ", row, name_var)
+             if (name_var .eq. 'gnfu') n_gnfu = n_gnfu + 1
              if (name_var .eq. 'haml') then
                 n_haml = n_haml + 1
                 row_haml(n_haml) = row
              endif
           enddo
+          if (n_gnfu > 0) call alloc(pbrg)
           if (n_haml > 0) then
-             call alloc(pbr)
+             call alloc(pbrh)
              do j1 =1,n_haml
                 row = row_haml(j1)
                 k = double_from_table("normal_results ", "value ", row, d_val)
@@ -1352,7 +1416,8 @@ CONTAINS
        !------------------------------------------------------------------------
 
        n=y
-       if (n_haml > 0) pbr = n%normal%pb
+       if (n_gnfu > 0) pbrg = n%a%pb
+       if (n_haml > 0) pbrh = n%normal%pb
        write(19,'(/a/)') 'Dispersion, First and Higher Orders'
        call daprint(n%A1,19)
 
@@ -1369,9 +1434,11 @@ CONTAINS
        endif
        if (n_rows > 0) then
           do row = 1,n_rows
+             name_var=" "
              k = string_from_table("normal_results ", "name ", row, name_var)
              val_ptc = double_from_ptc_normal(name_var,row)
-             if (name_var .ne. 'haml') call double_to_table_row("normal_results ", "value ", row, val_ptc)
+             if (name_var .ne. 'haml'.and.name_var .ne. 'gnfu')    &
+                  call double_to_table_row("normal_results ", "value ", row, val_ptc)
           enddo
        endif
 
@@ -1383,8 +1450,9 @@ CONTAINS
 
        call daprint(n%dhdj,19)
 
-       !       call daprint(pbr,19)
-       if (n_haml > 0) call kill(pbr)
+       !       call daprint(pbrh,19)
+       if (n_gnfu > 0) call kill(pbrg)
+       if (n_haml > 0) call kill(pbrh)
        call kill(n)
     endif
     CALL kill(y)
@@ -1739,7 +1807,6 @@ CONTAINS
           current=>r%start
           DO J=1,R%N
              IF(current%MAG%NAME==STR.and.current%MAG%P%NMUL==iorder) THEN
-                print*,current%MAG%P%NMUL,current%MAG%KIND
                 TOT=TOT+1
                 FAM(I,TOT)=J
              ENDIF

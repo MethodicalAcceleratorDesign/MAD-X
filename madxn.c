@@ -149,8 +149,8 @@ int advance_to_pos(char* table, int* t_pos)
 {
   struct table* t;
   int pos, cnt = 0, ret = 0;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
   {
     ret = 1;
     t = table_register->tables[pos];
@@ -977,87 +977,87 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   /* beam properties */
   if (aper_t->header == NULL)  aper_t->header = new_char_p_array(h_length);
   strcpy(tmp, current_sequ->name);
-  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""),i,stoupper(tmp));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),i,stoupper(tmp));
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "mass");
-  sprintf(c_dummy, v_format("@ MASS             %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "energy");
-  sprintf(c_dummy, v_format("@ ENERGY           %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "pc");
-  sprintf(c_dummy, v_format("@ PC               %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "gamma");
-  sprintf(c_dummy, v_format("@ GAMMA            %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
   /* aperture command properties */
   dtmp = command_par_value("exn", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ EXN              %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ EXN              %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("eyn", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ EYN              %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ EYN              %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dqf", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ DQF              %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DQF              %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("betaqfx", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ BETAQFX          %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ BETAQFX          %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dparx", this_cmd->clone);
   dtmp2 = command_par_value("dpary", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ P. DISP. X - Y   %%le       %g - %g"), dtmp,dtmp2);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ P. DISP. X - Y   %%le       %g - %g"), dtmp,dtmp2);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dp", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ DP/BUCKET SIZE   %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DP/BUCKET SIZE   %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("cor", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ CO RADIUS        %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ CO RADIUS        %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("bbeat", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ BETA BEATING     %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ BETA BEATING     %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("nco", this_cmd->clone);
-  sprintf(c_dummy, v_format("@ # OF ANGLES      %%d   %F"), dtmp*4);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ # OF ANGLES      %%d   %F"), dtmp*4);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
   /* if a filename with halo coordinates is given, need not show halo */
   stmp = command_par_string("halofile", this_cmd->clone);
   if (stmp)
   {
-    sprintf(c_dummy, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
   else
   {
     i = command_par_vector("halo", this_cmd->clone, vtmp);
-    sprintf(c_dummy, v_format("@ HALO SHAPE       %%le %g - %g - %g - %g"),
+    sprintf(c_dum->c, v_format("@ HALO SHAPE       %%le %g - %g - %g - %g"),
             vtmp[0],vtmp[1],vtmp[2],vtmp[3]);
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
   /* show filename with pipe coordinates if given */
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp)
   {
-    sprintf(c_dummy, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
-  sprintf(c_dummy, v_format(" "));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format(" "));
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
-  sprintf(c_dummy, v_format("@ APERTURE LIMIT: %s, n1: %g, apertype: %s, aperture: %g - %g - %g - %g, tolerance: %g  - %g - %g"),
+  sprintf(c_dum->c, v_format("@ APERTURE LIMIT: %s, n1: %g, apertype: %s, aperture: %g - %g - %g - %g, tolerance: %g  - %g - %g"),
           lim->name,lim->n1,lim->apertype,
           lim->aperture[0],lim->aperture[1],lim->aperture[2],
           lim->aperture[3],lim->aper_tol[0],lim->aper_tol[1],lim->aper_tol[2]);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
-  sprintf(c_dummy, v_format(" "));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format(" "));
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 }
 
 void aper_intersect(double a1, double b1, double a2, double b2, double x1, double y1, double x2, double y2,
@@ -1367,8 +1367,8 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
 {
   int pos;
   struct table* t;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
@@ -1401,12 +1401,12 @@ int char_from_table(char* table, char* name, int* row, char* val)
   struct table* t;
 
   strcpy(val,"No-Name");
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return -1;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
   strncpy(val,t->node_nm->p[*row-1],NAME_L);
   while (strlen(val)<=NAME_L) val[strlen(val)]=' ';
@@ -1459,16 +1459,16 @@ void comment_to_table(char* table, char* comment, int* length)
 {
   int pos;
   struct table* t;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
-  strncpy(c_dummy, comment, *length); c_dummy[*length] = '\0';
+  strncpy(c_dum->c, comment, *length); c_dum->c[*length] = '\0';
   if (t->l_head[t->curr] == NULL)
     t->l_head[t->curr] = new_char_p_array(2);
   else if (t->l_head[t->curr]->curr == t->l_head[t->curr]->max)
     grow_char_p_array(t->l_head[t->curr]);
-  t->l_head[t->curr]->p[t->l_head[t->curr]->curr++] = tmpbuff(c_dummy);
+  t->l_head[t->curr]->p[t->l_head[t->curr]->curr++] = tmpbuff(c_dum->c);
 }
 
 void comm_para(char* name, int* n_int, int* n_double, int* n_string,
@@ -1496,10 +1496,10 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
   struct command_parameter* cp;
   struct double_array* arr = NULL;
   *n_int = *n_double = *n_string = 0;
-  mycpy(c_dummy, name);
+  mycpy(c_dum->c, name);
   if (this_cmd != NULL && this_cmd->clone != NULL)
   {
-    if ((pos = name_list_pos(c_dummy, this_cmd->clone->par_names)) > -1)
+    if ((pos = name_list_pos(c_dum->c, this_cmd->clone->par_names)) > -1)
     {
       cp = this_cmd->clone->par->parameters[pos];
       switch (cp->type)
@@ -1618,12 +1618,12 @@ void double_to_table(char* table, char* name, double* val)
 {
   int pos;
   struct table* t;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) >= 0
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
       && t->columns->inform[pos] < 3) t->d_cols[pos][t->curr] = *val;
 }
 
@@ -1634,12 +1634,12 @@ void double_to_table_row(char* table, char* name, int* row, double* val)
   int pos;
   struct table* t;
 
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) >= 0
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
       && t->columns->inform[pos] < 3) t->d_cols[pos][*row-1] = *val;
 }
 
@@ -1656,12 +1656,12 @@ int double_from_table(char* table, char* name, int* row, double* val)
   struct table* t;
 
   *val = zero;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return -1;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
   *val = t->d_cols[pos][*row-1];
   return 0;
@@ -1681,12 +1681,12 @@ int string_from_table(char* table, char* name, int* row, char* string)
   int pos,l;
   struct table* t;
 
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return -1;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) < 0) return -2;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
   l = strlen(t->s_cols[pos][*row-1]);
   mycpy(string, t->s_cols[pos][*row-1]);
@@ -2381,7 +2381,7 @@ void select_ptc_normal(struct in_cmd* cmd)
   int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
   char names[PTC_NAMES_L][5]=
-    {"dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml"};
+    {"dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu"};
   int min_req_order;
   double order[4],n1,n2,n3,n4;
 
@@ -2423,7 +2423,7 @@ void select_ptc_normal(struct in_cmd* cmd)
           order[i] = (double)atoi(order_list);
         }
 
-        if (j == 10)
+        if (j == 10 || j == 11)
         {
           min_req_order = order[0]+order[1]+order[2];
           mynres = 0;
@@ -2437,40 +2437,79 @@ void select_ptc_normal(struct in_cmd* cmd)
           res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
           if (mynres > 0)
           {
-            for (jj = 0; jj < mynres; jj++)
+            if (j == 10)
             {
-              n1 = (double)indexa[0][jj];
-              n2 = (double)indexa[1][jj];
-              n3 = (double)indexa[2][jj];
-              n4 = (double)indexa[3][jj];
-              string_to_table("normal_results", "name", "hamc");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              for (jj = 0; jj < mynres; jj++)
+              {
+                n1 = (double)indexa[0][jj];
+                n2 = (double)indexa[1][jj];
+                n3 = (double)indexa[2][jj];
+                n4 = (double)indexa[3][jj];
+                string_to_table("normal_results", "name", "hamc");
+                double_to_table("normal_results", "order1", &n1);
+                double_to_table("normal_results", "order2", &n2);
+                double_to_table("normal_results", "order3", &n3);
+                double_to_table("normal_results", "order4", &n4);
+                augment_count("normal_results");
+                string_to_table("normal_results", "name", "hams");
+                double_to_table("normal_results", "order1", &n1);
+                double_to_table("normal_results", "order2", &n2);
+                double_to_table("normal_results", "order3", &n3);
+                double_to_table("normal_results", "order4", &n4);
+                augment_count("normal_results");
+                string_to_table("normal_results", "name", "hama");
+                double_to_table("normal_results", "order1", &n1);
+                double_to_table("normal_results", "order2", &n2);
+                double_to_table("normal_results", "order3", &n3);
+                double_to_table("normal_results", "order4", &n4);
+                augment_count("normal_results");
+              }
+              string_to_table("normal_results", "name", "haml");
+              double_to_table("normal_results", "order1", &order[0]);
+              double_to_table("normal_results", "order2", &order[1]);
+              double_to_table("normal_results", "order3", &order[2]);
+              double_to_table("normal_results", "order4", &order[3]);
+              n1 = (double)mynres;
+              double_to_table("normal_results", "value", &n1);
               augment_count("normal_results");
-              string_to_table("normal_results", "name", "hams");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
-              augment_count("normal_results");
-              string_to_table("normal_results", "name", "hama");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+           }
+            if (j == 11)
+            {
+              for (jj = 0; jj < mynres; jj++)
+              {
+                n1 = (double)indexa[0][jj];
+                n2 = (double)indexa[1][jj];
+                n3 = (double)indexa[2][jj];
+                n4 = (double)indexa[3][jj];
+                string_to_table("normal_results", "name", "gnfc");
+                double_to_table("normal_results", "order1", &n1);
+                double_to_table("normal_results", "order2", &n2);
+                double_to_table("normal_results", "order3", &n3);
+                double_to_table("normal_results", "order4", &n4);
+                augment_count("normal_results");
+                string_to_table("normal_results", "name", "gnfs");
+                double_to_table("normal_results", "order1", &n1);
+                double_to_table("normal_results", "order2", &n2);
+                double_to_table("normal_results", "order3", &n3);
+                double_to_table("normal_results", "order4", &n4);
+                augment_count("normal_results");
+                string_to_table("normal_results", "name", "gnfa");
+                double_to_table("normal_results", "order1", &n1);
+                double_to_table("normal_results", "order2", &n2);
+                double_to_table("normal_results", "order3", &n3);
+                double_to_table("normal_results", "order4", &n4);
+                augment_count("normal_results");
+              }
+              string_to_table("normal_results", "name", "gnfu");
+              double_to_table("normal_results", "order1", &order[0]);
+              double_to_table("normal_results", "order2", &order[1]);
+              double_to_table("normal_results", "order3", &order[2]);
+              double_to_table("normal_results", "order4", &order[3]);
+              n1 = (double)mynres;
+              double_to_table("normal_results", "value", &n1);
               augment_count("normal_results");
             }
           }
-          string_to_table("normal_results", "name", "haml");
-          double_to_table("normal_results", "order1", &order[0]);
-          double_to_table("normal_results", "order2", &order[1]);
-          double_to_table("normal_results", "order3", &order[2]);
-          double_to_table("normal_results", "order4", &order[3]);
-          n1 = (double)mynres;
-          double_to_table("normal_results", "value", &n1);
-          augment_count("normal_results");
         }
         else
         {
@@ -2775,151 +2814,151 @@ void fill_twiss_header(struct table* t)
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
   strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""),
+  sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""),
+  sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),
           i, stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "mass");
-  sprintf(c_dummy, v_format("@ MASS             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "charge");
-  sprintf(c_dummy, v_format("@ CHARGE           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ CHARGE           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "energy");
-  sprintf(c_dummy, v_format("@ ENERGY           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "pc");
-  sprintf(c_dummy, v_format("@ PC               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "gamma");
-  sprintf(c_dummy, v_format("@ GAMMA            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "kbunch");
-  sprintf(c_dummy, v_format("@ KBUNCH           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ KBUNCH           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dummy, v_format("@ BCURRENT         %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ BCURRENT         %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "sige");
-  sprintf(c_dummy, v_format("@ SIGE             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SIGE             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "sigt");
-  sprintf(c_dummy, v_format("@ SIGT             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SIGT             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "npart");
-  sprintf(c_dummy, v_format("@ NPART            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ NPART            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "ex");
-  sprintf(c_dummy, v_format("@ EX               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ EX               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "ey");
-  sprintf(c_dummy, v_format("@ EY               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ EY               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "et");
-  sprintf(c_dummy, v_format("@ ET               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ET               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   if ((pos = name_list_pos("summ", table_register->names)) > -1)
   {
     s = table_register->tables[pos];
     pos = name_list_pos("length", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ LENGTH           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("alfa", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ ALFA             %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ ALFA             %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("orbit5", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ ORBIT5           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ ORBIT5           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("gammatr", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ GAMMATR          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ GAMMATR          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("q1", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ Q1               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("q2", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ Q2               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("dq1", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DQ1              %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("dq2", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DQ2              %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("dxmax", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DXMAX            %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DXMAX            %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("dymax", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DYMAX            %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DYMAX            %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("xcomax", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ XCOMAX           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("ycomax", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ YCOMAX           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("betxmax", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ BETXMAX          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ BETXMAX          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("betymax", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ BETYMAX          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ BETYMAX          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("xcorms", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ XCORMS           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("ycorms", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ YCORMS           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("dxrms", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DXRMS            %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DXRMS            %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("dyrms", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DYRMS            %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DYRMS            %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("deltap", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ DELTAP           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("synch_1", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ SYNCH_1          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ SYNCH_1          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("synch_2", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ SYNCH_2          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ SYNCH_2          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("synch_3", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ SYNCH_3          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ SYNCH_3          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("synch_4", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ SYNCH_4          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ SYNCH_4          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     pos = name_list_pos("synch_5", s->columns);
     dtmp = s->d_cols[pos][0];
-    sprintf(c_dummy, v_format("@ SYNCH_5          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ SYNCH_5          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   }
 }
 
@@ -2935,154 +2974,154 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
   strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dummy, v_format("@ SEQUENCE         %%%02ds \"%s\""),
+  sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dummy, v_format("@ PARTICLE         %%%02ds \"%s\""),
+  sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),
           i, stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "mass");
-  sprintf(c_dummy, v_format("@ MASS             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "charge");
-  sprintf(c_dummy, v_format("@ CHARGE           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ CHARGE           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "energy");
-  sprintf(c_dummy, v_format("@ ENERGY           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "pc");
-  sprintf(c_dummy, v_format("@ PC               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "gamma");
-  sprintf(c_dummy, v_format("@ GAMMA            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "kbunch");
-  sprintf(c_dummy, v_format("@ KBUNCH           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ KBUNCH           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dummy, v_format("@ BCURRENT         %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ BCURRENT         %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "sige");
-  sprintf(c_dummy, v_format("@ SIGE             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SIGE             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "sigt");
-  sprintf(c_dummy, v_format("@ SIGT             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SIGT             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "npart");
-  sprintf(c_dummy, v_format("@ NPART            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ NPART            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "ex");
-  sprintf(c_dummy, v_format("@ EX               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ EX               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "ey");
-  sprintf(c_dummy, v_format("@ EY               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ EY               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = get_value("beam", "et");
-  sprintf(c_dummy, v_format("@ ET               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ET               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   if ((pos = name_list_pos("summ", table_register->names)) > -1)
   {
 /*
   s = table_register->tables[pos];
   pos = name_list_pos("length", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ LENGTH           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("alfa", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ ALFA             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ALFA             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("orbit5", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ ORBIT5           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ ORBIT5           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("gammatr", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ GAMMATR          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ GAMMATR          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("q1", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ Q1               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("q2", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ Q2               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("dq1", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ DQ1              %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("dq2", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ DQ2              %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("dxmax", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ DXMAX            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DXMAX            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("dymax", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ DYMAX            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DYMAX            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("xcomax", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ XCOMAX           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("ycomax", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ YCOMAX           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("betxmax", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ BETXMAX          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ BETXMAX          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("betymax", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ BETYMAX          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ BETYMAX          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("xcorms", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ XCORMS           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("ycorms", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ YCORMS           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("dxrms", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ DXRMS            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DXRMS            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("dyrms", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ DYRMS            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ DYRMS            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("deltap", s->columns);
   dtmp = s->d_cols[pos][0];
 */
-    sprintf(c_dummy, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 /*
   pos = name_list_pos("synch_1", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ SYNCH_1          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SYNCH_1          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("synch_2", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ SYNCH_2          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SYNCH_2          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("synch_3", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ SYNCH_3          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SYNCH_3          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("synch_4", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ SYNCH_4          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SYNCH_4          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   pos = name_list_pos("synch_5", s->columns);
   dtmp = s->d_cols[pos][0];
-  sprintf(c_dummy, v_format("@ SYNCH_5          %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+  sprintf(c_dum->c, v_format("@ SYNCH_5          %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 */
   }
 }
@@ -3285,8 +3324,8 @@ int get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
   char* c[2];
   char tmp[NAME_L];
   if (sequ == NULL) return 0;
-  strcpy(c_dummy, range); stolower(c_dummy);
-  c[0] = strtok(c_dummy, "/");
+  strcpy(c_dum->c, range); stolower(c_dum->c);
+  c[0] = strtok(c_dum->c, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
   else n = 2;
@@ -3333,8 +3372,8 @@ int get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
   struct node* c_node;
   char tmp[NAME_L];
   if (sequ == NULL) return 0;
-  strcpy(c_dummy, range); stolower(c_dummy);
-  c[0] = strtok(c_dummy, "/");
+  strcpy(c_dum->c, range); stolower(c_dum->c);
+  c[0] = strtok(c_dum->c, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
   else n = 2;
@@ -3380,9 +3419,9 @@ double plot_option(char* name)
 {
   double val = zero;
   int i;
-  mycpy(c_dummy, name);
+  mycpy(c_dum->c, name);
   if (plot_options != NULL
-      && (i = name_list_pos(c_dummy, plot_options->par_names)) > -1)
+      && (i = name_list_pos(c_dum->c, plot_options->par_names)) > -1)
     val = plot_options->par->parameters[i]->double_value;
   return val;
 }
@@ -3395,8 +3434,8 @@ int get_range(char* range, struct sequence* sequ, struct node** nodes)
   char* c[2];
   char tmp[NAME_L];
   if (sequ == NULL) return 0;
-  strcpy(c_dummy, range); stolower(c_dummy);
-  c[0] = strtok(c_dummy, "/");
+  strcpy(c_dum->c, range); stolower(c_dum->c);
+  c[0] = strtok(c_dum->c, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
   else n = 2;
@@ -3442,8 +3481,8 @@ int get_table_range(char* range, struct table* table, int* rows)
   char* c[2];
   char tmp[NAME_L], dumtex[3*NAME_L];;
   rows[0] = rows[1] = 0;
-  mycpy(c_dummy, range); stolower(c_dummy); strcpy(dumtex, c_dummy);
-  c[0] = strtok(c_dummy, "/");
+  mycpy(c_dum->c, range); stolower(c_dum->c); strcpy(dumtex, c_dum->c);
+  c[0] = strtok(c_dum->c, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
   else n = 2;
@@ -3493,9 +3532,9 @@ int get_vector(char* name, char* par, double* vector)
   /* returns double "vector" for "par" of command or store "name";
      length is returned as function value (0 if not found) */
 {
-  mycpy(c_dummy, name);
+  mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (strcmp(c_dummy, "threader") == 0)
+  if (strcmp(c_dum->c, "threader") == 0)
     return command_par_vector(aux_buff->c, threader_par, vector);
   else return 0;
 }
@@ -3779,14 +3818,14 @@ void make_sequ_from_line(char* name)
   if (occ_list == NULL)
     occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
   else occ_list->curr = 0;
-  sprintf(c_dummy, "%s$start", current_sequ->name);
-  el = make_element(c_dummy, "marker", clone, 0);
+  sprintf(c_dum->c, "%s$start", current_sequ->name);
+  el = make_element(c_dum->c, "marker", clone, 0);
   current_node = NULL;
   make_elem_node(el, 1);
   current_sequ->start = current_node;
   current_sequ->length = line_nodes(line_buffer);
-  sprintf(c_dummy, "%s$end", current_sequ->name);
-  el = make_element(c_dummy, "marker", clone, 0);
+  sprintf(c_dum->c, "%s$end", current_sequ->name);
+  el = make_element(c_dum->c, "marker", clone, 0);
   make_elem_node(el, 1);
   current_node->at_value = current_node->position = current_sequ->length;
   current_sequ->end = current_node;
@@ -5612,8 +5651,8 @@ void reset_count(char* table) /* resets table counter to zero */
 {
   int pos;
   struct table* t;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
   t->curr = 0;
@@ -5822,16 +5861,16 @@ void seq_cycle(struct in_cmd* cmd)
   int pos = name_list_pos("start", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
   {
-    sprintf(c_dummy, "%s:1", name);
-    if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
+    sprintf(c_dum->c, "%s:1", name);
+    if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
     {
       node = edit_sequ->nodes->nodes[pos];
-      sprintf(c_dummy, "%s_p_", strip(node->name));
+      sprintf(c_dum->c, "%s_p_", strip(node->name));
       if (strstr(node->previous->name, "_p_") == NULL)
       {
         clone = clone_node(node, 0);
         clone->p_elem = clone_element(node->p_elem);
-        strcpy(clone->p_elem->name, c_dummy);
+        strcpy(clone->p_elem->name, c_dum->c);
         add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
                        element_list, 1);
         link_in_front(clone, node);
@@ -5962,7 +6001,7 @@ void seq_install(struct in_cmd* cmd)
           {
             for (k = 0; k < seqedit_select->curr; k++)
             {
-              my_repl(":", "[", c_node->name, name);
+              myrepl(":", "[", c_node->name, name);
               strcat(name, "]");
               if (strchr(name, '$') == NULL &&
                   pass_select(c_node->name,
@@ -6060,9 +6099,9 @@ void seq_move(struct in_cmd* cmd)
     }
     else
     {
-      strcpy(c_dummy, name);
-      square_to_colon(c_dummy);
-      if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
+      strcpy(c_dum->c, name);
+      square_to_colon(c_dum->c);
+      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
       {
         node = edit_sequ->nodes->nodes[pos];
         if (nl->inform[name_list_pos("by", nl)] == 0)
@@ -6178,9 +6217,9 @@ void seq_remove(struct in_cmd* cmd)
     }
     else
     {
-      strcpy(c_dummy, name);
-      square_to_colon(c_dummy);
-      if ((pose = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
+      strcpy(c_dum->c, name);
+      square_to_colon(c_dum->c);
+      if ((pose = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
       {
         seqedit_remove += remove_one(edit_sequ->nodes->nodes[pose]);
       }
@@ -6261,9 +6300,9 @@ void seq_replace(struct in_cmd* cmd)
         mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
       rep_els = (struct element**)
         mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
-      strcpy(c_dummy, name);
-      square_to_colon(c_dummy);
-      if ((pos = name_list_pos(c_dummy, edit_sequ->nodes->list)) > -1)
+      strcpy(c_dum->c, name);
+      square_to_colon(c_dum->c);
+      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
       {
         node = edit_sequ->nodes->nodes[pos];
         pos = name_list_pos("by", nl);
@@ -6342,18 +6381,18 @@ void set_node_bv(struct sequence* sequ)
 void set_value(char* name, char* par, double* value)
   /* sets parameter value "par" for command or store "name" if present */
 {
-  mycpy(c_dummy, name);
+  mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (strcmp(c_dummy, "beam") == 0)
+  if (strcmp(c_dum->c, "beam") == 0)
     set_command_par_value(aux_buff->c, current_beam, *value);
-  else if (strcmp(c_dummy, "probe") == 0)
+  else if (strcmp(c_dum->c, "probe") == 0)
     set_command_par_value(aux_buff->c, probe_beam, *value);
-  else if (strcmp(c_dummy, "survey") == 0)
+  else if (strcmp(c_dum->c, "survey") == 0)
     set_command_par_value(aux_buff->c, current_survey, *value);
-  else if (strcmp(c_dummy, "twiss") == 0)
+  else if (strcmp(c_dum->c, "twiss") == 0)
     set_command_par_value(aux_buff->c, current_twiss, *value);
   else if (current_command != NULL
-           && strcmp(c_dummy, current_command->name) == 0)
+           && strcmp(c_dum->c, current_command->name) == 0)
     set_command_par_value(aux_buff->c, current_command, *value);
 }
 
@@ -6365,11 +6404,11 @@ double sss_variable(char* name)
   struct variable* var;
   struct element* el;
   struct command* cmd;
-  char *p, *n = c_dummy, *q = comm;
-  mycpy(c_dummy, name);
-  if ((p = strstr(c_dummy, "->")) == NULL) /* variable */
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
   {
-    if ((var = find_variable(c_dummy, variable_list)) != NULL)
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
       val = variable_value(var);
   }
   else /* element or command parameter */
@@ -6400,11 +6439,11 @@ void set_variable(char* name, double* value)
   double val = *value;
   struct element* el;
   struct command* cmd;
-  char *p, *n = c_dummy, *q = comm;
-  mycpy(c_dummy, name);
-  if ((p = strstr(c_dummy, "->")) == NULL) /* variable */
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
   {
-    if ((var = find_variable(c_dummy, variable_list)) != NULL)
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
     {
       if (var->type == 0)
         warning("ignored: attempt to redefine constant:", var->name);
@@ -6417,7 +6456,7 @@ void set_variable(char* name, double* value)
     }
     else
     {
-      var = new_variable(c_dummy, val, 1, 1, NULL, NULL);
+      var = new_variable(c_dum->c, val, 1, 1, NULL, NULL);
       add_to_var_list(var, variable_list, 1);
     }
   }
@@ -6628,8 +6667,8 @@ void set_twiss_deltas(struct command* comm)
   if ((pos = name_list_pos("deltap", nl)) >= 0 && nl->inform[pos]
       && (string = comm->par->parameters[pos]->string) != NULL)
   {
-    pre_split(string, c_dummy, 0);
-    mysplit(c_dummy, tmp_p_array);
+    pre_split(string, c_dum, 0);
+    mysplit(c_dum->c, tmp_p_array);
     while (k < tmp_p_array->curr)
     {
       for (i = k; i < tmp_p_array->curr; i++)
@@ -6653,8 +6692,8 @@ void set_twiss_deltas(struct command* comm)
         {
           if (twiss_deltas->curr == twiss_deltas->max)
           {
-            sprintf(c_dummy, "%d values", twiss_deltas->max);
-            warning("deltap loop cut at", c_dummy);
+            sprintf(c_dum->c, "%d values", twiss_deltas->max);
+            warning("deltap loop cut at", c_dum->c);
             break;
           }
           twiss_deltas->a[twiss_deltas->curr]
@@ -6953,18 +6992,18 @@ void string_to_table(char* table, char* name, char* string)
   int pos;
   struct table* t;
 
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
-  mycpy(c_dummy, name);
-  if ((pos = name_list_pos(c_dummy, t->columns)) >= 0
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
       && t->columns->inform[pos] == 3)
   {
-    mycpy(c_dummy, string);
-    if (strcmp(c_dummy, "name") == 0)
+    mycpy(c_dum->c, string);
+    if (strcmp(c_dum->c, "name") == 0)
       t->s_cols[pos][t->curr] = tmpbuff(current_node->name);
-    else t->s_cols[pos][t->curr] = tmpbuff(c_dummy);
+    else t->s_cols[pos][t->curr] = tmpbuff(c_dum->c);
   }
 }
 
@@ -6973,8 +7012,8 @@ int table_length(char* table)
 {
   int pos;
   int length = 0;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     length = table_register->tables[pos]->curr;
   return length;
 }
@@ -6984,8 +7023,8 @@ int table_org(char* table)
 {
   int pos;
   int org = 1;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     org = table_register->tables[pos]->origin;
   return org;
 }
@@ -6998,8 +7037,8 @@ void table_range(char* table, char* range, int* rows)
   struct table* t;
 
   rows[0] = rows[1] = 0;
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
   {
     t = table_register->tables[pos];
     get_table_range(range, t, rows);
@@ -7228,34 +7267,34 @@ void track_pteigen(double* eigen)
   {
     t = table_register->tables[pos];
     if (t->header == NULL)  t->header = new_char_p_array(45);
-    sprintf(c_dummy, v_format("@ XC               %%le  %F"), orbit0[0]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-    sprintf(c_dummy, v_format("@ PXC              %%le  %F"), orbit0[1]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-    sprintf(c_dummy, v_format("@ YC               %%le  %F"), orbit0[2]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-    sprintf(c_dummy, v_format("@ PYC              %%le  %F"), orbit0[3]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-    sprintf(c_dummy, v_format("@ TC               %%le  %F"), orbit0[4]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
-    sprintf(c_dummy, v_format("@ PTC              %%le  %F"), orbit0[5]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ XC               %%le  %F"), orbit0[0]);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ PXC              %%le  %F"), orbit0[1]);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ YC               %%le  %F"), orbit0[2]);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ PYC              %%le  %F"), orbit0[3]);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ TC               %%le  %F"), orbit0[4]);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ PTC              %%le  %F"), orbit0[5]);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     tmp = get_value("beam", "ex");
-    sprintf(c_dummy, v_format("@ EX               %%le  %F"), tmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ EX               %%le  %F"), tmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     tmp = get_value("beam", "ey");
-    sprintf(c_dummy, v_format("@ EY               %%le  %F"), tmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ EY               %%le  %F"), tmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     tmp = get_value("beam", "et");
-    sprintf(c_dummy, v_format("@ ET               %%le  %F"), tmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+    sprintf(c_dum->c, v_format("@ ET               %%le  %F"), tmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     for (i = 0; i < 6; i++)
     {
       for (j = 0; j < 6; j++)
       {
-        sprintf(c_dummy, v_format("@ E%d%d              %%le  %F"),
+        sprintf(c_dum->c, v_format("@ E%d%d              %%le  %F"),
                 i+1, j+1, eigen[6*j+i]);
-        t->header->p[t->header->curr++] = tmpbuff(c_dummy);
+        t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
       }
     }
   }
@@ -7416,8 +7455,8 @@ void track_start(struct command* comm)
   }
   track_start_cnt++;
   strcpy(name, "start.");
-  sprintf(c_dummy, "%d", track_start_cnt);
-  strcat(name, c_dummy);
+  sprintf(c_dum->c, "%d", track_start_cnt);
+  strcat(name, c_dum->c);
   add_to_command_list(name,comm,stored_track_start,1);
 }
 
@@ -7463,10 +7502,10 @@ void track_tables_dump()
     if (strstr(table_register->names->names[j], "track.obs")
         || strcmp(table_register->names->names[j], "trackone") == 0)
     {
-      strcpy(l_work, track_filename);
-      strcat(l_work, &table_register->names->names[j][5]);
-      strcat(l_work, track_fileext);
-      out_table("track", table_register->tables[j], l_work);
+      strcpy(l_wrk->c, track_filename);
+      strcat(l_wrk->c, &table_register->names->names[j][5]);
+      strcat(l_wrk->c, track_fileext);
+      out_table("track", table_register->tables[j], l_wrk->c);
     }
   }
 }
@@ -7677,12 +7716,12 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
   int j, pos, c_pos, last = 0;
   struct table* t;
 
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
-  mycpy(c_dummy, col);
-  if ((c_pos = name_list_pos(c_dummy, t->columns)) > -1)
+  mycpy(c_dum->c, col);
+  if ((c_pos = name_list_pos(c_dum->c, t->columns)) > -1)
     last = mymin(c_pos + *nval, t->num_cols);
   for (j = c_pos; j < last; j++)
     if (t->columns->inform[j] < 3) t->d_cols[j][t->curr] = vals[j-c_pos];
