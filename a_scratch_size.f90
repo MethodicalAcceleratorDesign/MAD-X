@@ -210,6 +210,7 @@ module precision_constants
      integer,POINTER :: NPARA     ! PARAMETER LOCATION IN PTC
      integer,POINTER :: npara_fpp     ! PARAMETER LOCATION IN FPP
      logical(lp),pointer :: knob
+     logical(lp),pointer :: OTHER_PROGRAM
      logical(lp), pointer :: setknob
      REAL(dp),POINTER     :: da_absolute_aperture  ! in case one tracks with da.
 
@@ -256,6 +257,14 @@ module precision_constants
      INTEGER, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
      real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
      logical(lp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
+     INTEGER, pointer :: ENGE_N  ! NUMBER OF ENGE FUNCTION   C
+     INTEGER, pointer :: ENGE_2Q1  ! NUMBER OF Z DERIVATIVES
+     INTEGER, pointer :: ENGE_NST  ! NUMBER OF STEPS IN FRINGE BY DEFAULT
+     real(dp), pointer :: C_ENGE_1(:)  ! NUMBER OF STEPS IN FRINGE BY DEFAULT
+     real(dp), pointer :: ENGE_LAM    ! FOR ALL LAM(NMUL) IN ENGE
+     real(dp), pointer :: ENGE_FRAC   ! DE AND DS ARE SET TO ENGE_LAM*ENGE_FRAC
+
+
 
 
 
@@ -599,6 +608,407 @@ CONTAINS
 
 
 end module file_handler
+
+
+module my_own_1D_TPSA
+  USE precision_constants
+  implicit none
+  private input_real_in_my_1D_taylor
+  integer :: n_tpsa_exp = 10
+  INTEGER, PARAMETER :: N_my_1D_taylor=9  ! SHOULD BE AS ENGE_N
+
+  PRIVATE mul,dmulsc,dscmul
+  PRIVATE div,ddivsc,dscdiv,Idivsc
+  PRIVATE add,unaryADD,daddsc,dscadd
+  PRIVATE subs,unarySUB,dsubsc,dscsub,POW
+  PRIVATE  DEXPT,DLOGT,DSQRTT
+  PRIVATE  DCOST,DSINT
+
+  ! Definitions
+  TYPE my_1D_taylor
+     real(dp) a(0:N_my_1D_taylor)
+
+  END TYPE my_1D_taylor
+
+  INTERFACE assignment (=)
+     MODULE PROCEDURE input_my_1D_taylor_in_real   !@1 &nbsp; Taylor=real
+     MODULE PROCEDURE input_real_in_my_1D_taylor  !@1 &nbsp; real=Taylor
+  end  INTERFACE
+
+  INTERFACE OPERATOR (*)
+     MODULE PROCEDURE mul   !@1 &nbsp; Taylor * Taylor
+     MODULE PROCEDURE dmulsc    !@1 &nbsp; Taylor * Real(dp)
+     MODULE PROCEDURE dscmul     !@1 &nbsp;  Real(dp) * Taylor
+  END INTERFACE
+
+  INTERFACE OPERATOR (/)
+     MODULE PROCEDURE div    !@1 &nbsp; Taylor / Taylor
+     MODULE PROCEDURE ddivsc  !@1 &nbsp; Taylor / Real(dp)
+     MODULE PROCEDURE dscdiv  !@1 &nbsp; Real(dp) / Taylor
+     MODULE PROCEDURE Idivsc  !@1 &nbsp; Taylor / Integer  <font color="#FF0000">&nbsp; &#8594; &nbsp; added because useful in example code</font>
+  END INTERFACE
+
+  INTERFACE OPERATOR (+)
+     MODULE PROCEDURE add       !@1 &nbsp; Taylor + Taylor
+     MODULE PROCEDURE unaryADD  !@1 &nbsp;  +Taylor
+     MODULE PROCEDURE daddsc    !@1 &nbsp;  Taylor + Real(dp)
+     MODULE PROCEDURE dscadd    !@1 &nbsp;  Real(dp) + Taylor
+  END INTERFACE
+
+  INTERFACE OPERATOR (-)
+     MODULE PROCEDURE subs      !@1 &nbsp; Taylor - Taylor
+     MODULE PROCEDURE unarySUB     !@1 &nbsp;  -Taylor
+     MODULE PROCEDURE dsubsc   !@1 &nbsp;  Taylor - Real(dp)
+     MODULE PROCEDURE dscsub    !@1 &nbsp;  Real(dp) - Taylor
+  END INTERFACE
+
+
+  INTERFACE OPERATOR (**)
+     MODULE PROCEDURE POW    !@1 &nbsp; Taylor ** Integer
+  END INTERFACE
+
+
+  !@3  <p><i><font size="5">&nbsp;Overloading standard procedures </font></i></p>
+
+  INTERFACE exp
+     MODULE PROCEDURE DEXPT   !@1 &nbsp; exp(Taylor)
+  END INTERFACE
+
+  INTERFACE LOG
+     MODULE PROCEDURE DLOGT   !@1 &nbsp; log(Taylor)
+  END INTERFACE
+
+  INTERFACE SQRT
+     MODULE PROCEDURE DSQRTT    !@1 &nbsp; sqrt(Taylor)
+  END INTERFACE
+
+  INTERFACE COS
+     MODULE PROCEDURE DCOST    !@1 &nbsp; cos(Taylor)
+  END INTERFACE
+
+  INTERFACE SIN
+     MODULE PROCEDURE DSINT   !@1 &nbsp; sin(Taylor)
+  END INTERFACE
+
+
+
+  !@3  <p><i><font size="5">User defined operator</font></i></p>
+
+
+  ! Destructors and Constructors for my_1D_taylor
+
+
+contains
+
+
+
+
+  FUNCTION add( S1, S2 )
+    implicit none
+    TYPE (my_1D_taylor) add
+    TYPE (my_1D_taylor), INTENT (IN) :: S1, S2
+
+    add%a=S1%a + S2%a
+
+  END FUNCTION add
+
+  FUNCTION daddsc( S1, sc )
+    implicit none
+    TYPE (my_1D_taylor) daddsc
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    daddsc=s1
+    daddsc%a(0)= s1%a(0) + sc
+
+  END FUNCTION daddsc
+
+  FUNCTION dscadd( sc ,  S1)
+    implicit none
+    TYPE (my_1D_taylor) dscadd
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    dscadd=s1
+    dscadd%a(0)= s1%a(0) + sc
+
+  END FUNCTION dscadd
+
+  FUNCTION unaryadd( S1 )
+    implicit none
+    TYPE (my_1D_taylor) unaryadd
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+
+    unaryadd=s1
+
+  END FUNCTION unaryadd
+
+
+  FUNCTION subs( S1, S2 )
+    implicit none
+    TYPE (my_1D_taylor) subs
+    TYPE (my_1D_taylor), INTENT (IN) :: S1, S2
+
+    subs%a=S1%a - S2%a
+
+  END FUNCTION subs
+
+  FUNCTION unarySUB( S1 )
+    implicit none
+    TYPE (my_1D_taylor) unarySUB
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+
+    unarySUB%a=-s1%a
+
+  END FUNCTION unarySUB
+
+  FUNCTION dsubsc( S1, sc )
+    implicit none
+    TYPE (my_1D_taylor) dsubsc
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    dsubsc=s1
+    dsubsc%a(0)= s1%a(0) - sc
+
+  END FUNCTION dsubsc
+
+
+  FUNCTION dscsub( sc , S1 )
+    implicit none
+    TYPE (my_1D_taylor) dscsub
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    dscsub=-s1   ! uses unary sub
+    dscsub=sc + dscsub   ! uses add
+
+  END FUNCTION dscsub
+
+
+  FUNCTION mul( S1, S2 )
+    implicit none
+    TYPE (my_1D_taylor) mul
+    TYPE (my_1D_taylor), INTENT (IN) :: S1, S2
+    INTEGER I,J
+    mul%a=0.0_DP
+    DO I=0,N_my_1D_taylor
+       DO J=0,N_my_1D_taylor
+          IF(I+J>N_my_1D_taylor) CYCLE
+          mul%a(I+J)=S1%a(I)*S2%a(J)+ mul%a(I+J)
+       ENDDO
+    ENDDO
+
+  END FUNCTION mul
+
+  FUNCTION dmulsc( S1, sc )
+    implicit none
+    TYPE (my_1D_taylor) dmulsc
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    dmulsc%a= s1%a*sc
+
+  END FUNCTION dmulsc
+
+  FUNCTION dscmul( sc ,S1 )
+    implicit none
+    TYPE (my_1D_taylor) dscmul
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    dscmul%a= s1%a*sc
+
+  END FUNCTION dscmul
+
+  FUNCTION ddivsc( S1, sc )
+    implicit none
+    TYPE (my_1D_taylor) ddivsc
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    ddivsc%a= s1%a/sc
+
+  END FUNCTION ddivsc
+
+  FUNCTION Idivsc( S1, sc )
+    implicit none
+    TYPE (my_1D_taylor) Idivsc
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: sc
+
+    Idivsc%a= s1%a/sc
+
+  END FUNCTION Idivsc
+
+  FUNCTION POW( S1,N )
+    implicit none
+    TYPE (my_1D_taylor) POW , T
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: N
+    INTEGER I
+
+    POW=1.D0
+
+    IF(N<=0) THEN
+       T=1.D0/S1
+       DO I=1,-N
+          POW=POW*T
+       ENDDO
+    ELSE
+       DO I=1,N
+          POW=POW*S1
+       ENDDO
+
+    ENDIF
+
+  END FUNCTION POW
+
+  FUNCTION inv( S1 )
+    implicit none
+    TYPE (my_1D_taylor) inv,t,TT
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    INTEGER I
+    T=S1/S1%A(0)
+    T%A(0)=0.D0
+
+    TT=T
+    inv=1.d0
+
+    DO I=1,N_my_1D_taylor
+       INV=INV-TT
+       TT=-TT*T
+    ENDDO
+
+    INV=INV/S1%A(0)
+
+  END FUNCTION inv
+
+  FUNCTION DIV( S1, S2 )
+    implicit none
+    TYPE (my_1D_taylor) DIV
+    TYPE (my_1D_taylor), INTENT (IN) :: S1, S2
+
+    DIV=INV(S2)
+    DIV=S1*DIV
+  END FUNCTION DIV
+
+  FUNCTION dscdiv(  sc , S1)
+    implicit none
+    TYPE (my_1D_taylor) dscdiv
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: sc
+
+    dscdiv=INV(S1)
+    dscdiv= SC *  dscdiv
+
+  END FUNCTION dscdiv
+
+  !  DEFININING my_1D_taylor=CONSTANT
+  subroutine input_real_in_my_1D_taylor( S2, S1 )
+    implicit none
+    real(dp), INTENT (IN) :: S1
+    TYPE (my_1D_taylor), INTENT (inout) :: S2
+
+    S2%a=0.0_dp
+    S2%a(0)=s1
+
+  END subroutine input_real_in_my_1D_taylor
+
+  subroutine input_my_1D_taylor_in_real( S2, S1 )
+    implicit none
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    real(dp), INTENT (inout) :: S2
+
+    S2=S1%a(0)
+
+  END subroutine input_my_1D_taylor_in_real
+
+  !  DEFININING EXP
+
+  FUNCTION DEXPT( S1 )
+    implicit none
+    TYPE (my_1D_taylor) DEXPT,t,tt
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    integer I
+    T=S1
+    T%A(0)=0.0_DP
+
+
+    DEXPT=1.0_dp
+    tt=1.0_dp
+
+    do i=1,N_my_1D_taylor
+       tt=tt*t/i
+       DEXPT=DEXPT + tt
+    enddo
+
+    DEXPT=DEXPT*EXP(S1%A(0))
+
+  END FUNCTION DEXPT
+
+
+  FUNCTION DLOGT( S1 )
+    implicit none
+    TYPE (my_1D_taylor) DLOGT,t,TT
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    INTEGER I
+
+    T=S1/S1%A(0)
+    T%A(0)=0.0_DP
+
+    TT=T
+    do i=1,N_my_1D_taylor
+       DLOGT=TT/I+DLOGT
+       TT=-TT*T
+    ENDDO
+
+    DLOGT=DLOGT+ LOG(S1%A(0))
+
+  END FUNCTION  DLOGT
+
+  FUNCTION DSQRTT( S1 )
+    implicit none
+    TYPE (my_1D_taylor) DSQRTT,t
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    WRITE(6,*) " MARDE "
+    STOP 666
+    T=S1/S1%A(0)
+    T%A(0)=0.0_DP
+
+    DSQRTT=1.0_DP + T/2.0_DP - T**2/8.0_DP+T**3/16.0_DP
+    DSQRTT=DSQRTT* SQRT(S1%A(0))
+
+  END FUNCTION  DSQRTT
+
+  FUNCTION DCOST(S1)
+    implicit none
+    TYPE (my_1D_taylor) DCOST,t
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+    WRITE(6,*) " MARDE "
+    STOP 666
+
+    T=S1
+    T%A(0)=0.0_DP
+
+    DCOST=COS(S1%A(0))*(1.0_DP-T**2/2.0_DP)-SIN(S1%A(0))*(T-T**3/6.0_DP)
+
+  END FUNCTION  DCOST
+
+  FUNCTION DSINT(S1)
+    implicit none
+    TYPE (my_1D_taylor) DSINT,t
+    TYPE (my_1D_taylor), INTENT (IN) :: S1
+
+    T=S1
+    T%A(0)=0.0_DP
+
+    DSINT=SIN(S1%A(0))*(1.0_DP-T**2/2.0_DP)+COS(S1%A(0))*(T-T**3/6.0_DP)
+
+  END FUNCTION  DSINT
+
+end module my_own_1D_TPSA
+
 
 integer function mypause(i)
   use precision_constants
