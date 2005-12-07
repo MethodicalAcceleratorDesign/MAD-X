@@ -9,7 +9,7 @@ module fitted_MAG_1
   logical(lp) :: use_beamlet=.false.
   TYPE magnet_b
      INTEGER, POINTER :: nb(:)
-     real(dp), POINTER :: blim(:,:),hb
+     real(dp), POINTER :: blim(:,:),hb,x_c
      real(dpm), POINTER :: b(:,:,:,:)
      real(dp), pointer :: grid(:,:,:)
      real(dp),pointer :: s(:)
@@ -32,17 +32,18 @@ module fitted_MAG_1
 
 contains
 
-  subroutine pointer_magnet_b(mag_b,hb,nb,blim)
+  subroutine pointer_magnet_b(mag_b,hb,x_c,nb,blim)
     implicit none
     type(magnet_b), intent(inout) :: mag_b
     integer, intent(in):: nb(3)
-    real(dpm), intent(in):: hb,blim(3,2)
+    real(dpm), intent(in):: hb,blim(3,2),x_c
 
-    allocate(mag_b%nb(3),mag_b%blim(3,2),mag_b%hb)
+    allocate(mag_b%nb(3),mag_b%blim(3,2),mag_b%hb,mag_b%x_c)
 
     mag_b%blim=blim
     mag_b%nb=nb
     mag_b%hb=hb
+    mag_b%x_c=x_c
 
     allocate(mag_b%b(3,mag_b%nb(1),mag_b%nb(2),mag_b%nb(3)),mag_b%s(nb(3)))
 
@@ -153,7 +154,7 @@ contains
     implicit none
     integer mf
     integer nb(3)
-    real(dp) hb,blim(3,2),x,y
+    real(dp) hb,blim(3,2),x,y,x_c
     character*(*) filename
     character*255 line
     type(magnet_b) mag_b
@@ -165,15 +166,15 @@ contains
     read(mf,'(a255)') line
 
     write(6,*) line
-    read(line,*) hb,nb(3),blim(3,1),blim(3,2),nb(1),blim(1,1),blim(1,2),nb(2),blim(2,1),blim(2,2)
-    write(6,*) hb,nb(3),blim(3,1),blim(3,2),nb(1),blim(1,1),blim(1,2),nb(2),blim(2,1),blim(2,2)
+    read(line,*) x_c, hb,nb(3),blim(3,1),blim(3,2),nb(1),blim(1,1),blim(1,2),nb(2),blim(2,1),blim(2,2)
+    write(6,*)x_c, hb,nb(3),blim(3,1),blim(3,2),nb(1),blim(1,1),blim(1,2),nb(2),blim(2,1),blim(2,2)
 
     if(mod(nb(3),2)/=1) then
        write(6,*) " Need a odd number of slices in fitted map"
        stop 1000
     endif
 
-    call  pointer_magnet_b(mag_b,hb,nb,blim)
+    call  pointer_magnet_b(mag_b,hb,x_c,nb,blim)
 
     do k=1,mag_b%nb(3)
        read(mf,*)   mag_b%s(k)
@@ -198,11 +199,11 @@ contains
   end subroutine read_magnet_b
 
 
-  subroutine fxr(f,x,b,r,hcurv,BETA0_in,GAMMA0I_in,time)
+  subroutine fxr(f,x,b,hcurv,BETA0_in,GAMMA0I_in,time)
     implicit none
 
     real(dp)  d(3),c(6),BETA0,GAMMA0I     ! variable r is a distance not necessarily hcurv**-1
-    real(dp) ,intent(in) :: b(3),r ,hcurv
+    real(dp) ,intent(in) :: b(3),hcurv
     real(dp), intent(in) :: BETA0_in,GAMMA0I_in
     real(dp) ,intent(inout) :: x(6)
     real(dp), intent(out):: f(6)
@@ -214,8 +215,13 @@ contains
        beta0=one;GAMMA0I=zero;
     endif
 
-    x(1)=x(1)-r
-    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
+    ! using absolute coordinate
+    !    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
+    if(hcurv==0.d0) then
+       d(1)=root(x(2)**2+x(4)**2+one)
+    else
+       d(1)=root(x(2)**2+x(4)**2+(hcurv*x(1))**2)
+    endif
     d(2)=(d(1)**3)/root(one+2*x(5)/beta0+x(5)**2)
     d(3)=one+hcurv*x(1)
 
@@ -237,7 +243,6 @@ contains
 
     d(2)=gamma0I/beta0/d(2)
     f(6)=root((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
-    x(1)=x(1)+r
   end subroutine fxr
 
   !
@@ -258,33 +263,33 @@ contains
 
     ds=bend%ds
     ns=bend%nb(3)
-
-    x(1)=x(1)+bend%blim(1,1)
+    hc=bend%hb
+    x(1)=x(1)+bend%x_c
     do i=1,ns-1,2
        dz=two*ds
 
        call get_b(bend,i,x(1),x(3),bf)
        ! original formula for electrons (q<0)  now switch to proton
 
-       call fxb(k1,x,bf,rho,hc,BETA0_in,GAMMA0I_in,time)
+       call fxb(k1,x,bf,hc,BETA0_in,GAMMA0I_in,time)
        do j=1,6
           xt(j)=x(j)+dz*k1(j)/two         ! temporary
        enddo
 
        call get_b(bend,i+1,xt(1),xt(3),bf)
-       call fxb(k2,xt,bf,rho,hc,BETA0_in,GAMMA0I_in,time)
+       call fxb(k2,xt,bf,hc,BETA0_in,GAMMA0I_in,time)
        do j=1,6
           xt(j)=x(j)+dz*k2(j)/two         ! temporary
        enddo
 
        call get_b(bend,i+1,xt(1),xt(3),bf)
-       call fxb(k3,xt,bf,rho,hc,BETA0_in,GAMMA0I_in,time)
+       call fxb(k3,xt,bf,hc,BETA0_in,GAMMA0I_in,time)
        do j=1,6
           xt(j)=x(j)+dz*k3(j)            ! temporary
        enddo
 
        call get_b(bend,i+2,xt(1),xt(3),bf)
-       call fxb(k4,xt,bf,rho,hc,BETA0_in,GAMMA0I_in,time)
+       call fxb(k4,xt,bf,hc,BETA0_in,GAMMA0I_in,time)
        write(17,'(i4,4(1x,E15.8))') i+2,bf(2),xt(1)
        do j=1,6
           x(j)=x(j)+dz*(k1(j)+two*k2(j)+two*k3(j)+k4(j))/six     ! temporary
@@ -301,7 +306,7 @@ contains
 
     ENDDO
 
-    x(1)=x(1)-bend%blim(1,1)
+    x(1)=x(1)-bend%x_c
 
 
 
