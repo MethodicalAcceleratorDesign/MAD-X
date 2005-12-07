@@ -46,7 +46,9 @@ contains
     LOGICAL(LP) EXACT0,magnet0
     logical(lp) FIBRE_flip0,MAD0
     logical(lp) :: t=.true.,f=.false.
-    INTEGER FIBRE_DIR0,IL
+    INTEGER FIBRE_DIR0,IL,multipi
+
+
     IL=15
 
     if(present(magnet_only)) then
@@ -97,7 +99,17 @@ contains
     CASE("SOLENOID       ")
        BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("QUADRUPOLE     ")
+       !        open(unit=10,file='multip.txt')
+       !         read(10,*) multipi
+       !        close(10)
+       !        if(multipi==1) then
+       !        BLANK=ZGOUBI_multip(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       !      write(6,*) " Using Multip of PTC"
+       !        else
        BLANK=QUADRUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       !        endif
+    CASE("ZGOUBI_MULTIP  ")
+       BLANK=ZGOUBI_multip(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("SEXTUPOLE     ")
        BLANK=SEXTUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("OCTUPOLE      ")
@@ -131,6 +143,8 @@ contains
        BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND14;
     CASE("MARKER         ")
        BLANK=MARKER(KEY%LIST%NAME)
+    CASE("CHANGEREF      ")
+       BLANK=CHANGEREF(KEY%LIST%NAME,KEY%LIST%ANG,KEY%LIST%T,KEY%LIST%PATCHG)
     CASE("RFCAVITY       ")
        BLANK=RFCAVITY(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("TWCAVITY       ")
