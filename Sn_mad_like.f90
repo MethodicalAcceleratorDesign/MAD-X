@@ -49,6 +49,8 @@ module Mad_like
 
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
+     real(dp) ang(3),t(3)
+     integer patchg
      real(dp) T1,T2,B0
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
      real(dp) tilt
@@ -224,6 +226,10 @@ module Mad_like
 
   INTERFACE quadrupole
      MODULE PROCEDURE QUADTILT
+  end  INTERFACE
+
+  INTERFACE ZGOUBI_MULTIP
+     MODULE PROCEDURE ZGOUBI_MULTIPTILT
   end  INTERFACE
 
   INTERFACE SOLENOID
@@ -646,6 +652,9 @@ CONTAINS
     endif
 
     IF(S1==0) THEN
+       S2%ang=zero
+       S2%t=zero
+       S2%patchg=0
        S2%L=zero
        S2%LD=zero
        S2%LC=zero
@@ -1047,6 +1056,58 @@ CONTAINS
   END FUNCTION GKICKTILT
 
 
+  FUNCTION  ZGOUBI_MULTIPTILT(NAME,L,K1,T,list)
+    implicit none
+    type (EL_LIST) ZGOUBI_MULTIPTILT
+    type (EL_LIST),optional, INTENT(IN)::list
+    type (TILTING),optional, INTENT(IN):: T
+    CHARACTER(*), INTENT(IN):: NAME
+    real(dp) ,optional, INTENT(IN):: L,K1
+    real(dp) L1,K11
+    L1=zero
+    K11=zero
+    IF(PRESENT(L)) L1=L
+    IF(PRESENT(K1)) K11=K1
+    if(present(list)) then
+       ZGOUBI_MULTIPTILT=list
+       l1=list%L
+       K11=LIST%K(2)
+    else
+       ZGOUBI_MULTIPTILT=0
+    endif
+    ZGOUBI_MULTIPTILT%L=L1
+    ZGOUBI_MULTIPTILT%LD=L1
+    ZGOUBI_MULTIPTILT%LC=L1
+    ZGOUBI_MULTIPTILT%K(2)=K11
+    IF(L1==zero) THEN
+       WRITE(6,*) " NOT PERMITTED IN ZGOUBI_MULTIPTILT "
+       STOP 22
+    ELSE
+       ZGOUBI_MULTIPTILT%K(2)=K11
+       ZGOUBI_MULTIPTILT%KIND=KINDMU
+    ENDIF
+    ZGOUBI_MULTIPTILT%nmul=2
+    IF(PRESENT(t)) then
+       IF(T%NATURAL) THEN
+          WRITE(6,*) " NOT PERMITTED IN ZGOUBI_MULTIPTILT "
+          STOP 23
+       ELSE
+          ZGOUBI_MULTIPTILT%tilt=t%tilt(0)
+       ENDIF
+    endif
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       call write_i
+       ZGOUBI_MULTIPTILT%NAME=NAME(1:16)
+    ELSE
+       ZGOUBI_MULTIPTILT%NAME=NAME
+    ENDIF
+  END FUNCTION ZGOUBI_MULTIPTILT
+
   FUNCTION  QUADTILT(NAME,L,K1,T,list)
     implicit none
     type (EL_LIST) QUADTILT
@@ -1097,6 +1158,7 @@ CONTAINS
        QUADTILT%NAME=NAME
     ENDIF
   END FUNCTION QUADTILT
+
 
   FUNCTION  SOLTILT(NAME,L,KS,K1,T,LIST)
     implicit none
@@ -2130,6 +2192,33 @@ CONTAINS
 
   END FUNCTION mark
 
+  FUNCTION  CHANGEREF(NAME,ANG,T,PATCHG)
+    implicit none
+    type (EL_LIST) CHANGEREF
+    CHARACTER(*), INTENT(IN):: NAME
+    REAL(DP) ANG(3),T(3)
+    INTEGER PATCHG
+
+    CHANGEREF=0
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       call write_i
+       CHANGEREF%NAME=NAME(1:16)
+    ELSE
+       CHANGEREF%NAME=NAME
+    ENDIF
+
+    CHANGEREF%KIND=KIND0
+    CHANGEREF%ANG=ANG
+    CHANGEREF%T=T
+    CHANGEREF%PATCHG=PATCHG
+
+  END FUNCTION CHANGEREF
+
   subroutine  guirder(f,cell)
     implicit none
     type (fibre) f
@@ -2768,12 +2857,27 @@ CONTAINS
        endif
     ENDIF
 
+    if(s1%patchg/=0) then
+       if(s1%patchg==3) then   ! zgoubi order
+          s22%PATCH%B_ANG=s1%ang    !
+          s22%PATCH%A_D=s1%t
+          s22%PATCH%patch=3
+       else
+          s22%PATCH%B_ANG=s1%ang    !
+          s22%PATCH%B_D=s1%t
+          s22%PATCH%patch=2
+       endif
+    endif
+
+
+
     IF(.NOT.MADX) THEN
        el=>s22
        !    call APPEND_mad_like(mad_list,s22)
        call APPEND_mad_like(mad_list,el)
     ENDIF
     madkick=.false.
+
 
   END SUBROUTINE EL_Q
 
@@ -2808,9 +2912,17 @@ CONTAINS
     c_%check_y_max => check_y_max
     c_%hyperbolic_aperture => hyperbolic_aperture
     c_%WATCH_USER => WATCH_USER
+    c_%ENGE_N => ENGE_N
+    c_%ENGE_2Q1 => ENGE_2Q1
+    c_%ENGE_NST => ENGE_NST
+    c_%C_ENGE_1 => C_ENGE_1
+    c_%ENGE_LAM => ENGE_LAM
+    c_%ENGE_FRAC => ENGE_FRAC
 
 
 
+
+    c_%other_program => other_program
     c_%NEW_METHOD => NEW_METHOD
     c_%MADTHICK => MADKIND2
     c_%MADTHIN_NORMAL => MADKIND3N
