@@ -19,6 +19,8 @@ MODULE S_TRACKING
   PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf,TRACK_LAYOUT_FLAG_Sf
   ! old Sj_elements
   PRIVATE TRACKR,TRACKP,TRACKS
+  logical(lp),TARGET :: other_program=.false.
+  integer j_global
   ! END old Sj_elements
 
   ! TYPE UPDATING
@@ -79,6 +81,10 @@ contains
     TYPE(INTERNAL_STATE) K
 
     if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    if(other_program) then
+       call track_R(x,j_global,j_global)
+       return
+    endif
     SELECT CASE(EL%KIND)
     CASE(KIND0)
        IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -134,6 +140,8 @@ contains
        call TRACK(EL%U2,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
+    case(KINDMU)
+       call TRACK(EL%MU,X,MID)
     case default
        w_p=0
        w_p%nc=1
@@ -151,6 +159,10 @@ contains
     TYPE(INTERNAL_STATE) K
 
     if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    if(other_program) then
+       call track_p(x,j_global,j_global)
+       return
+    endif
     SELECT CASE(EL%KIND)
     CASE(KIND0)
        IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -206,6 +218,8 @@ contains
        call TRACK(EL%U2,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
+    case(KINDMU)
+       call TRACK(EL%MU,X,MID)
     case default
        w_p=0
        w_p%nc=1
@@ -223,6 +237,10 @@ contains
     TYPE(INTERNAL_STATE) K
 
     if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    if(other_program) then
+       write(6,*) " OTHER PROGRAM FORBIDDEN "
+       STOP 350
+    endif
     SELECT CASE(EL%KIND)
     CASE(KIND0)
        !       IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -274,6 +292,8 @@ contains
        call TRACK(EL%U2,X)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X)
+    case(KINDMU)
+       call TRACK(EL%MU,X)
     case(KINDFITTED)
        w_p=0
        w_p%nc=1
@@ -458,7 +478,7 @@ contains
        J=I1
 
        DO  WHILE(J<I2.AND.ASSOCIATED(C))
-
+          j_global=j
           CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
           C=>C%NEXT
@@ -468,6 +488,7 @@ contains
        J=I1
 
        DO  WHILE(J>I2.AND.ASSOCIATED(C))
+          j_global=j
 
           c%dir=-c%dir
           CALL TRACK(C,X,K,R%CHARGE,X_IN)
@@ -504,6 +525,7 @@ contains
        J=I1
 
        DO  WHILE(J<I2.AND.ASSOCIATED(C))
+          j_global=j
           CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
           C=>C%NEXT
@@ -513,6 +535,7 @@ contains
        J=I1
 
        DO  WHILE(J>I2.AND.ASSOCIATED(C))
+          j_global=j
 
           c%dir=-c%dir
           CALL TRACK(C,X,K,R%CHARGE,X_IN)
@@ -558,6 +581,7 @@ contains
        J=I1
 
        DO  WHILE(J<I2.AND.ASSOCIATED(C))
+          j_global=j
 
           CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
@@ -568,6 +592,7 @@ contains
        J=I1
 
        DO  WHILE(J>I2.AND.ASSOCIATED(C))
+          j_global=j
 
           c%dir=-c%dir
           CALL TRACK(C,X,K,R%CHARGE,X_IN)
@@ -742,11 +767,13 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHG/=0.AND.PATCHG/=1) THEN
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        X(3)=C%PATCH%B_YZ*X(3);X(4)=C%PATCH%B_YZ*X(4);
        CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        X(1)=C%PATCH%B_XZ*X(1);X(2)=C%PATCH%B_XZ*X(2);
        CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XY(C%PATCH%B_ANG(3),X,DONEITT)
+       CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
+       !       CALL ROT_XY(C%PATCH%B_ANG(3),X,DONEITT)
        CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -927,11 +954,13 @@ contains
 
     ! POSITION PATCH
     IF(PATCHG/=0.AND.PATCHG/=1) THEN
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        X(3)=C%PATCH%B_YZ*X(3);X(4)=C%PATCH%B_YZ*X(4);
        CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        X(1)=C%PATCH%B_XZ*X(1);X(2)=C%PATCH%B_XZ*X(2);
        CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XY(C%PATCH%B_ANG(3),X,DONEITT)
+       CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
+       !       CALL ROT_XY(C%PATCH%B_ANG(3),X,DONEITT)
        CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -1132,6 +1161,7 @@ contains
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHG/=0.AND.PATCHG/=1) THEN
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL ALLOC(Y)
        Y=X
        Y(3)=C%PATCH%B_YZ*Y(3);Y(4)=C%PATCH%B_YZ*Y(4);
@@ -1141,7 +1171,8 @@ contains
        Y(1)=C%PATCH%B_XZ*Y(1);Y(2)=C%PATCH%B_XZ*Y(2);
        X=Y
        CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XY(C%PATCH%B_ANG(3),X,DONEITT)
+       !       CALL ROT_XY(C%PATCH%B_ANG(3),X,DONEITT)
+       CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
        CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        CALL KILL(Y)
     ENDIF
@@ -1340,5 +1371,64 @@ contains
     Y=X
     CALL KILL(X,6)
   END SUBROUTINE MIS_FIBS
+
+  SUBROUTINE TRACK_R(X,N1,N2)
+    IMPLICIT NONE
+    REAL(DP) X(6),x6,xp,yp,x5
+    INTEGER N1,N2,icharef
+    COMMON/ptc/ icharef
+
+    icharef=0
+
+    x(1)=x(1)*100.0_dp
+    x(3)=x(3)*100.0_dp
+    x6=x(6)*100.0_dp
+
+    xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
+    yp=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
+    x(2)=atan(xp)*1000.d0
+    x(4)=atan(yp)*1000.d0
+
+    x(6)=x(5)
+    x(5)=x6
+
+    !call track_z(x,j_global,j_global)
+
+    x6=x(5)/100.0_dp
+    x(5)=x(6)
+    x(6)=x6
+
+    x(1)=x(1)/100.0_dp
+    x(3)=x(3)/100.0_dp
+    xp=tan(x(2)/1000.0_dp)
+    yp=tan(x(4)/1000.0_dp)
+    x(2)=(one+x(5))*xp/root(one+xp**2+yp**2)
+    x(4)=(one+x(5))*yp/root(one+xp**2+yp**2)
+
+    icharef=1
+
+  END SUBROUTINE TRACK_R
+
+  SUBROUTINE TRACK_P(X,N1,N2)
+    implicit none
+    TYPE(REAL_8) X(6)
+    INTEGER N1,N2
+
+    WRITE(6,*) " NO OTHER PROGRAM FOR POLYMORPH ",N1,N2
+
+  END SUBROUTINE TRACK_P
+
+  SUBROUTINE TRACK_R1(X,N1,N2)
+    implicit none
+    REAL(DP) X(6)
+    INTEGER N1,N2
+
+
+
+    WRITE(6,*) " NO OTHER PROGRAM FOR REAL",N1,N2
+
+  END SUBROUTINE TRACK_R1
+
+
 
 END MODULE S_TRACKING
