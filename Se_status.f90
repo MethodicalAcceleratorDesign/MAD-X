@@ -40,6 +40,7 @@ module S_status
   integer, parameter :: KINDUSER1 = KIND23+2
   integer, parameter :: KINDUSER2 = KIND23+3
   integer, parameter :: KINDwiggler = KIND23+4
+  integer, parameter :: KINDmu      = KIND23+5
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6
@@ -742,7 +743,8 @@ CONTAINS
     LOGICAL(lp), INTENT(IN):: PACKAGE
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
-    INTEGER, INTENT(OUT)::    ND2,NPARA
+    INTEGER,optional :: ND2,NPARA
+    INTEGER  ND2l,NPARAl
 
     NDEL=0
     NDPT1=0
@@ -771,12 +773,14 @@ CONTAINS
 
     CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
 
-    ND2=ND1*2
-    NPARA=ND2+NDEL
-    C_%NPARA=NPARA
-    C_%ND2=ND2
-    C_%npara_fpp=NPARA
+    ND2l=ND1*2
+    NPARAl=ND2l+NDEL
+    C_%NPARA=NPARAl
+    C_%ND2=ND2l
+    C_%npara_fpp=NPARAl
 
+    if(present(nd2)) nd2=nd2l
+    if(present(npara)) npara=nparal
   END  subroutine S_init
 
   subroutine init_default(STATE,NO1,NP1)
