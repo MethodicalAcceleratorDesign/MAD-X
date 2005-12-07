@@ -322,3 +322,34 @@ TYPE MARTIN
    real(dp),pointer :: E_REV(:,:)
    logical(lp), POINTER :: deltamap
 END  TYPE MARTIN
+
+! MULTIP DE ZGOUBI
+
+TYPE MULTIP
+   TYPE(MAGNET_CHART), POINTER:: P
+   real(dp),  POINTER ::L,D ,DE,DS,DES
+   integer, pointer :: enge_nst
+   integer, pointer :: ENGE_2Q1
+   integer, pointer :: enge_n
+   logical(lp), pointer :: exi,ent
+   real(dp), pointer :: G(:,:)
+   real(dp),  DIMENSION(:), POINTER :: AN,BN               !
+   real(dp),  DIMENSION(:), POINTER :: EAN,EBN
+   real(dp),  DIMENSION(:), POINTER :: LAM,C,  LAMS,CS
+   real(dp),  DIMENSION(:), POINTER :: LAME,CE , LAMES,CES
+END  TYPE MULTIP
+
+TYPE MULTIPP
+   TYPE(MAGNET_CHART), POINTER:: P
+   TYPE(REAL_8),  POINTER ::L
+   real(dp),  POINTER :: D ,DE,DS,DES
+   integer, pointer :: enge_nst
+   integer, pointer :: ENGE_2Q1
+   integer, pointer :: enge_n
+   logical(lp), pointer :: exi,ent
+   real(dp), pointer :: G(:,:)
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: EAN,EBN
+   real(dp),  DIMENSION(:), POINTER :: LAM,C,  LAMS,CS
+   real(dp),  DIMENSION(:), POINTER :: LAME,CE , LAMES,CES
+END  TYPE MULTIPP
