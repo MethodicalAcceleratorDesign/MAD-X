@@ -6,7 +6,7 @@
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 24           /* internal name length */
 #define TITLE_SIZE 114      /* Size of the title for gnuplot ploting in tracking mode (ETDA 24/06/2004) */
-#define PTC_NAMES_L 11      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004) */
+#define PTC_NAMES_L 12      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004)(FRS 06/12/2005) */
 #define FNAME_L 240         /* for file names */
 #define FREECODE 380226     /* check-code to avoid multiple "free" */
 #ifdef _MEM_LEAKS
@@ -14,17 +14,17 @@
   int item_no=-1;
   int* mtable[MTABLE_SIZE];
 #endif
-#define AUX_LG 10000        /* for all sorts of ancillary buffers */
+#define AUX_LG 10000        /* initial size for ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
-#define MAX_D_ITEM 30000    /* storage for doubles */
-#define MAX_LINE 20000      /* max. input line length */
+#define MAX_D_ITEM 30000    /* initial storage size for doubles */
+#define MAX_LINE 20000      /* max. input line length (has to stay fixed) */
 #define MAX_LOOP 100        /* max. count for (possibly circular) calls */
 #define MAX_COND 100        /* max. nesting level for "if" and "while" */
 #define MAX_TYPE 11         /* for SXF output */
 #define MAX_TAG 50          /* for SXF output */
-#define CHAR_BUFF_SIZE 100000 /* size of each dynamic char_buff member */
-#define IN_BUFF_SIZE 500000 /* size of buffer for command groups */
+#define CHAR_BUFF_SIZE 100000 /* size of dynamic char_buff members */
+#define IN_BUFF_SIZE 500000 /* initial size of buffer for command groups */
 #define LINE_FILL 70        /* max. line length -2 for "save" output */
 #define LINE_F_MAD8 70      /* the same, for mad-8 format */
 #define LINE_MAX 78         /* for SXF output */
