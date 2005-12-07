@@ -137,7 +137,7 @@ CONTAINS
     !  his survey would have to be "caught" in this interface
 
     SELECT CASE(EL%KIND)
-    case(kind0:kind22,kindfitted:KINDWIGGLER)
+    case(kind0:kind22,kindfitted:KINDWIGGLER,kindmu)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
 
     case(kind23)
@@ -146,7 +146,7 @@ CONTAINS
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported SURVEY_mag"
+       write(w_p%c(1),'(1x,i4,a25)') el%kind," not supported SURVEY_mag"
        CALL WRITE_E(0)
     END SELECT
 

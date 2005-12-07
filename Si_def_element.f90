@@ -1222,6 +1222,20 @@ CONTAINS
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
        CALL POINTERS_SAGAN(EL%WI)
+    CASE(KINDmu)
+       if(.not.ASSOCIATED(EL%mu)) THEN
+          ALLOCATE(EL%mu)
+          EL%mu=0
+       ELSE
+          EL%mu=-1
+          EL%mu=0
+       ENDIF
+       EL%mu%P=>EL%P
+       EL%mu%L=>EL%L
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%mu%AN=>EL%AN
+       EL%mu%BN=>EL%BN
+       CALL POINTERS_multip(EL%MU)
     CASE(KINDFITTED)
        if(.not.ASSOCIATED(EL%Bend)) THEN
           ALLOCATE(EL%Bend)
@@ -1631,6 +1645,21 @@ CONTAINS
        EL%WI%BN=>EL%BN
        CALL POINTERS_SAGAN(EL%WI)
        CALL ALLOC(EL%WI)
+    CASE(KINDmu)
+       if(.not.ASSOCIATED(EL%mu)) THEN
+          ALLOCATE(EL%mu)
+          EL%mu=0
+       ELSE
+          EL%mu=-1
+          EL%mu=0
+       ENDIF
+       EL%mu%P=>EL%P
+       EL%mu%L=>EL%L
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%mu%AN=>EL%AN
+       EL%mu%BN=>EL%BN
+       CALL POINTERS_multip(EL%MU)
+       CALL ALLOC(EL%MU)
     CASE(KINDFITTED)
        if(.not.ASSOCIATED(EL%Bend)) THEN
           ALLOCATE(EL%Bend)
@@ -1817,6 +1846,9 @@ CONTAINS
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
+    CASE(KINDMU)
+       EL%MU%AN=>EL%AN
+       EL%MU%BN=>EL%BN
     case default
        w_p=0
        w_p%nc=1
@@ -1930,6 +1962,9 @@ CONTAINS
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
+    CASE(KINDMU)
+       EL%MU%AN=>EL%AN
+       EL%MU%BN=>EL%BN
     case default
        w_p=0
        w_p%nc=1
@@ -2022,6 +2057,7 @@ CONTAINS
     nullify(EL%U1);
     nullify(EL%U2);
     nullify(EL%WI);
+    nullify(EL%MU);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_EL
@@ -2066,6 +2102,7 @@ CONTAINS
     nullify(EL%U1);
     nullify(EL%U2);
     nullify(EL%WI);
+    nullify(EL%MU);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_ELp
@@ -2634,6 +2671,10 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
+    IF(EL%KIND==KINDMU) THEN         !
+       CALL SETFAMILY(ELP)
+       CALL COPY(EL%MU,ELP%MU)
+    ENDIF
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
        ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
     ENDIF
@@ -2850,6 +2891,10 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
+    IF(EL%KIND==KINDMU) THEN         !
+       CALL SETFAMILY(ELP)
+       CALL COPY(EL%MU,ELP%MU)
+    ENDIF
 
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
        ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
@@ -3065,6 +3110,10 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
+    IF(EL%KIND==KINDMU) THEN         !
+       CALL SETFAMILY(ELP)
+       CALL COPY(EL%MU,ELP%MU)
+    ENDIF
 
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
        ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
@@ -3141,6 +3190,10 @@ CONTAINS
 
     IF(ELP%KIND==KINDWIGGLER) THEN
        CALL reset_WI(ELP%WI)
+    ENDIF
+
+    IF(ELP%KIND==KINDMU) THEN
+       CALL reset_MU(ELP%MU)
     ENDIF
 
 
