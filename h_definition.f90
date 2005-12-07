@@ -48,14 +48,13 @@ module definition
      INTEGER I !@1  integer I is a pointer in old da-package of Berz
      type (taylorlow) j !@1   Taylorlow is an experimental type not supported
   END TYPE taylor
-  !!&1
-
+  !@2  UNIVERSAL_TAYLOR is used by Sagan in BMAD Code at Cornell
   TYPE UNIVERSAL_TAYLOR
      INTEGER, POINTER:: N,NV    !  Number of coeeficients and number of variables
      REAL(DP), POINTER,dimension(:)::C  ! Coefficients C(N)
      INTEGER, POINTER,dimension(:,:)::J ! Exponents of each coefficients J(N,NV)
   END TYPE UNIVERSAL_TAYLOR
-
+  !@3 ---------------------------------------------</br>
   TYPE complextaylor
      type (taylor) r  !@1 Real part
      type (taylor) i  !@1 Imaginary part
@@ -74,10 +73,7 @@ module definition
      LOGICAL(lp) :: ALLOC  !@1 IF TAYLOR IS ALLOCATED IN DA-PACKAGE
      !&2
   END TYPE REAL_8
-  !&2
-
-  ! this is a complex polymorphic type
-
+  !@3 ---------------------------------------------</br>
   TYPE double_complex
      type (complextaylor) t
      complex(dp) r
@@ -94,7 +90,7 @@ module definition
   TYPE ENV_8
      type (REAL_8) v
      type (REAL_8) e(ndim2)
-     type (REAL_8) sigma0(ndim2)  !@2
+     type (REAL_8) sigma0(ndim2)
      type (REAL_8) sigmaf(ndim2)
   END TYPE ENV_8
 
@@ -121,24 +117,22 @@ module definition
   TYPE DAMAP
      TYPE (TAYLOR) V(ndim2)    ! Ndim2=6 but allocated to nd2=2,4,6 ! etienne_oct_2004
   END TYPE DAMAP
-  !&1
+  !@3 ---------------------------------------------</br>
 
   TYPE GMAP
      TYPE (TAYLOR) V(lnv)    ! Ndim2=6 but allocated to nd2=2,4,6 ! etienne_oct_2004
      integer N
   END TYPE GMAP
 
-  !&4
   TYPE vecfield
      type (taylor) v(ndim2)          !@1 <font face="Times New Roman">V<sub>i</sub>&#8706;<sub>i</sub></font> Operator
      integer ifac                    !@1 Type of Factorization 0,1,-1 (One exponent, Dragt-Finn, Reversed Dragt-Finn)
   END TYPE vecfield
-
+  !@3 ---------------------------------------------</br>
   TYPE pbfield
      type (taylor) h
      integer ifac
   END TYPE pbfield
-  !&4
 
 
   TYPE tree
@@ -158,14 +152,14 @@ module definition
      type (vecfield) nonlinear
      type (pbfield)  pb
   END TYPE DRAGTFINN
-
+  !@3 ---------------------------------------------</br>
   TYPE reversedragtfinn
      real(dp)  CONSTANT(NDIM2)
      type (damap) Linear
      type (vecfield) nonlinear
      type (pbfield)  pb
   END TYPE reversedragtfinn
-
+  !@3 ---------------------------------------------</br>
   TYPE ONELIEEXPONENT
      real(dp) EPS
      type (vecfield) VECTOR
@@ -174,7 +168,6 @@ module definition
 
   !&5
 
-  !&3
   TYPE normalform
      type (damap) A_t   ! Total A  :  A_t= A1 o A
      type (damap) A1    ! Dispersion
@@ -192,7 +185,7 @@ module definition
      logical(lp) AUTO
      !&3
   END TYPE normalform
-  !&3
+
   TYPE genfield
      type (taylor) h
      type (damap) m
@@ -209,23 +202,21 @@ module definition
 
 
 
-  !!&1
   TYPE pbresonance
      type (pbfield)  cos,sin
      integer ifac
   END TYPE pbresonance
-
+  !@3 ---------------------------------------------</br>
   TYPE vecresonance
      type (vecfield)  cos,sin
      integer ifac
   END TYPE vecresonance
-
+  !@3 ---------------------------------------------</br>
   TYPE taylorresonance
      type (taylor)  cos,sin
   END TYPE taylorresonance
-  !!&1
 
-  TYPE beamenvelope
+  TYPE beamenvelope   !@2 A kind of Normal Form for Radiative Envelope
      ! radiation normalization
      type (damap) transpose    ! Transpose of map which acts on polynomials
      type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
