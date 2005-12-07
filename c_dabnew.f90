@@ -3076,7 +3076,7 @@ contains
     !
     do i=1,ib
        if(nomax.eq.1) then
-          do ib1 = 2,7
+          do ib1 =2,invc+1    ! 2,7    ! Etienne
              cc(ib1) = one
           enddo
        else
