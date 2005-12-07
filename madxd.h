@@ -410,6 +410,7 @@ int square_to_colon(char*);
 int get_stmt(FILE*, int);
 int get_table_range(char*, struct table* t, int*);
 void grow_char_array(struct char_array*);
+void grow_char_array_list(struct char_array_list*);
 void grow_char_p_array(struct char_p_array*);
 void grow_command_list(struct command_list*);
 void grow_command_list_list(struct command_list_list*);
@@ -482,8 +483,9 @@ void* mycalloc(char*, size_t, size_t);
 void myfree(char*, void*);
 void* mymalloc(char*, size_t);
 char* mystrchr(char*, char);
+void mystrcpy(struct char_array*, char*);
 char* mystrstr(char*, char*);
-void my_repl(char*, char*, char*, char*);
+void myrepl(char*, char*, char*, char*);
 int name_list_pos(char*, struct name_list*);
 struct in_buff_list* new_in_buff_list(int);
 struct char_array* new_char_array(int);
@@ -534,7 +536,7 @@ int polish_expr(int, char**);
 double polish_value(struct int_array*);
 int predef_const(struct variable*);
 void prepare_table_file(struct table*, struct command_list*);
-void pre_split(char*, char*, int);
+void pre_split(char*, struct char_array*, int);
 void print_command(struct command*);
 void print_command_parameter(struct command_parameter*);
 void print_global(double);
@@ -821,6 +823,10 @@ void cf77flush();
 
 /* Global structure variables by type (alphabetic) */
 struct char_array* aux_buff;       /* temporary buffer for many purposes */
+struct char_array* c_dum;
+struct char_array* c_join;
+struct char_array* work;
+struct char_array* l_wrk;
 
 struct char_array_list* char_buff; /* buffer for all sorts of strings */
 
@@ -987,10 +993,6 @@ FILE* tab_file;                /* for table input */
 
 char quote;                       /* current open single or double quote */
 char tmp_key[NAME_L],
-  c_dummy[AUX_LG],
-  c_join[AUX_LG],
-  work[AUX_LG],
-  l_work[AUX_LG],
   int_format[20],             /* current integer format */
   float_format[20],           /* current float format */
   string_format[20];          /* current string format */
@@ -998,7 +1000,7 @@ char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 3.01.00";
-char code_mod_date[] = "Code Modification Date: 29.11.2005";
+char code_mod_date[] = "Code Modification Date: 07.12.2005";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
