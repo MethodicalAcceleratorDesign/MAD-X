@@ -106,7 +106,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   double at, vec[FIELD_MAX];
 
   tmp_p_array->curr = 0;
-  pre_split(p, aux_buff->c, 0);
+  pre_split(p, aux_buff, 0);
   ntok = mysplit(aux_buff->c, tmp_p_array);
   ntok = join_prefix("-", ntok, toks);
   if (count == 0)
@@ -119,8 +119,8 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     current_sequ->cavities = new_el_list(100);
     pos = name_list_pos("marker", defined_commands->list);
     clone = clone_command(defined_commands->commands[pos]);
-    sprintf(c_dummy, "%s$start", current_sequ->name);
-    el = make_element(c_dummy, "marker", clone, 0);
+    sprintf(c_dum->c, "%s$start", current_sequ->name);
+    el = make_element(c_dum->c, "marker", clone, 0);
     make_elem_node(el, 1);
     current_sequ->start = current_node;
     for (j = 3; j < ntok; j++) /* push first element down */
@@ -134,8 +134,8 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     current_sequ->length = find_value("at", ntok, toks);
     pos = name_list_pos("marker", defined_commands->list);
     clone = clone_command(defined_commands->commands[pos]);
-    sprintf(c_dummy, "%s$end", current_sequ->name);
-    el = make_element(c_dummy, "marker", clone, 0);
+    sprintf(c_dum->c, "%s$end", current_sequ->name);
+    el = make_element(c_dum->c, "marker", clone, 0);
     make_elem_node(el, 1);
     current_node->at_value = current_sequ->length;
     current_sequ->end = current_node;
@@ -374,8 +374,8 @@ void sxf_write(struct command* comm, FILE* out)
   }
   sxf_rtag();
   put_line(out, "// SXF version 2.0");
-  sprintf(c_dummy, "%s sequence", current_sequ->name);
-  put_line(out, c_dummy);
+  sprintf(c_dum->c, "%s sequence", current_sequ->name);
+  put_line(out, c_dum->c);
   s_indent(add_indent[0]); put_line(out, "{");
   current_node = current_sequ->range_start;
   sequ_start = current_node->position;
@@ -386,8 +386,8 @@ void sxf_write(struct command* comm, FILE* out)
   }
   sequ_end = current_node->position;
   sequ_length = sequ_end - sequ_start;
-  sprintf(c_dummy, "endsequence at = %.12g", sequ_length);
-  put_line(out, c_dummy);
+  sprintf(c_dum->c, "endsequence at = %.12g", sequ_length);
+  put_line(out, c_dum->c);
   indent = b_indent[--b_level];
   put_line(out, "}");
   put_line(out, "// SXF end");
@@ -489,48 +489,48 @@ void write_elstart(FILE* out)
   }
   else strcpy(name, current_node->p_elem->name);
   put_line(out, name); s_indent(add_indent[2]);
-  sprintf(c_dummy, "%s {", current_node->base_name); put_line(out, c_dummy);
+  sprintf(c_dum->c, "%s {", current_node->base_name); put_line(out, c_dum->c);
   s_indent(add_indent[3]);
   /*
     if (tag_flag == 1 &&  current_node->p_elem != current_node->p_elem->parent)
     {
-    sprintf(c_dummy, "tag = %s", current_node->p_elem->parent->name);
-    put_line(out, c_dummy);
+    sprintf(c_dum->c, "tag = %s", current_node->p_elem->parent->name);
+    put_line(out, c_dum->c);
     }
     else if (tag_flag == 2 && (pc = tag_spec(current_node->base_name)) != NULL)
     {
-    sprintf(c_dummy, "tag = %s", pc);
-    put_line(out,c_dummy);
+    sprintf(c_dum->c, "tag = %s", pc);
+    put_line(out,c_dum->c);
     }
   */
 
-  sprintf(c_dummy, "tag = %s", current_node->p_elem->name);
-  put_line(out, c_dummy);
+  sprintf(c_dum->c, "tag = %s", current_node->p_elem->name);
+  put_line(out, c_dum->c);
 
   if (current_node->length > zero)
   {
     if (strstr(current_node->base_name, "bend") == NULL)
-      sprintf(c_dummy, "l = %.12g", current_node->length);
-    else sprintf(c_dummy, "arc = %.12g", current_node->length);
-    put_line(out,c_dummy);
+      sprintf(c_dum->c, "l = %.12g", current_node->length);
+    else sprintf(c_dum->c, "arc = %.12g", current_node->length);
+    put_line(out,c_dum->c);
   }
 
   /*
-    sprintf(c_dummy, "at = %.12g", current_node->position);
+    sprintf(c_dum->c, "at = %.12g", current_node->position);
     nm printf("%s l = %.12g at = %.12g, prev at= %.12g\n", current_node->name, current_node->length,
     nm current_node->position, global_tmp_at);
     if(current_node->position < global_tmp_at) {
     printf("error: %s position (%.12g) < prev position (%.12g)\n",  current_node->name,
     current_node->position, global_tmp_at);
-    sprintf(c_dummy, "at = %.12g", global_tmp_at);
+    sprintf(c_dum->c, "at = %.12g", global_tmp_at);
     }
     else {
-    sprintf(c_dummy, "at = %.12g", current_node->position);
+    sprintf(c_dum->c, "at = %.12g", current_node->position);
     global_tmp_at = current_node->position;
     }
   */
-  sprintf(c_dummy, "at = %.12g", current_node->position);
-  put_line(out,c_dummy);
+  sprintf(c_dum->c, "at = %.12g", current_node->position);
+  put_line(out,c_dum->c);
 }
 
 char* tag_spec(char* intype)
@@ -590,12 +590,12 @@ void fill_dump(FILE* out, int flag, char* label, double* values, int count,
 {
   int j;
 
-  if (flag == 0) sprintf(c_dummy, " %s = ", label);
-  else           sprintf(c_dummy, " %s = [", label);
-  accu_line(out, c_dummy);
+  if (flag == 0) sprintf(c_dum->c, " %s = ", label);
+  else           sprintf(c_dum->c, " %s = [", label);
+  accu_line(out, c_dum->c);
   for (j = 0; j < count; j += inc)
   {
-    sprintf(c_dummy, " %.12g", values[j]); accu_line(out, c_dummy);
+    sprintf(c_dum->c, " %.12g", values[j]); accu_line(out, c_dum->c);
   }
   if (flag != 0)
   {

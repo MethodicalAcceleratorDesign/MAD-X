@@ -48,9 +48,8 @@ void madx()
 int act_special(int type, char* statement)
   /* acts on special commands (IF{..} etc.) */
 {
-  char rout_name[] = "act_special";
-  char* loc_buff = NULL;
-  char* loc_w = NULL;
+  struct char_array* loc_buff = NULL;
+  struct char_array* loc_w = NULL;
   int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
   int ret_val = 0;
   struct char_p_array* logic;
@@ -68,12 +67,12 @@ int act_special(int type, char* statement)
   if (type == 5) /* macro */ return make_macro(statement);
   else if (type == 6) /* line */ return make_line(statement);
   logic = new_char_p_array(1000);
-  loc_buff = (char*) mymalloc("act_special", ls);
-  loc_w = (char*) mymalloc("act_special", ls);
+  loc_buff = new_char_array(ls);
+  loc_w = new_char_array(ls);
   get_bracket_range(statement, '{', '}', &rs, &re);
   if (re < 0) fatal_error("missing '{' or '}' in statement:",statement);
   cnt_1 = rs; start_2 = rs + 1;
-  strcpy(loc_buff, statement); loc_buff[re] =  '\0';
+  mystrcpy(loc_buff, statement); loc_buff->c[re] =  '\0';
   while(aux_buff->max < cnt_1) grow_char_array(aux_buff);
   strncpy(aux_buff->c, statement, cnt_1); aux_buff->c[cnt_1] = '\0';
   switch (type)
@@ -89,7 +88,7 @@ int act_special(int type, char* statement)
       if (pro->buffers[level]->flag == 0)
       {
         pre_split(aux_buff->c, loc_w, 0);
-        mysplit(loc_w, tmp_l_array);
+        mysplit(loc_w->c, tmp_l_array);
         get_bracket_t_range(tmp_l_array->p, '(', ')', 0, tmp_l_array->curr,
                             &rs, &re);
         rs++;
@@ -98,7 +97,7 @@ int act_special(int type, char* statement)
           pro->buffers[level]->flag = 1;
           pro->curr++;
           /* now loop over statements inside {...} */
-          pro_input(&loc_buff[start_2]);
+          pro_input(&loc_buff->c[start_2]);
           pro->curr--;
         }
         else if (logex < 0) warning("illegal if construct set false:", cp);
@@ -114,29 +113,29 @@ int act_special(int type, char* statement)
       {
         pro->curr++;
         /* now loop over statements inside {...} */
-        pro_input(&loc_buff[start_2]);
+        pro_input(&loc_buff->c[start_2]);
         pro->curr--;
         pro->buffers[level]->flag = -1;
       }
       break;
     case 4: /* while */
       pre_split(aux_buff->c, loc_w, 0);
-      mysplit(loc_w, logic);
+      mysplit(loc_w->c, logic);
       get_bracket_t_range(logic->p, '(', ')', 0, logic->curr,
                           &rs, &re);
       pro->curr++; rs++;
       while ((logex = logic_expr(re-rs, &logic->p[rs])) > 0)
       {
         /* now loop over statements inside {...} */
-        pro_input(&loc_buff[start_2]);
+        pro_input(&loc_buff->c[start_2]);
       }
       pro->curr--;
       break;
     default:
       ret_val = -1;
   }
-  if (loc_buff != NULL) myfree(rout_name, loc_buff);
-  if (loc_w != NULL) myfree(rout_name, loc_w);
+  if (loc_buff != NULL) delete_char_array(loc_buff);
+  if (loc_w != NULL) delete_char_array(loc_w);
   delete_char_p_array(logic, 0);
   return ret_val;
 }
@@ -309,15 +308,15 @@ void check_table(char* string)
   {
     if (!inbounds(pb, npos, qpos))
     {
-      strcpy(c_join, pa);
-      pt = strstr(c_join, "table");
+      mystrcpy(c_join, pa);
+      pt = strstr(c_join->c, "table");
       if ((pl = strchr(pt, '(')) == NULL) return;
       if ((pr = strchr(pl, ')')) == NULL) return;
       *pl = '\0';
       *pr = '\0';
       sv = make_string_variable(++pl);
       *pa ='\0';
-      strcat(string, c_join);
+      strcat(string, c_join->c);
       strcat(string, " ( ");
       strcat(string, sv);
       strcat(string, " ) ");
@@ -404,8 +403,8 @@ double command_par_value(char* parameter, struct command* cmd)
 char* compound(char* e_name, int occ)
   /* makes node name from element name and occurrence count */
 {
-  sprintf(c_dummy,"%s:%d", e_name, occ);
-  return c_dummy;
+  sprintf(c_dum->c,"%s:%d", e_name, occ);
+  return c_dum->c;
 }
 
 void control(struct in_cmd* cmd)
@@ -994,8 +993,8 @@ void enter_sequence(struct in_cmd* cmd)
   {
     pos = name_list_pos("marker", defined_commands->list);
     clone = clone_command(defined_commands->commands[pos]);
-    sprintf(c_dummy, "%s$end", current_sequ->name);
-    el = make_element(c_dummy, "marker", clone, 0);
+    sprintf(c_dum->c, "%s$end", current_sequ->name);
+    el = make_element(c_dum->c, "marker", clone, 0);
     make_elem_node(el, 1);
     current_node->at_value = current_sequ->length;
     current_sequ->end = current_node;
@@ -1042,8 +1041,8 @@ void enter_sequence(struct in_cmd* cmd)
     else current_sequ->cavities = new_el_list(100);
     pos = name_list_pos("marker", defined_commands->list);
     clone = clone_command(defined_commands->commands[pos]);
-    sprintf(c_dummy, "%s$start", current_sequ->name);
-    el = make_element(c_dummy, "marker", clone, 0);
+    sprintf(c_dum->c, "%s$start", current_sequ->name);
+    el = make_element(c_dum->c, "marker", clone, 0);
     make_elem_node(el, 1);
     current_sequ->start = current_node;
     current_sequ->share = aux_pos;
@@ -1511,7 +1510,7 @@ void exec_help(struct in_cmd* cmd)
 void exec_macro(struct in_cmd* cmd, int pos)
   /* executes a macro */
 {
-  int i, rs, re, any = 0, level = pro->curr;
+  int i, rs, re, sum = 0, any = 0, level = pro->curr;
   int n = macro_list->macros[pos]->n_formal;
   char** toks = cmd->tok_list->p;
   if (level == pro->max) grow_in_buff_list(pro);
@@ -1526,11 +1525,14 @@ void exec_macro(struct in_cmd* cmd, int pos)
     any = re - rs - 1; rs++;
     if (any < 0) any = 0;
     else if (any > n) any = n;
+    for (i = 0; i < any; i++)  sum += strlen(toks[rs+i]);
+    while (l_wrk->max < (strlen(pro->buffers[level]->c_a->c)+sum))
+	grow_char_array(l_wrk);
     for (i = 0; i < any; i++)
     {
-      my_repl(macro_list->macros[pos]->formal->p[i], toks[rs+i],
-              pro->buffers[level]->c_a->c, l_work);
-      strcpy(pro->buffers[level]->c_a->c, l_work);
+      myrepl(macro_list->macros[pos]->formal->p[i], toks[rs+i],
+              pro->buffers[level]->c_a->c, l_wrk->c);
+      mystrcpy(pro->buffers[level]->c_a, l_wrk->c);
     }
   }
   pro_input(pro->buffers[level]->c_a->c);
@@ -2052,9 +2054,9 @@ double get_node_pos(struct node* node, struct sequence* sequ) /*recursive */
   double pos, from = 0;
   if (loop_cnt++ == MAX_LOOP)
   {
-    sprintf(c_dummy, "%s   occurrence: %d", node->p_elem->name,
+    sprintf(c_dum->c, "%s   occurrence: %d", node->p_elem->name,
             node->occ_cnt);
-    fatal_error("circular call in position of", c_dummy);
+    fatal_error("circular call in position of", c_dum->c);
   }
   if (node->at_expr == NULL) pos = node->at_value;
   else                       pos = expression_value(node->at_expr, 2);
@@ -2072,11 +2074,11 @@ double get_node_pos(struct node* node, struct sequence* sequ) /*recursive */
 int get_option(char* str)
 {
   int i, k;
-  mycpy(c_dummy, str);
+  mycpy(c_dum->c, str);
   if (options != NULL
-      && (i = name_list_pos(c_dummy, options->par_names)) > -1)
+      && (i = name_list_pos(c_dum->c, options->par_names)) > -1)
     return (k = options->par->parameters[i]->double_value);
-  else if (strcmp(c_dummy, "warn") == 0) return init_warn;
+  else if (strcmp(c_dum->c, "warn") == 0) return init_warn;
   else return 0;
 }
 
@@ -2086,8 +2088,8 @@ double get_refpos(struct sequence* sequ)
   int i;
   if (sequ != NULL && sequ->refpos != NULL)
   {
-    sprintf(c_dummy, "%s:1", sequ->refpos);
-    if ((i = name_list_pos(c_dummy, sequ->nodes->list)) < 0)
+    sprintf(c_dum->c, "%s:1", sequ->refpos);
+    if ((i = name_list_pos(c_dum->c, sequ->nodes->list)) < 0)
       fatal_error("'refpos' reference to unknown element:", sequ->refpos);
     return get_node_pos(sequ->nodes->nodes[i], sequ);
   }
@@ -2169,81 +2171,81 @@ int get_string(char* name, char* par, char* string)
   struct command* cmd;
   char* p;
   int length = 0;
-  mycpy(c_dummy, name);
-  if (strcmp(c_dummy, "beam") == 0)
+  mycpy(c_dum->c, name);
+  if (strcmp(c_dum->c, "beam") == 0)
   {
-    mycpy(c_dummy, par);
-    if ((p = command_par_string(c_dummy, current_beam)) != NULL)
+    mycpy(c_dum->c, par);
+    if ((p = command_par_string(c_dum->c, current_beam)) != NULL)
     {
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if (strcmp(c_dummy, "probe") == 0)
+  else if (strcmp(c_dum->c, "probe") == 0)
   {
-    mycpy(c_dummy, par);
-    if ((p = command_par_string(c_dummy, probe_beam)) != NULL)
+    mycpy(c_dum->c, par);
+    if ((p = command_par_string(c_dum->c, probe_beam)) != NULL)
     {
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if (strcmp(c_dummy, "survey") == 0)
+  else if (strcmp(c_dum->c, "survey") == 0)
   {
-    mycpy(c_dummy, par);
+    mycpy(c_dum->c, par);
     if (current_survey != NULL) nl = current_survey->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(c_dummy, nl)])
+    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
     {
-      if ((p = command_par_string(c_dummy, current_survey)) != NULL)
+      if ((p = command_par_string(c_dum->c, current_survey)) != NULL)
       {
         strcpy(string, p); length = strlen(p);
       }
     }
   }
-  /*else if (strcmp(c_dummy, "ptc") == 0)
+  /*else if (strcmp(c_dum->c, "ptc") == 0)
     {
-    mycpy(c_dummy, par);
+    mycpy(c_dum->c, par);
     if (current_ptc != NULL) nl = current_ptc->par_names;
     if (nl != NULL )
     {
-    if ((p = command_par_string(c_dummy, current_ptc)) != NULL)
+    if ((p = command_par_string(c_dum->c, current_ptc)) != NULL)
     {
     strcpy(string, p); length = strlen(p);
     }
     }
     }  */
-  else if (strcmp(c_dummy, "twiss") == 0)
+  else if (strcmp(c_dum->c, "twiss") == 0)
   {
-    mycpy(c_dummy, par);
+    mycpy(c_dum->c, par);
     if (current_twiss != NULL) nl = current_twiss->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(c_dummy, nl)])
+    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
     {
-      if ((p = command_par_string(c_dummy, current_twiss)) != NULL)
+      if ((p = command_par_string(c_dum->c, current_twiss)) != NULL)
       {
         strcpy(string, p); length = strlen(p);
       }
     }
   }
-  else if (strcmp(c_dummy, "sequence") == 0)
+  else if (strcmp(c_dum->c, "sequence") == 0)
   {
-    mycpy(c_dummy, par);
-    if (current_sequ != NULL && strcmp(c_dummy, "name") == 0)
+    mycpy(c_dum->c, par);
+    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
     {
       p = current_sequ->name;
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if (strcmp(c_dummy, "element") == 0)
+  else if (strcmp(c_dum->c, "element") == 0)
   {
-    mycpy(c_dummy, par);
-    if (current_sequ != NULL && strcmp(c_dummy, "name") == 0)
+    mycpy(c_dum->c, par);
+    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
     {
       p = current_node->p_elem->name;
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if ((cmd = find_command(c_dummy, stored_commands)) != NULL)
+  else if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
   {
-    mycpy(c_dummy, par);
-    if ((p = command_par_string(c_dummy, cmd)) != NULL)
+    mycpy(c_dum->c, par);
+    if ((p = command_par_string(c_dum->c, cmd)) != NULL)
     {
       strcpy(string, p); length = strlen(p);
     }
@@ -2296,27 +2298,27 @@ double get_value(char* name, char* par)
      else INVALID */
 {
   struct name_list* nl = NULL;
-  mycpy(c_dummy, name);
+  mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (strcmp(c_dummy, "beam") == 0)
+  if (strcmp(c_dum->c, "beam") == 0)
     return command_par_value(aux_buff->c, current_beam);
-  else if (strcmp(c_dummy, "probe") == 0)
+  else if (strcmp(c_dum->c, "probe") == 0)
     return command_par_value(aux_buff->c, probe_beam);
-  else if (strcmp(c_dummy, "survey") == 0)
+  else if (strcmp(c_dum->c, "survey") == 0)
   {
     if (current_survey != NULL) nl = current_survey->par_names;
     if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
       return command_par_value(aux_buff->c, current_survey);
     else return zero;
   }
-  else if (strcmp(c_dummy, "twiss") == 0)
+  else if (strcmp(c_dum->c, "twiss") == 0)
   {
     if (current_twiss != NULL) nl = current_twiss->par_names;
     if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
       return command_par_value(aux_buff->c, current_twiss);
     else return zero;
   }
-  else if (strcmp(c_dummy, "sequence") == 0)
+  else if (strcmp(c_dum->c, "sequence") == 0)
   {
     if (strcmp(aux_buff->c, "l") == 0) return current_sequ->length;
     else if (strcmp(aux_buff->c, "range_start") == 0)
@@ -2325,7 +2327,7 @@ double get_value(char* name, char* par)
     else return INVALID;
   }
   else if (current_command != NULL
-           && strcmp(c_dummy, current_command->name) == 0)
+           && strcmp(c_dum->c, current_command->name) == 0)
     return command_par_value(aux_buff->c, current_command);
   else return INVALID;
 }
@@ -2338,11 +2340,11 @@ double get_variable(char* name)
   struct variable* var;
   struct element* el;
   struct command* cmd;
-  char *p, *n = c_dummy, *q = comm;
-  mycpy(c_dummy, name);
-  if ((p = strstr(c_dummy, "->")) == NULL) /* variable */
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
   {
-    if ((var = find_variable(c_dummy, variable_list)) != NULL)
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
       val = variable_value(var);
   }
   else /* element or command parameter */
@@ -2401,19 +2403,19 @@ int in_spec_list(char* string)
 {
   char* cp;
   int i = 0, n = mymin((int)strlen(string), 100);
-  strncpy(c_dummy, string, n); c_dummy[n] = '\0'; stolower(c_dummy);
-  supp_char(' ', c_dummy);
+  strncpy(c_dum->c, string, n); c_dum->c[n] = '\0'; stolower(c_dum->c);
+  supp_char(' ', c_dum->c);
   while (special_comm_cnt[i])
   {
     if (special_comm_desc[i][0] == '>')
     {
-      if ((cp = strchr(c_dummy, special_comm_desc[i][1])) != NULL)
+      if ((cp = strchr(c_dum->c, special_comm_desc[i][1])) != NULL)
       {
         if (strncmp(++cp, &special_comm_desc[i][2], special_comm_cnt[i])
             == 0)  return i+1;
       }
     }
-    else if (strncmp(c_dummy, &special_comm_desc[i][0],special_comm_cnt[i])
+    else if (strncmp(c_dum->c, &special_comm_desc[i][0],special_comm_cnt[i])
              == 0)  return i+1;
     i++;
   }
@@ -2550,30 +2552,34 @@ void madx_init()
   pro = new_in_buff_list(100); /* list of process buffers, dynamic */
   pro->buffers[0] = new_in_buffer(IN_BUFF_SIZE);
   pro->curr = 1;
-  char_buff = new_char_array_list(100);
+  c_dum = new_char_array(AUX_LG);
+  c_join = new_char_array(AUX_LG);
+  work = new_char_array(AUX_LG);
+  l_wrk = new_char_array(AUX_LG);
+  char_buff = new_char_array_list(100); /* list of character arrays, dynamic */
   char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
-  aux_buff = new_char_array(AUX_LG);  /* temporary buffer for many purposes */
-  drift_list = new_el_list(1000);
-  variable_list = new_var_list(2000);
-  comm_constraints = new_constraint_list(10);
-  beam_list = new_command_list("beam_list", 10);
-  stored_track_start = new_command_list("track_start", 100);
-  table_deselect = new_command_list_list(10);
-  table_select = new_command_list_list(10);
-  defined_commands = new_command_list("defined_commands", 100);
-  stored_commands = new_command_list("stored_commands", 500);
-  line_list = new_macro_list(100);
-  macro_list = new_macro_list(100);
-  base_type_list = new_el_list(60);
-  element_list = new_el_list(20000);
-  buffered_cmds = new_in_cmd_list(10000);
-  sequences = new_sequence_list(20);
+  aux_buff = new_char_array(AUX_LG);  /* dynamic temporary buffer */
+  drift_list = new_el_list(1000); /* dynamic list for internal drifts */
+  variable_list = new_var_list(2000); /* dynamic list of variables */
+  comm_constraints = new_constraint_list(10); /* dynamic constraint list */
+  beam_list = new_command_list("beam_list", 10); /* dynamic beam list */
+  stored_track_start = new_command_list("track_start", 100); /* dynamic */
+  table_deselect = new_command_list_list(10); /* dynamic */
+  table_select = new_command_list_list(10); /* dynamic */
+  defined_commands = new_command_list("defined_commands", 100); /* dynamic */
+  stored_commands = new_command_list("stored_commands", 500); /* dynamic */
+  line_list = new_macro_list(100); /* dynamic */
+  macro_list = new_macro_list(100); /* dynamic */
+  base_type_list = new_el_list(60); /* dynamic */
+  element_list = new_el_list(20000); /* dynamic */
+  buffered_cmds = new_in_cmd_list(10000); /* dynamic */
+  sequences = new_sequence_list(20); /* dynamic */
   match_sequs = new_sequence_list(2);
-  selected_ranges = new_node_list(10000);
-  selected_elements = new_el_list(10000);
-  tmp_p_array = new_char_p_array(1000);
-  tmp_l_array = new_char_p_array(1000);
-  sxf_list = new_name_list("sxf_list", 50);
+  selected_ranges = new_node_list(10000); /* dynamic */
+  selected_elements = new_el_list(10000); /* dynamic */
+  tmp_p_array = new_char_p_array(1000); /* dynamic */
+  tmp_l_array = new_char_p_array(1000); /* dynamic */
+  sxf_list = new_name_list("sxf_list", 50); /* dynamic */
   deco_init();
   get_defined_constants();
   get_defined_commands();
@@ -2594,18 +2600,23 @@ void madx_init()
   set_defaults("set");
   set_defaults("setplot");
   set_defaults("threader");
-  table_register = new_table_list(10);
-  beta0_list = new_command_list("beta0_list", 10);
-  savebeta_list = new_command_list("savebeta_list", 10);
-  seqedit_select = new_command_list("seqedit_select", 10); /* for "select seqedit" commands */
-  error_select = new_command_list("error-select", 10); /* for "select error" commands */
-  save_select = new_command_list("save_select", 10); /* for "select save" commands */
-  slice_select = new_command_list("slice_select", 10); /* for "select makethin" commands */
-  sector_select = new_command_list("sector_select", 10); /* for "select sectormap" commands */
-  s_range = new_int_array(10);
-  e_range = new_int_array(10);
-  sd_range = new_int_array(10);
-  ed_range = new_int_array(10);
+  table_register = new_table_list(10); /* dynamic */
+  beta0_list = new_command_list("beta0_list", 10); /* dynamic */
+  savebeta_list = new_command_list("savebeta_list", 10); /* dynamic */
+  seqedit_select = /* dynamic - for "select seqedit" commands */
+    new_command_list("seqedit_select", 10);
+  error_select = /* dynamic - for "select error" commands */
+    new_command_list("error-select", 10);
+  save_select = /* dynamic - for "select save" commands */
+    new_command_list("save_select", 10);
+  slice_select = /* dynamic - for "select makethin" commands */
+    new_command_list("slice_select", 10);
+  sector_select = /* dynamic - for "select sectormap" commands */
+    new_command_list("sector_select", 10);
+  s_range = new_int_array(10); /* dynamic */
+  e_range = new_int_array(10); /* dynamic */
+  sd_range = new_int_array(10); /* dynamic */
+  ed_range = new_int_array(10); /* dynamic */
   zero_double(orbit0, 6);
   zero_double(disp0, 6);
   zero_double(guess_orbit,6);
@@ -2710,8 +2721,8 @@ int make_line(char* statement)
   strcpy(aux_buff->c, statement);
   if ((prs = strchr(aux_buff->c, '=')) == NULL) return -3;
   *prs = '\0'; prs++;
-  pre_split(aux_buff->c, l_work, 0);
-  mysplit(l_work, tmp_l_array);
+  pre_split(aux_buff->c, l_wrk, 0);
+  mysplit(l_wrk->c, tmp_l_array);
   get_bracket_t_range(toks, '(', ')', 0, tmp_l_array->curr-1, &rs, &re);
   if ((n = re - rs - 1) < 0) n = 0; /* number of formal arguments if any */
   m = new_macro(n, 2*strlen(prs), 50);
@@ -2719,8 +2730,8 @@ int make_line(char* statement)
   for (i = 0; i < n; i++) m->formal->p[i] = permbuff(toks[rs+i]);
   if (n > 0) m->formal->curr = n;
   if ((psem = strchr(prs, ';')) != NULL) *psem = '\0';
-  strcpy(l_work, prs);
-  pre_split(l_work, m->body->c, 0);
+  mystrcpy(l_wrk, prs);
+  pre_split(l_wrk->c, m->body, 0);
   m->body->curr = strlen(m->body->c);
   mysplit(m->body->c, m->tokens);
   n = 0;
@@ -2747,8 +2758,8 @@ int make_macro(char* statement)
   get_bracket_range(aux_buff->c, '{', '}', &rs, &re);
   start_2 = rs + 1;
   aux_buff->c[rs] = '\0'; aux_buff->c[re] = '\0'; /* drop '{' and '}' */
-  pre_split(aux_buff->c, l_work, 0);
-  mysplit(l_work, tmp_l_array);
+  pre_split(aux_buff->c, l_wrk, 0);
+  mysplit(l_wrk->c, tmp_l_array);
   get_bracket_t_range(toks, '(', ')', 0, tmp_l_array->curr-1, &rs, &re);
   if ((n = re - rs - 1) < 0) n = 0; /* number of formal arguments if any */
   m = new_macro(n, strlen(&aux_buff->c[start_2]), 0);
@@ -2898,6 +2909,7 @@ char* permbuff(char* string)  /* string -> general buffer, returns address */
   n = strlen(string)+1;
   if (k + n >= char_buff->ca[char_buff->curr-1]->max)
   {
+    if (char_buff->curr == char_buff->max) grow_char_array_list(char_buff);
     char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
     k = 0;
   }
@@ -3131,13 +3143,14 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
   return stack[0];
 }
 
-void pre_split(char* inbuf, char* outbuf, int fill_flag)
+void pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
   /* inserts blanks between tokens */
   /* fill_flag != 0 makes a 0 to be inserted into an empty "()" */
 {
   char c, cp = ' ', cpnb = ' ', quote = ' ';
   int j, k, kn, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
   int left_b = 0, new_string = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
+  while (2*strlen(inbuf) > outbuf->max) grow_char_array(outbuf);
   for (k = 0; k < sl; k++)
   {
     c = inbuf[k];
@@ -3145,9 +3158,9 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
     {
       if (c == quote)
       {
-        quote_level--; outbuf[cout++] = c; outbuf[cout++] = ' ';
+        quote_level--; outbuf->c[cout++] = c; outbuf->c[cout++] = ' ';
       }
-      else outbuf[cout++] = c == ' ' ? '@' : c;
+      else outbuf->c[cout++] = c == ' ' ? '@' : c;
     }
     else
     {
@@ -3157,27 +3170,27 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
         case '\"':
         case '\'':
           quote = c;
-          quote_level++; outbuf[cout++] = ' '; outbuf[cout++] = c;
+          quote_level++; outbuf->c[cout++] = ' '; outbuf->c[cout++] = c;
           break;
         case '-':
           if (inbuf[k+1] == '>')
           {
-            outbuf[cout++] = c; break;
+            outbuf->c[cout++] = c; break;
           }
         case '+':
           if (left_b > 0)
           {
-            outbuf[cout++] = ' ';
-            outbuf[cout++] = '0';
-            outbuf[cout++] = ' ';
+            outbuf->c[cout++] = ' ';
+            outbuf->c[cout++] = '0';
+            outbuf->c[cout++] = ' ';
             left_b = 0;
           }
           if (!(new_string > 0 && c_digit > 0 && strchr("ed",cp)) && cout > 0)
-            outbuf[cout++] = ' ';
-          outbuf[cout++] = c;
+            outbuf->c[cout++] = ' ';
+          outbuf->c[cout++] = c;
           if (!(new_string > 0 && c_digit > 0 && strchr("ed",cp)))
           {
-            outbuf[cout++] = ' ';
+            outbuf->c[cout++] = ' ';
             new_string = 1;
           }
           break;
@@ -3185,18 +3198,18 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
           rb_level++;
           left_b = 1;
           new_string = 1;
-          outbuf[cout++] = ' ';
-          outbuf[cout++] = c;
-          outbuf[cout++] = ' ';
+          outbuf->c[cout++] = ' ';
+          outbuf->c[cout++] = c;
+          outbuf->c[cout++] = ' ';
           break;
         case '>':
-          if (cout > 0 && outbuf[cout-1] == '-')
+          if (cout > 0 && outbuf->c[cout-1] == '-')
           {
-            outbuf[cout++] = c; break;
+            outbuf->c[cout++] = c; break;
           }
         case ')':
           rb_level--;
-          if (fill_flag && cpnb == '(') outbuf[cout++] = '0';
+          if (fill_flag && cpnb == '(') outbuf->c[cout++] = '0';
         case '<':
         case ':':
         case '*':
@@ -3210,58 +3223,58 @@ void pre_split(char* inbuf, char* outbuf, int fill_flag)
         case '&':
           left_b = 0;
           new_string = 1;
-          outbuf[cout++] = ' ';
-          outbuf[cout++] = c;
-          outbuf[cout++] = ' ';
+          outbuf->c[cout++] = ' ';
+          outbuf->c[cout++] = c;
+          outbuf->c[cout++] = ' ';
           break;
         case '=':
           f_equal = 1;
           left_b = 0;
           new_string = 1;
-          outbuf[cout++] = ' ';
-          outbuf[cout++] = c;
-          outbuf[cout++] = ' ';
+          outbuf->c[cout++] = ' ';
+          outbuf->c[cout++] = c;
+          outbuf->c[cout++] = ' ';
           break;
         case ',': /* kept behind first "=", or if not first "," */
           /* not kept inside round brackets before '=' */
           left_b = 0;
           new_string = 1;
-          outbuf[cout++] = ' ';
+          outbuf->c[cout++] = ' ';
           if (f_equal || (comm_cnt && rb_level == 0))
           {
-            outbuf[cout++] = c;
-            outbuf[cout++] = ' ';
+            outbuf->c[cout++] = c;
+            outbuf->c[cout++] = ' ';
           }
           comm_cnt++;
           break;
         case ';':
           left_b = 0;
           new_string = 1;
-          outbuf[cout++] = ' ';
+          outbuf->c[cout++] = ' ';
           break;
         default:
-          if (c == ' ') outbuf[cout++] = c;
+          if (c == ' ') outbuf->c[cout++] = c;
           else
           {
             left_b = 0;
             if (new_string && (isdigit(c) || c == '.'))
             {
               kn = get_val_num(inbuf, k, sl);
-              for (j = k; j <= kn; j++) outbuf[cout++] = inbuf[j];
-              outbuf[cout++] = ' ';
+              for (j = k; j <= kn; j++) outbuf->c[cout++] = inbuf[j];
+              outbuf->c[cout++] = ' ';
               k = kn;
             }
             else
             {
               new_string = 0;
-              if (cout > 0 || c != ' ') outbuf[cout++] = c;
+              if (cout > 0 || c != ' ') outbuf->c[cout++] = c;
             }
           }
       }
       cp = c; if (c != ' ') cpnb = c;
     }
   }
-  outbuf[cout] = '\0';
+  outbuf->c[cout] = '\0';
 }
 
 void process()  /* steering routine: processes one command */
@@ -3409,8 +3422,8 @@ void pro_input(char* statement)
         *sem = '\0';
         this_cmd = new_in_cmd(400);
         pre_split(&statement[start], work, 1);
-        check_table(work);
-        this_cmd->tok_list->curr = mysplit(work, this_cmd->tok_list);
+        check_table(work->c);
+        this_cmd->tok_list->curr = mysplit(work->c, this_cmd->tok_list);
         if ((type = decode_command()) < 0) /* error */
         {
           if (get_option("warn"))
@@ -3423,7 +3436,7 @@ void pro_input(char* statement)
               case -2:
                 warning("statement label is protected keyword,","skipped");
               case -3:
-                warning("statement not recognised:", work);
+                warning("statement not recognised:", work->c);
                 break;
               default:
                 fatal_error("illegal return code","from decode_command");
@@ -3783,7 +3796,7 @@ void set_option(char* str, int* opt)
 {
   int i, j, k;
   char* bc;
-  mycpy(c_dummy, str); bc = permbuff(c_dummy);
+  mycpy(c_dum->c, str); bc = permbuff(c_dum->c);
   if ((i = name_list_pos(bc, options->par_names)) < 0)
   {
     j = add_to_name_list(bc, 0, options->par_names);
@@ -3940,7 +3953,7 @@ char* spec_join(char** it_list, int n)
   int j;
   char** p;
   struct variable* var;
-  *c_join = '\0';
+  *c_join->c = '\0';
   if (n > 0)
   {
     p = (char**) mymalloc(rout_name,n*sizeof(char*));
@@ -3949,10 +3962,10 @@ char* spec_join(char** it_list, int n)
       if (strcmp(p[j], "table") == 0 && j+3 < n
           && (var = find_variable(p[j+2], variable_list)) != NULL)
         p[j+2] = var->string;
-    for (j = 0; j < n; j++) strcat(c_join, p[j]);
+    for (j = 0; j < n; j++) strcat(c_join->c, p[j]);
     myfree(rout_name, p);
   }
-  return c_join;
+  return c_join->c;
 }
 
 void store_command_def(char* cmd_string)  /* processes command definition */
@@ -3965,7 +3978,7 @@ void store_command_def(char* cmd_string)  /* processes command definition */
   struct char_p_array* toks = tmp_cmd->tok_list;
 
   pre_split(cmd_string, work, 0);
-  n = mysplit(work, toks);
+  n = mysplit(work->c, toks);
   if (n < 6 || *toks->p[1] != ':') fatal_error("illegal command:", cmd_string);
   if (defined_commands->curr == defined_commands->max)
     grow_command_list(defined_commands);
@@ -4212,9 +4225,9 @@ double table_value()
   struct table* table;
   if (current_variable != NULL && current_variable->string != NULL)
   {
-    strcpy(c_dummy, current_variable->string);
-    supp_char(',', c_dummy);
-    mysplit(c_dummy, tmp_p_array);
+    strcpy(c_dum->c, current_variable->string);
+    supp_char(',', c_dum->c);
+    mysplit(c_dum->c, tmp_p_array);
     toks = tmp_p_array->p; ntok = tmp_p_array->curr;
     if (ntok > 1)
     {

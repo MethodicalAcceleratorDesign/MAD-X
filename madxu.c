@@ -15,8 +15,8 @@ int add_drifts(struct node* c_node, struct node* end)
     dl = c_node->position - el2 - pos;
     if (dl + ten_m_6 < zero)
     {
-      sprintf(c_dummy, "%s, length %e", c_node->name, dl);
-      fatal_error("negative drift in front of", c_dummy);
+      sprintf(c_dum->c, "%s, length %e", c_node->name, dl);
+      fatal_error("negative drift in front of", c_dum->c);
     }
     else if (dl > ten_m_6)
     {
@@ -924,10 +924,10 @@ void dump_char_array(struct char_array* a)
   while (n < a->curr)
   {
     k = a->curr - n; if (k > l_cnt) k = l_cnt;
-    strncpy(c_dummy, c, k);
+    strncpy(c_dum->c, c, k);
     c += k; n += k;
-    c_dummy[k] = '\0';
-    fprintf(prt_file, "%s\n", c_dummy);
+    c_dum->c[k] = '\0';
+    fprintf(prt_file, "%s\n", c_dum->c);
   }
 }
 
@@ -1405,31 +1405,31 @@ void export_sequence(struct sequence* sequ, FILE* file)
   struct sequence* sq;
   struct node* c_node = sequ->start;
   char rpos[3][6] = {"exit", "centre", "entry"};
-  *c_dummy = '\0';
-  if (sequ->share) strcat(c_dummy, "shared ");
-  strcat(c_dummy, sequ->name);
-  strcat(c_dummy, ": sequence");
+  *c_dum->c = '\0';
+  if (sequ->share) strcat(c_dum->c, "shared ");
+  strcat(c_dum->c, sequ->name);
+  strcat(c_dum->c, ": sequence");
   if (sequ->ref_flag)
   {
-    strcat(c_dummy, ", refer = ");
-    strcat(c_dummy, rpos[sequ->ref_flag+1]);
+    strcat(c_dum->c, ", refer = ");
+    strcat(c_dum->c, rpos[sequ->ref_flag+1]);
   }
   if (sequ->refpos != NULL)
   {
-    strcat(c_dummy, ", refpos = ");
-    strcat(c_dummy, sequ->refpos);
+    strcat(c_dum->c, ", refpos = ");
+    strcat(c_dum->c, sequ->refpos);
   }
-  strcat(c_dummy, ", l = ");
-  if (sequ->l_expr != NULL) strcat(c_dummy, sequ->l_expr->string);
+  strcat(c_dum->c, ", l = ");
+  if (sequ->l_expr != NULL) strcat(c_dum->c, sequ->l_expr->string);
   else
   {
     sprintf(num, v_format("%F"), sequ->length);
-    strcat(c_dummy, supp_tb(num));
+    strcat(c_dum->c, supp_tb(num));
   }
-  write_nice(c_dummy, file);
+  write_nice(c_dum->c, file);
   while(c_node != NULL)
   {
-    *c_dummy = '\0';
+    *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
         && strcmp(c_node->base_name, "drift") != 0)
     {
@@ -1437,34 +1437,34 @@ void export_sequence(struct sequence* sequ, FILE* file)
       {
         if (c_node->p_elem->def_type)
         {
-          strcat(c_dummy, el->name);
-          strcat(c_dummy, ": ");
-          strcat(c_dummy, el->parent->name);
+          strcat(c_dum->c, el->name);
+          strcat(c_dum->c, ": ");
+          strcat(c_dum->c, el->parent->name);
         }
-        else strcat(c_dummy, el->name);
+        else strcat(c_dum->c, el->name);
       }
-      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
+      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
       else fatal_error("save error: node without link:", c_node->name);
-      strcat(c_dummy, ", at = ");
-      if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
+      strcat(c_dum->c, ", at = ");
+      if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
       else
       {
         sprintf(num, v_format("%F"), c_node->at_value);
-        strcat(c_dummy, supp_tb(num));
+        strcat(c_dum->c, supp_tb(num));
       }
       if (c_node->from_name != NULL)
       {
-        strcat(c_dummy, ", from = ");
-        strcat(c_dummy, c_node->from_name);
+        strcat(c_dum->c, ", from = ");
+        strcat(c_dum->c, c_node->from_name);
       }
-      export_el_def(c_node->p_elem, c_dummy);
-      write_nice(c_dummy, file);
+      export_el_def(c_node->p_elem, c_dum->c);
+      write_nice(c_dum->c, file);
     }
     if (c_node == sequ->end)  break;
     c_node = c_node->next;
   }
-  strcpy(c_dummy, "endsequence");
-  write_nice(c_dummy, file);
+  strcpy(c_dum->c, "endsequence");
+  write_nice(c_dum->c, file);
 }
 
 void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
@@ -1475,13 +1475,13 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   struct sequence* sq;
   struct node* c_node = sequ->start;
   if (pass_select_list(sequ->name, cl) == 0)  return;
-  *c_dummy = '\0';
-  strcat(c_dummy, sequ->name);
-  strcat(c_dummy, ": sequence");
-  write_nice_8(c_dummy, file);
+  *c_dum->c = '\0';
+  strcat(c_dum->c, sequ->name);
+  strcat(c_dum->c, ": sequence");
+  write_nice_8(c_dum->c, file);
   while(c_node != NULL)
   {
-    *c_dummy = '\0';
+    *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
         && strcmp(c_node->base_name, "drift") != 0)
     {
@@ -1489,94 +1489,94 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
       {
         if (c_node->p_elem->def_type)
         {
-          strcat(c_dummy, el->name);
-          strcat(c_dummy, ": ");
-          strcat(c_dummy, el->parent->name);
+          strcat(c_dum->c, el->name);
+          strcat(c_dum->c, ": ");
+          strcat(c_dum->c, el->parent->name);
         }
-        else strcat(c_dummy, el->name);
+        else strcat(c_dum->c, el->name);
       }
-      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dummy, sq->name);
+      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
       else fatal_error("save error: node without link:", c_node->name);
-      strcat(c_dummy, ", at = ");
-      if (c_node->at_expr != NULL) strcat(c_dummy, c_node->at_expr->string);
+      strcat(c_dum->c, ", at = ");
+      if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
       else
       {
         sprintf(num, v_format("%F"), c_node->at_value);
-        strcat(c_dummy, supp_tb(num));
+        strcat(c_dum->c, supp_tb(num));
       }
       if (c_node->from_name != NULL)
       {
-        strcat(c_dummy, ", from = ");
-        strcat(c_dummy, c_node->from_name);
+        strcat(c_dum->c, ", from = ");
+        strcat(c_dum->c, c_node->from_name);
       }
-      export_el_def_8(c_node->p_elem, c_dummy);
-      write_nice_8(c_dummy, file);
+      export_el_def_8(c_node->p_elem, c_dum->c);
+      write_nice_8(c_dum->c, file);
     }
     if (c_node == sequ->end)  break;
     c_node = c_node->next;
   }
-  strcpy(c_dummy, sequ->name);
-  strcat(c_dummy, "_end: marker, at = ");
+  strcpy(c_dum->c, sequ->name);
+  strcat(c_dum->c, "_end: marker, at = ");
   sprintf(num, v_format("%F"), sequ->length);
-  strcat(c_dummy,num);
-  write_nice_8(c_dummy, file);
-  strcpy(c_dummy, "endsequence");
-  write_nice_8(c_dummy, file);
+  strcat(c_dum->c,num);
+  write_nice_8(c_dum->c, file);
+  strcpy(c_dum->c, "endsequence");
+  write_nice_8(c_dum->c, file);
 }
 
 void export_variable(struct variable* var, FILE* file)
   /* exports variable in mad-X format */
 {
   int k;
-  *c_dummy = '\0';
+  *c_dum->c = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
-  if (var->val_type == 0) strcat(c_dummy, "int ");
-  if (var->type == 0) strcat(c_dummy, "const ");
-  strcat(c_dummy, var->name);
-  if (var->type < 2) strcat(c_dummy, " = ");
-  else               strcat(c_dummy, " := ");
-  if (var->expr != NULL) strcat(c_dummy, var->expr->string);
+  if (var->val_type == 0) strcat(c_dum->c, "int ");
+  if (var->type == 0) strcat(c_dum->c, "const ");
+  strcat(c_dum->c, var->name);
+  if (var->type < 2) strcat(c_dum->c, " = ");
+  else               strcat(c_dum->c, " := ");
+  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
   else if (var->val_type == 0)
   {
-    k = var->value; sprintf(c_join, "%d", k); strcat(c_dummy, c_join);
+    k = var->value; sprintf(c_join->c, "%d", k); strcat(c_dum->c, c_join->c);
   }
   else
   {
-    sprintf(c_join, v_format("%F"), var->value);
-    strcat(c_dummy, supp_tb(c_join));
+    sprintf(c_join->c, v_format("%F"), var->value);
+    strcat(c_dum->c, supp_tb(c_join->c));
   }
-  write_nice(c_dummy, file);
+  write_nice(c_dum->c, file);
 }
 
 void export_var_8(struct variable* var, FILE* file)
   /* exports variable in mad-8 format */
 {
   int k;
-  *c_dummy = '\0';
+  *c_dum->c = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
   if (var->type == 0)
   {
-    strcat(c_dummy, var->name);
-    strcat(c_dummy, ": constant = ");
+    strcat(c_dum->c, var->name);
+    strcat(c_dum->c, ": constant = ");
   }
   else
   {
-    strcat(c_dummy, var->name);
-    if (var->type < 2) strcat(c_dummy, " = ");
-    else               strcat(c_dummy, " := ");
+    strcat(c_dum->c, var->name);
+    if (var->type < 2) strcat(c_dum->c, " = ");
+    else               strcat(c_dum->c, " := ");
   }
-  if (var->expr != NULL) strcat(c_dummy, var->expr->string);
+  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
   else if (var->val_type == 0)
   {
-    k = var->value; sprintf(c_join, v_format("%I"), k);
-    strcat(c_dummy, c_join);
+    k = var->value; sprintf(c_join->c, v_format("%I"), k);
+    strcat(c_dum->c, c_join->c);
   }
   else
   {
-    sprintf(c_join, v_format("%F"), var->value);
-    strcat(c_dummy, supp_tb(c_join));
+    sprintf(c_join->c, v_format("%F"), var->value);
+    strcat(c_dum->c, supp_tb(c_join->c));
   }
-  write_nice_8(c_dummy, file);
+  write_nice_8(c_dum->c, file);
 }
 
 double find_value(char* name, int ntok, char** toks)
@@ -1627,6 +1627,21 @@ void grow_char_array( /* doubles array size */
   p->c = (char*) mymalloc(rout_name, new);
   for (j = 0; j < p->curr; j++) p->c[j] = p_loc[j];
   myfree(rout_name, p_loc);
+}
+
+void grow_char_array_list( /* doubles list size */
+  struct char_array_list* p)
+{
+  char rout_name[] = "grow_char_array_list";
+  struct char_array** c_loc = p->ca;
+  int j, new = 2*p->max;
+
+  p->max = new;
+  p->ca
+    = (struct char_array**) mycalloc(rout_name,new, 
+                                     sizeof(struct char_array*));
+  for (j = 0; j < p->curr; j++) p->ca[j] = c_loc[j];
+  myfree(rout_name, c_loc);
 }
 
 void grow_char_p_array( /* doubles array size */
@@ -1846,8 +1861,8 @@ void double_table(char* table)
   int pos;
   struct table* t;
 
-  mycpy(c_dummy, table);
-  if ((pos = name_list_pos(c_dummy, table_register->names)) > -1)
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
   grow_table(t);
@@ -2005,9 +2020,9 @@ char* join(char** it_list, int n)
   /* joins n character strings into one */
 {
   int j;
-  *c_join = '\0';
-  for (j = 0; j < n; j++) strcat(c_join, it_list[j]);
-  return c_join;
+  *c_join->c = '\0';
+  for (j = 0; j < n; j++) strcat(c_join->c, it_list[j]);
+  return c_join->c;
 }
 
 char* join_b(char** it_list, int n)
@@ -2015,7 +2030,7 @@ char* join_b(char** it_list, int n)
 {
   char* target;
   int j, k = 0;
-  target = c_join;
+  target = c_join->c;
   for (j = 0; j < n; j++)
   {
     strcpy(&target[k], it_list[j]);
@@ -2183,6 +2198,13 @@ char* mystrchr(char* string, char c)
   return NULL;
 }
 
+void mystrcpy(struct char_array* target, char* source)
+{
+  /* string copy to char_array with size adjustment */
+    while (strlen(source) > target->max) grow_char_array(target);
+    strcpy(target->c, source);
+}
+
 char* mystrstr(char* string, char* s)
   /* returns strstr for s, but only outside strings included
      in single or double quotes */
@@ -2206,7 +2228,7 @@ char* mystrstr(char* string, char* s)
   return NULL;
 }
 
-void my_repl(char* in, char* out, char* string_in, char* string_out)
+void myrepl(char* in, char* out, char* string_in, char* string_out)
   /* replaces all occurrences of "in" in string_in by "out"
      in output string string_out */
 {
@@ -3458,10 +3480,10 @@ void write_table(struct table* t, char* filename)
             fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
           else if (t->columns->inform[col->i[i]] == 3)
           {
-            *c_dummy = '\"';
-            strcpy(&c_dummy[1], t->s_cols[col->i[i]][j]);
-            stoupper(c_dummy);
-            pc = strip(c_dummy); /* remove :<occ_count> */
+            *c_dum->c = '\"';
+            strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+            stoupper(c_dum->c);
+            pc = strip(c_dum->c); /* remove :<occ_count> */
             k = strlen(pc);
             pc[k++] = '\"'; pc[k] = '\0';
             fprintf(out_file, v_format(" %S "), pc);
