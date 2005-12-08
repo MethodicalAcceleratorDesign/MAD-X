@@ -78,8 +78,8 @@ struct el_list *thin_select_list = NULL;
 
 void force_consistent_slices(void)
 /* hbu 10/2005
-  loop over all elements and check that #slices of child and parent agree
-  if not, use the maximum for both
+   loop over all elements and check that #slices of child and parent agree
+   if not, use the maximum for both
 */
 {
   struct element* el_i;
@@ -336,7 +336,7 @@ void add_cmd_parameter_clone(struct command* cmd,struct command_parameter *param
   {
     cmd->par->parameters[cmd->par->curr] = clone_command_parameter(param); /* set current to identical copy (clone) of param */
     add_to_name_list(par_name,inf,cmd->par_names);
-      cmd->par->curr++;
+    cmd->par->curr++;
   }
 }
 
@@ -496,15 +496,15 @@ void add_lrad(struct command* cmd,struct command_parameter *length_param,int sli
   struct command_parameter *l_par;
   if(length_param)
   { add_cmd_parameter_new(cmd,0.,"l",1); /* new parameter l with value of 0 */
-    l_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(length_param); /* keep what was l */
-    strcpy(l_par->name,"lrad"); /* but rename to lrad and slice : */
-    if (slices > 1) /* divide numbers or expressions by the number of slices */
-    {
-      if (l_par->expr) l_par->expr = compound_expr(l_par->expr,0.,"/",NULL,slices);
-      else l_par->double_value /= slices;
-    }
-    add_to_name_list("lrad",1,cmd->par_names);
-    cmd->par->curr++;
+  l_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(length_param); /* keep what was l */
+  strcpy(l_par->name,"lrad"); /* but rename to lrad and slice : */
+  if (slices > 1) /* divide numbers or expressions by the number of slices */
+  {
+    if (l_par->expr) l_par->expr = compound_expr(l_par->expr,0.,"/",NULL,slices);
+    else l_par->double_value /= slices;
+  }
+  add_to_name_list("lrad",1,cmd->par_names);
+  cmd->par->curr++;
   }
 }
 
@@ -519,7 +519,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   int slices, minimizefl;
   int knl_flag = 0,ksl_flag = 0;
 
-  // next is new to handle parent with possibly different slice number than child
+  /* next is new to handle parent with possibly different slice number than child */
   slices = get_slices_from_elem(thick_elem);
   at_param = return_param("at",thick_elem);
 
@@ -532,12 +532,12 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
-    slice_no=slices=1; // do not slice this one
+    slice_no=slices=1; /* do not slice this one */
   }
   if(slice_no > slices && thick_elem!=thick_elem->parent ) /* check, but not for base classes */
   { printf("    *** warning in create_thin_multipole. Inconsistent child/parent slicing for %s  slice_no=%d exceeds slices=%d. Use 1 for parent.\n",
-      thick_elem->name,slice_no,slices);
-      slice_no=1;
+           thick_elem->name,slice_no,slices);
+  slice_no=1;
   }
 
   /* check to see if we've already done this one */
@@ -548,7 +548,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   fint_param   = return_param_recurse("fint",thick_elem);
   if(fint_param)
   { printf("    *** warning %s is a thick %s with fringe fields. These will be lost in the translation to a multipole. Use dipedge.\n",
-      thick_elem->name,thick_elem->parent->name);
+           thick_elem->name,thick_elem->parent->name);
   }
 
   length_param = return_param_recurse("l",thick_elem);
@@ -587,7 +587,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   /* set up new multipole command */
   cmd = new_command(buffer("thin_multipole"), 11, 11, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
-  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
+  add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -650,13 +650,13 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
-    slice_no=slices=1; // do not slice this one
+    slice_no=slices=1; /* do not slice this one */
   }
 
   /* set up new solenoid command */
   cmd = new_command(buffer("thin_solenoid"), 11, 11, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 9); /* 0 is link, solenoid is 9 */  /*hbu trial */
-  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
+  add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
 
 
   if(!minimizefl)
