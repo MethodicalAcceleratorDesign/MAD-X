@@ -58,6 +58,7 @@
 /l_complex_taylor.f90 -text
 /m_real_polymorph.f90 -text
 /madx.h -text
+/madx_main.f90 -text
 /madx_ptc_module.f90 -text
 /madx_ptc_track_run.f90 -text
 /madxc.c -text
