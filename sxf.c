@@ -43,7 +43,7 @@ void sxf_read(struct command* comm)
   /* reads an expanded sequence including errors from an SXF file */
 {
   struct sequence* keep_sequ = current_sequ;
-  int n, rcode, echo, err, izero = 0, count = 0;
+  int n, echo, err, izero = 0, count = 0;
   FILE* in_file = in->input_files[in->curr];
   char *p, *pp;
   sxf_suml = zero;
@@ -479,7 +479,6 @@ void pro_elem_sxf(FILE* out)
 void write_elstart(FILE* out)
 {
   char name[NAME_L];
-  char* pc;
   s_indent(add_indent[1]);
   if (current_node->occ_cnt > 1)  /* add count to name, print warning */
   {
@@ -612,9 +611,6 @@ void write_body(FILE* out)
   char npart[] = "npart";
   eldef = current_node->p_elem->def;
 
-  int    angle_flag = 0;
-  double angle      = node_value("angle");
-
   /* printf(" %s, , angle = %e \n", current_node->name,  angle); */
   for (i = 0; i < eldef->par_names->curr; i++)
   {
@@ -626,9 +622,9 @@ void write_body(FILE* out)
         && (pos = name_list_pos(eldef->par_names->names[i], sxf_list)) > -1)
     {
       /*
-      nm printf("kl_trans\n");
-      nm: ad hoc solution to avoid the SXF conceptual bug
-      if((nval = angle_kl_trans(angle, sxf_list->names[pos], out_name, val, &flag, &angle_flag)) > 0)
+        nm printf("kl_trans\n");
+        nm: ad hoc solution to avoid the SXF conceptual bug
+        if((nval = angle_kl_trans(angle, sxf_list->names[pos], out_name, val, &flag, &angle_flag)) > 0)
       */
       if ((nval = kl_trans(sxf_list->names[pos], out_name, val, &flag)) > 0)
       {
