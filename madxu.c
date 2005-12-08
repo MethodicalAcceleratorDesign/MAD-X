@@ -2201,8 +2201,8 @@ char* mystrchr(char* string, char c)
 void mystrcpy(struct char_array* target, char* source)
 {
   /* string copy to char_array with size adjustment */
-    while (strlen(source) > target->max) grow_char_array(target);
-    strcpy(target->c, source);
+  while (strlen(source) > target->max) grow_char_array(target);
+  strcpy(target->c, source);
 }
 
 char* mystrstr(char* string, char* s)
@@ -3005,7 +3005,7 @@ void print_value(struct in_cmd* cmd)
 {
   char** toks = &cmd->tok_list->p[cmd->decl_start];
   int n = cmd->tok_list->curr - cmd->decl_start;
-  int j, s_start = 0, end, type, nitem;
+  int j, s_start = 0, end, type, nitem = 0;
   while (s_start < n)
   {
     for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
