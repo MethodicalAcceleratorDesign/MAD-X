@@ -113,6 +113,8 @@ madx_ptc_module.o: Sp_keywords.o madx_ptc_module.f90
 madx_ptc_track_run.o: madx_ptc_module.o madx_ptc_track_run.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 wrap.o: madx_ptc_module.o wrap.f90
+run_madx.o: madx_ptc_module.o run_madx.f90
+madx_main.o: run_madx.o madx_main.f90
 
 # implicit rule to compile with C
 %.o : %.c
@@ -143,7 +145,7 @@ madx: $(madx_objectsf77) ;
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxdev_objects. All *.f90 , some c and F
-madxdev_objects = madxm.o $(patsubst %.f90,%.o,$(wildcard *.f90)) \
+madxdev_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxpf.o gxx11c.o \
 	$(madx_objectsf95)
 madxdev: $(madxdev_objects)
