@@ -16997,6 +16997,7 @@ contains
 
   SUBROUTINE find_full_br(el,z,X,b)
     IMPLICIT NONE
+    logical(LP) :: mytrue=.true.,myfalse=.false.
     real(dp),INTENT(INout):: X(6)
     real(dp),INTENT(out):: b(3)
     real(dp), intent(inout) :: z
@@ -17008,11 +17009,11 @@ contains
 
     !       if(z>=-el%de.and.z<=el%de.and.el%p%fringe.and.(.not.EL%P%KILL_ENT_FRINGE)) then
     if(el%ent) then
-       call ENGE_COM(EL,z,.true.)
+       call ENGE_COM(EL,z,mytrue)
        !       elseif(z>=el%l-el%ds.and.z<=el%l+el%ds.and.el%p%fringe.and.(.not.EL%P%KILL_exi_FRINGE)) then
     elseif(el%exi) then
        z=z-el%l
-       call ENGE_COM(EL,z,.false.)
+       call ENGE_COM(EL,z,myfalse)
        z=z+el%l
        !      elseif(z<-el%de.or.z>el%l+el%ds ) then
        !        b(1)=0.0_dp;b(2)=0.0_dp;b(3)=0.0_dp;
@@ -17072,6 +17073,7 @@ contains
 
   SUBROUTINE find_full_bp(el,z,X,b)
     IMPLICIT NONE
+    logical(LP) :: mytrue=.true.,myfalse=.false.
     type(real_8),INTENT(INout):: X(6)
     type(real_8), INTENT(out):: b(3)
     type(real_8), intent(inout) :: z
@@ -17084,11 +17086,11 @@ contains
 
     !       if(z>=-el%de.and.z<=el%de.and.el%p%fringe.and.(.not.EL%P%KILL_ENT_FRINGE)) then
     if(el%ent) then
-       call ENGE_COM(EL,z,.true.)
+       call ENGE_COM(EL,z,mytrue)
        !       elseif(z>=el%l-el%ds.and.z<=el%l+el%ds.and.el%p%fringe.and.(.not.EL%P%KILL_exi_FRINGE)) then
     elseif(el%exi) then
        z=z-el%l
-       call ENGE_COM(EL,z,.false.)
+       call ENGE_COM(EL,z,myfalse)
        z=z+el%l
        !      elseif(z<-el%de.or.z>el%l+el%ds ) then
        !        b(1)=0.0_dp;b(2)=0.0_dp;b(3)=0.0_dp;
