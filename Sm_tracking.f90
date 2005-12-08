@@ -719,7 +719,7 @@ contains
     ! The chart frame of reference is located here implicitely
     IF(PATCHG/=0.AND.PATCHG/=2) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
-       X(3)=C%PATCH%A_XZ*X(3);X(4)=C%PATCH%A_YZ*X(4);
+       X(3)=C%PATCH%A_YZ*X(3);X(4)=C%PATCH%A_YZ*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        X(1)=C%PATCH%A_XZ*X(1);X(2)=C%PATCH%A_XZ*X(2);
        CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
@@ -899,7 +899,7 @@ contains
     ! POSITION PATCH
     IF(PATCHG/=0.AND.PATCHG/=2) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
-       X(3)=C%PATCH%A_XZ*X(3);X(4)=C%PATCH%A_YZ*X(4);
+       X(3)=C%PATCH%A_YZ*X(3);X(4)=C%PATCH%A_YZ*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
        X(1)=C%PATCH%A_XZ*X(1);X(2)=C%PATCH%A_XZ*X(2);
        CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
