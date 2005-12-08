@@ -91,6 +91,7 @@
 /ptc_dummy.F -text
 /resindex.F -text
 /resindex.fi -text
+/run_madx.f90 -text
 /sodd.F -text
 /survey.F -text
 /sxf.c -text
