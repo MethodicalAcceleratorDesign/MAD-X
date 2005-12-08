@@ -532,15 +532,16 @@ CONTAINS
        key%list%harmon=one
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
     case(35)
+       key%magnet="CHANGEREF"
        call dzero(patch_ang,3)
        call dzero(patch_trans,3)
        call get_node_vector('patch_ang ',3,patch_ang)
        call get_node_vector('patch_trans ',3,patch_trans)
-!       do i=1,3
-!          key%list%ang(i)=patch_ang(i)
-!          key%list%trans(i)=patch_ang(i)
-!          key%patch%patch=2
-!       enddo
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
     case default
        print*,"Element: ",name," not implemented"
        stop
@@ -555,8 +556,12 @@ CONTAINS
     MY_RING%closed=.true.
     doneit=.true.
     call ring_l(my_ring,doneit)
-
+    write(6,*) "------------------------------------ PTC Survey ------------------------------------"
+    write(6,*) "Before start: ",my_ring%start%chart%f%a
+    write(6,*) "Before   end: ",my_ring%end%chart%f%b
     call survey(my_ring)
+    write(6,*) "After  start: ",my_ring%start%chart%f%a
+    write(6,*) "After    end: ",my_ring%end%chart%f%b
 
   END subroutine ptc_input
 
