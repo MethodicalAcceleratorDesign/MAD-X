@@ -3005,7 +3005,7 @@ void print_value(struct in_cmd* cmd)
 {
   char** toks = &cmd->tok_list->p[cmd->decl_start];
   int n = cmd->tok_list->curr - cmd->decl_start;
-  int j, s_start = 0, end, type, nitem = 0;
+  int j, s_start = 0, end, type, nitem;
   while (s_start < n)
   {
     for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
@@ -3025,7 +3025,7 @@ void print_value(struct in_cmd* cmd)
     }
     else
     {
-      warning("invalid expression:", spec_join(&toks[s_start], nitem));
+      warning("invalid expression:", spec_join(&toks[s_start], n));
       return;
     }
   }
