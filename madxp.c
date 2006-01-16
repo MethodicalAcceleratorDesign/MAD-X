@@ -2277,8 +2277,9 @@ int get_val_num(char* in_string, int start, int end)
         if (dot || exp) return (j - 1);
         dot = 1;
       }
-      else if (c == 'e')
+      else if (c == 'e' || c == 'd')
       {
+        if (c == 'd') in_string[j] = 'e';
         if (exp) return (j - 1);
         else exp = j+1;
       }
@@ -4237,10 +4238,17 @@ double table_value()
         if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1)
         {
           if (ntok > 2)  /* find row - else current (dynamic), or 0 */
+          {
             row = table_row(table, toks[1]);
+          }
           else if (table->dynamic)  row = table->curr;
           else row = 0;
           val = table->d_cols[col][row];
+        }
+        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1))
+        {
+          row = atoi(toks[2])-1;
+          if(row < table->curr) val = table->d_cols[col][row];
         }
       }
     }
