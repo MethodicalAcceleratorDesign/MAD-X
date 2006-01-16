@@ -2403,6 +2403,8 @@ void write_f34_special()
 
   if (special_flag == 0)  return;
 
+  n = 0;
+  if(f34_cnt++ == 0)    f34 = fopen("fc.34", "w");
   current_element = first_in_sequ;
   while (current_element != NULL)
   {
@@ -2411,7 +2413,6 @@ void write_f34_special()
       if (strcmp(current_element->base_name, t_list[i]) == 0)
       {
         n = f34_values(current_element, flags, values);
-        if (f34_cnt++ == 0)    f34 = fopen("fc.34", "w");
         for (j = 0; j < n; j++)
         {
           strcpy(t_name, current_element->name);
@@ -2447,9 +2448,9 @@ void write_f34_special()
     if ((err=double_from_table("twiss","muy",&(last_in_sequ->twtab_row),&muy)))
       printf ("Not found double_from table = %i\n",err);
   }
-  fprintf(f34,
-          " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
-          spos,"end_marker",100,zero,betx,bety,mux,muy);
+  if(n > 0) fprintf(f34,
+                    " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+                    spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
 void write_f3_aper()
