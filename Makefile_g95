@@ -32,7 +32,8 @@ FFLAGS77= -c -O4 -fno-second-underscore -funroll-loops -I.
 FP=-static
 
 # g95 Fortran90 link options
-f95_FOPT=-static
+#f95_FOPT=-static
+f95_FOPT=
 
 # libraries
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
