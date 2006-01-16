@@ -195,7 +195,9 @@ CONTAINS
     !hbu
     character*4 vec_names(7)
     !hbu
-    data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+!!! data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+    data vec_names     / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
+
     !k    data char_a / ' ' /
     !-------------------------------------------------------------------------
 
@@ -2031,7 +2033,8 @@ CONTAINS
       !hbu
       character*4 vec_names(7)
       !hbu
-      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+!!!data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+      data vec_names    / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
       data table_putone / 'trackone' /
 
       !vk
@@ -2101,7 +2104,8 @@ CONTAINS
       !hbu
       character*4 vec_names(7)
       !hbu
-      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+!!! data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+      data vec_names     / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
       data table_puttab / 'track.obs$$$$.p$$$$' /
 
       tmp_coord_array=zero; tmp_norm_array=zero
@@ -2298,15 +2302,17 @@ CONTAINS
             track_temp(2) = px_input                                          ! i   a   !
             track_temp(3) = y_input                                           ! t   r   !
             track_temp(4) = py_input                                          ! c   t   !
-            track_temp(5) = t_input                                           ! h   i   l
-            track_temp(6) = deltae_input                                      ! !   c   o
+            track_temp(5) = deltae_input  ! track_temp(5) = t_input           ! h   i   l
+            track_temp(6) = t_input       ! track_temp(6) = deltae_input      ! !   c   o
             track_temp(7) = fx_input                                            !   l   o
             track_temp(8) = phix_input                                          !   e   p
             track_temp(9) = fy_input                                          ! O   !   !
             track_temp(10) = phiy_input                                       ! n   !   !
             track_temp(11) = ft_input                                         ! e   !   f
             track_temp(12) = phit_input                                         !   !   o
+
             debug_print_4: if (ptc_track_debug) then !----!                     !   !   r
+               Print *, 'icase_PTC=', icase_PTC
                Print *, 'track_temp(1:12)=',track_temp    !                     !   !   !
             end if debug_print_4 !------------------------!                     !   !   !
             !                                                                   !   !   !
