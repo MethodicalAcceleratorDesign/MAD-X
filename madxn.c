@@ -5837,16 +5837,20 @@ void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
 {
   int i;
   fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
-  for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]);
+/*  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]);
+  for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]); */
+  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]); 
   fprintf(sec_file,"\n");
   for (i = 0; i < 36; i++)
   {
-    fprintf(sec_file, "%15.8e ", rmatrix[i]);
+/*    fprintf(sec_file, "%15.8e ", rmatrix[i]); */
+    fprintf(sec_file, v_format("%F"), rmatrix[i]);
     if ((i+1)%6 == 0)  fprintf(sec_file,"\n");
   }
   for (i = 0; i < 216; i++)
   {
-    fprintf(sec_file, "%15.8e ", tmatrix[i]);
+/*    fprintf(sec_file, "%15.8e ", tmatrix[i]); */
+    fprintf(sec_file, v_format("%F"), tmatrix[i]);
     if ((i+1)%6 == 0)  fprintf(sec_file,"\n");
   }
 }
