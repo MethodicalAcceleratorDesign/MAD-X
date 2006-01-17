@@ -2448,9 +2448,9 @@ void write_f34_special()
     if ((err=double_from_table("twiss","muy",&(last_in_sequ->twtab_row),&muy)))
       printf ("Not found double_from table = %i\n",err);
   }
-  if(n > 0) fprintf(f34,
-                    " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
-                    spos,"end_marker",100,zero,betx,bety,mux,muy);
+  fprintf(f34,
+          " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+          spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
 void write_f3_aper()
