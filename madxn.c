@@ -2748,7 +2748,7 @@ void fill_beta0(struct command* beta0, struct node* node)
     {
       i++;
       pl->parameters[i]->double_value = twiss_table->d_cols[i+3][pos];
-      if (strstr(nl->names[i], "mu")) pl->parameters[i]->double_value *= twopi;
+/*      if (strstr(nl->names[i], "mu")) pl->parameters[i]->double_value *= twopi; frs 19.10.2006*/
     }
     while (strcmp(nl->names[i], "energy") != 0);
   }
@@ -4984,10 +4984,10 @@ void pro_embedded_twiss(struct command* current_global_twiss)
     err = double_from_table(table_name, "bety", &jt, &bety);
     err = double_from_table(table_name, "alfx", &jt, &alfx);
     err = double_from_table(table_name, "mux", &jt, &mux);
-    mux = mux*twopi;
+    /* mux = mux*twopi; frs 19.10.2006 */
     err = double_from_table(table_name, "alfy", &jt, &alfy);
     err = double_from_table(table_name, "muy", &jt, &muy);
-    muy = muy*twopi;
+    /* muy = muy*twopi; frs 19.10.2006 */
     err = double_from_table(table_name, "x", &jt, &x);
     err = double_from_table(table_name, "px", &jt, &px);
     err = double_from_table(table_name, "y", &jt, &y);

@@ -196,9 +196,11 @@
       integer i1,i2
       double precision opt_fun0(*),rt(6,6),betx,alfx,mux,bety,alfy,muy, &
      &x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,phix,dmux,wy,phiy,dmuy,ddx,ddpx,  &
-     &ddy,ddpy,r(2,2),energy,get_value,zero
+     &ddy,ddpy,r(2,2),energy,get_value,zero,twopi,get_variable
       parameter(zero=0d0)
 
+!---- Initialize
+      twopi=get_variable('twopi ')
       betx=get_value('twiss ','betx ')
       bety=get_value('twiss ','bety ')
       if(betx.gt.zero) opt_fun0(3)=betx
@@ -239,9 +241,9 @@
       energy=get_value('probe ','energy ')
 
       if(alfx  .ne.zero) opt_fun0(4 )=alfx
-      if(mux   .ne.zero) opt_fun0(5 )=mux
+      if(mux   .ne.zero) opt_fun0(5 )=mux * twopi
       if(alfy  .ne.zero) opt_fun0(7 )=alfy
-      if(muy   .ne.zero) opt_fun0(8 )=muy
+      if(muy   .ne.zero) opt_fun0(8 )=muy * twopi
       if(x     .ne.zero) opt_fun0(9 )=x
       if(px    .ne.zero) opt_fun0(10)=px
       if(y     .ne.zero) opt_fun0(11)=y
