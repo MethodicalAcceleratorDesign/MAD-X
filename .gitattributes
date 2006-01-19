@@ -30,6 +30,7 @@
 /a_def_sagan.inc -text
 /a_def_user1.inc -text
 /a_def_user2.inc -text
+/a_def_worm.inc -text
 /a_scratch_size.f90 -text
 /b_da_arrays_all.f90 -text
 /bb.fi -text
