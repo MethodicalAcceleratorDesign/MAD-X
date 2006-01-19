@@ -4206,7 +4206,7 @@ void store_set(struct command* comm, int flag)
 
 int table_row(struct table* table, char* name)
 {
-  int i, j, ret = 0;
+  int i, j, ret = -1;
   for (i = 0; i < table->num_cols; i++)
     if(table->columns->inform[i] == 3) break;
   if (i < table->num_cols)
@@ -4215,6 +4215,7 @@ int table_row(struct table* table, char* name)
       if (tab_name_code(name, table->s_cols[i][j])) break;
     if (j < table->curr) ret = j;
   }
+  if(ret==-1) fatal_error("Name of row not found", name);
   return ret;
 }
 
