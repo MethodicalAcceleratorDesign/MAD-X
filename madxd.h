@@ -1046,7 +1046,7 @@ const double ten_m_16 = 1.e-16;
 const double ten_m_19 = 1.e-19;
 
 int add_error_opt = 0;      /* ADD error option, set with eoption */
-
+int warn_numb = 0;           /* Number of warnings */
 /* E. T. d'Amico 25 feb 2004 */
 int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
 /* E. T. d'Amico 13 may 2004 */

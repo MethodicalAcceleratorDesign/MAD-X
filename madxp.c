@@ -1527,11 +1527,11 @@ void exec_macro(struct in_cmd* cmd, int pos)
     else if (any > n) any = n;
     for (i = 0; i < any; i++)  sum += strlen(toks[rs+i]);
     while (l_wrk->max < (strlen(pro->buffers[level]->c_a->c)+sum))
-	grow_char_array(l_wrk);
+      grow_char_array(l_wrk);
     for (i = 0; i < any; i++)
     {
       myrepl(macro_list->macros[pos]->formal->p[i], toks[rs+i],
-              pro->buffers[level]->c_a->c, l_wrk->c);
+             pro->buffers[level]->c_a->c, l_wrk->c);
       mystrcpy(pro->buffers[level]->c_a, l_wrk->c);
     }
   }
@@ -2525,6 +2525,7 @@ void madx_finish()
       gxterm_();
     }
 #endif
+    printf("\n  Number of warning: %d\n", warn_numb);
     if (get_option("trace")) time_stamp("end");
     printf("\n  +++++++++++++++++++++++++++++++++++\n");
     printf("  + %s finished normally +\n", myversion);
@@ -4566,5 +4567,9 @@ double variable_value(struct variable* var)
 
 void warning(char* t1, char* t2)
 {
-  if (get_option("warn")) printf("++++++ warning: %s %s\n",t1,t2);
+  if (get_option("warn")) 
+  {
+    printf("++++++ warning: %s %s\n",t1,t2);
+    warn_numb++;
+  }
 }
