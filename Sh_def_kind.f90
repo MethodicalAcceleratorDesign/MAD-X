@@ -17265,11 +17265,11 @@ contains
 
     !       if(z>=-el%de.and.z<=el%de.and.el%p%fringe.and.(.not.EL%P%KILL_ENT_FRINGE)) then
     if(el%ent) then
-       call ENGE_COM(EL,z,.true.)
+       call ENGE_COM(EL,z,mytrue)
        !       elseif(z>=el%l-el%ds.and.z<=el%l+el%ds.and.el%p%fringe.and.(.not.EL%P%KILL_exi_FRINGE)) then
     elseif(el%exi) then
        z=z-el%l
-       call ENGE_COM(EL,z,.false.)
+       call ENGE_COM(EL,z,myfalse)
        z=z+el%l
        !      elseif(z<-el%de.or.z>el%l+el%ds ) then
        !        b(1)=0.0_dp;b(2)=0.0_dp;b(3)=0.0_dp;
