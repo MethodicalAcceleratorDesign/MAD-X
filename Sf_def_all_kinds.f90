@@ -6,6 +6,7 @@ module S_def_all_kinds
   use S_status
   implicit none
   private XMIDR,XMIDP,GMIDR,GMIDP
+  include "a_def_worm.inc"
   !  include "a_def_all_kind.inc"
   !  include "a_def_sagan.inc"
   !  include "a_def_user1.inc"
@@ -14,39 +15,6 @@ module S_def_all_kinds
   !  include "a_def_element_fibre_layout.inc"
   private ALLOC_midr,ALLOC_midp,KILL_midr,KILL_midP
 
-  TYPE INNER_FRAME
-     INTEGER, POINTER ::   NST
-     REAL(DP), POINTER :: ORIGIN(:,:)
-     REAL(DP), POINTER :: FRAME(:,:,:)
-     type(fibre), POINTER :: F
-     REAL(DP),POINTER :: L(:)
-     logical(LP),POINTER :: DO_SURVEY
-  END TYPE INNER_FRAME
-
-
-  TYPE worm
-     INTEGER, POINTER ::   NST
-     INTEGER, POINTER ::   POS(:)
-     REAL(DP), POINTER :: RAY(:,:)
-     TYPE(INNER_FRAME), POINTER :: E
-     type(fibre), POINTER :: F
-  END TYPE worm
-
-  TYPE WORM_8
-     INTEGER, POINTER ::   NST
-     INTEGER, POINTER ::   POS(:)
-     TYPE(REAL_8), POINTER :: RAY(:,:)
-     TYPE(INNER_FRAME), POINTER :: E
-     type(fibre), POINTER :: F
-  END TYPE WORM_8
-
-  TYPE INNER_ENV_8_DATA
-     INTEGER, POINTER ::   NST
-     INTEGER, POINTER ::   POS(:)
-     TYPE(ENV_8), POINTER :: RAY(:,:)
-     TYPE(INNER_FRAME), POINTER :: E
-     type(fibre), POINTER :: F
-  END TYPE INNER_ENV_8_DATA
 
   INTERFACE XMID
      MODULE PROCEDURE XMIDR

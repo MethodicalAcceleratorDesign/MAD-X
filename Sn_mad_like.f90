@@ -50,6 +50,7 @@ module Mad_like
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
      real(dp) ang(3),t(3)
+     real(dp) angi(3),ti(3)
      integer patchg
      real(dp) T1,T2,B0
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
@@ -654,6 +655,8 @@ CONTAINS
     IF(S1==0) THEN
        S2%ang=zero
        S2%t=zero
+       S2%angi=zero
+       S2%ti=zero
        S2%patchg=0
        S2%L=zero
        S2%LD=zero
@@ -2684,6 +2687,7 @@ CONTAINS
        S2%THIN=.FALSE.
        IF(S2%L==zero) then
           S2%THIN=.TRUE.
+
        else
           S2%volt=S2%volt/S2%L
        endif
@@ -2857,15 +2861,26 @@ CONTAINS
        endif
     ENDIF
 
+
     if(s1%patchg/=0) then
-       if(s1%patchg==3) then   ! zgoubi order
+       if(s1%patchg==4) then   ! zgoubi order using two patches
           s22%PATCH%B_ANG=s1%ang    !
           s22%PATCH%A_D=s1%t
           s22%PATCH%patch=3
-       else
+       elseif(s1%patchg==2) then
           s22%PATCH%B_ANG=s1%ang    !
           s22%PATCH%B_D=s1%t
           s22%PATCH%patch=2
+       elseif(s1%patchg==1) then
+          s22%PATCH%A_ANG=s1%angi    !
+          s22%PATCH%A_D=s1%ti
+          s22%PATCH%patch=1
+       elseif(s1%patchg==3) then
+          s22%PATCH%A_ANG=s1%angi    !
+          s22%PATCH%A_D=s1%ti
+          s22%PATCH%B_ANG=s1%ang    !
+          s22%PATCH%B_D=s1%t
+          s22%PATCH%patch=3
        endif
     endif
 
@@ -2877,6 +2892,15 @@ CONTAINS
        call APPEND_mad_like(mad_list,el)
     ENDIF
     madkick=.false.
+
+    if(s22%mag%kind==kind3) then
+       s22%mag%p%nst=1
+       s22%magp%p%nst=1
+    endif
+    if(s22%mag%L==ZERO) then
+       s22%mag%p%nst=1
+       s22%magp%p%nst=1
+    endif
 
 
   END SUBROUTINE EL_Q
@@ -2896,6 +2920,7 @@ CONTAINS
   subroutine set_pointers
     implicit none
     call set_da_pointers
+    c_%NP_pol => NP_pol
     c_%NPARA => NPARA
     c_%ROOT_CHECK => ROOT_CHECK
     c_%CHECK_STABLE => CHECK_STABLE
@@ -2918,8 +2943,12 @@ CONTAINS
     c_%C_ENGE_1 => C_ENGE_1
     c_%ENGE_LAM => ENGE_LAM
     c_%ENGE_FRAC => ENGE_FRAC
+    c_%ALWAYS_EXACTMIS=> ALWAYS_EXACTMIS
 
+    c_%x_prime => x_prime
+    c_%NDPT_OTHER => NDPT_OTHER
 
+    c_%CAVITY_TOTALPATH => CAVITY_TOTALPATH
 
 
     c_%other_program => other_program

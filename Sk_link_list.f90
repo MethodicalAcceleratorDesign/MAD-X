@@ -12,8 +12,9 @@ MODULE S_FIBRE_BUNDLE
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
   private move_to_p,move_to_name,move_to_name2,move_from_to_name
-
-  PRIVATE FIND_PATCH_p,FIND_PATCH_0
+  PRIVATE append_EMPTY_FIBRE
+  PRIVATE FIND_PATCH_0
+  PRIVATE FIND_PATCH_p_new
   PRIVATE INDEX
   private FIND_POS_in_universe, FIND_POS_in_layout
 
@@ -21,7 +22,6 @@ MODULE S_FIBRE_BUNDLE
   private zero_fibre
   INTEGER :: INDEX=0
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
-
 
 
   INTERFACE kill
@@ -44,6 +44,10 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE append_fibre
   END INTERFACE
 
+  INTERFACE append_EMPTY
+     MODULE PROCEDURE append_EMPTY_FIBRE
+  END INTERFACE
+
   INTERFACE move_to
      MODULE PROCEDURE move_to_p
      MODULE PROCEDURE move_to_name
@@ -52,9 +56,9 @@ MODULE S_FIBRE_BUNDLE
   END INTERFACE
 
   INTERFACE FIND_PATCH
-     MODULE PROCEDURE FIND_PATCH_p
      MODULE PROCEDURE FIND_PATCH_0
   END INTERFACE
+
 
   INTERFACE FIND_pos
      MODULE PROCEDURE FIND_POS_in_layout
@@ -585,7 +589,7 @@ CONTAINS
 
 
 
-  SUBROUTINE APPEND_EMPTY( L )  ! Creates an empty fibre to be filled later
+  SUBROUTINE append_EMPTY_FIBRE( L )  ! Creates an empty fibre to be filled later
     implicit none
     TYPE (fibre), POINTER :: Current
     TYPE (layout) L
@@ -603,7 +607,7 @@ CONTAINS
     L%LASTPOS=L%N ;
     L%LAST=>CURRENT;
 
-  END SUBROUTINE APPEND_EMPTY
+  END SUBROUTINE append_EMPTY_FIBRE
 
   SUBROUTINE NULL_FIBRE(CURRENT)  ! nullifies fibre content
     implicit none
@@ -769,7 +773,8 @@ CONTAINS
   END SUBROUTINE switch_to_kind7
 
   !  EUCLIDEAN ROUTINES
-  SUBROUTINE FIND_PATCH_P(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
+
+  SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE), INTENT(INOUT) :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
@@ -783,8 +788,10 @@ CONTAINS
     INTEGER A_YZ,A_XZ
     LOGICAL(LP) ENE,DOIT,DISCRETE
     INTEGER LOC,I,PATCH_NEEDED
-    REAL(DP) NORM
+    REAL(DP) NORM,pix(3)
     PATCH_NEEDED=1
+    pix=zero
+    pix(1)=pi
 
     DISCRETE=.FALSE.
     IF(PRESENT(EL2_NEXT)) THEN
@@ -809,23 +816,31 @@ CONTAINS
              B=>EL1%CHART%F%B
              ENT=EL2%CHART%F%ENT
              A=>EL2%CHART%F%A
+             A_XZ=1;A_YZ=1;
           ELSE
              EXI=EL1%CHART%F%ENT
+             call geo_rot(exi,pix,1,basis=exi)
              B=>EL1%CHART%F%A
              ENT=EL2%CHART%F%EXI
+             call geo_rot(ent,pix,1,basis=ent)
              A=>EL2%CHART%F%B
+             A_XZ=-1;A_YZ=-1;
           ENDIF
        ELSE                          !   1
           IF(EL1%DIR==1) THEN
              EXI=EL1%CHART%F%EXI
              B=>EL1%CHART%F%B
              ENT=EL2%CHART%F%EXI
+             call geo_rot(ent,pix,1,basis=ent)
              A=>EL2%CHART%F%B
+             A_XZ=1;A_YZ=-1;
           ELSE
              EXI=EL1%CHART%F%ENT
+             call geo_rot(exi,pix,1,basis=exi)
              B=>EL1%CHART%F%A
              ENT=EL2%CHART%F%ENT
              A=>EL2%CHART%F%A
+             A_XZ=-1;A_YZ=1;
           ENDIF
        ENDIF                     !   1
 
@@ -844,7 +859,7 @@ CONTAINS
           DO I=1,3
              NORM=NORM+ABS(ANG(I))
           ENDDO
-          IF(NORM<=PREC) THEN
+          IF(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)) THEN
              ANG=ZERO
              PATCH_NEEDED=PATCH_NEEDED+1
           ENDIF
@@ -855,33 +870,10 @@ CONTAINS
           ENDIF
        ENDIF
 
-       A_XZ=1;A_YZ=1;
-
-       IF(ANG(1)/TWOPI<-0.25D0) THEN
-          ANG(1)=ANG(1)+PI
-          A_YZ=-1
-          DISCRETE=.TRUE.
-       ENDIF
-       IF(ANG(1)/TWOPI>0.25D0) THEN
-          ANG(1)=ANG(1)-PI
-          A_YZ=-1
-          DISCRETE=.TRUE.
-       ENDIF
-       IF(ANG(2)/TWOPI<-0.25D0) THEN
-          ANG(2)=ANG(2)+PI
-          A_XZ=-1
-          DISCRETE=.TRUE.
-       ENDIF
-       IF(ANG(1)/TWOPI>0.25D0) THEN
-          ANG(2)=ANG(2)-PI
-          A_XZ=-1
-          DISCRETE=.TRUE.
-       ENDIF
-
        IF(DIR==1) THEN
 
-          EL2%PATCH%A_YZ=A_YZ
-          EL2%PATCH%A_XZ=A_XZ
+          EL2%PATCH%A_X2=A_YZ
+          EL2%PATCH%A_X1=A_XZ
           EL2%PATCH%A_D=D
           EL2%PATCH%A_ANG=ANG
           SELECT CASE(EL2%PATCH%PATCH)
@@ -901,8 +893,8 @@ CONTAINS
 
        ELSEIF(DIR==-1) THEN
 
-          EL1%PATCH%B_YZ=A_YZ    !  BUG WAS EL2
-          EL1%PATCH%B_XZ=A_XZ    !
+          EL1%PATCH%B_X2=A_YZ    !  BUG WAS EL2
+          EL1%PATCH%B_X1=A_XZ    !
           EL1%PATCH%B_D=D
           EL1%PATCH%B_ANG=ANG
           SELECT CASE(EL1%PATCH%PATCH)
@@ -971,7 +963,21 @@ CONTAINS
 
     ENDIF
 
-    IF(DISCRETE.AND.(EL1%DIR*EL2%DIR==1)) THEN
+    DISCRETE=.false.
+    IF(ANG(1)/TWOPI<-0.25D0) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>0.25D0) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(2)/TWOPI<-0.25D0) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>0.25D0) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+
+    IF(DISCRETE) THEN
        W_P=0
        W_P%NC=1
        W_P%FC='(2(1X,A72,/),(1X,A72))'
@@ -980,7 +986,7 @@ CONTAINS
     ENDIF
 
 
-  END SUBROUTINE FIND_PATCH_P
+  END SUBROUTINE FIND_PATCH_P_new
 
   SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
@@ -1009,10 +1015,13 @@ CONTAINS
     endif
     DIR=-1  ; IF(NEX) DIR=1;
     D=ZERO;ANG=ZERO;
-    CALL FIND_PATCH(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC)
+
+    CALL FIND_PATCH_P_new(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC)
 
 
   END SUBROUTINE FIND_PATCH_0
+
+
 
 
   ! UNIVERSE STUFF

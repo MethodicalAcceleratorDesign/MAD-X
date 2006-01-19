@@ -41,6 +41,7 @@ module S_status
   integer, parameter :: KINDUSER2 = KIND23+3
   integer, parameter :: KINDwiggler = KIND23+4
   integer, parameter :: KINDmu      = KIND23+5
+  integer, parameter :: KINDpa     = KIND23+6
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6
@@ -68,6 +69,7 @@ module S_status
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
   INTEGER, target :: SECTOR_NMUL = 4
+  INTEGER, TARGET :: NDPT_OTHER = 0
   real(dp) CRAD,CFLUC
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   !  real(dp),PARAMETER::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
@@ -762,7 +764,7 @@ CONTAINS
        ELSE
           ND1=3
           NDEL=0
-          NDPT1=5
+          NDPT1=5+C_%NDPT_OTHER
           !         MAPINT=6
        ENDIF
     ELSE              ! CAVITY IN RING

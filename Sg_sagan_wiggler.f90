@@ -911,6 +911,7 @@ contains
           s2%INTERNAL(I)%I=S1%SAGAN%Iinternal(I)+S1%NPARA
           s2%INTERNAL(I)%S=S1%SAGAN%Sinternal(I)
           s2%INTERNAL(I)%KIND=3
+          if(S1%SAGAN%Iinternal(I)>c_%np_pol) c_%np_pol=S1%SAGAN%Iinternal(I)
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
 
@@ -928,6 +929,7 @@ contains
           s2%w%a(i)%I=S1%SAGAN%w%ia(i)+S1%NPARA
           s2%w%a(i)%S=S1%SAGAN%w%sa(i)
           s2%w%a(i)%KIND=3
+          if(S1%SAGAN%w%ia(i)>c_%np_pol) c_%np_pol=S1%SAGAN%w%ia(i)
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%w%a(i)%R=s2%w%a(i)%R+s2%w%a(i)%S*s1%TPSAFIT(S1%SAGAN%w%ia(i))

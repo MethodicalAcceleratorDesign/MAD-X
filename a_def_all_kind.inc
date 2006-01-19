@@ -353,3 +353,25 @@ TYPE MULTIPP
    real(dp),  DIMENSION(:), POINTER :: LAM,C,  LAMS,CS
    real(dp),  DIMENSION(:), POINTER :: LAME,CE , LAMES,CES
 END  TYPE MULTIPP
+
+! GENERAL PANCAKE
+
+TYPE PANCAKE
+   TYPE(MAGNET_CHART), POINTER:: P
+   real(dp),  POINTER ::L
+   integer, pointer :: NMON
+   real(dp),  POINTER :: BX(:,:),BY(:,:),BZ(:,:)
+   REAL(DP), POINTER :: SCALE
+   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
+   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
+END  TYPE PANCAKE
+
+TYPE PANCAKEP
+   TYPE(MAGNET_CHART), POINTER:: P
+   TYPE(REAL_8),  POINTER ::L
+   integer, pointer :: NMON
+   real(dp),  POINTER :: BX(:,:),BY(:,:),BZ(:,:)
+   TYPE(REAL_8), POINTER :: SCALE
+   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
+   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
+END  TYPE PANCAKEP

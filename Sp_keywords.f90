@@ -418,7 +418,7 @@ contains
                 WRITE(40,*)  " FRONTAL PATCH NEEDED"
                 WRITE(40,200)   " TRANSLATION = ",P%PATCH%A_D
                 WRITE(40,200)   "   ROTATION  = ",P%PATCH%A_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_YZ,P%PATCH%A_XZ
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_X1,P%PATCH%A_X2
                 write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
              ENDIF
           case(2)
@@ -435,7 +435,7 @@ contains
                 WRITE(40,*)  " EXIT PATCH NEEDED"
                 WRITE(40,200)   " TRANSLATION = ",P%PATCH%B_D
                 WRITE(40,200)   "   ROTATION  = ",P%PATCH%B_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_YZ,P%PATCH%B_XZ
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_X1,P%PATCH%B_X2
                 write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
              ENDIF
           case(3)
@@ -453,11 +453,11 @@ contains
                 WRITE(40,*)  " FRONTAL PATCH NEEDED"
                 WRITE(40,200)   " TRANSLATION = ",P%PATCH%A_D
                 WRITE(40,200)   "   ROTATION  = ",P%PATCH%A_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_YZ,P%PATCH%A_XZ
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_X1,P%PATCH%A_X2
                 WRITE(40,*)  " EXIT PATCH NEEDED"
                 WRITE(40,200)   " TRANSLATION = ",P%PATCH%B_D
                 WRITE(40,200)   "   ROTATION  = ",P%PATCH%B_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_YZ,P%PATCH%B_XZ
+                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_X1,P%PATCH%B_X2
                 write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
              ENDIF
           END SELECT

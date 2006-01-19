@@ -548,7 +548,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(LAYOUT), INTENT(INOUT) :: R
     TYPE(FIBRE), POINTER:: P
-    INTEGER, allocatable, INTENT(INOUT) :: pos(:)
+    INTEGER, pointer ::  pos(:)
     integer i,ic
     ic=0
     P=>r%start
@@ -696,6 +696,8 @@ CONTAINS
   END SUBROUTINE  MISALIGN_FIBRE_EQUAL
 
 
+
+
   SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed
     IMPLICIT NONE
@@ -706,7 +708,6 @@ CONTAINS
     TYPE(MAGNET_FRAME), POINTER :: F,F0
     REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
     INTEGER I
-
 
 
 
@@ -1098,7 +1099,7 @@ CONTAINS
                    NORM=NORM+ABS(P%A_ANG(I))
                    NORM=NORM+ABS(P%A_D(I))
                 ENDDO
-                NORM=NORM+ABS(P%A_YZ-1)+ABS(P%A_XZ-1)
+                NORM=NORM+ABS(P%A_X1-1)+ABS(P%A_X2-1)
                 IF(NORM/=ZERO) THEN
                    W_P=0
                    W_P%NC=3
@@ -1167,7 +1168,7 @@ CONTAINS
                    NORM=NORM+ABS(P%A_ANG(I))
                    NORM=NORM+ABS(P%A_D(I))
                 ENDDO
-                NORM=NORM+ABS(P%A_YZ-1)+ABS(P%A_XZ-1)
+                NORM=NORM+ABS(P%A_X1-1)+ABS(P%A_X2-1)
                 IF(NORM/=ZERO) THEN
                    W_P=0
                    W_P%NC=3
@@ -1216,7 +1217,7 @@ CONTAINS
     !    TYPE(MAGNET_FRAME), OPTIONAL :: MAGNETFRAME
     TYPE(INNER_FRAME), OPTIONAL :: E_IN
     REAL(DP), INTENT(INOUT)  :: ENT(3,3),A(3)
-    REAL(DP) D(3),ANG(3)
+    REAL(DP) D(3),ANG(3),DT(3)
     LOGICAL(LP) SEL
     TYPE (PATCH), POINTER :: P
 
@@ -1236,11 +1237,21 @@ CONTAINS
        P=>C%PATCH
        IF(P%PATCH/=0) THEN
           ANG=ZERO
-          ANG=P%A_ANG ; IF(P%A_YZ<0) ANG(1)=ANG(1)+PI ; IF(P%A_XZ<0) ANG(2)=ANG(2)+PI ;
+          ANG=P%A_ANG ;
+
+          DT=P%A_D
+          IF(P%A_X1*P%A_X2<0) ANG(1)=ANG(1)+PI
+          IF(P%A_X2<0) then
+             ANG(2)=-ANG(2)
+             ANG(3)=-ANG(3)
+             DT(2)=-DT(2)
+             DT(3)=-DT(3)
+          endif
+
           D=ZERO
           CALL GEO_ROT(ENT,D,ANG,1,ENT)
 
-          CALL GEO_TRA(A,ENT,P%A_D,1)
+          CALL GEO_TRA(A,ENT,DT,1)
 
        ENDIF
     ENDIF
@@ -1275,7 +1286,17 @@ CONTAINS
     IF(ASSOCIATED(C%PATCH)) THEN
        IF(P%PATCH/=0) THEN
           ANG=ZERO
-          ANG=P%B_ANG ; IF(P%B_YZ<0) ANG(1)=ANG(1)+PI ; IF(P%B_XZ<0) ANG(2)=ANG(2)+PI ;
+          ANG=P%B_ANG ;
+
+          DT=P%B_D
+          IF(P%B_X1*P%B_X2<0) ANG(1)=ANG(1)+PI
+          IF(P%B_X2<0) then
+             ANG(2)=-ANG(2)
+             ANG(3)=-ANG(3)
+             DT(2)=-DT(2)
+             DT(3)=-DT(3)
+          endif
+
           D=ZERO
           CALL GEO_ROT(ENT,D,ANG,1,ENT)
 
@@ -1445,7 +1466,7 @@ CONTAINS
     TYPE(LAYOUT),INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
     LOGICAL(LP) DONEIT
-
+    c_%np_pol=0
     NULLIFY(C)
 
     CALL LINE_L(R,DONEIT)

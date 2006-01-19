@@ -29,6 +29,7 @@ MODULE S_DEF_ELEMENT
   logical(lp), PRIVATE :: GEN = .TRUE.
   logical(lp),TARGET :: ALWAYS_EXACTMIS=.TRUE.
   logical(lp),TARGET :: FEED_P0C=.FALSE.
+  integer, TARGET :: np_pol=0
   !  logical(lp) :: isomorphism_MIS=.TRUE.  !Not needed anymore always should be true
   private put_aperture_el,put_aperture_elp
 
@@ -474,7 +475,6 @@ CONTAINS
     CALL CONTEXT(S2%vorname)
 
     DOIT=.TRUE.
-
     IF(S1NAME/=' ') THEN
        if(s1%n_name==0) then
           IF(S1NAME/=S2%NAME) DOIT=.FALSE.
@@ -492,153 +492,12 @@ CONTAINS
     IF(DOIT) THEN
        IF(.not.S1%SET_TPSAFIT) THEN
           if(s2%knob) then
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1((1X,A72)))'
-             write(w_p%c(1),'(A51,A16)')" YOU CANNOT USE A POL_BLOCK AGAIN ON SAME ELEMENTP ",S2%NAME
-             CALL WRITE_E(144)
+             write(6,'(A45,A16)')" BE CAREFUL USING A POL_BLOCK ON SAME MAGNET ",S2%NAME
           ENDIF
        endif
        s2%knob=.TRUE.
-
-       !       IF(S1%NPARA>=4.AND.S1%NPARA<=6) THEN
-       DONEIT=.FALSE.
-
-       !        IF(S1%CHECK_NMUL) THEN
-       S1NMUL=0
-       DO I=NMAX,1,-1
-          IF(s1%IAN(I)/=0.OR.s1%IBN(I)/=0)  THEN
-             S1NMUL=I
-             GOTO 100
-          ENDIF
-       ENDDO
-100    CONTINUE
-       !          CALL SET_FALSE(S1%CHECK_NMUL)
-       !        ENDIF
-
-       IF(S1NMUL>S2%P%NMUL) then
-          CALL ADD(S2,S1NMUL,1,zero)  !etienne
-       endif
-       DO I=1,S1NMUL
-          IF(S1%IAN(I)>0) THEN
-             s2%AN(I)%I=S1%IAN(I)+S1%NPARA
-             s2%AN(I)%S=S1%SAN(I)
-             s2%AN(I)%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
-             ENDIF
-          ENDIF
-          IF(S1%IBN(I)>0) THEN
-             s2%BN(I)%I=S1%IBN(I)+S1%NPARA
-             s2%BN(I)%S=S1%SBN(I)
-             s2%BN(I)%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
-             ENDIF
-          ENDIF
-       ENDDO
-       IF(DONEIT.AND.S1%SET_TPSAFIT) THEN
-          CALL ADD(S2,1,1,zero)     !etienne
-       ENDIF
-       IF(S2%KIND==KIND4) THEN    ! CAVITY
-          DONEIT=.FALSE.                     ! NOT USED HERE
-          IF(S1%IVOLT>0) THEN
-             s2%VOLT%I=S1%IVOLT+S1%NPARA
-             s2%VOLT%S=S1%SVOLT
-             s2%VOLT%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
-             ENDIF
-          ENDIF
-          IF(S1%IFREQ>0) THEN
-             s2%FREQ%I=S1%IFREQ+S1%NPARA
-             s2%FREQ%S=S1%SFREQ
-             s2%FREQ%KIND=3
-             IF(S1%SET_TPSAFIT) THEN
-                s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
-             ENDIF
-             DONEIT=.TRUE.
-          ENDIF
-          IF(S1%IPHAS>0) THEN
-             s2%PHAS%I=S1%IPHAS+S1%NPARA
-             s2%PHAS%S=S1%SPHAS
-             s2%PHAS%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
-             ENDIF
-          ENDIF
-       ENDIF
-       IF(S2%KIND==KIND21) THEN    ! CAVITY
-          DONEIT=.FALSE.                     ! NOT USED HERE
-          IF(S1%IVOLT>0) THEN
-             s2%VOLT%I=S1%IVOLT+S1%NPARA
-             s2%VOLT%S=S1%SVOLT
-             s2%VOLT%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
-             ENDIF
-          ENDIF
-          IF(S1%IFREQ>0) THEN
-             s2%FREQ%I=S1%IFREQ+S1%NPARA
-             s2%FREQ%S=S1%SFREQ
-             s2%FREQ%KIND=3
-             IF(S1%SET_TPSAFIT) THEN
-                s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
-             ENDIF
-             DONEIT=.TRUE.
-          ENDIF
-          IF(S1%IPHAS>0) THEN
-             s2%PHAS%I=S1%IPHAS+S1%NPARA
-             s2%PHAS%S=S1%SPHAS
-             s2%PHAS%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
-             ENDIF
-          ENDIF
-       ENDIF
-       IF(S2%KIND==KIND5) THEN    ! SOLENOID
-          DONEIT=.FALSE.
-          IF(S1%IB_SOL>0) THEN
-             s2%B_SOL%I=S1%IB_SOL+S1%NPARA
-             s2%B_SOL%S=S1%SB_SOL
-             s2%B_SOL%KIND=3
-             DONEIT=.TRUE.
-             IF(S1%SET_TPSAFIT) THEN
-                s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
-             ENDIF
-          ENDIF
-       ENDIF
-       IF(S2%KIND==kinduser1) THEN    ! new element
-          DONEIT=.FALSE.                     ! NOT USED HERE
-          call ELp_POL_user1(S2%u1,S1,DONEIT)
-       ENDIF
-       IF(S2%KIND==kinduser2) THEN    ! new element
-          DONEIT=.FALSE.                     ! NOT USED HERE
-          call ELp_POL_user2(S2%u2,S1,DONEIT)
-       ENDIF
-       IF(S2%KIND==KINDWIGGLER) THEN    ! new element
-          DONEIT=.FALSE.                     ! NOT USED HERE
-          call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
-       ENDIF
-
-
-
-
-       !       ELSE
-       !          w_p=0
-       !          w_p%nc=1
-       !          w_p%fc='(1((1X,A72)))'
-       !          write(w_p%c(1),'(A31,I4)')" NPARA MUST BE BETWEEN 4 AND 6 ", S1%NPARA
-       !          CALL WRITE_E(456)
-       !       ENDIF
+       call ELp_POL_force(S2,S1)
     ENDIF
-
 
 
   END SUBROUTINE ELp_POL
@@ -668,14 +527,19 @@ CONTAINS
     !       IF(S1%NPARA>=4.AND.S1%NPARA<=6) THEN
     DONEIT=.FALSE.
 
+    !        IF(S1%CHECK_NMUL) THEN
     S1NMUL=0
     DO I=NMAX,1,-1
        IF(s1%IAN(I)/=0.OR.s1%IBN(I)/=0)  THEN
           S1NMUL=I
+          if(s1%IAN(I)>c_%np_pol) c_%np_pol=s1%IAN(I)
+          if(s1%IBN(I)>c_%np_pol) c_%np_pol=s1%IBN(I)
           GOTO 100
        ENDIF
     ENDDO
 100 CONTINUE
+    !          CALL SET_FALSE(S1%CHECK_NMUL)
+    !        ENDIF
 
     IF(S1NMUL>S2%P%NMUL) then
        CALL ADD(S2,S1NMUL,1,zero)  !etienne
@@ -710,6 +574,7 @@ CONTAINS
           s2%VOLT%S=S1%SVOLT
           s2%VOLT%KIND=3
           DONEIT=.TRUE.
+          if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           IF(S1%SET_TPSAFIT) THEN
              s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
           ENDIF
@@ -718,6 +583,7 @@ CONTAINS
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
           s2%FREQ%KIND=3
+          if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
              s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
           ENDIF
@@ -728,6 +594,7 @@ CONTAINS
           s2%PHAS%S=S1%SPHAS
           s2%PHAS%KIND=3
           DONEIT=.TRUE.
+          if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           IF(S1%SET_TPSAFIT) THEN
              s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
           ENDIF
@@ -739,6 +606,7 @@ CONTAINS
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
           s2%VOLT%KIND=3
+          if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
@@ -748,6 +616,7 @@ CONTAINS
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
           s2%FREQ%KIND=3
+          if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
              s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
           ENDIF
@@ -757,6 +626,7 @@ CONTAINS
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
           s2%PHAS%KIND=3
+          if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
@@ -770,6 +640,7 @@ CONTAINS
           s2%B_SOL%S=S1%SB_SOL
           s2%B_SOL%KIND=3
           DONEIT=.TRUE.
+          if(S1%IB_SOL>c_%np_pol) c_%np_pol=S1%IB_SOL
           IF(S1%SET_TPSAFIT) THEN
              s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
           ENDIF
@@ -787,17 +658,6 @@ CONTAINS
        DONEIT=.FALSE.                     ! NOT USED HERE
        call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
     ENDIF
-
-
-
-
-    !       ELSE
-    !          w_p=0
-    !          w_p%nc=1
-    !          w_p%fc='(1((1X,A72)))'
-    !          write(w_p%c(1),'(A31,I4)')" NPARA MUST BE BETWEEN 4 AND 6 ", S1%NPARA
-    !          CALL WRITE_E(456)
-    !       ENDIF
 
 
 

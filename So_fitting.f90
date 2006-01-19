@@ -221,7 +221,7 @@ contains
     SET_TPSAFIT=.FALSE.
 
     DO I=1,NPOLY
-       POLY(i)%NPARA=NPARA
+       !POLY(i)%NPARA=NPARA
 
        R=POLY(i)
     ENDDO
@@ -248,6 +248,7 @@ contains
 
     Y=NPARA
     Y=CLOSED
+
     CALL TRACK(R,Y,1,+STATE)
     NORM=Y
     w_p=0
@@ -955,7 +956,10 @@ contains
        !       CALL TRACK(RING,X,LOC,STAT)
        trackflag=TRACK_flag(RING,X,LOC,STAT)
        if(trackflag/=0) then
+          CALL RESET_APERTURE_FLAG
           c_%APERTURE_FLAG=APERTURE
+          write(6,*) " Unstable in find_orbit without TPSA"
+
           return
        endif
        if(.not.check_stable) then

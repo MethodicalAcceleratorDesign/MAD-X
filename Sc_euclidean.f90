@@ -390,12 +390,10 @@ CONTAINS
        X(3)=XN(3)
        X(4)=XN(4)
     ELSE
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
+       X(1)=X(1)+A*X(3)
+       X(4)=X(4)-A*X(2)
        X(2)=X(2)+A*X(4)
        X(3)=X(3)-A*X(1)
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
     ENDIF
 
   END SUBROUTINE ROT_XYR
@@ -419,12 +417,10 @@ CONTAINS
        X(4)=XN(4)
        CALL KILL(XN,4)
     ELSE
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
+       X(1)=X(1)+A*X(3)
+       X(4)=X(4)-A*X(2)
        X(2)=X(2)+A*X(4)
        X(3)=X(3)-A*X(1)
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
     ENDIF
   END SUBROUTINE ROT_XYP
 
@@ -447,12 +443,10 @@ CONTAINS
        X(4)=XN(4)
        CALL KILL(XN,4)
     ELSE
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
+       X(1)=X(1)+A*X(3)
+       X(4)=X(4)-A*X(2)
        X(2)=X(2)+A*X(4)
        X(3)=X(3)-A*X(1)
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
     ENDIF
   END SUBROUTINE ROT_XYP_P
 
@@ -479,12 +473,10 @@ CONTAINS
        X(4)=XN(4)
        CALL KILL(XN,4)
     ELSE
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
+       X(1)=X(1)+A*X(3)
+       X(4)=X(4)-A*X(2)
        X(2)=X(2)+A*X(4)
        X(3)=X(3)-A*X(1)
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
     ENDIF
     Y=X
     CALL KILL(X,6)
@@ -514,12 +506,10 @@ CONTAINS
        X(4)=XN(4)
        CALL KILL(XN,4)
     ELSE
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
+       X(1)=X(1)+A*X(3)
+       X(4)=X(4)-A*X(2)
        X(2)=X(2)+A*X(4)
        X(3)=X(3)-A*X(1)
-       X(1)=X(1)+A*half*X(3)
-       X(4)=X(4)-A*half*X(2)
     ENDIF
     Y=X
     CALL KILL(X,6)

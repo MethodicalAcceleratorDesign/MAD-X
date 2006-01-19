@@ -55,7 +55,7 @@ module precision_constants
   real(dp),TARGET :: hyperbolic_aperture=ten
   !Numbers single
   real(sp),parameter::c_1e7=1e7_sp,c_0e0=0e0_sp
-
+  logical(LP) :: mytrue=.true.,myfalse=.false.
   !Mathematical Constants
   real(dp),PARAMETER::pi=3.141592653589793238462643383279502e0_dp,twopi=two*pi,pih=pi*half
   real(dp),PARAMETER::twopii=one/twopi,pil=pih-c_4d_1,pim=pih+c_4d_1
@@ -209,11 +209,12 @@ module precision_constants
      integer,POINTER :: ndpt     ! constant energy variable position is different from zero
      integer,POINTER :: NPARA     ! PARAMETER LOCATION IN PTC
      integer,POINTER :: npara_fpp     ! PARAMETER LOCATION IN FPP
+     integer,POINTER :: np_pol     ! parameters produced through pol_block
      logical(lp),pointer :: knob
      logical(lp),pointer :: OTHER_PROGRAM
+     integer, pointer :: NDPT_OTHER
      logical(lp), pointer :: setknob
      REAL(dp),POINTER     :: da_absolute_aperture  ! in case one tracks with da.
-
      !
 
      LOGICAL(lp),POINTER  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
@@ -245,11 +246,14 @@ module precision_constants
      LOGICAL(lp), pointer :: MAD         !=.false. mad definition of multipole for input only
      LOGICAL(lp), pointer :: EXACT_MODEL != .false. exact model used
      logical(lp),pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
+     INTEGER, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0
      INTEGER,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
      ! creates a reverse propagator
      INTEGER,pointer ::FIBRE_DIR         !=1 or -1 for reversed
      ! creates a reverse propagator and a reversed ring in combination with above
      logical(lp),pointer ::FIBRE_flip    !=.true.
+     !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
+     LOGICAL(lp), pointer :: x_prime != .false.
 
      ! fill once and never touch again
 

@@ -11,36 +11,7 @@ module S_FRAME
   REAL(DP), public :: GLOBAL_FRAME(3,3)= RESHAPE((/1,0,0  ,0,1,0  ,0,0,1/),(/3,3/))
   REAL(DP), public :: GLOBAL_origin(3)= (/0,0,0/)
   integer :: ccc=0
-
-  TYPE MAGNET_FRAME
-     REAL(DP), POINTER,DIMENSION(:,:)::   ENT
-     REAL(DP), POINTER,DIMENSION(:)  ::   A
-     REAL(DP), POINTER,DIMENSION(:,:)::   EXI
-     REAL(DP), POINTER,DIMENSION(:)  ::   B
-     REAL(DP), POINTER,DIMENSION(:,:)::   MID
-     REAL(DP), POINTER,DIMENSION(:)  ::   O
-  END TYPE MAGNET_FRAME
-
-  TYPE PATCH
-     INTEGER(2), POINTER:: PATCH    ! IF TRUE, SPACIAL PATCHES NEEDED
-     INTEGER, POINTER :: A_YZ,A_XZ   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
-     INTEGER, POINTER :: B_YZ,B_XZ   ! FOR ROTATION OF PI AT EXIT = -1    , DEFAULT = 1
-     REAL(DP),DIMENSION(:), POINTER:: A_D,B_D      !ENTRACE AND EXIT TRANSLATIONS  A_D(3)
-     REAL(DP),DIMENSION(:), POINTER:: A_ANG,B_ANG   !ENTRACE AND EXIT ROTATIONS    A_ANG(3)
-     INTEGER(2), POINTER:: ENERGY   ! IF TRUE, ENERGY PATCHES NEEDED
-     INTEGER(2), POINTER:: TIME     ! IF TRUE, TIME PATCHES NEEDED
-     REAL(DP), POINTER:: A_T,B_T     ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
-  END TYPE PATCH
-
-  TYPE CHART
-     type(magnet_frame), pointer :: f
-     !     real(dp), POINTER:: A_XY
-     !     real(dp), POINTER:: L
-     !     real(dp), POINTER:: ALPHA
-     !  FIBRE MISALIGNMENTS
-     real(dp),dimension(:),  POINTER::   D_IN,ANG_IN
-     real(dp),dimension(:),  POINTER::   D_OUT,ANG_OUT
-  END TYPE CHART
+  include "a_def_frame_patch_chart.inc"
 
 
   INTERFACE assignment (=)
@@ -60,8 +31,8 @@ module S_FRAME
   INTERFACE GEO_ROT
      MODULE PROCEDURE GEO_ROTA      !(ENT,V,A,I)
      MODULE PROCEDURE GEO_ROTA_no_vec  !(ENT,A,I)
-     MODULE PROCEDURE GEO_ROTAB_no_vec   ! (ENT,Exi,A_yz,A_xz,A_xy)
-     MODULE PROCEDURE GEO_ROTB      ! (ENT,EXI,A,B,A_YZ,A_XZ,A_XY)
+     MODULE PROCEDURE GEO_ROTAB_no_vec   ! (ENT,Exi,A_X2,A_X1,A_xy)
+     MODULE PROCEDURE GEO_ROTB      ! (ENT,EXI,A,B,A_X2,A_X1,A_XY)
   end  INTERFACE
 
 
@@ -150,8 +121,8 @@ CONTAINS
 
        B%A_T=A%A_T
        B%B_T=A%B_T
-       B%A_YZ=A%A_YZ
-       B%B_XZ=A%B_XZ
+       B%A_X2=A%A_X2
+       B%B_X1=A%B_X1
 
        DO I=1,3
           B%A_D(I)=A%A_D(I)
@@ -221,16 +192,16 @@ CONTAINS
 
     IF(R==0.or.R==1) THEN    !
        NULLIFY(F%A_T,F%B_T,F%A_D,  F%B_D,   F%A_ANG,F%B_ANG)
-       NULLIFY(F%A_XZ,F%A_YZ,F%B_XZ,F%B_YZ)
+       NULLIFY(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
 
        NULLIFY(F%TIME,F%ENERGY,F%PATCH)
        ALLOCATE(F%A_D(3),F%B_D(3),F%A_ANG(3),F%B_ANG(3))
        ALLOCATE(F%A_T,F%B_T)
-       ALLOCATE(F%A_XZ,F%A_YZ,F%B_XZ,F%B_YZ)
+       ALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        ALLOCATE(F%TIME,F%ENERGY,F%PATCH)
        F%A_T=zero
        F%B_T=zero
-       F%A_XZ=1; F%A_YZ=1; F%B_XZ=1; F%B_YZ=1;
+       F%A_X1=1; F%A_X2=1; F%B_X1=1; F%B_X2=1;
        F%A_D=zero
        F%B_D=zero
        F%A_ANG=zero
@@ -241,11 +212,11 @@ CONTAINS
     ELSEIF(R==-1) THEN
        DEALLOCATE(F%A_D,F%B_D,F%A_ANG,F%B_ANG)
        DEALLOCATE(F%A_T,F%B_T)
-       DEALLOCATE(F%A_XZ,F%A_YZ,F%B_XZ,F%B_YZ)
+       DEALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        DEALLOCATE(F%TIME,F%ENERGY,F%PATCH)
        nullify(F%A_D,F%B_D,F%A_ANG,F%B_ANG)
        nullify(F%A_T,F%B_T)
-       nullify(F%A_XZ,F%A_YZ,F%B_XZ,F%B_YZ)
+       nullify(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        nullify(F%TIME,F%ENERGY,F%PATCH)
     ELSE
        w_p=1
@@ -433,7 +404,7 @@ CONTAINS
 
 
 
-  SUBROUTINE GEO_ROTAB_no_vec(ENT,Exi,Ang,basis) ! Used in survey stuff A_yz,A_xz,A_xy,
+  SUBROUTINE GEO_ROTAB_no_vec(ENT,Exi,Ang,basis) ! Used in survey stuff A_X2,A_X1,A_xy,
     implicit none
     real(dp), INTENT(INOUT):: ENT(3,3),exi(3,3)
     real(dp), INTENT(IN):: ANG(3)
@@ -443,7 +414,7 @@ CONTAINS
 
     v=zero
 
-    CALL GEO_ROT(ENT,Exi,V,V,ANG,basis)    !A_yz,A_xz,A_xy,
+    CALL GEO_ROT(ENT,Exi,V,V,ANG,basis)    !A_X2,A_X1,A_xy,
 
   END SUBROUTINE GEO_ROTAB_no_vec
 

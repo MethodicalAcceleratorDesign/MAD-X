@@ -117,6 +117,7 @@ MODULE S_DEF_KIND
   real(dp), target :: C_ENGE_1(0:5)=(/0.1553_DP,3.875_DP,-2.3622_DP,2.9782_DP,12.604_DP,15.026_DP/)
   real(dp), target :: ENGE_LAM = 0.112_DP   ! DEFAULT FOR ALL MULTIPOLES FRINGE IN ENGE at exit
   real(dp), target :: ENGE_FRAC = 1.5_DP   ! DE AND DS ARE SET BY DEFAULT TO ENGE_LAM*ENGE_FRAC
+  INTEGER , target :: CAVITY_TOTALPATH=1
   ! stochastic radiation in straigth
 
   !include "def_all_kind.f90"
@@ -906,7 +907,7 @@ contains
        RETURN
     ENDIF
     TOTALPATH=EL%P%TOTALPATH
-    EL%P%TOTALPATH=1
+    EL%P%TOTALPATH=CAVITY_TOTALPATH
 
     IF(EL%P%FRINGE) CALL FRINGECAV(EL,1,X)
 
@@ -920,8 +921,11 @@ contains
 
        DO I=1,EL%P%NST
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+          write(6,*)1, x
           CALL KICKCAV (EL,D,X)
+          write(6,*)2, x
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+          write(6,*)3, x
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
     CASE(4)
@@ -1015,9 +1019,9 @@ contains
     EL%P%TOTALPATH=TOTALPATH
 
     if(EL%P%TIME) then
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0
+       X(6)=X(6)-(CAVITY_TOTALPATH-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0
     else
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD
+       X(6)=X(6)-(CAVITY_TOTALPATH-EL%P%TOTALPATH)*EL%P%LD
     endif
 
 
@@ -1042,7 +1046,7 @@ contains
     ENDIF
 
     TOTALPATH=EL%P%TOTALPATH
-    EL%P%TOTALPATH=1
+    EL%P%TOTALPATH=CAVITY_TOTALPATH
 
 
     IF(EL%P%FRINGE) CALL FRINGECAV(EL,1,X)
@@ -1171,9 +1175,9 @@ contains
     EL%P%TOTALPATH=TOTALPATH
 
     if(EL%P%TIME) then
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0
+       X(6)=X(6)-(CAVITY_TOTALPATH-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0
     else
-       X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD
+       X(6)=X(6)-(CAVITY_TOTALPATH-EL%P%TOTALPATH)*EL%P%LD
     endif
 
   END SUBROUTINE CAVEP
@@ -3835,7 +3839,11 @@ contains
     real(dp) myCOS,mySIN,ANG,XT(6)
     INTEGER I
 
-    ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+    if(EL%P%TIME) then   ! bug 2006.1.8
+       ANG=YL*EL%B_SOL*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2)
+    else
+       ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+    endif
     myCOS=COS(ANG)
     mySIN=SIN(ANG)
     ! NO EXACT EL%EXACT
@@ -3868,7 +3876,11 @@ contains
     CALL ALLOC(mySIN)
     CALL ALLOC(ANG)
     CALL ALLOC(XT,6)
-    ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+    if(EL%P%TIME) then   ! bug 2006.1.8
+       ANG=YL*EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+    else
+       ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+    endif
     myCOS=COS(ANG)
     mySIN=SIN(ANG)
     ! NO EXACT EL%EXACT
@@ -3907,7 +3919,11 @@ contains
     CALL ALLOC(XT,6)
     CALL ALLOC(X,6)
     X=Y
-    ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+    if(EL%P%TIME) then   ! bug 2006.1.8
+       ANG=YL*EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+    else
+       ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+    endif
     myCOS=COS(ANG)
     mySIN=SIN(ANG)
     ! NO EXACT EL%EXACT
@@ -5835,8 +5851,7 @@ contains
     ENDDO
     DO I=1,6
        CALL KILL(V(I));CALL KILL(W(I))
-       DO J=1,6
-          CALL KILL(HL(I,J))
+       DO J=1,6;CALL KILL(HL(I,J))
        ENDDO
     ENDDO
     CALL KILL(DH);CALL KILL(X5);CALL KILL(X6);
@@ -6533,7 +6548,7 @@ contains
 
        DO I=1,el%p%NST*10
           do j=1,7
-             wa(j)=w(j)
+             wa(j)=w(j) 
           enddo
           tb=ti
           call rk4t(ti,h,el,w)
@@ -6593,7 +6608,7 @@ contains
        endif
 
        do j=1,4
-          x(j)=w(j)
+          x(j)=w(j) 
        enddo
 
        x(2)=x(2)*(one+x(5))
@@ -15234,7 +15249,8 @@ contains
     TYPE(CAV_TRAV),INTENT(INOUT):: EL
     real(dp) C1,S1,C2,S2,V,O
 
-    IF(EL%P%NOCAVITY.OR.(.NOT.EL%P%FRINGE)) RETURN
+    !    IF(EL%P%NOCAVITY.OR.(.NOT.EL%P%FRINGE)) RETURN
+    IF(EL%P%NOCAVITY) RETURN
 
     O=EL%freq*twopi/CLIGHT
     C1=COS(O*(x(6)-Z0)+EL%PHAS+phase0)
@@ -15257,7 +15273,8 @@ contains
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     TYPE(REAL_8) C1,S1,C2,S2,V,O
 
-    IF(EL%P%NOCAVITY.OR.(.NOT.EL%P%FRINGE)) RETURN
+    !    IF(EL%P%NOCAVITY.OR.(.NOT.EL%P%FRINGE)) RETURN
+    IF(EL%P%NOCAVITY) RETURN
 
     CALL ALLOC(C1,S1,C2,S2,V,O)
     O=EL%freq*twopi/CLIGHT
@@ -16011,6 +16028,170 @@ contains
   !   real,  DIMENSION(:), POINTER :: LAM(:),C(:),D
   !   real,  DIMENSION(:), POINTER :: LAME(:),CE(:),DE
   !END  TYPE MULTIP
+
+  ! multip
+  SUBROUTINE ZEROr_PANCAKE(EL,I)
+    IMPLICIT NONE
+    TYPE(PANCAKE), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%BX)) then
+          deallocate(EL%BX)
+          deallocate(EL%BY)
+          deallocate(EL%BZ)
+          deallocate(EL%NMON)
+          deallocate(EL%SCALE)
+          deallocate(EL%D_IN)
+          deallocate(EL%D_OUT)
+          deallocate(EL%ANG_IN)
+          deallocate(EL%ANG_OUT)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%BX)
+       NULLIFY(EL%BY)
+       NULLIFY(EL%BZ)
+       NULLIFY(EL%NMON)
+       NULLIFY(EL%SCALE)
+       NULLIFY(EL%D_IN)
+       NULLIFY(EL%D_OUT)
+       NULLIFY(EL%ANG_IN)
+       NULLIFY(EL%ANG_OUT)
+    endif
+
+  END SUBROUTINE ZEROr_PANCAKE
+
+  SUBROUTINE ZEROP_PANCAKE(EL,I)
+    IMPLICIT NONE
+    TYPE(PANCAKEP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%BX)) then
+          CALL KILL(EL%SCALE)
+          deallocate(EL%BX)
+          deallocate(EL%BY)
+          deallocate(EL%BZ)
+          deallocate(EL%NMON)
+          deallocate(EL%SCALE)
+          deallocate(EL%D_IN)
+          deallocate(EL%D_OUT)
+          deallocate(EL%ANG_IN)
+          deallocate(EL%ANG_OUT)
+       endif
+
+    elseif(i==0)       then          ! nullifies
+
+       deallocate(EL%BX)
+       deallocate(EL%BY)
+       deallocate(EL%BZ)
+       deallocate(EL%NMON)
+       deallocate(EL%SCALE)
+       deallocate(EL%D_IN)
+       deallocate(EL%D_OUT)
+       deallocate(EL%ANG_IN)
+       deallocate(EL%ANG_OUT)
+    endif
+
+  END SUBROUTINE ZEROP_PANCAKE
+
+  SUBROUTINE POINTERS_PANCAKE(EL)
+    IMPLICIT NONE
+    TYPE(PANCAKE), INTENT(INOUT)::EL
+
+
+    ALLOCATE(el%NMON)
+    el%NMON=number_mon(el%p%nmul-1,2)
+    ALLOCATE(  EL%BX(el%p%NST,el%NMON) )
+    ALLOCATE(  EL%BY(el%p%NST,el%NMON) )
+    ALLOCATE(  EL%BZ(el%p%NST,el%NMON) )
+    ALLOCATE(  EL%SCALE )
+    ALLOCATE(  EL%D_IN(3) )
+    ALLOCATE(  EL%D_OUT(3) )
+    ALLOCATE(  EL%ANG_IN(3) )
+    ALLOCATE(  EL%ANG_OUT(3) )
+    EL%BX=ZERO
+    EL%BY=ZERO
+    EL%BZ=ZERO
+    EL%SCALE=ONE
+    EL%D_IN=ZERO
+    EL%D_OUT=ZERO
+    EL%ANG_IN=ZERO
+    EL%ANG_OUT=ZERO
+
+  END SUBROUTINE POINTERS_PANCAKE
+
+  SUBROUTINE POINTERS_PANCAKEP(EL)
+    IMPLICIT NONE
+    TYPE(PANCAKEP), INTENT(INOUT)::EL
+
+
+    ALLOCATE(el%NMON)
+    el%NMON=number_mon(el%p%nmul-1,2)
+    ALLOCATE(  EL%BX(el%p%NST,el%NMON) )
+    ALLOCATE(  EL%BY(el%p%NST,el%NMON) )
+    ALLOCATE(  EL%BZ(el%p%NST,el%NMON) )
+    ALLOCATE(  EL%SCALE )
+    ALLOCATE(  EL%D_IN(3) )
+    ALLOCATE(  EL%D_OUT(3) )
+    ALLOCATE(  EL%ANG_IN(3) )
+    ALLOCATE(  EL%ANG_OUT(3) )
+    EL%BX=ZERO
+    EL%BY=ZERO
+    EL%BZ=ZERO
+    EL%D_IN=ZERO
+    EL%D_OUT=ZERO
+    EL%ANG_IN=ZERO
+    EL%ANG_OUT=ZERO
+    ! EL%SCALE MUST BE CREATED IN SETFAMILYP
+  END SUBROUTINE POINTERS_PANCAKEP
+
+  SUBROUTINE copyPANCAKE_el_elp(EL,ELP)
+    IMPLICIT NONE
+    TYPE(PANCAKE), INTENT(in)::EL
+    TYPE(PANCAKEP), INTENT(inout)::ELP
+
+    ELP%BX    =  EL%BX
+    ELP%BY    =  EL%BY
+    ELP%BZ    =  EL%BZ
+    ELP%D_IN    =  EL%D_IN
+    ELP%D_OUT    =  EL%D_OUT
+    ELP%ANG_IN    =  EL%ANG_IN
+    ELP%ANG_OUT    =  EL%ANG_OUT
+    ELP%SCALE  = EL%SCALE
+  END SUBROUTINE copyPANCAKE_el_elp
+
+  SUBROUTINE copyPANCAKE_el_el(EL,ELP)
+    IMPLICIT NONE
+    TYPE(PANCAKE), INTENT(in)::EL
+    TYPE(PANCAKE), INTENT(inout)::ELP
+
+    ELP%BX    =  EL%BX
+    ELP%BY    =  EL%BY
+    ELP%BZ    =  EL%BZ
+    ELP%D_IN    =  EL%D_IN
+    ELP%D_OUT    =  EL%D_OUT
+    ELP%ANG_IN    =  EL%ANG_IN
+    ELP%ANG_OUT    =  EL%ANG_OUT
+    ELP%SCALE  = EL%SCALE
+  END SUBROUTINE copyPANCAKE_el_el
+
+  SUBROUTINE copyPANCAKE_elP_el(EL,ELP)
+    IMPLICIT NONE
+    TYPE(PANCAKEP), INTENT(in)::EL
+    TYPE(PANCAKE), INTENT(inout)::ELP
+
+    ELP%BX    =  EL%BX
+    ELP%BY    =  EL%BY
+    ELP%BZ    =  EL%BZ
+    ELP%D_IN    =  EL%D_IN
+    ELP%D_OUT    =  EL%D_OUT
+    ELP%ANG_IN    =  EL%ANG_IN
+    ELP%ANG_OUT    =  EL%ANG_OUT
+    ELP%SCALE  = EL%SCALE
+  END SUBROUTINE copyPANCAKE_elP_el
 
 
 
@@ -16997,7 +17178,6 @@ contains
 
   SUBROUTINE find_full_br(el,z,X,b)
     IMPLICIT NONE
-    logical(LP) :: mytrue=.true.,myfalse=.false.
     real(dp),INTENT(INout):: X(6)
     real(dp),INTENT(out):: b(3)
     real(dp), intent(inout) :: z
@@ -17073,7 +17253,6 @@ contains
 
   SUBROUTINE find_full_bp(el,z,X,b)
     IMPLICIT NONE
-    logical(LP) :: mytrue=.true.,myfalse=.false.
     type(real_8),INTENT(INout):: X(6)
     type(real_8), INTENT(out):: b(3)
     type(real_8), intent(inout) :: z
@@ -17086,11 +17265,11 @@ contains
 
     !       if(z>=-el%de.and.z<=el%de.and.el%p%fringe.and.(.not.EL%P%KILL_ENT_FRINGE)) then
     if(el%ent) then
-       call ENGE_COM(EL,z,mytrue)
+       call ENGE_COM(EL,z,.true.)
        !       elseif(z>=el%l-el%ds.and.z<=el%l+el%ds.and.el%p%fringe.and.(.not.EL%P%KILL_exi_FRINGE)) then
     elseif(el%exi) then
        z=z-el%l
-       call ENGE_COM(EL,z,myfalse)
+       call ENGE_COM(EL,z,.false.)
        z=z+el%l
        !      elseif(z<-el%de.or.z>el%l+el%ds ) then
        !        b(1)=0.0_dp;b(2)=0.0_dp;b(3)=0.0_dp;
