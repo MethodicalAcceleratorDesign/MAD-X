@@ -35,7 +35,7 @@
       integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax,       &
      &mplred, mplout
 
-      parameter (mtitl  = 128, mxlabl = 80)
+      parameter (mtitl  = 128, mxlabl = 160)
       parameter (mnvar = 74, mxdep = 2)
       parameter (mqadd = 100000)
       parameter (mntmax = 20, mksmax = 10)
