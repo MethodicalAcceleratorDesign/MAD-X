@@ -2501,7 +2501,7 @@ void write_f3aux()
     if (double_from_table("summ","alfa", &row, &tw_alfa) !=0)
       printf("c6t warning: alfa not found in twiss\n");
     fprintf(f3aux, "SYNC\n");
-    fprintf(f3aux,"%12.0f%10.6f%10.3f 0.%12.6f%12.6f  1\n",
+    fprintf(f3aux,"%12.0f%10.6f%10.3f 0.  %12.6f%12.6f  1\n",
             harmon, tw_alfa, total_voltage, sequ_length,
             c1p3*command_par_value("mass", current_beam));
     fprintf(f3aux,"      1.        1.\n");
