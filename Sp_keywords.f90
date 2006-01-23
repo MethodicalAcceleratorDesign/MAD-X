@@ -120,11 +120,9 @@ contains
        BLANK=TRUERECTILT_MADX(KEY%LIST%NAME,tilt.is.KEY%tiltd,KEY%LIST)
     CASE("RBEND         ")
        IF(KEY%MAD8) THEN
-          ! MADX does some massaging of e1 and e2 for compatibility with mad8
-          ! PTC stays with MAD8
-          IF(KEY%LIST%B0/=ZERO) THEN
-             KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))    !  ld is computed
-          ENDIF
+!frs 23.01.2006          IF(KEY%LIST%B0/=ZERO) THEN
+!frs 23.01.2006             KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))    !  ld is computed
+!frs 23.01.2006          ENDIF
           KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
           KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
           BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
