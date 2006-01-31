@@ -297,6 +297,7 @@ struct variable* delete_variable(struct variable*);
 struct var_list* delete_var_list(struct var_list*);
 struct vector_list* delete_vector_list(struct vector_list*);
 struct table* delete_table(struct table*);
+void disable_line(char*, struct macro_list*);
 double double_from_expr(char**, int, int);
 int down_unit(char*);
 void dump_constraint_list(struct constraint_list*);
@@ -565,8 +566,10 @@ struct table* read_my_table(struct in_cmd*);
 struct table* read_his_table(struct in_cmd*);
 int remove_colon(char**, int, int);
 void remove_from_command_list(char*, struct command_list*);
+void remove_from_macro_list(struct macro*, struct macro_list*);
 int remove_from_name_list(char*, struct name_list*);
 void remove_from_node_list(struct node*, struct node_list*);
+void remove_from_sequ_list(struct sequence*, struct sequence_list*);
 int remove_one(struct node*);
 void remove_range(char*, char*, char*);
 void remove_upto(char*, char*);
@@ -999,8 +1002,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.01.05";
-char code_mod_date[] = "Code Modification Date: 23.01.2006";
+char myversion[] = "MAD-X 3.01.06";
+char code_mod_date[] = "Code Modification Date: 27.01.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

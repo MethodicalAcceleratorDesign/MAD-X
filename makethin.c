@@ -1126,7 +1126,7 @@ void makethin(struct in_cmd* cmd)
     {
       thick_sequ = sequences->sequs[pos2];
       thin_sequ = seq_diet(thick_sequ);
-      remove_from_name_list(thin_sequ->name, line_list->list);
+      disable_line(thin_sequ->name, line_list);
     }
     else warning("unknown sequence ignored:", name);
   }

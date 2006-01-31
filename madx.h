@@ -255,6 +255,7 @@ struct macro     /* stores one line or macro definition */
 {
   char name[NAME_L];
   int n_formal;                 /* no. of formal parameters */
+  int dead;                     /* set to 1 to prevent line from expansion */
   struct char_p_array* formal;  /* list of formal parameters */
   struct char_p_array* tokens;  /* token pointers into body if split (line) */
   struct char_array* body;      /* contains all statements */
@@ -336,6 +337,7 @@ struct sequence
   int nested;                   /* 0 flat, 1 if nested */
   int con_cnt;                  /* constraint counter */
   int stamp;
+  int line;                     /* set to 1 if origin is a line */
   double length;                /* length as in declaration */
   struct expression* l_expr;    /* length expression as in declaration */
   struct node* start;           /* first node in sequence */

@@ -148,7 +148,7 @@ void add_to_el_list( /* adds element to alphabetic element list */
         for (j = 0; j < sequences->curr; j++)
         {
           p_node = sequences->sequs[j]->start;
-          while (p_node != sequences->sequs[j]->end)
+          while (p_node && p_node != sequences->sequs[j]->end)
           {
             if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
             p_node = p_node->next;
@@ -915,6 +915,13 @@ struct vector_list* delete_vector_list(struct vector_list* vector)
   if (vector->vectors != NULL) myfree(rout_name, vector->vectors);
   myfree(rout_name, vector);
   return NULL;
+}
+
+void disable_line( /* prevents line from further expansion by "use" */
+  char* name, struct macro_list* nll)
+{
+  int pos;
+  if ((pos = name_list_pos(name, nll->list)) > -1) nll->macros[pos]->dead = 1;
 }
 
 void dump_char_array(struct char_array* a)
@@ -3037,6 +3044,47 @@ int remove_colon(char** toks, int number, int start)
   int i, k = start;
   for (i = start; i < number; i++)  if (*toks[i] != ':') toks[k++] = toks[i];
   return k;
+}
+
+void remove_from_macro_list( /* removes macro from alphabetic macro list */
+  struct macro* macro, struct macro_list* nll)
+{
+  int pos;
+  if ((pos = name_list_pos(macro->name, nll->list)) > -1)
+  {
+    remove_from_name_list(macro->name, nll->list);
+    delete_macro(nll->macros[pos]);
+    nll->macros[pos] = nll->macros[nll->curr--];
+  }
+}
+
+int remove_from_name_list(char* name, struct name_list* nl)
+{
+  int j, i, k = -1;
+  for (i = 0; i < nl->curr; i++)
+    if (strcmp(nl->names[nl->index[i]], name) == 0) break;
+  if (i < nl->curr)
+  {
+    k = nl->index[i];
+    for (j = i+1; j < nl->curr; j++) nl->index[j-1] = nl->index[j];
+    for (j = 0; j < nl->curr-1; j++)
+      if(nl->index[j] == nl->curr-1) break;
+    nl->index[j] = k;
+    nl->inform[k] = nl->inform[nl->curr-1];
+    nl->names[k] = nl->names[--nl->curr];
+  }
+  return k;
+}
+
+void remove_from_sequ_list(struct sequence* sequ, struct sequence_list* sql)
+  /* removes sequence sequ from sequence list sql */
+{
+  int i;
+  for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  break;
+  return;
+  remove_from_name_list(sequ->name, sql->list);
+  sql->sequs[i] = sql->sequs[sql->curr--];
+  return;
 }
 
 void replace(char* buf, char in, char out)

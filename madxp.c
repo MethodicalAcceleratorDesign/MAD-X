@@ -1016,13 +1016,15 @@ void enter_sequence(struct in_cmd* cmd)
       }
     }
     if ((pos = name_list_pos(toks[aux_pos], sequences->list)) >= 0)
-      current_sequ = sequences->sequs[pos];
-    else
     {
-      current_sequ = new_sequence(toks[aux_pos], k);
-      add_to_sequ_list(current_sequ, sequences);
+      remove_from_sequ_list(sequences->sequs[pos], sequences);
+      delete_sequence(sequences->sequs[pos]);
     }
+    current_sequ = new_sequence(toks[aux_pos], k);
+    add_to_sequ_list(current_sequ, sequences);
     cmd->clone = clone_command(cmd->cmd_def);
+/* prevent a line with this name from expansion */
+    disable_line(current_sequ->name, line_list);
     scan_in_cmd(cmd);
     nl = cmd->clone->par_names;
     pl = cmd->clone->par;
@@ -1550,7 +1552,8 @@ void exec_save(struct in_cmd* cmd)
   /* save a sequence with all necessary parameters and sub-sequences */
 {
   int i, n = 0, pos, prev = 0, beam_save = log_val("beam", cmd->clone),
-    mad8 = log_val("mad8", cmd->clone), all_sequ = 0;
+    mad8 = log_val("mad8", cmd->clone),
+    bare = log_val("bare", cmd->clone), all_sequ = 0;
   char *name, *filename;
   struct element* el;
   struct el_list* ell;
@@ -1617,7 +1620,7 @@ void exec_save(struct in_cmd* cmd)
       c_node = c_node->next;
     }
     /* end mod - HG 23.3.04 */
-    if (beam_save)
+    if (beam_save && bare == 0)
     {
       if (mad8 == 0) save_beam(sequ, out_file); /* only mad-X */
       else warning("when mad-8 format requested,","beam not saved");
@@ -1656,8 +1659,11 @@ void exec_save(struct in_cmd* cmd)
   }
   if (mad8)
   {
+   if (bare == 0)
+   {
     write_vars_8(varl, save_select, out_file);
     write_elems_8(ell, save_select, out_file);
+   }
     for (pos = 0; pos < sql->curr; pos++)
     {
       sequ = sql->sequs[pos];
@@ -1670,8 +1676,11 @@ void exec_save(struct in_cmd* cmd)
   }
   else
   {
+   if (bare == 0)
+   {
     write_vars(varl, save_select, out_file);
     write_elems(ell, save_select, out_file);
+   }
     write_sequs(sql, save_select, out_file);
   }
   fclose(out_file);
@@ -3466,24 +3475,6 @@ void put_info(char* t1, char* t2)
     printf("++++++ info: %s %s\n",t1,t2);
 }
 
-int remove_from_name_list(char* name, struct name_list* nl)
-{
-  int j, i, k = -1;
-  for (i = 0; i < nl->curr; i++)
-    if (strcmp(nl->names[nl->index[i]], name) == 0) break;
-  if (i < nl->curr)
-  {
-    k = nl->index[i];
-    for (j = i+1; j < nl->curr; j++) nl->index[j-1] = nl->index[j];
-    for (j = 0; j < nl->curr-1; j++)
-      if(nl->index[j] == nl->curr-1) break;
-    nl->index[j] = k;
-    nl->inform[k] = nl->inform[nl->curr-1];
-    nl->names[k] = nl->names[--nl->curr];
-  }
-  return k;
-}
-
 void remove_range(char* string, char* s1, char* s2)
   /* remove portion s1...s2 (included) in string */
 {
@@ -3752,7 +3743,6 @@ void seq_flatten(struct sequence* sequ)
     if (c_node == sequ->end) break;
     c_node = c_node->next;
   }
-  remove_from_name_list(sequ->name, line_list->list);
 }
 
 void set_defaults(char* string) /* reset options, beam etc. to defaults */

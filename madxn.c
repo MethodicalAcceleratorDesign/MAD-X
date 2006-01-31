@@ -3831,6 +3831,7 @@ void make_sequ_from_line(char* name)
   current_sequ->end = current_node;
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
+  current_sequ->line = 1; /* remember origin of sequence */
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
 
@@ -5920,7 +5921,11 @@ void seq_edit(struct in_cmd* cmd)
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
   {
     if ((pos = name_list_pos(name, sequences->list)) >= 0)
-      seq_edit_ex(sequences->sequs[pos]);
+    {
+     if (sequences->sequs[pos]->line) 
+       warning("sequence originates from line,","edit ignored");
+     else  seq_edit_ex(sequences->sequs[pos]);
+    }
     else warning("unknown sequence:", "ignored");
   }
   else warning("seqedit without sequence:", "ignored");
@@ -7694,8 +7699,9 @@ void use_sequ(struct in_cmd* cmd)
       myfree(rout_name, current_range); current_range = NULL;
     }
     name = pl->parameters[pos]->string;
-    if ((pos = name_list_pos(name, line_list->list)) > -1)
-      make_sequ_from_line(name);
+    if ((pos = name_list_pos(name, line_list->list)) > -1
+         && line_list->macros[pos]->dead == 0)
+	make_sequ_from_line(name); /* only if not disabled */
     if ((lp = name_list_pos(name, sequences->list)) > -1)
     {
       current_sequ = sequences->sequs[lp];

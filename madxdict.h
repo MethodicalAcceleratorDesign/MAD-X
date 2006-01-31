@@ -267,6 +267,7 @@ char command_def[] =
 " "
 "save: control none 0 0 "
 "sequence = [s, {none}], "
+"bare     = [l, false, true],"
 "beam     = [l, false, true],"
 "mad8     = [l, false, true], "
 "file     = [s, save, save]; "
