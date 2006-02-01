@@ -2472,7 +2472,7 @@ void select_ptc_normal(struct in_cmd* cmd)
               n1 = (double)mynres;
               double_to_table("normal_results", "value", &n1);
               augment_count("normal_results");
-           }
+            }
             if (j == 11)
             {
               for (jj = 0; jj < mynres; jj++)
@@ -3903,6 +3903,20 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
   return ++current_node->con_cnt;
 }
 
+
+int constraint_name(char* name, int* name_l, int* index)
+  /* returns the name of the constraint */
+{
+  int ncp, nbl;
+  struct constraint* c_c;
+  c_c = current_node->cl->constraints[*index];
+  ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
+  nbl = *name_l - ncp;
+  strncpy(name, c_c->name, ncp);
+  return 1;
+}
+
+
 int next_global(char* name, int* name_l, int* type, double* value,
                 double* c_min, double* c_max, double* weight)
   /* returns the parameters of the next global constraint;
@@ -3959,7 +3973,8 @@ int next_start(double* x,double* px,double* y,double* py,double* t,
 }
 
 int next_vary(char* name, int* name_l,
-              double* lower, double* upper, double* step)
+              double* lower, double* upper, double* step,
+              int* slope, double* opt)
   /* returns the next variable to be varied during match;
      0 = none, else count */
 {
@@ -3986,8 +4001,30 @@ int next_vary(char* name, int* name_l,
   *upper = command_par_value("upper", comm);
   if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = ten_m_12;
   *step = l_step;
+  *slope = command_par_value("slope", comm);
+  *opt = command_par_value("opt", comm);
   return ++vary_cnt;
 }
+
+int vary_name(char* name, int* name_l, int* index)
+  /* returns the variable name */
+{
+  int pos, ncp, nbl;
+  char* v_name;
+  struct name_list* nl;
+  struct command* comm;
+  struct command_parameter_list* pl;
+  comm = stored_match_var->commands[*index];
+  nl = comm->par_names;
+  pl = comm->par;
+  pos = name_list_pos("name", nl);
+  v_name = pl->parameters[pos]->string;
+  ncp = strlen(v_name) < *name_l ? strlen(v_name) : *name_l;
+  nbl = *name_l - ncp;
+  strncpy(name, v_name, ncp);
+  return 1;
+}
+
 
 int node_al_errors(double* errors)
   /* returns the alignment errors of a node */
@@ -4378,6 +4415,7 @@ void pro_match(struct in_cmd* cmd)
   }
   else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 ||
            strcmp(cmd->tok_list->p[0], "lmdif") == 0 ||
+           strcmp(cmd->tok_list->p[0], "jacobian") == 0 ||
            strcmp(cmd->tok_list->p[0], "simplex") == 0)
   {
     match_action(cmd);
@@ -5322,6 +5360,7 @@ struct table* read_table(struct in_cmd* cmd)
   }
   while (fgets(aux_buff->c, aux_buff->max, tab_file))
   {
+    supp_char('\r', aux_buff->c);
     cc = strtok(aux_buff->c, " \"\n");
     if (*cc == '@')
     {
@@ -5839,7 +5878,7 @@ void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
   int i;
   fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
 /*  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]);
-  for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]); */
+    for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]); */
   for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]); 
   fprintf(sec_file,"\n");
   for (i = 0; i < 36; i++)
@@ -5922,9 +5961,9 @@ void seq_edit(struct in_cmd* cmd)
   {
     if ((pos = name_list_pos(name, sequences->list)) >= 0)
     {
-     if (sequences->sequs[pos]->line) 
-       warning("sequence originates from line,","edit ignored");
-     else  seq_edit_ex(sequences->sequs[pos]);
+      if (sequences->sequs[pos]->line) 
+        warning("sequence originates from line,","edit ignored");
+      else  seq_edit_ex(sequences->sequs[pos]);
     }
     else warning("unknown sequence:", "ignored");
   }
@@ -7700,8 +7739,8 @@ void use_sequ(struct in_cmd* cmd)
     }
     name = pl->parameters[pos]->string;
     if ((pos = name_list_pos(name, line_list->list)) > -1
-         && line_list->macros[pos]->dead == 0)
-	make_sequ_from_line(name); /* only if not disabled */
+        && line_list->macros[pos]->dead == 0)
+      make_sequ_from_line(name); /* only if not disabled */
     if ((lp = name_list_pos(name, sequences->list)) > -1)
     {
       current_sequ = sequences->sequs[lp];
