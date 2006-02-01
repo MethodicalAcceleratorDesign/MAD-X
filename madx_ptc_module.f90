@@ -131,6 +131,7 @@ CONTAINS
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor
+    real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt
     real(kind(1d0)) get_value,node_value
     character(length) name
     character(name_len) aptype
@@ -402,16 +403,76 @@ CONTAINS
        key%tiltd=node_value('tilt ')
     case(5) ! PTC accepts mults
        key%magnet="quadrupole"
-       key%list%k(2)=node_value('k1 ')  ! other mul
-       key%tiltd=node_value('tilt ')
+       call dzero(f_errors,maxferr+1)
+       n_ferr = node_fd_errors(f_errors)
+       do i = 0, 1
+          do j = 1, 2
+             field(j,i) = zero
+          enddo
+       enddo
+       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(4,n_ferr))
+       sk1=node_value('k1 ')
+       sk1s=node_value('k1s ')
+       if (sk1s .eq. zero)  then
+          tilt = zero
+       else
+          tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two
+       endif
+       if(l.ne.0) then
+          sk1 = sk1 + field(1,1)/l
+          sk1s = sk1s + field(2,1)/l
+       endif
+       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
+       key%list%k(2)=sk1
+       key%tiltd=node_value('tilt ')+tilt
     case(6)
        key%magnet="sextupole"
-       key%list%k(3)=node_value('k2 ')
-       key%tiltd=node_value('tilt ')
+       call dzero(f_errors,maxferr+1)
+       n_ferr = node_fd_errors(f_errors)
+       do i = 0, 2
+          do j = 1, 2
+             field(j,i) = zero
+          enddo
+       enddo
+       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
+       sk2=node_value('k2 ')
+       sk2s=node_value('k2s ')
+       if (sk2s .eq. zero)  then
+          tilt = zero
+       else
+          tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three
+       endif
+       if(l.ne.0) then
+          sk2 = sk2 + field(1,2)/l
+          sk2s = sk2s + field(2,2)/l
+       endif
+       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)
+       key%list%k(3)=sk2
+       key%tiltd=node_value('tilt ')+tilt
     case(7) ! PTC accepts mults
        key%magnet="octupole"
-       key%list%k(4)=node_value('k3 ')
-       key%tiltd=node_value('tilt ')
+       call dzero(f_errors,maxferr+1)
+       n_ferr = node_fd_errors(f_errors)
+       do i = 0, 3
+          do j = 1, 2
+             field(j,i) = zero
+          enddo
+       enddo
+       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(8,n_ferr))
+       sk3=node_value('k3 ')
+       sk3s=node_value('k3s ')
+       if (sk3s .eq. zero)  then
+          tilt = zero
+       else
+          tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four
+       endif
+       if(l.ne.0) then
+          sk3 = sk3 + field(1,3)/l
+          sk3s = sk3s + field(2,3)/l
+       endif
+       if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)
+       key%list%k(4)=sk3
+       key%tiltd=node_value('tilt ')+tilt
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
