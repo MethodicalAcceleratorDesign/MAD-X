@@ -40,6 +40,10 @@
 #define next_global           next_global_
 #define next_start            next_start_
 #define next_vary             next_vary_
+/* RDM 20.1.2006 BEGIN jacobian strategy (match) */
+#define constraint_name       constraint_name_
+#define vary_name             vary_name_
+/* RDM 20.1.2006 END jacobian strategy (match) */
 #define node_al_errors        node_al_errors_
 #define node_fd_errors        node_fd_errors_
 #define node_string           node_string_
@@ -117,6 +121,9 @@ extern void micit_(double *,char *,double *,double *,double *,int *,float *,
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*, double*, double*);
+extern void mtjac_(int*, int*, int*, double*, double*, double*,
+                   int*, double*, int*, int*, double*, double*, double*,
+                   double*, double*, double*, double*, double*);
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*);
@@ -172,7 +179,11 @@ int next_constraint(char*, int*, int*, double*, double*, double*, double*);
 int next_global(char*, int*, int*, double*, double*, double*, double*);
 int next_start(double*,double*,double*,double*,double*,double*,double*,
                double*,double*,double*,double*,double*);
-int next_vary(char*, int*, double*, double*, double*);
+/* RDM 20.1.2006 BEGIN next_vary chage definition, new func defs*/
+int next_vary(char*, int*, double*, double*, double*, int*, double*);
+int vary_name(char*, int*, int*);
+int constraint_name(char*, int*, int*);
+/* RDM 20.1.2006 END */
 int node_al_errors(double*);
 int node_fd_errors(double*);
 void node_string(char*, char*, int*);
@@ -1002,8 +1013,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.01.06";
-char code_mod_date[] = "Code Modification Date: 27.01.2006";
+char myversion[] = "MAD-X 3.02";
+char code_mod_date[] = "Code Modification Date: 01.02.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
@@ -1086,6 +1097,11 @@ int match_num_beta = 0;     /* OB 23.1.2002 */
 int match_num_range = 0;    /* HG 12.11.2002 */
 int match_num_seqs = 0;     /* OB 23.1.2002 */
 int mig_strategy;           /* migrad strategy (match) */
+int jac_strategy;           /* RDM 24.8.2005 jacobian strategy (match) */
+int jac_repeat;             /* RDM 24.8.2005 jacobian repeat (match) */
+double jac_cool;            /* RDM 24.8.2005 jacobian cool factor (match) */
+double jac_balance;         /* RDM 24.8.2005 jacobian balance cool factor (match) */
+double jac_random;         /* RDM 24.8.2005 jacobian random factor (match) */
 int new_name_count = 0;     /* to make internal names */
 int next_rand = 0;          /* for random generator */
 int plots_made = 0;         /* set to 1 if plots are made */

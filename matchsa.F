@@ -22,8 +22,8 @@
       double precision tol,t,vect(*),fun_vect(*),fopt,vmod
       double precision rt,lb(*),ub(*),xopt(*),c(*),                     &
      &vm(*),xp(*),fstar(neps)
-      integer j,next_vary,get_option,name_l
-      double precision get_variable,val,c_min,c_max,step
+      integer j,next_vary,get_option,name_l,slope
+      double precision get_variable,val,c_min,c_max,step,opt
       logical logmax,psum
       common/forsa/m
       parameter(name_l=24)
@@ -35,7 +35,7 @@
 !     include 'match.fi'         !not used here i guess
       psum=get_option('match_summary ') .ne. 0
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step)
+      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = get_variable(name)
         lb(j)=c_min
@@ -983,4 +983,3 @@
 
       RETURN
       END
-

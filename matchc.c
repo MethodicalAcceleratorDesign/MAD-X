@@ -52,6 +52,28 @@ void match_action(struct in_cmd* cmd)
             match_work[4]->a, match_work[5]->a, match_work[6]->a,
             match_work[7]->a,match_work[8]->a,match_work[9]->a);
   }
+  else if (strcmp(cmd->tok_list->p[0], "jacobian") == 0)
+  {
+    print_match_summary = 0;
+    jac_strategy = command_par_value("strategy", cmd->clone);
+    jac_cool = command_par_value("cool", cmd->clone);
+    jac_repeat = command_par_value("repeat", cmd->clone);
+    jac_balance = command_par_value("balance", cmd->clone);
+    jac_random = command_par_value("random", cmd->clone);
+    match_work[0] = new_double_array(total_vars*total_const);
+    match_work[1] = new_double_array(total_const);
+    match_work[2] = new_double_array(total_const);
+    match_work[3] = new_double_array(total_vars);
+    match_work[4] = new_double_array(total_vars);
+    fprintf(prt_file, "START JACOBIAN:\n\n");
+    mtjac_(&total_const, &total_vars,
+           &jac_strategy, &jac_cool,&jac_balance, &jac_random,
+           &jac_repeat,
+           &match_tol, &current_calls, &current_call_lim,
+           vary_vect->a, vary_dvect->a, fun_vect->a,
+           match_work[0]->a,match_work[1]->a,match_work[2]->a,
+           match_work[3]->a,match_work[4]->a);
+  }
   else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 && total_vars <= total_const)
   {
     print_match_summary = 1;
@@ -123,6 +145,12 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
     if (get_option("varylength") != zero) match_prepare_varypos();
 
     if (get_option("rmatrix") != zero) fprintf(prt_file, "%s\n", "call TWISS with RMATRIX");
+    /* RDM 22.9.2005: match with chrom */
+    if (get_option("chrom") != zero) fprintf(prt_file, "%s\n", "call TWISS with CHROM");
+    /* RDM 12.12.2005: match with deltap */
+    if (get_option("deltap") != zero) fprintf(prt_file, "%s\n", "call TWISS with DELTAP");
+    /* RDM 16.12.2005: match with deltap */
+    if (get_option("sectormap") != zero) fprintf(prt_file, "%s\n", "call TWISS with SECTORMAP");
 
     pro_twiss();
     if (twiss_success)
@@ -210,6 +238,8 @@ void match_end(struct in_cmd* cmd)
 {
   int i;
   struct node* c_node;
+  /* RDM 28/9/2005 Command string for assigning var tar to penalty. */
+  char assign_cmd[40];
   /* OB 5.3.2002: write out all final constraint values and vary parameters */
   penalty = zero;
   if (get_option("varylength") != zero) match_prepare_varypos();
@@ -233,6 +263,8 @@ void match_end(struct in_cmd* cmd)
   fprintf(prt_file, "\n\n");
 
   fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
+  
+
 
   fprintf(prt_file, "\n\n");
   fprintf(prt_file, "Variable                   Final Value        Lower Limit        Upper Limit\n");
@@ -285,6 +317,11 @@ void match_end(struct in_cmd* cmd)
   current_calls = 0;
   total_const = 0;
   set_option("twiss_print", &keep_tw_print);
+
+
+  fprintf(prt_file, "EVALUATING \"tar= %16.8e;\"\n",penalty);
+  sprintf(assign_cmd,"tar= %16.8e ;",penalty);
+  pro_input(assign_cmd);
 }
 
 void match_fix(struct in_cmd* cmd)
@@ -359,6 +396,10 @@ void match_match(struct in_cmd* cmd)
   struct sequence* sequ;
   int i, j, pos, n, tpos;
   int izero = 0;
+  /* RDM 19/12/12005*/
+  int ione = 1;
+  char *dpp;
+  /* RDM 19/12/12005*/
   if (match_is_on)
   {
     warning("already inside match:", "ignored");
@@ -567,6 +608,66 @@ void match_match(struct in_cmd* cmd)
   }
   /* END CHK-R-MATRIX; OB 6.10.2003 */
 
+  /* START CHK-CHROM; RDM 22.9.2005 */
+  pos = name_list_pos("chrom", nl);
+  if(nl->inform[pos]) /* chrom specified */
+  {
+    cp = cmd->clone->par->parameters[pos];
+    for (i = 0; i < match_num_seqs; i++)
+    {
+      /* START adding chrom to TWISS input command for each sequence */
+      tnl = local_twiss[i]->cmd_def->par_names;
+      tpos = name_list_pos("chrom", tnl);
+      local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+      local_twiss[i]->cmd_def->par->parameters[tpos]->double_value
+        = 1;
+      set_option("twiss_chrom",&ione);
+      /* END adding chrom to TWISS input command for each sequence */
+    }
+  }
+  /* END CHK-CHROM; RDM 22.9.2005 */
+
+  /* START CHK-SECTORMAP; RDM 16.12.2005 */
+  pos = name_list_pos("sectormap", nl);
+  if(nl->inform[pos]) /* sectormap specified */
+  {
+    cp = cmd->clone->par->parameters[pos];
+    for (i = 0; i < match_num_seqs; i++)
+    {
+      /* START adding sectormap to TWISS input command for each sequence */
+      tnl = local_twiss[i]->cmd_def->par_names;
+      tpos = name_list_pos("sectormap", tnl);
+      local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+      local_twiss[i]->cmd_def->par->parameters[tpos]->double_value
+        = 1;
+      /* END adding sectormap to TWISS input command for each sequence */
+    }
+  }
+  /* END CHK-CHROM; RDM 16.12.2005 */
+
+  /* START CHK-DELTAP; RDM 12.12.2005 */
+  pos = name_list_pos("deltap", nl);
+  if(nl->inform[pos]) /* deltap specified */
+  {
+    cp = cmd->clone->par->parameters[pos];
+    for (i = 0; i < match_num_seqs; i++)
+    {
+      /* START adding deltap to TWISS input command for each sequence */
+      tnl = local_twiss[i]->cmd_def->par_names;
+      tpos = name_list_pos("deltap", tnl);
+      local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+      dpp=malloc(20);
+      sprintf(dpp,"%e",cp->double_array->a[0]);
+      local_twiss[i]->cmd_def->par->parameters[tpos]->string
+        = dpp;
+/*       END adding deltap to TWISS input command for each sequence */
+/*      fprintf(prt_file, "entry value: %f\n", cp->double_array->a[0]);*/
+/*      twiss_deltas->curr=1;*/
+/*      twiss_deltas->a[0]=cp->double_array->a[0];*/
+    }
+  }
+  /* END CHK-DELTAP; RDM 12.12.2005 */
+
   /* START CHK-ENTRIES of TYPE DOUBLE-REAL; OB 23.1.2002 */
   for (j = 0; j < nl->curr; j++)
   {
@@ -598,6 +699,7 @@ void match_match(struct in_cmd* cmd)
         local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
         local_twiss[i]->cmd_def->par->parameters[tpos]->double_value
           = cp->double_array->a[i];
+/*        fprintf(prt_file, "entry value: %f %f\n", match_beta_value, cp->double_array->a[i]);*/
         /* END defining a TWISS input command for each sequence */
       }
     }

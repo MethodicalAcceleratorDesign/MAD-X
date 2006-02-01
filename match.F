@@ -23,10 +23,10 @@
 
 
       logical psum
-      integer j,next_vary,get_option,name_l
+      integer j,next_vary,get_option,name_l,slope
       parameter(name_l=24)
       double precision get_variable,vect(*),dvect(*),c_min,c_max,step,  &
-     &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin
+     &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin, opt
       parameter(s_fact=5d-1)
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
@@ -35,7 +35,7 @@
 
       psum=get_option('match_summary ') .ne. 0
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step)
+      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = get_variable(name)
         if (val .ge. c_max) then
@@ -69,10 +69,10 @@
       implicit none
 
 
-      integer j,next_vary,name_l,ireset
+      integer j,next_vary,name_l,ireset,slope
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,                        &
-     &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin
+     &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin, opt
       parameter(s_fact=5d-1)
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
@@ -80,7 +80,7 @@
       character*(name_len) name
 
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step)
+      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = vect(j)
         if (val .ge. c_max) then
@@ -229,15 +229,15 @@
       implicit none
 
 
-      integer j,next_vary,name_l
+      integer j,next_vary,name_l,slope
       parameter(name_l=24)
-      double precision vect(*),c_min,c_max,step,s_fact
+      double precision vect(*),c_min,c_max,step,s_fact,opt
       parameter(s_fact=5d-1)
       include 'name_len.fi'
       character*(name_len) name
 
  1    continue
-      j=next_vary(name,name_l,c_min,c_max,step)
+      j=next_vary(name,name_l,c_min,c_max,step,slope,opt)
       if(j.ne.0)  then
         call set_variable(name,vect(j))
         goto 1
