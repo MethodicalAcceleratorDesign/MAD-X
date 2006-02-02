@@ -695,7 +695,13 @@ CONTAINS
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
     if(closed_orbit) then
        call find_orbit(my_ring,x,1,default,1d-7)
-       print*,"Closed orbit: ",x
+       if(icase.eq.4) then
+          print*,"Closed orbit: ",x(1),x(2),x(3),x(4)
+       elseif(icase.eq.5) then
+          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(5)
+       elseif(icase.eq.6) then
+          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(6),x(5)
+       endif
     endif
 
     no = get_value('ptc_twiss ','no ')
@@ -1333,7 +1339,13 @@ CONTAINS
     closed_orbit = get_value('ptc_normal ','closed_orbit ') .ne. 0
     if(closed_orbit) then
        call find_orbit(my_ring,x,1,default,1d-7)
-       print*,"Closed orbit: ",x
+       if(icase.eq.4) then
+          print*,"Closed orbit: ",x(1),x(2),x(3),x(4)
+       elseif(icase.eq.5) then
+          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(5)
+       elseif(icase.eq.6) then
+          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(6),x(5)
+       endif
     endif
 
     no = get_value('ptc_normal ','no ')
@@ -1562,7 +1574,13 @@ CONTAINS
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
     if(closed_orbit) then
        call find_orbit(my_ring,x0,1,default,1d-7)
-       print*,"Closed orbit: ",x0
+       if(icase.eq.4) then
+          print*,"Closed orbit: ",x0(1),x0(2),x0(3),x0(4)
+       elseif(icase.eq.5) then
+          print*,"Closed orbit: ",x0(1),x0(2),x0(3),x0(4),x0(5)
+       elseif(icase.eq.6) then
+          print*,"Closed orbit: ",x0(1),x0(2),x0(3),x0(4),x0(6),x0(5)
+       endif
     endif
 
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
