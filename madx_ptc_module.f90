@@ -1257,7 +1257,7 @@ CONTAINS
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
        END SELECT
     endif
-    double_from_ptc_normal = d_val/(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+    double_from_ptc_normal = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
   END FUNCTION double_from_ptc_normal
 
   RECURSIVE FUNCTION FACTORIAL (N) &
