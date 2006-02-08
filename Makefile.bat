@@ -1,11 +1,13 @@
-REM User Input 
-SET user_main=d:\programs\madX
+REM User Input - you may need to change the following folder locations
+REM This is for the case where WinCVS checks out to F:\MAD\MADXLahey\source
+REM
+SET user_main=F:\MAD\MADXLahey\source\madX
 REM FPP code
-SET FPP=d:\programs\madX
+SET FPP=F:\MAD\MADXLahey\source\madX
 REM PTC code
-SET PTC=d:\programs\madX
+SET PTC=F:\MAD\MADXLahey\source\madX
 REM MAD-X proper code
-SET MADX=d:\programs\madX
+SET MADX=F:\MAD\MADXLahey\source\madX
 
 set INCLUDE=C:\PROGRA~1\Microsoft Visual Studio\VC98\Include
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %MADX%\madxp.c
@@ -17,6 +19,7 @@ lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\dynap.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\emit.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\twiss.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\match.F
+lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\matchjc.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\matchsa.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\touschek.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\poisson.F
@@ -73,7 +76,7 @@ lf95 -c -o1 -tp %MADX%\timest.f90
 lf95 -c -o1 -tp %MADX%\timex.f90
 lf95 -c -o1 -tp %MADX%\run_madx.f90
 lf95 -c -o1 -tp %MADX%\madx_main.f90
-lf95 -out %user_main%\madx madxm.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
-lf95 -out %user_main%\madxdev madx_main.obj run_madx.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj e_define_newda.obj f_newda.obj g_newLielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_1_pol_template.obj Sb_2_pol_template.obj Sb_sagan_pol_arbitrary.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_0_fitted.obj Sg_1_fitted.obj Sg_1_template_my_kind.obj Sg_2_template_my_kind.obj Sg_sagan_wiggler.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj madx_ptc_module.obj madx_ptc_track_run.obj user2_photon.obj poisson.obj  wrap.obj timest.obj timex.obj
+lf95 -out %user_main%\madx madxm.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
+lf95 -out %user_main%\madxdev madx_main.obj run_madx.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj e_define_newda.obj f_newda.obj g_newLielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_1_pol_template.obj Sb_2_pol_template.obj Sb_sagan_pol_arbitrary.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_0_fitted.obj Sg_1_fitted.obj Sg_1_template_my_kind.obj Sg_2_template_my_kind.obj Sg_sagan_wiggler.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj madx_ptc_module.obj madx_ptc_track_run.obj user2_photon.obj poisson.obj  wrap.obj timest.obj timex.obj
 cl -c /Zm1000 -D_CATCH_MEM_W -D_WIN32 %MADX%\madxp.c
 lf95 -out %user_main%\mpars madxm.obj madxp.obj
