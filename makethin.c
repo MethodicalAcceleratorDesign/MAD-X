@@ -1,37 +1,7 @@
-/*******************************************************/
-/* the start of the thick to thin lens converter       */
-/*******************************************************/
-/* pre-CVS comments, new comments are now on CVS only */
-/* 20/06/2002 - MH removed ..0 ending from kickers, by putting slice_no=1 in
-   the call for create_thin_obj */
-/* 17/06/2002 - MH - added calls to grow_* in create_thin_obj to make sure the
-   array for command parameters in long enough. */
-/* 31/05/2002 - MH - new_element_nowarn removed, core dump problems from fulln.c
-   deleting the element in add_to_el_list (called from new_element_nowarn).
-   changes now done to make_element */
-/* 29/05/2002 - MH - ->name's are now arrays not pointers */
-/* 02/04/2002 - MH - corrected copy_thin_obj to copy lrad correctly */
-/*                   fixed length for collim problem */
-/*                   added new collimation slicing */
-/* 16/04/2002 - MH - added magnet command parameter to thin_multipole */
-/* 15/04/2002 - MH - changed calloc to mycalloc for HG error checking */
-/* 11/4/2002  - MH - removed *l for knl conversion */
-/*                 - angle is prioritised over k0 value for [rs]bend */
-/*                 - sequ->beam pointer is copied over from thick sequence */
-/* 10/12/2001 - MH - removed time info */
-/* 4/12/2001  - MH - changed so that >5 slices from teapot == simple style */
-/* 30/11/2001 - MH - warning message for no list given once now */
-/* 29/11/2001 - MH - removed the possibility of a save option */
-/* 27/11/2001 - MH - removed the conversion of the tilt parameter
-   now I only use the k2 and k2s (or k3 and k3s...) the tilt
-   has been removed */
-/* 23/11/2001 - MH - added in lrad param to create_thin_obj
-   but with check to see if lrad is allowed by dictionary.
-   also replaced return_param_index with name_list_pos and
-   a check on inform[] where needed. */
-/* 19/11/2001 - MH - Initial version 1.0 of the slicer */
-/* M. Hayes                                            */
-/* prototyping *******************************************************/
+/* makethin.c
+   Thick to thin lens converter. Helmut Burkhardt
+   Early versions in 2001, 2002 by Mark Hayes
+*/
 
 /* define bool like in C++ */
 #ifndef bool_for_c
@@ -537,8 +507,6 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   }
   if(slice_no > slices && thick_elem!=thick_elem->parent ) /* check, but not for base classes */
   {
-    printf("    *** warning in create_thin_multipole. Inconsistent child/parent slicing for %s  slice_no=%d exceeds slices=%d. Use 1 for parent.\n",
-    thick_elem->name,slice_no,slices);
     slice_no=1;
   }
 
