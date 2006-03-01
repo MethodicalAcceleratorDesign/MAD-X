@@ -95,13 +95,13 @@ MODULE S_DEF_KIND
 
   PRIVATE ZEROr_multip,ZEROP_multip,ALLOCMULTIP,KILLMULTIP
   PRIVATE INTMULTIPR,INTMULTIPP,INTMULTIPS
-  PRIVATE copyMULTIP,copyMULTIP_elp_el,copyMULTIP_el_el
+  PRIVATE copyMULTIP_elp_el,copyMULTIP_el_el
   PRIVATE POINTERS_multipr,POINTERS_multipP
 
   ! using x and x'
   private fxr,fxp,f_m,find_bR,find_bP,find_b_m,rk6P,rk6_m,rk6r
   PRIVATE fevalP,fevalr,feval,rk4r,rk4p,rk4_m,ENGE_COMP,ENGE_COMR,ENGE_COM
-  private find_vr,find_vb,find_v,find_single_br,find_single_bp,find_fb
+  private find_vr,find_vb,find_v,find_single_br,find_single_bp
   private find_full_br,find_full_bp,find_full_b,rk2r,rk2p,rk2_m
 
   INTEGER,PRIVATE :: NMAXI=10000

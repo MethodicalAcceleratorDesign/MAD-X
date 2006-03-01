@@ -3,6 +3,7 @@
 ! See file A_SCRATCH_SIZE.F90
 module fitted_MAG_1
   USE S_def_all_kinds
+  implicit none
   integer, parameter :: dpm =dp
   integer mff
   private fxr

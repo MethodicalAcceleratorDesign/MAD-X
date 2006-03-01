@@ -1,5 +1,6 @@
 module sagan_WIGGLER
   use S_def_all_kinds
+  implicit none
   private INTR,INTP,INTS,ZEROr_SAGAN,ZEROp_SAGAN
   private ALLOC_SAGAN,KILL_SAGAN,POINTERS_SAGANR,POINTERS_SAGANP
   private copy_el_elp ,copy_elp_el ,copy_el_el

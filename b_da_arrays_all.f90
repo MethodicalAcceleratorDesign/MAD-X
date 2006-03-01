@@ -21,7 +21,8 @@ module da_arrays
   character(10), allocatable,dimension(:)::daname                      ! daname(lda)*10
   logical(lp), allocatable,dimension(:)::allvec                            !lda
 
-  integer nda,ndamaxi
+  integer nda
+  integer :: ndamaxi=0
   real(dp),TARGET :: total_da_size = 300.D0
   integer nst,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
