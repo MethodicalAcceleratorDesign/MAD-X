@@ -976,6 +976,7 @@ contains
 
     x(6)=x(6)-freq*turns0
 
+    mx=zero
     DO J=1,ND2
 
        Y=FIX
