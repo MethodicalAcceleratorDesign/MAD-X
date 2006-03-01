@@ -2021,12 +2021,10 @@
         n_ferr = node_fd_errors(f_errors)
         bv0 = node_value('dipole_bv ')
         bvk = node_value('other_bv ')
-        if (ftrk) then
-          arad = get_value('probe ','arad ')
-          deltap = get_value('probe ','deltap ')
-          gamma = get_value('probe ','gamma ')
-          dorad = get_value('probe ','radiate ') .ne. zero
-        endif
+        arad = get_value('probe ','arad ')
+        deltap = get_value('probe ','deltap ')
+        gamma = get_value('probe ','gamma ')
+        dorad = get_value('probe ','radiate ') .ne. zero
         an = bv0 * node_value('angle ') * el/node_value('l ')
         tilt = -node_value('tilt ')
         e1 = bv0 * node_value('e1 ')
@@ -3465,6 +3463,7 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
+      cplxy=.false.
       fmap = el .ne. zero
       if (.not. fmap) return
 !---- Field error.
@@ -3664,6 +3663,7 @@
       parameter(zero=0d0,one=1d0,two=2d0,ten3m=1d-3)
 
 !---- Initialize.
+      cplxy=.false.
       charge = get_value('probe ','charge ')
       pc = get_value('probe ','pc ')
       deltap = get_value('probe ','deltap ')
@@ -3844,6 +3844,7 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
 
 !---- Initialize.
+      cplxy=.false.
       fmap = el .ne. zero
       if (.not. fmap) return
 !---- Field error.
