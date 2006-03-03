@@ -204,7 +204,7 @@ struct block*   current_block = NULL;
 
 int virgin_c6t = 1;
 
-struct c6t_element *first_in_sequ, *last_in_sequ;
+struct c6t_element *first_in_sequ, *last_in_sequ, *last_in_sequ_org;
 struct c6t_element* prev_element;
 struct c6t_element* current_element = NULL;
 struct c6t_element* debug_element = NULL;
@@ -298,8 +298,10 @@ void conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD
   get_args(mycmd);
   process_c6t();
   printf("\nc6t terminated - total number of elements: %d\n", elem_cnt);
-  printf("                    with alignment errors: %d\n", align_cnt);
-  printf("                    with field     errors: %d\n", field_cnt);
+  printf("                    field errors    MAD-X: %d\n", field_cnt);
+  printf("                    field errors SixTrack: %d\n", f16_cnt);
+  printf("                 alignment errors   MAD-X: %d\n", align_cnt);
+  printf("                alignment errors SixTrack: %d\n", f8_cnt);
   printf("                          sequence length: %f [m]\n", sequ_length);
   c6t_finish();
 }
@@ -824,7 +826,7 @@ void c6t_finish()
     }
     myfree(rout_name, types.member[i]);
   }
-  types.curr=0; first_in_sequ = NULL; last_in_sequ = NULL;
+  types.curr=0; first_in_sequ = NULL; last_in_sequ = NULL; last_in_sequ_org = NULL;
   current_element=NULL;
   /* remove blocks */
   p = first_block;
@@ -1531,7 +1533,11 @@ void link_c6t_in_front(struct c6t_element* new, struct c6t_element* el)
 
 void link_behind(struct c6t_element* new, struct c6t_element* el)
 {
-  if (el->next == NULL) last_in_sequ = new;
+  if (el->next == NULL) 
+  {
+    last_in_sequ = new;
+    last_in_sequ_org = new;
+  }
   else el->next->previous = new;
   new->previous = el; new->next = el->next;
   el->next = new;
@@ -2034,6 +2040,7 @@ void read_sequ()
   sequ_end = current_sequ->ex_end->position;
   sequ_length = sequ_end - sequ_start;
   last_in_sequ = current_element;
+  last_in_sequ_org = current_element;
   put_info("MADX sequence converted to c6t internal.","");
 }
 
@@ -2435,17 +2442,17 @@ void write_f34_special()
     }
     current_element = current_element->next;
   }
-  if (last_in_sequ->twtab_row > 0)
+  if (last_in_sequ_org->twtab_row > 0)
   {
-    if ((err=double_from_table("twiss","s",&(last_in_sequ->twtab_row),&spos)))
+    if ((err=double_from_table("twiss","s",&(last_in_sequ_org->twtab_row),&spos)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","betx",&(last_in_sequ->twtab_row),&betx)))
+    if ((err=double_from_table("twiss","betx",&(last_in_sequ_org->twtab_row),&betx)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","bety",&(last_in_sequ->twtab_row),&bety)))
+    if ((err=double_from_table("twiss","bety",&(last_in_sequ_org->twtab_row),&bety)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","mux",&(last_in_sequ->twtab_row),&mux)))
+    if ((err=double_from_table("twiss","mux",&(last_in_sequ_org->twtab_row),&mux)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","muy",&(last_in_sequ->twtab_row),&muy)))
+    if ((err=double_from_table("twiss","muy",&(last_in_sequ_org->twtab_row),&muy)))
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
