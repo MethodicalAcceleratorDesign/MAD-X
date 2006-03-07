@@ -445,13 +445,13 @@
 !------------  rectellipse case ----------------------------------
         else if(aptype.eq.'rectellipse') then
 !*****         test ellipse
-          apx = aperture(1)
-          apy = aperture(2)
+          apx = aperture(3)
+          apy = aperture(4)
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
      &last_pos, last_orbit, track, ktrack,al_errors)
 !*****         test rectangle
-          apx = aperture(3)
-          apy = aperture(4)
+          apx = aperture(1)
+          apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
      &last_pos, last_orbit, track, ktrack,al_errors)
 !       print*, " test apertures"
