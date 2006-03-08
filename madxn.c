@@ -4628,6 +4628,7 @@ void pro_ptc_twiss()
   if (w_file) out_table(table_name, twiss_table, filename);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
+  delete_int_array(tarr); 
 }
 
 void pro_twiss()
