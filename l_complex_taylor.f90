@@ -4,6 +4,7 @@
 module complex_taylor
   use tpsalie_analysis
   implicit none
+  public
   private mul,cscmul,cmulsc,dscmul,dmulsc,mulsc,scmul,imulsc,iscmul
   private ctmul, cmult,ctadd,caddt,ctsub,csubt,ctdiv,cdivt
   private add,cscadd,dscadd,caddsc,daddsc,unaryADD,addsc,scadd,iaddsc,iscadd

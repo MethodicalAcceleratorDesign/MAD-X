@@ -5,6 +5,7 @@
 module USER_kind2
   use S_def_all_kinds
   implicit none
+  public
   private INTR,INTP,INTS,ZEROr_USER2,ZEROp_USER2
   private ALLOC_USER2,KILL_USER2,POINTERS_USER2R,POINTERS_USER2P
   private copy_el_elp ,copy_elp_el ,copy_el_el

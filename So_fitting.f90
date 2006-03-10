@@ -4,6 +4,7 @@
 module S_fitting
   USE MAD_LIKE
   IMPLICIT NONE
+  public
   PRIVATE lattice_fit_TUNE_L,lattice_fit_L   !,LAGRANGE
   PRIVATE THINLENS_L_B,THINLENS_L_L,THINLENS_L_2
   PRIVATE FIND_ORBIT_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
@@ -75,14 +76,14 @@ contains
     call alloc(df,neq)
 
 
-    SCRATCHFILE=NEWFILE
+    call kanalnummer(SCRATCHFILE)
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
     do i=1,NFIT
        call dainput(eq(i),scratchfile)
        eq(i)=eq(i)-targ(i)
     enddo
-    SCRATCHFILE=CLOSEFILE
+    close(SCRATCHFILE)
 
 
 
@@ -216,6 +217,7 @@ contains
     SCRATCHFILE=90
 
     STATE=((DEFAULT+ONLY_4D)-RADIATION0)
+    STATE=(DEFAULT+RADIATION0-nocavity0)
     CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
 
     SET_TPSAFIT=.FALSE.
@@ -237,6 +239,9 @@ contains
 
     if(want) then
        CALL FIND_ORBIT(R,CLOSED,1,STATE,1.d-5)
+       write(6,*) "closed orbit "
+       write(6,*) CLOSED
+
     else
        closed=0.d0
     endif
@@ -260,7 +265,7 @@ contains
     eq(1)=       ((NORM%dhdj%v(1)).par.'0000')
     eq(2)=       ((NORM%dhdj%v(2)).par.'0000')
 
-    SCRATCHFILE=NEWFILE
+    call kanalnummer(SCRATCHFILE)
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
     nt=2
@@ -269,7 +274,7 @@ contains
        eq(i)=eq(i)<=npara
        call daprint(eq(i),scratchfile)
     enddo
-    SCRATCHFILE=CLOSEFILE
+    close(SCRATCHFILE)
     CALL KILL(NORM)
     CALL KILL(Y)
     CALL KILL(EQ,2)
@@ -285,11 +290,11 @@ contains
     w_p%nc=1
     w_p%fc='((1X,A72))'
     w_p%c(1)=" More =>  yes=1"
+    CALL ELP_TO_EL(R)
     call write_i
     call read(more)
     !    more=more+1
     if(more==1) goto 100
-    CALL ELP_TO_EL(R)
     CALL KILL_PARA(R)
   end subroutine lattice_fit_TUNE_L
 
@@ -303,14 +308,15 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE) STATE
     INTEGER I,SCRATCHFILE,ND2,NPARA,more
-    INTEGER,parameter::nt=5
+    INTEGER,parameter::nt=4
     TYPE(TAYLOR) EQ(nt)
-
+    real(dp) dst(nt)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
     integer ipause, mypause
 
     SCRATCHFILE=90
+    dst=0.d0
 
     STATE=((DEFAULT+ONLY_4D+delta)-RADIATION0)
     CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
@@ -318,7 +324,7 @@ contains
     SET_TPSAFIT=.FALSE.
 
     DO I=1,NPOLY
-       POLY(i)%NPARA=NPARA
+       !       POLY(i)%NPARA=NPARA
 
        R=POLY(i)
     ENDDO
@@ -347,20 +353,20 @@ contains
 
     eq(1)=       ((NORM%dhdj%v(1)).par.'00000')
     eq(2)=       ((NORM%dhdj%v(2)).par.'00000')
-    eq(3)=       (y(1).par.'00001')
-    eq(4)=       ((NORM%dhdj%v(1)).par.'00001')
-    eq(5)=       ((NORM%dhdj%v(2)).par.'00001')
+    !    eq(3)=       (y(1).par.'00001')
+    eq(3)=       ((NORM%dhdj%v(1)).par.'00001')
+    eq(4)=       ((NORM%dhdj%v(2)).par.'00001')
     !  eq(6)=       (y(1).par.'00000')
 
 
-    SCRATCHFILE=NEWFILE
+    call kanalnummer(SCRATCHFILE)
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
     do i=1,nt
        eq(i)=eq(i)<=npara
        call daprint(eq(i),scratchfile)
     enddo
-    SCRATCHFILE=CLOSEFILE
+    close(SCRATCHFILE)
     CALL KILL(NORM)
     CALL KILL(Y)
     CALL KILL(EQ,nt)
@@ -371,16 +377,20 @@ contains
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
-
+    dst=tpsafit(1:nt)+dst
     w_p=0
     w_p%nc=1
     w_p%fc='((1X,A72))'
     w_p%c(1) = " More =>  yes=1"
+    CALL ELP_TO_EL(R)
     call write_i
     call read(more)
     if(more==1) goto 100
 
-    CALL ELP_TO_EL(R)
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(6,*) "Final Delta_strength"
+    write(6,*)dst
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
 
     CALL KILL_PARA(R)
   end subroutine lattice_fit_L
@@ -1530,6 +1540,179 @@ contains
 
   end SUBROUTINE set_tw_cavity
 
+
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,lim) ! A re-splitting routine
+    IMPLICIT NONE
+    INTEGER NTE
+    TYPE(layout), intent(inout) :: R
+    real(dp), OPTIONAL, intent(inout) :: THIN
+    real(dp) gg,RHOI,XL,QUAD,THI
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2)  !,limit0(2)
+    integer, optional :: lim(2)
+    logical(lp) MANUAL,eject,doit
+    TYPE (fibre), POINTER :: C
+    logical(lp) doneit
+    nullify(C)
+
+    CALL LINE_L(R,doneit)
+
+    MANUAL=.FALSE.
+    eject=.FALSE.
+
+    THI=R%THIN
+    IF(PRESENT(THIN)) THI=THIN
+
+    IF(THI<=0) MANUAL=.TRUE.
+
+
+    IF(MANUAL) THEN
+       write(6,*) "thi: thin lens factor (THI<0 TO STOP) "
+       read(5,*) thi
+       IF(THI<0) eject=.true.
+    ENDIF
+
+1001 CONTINUE
+
+    limit(1)=4
+    limit(2)=18
+    if(present(lim)) limit=lim
+    !    limit0(1)=limit(1)
+    !    limit0(2)=limit(2)
+
+    M1=0
+    M2=0
+    M3=0
+    MK1=0
+    MK2=0
+    MK3=0
+    r%NTHIN=0
+
+    C=>R%START
+    do   WHILE(ASSOCIATED(C))
+
+       doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+
+       if(doit) then
+          select case(C%MAG%P%METHOD)
+          CASE(2)
+             M1=M1+1
+             MK1=MK1+C%MAG%P%NST
+          CASE(4)
+             M2=M2+1
+             MK2=MK2+3*C%MAG%P%NST
+          CASE(6)
+             M3=M3+1
+             MK3=MK3+7*C%MAG%P%NST
+          END SELECT
+          r%NTHIN=r%NTHIN+1   !C%MAG%NST
+       endif
+
+       C=>C%NEXT
+
+    enddo
+    write(6,*) "Present of thin lenses ",r%NTHIN
+    write(6,*)  "METHOD 2 ",M1,MK1
+    write(6,*) "METHOD 4 ",M2,MK2
+    write(6,*) "METHOD 6 ",M3,MK3
+    write(6,*)   "number of KICKS ", MK1+MK2+MK3
+
+    if(eject) then
+       !      limit(1)=limit0(1)
+       !      limit(2)=limit0(2)
+       return
+    endif
+    M1=0
+    M2=0
+    M3=0
+    MK1=0
+    MK2=0
+    MK3=0
+
+
+    r%NTHIN=0
+    r%THIN=THI
+
+    C=>R%START
+    do   WHILE(ASSOCIATED(C))
+
+       doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       if(doit)  then
+
+
+          xl=C%MAG%L
+          RHOI=C%MAG%P%B0
+          IF(C%MAG%P%NMUL>=2) THEN
+             QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
+          ELSE
+             QUAD=zero
+          ENDIF
+          if(C%MAG%KIND==kind5) then
+             quad=quad+(C%MAG%b_sol)**2/four
+          endif
+
+          GG=XL*(RHOI**2+ABS(QUAD))
+          GG=GG/THI
+          NTE=INT(GG)
+          IF(NTE.LT.limit(1)) THEN
+             M1=M1+1
+             C%MAG%P%METHOD=2
+             IF(NTE.EQ.0) NTE=1
+             C%MAG%P%NST=NTE
+             MK1=MK1+NTE
+          ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+             M2=M2+1
+             C%MAG%P%METHOD=4
+             NTE=NTE/3
+             IF(NTE.EQ.0) NTE=1
+             C%MAG%P%NST=NTE
+             MK2=MK2+NTE*3
+          ELSEIF(NTE.GE.limit(2)) THEN
+             M3=M3+1
+             C%MAG%P%METHOD=6
+             NTE=NTE/7
+             IF(NTE.EQ.0) NTE=1
+             C%MAG%P%NST=NTE
+             MK3=MK3+NTE*7
+          ENDIF
+          r%NTHIN=r%NTHIN+1  !C%MAG%NST
+
+
+          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call COPY(C%MAG,C%MAGP)
+       ENDIF
+
+       C=>C%NEXT
+    enddo
+
+
+    write(6,*) "Present of thin lenses ",r%NTHIN
+    write(6,*)  "METHOD 2 ",M1,MK1
+    write(6,*) "METHOD 4 ",M2,MK2
+    write(6,*) "METHOD 6 ",M3,MK3
+    write(6,*)   "number of KICKS ", MK1+MK2+MK3
+
+
+
+    IF(MANUAL) THEN
+       write(6,*) "thi: thin lens factor (THI<0 TO STOP) "
+       read(5,*) thi
+       IF(THI<0) THEN
+          THI=R%THIN
+          !          limit(1)=limit0(1)
+          !          limit(2)=limit0(2)
+          RETURN
+       ELSE
+          GOTO 1001
+       ENDIF
+    ENDIF
+
+
+    !    limit(1)=limit0(1)
+    !    limit(2)=limit0(2)
+
+    CALL RING_L(R,doneit)
+
+  END SUBROUTINE  THIN_LENS_resplit
 
 
 

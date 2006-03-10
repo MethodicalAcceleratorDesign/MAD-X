@@ -6,6 +6,7 @@ MODULE S_TRACKING
   USE S_FAMILY
 
   IMPLICIT NONE
+  public
   logical(lp),TARGET :: ALWAYS_EXACT_PATCHING=.TRUE.
   type(fibre), pointer :: lost_fibre
 
@@ -140,16 +141,14 @@ contains
           call TRACK(EL%G23,X,EL%G23%N,0,K)
        endif
        IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    case(KINDFITTED)
-       call track(el%bend,x,MID)
     case(KINDUSER1)
        call TRACK(EL%U1,X,MID)
     case(KINDUSER2)
        call TRACK(EL%U2,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
-    case(KINDMU)
-       call TRACK(EL%MU,X,MID)
+    case(KINDPA)
+       call TRACK(EL%PA,X,MID)
     case default
        w_p=0
        w_p%nc=1
@@ -218,16 +217,14 @@ contains
           call TRACK(EL%G23,X,EL%G23%N,0,K)
        endif
        IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    case(KINDFITTED)
-       call tracK(el%bend,x,MID)
     case(KINDUSER1)
        call TRACK(EL%U1,X,MID)
     case(KINDUSER2)
        call TRACK(EL%U2,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
-    case(KINDMU)
-       call TRACK(EL%MU,X,MID)
+    case(KINDPA)
+       call TRACK(EL%PA,X,MID)
     case default
        w_p=0
        w_p%nc=1
@@ -300,8 +297,6 @@ contains
        call TRACK(EL%U2,X)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X)
-    case(KINDMU)
-       call TRACK(EL%MU,X)
     case(KINDFITTED)
        w_p=0
        w_p%nc=1

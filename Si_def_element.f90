@@ -3,13 +3,13 @@
 ! See file A_SCRATCH_SIZE.F90
 
 MODULE S_DEF_ELEMENT
-  USE fitted_MAG
   USE S_DEF_KIND
   USE USER_kind1
   USE USER_kind2
   USE sagan_WIGGLER
 
   IMPLICIT NONE
+  public
   logical(lp),PARAMETER::BERZ=.TRUE.,ETIENNE=.NOT.BERZ
   logical(lp) :: USE_TPSAFIT=.TRUE.  ! USE GLOBAL ARRAY INSTEAD OF PERSONAL ARRAY
   logical(lp), target :: set_tpsafit=.false.
@@ -697,10 +697,11 @@ CONTAINS
 
 
 
-  SUBROUTINE SETFAMILYR(EL,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYR(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT) ::EL
     INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
+    type(tree_element),OPTIONAL :: T(:),t_ax(:),t_ay(:)
 
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1082,44 +1083,29 @@ CONTAINS
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
        CALL POINTERS_SAGAN(EL%WI)
-    CASE(KINDmu)
-       if(.not.ASSOCIATED(EL%mu)) THEN
-          ALLOCATE(EL%mu)
-          EL%mu=0
+    CASE(KINDpa)
+       if(.not.ASSOCIATED(EL%pa)) THEN
+          ALLOCATE(EL%pa)
+          EL%PA=0
        ELSE
-          EL%mu=-1
-          EL%mu=0
+          EL%pa=-1
+          EL%pa=0
        ENDIF
-       EL%mu%P=>EL%P
-       EL%mu%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%mu%AN=>EL%AN
-       EL%mu%BN=>EL%BN
-       CALL POINTERS_multip(EL%MU)
-    CASE(KINDFITTED)
-       if(.not.ASSOCIATED(EL%Bend)) THEN
-          ALLOCATE(EL%Bend)
-          EL%Bend=0
-       ELSE
-          EL%Bend=-1
-          EL%Bend=0
-       ENDIF
-       EL%BEND%P=>EL%P
-       EL%BEND%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%BEND%AN=>EL%AN
-       EL%BEND%BN=>EL%BN
-       CALL POINTERS_FITTED_P(EL%BEND)
-       EL%BEND%SCALE=one
-       EL%BEND%symplectic=.true.
+       EL%pa%P=>EL%P
+       EL%pa%L=>EL%L
+       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       !       EL%mu%AN=>EL%AN
+       !       EL%mu%BN=>EL%BN
+       CALL POINTERS_pancake(EL%pa,T,t_ax,t_ay)
     END SELECT
   END SUBROUTINE SETFAMILYR
 
 
-  SUBROUTINE SETFAMILYP(EL,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYP(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENTP), INTENT(INOUT) ::EL
     INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
+    type(tree_element),OPTIONAL :: T(:),t_ax(:),t_ay(:)
 
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1505,38 +1491,21 @@ CONTAINS
        EL%WI%BN=>EL%BN
        CALL POINTERS_SAGAN(EL%WI)
        CALL ALLOC(EL%WI)
-    CASE(KINDmu)
-       if(.not.ASSOCIATED(EL%mu)) THEN
-          ALLOCATE(EL%mu)
-          EL%mu=0
+    CASE(KINDpa)
+       if(.not.ASSOCIATED(EL%pa)) THEN
+          ALLOCATE(EL%pa)
+          EL%PA=0
        ELSE
-          EL%mu=-1
-          EL%mu=0
+          EL%pa=-1
+          EL%pa=0
        ENDIF
-       EL%mu%P=>EL%P
-       EL%mu%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%mu%AN=>EL%AN
-       EL%mu%BN=>EL%BN
-       CALL POINTERS_multip(EL%MU)
-       CALL ALLOC(EL%MU)
-    CASE(KINDFITTED)
-       if(.not.ASSOCIATED(EL%Bend)) THEN
-          ALLOCATE(EL%Bend)
-          EL%Bend=0
-       ELSE
-          EL%Bend=-1
-          EL%Bend=0
-       ENDIF
-       EL%BEND%P=>EL%P
-       EL%BEND%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%BEND%AN=>EL%AN
-       EL%BEND%BN=>EL%BN
-       CALL POINTERS_FITTED_P(EL%BEND)
-       CALL ALLOC(EL%BEND)
-       EL%BEND%SCALE=one
-       EL%BEND%symplectic=.true.
+       EL%pa%P=>EL%P
+       EL%pa%L=>EL%L
+       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       !       EL%mu%AN=>EL%AN
+       !       EL%mu%BN=>EL%BN
+       CALL POINTERS_pancake(EL%pa,T,t_ax,t_ay)
+       CALL ALLOC(EL%pa%SCALE)
     END SELECT
 
   END SUBROUTINE SETFAMILYP
@@ -1706,9 +1675,6 @@ CONTAINS
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
-    CASE(KINDMU)
-       EL%MU%AN=>EL%AN
-       EL%MU%BN=>EL%BN
     case default
        w_p=0
        w_p%nc=1
@@ -1822,9 +1788,6 @@ CONTAINS
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
-    CASE(KINDMU)
-       EL%MU%AN=>EL%AN
-       EL%MU%BN=>EL%BN
     case default
        w_p=0
        w_p%nc=1
@@ -1895,7 +1858,6 @@ CONTAINS
     nullify(EL%THIN);
     nullify(EL%MIS);nullify(EL%EXACTMIS);
     nullify(EL%D);nullify(EL%R);
-    nullify(EL%BEND);
     nullify(EL%D0);
     nullify(EL%K2);
     nullify(EL%K16);
@@ -1917,7 +1879,7 @@ CONTAINS
     nullify(EL%U1);
     nullify(EL%U2);
     nullify(EL%WI);
-    nullify(EL%MU);
+    nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_EL
@@ -1940,7 +1902,6 @@ CONTAINS
     nullify(EL%THIN);
     nullify(EL%MIS);nullify(EL%EXACTMIS);
     nullify(EL%D);nullify(EL%R);
-    nullify(EL%BEND);
     nullify(EL%D0);
     nullify(EL%K2);
     nullify(EL%K16);
@@ -1962,7 +1923,7 @@ CONTAINS
     nullify(EL%U1);
     nullify(EL%U2);
     nullify(EL%WI);
-    nullify(EL%MU);
+    nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_ELp
@@ -2060,10 +2021,6 @@ CONTAINS
           EL%K16=-1
           DEALLOCATE(EL%K16)       ! INTEGRATOR
        endif
-       IF(ASSOCIATED(EL%bend))        then
-          el%bend=-1      !machida's magnet
-          DEALLOCATE(EL%bend)
-       ENDIF
        IF(ASSOCIATED(EL%U1))        then
           el%U1=-1     !USER DEFINED MAGNET
           DEALLOCATE(EL%U1)
@@ -2213,10 +2170,6 @@ CONTAINS
           CALL KILL(EL%VOLT); CALL KILL(EL%PHAS);
           IF(ASSOCIATED(EL%VOLT)) DEALLOCATE(EL%VOLT)
           IF(ASSOCIATED(EL%PHAS)) DEALLOCATE(EL%PHAS)
-       ENDIF
-       IF(ASSOCIATED(EL%bend))        then
-          el%bend=-1      !machida's magnet
-          DEALLOCATE(EL%bend)
        ENDIF
        IF(ASSOCIATED(EL%TP10)) then
           EL%TP10=-1
@@ -2450,9 +2403,8 @@ CONTAINS
        if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
        if(associated(EL%M22%T)) k=EL%M22%T%N
        if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
-       CALL SETFAMILY(ELP,k,l,i,j,6)
+       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
        ELP%M22%DELTAMAP=EL%M22%DELTAMAP
-
        if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
        if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
        if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
@@ -2476,12 +2428,6 @@ CONTAINS
        ENDIF !.NOT.GEN
        GEN=.TRUE.
     ENDIF
-
-    IF(EL%KIND==KINDFITTED) THEN         ! machida
-       CALL SETFAMILY(ELP)
-       nx_0=EL%Bend%d%nx;ny_0=EL%Bend%d%ny;ns_0=EL%Bend%d%ns;
-       call copy(EL%Bend,ELP%Bend)
-    endif
 
     IF(EL%KIND==KIND8) CALL SETFAMILY(ELP)
 
@@ -2531,9 +2477,9 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
-    IF(EL%KIND==KINDMU) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%MU,ELP%MU)
+    IF(EL%KIND==KINDPA) THEN         !
+       CALL SETFAMILY(ELP,EL%PA%B,EL%PA%ax,EL%PA%ay)
+       CALL COPY(EL%PA,ELP%PA)
     ENDIF
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
        ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
@@ -2670,7 +2616,7 @@ CONTAINS
        if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
        if(associated(EL%M22%T)) k=EL%M22%T%N
        if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
-       CALL SETFAMILY(ELP,k,l,i,j,6)
+       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
        ELP%M22%DELTAMAP=EL%M22%DELTAMAP
 
        if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
@@ -2697,11 +2643,6 @@ CONTAINS
        GEN=.TRUE.
     ENDIF
 
-    IF(EL%KIND==KINDFITTED) THEN         ! machida
-       CALL SETFAMILY(ELP)
-       nx_0=EL%Bend%d%nx;ny_0=EL%Bend%d%ny;ns_0=EL%Bend%d%ns;
-       call copy(EL%Bend,ELP%Bend)
-    endif
 
     IF(EL%KIND==KIND8) CALL SETFAMILY(ELP)
 
@@ -2751,9 +2692,9 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
-    IF(EL%KIND==KINDMU) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%MU,ELP%MU)
+    IF(EL%KIND==KINDPA) THEN         !
+       CALL SETFAMILY(ELP,EL%PA%B,EL%PA%ax,EL%PA%ay)
+       CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
@@ -2889,7 +2830,7 @@ CONTAINS
        if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
        if(associated(EL%M22%T)) k=EL%M22%T%N
        if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
-       CALL SETFAMILY(ELP,k,l,i,j,6)
+       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
        ELP%M22%DELTAMAP=EL%M22%DELTAMAP
 
        if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
@@ -2916,11 +2857,6 @@ CONTAINS
        GEN=.TRUE.
     ENDIF
 
-    IF(EL%KIND==KINDFITTED) THEN         ! machida
-       CALL SETFAMILY(ELP)
-       nx_0=EL%Bend%d%nx;ny_0=EL%Bend%d%ny;ns_0=EL%Bend%d%ns;
-       call copy(EL%Bend,ELP%Bend)
-    endif
 
     IF(EL%KIND==KIND8) CALL SETFAMILY(ELP)
 
@@ -2970,9 +2906,9 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
-    IF(EL%KIND==KINDMU) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%MU,ELP%MU)
+    IF(EL%KIND==KINDPA) THEN         !
+       CALL SETFAMILY(ELP,EL%PA%B,EL%PA%ax,EL%PA%ay)
+       CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
@@ -3035,10 +2971,7 @@ CONTAINS
        CALL resetpoly_R31(ELP%B_SOL)
     ENDIF
 
-    ! Machida
-    IF(ELP%KIND==KINDFITTED) THEN
-       CALL resetpoly_R31(ELP%bend%scale)
-    ENDIF
+
 
     IF(ELP%KIND==KINDUSER1) THEN
        CALL reset_U1(ELP%U1)
@@ -3052,8 +2985,8 @@ CONTAINS
        CALL reset_WI(ELP%WI)
     ENDIF
 
-    IF(ELP%KIND==KINDMU) THEN
-       CALL reset_MU(ELP%MU)
+    IF(ELP%KIND==KINDPA) THEN
+       CALL reset_PA(ELP%PA)
     ENDIF
 
 

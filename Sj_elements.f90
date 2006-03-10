@@ -5,6 +5,7 @@
 MODULE S_ELEMENTS
   USE S_DEF_ELEMENT
   IMPLICIT NONE
+  public
   !  PRIVATE TRACKR,TRACKP,TRACKS
   private SURVEY_mag
 
@@ -227,11 +228,9 @@ contains
     case(kind0:KINDWIGGLER,kindmu)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
     case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a25)') el%kind," not supported SURVEY_mag"
-       CALL WRITE_E(0)
+
+       write(6,*) el%kind," not supported SURVEY_mag in S_ELEMENTS"
+
     END SELECT
 
 

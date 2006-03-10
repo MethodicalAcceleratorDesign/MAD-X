@@ -4,6 +4,7 @@
 module fitted_MAG_1
   USE S_def_all_kinds
   implicit none
+  public
   integer, parameter :: dpm =dp
   integer mff
   private fxr
@@ -161,7 +162,7 @@ contains
     type(magnet_b) mag_b
     integer i,j,k
 
-    mf=newfile
+    call kanalnummer(mf)
 
     open(unit=mf, file=filename)
     read(mf,'(a255)') line
@@ -190,7 +191,7 @@ contains
        enddo
     enddo
 
-    mf=closefile
+    close(mf)
 
     mag_b%ds = (blim(3,2)-blim(3,1))/(mag_b%nb(3)-1)
     mag_b%dx = (blim(1,2)-blim(1,1))/(mag_b%nb(1)-1)

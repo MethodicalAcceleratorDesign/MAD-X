@@ -4,6 +4,7 @@
 module define_newda
   use precision_constants
   implicit none
+  public
   logical(lp) warnda
   integer firsthole
   logical(lp),parameter::checkass=.true.,newdadynamical=.true., PACKING=.false.

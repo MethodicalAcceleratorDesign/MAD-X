@@ -5,6 +5,7 @@
 module S_extend_poly
   USE tree_element_MODULE
   IMPLICIT NONE
+  public
   integer,private,parameter::ndd=6
   private real_8REAL6,REAL6real_8,env_8map,real_8REAL_8,env_8benv
   private print6,PRINTenv
@@ -65,9 +66,9 @@ CONTAINS
     ENDIF
     c_%CHECK_STABLE =.TRUE.
     c_%CHECK_MADX_APERTURE =.TRUE.
-    c_%check_iteration =.TRUE.
-    c_%check_interpolate_x =.TRUE.
-    c_%check_interpolate_y =.TRUE.
+!frs 10.03.2006    c_%check_iteration =.TRUE.
+!frs 10.03.2006    c_%check_interpolate_x =.TRUE.
+!frs 10.03.2006    c_%check_interpolate_y =.TRUE.
     c_%check_x_min =.TRUE.
     c_%check_x_max =.TRUE.
     c_%check_y_min =.TRUE.
@@ -109,17 +110,17 @@ CONTAINS
        I=B+I
     ENDIF
     B=B*2
-    IF(.NOT.c_%check_iteration) THEN
-       I=B+I
-    ENDIF
+!frs 10.03.2006    IF(.NOT.c_%check_iteration) THEN
+!frs 10.03.2006       I=B+I
+!frs 10.03.2006    ENDIF
     B=B*2
-    IF(.NOT.c_%check_interpolate_x) THEN
-       I=B+I
-    ENDIF
+!frs 10.03.2006    IF(.NOT.c_%check_interpolate_x) THEN
+!frs 10.03.2006       I=B+I
+!frs 10.03.2006    ENDIF
     B=B*2
-    IF(.NOT.c_%check_interpolate_y) THEN
-       I=B+I
-    ENDIF
+!frs 10.03.2006    IF(.NOT.c_%check_interpolate_y) THEN
+!frs 10.03.2006       I=B+I
+!frs 10.03.2006    ENDIF
     B=B*2
     IF(.NOT.c_%check_x_min) THEN
        I=B+I
@@ -523,6 +524,7 @@ end module S_extend_poly
 Module anbn
   use precision_constants
   implicit none
+  public
   !frs real(dp),private::eps_extend_poly=c_1e_10
 
   TYPE B_CYL

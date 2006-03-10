@@ -6,8 +6,9 @@ module Mad_like
   USE S_TRACKING
   !USE file_handler
   IMPLICIT NONE
+  public
 
-  private QUADTILT, SOLTILT, EL_Q,EL_0
+  private QUADTILT, SOLTILT, EL_Q,EL_0,arbitrary_tilt
   private drft,mark,r_r !,rot
   PRIVATE SEXTTILT,OCTUTILT
   private HKICKTILT,VKICKTILT,GKICKTILT
@@ -16,7 +17,7 @@ module Mad_like
   PRIVATE rectaETILT,recttilt
   PRIVATE B1,A1,A2,B2,A3,B3,A4,B4,A5,A6,A7,A8,A9,A10,B5,B6,B7,B8,B9,B10,BLTILT
   private fac
-  private AIBAL,USER_1L,USER_2L,Taylor_maptilt
+  private USER_1L,USER_2L,Taylor_maptilt
   PRIVATE MONIT,HMONIT,VMONIT,INSTRUMEN
   PRIVATE RCOLIT,ECOLIT
   ! linked
@@ -46,7 +47,7 @@ module Mad_like
   REAL(DP) :: symplectic_eps = -one
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
   INTEGER, PRIVATE, TARGET :: NPARA
-
+  type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
      real(dp) ang(3),t(3)
@@ -329,11 +330,9 @@ module Mad_like
   end  INTERFACE
 
 
-  !  MACHIDA FITTED MAGNET
 
-  INTERFACE FITTED
-     MODULE PROCEDURE AIBAL
-     !    MODULE PROCEDURE AIBATILT
+  INTERFACE arbitrary
+     MODULE PROCEDURE arbitrary_tilt
   end  INTERFACE
 
   !  Taylor map
@@ -2728,7 +2727,6 @@ CONTAINS
     S2%P%gamma0I=gamma0I
     S2%P%gambet=gambet
     S2%P%p0c=p0c
-    if(S2%KIND==kindfitted) call read_n(file_fitted)
 
 
     if(S2%KIND==KIND2.AND.EXACT_MODEL) then
@@ -2748,8 +2746,14 @@ CONTAINS
        IF(ASSOCIATED(mad_tree_RAD_REV%CC)) ntot_rad_REV=mad_tree_RAD_REV%n
     endif
 
-    CALL SETFAMILY(S2,ntot,ntot_rad,ntot_REV,ntot_rad_REV,6)
-
+    !    CALL SETFAMILY(S2,ntot,ntot_rad,ntot_REV,ntot_rad_REV,6)
+    if(s2%kind/=kindpa) then
+       CALL SETFAMILY(S2,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
+    else
+       CALL SETFAMILY(S2,t=T_E,T_ax=T_ax,T_ay=T_ay)
+       S2%P%METHOD=4
+       deallocate(T_E,t_ax,t_ay)
+    endif
     IF(S2%KIND==KIND22) THEN
        S2%M22%DELTAMAP=MAD_TREE_DELTAMAP
        if(associated(s2%m22%t)) call copy_tree(mad_tree,s2%m22%t)
@@ -2783,19 +2787,6 @@ CONTAINS
        LIKEMAD=.false.
     endif
 
-    ! machida stuff here
-    if(S2%KIND==kindfitted) then
-       if(point_at.and.first_fitted) then
-          point_at=.false.
-          call POINTERS_D(s2%bend%d)
-          point_at=.true.
-       endif
-       call read(s2%bend%d,brho,file_fitted)
-       s2%bend%xmin=s2%bend%d%x(1) !/10.d0
-       s2%bend%xmax=s2%bend%d%x(2) !*10.d0
-       s2%bend%ymin=s2%bend%d%y(1) !*10.d0
-       s2%bend%ymax=s2%bend%d%y(2) !*10.d0
-    endif
 
     if(S2%KIND==KIND10) then
        S2%TP10%DRIFTKICK=DRIFT_KICK
@@ -2928,21 +2919,12 @@ CONTAINS
     c_%ROOT_CHECK => ROOT_CHECK
     c_%APERTURE_FLAG => APERTURE_FLAG
     c_%absolute_aperture => absolute_aperture
-    c_%check_iteration => check_iteration
-    c_%check_interpolate_x => check_interpolate_x
-    c_%check_interpolate_y => check_interpolate_y
     c_%check_x_min => check_x_min
     c_%check_x_max => check_x_max
     c_%check_y_min => check_y_min
     c_%check_y_max => check_y_max
     c_%hyperbolic_aperture => hyperbolic_aperture
     c_%WATCH_USER => WATCH_USER
-    c_%ENGE_N => ENGE_N
-    c_%ENGE_2Q1 => ENGE_2Q1
-    c_%ENGE_NST => ENGE_NST
-    c_%C_ENGE_1 => C_ENGE_1
-    c_%ENGE_LAM => ENGE_LAM
-    c_%ENGE_FRAC => ENGE_FRAC
     c_%ALWAYS_EXACTMIS=> ALWAYS_EXACTMIS
 
     c_%x_prime => x_prime
@@ -3274,7 +3256,6 @@ CONTAINS
     MC2=XMC2
   END SUBROUTINE Set_mad_v
 
-  !  MACHIDA FITTED
   FUNCTION  Taylor_maptilt(NAME,file,file_rev,T)
     implicit none
     type (EL_LIST) Taylor_maptilt
@@ -3291,7 +3272,7 @@ CONTAINS
     JS=0
     Taylor_maptilt%NST=1
     IF(PRESENT(FILE)) THEN
-       mf=NEWFILE
+       call kanalnummer(mf)
        open(unit=mf,file=file)
        read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
        Taylor_maptilt%NST=nst
@@ -3403,9 +3384,9 @@ CONTAINS
              call SET_TREE(mad_tree_rad,M)
           endif
        ENDIF ! MAD_TREE_DELTAMAP
-       mf=CLOSEFILE
+       close(mf)
        if(symplectic_print) then
-          mf=NEWFILE
+          call kanalnummer(mf)
           open(unit=mf,file=file)
           write(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
           Taylor_maptilt%NST=nst
@@ -3414,7 +3395,7 @@ CONTAINS
           ENDIF
           call daprint(m,mf)
 
-          mf=CLOSEFILE
+          close(mf)
        endif
 
 
@@ -3430,7 +3411,7 @@ CONTAINS
     ENDIF
 
     IF(PRESENT(FILE_REV)) THEN
-       mf=NEWFILE
+       call kanalnummer(mf)
        open(unit=mf,file=FILE_REV)
        read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
        Taylor_maptilt%NST=nst
@@ -3544,9 +3525,9 @@ CONTAINS
              call SET_TREE(mad_tree_rad_rev,M)
           endif
        ENDIF ! MAD_TREE_DELTAMAP
-       mf=CLOSEFILE
+       close(mf)
        if(symplectic_print) then
-          mf=NEWFILE
+          call kanalnummer(mf)
           open(unit=mf,file=file)
           write(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
           IF(MAD_TREE_DELTAMAP) THEN
@@ -3554,7 +3535,7 @@ CONTAINS
           ENDIF
           call daprint(m,mf)
 
-          mf=CLOSEFILE
+          close(mf)
        endif
        call kill(m,mr,id,id2); call kill(beta,gamma);
 
@@ -3597,48 +3578,69 @@ CONTAINS
   END FUNCTION Taylor_maptilt
 
 
-  FUNCTION  AIBAL(NAME,file,R1,T)
+
+  FUNCTION  arbitrary_tilt(NAME,file,T,no)
     implicit none
-    type (EL_LIST) AIBAL
+    type (EL_LIST) arbitrary_tilt
     CHARACTER(*), INTENT(IN):: NAME,file
     type (TILTING),optional, INTENT(IN):: T
-    real(dp) , optional, INTENT(IN):: R1
-    real(dp) x1,x2,x3,x4,x5,x6,R,ANG,hc
-    integer mf
+    real(dp) L,ANGLE,HC
+    integer mf,nst,I,ORDER
+    integer, optional :: no
+    LOGICAL(LP) REPEAT
+    TYPE(TAYLOR) B(3),ax(2),ay(2)
 
     file_fitted=file
-    AIBAL=0
+    arbitrary_tilt=0
 
-    mf=NEWFILE
+    call kanalnummer(mf)
     open(unit=mf,file=file_fitted)
-    read(mf,*) hc,ns_0,x1,x2,nx_0,x3,x4,ny_0,x5,x6
-    close(mf)
+    read(mf,*) nst,L,ANGLE, ORDER,REPEAT
+    if(present(no)) order=no
+    CALL INIT(ORDER,2)
+    CALL ALLOC(B)
+    CALL ALLOC(ax)
+    CALL ALLOC(ay)
 
-    ang=hc*(x2-x1)
 
-    !    if(.not.present(r1)) then
-    !       r=x3
-    !    else
-    !       r=r1
-    !    endif
+    ALLOCATE(T_E(NST),T_ax(NST),T_ay(NST))
+
+    DO I=1,NST
+       IF(I==1.or.(.not.repeat)) THEN
+          CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
+          CALL READ(Ax(1),mf);CALL READ(Ay(1),mf);CALL READ(Ax(2),mf);CALL READ(Ay(2),mf);
+       ENDIF
+       B(1)=B(1)/BRHO
+       B(2)=B(2)/BRHO
+       B(3)=B(3)/BRHO
+       Ax(1)=Ax(1)/BRHO
+       Ax(2)=Ax(2)/BRHO
+       Ay(1)=Ay(1)/BRHO
+       Ay(2)=Ay(2)/BRHO
+       CALL SET_TREE_g(T_E(i),B)
+       CALL SET_TREE_g(T_ax(i),ax)
+       CALL SET_TREE_g(T_ay(i),ay)
+    enddo
+    call KILL(B)
+    CALL KILL(ax)
+    CALL KILL(ay)
+
+    close(MF)
+
+
+
+    HC=ANGLE/L
 
 
     !    IF(ANG/=zero.AND.R/=zero) THEN
     if(hc>0.d0) then
-       AIBAL%LC=two*SIN(ANG/two)/hc
+       arbitrary_tilt%LC=two*SIN(ANGLE/two)/hc
     else
-       AIBAL%LC=(x2-x1)
+       arbitrary_tilt%LC=L
     endif
-    AIBAL%B0=hc                     !COS(ANG/two)/R
-    AIBAL%LD=(x2-x1)
-    AIBAL%L=AIBAL%LD
-    !    ELSE
-    !       w_p=0
-    !       w_p%nc=1
-    !       w_p%fc='(1(1X,A120))'
-    !       w_p%c(1)= " ROUTINE AIBAL: GIVE X OF FIRST DATA IN TOSCA FILE AND IDEAL ANGLE"
-    !       call write_e(1221)
-    !    ENDIF
+    arbitrary_tilt%B0=hc                     !COS(ANG/two)/R
+    arbitrary_tilt%LD=L
+    arbitrary_tilt%L=arbitrary_tilt%LD
 
     IF(LEN(NAME)>nlp) THEN
        w_p=0
@@ -3647,22 +3649,21 @@ CONTAINS
        w_p%c(1)=name
        WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        call write_i
-       AIBAL%NAME=NAME(1:16)
+       arbitrary_tilt%NAME=NAME(1:16)
     ELSE
-       AIBAL%NAME=NAME
+       arbitrary_tilt%NAME=NAME
     ENDIF
 
-    AIBAL%nst=ns_0
-    AIBAL%KIND=kindfitted
+    arbitrary_tilt%nst=NST
+    arbitrary_tilt%KIND=KINDPA
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN
-          AIBAL%tilt=t%tilt(1)
+          arbitrary_tilt%tilt=t%tilt(1)
        ELSE
-          AIBAL%tilt=t%tilt(0)
+          arbitrary_tilt%tilt=t%tilt(0)
        ENDIF
     ENDIF
-  END FUNCTION AIBAL
-
+  END FUNCTION arbitrary_tilt
   ! linked
 
 
@@ -3689,23 +3690,7 @@ CONTAINS
     c=>s1%start
     DO I=1,S1%N
 
-       !       if((c%mag%kind==kindfitted.and.point_at).and.(.not.firstfitted)) then
-       !          CALL APPEND( R, C )
-       !          R%LAST%MAG%BEND%D =>fitted%MAG%BEND%D
-       !          R%LAST%MAGP%BEND%D=>fitted%MAGP%BEND%D
-       !       else
        CALL APPEND( R, C )
-       !       endif
-
-       !      if(c%mag%kind==kindfitted.and.point_at.and.firstfitted) then  ! fitted magnets
-       !         fitted=>r%last                                            ! one family permitted
-       !         firstfitted=.false.
-       !         COPY_FIT=.FALSE.
-       !         deallocate(r%last%magp%bend%d)
-       !         r%last%magp%bend%d=>r%last%mag%bend%d
-       !      endif
-
-       !       R%CIRCUMFERENCE       = R%CIRCUMFERENCE+ C%MAG%P%LD
        c=>c%next
     ENDDO
 

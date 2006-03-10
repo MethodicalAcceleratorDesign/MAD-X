@@ -1,8 +1,10 @@
 module tree_element_MODULE
   USE polymorphic_complextaylor
   IMPLICIT NONE
+  public
 
-  PRIVATE track_TREE,track_TREEP,KILL_TREE
+  PRIVATE track_TREE,track_TREEP,KILL_TREE,KILL_TREE_N
+  PRIVATE track_TREE_G,track_TREEP_g
 
 
 
@@ -11,8 +13,16 @@ module tree_element_MODULE
      MODULE PROCEDURE track_TREEP
   END INTERFACE
 
+
+  INTERFACE trackg
+     MODULE PROCEDURE track_TREE_G
+     MODULE PROCEDURE track_TREEP_g
+  END INTERFACE
+
+
   INTERFACE KILL
      MODULE PROCEDURE KILL_TREE
+     MODULE PROCEDURE KILL_TREE_N
   END INTERFACE
 
 
@@ -34,6 +44,18 @@ CONTAINS
     U%ND2=T%ND2
 
   END SUBROUTINE COPY_TREE
+
+  SUBROUTINE COPY_TREE_N(T,U)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T(:)
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: U(:)
+    INTEGER I
+
+    DO I=1,SIZE(T)
+       CALL COPY_TREE(T(I),U(I))
+    ENDDO
+
+  END SUBROUTINE COPY_TREE_N
 
 
 
@@ -69,16 +91,139 @@ CONTAINS
     CALL ALLOC(M)
 
     CALL  mtree(MA%v%I,C_%ND2,M%v%I,C_%ND2)
-    CALL ppushGETN(M%v%I,C_%ND,N)
+    CALL ppushGETN(M%v%I,C_%ND2,N)
 
 
     CALL ALLOC_TREE(T,N,C_%ND2)
 
-    CALL ppushstore(M%v%I,C_%ND,T%CC,T%JL,T%JV)
+    CALL ppushstore(M%v%I,C_%ND2,T%CC,T%JL,T%JV)
 
     CALL KILL(M)
 
   END SUBROUTINE SET_TREE
+
+  ! FOR FAST B FIELD IN PACKAGE OF PTC
+  SUBROUTINE SET_TREE_G(T,MA)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
+    TYPE(taylor), INTENT(INOUT) :: MA(:)
+    INTEGER N,NP
+    TYPE(taylor), ALLOCATABLE :: M(:)
+
+    NP=SIZE(MA)
+
+    ALLOCATE(M(NP))
+    CALL ALLOC(M,NP)
+
+    CALL  mtree(MA%I,NP,M%I,NP)
+    CALL ppushGETN(M%I,NP,N)
+
+
+    CALL ALLOC_TREE(T,N,NP)
+
+    CALL ppushstore(M%I,NP,T%CC,T%JL,T%JV)
+
+    CALL KILL(M,NP)
+    deallocate(M)
+  END SUBROUTINE SET_TREE_G
+
+  SUBROUTINE track_TREE_G(T,XI)
+    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T
+    REAL(DP), INTENT(INOUT) :: XI(:)
+    REAL(DP) XT(lno),XF(lnv),XM(lno+1),XX
+    INTEGER JC,I,IV,ng
+
+    XT=0.0_DP
+    XF=0.0_DP
+    XM=0.0_DP
+
+    do i=1,T%ND2
+       xt(i)=xi(i)
+    enddo
+    do i=1,T%ND2
+       xf(i) = T%cc(i)
+    enddo
+
+    XM(1) = one
+    JC=T%ND2
+    do i=1,(T%N-T%ND2)/T%ND2
+       !
+       xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
+       xm(T%jl(JC+1)+1) = xx
+       !
+       do iv=1,T%ND2
+          jc=jc+1
+          xf(iv) = xf(iv) + t%cc(jc) * xx
+       enddo
+    enddo
+    xi=xf
+
+
+  END SUBROUTINE track_TREE_G
+
+
+
+  SUBROUTINE track_TREEP_g(T,XI)
+    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T
+    TYPE(REAL_8), INTENT(INOUT) :: XI(:)
+    TYPE(REAL_8) XT(lno),XF(lnv),XM(lno+1),XX
+    INTEGER JC,I,IV
+
+    CALL ALLOC(XT,lno)
+    CALL ALLOC(XF,lnv)
+    CALL ALLOC(XM,lno+1)
+    CALL ALLOC(XX)
+
+
+
+
+    do i=1,T%ND2
+       xt(i)=xi(i)
+    enddo
+    do i=1,T%ND2
+       xf(i) = T%cc(i)
+    enddo
+
+    XM(1) = one
+    JC=T%ND2
+
+    do i=1,(T%N-T%ND2)/T%ND2
+       !
+       xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
+       xm(T%jl(JC+1)+1) = xx
+       !
+       do iv=1,T%ND2
+          jc=jc+1
+          xf(iv) = xf(iv) + t%cc(jc) * xx
+       enddo
+    enddo
+
+    do i=1,T%ND2
+       xI(i)=xF(i)
+    enddo
+
+    CALL KILL(XT,lno)
+    CALL KILL(XF,lnv)
+    CALL KILL(XM,lno+1)
+    CALL KILL(XX)
+
+  END SUBROUTINE track_TREEP_g
+
+
+
+
+
+  ! END OF FAST B FIELD IN PACKAGE OF PTC
+
+  !  type  tree_element
+  !     real(dp) ,  DIMENSION(:), POINTER :: CC
+  !     integer,  DIMENSION(:), POINTER :: JL,JV
+  !     INTEGER,POINTER :: N,ND2
+  !  end  type tree_element
 
 
   SUBROUTINE KILL_TREE(T)
@@ -90,6 +235,19 @@ CONTAINS
 
 
   END SUBROUTINE KILL_TREE
+
+  SUBROUTINE KILL_TREE_N(T)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(:)
+    INTEGER I
+
+    DO I=1,SIZE(T)
+       CALL KILL(T(I))
+    ENDDO
+
+  END SUBROUTINE KILL_TREE_N
+
+
 
 
   SUBROUTINE track_TREE(T,XI,n)

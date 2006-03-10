@@ -92,7 +92,6 @@ TYPE ELEMENT
    !storage  space
    !integer  twiss                                                            !
    ! TYPES OF MAGNETS
-   TYPE(FITTED_MAGNET), POINTER :: BEND               ! Machida's magnet
    TYPE(DRIFT1), POINTER :: D0               ! DRIFT
    TYPE(DKD2), POINTER :: K2               ! INTEGRATOR
    TYPE(KICKT3), POINTER :: K3               !  THIN KICK
@@ -114,7 +113,7 @@ TYPE ELEMENT
    TYPE(USER2), POINTER :: U2                ! USER DEFINED
    TYPE(SAGAN), POINTER :: WI                ! USER DEFINED
    TYPE(MARTIN), POINTER :: M22               ! TAYLOR MAP
-   TYPE(MULTIP), POINTER :: MU             ! MULTIP ZGOUBI
+   TYPE(PANCAKE), POINTER :: PA          ! GENERAL B
    TYPE(layout), POINTER :: g23
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
 END TYPE  ELEMENT
@@ -147,7 +146,6 @@ TYPE ELEMENTP
    TYPE(MAGNET_CHART), POINTER :: P
 
    ! TYPES OF POLYMORPHIC MAGNETS
-   TYPE(FITTED_MAGNETP), POINTER :: BEND    ! MACHIDA'S FITTED MAGNET
    TYPE(DRIFT1P), POINTER :: D0             ! DRIFT
    TYPE(DKD2P), POINTER :: K2               ! INTEGRATOR
    TYPE(KICKT3P), POINTER :: K3             ! THIN KICK
@@ -169,7 +167,7 @@ TYPE ELEMENTP
    TYPE(USER2P), POINTER :: U2                ! USER DEFINED
    TYPE(SAGANP), POINTER :: WI                ! USER DEFINED
    TYPE(MARTIN), POINTER :: M22               ! TAYLOR MAP
-   TYPE(MULTIPP), POINTER :: MU               ! MULTIP ZGOUBI
+   TYPE(PANCAKEP), POINTER :: PA          ! GENERAL B
    TYPE(layout), POINTER :: g23
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
 END TYPE  ELEMENTP

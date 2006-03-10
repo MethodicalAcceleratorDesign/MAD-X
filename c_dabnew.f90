@@ -3262,10 +3262,10 @@ contains
     return
   end subroutine ppushprint
   !
-  subroutine ppushstore(mc,nd,coef,ml,mv)
+  subroutine ppushstore(mc,nd2,coef,ml,mv)
     implicit none
     !
-    integer i,ic,iv,jc,jl,jv,ntot,nd
+    integer i,ic,iv,jc,jl,jv,ntot,nd2
     integer,dimension(:), intent(in)::mc
     integer,dimension(:), intent(out)::ml,mv
     real(dp),dimension(:),intent(out)::coef
@@ -3273,7 +3273,7 @@ contains
     !
     jc=0
     jl=0;jv=0;
-    ic=2*nd
+    ic=nd2
     ntot=idall(mc(1))*ic
     do i=1,ic
        jc=1+jc
@@ -3301,13 +3301,13 @@ contains
     return
   end subroutine ppushstore
 
-  subroutine ppushGETN(mc,ND,ntot)
+  subroutine ppushGETN(mc,ND2,ntot)
     implicit none
     !
-    integer ntot,ND
+    integer ntot,ND2
     integer,dimension(:), intent(inout)::mc
     !
-    ntot=idall(mc(1))*2*nd
+    ntot=idall(mc(1))*nd2
   end subroutine ppushGETN
   !
 

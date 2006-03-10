@@ -7,6 +7,7 @@ MODULE TPSA
   use definition
   use file_handler
   IMPLICIT NONE
+  public
   integer,private::ndel ,nd2par,nd2part,nd2partt
   integer,private,dimension(lnv)::jfil,jfilt
 

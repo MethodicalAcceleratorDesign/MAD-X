@@ -4,6 +4,7 @@
 module S_pol_user1
   use precision_constants
   implicit none
+  public
   private bLPOL1_0
 
   TYPE POL_BLOCK1

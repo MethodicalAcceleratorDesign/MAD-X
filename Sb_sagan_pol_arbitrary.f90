@@ -1,6 +1,7 @@
 module S_pol_sagan
   use precision_constants
   implicit none
+  public
   private bLPOL2_0
   integer,private,parameter::n_max=10
 

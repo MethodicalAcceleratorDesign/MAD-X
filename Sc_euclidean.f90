@@ -4,6 +4,7 @@
 module S_euclidean   ! and module rotation_mis
   use S_extend_poly
   implicit none
+  public
 
   PRIVATE       transr,transp,TRANSP_P,transs,TRANSS_S
   PRIVATE       ROT_XZR,ROT_XZP,ROT_XZP_P,ROT_XZS,ROT_XZS_S

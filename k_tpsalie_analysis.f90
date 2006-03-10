@@ -4,6 +4,7 @@
 module tpsalie_analysis
   use tpsalie
   implicit none
+  public
   private allocvecres,allocpbres,allocONELIE,allocdf,allocfd,allocnormal
   private normalMAP,MAPrevdf,revdfMAP,MAPdf,dfMAP,respb,pbres,resovec,vecreso
   private ONEEXPMAP,killnormal,KILLdf,KILLREVdf,killpbres,KILLvecres,killONELIE

@@ -5,6 +5,7 @@
 module S_def_all_kinds
   use S_status
   implicit none
+  public
   private XMIDR,XMIDP,GMIDR,GMIDP
   include "a_def_worm.inc"
   !  include "a_def_all_kind.inc"
@@ -550,7 +551,7 @@ contains
              CALL GEO_TRA(A,MID,D,1)
              CALL XFRAME(E_IN,MID,A,start)
           ENDDO
-       CASE(KIND2,KIND6:KIND7,KIND10)
+       CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
           IF(P%B0==ZERO) THEN
              LH=P%LC/TWO
              A=O
@@ -692,7 +693,7 @@ contains
              start=start+E_IN%F%dir
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
           ENDDO
-       CASE(KIND2,KIND6:KIND7,KIND10)
+       CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
           IF(P%B0==ZERO) THEN
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
              DO I=1,NST

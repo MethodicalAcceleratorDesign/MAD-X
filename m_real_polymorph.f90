@@ -4,6 +4,7 @@
 module polymorphic_taylor
   use complex_taylor
   implicit none
+  public
   logical(lp),private,parameter::t=.true.,f=.false.
   integer,private::NO,ND,ND2,NP,NDPT,NV          !,lastmaster   ! 2002.12.13
   INTEGER,PRIVATE::NMAX=100

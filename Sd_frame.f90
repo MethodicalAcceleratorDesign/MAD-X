@@ -4,6 +4,7 @@
 module S_FRAME
   use S_euclidean
   IMPLICIT NONE
+  public
   PRIVATE ZERO_CHART,COPY_CHART,COPY_CHART1,GEO_ROTA,GEO_ROTB
   PRIVATE COPY_PATCH,COPY_PATCH1,ZERO_PATCH,FIND_PATCH_b
   Private alloc_f,dealloc_f,equal_f

@@ -6,6 +6,7 @@ module da_arrays
   use precision_constants
   use scratch_size
   implicit none
+  public
   integer lda,lea,lia,lst
   integer,parameter::lno=200,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
   logical(lp) :: reallocate = .true.
@@ -271,7 +272,7 @@ contains
        w_p%c(12)="* Execution Continues Nevertheless *"
        w_p%c(13)="************************************"
        call write_e(1000)
-       mf=newfile
+       call kanalnummer(mf)
        open(unit=mf,file='too_big_da.txt')
        write(mf,*) "no,nv  = ",no,nv
        write(mf,*) "LEA = ",lea

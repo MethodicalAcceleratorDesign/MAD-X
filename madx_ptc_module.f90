@@ -1,6 +1,7 @@
 MODULE ptc_results
   USE madx_keywords
   implicit none
+  public
   integer :: number_variables = 6
   integer :: order = 20
   character(len = 2), dimension(6) :: ptc_variables = (/'x ','xp','y ','yp','z ','dp'/)
@@ -12,6 +13,7 @@ END MODULE ptc_results
 MODULE madx_ptc_module
   USE madx_keywords
   implicit none
+  public
   integer icav
   integer :: universe=0,index=0,EXCEPTION=0
   integer ipause

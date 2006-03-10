@@ -10,6 +10,7 @@ module definition
   use newda
   USE LIELIB_ETIENNE
   implicit none
+  public
   logical(lp) :: newread=.false. ,newprint =  .false. , first_time = .true.
   logical(lp) :: print77=.true. ,read77 =  .true.
   logical(lp) :: no_ndum_check = .false.

@@ -9,6 +9,7 @@ module S_status
   USE S_pol_user2
   Use S_pol_sagan
   implicit none
+  public
 
   integer,private,parameter::ST=30
   !

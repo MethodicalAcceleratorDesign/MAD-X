@@ -279,38 +279,6 @@ TYPE STREXP
 END  TYPE STREXP
 ! fitted magnet stuff
 
-TYPE DATA_MAGNET
-   INTEGER, POINTER :: NS,NX,NY
-   real(dp), POINTER :: dtheta,dx,dy,hc
-   real(dp), POINTER,DIMENSION(:)::x,y,theta
-   REAL(sp),POINTER,DIMENSION(:,:,:,:,:)::B
-   REAL(dp),POINTER,DIMENSION(:,:,:)::grid
-   real(sp),POINTER,DIMENSION(:,:,:,:):: A
-   logical(lp),pointer :: read_in
-END TYPE DATA_MAGNET
-
-TYPE FITTED_MAGNET
-   TYPE(MAGNET_CHART), POINTER:: P
-   real(dp), POINTER ::L
-   real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
-   real(dp), POINTER ::SCALE
-   logical(lp), POINTER ::symplectic
-   TYPE(DATA_MAGNET), POINTER:: D
-   real(dp),  DIMENSION(:,:), POINTER :: X
-   real(dp), POINTER ::xmin,xmax,ymin,ymax
-END  TYPE FITTED_MAGNET
-
-TYPE FITTED_MAGNETP
-   TYPE(MAGNET_CHART), POINTER:: P
-   TYPE(REAL_8), POINTER ::L
-   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
-   logical(lp), POINTER ::symplectic
-   !  SPECIAL POINTERS
-   TYPE(REAL_8), POINTER ::SCALE
-   TYPE(DATA_MAGNET), POINTER:: D
-   real(dp), POINTER ::xmin,xmax,ymin,ymax
-END  TYPE FITTED_MAGNETP
-
 !  NO POLYMORPH NECESSARY: DESCRIBES A TAYLOR MAP AS IN COSY-INFINITY
 TYPE MARTIN
    TYPE(MAGNET_CHART), POINTER :: P
@@ -323,44 +291,14 @@ TYPE MARTIN
    logical(lp), POINTER :: deltamap
 END  TYPE MARTIN
 
-! MULTIP DE ZGOUBI
-
-TYPE MULTIP
-   TYPE(MAGNET_CHART), POINTER:: P
-   real(dp),  POINTER ::L,D ,DE,DS,DES
-   integer, pointer :: enge_nst
-   integer, pointer :: ENGE_2Q1
-   integer, pointer :: enge_n
-   logical(lp), pointer :: exi,ent
-   real(dp), pointer :: G(:,:)
-   real(dp),  DIMENSION(:), POINTER :: AN,BN               !
-   real(dp),  DIMENSION(:), POINTER :: EAN,EBN
-   real(dp),  DIMENSION(:), POINTER :: LAM,C,  LAMS,CS
-   real(dp),  DIMENSION(:), POINTER :: LAME,CE , LAMES,CES
-END  TYPE MULTIP
-
-TYPE MULTIPP
-   TYPE(MAGNET_CHART), POINTER:: P
-   TYPE(REAL_8),  POINTER ::L
-   real(dp),  POINTER :: D ,DE,DS,DES
-   integer, pointer :: enge_nst
-   integer, pointer :: ENGE_2Q1
-   integer, pointer :: enge_n
-   logical(lp), pointer :: exi,ent
-   real(dp), pointer :: G(:,:)
-   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN
-   TYPE(REAL_8),  DIMENSION(:), POINTER :: EAN,EBN
-   real(dp),  DIMENSION(:), POINTER :: LAM,C,  LAMS,CS
-   real(dp),  DIMENSION(:), POINTER :: LAME,CE , LAMES,CES
-END  TYPE MULTIPP
-
 ! GENERAL PANCAKE
 
 TYPE PANCAKE
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp),  POINTER ::L
-   integer, pointer :: NMON
-   real(dp),  POINTER :: BX(:,:),BY(:,:),BZ(:,:)
+   type(tree_element),  POINTER :: B(:)
+   type(tree_element),  POINTER :: Ax(:)
+   type(tree_element),  POINTER :: Ay(:)
    REAL(DP), POINTER :: SCALE
    REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
    REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
@@ -369,8 +307,9 @@ END  TYPE PANCAKE
 TYPE PANCAKEP
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8),  POINTER ::L
-   integer, pointer :: NMON
-   real(dp),  POINTER :: BX(:,:),BY(:,:),BZ(:,:)
+   type(tree_element),  POINTER :: B(:)
+   type(tree_element),  POINTER :: Ax(:)
+   type(tree_element),  POINTER :: Ay(:)
    TYPE(REAL_8), POINTER :: SCALE
    REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
    REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)

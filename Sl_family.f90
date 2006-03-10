@@ -5,6 +5,7 @@
 MODULE S_FAMILY
   USE S_FIBRE_BUNDLE
   IMPLICIT NONE
+  public
 
   ! LINKED LIST
   PRIVATE SURVEY_EXIST_PLANAR_L_NEW ,SURVEY_EXIST_PLANAR_IJ,MISALIGN_FIBRE_EQUAL,SURVEY_FIB ,SURVEY_EXIST_PLANAR_I
@@ -137,17 +138,13 @@ CONTAINS
     !  his survey would have to be "caught" in this interface
 
     SELECT CASE(EL%KIND)
-    case(kind0:kind22,kindfitted:KINDWIGGLER,kindmu)
+    case(kind0:kind22,kindfitted:KINDWIGGLER,kindmu,kindpa)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
 
     case(kind23)
        call SURVEY_CHART_layout(C,el,DIR,MAGNETFRAME,E_IN)
     case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a25)') el%kind," not supported SURVEY_mag"
-       CALL WRITE_E(0)
+       write(6,*) el%kind," not supported SURVEY_mag in S_FAMILY"
     END SELECT
 
     ! RECURSIVE   SUBROUTINE SURVEY_EXIST_PLANAR_L_NEW(PLAN,ENT,A) ! CALLS ABOVE ROUTINE FROM FIBRE #1 TO #PLAN%N : STANDARD SURVEY
@@ -397,7 +394,7 @@ CONTAINS
        !       IF(N(2)<EPS_FITTED) N(2)=N(2)/( ABS(CL%F%B(1))+ABS(CL%F%B(2))+ABS(CL%F%B(3)) )
 
        !       IF(N(1)>EPS_FITTED.OR.N(2)>EPS_FITTED) THEN
-       WRITE(6,*) "INCONSISTANCY IN SURVEY_CHART "
+       WRITE(6,*) "INCONSISTANCY IN SURVEY_CHART_layout "
        WRITE(6,*) N(1),N(2)
        !       ENDIF
        !

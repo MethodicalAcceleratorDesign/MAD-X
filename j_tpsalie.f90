@@ -4,6 +4,7 @@
 module tpsalie
   use tpsa
   implicit none
+  public
   private  ASSVEC,ASSMAP,ASSPB,asstaylor,explieflo,expliepb,expflot,exppb
   private  checkmap,checkpb,checkvec,checktaylor,MAPmatrixr,matrixMAPr,TREEMAP
   private  TAYLORSMAP,DPEKMAP,DPOKMAP,zeroEQUALMAP,IdentityEQUALMAP

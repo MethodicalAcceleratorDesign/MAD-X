@@ -261,12 +261,6 @@ module precision_constants
      INTEGER, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
      real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
      logical(lp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
-     INTEGER, pointer :: ENGE_N  ! NUMBER OF ENGE FUNCTION   C
-     INTEGER, pointer :: ENGE_2Q1  ! NUMBER OF Z DERIVATIVES
-     INTEGER, pointer :: ENGE_NST  ! NUMBER OF STEPS IN FRINGE BY DEFAULT
-     real(dp), pointer :: C_ENGE_1(:)  ! NUMBER OF STEPS IN FRINGE BY DEFAULT
-     real(dp), pointer :: ENGE_LAM    ! FOR ALL LAM(NMUL) IN ENGE
-     real(dp), pointer :: ENGE_FRAC   ! DE AND DS ARE SET TO ENGE_LAM*ENGE_FRAC
 
 
 
@@ -488,11 +482,13 @@ end module precision_constants
 
 module scratch_size
   implicit none
+  public
   integer,parameter::ndumt=10                   !  Number of scratch level
 end module scratch_size
 
 module file_handler
   implicit none
+  public
   PRIVATE INTFILE,INTFILE_K
   integer,private,parameter::nf=3,MFI=20,MFO=99
   integer,PRIVATE :: winterfile(nf) =(/40,41,42/)
@@ -610,6 +606,41 @@ CONTAINS
     enddo
   END SUBROUTINE ZEROFILE
 
+  SUBROUTINE KanalNummer(iff)
+    implicit none
+    INTEGER, INTENT(OUT) :: iff
+
+    LOGICAL :: opened, exists
+    INTEGER :: i
+
+    DO i= 9999, 7, -1
+       INQUIRE(UNIT= i, EXIST= exists, OPENED= opened)
+       IF (exists .AND. (.NOT. opened)) GOTO 20
+    ENDDO
+    WRITE (UNIT= *, FMT= *) ' cannot find free unit within the range 7-9999..'
+    CALL ReportOpenFiles
+    STOP
+20  CONTINUE
+    iff= I
+  END SUBROUTINE KanalNummer
+
+  SUBROUTINE ReportOpenFiles
+    implicit none
+
+    LOGICAL :: opened, exists, named
+    CHARACTER(LEN= 400) :: name
+    integer :: i
+
+    DO i= 9999, 7, -1
+       INQUIRE(UNIT= i, EXIST= exists, OPENED= opened)
+       IF (exists .AND. opened) THEN
+          INQUIRE(UNIT= i, NAMED= named, NAME= name)
+          write (*,7010) i, name(:LEN_TRIM(name))
+       ENDIF
+    ENDDO
+7010 FORMAT(' iUnit:',I3,', name: "',A,'"')
+
+  END SUBROUTINE ReportOpenFiles
 
 end module file_handler
 
@@ -617,6 +648,7 @@ end module file_handler
 module my_own_1D_TPSA
   USE precision_constants
   implicit none
+  public
   private input_real_in_my_1D_taylor
   integer :: n_tpsa_exp = 10
   INTEGER, PARAMETER :: N_my_1D_taylor=9  ! SHOULD BE AS ENGE_N

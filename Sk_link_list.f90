@@ -7,6 +7,7 @@ MODULE S_FIBRE_BUNDLE
   !  USE   S_ELEMENTS
   ! Implementation of abstract data type as a linked layout
   IMPLICIT NONE
+  public
 
   PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc

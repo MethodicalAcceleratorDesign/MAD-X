@@ -4,6 +4,7 @@
 module polymorphic_complextaylor
   use polymorphic_taylor
   implicit none
+  public
   integer,private,parameter::m1=1,m2=2,m3=3,ms=4
   integer,private,parameter:: m11=m1+ms*m1,m12=m1+ms*m2,m13=m1+ms*m3,  &
        m21=m2+ms*m1,m22=m2+ms*m2,m23=m2+ms*m3,                         &
