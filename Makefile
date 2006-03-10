@@ -114,8 +114,7 @@ Sd_frame.o: Sc_euclidean.o Sd_frame.f90
 Se_status.o: Sd_frame.o Se_status.f90 a_def_all_kind.inc a_def_sagan.inc \
 	a_def_user1.inc a_def_user2.inc a_def_element_fibre_layout.inc
 Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
-Sg_0_fitted.o: Sf_def_all_kinds.o Sg_0_fitted.f90
-Sg_1_fitted.o: Sg_0_fitted.o Sg_1_fitted.f90
+Sg_1_fitted.o: Sf_def_all_kinds.o Sg_1_fitted.f90
 Sg_1_template_my_kind.o: Sg_1_fitted.o Sg_1_template_my_kind.f90
 Sg_2_template_my_kind.o: Sg_1_template_my_kind.o Sg_2_template_my_kind.f90
 Sg_sagan_wiggler.o: Sg_2_template_my_kind.o Sg_sagan_wiggler.f90

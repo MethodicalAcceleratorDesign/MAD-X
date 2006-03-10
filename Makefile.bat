@@ -54,7 +54,6 @@ lf95 -c -o1 -tp %FPP%\Sc_euclidean.f90
 lf95 -c -o1 -tp %FPP%\Sd_frame.f90
 lf95 -c -o1 -tp %FPP%\Se_status.f90
 lf95 -c -o1 -tp %FPP%\Sf_def_all_kinds.f90
-lf95 -c -o1 -tp %FPP%\Sg_0_fitted.f90
 lf95 -c -o1 -tp %FPP%\Sg_1_fitted.f90
 lf95 -c -o1 -tp %FPP%\Sg_1_template_my_kind.f90
 lf95 -c -o1 -tp %FPP%\Sg_2_template_my_kind.f90
@@ -77,6 +76,6 @@ lf95 -c -o1 -tp %MADX%\timex.f90
 lf95 -c -o1 -tp %MADX%\run_madx.f90
 lf95 -c -o1 -tp %MADX%\madx_main.f90
 lf95 -out %user_main%\madx madxm.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
-lf95 -out %user_main%\madxdev madx_main.obj run_madx.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj e_define_newda.obj f_newda.obj g_newLielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_1_pol_template.obj Sb_2_pol_template.obj Sb_sagan_pol_arbitrary.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_0_fitted.obj Sg_1_fitted.obj Sg_1_template_my_kind.obj Sg_2_template_my_kind.obj Sg_sagan_wiggler.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj madx_ptc_module.obj madx_ptc_track_run.obj user2_photon.obj poisson.obj  wrap.obj timest.obj timex.obj
+lf95 -out %user_main%\madxdev madx_main.obj run_madx.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj e_define_newda.obj f_newda.obj g_newLielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_1_pol_template.obj Sb_2_pol_template.obj Sb_sagan_pol_arbitrary.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_1_fitted.obj Sg_1_template_my_kind.obj Sg_2_template_my_kind.obj Sg_sagan_wiggler.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj madx_ptc_module.obj madx_ptc_track_run.obj user2_photon.obj poisson.obj  wrap.obj timest.obj timex.obj
 cl -c /Zm1000 -D_CATCH_MEM_W -D_WIN32 %MADX%\madxp.c
 lf95 -out %user_main%\mpars madxm.obj madxp.obj

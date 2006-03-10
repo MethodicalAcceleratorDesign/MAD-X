@@ -179,10 +179,7 @@ Se_status.o: Sd_frame.o Se_status.f90 a_def_all_kind.inc a_def_sagan.inc \
 Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
 	$(f95) $(f95_FLAGS) Sf_def_all_kinds.f90
 
-Sg_0_fitted.o: Sf_def_all_kinds.o Sg_0_fitted.f90
-	$(f95) $(f95_FLAGS) Sg_0_fitted.f90
-
-Sg_1_fitted.o: Sg_0_fitted.o Sg_1_fitted.f90
+Sg_1_fitted.o: Sf_def_all_kinds.o Sg_1_fitted.f90
 	$(f95) $(f95_FLAGS) Sg_1_fitted.f90
 
 Sg_1_template_my_kind.o: Sg_1_fitted.o Sg_1_template_my_kind.f90
@@ -269,7 +266,7 @@ madxdev: \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
 	Sa_extend_poly.o Sb_1_pol_template.o Sb_2_pol_template.o \
 	Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o Se_status.o \
-	Sf_def_all_kinds.o Sg_0_fitted.o Sg_1_fitted.o Sg_1_template_my_kind.o \
+	Sf_def_all_kinds.o Sg_1_fitted.o Sg_1_template_my_kind.o \
 	Sg_2_template_my_kind.o Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
@@ -285,7 +282,7 @@ madxdev: \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
 	Sa_extend_poly.o Sb_1_pol_template.o Sb_2_pol_template.o \
 	Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o Se_status.o \
-	Sf_def_all_kinds.o Sg_0_fitted.o Sg_1_fitted.o Sg_1_template_my_kind.o \
+	Sf_def_all_kinds.o Sg_1_fitted.o Sg_1_template_my_kind.o \
 	Sg_2_template_my_kind.o Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
