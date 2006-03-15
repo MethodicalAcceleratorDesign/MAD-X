@@ -6193,6 +6193,7 @@ contains
           CALL PUSHKTK(EL,X)
           CALL KICKPATH(EL,DK,X)
           CALL KICKKTK(EL,DK,X) ! NEW
+          if(EL%P%RADIATION) CALL GETMAT(EL,X)
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
     CASE(6)
@@ -6226,6 +6227,7 @@ contains
           CALL PUSHKTK(EL,X)
           CALL KICKPATH(EL,DK,X)
           CALL KICKKTK(EL,DK,X)   ! NEW
+          if(EL%P%RADIATION) CALL GETMAT(EL,X)
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
        ENDDO
@@ -6409,7 +6411,8 @@ contains
           CALL PUSHKTK(EL,X)
           CALL KICKPATH(EL,DK,X)
           CALL KICKKTK(EL,DK,X) ! NEW
-          !       IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          if(EL%P%RADIATION) CALL GETMAT(EL,X)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
     CASE(6)
        DK2=c_14*EL%L/EL%P%NST/c_90
@@ -6442,7 +6445,8 @@ contains
           CALL PUSHKTK(EL,X)
           CALL KICKPATH(EL,DK,X)
           CALL KICKKTK(EL,DK,X)   ! NEW
-          !         IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          if(EL%P%RADIATION) CALL GETMAT(EL,X)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
        ENDDO
 
@@ -8014,7 +8018,7 @@ contains
 
     CASE(4)
        DK2=EL%L/EL%P%NST/three
-       DK6=two*EL%L/EL%P%NST/three
+       DK6=two*DK2
        DK=DK2/two
 
        !       CALL KICKTKT7(EL,DK,X)
@@ -8150,7 +8154,7 @@ contains
     CASE(4)
        CALL ALLOC(DK);CALL ALLOC(DK2);CALL ALLOC(DK6);
        DK2=EL%L/EL%P%NST/three
-       DK6=EL%L/EL%P%NST
+       DK6=two*DK2
        DK=DK2/two
 
        !       CALL KICKTKT7(EL,DK,X)
@@ -8306,7 +8310,7 @@ contains
     CASE(4)
        CALL ALLOC(DK);CALL ALLOC(DK2);CALL ALLOC(DK6);
        DK2=EL%L/EL%P%NST/three
-       DK6=EL%L/EL%P%NST
+       DK6=two*DK2
        DK=DK2/two
 
        CALL KICKTKT7(EL,DK,X)
