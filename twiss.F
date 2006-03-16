@@ -501,6 +501,7 @@
       do j = 1, 2
         corr_pick(j) = 0
         rep_cnt(j) = 0
+        restsum(j) = zero
       enddo
       if (thr_on .gt. 0)  then
         call dzero(vector,10)
@@ -529,13 +530,14 @@
 !--- kicker
         if (thr_on .gt. 0)  then
 !--- threader is on - keep position,orbit,matrix,and tensor for restart
-          restsum(j) = suml
           if (code .le. ccode) then
+            restsum(1) = suml
             call dcopy(orbit,restorb(1,1),6)
             call dcopy(rt,restm(1,1,1),36)
             call dcopy(tt,restt(1,1,1,1),216)
           endif
           if (code .ge. ccode) then
+            restsum(2) = suml
             call dcopy(orbit,restorb(1,2),6)
             call dcopy(rt,restm(1,1,2),36)
             call dcopy(tt,restt(1,1,1,2),216)
