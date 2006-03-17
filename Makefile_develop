@@ -218,11 +218,26 @@ So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
 	$(f95) $(f95_FLAGS) Sp_keywords.f90
 
-madx_ptc_module.o: Sp_keywords.o madx_ptc_module.f90
+madx_ptc_module.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_tablepush.o madx_ptc_module.f90 
 	$(f95) $(f95_FLAGS) madx_ptc_module.f90
 
 madx_ptc_track_run.o: madx_ptc_module.o madx_ptc_track_run.f90
 	$(f95) $(f95_FLAGS) madx_ptc_track_run.f90
+
+madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
+	$(f95) $(f95_FLAGS) madx_ptc_intstate.f90
+
+madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
+	$(f95) $(f95_FLAGS) madx_ptc_trackcavs.f90
+
+madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
+	$(f95) $(f95_FLAGS) madx_ptc_setcavs.f90
+
+madx_ptc_tablepush.o : madx_ptc_tablepush.f90
+	$(f95) $(f95_FLAGS) madx_ptc_tablepush.f90
+
+madx_ptc_script.o : madx_ptc_script.f90
+	$(f95) $(f95_FLAGS) madx_ptc_script.f90
 
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 	$(f95) $(f95_FLAGS) user2_photon.f90 
@@ -241,6 +256,9 @@ timest.o: timest.f90
 
 timex.o: timex.f90
 	$(f95) $(f95_FLAGS) -o timex.o timex.f90
+
+rplot.o: rplot.c
+	$(CC) $(GCCP_FLAGS) -c -o rplot.o rplot.c
 
 #Parser only
 mpars: madxm.o madxp.o
@@ -270,8 +288,10 @@ madxdev: \
 	Sg_2_template_my_kind.o Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
-	madx_ptc_module.o madx_ptc_track_run.o user2_photon.o \
-	poissonp.o wrap.o 
+	madx_ptc_module.o madx_ptc_track_run.o \
+	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
+	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
+	user2_photon.o poissonp.o wrap.o
 	$(f95) $(FOPT) -o madxdev madx_main.o run_madx.o madxpf.o twiss.o \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o touschek.o dynap.o \
 	plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
@@ -286,8 +306,11 @@ madxdev: \
 	Sg_2_template_my_kind.o Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
 	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
-	madx_ptc_module.o madx_ptc_track_run.o user2_photon.o \
-	poissonp.o wrap.o $(LIBX) -lm -lc
+	madx_ptc_module.o madx_ptc_track_run.o \
+	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
+	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
+	user2_photon.o poissonp.o wrap.o \
+	$(LIBX) -lm -lc
 
 clean:
 	rm -f *.o
