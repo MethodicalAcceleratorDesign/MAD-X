@@ -2317,12 +2317,12 @@ int get_string(char* name, char* par, char* string)
   }
   else
    {
-     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);
+/*     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);*/
      if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
       {
-        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);
+/*        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);*/
         mycpy(c_dum->c, par);
-        printf("<madxp.c: get_string>: Looking for parameter %s \n",c_dum->c);
+/*        printf("<madxp.c: get_string>: Looking for parameter %s \n",c_dum->c);*/
         if ((p = command_par_string(c_dum->c, cmd)) != NULL)
          {
            strcpy(string, p); length = strlen(p);
@@ -3391,22 +3391,6 @@ void process()  /* steering routine: processes one command */
         }
         break;
       case 1: /* element definition */
-        printf("skowrondebug We define an element %s\n",this_cmd->cmd_def->name);
-         {
-           if (this_cmd)
-            {
-              if  (this_cmd->cmd_def)
-               {
-                 if (this_cmd->cmd_def->name)
-                  {
-                   if (strcmp(this_cmd->cmd_def->name,"twcavity")==0) 
-                    {
-	  printf("skowrondebug We caught a twcavity\n");
-	}  
-                  }
-               }
-            }
-         }
         enter_element(this_cmd);
         buffer_in_cmd(this_cmd);
         break;
