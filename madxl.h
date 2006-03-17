@@ -397,34 +397,34 @@ char* summ_table_cols[] =
 
 int trackone_table_types[] =
 {
-  1, 1, 2, 2, 2, 2, 2, 2, 2
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 char* trackone_table_cols[] =
 {
-  "number", "turn", "x", "px", "y", "py", "t", "pt", "s",
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
 
 int track_table_types[] =
 {
-  1, 1, 2, 2, 2, 2, 2, 2, 2
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 char* track_table_cols[] =
 {
-  "number", "turn", "x", "px", "y", "py", "t", "pt", "s",
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
 
 int tracksumm_table_types[] =
 {
-  1, 1, 2, 2, 2, 2, 2, 2, 2
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 char* tracksumm_table_cols[] =
 {
-  "number", "turn", "x", "px", "y", "py", "t", "pt", "s",
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
 
@@ -453,3 +453,4 @@ char* dynaptune_table_cols[] =
   "x", "y", "tunx", "tuny", "dtune",
   " "  /* blank terminates */
 };
+

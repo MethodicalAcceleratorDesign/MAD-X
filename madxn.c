@@ -1371,14 +1371,34 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
+  
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
+  
   if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+  
   if (t->p_nodes != NULL) t->p_nodes[t->curr] = current_node;
+  
   if (t->node_nm != NULL)
   {
     t->node_nm->p[t->curr] = current_node->name;
     t->node_nm->curr = t->curr;
   }
+  if (++t->curr == t->max) grow_table(t);
+}
+
+void augmentcountonly(char* table) /* increase table occ. by 1, fill missing */
+{
+  int pos;
+  struct table* t;
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else 
+   {
+     warning("Can not find table",table);
+     return;
+   }  
+  
   if (++t->curr == t->max) grow_table(t);
 }
 
@@ -1618,13 +1638,28 @@ void double_to_table(char* table, char* name, double* val)
 {
   int pos;
   struct table* t;
+  
+/*  printf("double_to_table <%s> <%s> <%f>\n",table,name,*val);*/
+  
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
+   {
+      t = table_register->tables[pos];
+   }  
+  else 
+   {
+     printf("Can not find table %s\n",table);
+     return;
+   }  
   mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
-      && t->columns->inform[pos] < 3) t->d_cols[pos][t->curr] = *val;
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0 && t->columns->inform[pos] < 3) 
+    {  
+      t->d_cols[pos][t->curr] = *val;
+    }
+  else
+   {
+     printf("Position of column %s is %d\n",name,pos);
+   }
 }
 
 void double_to_table_row(char* table, char* name, int* row, double* val)
@@ -2008,7 +2043,10 @@ void exec_plot(struct in_cmd* cmd)
     /* get vaxis_name */
 
     pos = name_list_pos("vaxis", nl_plot);
+    
+    printf("exec_plot: Pos %d\n", pos);
     vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
+    printf("exec_plot: vaxis_name %s\n", vaxis_name);
 
     /* get interpolation */
 
@@ -2030,8 +2068,12 @@ void exec_plot(struct in_cmd* cmd)
     pos = name_list_pos("table", nl_plot);
     if(nl_plot->inform[pos]) /* table name specified */
     {
+      
       if ((table_name = pl_plot->parameters[pos]->string) == NULL)
         table_name = pl_plot->parameters[pos]->call_def->string;
+
+      printf("exec_plot: Table name specified %s\n", table_name);
+
       if(strcmp(table_name,"track") == 0)
         track_flag = 1;
     }
@@ -2078,9 +2120,13 @@ void exec_plot(struct in_cmd* cmd)
   if (track_flag)
   {
 
+    printf("exec_plot: We Plot TRACKING params\n");
+    
     /* get track file name */
 
     trackfile = command_par_string("trackfile", this_cmd->clone);
+
+    printf("exec_plot: Trackfile is %s\n",trackfile);
 
     /* get particle */
 
@@ -3842,7 +3888,11 @@ struct table* make_table(char* name, char* type, char** table_cols,
   struct name_list *cols;
   struct command_list* scl;
   int i, n = 0;
-  while (*table_cols[n] != ' ') {n++;}
+  while (*table_cols[n] != ' ') 
+   {
+/*     printf("make table %s col %d %s\n",name, n, table_cols[n]);*/
+     n++;
+   }
   cols = new_name_list("columns", n);
   for (i = 0; i < n; i++)
     add_to_name_list(table_cols[i], table_types[i], cols);
@@ -7408,7 +7458,420 @@ void track_run(struct in_cmd* cmd)
   myfree(rout_name, buf4); myfree(rout_name, buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
+/********************************************************************************/
+void ptc_dumpmaps(struct in_cmd* cmd)
+/*Dumps PTC map for each element in the current sequence*/
+{
+  w_ptc_dumpmaps_();
+}
 
+void pro_ptc_trackcavs(struct in_cmd* cmd)
+{
+ /*Does PTC tracking taking to the account acceleration */
+ /*it is basically wrapper to subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
+
+  int pos, one;
+
+  
+  printf("obs_points ptc_trackcavs: %d \n",curr_obs_points);
+  
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  
+  
+  pos = name_list_pos("file", nl);
+  if (nl->inform[pos]) set_option("track_dump", &one);
+  if ((track_filename = pl->parameters[pos]->string) == NULL)
+  {
+    if (pl->parameters[pos]->call_def != NULL)
+      track_filename = pl->parameters[pos]->call_def->string;
+    else track_filename = permbuff("dummy");
+  }
+  track_filename = permbuff(track_filename);
+  track_fileext = NULL;
+  pos = name_list_pos("extension", nl);
+  if ((track_fileext = pl->parameters[pos]->string) == NULL)
+  {
+    if (pl->parameters[pos]->call_def != NULL)
+      track_fileext = pl->parameters[pos]->call_def->string;
+    if (track_fileext == NULL)  track_fileext = permbuff("\0");
+  }
+  track_fileext = permbuff(track_fileext);
+
+  
+  
+  track_tables_create(cmd);
+  
+  w_ptc_trackcavs_(&curr_obs_points);
+  
+     printf("Dumping Tables\n");
+     track_tables_dump();
+  
+  printf("obs_points ptc_trackcavs Done\n");
+}
+/********************************************************************************/
+
+void pro_ptc_twiss_linac(struct in_cmd* cmd)
+{
+ /*Does PTC twiss taking to the account acceleration */
+ /*it is basically wrapper to subroutine ptc_twiss_linac() in madx_ptc_trackcavs.f90*/
+  struct int_array* tarr;
+  int l;
+  char *table_name, *filename = NULL;
+  int pos, w_file;
+  struct name_list* nl = current_twiss->par_names;
+  struct command_parameter_list* pl = current_twiss->par;
+  
+  table_name = "ptc_twiss";
+  pos = name_list_pos("table", nl);
+  if (pos >=0)
+   {
+     if(nl->inform[pos]) /* table name specified - overrides save */
+     {
+       if ((table_name = pl->parameters[pos]->string) == NULL)
+         table_name = pl->parameters[pos]->call_def->string;
+     }
+   }  
+   
+  pos = name_list_pos("file", nl);
+ 
+  w_file = 0;
+  
+  if (pos >=0)
+   {
+     if (nl->inform[pos])
+     {
+       if ((filename = pl->parameters[pos]->string) == NULL)
+       {
+         if (pl->parameters[pos]->call_def != NULL)
+           filename = pl->parameters[pos]->call_def->string;
+       }
+       if (filename == NULL) filename = permbuff("dummy");
+       w_file = 1;
+     }
+   }  
+  l = strlen(table_name);
+  tarr = new_int_array(l+1);
+  conv_char(table_name, tarr);
+  twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+                           twiss_table_types, current_sequ->n_nodes);
+  twiss_table->dynamic = 1;
+  add_to_table_list(twiss_table, table_register);
+  current_sequ->tw_table = twiss_table;
+  twiss_table->org_sequ = current_sequ;
+  twiss_table->curr= 0;
+  current_node = current_sequ->ex_start;
+
+  
+  printf("obs_points ptc_twiss_linac: %d \n",curr_obs_points);
+  w_ptc_twiss_linac_(tarr->i);
+  printf("obs_points ptc_twiss_linac Done");
+ 
+}
+/********************************************************************************/
+
+void pro_ptc_setswitch(struct in_cmd* cmd)
+{
+ /*Does PTC tracking taking to the account acceleration */
+ /*it is basically wrapper to subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
+  int i;
+  double switchvalue;
+
+  char* flag_name;
+  struct name_list* nl;
+  
+  printf("\n\n\n\n");
+  printf("obs_points pro_ptc_setswtch: %d \n",curr_obs_points);
+  for (i = 0; i < 5; i++) printf("##################################################\n");
+
+
+  if (cmd == 0x0)
+   {
+     printf("obs_points pro_ptc_setswtch: Command is null!!!\n");
+     return;
+   }
+
+  if (cmd->clone == 0x0)
+   {
+     printf("obs_points pro_ptc_setswtch: Command Definintion is null!!!\n");
+     return;
+   }
+
+
+  nl = cmd->clone->par_names;
+  
+    
+
+  /*ACCELERATION SWITCH*/
+  if ( name_list_pos("maxacceleration", nl) >=0 )
+   {
+     command_par_value2("maxacceleration", cmd->clone, &switchvalue);
+     printf("maxaccel is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setaccel_method_(&i);
+   } 
+  else
+   {
+     printf("maxaccel is not present\n");
+   } 
+
+
+  /*EXACT SWITCH*/
+  if ( name_list_pos("exact_mis", nl) >=0 )
+   {
+     command_par_value2("exact_mis", cmd->clone, &switchvalue);
+     printf("exact_mis is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setexactmis_(&i);
+   } 
+  else
+   {
+     printf("exact_mis is not present\n");
+   } 
+  
+
+  /*radiation SWITCH*/
+  if ( name_list_pos("radiation", nl) >=0 )
+   {
+     command_par_value2("radiation", cmd->clone, &switchvalue);
+     printf("radiation is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setradiation_(&i);
+   } 
+  else
+   {
+     printf("radiation is not present\n");
+   } 
+
+  /*fringe SWITCH*/
+  if ( name_list_pos("fringe", nl) >=0 )
+   {
+     command_par_value2("fringe", cmd->clone, &switchvalue);
+     printf("fringe is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setfringe_(&i);
+   } 
+  else
+   {
+     printf("fringe is not present\n");
+   } 
+  
+  
+
+  /*totalpath SWITCH*/
+  if ( name_list_pos("totalpath", nl) >=0 )
+   {
+     command_par_value2("totalpath", cmd->clone, &switchvalue);
+     printf("totalpath is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_settotalpath_(&i);
+   } 
+  else
+   {
+     printf("totalpath is not present\n");
+   } 
+  
+
+  /*TIME SWITCH*/
+  if ( name_list_pos("time", nl) >=0 )
+   { 
+     command_par_value2("time", cmd->clone, &switchvalue);
+     printf("time is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_settime_(&i);
+   } 
+  else
+   {
+     printf("time is not present\n");
+   } 
+  
+  /*NOCAVITY SWITCH*/
+  if ( name_list_pos("nocavity", nl) >=0 )
+   { 
+     command_par_value2("nocavity", cmd->clone, &switchvalue);
+     printf("nocavity is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setnocavity_(&i);
+   } 
+  else
+   {
+     printf("nocavity is not present\n");
+   } 
+  
+  
+  printf("obs_points pro_ptc_setswtch Done\n");
+
+  for (i = 0; i < 5; i++) printf("##################################################\n");
+  printf("\n\n\n\n");
+  
+}
+/********************************************************************************/
+
+void pro_ptc_select(struct in_cmd* cmd)
+{/*
+processes ptc_select command
+it directs ptc_twiss to store given QUANTITY in a named TABLE's COLUMN
+Then, it these values are accessible for other MAD-X modules for calculations.
+The most important one is the matching module.
+ */
+  
+  int                            i           = 0;  
+  struct node*                   nodes[2]    = {0x0,0x0};
+  struct table*                  aTable      = 0x0;
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+  char*                          tablename   = 0x0;
+  char*                          columnname  = 0x0;
+  int                            element     = 0;
+  char*                          monomial    = 0x0;
+  struct int_array*              tabnameIA   = 0x0;/*string passing to fortran is tricky*/
+  struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
+  struct int_array*              monoIA      = 0x0;
+  char                           buff[NAME_L];
+  char                           placestring[NAME_L];
+  int                            place       = -1;
+  
+  /*extracts table specified by the user*/
+  pos   = name_list_pos("table", c_parnames);
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_select: table parameter does not exist.\n");
+     return;
+   }
+
+  tablename  = c_parameters->parameters[pos]->string;
+  if ( tablename == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_select: no table name: ", "ignored");
+    return;
+  }
+
+  pos = name_list_pos(tablename, table_register->names); 
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
+     return;
+   }
+  
+  aTable = table_register->tables[pos];
+  if (aTable == 0x0)
+   {
+     printf("madxn.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
+     return;
+   }
+
+  /*extracts column specified by the user*/
+  pos        = name_list_pos("column", c_parnames);
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_select: column parameter does not exist.\n");
+     return;
+   }
+  
+  columnname  = c_parameters->parameters[pos]->string;
+  if ( columnname == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_select: Column name is empty: ", "ignored");
+    return;
+  }
+  
+  /*checks if the specified column exists*/
+  pos = name_list_pos(columnname,aTable->columns);
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_select: Can not find column named <<%s>> in table <<%s>>.\n",
+             columnname,aTable->name);
+     return;
+   }
+
+/*Checks the place*/
+/*
+  
+  pos = name_list_pos("place", c_parnames);
+  strcpy(placestring, c_parameters->parameters[pos]->string);
+  strcpy(buff,placestring);
+  if (square_to_colon(buff) == 0)
+    {
+      warning("madxn.c: pro_ptc_select: illegal expand range ignored:", placestring);
+      return;
+    }
+  
+  place = name_list_pos(buff, current_sequ->ex_nodes->list);
+  if (place > -1)
+   { 
+     printf("madxn.c: pro_ptc_select: Found place %s at position %d in the current senquence \n",
+             placestring,place);
+   }    
+  else
+   {
+     printf("madxn.c: pro_ptc_select: Can not find place %s\n",placestring);
+     return;
+   }
+*/
+
+  element = (int)command_par_value("polynomial",cmd->clone);
+  monomial = command_par_string("monomial",cmd->clone);
+  
+  tabnameIA = new_int_array(1+strlen(tablename));
+  colnameIA = new_int_array(1+strlen(columnname));
+  monoIA = new_int_array(1+strlen(monomial));
+  conv_char(tablename,tabnameIA);
+  conv_char(columnname,colnameIA);
+  conv_char(monomial,monoIA);
+  
+  place++; /*Converting to the Fortran numeration (1...n)*/
+  w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
+  
+  delete_int_array(tabnameIA);
+  delete_int_array(colnameIA);
+  delete_int_array(monoIA);
+
+}
+/********************************************************************************/
+
+void pro_ptc_script(struct in_cmd* cmd)
+{/*
+processes ptc_script command
+it directs ptc_twiss to store given QUANTITY in a named TABLE's COLUMN
+Then, it these values are accessible for other MAD-X modules for calculations.
+The most important one is the matching module.
+ */
+  
+  int                            i           = 0;  
+  struct node*                   nodes[2]    = {0x0,0x0};
+  struct table*                  aTable      = 0x0;
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+  char*                          scriptname   = 0x0;
+  struct int_array*              scriptnameIA = 0x0;/*string passing to fortran is tricky*/
+  char                           buff[NAME_L];
+  
+  /*extracts table specified by the user*/
+  pos   = name_list_pos("file", c_parnames);
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_script: file parameter does not exist.\n");
+     return;
+   }
+
+  scriptname  = c_parameters->parameters[pos]->string;
+  if ( scriptname == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_script: no script name: ", "ignored");
+    return;
+  }
+
+  scriptnameIA = new_int_array(1+strlen(scriptname));
+  conv_char(scriptname,scriptnameIA);
+
+  w_ptc_script_(scriptnameIA->i);/*calls the fortran*/
+  
+  delete_int_array(scriptnameIA);
+
+}
+/********************************************************************************/
 void pro_ptc_track(struct in_cmd* cmd)
 {
   int k=0, pos, one = 1;
@@ -7776,3 +8239,106 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
   for (j = c_pos; j < last; j++)
     if (t->columns->inform[j] < 3) t->d_cols[j][t->curr] = vals[j-c_pos];
 }
+
+/***************************************************************************/
+/***************************************************************************/
+/***************************************************************************/
+ 
+
+int getnumberoftracks()
+{
+/*returns number of input tracks */
+  if (stored_track_start == 0x0)
+   {
+     return 0;
+   }
+  
+  return stored_track_start->curr;
+  
+}
+/***************************************************************************/
+
+int copytrackstoarray()
+{
+  /*copies track positions from commands to array
+    returns number of copied tracks, value <= 0 in case of error
+  */
+  /**/
+  int ntracks = 0;/*number of tracks : returned value */
+  int n = 0; /*interator over tracks*/
+  struct command* comm;
+  if (trackstrarpositions)
+   {
+     deletetrackstrarpositions();
+   }
+  
+  ntracks = getnumberoftracks();
+  if (ntracks <= 0)
+   {
+     printf("ERROR: copytrackstoarray: number of tracks is 0! Nothing to copy!");
+     return 0;
+   }
+  trackstrarpositions =  (double**)malloc(ntracks*sizeof(double*));
+  
+  for (n = 0; n < ntracks; n++)
+   {
+     trackstrarpositions[n] = (double*)malloc(6*sizeof(double));
+     
+     comm = stored_track_start->commands[n];
+     trackstrarpositions[n][0] = command_par_value("x",  comm);
+     trackstrarpositions[n][1] = command_par_value("px", comm);
+     trackstrarpositions[n][2] = command_par_value("y",  comm);
+     trackstrarpositions[n][3] = command_par_value("py", comm);
+     trackstrarpositions[n][4] = command_par_value("t",  comm);
+     trackstrarpositions[n][5] = command_par_value("pt", comm);
+     
+   }
+  return ntracks;
+
+}
+/***************************************************************************/
+
+
+int gettrack(int* nt, double* x,double* px,double* y,double* py,double* t,double* pt)
+{
+  /* returns the parameters of track n;
+     0 = none, else count */
+   
+  
+  int n = *nt - 1;
+  if ( trackstrarpositions == 0x0 )
+   {
+     copytrackstoarray();
+   }
+  struct command* comm;
+  if ( (n<0) || (n >= stored_track_start->curr) )
+  {
+    printf("gettrack: track number %d out of range",n);
+    return 1;
+  }
+  
+  
+  *x      = trackstrarpositions[n][0];
+  *px     = trackstrarpositions[n][1];
+  *y      = trackstrarpositions[n][2];
+  *py     = trackstrarpositions[n][3];
+  *t      = trackstrarpositions[n][4];
+  *pt     = trackstrarpositions[n][5];
+  return 0;
+}
+
+/***************************************************************************/
+
+void deletetrackstrarpositions()
+{
+ /* deletes the array with track positions */
+  int i;
+  for ( i = 0; i < stored_track_start->curr; i++)
+   {
+     free(trackstrarpositions[i]);
+   }
+  free(trackstrarpositions);
+  
+  trackstrarpositions = 0x0;
+}
+/***************************************************************************/

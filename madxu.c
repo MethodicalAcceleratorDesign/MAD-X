@@ -3443,6 +3443,7 @@ void write_table(struct table* t, char* filename)
 #ifdef _WIN32
   strcpy(sys_name, "Win32");
 #endif
+  
   time(&now);    /* get system time */
   tm = localtime(&now); /* split system time */
   if (strcmp(filename, "terminal") == 0) out_file = stdout;
@@ -3519,13 +3520,18 @@ void write_table(struct table* t, char* filename)
         }
         for (i = 0; i < col->curr; i++)
         {
+/*          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );*/
           if (t->columns->inform[col->i[i]] == 1)
           {
             tmp = t->d_cols[col->i[i]][j];
             fprintf(out_file, v_format(" %I"), tmp);
           }
-          else if (t->columns->inform[col->i[i]] == 2)
-            fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
+          else 
+           if (t->columns->inform[col->i[i]] == 2)
+             { 
+               fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]); 
+               /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+             }  
           else if (t->columns->inform[col->i[i]] == 3)
           {
             *c_dum->c = '\"';

@@ -1055,7 +1055,8 @@ CONTAINS
                current_x_coord_incl_co(k_th_coord)= &                        !               +   !
                     x_coord_incl_co(k_th_coord,j_particle)                   !               +   !
             end do !---------------------------------------------------------!               +   !
-            !                                                                                !   ^
+            !
+            
             call track(my_ring,current_x_coord_incl_co,1,default)                            !   !
             ! The PTC subroutine " To TRACK the MY_RING for X coordinates                    +   !
             ! over one-turn in the DEFAULT state (citation, p. 25).                          +   !
@@ -1289,7 +1290,7 @@ CONTAINS
                        x_coord_incl_co(k_th_coord,j_th_partic)                  !                +  ! p
                end do !---------------------------------------------------------!                +  ! !
                !                                                                                 +  ^ !
-               !Print *, 'x=', current_x_coord_incl_co                                           !  ! !
+               write(6,'(6f12.8)') current_x_coord_incl_co
                call track(my_ring,current_x_coord_incl_co, &                                     !  ! !
                     i_current_elem,i_current_elem+1,default)                                     !  ! o
                ! The PTC subroutine " To TRACK the MY_RING for X coordinates                     +  ! v

@@ -127,8 +127,12 @@ Sm_tracking.o: Sl_family.o Sm_tracking.f90
 Sn_mad_like.o: Sm_tracking.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
-madx_ptc_module.o: Sp_keywords.o madx_ptc_module.f90
+madx_ptc_module.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_tablepush.o madx_ptc_module.f90 
 madx_ptc_track_run.o: madx_ptc_module.o madx_ptc_track_run.f90
+madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
+madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
+madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
+madx_ptc_tablepush.o : madx_ptc_tablepush.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 wrap.o: madx_ptc_module.o wrap.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
@@ -157,6 +161,7 @@ mpars: madxm.F madxp.o
 # madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
 madx_objectsf77 = madxpf.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+
 madx: $(madx_objectsf77) ;
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
@@ -164,7 +169,7 @@ madx: $(madx_objectsf77) ;
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxdev_objects. All *.f90 , some c and F
 madxdev_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
-	madxpf.o gxx11c.o \
+	madxpf.o gxx11c.o rplot.o \
 	$(madx_objectsf95)
 madxdev: $(madxdev_objects)
 	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext)

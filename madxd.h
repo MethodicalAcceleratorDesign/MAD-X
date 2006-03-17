@@ -2,6 +2,7 @@
 #define advance_node          advance_node_
 #define advance_to_pos        advance_to_pos_
 #define augment_count         augment_count_
+#define augmentcountonly      augmentcountonly_
 #define char_from_table       char_from_table_  /* OB 2.4.2002 */
 #define comment_to_table      comment_to_table_
 #define comm_para             comm_para_
@@ -38,6 +39,7 @@
 #define mtcond                mtcond_
 #define next_constraint       next_constraint_
 #define next_global           next_global_
+#define getnumberoftracks     getnumberoftracks_
 #define next_start            next_start_
 #define next_vary             next_vary_
 /* RDM 20.1.2006 BEGIN jacobian strategy (match) */
@@ -77,6 +79,8 @@
 #define w_ptc_normal            w_ptc_normal_
 #define w_ptc_track             w_ptc_track_
 #define w_ptc_start             w_ptc_start_
+#define w_ptc_select            w_ptc_select_
+#define w_ptc_script            w_ptc_script_
 #define w_ptc_end               w_ptc_end_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
@@ -1014,7 +1018,7 @@ char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 3.02.04";
-char code_mod_date[] = "Code Modification Date: 16.03.2006";
+char code_mod_date[] = "Code Modification Date: 17.03.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
@@ -1158,3 +1162,13 @@ time_t last_time;
 time_t start_time;
 
 /* end of definitions */
+
+
+#define gettrack gettrack_
+#define deletetrackstrarpositions deletetrackstrarpositions_
+
+double** trackstrarpositions = 0x0;//two dimensional array with track positions
+
+int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
+int  copytrackstoarray();
+void deletetrackstrarpositions();

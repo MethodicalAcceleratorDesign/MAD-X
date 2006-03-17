@@ -24,6 +24,8 @@
 /* FS & TdA 15.03.2004 plot upgrade, bugs correction, ptc_twiss upgrade, touschek preparation */
 #include "c6t.h"
 
+static const int kSkowronDebug = 0;
+
 void madx()
 {
 #ifdef _CATCH_MEM
@@ -350,11 +352,14 @@ int cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
       else if (strcmp(cmd_match_base[j], toks[k]) != 0)  break;
       k++;
     }
+    
     if (j == s_match[i2+1]) goto found;
   }
   return -3;
   found:
   *cmd_pos = lp; *decl_start = s_match[i2+1] - s_match[i2];
+  
+  
   return i2;
 }
 
@@ -381,6 +386,30 @@ char* command_par_string(char* parameter, struct command* cmd)
   }
   return p;
 }
+
+int command_par_value2(char* parameter, struct command* cmd, double* val)
+  /* returns a command parameter value val 
+  if found returns 1, else 0 */
+{
+  struct command_parameter* cp;
+  *val = zero;
+  int i;
+  int ret = 0;
+  
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
+  {
+    cp = cmd->par->parameters[i];
+    if (cp->type < 3)
+    {
+      if (cp->expr == NULL)  *val = cp->double_value;
+      else *val = expression_value(cp->expr, 2);
+      ret = 1;
+    }
+  }
+  
+  return ret;
+}
+
 
 double command_par_value(char* parameter, struct command* cmd)
   /* returns a command parameter value if found, else zero */
@@ -457,6 +486,8 @@ int decode_command () /* compares command with templates, fills this_cmd
   char** toks = this_cmd->tok_list->p;
   this_cmd->type = -3;
   if ((i = cmd_match(n, toks, &cmd_pos, &decl_start)) < 0)  return i;
+  
+
   this_cmd->sub_type = i;
   this_cmd->decl_start = decl_start;
   switch (i)
@@ -1404,9 +1435,41 @@ void exec_command()
       {
         select_ptc_normal(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_trackcavs") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackcavs, calling pro_ptc_trackcavs\n");
+        pro_ptc_trackcavs(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackcavs, calling pro_ptc_dumpmaps\n");
+        ptc_dumpmaps(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_twiss_linac") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_twiss_linac, calling pro_ptc_trackcavs\n");
+        current_twiss = p->clone;
+        pro_ptc_twiss_linac(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
       {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_track, calling pro_ptc_track\n");
         pro_ptc_track(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_setswitch") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_setswitch, calling pro_ptc_setswtch\n");
+        pro_ptc_setswitch(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_select") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_select, calling pro_ptc_select\n");
+        pro_ptc_select(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_script") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_script, calling pro_ptc_script\n");
+        pro_ptc_script(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_observe") == 0)
       {
@@ -2082,6 +2145,7 @@ double get_node_pos(struct node* node, struct sequence* sequ) /*recursive */
 
 int get_option(char* str)
 {
+/* This function is called by fortran to get option of a command */
   int i, k;
   mycpy(c_dum->c, str);
   if (options != NULL
@@ -2251,14 +2315,28 @@ int get_string(char* name, char* par, char* string)
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
-  {
-    mycpy(c_dum->c, par);
-    if ((p = command_par_string(c_dum->c, cmd)) != NULL)
-    {
-      strcpy(string, p); length = strlen(p);
-    }
-  }
+  else
+   {
+     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);
+     if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
+      {
+        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);
+        mycpy(c_dum->c, par);
+        printf("<madxp.c: get_string>: Looking for parameter %s \n",c_dum->c);
+        if ((p = command_par_string(c_dum->c, cmd)) != NULL)
+         {
+           strcpy(string, p); length = strlen(p);
+         }
+        else
+         {
+           printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
+         }
+      }
+     else
+      {
+        printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
+      } 
+   }  
   return length;
 }
 
@@ -2304,9 +2382,11 @@ int get_val_num(char* in_string, int start, int end)
 }
 
 double get_value(char* name, char* par)
-  /* returns parameter value "par" for command or store "name" if present,
+  /* this function is used by fortran to get the parameters values
+  returns parameter value "par" for command or store "name" if present,
      else INVALID */
 {
+/* WHY IT IS NOT A SWITCH?????????*/
   struct name_list* nl = NULL;
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
@@ -3311,6 +3391,22 @@ void process()  /* steering routine: processes one command */
         }
         break;
       case 1: /* element definition */
+        printf("skowrondebug We define an element %s\n",this_cmd->cmd_def->name);
+         {
+           if (this_cmd)
+            {
+              if  (this_cmd->cmd_def)
+               {
+                 if (this_cmd->cmd_def->name)
+                  {
+                   if (strcmp(this_cmd->cmd_def->name,"twcavity")==0) 
+                    {
+	  printf("skowrondebug We caught a twcavity\n");
+	}  
+                  }
+               }
+            }
+         }
         enter_element(this_cmd);
         buffer_in_cmd(this_cmd);
         break;
@@ -3977,6 +4073,14 @@ void store_command_def(char* cmd_string)  /* processes command definition */
   cmd = defined_commands->commands[defined_commands->curr++] =
     new_command(toks->p[0], 40, 40, toks->p[2], toks->p[3],
                 atoi(toks->p[4]), atoi(toks->p[5]));
+  
+/*  
+  printf("skowrondebug: store_command_def.c command name %s\n",cmd->name);
+  if (strcmp(cmd->name,"twcavity") == 0)
+   {
+     printf("skowrondebug: store_command_def.c I have got TWCAVITY\n");
+   }
+*/  
   i = add_to_name_list(cmd->name, 0, defined_commands->list);
   if (n > 6)
   {

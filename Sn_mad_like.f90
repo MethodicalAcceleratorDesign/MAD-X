@@ -2248,6 +2248,8 @@ CONTAINS
     INTEGER,optional, INTENT(IN):: HARMON
     real(dp)  L1,VOLT1,LAG1,FREQ01
     INTEGER  HARMON1
+    
+  
     L1=zero
     VOLT1=zero
     LAG1=zero
@@ -2693,7 +2695,7 @@ CONTAINS
     endif
 
     if(s1%kind==kind21) then
-       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%DELTA_E,S2%THIN)
+       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%LAG,S2%DELTA_E,S2%THIN)
        S2%volt=flip*S1%volt
        S2%freq=S1%freq0*S1%harmon
        S2%phas=-S1%lag
@@ -2701,6 +2703,8 @@ CONTAINS
        !frs
        S2%DELTA_E=S1%DELTA_E
        S2%THIN=.FALSE.
+       !skowron 14.03.06
+       S2%lag=s1%lag
        IF(S2%L==zero) then
           S2%THIN=.TRUE.
        else
