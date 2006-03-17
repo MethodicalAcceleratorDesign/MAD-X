@@ -2225,7 +2225,7 @@ void exec_plot(struct in_cmd* cmd)
             fprintf(gpu,", \\\n     ");
         }
         fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
-        printf("%s",track_file_name);
+        printf("%s\n",track_file_name);
         if (nolegend)
           fprintf(gpu,"notitle with points %d ",part_idx[j]);
         else
