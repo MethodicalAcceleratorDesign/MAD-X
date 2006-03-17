@@ -83,7 +83,7 @@ TYPE ELEMENT
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
    !
-   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E       ! Cavity information
+   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,LAG       ! Cavity information
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
    logical(lp), POINTER :: THIN
    !  misalignements and rotation
