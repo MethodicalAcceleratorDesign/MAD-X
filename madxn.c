@@ -7471,12 +7471,11 @@ void pro_ptc_trackcavs(struct in_cmd* cmd)
  /*it is basically wrapper to subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
 
   int pos, one;
-
-  
-  printf("obs_points ptc_trackcavs: %d \n",curr_obs_points);
-  
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
+
+ 
+  /*printf("obs_points ptc_trackcavs: %d \n",curr_obs_points);*/
   
   
   pos = name_list_pos("file", nl);
@@ -7576,8 +7575,6 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
  /*it is basically wrapper to subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
   int i;
   double switchvalue;
-
-  char* flag_name;
   struct name_list* nl;
   
   printf("\n\n\n\n");
@@ -7715,8 +7712,6 @@ Then, it these values are accessible for other MAD-X modules for calculations.
 The most important one is the matching module.
  */
   
-  int                            i           = 0;  
-  struct node*                   nodes[2]    = {0x0,0x0};
   struct table*                  aTable      = 0x0;
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
@@ -7728,10 +7723,14 @@ The most important one is the matching module.
   struct int_array*              tabnameIA   = 0x0;/*string passing to fortran is tricky*/
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
+  int                            place       = -1;
+
+/*
+  int                            i           = 0;  
+  struct node*                   nodes[2]    = {0x0,0x0};
   char                           buff[NAME_L];
   char                           placestring[NAME_L];
-  int                            place       = -1;
-  
+*/  
   /*extracts table specified by the user*/
   pos   = name_list_pos("table", c_parnames);
   if (pos < 0)
@@ -7838,15 +7837,11 @@ Then, it these values are accessible for other MAD-X modules for calculations.
 The most important one is the matching module.
  */
   
-  int                            i           = 0;  
-  struct node*                   nodes[2]    = {0x0,0x0};
-  struct table*                  aTable      = 0x0;
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
   char*                          scriptname   = 0x0;
   struct int_array*              scriptnameIA = 0x0;/*string passing to fortran is tricky*/
-  char                           buff[NAME_L];
   
   /*extracts table specified by the user*/
   pos   = name_list_pos("file", c_parnames);
@@ -8303,14 +8298,12 @@ int gettrack(int* nt, double* x,double* px,double* y,double* py,double* t,double
 {
   /* returns the parameters of track n;
      0 = none, else count */
-   
-  
   int n = *nt - 1;
+
   if ( trackstrarpositions == 0x0 )
    {
      copytrackstoarray();
    }
-  struct command* comm;
   if ( (n<0) || (n >= stored_track_start->curr) )
   {
     printf("gettrack: track number %d out of range",n);

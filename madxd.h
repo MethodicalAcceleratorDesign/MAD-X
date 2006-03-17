@@ -81,7 +81,19 @@
 #define w_ptc_start             w_ptc_start_
 #define w_ptc_select            w_ptc_select_
 #define w_ptc_script            w_ptc_script_
+#define w_ptc_addpush           w_ptc_addpush_
 #define w_ptc_end               w_ptc_end_
+#define w_ptc_dumpmaps          w_ptc_dumpmaps_
+#define w_ptc_trackcavs         w_ptc_trackcavs_
+#define w_ptc_twiss_linac       w_ptc_twiss_linac_
+#define w_ptc_setaccel_method   w_ptc_setaccel_method_
+#define w_ptc_setexactmis       w_ptc_setexactmis_
+#define w_ptc_setradiation      w_ptc_setradiation_
+#define w_ptc_setfringe         w_ptc_setfringe_
+#define w_ptc_settotalpath      w_ptc_settotalpath_
+#define w_ptc_settime           w_ptc_settime_
+#define w_ptc_setnocavity       w_ptc_setnocavity_
+
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
 #define min_order               min_order_       /* ETDA 17 nov 2004 */
@@ -291,6 +303,7 @@ struct double_array* command_par_array(char*, struct command*);
 struct expression* command_par_expr(char*, struct command*);
 char* command_par_string(char*, struct command*);
 double command_par_value(char*, struct command*);
+int command_par_value2(char* parameter, struct command* cmd, double* val);
 int command_par_vector(char*, struct command*, double*);
 struct constraint* delete_constraint(struct constraint*);
 struct constraint_list* delete_constraint_list(struct constraint_list*);
@@ -680,6 +693,19 @@ void w_ptc_normal();
 void w_ptc_track();
 void w_ptc_start();
 void w_ptc_end();
+void w_ptc_dumpmaps();
+void w_ptc_trackcavs(int* nobspoints);
+void w_ptc_twiss_linac(int* tabname);
+void w_ptc_setaccel_method(int* method);
+void w_ptc_setexactmis(int* boolflag);
+void w_ptc_setradiation(int* boolflag);
+void w_ptc_setfringe(int* boolflag);
+void w_ptc_settotalpath(int* boolflag);
+void w_ptc_settime(int* boolflag);
+void w_ptc_setnocavity(int* boolflag);
+void w_ptc_script(int* scriptname);
+void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
+
 int twiss_input(struct command*);
 void update_beam();
 void update_element(struct element*, struct command*);
@@ -1167,7 +1193,7 @@ time_t start_time;
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
-double** trackstrarpositions = 0x0;//two dimensional array with track positions
+double** trackstrarpositions = 0x0;/* two dimensional array with track positions*/
 
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
