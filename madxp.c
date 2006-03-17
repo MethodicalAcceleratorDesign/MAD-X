@@ -392,10 +392,10 @@ int command_par_value2(char* parameter, struct command* cmd, double* val)
   if found returns 1, else 0 */
 {
   struct command_parameter* cp;
-  *val = zero;
   int i;
   int ret = 0;
   
+  *val = zero;
   if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
   {
     cp = cmd->par->parameters[i];
