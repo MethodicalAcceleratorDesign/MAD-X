@@ -13,6 +13,7 @@ GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 ##f95_FLAGS=-gline -g -c -C=all -maxcontin=100 -nan -ieee=full
 # FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am -Mmods -Imods --pca --private --trap
+#FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap --chk a,e,s,u,x --chkglobal --info
 FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
 f95_FLAGS= --o1 --tp -c $(FDEB)
 #f95_FLAGS=-c -O4 -maxcontin=100 -w=unused -ieee=full
