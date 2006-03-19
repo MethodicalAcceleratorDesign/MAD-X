@@ -25,6 +25,9 @@
 #define wsetls   wsetls_
 #define wstring  wstring_
 
+void* mycalloc(char*, size_t, size_t);
+void myfree(char*, void*);
+
 /* declarations */
 char logo[] = "GXplot";
 
