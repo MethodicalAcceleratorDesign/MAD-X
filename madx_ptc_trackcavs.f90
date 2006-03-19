@@ -4,7 +4,8 @@ use madx_ptc_intstate_module
 use madx_ptc_setcavs_module
   implicit none
   save
-  
+  public
+
   public                              :: ptc_trackcavs       ! subroutine inside the module
   public                              :: ptc_setaccel_method ! subroutine inside the module
   
@@ -185,6 +186,7 @@ contains
     !==============================================================================
     contains
     subroutine putintracktable (npart,turn,nobs,x,px,y,py,t,pt,spos,e)
+      implicit none
       !--- purpose: enter particle coordinates in table                      *
       !    input:                                                            *
       !    npart  (int)           particle number                            *

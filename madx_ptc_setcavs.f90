@@ -1,7 +1,9 @@
 module madx_ptc_setcavs_module
   USE madx_keywords
   USE madx_ptc_intstate_module
-  
+  implicit none
+  public
+
   integer, private                    :: skowrondebug  = 10     ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   logical, public                     :: cavsareset   = .false.! flag that indicates if cavities were already set for the current setup
   

@@ -2,6 +2,7 @@ module madx_ptc_intstate_module
   use madx_keywords
   implicit none
   save
+  public
 
   public                            :: initintstate
   logical, public                   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest

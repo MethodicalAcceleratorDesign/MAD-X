@@ -4,6 +4,8 @@ module madx_ptc_tablepush_module
   use madx_keywords
   implicit none
   save
+  public
+
 !============================================================================================  
 !  PUBLIC INTERFACE
   public                                      :: putusertable
