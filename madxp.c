@@ -389,7 +389,7 @@ char* command_par_string(char* parameter, struct command* cmd)
 
 int command_par_value2(char* parameter, struct command* cmd, double* val)
   /* returns a command parameter value val 
-  if found returns 1, else 0 */
+     if found returns 1, else 0 */
 {
   struct command_parameter* cp;
   int i;
@@ -1722,11 +1722,11 @@ void exec_save(struct in_cmd* cmd)
   }
   if (mad8)
   {
-   if (bare == 0)
-   {
-    write_vars_8(varl, save_select, out_file);
-    write_elems_8(ell, save_select, out_file);
-   }
+    if (bare == 0)
+    {
+      write_vars_8(varl, save_select, out_file);
+      write_elems_8(ell, save_select, out_file);
+    }
     for (pos = 0; pos < sql->curr; pos++)
     {
       sequ = sql->sequs[pos];
@@ -1739,11 +1739,11 @@ void exec_save(struct in_cmd* cmd)
   }
   else
   {
-   if (bare == 0)
-   {
-    write_vars(varl, save_select, out_file);
-    write_elems(ell, save_select, out_file);
-   }
+    if (bare == 0)
+    {
+      write_vars(varl, save_select, out_file);
+      write_elems(ell, save_select, out_file);
+    }
     write_sequs(sql, save_select, out_file);
   }
   fclose(out_file);
@@ -2316,27 +2316,27 @@ int get_string(char* name, char* par, char* string)
     }
   }
   else
-   {
+  {
 /*     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);*/
-     if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
-      {
+    if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
+    {
 /*        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);*/
-        mycpy(c_dum->c, par);
+      mycpy(c_dum->c, par);
 /*        printf("<madxp.c: get_string>: Looking for parameter %s \n",c_dum->c);*/
-        if ((p = command_par_string(c_dum->c, cmd)) != NULL)
-         {
-           strcpy(string, p); length = strlen(p);
-         }
-        else
-         {
-           printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
-         }
-      }
-     else
+      if ((p = command_par_string(c_dum->c, cmd)) != NULL)
       {
-        printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
-      } 
-   }  
+        strcpy(string, p); length = strlen(p);
+      }
+      else
+      {
+        printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
+      }
+    }
+    else
+    {
+      printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
+    } 
+  }  
   return length;
 }
 
@@ -2383,7 +2383,7 @@ int get_val_num(char* in_string, int start, int end)
 
 double get_value(char* name, char* par)
   /* this function is used by fortran to get the parameters values
-  returns parameter value "par" for command or store "name" if present,
+     returns parameter value "par" for command or store "name" if present,
      else INVALID */
 {
 /* WHY IT IS NOT A SWITCH?????????*/
@@ -4059,11 +4059,11 @@ void store_command_def(char* cmd_string)  /* processes command definition */
                 atoi(toks->p[4]), atoi(toks->p[5]));
   
 /*  
-  printf("skowrondebug: store_command_def.c command name %s\n",cmd->name);
-  if (strcmp(cmd->name,"twcavity") == 0)
-   {
-     printf("skowrondebug: store_command_def.c I have got TWCAVITY\n");
-   }
+    printf("skowrondebug: store_command_def.c command name %s\n",cmd->name);
+    if (strcmp(cmd->name,"twcavity") == 0)
+    {
+    printf("skowrondebug: store_command_def.c I have got TWCAVITY\n");
+    }
 */  
   i = add_to_name_list(cmd->name, 0, defined_commands->list);
   if (n > 6)

@@ -11,7 +11,7 @@ struct reg_token* add_tok(char c, struct reg_token* rt)
   {
     rn->type = 2;
     rn->simple = (struct r_char_array*) mycalloc(rout_name, 1,
-                                               sizeof(struct r_char_array));
+                                                 sizeof(struct r_char_array));
     rn->simple->chars = (char*) mymalloc(rout_name, 100);
     rn->simple->max = 100;
   }
@@ -184,7 +184,7 @@ struct reg_token* make_list(struct reg_token* rt, char* pattern,
   if (rn->type != 0)
   {
     rn = (struct reg_token*) mycalloc(rout_name, 1,
-                                    sizeof(struct reg_token));
+                                      sizeof(struct reg_token));
     rt->next = rn; rn->previous = rt;
   }
   rn->type = 3;

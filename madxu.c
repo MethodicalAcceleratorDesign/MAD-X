@@ -3527,21 +3527,21 @@ void write_table(struct table* t, char* filename)
             fprintf(out_file, v_format(" %I"), tmp);
           }
           else 
-           if (t->columns->inform[col->i[i]] == 2)
-             { 
-               fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]); 
-               /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
-             }  
-          else if (t->columns->inform[col->i[i]] == 3)
-          {
-            *c_dum->c = '\"';
-            strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
-            stoupper(c_dum->c);
-            pc = strip(c_dum->c); /* remove :<occ_count> */
-            k = strlen(pc);
-            pc[k++] = '\"'; pc[k] = '\0';
-            fprintf(out_file, v_format(" %S "), pc);
-          }
+            if (t->columns->inform[col->i[i]] == 2)
+            { 
+              fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]); 
+              /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+            }  
+            else if (t->columns->inform[col->i[i]] == 3)
+            {
+              *c_dum->c = '\"';
+              strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+              stoupper(c_dum->c);
+              pc = strip(c_dum->c); /* remove :<occ_count> */
+              k = strlen(pc);
+              pc[k++] = '\"'; pc[k] = '\0';
+              fprintf(out_file, v_format(" %S "), pc);
+            }
         }
         fprintf(out_file, "\n");
       }
