@@ -701,7 +701,7 @@
 !     The integrand is calculated in the loop itself
         if (abs(cy+aloop).gt.onetominus20) then
           term = sqrt((cy+aloop)*ccy)*sqrt(                             &
-     &(alam*ccy*alam+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
+     &(aloop*ccy*aloop+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
         else
           term = sqrt((cy+aloop)*ccy)*sqrt(                             &
      &(aloop*ccy*aloop+td1*aloop+td2))
