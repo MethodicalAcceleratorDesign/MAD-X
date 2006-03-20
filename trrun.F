@@ -1667,6 +1667,7 @@
       if (j .ne. -1 .and. j.ne.0)  then
         if (switch .lt. 3 .or. j .eq. 1)  then
           jend = j
+          if (switch.gt.1) jend=jend+1 
 !---- Get start coordinates
           track(1) = x
           track(2) = px

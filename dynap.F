@@ -132,13 +132,16 @@
       double precision eigen(6,6),coords(6,0:turns,*),distvect(turns),  &
      &zn(turns,6),znt(6),track(6),tend,ptend,smear,yapunov,fitlyap,     &
      &templyap,tunx1,tunx2,tuny1,tuny2,tuneabt,tuneabt2,zero,one,two,   &
-     &onelog(turns), turnnumber(turns),dq(2*turns), dphi(3)
+     &onelog(turns), turnnumber(turns),dq(2*turns),dphi(3),dphi1,dphi2, &
+     &get_variable,pi,twopi
       parameter(zero=0d0,one=1d0,two=2d0)
       include 'deltra.fi'
       include 'wmaxmin0.fi'
       include 'dyntab.fi'
       include 'tunes.fi'
 
+      pi=get_variable('pi ')
+      twopi=get_variable('twopi ')
       dktrturns = turns
 
 !---- Initialize max and min betatron invariants.
@@ -224,7 +227,7 @@
 
 !---- Lyapunov exponent calculation
 
-!        open(50,file="lyapunov.data")
+        open(50,file="lyapunov.data")
 
         do i = 1, turns
           do j = 1, 6
@@ -234,13 +237,23 @@
           call wmaxmin(track,eigen,znt)
           templyap = zero
           do j = 1, 3
-            dphi(j) =  atan2(znt(2*j),znt(2*j-1))                       &
-     &-atan2(zn(i,2*j),zn(i,2*j-1))
-            templyap = templyap +                                       &
-     &(dphi(j))**2
+            if(znt(2*j).eq.zero.and.znt(2*j-1).eq.zero) then
+              dphi1=zero
+            else
+              dphi1=atan2(znt(2*j),znt(2*j-1))
+            endif
+            if(zn(i,2*j).eq.zero.and.zn(i,2*j-1).eq.zero) then
+              dphi2=zero
+            else
+              dphi2=atan2(zn(i,2*j),zn(i,2*j-1))
+            endif
+            dphi(j) =  dphi1-dphi2
+            if (dphi(j).gt.pi) dphi(j)=dphi(j)-twopi
+            if (dphi(j).lt.-pi) dphi(j)=dphi(j)+twopi
+            templyap = templyap + (dphi(j))**2
           end do
           distvect(i) = sqrt(templyap)
-!          write(50,*) i,distvect(i)
+          write(50,*) i,distvect(i)
 !            write(*,*) distvect(i)
         end do
 !        write(*,*) ' templyap =', templyap
@@ -359,8 +372,8 @@
 
 !---- Copy data to dq
       do mf = 1, npoint
-        dq(2*mf-1) = zn(initt,ixy)
-        dq(2*mf)   = zn(initt,ixy+1)
+        dq(2*mf-1) = zn(mf+initt,ixy)
+        dq(2*mf)   = zn(mf+initt,ixy+1)
       enddo
       call fft(dq, npoint, -1)
 
@@ -427,7 +440,7 @@
       do mf = 1, npoint
         temp = sin(mf * step)**2
         dq(2*mf-1) = temp * zn(mf+initt,ixy)
-        dq(2*mf)   = temp * zn(mf+initt,ixy)
+        dq(2*mf)   = temp * zn(mf+initt,ixy+1)
       enddo
       call fft(dq, npoint, -1)
 
@@ -493,7 +506,11 @@
 !        dq(ilogd+mf) = log(distvect(mf))
 !        dq(in+mf)    = mf
 !        dq(ilogn+mf) = log(dq(in+mf))
-        onelog(mf) = log(distvect(mf))
+        if(distvect(mf).eq.zero) then
+          onelog(mf) = zero
+        else
+          onelog(mf) = log(distvect(mf))
+        endif
         turnnumber(mf)    = real(mf)
 !        turnlog(mf) = log(dble(turnnumber(mf)))
       enddo
