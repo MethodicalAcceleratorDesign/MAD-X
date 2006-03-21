@@ -1056,7 +1056,7 @@ CONTAINS
                     x_coord_incl_co(k_th_coord,j_particle)                   !               +   !
             end do !---------------------------------------------------------!               +   !
             !
-            
+
             call track(my_ring,current_x_coord_incl_co,1,default)                            !   !
             ! The PTC subroutine " To TRACK the MY_RING for X coordinates                    +   !
             ! over one-turn in the DEFAULT state (citation, p. 25).                          +   !
