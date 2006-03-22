@@ -2602,7 +2602,7 @@ int log_val(char* name, struct command* cmd)
 void madx_finish()
   /* write the termination message */
 {
-
+  int nwarnings = warn_numb+warn_numbf;
   /* should work with Lahey on windows 24.03.2004 */
 
   if (final_message == 0)
@@ -2614,7 +2614,11 @@ void madx_finish()
       gxterm_();
     }
 #endif
-    printf("\n  Number of warning: %d\n", warn_numb);
+    printf("\n  Number of warnings: %d\n",nwarnings);
+    if (nwarnings > 0)
+     {
+        printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
+     }
     if (get_option("trace")) time_stamp("end");
     printf("\n  +++++++++++++++++++++++++++++++++++\n");
     printf("  + %s finished normally +\n", myversion);
@@ -4651,3 +4655,10 @@ void warning(char* t1, char* t2)
     warn_numb++;
   }
 }
+
+void augmentfwarn() 
+{
+/*increases counter of the fortran warnings*/
+   warn_numbf++;
+}
+

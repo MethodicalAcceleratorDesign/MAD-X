@@ -14,8 +14,10 @@
 
       character *(*) t1, t2
       integer get_option
-      if (get_option('warn ') .ne. 0)                                   &
-     &print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
+      if (get_option('warn ') .ne. 0) then
+        print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
+        call augmentfwarn()
+      endif
       end
       subroutine getclor(orbit0, rt, tt, error)
 

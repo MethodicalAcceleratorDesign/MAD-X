@@ -100,6 +100,8 @@
 #define result_from_normal      result_from_normal_ /* ETDA 11 nov 2004 */
 #define make_map_table          make_map_table_ /* KZ 28.06.2005 table for maps */
 #define minimum_acceptable_order minimum_acceptable_order_ /* ETDA 17 nov 2004 */
+
+#define augmentfwarn            augmentfwarn_
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
 int is_operator(char c) {return (strchr("-+*/^", c) ? 1 : 0);}
@@ -720,6 +722,7 @@ int v_length(char*);
 char* v_format(char*);
 double vmod(int*, double*);
 void warning(char*, char*);
+void augmentfwarn() ;
 void write_elems(struct el_list*, struct command_list*, FILE*);
 void write_elems_8(struct el_list*, struct command_list*, FILE*);
 void write_nice(char*, FILE*);
@@ -1091,6 +1094,7 @@ const double ten_m_19 = 1.e-19;
 
 int add_error_opt = 0;      /* ADD error option, set with eoption */
 int warn_numb = 0;           /* Number of warnings */
+int warn_numbf = 0;           /* Number of warnings from fortran*/
 /* E. T. d'Amico 25 feb 2004 */
 int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
 /* E. T. d'Amico 13 may 2004 */
