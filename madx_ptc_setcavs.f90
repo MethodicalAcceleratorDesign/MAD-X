@@ -360,7 +360,7 @@ contains
       ic=0
       p=>r%start
       do i=1,r%n
-         if(p%next%mag%kind==kind21) then
+         if(p%mag%kind==kind21) then
             if(p%mag%freq/=0.d0) then
                ic=ic+1
             endif
@@ -372,7 +372,7 @@ contains
       ic=0
       p=>r%start
       do i=1,r%n
-         if(p%next%mag%kind==kind21) then
+         if(p%mag%kind==kind21) then
             if(p%mag%freq/=0.d0) then
                ic=ic+1
                pos(ic)=i
