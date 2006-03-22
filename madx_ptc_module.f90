@@ -764,7 +764,7 @@ CONTAINS
     character(200)       :: filename='ptcmaps.txt'
     integer              :: get_string
     real(kind(1.d0))     :: get_value
-    integer              :: debug
+    integer              :: debug,flag_index,why(9)
 
 
     debug = get_value('ptc_dumpmaps ','debug ');
@@ -797,11 +797,43 @@ CONTAINS
 
        if(p%mag%kind/=kind21) then
           call track(my_ring,y2,i,i+1,intstate)
+          call PRODUCE_APERTURE_FLAG(flag_index)
+          if(flag_index/=0) then
+             call ANALYSE_APERTURE_FLAG(flag_index,why)
+             Write(6,*) " ptc_dumpmaps-1 "
+             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             c_%watch_user=.false.
+             return
+          endif
           call track(my_ring,xt,i,i+1,intstate)
+          call PRODUCE_APERTURE_FLAG(flag_index)
+          if(flag_index/=0) then
+             call ANALYSE_APERTURE_FLAG(flag_index,why)
+             Write(6,*) " ptc_dumpmaps-2 "
+             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             c_%watch_user=.false.
+             return
+          endif
        else
           print *, 'Track Cavity...'
           call track(my_ring,y2,i,i+2,intstate)
+          call PRODUCE_APERTURE_FLAG(flag_index)
+          if(flag_index/=0) then
+             call ANALYSE_APERTURE_FLAG(flag_index,why)
+             Write(6,*) " ptc_dumpmaps-3 "
+             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             c_%watch_user=.false.
+             return
+          endif
           call track(my_ring,xt,i,i+2,intstate)
+          call PRODUCE_APERTURE_FLAG(flag_index)
+          if(flag_index/=0) then
+             call ANALYSE_APERTURE_FLAG(flag_index,why)
+             Write(6,*) " ptc_dumpmaps-4 "
+             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             c_%watch_user=.false.
+             return
+          endif
        endif
 
 
