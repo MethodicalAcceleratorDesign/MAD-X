@@ -60,7 +60,7 @@ contains
     startfen = 0
     x(:)=0.0d0
 
-    call locate_all_cav(my_ring,poscav)
+    call locate_all_twcav(my_ring,poscav)
     if ( skowrondebug > 4 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
     if ( size(poscav) == 0) then
        return
@@ -349,6 +349,39 @@ contains
       endif
 
     end subroutine setcavity
+    !____________________________________________________________________________________________
+
+    subroutine locate_all_twcav(r,pos)
+      implicit none
+      type(layout), intent(inout) :: r
+      type(fibre), pointer:: p
+      integer, pointer ::  pos(:)
+      integer i,ic
+      ic=0
+      p=>r%start
+      do i=1,r%n
+         if(p%next%mag%kind==kind21) then
+            if(p%mag%freq/=0.d0) then
+               ic=ic+1
+            endif
+         endif
+         p=>p%next
+      enddo
+      allocate(pos(ic))
+      pos=0
+      ic=0
+      p=>r%start
+      do i=1,r%n
+         if(p%next%mag%kind==kind21) then
+            if(p%mag%freq/=0.d0) then
+               ic=ic+1
+               pos(ic)=i
+            endif
+         endif
+         p=>p%next
+      enddo
+
+    end subroutine locate_all_twcav
 
   end subroutine setcavities
 
