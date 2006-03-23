@@ -301,7 +301,7 @@ contains
       if(ene) then
          de_mev=f%mag%volt*f%mag%l
          if ( skowrondebug > 4 ) write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
-         f%mag%phas = pi/2.0d0 - twopi*f%mag%freq*arrivtime + f%mag%lag ! here we tune to be on the crest and then we add the lag
+         f%mag%phas = pi/2.0d0 - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
       else
