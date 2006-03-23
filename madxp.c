@@ -1458,7 +1458,7 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_setswitch") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_setswitch, calling pro_ptc_setswtch\n");
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_setswitch, calling pro_ptc_setswitch\n");
         pro_ptc_setswitch(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_select") == 0)

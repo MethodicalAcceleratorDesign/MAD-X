@@ -7569,13 +7569,13 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   
   if (cmd == 0x0)
   {
-    warning("pro_ptc_setswtch:","Command is null!!!");
+    warning("pro_ptc_setswitch:","Command is null!!!");
     return;
   }
 
   if (cmd->clone == 0x0)
   {
-    printf("pro_ptc_setswtch: Command Definintion is null!!!\n");
+    printf("pro_ptc_setswitch: Command Definintion is null!!!\n");
     return;
   }
 
@@ -7691,7 +7691,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("nocavity is not present\n");
   } 
   
-  if (debuglevel > 0) printf("obs_points pro_ptc_setswtch Done\n");
+  if (debuglevel > 0) printf("obs_points pro_ptc_setswitch Done\n");
 
   
 }

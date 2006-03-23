@@ -454,11 +454,11 @@ char command_def[] =
 "ffile    = [i, 1], "
 "file     = [s, track, track], "
 "extension= [s, none, none], "
-"onetable = [l, false, true], "
+"onetable = [l, false, true]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_dumpmaps: ptc_dumpmaps none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/
 "file     = [s, ptcmaps, ptcmaps], "
-"extension= [s, none, none], "
+"extension= [s, none, none]; "
 " "
 "ptc_track_shape: ptc_track_shape none 0 0 "
 "debug = [i, 0, 1]; "
@@ -493,7 +493,7 @@ char command_def[] =
 "ffile    = [i, 1], "
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
 "norm_out = [l, false, true], "
-"norm_no  = [i, 1], "
+"norm_no  = [i, 1]; "
 " "
 "ptc_start: ptc_start none 0 0 "
 "x        = [r, 0], "
@@ -515,7 +515,7 @@ char command_def[] =
 "ptc_track_end: ptc_track_end none 0 0; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_script: ptc_script none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_script.f90*/
-"file     = [s, script.ptc, script.ptc], "
+"file     = [s, script.ptc, script.ptc]; "
 " "
 "ptc_end: ptc_end none 0 0; "
 " "
