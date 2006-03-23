@@ -7,11 +7,7 @@ module madx_ptc_trackcavs_module
   public
 
   public                              :: ptc_trackcavs       ! subroutine inside the module
-  public                              :: ptc_setaccel_method ! subroutine inside the module
 
-
-
-  integer, private                    :: skowrondebug  = 9     
 ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
   private filter
@@ -59,15 +55,12 @@ contains
 
     !------------------------------------------------------
 
-
-    skowrondebug = get_value('ptc_trackcavs ','debug ')
-    print *, 'START ptc_trackcavs, skowrondebug = ', skowrondebug
-
     nturns = get_value('ptc_trackcavs ','turns ')
-    print *, 'ptc_trackcavs, nturns = ', nturns
+    if (getdebug() > 2) print *, 'ptc_trackcavs, nturns = ', nturns
+
     if ( (nturns > 1) .and. (my_ring%closed .eqv. .false.)) then
-       print *, 'WARNING: You can not make more than one turn in a line!'
-       print *, 'WARNING: Putting number of turns to 1!'
+       call fort_warn('WARNING: You can not make more than one turn in a line!', &
+                      'Putting number of turns to 1!')
        nturns = 1
     endif
 
@@ -93,7 +86,7 @@ contains
        IF (e.eq.1) obspointnumber=1 ! node_value gives 0 for 1st (?)
 
        if (obspointnumber .gt. 0) then
-          print *,"Element ",e," is an observation point no. ",obspointnumber
+          if (getdebug() > 0) print *,"Element ",e," is an observation point no. ",obspointnumber
           observedelements(e) = obspointnumber
        endif
 
@@ -103,40 +96,40 @@ contains
 
 
     charge = get_value('beam ', "charge ");
-    if (skowrondebug > 9 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
-    !    charge = my_ring%charge
+    if (getdebug() > 9 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
     endif
+    
+    if (getdebug() > 0) print *, 'reading tracks starting posiotions from table ....'
 
-
-
-    !     do n=n_temp, jmax_numb_particl_at_i_th_turn
-    print *, 'reading....'
     call gettrack(1,x(1),x(2),x(3),x(4),x(6),x(5))
-    print *, 'reading.... Done'
-    print *, '###################################################'
-    print *, '###################################################'
-    print *, '######         TRACKING WITH PTC         ##########'
-    print *, '###################################################'
-    print *, '###################################################'
 
+    if (getdebug() > 0) print *, 'reading.... Done'
+    
+    if (getdebug() > 0) then
+       print *, '###################################################'
+       print *, '###################################################'
+       print *, '######         TRACKING WITH PTC         ##########'
+       print *, '###################################################'
+       print *, '###################################################'
+    endif
+    
     call newrplot()
 
     n=1
     npart = getnumberoftracks()
-    print *, 'There is ', npart,' tracks'
+    if (getdebug() > 0) print *, 'There is ', npart,' tracks'
     do n=1, npart
 
        pathlegth = 0.d0
 
-
-       if (skowrondebug > 9 ) print *, 'Getting track ',n
+       if (getdebug() > 9 ) print *, 'Getting track ',n
 
        call gettrack(n,x(1),x(2),x(3),x(4),x(6),x(5))
 
-       if (skowrondebug > 9 ) write(6,'(6f9.6)') x
+       if (getdebug() > 1 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
 
        do t=1, nturns
 
@@ -144,10 +137,10 @@ contains
 
           do e=1, my_ring%n
 
-             call track(my_ring,x,e,e+1,intstate)
+             call track(my_ring,x,e,e+1,getintstate())
              pathlegth = pathlegth + p%mag%p%ld
 
-             if (skowrondebug > 9 ) then
+             if (getdebug() > 9 ) then
                 write(6,*) e, 'l=',pathlegth
                 write(6,'(6f8.4)') x
              endif
@@ -278,7 +271,7 @@ contains
     print *, "Table name is ", table_name
 
     charge = get_value('beam ', "charge ");
-    if (skowrondebug > 9 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
+    if (getdebug() > 9 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
@@ -300,9 +293,9 @@ contains
     np=0  ! to be discussed later
 
     if(my_nd_for_averaging/=2) then
-       call init(intstate,no,c_%np_pol,berz)
+       call init(getintstate(),no,c_%np_pol,berz)
     else
-       call init(intstate+nocavity0,no,c_%np_pol,berz)
+       call init(getintstate()+nocavity0,no,c_%np_pol,berz)
     endif
 
     call alloc(dispt,4)
@@ -353,14 +346,14 @@ contains
     do i=1,my_ring%n
 
 
-       iflag=track_flag(my_ring,y_pol,i,i+1,+intstate)
+       iflag=track_flag(my_ring,y_pol,i,i+1,+getintstate())
 
        mapa=y_pol
        mapa=mapa.sub.1
 
        call print(mapa%v(1),20)
 
-       iflag=track_flag(my_ring,x1,i,i+1,+intstate)
+       iflag=track_flag(my_ring,x1,i,i+1,+getintstate())
        x0=y_pol
 
 

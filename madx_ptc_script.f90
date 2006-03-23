@@ -4,7 +4,7 @@ module madx_ptc_script_module
   use madx_keywords
   implicit none
   save
-  public
+  private
 
   !============================================================================================
   !  PUBLIC INTERFACE

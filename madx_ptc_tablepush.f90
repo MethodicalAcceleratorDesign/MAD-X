@@ -2,15 +2,15 @@ module madx_ptc_tablepush_module
   !This module enables the user to store any variable of PTC in a MAD-X table
   !what gives access to them from the other modules, which the most important is MATCH
   use madx_keywords
+  use madx_ptc_intstate_module, only : getdebug
   implicit none
   save
-  public
+  private
 
   !============================================================================================
   !  PUBLIC INTERFACE
   public                                      :: putusertable
   public                                      :: addpush
-
 
   !============================================================================================
   !  PRIVATE
@@ -48,11 +48,13 @@ contains
 
        e => y(pushes(i)%element)
        coeff = e.sub.(pushes(i)%monomial)
-       !      write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-       !       &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
-       !       &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
-       !       &        " for fibre no ",n
-
+       if (getdebug()>9) then
+           write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+            &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+            &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+            &        " for fibre no ",n
+       endif
+       
        call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
 
     enddo
@@ -67,7 +69,7 @@ contains
     integer  :: i ! iterator
 
     do i=1,ntables
-       !     print *,"Augmenting ",tables(i)
+       if (getdebug()>9) print *,"Augmenting ",tables(i)
        call augmentcountonly(tables(i)) !we need to use special augement,
        !cause the regular one looks for for
        !variables names like columns to fill the table
@@ -93,15 +95,17 @@ contains
     pushes(npushes)%tabname(table(1)+1:table(1)+1)=achar(0)
     pushes(npushes)%colname(column(1)+1:column(1)+1)=achar(0)
     pushes(npushes)%monomial(monomial(1)+1:monomial(1)+1)=achar(0)
-
-    !    print  *,"madx_ptc_tablepush : addpush(",&
-    !   &          pushes(npushes)%tabname,">,<",pushes(npushes)%colname,">,<",&
-    !   &          pushes(npushes)%element,">,<",pushes(npushes)%monomial,">)"
-
+    
+    if (getdebug()>9) then
+        print  *,"madx_ptc_tablepush : addpush(",&
+       &          pushes(npushes)%tabname,">,<",pushes(npushes)%colname,">,<",&
+       &          pushes(npushes)%element,">,<",pushes(npushes)%monomial,">)"
+    endif
+    
     if ( issuchtableexist(pushes(npushes)%tabname) .eqv. .false.) then
        ntables = ntables + 1
        tables(ntables) = pushes(npushes)%tabname
-       !     print *,"Table has been added to the tables list ", tables(ntables)
+       if (getdebug()>9)  print *,"Table has been added to the tables list ", tables(ntables)
     endif
 
   end subroutine addpush

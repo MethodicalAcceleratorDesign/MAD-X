@@ -86,6 +86,7 @@
 #define w_ptc_dumpmaps          w_ptc_dumpmaps_
 #define w_ptc_trackcavs         w_ptc_trackcavs_
 #define w_ptc_twiss_linac       w_ptc_twiss_linac_
+#define w_ptc_setdebuglevel     w_ptc_setdebuglevel_
 #define w_ptc_setaccel_method   w_ptc_setaccel_method_
 #define w_ptc_setexactmis       w_ptc_setexactmis_
 #define w_ptc_setradiation      w_ptc_setradiation_
@@ -698,6 +699,7 @@ void w_ptc_end();
 void w_ptc_dumpmaps();
 void w_ptc_trackcavs(int* nobspoints);
 void w_ptc_twiss_linac(int* tabname);
+void w_ptc_setdebuglevel(int* level);
 void w_ptc_setaccel_method(int* method);
 void w_ptc_setexactmis(int* boolflag);
 void w_ptc_setradiation(int* boolflag);

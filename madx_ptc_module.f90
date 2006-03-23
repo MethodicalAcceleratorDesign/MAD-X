@@ -15,7 +15,8 @@ MODULE madx_ptc_module
   USE madx_keywords
   USE madx_ptc_setcavs_module
   USE madx_ptc_tablepush_module
-  !  use madx_ptc_trackcavs_module, only: setcavities
+  use madx_ptc_intstate_module, only : getdebug
+  
   implicit none
   public
   integer icav
@@ -71,7 +72,8 @@ CONTAINS
 
     print77=.false.
     read77 =.false.
-    print*,"Now PTC"
+    
+    if (getdebug()>0) print*,"Now PTC"
 
     call set_up_universe(m_u)
     universe=universe+1
@@ -136,7 +138,7 @@ CONTAINS
     integer i,j,k,code,nt,icount,nn,ns,nd
     integer get_option,double_from_table
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
-    integer, parameter :: imul=20,nt0=20000,length=16
+    integer, parameter :: nt0=20000,length=16
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
     real(dp) f_errors(0:50),aperture(maxnaper),normal(0:maxmul)
     real(dp) patch_ang(3),patch_trans(3)
@@ -156,21 +158,26 @@ CONTAINS
     integer             method0,method1
     integer             nst0,nst1
     !---------------------------------------------------------------
-    print *, '--------------------------------------------------------------'
-    print *, '--------------------------------------------------------------'
-    print *, '------    E X E C U T I N G     P T C     I N P U T   --------'
-    print *, '--------------------------------------------------------------'
-    print *, '--------------------------------------------------------------'
-
+    
+    if (getdebug() > 0) then
+       print *, '--------------------------------------------------------------'
+       print *, '--------------------------------------------------------------'
+       print *, '------    E X E C U T I N G     P T C     I N P U T   --------'
+       print *, '--------------------------------------------------------------'
+       print *, '--------------------------------------------------------------'
+    endif
+    
     energy=get_value('beam ','energy ')
     pma=get_value('beam ','mass ')
     e0f=sqrt(ENERGY**2-pma**2)
-    print *, 'MAD-X Beam Parameters'
-    print '(a20, f8.4)', '      Energy :',energy
-    print '(a20, f8.4)', '      Kinetic Energy :',energy-pma
-    print '(a20, f8.4)', '      Partice Rest Mass :',pma
-    print '(a20, f8.4)', '      Momentum :',e0f
-
+    
+    if (getdebug() > 0) then
+       print *, 'MAD-X Beam Parameters'
+       print '(a20, f8.4)', '      Energy :',energy
+       print '(a20, f8.4)', '      Kinetic Energy :',energy-pma
+       print '(a20, f8.4)', '      Partice Rest Mass :',pma
+       print '(a20, f8.4)', '      Momentum :',e0f
+    endif
 
 
 
@@ -178,15 +185,15 @@ CONTAINS
 
 
     if(abs(pma-pmae)/pmae<c_0_002) then
-       print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
+       if (getdebug() > 2) print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
        particle=.true.
        CALL MAKE_STATES(PARTICLE)
     elseif(abs(pma-pmap)/pmap<c_0_002) then
-       print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
+       if (getdebug() > 2) print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
        particle=.false.
        CALL MAKE_STATES(PARTICLE)
     else
-       print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
+       if (getdebug() > 2) print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
        muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
@@ -194,7 +201,7 @@ CONTAINS
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
 
-    print '(a23, l7, a1)','Executing MAKE_STATES(',PARTICLE,')'
+    if (getdebug() > 2) print '(a23, l7, a1)','Executing MAKE_STATES(',PARTICLE,')'
 
     CALL MAKE_STATES(PARTICLE)
 
@@ -204,19 +211,21 @@ CONTAINS
     !  with_patch=.false.
 
     ! Global Keywords
-
-    print *, '=============================================================='
-    print *, 'INPUT PARAMETERS ARE:'
-
+    
+    if (getdebug() > 2) then
+       print *, '=============================================================='
+       print *, 'INPUT PARAMETERS ARE:'
+    endif 
+    
     sector_nmul_max0 = get_value('ptc_create_layout ','sector_nmul_max ')
-    print*,'  Global max sector_nmul: ',sector_nmul_max0
+    if (getdebug() > 2) print*,'  Global max sector_nmul: ',sector_nmul_max0
 
     sector_nmul0 = get_value('ptc_create_layout ','sector_nmul ')
-    print*,'  Global sector_nmul: ',sector_nmul0
+    if (getdebug() > 2) print*,'  Global sector_nmul: ',sector_nmul0
 
 
     model = get_value('ptc_create_layout ','model ')
-    print*,'  Global Model code is : ',model
+    if (getdebug() > 2) print*,'  Global Model code is : ',model
 
     !*****************************
     !  MODEL Settings
@@ -237,48 +246,53 @@ CONTAINS
 
 
 
-    print*,'  Global Model name (keymod0) is : ',keymod0
+    if (getdebug() > 2) print*,'  Global Model name (keymod0) is : ',keymod0
 
     method0   = get_value('ptc_create_layout ','method ')
-    print*,'  Global method is: ',method0
+    if (getdebug() > 2) print*,'  Global method is: ',method0
 
     exact0    = get_value('ptc_create_layout ','exact ') .ne. 0
-    print*,'  Global exact is: ',exact0
+    if (getdebug() > 2) print*,'  Global exact is: ',exact0
 
     nst0      = get_value('ptc_create_layout ','nst ')
-    print*,'  Global Number of Integration Steps (nst) is: ',nst0
+    if (getdebug() > 2) print*,'  Global Number of Integration Steps (nst) is: ',nst0
 
     ! MAD-X specials
     madlength = get_option('rbarc ') .eq. 0
-    print*,'  global rbend_length: ',madlength
+    if (getdebug() > 2) print*,'  global rbend_length: ',madlength
 
     mad       = get_value('ptc_create_layout ','mad_mult ') .ne. 0
-    print*,'  global mad_mult as in mad8: ',mad
+    if (getdebug() > 2) print*,'  global mad_mult as in mad8: ',mad
 
     mad8      = get_value('ptc_create_layout ','mad8 ') .ne. 0
-    print*,'  rbend as in mad8 (only global): ',mad8
+    if (getdebug() > 2) print*,'  rbend as in mad8 (only global): ',mad8
 
     gamma     = get_value('beam ','gamma ')
-    print*,'  gamma: ',gamma
+    if (getdebug() > 2) print*,'  gamma: ',gamma
 
     k         = double_from_table('summ ','gammatr ',1,gammatr)
-    print*,'  gammatr: ',gammatr
+    if (getdebug() > 2) print*,'  gammatr: ',gammatr
 
     gamma2    = gamma**2
     gammatr2  = gammatr**2
-
-    print *, '=============================================================='
-    print *, ''
-
+    
+    if (getdebug() > 2) then
+      print *, '=============================================================='
+      print *, ''
+    endif
 
     !  call Set_Up(MY_RING)
-
-    print *, 'Setting MADx with '
-    print *, '    energy        ',energy
-    print *, '    method        ',method0
-    print *, '    Num. of steps ',nst0
+    
+    if (getdebug() > 0) then 
+       print *, 'Setting MADx with '
+       print *, '    energy        ',energy
+       print *, '    method        ',method0
+       print *, '    Num. of steps ',nst0
+    endif
+      
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-    print *, 'MADx is set'
+    
+    if (getdebug() > 0) print *, 'MADx is set'
 
     icav=0
     nt=0
@@ -412,7 +426,7 @@ CONTAINS
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
-       print *, 'This is drift'
+       if (getdebug() > 9)  print *, 'This is drift'
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
@@ -486,7 +500,7 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
     case(5) ! PTC accepts mults
-       print *, 'This is quadrupole'
+       if (getdebug() > 9)  print *, 'This is quadrupole'
        key%magnet="quadrupole"
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
@@ -663,7 +677,7 @@ CONTAINS
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
     case(27)
-       print *, 'This is twcavity'
+       if (getdebug() > 9)  print *, 'This is twcavity'
        key%magnet="twcavity"
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -718,14 +732,16 @@ CONTAINS
     write(6,*) "After  start: ",my_ring%start%chart%f%a
     write(6,*) "After    end: ",my_ring%end%chart%f%b
 
-
-    print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-    print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-    print *, '^^^^^^    F I N I S H E D      P T C     I N P U T    ^^^^^^^^'
-    print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-    print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-
-
+    
+    if (getdebug() > 0) then 
+       print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+       print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+       print *, '^^^^^^    F I N I S H E D      P T C     I N P U T    ^^^^^^^^'
+       print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+       print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+    endif
+    
+    
   END subroutine ptc_input
   !_________________________________________________________________
 
@@ -764,11 +780,8 @@ CONTAINS
     character(200)       :: filename='ptcmaps.txt'
     integer              :: get_string
     real(kind(1.d0))     :: get_value
-    integer              :: debug,flag_index,why(9)
-
-
-    debug = get_value('ptc_dumpmaps ','debug ');
-    print *, "Degug from value ", debug
+    integer              :: flag_index,why(9)
+    
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
@@ -779,10 +792,10 @@ CONTAINS
     !        return
     !      endif
 
-    print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
+    if (getdebug() > 0) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
     open(unit=42,file=filename)
 
-    call init(intstate,1,c_%np_pol,berz)
+    call init(getintstate(),1,c_%np_pol,berz)
 
     call alloc(id);
     call alloc(y2);
@@ -796,7 +809,8 @@ CONTAINS
        y2=xt+id ! we track identity map from the current position
 
        if(p%mag%kind/=kind21) then
-          call track(my_ring,y2,i,i+1,intstate)
+          call track(my_ring,y2,i,i+1,getintstate())
+          
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -805,7 +819,9 @@ CONTAINS
              c_%watch_user=.false.
              return
           endif
-          call track(my_ring,xt,i,i+1,intstate)
+
+          call track(my_ring,xt,i,i+1,getintstate())
+
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -815,8 +831,10 @@ CONTAINS
              return
           endif
        else
-          print *, 'Track Cavity...'
-          call track(my_ring,y2,i,i+2,intstate)
+          if (getdebug() > 2) print *, 'Track Cavity...'
+
+          call track(my_ring,y2,i,i+2,getintstate())
+
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -825,7 +843,9 @@ CONTAINS
              c_%watch_user=.false.
              return
           endif
-          call track(my_ring,xt,i,i+2,intstate)
+
+          call track(my_ring,xt,i,i+2,getintstate())
+
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -838,15 +858,23 @@ CONTAINS
 
 
        write(42,*) p%mag%name,' ==========================='
-       do ii=1,6
-          write(42,'(6f12.8)')  y2(ii).sub.'100000', &
-               &                        y2(ii).sub.'010000', &
-               &                        y2(ii).sub.'001000', &
-               &                        y2(ii).sub.'000100', &
-               &                        y2(ii).sub.'000010', &
-               &                        y2(ii).sub.'000001'
+       do ii=1,4
+          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
+         &                      y2(ii).sub.'010000', &
+         &                      y2(ii).sub.'001000', &
+         &                      y2(ii).sub.'000100', &
+         &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column 
+         &                      y2(ii).sub.'000010'    !
        enddo
-
+       do ii=6,5,-1
+          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
+         &                      y2(ii).sub.'010000', &
+         &                      y2(ii).sub.'001000', &
+         &                      y2(ii).sub.'000100', &
+         &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column 
+         &                      y2(ii).sub.'000010'    !
+       enddo
+       
        p=>p%next
     enddo
 
@@ -896,7 +924,7 @@ CONTAINS
     icase = get_value('ptc_twiss ','icase ')
     deltap0 = get_value('ptc_twiss ','deltap ')
 
-    default = intstate
+    default = getintstate()
 
     call my_state(icase,deltap,deltap0,mynpa)
     CALL UPDATE_STATES
@@ -1007,13 +1035,14 @@ CONTAINS
     print77=.false.
     open(unit=21,file='ptctwiss.txt')
 
-    call print(default,6)
-
     do i=1,MY_RING%n
-       write(6,*) "##########################################"
-       write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-       write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
-
+       
+       if (getdebug() > 0) then
+          write(6,*) "##########################################"
+          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
+          write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
+       endif
+       
        call track(my_ring,y,i,i+1,default)
 
        call PRODUCE_APERTURE_FLAG(flag_index)
@@ -1063,11 +1092,15 @@ CONTAINS
          ! p%next == NULL (LINE) OR
          ! p%next points the first element (CIRCLE)
          cfen=current                                    
-!if it is the last element in the line
-         print *, 'It is the last element  ', current%mag%name  
-!(it is always marker, i.e element that does not change reference energy)
-         print *, 'Its reference energy is ', cfen%p0c  
-!take its reference energy
+         
+         if (getdebug()>0) then
+            !if it is the last element in the line
+            print *, 'It is the last element  ', current%mag%name  
+            !(it is always marker, i.e element that does not change reference energy)
+            print *, 'Its reference energy is ', cfen%p0c  
+         endif
+         
+     !take its reference energy
       else
          cfen=current%next      ! energy after passing this element
       endif
@@ -1134,7 +1167,7 @@ CONTAINS
       opt_fun(35)=tw%disp(5)
       opt_fun(36)=tw%disp(6)
 
-      write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      if (getdebug() > 9) write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
 
       ioptfun=36
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
@@ -1237,7 +1270,7 @@ CONTAINS
 
 
       inval = get_option('twiss_inval ')
-      if(inval.eq.1) then
+      if( (inval.eq.1) .and. (getdebug() > 0)) then
          print*," Read BETA0 block in module ptc_twiss"
       endif
 
@@ -1888,8 +1921,12 @@ CONTAINS
     call my_state(icase,deltap,deltap0,mynpa)
 
     CALL UPDATE_STATES
-    call print(default,6)
+    if (getdebug() > 2) then
 
+      print *, "ptc_track: internal state is:"
+      call print(default,6)
+    endif
+    
     x0(:)=zero
     if(icase.eq.5) x0(5)=deltap
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
@@ -2330,19 +2367,15 @@ CONTAINS
     END SELECT
 
     if(mynpa==6.and.icav==0) then
-       !       print *, '->->->->->->->->->->->->->->->->->->->->->'
-       !       print *, ''
-       !       print *, '             ICAV IS 0'
-       !       print *, ''
-       !       print *, ''
-       !       print *, '<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-'
        default=default+delta
        mynpa=5
     endif
     !HEADdiff: removed default=default+time
-    intstate = default
+
+    call setintstate(default)
     CALL UPDATE_STATES
-    call print(default,6)
+
+    if (getdebug() > 2) call print(default,6)
 
   end subroutine my_state
 

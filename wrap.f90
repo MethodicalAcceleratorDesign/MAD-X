@@ -65,6 +65,12 @@ subroutine w_ptc_trackcavs(max_obs)
   call ptc_trackcavs(max_obs)
 end subroutine w_ptc_trackcavs
 
+subroutine w_ptc_setdebuglevel(level)
+  use madx_ptc_intstate_module
+  implicit none
+  integer level
+  call ptc_setdebuglevel(level)
+end subroutine w_ptc_setdebuglevel
 
 subroutine w_ptc_setaccel_method(method)
   use madx_ptc_intstate_module

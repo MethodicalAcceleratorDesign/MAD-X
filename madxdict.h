@@ -455,18 +455,17 @@ char command_def[] =
 "file     = [s, track, track], "
 "extension= [s, none, none], "
 "onetable = [l, false, true], "
-"debug = [i, 0, 1]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_dumpmaps: ptc_dumpmaps none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/
 "file     = [s, ptcmaps, ptcmaps], "
 "extension= [s, none, none], "
-"debug = [i, 0, 1]; "
 " "
-"ptc_track_shape: ptce_track_shape none 0 0 "
+"ptc_track_shape: ptc_track_shape none 0 0 "
 "debug = [i, 0, 1]; "
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
-"maxacceleration = [l, true, true], " /*switch saying to fit caviti's lags so the reference orbit is always on the crest, i.e. gains max energy*/
+"debuglevel = [i,0], "/*sets the level of debugging printout 0 none, 10 everything */
+"maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis = [l, false, true], " /* switch to ensure exact misaligment treatment */
 "totalpath = [l], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
 "radiation = [l], "  /*sets the radiation switch/internal state of PTC */
@@ -495,7 +494,6 @@ char command_def[] =
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
 "norm_out = [l, false, true], "
 "norm_no  = [i, 1], "
-"debug    = [l, false, true]; "
 " "
 "ptc_start: ptc_start none 0 0 "
 "x        = [r, 0], "
@@ -518,7 +516,6 @@ char command_def[] =
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_script: ptc_script none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_script.f90*/
 "file     = [s, script.ptc, script.ptc], "
-"debug = [i, 0, 1]; "
 " "
 "ptc_end: ptc_end none 0 0; "
 " "

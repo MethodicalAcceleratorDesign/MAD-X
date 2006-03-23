@@ -4,7 +4,6 @@ module madx_ptc_setcavs_module
   implicit none
   public
 
-  integer, private                    :: skowrondebug  = 10     
 ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   logical, public                     :: cavsareset   = .false.
 ! flag that indicates if cavities were already set for the current setup
@@ -37,6 +36,7 @@ contains
     real(dp)             :: sparivtime=0.d0 !synchronous particle arrival time
     real(dp)             :: position=0.d0 !synchronous particle position
     real(kind(1.d0))     :: get_value
+    integer              :: get_option
     !------------------------------------------------------
 100 format (a20, f10.4, a10, f10.4, a10, f10.4)
 110 format (8f10.4, l2, i3)
@@ -44,12 +44,16 @@ contains
 130 format (a12, i5, a6, a12, a6, f10.4, a20, f10.4)
     !------------------------------------------------------
 
-    print *, "I am in setcavities "
-    call print(intstate,6)
 
     !Below we enforce that x(6) is cT, and it is time of flight from the start
     !we use time T=x(6)/ctime to find the time of arrival to a cavity so we can adjust its phase optimally
-    localis = intstate
+    localis = getintstate()
+    
+    if (getdebug() > 0) then
+      print *, "I am in setcavities "
+      call print(localis,6)
+    endif
+        
 
     charge = get_value('beam ', "charge ")
 
@@ -61,7 +65,7 @@ contains
     x(:)=0.0d0
 
     call locate_all_twcav(my_ring,poscav)
-    if ( skowrondebug > 4 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
+    if ( getdebug() > 4 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
     if ( size(poscav) == 0) then
        return
     endif
@@ -74,14 +78,15 @@ contains
     startfen=p  !setting up start energy for record
     nfen=p      ! current fibre energy
 
-    print *, 'c_%feed_p0c = ', c_%feed_p0c
-    if ( skowrondebug > 4 ) write (*,*) 'START TRACKING TILL THE FIRST CAVITY'
+    if ( getdebug() > 0 ) print *, 'c_%feed_p0c = ', c_%feed_p0c
+
+    if ( getdebug() > 4 ) write (*,*) 'START TRACKING TILL THE FIRST CAVITY'
 
     i = 1
 
     do j=1,size(poscav)
 
-       if ( skowrondebug > 4 ) then
+       if ( getdebug() > 4 ) then
           write (*,*) 'Current cavity no is j=',j
           write (*,*) 'Setting beam momentum AND tracking', nfen%p0c,' till this cavity (',poscav(j),')'
        endif
@@ -91,17 +96,19 @@ contains
 
           p=nfen   ! set current reference energy
           call track(my_ring,x,i,i+1,localis)
-
-          write (6,*) 'i=',i,' name=',p%mag%name, 'beta0 ', nfen%beta0, ' newpos ', x(6), ' Current energy ',nfen%energy
+          
+          if ( getdebug()>0 ) then
+             write (6,*) ' i=',i,' name=',p%mag%name, &
+                         ' beta0 ', nfen%beta0, &
+	     ' newpos ', x(6), &
+	     ' Current energy ',nfen%energy
+             write(6,'(6f8.4)') x
+          endif
 
           write (21,*) ' '
           write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
           write (21,'(6f8.4)') x
 
-          if ( skowrondebug > 4 ) then
-             write(6,'(6f8.4)') x
-             write (*,*) 'Initial energy ',startfen%energy,' Current energy ',nfen%energy
-          endif
 
           p=>p%next
        enddo
@@ -126,10 +133,12 @@ contains
 
        ! set the reference energy in this cavity
        p=nfen
-
-       write (6,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-       write (6,'(6f8.4)') x
-
+       
+       if ( getdebug() > 0 ) then
+          write (6,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+          write (6,'(6f8.4)') x
+       endif
+       
        !TUNE CAVITY
        call setcavity(p,x,phasecav(j),charge,maxaccel)
        write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*360.0d0/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
@@ -137,10 +146,11 @@ contains
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
 
-       if ( skowrondebug > 4 ) then
-          write (21,*) ' '
-          write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-          write (21,'(6f8.4)') x
+       write (21,*) ' '
+       write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+       write (21,'(6f8.4)') x
+
+       if ( getdebug() > 4 ) then
           write(6,'(a, 6f12.8)') ' Track parameters after cavity ',x
           write(*,100) 'Old Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
        endif
@@ -149,18 +159,18 @@ contains
        prevbeta0=nfen%beta0
        nfen= x(5)*nfen%p0c
 
-       if ( skowrondebug > 4 ) then
+       if ( getdebug() > 4 ) then
           write(6,100) 'New Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
           write(6,110) nfen
           write(6,'(a10, f8.4)') 'Relative E increase', (nfen%energy-startfen%energy)/startfen%kinetic
        endif
 
-       write (6,*) 'beta0 ', prevbeta0, ' oldpos ', position, ' newpos ', x(6), ' Current energy ',nfen%energy
+       if (getdebug()>0) write (6,*) 'beta0 ', prevbeta0, ' oldpos ', position, ' newpos ', x(6), ' Current energy ',nfen%energy
        position = x(6)
 
        !PATCH THE NEXT ELEMENT ON ENTRANCE
        p%next = nfen
-       if ( skowrondebug > 4 ) write (*,*) 'Finding patch for j=',j,' ',p%mag%name
+       if ( getdebug() > 4 ) write (*,*) 'Finding patch for j=',j,' ',p%mag%name
        call find_patch(p,next=patchnext,ENERGY_PATCH=patchenergy,PREC=patchprecision)
 
        i=poscav(j)+1
@@ -169,10 +179,8 @@ contains
        !from this point on we do not need to calculate TOF cause there is no further cavs to set
     enddo
 
-    if ( skowrondebug > 4 ) write (*,*) 'Loop over cavities done'
-
-
-    if ( skowrondebug > 4 ) then
+    if ( getdebug() > 4 ) then
+       write (*,*) 'Loop over cavities done'
        write (*,*) 'Current element is ', p%mag%name
        write (*,*) 'Doing loop from the first element after the last cavity to the END'
     endif
@@ -181,32 +189,32 @@ contains
        p=nfen
        call track(my_ring,x,i,i+1,localis)
 
-       if ( skowrondebug > 4 ) then
-          write (21,*) ' '
-          write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-          write (21,'(6f8.4)') x
+       write (21,*) ' '
+       write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+       write (21,'(6f8.4)') x
+
+       if ( getdebug() > 0 ) then
+          write(6,*) ' i=',i,' name=',p%mag%name, &
+                      ' beta0 ', nfen%beta0, &
+	  ' newpos ', x(6), &
+	  ' Current energy ',nfen%energy
+          write(6,'(6f8.4)') x
        endif
 
        p=>p%next
     enddo
 
 
-    if ( skowrondebug > 9 ) then
-       write (21,*) ' '
-       write (21,*) 'END'
-       write (21,'(6f8.4)') x
-    endif
+    write (21,*) ' '
+    write (21,*) 'END'
+    write (21,'(6f8.4)') x
 
 
-    if ( skowrondebug > 4 ) then
+    if ( getdebug() > 0 ) then
        write(6,*) 'PARAMETERS AT THE END OF LINE:'
        write(6,'(a, 6f8.4)') ' Track parameters ',x
        write(*,100) 'START energy=',startfen%energy,' momentum=',startfen%p0c,' kinetic=',startfen%kinetic
-    endif
-
-    if ( skowrondebug > 4 ) then
        write(6,100) 'END energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
-
        write(6,110) nfen
        write(6,'(a10, f8.4)') 'Relative E increase', (nfen%energy-startfen%energy)/startfen%kinetic
     endif
@@ -218,34 +226,25 @@ contains
 
     do i=1,my_ring%n
        if ( associated(p%mag) .eqv. .false.) then
-          if (skowrondebug > 0 ) print *, 'Fibre no. ',i,' has no mag assigned to it'
+          if (getdebug() > 0 ) print *, 'Fibre no. ',i,' has no mag assigned to it'
           cycle
        endif
-       if ( skowrondebug > 9 ) then
+       if ( getdebug() > 9 ) then
           write(6,*) 'Name: ', p%mag%name, ' Kind: ', p%mag%kind
        endif
 
        if(p%mag%kind == kind21) then
 
-          if ( skowrondebug > 1 ) then
+          if ( getdebug() > 0 ) then
              write (6,*) 'Cavity ',i,' phase ', p%mag%phas,' Volt ',   p%mag%volt
           endif
-
-          write(6,*)  p%patch%energy
-          write(6,*) p%next%patch%energy
 
           if(p%next%patch%energy==1) then
              p%patch%energy=2
              p%next%patch%energy=0
           endif
 
-          write(6,*)  p%patch%energy
-          write(6,*) p%next%patch%energy
-
-          !        call find_patch(p,next=patchnext,ENERGY_PATCH=patchenergy,PREC=patchprecision)
-
-
-          if ( skowrondebug > 2 ) then
+          if ( getdebug() > 0 ) then
              write(6,*) 'DELTAE ', p%mag%DELTA_E
              write(6,*) 'Length ', p%mag%l
           endif
@@ -283,7 +282,7 @@ contains
       real(dp)                 :: arrivtime !time of arrival
 
       arrivtime = x(6)/clight
-      print *, 'arrivtime = ', arrivtime
+      if (getdebug()>9) print *, 'arrivtime = ', arrivtime
 
       if(f%mag%kind/=kind21) then
          write(6,*) " fatal error: not a twcavity "
@@ -300,7 +299,7 @@ contains
 
       if(ene) then
          de_mev=f%mag%volt*f%mag%l
-         if ( skowrondebug > 4 ) write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
+         if ( getdebug() > 4 ) write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          f%mag%phas = pi/2.0d0 - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
@@ -331,21 +330,16 @@ contains
 
 
       !    write (*,*) 'energy (t/f)? :',ene, 'charge: ', charge
-      if ( skowrondebug > -1 ) then
-         write(6,*) 'Input values:'
-         write(6,*) '    Charge ', charge,' max ene? : ',ene
-         write(6,*) '    Volt ',   f%mag%volt,' MV '
-         write(6,*) '    DELTAE ', f%mag%delta_e, ' GeV '
-         write(6,*) '    Length ', f%mag%l
-         write(6,*) '    Phase ',  f%mag%phas
-         write(6,*) '    Freq ',   f%mag%freq
-         write(6,*) '    Lag ',    f%mag%lag/twopi*360.d0,' deg ', f%mag%lag,' rad '
-         write(6,*) '    P0c ',    f%mag%p%p0c
-      endif
-
-      if ( skowrondebug > -1 ) then
-         write (*,'(a, f12.4, a, f12.4, a, f12.8)') &
-              'f%mag%volt=',f%mag%volt,' f%mag%phas=',f%mag%phas,' phase_rel=',phase_rel
+      if ( getdebug() > 2 ) then
+         write(6,*) 'Cavity settings:'
+         write(6,'(a12,i12,a10,l1)') '    Charge ', charge,' max ene? : ',ene
+         write(6,'(a12,f12.5,a10)') '    Volt ',   f%mag%volt,' MV '
+         write(6,'(a12,f12.5,a10)') '    DELTAE ', f%mag%delta_e, ' GeV '
+         write(6,'(a12,f12.5,a10)') '    Length ', f%mag%l,' m'
+         write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad'
+         write(6,'(a12,f12.0,a10)') '    Freq ',   f%mag%freq, ' Hz '
+         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*360.d0,' deg ', f%mag%lag,' rad '
+         write(6,'(a12,f12.5,a10)') '    P0c ',    f%mag%p%p0c, 'GeV/c'
       endif
 
     end subroutine setcavity

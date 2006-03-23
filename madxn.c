@@ -2044,9 +2044,7 @@ void exec_plot(struct in_cmd* cmd)
 
     pos = name_list_pos("vaxis", nl_plot);
     
-    printf("exec_plot: Pos %d\n", pos);
     vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
-    printf("exec_plot: vaxis_name %s\n", vaxis_name);
 
     /* get interpolation */
 
@@ -2071,8 +2069,6 @@ void exec_plot(struct in_cmd* cmd)
       
       if ((table_name = pl_plot->parameters[pos]->string) == NULL)
         table_name = pl_plot->parameters[pos]->call_def->string;
-
-      printf("exec_plot: Table name specified %s\n", table_name);
 
       if(strcmp(table_name,"track") == 0)
         track_flag = 1;
@@ -2119,14 +2115,9 @@ void exec_plot(struct in_cmd* cmd)
 
   if (track_flag)
   {
-
-    printf("exec_plot: We Plot TRACKING params\n");
-    
     /* get track file name */
 
     trackfile = command_par_string("trackfile", this_cmd->clone);
-
-    printf("exec_plot: Trackfile is %s\n",trackfile);
 
     /* get particle */
 
@@ -2210,7 +2201,6 @@ void exec_plot(struct in_cmd* cmd)
     fprintf(gpu,"set ylabel '%s'\n",vaxis_name);
     for (j = 0; j < curr; j++)
     {
-      printf("j = %d \n",j);
       sprintf(track_file_name, "%s.obs%04d.p%04d", trackfile, 1, part_idx[j]);
       if (fopen(track_file_name,"r") == NULL)
         printf("file %s does not exist \n",track_file_name);
@@ -2225,7 +2215,6 @@ void exec_plot(struct in_cmd* cmd)
             fprintf(gpu,", \\\n     ");
         }
         fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
-        printf("%s\n",track_file_name);
         if (nolegend)
           fprintf(gpu,"notitle with points %d ",part_idx[j]);
         else
@@ -7576,40 +7565,47 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   int i;
   double switchvalue;
   struct name_list* nl;
+  int debuglevel = 0;
   
-  printf("\n\n\n\n");
-  printf("obs_points pro_ptc_setswtch: %d \n",curr_obs_points);
-  for (i = 0; i < 5; i++) printf("##################################################\n");
-
-
   if (cmd == 0x0)
   {
-    printf("obs_points pro_ptc_setswtch: Command is null!!!\n");
+    warning("pro_ptc_setswtch:","Command is null!!!");
     return;
   }
 
   if (cmd->clone == 0x0)
   {
-    printf("obs_points pro_ptc_setswtch: Command Definintion is null!!!\n");
+    printf("pro_ptc_setswtch: Command Definintion is null!!!\n");
     return;
   }
 
 
   nl = cmd->clone->par_names;
+
+  /*DEBUG LEVEL SWITCH*/
+  if ( name_list_pos("debuglevel", nl) >=0 )
+  {
+    command_par_value2("debuglevel", cmd->clone, &switchvalue);
+    debuglevel = (int)switchvalue;
+    w_ptc_setdebuglevel_(&debuglevel);
+  } 
+  else
+  {
+    printf("debuglevel is not present\n");
+  } 
   
-    
 
   /*ACCELERATION SWITCH*/
   if ( name_list_pos("maxacceleration", nl) >=0 )
   {
     command_par_value2("maxacceleration", cmd->clone, &switchvalue);
-    printf("maxaccel is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setaccel_method_(&i);
   } 
   else
   {
-    printf("maxaccel is not present\n");
+    if (debuglevel > 0) printf("maxaccel is not present\n");
   } 
 
 
@@ -7617,13 +7613,13 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   if ( name_list_pos("exact_mis", nl) >=0 )
   {
     command_par_value2("exact_mis", cmd->clone, &switchvalue);
-    printf("exact_mis is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setexactmis_(&i);
   } 
   else
   {
-    printf("exact_mis is not present\n");
+   if (debuglevel > 0)  printf("exact_mis is not present\n");
   } 
   
 
@@ -7631,26 +7627,26 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   if ( name_list_pos("radiation", nl) >=0 )
   {
     command_par_value2("radiation", cmd->clone, &switchvalue);
-    printf("radiation is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("radiation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setradiation_(&i);
   } 
   else
   {
-    printf("radiation is not present\n");
+    if (debuglevel > 0) printf("radiation is not present\n");
   } 
 
   /*fringe SWITCH*/
   if ( name_list_pos("fringe", nl) >=0 )
   {
     command_par_value2("fringe", cmd->clone, &switchvalue);
-    printf("fringe is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("fringe is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setfringe_(&i);
   } 
   else
   {
-    printf("fringe is not present\n");
+    if (debuglevel > 0) printf("fringe is not present\n");
   } 
   
   
@@ -7659,13 +7655,13 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   if ( name_list_pos("totalpath", nl) >=0 )
   {
     command_par_value2("totalpath", cmd->clone, &switchvalue);
-    printf("totalpath is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("totalpath is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settotalpath_(&i);
   } 
   else
   {
-    printf("totalpath is not present\n");
+    if (debuglevel > 0) printf("totalpath is not present\n");
   } 
   
 
@@ -7673,33 +7669,30 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   if ( name_list_pos("time", nl) >=0 )
   { 
     command_par_value2("time", cmd->clone, &switchvalue);
-    printf("time is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("time is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settime_(&i);
   } 
   else
   {
-    printf("time is not present\n");
+    if (debuglevel > 0) printf("time is not present\n");
   } 
   
   /*NOCAVITY SWITCH*/
   if ( name_list_pos("nocavity", nl) >=0 )
   { 
     command_par_value2("nocavity", cmd->clone, &switchvalue);
-    printf("nocavity is found and its value is %f\n", switchvalue);
+    if (debuglevel > 0) printf("nocavity is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setnocavity_(&i);
   } 
   else
   {
-    printf("nocavity is not present\n");
+    if (debuglevel > 0) printf("nocavity is not present\n");
   } 
   
-  
-  printf("obs_points pro_ptc_setswtch Done\n");
+  if (debuglevel > 0) printf("obs_points pro_ptc_setswtch Done\n");
 
-  for (i = 0; i < 5; i++) printf("##################################################\n");
-  printf("\n\n\n\n");
   
 }
 /********************************************************************************/
