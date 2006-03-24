@@ -129,7 +129,7 @@ contains
 
        call gettrack(n,x(1),x(2),x(3),x(4),x(6),x(5))
 
-       if (getdebug() > 1 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
+       if (getdebug() > 0 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
 
        do t=1, nturns
 
@@ -140,7 +140,7 @@ contains
              call track(my_ring,x,e,e+1,getintstate())
              pathlegth = pathlegth + p%mag%p%ld
 
-             if (getdebug() > 9 ) then
+             if (getdebug() > 2 ) then
                 write(6,*) e, 'l=',pathlegth
                 write(6,'(6f8.4)') x
              endif
