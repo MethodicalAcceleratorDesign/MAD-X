@@ -1,4 +1,5 @@
-      subroutine mtjac(ncon,nvar,strategy,cool,balance,random,nrep,     &
+      subroutine mtjac(ncon,nvar,strategy,cool,balance,random,          &
+     &nrep,bisec,                                                       &
      &tol,calls,call_lim,                                               &
      &vect,dvect,fun_vec,                                               &
      &w_ifjac,w_iwa4,fval,xstart,xold)
@@ -15,6 +16,7 @@
 !   balance   (real)    # balance cooling factor, <0 use opt values    *
 !   cool      (real)    # cooling factor                               *
 !   random    (real)    # random  factor                               *
+!   bisec     (int)     # bisec iteration number                       *
 !   nrep      (int)     # number of repetition                         *
 !   tol       (real)    Final tolerance for match.                     *
 !   calls     (int)     current call count                             *
@@ -32,8 +34,12 @@
       double precision w_ifjac(*),w_iwa4(*)
       double precision fval(*),xold(*),xstart(*)
       double precision random,cool,balance
+      integer bisec
       include 'match.fi'
       external mtfcn
+
+! mtfcn store the parameter using mtputi(x) and compute the function
+! using mtcond
 
       icovar = 0
       ilevel = 0
@@ -43,13 +49,14 @@
       write(*,*) "JACOBIAN Strategy =", strategy
 
 !  Repeat the program ntimes
+!      write(*,*) nrep
       do i=1,nrep
         if (strategy .ge. 1) then
           calls=0
           call jacob(mtfcn,ncon,nvar,strategy,calls,call_lim,           &
      &vect,fun_vec,tol,                                                 &
      &w_ifjac,w_iwa4,fval,                                              &
-     &xstart,xold,cool,balance,random)
+     &xstart,xold,cool,balance,random,bisec)
         endif
       enddo
       end
@@ -57,7 +64,7 @@
 
       subroutine jacob(fcn,m,n,strategy,calls,call_lim,                 &
      &x,fvec,epsfcn,                                                    &
-     &fjac,wa4,fval,xstart,xold,cool,balance,random)
+     &fjac,wa4,fval,xstart,xold,cool,balance,random,bisec)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -66,24 +73,26 @@
 !   fcn       (real)    # function                                     *
 !   m         (int)     # constraints                                  *
 !   n         (int)     # variables                                    *
-!   strategy  (int)     # strategy   1 normal,2 print jacobian         *
+!   strategy  (int)     # strategy   1 normal,2 print jacobian,3 smart *
 !   tol       (real)    Final tolerance for match.                     *
 !   calls     (int)     current call count                             *
 !   call_lim  (int)     current call limit                             *
 !   x         (real)    variable values                                *
 !   dvect     (real)    variable steps                                 *
-!   fvec     (real)    function values                                *
-!                      mtfjac2 fjac,wa4
+!   fvec     (real)    function values                                 *
+!                      mtfjac2 fjac,wa4                                *
 !   cool      (real)    # cooling factor                               *
 !   balance   (real)    # balance cooling factor                       *
 !   random    (real)    # random  factor                               *
+!   bisec     (real)    # bisec iteration number                       *
 !----------------------------------------------------------------------*
 
       integer izero
       integer i,iflag,info,j,level,m,n,calls,call_lim
-      integer ireset,strategy
+      integer ireset,strategy,bisec
       double precision fval(m),fmin_old,epsfcn
       double precision fnorm,ftol,gtol
+      double precision dxnorm,xnorm,dx(n),fmin_start,fmin_old2
       double precision vmod
       double precision xtol,x(n),xstart(n),xold(n),fvec(m)
       double precision fjac(m,n),wa4(m),zero,one,two
@@ -105,7 +114,7 @@
       gtol = epsil
       xtol = epsil
 
-!---- Store the starting values in xstart
+!---- Store the starting values in xstart for mtslope
       do j = 1, n
         xstart(j) = x(j)
       enddo
@@ -136,9 +145,10 @@
       fnorm = vmod(m, fvec)
       fmin = fnorm**2
       write(*,831) fmin
+      fmin_start=fmin
 !      fmin_old = fmin
 !      edm = fmin
-!     the first calls usually has a worse penalty due perhaps
+!     the first calls usually have a worse penalty due perhaps
 !      to dimensional problems
 !      fmin = 1E24
 
@@ -282,6 +292,61 @@
         endif
       enddo
 
+      call FCN(M,N,x,fvec,IFLAG)
+      fnorm = vmod(m, fvec)
+      fmin_old=fmin
+      fmin = fnorm**2
+
+      xnorm=DNRM2(N, x, 1)
+      dxnorm=DNRM2(effvar, effsol, 1)/xnorm
+      write(*,*) 'Step lenght', dxnorm
+!      write(*,*) "tar=",fmin,fmin_old,ftol
+!      write(*,830) calls,fmin,effcon,N
+!      do i=1,N
+!        xdiff(i)=xstart(i)-x(i)
+!      enddo
+!      write(*,830) calls,fmin,DNRM2(N, xdiff, 1)/DNRM2(N, xstart, 1)
+
+      ! first fmin_old equal to fmin_start
+      ! Bisection search
+      fmin_old2=1E20
+      j=0
+36    continue
+      if(fmin.ge.fmin_old .and. j.lt. bisec ) then
+        ! go back to average solution
+        do i=1,N
+          x(i)=(x(i)+xold(i))*.5
+          dx(i)=(x(i)-xold(i))*.5
+        enddo
+        j=j+1
+        call FCN(M,N,x,fvec,IFLAG)
+!        calls=calls+1
+        fnorm = vmod(m, fvec)
+        fmin = fnorm**2
+        xnorm=DNRM2(N, x, 1)
+        dxnorm=DNRM2(N, dx, 1)/xnorm
+!        write(*,*) dxnorm,xnorm,fmin,fmin_old2
+        if (fmin.gt.fmin_old2) then
+!          do i=1,N
+!            x(i)=2*x(i)-xold(i)
+!          enddo
+!          call FCN(M,N,x,fvec,IFLAG)
+!!        calls=calls+1
+!          fnorm = vmod(m, fvec)
+!          fmin = fnorm**2
+!          xnorm=DNRM2(N, x, 1)
+!          write(*,*) dxnorm,xnorm,fmin,fmin_old2
+          goto 37
+        endif
+        fmin_old2=fmin
+        goto 36
+      endif
+37    continue
+
+      if (j.gt.0) then
+        write(*,*) 'Bisec iteration', j
+      endif
+
 
 
 !     Check for slope and limits and set the results in varinfo and
@@ -387,21 +452,44 @@
       fnorm = vmod(m, fvec)
       fmin_old=fmin
       fmin = fnorm**2
+
+      xnorm=DNRM2(N, x, 1)
+      dxnorm=DNRM2(effvar, effsol, 1)/xnorm
 !      write(*,*) "tar=",fmin,fmin_old,ftol
 !      write(*,830) calls,fmin,effcon,N
-      write(*,830) calls,DNRM2(effvar, effsol, 1),fmin
+      write(*,830) calls,dxnorm,fmin
 !      do i=1,N
 !        xdiff(i)=xstart(i)-x(i)
 !      enddo
 !      write(*,830) calls,fmin,DNRM2(N, xdiff, 1)/DNRM2(N, xstart, 1)
 
+!      ! Bisection search
+!35    continue
+!      if(fmin.ge.fmin_old .and. dxnorm.gt. bisec ) then
+!        ! go back to average solution
+!        do i=1,N
+!          x(i)=(x(i)+xold(i))*.5
+!          dx(i)=(x(i)-xold(i))*.5
+!        enddo
+!        call FCN(M,N,x,fvec,IFLAG)
+!!        calls=calls+1
+!        fnorm = vmod(m, fvec)
+!        fmin = fnorm**2
+!        xnorm=DNRM2(N, x, 1)
+!        dxnorm=DNRM2(N, dx, 1)/xnorm
+!        write(*,829) dxnorm,fmin
+!        fmin_old=fmin
+!!        write(*,*) "iterating",oldxnorm,xnorm,fmin_old,fmin
+!        goto 35
+!      endif
+      
 
       ! check if the target explode
       if((fmin .gt. 1D9)) then
 !       write(*,*) fmin, 1/xtol, (fmin .gt. 1D30)
         ! go back to the preovius solution
         do i=1,N
-          x(i)=x(i)+effsol(i)
+          x(i)=xold(i)
         enddo
         ! set values to the previous solution
         call FCN(M,N,X,fvec,IFLAG)
@@ -447,9 +535,17 @@
 !  999 format(i3,i3,e16.8)
   300 continue
 
+!---- Store the final distance
+      do i = 1, n
+        dx(i)=(x(i)-xstart(i))
+      enddo
+      
+      xnorm=DNRM2(N, x, 1)
+      dxnorm=DNRM2(N, dx, 1)/xnorm
+      write(*,*) 'final relative difference norm:',dxnorm
 
   831 format('Initial Penalty Function = ',e16.8,//)
-  830 format('call:',I6, ' Dx = ', e16.8,                               &
+  830 format('call: ',I5, ' Dx = ', e16.8,                              &
      &'  Penalty function = ',e16.8)
       end
 

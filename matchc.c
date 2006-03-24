@@ -60,6 +60,7 @@ void match_action(struct in_cmd* cmd)
     jac_repeat = command_par_value("repeat", cmd->clone);
     jac_balance = command_par_value("balance", cmd->clone);
     jac_random = command_par_value("random", cmd->clone);
+    jac_bisec = command_par_value("bisec", cmd->clone);
     match_work[0] = new_double_array(total_vars*total_const);
     match_work[1] = new_double_array(total_const);
     match_work[2] = new_double_array(total_const);
@@ -68,7 +69,7 @@ void match_action(struct in_cmd* cmd)
     fprintf(prt_file, "START JACOBIAN:\n\n");
     mtjac_(&total_const, &total_vars,
            &jac_strategy, &jac_cool,&jac_balance, &jac_random,
-           &jac_repeat,
+           &jac_repeat,&jac_bisec,
            &match_tol, &current_calls, &current_call_lim,
            vary_vect->a, vary_dvect->a, fun_vect->a,
            match_work[0]->a,match_work[1]->a,match_work[2]->a,
@@ -238,8 +239,6 @@ void match_end(struct in_cmd* cmd)
 {
   int i;
   struct node* c_node;
-  /* RDM 28/9/2005 Command string for assigning var tar to penalty. */
-  char assign_cmd[40];
   /* OB 5.3.2002: write out all final constraint values and vary parameters */
   penalty = zero;
   if (get_option("varylength") != zero) match_prepare_varypos();
@@ -320,8 +319,9 @@ void match_end(struct in_cmd* cmd)
 
 
   fprintf(prt_file, "EVALUATING \"tar= %16.8e;\"\n",penalty);
-  sprintf(assign_cmd,"tar= %16.8e ;",penalty);
-  pro_input(assign_cmd);
+/*  sprintf(assign_cmd,"tar= %16.8e ;",penalty);*/
+/*  pro_input(assign_cmd);*/
+  set_variable("tar",&penalty);
 }
 
 void match_fix(struct in_cmd* cmd)

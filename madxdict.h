@@ -1837,7 +1837,7 @@ char command_def[] =
 "balance  = [r, 0.5], "
 "random   = [r, 0.0], "
 "repeat   = [r, 1], "
-"sectormap= [l, false, true], "
+"bisec   = [i, 1], "
 "strategy = [i, 3]; "
 " "
 "rmatrix: match match 0 0 "

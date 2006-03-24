@@ -140,9 +140,12 @@ extern void micit_(double *,char *,double *,double *,double *,int *,float *,
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*, double*, double*);
-extern void mtjac_(int*, int*, int*, double*, double*, double*,
-                   int*, double*, int*, int*, double*, double*, double*,
-                   double*, double*, double*, double*, double*);
+extern void mtjac_(int*, int*,
+                  int*, double*, double*, double*,
+                   int*, int*,
+                   double*, int*, int*, double*, double*, double*,
+                   double*, double*, double*,
+                   double*, double*);
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*);
@@ -1138,6 +1141,7 @@ int jac_repeat;             /* RDM 24.8.2005 jacobian repeat (match) */
 double jac_cool;            /* RDM 24.8.2005 jacobian cool factor (match) */
 double jac_balance;         /* RDM 24.8.2005 jacobian balance cool factor (match) */
 double jac_random;         /* RDM 24.8.2005 jacobian random factor (match) */
+int jac_bisec;             /* RDM 16.3.2006 jacobian bisec factor (match) */
 int new_name_count = 0;     /* to make internal names */
 int next_rand = 0;          /* for random generator */
 int plots_made = 0;         /* set to 1 if plots are made */
