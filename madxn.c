@@ -7287,7 +7287,6 @@ void ptc_track_end()
   }
   curr_obs_points = 1;
   track_is_on = 0;
-  fprintf(prt_file, "exit PTC_TRACK module\n\n");
 }
 
 void track_observe(struct in_cmd* cmd)
@@ -7463,10 +7462,6 @@ void pro_ptc_trackcavs(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
 
- 
-  /*printf("obs_points ptc_trackcavs: %d \n",curr_obs_points);*/
-  
-  
   pos = name_list_pos("file", nl);
   if (nl->inform[pos]) set_option("track_dump", &one);
   if ((track_filename = pl->parameters[pos]->string) == NULL)
@@ -7486,16 +7481,9 @@ void pro_ptc_trackcavs(struct in_cmd* cmd)
   }
   track_fileext = permbuff(track_fileext);
 
-  
-  
   track_tables_create(cmd);
-  
   w_ptc_trackcavs_(&curr_obs_points);
-  
-  printf("Dumping Tables\n");
   track_tables_dump();
-  
-  printf("obs_points ptc_trackcavs Done\n");
 }
 /********************************************************************************/
 
