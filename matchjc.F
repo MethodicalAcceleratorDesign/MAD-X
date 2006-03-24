@@ -299,7 +299,7 @@
 
       xnorm=DNRM2(N, x, 1)
       dxnorm=DNRM2(effvar, effsol, 1)/xnorm
-      write(*,*) 'Step lenght', dxnorm
+      write(*,*) 'Step length', dxnorm
 !      write(*,*) "tar=",fmin,fmin_old,ftol
 !      write(*,830) calls,fmin,effcon,N
 !      do i=1,N
