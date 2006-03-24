@@ -52,7 +52,13 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
-      subroutine w_ptc_setaccel_method_ ()
+      subroutine w_ptc_setdebuglevel ()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
+      subroutine w_ptc_setaccel_method ()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
@@ -101,12 +107,6 @@
       end
 
       subroutine  w_ptc_dumpmaps()
-      implicit none
-      call fort_warn('PTC command skipped! ',                           &
-     &' Please use proper MAD-X version that includes PTC.')
-      end
-
-      subroutine  w_ptc_setaccel_method()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
