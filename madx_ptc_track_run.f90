@@ -2401,8 +2401,8 @@ CONTAINS
             Warn: if (zgiv_exist .and. zngiv_exist) then !------------!         !   !   !
                msg(1) = 'Absolute and normalized coordinates given,'  !         !   !   !
                msg(2) = 'Superposition used.'                         !         !   !   !
-               call aawarn('START-1: ', msg(1))                       !         !   !   !
-               call aawarn('START-2: ', msg(2))                       !         !   !   !
+               call fort_warn('START-1: ', msg(1))                    !         !   !   !
+               call fort_warn('START-2: ', msg(2))                    !         !   !   !
             endif Warn !----------------------------------------------!         !   !   !
             !                                                                   !   !   !
             ! fill a previous particles                                         !   !   !
