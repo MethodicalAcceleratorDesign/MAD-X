@@ -2098,7 +2098,8 @@ CONTAINS
       REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv), tmp_norm
 
       integer  :: npart,turn,j,nobs
-      REAL(dp) :: orbit(6),orbit0(6),tmp,tt
+      REAL(dp) :: orbit(6),orbit0(6),tmp,tt,tn
+      real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       character*36 table_puttab
       !hbu
       REAL(dp) :: spos
@@ -2111,10 +2112,14 @@ CONTAINS
 
       tmp_coord_array=zero; tmp_norm_array=zero
 
-      tt = turn
-      write(table_puttab(10:13), '(i4.4)') nobs
-      write(table_puttab(16:19), '(i4.4)') npart
-      call double_to_table(table_puttab, 'turn ', tt)
+      tt = turn; tn = npart
+      write(table_puttab(10:13), '(i4.4)') nobs    ! Write in the table head :
+      write(table_puttab(16:19), '(i4.4)') npart   ! "@NAME ... "TRACK.OBS0001.P0005"
+      
+          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
+      call double_to_table(table_puttab, 'e ', energy)
+      call double_to_table(table_puttab, 'number ', tn) ! the number of the current particle
+      call double_to_table(table_puttab, 'turn ', tt)   ! the number of the current turn
       do j = 1, 6
          tmp=zero
          IF (j.LE.mynpa) tmp = orbit(j) - orbit0(j)
