@@ -7453,10 +7453,10 @@ void ptc_dumpmaps(struct in_cmd* cmd)
   w_ptc_dumpmaps_();
 }
 
-void pro_ptc_trackcavs(struct in_cmd* cmd)
+void pro_ptc_trackline(struct in_cmd* cmd)
 {
   /*Does PTC tracking taking to the account acceleration */
-  /*it is basically wrapper to subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
+  /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 
   int pos, one;
   struct name_list* nl = cmd->clone->par_names;
@@ -7482,7 +7482,7 @@ void pro_ptc_trackcavs(struct in_cmd* cmd)
   track_fileext = permbuff(track_fileext);
 
   track_tables_create(cmd);
-  w_ptc_trackcavs_(&curr_obs_points);
+  w_ptc_trackline_(&curr_obs_points);
   track_tables_dump();
 }
 /********************************************************************************/
@@ -7490,7 +7490,7 @@ void pro_ptc_trackcavs(struct in_cmd* cmd)
 void pro_ptc_twiss_linac(struct in_cmd* cmd)
 {
   /*Does PTC twiss taking to the account acceleration */
-  /*it is basically wrapper to subroutine ptc_twiss_linac() in madx_ptc_trackcavs.f90*/
+  /*it is basically wrapper to subroutine ptc_twiss_linac() in madx_ptc_trackline.f90*/
   struct int_array* tarr;
   int l;
   char *table_name, *filename = NULL;
@@ -7549,7 +7549,7 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
 void pro_ptc_setswitch(struct in_cmd* cmd)
 {
   /*Does PTC tracking taking to the account acceleration */
-  /*it is basically wrapper to subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
+  /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
   int i;
   double switchvalue;
   struct name_list* nl;

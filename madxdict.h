@@ -449,7 +449,7 @@ char command_def[] =
 "time = [l, false, true], "
 "deltap = [r, 0]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
-"ptc_trackcavs: ptc_trackcavs none 0 0 " /*implemented by subroutine ptc_trackcavs() in madx_ptc_trackcavs.f90*/
+"ptc_trackline: ptc_trackline none 0 0 " /*implemented by subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 "turns        = [i, 1], "
 "ffile    = [i, 1], "
 "file     = [s, track, track], "
@@ -466,11 +466,11 @@ char command_def[] =
 "ptc_setswitch: ptc_setswitch none 0 0 "
 "debuglevel = [i,0], "/*sets the level of debugging printout 0 none, 10 everything */
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
-"exact_mis = [l, false, true], " /* switch to ensure exact misaligment treatment */
-"totalpath = [l], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
-"radiation = [l], "  /*sets the radiation switch/internal state of PTC */
-"fringe = [l], "  /*sets the fringe switch/internal state of PTC */
-"time = [l, false, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
+"exact_mis = [l, true, true], " /* switch to ensure exact misaligment treatment */
+"totalpath = [l, true, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
+"radiation = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
+"fringe = [l, true, true], "  /*sets the fringe switch/internal state of PTC */
+"time = [l, true, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
 " " 
 "ptc_track: ptc_track none 0 0 "
 "icase        = [i, 4], "

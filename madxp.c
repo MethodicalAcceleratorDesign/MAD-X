@@ -1435,19 +1435,19 @@ void exec_command()
       {
         select_ptc_normal(p);
       }
-      else if (strcmp(p->cmd_def->module, "ptc_trackcavs") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_trackline") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackcavs, calling pro_ptc_trackcavs\n");
-        pro_ptc_trackcavs(p);
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackline, calling pro_ptc_trackline\n");
+        pro_ptc_trackline(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackcavs, calling pro_ptc_dumpmaps\n");
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackline, calling pro_ptc_dumpmaps\n");
         ptc_dumpmaps(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_twiss_linac") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_twiss_linac, calling pro_ptc_trackcavs\n");
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_twiss_linac, calling pro_ptc_trackline\n");
         current_twiss = p->clone;
         pro_ptc_twiss_linac(p);
       }

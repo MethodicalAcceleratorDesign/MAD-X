@@ -263,7 +263,7 @@ contains
     !****************************************************************************************
     !________________________________________________________________________________________
 
-  contains  ! what follows are internal subroutines of ptc_trackcavs
+  contains  ! what follows are internal subroutines of ptc_trackline
     !____________________________________________________________________________________________
 
     subroutine setcavity(f, x, phase_rel, charge, ene)
@@ -273,11 +273,10 @@ contains
       real(dp)                 :: phase_rel ! final relative phase
       integer, target          :: charge    ! charge of an particle
       integer(4)               :: tmp
-      logical                  :: ene       
-! switches if cavity should always maximally accelerate the reference track; lag is calculated
-      logical(lp)              :: givendene = .false. 
-! makes cavity always accelerate about a given value;  volt is calculated; lag and freq is preserved
-      real(dp)                 :: kf
+      logical                  :: ene       ! switches if cavity should always maximally accelerate 
+                                            ! the reference track; lag is calculated
+      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;  
+                                                      ! volt is calculated; lag and freq is preserved
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival
 
@@ -296,37 +295,22 @@ contains
       endif
 
 
-
       if(ene) then
-         de_mev=f%mag%volt*f%mag%l
-         if ( getdebug() > 4 ) write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
+         
+         if ( getdebug() > 4 ) then  
+            de_mev=f%mag%volt*f%mag%l
+            write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
+         endif    
          f%mag%phas = pi/2.0d0 - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
       else
-         if (f%mag%DELTA_E > 0) then
-            kf= -f%mag%DELTA_E/f%mag%l/f%dir/charge
-            if(givendene) then
-               !push about given energy, calculates the needed voltage keeping lag and freq
-               f%mag%volt=kf
-               f%magp%volt=kf
-            else
-               !uses simply the peak voltage and phase
-               f%mag%volt=sign(1.0_dp,kf*f%mag%volt) * f%mag%volt
-               f%magp%volt=f%mag%volt
-            endif
-            f%mag%phas=pi/2.0d0-twopi*f%mag%freq*arrivtime-c_%phase0
-            f%magp%phas=f%mag%phas
-         endif
-
-         phase_rel=f%mag%phas+twopi*f%mag%freq*arrivtime
+         
+         f%mag%phas = - f%mag%lag
+         f%magp%phas= f%mag%phas
+         phase_rel=f%mag%phas
+         
       endif
-
-      !       tmp = f%mag%phas/twopi
-      !       print *, tmp, f%mag%phas/twopi
-      !       f%mag%phas = f%mag%phas - twopi*dble(tmp)
-      !       f%magp%phas=f%mag%phas
-      !       print *, f%mag%phas
 
 
       !    write (*,*) 'energy (t/f)? :',ene, 'charge: ', charge
@@ -380,3 +364,29 @@ contains
   end subroutine setcavities
 
 end module madx_ptc_setcavs_module
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!   
+!         if (f%mag%delta_e > 0) then
+!            kf= -f%mag%delta_e/f%mag%l/f%dir/charge
+!            if(givendene) then
+!               !push about given energy, calculates the needed voltage keeping lag and freq
+!               f%mag%volt=kf
+!               f%magp%volt=kf
+!            else
+!               !uses simply the peak voltage and phase
+!               f%mag%volt=sign(1.0_dp,kf*f%mag%volt) * f%mag%volt
+!               f%magp%volt=f%mag%volt
+!            endif
+!            f%mag%phas=pi/2.0d0-twopi*f%mag%freq*arrivtime-c_%phase0
+!            f%magp%phas=f%mag%phas
+!         endif
+!         phase_rel=f%mag%phas+twopi*f%mag%freq*arrivtime
+
+!       tmp = f%mag%phas/twopi
+!       print *, tmp, f%mag%phas/twopi
+!       f%mag%phas = f%mag%phas - twopi*dble(tmp)
+!       f%magp%phas=f%mag%phas
+!       print *, f%mag%phas
+

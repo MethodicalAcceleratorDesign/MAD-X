@@ -84,7 +84,7 @@
 #define w_ptc_addpush           w_ptc_addpush_
 #define w_ptc_end               w_ptc_end_
 #define w_ptc_dumpmaps          w_ptc_dumpmaps_
-#define w_ptc_trackcavs         w_ptc_trackcavs_
+#define w_ptc_trackline         w_ptc_trackline_
 #define w_ptc_twiss_linac       w_ptc_twiss_linac_
 #define w_ptc_setdebuglevel     w_ptc_setdebuglevel_
 #define w_ptc_setaccel_method   w_ptc_setaccel_method_
@@ -700,7 +700,7 @@ void w_ptc_track();
 void w_ptc_start();
 void w_ptc_end();
 void w_ptc_dumpmaps();
-void w_ptc_trackcavs(int* nobspoints);
+void w_ptc_trackline(int* nobspoints);
 void w_ptc_twiss_linac(int* tabname);
 void w_ptc_setdebuglevel(int* level);
 void w_ptc_setaccel_method(int* method);

@@ -1,4 +1,4 @@
-module madx_ptc_trackcavs_module
+module madx_ptc_trackline_module
   use madx_ptc_module
   use madx_ptc_intstate_module
   use madx_ptc_setcavs_module
@@ -6,7 +6,7 @@ module madx_ptc_trackcavs_module
   save
   public
 
-  public                              :: ptc_trackcavs       ! subroutine inside the module
+  public                              :: ptc_trackline       ! subroutine inside the module
 
 ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
@@ -24,9 +24,9 @@ module madx_ptc_trackcavs_module
 
 contains
 
-  subroutine ptc_trackcavs(nobs)
+  subroutine ptc_trackline(nobs)
     ! subroutine that performs tracking with acceleration
-    ! it is called as a result of ptc_trackcavs MAD-X command
+    ! it is called as a result of ptc_trackline MAD-X command
 
     implicit none
     integer, intent (IN) :: nobs ! the maximum number of observation points >=1
@@ -55,8 +55,8 @@ contains
 
     !------------------------------------------------------
 
-    nturns = get_value('ptc_trackcavs ','turns ')
-    if (getdebug() > 2) print *, 'ptc_trackcavs, nturns = ', nturns
+    nturns = get_value('ptc_trackline ','turns ')
+    if (getdebug() > 2) print *, 'ptc_trackline, nturns = ', nturns
 
     if ( (nturns > 1) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('WARNING: You can not make more than one turn in a line!', &
@@ -218,7 +218,7 @@ contains
 
     end subroutine putintracktable
 
-  end subroutine ptc_trackcavs
+  end subroutine ptc_trackline
   !_________________________________________________________________________________
   !_________________________________________________________________________________
 
@@ -861,4 +861,4 @@ contains
   end subroutine knobs
 
 
-end module madx_ptc_trackcavs_module
+end module madx_ptc_trackline_module
