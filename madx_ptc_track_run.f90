@@ -469,6 +469,7 @@ CONTAINS
     !=============================================================================
 
     SUBROUTINE Values_from_ptc_track_command ! Internal procedure (f95)
+    USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
       ! IMPLICIT NONE => in host
       ! local variables
       !DOUBLE PRECISION :: maxaper(1:6) move to HOST
@@ -551,7 +552,9 @@ CONTAINS
 
       Normal_Order_n0  = get_value('ptc_track ','norm_no ')
 
-      ptc_track_debug  =  get_value('ptc_track ','debug ') .ne. 0
+      !ptc_track_debug  =  get_value('ptc_track ','debug ') .ne. 0  ! before 2006.03.20
+      ptc_track_debug  =  getdebug () .ne. 0  ! ptc_track_debug=.T., if debuglevel.ge.1 ,i.e.,
+                                              ! in the madx input: ptc_setswitch, debuglevel=1 
 
       debug_print_1: if (ptc_track_debug) then
          print *,' '
@@ -2020,6 +2023,7 @@ CONTAINS
       include 'name_len.fi'
       integer i,j,npart,turn,tot_segm,segment,part_id(*),length
       REAL(dp) :: z(6,*),orbit0(6),tmp,tt,ss
+      real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       !vvk
       REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv), tmp_norm
 
@@ -2049,8 +2053,10 @@ CONTAINS
            &segment,tot_segm,npart,ielem,el_name
       call comment_to_table(table_putone, comment, length)
       tt = turn
+        Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
       do i = 1, npart
          call double_to_table(table_putone, 'turn ', tt)
+         call double_to_table(table_putone, 'e ', energy)
          ss = part_id(i)
          call double_to_table(table_putone, 'number ', ss)
          do j = 1, 6
