@@ -300,6 +300,13 @@ CONTAINS
     j=0
     l_machine=zero
 10  continue
+    nst1=node_value("nst ")
+    if(nst1.gt.0) then
+       nstd = nst1
+    else
+       nstd = nst0
+    endif
+
     call zero_key(key)
     j=j+1
     nt=nt+1
@@ -359,13 +366,6 @@ CONTAINS
        EXACT_MODEL = exact1 .ne. 0
     else
        EXACT_MODEL = exact0
-    endif
-
-    nst1=node_value("nst ")
-    if(nst1.gt.0) then
-       nstd = nst1
-    else
-       nstd = nst0
     endif
 
     !special node keys
