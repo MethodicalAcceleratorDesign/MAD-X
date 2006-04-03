@@ -711,7 +711,7 @@ CONTAINS
          print *, "  ,x_coord_co(5),deltap=", &           !                !
               x_coord_co(5),deltap                        !                !
       end if !--------------------------------------------!                !
-      !                                                                    !
+      !  
       if(closed_orbit) then !--------------------------------!             !
          call find_orbit(my_ring,x_coord_co,1,default,1d-7)  !             !
          print*,"Closed orbit VK: ",x_coord_co               !             !
@@ -890,7 +890,8 @@ CONTAINS
          !                                                                        !
          tmp_d = j_th_particle                                                    !
          call double_to_table('tracksumm ', 'number ', tmp_d)                     !
-         tmp_d = 1                                                                !
+         ! tmp_d = 1 <=  turn=1  in the original 2005 trrun.f                     !                          
+         tmp_d=0   ! <=  turn=0  for starting particles                           !
          call double_to_table('tracksumm ', 'turn ', tmp_d)                       !
          do k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
             !tmp_d = z(k_th_coord,j_th_particle) - orbit0(k_th_coord)         !   !
