@@ -1512,7 +1512,7 @@
       length = len(comment)
       segment = segment + 1
 !hbu
-      write(comment, '(''!segment'',4i8,1X,A)')                         &
+      write(comment, '(''#segment'',4i8,1X,A)')                         &
      &segment,tot_segm,npart,ielem,el_name
       call comment_to_table(table, comment, length)
       tt = turn
