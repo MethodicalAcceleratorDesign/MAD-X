@@ -311,7 +311,7 @@ CONTAINS
     ! At debug stage it is printed out with the command <write> in input file,
     ! e.g. "write,table=tracksumm, file=track_summary.txt;"
 
-    Call Enter_1st_turn_in_tables
+    Call Enter_0st_turn_in_tables
     ! Subroutines "tt_putone" and "tt_puttab"  from the file "trrun.F" are used.
     ! (renamed as "tt_putone_coord" & "tt_puttab_coord"
     ! The name of the tables are "trackone" and "track.obs$$$$.p$$$$"
@@ -376,6 +376,10 @@ CONTAINS
 
        !                                                                          !
     end do Loop_over_turns !===========loop over turn ============================!
+
+    Call Final_Coord_to_tables ! Complete all tables by one subroutine: 
+    !'trackone' filled before by by tt_puttab_coord, 'track.obs$$$$.p$$$$' by 
+    ! tt_putone_coord  and, the summary table 'tracksumm' 
 
 
     Output_observ_with_PTC: IF((.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
@@ -883,6 +887,7 @@ CONTAINS
 
       integer :: j_th_particle, k_th_coord ! counter
       double precision :: tmp_d ! temprorary dble vaiable
+      real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       ! Summary Table
       !--- enter start coordinates in summary table
       do  j_th_particle = 1, & !=====loop over particles ==== ====================!
@@ -907,6 +912,10 @@ CONTAINS
             !    with name "name". The table count is increased               !   !
             !    separately with "augment_count" */                           !   !
          enddo !>>>>> END loop over components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!   !
+         Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C, &                   !
+                                     gamma0I,gambet) ! to get "energy" value      !
+         call double_to_table('tracksumm ', 'e ', energy)                         !
+                                                                                  !
          !hbu add s                                                               !
          call double_to_table('tracksumm ',vec_names(7),spos_current_position)    !
          ! madxd.h:12:#define double_to_table       double_to_table_              !
@@ -921,13 +930,13 @@ CONTAINS
 
     !=============================================================================
 
-    SUBROUTINE Enter_1st_turn_in_tables
+    SUBROUTINE Enter_0st_turn_in_tables
       ! IMPLICIT NONE => in the host
 
       ! Local:
       integer :: j_th_particle ! loop counter
       if (ptc_track_debug) then
-         print*; Print *, 'Start Subr.<Enter_1st_turn_in_tables>'
+         print*; Print *, 'Start Subr.<Enter_0st_turn_in_tables>'
          print*, 'ptc_switch=', ptc_switch, '  ptc_ onetable=', ptc_onetable
          ! print *, 'eigen=', eigen, '<call track_pteigen(eigen)> Excluded !!!'
       endif ! debug printing
@@ -999,7 +1008,7 @@ CONTAINS
          endif !>> END if (onetable) >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!  !
       endif ! == switch =>RUN =========================================================!
 
-    END SUBROUTINE Enter_1st_turn_in_tables
+    END SUBROUTINE Enter_0st_turn_in_tables
 
     !=============================================================================
 
@@ -1520,6 +1529,16 @@ CONTAINS
       endif ! END :::: if(turn/ffile)=integer ::::::::::::::::::::::::::::::!     !       o
       !                                                                                   p
     END SUBROUTINE Write_tables_after_total_turn
+    !=============================================================================
+
+    !=============================================================================
+    SUBROUTINE Final_Coord_to_tables ! Complete all tables by one subroutine: 
+    !'trackone' filled before by by tt_puttab_coord, 'track.obs$$$$.p$$$$' by 
+    ! tt_putone_coord  and, the summary table 'tracksumm' 
+    
+    ! IMPLICIT NONE => in the host        
+
+    END SUBROUTINE Final_Coord_to_tables
     !=============================================================================
 
     !==============================================================================
@@ -2050,7 +2069,8 @@ CONTAINS
       length = len(comment)
       segment = segment + 1
       !hbu
-      write(comment, '(''!segment'',4i8,1X,A)')                         &
+      !write(comment, '(''!segment'',4i8,1X,A)')   &
+       write(comment, '(''#segment'',4i8,1X,A)')   & 
            &segment,tot_segm,npart,ielem,el_name
       call comment_to_table(table_putone, comment, length)
       tt = turn
