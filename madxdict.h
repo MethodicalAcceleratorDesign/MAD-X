@@ -457,8 +457,7 @@ char command_def[] =
 "onetable = [l, false, true]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_dumpmaps: ptc_dumpmaps none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/
-"file     = [s, ptcmaps, ptcmaps], "
-"extension= [s, none, none]; "
+"file     = [s, ptcmaps, ptcmaps]; "
 " "
 "ptc_track_shape: ptc_track_shape none 0 0 "
 "debug = [i, 0, 1]; "
