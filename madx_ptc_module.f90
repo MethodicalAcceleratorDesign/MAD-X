@@ -917,7 +917,9 @@ CONTAINS
        call fort_warn('return from ptc_twiss: ',' no layout created')
        return
     endif
-
+    
+    call cleartables()
+    
     nda=0
     suml=zero
 
@@ -1157,18 +1159,18 @@ CONTAINS
       opt_fun(25)=tw%gama(3,1) * deltae
       opt_fun(26)=tw%gama(3,2) * deltae
       opt_fun(27)=tw%gama(3,3) * deltae
-      opt_fun(28)=tw%mu(1)
-      opt_fun(29)=tw%mu(2)
-      opt_fun(30)=tw%mu(3)
-      opt_fun(31)=tw%disp(1)
-      opt_fun(32)=tw%disp(2)
-      opt_fun(33)=tw%disp(3)
-      opt_fun(34)=tw%disp(4)
-      opt_fun(35)=tw%disp(5)
-      opt_fun(36)=tw%disp(6)
+      opt_fun(28)=tw%mu(1) * deltae
+      opt_fun(29)=tw%mu(2) * deltae
+      opt_fun(30)=tw%mu(3) * deltae
+      opt_fun(31)=tw%disp(1) * deltae
+      opt_fun(32)=tw%disp(2) * deltae
+      opt_fun(33)=tw%disp(3) * deltae
+      opt_fun(34)=tw%disp(4) * deltae
+      opt_fun(35)=tw%disp(5) * deltae
+      opt_fun(36)=tw%disp(6) * deltae
 
-      if (getdebug() > 9) write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
-
+      if (getdebug() > 9)   write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      
       ioptfun=36
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)

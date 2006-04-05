@@ -11,6 +11,7 @@ module madx_ptc_tablepush_module
   !  PUBLIC INTERFACE
   public                                      :: putusertable
   public                                      :: addpush
+  public                                      :: cleartables
 
   !============================================================================================
   !  PRIVATE
@@ -63,7 +64,19 @@ contains
 
   end subroutine putusertable
   !____________________________________________________________________________________________
+   
+  subroutine cleartables()
+    implicit none
+    integer  :: i ! iterator
+    ! we do not deal here with the main twiss table, hence we do not clear it
+    do i=1,ntables
+       if (getdebug()>9) print *,"Clearing ",tables(i)
+       call reset_count(tables(i)) 
+    enddo
 
+  end subroutine cleartables
+  !____________________________________________________________________________________________
+   
   subroutine augment_counts()
     implicit none
     integer  :: i ! iterator
@@ -110,7 +123,7 @@ contains
 
   end subroutine addpush
   !____________________________________________________________________________________________
-
+  
 
   logical function issuchtableexist(tname)
     implicit none
