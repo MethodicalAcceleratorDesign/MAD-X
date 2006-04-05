@@ -360,7 +360,7 @@ void error_efcomp(struct in_cmd* cmd)
 /*
     i = 0;
     while((cmd->tok_list->p[i]) != NULL) {
-      for(k=0;k<6;k++) {
+      for(k=0;k<4;k++) {
           if(strcmp(cmd->tok_list->p[i],attv[k]) == 0) {
              iattv[k] = 1;
           }
@@ -368,7 +368,7 @@ void error_efcomp(struct in_cmd* cmd)
     i++;
     }
 */
-    for(k=0; k<6; k++) {
+    for(k=0; k<4; k++) {
          pos = name_list_pos(attv[k],nl);
          if(nl->inform[pos] > 0) {
              if (get_option("debug"))
@@ -529,7 +529,7 @@ void error_efcomp(struct in_cmd* cmd)
          /* normal components -> 2j, skew components 2j+1 */
          if(flgmgt == 1) {
 
-           for(i=0;i<6;i++)  {   /* loop over possible commands */
+           for(i=0;i<4;i++)  {   /* loop over possible commands */
 
              if (get_option("debug")) fprintf(prt_file, "%s %d\n",attv[i],iattv[i]);
 
