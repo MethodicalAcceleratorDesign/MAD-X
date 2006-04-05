@@ -950,7 +950,7 @@
               enddo
 !--Write Generating Function Calculation of each Element
               if(iu_on.eq.2.or.iu_on.eq.3) then
-                table_name ='distort_1_F_all\0'
+                table_name ='distort_1_F_all '
                 data_size = ivar(ia)
                 call fit_table(table_name,data_size,table_size_76)
                 do j=1,data_size
@@ -978,7 +978,7 @@
               endif
 !--Calculate and write Hamiltonian of each Element
               if(iu_on.eq.2.or.iu_on.eq.3) then
-                table_name ='distort_1_H_all\0'
+                table_name ='distort_1_H_all '
                 data_size = ivar(ia)
                 call fit_table(table_name,data_size,table_size_77)
                 do j=1,data_size
@@ -1012,7 +1012,7 @@
 !--Write total Generating Function
             if(iu_on.eq.1.or.iu_on.eq.3) then
               write(6,10020)
-              table_name ='distort_1_F_end\0'
+              table_name ='distort_1_F_end '
               data_size = ivar(ia)
               call fit_table(table_name,data_size,table_size_74)
               do j=1,data_size
@@ -1039,7 +1039,7 @@
               enddo
 !--Calculate and write total Hamiltonian
               write(6,10030)
-              table_name ='distort_1_H_end\0'
+              table_name ='distort_1_H_end '
               data_size = ivar(ia)
               call fit_table(table_name,data_size,table_size_75)
               do j=1,data_size
@@ -1501,7 +1501,7 @@
 !--Order the resonance terms
             call sortres(3,imax,ica2)
             write(6,10060)
-            table_name ='distort_2_F_end\0'
+            table_name ='distort_2_F_end '
             data_size = ica2
             call fit_table(table_name,data_size,table_size_78)
             do k1=1,data_size
@@ -1535,7 +1535,7 @@
               facd2(2,k1)=zero
             enddo
             write(6,10070)
-            table_name ='distort_2_H_end\0'
+            table_name ='distort_2_H_end '
             data_size = ica2
             call fit_table(table_name,data_size,table_size_79)
             do k1=1,data_size
@@ -2551,7 +2551,7 @@
 !---  handle unit 71 (detune_1_all)
 
         if(iu_on.eq.2.or.iu_on.eq.3) then
-          table_name = 'detune_1_all\0'
+          table_name = 'detune_1_all '
           data_size = 2*ih1+2+j71
           call fit_table(table_name,data_size,table_size_71)
           do i=ih1,0,-1
@@ -2592,7 +2592,7 @@
 
       else if(icase.eq.1) then
         write(6,10000)
-        table_name = 'detune_1_end\0'
+        table_name = 'detune_1_end '
         data_size = 2*ih1+2+j70
         call fit_table(table_name,data_size,table_size_70)
         do i=ih1,0,-1
@@ -2644,7 +2644,7 @@
 
         write(6,10000)
         if(iu_on.eq.1.or.iu_on.eq.3) then
-          table_name = 'detune_2_end\0'
+          table_name = 'detune_2_end '
           data_size = ih1+1+j72
           call fit_table(table_name,data_size,table_size_72)
         endif
@@ -2667,7 +2667,7 @@
 
         if(iu_on.eq.2.or.iu_on.eq.3) then
           write(6,10020)
-          table_name = 'detune_2_all\0'
+          table_name = 'detune_2_all '
           data_size = ih1+2+j73
           call fit_table(table_name,data_size,table_size_73)
         endif
@@ -2906,7 +2906,7 @@
 
       tab_name = table_name
       ll = len(tab_name)
-      tab_name(ll:ll) = '\0'
+      tab_name(ll:ll) = ' '
  10   if(data_size .gt. tab_size) then
         call double_table(tab_name)
         tab_size = tab_size*2
@@ -2947,14 +2947,14 @@
       data tab_types_8/1,2,2,2,1,1,1,1/
       data tab_types_9/1,1,2,2,2,1,1,1,1/
       data tab_types_11/1,1,1,2,2,2,2,1,1,1,1/
-      data name_5/'mpor\0','plane/mpor2\0','detune\0','H_inv_order\0',  &
-     &'V_inv_order\0'/
-      data name_8/'mpor\0','cos \0','sin\0','amp\0','j\0','k\0','l\0',  &
-     &'m\0'/
-      data name_9/'mpor\0','mpor2\0','cos\0','sin\0','amp\0','j\0',     &
-     &'k\0','l\0','m\0'/
-      data name_11/'mpor\0','app\0','res\0','pos\0','cos\0','sin\0',    &
-     &'amp\0','j\0','k\0','l\0','m\0'/
+      data name_5/'mpor ','plane/mpor2 ','detune ','H_inv_order ',      &
+     &'V_inv_order '/
+      data name_8/'mpor ','cos  ','sin ','amp ','j ','k ','l ',         &
+     &'m '/
+      data name_9/'mpor ','mpor2 ','cos ','sin ','amp ','j ',           &
+     &'k ','l ','m '/
+      data name_11/'mpor ','app ','res ','pos ','cos ','sin ',          &
+     &'amp ','j ','k ','l ','m '/
 
       goto(50,80,90,110) table_type_index(table_type)
  50   do k = 1,5
