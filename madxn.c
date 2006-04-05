@@ -1821,6 +1821,9 @@ void exec_create_table(struct in_cmd* cmd)
   char** t_c;
   int j, pos = name_list_pos("table", nl);
   char* name = NULL;
+  char withname = 0; /*specify if table should have column "name" of strings*/
+  int  ncols = 0;  /*number of columns*/  
+  
   if (nl->inform[pos] == 0)
   {
     warning("no table name:", "ignored");
@@ -1836,6 +1839,7 @@ void exec_create_table(struct in_cmd* cmd)
     warning("table already exists: ", "ignored");
     return;
   }
+
   pos = name_list_pos("column", nl);
   if (nl->inform[pos] == 0)
   {
@@ -1843,14 +1847,40 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
-  t_types = mymalloc(rout_name, m->curr*sizeof(int));
-  t_c = mymalloc(rout_name, (m->curr+1)*sizeof(char*));
+  
+  pos = name_list_pos("withname", nl);
+  printf("Value of withname %d\n",pos);
+  if (pl->parameters[pos] != 0x0)
+  {
+    if (pl->parameters[pos]->double_value != 0.0)
+     {
+       printf("We add <<name>> column\n");
+       withname = 1;
+       ncols = m->curr+1;
+     }
+    else
+     {
+       ncols = m->curr;
+     } 
+  }
+  
+  
+  t_types = mymalloc(rout_name, ncols*sizeof(int));
+  t_c = mymalloc(rout_name, (ncols+1)*sizeof(char*));
+
   for (j = 0; j < m->curr; j++)
   {
     t_types[j] = 2; /* type double */
     t_c[j] = permbuff(m->p[j]);
   }
-  t_c[m->curr] = blank;
+  
+  if (withname)
+   {
+    t_types[m->curr] = 3; /* type string */
+    t_c[m->curr] = permbuff("name");
+   }
+  
+  t_c[ncols] = blank;
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
   t->org_cols = 0;  /* all entries are "added" */
   add_to_table_list(t, table_register);
@@ -7751,7 +7781,6 @@ void pro_ptc_select(struct in_cmd* cmd)
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
   int                            place       = -1;
-
 /*
   int                            i           = 0;  
   struct node*                   nodes[2]    = {0x0,0x0};
@@ -7806,10 +7835,18 @@ void pro_ptc_select(struct in_cmd* cmd)
   pos = name_list_pos(columnname,aTable->columns);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_select: Can not find column named <<%s>> in table <<%s>>.\n",
+    error("madxn.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
            columnname,aTable->name);
     return;
   }
+
+  pos = name_list_pos("name",aTable->columns);
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_select","There  column named <<name>> in table <<%s>>.\n",aTable->name);
+     return;
+   }
+
 
 /*Checks the place*/
 /*
@@ -7836,22 +7873,22 @@ else
 }
 */
 
-element = (int)command_par_value("polynomial",cmd->clone);
-monomial = command_par_string("monomial",cmd->clone);
-  
-tabnameIA = new_int_array(1+strlen(tablename));
-colnameIA = new_int_array(1+strlen(columnname));
-monoIA = new_int_array(1+strlen(monomial));
-conv_char(tablename,tabnameIA);
-conv_char(columnname,colnameIA);
-conv_char(monomial,monoIA);
-  
-place++; /*Converting to the Fortran numeration (1...n)*/
-w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
-  
-delete_int_array(tabnameIA);
-delete_int_array(colnameIA);
-delete_int_array(monoIA);
+  element = (int)command_par_value("polynomial",cmd->clone);
+  monomial = command_par_string("monomial",cmd->clone);
+
+  tabnameIA = new_int_array(1+strlen(tablename));
+  colnameIA = new_int_array(1+strlen(columnname));
+  monoIA = new_int_array(1+strlen(monomial));
+  conv_char(tablename,tabnameIA);
+  conv_char(columnname,colnameIA);
+  conv_char(monomial,monoIA);
+
+  place++; /*Converting to the Fortran numeration (1...n)*/
+  w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
+
+  delete_int_array(tabnameIA);
+  delete_int_array(colnameIA);
+  delete_int_array(monoIA);
 
 }
 /********************************************************************************/

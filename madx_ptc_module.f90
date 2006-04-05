@@ -1055,7 +1055,7 @@ CONTAINS
           goto 100
        endif
 
-       call putusertable(i,y)
+       call putusertable(i,current%mag%name,y)
 
        suml=suml+current%MAG%P%ld
        tw=y

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/utsname.h>
@@ -4654,7 +4655,50 @@ double variable_value(struct variable* var)
   return val;
 }
 
-void warning(char* t1, char* t2)
+void warning(char* t1, register char* fmt, ...)
+{
+/*prints warning on the standard error and accepts parameters printout with std C formatting*/
+/*Piotr Skowronski CERN*/
+  va_list         list;
+
+  warn_numb++; /*I think that warnings should be counted even if the user does not want to see them*/
+  fflush(0); /*flushes all the buffers -> so the warning appears in a correct place*/
+
+  if (get_option("warn") == 0)
+   {
+     return;
+   }
+
+  va_start( list, fmt );
+
+  fprintf(stderr,"++++++ warning: %s",t1); /*prints first part to the STDERR and +++....*/
+  vfprintf(stderr, fmt, list); /*prints the second part and variables*/
+  fprintf(stderr,"\n"); /*prints end of line*/
+  fflush(stderr); /*flushes STDERR*/
+  va_end(list);
+}
+
+void error(char* t1, register char* fmt, ...)
+{
+/*prints warning on the standard error and accepts parameters printout with std C formatting*/
+/*Piotr Skowronski CERN*/
+  va_list         list;
+
+  warn_numb++; /*I think that warnings should be counted even if the user does not want to see them*/
+  fflush(0); /*flushes all the buffers -> so the warning appears in a correct place*/
+
+  va_start( list, fmt );
+
+  fprintf(stderr,"++++++ Error: %s",t1); /*prints first part to the STDERR and +++....*/
+  vfprintf(stderr, fmt, list); /*prints the second part and variables*/
+  fprintf(stderr,"\n"); /*prints end of line*/
+  fflush(stderr); /*flushes STDERR*/
+  va_end(list);
+}
+
+
+
+void warningOld(char* t1, char* t2)
 {
   if (get_option("warn")) 
   {
