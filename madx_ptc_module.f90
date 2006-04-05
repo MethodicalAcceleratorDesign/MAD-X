@@ -943,13 +943,7 @@ CONTAINS
 
     if(closed_orbit) then
        call find_orbit(my_ring,x,1,default,1d-7)
-       if(icase.eq.4) then
-          print*,"Closed orbit: ",x(1),x(2),x(3),x(4)
-       elseif(icase.eq.5) then
-          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(5)
-       elseif(icase.eq.6) then
-          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(6),x(5)
-       endif
+       CALL write_closed_orbit(icase,x)
     endif
 
     no = get_value('ptc_twiss ','no ')
@@ -1696,13 +1690,7 @@ CONTAINS
     closed_orbit = get_value('ptc_normal ','closed_orbit ') .ne. 0
     if(closed_orbit) then
        call find_orbit(my_ring,x,1,default,1d-7)
-       if(icase.eq.4) then
-          print*,"Closed orbit: ",x(1),x(2),x(3),x(4)
-       elseif(icase.eq.5) then
-          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(5)
-       elseif(icase.eq.6) then
-          print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(6),x(5)
-       endif
+       CALL write_closed_orbit(icase,x)
     endif
 
     no = get_value('ptc_normal ','no ')
@@ -1934,13 +1922,7 @@ CONTAINS
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
     if(closed_orbit) then
        call find_orbit(my_ring,x0,1,default,1d-7)
-       if(icase.eq.4) then
-          print*,"Closed orbit: ",x0(1),x0(2),x0(3),x0(4)
-       elseif(icase.eq.5) then
-          print*,"Closed orbit: ",x0(1),x0(2),x0(3),x0(4),x0(5)
-       elseif(icase.eq.6) then
-          print*,"Closed orbit: ",x0(1),x0(2),x0(3),x0(4),x0(6),x0(5)
-       endif
+       CALL write_closed_orbit(icase,x0)
     endif
 
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
@@ -2420,5 +2402,39 @@ CONTAINS
          ' F90FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
     stop
   end subroutine f90flush
+
+  SUBROUTINE Coord_MAD_to_PTC(X_MAD,X_PTC)
+  ! Convert coordinates from MAD to PTC
+  IMPLICIT NONE
+  REAL(dp), INTENT(IN)  :: X_MAD(6)
+  REAL(dp), INTENT(OUT) :: X_PTC(6)
+  X_PTC=X_MAD ! for all elements 
+  X_PTC(5)=X_MAD(6);  X_PTC(6)=-X_MAD(5);
+
+  END SUBROUTINE Coord_MAD_to_PTC
+
+  SUBROUTINE Coord_PTC_to_MAD(X_PTC,X_MAD)
+  ! Convert coordinates from PTC to MAD
+  IMPLICIT NONE
+  REAL(dp), INTENT(IN)  :: X_PTC(6)
+  REAL(dp), INTENT(OUT) :: X_MAD(6)
+
+  X_MAD=X_PTC ! for all elements 
+  X_MAD(5)=-X_PTC(6); X_MAD(6)=X_PTC(5);
+
+  END SUBROUTINE Coord_PTC_to_MAD
+
+  SUBROUTINE write_closed_orbit(icase,x)
+  INTEGER,  INTENT(IN):: icase
+  REAL (dp),INTENT(IN) :: x(6)
+    if(icase.eq.4) then
+       print*,"Closed orbit: ",x(1),x(2),x(3),x(4)
+    elseif(icase.eq.5) then
+       print*,"Closed orbit: ",x(1),x(2),x(3),x(4),x(5)
+    elseif(icase.eq.6) then
+       print*,"Closed orbit: ",x(1),x(2),x(3),x(4),-x(6),x(5)
+    endif
+  ENDSUBROUTINE write_closed_orbit
+
 
 END MODULE madx_ptc_module

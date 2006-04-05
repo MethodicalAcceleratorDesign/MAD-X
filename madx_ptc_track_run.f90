@@ -107,7 +107,8 @@ CONTAINS
          PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &                                   !
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
-         Find_Envelope                                                                     !
+         Find_Envelope, &                                                                  !
+         Coord_MAD_to_PTC, Coord_PTC_to_MAD, write_closed_orbit                            !
     !======================================================================================!
 
     IMPLICIT NONE
@@ -195,8 +196,8 @@ CONTAINS
     !hbu
     character*4 vec_names(7)
     !hbu
-!!! data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
-    data vec_names     / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
+    data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MADX
+    !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
 
     !k    data char_a / ' ' /
     !-------------------------------------------------------------------------
@@ -713,8 +714,10 @@ CONTAINS
       !   initialize the closed orbit coordinates                          !
       ! x0(:)=zero                                                         !
       x_coord_co(:)=zero                                                   !
-      if (ptc_track_debug) print *, &                                      !
-           " x_coord_co(:)=zero = ",x_coord_co                             !
+      if (ptc_track_debug) THEN !---------------------------!              !
+         print *, " x_coord_co(:)=zero = "                  !              !
+           CALL write_closed_orbit(icase_PTC,x_coord_co)    !              !
+      end if !----------------------------------------------!              !
       !                                                                    !
       if(icase_ptc.eq.5) x_coord_co(5)=deltap                              !
       if (ptc_track_debug) then  !------------------------!                !
@@ -725,11 +728,8 @@ CONTAINS
                                                                            !  
       if(closed_orbit) then !----------------------------------!           !
          call find_orbit(my_ring,x_coord_co,1,default,1d-7)    !           !
-         print*,"============================================" !           !
-         print*," ptc_track: the closed orbit at START, Xco  " !           !
-         print*, (x_coord_co(i_tmp),i_tmp=1,2);                !           !
-         print*, (x_coord_co(i_tmp),i_tmp=3,4);                !           !
-         print*, (x_coord_co(i_tmp),i_tmp=5,6);                !           !
+         print*,"===== ptc_tack =============================" !           !
+         CALL write_closed_orbit(icase_PTC,x_coord_co)         !           !
          print*,"============================================" !           !
       endif  !-------------------------------------------------!           !
                                                                            !
@@ -836,14 +836,14 @@ CONTAINS
       if (ptc_track_debug) then
          print*; Print *, 'Initial particle coordinates of ', &
               jmax_numb_particl_at_i_th_turn, ' particles.'
-         Print*, 'No.particle  No_coord, x_closed orbit  x_incl_co '
+         Print*, 'No.particle  No_coord,x_incl_co '
 
          Do j_th_particle=1,jmax_numb_particl_at_i_th_turn
             DO k_th_coord=1,6
                Print*,j_th_particle, k_th_coord, &
-                    x_coord_co(k_th_coord), &
                     x_coord_incl_co(k_th_coord,j_th_particle)
             END DO
+            CALL write_closed_orbit(icase_PTC,x_coord_co)
          end Do
          Print *, '================================================'
          Print *, ' '
@@ -901,6 +901,8 @@ CONTAINS
       integer :: j_th_particle, k_th_coord ! counter
       double precision :: tmp_d ! temprorary dble vaiable
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+      REAL (dp) :: X_MAD(6), X_PTC(6)
+
       ! Summary Table
       !--- enter start coordinates in summary table
       do  j_th_particle = 1, & !=====loop over particles ==== ====================!
@@ -908,15 +910,22 @@ CONTAINS
          !                                                                        !
          tmp_d = j_th_particle                                                    !
          call double_to_table('tracksumm ', 'number ', tmp_d)                     !
-         ! tmp_d = 1 <=  turn=1  in the original 2005 trrun.f                     !                          
+         ! tmp_d = 1 <=  turn=1  in the original 2005 trrun.f                     !
+                                                                                  !
          tmp_d=0   ! <=  turn=0  for starting particles                           !
          call double_to_table('tracksumm ', 'turn ', tmp_d)                       !
-         do k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
+         DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
             !tmp_d = z(k_th_coord,j_th_particle) - orbit0(k_th_coord)         !   !
             !z(1:6,1:j_tot) - coordinates                                     !   !
             !orbit0(1:6)    - (dble; 1:6) closed orbit                        !   !
-            tmp_d = x_coord_incl_co(k_th_coord,j_th_particle) - &             !   !
+            X_PTC(k_th_coord)=x_coord_incl_co(k_th_coord,j_th_particle) - &   !   !
                  x_coord_co(k_th_coord)                                       !   !
+         ENDDO !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!   !
+         !                                                                        !
+         CALL Coord_PTC_to_MAD(X_PTC,X_MAD)                                       !
+         !                                                                        !
+         DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
+            tmp_d = X_MAD(k_th_coord)                                         !   !
             !                                                                 !   !
             call double_to_table('tracksumm ', vec_names(k_th_coord), tmp_d)  !   !
             !madxn.c:1385: void                                               !   !
@@ -1554,6 +1563,7 @@ CONTAINS
     double precision :: tmp_dble ! temprorary dble vaiable
     INTEGER :: j_part_tmp, turn_final, i_coord 
     real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+    REAL (dp) :: X_MAD(6), X_PTC(6)
 
     turn_final=min(turns,i_th_turn) ! the FORTRAN bad feature: 
                                     ! if DO-loop ends, turn > turns    
@@ -1699,9 +1709,14 @@ CONTAINS
           !do j       = 1, 6 !>>>> loop over coord. components >>>>>>>>>>>>>>>>>!     !
            DO i_coord = 1, 6                                                    !     !
              !tmp_d =  last_orbit(j,i) - orbit0(j)                              !     !
-              tmp_dble=last_orbit_of_lost_particle(i_coord,j_part_tmp)- &       !     !
+              X_PTC(i_coord)=last_orbit_of_lost_particle(i_coord,j_part_tmp)- & !     !
                                         x_coord_co(i_coord)                     !     !
-                                                                                !     !
+           ENDDO !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!     !
+           !                                                                          ! 
+           CALL Coord_PTC_to_MAD(X_PTC,X_MAD)                                         !
+           !                                                                          !
+           DO i_coord = 1, 6 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!     !
+              tmp_dble=X_MAD(i_coord)
               call double_to_table('tracksumm ', vec_names(i_coord), tmp_dble)  !     !
              !call double_to_table('tracksumm ', vec_names(j), tmp_d)           !     !
                                                                                 !     ! 
@@ -2233,6 +2248,8 @@ CONTAINS
       !vvk
       REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv), tmp_norm
 
+      REAL (dp) :: X_MAD(6), X_PTC(6)
+
       !hbu was *36 allow longer info
       character*80 table_putone,comment
       !hbu
@@ -2244,8 +2261,8 @@ CONTAINS
       !hbu
       character*4 vec_names(7)
       !hbu
-!!!data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
-      data vec_names    / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MAD order
+     !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
       data table_putone / 'trackone' /
 
       !vk
@@ -2266,20 +2283,33 @@ CONTAINS
          call double_to_table(table_putone, 'e ', energy)
          ss = part_id(i)
          call double_to_table(table_putone, 'number ', ss)
+
          do j = 1, 6
             tmp=zero
             IF (j.LE.mynpa) tmp = z(j,i) - orbit0(j)
             tmp_coord_array(j)=tmp ! make array of coordinates
+            X_PTC(j)=tmp
+         end do 
+            CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates
+         do j = 1, 6         
+            tmp=X_MAD(j)
             IF( (.NOT.closed_orbit) .OR. (.NOT.NORM_OUT)) THEN
                call double_to_table(table_putone, vec_names(j), tmp)
             END IF
          enddo
+
          ! make normalization, if necessary
          IF( closed_orbit .AND. NORM_OUT) THEN
             tmp_norm_array=A_t_map_rev*tmp_coord_array
+        
+            DO j = 1, 6
+            X_PTC(j)=zero
+               IF (j.LE.mynpa) X_PTC(j)=tmp_norm_array(j)            
+            ENDDO            
+            CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates
             DO j = 1, 6
                tmp_norm=zero
-               IF (j.LE.mynpa) tmp_norm=tmp_norm_array(j)
+               IF (j.LE.mynpa) tmp_norm=X_MAD(j)
                call double_to_table(table_putone, vec_names(j), tmp_norm)
             END DO
          END IF
@@ -2312,15 +2342,18 @@ CONTAINS
 
       integer  :: npart,turn,j,nobs
       REAL(dp) :: orbit(6),orbit0(6),tmp,tt,tn
+
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+      REAL (dp) :: X_MAD(6), X_PTC(6)
+
       character*36 table_puttab
       !hbu
       REAL(dp) :: spos
       !hbu
       character*4 vec_names(7)
       !hbu
-!!! data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
-      data vec_names     / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
+      data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MAD order
+      !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
       data table_puttab / 'track.obs$$$$.p$$$$' /
 
       tmp_coord_array=zero; tmp_norm_array=zero
@@ -2337,18 +2370,26 @@ CONTAINS
          tmp=zero
          IF (j.LE.mynpa) tmp = orbit(j) - orbit0(j)
          tmp_coord_array(j)=tmp ! make array of coordinates
+         X_PTC(j)=tmp
       end do
-      IF( closed_orbit .AND. NORM_OUT) &
+      
+      IF( closed_orbit .AND. NORM_OUT) THEN
            tmp_norm_array=A_t_map_rev*tmp_coord_array
-
+         DO j = 1, 6
+           X_PTC(j)=zero 
+           IF (j.LE.mynpa) X_PTC(j)=tmp_norm_array(j)
+         ENDDO
+           
+      ENDIF
+      CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates (canonical or normal)   
       do j = 1, 6
          IF (closed_orbit .AND. NORM_OUT) THEN
             tmp_norm=zero
-            IF (j.LE.mynpa) tmp_norm=tmp_norm_array(j)
+            IF (j.LE.mynpa) tmp_norm=X_MAD(j)
             call double_to_table(table_puttab, vec_names(j), tmp_norm)
          ELSE
             tmp=zero
-            IF (j.LE.mynpa) tmp = tmp_coord_array(j) ! orbit(j) - orbit0(j)
+            IF (j.LE.mynpa) tmp = X_MAD(j) ! orbit(j) - orbit0(j)
             call double_to_table(table_puttab, vec_names(j), tmp)
          END IF
       enddo
@@ -2455,6 +2496,8 @@ CONTAINS
 
       Real (dp) :: Z_norm_temp(lnv), Z_stdt_temp(lnv) ! Z_stdt=A_t_map*Z_norm
 
+      REAL (dp) :: X_MAD(6), X_PTC(6)
+
       logical :: zgiv_exist, zngiv_exist ! existence of non-zero input for action-angle
 
       !k      parameter(zero=0d0)
@@ -2517,14 +2560,15 @@ CONTAINS
             !                                                                   !   !   !
             track_temp(:)=zero                                                  !   !   !
             !---- Get start coordinates                                         s   !   !
-            track_temp(1) = x_input                                           ! w   p   !
-            track_temp(2) = px_input                                          ! i   a   !
-            track_temp(3) = y_input                                           ! t   r   !
-            track_temp(4) = py_input                                          ! c   t   !
-            track_temp(5) = deltae_input  ! track_temp(5) = t_input           ! h   i   l
-            track_temp(6) = t_input       ! track_temp(6) = deltae_input      ! !   c   o
-            track_temp(7) = fx_input                                            !   l   o
-            track_temp(8) = phix_input                                          !   e   p
+            X_MAD(1)=x_input; X_MAD(2)=px_input                               ! w   p   !
+            X_MAD(3)=y_input; X_MAD(4)=py_input                               ! i   a   !
+            X_MAD(5)=t_input; X_MAD(6)=deltae_input                           ! t   r   !
+            CALL Coord_MAD_to_PTC(X_MAD,X_PTC) ! convert coordinates          ! c   t   !
+            DO k_th_coord=1,6                                                 ! h   i   l
+              track_temp(k_th_coord)=X_PTC(k_th_coord)                          !   c   o
+            END DO                                                              !   l   o
+            track_temp(7) = fx_input                                            !   e   p
+            track_temp(8) = phix_input                                          !   !   !
             track_temp(9) = fy_input                                          ! O   !   !
             track_temp(10) = phiy_input                                       ! n   !   !
             track_temp(11) = ft_input                                         ! e   !   f
