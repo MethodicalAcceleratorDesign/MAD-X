@@ -229,6 +229,10 @@ CONTAINS
     Call Call_my_state_and_update_states ! parameter "deltap" is defined now
     !                                    ! mynpa is changed to correct value
 
+    Print *;  Print *,'  ================================================================'
+    Print *, '  ptc_track: The current dimensionality of the problem is mynpa=', mynpa
+    Print *,'  ================================================================'; Print *;
+
     ! initialize the closed orbit coordinates  at START of the ring
     x_coord_co(:)=zero
     if (ptc_track_debug) print *, " x_coord_co(:)=zero = ",x_coord_co
@@ -372,10 +376,12 @@ CONTAINS
           !  ?  Call Save_Coord_for_DYNAP_after_total_turn                    !   n
           !                                                                   !   !
        END IF switch_1!=== END if (switch) ==== RUN or DYNAP =================!   !
-       !
-
-       !                                                                          !
+                                                                                  !
+       IF (jmax_numb_particl_at_i_th_turn.eq.0) EXIT Loop_over_turns              !
+       ! all particles are lost                                                   !
+                                                                                  !
     end do Loop_over_turns !===========loop over turn ============================!
+
 
     Call Final_Coord_to_tables ! Complete all tables by one subroutine: 
     !'trackone' filled before by by tt_puttab_coord, 'track.obs$$$$.p$$$$' by 
@@ -702,6 +708,7 @@ CONTAINS
     SUBROUTINE Find_Closed_Orbit
       ! USE madx_ptc_module, ONLY: dp, zero, find_orbit, my_ring,default
       ! IMPLICIT NONE => in the host
+      INTEGER :: i_tmp ! the local counter in the DO-loop
       !====================================================================!
       !   initialize the closed orbit coordinates                          !
       ! x0(:)=zero                                                         !
@@ -715,13 +722,19 @@ CONTAINS
          print *, "  ,x_coord_co(5),deltap=", &           !                !
               x_coord_co(5),deltap                        !                !
       end if !--------------------------------------------!                !
-      !  
-      if(closed_orbit) then !--------------------------------!             !
-         call find_orbit(my_ring,x_coord_co,1,default,1d-7)  !             !
-         print*,"Closed orbit VK: ",x_coord_co               !             !
-      endif                                                  !             !
-      if (ptc_track_debug) print *, "After closed_orbit"     !             !
-      print *, ' '                                           !             !
+                                                                           !  
+      if(closed_orbit) then !----------------------------------!           !
+         call find_orbit(my_ring,x_coord_co,1,default,1d-7)    !           !
+         print*,"============================================" !           !
+         print*," ptc_track: the closed orbit at START, Xco  " !           !
+         print*, (x_coord_co(i_tmp),i_tmp=1,2);                !           !
+         print*, (x_coord_co(i_tmp),i_tmp=3,4);                !           !
+         print*, (x_coord_co(i_tmp),i_tmp=5,6);                !           !
+         print*,"============================================" !           !
+      endif  !-------------------------------------------------!           !
+                                                                           !
+      if (ptc_track_debug) print*,"After closed_orbit"; print *;           !
+                                                                           !
       !END closed_orbit    which is logically (.not.ONEPASS)               !
       !====================================================================!
 
@@ -1537,6 +1550,179 @@ CONTAINS
     ! tt_putone_coord  and, the summary table 'tracksumm' 
     
     ! IMPLICIT NONE => in the host        
+    ! Local variables
+    double precision :: tmp_dble ! temprorary dble vaiable
+    INTEGER :: j_part_tmp, turn_final, i_coord 
+    real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+
+    turn_final=min(turns,i_th_turn) ! the FORTRAN bad feature: 
+                                    ! if DO-loop ends, turn > turns    
+         debug_Final_Coord: if (ptc_track_debug) then
+           Print *, ' Start SUBR. <<Final_Coord_to_tables>>:'
+           Print *, ' jmax=', jmax_numb_particl_at_i_th_turn    
+           Print *, 'Total number of turns: turns=', turns
+           Print *, 'The current turn number: turn=', i_th_turn
+           Print *, 'The actual final turn number: turn_final=', turn_final
+           Print *, 'The dimensionality of the task: mynpa=', mynpa
+         ENDIF  debug_Final_Coord  
+    
+      !do i         =1,jmax !++loop over surviving particles ++++!
+       do j_part_tmp=1,jmax_numb_particl_at_i_th_turn            !
+                                                                 !
+         !last_turn(part_id(i)) = min(turns, turn)               ! 
+          last_turn_of_lost_particle(particle_ID(j_part_tmp))= & !
+                                                      turn_final !
+         !last_pos(part_id(i)) = sum                             !
+          last_position_of_lost_particle &                       !
+                  (particle_ID(j_part_tmp))= sum_length          !
+                 ! remember last turn and position of particles  ! 
+                                                                 ! 
+          !do j = 1, 6 !>>> loop over coord. components >>>>>>>! !
+           do i_coord = 1, mynpa                               ! !
+            !last_orbit(j,part_id(i)) = z(j,i)                 ! !
+             last_orbit_of_lost_particle(i_coord,    &         ! !
+                          particle_ID(j_part_tmp))=  &         ! !
+                          x_coord_incl_co(i_coord, j_part_tmp) ! !
+               ! last orbit => to finalize tables              ! !
+           enddo ! END loop over coord. components >>>>>>>>>>>>! ! 
+                                                                 !
+        enddo ! ++ END loop over surviving particles ++++++++++++!
+
+       !turn = min(turn, turns)  => turn_final (see above)
+
+!--- enter last turn in tables if not done already
+       !if (.not. last_out)  then ! ==== enter last turn in tables if not done =======!
+        if (.not. last_table_line_out)  then                                          !
+	         ! flag to avoid double entry of last line                            !
+                                                                                      !
+         !if (switch .eq. 1)  then ! @@@@ switch=>RUN @@@@@@@@@@@@@@@@@@@@@@@@@@@@@!  !
+          IF (ptc_switch.EQ. 1) THEN                                               !  !
+                                                                                   !  ! 
+            !if (onetable)  then !>>>>>>> onetable=.TRUE.>>>>>>>>>>>>>>>>>>>>>>>!  !  !
+             IF (ptc_onetable) THEN                    !>>> a single file >>>>>>!  !  !
+                                                                                !  !  !
+              !hbu                                                              !  !  !
+              !spos=sum ! (dble) initial s position ???                         !  !  !
+               spos_current_position=sum_length                                 !  !  !
+	               ! sum (dble) (in subr. ttmap)   Accumulated length       !  !  !
+                                                                                !  !  ! 
+                 if (ptc_track_debug) then  ! ----- debug printing ----------!  !  !  !
+                   Print *, ' jmax=', jmax_numb_particl_at_i_th_turn         !  !  !  !
+                   Print *, 'The final turn number: turn_final=', turn_final !  !  !  !
+                   Print *, 'tot_segm_one_table=', tot_segm_one_table        !  !  !  !
+                   Print *, 'segment_one_table=', segment_one_table          !  !  !  !
+                   Print *, 'particle_ID=', particle_ID                      !  !  !  !
+                   Print *, ' spos_current_position=', spos_current_position !  !  !  !
+                   ! check later and compare with trrun                      !  !  !  !
+                   Print *, ' nlm_current_element_number=', &                !  !  !  !
+                   nlm_current_element_number; Print *, ' el_name=', el_name !  !  !  !
+                 end if  ! ----- debug printing -----------------------------!  !  !  !
+                                                                                !  !  !  
+                CALL tt_putone_coord(jmax_numb_particl_at_i_th_turn, &          !  !  !
+                  turn_final, tot_segm_one_table, segment_one_table, &          !  !  !
+                  particle_ID, x_coord_incl_co, x_coord_co, &                   !  !  !
+                  spos_current_position, &                                      !  !  !
+                  nlm_current_element_number, el_name)                          !  !  !
+                                                                                !  !  !
+                !hbu get current node name                                      !  !  !
+                ! call element_name(el_name,len(el_name))                       !  !  !
+                !hbu spos added                                                 !  !  !
+                ! call tt_putone(jmax, turn, tot_segm, segment, part_id,  &     !  !  !
+                !                z, orbit0,spos,nlm,el_name)                    !  !  !
+                ! SUBROUTINE in this file                                       !  !  !
+                !      tt_putone(npart,turn, tot_segm, segment, part_id,        !  !  !
+                !                z, orbit0,spos,ielem,el_name)                  !  !  ! 
+                !--- purpose: enter all particle coordinates in one table   *   !  !  !
+                !    input:                                                 *   !  !  !
+                !    npart  (int)           number of particles             *   !  !  !
+                !    turn   (int)           turn number                     *   !  !  !
+                !    tot_segm (int)         total (target) number of entries*   !  !  !
+                !    segment(int)           current segment count           *   !  !  !
+                !    part_id (int array)    particle identifiers            *   !  !  !
+                !    z (double (6,*))       particle orbits                 *   !  !  !
+                !    orbit0 (double array)  reference orbit                 *   !  !  !
+                !-----------------------------------------------------------*   !  !  ! 
+		                                                                !  !  !
+            else ! >>>>>>>>>>>>>>>>>>> onetable=.TRUE. >>>>>>>>>>>>>>>>>>>>>>>>>!  !  !
+	         ! write all particle coordinates :            >>>>>>>>>>>>>>>>>!  !  !
+                 ! one file per particle and observation point >>>>>>>>>>>>>>>>>!  !  !
+                                                                                !  !  !
+              spos_current_position=sum_length                                  !  !  !
+                                                                                !  !  !
+             !do i = 1, jmax !#### loop over surv. particles #################! !  !  !
+              do j_part_tmp=1,jmax_numb_particl_at_i_th_turn                  ! !  !  !
+                                                                              ! !  !  !
+                call tt_puttab_coord &                                        ! !  !  !
+                    (particle_ID(j_part_tmp),turn_final,  1, &                ! !  !  !
+                     x_coord_incl_co(1,j_part_tmp), &                         ! !  !  !
+                     x_coord_co, spos_current_position)                       ! !  !  !
+           !!hbu                                                              ! !  !  ! 
+           !    call tt_puttab(part_id(i), turn,   1, z(1,i), orbit0,spos)    ! !  !  !
+           !  SUBR.  tt_puttab(npart,      turn,nobs,  orbit, orbit0,spos)    ! !  !  ! 
+           !  (in this file) - purpose:                                       ! !  !  ! 
+	   !                           enter particle coordinates in table *  ! !  !  !
+           !      input:                                                   *  ! !  !  !
+           !      npart  (int)           particle number                   *  ! !  !  !
+           !      turn   (int)           turn number                       *  ! !  !  !
+           !      nobs   (int)           observation point number          *  ! !  !  ! 
+           !      orbit  (double array)  particle orbit                    *  ! !  !  !
+           !      orbit0 (double array)  reference orbit                   *  ! !  !  ! 
+           !---------------------------------------------------------------*  ! !  !  !
+                                                                              ! !  !  !
+              enddo ! END loop over surv. particles ##########################! !  !  !
+                                                                                !  !  !
+            endif ! >>> END if (onetable) >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!  !  !
+                                                                                   !  !
+          endif ! END if (switch .eq. 1)  @@@@ switch=>RUN @@@@@@@@@@@@@@@@@@@@@@@@!  !
+	                                                                              !
+        endif ! ====END:  enter last turn in tables if not done ======================! 
+
+!    Summary table ===================!
+!--- enter last turn in summary table !-----------------------------------------------!
+!+      do  i          = 1,j_tot !#### loop over all started particles ###############!
+        do  j_part_tmp = 1,j_tot_numb_starting_particles  !###########################!
+          !tmp_d = i ! convert INTEGER to DBLE                                        !
+           tmp_dble = j_part_tmp                                                      ! 
+          call  double_to_table('tracksumm ', 'number ', tmp_dble)                    !  
+          !call double_to_table('tracksumm ', 'number ', tmp_d)                       ! 
+              !madxn.c:1385: void                                                     !
+              !double_to_table(char* table,char* name,double* val)                    ! 
+              ! /* puts val at current position in column                             !
+              !    with name "name". The table count is increased                     !
+              !    separately with "augment_count" */                                 !
+                                                                                      !
+          !tmp_d = last_turn(i)                                                       !
+          tmp_dble=last_turn_of_lost_particle(j_part_tmp)                             !
+                call double_to_table('tracksumm ', 'turn ', tmp_dble)                 !
+              ! call double_to_table('tracksumm ', 'turn ', tmp_d)                    !
+                                                                                      !
+          !do j       = 1, 6 !>>>> loop over coord. components >>>>>>>>>>>>>>>>>!     !
+           DO i_coord = 1, 6                                                    !     !
+             !tmp_d =  last_orbit(j,i) - orbit0(j)                              !     !
+              tmp_dble=last_orbit_of_lost_particle(i_coord,j_part_tmp)- &       !     !
+                                        x_coord_co(i_coord)                     !     !
+                                                                                !     !
+              call double_to_table('tracksumm ', vec_names(i_coord), tmp_dble)  !     !
+             !call double_to_table('tracksumm ', vec_names(j), tmp_d)           !     !
+                                                                                !     ! 
+           enddo ! END loop over coord. components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>!     !
+           !hbu                                                                       !
+           !  spos                  = last_pos(i)                                     !
+              spos_current_position = last_position_of_lost_particle(j_part_tmp)      !
+           !hbu                                                                       !
+               call double_to_table('tracksumm ',vec_names(7),spos_current_position)  !
+             !   call double_to_table('tracksumm ',vec_names(7),spos)  !              !
+             ! madxd.h:12:#define double_to_table                      !              !
+             ! madxd.h:150:void double_to_table(char*, char*, double*) !              ! 
+             ! ???????????????                                         !              !
+                                                                                      !
+            ! to get "energy" value                                                   !
+            Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)       !
+                                                                                      !
+            call double_to_table('tracksumm ', 'e ', energy)                          !
+                                                                                      !
+            call augment_count('tracksumm ')                                          !
+        enddo !#### loop over all started particles ##################################!
 
     END SUBROUTINE Final_Coord_to_tables
     !=============================================================================
