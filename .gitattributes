@@ -3,6 +3,7 @@
 /Makefile.bat -text
 /Makefile_develop -text
 /Makefile_g95 -text
+/Makefile_gdb -text
 /Sa_extend_poly.f90 -text
 /Sb_1_pol_template.f90 -text
 /Sb_2_pol_template.f90 -text
@@ -82,7 +83,9 @@
 /match.F -text
 /match.fi -text
 /matchc.c -text
+/matchc2.c -text
 /matchjc.F -text
+/matchlib.F -text
 /matchsa.F -text
 /n_complex_polymorph.f90 -text
 /name_len.fi -text

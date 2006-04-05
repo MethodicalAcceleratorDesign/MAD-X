@@ -142,7 +142,7 @@ extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*);
 extern void mtjac_(int*, int*,
                   int*, double*, double*, double*,
-                   int*, int*,
+                   int*, int*, int*,
                    double*, int*, int*, double*, double*, double*,
                    double*, double*, double*,
                    double*, double*);
@@ -512,6 +512,7 @@ void match_tmatrix(struct in_cmd*);
 void match_vary(struct in_cmd*);
 void match_weight(struct in_cmd*);
 void mtcond(int*, int*, double*, int*);
+void mtjacprint(int, int, double*);
 double mult_par(char*, struct element*);
 void mycpy(char*, char*);
 void* mycalloc(char*, size_t, size_t);
@@ -1208,3 +1209,19 @@ double** trackstrarpositions = 0x0;/* two dimensional array with track positions
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
 void deletetrackstrarpositions();
+
+
+
+void match2_match(struct in_cmd*);
+void match2_end(struct in_cmd*);
+void match2_macro(struct in_cmd*);
+void match2_constraint(struct in_cmd*);
+char* match2_macro_name[10];
+char* match2_cons_name[10][30];
+double match2_cons_value[10][30];
+double match2_cons_value_rhs[10][30];
+double match2_cons_value_lhs[10][30];
+char match2_cons_sign[10][30];
+int match2_cons_curr[3];
+struct expression* match2_cons_rhs[10][30];
+struct expression* match2_cons_lhs[10][30];

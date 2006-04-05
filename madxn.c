@@ -26,6 +26,7 @@
 #include "makethin.c"
 
 #include "matchc.c"
+#include "matchc2.c"
 
 void adjust_beam()
   /* adjusts beam parameters to current beta, gamma, bcurrent, npart */
@@ -3921,25 +3922,66 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
 {
   int i, ncp, nbl;
   struct constraint* c_c;
-  if (current_node->cl == NULL) return 0;
-  if (current_node->con_cnt == current_node->cl->curr)
-  {
-    current_node->con_cnt = 0; return 0;
+  int j,k;/* RDM fork */
+  char s; /* RDM fork */
+  /* RDM fork */
+  if (match_is_on==2) {
+    i=match2_cons_curr[0];
+    j=match2_cons_curr[1];
+    k=match2_cons_curr[2];
+    if(match2_cons_name[i][j]==NULL) {
+      j++;
+      if(match2_cons_name[i][j]==NULL) {
+        i++;j=0;
+        if(match2_cons_name[i][j]!=NULL){
+          name=match2_cons_name[i][j];
+          *name_l=strlen(name);
+          *type=2; /* to be changed according to s or <,=,>*/
+          *value=match2_cons_value[i][j];
+          s =match2_cons_sign[i][j];
+          if (s == '>' && *value > 0) *value=0;
+          else if (s == '<' && *value < 0) *value=0;
+          c_min=value; /* unknown use */
+          c_max=value; /* unknown use */
+          *weight=1; /*hardcode no weight with this interface */
+          k++;
+          match2_cons_curr[0]=i;
+          match2_cons_curr[1]=j;
+          match2_cons_curr[2]=k;
+          return k;
+        } else {
+          match2_cons_curr[0]=0;
+          match2_cons_curr[1]=0;
+          match2_cons_curr[2]=0;
+          return 0;
+        }
+      }
+    }
   }
-  c_c = current_node->cl->constraints[current_node->con_cnt];
-  ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
-  nbl = *name_l - ncp;
-  strncpy(name, c_c->name, ncp);
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
-  *type = c_c->type;
-  if (c_c->ex_value == NULL) *value = c_c->value;
-  else                       *value = expression_value(c_c->ex_value,2);
-  if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
-  else                       *c_min = expression_value(c_c->ex_c_min,2);
-  if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
-  else                       *c_max = expression_value(c_c->ex_c_max,2);
-  *weight = c_c->weight;
-  return ++current_node->con_cnt;
+  else  /* RDM old match */
+  {
+    if (current_node->cl == NULL) return 0;
+    if (current_node->con_cnt == current_node->cl->curr)
+    {
+      current_node->con_cnt = 0; return 0;
+    }
+    c_c = current_node->cl->constraints[current_node->con_cnt];
+    ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
+    nbl = *name_l - ncp;
+    strncpy(name, c_c->name, ncp);
+    for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+    *type = c_c->type;
+    if (c_c->ex_value == NULL) *value = c_c->value;
+    else                       *value = expression_value(c_c->ex_value,2);
+    if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
+    else                       *c_min = expression_value(c_c->ex_c_min,2);
+    if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
+    else                       *c_max = expression_value(c_c->ex_c_max,2);
+    *weight = c_c->weight;
+    return ++current_node->con_cnt;
+  }
+  /* RDM fork */
+  return 0;
 }
 
 
@@ -4502,6 +4544,10 @@ void pro_match(struct in_cmd* cmd)
   else if (strcmp(cmd->tok_list->p[0], "global") == 0)
   {
     match_global(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "use_macro") == 0)
+  {
+    match2_macro(cmd);
   }
 }
 

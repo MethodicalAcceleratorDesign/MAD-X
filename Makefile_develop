@@ -48,18 +48,22 @@ default: madx
 
 # files
 
-madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS_MPARS) madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS) -o madxpf.o madxp.c
 
+matchlib.o: matchlib.F
+	$(FC) $(FCP) -o matchlib.o matchlib.F
+	
 twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
 	$(FC) $(FCP) -o twissp.o twiss.F
 
 ptc_dummy.o: ptc_dummy.F
 	$(FC) $(FCP) -o ptc_dummy.o ptc_dummy.F
 
+	
 surveyp.o: survey.F
 	$(FC) $(FCP) -o surveyp.o survey.F
 
@@ -276,11 +280,11 @@ madx: \
 	madxm.o madxpf.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o \
 	utilp.o matchp.o matchsap.o matchjcp.o touschekp.o plotp.o soddp.o \
 	ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
-	gxx11c.o resindexp.o timel.o
+	gxx11c.o resindexp.o timel.o matchlib.o
 	$(FC) $(FOPT) -o madx madxm.o madxpf.o twissp.o ptc_dummy.o \
 	surveyp.o matchp.o matchsap.o matchjcp.o touschekp.o plotp.o soddp.o \
 	ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
-	gxx11c.o resindexp.o timel.o $(LIBX) -lm -lc
+	gxx11c.o resindexp.o timel.o matchlib.o $(LIBX) -lm -lc
 
 madxdev: \
 	madx_main.o run_madx.o madxpf.o twiss.o survey.o orbf.o emit.o util.o \
@@ -299,7 +303,7 @@ madxdev: \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
 	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
-	user2_photon.o poissonp.o wrap.o
+	user2_photon.o poissonp.o wrap.o  matchlib.o
 	$(f95) $(FOPT) -o madxdev madx_main.o run_madx.o madxpf.o twiss.o \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o touschek.o dynap.o \
 	plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
@@ -317,7 +321,7 @@ madxdev: \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
-	user2_photon.o poissonp.o wrap.o \
+	user2_photon.o poissonp.o wrap.o  matchlib.o \
 	$(LIBX) -lm -lc
 
 clean:
