@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <errno.h>
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/utsname.h>
@@ -291,6 +292,7 @@ void buffer_in_cmd(struct in_cmd* cmd)
 void check_table(char* string)
   /* replaces argument of "table" if any by a string variable */
 {
+
   char *pa, *pb, *pt, *pl, *pr, *sv, *quote;
   char* qpos[1000];
   int npos = 0;
@@ -482,6 +484,8 @@ int decode_command () /* compares command with templates, fills this_cmd
                          -2 label is protected keyword;
                          -3 statement not recognised */
 {
+
+  
   int i, aux_pos, cmd_pos, decl_start, type;
   int n = this_cmd->tok_list->curr;
   char** toks = this_cmd->tok_list->p;
@@ -4298,53 +4302,166 @@ int table_row(struct table* table, char* name)
 {
   int i, j, ret = -1;
   for (i = 0; i < table->num_cols; i++)
-    if(table->columns->inform[i] == 3) break;
+   {
+     if(table->columns->inform[i] == 3) 
+      {
+        /*printf("Column %d named <<%s>> is of strings\n",i,table->columns->names[i]);*/
+        break;
+      } 
+   }  
+  
   if (i < table->num_cols)
-  {
+   {
     for (j = 0; j < table->curr; j++)
-      if (tab_name_code(name, table->s_cols[i][j])) break;
+     {
+        if (tab_name_code(name, table->s_cols[i][j])) break;
+     }  
     if (j < table->curr) ret = j;
-  }
+   }
+  else
+   {
+     if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
+   } 
 /*  if(ret==-1) fatal_error("Name of row not found", name);*/
-  if(ret==-1) warning("Name of row not found:", name);
+  if(ret==-1) warning("table_row","Name of row not found: %s,", name);
   return ret;
 }
 
 double table_value()
 {
   double val = zero;
-  int ntok, pos, col, row;
+  int ntok, pos, col=-1, row=-1;
   char** toks;
   struct table* table;
-  if (current_variable != NULL && current_variable->string != NULL)
-  {
-    strcpy(c_dum->c, current_variable->string);
-    supp_char(',', c_dum->c);
-    mysplit(c_dum->c, tmp_p_array);
-    toks = tmp_p_array->p; ntok = tmp_p_array->curr;
-    if (ntok > 1)
-    {
-      if ((pos = name_list_pos(toks[0], table_register->names)) > -1)
-      {
-        table = table_register->tables[pos];
-        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1)
-        {
-          if (ntok > 2)  /* find row - else current (dynamic), or 0 */
-          {
-            row = table_row(table, toks[1]);
-          }
-          else if (table->dynamic)  row = table->curr;
-          else row = 0;
-          val = table->d_cols[col][row];
-        }
-        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1))
-        {
-          row = atoi(toks[2])-1;
-          if(row < table->curr) val = table->d_cols[col][row];
-        }
+
+  /*
+    if (current_variable != NULL && current_variable->string != NULL)
+    the above was dengerous - in C standard there is no requirement that 
+    if first part is false then second is not evaluated!!!
+  */  
+  
+  if (current_variable == NULL)
+   {
+     warning("table_value","current_variable is NULL. Returning 0.0");
+     return 0.0;
+   }
+
+  if (current_variable->string == NULL)
+   {
+     warning("table_value","current_variable->string is NULL. Returning 0.0");
+     return 0.0;
+   }
+  
+  
+  if (debuglevel > 2) printf("Current variable <<%s>>\n", current_variable->string);
+  
+  strcpy(c_dum->c, current_variable->string);
+  supp_char(',', c_dum->c);
+  mysplit(c_dum->c, tmp_p_array);
+  toks = tmp_p_array->p; 
+  ntok = tmp_p_array->curr;
+  
+  if (debuglevel > 2) printf("table_value: There is %d tokens in the command.\n", ntok);
+  
+  if (ntok < 2) 
+   {
+     warning("table_value","Number of tokens is smaller then 2 (%d). Returning 0.0 \n",ntok);
+     return 0.0;
+   }
+
+
+  if ((pos = name_list_pos(toks[0], table_register->names)) < 0)
+   {
+     warning("table_value","Can not find <<%s>> in table register. Returning 0.0 \n",toks[0]);
+     return 0.0;
+   } 
+
+
+  table = table_register->tables[pos];
+  /*Good We got the table*/
+
+  col = name_list_pos(toks[ntok-1], table->columns);
+  
+  if (col < 0)
+   {/*column name is not the last i.e. format is (tabname, colname, int row)*/
+    
+     if (ntok != 3)
+      {/*bad syntax*/
+        warning("table_value",
+                "Table <<%s>> does not contain column <<%s>> . Returning 0.0\n",
+                table->name,toks[ntok-1]);  
+        return 0.0;
       }
+     
+     /*column name is in the second position*/
+     col = name_list_pos(toks[1], table->columns);
+     if (col < 0)
+      {
+        warning("table_value",
+                "Table <<%s>> does not contain column <<%s>> . Returning 0.0\n",
+                table->name,toks[1]);  
+        return 0.0;
+        
+      }
+     /*convert last argument to integer*/
+     errno = 0;
+     row = strtol(toks[2],NULL,10) - 1;
+     if (errno)
+      {
+        warning("table_value",
+                "Error occured while converting <<%s>> to integer. Returning 0.0\n",toks[2]);
+
+        return 0.0;    
+      }
+     /*we have row number!!!*/ 
+  }
+ else
+  {
+   if(debuglevel>2) printf("Token %d describes column number %d named %s \n",ntok-1,col,toks[ntok-1]);
+   
+   if (ntok == 2)
+    { /*this is (tabname,colname) sytnax*/
+      if (table->dynamic)  
+       {
+         if(debuglevel>2) 
+           printf("table_value: Table <<%s>> is dynamic: taking the currnet row %d\n",table->name,table->curr);
+         row = table->curr;
+       }  
+      else 
+       {
+         if(debuglevel>2) 
+           printf("table_value: Table <<%s>> is not dynamic: taking the 0th row %d\n",table->name);
+         row = 0;
+       }  
+    }
+   else /* ntok > 2*/
+    {
+     /*this is (tabname,elname,colname) sytnax*/
+      row = table_row(table, toks[1]);
+      if (row < 0)
+       {
+         warning("table_value","Row named <<%s>> does not exist. Trying upper case.", toks[1]);
+         row = table_row(table, stoupper(toks[1]));
+         if (row < 0)
+          {
+            warning("table_value","Row named <<%s>> neither exists. Return 0.0.", stoupper(toks[1]));
+            return 0.0;
+          }
+         else warning("table_value","Upper case found!!!!!");
+       }
+      if(debuglevel>1) printf("Found the row at position %d\n",row); 
     }
   }
+
+   
+  /*Here we have VALID column */ 
+
+  if( (row < table->curr) && (row>=0)) 
+   {
+     val = table->d_cols[col][row];
+   } 
+
+  if (debuglevel > 2 ) printf("table_value: return %f\n",val);
   return val;
 }
 
@@ -4671,7 +4788,7 @@ void warning(char* t1, register char* fmt, ...)
 
   va_start( list, fmt );
 
-  fprintf(stderr,"++++++ warning: %s",t1); /*prints first part to the STDERR and +++....*/
+  fprintf(stderr,"++++++ warning: %s : ",t1); /*prints first part to the STDERR and +++....*/
   vfprintf(stderr, fmt, list); /*prints the second part and variables*/
   fprintf(stderr,"\n"); /*prints end of line*/
   fflush(stderr); /*flushes STDERR*/
@@ -4689,7 +4806,7 @@ void error(char* t1, register char* fmt, ...)
 
   va_start( list, fmt );
 
-  fprintf(stderr,"++++++ Error: %s",t1); /*prints first part to the STDERR and +++....*/
+  fprintf(stderr,"++++++ Error: %s : ",t1); /*prints first part to the STDERR and +++....*/
   vfprintf(stderr, fmt, list); /*prints the second part and variables*/
   fprintf(stderr,"\n"); /*prints end of line*/
   fflush(stderr); /*flushes STDERR*/

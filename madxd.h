@@ -876,6 +876,9 @@ void write_field(FILE*, struct double_array*);
 void write_elstart(FILE*);
 void cf77flush();
 
+/*Debug level */
+int debuglevel = 1;
+
 /* Global structure variables by type (alphabetic) */
 struct char_array* aux_buff;       /* temporary buffer for many purposes */
 struct char_array* c_dum;
@@ -1203,6 +1206,8 @@ time_t start_time;
 /* end of definitions */
 
 
+/*Piotr Skowronski (CERN)*/
+
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
@@ -1213,7 +1218,7 @@ int  copytrackstoarray();
 void deletetrackstrarpositions();
 
 
-
+/*Riccardo de Maria (CERN)*/
 void match2_match(struct in_cmd*);
 void match2_end(struct in_cmd*);
 void match2_macro(struct in_cmd*);
