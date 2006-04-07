@@ -4355,7 +4355,6 @@ double table_value()
      return 0.0;
    }
   
-  
   if (debuglevel > 2) printf("Current variable <<%s>>\n", current_variable->string);
   
   strcpy(c_dum->c, current_variable->string);
@@ -4372,8 +4371,8 @@ double table_value()
      return 0.0;
    }
 
-
-  if ((pos = name_list_pos(toks[0], table_register->names)) < 0)
+  pos = name_list_pos(toks[0], table_register->names);
+  if (pos < 0)
    {
      warning("table_value","Can not find <<%s>> in table register. Returning 0.0 \n",toks[0]);
      return 0.0;
@@ -4463,8 +4462,8 @@ double table_value()
    {
      val = table->d_cols[col][row];
    } 
-
-  if (debuglevel > 2 ) printf("table_value: return %f\n",val);
+  
+  if (debuglevel > 2 ) printf("table_value: Current variable <<%s>> = %f\n", current_variable->string,val);
   return val;
 }
 
