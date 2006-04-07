@@ -2405,27 +2405,6 @@ CONTAINS
     stop
   end subroutine f90flush
 
-  SUBROUTINE Coord_MAD_to_PTC(X_MAD,X_PTC)
-  ! Convert coordinates from MAD to PTC
-  IMPLICIT NONE
-  REAL(dp), INTENT(IN)  :: X_MAD(6)
-  REAL(dp), INTENT(OUT) :: X_PTC(6)
-  X_PTC=X_MAD ! for all elements 
-  X_PTC(5)=X_MAD(6);  X_PTC(6)=-X_MAD(5);
-
-  END SUBROUTINE Coord_MAD_to_PTC
-
-  SUBROUTINE Coord_PTC_to_MAD(X_PTC,X_MAD)
-  ! Convert coordinates from PTC to MAD
-  IMPLICIT NONE
-  REAL(dp), INTENT(IN)  :: X_PTC(6)
-  REAL(dp), INTENT(OUT) :: X_MAD(6)
-
-  X_MAD=X_PTC ! for all elements 
-  X_MAD(5)=-X_PTC(6); X_MAD(6)=X_PTC(5);
-
-  END SUBROUTINE Coord_PTC_to_MAD
-
   SUBROUTINE write_closed_orbit(icase,x)
   INTEGER,  INTENT(IN):: icase
   REAL (dp),INTENT(IN) :: x(6)
