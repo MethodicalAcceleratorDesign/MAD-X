@@ -4305,7 +4305,9 @@ int table_row(struct table* table, char* name)
    {
      if(table->columns->inform[i] == 3) 
       {
-        /*printf("Column %d named <<%s>> is of strings\n",i,table->columns->names[i]);*/
+        if (debuglevel > 2) 
+          printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
+                 i,table->columns->names[i]);
         break;
       } 
    }  
@@ -4313,7 +4315,8 @@ int table_row(struct table* table, char* name)
   if (i < table->num_cols)
    {
     for (j = 0; j < table->curr; j++)
-     {
+     {  
+        if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
         if (tab_name_code(name, table->s_cols[i][j])) break;
      }  
     if (j < table->curr) ret = j;
