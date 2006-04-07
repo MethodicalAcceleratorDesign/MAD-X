@@ -50,7 +50,7 @@ contains
     !    print *,"madx_ptc_tablepush :putusertable "
     !    call daprint(y(1),6)
     
-    call putnameintables(name)
+    call putnameintables()
     
     do i=1,npushes
 
@@ -98,14 +98,12 @@ contains
   end subroutine augment_counts
   !____________________________________________________________________________________________
    
-  subroutine putnameintables(name)
+  subroutine putnameintables()
     implicit none
-    character(48) :: name
     integer       :: i ! iterator
-
     do i=1,ntables
-       if (getdebug()>9) print *,"Putting name ",name," in ",tables(i)
-       call string_to_table(tables(i),"name ",name)
+       if (getdebug()>2) print *,"Putting name in ",tables(i)
+       call string_to_table(tables(i),"name ","name ")
     enddo
 
   end subroutine putnameintables
