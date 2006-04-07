@@ -95,6 +95,7 @@
 #define w_ptc_settime           w_ptc_settime_
 #define w_ptc_setnocavity       w_ptc_setnocavity_
 
+#define stolower                stolower_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
 #define min_order               min_order_       /* ETDA 17 nov 2004 */
