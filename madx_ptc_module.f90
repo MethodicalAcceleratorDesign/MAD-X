@@ -890,7 +890,7 @@ CONTAINS
     implicit none
     include 'twissa.fi'
     logical(lp) closed_orbit,beta_flg,betz_flg
-    integer k,i,ii,no,mynd2,npara,mynpa,nda,icase,flag_index,why(9),my_nv,nv_min
+    integer k,i,ii,no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
     integer inval,ioptfun,iii,restart_sequ,advance_node,get_option
     integer tab_name(*)
     real(dp) x(6),suml,deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy
@@ -928,7 +928,7 @@ CONTAINS
 
     default = getintstate()
 
-    call my_state(icase,deltap,deltap0,mynpa)
+    call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
 
     x(:)=zero
@@ -1651,7 +1651,7 @@ CONTAINS
     USE madx_ptc_intstate_module
     implicit none
     logical(lp) closed_orbit,normal,maptable
-    integer no,mynd2,npara,mynpa,nda,icase,flag_index,why(9)
+    integer no,mynd2,npara,nda,icase,flag_index,why(9)
     integer i, ii, iii, j1, jj, ja(6), k, l, starti
     integer,parameter :: i_map_coor=10
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2,map_term
@@ -1683,7 +1683,7 @@ CONTAINS
     icase = get_value('ptc_normal ','icase ')
     deltap0 = get_value('ptc_normal ','deltap ')
 
-    call my_state(icase,deltap,deltap0,mynpa)
+    call my_state(icase,deltap,deltap0)
 
     x(:)=zero
     if(icase.eq.5) x(5)=deltap
@@ -1887,7 +1887,7 @@ CONTAINS
 
   subroutine ptc_track()
     implicit none
-    integer i,nint,ndble,nchar,int_arr(1),char_l,mynpa,icase,turns,flag_index,why(9)
+    integer i,nint,ndble,nchar,int_arr(1),char_l,icase,turns,flag_index,why(9)
     integer j,next_start
     real(dp) x0(6),x(6),deltap0,deltap
     real(dp)  xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
@@ -1908,7 +1908,7 @@ CONTAINS
 
     icase = get_value('ptc_track ','icase ')
     deltap0 = get_value('ptc_track ','deltap ')
-    call my_state(icase,deltap,deltap0,mynpa)
+    call my_state(icase,deltap,deltap0)
 
     CALL UPDATE_STATES
     if (getdebug() > 2) then
@@ -2329,37 +2329,39 @@ CONTAINS
   end subroutine set_PARAMETERS
   !______________________________________________________________________
 
-  subroutine my_state(icase,deltap,deltap0,mynpa)
+  subroutine my_state(icase,deltap,deltap0)
     implicit none
-    integer icase,mynpa
+    integer icase,i
     real(dp) deltap0,deltap
 
     deltap = zero
     select case(icase)
     CASE(4)
        default=default+only_4d+NOCAVITY
-       mynpa=4
+       i=4
     CASE(5)
        default=default+delta
        deltap=deltap0
-       mynpa=5
+       i=5
     CASE(6)
-       mynpa=6
+       i=6
     CASE DEFAULT
        default=default+only_4d+NOCAVITY
-       mynpa=4
+       i=4
     END SELECT
 
-    if(mynpa==6.and.icav==0) then
-       default=default+delta
-       mynpa=5
+    if(i==6.and.icav==0) then
+       default=default+only_4d+NOCAVITY
+       call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
+       i=4
     endif
-    !HEADdiff: removed default=default+time
 
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug() > 2) call print(default,6)
+    call print(default,6)
+
+    icase = i
 
   end subroutine my_state
 
