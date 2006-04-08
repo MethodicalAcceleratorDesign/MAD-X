@@ -16,7 +16,7 @@ MODULE madx_ptc_module
   USE madx_ptc_setcavs_module
   USE madx_ptc_tablepush_module
   use madx_ptc_intstate_module, only : getdebug
-  
+
   implicit none
   public
   integer icav
@@ -72,7 +72,7 @@ CONTAINS
 
     print77=.false.
     read77 =.false.
-    
+
     if (getdebug()>0) print*,"Now PTC"
 
     call set_up_universe(m_u)
@@ -158,7 +158,7 @@ CONTAINS
     integer             method0,method1
     integer             nst0,nst1
     !---------------------------------------------------------------
-    
+
     if (getdebug() > 0) then
        print *, '--------------------------------------------------------------'
        print *, '--------------------------------------------------------------'
@@ -166,11 +166,11 @@ CONTAINS
        print *, '--------------------------------------------------------------'
        print *, '--------------------------------------------------------------'
     endif
-    
+
     energy=get_value('beam ','energy ')
     pma=get_value('beam ','mass ')
     e0f=sqrt(ENERGY**2-pma**2)
-    
+
     if (getdebug() > 0) then
        print *, 'MAD-X Beam Parameters'
        print '(a20, f8.4)', '      Energy :',energy
@@ -211,12 +211,12 @@ CONTAINS
     !  with_patch=.false.
 
     ! Global Keywords
-    
+
     if (getdebug() > 2) then
        print *, '=============================================================='
        print *, 'INPUT PARAMETERS ARE:'
-    endif 
-    
+    endif
+
     sector_nmul_max0 = get_value('ptc_create_layout ','sector_nmul_max ')
     if (getdebug() > 2) print*,'  Global max sector_nmul: ',sector_nmul_max0
 
@@ -275,23 +275,23 @@ CONTAINS
 
     gamma2    = gamma**2
     gammatr2  = gammatr**2
-    
+
     if (getdebug() > 2) then
-      print *, '=============================================================='
-      print *, ''
+       print *, '=============================================================='
+       print *, ''
     endif
 
     !  call Set_Up(MY_RING)
-    
-    if (getdebug() > 0) then 
+
+    if (getdebug() > 0) then
        print *, 'Setting MADx with '
        print *, '    energy        ',energy
        print *, '    method        ',method0
        print *, '    Num. of steps ',nst0
     endif
-      
+
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-    
+
     if (getdebug() > 0) print *, 'MADx is set'
 
     icav=0
@@ -426,7 +426,7 @@ CONTAINS
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
-       if (getdebug() > 9)  print *, 'This is drift'
+       if (getdebug() > 9)  print *, 'This is a drift'
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
@@ -500,7 +500,7 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
     case(5) ! PTC accepts mults
-       if (getdebug() > 9)  print *, 'This is quadrupole'
+       if (getdebug() > 9)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
@@ -677,7 +677,7 @@ CONTAINS
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
     case(27)
-       if (getdebug() > 9)  print *, 'This is twcavity'
+       if (getdebug() > 9)  print *, 'This is a twcavity'
        key%magnet="twcavity"
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -732,16 +732,16 @@ CONTAINS
     write(6,*) "After  start: ",my_ring%start%chart%f%a
     write(6,*) "After    end: ",my_ring%end%chart%f%b
 
-    
-    if (getdebug() > 0) then 
+
+    if (getdebug() > 0) then
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^    F I N I S H E D      P T C     I N P U T    ^^^^^^^^'
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
-    
-    
+
+
   END subroutine ptc_input
   !_________________________________________________________________
 
@@ -781,7 +781,7 @@ CONTAINS
     integer              :: get_string
     real(kind(1.d0))     :: get_value
     integer              :: flag_index,why(9)
-    
+
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
@@ -810,7 +810,7 @@ CONTAINS
 
        if(p%mag%kind/=kind21) then
           call track(my_ring,y2,i,i+1,getintstate())
-          
+
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -860,21 +860,21 @@ CONTAINS
        write(42,*) p%mag%name,' ==========================='
        do ii=1,4
           write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-         &                      y2(ii).sub.'010000', &
-         &                      y2(ii).sub.'001000', &
-         &                      y2(ii).sub.'000100', &
-         &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column 
-         &                      y2(ii).sub.'000010'    !
+               &                      y2(ii).sub.'010000', &
+               &                      y2(ii).sub.'001000', &
+               &                      y2(ii).sub.'000100', &
+               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+               &                      y2(ii).sub.'000010'    !
        enddo
        do ii=6,5,-1
           write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-         &                      y2(ii).sub.'010000', &
-         &                      y2(ii).sub.'001000', &
-         &                      y2(ii).sub.'000100', &
-         &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column 
-         &                      y2(ii).sub.'000010'    !
+               &                      y2(ii).sub.'010000', &
+               &                      y2(ii).sub.'001000', &
+               &                      y2(ii).sub.'000100', &
+               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+               &                      y2(ii).sub.'000010'    !
        enddo
-       
+
        p=>p%next
     enddo
 
@@ -893,7 +893,7 @@ CONTAINS
     integer k,i,ii,no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
     integer inval,ioptfun,iii,restart_sequ,advance_node,get_option
     integer tab_name(*)
-    real(dp) x(6),suml,deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy
+    real(dp) x(6),suml,deltap0,deltap,mypt,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy
     real(kind(1d0)) get_value
     type(real_8) y(6)
     type(twiss) tw
@@ -917,9 +917,9 @@ CONTAINS
        call fort_warn('return from ptc_twiss: ',' no layout created')
        return
     endif
-    
+
     call cleartables()
-    
+
     nda=0
     suml=zero
 
@@ -932,7 +932,8 @@ CONTAINS
     CALL UPDATE_STATES
 
     x(:)=zero
-    if(icase.eq.5) x(5)=deltap
+    call Convert_dp_to_dt(deltap,mypt)
+    if(icase.eq.5) x(5)=mypt
 
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
 
@@ -942,7 +943,7 @@ CONTAINS
     endif
 
     if(closed_orbit) then
-       call find_orbit(my_ring,x,1,default,1d-7)
+       call find_orbit(my_ring,x,1,default,c_1d_7)
        CALL write_closed_orbit(icase,x)
     endif
 
@@ -1032,13 +1033,13 @@ CONTAINS
     open(unit=21,file='ptctwiss.txt')
 
     do i=1,MY_RING%n
-       
+
        if (getdebug() > 0) then
           write(6,*) "##########################################"
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
           write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
        endif
-       
+
        call track(my_ring,y,i,i+1,default)
 
        call PRODUCE_APERTURE_FLAG(flag_index)
@@ -1087,16 +1088,16 @@ CONTAINS
          ! if current is the last element in the sequence i.e.
          ! p%next == NULL (LINE) OR
          ! p%next points the first element (CIRCLE)
-         cfen=current                                    
-         
+         cfen=current
+
          if (getdebug()>0) then
             !if it is the last element in the line
-            print *, 'It is the last element  ', current%mag%name  
+            print *, 'It is the last element  ', current%mag%name
             !(it is always marker, i.e element that does not change reference energy)
-            print *, 'Its reference energy is ', cfen%p0c  
+            print *, 'Its reference energy is ', cfen%p0c
          endif
-         
-     !take its reference energy
+
+         !take its reference energy
       else
          cfen=current%next      ! energy after passing this element
       endif
@@ -1164,7 +1165,7 @@ CONTAINS
       opt_fun(36)=tw%disp(6) * deltae
 
       if (getdebug() > 9)   write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
-      
+
       ioptfun=36
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
@@ -1657,7 +1658,7 @@ CONTAINS
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2,map_term
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
          string_from_table, double_from_table, result_from_normal
-    real(dp) x(6),deltap0,deltap,map_coor(i_map_coor)
+    real(dp) x(6),deltap0,deltap,mypt,map_coor(i_map_coor)
     !type(real_8) y(6)
     integer :: column(6) = (/1,0,0,0,0,0/)
     integer :: ord(3), indexa(4)
@@ -1686,10 +1687,11 @@ CONTAINS
     call my_state(icase,deltap,deltap0)
 
     x(:)=zero
-    if(icase.eq.5) x(5)=deltap
+    call Convert_dp_to_dt(deltap,mypt)
+    if(icase.eq.5) x(5)=mypt
     closed_orbit = get_value('ptc_normal ','closed_orbit ') .ne. 0
     if(closed_orbit) then
-       call find_orbit(my_ring,x,1,default,1d-7)
+       call find_orbit(my_ring,x,1,default,c_1d_7)
        CALL write_closed_orbit(icase,x)
     endif
 
@@ -1889,7 +1891,7 @@ CONTAINS
     implicit none
     integer i,nint,ndble,nchar,int_arr(1),char_l,icase,turns,flag_index,why(9)
     integer j,next_start
-    real(dp) x0(6),x(6),deltap0,deltap
+    real(dp) x0(6),x(6),deltap0,deltap,mypt
     real(dp)  xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
     real(kind(1d0)) get_value
     logical(lp) closed_orbit
@@ -1913,15 +1915,16 @@ CONTAINS
     CALL UPDATE_STATES
     if (getdebug() > 2) then
 
-      print *, "ptc_track: internal state is:"
-      call print(default,6)
+       print *, "ptc_track: internal state is:"
+       call print(default,6)
     endif
-    
+
     x0(:)=zero
+    call Convert_dp_to_dt(deltap,mypt)
     if(icase.eq.5) x0(5)=deltap
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
     if(closed_orbit) then
-       call find_orbit(my_ring,x0,1,default,1d-7)
+       call find_orbit(my_ring,x0,1,default,c_1d_7)
        CALL write_closed_orbit(icase,x0)
     endif
 
@@ -2406,8 +2409,9 @@ CONTAINS
   end subroutine f90flush
 
   SUBROUTINE write_closed_orbit(icase,x)
-  INTEGER,  INTENT(IN):: icase
-  REAL (dp),INTENT(IN) :: x(6)
+    implicit none
+    INTEGER,  INTENT(IN):: icase
+    REAL (dp),INTENT(IN) :: x(6)
     if(icase.eq.4) then
        print*,"Closed orbit: ",x(1),x(2),x(3),x(4)
     elseif(icase.eq.5) then
@@ -2417,5 +2421,25 @@ CONTAINS
     endif
   ENDSUBROUTINE write_closed_orbit
 
+  SUBROUTINE Convert_dp_to_dt(deltap, dt)
+    implicit none
+    ! convert deltap=(p-p0)/p0 to dt=deltaE/p0c
+    REAL(dp), INTENT(IN)  :: deltap
+    REAL(dp), INTENT(OUT) :: dt
+
+    ! local
+    real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+
+    ! to get "energy" value
+    Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)
+
+    IF (beta0.gt.0.0 ) THEN
+       dt=SQRT(deltap*(deltap+two)+one/beta0/beta0)-one/beta0
+    ELSE  ! exculde devision by 0
+       call aafail('SUBR. Convert_dp_to_dt: ',' CALL GET_ONE => beta0.LE.0')
+    ENDIF
+
+  END SUBROUTINE Convert_dp_to_dt
+  !=============================================================================
 
 END MODULE madx_ptc_module
