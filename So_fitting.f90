@@ -238,7 +238,7 @@ contains
 
 
     if(want) then
-       CALL FIND_ORBIT(R,CLOSED,1,STATE,1.d-5)
+       CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
        write(6,*) "closed orbit "
        write(6,*) CLOSED
 

@@ -1262,7 +1262,7 @@ CONTAINS
        CALL  CHARINT(RESUL(I:I),J(I))
        if(i>nv) then
           if(j(i)>0) then
-             dputchar=0.d0
+             dputchar=zero
              !             call var(dputchar,zero,0)
              return
           endif
@@ -1271,7 +1271,7 @@ CONTAINS
 
 
 
-    dputchar=0.d0
+    dputchar=zero
     !    call var(dputchar,zero,0)
     CALL pok(dputchar,j,s1)
     master=localmaster
@@ -1305,14 +1305,14 @@ CONTAINS
        if(i>nv) then
           if(j(i)>0) then
              !             call var(dputint,zero,0)
-             dputint=0.d0
+             dputint=zero
              return
           endif
        endif
     enddo
 
 
-    dputint=0.d0
+    dputint=zero
     !    call var(dputint,zero,0)
     CALL pok(dputint,j,s1)
     master=localmaster
@@ -1337,7 +1337,7 @@ CONTAINS
     endif
 
 
-    dputint0=0.d0
+    dputint0=zero
     !    call var(dputint0,zero,s2)
 
     j(s2)=1

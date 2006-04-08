@@ -311,9 +311,9 @@ contains
 
     allocate(dismom(c_%nd,0:no/2))
 !!! call a routine which sets dismon in each plane according to user definition
-    call make_ring(1,1.d-0)
-    call make_ring(2,1.d-0)
-    call make_ring(3,1.d-0)
+    call make_ring(1,one)
+    call make_ring(2,one)
+    call make_ring(3,one)
 
     allocate(ePP(lnv));
     allocate(ee(c_%nd2));
