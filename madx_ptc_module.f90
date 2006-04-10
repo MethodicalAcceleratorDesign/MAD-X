@@ -68,16 +68,23 @@ MODULE madx_ptc_module
 CONTAINS
 
   subroutine ptc_create_universe()
+    use madx_ptc_intstate_module, only : getintstate
     implicit none
+    type (internal_state)  :: state
+    if (getdebug()>1) print*,"Now PTC"
+    
+    state = getintstate() !picks up the current MAD-X-PTC internal state 
+    call initintstate(state-nocavity) !there might be some cavities - if not then my_state routine will remove it
+    state = getintstate() !picks up the current MAD-X-PTC the new internal state 
+    call print(state,6)
 
     print77=.false.
     read77 =.false.
-    
-    if (getdebug()>1) print*,"Now PTC"
+
+    if (getdebug()==0) global_verbose = .false.
 
     call set_up_universe(m_u)
     universe=universe+1
-
   end subroutine ptc_create_universe
   !_________________________________________________________________
 
@@ -101,7 +108,6 @@ CONTAINS
        return
     endif
 
-    call initintstate(default)
 
   end subroutine ptc_create_layout
   !_________________________________________________________________
@@ -158,7 +164,6 @@ CONTAINS
     integer             method0,method1
     integer             nst0,nst1
     !---------------------------------------------------------------
-    
     if (getdebug() > 1) then
        print *, '--------------------------------------------------------------'
        print *, '--------------------------------------------------------------'
@@ -204,6 +209,8 @@ CONTAINS
     if (getdebug() > 1) print '(a23, l7, a1)','Executing MAKE_STATES(',PARTICLE,')'
 
     CALL MAKE_STATES(PARTICLE)
+
+    if (getdebug()==0) global_verbose = .false.
 
     !  with_external_frame=.false.
     !  with_internal_frame=.false.
@@ -2109,10 +2116,11 @@ CONTAINS
           ii1=ii
           ii2=ii-1
        endif
-
+       
        angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
        au(ii,ii-1)=s1%junk%v(ii2).sub.string(ii-1)
        angp(1,ii)=s1%junk%v(ii1).sub.string(ii)
+       
        au(ii,ii)=s1%junk%v(ii2).sub.string(ii)
        au(i2-1,i2-1)=s1%junk%v(ii1).sub.string(i2-1)
        au(i2,i2-1)=s1%junk%v(ii2).sub.string(i2-1)
@@ -2354,13 +2362,19 @@ CONTAINS
     implicit none
     integer icase,mynpa
     real(dp) deltap0,deltap
-
+    
+    if (getdebug()>1) then
+      print*, "icase=",icase," mynpa=",mynpa," deltap=",deltap," deltap0=",deltap0
+    endif
+      
     deltap = zero
     select case(icase)
     CASE(4)
+       if (getdebug()>1) print*, "Enforcing ONLY_4D+NOCAVITY"
        default=default+only_4d+NOCAVITY
        mynpa=4
     CASE(5)
+       if (getdebug()>1) print*, "Enforcing DELTA"
        default=default+delta
        deltap=deltap0
        mynpa=5
@@ -2372,7 +2386,10 @@ CONTAINS
     END SELECT
 
     if(mynpa==6.and.icav==0) then
-       default=default+delta
+       if (getdebug()>1) then
+         print*, "There is no cavities present in the layout: Reducing reduntant phase space dimension"
+       endif
+       default=default+delta+NOCAVITY
        mynpa=5
     endif
     !HEADdiff: removed default=default+time
