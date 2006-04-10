@@ -1387,7 +1387,7 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   if (++t->curr == t->max) grow_table(t);
 }
 
-void augmentcountonly(char* table) /* increase table occ. by 1, fill missing */
+void augmentcountonly(char* table) /* increase table occ. by 1 */
 {
   int pos;
   struct table* t;
@@ -1399,6 +1399,8 @@ void augmentcountonly(char* table) /* increase table occ. by 1, fill missing */
     warning("Can not find table",table);
     return;
   }  
+  
+  if (t->num_cols > t->org_cols)  add_vars_to_table(t);
   
   if (++t->curr == t->max) grow_table(t);
 }
@@ -1885,6 +1887,11 @@ void exec_create_table(struct in_cmd* cmd)
   t->org_cols = 0;  /* all entries are "added" */
   add_to_table_list(t, table_register);
   myfree(rout_name, t_c); myfree(rout_name, t_types);
+
+  if (withname)
+   {
+     t->dynamic = 1;
+   }
 }
 
 void exec_store_coguess(struct in_cmd* cmd)
