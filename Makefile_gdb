@@ -6,7 +6,7 @@
 
 # compilers
 CC=gcc
-FC=g77 
+FC=lf95 
 # NAG for testing
 #f95=f95
 # LF95 for production
@@ -32,8 +32,12 @@ GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM -D_FULL
 #f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan
 # NAG alternative
 #f95_FLAGS=-c -O4 -maxcontin=100 -w=unused
-# LF95 default f95 compiler options
-f95_FLAGS= -g -c
+# G95
+#f95_FLAGS= -g -c -fno-second-underscore
+# LF95 debug f95 compiler options
+FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap --trace
+	# LF95 default f95 compiler options
+f95_FLAGS= -g -c $(FDEB)
 
 # NAG f95 compiler options to compile f77 code
 #FFLAGS77=-gline -g90 -c -maxcontin=100 -nan
@@ -41,7 +45,9 @@ f95_FLAGS= -g -c
 #FFLAGS77=-gline -g90 -c -maxcontin=100 -nan -ieee=full
 #FFLAGS77=-g90 -c -O4 -maxcontin=100 -w=unused
 # LF95 f95 compiler options to compile f77 code
-FFLAGS77= -g -c
+FFLAGS77=  -g -c $(FDEB)
+#G95
+#FFLAGS77= -g -c -fno-second-underscore
 
 # g77 link options
 FP=-static
@@ -49,7 +55,7 @@ FP=-static
 # NAG f95 link options
 #f95_FOPT=
 # LF95 f95 link options
-f95_FOPT=-static
+f95_FOPT=-static --trap --trace
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc

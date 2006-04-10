@@ -48,7 +48,7 @@ contains
     !Below we enforce that x(6) is cT, and it is time of flight from the start
     !we use time T=x(6)/ctime to find the time of arrival to a cavity so we can adjust its phase optimally
     localis = getintstate()
-    
+    localis = localis - nocavity + totalpath
     if (getdebug() > 1) then
       print *, "I am in setcavities "
       call print(localis,6)
