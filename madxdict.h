@@ -470,6 +470,7 @@ char command_def[] =
 "totalpath = [l, true, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
 "radiation = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
 "fringe = [l, true, true], "  /*sets the fringe switch/internal state of PTC */
+"nocavity = [l, true, true], "  /*sets the nocavity switch/internal state of PTC */
 "time = [l, true, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
 " " 
 "ptc_track: ptc_track none 0 0 "
