@@ -6,23 +6,21 @@
 
 # compilers
 CC=gcc
-FC=lf95 
+FC=g77
 # NAG for testing
 #f95=f95
 # LF95 for production
-f95=lf95 
-CXX=$(CC)
+f95=lf95
 
 # default fortran compiler options
-# Jacobian fail with O2 O3 O4
-FCP=-fno-second-underscore -I.
+FCP=-O4 -fno-second-underscore -funroll-loops -I.
 
 # alternative for development and debug
-FCM= -fno-second-underscore
-FCDB= -fno-second-underscore
+FCM=-O2 -fno-second-underscore -funroll-loops
+FCDB=-g -O0 -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -fno-second-underscore -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 
 # alternative for development
@@ -32,12 +30,8 @@ GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM -D_FULL
 #f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan
 # NAG alternative
 #f95_FLAGS=-c -O4 -maxcontin=100 -w=unused
-# G95
-#f95_FLAGS= -g -c -fno-second-underscore
-# LF95 debug f95 compiler options
-FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap --trace
-	# LF95 default f95 compiler options
-f95_FLAGS= -g -c $(FDEB)
+# LF95 default f95 compiler options
+f95_FLAGS= --o1 --tp -c
 
 # NAG f95 compiler options to compile f77 code
 #FFLAGS77=-gline -g90 -c -maxcontin=100 -nan
@@ -45,9 +39,7 @@ f95_FLAGS= -g -c $(FDEB)
 #FFLAGS77=-gline -g90 -c -maxcontin=100 -nan -ieee=full
 #FFLAGS77=-g90 -c -O4 -maxcontin=100 -w=unused
 # LF95 f95 compiler options to compile f77 code
-FFLAGS77=  -g -c $(FDEB)
-#G95
-#FFLAGS77= -g -c -fno-second-underscore
+FFLAGS77= --o1 --tp -c
 
 # g77 link options
 FP=-static
@@ -55,7 +47,7 @@ FP=-static
 # NAG f95 link options
 #f95_FOPT=
 # LF95 f95 link options
-f95_FOPT=-static --trap --trace
+f95_FOPT=-static
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
@@ -70,12 +62,12 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -D_CATCH_MEM -I /usr/X11R6/include/
+  GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
   FP=
 endif
 
-default: madxdev
+default: madx
 
 # dependencies of madxpf which combines the C-code
 madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
@@ -83,9 +75,6 @@ madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c maketh
 
 madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
-
-rplot.o: rplot.c
-	$(CXX) $(CXX_FLAGS) -c -o rplot.o rplot.c
 
 # fortran code dependencies on header files fi
 twiss_f77.o twiss.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
@@ -143,8 +132,7 @@ madx_ptc_track_run.o: madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
-madx_ptc_tablepush.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_tablepush.f90
-madx_ptc_script.o : Sp_keywords.o madx_ptc_script.f90
+madx_ptc_tablepush.o : madx_ptc_tablepush.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 wrap.o: madx_ptc_module.o wrap.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
@@ -172,9 +160,9 @@ mpars: madxm.F madxp.o
 
 # madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
-madx_objectsf77 = madxpf.o gxx11c.o rplot.o timel.o $(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+madx_objectsf77 = madxpf.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+
 madx: $(madx_objectsf77) ;
-	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
@@ -192,7 +180,6 @@ clean:
 	rm -f *.mod
 	rm -f core
 	rm -f *~
-	rm -f madx madxdev
 
 info:
 	@echo "-------------------------------------"
@@ -216,7 +203,3 @@ info:
 	@echo GPUB "                     " = $(GPUB)
 	@echo the OS is "                " = $(OS)
 	@echo the OSTYPE is "            " = $(OSTYPE)
-
-
-
-
