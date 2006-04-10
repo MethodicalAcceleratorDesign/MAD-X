@@ -28,7 +28,7 @@ module madx_ptc_intstate_module
   !    data structures
 
   logical,                public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
-  type (internal_state),  private  :: intstate
+  type (internal_state),  private  :: intstate = default0
   integer,                private  :: debug = 0    ! defines debug level
 
   !    routines
@@ -59,7 +59,9 @@ contains
     implicit none
     type (internal_state)  :: state
     !sets the internal state
+    if (getdebug() > 1) print *, "Setting internal state"
     intstate = state
+    if (getdebug() > 2) call print(intstate,6)
   end subroutine setintstate
   
   !____________________________________________________________________________________________
@@ -74,24 +76,24 @@ contains
     implicit none
     type (internal_state) :: intst
     
-    if (getdebug() > 0) print *, "Initializing internal state"
+    if (getdebug() > 1) print *, "Initializing internal state"
     
     intstate = intst-nocavity0
     call update_states
     
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
   end subroutine initintstate
   !____________________________________________________________________________________________
 
   subroutine ptc_resetinternalstate
     implicit none
 
-    if (getdebug() > 0) print *, "Setting internal state to DEFAULT0"
+    if (getdebug() > 1) print *, "Setting internal state to DEFAULT0"
 
     intstate = default0
     call update_states
 
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
 
   end subroutine ptc_resetinternalstate
   !____________________________________________________________________________________________
@@ -113,7 +115,7 @@ contains
     integer     :: flag
 
     if (flag == 1) then
-       if (getdebug() > 0) print *, "Setting MAX ACCEL"
+       if (getdebug() > 1) print *, "Setting MAX ACCEL"
        maxaccel = .true.
     endif
 
@@ -129,14 +131,14 @@ contains
     !    print *, "And the flag is", flag
 
     if (flag) then
-       if (getdebug() > 0) print *, "Switching ON exact missaligment"
+       if (getdebug() > 1) print *, "Switching ON exact missaligment"
        intstate = intstate + EXACTMIS0
     else
-       if (getdebug() > 0) print *, "Switching OFF exact missaligment"
+       if (getdebug() > 1) print *, "Switching OFF exact missaligment"
        intstate = intstate - EXACTMIS0
     endif
     call update_states
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
   end subroutine ptc_setexactmis
   !____________________________________________________________________________________________
 
@@ -146,14 +148,14 @@ contains
 
 
     if (flag) then
-       if (getdebug() > 0) print *, "Switching ON radiation"
+       if (getdebug() > 1) print *, "Switching ON radiation"
        intstate = intstate + radiation0
     else
-       if (getdebug() > 0) print *, "Switching OFF radiation"
+       if (getdebug() > 1) print *, "Switching OFF radiation"
        intstate = intstate - radiation0
     endif
     call update_states
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
   end subroutine ptc_setradiation
   !____________________________________________________________________________________________
 
@@ -162,14 +164,14 @@ contains
     logical     :: flag
 
     if (flag) then
-       if (getdebug() > 0) print *, "Switching ON fringe"
+       if (getdebug() > 1) print *, "Switching ON fringe"
        intstate = intstate + fringe0
     else
-       if (getdebug() > 0) print *, "Switching OFF fringe"
+       if (getdebug() > 1) print *, "Switching OFF fringe"
        intstate = intstate - fringe0
     endif
     call update_states
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
   end subroutine ptc_setfringe
   !____________________________________________________________________________________________
 
@@ -178,15 +180,15 @@ contains
     logical     :: flag
 
     if (flag) then
-       if (getdebug() > 0) print *, "Switching ON totalpath"
+       if (getdebug() > 1) print *, "Switching ON totalpath"
        intstate = intstate + totalpath0
     else
-       if (getdebug() > 0) print *, "Switching OFF totalpath"
+       if (getdebug() > 1) print *, "Switching OFF totalpath"
        intstate = intstate - totalpath0
     endif
 
     call update_states
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
 
   end subroutine ptc_settotalpath
   !____________________________________________________________________________________________
@@ -200,15 +202,15 @@ contains
     !    print *, "And the flag is", flag
 
     if (flag) then
-       if (getdebug() > 0) print *, "Switching ON time"
+       if (getdebug() > 1) print *, "Switching ON time"
        intstate = intstate + time0
     else
-       if (getdebug() > 0) print *, "Switching OFF time"
+       if (getdebug() > 1) print *, "Switching OFF time"
        intstate = intstate - time0
     endif
 
     call update_states
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
 
   end subroutine ptc_settime
 
@@ -218,14 +220,14 @@ contains
     logical     :: flag
 
     if (flag) then
-       if (getdebug() > 0) print *, "Switching ON nocavity"
+       if (getdebug() > 1) print *, "Switching ON nocavity"
        intstate = intstate + nocavity0
     else
-       if (getdebug() > 0) print *, "Switching OFF nocavity"
+       if (getdebug() > 1) print *, "Switching OFF nocavity"
        intstate = intstate - nocavity0
     endif
     call update_states
-    if (getdebug() > 9) call print(intstate,6)
+    if (getdebug() > 2) call print(intstate,6)
   end subroutine ptc_setnocavity
 
 
