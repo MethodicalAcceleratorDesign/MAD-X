@@ -2353,7 +2353,7 @@ CONTAINS
     real(dp) deltap0,deltap
     
     if (getdebug()>1) then
-      print*, "icase=",icase," mynpa=",mynpa," deltap=",deltap," deltap0=",deltap0
+      print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
     endif
       
     deltap = zero
