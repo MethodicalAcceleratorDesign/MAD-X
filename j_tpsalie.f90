@@ -2336,7 +2336,7 @@ contains
     ENDIF
 
     do i=1,s1%n
-       s0%v(i)=(1.d0.mono.i)-v(i)
+       s0%v(i)=(one.mono.i)-v(i)
        !s11%v(i)=s11%v(i)-(s11%v(i).sub.'0')
     enddo
 

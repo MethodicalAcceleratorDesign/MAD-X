@@ -37,7 +37,7 @@ module precision_constants
 
   real(dp),parameter::six=6e0_dp,seven=7e0_dp,eight=8e0_dp,nine=9e0_dp,ten=10e0_dp
   real(dp),parameter::eleven=11e0_dp,twelve=12e0_dp,c_14=14e0_dp,c_15=15e0_dp
-  real(dp),parameter::c_16=16e0_dp,c_20=20e0_dp,c_24=24e0_dp,c_30=30e0_dp
+  real(dp),parameter::c_16=16e0_dp,c_20=20e0_dp,c_24=24e0_dp,c_27=27e0_dp,c_30=30e0_dp
   real(dp),parameter::c_32=32e0_dp,c_40=40e0_dp,c_48=48e0_dp,c_50=50e0_dp
   real(dp),parameter::c_55=55e0_dp,c_72=72e0_dp,c_80=80e0_dp,c_85=85e0_dp
   real(dp),parameter::c_90=90e0_dp,c_100=100e0_dp,c_120=120e0_dp,c_160=160e0_dp
@@ -52,6 +52,14 @@ module precision_constants
   real(dp),parameter::c_1d9=1e9_dp,c_111110=1.1111e5_dp,c_2d5=2e5_dp
   real(dp),parameter::c_1d8=1e8_dp,c_1d10=1e10_dp,c_1d4=1e4_dp
   real(dp),parameter::c_1d30=1e30_dp,c_1d36=1e36_dp
+  real(dp),parameter::c_221=221e0_dp,c_981=981e0_dp,c_867=867e0_dp,c_102=102e0_dp
+  real(dp),parameter::c_183=183e0_dp,c_678=678e0_dp,c_472=472e0_dp,c_66=66e0_dp
+  real(dp),parameter::c_716=716e0_dp,c_2079=2079e0_dp,c_1002=1002e9_dp,c_834=834e0_dp
+  real(dp),parameter::c_454=454e0_dp,c_82=82e0_dp,c_41=41e0_dp,c_216=216e0_dp,c_272=272e0_dp
+  real(dp),parameter::c_840=840e0_dp
+
+  real(dp),parameter::c_1d_5=1e-05_dp
+
   real(dp),TARGET :: hyperbolic_aperture=ten
   !Numbers single
   real(sp),parameter::c_1e7=1e7_sp,c_0e0=0e0_sp
@@ -884,10 +892,10 @@ contains
     INTEGER, INTENT (IN) :: N
     INTEGER I
 
-    POW=1.D0
+    POW=one
 
     IF(N<=0) THEN
-       T=1.D0/S1
+       T=one/S1
        DO I=1,-N
           POW=POW*T
        ENDDO
@@ -909,7 +917,7 @@ contains
     T%A(0)=0.D0
 
     TT=T
-    inv=1.d0
+    inv=one
 
     DO I=1,N_my_1D_taylor
        INV=INV-TT

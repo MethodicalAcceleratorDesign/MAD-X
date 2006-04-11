@@ -3483,7 +3483,7 @@ void write_table(struct table* t, char* filename)
     fprintf(out_file,
             "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
             tm->tm_hour, tm->tm_min, tm->tm_sec);
-    fprintf(out_file, "*");
+    fprintf(out_file, "* ");
 
     for (i = 0; i < col->curr; i++)
     {
@@ -3497,7 +3497,7 @@ void write_table(struct table* t, char* filename)
     }
     fprintf(out_file, "\n");
 
-    fprintf(out_file, "$");
+    fprintf(out_file, "$ ");
     for (i = 0; i < col->curr; i++)
     {
       if (t->columns->inform[col->i[i]] == 1)
