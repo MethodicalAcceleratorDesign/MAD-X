@@ -96,7 +96,7 @@ TYPE ELEMENT
    TYPE(DKD2), POINTER :: K2               ! INTEGRATOR
    TYPE(KICKT3), POINTER :: K3               !  THIN KICK
    TYPE(CAV4), POINTER :: C4               ! CAVITY
-   TYPE(SOL5), POINTER :: S5               ! CAVITY
+   TYPE(SOL5), POINTER :: S5               ! solenoid
    TYPE(KTK), POINTER :: T6               ! INTEGRATOR   thick slow
    TYPE(TKTF), POINTER :: T7               ! INTEGRATOR   thick fast
    TYPE(NSMI), POINTER :: S8               ! NORMAL SMI

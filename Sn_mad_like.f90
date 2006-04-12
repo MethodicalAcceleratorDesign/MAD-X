@@ -67,7 +67,7 @@ module Mad_like
      INTEGER APERTURE_KIND
      REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
      LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE,PERMFRINGE
-     REAL(DP) DPHAS,PSI
+     REAL(DP) DPHAS,PSI,dvds
      INTEGER N_BESSEL
      !     logical(lp) in,out
   END TYPE EL_LIST
@@ -695,6 +695,7 @@ CONTAINS
        s2%BEND_FRINGE=.FALSE.
        s2%PERMFRINGE=.FALSE.
        s2%DPHAS=ZERO
+       s2%dvds=ZERO
        s2%PSI=ZERO
        s2%N_BESSEL=0
 
@@ -2248,8 +2249,6 @@ CONTAINS
     INTEGER,optional, INTENT(IN):: HARMON
     real(dp)  L1,VOLT1,LAG1,FREQ01
     INTEGER  HARMON1
-    
-  
     L1=zero
     VOLT1=zero
     LAG1=zero
@@ -2775,6 +2774,7 @@ CONTAINS
     ENDIF
     IF(S2%KIND==KIND21) THEN
        s2%CAV21%DPHAS=s1%DPHAS
+       s2%CAV21%dvds=s1%dvds
        s2%CAV21%PSI=s1%PSI
     ENDIF
 

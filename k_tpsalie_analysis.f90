@@ -1252,7 +1252,7 @@ contains
        w_p%nc=1
        w_p=(/" Berz's Package  "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_i
+       !       CALL WRITE_i
     else
        if(no1>3) then
           w_p=0
@@ -1339,7 +1339,7 @@ contains
        w_p%nc=1
        w_p=(/" Berz's Package  "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_i
+       !       CALL WRITE_i
     else
        if(no1>3) then
           w_p=0
