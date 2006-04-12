@@ -27,14 +27,14 @@ contains
     type(work)           :: nfen      ! New Fibre ENergy
     integer, pointer     :: poscav(:) !array keeping indexes of cavities
     real(dp),allocatable :: phasecav(:) !array keeping phases of cavities
-    real(dp)             :: patchprecision=1.d-8
+    real(dp)             :: patchprecision=1.0e-08_dp
     logical(lp)          :: patchenergy=.true.
     logical(lp)          :: patchnext=.true.
     real(dp)             :: prevbeta0  !just a temporary real variable
     real (dp)            :: x(1:6)   ! track vector -
     ! here we always use closed orbit track, that is all its relative coordinates are 0
-    real(dp)             :: sparivtime=0.d0 !synchronous particle arrival time
-    real(dp)             :: position=0.d0 !synchronous particle position
+    real(dp)             :: sparivtime=zero !synchronous particle arrival time
+    real(dp)             :: position=zero !synchronous particle position
     real(kind(1.d0))     :: get_value
     integer              :: get_option
     !------------------------------------------------------
@@ -62,7 +62,7 @@ contains
     write(24,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
     nfen = 0
     startfen = 0
-    x(:)=0.0d0
+    x(:)=zero
 
     call locate_all_twcav(my_ring,poscav)
     if ( getdebug() > 4 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
@@ -141,7 +141,7 @@ contains
        
        !TUNE CAVITY
        call setcavity(p,x,phasecav(j),charge,maxaccel)
-       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*360.0d0/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
+       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*360.0_dp/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
 
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
@@ -301,7 +301,7 @@ contains
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          endif    
-         f%mag%phas = pi/2.0d0 - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
+         f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
       else
@@ -322,7 +322,7 @@ contains
          write(6,'(a12,f12.5,a10)') '    Length ', f%mag%l,' m'
          write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad'
          write(6,'(a12,f12.0,a10)') '    Freq ',   f%mag%freq, ' Hz '
-         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*360.d0,' deg ', f%mag%lag,' rad '
+         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*360_dp,' deg ', f%mag%lag,' rad '
          write(6,'(a12,f12.5,a10)') '    P0c ',    f%mag%p%p0c, 'GeV/c'
       endif
 
@@ -339,7 +339,7 @@ contains
       p=>r%start
       do i=1,r%n
          if(p%mag%kind==kind21) then
-            if(p%mag%freq/=0.d0) then
+            if(p%mag%freq/=zero) then
                ic=ic+1
             endif
          endif
@@ -351,7 +351,7 @@ contains
       p=>r%start
       do i=1,r%n
          if(p%mag%kind==kind21) then
-            if(p%mag%freq/=0.d0) then
+            if(p%mag%freq/=zero) then
                ic=ic+1
                pos(ic)=i
             endif
