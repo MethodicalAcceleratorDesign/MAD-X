@@ -243,7 +243,7 @@ contains
        write(6,*) CLOSED
 
     else
-       closed=0.d0
+       closed=zero
     endif
 
     CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
@@ -316,7 +316,7 @@ contains
     integer ipause, mypause
 
     SCRATCHFILE=90
-    dst=0.d0
+    dst=zero
 
     STATE=((DEFAULT+ONLY_4D+delta)-RADIATION0)
     CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
@@ -709,7 +709,7 @@ contains
           c=>c%next
           i=i+1
        enddo
-       if(freq==0.d0) then
+       if(freq==zero) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -939,7 +939,7 @@ contains
           c=>c%next
           i=i+1
        enddo
-       if(freq==0.d0) then
+       if(freq==zero) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -1154,7 +1154,7 @@ contains
     CALL ALLOC(SXI)
     CALL ALLOC(IS)
     CALL ALLOC(YS,6)
-    CALL FIND_ORBIT(RING,FIX,LOC,SSS,1.e-8_dp)
+    CALL FIND_ORBIT(RING,FIX,LOC,SSS,c_1d_8)
     X=ND2
     DO I=1,6
        X(I)=FIX(I)
@@ -1389,7 +1389,7 @@ contains
     if(present(charge)) charge1=charge
 
     If(f%mag%thin) then  ! no waste of time!!!
-       kf=-f%DIR*charge1*de_gev/f%mag%volt/1.0e-3_dp
+       kf=-f%DIR*charge1*de_gev/f%mag%volt/c_1d_3
        if(kf>one) then
           Write(6,*) " Fatal Error: voltage not high enough ",kf
           stop
@@ -1400,7 +1400,7 @@ contains
        time_patch=zero
        return
     endif
-    kf=-f%DIR*charge1*de_gev/f%mag%L/f%mag%volt/1.0e-3_dp
+    kf=-f%DIR*charge1*de_gev/f%mag%L/f%mag%volt/c_1d_3
     if(abs(kf)>one) then
        Write(6,*) " Fatal Error: voltage not high enough ",kf
        stop
@@ -1524,12 +1524,12 @@ contains
     if(present(charge)) charge1=charge
     if(present(energy)) ene=energy
 
-    kf= -de_gev/1.0e-3_dp/f%mag%L/f%DIR/charge1
+    kf= -de_gev/c_1d_3/f%mag%L/f%DIR/charge1
     if(ene) then
        f%mag%volt=kf
        f%magp%volt=kf
     else
-       f%mag%volt=sign(1.0_dp,kf*f%mag%volt)* f%mag%volt
+       f%mag%volt=sign(one,kf*f%mag%volt)* f%mag%volt
        f%magp%volt=f%mag%volt
     endif
 
