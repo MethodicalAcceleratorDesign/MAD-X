@@ -3158,9 +3158,10 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
         case 3:
           if (stack[c_stack+1] == 0.0)
            {
-             warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to NaN!",stack[c_stack+1]);
+             warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);
              /*fatal_error("Division by zero is not defined","Aborting!");*/
-             stack[c_stack] = nan("");
+             stack[c_stack] = 0.0;
+             /*stack[c_stack] = nan("");*/
              break;
            }  
           stack[c_stack] /= stack[c_stack+1];
