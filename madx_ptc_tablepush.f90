@@ -40,7 +40,7 @@ contains
     !puts the coefficients in tables as defined in array pushes
     implicit none
     integer         :: n !fibre number
-    character(48)   :: name !fibre name
+    character(*)   :: name !fibre name
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
     type(real_8),pointer :: e !element in array
     real(dp)        :: coeff
