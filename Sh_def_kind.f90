@@ -10553,8 +10553,8 @@ contains
     BX=zero
     BY=zero
 
-    ! x1=1.d0.mono.'1'
-    ! x3=1.d0.mono.'01'
+    ! x1=one.mono.'1'
+    ! x3=one.mono.'01'
     k=0
     m=EL%P%nmul-1
     do a=m,1,-1
@@ -10600,8 +10600,8 @@ contains
     ! write(16,*)"el%p%b0 = ", junk
     ! call print(bx,16)
     ! call print(by,16)
-    ! B(1)=BY/morph(one+(1.d0.mono.'1')*EL%P%B0)
-    ! B(2)=-Bx/morph(one+(1.d0.mono.'1')*EL%P%B0)
+    ! B(1)=BY/morph(one+(one.mono.'1')*EL%P%B0)
+    ! B(2)=-Bx/morph(one+(one.mono.'1')*EL%P%B0)
     ! write(16,*) "******************************"
     ! call print(b(1),16)
     ! call print(b(2),16)
@@ -15322,7 +15322,7 @@ contains
     f(2)=x(4)*b(3)-x(6)*b(2)
     f(4)=x(6)*b(1)-x(2)*b(3)
     f(6)=x(2)*b(2)-x(4)*b(1)
-    f(7)=0.d0
+    f(7)=zero
 
   end subroutine f_Mtr
 
@@ -16302,7 +16302,7 @@ contains
        yt(j)=y(j)+a(j)/two
     enddo
 
-    tt=tI+h/2.d+0
+    tt=tI+h/two
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -16517,59 +16517,59 @@ contains
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/9.d+0
+       yt(j)=y(j)+a(j)/nine
     enddo
-    tt=tI+h/9.d+0
+    tt=tI+h/nine
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + 3.d+0*b(j))/24.d+0
+       yt(j)=y(j) + (a(j) + three*b(j))/c_24
     enddo
-    tt=tI+h/6.d+0
+    tt=tI+h/six
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-3.d+0*b(j)+4.d+0*c(j))/6.d+0
+       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
     enddo
 
-    tt=tI+h/3.d+0
+    tt=tI+h/three
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-5.d+0*a(j) + 27.d+0*b(j) - 24.d+0*c(j) + 6.d+0*d(j))/8.d+0
+       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
     enddo
-    tt=tI+.5d+0*h
+    tt=tI+half*h
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (221.d+0*a(j) - 981.d+0*b(j) + 867.d+0*c(j)- 102.d+0*d(j) + e(j))/9.d+0
+       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
     enddo
-    tt = tI+2.d+0*h/3.d+0
+    tt = tI+two*h/three
     call feval_cav(tt,yt,f,gr)
     do   j=1,ne
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-183.d+0*a(j)+678.d+0*b(j)-472.d+0*c(j)-66.d+0*d(j)+80.d+0*e(j) + 3.d+0*g(j))/48.d+0
+       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
     enddo
-    tt = tI + 5.d+0*h/6.d+0
+    tt = tI + five*h/six
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(716.d+0*a(j)-2079.d+0*b(j)+1002.d+0*c(j)+834.d+0*d(j)-454.d+0*e(j)-9.d+0*g(j)+72.d+0*o(j))/82.d+0
+       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
     enddo
 
     tt = tI + h
@@ -16579,7 +16579,7 @@ contains
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(41.d+0*a(j)+216.d+0*c(j)+27.d+0*d(j)+  272.d+0*e(j)+27.d+0*g(j)+216.d+0*o(j)+41.d+0*p(j))/840.d+0
+       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
     enddo
     tI=ti+h
 
@@ -16648,7 +16648,7 @@ contains
     do  j=1,ne
        yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
     enddo
-    tt=tI+five*h
+    tt=tI+half*h
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
