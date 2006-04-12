@@ -476,7 +476,7 @@ contains
     ENDDO
     CLOSED(:)=zero
     it=0
-    EPSNOW=eps
+    EPSNOW=one/eps
 100 continue
     it=it+1
 
@@ -1554,7 +1554,7 @@ contains
 
     xn=zero
     JMAX=ZERO
-    JMIN=eps
+    JMIN=one/eps
     emit(1:2)=scat*aper(1:2)
     write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     write(6,*) " Initial emit = ", emit(1:2)," scale = ",scat
