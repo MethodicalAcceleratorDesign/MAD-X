@@ -59,7 +59,7 @@ contains
     implicit none
     type (internal_state)  :: state
     !sets the internal state
-    if (getdebug() > 1) print *, "Setting internal state"
+    if (getdebug() > 1) print *, "setintstate: Setting internal state"
     intstate = state
     if (getdebug() > 2) call print(intstate,6)
   end subroutine setintstate
