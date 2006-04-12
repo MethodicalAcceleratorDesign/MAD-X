@@ -893,7 +893,7 @@ CONTAINS
     integer k,i,ii,no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
     integer inval,ioptfun,iii,restart_sequ,advance_node,get_option
     integer tab_name(*)
-    real(dp) x(6),suml,deltap0,deltap,mypt,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy
+    real(dp) x(6),suml,deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy
     real(kind(1d0)) get_value
     type(real_8) y(6)
     type(twiss) tw
@@ -932,8 +932,7 @@ CONTAINS
     CALL UPDATE_STATES
 
     x(:)=zero
-    call Convert_dp_to_dt(deltap,mypt)
-    if(icase.eq.5) x(5)=mypt
+    if(icase.eq.5) x(5)=deltap
 
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
 
@@ -1658,7 +1657,7 @@ CONTAINS
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2,map_term
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
          string_from_table, double_from_table, result_from_normal
-    real(dp) x(6),deltap0,deltap,mypt,map_coor(i_map_coor)
+    real(dp) x(6),deltap0,deltap,map_coor(i_map_coor)
     !type(real_8) y(6)
     integer :: column(6) = (/1,0,0,0,0,0/)
     integer :: ord(3), indexa(4)
@@ -1687,8 +1686,7 @@ CONTAINS
     call my_state(icase,deltap,deltap0)
 
     x(:)=zero
-    call Convert_dp_to_dt(deltap,mypt)
-    if(icase.eq.5) x(5)=mypt
+    if(icase.eq.5) x(5)=deltap
     closed_orbit = get_value('ptc_normal ','closed_orbit ') .ne. 0
     if(closed_orbit) then
        call find_orbit(my_ring,x,1,default,c_1d_7)
@@ -1891,7 +1889,7 @@ CONTAINS
     implicit none
     integer i,nint,ndble,nchar,int_arr(1),char_l,icase,turns,flag_index,why(9)
     integer j,next_start
-    real(dp) x0(6),x(6),deltap0,deltap,mypt
+    real(dp) x0(6),x(6),deltap0,deltap
     real(dp)  xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx
     real(kind(1d0)) get_value
     logical(lp) closed_orbit
@@ -1920,7 +1918,6 @@ CONTAINS
     endif
 
     x0(:)=zero
-    call Convert_dp_to_dt(deltap,mypt)
     if(icase.eq.5) x0(5)=deltap
     closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
     if(closed_orbit) then
@@ -2348,6 +2345,7 @@ CONTAINS
        i=5
     CASE(6)
        i=6
+       default=default+time
     CASE DEFAULT
        default=default+only_4d+NOCAVITY
        i=4
