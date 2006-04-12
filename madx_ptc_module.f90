@@ -68,16 +68,10 @@ MODULE madx_ptc_module
 CONTAINS
 
   subroutine ptc_create_universe()
-    use madx_ptc_intstate_module, only : getintstate
     implicit none
-    type (internal_state)  :: state
+
     if (getdebug()>1) print*,"Now PTC"
     
-    state = getintstate() !picks up the current MAD-X-PTC internal state 
-    call initintstate(state-nocavity) !there might be some cavities - if not then my_state routine will remove it
-    state = getintstate() !picks up the current MAD-X-PTC the new internal state 
-    call print(state,6)
-
     print77=.false.
     read77 =.false.
 
@@ -86,12 +80,14 @@ CONTAINS
 
     call set_up_universe(m_u)
     universe=universe+1
+    
+    
   end subroutine ptc_create_universe
   !_________________________________________________________________
 
   subroutine ptc_create_layout()
-    use madx_ptc_intstate_module, only : initintstate
     implicit none
+    type (internal_state)  :: state
 
     if(universe.le.0) then
        call fort_warn('return from ptc_create_layout: ',' no universe created')
@@ -109,6 +105,7 @@ CONTAINS
        return
     endif
 
+    cavsareset = .false.
 
   end subroutine ptc_create_layout
   !_________________________________________________________________
@@ -434,7 +431,7 @@ CONTAINS
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
-       if (getdebug() > 2)  print *, 'This is a drift'
+!       if (getdebug() > 2)  print *, 'This is a drift'
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
@@ -508,7 +505,7 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
     case(5) ! PTC accepts mults
-       if (getdebug() > 2)  print *, 'This is a quadrupole'
+!       if (getdebug() > 2)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
@@ -685,7 +682,7 @@ CONTAINS
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
     case(27)
-       if (getdebug() > 2)  print *, 'This is a twcavity'
+!       if (getdebug() > 2)  print *, 'This is a twcavity'
        key%magnet="twcavity"
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -920,8 +917,10 @@ CONTAINS
     integer  :: charge    ! charge of an accelerated particle
 
 
+    print*,"ptc_twiss"
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
+    print*,"ptc_twiss: Table name is ",table_name
 
     if(universe.le.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -940,12 +939,13 @@ CONTAINS
     icase = get_value('ptc_twiss ','icase ')
     deltap0 = get_value('ptc_twiss ','deltap ')
 
-    default = getintstate()
-
+    deltap = zero
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
-
+    
+    
     x(:)=zero
+    mypt=zero
     call Convert_dp_to_dt(deltap,mypt)
     if(icase.eq.5) x(5)=mypt
 
@@ -1045,6 +1045,11 @@ CONTAINS
     iii=restart_sequ()
     print77=.false.
     open(unit=21,file='ptctwiss.txt')
+
+    if (getdebug() > 2) then
+       print *, "ptc_twiss: internal state is:"
+       call print(default,6)
+    endif
 
     do i=1,MY_RING%n
        
@@ -1178,7 +1183,7 @@ CONTAINS
       opt_fun(35)=tw%disp(5) * deltae
       opt_fun(36)=tw%disp(6) * deltae
 
-      if (getdebug() > 2)   write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      if (getdebug() > 2)   write(6,'(a16,4f12.8)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
       
       ioptfun=36
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
@@ -1697,8 +1702,10 @@ CONTAINS
 
     icase = get_value('ptc_normal ','icase ')
     deltap0 = get_value('ptc_normal ','deltap ')
-
+    
+    deltap = zero
     call my_state(icase,deltap,deltap0)
+    CALL UPDATE_STATES
 
     x(:)=zero
     call Convert_dp_to_dt(deltap,mypt)
@@ -1924,11 +1931,12 @@ CONTAINS
 
     icase = get_value('ptc_track ','icase ')
     deltap0 = get_value('ptc_track ','deltap ')
+    
+    deltap = zero
     call my_state(icase,deltap,deltap0)
-
     CALL UPDATE_STATES
-    if (getdebug() > 2) then
 
+    if (getdebug() > 2) then
        print *, "ptc_track: internal state is:"
        call print(default,6)
     endif
@@ -1941,6 +1949,7 @@ CONTAINS
        call find_orbit(my_ring,x0,1,default,c_1d_7)
        CALL write_closed_orbit(icase,x0)
     endif
+
 
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
 
@@ -2351,19 +2360,26 @@ CONTAINS
     implicit none
     integer icase,i
     real(dp) deltap0,deltap
+
+    default = getintstate()
+
+    print*, "my_state: state from getintstate: " 
+    call print(DEFAULT,6)
     
     if (getdebug()>1) then
       print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
     endif
+    
+    
       
     deltap = zero
     select case(icase)
     CASE(4)
-       if (getdebug()>1) print*, "Enforcing ONLY_4D+NOCAVITY"
+       if (getdebug()>1) print*, "my_state: Enforcing ONLY_4D+NOCAVITY"
        default=default+only_4d+NOCAVITY
        i=4
     CASE(5)
-       if (getdebug()>1) print*, "Enforcing DELTA"
+       if (getdebug()>1) print*, "my_state: Enforcing DELTA"
        default=default+delta
        deltap=deltap0
        i=5
@@ -2374,17 +2390,21 @@ CONTAINS
        i=4
     END SELECT
 
-    if(i==6.and.icav==0) then
+    if (i==6) then
+      if (icav==0) then
        default=default+only_4d+NOCAVITY
        call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
        i=4
+      else
+       default = default - NOCAVITY !enforcing nocavity to false
+      endif 
     endif
+    
 
     call setintstate(default)
     CALL UPDATE_STATES
 
     if (getdebug() > 0) call print(default,6)
-    call print(default,6)
 
     icase = i
 
