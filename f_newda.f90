@@ -3096,7 +3096,7 @@ contains
              enddo
              IF(I.EQ.J) PROD = PROD - one
              IF(abs(PROD).GT.c_100*EPSdolMAC) THEN
-                write(line,'(a50,2(1x,i4),3(1x,g12.6))')'ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
+                write(line,'(a50,2(1x,i4),3(1x,g12.6))')'newDAINV: ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
                      & ,I,J,PROD,EPSdolmac,EPSdol
                 IER = 1
                 ipause=mypauses(-555,line)
@@ -3233,7 +3233,7 @@ contains
              enddo
              IF(I.EQ.J) PROD = PROD - one
              IF(abs(PROD).GT.c_100*EPSdolMAC) THEN
-                write(line,'(a50,2(1x,i4),3(1x,g12.6))')'ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
+                write(line,'(a50,2(1x,i4),3(1x,g12.6))')'newDAINV2: ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
                      & ,I,J,PROD,EPSdolmac,EPSdol
                 IER = 1
                 ipause=mypauses(-555,line)

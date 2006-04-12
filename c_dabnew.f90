@@ -3552,7 +3552,8 @@ contains
                 call dadal(ms,ia)
                 return
              else
-                write(line,'(a50,2(1x,i4),3(1x,g12.6))')  'ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
+                write(line,'(a50,2(1x,i4),3(1x,g12.6))')  &
+                     & 'dainvt: ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
                      &  ,i,j,prod,epsmac,eps
                 ipause=mypauses(35,line)
                 ier = 1
