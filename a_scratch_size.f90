@@ -54,7 +54,7 @@ module precision_constants
   real(dp),parameter::c_1d30=1e30_dp,c_1d36=1e36_dp
   real(dp),parameter::c_221=221e0_dp,c_981=981e0_dp,c_867=867e0_dp,c_102=102e0_dp
   real(dp),parameter::c_183=183e0_dp,c_678=678e0_dp,c_472=472e0_dp,c_66=66e0_dp
-  real(dp),parameter::c_716=716e0_dp,c_2079=2079e0_dp,c_1002=1002e9_dp,c_834=834e0_dp
+  real(dp),parameter::c_716=716e0_dp,c_2079=2079e0_dp,c_1002=1002e0_dp,c_834=834e0_dp
   real(dp),parameter::c_454=454e0_dp,c_82=82e0_dp,c_41=41e0_dp,c_216=216e0_dp,c_272=272e0_dp
   real(dp),parameter::c_840=840e0_dp
 
