@@ -110,7 +110,7 @@ contains
        bf=zero;
        dx=(x-x0)/(b%blim(1,2)-b%blim(1,1))*(b%nb(1)-1)
        dy=(y-y0)/(b%blim(2,2)-b%blim(2,1))*(b%nb(2)-1)
-       dz=0.0_DP
+       dz=zero
        do k=1,3
           ! bf(k)=dx*(dx-one)/two*f(K,-1,0)+dy*(dy-one)/two*f(K,0,-1)+(ONE+DX*DY-DX**2-DY**2)*F(K,0,0)
           ! bf(k)=  bf(k)+DX*(DX-TWO*DY+one)/TWO*F(K,1,0)+DY*(DY-TWO*DX+one)/TWO*F(K,0,1)+DX*DY*F(K,1,1)
@@ -124,8 +124,8 @@ contains
           ! makes less symplectic  xy term only h**3 accurate
           bf(k)=bf(k)+dx*dy*(2*f(k,0,0)+f(k,1,1)+f(k,-1,-1)-f(k,0,1)-f(k,1,0)-f(k,0,-1)-f(k,-1,0))/two
           ! correction of f_xx and f_yy  ! f_xxxx and f_yyyy
-          bf(k)=bf(k)+(dx**2-dx**4)*(-6*f(k,0,0)+4*f(k,1,0)+4*f(k,-1,0)-f(k,2,0)-f(k,-2,0))/24.0_dp
-          bf(k)=bf(k)+(dy**2-dy**4)*(-6*f(k,0,0)+4*f(k,0,1)+4*f(k,0,-1)-f(k,0,2)-f(k,0,-2))/24.0_dp
+          bf(k)=bf(k)+(dx**2-dx**4)*(-6*f(k,0,0)+4*f(k,1,0)+4*f(k,-1,0)-f(k,2,0)-f(k,-2,0))/c_24
+          bf(k)=bf(k)+(dy**2-dy**4)*(-6*f(k,0,0)+4*f(k,0,1)+4*f(k,0,-1)-f(k,0,2)-f(k,0,-2))/c_24
 
 
        enddo

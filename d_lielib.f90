@@ -1312,7 +1312,7 @@ contains
     enddo
     xnbefore=c_1d36
     more=.false.
-    eps=1.e-5_dp
+    eps=c_1d_5
     nrmax=1000
     xn=c_1d4
     do k=1,nrmax

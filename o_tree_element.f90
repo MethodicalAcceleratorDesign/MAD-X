@@ -135,9 +135,9 @@ CONTAINS
     REAL(DP) XT(lno),XF(lnv),XM(lno+1),XX
     INTEGER JC,I,IV,ng
 
-    XT=0.0_DP
-    XF=0.0_DP
-    XM=0.0_DP
+    XT=zero
+    XF=zero
+    XM=zero
 
     do i=1,T%ND2
        xt(i)=xi(i)
@@ -264,9 +264,9 @@ CONTAINS
     if(present(n)) n1=n
     do k=1,n1
        if(.not.c_%CHECK_STABLE) return
-       XT=0.0_DP
-       XF=0.0_DP
-       XM=0.0_DP
+       XT=zero
+       XF=zero
+       XM=zero
 
        do i=1,T%ND2
           xt(i)=xi(i)

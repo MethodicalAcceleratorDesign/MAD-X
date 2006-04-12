@@ -35,7 +35,7 @@ module definition
   private xintex,dsta,sta,angle,rad,ps,rads,mx
   ! numerical differentiation by knobs
   logical(lp) :: knob_numerical=.false.
-  real(dp) ::  knob_eps(lnv)=1.e-6_dp
+  real(dp) ::  knob_eps(lnv)=c_1d_6
   integer ::  knob_i =0
 
   !

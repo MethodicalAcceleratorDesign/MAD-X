@@ -379,7 +379,7 @@ contains
        !     ENDDO
        !     JUNK=ZERO_
        IF(s2%eps==ZERO) THEN
-          S2%EPS=1000.0_DP*FULL_ABS(S1)
+          S2%EPS=c_1d3*FULL_ABS(S1)
           call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
           S2%EPS=ZERO
        ELSE
@@ -398,7 +398,7 @@ contains
        !     ENDDO
        !     JUNK=ZERO_
        IF(s2%eps==ZERO) THEN
-          S2%EPS=1000.0_DP*FULL_ABS(S1)
+          S2%EPS=c_1d3*FULL_ABS(S1)
           call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
           S2%EPS=ZERO
        ELSE
@@ -636,7 +636,7 @@ contains
     integer i,j
     call alloc(s1%h)
 
-    s1%eps=1.0e-6_dp
+    s1%eps=c_1d_6
     s1%ifac=1
     s1%linear_in=.false.
     s1%imax=1000

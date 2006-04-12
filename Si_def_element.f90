@@ -13,7 +13,7 @@ MODULE S_DEF_ELEMENT
   logical(lp),PARAMETER::BERZ=.TRUE.,ETIENNE=.NOT.BERZ
   logical(lp) :: USE_TPSAFIT=.TRUE.  ! USE GLOBAL ARRAY INSTEAD OF PERSONAL ARRAY
   logical(lp), target :: set_tpsafit=.false.
-  real(dp) , target :: scale_tpsafit=1.0_dp
+  real(dp) , target :: scale_tpsafit=one
   real(dp), target :: tpsafit(lnv) !   used for fitting with tpsa in conjunction with pol_block
   PRIVATE copy_el_elp,copy_elp_el,copy_el_el
   PRIVATE cop_el_elp,cop_elp_el,cop_el_el

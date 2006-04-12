@@ -27,7 +27,7 @@ contains
     type(work)           :: nfen      ! New Fibre ENergy
     integer, pointer     :: poscav(:) !array keeping indexes of cavities
     real(dp),allocatable :: phasecav(:) !array keeping phases of cavities
-    real(dp)             :: patchprecision=1.0e-08_dp
+    real(dp)             :: patchprecision=c_1d_8
     logical(lp)          :: patchenergy=.true.
     logical(lp)          :: patchnext=.true.
     real(dp)             :: prevbeta0  !just a temporary real variable
@@ -141,7 +141,7 @@ contains
        
        !TUNE CAVITY
        call setcavity(p,x,phasecav(j),charge,maxaccel)
-       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*360.0_dp/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
+       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
 
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
@@ -322,7 +322,7 @@ contains
          write(6,'(a12,f12.5,a10)') '    Length ', f%mag%l,' m'
          write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad'
          write(6,'(a12,f12.0,a10)') '    Freq ',   f%mag%freq, ' Hz '
-         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*360_dp,' deg ', f%mag%lag,' rad '
+         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*c_360,' deg ', f%mag%lag,' rad '
          write(6,'(a12,f12.5,a10)') '    P0c ',    f%mag%p%p0c, 'GeV/c'
       endif
 
@@ -376,7 +376,7 @@ end module madx_ptc_setcavs_module
 !               f%magp%volt=kf
 !            else
 !               !uses simply the peak voltage and phase
-!               f%mag%volt=sign(1.0_dp,kf*f%mag%volt) * f%mag%volt
+!               f%mag%volt=sign(one,kf*f%mag%volt) * f%mag%volt
 !               f%magp%volt=f%mag%volt
 !            endif
 !            f%mag%phas=pi/2.0d0-twopi*f%mag%freq*arrivtime-c_%phase0

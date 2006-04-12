@@ -618,17 +618,17 @@ contains
       endif
 
       mapa=1 ! makes identity map
-      mapa%v(1)=sqrt(betx)*(1.0_dp.mono.1) + ddx*(1.0_dp.mono.5)
-      mapa%v(2)=(1.0_dp/sqrt(betx))*(1.0_dp.mono.2) - (alfx/sqrt(betx))*(1.0_dp.mono.1)+ ddpx*(1.0_dp.mono.5)
-      mapa%v(3)=sqrt(bety)*(1.0_dp.mono.3) + ddy*(1.0_dp.mono.5)
-      mapa%v(4)=(1.0_dp/sqrt(bety))*(1.0_dp.mono.4) - (alfy/sqrt(bety))*(1.0_dp.mono.3)+ ddpy*(1.0_dp.mono.5)
+      mapa%v(1)=sqrt(betx)*(one.mono.1) + ddx*(one.mono.5)
+      mapa%v(2)=(one/sqrt(betx))*(one.mono.2) - (alfx/sqrt(betx))*(one.mono.1)+ ddpx*(one.mono.5)
+      mapa%v(3)=sqrt(bety)*(one.mono.3) + ddy*(one.mono.5)
+      mapa%v(4)=(one/sqrt(bety))*(one.mono.4) - (alfy/sqrt(bety))*(one.mono.3)+ ddpy*(one.mono.5)
 
       if(c_%nd2 == 6) then
          if (gamdelta > 0) then
             print *,"We go 6D"
-            betd=(1.0_dp+alfdelta**2)/gamdelta
-            mapa%v(5)=sqrt(betd)*(1.0_dp.mono.5)
-            mapa%v(6)=(1.0_dp/sqrt(betd))*(1.0_dp.mono.6) - (alfdelta/sqrt(betd))*(1.0_dp.mono.5)
+            betd=(one+alfdelta**2)/gamdelta
+            mapa%v(5)=sqrt(betd)*(one.mono.5)
+            mapa%v(6)=(one/sqrt(betd))*(one.mono.6) - (alfdelta/sqrt(betd))*(one.mono.5)
          else
             print *, "Error: User must provide initial conditions:"
             print *, "Error: 6D calculation requested but initial gamdelta is 0"
@@ -650,10 +650,10 @@ contains
     integer plane,i
     real(dp) I0
 
-    dismom(plane,0)=1.0_dp
+    dismom(plane,0)=one
 
     do i=1,c_%no/2
-       dismom(plane,i)=i*I0*2.0_dp*dismom(plane,i-1)
+       dismom(plane,i)=i*I0*two*dismom(plane,i-1)
     enddo
 
   end   subroutine make_gaussian
@@ -664,10 +664,10 @@ contains
     integer plane,i
     real(dp) I0
 
-    dismom(plane,0)=1.0_dp
+    dismom(plane,0)=one
 
     do i=1,c_%no/2
-       dismom(plane,i)=I0*2.0_dp*dismom(plane,i-1)
+       dismom(plane,i)=I0*two*dismom(plane,i-1)
     enddo
 
   end   subroutine make_ring
@@ -681,7 +681,7 @@ contains
     integer i,j,k
 
     e=0
-    ave=0.0_dp
+    ave=zero
     do i=1,c_%nd2
        do j=i,c_%nd2
           do k=1,c_%nd
@@ -711,7 +711,7 @@ contains
     do i=1,c_%nd2
        do j=i,c_%nd2
           do k=1,c_%nd
-             ave(i,j,k)=0.0_dp
+             ave(i,j,k)=zero
              e(k*2-1)=1
              ave(i,j,k)=      ave(i,j,k) + (y(i)%t.par.e)*(y(j)%t.par.e) !*
              e(k*2-1)=0
@@ -792,7 +792,7 @@ contains
     integer e(:)
     integer i
 
-    filter=1.0_dp
+    filter=one
 
     do i=1,my_nd_for_averaging
        if(e(2*i-1)/=e(2*i)) then

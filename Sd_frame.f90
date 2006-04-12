@@ -519,8 +519,8 @@ CONTAINS
     ! Original order now changed was xy,xz,yz
     ! TRANSPOSED OF GEO_ROTB
 
-    exii(:,:)=0.0_dp
-    enti(:,:)=0.0_dp
+    exii(:,:)=zero
+    enti(:,:)=zero
     exii(:,:)=zero
     temp(:,:)=zero
 

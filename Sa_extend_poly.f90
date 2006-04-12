@@ -22,7 +22,7 @@ module S_extend_poly
   LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
-  REAL(dp),TARGET   :: absolute_aperture=1e3_dp
+  REAL(dp),TARGET   :: absolute_aperture=c_1d3
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE REAL_8REAL6
      MODULE PROCEDURE REAL6REAL_8
