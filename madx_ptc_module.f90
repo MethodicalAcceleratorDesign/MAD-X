@@ -155,6 +155,7 @@ CONTAINS
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt
+    REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
     real(kind(1d0)) get_value,node_value,gammatr
     character(length) name
     character(name_len) aptype
@@ -442,14 +443,26 @@ CONTAINS
           goto 100
        endif
        key%magnet="rbend"
+           !VK
+           CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+
        key%list%b0=node_value('angle ')
        !     key%list%k(1)=node_value('k0 ')
-       key%list%k(2)=node_value('k1 ')
-       key%list%k(3)=node_value('k2 ')
+             key%list%k(1) =zero; key%list%ks(1)=zero !VK
+
+!VK       key%list%k(2)=node_value('k1 ')
+          key%list%k(2)=node_value('k1 ')+ key%list%k(2) !VK
+
+!VK       key%list%k(3)=node_value('k2 ')
+          key%list%k(3)=node_value('k2 ')+ key%list%k(3) !VK
+
        !     key%list%k(3)=node_value('k2 ')
        !     key%list%ks(1)=node_value('k0s ')
        !     key%list%ks(2)=node_value('k1s ')
+             key%list%ks(2)=node_value('k1s ')+key%list%ks(2) !VK
        !     key%list%ks(3)=node_value('k2s ')
+             key%list%ks(3)=node_value('k2s ')+key%list%ks(3) !VK
+
        ! Gymnastic needed since PTC expects MAD8 convention
        key%list%t1=node_value('e1 ')-node_value('angle ')/two
        key%list%t2=node_value('e2 ')-node_value('angle ')/two
@@ -481,9 +494,18 @@ CONTAINS
           goto 100
        endif
        key%magnet="sbend"
+           !VK
+           CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+
        key%list%b0=node_value('angle ')
-       key%list%k(2)=node_value('k1 ')
-       key%list%k(3)=node_value('k2 ')
+             key%list%k(1) =zero; key%list%ks(1)=zero !VK
+
+!VK       key%list%k(2)=node_value('k1 ')
+          key%list%k(2)=node_value('k1 ')+ key%list%k(2) !VK
+
+!VK       key%list%k(3)=node_value('k2 ')
+          key%list%k(3)=node_value('k2 ')+ key%list%k(3) !VK
+
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
@@ -508,7 +530,8 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-    case(5) ! PTC accepts mults
+    case(987) ! keeping old code 
+    !case(5) ! PTC accepts mults
        if (getdebug() > 9)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
        call dzero(f_errors,maxferr+1)
@@ -533,54 +556,155 @@ CONTAINS
        if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
        key%list%k(2)=sk1
        key%tiltd=node_value('tilt ')+tilt
+
+   !================================================================
+   ! QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real;
+   case(5) ! PTC accepts mults
+       if (getdebug() > 9)  print *, 'This is a quadrupole'
+       key%magnet="quadrupole"
+
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+       ! Read data & fill %k(:), %ks(:) arrays which are 
+       ! summs of multipoles and errors
+
+       ! quadrupole components 
+       sk1=node_value('k1 ')
+       sk1s=node_value('k1s ')
+
+       !#Dipole components are zeroed for Q-element ###!
+       key%list%k(1) =zero                             !
+       key%list%ks(1)=zero                             !
+       ! USE DIPOLE KICKS as ERRORS or use BENDs ##### !
+    
+       ! A sum of quadrupole components from K1 & K1S and ========!
+       ! from multipoles on the bench (without errors) defines    !
+       ! a tilt angle of normal Q                                 !
+       if(l.ne.0) then                                            !
+         !sk1 = sk1 +  normal(1)/l                                !
+          sk1 = sk1 +  normal_0123(1)                             !
+         !sk1s = sk1s + skew(1)/l                                 !
+          sk1s = sk1s + skew_0123(1)                              !
+       endif                                                      !
+       if (sk1s .eq. zero)  then                                  !
+          tilt = zero                                             !
+       else                                                       !
+          tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two          !
+       endif                                                      ! 
+                                                                  !
+       if(l.ne.0) then                                            !
+         !sk1  = sk1  + field(1,1)/l                              !
+          sk1  = sk1  + (key%list%k(2)-normal_0123(1))            !
+         !sk1s = sk1s + field(2,1)/l                              !
+          sk1s = sk1s + (key%list%ks(2)-skew_0123(1))             !
+       endif                                                      !
+                                                                  !
+       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
+       key%list%k(2)=sk1                                          !
+       key%list%ks(2)=zero  ! added by VK                         !       
+       key%tiltd=node_value('tilt ')+tilt  !======================!
+
+   !================================================================
+
     case(6)
        key%magnet="sextupole"
-       call dzero(f_errors,maxferr+1)
-       n_ferr = node_fd_errors(f_errors)
-       do i = 0, 2
-          do j = 1, 2
-             field(j,i) = zero
-          enddo
-       enddo
-       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
+
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) !VK
+
+       !VK call dzero(f_errors,maxferr+1)
+       !VK n_ferr = node_fd_errors(f_errors)
+       !VK do i = 0, 2
+       !VK   do j = 1, 2
+       !VK      field(j,i) = zero
+       !VK   enddo
+       !VK enddo
+       !VK if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
+
+       !#Dipole components are zeroed for Sextupole ###!
+       key%list%k(1) =zero                             !
+       key%list%ks(1)=zero                             !
+       ! USE DIPOLE KICKS as ERRORS or use BENDs ##### !
+
+       !VK: Quadr-fields are not zeroed ? Why not.
+  
        sk2=node_value('k2 ')
        sk2s=node_value('k2s ')
-       if (sk2s .eq. zero)  then
-          tilt = zero
-       else
-          tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three
-       endif
-       if(l.ne.0) then
-          sk2 = sk2 + field(1,2)/l
-          sk2s = sk2s + field(2,2)/l
-       endif
-       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)
-       key%list%k(3)=sk2
-       key%tiltd=node_value('tilt ')+tilt
+
+       ! A sum of sextupole components from K2 & K2S and  ========!
+       ! from multipoles on the bench (without errors) defines    !
+       ! a tilt angle of normal Sextupole                         !
+       if(l.ne.0) then                                            !
+         !sk2 = sk2 +  normal(2)/l                                !
+          sk2 = sk2 +  normal_0123(2)                             !
+         !sk2s = sk2s + skew(2)/l                                 !
+          sk2s = sk2s + skew_0123(2)                              !
+       endif                                                      !
+       !                                                          !
+       if (sk2s .eq. zero)  then                                  !
+          tilt = zero                                             !
+       else                                                       !
+          tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three        !
+       endif                                                      !
+       !                                                          !
+       if(l.ne.0) then                                            !
+         !sk2  = sk2 + field(1,2)/l                               !
+          sk2  = sk2 + (key%list%k(3)-normal_0123(2))             !
+         !sk2s = sk2s + field(2,2)/l                              !
+          sk2s = sk2s + (key%list%ks(3)-skew_0123(2))             !
+       endif                                                      !
+       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           ! 
+       key%list%k(3)=sk2                                          !
+       key%tiltd=node_value('tilt ')+tilt !-----------------------!
+
     case(7) ! PTC accepts mults
        key%magnet="octupole"
-       call dzero(f_errors,maxferr+1)
-       n_ferr = node_fd_errors(f_errors)
-       do i = 0, 3
-          do j = 1, 2
-             field(j,i) = zero
-          enddo
-       enddo
-       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(8,n_ferr))
+
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) !VK
+
+       !VK call dzero(f_errors,maxferr+1)
+       !VK n_ferr = node_fd_errors(f_errors)
+       !VK do i = 0, 3
+       !VK    do j = 1, 2
+       !VK       field(j,i) = zero
+       !VK    enddo
+       !VK enddo
+       !VK if (n_ferr .gt. 0) call dcopy(f_errors, field, min(8,n_ferr))
+
+       !#Dipole components are zeroed for Octupole ####!
+       key%list%k(1) =zero                             !
+       key%list%ks(1)=zero                             !
+       ! USE DIPOLE KICKS as ERRORS or use BENDs ######!
+
+       !VK: Quadr- & Sextupole -fields are not zeroed ? Why not.
+  
        sk3=node_value('k3 ')
        sk3s=node_value('k3s ')
-       if (sk3s .eq. zero)  then
-          tilt = zero
-       else
-          tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four
-       endif
-       if(l.ne.0) then
-          sk3 = sk3 + field(1,3)/l
-          sk3s = sk3s + field(2,3)/l
-       endif
-       if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)
-       key%list%k(4)=sk3
-       key%tiltd=node_value('tilt ')+tilt
+
+       ! A sum of octupole components from K3 & K3S and ==========!
+       ! from multipoles on the bench (without errors) defines    !
+       ! a tilt angle of normal Octupole                          !
+       if(l.ne.0) then                                            !
+         !sk3 = sk3 +  normal(3)/l                                !
+          sk3 = sk3 +  normal_0123(3)                             !
+         !sk3s = sk3s + skew(3)/l                                 !
+          sk3s = sk3s + skew_0123(3)                              !
+       endif                                                      !
+       !                                                          !
+       if (sk3s .eq. zero)  then                                  !
+          tilt = zero                                             !
+       else                                                       !
+          tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four         !
+       endif                                                      !
+       !                                                          !
+       if(l.ne.0) then                                            !
+         !sk3 = sk3 + field(1,3)/l                                !
+          sk3 = sk3 + (key%list%k(4)-normal_0123(3))              !
+         !sk3s = sk3s + field(2,3)/l                              !
+          sk3s = sk3s + (key%list%ks(3)-skew_0123(3))             !
+       endif                                                      !
+       if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
+       key%list%k(4)=sk3                                          !
+       key%tiltd=node_value('tilt ')+tilt !-----------------------!
+
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
@@ -623,6 +747,12 @@ CONTAINS
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
        key%list%bsol=node_value('ks ')
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) !VK
+       !#Dipole components are zeroed for Solenoid  ###!
+       key%list%k(1) =zero                             !
+       key%list%ks(1)=zero                             !
+       ! USE DIPOLE KICKS as ERRORS or use BENDs ##### !
+
     case(10)
        key%magnet="rfcavity"
        key%list%volt=node_value('volt ')
@@ -754,9 +884,79 @@ CONTAINS
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
 
-
   END subroutine ptc_input
   !_________________________________________________________________
+
+  SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123)
+  ! 1) read multipole coeff. and errors for a current thick element
+  ! 2) fill the error and multiploes arrays of data-bases
+    include 'twtrr.fi' ! integer, maxmul,maxferr,maxnaper
+    REAL(dp), INTENT(IN) :: l
+    type(keywords), INTENT(OUT) ::  key    
+    REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;     
+    REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
+                f_errors(0:50), field(2,0:maxmul)
+    INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
+    INTEGER :: node_fd_errors ! function
+    integer :: i_count, n_dim_mult_err
+
+           ! real(dp) f_errors(0:50),normal(0:maxmul),skew(0:maxmul)
+       ! Get multipole components on bench !-----------------------!
+       call dzero(normal,maxmul+1) ! make zero "normal"            !                     
+       call dzero(skew,maxmul+1)   ! make zero "skew"              !
+                                                                   !
+       ! madxdict.h: "knl = [r, {0}], "                            !
+       !             "ksl = [r, {0}], "                            !
+       ! Assign values from the command line                       !
+       call get_node_vector('knl ',n_norm,normal)                  !    
+       call get_node_vector('ksl ',n_skew,skew)                    !
+       ! void get_node_vector(char*par,int*length,double* vector)  !
+       ! /* returns vector for parameter par of current element */ !
+                                                                   !
+       ! get errors                                                !
+       call dzero(f_errors,maxferr+1)                              !
+       n_ferr = node_fd_errors(f_errors) !                         !
+                ! /* returns the field errors of a node */         !
+       call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
+       if (n_ferr .gt. 0) then                                     !
+          call dcopy(f_errors,field,n_ferr)                        !
+            ! subroutine dcopy(in,out,n)                           !
+            ! Purpose:   Copy arrays.                              !
+       endif                                                       !
+       !-----------------------------------------------------------!
+ 
+       ! fill strength of ALL normal multipoles
+       if(n_norm.gt.0) then  ! ========================!
+          do i_count=0,n_norm                          !
+             key%list%k(i_count+1)=normal(i_count)/l   !
+             if (i_count.le.3) &                       !
+               normal_0123(i_count)=normal(i_count)/l  !
+          enddo                                        !
+       endif !=========================================!
+
+       ! fill strength of ALL skew multipoles
+       if(n_skew.gt.0) then !==========================! 
+          do i_count=0,n_skew                          !
+             key%list%ks(i_count+1)=skew(i_count)/l    !
+             if (i_count.le.3) &                       !
+               skew_0123(i_count)=skew(i_count)/l      !
+          enddo                                        !
+       endif !=========================================!   
+ 
+       n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !========!
+       if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1    !
+       if(n_ferr.gt.0) then                                    !
+          do i_count=0,n_dim_mult_err                          !
+            key%list%k(i_count+1)=key%list%k(i_count+1)+ &     !
+                                      field(1,i_count)/l       !
+            key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &   !
+                                      field(2,i_count)/l       !
+          enddo                                                !
+       endif !=================================================!
+
+  END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
+  !----------------------------------------------------------------
+
 
   subroutine ptc_align()
     implicit none
