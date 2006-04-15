@@ -125,7 +125,7 @@ contains
   !____________________________________________________________________________________________
   
 
-  logical function issuchtableexist(tname)
+  logical(lp) function issuchtableexist(tname)
     implicit none
     character(20) :: tname !name of the table to be checked if already is listed in table names array
     integer       :: i! iterator

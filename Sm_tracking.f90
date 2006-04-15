@@ -32,7 +32,7 @@ MODULE S_TRACKING
 
 
   !  TYPE (UPDATING), PARAMETER ::  COMPUTE= UPDATING(.TRUE.)
-  LOGICAL :: COMPUTE = .FALSE.
+  LOGICAL(LP) :: COMPUTE = .FALSE.
 
   INTERFACE TRACK
      ! linked
@@ -1584,8 +1584,8 @@ contains
 
     xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
     yp=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
-    x(2)=atan(xp)*1000.d0
-    x(4)=atan(yp/root(one+xp**2))*1000.d0
+    x(2)=atan(xp)*c_1d3
+    x(4)=atan(yp/root(one+xp**2))*c_1d3
 
     x(6)=x(5)
     x(5)=x6

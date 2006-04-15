@@ -469,10 +469,10 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    FREQ=0.D0
+    FREQ=zero
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              FREQ=P%MAG%FREQ
           ENDIF
        ENDIF
@@ -487,10 +487,10 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    FREQ=0.D0;VOLT=0.D0;PHAS=0.D0;
+    FREQ=zero;VOLT=zero;PHAS=zero;
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              FREQ=TWOPI*P%MAG%FREQ/CLIGHT
              VOLT=-P%MAG%VOLT*C_1D_3/P%MAG%P%P0C
              PHAS=P%MAG%PHAS
@@ -507,10 +507,10 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    FREQ=0.D0;VOLT=0.D0;PHAS=0.D0;
+    FREQ=zero;VOLT=zero;PHAS=zero;
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              FREQ=P%MAG%FREQ
              VOLT=P%MAG%VOLT
              PHAS=-P%MAG%PHAS
@@ -531,7 +531,7 @@ CONTAINS
     DO I=1,R%N
        if(associated(p)) then
           IF(ASSOCIATED(P%MAG%FREQ)) THEN
-             IF(P%MAG%FREQ/=0.D0) THEN
+             IF(P%MAG%FREQ/=zero) THEN
                 exit
              ENDIF
           ENDIF
@@ -551,7 +551,7 @@ CONTAINS
     P=>r%start
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              ic=ic+1
           ENDIF
        ENDIF
@@ -563,7 +563,7 @@ CONTAINS
     P=>r%start
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              ic=ic+1
              pos(ic)=i
           ENDIF
@@ -583,7 +583,7 @@ CONTAINS
     P=>R%START
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              P%MAG%FREQ=FREQ
              P%MAGP%FREQ=FREQ
           ENDIF
@@ -601,7 +601,7 @@ CONTAINS
     P=>R%START
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=0.D0) THEN
+          IF(P%MAG%FREQ/=zero) THEN
              P%MAG%FREQ=P%MAG%FREQ+FREQ
              P%MAGP%FREQ=P%MAGP%FREQ+FREQ
           ENDIF

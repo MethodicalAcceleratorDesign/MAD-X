@@ -130,11 +130,11 @@ contains
 
        enddo
     else   ! beamlets
-       sb=1.8d0
+       sb=c_1_8
 
 
 
-       bf=0.d0
+       bf=zero
        do ix=1,b%nb(1)
           do iy=1,b%nb(2)
 
@@ -196,7 +196,7 @@ contains
     mag_b%ds = (blim(3,2)-blim(3,1))/(mag_b%nb(3)-1)
     mag_b%dx = (blim(1,2)-blim(1,1))/(mag_b%nb(1)-1)
     mag_b%dy = (blim(2,2)-blim(2,1))/(mag_b%nb(2)-1)
-    mag_b%dsh=mag_b%ds /2.d0
+    mag_b%dsh=mag_b%ds /two
     mag_b%scale = one
   end subroutine read_magnet_b
 
@@ -219,7 +219,7 @@ contains
 
     ! using absolute coordinate
     !    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
-    if(hcurv==0.d0) then
+    if(hcurv==zero) then
        d(1)=root(x(2)**2+x(4)**2+one)
     else
        d(1)=root(x(2)**2+x(4)**2+(hcurv*x(1))**2)

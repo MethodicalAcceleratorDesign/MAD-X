@@ -80,11 +80,11 @@ CONTAINS
     implicit none
     type(info), intent(inout):: c
 
-    allocate(c%s) ;c%s=0.d0;
-    allocate(c%beta(40));c%beta=0.d0;
-    allocate(c%fix(6));c%fix=0.d0;
-    allocate(c%fix0(6));c%fix0=0.d0;
-    allocate(c%pos(2));c%pos=0.d0;
+    allocate(c%s) ;c%s=zero;
+    allocate(c%beta(40));c%beta=zero;
+    allocate(c%fix(6));c%fix=zero;
+    allocate(c%fix0(6));c%fix0=zero;
+    allocate(c%pos(2));c%pos=zero;
 
 
   end SUBROUTINE alloc_info
@@ -965,16 +965,16 @@ CONTAINS
     ENDIF
 
     DISCRETE=.false.
-    IF(ANG(1)/TWOPI<-0.25D0) THEN
+    IF(ANG(1)/TWOPI<-c_0_25) THEN
        DISCRETE=.TRUE.
     ENDIF
-    IF(ANG(1)/TWOPI>0.25D0) THEN
+    IF(ANG(1)/TWOPI>c_0_25) THEN
        DISCRETE=.TRUE.
     ENDIF
-    IF(ANG(2)/TWOPI<-0.25D0) THEN
+    IF(ANG(2)/TWOPI<-c_0_25) THEN
        DISCRETE=.TRUE.
     ENDIF
-    IF(ANG(1)/TWOPI>0.25D0) THEN
+    IF(ANG(1)/TWOPI>c_0_25) THEN
        DISCRETE=.TRUE.
     ENDIF
 

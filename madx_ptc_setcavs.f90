@@ -5,7 +5,7 @@ module madx_ptc_setcavs_module
   public
 
 ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
-  logical, public                     :: cavsareset   = .false.
+  logical(lp), public                     :: cavsareset   = .false.
 ! flag that indicates if cavities were already set for the current setup
 
   !********************************************************************************************
@@ -17,7 +17,7 @@ contains
     implicit                none
     type(layout)         :: my_ring
     type(internal_state) :: localis ! internal state to be use in this routine = intstate+totalpath+time
-    logical              :: maxaccel
+    logical(lp)          :: maxaccel
     integer              :: charge    ! charge of an accelerated particle
     !      use madx_keywords
     integer              :: i,j,currentelement=1       !iterators
@@ -35,7 +35,7 @@ contains
     ! here we always use closed orbit track, that is all its relative coordinates are 0
     real(dp)             :: sparivtime=zero !synchronous particle arrival time
     real(dp)             :: position=zero !synchronous particle position
-    real(kind(1.d0))     :: get_value
+    real(kind(1d0))     :: get_value
     integer              :: get_option
     !------------------------------------------------------
 100 format (a20, f10.4, a10, f10.4, a10, f10.4)
@@ -273,7 +273,7 @@ contains
       real(dp)                 :: phase_rel ! final relative phase
       integer, target          :: charge    ! charge of an particle
       integer(4)               :: tmp
-      logical                  :: ene       ! switches if cavity should always maximally accelerate 
+      logical(lp)              :: ene       ! switches if cavity should always maximally accelerate 
                                             ! the reference track; lag is calculated
       logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;  
                                                       ! volt is calculated; lag and freq is preserved
@@ -379,7 +379,7 @@ end module madx_ptc_setcavs_module
 !               f%mag%volt=sign(one,kf*f%mag%volt) * f%mag%volt
 !               f%magp%volt=f%mag%volt
 !            endif
-!            f%mag%phas=pi/2.0d0-twopi*f%mag%freq*arrivtime-c_%phase0
+!            f%mag%phas=pi/two-twopi*f%mag%freq*arrivtime-c_%phase0
 !            f%magp%phas=f%mag%phas
 !         endif
 !         phase_rel=f%mag%phas+twopi*f%mag%freq*arrivtime

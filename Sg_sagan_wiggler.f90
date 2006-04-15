@@ -1548,7 +1548,7 @@ contains
     TYPE(REAL_8) B_F(3),A,B,AP,BP,C,B2,X_MEC(6),x5
     TYPE(DAMAP) XP,ID,DISP,XT
     TYPE(REAL_8) x1,x3,DENF
-    logical done_stoch
+    logical(lp) done_stoch
     real(dp) B20,B30,BF, v(6) !,R1,R2,DEN0
     INTEGER I,J
 

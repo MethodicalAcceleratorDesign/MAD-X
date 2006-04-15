@@ -81,50 +81,57 @@ end subroutine w_ptc_setaccel_method
 
 
 subroutine w_ptc_setexactmis(method)
+  use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical method
+  logical(lp) method
   call ptc_setexactmis(method)
 end subroutine w_ptc_setexactmis
 
 subroutine w_ptc_setradiation(method)
+  use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical method
+  logical(lp) method
   call ptc_setradiation(method)
 end subroutine w_ptc_setradiation
 
 
 subroutine w_ptc_settotalpath(method)
+  use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical method
+  logical(lp) method
   call ptc_settotalpath(method)
 end subroutine w_ptc_settotalpath
 
 
 subroutine w_ptc_settime(method)
+  use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical method
+  logical(lp) method
   call ptc_settime(method)
 end subroutine w_ptc_settime
 
 subroutine w_ptc_setnocavity(method)
+  use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical method
+  logical(lp) method
   call ptc_setnocavity(method)
 end subroutine w_ptc_setnocavity
 
 subroutine w_ptc_setfringe(method)
+  use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical method
+  logical(lp) method
   call ptc_setfringe(method)
 end subroutine w_ptc_setfringe
 
 subroutine w_ptc_end()
+  use precision_constants
   use madx_ptc_module
   implicit none
   call ptc_end()

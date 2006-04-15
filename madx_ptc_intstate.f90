@@ -27,7 +27,7 @@ module madx_ptc_intstate_module
   !  PRIVATE
   !    data structures
 
-  logical,                public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
+  logical(lp),                public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
   type (internal_state),  private  :: intstate
   integer,                private  :: debug = 0    ! defines debug level
 
@@ -39,9 +39,9 @@ module madx_ptc_intstate_module
 
 contains
 
-  logical function getmaxaccel()
+  logical(lp) function getmaxaccel()
     implicit none
-    logical   :: getintstate
+    logical(lp)  :: getintstate
     getmaxaccel = maxaccel
     return
   end function getmaxaccel
@@ -123,7 +123,7 @@ contains
 
   subroutine ptc_setexactmis(flag)
     implicit none
-    logical     :: flag
+    logical(lp)    :: flag
 
     !    print *, "Setting the flag"
     !    print *, "And the flag is", flag
@@ -142,7 +142,7 @@ contains
 
   subroutine ptc_setradiation(flag)
     implicit none
-    logical     :: flag
+    logical(lp)    :: flag
 
 
     if (flag) then
@@ -159,7 +159,7 @@ contains
 
   subroutine ptc_setfringe(flag)
     implicit none
-    logical     :: flag
+    logical(lp)    :: flag
 
     if (flag) then
        if (getdebug() > 0) print *, "Switching ON fringe"
@@ -175,7 +175,7 @@ contains
 
   subroutine ptc_settotalpath(flag)
     implicit none
-    logical     :: flag
+    logical(lp)    :: flag
 
     if (flag) then
        if (getdebug() > 0) print *, "Switching ON totalpath"
@@ -194,7 +194,7 @@ contains
 
   subroutine ptc_settime(flag)
     implicit none
-    logical     :: flag
+    logical(lp)    :: flag
 
     !    print *, "Setting the flag"
     !    print *, "And the flag is", flag
@@ -215,7 +215,7 @@ contains
 
   subroutine ptc_setnocavity(flag)
     implicit none
-    logical     :: flag
+    logical(lp)    :: flag
 
     if (flag) then
        if (getdebug() > 0) print *, "Switching ON nocavity"

@@ -2460,6 +2460,7 @@ contains
        T  = one/(one+P*A0)
        E2 = one-T*(A1+T*(A2+T*(A3+T*(A4+T*A5))))*E1
        XF(0)= E2
+       rpi4=sqrt(pi)/two
        XF(1) = E1/RPI4
        XF(2) = -A0*E1/RPI4
        XF(3) = (-two+four*A0*A0)/six*E1/RPI4

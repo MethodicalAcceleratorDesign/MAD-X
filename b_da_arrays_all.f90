@@ -24,12 +24,12 @@ module da_arrays
 
   integer nda
   integer :: ndamaxi=0
-  real(dp),TARGET :: total_da_size = 300.D0
+  real(dp),TARGET :: total_da_size = c_300
   integer nst,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
   integer,TARGET :: lda_used =1000
-  logical,TARGET :: stable_da =.true.
+  logical(lp),TARGET :: stable_da =.true.
   logical,TARGET :: check_da =.false.
   real(dp),target ::  da_absolute_aperture=c_1d6
 

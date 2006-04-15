@@ -25,7 +25,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !
   !                                                           FZ/28.02.2001
   !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-  USE precision_constants, ONLY:dp,sp
+  USE precision_constants, ONLY:CLIGHT,dhbar,pmae,dp,sp,qelect,c_1d6,c_1d_10,c_1d_3,c_0_3079,c_137,one,two,three,five
   implicit none
   include 'photoni.inc'
 
@@ -37,7 +37,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   REAL(dp) :: gamma,theta, dnpho, dnphohalf,ec,eave,ep1,ep2, ra2, &
        ran,xl,en,gamfac
 
-  REAL(dp), parameter :: el=1.602d-19, dhbar=1.055d-34, vl=2.99792d8
+  REAL(dp), parameter :: el=qelect, vl=CLIGHT
   real(sp) amu
   Double Precision :: ran2 ! function
   !      integer i,j,nmax,n1,n2,npmax,iseed,idumy,ieave,iquasto,iele
@@ -61,7 +61,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !      print*,"RRRRRRRRRRRRRRRRRad in photon",iele,rad,dlength,energy,dmass
 
   ! for electrons
-  gamma=energy/0.511D0
+  gamma=energy/pmae*c_1d_3
 
   if (gamma.le.1) then
      write(*,*) ' error in subroutine photon - no initialization '
@@ -88,9 +88,9 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !     trajectory bending angle
   theta = dlength/rad
 
-  dnpho = 5d0/2d0/sqrt(3d0)*gamma/137d0*theta
+  dnpho = five/two/sqrt(three)*gamma/c_137*theta
   !
-  dnphohalf = dnpho/2d0
+  dnphohalf = dnpho/two
   !
   !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
   !
@@ -100,9 +100,9 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !
   !     critical photon energy as fraction of beam energy
 
-  ec = 3d0/2d0*vl*gamma**3/rad*dhbar/(energy*el*1d6)
+  ec = three/two*vl*gamma**3/rad*dhbar/(energy*el*c_1d6)
   !
-  eave = dnphohalf*0.3079d0*ec
+  eave = dnphohalf*c_0_3079*ec
   !
   !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
   !
@@ -132,7 +132,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   do i = 1, npmax
 
      ra2 = ran2(idumy)
-     if (ra2.lt.1e-10) goto 989
+     if (ra2.lt.c_1d_10) goto 989
 
      ran = log(ra2)
      do j = 1, nmax
@@ -169,7 +169,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !     compute total relative photon energy (average loss is
   !     added for compensation)
   !
-  gamfac = gamma*gamma/(gamma*gamma-1d0)
+  gamfac = gamma*gamma/(gamma*gamma-one)
   if( ieave.eq.1 ) then
      d1 = (ep1 + eave) * gamfac
      d2 = (ep2 + eave) * gamfac
@@ -198,11 +198,12 @@ double precision function   ran2(idum)
   !   (Numerical Recipies ran3(idumy), pg. 273.)
   !
   !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  USE precision_constants, ONLY:CLIGHT,dhbar,pmae,dp,sp,qelect,c_1d6,c_1d_10,c_1d_3,c_0_3079,c_137,one,two,three,five
   implicit none
   integer    idum
   integer    mbig, mseed, mz
   double precision     fac
-  parameter(mbig=1000000000,mseed=161803398,mz=0,fac=1d0/mbig)
+  parameter(mbig=1000000000,mseed=161803398,mz=0,fac=one/mbig)
   integer    i, iff, ii, inext, inextp, k
   integer    mj, mk, ma(55)
   save       iff, inext, inextp, ma

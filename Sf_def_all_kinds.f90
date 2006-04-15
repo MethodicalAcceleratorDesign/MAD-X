@@ -48,7 +48,7 @@ contains
     REAL(DP) LG
     INTEGER I
     P=>R%START
-    L=0.D0
+    L=zero
     DO I=1,R%N
        IF(P%MAG%KIND/=KIND23) THEN
           L=L+P%MAG%P%LD

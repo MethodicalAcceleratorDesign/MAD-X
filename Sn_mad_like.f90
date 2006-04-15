@@ -2652,7 +2652,7 @@ CONTAINS
     IF(.NOT.DONE) S2 = S1%NMUL
 
     S2%P%B0=S1%B0
-    !    if(S2%P%B0/=0.d0) S2%P%bend_fringe=.true.
+    !    if(S2%P%B0/=zero) S2%P%bend_fringe=.true.
     IF(CURVED_ELEMENT) THEN
        S2%P%bend_fringe=.true.
        CURVED_ELEMENT=.FALSE.
@@ -3637,7 +3637,7 @@ CONTAINS
 
 
     !    IF(ANG/=zero.AND.R/=zero) THEN
-    if(hc>0.d0) then
+    if(hc>zero) then
        arbitrary_tilt%LC=two*SIN(ANGLE/two)/hc
     else
        arbitrary_tilt%LC=L
@@ -3701,7 +3701,7 @@ CONTAINS
 
     if(use_info) then
        c=>R%start
-       c%i%s=0.d0
+       c%i%s=zero
        do i=1,R%n
           if(i<R%n.and.use_info) c%next%i%s=c%i%s+c%mag%p%ld
 

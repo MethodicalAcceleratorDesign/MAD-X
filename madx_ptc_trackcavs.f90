@@ -36,7 +36,7 @@ contains
     real (dp)            :: x(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
     real (dp)            :: xp, yp, pz, p0
-    real (dp)            :: pathlegth = 0.d0
+    real (dp)            :: pathlegth = zero
     integer              :: npart = 1
     integer              :: n = 1
     integer              :: nturns = 1
@@ -46,7 +46,7 @@ contains
     !    integer              :: rplotno
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
-    real(kind(1.d0))     :: get_value,get_variable
+    real(kind(1d0))     :: get_value,get_variable
     integer, external :: get_option, &   !  int get_option(char*);
          restart_sequ, & !  restart beamline and return number of beamline node
          advance_node    !  advance to the next node in expanded sequence
@@ -123,7 +123,7 @@ contains
     if (getdebug() > 0) print *, 'There is ', npart,' tracks'
     do n=1, npart
 
-       pathlegth = 0.d0
+       pathlegth = zero
 
        if (getdebug() > 9 ) print *, 'Getting track ',n
 
@@ -234,9 +234,9 @@ contains
     type(fibre), pointer :: p
     integer              :: n,no,np, iflag, i,j,k
     integer, allocatable :: ePP(:),ee(:) ! exponents of a monomial for x_1^{2}*x_3^{4}, j is [0,2,0,4]
-    logical              :: sixd
+    logical(lp)          :: sixd
     type(taylor)         :: mom,r2,I1,dispt(4),avet(6,6,3)
-    real(kind(1.d0))     :: get_value,get_variable ! c functions
+    real(kind(1d0))     :: get_value,get_variable ! c functions
     integer              :: get_option ! c function
     real (dp)            :: disp(4)
     type(pol_block)      :: pb !pol_block - it enables additional parameter dependences (variable) for polynomials
@@ -333,10 +333,10 @@ contains
 
     write(20,*)  "#########################################"
 
-    s     = 0.d0
+    s     = zero
     ee    = 0
-    xt(:) = 0.d0
-    x1(:) = 0.d0
+    xt(:) = zero
+    x1(:) = zero
     id    = 1     ! making identity map
     y_pol=x0+mapa
 
@@ -509,7 +509,7 @@ contains
                " Ener ", nfen%energy," deltae ",deltae
           !                print *, ave(1,1,1),ave(2,2,1),ave(1,2,1)
           !                print *, opt_fun(1),opt_fun(19),opt_fun(10)
-          !                print *, "zero ",1.d0 - opt_fun(1)*opt_fun(19) + opt_fun(10)**2
+          !                print *, "zero ",one - opt_fun(1)*opt_fun(19) + opt_fun(10)**2
 
 
        endif
@@ -796,7 +796,7 @@ contains
 
     do i=1,my_nd_for_averaging
        if(e(2*i-1)/=e(2*i)) then
-          filter=0.d0
+          filter=zero
           return
        else
           filter=filter*dismom(i,e(2*i))
@@ -846,7 +846,7 @@ contains
     CALL SCAN_FOR_POLYMORPHS(my_ring,PB2)
     write(6,*) c_%np_pol
 
-    !    X=0.D0; CALL FIND_ORBIT(my_ring,X,1,DEFAULT)  !@1 Orbite Close
+    !    X=zero; CALL FIND_ORBIT(my_ring,X,1,DEFAULT)  !@1 Orbite Close
 
     !     CALL INIT(DEFAULT,2,c_%np_pol,BERZ)   !
 
