@@ -34,7 +34,7 @@ MODULE madx_ptc_track_run_module
 
   integer :: ptc_ffile    ! periodicity of printing coordinates (every ffile-th turn)
   !                       ! integer for keyword 'ffile' in 'ptc_track' command
-  logical :: ptc_onetable ! logical for keyword 'onetable'
+  logical(lp) :: ptc_onetable ! logical for keyword 'onetable'
   !                       ! in 'ptc_track' command
 
   !--------------------------------------------------!
@@ -75,9 +75,9 @@ MODULE madx_ptc_track_run_module
   real(dp), PRIVATE, allocatable :: x_all_incl_co_at0(:,:,:) ! save x at START of the ring
   !                                               ! (1:6,0:turns,1:jmax_numb_particl_at_i_th_turn)
 
-  logical, public :: ptc_track_debug=.False. !.TRUE.  .False.
+  logical(lp), public :: ptc_track_debug=.False. !.TRUE.  .False.
 
-  logical :: last_table_line_out ! = last_out => flag to avoid double entry of last line
+  logical(lp) :: last_table_line_out ! = last_out => flag to avoid double entry of last line
 
   INTEGER, ALLOCATABLE :: elem_number_at_observ(:)   ! the sequent number of a ring element at
   !                                                  ! the observation point
@@ -110,10 +110,10 @@ CONTAINS
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
          Find_Envelope, &                                                                  !
          ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
-         write_closed_orbit!,Convert_dp_to_dt                                              !
+         write_closed_orbit,Convert_dp_to_dt,mytime                                              !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
-         c_1d_7,one,two, twopi, zero
+         c_1d_7,c_1D3,one,two, twopi, zero
 
     IMPLICIT NONE
 
@@ -126,7 +126,7 @@ CONTAINS
 
     include 'bb.fi'         ! integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max;
     !                       !uses bbd_pos                parameter(bbd_max=200)
-    !                       !double precision bb_kick
+    !                       !real(kind(1d0)) bb_kick
     !                       ! common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos
     !                       !common/bbr/bb_kick(2,bbd_max)
 
@@ -162,7 +162,7 @@ CONTAINS
          last_orbit_of_lost_particle (:,:) !(1:6,1:N_particle_max)   != last_orbit
 
     !   /* C routines called from Fortran and C */
-    DOUBLE PRECISION, external :: get_value, get_variable ! external c-functions
+    real(kind(1d0)), external :: get_value, get_variable ! external c-functions
     INTEGER, external :: get_option, &   !  int get_option(char*);
          restart_sequ, & !  restart beamline and return number of beamline node
          advance_node    !  advance to the next node in expanded sequence
@@ -178,7 +178,7 @@ CONTAINS
 
     real(dp) :: maxaper(1:6) ! moved from int.subr.ST
     integer :: k_th_coord !, j_th_particle
-    logical :: return_from_subr_ptc_track
+    logical(lp) :: return_from_subr_ptc_track
 
     REAL(dp) :: sum_length  ! = sum  <in trrun.F>
 
@@ -487,7 +487,7 @@ CONTAINS
       USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
       ! IMPLICIT NONE => in host
       ! local variables
-      !DOUBLE PRECISION :: maxaper(1:6) move to HOST
+      !real(kind(1d0)) :: maxaper(1:6) move to HOST
       character*12 tol_a, char_a
       integer :: nint,ndble, nchar, int_arr(1),char_l
       data tol_a,char_a / 'maxaper ', ' ' /
@@ -723,10 +723,14 @@ CONTAINS
          CALL write_closed_orbit(icase_ptc,x_coord_co)      !              !
       end if !----------------------------------------------!              !
       !                                                                    !
-      if(icase_ptc.eq.5) THEN !----------------------!                     !
-         ! call Convert_dp_to_dt (deltap, dt)        !                     !
-         x_coord_co(5)=deltap                        !                     !
-      ENDIF !----------------------------------------!                     !
+      if(icase_ptc.eq.5) THEN !------------------------!                   !
+         if(mytime) then !----------------------!      !                   !                   
+            call Convert_dp_to_dt (deltap, dt)  !      !                   !
+         else                                   !      !                   !
+            dt=deltap                           !      !                   !
+         endif !--------------------------------!      !                   !
+         x_coord_co(5)=dt                              !                   !
+      ENDIF !------------------------------------------!                   !
       !                                                                    !
       if (ptc_track_debug) then  !------------------------!                !
          print *, " if(icase.eq.5) ,x_coord_co(5)=deltap" !                !
@@ -1277,7 +1281,7 @@ CONTAINS
            iii_c_code, j_th_partic, j_part, number_observation_point
       character(16) :: name_curr_elem
       character(24) :: name_curr_elem_24
-      LOGICAL ::  Entry_not_exit
+      LOGICAL(lp) ::  Entry_not_exit
       REAL(dp) :: length_curr_elem
       real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
 
@@ -1737,8 +1741,8 @@ CONTAINS
       Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)
       ! real(dp) ,optional,INTENT(OUT)::MASS,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
 
-      Energy_rest_MeV=MASS_GeV*1.0D3
-      Energy_total_MeV=ENERGY*1.0D3
+      Energy_rest_MeV=MASS_GeV*c_1D3
+      Energy_total_MeV=ENERGY*c_1D3
 
     END SUBROUTINE Particle_Interactions_Ini
     !==============================================================================
@@ -1758,7 +1762,7 @@ CONTAINS
       INTEGER, INTENT(IN)       :: i_current_elem
       CHARACTER(16), INTENT(IN) :: name_curr_elem !      current%MAG%    name
       ! TYPE:fibre   element Character(16)
-      LOGICAL, INTENT(IN)       ::  Entry_not_exit
+      LOGICAL(lp), INTENT(IN)   ::  Entry_not_exit
       REAL(dp), INTENT(IN)      ::  sum_length, length_curr_elem
 
       Real (dp) :: B0_dipole, Quadr_k, TiltD_dipole, rad_curv_m, &
@@ -1789,10 +1793,10 @@ CONTAINS
          if (ptc_track_debug) Print *, 'B0_dipole=', B0_dipole, &
               'TiltD_dipole=', TiltD_dipole, &
               '  Quadr_k=',Quadr_k
-         IF (B0_dipole.EQ.0.0 .AND.Quadr_k .EQ.0.0 ) i_elem_type=0
-         IF (B0_dipole.NE.0.0 .AND.Quadr_k .EQ.0.0 ) i_elem_type=1
-         IF (B0_dipole.EQ.0.0 .AND.Quadr_k .NE.0.0 ) i_elem_type=2
-         IF (B0_dipole.NE.0.0 .AND.Quadr_k .NE.0.0 ) i_elem_type=3
+         IF (B0_dipole.EQ.zero .AND.Quadr_k .EQ.zero ) i_elem_type=0
+         IF (B0_dipole.NE.zero .AND.Quadr_k .EQ.zero ) i_elem_type=1
+         IF (B0_dipole.EQ.zero .AND.Quadr_k .NE.zero ) i_elem_type=2
+         IF (B0_dipole.NE.zero .AND.Quadr_k .NE.zero ) i_elem_type=3
          if (ptc_track_debug) Print *,'i_elem_type=',i_elem_type
 
          IF (i_elem_type .EQ. 0) RETURN
@@ -2117,7 +2121,7 @@ CONTAINS
 
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
                !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/double precision
+               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(kind(1d0))
                Read_START_coord: DO i_coord=1,icase_ptc
                   X_lnv_START(i_coord)= x_all_incl_co_at0(i_coord, i_turn_tmp, j_part_tmp) - &
                        x_coord_co_at_START(i_coord) ! X_out=M(x0,x)*x_in, where X=x0+x !
@@ -2126,7 +2130,7 @@ CONTAINS
                X_lnv_OBSRV=Map_damap*X_lnv_START
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
                !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/double precision
+               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(kind(1d0))
 
                Loop_coord: DO i_coord=1,icase_ptc
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)%T*X_lnv_START(i_coord)
@@ -2453,7 +2457,7 @@ CONTAINS
       !k      include 'bb.fi': --------------------------------------!
       !k      integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max       !
       !k      parameter(bbd_max=200)                                 !
-      !k      double precision bb_kick                               !
+      !k      real(kind(1d0)) bb_kick                                !
       !k      common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos   !
       !k      common/bbr/bb_kick(2,bbd_max !-------------------------!
       !k
@@ -2461,15 +2465,15 @@ CONTAINS
       !k      integer j,jend,k,kp,kq,next_start,itype(23),switch,turns
       INTEGER ::  j_particle_line_counter,kq,kp
       INTEGER ::  next_start ! int. function
-      !k      double precision phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
+      !k      real(kind(1d0)) phi,track(12),zstart(12),twopi,z(6,1000),zn(6),   &
       !k     &ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
       !k     &ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
-      !DOUBLE PRECISION :: twoPi, Ex_horz_emi_m, Ey_vert_emi_m, Et_long_emi_m
+      !real(kind(1d0)) :: twoPi, Ex_horz_emi_m, Ey_vert_emi_m, Et_long_emi_m
       REAL(dp)  :: x_input,px_input,y_input,py_input,t_input,deltae_input, &
            fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input, &
            phi_n
 
-      ! DOUBLE PRECISION :: get_value,get_variable ! dble c-functions in the HOST routine
+      ! real(kind(1d0)) :: get_value,get_variable ! dble c-functions in the HOST routine
       ! local temprorary variables
       INTEGER :: k_th_coord,  j_th_particle, & ! local
            itype_non_zero_flag(12) ! not itype(23)
@@ -2482,7 +2486,7 @@ CONTAINS
 
       REAL (dp) :: X_MAD(6), X_PTC(6)
 
-      logical :: zgiv_exist, zngiv_exist ! existence of non-zero input for action-angle
+      logical(lp) :: zgiv_exist, zngiv_exist ! existence of non-zero input for action-angle
 
       !k      parameter(zero=0d0)
       character*120 msg(2) ! text stings for messages
@@ -2549,8 +2553,12 @@ CONTAINS
             X_MAD(5)=t_input; X_MAD(6)=deltae_input                           ! t   r   !
             !                                                                 ! c   t   f
             IF(icase_ptc.eq.5 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
-               ! call Convert_dp_to_dt (deltap, dt)              !              !   c   r
-               X_MAD(6)=X_MAD(6)+deltap                          !              !   l   !
+               if(mytime) then !----------------------!          !              !                   
+                  call Convert_dp_to_dt (deltap, dt)  !          !              !
+               else                                   !          !              !
+                  dt=deltap                           !          !              !
+               endif !--------------------------------!          !              !
+               X_MAD(6)=X_MAD(6)+dt                              !              !   l   !
             ENDIF !----------------------------------------------!              !   e   !
             !                                                                   !   !   p
             CALL Coord_MAD_to_PTC(X_MAD,X_PTC) ! convert coordinates          ! c   t   a
@@ -2797,7 +2805,7 @@ CONTAINS
     ! USE ptc_results
     implicit none
 
-    LOGICAL,           INTENT(IN) :: ptc_track_debug
+    LOGICAL(lp),       INTENT(IN) :: ptc_track_debug
     INTEGER,           INTENT(IN) :: Normal_Order_n0   ! =1 for Linear
     REAL (dp),         INTENT(IN)  ::  x_coord_co(1:6) ! => x0(1:6) in ptc_track
     TYPE (real_8),     INTENT(OUT)  :: Map_Y(6)        !  y => Map_Y - local name
