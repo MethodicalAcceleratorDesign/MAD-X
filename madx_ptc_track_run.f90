@@ -110,7 +110,7 @@ CONTAINS
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
          Find_Envelope, &                                                                  !
          ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
-         write_closed_orbit,Convert_dp_to_dt,mytime                                              !
+         write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
          c_1d_7,c_1D3,one,two, twopi, zero
@@ -1150,7 +1150,7 @@ CONTAINS
                n_temp=j_last_particle_buffer                                       !         +   !
                !                                                                   !         +   !
                CALL kill_ptc_track &                                               !         +   !
-                    (n_temp,i_th_turn,zero,jmax_numb_particl_at_i_th_turn, &      !         +   !
+                    (n_temp,i_th_turn,zero,jmax_numb_particl_at_i_th_turn, &       !         +   !
                     particle_ID, last_turn_of_lost_particle, &                     !         +   ^
                     last_position_of_lost_particle, last_orbit_of_lost_particle, & !         !   !
                     x_coord_incl_co)                                               !         +   !
