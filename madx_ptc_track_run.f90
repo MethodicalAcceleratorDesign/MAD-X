@@ -240,6 +240,11 @@ CONTAINS
     Print *, '  ptc_track: The current dimensionality of the problem is icase=', icase_ptc
     Print *,'  ================================================================'; Print *;
 
+    warn_coordinate_system_changed: IF((.NOT. mytime) .AND.(icase_ptc.gt.4) ) THEN
+      CALL FORT_WARN('time=false => coord. system: {-pathlength, delta_p} ', &
+                     'the table headers mean:  PT -> delta_p, T -> pathlength')
+    ENDIF warn_coordinate_system_changed
+
     ! initialize the closed orbit coordinates  at START of the ring
     x_coord_co(:)=zero
     if (ptc_track_debug) print *, " x_coord_co(:)=zero = ",x_coord_co
