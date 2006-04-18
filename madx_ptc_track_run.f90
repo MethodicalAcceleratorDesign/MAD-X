@@ -2782,10 +2782,13 @@ CONTAINS
       REAL(dp), INTENT(OUT) :: X_PTC(6)
 
       X_PTC=X_MAD ! for all elements
-      if (ptc_track_debug) print *,'Coord_MAD_to_PTC icase_ptc=', icase_ptc
+
+        if (ptc_track_debug) print *, &
+         'Coord_MAD_to_PTC icase_ptc=', icase_ptc, ' mytimec=', mytime
 
       if (icase_ptc.eq.6) THEN
-         X_PTC(5)=X_MAD(6); X_PTC(6)=-X_MAD(5);
+         X_PTC(5)=X_MAD(6); X_PTC(6)=X_MAD(5);
+         if (mytime) X_PTC(6)=-X_PTC(6) ! reverse sign
       elseif(icase_ptc.eq.5) THEN
          X_PTC(5)=X_MAD(6); X_PTC(6)=zero
       ENDIF
@@ -2799,10 +2802,12 @@ CONTAINS
 
       X_MAD=X_PTC ! for all elements
 
-      if (ptc_track_debug) print *,'Coord_PTC_to_MAD icase_ptc=', icase_ptc
+      if (ptc_track_debug) print *, &
+          'Coord_PTC_to_MAD icase_ptc=', icase_ptc, ' mytime=', mytime
 
       IF (icase_ptc.eq.6) THEN
-         X_MAD(5)=-X_PTC(6); X_MAD(6)=X_PTC(5);
+         X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5);
+         if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign         
       elseif(icase_ptc.eq.5) THEN
          X_MAD(5)=zero; X_MAD(6)=X_PTC(5)
       ENDIF
