@@ -544,7 +544,7 @@
       enddo
       
       xnorm=DNRM2(N, x, 1)
-      dxnorm=DNRM2(N, dx, 1)/xnorm
+      dxnorm=sqrt(DNRM2(N, dx, 1)/xnorm)
       write(*,*) 'final relative difference norm:',dxnorm
 
   831 format('Initial Penalty Function = ',e16.8,//)

@@ -153,7 +153,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
           lhs=expression_value(match2_cons_lhs[i][j],2);
           s =match2_cons_sign[i][j];
           r=lhs - rhs;
-          fun_vec[k]=r;
+          fun_vec[k]=match2_cons_weight[i][j]*r;
           if (s == '>' && r > 0) fun_vec[k]=0;
           else if (s == '<'  && r < 0) fun_vec[k]=0;
           match2_cons_value[i][j]=fun_vec[k];
@@ -848,12 +848,14 @@ void mtjacprint(int m, int n,double* jac){
   int i,j,k,l;
   struct command* comm;
   k=0;
+  printf("Macro Constraint Variable Derivative\n");
+  printf("------------------------------------\n");
   for(i=0;match2_macro_name[i]!=NULL;i++) {
     for(j=0;match2_cons_name[i][j]!=NULL;j++) {
       for(l=0;l<n;l++){
-        printf("%s",match2_macro_name[i]);
-        printf("%s",match2_cons_name[i][j]);
-        printf("%s",command_par_string("name",stored_match_var->commands[l]));
+        printf("%10s ",match2_macro_name[i]);
+        printf("%10s ",match2_cons_name[i][j]);
+        printf("%10s ",command_par_string("name",stored_match_var->commands[l]));
         printf("%e",jac[l*m+k]);
         printf("\n");
       }

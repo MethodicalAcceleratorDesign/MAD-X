@@ -2868,12 +2868,6 @@ int make_macro(char* statement)
   if (n > 0) m->formal->curr = n;
   strcpy(m->body->c, &aux_buff->c[start_2]); m->body->curr = strlen(m->body->c);
   add_to_macro_list(m, macro_list);
-  /* RDM new matching*/
-  if (match_is_on==2) {
-     for(i=0;match2_macro_name[i]!=NULL;i++);
-     match2_macro_name[i]=m->name;
-  }
-  /* RDM new matching*/
   return 0;
 }
 

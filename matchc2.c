@@ -12,6 +12,7 @@ void match2_match(struct in_cmd* cmd)
   for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_value_lhs[i][j]=0;
   for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_value_rhs[i][j]=0;
   for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_sign[i][j]='n';
+  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_weight[i][j]=0;
   for(i=0;i<3;i++) match2_cons_curr[i]=0;
   return;
 }
@@ -41,6 +42,7 @@ void match2_end(struct in_cmd* cmd)
       delete_expression(match2_cons_lhs[i][j]);
     }
   }
+  
   fprintf(prt_file, "\n\n");
   fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
 
@@ -103,8 +105,11 @@ void match2_constraint(struct in_cmd* cmd)
   char* cname;
   char s;
 
-
-  start=3; /*constraint [0], expr [1] = [2] start [3]*/
+  for(start=0; start<n; start++) {
+    if (strcmp(toks[start],"expr")==0) break;
+  }
+  start=start+2;
+/*  start=3; |+constraint [0], expr [1] = [2] start [3]+|*/
   /*  printf("%s\n",toks[start]);*/
   for (k = start; k < n; k++) {
     s=*toks[k];
@@ -140,8 +145,13 @@ void match2_constraint(struct in_cmd* cmd)
     warning("no valid expression in constraint","ignoring");
     return;
   }
-  nitem = end - 1;
-  cname=spec_join(&toks[3], nitem);
+  match2_cons_weight[i][j]=command_par_value("weight",cmd->clone);
+  for(start=0; start<n; start++) {
+    if (strcmp(toks[start],"expr")==0) break;
+  }
+  start=start+2;
+  nitem = end-start+1;
+  cname=spec_join(&toks[start], nitem);
   match2_cons_name[i][j]=(char*) malloc(strlen(cname)+1);
 /*  strcpy(match2_cons_name[i][j],cname);*/
   n=0;

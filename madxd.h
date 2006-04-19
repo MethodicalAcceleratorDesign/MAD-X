@@ -1229,6 +1229,7 @@ char* match2_cons_name[10][30];
 double match2_cons_value[10][30];
 double match2_cons_value_rhs[10][30];
 double match2_cons_value_lhs[10][30];
+double match2_cons_weight[10][30];
 char match2_cons_sign[10][30];
 int match2_cons_curr[3];
 struct expression* match2_cons_rhs[10][30];

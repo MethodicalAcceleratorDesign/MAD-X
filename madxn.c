@@ -2266,7 +2266,7 @@ void exec_plot(struct in_cmd* cmd)
     /* Copy or append the gnuplot ps file in the target ps_file */
     gnuplot_append("tmpplot.ps",ps_file_name);
     /* Remove the gnuplot command */
-    remove("gnu_plot.cmd");
+/*    remove("gnu_plot.cmd");*/
   }
   else
 

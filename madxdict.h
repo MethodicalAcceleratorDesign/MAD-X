@@ -1719,6 +1719,7 @@ char command_def[] =
 " "
 "constraint: match match 0 0 "
 "expr     = [s, none, none], "
+"weight   = [r, 1.0], "
 "range    = [s, #s/#e, none], "
 "class    = [s, none, none], "
 "pattern  = [s, any, none], "
