@@ -167,6 +167,7 @@ CONTAINS
     integer             model
     integer             method0,method1
     integer             nst0,nst1
+    REAL (dp) :: tempdp
     !---------------------------------------------------------------
 
     if (getdebug() > 0) then
@@ -446,8 +447,8 @@ CONTAINS
            !VK
            CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
 
-       key%list%b0=node_value('angle ')+ &
-            sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))*l
+          tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
+          key%list%b0=node_value('angle ')+tempdp*l
 
           key%list%k(2)=node_value('k1 ')+ key%list%k(2) 
           key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
@@ -481,8 +482,8 @@ CONTAINS
        endif
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
-       key%tiltd=node_value('tilt ')+ asin(skew_0123(0)/  &
-            sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0)))
+       key%tiltd=node_value('tilt ')
+          if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)       
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
        if(l.eq.zero) then
           key%magnet="marker"
@@ -492,8 +493,8 @@ CONTAINS
            !VK
            CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
 
-       key%list%b0=node_value('angle ')+ &
-            sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))*l
+          tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
+          key%list%b0=node_value('angle ')+ tempdp*l
 
           key%list%k(2)=node_value('k1 ')+ key%list%k(2) 
           key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
@@ -526,8 +527,8 @@ CONTAINS
        endif
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
-       key%tiltd=node_value('tilt ')+ asin(skew_0123(0)/  &
-            sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0)))
+       key%tiltd=node_value('tilt ')
+          if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
 
     case(987) ! keeping old code 
     !case(5) ! PTC accepts mults
@@ -1589,9 +1590,10 @@ CONTAINS
     name_var1 = name_var
     SELECT CASE (name_var1)
     CASE ("dx")
-       do j = 1,4
-          ind(j) = 0
-       enddo
+!       do j = 1,4
+!          ind(j) = 0
+!       enddo
+       ind(:)=0
        k = double_from_table("normal_results ", "order1 ", row, doublenum)
        d_val=doublenum
        ind(5) = int(d_val)

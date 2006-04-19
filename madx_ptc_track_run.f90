@@ -2828,7 +2828,7 @@ CONTAINS
 
     USE  madx_ptc_module, ONLY: dp, real_8, normalform, damap,   &
          my_ring, default, BERZ, daprint, &
-         assignment(=), operator(**), &
+         assignment(=), operator(**), operator(.sub.), &
          track, init, alloc, kill, &
          PRODUCE_APERTURE_FLAG,  ANALYSE_APERTURE_FLAG
     ! USE ptc_results
@@ -2845,6 +2845,9 @@ CONTAINS
 
     integer :: mynd2,nda, flag_index,why(9) ! icase,
     ! integer :: npara ! Global in module
+    REAL (dp) :: d_val(6) !REAL (dp), allocatable :: d_val(:) 
+    !REAL (dp) :: d_val
+    INTEGER   :: i_vec, i_comp, ind(6)
 
     !------------------------------------------------------------------------------
     IF (ptc_track_debug)  print *, 'Start Subr.  Get_map_from_NormalForm '
@@ -2904,6 +2907,19 @@ CONTAINS
        ! CALL TEST_PTC_Normal(Normal_Form_N)
     end if
 
+   !EigenVectors
+    !allocate (d_val(1:icase_ptc))
+    do i_vec=1,icase_ptc
+      do i_comp=1,6 !icase_ptc
+        ind(:)=0; ind(i_comp)=1
+        d_val(i_comp)=Normal_Form_N%A_t%V(i_vec).sub.ind
+      enddo
+        if (ptc_track_debug) then
+         WRITE(17,*) 'EigenVector V(',i_vec,')=', d_val  
+        endif
+      !enddo  
+     end do
+     !DEallocate (d_val)
   END subroutine Get_map_from_NormalForm
   !==============================================================================
 

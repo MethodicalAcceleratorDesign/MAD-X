@@ -15,7 +15,7 @@
       integer i
       integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
-     &ddisp0(6),r0mat(2,2),zero,one,two,get_value
+     &ddisp0(6),r0mat(2,2),zero,one,two,get_value,eigen(6,6)
       parameter(zero=0d0,one=1d0,two=2d0)
       data izero, ione / 0, 1 /
 
@@ -127,6 +127,11 @@
       endif
 
 !---- Print summary
+      call trbegn(rt,eigen)
+      print*,"  EEEEEEEEEEigen 1",(eigen(1,i), i=1,6)
+      print*,"  EEEEEEEEEEigen 2",(eigen(2,i), i=1,6)
+      print*,"  EEEEEEEEEEigen 3",(eigen(3,i), i=1,6)
+      print*,"  EEEEEEEEEEigen 4",(eigen(4,i), i=1,6)
       if(summ.ne.0) call tw_summ(rt,tt)
       if (get_option('keeporbit ') .ne. 0)  then
         i = 6
