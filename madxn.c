@@ -1371,13 +1371,13 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
   else return;
-  
+
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
-  
+
   if (t->num_cols > t->org_cols)  add_vars_to_table(t);
-  
+
   if (t->p_nodes != NULL) t->p_nodes[t->curr] = current_node;
-  
+
   if (t->node_nm != NULL)
   {
     t->node_nm->p[t->curr] = current_node->name;
@@ -1393,12 +1393,12 @@ void augmentcountonly(char* table) /* increase table occ. by 1, fill missing */
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
-  else 
+  else
   {
     warning("Can not find table",table);
     return;
-  }  
-  
+  }
+
   if (++t->curr == t->max) grow_table(t);
 }
 
@@ -1638,22 +1638,22 @@ void double_to_table(char* table, char* name, double* val)
 {
   int pos;
   struct table* t;
-  
+
 /*  printf("double_to_table <%s> <%s> <%f>\n",table,name,*val);*/
-  
+
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
   {
     t = table_register->tables[pos];
-  }  
-  else 
+  }
+  else
   {
     printf("Can not find table %s\n",table);
     return;
-  }  
+  }
   mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0 && t->columns->inform[pos] < 3) 
-  {  
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0 && t->columns->inform[pos] < 3)
+  {
     t->d_cols[pos][t->curr] = *val;
   }
   else
@@ -2043,7 +2043,7 @@ void exec_plot(struct in_cmd* cmd)
     /* get vaxis_name */
 
     pos = name_list_pos("vaxis", nl_plot);
-    
+
     vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
 
     /* get interpolation */
@@ -2066,7 +2066,7 @@ void exec_plot(struct in_cmd* cmd)
     pos = name_list_pos("table", nl_plot);
     if(nl_plot->inform[pos]) /* table name specified */
     {
-      
+
       if ((table_name = pl_plot->parameters[pos]->string) == NULL)
         table_name = pl_plot->parameters[pos]->call_def->string;
 
@@ -2412,11 +2412,9 @@ void select_ptc_normal(struct in_cmd* cmd)
   struct command_parameter_list* pl;
   struct table* t;
   int pos;
-  int i, j, jj, curr, max_rows = 101;
+  int i, j, jj, curr;
   int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
-  char names[PTC_NAMES_L][5]=
-    {"dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu"};
   int min_req_order;
   double order[4],n1,n2,n3,n4;
 
@@ -2426,7 +2424,7 @@ void select_ptc_normal(struct in_cmd* cmd)
   {
     /* initialise table */
     normal_results = make_table("normal_results", "normal_res", normal_res_cols,
-                                normal_res_types, max_rows);
+                                normal_res_types, MAX_ROWS);
     normal_results->dynamic = 1;
     add_to_table_list(normal_results, table_register);
     reset_count("normal_results");
@@ -2440,126 +2438,124 @@ void select_ptc_normal(struct in_cmd* cmd)
   order[1] = zero;
   order[2] = zero;
   order[3] = zero;
-  if (t->curr < max_rows)
+  if (t->curr == t->max) grow_table(t);
+  for (j = 0; j < PTC_NAMES_L; j++)
   {
-    for (j = 0; j < PTC_NAMES_L; j++)
+    /* Treat each ptc variable */
+
+    pos = name_list_pos(names[j], nl);
+    if (pos > -1 && nl->inform[pos])
     {
-      /* Treat each ptc variable */
-
-      pos = name_list_pos(names[j], nl);
-      if (pos > -1 && nl->inform[pos])
+      curr = pl->parameters[pos]->m_string->curr;
+      if (curr > 4)
+        printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
+      for (i = 0; i < curr; i++)
       {
-        curr = pl->parameters[pos]->m_string->curr;
-        if (curr > 4)
-          printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
-        for (i = 0; i < curr; i++)
-        {
-          order_list = pl->parameters[pos]->m_string->p[i];
-          order[i] = (double)atoi(order_list);
-        }
+        order_list = pl->parameters[pos]->m_string->p[i];
+        order[i] = (double)atoi(order_list);
+      }
 
-        if (j == 10 || j == 11)
+      if (j == 10 || j == 11)
+      {
+        min_req_order = order[0]+order[1]+order[2];
+        mynres = 0;
+        skew = 0;
+        mynorder = (int)order[0];
+        if (mynorder < 0) skew = 1;
+        mynorder = abs(mynorder);
+        myn1 = (int)order[1];
+        myn2 = (int)order[2];
+        min_req_order = mynorder;
+        res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
+        if (mynres > 0)
         {
-          min_req_order = order[0]+order[1]+order[2];
-          mynres = 0;
-          skew = 0;
-          mynorder = (int)order[0];
-          if (mynorder < 0) skew = 1;
-          mynorder = abs(mynorder);
-          myn1 = (int)order[1];
-          myn2 = (int)order[2];
-          min_req_order = mynorder;
-          res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
-          if (mynres > 0)
+          if (j == 10)
           {
-            if (j == 10)
+            for (jj = 0; jj < mynres; jj++)
             {
-              for (jj = 0; jj < mynres; jj++)
-              {
-                n1 = (double)indexa[0][jj];
-                n2 = (double)indexa[1][jj];
-                n3 = (double)indexa[2][jj];
-                n4 = (double)indexa[3][jj];
-                string_to_table("normal_results", "name", "hamc");
-                double_to_table("normal_results", "order1", &n1);
-                double_to_table("normal_results", "order2", &n2);
-                double_to_table("normal_results", "order3", &n3);
-                double_to_table("normal_results", "order4", &n4);
-                augment_count("normal_results");
-                string_to_table("normal_results", "name", "hams");
-                double_to_table("normal_results", "order1", &n1);
-                double_to_table("normal_results", "order2", &n2);
-                double_to_table("normal_results", "order3", &n3);
-                double_to_table("normal_results", "order4", &n4);
-                augment_count("normal_results");
-                string_to_table("normal_results", "name", "hama");
-                double_to_table("normal_results", "order1", &n1);
-                double_to_table("normal_results", "order2", &n2);
-                double_to_table("normal_results", "order3", &n3);
-                double_to_table("normal_results", "order4", &n4);
-                augment_count("normal_results");
-              }
-              string_to_table("normal_results", "name", "haml");
-              double_to_table("normal_results", "order1", &order[0]);
-              double_to_table("normal_results", "order2", &order[1]);
-              double_to_table("normal_results", "order3", &order[2]);
-              double_to_table("normal_results", "order4", &order[3]);
-              n1 = (double)mynres;
-              double_to_table("normal_results", "value", &n1);
+              n1 = (double)indexa[0][jj];
+              n2 = (double)indexa[1][jj];
+              n3 = (double)indexa[2][jj];
+              n4 = (double)indexa[3][jj];
+              string_to_table("normal_results", "name", "hamc");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+              string_to_table("normal_results", "name", "hams");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+              string_to_table("normal_results", "name", "hama");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
               augment_count("normal_results");
             }
-            if (j == 11)
+            string_to_table("normal_results", "name", "haml");
+            double_to_table("normal_results", "order1", &order[0]);
+            double_to_table("normal_results", "order2", &order[1]);
+            double_to_table("normal_results", "order3", &order[2]);
+            double_to_table("normal_results", "order4", &order[3]);
+            n1 = (double)mynres;
+            double_to_table("normal_results", "value", &n1);
+            augment_count("normal_results");
+          }
+          if (j == 11)
+          {
+            for (jj = 0; jj < mynres; jj++)
             {
-              for (jj = 0; jj < mynres; jj++)
-              {
-                n1 = (double)indexa[0][jj];
-                n2 = (double)indexa[1][jj];
-                n3 = (double)indexa[2][jj];
-                n4 = (double)indexa[3][jj];
-                string_to_table("normal_results", "name", "gnfc");
-                double_to_table("normal_results", "order1", &n1);
-                double_to_table("normal_results", "order2", &n2);
-                double_to_table("normal_results", "order3", &n3);
-                double_to_table("normal_results", "order4", &n4);
-                augment_count("normal_results");
-                string_to_table("normal_results", "name", "gnfs");
-                double_to_table("normal_results", "order1", &n1);
-                double_to_table("normal_results", "order2", &n2);
-                double_to_table("normal_results", "order3", &n3);
-                double_to_table("normal_results", "order4", &n4);
-                augment_count("normal_results");
-                string_to_table("normal_results", "name", "gnfa");
-                double_to_table("normal_results", "order1", &n1);
-                double_to_table("normal_results", "order2", &n2);
-                double_to_table("normal_results", "order3", &n3);
-                double_to_table("normal_results", "order4", &n4);
-                augment_count("normal_results");
-              }
-              string_to_table("normal_results", "name", "gnfu");
-              double_to_table("normal_results", "order1", &order[0]);
-              double_to_table("normal_results", "order2", &order[1]);
-              double_to_table("normal_results", "order3", &order[2]);
-              double_to_table("normal_results", "order4", &order[3]);
-              n1 = (double)mynres;
-              double_to_table("normal_results", "value", &n1);
+              n1 = (double)indexa[0][jj];
+              n2 = (double)indexa[1][jj];
+              n3 = (double)indexa[2][jj];
+              n4 = (double)indexa[3][jj];
+              string_to_table("normal_results", "name", "gnfc");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+              string_to_table("normal_results", "name", "gnfs");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
+              augment_count("normal_results");
+              string_to_table("normal_results", "name", "gnfa");
+              double_to_table("normal_results", "order1", &n1);
+              double_to_table("normal_results", "order2", &n2);
+              double_to_table("normal_results", "order3", &n3);
+              double_to_table("normal_results", "order4", &n4);
               augment_count("normal_results");
             }
+            string_to_table("normal_results", "name", "gnfu");
+            double_to_table("normal_results", "order1", &order[0]);
+            double_to_table("normal_results", "order2", &order[1]);
+            double_to_table("normal_results", "order3", &order[2]);
+            double_to_table("normal_results", "order4", &order[3]);
+            n1 = (double)mynres;
+            double_to_table("normal_results", "value", &n1);
+            augment_count("normal_results");
           }
         }
-        else
-        {
-          string_to_table("normal_results", "name", names[j]);
-          double_to_table("normal_results", "order1", &order[0]);
-          double_to_table("normal_results", "order2", &order[1]);
-          double_to_table("normal_results", "order3", &order[2]);
-          double_to_table("normal_results", "order4", &order[3]);
-          augment_count("normal_results");
-          min_req_order = order[0]+order[1]+order[2];
-          if (j >= 9) min_req_order += order[0]+order[1];
-          if (j >= 7) min_req_order += 1;
-        }
-        if (min_order < min_req_order) min_order = min_req_order;
       }
+      else
+      {
+        string_to_table("normal_results", "name", names[j]);
+        double_to_table("normal_results", "order1", &order[0]);
+        double_to_table("normal_results", "order2", &order[1]);
+        double_to_table("normal_results", "order3", &order[2]);
+        double_to_table("normal_results", "order4", &order[3]);
+        augment_count("normal_results");
+	min_req_order = order[0]+order[1]+order[2];
+	if (j >= 9  && j < 12) min_req_order += order[0]+order[1];
+	if (j >= 7  && j < 12) min_req_order += 1;
+      }
+      if (min_order < min_req_order) min_order = min_req_order;
     }
   }
   printf("The minimum required order is %d \n",min_order);
@@ -3877,7 +3873,7 @@ struct table* make_table(char* name, char* type, char** table_cols,
   struct name_list *cols;
   struct command_list* scl;
   int i, n = 0;
-  while (*table_cols[n] != ' ') 
+  while (*table_cols[n] != ' ')
   {
 /*     printf("make table %s col %d %s\n",name, n, table_cols[n]);*/
     n++;
@@ -4667,7 +4663,7 @@ void pro_ptc_twiss()
   if (w_file) out_table(table_name, twiss_table, filename);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
-  delete_int_array(tarr); 
+  delete_int_array(tarr);
 }
 
 void pro_twiss()
@@ -5919,7 +5915,7 @@ void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
   fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
 /*  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]);
     for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]); */
-  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]); 
+  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]);
   fprintf(sec_file,"\n");
   for (i = 0; i < 36; i++)
   {
@@ -6001,7 +5997,7 @@ void seq_edit(struct in_cmd* cmd)
   {
     if ((pos = name_list_pos(name, sequences->list)) >= 0)
     {
-      if (sequences->sequs[pos]->line) 
+      if (sequences->sequs[pos]->line)
         warning("sequence originates from line,","edit ignored");
       else  seq_edit_ex(sequences->sequs[pos]);
     }
@@ -7497,7 +7493,7 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
   int pos, w_file;
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
-  
+
   table_name = "ptc_twiss";
   pos = name_list_pos("table", nl);
   if (pos >=0)
@@ -7507,12 +7503,12 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
       if ((table_name = pl->parameters[pos]->string) == NULL)
         table_name = pl->parameters[pos]->call_def->string;
     }
-  }  
-   
+  }
+
   pos = name_list_pos("file", nl);
- 
+
   w_file = 0;
-  
+
   if (pos >=0)
   {
     if (nl->inform[pos])
@@ -7525,7 +7521,7 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
       if (filename == NULL) filename = permbuff("dummy");
       w_file = 1;
     }
-  }  
+  }
   l = strlen(table_name);
   tarr = new_int_array(l+1);
   conv_char(table_name, tarr);
@@ -7538,11 +7534,11 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
   twiss_table->curr= 0;
   current_node = current_sequ->ex_start;
 
-  
+
   printf("obs_points ptc_twiss_linac: %d \n",curr_obs_points);
   w_ptc_twiss_linac_(tarr->i);
   printf("obs_points ptc_twiss_linac Done");
- 
+
 }
 /********************************************************************************/
 
@@ -7554,7 +7550,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   double switchvalue;
   struct name_list* nl;
   int debuglevel = 0;
-  
+
   if (cmd == 0x0)
   {
     warning("pro_ptc_setswitch:","Command is null!!!");
@@ -7576,12 +7572,12 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("debuglevel", cmd->clone, &switchvalue);
     debuglevel = (int)switchvalue;
     w_ptc_setdebuglevel_(&debuglevel);
-  } 
+  }
   else
   {
     printf("debuglevel is not present\n");
-  } 
-  
+  }
+
 
   /*ACCELERATION SWITCH*/
   if ( name_list_pos("maxacceleration", nl) >=0 )
@@ -7590,11 +7586,11 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setaccel_method_(&i);
-  } 
+  }
   else
   {
     if (debuglevel > 0) printf("maxaccel is not present\n");
-  } 
+  }
 
 
   /*EXACT SWITCH*/
@@ -7604,12 +7600,12 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setexactmis_(&i);
-  } 
+  }
   else
   {
-   if (debuglevel > 0)  printf("exact_mis is not present\n");
-  } 
-  
+    if (debuglevel > 0)  printf("exact_mis is not present\n");
+  }
+
 
   /*radiation SWITCH*/
   if ( name_list_pos("radiation", nl) >=0 )
@@ -7618,11 +7614,11 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("radiation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setradiation_(&i);
-  } 
+  }
   else
   {
     if (debuglevel > 0) printf("radiation is not present\n");
-  } 
+  }
 
   /*fringe SWITCH*/
   if ( name_list_pos("fringe", nl) >=0 )
@@ -7631,13 +7627,13 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("fringe is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setfringe_(&i);
-  } 
+  }
   else
   {
     if (debuglevel > 0) printf("fringe is not present\n");
-  } 
-  
-  
+  }
+
+
 
   /*totalpath SWITCH*/
   if ( name_list_pos("totalpath", nl) >=0 )
@@ -7646,42 +7642,42 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("totalpath is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settotalpath_(&i);
-  } 
+  }
   else
   {
     if (debuglevel > 0) printf("totalpath is not present\n");
-  } 
-  
+  }
+
 
   /*TIME SWITCH*/
   if ( name_list_pos("time", nl) >=0 )
-  { 
+  {
     command_par_value2("time", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("time is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settime_(&i);
-  } 
+  }
   else
   {
     if (debuglevel > 0) printf("time is not present\n");
-  } 
-  
+  }
+
   /*NOCAVITY SWITCH*/
   if ( name_list_pos("nocavity", nl) >=0 )
-  { 
+  {
     command_par_value2("nocavity", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("nocavity is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setnocavity_(&i);
-  } 
+  }
   else
   {
     if (debuglevel > 0) printf("nocavity is not present\n");
-  } 
-  
+  }
+
   if (debuglevel > 0) printf("obs_points pro_ptc_setswitch Done\n");
 
-  
+
 }
 /********************************************************************************/
 
@@ -7692,7 +7688,7 @@ void pro_ptc_select(struct in_cmd* cmd)
    Then, it these values are accessible for other MAD-X modules for calculations.
    The most important one is the matching module.
  */
-  
+
   struct table*                  aTable      = 0x0;
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
@@ -7707,11 +7703,11 @@ void pro_ptc_select(struct in_cmd* cmd)
   int                            place       = -1;
 
 /*
-  int                            i           = 0;  
+  int                            i           = 0;
   struct node*                   nodes[2]    = {0x0,0x0};
   char                           buff[NAME_L];
   char                           placestring[NAME_L];
-*/  
+*/
   /*extracts table specified by the user*/
   pos   = name_list_pos("table", c_parnames);
   if (pos < 0)
@@ -7727,13 +7723,13 @@ void pro_ptc_select(struct in_cmd* cmd)
     return;
   }
 
-  pos = name_list_pos(tablename, table_register->names); 
+  pos = name_list_pos(tablename, table_register->names);
   if (pos < 0)
   {
     printf("madxn.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
     return;
   }
-  
+
   aTable = table_register->tables[pos];
   if (aTable == 0x0)
   {
@@ -7748,14 +7744,14 @@ void pro_ptc_select(struct in_cmd* cmd)
     printf("madxn.c: pro_ptc_select: column parameter does not exist.\n");
     return;
   }
-  
+
   columnname  = c_parameters->parameters[pos]->string;
   if ( columnname == 0x0 )
   {
     warning("madxn.c: pro_ptc_select: Column name is empty: ", "ignored");
     return;
   }
-  
+
   /*checks if the specified column exists*/
   pos = name_list_pos(columnname,aTable->columns);
   if (pos < 0)
@@ -7767,7 +7763,7 @@ void pro_ptc_select(struct in_cmd* cmd)
 
 /*Checks the place*/
 /*
-  
+
 pos = name_list_pos("place", c_parnames);
 strcpy(placestring, c_parameters->parameters[pos]->string);
 strcpy(buff,placestring);
@@ -7776,13 +7772,13 @@ if (square_to_colon(buff) == 0)
 warning("madxn.c: pro_ptc_select: illegal expand range ignored:", placestring);
 return;
 }
-  
+
 place = name_list_pos(buff, current_sequ->ex_nodes->list);
 if (place > -1)
-{ 
+{
   printf("madxn.c: pro_ptc_select: Found place %s at position %d in the current senquence \n",
          placestring,place);
-}    
+}
 else
 {
   printf("madxn.c: pro_ptc_select: Can not find place %s\n",placestring);
@@ -7792,17 +7788,17 @@ else
 
 element = (int)command_par_value("polynomial",cmd->clone);
 monomial = command_par_string("monomial",cmd->clone);
-  
+
 tabnameIA = new_int_array(1+strlen(tablename));
 colnameIA = new_int_array(1+strlen(columnname));
 monoIA = new_int_array(1+strlen(monomial));
 conv_char(tablename,tabnameIA);
 conv_char(columnname,colnameIA);
 conv_char(monomial,monoIA);
-  
+
 place++; /*Converting to the Fortran numeration (1...n)*/
 w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
-  
+
 delete_int_array(tabnameIA);
 delete_int_array(colnameIA);
 delete_int_array(monoIA);
@@ -7817,13 +7813,13 @@ void pro_ptc_script(struct in_cmd* cmd)
    Then, it these values are accessible for other MAD-X modules for calculations.
    The most important one is the matching module.
  */
-  
+
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
   char*                          scriptname   = 0x0;
   struct int_array*              scriptnameIA = 0x0;/*string passing to fortran is tricky*/
-  
+
   /*extracts table specified by the user*/
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
@@ -7843,7 +7839,7 @@ void pro_ptc_script(struct in_cmd* cmd)
   conv_char(scriptname,scriptnameIA);
 
   w_ptc_script_(scriptnameIA->i);/*calls the fortran*/
-  
+
   delete_int_array(scriptnameIA);
 
 }
@@ -8219,7 +8215,7 @@ void vector_to_table(char* table, char* col, int* nval, double* vals)
 /***************************************************************************/
 /***************************************************************************/
 /***************************************************************************/
- 
+
 
 int getnumberoftracks()
 {
@@ -8228,9 +8224,9 @@ int getnumberoftracks()
   {
     return 0;
   }
-  
+
   return stored_track_start->curr;
-  
+
 }
 /***************************************************************************/
 
@@ -8247,7 +8243,7 @@ int copytrackstoarray()
   {
     deletetrackstrarpositions();
   }
-  
+
   ntracks = getnumberoftracks();
   if (ntracks <= 0)
   {
@@ -8255,11 +8251,11 @@ int copytrackstoarray()
     return 0;
   }
   trackstrarpositions =  (double**)malloc(ntracks*sizeof(double*));
-  
+
   for (n = 0; n < ntracks; n++)
   {
     trackstrarpositions[n] = (double*)malloc(6*sizeof(double));
-     
+
     comm = stored_track_start->commands[n];
     trackstrarpositions[n][0] = command_par_value("x",  comm);
     trackstrarpositions[n][1] = command_par_value("px", comm);
@@ -8267,7 +8263,7 @@ int copytrackstoarray()
     trackstrarpositions[n][3] = command_par_value("py", comm);
     trackstrarpositions[n][4] = command_par_value("t",  comm);
     trackstrarpositions[n][5] = command_par_value("pt", comm);
-     
+
   }
   return ntracks;
 
@@ -8290,8 +8286,8 @@ int gettrack(int* nt, double* x,double* px,double* y,double* py,double* t,double
     printf("gettrack: track number %d out of range",n);
     return 1;
   }
-  
-  
+
+
   *x      = trackstrarpositions[n][0];
   *px     = trackstrarpositions[n][1];
   *y      = trackstrarpositions[n][2];
@@ -8312,7 +8308,7 @@ void deletetrackstrarpositions()
     free(trackstrarpositions[i]);
   }
   free(trackstrarpositions);
-  
+
   trackstrarpositions = 0x0;
 }
 /***************************************************************************/

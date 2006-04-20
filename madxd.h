@@ -1197,9 +1197,6 @@ char          line[LINE_MAX],
 time_t last_time;
 time_t start_time;
 
-/* end of definitions */
-
-
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
@@ -1208,3 +1205,6 @@ double** trackstrarpositions = 0x0;/* two dimensional array with track positions
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
 void deletetrackstrarpositions();
+
+/* end of definitions */
+
