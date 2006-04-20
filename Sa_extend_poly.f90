@@ -22,7 +22,7 @@ module S_extend_poly
   LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
-  REAL(dp),TARGET   :: absolute_aperture=1e3_dp
+  REAL(dp),TARGET   :: absolute_aperture=c_1d3
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE REAL_8REAL6
      MODULE PROCEDURE REAL6REAL_8
@@ -66,9 +66,9 @@ CONTAINS
     ENDIF
     c_%CHECK_STABLE =.TRUE.
     c_%CHECK_MADX_APERTURE =.TRUE.
-!frs 10.03.2006    c_%check_iteration =.TRUE.
-!frs 10.03.2006    c_%check_interpolate_x =.TRUE.
-!frs 10.03.2006    c_%check_interpolate_y =.TRUE.
+    !frs 10.03.2006    c_%check_iteration =.TRUE.
+    !frs 10.03.2006    c_%check_interpolate_x =.TRUE.
+    !frs 10.03.2006    c_%check_interpolate_y =.TRUE.
     c_%check_x_min =.TRUE.
     c_%check_x_max =.TRUE.
     c_%check_y_min =.TRUE.
@@ -110,17 +110,17 @@ CONTAINS
        I=B+I
     ENDIF
     B=B*2
-!frs 10.03.2006    IF(.NOT.c_%check_iteration) THEN
-!frs 10.03.2006       I=B+I
-!frs 10.03.2006    ENDIF
+    !frs 10.03.2006    IF(.NOT.c_%check_iteration) THEN
+    !frs 10.03.2006       I=B+I
+    !frs 10.03.2006    ENDIF
     B=B*2
-!frs 10.03.2006    IF(.NOT.c_%check_interpolate_x) THEN
-!frs 10.03.2006       I=B+I
-!frs 10.03.2006    ENDIF
+    !frs 10.03.2006    IF(.NOT.c_%check_interpolate_x) THEN
+    !frs 10.03.2006       I=B+I
+    !frs 10.03.2006    ENDIF
     B=B*2
-!frs 10.03.2006    IF(.NOT.c_%check_interpolate_y) THEN
-!frs 10.03.2006       I=B+I
-!frs 10.03.2006    ENDIF
+    !frs 10.03.2006    IF(.NOT.c_%check_interpolate_y) THEN
+    !frs 10.03.2006       I=B+I
+    !frs 10.03.2006    ENDIF
     B=B*2
     IF(.NOT.c_%check_x_min) THEN
        I=B+I
@@ -435,27 +435,6 @@ CONTAINS
   END SUBROUTINE tenv_8
 
   ! End of Some polymorphism
-
-  SUBROUTINE CONTEXT( STRING )
-    IMPLICIT NONE
-    CHARACTER(*) STRING
-    CHARACTER(1) C1
-    INTEGER I,J,K
-    J = 0
-    DO I = 1, LEN (STRING)
-       C1 = STRING(I:I)
-       STRING(I:I) = ' '
-       IF( C1 .NE. ' ' ) THEN
-          J = J + 1
-          K = ICHAR( C1 )
-          IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z') ) THEN
-             C1 = CHAR( K - ICHAR('a') + ICHAR('A') )
-          ENDIF
-          STRING(J:J) = C1
-       ENDIF
-    ENDDO
-    RETURN
-  END  SUBROUTINE CONTEXT
 
   FUNCTION daddsc( S1, S2 )
     implicit none
