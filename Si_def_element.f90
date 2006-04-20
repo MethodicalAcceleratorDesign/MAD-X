@@ -13,7 +13,7 @@ MODULE S_DEF_ELEMENT
   logical(lp),PARAMETER::BERZ=.TRUE.,ETIENNE=.NOT.BERZ
   logical(lp) :: USE_TPSAFIT=.TRUE.  ! USE GLOBAL ARRAY INSTEAD OF PERSONAL ARRAY
   logical(lp), target :: set_tpsafit=.false.
-  real(dp) , target :: scale_tpsafit=1.0_dp
+  real(dp) , target :: scale_tpsafit=one
   real(dp), target :: tpsafit(lnv) !   used for fitting with tpsa in conjunction with pol_block
   PRIVATE copy_el_elp,copy_elp_el,copy_el_el
   PRIVATE cop_el_elp,cop_elp_el,cop_el_el
@@ -777,6 +777,7 @@ CONTAINS
        EL%CAV21%DELTA_E=>EL%DELTA_E
        EL%CAV21%THIN=>EL%THIN
        ALLOCATE(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
+       ALLOCATE(EL%CAV21%DVDS);EL%CAV21%DVDS=ZERO
        ALLOCATE(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
@@ -1181,6 +1182,7 @@ CONTAINS
        EL%CAV21%DELTA_E=>EL%DELTA_E
        EL%CAV21%THIN=>EL%THIN
        ALLOCATE(EL%CAV21%PSI);CALL ALLOC(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
+       ALLOCATE(EL%CAV21%DVDS);CALL ALLOC(EL%CAV21%DVDS);EL%CAV21%DVDS=ZERO
        ALLOCATE(EL%CAV21%DPHAS);CALL ALLOC(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
@@ -2376,6 +2378,7 @@ CONTAINS
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
        ELP%CAV21%PSI = EL%CAV21%PSI
+       ELP%CAV21%DVDS = EL%CAV21%DVDS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
     ENDIF
 
@@ -2591,6 +2594,7 @@ CONTAINS
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
        ELP%CAV21%PSI = EL%CAV21%PSI
+       ELP%CAV21%DVDS = EL%CAV21%DVDS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
     ENDIF
 
@@ -2805,6 +2809,7 @@ CONTAINS
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
        ELP%CAV21%PSI = EL%CAV21%PSI
+       ELP%CAV21%DVDS = EL%CAV21%DVDS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
     ENDIF
 
@@ -2959,6 +2964,7 @@ CONTAINS
        CALL resetpoly_R31(ELP%FREQ )
        CALL resetpoly_R31(ELP%PHAS )
        CALL resetpoly_R31(ELP%CAV21%PSI )
+       CALL resetpoly_R31(ELP%CAV21%DVDS )
        CALL resetpoly_R31(ELP%CAV21%DPHAS )
     ENDIF
 

@@ -1183,7 +1183,10 @@ CONTAINS
       opt_fun(35)=tw%disp(5) * deltae
       opt_fun(36)=tw%disp(6) * deltae
 
-      if (getdebug() > 2)   write(6,'(a16,4f12.8)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      if (getdebug() > 2)  then
+        write(6,'(a16,4f12.3)') 'b11,b12,b21,b22: ',&
+             &opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      endif
       
       ioptfun=36
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
@@ -1934,7 +1937,6 @@ CONTAINS
     
     deltap = zero
     call my_state(icase,deltap,deltap0)
-    CALL UPDATE_STATES
 
     if (getdebug() > 2) then
        print *, "ptc_track: internal state is:"
@@ -2385,6 +2387,7 @@ CONTAINS
        i=5
     CASE(6)
        i=6
+       default=default+time
     CASE DEFAULT
        default=default+only_4d+NOCAVITY
        i=4
@@ -2399,7 +2402,6 @@ CONTAINS
        default = default - NOCAVITY !enforcing nocavity to false
       endif 
     endif
-    
 
     call setintstate(default)
     CALL UPDATE_STATES

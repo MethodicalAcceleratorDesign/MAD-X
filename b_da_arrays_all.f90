@@ -31,7 +31,7 @@ module da_arrays
   integer,TARGET :: lda_used =1000
   logical,TARGET :: stable_da =.true.
   logical,TARGET :: check_da =.false.
-  real(dp),target ::  da_absolute_aperture=1.0e6_dp
+  real(dp),target ::  da_absolute_aperture=c_1d6
 
 contains
 

@@ -59,7 +59,7 @@ TYPE CAV_TRAV
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp) , POINTER ::L                    !  Storage space for computed
-   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E
+   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,DVDS
    real(dp), POINTER :: PSI,DPHAS
 END  TYPE CAV_TRAV
 
@@ -68,7 +68,7 @@ TYPE CAV_TRAVP
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8) , POINTER ::L                    !  Storage space for computed
-   TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS
+   TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS,DVDS
    TYPE(REAL_8), POINTER :: PSI,DPHAS
    real(dp), POINTER :: DELTA_E                        ! Cavity information
 END  TYPE CAV_TRAVP

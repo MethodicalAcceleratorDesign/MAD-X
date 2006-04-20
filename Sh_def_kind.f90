@@ -89,9 +89,7 @@ MODULE S_DEF_KIND
   PRIVATE KICKMULTR,KICKMULTP,KICKMULTS
   PRIVATE KICK_SOLTR,KICK_SOLTP,KICK_SOLTS
   PRIVATE KICKPATH6TR,KICKPATH6TP,KICKPATH6TS
-  PRIVATE KICKCAVR_TRAV,KICKCAVP_TRAV,KICKCAVS_TRAV,FRINGECAVR_TRAV,FRINGECAVP_TRAV,FRINGECAVS_TRAV
   PRIVATE ZEROR_CAV_TRAV,ZEROP_CAV_TRAV
-  PRIVATE A_TRAVR,A_TRAVP,A_TRAVS,A_TRAV
   PRIVATE MARTINR,MARTINP,MARTINS,ZERO_MARTIN
 
   PRIVATE copypancake_el_elp,copypancake_elp_el,copypancake_el_el
@@ -107,6 +105,7 @@ MODULE S_DEF_KIND
   !  FOR CAV_TRAV
   PRIVATE A_TRANSR,A_TRANSP,A_TRANS
   PRIVATE feval_CAVr,feval_CAVP,feval_CAV
+  private FRINGECAV_TRAV, FRINGECAVR_TRAV,FRINGECAVP_TRAV,FRINGECAVS_TRAV
   private rk2_cavr,rk2_cavp,rk2_cav
   private rk4_cavr,rk4_cavp,rk4_cav
   private rk6_cavr,rk6_cavp,rk6_cav
@@ -209,16 +208,8 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE KICKCAVR
      MODULE PROCEDURE KICKCAVP       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
      MODULE PROCEDURE KICKCAVS
-     MODULE PROCEDURE KICKCAVR_TRAV
-     MODULE PROCEDURE KICKCAVP_TRAV       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
-     MODULE PROCEDURE KICKCAVS_TRAV
   END INTERFACE
 
-  INTERFACE A_TRAV
-     MODULE PROCEDURE A_TRAVR
-     MODULE PROCEDURE A_TRAVP
-     MODULE PROCEDURE A_TRAVS
-  END INTERFACE
 
   INTERFACE A_TRANS
      MODULE PROCEDURE A_TRANSR
@@ -249,6 +240,9 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE FRINGECAVR
      MODULE PROCEDURE FRINGECAVP       ! CAVITY FRINGE FIELDS
      MODULE PROCEDURE FRINGECAVS
+  END INTERFACE
+
+  INTERFACE FRINGECAV_TRAV
      MODULE PROCEDURE FRINGECAVR_TRAV
      MODULE PROCEDURE FRINGECAVP_TRAV       ! CAVITY FRINGE FIELDS
      MODULE PROCEDURE FRINGECAVS_TRAV
@@ -898,11 +892,8 @@ contains
 
        DO I=1,EL%P%NST
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          write(6,*)1, x
           CALL KICKCAV (EL,D,X)
-          write(6,*)2, x
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          write(6,*)3, x
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
     CASE(4)
@@ -10553,8 +10544,8 @@ contains
     BX=zero
     BY=zero
 
-    ! x1=1.d0.mono.'1'
-    ! x3=1.d0.mono.'01'
+    ! x1=one.mono.'1'
+    ! x3=one.mono.'01'
     k=0
     m=EL%P%nmul-1
     do a=m,1,-1
@@ -10600,8 +10591,8 @@ contains
     ! write(16,*)"el%p%b0 = ", junk
     ! call print(bx,16)
     ! call print(by,16)
-    ! B(1)=BY/morph(one+(1.d0.mono.'1')*EL%P%B0)
-    ! B(2)=-Bx/morph(one+(1.d0.mono.'1')*EL%P%B0)
+    ! B(1)=BY/morph(one+(one.mono.'1')*EL%P%B0)
+    ! B(2)=-Bx/morph(one+(one.mono.'1')*EL%P%B0)
     ! write(16,*) "******************************"
     ! call print(b(1),16)
     ! call print(b(2),16)
@@ -14092,7 +14083,7 @@ contains
     INTEGER TOTALPATH
 
     !    IF(EL%P%FRINGE)
-    CALL FRINGECAV(EL,EL%P%DIR,X)
+    CALL FRINGECAV_TRAV(EL,EL%P%DIR,X)
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
@@ -14143,7 +14134,7 @@ contains
     END SELECT
 
     !    IF(EL%P%FRINGE)
-    CALL FRINGECAV(EL,-EL%P%DIR,X)
+    CALL FRINGECAV_TRAV(EL,-EL%P%DIR,X)
 
     EL%P%TOTALPATH=TOTALPATH
 
@@ -14168,7 +14159,7 @@ contains
     CALL ALLOC(Z0)
 
     !    IF(EL%P%FRINGE)
-    CALL FRINGECAV(EL,EL%P%DIR,X)
+    CALL FRINGECAV_TRAV(EL,EL%P%DIR,X)
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     IF(EL%P%DIR==1) THEN
@@ -14232,7 +14223,7 @@ contains
     END SELECT
 
     !    IF(EL%P%FRINGE)
-    CALL FRINGECAV(EL,-EL%P%DIR,X)
+    CALL FRINGECAV_TRAV(EL,-EL%P%DIR,X)
 
     EL%P%TOTALPATH=TOTALPATH
 
@@ -14272,6 +14263,7 @@ contains
     integer, intent(in) :: i
     real(dp) C1,S1,C2,S2,V,O,Z0,CPSI,SPSI
     integer eps1,eps2
+    real(dp) dv
 
     IF(EL%P%NOCAVITY) RETURN
 
@@ -14281,8 +14273,10 @@ contains
     eps2=-1
     if(EL%P%DIR*I==1) then
        Z0=ZERO
+       dv=zero
     else
        Z0=EL%L
+       dv=EL%dvds*z0
     endif
 
     CPSI=COS(EL%PSI)
@@ -14295,25 +14289,11 @@ contains
     S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
     S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
-    V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=I*EL%P%CHARGE*(EL%volt-dv)*c_1d_3/EL%P%P0C
 
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
     X(4)=X(4)+V*(CPSI*S1+SPSI*S2)*X(3)
     x(5)=x(5)-HALF*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
-
-    !   !   R.R' TERM IN THE ULTRA RELATIVISTIC CASE  X(5)=PT
-    !       C2=COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    !       S2=SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)    ! PUT BACK   ULTRA RELATIVISTIC
-    !
-    !       F=-(V/TWO/O) +(V/O)      !  A_Z AND A_X,Y TERM
-    !       X(5)=(X(5)-ONE+SQRT( (ONE+X(5))**2+FOUR*O*F*  (X(1)*X(2)+X(3)*X(4))*(CPSI*S1+SPSI*S2)  ))/TWO
-    !
-    !       X(1)= EXP(-F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(1)
-    !       X(2)= EXP( F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(2)
-    !       X(3)= EXP(-F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(3)
-    !       X(4)= EXP( F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(4)
-    !
-    !       X(6)=X(6)-F*(X(1)*X(2)+X(3)*X(4))*(CPSI*C1+SPSI*C2)/(ONE+X(5))**2
 
   END SUBROUTINE FRINGECAVR_TRAV
 
@@ -14322,7 +14302,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     integer, intent(in) :: i
-    TYPE(REAL_8) C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI
+    TYPE(REAL_8) C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI,dv
     integer eps1,eps2
 
 
@@ -14332,13 +14312,16 @@ contains
     !    IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
 
     CALL ALLOC(C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI)
+    call alloc(dv)
 
     eps1=1
     eps2=-1
     if(EL%P%DIR*I==1) then
        Z0=ZERO
+       dv=zero
     else
        Z0=EL%L
+       dv=EL%dvds*z0
     endif
 
     CPSI=COS(EL%PSI)
@@ -14351,27 +14334,13 @@ contains
     S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
     S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
-    V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=I*EL%P%CHARGE*(EL%volt-dv)*c_1d_3/EL%P%P0C
 
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
     X(4)=X(4)+V*(CPSI*S1+SPSI*S2)*X(3)
     x(5)=x(5)-HALF*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
 
-    !   !   R.R' TERM IN THE ULTRA RELATIVISTIC CASE  X(5)=PT
-    !       C2=COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    !       S2=SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)    ! PUT BACK   ULTRA RELATIVISTIC
-    !
-    !       F=-(V/TWO/O) +(V/O)      !  A_Z AND A_X,Y TERM
-    !       X(5)=(X(5)-ONE+SQRT( (ONE+X(5))**2+FOUR*O*F*  (X(1)*X(2)+X(3)*X(4))*(CPSI*S1+SPSI*S2)  ))/TWO
-    !
-    !       X(1)= EXP(-F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(1)
-    !       X(2)= EXP( F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(2)
-    !       X(3)= EXP(-F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(3)
-    !       X(4)= EXP( F*(CPSI*C1+SPSI*C2)/(ONE+X(5)))*X(4)
-    !
-    !       X(6)=X(6)-F*(X(1)*X(2)+X(3)*X(4))*(CPSI*C1+SPSI*C2)/(ONE+X(5))**2
-
-
+    call KILL(dv)
     CALL KILL(C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI)
   END SUBROUTINE FRINGECAVP_TRAV
 
@@ -14384,130 +14353,11 @@ contains
 
     CALL ALLOC(X)
     X=Y
-    CALL FRINGECAV(EL,I,X)
+    CALL FRINGECAV_TRAV(EL,I,X)
     Y=X
 
     CALL KILL(X)
   END SUBROUTINE FRINGECAVS_TRAV
-
-
-  SUBROUTINE A_TRAVR(EL,Z0,I,X)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
-    IMPLICIT NONE
-    real(dp),INTENT(INOUT):: X(6)
-    real(dp),INTENT(INOUT):: Z0
-    INTEGER,INTENT(IN):: I
-    TYPE(CAV_TRAV),INTENT(INOUT):: EL
-    real(dp) C1,S1,C2,S2,V,O
-
-    !    IF(EL%P%NOCAVITY.OR.(.NOT.EL%P%FRINGE)) RETURN
-    IF(EL%P%NOCAVITY) RETURN
-
-    O=EL%freq*twopi/CLIGHT
-    C1=COS(O*(x(6)-Z0)+EL%PHAS+phase0)
-    C2=COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    S1=SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
-    S2=SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
-
-    X(2)=X(2)-HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)*X(1)
-    X(4)=X(4)-HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)*X(3)
-    x(5)=x(5)+c_0_25*(X(1)**2+X(3)**2)*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)*O
-
-  END SUBROUTINE A_TRAVR
-
-  SUBROUTINE A_TRAVP(EL,Z0,I,X)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
-    IMPLICIT NONE
-    TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(REAL_8),INTENT(INOUT):: Z0
-    INTEGER,INTENT(IN):: I
-    TYPE(CAV_TRAVP),INTENT(INOUT):: EL
-    TYPE(REAL_8) C1,S1,C2,S2,V,O
-    !    IF(EL%P%NOCAVITY.OR.(.NOT.EL%P%FRINGE)) RETURN
-    IF(EL%P%NOCAVITY) RETURN
-    CALL ALLOC(C1,S1,C2,S2,V,O)
-    O=EL%freq*twopi/CLIGHT
-    C1=COS(O*(x(6)-Z0)+EL%PHAS+phase0)
-    C2=COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    S1=SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
-    S2=SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    V=I*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
-    X(2)=X(2)-HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)*X(1)
-    X(4)=X(4)-HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)*X(3)
-    x(5)=x(5)+c_0_25*(X(1)**2+X(3)**2)*V*(COS(EL%PSI)*C1)*O
-
-    CALL KILL(C1,S1,C2,S2,V,O)
-
-  END SUBROUTINE A_TRAVP
-
-  SUBROUTINE A_TRAVS(EL,Z0,I,Y)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
-    IMPLICIT NONE
-    TYPE(ENV_8),INTENT(INOUT):: Y(6)
-    TYPE(REAL_8),INTENT(INOUT):: Z0
-    INTEGER,INTENT(IN):: I
-    TYPE(CAV_TRAVP),INTENT(INOUT):: EL
-    TYPE(REAL_8) X(6)
-
-    CALL ALLOC(X,6)
-    X=Y
-    CALL A_TRAV(EL,Z0,I,X)
-    Y=X
-    CALL KILL(X,6)
-
-  END SUBROUTINE A_TRAVS
-
-
-  SUBROUTINE KICKCAVR_TRAV(EL,YL,Z0,X)
-    IMPLICIT NONE
-    real(dp),INTENT(INOUT):: X(6)
-    real(dp),INTENT(INOUT):: YL,Z0
-    TYPE(CAV_TRAV),INTENT(INOUT):: EL
-
-    IF(EL%P%NOCAVITY) RETURN
-    !    write(16,*)(x(6)-Z0), EL%freq*twopi*(x(6)-Z0)/CLIGHT
-    EL%DELTA_E=x(5)
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
-         COS(EL%PSI)*SIN(EL%freq*twopi*(x(6)-Z0)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
-         SIN(EL%PSI)*SIN(EL%freq*twopi*(x(6)+Z0)/CLIGHT+EL%PHAS+phase0+EL%DPHAS)/EL%P%P0C
-
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
-
-  END SUBROUTINE KICKCAVR_TRAV
-
-  SUBROUTINE KICKCAVP_TRAV(EL,YL,Z0,X)
-    IMPLICIT NONE
-    TYPE(REAL_8),INTENT(INOUT):: X(6),YL,Z0
-    TYPE(CAV_TRAVP),INTENT(INOUT):: EL
-    !    real(dp) c1,c2
-    IF(EL%P%NOCAVITY) RETURN
-    EL%DELTA_E=x(5)
-    !    c1=(x(6)-Z0)
-    !    c2=EL%freq*twopi*(x(6)-Z0)/CLIGHT
-    !    write(16,*)'1',c1,c2
-
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
-         COS(EL%PSI)*SIN(EL%freq*twopi*(x(6)-Z0)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*YL*EL%volt*c_1d_3* &
-         SIN(EL%PSI)*SIN(EL%freq*twopi*(x(6)+Z0)/CLIGHT+EL%PHAS+phase0+EL%DPHAS)/EL%P%P0C
-
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
-
-  END SUBROUTINE KICKCAVP_TRAV
-
-
-  SUBROUTINE KICKCAVS_TRAV(EL,YL,Z0,Y)
-    IMPLICIT NONE
-    TYPE(REAL_8)  X(6)
-    TYPE(REAL_8),INTENT(INOUT):: YL,Z0
-    TYPE(ENV_8),INTENT(INOUT):: Y(6)
-    TYPE(CAV_TRAVP),INTENT(INOUT):: EL
-
-    CALL ALLOC(X,6)
-    X=Y
-    CALL KICKCAV(EL,YL,Z0,X)
-    Y=X
-    CALL KILL(X,6)
-  END SUBROUTINE KICKCAVS_TRAV
 
   SUBROUTINE ZEROR_CAV_TRAV(EL,I)
     IMPLICIT NONE
@@ -14518,11 +14368,13 @@ contains
        if(ASSOCIATED(EL%DPHAS)) then
           deallocate(EL%PSI)
           deallocate(EL%DPHAS)
+          deallocate(EL%DVDS)
        endif
     elseif(i==0)       then          ! nullifies
 
        NULLIFY(EL%PSI)
        NULLIFY(EL%DPHAS)
+       NULLIFY(EL%DVDS)
     endif
 
   END SUBROUTINE ZEROR_CAV_TRAV
@@ -14538,11 +14390,14 @@ contains
           deallocate(EL%DPHAS)
           CALL KILL(EL%PSI)
           deallocate(EL%PSI)
+          CALL KILL(EL%DVDS)
+          deallocate(EL%DVDS)
        endif
     elseif(i==0)       then          ! nullifies
 
        NULLIFY(EL%DPHAS)
        NULLIFY(EL%PSI)
+       NULLIFY(EL%DVDS)
     endif
 
   END SUBROUTINE ZEROP_CAV_TRAV
@@ -15322,7 +15177,7 @@ contains
     f(2)=x(4)*b(3)-x(6)*b(2)
     f(4)=x(6)*b(1)-x(2)*b(3)
     f(6)=x(2)*b(2)-x(4)*b(1)
-    f(7)=0.d0
+    f(7)=zero
 
   end subroutine f_Mtr
 
@@ -16241,7 +16096,7 @@ contains
     C2=COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
     S1=SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
     S2=SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    V=EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=EL%P%CHARGE*(EL%volt-el%dvds*z0)*c_1d_3/EL%P%P0C
 
     AD(1)=HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
     AD(2)=O*HALF*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
@@ -16269,7 +16124,7 @@ contains
     C2=COS(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
     S1=SIN(O*(x(6)-Z0)+EL%PHAS+phase0)
     S2=SIN(O*(x(6)+Z0)+EL%PHAS+phase0+EL%DPHAS)
-    V=EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=EL%P%CHARGE*(EL%volt-el%dvds*z0)*c_1d_3/EL%P%P0C
 
     AD(1)=HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
     AD(2)=O*HALF*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
@@ -16302,7 +16157,7 @@ contains
        yt(j)=y(j)+a(j)/two
     enddo
 
-    tt=tI+h/2.d+0
+    tt=tI+h/two
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -16517,59 +16372,59 @@ contains
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/9.d+0
+       yt(j)=y(j)+a(j)/nine
     enddo
-    tt=tI+h/9.d+0
+    tt=tI+h/nine
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + 3.d+0*b(j))/24.d+0
+       yt(j)=y(j) + (a(j) + three*b(j))/c_24
     enddo
-    tt=tI+h/6.d+0
+    tt=tI+h/six
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-3.d+0*b(j)+4.d+0*c(j))/6.d+0
+       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
     enddo
 
-    tt=tI+h/3.d+0
+    tt=tI+h/three
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-5.d+0*a(j) + 27.d+0*b(j) - 24.d+0*c(j) + 6.d+0*d(j))/8.d+0
+       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
     enddo
-    tt=tI+.5d+0*h
+    tt=tI+half*h
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (221.d+0*a(j) - 981.d+0*b(j) + 867.d+0*c(j)- 102.d+0*d(j) + e(j))/9.d+0
+       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
     enddo
-    tt = tI+2.d+0*h/3.d+0
+    tt = tI+two*h/three
     call feval_cav(tt,yt,f,gr)
     do   j=1,ne
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-183.d+0*a(j)+678.d+0*b(j)-472.d+0*c(j)-66.d+0*d(j)+80.d+0*e(j) + 3.d+0*g(j))/48.d+0
+       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
     enddo
-    tt = tI + 5.d+0*h/6.d+0
+    tt = tI + five*h/six
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(716.d+0*a(j)-2079.d+0*b(j)+1002.d+0*c(j)+834.d+0*d(j)-454.d+0*e(j)-9.d+0*g(j)+72.d+0*o(j))/82.d+0
+       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
     enddo
 
     tt = tI + h
@@ -16579,7 +16434,7 @@ contains
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(41.d+0*a(j)+216.d+0*c(j)+27.d+0*d(j)+  272.d+0*e(j)+27.d+0*g(j)+216.d+0*o(j)+41.d+0*p(j))/840.d+0
+       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
     enddo
     tI=ti+h
 
@@ -16648,7 +16503,7 @@ contains
     do  j=1,ne
        yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
     enddo
-    tt=tI+five*h
+    tt=tI+half*h
     call feval_cav(tt,yt,f,gr)
     do  j=1,ne
        e(j)=h*f(j)

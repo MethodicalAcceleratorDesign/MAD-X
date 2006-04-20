@@ -52,11 +52,12 @@ module precision_constants
   real(dp),parameter::c_1d9=1e9_dp,c_111110=1.1111e5_dp,c_2d5=2e5_dp
   real(dp),parameter::c_1d8=1e8_dp,c_1d10=1e10_dp,c_1d4=1e4_dp
   real(dp),parameter::c_1d30=1e30_dp,c_1d36=1e36_dp
+
   real(dp),parameter::c_221=221e0_dp,c_981=981e0_dp,c_867=867e0_dp,c_102=102e0_dp
   real(dp),parameter::c_183=183e0_dp,c_678=678e0_dp,c_472=472e0_dp,c_66=66e0_dp
-  real(dp),parameter::c_716=716e0_dp,c_2079=2079e0_dp,c_1002=1002e9_dp,c_834=834e0_dp
+  real(dp),parameter::c_716=716e0_dp,c_2079=2079e0_dp,c_1002=1002e0_dp,c_834=834e0_dp
   real(dp),parameter::c_454=454e0_dp,c_82=82e0_dp,c_41=41e0_dp,c_216=216e0_dp,c_272=272e0_dp
-  real(dp),parameter::c_840=840e0_dp
+  real(dp),parameter::c_840=840e0_dp,c_360=360e0_dp
 
   real(dp),parameter::c_1d_5=1e-05_dp
 
@@ -650,6 +651,46 @@ CONTAINS
 
   END SUBROUTINE ReportOpenFiles
 
+
+  SUBROUTINE CONTEXT( STRING )
+    IMPLICIT NONE
+    CHARACTER(*) STRING
+    CHARACTER(1) C1
+    INTEGER I,J,K
+    J = 0
+    DO I = 1, LEN (STRING)
+       C1 = STRING(I:I)
+       STRING(I:I) = ' '
+       IF( C1 .NE. ' ' ) THEN
+          J = J + 1
+          K = ICHAR( C1 )
+          IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z') ) THEN
+             C1 = CHAR( K - ICHAR('a') + ICHAR('A') )
+          ENDIF
+          STRING(J:J) = C1
+       ENDIF
+    ENDDO
+    RETURN
+  END  SUBROUTINE CONTEXT
+
+  SUBROUTINE create_name(name_root,ind,suffix,filename)
+    implicit none
+    LOGICAL :: opened, exists, named
+    CHARACTER(*) name_root,suffix,filename
+    integer :: ind
+    character(20) temp
+    call context(name_root)
+    call context(suffix)
+
+    write(temp,*) ind
+    call context(temp)
+
+    filename=' '
+
+    filename=name_root(1:len_trim(name_root))//temp(1:len_trim(temp))//'.'//suffix(1:len_trim(suffix))
+
+  END SUBROUTINE create_name
+
 end module file_handler
 
 
@@ -1053,6 +1094,65 @@ contains
 
 end module my_own_1D_TPSA
 
+module gauss_dis
+
+  use precision_constants
+  private alex_ISEED
+  public
+  integer :: alex_ISEED=1000
+  !cccccccccccccccccccccccc     Program 2.13     ccccccccccccccccccccccccc
+  !
+  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  !                                                                      c
+  ! Please Note:                                                         c
+  !                                                                      c
+  ! (1) This computer program is part of the book, "An Introduction to   c
+  !     Computational Physics," written by Tao Pang and published and    c
+  !     copyrighted by Cambridge University Press in 1997.               c
+  !                                                                      c
+  ! (2) No warranties, express or implied, are made for this program.    c
+  !                                                                      c
+  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  !
+contains
+
+  SUBROUTINE gaussian_seed(i)
+    implicit none
+    integer i
+    alex_ISEED=i
+  end SUBROUTINE gaussian_seed
+
+  SUBROUTINE GRNF(X,cut)
+    implicit none
+    real(dp) r1,r2,x,y,cut
+
+
+1   R1 = -LOG(1.d0-RANF())
+    R2 = 2.0_dp*PI*RANF()
+    R1 = SQRT(2.0_dp*R1)
+    X  = R1*COS(R2)
+    if(abs(x)>cut) goto 1
+    ! Y  = R1*SIN(R2)
+    RETURN
+  END SUBROUTINE GRNF
+  !
+  real(dp) FUNCTION RANF()
+    implicit none
+    integer ia,ic,iq,ir,ih,il,it
+    DATA IA/16807/,IC/2147483647/,IQ/127773/,IR/2836/
+    IH = alex_ISEED/IQ
+    IL = MOD(alex_ISEED,IQ)
+    IT = IA*IL-IR*IH
+    IF(IT.GT.0) THEN
+       alex_ISEED = IT
+    ELSE
+       alex_ISEED = IC+IT
+    END IF
+    RANF = alex_ISEED/FLOAT(IC)
+    RETURN
+  END FUNCTION RANF
+
+end module gauss_dis
 
 integer function mypause(i)
   use precision_constants

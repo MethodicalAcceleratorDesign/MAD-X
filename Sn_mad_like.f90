@@ -67,7 +67,7 @@ module Mad_like
      INTEGER APERTURE_KIND
      REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
      LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE,PERMFRINGE
-     REAL(DP) DPHAS,PSI
+     REAL(DP) DPHAS,PSI,dvds
      INTEGER N_BESSEL
      !     logical(lp) in,out
   END TYPE EL_LIST
@@ -695,6 +695,7 @@ CONTAINS
        s2%BEND_FRINGE=.FALSE.
        s2%PERMFRINGE=.FALSE.
        s2%DPHAS=ZERO
+       s2%dvds=ZERO
        s2%PSI=ZERO
        s2%N_BESSEL=0
 
@@ -719,7 +720,7 @@ CONTAINS
     LOGICAL(LP) SEARCH
     REAL(DP) K11
     NN=0
-    K11=0.0_DP
+    K11=zero
     IF(PRESENT(N)) NN=N
     IF(PRESENT(K1)) K11=K1
 
@@ -731,12 +732,12 @@ CONTAINS
        NN=1
        SEARCH=.TRUE.
        DO I=NMAX,1,-1
-          IF(LIST%K(I)/=0.0_DP.AND.SEARCH) THEN
+          IF(LIST%K(I)/=zero.AND.SEARCH) THEN
              SEARCH=.FALSE.
              K11=LIST%K(I)
              NN=I
           ENDIF
-          IF(LIST%KS(I)/=0.0_DP.AND.SEARCH) THEN
+          IF(LIST%KS(I)/=zero.AND.SEARCH) THEN
              SEARCH=.FALSE.
              K11=LIST%KS(I)
              NN=-I
@@ -840,7 +841,7 @@ CONTAINS
           BLTILT%K(I)=LIST%K(I)/fac(i)
           BLTILT%KS(I)=LIST%KS(I)/fac(i)
           IF(COUNT) THEN
-             IF(BLTILT%K(I)/=0.0_DP.OR.BLTILT%KS(I)/=0.0_DP) THEN
+             IF(BLTILT%K(I)/=zero.OR.BLTILT%KS(I)/=zero) THEN
                 COUNT=.FALSE.
                 BLTILT%nmul=I
              ENDIF
@@ -1856,9 +1857,9 @@ CONTAINS
     LM1=LIST%L
     ANG1=LIST%B0
 
-    IF(E1/=0.0_DP) THEN
+    IF(E1/=zero) THEN
        ANGI1=e1
-    ELSEIF(E1/=0.0_DP) THEN
+    ELSEIF(E1/=zero) THEN
        ANGI1=ANG1-e2
     ELSE
        WRITE(6,*) " ERROR IN  TRUERECTILT_MADX INPUT "
@@ -2248,8 +2249,6 @@ CONTAINS
     INTEGER,optional, INTENT(IN):: HARMON
     real(dp)  L1,VOLT1,LAG1,FREQ01
     INTEGER  HARMON1
-    
-  
     L1=zero
     VOLT1=zero
     LAG1=zero
@@ -2279,8 +2278,8 @@ CONTAINS
        LAG1=LIST%LAG
        FREQ01=LIST%FREQ0
        HARMON1=LIST%HARMON
-       if(LIST%delta_e/=0.0_dp) then
-          if(volt1==0.0_dp) then
+       if(LIST%delta_e/=zero) then
+          if(volt1==zero) then
              volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
           else
              w_p=0
@@ -2356,8 +2355,8 @@ CONTAINS
        LAG1=LIST%LAG
        FREQ01=LIST%FREQ0
        HARMON1=LIST%HARMON
-       if(LIST%delta_e/=0.0_dp) then
-          if(volt1==0.0_dp) then
+       if(LIST%delta_e/=zero) then
+          if(volt1==zero) then
              volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
           else
              w_p=0
@@ -2775,6 +2774,7 @@ CONTAINS
     ENDIF
     IF(S2%KIND==KIND21) THEN
        s2%CAV21%DPHAS=s1%DPHAS
+       s2%CAV21%dvds=s1%dvds
        s2%CAV21%PSI=s1%PSI
     ENDIF
 

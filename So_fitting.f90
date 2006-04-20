@@ -5,27 +5,10 @@ module S_fitting
   USE MAD_LIKE
   IMPLICIT NONE
   public
-  PRIVATE lattice_fit_TUNE_L,lattice_fit_L   !,LAGRANGE
-  PRIVATE THINLENS_L_B,THINLENS_L_L,THINLENS_L_2
   PRIVATE FIND_ORBIT_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
   logical(lp), PRIVATE :: VERBOSE = .false.
+  integer :: max_fit_iter=20, ierror_fit=0
 
-
-
-  INTERFACE lattice_fit_TUNE
-     ! LINKED
-     MODULE PROCEDURE lattice_fit_TUNE_L
-  END INTERFACE
-
-  INTERFACE lattice_fit
-     MODULE PROCEDURE lattice_fit_L
-  END INTERFACE
-
-  INTERFACE THINLENS
-     !LINKED
-     MODULE PROCEDURE THINLENS_L_L
-     MODULE PROCEDURE THINLENS_L_2
-  END INTERFACE
 
   INTERFACE FIND_ORBIT
      ! LINKED
@@ -37,8 +20,723 @@ module S_fitting
   END INTERFACE
 
 contains
+  SUBROUTINE lattice_GET_CHROM(R,my_state,CHROM)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    REAL(DP) CHROM(:)
+    integer i,IB
+    TYPE(internal_state) state
+    real(dp) closed(6)
+    type(DAMAP) ID
+    TYPE(NORMALFORM) NORM
+    TYPE(REAL_8) Y(6)
+
+    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+
+    closed=zero
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+    CALL INIT(STATE,2,0,BERZ)
+
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,STATE)
+    NORM=Y
+    CHROM(1)=norm%DHDJ%V(1).SUB.'00001'
+    CHROM(2)=norm%DHDJ%V(2).SUB.'00001'
+    WRITE(6,*) "Fractional Tunes = ",norm%tune(1:2)
+    WRITE(6,*) "CHROMATICITIES = ",CHROM
+    CALL kill(NORM)
+    CALL kill(Y)
+    call kill(id)
+
+  end SUBROUTINE lattice_GET_CHROM
+
+  SUBROUTINE FILL_BETA(r,my_state,BETA,IB,DBETA,tune,tune2,a,ai,mat,clos)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    REAL(DP), ALLOCATABLE :: BETA(:,:,:)
+    REAL(DP)DBETA,tune(:),tune2(:)
+    type(fibre),pointer :: p
+    integer i,IB
+    TYPE(internal_state) state
+    real(dp) closed(6)
+    type(DAMAP) ID
+    TYPE(NORMALFORM) NORM
+    TYPE(REAL_8) Y(6)
+    real(dp) dbetamax,db1,db2
+    real(dp),optional :: a(6,6),ai(6,6),mat(6,6),clos(6)
+
+    if(.not.allocated(beta))   ALLOCATE(BETA(2,2,R%N))
 
 
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+    if(present(clos)) then
+       closed=clos
+    else
+       closed=zero
+    endif
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+    DBETA=ZERO
+    dbetamax=zero
+    CALL INIT(STATE,1,0,BERZ)
+
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,STATE)
+    NORM=Y
+    if(present(a)) then
+       a=norm%a_t
+       ai=norm%a_t**(-1)
+       id=y
+       mat=id
+    endif
+    if(ib==1) then
+       tune(1:2)=norm%tune(1:2)
+       Write(6,*) " Tunes ", tune(1:2)
+    endif
+    tune2(1:2)=norm%tune(1:2)
+
+    y=closed+norm%a_t
+    p=>r%start
+    do i=1,r%n
+
+       CALL TRACK(R,Y,i,i+1,STATE)
+       beta(IB,1,i)=(y(1).sub.'1')**2   + (y(1).sub.'01')**2
+       beta(iB,2,i)=(y(3).sub.'001')**2 + (y(3).sub.'0001')**2
+
+       IF(IB==2) THEN
+          db1=ABS(beta(2,1,i)-beta(1,1,i))/beta(1,1,i)
+          db2=ABS(beta(2,2,i)-beta(1,2,i))/beta(1,2,i)
+          DBETA=(db1+db2)/TWO+dbeta
+          if( db1>dbetamax) dbetamax=db1
+          if( db2>dbetamax) dbetamax=db2
+       ENDIF
+       p=>p%next
+    enddo
+    DBETA=DBETA/R%N
+
+    IF(IB==2) WRITE(6,*) "<DBETA/BETA> = ",DBETA
+    IF(IB==2) WRITE(6,*) "MAXIMUM OF DBETA/BETA = ",dbetamax
+
+    CALL kill(NORM)
+    CALL kill(Y)
+    call kill(id)
+    if(present(clos)) clos=closed
+
+  end SUBROUTINE FILL_BETA
+
+  SUBROUTINE comp_linear2(r,my_state,a,ai,mat,closed)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    TYPE(internal_state) state
+    real(dp) closed(6),a(6,6),ai(6,6),mat(6,6)
+    type(DAMAP) ID
+    TYPE(NORMALFORM) NORM
+    TYPE(REAL_8) Y(6)
+
+
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+
+    CALL INIT(STATE,1,0,BERZ)
+
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,STATE)
+    NORM=Y
+
+    Write(6,*) " Tunes ",norm%tune(1:2)
+    A=ZERO
+    AI=ZERO
+    MAT=ZERO
+    a=norm%a_t
+    AI=norm%a_t**(-1)
+    id=y
+    mat=id
+    CALL kill(NORM)
+    CALL kill(Y)
+    call kill(id)
+
+  end SUBROUTINE comp_linear2
+
+
+  subroutine lattice_fit_TUNE_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,NP
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE,more
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq=2, no=2,nt,j,it
+    type(damap) id
+    type(gmap) g
+    TYPE(TAYLOR)t
+    real(dp) epsf,epsr,epsnow
+    !    EPSF=.0001
+    epsr=abs(epsf)
+
+    allocate(eq(neq))
+
+    nt=neq+np
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+    CALL INIT(STATE,no,NP,BERZ)
+
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    CLOSED(:)=zero
+    it=0
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP,BERZ)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+    NORM=Y
+    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2)
+
+    eq(1)=       ((NORM%dhdj%v(1)).par.'0000')-targ(1)
+    eq(2)=       ((NORM%dhdj%v(2)).par.'0000')-targ(2)
+    epsnow=abs(eq(1))+abs(eq(2))
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(id)
+    CALL KILL(EQ)
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+
+  end subroutine lattice_fit_TUNE_gmap
+
+  subroutine lattice_fit_CHROM_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,NP
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE,more
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq=2, no=3,nt,j,it
+    type(damap) id
+    type(gmap) g
+    TYPE(TAYLOR)t
+    real(dp) epsf,epsr,epsnow,CHROM(2)
+    !    EPSF=.0001
+    epsr=abs(epsf)
+
+    allocate(eq(neq))
+
+    nt=neq+np
+    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+
+    CALL INIT(STATE,no,NP,BERZ)
+
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    CLOSED(:)=zero
+    it=0
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP,BERZ)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+    NORM=Y
+    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2)
+    CHROM(1)=(NORM%dhdj%v(1)).SUB.'00001'
+    CHROM(2)=(NORM%dhdj%v(2)).SUB.'00001'
+    write(6,*) " CHROM ",CHROM
+
+    eq(1)=       ((NORM%dhdj%v(1)).par.'00001')-targ(1)
+    eq(2)=       ((NORM%dhdj%v(2)).par.'00001')-targ(2)
+    epsnow=abs(eq(1))+abs(eq(2))
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(id)
+    CALL KILL(EQ)
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+
+  end subroutine lattice_fit_CHROM_gmap
+
+  subroutine lattice_fit_SEXT_RES_from_a_gmap_vec(R,my_state,EPSF,MRES,POLY,NPOLY,TARG,NP,neq)
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,NP
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE,more
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq, no=3,nt,j,it,MRES(3)
+    type(damap) id,B,N,NC
+    type(gmap) g
+    TYPE(TAYLOR)t,Q1,P1,Q2,P2
+    TYPE(PBFIELD)H
+    TYPE(PBresonance)Hr
+    TYPE(VECRESONANCE)HRES_a,hres_n
+    TYPE(ONELIEEXPONENT)HC
+    real(dp) epsf,epsr,epsnow,CHROM(2),ARES(2),TR,PREC
+    INTEGER, ALLOCATABLE :: EXPON(:),JEXP(:)
+    integer i_look
+    epsr=abs(epsf)
+    PREC=c_1d_10
+    allocate(eq(neq))
+
+    nt=neq+np
+    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+
+    CALL INIT(STATE,no,NP,BERZ)
+
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    CLOSED(:)=zero
+    it=0
+    EPSNOW=one/eps
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP,BERZ)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id,B,N,NC)    ! LOOK AT PAGE 143 OF THE BOOK
+    CALL ALLOC(H)
+    CALL ALLOC(HC)
+    CALL ALLOC(HRES_a)
+    CALL ALLOC(hres_n)
+    ALLOCATE(EXPON(C_%NV))
+    ALLOCATE(JEXP(C_%NPARA))
+    call alloc(hr)
+    WRITE(6,*) " NPARA = ",C_%NPARA
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+
+    ! ETIENNE
+
+    NORM=Y
+
+
+    HRES_a=NORM%a%nonlinear
+    hr=NORM%a%pb
+
+    CALL PRINT(HR%COS,6,PREC)
+    CALL PRINT(HR%SIN,6,PREC)
+    if(neq==4) then
+       HRES_n=NORM%normal%nonlinear
+       hr=NORM%normal%pb
+
+       CALL PRINT(HR%COS,6,PREC)
+    endif
+    EXPON=0
+    IF(MRES(1)==0) THEN
+       expon(3)=iabs(mres(2))-1
+       i_look=4
+    ELSEIF(MRES(2)==0) THEN
+       expon(1)=iabs(mres(1))-1
+       i_look=2
+    ELSEIF(MRES(1)*MRES(2)>0) THEN
+       expon(1)=iabs(mres(1))-1
+       i_look=2
+       expon(3)= iabs(mres(2))
+    ELSE
+       expon(1)=iabs(mres(1))-1
+       i_look=2
+       expon(4)= iabs(mres(2))
+    ENDIF
+
+    ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-mres(i_look/2))/two
+    ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(mres(i_look/2))/two
+    JEXP=0
+    JEXP(1:C_%NPARA)=EXPON(1:C_%NPARA)
+    CHROM(1)=(HRES_n%sin%v(2).SUB.'01001')/(PI)/two
+    CHROM(2)=(HRES_n%sin%v(4).SUB.'00011')/(PI)/two
+
+    !    write(6,*) " CHROM ",CHROM
+    WRITE(6,*) " STRENGTH OF RESONANCE = ",ARES
+    WRITE(6,*) " CHROMATICITIES  = ",CHROM
+
+
+    eq(1)=       ( (HRES_a%sin%v(i_look).par.jexp)/(-mres(i_look/2))/two)-targ(1)
+    eq(2)=       ((HRES_a%cos%v(i_look).par.jexp)/(mres(i_look/2))/two)-targ(2)
+    if(neq==4) then
+       eq(3)=       (HRES_n%sin%v(2).par.'01001')/(PI)/two-targ(3)
+       eq(4)=       (HRES_n%sin%v(4).par.'00011')/(PI)/two-targ(4)
+    endif
+    epsnow=zero
+    do i=1,neq
+       epsnow=abs(eq(i))+epsnow
+    enddo
+
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(HC)
+    CALL KILL(id,B,N,NC)
+    CALL KILL(EQ)
+    CALL KILL(H)
+    CALL KILL(HRES_a)
+    CALL KILL(hres_n)
+
+    call KILL(hr)
+
+    DEALLOCATE(EXPON)
+    DEALLOCATE(JEXP)
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+
+  end subroutine lattice_fit_SEXT_RES_from_a_gmap_vec
+
+  subroutine lattice_PRINT_RES_FROM_A(R,my_state,NO,EMIT0,MRES,FILENAME)
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    type(damap) id
+    TYPE(PBresonance)Hr
+    CHARACTER(*) FILENAME
+    REAL(DP) PREC,EMIT0(2),STR
+    INTEGER NO,MF,MRES(4)
+
+    PREC=c_1d_10
+
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,0,BERZ)
+
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(hr)
+    call alloc(id)    ! LOOK AT PAGE 143 OF THE BOOK
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,STATE)
+
+    ! ETIENNE
+
+    NORM=Y
+
+
+    hr=NORM%a%pb
+
+    CALL KANALNUMMER(MF)
+
+    OPEN(UNIT=MF,FILE=FILENAME)
+
+    CALL PRINT(HR%COS,6,PREC)
+    CALL PRINT(HR%SIN,6,PREC)
+    STR=(HR%COS%H.SUB.MRES)**2+(HR%SIN%H.SUB.MRES)**2; STR=SQRT(STR)
+    WRITE(6,*) "RESONANCE = ",MRES,STR
+    WRITE(MF,*) "RESONANCE = ",MRES,STR
+    CALL PRINT(HR%COS,MF,PREC)
+    CALL PRINT(HR%SIN,MF,PREC)
+    WRITE(MF,*) " SCALE AT EMIT = ",EMIT0
+    ID=1
+    ID%V(1)=ID%V(1)*SQRT(EMIT0(1))
+    ID%V(2)=ID%V(2)*SQRT(EMIT0(1))
+    ID%V(3)=ID%V(3)*SQRT(EMIT0(2))
+    ID%V(4)=ID%V(4)*SQRT(EMIT0(2))
+    HR%COS%H=HR%COS%H*ID
+    HR%SIN%H=HR%SIN%H*ID
+    CALL PRINT(HR%COS,MF,PREC)
+    CALL PRINT(HR%SIN,MF,PREC)
+
+
+    CLOSE(MF)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(hr)
+
+  end subroutine lattice_PRINT_RES_FROM_A
+
+  subroutine lattice_random_error(R,nom,iseed,cut,n,addi,integrated,cn,cns)
+    use gauss_dis
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    integer iseed,n,addi,ic,i
+    character(nlp) nom
+    type(fibre), pointer :: p
+    logical(lp) integrated
+    real(dp) x,bn,cn,cns,cut
+
+
+    call gaussian_seed(iseed)
+
+    call context(nom)
+    ic=0
+    p=>r%start
+    do i=1,r%n
+       if(p%mag%name==nom) then
+          call GRNF(X,cut)
+          bn=cn*x
+          if(integrated.and.p%mag%p%ld/=zero) then
+             bn=(cns+bn)/p%mag%l
+          endif
+          call add(p,n,addi,bn)
+          ic=ic+1
+       endif
+       p=>P%next
+    enddo
+
+    write(6,*) ic," Magnets modified "
+  end  subroutine lattice_random_error
 
   subroutine toggle_verbose
     implicit none
@@ -47,575 +745,9 @@ contains
 
 
 
-  subroutine Lagrange(nfam,nfit,targ)
-    implicit none
-    logical(lp) :: doneitt=.true.
-    INTEGER resultI,I,K,j
-    INTEGER SCRATCHFILE
-    INTEGER,PARAMETER::NEQ=8*4
 
-    INTEGER, intent(in) :: nfam,nfit
-    real(dp), intent(in),dimension(:)::TARG
-    real(dp)  DELT ,DELTw
-    real(dp) result  ,La(neq,neq),Lar(neq,neq),VLa(neq),vlb(neq)
-    type (taylor) eq(NEQ),scrap,TEST,DF(NEQ)
-
-    tpsafit(:)=zero
-    VLa(:)=zero
-    vlb(:)=zero
-    LA(:,:)=zero
-    Lar(:,:)=zero
-    DELT=zero
-    DELTw=zero
-
-    call init(2,NFAM,doneitt)
-
-    call alloc(eq,neq)
-    call alloc(scrap)
-    call alloc(test)
-    call alloc(df,neq)
-
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    do i=1,NFIT
-       call dainput(eq(i),scratchfile)
-       eq(i)=eq(i)-targ(i)
-    enddo
-    close(SCRATCHFILE)
-
-
-
-    w_p=0
-    w_p%nc=1
-    w_p%fc='(1(1X,A120))'
-    w_p%c(1)= " norms"
-    call write_i
-    DELT=zero
-    do i=1,NFIT
-       DELTw=eq(i).sub.'0'
-       w_p=0
-       w_p%nr=1
-       w_p%fr='(1(1X,g20.14))'
-       w_p%r(1)= DELTw
-       call write_i
-       DELT=DELT+abs(DELTw)
-    enddo
-    w_p=0
-    w_p%nc=1
-    w_p%fc='(1(1X,A72))'
-    write(w_p%c(1),'(1(1X,A6,1x,g20.14))')  " norm ",DELT
-    call write_i
-
-
-    DELT=one
-
-    do i=1,NFIT
-       eq(i)=eq(i)+(DELT-one)*(eq(i).sub.'0')
-    enddo
-
-
-    scrap=zero
-
-
-
-
-    do i=1,neq
-       vlb(i)=zero
-       vla(i)=zero
-       do k=1,neq
-          la(i,k)= zero
-       enddo
-    enddo
-    do i=NFAM+nfit+1,neq              ! initializing beyond useful part of array
-       la(i,i)= one
-    enddo
-
-    do i=1,nfam
-       la(i,i)= one      ! equal weight
-    enddo
-
-
-    do i=1,nfit
-       result=eq(i).sub.'0'
-       vla(i+nfam)=-result
-
-       do k=1,NFAM
-          scrap=eq(i).d.k
-
-          result=       scrap.sub.'0'
-          La(i+nfam,k)=result
-          La(k,i+nfam)=result
-       enddo
-
-    enddo
-
-
-    CALL MATINV(La,Lar,neq,neq,resultI)
-
-
-    IF(resultI/=0) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='(1(1X,A72))'
-       write(w_p%c(1),'(1(1X,A22,1x,i4))')  "MATRIX INVERSION FLAG ",resultI
-       w_p%c(2)="PROBLEMS IN INVERSION MATINV"
-       call write_e(1000)
-    ENDIF
-
-    do i=1,neq
-       do k=1,neq
-          vlb(i)=lar(i,k)*vla(k)+vlb(i)
-       enddo
-    enddo
-    w_p=0
-    w_p%nc=neq/8+2
-    !    w_p%fc='(1(1X,A22,1x,i4))'
-    w_p%c(1)='********    AJUSTMENTS   *********'
-    do i=1,neq/8
-       j=i*8-7
-       write(w_p%c(i+1),'(8(2x,1pe12.5))') (vLb(k),k=j,j+7)
-    enddo
-    w_p%c(i+1) ='**********************************'
-    call write_i
-
-
-
-    do i=1,NFAM
-       tpsafit(i)=vlb(i)   !vlb(i+1)
-    enddo
-
-
-
-
-
-
-    call kill(eq,neq)
-    call kill(test)
-    call kill(scrap)
-    call kill(df,neq)
-
-
-  end subroutine Lagrange
 
   ! linked
-  subroutine lattice_fit_TUNE_L(R,POLY,NPOLY,TARG,NP)
-    IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
-    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
-    INTEGER, intent(in):: NPOLY,NP
-    real(dp) , intent(IN),dimension(:)::TARG
-    real(dp) CLOSED(6)
-    TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,ND2,NPARA,nt,more
-    TYPE(TAYLOR) EQ(2)
-    logical want
-    TYPE(REAL_8) Y(6)
-    TYPE(NORMALFORM) NORM
-
-    SCRATCHFILE=90
-
-    STATE=((DEFAULT+ONLY_4D)-RADIATION0)
-    STATE=(DEFAULT+RADIATION0-nocavity0)
-    CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
-
-    SET_TPSAFIT=.FALSE.
-
-    DO I=1,NPOLY
-       !POLY(i)%NPARA=NPARA
-
-       R=POLY(i)
-    ENDDO
-    want=.false.
-    if(.not.want)then
-       write(6,*) "do you want fixed point search ?  T or F "
-       read(5,*) want
-    endif
-    CLOSED(:)=zero
-    !    more=-1
-100 continue
-
-
-    if(want) then
-       CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
-       write(6,*) "closed orbit "
-       write(6,*) CLOSED
-
-    else
-       closed=0.d0
-    endif
-
-    CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
-    CALL ALLOC(NORM)
-    CALL ALLOC(Y)
-    CALL ALLOC(EQ,2)
-
-    Y=NPARA
-    Y=CLOSED
-
-    CALL TRACK(R,Y,1,+STATE)
-    NORM=Y
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,A72))'
-    write(w_p%c(1),'(8(2x,g20.14))') NORM%TUNE(1), NORM%TUNE(2)
-    call write_i
-
-    eq(1)=       ((NORM%dhdj%v(1)).par.'0000')
-    eq(2)=       ((NORM%dhdj%v(2)).par.'0000')
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    nt=2
-    do i=1,nt
-       !       call shiftda(eq(i),eq(i),NPARA)
-       eq(i)=eq(i)<=npara
-       call daprint(eq(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-    CALL KILL(NORM)
-    CALL KILL(Y)
-    CALL KILL(EQ,2)
-    call Lagrange(np,nt,targ)
-
-    SET_TPSAFIT=.true.
-
-    DO I=1,NPOLY
-       R=POLY(i)
-    ENDDO
-
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,A72))'
-    w_p%c(1)=" More =>  yes=1"
-    CALL ELP_TO_EL(R)
-    call write_i
-    call read(more)
-    !    more=more+1
-    if(more==1) goto 100
-    CALL KILL_PARA(R)
-  end subroutine lattice_fit_TUNE_L
-
-
-  subroutine lattice_fit_L(R,POLY,NPOLY,TARG,NP)
-    IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
-    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
-    INTEGER, intent(in):: NPOLY,NP
-    real(dp) , intent(IN),dimension(:)::TARG
-    real(dp) CLOSED(6)
-    TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,ND2,NPARA,more
-    INTEGER,parameter::nt=4
-    TYPE(TAYLOR) EQ(nt)
-    real(dp) dst(nt)
-    TYPE(REAL_8) Y(6)
-    TYPE(NORMALFORM) NORM
-    integer ipause, mypause
-
-    SCRATCHFILE=90
-    dst=0.d0
-
-    STATE=((DEFAULT+ONLY_4D+delta)-RADIATION0)
-    CALL INIT(STATE,2,NP,BERZ,ND2,NPARA)
-    ipause=mypause(888)
-    SET_TPSAFIT=.FALSE.
-
-    DO I=1,NPOLY
-       !       POLY(i)%NPARA=NPARA
-
-       R=POLY(i)
-    ENDDO
-
-
-
-    CLOSED(:)=zero
-100 continue
-
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_7)
-
-    CALL INIT(STATE,3,NP,BERZ,ND2,NPARA)
-    CALL ALLOC(NORM)
-    CALL ALLOC(Y)
-    CALL ALLOC(EQ,nt)
-
-    Y=NPARA
-    Y=CLOSED
-    CALL TRACK(R,Y,1,+STATE)
-    NORM=Y
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,A72))'
-    write(w_p%c(1),'(8(2x,g20.14))') NORM%TUNE(1), NORM%TUNE(2)
-    call write_i
-
-    eq(1)=       ((NORM%dhdj%v(1)).par.'00000')
-    eq(2)=       ((NORM%dhdj%v(2)).par.'00000')
-    !    eq(3)=       (y(1).par.'00001')
-    eq(3)=       ((NORM%dhdj%v(1)).par.'00001')
-    eq(4)=       ((NORM%dhdj%v(2)).par.'00001')
-    !  eq(6)=       (y(1).par.'00000')
-
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    do i=1,nt
-       eq(i)=eq(i)<=npara
-       call daprint(eq(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-    CALL KILL(NORM)
-    CALL KILL(Y)
-    CALL KILL(EQ,nt)
-    call Lagrange(np,nt,targ)
-
-    SET_TPSAFIT=.true.
-
-    DO I=1,NPOLY
-       R=POLY(i)
-    ENDDO
-    dst=tpsafit(1:nt)+dst
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,A72))'
-    w_p%c(1) = " More =>  yes=1"
-    CALL ELP_TO_EL(R)
-    call write_i
-    call read(more)
-    if(more==1) goto 100
-
-    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(6,*) "Final Delta_strength"
-    write(6,*)dst
-    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-
-    CALL KILL_PARA(R)
-  end subroutine lattice_fit_L
-
-  SUBROUTINE  THINLENS_L_B(R,THI,kind_) ! A re-splitting routine
-    IMPLICIT NONE
-    INTEGER NTE
-    TYPE(layout), intent(inout) :: R
-    real(dp),intent(inout) :: THI
-    real(dp) gg,RHOI,XL,QUAD
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),limit0(2)
-    logical(lp) MANUAL,eject,doit
-    integer,intent(in) :: kind_
-    TYPE (fibre), POINTER :: C
-    logical(lp) doneit
-    nullify(C)
-
-    CALL LINE_L(R,doneit)
-
-    MANUAL=.FALSE.
-    eject=.FALSE.
-    if(kind_/=kind2.and.kind_/=kind7.and.kind_/=kind6.and.kind_/=kind10.and.kind_/=kind0.and.kind_/=kind16.and.kind_/=kind20) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" THINLENS_L_B "
-       call write_e(451)
-    endif
-
-    IF(THI<0) MANUAL=.TRUE.
-
-
-    IF(MANUAL) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)="thi: thin lens factor (THI<0 TO STOP) "
-       call write_I
-       call read(thi)
-       IF(THI<0) eject=.true.
-    ENDIF
-
-1001 CONTINUE
-
-    limit(1)=3
-    limit(2)=14
-    if(kind_==kind6) then
-       limit(1)=100000
-       limit(2)=1000000
-    endif
-    limit0(1)=limit(1)
-    limit0(2)=limit(2)
-
-    M1=0
-    M2=0
-    M3=0
-    MK1=0
-    MK2=0
-    MK3=0
-    r%NTHIN=0
-
-    C=>R%START
-    do   WHILE(ASSOCIATED(C))
-
-       if(kind_==kind0) then
-          doit=C%MAG%KIND==kind2.or.C%MAG%KIND==kind10.or.C%MAG%KIND==kind16.or.C%MAG%KIND==kind20
-       else
-          doit=C%MAG%KIND==kind_
-       endif
-       if(doit) then
-          select case(C%MAG%P%METHOD)
-          CASE(2)
-             M1=M1+1
-             MK1=MK1+C%MAG%P%NST
-          CASE(4)
-             M2=M2+1
-             MK2=MK2+3*C%MAG%P%NST
-          CASE(6)
-             M3=M3+1
-             MK3=MK3+7*C%MAG%P%NST
-          END SELECT
-          r%NTHIN=r%NTHIN+1   !C%MAG%NST
-       endif
-
-       C=>C%NEXT
-
-    enddo
-    w_p=0
-    w_p%nc=6
-    w_p%fc='(5(1X,a72,/),(1X,a72))'
-    WRITE(w_p%c(1),'(1x,A13,1x,A24)') " Magnet type ",MYTYPE(kind_)
-    WRITE(w_p%c(2),'(1x,A23,1x,I4)') "Present of thin lenses ",r%NTHIN
-    WRITE(w_p%c(3),'(1x,A9,2(1x,I4))') "METHOD 2 ",M1,MK1
-    WRITE(w_p%c(4),'(1x,A9,2(1x,I4))') "METHOD 4 ",M2,MK2
-    WRITE(w_p%c(5),'(1x,A9,2(1x,I4))') "METHOD 6 ",M3,MK3
-    WRITE(w_p%c(6),'(1x,A16,(1x,I4))') "number of KICKS ", MK1+MK2+MK3
-    call write_I
-    if(eject) then
-       limit(1)=limit0(1)
-       limit(2)=limit0(2)
-       return
-    endif
-    M1=0
-    M2=0
-    M3=0
-    MK1=0
-    MK2=0
-    MK3=0
-
-
-    r%NTHIN=0
-    r%THIN=THI
-
-    C=>R%START
-    do   WHILE(ASSOCIATED(C))
-
-       if(kind_==kind0) then
-          doit=C%MAG%KIND==kind2.or.C%MAG%KIND==kind10.or.C%MAG%KIND==kind16.or.C%MAG%KIND==kind20
-       else
-          doit=C%MAG%KIND==kind_
-       endif
-       if(doit)  then
-
-
-          xl=C%MAG%L
-          RHOI=C%MAG%P%B0
-          IF(C%MAG%P%NMUL>=2) THEN
-             QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
-          ELSE
-             QUAD=zero
-          ENDIF
-
-          GG=XL*(RHOI**2+ABS(QUAD))
-          GG=GG/THI
-          NTE=INT(GG)
-          IF(NTE.LT.limit(1)) THEN
-             M1=M1+1
-             C%MAG%P%METHOD=2
-             IF(NTE.EQ.0) NTE=1
-             C%MAG%P%NST=NTE
-             MK1=MK1+NTE
-          ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
-             M2=M2+1
-             C%MAG%P%METHOD=4
-             NTE=NTE/3
-             IF(NTE.EQ.0) NTE=1
-             C%MAG%P%NST=NTE
-             MK2=MK2+NTE*3
-          ELSEIF(NTE.GE.limit(2)) THEN
-             M3=M3+1
-             C%MAG%P%METHOD=6
-             NTE=NTE/7
-             IF(NTE.EQ.0) NTE=1
-             C%MAG%P%NST=NTE
-             MK3=MK3+NTE*7
-          ENDIF
-          r%NTHIN=r%NTHIN+1  !C%MAG%NST
-
-
-          call add(C%MAG,C%MAG%P%nmul,1,zero)
-          call COPY(C%MAG,C%MAGP)
-       ENDIF
-
-       C=>C%NEXT
-    enddo
-
-
-    w_p=0
-    w_p%nc=6
-    w_p%fc='(5(1X,a72,/),(1X,a72))'
-    WRITE(w_p%c(1),'(1x,A13,1x,A24)') " Magnet type ",MYTYPE(kind_)
-    WRITE(w_p%c(2),'(1x,A23,1x,I4)') "Present of thin lenses ",r%NTHIN
-    WRITE(w_p%c(3),'(1x,A9,2(1x,I4))') "METHOD 2 ",M1,MK1
-    WRITE(w_p%c(4),'(1x,A9,2(1x,I4))') "METHOD 4 ",M2,MK2
-    WRITE(w_p%c(5),'(1x,A9,2(1x,I4))') "METHOD 6 ",M3,MK3
-    WRITE(w_p%c(6),'(1x,A16,(1x,I4))') "number of KICKS ", MK1+MK2+MK3
-    call write_I
-
-
-    IF(MANUAL) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)= "thi: thin lens factor (THI<0 TO STOP) "
-       call write_I
-       call read(thi)
-       IF(THI<0) THEN
-          THI=R%THIN
-          limit(1)=limit0(1)
-          limit(2)=limit0(2)
-          RETURN
-       ELSE
-          GOTO 1001
-       ENDIF
-
-    ENDIF
-
-    limit(1)=limit0(1)
-    limit(2)=limit0(2)
-
-    CALL RING_L(R,doneit)
-
-  END SUBROUTINE  THINLENS_L_B
-
-
-  SUBROUTINE  THINLENS_L_L(R,THI,kind_) ! Interface to THINLENS_L_B
-    IMPLICIT NONE
-    TYPE(layout), intent(inout) :: R
-    real(dp),intent(inout) :: THI
-    integer,intent(in) :: kind_
-
-    call THINLENS_L_B(R,THI,kind_)
-
-  end SUBROUTINE THINLENS_L_L
-
-  SUBROUTINE  THINLENS_L_2(R,THI) ! Interface to THINLENS_L_B
-    IMPLICIT NONE
-    TYPE(layout), intent(inout) :: R
-    real(dp),intent(inout) :: THI
-    integer :: kind_ !frs adding ::
-
-    kind_=kind0
-    call THINLENS_L_B(R,THI,kind_)
-
-  end SUBROUTINE THINLENS_L_2
 
   SUBROUTINE FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE,TURNS)  ! Finds orbit with TPSA in State or compatible state
     IMPLICIT NONE
@@ -709,7 +841,7 @@ contains
           c=>c%next
           i=i+1
        enddo
-       if(freq==0.d0) then
+       if(freq==zero) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -939,7 +1071,7 @@ contains
           c=>c%next
           i=i+1
        enddo
-       if(freq==0.d0) then
+       if(freq==zero) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -1154,7 +1286,7 @@ contains
     CALL ALLOC(SXI)
     CALL ALLOC(IS)
     CALL ALLOC(YS,6)
-    CALL FIND_ORBIT(RING,FIX,LOC,SSS,1.e-8_dp)
+    CALL FIND_ORBIT(RING,FIX,LOC,SSS,c_1d_8)
     X=ND2
     DO I=1,6
        X(I)=FIX(I)
@@ -1313,6 +1445,22 @@ contains
 
   END SUBROUTINE find_ENVELOPE
 
+  SUBROUTINE fit_all_bends(r,state)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: state
+    type(fibre),pointer :: p
+    integer i
+
+    p=>r%start
+
+    do i=1,r%n
+       if(p%mag%p%b0/=zero) call fit_bare_bend(p,state,r%charge)
+       p=>p%next
+    enddo
+
+  end SUBROUTINE fit_all_bends
+
   SUBROUTINE fit_bare_bend(f,state,charge)
     IMPLICIT NONE
     TYPE(fibre),INTENT(INOUT):: f
@@ -1337,7 +1485,7 @@ contains
     Y=X
     CALL TRACK(f,Y,+state,CHARGE)
     x=y
-    write(6,'(A10,6(1X,G14.7))') " ORBIT IS ",x
+    !    write(6,'(A10,6(1X,G14.7))') " ORBIT IS ",x
     kf=-(y(2).sub.'0')/(y(2).sub.'1')
     xdix=abs(y(2).sub.'0')
     f%MAGP%BN(1) = f%MAGP%BN(1)+KF
@@ -1358,7 +1506,7 @@ contains
 
     F%MAGP%BN(1)%KIND=1
     F%MAGP%BN(1)%I=0
-    write(6,'(A10,1(1X,g14.7))') " BN(1) IS ",    f%MAG%BN(1)
+    !    write(6,'(A10,1(1X,g14.7))') " BN(1) IS ",    f%MAG%BN(1)
 
 
     CALL KILL(Y)
@@ -1366,179 +1514,237 @@ contains
 
   end SUBROUTINE fit_bare_bend
 
-  SUBROUTINE fit_bare_cavity(f,de_gev,phase_rel,time_patch,x,state,charge,max_iteration)
+  SUBROUTINE  track_aperture(r,my_state,beta,dbeta,tuneold,ib,ITMAX,emit0,aper,pos,nturn,FILENAME,FILEtune,FILESMEAR,resmax)
     IMPLICIT NONE
-    TYPE(fibre),INTENT(INOUT):: f
-    TYPE(real_8) y(6)
-    TYPE(internal_state), intent(in):: state
-    integer,optional :: charge
-    integer, target ::  charge1
-    integer, optional ::  max_iteration
-    real(dp) kf,x(6),xdix,xdix0,tiny,de,xn(6),de_gev,x6
-    real(dp) DH,DD,beta0,phase_rel,time_patch
-    integer TOTALPATH
-    logical(lp) EXACT,TIME
-    integer ite,itemax,ic
+    INTEGER NTE
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    TYPE(layout), intent(inout) :: R
+    REAL(DP), ALLOCATABLE :: BETA(:,:,:)
+    integer pos,nturn,i,flag,ib,MF,mft,j,resmax,it,I1
+    real(dp) closed(6),MAT(6,6),AI(6,6),A(6,6),emit(2),emit0(5),aper(2),x(6),xn(6),dbeta,tuneold(:)
+    real(dp) ra(2),tunenew(2)
+    CHARACTER(*) FILENAME,FILEtune,FILESMEAR
+    real(dp), allocatable :: dat(:,:),dats(:,:),SMEAR(:,:)
+    REAL(DP) JMin(2),JMAX(2), tune1(2),tune2(2),tot_tune(2),epsi,scas,scau,scat
+    integer itmax
+    epsi=one/nturn
+    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+    allocate(dat(0:nturn,6),dats(0:nturn,6))
+    allocate(SMEAR(ITMAX,8))
+    CLOSED=ZERO
+    call FILL_BETA(r,my_state,BETA,IB,DBETA,tuneold,tunenew,a,ai,mat,closed)
+    write(6,*) " *****************************************************************"
+    write(6,*) "        Tracking with Normalized Aperture "
+    write(6,*) "        Tunes = ",tunenew(1:2)
 
-    itemax=100
-    if(present(max_iteration)) itemax=max_iteration
-    tiny=c_1d_40
-    xdix0=c_1d4*DEPS_tracking
-    de=de_gev/f%mag%p%p0c
-    charge1=1
-    if(present(charge)) charge1=charge
+    scau=one
+    scas=zero
+    dats=zero
+    SMEAR=ZERO
+    it=0
+1001 continue
+    it=it+1
+    write(6,*) " iteration ",it
+    IF(IT==ITMAX+1) GOTO 1002
 
-    If(f%mag%thin) then  ! no waste of time!!!
-       kf=-f%DIR*charge1*de_gev/f%mag%volt/1.0e-3_dp
-       if(kf>one) then
-          Write(6,*) " Fatal Error: voltage not high enough ",kf
-          stop
+    scat=(emit0(1)+ it*emit0(3))/aper(1)
+    !    scat=(scau+scas)/two    ! etienne
+    dat=zero
+
+    xn=zero
+    JMAX=ZERO
+    JMIN=one/eps
+    emit(1:2)=scat*aper(1:2)
+    write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    write(6,*) " Initial emit = ", emit(1:2)," scale = ",scat
+    write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    xn(2)=sqrt(emit(1))
+    xn(4)=sqrt(emit(2))
+    X=zero
+    x=(a*xn)+closed
+    WRITE(6,*) " INITIAL X"
+    WRITE(6,200) X
+    !    x=zero
+    !    x(1)=xn(2)/sqrt(a(2,1)**2+a(2,2)**2)
+    !    x(3)=xn(4)/sqrt(a(4,3)**2+a(4,4)**2)
+    ! Etienne
+
+    dat(0,1:4)=xn(1:4)
+    ra(1)=xn(1)**2+xn(2)**2
+    ra(2)=xn(3)**2+xn(4)**2
+    dat(0,5:6)=ra(1:2)
+
+    flag=0
+    do i=1,nturn
+
+       flag=track_flag(r,x,pos,state)
+       if(flag/=0) exit
+       xn=(ai*x)-closed
+       ra(1)=xn(1)**2+xn(2)**2
+       ra(2)=xn(3)**2+xn(4)**2
+       IF(RA(1)>JMAX(1)) JMAX(1)=RA(1)
+       IF(RA(2)>JMAX(2)) JMAX(2)=RA(2)
+       IF(RA(1)<JMIN(1)) JMIN(1)=RA(1)
+       IF(RA(2)<JMIN(2)) JMIN(2)=RA(2)
+       if(ra(1)>aper(1)) then
+          flag=101
+          exit
        endif
-       f%mag%phas=asin(kf)-c_%phase0-twopi*f%mag%freq/clight*x(6)
-       f%magp%phas=f%mag%phas
-       phase_rel=f%mag%phas+twopi*f%mag%freq/clight*x(6)
-       time_patch=zero
-       return
-    endif
-    kf=-f%DIR*charge1*de_gev/f%mag%L/f%mag%volt/1.0e-3_dp
-    if(abs(kf)>one) then
-       Write(6,*) " Fatal Error: voltage not high enough ",kf
-       stop
-    endif
-
-    goto 1111
-    If(f%mag%p%nst==1.and.f%mag%p%method==2) then  ! no waste of time!!!
-       xn=x
-       DH=f%mag%l/two
-       DD=f%mag%p%ld/two
-       beta0=f%mag%P%beta0
-       TOTALPATH=1    !    always true inside cavity f%mag%P%TOTALPATH
-       exact=f%mag%P%EXACT
-       time=f%mag%P%TIME
-
-       CALL DRIFTR(DH,DD,beta0,TOTALPATH,EXACT,TIME,Xn)
-       x6=xn(6)
-       f%mag%phas=asin(kf)-c_%phase0-twopi*f%mag%freq/clight*x6
-       f%magp%phas=f%mag%phas
-       phase_rel=f%mag%phas+twopi*f%mag%freq/clight*x(6)
-       CALL DRIFTR(DH,DD,beta0,TOTALPATH,EXACT,TIME,Xn)
-       If(f%mag%p%nst==1.and.f%mag%p%method==2) then
-          time_patch=-XN(6)+X(6)
-          if(f%mag%P%TIME) then
-             time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD/f%mag%P%BETA0
-          else
-             time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD
-          endif
-          write(6,*) " returning "
-          return
+       if(ra(2)>aper(2)) then
+          flag=102
+          exit
        endif
-
-    endif
-    ! one thin less nst=1 and method =2 also exact calculation
-
-1111 continue
-
-    !    Kf=ZERO
-    if(global_verbose) write(6,'(A18,1(1X,g14.7))') " INITIAL PHASE IS ",    f%MAG%phas
-    f%MAGP%phas=f%MAGP%phas+Kf
-    f%MAG%phas=f%MAG%phas+Kf
-    f%MAGP%phas%KIND=3
-    f%MAGP%phas%I=1
-
-    CALL INIT(1,1,BERZ)
-
-    CALL ALLOC(Y)
-    ic=0
-3   continue
-
-    !    X=ZERO
-    Y=X
-    CALL TRACK(f,Y,+state,CHARGE1)
-    xn=y
-    if(global_verbose) write(6,'(A10,6(1X,g14.7))') " ORBIT IS ",xn
-    kf=(de+x(5)-(y(5).sub.'0'))/(y(5).sub.'1')
-    xdix=abs(de+x(5)-(y(5).sub.'0'))
-    f%MAGP%phas=f%MAGP%phas+KF
-    f%MAG%phas=f%MAG%phas+KF
-    !write(6,*) x(5),x(6)
-    !write(6,*) xn(5),xn(6)
-
-    if(xdix.gt.deps_tracking) then
-       ite=1
-    else
-       if(xdix.ge.xdix0.or.xdix<=tiny) then
-          ite=0
+       dat(i,1:4)=xn(1:4)
+       dat(i,5:6)=ra(1:2)
+    enddo
+    WRITE(6,*) "     MAXIMUM RADIUS SQUARE = ",JMAX
+    WRITE(6,*) "      MAXIMUM/INITIAL = ",JMAX(1:2)/emit(1:2)
+    WRITE(6,*) "     MINIMUM RADIUS SQUARE = ",JMIN
+    WRITE(6,*) "      MINIMUM/INITIAL = ",JMIN(1:2)/emit(1:2)
+    WRITE(6,*) "     SMEAR = ",TWO*(JMAX-JMIN)/(JMAX+JMIN)
+    SMEAR(IT,1:2)=EMIT(1:2)
+    SMEAR(IT,3:4)=JMIN(1:2)
+    SMEAR(IT,5:6)=JMAX(1:2)
+    SMEAR(IT,7:8)=TWO*(JMAX-JMIN)/(JMAX+JMIN)
+    if(flag/=0)then
+       scau=scat
+       IF(fLAG==101) THEN
+          write(6,*)  "          UNSTABLE AT X-NORMALIZED APERTURE "
+          !   write(mf,*) "UNSTABLE AT X-NORMALIZED APERTURE "
+       ELSEIF(FLAG==102) THEN
+          !   write(mf,*) "UNSTABLE AT Y-NORMALIZED APERTURE "
+          write(6,*) "          UNSTABLE AT Y-NORMALIZED APERTURE "
+       ELSE
+          !   write(mf,*) "UNSTABLE: DYNAMIC APERTURE "
+          write(6,*) "          UNSTABLE: DYNAMIC APERTURE "
+       ENDIF
+       goto 1002  ! etienne
+       if(abs(scau-scas)<=emit0(3)) then
+          goto 1002
        else
-          ite=1
-          xdix0=xdix
+          goto 1001
        endif
-    endif
-    ic=ic+1
-    if(ic==itemax) then
-       write(6,*) " Fatal Error Fitting phase in Cavity "
-       write(6,*) " reached  ",ic," Iterations "
-       stop 888
-    endif
-    if(ite.eq.1) GOTO 3
+    ELSE
+       write(6,*) "          STABLE "
 
-    f%MAGP%phas%KIND=1
-    f%MAGP%phas%I=0
+       write(6,*) "tunes of the ray " ,tot_tune(1:2)
+       WRITE(6,201) EMIT,APER, TUNEnew(1:2),DBETA
 
-    if(global_verbose) write(6,'(A10,1(1X,g14.7))') " PHASE IS ",    f%MAG%phas
+       scas=scat
+       dats=dat
 
-    CALL KILL(Y)
-
-    phase_rel=f%mag%phas+twopi*f%mag%freq/clight*x(6)
-    time_patch=-XN(6)+X(6)
-    if(f%mag%P%TIME) then
-       time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD/f%mag%P%BETA0
-    else
-       time_patch=time_patch+(1-f%mag%P%TOTALPATH)*f%mag%P%LD
-    endif
-
-  end SUBROUTINE fit_bare_cavity
-
-
-  SUBROUTINE set_tw_cavity(f,de_gev,phase_rel,x,state,charge,energy)
-    IMPLICIT NONE
-    TYPE(fibre),INTENT(INOUT):: f
-    TYPE(internal_state), intent(in):: state
-    logical(lp),optional :: energy
-    logical(lp) ene
-    integer,optional :: charge
-    integer, target ::  charge1
-    real(dp) kf,x(6),de_gev,phase_rel
-
-    ene=.true.
-    if(f%mag%kind/=kind21) then
-       Write(6,*) " Fatal Error: not a TWCAVITY "
-       stop
-    endif
-    if(f%mag%cav21%psi/=zero) then
-       Write(6,*) " Warning: backwards wave present ",f%mag%cav21%psi
-    endif
-    f%mag%cav21%psi=zero   ! removing backward waves
-    f%magp%cav21%psi=zero   ! removing backward waves
-
-    charge1=1
-    if(present(charge)) charge1=charge
-    if(present(energy)) ene=energy
-
-    kf= -de_gev/1.0e-3_dp/f%mag%L/f%DIR/charge1
-    if(ene) then
-       f%mag%volt=kf
-       f%magp%volt=kf
-    else
-       f%mag%volt=sign(1.0_dp,kf*f%mag%volt)* f%mag%volt
-       f%magp%volt=f%mag%volt
-    endif
-
-    f%mag%phas=pi/two-twopi*f%mag%freq*x(6)/clight-c_%phase0
-    f%magp%phas=f%mag%phas
-    phase_rel=f%mag%phas+twopi*f%mag%freq*x(6)/clight
+       !  RESONANCE
+       tot_tune=zero
+       xn(1:4)=dats(0,1:4)
+       tune1(1)=atan2(-xn(2),xn(1))/twopi
+       tune1(2)=atan2(-xn(4),xn(3))/twopi
+       if(tune1(1)<zero)  tune1(1)=tune1(1)+one
+       if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+       DO I1=0,NTURN
+          xn(1:4)=dats(i1,1:4)
+          tune2(1)=atan2(-xn(2),xn(1))/twopi
+          tune2(2)=atan2(-xn(4),xn(3))/twopi
+          if(tune2(1)<zero)  tune2(1)=tune2(1)+one
+          if(tune2(2)<zero)  tune2(2)=tune2(2)+one
+          tune1=tune2-tune1
+          if(tune1(1)<zero)  tune1(1)=tune1(1)+one
+          if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+          tot_tune =tot_tune+tune1
+          tune1=tune2
+       ENDDO
+       tot_tune=tot_tune/nturn
+       do i1=0,resmax
+          do j=-resmax,resmax
+             dbeta=i1*tot_tune(1)+j*tot_tune(2)
+             if(abs(dbeta-nint(dbeta))<epsi ) then
+                if(i1+j/=0) write(6,*) i1,j,dbeta," <--- here "
+             else
+                if(i1+j/=0) write(6,*)i1,j,dbeta
+             endif
+          enddo
+       enddo
+       !     PAUSE 100
+       ! END  RESONANCE
 
 
-  end SUBROUTINE set_tw_cavity
+
+       if(abs(scau-scas)<=emit0(3)) then
+          goto 1002
+       else
+          goto 1001
+       endif
+
+    ENDIF
+
+
+1002 continue
+    CALL KANALNUMMER(MF)
+
+    OPEN(UNIT=MF,FILE=FILENAME)
+
+    WRITE(MF,201) EMIT,APER, TUNEnew(1:2),DBETA
+    tot_tune=zero
+    xn(1:4)=dats(0,1:4)
+    tune1(1)=atan2(-xn(2),xn(1))/twopi
+    tune1(2)=atan2(-xn(4),xn(3))/twopi
+    if(tune1(1)<zero)  tune1(1)=tune1(1)+one
+    if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+
+    DO I=0,NTURN
+       WRITE(MF,200)DATs(I,1:6)
+       xn(1:4)=dats(i,1:4)
+       tune2(1)=atan2(-xn(2),xn(1))/twopi
+       tune2(2)=atan2(-xn(4),xn(3))/twopi
+       if(tune2(1)<zero)  tune2(1)=tune2(1)+one
+       if(tune2(2)<zero)  tune2(2)=tune2(2)+one
+       tune1=tune2-tune1
+       if(tune1(1)<zero)  tune1(1)=tune1(1)+one
+       if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+       tot_tune =tot_tune+tune1
+       tune1=tune2
+    ENDDO
+    tot_tune=tot_tune/nturn
+    CLOSE(MF)
+    CALL KANALNUMMER(MFt)
+    OPEN(UNIT=MFt,FILE=FILEtune)
+    write(mft,*) " tunes = ",tot_tune(1:2)
+    do i=0,resmax
+       do j=-resmax,resmax
+          dbeta=i*tot_tune(1)+j*tot_tune(2)
+          if(abs(dbeta-nint(dbeta))<epsi ) then
+             if(i+j/=0) write(mft,*) i,j,dbeta," <--- here "
+          else
+             if(i+j/=0) write(mft,*)i,j,dbeta
+          endif
+       enddo
+    enddo
+    CLOSE(mft)
+
+    CALL KANALNUMMER(MF)
+    OPEN(UNIT=MF,FILE=FILESMEAR)
+    WRITE(MF,*) " ITERATION   EMIT0(1:2)  JMIN(1:2) JMAX(1:2) TWO*(JMAX-JMIN)/(JMAX+JMIN)"
+    DO I=1,ITMAX
+       WRITE(MF,202)I, SMEAR(I,1:8)
+    ENDDO
+
+    CLOSE(mf)
+
+    emit0(1:2)=scas*aper(1:2)
+    emit0(4:5)=tunenew(1:2)
+
+202 FORMAT(1X,I4,8(1X,D18.11))
+201 FORMAT(9(1X,D18.11))
+200 FORMAT(6(1X,D18.11))
+    deallocate(dat,dats,SMEAR)
+    WRITE(6,*) "     MAXIMUM RADIUS SQUARE = ",JMAX
+    WRITE(6,*) "      MAXIMUM/INITIAL = ",JMAX(1:2)/emit(1:2)
+    WRITE(6,*) "     MINIMUM RADIUS SQUARE = ",JMIN
+    WRITE(6,*) "      MINIMUM/INITIAL = ",JMIN(1:2)/emit(1:2)
+    WRITE(6,*) "     SMEAR = ",TWO*(JMAX-JMIN)/(JMAX+JMIN)
+    write(6,*) " *****************************************************************"
+
+  end SUBROUTINE  track_aperture
 
 
   SUBROUTINE  THIN_LENS_resplit(R,THIN,lim) ! A re-splitting routine
@@ -1591,6 +1797,9 @@ contains
     do   WHILE(ASSOCIATED(C))
 
        doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind17)
 
        if(doit) then
           select case(C%MAG%P%METHOD)
@@ -1610,11 +1819,11 @@ contains
        C=>C%NEXT
 
     enddo
-    write(6,*) "Present of thin lenses ",r%NTHIN
-    write(6,*)  "METHOD 2 ",M1,MK1
+    write(6,*) "Present of cutable Elements ",r%NTHIN
+    write(6,*) "METHOD 2 ",M1,MK1
     write(6,*) "METHOD 4 ",M2,MK2
     write(6,*) "METHOD 6 ",M3,MK3
-    write(6,*)   "number of KICKS ", MK1+MK2+MK3
+    write(6,*)   "number of Slices ", MK1+MK2+MK3
 
     if(eject) then
        !      limit(1)=limit0(1)
@@ -1636,6 +1845,10 @@ contains
     do   WHILE(ASSOCIATED(C))
 
        doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind17)
+
        if(doit)  then
 
 
@@ -1646,7 +1859,7 @@ contains
           ELSE
              QUAD=zero
           ENDIF
-          if(C%MAG%KIND==kind5) then
+          if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
              quad=quad+(C%MAG%b_sol)**2/four
           endif
 
@@ -1685,11 +1898,11 @@ contains
     enddo
 
 
-    write(6,*) "Present of thin lenses ",r%NTHIN
-    write(6,*)  "METHOD 2 ",M1,MK1
+    write(6,*) "Present of cutable Elements ",r%NTHIN
+    write(6,*) "METHOD 2 ",M1,MK1
     write(6,*) "METHOD 4 ",M2,MK2
     write(6,*) "METHOD 6 ",M3,MK3
-    write(6,*)   "number of KICKS ", MK1+MK2+MK3
+    write(6,*)   "number of Slices ", MK1+MK2+MK3
 
 
 
@@ -1714,6 +1927,92 @@ contains
 
   END SUBROUTINE  THIN_LENS_resplit
 
+
+
+  SUBROUTINE  print_bn_an(r,n,title,filename)
+    implicit none
+    type(layout),intent(inout) ::r
+    character(*) filename
+    type(fibre),pointer ::p
+    integer n,i,mf,j,ntot
+    character(*) title
+
+    ntot=0
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+    p=>r%start
+    write(mf,'(a120)') title
+    write(mf,*) n
+    do i=1,r%n
+
+       if(associated(p%mag%an)) then
+          ntot=ntot+1
+          write(mf,*) min(n,p%mag%p%nmul),p%mag%name
+          do j=1,min(n,p%mag%p%nmul)
+             write(mf,*)j,p%mag%bn(j),p%mag%an(j)
+          enddo
+       endif
+       p=>p%next
+    enddo
+
+
+    close(mf)
+
+    write(6,*) ntot," magnets settings saved to maximum order ",n
+
+  end   SUBROUTINE  print_bn_an
+
+  SUBROUTINE  read_bn_an(r,filename)
+    implicit none
+    type(layout),intent(inout) ::r
+    character(*) filename
+    type(fibre),pointer ::p
+    integer n,i,mf,j,nt,jt,ntot
+    character(nlp) nom
+    character*120 title
+    real(dp), allocatable :: an(:),bn(:)
+
+    ntot=0
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+
+    p=>r%start
+    read(mf,'(a120)') title
+    write(6,'(a120)') title
+    read(mf,*) n
+    allocate(an(n),bn(n))
+    an=zero;bn=zero;
+
+    do i=1,r%n
+
+       read(mf,*,end=100) nt,nom
+       call context(nom)
+
+       do j=1,nt
+          read(mf,*)jt,bn(j),an(j)
+       enddo
+
+       do jt=1,r%n
+          if(nom==p%mag%name) then
+             ntot=ntot+1
+             do j=nt,1,-1
+                call ADD(p,j,0,bn(j))
+                call ADD(p,-j,0,an(j))
+             enddo
+          endif
+          if(nom==p%mag%name) exit
+          p=>p%next
+       enddo
+
+    enddo
+
+100 continue
+    write(6,*) ntot," magnets settings read"
+
+    close(mf)
+    deallocate(an,bn)
+
+  end   SUBROUTINE  read_bn_an
 
 
 end module S_fitting

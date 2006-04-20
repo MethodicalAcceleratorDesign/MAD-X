@@ -17,8 +17,6 @@ module sagan_WIGGLER
   PRIVATE copy_W_WP,copy_WP_W,copy_W_W
   !  PRIVATE SET_R,SET_P,SET_W
 
-  real(dp) :: c_1_5e0 = 1.5e0_dp
-
   integer, parameter :: hyperbolic_ydollar  = 1
   integer, parameter :: hyperbolic_xydollar = 2
   integer, parameter :: hyperbolic_xdollar  = 3
@@ -1606,7 +1604,7 @@ contains
     if(EL%P%B0==zero.and.stoch_in_rec) then
        denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
        b20=b2
-       b30=b20**c_1_5e0
+       b30=b20**c_1_5
        bf=cfluc*b30
        denf=denf*bf*L
        done_stoch=.true.
@@ -1636,13 +1634,13 @@ contains
              CALL B2PERP(EL%P,B_F,xr,X5,B2)
 
              denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
-             denf=DENF*cfluc*L*b2**c_1_5e0
+             denf=DENF*cfluc*L*b2**c_1_5
           else
              CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
 
              denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
              b20=b2
-             b30=b20**c_1_5e0
+             b30=b20**c_1_5
              bf=cfluc*b30
              denf=denf*bf*L
           endif

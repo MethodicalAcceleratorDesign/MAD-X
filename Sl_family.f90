@@ -718,8 +718,8 @@ CONTAINS
           S2%MAG%D(I)=S1(I);   S2%MAGP%D(I)=S1(I);
           S2%MAG%R(I)=S1(3+I); S2%MAGP%R(I)=S1(3+I);
        ENDDO
-       S2%CHART%D_IN=0.0_DP;S2%CHART%D_OUT=0.0_DP;
-       S2%CHART%ANG_IN=0.0_DP;S2%CHART%ANG_OUT=0.0_DP;
+       S2%CHART%D_IN=zero;S2%CHART%D_OUT=zero;
+       S2%CHART%ANG_IN=zero;S2%CHART%ANG_OUT=zero;
        S2%MAG%MIS=.TRUE.
        S2%MAGP%MIS=.TRUE.
 

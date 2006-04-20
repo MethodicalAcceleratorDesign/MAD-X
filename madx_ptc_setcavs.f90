@@ -25,16 +25,17 @@ contains
     type(work)           :: startfen
     type(work)           :: endfen    ! END Fibre ENergy: energy description at start and end of a line
     type(work)           :: nfen      ! New Fibre ENergy
+    type(work)           :: cfen      ! Current Fibre ENergy
     integer, pointer     :: poscav(:) !array keeping indexes of cavities
     real(dp),allocatable :: phasecav(:) !array keeping phases of cavities
-    real(dp)             :: patchprecision=1.d-8
+    real(dp)             :: patchprecision=c_1d_8
     logical(lp)          :: patchenergy=.true.
     logical(lp)          :: patchnext=.true.
     real(dp)             :: prevbeta0  !just a temporary real variable
     real (dp)            :: x(1:6)   ! track vector -
     ! here we always use closed orbit track, that is all its relative coordinates are 0
-    real(dp)             :: sparivtime=0.d0 !synchronous particle arrival time
-    real(dp)             :: position=0.d0 !synchronous particle position
+    real(dp)             :: sparivtime=zero !synchronous particle arrival time
+    real(dp)             :: position=zero !synchronous particle position
     real(kind(1.d0))     :: get_value
     integer              :: get_option
     !------------------------------------------------------
@@ -54,7 +55,8 @@ contains
       call print(localis,6)
     endif
         
-
+    patchnext=.true.
+    
     charge = get_value('beam ', "charge ")
 
     open(unit=21,file='sychrpart.txt')
@@ -62,7 +64,7 @@ contains
     write(24,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
     nfen = 0
     startfen = 0
-    x(:)=0.0d0
+    x(:)=zero
 
     call locate_all_twcav(my_ring,poscav)
     if ( getdebug() > 2 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
@@ -88,13 +90,13 @@ contains
 
        if ( getdebug() > 2 ) then
           write (*,*) 'Current cavity no is j=',j
-          write (*,*) 'Setting beam momentum AND tracking', nfen%p0c,' till this cavity (',poscav(j),')'
+          write (*,*) 'Setting beam momentum AND tracking', nfen%p0c,' till the cavity (',poscav(j),')'
        endif
 
 
        do i=i,poscav(j)-1 !from the current element i to the current cavity j
 
-          p=nfen   ! set current reference energy
+          p = nfen   ! set current reference energy
           call track(my_ring,x,i,i+1,localis)
           
           if ( getdebug()>1 ) then
@@ -108,7 +110,6 @@ contains
           write (21,*) ' '
           write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
           write (21,'(6f8.4)') x
-
 
           p=>p%next
        enddo
@@ -132,7 +133,8 @@ contains
        ! p point to this cavity
 
        ! set the reference energy in this cavity
-       p=nfen
+       
+       p = nfen
        
        if ( getdebug() > 1 ) then
           write (6,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
@@ -141,11 +143,12 @@ contains
        
        !TUNE CAVITY
        call setcavity(p,x,phasecav(j),charge,maxaccel)
-       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*360.0d0/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
+       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
 
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
-
+       
+       
        write (21,*) ' '
        write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
        write (21,'(6f8.4)') x
@@ -156,7 +159,8 @@ contains
        endif
 
        ! GET NEW ENERGY AFTER THE CAVITY
-       prevbeta0=nfen%beta0
+       prevbeta0 = nfen%beta0
+       
        nfen= x(5)*nfen%p0c
 
        if ( getdebug() > 2 ) then
@@ -170,6 +174,7 @@ contains
 
        !PATCH THE NEXT ELEMENT ON ENTRANCE
        p%next = nfen
+
        if ( getdebug() > 2 ) write (*,*) 'Finding patch for j=',j,' ',p%mag%name
        call find_patch(p,next=patchnext,ENERGY_PATCH=patchenergy,PREC=patchprecision)
 
@@ -186,7 +191,7 @@ contains
     endif
 
     do i=i,my_ring%n !setting beam energies to the end of line
-       p=nfen
+       p = nfen
        call track(my_ring,x,i,i+1,localis)
 
        write (21,*) ' '
@@ -235,19 +240,17 @@ contains
 
        if(p%mag%kind == kind21) then
 
-          if ( getdebug() > 1 ) then
-             write (6,*) 'Cavity ',i,' phase ', p%mag%phas,' Volt ',   p%mag%volt
-          endif
-
           if(p%next%patch%energy==1) then
              p%patch%energy=2
              p%next%patch%energy=0
           endif
 
           if ( getdebug() > 1 ) then
+             write (6,*) 'Cavity ',i,' name ',p%mag%name,' phase ', p%mag%phas,' Volt ',p%mag%volt, &
+             & ' length ', p%mag%l
              write(6,*) 'DELTAE ', p%mag%DELTA_E
-             write(6,*) 'Length ', p%mag%l
           endif
+
 
        endif
        p=>p%next
@@ -301,7 +304,7 @@ contains
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          endif    
-         f%mag%phas = pi/2.0d0 - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
+         f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
       else
@@ -316,13 +319,14 @@ contains
       !    write (*,*) 'energy (t/f)? :',ene, 'charge: ', charge
       if ( getdebug() > 1 ) then
          write(6,*) 'Cavity settings:'
+         write(6,*)                  '    Name   ', f%mag%name
          write(6,'(a12,i12,a10,l1)') '    Charge ', charge,' max ene? : ',ene
          write(6,'(a12,f12.5,a10)') '    Volt ',   f%mag%volt,' MV '
          write(6,'(a12,f12.5,a10)') '    DELTAE ', f%mag%delta_e, ' GeV '
          write(6,'(a12,f12.5,a10)') '    Length ', f%mag%l,' m'
          write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad'
          write(6,'(a12,f12.0,a10)') '    Freq ',   f%mag%freq, ' Hz '
-         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*360.d0,' deg ', f%mag%lag,' rad '
+         write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*c_360,' deg ', f%mag%lag,' rad '
          write(6,'(a12,f12.5,a10)') '    P0c ',    f%mag%p%p0c, 'GeV/c'
       endif
 
@@ -339,7 +343,7 @@ contains
       p=>r%start
       do i=1,r%n
          if(p%mag%kind==kind21) then
-            if(p%mag%freq/=0.d0) then
+            if(p%mag%freq/=zero) then
                ic=ic+1
             endif
          endif
@@ -351,7 +355,7 @@ contains
       p=>r%start
       do i=1,r%n
          if(p%mag%kind==kind21) then
-            if(p%mag%freq/=0.d0) then
+            if(p%mag%freq/=zero) then
                ic=ic+1
                pos(ic)=i
             endif
@@ -376,7 +380,7 @@ end module madx_ptc_setcavs_module
 !               f%magp%volt=kf
 !            else
 !               !uses simply the peak voltage and phase
-!               f%mag%volt=sign(1.0_dp,kf*f%mag%volt) * f%mag%volt
+!               f%mag%volt=sign(one,kf*f%mag%volt) * f%mag%volt
 !               f%magp%volt=f%mag%volt
 !            endif
 !            f%mag%phas=pi/2.0d0-twopi*f%mag%freq*arrivtime-c_%phase0

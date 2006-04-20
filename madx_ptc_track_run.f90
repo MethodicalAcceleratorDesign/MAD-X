@@ -110,7 +110,7 @@ CONTAINS
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
          Find_Envelope, &                                                                  !
          ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
-         write_closed_orbit,Convert_dp_to_dt                                               !
+         write_closed_orbit!,Convert_dp_to_dt                                              !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
          c_1d_7,one,two, twopi, zero
@@ -724,8 +724,8 @@ CONTAINS
       end if !----------------------------------------------!              !
       !                                                                    !
       if(icase_ptc.eq.5) THEN !----------------------!                     !
-         call Convert_dp_to_dt (deltap, dt)          !                     !
-         x_coord_co(5)=dt                            !                     !
+         ! call Convert_dp_to_dt (deltap, dt)        !                     !
+         x_coord_co(5)=deltap                        !                     !
       ENDIF !----------------------------------------!                     !
       !                                                                    !
       if (ptc_track_debug) then  !------------------------!                !
@@ -2549,8 +2549,8 @@ CONTAINS
             X_MAD(5)=t_input; X_MAD(6)=deltae_input                           ! t   r   !
             !                                                                 ! c   t   f
             IF(icase_ptc.eq.5 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
-               call Convert_dp_to_dt (deltap, dt)                !              !   c   r
-               X_MAD(6)=X_MAD(6)+dt                              !              !   l   !
+               ! call Convert_dp_to_dt (deltap, dt)              !              !   c   r
+               X_MAD(6)=X_MAD(6)+deltap                          !              !   l   !
             ENDIF !----------------------------------------------!              !   e   !
             !                                                                   !   !   p
             CALL Coord_MAD_to_PTC(X_MAD,X_PTC) ! convert coordinates          ! c   t   a

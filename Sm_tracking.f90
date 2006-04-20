@@ -1578,9 +1578,9 @@ contains
     if(j_global==1) return  ! skipping OBJECT OF ZGOUBI = TRACKING COMMAND INTERNAL TO ZGOUBI
     icharef=0
 
-    x(1)=x(1)*100.0_dp
-    x(3)=x(3)*100.0_dp
-    x6=x(6)*100.0_dp
+    x(1)=x(1)*c_100
+    x(3)=x(3)*c_100
+    x6=x(6)*c_100
 
     xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
     yp=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
@@ -1592,14 +1592,14 @@ contains
 
     !call track_z(x,j_global,j_global)
 
-    x6=x(5)/100.0_dp
+    x6=x(5)/c_100
     x(5)=x(6)
     x(6)=x6
 
-    x(1)=x(1)/100.0_dp
-    x(3)=x(3)/100.0_dp
-    xp=tan(x(2)/1000.0_dp)
-    yp=tan(x(4)/1000.0_dp)*root(one+xp**2)
+    x(1)=x(1)/c_100
+    x(3)=x(3)/c_100
+    xp=tan(x(2)/c_1d3)
+    yp=tan(x(4)/c_1d3)*root(one+xp**2)
 
     x(2)=(one+x(5))*xp/root(one+xp**2+yp**2)
     x(4)=(one+x(5))*yp/root(one+xp**2+yp**2)
