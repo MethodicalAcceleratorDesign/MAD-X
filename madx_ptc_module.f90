@@ -1142,10 +1142,9 @@ CONTAINS
 
     if(initial_matrix_table) then
        k = double_from_table("map_table ", "nv ", 1, doublenum)
-       d_val=doublenum
        if(k.ne.-1) then
           call liepeek(iia,icoast)
-          my_nv=int(d_val)
+          my_nv=int(doublenum)
           nv_min=min(iia(2),my_nv)
        else
           initial_matrix_table=.false.
@@ -1577,7 +1576,7 @@ CONTAINS
     logical(lp) name_l
     integer row
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
-    integer idx
+    integer idx,ii,i1,i2
     integer j,k,ind(6)
     integer double_from_table
     character(len = 4)  name_var
@@ -1590,35 +1589,24 @@ CONTAINS
     name_var1 = name_var
     SELECT CASE (name_var1)
     CASE ("dx")
-!       do j = 1,4
-!          ind(j) = 0
-!       enddo
        ind(:)=0
        k = double_from_table("normal_results ", "order1 ", row, doublenum)
-       d_val=doublenum
-       ind(5) = int(d_val)
+       ind(5) = int(doublenum)
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
        d_val = n%A1%V(1).sub.ind
     CASE ('dy')
-       do j = 1,4
-          ind(j) = 0
-       enddo
+       ind(:)=0
        k = double_from_table("normal_results ", "order1 ", row, doublenum)
-       d_val=doublenum
-       ind(5) = int(d_val)
+       ind(5) = int(doublenum)
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
        d_val = n%A1%V(3).sub.ind
     CASE ('q1')
-       do j = 1,6
-          ind(j) = 0
-       enddo
+       ind(:)=0
        d_val = n%dhdj%V(3).sub.ind
     CASE ('q2')
-       do j = 1,6
-          ind(j) = 0
-       enddo
+       ind(:)=0
        d_val = n%dhdj%V(4).sub.ind
     CASE DEFAULT
        name_l = .true.
@@ -1628,42 +1616,30 @@ CONTAINS
        name_var2 = name_var
        SELECT CASE (name_var2)
        CASE ('dpx')
-          do j = 1,4
-             ind(j) = 0
-          enddo
+          ind(:)=0
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(5) = int(d_val)
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(2).sub.ind
        CASE ('dpy')
-          do j = 1,4
-             ind(j) = 0
-          enddo
+          ind(:)=0
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(5) = int(d_val)
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(4).sub.ind
        CASE ('dq1')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          do j = 1,4
-             ind(j) = 0
-          enddo
-          ind(5) = int(d_val)
+          ind(:)=0
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
        CASE ('dq2')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          do j = 1,6
-             ind(j) = 0
-          enddo
-          ind(5) = int(d_val)
+          ind(:)=0
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%dhdj%V(4).sub.ind
@@ -1675,49 +1651,39 @@ CONTAINS
        SELECT CASE (name_var)
        CASE ('anhx')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
           do j = 1,2
-             ind(j) =  int(d_val)
+             ind(j) =  int(doublenum)
           enddo
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
           do j = 3,4
-             ind(j) = int(d_val)
+             ind(j) = int(doublenum)
           enddo
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(5) = int(d_val)
+          ind(5) = int(doublenum)
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
        CASE ('anhy')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
           do j = 1,2
-             ind(j) = int(d_val)
+             ind(j) = int(doublenum)
           enddo
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
           do j = 3,4
-             ind(j) = int(d_val)
+             ind(j) = int(doublenum)
           enddo
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(5) = int(d_val)
+          ind(5) = int(doublenum)
           ind(6) = 0
           d_val = n%dhdj%V(4).sub.ind
        CASE ('hamc')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(1) = int(d_val)
+          ind(1) = int(doublenum)
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
-          ind(2) = int(d_val)
+          ind(2) = int(doublenum)
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(3) = int(d_val)
+          ind(3) = int(doublenum)
           k = double_from_table("normal_results ", "order4 ", row, doublenum)
-          d_val=doublenum
-          ind(4) = int(d_val)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrh%cos%h.sub.ind
@@ -1725,17 +1691,13 @@ CONTAINS
           RETURN
        CASE ('hams')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-         ind(1) = int(d_val)
+          ind(1) = int(doublenum)
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
-          ind(2) = int(d_val)
+          ind(2) = int(doublenum)
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(3) = int(d_val)
+          ind(3) = int(doublenum)
           k = double_from_table("normal_results ", "order4 ", row, doublenum)
-          d_val=doublenum
-          ind(4) = int(d_val)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrh%sin%h.sub.ind
@@ -1743,17 +1705,13 @@ CONTAINS
           RETURN
        CASE ('hama')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(1) = int(d_val)
+          ind(1) = int(doublenum)
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
-          ind(2) = int(d_val)
+          ind(2) = int(doublenum)
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(3) = int(d_val)
+          ind(3) = int(doublenum)
           k = double_from_table("normal_results ", "order4 ", row, doublenum)
-          d_val=doublenum
-          ind(4) = int(d_val)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val1 = pbrh%cos%h.sub.ind
@@ -1765,17 +1723,13 @@ CONTAINS
           RETURN
        CASE ('gnfc')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(1) = int(d_val)
+          ind(1) = int(doublenum)
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
-          ind(2) = int(d_val)
+          ind(2) = int(doublenum)
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(3) = int(d_val)
+          ind(3) = int(doublenum)
           k = double_from_table("normal_results ", "order4 ", row, doublenum)
-          d_val=doublenum
-          ind(4) = int(d_val)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrg%cos%h.sub.ind
@@ -1783,17 +1737,13 @@ CONTAINS
           RETURN
        CASE ('gnfs')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(1) = int(d_val)
+          ind(1) = int(doublenum)
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
-          ind(2) = int(d_val)
+          ind(2) = int(doublenum)
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(3) = int(d_val)
+          ind(3) = int(doublenum)
           k = double_from_table("normal_results ", "order4 ", row, doublenum)
-          d_val=doublenum
-          ind(4) = int(d_val)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrg%sin%h.sub.ind
@@ -1801,17 +1751,13 @@ CONTAINS
           RETURN
        CASE ('gnfa')
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          d_val=doublenum
-          ind(1) = int(d_val)
+          ind(1) = int(doublenum)
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
-          d_val=doublenum
-          ind(2) = int(d_val)
+          ind(2) = int(doublenum)
           k = double_from_table("normal_results ", "order3 ", row, doublenum)
-          d_val=doublenum
-          ind(3) = int(d_val)
+          ind(3) = int(doublenum)
           k = double_from_table("normal_results ", "order4 ", row, doublenum)
-          d_val=doublenum
-          ind(4) = int(d_val)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val1 = pbrg%cos%h.sub.ind
@@ -1820,6 +1766,18 @@ CONTAINS
           RETURN
        CASE ('gnfu')
           double_from_ptc_normal = zero
+          RETURN
+       CASE ('eign')
+          ii=4
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          i1 = int(doublenum) 
+          if(i1.gt.ii) call fort_warn('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          i2 = int(doublenum)
+          if(i2.gt.ii) call fort_warn('return from double_from_ptc_normal: ',' eigenvectors too many components')
+          ind(:)=0
+          ind(i2)=1
+          double_from_ptc_normal = n%A_t%V(i1).sub.ind
           RETURN
        CASE DEFAULT
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
@@ -1847,20 +1805,19 @@ CONTAINS
     character(len = 4) name_var
     integer row,k
     integer :: ord(3)
-    real(kind(1d0)) d_val
 
     print *,"Variable name  Order 1  order 2  order 3        Value      "
     do row = 1 , select_ptc_idx()
        name_var=" "
        k = string_from_table("normal_results ", "name ", row, name_var)
-       k = double_from_table("normal_results ", "order1 ", row, d_val)
-       ord(1) = int(d_val)
-       k = double_from_table("normal_results ", "order2 ", row, d_val)
-       ord(2) = int(d_val)
-       k = double_from_table("normal_results ", "order3 ", row, d_val)
-       ord(3) = int(d_val)
-       k = double_from_table("normal_results ", "value ", row, d_val)
-       WRITE(*,100) name_var,ord(1),ord(2),ord(3),d_val
+       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       ord(1) = int(doublenum)
+       k = double_from_table("normal_results ", "order2 ", row, doublenum)
+       ord(2) = int(doublenum)
+       k = double_from_table("normal_results ", "order3 ", row, doublenum)
+       ord(3) = int(doublenum)
+       k = double_from_table("normal_results ", "value ", row, doublenum)
+       WRITE(*,100) name_var,ord(1),ord(2),ord(3),doublenum
     enddo
 100 FORMAT(3X,A4,14X,I1,8X,I1,8X,I1,5X,f25.18)
   END SUBROUTINE display_table_results
@@ -1884,9 +1841,8 @@ CONTAINS
     integer :: row_haml(101)
     integer :: index1(1000,2)
     real(dp) coef
-    real(kind(1d0)) get_value,d_val,val_ptc,map_coor(i_map_coor)
+    real(kind(1d0)) get_value,val_ptc,map_coor(i_map_coor)
     character(len = 4) name_var
-
     !------------------------------------------------------------------------------
 
     if(universe.le.0) then
@@ -1936,10 +1892,10 @@ CONTAINS
        return
     endif
     c_%watch_user=.false.
-    call daprint(y,18)
+    if (getdebug()>1) call daprint(y,18)
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
-    if(no.eq.1.and.maptable) then
+    if(maptable) then
        map_term=42
        call  make_map_table(map_term)
        call liepeek(iia,icoast)
@@ -2009,19 +1965,19 @@ CONTAINS
              call alloc(pbrh)
              do j1 =1,n_haml
                 row = row_haml(j1)
-                k = double_from_table("normal_results ", "value ", row, d_val)
-                mynres = int(d_val)
+                k = double_from_table("normal_results ", "value ", row, doublenum)
+                mynres = int(doublenum)
                 row = row_haml(j1) - 3*mynres + 2
                 starti = 1
                 if (j1 .eq. 1) then
-                   k = double_from_table("normal_results ", "order1 ", row, d_val)
-                   indexa(1) = int(d_val)
-                   k = double_from_table("normal_results ", "order2 ", row, d_val)
-                   indexa(2) = int(d_val)
-                   k = double_from_table("normal_results ", "order3 ", row, d_val)
-                   indexa(3) = int(d_val)
-                   k = double_from_table("normal_results ", "order4 ", row, d_val)
-                   indexa(4) = int(d_val)
+                   k = double_from_table("normal_results ", "order1 ", row, doublenum)
+                   indexa(1) = int(doublenum)
+                   k = double_from_table("normal_results ", "order2 ", row, doublenum)
+                   indexa(2) = int(doublenum)
+                   k = double_from_table("normal_results ", "order3 ", row, doublenum)
+                   indexa(3) = int(doublenum)
+                   k = double_from_table("normal_results ", "order4 ", row, doublenum)
+                   indexa(4) = int(doublenum)
                    index1(1,1) = indexa(1) - indexa(2)
                    index1(1,2) = indexa(3) - indexa(4)
                    n%m(1,1)= index1(1,1)
@@ -2035,14 +1991,14 @@ CONTAINS
                 if (mynres .ge. starti) then
                    do i = starti,mynres
                       ii = row + 3*(i-1)
-                      k = double_from_table("normal_results ", "order1 ", ii, d_val)
-                      indexa(1) = int(d_val)
-                      k = double_from_table("normal_results ", "order2 ", ii, d_val)
-                      indexa(2) = int(d_val)
-                      k = double_from_table("normal_results ", "order3 ", ii, d_val)
-                      indexa(3) = int(d_val)
-                      k = double_from_table("normal_results ", "order4 ", ii, d_val)
-                      indexa(4) = int(d_val)
+                      k = double_from_table("normal_results ", "order1 ", ii, doublenum)
+                      indexa(1) = int(doublenum)
+                      k = double_from_table("normal_results ", "order2 ", ii, doublenum)
+                      indexa(2) = int(doublenum)
+                      k = double_from_table("normal_results ", "order3 ", ii, doublenum)
+                      indexa(3) = int(doublenum)
+                      k = double_from_table("normal_results ", "order4 ", ii, doublenum)
+                      indexa(4) = int(doublenum)
                       n1 = indexa(1) - indexa(2)
                       n2 = indexa(3) - indexa(4)
                       do l = 1,nres
@@ -2067,7 +2023,7 @@ CONTAINS
        if (n_gnfu > 0) pbrg = n%a%pb
        if (n_haml > 0) pbrh = n%normal%pb
        write(19,'(/a/)') 'Dispersion, First and Higher Orders'
-       call daprint(n%A1,19)
+       if (getdebug()>1) call daprint(n%A1,19)
 
        !------ get values and store them in the table 'normal_results' ---------
 
@@ -2080,6 +2036,7 @@ CONTAINS
           print *,"ptc_normal failed. MAD-X continues."
           stop
        endif
+       
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
@@ -2096,7 +2053,7 @@ CONTAINS
        !  call daprint(n%A_t,19)
        !  call daprint(n%A,19)
 
-       call daprint(n%dhdj,19)
+       if (getdebug()>1) call daprint(n%dhdj,19)
 
        !       call daprint(pbrh,19)
        if (n_gnfu > 0) call kill(pbrg)
@@ -2591,7 +2548,7 @@ CONTAINS
     call setintstate(default)
     CALL UPDATE_STATES
 
-    call print(default,6)
+    if (getdebug()>0) call print(default,6)
 
     icase = i
 
