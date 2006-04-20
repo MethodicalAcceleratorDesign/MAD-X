@@ -716,7 +716,10 @@ CONTAINS
     call create_fibre(my_ring%end,key,EXCEPTION)
     if(advance_node().ne.0)  goto 10
 
-    print*,' Length of machine: ',l_machine
+    if (getdebug() > 0) then
+      print*,' Length of machine: ',l_machine
+    endif
+       
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
 
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
@@ -2364,9 +2367,6 @@ CONTAINS
     real(dp) deltap0,deltap
 
     default = getintstate()
-
-    print*, "my_state: state from getintstate: " 
-    call print(DEFAULT,6)
     
     if (getdebug()>1) then
       print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
