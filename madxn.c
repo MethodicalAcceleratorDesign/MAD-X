@@ -2551,9 +2551,16 @@ void select_ptc_normal(struct in_cmd* cmd)
         double_to_table("normal_results", "order3", &order[2]);
         double_to_table("normal_results", "order4", &order[3]);
         augment_count("normal_results");
-	min_req_order = order[0]+order[1]+order[2];
-	if (j >= 9  && j < 12) min_req_order += order[0]+order[1];
-	if (j >= 7  && j < 12) min_req_order += 1;
+	if(j == 12)
+	  {
+	    min_req_order = 1;
+	  }
+	else
+	  {
+	    min_req_order = order[0]+order[1]+order[2];
+	    if (j >= 9) min_req_order += order[0]+order[1];
+	    if (j >= 7) min_req_order += 1;
+	  }
       }
       if (min_order < min_req_order) min_order = min_req_order;
     }

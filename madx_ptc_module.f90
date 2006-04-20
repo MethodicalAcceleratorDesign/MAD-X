@@ -1570,11 +1570,11 @@ CONTAINS
     double_from_ptc = y(j)%t.sub.ind
   END FUNCTION double_from_ptc
 
-  FUNCTION double_from_ptc_normal(name_var,row)
+  FUNCTION double_from_ptc_normal(name_var,row,icase)
     USE ptc_results
     implicit none
     logical(lp) name_l
-    integer row
+    integer,intent(IN) ::  row,icase
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
     integer idx,ii,i1,i2
     integer j,k,ind(6)
@@ -1768,13 +1768,13 @@ CONTAINS
           double_from_ptc_normal = zero
           RETURN
        CASE ('eign')
-          ii=4
+          ii=(icase/2)*2
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
           i1 = int(doublenum) 
-          if(i1.gt.ii) call fort_warn('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
+          if(i1.gt.ii) call aafail('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
           i2 = int(doublenum)
-          if(i2.gt.ii) call fort_warn('return from double_from_ptc_normal: ',' eigenvectors too many components')
+          if(i2.gt.ii) call aafail('return from double_from_ptc_normal: ',' eigenvectors too many components')
           ind(:)=0
           ind(i2)=1
           double_from_ptc_normal = n%A_t%V(i1).sub.ind
@@ -2041,7 +2041,7 @@ CONTAINS
           do row = 1,n_rows
              name_var=" "
              k = string_from_table("normal_results ", "name ", row, name_var)
-             val_ptc = double_from_ptc_normal(name_var,row)
+             val_ptc = double_from_ptc_normal(name_var,row,icase)
              if (name_var .ne. 'haml'.and.name_var .ne. 'gnfu')    &
                   call double_to_table_row("normal_results ", "value ", row, val_ptc)
           enddo
