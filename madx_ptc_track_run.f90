@@ -401,7 +401,8 @@ CONTAINS
     ! tt_putone_coord  and, the summary table 'tracksumm'
 
 
-    Output_observ_with_PTC: IF((.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
+    Output_observ_with_PTC: IF(closed_orbit .AND. &
+                               (.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
        debug_print_5: if (ptc_track_debug) then !----------------!                         !
           Print *, 'element_by_element=', element_by_element, &  !                         !
                ' Radiation_PTC=',Radiation_PTC                   !                         !
@@ -545,6 +546,17 @@ CONTAINS
       deltap0      = get_value('ptc_track ','deltap ')
 
       element_by_element = get_value('ptc_track ', 'element_by_element ') .ne. 0
+
+    IF(max_obs.gt.1.AND.(.NOT.CLOSED_ORBIT).AND.(.NOT. ELEMENT_BY_ELEMENT)) THEN
+      Print *, ' '
+      Print *, '===================================================================='
+      Print *,'To perform tracking with observation points the option'
+      Print *,'ELEMENT_BY_ELEMENT must be ON, if the option CLOSED_ORBIT is OFF' 
+      call fort_warn(' ELEMENT_BY_ELEMENT',' has been switched ON by the code')
+      Print *, '===================================================================='
+      Print *, ' '
+      ELEMENT_BY_ELEMENT=.TRUE.
+    ENDIF
 
       Radiation_PTC = get_value('ptc_track ','radiation ') .ne. 0
 
@@ -1346,7 +1358,6 @@ CONTAINS
                        x_coord_incl_co(k_th_coord,j_th_partic)                  !                +  ! p
                end do !---------------------------------------------------------!                +  ! !
                !                                                                                 +  ^ !
-               write(6,'(6f12.8)') current_x_coord_incl_co
                call track(my_ring,current_x_coord_incl_co, &                                     !  ! !
                     i_current_elem,i_current_elem+1,default)                                     !  ! o
                ! The PTC subroutine " To TRACK the MY_RING for X coordinates                     +  ! v
@@ -2289,7 +2300,8 @@ CONTAINS
 
          do j = 1, 6
             tmp=zero
-            IF (j.LE.icase_ptc) tmp = z(j,i) - orbit0(j)
+            !IF (j.LE.icase_ptc) tmp = z(j,i) - orbit0(j)
+            tmp = z(j,i) - orbit0(j)
             tmp_coord_array(j)=tmp ! make array of coordinates
             X_PTC(j)=tmp
          end do
@@ -2313,7 +2325,7 @@ CONTAINS
             CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates
             DO j = 1, 6
                tmp_norm=zero
-               IF (j.LE.icase_ptc) tmp_norm=X_MAD(j)
+               tmp_norm=X_MAD(j)
                                                                 dble_num_C=tmp_norm
                call double_to_table(table_putone, vec_names(j), dble_num_C)
             END DO
@@ -2377,7 +2389,8 @@ CONTAINS
       call double_to_table(table_puttab, 'turn ', dble_num_C)   ! the number of the current turn
       do j = 1, 6
          tmp=zero
-         IF (j.LE.icase_ptc) tmp = orbit(j) - orbit0(j)
+         !IF (j.LE.icase_ptc) tmp = orbit(j) - orbit0(j)
+         tmp = orbit(j) - orbit0(j)
          tmp_coord_array(j)=tmp ! make array of coordinates
          X_PTC(j)=tmp
       end do
@@ -2394,12 +2407,12 @@ CONTAINS
       do j = 1, 6
          IF (closed_orbit .AND. NORM_OUT) THEN
             tmp_norm=zero
-            IF (j.LE.icase_ptc) tmp_norm=X_MAD(j)
+            tmp_norm=X_MAD(j)
                                                              dble_num_C=tmp_norm
             call double_to_table(table_puttab, vec_names(j), dble_num_C)
          ELSE
             tmp=zero
-            IF (j.LE.icase_ptc) tmp = X_MAD(j) ! orbit(j) - orbit0(j)
+            tmp = X_MAD(j) ! orbit(j) - orbit0(j)
                                                              dble_num_C=tmp
             call double_to_table(table_puttab, vec_names(j), dble_num_C)
          END IF
@@ -2809,7 +2822,8 @@ CONTAINS
          X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5);
          if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign         
       elseif(icase_ptc.eq.5) THEN
-         X_MAD(5)=zero; X_MAD(6)=X_PTC(5)
+         X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5)
+         if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
       ENDIF
     END SUBROUTINE Coord_PTC_to_MAD
     !=============================================================================
@@ -2845,8 +2859,8 @@ CONTAINS
 
     integer :: mynd2,nda, flag_index,why(9) ! icase,
     ! integer :: npara ! Global in module
-    REAL (dp) :: d_val(6) !REAL (dp), allocatable :: d_val(:) 
-    !REAL (dp) :: d_val
+
+    REAL (dp) :: d_val(6) 
     INTEGER   :: i_vec, i_comp, ind(6)
 
     !------------------------------------------------------------------------------
