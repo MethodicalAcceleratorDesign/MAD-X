@@ -50,6 +50,7 @@ MODULE madx_ptc_module
      real(dp), dimension(3)   ::  mu
      real(dp), dimension(6)   ::  disp
      real(dp), dimension(3)   ::  tune
+     real(dp), dimension(6,6) ::  eigen
   end type twiss
 
   interface assignment (=)
@@ -1260,7 +1261,8 @@ CONTAINS
     subroutine puttwisstable()
       implicit none
       include 'twissa.fi'
-      real(kind(1d0))   :: opt_fun(36)
+      integer i1,i2,ii
+      real(kind(1d0))   :: opt_fun(72)
       real(dp)   :: deltae
       type(work) :: cfen !current fibre energy
 
@@ -1345,10 +1347,17 @@ CONTAINS
       opt_fun(34)=tw%disp(4) * deltae
       opt_fun(35)=tw%disp(5) * deltae
       opt_fun(36)=tw%disp(6) * deltae
+      ii=37
+      do i1=1,nd2
+         do i2=1,nd2
+            opt_fun(ii)=tw%eigen(i1,i2) * deltae
+            ii=ii+1
+         enddo
+      enddo
 
       if (getdebug() > 9)   write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
 
-      ioptfun=36
+      ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
       write(20,'(a,13(f9.6))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),&
@@ -2193,6 +2202,7 @@ CONTAINS
        s1%mu(:)=zero
        s1%disp(:)=zero
        s1%tune(:)=zero
+       s1%eigen(:,:)=zero
        dicu(:)=zero
        angp(:,:)=zero
     endif
@@ -2205,7 +2215,8 @@ CONTAINS
     implicit none
     type(twiss), intent(inout)::s1
     type(real_8), intent(in)::s2(ndd)
-    integer i,j,j1,ii,ii1,ii2,iii,i2,i3
+    integer i,j,j1,ii,ii1,ii2,iii,i2,i3,i1
+    integer ind(6)
     real(dp) au(6,6),aui(2),sx,cx,dphi(3)
     character(len=nd2), dimension(:), pointer :: string
 
@@ -2255,10 +2266,12 @@ CONTAINS
           s1%disp(ii)=rdd(ii,1)*dicu(1)+rdd(ii,2)*dicu(2)+rdd(ii,3)*dicu(3)+rdd(ii,4)*dicu(4)+rdd(ii,5)
        enddo
     endif
+
     if(nd.eq.3) then
        !       call daprint(s1%junk,6)
        s1%junk1=s1%junk**(-1)
     endif
+    ind(:)=0
     do j=1,nd
        ii=2*j
        ii1=ii-1
@@ -2276,6 +2289,13 @@ CONTAINS
           ii2=ii-1
        endif
 
+       do i2=1,nd2
+          ind(i2)=1
+          s1%eigen(ii1,i2)=s1%junk%V(ii1).sub.ind
+          s1%eigen(ii,i2)=s1%junk%V(ii).sub.ind
+          ind(i2)=0
+       enddo
+    
        angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
        au(ii,ii-1)=s1%junk%v(ii2).sub.string(ii-1)
        angp(1,ii)=s1%junk%v(ii1).sub.string(ii)
@@ -2359,6 +2379,7 @@ CONTAINS
     s1%mu(:)=zero
     s1%disp(:)=zero
     s1%tune(:)=zero
+    s1%eigen(:,:)=zero
 
   end subroutine killtwiss
   !_________________________________________________________________
