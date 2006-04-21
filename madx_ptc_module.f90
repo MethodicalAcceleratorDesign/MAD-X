@@ -49,6 +49,7 @@ MODULE madx_ptc_module
      real(dp), dimension(3)   ::  mu
      real(dp), dimension(6)   ::  disp
      real(dp), dimension(3)   ::  tune
+     real(dp), dimension(6,6) ::  eigen
   end type twiss
 
   interface assignment (=)
@@ -150,7 +151,8 @@ CONTAINS
     real(dp) gamma,gammatr,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt
-    real(kind(1d0)) get_value,node_value
+    REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
+    real(kind(1d0)) get_value,node_value,gammatr
     character(length) name
     character(name_len) aptype
     type(keywords) key
@@ -161,6 +163,7 @@ CONTAINS
     integer             model
     integer             method0,method1
     integer             nst0,nst1
+    REAL (dp) :: tempdp
     !---------------------------------------------------------------
     if (getdebug() > 1) then
        print *, '--------------------------------------------------------------'
@@ -438,14 +441,20 @@ CONTAINS
           goto 100
        endif
        key%magnet="rbend"
-       key%list%b0=node_value('angle ')
-       !     key%list%k(1)=node_value('k0 ')
-       key%list%k(2)=node_value('k1 ')
-       key%list%k(3)=node_value('k2 ')
-       !     key%list%k(3)=node_value('k2 ')
-       !     key%list%ks(1)=node_value('k0s ')
-       !     key%list%ks(2)=node_value('k1s ')
-       !     key%list%ks(3)=node_value('k2s ')
+           !VK
+           CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+
+          tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
+          key%list%b0=node_value('angle ')+tempdp*l
+
+          key%list%k(2)=node_value('k1 ')+ key%list%k(2) 
+          key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
+          key%list%k(4)=node_value('k3 ')+ key%list%k(4)
+
+          key%list%ks(2)=node_value('k1s ')+ key%list%ks(2) 
+          key%list%ks(3)=node_value('k2s ')+ key%list%ks(3) 
+          key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+ 
        ! Gymnastic needed since PTC expects MAD8 convention
        key%list%t1=node_value('e1 ')-node_value('angle ')/two
        key%list%t2=node_value('e2 ')-node_value('angle ')/two
@@ -471,15 +480,27 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
+          if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)       
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
        if(l.eq.zero) then
           key%magnet="marker"
           goto 100
        endif
        key%magnet="sbend"
-       key%list%b0=node_value('angle ')
-       key%list%k(2)=node_value('k1 ')
-       key%list%k(3)=node_value('k2 ')
+           !VK
+           CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+
+          tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
+          key%list%b0=node_value('angle ')+ tempdp*l
+
+          key%list%k(2)=node_value('k1 ')+ key%list%k(2) 
+          key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
+          key%list%k(4)=node_value('k3 ')+ key%list%k(4)
+
+          key%list%ks(2)=node_value('k1s ')+ key%list%ks(2) 
+          key%list%ks(3)=node_value('k2s ')+ key%list%ks(3) 
+          key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+ 
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
@@ -504,8 +525,11 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-    case(5) ! PTC accepts mults
-!       if (getdebug() > 2)  print *, 'This is a quadrupole'
+          if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
+
+    case(987) ! keeping old code 
+    !case(5) ! PTC accepts mults
+       if (getdebug() > 9)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
@@ -529,54 +553,120 @@ CONTAINS
        if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
        key%list%k(2)=sk1
        key%tiltd=node_value('tilt ')+tilt
+
+   !================================================================
+   ! QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real;
+   case(5) ! PTC accepts mults
+       if (getdebug() > 9)  print *, 'This is a quadrupole'
+       key%magnet="quadrupole"
+
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+       ! Read data & fill %k(:), %ks(:) arrays which are 
+       ! summs of multipoles and errors
+
+       ! quadrupole components 
+       sk1=node_value('k1 ')
+       sk1s=node_value('k1s ')
+
+       ! A sum of quadrupole components from K1 & K1S and ========!
+       ! from multipoles on the bench (without errors) defines    !
+       ! a tilt angle of normal Q                                 !
+       if(l.ne.0) then                                            !
+         !sk1 = sk1 +  normal(1)/l                                !
+          sk1 = sk1 +  normal_0123(1)                             !
+         !sk1s = sk1s + skew(1)/l                                 !
+          sk1s = sk1s + skew_0123(1)                              !
+       endif                                                      !
+       if (sk1s .eq. zero)  then                                  !
+          tilt = zero                                             !
+       else                                                       !
+          tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two          !
+       endif                                                      ! 
+                                                                  !
+       if(l.ne.0) then                                            !
+         !sk1  = sk1  + field(1,1)/l                              !
+          sk1  = sk1  + (key%list%k(2)-normal_0123(1))            !
+         !sk1s = sk1s + field(2,1)/l                              !
+          sk1s = sk1s + (key%list%ks(2)-skew_0123(1))             !
+       endif                                                      !
+                                                                  !
+       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
+       key%list%k(2)=sk1                                          !
+       key%list%ks(2)=zero  ! added by VK                         !       
+       key%tiltd=node_value('tilt ')+tilt  !======================!
+
+   !================================================================
+
     case(6)
        key%magnet="sextupole"
-       call dzero(f_errors,maxferr+1)
-       n_ferr = node_fd_errors(f_errors)
-       do i = 0, 2
-          do j = 1, 2
-             field(j,i) = zero
-          enddo
-       enddo
-       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
+
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) !VK
+
        sk2=node_value('k2 ')
        sk2s=node_value('k2s ')
-       if (sk2s .eq. zero)  then
-          tilt = zero
-       else
-          tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three
-       endif
-       if(l.ne.0) then
-          sk2 = sk2 + field(1,2)/l
-          sk2s = sk2s + field(2,2)/l
-       endif
-       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)
-       key%list%k(3)=sk2
-       key%tiltd=node_value('tilt ')+tilt
+
+       ! A sum of sextupole components from K2 & K2S and  ========!
+       ! from multipoles on the bench (without errors) defines    !
+       ! a tilt angle of normal Sextupole                         !
+       if(l.ne.0) then                                            !
+         !sk2 = sk2 +  normal(2)/l                                !
+          sk2 = sk2 +  normal_0123(2)                             !
+         !sk2s = sk2s + skew(2)/l                                 !
+          sk2s = sk2s + skew_0123(2)                              !
+       endif                                                      !
+       !                                                          !
+       if (sk2s .eq. zero)  then                                  !
+          tilt = zero                                             !
+       else                                                       !
+          tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three        !
+       endif                                                      !
+       !                                                          !
+       if(l.ne.0) then                                            !
+         !sk2  = sk2 + field(1,2)/l                               !
+          sk2  = sk2 + (key%list%k(3)-normal_0123(2))             !
+         !sk2s = sk2s + field(2,2)/l                              !
+          sk2s = sk2s + (key%list%ks(3)-skew_0123(2))             !
+       endif                                                      !
+       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           ! 
+       key%list%k(3)=sk2                                          !
+       key%list%ks(3)=zero  ! added by VK                         ! 
+       key%tiltd=node_value('tilt ')+tilt !-----------------------!
+
     case(7) ! PTC accepts mults
        key%magnet="octupole"
-       call dzero(f_errors,maxferr+1)
-       n_ferr = node_fd_errors(f_errors)
-       do i = 0, 3
-          do j = 1, 2
-             field(j,i) = zero
-          enddo
-       enddo
-       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(8,n_ferr))
+
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) !VK
+
        sk3=node_value('k3 ')
        sk3s=node_value('k3s ')
-       if (sk3s .eq. zero)  then
-          tilt = zero
-       else
-          tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four
-       endif
-       if(l.ne.0) then
-          sk3 = sk3 + field(1,3)/l
-          sk3s = sk3s + field(2,3)/l
-       endif
-       if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)
-       key%list%k(4)=sk3
-       key%tiltd=node_value('tilt ')+tilt
+
+       ! A sum of octupole components from K3 & K3S and ==========!
+       ! from multipoles on the bench (without errors) defines    !
+       ! a tilt angle of normal Octupole                          !
+       if(l.ne.0) then                                            !
+         !sk3 = sk3 +  normal(3)/l                                !
+          sk3 = sk3 +  normal_0123(3)                             !
+         !sk3s = sk3s + skew(3)/l                                 !
+          sk3s = sk3s + skew_0123(3)                              !
+       endif                                                      !
+       !                                                          !
+       if (sk3s .eq. zero)  then                                  !
+          tilt = zero                                             !
+       else                                                       !
+          tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four         !
+       endif                                                      !
+       !                                                          !
+       if(l.ne.0) then                                            !
+         !sk3 = sk3 + field(1,3)/l                                !
+          sk3 = sk3 + (key%list%k(4)-normal_0123(3))              !
+         !sk3s = sk3s + field(2,3)/l                              !
+          sk3s = sk3s + (key%list%ks(3)-skew_0123(3))             !
+       endif                                                      !
+       if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
+       key%list%k(4)=sk3                                          !
+       key%list%ks(4)=zero  ! added by VK                         ! 
+       key%tiltd=node_value('tilt ')+tilt !-----------------------!
+
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
@@ -619,6 +709,8 @@ CONTAINS
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
        key%list%bsol=node_value('ks ')
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) !VK
+
     case(10)
        key%magnet="rfcavity"
        key%list%volt=node_value('volt ')
@@ -755,9 +847,81 @@ CONTAINS
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
 
-
   END subroutine ptc_input
   !_________________________________________________________________
+
+  SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123)
+  ! 1) read multipole coeff. and errors for a current thick element
+  ! 2) fill the error and multiploes arrays of data-bases
+    include 'twtrr.fi' ! integer, maxmul,maxferr,maxnaper
+    REAL(dp), INTENT(IN) :: l
+    type(keywords), INTENT(OUT) ::  key    
+    REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;     
+    REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
+                f_errors(0:50), field(2,0:maxmul)
+    INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
+    INTEGER :: node_fd_errors ! function
+    integer :: i_count, n_dim_mult_err
+
+           ! real(dp) f_errors(0:50),normal(0:maxmul),skew(0:maxmul)
+       ! Get multipole components on bench !-----------------------!
+       call dzero(normal,maxmul+1) ! make zero "normal"            !                     
+       call dzero(skew,maxmul+1)   ! make zero "skew"              !
+                                                                   !
+       ! madxdict.h: "knl = [r, {0}], "                            !
+       !             "ksl = [r, {0}], "                            !
+       ! Assign values from the command line                       !
+       call get_node_vector('knl ',n_norm,normal)                  !    
+       call get_node_vector('ksl ',n_skew,skew)                    !
+       ! void get_node_vector(char*par,int*length,double* vector)  !
+       ! /* returns vector for parameter par of current element */ !
+                                                                   !
+       ! get errors                                                !
+       call dzero(f_errors,maxferr+1)                              !
+       n_ferr = node_fd_errors(f_errors) !                         !
+                ! /* returns the field errors of a node */         !
+       call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
+       if (n_ferr .gt. 0) then                                     !
+          call dcopy(f_errors,field,n_ferr)                        !
+            ! subroutine dcopy(in,out,n)                           !
+            ! Purpose:   Copy arrays.                              !
+       endif                                                       !
+       !-----------------------------------------------------------!
+ 
+       ! fill strength of ALL normal multipoles
+       if(n_norm.gt.0) then  ! ========================!
+          do i_count=0,n_norm                          !
+             if(i_count.gt.0) &                        !
+             key%list%k(i_count+1)=normal(i_count)/l   !
+             if (i_count.le.3) &                       !
+               normal_0123(i_count)=normal(i_count)/l  !
+          enddo                                        !
+       endif !=========================================!
+
+       ! fill strength of ALL skew multipoles
+       if(n_skew.gt.0) then !==========================! 
+          do i_count=0,n_skew                          !
+             if(i_count.gt.0) &                        !
+             key%list%ks(i_count+1)=skew(i_count)/l    !
+             if (i_count.le.3) &                       !
+               skew_0123(i_count)=skew(i_count)/l      !
+          enddo                                        !
+       endif !=========================================!   
+ 
+       n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !========!
+       if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1    !
+       if(n_ferr.gt.0) then                                    !
+          do i_count=0,n_dim_mult_err                          !
+            key%list%k(i_count+1)=key%list%k(i_count+1)+ &     !
+                                      field(1,i_count)/l       !
+            key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &   !
+                                      field(2,i_count)/l       !
+          enddo                                                !
+       endif !=================================================!
+
+  END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
+  !----------------------------------------------------------------
+
 
   subroutine ptc_align()
     implicit none
@@ -978,10 +1142,10 @@ CONTAINS
     initial_matrix_table = get_value('ptc_twiss ','initial_matrix_table ') .ne. 0
 
     if(initial_matrix_table) then
-       k = double_from_table("map_table ", "nv ", 1, d_val)
+       k = double_from_table("map_table ", "nv ", 1, doublenum)
        if(k.ne.-1) then
           call liepeek(iia,icoast)
-          my_nv=int(d_val)
+          my_nv=int(doublenum)
           nv_min=min(iia(2),my_nv)
        else
           initial_matrix_table=.false.
@@ -1100,7 +1264,8 @@ CONTAINS
     subroutine puttwisstable()
       implicit none
       include 'twissa.fi'
-      real(dp)   :: opt_fun(36)
+      integer i1,i2,ii
+      real(kind(1d0))   :: opt_fun(72)
       real(dp)   :: deltae
       type(work) :: cfen !current fibre energy
 
@@ -1185,13 +1350,20 @@ CONTAINS
       opt_fun(34)=tw%disp(4) * deltae
       opt_fun(35)=tw%disp(5) * deltae
       opt_fun(36)=tw%disp(6) * deltae
+      ii=37
+      do i1=1,nd2
+         do i2=1,nd2
+            opt_fun(ii)=tw%eigen(i1,i2) * deltae
+            ii=ii+1
+         enddo
+      enddo
 
       if (getdebug() > 2)  then
         write(6,'(a16,4f12.3)') 'b11,b12,b21,b22: ',&
              &opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
       endif
-      
-      ioptfun=36
+
+      ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
       write(20,'(a,13(f9.6))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),&
@@ -1414,13 +1586,13 @@ CONTAINS
     double_from_ptc = y(j)%t.sub.ind
   END FUNCTION double_from_ptc
 
-  FUNCTION double_from_ptc_normal(name_var,row)
+  FUNCTION double_from_ptc_normal(name_var,row,icase)
     USE ptc_results
     implicit none
-    logical name_l
-    integer row
+    logical(lp) name_l
+    integer,intent(IN) ::  row,icase
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
-    integer idx
+    integer idx,ii,i1,i2
     integer j,k,ind(6)
     integer double_from_table
     character(len = 4)  name_var
@@ -1433,32 +1605,24 @@ CONTAINS
     name_var1 = name_var
     SELECT CASE (name_var1)
     CASE ("dx")
-       do j = 1,4
-          ind(j) = 0
-       enddo
-       k = double_from_table("normal_results ", "order1 ", row, d_val)
-       ind(5) = int(d_val)
+       ind(:)=0
+       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       ind(5) = int(doublenum)
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
        d_val = n%A1%V(1).sub.ind
     CASE ('dy')
-       do j = 1,4
-          ind(j) = 0
-       enddo
-       k = double_from_table("normal_results ", "order1 ", row, d_val)
-       ind(5) = int(d_val)
+       ind(:)=0
+       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       ind(5) = int(doublenum)
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
        d_val = n%A1%V(3).sub.ind
     CASE ('q1')
-       do j = 1,6
-          ind(j) = 0
-       enddo
+       ind(:)=0
        d_val = n%dhdj%V(3).sub.ind
     CASE ('q2')
-       do j = 1,6
-          ind(j) = 0
-       enddo
+       ind(:)=0
        d_val = n%dhdj%V(4).sub.ind
     CASE DEFAULT
        name_l = .true.
@@ -1468,38 +1632,30 @@ CONTAINS
        name_var2 = name_var
        SELECT CASE (name_var2)
        CASE ('dpx')
-          do j = 1,4
-             ind(j) = 0
-          enddo
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(5) = int(d_val)
+          ind(:)=0
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(2).sub.ind
        CASE ('dpy')
-          do j = 1,4
-             ind(j) = 0
-          enddo
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(5) = int(d_val)
+          ind(:)=0
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(4).sub.ind
        CASE ('dq1')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          do j = 1,4
-             ind(j) = 0
-          enddo
-          ind(5) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(:)=0
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
        CASE ('dq2')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          do j = 1,6
-             ind(j) = 0
-          enddo
-          ind(5) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(:)=0
+          ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%dhdj%V(4).sub.ind
@@ -1510,68 +1666,68 @@ CONTAINS
     if (name_l) then
        SELECT CASE (name_var)
        CASE ('anhx')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
           do j = 1,2
-             ind(j) =  int(d_val)
+             ind(j) =  int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
           do j = 3,4
-             ind(j) = int(d_val)
+             ind(j) = int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(5) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(5) = int(doublenum)
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
        CASE ('anhy')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
           do j = 1,2
-             ind(j) = int(d_val)
+             ind(j) = int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
           do j = 3,4
-             ind(j) = int(d_val)
+             ind(j) = int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(5) = int(d_val)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(5) = int(doublenum)
           ind(6) = 0
           d_val = n%dhdj%V(4).sub.ind
        CASE ('hamc')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(1) = int(d_val)
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
-          ind(2) = int(d_val)
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(3) = int(d_val)
-          k = double_from_table("normal_results ", "order4 ", row, d_val)
-          ind(4) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrh%cos%h.sub.ind
           double_from_ptc_normal = d_val
           RETURN
        CASE ('hams')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(1) = int(d_val)
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
-          ind(2) = int(d_val)
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(3) = int(d_val)
-          k = double_from_table("normal_results ", "order4 ", row, d_val)
-          ind(4) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrh%sin%h.sub.ind
           double_from_ptc_normal = d_val
           RETURN
        CASE ('hama')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(1) = int(d_val)
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
-          ind(2) = int(d_val)
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(3) = int(d_val)
-          k = double_from_table("normal_results ", "order4 ", row, d_val)
-          ind(4) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val1 = pbrh%cos%h.sub.ind
@@ -1582,42 +1738,42 @@ CONTAINS
           double_from_ptc_normal = 0.0D0
           RETURN
        CASE ('gnfc')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(1) = int(d_val)
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
-          ind(2) = int(d_val)
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(3) = int(d_val)
-          k = double_from_table("normal_results ", "order4 ", row, d_val)
-          ind(4) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrg%cos%h.sub.ind
           double_from_ptc_normal = d_val
           RETURN
        CASE ('gnfs')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(1) = int(d_val)
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
-          ind(2) = int(d_val)
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(3) = int(d_val)
-          k = double_from_table("normal_results ", "order4 ", row, d_val)
-          ind(4) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val = pbrg%sin%h.sub.ind
           double_from_ptc_normal = d_val
           RETURN
        CASE ('gnfa')
-          k = double_from_table("normal_results ", "order1 ", row, d_val)
-          ind(1) = int(d_val)
-          k = double_from_table("normal_results ", "order2 ", row, d_val)
-          ind(2) = int(d_val)
-          k = double_from_table("normal_results ", "order3 ", row, d_val)
-          ind(3) = int(d_val)
-          k = double_from_table("normal_results ", "order4 ", row, d_val)
-          ind(4) = int(d_val)
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
           d_val1 = pbrg%cos%h.sub.ind
@@ -1626,6 +1782,18 @@ CONTAINS
           RETURN
        CASE ('gnfu')
           double_from_ptc_normal = 0.0D0
+          RETURN
+       CASE ('eign')
+          ii=(icase/2)*2
+          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          i1 = int(doublenum) 
+          if(i1.gt.ii) call aafail('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
+          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          i2 = int(doublenum)
+          if(i2.gt.ii) call aafail('return from double_from_ptc_normal: ',' eigenvectors too many components')
+          ind(:)=0
+          ind(i2)=1
+          double_from_ptc_normal = n%A_t%V(i1).sub.ind
           RETURN
        CASE DEFAULT
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
@@ -1653,20 +1821,19 @@ CONTAINS
     character(len = 4) name_var
     integer row,k
     integer :: ord(3)
-    real(dp) d_val
 
     print *,"Variable name  Order 1  order 2  order 3        Value      "
     do row = 1 , select_ptc_idx()
        name_var=" "
        k = string_from_table("normal_results ", "name ", row, name_var)
-       k = double_from_table("normal_results ", "order1 ", row, d_val)
-       ord(1) = int(d_val)
-       k = double_from_table("normal_results ", "order2 ", row, d_val)
-       ord(2) = int(d_val)
-       k = double_from_table("normal_results ", "order3 ", row, d_val)
-       ord(3) = int(d_val)
-       k = double_from_table("normal_results ", "value ", row, d_val)
-       WRITE(*,100) name_var,ord(1),ord(2),ord(3),d_val
+       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       ord(1) = int(doublenum)
+       k = double_from_table("normal_results ", "order2 ", row, doublenum)
+       ord(2) = int(doublenum)
+       k = double_from_table("normal_results ", "order3 ", row, doublenum)
+       ord(3) = int(doublenum)
+       k = double_from_table("normal_results ", "value ", row, doublenum)
+       WRITE(*,100) name_var,ord(1),ord(2),ord(3),doublenum
     enddo
 100 FORMAT(3X,A4,14X,I1,8X,I1,8X,I1,5X,f25.18)
   END SUBROUTINE display_table_results
@@ -1689,10 +1856,9 @@ CONTAINS
     integer :: ord(3), indexa(4)
     integer :: row_haml(101)
     integer :: index1(1000,2)
-    real(dp) val_ptc,d_val,coef
-    real(kind(1d0)) get_value
+    real(dp) coef
+    real(kind(1d0)) get_value,val_ptc,map_coor(i_map_coor)
     character(len = 4) name_var
-
     !------------------------------------------------------------------------------
 
     if(universe.le.0) then
@@ -1740,10 +1906,10 @@ CONTAINS
        return
     endif
     c_%watch_user=.false.
-    call daprint(y,18)
+    if (getdebug()>1) call daprint(y,18)
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
-    if(no.eq.1.and.maptable) then
+    if(maptable) then
        map_term=42
        call  make_map_table(map_term)
        call liepeek(iia,icoast)
@@ -1813,19 +1979,19 @@ CONTAINS
              call alloc(pbrh)
              do j1 =1,n_haml
                 row = row_haml(j1)
-                k = double_from_table("normal_results ", "value ", row, d_val)
-                mynres = int(d_val)
+                k = double_from_table("normal_results ", "value ", row, doublenum)
+                mynres = int(doublenum)
                 row = row_haml(j1) - 3*mynres + 2
                 starti = 1
                 if (j1 .eq. 1) then
-                   k = double_from_table("normal_results ", "order1 ", row, d_val)
-                   indexa(1) = int(d_val)
-                   k = double_from_table("normal_results ", "order2 ", row, d_val)
-                   indexa(2) = int(d_val)
-                   k = double_from_table("normal_results ", "order3 ", row, d_val)
-                   indexa(3) = int(d_val)
-                   k = double_from_table("normal_results ", "order4 ", row, d_val)
-                   indexa(4) = int(d_val)
+                   k = double_from_table("normal_results ", "order1 ", row, doublenum)
+                   indexa(1) = int(doublenum)
+                   k = double_from_table("normal_results ", "order2 ", row, doublenum)
+                   indexa(2) = int(doublenum)
+                   k = double_from_table("normal_results ", "order3 ", row, doublenum)
+                   indexa(3) = int(doublenum)
+                   k = double_from_table("normal_results ", "order4 ", row, doublenum)
+                   indexa(4) = int(doublenum)
                    index1(1,1) = indexa(1) - indexa(2)
                    index1(1,2) = indexa(3) - indexa(4)
                    n%m(1,1)= index1(1,1)
@@ -1839,14 +2005,14 @@ CONTAINS
                 if (mynres .ge. starti) then
                    do i = starti,mynres
                       ii = row + 3*(i-1)
-                      k = double_from_table("normal_results ", "order1 ", ii, d_val)
-                      indexa(1) = int(d_val)
-                      k = double_from_table("normal_results ", "order2 ", ii, d_val)
-                      indexa(2) = int(d_val)
-                      k = double_from_table("normal_results ", "order3 ", ii, d_val)
-                      indexa(3) = int(d_val)
-                      k = double_from_table("normal_results ", "order4 ", ii, d_val)
-                      indexa(4) = int(d_val)
+                      k = double_from_table("normal_results ", "order1 ", ii, doublenum)
+                      indexa(1) = int(doublenum)
+                      k = double_from_table("normal_results ", "order2 ", ii, doublenum)
+                      indexa(2) = int(doublenum)
+                      k = double_from_table("normal_results ", "order3 ", ii, doublenum)
+                      indexa(3) = int(doublenum)
+                      k = double_from_table("normal_results ", "order4 ", ii, doublenum)
+                      indexa(4) = int(doublenum)
                       n1 = indexa(1) - indexa(2)
                       n2 = indexa(3) - indexa(4)
                       do l = 1,nres
@@ -1871,7 +2037,7 @@ CONTAINS
        if (n_gnfu > 0) pbrg = n%a%pb
        if (n_haml > 0) pbrh = n%normal%pb
        write(19,'(/a/)') 'Dispersion, First and Higher Orders'
-       call daprint(n%A1,19)
+       if (getdebug()>1) call daprint(n%A1,19)
 
        !------ get values and store them in the table 'normal_results' ---------
 
@@ -1884,11 +2050,12 @@ CONTAINS
           print *,"ptc_normal failed. MAD-X continues."
           stop
        endif
+       
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
              k = string_from_table("normal_results ", "name ", row, name_var)
-             val_ptc = double_from_ptc_normal(name_var,row)
+             val_ptc = double_from_ptc_normal(name_var,row,icase)
              if (name_var .ne. 'haml'.and.name_var .ne. 'gnfu')    &
                   call double_to_table_row("normal_results ", "value ", row, val_ptc)
           enddo
@@ -1900,7 +2067,7 @@ CONTAINS
        !  call daprint(n%A_t,19)
        !  call daprint(n%A,19)
 
-       call daprint(n%dhdj,19)
+       if (getdebug()>1) call daprint(n%dhdj,19)
 
        !       call daprint(pbrh,19)
        if (n_gnfu > 0) call kill(pbrg)
@@ -2037,6 +2204,7 @@ CONTAINS
        s1%mu(:)=zero
        s1%disp(:)=zero
        s1%tune(:)=zero
+       s1%eigen(:,:)=zero
        dicu(:)=zero
        angp(:,:)=zero
     endif
@@ -2049,7 +2217,8 @@ CONTAINS
     implicit none
     type(twiss), intent(inout)::s1
     type(real_8), intent(in)::s2(ndd)
-    integer i,j,j1,ii,ii1,ii2,iii,i2,i3
+    integer i,j,j1,ii,ii1,ii2,iii,i2,i3,i1
+    integer ind(6)
     real(dp) au(6,6),aui(2),sx,cx,dphi(3)
     character(len=nd2), dimension(:), pointer :: string
 
@@ -2099,10 +2268,12 @@ CONTAINS
           s1%disp(ii)=rdd(ii,1)*dicu(1)+rdd(ii,2)*dicu(2)+rdd(ii,3)*dicu(3)+rdd(ii,4)*dicu(4)+rdd(ii,5)
        enddo
     endif
+
     if(nd.eq.3) then
        !       call daprint(s1%junk,6)
        s1%junk1=s1%junk**(-1)
     endif
+    ind(:)=0
     do j=1,nd
        ii=2*j
        ii1=ii-1
@@ -2119,7 +2290,14 @@ CONTAINS
           ii1=ii
           ii2=ii-1
        endif
-       
+
+       do i2=1,nd2
+          ind(i2)=1
+          s1%eigen(ii1,i2)=s1%junk%V(ii1).sub.ind
+          s1%eigen(ii,i2)=s1%junk%V(ii).sub.ind
+          ind(i2)=0
+       enddo
+    
        angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
        au(ii,ii-1)=s1%junk%v(ii2).sub.string(ii-1)
        angp(1,ii)=s1%junk%v(ii1).sub.string(ii)
@@ -2204,6 +2382,7 @@ CONTAINS
     s1%mu(:)=zero
     s1%disp(:)=zero
     s1%tune(:)=zero
+    s1%eigen(:,:)=zero
 
   end subroutine killtwiss
   !_________________________________________________________________
@@ -2406,7 +2585,7 @@ CONTAINS
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug() > 0) call print(default,6)
+    if (getdebug()>0) call print(default,6)
 
     icase = i
 

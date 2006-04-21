@@ -1058,8 +1058,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.02.16-NEWMATCH";
-char code_mod_date[] = "Code Modification Date: 14.04.2006";
+char myversion[] = "MAD-X 3.02.25-NEWMATCH";
+char code_mod_date[] = "Code Modification Date: 21.04.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
@@ -1204,11 +1204,7 @@ char          line[LINE_MAX],
 time_t last_time;
 time_t start_time;
 
-/* end of definitions */
-
-
 /*Piotr Skowronski (CERN)*/
-
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
@@ -1217,7 +1213,6 @@ double** trackstrarpositions = 0x0;/* two dimensional array with track positions
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
 void deletetrackstrarpositions();
-
 
 /*Riccardo de Maria (CERN)*/
 void match2_match(struct in_cmd*);
@@ -1234,3 +1229,6 @@ char match2_cons_sign[10][30];
 int match2_cons_curr[3];
 struct expression* match2_cons_rhs[10][30];
 struct expression* match2_cons_lhs[10][30];
+
+/* end of definitions */
+

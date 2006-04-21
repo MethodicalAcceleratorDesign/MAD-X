@@ -1,3 +1,4 @@
+
 /* preparation of Touschek */
 /* defined constants for word lengths etc. */
 #define ALIGN_MAX 14        /* alignment error array length */
@@ -6,7 +7,8 @@
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 24           /* internal name length */
 #define TITLE_SIZE 114      /* Size of the title for gnuplot ploting in tracking mode (ETDA 24/06/2004) */
-#define PTC_NAMES_L 12      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004)(FRS 06/12/2005) */
+#define PTC_NAMES_L 13      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004)(FRS 06/12/2005) (FRS/VK 20/04/2006) */
+#define MAX_ROWS 101        /* Initial size of ptc_normal table */
 #define FNAME_L 240         /* for file names */
 #define FREECODE 380226     /* check-code to avoid multiple "free" */
 #ifdef _MEM_LEAKS
@@ -181,14 +183,12 @@ int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 3,
-  2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
   2, 2, 2,
   2, 2, 2,
   2, 2, 2,
@@ -201,6 +201,12 @@ int twiss_table_types[] =
   2, 2, 2,
   2, 2, 2,
   2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
   2
 };
 
@@ -219,14 +225,12 @@ char* twiss_table_cols[] =
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
   "k9sl", "k10l", "k10sl", "ks", "hkick",
   "vkick", "tilt", "parent",
-  "re11", "re12", "re13", "re14", "re15",
-  "re16", "re21", "re22", "re23", "re24",
-  "re25", "re26", "re31", "re32", "re33",
-  "re34", "re35", "re36", "re41", "re42",
-  "re43", "re44", "re45", "re46", "re51",
-  "re52", "re53", "re54", "re55", "re56",
-  "re61", "re62", "re63", "re64", "re65",
-  "re66",
+  "re11", "re12", "re13", "re14", "re15", "re16", 
+  "re21", "re22", "re23", "re24", "re25", "re26",
+  "re31", "re32", "re33", "re34", "re35", "re36",
+  "re41", "re42", "re43", "re44", "re45", "re46",
+  "re51", "re52", "re53", "re54", "re55", "re56",
+  "re61", "re62", "re63", "re64", "re65", "re66",
   "beta11", "beta12", "beta13",
   "beta21", "beta22", "beta23",
   "beta31", "beta32", "beta33",
@@ -239,6 +243,12 @@ char* twiss_table_cols[] =
   "mu1", "mu2", "mu3",
   "disp1", "disp2", "disp3",
   "disp4", "disp5", "disp6",
+  "eign11", "eign12", "eign13", "eign14", "eign15", "eign16", 
+  "eign21", "eign22", "eign23", "eign24", "eign25", "eign26", 
+  "eign31", "eign32", "eign33", "eign34", "eign35", "eign36", 
+  "eign41", "eign42", "eign43", "eign44", "eign45", "eign46", 
+  "eign51", "eign52", "eign53", "eign54", "eign55", "eign56",
+  "eign61", "eign62", "eign63", "eign64", "eign65", "eign66",
   "n1",
   " "  /* blank terminates */
 };
@@ -454,3 +464,8 @@ char* dynaptune_table_cols[] =
   " "  /* blank terminates */
 };
 
+/* Definition of "select_ptc_normal" parameters for "ptc_normal" FS/VK 20.04.2006*/
+char names[PTC_NAMES_L][5]=
+{
+  "dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu","eign"
+};
