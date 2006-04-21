@@ -243,12 +243,12 @@ char* twiss_table_cols[] =
   "mu1", "mu2", "mu3",
   "disp1", "disp2", "disp3",
   "disp4", "disp5", "disp6",
-  "eigen11", "eigen12", "eigen13", "eigen14", "eigen15", "eigen16", 
-  "eigen21", "eigen22", "eigen23", "eigen24", "eigen25", "eigen26", 
-  "eigen31", "eigen32", "eigen33", "eigen34", "eigen35", "eigen36", 
-  "eigen41", "eigen42", "eigen43", "eigen44", "eigen45", "eigen46", 
-  "eigen51", "eigen52", "eigen53", "eigen54", "eigen55", "eigen56",
-  "eigen61", "eigen62", "eigen63", "eigen64", "eigen65", "eigen66",
+  "eign11", "eign12", "eign13", "eign14", "eign15", "eign16", 
+  "eign21", "eign22", "eign23", "eign24", "eign25", "eign26", 
+  "eign31", "eign32", "eign33", "eign34", "eign35", "eign36", 
+  "eign41", "eign42", "eign43", "eign44", "eign45", "eign46", 
+  "eign51", "eign52", "eign53", "eign54", "eign55", "eign56",
+  "eign61", "eign62", "eign63", "eign64", "eign65", "eign66",
   "n1",
   " "  /* blank terminates */
 };

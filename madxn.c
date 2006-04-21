@@ -6673,11 +6673,11 @@ void set_selected_columns(struct table* t, struct command_list* select)
               }
             }
           }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eigen") == 0)
+          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
             {
-              if (strncmp("eigen", t->columns->names[k], 2) == 0)
+              if (strncmp("eign", t->columns->names[k], 2) == 0)
               {
                 if (k <  t->num_cols
                     && int_in_array(k, n, t->col_out->i) == 0)
