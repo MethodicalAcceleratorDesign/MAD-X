@@ -3,9 +3,10 @@ MODULE madx_ptc_track_run_module
   ! It contains variables which exchange data between
   ! SUBROUTINE ptc_track_run and called from it
   ! external subroutines calculating particle interactions
-  USE madx_ptc_module , ONLY: dp, lp, lnv
+  USE madx_ptc_module , ONLY: dp, lp, lnv, &
   !                          ! shorts for <double precision>, <logical>, 0D0 etc.
-  implicit none
+                   doublenum ! am temprorary double number for I/O with C-procedures  
+implicit none
   SAVE
   PRIVATE
 
@@ -88,7 +89,7 @@ MODULE madx_ptc_track_run_module
   CHARACTER(24), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
   !                                                  ! contrary to <character (16)> in c-code
 
-  real(kind(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures 
+  !real(kind(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures 
 
 CONTAINS
 
@@ -760,7 +761,7 @@ CONTAINS
       !                                                                    !
       if(closed_orbit) then !------------------------------------!         !
          call find_orbit(my_ring,x_coord_co,1,default,c_1d_7)    !         !
-         print*,"===== ptc_tack ============================="   !         !
+         print*,"===== ptc_track ============================"   !         !
          CALL write_closed_orbit(icase_ptc,x_coord_co)           !         !
          print*,"============================================"   !         !
       endif  !---------------------------------------------------!         !
@@ -940,12 +941,12 @@ CONTAINS
       do  j_th_particle = 1, & !=====loop over particles ==== ====================!
            j_tot_numb_starting_particles ! => initial number of particles         !
          !                                                                        !
-         dble_num_C = j_th_particle                                               !
-         call double_to_table('tracksumm ', 'number ', dble_num_C)                !
+         doublenum = j_th_particle                                                !
+         call double_to_table('tracksumm ', 'number ', doublenum)                 !
          ! tmp_d = 1 <=  turn=1  in the original 2005 trrun.f                     !
          !                                                                        !
-         dble_num_C=zero ! <=  turn=0  for starting particles                     !
-         call double_to_table('tracksumm ', 'turn ', dble_num_C)                  !
+         doublenum = zero ! <=  turn=0  for starting particles                    !
+         call double_to_table('tracksumm ', 'turn ', doublenum)                   !
          DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
             !tmp_d = z(k_th_coord,j_th_particle) - orbit0(k_th_coord)         !   !
             !z(1:6,1:j_tot) - coordinates                                     !   !
@@ -957,9 +958,9 @@ CONTAINS
          CALL Coord_PTC_to_MAD(X_PTC,X_MAD)                                       !
          !                                                                        !
          DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
-            dble_num_C = X_MAD(k_th_coord)                                    !   !
+            doublenum  = X_MAD(k_th_coord)                                    !   !
             !                                                                 !   !
-           call double_to_table('tracksumm ',vec_names(k_th_coord),dble_num_C)!   !
+           call double_to_table('tracksumm ',vec_names(k_th_coord),doublenum) !   !
             !madxn.c:1385: void                                               !   !
             !double_to_table(char* table,char* name,double* val)              !   !
             ! /* puts val at current position in column                       !   !
@@ -968,12 +969,12 @@ CONTAINS
          enddo !>>>>> END loop over components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!   !
          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C, &                   !
               gamma0I,gambet) ! to get "energy" value                             !
-                                                  dble_num_C=energy               !
-         call double_to_table('tracksumm ', 'e ', dble_num_C)                     !
+                                                  doublenum=energy                !
+         call double_to_table('tracksumm ', 'e ', doublenum)                      !
          !                                                                        !
          !hbu add s                                                               !  
-                                    dble_num_C= spos_current_position             !
-         call double_to_table('tracksumm ',vec_names(7),dble_num_C)               !
+                                    doublenum = spos_current_position             !
+         call double_to_table('tracksumm ',vec_names(7),doublenum)                !
          ! madxd.h:12:#define double_to_table       double_to_table_              !
          ! madxd.h:150:void double_to_table(char*, char*, double*);               !
          ! ???????????????                                                        !
@@ -1596,7 +1597,7 @@ CONTAINS
       INTEGER :: j_part_tmp, turn_final, i_coord
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       REAL (dp) :: X_MAD(6), X_PTC(6)
-
+      sum_length =zero
       turn_final=min(turns,i_th_turn) ! the FORTRAN bad feature:
       ! if DO-loop ends, turn > turns
       debug_Final_Coord: if (ptc_track_debug) then
@@ -1620,7 +1621,7 @@ CONTAINS
          ! remember last turn and position of particles          !
          !                                                       !
          !do j = 1, 6 !>>> loop over coord. components >>>>>>>!  !
-         do i_coord = 1, icase_ptc                            !  !
+          do i_coord = 1, 6! icase_ptc                        !  !
             !last_orbit(j,part_id(i)) = z(j,i)                !  !
             last_orbit_of_lost_particle(i_coord,    &         !  !
                  particle_ID(j_part_tmp))=  &                 !  !
@@ -1712,11 +1713,11 @@ CONTAINS
       !+      do  i          = 1,j_tot !#### loop over all started particles #######!
       do  j_part_tmp = 1,j_tot_numb_starting_particles  !###########################!
          !tmp_d = i ! convert INTEGER to DBLE                                       !
-         dble_num_C = j_part_tmp                                                    !
-         call  double_to_table('tracksumm ', 'number ', dble_num_C)                 !
+         doublenum  = j_part_tmp                                                    !
+         call  double_to_table('tracksumm ', 'number ', doublenum)                  !
          !tmp_d = last_turn(i)                                                      !
-         dble_num_C=last_turn_of_lost_particle(j_part_tmp)                          !
-         call double_to_table('tracksumm ', 'turn ', dble_num_C)                    !
+         doublenum=last_turn_of_lost_particle(j_part_tmp)                           !
+         call double_to_table('tracksumm ', 'turn ', doublenum)                     !
          ! call double_to_table('tracksumm ', 'turn ', tmp_d)                       !
          !                                                                          !
          !do j       = 1, 6 !>>>> loop over coord. components >>>>>>>>>>>>>>>>>!    !
@@ -1729,8 +1730,8 @@ CONTAINS
          CALL Coord_PTC_to_MAD(X_PTC,X_MAD)                                         !
          !                                                                          !
          DO i_coord = 1, 6 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!    !
-            dble_num_C=X_MAD(i_coord)                                          !    !
-            call double_to_table('tracksumm ', vec_names(i_coord), dble_num_C) !    !
+            doublenum = X_MAD(i_coord)                                         !    !
+            call double_to_table('tracksumm ', vec_names(i_coord), doublenum)  !    !
             !call double_to_table('tracksumm ', vec_names(j), tmp_d)           !    !
             !                                                                  !    !
          enddo ! END loop over coord. components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!    !
@@ -1738,14 +1739,14 @@ CONTAINS
          !  spos                  = last_pos(i)                                     !
          spos_current_position = last_position_of_lost_particle(j_part_tmp)         !
          !hbu                                                                       !
-                                                 dble_num_C = spos_current_position !
-         call double_to_table('tracksumm ',vec_names(7),dble_num_C)                 !
+                                                 doublenum = spos_current_position  !
+         call double_to_table('tracksumm ',vec_names(7),doublenum)                  !
          !                                                                          !
          ! to get "energy" value                                                    !
          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
          !                                                                          !
-                                                   dble_num_C= energy               !
-         call double_to_table('tracksumm ', 'e ',  dble_num_C)                      !
+                                                   doublenum= energy                !
+         call double_to_table('tracksumm ', 'e ',  doublenum)                       !
          !                                                                          !
          call augment_count('tracksumm ')                                           !
       enddo !#### loop over all started particles ##################################!
@@ -2287,16 +2288,14 @@ CONTAINS
       write(comment, '(''#segment'',4i8,1X,A)')   &
            &segment,tot_segm,npart,ielem,el_name
       call comment_to_table(table_putone, comment, length)
-      tt = turn
       Call GET_ONE(MASS_GeV,energy,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
       do i = 1, npart
-                                                     dble_num_C=tt
-         call double_to_table(table_putone, 'turn ', dble_num_C)
-                                                  dble_num_C=energy
-         call double_to_table(table_putone, 'e ', dble_num_C)
-         ss = part_id(i)
-                                                       dble_num_C=ss
-         call double_to_table(table_putone, 'number ', dble_num_C)
+                                                     doublenum=turn
+         call double_to_table(table_putone, 'turn ', doublenum)
+                                                  doublenum=energy
+         call double_to_table(table_putone, 'e ', doublenum)
+                                                       doublenum = part_id(i)
+         call double_to_table(table_putone, 'number ', doublenum)
 
          do j = 1, 6
             tmp=zero
@@ -2307,10 +2306,9 @@ CONTAINS
          end do
          CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates
          do j = 1, 6
-            tmp=X_MAD(j)
+            doublenum=X_MAD(j)
             IF( (.NOT.closed_orbit) .OR. (.NOT.NORM_OUT)) THEN
-                                                                dble_num_C=tmp
-               call double_to_table(table_putone, vec_names(j), dble_num_C)
+               call double_to_table(table_putone, vec_names(j), doublenum)
             END IF
          enddo
 
@@ -2324,16 +2322,15 @@ CONTAINS
             ENDDO
             CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates
             DO j = 1, 6
-               tmp_norm=zero
-               tmp_norm=X_MAD(j)
-                                                                dble_num_C=tmp_norm
-               call double_to_table(table_putone, vec_names(j), dble_num_C)
+               !tmp_norm=zero
+               doublenum=X_MAD(j)
+               call double_to_table(table_putone, vec_names(j), doublenum)
             END DO
          END IF
 
          !hbu spos
-                                                        dble_num_C=spos
-         call double_to_table(table_putone,vec_names(7),dble_num_C)
+                                                        doublenum=spos
+         call double_to_table(table_putone,vec_names(7),doublenum)
          call augment_count(table_putone)
       enddo
     END SUBROUTINE tt_putone_coord
@@ -2356,10 +2353,10 @@ CONTAINS
       !----------------------------------------------------------------------*
 
       !vvk
-      REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv), tmp_norm
+      REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv) !, tmp_norm
 
       integer  :: npart,turn,j,nobs
-      REAL(dp) :: orbit(6),orbit0(6),tmp,tt,tn
+      REAL(dp) :: orbit(6),orbit0(6),tmp !,tt,tn
 
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       REAL (dp) :: X_MAD(6), X_PTC(6)
@@ -2376,17 +2373,17 @@ CONTAINS
 
       tmp_coord_array=zero; tmp_norm_array=zero
 
-      tt = turn; tn = npart
+      !tt = turn; !tn = npart
       write(table_puttab(10:13), '(i4.4)') nobs    ! Write in the table head :
       write(table_puttab(16:19), '(i4.4)') npart   ! "@NAME ... "TRACK.OBS0001.P0005"
 
       Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
-                                               dble_num_C=energy
-      call double_to_table(table_puttab, 'e ', dble_num_C)
-                                                    dble_num_C=tn
-      call double_to_table(table_puttab, 'number ', dble_num_C) ! number of the current particle
-                                                  dble_num_C=tt
-      call double_to_table(table_puttab, 'turn ', dble_num_C)   ! the number of the current turn
+                                               doublenum=energy
+      call double_to_table(table_puttab, 'e ', doublenum)
+                                                    doublenum=npart
+      call double_to_table(table_puttab, 'number ', doublenum) ! number of the current particle
+                                                  doublenum=turn
+      call double_to_table(table_puttab, 'turn ', doublenum)   ! the number of the current turn
       do j = 1, 6
          tmp=zero
          !IF (j.LE.icase_ptc) tmp = orbit(j) - orbit0(j)
@@ -2406,20 +2403,18 @@ CONTAINS
       CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates (canonical or normal)
       do j = 1, 6
          IF (closed_orbit .AND. NORM_OUT) THEN
-            tmp_norm=zero
-            tmp_norm=X_MAD(j)
-                                                             dble_num_C=tmp_norm
-            call double_to_table(table_puttab, vec_names(j), dble_num_C)
+            !tmp_norm=zero
+            doublenum=X_MAD(j)
+            call double_to_table(table_puttab, vec_names(j), doublenum)
          ELSE
-            tmp=zero
-            tmp = X_MAD(j) ! orbit(j) - orbit0(j)
-                                                             dble_num_C=tmp
-            call double_to_table(table_puttab, vec_names(j), dble_num_C)
+            !tmp=zero
+            doublenum = X_MAD(j) ! orbit(j) - orbit0(j)
+            call double_to_table(table_puttab, vec_names(j), doublenum)
          END IF
       enddo
       !hbu spos
-                                                     dble_num_C=spos
-      call double_to_table(table_puttab,vec_names(7),dble_num_C)
+                                                     doublenum=spos
+      call double_to_table(table_puttab,vec_names(7),doublenum)
       call augment_count(table_puttab)
     END SUBROUTINE tt_puttab_coord
     !==============================================================================
@@ -2804,6 +2799,8 @@ CONTAINS
          if (mytime) X_PTC(6)=-X_PTC(6) ! reverse sign
       elseif(icase_ptc.eq.5) THEN
          X_PTC(5)=X_MAD(6); X_PTC(6)=zero
+      elseif(icase_ptc.eq.4) THEN
+         X_PTC(5)=zero; X_PTC(6)=zero      
       ENDIF
     END SUBROUTINE Coord_MAD_to_PTC
 
@@ -2824,6 +2821,8 @@ CONTAINS
       elseif(icase_ptc.eq.5) THEN
          X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5)
          if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
+      elseif(icase_ptc.eq.4) THEN
+         X_MAD(5)=zero; X_MAD(6)=zero      
       ENDIF
     END SUBROUTINE Coord_PTC_to_MAD
     !=============================================================================
