@@ -531,35 +531,6 @@ CONTAINS
        key%tiltd=node_value('tilt ')
           if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
 
-    case(987) ! keeping old code 
-    !case(5) ! PTC accepts mults
-       if (getdebug() > 9)  print *, 'This is a quadrupole'
-       key%magnet="quadrupole"
-       call dzero(f_errors,maxferr+1)
-       n_ferr = node_fd_errors(f_errors)
-       do i = 0, 1
-          do j = 1, 2
-             field(j,i) = zero
-          enddo
-       enddo
-       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(4,n_ferr))
-       sk1=node_value('k1 ')
-       sk1s=node_value('k1s ')
-       if (sk1s .eq. zero)  then
-          tilt = zero
-       else
-          tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two
-       endif
-       if(l.ne.0) then
-          sk1 = sk1 + field(1,1)/l
-          sk1s = sk1s + field(2,1)/l
-       endif
-       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
-       key%list%k(2)=sk1
-       key%tiltd=node_value('tilt ')+tilt
-
-   !================================================================
-   ! QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real;
    case(5) ! PTC accepts mults
        if (getdebug() > 9)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
@@ -758,6 +729,8 @@ CONTAINS
        else if(code.eq.16) then
           key%magnet="vkicker"
           key%list%ks(1)=node_value('kick ')+node_value('cvkick ')+fieldk(2)/div
+       else
+          key%magnet="marker"
        endif
        key%tiltd=node_value('tilt ')
     case(17)
@@ -854,13 +827,17 @@ CONTAINS
   ! 2) fill the error and multiploes arrays of data-bases
     include 'twtrr.fi' ! integer, maxmul,maxferr,maxnaper
     REAL(dp), INTENT(IN) :: l
-    type(keywords), INTENT(OUT) ::  key    
+    type(keywords), INTENT(INOUT) ::  key    
     REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;     
     REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
                 f_errors(0:50), field(2,0:maxmul)
     INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
     INTEGER :: node_fd_errors ! function
     integer :: i_count, n_dim_mult_err
+
+    !initialization
+    normal_0123(:)=zero
+    skew_0123(:)=zero
 
            ! real(dp) f_errors(0:50),normal(0:maxmul),skew(0:maxmul)
        ! Get multipole components on bench !-----------------------!
