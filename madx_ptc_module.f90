@@ -2192,7 +2192,7 @@ CONTAINS
     implicit none
     type(twiss), intent(inout)::s1
     type(real_8), intent(in)::s2(ndd)
-    integer i,j,j1,ii,ii1,ii2,iii,i2,i3,i1
+    integer i,j,j1,ii,ii1,ii2,iii,i2,i3,i1,ei2
     integer ind(6)
     real(dp) au(6,6),aui(2),sx,cx,dphi(3)
     character(len=nd2), dimension(:), pointer :: string
@@ -2266,11 +2266,11 @@ CONTAINS
           ii2=ii-1
        endif
 
-       do i2=1,nd2
-          ind(i2)=1
-          s1%eigen(ii1,i2)=s1%junk%V(ii1).sub.ind
-          s1%eigen(ii,i2)=s1%junk%V(ii).sub.ind
-          ind(i2)=0
+       do ei2=1,nd2
+          ind(ei2)=1
+          s1%eigen(ii1,ei2)=s1%junk%V(ii1).sub.ind
+          s1%eigen(ii,ei2)=s1%junk%V(ii).sub.ind
+          ind(ei2)=0
        enddo
     
        angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
