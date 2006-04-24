@@ -1337,19 +1337,23 @@
 !        track(2,itrack) = px + dpxx*ttt/ddd
 !        track(4,itrack) = py + dpyy*ttt/ddd
 
-        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
-        ddd = sqrt(one+two*pt*bet0i+pt**2)
+!        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+!        ddd = sqrt(one+two*pt*bet0i+pt**2)
+!
+!        xp = px/ttt + dpxx/ddd  ! Apply kick in standard coordinates!
+!        yp = py/ttt + dpyy/ddd
+!
+!        ttt = sqrt(one + xp**2 + yp**2)
+!        
+!        px = xp*ddd/ttt ! Transform back to canonical coordinates
+!        py = yp*ddd/ttt
+!        
+!        track(2,itrack) = px
+!        track(4,itrack) = py
 
-        xp = px/ttt + dpxx/ddd  ! Apply kick in standard coordinates!
-        yp = py/ttt + dpyy/ddd
+        track(2,itrack) = px + dpxx
+        track(4,itrack) = py + dpyy
 
-        ttt = sqrt(one + xp**2 + yp**2)
-        
-        px = xp*ddd/ttt ! Transform back to canonical coordinates
-        py = yp*ddd/ttt
-        
-        track(2,itrack) = px
-        track(4,itrack) = py
 !       Add time of flight effects (stolen from Ripken-Dipole)
 !        track(5,itrack) = track(5,itrack) -                             &
 !     &   (dpxx*track(1,itrack) - dpyy*track(3,itrack)) *                &
