@@ -1462,6 +1462,11 @@ CONTAINS
                   x_coord_co_temp(k_th_coord)= &                                  !    #              *
                        x_co_at_all_observ(k_th_coord,number_observation_point)    !    #              *
                ENDDO extract_CO_at_observ_point                                   !    #              *
+                  if (ptc_track_debug) THEN !+++debug print+++++++!               !    #              *
+                    Print *,'obs.No=',number_observation_point    !               !    #              *
+                    Print *,'CO=', x_coord_co_temp                !               !    #              *
+                    Print *,'x_coord_incl_co=', x_coord_incl_co   !               !    #              *                     
+                  endif !+++++++++++++++++++++++++++++++++++++++++!               !    #              *
                !                                                                  !    #              *
                if (ptc_onetable) then !>>>>> onetable=.TRUE.>>>>>>>>>>>>>>>>!     !    #              *
                   !                                                         !     !    #              *
@@ -1962,6 +1967,14 @@ CONTAINS
          length_current_element_c=node_value('l ')
          Sum_length_S=Sum_length_S+length_current_element_f90
 
+         find_CO_for_el_by_el: IF (element_by_element) THEN !===!
+            IF (closed_orbit) THEN !-------------------------!  !
+              Call track(my_ring,x_coord_co_temp, &          !  !
+              i_ring_element, i_ring_element+1, default )    !  !
+            ELSE                                             !  !
+              x_coord_co_temp(:)=zero                        !  !
+            ENDIF !------------------------------------------!  !
+         ENDIF find_CO_for_el_by_el !===========================!
 
          IF(number_obs.GT.0) THEN
             elem_number_at_observ(number_obs)= i_ring_element
@@ -1981,16 +1994,10 @@ CONTAINS
             Print *, ' l_c_code=',length_current_element_c,' l_f90=', &
                  length_current_element_f90, &
                  ' name_c=', name_16, ' &_f90=', current%MAG%name
+            Print *, 'x_coord_co_temp=', x_coord_co_temp
+                 
          endif
 
-         find_CO_for_el_by_el: IF (element_by_element) THEN !===!
-            IF (closed_orbit) THEN !-------------------------!  !
-              Call track(my_ring,x_coord_co_temp, &          !  !
-              i_ring_element, i_ring_element+1, default )    !  !
-            ELSE                                             !  !
-              x_coord_co_temp(:)=zero                        !  !
-            ENDIF !------------------------------------------!  !
-         ENDIF find_CO_for_el_by_el !===========================!
 
          iii_c_code=advance_node() ! c-code go to the next node
          current=>current%next     ! f90-code bring to the next mode
