@@ -1,4 +1,4 @@
-      double precision arad,betas,beti,gammas,dtbyds,deltas
-      common / trackd / arad,betas,beti,gammas,dtbyds,deltas
+      double precision arad,betas,beti,gammas,dtbyds,deltas,bet0,bet0i
+      common / trackd / arad,betas,beti,gammas,dtbyds,deltas,bet0,bet0i
       logical dodamp,dorad,dorand,fsecarb
       common / trackl / dodamp,dorad,dorand,fsecarb

@@ -51,6 +51,20 @@
 !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
 
+
+!---- AK 2006 04 23
+!---- This version of trrun.F gets rid of all problems concerning delta_p
+!---- by eliminating any delta_p dependence and using full 6D formulae only!!!
+!---- Only the parts of the code that deal with radiation effects still use
+!---- the quantity delta_p
+
+!      print *,"madX::trrun.F"
+!      print *," "
+!      print *," AK special version 2006/04/23"
+!      print *," ============================="
+!      print *," Full 6D formulae internally only."      
+
+
       if(fsecarb) then
         write (msg,*) 'Second order terms of arbitrary Matrix not '//   &
      &'allowed for tracking.'
@@ -96,7 +110,7 @@
       do  i = 1,j_tot
         tmp_d = i
         call double_to_table('tracksumm ', 'number ', tmp_d)
-        tmp_d = 1
+        tmp_d = 0
         call double_to_table('tracksumm ', 'turn ', tmp_d)
         do j = 1, 6
           tmp_d = z(j,i) - orbit0(j)
@@ -121,9 +135,11 @@
         endif
       endif
 !---- Initialize kinematics and orbit
+      bet0  = get_value('beam ','beta ')
       betas = get_value('probe ','beta ')
       gammas= get_value('probe ','gamma ')
-      beti = one / betas
+      bet0i = one / bet0
+      beti   = one / betas
       dtbyds = get_value('probe ','dtbyds ')
       deltas = get_variable('track_deltap ')
       arad = get_value('probe ','arad ')
@@ -182,7 +198,7 @@
         endif
 !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
-     &last_pos, last_orbit,aperflag,maxaper,al_errors)
+     &last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
@@ -299,7 +315,8 @@
       enddo
  999  end
       subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
-     &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors)
+     &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,        &
+     &onepass)                                                          &
       implicit none
 
 !----------------------------------------------------------------------*
@@ -316,7 +333,7 @@
       include 'twiss0.fi'
       include 'name_len.fi'
       include 'twtrr.fi'
-      logical aperflag,bend,fmap
+      logical aperflag,bend,fmap,onepass
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
      &get_option
       double precision apx,apy,el,sum,node_value,track(6,*),            &
@@ -335,6 +352,14 @@
       if(code.eq.1) then
         call ttdrf(el,track,ktrack)
         go to 502
+      endif
+!---- Translation of particles // AK 23.02.2006
+!---- useful for combination of different transfer lines or rings
+      if(code.eq.36) then
+        if (onepass) then
+          call tttrans(track,ktrack)
+          go to 502
+        endif
       endif
 !---- Collimator with elliptic aperture.
       if(code.eq.20) then
@@ -485,11 +510,16 @@
 !      print *,"   CODE    ",code
       go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
-     &500, 500, 230, 240, 250, 260, 270, 280, 290, 310,                 &
-     &310, 310, 300, 310, 310, 310, 310, 310, 310, 310), code
+     &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
+     &310, 320, 330, 500, 350, 360, 500, 500, 500, 500), code
+!
+!---- Make sure that nothing is execute if element is not known
+      go to 500
+!
 !---- Bending magnet. OBSOLETE, to be kept for go to
-   20 continue
-   30 continue
+   20 continue  ! RBEND
+   30 continue  ! SBEND
+      go to 500
 !---- Arbitrary matrix. OBSOLETE, to be kept for go to
    40 continue
       call tmarb(.false.,.false.,craporb,fmap,el,ek,re,te)
@@ -497,15 +527,19 @@
       go to 500
 !---- Quadrupole. OBSOLETE, to be kept for go to
    50 continue
+      go to 500
 !---- Sextupole. OBSOLETE, to be kept for go to
    60 continue
+      go to 500
 !---- Octupole. OBSOLETE, to be kept for go to
    70 continue
-!     monitors, beam instrument.
+      go to 500
+!---- Monitors, beam instrument., MONITOR, HMONITOR, VMONITOR
   170 continue
   180 continue
   190 continue
       go to 500
+!---- Multipole
    80 continue
       call ttmult(track,ktrack,dxt,dyt)
       go to 500
@@ -535,10 +569,13 @@
   160 continue
       call ttcorr(el, track, ktrack)
       go to 500
-!---- Lump.
+!---- ECollimator, RCollimator, BeamBeam, Lump. ??
+  200 continue
+  210 continue
+  220 continue
   230 continue
       go to 500
-!---- ??
+!---- Instrument
   240 continue
       go to 500
 !---- Marker.
@@ -551,13 +588,24 @@
   270 continue
 !        call ttlcav(el, track, ktrack)
       go to 500
-!---- Reserved.
+!---- Reserved. (PROFILE,WIRE,SLMONITOR,BLMONITOR,IMONITOR)
   280 continue
   290 continue
   300 continue
-!---- Dipole edge
-      call ttdpdg(track,ktrack)
   310 continue
+  320 continue
+      go to 500
+!---- Dipole edge
+  330 continue
+      call ttdpdg(track,ktrack)
+      go to 500
+!---- Changeref ???
+  350 continue
+      go to 500
+!---- Translation
+  360 continue
+      go to 500
+
 
   500 continue
       if (.not. bend)  then
@@ -598,7 +646,8 @@
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
      &f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
      &ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half
+     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half,        &
+     &ttt
 
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
       save first,ordinv
@@ -636,17 +685,22 @@
         call dcopy(f_errors,field,n_ferr)
       endif
 !---- Dipole error.
-      dbr = bv0 * field(1,0) / (one + deltas)
-      dbi = bv0 * field(2,0) / (one + deltas)
+!      dbr = bv0 * field(1,0) / (one + deltas)
+!      dbi = bv0 * field(2,0) / (one + deltas)
+      dbr = bv0 * field(1,0)
+      dbi = bv0 * field(2,0)
 !---- Nominal dipole strength.
-      dipr = bv0 * vals(1,0) / (one + deltas)
-      dipi = bv0 * vals(2,0) / (one + deltas)
+!      dipr = bv0 * vals(1,0) / (one + deltas)
+!      dipi = bv0 * vals(2,0) / (one + deltas)
+      dipr = bv0 * vals(1,0)
+      dipi = bv0 * vals(2,0)
 !---- Other components and errors.
       nord = 0
       do iord = 1, nd/2
         do j = 1, 2
-          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     &/ (one + deltas)
+!          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
+!     &/ (one + deltas)
+          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          
           if (field(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
@@ -680,10 +734,10 @@
             dyt(jtrk) = dx*track(3,jtrk) + dy*track(1,jtrk)
           enddo
         enddo
-        do jtrk = 1,ktrack
-          dxt(jtrk) = dxt(jtrk) / (one + deltas)
-          dyt(jtrk) = dyt(jtrk) / (one + deltas)
-        enddo
+!        do jtrk = 1,ktrack
+!          dxt(jtrk) = dxt(jtrk) / (one + deltas)
+!          dyt(jtrk) = dyt(jtrk) / (one + deltas)
+!        enddo
         if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
           do jtrk = 1,ktrack
             dxt(jtrk) = dxt(jtrk) + dipr*dipr*track(1,jtrk)/elrad
@@ -736,12 +790,21 @@
 
 !---- Apply multipole effect including dipole.
       do jtrk = 1,ktrack
+!       Added for correct Ripken implementation of formulae      	
+        ttt = sqrt(one+two*track(6,jtrk)*bet0i+track(6,jtrk)**2)
+!        track(2,jtrk) = track(2,jtrk) -                                 &
+!     &(dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
+!        track(4,jtrk) = track(4,jtrk) +                                 &
+!     &(dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
+!        track(5,jtrk) = track(5,jtrk)                                   &
+!     &- (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
         track(2,jtrk) = track(2,jtrk) -                                 &
-     &(dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
+     &   (dbr + dxt(jtrk) - dipr * (ttt - one))
         track(4,jtrk) = track(4,jtrk) +                                 &
-     &(dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
-        track(5,jtrk) = track(5,jtrk)                                   &
-     &- (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
+     &   (dbi + dyt(jtrk) - dipi * (ttt - one))
+        track(5,jtrk) = track(5,jtrk) -                                 &
+     &   (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *                    &
+     &   ((one + bet0*track(6,jtrk))/ttt)*bet0i
       enddo
 
 !---- Radiation loss at exit.
@@ -996,11 +1059,15 @@
         px = track(2,itrack)
         py = track(4,itrack)
         pt = track(6,itrack)
-        ttt = el/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
+        ttt = el/sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
         track(1,itrack) = track(1,itrack) + ttt*px
         track(3,itrack) = track(3,itrack) + ttt*py
+!        track(5,itrack) = track(5,itrack)                               &
+!     &+ el*(beti + pt * dtbyds) - (beti+pt)*ttt
+!---- AK 20060413
+!---- Ripken DESY-95-189 p.36
         track(5,itrack) = track(5,itrack)                               &
-     &+ el*(beti + pt * dtbyds) - (beti+pt)*ttt
+     &                  + bet0i*(el - (one + bet0*pt) * ttt)
       enddo
       end
       subroutine ttrf(track,ktrack)
@@ -1024,7 +1091,7 @@
 !----------------------------------------------------------------------*
       integer itrack,ktrack
       double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
-     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,      &
+     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
      &get_variable,node_value,get_value,one,two,half,ten3m,ten6p
 !      double precision px,py,ttt,beti,el1
       parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
@@ -1034,17 +1101,18 @@
       twopi=get_variable('twopi ')
 
 !---- Fetch data.
-      el = node_value('l ')
+!      el = node_value('l ')
 !      el1 = node_value('l ')
       rfv = node_value('volt ')
       rff = node_value('freq ')
       rfl = node_value('lag ')
-      deltap = get_value('probe ','deltap ')
-      deltas = get_variable('track_deltap ')
-      pc = get_value('probe ','pc ')
-      betas = get_value('probe ','beta ')
-      gammas= get_value('probe ','gamma ')
-      dtbyds = get_value('probe ','dtbyds ')
+!      deltap = get_value('probe ','deltap ')
+!      deltas = get_variable('track_deltap ')
+!      pc = get_value('probe ','pc ')
+      pc0 = get_value('beam ','pc ')
+!      betas = get_value('probe ','beta ')
+!      gammas= get_value('probe ','gamma ')
+!      dtbyds = get_value('probe ','dtbyds ')
 
 !      print *,"RF cav.  volt=",rfv, "  freq.",rff
 
@@ -1075,11 +1143,18 @@
 !      endif
 !---- Set up.
       omega = rff * (ten6p * twopi / clight)
-      vrf   = rfv * ten3m / (pc * (one + deltas))
+!      vrf   = rfv * ten3m / (pc * (one + deltas))
+      vrf   = rfv * ten3m / pc0
       phirf = rfl * twopi
-      dl    = el * half
-      bi2gi2 = one / (betas * gammas) ** 2
+!      dl    = el * half
+!      bi2gi2 = one / (betas * gammas) ** 2
 !---- Loop for all particles.
+!      do itrack = 1, ktrack
+!        pt = track(6,itrack)
+!        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+!        track(6,itrack) = pt
+!!      print *," pt ",pt, "   track(5,itrack)",track(5,itrack)
+!      enddo
       do itrack = 1, ktrack
         pt = track(6,itrack)
         pt = pt + vrf * sin(phirf - omega * track(5,itrack))
@@ -1131,13 +1206,15 @@
 ! Output:                                                              *
 !   EL        (double)    Length of quadrupole.                        *
 !----------------------------------------------------------------------*
+      include 'track.fi'
       include 'twtrr.fi'
-      logical dorad,dodamp,dorand
+!      logical dorad,dodamp,dorand
       integer itrack,ktrack,n_ferr,node_fd_errors,code,bv0,i,get_option
       double precision bi2gi2,bil2,curv,d,dpx,dpy,el,pt,px,py,rfac,rpt, &
-     &rpx,rpy,track(6,*),xkick,ykick,deltas,arad,betas,gammas,dtbyds,   &
+     &rpx,rpy,track(6,*),xkick,ykick, !deltas,arad,betas,gammas,dtbyds, &
      &div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
      &node_value,zero,one,two,three,half
+      double precision dpxx,dpyy,ttt,ddd,xp,yp,pxx,pyy
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
 
 !---- Initialize.
@@ -1184,6 +1261,9 @@
 !---- Sum up total kicks.
       dpx = xkick / (one + deltas)
       dpy = ykick / (one + deltas)
+!---- Thin lens 6D version
+      dpxx = xkick
+      dpyy = ykick
 
       bil2 = el / (two * betas)
       bi2gi2 = one / (betas * gammas) ** 2
@@ -1222,23 +1302,59 @@
         endif
       endif
 
-!---- Half kick at entrance.
+!---- Thick lens code taken out! AK 21.04.2006
+!!---- Half kick at entrance.
+!      do itrack = 1, ktrack
+!        px = track(2,itrack) + half * dpx
+!        py = track(4,itrack) + half * dpy
+!        pt = track(6,itrack)
+!
+!!---- Drift through corrector.
+!        d = (one - pt / betas) * el
+!        track(1,itrack) = track(1,itrack) + px * d
+!        track(3,itrack) = track(3,itrack) + py * d
+!        track(5,itrack) = track(5,itrack) + d * bi2gi2 * pt -           &
+!     &bil2 * (px**2 + py**2 + bi2gi2*pt**2) + el*pt*dtbyds
+!
+!!---- Half kick at exit.
+!        track(2,itrack) = px + half * dpx
+!        track(4,itrack) = py + half * dpy
+!        track(6,itrack) = pt
+!      enddo
+
+!---- Kick at dipole corrector magnet
+!     including PT-dependence 
       do itrack = 1, ktrack
-        px = track(2,itrack) + half * dpx
-        py = track(4,itrack) + half * dpy
+        px = track(2,itrack)
+        py = track(4,itrack)
         pt = track(6,itrack)
+!        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+!        ddd = sqrt(one+two*pt*bet0i+pt**2)
+!        track(2,itrack) = px + dpxx*ttt/ddd
+!        track(4,itrack) = py + dpyy*ttt/ddd
+!        ttt = sqrt(one+two*pt*bet0i+pt**2 - dpxx**2 - dpyy**2)
+!        ddd = sqrt(one+two*pt*bet0i+pt**2)
+!        track(2,itrack) = px + dpxx*ttt/ddd
+!        track(4,itrack) = py + dpyy*ttt/ddd
 
-!---- Drift through corrector.
-        d = (one - pt / betas) * el
-        track(1,itrack) = track(1,itrack) + px * d
-        track(3,itrack) = track(3,itrack) + py * d
-        track(5,itrack) = track(5,itrack) + d * bi2gi2 * pt -           &
-     &bil2 * (px**2 + py**2 + bi2gi2*pt**2) + el*pt*dtbyds
+        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+        ddd = sqrt(one+two*pt*bet0i+pt**2)
 
-!---- Half kick at exit.
-        track(2,itrack) = px + half * dpx
-        track(4,itrack) = py + half * dpy
-        track(6,itrack) = pt
+        xp = px/ttt + dpxx/ddd  ! Apply kick in standard coordinates!
+        yp = py/ttt + dpyy/ddd
+
+        ttt = sqrt(one + xp**2 + yp**2)
+        
+        px = xp*ddd/ttt ! Transform back to canonical coordinates
+        py = yp*ddd/ttt
+        
+        track(2,itrack) = px
+        track(4,itrack) = py
+!       Add time of flight effects (stolen from Ripken-Dipole)
+!        track(5,itrack) = track(5,itrack) -                             &
+!     &   (dpxx*track(1,itrack) - dpyy*track(3,itrack)) *                &
+!     &   ((one + bet0*track(6,itrack))/ddd)*bet0i
+        
       enddo
 
 !---- Half radiation effects at exit.
@@ -1543,20 +1659,29 @@
 !    orbit0 (double array)  reference orbit                            *
 !----------------------------------------------------------------------*
       integer npart,turn,j,nobs
-      double precision orbit(6),orbit0(6),tmp,tt
+      double precision orbit(6),orbit0(6),tmp,tt,tn
+      double precision energy, get_value
       character*36 table
 !hbu
       double precision spos
 !hbu
       character*4 vec_names(7)
 !hbu
-      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
       data table / 'track.obs$$$$.p$$$$' /
 
-      tt = turn
+      tt = turn 
+      tn = npart
+      
       write(table(10:13), '(i4.4)') nobs
       write(table(16:19), '(i4.4)') npart
-      call double_to_table(table, 'turn ', tt)
+      
+      energy = get_value('probe ','energy ')
+      
+      call double_to_table(table, 'turn ', tt)   ! the number of the current turn
+      call double_to_table(table, 'number ', tn) ! the number of the current particle
+      call double_to_table(table, 'e ', energy)
+      
       do j = 1, 6
         tmp = orbit(j) - orbit0(j)
         call double_to_table(table, vec_names(j), tmp)
@@ -1640,15 +1765,18 @@
 !   z(6,jend) - Transformed cartesian coordinates incl. c.o.           *
 !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
 !----------------------------------------------------------------------*
+      include 'track.fi'
       include 'bb.fi'
       logical zgiv,zngiv
       integer j,jend,k,kp,kq,next_start,itype(23),switch,turns,jt
       double precision phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
      &ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
      &ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
-      parameter(zero=0d0)
+      double precision deltap,one
+      parameter(zero=0d0,one=1d0)
       character*120 msg(2)
 
+      deltap = get_variable('track_deltap ')
 !---- Initialise orbit, emittances and eigenvectors etc.
       j = 0
       twopi = get_variable('twopi ')
@@ -1674,7 +1802,9 @@
           track(3) = y
           track(4) = py
           track(5) = t
-          track(6) = deltae
+!          track(6) = deltae
+!---- Here we absorb deltap into the PT variable
+          track(6) = deltae + sqrt((one+deltap)**2+bet0i**2-one)-bet0i
           track(7) = fx
           track(8) = phix
           track(9) = fy
@@ -1871,5 +2001,43 @@ c      endif
         track(5,itrack) =  (sigf + (xf*pyf - yf*pxf)*Z)/beta
 !        track(6,itrack) =  psigf*beta
 
+      enddo
+      end
+
+      subroutine tttrans(track,ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Translation of a set of particles.                                 *
+! Input/output:                                                        *
+!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+!----------------------------------------------------------------------*
+      integer itrack,ktrack
+      double precision get_value, node_value
+      double precision track(6,*)
+      double precision t_x,t_px,t_y,t_py,t_sig,t_psig
+!
+!---- Initialize.
+!
+!---- Get translation parameters
+      t_x    = node_value('x ')
+      t_px   = node_value('px ')
+      t_y    = node_value('y ')
+      t_py   = node_value('py ')
+      t_sig  = node_value('t ')
+      t_psig = node_value('pt ')
+!
+!---- Loop over particles
+!
+      do  itrack = 1, ktrack
+!
+!     Add vector to particle coordinates
+        track(1,itrack) = track(1,itrack) + t_x       
+        track(2,itrack) = track(2,itrack) + t_px      
+        track(3,itrack) = track(3,itrack) + t_y      
+        track(4,itrack) = track(4,itrack) + t_py      
+        track(5,itrack) = track(5,itrack) + t_sig      
+        track(6,itrack) = track(6,itrack) + t_psig      
+!
       enddo
       end
