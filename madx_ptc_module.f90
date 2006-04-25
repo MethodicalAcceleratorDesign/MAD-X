@@ -1238,7 +1238,7 @@ CONTAINS
     subroutine puttwisstable()
       implicit none
       include 'twissa.fi'
-      integer i1,i2,ii
+      integer i1,i2,ii,i1a,i2a
       real(kind(1d0))   :: opt_fun(72)
       real(dp)   :: deltae
       type(work) :: cfen !current fibre energy
@@ -1324,11 +1324,25 @@ CONTAINS
       opt_fun(34)=tw%disp(4) * deltae
       opt_fun(35)=tw%disp(5) * deltae
       opt_fun(36)=tw%disp(6) * deltae
-      ii=37
       do i1=1,nd2
+         if(i1.le.4) then
+            i1a=i1
+         elseif(i1.eq.5) then
+            i1a=6
+         else
+            i1a=5
+         endif
          do i2=1,nd2
+            if(i2.le.4) then
+               i2a=i2
+            elseif(i2.eq.5) then
+               i2a=6
+            else
+               i2a=5
+            endif
+            ii=37+(i1a-1)*6+i2a
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
-            ii=ii+1
+            if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
          enddo
       enddo
 
@@ -1758,12 +1772,17 @@ CONTAINS
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
           i1 = int(doublenum) 
           if(i1.gt.ii) call aafail('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
+          if(i1.eq.5) i1=6
+          if(i1.eq.6) i1=5             
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
           i2 = int(doublenum)
           if(i2.gt.ii) call aafail('return from double_from_ptc_normal: ',' eigenvectors too many components')
+          if(i2.eq.5) i2=6
+          if(i2.eq.6) i2=5             
           ind(:)=0
           ind(i2)=1
           double_from_ptc_normal = n%A_t%V(i1).sub.ind
+          if(mytime.and.i2.eq.6) double_from_ptc_normal = -double_from_ptc_normal
           RETURN
        CASE DEFAULT
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
