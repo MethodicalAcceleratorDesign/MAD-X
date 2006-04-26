@@ -83,6 +83,7 @@
 /match.fi -text
 /matchc.c -text
 /matchjc.F -text
+/matchlib.F -text
 /matchsa.F -text
 /n_complex_polymorph.f90 -text
 /name_len.fi -text
