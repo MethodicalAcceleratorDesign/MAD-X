@@ -52,7 +52,11 @@ contains
          advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
-
+    !------------------------------------------------------
+    !initialization
+    npart = 1
+    n = 1
+    t = 1 
     !------------------------------------------------------
 
     nturns = get_value('ptc_trackline ','turns ')
@@ -191,10 +195,11 @@ contains
       !vvk
       !      real(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv), tmp_norm
       integer  :: npart,turn,nobs
-      real(dp) :: tt
+      real(kind(1d0)) :: tt
       character*36 table_puttab
       !hbu
-      real(dp) :: x,px,y,py,t,pt,spos,e
+      real(dp) :: x,px,y,py,t,pt
+      real(kind(1d0)) :: spos,e
       !hbu
       data table_puttab / 'track.obs$$$$.p$$$$' /
 
@@ -204,13 +209,23 @@ contains
       write(table_puttab(16:19), '(i4.4)') npart
 
       call double_to_table(table_puttab, 'turn ', tt)
+      doublenum = x
+      call double_to_table(table_puttab, 'x ' , doublenum)
 
-      call double_to_table(table_puttab, 'x ' , x)
-      call double_to_table(table_puttab, 'px ', px)
-      call double_to_table(table_puttab, 'y ' , y)
-      call double_to_table(table_puttab, 'py ', py)
-      call double_to_table(table_puttab, 't ' , t)
-      call double_to_table(table_puttab, 'pt ', pt)
+      doublenum = px
+      call double_to_table(table_puttab, 'px ', doublenum)
+      
+      doublenum = y
+      call double_to_table(table_puttab, 'y ' , doublenum)
+
+      doublenum = py
+      call double_to_table(table_puttab, 'py ', doublenum)
+      
+      doublenum = t
+      call double_to_table(table_puttab, 't ' , doublenum)
+      
+      doublenum = pt
+      call double_to_table(table_puttab, 'pt ', doublenum)
 
       call double_to_table(table_puttab, 's ' , spos)
       call double_to_table(table_puttab, 'e ' , e)
@@ -228,7 +243,7 @@ contains
     integer              :: tab_name(*)
     include 'twissa.fi'
     integer              :: charge    ! charge of an accelerated particle
-    real(dp)             :: x0(6),betd,beta(3),gamma(3),s,ave(6,6,3),x1(6),xt(6)
+    real(dp)             :: x0(6),betd,beta(3),gamma(3),ave(6,6,3),x1(6),xt(6)
     type(real_8)         :: y_pol(6), y2(6)
     type(damap)          :: mapA, id
     type(fibre), pointer :: p
@@ -236,12 +251,13 @@ contains
     integer, allocatable :: ePP(:),ee(:) ! exponents of a monomial for x_1^{2}*x_3^{4}, j is [0,2,0,4]
     logical(lp)          :: sixd
     type(taylor)         :: mom,r2,I1,dispt(4),avet(6,6,3)
-    real(kind(1d0))     :: get_value,get_variable ! c functions
+    real(kind(1d0))      :: get_value,get_variable ! c functions
+    real(kind(1d0))      :: s
     integer              :: get_option ! c function
     real (dp)            :: disp(4)
     type(pol_block)      :: pb !pol_block - it enables additional parameter dependences (variable) for polynomials
     integer              :: ioptfun !number of parameters tu put in table using vector_to_table c-func
-    real(dp)             :: opt_fun(36) !array with parameters that is passed to vector_to_table c-func
+    real(kind(1d0))      :: opt_fun(72) !array with parameters that is passed to vector_to_table c-func
     integer              :: ii !iterator
     type(work)           :: nfen, startfen      ! New Fibre ENergy
     real(dp)             :: p0n,p0i
@@ -249,7 +265,8 @@ contains
 
     nfen = 0
     startfen = 0
-
+    s = zero
+    
     print *, '###################################################'
     print *, '###################################################'
     print *, '######          TWISS WITH PTC           ##########'
@@ -421,8 +438,10 @@ contains
 
        if (.true.) then
 
-          call double_to_table(table_name, 's ', s)
-          call double_to_table(table_name, 'energy ', p%mag%p%p0c)
+          doublenum = s
+          call double_to_table(table_name, 's ', doublenum)
+          doublenum = p%mag%p%p0c
+          call double_to_table(table_name, 'energy ', doublenum)
 
 
           do ii=1,c_%nd2 !

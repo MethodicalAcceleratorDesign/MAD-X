@@ -95,6 +95,7 @@
 #define w_ptc_settime           w_ptc_settime_
 #define w_ptc_setnocavity       w_ptc_setnocavity_
 
+#define stolower                stolower_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
 #define min_order               min_order_       /* ETDA 17 nov 2004 */
@@ -142,7 +143,7 @@ extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*);
 extern void mtjac_(int*, int*,
                   int*, double*, double*, double*,
-                   int*, int*,
+                   int*, int*, int*,
                    double*, int*, int*, double*, double*, double*,
                    double*, double*, double*,
                    double*, double*);
@@ -512,6 +513,7 @@ void match_tmatrix(struct in_cmd*);
 void match_vary(struct in_cmd*);
 void match_weight(struct in_cmd*);
 void mtcond(int*, int*, double*, int*);
+void mtjacprint(int, int, double*);
 double mult_par(char*, struct element*);
 void mycpy(char*, char*);
 void* mycalloc(char*, size_t, size_t);
@@ -726,7 +728,9 @@ int version_header(char*);
 int v_length(char*);
 char* v_format(char*);
 double vmod(int*, double*);
-void warning(char*, char*);
+void error(char* t1, register char* fmt, ...);
+void warning(char* t1, register char* fmt, ...);
+void warningOld(char*, char*);
 void augmentfwarn() ;
 void write_elems(struct el_list*, struct command_list*, FILE*);
 void write_elems_8(struct el_list*, struct command_list*, FILE*);
@@ -872,6 +876,9 @@ void write_elend(FILE*);
 void write_field(FILE*, struct double_array*);
 void write_elstart(FILE*);
 void cf77flush();
+
+/*Debug level */
+int debuglevel = 1;
 
 /* Global structure variables by type (alphabetic) */
 struct char_array* aux_buff;       /* temporary buffer for many purposes */
@@ -1051,7 +1058,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.02.28";
+char myversion[] = "MAD-X 3.02.29";
 char code_mod_date[] = "Code Modification Date: 25.04.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
@@ -1197,6 +1204,7 @@ char          line[LINE_MAX],
 time_t last_time;
 time_t start_time;
 
+/*Piotr Skowronski (CERN)*/
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
@@ -1205,6 +1213,22 @@ double** trackstrarpositions = 0x0;/* two dimensional array with track positions
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
 void deletetrackstrarpositions();
+
+/*Riccardo de Maria (CERN)*/
+void match2_match(struct in_cmd*);
+void match2_end(struct in_cmd*);
+void match2_macro(struct in_cmd*);
+void match2_constraint(struct in_cmd*);
+char* match2_macro_name[10];
+char* match2_cons_name[10][30];
+double match2_cons_value[10][30];
+double match2_cons_value_rhs[10][30];
+double match2_cons_value_lhs[10][30];
+double match2_cons_weight[10][30];
+char match2_cons_sign[10][30];
+int match2_cons_curr[3];
+struct expression* match2_cons_rhs[10][30];
+struct expression* match2_cons_lhs[10][30];
 
 /* end of definitions */
 

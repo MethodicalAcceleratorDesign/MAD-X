@@ -25,6 +25,7 @@ contains
     type(work)           :: startfen
     type(work)           :: endfen    ! END Fibre ENergy: energy description at start and end of a line
     type(work)           :: nfen      ! New Fibre ENergy
+    type(work)           :: cfen      ! Current Fibre ENergy
     integer, pointer     :: poscav(:) !array keeping indexes of cavities
     real(dp),allocatable :: phasecav(:) !array keeping phases of cavities
     real(dp)             :: patchprecision=c_1d_8
@@ -48,13 +49,14 @@ contains
     !Below we enforce that x(6) is cT, and it is time of flight from the start
     !we use time T=x(6)/ctime to find the time of arrival to a cavity so we can adjust its phase optimally
     localis = getintstate()
-    
-    if (getdebug() > 0) then
+    localis = localis - nocavity + totalpath
+    if (getdebug() > 1) then
       print *, "I am in setcavities "
       call print(localis,6)
     endif
         
-
+    patchnext=.true.
+    
     charge = get_value('beam ', "charge ")
 
     open(unit=21,file='sychrpart.txt')
@@ -65,7 +67,7 @@ contains
     x(:)=zero
 
     call locate_all_twcav(my_ring,poscav)
-    if ( getdebug() > 4 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
+    if ( getdebug() > 2 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
     if ( size(poscav) == 0) then
        return
     endif
@@ -78,26 +80,26 @@ contains
     startfen=p  !setting up start energy for record
     nfen=p      ! current fibre energy
 
-    if ( getdebug() > 0 ) print *, 'c_%feed_p0c = ', c_%feed_p0c
+    if ( getdebug() > 1 ) print *, 'c_%feed_p0c = ', c_%feed_p0c
 
-    if ( getdebug() > 4 ) write (*,*) 'START TRACKING TILL THE FIRST CAVITY'
+    if ( getdebug() > 2 ) write (*,*) 'START TRACKING TILL THE FIRST CAVITY'
 
     i = 1
 
     do j=1,size(poscav)
 
-       if ( getdebug() > 4 ) then
+       if ( getdebug() > 2 ) then
           write (*,*) 'Current cavity no is j=',j
-          write (*,*) 'Setting beam momentum AND tracking', nfen%p0c,' till this cavity (',poscav(j),')'
+          write (*,*) 'Setting beam momentum AND tracking', nfen%p0c,' till the cavity (',poscav(j),')'
        endif
 
 
        do i=i,poscav(j)-1 !from the current element i to the current cavity j
 
-          p=nfen   ! set current reference energy
+          p = nfen   ! set current reference energy
           call track(my_ring,x,i,i+1,localis)
           
-          if ( getdebug()>0 ) then
+          if ( getdebug()>1 ) then
              write (6,*) ' i=',i,' name=',p%mag%name, &
                          ' beta0 ', nfen%beta0, &
 	     ' newpos ', x(6), &
@@ -108,7 +110,6 @@ contains
           write (21,*) ' '
           write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
           write (21,'(6f8.4)') x
-
 
           p=>p%next
        enddo
@@ -132,9 +133,10 @@ contains
        ! p point to this cavity
 
        ! set the reference energy in this cavity
-       p=nfen
        
-       if ( getdebug() > 0 ) then
+       p = nfen
+       
+       if ( getdebug() > 1 ) then
           write (6,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
           write (6,'(6f8.4)') x
        endif
@@ -145,32 +147,35 @@ contains
 
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
-
+       
+       
        write (21,*) ' '
        write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
        write (21,'(6f8.4)') x
 
-       if ( getdebug() > 4 ) then
+       if ( getdebug() > 2 ) then
           write(6,'(a, 6f12.8)') ' Track parameters after cavity ',x
           write(*,100) 'Old Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
        endif
 
        ! GET NEW ENERGY AFTER THE CAVITY
-       prevbeta0=nfen%beta0
+       prevbeta0 = nfen%beta0
+       
        nfen= x(5)*nfen%p0c
 
-       if ( getdebug() > 4 ) then
+       if ( getdebug() > 2 ) then
           write(6,100) 'New Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
           write(6,110) nfen
           write(6,'(a10, f8.4)') 'Relative E increase', (nfen%energy-startfen%energy)/startfen%kinetic
        endif
 
-       if (getdebug()>0) write (6,*) 'beta0 ', prevbeta0, ' oldpos ', position, ' newpos ', x(6), ' Current energy ',nfen%energy
+       if (getdebug()>1) write (6,*) 'beta0 ', prevbeta0, ' oldpos ', position, ' newpos ', x(6), ' Current energy ',nfen%energy
        position = x(6)
 
        !PATCH THE NEXT ELEMENT ON ENTRANCE
        p%next = nfen
-       if ( getdebug() > 4 ) write (*,*) 'Finding patch for j=',j,' ',p%mag%name
+
+       if ( getdebug() > 2 ) write (*,*) 'Finding patch for j=',j,' ',p%mag%name
        call find_patch(p,next=patchnext,ENERGY_PATCH=patchenergy,PREC=patchprecision)
 
        i=poscav(j)+1
@@ -179,21 +184,21 @@ contains
        !from this point on we do not need to calculate TOF cause there is no further cavs to set
     enddo
 
-    if ( getdebug() > 4 ) then
+    if ( getdebug() > 2 ) then
        write (*,*) 'Loop over cavities done'
        write (*,*) 'Current element is ', p%mag%name
        write (*,*) 'Doing loop from the first element after the last cavity to the END'
     endif
 
     do i=i,my_ring%n !setting beam energies to the end of line
-       p=nfen
+       p = nfen
        call track(my_ring,x,i,i+1,localis)
 
        write (21,*) ' '
        write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
        write (21,'(6f8.4)') x
 
-       if ( getdebug() > 0 ) then
+       if ( getdebug() > 1 ) then
           write(6,*) ' i=',i,' name=',p%mag%name, &
                       ' beta0 ', nfen%beta0, &
 	  ' newpos ', x(6), &
@@ -210,7 +215,7 @@ contains
     write (21,'(6f8.4)') x
 
 
-    if ( getdebug() > 0 ) then
+    if ( getdebug() > 1 ) then
        write(6,*) 'PARAMETERS AT THE END OF LINE:'
        write(6,'(a, 6f8.4)') ' Track parameters ',x
        write(*,100) 'START energy=',startfen%energy,' momentum=',startfen%p0c,' kinetic=',startfen%kinetic
@@ -226,28 +231,26 @@ contains
 
     do i=1,my_ring%n
        if ( associated(p%mag) .eqv. .false.) then
-          if (getdebug() > 0 ) print *, 'Fibre no. ',i,' has no mag assigned to it'
+          if (getdebug() > 1 ) print *, 'Fibre no. ',i,' has no mag assigned to it'
           cycle
        endif
-       if ( getdebug() > 9 ) then
+       if ( getdebug() > 2 ) then
           write(6,*) 'Name: ', p%mag%name, ' Kind: ', p%mag%kind
        endif
 
        if(p%mag%kind == kind21) then
-
-          if ( getdebug() > 0 ) then
-             write (6,*) 'Cavity ',i,' phase ', p%mag%phas,' Volt ',   p%mag%volt
-          endif
 
           if(p%next%patch%energy==1) then
              p%patch%energy=2
              p%next%patch%energy=0
           endif
 
-          if ( getdebug() > 0 ) then
+          if ( getdebug() > 1 ) then
+             write (6,*) 'Cavity ',i,' name ',p%mag%name,' phase ', p%mag%phas,' Volt ',p%mag%volt, &
+             & ' length ', p%mag%l
              write(6,*) 'DELTAE ', p%mag%DELTA_E
-             write(6,*) 'Length ', p%mag%l
           endif
+
 
        endif
        p=>p%next
@@ -281,7 +284,7 @@ contains
       real(dp)                 :: arrivtime !time of arrival
 
       arrivtime = x(6)/clight
-      if (getdebug()>9) print *, 'arrivtime = ', arrivtime
+      if (getdebug()>2) print *, 'arrivtime = ', arrivtime
 
       if(f%mag%kind/=kind21) then
          write(6,*) " fatal error: not a twcavity "
@@ -297,7 +300,7 @@ contains
 
       if(ene) then
          
-         if ( getdebug() > 4 ) then  
+         if ( getdebug() > 2 ) then  
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          endif    
@@ -314,8 +317,9 @@ contains
 
 
       !    write (*,*) 'energy (t/f)? :',ene, 'charge: ', charge
-      if ( getdebug() > 2 ) then
+      if ( getdebug() > 1 ) then
          write(6,*) 'Cavity settings:'
+         write(6,*)                  '    Name   ', f%mag%name
          write(6,'(a12,i12,a10,l1)') '    Charge ', charge,' max ene? : ',ene
          write(6,'(a12,f12.5,a10)') '    Volt ',   f%mag%volt,' MV '
          write(6,'(a12,f12.5,a10)') '    DELTAE ', f%mag%delta_e, ' GeV '

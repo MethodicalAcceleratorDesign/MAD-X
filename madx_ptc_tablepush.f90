@@ -23,28 +23,35 @@ module madx_ptc_tablepush_module
      character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3
   end type tablepush_poly
 
-  !    routines
   type (tablepush_poly), private, dimension(20) :: pushes
   integer                                       :: npushes = 0
   character(20), private, dimension(20)         :: tables  !tables names of existing pushes - each is listed only ones
   integer,       private                        :: ntables = 0 !number of distictive tables
 
+  !    routines
+  private                                       :: augment_counts
+  private                                       :: issuchtableexist
+  private                                       :: putnameintables
+  
 contains
   !____________________________________________________________________________________________
 
-  subroutine putusertable(n,y)
+  subroutine putusertable(n,name,y)
     !puts the coefficients in tables as defined in array pushes
     implicit none
     integer         :: n !fibre number
+    character(*)   :: name !fibre name
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
     type(real_8),pointer :: e !element in array
-    real(dp)        :: coeff
-    integer         :: i,ii !iterator
-    integer         :: at !iterator
+    real(kind(1d0))      :: coeff
+    integer              :: i,ii !iterator
+    integer              :: at !iterator
 
     !    print *,"madx_ptc_tablepush :putusertable "
     !    call daprint(y(1),6)
-
+    
+    call putnameintables()
+    
     do i=1,npushes
 
        e => y(pushes(i)%element)
@@ -90,6 +97,18 @@ contains
 
   end subroutine augment_counts
   !____________________________________________________________________________________________
+   
+  subroutine putnameintables()
+    implicit none
+    integer       :: i ! iterator
+    do i=1,ntables
+       if (getdebug()>2) print *,"Putting name in ",tables(i)
+       call string_to_table(tables(i),"name ","name ")
+    enddo
+
+  end subroutine putnameintables
+  !____________________________________________________________________________________________
+
 
   subroutine addpush(table,column,element,monomial)
     implicit none

@@ -26,6 +26,7 @@
 #include "makethin.c"
 
 #include "matchc.c"
+#include "matchc2.c"
 
 void adjust_beam()
   /* adjusts beam parameters to current beta, gamma, bcurrent, npart */
@@ -1386,7 +1387,7 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   if (++t->curr == t->max) grow_table(t);
 }
 
-void augmentcountonly(char* table) /* increase table occ. by 1, fill missing */
+void augmentcountonly(char* table) /* increase table occ. by 1 */
 {
   int pos;
   struct table* t;
@@ -1397,8 +1398,10 @@ void augmentcountonly(char* table) /* increase table occ. by 1, fill missing */
   {
     warning("Can not find table",table);
     return;
-  }
-
+  }  
+  
+  if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+  
   if (++t->curr == t->max) grow_table(t);
 }
 
@@ -1820,6 +1823,9 @@ void exec_create_table(struct in_cmd* cmd)
   char** t_c;
   int j, pos = name_list_pos("table", nl);
   char* name = NULL;
+  char withname = 0; /*specify if table should have column "name" of strings*/
+  int  ncols = 0;  /*number of columns*/  
+  
   if (nl->inform[pos] == 0)
   {
     warning("no table name:", "ignored");
@@ -1835,6 +1841,7 @@ void exec_create_table(struct in_cmd* cmd)
     warning("table already exists: ", "ignored");
     return;
   }
+
   pos = name_list_pos("column", nl);
   if (nl->inform[pos] == 0)
   {
@@ -1842,18 +1849,49 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
-  t_types = mymalloc(rout_name, m->curr*sizeof(int));
-  t_c = mymalloc(rout_name, (m->curr+1)*sizeof(char*));
+  
+  pos = name_list_pos("withname", nl);
+  printf("Value of withname %d\n",pos);
+  if (pl->parameters[pos] != 0x0)
+  {
+    if (pl->parameters[pos]->double_value != 0.0)
+     {
+       printf("We add <<name>> column\n");
+       withname = 1;
+       ncols = m->curr+1;
+     }
+    else
+     {
+       ncols = m->curr;
+     } 
+  }
+  
+  
+  t_types = mymalloc(rout_name, ncols*sizeof(int));
+  t_c = mymalloc(rout_name, (ncols+1)*sizeof(char*));
+
   for (j = 0; j < m->curr; j++)
   {
     t_types[j] = 2; /* type double */
     t_c[j] = permbuff(m->p[j]);
   }
-  t_c[m->curr] = blank;
+  
+  if (withname)
+   {
+    t_types[m->curr] = 3; /* type string */
+    t_c[m->curr] = permbuff("name");
+   }
+  
+  t_c[ncols] = blank;
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
   t->org_cols = 0;  /* all entries are "added" */
   add_to_table_list(t, table_register);
   myfree(rout_name, t_c); myfree(rout_name, t_types);
+
+  if (withname)
+   {
+     t->dynamic = 1;
+   }
 }
 
 void exec_store_coguess(struct in_cmd* cmd)
@@ -2228,7 +2266,7 @@ void exec_plot(struct in_cmd* cmd)
     /* Copy or append the gnuplot ps file in the target ps_file */
     gnuplot_append("tmpplot.ps",ps_file_name);
     /* Remove the gnuplot command */
-    remove("gnu_plot.cmd");
+/*    remove("gnu_plot.cmd");*/
   }
   else
 
@@ -3924,25 +3962,66 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
 {
   int i, ncp, nbl;
   struct constraint* c_c;
-  if (current_node->cl == NULL) return 0;
-  if (current_node->con_cnt == current_node->cl->curr)
-  {
-    current_node->con_cnt = 0; return 0;
+  int j,k;/* RDM fork */
+  char s; /* RDM fork */
+  /* RDM fork */
+  if (match_is_on==2) {
+    i=match2_cons_curr[0];
+    j=match2_cons_curr[1];
+    k=match2_cons_curr[2];
+    if(match2_cons_name[i][j]==NULL) {
+      j++;
+      if(match2_cons_name[i][j]==NULL) {
+        i++;j=0;
+        if(match2_cons_name[i][j]!=NULL){
+          name=match2_cons_name[i][j];
+          *name_l=strlen(name);
+          *type=2; /* to be changed according to s or <,=,>*/
+          *value=match2_cons_value[i][j];
+          s =match2_cons_sign[i][j];
+          if (s == '>' && *value > 0) *value=0;
+          else if (s == '<' && *value < 0) *value=0;
+          c_min=value; /* unknown use */
+          c_max=value; /* unknown use */
+          *weight=1; /*hardcode no weight with this interface */
+          k++;
+          match2_cons_curr[0]=i;
+          match2_cons_curr[1]=j;
+          match2_cons_curr[2]=k;
+          return k;
+        } else {
+          match2_cons_curr[0]=0;
+          match2_cons_curr[1]=0;
+          match2_cons_curr[2]=0;
+          return 0;
+        }
+      }
+    }
   }
-  c_c = current_node->cl->constraints[current_node->con_cnt];
-  ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
-  nbl = *name_l - ncp;
-  strncpy(name, c_c->name, ncp);
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
-  *type = c_c->type;
-  if (c_c->ex_value == NULL) *value = c_c->value;
-  else                       *value = expression_value(c_c->ex_value,2);
-  if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
-  else                       *c_min = expression_value(c_c->ex_c_min,2);
-  if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
-  else                       *c_max = expression_value(c_c->ex_c_max,2);
-  *weight = c_c->weight;
-  return ++current_node->con_cnt;
+  else  /* RDM old match */
+  {
+    if (current_node->cl == NULL) return 0;
+    if (current_node->con_cnt == current_node->cl->curr)
+    {
+      current_node->con_cnt = 0; return 0;
+    }
+    c_c = current_node->cl->constraints[current_node->con_cnt];
+    ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
+    nbl = *name_l - ncp;
+    strncpy(name, c_c->name, ncp);
+    for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+    *type = c_c->type;
+    if (c_c->ex_value == NULL) *value = c_c->value;
+    else                       *value = expression_value(c_c->ex_value,2);
+    if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
+    else                       *c_min = expression_value(c_c->ex_c_min,2);
+    if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
+    else                       *c_max = expression_value(c_c->ex_c_max,2);
+    *weight = c_c->weight;
+    return ++current_node->con_cnt;
+  }
+  /* RDM fork */
+  return 0;
 }
 
 
@@ -4505,6 +4584,10 @@ void pro_match(struct in_cmd* cmd)
   else if (strcmp(cmd->tok_list->p[0], "global") == 0)
   {
     match_global(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "use_macro") == 0)
+  {
+    match2_macro(cmd);
   }
 }
 
@@ -7720,7 +7803,6 @@ void pro_ptc_select(struct in_cmd* cmd)
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
   int                            place       = -1;
-
 /*
   int                            i           = 0;
   struct node*                   nodes[2]    = {0x0,0x0};
@@ -7775,52 +7857,34 @@ void pro_ptc_select(struct in_cmd* cmd)
   pos = name_list_pos(columnname,aTable->columns);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_select: Can not find column named <<%s>> in table <<%s>>.\n",
+    error("madxn.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
            columnname,aTable->name);
     return;
   }
 
-/*Checks the place*/
-/*
+  pos = name_list_pos("name",aTable->columns);
+  if (pos < 0)
+   {
+     warning("madxn.c: pro_ptc_select","There  column named <<name>> in table <<%s>>.\n",aTable->name);
+     return;
+   }
 
-pos = name_list_pos("place", c_parnames);
-strcpy(placestring, c_parameters->parameters[pos]->string);
-strcpy(buff,placestring);
-if (square_to_colon(buff) == 0)
-{
-warning("madxn.c: pro_ptc_select: illegal expand range ignored:", placestring);
-return;
-}
+  element = (int)command_par_value("polynomial",cmd->clone);
+  monomial = command_par_string("monomial",cmd->clone);
 
-place = name_list_pos(buff, current_sequ->ex_nodes->list);
-if (place > -1)
-{
-  printf("madxn.c: pro_ptc_select: Found place %s at position %d in the current senquence \n",
-         placestring,place);
-}
-else
-{
-  printf("madxn.c: pro_ptc_select: Can not find place %s\n",placestring);
-  return;
-}
-*/
+  tabnameIA = new_int_array(1+strlen(tablename));
+  colnameIA = new_int_array(1+strlen(columnname));
+  monoIA = new_int_array(1+strlen(monomial));
+  conv_char(tablename,tabnameIA);
+  conv_char(columnname,colnameIA);
+  conv_char(monomial,monoIA);
 
-element = (int)command_par_value("polynomial",cmd->clone);
-monomial = command_par_string("monomial",cmd->clone);
+  place++; /*Converting to the Fortran numeration (1...n)*/
+  w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
 
-tabnameIA = new_int_array(1+strlen(tablename));
-colnameIA = new_int_array(1+strlen(columnname));
-monoIA = new_int_array(1+strlen(monomial));
-conv_char(tablename,tabnameIA);
-conv_char(columnname,colnameIA);
-conv_char(monomial,monoIA);
-
-place++; /*Converting to the Fortran numeration (1...n)*/
-w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
-
-delete_int_array(tabnameIA);
-delete_int_array(colnameIA);
-delete_int_array(monoIA);
+  delete_int_array(tabnameIA);
+  delete_int_array(colnameIA);
+  delete_int_array(monoIA);
 
 }
 /********************************************************************************/

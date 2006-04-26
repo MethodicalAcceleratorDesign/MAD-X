@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <errno.h>
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/utsname.h>
@@ -290,6 +292,7 @@ void buffer_in_cmd(struct in_cmd* cmd)
 void check_table(char* string)
   /* replaces argument of "table" if any by a string variable */
 {
+
   char *pa, *pb, *pt, *pl, *pr, *sv, *quote;
   char* qpos[1000];
   int npos = 0;
@@ -481,6 +484,8 @@ int decode_command () /* compares command with templates, fills this_cmd
                          -2 label is protected keyword;
                          -3 statement not recognised */
 {
+
+  
   int i, aux_pos, cmd_pos, decl_start, type;
   int n = this_cmd->tok_list->curr;
   char** toks = this_cmd->tok_list->p;
@@ -3131,6 +3136,8 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
         stack[1] = stack[0]; stack[0] = 0;
       }
       else  c_stack--;
+      
+      
       switch(k)
       {
         case 0:
@@ -3143,6 +3150,14 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
           stack[c_stack] *= stack[c_stack+1];
           break;
         case 3:
+          if (stack[c_stack+1] == 0.0)
+           {
+             warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);
+             /*fatal_error("Division by zero is not defined","Aborting!");*/
+             stack[c_stack] = 0.0;
+             /*stack[c_stack] = nan("");*/
+             break;
+           }  
           stack[c_stack] /= stack[c_stack+1];
           break;
         case 4:
@@ -4291,14 +4306,31 @@ int table_row(struct table* table, char* name)
 {
   int i, j, ret = -1;
   for (i = 0; i < table->num_cols; i++)
-    if(table->columns->inform[i] == 3) break;
+   {
+     if(table->columns->inform[i] == 3) 
+      {
+        if (debuglevel > 2) 
+          printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
+                 i,table->columns->names[i]);
+        break;
+      } 
+   }  
+  
   if (i < table->num_cols)
-  {
+   {
     for (j = 0; j < table->curr; j++)
-      if (tab_name_code(name, table->s_cols[i][j])) break;
+     {  
+        if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
+        if (tab_name_code(name, table->s_cols[i][j])) break;
+     }  
     if (j < table->curr) ret = j;
-  }
-  if(ret==-1) fatal_error("Name of row not found", name);
+   }
+  else
+   {
+     if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
+   } 
+/*  if(ret==-1) fatal_error("Name of row not found", name);*/
+  if(ret==-1) warning("table_row","Name of row not found: %s,", name);
   return ret;
 }
 
@@ -4647,7 +4679,50 @@ double variable_value(struct variable* var)
   return val;
 }
 
-void warning(char* t1, char* t2)
+void warning(char* t1, register char* fmt, ...)
+{
+/*prints warning on the standard error and accepts parameters printout with std C formatting*/
+/*Piotr Skowronski CERN*/
+  va_list         list;
+
+  warn_numb++; /*I think that warnings should be counted even if the user does not want to see them*/
+  fflush(0); /*flushes all the buffers -> so the warning appears in a correct place*/
+
+  if (get_option("warn") == 0)
+   {
+     return;
+   }
+
+  va_start( list, fmt );
+
+  fprintf(stderr,"++++++ warning: %s : ",t1); /*prints first part to the STDERR and +++....*/
+  vfprintf(stderr, fmt, list); /*prints the second part and variables*/
+  fprintf(stderr,"\n"); /*prints end of line*/
+  fflush(stderr); /*flushes STDERR*/
+  va_end(list);
+}
+
+void error(char* t1, register char* fmt, ...)
+{
+/*prints warning on the standard error and accepts parameters printout with std C formatting*/
+/*Piotr Skowronski CERN*/
+  va_list         list;
+
+  warn_numb++; /*I think that warnings should be counted even if the user does not want to see them*/
+  fflush(0); /*flushes all the buffers -> so the warning appears in a correct place*/
+
+  va_start( list, fmt );
+
+  fprintf(stderr,"++++++ Error: %s : ",t1); /*prints first part to the STDERR and +++....*/
+  vfprintf(stderr, fmt, list); /*prints the second part and variables*/
+  fprintf(stderr,"\n"); /*prints end of line*/
+  fflush(stderr); /*flushes STDERR*/
+  va_end(list);
+}
+
+
+
+void warningOld(char* t1, char* t2)
 {
   if (get_option("warn")) 
   {

@@ -72,19 +72,22 @@ CONTAINS
   subroutine ptc_create_universe()
     implicit none
 
+    if (getdebug()>1) print*,"Now PTC"
+    
     print77=.false.
     read77 =.false.
 
+    if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
 
     call set_up_universe(m_u)
     universe=universe+1
-
+    
+    
   end subroutine ptc_create_universe
   !_________________________________________________________________
 
   subroutine ptc_create_layout()
-    use madx_ptc_intstate_module, only : initintstate
     implicit none
     real(kind(1d0)) get_value
 
@@ -104,11 +107,11 @@ CONTAINS
        return
     endif
 
+    cavsareset = .false.
     mytime=get_value('ptc_create_layout ','time ').ne.0
-    
-    call initintstate(default)
 
     if(mytime) then
+       default=getintstate()
        default=default+time
        call setintstate(default)
     endif
@@ -170,8 +173,7 @@ CONTAINS
     integer             nst0,nst1
     REAL (dp) :: tempdp
     !---------------------------------------------------------------
-
-    if (getdebug() > 0) then
+    if (getdebug() > 1) then
        print *, '--------------------------------------------------------------'
        print *, '--------------------------------------------------------------'
        print *, '------    E X E C U T I N G     P T C     I N P U T   --------'
@@ -197,15 +199,15 @@ CONTAINS
 
 
     if(abs(pma-pmae)/pmae<c_0_002) then
-       if (getdebug() > 2) print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
+       if (getdebug() > 1) print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
        particle=.true.
        CALL MAKE_STATES(PARTICLE)
     elseif(abs(pma-pmap)/pmap<c_0_002) then
-       if (getdebug() > 2) print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
+       if (getdebug() > 1) print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
        particle=.false.
        CALL MAKE_STATES(PARTICLE)
     else
-       if (getdebug() > 2) print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
+       if (getdebug() > 1) print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
        muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
@@ -213,9 +215,11 @@ CONTAINS
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
 
-    if (getdebug() > 2) print '(a23, l7, a1)','Executing MAKE_STATES(',PARTICLE,')'
+    if (getdebug() > 1) print '(a23, l7, a1)','Executing MAKE_STATES(',PARTICLE,')'
 
     CALL MAKE_STATES(PARTICLE)
+
+    if (getdebug()==0) global_verbose = .false.
 
     !  with_external_frame=.false.
     !  with_internal_frame=.false.
@@ -223,21 +227,21 @@ CONTAINS
     !  with_patch=.false.
 
     ! Global Keywords
-
-    if (getdebug() > 2) then
+    
+    if (getdebug() > 1) then
        print *, '=============================================================='
        print *, 'INPUT PARAMETERS ARE:'
     endif
 
     sector_nmul_max0 = get_value('ptc_create_layout ','sector_nmul_max ')
-    if (getdebug() > 2) print*,'  Global max sector_nmul: ',sector_nmul_max0
+    if (getdebug() > 1) print*,'  Global max sector_nmul: ',sector_nmul_max0
 
     sector_nmul0 = get_value('ptc_create_layout ','sector_nmul ')
-    if (getdebug() > 2) print*,'  Global sector_nmul: ',sector_nmul0
+    if (getdebug() > 1) print*,'  Global sector_nmul: ',sector_nmul0
 
 
     model = get_value('ptc_create_layout ','model ')
-    if (getdebug() > 2) print*,'  Global Model code is : ',model
+    if (getdebug() > 1) print*,'  Global Model code is : ',model
 
     !*****************************
     !  MODEL Settings
@@ -258,39 +262,39 @@ CONTAINS
 
 
 
-    if (getdebug() > 2) print*,'  Global Model name (keymod0) is : ',keymod0
+    if (getdebug() > 1) print*,'  Global Model name (keymod0) is : ',keymod0
 
     method0   = get_value('ptc_create_layout ','method ')
-    if (getdebug() > 2) print*,'  Global method is: ',method0
+    if (getdebug() > 1) print*,'  Global method is: ',method0
 
     exact0    = get_value('ptc_create_layout ','exact ') .ne. 0
-    if (getdebug() > 2) print*,'  Global exact is: ',exact0
+    if (getdebug() > 1) print*,'  Global exact is: ',exact0
 
     nst0      = get_value('ptc_create_layout ','nst ')
-    if (getdebug() > 2) print*,'  Global Number of Integration Steps (nst) is: ',nst0
+    if (getdebug() > 1) print*,'  Global Number of Integration Steps (nst) is: ',nst0
 
     ! MAD-X specials
     madlength = get_option('rbarc ') .eq. 0
-    if (getdebug() > 2) print*,'  global rbend_length: ',madlength
+    if (getdebug() > 1) print*,'  global rbend_length: ',madlength
 
     mad       = get_value('ptc_create_layout ','mad_mult ') .ne. 0
-    if (getdebug() > 2) print*,'  global mad_mult as in mad8: ',mad
+    if (getdebug() > 1) print*,'  global mad_mult as in mad8: ',mad
 
     mad8      = get_value('ptc_create_layout ','mad8 ') .ne. 0
-    if (getdebug() > 2) print*,'  rbend as in mad8 (only global): ',mad8
+    if (getdebug() > 1) print*,'  rbend as in mad8 (only global): ',mad8
 
     gamma     = get_value('beam ','gamma ')
-    if (getdebug() > 2) print*,'  gamma: ',gamma
+    if (getdebug() > 1) print*,'  gamma: ',gamma
 
     k         = double_from_table('summ ','gammatr ',1,gammatr)
-    if (getdebug() > 2) print*,'  gammatr: ',gammatr
+    if (getdebug() > 1) print*,'  gammatr: ',gammatr
 
     gamma2    = gamma**2
     gammatr2  = gammatr**2
-
-    if (getdebug() > 2) then
-       print *, '=============================================================='
-       print *, ''
+    
+    if (getdebug() > 1) then
+      print *, '=============================================================='
+      print *, ''
     endif
 
     !  call Set_Up(MY_RING)
@@ -303,8 +307,8 @@ CONTAINS
     endif
 
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-
-    if (getdebug() > 0) print *, 'MADx is set'
+    
+    if (getdebug() > 1) print *, 'MADx is set'
 
     icav=0
     nt=0
@@ -438,7 +442,7 @@ CONTAINS
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
-       if (getdebug() > 9)  print *, 'This is a drift'
+!       if (getdebug() > 2)  print *, 'This is a drift'
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
@@ -753,7 +757,7 @@ CONTAINS
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
     case(27)
-       if (getdebug() > 9)  print *, 'This is a twcavity'
+!       if (getdebug() > 2)  print *, 'This is a twcavity'
        key%magnet="twcavity"
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -789,7 +793,10 @@ CONTAINS
     call create_fibre(my_ring%end,key,EXCEPTION)
     if(advance_node().ne.0)  goto 10
 
-    print*,' Length of machine: ',l_machine
+    if (getdebug() > 0) then
+      print*,' Length of machine: ',l_machine
+    endif
+       
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
 
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
@@ -803,15 +810,21 @@ CONTAINS
 
     doneit=.true.
     call ring_l(my_ring,doneit)
-    write(6,*) "------------------------------------ PTC Survey ------------------------------------"
-    write(6,*) "Before start: ",my_ring%start%chart%f%a
-    write(6,*) "Before   end: ",my_ring%end%chart%f%b
-    call survey(my_ring)
-    write(6,*) "After  start: ",my_ring%start%chart%f%a
-    write(6,*) "After    end: ",my_ring%end%chart%f%b
-
 
     if (getdebug() > 0) then
+      write(6,*) "------------------------------------ PTC Survey ------------------------------------"
+      write(6,*) "Before start: ",my_ring%start%chart%f%a
+      write(6,*) "Before   end: ",my_ring%end%chart%f%b
+    endif 
+    
+    call survey(my_ring)
+    
+    if (getdebug() > 0) then
+      write(6,*) "After  start: ",my_ring%start%chart%f%a
+      write(6,*) "After    end: ",my_ring%end%chart%f%b
+    endif 
+    
+    if (getdebug() > 1) then 
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^    F I N I S H E D      P T C     I N P U T    ^^^^^^^^'
@@ -946,7 +959,7 @@ CONTAINS
     !        return
     !      endif
 
-    if (getdebug() > 0) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
+    if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
     open(unit=42,file=filename)
 
     call init(getintstate(),1,c_%np_pol,berz)
@@ -1060,8 +1073,11 @@ CONTAINS
     integer  :: charge    ! charge of an accelerated particle
 
 
+    if (getdebug() > 1) print*,"ptc_twiss"
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
+
+    if (getdebug() > 1) print*,"ptc_twiss: Table name is ",table_name
 
     if(universe.le.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -1080,11 +1096,11 @@ CONTAINS
     icase = get_value('ptc_twiss ','icase ')
     deltap0 = get_value('ptc_twiss ','deltap ')
 
-    default = getintstate()
-
+    deltap = zero
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
-
+    
+    
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -1192,9 +1208,14 @@ CONTAINS
     print77=.false.
     open(unit=21,file='ptctwiss.txt')
 
-    do i=1,MY_RING%n
+    if (getdebug() > 2) then
+       print *, "ptc_twiss: internal state is:"
+       call print(default,6)
+    endif
 
-       if (getdebug() > 0) then
+    do i=1,MY_RING%n
+       
+       if (getdebug() > 1) then
           write(6,*) "##########################################"
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
           write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
@@ -1210,7 +1231,7 @@ CONTAINS
           goto 100
        endif
 
-       call putusertable(i,y)
+       call putusertable(i,current%mag%name,y)
 
        suml=suml+current%MAG%P%ld
        tw=y
@@ -1249,9 +1270,9 @@ CONTAINS
          ! if current is the last element in the sequence i.e.
          ! p%next == NULL (LINE) OR
          ! p%next points the first element (CIRCLE)
-         cfen=current
-
-         if (getdebug()>0) then
+         cfen=current                                    
+         
+         if (getdebug()>1) then
             !if it is the last element in the line
             print *, 'It is the last element  ', current%mag%name
             !(it is always marker, i.e element that does not change reference energy)
@@ -1346,7 +1367,10 @@ CONTAINS
          enddo
       enddo
 
-      if (getdebug() > 9)   write(6,'(a16,4f10.6)') 'b11,b12,b21,b22: ',opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      if (getdebug() > 2)  then
+        write(6,'(a16,4f12.3)') 'b11,b12,b21,b22: ',&
+             &opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+      endif
 
       ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
@@ -1449,7 +1473,7 @@ CONTAINS
 
 
       inval = get_option('twiss_inval ')
-      if( (inval.eq.1) .and. (getdebug() > 0)) then
+      if( (inval.eq.1) .and. (getdebug() > 1)) then
          print*," Read BETA0 block in module ptc_twiss"
       endif
 
@@ -1863,8 +1887,10 @@ CONTAINS
 
     icase = get_value('ptc_normal ','icase ')
     deltap0 = get_value('ptc_normal ','deltap ')
-
+    
+    deltap = zero
     call my_state(icase,deltap,deltap0)
+    CALL UPDATE_STATES
 
     x(:)=zero
     if(mytime) then
@@ -2095,11 +2121,11 @@ CONTAINS
 
     icase = get_value('ptc_track ','icase ')
     deltap0 = get_value('ptc_track ','deltap ')
+    
+    deltap = zero
     call my_state(icase,deltap,deltap0)
 
-    CALL UPDATE_STATES
     if (getdebug() > 2) then
-
        print *, "ptc_track: internal state is:"
        call print(default,6)
     endif
@@ -2116,6 +2142,7 @@ CONTAINS
        call find_orbit(my_ring,x0,1,default,c_1d_7)
        CALL write_closed_orbit(icase,x0)
     endif
+
 
     call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
 
@@ -2215,7 +2242,7 @@ CONTAINS
     integer ind(6)
     real(dp) au(6,6),aui(2),sx,cx,dphi(3)
     character(len=nd2), dimension(:), pointer :: string
-
+   
     icount=icount+1
     if(nd2.eq.4) string=>str4
     if(nd2.eq.6) string=>str6
@@ -2295,6 +2322,7 @@ CONTAINS
        angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
        au(ii,ii-1)=s1%junk%v(ii2).sub.string(ii-1)
        angp(1,ii)=s1%junk%v(ii1).sub.string(ii)
+       
        au(ii,ii)=s1%junk%v(ii2).sub.string(ii)
        au(i2-1,i2-1)=s1%junk%v(ii1).sub.string(i2-1)
        au(i2,i2-1)=s1%junk%v(ii2).sub.string(i2-1)
@@ -2539,13 +2567,19 @@ CONTAINS
     real(dp) deltap0,deltap
 
     default = getintstate()
-
+    
+    if (getdebug()>1) then
+      print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
+    endif
+    
     deltap = zero
     select case(icase)
     CASE(4)
+       if (getdebug()>1) print*, "my_state: Enforcing ONLY_4D+NOCAVITY"
        default=default+only_4d+NOCAVITY
        i=4
     CASE(5)
+       if (getdebug()>1) print*, "my_state: Enforcing DELTA"
        default=default+delta
        deltap=deltap0
        i=5
@@ -2556,10 +2590,14 @@ CONTAINS
        i=4
     END SELECT
 
-    if(i==6.and.icav==0) then
+    if (i==6) then
+      if (icav==0) then
        default=default+only_4d+NOCAVITY
        call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
        i=4
+      else
+       default = default - NOCAVITY !enforcing nocavity to false
+      endif 
     endif
 
     call setintstate(default)

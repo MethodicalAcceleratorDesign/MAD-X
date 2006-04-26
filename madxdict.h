@@ -173,6 +173,7 @@ char command_def[] =
 " "
 "create: control none 0 0 "
 "table = [s, none], "
+"withname = [l, false, true], "
 "column   = [s,{none}]; "
 " "
 "deselect: control none 0 0 "
@@ -465,12 +466,13 @@ char command_def[] =
 "debug = [i, 0, 1]; "
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
-"debuglevel = [i,0], "/*sets the level of debugging printout 0 none, 10 everything */
+"debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 10 everything */
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis = [l, true, true], " /* switch to ensure exact misaligment treatment */
 "totalpath = [l, true, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
 "radiation = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
 "fringe = [l, true, true], "  /*sets the fringe switch/internal state of PTC */
+"nocavity = [l, true, true], "  /*sets the nocavity switch/internal state of PTC */
 "time = [l, true, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
 " " 
 "ptc_track: ptc_track none 0 0 "
@@ -1699,6 +1701,7 @@ char command_def[] =
 "deltap   = [s, none]; "
 " "
 "match: match match 1 0 "
+"use_macro= [l, false, true], "
 "betx     = [r, {0}], alfx     = [r, {0}], mux      = [r, {0}], "
 "bety     = [r, {0}], alfy     = [r, {0}], muy      = [r, {0}], "
 "x        = [r, {0}], px       = [r, {0}], "
@@ -1745,6 +1748,8 @@ char command_def[] =
 "calls    = [i, 1000, 1000]; "
 " "
 "constraint: match match 0 0 "
+"expr     = [s, none, none], "
+"weight   = [r, 1.0], "
 "range    = [s, #s/#e, none], "
 "class    = [s, none, none], "
 "pattern  = [s, any, none], "
@@ -1959,5 +1964,8 @@ char command_def[] =
 " "
 "observe: track track 0 0 "
 "place    = [s, none]; "
+" "
+"use_macro: match match 0 0 "
+"name     = [s, none, none]; "
 " "
 ;
