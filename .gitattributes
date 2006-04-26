@@ -16,6 +16,7 @@
 /Sk_link_list.f90 -text
 /Sl_family.f90 -text
 /Sm_tracking.f90 -text
+/Sma_multiparticle.f90 -text
 /Sn_mad_like.f90 -text
 /So_fitting.f90 -text
 /Sp_keywords.f90 -text
@@ -90,6 +91,7 @@
 /plot_b.fi -text
 /plot_c.fi -text
 /plot_math.fi -text
+/pointers.f90 -text
 /poisson.F -text
 /ptc_dummy.F -text
 /resindex.F -text
