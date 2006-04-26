@@ -82,6 +82,7 @@
 /match.F -text
 /match.fi -text
 /matchc.c -text
+/matchc2.c -text
 /matchjc.F -text
 /matchlib.F -text
 /matchsa.F -text
