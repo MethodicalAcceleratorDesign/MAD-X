@@ -5,8 +5,8 @@ module S_status
   use s_frame
   USE S_extend_poly
   use anbn
-  USE S_pol_user1
-  USE S_pol_user2
+  !  USE S_pol_user1
+  !  USE S_pol_user2
   Use S_pol_sagan
   implicit none
   public
@@ -35,23 +35,17 @@ module S_status
   integer, parameter :: KIND19 =ST+19
   integer, parameter :: KIND20 =ST+20     !  MADLIKE wedges on RBEND
   integer, parameter :: KIND21 =ST+21     !  travelling wave cavity
-  integer, parameter :: KIND22 =ST+22     !  travelling wave cavity
-  integer, parameter :: KIND23 =ST+23     !  travelling wave cavity
-  integer, parameter :: KINDFITTED = KIND23+1
-  integer, parameter :: KINDUSER1 = KIND23+2
-  integer, parameter :: KINDUSER2 = KIND23+3
-  integer, parameter :: KINDwiggler = KIND23+4
-  integer, parameter :: KINDmu      = KIND23+5
-  integer, parameter :: KINDpa     = KIND23+6
+  integer, parameter :: KIND22 =ST+22     !
+  integer, parameter :: KIND23 =ST+23     !
+  !  integer, parameter :: KINDFITTED = KIND23+1
+  !  integer, parameter :: KINDUSER1 = KIND23+2
+  !  integer, parameter :: KINDUSER2 = KIND23+3
+  integer, parameter :: KINDwiggler = KIND23+2
+  integer, parameter :: KINDmu      = KIND23+3
+  integer, parameter :: KINDpa     = KIND23+4
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6
-  INTEGER, PARAMETER :: METHOD_1 = -1
-  INTEGER, PARAMETER :: METHOD_2 = -2
-  INTEGER, PARAMETER :: METHOD_3 = -3
-  INTEGER, PARAMETER :: METHOD_4 = -4
-  INTEGER, PARAMETER :: METHOD_F = -5
-  LOGICAL(lp),TARGET  :: NEW_METHOD=.FALSE.
   character(6) ind_stoc(ndim2)
   !  Making PTC leaner is false
   !
@@ -75,10 +69,7 @@ module S_status
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   !  real(dp),PARAMETER::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
   !  real(dp),PARAMETER::FD1=half/(one+AAA),FD2=AAA*FD1,FK1=one/(one+AAA),FK2=(AAA-one)*FK1
-  real(dp), ALLOCATABLE,DIMENSION(:,:)::SPK,SPD    ! 5 NEGATIVE METHODS
-  real(dp), ALLOCATABLE,DIMENSION(:)::SDF,SDK,SDDF
-  TYPE(REAL_8), ALLOCATABLE,DIMENSION(:)::PSDF,PSDK
-  INTEGER, ALLOCATABLE,DIMENSION(:)::SPN
+
   LOGICAL(lp) :: firsttime_coef=.true.
 
   PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt
@@ -91,9 +82,9 @@ module S_status
   INTEGER,PARAMETER::NMAX=20
   include "a_def_all_kind.inc"
   include "a_def_sagan.inc"
-  include "a_def_user1.inc"
+  !  include "a_def_user1.inc"
   !!  include "a_def_arbitrary.inc"
-  include "a_def_user2.inc"
+  !  include "a_def_user2.inc"
   include "a_def_element_fibre_layout.inc"
   TYPE(INTERNAL_STATE), target ::  DEFAULT
   TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME,EXACTMIS
@@ -486,9 +477,9 @@ CONTAINS
     MYTYPE(kind16)=" TRUE PARAELLEL  BEND  "
     MYTYPE(kind20)=" STRAIGHT EXACT (BEND) "
     MYTYPE(kind17)=" SOLENOID SIXTRACK"
-    MYTYPE(KINDFITTED)=" FITTED "
-    MYTYPE(KINDUSER1)=" USER_1 "
-    MYTYPE(KINDUSER2)=" USER_2 "
+    !    MYTYPE(KINDFITTED)=" FITTED "
+    !    MYTYPE(KINDUSER1)=" USER_1 "
+    !    MYTYPE(KINDUSER2)=" USER_2 "
     ind_stoc(1)='100000'
     ind_stoc(2)='010000'
     ind_stoc(3)='001000'
@@ -814,162 +805,6 @@ CONTAINS
     C_%NPARA=NPARA
     C_%npara_fpp=NPARA
   END  subroutine S_init_berz
-
-  SUBROUTINE MAKE_METHOD(N)
-    IMPLICIT NONE
-    integer I,J,N
-
-
-    ALLOCATE(SPK(N,METHOD_F:METHOD_1))
-    ALLOCATE(SPD(N,METHOD_F:METHOD_1))
-    ALLOCATE(SPN(METHOD_F:METHOD_1))
-    ALLOCATE(SDF(N))
-    ALLOCATE(SDK(N))
-    ALLOCATE(SDDF(N))
-    ALLOCATE(PSDF(N))  ! POLYMORPHS
-    ALLOCATE(PSDK(N))  ! POLYMORPHS
-
-    DO J=METHOD_F,METHOD_1
-       SPN(J)=N               ! DEFAULT
-       DO I=1,N
-          SDF(I)=zero
-          SDK(I)=zero
-          SDK(I)=zero
-          SPK(I,J)=zero
-          SPD(I,J)=zero
-       ENDDO
-    ENDDO
-    NEW_METHOD=.TRUE.
-
-  END SUBROUTINE MAKE_METHOD
-
-  SUBROUTINE KILL_METHOD
-    IMPLICIT NONE
-    integer ERROR
-
-    DEALLOCATE (SPK, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) = " SPK ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) = " SPK ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (SPD, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SPD ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SPD ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (SPN, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SPN ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SPN ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (SDF, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SDF ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SDF ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (SDK, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SDK ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SDK ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (PSDF, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " PSDF ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " PSDF ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (PSDK, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " PSDK ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " PSDK ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    DEALLOCATE (SDDF, STAT = error)
-    IF(ERROR==0) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SDDF ARRAY DEALLOCATED "
-       call WRITE_I
-    ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1) =  " SDDF ARRAY not DEALLOCATED : PROBLEMS"
-       call WRITE_I
-    ENDIF
-
-    NEW_METHOD=.FALSE.
-
-  END SUBROUTINE KILL_METHOD
 
 
   SUBROUTINE B2PERPR(P,B,X,X5,B2)

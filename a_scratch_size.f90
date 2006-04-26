@@ -103,6 +103,7 @@ module precision_constants
   real(dp),parameter::eps_extend_poly=1e-10_dp
   real(dp),parameter::eps_fitted=1e-11_dp
   real(dp),parameter::c_1d_11=1e-11_dp
+  real(dp),parameter::c_1d_16=1e-16_dp
   real(dp),parameter::eps_def_kind=1e-9_dp
   real(dp),parameter::deps_tracking=1e-6_dp
   real(dp),parameter::c_1d_7=1e-7_dp
@@ -193,8 +194,6 @@ module precision_constants
      REAL(dp),pointer     :: absolute_aperture     !=1e3_dp generic aperture check
      real(dp),pointer :: hyperbolic_aperture  ! controls crashes in exponentials
 
-     !
-     logical(lp),pointer   :: NEW_METHOD ! new integration method exists
 
      ! influence fibre creation
      integer, pointer :: MADTHICK        !
@@ -213,7 +212,7 @@ module precision_constants
      logical(lp),pointer ::FIBRE_flip    !=.true.
      !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
      logical(lp), pointer :: x_prime != .false.
-
+     real(dp), pointer :: eps_pos
      ! fill once and never touch again
 
      integer, pointer :: SECTOR_NMUL_MAX     != 10 maxwell equations is solved to order 10 in exact sectors
@@ -621,6 +620,7 @@ CONTAINS
           STRING(J:J) = C1
        ENDIF
     ENDDO
+    string=string(1:len_trim(string))
     RETURN
   END  SUBROUTINE CONTEXT
 
@@ -827,7 +827,7 @@ contains
     type (my_1D_taylor) mul
     type (my_1D_taylor), INTENT (IN) :: S1, S2
     integer I,J
-    mul%a=0.0_DP
+    mul%a=zero
     DO I=0,N_my_1D_taylor
        DO J=0,N_my_1D_taylor
           IF(I+J>N_my_1D_taylor) CYCLE
@@ -946,7 +946,7 @@ contains
     real(dp), INTENT (IN) :: S1
     type (my_1D_taylor), INTENT (inout) :: S2
 
-    S2%a=0.0_dp
+    S2%a=zero
     S2%a(0)=s1
 
   END subroutine input_real_in_my_1D_taylor
@@ -968,11 +968,11 @@ contains
     type (my_1D_taylor), INTENT (IN) :: S1
     integer I
     T=S1
-    T%A(0)=0.0_DP
+    T%A(0)=zero
 
 
-    DEXPT=1.0_dp
-    tt=1.0_dp
+    DEXPT=one
+    tt=one
 
     do i=1,N_my_1D_taylor
        tt=tt*t/i
@@ -991,7 +991,7 @@ contains
     integer I
 
     T=S1/S1%A(0)
-    T%A(0)=0.0_DP
+    T%A(0)=zero
 
     TT=T
     do i=1,N_my_1D_taylor
@@ -1010,9 +1010,9 @@ contains
     WRITE(6,*) " MARDE "
     STOP 666
     T=S1/S1%A(0)
-    T%A(0)=0.0_DP
+    T%A(0)=zero
 
-    DSQRTT=1.0_DP + T/2.0_DP - T**2/8.0_DP+T**3/16.0_DP
+    DSQRTT=one + T/two - T**2/eight+T**3/c_16
     DSQRTT=DSQRTT* SQRT(S1%A(0))
 
   END FUNCTION  DSQRTT
@@ -1025,9 +1025,9 @@ contains
     STOP 666
 
     T=S1
-    T%A(0)=0.0_DP
+    T%A(0)=zero
 
-    DCOST=COS(S1%A(0))*(1.0_DP-T**2/2.0_DP)-SIN(S1%A(0))*(T-T**3/6.0_DP)
+    DCOST=COS(S1%A(0))*(one-T**2/two)-SIN(S1%A(0))*(T-T**3/six)
 
   END FUNCTION  DCOST
 
@@ -1037,9 +1037,9 @@ contains
     type (my_1D_taylor), INTENT (IN) :: S1
 
     T=S1
-    T%A(0)=0.0_DP
+    T%A(0)=zero
 
-    DSINT=SIN(S1%A(0))*(1.0_DP-T**2/2.0_DP)+COS(S1%A(0))*(T-T**3/6.0_DP)
+    DSINT=SIN(S1%A(0))*(one-T**2/two)+COS(S1%A(0))*(T-T**3/six)
 
   END FUNCTION  DSINT
 
@@ -1048,8 +1048,8 @@ end module my_own_1D_TPSA
 module gauss_dis
 
   use precision_constants
-  private alex_ISEED
   public
+  private alex_ISEED
   integer :: alex_ISEED=1000
   !cccccccccccccccccccccccc     Program 2.13     ccccccccccccccccccccccccc
   !
@@ -1079,8 +1079,8 @@ contains
 
 
 1   R1 = -LOG(one-RANF())
-    R2 = 2.0_dp*PI*RANF()
-    R1 = SQRT(2.0_dp*R1)
+    R2 = two*PI*RANF()
+    R1 = SQRT(two*R1)
     X  = R1*COS(R2)
     if(abs(x)>cut) goto 1
     ! Y  = R1*SIN(R2)

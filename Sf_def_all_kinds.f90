@@ -52,9 +52,9 @@ contains
     DO I=1,R%N
        IF(P%MAG%KIND/=KIND23) THEN
           L=L+P%MAG%P%LD
-       ELSE
-          CALL GET_LENGTH(P%MAG%G23,LG)
-          L=L+LG
+          !       ELSE
+          !          CALL GET_LENGTH(P%MAG%G23,LG)
+          !          L=L+LG
        ENDIF
        P=>P%NEXT
     ENDDO
@@ -503,39 +503,40 @@ contains
 
        SELECT CASE(E_IN%F%MAG%KIND)
 
-       CASE(KIND0)
-          CALL XFRAME(E_IN,MID,O,0)
-          E_IN%L(0)=zero +E_IN%L(-1)
-          IF(NST/=0) THEN
-             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG at kind23"
-             STOP 330
-          ENDIF
-       CASE(kind23)                 ! kind 23 layout
-          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
+          !       CASE(KIND0)
+          !          CALL XFRAME(E_IN,MID,O,0)
+          !          E_IN%L(0)=zero +E_IN%L(-1)
+          !          IF(NST/=0) THEN
+          !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG at kind23"
+          !             STOP 330
+          !          ENDIF
 
-          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+          !       CASE(kind23)                 ! kind 23 layout
+          !          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
+          !
+          !          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+          !
+          !          if(E_IN%F%dir==1) then
+          !             CALL XFRAME(E_IN,P%F%ent,P%F%a,start)
+          !          else
+          !             CALL XFRAME(E_IN,P%F%exi,P%F%b,start)
+          !          endif
+          !
+          !          start=start+E_IN%F%dir
+          !
+          !          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+          !
+          !          if(E_IN%F%dir==1) then
+          !             CALL XFRAME(E_IN,P%F%exi,P%F%b,start)
+          !          else
+          !             CALL XFRAME(E_IN,P%F%ent,P%F%a,start)
+          !          endif
 
-          if(E_IN%F%dir==1) then
-             CALL XFRAME(E_IN,P%F%ent,P%F%a,start)
-          else
-             CALL XFRAME(E_IN,P%F%exi,P%F%b,start)
-          endif
-
-          start=start+E_IN%F%dir
-
-          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
-
-          if(E_IN%F%dir==1) then
-             CALL XFRAME(E_IN,P%F%exi,P%F%b,start)
-          else
-             CALL XFRAME(E_IN,P%F%ent,P%F%a,start)
-          endif
-
-          IF(NST/=1) THEN
-             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
-             STOP 331
-          ENDIF
-       CASE(KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,KINDMU)
+          !          IF(NST/=1) THEN
+          !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+          !             STOP 331
+          !          ENDIF
+       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,KINDMU)
           LH=P%LC/TWO
           A=O
           D=ZERO;D(3)=-LH
@@ -681,13 +682,13 @@ contains
 
        SELECT CASE(E_IN%F%MAG%KIND)
 
-       CASE(KIND0)
-          E_IN%L(0)=zero +E_IN%L(-1)
-          IF(NST/=0) THEN
-             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
-             STOP 330
-          ENDIF
-       CASE(KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,KINDMU)
+          !       CASE(KIND0)
+          !          E_IN%L(0)=zero +E_IN%L(-1)
+          !          IF(NST/=0) THEN
+          !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+          !             STOP 330
+          !          ENDIF
+       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,KINDMU)
           E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
           DO I=1,NST
              start=start+E_IN%F%dir
@@ -733,21 +734,21 @@ contains
              ENDDO
 
           ENDIF
-       CASE(kind23)                 ! kind 23 layout
-          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
+          !       CASE(kind23)                 ! kind 23 layout
+          !          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
+          !
+          !          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
+          !
+          !
+          !          start=start+E_IN%F%dir
+          !
+          !          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
 
-          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
-
-
-          start=start+E_IN%F%dir
-
-          E_IN%L(start)=start*lh/nst  +E_IN%L(-1)
-
-          IF(NST/=1) THEN
-             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
-             STOP 331
-          ENDIF
-
+          !          IF(NST/=1) THEN
+          !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
+          !             STOP 331
+          !          ENDIF
+          !
        CASE DEFAULT
 
 

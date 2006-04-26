@@ -106,35 +106,33 @@ m_real_polymorph.o: l_complex_taylor.o m_real_polymorph.f90
 n_complex_polymorph.o: m_real_polymorph.o n_complex_polymorph.f90
 o_tree_element.o: n_complex_polymorph.o o_tree_element.f90
 Sa_extend_poly.o: o_tree_element.o Sa_extend_poly.f90
-Sb_1_pol_template.o: Sa_extend_poly.o Sb_1_pol_template.f90
-Sb_2_pol_template.o: Sb_1_pol_template.o Sb_2_pol_template.f90
-Sb_sagan_pol_arbitrary.o: Sb_2_pol_template.o Sb_sagan_pol_arbitrary.f90
+Sb_sagan_pol_arbitrary.o: Sa_extend_poly.o Sb_sagan_pol_arbitrary.f90
 Sc_euclidean.o: Sb_sagan_pol_arbitrary.o Sc_euclidean.f90
 Sd_frame.o: Sc_euclidean.o Sd_frame.f90
 Se_status.o: Sd_frame.o Se_status.f90 a_def_all_kind.inc a_def_sagan.inc \
-	a_def_user1.inc a_def_user2.inc a_def_element_fibre_layout.inc
+	a_def_element_fibre_layout.inc
 Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
-Sg_1_fitted.o: Sf_def_all_kinds.o Sg_1_fitted.f90
-Sg_1_template_my_kind.o: Sg_1_fitted.o Sg_1_template_my_kind.f90
-Sg_2_template_my_kind.o: Sg_1_template_my_kind.o Sg_2_template_my_kind.f90
-Sg_sagan_wiggler.o: Sg_2_template_my_kind.o Sg_sagan_wiggler.f90
+Sg_sagan_wiggler.o: Sf_def_all_kinds.o Sg_sagan_wiggler.f90
 Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
 Si_def_element.o: Sh_def_kind.o Si_def_element.f90
 Sj_elements.o: Si_def_element.o Sj_elements.f90
 Sk_link_list.o: Sj_elements.o Sk_link_list.f90
 Sl_family.o: Sk_link_list.o Sl_family.f90
 Sm_tracking.o: Sl_family.o Sm_tracking.f90
-Sn_mad_like.o: Sm_tracking.o Sn_mad_like.f90
+Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
+Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
 madx_ptc_module.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_tablepush.o madx_ptc_module.f90 
-madx_ptc_track_run.o: madx_ptc_module.o madx_ptc_track_run.f90
+madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
-madx_ptc_tablepush.o : madx_ptc_tablepush.f90
+madx_ptc_tablepush.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_tablepush.f90
+pointers.o  : Sp_keywords.o madx_ptc_module.o pointers.f90
+madx_ptc_script.o  : Sp_keywords.o pointers.o madx_ptc_script.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
-wrap.o: madx_ptc_module.o wrap.f90
+wrap.o: madx_ptc_module.o madx_ptc_script.o wrap.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
 

@@ -272,6 +272,105 @@ contains
 
   END SUBROUTINE INTR
 
+  SUBROUTINE INTR_SAGAN(EL,X,ZI)
+    IMPLICIT NONE
+    integer ipause, mypause
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(SAGAN),INTENT(INOUT):: EL
+    real(dp),INTENT(IN):: ZI
+    real(dp) Z
+    real(dp) D,DH
+    real(dp) D1,D2,DK1,DK2
+    real(dp) DF(4),DK(4)
+    INTEGER I,J
+
+    !    CALL SET_W(EL%W)
+    Z=ZI
+    SELECT CASE(EL%P%METHOD)
+    CASE(2)
+       DH=EL%L/two/EL%P%NST
+       D=EL%L/EL%P%NST
+
+       Z=Z+EL%P%DIR*DH
+       CALL DRIFT(EL,DH,Z,1,X)
+       CALL DRIFT(EL,DH,Z,2,X)
+       CALL KICKPATH(EL,DH,X)
+       CALL KICK(EL,D,Z,X)
+       CALL KICKPATH(EL,DH,X)
+       CALL DRIFT(EL,DH,Z,2,X)
+       CALL DRIFT(EL,DH,Z,1,X)
+
+    CASE(4)
+       D=EL%L/EL%P%NST
+
+       DK1=D*FK1
+       D1=DK1/two
+       DK2=D*FK2
+       D2=DK2/two
+
+       Z=Z+EL%P%DIR*D1
+       CALL DRIFT(EL,D1,Z,1,X)
+       CALL DRIFT(EL,D1,Z,2,X)
+       CALL KICKPATH(EL,D1,X)
+       CALL KICK(EL,DK1,Z,X)
+       CALL KICKPATH(EL,D1,X)
+       CALL DRIFT(EL,D1,Z,2,X)
+       CALL DRIFT(EL,D1,Z,1,X)
+       Z=Z+EL%P%DIR*D1+D2
+       CALL DRIFT(EL,D2,Z,1,X)
+       CALL DRIFT(EL,D2,Z,2,X)
+       CALL KICKPATH(EL,D2,X)
+       CALL KICK(EL,DK2,Z,X)
+       CALL KICKPATH(EL,D2,X)
+       CALL DRIFT(EL,D2,Z,2,X)
+       CALL DRIFT(EL,D2,Z,1,X)
+       Z=Z+EL%P%DIR*(D1+D2)
+       CALL DRIFT(EL,D1,Z,1,X)
+       CALL DRIFT(EL,D1,Z,2,X)
+       CALL KICKPATH(EL,D1,X)
+       CALL KICK(EL,DK1,Z,X)
+       CALL KICKPATH(EL,D1,X)
+       CALL DRIFT(EL,D1,Z,2,X)
+       CALL DRIFT(EL,D1,Z,1,X)
+
+    CASE(6)
+       DO I =1,4
+          DK(I)=EL%L*YOSK(I)/EL%P%NST
+          DF(I)=DK(I)/two
+       ENDDO
+       DO J=4,1,-1
+          Z=Z+EL%P%DIR*DF(J)
+          CALL DRIFT(EL,DF(J),Z,1,X)
+          CALL DRIFT(EL,DF(J),Z,2,X)
+          CALL KICKPATH(EL,DF(J),X)
+          CALL KICK(EL,DK(J),Z,X)
+          CALL KICKPATH(EL,DF(J),X)
+          CALL DRIFT(EL,DF(J),Z,2,X)
+          CALL DRIFT(EL,DF(J),Z,1,X)
+          Z=Z+EL%P%DIR*DF(J)
+       ENDDO
+       DO J=2,4
+          Z=Z+EL%P%DIR*DF(J)
+          CALL DRIFT(EL,DF(J),Z,1,X)
+          CALL DRIFT(EL,DF(J),Z,2,X)
+          CALL KICKPATH(EL,DF(J),X)
+          CALL KICK(EL,DK(J),Z,X)
+          CALL KICKPATH(EL,DF(J),X)
+          CALL DRIFT(EL,DF(J),Z,2,X)
+          CALL DRIFT(EL,DF(J),Z,1,X)
+          Z=Z+EL%P%DIR*DF(J)
+       ENDDO
+
+    CASE DEFAULT
+       WRITE(6,*) " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       ipause=mypause(357)
+    END SELECT
+
+
+  END SUBROUTINE INTR_SAGAN
+
+
+
   SUBROUTINE INTP(EL,X,mid)
     IMPLICIT NONE
     integer ipause, mypause

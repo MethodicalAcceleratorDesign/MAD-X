@@ -59,14 +59,70 @@ contains
 
   end SUBROUTINE lattice_GET_CHROM
 
-  SUBROUTINE FILL_BETA(r,my_state,BETA,IB,DBETA,tune,tune2,a,ai,mat,clos)
+  SUBROUTINE compute_map_4d(r,my_state,filename,pos,del,no)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    integer pos,no,imod,ic,I
+    TYPE(internal_state) state
+    real(dp) closed(6),del
+    type(DAMAP) ID
+    TYPE(REAL_8) Y(6)
+    CHARACTER(*) FILENAME
+    TYPE(FIBRE), POINTER :: P
+
+
+
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+    closed=zero
+    closed(5)=del
+    CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+    CALL INIT(STATE,no,0,BERZ)
+
+    CALL ALLOC(Y)
+    call alloc(id)
+    imod=r%n/10
+    id=1
+    Y=CLOSED+id
+    ic=0
+    p=>r%start
+    do i=1,r%n
+
+       CALL TRACK(R,Y,i,i+1,STATE)
+       if(mod(i,imod)==0) then
+          ic=ic+1
+          write(6,*) ic*10," % done "
+       endif
+       p=>p%next
+    enddo
+    id=y
+
+    call kanalnummer(ic)
+    open(unit=ic,file=FILENAME)
+
+
+    call print(ID,IC)
+
+    CLOSE(IC)
+
+
+    CALL kill(Y)
+    call kill(id)
+
+  end SUBROUTINE compute_map_4d
+
+  SUBROUTINE FILL_BETA(r,my_state,pos,BETA,IB,DBETA,tune,tune2,a,ai,mat,clos)
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     REAL(DP), ALLOCATABLE :: BETA(:,:,:)
     REAL(DP)DBETA,tune(:),tune2(:)
     type(fibre),pointer :: p
-    integer i,IB
+    integer i,IB,pos,mf
     TYPE(internal_state) state
     real(dp) closed(6)
     type(DAMAP) ID
@@ -85,10 +141,13 @@ contains
     else
        closed=zero
     endif
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
-    write(6,*) "closed orbit "
-    write(6,*) CLOSED
-
+    if(pos/=0) then
+       CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+       write(6,*) "closed orbit "
+       write(6,*) CLOSED
+    else
+       write(6,*) " Using a map "
+    endif
     DBETA=ZERO
     dbetamax=zero
     CALL INIT(STATE,1,0,BERZ)
@@ -96,46 +155,56 @@ contains
     CALL ALLOC(NORM)
     CALL ALLOC(Y)
     call alloc(id)
+    if(pos/=0) then
 
-    id=1
-    Y=CLOSED+id
+       id=1
+       Y=CLOSED+id
 
-    CALL TRACK(R,Y,1,STATE)
-    NORM=Y
+       CALL TRACK(R,Y,1,STATE)
+       id=y
+    else
+       call kanalnummer(mf)
+       open(unit=mf,file='map.dat')
+       call read(id,mf)
+       close(mf)
+    endif
+    NORM=id
     if(present(a)) then
        a=norm%a_t
        ai=norm%a_t**(-1)
        id=y
        mat=id
+       if(pos==0)  Write(6,*) " Tunes ",norm%tune(1:2)
     endif
-    if(ib==1) then
-       tune(1:2)=norm%tune(1:2)
-       Write(6,*) " Tunes ", tune(1:2)
+    if(pos/=0) then
+       if(ib==1) then
+          tune(1:2)=norm%tune(1:2)
+          Write(6,*) " Tunes ", tune(1:2)
+       endif
+       tune2(1:2)=norm%tune(1:2)
+
+       y=closed+norm%a_t
+       p=>r%start
+       do i=pos,pos+r%n-1
+
+          CALL TRACK(R,Y,i,i+1,STATE)
+          beta(IB,1,i)=(y(1).sub.'1')**2   + (y(1).sub.'01')**2
+          beta(iB,2,i)=(y(3).sub.'001')**2 + (y(3).sub.'0001')**2
+
+          IF(IB==2) THEN
+             db1=ABS(beta(2,1,i)-beta(1,1,i))/beta(1,1,i)
+             db2=ABS(beta(2,2,i)-beta(1,2,i))/beta(1,2,i)
+             DBETA=(db1+db2)/TWO+dbeta
+             if( db1>dbetamax) dbetamax=db1
+             if( db2>dbetamax) dbetamax=db2
+          ENDIF
+          p=>p%next
+       enddo
+       DBETA=DBETA/R%N
+
+       IF(IB==2) WRITE(6,*) "<DBETA/BETA> = ",DBETA
+       IF(IB==2) WRITE(6,*) "MAXIMUM OF DBETA/BETA = ",dbetamax
     endif
-    tune2(1:2)=norm%tune(1:2)
-
-    y=closed+norm%a_t
-    p=>r%start
-    do i=1,r%n
-
-       CALL TRACK(R,Y,i,i+1,STATE)
-       beta(IB,1,i)=(y(1).sub.'1')**2   + (y(1).sub.'01')**2
-       beta(iB,2,i)=(y(3).sub.'001')**2 + (y(3).sub.'0001')**2
-
-       IF(IB==2) THEN
-          db1=ABS(beta(2,1,i)-beta(1,1,i))/beta(1,1,i)
-          db2=ABS(beta(2,2,i)-beta(1,2,i))/beta(1,2,i)
-          DBETA=(db1+db2)/TWO+dbeta
-          if( db1>dbetamax) dbetamax=db1
-          if( db2>dbetamax) dbetamax=db2
-       ENDIF
-       p=>p%next
-    enddo
-    DBETA=DBETA/R%N
-
-    IF(IB==2) WRITE(6,*) "<DBETA/BETA> = ",DBETA
-    IF(IB==2) WRITE(6,*) "MAXIMUM OF DBETA/BETA = ",dbetamax
-
     CALL kill(NORM)
     CALL kill(Y)
     call kill(id)
@@ -536,6 +605,9 @@ contains
        expon(4)= iabs(mres(2))
     ENDIF
 
+    ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-(EXPON(i_look-1)+1))/two
+    ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(EXPON(i_look-1)+1)/two
+    !   WRITE(6,*) " STRENGTH OF RESONANCE = ",ARES
     ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-mres(i_look/2))/two
     ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(mres(i_look/2))/two
     JEXP=0
@@ -633,6 +705,249 @@ contains
 
   end subroutine lattice_fit_SEXT_RES_from_a_gmap_vec
 
+  subroutine lattice_fit_SEXT_RES_from_a_gmap_vec1(R,my_state,EPSF,MRES,POLY,NPOLY,TARG,NP,neq)
+    IMPLICIT NONE
+    integer ipause, mypause
+    TYPE(layout), intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,NP
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE,more
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq, no=5,nt,j,it,MRES(3)
+    type(damap) id,B,N,NC
+    type(gmap) g
+    TYPE(TAYLOR)t,Q1,P1,Q2,P2
+    TYPE(PBFIELD)H
+    TYPE(PBresonance)Hr
+    TYPE(VECRESONANCE)HRES_a,hres_n
+    TYPE(ONELIEEXPONENT)HC
+    real(dp) epsf,epsr,epsnow,CHROM(2),ARES(2),TR,PREC,emit
+    INTEGER, ALLOCATABLE :: EXPON(:),JEXP(:),JEXP5_x(:),JEXP5_y(:)
+    integer i_look
+    TYPE(TAYLOR)  r5_cos(2),r5_sin(2)
+
+    write(6,*) " give r**2  for fit "
+    read(5,*) emit
+    !   emit=22.e-6_dp
+    epsr=abs(epsf)
+    PREC=c_1d_10
+    allocate(eq(neq))
+
+    nt=neq+np
+    if(neq==4) then
+       STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+    else
+       STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+    endif
+    CALL INIT(STATE,no,NP,BERZ)
+
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    CLOSED(:)=zero
+    it=0
+    EPSNOW=mybig
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP,BERZ)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id,B,N,NC)    ! LOOK AT PAGE 143 OF THE BOOK
+    CALL ALLOC(H)
+    CALL ALLOC(HC)
+    CALL ALLOC(HRES_a)
+    CALL ALLOC(hres_n)
+    call alloc(r5_cos)
+    call alloc(r5_sin)
+    ALLOCATE(JEXP5_x(C_%NPARA))
+    ALLOCATE(JEXP5_y(C_%NPARA))
+    ALLOCATE(EXPON(C_%NV))
+    ALLOCATE(JEXP(C_%NPARA))
+    call alloc(hr)
+    WRITE(6,*) " NPARA = ",C_%NPARA
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+
+    ! ETIENNE
+
+    NORM=Y
+
+
+    HRES_a=NORM%a%nonlinear
+    hr=NORM%a%pb
+    !          open(unit=36,file='junk.txt')
+    ! CALL PRINT(HR%COS,36,PREC)
+    ! CALL PRINT(HR%SIN,36,PREC)
+    if(neq==4) then
+       HRES_n=NORM%normal%nonlinear
+       hr=NORM%normal%pb
+
+       CALL PRINT(HR%COS,6,PREC)
+    endif
+    EXPON=0
+    IF(MRES(1)==0) THEN
+       expon(3)=iabs(mres(2))-1
+       i_look=4
+    ELSEIF(MRES(2)==0) THEN
+       expon(1)=iabs(mres(1))-1
+       i_look=2
+    ELSEIF(MRES(1)*MRES(2)>0) THEN
+       expon(1)=iabs(mres(1))-1
+       i_look=2
+       expon(3)= iabs(mres(2))
+    ELSE
+       expon(1)=iabs(mres(1))-1
+       i_look=2
+       expon(4)= iabs(mres(2))
+    ENDIF
+
+    ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-(EXPON(i_look-1)+1))/two
+    ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(EXPON(i_look-1)+1)/two
+    JEXP=0
+    JEXP(1:C_%NPARA)=EXPON(1:C_%NPARA)
+    if(neq==4)  CHROM(1)=(HRES_n%sin%v(2).SUB.'01001')/(PI)/two
+    if(neq==4)   CHROM(2)=(HRES_n%sin%v(4).SUB.'00011')/(PI)/two
+
+    !    write(6,*) " CHROM ",CHROM
+    WRITE(6,*) " STRENGTH OF RESONANCE = ",ARES
+    if(neq==4)    WRITE(6,*) " CHROMATICITIES  = ",CHROM
+
+
+    eq(1)=       ( (HRES_a%sin%v(i_look).par.jexp)/(-mres(i_look/2))/two)-targ(1)
+    eq(2)=       ((HRES_a%cos%v(i_look).par.jexp)/(mres(i_look/2))/two)-targ(2)
+    JEXP5_x=jexp
+    JEXP5_x(1)=JEXP5_x(1)+1
+    JEXP5_x(2)=JEXP5_x(2)+1
+    r5_cos(1)=( (HRES_a%sin%v(i_look).par.JEXP5_x)/(-(JEXP5_x(i_look-1)+1))/two)
+    r5_sin(1)=( (HRES_a%cos%v(i_look).par.JEXP5_x)/((JEXP5_x(i_look-1)+1))/two)
+    JEXP5_y=jexp
+    JEXP5_y(3)=JEXP5_y(3)+1
+    JEXP5_y(4)=JEXP5_y(4)+1
+    r5_cos(2)=( (HRES_a%sin%v(i_look).par.JEXP5_y)/(-(JEXP5_y(i_look-1)+1))/two)
+    r5_sin(2)=( (HRES_a%cos%v(i_look).par.JEXP5_y)/((JEXP5_y(i_look-1)+1))/two)
+
+    call print(eq(1),6)
+    call print(r5_cos(1),6)
+    call print(r5_cos(2),6)
+    ipause=mypause(12)
+    !      pause 11
+    !      call print(r5_sin(1),36)
+    !      pause 12
+    !      call print(r5_cos(2),36)
+    !      pause 13
+    !      call print(r5_sin(2),36)
+    !      close(36)
+    !      pause 14
+    eq(1)=eq(1)+emit*(r5_cos(1)+r5_cos(2))
+    eq(2)=eq(2)+emit*(r5_sin(1)+r5_sin(2))
+    ares(1)=eq(1)
+    ares(2)=eq(2)
+    WRITE(6,*) " STRENGTH OF the combined RESONANCE = ",ARES
+    if(neq==4) then
+       eq(3)=       (HRES_n%sin%v(2).par.'01001')/(PI)/two-targ(3)
+       eq(4)=       (HRES_n%sin%v(4).par.'00011')/(PI)/two-targ(4)
+    endif
+    epsnow=zero
+    do i=1,neq
+       epsnow=abs(eq(i))+epsnow
+    enddo
+
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(HC)
+    CALL KILL(id,B,N,NC)
+    CALL KILL(EQ)
+    CALL KILL(H)
+    CALL KILL(HRES_a)
+    CALL KILL(hres_n)
+    call KILL(r5_cos)
+    call KILL(r5_sin)
+
+    call KILL(hr)
+
+    DEALLOCATE(EXPON)
+    DEALLOCATE(JEXP)
+    DEALLOCATE(JEXP5_x)
+    DEALLOCATE(JEXP5_y)
+
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+
+  end subroutine lattice_fit_SEXT_RES_from_a_gmap_vec1
+
   subroutine lattice_PRINT_RES_FROM_A(R,my_state,NO,EMIT0,MRES,FILENAME)
     IMPLICIT NONE
     TYPE(layout), intent(inout):: R
@@ -706,18 +1021,17 @@ contains
 
   end subroutine lattice_PRINT_RES_FROM_A
 
-  subroutine lattice_random_error(R,nom,iseed,cut,n,addi,integrated,cn,cns)
+  subroutine lattice_random_error(R,nom,cut,n,addi,integrated,cn,cns)
     use gauss_dis
     IMPLICIT NONE
     TYPE(layout), intent(inout):: R
-    integer iseed,n,addi,ic,i
+    integer n,addi,ic,i
     character(nlp) nom
     type(fibre), pointer :: p
     logical(lp) integrated
     real(dp) x,bn,cn,cns,cut
 
 
-    call gaussian_seed(iseed)
 
     call context(nom)
     ic=0
@@ -725,9 +1039,9 @@ contains
     do i=1,r%n
        if(p%mag%name==nom) then
           call GRNF(X,cut)
-          bn=cn*x
+          bn=cns+cn*x
           if(integrated.and.p%mag%p%ld/=zero) then
-             bn=(cns+bn)/p%mag%l
+             bn=bn/p%mag%l
           endif
           call add(p,n,addi,bn)
           ic=ic+1
@@ -1521,41 +1835,63 @@ contains
     TYPE(INTERNAL_STATE) STATE
     TYPE(layout), intent(inout) :: R
     REAL(DP), ALLOCATABLE :: BETA(:,:,:)
-    integer pos,nturn,i,flag,ib,MF,mft,j,resmax,it,I1
-    real(dp) closed(6),MAT(6,6),AI(6,6),A(6,6),emit(2),emit0(5),aper(2),x(6),xn(6),dbeta,tuneold(:)
-    real(dp) ra(2),tunenew(2)
+    integer pos,nturn,i,flag,ib,MF,mft,j,resmax,it,I1,no
+    real(dp) closed(6),MAT(6,6),AI(6,6),A(6,6),emit(2),emit0(6),aper(2),x(6),xn(6),dbeta,tuneold(:)
+    real(dp) ra(2),tunenew(2),xda(lnv)
     CHARACTER(*) FILENAME,FILEtune,FILESMEAR
     real(dp), allocatable :: dat(:,:),dats(:,:),SMEAR(:,:)
-    REAL(DP) JMin(2),JMAX(2), tune1(2),tune2(2),tot_tune(2),epsi,scas,scau,scat
+    REAL(DP) JMin(2),JMAX(2), tune1(2),tune2(2),tot_tune(2),epsi,scas(2),scau,scat(2)
     integer itmax
+    type(damap) id
+    type(tree) monkey
+
+
+
     epsi=one/nturn
     STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
     allocate(dat(0:nturn,6),dats(0:nturn,6))
     allocate(SMEAR(ITMAX,8))
     CLOSED=ZERO
-    call FILL_BETA(r,my_state,BETA,IB,DBETA,tuneold,tunenew,a,ai,mat,closed)
+
+    call FILL_BETA(r,my_state,pos,BETA,IB,DBETA,tuneold,tunenew,a,ai,mat,closed)
     write(6,*) " *****************************************************************"
     write(6,*) "        Tracking with Normalized Aperture "
     write(6,*) "        Tunes = ",tunenew(1:2)
-
+    if(pos==0) then
+       write(6,*) " give no "
+       read(5,*) no
+       call init(no,2,0,0)
+       call alloc(id); call alloc(monkey)
+       call kanalnummer(mf)
+       open(unit=mf,file='map.dat')
+       call read(id,mf)
+       id=closed
+       monkey=id
+       call kill(id)
+       close(mf)
+       xda=zero
+    endif
     scau=one
     scas=zero
     dats=zero
     SMEAR=ZERO
     it=0
+    CALL KANALNUMMER(MFt)
+    OPEN(UNIT=MFt,FILE=FILEtune)
 1001 continue
     it=it+1
     write(6,*) " iteration ",it
     IF(IT==ITMAX+1) GOTO 1002
 
-    scat=(emit0(1)+ it*emit0(3))/aper(1)
+    scat(1)=(emit0(1)+ it*emit0(3))/aper(1)
+    scat(2)=(emit0(2)+ it*emit0(6))/aper(2)
     !    scat=(scau+scas)/two    ! etienne
     dat=zero
 
     xn=zero
     JMAX=ZERO
     JMIN=mybig
-    emit(1:2)=scat*aper(1:2)
+    emit=scat*aper
     write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     write(6,*) " Initial emit = ", emit(1:2)," scale = ",scat
     write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
@@ -1578,9 +1914,17 @@ contains
     flag=0
     do i=1,nturn
 
-       flag=track_flag(r,x,pos,state)
+       if(pos/=0) then
+          flag=track_flag(r,x,pos,state)
+       else
+          flag=0
+          xda(1:4)=x(1:4)
+          xda=monkey*xda
+          x(1:4)=xda(1:4)
+       endif
+       write(80,*) x(1:4)
        if(flag/=0) exit
-       xn=(ai*x)-closed
+       xn=ai*(x-closed)
        ra(1)=xn(1)**2+xn(2)**2
        ra(2)=xn(3)**2+xn(4)**2
        IF(RA(1)>JMAX(1)) JMAX(1)=RA(1)
@@ -1608,7 +1952,7 @@ contains
     SMEAR(IT,5:6)=JMAX(1:2)
     SMEAR(IT,7:8)=TWO*(JMAX-JMIN)/(JMAX+JMIN)
     if(flag/=0)then
-       scau=scat
+       ! scau=scat
        IF(fLAG==101) THEN
           write(6,*)  "          UNSTABLE AT X-NORMALIZED APERTURE "
           !   write(mf,*) "UNSTABLE AT X-NORMALIZED APERTURE "
@@ -1620,7 +1964,7 @@ contains
           write(6,*) "          UNSTABLE: DYNAMIC APERTURE "
        ENDIF
        goto 1002  ! etienne
-       if(abs(scau-scas)<=emit0(3)) then
+       if(abs(scau-scas(1))<=emit0(3)) then
           goto 1002
        else
           goto 1001
@@ -1664,12 +2008,24 @@ contains
              endif
           enddo
        enddo
+       write(mft,*) " emit = ",emit(1:2)
+       write(mft,*) " tunes = ",tot_tune(1:2)
+       do i=0,resmax
+          do j=-resmax,resmax
+             dbeta=i*tot_tune(1)+j*tot_tune(2)
+             if(abs(dbeta-nint(dbeta))<epsi ) then
+                if(i+j/=0) write(mft,*) i,j,dbeta," <--- here "
+             else
+                if(i+j/=0) write(mft,*)i,j,dbeta
+             endif
+          enddo
+       enddo
        !     PAUSE 100
        ! END  RESONANCE
 
 
 
-       if(abs(scau-scas)<=emit0(3)) then
+       if(abs(scau-scas(1))<=emit0(3)) then
           goto 1002
        else
           goto 1001
@@ -1706,19 +2062,7 @@ contains
     ENDDO
     tot_tune=tot_tune/nturn
     CLOSE(MF)
-    CALL KANALNUMMER(MFt)
-    OPEN(UNIT=MFt,FILE=FILEtune)
-    write(mft,*) " tunes = ",tot_tune(1:2)
-    do i=0,resmax
-       do j=-resmax,resmax
-          dbeta=i*tot_tune(1)+j*tot_tune(2)
-          if(abs(dbeta-nint(dbeta))<epsi ) then
-             if(i+j/=0) write(mft,*) i,j,dbeta," <--- here "
-          else
-             if(i+j/=0) write(mft,*)i,j,dbeta
-          endif
-       enddo
-    enddo
+
     CLOSE(mft)
 
     CALL KANALNUMMER(MF)
@@ -1730,7 +2074,7 @@ contains
 
     CLOSE(mf)
 
-    emit0(1:2)=scas*aper(1:2)
+    emit0(1:2) =scas*aper
     emit0(4:5)=tunenew(1:2)
 
 202 FORMAT(1X,I4,8(1X,D18.11))
@@ -1743,23 +2087,33 @@ contains
     WRITE(6,*) "      MINIMUM/INITIAL = ",JMIN(1:2)/emit(1:2)
     WRITE(6,*) "     SMEAR = ",TWO*(JMAX-JMIN)/(JMAX+JMIN)
     write(6,*) " *****************************************************************"
-
+    if(pos==0) call kill(monkey)
   end SUBROUTINE  track_aperture
 
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,lim) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout), intent(inout) :: R
     real(dp), OPTIONAL, intent(inout) :: THIN
     real(dp) gg,RHOI,XL,QUAD,THI
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2)  !,limit0(2)
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc  !,limit0(2)
     integer, optional :: lim(2)
     logical(lp) MANUAL,eject,doit
     TYPE (fibre), POINTER :: C
+    logical(lp),optional :: even
     logical(lp) doneit
     nullify(C)
-
+    parity=0
+    inc=0
+    if(present(even)) then
+       inc=1
+       if(even) then
+          parity=0
+       else
+          parity=1
+       endIf
+    endif
     CALL LINE_L(R,doneit)
 
     MANUAL=.FALSE.
@@ -1870,6 +2224,7 @@ contains
              M1=M1+1
              C%MAG%P%METHOD=2
              IF(NTE.EQ.0) NTE=1
+             if(mod(nte,2)/=parity) nte=nte+inc
              C%MAG%P%NST=NTE
              MK1=MK1+NTE
           ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
@@ -1877,6 +2232,7 @@ contains
              C%MAG%P%METHOD=4
              NTE=NTE/3
              IF(NTE.EQ.0) NTE=1
+             if(mod(nte,2)/=parity) nte=nte+inc
              C%MAG%P%NST=NTE
              MK2=MK2+NTE*3
           ELSEIF(NTE.GE.limit(2)) THEN
@@ -1884,6 +2240,7 @@ contains
              C%MAG%P%METHOD=6
              NTE=NTE/7
              IF(NTE.EQ.0) NTE=1
+             if(mod(nte,2)/=parity) nte=nte+inc
              C%MAG%P%NST=NTE
              MK3=MK3+NTE*7
           ENDIF
@@ -2013,6 +2370,261 @@ contains
     deallocate(an,bn)
 
   end   SUBROUTINE  read_bn_an
+
+  ! THIN LENS EXAMPLE
+
+  SUBROUTINE MESS_UP_ALIGNMENT(R,SIG,cut)
+    use gauss_dis
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer J,I
+    type(fibre), pointer :: P
+    REAL(DP) SIG(:),X,MIS(6),cut
+
+
+    p=>r%start
+    do i=1,r%n
+
+       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1) THEN
+          DO J=1,6
+             call GRNF(X,cut)
+             MIS(J)=X*SIG(J)
+          ENDDO
+          call MISALIGN_FIBRE(p,mis)
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+  end SUBROUTINE MESS_UP_ALIGNMENT
+
+  SUBROUTINE THIN_EXAMPLE(R,B,I1,I2,IN_STATE,MF)
+    IMPLICIT NONE
+    TYPE(BEAM), INTENT(INOUT) :: B(:)
+    TYPE(LAYOUT),TARGET :: R
+    integer i1,i2,MF,i,IT1,IT2,INSIDE_POS1,INSIDE_POS2
+    type(fibre), pointer :: FIBRE1,FIBRE2
+    TYPE(THIN_LENS),POINTER :: SLICE1,SLICE2
+    TYPE(INTERNAL_STATE) IN_STATE
+    TYPE(INTERNAL_STATE) STATE
+    real(dp) X(6),S_INITIAL,S_FINAL,TOTAL_LENGTH
+
+    STATE=IN_STATE
+
+    CALL COPY_BEAM(B(1),B(2))
+
+
+
+
+
+    !  TRACKING AS IN PTC PROPER
+
+    !   We locate the I1th fibre and the I2th
+
+
+    call move_to(r,FIBRE1,i1)
+    call move_to(r,FIBRE2,i2)
+
+
+    Write(MF,*)"Magnets ",i1," AND ",i2," are ",FIBRE1%mag%name(1:LEN_TRIM(FIBRE1%mag%name))," AND ",&
+         FIBRE2%mag%name(1:LEN_TRIM(FIBRE2%mag%name))
+
+    ! WE TRACK FROM ENTRANCE OF FIBRE1 TO ENTRANCE OF FIBRE2
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 ) "
+    WRITE(MF,*) "                                            "
+    CALL TRACK(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+
+
+
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),6)
+
+    ! Regular PTC tracking: it should agree
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "___________________ ORDINARY PTC RESULTS    ____________________________"
+
+    DO I=1,B(2)%N
+       X=B(1)%X(I,1:6)      ! B(2) WAS SAVED IN B(1)
+       CALL TRACK(R,X,I1,I2,STATE)
+       WRITE(MF,*) "_________________________________________________________________________"
+       WRITE(MF,*) " PARTICLE # ",I
+       WRITE(MF,*) " TIME  = ",X(6)
+       WRITE(MF,*) " X,Y = ", X(1),X(3)
+       WRITE(MF,*) " PX,PY = ",X(2),X(4)
+       WRITE(MF,*) " ENERGY VARIABLE = ",X(5)
+
+    ENDDO
+
+
+!!!!!!!
+    ! THESE TWO FIBRES START AT THE SLICE NUMBER IT1 AND IT2 RESPECTIVELY
+    !
+    CALL COPY_BEAM(B(1),B(2))
+
+    IT1=FIBRE1%T1%POS
+    IT2=FIBRE2%T1%POS
+
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,POS1=IT1,POS2=IT2 ) "
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  INDEX OF THE FIRST SLICE   =",IT1
+    WRITE(MF,*) "  INDEX OF THE FINAL SLICE   =",IT2
+    CALL TRACK(R,B(2),STATE,POS1=IT1,POS2=IT2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),MF)
+
+    ! TRACKING USING THE POINTERS SLICE1 AND SLICE2 RESPECTIVELY
+    !
+    CALL COPY_BEAM(B(1),B(2))
+
+    SLICE1=>FIBRE1%T1
+    SLICE2=>FIBRE2%T1
+
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) "
+    WRITE(MF,*) "                                            "
+    CALL TRACK(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),MF)
+
+    ! TRACKING USING THE POINTERS S_INITIAL AND S_FINAL RESPECTIVELY
+    !
+    CALL COPY_BEAM(B(1),B(2))
+
+    S_INITIAL = SLICE1%S(3)
+    S_FINAL   = SLICE2%S(3)
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) "
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
+    WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
+    CALL TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),MF)
+
+    !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$!
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$  going inside a magnet  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    WRITE(MF,*) "                                            "
+    write(mf,*) fibre1%mag%name," has ",fibre1%mag%p%nst," steps "
+    write(mf,*) fibre2%mag%name," has ",fibre2%mag%p%nst," steps "
+    WRITE(MF,*) "                                            "
+    write(mf,*) "$$$$$$$$$$$$$$$$ STARTING AND ENDING IN THE MIDDLE   $$$$$$$$$$$$$$$$$$$$$$$$"
+
+    INSIDE_POS1=3+fibre1%mag%p%nst/2
+    INSIDE_POS2=3+fibre2%mag%p%nst/2
+    CALL COPY_BEAM(B(1),B(2))
+    ! WE TRACK FROM ENTRANCE OF FIBRE1,INSIDE_POS1 TO ENTRANCE OF FIBRE2,INSIDE_POS2
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )  "
+    WRITE(MF,*) "                                            "
+    CALL TRACK(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),MF)
+
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$  going inside a magnet using s $$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+
+    S_INITIAL = SLICE1%S(3)+ FIBRE1%MAG%L/TWO
+    S_FINAL   = SLICE2%S(3)+ FIBRE2%MAG%L/TWO
+    CALL COPY_BEAM(B(1),B(2))
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) "
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
+    WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
+    CALL TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),MF)
+
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$  NOW WE LOOK AT TIME TRACKING  $$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$    THE AGREEMENT IS PERFECT    $$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$ IF WE LOOK IN A DRIFT SECTION  $$$$$$$$$$$$$$$$$$$$$$"
+    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    WRITE(MF,*) " WE USE TOTAL TOTAL TIME BECAUSE THIS IS THE ONLY THING IMPLEMENTED WITH TIME TRACKING"
+    WRITE(MF,*) " STATE=IN_STATE+TOTALPATH0 "
+    STATE=IN_STATE+TOTALPATH0
+
+    CALL COPY_BEAM(B(1),B(2))
+
+    ! FIRST MOVE THE BEAM 1.0 METRE INSIDE D1
+    S_INITIAL = zero
+    S_FINAL   = ONE
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) "
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
+    WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
+    CALL TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    ! WE PRINT THE RESULTS
+    CALL PRINT_beam(B(2),MF,I=1)
+    CALL COPY_BEAM(B(2),B(1))
+
+    ! THEN TRACK FOR A TIME EQUAL TO THE TOTAL LENGTH OF THE MACHINE: THIS PUTS US BACK SOMEWHERE IN D1
+    TOTAL_LENGTH=R%T%END%S(3)
+    WRITE(MF,*) "                                            "
+    WRITE(MF,*) "  TRACK(B(2),TOTAL_LENGTH,STATE) "
+    WRITE(MF,*) "                                            "
+
+    CALL TRACK(B(2),TOTAL_LENGTH,STATE)       !  TRACK_THIN_T(B,DT,K)
+
+    CALL PRINT_beam(B(2),MF,I=1)
+
+    WRITE(MF,*) " NOW WE REPRODUCE THIS WITH 'S' TRACKING TO SEE IF WE HAVE CONSISTENCY"
+    WRITE(MF,*) " WE DO ONLY THE FIRST PARTICLE: SAME CHECK WOULD APPLY FOR PARTICLE #2"
+
+    WRITE(MF,*) "  S_INITIAL = ONE "
+    WRITE(MF,*) "  S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%THINLENS%S(3)+B(2)%X(1,7)"
+    WRITE(MF,*) "  CALL TRACK(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL )"
+
+
+    S_INITIAL = ONE
+    S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%THINLENS%S(3)+B(2)%X(1,7)
+
+    CALL TRACK(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+
+    CALL PRINT_beam(B(1),MF,I=1)
+
+
+  END SUBROUTINE THIN_EXAMPLE
+
+  !  INTERFACE TRACK
+  !     MODULE PROCEDURE TRACK_LAYOUT_12
+  !     MODULE PROCEDURE TRACK_LAYOUT_S12
+  !     MODULE PROCEDURE TRACK_THIN_T
+  !  END INTERFACE
+
+  !  SUBROUTINE TRACK_LAYOUT_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2 ) OF SMA_MULTIPARTICLE.F90
+
+  ! Tracks through the thin lens structure R%T of the layout R if it exists.
+  ! Several posibilities:
+  !1) Pos1 and Pos2 are given :  tracks from thin lens position pos1 to thin lens position pos2
+  !2) Thin lens points T1 and T2 are given: Same as above pos1 and pos2 are derived from T1 and T2
+  !3) P1 and P2 are fibres: Tracks from the first thin lens of P1 to the first of P2. Results should agree
+  !   with plain PTC.
+  !4) P1, IN_P1 and P2 , IN_P2 are give: movies to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
+  !  For example, if the input is (P1,1) and (P2,1) the results is same as item #3 (same as plain PTC).
+
+  ! In all the above cases one can elect to give only the first input. Then it tracks one turn around as in
+  ! plain PTC.
+  ! interfaced as TRACK_LAYOUT_USING_THIN_S
+
+  !  SUBROUTINE TRACK_LAYOUT_S12( R,B,K,S1,S2 )
+
+  ! Tracks through the thin lens structure from position S1 to position S2 (defined as the S(3) variables
+  ! of the thin lens.
+  ! The final position is stored as in time tracking but is obviously the same for all the particles.
+  ! interfaced as TRACK_LAYOUT_USING_THIN_S
+
+  !  SUBROUTINE TRACK_THIN_T(B,DT,K)
+  ! Tracks to full beam for a time DT
+  ! All the particles are at different locations
+  ! Notice that the layout is hidden: this is consistant with time tracking
+  ! Magnets are not ontological objects
 
 
 end module S_fitting

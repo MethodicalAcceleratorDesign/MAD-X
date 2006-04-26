@@ -23,6 +23,7 @@ MODULE S_TRACKING
   logical(lp),TARGET :: other_program=.false.
   logical(lp),TARGET :: x_prime=.false.
   integer j_global
+
   ! END old Sj_elements
 
   ! TYPE UPDATING
@@ -32,7 +33,7 @@ MODULE S_TRACKING
 
 
   !  TYPE (UPDATING), PARAMETER ::  COMPUTE= UPDATING(.TRUE.)
-  LOGICAL(LP) :: COMPUTE = .FALSE.
+  LOGICAL :: COMPUTE = .FALSE.
 
   INTERFACE TRACK
      ! linked
@@ -133,18 +134,6 @@ contains
        call TRACK(EL%CAV21,X,MID)
     CASE(KIND22)
        call TRACK(EL%M22,X,MID)
-    CASE(KIND23)
-       IF(PRESENT(MID)) CALL XMID(MID,X,0)
-       if(el%p%dir==1) then
-          call TRACK(EL%G23,X,1,K)
-       else
-          call TRACK(EL%G23,X,EL%G23%N,0,K)
-       endif
-       IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    case(KINDUSER1)
-       call TRACK(EL%U1,X,MID)
-    case(KINDUSER2)
-       call TRACK(EL%U2,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
     case(KINDPA)
@@ -209,18 +198,6 @@ contains
        call TRACK(EL%CAV21,X,MID)
     CASE(KIND22)
        call TRACK(EL%M22,X,MID)
-    CASE(KIND23)
-       IF(PRESENT(MID)) CALL XMID(MID,X,0)
-       if(el%p%dir==1) then
-          call TRACK(EL%G23,X,1,K)
-       else
-          call TRACK(EL%G23,X,EL%G23%N,0,K)
-       endif
-       IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    case(KINDUSER1)
-       call TRACK(EL%U1,X,MID)
-    case(KINDUSER2)
-       call TRACK(EL%U2,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
     case(KINDPA)
@@ -285,24 +262,19 @@ contains
        call TRACK(EL%CAV21,X)
     CASE(KIND22)
        call TRACK(EL%M22,X)
-    CASE(KIND23)
-       if(el%p%dir==1) then
-          call TRACK(EL%G23,X,1,K)
-       else
-          call TRACK(EL%G23,X,EL%G23%N,0,K)
-       endif
-    case(KINDUSER1)
-       call TRACK(EL%U1,X)
-    case(KINDUSER2)
-       call TRACK(EL%U2,X)
+       !    CASE(KIND23)
+       !       if(el%p%dir==1) then
+       !!          call TRACK(EL%G23,X,1,K)
+       !      else
+       !          call TRACK(EL%G23,X,EL%G23%N,0,K)
+       !       endif
+       !    case(KINDUSER1)
+       !       call TRACK(EL%U1,X)
+       !    case(KINDUSER2)
+       !       call TRACK(EL%U2,X)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X)
-    case(KINDFITTED)
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       w_p%c(1)= "KINDFITTED not supported "
-       CALL WRITE_E(0)
+
     case default
        w_p=0
        w_p%nc=1
@@ -317,7 +289,8 @@ contains
 
   ! END old Sj_elements
 
-  recursive integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k,X_IN)
+  !  recursive
+  integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k,X_IN)
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -330,7 +303,8 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_R1f
 
-  recursive   integer function TRACK_LAYOUT_FLAG_P1f(R,X,II1,k,X_IN)
+  !  recursive
+  integer function TRACK_LAYOUT_FLAG_P1f(R,X,II1,k,X_IN)
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(REAL_8), INTENT(INOUT):: X(6)
@@ -343,7 +317,8 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_P1f
 
-  recursive   integer function TRACK_LAYOUT_FLAG_S1f(R,X,II1,k,X_IN)
+  !  recursive
+  integer function TRACK_LAYOUT_FLAG_S1f(R,X,II1,k,X_IN)
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -357,7 +332,8 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_S1f
 
-  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
+  !  recursive
+  SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -378,7 +354,8 @@ contains
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
   END SUBROUTINE TRACK_LAYOUT_FLAG_R1
 
-  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_P1(R,X,II1,k,X_IN) ! Tracks polymorphs from II1 to the end or back to II1 if closed
+  !  recursive
+  SUBROUTINE TRACK_LAYOUT_FLAG_P1(R,X,II1,k,X_IN) ! Tracks polymorphs from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(REAL_8), INTENT(INOUT):: X(6)
@@ -400,7 +377,8 @@ contains
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_P1
 
-  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_S1(R,X,II1,k,X_IN) ! Tracks envelope from II1 to the end or back to II1 if closed
+  !  recursive
+  SUBROUTINE TRACK_LAYOUT_FLAG_S1(R,X,II1,k,X_IN) ! Tracks envelope from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -422,7 +400,8 @@ contains
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
   END SUBROUTINE TRACK_LAYOUT_FLAG_S1
 
-  recursive   integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  !  recursive
+  integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -435,7 +414,8 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_Rf
 
-  recursive   integer function TRACK_LAYOUT_FLAG_Pf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  !  recursive
+  integer function TRACK_LAYOUT_FLAG_Pf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
@@ -446,7 +426,8 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_Pf
 
-  recursive   integer function TRACK_LAYOUT_FLAG_Sf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  !  recursive
+  integer function TRACK_LAYOUT_FLAG_Sf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -460,7 +441,8 @@ contains
   end  function TRACK_LAYOUT_FLAG_Sf
 
 
-  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  !  recursive
+  SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
@@ -475,7 +457,7 @@ contains
 
 
 
-    call move_to(r,c,MOD_N(I1,R%N))
+    call move_to(r,c,I1)
 
     if(i2>i1) then
        J=I1
@@ -510,7 +492,8 @@ contains
 
 
 
-  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_P(R,X,I1,I2,K,X_IN) ! TRACKS POLYMORPHS FROM I1 TO I2 IN STATE K
+  !  recursive
+  SUBROUTINE TRACK_LAYOUT_FLAG_P(R,X,I1,I2,K,X_IN) ! TRACKS POLYMORPHS FROM I1 TO I2 IN STATE K
     IMPLICIT NONE
     TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
@@ -522,7 +505,7 @@ contains
 
     CALL RESET_APERTURE_FLAG
 
-    call move_to(r,c,MOD_N(I1,R%N))
+    call move_to(r,c,I1)
 
     if(i2>i1) then
        J=I1
@@ -555,7 +538,8 @@ contains
     ! PATCHES
   END SUBROUTINE TRACK_LAYOUT_FLAG_P
 
-  recursive   SUBROUTINE TRACK_LAYOUT_FLAG_S(R,X,I1,I2,k,X_IN) ! Tracks envelopes from i1 to i2 in state k
+  !  recursive
+  SUBROUTINE TRACK_LAYOUT_FLAG_S(R,X,I1,I2,k,X_IN) ! Tracks envelopes from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
     TYPE(ENV_8), INTENT(INOUT):: X(6)
@@ -573,7 +557,7 @@ contains
 
     CALL RESET_APERTURE_FLAG
 
-    call move_to(r,c,MOD_N(I1,R%N))
+    call move_to(r,c,I1)
 
     !    ! new stuff with kind=3
     !    IF(k%para_in ) knob=.true.
@@ -652,7 +636,8 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_S
 
 
-  recursive   SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
+  !  recursive
+  SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
@@ -867,7 +852,8 @@ contains
     lost_fibre=>c
   END SUBROUTINE TRACK_FIBRE_R
 
-  recursive   SUBROUTINE TRACK_FIBRE_P(C,X,K,CHARGE,X_IN)
+  !  recursive
+  SUBROUTINE TRACK_FIBRE_P(C,X,K,CHARGE,X_IN)
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
@@ -1105,7 +1091,8 @@ contains
   END SUBROUTINE TRACK_FIBRE_P
 
 
-  recursive   SUBROUTINE TRACK_FIBRE_S(C,X,K,CHARGE,X_IN)   !,UPDATE
+  !  recursive
+  SUBROUTINE TRACK_FIBRE_S(C,X,K,CHARGE,X_IN)   !,UPDATE
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
@@ -1617,6 +1604,7 @@ contains
     WRITE(6,*) " NOT SUPPORTED "
     STOP 111
   END SUBROUTINE TRACK_P
+
 
 
 END MODULE S_TRACKING

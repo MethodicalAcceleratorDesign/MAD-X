@@ -12,7 +12,7 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
-  private move_to_p,move_to_name,move_to_name2,move_from_to_name
+  private move_to_p
   PRIVATE append_EMPTY_FIBRE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
@@ -23,7 +23,7 @@ MODULE S_FIBRE_BUNDLE
   private zero_fibre
   INTEGER :: INDEX=0
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
-
+  real(dp),target :: eps_pos=c_1d_10
 
   INTERFACE kill
      MODULE PROCEDURE kill_layout
@@ -51,9 +51,6 @@ MODULE S_FIBRE_BUNDLE
 
   INTERFACE move_to
      MODULE PROCEDURE move_to_p
-     MODULE PROCEDURE move_to_name
-     MODULE PROCEDURE move_to_name2
-     MODULE PROCEDURE move_from_to_name
   END INTERFACE
 
   INTERFACE FIND_PATCH
@@ -155,6 +152,10 @@ CONTAINS
     logical(lp) doneit
     CALL LINE_L(L,doneit)
     nullify(current)
+    IF(ASSOCIATED(L%T)) THEN
+       CALL kill_THIN_Layout(L%T)  !  KILLING THIN LAYOUT
+       WRITE(6,*) " THIN LAYOUT HAS BEEN KILLED "
+    ENDIF
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
        L % end => Current % previous  ! update the end before disposing
@@ -231,21 +232,15 @@ CONTAINS
 
 
 
-  SUBROUTINE move_to_p( L,current,i ) ! Moves current to the i^th position
+  SUBROUTINE move_to_p( L,current,POS ) ! Moves current to the i^th position
     implicit none
     TYPE (fibre), POINTER :: Current
     TYPE (layout) L
-    integer i,k
+    integer i,k,POS
     logical(lp) doneit
 
     CALL LINE_L(L,doneit)
-    if(i>l%n.AND.(.NOT.L%CLOSED)) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       w_p%c(1)= " i>l%n PERMITTED ONLY IN RINGS"
-       CALL WRITE_E(-123)
-    ENDIF
+    I=mod_n(POS,L%N)
     IF(L%LASTPOS==0) THEN
        w_p=0
        w_p%nc=2
@@ -254,6 +249,7 @@ CONTAINS
        write(w_p%c(2),'(a7,i4)')" L%N = ",L%N
        CALL WRITE_E(-124)
     ENDIF
+
     nullify(current);
     Current => L%LAST
 
@@ -274,166 +270,8 @@ CONTAINS
   END SUBROUTINE move_to_p
 
 
-  SUBROUTINE move_from_to_name( L,c1,POSC1,current,name,pos)
-    ! Moves from (c1,posc1) to current called "name" (posc1<=0 then finds posc1)
-    implicit none
-    TYPE (fibre), POINTER :: c1
-    TYPE (fibre), POINTER :: Current
-    TYPE (layout), intent(inout):: L
-    integer, intent(inout):: pos,POSC1
-    character(*), intent(in):: name
-    CHARACTER(nlp) S1NAME
-    integer i
-
-    logical(lp) foundit
-    TYPE (fibre), POINTER :: p
-
-    foundit=.false.
-    S1NAME=name
-    CALL CONTEXT(S1name)
-
-    nullify(p)
-    IF(POSC1<=0) THEN
-       CALL FIND_POS(L, C1,POSC1 )
-    ENDIF
-    p=>c1%NEXT
-    if(.not.associated(p)) goto 100
-    do i=1,l%n-1
-       if(p%mag%name==s1name) then
-          foundit=.true.
-          goto 100
-       endif
-       p=>p%next
-       if(.not.associated(p)) goto 100
-    enddo
-100 continue
-    if(foundit) then
-       current=>p
-       pos=mod_n(POSC1+i,l%n)
-    else
-       pos=0
-    endif
-  END SUBROUTINE move_from_to_name
 
 
-  SUBROUTINE move_to_name( L,current,name,pos) ! moves to next one in list called name
-    implicit none
-    TYPE (fibre), POINTER :: Current
-    TYPE (layout), intent(inout):: L
-    integer, intent(inout):: pos
-    character(*), intent(in):: name
-    CHARACTER(nlp) S1NAME
-    integer i
-
-    logical(lp) foundit
-    TYPE (fibre), POINTER :: p
-
-    foundit=.false.
-    S1NAME=name
-    CALL CONTEXT(S1name)
-
-    nullify(p)
-    p=>l%last%next
-
-    if(.not.associated(p)) goto 100
-    do i=1,l%n-1
-       if(p%mag%name==s1name) then
-          foundit=.true.
-          goto 100
-       endif
-       p=>p%next
-       if(.not.associated(p)) goto 100
-    enddo
-100 continue
-    if(foundit) then
-       current=>p
-       pos=mod_n(l%lastpos+i,l%n)
-       l%lastpos=pos
-       l%last=>current
-    else
-       pos=0
-    endif
-  END SUBROUTINE move_to_name
-
-  SUBROUTINE move_to_FLAT( L,current,name,POS)
-    ! find in a simple flat file (Same as move_to_name but starts with oneself and scan completely)
-    implicit none
-    TYPE (fibre), POINTER :: Current
-    TYPE (layout), intent(inout):: L
-    integer, intent(inout):: pos
-    character(*), intent(in):: name
-    CHARACTER(nlp) S1NAME
-    integer i
-
-    logical(lp) foundit
-    TYPE (fibre), POINTER :: p
-
-    foundit=.false.
-    S1NAME=name
-    CALL CONTEXT(S1name)
-
-    nullify(p)
-    p=>l%last
-    if(.not.associated(p)) goto 100
-    do i=0,l%n-1
-       if(p%mag%name==s1name) then
-          foundit=.true.
-          goto 100
-       endif
-       p=>p%next
-       if(.not.associated(p)) goto 100
-    enddo
-100 continue
-    if(foundit) then
-       current=>p
-       pos=mod_n(l%lastpos+i,l%n)
-       l%lastpos=pos
-       l%last=>current
-    else
-       pos=0
-    endif
-  END SUBROUTINE move_to_FLAT
-
-
-  SUBROUTINE move_to_name2( L,current,name,vorname,pos) !Same as move_to_name but matches name and vorname
-    implicit none
-    TYPE (fibre), POINTER :: Current
-    TYPE (layout), intent(inout):: L
-    integer, intent(inout):: pos
-    character(*), intent(in):: name,vorname
-    CHARACTER(nlp) S1NAME,s2name
-    integer i
-
-    logical(lp) foundit
-    TYPE (fibre), POINTER :: p
-
-    foundit=.false.
-    S1NAME=name
-    S2NAME=vorname
-    CALL CONTEXT(S1name)
-    CALL CONTEXT(S2name)
-
-    nullify(p)
-    p=>l%last%next
-    if(.not.associated(p)) goto 100
-    do i=1,l%n-1
-       if((p%mag%name==s1name).and.(p%mag%vorname==s2name)) then
-          foundit=.true.
-          goto 100
-       endif
-       p=>p%next
-       if(.not.associated(p)) goto 100
-    enddo
-100 continue
-    if(foundit) then
-       current=>p
-       pos=mod_n(l%lastpos+i,l%n)
-       l%lastpos=pos
-       l%last=>current
-    else
-       pos=0
-    endif
-  END SUBROUTINE move_to_name2
 
 
   SUBROUTINE Set_Up( L ) ! Sets up a layout: gives a unique negative index
@@ -446,7 +284,7 @@ CONTAINS
     L%closed=.false.;
     L%NTHIN=0;L%THIN=zero;
     L%N=0;
-    L%lastpos=0;L%NAME='NEMO';
+    L%lastpos=0;L%NAME='No name assigned';
     INDEX=INDEX-1
     L%INDEX=INDEX
     L%CHARGE=1
@@ -471,6 +309,8 @@ CONTAINS
     !   integer , intent(in) :: i
     TYPE (layout), intent(inout) :: L
     !   if(i==0) then
+    nullify(L%T)  ! THIN LAYOUT
+    nullify(L%parent_universe)
     nullify(L%INDEX)
     nullify(L%CHARGE)
     nullify(L%HARMONIC_NUMBER)
@@ -617,6 +457,7 @@ CONTAINS
     nullify(Current%magp);nullify(Current%mag);nullify(Current%CHART);nullify(Current%PATCH);
     nullify(current%next);nullify(current%previous);
     nullify(current%PARENT_LAYOUT);
+    nullify(current%T1,current%T2);
     !    nullify(current%PARENT_PATCH);
     !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
@@ -693,6 +534,10 @@ CONTAINS
        IF(ASSOCIATED(c%DIR)) THEN
           deallocate(c%DIR);
        ENDIF
+       IF(ASSOCIATED(C%T1)) THEN
+          deallocate(C%T1);
+          deallocate(C%T2);
+       ENDIF
        !      IF(ASSOCIATED(c%P0C)) THEN
        !         deallocate(c%P0C);
        !      ENDIF
@@ -715,7 +560,7 @@ CONTAINS
     implicit none
     type(fibre),pointer :: c
     IF(ASSOCIATED(C)) THEN
-       c=-1
+       CALL zero_fibre(c,-1)
        deallocate(c);
     ENDIF
   end SUBROUTINE dealloc_fibre
@@ -1162,6 +1007,209 @@ CONTAINS
 
   END SUBROUTINE locate_in_universe
 
+
+
+  !  THIN LENS STRUCTURE STUFF
+
+
+  SUBROUTINE NULL_THIN(T)  ! nullifies THIN content
+    implicit none
+    TYPE (THIN_LENS), POINTER :: T
+    NULLIFY(T%PARENT_THIN_LAYOUT)
+    NULLIFY(T%PARENT_FIBRE)
+    NULLIFY(T%S)
+    NULLIFY(T%NEXT)
+    NULLIFY(T%PREVIOUS)
+
+  END SUBROUTINE NULL_THIN
+
+  SUBROUTINE ALLOCATE_THIN(CURRENT)   ! allocates and nullifies current's content
+    implicit none
+    TYPE (THIN_LENS), POINTER :: Current
+    NULLIFY(CURRENT)
+    ALLOCATE(Current)
+    CALL NULL_THIN(CURRENT)
+
+    ALLOCATE(CURRENT%S(4))
+    ALLOCATE(CURRENT%pos_in_fibre)
+    ALLOCATE(CURRENT%pos)
+    ALLOCATE(CURRENT%CAS)
+    ALLOCATE(CURRENT%TEAPOT_LIKE)
+
+    CURRENT%S=ZERO
+    CURRENT%pos_in_fibre=-100
+    CURRENT%pos=-100
+    CURRENT%CAS=-100
+    CURRENT%TEAPOT_LIKE=-100
+
+  END SUBROUTINE ALLOCATE_THIN
+
+
+  SUBROUTINE nullIFY_THIN_LAYOUT( L ) ! Nullifies layout content,i
+    implicit none
+    !   integer , intent(in) :: i
+    TYPE (THIN_layout), intent(inout) :: L
+    !   if(i==0) then
+    nullify(L%INDEX)
+    nullify(L%NAME)
+    nullify(L%CLOSED,L%N )
+    nullify(L%LASTPOS )  ! POSITION OF LAST VISITED
+    nullify(L%LAST )! LAST VISITED
+    !
+    nullify(L%END )
+    nullify(L%START )
+    nullify(L%START_GROUND )! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
+    nullify(L%END_GROUND )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+    nullify(L%parent_LAYOUT )!
+
+
+  END SUBROUTINE nullIFY_THIN_LAYOUT
+
+  SUBROUTINE Set_Up_THIN_LAYOUT( L ) ! Sets up a layout: gives a unique  index
+    implicit none
+    TYPE (THIN_LAYOUT) L
+    CALL NULLIFY_THIN_LAYOUT(L)
+    ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);
+    ALLOCATE(L%INDEX);
+    ALLOCATE(L%n);
+    L%closed=.false.;
+    L%N=0;
+    L%lastpos=0;L%NAME='NEMO';
+    NULLIFY(L%LAST)
+    INDEX=INDEX+1
+    L%INDEX=INDEX
+  END SUBROUTINE Set_Up_THIN_LAYOUT
+
+  SUBROUTINE APPEND_EMPTY_THIN( L )  ! Creates an empty fibre to be filled later
+    implicit none
+    TYPE (THIN_LENS), POINTER :: Current
+    TYPE (THIN_LAYOUT) L
+    !    LOGICAL(LP) doneit
+
+    L%N=L%N+1
+    CALL ALLOCATE_THIN(Current)
+    if(L%N==1) current%next=> L%start
+    Current % previous => L % end  ! point it to next fibre
+    if(L%N>1)  THEN
+       L%end%next => current      !
+    ENDIF
+
+    L % end => Current
+    if(L%N==1) L%start=> Current
+
+    L%LASTPOS=L%N ;
+    L%LAST=>CURRENT;
+
+  END SUBROUTINE APPEND_EMPTY_THIN
+
+  SUBROUTINE LINE_L_THIN(L,doneit) ! makes into line temporarily
+    implicit none
+    TYPE (THIN_layout) L
+    logical(lp) doneit
+    doneit=.false.
+    if(L%closed)  then
+       if(associated(L%end%next)) then
+          L%end%next=>L%start_ground
+          doneit=.true.
+       endif
+       if(associated(L%start%previous)) then
+          L%start%previous=>L%end_ground
+       endif
+    endif
+  END SUBROUTINE LINE_L_THIN
+
+  SUBROUTINE RING_L_THIN(L,doit) ! Brings back to ring if needed
+    implicit none
+    TYPE (THIN_layout) L
+    logical(lp) doit
+    if(L%closed.and.doit)  then
+       if(.NOT.(associated(L%end%next))) then
+          L%start_ground=>L%end%next      ! saving grounded pointer
+          L%end%next=>L%start
+       endif
+       if(.NOT.(associated(L%start%previous))) then
+          L%end_ground=>L%start%previous  ! saving grounded pointer
+          L%start%previous=>L%end
+       endif
+    endif
+  END SUBROUTINE RING_L_THIN
+
+  SUBROUTINE  DEALLOC_THIN_LENS(T)
+    IMPLICIT NONE
+    TYPE(THIN_LENS), TARGET, INTENT(INOUT) :: T
+
+    IF(ASSOCIATED(T%S)) DEALLOCATE(T%S)
+    IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
+    IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)
+    IF(ASSOCIATED(T%CAS)) DEALLOCATE(T%CAS)
+    IF(ASSOCIATED(T%TEAPOT_LIKE)) DEALLOCATE(T%TEAPOT_LIKE)
+
+  END SUBROUTINE  DEALLOC_THIN_LENS
+
+  SUBROUTINE kill_THIN_Layout( L )  ! Destroys a layout
+    implicit none
+    TYPE (THIN_LENS), POINTER :: Current
+    TYPE (THIN_layout) L
+    logical(lp) doneit
+    CALL LINE_L_THIN(L,doneit)
+    nullify(current)
+    Current => L % end      ! end at the end
+    DO WHILE (ASSOCIATED(L % end))
+       L % end => Current % previous  ! update the end before disposing
+       call DEALLOC_THIN_LENS(Current)
+       Current => L % end     ! alias of last fibre again
+       L%N=L%N-1
+    END DO
+    call de_Set_Up_THIN_LAYOUT(L)
+  END SUBROUTINE kill_THIN_Layout
+
+  SUBROUTINE de_Set_Up_THIN_LAYOUT( L ) ! deallocates layout content
+    implicit none
+    TYPE (THIN_layout) L
+    deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);
+    deallocate(L%INDEX);
+    deallocate(L%n);          !deallocate(L%parent_universe)   left out
+  END SUBROUTINE de_Set_Up_THIN_LAYOUT
+
+  SUBROUTINE move_to_THIN_LENS( L,current,POS ) ! Moves current to the i^th position
+    implicit none
+    TYPE (THIN_lENS), POINTER :: Current
+    TYPE (THIN_layout) L
+    integer i,k,POS
+    logical(lp) doneit
+
+    I=mod_n(POS,L%N)
+
+    CALL LINE_L_THIN(L,doneit)
+
+    IF(L%LASTPOS==0) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1X,a72))'
+       w_p%c(1)= " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
+       write(w_p%c(2),'(a7,i4)')" L%N = ",L%N
+       CALL WRITE_E(-124)
+    ENDIF
+
+    nullify(current);
+    Current => L%LAST
+
+    k=L%LASTPOS
+
+    IF(I>=L%LASTPOS) THEN
+       DO WHILE (ASSOCIATED(Current).and.k<i)
+          k=k+1
+          Current => Current % next
+       END DO
+    ELSE
+       DO WHILE (ASSOCIATED(Current).and.k>i)
+          k=k-1
+          Current => Current % PREVIOUS
+       END DO
+    ENDIF
+    L%LASTPOS=I; L%LAST => Current;
+    CALL RING_L_THIN(L,doneit)
+  END SUBROUTINE move_to_THIN_LENS
 
 
 END MODULE S_FIBRE_BUNDLE

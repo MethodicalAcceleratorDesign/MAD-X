@@ -5,26 +5,25 @@
 MODULE S_DEF_KIND
   USE S_def_all_kinds   ! not needed because of things below
   public
-  PRIVATE DRFTR,DRFTP,DRFTS
-  PRIVATE DRIFTP,DRIFTS,DRIFT    !,DRIFTR
-  PRIVATE SPARR,SPARP,SPARS,SPAR
-  PRIVATE CAVITYR,CAVITYP,CAVITYS,CAVITY
+  PRIVATE DRIFTP,DRIFTS  !,DRIFT   ! ,DRIFTR
+  PRIVATE SPARR,SPARP,SPARS !,SPAR
+  PRIVATE CAVITYR,CAVITYP,CAVITYS !,CAVITY
   PRIVATE CAVER,CAVEP,CAVES
-  PRIVATE KICKCAVR,KICKCAVP,KICKCAVS,KICKCAV
+  PRIVATE KICKCAVR,KICKCAVP,KICKCAVS !,KICKCAV
   PRIVATE FRINGECAVR,FRINGECAVP,FRINGECAVS,FRINGECAV
   PRIVATE KICKTR,KICKTP,KICKTS
-  PRIVATE MULTIPOLE_FRINGER,MULTIPOLE_FRINGEP,MULTIPOLE_FRINGES,MULTIPOLE_FRINGE
+  PRIVATE MULTIPOLE_FRINGER,MULTIPOLE_FRINGEP,MULTIPOLE_FRINGES !,MULTIPOLE_FRINGE
   PRIVATE FRINGER,FRINGEP,FRINGES
   PRIVATE FRINGE_
-  PRIVATE EDGER,EDGEP,EDGES,EDGE
-  PRIVATE KICKR,KICKP,KICKS,KICK
+  PRIVATE EDGER,EDGEP,EDGES !,EDGE
+  PRIVATE KICKR,KICKP,KICKS !,KICK
   PRIVATE KICKEXR,KICKEXP,KICKEXS
   PRIVATE INTER,INTEP,INTES,INTE
-  PRIVATE INTEEXR,INTEEXP,INTEEXS
+  PRIVATE INTEEXR,INTEEXP,INTEEXS,INTE_strex
   PRIVATE SYMPINTR,SYMPINTP,SYMPINTS
   PRIVATE SYMPINTEXR,SYMPINTEXP,SYMPINTEXS
-  PRIVATE KICK_SOLR,KICK_SOLP,KICK_SOLS,KICK_SOL
-  PRIVATE SOL_ROTR,SOL_ROTP,SOL_ROTS,SOL_ROT
+  PRIVATE KICK_SOLR,KICK_SOLP,KICK_SOLS !,KICK_SOL
+  PRIVATE SOL_ROTR,SOL_ROTP,SOL_ROTS !,SOL_ROT
   PRIVATE INTESOLR,INTESOLP,INTESOLS,INTESOL
   PRIVATE FACER,FACEP,FACES,FACE
   PRIVATE NEWFACER,NEWFACEP,NEWFACES
@@ -33,9 +32,9 @@ MODULE S_DEF_KIND
   PRIVATE ZEROR_KTK,ZEROP_KTK,ZEROR_STREX,ZEROP_STREX,ZEROR_CAV4,ZEROP_CAV4
   PRIVATE ZEROR_KICKT3,ZEROP_KICKT3
   PRIVATE ALLOCKTK,KILLKTK
-  PRIVATE GETMATR,GETMATD,GETMATS,GETMAT
-  PRIVATE PUSHKTKR,PUSHKTKD,PUSHKTKS,PUSHKTK
-  PRIVATE KICKKTKR,KICKKTKP,KICKKTKS,KICKKTK
+  PRIVATE GETMATR,GETMATD,GETMATS !,GETMAT
+  PRIVATE PUSHKTKR,PUSHKTKD,PUSHKTKS !,PUSHKTK
+  PRIVATE KICKKTKR,KICKKTKP,KICKKTKS !,KICKKTK
   PRIVATE INTKTKR,INTKTKD,INTKTKS,INTKTK
   PRIVATE SYMPINTKTKR,SYMPINTKTKD,SYMPINTKTKS
 
@@ -46,14 +45,14 @@ MODULE S_DEF_KIND
   PRIVATE ZEROR_TKT7,ZEROP_TKT7
   PRIVATE ALLOCTKT7,KILLTKT7
   PRIVATE GETMAT7R,GETMAT7D  !,GETMAT7
-  PRIVATE PUSHTKT7R,PUSHTKT7D,PUSHTKT7S,PUSHTKT7
-  PRIVATE KICKTKT7R,KICKTKT7P,KICKTKT7S,KICKTKT7
-  PRIVATE KICKPATHR,KICKPAThD,KICKPATHS,KICKPATH
+  PRIVATE PUSHTKT7R,PUSHTKT7D,PUSHTKT7S !,PUSHTKT7
+  PRIVATE KICKTKT7R,KICKTKT7P,KICKTKT7S !,KICKTKT7
+  PRIVATE KICKPATHR,KICKPAThD,KICKPATHS !,KICKPATH
   PRIVATE INTTKT7R,INTTKT7D,INTTKT7S,INTTKT7
   PRIVATE SYMPINTTKT7R,SYMPINTTKT7D,SYMPINTTKT7S
   PRIVATE SYMPINTSOLR,SYMPINTSOLP,SYMPINTSOLS
   PRIVATE GETMULB_SOLR,GETMULB_SOLP,GETMULB_SOL
-  PRIVATE KICKMULR,KICKMULP,KICKMULS,KICKMUL
+  PRIVATE KICKMULR,KICKMULP,KICKMULS !,KICKMUL
 
   PRIVATE EXPR7,EXPD7,EXPCOSY7
 
@@ -63,25 +62,28 @@ MODULE S_DEF_KIND
   PRIVATE GETANBNR,GETANBNP,ZEROR_teapot,ZEROP_teapot,ALLOCTEAPOT,KILLTEAPOT
   PRIVATE SPROTR,SPROTP,SPROTS,SPROT
   PRIVATE SseCR,SseCP,SseCS,Ssec
-  PRIVATE SSECH1R,SSECH1P,SSECH1S,SSECH1
-  PRIVATE SKICKR,SKICKP,SKICKS,SKICK
+  PRIVATE SSECH1R,SSECH1P,SSECH1S !,SSECH1
+  PRIVATE SKICKR,SKICKP,SKICKS !,SKICK
   PRIVATE SINTER,SINTEP,SINTES,SINTE
   PRIVATE SSYMPINTR,SSYMPINTP,SSYMPINTS
-  PRIVATE wedgeR,wedgeP,wedgeS,wedge
+  PRIVATE wedgeR,wedgeP,wedgeS !,wedge
 
 
   PRIVATE MONTR,MONTP,MONTS,ZEROr_mon,ZEROP_mon
+  PRIVATE MONTIR,MONTIP,MONTIS
   PRIVATE ECOLLIMATORR,ECOLLIMATORP,ECOLLIMATORS
   PRIVATE RCOLLIMATORR,RCOLLIMATORP,RCOLLIMATORS
+  PRIVATE RCOLLIMATORiR,RCOLLIMATORiP ,RCOLLIMATORiS !,RCOLLIMATORi
+  PRIVATE ECOLLIMATORiR,ECOLLIMATORiP ,ECOLLIMATORiS !,RCOLLIMATORi
   PRIVATE ZEROr_ECOL,ZEROP_ECOL,ZEROr_RCOL,ZEROP_RCOL
 
-  PRIVATE SEPR,SEPP,SEPS,SEPTTRACK,SYMPSEPR,SYMPSEPP,SYMPSEPS
+  PRIVATE SEPR,SEPP,SEPS,SYMPSEPR,SYMPSEPP,SYMPSEPS !,SEPTTRACK
   !  PRIVATE IN,IN1,IN2
   INTEGER IN(4,4),IN1(10),IN2(10)
   PRIVATE EXPSOLR,EXPSOLD,EXPCOSSOL
   PRIVATE EXPSOL6R,EXPSOL6D,EXPCOSSOL6
-  PRIVATE PUSHSOLR,PUSHSOLD,PUSHSOLS,PUSHSOL
-  PRIVATE GETMATSOLR,GETMATSOLP,GETMATSOLS,GETMATSOL
+  PRIVATE PUSHSOLR,PUSHSOLD,PUSHSOLS !,PUSHSOL
+  PRIVATE GETMATSOLR,GETMATSOLP,GETMATSOLS !,GETMATSOL
   PRIVATE ALLOCSOL,KILLSOL,ZEROR_SOL,ZEROP_SOL
   PRIVATE INTSOLR,INTSOLP,INTSOLS
   PRIVATE SYMPINTSOLTR,SYMPINTSOLTP,SYMPINTSOLTS
@@ -105,11 +107,11 @@ MODULE S_DEF_KIND
   !  FOR CAV_TRAV
   PRIVATE A_TRANSR,A_TRANSP,A_TRANS
   PRIVATE feval_CAVr,feval_CAVP,feval_CAV
-  private FRINGECAV_TRAV, FRINGECAVR_TRAV,FRINGECAVP_TRAV,FRINGECAVS_TRAV
-  private rk2_cavr,rk2_cavp,rk2_cav
-  private rk4_cavr,rk4_cavp,rk4_cav
-  private rk6_cavr,rk6_cavp,rk6_cav
-
+  private  FRINGECAVR_TRAV,FRINGECAVP_TRAV,FRINGECAVS_TRAV !,FRINGECAV_TRAV
+  private rk2_cavr,rk2_cavp !,rk2_cav
+  private rk4_cavr,rk4_cavp !,rk4_cav
+  private rk6_cavr,rk6_cavp !,rk6_cav
+  PRIVATE DRIFT_INTER,DRIFT_INTEP,DRIFT_INTES   ! NEW DRIFTS CUTABLE
   INTEGER,PRIVATE :: NMAXI=10000
   logical(lp) :: SPEED=.TRUE.
   integer,TARGET :: HIGHEST_FRINGE=2
@@ -124,10 +126,14 @@ MODULE S_DEF_KIND
   ! New home for element and elementp
 
   INTERFACE TRACK
-     MODULE PROCEDURE DRFTR   ! MID DEFINED AS 1/2 L
-     MODULE PROCEDURE DRFTP   ! MID
-     MODULE PROCEDURE DRFTS
-     MODULE PROCEDURE SYMPINTR ! MID IN INTE
+     !     MODULE PROCEDURE DRFTR   ! MID DEFINED AS 1/2 L
+     !     MODULE PROCEDURE DRFTP   ! MID
+     !     MODULE PROCEDURE DRFTS
+     MODULE PROCEDURE DRIFT_INTER   ! MID DEFINED AS 1/2 L
+     MODULE PROCEDURE DRIFT_INTEP   ! MID
+     MODULE PROCEDURE DRIFT_INTES
+
+     MODULE PROCEDURE SYMPINTR ! MID IN INTE  DKD2
      MODULE PROCEDURE SYMPINTP ! MID IN INTE
      MODULE PROCEDURE SYMPINTS
      MODULE PROCEDURE SYMPINTEXR ! MID IN INTE
@@ -200,8 +206,30 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE DRIFTR
      MODULE PROCEDURE DRIFTP       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
      MODULE PROCEDURE DRIFTS
+  END INTERFACE
+
+
+  INTERFACE DRIFT_pancake
      MODULE PROCEDURE DRIFT_pancaker
      MODULE PROCEDURE DRIFT_pancakep
+  END INTERFACE
+
+  INTERFACE MONTI
+     MODULE PROCEDURE MONTIR
+     MODULE PROCEDURE MONTIP       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
+     MODULE PROCEDURE MONTIS
+  END INTERFACE
+
+  INTERFACE RCOLLIMATORi
+     MODULE PROCEDURE RCOLLIMATORiR
+     MODULE PROCEDURE RCOLLIMATORiP       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
+     MODULE PROCEDURE RCOLLIMATORiS
+  END INTERFACE
+
+  INTERFACE ECOLLIMATORi
+     MODULE PROCEDURE ECOLLIMATORiR
+     MODULE PROCEDURE ECOLLIMATORiP       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
+     MODULE PROCEDURE ECOLLIMATORiS
   END INTERFACE
 
   INTERFACE KICKCAV
@@ -273,6 +301,10 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE FRINGES       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
   END INTERFACE
 
+  INTERFACE FRINGE__MULTI
+     MODULE PROCEDURE FRINGER
+  END INTERFACE
+
   INTERFACE FACE
      MODULE PROCEDURE FACER
      MODULE PROCEDURE FACEP       ! H1 AND H2 OF MAD FOR EXACT = FALSE
@@ -280,6 +312,10 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE NEWFACER
      MODULE PROCEDURE NEWFACEP    ! H1 AND H2 OF MAD FOR EXACT = TRUE
      MODULE PROCEDURE NEWFACES
+  END INTERFACE
+
+  INTERFACE FACE_MULTI
+     MODULE PROCEDURE NEWFACER
   END INTERFACE
 
 
@@ -302,15 +338,29 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE KICKR   ! NOT EXACT
      MODULE PROCEDURE KICKP
      MODULE PROCEDURE KICKS
+  END INTERFACE
+
+  INTERFACE KICKEX
      MODULE PROCEDURE KICKEXR !  EXACT
      MODULE PROCEDURE KICKEXP
      MODULE PROCEDURE KICKEXS
   END INTERFACE
 
+
+
+  !  INTERFACE KICK_multi
+  !     MODULE PROCEDURE KICKR
+  !     MODULE PROCEDURE KICKEXR !  EXACT
+  !  END INTERFACE
+
   INTERFACE INTE
-     MODULE PROCEDURE INTER   ! NOT EXACT !MID
+     MODULE PROCEDURE INTER   ! NOT EXACT !MID  dkd2
      MODULE PROCEDURE INTEP   ! MID
      MODULE PROCEDURE INTES
+  END INTERFACE
+
+
+  INTERFACE INTE_strex
      MODULE PROCEDURE INTEEXR ! EXACT
      MODULE PROCEDURE INTEEXP
      MODULE PROCEDURE INTEEXS
@@ -565,8 +615,6 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE SPARS
   END INTERFACE
 
-
-
   INTERFACE SKICK
      MODULE PROCEDURE SKICKR
      MODULE PROCEDURE SKICKP       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
@@ -585,7 +633,6 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE wedgeP       ! USE IN EXACT SECTOR BEND (INTEGRATION)
      MODULE PROCEDURE wedgeS
   END INTERFACE
-
   INTERFACE F_M
      MODULE PROCEDURE FXR
      MODULE PROCEDURE FXP
@@ -609,257 +656,102 @@ MODULE S_DEF_KIND
 
 contains
 
-  SUBROUTINE DRFTR(D,X,MID)
+  SUBROUTINE DRIFT_INTER(EL,X,MID)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
-    TYPE(DRIFT1),INTENT(IN):: D
-    real(dp) PZ
+    TYPE(DRIFT1),INTENT(IN):: EL
+    real(dp) DH,DD
+    INTEGER I
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-    IF(PRESENT(MID)) THEN
-       CALL XMID(MID,X,0)
-       IF(D%P%EXACT) THEN
-          if(D%P%TIME) then
-             PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one/D%P%BETA0+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-          else
-             PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD
-          endif
-       ELSE
-          if(D%P%TIME) then
-             PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/pz
-             X(3)=X(3)+HALF*D%L*X(4)/pz
-             ! bug found by Schmidt totalpath=false time=true
-             !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*HALF*D%L/pz
-             X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*HALF*D%L/pz
-             X(6)=X(6)-HALF*(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-          else
-             X(1)=X(1)+HALF*D%L*X(2)/(one+X(5))
-             X(3)=X(3)+HALF*D%L*X(4)/(one+X(5))
-             X(6)=X(6)+(HALF*D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+HALF*D%P%TOTALPATH*D%p%LD
-          endif
-       ENDIF
-       CALL XMID(MID,X,1)
-       IF(D%P%EXACT) THEN
-          if(D%P%TIME) then
-             PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one/D%P%BETA0+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-          else
-             PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD
-          endif
-       ELSE
-          if(D%P%TIME) then
-             PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/pz
-             X(3)=X(3)+HALF*D%L*X(4)/pz
-             ! bug found by Schmidt totalpath=false time=true
-             !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*HALF*D%L/pz
-             X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*HALF*D%L/pz
-             X(6)=X(6)-HALF*(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-          else
-             X(1)=X(1)+HALF*D%L*X(2)/(one+X(5))
-             X(3)=X(3)+HALF*D%L*X(4)/(one+X(5))
-             X(6)=X(6)+(HALF*D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+HALF*D%P%TOTALPATH*D%p%LD
-          endif
-       ENDIF
-       CALL XMID(MID,X,2)
-    ELSE
-       IF(D%P%EXACT) THEN
-          if(D%P%TIME) then
-             PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+D%L*X(2)/PZ
-             X(3)=X(3)+D%L*X(4)/PZ
-             X(6)=X(6)+D%L*(one/D%P%BETA0+X(5))/PZ-(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-          else
-             PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+D%L*X(2)/PZ
-             X(3)=X(3)+D%L*X(4)/PZ
-             X(6)=X(6)+D%L*(one+X(5))/PZ-(1-D%P%TOTALPATH)*D%P%LD
-          endif
-       ELSE
-          if(D%P%TIME) then
-             PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2)
-             X(1)=X(1)+D%L*X(2)/pz
-             X(3)=X(3)+D%L*X(4)/pz
-             ! bug found by Schmidt totalpath=false time=true
-             !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*D%L/pz
-             X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*D%L/pz
-             X(6)=X(6)-(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-          else
-             X(1)=X(1)+D%L*X(2)/(one+X(5))
-             X(3)=X(3)+D%L*X(4)/(one+X(5))
-             X(6)=X(6)+(D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+D%P%TOTALPATH*D%p%LD
-          endif
-       ENDIF
-    ENDIF
-  END SUBROUTINE DRFTR
+    SELECT CASE(EL%P%METHOD)
+    CASE(2,4,6)
+       DH=EL%L/EL%P%NST
+       DD=EL%P%LD/EL%P%NST
+
+       DO I=1,EL%P%NST
+          CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+       ENDDO
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
+
+  END SUBROUTINE DRIFT_INTER
 
 
 
-  SUBROUTINE DRFTP(D,X,MID)
+
+
+  SUBROUTINE DRIFT_INTEP(EL,X,MID)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
-    TYPE(DRIFT1P),INTENT(IN):: D
-    TYPE(REAL_8) PZ
+    TYPE(DRIFT1P),INTENT(IN):: EL
+    TYPE(REAL_8) DH
+    real(dp) DD
+    INTEGER I
 
-    IF(PRESENT(MID)) THEN
-       CALL XMID(MID,X,0)
-       IF(D%P%EXACT) THEN
-          CALL ALLOC(PZ)
-          if(D%P%TIME) then
-             PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one/D%P%BETA0+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-          else
-             PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD
-          endif
-          CALL KILL(PZ)
-       ELSE
-          if(D%P%TIME) then
-             CALL ALLOC(PZ)
-             PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/pz
-             X(3)=X(3)+HALF*D%L*X(4)/pz
-             ! bug found by Schmidt totalpath=false time=true
-             !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*D%L/pz
-             X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*HALF*D%L/pz
-             X(6)=X(6)-HALF*(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-             CALL KILL(PZ)
-          else
-             X(1)=X(1)+HALF*D%L*X(2)/(one+X(5))
-             X(3)=X(3)+HALF*D%L*X(4)/(one+X(5))
-             X(6)=X(6)+(HALF*D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+HALF*D%P%TOTALPATH*D%p%LD
-          endif
-       ENDIF
-       CALL XMID(MID,X,1)
-       IF(D%P%EXACT) THEN
-          CALL ALLOC(PZ)
-          if(D%P%TIME) then
-             PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one/D%P%BETA0+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-          else
-             PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/PZ
-             X(3)=X(3)+HALF*D%L*X(4)/PZ
-             X(6)=X(6)+HALF*D%L*(one+X(5))/PZ-HALF*(1-D%P%TOTALPATH)*D%P%LD
-          endif
-          CALL KILL(PZ)
-       ELSE
-          if(D%P%TIME) then
-             CALL ALLOC(PZ)
-             PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2)
-             X(1)=X(1)+HALF*D%L*X(2)/pz
-             X(3)=X(3)+HALF*D%L*X(4)/pz
-             ! bug found by Schmidt totalpath=false time=true
-             !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*D%L/pz
-             X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*HALF*D%L/pz
-             X(6)=X(6)-HALF*(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-             CALL KILL(PZ)
-          else
-             X(1)=X(1)+HALF*D%L*X(2)/(one+X(5))
-             X(3)=X(3)+HALF*D%L*X(4)/(one+X(5))
-             X(6)=X(6)+(HALF*D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+HALF*D%P%TOTALPATH*D%p%LD
-          endif
-       ENDIF
-       CALL XMID(MID,X,2)
-    ELSE
-       IF(D%P%EXACT) THEN
-          CALL ALLOC(PZ)
-          if(D%P%TIME) then
-             PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+D%L*X(2)/PZ
-             X(3)=X(3)+D%L*X(4)/PZ
-             X(6)=X(6)+D%L*(one/D%P%BETA0+X(5))/PZ-(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-          else
-             PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-             X(1)=X(1)+D%L*X(2)/PZ
-             X(3)=X(3)+D%L*X(4)/PZ
-             X(6)=X(6)+D%L*(one+X(5))/PZ-(1-D%P%TOTALPATH)*D%P%LD
-          endif
-          CALL KILL(PZ)
-       ELSE
-          if(D%P%TIME) then
-             CALL ALLOC(PZ)
-             PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2)
-             X(1)=X(1)+D%L*X(2)/pz
-             X(3)=X(3)+D%L*X(4)/pz
-             ! bug found by Schmidt totalpath=false time=true
-             !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*D%L/pz
-             X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*D%L/pz
-             X(6)=X(6)-(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-             CALL KILL(PZ)
-          else
-             X(1)=X(1)+D%L*X(2)/(one+X(5))
-             X(3)=X(3)+D%L*X(4)/(one+X(5))
-             X(6)=X(6)+(D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+D%P%TOTALPATH*D%p%LD
-          endif
-       ENDIF
-    ENDIF
-  END SUBROUTINE DRFTP
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-  SUBROUTINE DRFTS(D,Y)
+    SELECT CASE(EL%P%METHOD)
+    CASE(2,4,6)
+       CALL ALLOC(DH)
+       DH=EL%L/EL%P%NST
+       DD=EL%P%LD/EL%P%NST
+
+       DO I=1,EL%P%NST
+          CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+       ENDDO
+       CALL KILL(DH)
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
+
+  END SUBROUTINE DRIFT_INTEP
+
+
+  SUBROUTINE DRIFT_INTES(EL,X)
     IMPLICIT NONE
-    TYPE(DRIFT1P),INTENT(IN):: D
-    TYPE(REAL_8) PZ
-    TYPE(REAL_8)   X(6)
-    TYPE(ENV_8),INTENT(INOUT):: Y(6)
-    CALL ALLOC(X,6)
-    X=Y
+    TYPE(ENV_8),INTENT(INOUT):: X(6)
+    TYPE(DRIFT1P),INTENT(IN):: EL
+    TYPE(REAL_8) DH
+    real(dp) DD
+    INTEGER I
 
-    IF(D%P%EXACT) THEN
-       CALL ALLOC(PZ)
-       if(D%P%TIME) then
-          PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
-          X(1)=X(1)+D%L*X(2)/PZ
-          X(3)=X(3)+D%L*X(4)/PZ
-          X(6)=X(6)+D%L*(one/D%P%BETA0+X(5))/PZ-(1-D%P%TOTALPATH)*D%P%LD/D%P%BETA0
-       else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          X(1)=X(1)+D%L*X(2)/PZ
-          X(3)=X(3)+D%L*X(4)/PZ
-          X(6)=X(6)+D%L*(one+X(5))/PZ-(1-D%P%TOTALPATH)*D%P%LD
-       endif
-       CALL KILL(PZ)
-    ELSE
-       if(D%P%TIME) then
-          CALL ALLOC(PZ)
-          PZ=SQRT(one+two*X(5)/D%P%BETA0+x(5)**2)
-          X(1)=X(1)+D%L*X(2)/pz
-          X(3)=X(3)+D%L*X(4)/pz
-          ! bug found by Schmidt totalpath=false time=true
-          !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+D%P%TOTALPATH)*(one/D%P%BETA0+x(5))*D%L/pz
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))*D%L/pz
-          X(6)=X(6)-(1-D%P%TOTALPATH)*D%p%LD/D%P%BETA0
-          CALL KILL(PZ)
-       else
-          X(1)=X(1)+D%L*X(2)/(one+X(5))
-          X(3)=X(3)+D%L*X(4)/(one+X(5))
-          X(6)=X(6)+(D%L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+D%P%TOTALPATH*D%p%LD
-       endif
-    ENDIF
-    Y=X
-    CALL KILL(X,6)
+    SELECT CASE(EL%P%METHOD)
+    CASE(2,4,6)
+       CALL ALLOC(DH)
+       DH=EL%L/EL%P%NST
+       DD=EL%P%LD/EL%P%NST
 
-  END SUBROUTINE DRFTS
+       DO I=1,EL%P%NST
+          CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+       ENDDO
+       CALL KILL(DH)
 
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
+
+  END SUBROUTINE DRIFT_INTES
 
   SUBROUTINE CAVER(EL,X,MID)
     IMPLICIT NONE
@@ -939,40 +831,6 @@ contains
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
-    CASE(METHOD_F:METHOD_1)
-
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-
-       DO I =1,SPN(EL%P%METHOD)
-          SDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-       IF(EL%P%DIR==1) THEN     ! BACKWARDS
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL DRIFT(SDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICKCAV (EL,SDK(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL KICKCAV (EL,SDK(J),X)
-                CALL DRIFT(SDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ENDIF
 
     CASE DEFAULT
        w_p=0
@@ -1088,47 +946,6 @@ contains
        CALL KILL(DF,4)
        CALL KILL(DK,4)
 
-    CASE(METHOD_F:METHOD_1)
-
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-
-       CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-       CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-
-       DO I =1,SPN(EL%P%METHOD)
-          PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-
-       IF(EL%P%DIR==1) THEN     ! BACKWARDS
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICKCAV (EL,PSDK(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL KICKCAV (EL,PSDK(J),X)
-                CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ENDIF
-
-       CALL KILL(PSDF,SPN(EL%P%METHOD))
-       CALL KILL(PSDK,SPN(EL%P%METHOD))
 
     CASE DEFAULT
        w_p=0
@@ -3091,41 +2908,7 @@ contains
 
        ENDDO
 
-    CASE(METHOD_F:METHOD_1)
 
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-
-       DO I =1,SPN(EL%P%METHOD)
-          SDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-       IF(EL%P%DIR==1) THEN     ! BACKWARDS
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL DRIFT(SDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICK (EL,SDK(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL KICK (EL,SDK(J),X)
-                CALL DRIFT(SDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ENDIF
 
     CASE DEFAULT
        w_p=0
@@ -3225,47 +3008,7 @@ contains
        CALL KILL(DF,4)
        CALL KILL(DK,4)
 
-    CASE(METHOD_F:METHOD_1)
 
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-
-       CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-       CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-
-       DO I =1,SPN(EL%P%METHOD)
-          PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-
-       IF(EL%P%DIR==1) THEN     ! BACKWARDS
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICK (EL,PSDK(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL KICK (EL,PSDK(J),X)
-                CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ENDIF
-
-       CALL KILL(PSDF,SPN(EL%P%METHOD))
-       CALL KILL(PSDK,SPN(EL%P%METHOD))
 
     CASE DEFAULT
        w_p=0
@@ -3355,44 +3098,6 @@ contains
        CALL KILL(DF,4)
        CALL KILL(DK,4)
 
-    CASE(METHOD_F:METHOD_1)
-
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-       CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-       CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-       DO I =1,SPN(EL%P%METHOD)
-          PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-       IF(EL%P%DIR==1) THEN     ! BACKWARDS
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICK (EL,PSDK(J),X)
-             ENDDO
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL KICK (EL,PSDK(J),X)
-                CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             ENDDO
-          ENDDO
-       ENDIF
-
-
-       CALL KILL(PSDF,SPN(EL%P%METHOD))
-       CALL KILL(PSDK,SPN(EL%P%METHOD))
-
 
 
     CASE DEFAULT
@@ -3424,6 +3129,7 @@ contains
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
     ENDIF
+
 
   END SUBROUTINE SYMPINTR
 
@@ -10870,41 +10576,6 @@ contains
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
-    CASE(METHOD_F:METHOD_1)
-
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-       DO I =1,SPN(EL%P%METHOD)
-          SDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-       IF(EL%P%DIR==1) THEN
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL SSECH1(EL,SDF(J),SDDF(J),X)
-                CALL SKICK (EL,SDK(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL SKICK (EL,SDK(J),X)
-                CALL SSECH1(EL,SDF(J),SDDF(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ENDIF
-
-
 
 
     CASE DEFAULT
@@ -11015,47 +10686,6 @@ contains
        ENDDO
        CALL KILL(DF,4)
        CALL KILL(DK,4)
-
-    CASE(METHOD_F:METHOD_1)
-
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-
-
-       CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-       CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-       DO I =1,SPN(EL%P%METHOD)
-          PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-       IF(EL%P%DIR==1) THEN
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL SSECH1(EL,PSDF(J),SDDF(J),X)
-                CALL SKICK (EL,PSDK(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL SKICK (EL,PSDK(J),X)
-                CALL SSECH1(EL,PSDF(J),SDDF(J),X)
-             ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
-          ENDDO
-       ENDIF
-
-       CALL KILL(PSDF,SPN(EL%P%METHOD))
-       CALL KILL(PSDK,SPN(EL%P%METHOD))
 
     CASE DEFAULT
        w_p=0
@@ -11196,44 +10826,6 @@ contains
        CALL KILL(DF,4)
        CALL KILL(DK,4)
 
-    CASE(METHOD_F:METHOD_1)
-
-
-       IF(.NOT.NEW_METHOD)THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          w_p%c(1)= " USER METHOD NOT DEFINED "
-          call write_e(EL%P%METHOD)
-       ENDIF
-
-       CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-       CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-       DO I =1,SPN(EL%P%METHOD)
-          PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-          SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-          PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-       ENDDO
-
-       IF(EL%P%DIR==1) THEN
-          DO I=1,EL%P%NST
-             DO J=1,SPN(EL%P%METHOD)
-                CALL SSECH1(EL,PSDF(J),SDDF(J),X)
-                CALL SKICK (EL,PSDK(J),X)
-             ENDDO
-          ENDDO
-       ELSE
-          DO I=1,EL%P%NST
-             DO J=SPN(EL%P%METHOD),1,-1
-                CALL SKICK (EL,PSDK(J),X)
-                CALL SSECH1(EL,PSDF(J),SDDF(J),X)
-             ENDDO
-          ENDDO
-       ENDIF
-
-
-       CALL KILL(PSDF,SPN(EL%P%METHOD))
-       CALL KILL(PSDK,SPN(EL%P%METHOD))
 
     CASE DEFAULT
        w_p=0
@@ -11784,62 +11376,151 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
     TYPE(mon),INTENT(INOUT):: EL
-    real(dp) DH,DD
-
-    DH=EL%L/two
-    DD=EL%P%LD/two
+    INTEGER I
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    EL%X=X(1);EL%Y=X(3);
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    DO I=1,EL%P%NST
+       CALL MONTI(EL,X,I,MID)
+    ENDDO
     IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
   END SUBROUTINE MONTR
+
+
+
 
   SUBROUTINE MONTP(EL,X,MID)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(monP),INTENT(INOUT):: EL
-    real(dp) DD
-    TYPE(REAL_8) DH
-    CALL ALLOC(DH)
-
-    DH=EL%L/two
-    DD=EL%P%LD/two
+    INTEGER I
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    EL%X=X(1);EL%Y=X(3);
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    DO I=1,EL%P%NST
+       CALL MONTI(EL,X,I,MID)
+    ENDDO
     IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
-    CALL KILL(DH)
 
   END SUBROUTINE MONTP
+
 
   SUBROUTINE MONTS(EL,X)
     IMPLICIT NONE
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     TYPE(monP),INTENT(INOUT):: EL
-    real(dp) DD
     TYPE(REAL_8) DH
-    CALL ALLOC(DH)
 
-    DH=EL%L/two
-    DD=EL%P%LD/two
+    INTEGER I
 
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    EL%X=X(1)%V;EL%Y=X(3)%V;
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-
-    CALL KILL(DH)
+    DO I=1,EL%P%NST
+       CALL MONTI(EL,X,I)
+    ENDDO
 
   END SUBROUTINE MONTS
 
+  SUBROUTINE MONTIR(EL,X,I,MID)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(mon),INTENT(INOUT):: EL
+    INTEGER, INTENT(IN) :: I
+    real(dp) DH,DD
+
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       if(i==(el%p%nst+1)/2) THEN
+          EL%X=X(1);EL%Y=X(3);
+       ENDIF
+       IF(PRESENT(MID)) THEN
+          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       if(i==el%p%nst/2) THEN
+          EL%X=X(1);EL%Y=X(3);
+       ENDIF
+       IF(PRESENT(MID)) THEN
+          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+
+  END SUBROUTINE MONTIR
+
+
+  SUBROUTINE MONTIP(EL,X,I,MID)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(monP),INTENT(INOUT):: EL
+    real(dp) DD
+    TYPE(REAL_8) DH
+    INTEGER, INTENT(IN) :: I
+
+
+    CALL ALLOC(DH)
+
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       if(i==(el%p%nst+1)/2) THEN
+          EL%X=X(1);EL%Y=X(3);
+       ENDIF
+       IF(PRESENT(MID)) THEN
+          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       if(i==el%p%nst/2) THEN
+          EL%X=X(1);EL%Y=X(3);
+       ENDIF
+       IF(PRESENT(MID)) THEN
+          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+
+    CALL KILL(DH)
+
+  END SUBROUTINE MONTIP
+
+  SUBROUTINE MONTIS(EL,X,I)
+    IMPLICIT NONE
+    TYPE(ENV_8),INTENT(INOUT):: X(6)
+    TYPE(monP),INTENT(INOUT):: EL
+    real(dp) DD
+    TYPE(REAL_8) DH
+    INTEGER, INTENT(IN) :: I
+
+    CALL ALLOC(DH)
+
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       if(i==(el%p%nst+1)/2) THEN
+          EL%X=X(1)%V;EL%Y=X(3)%V;
+       ENDIF
+    endif
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       if(i==el%p%nst/2) THEN
+          EL%X=X(1)%V;EL%Y=X(3)%V;
+       ENDIF
+    endif
+
+    CALL KILL(DH)
+
+
+  END SUBROUTINE MONTIS
   !  RCOLLIMATOR STUFF
 
   SUBROUTINE RCOLLIMATORR(EL,X,MID)
@@ -11847,21 +11528,13 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
     TYPE(RCOL),INTENT(INOUT):: EL
-    real(dp) DH,DD
-    logical(lp) aper
-
-    DH=EL%L/two
-    DD=EL%P%LD/two
-    aper=APERTURE_FLAG
-    APERTURE_FLAG=.true.
+    INTEGER I
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    CALL CHECK_APERTURE(EL%A,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    DO I=1,EL%P%NST
+       CALL RCOLLIMATORi(EL,X,i,MID)
+    ENDDO
     IF(PRESENT(MID)) CALL XMID(MID,X,2)
-    APERTURE_FLAG=aper
 
   END SUBROUTINE RCOLLIMATORR
 
@@ -11870,25 +11543,14 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(RCOLP),INTENT(INOUT):: EL
-    real(dp) DD
-    TYPE(REAL_8) DH
-    logical(lp) aper
-    CALL ALLOC(DH)
 
-    DH=EL%L/two
-    DD=EL%P%LD/two
-    aper=APERTURE_FLAG
-    APERTURE_FLAG=.true.
+    INTEGER I
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    CALL CHECK_APERTURE(EL%A,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    DO I=1,EL%P%NST
+       CALL RCOLLIMATORi(EL,X,i,MID)
+    ENDDO
     IF(PRESENT(MID)) CALL XMID(MID,X,2)
-    APERTURE_FLAG=aper
-
-    CALL KILL(DH)
 
   END SUBROUTINE RCOLLIMATORP
 
@@ -11896,24 +11558,117 @@ contains
     IMPLICIT NONE
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     TYPE(RCOLP),INTENT(INOUT):: EL
+
+    INTEGER I
+
+    DO I=1,EL%P%NST
+       CALL RCOLLIMATORi(EL,X,i)
+    ENDDO
+
+
+  END SUBROUTINE RCOLLIMATORS
+
+
+
+  SUBROUTINE RCOLLIMATORiR(EL,X,i,MID)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(RCOL),INTENT(INOUT):: EL
+    real(dp) DH,DD
+    logical(lp) aper
+    integer, intent(in) :: i
+
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    aper=APERTURE_FLAG
+    APERTURE_FLAG=.true.
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       IF(PRESENT(MID)) THEN
+          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+    CALL CHECK_APERTURE(EL%A,X)
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       IF(PRESENT(MID)) THEN
+          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+
+    APERTURE_FLAG=aper
+
+  END SUBROUTINE RCOLLIMATORiR
+
+  SUBROUTINE RCOLLIMATORiP(EL,X,i,MID)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(RCOLP),INTENT(INOUT):: EL
     real(dp) DD
     TYPE(REAL_8) DH
     logical(lp) aper
-    CALL ALLOC(DH)
+    integer, intent(in) :: i
 
-    DH=EL%L/two
-    DD=EL%P%LD/two
+    CALL ALLOC(DH)
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    aper=APERTURE_FLAG
+    APERTURE_FLAG=.true.
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       IF(PRESENT(MID)) THEN
+          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+    CALL CHECK_APERTURE(EL%A,X)
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       IF(PRESENT(MID)) THEN
+          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+
+    APERTURE_FLAG=aper
+
+    CALL kill(DH)
+
+  END SUBROUTINE RCOLLIMATORiP
+
+  SUBROUTINE RCOLLIMATORiS(EL,X,i)
+    IMPLICIT NONE
+    TYPE(ENV_8),INTENT(INOUT):: X(6)
+    TYPE(RCOLP),INTENT(INOUT):: EL
+    real(dp) DD
+    TYPE(REAL_8) DH
+    logical(lp) aper
+    integer, intent(in) :: i
+
+    CALL ALLOC(DH)
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     CALL CHECK_APERTURE(EL%A,X)
+
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+
     APERTURE_FLAG=aper
 
-    CALL KILL(DH)
+    CALL kill(DH)
 
-  END SUBROUTINE RCOLLIMATORS
+  END SUBROUTINE RCOLLIMATORiS
+
 
   !  ECOLLIMATOR STUFF
 
@@ -11988,27 +11743,121 @@ contains
 
   END SUBROUTINE ECOLLIMATORS
 
+  SUBROUTINE ECOLLIMATORiR(EL,X,i,MID)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(ECOL),INTENT(INOUT):: EL
+    real(dp) DH,DD
+    logical(lp) aper
+    integer, intent(in) :: i
+
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    aper=APERTURE_FLAG
+    APERTURE_FLAG=.true.
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       IF(PRESENT(MID)) THEN
+          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+    CALL CHECK_APERTURE(EL%A,X)
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       IF(PRESENT(MID)) THEN
+          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+
+    APERTURE_FLAG=aper
+
+  END SUBROUTINE ECOLLIMATORiR
+
+  SUBROUTINE ECOLLIMATORiP(EL,X,i,MID)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    TYPE(ECOLP),INTENT(INOUT):: EL
+    real(dp) DD
+    TYPE(REAL_8) DH
+    logical(lp) aper
+    integer, intent(in) :: i
+
+    CALL ALLOC(DH)
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    aper=APERTURE_FLAG
+    APERTURE_FLAG=.true.
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==1) then
+       IF(PRESENT(MID)) THEN
+          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+    CALL CHECK_APERTURE(EL%A,X)
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    if(mod(el%p%nst,2)==0) then
+       IF(PRESENT(MID)) THEN
+          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       ENDIF
+    endif
+
+    APERTURE_FLAG=aper
+
+    CALL kill(DH)
+
+  END SUBROUTINE ECOLLIMATORiP
+
+  SUBROUTINE ECOLLIMATORiS(EL,X,i)
+    IMPLICIT NONE
+    TYPE(ENV_8),INTENT(INOUT):: X(6)
+    TYPE(ECOLP),INTENT(INOUT):: EL
+    real(dp) DD
+    TYPE(REAL_8) DH
+    logical(lp) aper
+    integer, intent(in) :: i
+
+    CALL ALLOC(DH)
+    DH=EL%L/two/el%p%nst
+    DD=EL%P%LD/two/el%p%nst
+
+    aper=APERTURE_FLAG
+    APERTURE_FLAG=.true.
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    CALL CHECK_APERTURE(EL%A,X)
+
+    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+
+    APERTURE_FLAG=aper
+
+    CALL kill(DH)
+
+  END SUBROUTINE ECOLLIMATORiS
+
   !  Electric septum
 
-  SUBROUTINE SEPR(EL,X,MID)
+  SUBROUTINE SEPR(EL,X,i,MID)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(ESEPTUM),INTENT(INOUT):: EL
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
     real(dp) K,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
     LOGICAL(LP) EXACT
+    integer, intent(IN) ::i
 
     !    if(EL%P%EXACT) THEN
     if(.true.) then
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
 
-       IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,0)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
-       ENDIF
-
 
        if(EL%P%TIME) then
           PZ=ROOT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
@@ -12017,15 +11866,15 @@ contains
           PZ=ROOT((one+X(5)+K*X(3))**2-X(2)**2-X(4)**2)
           E1=one+X(5)
        endif
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
        ARG=ARG*TWO
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12034,17 +11883,16 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,1)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==1) then
+             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
-
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
 
@@ -12056,15 +11904,15 @@ contains
           E1=one+X(5)
        endif
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
        ARG=ARG*TWO
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12073,26 +11921,20 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,2)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==0) then
+             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
-
     else
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
 
-       IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,0)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
-       ENDIF
 
 
        if(EL%P%TIME) then
@@ -12103,15 +11945,15 @@ contains
           E1=one+X(5)
        endif
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
        ARG=ARG*TWO
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12120,15 +11962,15 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,1)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==1) then
+             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
 
 
@@ -12142,15 +11984,15 @@ contains
           E1=one+X(5)
        endif
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
        ARG=ARG*TWO
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12159,15 +12001,15 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,2)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==0) then
+             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
 
     endif
@@ -12175,13 +12017,14 @@ contains
 
   END SUBROUTINE SEPR
 
-  SUBROUTINE SEPP(EL,X,MID)
+  SUBROUTINE SEPP(EL,X,I,MID)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(REAL_8) K,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
     LOGICAL(LP) EXACT
+    integer, intent(IN) ::i
 
     !    if(EL%P%EXACT) THEN
     if(.true.) then
@@ -12190,11 +12033,7 @@ contains
        CALL ALLOC( XT,2)
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
-       IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,0)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
-       ENDIF
+
 
        if(EL%P%TIME) then
           PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
@@ -12204,15 +12043,15 @@ contains
           E1=one+X(5)
        endif
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
        ARG=TWO*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12221,15 +12060,15 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,1)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==1) then
+             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
 
 
@@ -12243,15 +12082,15 @@ contains
        endif
 
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
        ARG=TWO*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12260,14 +12099,14 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,2)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==0) then
+             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
 
 
@@ -12279,11 +12118,6 @@ contains
        CALL ALLOC( XT,2)
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
-       IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,0)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
-       ENDIF
 
        if(EL%P%TIME) then
           PZ=SQRT((one/EL%P%BETA0+X(5)+K*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
@@ -12293,15 +12127,15 @@ contains
           E1=one+X(5)
        endif
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
        ARG=TWO*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12310,15 +12144,15 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,1)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==1) then
+             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
 
 
@@ -12332,15 +12166,15 @@ contains
        endif
 
 
-       ARG=(EL%L/two)*K/PZ
-       SH_X=(EL%L/two)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/two/el%p%nst)*K/PZ
+       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
        ARG=ARG*half
-       CHM=(EL%L/two)*SINHX_X(ARG)/PZ*SINH(ARG)
+       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
        ARG=TWO*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two)/PZ
+       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -12349,14 +12183,15 @@ contains
        X(4)=XT(2)
 
        if(EL%P%TIME) then
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
        else
-          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO
+          X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
+
        IF(PRESENT(MID)) THEN
-          !             EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
-          CALL XMID(MID,X,2)
-          !             CALL ROT_XY(EL%PHAS,X,EXACT)
+          if(mod(el%p%nst,2)==0) then
+             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+          endif
        ENDIF
 
 
@@ -12374,7 +12209,7 @@ contains
 
     CALL ALLOC(X,6)
     X=Y
-    CALL SEPTTRACK(EL,X)
+    CALL SEPTTRACK(EL,X,0)
 
     Y=X
     CALL KILL(X,6)
@@ -12386,13 +12221,16 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(ESEPTUM),INTENT(INOUT):: EL
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
+    integer i
     !    LOGICAL(LP) EXACT
 
-    !    EXACT=.TRUE.
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-    !        CALL ROT_XY(EL%PHAS,X,EXACT)
-    CALL SEPTTRACK(EL,X,MID)
-    !        EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+    do i=1,el%p%nst
+       CALL SEPTTRACK(EL,X,i,MID)
+    enddo
+
+    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
   END SUBROUTINE SYMPSEPR
 
@@ -12401,12 +12239,13 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
-    !    LOGICAL(LP) EXACT
+    integer i
 
-    !    EXACT=.TRUE.
-    !        CALL ROT_XY(EL%PHAS,X,EXACT)
-    CALL SEPTTRACK(EL,X,MID)
-    !       EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    do i=1,el%p%nst
+       CALL SEPTTRACK(EL,X,i,MID)
+    enddo
+    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
 
   END SUBROUTINE SYMPSEPP
@@ -12415,10 +12254,13 @@ contains
     IMPLICIT NONE
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
+    integer i
 
     !    EXACT=.TRUE.
     !       CALL ROT_XY(EL%PHAS,X,EXACT)
-    CALL SEPTTRACK(EL,X)
+    do i=1,el%p%nst
+       CALL SEPTTRACK(EL,X)
+    enddo
     !       EL%PHAS=-EL%PHAS; CALL ROT_XY(EL%PHAS,X,EXACT);EL%PHAS=-EL%PHAS;
 
 
@@ -12745,7 +12587,7 @@ contains
 
           DO I=1,EL%P%NST
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,D,X)
+             CALL KICKEX (EL,D,X)
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -12759,11 +12601,11 @@ contains
 
           DO I=1,EL%P%NST
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK2,X)
+             CALL KICKEX (EL,DK2,X)
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -12778,52 +12620,17 @@ contains
           DO I=1,EL%P%NST
              DO J=4,2,-1
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
              ENDDO
              CALL DRIFT(DF(1),DDF(1),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK(1),X)
+             CALL KICKEX (EL,DK(1),X)
              CALL DRIFT(DF(1),DDF(1),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              DO J=2,4
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              ENDDO
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
-
-       CASE(METHOD_F:METHOD_1)
-
-          IF(.NOT.NEW_METHOD)THEN
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1(1X,A72))'
-             w_p%c(1)= " USER METHOD NOT DEFINED "
-             call write_e(EL%P%METHOD)
-          ENDIF
-
-
-          DO I =1,SPN(EL%P%METHOD)
-             SDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-          ENDDO
-
-          IF(EL%P%DIR==1) THEN
-             DO I=1,EL%P%NST
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL DRIFT(SDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                   CALL KICK (EL,SDK(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ELSE
-             DO I=EL%P%NST,1,-1
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL KICK (EL,SDK(J),X)
-                   CALL DRIFT(SDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ENDIF
 
        CASE DEFAULT
           w_p=0
@@ -12841,7 +12648,7 @@ contains
 
           DO I=1,EL%P%NST
              CALL SPAR(EL,DH,DD,X)
-             CALL KICK (EL,D,X)
+             CALL KICKEX (EL,D,X)
              CALL SPAR(EL,DH,DD,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -12855,11 +12662,11 @@ contains
 
           DO I=1,EL%P%NST
              CALL SPAR(EL,D1,DD1,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D2,DD2,X)
-             CALL KICK (EL,DK2,X)
+             CALL KICKEX (EL,DK2,X)
              CALL SPAR(EL,D2,DD2,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D1,DD1,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -12874,52 +12681,18 @@ contains
           DO I=1,EL%P%NST
              DO J=4,2,-1
                 CALL SPAR(EL,DF(J),DDF(J),X)
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
              ENDDO
              CALL SPAR(EL,DF(1),DDF(1),X)
-             CALL KICK (EL,DK(1),X)
+             CALL KICKEX (EL,DK(1),X)
              CALL SPAR(EL,DF(1),DDF(1),X)
              DO J=2,4
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
                 CALL SPAR(EL,DF(J),DDF(J),X)
              ENDDO
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
 
-       CASE(METHOD_F:METHOD_1)
-
-          IF(.NOT.NEW_METHOD)THEN
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1(1X,A72))'
-             w_p%c(1)= " USER METHOD NOT DEFINED "
-             call write_e(EL%P%METHOD)
-          ENDIF
-
-
-          DO I =1,SPN(EL%P%METHOD)
-             SDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-          ENDDO
-
-          IF(EL%P%DIR==1) THEN
-             DO I=1,EL%P%NST
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL SPAR(EL,SDF(J),SDDF(J),X)
-                   CALL KICK (EL,SDK(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ELSE
-             DO I=EL%P%NST,1,-1
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL KICK (EL,SDK(J),X)
-                   CALL SPAR(EL,SDF(J),SDDF(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ENDIF
 
        CASE DEFAULT
           w_p=0
@@ -12965,7 +12738,7 @@ contains
 
           DO I=1,EL%P%NST
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,D,X)
+             CALL KICKEX (EL,D,X)
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -12985,11 +12758,11 @@ contains
 
           DO I=1,EL%P%NST
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK2,X)
+             CALL KICKEX (EL,DK2,X)
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -13009,13 +12782,13 @@ contains
           DO I=1,EL%P%NST
              DO J=4,2,-1
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
              ENDDO
              CALL DRIFT(DF(1),DDF(1),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK(1),X)
+             CALL KICKEX (EL,DK(1),X)
              CALL DRIFT(DF(1),DDF(1),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              DO J=2,4
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              ENDDO
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
@@ -13023,46 +12796,6 @@ contains
           CALL KILL(DF,4)
           CALL KILL(DK,4)
 
-       CASE(METHOD_F:METHOD_1)
-
-          IF(.NOT.NEW_METHOD)THEN
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1(1X,A72))'
-             w_p%c(1)= " USER METHOD NOT DEFINED "
-             call write_e(EL%P%METHOD)
-          ENDIF
-
-
-          CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-          CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-          DO I =1,SPN(EL%P%METHOD)
-             PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-             PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-          ENDDO
-
-          IF(EL%P%DIR==1) THEN
-             DO I=1,EL%P%NST
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                   CALL KICK (EL,PSDK(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ELSE
-             DO I=EL%P%NST,1,-1
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                   CALL KICK (EL,PSDK(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ENDIF
-
-
-          CALL KILL(PSDF,SPN(EL%P%METHOD))
-          CALL KILL(PSDK,SPN(EL%P%METHOD))
 
        CASE DEFAULT
           w_p=0
@@ -13082,7 +12815,7 @@ contains
 
           DO I=1,EL%P%NST
              CALL SPAR(EL,DH,DD,X)
-             CALL KICK (EL,D,X)
+             CALL KICKEX (EL,D,X)
              CALL SPAR(EL,DH,DD,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -13102,11 +12835,11 @@ contains
 
           DO I=1,EL%P%NST
              CALL SPAR(EL,D1,DD1,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D2,DD2,X)
-             CALL KICK (EL,DK2,X)
+             CALL KICKEX (EL,DK2,X)
              CALL SPAR(EL,D2,DD2,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D1,DD1,X)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
@@ -13126,13 +12859,13 @@ contains
           DO I=1,EL%P%NST
              DO J=4,2,-1
                 CALL SPAR(EL,DF(J),DDF(J),X)
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
              ENDDO
              CALL SPAR(EL,DF(1),DDF(1),X)
-             CALL KICK (EL,DK(1),X)
+             CALL KICKEX (EL,DK(1),X)
              CALL SPAR(EL,DF(1),DDF(1),X)
              DO J=2,4
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
                 CALL SPAR(EL,DF(J),DDF(J),X)
              ENDDO
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
@@ -13140,46 +12873,6 @@ contains
           CALL KILL(DF,4)
           CALL KILL(DK,4)
 
-       CASE(METHOD_F:METHOD_1)
-
-          IF(.NOT.NEW_METHOD)THEN
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1(1X,A72))'
-             w_p%c(1)= " USER METHOD NOT DEFINED "
-             call write_e(EL%P%METHOD)
-          ENDIF
-
-
-          CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-          CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-          DO I =1,SPN(EL%P%METHOD)
-             PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-             PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-          ENDDO
-
-
-          IF(EL%P%DIR==1) THEN
-             DO I=1,EL%P%NST
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL SPAR(EL,PSDF(J),SDDF(J),X)
-                   CALL KICK (EL,PSDK(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ELSE
-             DO I=EL%P%NST,1,-1
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL KICK (EL,PSDK(J),X)
-                   CALL SPAR(EL,PSDF(J),SDDF(J),X)
-                ENDDO
-                IF(PRESENT(MID)) CALL XMID(MID,X,I)
-             ENDDO
-          ENDIF
-
-          CALL KILL(PSDF,SPN(EL%P%METHOD))
-          CALL KILL(PSDK,SPN(EL%P%METHOD))
 
        CASE DEFAULT
           w_p=0
@@ -13217,7 +12910,7 @@ contains
 
           DO I=1,EL%P%NST
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,D,X)
+             CALL KICKEX (EL,D,X)
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           ENDDO
           CALL KILL(DH)
@@ -13236,11 +12929,11 @@ contains
 
           DO I=1,EL%P%NST
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK2,X)
+             CALL KICKEX (EL,DK2,X)
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           ENDDO
           CALL KILL(D1)
@@ -13259,56 +12952,18 @@ contains
           DO I=1,EL%P%NST
              DO J=4,2,-1
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
              ENDDO
              CALL DRIFT(DF(1),DDF(1),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             CALL KICK (EL,DK(1),X)
+             CALL KICKEX (EL,DK(1),X)
              CALL DRIFT(DF(1),DDF(1),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              DO J=2,4
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              ENDDO
           ENDDO
           CALL KILL(DF,4)
           CALL KILL(DK,4)
-
-       CASE(METHOD_F:METHOD_1)
-
-          IF(.NOT.NEW_METHOD)THEN
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1(1X,A72))'
-             w_p%c(1)= " USER METHOD NOT DEFINED "
-             call write_e(EL%P%METHOD)
-          ENDIF
-
-          CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-          CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-
-          DO I =1,SPN(EL%P%METHOD)
-             PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-             PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-          ENDDO
-
-          IF(EL%P%DIR==1) THEN
-             DO I=1,EL%P%NST
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                   CALL KICK (EL,PSDK(J),X)
-                ENDDO
-             ENDDO
-          ELSE
-             DO I=EL%P%NST,1,-1
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL DRIFT(PSDF(J),SDDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-                   CALL KICK (EL,PSDK(J),X)
-                ENDDO
-             ENDDO
-          ENDIF
-
-          CALL KILL(PSDF,SPN(EL%P%METHOD))
-          CALL KILL(PSDK,SPN(EL%P%METHOD))
 
 
 
@@ -13330,7 +12985,7 @@ contains
 
           DO I=1,EL%P%NST
              CALL SPAR(EL,DH,DD,X)
-             CALL KICK (EL,D,X)
+             CALL KICKEX (EL,D,X)
              CALL SPAR(EL,DH,DD,X)
           ENDDO
           CALL KILL(DH)
@@ -13349,11 +13004,11 @@ contains
 
           DO I=1,EL%P%NST
              CALL SPAR(EL,D1,DD1,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D2,DD2,X)
-             CALL KICK (EL,DK2,X)
+             CALL KICKEX (EL,DK2,X)
              CALL SPAR(EL,D2,DD2,X)
-             CALL KICK (EL,DK1,X)
+             CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D1,DD1,X)
           ENDDO
           CALL KILL(D1)
@@ -13372,56 +13027,19 @@ contains
           DO I=1,EL%P%NST
              DO J=4,2,-1
                 CALL SPAR(EL,DF(J),DDF(J),X)
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
              ENDDO
              CALL SPAR(EL,DF(1),DDF(1),X)
-             CALL KICK (EL,DK(1),X)
+             CALL KICKEX (EL,DK(1),X)
              CALL SPAR(EL,DF(1),DDF(1),X)
              DO J=2,4
-                CALL KICK (EL,DK(J),X)
+                CALL KICKEX (EL,DK(J),X)
                 CALL SPAR(EL,DF(J),DDF(J),X)
              ENDDO
           ENDDO
           CALL KILL(DF,4)
           CALL KILL(DK,4)
 
-       CASE(METHOD_F:METHOD_1)
-
-          IF(.NOT.NEW_METHOD)THEN
-             w_p=0
-             w_p%nc=1
-             w_p%fc='(1(1X,A72))'
-             w_p%c(1)= " USER METHOD NOT DEFINED "
-             call write_e(EL%P%METHOD)
-          ENDIF
-
-
-          CALL ALLOC(PSDF,SPN(EL%P%METHOD))
-          CALL ALLOC(PSDK,SPN(EL%P%METHOD))
-          DO I =1,SPN(EL%P%METHOD)
-             PSDF(I)=EL%L*SPD(I,EL%P%METHOD)/EL%P%NST
-             SDDF(I)=EL%P%LD*SPD(I,EL%P%METHOD)/EL%P%NST
-             PSDK(I)=EL%L*SPK(I,EL%P%METHOD)/EL%P%NST
-          ENDDO
-
-          IF(EL%P%DIR==1) THEN
-             DO I=1,EL%P%NST
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL SPAR(EL,PSDF(J),SDDF(J),X)
-                   CALL KICK (EL,PSDK(J),X)
-                ENDDO
-             ENDDO
-          ELSE
-             DO I=EL%P%NST,1,-1
-                DO J=1,SPN(EL%P%METHOD)
-                   CALL KICK (EL,PSDK(J),X)
-                   CALL SPAR(EL,PSDF(J),SDDF(J),X)
-                ENDDO
-             ENDDO
-          ENDIF
-
-          CALL KILL(PSDF,SPN(EL%P%METHOD))
-          CALL KILL(PSDK,SPN(EL%P%METHOD))
 
        CASE DEFAULT
           w_p=0
@@ -13461,7 +13079,7 @@ contains
        ENDIF
 
 
-       CALL INTE(EL,X,MID)
+       CALL INTE_strex(EL,X,MID)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
@@ -13493,7 +13111,7 @@ contains
        ENDIF
 
 
-       CALL INTE(EL,X,MID)
+       CALL INTE_strex(EL,X,MID)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
@@ -13539,7 +13157,7 @@ contains
        ENDIF
 
 
-       CALL INTE(EL,X,MID)
+       CALL INTE_strex(EL,X,MID)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
@@ -13571,7 +13189,7 @@ contains
        ENDIF
 
 
-       CALL INTE(EL,X,MID)
+       CALL INTE_strex(EL,X,MID)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
@@ -13615,7 +13233,7 @@ contains
        ENDIF
 
 
-       CALL INTE(EL,X)
+       CALL INTE_strex(EL,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
@@ -13647,7 +13265,7 @@ contains
        ENDIF
 
 
-       CALL INTE(EL,X)
+       CALL INTE_strex(EL,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
@@ -14117,14 +13735,6 @@ contains
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
-    CASE(METHOD_F:METHOD_1)
-
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1)= " USER METHOD NOT DEFINED "
-       call write_e(EL%P%METHOD)
-
     CASE DEFAULT
        w_p=0
        w_p%nc=1
@@ -14206,13 +13816,6 @@ contains
 
 
 
-    CASE(METHOD_F:METHOD_1)
-
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1(1X,A72))'
-       w_p%c(1)= " USER METHOD NOT DEFINED "
-       call write_e(EL%P%METHOD)
 
     CASE DEFAULT
        w_p=0
@@ -15647,19 +15250,19 @@ contains
           endif
        CASE(2)
           IS=1
-          call drift(EL,hh,is,1,X)
-          call drift(EL,hh,is,2,X)
+          call DRIFT_pancake(EL,hh,is,1,X)
+          call DRIFT_pancake(EL,hh,is,2,X)
           call KICKPATH(EL,hf,X)
           DO I=1,el%p%NST-2
              IS=is+1
-             call drift(EL,hh,is,2,X)
-             call drift(EL,hf,is,1,X)
-             call drift(EL,hh,is,2,X)
+             call DRIFT_pancake(EL,hh,is,2,X)
+             call DRIFT_pancake(EL,hf,is,1,X)
+             call DRIFT_pancake(EL,hh,is,2,X)
              call KICKPATH(EL,hf,X)
           ENDDO
           IS=is+1
-          call drift(EL,hh,is,2,X)
-          call drift(EL,hf,is,1,X)
+          call DRIFT_pancake(EL,hh,is,2,X)
+          call DRIFT_pancake(EL,hf,is,1,X)
           a(1)=x(1)
           a(2)=x(3)
           CALL trackg(EL%ax(is),A)
@@ -15737,19 +15340,19 @@ contains
           endif
        CASE(2)
           IS=1
-          call drift(EL,hh,is,1,X)
-          call drift(EL,hh,is,2,X)
+          call DRIFT_pancake(EL,hh,is,1,X)
+          call DRIFT_pancake(EL,hh,is,2,X)
           call KICKPATH(EL,hf,X)
           DO I=1,el%p%NST-2
              IS=is+1
-             call drift(EL,hh,is,2,X)
-             call drift(EL,hf,is,1,X)
-             call drift(EL,hh,is,2,X)
+             call DRIFT_pancake(EL,hh,is,2,X)
+             call DRIFT_pancake(EL,hf,is,1,X)
+             call DRIFT_pancake(EL,hh,is,2,X)
              call KICKPATH(EL,hf,X)
           ENDDO
           IS=is+1
-          call drift(EL,hh,is,2,X)
-          call drift(EL,hf,is,1,X)
+          call DRIFT_pancake(EL,hh,is,2,X)
+          call DRIFT_pancake(EL,hf,is,1,X)
           a(1)=x(1)
           a(2)=x(3)
           CALL trackg(EL%ax(is),A)
@@ -15967,6 +15570,7 @@ contains
     REAL(DP) A(3),AD(2),PZ
     TYPE(CAV_TRAV),  INTENT(INOUT) :: D
 
+    A=zero;AD=zero;
     CALL A_TRANS(D,Z0,X,A,AD)
 
     X(2)=X(2)-A(1)

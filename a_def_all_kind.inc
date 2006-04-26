@@ -224,7 +224,7 @@ END  TYPE MONP
 
 TYPE RCOL
    TYPE(MAGNET_CHART), POINTER :: P
-   real(dp) , POINTER :: L   !  monitor and instrument of MAD
+   real(dp) , POINTER :: L   !  collimator of MAD
    type(MADX_APERTURE), POINTER :: A
 END  TYPE RCOL
 
@@ -236,7 +236,7 @@ END  TYPE RCOLP
 
 TYPE ECOL
    TYPE(MAGNET_CHART), POINTER :: P
-   real(dp) , POINTER ::L   !  monitor and instrument of MAD
+   real(dp) , POINTER ::L   !  collimator of MAD
    type(MADX_APERTURE), POINTER :: A
 END  TYPE ECOL
 

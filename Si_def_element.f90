@@ -4,8 +4,8 @@
 
 MODULE S_DEF_ELEMENT
   USE S_DEF_KIND
-  USE USER_kind1
-  USE USER_kind2
+  !  USE USER_kind1
+  !  USE USER_kind2
   USE sagan_WIGGLER
 
   IMPLICIT NONE
@@ -190,8 +190,8 @@ CONTAINS
        endif
        if(associated(s2%B_sol))  s2%B_sol=s2%B_sol*(S2%P%P0C/S1%P0C)**S1%power
 
-       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C,S1%power)
-       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C,S1%power)
+       !       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C,S1%power)
+       !       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C,S1%power)
        if(s2%kind==KINDwiggler) call scale_sagan(s2%wi,S2%P%P0C,S1%P0C,S1%power)
 
     endif
@@ -220,8 +220,8 @@ CONTAINS
           CALL ADD(s2,1,1,zero)
        endif
        if(associated(s2%B_sol))  s2%B_sol=s2%B_sol*(S2%P%P0C/S1%P0C)**S1%power
-       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C,S1%power)
-       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C,S1%power)
+       !       if(s2%kind==kinduser1) call scale_user1(s2%u1,S2%P%P0C,S1%P0C,S1%power)
+       !       if(s2%kind==kinduser2) call scale_user2(s2%u2,S2%P%P0C,S1%P0C,S1%power)
        if(s2%kind==KINDwiggler) call scale_sagan(s2%wi,S2%P%P0C,S1%P0C,S1%power)
     endif
 
@@ -330,8 +330,8 @@ CONTAINS
        s2%IaN(i)=0
        s2%IbN(i)=0
     enddo
-    S2%user1=0
-    S2%user2=0
+    !    S2%user1=0
+    !    S2%user2=0
     S2%SAGAN=0
     S2%SVOLT=one
     S2%SFREQ=one
@@ -646,14 +646,14 @@ CONTAINS
           ENDIF
        ENDIF
     ENDIF
-    IF(S2%KIND==kinduser1) THEN    ! new element
-       DONEIT=.FALSE.                     ! NOT USED HERE
-       call ELp_POL_user1(S2%u1,S1,DONEIT)
-    ENDIF
-    IF(S2%KIND==kinduser2) THEN    ! new element
-       DONEIT=.FALSE.                     ! NOT USED HERE
-       call ELp_POL_user2(S2%u2,S1,DONEIT)
-    ENDIF
+    !    IF(S2%KIND==kinduser1) THEN    ! new element
+    !       DONEIT=.FALSE.                     ! NOT USED HERE
+    !       call ELp_POL_user1(S2%u1,S1,DONEIT)
+    !    ENDIF
+    !    IF(S2%KIND==kinduser2) THEN    ! new element
+    !       DONEIT=.FALSE.                     ! NOT USED HERE
+    !       call ELp_POL_user2(S2%u2,S1,DONEIT)
+    !    ENDIF
     IF(S2%KIND==KINDWIGGLER) THEN    ! new element
        DONEIT=.FALSE.                     ! NOT USED HERE
        call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
@@ -1042,34 +1042,34 @@ CONTAINS
           allocate(EL%M22%T_rad_REV)
           CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
        endif
-    CASE(KINDUSER1)
-       if(.not.ASSOCIATED(EL%U1)) THEN
-          ALLOCATE(EL%U1)
-          EL%U1=0
-       ELSE
-          EL%U1=-1
-          EL%U1=0
-       ENDIF
-       EL%U1%P=>EL%P
-       EL%U1%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%U1%AN=>EL%AN
-       EL%U1%BN=>EL%BN
-       CALL POINTERS_USER1(EL%U1)
-    CASE(KINDUSER2)
-       if(.not.ASSOCIATED(EL%U2)) THEN
-          ALLOCATE(EL%U2)
-          EL%U2=0
-       ELSE
-          EL%U2=-1
-          EL%U2=0
-       ENDIF
-       EL%U2%P=>EL%P
-       EL%U2%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%U2%AN=>EL%AN
-       EL%U2%BN=>EL%BN
-       CALL POINTERS_USER2(EL%U2)
+       !    CASE(KINDUSER1)
+       !       if(.not.ASSOCIATED(EL%U1)) THEN
+       !          ALLOCATE(EL%U1)
+       !          EL%U1=0
+       !       ELSE
+       !          EL%U1=-1
+       !          EL%U1=0
+       !       ENDIF
+       !       EL%U1%P=>EL%P
+       !       EL%U1%L=>EL%L
+       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       !       EL%U1%AN=>EL%AN
+       !       EL%U1%BN=>EL%BN
+       !       CALL POINTERS_USER1(EL%U1)
+       !    CASE(KINDUSER2)
+       !       if(.not.ASSOCIATED(EL%U2)) THEN
+       !          ALLOCATE(EL%U2)
+       !          EL%U2=0
+       !       ELSE
+       !          EL%U2=-1
+       !          EL%U2=0
+       !       ENDIF
+       !       EL%U2%P=>EL%P
+       !       EL%U2%L=>EL%L
+       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       !       EL%U2%AN=>EL%AN
+       !       EL%U2%BN=>EL%BN
+       !       CALL POINTERS_USER2(EL%U2)
     CASE(KINDWIGGLER)
        if(.not.ASSOCIATED(EL%WI)) THEN
           ALLOCATE(EL%WI)
@@ -1448,36 +1448,36 @@ CONTAINS
           allocate(EL%M22%T_rad_REV)
           CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
        endif
-    CASE(KINDUSER1)
-       if(.not.ASSOCIATED(EL%U1)) THEN
-          ALLOCATE(EL%U1)
-          EL%U1=0
-       ELSE
-          EL%U1=-1
-          EL%U1=0
-       ENDIF
-       EL%U1%P=>EL%P
-       EL%U1%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%U1%AN=>EL%AN
-       EL%U1%BN=>EL%BN
-       CALL POINTERS_USER1(EL%U1)
-       CALL ALLOC(EL%U1)
-    CASE(KINDUSER2)
-       if(.not.ASSOCIATED(EL%U2)) THEN
-          ALLOCATE(EL%U2)
-          EL%U2=0
-       ELSE
-          EL%U2=-1
-          EL%U2=0
-       ENDIF
-       EL%U2%P=>EL%P
-       EL%U2%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       EL%U2%AN=>EL%AN
-       EL%U2%BN=>EL%BN
-       CALL POINTERS_USER2(EL%U2)
-       CALL ALLOC(EL%U2)
+       !    CASE(KINDUSER1)
+       !       if(.not.ASSOCIATED(EL%U1)) THEN
+       !          ALLOCATE(EL%U1)
+       !          EL%U1=0
+       !       ELSE
+       !          EL%U1=-1
+       !          EL%U1=0
+       !       ENDIF
+       !       EL%U1%P=>EL%P
+       !       EL%U1%L=>EL%L
+       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       !       EL%U1%AN=>EL%AN
+       !       EL%U1%BN=>EL%BN
+       !       CALL POINTERS_USER1(EL%U1)
+       !       CALL ALLOC(EL%U1)
+       !    CASE(KINDUSER2)
+       !       if(.not.ASSOCIATED(EL%U2)) THEN
+       !          ALLOCATE(EL%U2)
+       !          EL%U2=0
+       !       ELSE
+       !          EL%U2=-1
+       !          EL%U2=0
+       !       ENDIF
+       !       EL%U2%P=>EL%P
+       !       EL%U2%L=>EL%L
+       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       !       EL%U2%AN=>EL%AN
+       !       EL%U2%BN=>EL%BN
+       !       CALL POINTERS_USER2(EL%U2)
+       !       CALL ALLOC(EL%U2)
     CASE(KINDWIGGLER)
        if(.not.ASSOCIATED(EL%WI)) THEN
           ALLOCATE(EL%WI)
@@ -1668,12 +1668,12 @@ CONTAINS
     CASE(KIND16,KIND20)
        EL%K16%AN=>EL%AN
        EL%K16%BN=>EL%BN
-    CASE(KINDuser1)
-       EL%U1%AN=>EL%AN
-       EL%U1%BN=>EL%BN
-    CASE(KINDuser2)
-       EL%U2%AN=>EL%AN
-       EL%U2%BN=>EL%BN
+       !    CASE(KINDuser1)
+       !       EL%U1%AN=>EL%AN
+       !       EL%U1%BN=>EL%BN
+       !    CASE(KINDuser2)
+       !       EL%U2%AN=>EL%AN
+       !       EL%U2%BN=>EL%BN
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
@@ -1781,12 +1781,12 @@ CONTAINS
     CASE(KIND16,KIND20)
        EL%K16%AN=>EL%AN
        EL%K16%BN=>EL%BN
-    CASE(KINDuser1)
-       EL%U1%AN=>EL%AN
-       EL%U1%BN=>EL%BN
-    CASE(KINDuser2)
-       EL%U2%AN=>EL%AN
-       EL%U2%BN=>EL%BN
+       !    CASE(KINDuser1)
+       !       EL%U1%AN=>EL%AN
+       !       EL%U1%BN=>EL%BN
+       !    CASE(KINDuser2)
+       !       EL%U2%AN=>EL%AN
+       !       EL%U2%BN=>EL%BN
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
@@ -1878,8 +1878,8 @@ CONTAINS
     nullify(EL%SEP15);
     nullify(EL%RCOL18);
     nullify(EL%ECOL19);
-    nullify(EL%U1);
-    nullify(EL%U2);
+    !    nullify(EL%U1);
+    !    nullify(EL%U2);
     nullify(EL%WI);
     nullify(EL%PA);
     nullify(EL%P);
@@ -1922,8 +1922,8 @@ CONTAINS
     nullify(EL%SEP15);
     nullify(EL%RCOL18);
     nullify(EL%ECOL19);
-    nullify(EL%U1);
-    nullify(EL%U2);
+    !    nullify(EL%U1);
+    !    nullify(EL%U2);
     nullify(EL%WI);
     nullify(EL%PA);
     nullify(EL%P);
@@ -2023,15 +2023,15 @@ CONTAINS
           EL%K16=-1
           DEALLOCATE(EL%K16)       ! INTEGRATOR
        endif
-       IF(ASSOCIATED(EL%U1))        then
-          el%U1=-1     !USER DEFINED MAGNET
-          DEALLOCATE(EL%U1)
-       ENDIF
+       !       IF(ASSOCIATED(EL%U1))        then
+       !          el%U1=-1     !USER DEFINED MAGNET
+       !          DEALLOCATE(EL%U1)
+       !       ENDIF
 
-       IF(ASSOCIATED(EL%U2))        then
-          el%U2=-1     !USER DEFINED MAGNET
-          DEALLOCATE(EL%U2)
-       ENDIF
+       !       IF(ASSOCIATED(EL%U2))        then
+       !          el%U2=-1     !USER DEFINED MAGNET
+       !          DEALLOCATE(EL%U2)
+       !       ENDIF
 
        IF(ASSOCIATED(EL%WI))        then
           el%WI=-1     !USER DEFINED MAGNET
@@ -2177,14 +2177,14 @@ CONTAINS
           EL%TP10=-1
           DEALLOCATE(EL%TP10)       ! INTEGRATOR SECTOR EXACT
        ENDIF
-       IF(ASSOCIATED(EL%U1))        then
-          el%U1=-1
-          DEALLOCATE(EL%U1)
-       ENDIF
-       IF(ASSOCIATED(EL%U2))        then
-          el%U2=-1
-          DEALLOCATE(EL%U2)
-       ENDIF
+       !       IF(ASSOCIATED(EL%U1))        then
+       !          el%U1=-1
+       !          DEALLOCATE(EL%U1)
+       !       ENDIF
+       !       IF(ASSOCIATED(EL%U2))        then
+       !          el%U2=-1
+       !          DEALLOCATE(EL%U2)
+       !       ENDIF
 
        IF(ASSOCIATED(EL%WI))        then
           el%WI=-1
@@ -2467,15 +2467,16 @@ CONTAINS
        CALL SETFAMILY(ELP)
     ENDIF
 
-    IF(EL%KIND==KINDUSER1) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%U1,ELP%U1)
-    ENDIF
+    !    IF(EL%KIND==KINDUSER1) THEN         !
+    !       CALL SETFAMILY(ELP)
+    !       CALL COPY(EL%U1,ELP%U1)
+    !    ENDIF
 
-    IF(EL%KIND==KINDUSER2) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%U2,ELP%U2)
-    ENDIF
+    !    IF(EL%KIND==KINDUSER2) THEN         !
+    !       CALL SETFAMILY(ELP)
+    !       CALL COPY(EL%U2,ELP%U2)
+    !    ENDIF
+
     IF(EL%KIND==KINDWIGGLER) THEN         !
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
@@ -2682,15 +2683,15 @@ CONTAINS
        CALL SETFAMILY(ELP)
     ENDIF
 
-    IF(EL%KIND==KINDUSER1) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%U1,ELP%U1)
-    ENDIF
+    !    IF(EL%KIND==KINDUSER1) THEN         !
+    !       CALL SETFAMILY(ELP)
+    !       CALL COPY(EL%U1,ELP%U1)
+    !    ENDIF
 
-    IF(EL%KIND==KINDUSER2) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%U2,ELP%U2)
-    ENDIF
+    !    IF(EL%KIND==KINDUSER2) THEN         !
+    !       CALL SETFAMILY(ELP)
+    !       CALL COPY(EL%U2,ELP%U2)
+    !    ENDIF
 
     IF(EL%KIND==KINDWIGGLER) THEN         !
        CALL SETFAMILY(ELP)
@@ -2897,15 +2898,15 @@ CONTAINS
        CALL SETFAMILY(ELP)
     ENDIF
 
-    IF(EL%KIND==KINDUSER1) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%U1,ELP%U1)
-    ENDIF
+    !    IF(EL%KIND==KINDUSER1) THEN         !
+    !       CALL SETFAMILY(ELP)
+    !       CALL COPY(EL%U1,ELP%U1)
+    !    ENDIF
 
-    IF(EL%KIND==KINDUSER2) THEN         !
-       CALL SETFAMILY(ELP)
-       CALL COPY(EL%U2,ELP%U2)
-    ENDIF
+    !    IF(EL%KIND==KINDUSER2) THEN         !
+    !       CALL SETFAMILY(ELP)
+    !       CALL COPY(EL%U2,ELP%U2)
+    !    ENDIF
 
     IF(EL%KIND==KINDWIGGLER) THEN         !
        CALL SETFAMILY(ELP)
@@ -2979,13 +2980,13 @@ CONTAINS
 
 
 
-    IF(ELP%KIND==KINDUSER1) THEN
-       CALL reset_U1(ELP%U1)
-    ENDIF
+    !    IF(ELP%KIND==KINDUSER1) THEN
+    !       CALL reset_U1(ELP%U1)
+    !    ENDIF
 
-    IF(ELP%KIND==KINDUSER2) THEN
-       CALL reset_U2(ELP%U2)
-    ENDIF
+    !    IF(ELP%KIND==KINDUSER2) THEN
+    !       CALL reset_U2(ELP%U2)
+    !    ENDIF
 
     IF(ELP%KIND==KINDWIGGLER) THEN
        CALL reset_WI(ELP%WI)

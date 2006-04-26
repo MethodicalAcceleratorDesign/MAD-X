@@ -3,7 +3,7 @@
 ! See file A_SCRATCH_SIZE.F90
 
 module Mad_like
-  USE S_TRACKING
+  USE ptc_multiparticle,drifter=>drift
   !USE file_handler
   IMPLICIT NONE
   public
@@ -17,7 +17,7 @@ module Mad_like
   PRIVATE rectaETILT,recttilt
   PRIVATE B1,A1,A2,B2,A3,B3,A4,B4,A5,A6,A7,A8,A9,A10,B5,B6,B7,B8,B9,B10,BLTILT
   private fac
-  private USER_1L,USER_2L,Taylor_maptilt
+  private Taylor_maptilt
   PRIVATE MONIT,HMONIT,VMONIT,INSTRUMEN
   PRIVATE RCOLIT,ECOLIT
   ! linked
@@ -48,6 +48,7 @@ module Mad_like
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
   INTEGER, PRIVATE, TARGET :: NPARA
   type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
+
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
      real(dp) ang(3),t(3)
@@ -318,12 +319,7 @@ module Mad_like
 
 
 
-  INTERFACE USER_1
-     MODULE PROCEDURE USER_1L
-  end  INTERFACE
-  INTERFACE USER_2
-     MODULE PROCEDURE USER_2L
-  end  INTERFACE
+
 
   INTERFACE WIGGLER
      MODULE PROCEDURE WIGGLERL
@@ -409,7 +405,7 @@ CONTAINS
     CALL CHECKSMI(S2,-10)
     A10 =S2
     A10 %K(10)=A10%K(10)
-    A10 %KS(10)=A10%KS(10)+S1/fac(10)
+    A10 %KS(10)=A10%KS(10)+S1 !/fac(10)
   END FUNCTION A10
 
   FUNCTION  B10(S2,S1)
@@ -419,7 +415,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,10)
     B10 =S2
-    B10 %K(10)=B10 %K(10)+S1/fac(10)
+    B10 %K(10)=B10 %K(10)+S1 !/fac(10)
     B10 %KS(10)=B10 %KS(10)
   END FUNCTION B10
 
@@ -431,7 +427,7 @@ CONTAINS
     CALL CHECKSMI(S2,-9)
     A9 =S2
     A9 %K(9)=A9%K(9)
-    A9 %KS(9)=A9%KS(9)+S1/fac(9)
+    A9 %KS(9)=A9%KS(9)+S1  !/fac(9)
   END FUNCTION A9
 
   FUNCTION  B9(S2,S1)
@@ -441,7 +437,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,9)
     B9 =S2
-    B9 %K(9)=B9 %K(9)+S1/fac(9)
+    B9 %K(9)=B9 %K(9)+S1 !/fac(9)
     B9 %KS(9)=B9 %KS(9)
   END FUNCTION B9
 
@@ -453,7 +449,7 @@ CONTAINS
     CALL CHECKSMI(S2,-8)
     A8 =S2
     A8 %K(8)=A8%K(8)
-    A8 %KS(8)=A8%KS(8)+S1/fac(8)
+    A8 %KS(8)=A8%KS(8)+S1 !/fac(8)
   END FUNCTION A8
 
   FUNCTION  B8(S2,S1)
@@ -463,7 +459,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,8)
     B8 =S2
-    B8 %K(8)=B8 %K(8)+S1/fac(8)
+    B8 %K(8)=B8 %K(8)+S1 !/fac(8)
     B8 %KS(8)=B8 %KS(8)
   END FUNCTION B8
 
@@ -475,7 +471,7 @@ CONTAINS
     CALL CHECKSMI(S2,-7)
     A7 =S2
     A7 %K(7)=A7%K(7)
-    A7 %KS(7)=A7%KS(7)+S1/fac(7)
+    A7 %KS(7)=A7%KS(7)+S1  !/fac(7)
   END FUNCTION A7
 
   FUNCTION  B7(S2,S1)
@@ -485,7 +481,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,7)
     B7 =S2
-    B7 %K(7)=B7 %K(7)+S1/fac(7)
+    B7 %K(7)=B7 %K(7)+S1   !/fac(7)
     B7 %KS(7)=B7 %KS(7)
   END FUNCTION B7
 
@@ -497,7 +493,7 @@ CONTAINS
     CALL CHECKSMI(S2,-6)
     A6 =S2
     A6 %K(6)=A6%K(6)
-    A6 %KS(6)=A6%KS(6)+S1/fac(6)
+    A6 %KS(6)=A6%KS(6)+S1  !/fac(6)
   END FUNCTION A6
 
   FUNCTION  B6(S2,S1)
@@ -507,7 +503,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,6)
     B6 =S2
-    B6 %K(6)=B6 %K(6)+S1/fac(6)
+    B6 %K(6)=B6 %K(6)+S1 !/fac(6)
     B6 %KS(6)=B6 %KS(6)
   END FUNCTION B6
 
@@ -519,7 +515,7 @@ CONTAINS
     CALL CHECKSMI(S2,-5)
     A5 =S2
     A5 %K(5)=A5%K(5)
-    A5 %KS(5)=A5%KS(5)+S1/fac(5)
+    A5 %KS(5)=A5%KS(5)+S1 !/fac(5)
   END FUNCTION A5
 
   FUNCTION  B5(S2,S1)
@@ -529,7 +525,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,5)
     B5 =S2
-    B5 %K(5)=B5 %K(5)+S1/fac(5)
+    B5 %K(5)=B5 %K(5)+S1 !/fac(5)
     B5 %KS(5)=B5 %KS(5)
   END FUNCTION B5
 
@@ -541,7 +537,7 @@ CONTAINS
     CALL CHECKSMI(S2,-4)
     A4 =S2
     A4 %K(4)=A4%K(4)
-    A4 %KS(4)=A4%KS(4)+S1/fac(4)
+    A4 %KS(4)=A4%KS(4)+S1 !/fac(4)
   END FUNCTION A4
 
   FUNCTION  B4(S2,S1)
@@ -551,7 +547,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,4)
     B4 =S2
-    B4 %K(4)=B4 %K(4)+S1/fac(4)
+    B4 %K(4)=B4 %K(4)+S1 !/fac(4)
     B4 %KS(4)=B4 %KS(4)
   END FUNCTION B4
 
@@ -563,7 +559,7 @@ CONTAINS
     CALL CHECKSMI(S2,-3)
     A3 =S2
     A3 %K(3)=A3%K(3)
-    A3 %KS(3)=A3%KS(3)+S1/fac(3)
+    A3 %KS(3)=A3%KS(3)+S1 !/fac(3)
   END FUNCTION A3
 
   FUNCTION  B3(S2,S1)
@@ -573,7 +569,7 @@ CONTAINS
     real(dp),INTENT(IN):: S1
     CALL CHECKSMI(S2,3)
     B3 =S2
-    B3 %K(3)=B3 %K(3)+S1/fac(3)
+    B3 %K(3)=B3 %K(3)+S1 !/fac(3)
     B3 %KS(3)=B3 %KS(3)
   END FUNCTION B3
 
@@ -745,11 +741,11 @@ CONTAINS
        ENDDO
 
        IF(NN>=1.AND.NN<=10) THEN
-          SMITILT%K(NN)=K11/fac(nN)
+          SMITILT%K(NN)=K11  !/fac(nN)
           SMITILT%KIND=kind8
           SMITILT%nmul=NN
        ELSEIF(NN<0.AND.NN>=-10) THEN
-          SMITILT%KS(-NN)=K11/fac(nN)
+          SMITILT%KS(-NN)=K11 !/fac(nN)
           SMITILT%KIND=kind9
           SMITILT%nmul=-NN
        ELSE
@@ -779,11 +775,11 @@ CONTAINS
        SMITILT%LD=zero
        SMITILT%LC=zero
        IF(NN>=1.AND.NN<=10) THEN
-          SMITILT%K(NN)=K11/fac(Nn)
+          SMITILT%K(NN)=K11 !/fac(Nn)
           SMITILT%KIND=kind8
           SMITILT%nmul=NN
        ELSEIF(NN<0.AND.NN>=-10) THEN
-          SMITILT%KS(-NN)=K11/fac(nN)
+          SMITILT%KS(-NN)=K11 !/fac(nN)
           SMITILT%KIND=kind9
           SMITILT%nmul=-NN
        ELSE
@@ -838,8 +834,8 @@ CONTAINS
        COUNT=.TRUE.
 
        DO I=NMAX,1,-1
-          BLTILT%K(I)=LIST%K(I)/fac(i)
-          BLTILT%KS(I)=LIST%KS(I)/fac(i)
+          BLTILT%K(I)=LIST%K(I) !/fac(i)
+          BLTILT%KS(I)=LIST%KS(I) !/fac(i)
           IF(COUNT) THEN
              IF(BLTILT%K(I)/=zero.OR.BLTILT%KS(I)/=zero) THEN
                 COUNT=.FALSE.
@@ -873,8 +869,8 @@ CONTAINS
        BLTILT%KIND=kind3
        BLTILT%nmul=K%NMUL
        DO I=1,K%NMUL
-          BLTILT%K(I)=K%BN(I)/fac(i)
-          BLTILT%KS(I)=K%AN(I)/fac(i)
+          BLTILT%K(I)=K%BN(I) !/fac(i)
+          BLTILT%KS(I)=K%AN(I) !/fac(i)
        ENDDO
 
        if(present(t)) then
@@ -1195,7 +1191,7 @@ CONTAINS
     IF(L1==zero) THEN
        SOLTILT%KIND=KIND0
     ELSE
-       SOLTILT%K(2)=KQ/FAC(2)    ! MAD FACTOR
+       SOLTILT%K(2)=KQ !/FAC(2)    ! MAD FACTOR
        if(madkind2==kind2) then
           SOLTILT%KIND=KIND5
        else
@@ -1249,10 +1245,10 @@ CONTAINS
     SEXTTILT%LD=L1
     SEXTTILT%LC=L1
     IF(L1==zero) THEN
-       SEXTTILT%K(3)=K11/FAC(3)    ! MAD FACTOR
+       SEXTTILT%K(3)=K11  !/FAC(3)    ! MAD FACTOR
        SEXTTILT%KIND=MADKIND3N
     ELSE
-       SEXTTILT%K(3)=K11/FAC(3)         ! MAD FACTOR
+       SEXTTILT%K(3)=K11 !/FAC(3)         ! MAD FACTOR
        SEXTTILT%KIND=MADKIND2
     ENDIF
     SEXTTILT%nmul=3
@@ -1301,10 +1297,10 @@ CONTAINS
     OCTUTILT%LD=L1
     OCTUTILT%LC=L1
     IF(L1==zero) THEN
-       OCTUTILT%K(4)=K11/FAC(4)         ! MAD FACTOR
+       OCTUTILT%K(4)=K11 !/FAC(4)         ! MAD FACTOR
        OCTUTILT%KIND=MADKIND3N
     ELSE
-       OCTUTILT%K(4)=K11/FAC(4)         ! MAD FACTOR
+       OCTUTILT%K(4)=K11 !/FAC(4)         ! MAD FACTOR
        OCTUTILT%KIND=MADKIND2
     ENDIF
     OCTUTILT%nmul=4
@@ -1859,7 +1855,7 @@ CONTAINS
 
     IF(E1/=zero) THEN
        ANGI1=e1
-    ELSEIF(E1/=zero) THEN
+    ELSEIF(E1/=ZERO) THEN
        ANGI1=ANG1-e2
     ELSE
        WRITE(6,*) " ERROR IN  TRUERECTILT_MADX INPUT "
@@ -1943,6 +1939,8 @@ CONTAINS
     else
        drft=0
     endif
+    DRFT%NST=1
+    DRFT%METHOD=2
 
     drft%L=L1
     drft%LD=L1
@@ -2001,6 +1999,8 @@ CONTAINS
     if(present(t)) then
        RCOLIT%tilt=t%tilt(0)
     endif
+    RCOLIT%NST=1
+    RCOLIT%METHOD=2
 
   END FUNCTION RCOLIT
 
@@ -2045,6 +2045,9 @@ CONTAINS
        ECOLIT%tilt=t%tilt(0)
     endif
 
+    ECOLIT%NST=1
+    ECOLIT%METHOD=2
+
   END FUNCTION ECOLIT
 
   FUNCTION  MONIT(NAME,L,T,LIST)
@@ -2064,6 +2067,9 @@ CONTAINS
     else
        MONIT=0
     endif
+
+    MONIT%NST=1
+    MONIT%METHOD=2
 
     MONIT%L=L1
     MONIT%LD=L1
@@ -2112,6 +2118,8 @@ CONTAINS
        hMONIT%NAME=NAME
     ENDIF
     hMONIT%KIND=KIND12
+    hMONIT%NST=1
+    hMONIT%METHOD=2
 
   END FUNCTION hMONIT
 
@@ -2141,6 +2149,8 @@ CONTAINS
        VMONIT%NAME=NAME
     ENDIF
     VMONIT%KIND=KIND13
+    VMONIT%NST=1
+    VMONIT%METHOD=2
 
   END FUNCTION VMONIT
 
@@ -2170,6 +2180,8 @@ CONTAINS
        INSTRUMEN%NAME=NAME
     ENDIF
     INSTRUMEN%KIND=KIND14
+    INSTRUMEN%NST=1
+    INSTRUMEN%METHOD=2
 
   END FUNCTION INSTRUMEN
 
@@ -2222,23 +2234,23 @@ CONTAINS
 
   END FUNCTION CHANGEREF
 
-  subroutine  guirder(f,cell)
-    implicit none
-    type (fibre) f
-    type (layout),target :: cell
+  !  subroutine  guirder(f,cell)
+  !    implicit none
+  !    type (fibre) f
+  !    type (layout),target :: cell!
 
-    f%MAG%G23=>CELL
-    f%MAGP%G23=>CELL
-    f%MAG%KIND=KIND23
-    f%MAGP%KIND=KIND23
-    f%MAG%p%nst=1
-    f%MAGP%p%nst=1
-    f%chart%f%ent=1
-    f%chart=0
-    CALL SURVEY_no_patch(f)
+  !    f%MAG%G23=>CELL
+  !    f%MAGP%G23=>CELL
+  !    f%MAG%KIND=KIND23
+  !    f%MAGP%KIND=KIND23
+  !    f%MAG%p%nst=1
+  !    f%MAGP%p%nst=1
+  !    f%chart%f%ent=1
+  !    f%chart=0
+  !   CALL SURVEY_no_patch(f)
 
 
-  END  subroutine guirder
+  !  END  subroutine guirder
 
   FUNCTION  RFCAVITYL(NAME,L,VOLT,LAG,HARMON,REV_FREQ,DELTAE,LIST)
     implicit none
@@ -2426,6 +2438,8 @@ CONTAINS
     ELSESTILT%LC=L1
     ELSESTILT%VOLT=K11
     ELSESTILT%KIND=KIND15
+    ELSESTILT%NST=1
+    ELSESTILT%METHOD=2
 
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN
@@ -2451,88 +2465,7 @@ CONTAINS
 
 
 
-  FUNCTION  USER_1L(NAME,L,T,list)
-    implicit none
-    type (EL_LIST) USER_1L
-    type (TILTING),optional, INTENT(IN):: T
-    type (EL_LIST),optional, INTENT(IN):: LIST
-    CHARACTER(*), INTENT(IN):: NAME
-    real(dp) ,optional, INTENT(IN):: L
 
-    if(present(list)) then
-       USER_1L=list
-       USER_1L%L=list%L
-    elseif(present(L)) then
-       USER_1L=0
-       USER_1L%L=L
-       USER_1L%LD=L
-       USER_1L%LC=L
-    else
-       write(6,*) " Error neither L nor list is present in USER_1L"
-       stop 900
-    endif
-    USER_1L%KIND=KINDUSER1
-    IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
-       call write_i
-       USER_1L%NAME=NAME(1:16)
-    ELSE
-       USER_1L%NAME=NAME
-    ENDIF
-    IF(PRESENT(t)) then
-       IF(T%NATURAL) THEN
-          USER_1L%tilt=t%tilt(1)
-       ELSE
-          USER_1L%tilt=t%tilt(0)
-       ENDIF
-    ENDIF
-  END FUNCTION USER_1L
-
-
-  FUNCTION  USER_2L(NAME,L,T,list)
-    implicit none
-    type (EL_LIST) USER_2L
-    type (TILTING),optional, INTENT(IN):: T
-    type (EL_LIST),optional, INTENT(IN):: LIST
-    CHARACTER(*), INTENT(IN):: NAME
-    real(dp) ,optional, INTENT(IN):: L
-
-    if(present(list)) then
-       USER_2L=list
-       USER_2L%L=list%L
-    elseif(present(L)) then
-       USER_2L=0
-       USER_2L%L=L
-       USER_2L%LD=L
-       USER_2L%LC=L
-    else
-       write(6,*) " Error neither L nor list is present in USER_2L"
-       stop 900
-    endif
-    USER_2L%KIND=KINDUSER2
-    IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
-       call write_i
-       USER_2L%NAME=NAME(1:16)
-    ELSE
-       USER_2L%NAME=NAME
-    ENDIF
-    IF(PRESENT(t)) then
-       IF(T%NATURAL) THEN
-          USER_2L%tilt=t%tilt(1)
-       ELSE
-          USER_2L%tilt=t%tilt(0)
-       ENDIF
-    ENDIF
-  END FUNCTION USER_2L
 
   FUNCTION  WIGGLERL(NAME,L,T,list)
     implicit none
@@ -2667,7 +2600,7 @@ CONTAINS
     !    S2%P%BEND_FRINGE=S1%BEND_FRINGE    ! SET ON THE BASIS OF B0
 
     DO I=1,S2%P%NMUL
-       S2 %BN(I)=flip*S1%K(I) ;S2 %AN(I)=flip*S1%KS(I)
+       S2%BN(I)=flip*S1%K(I)/FAC(I) ; S2%AN(I)=flip*S1%KS(I)/FAC(I);
     ENDDO
     S2%p%exact=EXACT_MODEL
     !    IF(S2%p%EXACT) THEN
@@ -2938,7 +2871,6 @@ CONTAINS
 
 
     c_%other_program => other_program
-    c_%NEW_METHOD => NEW_METHOD
     c_%MADTHICK => MADKIND2
     c_%MADTHIN_NORMAL => MADKIND3N
     c_%MADTHIN_SKEW => MADKIND3S
@@ -2951,6 +2883,7 @@ CONTAINS
     c_%HIGHEST_FRINGE => HIGHEST_FRINGE
     c_%FIBRE_DIR => FIBRE_DIR
     c_%FIBRE_flip => FIBRE_flip
+    c_%eps_pos => eps_pos
     c_%SECTOR_NMUL => SECTOR_NMUL
     c_%SECTOR_NMUL_MAX => SECTOR_NMUL_MAX
     c_%electron => electron

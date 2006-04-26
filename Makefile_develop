@@ -48,10 +48,10 @@ default: madx
 
 # files
 
-madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS_MPARS) madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS) -o madxpf.o madxp.c
 
 twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
@@ -95,6 +95,9 @@ matchsap.o: matchsa.F
 
 matchjcp.o: matchjc.F
 	$(FC) $(FCP) -o matchjcp.o matchjc.F
+
+matchlibp.o: matchlib.F
+	$(FC) $(FCP) -o matchlibp.o matchlib.F
 
 touschekp.o: touschek.F touschek.fi name_len.fi physcons.fi 
 	$(FC) $(FCP) -o touschekp.o touschek.F
@@ -165,13 +168,7 @@ o_tree_element.o: n_complex_polymorph.o o_tree_element.f90
 Sa_extend_poly.o: o_tree_element.o Sa_extend_poly.f90
 	$(f95) $(f95_FLAGS) Sa_extend_poly.f90
 
-Sb_1_pol_template.o: Sa_extend_poly.o Sb_1_pol_template.f90
-	$(f95) $(f95_FLAGS) Sb_1_pol_template.f90
-
-Sb_2_pol_template.o: Sb_1_pol_template.o Sb_2_pol_template.f90
-	$(f95) $(f95_FLAGS) Sb_2_pol_template.f90
-
-Sb_sagan_pol_arbitrary.o: Sb_2_pol_template.o Sb_sagan_pol_arbitrary.f90
+Sb_sagan_pol_arbitrary.o: Sa_extend_poly.o Sb_sagan_pol_arbitrary.f90
 	$(f95) $(f95_FLAGS) Sb_sagan_pol_arbitrary.f90
 
 Sc_euclidean.o: Sb_sagan_pol_arbitrary.o Sc_euclidean.f90
@@ -181,22 +178,13 @@ Sd_frame.o: Sc_euclidean.o Sd_frame.f90
 	$(f95) $(f95_FLAGS) Sd_frame.f90
 
 Se_status.o: Sd_frame.o Se_status.f90 a_def_all_kind.inc a_def_sagan.inc \
-	a_def_user1.inc a_def_user2.inc a_def_element_fibre_layout.inc
+	a_def_element_fibre_layout.inc
 	$(f95) $(f95_FLAGS) Se_status.f90
 
 Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
 	$(f95) $(f95_FLAGS) Sf_def_all_kinds.f90
 
-Sg_1_fitted.o: Sf_def_all_kinds.o Sg_1_fitted.f90
-	$(f95) $(f95_FLAGS) Sg_1_fitted.f90
-
-Sg_1_template_my_kind.o: Sg_1_fitted.o Sg_1_template_my_kind.f90
-	$(f95) $(f95_FLAGS) Sg_1_template_my_kind.f90
-
-Sg_2_template_my_kind.o: Sg_1_template_my_kind.o Sg_2_template_my_kind.f90
-	$(f95) $(f95_FLAGS) Sg_2_template_my_kind.f90
-
-Sg_sagan_wiggler.o: Sg_2_template_my_kind.o Sg_sagan_wiggler.f90
+Sg_sagan_wiggler.o: Sf_def_all_kinds.o Sg_sagan_wiggler.f90
 	$(f95) $(f95_FLAGS) Sg_sagan_wiggler.f90
 
 Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
@@ -217,7 +205,10 @@ Sl_family.o: Sk_link_list.o Sl_family.f90
 Sm_tracking.o: Sl_family.o Sm_tracking.f90
 	$(f95) $(f95_FLAGS) Sm_tracking.f90
 
-Sn_mad_like.o: Sm_tracking.o Sn_mad_like.f90
+Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
+	$(f95) $(f95_FLAGS) Sma_multiparticle.f90
+	
+Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
 	$(f95) $(f95_FLAGS) Sn_mad_like.f90
 
 So_fitting.o: Sn_mad_like.o So_fitting.f90
@@ -232,7 +223,7 @@ madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_setcavs.o: madx_ptc_intstate.o madx_ptc_setcavs.f90
 	$(f95) $(f95_FLAGS) madx_ptc_setcavs.f90
 
-madx_ptc_tablepush.o: madx_ptc_setcavs.o madx_ptc_tablepush.f90
+madx_ptc_tablepush.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_tablepush.f90
 	$(f95) $(f95_FLAGS) madx_ptc_tablepush.f90
 
 madx_ptc_module.o: madx_ptc_tablepush.o madx_ptc_module.f90 
@@ -241,16 +232,19 @@ madx_ptc_module.o: madx_ptc_tablepush.o madx_ptc_module.f90
 madx_ptc_trackcavs.o: madx_ptc_module.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_trackcavs.f90
 	$(f95) $(f95_FLAGS) madx_ptc_trackcavs.f90
 
-madx_ptc_script.o: madx_ptc_trackcavs.o madx_ptc_script.f90
+pointers.o: Sp_keywords.o madx_ptc_module.o pointers.f90
+	$(f95) $(f95_FLAGS) pointers.f90
+	
+madx_ptc_script.o: pointers.o madx_ptc_trackcavs.o madx_ptc_script.f90
 	$(f95) $(f95_FLAGS) madx_ptc_script.f90
 
-madx_ptc_track_run.o: madx_ptc_script.o madx_ptc_track_run.f90
+madx_ptc_track_run.o:  Sp_keywords.o madx_ptc_script.o madx_ptc_track_run.f90
 	$(f95) $(f95_FLAGS) madx_ptc_track_run.f90
 
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 	$(f95) $(f95_FLAGS) user2_photon.f90 
 
-wrap.o: madx_ptc_track_run.o wrap.f90
+wrap.o: madx_ptc_script.o madx_ptc_track_run.o wrap.f90
 	$(f95) $(f95_FLAGS) wrap.f90
 
 run_madx.o: madx_ptc_module.o run_madx.f90
@@ -274,49 +268,49 @@ mpars: madxm.o madxp.o
 
 madx: \
 	madxm.o madxpf.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o \
-	utilp.o matchp.o matchsap.o matchjcp.o touschekp.o plotp.o soddp.o \
-	ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
+	utilp.o matchp.o matchsap.o matchjcp.o matchlibp.o touschekp.o plotp.o \
+	soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
 	gxx11c.o resindexp.o timel.o
 	$(FC) $(FOPT) -o madx madxm.o madxpf.o twissp.o ptc_dummy.o \
-	surveyp.o matchp.o matchsap.o matchjcp.o touschekp.o plotp.o soddp.o \
-	ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
+	surveyp.o matchp.o matchsap.o matchjcp.o matchlibp.o touschekp.o plotp.o \
+	soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
 	gxx11c.o resindexp.o timel.o $(LIBX) -lm -lc
 
 madxdev: \
 	madx_main.o run_madx.o madxpf.o twiss.o survey.o orbf.o emit.o util.o \
-	match.o matchsa.o matchjc.o touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o \
-	gxx11.o gxx11c.o resindex.o timest.o timex.o \
+	match.o matchsa.o matchjc.o matchlibp.o touschek.o dynap.o plot.o sodd.o \
+	ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o timest.o timex.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
-	Sa_extend_poly.o Sb_1_pol_template.o Sb_2_pol_template.o \
+	Sa_extend_poly.o  \
 	Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o Se_status.o \
-	Sf_def_all_kinds.o Sg_1_fitted.o Sg_1_template_my_kind.o \
-	Sg_2_template_my_kind.o Sg_sagan_wiggler.o Sh_def_kind.o \
+	Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
-	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
+	Sm_tracking.o Sma_multiparticle.o  \
+	Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
-	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
+	madx_ptc_tablepush.o madx_ptc_script.o pointers.o rplot.o \
 	user2_photon.o poissonp.o wrap.o
 	$(f95) $(FOPT) -o madxdev madx_main.o run_madx.o madxpf.o twiss.o \
-	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o touschek.o dynap.o \
-	plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
+	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlibp.o \
+	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
 	timest.o timex.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o \
 	e_define_newda.o f_newda.o g_newLielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
-	Sa_extend_poly.o Sb_1_pol_template.o Sb_2_pol_template.o \
+	Sa_extend_poly.o  \
 	Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o Se_status.o \
-	Sf_def_all_kinds.o Sg_1_fitted.o Sg_1_template_my_kind.o \
-	Sg_2_template_my_kind.o Sg_sagan_wiggler.o Sh_def_kind.o \
+	Sf_def_all_kinds.o Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o \
-	Sm_tracking.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
+	Sm_tracking.o Sma_multiparticle.o \
+	Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
-	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
+	madx_ptc_tablepush.o madx_ptc_script.o pointers.o rplot.o \
 	user2_photon.o poissonp.o wrap.o \
 	$(LIBX) -lm -lc
 
