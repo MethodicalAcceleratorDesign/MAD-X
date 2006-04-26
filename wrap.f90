@@ -146,9 +146,9 @@ subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
   integer colname(*)
   integer polinomial
   integer monomial(*)
-  
+
   call addpush(tabname, colname, polinomial, monomial)
-    
+
 end subroutine w_ptc_addpush
 
 
@@ -158,7 +158,7 @@ subroutine w_ptc_script(scriptname)
   use madx_ptc_script_module
   implicit none
   integer scriptname(*)
-  
+
   call execscript(scriptname)
-    
+
 end subroutine w_ptc_script
