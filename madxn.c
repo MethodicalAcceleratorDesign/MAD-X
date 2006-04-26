@@ -1398,10 +1398,10 @@ void augmentcountonly(char* table) /* increase table occ. by 1 */
   {
     warning("Can not find table",table);
     return;
-  }  
-  
+  }
+
   if (t->num_cols > t->org_cols)  add_vars_to_table(t);
-  
+
   if (++t->curr == t->max) grow_table(t);
 }
 
@@ -1824,8 +1824,8 @@ void exec_create_table(struct in_cmd* cmd)
   int j, pos = name_list_pos("table", nl);
   char* name = NULL;
   char withname = 0; /*specify if table should have column "name" of strings*/
-  int  ncols = 0;  /*number of columns*/  
-  
+  int  ncols = 0;  /*number of columns*/
+
   if (nl->inform[pos] == 0)
   {
     warning("no table name:", "ignored");
@@ -1849,24 +1849,24 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
-  
+
   pos = name_list_pos("withname", nl);
   printf("Value of withname %d\n",pos);
   if (pl->parameters[pos] != 0x0)
   {
     if (pl->parameters[pos]->double_value != 0.0)
-     {
-       printf("We add <<name>> column\n");
-       withname = 1;
-       ncols = m->curr+1;
-     }
+    {
+      printf("We add <<name>> column\n");
+      withname = 1;
+      ncols = m->curr+1;
+    }
     else
-     {
-       ncols = m->curr;
-     } 
+    {
+      ncols = m->curr;
+    }
   }
-  
-  
+
+
   t_types = mymalloc(rout_name, ncols*sizeof(int));
   t_c = mymalloc(rout_name, (ncols+1)*sizeof(char*));
 
@@ -1875,13 +1875,13 @@ void exec_create_table(struct in_cmd* cmd)
     t_types[j] = 2; /* type double */
     t_c[j] = permbuff(m->p[j]);
   }
-  
+
   if (withname)
-   {
+  {
     t_types[m->curr] = 3; /* type string */
     t_c[m->curr] = permbuff("name");
-   }
-  
+  }
+
   t_c[ncols] = blank;
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
   t->org_cols = 0;  /* all entries are "added" */
@@ -1889,9 +1889,9 @@ void exec_create_table(struct in_cmd* cmd)
   myfree(rout_name, t_c); myfree(rout_name, t_types);
 
   if (withname)
-   {
-     t->dynamic = 1;
-   }
+  {
+    t->dynamic = 1;
+  }
 }
 
 void exec_store_coguess(struct in_cmd* cmd)
@@ -2589,16 +2589,16 @@ void select_ptc_normal(struct in_cmd* cmd)
         double_to_table("normal_results", "order3", &order[2]);
         double_to_table("normal_results", "order4", &order[3]);
         augment_count("normal_results");
-	if(j == 12)
-	  {
-	    min_req_order = 1;
-	  }
-	else
-	  {
-	    min_req_order = order[0]+order[1]+order[2];
-	    if (j >= 9) min_req_order += order[0]+order[1];
-	    if (j >= 7) min_req_order += 1;
-	  }
+        if(j == 12)
+        {
+          min_req_order = 1;
+        }
+        else
+        {
+          min_req_order = order[0]+order[1]+order[2];
+          if (j >= 9) min_req_order += order[0]+order[1];
+          if (j >= 7) min_req_order += 1;
+        }
       }
       if (min_order < min_req_order) min_order = min_req_order;
     }
@@ -7858,16 +7858,16 @@ void pro_ptc_select(struct in_cmd* cmd)
   if (pos < 0)
   {
     error("madxn.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
-           columnname,aTable->name);
+          columnname,aTable->name);
     return;
   }
 
   pos = name_list_pos("name",aTable->columns);
   if (pos < 0)
-   {
-     warning("madxn.c: pro_ptc_select","There  column named <<name>> in table <<%s>>.\n",aTable->name);
-     return;
-   }
+  {
+    warning("madxn.c: pro_ptc_select","There  column named <<name>> in table <<%s>>.\n",aTable->name);
+    return;
+  }
 
   element = (int)command_par_value("polynomial",cmd->clone);
   monomial = command_par_string("monomial",cmd->clone);

@@ -183,12 +183,12 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
     j = add_to_name_list(permbuff(macro->name), 0, nll->list);
     nll->macros[nll->curr++] = macro;
   }
- /* RDM new matching*/
+  /* RDM new matching*/
   if (match_is_on==2) {
     for(j=0;match2_macro_name[j]!=NULL;j++);
     match2_macro_name[j]=macro->name;
   }
-   /* RDM new matching*/
+  /* RDM new matching*/
 }
 
 int add_to_name_list(char* name, int inf, struct name_list* vlist)
@@ -1651,7 +1651,7 @@ void grow_char_array_list( /* doubles list size */
 
   p->max = new;
   p->ca
-    = (struct char_array**) mycalloc(rout_name,new, 
+    = (struct char_array**) mycalloc(rout_name,new,
                                      sizeof(struct char_array*));
   for (j = 0; j < p->curr; j++) p->ca[j] = c_loc[j];
   myfree(rout_name, c_loc);
@@ -3449,7 +3449,7 @@ void write_table(struct table* t, char* filename)
 #ifdef _WIN32
   strcpy(sys_name, "Win32");
 #endif
-  
+
   time(&now);    /* get system time */
   tm = localtime(&now); /* split system time */
   if (strcmp(filename, "terminal") == 0) out_file = stdout;
@@ -3532,12 +3532,12 @@ void write_table(struct table* t, char* filename)
             tmp = t->d_cols[col->i[i]][j];
             fprintf(out_file, v_format(" %I"), tmp);
           }
-          else 
+          else
             if (t->columns->inform[col->i[i]] == 2)
-            { 
-              fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]); 
+            {
+              fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
               /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
-            }  
+            }
             else if (t->columns->inform[col->i[i]] == 3)
             {
               *c_dum->c = '\"';

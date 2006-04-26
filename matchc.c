@@ -74,10 +74,10 @@ void match_action(struct in_cmd* cmd)
            vary_vect->a, vary_dvect->a, fun_vect->a,
            match_work[0]->a,match_work[1]->a,match_work[2]->a,
            match_work[3]->a,match_work[4]->a);
-   if (jac_strategy==2 && match_is_on==2) {
-     printf("Print Jacobian\n");
-     mtjacprint(total_const,total_vars,match_work[0]->a);
-   }
+    if (jac_strategy==2 && match_is_on==2) {
+      printf("Print Jacobian\n");
+      mtjacprint(total_const,total_vars,match_work[0]->a);
+    }
   }
   else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 && total_vars <= total_const)
   {
@@ -147,60 +147,60 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       sprintf(execute,"exec, %s;",match2_macro_name[i]);
       pro_input(execute);
 /*      if (twiss_success) {*/
-        *stab_flag=0;
-        for(j=0;match2_cons_name[i][j]!=NULL;j++) {
-          rhs=expression_value(match2_cons_rhs[i][j],2);
-          lhs=expression_value(match2_cons_lhs[i][j],2);
-          s =match2_cons_sign[i][j];
-          r=lhs - rhs;
-          fun_vec[k]=match2_cons_weight[i][j]*r;
-          if (s == '>' && r > 0) fun_vec[k]=0;
-          else if (s == '<'  && r < 0) fun_vec[k]=0;
-          match2_cons_value[i][j]=fun_vec[k];
-          match2_cons_value_rhs[i][j]=rhs;
-          match2_cons_value_lhs[i][j]=lhs;
-          k++;
-        }
+      *stab_flag=0;
+      for(j=0;match2_cons_name[i][j]!=NULL;j++) {
+        rhs=expression_value(match2_cons_rhs[i][j],2);
+        lhs=expression_value(match2_cons_lhs[i][j],2);
+        s =match2_cons_sign[i][j];
+        r=lhs - rhs;
+        fun_vec[k]=match2_cons_weight[i][j]*r;
+        if (s == '>' && r > 0) fun_vec[k]=0;
+        else if (s == '<'  && r < 0) fun_vec[k]=0;
+        match2_cons_value[i][j]=fun_vec[k];
+        match2_cons_value_rhs[i][j]=rhs;
+        match2_cons_value_lhs[i][j]=lhs;
+        k++;
+      }
 /*      } else {*/
 /*        *stab_flag=1; return;*/
 /*      }*/
     }
   } else { /* RDM old match */
-  current_const = 0;
-  penalty = zero;
-  set_option("match_print", print_flag);
-  /* mtgeti_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); */
-  for (i = 0; i < match_num_seqs; i++)
-  {
-    /* fprintf(prt_file, "%s %s\n", "call TWISS from matching: sequence=",
-       match_sequs->sequs[i]->name); */
-    current_twiss = local_twiss[i]->clone;
-    if (get_option("varylength") != zero) match_prepare_varypos();
-
-    if (get_option("rmatrix") != zero) fprintf(prt_file, "%s\n", "call TWISS with RMATRIX");
-    /* RDM 22.9.2005: match with chrom */
-    if (get_option("chrom") != zero) fprintf(prt_file, "%s\n", "call TWISS with CHROM");
-    /* RDM 12.12.2005: match with deltap */
-    if (get_option("deltap") != zero) fprintf(prt_file, "%s\n", "call TWISS with DELTAP");
-    /* RDM 16.12.2005: match with deltap */
-    if (get_option("sectormap") != zero) fprintf(prt_file, "%s\n", "call TWISS with SECTORMAP");
-
-    pro_twiss();
-    if (twiss_success)
+    current_const = 0;
+    penalty = zero;
+    set_option("match_print", print_flag);
+    /* mtgeti_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); */
+    for (i = 0; i < match_num_seqs; i++)
     {
-      *stab_flag = 0;
-      collect_(&current_const, &penalty, fun_vec);
-      /*OB 5.3.2002: Do not write the penalty function here.
-        'lmdif' still needs to check if the itteration was succesfull!
-        the penalty function should only be printed from the
-        'lmdif' routine. */
-      /* fprintf(prt_file, "penalty function: %e\n", penalty); */
+      /* fprintf(prt_file, "%s %s\n", "call TWISS from matching: sequence=",
+         match_sequs->sequs[i]->name); */
+      current_twiss = local_twiss[i]->clone;
+      if (get_option("varylength") != zero) match_prepare_varypos();
+
+      if (get_option("rmatrix") != zero) fprintf(prt_file, "%s\n", "call TWISS with RMATRIX");
+      /* RDM 22.9.2005: match with chrom */
+      if (get_option("chrom") != zero) fprintf(prt_file, "%s\n", "call TWISS with CHROM");
+      /* RDM 12.12.2005: match with deltap */
+      if (get_option("deltap") != zero) fprintf(prt_file, "%s\n", "call TWISS with DELTAP");
+      /* RDM 16.12.2005: match with deltap */
+      if (get_option("sectormap") != zero) fprintf(prt_file, "%s\n", "call TWISS with SECTORMAP");
+
+      pro_twiss();
+      if (twiss_success)
+      {
+        *stab_flag = 0;
+        collect_(&current_const, &penalty, fun_vec);
+        /*OB 5.3.2002: Do not write the penalty function here.
+          'lmdif' still needs to check if the itteration was succesfull!
+          the penalty function should only be printed from the
+          'lmdif' routine. */
+        /* fprintf(prt_file, "penalty function: %e\n", penalty); */
+      }
+      else
+      {
+        *stab_flag = 1; break;  /* Twiss failed - give up */
+      }
     }
-    else
-    {
-      *stab_flag = 1; break;  /* Twiss failed - give up */
-    }
-  }
   } /*RDM old match */
 }
 
@@ -283,7 +283,7 @@ void match_end(struct in_cmd* cmd)
     match2_end(cmd);
     return;
   }
-  
+
   /* OB 5.3.2002: write out all final constraint values and vary parameters */
   penalty = zero;
   if (get_option("varylength") != zero) match_prepare_varypos();
@@ -307,7 +307,7 @@ void match_end(struct in_cmd* cmd)
   fprintf(prt_file, "\n\n");
 
   fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
-  
+
 
 
   fprintf(prt_file, "\n\n");

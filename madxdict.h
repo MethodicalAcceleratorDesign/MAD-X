@@ -474,7 +474,7 @@ char command_def[] =
 "fringe = [l, true, true], "  /*sets the fringe switch/internal state of PTC */
 "nocavity = [l, true, true], "  /*sets the nocavity switch/internal state of PTC */
 "time = [l, true, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
-" " 
+" "
 "ptc_track: ptc_track none 0 0 "
 "icase        = [i, 4], "
 "turns        = [i, 1], "

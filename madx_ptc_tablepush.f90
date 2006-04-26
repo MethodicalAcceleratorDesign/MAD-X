@@ -32,7 +32,7 @@ module madx_ptc_tablepush_module
   private                                       :: augment_counts
   private                                       :: issuchtableexist
   private                                       :: putnameintables
-  
+
 contains
   !____________________________________________________________________________________________
 
@@ -49,20 +49,20 @@ contains
 
     !    print *,"madx_ptc_tablepush :putusertable "
     !    call daprint(y(1),6)
-    
+
     call putnameintables()
-    
+
     do i=1,npushes
 
        e => y(pushes(i)%element)
        coeff = e.sub.(pushes(i)%monomial)
        if (getdebug()>9) then
-           write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-            &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
-            &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
-            &        " for fibre no ",n
+          write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+               &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+               &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+               &        " for fibre no ",n
        endif
-       
+
        call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
 
     enddo
@@ -71,19 +71,19 @@ contains
 
   end subroutine putusertable
   !____________________________________________________________________________________________
-   
+
   subroutine cleartables()
     implicit none
     integer  :: i ! iterator
     ! we do not deal here with the main twiss table, hence we do not clear it
     do i=1,ntables
        if (getdebug()>9) print *,"Clearing ",tables(i)
-       call reset_count(tables(i)) 
+       call reset_count(tables(i))
     enddo
 
   end subroutine cleartables
   !____________________________________________________________________________________________
-   
+
   subroutine augment_counts()
     implicit none
     integer  :: i ! iterator
@@ -97,7 +97,7 @@ contains
 
   end subroutine augment_counts
   !____________________________________________________________________________________________
-   
+
   subroutine putnameintables()
     implicit none
     integer       :: i ! iterator
@@ -127,13 +127,13 @@ contains
     pushes(npushes)%tabname(table(1)+1:table(1)+1)=achar(0)
     pushes(npushes)%colname(column(1)+1:column(1)+1)=achar(0)
     pushes(npushes)%monomial(monomial(1)+1:monomial(1)+1)=achar(0)
-    
+
     if (getdebug()>9) then
-        print  *,"madx_ptc_tablepush : addpush(",&
-       &          pushes(npushes)%tabname,">,<",pushes(npushes)%colname,">,<",&
-       &          pushes(npushes)%element,">,<",pushes(npushes)%monomial,">)"
+       print  *,"madx_ptc_tablepush : addpush(",&
+            &          pushes(npushes)%tabname,">,<",pushes(npushes)%colname,">,<",&
+            &          pushes(npushes)%element,">,<",pushes(npushes)%monomial,">)"
     endif
-    
+
     if ( issuchtableexist(pushes(npushes)%tabname) .eqv. .false.) then
        ntables = ntables + 1
        tables(ntables) = pushes(npushes)%tabname
@@ -142,7 +142,7 @@ contains
 
   end subroutine addpush
   !____________________________________________________________________________________________
-  
+
 
   logical(lp) function issuchtableexist(tname)
     implicit none

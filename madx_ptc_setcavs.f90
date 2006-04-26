@@ -4,9 +4,9 @@ module madx_ptc_setcavs_module
   implicit none
   public
 
-! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
+  ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   logical(lp), public                     :: cavsareset   = .false.
-! flag that indicates if cavities were already set for the current setup
+  ! flag that indicates if cavities were already set for the current setup
 
   !********************************************************************************************
   !********************************************************************************************
@@ -51,12 +51,12 @@ contains
     localis = getintstate()
     localis = localis - nocavity + totalpath
     if (getdebug() > 1) then
-      print *, "I am in setcavities "
-      call print(localis,6)
+       print *, "I am in setcavities "
+       call print(localis,6)
     endif
-        
+
     patchnext=.true.
-    
+
     charge = get_value('beam ', "charge ")
 
     open(unit=21,file='sychrpart.txt')
@@ -98,12 +98,12 @@ contains
 
           p = nfen   ! set current reference energy
           call track(my_ring,x,i,i+1,localis)
-          
+
           if ( getdebug()>1 ) then
              write (6,*) ' i=',i,' name=',p%mag%name, &
-                         ' beta0 ', nfen%beta0, &
-	     ' newpos ', x(6), &
-	     ' Current energy ',nfen%energy
+                  ' beta0 ', nfen%beta0, &
+                  ' newpos ', x(6), &
+                  ' Current energy ',nfen%energy
              write(6,'(6f8.4)') x
           endif
 
@@ -133,22 +133,22 @@ contains
        ! p point to this cavity
 
        ! set the reference energy in this cavity
-       
+
        p = nfen
-       
+
        if ( getdebug() > 1 ) then
           write (6,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
           write (6,'(6f8.4)') x
        endif
-       
+
        !TUNE CAVITY
        call setcavity(p,x,phasecav(j),charge,maxaccel)
        write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
 
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
-       
-       
+
+
        write (21,*) ' '
        write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
        write (21,'(6f8.4)') x
@@ -160,7 +160,7 @@ contains
 
        ! GET NEW ENERGY AFTER THE CAVITY
        prevbeta0 = nfen%beta0
-       
+
        nfen= x(5)*nfen%p0c
 
        if ( getdebug() > 2 ) then
@@ -200,9 +200,9 @@ contains
 
        if ( getdebug() > 1 ) then
           write(6,*) ' i=',i,' name=',p%mag%name, &
-                      ' beta0 ', nfen%beta0, &
-	  ' newpos ', x(6), &
-	  ' Current energy ',nfen%energy
+               ' beta0 ', nfen%beta0, &
+               ' newpos ', x(6), &
+               ' Current energy ',nfen%energy
           write(6,'(6f8.4)') x
        endif
 
@@ -247,7 +247,7 @@ contains
 
           if ( getdebug() > 1 ) then
              write (6,*) 'Cavity ',i,' name ',p%mag%name,' phase ', p%mag%phas,' Volt ',p%mag%volt, &
-             & ' length ', p%mag%l
+                  & ' length ', p%mag%l
              write(6,*) 'DELTAE ', p%mag%DELTA_E
           endif
 
@@ -276,10 +276,10 @@ contains
       real(dp)                 :: phase_rel ! final relative phase
       integer, target          :: charge    ! charge of an particle
       integer(4)               :: tmp
-      logical(lp)              :: ene       ! switches if cavity should always maximally accelerate 
-                                            ! the reference track; lag is calculated
-      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;  
-                                                      ! volt is calculated; lag and freq is preserved
+      logical(lp)              :: ene       ! switches if cavity should always maximally accelerate
+      ! the reference track; lag is calculated
+      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;
+      ! volt is calculated; lag and freq is preserved
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival
 
@@ -299,20 +299,20 @@ contains
 
 
       if(ene) then
-         
-         if ( getdebug() > 2 ) then  
+
+         if ( getdebug() > 2 ) then
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
-         endif    
+         endif
          f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
       else
-         
+
          f%mag%phas = - f%mag%lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
-         
+
       endif
 
 
@@ -371,7 +371,7 @@ end module madx_ptc_setcavs_module
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!   
+!
 !         if (f%mag%delta_e > 0) then
 !            kf= -f%mag%delta_e/f%mag%l/f%dir/charge
 !            if(givendene) then
@@ -393,4 +393,3 @@ end module madx_ptc_setcavs_module
 !       f%mag%phas = f%mag%phas - twopi*dble(tmp)
 !       f%magp%phas=f%mag%phas
 !       print *, f%mag%phas
-

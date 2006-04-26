@@ -33,7 +33,7 @@ module madx_ptc_intstate_module
 
   !    routines
 
-    !--none--!
+  !--none--!
 
   !============================================================================================
 
@@ -63,9 +63,9 @@ contains
     intstate = state
     if (getdebug() > 2) call print(intstate,6)
   end subroutine setintstate
-  
+
   !____________________________________________________________________________________________
-  
+
   integer function getdebug()
     implicit none
     getdebug = debug
@@ -75,12 +75,12 @@ contains
   subroutine initintstate(intst)
     implicit none
     type (internal_state) :: intst
-    
+
     if (getdebug() > 1) print *, "Initializing internal state"
-    
+
     intstate = intst-nocavity0
     call update_states
-    
+
     if (getdebug() > 2) call print(intstate,6)
   end subroutine initintstate
   !____________________________________________________________________________________________
@@ -106,7 +106,7 @@ contains
     if (level > 0) print *, "Setting debug level to", level
     debug = level
 
-  end subroutine 
+  end subroutine ptc_setdebuglevel
   !____________________________________________________________________________________________
 
 

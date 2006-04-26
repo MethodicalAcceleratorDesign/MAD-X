@@ -73,7 +73,7 @@ CONTAINS
     implicit none
 
     if (getdebug()>1) print*,"Now PTC"
-    
+
     print77=.false.
     read77 =.false.
 
@@ -82,8 +82,8 @@ CONTAINS
 
     call set_up_universe(m_u)
     universe=universe+1
-    
-    
+
+
   end subroutine ptc_create_universe
   !_________________________________________________________________
 
@@ -227,7 +227,7 @@ CONTAINS
     !  with_patch=.false.
 
     ! Global Keywords
-    
+
     if (getdebug() > 1) then
        print *, '=============================================================='
        print *, 'INPUT PARAMETERS ARE:'
@@ -291,10 +291,10 @@ CONTAINS
 
     gamma2    = gamma**2
     gammatr2  = gammatr**2
-    
+
     if (getdebug() > 1) then
-      print *, '=============================================================='
-      print *, ''
+       print *, '=============================================================='
+       print *, ''
     endif
 
     !  call Set_Up(MY_RING)
@@ -307,7 +307,7 @@ CONTAINS
     endif
 
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-    
+
     if (getdebug() > 1) print *, 'MADx is set'
 
     icav=0
@@ -442,27 +442,27 @@ CONTAINS
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
-!       if (getdebug() > 2)  print *, 'This is a drift'
+       !       if (getdebug() > 2)  print *, 'This is a drift'
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
           goto 100
        endif
        key%magnet="rbend"
-           !VK
-           CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+       !VK
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
 
-          tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-          key%list%b0=node_value('angle ')+tempdp*l
+       tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
+       key%list%b0=node_value('angle ')+tempdp*l
 
-          key%list%k(2)=node_value('k1 ')+ key%list%k(2) 
-          key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
-          key%list%k(4)=node_value('k3 ')+ key%list%k(4)
+       key%list%k(2)=node_value('k1 ')+ key%list%k(2)
+       key%list%k(3)=node_value('k2 ')+ key%list%k(3)
+       key%list%k(4)=node_value('k3 ')+ key%list%k(4)
 
-          key%list%ks(2)=node_value('k1s ')+ key%list%ks(2) 
-          key%list%ks(3)=node_value('k2s ')+ key%list%ks(3) 
-          key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
- 
+       key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
+       key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
+       key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+
        ! Gymnastic needed since PTC expects MAD8 convention
        key%list%t1=node_value('e1 ')-node_value('angle ')/two
        key%list%t2=node_value('e2 ')-node_value('angle ')/two
@@ -488,27 +488,27 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-          if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)       
+       if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
        if(l.eq.zero) then
           key%magnet="marker"
           goto 100
        endif
        key%magnet="sbend"
-           !VK
-           CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
+       !VK
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
 
-          tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-          key%list%b0=node_value('angle ')+ tempdp*l
+       tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
+       key%list%b0=node_value('angle ')+ tempdp*l
 
-          key%list%k(2)=node_value('k1 ')+ key%list%k(2) 
-          key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
-          key%list%k(4)=node_value('k3 ')+ key%list%k(4)
+       key%list%k(2)=node_value('k1 ')+ key%list%k(2)
+       key%list%k(3)=node_value('k2 ')+ key%list%k(3)
+       key%list%k(4)=node_value('k3 ')+ key%list%k(4)
 
-          key%list%ks(2)=node_value('k1s ')+ key%list%ks(2) 
-          key%list%ks(3)=node_value('k2s ')+ key%list%ks(3) 
-          key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
- 
+       key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
+       key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
+       key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
@@ -533,17 +533,17 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-          if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
+       if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
 
-   case(5) ! PTC accepts mults
+    case(5) ! PTC accepts mults
        if (getdebug() > 9)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
 
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123) 
-       ! Read data & fill %k(:), %ks(:) arrays which are 
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       ! Read data & fill %k(:), %ks(:) arrays which are
        ! summs of multipoles and errors
 
-       ! quadrupole components 
+       ! quadrupole components
        sk1=node_value('k1 ')
        sk1s=node_value('k1s ')
 
@@ -551,30 +551,30 @@ CONTAINS
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Q                                 !
        if(l.ne.0) then                                            !
-         !sk1 = sk1 +  normal(1)/l                                !
+          !sk1 = sk1 +  normal(1)/l                               !
           sk1 = sk1 +  normal_0123(1)                             !
-         !sk1s = sk1s + skew(1)/l                                 !
+          !sk1s = sk1s + skew(1)/l                                !
           sk1s = sk1s + skew_0123(1)                              !
        endif                                                      !
        if (sk1s .eq. zero)  then                                  !
           tilt = zero                                             !
        else                                                       !
           tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two          !
-       endif                                                      ! 
-                                                                  !
+       endif                                                      !
+       !                                                          !
        if(l.ne.0) then                                            !
-         !sk1  = sk1  + field(1,1)/l                              !
+          !sk1  = sk1  + field(1,1)/l                             !
           sk1  = sk1  + (key%list%k(2)-normal_0123(1))            !
-         !sk1s = sk1s + field(2,1)/l                              !
+          !sk1s = sk1s + field(2,1)/l                             !
           sk1s = sk1s + (key%list%ks(2)-skew_0123(1))             !
        endif                                                      !
-                                                                  !
+       !                                                          !
        if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
        key%list%k(2)=sk1                                          !
-       key%list%ks(2)=zero  ! added by VK                         !       
+       key%list%ks(2)=zero  ! added by VK                         !
        key%tiltd=node_value('tilt ')+tilt  !======================!
 
-   !================================================================
+       !================================================================
 
     case(6)
        key%magnet="sextupole"
@@ -588,9 +588,9 @@ CONTAINS
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Sextupole                         !
        if(l.ne.0) then                                            !
-         !sk2 = sk2 +  normal(2)/l                                !
+          !sk2 = sk2 +  normal(2)/l                               !
           sk2 = sk2 +  normal_0123(2)                             !
-         !sk2s = sk2s + skew(2)/l                                 !
+          !sk2s = sk2s + skew(2)/l                                !
           sk2s = sk2s + skew_0123(2)                              !
        endif                                                      !
        !                                                          !
@@ -601,14 +601,14 @@ CONTAINS
        endif                                                      !
        !                                                          !
        if(l.ne.0) then                                            !
-         !sk2  = sk2 + field(1,2)/l                               !
+          !sk2  = sk2 + field(1,2)/l                              !
           sk2  = sk2 + (key%list%k(3)-normal_0123(2))             !
-         !sk2s = sk2s + field(2,2)/l                              !
+          !sk2s = sk2s + field(2,2)/l                             !
           sk2s = sk2s + (key%list%ks(3)-skew_0123(2))             !
        endif                                                      !
-       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           ! 
+       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           !
        key%list%k(3)=sk2                                          !
-       key%list%ks(3)=zero  ! added by VK                         ! 
+       key%list%ks(3)=zero  ! added by VK                         !
        key%tiltd=node_value('tilt ')+tilt !-----------------------!
 
     case(7) ! PTC accepts mults
@@ -623,9 +623,9 @@ CONTAINS
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Octupole                          !
        if(l.ne.0) then                                            !
-         !sk3 = sk3 +  normal(3)/l                                !
+          !sk3 = sk3 +  normal(3)/l                               !
           sk3 = sk3 +  normal_0123(3)                             !
-         !sk3s = sk3s + skew(3)/l                                 !
+          !sk3s = sk3s + skew(3)/l                                !
           sk3s = sk3s + skew_0123(3)                              !
        endif                                                      !
        !                                                          !
@@ -636,14 +636,14 @@ CONTAINS
        endif                                                      !
        !                                                          !
        if(l.ne.0) then                                            !
-         !sk3 = sk3 + field(1,3)/l                                !
+          !sk3 = sk3 + field(1,3)/l                               !
           sk3 = sk3 + (key%list%k(4)-normal_0123(3))              !
-         !sk3s = sk3s + field(2,3)/l                              !
+          !sk3s = sk3s + field(2,3)/l                             !
           sk3s = sk3s + (key%list%ks(3)-skew_0123(3))             !
        endif                                                      !
        if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
        key%list%k(4)=sk3                                          !
-       key%list%ks(4)=zero  ! added by VK                         ! 
+       key%list%ks(4)=zero  ! added by VK                         !
        key%tiltd=node_value('tilt ')+tilt !-----------------------!
 
     case(8)
@@ -757,7 +757,7 @@ CONTAINS
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
     case(27)
-!       if (getdebug() > 2)  print *, 'This is a twcavity'
+       !       if (getdebug() > 2)  print *, 'This is a twcavity'
        key%magnet="twcavity"
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -794,9 +794,9 @@ CONTAINS
     if(advance_node().ne.0)  goto 10
 
     if (getdebug() > 0) then
-      print*,' Length of machine: ',l_machine
+       print*,' Length of machine: ',l_machine
     endif
-       
+
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
 
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
@@ -812,19 +812,19 @@ CONTAINS
     call ring_l(my_ring,doneit)
 
     if (getdebug() > 0) then
-      write(6,*) "------------------------------------ PTC Survey ------------------------------------"
-      write(6,*) "Before start: ",my_ring%start%chart%f%a
-      write(6,*) "Before   end: ",my_ring%end%chart%f%b
-    endif 
-    
+       write(6,*) "------------------------------------ PTC Survey ------------------------------------"
+       write(6,*) "Before start: ",my_ring%start%chart%f%a
+       write(6,*) "Before   end: ",my_ring%end%chart%f%b
+    endif
+
     call survey(my_ring)
-    
+
     if (getdebug() > 0) then
-      write(6,*) "After  start: ",my_ring%start%chart%f%a
-      write(6,*) "After    end: ",my_ring%end%chart%f%b
-    endif 
-    
-    if (getdebug() > 1) then 
+       write(6,*) "After  start: ",my_ring%start%chart%f%a
+       write(6,*) "After    end: ",my_ring%end%chart%f%b
+    endif
+
+    if (getdebug() > 1) then
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
        print *, '^^^^^^    F I N I S H E D      P T C     I N P U T    ^^^^^^^^'
@@ -836,14 +836,15 @@ CONTAINS
   !_________________________________________________________________
 
   SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123)
-  ! 1) read multipole coeff. and errors for a current thick element
-  ! 2) fill the error and multiploes arrays of data-bases
+    implicit none
+    ! 1) read multipole coeff. and errors for a current thick element
+    ! 2) fill the error and multiploes arrays of data-bases
     include 'twtrr.fi' ! integer, maxmul,maxferr,maxnaper
     REAL(dp), INTENT(IN) :: l
-    type(keywords), INTENT(INOUT) ::  key    
-    REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;     
+    type(keywords), INTENT(INOUT) ::  key
+    REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;
     REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
-                f_errors(0:50), field(2,0:maxmul)
+         f_errors(0:50), field(2,0:maxmul)
     INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
     INTEGER :: node_fd_errors ! function
     integer :: i_count, n_dim_mult_err
@@ -852,61 +853,61 @@ CONTAINS
     normal_0123(:)=zero
     skew_0123(:)=zero
 
-           ! real(dp) f_errors(0:50),normal(0:maxmul),skew(0:maxmul)
-       ! Get multipole components on bench !-----------------------!
-       call dzero(normal,maxmul+1) ! make zero "normal"            !                     
-       call dzero(skew,maxmul+1)   ! make zero "skew"              !
-                                                                   !
-       ! madxdict.h: "knl = [r, {0}], "                            !
-       !             "ksl = [r, {0}], "                            !
-       ! Assign values from the command line                       !
-       call get_node_vector('knl ',n_norm,normal)                  !    
-       call get_node_vector('ksl ',n_skew,skew)                    !
-       ! void get_node_vector(char*par,int*length,double* vector)  !
-       ! /* returns vector for parameter par of current element */ !
-                                                                   !
-       ! get errors                                                !
-       call dzero(f_errors,maxferr+1)                              !
-       n_ferr = node_fd_errors(f_errors) !                         !
-                ! /* returns the field errors of a node */         !
-       call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
-       if (n_ferr .gt. 0) then                                     !
-          call dcopy(f_errors,field,n_ferr)                        !
-            ! subroutine dcopy(in,out,n)                           !
-            ! Purpose:   Copy arrays.                              !
-       endif                                                       !
-       !-----------------------------------------------------------!
- 
-       ! fill strength of ALL normal multipoles
-       if(n_norm.gt.0) then  ! ========================!
-          do i_count=0,n_norm                          !
-             if(i_count.gt.0) &                        !
-             key%list%k(i_count+1)=normal(i_count)/l   !
-             if (i_count.le.3) &                       !
-               normal_0123(i_count)=normal(i_count)/l  !
-          enddo                                        !
-       endif !=========================================!
+    ! real(dp) f_errors(0:50),normal(0:maxmul),skew(0:maxmul)
+    ! Get multipole components on bench !-----------------------!
+    call dzero(normal,maxmul+1) ! make zero "normal"            !
+    call dzero(skew,maxmul+1)   ! make zero "skew"              !
+    !                                                           !
+    ! madxdict.h: "knl = [r, {0}], "                            !
+    !             "ksl = [r, {0}], "                            !
+    ! Assign values from the command line                       !
+    call get_node_vector('knl ',n_norm,normal)                  !
+    call get_node_vector('ksl ',n_skew,skew)                    !
+    ! void get_node_vector(char*par,int*length,double* vector)  !
+    ! /* returns vector for parameter par of current element */ !
+    !                                                           !
+    ! get errors                                                !
+    call dzero(f_errors,maxferr+1)                              !
+    n_ferr = node_fd_errors(f_errors) !                         !
+    ! /* returns the field errors of a node */                  !
+    call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
+    if (n_ferr .gt. 0) then                                     !
+       call dcopy(f_errors,field,n_ferr)                        !
+       ! subroutine dcopy(in,out,n)                             !
+       ! Purpose:   Copy arrays.                                !
+    endif                                                       !
+    !-----------------------------------------------------------!
 
-       ! fill strength of ALL skew multipoles
-       if(n_skew.gt.0) then !==========================! 
-          do i_count=0,n_skew                          !
-             if(i_count.gt.0) &                        !
-             key%list%ks(i_count+1)=skew(i_count)/l    !
-             if (i_count.le.3) &                       !
-               skew_0123(i_count)=skew(i_count)/l      !
-          enddo                                        !
-       endif !=========================================!   
- 
-       n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !========!
-       if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1    !
-       if(n_ferr.gt.0) then                                    !
-          do i_count=0,n_dim_mult_err                          !
-            key%list%k(i_count+1)=key%list%k(i_count+1)+ &     !
-                                      field(1,i_count)/l       !
-            key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &   !
-                                      field(2,i_count)/l       !
-          enddo                                                !
-       endif !=================================================!
+    ! fill strength of ALL normal multipoles
+    if(n_norm.gt.0) then  ! =============================!
+       do i_count=0,n_norm                               !
+          if(i_count.gt.0) &                             !
+               key%list%k(i_count+1)=normal(i_count)/l   !
+          if (i_count.le.3) &                            !
+               normal_0123(i_count)=normal(i_count)/l    !
+       enddo                                             !
+    endif !==============================================!
+
+    ! fill strength of ALL skew multipoles
+    if(n_skew.gt.0) then !===============================!
+       do i_count=0,n_skew                               !
+          if(i_count.gt.0) &                             !
+               key%list%ks(i_count+1)=skew(i_count)/l    !
+          if (i_count.le.3) &                            !
+               skew_0123(i_count)=skew(i_count)/l        !
+       enddo                                             !
+    endif !==============================================!
+
+    n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !========!
+    if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1    !
+    if(n_ferr.gt.0) then                                    !
+       do i_count=0,n_dim_mult_err                          !
+          key%list%k(i_count+1)=key%list%k(i_count+1)+ &    !
+               field(1,i_count)/l                           !
+          key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &  !
+               field(2,i_count)/l                           !
+       enddo                                                !
+    endif !=================================================!
 
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
   !----------------------------------------------------------------
@@ -1099,8 +1100,8 @@ CONTAINS
     deltap = zero
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
-    
-    
+
+
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -1214,7 +1215,7 @@ CONTAINS
     endif
 
     do i=1,MY_RING%n
-       
+
        if (getdebug() > 1) then
           write(6,*) "##########################################"
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
@@ -1270,8 +1271,8 @@ CONTAINS
          ! if current is the last element in the sequence i.e.
          ! p%next == NULL (LINE) OR
          ! p%next points the first element (CIRCLE)
-         cfen=current                                    
-         
+         cfen=current
+
          if (getdebug()>1) then
             !if it is the last element in the line
             print *, 'It is the last element  ', current%mag%name
@@ -1368,8 +1369,8 @@ CONTAINS
       enddo
 
       if (getdebug() > 2)  then
-        write(6,'(a16,4f12.3)') 'b11,b12,b21,b22: ',&
-             &opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+         write(6,'(a16,4f12.3)') 'b11,b12,b21,b22: ',&
+              &opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
       endif
 
       ioptfun=72
@@ -1794,15 +1795,15 @@ CONTAINS
        CASE ('eign')
           ii=(icase/2)*2
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
-          i1 = int(doublenum) 
+          i1 = int(doublenum)
           if(i1.gt.ii) call aafail('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
           if(i1.eq.5) i1=6
-          if(i1.eq.6) i1=5             
+          if(i1.eq.6) i1=5
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
           i2 = int(doublenum)
           if(i2.gt.ii) call aafail('return from double_from_ptc_normal: ',' eigenvectors too many components')
           if(i2.eq.5) i2=6
-          if(i2.eq.6) i2=5             
+          if(i2.eq.6) i2=5
           ind(:)=0
           ind(i2)=1
           double_from_ptc_normal = n%A_t%V(i1).sub.ind
@@ -1887,7 +1888,7 @@ CONTAINS
 
     icase = get_value('ptc_normal ','icase ')
     deltap0 = get_value('ptc_normal ','deltap ')
-    
+
     deltap = zero
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
@@ -2067,7 +2068,7 @@ CONTAINS
           print *,"ptc_normal failed. MAD-X continues."
           stop
        endif
-       
+
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
@@ -2121,7 +2122,7 @@ CONTAINS
 
     icase = get_value('ptc_track ','icase ')
     deltap0 = get_value('ptc_track ','deltap ')
-    
+
     deltap = zero
     call my_state(icase,deltap,deltap0)
 
@@ -2242,7 +2243,7 @@ CONTAINS
     integer ind(6)
     real(dp) au(6,6),aui(2),sx,cx,dphi(3)
     character(len=nd2), dimension(:), pointer :: string
-   
+
     icount=icount+1
     if(nd2.eq.4) string=>str4
     if(nd2.eq.6) string=>str6
@@ -2318,11 +2319,11 @@ CONTAINS
           s1%eigen(ii,ei2)=s1%junk%V(ii).sub.ind
           ind(ei2)=0
        enddo
-    
+
        angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
        au(ii,ii-1)=s1%junk%v(ii2).sub.string(ii-1)
        angp(1,ii)=s1%junk%v(ii1).sub.string(ii)
-       
+
        au(ii,ii)=s1%junk%v(ii2).sub.string(ii)
        au(i2-1,i2-1)=s1%junk%v(ii1).sub.string(i2-1)
        au(i2,i2-1)=s1%junk%v(ii2).sub.string(i2-1)
@@ -2567,11 +2568,11 @@ CONTAINS
     real(dp) deltap0,deltap
 
     default = getintstate()
-    
+
     if (getdebug()>1) then
-      print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
+       print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
     endif
-    
+
     deltap = zero
     select case(icase)
     CASE(4)
@@ -2591,13 +2592,13 @@ CONTAINS
     END SELECT
 
     if (i==6) then
-      if (icav==0) then
-       default=default+only_4d+NOCAVITY
-       call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
-       i=4
-      else
-       default = default - NOCAVITY !enforcing nocavity to false
-      endif 
+       if (icav==0) then
+          default=default+only_4d+NOCAVITY
+          call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
+          i=4
+       else
+          default = default - NOCAVITY !enforcing nocavity to false
+       endif
     endif
 
     call setintstate(default)

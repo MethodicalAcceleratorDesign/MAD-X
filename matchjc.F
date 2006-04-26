@@ -490,7 +490,7 @@
 !!        write(*,*) "iterating",oldxnorm,xnorm,fmin_old,fmin
 !        goto 35
 !      endif
-      
+
 
       ! check if the target explode
       if((fmin .gt. 1D20)) then
@@ -547,7 +547,7 @@
       do i = 1, n
         dx(i)=(x(i)-xstart(i))
       enddo
-      
+
       xnorm=DNRM2(N, x, 1)
       dxnorm=sqrt(DNRM2(N, dx, 1)/xnorm)
       write(*,*) 'final relative difference norm:',dxnorm
@@ -566,9 +566,9 @@
       integer i,j
 
       do i=1,m
-      do j=1,n
-        write(*,*) i,j,fjac(i,j)
-      enddo
+        do j=1,n
+          write(*,*) i,j,fjac(i,j)
+        enddo
       enddo
 
       end
@@ -594,52 +594,54 @@
 
       if(match_mode.eq.1) then
 
-      write(*,997) "Node Name    ","Constraint      ",                  &
+        write(*,997) "Node Name    ","Constraint      ",                &
      &"Variable        ","Derivative    "
-      write(*,996) "----------------------------------------------------&
+        write(*,996) "------------------------------------------------  &
+     &----                                                              &
      &----------------"
 !      write(25,*) "# ", m,n
-      ncon=1
-      local=get_option('match_local ') .ne. 0
-      call table_range('twiss ','#s/#e ',range)
-      if(local) then
-        j=restart_sequ()
-        do pos=range(1),range(2)
-          j=advance_to_pos('twiss ',pos)
- 20       continue
-          i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
-          if(i.ne.0)  then
-            flag=char_from_table('twiss ','name ',pos,node_name)
-            do nvar=1,n
- 22           ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
-              if (ivar.eq.0) then
-                goto 22
-              endif
-              write (*,998) node_name,name,namevar,fjac(ncon,ivar)
+        ncon=1
+        local=get_option('match_local ') .ne. 0
+        call table_range('twiss ','#s/#e ',range)
+        if(local) then
+          j=restart_sequ()
+          do pos=range(1),range(2)
+            j=advance_to_pos('twiss ',pos)
+ 20         continue
+            i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
+            if(i.ne.0)  then
+              flag=char_from_table('twiss ','name ',pos,node_name)
+              do nvar=1,n
+ 22             ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,   &
+     &opt)
+                if (ivar.eq.0) then
+                  goto 22
+                endif
+                write (*,998) node_name,name,namevar,fjac(ncon,ivar)
 !            write(25,999) ncon,ivar,fjac(ncon,ivar)
-            enddo
-            ncon=ncon+1
-            goto 20
-          endif
-        enddo
-      endif
- 30   continue
-      i=next_global(name,name_l,type,value,c_min,c_max,weight)
+              enddo
+              ncon=ncon+1
+              goto 20
+            endif
+          enddo
+        endif
+ 30     continue
+        i=next_global(name,name_l,type,value,c_min,c_max,weight)
 !      write(*,*) i,name
-      if(i.ne.0)  then
-        pos=1
+        if(i.ne.0)  then
+          pos=1
 !          flag=double_from_table('summ ',name,pos,val)
-        do nvar=1,n
- 32       ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
-          if (ivar.eq.0) then
-            goto 32
-          endif
+          do nvar=1,n
+ 32         ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
+            if (ivar.eq.0) then
+              goto 32
+            endif
 !            write(*,*) ncon,ivar,fjac(ncon,ivar)
-          write (*,998) 'Global',name,namevar,fjac(ncon,ivar)
-        enddo
-        ncon=ncon+1
-        goto 30
-      endif
+            write (*,998) 'Global',name,namevar,fjac(ncon,ivar)
+          enddo
+          ncon=ncon+1
+          goto 30
+        endif
 
 !      do nvar=1,n
 ! 23   ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)

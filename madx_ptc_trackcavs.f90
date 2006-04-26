@@ -8,7 +8,7 @@ module madx_ptc_trackline_module
 
   public                              :: ptc_trackline       ! subroutine inside the module
 
-! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
+  ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
   private filter
   private my_nd_for_averaging
@@ -56,7 +56,7 @@ contains
     !initialization
     npart = 1
     n = 1
-    t = 1 
+    t = 1
     !------------------------------------------------------
 
     nturns = get_value('ptc_trackline ','turns ')
@@ -64,7 +64,7 @@ contains
 
     if ( (nturns > 1) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('WARNING: You can not make more than one turn in a line!', &
-                      'Putting number of turns to 1!')
+            'Putting number of turns to 1!')
        nturns = 1
     endif
 
@@ -105,13 +105,13 @@ contains
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
     endif
-    
+
     if (getdebug() > 0) print *, 'reading tracks starting posiotions from table ....'
 
     call gettrack(1,x(1),x(2),x(3),x(4),x(6),x(5))
 
     if (getdebug() > 0) print *, 'reading.... Done'
-    
+
     if (getdebug() > 0) then
        print *, '###################################################'
        print *, '###################################################'
@@ -119,7 +119,7 @@ contains
        print *, '###################################################'
        print *, '###################################################'
     endif
-    
+
     call newrplot()
 
     n=1
@@ -214,16 +214,16 @@ contains
 
       doublenum = px
       call double_to_table(table_puttab, 'px ', doublenum)
-      
+
       doublenum = y
       call double_to_table(table_puttab, 'y ' , doublenum)
 
       doublenum = py
       call double_to_table(table_puttab, 'py ', doublenum)
-      
+
       doublenum = t
       call double_to_table(table_puttab, 't ' , doublenum)
-      
+
       doublenum = pt
       call double_to_table(table_puttab, 'pt ', doublenum)
 
@@ -252,7 +252,7 @@ contains
     logical(lp)          :: sixd
     type(taylor)         :: mom,r2,I1,dispt(4),avet(6,6,3)
     real(kind(1d0))      :: get_value,get_variable ! c functions
-    real(kind(1d0))      :: s
+    real(dp)             :: s
     integer              :: get_option ! c function
     real (dp)            :: disp(4)
     type(pol_block)      :: pb !pol_block - it enables additional parameter dependences (variable) for polynomials
@@ -266,7 +266,7 @@ contains
     nfen = 0
     startfen = 0
     s = zero
-    
+
     print *, '###################################################'
     print *, '###################################################'
     print *, '######          TWISS WITH PTC           ##########'
@@ -457,12 +457,12 @@ contains
              ! if p is the last element in the sequence i.e.
              ! p%next == NULL (LINE) OR
              ! p%next points the first element (CIRCLE)
-             nfen=p                                          
-!if it is the last element in the line
-             print *, 'It is the last element  ', p%mag%name  
-!(it is always marker, i.e element that does not change reference energy)
-             print *, 'Its reference energy is ', nfen%p0c  
-!take its reference energy
+             nfen=p
+             !if it is the last element in the line
+             print *, 'It is the last element  ', p%mag%name
+             !(it is always marker, i.e element that does not change reference energy)
+             print *, 'Its reference energy is ', nfen%p0c
+             !take its reference energy
           else
              nfen=p%next      ! energy after passing this element
           endif

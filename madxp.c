@@ -355,14 +355,14 @@ int cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
       else if (strcmp(cmd_match_base[j], toks[k]) != 0)  break;
       k++;
     }
-    
+
     if (j == s_match[i2+1]) goto found;
   }
   return -3;
   found:
   *cmd_pos = lp; *decl_start = s_match[i2+1] - s_match[i2];
-  
-  
+
+
   return i2;
 }
 
@@ -391,13 +391,13 @@ char* command_par_string(char* parameter, struct command* cmd)
 }
 
 int command_par_value2(char* parameter, struct command* cmd, double* val)
-  /* returns a command parameter value val 
+  /* returns a command parameter value val
      if found returns 1, else 0 */
 {
   struct command_parameter* cp;
   int i;
   int ret = 0;
-  
+
   *val = zero;
   if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
   {
@@ -409,7 +409,7 @@ int command_par_value2(char* parameter, struct command* cmd, double* val)
       ret = 1;
     }
   }
-  
+
   return ret;
 }
 
@@ -485,13 +485,13 @@ int decode_command () /* compares command with templates, fills this_cmd
                          -3 statement not recognised */
 {
 
-  
+
   int i, aux_pos, cmd_pos, decl_start, type;
   int n = this_cmd->tok_list->curr;
   char** toks = this_cmd->tok_list->p;
   this_cmd->type = -3;
   if ((i = cmd_match(n, toks, &cmd_pos, &decl_start)) < 0)  return i;
-  
+
 
   this_cmd->sub_type = i;
   this_cmd->decl_start = decl_start;
@@ -2340,8 +2340,8 @@ int get_string(char* name, char* par, char* string)
     else
     {
       printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
-    } 
-  }  
+    }
+  }
   return length;
 }
 
@@ -2621,9 +2621,9 @@ void madx_finish()
 #endif
     printf("\n  Number of warnings: %d\n",nwarnings);
     if (nwarnings > 0)
-     {
-        printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
-     }
+    {
+      printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
+    }
     if (get_option("trace")) time_stamp("end");
     printf("\n  +++++++++++++++++++++++++++++++++++\n");
     printf("  + %s finished normally +\n", myversion);
@@ -3136,8 +3136,8 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
         stack[1] = stack[0]; stack[0] = 0;
       }
       else  c_stack--;
-      
-      
+
+
       switch(k)
       {
         case 0:
@@ -3151,13 +3151,13 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
           break;
         case 3:
           if (stack[c_stack+1] == 0.0)
-           {
-             warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);
-             /*fatal_error("Division by zero is not defined","Aborting!");*/
-             stack[c_stack] = 0.0;
-             /*stack[c_stack] = nan("");*/
-             break;
-           }  
+          {
+            warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);
+            /*fatal_error("Division by zero is not defined","Aborting!");*/
+            stack[c_stack] = 0.0;
+            /*stack[c_stack] = nan("");*/
+            break;
+          }
           stack[c_stack] /= stack[c_stack+1];
           break;
         case 4:
@@ -4076,14 +4076,14 @@ void store_command_def(char* cmd_string)  /* processes command definition */
   cmd = defined_commands->commands[defined_commands->curr++] =
     new_command(toks->p[0], 40, 40, toks->p[2], toks->p[3],
                 atoi(toks->p[4]), atoi(toks->p[5]));
-  
-/*  
-    printf("skowrondebug: store_command_def.c command name %s\n",cmd->name);
-    if (strcmp(cmd->name,"twcavity") == 0)
-    {
-    printf("skowrondebug: store_command_def.c I have got TWCAVITY\n");
-    }
-*/  
+
+/*
+  printf("skowrondebug: store_command_def.c command name %s\n",cmd->name);
+  if (strcmp(cmd->name,"twcavity") == 0)
+  {
+  printf("skowrondebug: store_command_def.c I have got TWCAVITY\n");
+  }
+*/
   i = add_to_name_list(cmd->name, 0, defined_commands->list);
   if (n > 6)
   {
@@ -4306,29 +4306,29 @@ int table_row(struct table* table, char* name)
 {
   int i, j, ret = -1;
   for (i = 0; i < table->num_cols; i++)
-   {
-     if(table->columns->inform[i] == 3) 
-      {
-        if (debuglevel > 2) 
-          printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
-                 i,table->columns->names[i]);
-        break;
-      } 
-   }  
-  
+  {
+    if(table->columns->inform[i] == 3)
+    {
+      if (debuglevel > 2)
+        printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
+               i,table->columns->names[i]);
+      break;
+    }
+  }
+
   if (i < table->num_cols)
-   {
+  {
     for (j = 0; j < table->curr; j++)
-     {  
-        if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
-        if (tab_name_code(name, table->s_cols[i][j])) break;
-     }  
+    {
+      if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
+      if (tab_name_code(name, table->s_cols[i][j])) break;
+    }
     if (j < table->curr) ret = j;
-   }
+  }
   else
-   {
-     if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
-   } 
+  {
+    if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
+  }
 /*  if(ret==-1) fatal_error("Name of row not found", name);*/
   if(ret==-1) warning("table_row","Name of row not found: %s,", name);
   return ret;
@@ -4689,9 +4689,9 @@ void warning(char* t1, register char* fmt, ...)
   fflush(0); /*flushes all the buffers -> so the warning appears in a correct place*/
 
   if (get_option("warn") == 0)
-   {
-     return;
-   }
+  {
+    return;
+  }
 
   va_start( list, fmt );
 
@@ -4724,16 +4724,15 @@ void error(char* t1, register char* fmt, ...)
 
 void warningOld(char* t1, char* t2)
 {
-  if (get_option("warn")) 
+  if (get_option("warn"))
   {
     printf("++++++ warning: %s %s\n",t1,t2);
     warn_numb++;
   }
 }
 
-void augmentfwarn() 
+void augmentfwarn()
 {
 /*increases counter of the fortran warnings*/
-   warn_numbf++;
+  warn_numbf++;
 }
-
