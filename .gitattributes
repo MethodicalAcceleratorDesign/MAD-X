@@ -1,6 +1,7 @@
 * text=auto !eol
 /Makefile -text
 /Makefile.bat -text
+/Makefile.prof -text
 /Makefile_develop -text
 /Makefile_g95 -text
 /Sa_extend_poly.f90 -text
