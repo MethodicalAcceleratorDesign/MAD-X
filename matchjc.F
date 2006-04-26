@@ -295,62 +295,6 @@
         endif
       enddo
 
-      call FCN(M,N,x,fvec,IFLAG)
-      fnorm = vmod(m, fvec)
-      fmin_old=fmin
-      fmin = fnorm**2
-
-      xnorm=DNRM2(N, x, 1)
-      dxnorm=DNRM2(effvar, effsol, 1)/xnorm
-      write(*,*) 'Step length', dxnorm
-!      write(*,*) "tar=",fmin,fmin_old,ftol
-!      write(*,830) calls,fmin,effcon,N
-!      do i=1,N
-!        xdiff(i)=xstart(i)-x(i)
-!      enddo
-!      write(*,830) calls,fmin,DNRM2(N, xdiff, 1)/DNRM2(N, xstart, 1)
-
-      ! first fmin_old equal to fmin_start
-      ! Bisection search
-      fmin_old2=1E20
-      j=0
-36    continue
-      if(fmin.ge.fmin_old .and. j.lt. bisec ) then
-        ! go back to average solution
-        do i=1,N
-          x(i)=(x(i)+xold(i))*.5
-          dx(i)=(x(i)-xold(i))*.5
-        enddo
-        j=j+1
-        call FCN(M,N,x,fvec,IFLAG)
-!        calls=calls+1
-        fnorm = vmod(m, fvec)
-        fmin = fnorm**2
-        xnorm=DNRM2(N, x, 1)
-        dxnorm=DNRM2(N, dx, 1)/xnorm
-!        write(*,*) dxnorm,xnorm,fmin,fmin_old2
-        if (fmin.gt.fmin_old2) then
-!          do i=1,N
-!            x(i)=2*x(i)-xold(i)
-!          enddo
-!          call FCN(M,N,x,fvec,IFLAG)
-!!        calls=calls+1
-!          fnorm = vmod(m, fvec)
-!          fmin = fnorm**2
-!          xnorm=DNRM2(N, x, 1)
-!          write(*,*) dxnorm,xnorm,fmin,fmin_old2
-          goto 37
-        endif
-        fmin_old2=fmin
-        goto 36
-      endif
-37    continue
-
-      if (j.gt.0) then
-        write(*,*) 'Bisec iteration', j
-      endif
-
-
 
 !     Check for slope and limits and set the results in varinfo and
 !     the number of effective variables in effvar
@@ -446,6 +390,67 @@
 !      write(*,*) "effsol=",effsol
 
 !      endif
+
+      ! HERE
+!----- Calculate the penalty function
+      call FCN(M,N,x,fvec,IFLAG)
+      fnorm = vmod(m, fvec)
+      fmin_old=fmin
+      fmin = fnorm**2
+
+      xnorm=DNRM2(N, x, 1)
+      dxnorm=DNRM2(effvar, effsol, 1)/xnorm
+      write(*,*) 'Step length', dxnorm
+!      write(*,*) "tar=",fmin,fmin_old,ftol
+!      write(*,830) calls,fmin,effcon,N
+!      do i=1,N
+!        xdiff(i)=xstart(i)-x(i)
+!      enddo
+!      write(*,830) calls,fmin,DNRM2(N, xdiff, 1)/DNRM2(N, xstart, 1)
+
+      ! first fmin_old equal to fmin_start
+      ! Bisection search
+      fmin_old2=1E20
+      j=0
+36    continue
+      if(fmin.ge.fmin_old .and. j.lt. bisec ) then
+        ! go back to average solution
+        do i=1,N
+          x(i)=(x(i)+xold(i))*.5
+          dx(i)=(x(i)-xold(i))*.5
+        enddo
+        j=j+1
+        call FCN(M,N,x,fvec,IFLAG)
+!        calls=calls+1
+        fnorm = vmod(m, fvec)
+        fmin = fnorm**2
+        xnorm=DNRM2(N, x, 1)
+        dxnorm=DNRM2(N, dx, 1)/xnorm
+!        write(*,*) dxnorm,xnorm,fmin,fmin_old2
+        if (fmin.gt.fmin_old2) then
+!          do i=1,N
+!            x(i)=2*x(i)-xold(i)
+!          enddo
+!          call FCN(M,N,x,fvec,IFLAG)
+!!        calls=calls+1
+!          fnorm = vmod(m, fvec)
+!          fmin = fnorm**2
+!          xnorm=DNRM2(N, x, 1)
+!          write(*,*) dxnorm,xnorm,fmin,fmin_old2
+          goto 37
+        endif
+        fmin_old2=fmin
+        goto 36
+      endif
+37    continue
+
+      if (j.gt.0) then
+        write(*,*) 'Bisec iteration', j
+      endif
+
+
+      ! HERE
+
 
 !---- calculate the target function and set new values
       call FCN(M,N,x,fvec,IFLAG)
