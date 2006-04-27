@@ -42,7 +42,7 @@ contains
 100 format (a20, f10.4, a10, f10.4, a10, f10.4)
 110 format (8f10.4, l2, i3)
 120 format (i16, f16.3, f16.4, e16.3, e16.3, f16.3)
-130 format (a12, i5, a6, a12, a6, f10.4, a20, f10.4)
+130 format (a12, i5, a6, a30, a6, f10.4, a20, f10.4)
     !------------------------------------------------------
 
 
@@ -59,9 +59,12 @@ contains
 
     charge = get_value('beam ', "charge ")
 
-    open(unit=21,file='sychrpart.txt')
-    open(unit=24,file='twcavsettings.txt')
-    write(24,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
+    if (getdebug() > 1) then
+      open(unit=21,file='sychrpart.txt')
+      open(unit=24,file='twcavsettings.txt')
+      write(24,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
+    endif
+    
     nfen = 0
     startfen = 0
     x(:)=zero
@@ -107,10 +110,12 @@ contains
              write(6,'(6f8.4)') x
           endif
 
-          write (21,*) ' '
-          write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-          write (21,'(6f8.4)') x
-
+          if (getdebug() > 1) then
+             write (21,*) ' '
+             write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+             write (21,'(6f8.4)') x
+          endif
+          
           p=>p%next
        enddo
 
@@ -143,16 +148,20 @@ contains
 
        !TUNE CAVITY
        call setcavity(p,x,phasecav(j),charge,maxaccel)
-       write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
+
+       if (getdebug() > 1) then
+          write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
+       endif   
 
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
 
-
-       write (21,*) ' '
-       write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-       write (21,'(6f8.4)') x
-
+       if (getdebug() > 1) then
+          write (21,*) ' '
+          write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+          write (21,'(6f8.4)') x
+       endif
+       
        if ( getdebug() > 2 ) then
           write(6,'(a, 6f12.8)') ' Track parameters after cavity ',x
           write(*,100) 'Old Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
@@ -194,10 +203,12 @@ contains
        p = nfen
        call track(my_ring,x,i,i+1,localis)
 
-       write (21,*) ' '
-       write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-       write (21,'(6f8.4)') x
-
+       if (getdebug() > 1) then
+          write (21,*) ' '
+          write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+          write (21,'(6f8.4)') x
+       endif
+       
        if ( getdebug() > 1 ) then
           write(6,*) ' i=',i,' name=',p%mag%name, &
                ' beta0 ', nfen%beta0, &
@@ -210,9 +221,11 @@ contains
     enddo
 
 
-    write (21,*) ' '
-    write (21,*) 'END'
-    write (21,'(6f8.4)') x
+    if (getdebug() > 1) then
+       write (21,*) ' '
+       write (21,*) 'END'
+       write (21,'(6f8.4)') x
+    endif
 
 
     if ( getdebug() > 1 ) then
@@ -259,8 +272,11 @@ contains
     cavsareset = .true. !module field indicating that cavities were set appriopriately
     deallocate(poscav);
     deallocate(phasecav);
-
-    close(21);close(24);
+    
+    if (getdebug() > 1) then
+       close(21);close(24);
+    endif
+       
     !****************************************************************************************
     !*********  E N D   O F   PTC_TRACKCAVS  ************************************************
     !****************************************************************************************

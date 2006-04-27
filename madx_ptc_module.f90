@@ -790,12 +790,15 @@ CONTAINS
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
 
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
-    if (isclosedlayout .eqv. .true.) then
-       print *,'The machine is a RING'
-    else
-       print *,'The machine is a LINE'
+    
+    if (getdebug() > 0) then 
+      if ( isclosedlayout .eqv. .true. ) then
+         print *,'The machine is a RING'
+      else
+         print *,'The machine is a LINE'
+      endif
     endif
-
+    
     MY_RING%closed=isclosedlayout
 
     doneit=.true.
