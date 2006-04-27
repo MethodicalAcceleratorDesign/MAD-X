@@ -4679,7 +4679,7 @@ double variable_value(struct variable* var)
   return val;
 }
 
-void warning(char* t1, register char* fmt, ...)
+void warning(char* t1, char* fmt, ...)
 {
 /*prints warning on the standard error and accepts parameters printout with std C formatting*/
 /*Piotr Skowronski CERN*/
@@ -4702,7 +4702,7 @@ void warning(char* t1, register char* fmt, ...)
   va_end(list);
 }
 
-void error(char* t1, register char* fmt, ...)
+void error(char* t1, char* fmt, ...)
 {
 /*prints warning on the standard error and accepts parameters printout with std C formatting*/
 /*Piotr Skowronski CERN*/
