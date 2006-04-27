@@ -72,8 +72,6 @@ CONTAINS
   subroutine ptc_create_universe()
     implicit none
 
-    if (getdebug()>1) print*,"Now PTC"
-
     print77=.false.
     read77 =.false.
 
@@ -432,17 +430,11 @@ CONTAINS
     endif
     call append_empty(my_ring)
 
-
-    !    print *,'____________________________________________________'
-    !    print *,'Adding an element with code',code,' named ',name
-    !    print *,'____________________________________________________'
-
     select case(code)
     case(0,4,25)
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
-       !       if (getdebug() > 2)  print *, 'This is a drift'
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
@@ -536,7 +528,6 @@ CONTAINS
        if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
 
     case(5) ! PTC accepts mults
-       if (getdebug() > 9)  print *, 'This is a quadrupole'
        key%magnet="quadrupole"
 
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
@@ -757,7 +748,6 @@ CONTAINS
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
     case(27)
-       !       if (getdebug() > 2)  print *, 'This is a twcavity'
        key%magnet="twcavity"
        key%list%volt=node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -954,11 +944,6 @@ CONTAINS
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
     endif
-    !      ii = get_string('ptc_dumpmaps ','file ',filename)
-    !      if (ii < 1) then
-    !        print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Specified file name has 0 legth',filename
-    !        return
-    !      endif
 
     if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
     open(unit=42,file=filename)
@@ -1024,24 +1009,25 @@ CONTAINS
           endif
        endif
 
-
-       write(42,*) p%mag%name,' ==========================='
-       do ii=1,4
-          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-               &                      y2(ii).sub.'010000', &
-               &                      y2(ii).sub.'001000', &
-               &                      y2(ii).sub.'000100', &
-               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-               &                      y2(ii).sub.'000010'    !
-       enddo
-       do ii=6,5,-1
-          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-               &                      y2(ii).sub.'010000', &
-               &                      y2(ii).sub.'001000', &
-               &                      y2(ii).sub.'000100', &
-               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-               &                      y2(ii).sub.'000010'    !
-       enddo
+       if (getdebug() > 2) then
+          write(42,*) p%mag%name,' ==========================='
+          do ii=1,4
+             write(42,'(6f13.8)')  y2(ii).sub.'100000', &
+                  &                      y2(ii).sub.'010000', &
+                  &                      y2(ii).sub.'001000', &
+                  &                      y2(ii).sub.'000100', &
+                  &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+                  &                      y2(ii).sub.'000010'    !
+          enddo
+          do ii=6,5,-1
+             write(42,'(6f13.8)')  y2(ii).sub.'100000', &
+                  &                      y2(ii).sub.'010000', &
+                  &                      y2(ii).sub.'001000', &
+                  &                      y2(ii).sub.'000100', &
+                  &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+                  &                      y2(ii).sub.'000010'    !
+          enddo
+       endif
 
        p=>p%next
     enddo
@@ -1287,12 +1273,14 @@ CONTAINS
 
       deltae = cfen%energy/startfen%energy
 
-      write(21,*) "##########################################"
-      write(21,*) ""
-      write(21,'(i4, 1x,a, f10.6)') i,current%mag%name,suml
-      write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",deltae
-      write(21,*) ""
-      call print(y,21)
+      if (getdebug() > 2) then
+         write(21,*) "##########################################"
+         write(21,*) ""
+         write(21,'(i4, 1x,a, f10.6)') i,current%mag%name,suml
+         write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",deltae
+         write(21,*) ""
+         call print(y,21)
+      endif
 
       call double_to_table(table_name, 's ', suml)
       doublenum=current%mag%p%p0c
@@ -1362,7 +1350,7 @@ CONTAINS
             else
                i2a=5
             endif
-            ii=37+(i1a-1)*6+i2a
+            ii=36+(i1a-1)*6+i2a
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
          enddo
@@ -1376,10 +1364,12 @@ CONTAINS
       ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
-      write(20,'(a,13(f9.6))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),&
-           tw%beta(2,1),tw%beta(2,2),tw%beta(3,1),tw%disp(1),tw%disp(3)
-      !write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),&
-      !     tw%beta(2,1),tw%beta(2,2),&
+      if (getdebug() > 1) then
+         write(20,'(a,12(f15.6,1x))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),&
+              tw%beta(2,1),tw%beta(2,2),tw%beta(3,1),tw%disp(1),tw%disp(3)
+         !write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),&
+         !     tw%beta(2,1),tw%beta(2,2),&
+      endif
 
     end subroutine puttwisstable
     !____________________________________________________________________________________________
@@ -1601,7 +1591,7 @@ CONTAINS
     logical(lp) name_l
     integer,intent(IN) ::  row,icase
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
-    integer idx,ii,i1,i2
+    integer idx,ii,i1,i2,jj
     integer j,k,ind(6)
     integer double_from_table
     character(len = 4)  name_var
@@ -1797,13 +1787,17 @@ CONTAINS
           k = double_from_table("normal_results ", "order1 ", row, doublenum)
           i1 = int(doublenum)
           if(i1.gt.ii) call aafail('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
-          if(i1.eq.5) i1=6
+          jj=0
+          if(i1.eq.5) jj=6
           if(i1.eq.6) i1=5
+          if(jj.eq.6) i1=jj
           k = double_from_table("normal_results ", "order2 ", row, doublenum)
           i2 = int(doublenum)
           if(i2.gt.ii) call aafail('return from double_from_ptc_normal: ',' eigenvectors too many components')
-          if(i2.eq.5) i2=6
+          jj=0
+          if(i2.eq.5) jj=6
           if(i2.eq.6) i2=5
+          if(jj.eq.6) i2=jj
           ind(:)=0
           ind(i2)=1
           double_from_ptc_normal = n%A_t%V(i1).sub.ind
@@ -2054,8 +2048,10 @@ CONTAINS
        n=y
        if (n_gnfu > 0) pbrg = n%a%pb
        if (n_haml > 0) pbrh = n%normal%pb
-       write(19,'(/a/)') 'Dispersion, First and Higher Orders'
-       if (getdebug()>1) call daprint(n%A1,19)
+       if (getdebug() > 1) then
+          write(19,'(/a/)') 'Dispersion, First and Higher Orders'
+          call daprint(n%A1,19)
+       endif
 
        !------ get values and store them in the table 'normal_results' ---------
 
@@ -2081,13 +2077,14 @@ CONTAINS
 
        !------------------------------------------------------------------------
 
-       write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
-       !  call daprint(n%A_t,19)
-       !  call daprint(n%A,19)
+       if (getdebug() > 1) then
+          write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
+          !  call daprint(n%A_t,19)
+          !  call daprint(n%A,19)
+          call daprint(n%dhdj,19)
+          !  call daprint(pbrh,19)
+       endif
 
-       if (getdebug()>1) call daprint(n%dhdj,19)
-
-       !       call daprint(pbrh,19)
        if (n_gnfu > 0) call kill(pbrg)
        if (n_haml > 0) call kill(pbrh)
        call kill(n)
@@ -2292,7 +2289,9 @@ CONTAINS
     endif
 
     if(nd.eq.3) then
-       !       call daprint(s1%junk,6)
+       if (getdebug() > 2) then
+          call daprint(s1%junk,6)
+       endif
        s1%junk1=s1%junk**(-1)
     endif
     ind(:)=0
