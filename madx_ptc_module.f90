@@ -2599,7 +2599,7 @@ CONTAINS
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
           i=4
        else
-          default = default - NOCAVITY !enforcing nocavity to false
+          default = default-only_4d-NOCAVITY !enforcing nocavity to false
        endif
     endif
 
