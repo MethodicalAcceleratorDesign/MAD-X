@@ -129,10 +129,10 @@ madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
 madx_ptc_tablepush.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_tablepush.f90
-pointers.o  : Sp_keywords.o madx_ptc_module.o pointers.f90
-madx_ptc_script.o  : Sp_keywords.o pointers.o madx_ptc_script.f90
+madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 wrap.o: madx_ptc_module.o madx_ptc_script.o wrap.f90
+pointers.o  : Sp_keywords.o madx_ptc_module.o pointers.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
 

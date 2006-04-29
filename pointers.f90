@@ -30,7 +30,7 @@ module pointer_lattice
 contains
 
   subroutine read_ptc_command(ptc_fichier)
-    use madx_ptc_module, piotr_state=>my_state
+    use madx_ptc_module , piotr_state=>my_state
     implicit none
     CHARACTER*(120) com,COMT,filename,name_root,title,name_root_res,filetune,FILESMEAR
     character*(4) suffix,SUFFIX_res
@@ -198,6 +198,7 @@ contains
           read(mf,*) n,cns,cn
           read(mf,*) addi,integrated
           read(mf,*) cut
+          write(6,*) " Distribution cut at ",cut," sigmas"
           call lattice_random_error(my_ring,name,cut,n,addi,integrated,cn,cns)
        case('MISALIGNEVERYTHING')
           read(mf,*) SIG(1:6),cut

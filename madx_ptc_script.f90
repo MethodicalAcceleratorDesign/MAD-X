@@ -2,7 +2,7 @@ module madx_ptc_script_module
   !This module enables the user to execute a PTC script
   !that enables additional functionality that is not possible with MAD-X scripting language
   use madx_keywords
-  use pointer_lattice
+  !  use pointer_lattice
   implicit none
   save
   private

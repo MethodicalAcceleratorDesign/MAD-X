@@ -232,10 +232,7 @@ madx_ptc_module.o: madx_ptc_tablepush.o madx_ptc_module.f90
 madx_ptc_trackcavs.o: madx_ptc_module.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_trackcavs.f90
 	$(f95) $(f95_FLAGS) madx_ptc_trackcavs.f90
 
-pointers.o: Sp_keywords.o madx_ptc_module.o pointers.f90
-	$(f95) $(f95_FLAGS) pointers.f90
-	
-madx_ptc_script.o: pointers.o madx_ptc_trackcavs.o madx_ptc_script.f90
+madx_ptc_script.o: Sp_keywords.o madx_ptc_script.f90
 	$(f95) $(f95_FLAGS) madx_ptc_script.f90
 
 madx_ptc_track_run.o:  Sp_keywords.o madx_ptc_script.o madx_ptc_track_run.f90
@@ -247,6 +244,9 @@ user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 wrap.o: madx_ptc_script.o madx_ptc_track_run.o wrap.f90
 	$(f95) $(f95_FLAGS) wrap.f90
 
+pointers.o: Sp_keywords.o madx_ptc_module.o pointers.f90
+	$(f95) $(f95_FLAGS) pointers.f90
+	
 run_madx.o: madx_ptc_module.o run_madx.f90
 	$(f95) $(f95_FLAGS) run_madx.f90
 
@@ -292,8 +292,8 @@ madxdev: \
 	Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
-	madx_ptc_tablepush.o madx_ptc_script.o pointers.o rplot.o \
-	user2_photon.o poissonp.o wrap.o
+	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
+	user2_photon.o poissonp.o wrap.o pointers.o 
 	$(f95) $(FOPT) -o madxdev madx_main.o run_madx.o madxpf.o twiss.o \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlibp.o \
 	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
@@ -310,8 +310,8 @@ madxdev: \
 	Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
-	madx_ptc_tablepush.o madx_ptc_script.o pointers.o rplot.o \
-	user2_photon.o poissonp.o wrap.o \
+	madx_ptc_tablepush.o madx_ptc_script.o rplot.o \
+	user2_photon.o poissonp.o wrap.o pointers.o \
 	$(LIBX) -lm -lc
 
 clean:
