@@ -729,7 +729,8 @@ int v_length(char*);
 char* v_format(char*);
 double vmod(int*, double*);
 void error(char* t1, register char* fmt, ...);
-void warning(char* t1, register char* fmt, ...);
+/* void warning(char* t1, register char* fmt, ...); */
+void warning(char*, char*);
 void warningOld(char*, char*);
 void augmentfwarn() ;
 void write_elems(struct el_list*, struct command_list*, FILE*);
@@ -1058,7 +1059,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.02.33";
+char myversion[] = "MAD-X 3.02.34";
 char code_mod_date[] = "Code Modification Date: 29.04.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
