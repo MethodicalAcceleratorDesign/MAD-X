@@ -170,6 +170,8 @@ contains
     endif
     NORM=id
     if(present(a)) then
+       a=zero
+       ai=zero
        a=norm%a_t
        ai=norm%a_t**(-1)
        id=y
@@ -1898,7 +1900,9 @@ contains
     xn(2)=sqrt(emit(1))
     xn(4)=sqrt(emit(2))
     X=zero
+
     x=(a*xn)+closed
+
     WRITE(6,*) " INITIAL X"
     WRITE(6,200) X
     !    x=zero
@@ -1972,7 +1976,7 @@ contains
     ELSE
        write(6,*) "          STABLE "
 
-       write(6,*) "tunes of the ray " ,tot_tune(1:2)
+!       write(6,*) "tunes of the ray " ,tot_tune(1:2)
        WRITE(6,201) EMIT,APER, TUNEnew(1:2),DBETA
 
        scas=scat

@@ -1352,6 +1352,8 @@ contains
     real(dp) pushmatrixr(ndim2) ,junk(ndim2)
     integer i,j
 
+    pushmatrixr=zero
+
     do i=1,nd2
        junk(i)=zero
     enddo
