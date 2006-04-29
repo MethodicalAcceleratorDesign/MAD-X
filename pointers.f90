@@ -284,7 +284,7 @@ contains
        case('GETCHROMATICITY')
           call lattice_GET_CHROM(my_ring,my_state,CHROM)
        case('PAUSE')
-          WRITE(6,*) " ipause=mypause(0) "
+          WRITE(6,*) " Type enter to continue execution "
           READ(5,*)
        case('PRINTONCE')
           print77=.true.
