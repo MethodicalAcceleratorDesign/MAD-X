@@ -3152,7 +3152,8 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
         case 3:
           if (stack[c_stack+1] == 0.0)
           {
-            warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);
+/*            warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);*/
+            warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!");
             /*fatal_error("Division by zero is not defined","Aborting!");*/
             stack[c_stack] = 0.0;
             /*stack[c_stack] = nan("");*/
@@ -4329,8 +4330,8 @@ int table_row(struct table* table, char* name)
   {
     if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
   }
-/*  if(ret==-1) fatal_error("Name of row not found", name);*/
-  if(ret==-1) warning("table_row","Name of row not found: %s,", name);
+  if(ret==-1) fatal_error("Name of row not found", name);
+/*  if(ret==-1) warning("table_row","Name of row not found: %s,", name);*/
   return ret;
 }
 
@@ -4679,7 +4680,7 @@ double variable_value(struct variable* var)
   return val;
 }
 
-void warning(char* t1, char* fmt, ...)
+void warningnew(char* t1, char* fmt, ...)
 {
 /*prints warning on the standard error and accepts parameters printout with std C formatting*/
 /*Piotr Skowronski CERN*/
@@ -4722,7 +4723,7 @@ void error(char* t1, char* fmt, ...)
 
 
 
-void warningOld(char* t1, char* t2)
+void warning(char* t1, char* t2)
 {
   if (get_option("warn"))
   {
