@@ -872,35 +872,62 @@ CONTAINS
     !-----------------------------------------------------------!
 
     ! fill strength of ALL normal multipoles
-    if(n_norm.gt.0) then  ! =============================!
-       do i_count=0,n_norm                               !
-          if(i_count.gt.0) &                             !
-               key%list%k(i_count+1)=normal(i_count)/l   !
-          if (i_count.le.3) &                            !
-               normal_0123(i_count)=normal(i_count)/l    !
-       enddo                                             !
-    endif !==============================================!
+    if(n_norm.gt.0) then  ! ===============================!
+       do i_count=0,n_norm                                 !
+          if(i_count.gt.0) then                            !
+             if(l.ne.zero) then                            !
+                key%list%k(i_count+1)=normal(i_count)/l    !
+             else                                          !
+                key%list%k(i_count+1)=normal(i_count)      !
+             endif                                         !
+          endif                                            !
+          if (i_count.le.3) then                           !
+               if(l.ne.zero) then                          !
+                  normal_0123(i_count)=normal(i_count)/l   !
+               else                                        !
+                  normal_0123(i_count)=normal(i_count)     !
+               endif                                       !
+            endif                                          !
+       enddo                                               !
+    endif !================================================!
 
     ! fill strength of ALL skew multipoles
-    if(n_skew.gt.0) then !===============================!
-       do i_count=0,n_skew                               !
-          if(i_count.gt.0) &                             !
-               key%list%ks(i_count+1)=skew(i_count)/l    !
-          if (i_count.le.3) &                            !
-               skew_0123(i_count)=skew(i_count)/l        !
-       enddo                                             !
-    endif !==============================================!
+    if(n_skew.gt.0) then  ! ===============================!
+       do i_count=0,n_skew                                 !
+          if(i_count.gt.0) then                            !
+             if(l.ne.zero) then                            !
+                key%list%ks(i_count+1)=skew(i_count)/l     !
+             else                                          !
+                key%list%ks(i_count+1)=skew(i_count)       ! 
+             endif                                         !
+          endif                                            !
+          if (i_count.le.3) then                           !
+               if(l.ne.zero) then                          !
+                  skew_0123(i_count)=skew(i_count)/l       !
+               else                                        !
+                  skew_0123(i_count)=skew(i_count)         !
+               endif                                       !
+            endif                                          !
+       enddo                                               !
+    endif !================================================!
 
-    n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !========!
-    if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1    !
-    if(n_ferr.gt.0) then                                    !
-       do i_count=0,n_dim_mult_err                          !
-          key%list%k(i_count+1)=key%list%k(i_count+1)+ &    !
-               field(1,i_count)/l                           !
-          key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &  !
-               field(2,i_count)/l                           !
-       enddo                                                !
-    endif !=================================================!
+    n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !===========!
+    if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1       !
+    if(n_ferr.gt.0) then                                       !
+       do i_count=0,n_dim_mult_err                             !
+          if(l.ne.zero) then                                   !
+             key%list%k(i_count+1)=key%list%k(i_count+1)+ &    !
+                  field(1,i_count)/l                           !
+             key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &  !
+                  field(2,i_count)/l                           !
+          else                                                 !
+             key%list%k(i_count+1)=key%list%k(i_count+1)+ &    !
+                  field(1,i_count)                             !
+             key%list%ks(i_count+1)=key%list%ks(i_count+1)+ &  !
+                  field(2,i_count)                             !
+          endif                                                !
+       enddo                                                   !
+    endif !====================================================!
 
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
   !----------------------------------------------------------------
