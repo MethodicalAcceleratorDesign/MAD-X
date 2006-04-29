@@ -1058,7 +1058,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.02.32";
+char myversion[] = "MAD-X 3.02.33";
 char code_mod_date[] = "Code Modification Date: 29.04.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
@@ -1231,4 +1231,3 @@ struct expression* match2_cons_rhs[10][30];
 struct expression* match2_cons_lhs[10][30];
 
 /* end of definitions */
-
