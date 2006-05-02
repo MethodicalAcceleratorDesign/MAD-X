@@ -213,10 +213,6 @@ CONTAINS
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
 
-    if (getdebug() > 1) print '(a23, l7, a1)','Executing MAKE_STATES(',PARTICLE,')'
-
-    CALL MAKE_STATES(PARTICLE)
-
     if (getdebug()==0) global_verbose = .false.
 
     !  with_external_frame=.false.
