@@ -529,7 +529,7 @@ CONTAINS
           !          SECTOR_B%firsttime=0   !slightly unsafe
           ALLOCATE(S_B(SECTOR_NMUL_MAX))
           DO I=1,SECTOR_NMUL_MAX
-             if(i==SECTOR_NMUL_MAX)     global_verbose=.true.
+!             if(i==SECTOR_NMUL_MAX)     global_verbose=.true.
              S_B(I)%firsttime=0
              call nul_coef(S_B(I))
              call make_coef(S_B(I),I)
