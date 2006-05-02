@@ -2626,14 +2626,14 @@ CONTAINS
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
           i=4
        else
-          default = default-only_4d-NOCAVITY !enforcing nocavity to false
+          default = default-delta-only_4d-NOCAVITY !enforcing nocavity to false
        endif
     endif
 
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug()>0) call print(default,6)
+    if (getdebug()>0) call print(default,6) 
 
     icase = i
 
