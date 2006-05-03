@@ -212,6 +212,7 @@ char command_def[] =
 "threader = [l, false, true], "
 "trace    = [l, false, true], "
 "verify   = [l, false, true], "
+"no_fatal_stop= [l, false, true], "
 "warn     = [l, true, true]; "
 " "
 "plot: control none 0 0 "

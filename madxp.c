@@ -1880,7 +1880,8 @@ double expression_value(struct expression* expr, int flag) /* recursive */
 void fatal_error(char* t1, char* t2)
   /*prints fatal error message, halts program */
 {
-  printf("+=+=+= fatal: %s %s\n",t1,t2); exit(1);
+  printf("+=+=+= fatal: %s %s\n",t1,t2);
+  if (get_option("no_fatal_stop ")==0) exit(1);
 }
 
 struct command* find_command(char* name, struct command_list* cl)
