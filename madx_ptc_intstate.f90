@@ -19,6 +19,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
   public                            :: ptc_setfringe
+  public                            :: printintstate
 
 
 
@@ -41,7 +42,6 @@ contains
 
   logical(lp) function getmaxaccel()
     implicit none
-    logical(lp)  :: getintstate
     getmaxaccel = maxaccel
     return
   end function getmaxaccel
@@ -59,9 +59,9 @@ contains
     implicit none
     type (internal_state)  :: state
     !sets the internal state
-    if (getdebug() > 1) print *, "setintstate: Setting internal state"
+    !if (getdebug() > 1) 
     intstate = state
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
   end subroutine setintstate
 
   !____________________________________________________________________________________________
@@ -76,12 +76,13 @@ contains
     implicit none
     type (internal_state) :: intst
 
-    if (getdebug() > 1) print *, "Initializing internal state"
+    !if (getdebug() > 1) 
+    print *, "Initializing internal state"
 
-    intstate = intst-nocavity0
+    intstate = intst - nocavity0
     call update_states
 
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
   end subroutine initintstate
   !____________________________________________________________________________________________
 
@@ -91,9 +92,10 @@ contains
     if (getdebug() > 1) print *, "Setting internal state to DEFAULT0"
 
     intstate = default0
+    default = intstate
     call update_states
 
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
 
   end subroutine ptc_resetinternalstate
   !____________________________________________________________________________________________
@@ -137,8 +139,9 @@ contains
        if (getdebug() > 1) print *, "Switching OFF exact missaligment"
        intstate = intstate - EXACTMIS0
     endif
+    default = intstate
     call update_states
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setexactmis
   !____________________________________________________________________________________________
 
@@ -154,8 +157,9 @@ contains
        if (getdebug() > 1) print *, "Switching OFF radiation"
        intstate = intstate - radiation0
     endif
+    default = intstate
     call update_states
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setradiation
   !____________________________________________________________________________________________
 
@@ -170,8 +174,10 @@ contains
        if (getdebug() > 1) print *, "Switching OFF fringe"
        intstate = intstate - fringe0
     endif
+    
+    default = intstate
     call update_states
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setfringe
   !____________________________________________________________________________________________
 
@@ -180,16 +186,17 @@ contains
     logical(lp)    :: flag
 
     if (flag) then
-       if (getdebug() > 1) print *, "Switching ON totalpath"
-       intstate = intstate + totalpath0
+       if (getdebug() > 1) print *, "Switching ON totalpath (and switching OFF delta and only_4d)"
+       intstate = intstate - delta0 - only_4d0 + totalpath0
     else
        if (getdebug() > 1) print *, "Switching OFF totalpath"
        intstate = intstate - totalpath0
     endif
 
+    default = intstate
     call update_states
-    if (getdebug() > 2) call print(intstate,6)
-
+    if (getdebug() > 1) call print(intstate,6)
+    
   end subroutine ptc_settotalpath
   !____________________________________________________________________________________________
 
@@ -209,11 +216,13 @@ contains
        intstate = intstate - time0
     endif
 
+    default = intstate
     call update_states
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
 
   end subroutine ptc_settime
 
+  !____________________________________________________________________________________________
 
   subroutine ptc_setnocavity(flag)
     implicit none
@@ -223,14 +232,23 @@ contains
        if (getdebug() > 1) print *, "Switching ON nocavity"
        intstate = intstate + nocavity0
     else
-       if (getdebug() > 1) print *, "Switching OFF nocavity"
-       intstate = intstate - nocavity0
+       if (getdebug() > 1) print *, "Switching OFF nocavity and (also) delta and only_4d"
+       intstate = intstate  - delta0 - only_4d0 - nocavity0
     endif
+
+    default = intstate
     call update_states
-    if (getdebug() > 2) call print(intstate,6)
+    if (getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setnocavity
 
 
+  !____________________________________________________________________________________________
+
+  subroutine printintstate(n)
+  implicit none
+  integer               :: n
+    call print(intstate,n)
+  end subroutine printintstate
   !____________________________________________________________________________________________
 
 end module madx_ptc_intstate_module
