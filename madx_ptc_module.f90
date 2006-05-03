@@ -21,6 +21,7 @@ MODULE madx_ptc_module
   public
   logical(lp) mytime
   integer icav
+  
   integer :: universe=0,index=0,EXCEPTION=0
   integer ipause
   integer,external :: mypause
@@ -209,7 +210,9 @@ CONTAINS
        muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
-
+    
+    !the state is cleared at this stage
+    call setintstate(default)
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
 
@@ -749,10 +752,8 @@ CONTAINS
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
+       default=default+totalpath0 !fringe field calculation vitally relies on it!!!!
        if(offset_deltap.ne.zero) then
-          default = getintstate()
-          default=default+totalpath0
-          call setintstate(default)
           freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one)
        endif
        key%list%freq0=freq
@@ -812,6 +813,8 @@ CONTAINS
        write(6,*) "After  start: ",my_ring%start%chart%f%a
        write(6,*) "After    end: ",my_ring%end%chart%f%b
     endif
+
+    call setintstate(default)
 
     if (getdebug() > 1) then
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
@@ -2602,27 +2605,27 @@ CONTAINS
     select case(icase)
     CASE(4)
        if (getdebug()>1) print*, "my_state: Enforcing ONLY_4D+NOCAVITY"
-       default=default+only_4d+NOCAVITY
+       default=default+only_4d0+NOCAVITY0
        i=4
     CASE(5)
        if (getdebug()>1) print*, "my_state: Enforcing DELTA"
-       default=default+delta
+       default=default+delta0
        deltap=deltap0
        i=5
     CASE(6)
        i=6
     CASE DEFAULT
-       default=default+only_4d+NOCAVITY
+       default=default+only_4d0+NOCAVITY0
        i=4
     END SELECT
 
     if (i==6) then
        if (icav==0) then
-          default=default+only_4d+NOCAVITY
+          default=default + only_4d0 + NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
           i=4
        else
-          default = default-delta-only_4d-NOCAVITY !enforcing nocavity to false
+          default = default - delta0 - only_4d0 - NOCAVITY0 !enforcing nocavity to false
        endif
     endif
 
