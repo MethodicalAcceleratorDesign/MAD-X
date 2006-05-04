@@ -112,7 +112,7 @@ ifeq ($(OSTYPE),darwin)
   LDOPS=
 endif
 
-default: rplot madxdev
+default: rplot madxp
 
 # dependencies of madxpf which combines the C-code
 madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c \
@@ -217,10 +217,10 @@ madx: $(madx_objectsf77)
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 
-# madxdev_objects. All *.f90 , some c and F
+# madxp_objects. All *.f90 , some c and F
 c_objs = madxpf.o gxx11c.o rplot.o
 f90_objs = $(patsubst %.f90,%.o,$(wildcard *.f90))
-madxdev_objects = $(f90_objs) $(c_objs) $(madx_objectsf95)
+madxp_objects = $(f90_objs) $(c_objs) $(madx_objectsf95)
 
 rplot:: 
 ifdef RPLOT
@@ -228,12 +228,12 @@ ifdef RPLOT
 	make -C rplot;
 endif
 	
-madxdev: $(f90_objs) $(c_objs) $(madx_objectsf95)
-	$(LD) $(LDOPS) -o $@ $(madxdev_objects) $(LIBS) 
+madxp: $(f90_objs) $(c_objs) $(madx_objectsf95)
+	$(LD) $(LDOPS) -o $@ $(madxp_objects) $(LIBS) 
 
-madxdev_prof: $(f90_objs) $(c_objs) $(madx_objectsf95) 
+madxp_prof: $(f90_objs) $(c_objs) $(madx_objectsf95) 
 	echo ENTERING PROFILE
-	$(LD) -pg $(LDOPS) -o madxdev_prof $(madxdev_objects) $(LIBS) 
+	$(LD) -pg $(LDOPS) -o madxp_prof $(madxp_objects) $(LIBS) 
 
 madx_prof: $(madx_objectsf77) 
 	$(LD) -pg  $(LDOPS) -o madx_prof $(madx_objectsf77) $(LIBX) -lpthread -lm -lc
@@ -245,7 +245,7 @@ clean:
 	rm -f *.mod
 	rm -f core
 	rm -f *~
-	rm -f madx madxdev
+	rm -f madx madxp
 ifdef RPLOT
 	echo Cleaning rplot;
 	make -C rplot clean;
@@ -262,7 +262,7 @@ info:
 	@echo "-------------------------------------"
 	@echo madx_objectsf77 = $(sort $(madx_objectsf77))
 	@echo
-	@echo madxdev_objects = $(sort $(madxdev_objects))
+	@echo madxp_objects = $(sort $(madxp_objects))
 	@echo
 	@echo default C compiler CC "    " = $(CC)
 	@echo GCC_FLAGS "                " = $(GCC_FLAGS)

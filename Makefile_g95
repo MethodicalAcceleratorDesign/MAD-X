@@ -146,12 +146,12 @@ madx: $(madx_objectsf77) ;
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
-# madxdev_objects. All *.f90 , some c and F
-madxdev_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
+# madxp_objects. All *.f90 , some c and F
+madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxpf.o gxx11c.o rplot.o \
 	$(madx_objectsf95)
-madxdev: $(madxdev_objects)
-	$(f95) $(f95_FOPT) -o $@ $(madxdev_objects) $(LIBX) $(LIBX_ext)
+madxp: $(madxp_objects)
+	$(f95) $(f95_FOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
 
 clean:
 	rm -f *.o
@@ -166,7 +166,7 @@ info:
 	@echo "-------------------------------------"
 	@echo madx_objectsf77 = $(sort $(madx_objectsf77))
 	@echo
-	@echo madxdev_objects = $(sort $(madxdev_objects))
+	@echo madxp_objects = $(sort $(madxp_objects))
 	@echo
 	@echo default C compiler CC "    " = $(CC)
 	@echo GCC_FLAGS "                " = $(GCC_FLAGS)
