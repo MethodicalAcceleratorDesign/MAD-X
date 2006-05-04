@@ -540,24 +540,24 @@ CONTAINS
        ! A sum of quadrupole components from K1 & K1S and ========!
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Q                                 !
-       if(l.ne.0) then                                            !
+       !if(l.ne.0) then                                           !
           !sk1 = sk1 +  normal(1)/l                               !
           sk1 = sk1 +  normal_0123(1)                             !
           !sk1s = sk1s + skew(1)/l                                !
           sk1s = sk1s + skew_0123(1)                              !
-       endif                                                      !
+       !endif                                                     !
        if (sk1s .eq. zero)  then                                  !
           tilt = zero                                             !
        else                                                       !
           tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two          !
        endif                                                      !
        !                                                          !
-       if(l.ne.0) then                                            !
+       !if(l.ne.0) then                                           !
           !sk1  = sk1  + field(1,1)/l                             !
           sk1  = sk1  + (key%list%k(2)-normal_0123(1))            !
           !sk1s = sk1s + field(2,1)/l                             !
           sk1s = sk1s + (key%list%ks(2)-skew_0123(1))             !
-       endif                                                      !
+       !endif                                                     !
        !                                                          !
        if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
        key%list%k(2)=sk1                                          !
@@ -577,12 +577,12 @@ CONTAINS
        ! A sum of sextupole components from K2 & K2S and  ========!
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Sextupole                         !
-       if(l.ne.0) then                                            !
+       !if(l.ne.0) then                                           !
           !sk2 = sk2 +  normal(2)/l                               !
           sk2 = sk2 +  normal_0123(2)                             !
           !sk2s = sk2s + skew(2)/l                                !
           sk2s = sk2s + skew_0123(2)                              !
-       endif                                                      !
+       !endif                                                     !
        !                                                          !
        if (sk2s .eq. zero)  then                                  !
           tilt = zero                                             !
@@ -590,12 +590,12 @@ CONTAINS
           tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three        !
        endif                                                      !
        !                                                          !
-       if(l.ne.0) then                                            !
+       !if(l.ne.0) then                                           !
           !sk2  = sk2 + field(1,2)/l                              !
           sk2  = sk2 + (key%list%k(3)-normal_0123(2))             !
           !sk2s = sk2s + field(2,2)/l                             !
           sk2s = sk2s + (key%list%ks(3)-skew_0123(2))             !
-       endif                                                      !
+       !endif                                                     !
        if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           !
        key%list%k(3)=sk2                                          !
        key%list%ks(3)=zero  ! added by VK                         !
@@ -612,12 +612,12 @@ CONTAINS
        ! A sum of octupole components from K3 & K3S and ==========!
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Octupole                          !
-       if(l.ne.0) then                                            !
+       !if(l.ne.0) then                                           !
           !sk3 = sk3 +  normal(3)/l                               !
           sk3 = sk3 +  normal_0123(3)                             !
           !sk3s = sk3s + skew(3)/l                                !
           sk3s = sk3s + skew_0123(3)                              !
-       endif                                                      !
+       !endif                                                     !
        !                                                          !
        if (sk3s .eq. zero)  then                                  !
           tilt = zero                                             !
@@ -625,12 +625,12 @@ CONTAINS
           tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four         !
        endif                                                      !
        !                                                          !
-       if(l.ne.0) then                                            !
+       !if(l.ne.0) then                                           !
           !sk3 = sk3 + field(1,3)/l                               !
           sk3 = sk3 + (key%list%k(4)-normal_0123(3))              !
           !sk3s = sk3s + field(2,3)/l                             !
           sk3s = sk3s + (key%list%ks(3)-skew_0123(3))             !
-       endif                                                      !
+       !endif                                                     !
        if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
        key%list%k(4)=sk3                                          !
        key%list%ks(4)=zero  ! added by VK                         !
