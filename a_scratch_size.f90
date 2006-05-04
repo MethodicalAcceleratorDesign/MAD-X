@@ -569,7 +569,7 @@ CONTAINS
     implicit none
     integer, INTENT(OUT) :: iff
 
-    logical(lp) :: opened, exists
+    logical :: opened, exists
     integer :: i
 
     DO i= 9999, 7, -1
@@ -586,7 +586,7 @@ CONTAINS
   SUBROUTINE ReportOpenFiles
     implicit none
 
-    logical(lp) :: opened, exists, named
+    logical :: opened, exists, named
     CHARACTER(LEN= 400) :: name
     integer :: i
 
