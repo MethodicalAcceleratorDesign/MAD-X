@@ -1038,25 +1038,23 @@ CONTAINS
           endif
        endif
 
-       if (getdebug() > 2) then
-          write(42,*) p%mag%name,' ==========================='
-          do ii=1,4
-             write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-                  &                      y2(ii).sub.'010000', &
-                  &                      y2(ii).sub.'001000', &
-                  &                      y2(ii).sub.'000100', &
-                  &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-                  &                      y2(ii).sub.'000010'    !
-          enddo
-          do ii=6,5,-1
-             write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-                  &                      y2(ii).sub.'010000', &
-                  &                      y2(ii).sub.'001000', &
-                  &                      y2(ii).sub.'000100', &
-                  &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-                  &                      y2(ii).sub.'000010'    !
-          enddo
-       endif
+       write(42,*) p%mag%name,' ==========================='
+       do ii=1,4
+          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
+               &                      y2(ii).sub.'010000', &
+               &                      y2(ii).sub.'001000', &
+               &                      y2(ii).sub.'000100', &
+               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+               &                      y2(ii).sub.'000010'    !
+       enddo
+       do ii=6,5,-1
+          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
+               &                      y2(ii).sub.'010000', &
+               &                      y2(ii).sub.'001000', &
+               &                      y2(ii).sub.'000100', &
+               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+               &                      y2(ii).sub.'000010'    !
+       enddo
 
        p=>p%next
     enddo
