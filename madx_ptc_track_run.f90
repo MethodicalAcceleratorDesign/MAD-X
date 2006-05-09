@@ -591,8 +591,8 @@ CONTAINS
       Normal_Order_n0  = get_value('ptc_track ','norm_no ')
 
       !ptc_track_debug  =  get_value('ptc_track ','debug ') .ne. 0  ! before 2006.03.20
-      ptc_track_debug  =  getdebug () .ne. 0  ! ptc_track_debug=.T., if debuglevel.ge.1 ,i.e.,
-      ! in the madx input: ptc_setswitch, debuglevel=1
+      if (getdebug()>3) ptc_track_debug=.true.  ! ptc_track_debug=.T., if debuglevel.ge.3 ,i.e.,
+      ! in the madx input: ptc_setswitch, debuglevel=4
 
       debug_print_1: if (ptc_track_debug) then
          print *,' '
