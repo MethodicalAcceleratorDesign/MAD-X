@@ -21,7 +21,7 @@ MODULE madx_ptc_module
   public
   logical(lp) mytime
   integer icav
-  
+
   integer :: universe=0,index=0,EXCEPTION=0
   integer ipause
   integer,external :: mypause
@@ -210,7 +210,7 @@ CONTAINS
        muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
-    
+
     !the state is cleared at this stage
     call setintstate(default)
     !valid October 2002: oldscheme=.false.
@@ -541,10 +541,10 @@ CONTAINS
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Q                                 !
        !if(l.ne.0) then                                           !
-          !sk1 = sk1 +  normal(1)/l                               !
-          sk1 = sk1 +  normal_0123(1)                             !
-          !sk1s = sk1s + skew(1)/l                                !
-          sk1s = sk1s + skew_0123(1)                              !
+       !sk1 = sk1 +  normal(1)/l                                  !
+       sk1 = sk1 +  normal_0123(1)                                !
+       !sk1s = sk1s + skew(1)/l                                   !
+       sk1s = sk1s + skew_0123(1)                                 !
        !endif                                                     !
        if (sk1s .eq. zero)  then                                  !
           tilt = zero                                             !
@@ -553,10 +553,10 @@ CONTAINS
        endif                                                      !
        !                                                          !
        !if(l.ne.0) then                                           !
-          !sk1  = sk1  + field(1,1)/l                             !
-          sk1  = sk1  + (key%list%k(2)-normal_0123(1))            !
-          !sk1s = sk1s + field(2,1)/l                             !
-          sk1s = sk1s + (key%list%ks(2)-skew_0123(1))             !
+       !sk1  = sk1  + field(1,1)/l                                !
+       sk1  = sk1  + (key%list%k(2)-normal_0123(1))               !
+       !sk1s = sk1s + field(2,1)/l                                !
+       sk1s = sk1s + (key%list%ks(2)-skew_0123(1))                !
        !endif                                                     !
        !                                                          !
        if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
@@ -578,10 +578,10 @@ CONTAINS
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Sextupole                         !
        !if(l.ne.0) then                                           !
-          !sk2 = sk2 +  normal(2)/l                               !
-          sk2 = sk2 +  normal_0123(2)                             !
-          !sk2s = sk2s + skew(2)/l                                !
-          sk2s = sk2s + skew_0123(2)                              !
+       !sk2 = sk2 +  normal(2)/l                                  !
+       sk2 = sk2 +  normal_0123(2)                                !
+       !sk2s = sk2s + skew(2)/l                                   !
+       sk2s = sk2s + skew_0123(2)                                 !
        !endif                                                     !
        !                                                          !
        if (sk2s .eq. zero)  then                                  !
@@ -591,10 +591,10 @@ CONTAINS
        endif                                                      !
        !                                                          !
        !if(l.ne.0) then                                           !
-          !sk2  = sk2 + field(1,2)/l                              !
-          sk2  = sk2 + (key%list%k(3)-normal_0123(2))             !
-          !sk2s = sk2s + field(2,2)/l                             !
-          sk2s = sk2s + (key%list%ks(3)-skew_0123(2))             !
+       !sk2  = sk2 + field(1,2)/l                                 !
+       sk2  = sk2 + (key%list%k(3)-normal_0123(2))                !
+       !sk2s = sk2s + field(2,2)/l                                !
+       sk2s = sk2s + (key%list%ks(3)-skew_0123(2))                !
        !endif                                                     !
        if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           !
        key%list%k(3)=sk2                                          !
@@ -613,10 +613,10 @@ CONTAINS
        ! from multipoles on the bench (without errors) defines    !
        ! a tilt angle of normal Octupole                          !
        !if(l.ne.0) then                                           !
-          !sk3 = sk3 +  normal(3)/l                               !
-          sk3 = sk3 +  normal_0123(3)                             !
-          !sk3s = sk3s + skew(3)/l                                !
-          sk3s = sk3s + skew_0123(3)                              !
+       !sk3 = sk3 +  normal(3)/l                                  !
+       sk3 = sk3 +  normal_0123(3)                                !
+       !sk3s = sk3s + skew(3)/l                                   !
+       sk3s = sk3s + skew_0123(3)                                 !
        !endif                                                     !
        !                                                          !
        if (sk3s .eq. zero)  then                                  !
@@ -626,10 +626,10 @@ CONTAINS
        endif                                                      !
        !                                                          !
        !if(l.ne.0) then                                           !
-          !sk3 = sk3 + field(1,3)/l                               !
-          sk3 = sk3 + (key%list%k(4)-normal_0123(3))              !
-          !sk3s = sk3s + field(2,3)/l                             !
-          sk3s = sk3s + (key%list%ks(3)-skew_0123(3))             !
+       !sk3 = sk3 + field(1,3)/l                                  !
+       sk3 = sk3 + (key%list%k(4)-normal_0123(3))                 !
+       !sk3s = sk3s + field(2,3)/l                                !
+       sk3s = sk3s + (key%list%ks(3)-skew_0123(3))                !
        !endif                                                     !
        if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
        key%list%k(4)=sk3                                          !
@@ -787,15 +787,15 @@ CONTAINS
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
 
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
-    
-    if (getdebug() > 0) then 
-      if ( isclosedlayout .eqv. .true. ) then
-         print *,'The machine is a RING'
-      else
-         print *,'The machine is a LINE'
-      endif
+
+    if (getdebug() > 0) then
+       if ( isclosedlayout .eqv. .true. ) then
+          print *,'The machine is a RING'
+       else
+          print *,'The machine is a LINE'
+       endif
     endif
-    
+
     MY_RING%closed=isclosedlayout
 
     doneit=.true.
@@ -881,12 +881,12 @@ CONTAINS
              endif                                         !
           endif                                            !
           if (i_count.le.3) then                           !
-               if(l.ne.zero) then                          !
-                  normal_0123(i_count)=normal(i_count)/l   !
-               else                                        !
-                  normal_0123(i_count)=normal(i_count)     !
-               endif                                       !
-            endif                                          !
+             if(l.ne.zero) then                            !
+                normal_0123(i_count)=normal(i_count)/l     !
+             else                                          !
+                normal_0123(i_count)=normal(i_count)       !
+             endif                                         !
+          endif                                            !
        enddo                                               !
     endif !================================================!
 
@@ -897,16 +897,16 @@ CONTAINS
              if(l.ne.zero) then                            !
                 key%list%ks(i_count+1)=skew(i_count)/l     !
              else                                          !
-                key%list%ks(i_count+1)=skew(i_count)       ! 
+                key%list%ks(i_count+1)=skew(i_count)       !
              endif                                         !
           endif                                            !
           if (i_count.le.3) then                           !
-               if(l.ne.zero) then                          !
-                  skew_0123(i_count)=skew(i_count)/l       !
-               else                                        !
-                  skew_0123(i_count)=skew(i_count)         !
-               endif                                       !
-            endif                                          !
+             if(l.ne.zero) then                            !
+                skew_0123(i_count)=skew(i_count)/l         !
+             else                                          !
+                skew_0123(i_count)=skew(i_count)           !
+             endif                                         !
+          endif                                            !
        enddo                                               !
     endif !================================================!
 
@@ -1274,7 +1274,7 @@ CONTAINS
       implicit none
       include 'twissa.fi'
       integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(72)
+      real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
       type(work) :: cfen !current fibre energy
 
@@ -1320,6 +1320,9 @@ CONTAINS
       do ii=1,iia(2) !iia(2)==nv
          opt_fun(ii)=y(ii)%T.sub.j
       enddo
+      myx=opt_fun(6)
+      opt_fun(6)=opt_fun(5)
+      opt_fun(5)=myx
       deallocate(j)
 
       ioptfun=6
@@ -2630,7 +2633,7 @@ CONTAINS
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug()>0) call print(default,6) 
+    if (getdebug()>0) call print(default,6)
 
     icase = i
 
