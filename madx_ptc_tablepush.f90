@@ -56,7 +56,7 @@ contains
 
        e => y(pushes(i)%element)
        coeff = e.sub.(pushes(i)%monomial)
-       if (getdebug()>9) then
+       if (getdebug()>3) then
           write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
                &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
                &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
@@ -77,7 +77,7 @@ contains
     integer  :: i ! iterator
     ! we do not deal here with the main twiss table, hence we do not clear it
     do i=1,ntables
-       if (getdebug()>9) print *,"Clearing ",tables(i)
+       if (getdebug()>3) print *,"Clearing ",tables(i)
        call reset_count(tables(i))
     enddo
 
@@ -89,7 +89,7 @@ contains
     integer  :: i ! iterator
 
     do i=1,ntables
-       if (getdebug()>9) print *,"Augmenting ",tables(i)
+       if (getdebug()>3) print *,"Augmenting ",tables(i)
        call augmentcountonly(tables(i)) !we need to use special augement,
        !cause the regular one looks for for
        !variables names like columns to fill the table
@@ -128,7 +128,7 @@ contains
     pushes(npushes)%colname(column(1)+1:column(1)+1)=achar(0)
     pushes(npushes)%monomial(monomial(1)+1:monomial(1)+1)=achar(0)
 
-    if (getdebug()>9) then
+    if (getdebug()>3) then
        print  *,"madx_ptc_tablepush : addpush(",&
             &          pushes(npushes)%tabname,">,<",pushes(npushes)%colname,">,<",&
             &          pushes(npushes)%element,">,<",pushes(npushes)%monomial,">)"
@@ -137,7 +137,7 @@ contains
     if ( issuchtableexist(pushes(npushes)%tabname) .eqv. .false.) then
        ntables = ntables + 1
        tables(ntables) = pushes(npushes)%tabname
-       if (getdebug()>9)  print *,"Table has been added to the tables list ", tables(ntables)
+       if (getdebug()>3)  print *,"Table has been added to the tables list ", tables(ntables)
     endif
 
   end subroutine addpush
