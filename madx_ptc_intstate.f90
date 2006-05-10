@@ -30,7 +30,7 @@ module madx_ptc_intstate_module
 
   logical(lp),                public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
   type (internal_state),  private  :: intstate = default0
-  integer,                private  :: debug = 0    ! defines debug level
+  integer,                private  :: debug = 1    ! defines debug level
 
   !    routines
 

@@ -467,7 +467,7 @@ char command_def[] =
 "debug = [i, 0, 1]; "
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
-"debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 10 everything */
+"debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 4 everything */
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis = [l, true, true], " /* switch to ensure exact misaligment treatment */
 "totalpath = [l, true, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
