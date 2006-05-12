@@ -968,8 +968,10 @@ CONTAINS
     integer              :: get_string
     real(kind(1d0))      :: get_value
     integer              :: flag_index,why(9)
-
-
+    real(kind(1d0))      :: suml=zero
+    
+    suml=zero
+    
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
     endif
@@ -977,6 +979,7 @@ CONTAINS
     if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
     open(unit=42,file=filename)
 
+    print*, "no=1"," mynd2=",c_%nd2," npara=",c_%npara
     call init(getintstate(),1,c_%np_pol,berz)
 
     call alloc(id);
@@ -1037,25 +1040,19 @@ CONTAINS
              return
           endif
        endif
+       
+       suml=suml+p%MAG%P%ld
 
-       write(42,*) p%mag%name,' ==========================='
-       do ii=1,4
-          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-               &                      y2(ii).sub.'010000', &
-               &                      y2(ii).sub.'001000', &
-               &                      y2(ii).sub.'000100', &
-               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-               &                      y2(ii).sub.'000010'    !
-       enddo
-       do ii=6,5,-1
-          write(42,'(6f13.8)')  y2(ii).sub.'100000', &
-               &                      y2(ii).sub.'010000', &
-               &                      y2(ii).sub.'001000', &
-               &                      y2(ii).sub.'000100', &
-               &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-               &                      y2(ii).sub.'000010'    !
-       enddo
-
+       write(42,*) p%mag%name, suml,' m ==========================='
+       if (c_%npara == 6) then
+         call dump6dmap(y2, 42)  
+       elseif (c_%npara == 5) then
+         call dump5dmap(y2, 42)  
+       elseif (c_%npara == 4) then
+         call dump4dmap(y2, 42)  
+       else
+         call fort_warn("ptc_dumpmaps","c_%npara is neither 6,5 nor 4")
+       endif
        p=>p%next
     enddo
 
@@ -1063,6 +1060,74 @@ CONTAINS
     call kill(y2);
     call kill(id);
 
+  !_________________________________________________________________
+  !_________________________________________________________________
+  !_________________________________________________________________
+    
+    contains
+      !_________________________________________________________________
+      subroutine dump4dmap(y2, fun)
+         implicit none
+         type(real_8) :: y2(6)  !polimorphes array used for calculating maps for each element
+         integer      :: fun !file unit number
+         integer      :: ii
+         
+         if (getdebug() > 1) then
+           
+         endif
+         
+         do ii=1,4
+            write(fun,'(4f13.8)')  y2(ii).sub.'1000', &
+            &                      y2(ii).sub.'0100', &
+            &                      y2(ii).sub.'0010', &
+            &                      y2(ii).sub.'0001' 
+         enddo
+
+      end subroutine dump4dmap
+      !_________________________________________________________________
+
+      subroutine dump5dmap(y2, fun)
+         implicit none
+         type(real_8) :: y2(6)  !polimorphes array used for calculating maps for each element
+         integer      :: fun !file unit number
+         integer      :: ii
+         do ii=1,5
+           write(fun,'(5f13.8)')  y2(ii).sub.'10000', &
+           &                      y2(ii).sub.'01000', &
+           &                      y2(ii).sub.'00100', &
+           &                      y2(ii).sub.'00010', &
+           &                      y2(ii).sub.'00001'    !
+         enddo
+
+      end subroutine dump5dmap
+      !_________________________________________________________________
+
+      subroutine dump6dmap(y2, fun)
+         implicit none
+         type(real_8) :: y2(6)  !polimorphes array used for calculating maps for each element
+         integer      :: fun !file unit number
+         integer      :: ii
+
+         do ii=1,4
+            write(fun,'(6f13.8)')  y2(ii).sub.'100000', &
+                 &                      y2(ii).sub.'010000', &
+                 &                      y2(ii).sub.'001000', &
+                 &                      y2(ii).sub.'000100', &
+                 &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+                 &                      y2(ii).sub.'000010'    !
+         enddo
+
+         do ii=6,5,-1
+           write(fun,'(6f13.8)')  y2(ii).sub.'100000', &
+                &                      y2(ii).sub.'010000', &
+                &                      y2(ii).sub.'001000', &
+                &                      y2(ii).sub.'000100', &
+                &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
+                &                      y2(ii).sub.'000010'    !
+         enddo
+      end subroutine dump6dmap
+      
+      
   end subroutine ptc_dumpmaps
 
   !_________________________________________________________________
@@ -1138,13 +1203,16 @@ CONTAINS
     no = get_value('ptc_twiss ','no ')
 
     call init(default,no,nda,BERZ,mynd2,npara)
+    
+!    print*, "no=",no," nda=",nda," mynd2=",mynd2," npara=",npara
+    
     call alloc(y)
     y=npara
     Y=X
 
     beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
-    betz_flg = (get_value('ptc_twiss ','betz ').gt.0) .and. (npara.eq.6)
-
+    
+    
     initial_matrix_manual = get_value('ptc_twiss ','initial_matrix_manual ') .ne. 0
     initial_matrix_table = get_value('ptc_twiss ','initial_matrix_table ') .ne. 0
 
@@ -1355,15 +1423,15 @@ CONTAINS
       opt_fun(25)=tw%gama(3,1) * deltae
       opt_fun(26)=tw%gama(3,2) * deltae
       opt_fun(27)=tw%gama(3,3) * deltae
-      opt_fun(28)=tw%mu(1) * deltae
-      opt_fun(29)=tw%mu(2) * deltae
-      opt_fun(30)=tw%mu(3) * deltae
-      opt_fun(31)=tw%disp(1) * deltae
-      opt_fun(32)=tw%disp(2) * deltae
-      opt_fun(33)=tw%disp(3) * deltae
-      opt_fun(34)=tw%disp(4) * deltae
-      opt_fun(35)=tw%disp(5) * deltae
-      opt_fun(36)=tw%disp(6) * deltae
+      opt_fun(28)=tw%mu(1) !* deltae
+      opt_fun(29)=tw%mu(2) !* deltae
+      opt_fun(30)=tw%mu(3) !* deltae
+      opt_fun(31)=tw%disp(1) 
+      opt_fun(32)=tw%disp(2) 
+      opt_fun(33)=tw%disp(3) 
+      opt_fun(34)=tw%disp(4) 
+      opt_fun(35)=tw%disp(5) 
+      opt_fun(36)=tw%disp(6) 
       do i1=1,nd2
          if(i1.le.4) then
             i1a=i1
@@ -1475,14 +1543,18 @@ CONTAINS
 
       betx = get_value('ptc_twiss ','betx ')
       bety = get_value('ptc_twiss ','bety ')
+      betz = get_value('ptc_twiss ','betz ')
       alfx = get_value('ptc_twiss ','alfx ')
       alfy = get_value('ptc_twiss ','alfy ')
+      alfz = get_value('ptc_twiss ','alfz ')
       dx   = get_value('ptc_twiss ','dx ')
       dpx  = get_value('ptc_twiss ','dpx ')
       dy   = get_value('ptc_twiss ','dy ')
       dpy  = get_value('ptc_twiss ','dpy ')
       mux  = get_value('ptc_twiss ','mux ')
       muy  = get_value('ptc_twiss ','muy ')
+      muz  = get_value('ptc_twiss ','muz ')
+
 
       x(:)=zero
       x(1)=get_value('ptc_twiss ','x ')
@@ -1538,6 +1610,17 @@ CONTAINS
       re(6,5) = zero
       re(6,6) = one
 
+
+      betz_flg = .false.
+      if (icase .eq. 6) then
+        if (betz .le. 0) then
+          call fort_warn("ptc_twiss","Fatal: 6D requested and betz is smaller then or equal to 0!")
+          stop
+        else
+          betz_flg = .true.
+        endif
+      endif
+
       if(betz_flg) then
          betz = get_value('ptc_twiss ','betz ')
          alfz = get_value('ptc_twiss ','alfz ')
@@ -1567,7 +1650,29 @@ CONTAINS
       do i=1,iia(2)
          x(i) = 0
       enddo
-
+      
+      if ( getdebug() > 2) then
+         print*," Read the following BETA0 block in module ptc_twiss"
+         print*," R matrix:"
+         write (6,'(6f8.4)') re(1,1),re(1,2),re(1,3),re(1,4),re(1,5),re(1,6)
+         write (6,'(6f8.4)') re(2,1),re(2,2),re(2,3),re(2,4),re(2,5),re(2,6)
+         write (6,'(6f8.4)') re(3,1),re(3,2),re(3,3),re(3,4),re(3,5),re(3,6)
+         write (6,'(6f8.4)') re(4,1),re(4,2),re(4,3),re(4,4),re(4,5),re(4,6)
+         write (6,'(6f8.4)') re(5,1),re(5,2),re(5,3),re(5,4),re(5,5),re(5,6)
+         write (6,'(6f8.4)') re(6,1),re(6,2),re(6,3),re(6,4),re(6,5),re(6,6)
+         
+         print*," Twiss parameters:"
+         write (6,'(6a8)')   "betx","alfx","bety","alfy","betz","alfz"
+         write (6,'(6f8.4)')  betx,  alfx,  bety,  alfy,  betz,  alfz
+         write (6,'(4a8)')   "dx","dpx","dy","dpy"
+         write (6,'(4f8.4)')  dx,dpx,dy,dpy
+         write (6,'(2a8)')   "mux","muy"
+         write (6,'(2f8.4)')  mux , muy
+         
+         print*," Track:"
+         write(6,'(6f8.4)') x
+         
+      endif
     end subroutine readinitialtwiss
 
   END subroutine ptc_twiss
@@ -2282,6 +2387,7 @@ CONTAINS
 
              s1%junk%v(i)=s2(i)
           enddo
+!          call daprint(s1%junk,6)
           s1%n=s1%junk
           s1%a1=s1%n%a1
           s1%a_t=s1%n%a_t
@@ -2621,7 +2727,7 @@ CONTAINS
     END SELECT
 
     if (i==6) then
-       if (icav==0) then
+       if ( (icav==0) .and. (getenforce6D() .eqv. .false.)) then
           default=default + only_4d0 + NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
           i=4
