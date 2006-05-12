@@ -11,6 +11,8 @@ module madx_ptc_intstate_module
   public                            :: initintstate
   public                            :: getmaxaccel
   public                            :: getdebug
+  public                            :: getenforce6D
+  public                            :: setenforce6D
   public                            :: ptc_setdebuglevel
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
@@ -20,7 +22,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_setnocavity
   public                            :: ptc_setfringe
   public                            :: printintstate
-
+  
 
 
   private
@@ -28,7 +30,9 @@ module madx_ptc_intstate_module
   !  PRIVATE
   !    data structures
 
-  logical(lp),                public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
+  logical(lp),            public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
+  logical,                public   :: enforce6D = .false. ! normally 6D is reduced to 4D if no cavities are present
+                                                 ! this switch prevents it. It is needed to calcualte  fg R56 in a chicane
   type (internal_state),  private  :: intstate = default0
   integer,                private  :: debug = 1    ! defines debug level
 
@@ -111,6 +115,27 @@ contains
   end subroutine ptc_setdebuglevel
   !____________________________________________________________________________________________
 
+  subroutine setenforce6D(flag)
+    implicit none
+    integer     :: flag
+
+    if (flag == 0) then
+       if (getdebug() > 1) print *, "Switching off ENFORCE6D"
+       enforce6D = .false.
+    else
+       if (getdebug() > 1) print *, "Setting ENFORCE6D"
+       enforce6D = .true.
+    endif
+
+  end subroutine setenforce6D
+  !____________________________________________________________________________________________
+
+  logical function getenforce6D()
+    implicit none
+    getenforce6D = enforce6D
+  end function getenforce6D
+
+  !____________________________________________________________________________________________
 
   subroutine ptc_setaccel_method(flag)
     implicit none

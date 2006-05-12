@@ -426,6 +426,7 @@ char command_def[] =
 "re54     = [r, 0], re55     = [r, 1], re56     = [r, 0], "
 "re61     = [r, 0], re62     = [r, 0], re63     = [r, 0], "
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
+"betz     = [r, 0], alfz     = [r, 0], muz      = [r, 0], "
 "beta0    = [s, none, beta0]; "
 " "
 "select_ptc_normal: select_ptc_normal none 0 0 "
@@ -475,6 +476,9 @@ char command_def[] =
 "fringe = [l, true, true], "  /*sets the fringe switch/internal state of PTC */
 "nocavity = [l, true, true], "  /*sets the nocavity switch/internal state of PTC */
 "time = [l, true, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
+" "
+"ptc_enforce6d: ptc_enforce6d none 0 0 "
+"flag = [l, false, false]; " /* normally 6D is reduced to 4D if no cavities are present. This switch prevents it. It is needed to calcualte  fg R56 in a chicane */
 " "
 "ptc_track: ptc_track none 0 0 "
 "icase        = [i, 4], "

@@ -87,6 +87,7 @@
 #define w_ptc_trackline         w_ptc_trackline_
 #define w_ptc_twiss_linac       w_ptc_twiss_linac_
 #define w_ptc_setdebuglevel     w_ptc_setdebuglevel_
+#define w_ptc_enforce6d         w_ptc_enforce6d_
 #define w_ptc_setaccel_method   w_ptc_setaccel_method_
 #define w_ptc_setexactmis       w_ptc_setexactmis_
 #define w_ptc_setradiation      w_ptc_setradiation_

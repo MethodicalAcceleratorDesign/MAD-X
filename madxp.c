@@ -1476,6 +1476,11 @@ void exec_command()
         if (kSkowronDebug) printf("madxp.c: Command is ptc_script, calling pro_ptc_script\n");
         pro_ptc_script(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_enforce6d, calling pro_ptc_enforce6d\n");
+        pro_ptc_enforce6d(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_observe") == 0)
       {
         ptc_track_observe(p);

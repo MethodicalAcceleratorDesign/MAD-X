@@ -7644,6 +7644,42 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
 }
 /********************************************************************************/
 
+void pro_ptc_enforce6d(struct in_cmd* cmd)
+{
+  /*Does PTC tracking taking to the account acceleration */
+  /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
+  double switchvalue;
+  struct name_list* nl;
+  int flag;
+  
+  if (cmd == 0x0)
+  {
+    warning("pro_ptc_enforce6d:","Command is null!!!");
+    return;
+  }
+
+  if (cmd->clone == 0x0)
+  {
+    error("pro_ptc_enforce6d","Command Definintion is null!!!");
+    return;
+  }
+
+  nl = cmd->clone->par_names;
+
+  /*DEBUG LEVEL SWITCH*/
+  if ( name_list_pos("flag", nl) >=0 )
+  {
+    command_par_value2("flag", cmd->clone, &switchvalue);
+    flag = (int)switchvalue;
+    w_ptc_enforce6d(&flag);
+  }
+  else
+  {
+    printf("flag is not present\n");
+  }
+}
+/********************************************************************************/
+
 void pro_ptc_setswitch(struct in_cmd* cmd)
 {
   /*Does PTC tracking taking to the account acceleration */
@@ -7673,7 +7709,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   {
     command_par_value2("debuglevel", cmd->clone, &switchvalue);
     debuglevel = (int)switchvalue;
-    w_ptc_setdebuglevel_(&debuglevel);
+    w_ptc_setdebuglevel(&debuglevel);
   }
   else
   {
@@ -7687,7 +7723,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("maxacceleration", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setaccel_method_(&i);
+    w_ptc_setaccel_method(&i);
   }
   else
   {
@@ -7701,7 +7737,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("exact_mis", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setexactmis_(&i);
+    w_ptc_setexactmis(&i);
   }
   else
   {
@@ -7715,7 +7751,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("radiation", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("radiation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setradiation_(&i);
+    w_ptc_setradiation(&i);
   }
   else
   {
@@ -7728,7 +7764,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("fringe", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("fringe is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setfringe_(&i);
+    w_ptc_setfringe(&i);
   }
   else
   {
@@ -7743,7 +7779,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("totalpath", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("totalpath is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_settotalpath_(&i);
+    w_ptc_settotalpath(&i);
   }
   else
   {
@@ -7757,7 +7793,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("time", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("time is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_settime_(&i);
+    w_ptc_settime(&i);
   }
   else
   {
@@ -7770,7 +7806,7 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("nocavity", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("nocavity is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setnocavity_(&i);
+    w_ptc_setnocavity(&i);
   }
   else
   {

@@ -72,6 +72,14 @@ subroutine w_ptc_setdebuglevel(level)
   call ptc_setdebuglevel(level)
 end subroutine w_ptc_setdebuglevel
 
+subroutine w_ptc_enforce6D(level)
+  use madx_ptc_intstate_module
+  implicit none
+  integer level
+  call setenforce6D(level)
+end subroutine w_ptc_enforce6D
+
+
 subroutine w_ptc_setaccel_method(method)
   use madx_ptc_intstate_module
   implicit none
@@ -105,7 +113,6 @@ subroutine w_ptc_settotalpath(method)
   call ptc_settotalpath(method)
 end subroutine w_ptc_settotalpath
 
-
 subroutine w_ptc_settime(method)
   use precision_constants
   use madx_ptc_intstate_module
@@ -138,7 +145,6 @@ subroutine w_ptc_end()
 end subroutine w_ptc_end
 
 
-
 subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
   use madx_ptc_tablepush_module
   implicit none
@@ -150,9 +156,6 @@ subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
   call addpush(tabname, colname, polinomial, monomial)
 
 end subroutine w_ptc_addpush
-
-
-
 
 subroutine w_ptc_script(scriptname)
   use madx_ptc_script_module
