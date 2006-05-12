@@ -58,6 +58,14 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine w_ptc_enforce6D(level)
+      implicit none
+      integer level
+       call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end subroutine w_ptc_enforce6D
+
+
       subroutine w_ptc_setaccel_method ()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
