@@ -7651,7 +7651,7 @@ void pro_ptc_enforce6d(struct in_cmd* cmd)
   double switchvalue;
   struct name_list* nl;
   int flag;
-  
+
   if (cmd == 0x0)
   {
     warning("pro_ptc_enforce6d:","Command is null!!!");
@@ -7907,7 +7907,7 @@ void pro_ptc_select(struct in_cmd* cmd)
 
   /*so none of the columns is filled */
   aTable->org_cols = aTable->num_cols;
-  
+
 
   element = (int)command_par_value("polynomial",cmd->clone);
   monomial = command_par_string("monomial",cmd->clone);
@@ -7925,7 +7925,7 @@ void pro_ptc_select(struct in_cmd* cmd)
   delete_int_array(tabnameIA);
   delete_int_array(colnameIA);
   delete_int_array(monoIA);
-  
+
 }
 /********************************************************************************/
 
