@@ -51,24 +51,71 @@ contains
     !    call daprint(y(1),6)
 
     call putnameintables()
+    
+    if (c_%npara == 6) then
+      call sixdmode()
+    else
+      do i=1,npushes
 
-    do i=1,npushes
+         e => y(pushes(i)%element)
+         coeff = e.sub.(pushes(i)%monomial)
+         if (getdebug()>3) then
+            write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+                 &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+                 &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+                 &        " for fibre no ",n
+         endif
 
-       e => y(pushes(i)%element)
-       coeff = e.sub.(pushes(i)%monomial)
-       if (getdebug()>3) then
-          write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-               &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
-               &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
-               &        " for fibre no ",n
-       endif
+         call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
 
-       call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
-
-    enddo
-
+      enddo
+    endif
+    
     call augment_counts()
 
+    contains 
+      subroutine sixdmode()
+        implicit none
+        integer ele
+        character bufchar
+        character(10) monstr
+
+
+        do i=1,npushes
+
+           if (pushes(i)%element < 5) then
+             e => y(pushes(i)%element)
+           else       
+             if (pushes(i)%element == 5) then
+               e => y(6) !6th coordinate  is d(cT) or cT
+             else
+               e => y(5) !5th coordinate is dp/p  
+             endif
+           endif
+
+           monstr = pushes(i)%monomial
+           print*, "Orig mono: ",monstr
+           bufchar = monstr(5:5)
+           monstr(5:5) = monstr(6:6)
+           monstr(6:6) = bufchar
+           print*, "Inv. mono: ",monstr
+           
+           coeff = e.sub.(monstr)
+
+           if (getdebug()>3) then
+              write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+                   &        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+                   &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+                   &        " for fibre no ",n
+           endif
+
+           call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+
+        enddo
+      end subroutine sixdmode
+
+    !____________________________________________________________________________________________
+      
   end subroutine putusertable
   !____________________________________________________________________________________________
 
@@ -137,7 +184,10 @@ contains
     if ( issuchtableexist(pushes(npushes)%tabname) .eqv. .false.) then
        ntables = ntables + 1
        tables(ntables) = pushes(npushes)%tabname
-       if (getdebug()>3)  print *,"Table has been added to the tables list ", tables(ntables)
+       if (getdebug()>3)  then
+          print *,"Table has been added to the tables list ", tables(ntables)
+       endif
+          
     endif
 
   end subroutine addpush
@@ -152,7 +202,7 @@ contains
     issuchtableexist = .false.
 
     do i=1, ntables
-       if (pushes(i)%tabname == tname) then
+       if (tables(i) == tname) then
           issuchtableexist = .true.
           return
        endif
