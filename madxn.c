@@ -7901,10 +7901,13 @@ void pro_ptc_select(struct in_cmd* cmd)
   pos = name_list_pos("name",aTable->columns);
   if (pos < 0)
   {
-/*    warning("madxn.c: pro_ptc_selectaTable->name","There  column named <<name>> in table <<%s>>.\n",aTable->name);*/
-    warning("madxn.c: pro_ptc_select",aTable->name);
+    warning("madxn.c: pro_ptc_selectaTable->name: There column named <<name>> in table <<%s>>.",aTable->name);
     return;
   }
+
+  /*so none of the columns is filled */
+  aTable->org_cols = aTable->num_cols;
+  
 
   element = (int)command_par_value("polynomial",cmd->clone);
   monomial = command_par_string("monomial",cmd->clone);
@@ -7922,7 +7925,7 @@ void pro_ptc_select(struct in_cmd* cmd)
   delete_int_array(tabnameIA);
   delete_int_array(colnameIA);
   delete_int_array(monoIA);
-
+  
 }
 /********************************************************************************/
 
