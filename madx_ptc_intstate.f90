@@ -31,7 +31,7 @@ module madx_ptc_intstate_module
   !    data structures
 
   logical(lp),            public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
-  logical,                public   :: enforce6D = .false. ! normally 6D is reduced to 4D if no cavities are present
+  logical(lp),            public   :: enforce6D = .false. ! normally 6D is reduced to 4D if no cavities are present
                                                  ! this switch prevents it. It is needed to calcualte  fg R56 in a chicane
   type (internal_state),  private  :: intstate = default0
   integer,                private  :: debug = 1    ! defines debug level
