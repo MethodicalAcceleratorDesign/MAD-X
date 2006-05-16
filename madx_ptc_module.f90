@@ -1475,6 +1475,8 @@ CONTAINS
     subroutine readinitialmatrix
       !reads initial map elements from MAD-X ptc_twiss command parameters
       implicit none
+      real(dp),dimension(6)::reval,aieval
+      real(dp),dimension(6,6)::revec,aievec
 
       re(1,1) = get_value('ptc_twiss ','re11 ')
       re(1,2) = get_value('ptc_twiss ','re12 ')
@@ -1533,6 +1535,15 @@ CONTAINS
       enddo
       deallocate(j)
 
+      call eig6(re,reval,aieval,revec,aievec)
+      do i=1,iia(4)-icoast(2) 
+        if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
+           call fort_warn("ptc_twiss","Fatal: Eigenvalues off the unit circle!")
+           stop
+        endif
+      enddo
+
+
     end subroutine readinitialmatrix
     !_________________________________________________________________
 
@@ -1540,7 +1551,9 @@ CONTAINS
       !Reads initial twiss parameters from MAD-X command
       implicit none
       integer get_option
-
+      real(dp),dimension(6)::reval,aieval
+      real(dp),dimension(6,6)::revec,aievec
+      
       betx = get_value('ptc_twiss ','betx ')
       bety = get_value('ptc_twiss ','bety ')
       betz = get_value('ptc_twiss ','betz ')
@@ -1634,8 +1647,11 @@ CONTAINS
          re(6,5) = betz*sin(twopi*muz)
          re(5,6) = -(1+alfz**2)*sin(twopi*muz)/betz
          re(5,5) = cos(twopi*muz)-alfz*sin(twopi*muz)
+         
       endif
+
       call liepeek(iia,icoast)
+      
       allocate(j(iia(2)))
       j(:)=0
       do i = 1,iia(2)
@@ -1653,7 +1669,7 @@ CONTAINS
       
       if ( getdebug() > 2) then
          print*," Read the following BETA0 block in module ptc_twiss"
-         print*," R matrix:"
+         print*," R matrix (PTC notation):"
          write (6,'(6f8.4)') re(1,1),re(1,2),re(1,3),re(1,4),re(1,5),re(1,6)
          write (6,'(6f8.4)') re(2,1),re(2,2),re(2,3),re(2,4),re(2,5),re(2,6)
          write (6,'(6f8.4)') re(3,1),re(3,2),re(3,3),re(3,4),re(3,5),re(3,6)
@@ -1666,13 +1682,25 @@ CONTAINS
          write (6,'(6f8.4)')  betx,  alfx,  bety,  alfy,  betz,  alfz
          write (6,'(4a8)')   "dx","dpx","dy","dpy"
          write (6,'(4f8.4)')  dx,dpx,dy,dpy
-         write (6,'(2a8)')   "mux","muy"
-         write (6,'(2f8.4)')  mux , muy
+         write (6,'(2a8)')   "mux","muy","muz"
+         write (6,'(2f8.4)')  mux , muy , muz
          
          print*," Track:"
          write(6,'(6f8.4)') x
          
       endif
+
+      !Check if the input parameters does make any sense
+      call eig6(re,reval,aieval,revec,aievec)
+
+      do i=1,iia(4)-icoast(2) 
+        if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
+           call fort_warn("ptc_twiss","Fatal: Eigenvalues off the unit circle!")
+           stop
+        endif
+      enddo
+      
+      
     end subroutine readinitialtwiss
 
   END subroutine ptc_twiss
