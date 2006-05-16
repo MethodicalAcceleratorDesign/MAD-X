@@ -5169,7 +5169,7 @@
       deltap  = get_value('probe ','deltap ')
 !
 !---- Get solenoid parameters
-      sksl    = node_value('ksl ')
+      sksl    = node_value('ksi ')
       sks     = node_value('ks ')
 
 !---- Set up strengths

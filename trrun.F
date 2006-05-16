@@ -1962,7 +1962,7 @@ c      endif
 !
 !---- Get solenoid parameters
 !      elrad   = node_value('lrad ')
-      sksl    = node_value('ksl ')
+      sksl    = node_value('ksi ')
       sks     = node_value('ks ')
 !
 !---- Set up strengths

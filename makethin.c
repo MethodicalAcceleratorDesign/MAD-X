@@ -639,10 +639,10 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   add_cmd_parameter_clone(cmd,ks_param,"ks",1); /* keep ks */
   if(!minimizefl)
   {
-    if (length_param && ks_param) /* in addition provide   ksl = ks * l /slices */
+    if (length_param && ks_param) /* in addition provide   ksi = ks * l /slices */
     {
       ks_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(ks_param); /* start from clone of ks */
-      strcpy(ks_par->name,"ksl"); /* change name to ksl */
+      strcpy(ks_par->name,"ksi"); /* change name to ksi */
       if (length_param->expr && ks_par->expr) /* first step is ks * l calculation, expression or value */
       {
         ks_par->expr = compound_expr(ks_par->expr,ks_par->double_value,"*",length_param->expr,length_param->double_value); /* multiply expression with length */
@@ -653,7 +653,7 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
         if (ks_par->expr) ks_par->expr = compound_expr(ks_par->expr,0.,"/",NULL,slices);
         else ks_par->double_value /= slices;
       }
-      add_to_name_list("ksl",1,cmd->par_names);
+      add_to_name_list("ksi",1,cmd->par_names);
       cmd->par->curr++;
     }
   }
