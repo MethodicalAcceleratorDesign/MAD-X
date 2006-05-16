@@ -22,7 +22,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_setnocavity
   public                            :: ptc_setfringe
   public                            :: printintstate
-  
+
 
 
   private
@@ -32,7 +32,7 @@ module madx_ptc_intstate_module
 
   logical(lp),            public   :: maxaccel  ! switch saying to make the reference particle to fly always on the crest
   logical(lp),            public   :: enforce6D = .false. ! normally 6D is reduced to 4D if no cavities are present
-                                                 ! this switch prevents it. It is needed to calcualte  fg R56 in a chicane
+  ! this switch prevents it. It is needed to calcualte  fg R56 in a chicane
   type (internal_state),  private  :: intstate = default0
   integer,                private  :: debug = 1    ! defines debug level
 
@@ -63,7 +63,7 @@ contains
     implicit none
     type (internal_state)  :: state
     !sets the internal state
-    !if (getdebug() > 1) 
+    !if (getdebug() > 1)
     intstate = state
     if (getdebug() > 1) call print(intstate,6)
   end subroutine setintstate
@@ -80,7 +80,7 @@ contains
     implicit none
     type (internal_state) :: intst
 
-    !if (getdebug() > 1) 
+    !if (getdebug() > 1)
     print *, "Initializing internal state"
 
     intstate = intst - nocavity0
@@ -130,7 +130,7 @@ contains
   end subroutine setenforce6D
   !____________________________________________________________________________________________
 
-  logical function getenforce6D()
+  logical(lp) function getenforce6D()
     implicit none
     getenforce6D = enforce6D
   end function getenforce6D
@@ -199,7 +199,7 @@ contains
        if (getdebug() > 1) print *, "Switching OFF fringe"
        intstate = intstate - fringe0
     endif
-    
+
     default = intstate
     call update_states
     if (getdebug() > 1) call print(intstate,6)
@@ -221,7 +221,7 @@ contains
     default = intstate
     call update_states
     if (getdebug() > 1) call print(intstate,6)
-    
+
   end subroutine ptc_settotalpath
   !____________________________________________________________________________________________
 
@@ -270,8 +270,8 @@ contains
   !____________________________________________________________________________________________
 
   subroutine printintstate(n)
-  implicit none
-  integer               :: n
+    implicit none
+    integer               :: n
     call print(intstate,n)
   end subroutine printintstate
   !____________________________________________________________________________________________
