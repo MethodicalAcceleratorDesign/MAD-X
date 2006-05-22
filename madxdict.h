@@ -458,6 +458,7 @@ char command_def[] =
 "turns        = [i, 1], "
 "ffile    = [i, 1], "
 "file     = [s, track, track], "
+"gcs   = [l, false, true], "
 "extension= [s, none, none], "
 "onetable = [l, false, true]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
