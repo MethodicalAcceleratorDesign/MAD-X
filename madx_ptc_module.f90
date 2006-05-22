@@ -976,11 +976,15 @@ CONTAINS
     real(kind(1d0))      :: get_value
     integer              :: flag_index,why(9)
     real(kind(1d0))      :: suml=zero
+    integer  geterrorflag !C function that returns errorflag value
 
     suml=zero
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
+       if (geterrorflag() /= 0) then
+         return
+       endif
     endif
 
     if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
@@ -1001,24 +1005,41 @@ CONTAINS
        y2=xt+id ! we track identity map from the current position
 
        if(p%mag%kind/=kind21) then
+
           call track(my_ring,y2,i,i+1,getintstate())
+
+          if ( .not. c_%stable_da) then
+            call fort_warn('ptc_dumpmaps: ','DA got unstable')
+            call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+            return
+          endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
-             Write(6,*) " ptc_dumpmaps-1 "
-             Write(6,*) why ! See produce aperture flag routine in sd_frame
+
+             Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
+             call fort_warn('ptc_twiss: ','APERTURE error')
+             call fort_warn('ptc_twiss: ',why)
+             call seterrorflag(10,"ptc_twiss: aperture error ",why);
              c_%watch_user=.false.
              return
           endif
 
           call track(my_ring,xt,i,i+1,getintstate())
+          if ( .not. c_%stable_da) then
+            call fort_warn('ptc_dumpmaps: ','DA got unstable')
+            call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+            return
+          endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
-             Write(6,*) " ptc_dumpmaps-2 "
-             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
+             call fort_warn('ptc_twiss: ','APERTURE error')
+             call fort_warn('ptc_twiss: ',why)
+             call seterrorflag(10,"ptc_twiss: aperture error ",why);
              c_%watch_user=.false.
              return
           endif
@@ -1030,19 +1051,28 @@ CONTAINS
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
-             Write(6,*) " ptc_dumpmaps-3 "
-             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
+             call fort_warn('ptc_twiss: ','APERTURE error')
+             call fort_warn('ptc_twiss: ',why)
+             call seterrorflag(10,"ptc_twiss: aperture error ",why);
              c_%watch_user=.false.
              return
           endif
 
           call track(my_ring,xt,i,i+2,getintstate())
+          if ( .not. c_%stable_da) then
+            call fort_warn('ptc_twiss: ','DA got unstable')
+            call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+            return
+          endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
-             Write(6,*) " ptc_dumpmaps-4 "
-             Write(6,*) why ! See produce aperture flag routine in sd_frame
+             Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
+             call fort_warn('ptc_twiss: ','APERTURE error')
+             call fort_warn('ptc_twiss: ',why)
+             call seterrorflag(10,"ptc_twiss: aperture error ",why);
              c_%watch_user=.false.
              return
           endif
@@ -1148,6 +1178,7 @@ CONTAINS
     integer tab_name(*)
     real(dp) x(6),deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy,d_val
     real(kind(1d0)) get_value,suml
+    integer  geterrorflag !C function that returns errorflag value
     type(real_8) y(6)
     type(twiss) tw
     type(fibre), POINTER :: current
@@ -1167,10 +1198,12 @@ CONTAINS
 
     if(universe.le.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
+       call seterrorflag(1,"ptc_twiss ","no universe created till now");
        return
     endif
     if(index.le.0) then
        call fort_warn('return from ptc_twiss: ',' no layout created')
+       call seterrorflag(2,"ptc_twiss ","no layout created till now");
        return
     endif
 
@@ -1199,6 +1232,7 @@ CONTAINS
 
     if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('return from ptc_twiss: ',' Closed orbit requested on not closed layout.')
+       call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.");
        return
     endif
 
@@ -1259,16 +1293,33 @@ CONTAINS
        deallocate(j)
     elseif(initial_matrix_manual) then
        call readinitialmatrix()
+       if (geterrorflag() /= 0) then
+         return
+       endif
     elseif(beta_flg) then
        call readinitialtwiss()
+       if (geterrorflag() /= 0) then
+         return
+       endif
     else
        c_%watch_user=.true.
        call track(my_ring,y,1,default)
+
+       if ( .not. c_%stable_da) then
+         call fort_warn('ptc_twiss: ','DA got unstable')
+         call seterrorflag(10,"ptc_twiss ","DA got unstable");
+         return
+       endif
+       
        call PRODUCE_APERTURE_FLAG(flag_index)
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
-          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
-          Write(6,*) why ! See produce aperture flag routine in sd_frame
+
+          call fort_warn('ptc_twiss: ','APERTURE unstable (map production)-programs continues')
+          call fort_warn('ptc_twiss: ',why)
+          call seterrorflag(10,"ptc_twiss: aperture error ",why);
+!          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
+!          Write(6,*) why ! See produce aperture flag routine in sd_frame
           c_%watch_user=.false.
           CALL kill(y)
           return
@@ -1278,6 +1329,9 @@ CONTAINS
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
+       if (geterrorflag() /= 0) then
+         return
+       endif
     endif
 
 
@@ -1312,11 +1366,20 @@ CONTAINS
 
        call track(my_ring,y,i,i+1,default)
 
+       if ( .not. c_%stable_da) then
+         call fort_warn('ptc_twiss: ','DA got unstable')
+         call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+         return
+       endif
+
        call PRODUCE_APERTURE_FLAG(flag_index)
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
           Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
-          Write(6,*) why ! See produce aperture flag routine in sd_frame
+          call fort_warn('ptc_twiss: ','APERTURE unstable')
+          call fort_warn('ptc_twiss: ',why)
+          call seterrorflag(10,"ptc_twiss: aperture error ",why);
+!          Write(6,*) why ! See produce aperture flag routine in sd_frame
           goto 100
        endif
 
@@ -2277,6 +2340,7 @@ CONTAINS
     character*12 char_a
     data char_a / ' ' /
     !------------------------------------------------------------------------------
+
 
     if(universe.le.0) then
        call fort_warn('return from ptc_track: ',' no universe created')

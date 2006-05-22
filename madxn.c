@@ -4959,7 +4959,11 @@ void pro_twiss()
       if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
       if (w_file) out_table(table_name, twiss_table, filename);
     }
-    else warning("Twiss failed: ", "MAD-X continues");
+    else 
+    {
+     seterrorflag(1,"pro_twiss","TWISS failed");
+     warning("Twiss failed: ", "MAD-X continues");
+    } 
   }
   if (sec_file)
   {

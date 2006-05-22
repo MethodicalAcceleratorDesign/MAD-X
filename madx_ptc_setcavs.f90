@@ -49,7 +49,7 @@ contains
     !Below we enforce that x(6) is cT, and it is time of flight from the start
     !we use time T=x(6)/ctime to find the time of arrival to a cavity so we can adjust its phase optimally
     localis = getintstate()
-    localis = localis - nocavity + totalpath
+    localis = localis - nocavity0 + totalpath0
     if (getdebug() > 1) then
        print *, "I am in setcavities "
        call print(localis,6)
@@ -72,6 +72,9 @@ contains
     call locate_all_twcav(my_ring,poscav)
     if ( getdebug() > 2 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
     if ( size(poscav) == 0) then
+       if (getdebug() > 1) then
+          close(21);close(24);
+       endif
        return
     endif
 
@@ -101,7 +104,19 @@ contains
 
           p = nfen   ! set current reference energy
           call track(my_ring,x,i,i+1,localis)
+          
+          if ( .not. c_%stable_da) then
+            call fort_warn('setcavities: ','DA got unstable')
+            call seterrorflag(10,"setcavities ","DA got unstable");
 
+            deallocate(poscav);
+            deallocate(phasecav);
+            if (getdebug() > 1) then
+               close(21);close(24);
+            endif
+            return
+          endif
+          
           if ( getdebug()>1 ) then
              write (6,*) ' i=',i,' name=',p%mag%name, &
                   ' beta0 ', nfen%beta0, &
@@ -156,6 +171,18 @@ contains
        !TRACK CAVITY
        call track(my_ring,x,poscav(j),poscav(j)+1,localis)
 
+       if ( .not. c_%stable_da) then
+         call fort_warn('setcavities: ','DA got unstable')
+         call seterrorflag(10,"setcavities ","DA got unstable");
+
+         deallocate(poscav);
+         deallocate(phasecav);
+         if (getdebug() > 1) then
+            close(21);close(24);
+         endif
+         return
+       endif
+
        if (getdebug() > 1) then
           write (21,*) ' '
           write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
@@ -203,6 +230,18 @@ contains
        p = nfen
        call track(my_ring,x,i,i+1,localis)
 
+       if ( .not. c_%stable_da) then
+         call fort_warn('setcavities: ','DA got unstable')
+         call seterrorflag(10,"setcavities ","DA got unstable");
+
+         deallocate(poscav);
+         deallocate(phasecav);
+         if (getdebug() > 1) then
+            close(21);close(24);
+         endif
+         return
+       endif
+
        if (getdebug() > 1) then
           write (21,*) ' '
           write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
@@ -225,10 +264,7 @@ contains
        write (21,*) ' '
        write (21,*) 'END'
        write (21,'(6f8.4)') x
-    endif
-
-
-    if ( getdebug() > 1 ) then
+ 
        write(6,*) 'PARAMETERS AT THE END OF LINE:'
        write(6,'(a, 6f8.4)') ' Track parameters ',x
        write(*,100) 'START energy=',startfen%energy,' momentum=',startfen%p0c,' kinetic=',startfen%kinetic

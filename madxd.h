@@ -96,6 +96,8 @@
 #define w_ptc_settime           w_ptc_settime_
 #define w_ptc_setnocavity       w_ptc_setnocavity_
 
+#define seterrorflagfort        seterrorflagfort_  /*sets the dglobal error flag*/
+#define geterrorflag            geterrorflag_  /*returns the dglobal error flag*/
 #define stolower                stolower_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
@@ -715,6 +717,7 @@ void w_ptc_settime(int* boolflag);
 void w_ptc_setnocavity(int* boolflag);
 void w_ptc_script(int* scriptname);
 void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
+void w_ptc_enforce6d(int* flag);
 
 int twiss_input(struct command*);
 void update_beam();
@@ -880,7 +883,11 @@ void write_elstart(FILE*);
 void cf77flush();
 
 /*Debug level */
+void seterrorflagfort(int* errcode, const char* from, int *lf, const char* descr, int *ld);
+void seterrorflag (int  errcode, const char* from, const char* descr);
+int  geterrorflag();
 int debuglevel = 1;
+int errorflag = 0; 
 
 /* Global structure variables by type (alphabetic) */
 struct char_array* aux_buff;       /* temporary buffer for many purposes */

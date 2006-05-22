@@ -1316,6 +1316,8 @@ void exec_command()
   struct in_cmd* p = this_cmd;
   struct in_cmd* pp;
   int ret, izero = 0, pos;
+  
+  
   if (p->cmd_def != NULL)
   {
     while (strcmp(p->cmd_def->name, "exec") == 0)
@@ -3484,6 +3486,9 @@ void pro_input(char* statement)
   int type, code, nnb, ktmp;
   char* sem;
   int rs, re, start = 0, l = strlen(statement);
+
+  errorflag = 0; /*reset global error flag */
+
   while (start < l)
   {
     if ((type = in_spec_list(&statement[start])))
@@ -4336,8 +4341,8 @@ int table_row(struct table* table, char* name)
   {
     if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
   }
-  if(ret==-1) fatal_error("Name of row not found", name);
-/*  if(ret==-1) warning("table_row","Name of row not found: %s,", name);*/
+/*  if(ret==-1) fatal_error("Name of row not found", name);*/
+  if(ret==-1) warning("table_row: Name of row not found:",name);
   return ret;
 }
 
@@ -4684,6 +4689,41 @@ double variable_value(struct variable* var)
     k = val; val = k;
   }
   return val;
+}
+
+void seterrorflagfort(int* errcode, const char* from, int *lf, const char* descr, int *ld)
+{
+/*Sets error flag - Used to comunicate occurance of an error.
+Mainly between c and fortran parts
+This one is called from Fortran
+*/
+  static const int maxlength = 200;
+  char f[200];
+  char d[200];
+  int n = *lf , m = *ld;
+  if (n >= maxlength ) n = maxlength - 1;  
+  if (m >= maxlength ) m = maxlength - 1;  
+  strncpy(f,from,n);
+  strncpy(d,descr,m);
+  f[n]=0;
+  d[m]=0;
+  seterrorflag(*errcode,f,d);
+}
+
+void seterrorflag(int errcode, const char* from, const char* descr)
+{
+/*Sets error flag - Used to comunicate occurance of an error.
+Mainly between c and fortran parts*/
+  errorflag = errcode;
+  error("seterrorflag","Errorcode: %d   Reported from %s:",errorflag,from);
+  error("seterrorflag","Description: %s",descr);
+
+}
+
+int  geterrorflag()
+{
+ /*returns errorflag status - used by fortran code to check if error occured*/
+ return errorflag;
 }
 
 void warningnew(char* t1, char* fmt, ...)
