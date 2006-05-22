@@ -1990,3 +1990,26 @@
      &' on UNIT ',i
       stop
       end
+
+
+      subroutine seterrorflag(errorcode,from,descr)
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Puts global error flag in c code.                                  *
+! Input:                                                               *
+!   errorcode                                                          *
+!   from - name of a routine where the error occured                   *
+!   descr - description of the error that has occured                  *
+! Input/output:                                                        *
+!----------------------------------------------------------------------*
+        implicit none
+        integer :: errorcode
+        character* (*) :: from
+        character* (*) :: descr
+        integer  n,m
+
+        n = LEN(from) 
+        m = LEN(descr) 
+        call seterrorflagfort(errorcode,from,n,descr,m)
+
+      end subroutine seterrorflag
