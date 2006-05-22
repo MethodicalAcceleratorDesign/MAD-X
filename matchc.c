@@ -1,3 +1,5 @@
+#include <float.h>
+
 void mtsa_(int*, int*, double*, int*, int*, double*, double*, int*, int*,
            double*, int*, double*, double*, double*, double*, double*);
 void match_action(struct in_cmd* cmd)
@@ -141,29 +143,46 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
   int j,k=0;/* RDM fork */
   double rhs,lhs,r;/* RDM fork */
   char execute[40],s;/* RDM fork */
-
+  static int nconserrs = 0; /*number of call finihed with error*/
+  
   if (match_is_on==2) { /* RDM fork */
     for(i=0;match2_macro_name[i]!=NULL;i++) {
       sprintf(execute,"exec, %s;",match2_macro_name[i]);
       pro_input(execute);
-/*      if (twiss_success) {*/
-      *stab_flag=0;
-      for(j=0;match2_cons_name[i][j]!=NULL;j++) {
-        rhs=expression_value(match2_cons_rhs[i][j],2);
-        lhs=expression_value(match2_cons_lhs[i][j],2);
-        s =match2_cons_sign[i][j];
-        r=lhs - rhs;
-        fun_vec[k]=match2_cons_weight[i][j]*r;
-        if (s == '>' && r > 0) fun_vec[k]=0;
-        else if (s == '<'  && r < 0) fun_vec[k]=0;
-        match2_cons_value[i][j]=fun_vec[k];
-        match2_cons_value_rhs[i][j]=rhs;
-        match2_cons_value_lhs[i][j]=lhs;
-        k++;
+      if (errorflag == 0) 
+       {
+         *stab_flag=0;
+         for(j=0;match2_cons_name[i][j]!=NULL;j++) {
+           rhs=expression_value(match2_cons_rhs[i][j],2);
+           lhs=expression_value(match2_cons_lhs[i][j],2);
+           s =match2_cons_sign[i][j];
+           r=lhs - rhs;
+           fun_vec[k]=match2_cons_weight[i][j]*r;
+           if (s == '>' && r > 0) fun_vec[k]=0;
+           else if (s == '<'  && r < 0) fun_vec[k]=0;
+           match2_cons_value[i][j]=fun_vec[k];
+           match2_cons_value_rhs[i][j]=rhs;
+           match2_cons_value_lhs[i][j]=lhs;
+           k++;
+         }
+        nconserrs = 0; 
+       } 
+      else 
+      {  
+        nconserrs++;
+        if (nconserrs > 5)
+         { /*return the error code only after 5 consecutive fails*/
+           *stab_flag=1; return;
+         }
+        else
+         { /*otherwise just put all the constraints to max double value*/
+           *stab_flag=0;
+           for(j=0; j <= *nf; j++) 
+            {
+              fun_vec[j] = DBL_MAX;
+            }  
+         } 
       }
-/*      } else {*/
-/*        *stab_flag=1; return;*/
-/*      }*/
     }
   } else { /* RDM old match */
     current_const = 0;
@@ -186,7 +205,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       if (get_option("sectormap") != zero) fprintf(prt_file, "%s\n", "call TWISS with SECTORMAP");
 
       pro_twiss();
-      if (twiss_success)
+      if ((twiss_success) && (errorflag == 0))
       {
         *stab_flag = 0;
         collect_(&current_const, &penalty, fun_vec);
