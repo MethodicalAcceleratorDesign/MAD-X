@@ -27,11 +27,13 @@ module madx_ptc_tablepush_module
   integer                                       :: npushes = 0
   character(20), private, dimension(20)         :: tables  !tables names of existing pushes - each is listed only ones
   integer,       private                        :: ntables = 0 !number of distictive tables
+  real(dp),      private, allocatable           :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
 
   !    routines
   private                                       :: augment_counts
   private                                       :: issuchtableexist
   private                                       :: putnameintables
+
 
 contains
   !____________________________________________________________________________________________
@@ -73,51 +75,61 @@ contains
 
     call augment_counts()
 
+  !____________________________________________________________________________________________
   contains
+    !____________________________________________________________________________________________
     subroutine sixdmode()
       implicit none
       integer ele
       character bufchar
       character(10) monstr
 
+        do i=1,npushes
 
-      do i=1,npushes
-
-         if (pushes(i)%element < 5) then
-            e => y(pushes(i)%element)
-         else
-            if (pushes(i)%element == 5) then
+           if (pushes(i)%element < 5) then
+             e => y(pushes(i)%element)
+           else       
+             if (pushes(i)%element == 5) then
                e => y(6) !6th coordinate  is d(cT) or cT
-            else
-               e => y(5) !5th coordinate is dp/p
-            endif
-         endif
+             else
+               e => y(5) !5th coordinate is dp/p  
+             endif
+           endif
 
-         monstr = pushes(i)%monomial
-         print*, "Orig mono: ",monstr
-         bufchar = monstr(5:5)
-         monstr(5:5) = monstr(6:6)
-         monstr(6:6) = bufchar
-         print*, "Inv. mono: ",monstr
+           monstr = pushes(i)%monomial
+           bufchar = monstr(5:5)
+           monstr(5:5) = monstr(6:6)
+           monstr(6:6) = bufchar
+           
+           coeff = e.sub.(monstr)
 
-         coeff = e.sub.(monstr)
+           if (getdebug()>3) then
+              write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+                   &        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+                   &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+                   &        " for fibre no ",n
+           endif
 
-         if (getdebug()>3) then
-            write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-                 &        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
-                 &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
-                 &        " for fibre no ",n
-         endif
+           call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
 
-         call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
-
-      enddo
-    end subroutine sixdmode
+        enddo
+      end subroutine sixdmode
 
     !____________________________________________________________________________________________
-
+      
   end subroutine putusertable
   !____________________________________________________________________________________________
+
+  subroutine inittables()
+    implicit none
+    integer  :: i ! iterator
+
+    deallocate(dismom)
+     
+    allocate(dismom(c_%nd,0:c_%no/2))
+    
+    
+  end subroutine inittables
 
   subroutine cleartables()
     implicit none
@@ -170,7 +182,7 @@ contains
     pushes(npushes)%colname = charconv(column)
     pushes(npushes)%element = element
     pushes(npushes)%monomial = charconv(monomial)
-
+    !imput "int string"  has the length of the string at the first plave
     pushes(npushes)%tabname(table(1)+1:table(1)+1)=achar(0)
     pushes(npushes)%colname(column(1)+1:column(1)+1)=achar(0)
     pushes(npushes)%monomial(monomial(1)+1:monomial(1)+1)=achar(0)
@@ -210,6 +222,76 @@ contains
 
   end function issuchtableexist
   !____________________________________________________________________________________________
+
+  subroutine average_x_i_x_j(y,ave,i,j)   !  Computes <x_i x_j>
+    implicit none
+    type(real_8) y(6)
+    type(taylor) ave
+    type(taylorresonance) tr
+    integer i,j
+
+    call alloc(tr)
+
+    if(j/=0) then
+       tr=y(i)%t*y(j)%t
+    else
+       tr=y(i)%t
+    endif
+
+    call cfu(tr%cos,filter,ave)
+
+    call kill(tr)
+  end subroutine average_x_i_x_j
+  !_________________________________________________________________________________
+
+  real(dp) function filter(e)   !  Computes <x_i x_j>
+    implicit none
+    integer e(:)
+    integer i
+
+    filter=one
+
+    do i=1,c_%nd
+       if(e(2*i-1)/=e(2*i)) then
+          filter=zero
+          return
+       else
+          filter=filter*dismom(i,e(2*i)) 
+       endif
+    enddo
+
+  end function filter
+  !_________________________________________________________________________________
+
+
+
+  subroutine make_gaussian(plane,I0)
+    implicit none
+    integer plane,i
+    real(dp) I0
+
+    dismom(plane,0)=one
+
+    do i=1,c_%no/2
+       dismom(plane,i)=i*I0*two*dismom(plane,i-1)
+    enddo
+
+  end   subroutine make_gaussian
+  !_________________________________________________________________________________
+
+  subroutine make_ring(plane,I0)
+    implicit none
+    integer plane,i
+    real(dp) I0
+
+    dismom(plane,0)=one
+
+    do i=1,c_%no/2
+       dismom(plane,i)=I0*two*dismom(plane,i-1)
+    enddo
+
+  end   subroutine make_ring
+  !_________________________________________________________________________________
 
 
 end module madx_ptc_tablepush_module
