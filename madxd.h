@@ -887,7 +887,7 @@ void seterrorflagfort(int* errcode, const char* from, int *lf, const char* descr
 void seterrorflag (int  errcode, const char* from, const char* descr);
 int  geterrorflag();
 int debuglevel = 1;
-int errorflag = 0; 
+int errorflag = 0;
 
 /* Global structure variables by type (alphabetic) */
 struct char_array* aux_buff;       /* temporary buffer for many purposes */
@@ -1067,8 +1067,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.02";
-char code_mod_date[] = "Code Modification Date: 16.05.2006";
+char myversion[] = "MAD-X 3.03.03";
+char code_mod_date[] = "Code Modification Date: 25.05.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
