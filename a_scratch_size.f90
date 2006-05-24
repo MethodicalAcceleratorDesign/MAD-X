@@ -33,7 +33,7 @@ module precision_constants
   integer,parameter::vp=16
   integer,parameter::lp=4
   integer,parameter::sp=kind(1e0)
-  integer,parameter::dp=selected_real_kind(2*kind(1e0))
+  integer,parameter::dp=selected_real_kind(2*precision(1e0_sp))
   !Logicals
   logical(lp),parameter:: my_true=.true.
   logical(lp),parameter:: my_false=.false.
@@ -63,11 +63,11 @@ module precision_constants
   real(dp),parameter::c_840=840e0_dp,c_360=360e0_dp,c_300=300e0_dp,c_137=137e0_dp
   real(dp),parameter::c_0_28=0.28e0_dp,c_0_31=0.31e0_dp,c_1_8=1.8e0_dp
   real(dp),parameter::c_1d_5=1e-5_dp, c_0_3079=0.3079e0_dp
-   !Mathematical Constants
+  !Mathematical Constants
   real(dp),TARGET :: hyperbolic_aperture=ten
   real(dp),parameter::pi=3.141592653589793238462643383279502e0_dp,twopi=two*pi,pih=pi*half
   real(dp),parameter::twopii=one/twopi,pil=pih-c_4d_1,pim=pih+c_4d_1
-!  real(dp),parameter::rpi4=1.772453850905516027298167e0_dp/two ! rpi4=sqrt(pi)/2
+  !  real(dp),parameter::rpi4=1.772453850905516027298167e0_dp/two ! rpi4=sqrt(pi)/2
   real(dp)::rpi4
   real(dp),parameter::RAD_TO_DEG_=c_180/pi,DEG_TO_RAD_=pi/c_180
   !Physical Constants
@@ -143,7 +143,21 @@ module precision_constants
   !Initialized numbers
   real(dp)::eps=1e-38_dp
   real(dp)::EPSdol=1e-37_dp
-
+  LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
+  LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
+  LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
+  LOGICAL(lp) :: ALLOW_TRACKING=.true.
+  LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
+  LOGICAL(lp),TARGET  :: APERTURE_FLAG=.FALSE.
+  LOGICAL(lp),TARGET  :: check_x_min  =.true.   ! check if lost by aperture fitted now
+  LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
+  LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
+  LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
+  REAL(dp),TARGET   :: absolute_aperture=c_1d3
+  logical(lp),TARGET :: stable_da =.true.
+  logical(lp),TARGET :: check_da =.true.
+  real(dp),target ::  da_absolute_aperture=c_1d6
+  real(dp) :: crash=-one
   type info_window
      character(3) adv
      integer nc,nr,ni
@@ -268,13 +282,22 @@ module precision_constants
      MODULE PROCEDURE read_d_a
   END INTERFACE
 
-
 contains
 
-  !  SUBROUTINE check_stability(c)
-  !    IMPLICIT NONE
+  SUBROUTINE  check_stability(S1)
+    implicit none
+    REAL(DP),INTENT(INOUT)::S1(6)
+    INTEGER I
 
-  !  end   SUBROUTINE check_stability
+    DO I=1,5
+       IF(ABS(S1(I))>C_%ABSOLUTE_APERTURE) THEN
+          S1=PUNY
+          C_%CHECK_STABLE=.FALSE.
+          EXIT
+       ENDIF
+    ENDDO
+
+  end   SUBROUTINE check_stability
 
   ! Symplectic integrator routines setting coefficients
 
@@ -434,6 +457,154 @@ contains
     integer i
     read(5,*) (iex(i),i=1,n)
   END SUBROUTINE read_d_a
+
+  ! moved here from sa_extend_poly.f90
+
+  REAL(DP) FUNCTION  ROOT(X)  ! REPLACES SQRT(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+
+    IF((X<ZERO).AND.c_%ROOT_CHECK) THEN
+       ROOT=ONE
+       c_%CHECK_STABLE=.FALSE.
+    ELSEIF(X>=ZERO) THEN
+       ROOT=SQRT(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ROOT=ONE
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION ROOT
+
+  REAL(DP) FUNCTION  ARCSIN(X)  ! REPLACES ASIN(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
+       ARCSIN=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ELSEIF(ABS(X)<=ONE) THEN
+       ARCSIN=ASIN(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ARCSIN=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION ARCSIN
+
+  REAL(DP) FUNCTION  ARCCOS(X)  ! REPLACES ACOS(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
+       ARCCOS=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ELSEIF(ABS(X)<=ONE) THEN
+       ARCCOS=ACOS(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ARCCOS=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION ARCCOS
+
+  REAL(DP) FUNCTION  LOGE(X)  ! REPLACES ACOS(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+
+    IF(X<=ZERO.AND.c_%ROOT_CHECK) THEN
+       LOGE=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ELSE
+       LOGE=LOG(X)
+    ENDIF
+
+  END FUNCTION LOGE
+
+
+
+  REAL(DP) FUNCTION  COSEH(X) ! REPLACES COSH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+
+    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
+       COSEH=ONE
+       c_%CHECK_STABLE=.FALSE.
+    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
+       COSEH=COSH(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       COSEH=ONE
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION COSEH
+
+  REAL(DP) FUNCTION  SINEH(X) ! REPLACES SINH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+
+    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
+       SINEH=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
+       SINEH=SINH(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       SINEH=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION SINEH
+
+  REAL(DP) FUNCTION  arctan(X) ! REPLACES SINH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) return
+
+    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
+       arctan=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
+       arctan=atan(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       arctan=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION arctan
+
+  SUBROUTINE RESET_APERTURE_FLAG
+    IMPLICIT NONE
+    IF(c_%WATCH_USER) THEN
+       IF(.NOT.ALLOW_TRACKING) THEN
+          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
+          WRITE(6,*) "  YOU DID NOT CHECK THE APERTURE STATUS"
+          WRITE(6,*) "  USING A CALL TO PRODUCE_APERTURE_FLAG"
+          WRITE(6,*) "  BEFORE CALLING A TRACKING FUNCTION"
+          STOP 666
+       ENDIF
+       IF(.NOT.c_%check_stable) THEN
+          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
+          WRITE(6,*) " CODE MOST LIKELY DIED IN PURE DA/TPSA/LIE OPERATIONS  "
+          STOP 667
+       ENDIF
+    ENDIF
+    c_%STABLE_DA =.TRUE.
+    c_%CHECK_STABLE =.TRUE.
+    c_%CHECK_MADX_APERTURE =.TRUE.
+    !frs 10.03.2006    c_%check_iteration =.TRUE.
+    !frs 10.03.2006    c_%check_interpolate_x =.TRUE.
+    !frs 10.03.2006    c_%check_interpolate_y =.TRUE.
+    c_%check_x_min =.TRUE.
+    c_%check_x_max =.TRUE.
+    c_%check_y_min =.TRUE.
+    c_%check_y_max =.TRUE.
+    c_%stable_da =.true.
+
+  END   SUBROUTINE RESET_APERTURE_FLAG
 
 end module precision_constants
 
@@ -1119,7 +1290,7 @@ integer function mypause(i)
   w_p%nc=1
   w_p%c(1)=' ipause=mypause(0)  ';w_p%fc='((A8,1x))'
 
-  ! call write_i
+  call write_i
   ! read(*,*) I
   mypause=i
   ! mypause=sqrt(dble(-i))
@@ -1145,7 +1316,7 @@ integer function mypauses(i,string)
   w_p%c(2)=' ipause=mypause(0)  ';w_p%fc='((A120,1x,/,a8,1x,))'
 
   call write_i
-  read(*,*) I
+  !  read(*,*) I
   mypauses=i
-  mypauses=sqrt(dble(-i))
+  !  mypauses=sqrt(dble(-i))
 end function mypauses
