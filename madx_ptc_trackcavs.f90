@@ -41,7 +41,7 @@ contains
     integer              :: n = 1
     integer              :: nturns = 1
     integer              :: t = 1
-    logical(dp)          :: gcs
+    logical(lp)          :: gcs
     real (dp)            :: gposx, gposy, gposz
     integer              :: e
     integer              :: apertflag
