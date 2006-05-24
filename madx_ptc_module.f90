@@ -983,7 +983,7 @@ CONTAINS
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
        if (geterrorflag() /= 0) then
-         return
+          return
        endif
     endif
 
@@ -1009,9 +1009,9 @@ CONTAINS
           call track(my_ring,y2,i,i+1,getintstate())
 
           if ( .not. c_%stable_da) then
-            call fort_warn('ptc_dumpmaps: ','DA got unstable')
-            call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
-            return
+             call fort_warn('ptc_dumpmaps: ','DA got unstable')
+             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             return
           endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
@@ -1028,9 +1028,9 @@ CONTAINS
 
           call track(my_ring,xt,i,i+1,getintstate())
           if ( .not. c_%stable_da) then
-            call fort_warn('ptc_dumpmaps: ','DA got unstable')
-            call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
-            return
+             call fort_warn('ptc_dumpmaps: ','DA got unstable')
+             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             return
           endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
@@ -1061,9 +1061,9 @@ CONTAINS
 
           call track(my_ring,xt,i,i+2,getintstate())
           if ( .not. c_%stable_da) then
-            call fort_warn('ptc_twiss: ','DA got unstable')
-            call seterrorflag(10,"ptc_twiss ","DA got unstable ");
-            return
+             call fort_warn('ptc_twiss: ','DA got unstable')
+             call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+             return
           endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
@@ -1294,23 +1294,23 @@ CONTAINS
     elseif(initial_matrix_manual) then
        call readinitialmatrix()
        if (geterrorflag() /= 0) then
-         return
+          return
        endif
     elseif(beta_flg) then
        call readinitialtwiss()
        if (geterrorflag() /= 0) then
-         return
+          return
        endif
     else
        c_%watch_user=.true.
        call track(my_ring,y,1,default)
 
        if ( .not. c_%stable_da) then
-         call fort_warn('ptc_twiss: ','DA got unstable')
-         call seterrorflag(10,"ptc_twiss ","DA got unstable");
-         return
+          call fort_warn('ptc_twiss: ','DA got unstable')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable");
+          return
        endif
-       
+
        call PRODUCE_APERTURE_FLAG(flag_index)
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -1318,8 +1318,8 @@ CONTAINS
           call fort_warn('ptc_twiss: ','APERTURE unstable (map production)-programs continues')
           call fort_warn('ptc_twiss: ',why)
           call seterrorflag(10,"ptc_twiss: aperture error ",why);
-!          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
-!          Write(6,*) why ! See produce aperture flag routine in sd_frame
+          !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
+          !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           c_%watch_user=.false.
           CALL kill(y)
           return
@@ -1330,7 +1330,7 @@ CONTAINS
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
        if (geterrorflag() /= 0) then
-         return
+          return
        endif
     endif
 
@@ -1367,9 +1367,9 @@ CONTAINS
        call track(my_ring,y,i,i+1,default)
 
        if ( .not. c_%stable_da) then
-         call fort_warn('ptc_twiss: ','DA got unstable')
-         call seterrorflag(10,"ptc_twiss ","DA got unstable ");
-         return
+          call fort_warn('ptc_twiss: ','DA got unstable')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+          return
        endif
 
        call PRODUCE_APERTURE_FLAG(flag_index)
@@ -1379,7 +1379,7 @@ CONTAINS
           call fort_warn('ptc_twiss: ','APERTURE unstable')
           call fort_warn('ptc_twiss: ',why)
           call seterrorflag(10,"ptc_twiss: aperture error ",why);
-!          Write(6,*) why ! See produce aperture flag routine in sd_frame
+          !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           goto 100
        endif
 

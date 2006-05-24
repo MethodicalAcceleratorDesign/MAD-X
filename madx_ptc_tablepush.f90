@@ -75,7 +75,7 @@ contains
 
     call augment_counts()
 
-  !____________________________________________________________________________________________
+    !____________________________________________________________________________________________
   contains
     !____________________________________________________________________________________________
     subroutine sixdmode()
@@ -84,39 +84,39 @@ contains
       character bufchar
       character(10) monstr
 
-        do i=1,npushes
+      do i=1,npushes
 
-           if (pushes(i)%element < 5) then
-             e => y(pushes(i)%element)
-           else       
-             if (pushes(i)%element == 5) then
+         if (pushes(i)%element < 5) then
+            e => y(pushes(i)%element)
+         else
+            if (pushes(i)%element == 5) then
                e => y(6) !6th coordinate  is d(cT) or cT
-             else
-               e => y(5) !5th coordinate is dp/p  
-             endif
-           endif
+            else
+               e => y(5) !5th coordinate is dp/p
+            endif
+         endif
 
-           monstr = pushes(i)%monomial
-           bufchar = monstr(5:5)
-           monstr(5:5) = monstr(6:6)
-           monstr(6:6) = bufchar
-           
-           coeff = e.sub.(monstr)
+         monstr = pushes(i)%monomial
+         bufchar = monstr(5:5)
+         monstr(5:5) = monstr(6:6)
+         monstr(6:6) = bufchar
 
-           if (getdebug()>3) then
-              write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-                   &        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
-                   &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
-                   &        " for fibre no ",n
-           endif
+         coeff = e.sub.(monstr)
 
-           call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+         if (getdebug()>3) then
+            write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+                 &        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+                 &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+                 &        " for fibre no ",n
+         endif
 
-        enddo
-      end subroutine sixdmode
+         call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+
+      enddo
+    end subroutine sixdmode
 
     !____________________________________________________________________________________________
-      
+
   end subroutine putusertable
   !____________________________________________________________________________________________
 
@@ -125,10 +125,10 @@ contains
     integer  :: i ! iterator
 
     deallocate(dismom)
-     
+
     allocate(dismom(c_%nd,0:c_%no/2))
-    
-    
+
+
   end subroutine inittables
 
   subroutine cleartables()
@@ -256,7 +256,7 @@ contains
           filter=zero
           return
        else
-          filter=filter*dismom(i,e(2*i)) 
+          filter=filter*dismom(i,e(2*i))
        endif
     enddo
 
