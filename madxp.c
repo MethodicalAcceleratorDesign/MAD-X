@@ -1316,8 +1316,8 @@ void exec_command()
   struct in_cmd* p = this_cmd;
   struct in_cmd* pp;
   int ret, izero = 0, pos;
-  
-  
+
+
   if (p->cmd_def != NULL)
   {
     while (strcmp(p->cmd_def->name, "exec") == 0)
@@ -4694,15 +4694,15 @@ double variable_value(struct variable* var)
 void seterrorflagfort(int* errcode, const char* from, int *lf, const char* descr, int *ld)
 {
 /*Sets error flag - Used to comunicate occurance of an error.
-Mainly between c and fortran parts
-This one is called from Fortran
+  Mainly between c and fortran parts
+  This one is called from Fortran
 */
   static const int maxlength = 200;
   char f[200];
   char d[200];
   int n = *lf , m = *ld;
-  if (n >= maxlength ) n = maxlength - 1;  
-  if (m >= maxlength ) m = maxlength - 1;  
+  if (n >= maxlength ) n = maxlength - 1;
+  if (m >= maxlength ) m = maxlength - 1;
   strncpy(f,from,n);
   strncpy(d,descr,m);
   f[n]=0;
@@ -4713,7 +4713,7 @@ This one is called from Fortran
 void seterrorflag(int errcode, const char* from, const char* descr)
 {
 /*Sets error flag - Used to comunicate occurance of an error.
-Mainly between c and fortran parts*/
+  Mainly between c and fortran parts*/
   errorflag = errcode;
   error("seterrorflag","Errorcode: %d   Reported from %s:",errorflag,from);
   error("seterrorflag","Description: %s",descr);
@@ -4722,8 +4722,8 @@ Mainly between c and fortran parts*/
 
 int  geterrorflag()
 {
- /*returns errorflag status - used by fortran code to check if error occured*/
- return errorflag;
+  /*returns errorflag status - used by fortran code to check if error occured*/
+  return errorflag;
 }
 
 void warningnew(char* t1, char* fmt, ...)
