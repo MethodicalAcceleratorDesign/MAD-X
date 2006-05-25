@@ -29,9 +29,6 @@ module da_arrays
   real(dp) facint(0:lno)
   integer nhole
   integer,TARGET :: lda_used =1000
-  logical(lp),TARGET :: stable_da =.true.
-  logical,TARGET :: check_da =.false.
-  real(dp),target ::  da_absolute_aperture=c_1d6
 
 contains
 

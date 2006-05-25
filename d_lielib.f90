@@ -9,7 +9,7 @@ module lielib_berz
   use precision_constants
   implicit none
   private
-  PUBLIC FILTRES,DLIE,FILT,DFILT,XGAM,XGBM,REXT, EIG6
+  PUBLIC DLIE,FILT,DFILT,XGAM,XGBM,REXT  !,FILTRES
   PUBLIC LIEPEEK,INITPERT,HYPER,MAPFLOL
   PUBLIC ETALL1,TAKE,ETALL,DAPEK0,ETINI,DACLRD,DACOPD,DIFD
   PUBLIC INTD,ETCCT,TRXFLO,TRX,FACFLOD,EXPFLO,DALIND,ETINV
@@ -18,17 +18,18 @@ module lielib_berz
   PUBLIC LIEINIT,PERTPEEK,FLOWPARA,COMCFU
   PUBLIC DAPOK0,FACFLO,EXPFLOD
   integer,public,parameter::ndim=3,nreso=20
-  integer,public::no,nv,nd,nd2,ndc,ndc2,ndt,ndpt,iref,itu,idpr,iflow,jtune,nres,ifilt
-  integer,public,dimension(ndim)::nplane,idsta,ista
-  real(dp),public,dimension(0:20)::xintex
-  real(dp),public,dimension(ndim)::dsta,sta,angle,rad,ps,rads
-  real(dp),public,dimension(ndim,nreso)::mx
+  integer,public::no,nv,nd,nd2,ndpt
+  integer ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
+  integer,dimension(ndim)::nplane,idsta,ista
+  real(dp),dimension(0:20)::xintex
+  real(dp),dimension(ndim)::dsta,sta,angle,rad,ps,rads
+  real(dp),dimension(ndim,nreso)::mx
   !real(dp),private::epsplane
   !real(dp),private,dimension(ndim)::xplane
   !integer,public,parameter::ndim2=2*ndim,ntt=40
   integer,private,parameter::ndim2=2*ndim,ntt=100
   character(120) line
-  public getcct,GETINV,gtrx
+  public getcct,GETINV,gtrx,eig6
 contains
 
   subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
@@ -85,11 +86,7 @@ contains
     if(iref1.eq.0) iref=-1
 
     if(idpr.eq.1) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72),/))'
-       write(w_p%c(1),'(a6,i4,a20)') ' NO = ',no,' IN DA-CALCULATIONS '
-       CALL WRITE_i
+       write(6,'(a6,i4,a20)') ' NO = ',no,' IN DA-CALCULATIONS '
     endif
 
     do i=0,20
@@ -886,25 +883,25 @@ contains
     enddo
     return
   end subroutine daprid
-  real(dp) function filtres(j)
-    implicit none
-    integer i,ic
-    !      INTEGER J(NTT)
-    integer,dimension(:)::j
-    if(.not.c_%stable_da) return
-
-    filtres=one
-    ic=0
-    do i=1,(nd2-ndc2)
-       ic=ic+j(i)*(-1)**(i+1)
-    enddo
-    ic=ic+ifilt
-    if(ic.lt.0) filtres=zero
-    if(ic.eq.0.and.ifilt.eq.1) then
-       filtres=zero
-    endif
-    return
-  end function filtres
+  !  real(dp) function filtres(j)
+  !    implicit none
+  !    integer i,ic
+  !    !      INTEGER J(NTT)
+  !    integer,dimension(:)::j
+  !    if(.not.c_%stable_da) return
+  !
+  !    filtres=one
+  !    ic=0
+  !    do i=1,(nd2-ndc2)
+  !       ic=ic+j(i)*(-1)**(i+1)
+  !    enddo
+  !    ic=ic+ifilt
+  !    if(ic.lt.0) filtres=zero
+  !   if(ic.eq.0.and.ifilt.eq.1) then
+  !      filtres=zero
+  !   endif
+  !   return
+  ! end function filtres
   subroutine daflo(h,x,y)
     implicit none
     ! LIE EXPONENT ROUTINES WITH FLOW OPERATORS
@@ -1059,13 +1056,9 @@ contains
        call dacop(b3,b4)
     enddo
     if(idpr.ge.0) then
-       w_p=0
-       w_p%nc=2
-       w_p%fc='(((1X,A72),/,(1X,A72)))'
-       write(w_p%c(1),'(a6,1x,g20.14,1x,a25)') ' NORM ',eps,' NEVER REACHED IN EXPFLO '
-       w_p%c(2)='NEW IDPR '
-       CALL WRITE_i
-       call read(idpr)
+       write(6,'(a6,1x,g20.14,1x,a25)') ' NORM ',eps,' NEVER REACHED IN EXPFLO '
+       write(6,*) 'NEW IDPR '
+       read(5,*)idpr
     endif
     call dacop(b3,y)
     call dadal1(b4)
@@ -2379,22 +2372,21 @@ contains
     call mapflol(sa,sai,cr,cm,st)
     do i=1,nd-ndc
        if(st(i)+c_1d_3.gt.one) then
-          a(i)=SQRT(cr(2*i-1,2*i-1)**2+cr(2*i-1,2*i)**2)
-          q(i)=ACOS(cr(2*i-1,2*i-1)/a(i))
-          a(i)=LOG(a(i))
+          a(i)=root(cr(2*i-1,2*i-1)**2+cr(2*i-1,2*i)**2)
+          q(i)=ARCCOS(cr(2*i-1,2*i-1)/a(i))
+          a(i)=LOGE(a(i))
           if(cr(2*i-1,2*i).lt.zero) q(i)=twopi-q(i)
        else
-          a(i)=SQRT(cr(2*i-1,2*i-1)**2-cr(2*i-1,2*i)**2)
+          a(i)=ROOT(cr(2*i-1,2*i-1)**2-cr(2*i-1,2*i)**2)
           ch=cr(2*i-1,2*i-1)/a(i)
           shm=cr(2*i-1,2*i)/a(i)
           !       CH=CH+SQRT(CH**2-one)
           !       q(i)=LOG(CH)
-          q(i)=-LOG(ch+shm)   ! half integer ???? blows up
+          q(i)=-LOGE(ch+shm)   ! half integer ???? blows up
           !       IF(cr(2*i-1,2*i).gt.zero) Q(I)=-Q(I)
-          a(i)=LOG(a(i))
+          a(i)=LOGE(a(i))
        endif
     enddo
-
     if(ndc.eq.0) then
        if(st(3)+c_1d_3.gt.one.and.nd.eq.3.and.q(nd).gt.half) q(3)=q(3)-twopi
     else

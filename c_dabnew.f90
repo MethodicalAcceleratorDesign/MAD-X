@@ -221,7 +221,12 @@ contains
     !frs if(eps.le.zero) eps=c_1d_38
     !      if(EPS.le.zero) eps=c_1d_90
     !frs epsmac=c_1d_7
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nv.eq.0) return
 
     call alloc_all(no,nv,nd2t)
@@ -254,7 +259,7 @@ contains
     !    enddo
     !
     if(nv.gt.lnv.or.no.gt.lno) then
-       write(line,'(a36,1x,i4,1x,i4)') 'ERROR IN SUBROUTINE DAINI, NO, NV = ',no,nv
+       write(6,*) 'ERROR IN SUBROUTINE DAINI, NO, NV = ',no,nv
        ipause=mypauses(1,line)
        call dadeb(31,'ERR DAINI ',1)
     endif
@@ -559,7 +564,12 @@ contains
     integer,dimension(:)::ic
     real(dp) x
     character(10) c,ccc
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     no=nomax
     nv=nvmax
@@ -664,7 +674,12 @@ contains
     logical(lp) incnda
     integer ind,ndanum,no,nv,ic,ipause,mypauses
     character(10) c,ccc
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     no=nomax
     nv=nvmax
@@ -768,7 +783,12 @@ contains
     integer i,ind,l,ndanum,no,nv,ipause,mypauses
     integer,dimension(:)::ic
     character(10) c,ccc
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     ind = 1
 
@@ -874,7 +894,12 @@ contains
     logical(lp) incnda
     integer ic,ind,ndanum,no,nv,ipause,mypauses
     character(10) c,ccc
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     ind = 1
 
@@ -977,7 +1002,12 @@ contains
     integer i,l,ipause,mypauses
     integer,dimension(:)::idal
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     do i=l,1,-1
        if(idal(i).le.nomax+2.or.idal(i).gt.nda) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda
@@ -1016,7 +1046,12 @@ contains
     !
     integer idal,ipause,mypauses
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(idal.le.nomax+2.or.idal.gt.nda) then
        write(line,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,nda
        ipause=mypauses(14,line)
@@ -1072,8 +1107,19 @@ contains
     integer i,ibase,ic1,ic2,illa,ilma,ina,inoa,inva,ipoa,ipause,mypauses
     real(dp) ckon
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(i.gt.inva) then
@@ -1133,8 +1179,19 @@ contains
     integer illa,ilma,ina,inoa,inva,ipoa
     real(dp) ckon
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(nomax.eq.1) then
@@ -1162,7 +1219,12 @@ contains
     !
     integer not,ipause,mypauses
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(not.gt.nomax) then
        write(line,'(a15,i8,a17,i8)') 'ERROR, NOCUT = ',nocut,' EXCEEDS NOMAX = ',nomax
        ipause=mypauses(15,line)
@@ -1229,7 +1291,12 @@ contains
     integer,dimension(lnv)::jj
     real(dp) cjj
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     jj=0
     do i=1,size(jv)
        jj(i)=jv(i)
@@ -1237,6 +1304,12 @@ contains
 
 
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(illa.eq.0) then   ! Etienne shit
@@ -1350,7 +1423,12 @@ contains
     integer,dimension(lnv)::jj
     real(dp) cjj
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
 
     jj=0
     do i=1,size(jv)
@@ -1358,6 +1436,12 @@ contains
     enddo
     !
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     jj1 = 1
@@ -1502,8 +1586,19 @@ contains
     !
     integer i,illc,ilmc,inc,inoc,invc,ipoc
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     do i=ipoc,ipoc+ilmc-1
        !
@@ -1530,7 +1625,12 @@ contains
     !
     integer ia,ib,illa,ina,inb,ipoa,ipob
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     ipob = idapo(inb)
     ipoa = idapo(ina)
     illa = idall(ina)
@@ -1569,7 +1669,19 @@ contains
     integer,dimension(lnv)::jd
     real(dp) rr
     !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     inb=0
 
     if(inbb.eq.ina) then
@@ -1622,7 +1734,12 @@ contains
     integer idaadd,inb,inc,ipoc
     integer ipob
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1659,7 +1776,12 @@ contains
     integer inc,ipoc,inb
     integer ipob
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1697,7 +1819,12 @@ contains
     integer ina,inb,inc,incc,ind,ine,inoc,invc
     real(dp) coe1,coe2
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call daall1(incc,'$$DAJUNK$$',inoc,invc)
     call damul(ina,inb,incc)
     call damul(inc,ind,ine)
@@ -1723,7 +1850,12 @@ contains
     integer ina,inb,inc,incc,ipoc,ipoa,ipob,i
     real(dp) ccipoa,ccipob
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoa=idapo(ina)
        ipob=idapo(inb)
@@ -1778,7 +1910,12 @@ contains
     integer,dimension(0:lno)::ipno,noff
     real(dp) ccia,ccipoa,ccipob
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoa=idapo(ina)
        ipob=idapo(inb)
@@ -1797,6 +1934,12 @@ contains
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inb,inob,invb,ipob,ilmb,illb)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
 
     !     GENERAL CASE
     !     ************
@@ -1879,7 +2022,12 @@ contains
     integer idadiv,inb,ina,inc,ipoc,ipoa,ipob,i
     real(dp) ck,ck1
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        !         minv = min(inva,invb)
        ipoa = idapo(ina)
@@ -1918,7 +2066,12 @@ contains
     !
     !     CASE OF FIRST ORDER ONLY
     !     ************************
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1967,7 +2120,12 @@ contains
     integer,dimension(0:lno)::ipno,noff
     real(dp) ccia,ccipoa
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -1981,6 +2139,12 @@ contains
     endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !     GENERAL CASE
     !     ************
     !
@@ -2070,7 +2234,12 @@ contains
     integer,parameter,dimension(lnv)::jjx=0
     real(dp) ckon,const
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dacop(ina,inb)
     if(nomax.eq.1) then
        cc(idapo(inb)) = cc(idapo(inb)) + ckon
@@ -2095,7 +2264,12 @@ contains
     integer,parameter,dimension(lnv)::jjx=0
     real(dp) ckon,const
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dacop(ina,inb)
     !
     if(nomax.eq.1) then
@@ -2124,7 +2298,12 @@ contains
     integer i,ina,inb,ipoa,ipob
     real(dp) ckon
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     ipob=idapo(inb)
     ipoa=idapo(ina)
     if(nomax.eq.1) then
@@ -2154,7 +2333,12 @@ contains
     integer ipoa,i,ina,inc,incc,ipoc
     real(dp) ckon
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        !         minv = min(inva,invb)
        ipoa = idapo(ina)
@@ -2198,7 +2382,12 @@ contains
          ipob,ipause,mypauses
     real(dp) ckon
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        !         minv = min(inva,invb)
        ipoa = idapo(ina)
@@ -2210,6 +2399,12 @@ contains
     endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inb,inob,invb,ipob,ilmb,illb)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(abs(ckon).lt.eps) then
        idall(inb) = 0
        return
@@ -2249,10 +2444,15 @@ contains
     integer i,ina,inb,ipoa,ipob,ipause,mypauses
     real(dp) ckon
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ckon==zero) then
        if(check_da) then
-          stable_da=.false.
+          C_%STABLE_DA=.false.
           c_%message='constant part zero in dacdi'
           return
        else
@@ -2288,10 +2488,15 @@ contains
     integer i,idadic,ina,inc,ipoa,ipoc
     real(dp) ckon,ck
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     ipoa = idapo(ina)
     if(cc(ipoa)==zero) then
-       if(check_da) stable_da=.false.
+       if(check_da) C_%STABLE_DA=.false.
        c_%message='constant part zero in dadic'
        return
     endif
@@ -2346,7 +2551,12 @@ contains
     integer idacma,ina,inb,inc,ipoc,ipob,ipoa,i
     real(dp) bfac
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2383,7 +2593,12 @@ contains
     !
     integer  ipob,ipoa,i
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2430,7 +2645,12 @@ contains
          ipause,mypauses
     real(dp) afac,bfac,ccc,copf
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(nomax.eq.1) then
        ipoc = idapo(inc)
        ipoa = idapo(ina)
@@ -2446,6 +2666,12 @@ contains
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inb,inob,invb,ipob,ilmb,illb)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     ia = ipoa
     ib = ipob
     ic = ipoc - 1
@@ -2592,7 +2818,12 @@ contains
     integer ina,inc,incc
     character(4) cf
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.eq.inc) then
        !       call dainf(inc,inoc,invc,ipoc,ilmc,illc)
        incc=0
@@ -2628,7 +2859,12 @@ contains
     data abcs /'abcdefghijklmnopqrstuvwxyz'/
     data abcc /'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(cf(1:1).eq.' ') then
        cfh(1:3) = cf(2:4)
        cfh(1:4) = ' '
@@ -2681,7 +2917,7 @@ contains
        if(a0.eq.0) then
           if(check_da) then
              c_%message="a0.eq.0 for INV in dafun"
-             stable_da=.false.
+             C_%STABLE_DA=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2704,7 +2940,7 @@ contains
        if(a0.le.0) then
           if(check_da) then
              c_%message="a0.le.0 for SQRT in dafun"
-             stable_da=.false.
+             C_%STABLE_DA=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2729,7 +2965,7 @@ contains
        if(a0>hyperbolic_aperture) then
           if(check_da) then
              c_%message="a0>hyperbolic_aperture for EXP in dafun"
-             stable_da=.false.
+             C_%STABLE_DA=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2753,7 +2989,7 @@ contains
        if(a0.le.0) then
           if(check_da) then
              c_%message="a0.le.0 for LOG in dafun"
-             stable_da=.false.
+             C_%STABLE_DA=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2799,7 +3035,7 @@ contains
        if(a0>hyperbolic_aperture) then
           if(check_da) then
              c_%message="a0>hyperbolic_aperture for SINH in dafun"
-             stable_da=.false.
+             C_%STABLE_DA=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2823,7 +3059,7 @@ contains
        if(a0>hyperbolic_aperture) then
           if(check_da) then
              c_%message="a0>hyperbolic_aperture for COSH in dafun"
-             stable_da=.false.
+             C_%STABLE_DA=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2885,8 +3121,19 @@ contains
     integer i,illa,ilma,ina,inoa,inva,ipoa
     real(dp) anorm
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     anorm = zero
     do i=ipoa,ipoa+illa-1
@@ -2911,10 +3158,21 @@ contains
     integer i,ia,ib,ic,ij,illc,ilmc,inoc,invc,ipoc
     integer,dimension(lnv)::monx
     integer,dimension(:)::ma,mb,mc
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     if(ma(1).eq.mc(1).or.mb(1).eq.mc(1)) then
        call dainf(mc(1),inoc,invc,ipoc,ilmc,illc)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        do ij=1,ic
           monx(ij)=0
        enddo
@@ -2952,7 +3210,12 @@ contains
     integer,dimension(lno)::icc
     integer,dimension(:)::ma,mb,mc
     real(dp) ccf
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !ETIENNE
     !
@@ -2965,6 +3228,12 @@ contains
     call dainf(iia,inoa,inva,ipoa,ilma,illa)
     call dainf(iib,inob,invb,ipob,ilmb,illb)
     call dainf(iic,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     call damch(ma,ia)
     call damch(mb,ib)
@@ -3042,7 +3311,12 @@ contains
     integer,dimension(0:lno)::jv
     integer,dimension(:)::mb,mc
     real(dp) apek,bbijj,chkjj
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !     CONSISTENCY CHECKS
     !     ******************
@@ -3051,6 +3325,12 @@ contains
     iic = mc(1)
     call dainf(iib,inob,invb,ipob,ilmb,illb)
     call dainf(iic,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     call damch(mb,ib)
     call damch(mc,ic)
@@ -3238,7 +3518,12 @@ contains
     integer i,ic,iv,jc,jl,jv,mf
     integer,dimension(:)::mc
     character(20) line
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     if(mf.le.0) return
     write(mf,*) 0,0,jc+1,0,line
@@ -3326,7 +3611,12 @@ contains
     real(dp),dimension(lno+1)::xm
     real(dp),dimension(lno)::xt
     real(dp),dimension(:)::xf,xi
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     do i=1,ic
        xt(i)=xi(i)
@@ -3350,7 +3640,7 @@ contains
     enddo
     do i=1,nvmax
        if(abs(xf(i))>da_absolute_aperture.and.check_da) then
-          stable_da=.false.
+          C_%STABLE_DA=.false.
           write(6,*) "unstable in ppush ",i,xf(i)
        endif
     enddo
@@ -3372,7 +3662,12 @@ contains
     real(dp),dimension(:)::xi
     real(dp),dimension(lno)::xt
     real(dp),dimension(lno+1)::xm
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     do i=1,nvmax
        xt(i)=xi(i)
@@ -3394,7 +3689,7 @@ contains
 
 
     if(abs(xf)>da_absolute_aperture.and.check_da) then
-       stable_da=.false.
+       C_%STABLE_DA=.false.
        write(6,*) "unstable in ppush1 ", xf
        write(6,*) xi(1:nvmax)
     endif
@@ -3414,7 +3709,12 @@ contains
     integer,dimension(lnv)::jj,ml
     integer,dimension(:)::ma,mb
     real(dp),dimension(lnv)::x
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     do i=1,lnv
        jj(i)=0
@@ -3422,6 +3722,12 @@ contains
 
     if(ma(1).eq.mb(1)) then
        call dainf(mb(1),inob,invb,ipob,ilmb,illb)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        do i=1,ia
           call dapok(ma(i),jj,zero)
        enddo
@@ -3463,10 +3769,21 @@ contains
     integer,dimension(:)::ma,mb
     real(dp),dimension(lnv,lnv)::aa,ai
     real(dp) amjj,amsjj,prod
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     call dainf(ma(1),inoa,inva,ipoa,ilma,illa)
     call dainf(mb(1),inob,invb,ipob,ilmb,illb)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !     CONSISTENCY CHECKS
     !     ******************
@@ -3523,7 +3840,7 @@ contains
     !
     if(ier.eq.132) then
        if(check_da) then
-          stable_da=.false.
+          C_%STABLE_DA=.false.
           c_%message='ERROR IN ROUTINE DAINV, ier=132 in matinv'
           call dadal(ml,ia)
           call dadal(ms,ia)
@@ -3546,7 +3863,7 @@ contains
           if(i.eq.j) prod = prod - one
           if(abs(prod).gt.c_100*epsmac) then
              if(check_da) then
-                stable_da=.false.
+                C_%STABLE_DA=.false.
                 c_%message='ERROR IN ROUTINE DAINV, abs(prod).gt.c_100*epsmac '
                 call dadal(ml,ia)
                 call dadal(ms,ia)
@@ -3626,7 +3943,12 @@ contains
     real(dp),dimension(nmx,nmx)::a,ai
     real(dp),dimension(nmax,nmax)::aw
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
 
     aw(1:n,1:n) = a(1:n,1:n)
 
@@ -3664,7 +3986,12 @@ contains
     real(dp),dimension(np,np)::a
     real(dp),dimension(nmax)::vv
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     ier=0
     d=one
     do i=1,n
@@ -3748,7 +4075,12 @@ contains
     real(dp),dimension(np,np)::a
     real(dp),dimension(nmx)::b
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     ii = 0
     do i=1,n
        ll = indx(i)
@@ -3792,13 +4124,24 @@ contains
     integer,dimension(:)::ma,mb,jx
     real(dp),dimension(lnv)::x
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     do i=1,lnv
        jj(i)=0
     enddo
 
     if(ma(1).eq.mb(1)) then
        call dainf(mb(1),inob,invb,ipob,ilmb,illb)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        do i=1,ia
           call dapok(ma(i),jj,zero)
        enddo
@@ -3838,8 +4181,19 @@ contains
     integer,dimension(lnv)::jj,mn,mi,me
     integer,dimension(:)::ma,mb,jind
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ma(1),inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
 
     do i=1,ia
@@ -3891,9 +4245,20 @@ contains
     !
     integer idif,illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        incc=0
        call daall1(incc,'$$DAJUNK$$',inoc,invc)
        call dadert(idif,ina,incc)
@@ -3920,9 +4285,20 @@ contains
     integer,dimension(lnv)::jd
     real(dp) rr,x,xdivi
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(nomax.eq.1) then
@@ -4007,7 +4383,12 @@ contains
     !-----------------------------------------------------------------------------
     !
     integer i,ina,inb,inc, n,is(4)
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
 
     !
     is = 0
@@ -4052,9 +4433,20 @@ contains
     integer illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     complex(dp),external::fun
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        incc=0
        call daall1(incc,'$$DAJUNK$$',inoc,invc)
        call dacfuRt(ina,fun,incc)
@@ -4093,9 +4485,20 @@ contains
        end function fun
     end interface
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(nomax.eq.1) then
@@ -4162,9 +4565,20 @@ contains
     integer illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     real(dp),external::fun
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        incc=0
        call daall1(incc,'$$DAJUNK$$',inoc,invc)
        call dacfut(ina,fun,incc)
@@ -4190,9 +4604,20 @@ contains
     integer illc,ilmc,ina,inc,incc,inoc,invc,ipoc
     complex(dp),external::fun
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.eq.inc) then
        call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        incc=0
        call daall1(incc,'$$DAJUNK$$',inoc,invc)
        call dacfuIt(ina,fun,incc)
@@ -4231,9 +4656,20 @@ contains
        end function fun
     end interface
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(nomax.eq.1) then
@@ -4314,9 +4750,20 @@ contains
        end function fun
     end interface
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     if(nomax.eq.1) then
@@ -4393,11 +4840,15 @@ contains
     integer i,ii,iii,illa,ilma,ina,inoa,inva,ioa,iout,ipoa,iunit,k
     integer,dimension(lnv)::j
     !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.lt.1.or.ina.gt.nda) then
        print*,'ERROR IN DAPRI, INA = ',ina
-       !        X = SQRT(-ONE)
-       !        PRINT*,X
-       stop
+       C_%STABLE_DA=.false.
     endif
     !
     inoa = idano(ina)
@@ -4473,11 +4924,16 @@ contains
     character(10) c10,k10
     !
     if(iunit.eq.0) return
-    !
+
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.lt.1.or.ina.gt.nda) then
        write(line,'(a22,i8)') 'ERROR IN DAPRI, INA = ',ina
-       ipause=mypauses(39,line)
-       stop
+       C_%STABLE_DA=.false.
     endif
     !
     inoa = idano(ina)
@@ -4564,12 +5020,16 @@ contains
          ik,inc,ipause,mypauses,k
     integer,dimension(lnv)::j,jd
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     inb=0
     if(ina.lt.1.or.ina.gt.nda) then
-       write(line,'(a22,i8)') 'ERROR IN DAPRI, INA = ',ina
-       ipause=mypauses(39,line)
-       stop
+       write(line,'(a22,i8)') 'ERROR IN dashift, INA = ',ina
+       C_%STABLE_DA=.false.
     endif
     !
     inoa = idano(ina)
@@ -4681,12 +5141,18 @@ contains
     integer,dimension(lnv)::j
     real(dp) c
     character(10) c10
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     if(ina.lt.1.or.ina.gt.nda) then
+       C_%STABLE_DA=.false.
        print*,'ERROR IN DAREA, INA = ',ina
        !        X = SQRT(-ONE)
        !        PRINT*,X
-       stop
     endif
     !
     inoa = idano(ina)
@@ -4782,10 +5248,15 @@ contains
     real(dp) c
     character(10) c10,k10
     !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     if(ina.lt.1.or.ina.gt.nda) then
-       write(line,'(a22,i8)') 'ERROR IN DAPRI, INA = ',ina
-       ipause=mypauses(39,line)
-       stop
+       write(line,'(a22,i8)') 'ERROR IN darea77, INA = ',ina
+       C_%STABLE_DA=.false.
     endif
     !
     inoa = idano(ina)
@@ -4857,13 +5328,13 @@ contains
     character(10) c
     !
     !etienne
-    if(check_da) then
-       stable_da=.false.
-       return
-    endif
-    READ(*,*) I
-    I=SQRT(DBLE(I))
-    stop
+    !    if(check_da) then
+    C_%STABLE_DA=.false.
+    return
+    !    endif
+    !READ(*,*) I
+    !I=SQRT(DBLE(I))
+    !    stop
   end subroutine dadeb
   !
   !
@@ -5007,10 +5478,28 @@ contains
     integer i,ia,illa,ilma,ino1,inoi,inv1,invi,ipoa,ipause,mypauses
     integer,dimension(:)::iaa
     !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(iaa(1),ino1,inv1,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     do i=2,ia
        call dainf(iaa(i),inoi,invi,ipoa,ilma,illa)
+       if((.not.C_%STABLE_DA)) then
+          if(c_%watch_user) then
+             write(6,*) "big problem in dabnew ", sqrt(crash)
+          endif
+          return
+       endif
        if(ino1.ne.inoi.or.inv1.ne.invi) then
           write(line,'(a24,i8,a5,i8,a18)')  'ERROR IN DAMCH, VECTORS ',iaa(1), &
                & ' AND ',iaa(i),' ARE INCOMPATIBLE '
@@ -5100,9 +5589,20 @@ contains
          ilmc,ina,inc,inoa,inoc,inva,invc,ipoa,ipoc,jj,ipause,mypauses
     real(dp) x,xdivi
     !
-    if((.not.stable_da)) return
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     !
     !       CALL DACHK(INA,INOA,INVA, '          ',-1,-1,INC,INOC,INVC)
@@ -5287,7 +5787,19 @@ contains
     integer ia,ic,ic1,ic2,illb,ilmb,inb,inob,invb,ipob,j1,j2,k1,k2
     integer,dimension(lnv)::jj
     !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(inb,inob,invb,ipob,ilmb,illb)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
 
     call daclr(1)
     !
@@ -5328,7 +5840,19 @@ contains
     integer i,illa,ilma,ina,inoa,inva,ipoa,ipause,mypauses
     real(dp) cm,xran
     !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
     !
     if(inva.eq.0.or.nomax.eq.1) then
        do i=ipoa,ipoa+ilma-1
@@ -5405,7 +5929,7 @@ contains
     real(dp) value
     !
     if(ina.lt.1.or.ina.gt.nda) then
-       write(line,'(a22,i8)') 'ERROR IN DAPRI, INA = ',ina
+       write(line,'(a22,i8)') 'ERROR IN dacycle, INA = ',ina
        ipause=mypauses(39,line)
        stop
     endif

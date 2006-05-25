@@ -76,10 +76,7 @@ a_scratch_size.o: a_scratch_size.f90
 b_da_arrays_all.o: a_scratch_size.o b_da_arrays_all.f90
 c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
 d_lielib.o: c_dabnew.o d_lielib.f90
-e_define_newda.o: d_lielib.o e_define_newda.f90
-f_newda.o: e_define_newda.o f_newda.f90
-g_newLielib.o: f_newda.o g_newLielib.f90
-h_definition.o: g_newLielib.o h_definition.f90
+h_definition.o: h_definition.f90
 i_tpsa.o: h_definition.o i_tpsa.f90
 j_tpsalie.o: i_tpsa.o j_tpsalie.f90
 k_tpsalie_analysis.o: j_tpsalie.o k_tpsalie_analysis.f90

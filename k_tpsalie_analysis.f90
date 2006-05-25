@@ -134,6 +134,7 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (onelieexponent), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     call checkdamap(s2)
@@ -158,6 +159,7 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (onelieexponent), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     call checkdamap(s2)
@@ -183,6 +185,7 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (dragtfinn), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     call checkdamap(s2)
@@ -207,6 +210,7 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (dragtfinn), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     call checkdamap(s2)
@@ -231,6 +235,7 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (reversedragtfinn), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     call checkdamap(s2)
@@ -255,6 +260,7 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (reversedragtfinn), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     call checkdamap(s2)
@@ -279,61 +285,63 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
+    IF(.NOT.C_%STABLE_DA) RETURN
+
     call check_snake
     call alloc(junk)
     zero_(:)=zero
-    if(old) then
-       if(s2%normal%linear%V(1)%i==0)  call crap1("normalMAP 1") !call allocw(s2%normal%linear%V(1))  ! changed
-       if(S2%auto) then
-          !     call setidpr(-100,S2%plane)
-          if(print77) then
-             call idprset(-101)
-          else
-             call idprset(-102)
-          endif
-       else
-          call setidpr(0,S2%plane)
-       endif
-       CALL INPUTRES(S2%M,S2%NRES)
-       JUNK=S1
-       S2%a%CONSTANT=JUNK
-       JUNK=ZERO_
-       if(s2%nord.le.0.or.s2%nord.gt.no) s2%nord=no
-       if(s2%jtune.lt.0) s2%jtune=0
-       CALL MAPNORMF(junk%V%i,s2%a%nonlinear%v%i,s2%a%linear%v%i,&
-            & s2%A1%v%i,s2%normal%linear%v%i,s2%normal%nonlinear%v%i,s2%NORD,s2%jtune)
-       !S2%a1=S2%a%CONSTANT
-       !     S2%a%linear=S2%a%CONSTANT
-
-       s2%normal%linear=(s2%normal%linear).sub.1
-       S2%normal%pb=S2%normal%nonlinear
-       S2%a%pb=S2%a%nonlinear
-       CALL DHDJFLO(S2%NORMAL%NONLINEAR%V%i,S2%DHDJ%V%i)
-       call GETTURA(s2%TUNE,S2%DAMPING)
-    else
-       if(.NOT.ASSOCIATED(s2%normal%linear%V(1)%j%r))  call crap1("normalMAP 2") ! call alloc(s2%normal%linear%V(1))
-       if(S2%auto) then
-          !     call setidpr(-100,S2%plane)
+    !    if(old) then
+    if(s2%normal%linear%V(1)%i==0)  call crap1("normalMAP 1") !call allocw(s2%normal%linear%V(1))  ! changed
+    if(S2%auto) then
+       !     call setidpr(-100,S2%plane)
+       if(print77) then
           call idprset(-101)
        else
-          call setidpr(0,S2%plane)
+          call idprset(-102)
        endif
-       CALL INPUTRES(S2%M,S2%NRES)
-       JUNK=S1
-       !     S2%a%CONSTANT=JUNK
-       JUNK=ZERO_
-       if(s2%nord.le.0.or.s2%nord.gt.no) s2%nord=no
-       if(s2%jtune.lt.0) s2%jtune=0
-       CALL newMAPNORMF(junk%V%j,s2%a%nonlinear%v%j,s2%a%linear%v%j,&
-            & s2%A1%v%j,s2%normal%linear%v%j,s2%normal%nonlinear%v%j,s2%NORD,s2%jtune)
-       !     S2%a1=S2%a%CONSTANT
-       !     S2%a%linear=S2%a%CONSTANT
-       s2%normal%linear=(s2%normal%linear).sub.1
-       S2%normal%pb=S2%normal%nonlinear
-       S2%a%pb=S2%a%nonlinear
-       CALL NEWDHDJFLO(S2%NORMAL%NONLINEAR%V%J,S2%DHDJ%V%J)
-       call GETTURA(s2%TUNE,S2%DAMPING)
+    else
+       call setidpr(0,S2%plane)
     endif
+    CALL INPUTRES(S2%M,S2%NRES)
+    JUNK=S1
+    S2%a%CONSTANT=JUNK
+    JUNK=ZERO_
+    if(s2%nord.le.0.or.s2%nord.gt.no) s2%nord=no
+    if(s2%jtune.lt.0) s2%jtune=0
+    CALL MAPNORMF(junk%V%i,s2%a%nonlinear%v%i,s2%a%linear%v%i,&
+         & s2%A1%v%i,s2%normal%linear%v%i,s2%normal%nonlinear%v%i,s2%NORD,s2%jtune)
+    !S2%a1=S2%a%CONSTANT
+    !     S2%a%linear=S2%a%CONSTANT
+
+    s2%normal%linear=(s2%normal%linear).sub.1
+    S2%normal%pb=S2%normal%nonlinear
+    S2%a%pb=S2%a%nonlinear
+    CALL DHDJFLO(S2%NORMAL%NONLINEAR%V%i,S2%DHDJ%V%i)
+    call GETTURA(s2%TUNE,S2%DAMPING)
+    !    else
+    !       if(.NOT.ASSOCIATED(s2%normal%linear%V(1)%j%r))  call crap1("normalMAP 2") ! call alloc(s2%normal%linear%V(1))
+    !       if(S2%auto) then
+    !          !     call setidpr(-100,S2%plane)
+    !          call idprset(-101)
+    !       else
+    !          call setidpr(0,S2%plane)
+    !       endif
+    !       CALL INPUTRES(S2%M,S2%NRES)
+    !       JUNK=S1
+    !       !     S2%a%CONSTANT=JUNK
+    !       JUNK=ZERO_
+    !       if(s2%nord.le.0.or.s2%nord.gt.no) s2%nord=no
+    !       if(s2%jtune.lt.0) s2%jtune=0
+    !       CALL newMAPNORMF(junk%V%j,s2%a%nonlinear%v%j,s2%a%linear%v%j,&
+    !            & s2%A1%v%j,s2%normal%linear%v%j,s2%normal%nonlinear%v%j,s2%NORD,s2%jtune)
+    !       !     S2%a1=S2%a%CONSTANT
+    !       !     S2%a%linear=S2%a%CONSTANT
+    !       s2%normal%linear=(s2%normal%linear).sub.1
+    !       S2%normal%pb=S2%normal%nonlinear
+    !       S2%a%pb=S2%a%nonlinear
+    !       CALL NEWDHDJFLO(S2%NORMAL%NONLINEAR%V%J,S2%DHDJ%V%J)
+    !       call GETTURA(s2%TUNE,S2%DAMPING)
+    !    endif
 
     s2%a_t=S2%a
     s2%a_t=s2%a1*s2%a_t
@@ -348,6 +356,8 @@ contains
     type (normalform),INTENT(in)::S2
     type (damap),INTENT(INOUT)::S1
     type (damap) JUNK,id
+    IF(.NOT.C_%STABLE_DA) RETURN
+
     call check_snake
 
     call alloc(JUNK,id)
@@ -368,46 +378,47 @@ contains
     type (ONELIEEXPONENT),INTENT(inOUT)::S2
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(junk)
-    if(old) then
-       if(s2%VECTOR%V(1)%i==0) call crap1("ONEEXPMAP 1") ! call allocw(s2%VECTOR%V(1))
-       JUNK=S1
-       !     S2%CONSTANT=JUNK
-       !     DO I=1,ND2
-       !     ZERO_(I)=zero
-       !     ENDDO
-       !     JUNK=ZERO_
-       IF(s2%eps==ZERO) THEN
-          S2%EPS=c_1d3*FULL_ABS(S1)
-          call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
-          S2%EPS=ZERO
-       ELSE
-          call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
-       ENDIF
-       S2%pb=S2%VECTOR
-       CALL KILL(JUNK)
-    else
-       if(.NOT.ASSOCIATED(s2%VECTOR%V(1)%j%r)) THEN
-          call crap1("ONEEXPMAP 2")  !call allocw(s2%VECTOR%V(1))
-       ENDIF
-       JUNK=S1
-       !     S2%CONSTANT=JUNK
-       !     DO I=1,ND2
-       !     ZERO_(I)=zero
-       !     ENDDO
-       !     JUNK=ZERO_
-       IF(s2%eps==ZERO) THEN
-          S2%EPS=c_1d3*FULL_ABS(S1)
-          call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
-          S2%EPS=ZERO
-       ELSE
-          call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
-       ENDIF
-       S2%pb=S2%VECTOR
-       CALL KILL(JUNK)
-    endif
-
+    !    if(old) then
+    if(s2%VECTOR%V(1)%i==0) call crap1("ONEEXPMAP 1") ! call allocw(s2%VECTOR%V(1))
+    JUNK=S1
+    !     S2%CONSTANT=JUNK
+    !     DO I=1,ND2
+    !     ZERO_(I)=zero
+    !     ENDDO
+    !     JUNK=ZERO_
+    IF(s2%eps==ZERO) THEN
+       S2%EPS=c_1d3*FULL_ABS(S1)
+       call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
+       S2%EPS=ZERO
+    ELSE
+       call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
+    ENDIF
+    S2%pb=S2%VECTOR
+    CALL KILL(JUNK)
+    !    else
+    !       if(.NOT.ASSOCIATED(s2%VECTOR%V(1)%j%r)) THEN
+    !          call crap1("ONEEXPMAP 2")  !call allocw(s2%VECTOR%V(1))
+    !       ENDIF
+    !       JUNK=S1
+    !       !     S2%CONSTANT=JUNK
+    !       !     DO I=1,ND2
+    !       !     ZERO_(I)=zero
+    !       !     ENDDO
+    !       !     JUNK=ZERO_
+    !       IF(s2%eps==ZERO) THEN
+    !          S2%EPS=c_1d3*FULL_ABS(S1)
+    !          call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
+    !          S2%EPS=ZERO
+    !       ELSE
+    !          call newFLOFACG(JUNK%V%j,s2%VECTOR%V%j,s2%eps)
+    !       ENDIF
+    !       S2%pb=S2%VECTOR
+    !       CALL KILL(JUNK)
+    !    endif
+    !
   END SUBROUTINE ONEEXPMAP
 
 
@@ -416,6 +427,7 @@ contains
     type (ONELIEEXPONENT),INTENT(IN)::S2
     type (damap),INTENT(inout)::S1
     type (damap) JUNK
+    IF(.NOT.C_%STABLE_DA) RETURN
     call alloc(junk)
     call check_snake
     junk=1
@@ -433,32 +445,33 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(junk)
     ZERO_(:)=zero
-    if(old) then
-       if(s2%linear%V(1)%i==0)  call crap1("revdfMAP 1")  !call allocw(s2%linear%V(1))
-       JUNK=S1
-       S2%CONSTANT=JUNK
-       JUNK=ZERO_
-       junk=junk**(-1)
-       call FLOFAC(JUNK%V%i,s2%linear%V%i,s2%nonlinear%V%i)
-       s2%linear=s2%linear**(-1)
-       call dacmud(s2%nonlinear%V%i,-one,s2%nonlinear%V%i)
-       !    S2%nonlinear=S2%nonlinear*S2%linear
-       S2%pb=S2%nonlinear
-    else
-       if(.NOT.ASSOCIATED(s2%linear%V(1)%j%r))  call crap1("revdfMAP 2")  !call allocw(s2%linear%V(1))
-       JUNK=S1
-       S2%CONSTANT=JUNK
-       JUNK=ZERO_
-       junk=junk**(-1)
-       call newFLOFAC(JUNK%V%j,s2%linear%V%j,s2%nonlinear%V%j)
-       s2%linear=s2%linear**(-1)
-       call newdacmud(s2%nonlinear%V%j,-one,s2%nonlinear%V%j)
-       !    S2%nonlinear=S2%nonlinear*S2%linear
-       S2%pb=S2%nonlinear
-    endif
+    !    if(old) then
+    if(s2%linear%V(1)%i==0)  call crap1("revdfMAP 1")  !call allocw(s2%linear%V(1))
+    JUNK=S1
+    S2%CONSTANT=JUNK
+    JUNK=ZERO_
+    junk=junk**(-1)
+    call FLOFAC(JUNK%V%i,s2%linear%V%i,s2%nonlinear%V%i)
+    s2%linear=s2%linear**(-1)
+    call dacmud(s2%nonlinear%V%i,-one,s2%nonlinear%V%i)
+    !    S2%nonlinear=S2%nonlinear*S2%linear
+    S2%pb=S2%nonlinear
+    !    else
+    !       if(.NOT.ASSOCIATED(s2%linear%V(1)%j%r))  call crap1("revdfMAP 2")  !call allocw(s2%linear%V(1))
+    !       JUNK=S1
+    !       S2%CONSTANT=JUNK
+    !       JUNK=ZERO_
+    !       junk=junk**(-1)
+    !       call newFLOFAC(JUNK%V%j,s2%linear%V%j,s2%nonlinear%V%j)
+    !       s2%linear=s2%linear**(-1)
+    !       call newdacmud(s2%nonlinear%V%j,-one,s2%nonlinear%V%j)
+    !       !    S2%nonlinear=S2%nonlinear*S2%linear
+    !       S2%pb=S2%nonlinear
+    !    endif
     CALL KILL(JUNK)
 
   END SUBROUTINE revdfMAP
@@ -470,24 +483,25 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(junk)
     ZERO_(:)=zero
-    if(old) then
-       if(s2%linear%V(1)%i==0)  call crap1("dfMAP 1")  !call allocw(s2%linear%V(1))
-       JUNK=S1
-       S2%CONSTANT=JUNK
-       JUNK=ZERO_
-       call FLOFAC(JUNK%V%i,s2%linear%V%i,s2%nonlinear%V%i)
-       S2%pb=S2%nonlinear
-    else
-       if(.NOT.ASSOCIATED(s2%linear%V(1)%j%r))  call crap1("dfMAP 2")  !call allocw(s2%linear%V(1))
-       JUNK=S1
-       S2%CONSTANT=JUNK
-       JUNK=ZERO_
-       call newFLOFAC(JUNK%V%j,s2%linear%V%j,s2%nonlinear%V%j)
-       S2%pb=S2%nonlinear
-    endif
+    !    if(old) then
+    if(s2%linear%V(1)%i==0)  call crap1("dfMAP 1")  !call allocw(s2%linear%V(1))
+    JUNK=S1
+    S2%CONSTANT=JUNK
+    JUNK=ZERO_
+    call FLOFAC(JUNK%V%i,s2%linear%V%i,s2%nonlinear%V%i)
+    S2%pb=S2%nonlinear
+    !    else
+    !       if(.NOT.ASSOCIATED(s2%linear%V(1)%j%r))  call crap1("dfMAP 2")  !call allocw(s2%linear%V(1))
+    !       JUNK=S1
+    !       S2%CONSTANT=JUNK
+    !       JUNK=ZERO_
+    !       call newFLOFAC(JUNK%V%j,s2%linear%V%j,s2%nonlinear%V%j)
+    !       S2%pb=S2%nonlinear
+    !    endif
     CALL KILL(JUNK)
   END SUBROUTINE dfMAP
 
@@ -495,14 +509,15 @@ contains
     implicit none
     type (vecfield),INTENT(IN)::S2
     type (vecresonance),INTENT(inOUT)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    if(old) then
-       if(S1%cos%v(1)%i==0) call crap1("resovec 1")  !call allocw(s1%cos%v(1))
-       call ctorflo(s2%v%i,S1%cos%v%i,S1%sin%v%i)
-    else
-       if(.NOT.ASSOCIATED(S1%cos%v(1)%j%r)) call crap1("resovec 2")  !call allocw(s1%cos%v(1))
-       call newctorflo(s2%v%j,S1%cos%v%j,S1%sin%v%j)
-    endif
+    !    if(old) then
+    if(S1%cos%v(1)%i==0) call crap1("resovec 1")  !call allocw(s1%cos%v(1))
+    call ctorflo(s2%v%i,S1%cos%v%i,S1%sin%v%i)
+    !    else
+    !       if(.NOT.ASSOCIATED(S1%cos%v(1)%j%r)) call crap1("resovec 2")  !call allocw(s1%cos%v(1))
+    !       call newctorflo(s2%v%j,S1%cos%v%j,S1%sin%v%j)
+    !    endif
     s1%ifac=s2%ifac
     s1%cos%ifac=s2%ifac
     s1%sin%ifac=s2%ifac
@@ -513,14 +528,15 @@ contains
     implicit none
     type (vecfield),INTENT(inout)::S2
     type (vecresonance),INTENT(in)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    if(old) then
-       if(S2%v(1)%i==0) call crap1("vecreso 1")  !call allocw(s2%v(1))
-       call RTOCflo(S1%cos%v%i,S1%sin%v%i,s2%v%i)
-    else
-       if(.not.associated(S2%v(1)%j%r)) call crap1("vecreso 2")  !call allocw(s2%v(1))
-       call newRTOCflo(S1%cos%v%j,S1%sin%v%j,s2%v%j)
-    endif
+    ! if(old) then
+    if(S2%v(1)%i==0) call crap1("vecreso 1")  !call allocw(s2%v(1))
+    call RTOCflo(S1%cos%v%i,S1%sin%v%i,s2%v%i)
+    !    else
+    !       if(.not.associated(S2%v(1)%j%r)) call crap1("vecreso 2")  !call allocw(s2%v(1))
+    !       call newRTOCflo(S1%cos%v%j,S1%sin%v%j,s2%v%j)
+    !    endif
     s2%ifac=s1%ifac
   END SUBROUTINE vecreso
 
@@ -528,14 +544,15 @@ contains
     implicit none
     type (pbfield),INTENT(IN)::S2
     type (pbresonance),INTENT(inOUT)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    if(old) then
-       if(S1%cos%h%i==0) call crap1("respb 1")  !call allocw(s1%cos%h)
-       call ctor(s2%h%i,S1%cos%h%i,S1%sin%h%i)
-    else
-       if(.not.associated(S1%cos%h%j%r)) call crap1("respb 1")
-       call newctor(s2%h%j,S1%cos%h%j,S1%sin%h%j)
-    endif
+    ! if(old) then
+    if(S1%cos%h%i==0) call crap1("respb 1")  !call allocw(s1%cos%h)
+    call ctor(s2%h%i,S1%cos%h%i,S1%sin%h%i)
+    !    else
+    !       if(.not.associated(S1%cos%h%j%r)) call crap1("respb 1")
+    !       call newctor(s2%h%j,S1%cos%h%j,S1%sin%h%j)
+    !    endif
     s1%ifac=s2%ifac
     s1%cos%ifac=s2%ifac
     s1%sin%ifac=s2%ifac
@@ -547,14 +564,15 @@ contains
     implicit none
     type (pbfield),INTENT(inOUT)::S2
     type (pbresonance),INTENT(IN)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    if(old) then
-       if(s2%h%i==0) call crap1("respb 1")
-       call RTOC(S1%cos%h%i,S1%sin%h%i,s2%h%i)
-    else
-       if(.not.associated(s2%h%j%r)) call crap1("respb 2")  !call allocw(s2%h)
-       call newRTOC(S1%cos%h%j,S1%sin%h%j,s2%h%j)
-    endif
+    ! if(old) then
+    if(s2%h%i==0) call crap1("respb 1")
+    call RTOC(S1%cos%h%i,S1%sin%h%i,s2%h%i)
+    !    else
+    !       if(.not.associated(s2%h%j%r)) call crap1("respb 2")  !call allocw(s2%h)
+    !       call newRTOC(S1%cos%h%j,S1%sin%h%j,s2%h%j)
+    !    endif
     s2%ifac=s1%ifac
   END SUBROUTINE pbres
 
@@ -562,28 +580,30 @@ contains
     implicit none
     type (taylor),INTENT(IN)::S2
     type (taylorresonance),INTENT(inOUT)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    if(old) then
-       if(S1%cos%i==0)  call crap1("resta 1")  !call allocw(s1%cos)
-       call ctor(s2%i,S1%cos%i,S1%sin%i)
-    else
-       if(.not.associated(S1%cos%j%r))  call crap1("resta 2")  !call allocw(s1%cos)
-       call newctor(s2%j,S1%cos%j,S1%sin%j)
-    endif
+    ! if(old) then
+    if(S1%cos%i==0)  call crap1("resta 1")  !call allocw(s1%cos)
+    call ctor(s2%i,S1%cos%i,S1%sin%i)
+    !    else
+    !       if(.not.associated(S1%cos%j%r))  call crap1("resta 2")  !call allocw(s1%cos)
+    !       call newctor(s2%j,S1%cos%j,S1%sin%j)
+    !    endif
   END SUBROUTINE resta
 
   SUBROUTINE  tares(S2,S1)
     implicit none
     type (taylor),INTENT(inOUT)::S2
     type (taylorresonance),INTENT(IN)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    if(old) then
-       if(s2%i==0)  call crap1("tares 1")  !call allocw(s2)
-       call RTOC(S1%cos%i,S1%sin%i,s2%i)
-    else
-       if(.not.associated(s2%j%r))  call crap1("tares 2")  !call allocw(s2)
-       call newRTOC(S1%cos%j,S1%sin%j,s2%j)
-    endif
+    ! if(old) then
+    if(s2%i==0)  call crap1("tares 1")  !call allocw(s2)
+    call RTOC(S1%cos%i,S1%sin%i,s2%i)
+    !   else
+    !      if(.not.associated(s2%j%r))  call crap1("tares 2")  !call allocw(s2)
+    !      call newRTOC(S1%cos%j,S1%sin%j,s2%j)
+    !   endif
   END SUBROUTINE tares
 
   SUBROUTINE  MAPdf(S1,S2)
@@ -592,16 +612,16 @@ contains
     type (damap),INTENT(inOUT)::S1
     TYPE (DAMAP) ID
     integer no1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     no1=no
     call alloc(ID)
-    if(old) then
-       if(s1%V(1)%i==0) call crap1("MAPdf 1")  !call allocw(s1%V(1))
-    else
-       if(.not.associated(s1%V(1)%j%r)) call crap1("MAPdf 2")  !call allocw(s1%V(1))
-    endif
+    ! if(old) then
+    if(s1%V(1)%i==0) call crap1("MAPdf 1")  !call allocw(s1%V(1))
+    !    else
+    !       if(.not.associated(s1%V(1)%j%r)) call crap1("MAPdf 2")  !call allocw(s1%V(1))
+    !    endif
     ID=1
-    !     ID=tEXP(S2%NONLINEAR,ID)
     ID=texpdf( S2%NONLINEAR, ID,2,NO1,one,1 )
     S1=ID*S2%LINEAR
     S1=S2%CONSTANT
@@ -614,16 +634,16 @@ contains
     type (damap),INTENT(inOUT)::S1
     TYPE (DAMAP) ID
     integer no1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     no1=no
     call alloc(ID)
-    if(old) then
-       if(s1%V(1)%i==0) call crap1("MAPrevdf 1")  !call allocw(s1%V(1))
-    else
-       if(.NOT.ASSOCIATED(s1%V(1)%j%r)) call crap1("MAPrevdf 2")  !call allocw(s1%V(1))
-    endif
+    ! if(old) then
+    if(s1%V(1)%i==0) call crap1("MAPrevdf 1")  !call allocw(s1%V(1))
+    !    else
+    !       if(.NOT.ASSOCIATED(s1%V(1)%j%r)) call crap1("MAPrevdf 2")  !call allocw(s1%V(1))
+    !    endif
     ID=1
-    !     ID=tEXP(S2%NONLINEAR,ID)
     ID=texpdf( S2%NONLINEAR, ID,2,NO1,one,-1 )
     S1=S2%LINEAR*ID
     S1=S2%CONSTANT
@@ -656,11 +676,7 @@ contains
     enddo
 
 
-    !      if(old) then
-    !      call etall1(s1%h%i)
-    !      else
-    !      call NEWetall(s1%h%j,1)
-    !      endif
+
   END SUBROUTINE allocgen
 
   SUBROUTINE  KILLgen(S1)
@@ -683,11 +699,11 @@ contains
        call kill(s1%mt%v(i))
        call kill(s1%m%v(i))
     enddo
-    if(old) then
-       call DADAL1(s1%h%i)
-    else
-       call newDADAL(s1%h%j,1)
-    endif
+    ! if(old) then
+    call DADAL1(s1%h%i)
+    !    else
+    !       call newDADAL(s1%h%j,1)
+    !    endif
   END SUBROUTINE KILLgen
 
   SUBROUTINE  EQUALgenMAP(S2,S1)
@@ -699,6 +715,8 @@ contains
     type(onelieexponent) one_
     real(dp) zero_(ndim2)
     integer i,j,jn(lnv),k
+
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(w)
     call alloc(t)
@@ -736,17 +754,17 @@ contains
     endif
 
 
-    if(old) then
-       if(s2%h%i==0) call crap1("EQUALgenMAP 1")  ! call etall1(s2%h%i)
-       if(s2%m%v(1)%i==0) call crap1("EQUALgenMAP 2")  !call etall(s2%m%v%i,nd2)
-       call etpin(w%v%i,s2%m%v%i,jn)
-       call intd(s2%m%v%i,s2%h%i,one)
-    else
-       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALgenMAP 3")  !call newetall(s2%h%j,1)
-       if(.NOT. ASSOCIATED(s2%m%v(1)%J%r)) call crap1("EQUALgenMAP 4")  !call newetall(s2%m%v%J,nd2)
-       call newetpin(w%v%j,s2%m%v%j,jn)
-       call newintd(s2%m%v%j,s2%h%j,one)
-    endif
+    ! if(old) then
+    if(s2%h%i==0) call crap1("EQUALgenMAP 1")  ! call etall1(s2%h%i)
+    if(s2%m%v(1)%i==0) call crap1("EQUALgenMAP 2")  !call etall(s2%m%v%i,nd2)
+    call etpin(w%v%i,s2%m%v%i,jn)
+    call intd(s2%m%v%i,s2%h%i,one)
+    !   else
+    !       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALgenMAP 3")  !call newetall(s2%h%j,1)
+    !       if(.NOT. ASSOCIATED(s2%m%v(1)%J%r)) call crap1("EQUALgenMAP 4")  !call newetall(s2%m%v%J,nd2)
+    !       call newetpin(w%v%j,s2%m%v%j,jn)
+    !       call newintd(s2%m%v%j,s2%h%j,one)
+    !    endif
     ! Truncating to order no-1: not necessary completly but for self-conssitancy
     s2%m=s2%m.cut.s2%no_cut
     do i=1,nd
@@ -773,6 +791,7 @@ contains
     type (damap),INTENT(inout)::S1
     type (damap)  w
     integer i,jn(lnv)
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(w)
 
@@ -784,15 +803,15 @@ contains
     enddo
 
 
-    if(old) then
-       if(s1%v(1)%i==0)call crap1("EQUALMAPgen 1")  ! call etall(s1%v%i,nd2)
-       call difd(s2%h%i,w%v%i,one)
-       call etpin(w%v%i,s1%v%i,jn)
-    else
-       if(.NOT. ASSOCIATED(s1%v(1)%J%r))call crap1("EQUALMAPgen 2")  ! call newetall(s1%v%J,nd2)
-       call newdifd(s2%h%j,w%v%j,one)
-       call newetpin(w%v%j,s1%v%j,jn)
-    endif
+    ! if(old) then
+    if(s1%v(1)%i==0)call crap1("EQUALMAPgen 1")  ! call etall(s1%v%i,nd2)
+    call difd(s2%h%i,w%v%i,one)
+    call etpin(w%v%i,s1%v%i,jn)
+    !   else
+    !      if(.NOT. ASSOCIATED(s1%v(1)%J%r))call crap1("EQUALMAPgen 2")  ! call newetall(s1%v%J,nd2)
+    !      call newdifd(s2%h%j,w%v%j,one)
+    !      call newetpin(w%v%j,s1%v%j,jn)
+    !   endif
 
     s1=s1*s2%linear
 
@@ -827,6 +846,7 @@ contains
     logical(lp) more
     integer i,j,k,imax,ier,ifac
 
+    IF(.NOT.C_%STABLE_DA) RETURN
     if(.not.imaxflag) then
        junk(:)=0
        do i=1,nd2
@@ -1219,7 +1239,7 @@ contains
     implicit none
     integer NO1,ND1,NP1,NDPT1
     LOGICAL(lp) log1
-    warnda=.false.
+    !   warnda=.false.
     if(first_time) then
        first_time=.false.
        w_p=0
@@ -1232,12 +1252,12 @@ contains
        call kill(varf1)
        call kill(varf2)
     endif
-    warnda=.true.
+    !   warnda=.true.
 
 
     master=0  !  master=1   2002.12.25
 
-
+    call RESET_APERTURE_FLAG
     old=log1
     NO=NO1
     ND=ND1
@@ -1246,29 +1266,29 @@ contains
     NDPT=NDPT1
     NV=ND2+NP
     newprint=.false.
-    if(old) then
-       call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
-       w_p=0
-       w_p%nc=1
-       w_p=(/" Berz's Package  "/)
-       w_p%fc='(1((1X,A72),/))'
-       !       CALL WRITE_i
-    else
-       if(no1>3) then
-          w_p=0
-          w_p%nc=1
-          w_p=(/" No1 is too big: run old=.true."/)
-          w_p%fc='(1((1X,A72)))'
-          CALL WRITE_e(-1)
-       endif
-       w_p=0
-       w_p%nc=1
-       w_p=(/" Etienne's Experimental Package  "/)
-       w_p%fc='(1((1X,A72)))'
-       CALL WRITE_i
-       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
-    endif
-
+    ! if(old) then
+    call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
+    w_p=0
+    w_p%nc=1
+    w_p=(/" Berz's Package  "/)
+    w_p%fc='(1((1X,A72),/))'
+    !       CALL WRITE_i
+    !    else
+    !       if(no1>3) then
+    !          w_p=0
+    !          w_p%nc=1
+    !          w_p=(/" No1 is too big: run old=.true."/)
+    !          w_p%fc='(1((1X,A72)))'
+    !          CALL WRITE_e(-1)
+    !       endif
+    !       w_p=0
+    !       w_p%nc=1
+    !       w_p=(/" Etienne's Experimental Package  "/)
+    !       w_p%fc='(1((1X,A72)))'
+    !       CALL WRITE_i
+    !       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
+    !    endif
+    !
     call set_in_tpsa( NO,ND,ND2,NP,NDPT,NV,old)
     call set_in_tpsalie( NO,ND,ND2,NP,NDPT,NV,old)
 
@@ -1305,7 +1325,7 @@ contains
     integer NO1,ND1,NP1,NDPT1
     LOGICAL(lp) log1
 
-    warnda=.false.
+    !   warnda=.false.
     if(first_time) then
        first_time=.false.
        w_p=0
@@ -1318,7 +1338,7 @@ contains
        call kill(varf1)
        call kill(varf2)
     endif
-    warnda=.true.
+    !   warnda=.true.
 
     master=0  !  master=1   2002.12.25
 
@@ -1333,28 +1353,29 @@ contains
     NV=ND2+NP
     newprint=.false.
 
-    if(old) then
-       call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
-       w_p=0
-       w_p%nc=1
-       w_p=(/" Berz's Package  "/)
-       w_p%fc='(1((1X,A72),/))'
-       !       CALL WRITE_i
-    else
-       if(no1>3) then
-          w_p=0
-          w_p%nc=1
-          w_p=(/" No1 is too big: run old=.true."/)
-          w_p%fc='(1((1X,A72)))'
-          CALL WRITE_e(-1)
-       endif
-       w_p=0
-       w_p%nc=1
-       w_p=(/" Etienne's Experimental Package  "/)
-       w_p%fc='(1((1X,A72)))'
-       CALL WRITE_i
-       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
-    endif
+    ! if(old) then
+    call RESET_APERTURE_FLAG
+    call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
+    w_p=0
+    w_p%nc=1
+    w_p=(/" Berz's Package  "/)
+    w_p%fc='(1((1X,A72),/))'
+    !       CALL WRITE_i
+    !    else
+    !       if(no1>3) then
+    !          w_p=0
+    !          w_p%nc=1
+    !          w_p=(/" No1 is too big: run old=.true."/)
+    !          w_p%fc='(1((1X,A72)))'
+    !          CALL WRITE_e(-1)
+    !       endif
+    !       w_p=0
+    !       w_p%nc=1
+    !       w_p=(/" Etienne's Experimental Package  "/)
+    !       w_p%fc='(1((1X,A72)))'
+    !       CALL WRITE_i
+    !       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
+    !    endif
     call set_in_tpsa( NO,ND,ND2,NP,NDPT,NV,old)
     call set_in_tpsalie( NO,ND,ND2,NP,NDPT,NV,old)
 
@@ -1374,9 +1395,9 @@ contains
 
     CALL DEASSIGN
     !    CALL DEASSIGNMAP
-    IF(.NOT.OLD) then
-       CALL DE_initialize_da
-    endif
+    !   IF(.NOT.OLD) then
+    !      CALL DE_initialize_da
+    !   endif
 
   end subroutine DATERMINATE
 
@@ -1417,6 +1438,8 @@ contains
     real(dp) stn(ndim),radn(ndim),angn(ndim)
     integer i,j,jj(lnv)
     character(6) ind_stoc(ndim2)
+
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     st(:)=zero;rad(:)=zero;ang(:)=zero;
     stn(:)=zero;radn(:)=zero;angn(:)=zero;
@@ -1521,14 +1544,7 @@ contains
     enddo
     call initpert(stn,angn,radn)
     call  kernelrad(bijn,bijnout)
-    !if(old) then
-    !   call comcfu(tc%i,xgam,xgbm,tc%i)
-    !else
-    !   call newcomcfu(tc%j,xgam,xgbm,tc%j)
-    !endif
-    !s2%bijnr%cos=tc(1)
-    !s2%bijnr%sin=tc(2)
-    !bijn=s2%bijnr
+
 
     bijn=bijnout
 
@@ -1631,6 +1647,7 @@ contains
     type (taylor) tc(2)
     TYPE (pbresonance) bijnr
 
+    IF(.NOT.C_%STABLE_DA) RETURN
     call allocdas(tc,2)
     call alloc(bijn)
     call alloc(bijnr)
@@ -1639,11 +1656,11 @@ contains
     tc(1)=bijnr%cos
     tc(2)=bijnr%sin
 
-    if(old) then
-       call comcfu(tc%i,xgam,xgbm,tc%i)
-    else
-       call newcomcfu(tc%j,xgam,xgbm,tc%j)
-    endif
+    ! if(old) then
+    call comcfu(tc%i,xgam,xgbm,tc%i)
+    !    else
+    !       call newcomcfu(tc%j,xgam,xgbm,tc%j)
+    !    endif
     bijnr%cos=tc(1)
     bijnr%sin=tc(2)
     bout=bijnr

@@ -14,7 +14,7 @@ MODULE S_DEF_KIND
   PRIVATE KICKTR,KICKTP,KICKTS
   PRIVATE MULTIPOLE_FRINGER,MULTIPOLE_FRINGEP,MULTIPOLE_FRINGES !,MULTIPOLE_FRINGE
   PRIVATE FRINGER,FRINGEP,FRINGES
-  PRIVATE FRINGE_
+  !  PRIVATE FRINGE_
   PRIVATE EDGER,EDGEP,EDGES !,EDGE
   PRIVATE KICKR,KICKP,KICKS !,KICK
   PRIVATE KICKEXR,KICKEXP,KICKEXS
@@ -25,7 +25,7 @@ MODULE S_DEF_KIND
   PRIVATE KICK_SOLR,KICK_SOLP,KICK_SOLS !,KICK_SOL
   PRIVATE SOL_ROTR,SOL_ROTP,SOL_ROTS !,SOL_ROT
   PRIVATE INTESOLR,INTESOLP,INTESOLS,INTESOL
-  PRIVATE FACER,FACEP,FACES,FACE
+  PRIVATE FACER,FACEP,FACES !,FACE
   PRIVATE NEWFACER,NEWFACEP,NEWFACES
   PRIVATE EDGER_TRUE_PARALLEL,EDGEP_TRUE_PARALLEL,EDGES_TRUE_PARALLEL
 
@@ -301,9 +301,9 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE FRINGES       ! USE TO CREATE OTHER ELEMENTS (INTEGRATION)
   END INTERFACE
 
-  INTERFACE FRINGE__MULTI
-     MODULE PROCEDURE FRINGER
-  END INTERFACE
+  !  INTERFACE FRINGE__MULTI
+  !     MODULE PROCEDURE FRINGER
+  !  END INTERFACE
 
   INTERFACE FACE
      MODULE PROCEDURE FACER
@@ -314,9 +314,9 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE NEWFACES
   END INTERFACE
 
-  INTERFACE FACE_MULTI
-     MODULE PROCEDURE NEWFACER
-  END INTERFACE
+  !  INTERFACE FACE_MULTI
+  !     MODULE PROCEDURE NEWFACER
+  !  END INTERFACE
 
 
   INTERFACE EDGE
@@ -764,9 +764,11 @@ contains
     real(dp) DF(4),DK(4),DDF(4)
     INTEGER I,J,TOTALPATH
 
+    EL%DELTA_E=x(5)
 
     IF(EL%THIN) THEN
        CALL CAVITY(EL,X,MID)
+       EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
        RETURN
     ENDIF
     TOTALPATH=EL%P%TOTALPATH
@@ -850,6 +852,7 @@ contains
        X(6)=X(6)-(CAVITY_TOTALPATH-EL%P%TOTALPATH)*EL%P%LD
     endif
 
+    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
 
   END SUBROUTINE CAVER
 
@@ -866,8 +869,10 @@ contains
     real(dp) DDF(4)
     INTEGER I,J,TOTALPATH
 
+    EL%DELTA_E=x(5)
     IF(EL%THIN) THEN
        CALL CAVITY(EL,X)
+       EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
        RETURN
     ENDIF
 
@@ -964,6 +969,7 @@ contains
     else
        X(6)=X(6)-(CAVITY_TOTALPATH-EL%P%TOTALPATH)*EL%P%LD
     endif
+    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
 
   END SUBROUTINE CAVEP
 
@@ -994,12 +1000,12 @@ contains
 
     IF(EL%P%NOCAVITY) RETURN
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    EL%DELTA_E=x(5)
+    !    EL%DELTA_E=x(5)
     x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
 
     IF(PRESENT(MID)) CALL XMID(MID,X,1)
     x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
+    !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
   END SUBROUTINE CAVITYR
@@ -1012,11 +1018,11 @@ contains
 
     IF(EL%P%NOCAVITY) RETURN
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    EL%DELTA_E=x(5)
+    !    EL%DELTA_E=x(5)
     x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
     IF(PRESENT(MID)) CALL XMID(MID,X,1)
     x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
+    !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
   END SUBROUTINE CAVITYP
@@ -1031,10 +1037,10 @@ contains
     IF(EL%P%NOCAVITY) RETURN
     CALL ALLOC(X,6)
     X=Y
-    EL%DELTA_E=x(5)
+    !    EL%DELTA_E=x(5)
     !x(5)=x(5)-EL%volt*SIN(EL%freq*x(6)+EL%PHAS+phase0)/EL%P%P0C
     x(5)=x(5)-EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
+    !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     Y=X
     CALL KILL(X,6)
   END SUBROUTINE CAVITYS
@@ -1138,7 +1144,7 @@ contains
        F=F+R2
     ENDDO
 
-    EL%DELTA_E=x(5)
+    !    EL%DELTA_E=x(5)
 
     IF(EL%N_BESSEL>0) THEN
        X(2)=X(2)-X(1)*DF*VL*COS(O*X(6)+EL%PHAS+phase0)/O
@@ -1148,7 +1154,7 @@ contains
 
     x(5)=x(5)-F*VL*SIN(O*x(6)+EL%PHAS+phase0)
 
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
+    !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
 
 
   END SUBROUTINE KICKCAVR
@@ -1179,7 +1185,7 @@ contains
        F=F+R2
     ENDDO
 
-    EL%DELTA_E=x(5)
+    !    EL%DELTA_E=x(5)
 
     IF(EL%N_BESSEL>0) THEN
        X(2)=X(2)-X(1)*DF*VL*COS(O*X(6)+EL%PHAS+phase0)/O
@@ -1189,7 +1195,7 @@ contains
 
     x(5)=x(5)-F*VL*SIN(O*x(6)+EL%PHAS+phase0)
 
-    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
+    !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
 
     CALL KILL(DF,R2,F,DR2,O,VL)
 
@@ -1688,7 +1694,8 @@ contains
     else
        X(6)=X(6)-(X(2)*FX+X(4)*FY)*DEL**2
     endif
-
+    !    CALL CHECK_STABILITY(X)
+    call check_root_drift(el,X)
   END SUBROUTINE MULTIPOLE_FRINGER
 
   SUBROUTINE MULTIPOLE_FRINGEP(EL,AN,BN,K,X)
@@ -1856,7 +1863,8 @@ contains
        ! HORIZONTAL WEDGE
        X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/TWO)*X(1)**2
     ENDIF
-
+    !    CALL check_stability(X)
+    call check_root_drift(el,X)
   END SUBROUTINE NEWFACER
 
   SUBROUTINE NEWFACEP(EL,BN,H,X)
@@ -2058,7 +2066,8 @@ contains
     D(3,3)= TIME_FAC/PZ
 
     !    FI0=(B*XP/(one+yp**2)-B2* ( ONE + XP**2*(TWO+YP**2) )/PZ)
-    FI0= arctan((XP/(one+yp**2)))    !-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )   *PZ
+    !    FI0= arctan((XP/(one+yp**2)))    !-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )   *PZ
+    FI0= ATAN((XP/(one+yp**2)))-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
     CO2=B/COS(FI0)**2
     CO1=CO2/(ONE+(XP/(one+yp**2))**2 )
 
@@ -2076,7 +2085,7 @@ contains
     DO i=1,3
        B=FI(I)*D(I,2)+B
     ENDDO
-    X(3)=TWO*X(3)/(ONE+ ROOT(ONE-TWO*B*X(3)) )
+    X(3)=TWO*X(3)/(ONE+ sqrt(ONE-TWO*B*X(3)) )
     X(4)=X(4)-FI0*X(3)
 
     B=ZERO
@@ -2090,8 +2099,8 @@ contains
        B=FI(I)*D(I,3)+B
     ENDDO
     X(6)=X(6)-HALF*B*X(3)**2
-
-
+    !    CALL check_stability(X)
+    call check_root_drift(el,X)
   END SUBROUTINE FRINGER
 
 
@@ -5848,10 +5857,9 @@ contains
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
+       DK2=EL%L/EL%P%NST
+       DK=DK2/two
        IF(OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
-          DK2=EL%L/EL%P%NST
-          DK=DK2/two
-
 
           DO I=1,EL%P%NST  !-1
              CALL KICKKTK(EL,DK,X)  ! NEW
@@ -5956,10 +5964,10 @@ contains
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       IF(OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
-          DK2=EL%L/EL%P%NST
-          DK=DK2/two
+       DK2=EL%L/EL%P%NST
+       DK=DK2/two
 
+       IF(OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
 
           DO I=1,EL%P%NST  !-1
              CALL KICKKTK(EL,DK,X)  ! NEW
@@ -6066,9 +6074,9 @@ contains
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
+       DK2=EL%L/EL%P%NST
+       DK=DK2/two
        IF(OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
-          DK2=EL%L/EL%P%NST
-          DK=DK2/two
 
 
           DO I=1,EL%P%NST  !-1
@@ -9790,6 +9798,12 @@ contains
     real(dp),INTENT(IN):: YL,DL
     TYPE(TEAPOT),INTENT(IN):: EL
 
+    ! if(abs(x(1))+abs(x(3))+abs(x(2))+abs(x(4))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+    !    if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in SSECH1R"
+    !    CHECK_STABLE=.false.
+    ! endif
+    ! if(.not.CHECK_STABLE) return
+
     IF(EL%DRIFTKICK) THEN
        CALL Sprot(EL,YL,DL,X)
     ELSE
@@ -9837,7 +9851,6 @@ contains
     TYPE(TEAPOT),INTENT(IN):: EL
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
-
     if(EL%P%B0/=zero) then
        A=YL*EL%P%B0
        R=one/EL%P%B0
@@ -9845,7 +9858,8 @@ contains
           B=EL%P%BETA0
           PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
           PT=one-X(2)*TAN(A)/PZ
-          XN(1)=(X(1)+R)/COS(A)/PT-R
+          !       XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
           XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
@@ -9853,7 +9867,7 @@ contains
        else
           PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
           PT=one-X(2)*TAN(A)/PZ
-          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
           XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
@@ -9866,9 +9880,8 @@ contains
     else
        CALL DRIFT(YL,DL,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     endif
-
-
-
+    !    CALL CHECK_STABILITY(X)
+    call check_root_drift(el%p,X)
   END SUBROUTINE Sprotr
 
   SUBROUTINE SPROTP(EL,YL,DL,X)
@@ -9877,21 +9890,23 @@ contains
     TYPE(REAL_8),INTENT(IN):: YL
     real(dp),INTENT(IN):: DL
     TYPE(TEAPOTP),INTENT(IN):: EL
-    TYPE(REAL_8) XN(6),PZ,PT,A
+    TYPE(REAL_8) XN(6),PZ,PT,A,ah
     real(dp)  b,R
 
     if(EL%P%B0/=zero) then
        CALL ALLOC( XN,6)
        CALL ALLOC( PZ)
        CALL ALLOC( PT)
-       CALL ALLOC( A)
+       CALL ALLOC( A,ah)
        A=YL*EL%P%B0
+       ah=a/two
        R=one/EL%P%B0
        if(EL%P%TIME) then
           B=EL%P%BETA0
           PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
           PT=one-X(2)*TAN(A)/PZ
-          XN(1)=(X(1)+R)/COS(A)/PT-R
+          !          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(1)=(X(1)+R*(two*sin(ah)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
           XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
@@ -9899,7 +9914,7 @@ contains
        else
           PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
           PT=one-X(2)*TAN(A)/PZ
-          XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(1)=(X(1)+R*(two*sin(ah)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
           XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
@@ -9913,7 +9928,7 @@ contains
        CALL KILL( XN,6)
        CALL KILL( PZ)
        CALL KILL( PT)
-       CALL KILL( A)
+       CALL KILL( A,ah)
     else
        CALL DRIFT(YL,DL,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     endif
@@ -10018,8 +10033,10 @@ contains
     X(2)=XN(2)
     X(3)=XN(3)
     X(6)=XN(6)
-
+    !    CALL CHECK_STABILITY(X)
+    call check_root_drift(EL%P,X)
   END SUBROUTINE Ssecr
+
 
   SUBROUTINE SsecP(EL,YL,DL,X)
     IMPLICIT NONE
@@ -10147,6 +10164,12 @@ contains
     real(dp) X1,X3,X5,BX,BY,BTX,BTY,B(3),B2
     INTEGER J,M,A,K,DIR
 
+    !    if(abs(x(1))+abs(x(3))+abs(x(2))+abs(x(4))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+    !       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in SKICKR"
+    !       CHECK_STABLE=.false.
+    !    endif
+    !    if(.not.CHECK_STABLE) return
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
 
@@ -10222,6 +10245,8 @@ contains
     ENDIF
 
   END SUBROUTINE SKICKR
+
+
 
   SUBROUTINE SKICKP(EL,YL,X)
     IMPLICIT NONE
@@ -10897,7 +10922,6 @@ contains
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
 
     IF(EL%P%DIR==1) THEN
-
        IF(EL%P%EDGE(1)/=zero) THEN
           CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,EL%P%TIME)
           CALL FACE(EL%P,EL%BN,EL%H1,X)
@@ -13443,6 +13467,25 @@ contains
 
   END SUBROUTINE SPARS
 
+  SUBROUTINE check_root_drift(p,X)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    type(magnet_chart),intent(in):: p
+    real(dp) PZ
+
+    IF(P%EXACT) THEN
+       if(P%TIME) then
+          PZ=ROOT(one+two*X(5)/P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+       else
+          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+       endif
+    ENDIF
+    !       write(30,*) x(1:5),c_%check_stable
+    if(.not.c_%check_stable)x=zero
+
+  END SUBROUTINE check_root_drift
+
+
   SUBROUTINE wedger(A,X,EL1,EL2)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
@@ -13454,6 +13497,12 @@ contains
     integer TOTALPATH
     logical(lp) time,EXACT
     EXACT=.TRUE.
+
+    !    if(abs(x(1))+abs(x(3))+abs(x(2))+abs(x(4))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+    !       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in wedger"
+    !       CHECK_STABLE=.false.
+    !    endif
+    !    if(.not.CHECK_STABLE) return
 
 
     IF(PRESENT(EL1)) THEN
@@ -13492,7 +13541,6 @@ contains
 
           XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2) )&
                & /(PZS+PZ*COS(A)-X(2)*SIN(A))
-
           XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/B1
 
           XN(6)=X(6)+XN(3)*(one/b+x(5))
@@ -13518,6 +13566,7 @@ contains
        X(3)=XN(3)
        X(6)=XN(6)
     ENDIF
+    !    CALL CHECK_STABILITY(X)
 
   END SUBROUTINE wedger
 

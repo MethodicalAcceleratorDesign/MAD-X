@@ -59,6 +59,128 @@ contains
 
   end SUBROUTINE lattice_GET_CHROM
 
+
+  SUBROUTINE compute_A_4d(r,my_state,filename,pos,del,no,MY_A)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    integer pos,no,imod,ic,I
+    TYPE(internal_state) state
+    real(dp) closed(6),del
+    type(DAMAP) ID
+    TYPE(REAL_8) Y(6)
+    CHARACTER(*) FILENAME
+    TYPE(FIBRE), POINTER :: P
+    TYPE(DAMAP) MY_A
+    TYPE(NORMALFORM) NORM
+
+
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+    closed=zero
+    closed(5)=del
+    CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+    CALL INIT(STATE,no,0,BERZ)
+
+    CALL ALLOC(Y); CALL ALLOC(MY_A); CALL ALLOC(NORM)
+    call alloc(id)
+    imod=r%n/10
+    id=1
+    Y=CLOSED+id
+    ic=0
+    p=>r%start
+    do i=1,r%n
+
+       CALL TRACK(R,Y,i,i+1,STATE)
+       if(mod(i,imod)==0) then
+          ic=ic+1
+          write(6,*) ic*10," % done "
+       endif
+       p=>p%next
+    enddo
+    id=y
+
+    call kanalnummer(ic)
+    open(unit=ic,file=FILENAME)
+
+
+    call print(ID,IC)
+    NORM=ID
+    MY_A=NORM%A_T
+    WRITE(6,*) " TUNES ",NORM%TUNE(1:2)
+    call print(MY_A,IC)
+    CLOSE(IC)
+
+
+    CALL kill(Y)
+    call kill(id)
+    call kill(NORM)
+
+  end SUBROUTINE compute_A_4d
+
+
+
+  SUBROUTINE compute_map_general(r,my_state,filename,pos,del,no)
+    IMPLICIT NONE
+    TYPE(layout),INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    TYPE(internal_state) state
+    integer pos,no,is,i,mf
+    real(dp) closed(6),del,s
+    type(DAMAP) ID
+    TYPE(REAL_8) Y(6)
+    CHARACTER(NLP) NAME
+    CHARACTER(*) FILENAME
+    TYPE(FIBRE), POINTER :: P
+    type(normalform) norm
+    type(taylor) betax,betax2
+    integer, allocatable :: expo1(:),expo2(:)
+    integer, allocatable :: expo3(:),expo4(:)
+
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+
+    state=my_state   !+nocavity0
+
+    if(state%nocavity) then
+       allocate(expo1(4),expo2(4))
+       allocate(expo3(4),expo4(4))
+    else
+       allocate(expo1(6),expo2(6))
+       allocate(expo3(6),expo4(6))
+    endif
+
+    expo1=zero;expo2=zero;
+    expo3=zero;expo4=zero;
+
+    closed=zero
+    closed(5)=del
+    CALL FIND_ORBIT(R,CLOSED,pos,my_state,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+    call init(state,no,c_%np_pol,berz)
+    call alloc(id); call alloc(norm);call alloc(y);call alloc(betax,betax2);
+
+    id=1; y=closed+id;
+    is=track_flag(r,y,pos,+state)
+
+    if(is/=0) then
+       write(6,*) "HELP"
+       stop
+    endif
+
+
+    call kill(id); call kill(norm);call kill(y);call kill(betax,betax2);
+    deallocate(expo1,expo2)
+    deallocate(expo3,expo4)
+
+  END SUBROUTINE compute_map_general
+
+
   SUBROUTINE compute_map_4d(r,my_state,filename,pos,del,no)
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: r
@@ -181,9 +303,9 @@ contains
     if(pos/=0) then
        if(ib==1) then
           tune(1:2)=norm%tune(1:2)
-          Write(6,*) " Tunes ", tune(1:2)
        endif
        tune2(1:2)=norm%tune(1:2)
+       Write(6,*) " Tunes ", norm%tune(1:2)
 
        y=closed+norm%a_t
        p=>r%start
@@ -1417,7 +1539,6 @@ contains
           CALL RESET_APERTURE_FLAG
           c_%APERTURE_FLAG=APERTURE
           write(6,*) " Unstable in find_orbit without TPSA"
-
           return
        endif
        if(.not.check_stable) then
@@ -1976,7 +2097,7 @@ contains
     ELSE
        write(6,*) "          STABLE "
 
-!       write(6,*) "tunes of the ray " ,tot_tune(1:2)
+       !       write(6,*) "tunes of the ray " ,tot_tune(1:2)
        WRITE(6,201) EMIT,APER, TUNEnew(1:2),DBETA
 
        scas=scat
@@ -2346,28 +2467,23 @@ contains
 
     do i=1,r%n
 
-       read(mf,*,end=100) nt,nom
-       call context(nom)
+       if(associated(p%mag%an)) then
+          read(mf,*) nt,nom
+          call context(nom)
 
-       do j=1,nt
-          read(mf,*)jt,bn(j),an(j)
-       enddo
+          do j=1,nt
+             read(mf,*)jt,bn(j),an(j)
+          enddo
 
-       do jt=1,r%n
-          if(nom==p%mag%name) then
-             ntot=ntot+1
-             do j=nt,1,-1
-                call ADD(p,j,0,bn(j))
-                call ADD(p,-j,0,an(j))
-             enddo
-          endif
-          if(nom==p%mag%name) exit
-          p=>p%next
-       enddo
-
+          ntot=ntot+1
+          do j=nt,1,-1
+             call ADD(p,j,0,bn(j))
+             call ADD(p,-j,0,an(j))
+          enddo
+       endif  ! associated
+       p=>p%next
     enddo
 
-100 continue
     write(6,*) ntot," magnets settings read"
 
     close(mf)
@@ -2376,6 +2492,47 @@ contains
   end   SUBROUTINE  read_bn_an
 
   ! THIN LENS EXAMPLE
+
+  SUBROUTINE assign_one_aperture(L,pos,kindaper,R,X,Y)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: L
+    integer pos,kindaper
+    REAL(DP) R,X,Y
+    type(fibre), pointer :: P
+
+    call move_to(L,p,pos)
+
+    if(.NOT.ASSOCIATED(P%MAG%p%aperture)) THEN
+       call alloc(P%MAG%p%aperture)
+       call alloc(P%MAGP%p%aperture)
+    ENDIF
+    if(kindaper/=0) then
+       P%MAG%p%aperture%kind = kindaper
+       P%MAGP%p%aperture%kind = kindaper
+       P%MAG%p%aperture%r    = R
+       P%MAG%p%aperture%x    = X
+       P%MAG%p%aperture%y    = y
+       P%MAGP%p%aperture%r    = R
+       P%MAGP%p%aperture%x    = X
+       P%MAGP%p%aperture%y    = y
+    endif
+
+  end SUBROUTINE assign_one_aperture
+
+  SUBROUTINE TURN_OFF_ONE_aperture(R,pos)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer pos
+    type(fibre), pointer :: P
+
+    call move_to(r,p,pos)
+
+    if(ASSOCIATED(P%MAG%p%aperture)) THEN
+       P%MAG%p%aperture%kind = -P%MAG%p%aperture%kind
+       P%MAGP%p%aperture%kind = P%MAG%p%aperture%kind
+    ENDIF
+
+  end SUBROUTINE TURN_OFF_ONE_aperture
 
   SUBROUTINE MESS_UP_ALIGNMENT(R,SIG,cut)
     use gauss_dis
@@ -2399,6 +2556,93 @@ contains
        P=>P%NEXT
     ENDDO
   end SUBROUTINE MESS_UP_ALIGNMENT
+
+
+
+
+  SUBROUTINE dyn_aper(L,x_in,n_in,ang_in,ang_out,del_in,dlam,pos,nturn,ite,state,mf)
+    IMPLICIT NONE
+    type(layout), intent(inout) :: L
+    real(dp) x(6)
+    REAL(DP) x_in,del_in,closed(6),r(6),rt(6)
+    REAL(DP) lamT,lams,lamu,dlam,DLAMT,DX,ang,ang_in,ang_out
+    integer pos,nturn,i,st,ite,ic,mf,J,n_in,j_in
+    TYPE(INTERNAL_STATE) STATE
+    TYPE(FIBRE), POINTER :: P
+    !
+    !    TYPE(REAL_8) Y(6)
+    !    TYPE(DAMAP) ID
+    !    TYPE(NORMALFORM) NORM
+
+    closed=zero
+    !    STATE=STATE+NOCAVITY0
+    if(state%nocavity) closed(5)=del_in
+
+    CALL FIND_ORBIT(L,CLOSED,pos,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+    write(mf,201) closed
+    ang= (ang_out-ang_in)/n_in
+    lamt=one
+    do j_in=0,n_in
+
+       x=zero
+       x(1)=x_in*cos(j_in*ang+ang_in)
+       x(3)=x_in*sin(j_in*ang+ang_in)
+       x(5)=del_in
+
+
+       dx=0.3_dp
+
+       r=zero;rt=zero;
+       lams=zero
+       lamu=ZERO
+
+       DLAMT=DX
+
+       !    lamt=ONE
+       ic=0
+       do while(DLAMT>dlam.and.ic<ite)
+
+          ic=ic+1
+          R=ZERO;
+          r(1:4)=lamt*x(1:4)
+          if(state%nocavity) then
+             rt=r+closed
+          else
+             rt=r+closed
+             rt(5)=rt(5)+x(5)
+          endif
+
+
+          do i=1,nturn
+             st=track_flag(L,rt,pos,state)
+             if(st/=0) exit
+          enddo
+
+          if(st/=0) then
+             lamu=lamt
+             lamt=(lams+lamt)/two
+          else
+             lams=lamt
+             IF(LAMU<DX) THEN
+                lamt=DX+lamt
+             ELSE
+                lamt=(lamu+lamt)/two
+             ENDIF
+          endif
+          DLAMT=sqrt(x(1)**2+x(3)**2)*ABS(LAMU-LAMS)
+       enddo
+       write(6,*) ic,(j_in*ang+ang_in)/twopi,lamS*x(1),lamS*x(3)
+
+       write(mf,202) lamS*x(1),lamS*x(3),lamS*x(1)+closed(1),lamS*x(3)+closed(3),DLAMT
+       lamt=lamt*0.8_dp
+    enddo
+201 FORMAT(6(1X,D18.11))
+202 FORMAT(5(1X,D18.11))
+
+  end SUBROUTINE dyn_aper
+
 
   SUBROUTINE THIN_EXAMPLE(R,B,I1,I2,IN_STATE,MF)
     IMPLICIT NONE
@@ -2629,6 +2873,8 @@ contains
   ! All the particles are at different locations
   ! Notice that the layout is hidden: this is consistant with time tracking
   ! Magnets are not ontological objects
+
+
 
 
 end module S_fitting

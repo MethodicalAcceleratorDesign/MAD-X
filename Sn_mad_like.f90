@@ -2850,18 +2850,6 @@ CONTAINS
     call set_da_pointers
     c_%NP_pol => NP_pol
     c_%NPARA => NPARA
-    c_%ROOT_CHECK => ROOT_CHECK
-    c_%CHECK_STABLE => CHECK_STABLE
-    c_%CHECK_MADX_APERTURE => CHECK_MADX_APERTURE
-    c_%ROOT_CHECK => ROOT_CHECK
-    c_%APERTURE_FLAG => APERTURE_FLAG
-    c_%absolute_aperture => absolute_aperture
-    c_%check_x_min => check_x_min
-    c_%check_x_max => check_x_max
-    c_%check_y_min => check_y_min
-    c_%check_y_max => check_y_max
-    c_%hyperbolic_aperture => hyperbolic_aperture
-    c_%WATCH_USER => WATCH_USER
     c_%ALWAYS_EXACTMIS=> ALWAYS_EXACTMIS
 
     c_%x_prime => x_prime

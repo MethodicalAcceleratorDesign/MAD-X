@@ -449,7 +449,7 @@ contains
     TYPE(INTERNAL_STATE) K
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     INTEGER, INTENT(IN):: I1,I2
-    INTEGER J
+    INTEGER J,i22
     TYPE (fibre), POINTER :: C
 
 
@@ -459,31 +459,37 @@ contains
 
     call move_to(r,c,I1)
 
-    if(i2>i1) then
-       J=I1
-
-       DO  WHILE(J<I2.AND.ASSOCIATED(C))
-          j_global=j
-          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-
-          C=>C%NEXT
-          J=J+1
-       ENDDO
+    if(i2>=i1) then
+       i22=i2
     else
-       J=I1
-
-       DO  WHILE(J>I2.AND.ASSOCIATED(C))
-          j_global=j
-
-          c%dir=-c%dir
-          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-          c%dir=-c%dir
-
-          C=>C%previous
-          J=J-1
-       ENDDO
-
+       i22=r%n+i2
     endif
+
+    !    if(i2>i1) then
+    J=I1
+
+    DO  WHILE(J<I22.AND.ASSOCIATED(C))
+       j_global=j
+       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+
+       C=>C%NEXT
+       J=J+1
+    ENDDO
+    !    else
+    !       J=I1
+    !
+    !       DO  WHILE(J>I2.AND.ASSOCIATED(C))
+    !          j_global=j
+    !
+    !          c%dir=-c%dir
+    !          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+    !          c%dir=-c%dir
+    !
+    !          C=>C%previous
+    !          J=J-1
+    !       ENDDO
+    !
+    !    endif
 
 
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
@@ -498,7 +504,7 @@ contains
     TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
     TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
-    INTEGER J;
+    INTEGER J,I22
 
     TYPE (FIBRE), POINTER :: C
 
@@ -507,31 +513,39 @@ contains
 
     call move_to(r,c,I1)
 
-    if(i2>i1) then
-       J=I1
-
-       DO  WHILE(J<I2.AND.ASSOCIATED(C))
-          j_global=j
-          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-
-          C=>C%NEXT
-          J=J+1
-       ENDDO
+    if(i2>=i1) then
+       i22=i2
     else
-       J=I1
-
-       DO  WHILE(J>I2.AND.ASSOCIATED(C))
-          j_global=j
-
-          c%dir=-c%dir
-          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-          c%dir=-c%dir
-
-          C=>C%previous
-          J=J-1
-       ENDDO
-
+       i22=r%n+i2
     endif
+
+    !    if(i2>i1) then
+    J=I1
+
+    DO  WHILE(J<I22.AND.ASSOCIATED(C))
+       j_global=j
+       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+
+       C=>C%NEXT
+       J=J+1
+    ENDDO
+
+
+    !    else
+    !       J=I1
+
+    !       DO  WHILE(J>I2.AND.ASSOCIATED(C))
+    !          j_global=j
+
+    !          c%dir=-c%dir
+    !          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+    !          c%dir=-c%dir
+
+    !          C=>C%previous
+    !          J=J-1
+    !       ENDDO
+
+    !    endif
 
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
@@ -546,7 +560,7 @@ contains
     TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
     INTEGER, INTENT(IN):: I1,I2
-    INTEGER I,J,M,N
+    INTEGER I,J,M,N,I22
     ! YS SPECIFIC STUFF
     TYPE(DAMAP) ID,XT,DISP
     TYPE(REAL_8) XR(6),X1,X3
@@ -564,32 +578,38 @@ contains
     !    ! end new stuff with kind=3
 
 
-    if(i2>i1) then
-       J=I1
-
-       DO  WHILE(J<I2.AND.ASSOCIATED(C))
-          j_global=j
-
-          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-
-          C=>C%NEXT
-          J=J+1
-       ENDDO
+    if(i2>=i1) then
+       i22=i2
     else
-       J=I1
-
-       DO  WHILE(J>I2.AND.ASSOCIATED(C))
-          j_global=j
-
-          c%dir=-c%dir
-          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-          c%dir=-c%dir
-
-          C=>C%previous
-          J=J-1
-       ENDDO
-
+       i22=r%n+i2
     endif
+
+    !    if(i2>i1) then
+    J=I1
+
+    DO  WHILE(J<I22.AND.ASSOCIATED(C))
+       j_global=j
+
+       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+
+       C=>C%NEXT
+       J=J+1
+    ENDDO
+    !    else
+    !       J=I1
+
+    !       DO  WHILE(J>I2.AND.ASSOCIATED(C))
+    !          j_global=j
+
+    !          c%dir=-c%dir
+    !          CALL TRACK(C,X,K,R%CHARGE,X_IN)
+    !          c%dir=-c%dir
+
+    !          C=>C%previous
+    !          J=J-1
+    !       ENDDO
+
+    !    endif
     !    ! new stuff with kind=3
     !    knob=.FALSE.
     !    ! end new stuff with kind=3

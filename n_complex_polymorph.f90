@@ -953,7 +953,8 @@ contains
     c_%lda_used => lda_used
     c_%real_warning => real_warning
     c_%check_da => check_da
-    c_%stable_da => stable_da
+    !    c_%stable_da => stable_da
+    c_%stable_da => CHECK_STABLE
     c_%no => no
     c_%nv => nv
     c_%nd => nd
@@ -966,6 +967,20 @@ contains
     c_%OLD => OLD
     c_%global_verbose => global_verbose
     c_%da_absolute_aperture=>da_absolute_aperture
+
+    c_%ROOT_CHECK => ROOT_CHECK
+    c_%CHECK_STABLE => CHECK_STABLE
+    c_%CHECK_MADX_APERTURE => CHECK_MADX_APERTURE
+    c_%ROOT_CHECK => ROOT_CHECK
+    c_%APERTURE_FLAG => APERTURE_FLAG
+    c_%absolute_aperture => absolute_aperture
+    c_%check_x_min => check_x_min
+    c_%check_x_max => check_x_max
+    c_%check_y_min => check_y_min
+    c_%check_y_max => check_y_max
+    c_%hyperbolic_aperture => hyperbolic_aperture
+    c_%WATCH_USER => WATCH_USER
+
   end subroutine set_da_pointers
 
   subroutine init_map_cp(NO1,ND1,NP1,NDPT1,PACKAGE)

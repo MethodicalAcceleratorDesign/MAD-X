@@ -11,18 +11,6 @@ module S_extend_poly
   private print6,PRINTenv
   private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8,scdadd,daddsc
 
-  LOGICAL(lp) :: ALLOW_TRACKING=.true.
-  LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
-
-  LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
-  LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
-  LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
-  LOGICAL(lp),TARGET  :: APERTURE_FLAG=.FALSE.
-  LOGICAL(lp),TARGET  :: check_x_min  =.true.   ! check if lost by aperture fitted now
-  LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
-  LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
-  LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
-  REAL(dp),TARGET   :: absolute_aperture=c_1d3
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE REAL_8REAL6
      MODULE PROCEDURE REAL6REAL_8
@@ -53,29 +41,7 @@ module S_extend_poly
 
 CONTAINS
 
-  SUBROUTINE RESET_APERTURE_FLAG
-    IMPLICIT NONE
-    IF(c_%WATCH_USER) THEN
-       IF(.NOT.ALLOW_TRACKING) THEN
-          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
-          WRITE(6,*) "  YOU DID NOT CHECK THE APERTURE STATUS"
-          WRITE(6,*) "  USING A CALL TO PRODUCE_APERTURE_FLAG"
-          WRITE(6,*) "  BEFORE CALLING A TRACKING FUNCTION"
-          STOP 666
-       ENDIF
-    ENDIF
-    c_%CHECK_STABLE =.TRUE.
-    c_%CHECK_MADX_APERTURE =.TRUE.
-    !frs 10.03.2006    c_%check_iteration =.TRUE.
-    !frs 10.03.2006    c_%check_interpolate_x =.TRUE.
-    !frs 10.03.2006    c_%check_interpolate_y =.TRUE.
-    c_%check_x_min =.TRUE.
-    c_%check_x_max =.TRUE.
-    c_%check_y_min =.TRUE.
-    c_%check_y_max =.TRUE.
-    c_%stable_da =.true.
 
-  END   SUBROUTINE RESET_APERTURE_FLAG
 
   SUBROUTINE ANALYSE_APERTURE_FLAG(I,R)
     IMPLICIT NONE
@@ -148,42 +114,13 @@ CONTAINS
   END   SUBROUTINE PRODUCE_APERTURE_FLAG
 
 
-  REAL(DP) FUNCTION  ROOT(X)  ! REPLACES SQRT(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
 
-    IF((X<ZERO).AND.ROOT_CHECK) THEN
-       ROOT=ONE
-       CHECK_STABLE=.FALSE.
-    ELSEIF(X>=ZERO) THEN
-       ROOT=SQRT(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       ROOT=ONE
-       CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION ROOT
-
-  REAL(DP) FUNCTION  ARCSIN(X)  ! REPLACES ASIN(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-
-    IF((ABS(X)>ONE).AND.ROOT_CHECK) THEN
-       ARCSIN=ZERO
-       CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=ONE) THEN
-       ARCSIN=ASIN(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       ARCSIN=ZERO
-       CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION ARCSIN
 
 
   REAL(DP) FUNCTION  SINEHX_X(X) ! REPLACES SINH(X)/X
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
+    IF(.NOT.CHECK_STABLE) return
 
     IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
        SINEHX_X=ZERO
@@ -197,53 +134,6 @@ CONTAINS
 
   END FUNCTION SINEHX_X
 
-  REAL(DP) FUNCTION  COSEH(X) ! REPLACES COSH(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-
-    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
-       COSEH=ONE
-       CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
-       COSEH=COSH(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       COSEH=ONE
-       CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION COSEH
-
-  REAL(DP) FUNCTION  SINEH(X) ! REPLACES SINH(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-
-    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
-       SINEH=ZERO
-       CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
-       SINEH=SINH(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       SINEH=ZERO
-       CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION SINEH
-
-  REAL(DP) FUNCTION  arctan(X) ! REPLACES SINH(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-
-    IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
-       arctan=ZERO
-       CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
-       arctan=atan(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       arctan=ZERO
-       CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION arctan
 
 
   ! Some polymorphism

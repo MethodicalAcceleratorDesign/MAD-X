@@ -220,6 +220,26 @@ CONTAINS
     ENDDO
   END SUBROUTINE GET_FREQ
 
+  SUBROUTINE GET_loss(R,energy,deltap)
+    IMPLICIT NONE
+    TYPE(LAYOUT), INTENT(IN) :: R
+    REAL(DP), INTENT(OUT) :: energy,deltap
+    TYPE(FIBRE), POINTER:: P
+    INTEGER I
+    P=>R%START
+    energy=zero
+    deltap=zero
+    DO I=1,R%N
+       IF(P%MAG%kind==kind4) THEN
+          energy=energy+p%mag%delta_e
+          write(6,*) p%mag%name
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+    P=>R%START
+    deltap=energy/p%mag%p%p0c
+  END SUBROUTINE GET_loss
+
   SUBROUTINE GET_ALL(R,FREQ,VOLT,PHAS)
     IMPLICIT NONE
     TYPE(LAYOUT), INTENT(IN) :: R

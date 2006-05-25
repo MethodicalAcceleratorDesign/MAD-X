@@ -3,12 +3,13 @@
 ! See file a_scratch_size
 
 module definition
-  use define_newda
+  !  use define_newda
+  use precision_constants   ! added to replace use define_newda
   use scratch_size
   use DABNEW
   use lielib_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
-  use newda
-  USE LIELIB_ETIENNE
+  !  use newda
+  !  USE LIELIB_ETIENNE
   implicit none
   public
   logical(lp) :: newread=.false. ,newprint =  .false. , first_time = .true.
@@ -29,10 +30,10 @@ module definition
   integer iass0user(ndumt)
   integer,parameter::ndim2=2*ndim
   integer,parameter::mmmmmm1=1,mmmmmm2=2,mmmmmm3=3,mmmmmm4=4
-  type (taylorlow) DUMMYl,templ             !,DUMl(ndum)
-  private NDC,NDC2,NDT,IREF,itu,iflow,jtune,nres,ifilt  ,idpr
-  private nplane,idsta,ista
-  private xintex,dsta,sta,angle,rad,ps,rads,mx
+  !  type (taylorlow) DUMMYl,templ             !,DUMl(ndum)
+  !  private NDC,NDC2,NDT,IREF,itu,iflow,jtune,nres,ifilt  ,idpr
+  !  private nplane,idsta,ista
+  !  private xintex,dsta,sta,angle,rad,ps,rads,mx
   ! numerical differentiation by knobs
   logical(lp) :: knob_numerical=.false.
   real(dp) ::  knob_eps(lnv)=c_1d_6
@@ -47,7 +48,7 @@ module definition
   !!&1
   TYPE taylor
      INTEGER I !@1  integer I is a pointer in old da-package of Berz
-     type (taylorlow) j !@1   Taylorlow is an experimental type not supported
+     !     type (taylorlow) j !@1   Taylorlow is an experimental type not supported
   END TYPE taylor
   !@2  UNIVERSAL_TAYLOR is used by Sagan in BMAD Code at Cornell
   TYPE UNIVERSAL_TAYLOR
@@ -170,9 +171,9 @@ module definition
   !&5
 
   TYPE normalform
-     type (damap) A_t   ! Total A  :  A_t= A1 o A
+     type (damap) A_t   ! Total A  :  A_t= A1 o A_rest
      type (damap) A1    ! Dispersion
-     type (reversedragtfinn) A  ! Linear A and nonlinear A
+     type (reversedragtfinn) A  ! Linear A_t and nonlinear A_t
      type (dragtfinn) NORMAL    ! Normal is the Normal Form R
      type (damap) DHDJ  ! Contains the tunes in convenient form: extracted from NORMAL (=R)
      !         .
@@ -180,8 +181,8 @@ module definition
      !         .
      !         .
      !&3
-     real(dp) TUNE(NDIM),DAMPING(NDIM)
-     integer nord,jtune
+     real(dp) TUNE(NDIM),DAMPING(NDIM)  ! linear tune and linear damping
+     integer nord,jtune                 ! nord=1 A1 first order in parameters
      integer NRES,M(NDIM,NRESO),PLANE(NDIM)
      logical(lp) AUTO
      !&3

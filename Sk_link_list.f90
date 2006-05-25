@@ -12,7 +12,7 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
-  private move_to_p
+  private move_to_p,move_to_name,move_to_nameS
   PRIVATE append_EMPTY_FIBRE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
@@ -51,6 +51,8 @@ MODULE S_FIBRE_BUNDLE
 
   INTERFACE move_to
      MODULE PROCEDURE move_to_p
+     MODULE PROCEDURE move_to_name
+     MODULE PROCEDURE move_to_nameS
   END INTERFACE
 
   INTERFACE FIND_PATCH
@@ -270,6 +272,86 @@ CONTAINS
   END SUBROUTINE move_to_p
 
 
+  SUBROUTINE move_to_name( L,current,name,pos) ! moves to next one in list called name
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), intent(inout):: L
+    integer, intent(inout):: pos
+    character(*), intent(in):: name
+    CHARACTER(nlp) S1NAME
+    integer i
+
+    logical(lp) foundit
+    TYPE (fibre), POINTER :: p
+
+    foundit=.false.
+    S1NAME=name
+    CALL CONTEXT(S1name)
+
+    nullify(p)
+    p=>l%last%next
+
+    if(.not.associated(p)) goto 100
+    do i=1,l%n
+       if(p%mag%name==s1name) then
+          foundit=.true.
+          goto 100
+       endif
+       p=>p%next
+       if(.not.associated(p)) goto 100
+    enddo
+100 continue
+    if(foundit) then
+       current=>p
+       pos=mod_n(l%lastpos+i,l%n)
+       l%lastpos=pos
+       l%last=>current
+    else
+       pos=0
+    endif
+  END SUBROUTINE move_to_name
+
+  SUBROUTINE move_to_nameS( L,current,name,posR,POS) ! moves to next one in list called name
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), intent(inout):: L
+    integer, intent(inout):: pos,POSR
+    character(*), intent(in):: name
+    CHARACTER(nlp) S1NAME
+    integer i,IC
+
+    logical(lp) foundit
+    TYPE (fibre), POINTER :: p
+
+    foundit=.false.
+    S1NAME=name
+    CALL CONTEXT(S1name)
+
+    nullify(p)
+    p=>l%START
+    IC=0
+    if(.not.associated(p)) goto 100
+    do i=1,l%n
+       if(p%mag%name==s1name) then
+          IC=IC+1
+          IF(IC==POSR) THEN
+             foundit=.true.
+             goto 100
+          ENDIF
+       endif
+       p=>p%next
+       if(.not.associated(p)) goto 100
+    enddo
+100 continue
+    if(foundit) then
+       current=>p
+       pos=mod_n(i,l%n)
+       l%lastpos=pos
+       l%last=>current
+    else
+       pos=0
+    endif
+  END SUBROUTINE move_to_nameS
 
 
 
@@ -1018,6 +1100,8 @@ CONTAINS
     NULLIFY(T%PARENT_THIN_LAYOUT)
     NULLIFY(T%PARENT_FIBRE)
     NULLIFY(T%S)
+    NULLIFY(T%ORBIT)
+    NULLIFY(T%BT)
     NULLIFY(T%NEXT)
     NULLIFY(T%PREVIOUS)
 
@@ -1031,12 +1115,14 @@ CONTAINS
     CALL NULL_THIN(CURRENT)
 
     ALLOCATE(CURRENT%S(4))
+    ALLOCATE(CURRENT%ORBIT(6))
     ALLOCATE(CURRENT%pos_in_fibre)
     ALLOCATE(CURRENT%pos)
     ALLOCATE(CURRENT%CAS)
     ALLOCATE(CURRENT%TEAPOT_LIKE)
 
     CURRENT%S=ZERO
+    CURRENT%ORBIT=ZERO
     CURRENT%pos_in_fibre=-100
     CURRENT%pos=-100
     CURRENT%CAS=-100
@@ -1139,6 +1225,7 @@ CONTAINS
     TYPE(THIN_LENS), TARGET, INTENT(INOUT) :: T
 
     IF(ASSOCIATED(T%S)) DEALLOCATE(T%S)
+    IF(ASSOCIATED(T%ORBIT)) DEALLOCATE(T%ORBIT)
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
     IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)
     IF(ASSOCIATED(T%CAS)) DEALLOCATE(T%CAS)

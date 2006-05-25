@@ -554,7 +554,7 @@ CONTAINS
           X(6)=X(6)+A*X(1)
        endif
     ENDIF
-
+    !    CALL CHECK_STABILITY(X)
   END SUBROUTINE ROT_XZR
 
   SUBROUTINE ROT_XZP(A,X,b,EXACT,ctime)

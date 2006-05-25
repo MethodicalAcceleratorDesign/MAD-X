@@ -687,6 +687,9 @@ CONTAINS
     TYPE (TAYLOR) unaryADD
     TYPE (TAYLOR), INTENT (IN) :: S1
     integer localmaster
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+
     localmaster=master
 
     !    call check(s1)
@@ -703,20 +706,22 @@ CONTAINS
     TYPE (TAYLOR) unarySUB
     TYPE (TAYLOR), INTENT (IN) :: S1
     integer localmaster
+
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     !    call check(s1)
     call ass(unarySUB)
 
     ! unarySUB=(-one)*s1
-    if(old) then
-       call dacmu(s1%i,-one,temp)
-       call dacop(temp,unarySUB%i)
-    else
-       call newdacmu(s1%j,-one,unarySUB%j)
-       !  call newdacmu(s1%j,-one,templ)
-       !  call newdacop(templ,unarySUB%j)
-    endif
+    !    if(old) then
+    call dacmu(s1%i,-one,temp)
+    call dacop(temp,unarySUB%i)
+    !   else
+    !      call newdacmu(s1%j,-one,unarySUB%j)
+    !      !  call newdacmu(s1%j,-one,templ)
+    !      !  call newdacop(templ,unarySUB%j)
+    !   endif
     master=localmaster
 
   END FUNCTION unarySUB
@@ -725,17 +730,19 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(IN)::S1
     type (TAYLOR),INTENT(inOUT):: s2
+    IF(.NOT.C_%STABLE_DA) RETURN
 
-    if(old) then
-       call mtree((/s1%i/),1,(/s2%i/),1)
-    else
-       call newdacop(s1%j,s2%j)
-    endif
+    !    if(old) then
+    call mtree((/s1%i/),1,(/s2%i/),1)
+    !   else
+    !      call newdacop(s1%j,s2%j)
+    !   endif
   END SUBROUTINE maketree
 
   SUBROUTINE  allocda(S1)
     implicit none
     type (TAYLOR),INTENT(INOUT)::S1
+
     IF(first_time) THEN
        w_p=0
        w_p%nc=1
@@ -743,13 +750,13 @@ CONTAINS
        w_p%fc='(1((1X,A72),/))'
        CALL WRITE_E(111)
     ENDIF
-    if(old) then
-       s1%i=0
-       call etall1(s1%i)
-    else
-       call nullnewda(s1%j)
-       call allocnewda(s1%j)
-    endif
+    !    if(old) then
+    s1%i=0
+    call etall1(s1%i)
+    !    else
+    !       call nullnewda(s1%j)
+    !       call allocnewda(s1%j)
+    !    endif
   END SUBROUTINE allocda
 
   SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
@@ -808,11 +815,11 @@ CONTAINS
   SUBROUTINE  KILLda(S1)
     implicit none
     type (TAYLOR),INTENT(INOUT)::S1
-    if(old) then
-       call DADAL1(s1%i)
-    else
-       call KILLNEWDAs(s1%j)
-    endif
+    !    if(old) then
+    call DADAL1(s1%i)
+    !    else
+    !       call KILLNEWDAs(s1%j)
+    !    endif
 
   END SUBROUTINE KILLda
 
@@ -841,25 +848,27 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(inOUT)::S2
     type (TAYLOR),INTENT(IN)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
 
     call check_snake
-    if(old) then
-       if(s2%i==0) then
-          call crap1("EQUAL 1 in tpsa") !call allocw(s2)
-       endif
-       if(s1%i==0) call crap1("EQUAL 2") ! call allocw(s1)
-       CALL DACOP(S1%I,S2%I)
-    else
-       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUAL 3") !call allocw(s2)
-       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("EQUAL 4") !call allocw(s1)
-       call newdacop(S1%j,S2%j)
+    !    if(old) then
+    if(s2%i==0) then
+       call crap1("EQUAL 1 in tpsa") !call allocw(s2)
     endif
+    if(s1%i==0) call crap1("EQUAL 2") ! call allocw(s1)
+    CALL DACOP(S1%I,S2%I)
+    !    else
+    !      IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUAL 3") !call allocw(s2)
+    !      IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("EQUAL 4") !call allocw(s1)
+    !      call newdacop(S1%j,S2%j)
+    !   endif
   END SUBROUTINE EQUAL
 
   SUBROUTINE  DEQUAL(R1,S2)
     implicit none
     type (TAYLOR),INTENT(IN)::S2
     real(dp), INTENT(inOUT)::R1
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
 
     R1=S2.SUB.'0'
@@ -869,6 +878,7 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(IN)::S2
     REAL(SP), INTENT(inOUT)::R1
+    IF(.NOT.C_%STABLE_DA) RETURN
 
     if(real_warning) call real_stop
     call check_snake
@@ -881,6 +891,7 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(IN)::S2
     real(dp) DAABSEQUAL
+    IF(.NOT.C_%STABLE_DA) RETURN
 
 
     DAABSEQUAL=abs(S2.sub.'0')
@@ -892,14 +903,15 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(inOUT)::S2
     real(dp), INTENT(IN)::R1
+    IF(.NOT.C_%STABLE_DA) RETURN
 
-    if(old) then
-       if(s2%i==0)  call crap1("DEQUALDACON 1") !call allocw(s2)
-       CALL DACON(S2%I,R1)
-    else
-       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("DEQUALDACON 2") !call allocw(s2)
-       CALL newDACON(S2%j,R1)
-    endif
+    !    if(old) then
+    if(s2%i==0)  call crap1("DEQUALDACON 1") !call allocw(s2)
+    CALL DACON(S2%I,R1)
+    !    else
+    !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("DEQUALDACON 2") !call allocw(s2)
+    !       CALL newDACON(S2%j,R1)
+    !    endif
   END SUBROUTINE DEQUALDACON
 
   SUBROUTINE  EQUALDACON(S2,R1)
@@ -907,15 +919,16 @@ CONTAINS
     type (TAYLOR),INTENT(inOUT)::S2
     REAL(SP), INTENT(IN)::R1
     real(dp) R2
+    IF(.NOT.C_%STABLE_DA) RETURN
     if(real_warning) call real_stop
     call check_snake
 
     if(real_warning) call real_stop
-    if(old) then
-       if(s2%i==0) call crap1("EQUALDACON 1") !call allocw(s2)
-    else
-       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUALDACON 2") !call allocw(s2)
-    endif
+    !    if(old) then
+    if(s2%i==0) call crap1("EQUALDACON 1") !call allocw(s2)
+    !    else
+    !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUALDACON 2") !call allocw(s2)
+    !    endif
     r2=REAL(r1,kind=DP)
     s2=r2
   END SUBROUTINE EQUALDACON
@@ -925,14 +938,15 @@ CONTAINS
     type (TAYLOR),INTENT(inOUT)::S2
     INTEGER, INTENT(IN)::R1
     real(dp) r2
+    IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
 
 
-    if(old) then
-       if(s2%i==0) call crap1("IEQUALDACON 1") !call allocw(s2)
-    else
-       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("IEQUALDACON 2") !call allocw(s2)
-    endif
+    ! if(old) then
+    if(s2%i==0) call crap1("IEQUALDACON 1") !call allocw(s2)
+    !    else
+    !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("IEQUALDACON 2") !call allocw(s2)
+    !    endif
     r2=REAL(r1,kind=DP)
     s2=r2
   END SUBROUTINE IEQUALDACON
@@ -942,19 +956,18 @@ CONTAINS
     TYPE (taylor) dexpt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     !    call check(s1)
     call ass(dexpt)
 
-    if(old) then
-       call dafun('EXP ',s1%i,temp)
-       call dacop(temp,dexpt%i)
-    else
-       call newdafun('EXP ',s1%j,dexpt%j)
-       !call newdafun('EXP ',s1%j,templ)
-       !  call newdacop(templ,dexpt%j)
-    endif
+    ! if(old) then
+    call dafun('EXP ',s1%i,temp)
+    call dacop(temp,dexpt%i)
+    !    else
+    !       call newdafun('EXP ',s1%j,dexpt%j)
+    !    endif
 
     master=localmaster
 
@@ -965,13 +978,14 @@ CONTAINS
     real(dp) FULL_ABST
     TYPE (taylor), INTENT (IN) :: S1
 
+    IF(.NOT.C_%STABLE_DA) RETURN
     !    call check(s1)
 
-    if(old) then
-       CALL DAABS(S1%I,FULL_ABST)
-    else
-       CALL newDAABS(S1%j,FULL_ABST)
-    endif
+    ! if(old) then
+    CALL DAABS(S1%I,FULL_ABST)
+    !    else
+    !       CALL newDAABS(S1%j,FULL_ABST)
+    !    endif
 
   END FUNCTION FULL_ABST
 
@@ -983,22 +997,23 @@ CONTAINS
     TYPE (taylor) dtant
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
     !    call check(s1)
     call ass(dtant)
 
-    if(old) then
-       call dafun('SIN ',s1%i,temp)
-       call dacop(temp,dtant%i)
-       call dafun('COS ',s1%i,temp)
-       call dadiv(dtant%i,temp,dtant%i)
-    else
-       call newdafun('SIN ',s1%j,templ)
-       call newdacop(templ,dtant%j)
-       call newdafun('COS ',s1%j,templ)
-       call newdadiv(dtant%j,templ,dtant%j)
-    endif
+    ! if(old) then
+    call dafun('SIN ',s1%i,temp)
+    call dacop(temp,dtant%i)
+    call dafun('COS ',s1%i,temp)
+    call dadiv(dtant%i,temp,dtant%i)
+    !    else
+    !       call newdafun('SIN ',s1%j,templ)
+    !       call newdacop(templ,dtant%j)
+    !       call newdafun('COS ',s1%j,templ)
+    !       call newdadiv(dtant%j,templ,dtant%j)
+    !    endif
 
     master=localmaster
 
@@ -1009,6 +1024,7 @@ CONTAINS
     TYPE (taylor) dcost
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
 
@@ -1016,14 +1032,12 @@ CONTAINS
     !    call check(s1)
     call ass(dcost)
 
-    if(old) then
-       call dafun('COS ',s1%i,temp)
-       call dacop(temp,dcost%i)
-    else
-       call newdafun('COS ',s1%j,dcost%j)
-       !call newdafun('COS ',s1%j,templ)
-       !  call newdacop(templ,dcost%j)
-    endif
+    ! if(old) then
+    call dafun('COS ',s1%i,temp)
+    call dacop(temp,dcost%i)
+    !    else
+    !       call newdafun('COS ',s1%j,dcost%j)
+    !    endif
 
     master=localmaster
 
@@ -1034,18 +1048,18 @@ CONTAINS
     TYPE (taylor) dsint
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dsint)
-    if(old) then
-       call dafun('SIN ',s1%i,temp)
-       call dacop(temp,dsint%i)
-    else
-       call newdafun('SIN ',s1%j,dsint%j)
-       !call newdafun('SIN ',s1%j,templ)
-       !  call newdacop(templ,dsint%j)
-    endif
+    ! if(old) then
+    call dafun('SIN ',s1%i,temp)
+    call dacop(temp,dsint%i)
+    !    else
+    !       call newdafun('SIN ',s1%j,dsint%j)
+    !    endif
 
     master=localmaster
 
@@ -1056,16 +1070,18 @@ CONTAINS
     TYPE (taylor) dsinHt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dsinHt)
-    if(old) then
-       call dafun('SINH',s1%i,temp)
-       call dacop(temp,dsinHt%i)
-    else
-       call newdafun('SINH',s1%j,dsinHt%j)
-    endif
+    ! if(old) then
+    call dafun('SINH',s1%i,temp)
+    call dacop(temp,dsinHt%i)
+    !    else
+    !       call newdafun('SINH',s1%j,dsinHt%j)
+    !    endif
     master=localmaster
 
   END FUNCTION dsinHt
@@ -1075,16 +1091,18 @@ CONTAINS
     TYPE (taylor) DCOSHT
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(DCOSHT)
-    if(old) then
-       call dafun('COSH',s1%i,temp)
-       call dacop(temp,DCOSHT%i)
-    else
-       call newdafun('COSH',s1%j,DCOSHT%j)
-    endif
+    ! if(old) then
+    call dafun('COSH',s1%i,temp)
+    call dacop(temp,DCOSHT%i)
+    !    else
+    !       call newdafun('COSH',s1%j,DCOSHT%j)
+    !    endif
 
     master=localmaster
 
@@ -1096,18 +1114,18 @@ CONTAINS
     TYPE (taylor) dlogt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dlogt)
-    if(old) then
-       call dafun('LOG ',s1%i,temp)
-       call dacop(temp,dlogt%i)
-    else
-       call newdafun('LOG ',s1%j,dlogt%j)
-       !call newdafun('LOG ',s1%j,templ)
-       !  call newdacop(templ,dlogt%j)
-    endif
+    ! if(old) then
+    call dafun('LOG ',s1%i,temp)
+    call dacop(temp,dlogt%i)
+    !    else
+    !       call newdafun('LOG ',s1%j,dlogt%j)
+    !    endif
 
     master=localmaster
 
@@ -1118,19 +1136,19 @@ CONTAINS
     TYPE (taylor) dsqrtt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dsqrtt)
 
-    if(old) then
-       call dafun('SQRT',s1%i,temp)
-       call dacop(temp,dsqrtt%i)
-    else
-       call newdafun('SQRT',s1%j,dsqrtt%j)
-       !call newdafun('SQRT',s1%j,templ)
-       !call newdacop(templ,dsqrtt%j)
-    endif
+    ! if(old) then
+    call dafun('SQRT',s1%i,temp)
+    call dacop(temp,dsqrtt%i)
+    !    else
+    !       call newdafun('SQRT',s1%j,dsqrtt%j)
+    !    endif
 
     master=localmaster
 
@@ -1141,20 +1159,20 @@ CONTAINS
     TYPE (taylor) mul
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     !    call check(s2)
     call ass(mul)
 
-    if(old) then
-       call damul(s1%i,s2%i,temp)
-       call dacop(temp,mul%i)
-    else
-       call newdamul(s1%j,s2%j,mul%j)
-       ! call newdamul(s1%j,s2%j,templ)
-       !  call newdacop(templ,mul%j)
-    endif
+    ! if(old) then
+    call damul(s1%i,s2%i,temp)
+    call dacop(temp,mul%i)
+    !    else
+    !       call newdamul(s1%j,s2%j,mul%j)
+    !    endif
 
     master=localmaster
 
@@ -1165,19 +1183,21 @@ CONTAINS
     TYPE (taylor) pbbra
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     !    call check(s2)
     call ass(pbbra)
 
-    if(old) then
-       call DAPOI(s1%i,s2%i,temp,nd)
-       call dacop(temp,pbbra%i)
-    else
-       call newDAPOI(s1%j,s2%j,templ,nd)
-       call newdacop(templ,pbbra%j)
-    endif
+    ! if(old) then
+    call DAPOI(s1%i,s2%i,temp,nd)
+    call dacop(temp,pbbra%i)
+    !    else
+    !       call newDAPOI(s1%j,s2%j,templ,nd)
+    !       call newdacop(templ,pbbra%j)
+    !    endif
 
     master=localmaster
 
@@ -1189,18 +1209,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(GETORDER)
 
-    if(old) then
-       CALL TAKE(S1%I,S2,TEMP)
-       call dacop(temp,GETORDER%i)
-    else
-       CALL NEWTAKE(S1%J,S2,TEMPL)
-       call NEWdacop(tempL,GETORDER%J)
-    endif
+    ! if(old) then
+    CALL TAKE(S1%I,S2,TEMP)
+    call dacop(temp,GETORDER%i)
+    !    else
+    !       CALL NEWTAKE(S1%J,S2,TEMPL)
+    !       call NEWdacop(tempL,GETORDER%J)
+    !    endif
     master=localmaster
 
   END FUNCTION GETORDER
@@ -1215,23 +1237,25 @@ CONTAINS
     INTEGER, INTENT (IN) ::  S2
     INTEGER I
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
     !    call check(s1)
     call ass(CUTORDER)
 
-    if(old) then
-       call dacop(S1%I,CUTORDER%i)
-       DO I=S2,NO
-          CALL TAKE(CUTORDER%I,I,TEMP)
-          CALL DASUB(CUTORDER%I,TEMP,CUTORDER%I)
-       ENDDO
-    else
-       call NEWdacop(S1%J,CUTORDER%J)
-       DO I=S2,NO
-          CALL NEWTAKE(CUTORDER%J,I,TEMPL)
-          CALL NEWDASUB(CUTORDER%J,TEMPL,CUTORDER%J)
-       ENDDO
-    endif
+    ! if(old) then
+    call dacop(S1%I,CUTORDER%i)
+    DO I=S2,NO
+       CALL TAKE(CUTORDER%I,I,TEMP)
+       CALL DASUB(CUTORDER%I,TEMP,CUTORDER%I)
+    ENDDO
+    !    else
+    !       call NEWdacop(S1%J,CUTORDER%J)
+    !       DO I=S2,NO
+    !          CALL NEWTAKE(CUTORDER%J,I,TEMPL)
+    !          CALL NEWDASUB(CUTORDER%J,TEMPL,CUTORDER%J)
+    !       ENDDO
+    !    endif
     master=localmaster
 
   END FUNCTION CUTORDER
@@ -1244,7 +1268,9 @@ CONTAINS
     CHARACTER (LEN = LNV)  resul
     integer j(lnv),i
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(dputchar)
 
@@ -1285,7 +1311,9 @@ CONTAINS
     integer  , INTENT (IN) ::  S2(:)
     integer j(lnv),i
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(dputint)
 
@@ -1326,7 +1354,9 @@ CONTAINS
     integer  , INTENT (IN) ::  S2
     integer j(lnv),i
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(dputint0)
 
@@ -1355,7 +1385,9 @@ CONTAINS
     CHARACTER(*)  , INTENT (IN) ::  S2
 
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(GETCHARnd2s)
 
@@ -1375,7 +1407,9 @@ CONTAINS
     integer  , INTENT (IN) ::  S2(:)
 
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(GETintnd2s)
 
@@ -1396,7 +1430,9 @@ CONTAINS
     integer  , INTENT (IN) ::  S2
 
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(GETintk)
 
@@ -1419,6 +1455,7 @@ CONTAINS
     CHARACTER(*)  , INTENT (IN) ::  S2
     CHARACTER (LEN = LNV)  resul
     integer j(lnv),i
+    IF(.NOT.C_%STABLE_DA) RETURN
 
     !    call check(s1)
 
@@ -1436,11 +1473,11 @@ CONTAINS
     enddo
 
 
-    if(old) then
-       CALL dapek(S1%I,j,r1)
-    else
-       CALL newdapek(S1%j,j,r1)
-    endif
+    ! if(old) then
+    CALL dapek(S1%I,j,r1)
+    !    else
+    !       CALL newdapek(S1%j,j,r1)
+    !    endif
     GETchar=r1
 
   END FUNCTION GETchar
@@ -1451,6 +1488,7 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer , INTENT (IN) ::  S2(:)
     integer j(lnv),i
+    IF(.NOT.C_%STABLE_DA) RETURN
 
     !    call check(s1)
 
@@ -1467,11 +1505,11 @@ CONTAINS
     enddo
 
 
-    if(old) then
-       CALL dapek(S1%I,j,r1)
-    else
-       CALL newdapek(S1%j,j,r1)
-    endif
+    ! if(old) then
+    CALL dapek(S1%I,j,r1)
+    !    else
+    !       CALL newdapek(S1%j,j,r1)
+    !    endif
     GETint=r1
 
   END FUNCTION GETint
@@ -1485,18 +1523,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(GETdiff)
 
-    if(old) then
-       CALL dader(S2,S1%I,TEMP)
-       call dacop(temp,GETdiff%i)
-    else
-       CALL NEWdader(S2,S1%J,TEMPL)
-       call NEWdacop(tempL,GETdiff%J)
-    endif
+    ! if(old) then
+    CALL dader(S2,S1%I,TEMP)
+    call dacop(temp,GETdiff%i)
+    !    else
+    !       CALL NEWdader(S2,S1%J,TEMPL)
+    !       call NEWdacop(tempL,GETdiff%J)
+    !    endif
     master=localmaster
 
   END FUNCTION GETdiff
@@ -1507,18 +1547,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(GETdatra)
 
-    if(old) then
-       CALL datra(S2,S1%I,TEMP)
-       call dacop(temp,GETdatra%i)
-    else
-       CALL NEWdatra(S2,S1%J,TEMPL)
-       call NEWdacop(tempL,GETdatra%J)
-    endif
+    ! if(old) then
+    CALL datra(S2,S1%I,TEMP)
+    call dacop(temp,GETdatra%i)
+    !    else
+    !       CALL NEWdatra(S2,S1%J,TEMPL)
+    !       call NEWdacop(tempL,GETdatra%J)
+    !    endif
     master=localmaster
 
   END FUNCTION GETdatra
@@ -1530,35 +1572,37 @@ CONTAINS
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(POW)
 
-    if(old) then
-       CALL DACON(TEMP,one)
+    ! if(old) then
+    CALL DACON(TEMP,one)
 
-       R22=IABS(R2)
-       DO I=1,R22
-          CALL DAMUL(TEMP,S1%I,TEMP)
-       ENDDO
-       IF(R2.LT.0) THEN
-          CALL DADIC(TEMP,one,TEMP)
-       ENDIF
-       call dacop(temp,POW%i)
-    ELSE
-
-       CALL newDACON(TEMPl,one)
-
-       R22=IABS(R2)
-       DO I=1,R22
-          CALL newDAMUL(TEMPl,S1%j,TEMPl)
-       ENDDO
-       IF(R2.LT.0) THEN
-          CALL newDADIC(TEMPl,one,TEMPl)
-       ENDIF
-       call newdacop(templ,POW%j)
-    endif
+    R22=IABS(R2)
+    DO I=1,R22
+       CALL DAMUL(TEMP,S1%I,TEMP)
+    ENDDO
+    IF(R2.LT.0) THEN
+       CALL DADIC(TEMP,one,TEMP)
+    ENDIF
+    call dacop(temp,POW%i)
+    !    ELSE
+    !
+    !       CALL newDACON(TEMPl,one)
+    !
+    !       R22=IABS(R2)
+    !       DO I=1,R22
+    !          CALL newDAMUL(TEMPl,S1%j,TEMPl)
+    !       ENDDO
+    !       IF(R2.LT.0) THEN
+    !          CALL newDADIC(TEMPl,one,TEMPl)
+    !       ENDIF
+    !       call newdacop(templ,POW%j)
+    !    endif
     master=localmaster
   END FUNCTION POW
 
@@ -1568,23 +1612,23 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: R2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(POWR8)
 
-    if(old) then
-       CALL DAFUN('LOG ',S1%I,TEMP)
-       CALL DACMU(TEMP,R2,TEMP)
-       CALL DAFUN('EXP ',TEMP,TEMP)
-       call dacop(temp,POWR8%i)
-    ELSE
-       CALL NEWDAFUN('LOG ',S1%J,TEMPL)
-       CALL NEWDACMU(TEMPL,R2,TEMPL)
-       CALL NEWDAFUN('EXP ',TEMPL,POWR8%J)
-       !  CALL NEWDAFUN('EXP ',TEMPL,TEMPL)
-       !  call newdacop(TEMPL,POWR8%J)
-    endif
+    ! if(old) then
+    CALL DAFUN('LOG ',S1%I,TEMP)
+    CALL DACMU(TEMP,R2,TEMP)
+    CALL DAFUN('EXP ',TEMP,TEMP)
+    call dacop(temp,POWR8%i)
+    !    ELSE
+    !       CALL NEWDAFUN('LOG ',S1%J,TEMPL)
+    !       CALL NEWDACMU(TEMPL,R2,TEMPL)
+    !       CALL NEWDAFUN('EXP ',TEMPL,POWR8%J)
+    !    endif
     master=localmaster
   END FUNCTION POWR8
 
@@ -1594,24 +1638,24 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     REAL(SP), INTENT (IN) :: R2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(POWR)
 
-    if(old) then
-       CALL DAFUN('LOG ',S1%I,TEMP)
-       CALL DACMU(TEMP,REAL(R2,kind=DP),TEMP)
-       CALL DAFUN('EXP ',TEMP,TEMP)
-       call dacop(temp,POWR%i)
-    ELSE
-       CALL NEWDAFUN('LOG ',S1%J,TEMPL)
-       CALL NEWDACMU(TEMPL,REAL(R2,kind=DP),TEMPL)
-       CALL NEWDAFUN('EXP ',TEMPL,POWR%J)
-       !  CALL NEWDAFUN('EXP ',TEMPL,TEMPL)
-       !  call newdacop(TEMPL,POWR%J)
-    endif
+    ! if(old) then
+    CALL DAFUN('LOG ',S1%I,TEMP)
+    CALL DACMU(TEMP,REAL(R2,kind=DP),TEMP)
+    CALL DAFUN('EXP ',TEMP,TEMP)
+    call dacop(temp,POWR%i)
+    !    ELSE
+    !       CALL NEWDAFUN('LOG ',S1%J,TEMPL)
+    !       CALL NEWDACMU(TEMPL,REAL(R2,kind=DP),TEMPL)
+    !       CALL NEWDAFUN('EXP ',TEMPL,POWR%J)
+    !    endif
     master=localmaster
   END FUNCTION POWR
 
@@ -1623,19 +1667,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dmulsc)
 
-    if(old) then
-       call dacmu(s1%i,sc,temp)
-       call dacop(temp,dmulsc%i)
-    else
-       call newdacmu(s1%j,sc,dmulsc%j)
-       !  call newdacmu(s1%j,sc,templ)
-       ! call newdacop(templ,dmulsc%j)
-    endif
+    ! if(old) then
+    call dacmu(s1%i,sc,temp)
+    call dacop(temp,dmulsc%i)
+    !    else
+    !       call newdacmu(s1%j,sc,dmulsc%j)
+    !    endif
 
     master=localmaster
   END FUNCTION dmulsc
@@ -1646,20 +1690,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(mulsc)
 
-    if(old) then
-       call dacmu(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,mulsc%i)
-    else
-       call newdacmu(s1%j,REAL(sc,kind=DP),mulsc%j)
-       ! call newdacmu(s1%j,REAL(sc,kind=DP),templ)
-       ! call newdacop(templ,mulsc%j)
-    endif
+    ! if(old) then
+    call dacmu(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,mulsc%i)
+    !    else
+    !       call newdacmu(s1%j,REAL(sc,kind=DP),mulsc%j)
+    !    endif
     master=localmaster
   END FUNCTION mulsc
 
@@ -1669,20 +1713,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(imulsc)
 
 
-    if(old) then
-       call dacmu(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,imulsc%i)
-    else
-       call newdacmu(s1%j,REAL(sc,kind=DP),imulsc%j)
-       !  call newdacmu(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,imulsc%j)
-    endif
+    ! if(old) then
+    call dacmu(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,imulsc%i)
+    !    else
+    !       call newdacmu(s1%j,REAL(sc,kind=DP),imulsc%j)
+    !    endif
 
     master=localmaster
   END FUNCTION imulsc
@@ -1693,19 +1737,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dscmul)
 
-    if(old) then
-       call dacmu(s1%i,sc,temp)
-       call dacop(temp,dscmul%i)
-    else
-       call newdacmu(s1%j,sc,dscmul%j)
-       !  call newdacmu(s1%j,sc,templ)
-       !  call newdacop(templ,dscmul%j)
-    endif
+    ! if(old) then
+    call dacmu(s1%i,sc,temp)
+    call dacop(temp,dscmul%i)
+    !    else
+    !       call newdacmu(s1%j,sc,dscmul%j)
+    !    endif
 
     master=localmaster
 
@@ -1717,21 +1761,21 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(scmul)
 
 
-    if(old) then
-       call dacmu(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,scmul%i)
-    else
-       call newdacmu(s1%j,REAL(sc,kind=DP),scmul%j)
-       !  call newdacmu(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,scmul%j)
-    endif
+    ! if(old) then
+    call dacmu(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,scmul%i)
+    !    else
+    !       call newdacmu(s1%j,REAL(sc,kind=DP),scmul%j)
+    !    endif
 
     master=localmaster
 
@@ -1743,19 +1787,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(iscmul)
 
-    if(old) then
-       call dacmu(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,iscmul%i)
-    else
-       call newdacmu(s1%j,REAL(sc,kind=DP),iscmul%j)
-       !  call newdacmu(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,iscmul%j)
-    endif
+    ! if(old) then
+    call dacmu(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,iscmul%i)
+    !    else
+    !       call newdacmu(s1%j,REAL(sc,kind=DP),iscmul%j)
+    !    endif
 
     master=localmaster
 
@@ -1766,20 +1810,21 @@ CONTAINS
     TYPE (taylor) div
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     !    call check(s2)
     call ass(div)
 
-    if(old) then
-       call dadiv(s1%i,s2%i,temp)
-       call dacop(temp,div%i)
-    else
-       ! call newdadiv(s1%j,s2%j,div%j)
-       call newdadiv(s1%j,s2%j,templ)
-       call newdacop(templ,div%j)
-    endif
+    ! if(old) then
+    call dadiv(s1%i,s2%i,temp)
+    call dacop(temp,div%i)
+    !    else
+    !       call newdadiv(s1%j,s2%j,templ)
+    !       call newdacop(templ,div%j)
+    !    endif
 
     master=localmaster
   END FUNCTION div
@@ -1790,19 +1835,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dscdiv)
 
-    if(old) then
-       call dadic(s1%i,sc,temp)
-       call dacop(temp,dscdiv%i)
-    else
-       call newdadic(s1%j,sc,dscdiv%j)
-       !  call newdadic(s1%j,sc,templ)
-       !  call newdacop(templ,dscdiv%j)
-    endif
+    ! if(old) then
+    call dadic(s1%i,sc,temp)
+    call dacop(temp,dscdiv%i)
+    !    else
+    !       call newdadic(s1%j,sc,dscdiv%j)
+    !    endif
 
     master=localmaster
 
@@ -1814,21 +1859,21 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(scdiv)
 
 
-    if(old) then
-       call dadic(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,scdiv%i)
-    else
-       call newdadic(s1%j,REAL(sc,kind=DP),scdiv%j)
-       ! call newdadic(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,scdiv%j)
-    endif
+    ! if(old) then
+    call dadic(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,scdiv%i)
+    !    else
+    !       call newdadic(s1%j,REAL(sc,kind=DP),scdiv%j)
+    !    endif
 
     master=localmaster
   END FUNCTION scdiv
@@ -1839,19 +1884,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(iscdiv)
 
-    if(old) then
-       call dadic(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,iscdiv%i)
-    else
-       call newdadic(s1%j,REAL(sc,kind=DP),iscdiv%j)
-       !  call newdadic(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,iscdiv%j)
-    endif
+    ! if(old) then
+    call dadic(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,iscdiv%i)
+    !    else
+    !       call newdadic(s1%j,REAL(sc,kind=DP),iscdiv%j)
+    !    endif
 
 
     master=localmaster
@@ -1863,20 +1908,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(ddivsc)
 
 
-    if(old) then
-       call dacdi(s1%i,sc,temp)
-       call dacop(temp,ddivsc%i)
-    else
-       call newdacdi(s1%j,sc,ddivsc%j)
-       !  call newdacdi(s1%j,sc,templ)
-       !  call newdacop(templ,ddivsc%j)
-    endif
+    ! if(old) then
+    call dacdi(s1%i,sc,temp)
+    call dacop(temp,ddivsc%i)
+    !    else
+    !       call newdacdi(s1%j,sc,ddivsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION ddivsc
@@ -1887,20 +1932,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(divsc)
 
-    if(old) then
-       call dacdi(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,divsc%i)
-    else
-       call newdacdi(s1%j,REAL(sc,kind=DP),divsc%j)
-       !  call newdacdi(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,divsc%j)
-    endif
+    ! if(old) then
+    call dacdi(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,divsc%i)
+    !    else
+    !       call newdacdi(s1%j,REAL(sc,kind=DP),divsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION divsc
@@ -1912,20 +1957,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(idivsc)
 
 
-    if(old) then
-       call dacdi(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,idivsc%i)
-    else
-       call newdacdi(s1%j,REAL(sc,kind=DP),idivsc%j)
-       !  call newdacdi(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,idivsc%j)
-    endif
+    ! if(old) then
+    call dacdi(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,idivsc%i)
+    !    else
+    !       call newdacdi(s1%j,REAL(sc,kind=DP),idivsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION idivsc
@@ -1936,23 +1981,23 @@ CONTAINS
     TYPE (taylor) add
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     !    call check(s2)
     call ass(add)
 
 
-    if(old) then
-       call daadd(s1%i,s2%i,add%i)
-       !  call dacop(temp,add%i)
-       !  call daadd(s1%i,s2%i,temp)
-       !  call dacop(temp,add%i)
-    else
-       call newdaadd(s1%j,s2%j,add%j)
-       !  call newdaadd(s1%j,s2%j,templ)
-       !  call newdacop(templ,add%j)
-    endif
+    ! if(old) then
+    call daadd(s1%i,s2%i,add%i)
+    !  call dacop(temp,add%i)
+    !  call daadd(s1%i,s2%i,temp)
+    !  call dacop(temp,add%i)
+    !    else
+    !       call newdaadd(s1%j,s2%j,add%j)
+    !    endif
 
     master=localmaster
 
@@ -1964,19 +2009,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(daddsc)
 
-    if(old) then
-       call dacad(s1%i,sc,temp)
-       call dacop(temp,daddsc%i)
-    else
-       call newdacad(s1%j,sc,daddsc%j)
-       !  call newdacad(s1%j,sc,templ)
-       !  call newdacop(templ,daddsc%j)
-    endif
+    ! if(old) then
+    call dacad(s1%i,sc,temp)
+    call dacop(temp,daddsc%i)
+    !    else
+    !       call newdacad(s1%j,sc,daddsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION daddsc
@@ -1987,21 +2032,21 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(addsc)
 
 
-    if(old) then
-       call dacad(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,addsc%i)
-    else
-       call newdacad(s1%j,REAL(sc,kind=DP),addsc%j)
-       !  call newdacad(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,addsc%j)
-    endif
+    ! if(old) then
+    call dacad(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,addsc%i)
+    !    else
+    !       call newdacad(s1%j,REAL(sc,kind=DP),addsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION addsc
@@ -2012,19 +2057,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(iaddsc)
 
-    if(old) then
-       call dacad(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,iaddsc%i)
-    else
-       call newdacad(s1%j,REAL(sc,kind=DP),iaddsc%j)
-       !  call newdacad(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,iaddsc%j)
-    endif
+    ! if(old) then
+    call dacad(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,iaddsc%i)
+    !    else
+    !       call newdacad(s1%j,REAL(sc,kind=DP),iaddsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION iaddsc
@@ -2035,19 +2080,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dscadd)
 
-    if(old) then
-       call dacad(s1%i,sc,temp)
-       call dacop(temp,dscadd%i)
-    else
-       call newdacad(s1%j,sc,dscadd%j)
-       !  call newdacad(s1%j,sc,templ)
-       !  call newdacop(templ,dscadd%j)
-    endif
+    ! if(old) then
+    call dacad(s1%i,sc,temp)
+    call dacop(temp,dscadd%i)
+    !    else
+    !       call newdacad(s1%j,sc,dscadd%j)
+    !    endif
     master=localmaster
 
   END FUNCTION dscadd
@@ -2058,20 +2103,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(scadd)
 
-    if(old) then
-       call dacad(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,scadd%i)
-    else
-       call newdacad(s1%j,REAL(sc,kind=DP),scadd%j)
-       ! call newdacad(s1%j,REAL(sc,kind=DP),templ)
-       ! call newdacop(templ,scadd%j)
-    endif
+    ! if(old) then
+    call dacad(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,scadd%i)
+    !    else
+    !       call newdacad(s1%j,REAL(sc,kind=DP),scadd%j)
+    !    endif
 
     master=localmaster
 
@@ -2083,20 +2128,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(iscadd)
 
 
-    if(old) then
-       call dacad(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,iscadd%i)
-    else
-       call newdacad(s1%j,REAL(sc,kind=DP),iscadd%j)
-       ! call newdacad(s1%j,REAL(sc,kind=DP),templ)
-       ! call newdacop(templ,iscadd%j)
-    endif
+    ! if(old) then
+    call dacad(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,iscadd%i)
+    !    else
+    !       call newdacad(s1%j,REAL(sc,kind=DP),iscadd%j)
+    !    endif
     master=localmaster
 
   END FUNCTION iscadd
@@ -2106,7 +2151,9 @@ CONTAINS
     TYPE (taylor) subs
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     !    call check(s2)
@@ -2114,14 +2161,12 @@ CONTAINS
 
 
 
-    if(old) then
-       call dasub(s1%i,s2%i,temp)
-       call dacop(temp,subs%i)
-    else
-       call newdasub(s1%j,s2%j,subs%j)
-       !call newdasub(s1%j,s2%j,templ)
-       !call newdacop(templ,subs%j)
-    endif
+    ! if(old) then
+    call dasub(s1%i,s2%i,temp)
+    call dacop(temp,subs%i)
+    !    else
+    !       call newdasub(s1%j,s2%j,subs%j)
+    !    endif
     master=localmaster
 
   END FUNCTION subs
@@ -2132,19 +2177,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dsubsc)
 
-    if(old) then
-       call dacsu(s1%i,sc,temp)
-       call dacop(temp,dsubsc%i)
-    else
-       call newdacsu(s1%j,sc,dsubsc%j)
-       !  call newdacsu(s1%j,sc,templ)
-       !  call newdacop(templ,dsubsc%j)
-    endif
+    ! if(old) then
+    call dacsu(s1%i,sc,temp)
+    call dacop(temp,dsubsc%i)
+    !    else
+    !       call newdacsu(s1%j,sc,dsubsc%j)
+    !    endif
 
     master=localmaster
 
@@ -2157,20 +2202,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(subsc)
 
-    if(old) then
-       call dacsu(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,subsc%i)
-    else
-       call newdacsu(s1%j,REAL(sc,kind=DP),subsc%j)
-       !  call newdacsu(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,subsc%j)
-    endif
+    ! if(old) then
+    call dacsu(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,subsc%i)
+    !    else
+    !       call newdacsu(s1%j,REAL(sc,kind=DP),subsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION subsc
@@ -2181,19 +2226,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(isubsc)
 
-    if(old) then
-       call dacsu(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,isubsc%i)
-    else
-       call newdacsu(s1%j,REAL(sc,kind=DP),isubsc%j)
-       !  call newdacsu(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,isubsc%j)
-    endif
+    ! if(old) then
+    call dacsu(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,isubsc%i)
+    !    else
+    !       call newdacsu(s1%j,REAL(sc,kind=DP),isubsc%j)
+    !    endif
     master=localmaster
 
   END FUNCTION isubsc
@@ -2204,19 +2249,19 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(dscsub)
 
-    if(old) then
-       call dasuc(s1%i,sc,temp)
-       call dacop(temp,dscsub%i)
-    else
-       call newdasuc(s1%j,sc,dscsub%j)
-       !  call newdasuc(s1%j,sc,templ)
-       !  call newdacop(templ,dscsub%j)
-    endif
+    ! if(old) then
+    call dasuc(s1%i,sc,temp)
+    call dacop(temp,dscsub%i)
+    !    else
+    !       call newdasuc(s1%j,sc,dscsub%j)
+    !    endif
     master=localmaster
 
   END FUNCTION dscsub
@@ -2227,20 +2272,20 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     if(real_warning) call real_stop
     !    call check(s1)
     call ass(scsub)
 
-    if(old) then
-       call dasuc(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,scsub%i)
-    else
-       call newdasuc(s1%j,REAL(sc,kind=DP),scsub%j)
-       ! call newdasuc(s1%j,REAL(sc,kind=DP),templ)
-       ! call newdacop(templ,scsub%j)
-    endif
+    ! if(old) then
+    call dasuc(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,scsub%i)
+    !    else
+    !       call newdasuc(s1%j,REAL(sc,kind=DP),scsub%j)
+    !    endif
     master=localmaster
 
   END FUNCTION scsub
@@ -2251,46 +2296,23 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     !    call check(s1)
     call ass(iscsub)
 
-    if(old) then
-       call dasuc(s1%i,REAL(sc,kind=DP),temp)
-       call dacop(temp,iscsub%i)
-    else
-       call newdasuc(s1%j,REAL(sc,kind=DP),iscsub%j)
-       !  call newdasuc(s1%j,REAL(sc,kind=DP),templ)
-       !  call newdacop(templ,iscsub%j)
-    endif
+    ! if(old) then
+    call dasuc(s1%i,REAL(sc,kind=DP),temp)
+    call dacop(temp,iscsub%i)
+    !    else
+    !       call newdasuc(s1%j,REAL(sc,kind=DP),iscsub%j)
+    !    endif
     master=localmaster
 
   END FUNCTION iscsub
 
-  !  subroutine check(s1)
-  !    implicit none
-  !    TYPE (taylor) s1
-  !    if(.not.checkass) return
-  !    if(old) then
-  !       if(s1%i==0) then
-  !          w_p=0
-  !          w_p%nc=1
-  !          w_p=(/"Should not be here: Assign variables"/)
-  !          w_p%fc='(1((1X,A72),/))'
-  !          CALL WRITE_E(100)
-  !       endif
-  !    else
-  !       IF (.NOT. ASSOCIATED(s1%j%r)) then
-  !          w_p=0
-  !          w_p%nc=1
-  !          w_p=(/"Should not be here: Assign variables"/)
-  !          w_p%fc='(1((1X,A72),/))'
-  !          CALL WRITE_E(101)
-  !       endif
-  !    endif
-  !  end subroutine check
-  !
 
   !  These are new general TPSA-Routines
 
@@ -2302,7 +2324,9 @@ CONTAINS
     real(dp), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(varf)
 
@@ -2318,7 +2342,9 @@ CONTAINS
     real(dp), INTENT (IN) :: S1(2)
     integer  , INTENT (IN) ::  S2
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
 
     call ass(varf001)
 
@@ -2329,92 +2355,23 @@ CONTAINS
   END FUNCTION varf001
 
 
-  !  SUBROUTINE  VAR000(S1,R1,I1)
-  !    implicit none
-  !    INTEGER,INTENT(IN)::I1
-  !    real(dp),INTENT(IN)::R1
-  !    type (taylor),INTENT(INOUT)::S1
-  !    integer localmaster
-  !    localmaster=master
-  !
-
-  !    s1=r1+ (one.mono.i1)
-
-  !    master=localmaster
-
-  !    if(old) then
-  !       if(s1%i==0) call crap1("VAR000  1" )  !call  etall1(s1%i)
-  !       if(i1.ne.0) then
-  !          CALL DAVAR(s1%i,R1,I1)
-  !       else
-  !          CALL DACON(s1%i,R1)
-  !       endif
-  !    else
-  !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("VAR000  2" ) !call newetall(s1%j,1)
-  !
-  !       if(i1.ne.0) then
-  !          CALL NEWDAVAR(s1%J,R1,I1)
-  !       else
-  !          CALL NEWDACON(s1%j,R1)
-  !       endif
-  !    endif
-
-  !  END SUBROUTINE VAR000
-
-  !  SUBROUTINE  VAR001(S1,R1,R2,I1)
-  !    implicit none
-  !    INTEGER,INTENT(IN)::I1
-  !    real(dp),INTENT(IN)::R1,R2
-  !    type (taylor),INTENT(INOUT)::S1!
-
-  !    integer localmaster
-  !    localmaster=master
-
-
-  !    s1=r1+ R2*(one.mono.i1)
-
-  !    master=localmaster
-
-
-
-  !    if(old) then
-  !       if(s1%i==0)  call crap1("VAR001  1" ) !etall1(s1%i)
-  !       if(i1.ne.0) then
-  !          CALL DAVAR(s1%i,zero,I1)
-  !          CALL DACMU(s1%i,R2,TEMP)
-  !          CALL DACAD(TEMP,R1,s1%i)
-  !       else
-  !          CALL DACON(s1%i,R1)
-  !       endif
-  !    else
-  !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("VAR001  2" )  !call newetall(s1%j,1)
-  !
-  !       if(i1.ne.0) then
-  !          CALL NEWDAVAR(s1%J,zero,I1)
-  !          CALL NEWDACMU(s1%J,R2,TEMPL)
-  !          CALL NEWDACAD(TEMPL,R1,s1%J)
-  !       else
-  !          CALL NEWDACON(s1%j,R1)
-  !       endif
-  !    endif
-  !
-  !   END SUBROUTINE VAR001
 
   SUBROUTINE  shift000(S1,S2,s)
     implicit none
     INTEGER,INTENT(IN)::s
     type (taylor),INTENT(IN)::S1
     type (taylor),INTENT(inout)::S2
+    IF(.NOT.C_%STABLE_DA) RETURN
 
-    if(old) then
-       if(s2%i==0) call crap1("shift000  1" )  !call etall1(s2%i)
-       CALL DAshift(s1%i,s2%i,s)
-    else
-       if(.NOT. ASSOCIATED(s2%j%r))call crap1("shift000  2" )   ! call newetall(s2%j,1)
-
-       CALL NEWDAshift(s1%j,s2%j,s)
-    endif
-
+    ! if(old) then
+    if(s2%i==0) call crap1("shift000  1" )  !call etall1(s2%i)
+    CALL DAshift(s1%i,s2%i,s)
+    !   else
+    !      if(.NOT. ASSOCIATED(s2%j%r))call crap1("shift000  2" )   ! call newetall(s2%j,1)
+    !
+    !      CALL NEWDAshift(s1%j,s2%j,s)
+    !   endif
+    !
   END SUBROUTINE shift000
 
 
@@ -2423,15 +2380,16 @@ CONTAINS
     INTEGER,INTENT(IN),dimension(:)::j
     real(dp),INTENT(inOUT)::R1
     type (taylor),INTENT(IN)::S1
-    if(old) then
-       if(s1%i==0) call crap1("pek000  1" )  !call etall1(s1%i)
-       CALL DApek(s1%i,j,r1)
-    else
-       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pek000  2" ) ! newetall(s1%j,1)
-
-       CALL newDApek(s1%j,j,r1)
-    endif
-
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) then
+    if(s1%i==0) call crap1("pek000  1" )  !call etall1(s1%i)
+    CALL DApek(s1%i,j,r1)
+    !    else
+    !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pek000  2" ) ! newetall(s1%j,1)
+    !
+    !      CALL newDApek(s1%j,j,r1)
+    !    endif
+    !
   END SUBROUTINE pek000
 
   SUBROUTINE  pok000(S1,J,R1)
@@ -2439,17 +2397,18 @@ CONTAINS
     INTEGER,INTENT(in),dimension(:)::j
     real(dp),INTENT(in)::R1
     type (taylor),INTENT(inout)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
 
     if(check_j(j)/=0) return
-    if(old) then
-       if(s1%i==0) call crap1("pok000 1" )  ! call etall1(s1%i)
-       CALL DApok(s1%i,j,r1)
-    else
-       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pok000  2" )  ! call newetall(s1%j,1)
-
-       CALL newDApok(s1%j,j,r1)
-    endif
-
+    ! if(old) then
+    if(s1%i==0) call crap1("pok000 1" )  ! call etall1(s1%i)
+    CALL DApok(s1%i,j,r1)
+    !    else
+    !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pok000  2" )  ! call newetall(s1%j,1)
+    !
+    !       CALL newDApok(s1%j,j,r1)
+    !    endif
+    !
   END SUBROUTINE pok000
 
   SUBROUTINE  TAYLOR_ran(S1,r1,R2)
@@ -2457,20 +2416,22 @@ CONTAINS
     real(dp),INTENT(in)::R1
     real(dp),INTENT(inout)::R2
     type (taylor),INTENT(inout)::S1
+    IF(.NOT.C_%STABLE_DA) RETURN
+
     !
     !     THIS SUBROUTINE FILLS THE DA VECTOR A WITH RANDOM ENTRIES.
     !     FOR R1 > 0, THE VECTOR IS FILLED WITH REALS,
     !     FOR R1 < 0, THE VECTOR IS FILLED WITH SINGLE DIGIT INTEGERS
     !     ABS(R1) IS THE FILLING FACTOR
-    if(old) then
-       if(s1%i==0) call crap1("tAYLOR_ran  1" )  ! call etall1(s1%i)
-       call daran(s1%i,r1,R2)
-    else
-       if(.NOT. ASSOCIATED(s1%j%r))call crap1("tAYLOR_ran  2" )  !  call newetall(s1%j,1)
-
-       call newdaran(s1%j,r1,R2)
-    endif
-
+    ! if(old) then
+    if(s1%i==0) call crap1("tAYLOR_ran  1" )  ! call etall1(s1%i)
+    call daran(s1%i,r1,R2)
+    !    else
+    !       if(.NOT. ASSOCIATED(s1%j%r))call crap1("tAYLOR_ran  2" )  !  call newetall(s1%j,1)
+    !
+    !       call newdaran(s1%j,r1,R2)
+    !    endif
+    !
   END SUBROUTINE TAYLOR_ran
 
   SUBROUTINE  intd_taylor(S1,S2,factor)
@@ -2478,13 +2439,15 @@ CONTAINS
     type (taylor),INTENT(inOUT)::S2
     type (taylor),INTENT(IN)::S1(:)
     real(dp),INTENT(IN):: factor
-    if(old) then
-       if(s1(1)%i==0) call crap1("intd_taylor 1")  !call etall1(s2%h%i)
-       CALL intd(S1%i,s2%i,factor)
-    else
-       if(.NOT. ASSOCIATED(s1(1)%j%r)) call crap1("intd_taylor 2")  !call etall1(s2%h%i)
-       CALL newintd(S1%j,s2%j,factor)
-    endif
+    IF(.NOT.C_%STABLE_DA) RETURN
+
+    ! if(old) then
+    if(s1(1)%i==0) call crap1("intd_taylor 1")  !call etall1(s2%h%i)
+    CALL intd(S1%i,s2%i,factor)
+    !    else
+    !       if(.NOT. ASSOCIATED(s1(1)%j%r)) call crap1("intd_taylor 2")  !call etall1(s2%h%i)
+    !       CALL newintd(S1%j,s2%j,factor)
+    !    endif
   END SUBROUTINE intd_taylor
 
   SUBROUTINE  DIFd_taylor(S2,S1,factor)
@@ -2492,11 +2455,12 @@ CONTAINS
     type (taylor),INTENT(in)::S2
     type (taylor),INTENT(INOUT)::S1(:)
     real(dp),INTENT(IN):: factor
-    if(old) then
-       CALL DIFD(S2%i,s1%i,factor)
-    else
-       CALL NEWDIFD(S2%j,s1%j,factor)
-    endif
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) then
+    CALL DIFD(S2%i,s1%i,factor)
+    !    else
+    !       CALL NEWDIFD(S2%j,s1%j,factor)
+    !    endif
   END SUBROUTINE DIFd_taylor
 
 
@@ -2506,13 +2470,14 @@ CONTAINS
     type (taylor),INTENT(IN)::S2
     real(dp) FUN
     EXTERNAL FUN
-    if(old) then
-       if(s1%i==0) call crap1("CFU000  1" )  !  call etall1(s1%i)
-       CALL DACFU(s2%i,FUN,s1%i)
-    else
-       if(.NOT. ASSOCIATED(s1%j%r))call crap1("CFU000  2" )  !  call newetall(s1%j,1)
-       CALL NEWDACFU(s2%J,FUN,s1%J)
-    endif
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) then
+    if(s1%i==0) call crap1("CFU000  1" )  !  call etall1(s1%i)
+    CALL DACFU(s2%i,FUN,s1%i)
+    !    else
+    !       if(.NOT. ASSOCIATED(s1%j%r))call crap1("CFU000  2" )  !  call newetall(s1%j,1)
+    !       CALL NEWDACFU(s2%J,FUN,s1%J)
+    !    endif
 
   END SUBROUTINE CFU000
 
@@ -2522,13 +2487,14 @@ CONTAINS
     type (taylor),INTENT(IN)::S2
     complex(dp) FUN
     EXTERNAL FUN
-    if(old) then
-       if(s1%i==0) call crap1("CFUR  1" )  ! call etall1(s1%i)
-       CALL DACFUR(s2%i,FUN,s1%i)
-    else
-       if(.NOT. ASSOCIATED(s1%j%r))call crap1("CFUR  2" )  !  call newetall(s1%j,1)
-       CALL NEWDACFUR(s2%J,FUN,s1%J)
-    endif
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) then
+    if(s1%i==0) call crap1("CFUR  1" )  ! call etall1(s1%i)
+    CALL DACFUR(s2%i,FUN,s1%i)
+    !   else
+    !      if(.NOT. ASSOCIATED(s1%j%r))call crap1("CFUR  2" )  !  call newetall(s1%j,1)
+    !      CALL NEWDACFUR(s2%J,FUN,s1%J)
+    !   endif
 
   END SUBROUTINE CFUR
 
@@ -2538,24 +2504,26 @@ CONTAINS
     type (taylor),INTENT(IN)::S2
     complex(dp) FUN
     EXTERNAL FUN
-    if(old) then
-       if(s1%i==0)call crap1("CFUI  1" ) ! call etall1(s1%i)
-       CALL DACFUI(s2%i,FUN,s1%i)
-    else
-       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("CFUI  2" ) !call newetall(s1%j,1)
-       CALL NEWDACFUI(s2%J,FUN,s1%J)
-    endif
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) then
+    if(s1%i==0)call crap1("CFUI  1" ) ! call etall1(s1%i)
+    CALL DACFUI(s2%i,FUN,s1%i)
+    !    else
+    !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("CFUI  2" ) !call newetall(s1%j,1)
+    !       CALL NEWDACFUI(s2%J,FUN,s1%J)
+    !    endif
 
   END SUBROUTINE CFUI
 
   SUBROUTINE  taylor_eps(r1)
     implicit none
     real(dp),INTENT(INOUT)::r1
-    if(old) then
-       CALL DAeps(r1)
-    else
-       CALL newDAeps(r1)
-    endif
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) then
+    CALL DAeps(r1)
+    !   else
+    !      CALL newDAeps(r1)
+    !   endif
 
   END SUBROUTINE taylor_eps
 
@@ -2570,7 +2538,9 @@ CONTAINS
     integer i,k
     integer localmaster
 
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
     ndel=0
     !    call check(s1)
     call ass(GETCHARnd2)
@@ -2632,7 +2602,9 @@ CONTAINS
     integer , INTENT (IN) ::  S2(:)
     integer i,k
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
     !    call check(s1)
     call ass(GETintnd2)
 
@@ -2693,7 +2665,9 @@ CONTAINS
     integer s2(lnv)
     integer i,k
     integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
+
     !    call check(s1)
     call ass(GETintnd2t)
 
@@ -2756,37 +2730,38 @@ CONTAINS
     real(dp), OPTIONAL, intent(inout):: value
     INTEGER ipresent,ILLA,I
     real(dp) VALUE0
-    IF(OLD) THEN
-       IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
-          call dacycle(S1%i,N,value,illa,J)
-       ELSE
-          call dacycle(S1%i,ipresent,value0,N)
-       ENDIF
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) THEN
+    IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
+       call dacycle(S1%i,N,value,illa,J)
     ELSE
-       IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
-          ILLA=0
-          DO i=1,SIZE(S1%J%R)
-             IF(PACKING) THEN
-                IF(S1%J%YES(I))      ILLA=ILLA+1
-             ELSE
-                IF(S1%J%R(I)/=zero)  ILLA=ILLA+1
-             ENDIF
-             IF(ILLA==N) EXIT
-          ENDDO
-          VALUE=S1%J%R(ILLA)
-          N=N+1
-       ELSE
-          N=0
-          DO i=1,SIZE(S1%J%R)
-             IF(PACKING) THEN
-                IF(S1%J%YES(I)) N=N+1
-             ELSE
-                IF(S1%J%R(I)/=zero)  N=N+1
-             ENDIF
-          ENDDO
-       ENDIF
-
+       call dacycle(S1%i,ipresent,value0,N)
     ENDIF
+    !    ELSE
+    !       IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
+    !          ILLA=0
+    !          DO i=1,SIZE(S1%J%R)
+    !             IF(PACKING) THEN
+    !                IF(S1%J%YES(I))      ILLA=ILLA+1
+    !             ELSE
+    !                IF(S1%J%R(I)/=zero)  ILLA=ILLA+1
+    !             ENDIF
+    !             IF(ILLA==N) EXIT
+    !          ENDDO
+    !          VALUE=S1%J%R(ILLA)
+    !          N=N+1
+    !       ELSE
+    !          N=0
+    !          DO i=1,SIZE(S1%J%R)
+    !             IF(PACKING) THEN
+    !                IF(S1%J%YES(I)) N=N+1
+    !             ELSE
+    !                IF(S1%J%R(I)/=zero)  N=N+1
+    !             ENDIF
+    !          ENDDO
+    !       ENDIF
+    !
+    !    ENDIF
 
   END SUBROUTINE taylor_cycle
 
@@ -2867,6 +2842,7 @@ CONTAINS
     integer check_j
     INTEGER,INTENT(in),dimension(:)::j
     integer i,no
+    IF(.NOT.C_%STABLE_DA) RETURN
 
     check_j=0
 
@@ -2933,24 +2909,24 @@ CONTAINS
        CALL taylor_eps(DEPS)
     ENDIF
 
-    if(old) then
-       if(print77) then
-          CALL DAPRI77(s1%i,MFILE)
-       else
-          CALL DAPRI(s1%i,MFILE)
-       endif
+    ! if(old) then
+    if(print77) then
+       CALL DAPRI77(s1%i,MFILE)
     else
-       if(newprint) then
-          CALL newDAPRI(s1%j,MFILE)
-       else
-          if(print77) then
-             CALL oldDAPRI77(s1%j,MFILE)
-          else
-             CALL oldDAPRI(s1%j,MFILE)
-          endif
-       endif
+       CALL DAPRI(s1%i,MFILE)
     endif
-
+    !    else
+    !       if(newprint) then
+    !          CALL newDAPRI(s1%j,MFILE)
+    !       else
+    !          if(print77) then
+    !             CALL oldDAPRI77(s1%j,MFILE)
+    !          else
+    !             CALL oldDAPRI(s1%j,MFILE)
+    !          endif
+    !       endif
+    !    endif
+    !
     IF(PRESENT(DEPS))  CALL taylor_eps(PREC)
 
   END SUBROUTINE pri
@@ -2960,26 +2936,26 @@ CONTAINS
     INTEGER,INTENT(in)::MFILE
     type (TAYLOR),INTENT(IN)::S1
 
-    if(old) then
-       if(s1%i==0)call crap1("REA  1" ) !  call etall1(s1%i)
+    ! if(old) then
+    if(s1%i==0)call crap1("REA  1" ) !  call etall1(s1%i)
 
-       if(read77) then
-          CALL DAREA77(s1%i,MFILE)
-       else
-          CALL DAREA(s1%i,MFILE)
-       endif
+    if(read77) then
+       CALL DAREA77(s1%i,MFILE)
     else
-       if(.NOT. ASSOCIATED(s1%j%r))call crap1("REA  2" ) ! call newetall(s1%j,1)
-       if(newread) then
-          CALL newDAREA(s1%j,MFILE)
-       else
-          if(read77) then
-             CALL oldDAREA77(s1%j,MFILE)
-          else
-             CALL oldDAREA(s1%j,MFILE)
-          endif
-       endif
+       CALL DAREA(s1%i,MFILE)
     endif
+    !    else
+    !       if(.NOT. ASSOCIATED(s1%j%r))call crap1("REA  2" ) ! call newetall(s1%j,1)
+    !       if(newread) then
+    !          CALL newDAREA(s1%j,MFILE)
+    !       else
+    !          if(read77) then
+    !             CALL oldDAREA77(s1%j,MFILE)
+    !          else
+    !             CALL oldDAREA(s1%j,MFILE)
+    !          endif
+    !       endif
+    !    endif
 
   END SUBROUTINE REA
 
@@ -3039,61 +3015,61 @@ CONTAINS
 
     call check_snake
 
-    if(old) then
-       if(s1%i==0)  call crap1("FILL_N 1")
-    else
-       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("FILL_N 2")
-    endif
+    ! if(old) then
+    if(s1%i==0)  call crap1("FILL_N 1")
+    !    else
+    !       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("FILL_N 2")
+    !    endif
 
 
     IF(ASSOCIATED(S2%N)) S2=-1
     S2=0
-    IF(OLD) THEN
-       CALL dainf(S1%I,inoc,invc,ipoc,k,N)
-       CALL ALLOC_U(S2,N,invc)
-       do i=1,N
-          k=ipoC+i-1
-          CALL GET_C_J(k,S2%C(I),J)
-          if(no==1) then
-             j=0
-             k=k-ipoc
-             if(k/=0) j(k)=1
-          endif
-          DO N=1,S2%NV
-             S2%J(i,N)=J(N)
-          ENDDO
+    ! if(old) THEN
+    CALL dainf(S1%I,inoc,invc,ipoc,k,N)
+    CALL ALLOC_U(S2,N,invc)
+    do i=1,N
+       k=ipoC+i-1
+       CALL GET_C_J(k,S2%C(I),J)
+       if(no==1) then
+          j=0
+          k=k-ipoc
+          if(k/=0) j(k)=1
+       endif
+       DO N=1,S2%NV
+          S2%J(i,N)=J(N)
        ENDDO
-    else
-       N=0
-       DO i=1,SIZE(S1%J%R)
-          IF(PACKING) THEN
-             IF(S1%J%YES(I)) N=N+1
-          ELSE
-             IF(S1%J%R(I)/=zero)  N=N+1
-          ENDIF
-       ENDDO
-       CALL ALLOC_U(S2,N,nv)
-       N=0
-       DO i=1,SIZE(S1%J%R)
-          DOIT=.FALSE.
-          IF(PACKING) THEN
-             IF(S1%J%YES(I)) DOIT=.TRUE.
-          ELSE
-             IF(S1%J%R(I)/=zero)  DOIT=.TRUE.
-          ENDIF
-
-          IF(DOIT) THEN
-
-             N=N+1
-             CALL newdancd(I,j)
-             DO K=1,S2%NV
-                S2%J(N,K)=J(K)
-             ENDDO
-             S2%C(N)=S1%J%R(I)
-          ENDIF
-       ENDDO
-
-    ENDIF
+    ENDDO
+    !    else
+    !       N=0
+    !       DO i=1,SIZE(S1%J%R)
+    !          IF(PACKING) THEN
+    !             IF(S1%J%YES(I)) N=N+1
+    !          ELSE
+    !             IF(S1%J%R(I)/=zero)  N=N+1
+    !          ENDIF
+    !       ENDDO
+    !       CALL ALLOC_U(S2,N,nv)
+    !       N=0
+    !       DO i=1,SIZE(S1%J%R)
+    !          DOIT=.FALSE.
+    !          IF(PACKING) THEN
+    !             IF(S1%J%YES(I)) DOIT=.TRUE.
+    !          ELSE
+    !             IF(S1%J%R(I)/=zero)  DOIT=.TRUE.
+    !          ENDIF
+    !
+    !          IF(DOIT) THEN
+    !
+    !             N=N+1
+    !             CALL newdancd(I,j)
+    !             DO K=1,S2%NV
+    !                S2%J(N,K)=J(K)
+    !             ENDDO
+    !             S2%C(N)=S1%J%R(I)
+    !          ENDIF
+    !       ENDDO
+    !
+    !    ENDIF
   END SUBROUTINE FILL_N
 
   SUBROUTINE  REFILL_N(S1,S2)
@@ -3103,11 +3079,11 @@ CONTAINS
     INTEGER I,K,J(LNV)
     logical(lp) DOIT
 
-    if(old) then
-       if(s1%i==0)  call crap1("REFILL_N 1")
-    else
-       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("REFILL_N 2")
-    endif
+    ! if(old) then
+    if(s1%i==0)  call crap1("REFILL_N 1")
+    !    else
+    !       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("REFILL_N 2")
+    !    endif
 
 
     S1=zero
@@ -3397,13 +3373,13 @@ CONTAINS
        iassdoluser(i)=0
        iass0user(i)=0
     enddo
-    if(old) then
-       CALL ETALL1(DUMMY)
-       call etall1(temp)
-    else
-       CALL allocnewda(DUMMYl)
-       call allocnewda(templ)
-    endif
+    ! if(old) then
+    CALL ETALL1(DUMMY)
+    call etall1(temp)
+    !    else
+    !       CALL allocnewda(DUMMYl)
+    !       call allocnewda(templ)
+    !    endif
     CALL set_up_level
   end subroutine ASSIGN
 
@@ -3414,13 +3390,13 @@ CONTAINS
        iassdoluser(i)=0
        iass0user(i)=0
     enddo
-    if(old) then
-       CALL DADAL1(DUMMY)
-       call DADAL1(temp)
-    else
-       CALL KILLnewdaS(DUMMYl)
-       call KILLnewdaS(templ)
-    endif
+    ! if(old) then
+    CALL DADAL1(DUMMY)
+    call DADAL1(temp)
+    !    else
+    !       CALL KILLnewdaS(DUMMYl)
+    !       call KILLnewdaS(templ)
+    !    endif
     do i=1,ndumt
        CALL kill_DALEVEL(scratchda(I))
     ENDDO
@@ -3465,11 +3441,11 @@ CONTAINS
     ELSE
        scratchda(master)%PRESENT=>scratchda(master)%PRESENT%NEXT
     ENDIF
-    if(old) then
-       s1%i=scratchda(master)%PRESENT%T%i
-    else
-       s1%j=scratchda(master)%PRESENT%T%j
-    endif
+    ! if(old) then
+    s1%i=scratchda(master)%PRESENT%T%i
+    !    else
+    !       s1%j=scratchda(master)%PRESENT%T%j
+    !    endif
 
 
   end subroutine ASS0
