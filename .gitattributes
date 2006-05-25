@@ -37,11 +37,8 @@
 /deltra.fi -text
 /dynap.F -text
 /dyntab.fi -text
-/e_define_newda.f90 -text
 /emit.F -text
 /emit.fi -text
-/f_newda.f90 -text
-/g_newLielib.f90 -text
 /gxx11.F -text
 /gxx11c.c -text
 /gxx11ps.F -text
