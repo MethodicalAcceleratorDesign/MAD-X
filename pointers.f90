@@ -143,9 +143,12 @@ contains
 
              i_layout=i_layout_temp
              call move_to_layout_i(m_u,my_ring,i_layout)
-             write(6,*) "Selected Layout",i_layout," called ",my_ring%name
+             write(6,*) "Selected Layout",i_layout,"  called  ---> ",my_ring%name
           endif
+       case('NAMELAYOUT')
+          read(mf,*) NAME
 
+          MY_RING%NAME=NAME
        case('DEFAULT')
           MY_STATE=DEFAULT0
        case('+NOCAVITY')
@@ -512,6 +515,22 @@ contains
           ENDDO
 
           CLOSE(MFR)
+
+       case('PRINTENTRANCEFRAMES')
+
+          READ(MF,*) FILENAME
+          CALL print_frames(MY_RING,filename)
+
+       case('PSREXAMPLEOFPATCHING')
+
+          call APPEND_EMPTY_LAYOUT(m_u)
+          CALL remove_drifts(MY_RING,m_u%END)
+          m_u%end%name="psr_no_drift"
+          call APPEND_EMPTY_LAYOUT(m_u)
+          m_u%end%name="psr_quads_for_bends"
+          CALL remove_drifts_bends(MY_RING,m_u%END)
+
+          WRITE(6,*) MY_RING%N , m_u%END%N
 
        case('NORMALFORM')
           READ(MF,*)POS,name
@@ -882,7 +901,187 @@ contains
 
   end subroutine radia
 
+  SUBROUTINE remove_drifts(R,NR)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R,NR
+    integer I
+    type(fibre), pointer :: P
+    logical(lp) doneit
+
+    p=>r%start
+
+    do i=1,r%n
+       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1) THEN
+
+          !        call APPEND_EMPTY(NR)
+          CALL APPEND( NR, P )
+
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+
+    NR%closed=.true.
+    doneit=.true.
+    call ring_l(NR,doneit)
+
+
+
+    p=>nr%start
+
+    do i=1,nr%n-1
+       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+
+       P=>P%NEXT
+    ENDDO
+    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
+
+    ! avoiding putting a patch on the very first fibre since survey does not allow it....
+
+
+  end SUBROUTINE remove_drifts
+
+  SUBROUTINE remove_drifts_bends(R,NR)  ! special example to be removed later
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R,NR
+    integer I,IG
+    type(fibre), pointer :: P,bend
+    logical(lp) doneit,first
+    real(dp) ent(3,3),a(3),ang(3),d(3)
+
+    p=>r%start
+    bend=>r%next%start%next   ! second layout in universe
+    write(6,*) " using bend called ",bend%mag%name
+    write(6,*) " 'USING SURVEY' TYPE 1 / 'USING GEOMETRY' TYPE 0 "
+    READ(5,*) IG
+    do i=1,r%n
+       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1.and.P%MAG%p%b0==zero) THEN
+
+          CALL APPEND( NR, P )
+       elseif(P%MAG%p%b0/=zero) then
+          bend%mag%p%bend_fringe=.true.
+          bend%magp%p%bend_fringe=.true.
+          bend%mag%L=P%MAG%p%lc
+          bend%magp%L=P%MAG%p%lc   ! give it correct arc length
+          bend%mag%p%Lc=P%MAG%p%lc
+          bend%magp%p%Lc=P%MAG%p%lc   ! give it correct arc length
+          bend%mag%p%Ld=P%MAG%p%lc
+          bend%magp%p%Ld=P%MAG%p%lc   ! give it correct arc length
+          call add(bend,1,0,p%mag%bn(1))    ! Give a huge B field to quadrupole, i.e. looks like a kicker now
+          CALL APPEND( NR, bend )
+          ent=p%chart%f%mid     !  storing the bend location
+          a=p%chart%f%a         !
+          !     since we use a quadrupole, the entrance frame of this quad is the mid frame of the bend
+          !     The  fibre bend must be rotated and translated into position
+          ! easiest way is to survey it with initial condition correspounding to the actual position and orientation
+          !
+          IF(IG==1) THEN
+             call SURVEY(nr%end,ENT,A)
+          ELSE
+             d=a-nr%end%chart%f%a
+             CALL TRANSLATE_Fibre(nr%end,D)  ! translation in global frame
+             CALL COMPUTE_ENTRANCE_ANGLE(nr%end%chart%f%ENT,ENT,ANG)
+             CALL ROTATE_Fibre(nr%end,A,ang)  ! translation in global frame
+          ENDIF
+
+
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+
+    NR%closed=.true.
+    doneit=.true.
+    call ring_l(NR,doneit)
+
+
+
+    p=>nr%start
+
+    do i=1,nr%n-1
+       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+
+       P=>P%NEXT
+
+    ENDDO
+    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
+
+    ! avoiding putting a patch on the very first fibre since survey is not a self-check in that case
+
+
+  end SUBROUTINE remove_drifts_bends
+
+  SUBROUTINE print_frames(R,filename)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer I,mf
+    type(fibre), pointer :: P
+    character(*) filename
+    call kanalnummer(mf)
+
+
+    open(unit=mf,file=filename)
+    write(mf,*) "Contains location of each fibre and the magnet within the fibre "
+    write(mf,*) "N.B. Drifts and Markers are fibres in PTC "
+    p=>r%start
+    do i=1,r%n
+
+       write(mf,*) " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+       write(mf,*) "  "
+       write(mf,*) "|| position = ", i,' || PTC kind = ', P%mag%kind," || name = ",P%mag%name, " ||"
+       write(mf,*) "  "
+       write(mf,*) " Fibre positioning or Ideal position in conventional parlance"
+       write(mf,*) "  "
+       write(mf,*) " Entrance origin A(3) "
+       write(mf,*) P%chart%f%a
+       write(mf,*) " Entrance frame (i,j,k) basis in the ent(3,3) array "
+       write(mf,*) P%chart%f%ent(1,:)
+       write(mf,*) P%chart%f%ent(2,:)
+       write(mf,*) P%chart%f%ent(3,:)
+       write(mf,*) " Middle origin O(3) "
+       write(mf,*) P%chart%f%o
+       write(mf,*) " Middle frame (i,j,k) basis in the ent(3,3) array "
+       write(mf,*) P%chart%f%mid(1,:)
+       write(mf,*) P%chart%f%mid(2,:)
+       write(mf,*) P%chart%f%mid(3,:)
+       write(mf,*) " Exit origin B(3) "
+       write(mf,*) P%chart%f%B
+       write(mf,*) " Exit frame (i,j,k) basis in the ent(3,3) array "
+       write(mf,*) P%chart%f%exi(1,:)
+       write(mf,*) P%chart%f%exi(2,:)
+       write(mf,*) P%chart%f%exi(3,:)
+       write(mf,*) "  "
+       write(mf,*) " Actual magnet positioning  "
+       write(mf,*) "  "
+       write(mf,*) " Entrance origin A(3) "
+       write(mf,*) P%mag%p%f%a
+       write(mf,*) " Entrance frame (i,j,k) basis in the ent(3,3) array "
+       write(mf,*) P%mag%p%f%ent(1,:)
+       write(mf,*) P%mag%p%f%ent(2,:)
+       write(mf,*) P%mag%p%f%ent(3,:)
+       write(mf,*) " Middle origin O(3) "
+       write(mf,*) P%mag%p%f%o
+       write(mf,*) " Middle frame (i,j,k) basis in the ent(3,3) array "
+       write(mf,*) P%mag%p%f%mid(1,:)
+       write(mf,*) P%mag%p%f%mid(2,:)
+       write(mf,*) P%mag%p%f%mid(3,:)
+       write(mf,*) " Exit origin B(3) "
+       write(mf,*) P%mag%p%f%B
+       write(mf,*) " Exit frame (i,j,k) basis in the ent(3,3) array "
+       write(mf,*) P%mag%p%f%exi(1,:)
+       write(mf,*) P%mag%p%f%exi(2,:)
+       write(mf,*) P%mag%p%f%exi(3,:)
+       write(mf,*) " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+
+       P=>P%NEXT
+    ENDDO
+
+    close(mf)
+  end SUBROUTINE print_frames
+
+
+
 end module pointer_lattice
+
+
 
 subroutine read_ptc_command77(ptc_fichier)
   use pointer_lattice

@@ -3167,17 +3167,17 @@ CONTAINS
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
           !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! No need to patch IF PATCHED BEFORE
           IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
-             P0=>CN%MAG%P%P0C
-             B0=>CN%MAG%P%BETA0
+             P0=>CN%MAGP%P%P0C
+             B0=>CN%MAGP%P%BETA0
 
-             X(2)=X(2)*P0/C%MAG%P%P0C
-             X(4)=X(4)*P0/C%MAG%P%P0C
-             IF(C%MAG%P%TIME)THEN
+             X(2)=X(2)*P0/C%MAGP%P%P0C
+             X(4)=X(4)*P0/C%MAGP%P%P0C
+             IF(C%MAGP%P%TIME)THEN
                 X(5)=SQRT(one+two*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAG%P%P0C-one !X(5) = DP/P0C_NEW
-                X(5)=(two*X(5)+X(5)**2)/(SQRT(one/C%MAG%P%BETA0**2+two*X(5)+X(5)**2)+one/C%MAG%P%BETA0)
+                X(5)=X(5)*P0/C%MAGP%P%P0C-one !X(5) = DP/P0C_NEW
+                X(5)=(two*X(5)+X(5)**2)/(SQRT(one/C%MAGP%P%BETA0**2+two*X(5)+X(5)**2)+one/C%MAGP%P%BETA0)
              ELSE
-                X(5)=(one+X(5))*P0/C%MAG%P%P0C-one
+                X(5)=(one+X(5))*P0/C%MAGP%P%P0C-one
              ENDIF
           ENDIF ! No need to patch
        ENDIF ! ASSOCIATED
@@ -3186,7 +3186,7 @@ CONTAINS
 
     ! The chart frame of reference is located here implicitely
     IF(PATCHG/=0.AND.PATCHG/=2) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
 
@@ -3194,12 +3194,12 @@ CONTAINS
        X(6)=X(6)+C%PATCH%a_T
     ENDIF
 
-    CALL DTILTD(C%DIR,C%MAG%P%TILTD,1,X)
+    CALL DTILTD(C%DIR,C%MAGP%P%TILTD,1,X)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
-    IF(C%MAG%MIS) THEN
-       ou = K%EXACTMIS.or.C%MAG%EXACTMIS
+    IF(C%MAGP%MIS) THEN
+       ou = K%EXACTMIS.or.C%MAGP%EXACTMIS
        CALL MIS_FIB(C,X,OU,DONEITT)
     ENDIF
 
@@ -3293,19 +3293,19 @@ CONTAINS
 
 
 
-    IF(C%MAG%MIS) THEN
-       ou = K%EXACTMIS.or.C%MAG%EXACTMIS
+    IF(C%MAGP%MIS) THEN
+       ou = K%EXACTMIS.or.C%MAGP%EXACTMIS
        CALL MIS_FIB(C,X,OU,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)
+    CALL DTILTD(C%DIR,C%MAGP%P%TILTD,2,X)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
 
     IF(PATCHG/=0.AND.PATCHG/=1) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
 
@@ -3315,16 +3315,16 @@ CONTAINS
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
-       P0=>CN%MAG%P%P0C
-       B0=>CN%MAG%P%BETA0
-       X(2)=X(2)*C%MAG%P%P0C/P0
-       X(4)=X(4)*C%MAG%P%P0C/P0
-       IF(C%MAG%P%TIME)THEN
-          X(5)=sqrt(one+two*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-          X(5)=X(5)*C%MAG%P%P0C/P0-one !X(5) = DP/P0C_NEW
+       P0=>CN%MAGP%P%P0C
+       B0=>CN%MAGP%P%BETA0
+       X(2)=X(2)*C%MAGP%P%P0C/P0
+       X(4)=X(4)*C%MAGP%P%P0C/P0
+       IF(C%MAGP%P%TIME)THEN
+          X(5)=sqrt(one+two*X(5)/C%MAGP%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+          X(5)=X(5)*C%MAGP%P%P0C/P0-one !X(5) = DP/P0C_NEW
           X(5)=(two*X(5)+X(5)**2)/(sqrt(one/B0**2+two*X(5)+X(5)**2)+one/B0)
        ELSE
-          X(5)=(one+X(5))*C%MAG%P%P0C/P0-one
+          X(5)=(one+X(5))*C%MAGP%P%P0C/P0-one
        ENDIF
     ENDIF
 

@@ -677,6 +677,7 @@ contains
 
 
     IF(.NOT.CHECK_STABLE) return
+    C%MAG=K
 
     if(c_%x_prime) then
        P0=>C%MAG%P%P0C
@@ -717,7 +718,6 @@ contains
     endif
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
-    C%MAG=K
     !FRONTAL PATCH
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
@@ -891,13 +891,14 @@ contains
     TYPE(REAL_8) xp
 
     IF(.NOT.CHECK_STABLE) return
+    C%MAGP=K
 
     if(c_%x_prime) then
        call alloc(xp)  ! deallocated below
-       P0=>C%MAG%P%P0C
-       B0=>C%MAG%P%BETA0
-       IF(C%MAG%P%exact)THEN
-          IF(C%MAG%P%TIME)THEN
+       P0=>C%MAGP%P%P0C
+       B0=>C%MAGP%P%BETA0
+       IF(C%MAGP%P%exact)THEN
+          IF(C%MAGP%P%TIME)THEN
              xp=x(2)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
              x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
              x(2)=xp
@@ -907,7 +908,7 @@ contains
              x(2)=xp
           endif
        else
-          IF(C%MAG%P%TIME)THEN
+          IF(C%MAGP%P%TIME)THEN
              x(2)=x(2)/sqrt(one+two*X(5)/B0+X(5)**2)
              x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2)
           else
@@ -938,7 +939,6 @@ contains
     !
 
     ! PASSING THE STATE K TO THE ELEMENT
-    C%MAGP=K
     !FRONTAL PATCH
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
@@ -977,7 +977,7 @@ contains
 
     ! POSITION PATCH
     IF(PATCHG/=0.AND.PATCHG/=2) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
@@ -1028,7 +1028,7 @@ contains
 
     ! POSITION PATCH
     IF(PATCHG/=0.AND.PATCHG/=1) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -1066,10 +1066,10 @@ contains
     ENDIF
 
     if(c_%x_prime) then
-       P0=>C%MAG%P%P0C
-       B0=>C%MAG%P%BETA0
-       IF(C%MAG%P%exact)THEN
-          IF(C%MAG%P%TIME)THEN
+       P0=>C%MAGP%P%P0C
+       B0=>C%MAGP%P%BETA0
+       IF(C%MAGP%P%exact)THEN
+          IF(C%MAGP%P%TIME)THEN
              xp=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)/sqrt(one+x(2)**2+x(4)**2)
              x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)/sqrt(one+x(2)**2+x(4)**2)
              x(2)=xp
@@ -1079,7 +1079,7 @@ contains
              x(2)=xp
           endif
        else
-          IF(C%MAG%P%TIME)THEN
+          IF(C%MAGP%P%TIME)THEN
              x(2)=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)
              x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)
           else
@@ -1136,14 +1136,15 @@ contains
     TYPE(REAL_8) xp
 
     IF(.NOT.CHECK_STABLE) return
+    C%MAGP=K
 
     if(c_%x_prime) then
        call alloc(xp)  ! deallocated below
        call alloc(y)
-       P0=>C%MAG%P%P0C
-       B0=>C%MAG%P%BETA0
-       IF(C%MAG%P%exact)THEN
-          IF(C%MAG%P%TIME)THEN
+       P0=>C%MAGP%P%P0C
+       B0=>C%MAGP%P%BETA0
+       IF(C%MAGP%P%exact)THEN
+          IF(C%MAGP%P%TIME)THEN
              xp=y(2)/sqrt(one+two*y(5)/B0+y(5)**2-y(2)**2-y(4)**2)
              y(4)=y(4)/sqrt(one+two*y(5)/B0+y(5)**2-y(2)**2-y(4)**2)
              y(2)=xp
@@ -1153,7 +1154,7 @@ contains
              y(2)=xp
           endif
        else
-          IF(C%MAG%P%TIME)THEN
+          IF(C%MAGP%P%TIME)THEN
              y(2)=y(2)/sqrt(one+two*y(5)/B0+y(5)**2)
              y(4)=y(4)/sqrt(one+two*y(5)/B0+y(5)**2)
           else
@@ -1180,7 +1181,6 @@ contains
     endif
     !
 
-    C%MAGP=K
     !FRONTAL PATCH
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
@@ -1199,8 +1199,8 @@ contains
        IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
           !          IF(.NOT.CN%PATCH%ENERGY) THEN   ! No need to patch IF PATCHED BEFORE
           IF(CN%PATCH%ENERGY==0) THEN   ! No need to patch IF PATCHED BEFORE
-             P0=>CN%MAG%P%P0C
-             B0=>CN%MAG%P%BETA0
+             P0=>CN%MAGP%P%P0C
+             B0=>CN%MAGP%P%BETA0
 
              Y(2)=Y(2)*P0/C%MAGP%P%P0C
              Y(4)=Y(4)*P0/C%MAGP%P%P0C
@@ -1225,7 +1225,7 @@ contains
 
 
     IF(PATCHG/=0.AND.PATCHG/=2) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
     !       IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
@@ -1273,7 +1273,7 @@ contains
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHG/=0.AND.PATCHG/=1) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -1306,10 +1306,10 @@ contains
 
     if(c_%x_prime) then
        call alloc(y)
-       P0=>C%MAG%P%P0C
-       B0=>C%MAG%P%BETA0
-       IF(C%MAG%P%exact)THEN
-          IF(C%MAG%P%TIME)THEN
+       P0=>C%MAGP%P%P0C
+       B0=>C%MAGP%P%BETA0
+       IF(C%MAGP%P%exact)THEN
+          IF(C%MAGP%P%TIME)THEN
              xp=sqrt(one+two*y(5)/B0+y(5)**2)*y(2)/sqrt(one+y(2)**2+y(4)**2)
              y(4)=sqrt(one+two*y(5)/B0+y(5)**2)*y(4)/sqrt(one+y(2)**2+y(4)**2)
              y(2)=xp
@@ -1319,7 +1319,7 @@ contains
              y(2)=xp
           endif
        else
-          IF(C%MAG%P%TIME)THEN
+          IF(C%MAGP%P%TIME)THEN
              y(2)=sqrt(one+two*y(5)/B0+y(5)**2)*y(2)
              y(4)=sqrt(one+two*y(5)/B0+y(5)**2)*y(4)
           else
@@ -1426,17 +1426,17 @@ contains
 
     IF(ENTERING) THEN
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
-       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
+       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
        CALL ROT_XY(C%PATCH%A_ANG(3),X,PATCH)
-       CALL TRANS(C%PATCH%A_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL TRANS(C%PATCH%A_D,X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
        X(3)=C%PATCH%A_X2*X(3);X(4)=C%PATCH%A_X2*X(4);
     ELSE
        X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
-       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
+       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
        CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
-       CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL TRANS(C%PATCH%B_D,X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
 

@@ -40,7 +40,8 @@ module S_def_all_kinds
 
 contains
 
-  RECURSIVE SUBROUTINE GET_LENGTH(R,L)
+  !  RECURSIVE
+  SUBROUTINE GET_LENGTH(R,L)
     IMPLICIT NONE
     TYPE(LAYOUT), INTENT(IN) :: R
     REAL(DP), INTENT(OUT) :: L
@@ -384,7 +385,7 @@ contains
        !          A(I)=C%ANG_IN(I)
 
        A=C%ANG_IN
-       call ROT_FRAME(f,OMEGA,a,1,BASIS)
+       call ROTATE_FRAME(f,OMEGA,a,1,BASIS)
 
        !       D=F%A-OMEGA
        !       CALL GEO_ROT(F%ENT,D,A,1,BASIS)
