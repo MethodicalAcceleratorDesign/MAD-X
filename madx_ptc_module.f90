@@ -1349,9 +1349,9 @@ CONTAINS
     suml=zero
     iii=restart_sequ()
     print77=.false.
-    open(unit=21,file='ptctwiss.txt')
 
     if (getdebug() > 2) then
+       open(unit=21,file='ptctwiss.txt')
        print *, "ptc_twiss: internal state is:"
        call print(default,6)
     endif
@@ -1398,7 +1398,7 @@ CONTAINS
     CALL kill(y)
     call f90flush(20,.false.)
 
-    close(21)
+    if (getdebug() > 2) close(21)
 
     !****************************************************************************************
     !*********  E N D   O F   PTC_TWISS      ************************************************
