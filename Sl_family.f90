@@ -963,7 +963,7 @@ CONTAINS
           D=ZERO
           CALL GEO_ROT(ENT,D,ANG,1,ENT)
 
-          CALL GEO_TRA(A,ENT,P%B_D,1)
+          CALL GEO_TRA(A,ENT,DT,1)
 
        ENDIF
     ENDIF
