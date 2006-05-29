@@ -198,11 +198,11 @@ contains
        case('EVENTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=.TRUE.)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=my_true)
        case('ODDTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=.FALSE.)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=my_false)
           ! thin layout stuff
        case('MAKE_THIN_LAYOUT','MAKETHINLAYOUT')
 
@@ -929,11 +929,11 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+       CALL FIND_PATCH(P,P%next,NEXT=my_true,ENERGY_PATCH=my_false)
 
        P=>P%NEXT
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
+    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=my_false)
 
     ! avoiding putting a patch on the very first fibre since survey does not allow it....
 
@@ -997,12 +997,12 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+       CALL FIND_PATCH(P,P%next,NEXT=my_true,ENERGY_PATCH=my_false)
 
        P=>P%NEXT
 
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
+    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=my_false)
 
     ! avoiding putting a patch on the very first fibre since survey is not a self-check in that case
 

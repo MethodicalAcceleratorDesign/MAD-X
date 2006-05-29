@@ -1399,7 +1399,7 @@ CONTAINS
     c_%watch_user=.false.
     call kill(tw)
     CALL kill(y)
-    call f90flush(20,.false.)
+    call f90flush(20,my_false)
 
     if (getdebug() > 2) close(21)
 
@@ -2326,8 +2326,8 @@ CONTAINS
        call kill(n)
     endif
     CALL kill(y)
-    call f90flush(18,.false.)
-    call f90flush(19,.false.)
+    call f90flush(18,my_false)
+    call f90flush(19,my_false)
 
   END subroutine ptc_normal
   !________________________________________________________________________________
@@ -2853,10 +2853,13 @@ CONTAINS
     implicit none
     integer i,ios
     logical(lp) ostat, fexist,option
+    logical fexist1, ostat1
     character*20 faction,faccess,fform,fwstat
     character*255 fname
     inquire(err=1,iostat=ios,&
-         unit=i,opened=ostat,exist=fexist,write=fwstat)
+         unit=i,opened=ostat1,exist=fexist1,write=fwstat)
+    fexist = fexist1
+    ostat  = ostat1
     if (.not.ostat.or..not.fexist.or.fwstat.ne.'YES') return
     inquire(err=2,iostat=ios,&
          unit=i,action=faction,access=faccess,&
