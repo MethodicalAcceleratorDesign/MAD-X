@@ -955,6 +955,7 @@ CONTAINS
     j=j+1
     n_align = node_al_errors(al_errors)
     if (n_align.ne.0)  then
+       write(6,'(6f8.3)')  al_errors(1:6)
        call mad_misalign_fibre(f,al_errors(1:6))
     endif
     f=>f%next
@@ -975,6 +976,7 @@ CONTAINS
     integer              :: get_string
     real(kind(1d0))      :: get_value
     integer              :: flag_index,why(9)
+    character(200)       :: whymsg
     real(kind(1d0))      :: suml=zero
     integer  geterrorflag !C function that returns errorflag value
 
@@ -1019,9 +1021,9 @@ CONTAINS
              call ANALYSE_APERTURE_FLAG(flag_index,why)
 
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
-             call fort_warn('ptc_twiss: ','APERTURE error')
-             call fort_warn('ptc_twiss: ',why)
-             call seterrorflag(10,"ptc_twiss: aperture error ",why);
+             write(whymsg,*) 'APERTURE error: ',why
+             call fort_warn('ptc_twiss: ',whymsg)
+             call seterrorflag(10,"ptc_twiss: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1037,9 +1039,9 @@ CONTAINS
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
-             call fort_warn('ptc_twiss: ','APERTURE error')
-             call fort_warn('ptc_twiss: ',why)
-             call seterrorflag(10,"ptc_twiss: aperture error ",why);
+             write(whymsg,*) 'APERTURE error: ',why
+             call fort_warn('ptc_twiss: ',whymsg)
+             call seterrorflag(10,"ptc_twiss: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1052,9 +1054,9 @@ CONTAINS
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
-             call fort_warn('ptc_twiss: ','APERTURE error')
-             call fort_warn('ptc_twiss: ',why)
-             call seterrorflag(10,"ptc_twiss: aperture error ",why);
+             write(whymsg,*) 'APERTURE error: ',why
+             call fort_warn('ptc_twiss: ',whymsg)
+             call seterrorflag(10,"ptc_twiss: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1070,9 +1072,9 @@ CONTAINS
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
-             call fort_warn('ptc_twiss: ','APERTURE error')
-             call fort_warn('ptc_twiss: ',why)
-             call seterrorflag(10,"ptc_twiss: aperture error ",why);
+             write(whymsg,*) 'APERTURE error: ',why
+             call fort_warn('ptc_twiss: ',whymsg)
+             call seterrorflag(10,"ptc_twiss: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1174,6 +1176,7 @@ CONTAINS
     include 'twissa.fi'
     logical(lp) closed_orbit,beta_flg,betz_flg
     integer k,i,ii,no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
+    character(200)       :: whymsg
     integer inval,ioptfun,iii,restart_sequ,advance_node,get_option
     integer tab_name(*)
     real(dp) x(6),deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy,d_val
@@ -1315,9 +1318,9 @@ CONTAINS
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
 
-          call fort_warn('ptc_twiss: ','APERTURE unstable (map production)-programs continues')
-          call fort_warn('ptc_twiss: ',why)
-          call seterrorflag(10,"ptc_twiss: aperture error ",why);
+          write(whymsg,*) 'APERTURE unstable (map production) - programs continues: ',why
+          call fort_warn('ptc_twiss: ',whymsg)
+          call seterrorflag(10,"ptc_twiss: ",whymsg);
           !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
           !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           c_%watch_user=.false.
@@ -1376,9 +1379,9 @@ CONTAINS
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
           Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
-          call fort_warn('ptc_twiss: ','APERTURE unstable')
-          call fort_warn('ptc_twiss: ',why)
-          call seterrorflag(10,"ptc_twiss: aperture error ",why);
+          write(whymsg,*) 'APERTURE error: ',why
+          call fort_warn('ptc_twiss: ',whymsg)
+          call seterrorflag(10,"ptc_twiss: ",whymsg);
           !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           goto 100
        endif
