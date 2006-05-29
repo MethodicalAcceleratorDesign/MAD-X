@@ -132,7 +132,7 @@ c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
 d_lielib.o: c_dabnew.o d_lielib.f90
 	$(f95) $(f95_FLAGS) d_lielib.f90
 
-h_definition.o: d_lielib.o h_definition.f90
+h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90
 	$(f95) $(f95_FLAGS) h_definition.f90
 
 i_tpsa.o: h_definition.o i_tpsa.f90
