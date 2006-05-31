@@ -215,12 +215,12 @@ struct object *p_err_zero;  /* pointer to error object with all zeroes */
 
 char el_info[N_TYPES][60] = /* see type_info definition */
 /*           l=0 l>0,normal l>0,skew ->drift make_k*l split */
-{"aperture    2       2       2       0       0       0",
+{"aperture     2       2       2       0       0       0",
  "beambeam     2       2       2       0       0       0",
  "beamint      0       1       1       1       0       0",
  "drift        0       1       1       0       0       0",
  "decapole     2       2       2       0       1       2",
- "ecollimator  2       2       1       0       0       0",
+ "ecollimator  2       1       1       0       0       0",
  "elseparator  0       1       1       1       0       0",
  "gbend        1       1       1       2       1       1",
  "hkicker      5       5       5       1       0       3",
@@ -235,7 +235,7 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "octupole     2       2       2       0       1       2",
  "quadrupole   2       1       2       0       1       1",
  "rbend        2       1       1       0       1       1",
- "rcollimator  2       2       1       0       0       0",
+ "rcollimator  2       1       1       0       0       0",
  "rfcavity     3       3       3       0       0       2",
  "sbend        2       1       1       0       1       1",
  "sextupole    2       2       2       0       1       2",
