@@ -1020,12 +1020,12 @@ struct table* sodd_table_70;      /* sodd output table detune_1_end */
 struct table* sodd_table_71;      /* sodd output table detune_1_all */
 struct table* sodd_table_72;      /* sodd output table detune_2_end */
 struct table* sodd_table_73;      /* sodd output table detune_2_all */
-struct table* sodd_table_74;      /* sodd output table distort_1_F_end */
-struct table* sodd_table_75;      /* sodd output table distort_1_H_end */
-struct table* sodd_table_76;      /* sodd output table distort_1_F_all */
-struct table* sodd_table_77;      /* sodd output table distort_1_H_all */
-struct table* sodd_table_78;      /* sodd output table distort_2_F_end */
-struct table* sodd_table_79;      /* sodd output table distort_2_F_all */
+struct table* sodd_table_74;      /* sodd output table distort_1_f_end */
+struct table* sodd_table_75;      /* sodd output table distort_1_h_end */
+struct table* sodd_table_76;      /* sodd output table distort_1_f_all */
+struct table* sodd_table_77;      /* sodd output table distort_1_h_all */
+struct table* sodd_table_78;      /* sodd output table distort_2_f_end */
+struct table* sodd_table_79;      /* sodd output table distort_2_h_end */
 struct table* target_table = NULL;       /* current target table */
 struct table* model_table = NULL;        /* current model table */
 struct table* orbin_table = NULL;        /* current orbit table */
@@ -1067,8 +1067,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.06";
-char code_mod_date[] = "Code Modification Date: 31.05.2006";
+char myversion[] = "MAD-X 3.03.07";
+char code_mod_date[] = "Code Modification Date: 01.06.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
