@@ -383,21 +383,21 @@
           write(72,10072)
         endif
         if(disto1.eq.1) then
-          open(74,file='distort_1_F_end',form='formatted',              &
+          open(74,file='distort_1_f_end',form='formatted',              &
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,74)
           write(74,10074)
-          open(75,file='distort_1_H_end',form='formatted',              &
+          open(75,file='distort_1_h_end',form='formatted',              &
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,75)
           write(75,10074)
         endif
         if(disto2.eq.1) then
-          open(78,file='distort_2_F_end',form='formatted',              &
+          open(78,file='distort_2_f_end',form='formatted',              &
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,78)
           write(78,10078)
-          open(79,file='distort_2_H_end',form='formatted',              &
+          open(79,file='distort_2_h_end',form='formatted',              &
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,79)
           write(79,10078)
@@ -416,11 +416,11 @@
           write(73,10072)
         endif
         if(disto1.eq.1) then
-          open(76,file='distort_1_F_all',form='formatted',              &
+          open(76,file='distort_1_f_all',form='formatted',              &
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,76)
           write(76,10076)
-          open(77,file='distort_1_H_all',form='formatted',              &
+          open(77,file='distort_1_h_all',form='formatted',              &
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,77)
           write(77,10076)
@@ -476,15 +476,16 @@
      &' of Execution Time'//80('-')//)
 10010 format(/80('-')//'Program <SODD> used a total of ',f10.3,         &
      &' second(s) of Execution Time'//80('-')//)
-10070 format('mpor','plan',4x,'Hor/Vert detuning',3x,'HinvVinv')
-10072 format('mpo1','mpo2',3x,'Horizontal detuning',2x,'HinvVinv')
-10074 format('mpor',6x,'cosine part',13x,'sine part',14x,'amplitude',   &
-     &9x,'j',3x,'k',3x,'l',3x,'m',1x)
-10076 format('mpor',2x,'app',3x,'res',8x,'position',8x,'cosine part',   &
-     &13x,'sine part',14x,'amplitude',                                  &
-     &9x,'j',3x,'k',3x,'l',3x,'m',1x)
-10078 format('mpo1','mpo2',6x,'cosine part',13x,'sine part',14x,        &
-     &'amplitude',9x,'j',3x,'k',3x,'l',3x,'m',1x)
+10070 format('MulOrd ',' Plane',4x,'Hor/Vert detuning',3x,'Hinv Vinv')
+10072 format('MulOrd1 ','MulOrd2 ',3x,'Horizontal detuning',            &
+     &2x,'Hinv Vinv')
+10074 format('MulOrd',11x,'Cosine',17x,'Sine',19x,'Amplitude',          &
+     &8x,'j',3x,'k',3x,'l',3x,'m',1x)
+10076 format('MulOrd',3x,'Loc',2x,'Res',6x,'Position[m]',14x,'Cosine',  &
+     &17x,'Sine',19x,'Amplitude',                                       &
+     &8x,'j',3x,'k',3x,'l',3x,'m',1x)
+10078 format('MulOrd1',' MulOrd2',10x,'Cosine',17x,'Sine',19x,          &
+     &'Amplitude',8x,'j',3x,'k',3x,'l',3x,'m',1x)
       return
       end
 
@@ -950,7 +951,7 @@
               enddo
 !--Write Generating Function Calculation of each Element
               if(iu_on.eq.2.or.iu_on.eq.3) then
-                table_name ='distort_1_F_all '
+                table_name ='distort_1_f_all '
                 data_size = ivar(ia)
                 call fit_table(table_name,data_size,table_size_76)
                 do j=1,data_size
@@ -978,7 +979,7 @@
               endif
 !--Calculate and write Hamiltonian of each Element
               if(iu_on.eq.2.or.iu_on.eq.3) then
-                table_name ='distort_1_H_all '
+                table_name ='distort_1_h_all '
                 data_size = ivar(ia)
                 call fit_table(table_name,data_size,table_size_77)
                 do j=1,data_size
@@ -1012,7 +1013,7 @@
 !--Write total Generating Function
             if(iu_on.eq.1.or.iu_on.eq.3) then
               write(6,10020)
-              table_name ='distort_1_F_end '
+              table_name ='distort_1_f_end '
               data_size = ivar(ia)
               call fit_table(table_name,data_size,table_size_74)
               do j=1,data_size
@@ -1039,7 +1040,7 @@
               enddo
 !--Calculate and write total Hamiltonian
               write(6,10030)
-              table_name ='distort_1_H_end '
+              table_name ='distort_1_h_end '
               data_size = ivar(ia)
               call fit_table(table_name,data_size,table_size_75)
               do j=1,data_size
@@ -1075,7 +1076,7 @@
       write(6,10110) tim5-tim2
 !---------------------------------------------------------------------
 10000 format(i4,i7,i5,4(1pe23.15),4i4)
-10010 format(i4,3(1pe23.15),6i4)
+10010 format(i4,4x,3(1pe23.15),6i4)
 10020 format(/80('-')/10x,'Distortionfunction Terms (first order)'/     &
      &80('-')/4x,'Cosine-Term',8x,'Sine-Term',8x,'Amplitude',7x,'J',    &
      &5x,'K',5x,'L',5x,'M'/80('-'))
@@ -1501,7 +1502,7 @@
 !--Order the resonance terms
             call sortres(3,imax,ica2)
             write(6,10060)
-            table_name ='distort_2_F_end '
+            table_name ='distort_2_f_end '
             data_size = ica2
             call fit_table(table_name,data_size,table_size_78)
             do k1=1,data_size
@@ -1535,7 +1536,7 @@
               facd2(2,k1)=zero
             enddo
             write(6,10070)
-            table_name ='distort_2_H_end '
+            table_name ='distort_2_h_end '
             data_size = ica2
             call fit_table(table_name,data_size,table_size_79)
             do k1=1,data_size
@@ -1592,7 +1593,7 @@
 10080 format(3(1pe17.9),4i6)
 10090 format(//80('-')//10x,a,i8,2a,i8,a)
 10100 format(//80('-')//10x,a,i8,a)
-10110 format(2i4,3(1pe23.15),4i4)
+10110 format(i4,4x,i4,4x,3(1pe23.15),4i4)
       end
       subroutine caldet2(ia,ib,imuty)
 !---------------------------------------------------------------------
@@ -2489,6 +2490,7 @@
       call prror(3,4,num)
  5    continue
       write(6,*) ' Qx= ',qx/pi,' Qy= ',qy/pi
+      close(34)
       return
  900  call prror(3,1,ndum)
       end
@@ -2651,7 +2653,7 @@
         do i=ih1,0,-1
           write(6,10010) det(1,ic,i,ih1-i)/pi2,i,ih1-i
           if(iu_on.eq.1.or.iu_on.eq.3) then
-            write(72,10040) ic,id,det(1,ic,i,ih1-i)/pi2,i,ih1-i
+            write(72,10050) ic,id,det(1,ic,i,ih1-i)/pi2,i,ih1-i
             int_to_write(1) = ic
             int_to_write(2) = id
             double_to_write(3) = det(1,ic,i,ih1-i)/pi2
@@ -2659,7 +2661,7 @@
             int_to_write(5) = ih1-i
             call write_table(table_name,5,int_to_write,double_to_write)
             j72 = j72 + 1
-            call augment_count('detune_2_end ')
+            call augment_count(table_name)
           endif
         enddo
 
@@ -2675,7 +2677,7 @@
           write(6,10010) det(1,ic,i,ih1-i)*dble(ih1-i)/                 &
      &dble(i+1)/pi2,i+1,ih1-i-1
           if(iu_on.eq.1.or.iu_on.eq.3) then
-            write(73,10040) ic,id,                                      &
+            write(73,10050) ic,id,                                      &
      &det(1,ic,i,ih1-i)*dble(ih1-i)/dble(i+1)/pi2,i+1,ih1-i-1
             int_to_write(1) = ic
             int_to_write(2) = id
@@ -2690,7 +2692,7 @@
         enddo
         write(6,10010) det(2,ic,0,ih1)/pi2,0,ih1
         if(iu_on.eq.1.or.iu_on.eq.3) then
-          write(73,10040) ic,id,                                        &
+          write(73,10050) ic,id,                                        &
      &det(2,ic,0,ih1)/pi2,0,ih1
           double_to_write(3) = det(2,ic,0,ih1)/pi2
           int_to_write(4) = 0
@@ -2719,7 +2721,8 @@
 10010 format(10x,1pe20.12,2i6)
 10020 format(/80('-')/8x,'  Vertical Coefficient',4x,'E-x',3x,'E-y'/    &
      &80('-'))
-10040 format(2i4,1pe23.15,2i4)
+10040 format(i4,3x,i4,2x,1pe23.15,i4,1x,i4)
+10050 format(i4,4x,i4,3x,1pe23.15,1x,i4,1x,i4)
 
       end
       subroutine sortres(icase,im1,ic)
@@ -2940,21 +2943,21 @@
      &tab_types_11(11)
       double precision double_to_write(11)
       character table_name*(*)
-      character*13  name_5(5),name_8(8),name_9(9),name_11(11)
+      character*16  name_5(5),name_8(8),name_9(9),name_11(11)
       common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
       data table_type_index/0,0,0,0,1,0,0,2,3,0,4/
       data tab_types_5/1,1,2,1,1/
       data tab_types_8/1,2,2,2,1,1,1,1/
       data tab_types_9/1,1,2,2,2,1,1,1,1/
       data tab_types_11/1,1,1,2,2,2,2,1,1,1,1/
-      data name_5/'mpor ','plane/mpor2 ','detune ','H_inv_order ',      &
-     &'V_inv_order '/
-      data name_8/'mpor ','cos  ','sin ','amp ','j ','k ','l ',         &
-     &'m '/
-      data name_9/'mpor ','mpor2 ','cos ','sin ','amp ','j ',           &
-     &'k ','l ','m '/
-      data name_11/'mpor ','app ','res ','pos ','cos ','sin ',          &
-     &'amp ','j ','k ','l ','m '/
+      data name_5/'multipoleorder ','plane ','detuning ','h_inv_order ',&
+     &'v_inv_order '/
+      data name_8/'multipoleorder ','cosine ','sine ','amplitude ',     &
+     &'j ','k ','l ','m '/
+      data name_9/'multipoleorder1 ','multipoleorder2 ','cosine ',      &
+     &'sine ','amplitude ','j ','k ','l ','m '/
+      data name_11/'multipoleorder ','location ','resonance ',          &
+     &'position[m] ','cosine ','sine ','amplitude ','j ','k ','l ','m '/
 
       goto(50,80,90,110) table_type_index(table_type)
  50   do k = 1,5

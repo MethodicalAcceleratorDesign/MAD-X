@@ -293,7 +293,7 @@ int sodd_detune_5_types[] =
 
 char* sodd_detune_5_cols[] =
 {
-  "mpor", "plane/mpor2", "detune", "H_inv_order", "V_inv_order",
+  "multipoleorder", "plane", "detuning", "h_inv_order", "v_inv_order",
   " "  /* blank terminates */
 };
 
@@ -304,7 +304,7 @@ int sodd_distort1_8_types[] =
 
 char* sodd_distort1_8_cols[] =
 {
-  "mpor", "cos", "sin", "amp", "j", "k", "l", "m",
+  "multipoleorder", "cosine", "sine", "amplitude", "j", "k", "l", "m",
   " "  /* blank terminates */
 };
 
@@ -315,7 +315,7 @@ int sodd_distort1_11_types[] =
 
 char* sodd_distort1_11_cols[] =
 {
-  "mpor", "app", "res", "pos", "cos", "sin", "amp", "j", "k", "l", "m",
+  "multipoleorder", "location", "resonance", "position[m]", "cosine", "sine", "amplitude", "j", "k", "l", "m",
   " "  /* blank terminates */
 };
 
@@ -326,7 +326,7 @@ int sodd_distort2_9_types[] =
 
 char* sodd_distort2_9_cols[] =
 {
-  "mpor", "mpor2", "cos", "sin", "amp", "j", "k", "l", "m",
+  "multipoleorder1", "multipoleorder2", "cosine", "sine", "amplitude", "j", "k", "l", "m",
   " "  /* blank terminates */
 };
 

@@ -2400,27 +2400,27 @@ void exec_sodd(struct in_cmd* cmd)
                              sodd_detune_5_types, 2);
   sodd_table_73->dynamic = 1;
   add_to_table_list(sodd_table_73, table_register);
-  sodd_table_74 = make_table("distort_1_F_end", "sodd_distort1_8", sodd_distort1_8_cols,
+  sodd_table_74 = make_table("distort_1_f_end", "sodd_distort1_8", sodd_distort1_8_cols,
                              sodd_distort1_8_types, 2);
   sodd_table_74->dynamic = 1;
   add_to_table_list(sodd_table_74, table_register);
-  sodd_table_75 = make_table("distort_1_H_end", "sodd_distort1_8", sodd_distort1_8_cols,
+  sodd_table_75 = make_table("distort_1_h_end", "sodd_distort1_8", sodd_distort1_8_cols,
                              sodd_distort1_8_types, 2);
   sodd_table_75->dynamic = 1;
   add_to_table_list(sodd_table_75, table_register);
-  sodd_table_76 = make_table("distort_1_F_all", "sodd_distort1_11", sodd_distort1_11_cols,
+  sodd_table_76 = make_table("distort_1_f_all", "sodd_distort1_11", sodd_distort1_11_cols,
                              sodd_distort1_11_types, 2);
   sodd_table_76->dynamic = 1;
   add_to_table_list(sodd_table_76, table_register);
-  sodd_table_77 = make_table("distort_1_H_all", "sodd_distort1_11", sodd_distort1_11_cols,
+  sodd_table_77 = make_table("distort_1_h_all", "sodd_distort1_11", sodd_distort1_11_cols,
                              sodd_distort1_11_types, 2);
   sodd_table_77->dynamic = 1;
   add_to_table_list(sodd_table_77, table_register);
-  sodd_table_78 = make_table("distort_2_F_end", "sodd_distort2_9", sodd_distort2_9_cols,
+  sodd_table_78 = make_table("distort_2_f_end", "sodd_distort2_9", sodd_distort2_9_cols,
                              sodd_distort2_9_types, 2);
   sodd_table_78->dynamic = 1;
   add_to_table_list(sodd_table_78, table_register);
-  sodd_table_79 = make_table("distort_2_H_end", "sodd_distort2_9", sodd_distort2_9_cols,
+  sodd_table_79 = make_table("distort_2_h_end", "sodd_distort2_9", sodd_distort2_9_cols,
                              sodd_distort2_9_types, 2);
   sodd_table_79->dynamic = 1;
   add_to_table_list(sodd_table_79, table_register);
