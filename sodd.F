@@ -2492,7 +2492,8 @@
       write(6,*) ' Qx= ',qx/pi,' Qy= ',qy/pi
       close(34)
       return
- 900  call prror(3,1,ndum)
+ 900  close(34)
+      call prror(3,1,ndum)
       end
       subroutine detwri(icase,imu,ih1)
 !---------------------------------------------------------------------
