@@ -248,6 +248,8 @@ TYPE THIN_LENS
    INTEGER, POINTER ::  pos
    real(dp), POINTER :: S(:)
    real(dp), POINTER :: orbit(:)
+   real(dp), pointer :: ent(:,:),a(:)
+   real(dp), pointer :: exi(:,:),b(:)
    INTEGER, POINTER :: TEAPOT_LIKE
    TYPE (THIN_LENS), POINTER :: NEXT
    TYPE (THIN_LENS), POINTER :: PREVIOUS

@@ -48,6 +48,7 @@ contains
     logical(lp) FIBRE_flip0,MAD0
     logical(lp) :: t=.true.,f=.false.
     INTEGER FIBRE_DIR0,IL,multipi
+    real(dp) e1_true
 
 
     IL=15
@@ -100,17 +101,7 @@ contains
     CASE("SOLENOID       ")
        BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("QUADRUPOLE     ")
-       !        open(unit=10,file='multip.txt')
-       !         read(10,*) multipi
-       !        close(10)
-       !        if(multipi==1) then
-       !        BLANK=ZGOUBI_multip(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
-       !      write(6,*) " Using Multip of PTC"
-       !        else
        BLANK=QUADRUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
-       !        endif
-    CASE("ZGOUBI_MULTIP  ")
-       BLANK=ZGOUBI_multip(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("SEXTUPOLE     ")
        BLANK=SEXTUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("OCTUPOLE      ")
@@ -118,20 +109,18 @@ contains
     CASE("SBEND         ")
        BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("TRUERBEND     ")
-       BLANK=TRUERECTILT_MADX(KEY%LIST%NAME,tilt.is.KEY%tiltd,KEY%LIST)
+
+       e1_true= KEY%LIST%b0/two+ KEY%LIST%t1
+       BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=e1_true,list=KEY%LIST)
+
+    CASE("WEDGRBEND     ")
+
+       BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=KEY%LIST%t1,e2=KEY%LIST%t2,list=KEY%LIST)
+
     CASE("RBEND         ")
-       IF(KEY%MAD8) THEN
-          ! MADX does some massaging of e1 and e2 for compatibility with mad8
-          ! PTC stays with MAD8
-          !  IF(KEY%LIST%B0/=ZERO) THEN
-          !     KEY%LIST%L=   KEY%LIST%B0*KEY%LIST%L /(two*SIN(KEY%LIST%B0/two))    !  ld is computed
-          !  ENDIF
-          KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
-          KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
-          BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
-       ELSE
-          BLANK=RECTTILT_MADX(KEY%LIST%NAME,tilt.is.KEY%tiltd,KEY%LIST)
-       ENDIF
+       KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
+       KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
+       BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("KICKER         ","VKICKER        ","HKICKER        ")
        BLANK=KICKER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("MONITOR        ")
@@ -183,6 +172,7 @@ contains
     END SELECT
 
     CALL EL_Q_FOR_MADX(EL,BLANK)
+
 
     CALL SET_MADX_(f,f)
 

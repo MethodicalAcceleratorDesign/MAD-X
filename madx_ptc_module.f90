@@ -171,6 +171,7 @@ CONTAINS
     integer             method0,method1
     integer             nst0,nst1
     REAL (dp) :: tempdp
+    logical(lp):: ptcrbend,truerbend
     !---------------------------------------------------------------
     if (getdebug() > 1) then
        print *, '--------------------------------------------------------------'
@@ -271,7 +272,8 @@ CONTAINS
     if (getdebug() > 1) print*,'  Global Number of Integration Steps (nst) is: ',nst0
 
     ! MAD-X specials
-    madlength = get_option('rbarc ') .eq. 0
+    !    madlength = get_option('rbarc ') .eq. 0
+    madlength = .false.
     if (getdebug() > 1) print*,'  global rbend_length: ',madlength
 
     mad       = get_value('ptc_create_layout ','mad_mult ') .ne. 0
@@ -480,6 +482,27 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
+       ptcrbend=node_value('ptcrbend ').ne.0
+       if(ptcrbend) then
+          call context(key%list%name)
+          truerbend=node_value('truerbend ').ne.0
+          if(truerbend) then
+             key%magnet="TRUERBEND"
+             if(key%list%t2/=zero) then
+                write(6,*) " The true parallel face bend "
+                write(6,*) " only accepts the total angle and e1 as an input "
+                write(6,*) " if e1=0, then the pipe angle to the entrance face is "
+                write(6,*) " angle/2. It is a normal rbend."
+                write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
+                write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
+                write(6,*) " with the exit face."
+                write(6,*) " CHANGE YOUR LATTICE FILE."
+                stop 666
+             endif
+          else
+             key%magnet="WEDGRBEND"
+          endif
+       endif
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
        if(l.eq.zero) then
           key%magnet="marker"

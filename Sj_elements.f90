@@ -225,7 +225,7 @@ contains
     !  his survey would have to be "caught" in this interface
 
     SELECT CASE(EL%KIND)
-    case(kind0:KINDWIGGLER,kindmu)
+    case(kind0:KINDWIGGLER)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
     case default
 

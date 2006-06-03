@@ -3926,10 +3926,10 @@ CONTAINS
        DLD=P%MAG%P%LD/P%MAG%P%NST
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;
-       T1=>L%END
-
-       L%END%CAS=CASEP1
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;    ! s(1) total ld
+       T1=>L%END                                                    ! s(2) local integration distance
+       ! s(3) total integration distance
+       L%END%CAS=CASEP1                                             ! s(4) end of step =  DL
        L%END%pos_in_fibre=1
        L%END%pos=k;k=k+1;
        L%END%PARENT_THIN_LAYOUT=>L
@@ -3955,7 +3955,7 @@ CONTAINS
           L%END%PARENT_FIBRE=>P
           S=S+DLD
           LI=LI+DL
-          SL=SL+DL
+          SL=SL+P%DIR*DL
        ENDDO
 
        CALL APPEND_EMPTY_THIN( L )
@@ -4213,6 +4213,142 @@ CONTAINS
 
 
   END SUBROUTINE DRIFT_BEAM_BACK_TO_POSITION
+
+  !  Survey still worm like
+
+  subroutine fill_survey_data_in_thin_layout(r)
+    IMPLICIT NONE
+    type(layout),target:: r
+    type(fibre), pointer ::c
+    type(thin_lens), pointer ::t
+    type(worm) vers
+    integer k,my_start,ic,j
+    real(dp) x(6),ent(3,3),a(3)
+
+    call survey(r)
+
+    CALL ALLOC(vers,r)
+    C=>r%START
+    CALL XFRAME(vers%E,C%chart%f%ent,C%chart%f%A,-7)  ! initializes the survey part of worm
+    vers%E%L(-1)=0.d0 !Starts beam line at z=0   fake distance along ld for cheap work
+
+    do k=1,r%n
+       x=zero
+       CALL TRACK(r,x,k,k+1,default,vers)
+
+
+       t=>c%t1
+       j=-6
+       call gMID(vers,x,j)
+       call G_FRAME(vers%e,ENT,A,j)
+       t%ent=ent
+       t%a=a
+
+       t=>t%next
+       if(t%cas/=case1) then
+          write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+          stop 665
+       endif
+       j=vers%POS(2)
+       call gMID(vers,x,j)
+       call G_FRAME(vers%e,ENT,A,j)
+       t%ent=ent
+       t%a=a
+       t%previous%exi=ent
+       t%previous%b=a
+       t=>t%next
+       ic=0
+       DO J=vers%POS(2)+1,vers%POS(3)-1     ! pos(2)+1 to pos(3)-1 inside the magnet
+
+          ic=ic+1
+
+          call gMID(vers,x,j)
+          call G_FRAME(vers%e,ENT,A,j)
+
+          if(j/=vers%POS(2)+1) then
+             t%previous%exi=ent
+             t%previous%b=a
+             if(t%previous%cas/=case0) then
+                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%previous%cas
+                stop 666
+             endif
+          else
+             t%previous%exi=ent
+             t%previous%b=a
+             if(t%previous%cas/=case1) then
+                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%previous%cas
+                stop 664
+             endif
+          endif
+
+          if(j/=vers%POS(3)-1) then
+             t%ent=ent
+             t%a=a
+             if(t%cas/=case0) then
+                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+                stop 666
+             endif
+          else
+             t%ent=ent
+             t%a=a
+             if(t%cas/=case2) then
+                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+                stop 668
+             endif
+          endif
+
+
+          !  omega(1)= a(1)+scale*(xr(1)*ent(1,1)+xr(3)*ent(2,1))
+          !  omega(2)= a(2)+scale*(xr(1)*ent(1,2)+xr(3)*ent(2,2))
+          !  omega(3)= a(3)+scale*(xr(1)*ent(1,3)+xr(3)*ent(2,3))
+          !  r1(1)=omega0(3)
+          !  r1(2)=omega0(1)
+          !  r2(1)=omega(3)
+          !  r2(2)=omega(1)
+          !  if(abs(r1(1))>1.d6) r1=r2
+          !  call gMoveTo2D(r1(1),r1(2))
+          !  call  gDrawLineTo2D(r2(1),r2(2))
+          !  omega0=omega
+          t=>t%next
+       enddo
+       j=vers%POS(3)
+       call gMID(vers,x,j)
+       call G_FRAME(vers%e,ENT,A,j)
+       t%previous%exi=ent
+       t%previous%b=a
+       t%ent=ent
+       t%a=a
+       if(t%previous%cas/=case2) then
+          write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+          stop 669
+       endif
+       !      t=>t%next
+
+       j=vers%nst
+       call gMID(vers,x,j)
+       call G_FRAME(vers%e,ENT,A,j)
+
+       t%exi=ent
+       t%b=a
+
+       if(t%cas/=casep2) then
+          write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+          stop 670
+       endif
+
+
+       if(ic/=c%mag%p%nst+1) then
+          write(6,*)" error in fill_survey_data_in_thin_layout"
+          write(6,*)k, ic,c%mag%name,c%mag%p%nst
+          stop 888
+       endif
+       c=>c%next
+    enddo
+
+    CALL kill(vers)
+
+
+  end  subroutine fill_survey_data_in_thin_layout
 
   ! BEAM STUFF
 
@@ -4589,16 +4725,17 @@ CONTAINS
 
   END  FUNCTION BEAM_IN_X
 
-  SUBROUTINE X_IN_BEAM(X,B,I,DL)
+  SUBROUTINE X_IN_BEAM(X,B,I,DL,T)
     IMPLICIT NONE
     REAL(DP) X(6)
     REAL(DP),OPTIONAL:: DL
     TYPE(BEAM), INTENT(INOUT) ::B
-    TYPE(THIN_LENS),POINTER :: T
+    TYPE(THIN_LENS),OPTIONAL,POINTER :: T
     INTEGER, INTENT(IN) :: I
 
     B%X(I,1:6)=X(1:6)
     IF(PRESENT(DL)) B%X(I,7)=DL
+    IF(PRESENT(T)) B%POS(I)%THINLENS=>T
     if(.not.CHECK_STABLE) then
        !       write(6,*) "unstable "
        CALL RESET_APERTURE_FLAG

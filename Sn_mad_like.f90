@@ -150,6 +150,7 @@ module Mad_like
      MODULE PROCEDURE B6
   end  INTERFACE
   INTERFACE operator (.sDo.)
+
      MODULE PROCEDURE a6
   end  INTERFACE
 
@@ -231,9 +232,6 @@ module Mad_like
      MODULE PROCEDURE QUADTILT
   end  INTERFACE
 
-  INTERFACE ZGOUBI_MULTIP
-     MODULE PROCEDURE ZGOUBI_MULTIPTILT
-  end  INTERFACE
 
   INTERFACE SOLENOID
      MODULE PROCEDURE SOLTILT
@@ -1055,57 +1053,6 @@ CONTAINS
   END FUNCTION GKICKTILT
 
 
-  FUNCTION  ZGOUBI_MULTIPTILT(NAME,L,K1,T,list)
-    implicit none
-    type (EL_LIST) ZGOUBI_MULTIPTILT
-    type (EL_LIST),optional, INTENT(IN)::list
-    type (TILTING),optional, INTENT(IN):: T
-    CHARACTER(*), INTENT(IN):: NAME
-    real(dp) ,optional, INTENT(IN):: L,K1
-    real(dp) L1,K11
-    L1=zero
-    K11=zero
-    IF(PRESENT(L)) L1=L
-    IF(PRESENT(K1)) K11=K1
-    if(present(list)) then
-       ZGOUBI_MULTIPTILT=list
-       l1=list%L
-       K11=LIST%K(2)
-    else
-       ZGOUBI_MULTIPTILT=0
-    endif
-    ZGOUBI_MULTIPTILT%L=L1
-    ZGOUBI_MULTIPTILT%LD=L1
-    ZGOUBI_MULTIPTILT%LC=L1
-    ZGOUBI_MULTIPTILT%K(2)=K11
-    IF(L1==zero) THEN
-       WRITE(6,*) " NOT PERMITTED IN ZGOUBI_MULTIPTILT "
-       STOP 22
-    ELSE
-       ZGOUBI_MULTIPTILT%K(2)=K11
-       ZGOUBI_MULTIPTILT%KIND=KINDMU
-    ENDIF
-    ZGOUBI_MULTIPTILT%nmul=2
-    IF(PRESENT(t)) then
-       IF(T%NATURAL) THEN
-          WRITE(6,*) " NOT PERMITTED IN ZGOUBI_MULTIPTILT "
-          STOP 23
-       ELSE
-          ZGOUBI_MULTIPTILT%tilt=t%tilt(0)
-       ENDIF
-    endif
-    IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
-       call write_i
-       ZGOUBI_MULTIPTILT%NAME=NAME(1:16)
-    ELSE
-       ZGOUBI_MULTIPTILT%NAME=NAME
-    ENDIF
-  END FUNCTION ZGOUBI_MULTIPTILT
 
   FUNCTION  QUADTILT(NAME,L,K1,T,list)
     implicit none
@@ -1610,99 +1557,8 @@ CONTAINS
     endif
   END FUNCTION RECTTILT
 
-  FUNCTION  RECTTILT_MADX(NAME,T,LIST)
-    implicit none
-    type (EL_LIST) LIST
-    type (EL_LIST) RECTTILT_MADX
-    type (TILTING)T
-    CHARACTER(*), INTENT(IN):: NAME
-    real(dp) L1,LM,ANG1,E11,E22
 
-    IF(EXACT_MODEL) LIKEMAD=.true.
-
-    !    LIKEMAD=.TRUE.                       ! etienne check it  out
-    L1=zero
-
-    LM=LIST%L
-    ANG1=LIST%B0
-
-
-    E11=LIST%T1
-    E22=LIST%T2
-
-    IF(MADLENGTH.OR.ANG1==ZERO) THEN
-       L1=LM
-    ELSE
-       L1=two*LM*SIN(ANG1/two)/ANG1
-    ENDIF
-
-    RECTTILT_MADX=LIST
-    RECTTILT_MADX%B0=two*SIN(ANG1/two)/L1
-    !    IF(ANG1==zero) THEN
-    !       RECTTILT_MADX%L=L1
-    !       RECTTILT_MADX%LD=L1
-    !       RECTTILT_MADX%LC=L1
-    !    ELSE
-    IF(EXACT_MODEL) THEN
-       if(verbose) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/,1x,a72))'
-          w_p%c(1)= NAME
-          w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
-          call write_i
-       endif
-       if(ang1==zero) then
-          RECTTILT_MADX%LD=L1
-       else
-          RECTTILT_MADX%LD=ANG1/RECTTILT_MADX%B0
-       endif
-       RECTTILT_MADX%L=L1
-       RECTTILT_MADX%LC=L1
-       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0+RECTTILT_MADX%K(1)
-       if(LIKEMAD) then
-          RECTTILT_MADX%T1=ANG1/two+E11    !one
-          RECTTILT_MADX%T2=ANG1/two+E22    !zero
-       else
-          RECTTILT_MADX%T1=ANG1/two+E11    !one
-          RECTTILT_MADX%T2=ANG1/two+E22    !zero
-          !             RECTTILT_MADX%T1=one   !wrong???
-          !             RECTTILT_MADX%T2=zero
-       endif
-       RECTTILT_MADX%nmul=2
-    ELSE
-       RECTTILT_MADX%LC=L1
-       IF(ANG1==ZERO) THEN
-          RECTTILT_MADX%L=L1
-          RECTTILT_MADX%LD=L1
-       ELSE
-          RECTTILT_MADX%L=ANG1/RECTTILT_MADX%B0
-          RECTTILT_MADX%LD=ANG1/RECTTILT_MADX%B0
-       ENDIF
-       RECTTILT_MADX%T1=ANG1/two+E11 ; RECTTILT_MADX%T2=ANG1/two+E22;
-       RECTTILT_MADX%K(1)=RECTTILT_MADX%B0+RECTTILT_MADX%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
-       RECTTILT_MADX%nmul=2   ! 0 before
-    ENDIF
-    !    ENDIF
-    IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
-       call write_i
-       RECTTILT_MADX%NAME=NAME(1:16)
-    ELSE
-       RECTTILT_MADX%NAME=NAME
-    ENDIF
-
-    RECTTILT_MADX%KIND=MADKIND2
-    RECTTILT_MADX%tilt=t%tilt(0)
-  END FUNCTION RECTTILT_MADX
-
-
-
-  FUNCTION  rectaETILT(NAME,L,ANGLE,E1,E2,T)
+  FUNCTION  rectaETILT(NAME,L,ANGLE,E1,E2,T,LIST)
     implicit none
     type (EL_LIST) rectaETILT
     CHARACTER(*), INTENT(IN):: NAME
@@ -1711,6 +1567,10 @@ CONTAINS
     real(dp) ANGE,SPE
     real(dp) LM1,ANG1,ANGI1,e11,e22
     integer tempkind
+    type (EL_LIST),optional, INTENT(IN)::list
+
+
+
 
     CURVED_ELEMENT=.TRUE.
 
@@ -1737,6 +1597,7 @@ CONTAINS
        WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
        call write_i
     ENDIF
+
     IF((PRESENT(E1).AND.PRESENT(E2)).OR.(.NOT.PRESENT(E1).AND.(.NOT.PRESENT(E2))) ) THEN !1
        if(present(e1).and.present(e2)) THEN
           IF(EXACT_MODEL) LIKEMAD=.true.
@@ -1833,93 +1694,29 @@ CONTAINS
     ENDIF !1
     madkind2=TEMPKIND
 
+    if(present(list)) then
+       rectaETILT%k=rectaETILT%k+list%k
+       rectaETILT%ks=rectaETILT%ks+list%ks
+       rectaETILT%tilt=list%tilt
+       rectaETILT%FINT=list%FINT
+       rectaETILT%hgap=list%hgap
+       rectaETILT%h1=list%h1
+       rectaETILT%h2=list%h2
+       rectaETILT%nmul=list%nmul
+       rectaETILT%nst=list%nst
+       rectaETILT%APERTURE_ON=list%APERTURE_ON
+       rectaETILT%APERTURE_KIND=list%APERTURE_KIND
+       rectaETILT%APERTURE_R=list%APERTURE_R
+       rectaETILT%APERTURE_X=list%APERTURE_X
+       rectaETILT%APERTURE_Y=list%APERTURE_Y
+       rectaETILT%KILL_ENT_FRINGE=list%KILL_ENT_FRINGE
+       rectaETILT%KILL_EXI_FRINGE=list%KILL_EXI_FRINGE
+       rectaETILT%BEND_FRINGE=list%BEND_FRINGE
+       rectaETILT%PERMFRINGE=list%PERMFRINGE
+    endif
+
+
   END FUNCTION rectaETILT
-
-  FUNCTION  TRUERECTILT_MADX(NAME,T,LIST)
-    implicit none
-    type (EL_LIST) TRUERECTILT_MADX
-    type (EL_LIST),optional, INTENT(IN)::list
-    CHARACTER(*), INTENT(IN):: NAME
-    type (TILTING),INTENT(IN):: T
-    real(dp) ANGE,SPE
-    real(dp) LM1,ANG1,ANGI1,e1,e2
-
-    CURVED_ELEMENT=.TRUE.
-
-    E1=LIST%T1
-    E2=LIST%T2
-
-
-    LM1=LIST%L
-    ANG1=LIST%B0
-
-    IF(E1/=zero) THEN
-       ANGI1=e1
-    ELSEIF(E1/=ZERO) THEN
-       ANGI1=ANG1-e2
-    ELSE
-       WRITE(6,*) " ERROR IN  TRUERECTILT_MADX INPUT "
-       STOP 222
-    ENDIF
-    TRUERECTILT_MADX=LIST
-    ANGE=ANG1-ANGI1
-    SPE=ANG1/two-ANGI1
-
-    IF(MADLENGTH) THEN
-       TRUERECTILT_MADX%L=LM1
-       TRUERECTILT_MADX%LC=TRUERECTILT_MADX%L/COS(SPE)
-       TRUERECTILT_MADX%B0=two*SIN(ANG1/two)/TRUERECTILT_MADX%LC
-       TRUERECTILT_MADX%LD=ANG1/TRUERECTILT_MADX%B0
-    ELSE
-       TRUERECTILT_MADX%LD=LM1
-       TRUERECTILT_MADX%B0=ANG1/TRUERECTILT_MADX%LD
-       TRUERECTILT_MADX%LC=two*SIN(ANG1/two)/TRUERECTILT_MADX%B0
-       TRUERECTILT_MADX%L=TRUERECTILT_MADX%LC*COS(SPE)
-    ENDIF
-
-
-    IF(EXACT_MODEL) THEN
-       if(verbose) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/,1x,a72))'
-          w_p%c(1)= NAME
-          w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
-          call write_i
-       endif
-       TRUERECTILT_MADX%K(1)=TRUERECTILT_MADX%B0+TRUERECTILT_MADX%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
-       TRUERECTILT_MADX%nmul=2
-       !         rectaETILT%T1=ANGI1/(ANG1/two)
-       TRUERECTILT_MADX%T1=ANGI1
-       TRUERECTILT_MADX%T2=ange
-
-       !         rectaETILT%T2=rectaETILT%LC*SIN(SPE)
-    ELSE
-       TRUERECTILT_MADX%K(1)=TRUERECTILT_MADX%B0+TRUERECTILT_MADX%K(1)
-       TRUERECTILT_MADX%L=TRUERECTILT_MADX%LD
-       TRUERECTILT_MADX%T1=ANGI1 ; TRUERECTILT_MADX%T2=ANGE;
-       TRUERECTILT_MADX%nmul=2   ! 0 before
-    ENDIF
-
-    IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
-       call write_i
-       TRUERECTILT_MADX%NAME=NAME(1:16)
-    ELSE
-       TRUERECTILT_MADX%NAME=NAME
-    ENDIF
-
-    TRUERECTILT_MADX%KIND=MADKIND2
-    TRUERECTILT_MADX%tilt=t%tilt(0)
-
-
-  END FUNCTION TRUERECTILT_MADX
-
-
 
 
 

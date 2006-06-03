@@ -87,7 +87,7 @@ contains
 
     my_default=default0
     my_state=>my_default
-    skip=.false.
+    skip=my_false
     call kanalnummer(mf)
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
@@ -116,13 +116,13 @@ contains
        ENDIF
        if(.not.skip) then
           if(com(1:2)=="!!") then
-             skip=.true.
+             skip=my_true
              cycle
           endif
        endif
        if(skip) then !1
           if(com(1:2)=="!!") then
-             skip=.false.
+             skip=my_false
           endif
           cycle
        endif         ! 1
@@ -198,11 +198,11 @@ contains
        case('EVENTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=my_true)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=MY_TRUE)
        case('ODDTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=my_false)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=MY_FALSE)
           ! thin layout stuff
        case('MAKE_THIN_LAYOUT','MAKETHINLAYOUT')
 
@@ -340,7 +340,7 @@ contains
           if(targ_tune(1)<=zero) targ_tune=tune(1:2)
           call lattice_fit_TUNE_gmap(my_ring,my_state,epsf,pol_,NPOL,targ_tune,NP)
        case('SCANTUNE')
-          STRAIGHT=.FALSE.
+          STRAIGHT=MY_FALSE
           read(mf,*) epsf
           read(mf,*) nstep
           read(mf,*) tune_ini,tune_fin
@@ -352,7 +352,7 @@ contains
           ELSE
              dtu(1)=(tune_fin(1)-tune_ini(1))/(nstep(1)-1)
              dtu(2)=(tune_fin(2)-tune_ini(2))/(nstep(1)-1)
-             STRAIGHT=.TRUE.
+             STRAIGHT=MY_TRUE
              NSTEP(2)=1
           ENDIF
 
@@ -397,8 +397,8 @@ contains
           WRITE(6,*) " Type enter to continue execution "
           READ(5,*)
        case('PRINTONCE')
-          print77=.true.
-          read77=.true.
+          print77=my_true
+          read77=my_true
        CASE('4DMAP')
           READ(MF,*) NO
           READ(MF,*) POS, DEL
@@ -412,8 +412,8 @@ contains
        case('PRINTSTATE')
           CALL PRINT(MY_STATE,6)
        case('PRINTTWICE')
-          print77=.false.
-          read77=.false.
+          print77=my_false
+          read77=my_false
        case('PRINTBNAN','PRINTANBN','PRINTBN','PRINTAN')
           read(mf,*) title
           read(mf,*) nmul,filename
@@ -516,7 +516,7 @@ contains
 
           CLOSE(MFR)
 
-       case('PRINTENTRANCEFRAMES')
+       case('PRINTFRAMES')
 
           READ(MF,*) FILENAME
           CALL print_frames(MY_RING,filename)
@@ -757,7 +757,7 @@ contains
 
     CALL TRACK(R,YS,loc,state)
     if(.not.check_stable) write(6,*) " unstable tracking envelope "
-    env%stochastic=.true.
+    env%stochastic=my_true
     env=ys
     if(.not.check_stable) write(6,*) " unstable in normalizing envelope "
 
@@ -920,20 +920,23 @@ contains
        P=>P%NEXT
     ENDDO
 
-    NR%closed=.true.
-    doneit=.true.
+    NR%closed=my_true
+    doneit=my_true
     call ring_l(NR,doneit)
 
 
+    write(6,*) " do you want patching ?"
+    read(5,*) i
+    if(i==0) return
 
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=my_true,ENERGY_PATCH=my_false)
+       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
 
        P=>P%NEXT
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=my_false)
+    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
 
     ! avoiding putting a patch on the very first fibre since survey does not allow it....
 
@@ -958,8 +961,8 @@ contains
 
           CALL APPEND( NR, P )
        elseif(P%MAG%p%b0/=zero) then
-          bend%mag%p%bend_fringe=.true.
-          bend%magp%p%bend_fringe=.true.
+          bend%mag%p%bend_fringe=my_true
+          bend%magp%p%bend_fringe=my_true
           bend%mag%L=P%MAG%p%lc
           bend%magp%L=P%MAG%p%lc   ! give it correct arc length
           bend%mag%p%Lc=P%MAG%p%lc
@@ -988,8 +991,8 @@ contains
        P=>P%NEXT
     ENDDO
 
-    NR%closed=.true.
-    doneit=.true.
+    NR%closed=my_true
+    doneit=my_true
     call ring_l(NR,doneit)
 
 
@@ -997,12 +1000,12 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=my_true,ENERGY_PATCH=my_false)
+       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
 
        P=>P%NEXT
 
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=my_false)
+    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
 
     ! avoiding putting a patch on the very first fibre since survey is not a self-check in that case
 
@@ -1024,10 +1027,29 @@ contains
     p=>r%start
     do i=1,r%n
 
+
+       !   INTEGER(2), POINTER:: PATCH    ! IF TRUE, SPACIAL PATCHES NEEDED
+       !   INTEGER, POINTER :: A_X1,A_X2   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
+       !   INTEGER, POINTER :: B_X1,B_X2   ! FOR ROTATION OF PI AT EXIT = -1    , DEFAULT = 1
+       !   REAL(DP),DIMENSION(:), POINTER:: A_D,B_D      !ENTRACE AND EXIT TRANSLATIONS  A_D(3)
+       !   REAL(DP),DIMENSION(:), POINTER:: A_ANG,B_ANG   !ENTRACE AND EXIT ROTATIONS    A_ANG(3)
+       !   INTEGER(2), POINTER:: ENERGY   ! IF TRUE, ENERGY PATCHES NEEDED
+       !   INTEGER(2), POINTER:: TIME     ! IF TRUE, TIME PATCHES NEEDED
+       !   REAL(DP), POINTER:: A_T,B_T     ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
        write(mf,*) " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
        write(mf,*) "  "
        write(mf,*) "|| position = ", i,' || PTC kind = ', P%mag%kind," || name = ",P%mag%name, " ||"
        write(mf,*) "  "
+       if(p%patch%patch==1.or.p%patch%patch==3) then
+          write(mf,*) " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+          write(mf,*) " Entrance geometrical Patch "
+          write(mf,*) " Translations A_D(3) "
+          write(mf,*) P%patch%a_d
+          write(mf,*) " Rotations A_ANG(3) || PI rotations ->   ",p%patch%a_x1,p%patch%a_x2
+          write(mf,*) P%patch%A_ANG
+          write(mf,*) " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+          write(mf,*) "  "
+       endif
        write(mf,*) " Fibre positioning or Ideal position in conventional parlance"
        write(mf,*) "  "
        write(mf,*) " Entrance origin A(3) "
@@ -1069,6 +1091,16 @@ contains
        write(mf,*) P%mag%p%f%exi(1,:)
        write(mf,*) P%mag%p%f%exi(2,:)
        write(mf,*) P%mag%p%f%exi(3,:)
+       if(p%patch%patch==2.or.p%patch%patch==3) then
+          write(mf,*) " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+          write(mf,*) " Exit geometrical Patch "
+          write(mf,*) " Translations B_D(3) "
+          write(mf,*) P%patch%b_d
+          write(mf,*) " Rotations B_ANG(3) || PI rotations ->   ",p%patch%b_x1,p%patch%b_x2
+          write(mf,*) P%patch%B_ANG
+          write(mf,*) " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+          write(mf,*) "  "
+       endif
        write(mf,*) " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
 
        P=>P%NEXT

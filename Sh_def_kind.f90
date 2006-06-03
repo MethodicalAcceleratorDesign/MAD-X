@@ -11406,7 +11406,7 @@ contains
     DO I=1,EL%P%NST
        CALL MONTI(EL,X,I,MID)
     ENDDO
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
   END SUBROUTINE MONTR
 
@@ -11424,7 +11424,7 @@ contains
     DO I=1,EL%P%NST
        CALL MONTI(EL,X,I,MID)
     ENDDO
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
 
   END SUBROUTINE MONTP
@@ -11460,19 +11460,14 @@ contains
        if(i==(el%p%nst+1)/2) THEN
           EL%X=X(1);EL%Y=X(3);
        ENDIF
-       IF(PRESENT(MID)) THEN
-          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-       ENDIF
     endif
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     if(mod(el%p%nst,2)==0) then
        if(i==el%p%nst/2) THEN
           EL%X=X(1);EL%Y=X(3);
        ENDIF
-       IF(PRESENT(MID)) THEN
-          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-       ENDIF
-    endif
+    ENDIF
+    IF(PRESENT(MID))  CALL XMID(MID,X,i)
 
   END SUBROUTINE MONTIR
 
@@ -11497,19 +11492,14 @@ contains
        if(i==(el%p%nst+1)/2) THEN
           EL%X=X(1);EL%Y=X(3);
        ENDIF
-       IF(PRESENT(MID)) THEN
-          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-       ENDIF
     endif
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     if(mod(el%p%nst,2)==0) then
        if(i==el%p%nst/2) THEN
           EL%X=X(1);EL%Y=X(3);
        ENDIF
-       IF(PRESENT(MID)) THEN
-          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-       ENDIF
     endif
+    IF(PRESENT(MID)) CALL XMID(MID,X,i)
 
     CALL KILL(DH)
 
