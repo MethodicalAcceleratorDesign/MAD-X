@@ -1533,7 +1533,7 @@ void link_c6t_in_front(struct c6t_element* new, struct c6t_element* el)
 
 void link_behind(struct c6t_element* new, struct c6t_element* el)
 {
-  if (el->next == NULL) 
+  if (el->next == NULL)
   {
     last_in_sequ = new;
     last_in_sequ_org = new;

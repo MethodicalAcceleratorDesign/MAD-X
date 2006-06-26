@@ -10,7 +10,7 @@
 #include <MadxPlotter.h>
 #define type_OfExtern "C"
 #else
-#define type_OfExtern 
+#define type_OfExtern
 #endif
 
 
@@ -18,7 +18,7 @@
 # define newrplot newrplot_
 # define plottrack plottrack_
 # define plottwiss plottwiss_
-# define rplotfinish rplotfinish_  
+# define rplotfinish rplotfinish_
 # define type_ofCall
 #else
 # define newrplot NEWRPLOT
@@ -26,44 +26,44 @@
 # define plottwiss PLOTTWISS
 # define rplotfinish RPLOTFINISH
 # define type_ofCall  _stdcall
-#endif    
+#endif
 
 
-extern type_OfExtern 
-void type_ofCall plottrack(int* particleno, int* obspoint, 
-                           double* x, double* xp, 
-                           double* y, double* yp, 
-                           double* dpOverP,  double* p, 
+extern type_OfExtern
+void type_ofCall plottrack(int* particleno, int* obspoint,
+                           double* x, double* xp,
+                           double* y, double* yp,
+                           double* dpOverP,  double* p,
                            double* length)
 {
 
 #ifdef ROOT_PLOT
 
-  if (MadxPlotter::GetDebug() >9) 
+  if (MadxPlotter::GetDebug() >9)
   {
     printf("rlot.c: plottrack: %d      %d   %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f  %10.7f \n",
            *particleno, *obspoint, *x,     *xp,    *y,     *yp,    *dpOverP, *p, *length);
-  }        
+  }
 
   MadxPlotter::Instance()->Fill(*particleno, *obspoint, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
 #endif
 }
 
 extern type_OfExtern
-void type_ofCall  plottwiss(int* obspoint, 
-                            double* betax, double* alfax, 
-                            double* betay, double* alfay, 
-                            double* betaz, double* alfaz, 
+void type_ofCall  plottwiss(int* obspoint,
+                            double* betax, double* alfax,
+                            double* betay, double* alfay,
+                            double* betaz, double* alfaz,
                             double* length)
 {
 
 #ifdef ROOT_PLOT
 
-  if (MadxPlotter::GetDebug() >9) 
+  if (MadxPlotter::GetDebug() >9)
   {
     printf("rlot.c: plottwiss:   %d   %12.8f %12.8f %12.8f %12.8f %12.8f %12.8f %12.8f\n",
            *obspoint,  *betax, *alfax, *betay, *alfay, *betaz, *alfaz, *length);
-  }        
+  }
 
   MadxPlotter::Instance()->Fill(*obspoint, *betax, *alfax, *betay, *alfay, *betaz, *alfaz, *length);
 #endif
