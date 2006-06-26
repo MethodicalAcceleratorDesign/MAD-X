@@ -325,7 +325,7 @@ int myregex(char* pattern, char* string)
       if (l == 3)  return 0;
       if (mypat[l-4] != '\\') mypat[l-3] = '\0';
     }
-    else 
+    else
     {
       mypat[l-1] = '\0';
       dollar = 1;
