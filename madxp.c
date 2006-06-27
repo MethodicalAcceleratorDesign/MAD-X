@@ -3244,8 +3244,11 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
             case 17:
               stack[c_stack] = table_value();
               break;
+            case 18: /* function "exist" */
+              continue; /* value in stack not changed */
+              break;
             default:
-              fatal_error("polish_value",
+              fatal_error("polish_value:",
                           "illegal function in Polish decoding");
           }
           break;
@@ -3727,6 +3730,13 @@ int scan_expr(int c_item, char** item)   /* split input */
         if (l_cat == func->max)  grow_int_array(func);
         cat->i[l_cat] = 5;
         func->i[l_cat++] = lp;
+        if (strcmp("exist", functs[lp]) == 0  /* special function */
+            && i+3 < c_item && *item[i+1] == '(' && *item[i+3] == ')')
+        {
+          if (find_variable(item[i+2], variable_list) == NULL)
+            strcpy(item[i+2], "0");
+          else strcpy(item[i+2], "1");
+        }
       }
       else
       {

@@ -42,7 +42,7 @@
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
                         "atan", "sinh", "cosh", "tanh", "ranf",
-                        "gauss", "tgauss", "table",
+                        "gauss", "tgauss", "table", "exist",
                         ""}; /* keep "" ! */
 
 const char op_string[] = "-+*/^";
