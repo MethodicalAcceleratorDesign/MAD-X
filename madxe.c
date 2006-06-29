@@ -655,7 +655,24 @@ void error_eoption(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   int i, debug;
-  int val, pos, seed;
+  int val, val2, pos, seed;
+  int is, ia;
+  static  int  ia_seen = 0;
+  static  int  is_seen = 0;
+
+  is = 0; ia = 0;
+  
+  i = 0;
+  while(cmd->tok_list->p[i] != NULL) {
+     if(strcmp("add",cmd->tok_list->p[i]) == 0) {
+          ia = 1;
+     }
+     if(strcmp("seed",cmd->tok_list->p[i]) == 0) {
+          is = 1;
+     }
+     i++;
+  }
+  if (debug=get_option("debug")) printf("FOUND: %d %d \n",ia,is);
 
   if ((debug=get_option("debug")))  {
      fprintf(prt_file, "in eoption routine\n");
@@ -663,6 +680,7 @@ void error_eoption(struct in_cmd* cmd)
         fprintf(prt_file, "command(s): %s\n",cmd->tok_list->p[i]);
      }
   }
+
   if ((pos = name_list_pos("seed", nl)) > -1)
     {
      if (nl->inform[pos])
@@ -671,14 +689,24 @@ void error_eoption(struct in_cmd* cmd)
         init55(seed);
        }
     }
- val = command_par_value("add", cmd->clone);
- if(val == 0) {
-      if (debug)  fprintf(prt_file, "add option not set\n");
-      add_error_opt = 0;
- }else {
-      if (debug)  fprintf(prt_file, "add option set\n");
-      add_error_opt = 1;
- }
+
+  /* change only if present in command or not yet set */
+  if ((ia == 1) || (ia_seen != 1))
+  {
+       val = command_par_value("add", cmd->clone);
+       if(val == 0) {
+         if (debug)  fprintf(prt_file, "add option not set\n");
+         add_error_opt = 0;
+       }else {
+         if (debug)  fprintf(prt_file, "add option set\n");
+         add_error_opt = 1;
+       }
+  }
+
+
+  if(ia == 1) ia_seen = 1;
+
+  if (debug=get_option("debug")) printf("err_add eoption: %d seen: %d\n",add_error_opt,ia_seen);
 
 }
 
