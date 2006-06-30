@@ -3044,6 +3044,27 @@ void print_value(struct in_cmd* cmd)
   }
 }
 
+int quote_level(char* string, char* send)
+{
+/* returns the level count of quotation marks " and ' inside string between */
+/* start of string and send */
+  int level = 0;
+  char* p;
+  char c = ' ';
+  for (p = string; p < send; p++)
+  {
+    if (level == 0)
+    {
+      if (*p == '\"' || *p == '\'')
+      {
+        c = *p; level++;
+      }
+    }
+    else if(*p == c) level--;
+  }
+  return level;
+}
+
 int remove_colon(char** toks, int number, int start)
   /* removes colon behind declarative part for MAD-8 compatibility */
 {

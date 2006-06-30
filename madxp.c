@@ -293,25 +293,11 @@ void check_table(char* string)
   /* replaces argument of "table" if any by a string variable */
 {
 
-  char *pa, *pb, *pt, *pl, *pr, *sv, *quote;
-  char* qpos[1000];
-  int npos = 0;
-  pa = string;
-  while (*pa) /* find all strings in quotes, keep positions */
-  {
-    if (*pa == '\'' || *pa == '\"')
-    {
-      quote = pa;
-      qpos[npos++] = pa++;
-      if (!(pa = strchr(pa, *quote))) return; /* quote string not closed */
-      qpos[npos++] = pa;
-    }
-    pa++;
-  }
+  char *pa, *pb, *pt, *pl, *pr, *sv;
   pa = string;
   while ((pb = strstr(pa, "table")) != NULL)
   {
-    if (!inbounds(pb, npos, qpos))
+    if (quote_level(pa, pb) == 0)
     {
       mystrcpy(c_join, pa);
       pt = strstr(c_join->c, "table");
@@ -325,6 +311,32 @@ void check_table(char* string)
       strcat(string, " ( ");
       strcat(string, sv);
       strcat(string, " ) ");
+      strcat(string, ++pr);
+    }
+    pa = ++pb;
+  }
+}
+
+void check_tabstring(char* string)
+  /* replaces tabstring(tab_name, col_name, row_number) by the
+     string found in that column/row of table tab_name, or by "_void_"
+     if not found */
+{
+  char *pa, *pb, *pt, *pl, *pr, *sv;
+  pa = string;
+  while ((pb = strstr(pa, "tabstring")) != NULL)
+  {
+    if (quote_level(pa, pb) == 0)
+    {
+      mystrcpy(c_join, pa);
+      pt = strstr(c_join->c, "tabstring");
+      if ((pl = strchr(pt, '(')) == NULL) return;
+      if ((pr = strchr(pl, ')')) == NULL) return;
+      if ((sv = get_table_string(pl,pr)) == NULL) sv = permbuff("_void_");
+      *pt = '\0';
+      *pa ='\0';
+      strcat(string, c_join->c);
+      strcat(string, sv);
       strcat(string, ++pr);
     }
     pa = ++pb;
@@ -2363,6 +2375,32 @@ void get_sxf_names()
   }
 }
 
+char* get_table_string(char* left, char* right)
+{
+/* for command tabstring(table,column,row) where table = table name, */
+/* column = name of a column containing strings, row = integer row number */
+/* starting at 0, returns the string found in that column and row, else NULL */
+  int col, ntok, pos, row;
+  char** toks;
+  struct table* table;
+  *right = '\0';
+  strcpy(c_dum->c, ++left);
+  supp_char(',', c_dum->c);
+  mysplit(c_dum->c, tmp_p_array);
+  toks = tmp_p_array->p; ntok = tmp_p_array->curr;
+  if (ntok == 3 && (pos = name_list_pos(toks[0], table_register->names)) > -1)
+  {
+    table = table_register->tables[pos];
+    if ((col = name_list_pos(toks[1], table->columns)) > -1)
+    {
+      row = atoi(toks[2]);
+      if(row > 0 && row <= table->curr && table->s_cols[col])
+        return table->s_cols[col][row-1];
+    }
+  }
+  return NULL;
+}
+
 int get_val_num(char* in_string, int start, int end)
 {
   int j, dot = 0, exp = 0, sign = 0;
@@ -3270,17 +3308,17 @@ void pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
   /* fill_flag != 0 makes a 0 to be inserted into an empty "()" */
 {
   char c, cp = ' ', cpnb = ' ', quote = ' ';
-  int j, k, kn, sl = strlen(inbuf), cout = 0, quote_level = 0, rb_level = 0;
+  int j, k, kn, sl = strlen(inbuf), cout = 0, quote_lv = 0, rb_level = 0;
   int left_b = 0, new_string = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
   while (2*strlen(inbuf) > outbuf->max) grow_char_array(outbuf);
   for (k = 0; k < sl; k++)
   {
     c = inbuf[k];
-    if (quote_level > 0)
+    if (quote_lv > 0)
     {
       if (c == quote)
       {
-        quote_level--; outbuf->c[cout++] = c; outbuf->c[cout++] = ' ';
+        quote_lv--; outbuf->c[cout++] = c; outbuf->c[cout++] = ' ';
       }
       else outbuf->c[cout++] = c == ' ' ? '@' : c;
     }
@@ -3292,7 +3330,7 @@ void pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
         case '\"':
         case '\'':
           quote = c;
-          quote_level++; outbuf->c[cout++] = ' '; outbuf->c[cout++] = c;
+          quote_lv++; outbuf->c[cout++] = ' '; outbuf->c[cout++] = c;
           break;
         case '-':
           if (inbuf[k+1] == '>')
@@ -3547,7 +3585,7 @@ void pro_input(char* statement)
         *sem = '\0';
         this_cmd = new_in_cmd(400);
         pre_split(&statement[start], work, 1);
-        check_table(work->c);
+        check_table(work->c); check_tabstring(work->c);
         this_cmd->tok_list->curr = mysplit(work->c, this_cmd->tok_list);
         if ((type = decode_command()) < 0) /* error */
         {

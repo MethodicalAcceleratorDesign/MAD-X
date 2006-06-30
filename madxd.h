@@ -265,6 +265,7 @@ void buffer_in_cmd(struct in_cmd*);
 int char_cnt(char, char*);
 int char_p_pos(char*, struct char_p_array*);
 void check_table(char*);
+void check_tabstring(char*);
 struct char_p_array* clone_char_p_array(struct char_p_array*);
 struct command* clone_command(struct command*);
 struct command_parameter* clone_command_parameter(struct command_parameter*);
@@ -444,6 +445,7 @@ int get_select_ranges(struct sequence*,struct command_list*,
 void get_select_t_ranges(struct command_list*,
                          struct command_list*, struct table*);
 int get_sub_range(char*, struct sequence*, struct node**);
+char* get_table_string(char*, char*);
 int get_val_num(char*, int, int);
 int square_to_colon(char*);
 int get_stmt(FILE*, int);
@@ -600,6 +602,7 @@ void pro_twiss();
 void pro_ptc_twiss();
 void pro_ptc_track(struct in_cmd*);
 void put_info(char*, char*);
+int quote_level(char*, char*);
 struct table* read_table(struct in_cmd*);
 struct table* read_my_table(struct in_cmd*);
 struct table* read_his_table(struct in_cmd*);
@@ -1067,8 +1070,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.09";
-char code_mod_date[] = "Code Modification Date: 26.06.2006";
+char myversion[] = "MAD-X 3.03.11";
+char code_mod_date[] = "Code Modification Date: 29.06.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
