@@ -1109,6 +1109,17 @@ contains
     close(mf)
   end SUBROUTINE print_frames
 
+  subroutine printframes(filenameIA)
+    use madx_ptc_module
+    implicit none
+    include 'twissa.fi'
+    integer   filenameIA(*)
+    character(48) filename
+
+      filename = charconv(filenameIA)
+      call print_frames(MY_RING,filename)
+
+  end subroutine printframes
 
 
 end module pointer_lattice

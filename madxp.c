@@ -1485,6 +1485,21 @@ void exec_command()
         if (kSkowronDebug) printf("madxp.c: Command is ptc_select, calling pro_ptc_select\n");
         pro_ptc_select(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_knob, calling pro_ptc_knob\n");
+        pro_ptc_knob(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_printframes, calling pro_ptc_printframes\n");
+        pro_ptc_printframes(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_eplacement") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_eplacement, calling pro_ptc_eplacement\n");
+        pro_ptc_eplacement(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_script") == 0)
       {
         if (kSkowronDebug) printf("madxp.c: Command is ptc_script, calling pro_ptc_script\n");
@@ -4790,10 +4805,10 @@ void warningnew(char* t1, char* fmt, ...)
 
   va_start( list, fmt );
 
-  fprintf(stderr,"++++++ warning: %s : ",t1); /*prints first part to the STDERR and +++....*/
-  vfprintf(stderr, fmt, list); /*prints the second part and variables*/
-  fprintf(stderr,"\n"); /*prints end of line*/
-  fflush(stderr); /*flushes STDERR*/
+  fprintf(stdout,"++++++ warning: %s : ",t1); /*prints first part to the STDERR and +++....*/
+  vfprintf(stdout, fmt, list); /*prints the second part and variables*/
+  fprintf(stdout,"\n"); /*prints end of line*/
+  fflush(stdout); /*flushes STDERR*/
   va_end(list);
 }
 

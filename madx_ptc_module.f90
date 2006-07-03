@@ -15,6 +15,7 @@ MODULE madx_ptc_module
   USE madx_keywords
   USE madx_ptc_setcavs_module
   USE madx_ptc_tablepush_module
+  USE madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
 
   implicit none
@@ -1045,8 +1046,8 @@ CONTAINS
 
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
              write(whymsg,*) 'APERTURE error: ',why
-             call fort_warn('ptc_twiss: ',whymsg)
-             call seterrorflag(10,"ptc_twiss: ",whymsg);
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1063,8 +1064,8 @@ CONTAINS
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
              write(whymsg,*) 'APERTURE error: ',why
-             call fort_warn('ptc_twiss: ',whymsg)
-             call seterrorflag(10,"ptc_twiss: ",whymsg);
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1078,16 +1079,16 @@ CONTAINS
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
              write(whymsg,*) 'APERTURE error: ',why
-             call fort_warn('ptc_twiss: ',whymsg)
-             call seterrorflag(10,"ptc_twiss: ",whymsg);
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
              return
           endif
 
           call track(my_ring,xt,i,i+2,getintstate())
           if ( .not. c_%stable_da) then
-             call fort_warn('ptc_twiss: ','DA got unstable')
-             call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+             call fort_warn('ptc_dumpmaps: ','DA got unstable')
+             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
              return
           endif
 
@@ -1096,8 +1097,8 @@ CONTAINS
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
              write(whymsg,*) 'APERTURE error: ',why
-             call fort_warn('ptc_twiss: ',whymsg)
-             call seterrorflag(10,"ptc_twiss: ",whymsg);
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
              return
           endif
@@ -1214,7 +1215,7 @@ CONTAINS
     integer n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
     integer row,double_from_table
     integer  :: charge    ! charge of an accelerated particle
-
+    
 
     if (getdebug() > 1) print*,"ptc_twiss"
     !------------------------------------------------------------------------------
@@ -1233,9 +1234,9 @@ CONTAINS
        return
     endif
 
-    call cleartables()
+    call cleartables() !defined in madx_ptc_tablepush
 
-    nda=0
+    nda = getnknobs() !defined in madx_ptc_knobs
     suml=zero
 
     icase = get_value('ptc_twiss ','icase ')
@@ -1267,12 +1268,12 @@ CONTAINS
        CALL write_closed_orbit(icase,x)
     endif
 
+    mynd2 = 0
+    npara = 0
     no = get_value('ptc_twiss ','no ')
 
     call init(default,no,nda,BERZ,mynd2,npara)
-
-    !    print*, "no=",no," nda=",nda," mynd2=",mynd2," npara=",npara
-
+    
     call alloc(y)
     y=npara
     Y=X
@@ -1288,7 +1289,7 @@ CONTAINS
        if(k.ne.-1) then
           call liepeek(iia,icoast)
           my_nv=int(doublenum)
-          nv_min=min(iia(2),my_nv)
+          nv_min=min(c_%npara,my_nv)
        else
           initial_matrix_table=.false.
        endif
@@ -1296,12 +1297,12 @@ CONTAINS
 
     if(initial_matrix_table) then
        x(:)=zero
-       allocate(j(iia(2)))
+       allocate(j(c_%npara))
        j(:)=0
        do i = 1,my_nv
           k   = double_from_table("map_table ", "coef ", i, doublenum)
           d_val=doublenum
-          if(i.le.iia(2)) then
+          if(i.le.c_%npara) then
              x(i)  = d_val-(y(i)%T.sub.j)
           endif
        enddo
@@ -1359,12 +1360,14 @@ CONTAINS
           return
        endif
     endif
-
+     
+    call setknobs(my_ring)
 
     !############################################################################
     !############################################################################
     !############################################################################
-
+    
+    
     call alloc(tw)
     tw=y
     y=npara
@@ -1411,10 +1414,15 @@ CONTAINS
 
        call putusertable(i,current%mag%name,y)
 
+       if (nda > 0) then
+         call resultswithknobs(i,current%mag%name,y)
+       endif  
+
        suml=suml+current%MAG%P%ld
        tw=y
+       
        call puttwisstable()
-
+       
        iii=advance_node()
        current=>current%next
     enddo
@@ -1478,12 +1486,14 @@ CONTAINS
       call double_to_table(table_name, 'energy ', doublenum)
 
       opt_fun(:)=zero
+
       call liepeek(iia,icoast)
-      allocate(j(iia(2)))
+      allocate(j(c_%npara))
       j(:)=0
-      do ii=1,iia(2) !iia(2)==nv
+      do ii=1,c_%npara ! fish
          opt_fun(ii)=y(ii)%T.sub.j
       enddo
+
       myx=opt_fun(6)
       opt_fun(6)=opt_fun(5)
       opt_fun(5)=myx
@@ -1551,19 +1561,15 @@ CONTAINS
       enddo
 
       if (getdebug() > 2)  then
-         write(6,'(a16,4f12.3)') 'b11,b12,b21,b22: ',&
-              &opt_fun(1),opt_fun(2),opt_fun(4),opt_fun(5)
+         write(6,'(a,(f8.4,1x))') current%MAG%name,suml
+         write(6,'(a,3(f8.4,1x))')  "betas ", opt_fun(1),opt_fun(2),opt_fun(3)
+         write(6,'(a,3(f8.4,1x))')  "disps ", opt_fun(31),opt_fun(33),opt_fun(35)
+         write(6,'(a,3(f8.4,1x))')  "tunes ", tw%mu(1),tw%mu(2),tw%mu(3)
       endif
 
       ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
-      if (getdebug() > 1) then
-         write(20,'(a,12(f15.6,1x))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),tw%beta(1,2),&
-              tw%beta(2,1),tw%beta(2,2),tw%beta(3,1),tw%disp(1),tw%disp(3)
-         !write(20,'(a,13(1x,1p,e21.14))') current%MAG%name,suml,tw%mu(1),tw%mu(2),tw%mu(3),tw%beta(1,1),&
-         !     tw%beta(2,1),tw%beta(2,2),&
-      endif
 
     end subroutine puttwisstable
     !____________________________________________________________________________________________
@@ -1619,10 +1625,16 @@ CONTAINS
       x(6)=get_value('ptc_twiss ','pt ')
 
       call liepeek(iia,icoast)
-      allocate(j(iia(2)))
+      if (getdebug() > 1) then
+         write (6,'(8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
+         write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
+         print*, "c_%npara is ", c_%npara
+      endif
+      
+      allocate(j(c_%npara))
       j(:)=0
-      do i = 1,iia(2)
-         do ii = 1,iia(2)
+      do i = 1,c_%npara
+         do ii = 1,c_%npara
             j(ii)=1
             r=re(i,ii)-(y(i)%T.sub.j)
             y(i)%T=y(i)%T+(r.mono.j)
@@ -1747,11 +1759,17 @@ CONTAINS
       endif
 
       call liepeek(iia,icoast)
-
-      allocate(j(iia(2)))
+      if (getdebug() > 1) then
+         write (6,'(2x,8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
+         write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
+         print*, "c_%npara is ", c_%npara
+      endif
+       
+      
+      allocate(j(c_%npara))
       j(:)=0
-      do i = 1,iia(2)
-         do ii = 1,iia(2)
+      do i = 1,c_%npara
+         do ii = 1,c_%npara
             j(ii)=1
             r=re(i,ii)-(y(i)%T.sub.j)
             y(i)%T=y(i)%T+(r.mono.j)
@@ -1759,7 +1777,7 @@ CONTAINS
          enddo
       enddo
       deallocate(j)
-      do i=1,iia(2)
+      do i=1,c_%npara
          x(i) = 0
       enddo
 
@@ -1778,8 +1796,8 @@ CONTAINS
          write (6,'(6f8.4)')  betx,  alfx,  bety,  alfy,  betz,  alfz
          write (6,'(4a8)')   "dx","dpx","dy","dpy"
          write (6,'(4f8.4)')  dx,dpx,dy,dpy
-         write (6,'(2a8)')   "mux","muy","muz"
-         write (6,'(2f8.4)')  mux , muy , muz
+         write (6,'(3a8)')   "mux","muy","muz"
+         write (6,'(3f8.4)')  mux , muy , muz
 
          print*," Track:"
          write(6,'(6f8.4)') x
@@ -2184,14 +2202,14 @@ CONTAINS
        map_term=42
        call  make_map_table(map_term)
        call liepeek(iia,icoast)
-       allocate(j(iia(2)))
+       allocate(j(c_%npara))
        ja(:)    = 0
        j(:)     = 0
-       do iii=1,iia(2)
+       do iii=1,c_%npara
           coef = y(iii)%T.sub.j
           map_coor(1)=coef
           map_coor(2)=iii
-          map_coor(3)=iia(2)
+          map_coor(3)=c_%npara
           map_coor(4)=0
           map_coor(5)=ja(1)
           map_coor(6)=ja(2)
@@ -2202,14 +2220,14 @@ CONTAINS
           call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
           call augment_count("map_table ")
        enddo
-       do i = 1,iia(2)
-          do ii = 1,iia(2)
+       do i = 1,c_%npara
+          do ii = 1,c_%npara
              j(ii) = 1
              ja(ii) = j(ii)
              coef = y(i)%T.sub.j
              map_coor(1)=coef
              map_coor(2)=i
-             map_coor(3)=iia(2)
+             map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
              map_coor(4)=no
              map_coor(5)=ja(1)
              map_coor(6)=ja(2)

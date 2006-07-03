@@ -388,6 +388,27 @@ char command_def[] =
 /*"place    = [s, none], "*/
 "quantity = [s, none] ; "
 " "
+"ptc_knob: ptc_knob none 0 0 "
+"elementname = [s, none] , "/* */
+"kn    = [i, {-1}], "
+"ks    = [i, {-1}], "
+"exactmatch = [l, true, true] ; "
+" "
+"ptc_eplacement: ptc_eplacement none 0 0 "
+"range = [s, none] , "/* */
+"x        = [r, 0], y       = [r, 0], z       = [r, 0], " /*position of the front face*/
+"phi      = [r, 0], " /**/
+"theta   = [r, 0], "
+"onlyposition    = [l, false, true] , "/* if true changes only position and, leaves orinetation untouched */
+"onlyorientation = [l, false, true] , "/* if true changes only orientation and, leaves position untouched */
+"autoplacedownstream = [l, true, true] , "/* if true all the elements downstream are placed at default positions, if false the rest of the layout stays antouched  */
+"refframe = [s, gcs] ; " /* coordinate system, gcs - global coordinate syste, current - current position, previouselement */
+" "
+"ptc_printframes: ptc_printframes none 0 0 "
+"file = [s, none] , "/* */
+"with = [s, none] , "/* */
+"format = [s, text] ; "
+" "
 "ptc_twiss: ptc_twiss none 0 0 "
 "betx     = [r, 0], alfx     = [r, 0], mux      = [r, 0], "
 "bety     = [r, 0], alfy     = [r, 0], muy      = [r, 0], "

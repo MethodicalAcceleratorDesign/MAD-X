@@ -45,6 +45,8 @@ contains
     real (dp)            :: gposx, gposy, gposz
     integer              :: e
     integer              :: apertflag
+    character(200)       :: whymsg
+    integer              :: why(9)
     !    integer              :: rplotno
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
@@ -180,14 +182,16 @@ contains
              endif
 
              if (gcs) then
-                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+!                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
                 gposx = x(1)*p%mag%p%f%exi(1,1) + x(3)*p%mag%p%f%exi(1,2) + x(6)*p%mag%p%f%exi(1,3)
                 gposy = x(1)*p%mag%p%f%exi(2,1) + x(3)*p%mag%p%f%exi(2,2) + x(6)*p%mag%p%f%exi(2,3)
                 gposz = x(1)*p%mag%p%f%exi(3,1) + x(3)*p%mag%p%f%exi(3,2) + x(6)*p%mag%p%f%exi(3,3)
-                write(6,'(a12,3f8.4)') " ", gposx,gposy,gposz
-                gposx = gposx + p%chart%f%b(1)
-                gposy = gposy + p%chart%f%b(2)
-                gposz = gposz + p%chart%f%b(3)
+!                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                gposx = gposx + p%mag%p%f%b(1)
+                gposy = gposy + p%mag%p%f%b(2)
+                gposz = gposz + p%mag%p%f%b(3)
+
+                write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
                 call plottrack(n, e, gposx, xp , gposy, yp , x(5), p0 , gposz)
              else
@@ -201,6 +205,14 @@ contains
              call produce_aperture_flag(apertflag)
              if (apertflag/=0) then
                 print *, 'Particle out of aperture!'
+
+                call ANALYSE_APERTURE_FLAG(apertflag,why)
+                Write(6,*) "ptc_trackline: APERTURE error for element: ",e," name: ",p%MAG%name
+                Write(6,*) "Message: ",c_%message
+                write(whymsg,*) 'APERTURE error: ',why
+                call fort_warn('ptc_twiss: ',whymsg)
+                call seterrorflag(10,"ptc_twiss: ",whymsg);
+                
                 exit; !goes to the ne
              endif
              p=>p%next

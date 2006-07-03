@@ -144,6 +144,42 @@ subroutine w_ptc_end()
   call ptc_end()
 end subroutine w_ptc_end
 
+subroutine w_ptc_addknob(fibre)
+  use madx_ptc_knobs_module
+  implicit none
+  integer fibre(*)
+
+  call addknob(fibre)
+
+end subroutine w_ptc_addknob
+
+subroutine w_ptc_printframes(filename)
+  use pointer_lattice
+  implicit none
+  integer filename(*)
+
+  call printframes(filename)
+
+end subroutine w_ptc_printframes
+
+subroutine w_ptc_printlayout_rootm(filename)
+  use madx_ptc_eplacement_module
+  implicit none
+  integer filename(*)
+
+  call printlayout_rootm(filename)
+
+end subroutine w_ptc_printlayout_rootm
+
+subroutine w_ptc_eplacement(elementidx,rf)
+  use madx_ptc_eplacement_module
+  implicit none
+  integer elementidx
+  integer rf
+
+  call place_element(elementidx,rf)
+
+end subroutine w_ptc_eplacement
 
 subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
   use madx_ptc_tablepush_module

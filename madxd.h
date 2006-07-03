@@ -80,6 +80,10 @@
 #define w_ptc_track             w_ptc_track_
 #define w_ptc_start             w_ptc_start_
 #define w_ptc_select            w_ptc_select_
+#define w_ptc_printframes       w_ptc_printframes_
+#define w_ptc_printlayout_rootm w_ptc_printlayout_rootm_
+#define w_ptc_eplacement        w_ptc_eplacement_
+#define w_ptc_addknob           w_ptc_addknob_
 #define w_ptc_script            w_ptc_script_
 #define w_ptc_addpush           w_ptc_addpush_
 #define w_ptc_end               w_ptc_end_
@@ -718,6 +722,10 @@ void w_ptc_setfringe(int* boolflag);
 void w_ptc_settotalpath(int* boolflag);
 void w_ptc_settime(int* boolflag);
 void w_ptc_setnocavity(int* boolflag);
+void w_ptc_addknob(int* fibrename);
+void w_ptc_eplacement(int* eidx,int* refframe);
+void w_ptc_printframes(int* filename);
+void w_ptc_printlayout_rootm(int* filename);
 void w_ptc_script(int* scriptname);
 void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
 void w_ptc_enforce6d(int* flag);
@@ -736,7 +744,7 @@ int v_length(char*);
 char* v_format(char*);
 double vmod(int*, double*);
 void error(char* t1, register char* fmt, ...);
-/* void warning(char* t1, register char* fmt, ...); */
+void warningnew(char* t1, char* fmt, ...); 
 void warning(char*, char*);
 void warningOld(char*, char*);
 void augmentfwarn() ;

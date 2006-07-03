@@ -2083,7 +2083,7 @@ void exec_plot(struct in_cmd* cmd)
     pos = name_list_pos("vaxis", nl_plot);
 
     vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
-
+    
     /* get interpolation */
 
     pos = name_list_pos("interpolation", nl_plot);
@@ -7823,6 +7823,214 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
 }
 /********************************************************************************/
 
+void pro_ptc_printframes(struct in_cmd* cmd)
+{
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+
+  char*                          filename    = 0x0;
+  struct int_array*              filenameIA      = 0x0;
+  char*                          format    = 0x0;
+
+  pos   = name_list_pos("file", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_printframes: file parameter does not exist.\n");
+    return;
+  }
+
+  filename  = c_parameters->parameters[pos]->string;
+  if ( filename == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_printframes: no file name: ", "ignored");
+    return;
+  }
+
+
+  pos   = name_list_pos("format", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_printframes: format parameter does not exist.\n");
+    return;
+  }
+
+  format  = c_parameters->parameters[pos]->string;
+  printf("madxn.c: pro_ptc_printframes: format is %s.\n", format);
+
+  filenameIA = new_int_array(1+strlen(filename));
+
+  conv_char(filename,filenameIA);
+
+  
+  if (strcmp(format,"rootmacro") == 0)
+   {
+     w_ptc_printlayout_rootm(filenameIA->i);
+   }
+  else
+   { 
+    w_ptc_printframes(filenameIA->i);
+   } 
+
+  delete_int_array(filenameIA);
+  
+  
+}
+/********************************************************************************/
+        
+
+void pro_ptc_eplacement(struct in_cmd* cmd)
+{/*
+  Sets a parameter
+ */
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+  int                            k         = 0;
+  struct node*                   nodes[2]={0x0,0x0};
+  struct node*                   anode=0x0;
+  char*                          element;
+  int                            refframe=0;/*0 global, 1 current position, 2 end face if the previous element*/
+
+
+  pos   = name_list_pos("refframe", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_knob: refframe parameter does not exist.\n");
+    return;
+  }
+
+  if ( c_parnames->inform[pos] != 0 )
+   {
+     /*if it is zero it is not specified*/
+     
+     if ( c_parameters->parameters[pos]->string == 0x0 )
+      {
+        warning("madxn.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
+        refframe = 0;
+      }
+     else
+      {
+       /*printf("refframe is %s.\n", c_parameters->parameters[pos]->string );*/
+
+       if ( strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
+        {
+          refframe = 1;
+        }
+
+       if ( strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
+        {
+          refframe = 2;
+        }
+      } 
+   }  
+  
+
+  pos   = name_list_pos("range", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_knob: range parameter does not exist.\n");
+    return;
+  }
+
+  if ( c_parnames->inform[pos] == 0 )
+   {
+    printf("madxn.c: pro_ptc_eplacement: inform for range is 0.\n");
+    return;
+   }
+
+  element  = c_parameters->parameters[pos]->string;
+  if ( element == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_eplacement: no element name: ", "ignored");
+    return;
+  }
+ 
+  
+  k = get_range(element, current_sequ, nodes);  
+  if ( k != 1)
+    {
+      if (k > 1)
+       {
+         warningnew("pro_ptc_eplacement","More then one element correstponds to the range <<%s>>.",element);
+         seterrorflag(1,"pro_ptc_eplacement","More then one element correstponds to the range");
+         return;
+       }
+      else
+       {
+         warningnew("pro_ptc_eplacement","Element <<%s>> not found",element);
+         seterrorflag(1,"pro_ptc_eplacement","Element not found");
+         return;
+       } 
+    } 
+
+
+  
+  pos = 0;
+  anode=current_sequ->range_start;
+  while( anode != 0x0  )
+   { 
+     if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
+      {
+       /* printf("Element is at pos %d !\n",pos);*/
+        break;
+      }
+
+     if (current_sequ->nodes->nodes[pos] == current_sequ->range_end) 
+      {
+         warningnew("pro_ptc_eplacement","Reached the end of sequence - Element <<%s>> not found",element);
+         return;
+      }
+     pos++; /*before if because fortran numerates from 1*/
+   }  
+
+   
+  w_ptc_eplacement(&pos,&refframe);
+
+ 
+}
+/********************************************************************************/
+
+void pro_ptc_knob(struct in_cmd* cmd)
+{/*
+  Sets a parameter
+ */
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+
+  char*                          element    = 0x0;
+  struct int_array*              elementIA      = 0x0;
+ 
+
+  pos   = name_list_pos("elementname", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_knob: elementname parameter does not exist.\n");
+    return;
+  }
+
+  element  = c_parameters->parameters[pos]->string;
+  if ( element == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_knob: no element name: ", "ignored");
+    return;
+  }
+
+  mycpy(c_dum->c, element);
+  
+  stoupper(c_dum->c);
+  
+  elementIA = new_int_array(1+strlen(c_dum->c));
+
+  conv_char(c_dum->c,elementIA);
+
+  w_ptc_addknob(elementIA->i);
+
+  delete_int_array(elementIA);
+ 
+}
+
 void pro_ptc_select(struct in_cmd* cmd)
 {/*
    processes ptc_select command
@@ -7842,7 +8050,6 @@ void pro_ptc_select(struct in_cmd* cmd)
   struct int_array*              tabnameIA   = 0x0;/*string passing to fortran is tricky*/
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
-  int                            place       = -1;
 /*
   int                            i           = 0;
   struct node*                   nodes[2]    = {0x0,0x0};
@@ -7923,7 +8130,6 @@ void pro_ptc_select(struct in_cmd* cmd)
   conv_char(columnname,colnameIA);
   conv_char(monomial,monoIA);
 
-  place++; /*Converting to the Fortran numeration (1...n)*/
   w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
 
   delete_int_array(tabnameIA);
