@@ -39,6 +39,13 @@
 #define MAXARRAY 1000       /* max. length of apex tables in aperture module*/
 #define E_D_MAX 100         /* max. length of extra displacement tables */
 
+#define MADX_LONG      1
+#define MADX_DOUBLE    2
+#define MADX_STRING    3
+
+#define MAX_TFS_ROW 2000  /* max. number of rows for SDDS  conversion */
+#define MAX_TFS_COL 500   /* max. number of columns for SDDS conversion */
+
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
                         "atan", "sinh", "cosh", "tanh", "ranf",
