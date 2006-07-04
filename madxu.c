@@ -3528,7 +3528,7 @@ void write_table(struct table* t, char* filename)
     for (i = 0; i < col->curr; i++)
     {
       if (t->columns->inform[col->i[i]] == 1)
-        fprintf(out_file, v_format("%NIs "),"%hd");
+        fprintf(out_file, v_format("%NIs "),"%d");
       else if (t->columns->inform[col->i[i]] == 2)
         fprintf(out_file, v_format("%NFs "),"%le");
       else if (t->columns->inform[col->i[i]] == 3)
