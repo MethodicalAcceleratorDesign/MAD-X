@@ -5460,6 +5460,7 @@ struct table* read_table(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("file", nl);
+  short sk;
   int i, k, error = 0;
   char *cc, *filename, *type = NULL, *tmp, *name;
 
@@ -5521,6 +5522,7 @@ struct table* read_table(struct in_cmd* cmd)
       {
         if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
         if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+        else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
         else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
         else                              tnl->inform[tcpa->curr] = 2;
         tcpa->p[tcpa->curr++] = permbuff(tmp);
@@ -5570,9 +5572,13 @@ struct table* read_table(struct in_cmd* cmd)
         if (t->curr == t->max) grow_table(t);
         tmp = tcpa->p[i];
         if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-        else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
+        else if (strcmp(tmp,"%d") == 0)
         {
           sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+        }
+        else if (strcmp(tmp,"%hd") == 0)
+        {
+          sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
         }
         else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
         if (i+1 < tnl->curr)
@@ -5592,6 +5598,7 @@ struct table* read_table(struct in_cmd* cmd)
   add_to_table_list(t, table_register);
   return NULL;
 }
+
 
 struct table* read_his_table(struct in_cmd* cmd)
   /* reads and stores TFS table */
