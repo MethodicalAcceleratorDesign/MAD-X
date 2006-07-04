@@ -1668,6 +1668,8 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
   char     name[NAME_L];
   char   l1name[NAME_L];
   char   l2name[NAME_L];
+  char   l3name[NAME_L];
+  char   l4name[NAME_L];
   double rx, ry, dpsi;
 
   int    posx, posy, pospx, pospy;
@@ -1742,7 +1744,13 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
     jjx = -1;
     for (j=1; j < (ttb->curr)+1; j++) {
       i = str_from_tablet(ttb, "name", &j, name);
-      if(strncmp(name,l2name,strlen(l2name)) == 0) jjx = j-1;
+      strcpy(l3name,name);
+      stolower(l3name);
+      strcpy(l4name,strip(l3name));
+      supp_tb(l4name);
+      if(strlen(l4name) == strlen(l2name)) {
+         if(strncmp(l4name,l2name,strlen(l2name)) == 0) jjx = j-1;
+      }
     }
 
 /* If correction to target orbit, subtract the wanted orbit ... */
@@ -2800,6 +2808,7 @@ struct table* read_my_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("file", nl);
   int i, k, error = 0;
+  short  sk;
   char *cc, *filename, *type = NULL, *tmp, *name;
 
   char* namtab;
@@ -2858,6 +2867,7 @@ struct table* read_my_table(struct in_cmd* cmd)
          if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
            if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
            else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+           else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
            else                              tnl->inform[tcpa->curr] = 2;
            tcpa->p[tcpa->curr++] = permbuff(tmp);
         }
@@ -2904,9 +2914,13 @@ struct table* read_my_table(struct in_cmd* cmd)
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
            if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-           else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
+           else if (strcmp(tmp,"%d") == 0 )
            {
             sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+           }
+           else if (strcmp(tmp,"%hd") == 0 )
+           {
+            sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
            }
            else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
            if (i+1 < tnl->curr)
