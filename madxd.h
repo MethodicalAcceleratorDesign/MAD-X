@@ -813,7 +813,7 @@ void error_esave(struct in_cmd* cmd);
 void error_seterr(struct in_cmd* cmd);
 void f_ctof(int *j, char *string, int *nel);
 void pro_error_make_efield_table();
-
+                                                                                                          
 /* regular expression match routines */
 
 struct reg_token* add_tok(char, struct reg_token*);
@@ -1060,7 +1060,9 @@ FILE* fddata;
 FILE* fcdata;
 FILE* ftdata;
 FILE* fgdata;
-
+                                                                                                          
+struct char_p_array* sdds_pat; /* array for selected sdds patterns */
+                                                                                                          
 FILE* debug_file;              /* for debug output */
 FILE* stamp_file;              /* for debug output */
 FILE* out_file;                /* for table output */
