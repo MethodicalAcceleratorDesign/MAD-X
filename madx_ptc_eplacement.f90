@@ -43,13 +43,16 @@ contains
     real(kind(1d0))      :: get_value
     type(fibre), pointer :: p
     type(fibre), pointer :: mvf !moved fibre
-    real(dp)             :: ent(3,3),a(3)
-    logical              :: onlyposition, onlyorientation, autoplace
+    real(dp),target      :: a(3), ange(3), rotpoint(3)
+    real(dp)             :: phi, theta, eta
+    real(dp),target      :: idm(3,3),ent(3,3),rotm(3,3)
+    real(dp),pointer     :: base(:,:)
+    logical              :: onlyposition, onlyorientation, autoplace, surveyall
     
-    ent(:,:) = 0
-    ent(1,1) = 1
-    ent(2,2) = 1
-    ent(3,3) = 1
+    idm(:,:) = zero
+    idm(1,1) = one
+    idm(2,2) = one
+    idm(3,3) = one
     
     a(:) = 0
     nullify(mvf)
@@ -70,7 +73,6 @@ contains
     endif
     
     do 
-
       j=j+1
       
       if (elementidx == j) then
@@ -82,127 +84,115 @@ contains
       endif
 
       p=>p%next
-    
     enddo
 
     if (getdebug() > 1 ) then
        print*,"Found element no. ", elementidx," named ", p%mag%name, &
              &" of kind ", p%mag%kind, mytype(p%mag%kind)
     endif
+
     
     onlyorientation = get_value('ptc_eplacement ','onlyorientation ') .ne. 0
     if (onlyorientation .eqv. .false.) then
        a(1) = get_value('ptc_eplacement ','x ')
        a(2) = get_value('ptc_eplacement ','y ')
        a(3) = get_value('ptc_eplacement ','z ')
-       write(6,'(a20, 3(f12.10,1x))') 'Read position ',a
-       
-       if (refframe ==  1) then
-         !reference frame of the passed parameters is the current magnet position
-         if (getdebug() > 2) then
-           print*,"Reference frame: the current magnet position"
-         endif
-
-         a = rot(P%chart%f%ent,a)
-   
-         write(6,'(a65, 3f8.4)') 'Position tranformed from the current magnet ref frame to global',a
-         
-         a(1) = a(1) +  P%chart%f%a(1)
-         a(2) = a(2) +  P%chart%f%a(2)
-         a(3) = a(3) +  P%chart%f%a(3)
-         
-         
-       endif
-
-       if (refframe ==  2) then
-         !reference frame of the passed parameters is the end face of the preceding magnet
-         if (getdebug() > 2) then
-           print*,"Reference frame: the end face of the preceding magnet"
-         endif
-
-         a = rot(P%previous%chart%f%exi,a)
-         
-         a(1) = a(1) +  P%previous%chart%f%b(1)
-         a(2) = a(2) +  P%previous%chart%f%b(2)
-         a(3) = a(3) +  P%previous%chart%f%b(3)
-         
-       endif
-       
-    else
-       a =  P%chart%f%a !copy current position
+       write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: Read position ',a
     endif
+    
+    select case(refframe)
+      case(0) 
+        if (getdebug() > 2) then
+          print*,"ptc_eplacement: Reference frame: Global Coordinate System"
+        endif
+        a = a - p%chart%f%a
+        base => idm
+      case(1) 
+        !reference frame of the passed parameters is the current magnet position
+        if (getdebug() > 2) then
+          print*,"ptc_eplacement: Reference frame: the current magnet position"
+        endif
+
+        ent = p%chart%f%ent  !we need to make copy because it may be overwritten at the time of rotation
+        base => ent 
+      case(2) 
+        !reference frame of the passed parameters is the end face of the preceding magnet
+        if (getdebug() > 2) then
+          print*,"ptc_eplacement: Reference frame: the end face of the preceding magnet"
+        endif
+        base => P%previous%chart%f%exi 
+      case default
+        refframe = 0
+        call fort_warn("ptc_eplacement","Such reference frame is not supported. Using global")
+        a = a - p%chart%f%a
+        base => idm
+    end select
+
+
+
         
     onlyposition = get_value('ptc_eplacement ','onlyposition ') .ne. 0
     if (onlyposition .eqv. .false.) then
-       call readrotmatrix() !reads ent matrix
 
-       if (refframe ==  1) then
-         ent = rotm(P%chart%f%ent,ent)
-       endif
+       phi   = get_value('ptc_eplacement ','phi ')
+       theta = get_value('ptc_eplacement ','theta ')
+       eta   = zero
+       write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
+
+
+       if (refframe /=  1) then
+         !brings it to the ref system
+         CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,base,ANGE)
+         write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
+         CALL ROTATE_Fibre(p,p%chart%f%a,ange) 
+         
+       endif  
+
+       ange(1) = theta
+       ange(2) = phi
+       ange(3) = eta
+
+       CALL ROTATE_Fibre(p,p%chart%f%a,ange,1,base) 
        
-       if (refframe ==  2) then
-         ent = rotm(P%previous%chart%f%exi,ent)
-       endif
-       
-    else
-       ent = P%chart%f%exi
     endif
     
+    if (onlyorientation .eqv. .false.) then 
+       if (refframe ==  2) then ! face translation of the moved one to the end of the previous one
+         CALL TRANSLATE_Fibre(p,p%previous%chart%f%b - p%chart%f%a) 
+       endif    
+       CALL TRANSLATE_Fibre(p,a,1,base)
+    endif
+       
     
-    call survey(p,ENT,a)
-    
+    p%patch=0
+    CALL FIND_PATCH(P%PREVIOUS,P,NEXT=my_true,ENERGY_PATCH=MY_FALSE)
 
     autoplace = get_value('ptc_eplacement ','autoplacedownstream ') .ne. 0
-
     if (autoplace) then
-      call survey(my_ring,j,my_ring%n)
+      call survey(my_ring,j+1,my_ring%n)
     else
-      CALL FIND_PATCH(P%PREVIOUS,P,NEXT=my_true,ENERGY_PATCH=MY_FALSE)
       CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
     endif  
 
-
     mvf=>p
 
+    j=j+1
+    p=>p%next
 
     do i=j,my_ring%n-1
+       p%patch = 0
        CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
        P=>P%NEXT
     ENDDO
+
+    surveyall = get_value('ptc_eplacement ','surveyall ') .ne. 0
+    if (surveyall) then
+      call survey(my_ring)
+    endif
+    
 !    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
     
 !    print*, "Exiting placeelement"
-  contains 
-    subroutine readrotmatrix
-      implicit none
-      real(dp)             :: phi, theta
-      real(dp)             :: sinphi, cosphi, sintheta, costheta
-       phi   = get_value('ptc_eplacement ','phi ')
-       theta = get_value('ptc_eplacement ','theta ')
-
-       write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
-       sinphi = sin(phi)
-       cosphi = cos(phi)
-       sintheta = sin(theta)
-       costheta = cos(theta)
-
-       ent(1,1) = cosphi 
-       ent(1,2) = 0
-       ent(1,3) = sinphi
-
-       ent(2,1) =  sintheta*sinphi
-       ent(2,2) =  costheta
-       ent(2,3) = -sintheta*cosphi
-
-       ent(3,1) = -costheta*sinphi
-       ent(3,2) =  sintheta
-       ent(3,3) =  costheta*cosphi
-
-       write(6,*) " Rotation MATRIX  "
-       write(6,'(3f8.4)') ent(1,:)
-       write(6,'(3f8.4)') ent(2,:)
-       write(6,'(3f8.4)') ent(3,:)
-    end subroutine readrotmatrix
   end subroutine place_element
 
 
@@ -586,6 +576,40 @@ contains
     endif
     
   end function 
+
+  !____________________________________________________________________________________________
+
+  subroutine rotmatrixfromeuler(phi, theta, eta, ent)
+    implicit none
+    real(dp)             :: phi, theta, eta
+    real(dp)             :: ent(3,3)
+    real(dp)             :: sinphi, cosphi, sintheta, costheta
+     
+     eta = zero ! we do not support rotations around the magnet axis yet
+     
+
+     sinphi = sin(phi)
+     cosphi = cos(phi)
+     sintheta = sin(theta)
+     costheta = cos(theta)
+
+     ent(1,1) = cosphi 
+     ent(1,2) = 0
+     ent(1,3) = sinphi
+
+     ent(2,1) =  sintheta*sinphi
+     ent(2,2) =  costheta
+     ent(2,3) = -sintheta*cosphi
+
+     ent(3,1) = -costheta*sinphi
+     ent(3,2) =  sintheta
+     ent(3,3) =  costheta*cosphi
+
+     write(6,*) " Rotation MATRIX  "
+     write(6,'(3f8.4)') ent(1,:)
+     write(6,'(3f8.4)') ent(2,:)
+     write(6,'(3f8.4)') ent(3,:)
+  end subroutine rotmatrixfromeuler
   
   
 end module madx_ptc_eplacement_module
