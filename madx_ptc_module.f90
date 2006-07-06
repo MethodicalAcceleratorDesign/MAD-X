@@ -1392,8 +1392,14 @@ CONTAINS
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
           write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
        endif
-
-       call track(my_ring,y,i,i+1,default)
+       
+       if (nda > 0) then
+         print*, " Parametric track "
+         call track(my_ring,y,i,i+1,+default)
+       else
+         call track(my_ring,y,i,i+1, default)
+       endif   
+         
 
        if ( .not. c_%stable_da) then
           call fort_warn('ptc_twiss: ','DA got unstable')
