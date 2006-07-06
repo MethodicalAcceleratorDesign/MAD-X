@@ -399,6 +399,7 @@ char command_def[] =
 "x        = [r, 0], y       = [r, 0], z       = [r, 0], " /*position of the front face*/
 "phi      = [r, 0], " /**/
 "theta   = [r, 0], "
+"surveyall    = [l, true, true] , "/* if true changes only position and, leaves orinetation untouched */
 "onlyposition    = [l, false, true] , "/* if true changes only position and, leaves orinetation untouched */
 "onlyorientation = [l, false, true] , "/* if true changes only orientation and, leaves position untouched */
 "autoplacedownstream = [l, true, true] , "/* if true all the elements downstream are placed at default positions, if false the rest of the layout stays antouched  */
