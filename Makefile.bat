@@ -62,6 +62,7 @@ lf95 -c -o1 -tp %FPP%\Sma_multiparticle.f90
 lf95 -c -o1 -tp %FPP%\Sn_mad_like.f90
 lf95 -c -o1 -tp %FPP%\So_fitting.f90
 lf95 -c -o1 -tp %FPP%\Sp_keywords.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_knobs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_intstate.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_setcavs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_tablepush.f90
@@ -70,10 +71,9 @@ lf95 -c -o1 -tp %MADX%\madx_ptc_script.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_trackcavs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_track_run.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_eplacement.f90
-lf95 -c -o1 -tp %MADX%\madx_ptc_knobs.f90
 lf95 -c -o1 -tp %MADX%\user2_photon.f90
-lf95 -c -o1 -tp %MADX%\wrap.f90
 lf95 -c -o1 -tp %MADX%\pointers.f90
+lf95 -c -o1 -tp %MADX%\wrap.f90
 lf95 -c -o1 -tp %MADX%\timest.f90
 lf95 -c -o1 -tp %MADX%\timex.f90
 lf95 -c -o1 -tp %MADX%\run_madx.f90
