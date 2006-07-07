@@ -92,15 +92,20 @@ contains
     type(layout),pointer       :: alayout
     type (pol_block), pointer  :: pb
     integer                    :: i
-
-    print*, "setknobs: There is ", npolblocks, "pol_blocks"
+    
+    if (getdebug() > 2 ) then
+      print*, "setknobs: There is ", npolblocks, "pol_blocks"
+    endif  
+    
     do i=1, npolblocks
       pb => polblocks(i)
-      print*, "setknobs: Setting pol_block ", i," for ",pb%name
+      if (getdebug() > 2 ) then
+        print*, "setknobs: Setting pol_block ", i," for ",pb%name
+      endif  
       alayout = pb
     enddo
 
-    print*, "setknobs: All pol_blocks set"
+!    print*, "setknobs: All pol_blocks set"
      
   end subroutine setknobs
   !____________________________________________________________________________________________
