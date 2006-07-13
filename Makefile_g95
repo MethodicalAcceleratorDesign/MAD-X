@@ -102,17 +102,16 @@ Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
 Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
-madx_ptc_module.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_tablepush.o madx_ptc_knobs.o madx_ptc_module.f90 
+madx_ptc_module.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90 
 madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
-madx_ptc_tablepush.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_tablepush.f90
 madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
 madx_ptc_knobs.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
 madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
-	madx_ptc_setcavs.o madx_ptc_trackcavs.o madx_ptc_tablepush.o \
+	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_eplacement.o madx_ptc_knobs.o \
 	madx_ptc_script.o pointers.o \
 	wrap.f90
