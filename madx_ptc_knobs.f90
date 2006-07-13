@@ -7,40 +7,361 @@ module madx_ptc_knobs_module
 ! MAD-X command ptc_knob configures the knobs. 
 ! - addknob sets a pol_block(s) in this module
 ! - setknobs sets the configured previously knobs on a layout
-
   use madx_keywords
   use madx_ptc_intstate_module, only : getdebug
   implicit none
+  include "madx_ptc_knobs.inc"
   save
   private
 
   !============================================================================================
   !  PUBLIC INTERFACE
-  public                                      :: addknob   !adds knobs (called from c)
-  public                                      :: resetknobs ! removes knobs
-  public                                      :: setknobs ! sets added knobs on a layout
-  public                                      :: getnknobs ! returns number
-  public                                      :: resultswithknobs ! called by ptc_twiss to dump the requested results
-  public                                      :: parametrictwiss  ! returns lattice functions with dependence on knobs
+  public                         :: putusertable
+  public                         :: addpush
+  public                         :: cleartables
+
+  public                         :: addknob   !adds knobs (called from c)
+  public                         :: resetknobs ! removes knobs
+  public                         :: setknobs ! sets added knobs on a layout
+  public                         :: getnknobs ! returns number
+  public                         :: resultswithknobs ! called by ptc_twiss to dump the requested results
+  public                         :: parametrictwiss  ! returns lattice functions with dependence on knobs
   
-  integer, parameter         ::   maxnpolblocks=10
-  type (pol_block), target   ::   polblocks(maxnpolblocks) 
-  integer                    ::   npolblocks=0
-  integer                    ::   nknobs=0
+  public                         :: writeparresults
+  public                         :: killparresult
+  public                         :: twissfctn
+  
+  interface daprint
+    module procedure printunitaylor
+  end interface daprint
+
+
+  !============================================================================================
+  !  PRIVATE
+  !    data structures
+
+  integer, parameter                    ::  maxnpushes=100
+  type (tablepush_poly), private        ::  pushes(maxnpushes)
+  integer                               ::  npushes = 0
+  character(20), private                ::  tables(maxnpushes)  !tables names of existing pushes - each is listed only ones
+  integer,  private                     ::  ntables = 0 !number of distinctive tables
+  real(dp), private, allocatable        ::  Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
+
+
+  integer, parameter                    ::  maxnpolblocks=10
+  type (pol_block), target              ::  polblocks(maxnpolblocks) 
+  integer                               ::  npolblocks=0
+  integer                               ::  nknobs=0
+  
+  integer, parameter                    ::  maxpar = 100
+  integer                               ::  nmapels = 0 
+  type(mapelresult),target              ::  mapels(maxpar)
+              
+  type(universal_taylor), allocatable   ::  results(:,:)
+!  type(taylor), allocatable             ::  results(:,:)
+
+  integer                               ::  currentrow = 0 
+  type(taylor), allocatable             ::  oldy(:)
+  
+  !============================================================================================
+  !  PRIVATE
+  !    routines
+  private                               :: augment_counts
+  private                               :: issuchtableexist
+  private                               :: putnameintables
+  private                               :: allocparresult
+
   
   
+  
+     
 contains
+  !____________________________________________________________________________________________
+
+  subroutine putusertable(n,name,y)
+    !puts the coefficients in tables as defined in array pushes
+    implicit none
+    integer         :: n !fibre number
+    character(*)   :: name !fibre name
+    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
+    type(real_8),pointer :: e !element in array
+    real(kind(1d0))      :: coeff
+    integer              :: i,ii !iterator
+    integer              :: at !iterator
+    logical              :: pblockson
+
+    !    print *,"madx_ptc_tablepush :putusertable "
+    !    call daprint(y(1),6)
+    
+    if ((getnknobs() > 0) .and. (currentrow > 0)) then
+      !if there are any knobs and knobs where initialized (i.e. currentrow > 0)
+      ! otherwise the results table is not allocated
+      pblockson = .true.  !it means there are parameters on
+      call parametrictwiss(y)
+    else  
+      pblockson = .false.
+    endif
+    
+    call putnameintables()
+
+    if (c_%npara == 6) then
+       call sixdmode()
+    else
+       do i=1,npushes
+
+          e => y(pushes(i)%element)
+
+         if (pushes(i)%pushtab) then
+            coeff  = e.sub.(pushes(i)%monomial)
+            if (getdebug()>3) then
+               write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+	&        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+	&        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+	&        " for fibre no ",n
+            endif
+
+            call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+          endif
+          
+         if ( pblockson .and. (pushes(i)%index > 0) ) then
+            
+            results(currentrow,pushes(i)%index) = e.par.(pushes(i)%monomial)
+
+            if (getdebug()>3) then
+               write(6,*) &
+	&        "Put 6D coef ",pushes(i)%monomial," arr_row ", pushes(i)%element,&
+	&        " at named ", pushes(i)%colname, &
+	&        " for fibre no ",n
+               write(6,*) "currentrow is ", currentrow," index ",pushes(i)%index
+               call daprint(results(currentrow,pushes(i)%index),6)
+            endif
+         endif
+          
+       enddo
+    endif
+
+    call augment_counts()
+    
+    if (currentrow > 0) then 
+       !if currnet row == 0 it means that knobs were not initialized
+       currentrow = currentrow + 1
+    endif
+
+    !____________________________________________________________________________________________
+  contains
+    !____________________________________________________________________________________________
+    subroutine sixdmode()
+      implicit none
+      integer ele
+      character bufchar
+      character*(6) monstr
+
+      do i=1,npushes
+
+         if (pushes(i)%element < 5) then
+            e => y(pushes(i)%element)
+         else
+            if (pushes(i)%element == 5) then
+               e => y(6) !6th coordinate  is d(cT) or cT
+            else
+               e => y(5) !5th coordinate is dp/p
+            endif
+         endif
+
+         monstr = pushes(i)%monomial
+         bufchar = monstr(5:5)
+         monstr(5:5) = monstr(6:6)
+         monstr(6:6) = bufchar
+         
+         if (pushes(i)%pushtab) then
+            coeff = e.sub.monstr
+
+            if (getdebug()>3) then
+               write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+	&        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+	&        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
+	&        " for fibre no ",n
+            endif
+
+            call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+         endif    
+         
+         if ( pblockson .and. (pushes(i)%index > 0) ) then
+
+           results(currentrow,pushes(i)%index) = e.par.monstr
+
+
+           if (getdebug()>3) then
+               write(6,*) &
+	&        "Put 6D coef ",pushes(i)%monomial," arr_row ", pushes(i)%element,&
+	&        " at named ", pushes(i)%colname, &
+	&        " for fibre no ",n
+               write(6,*) "currentrow is ", currentrow," index ",pushes(i)%index
+               call daprint(results(currentrow,pushes(i)%index),6)
+           endif
+
+         endif
+
+      enddo
+    end subroutine sixdmode
+
+    !____________________________________________________________________________________________
+
+  end subroutine putusertable
+  !____________________________________________________________________________________________
+
+  subroutine inittables()
+    implicit none
+    integer  :: i ! iterator
+
+    deallocate(dismom)
+    allocate(dismom(c_%nd,0:c_%no/2))
+
+  end subroutine inittables
+  !____________________________________________________________________________________________
+
+  subroutine cleartables()
+    implicit none
+    integer  :: i ! iterator
+    ! we do not deal here with the main twiss table, hence we do not clear it
+    do i=1,ntables
+       if (getdebug()>3) print *,"Clearing ",tables(i)
+       call reset_count(tables(i))
+    enddo
+
+  end subroutine cleartables
+  !____________________________________________________________________________________________
+
+  subroutine augment_counts()
+    implicit none
+    integer  :: i ! iterator
+
+    do i=1,ntables
+       if (getdebug()>3) print *,"Augmenting ",tables(i)
+       call augmentcountonly(tables(i)) !we need to use special augement,
+       !cause the regular one looks for for
+       !variables names like columns to fill the table
+    enddo
+
+  end subroutine augment_counts
+  !____________________________________________________________________________________________
+
+  subroutine putnameintables()
+    implicit none
+    integer       :: i ! iterator
+    do i=1,ntables
+       if (getdebug()>2) print *,"Putting name in ",tables(i)
+       call string_to_table(tables(i),"name ","name ")
+    enddo
+
+  end subroutine putnameintables
+  !____________________________________________________________________________________________
+
+
+  subroutine addpush(table,column,element,monomial)
+    implicit none
+    include 'twissa.fi'
+    integer   table(*)
+    integer   column(*)
+    integer   element
+    integer   monomial(*)
+    logical   addtable
+    logical   parametric
+    real(kind(1d0))            :: get_value
+
+
+    parametric = get_value('ptc_select ','parametric ') .ne. 0
+    if ( (parametric .eqv. .false.) .and. (table(1) == 0) ) then
+      call fort_warn("addpush","Neither table specified neither parametric value. Ignoring")
+      return
+    endif
+
+    npushes = npushes + 1
+    
+    pushes(npushes)%tabname = charconv(table)
+    pushes(npushes)%colname = charconv(column)
+    
+    pushes(npushes)%element = element
+    pushes(npushes)%monomial = charconv(monomial)
+    !imput "int string"  has the length of the string at the first plave
+    pushes(npushes)%tabname(table(1)+1:table(1)+1)=achar(0)
+    pushes(npushes)%colname(column(1)+1:column(1)+1)=achar(0)
+    pushes(npushes)%monomial(monomial(1)+1:monomial(1)+1)=achar(0)
+    
+    if (column(1) == 0) then
+      write(pushes(npushes)%colname,'(i1,a1,a6)') element,"_",pushes(npushes)%monomial
+    endif
+    
+    
+    if (table(1) > 0) then
+      pushes(npushes)%pushtab = .true.
+      addtable = .not. issuchtableexist(pushes(npushes)%tabname) !add to table to the list onl
+      
+    else
+      pushes(npushes)%pushtab = .false.
+      addtable = .false. !no table name 
+    endif
+
+    if (parametric) then
+      nmapels = nmapels + 1
+      pushes(npushes)%index = ntwisses+nmapels
+    else
+      pushes(npushes)%index = 0   
+    endif    
+    
+    
+    if (getdebug()>3) then
+       print  *,"madx_ptc_tablepush : addpush(<",&
+            &          pushes(npushes)%element,">,<",pushes(npushes)%monomial,">)"
+       print  *,"madx_ptc_tablepush : colname <",pushes(npushes)%colname,">"
+       print  *,"madx_ptc_tablepush : parametric results index ", pushes(npushes)%index
+       if (pushes(npushes)%pushtab) then
+          print  *,"madx_ptc_tablepush : table <",pushes(npushes)%tabname,">"
+       else
+          print  *,"madx_ptc_tablepush : not pushing to table"
+       endif   
+    endif
+
+
+    if ( addtable) then
+       ntables = ntables + 1
+       tables(ntables) = pushes(npushes)%tabname
+       if (getdebug()>3)  then
+          print *,"Table has been added to the tables list ", tables(ntables)
+       endif
+
+    endif
+
+  end subroutine addpush
+  !____________________________________________________________________________________________
+
+
+  logical(lp) function issuchtableexist(tname)
+    implicit none
+    character(20) :: tname !name of the table to be checked if already is listed in table names array
+    integer       :: i! iterator
+
+    issuchtableexist = .false.
+
+    do i=1, ntables
+       if (tables(i) == tname) then
+          issuchtableexist = .true.
+          return
+       endif
+    enddo
+
+  end function issuchtableexist
   !____________________________________________________________________________________________
   subroutine addknob(fibrenameIA)
     implicit none
     include 'twissa.fi'
-    integer                    :: fibrenameIA(*)
+    integer     :: fibrenameIA(*)
     character(48)              :: fibrename
-    integer                    :: nint, ndble, k, int_arr(nmax), char_l(nmax), i
+    integer     :: nint, ndble, k, int_arr(nmax), char_l(nmax), i
     real(kind(1d0))            :: d_arr(nmax)
     character(400)             :: char_a
     type (pol_block), pointer  :: pb
-    logical(lp)                :: exactmatch
+    logical(lp) :: exactmatch
     real(kind(1d0))            :: get_value
     
     
@@ -91,7 +412,7 @@ contains
     implicit none
     type(layout),pointer       :: alayout
     type (pol_block), pointer  :: pb
-    integer                    :: i
+    integer     :: i
     
     if (getdebug() > 2 ) then
       print*, "setknobs: There is ", npolblocks, "pol_blocks"
@@ -104,7 +425,11 @@ contains
       endif  
       alayout = pb
     enddo
+    
+   if (ALLOCATED(results)) call killparresult()
 
+   call allocparresult(alayout%n)
+   currentrow = 1 
 !    print*, "setknobs: All pol_blocks set"
      
   end subroutine setknobs
@@ -112,7 +437,7 @@ contains
 
   subroutine resetknobs()
     implicit none
-    integer                    :: i
+    integer     :: i
     
     do i=1, npolblocks
       polblocks(i) = 0
@@ -124,22 +449,89 @@ contains
 
   function getnknobs()
     implicit none
-    integer                    :: getnknobs
+    integer     :: getnknobs
     
     getnknobs = nknobs
 
   end function getnknobs
+  !____________________________________________________________________________________________
+  !____________________________________________________________________________________________
+  !____________________________________________________________________________________________
+  !____________________________________________________________________________________________
+  !____________________________________________________________________________________________
   
-  
-  !_________________________________________________________________________________
-  subroutine parametrictwiss(y,ave)   !  Computes <x_i x_j> assuming linearity and with parameters
+  subroutine twissfctn(y,ave)   !  Computes <x_i x_j> assuming linearity and no parameters
     implicit none
     type(real_8) y(6)
-    type(taylor) ave(6,6,3)
+    real(dp) ave(6,6,3)
+    integer e(6)
+    integer i,j,k,l,m
+    
+    print*,"c_%nd2 is ", c_%nd2
+    print*,"c_%nd is ", c_%nd
+    
+    e=0
+    ave=zero
+    do i=1,c_%nd2
+      do j=i,c_%nd2
+        do k=1,c_%nd
+             e(k*2-1)=1
+             ave(i,j,k)=ave(i,j,k)+(y(i).sub.e)*(y(j).sub.e)
+             e(k*2-1)=0
+             e(k*2)=1
+             ave(i,j,k)=ave(i,j,k)+(y(i).sub.e)*(y(j).sub.e)
+             e(2*k)=0
+             ave(j,i,k)=ave(i,j,k)
+
+!              if (ave(i,j,k) /= zero) then
+!                write(6,'(a3,i1,i1,i1,a3,f16.8)') 'ave', i,j,k,' = ',ave(i,j,k)
+!              endif
+          enddo
+       enddo
+    enddo
+    
+    
+!    print*, "Beta11", ave(1,1,1)
+!    print*, "Alfa11", ave(1,1,2)
+!    print*, "Gama11", ave(1,1,3)
+!    
+!    print*, "Beta12", ave(3,3,1)
+!    print*, "Beta12", ave(3,3,2)
+!    print*, "Beta12", ave(3,3,3)
+! 
+!    print*, "Beta13", ave(5,5,3)
+! 
+!    print*, "Beta21", ave(1,3,1)
+!    print*, "Beta22", ave(1,5,1)
+!    print*, "Beta23", ave(3,5,1)
+! 
+!    print*, "Beta31", ave(3,1,1)
+!    print*, "Beta32", ave(5,1,1)
+!    print*, "Beta33", ave(5,5,1)
+
+
+  end subroutine twissfctn
+  
+  !_________________________________________________________________________________
+  subroutine parametrictwiss(y)   !  Computes <x_i x_j> assuming linearity and with parameters
+    implicit none
+    type(real_8) y(6)
+    type(taylor) :: ave(6,6,3)
+    type(universal_taylor) :: unita
     integer i,j,k
     integer, allocatable :: e(:)
-
+    
+    print*, "parametrictwiss"
     allocate(e(c_%npara_fpp))
+    
+    do i=1,c_%nd2
+       do j=1,c_%nd2
+          do k=1,c_%nd
+             call alloc(ave(i,j,k))
+          enddo
+       enddo
+    enddo
+    
 
     e=0
     do i=1,c_%nd2
@@ -147,7 +539,7 @@ contains
           do k=1,c_%nd
              ave(i,j,k)=zero
              e(k*2-1)=1
-             ave(i,j,k)=      ave(i,j,k) + (y(i)%t.par.e)*(y(j)%t.par.e) !*
+             ave(i,j,k)= ave(i,j,k) + (y(i)%t.par.e)*(y(j)%t.par.e) 
              e(k*2-1)=0
              e(k*2)=1
              ave(i,j,k)=morph(ave(i,j,k))+ (y(i).par.e)*(y(j).par.e) !line * does the same, here taylor is morphed to polimorph,
@@ -157,17 +549,86 @@ contains
        enddo
     enddo
 
+    
+    ave(1,2,1) = -ave(1,2,1)
+    results(currentrow, alfa11) = ave(1,2,1)
+    results(currentrow, beta11) = ave(1,1,1)  !-
+    results(currentrow, gama11) = ave(2,2,1)  
+    
+    ave(3,4,2) = -ave(3,4,2)
+    results(currentrow, alfa12) = ave(3,4,2) !-
+    results(currentrow, beta12) = ave(3,3,2) !- 
+    results(currentrow, gama12) = ave(4,4,2)  
+
+    ave(5,6,3) = -ave(5,6,3)
+    results(currentrow, alfa13) = ave(5,6,3) !-
+    results(currentrow, beta13) = ave(6,6,3) !-
+    results(currentrow, gama13) = ave(5,5,3)  
+
+    !----------------
+
+    ave(1,2,2) = -ave(1,2,2)
+    results(currentrow, alfa21) = ave(1,2,2) !-
+    results(currentrow, beta21) = ave(1,1,2)  !-
+    results(currentrow, gama21) = ave(2,2,2)  !-
+
+    ave(3,4,1) = -ave(3,4,1)
+    results(currentrow, alfa22) = ave(3,4,1) !-  
+    results(currentrow, beta22) = ave(3,3,1)  !-  
+    results(currentrow, gama22) = ave(4,4,1) 
+
+    ave(5,6,1) = -ave(5,6,1)
+    results(currentrow, alfa23) = ave(5,6,1) !-
+    results(currentrow, beta23) = ave(6,6,1)  !-
+    results(currentrow, gama23) = ave(5,5,1)  !-
+
+    !----------------
+
+    ave(1,2,3) = -ave(1,2,3)
+    results(currentrow, alfa31) = ave(1,2,3) !-
+    results(currentrow, beta31) = ave(1,1,3)  !-
+    results(currentrow, gama31) = ave(2,2,3)  !-
+
+    ave(3,4,3) =-ave(3,4,3)
+    results(currentrow, alfa32) = ave(3,4,3) !-  
+    results(currentrow, beta32) = ave(3,3,3)  !-
+    results(currentrow, gama32) = ave(4,4,3)  !-
+
+    ave(5,6,2) =-ave(5,6,2)
+    results(currentrow, alfa33) = ave(5,6,2) !
+    results(currentrow, beta33) = ave(6,6,2)  !-
+    results(currentrow, gama33) = ave(5,5,2)  !-
+    
+!     j=1
+!     ii = 2*j ! == 2                  100000
+!     angp(1,ii-1) = y(ii-1).sub.string(ii-1)
+! !                                    010000
+!     angp(1,ii)   = y(ii-1).sub.string(ii)
+! 
+!     sx=angp(2,ii-1)*angp(1,ii)-angp(1,ii-1)*angp(2,ii)
+    
+    
+    
+!     print*, "Beta X"
+!     call daprint(ave(1,1,1),6)
+! 
+!     print*, "Beta Y"
+!     call daprint(ave(3,3,2),6)
+! 
+!     print*, "Beta Z"
+!     call daprint(ave(5,5,3),6)
+    
+
+    do i=1,c_%nd2
+       do j=1,c_%nd2
+          do k=1,c_%nd
+             call kill(ave(i,j,k))
+          enddo
+       enddo
+    enddo
+
     deallocate(e)
-    
-    print*, "Beta X"
-    call daprint(ave(1,1,1),6)
-
-    print*, "Beta Y"
-    call daprint(ave(1,1,2),6)
-
-    print*, "Beta Z"
-    call daprint(ave(1,1,3),6)
-    
+      
   end subroutine parametrictwiss
   !_________________________________________________________________________________
 
@@ -179,27 +640,381 @@ contains
     real(kind(1d0))      :: coeff
     integer              :: i,ii,j,k !iterator
     type(taylor)         :: ave(6,6,3)
-    
-    do i=1,6
-       do j=1,6
-          do k=1,3
-             call alloc(ave(i,j,k))
-          enddo
-       enddo
-    enddo
-    
-    call print(y(1),6)
-    call parametrictwiss(y,ave)
 
-    do i=1,6
-       do j=1,6
-          do k=1,3
-             call kill(ave(i,j,k))
-          enddo
-       enddo
-    enddo
+    
+!    call print(y(1),6)
 
   end subroutine resultswithknobs
   
   !____________________________________________________________________________________________
+
+  !____________________________________________________________________________________________
+
+  subroutine average_x_i_x_j(y,ave,i,j)   !  Computes <x_i x_j>
+    implicit none
+    type(real_8) y(6)
+    type(taylor) ave
+    type(taylorresonance) tr
+    integer i,j
+
+    call alloc(tr)
+
+    if(j/=0) then
+       tr=y(i)%t*y(j)%t
+    else
+       tr=y(i)%t
+    endif
+
+    call cfu(tr%cos,filter,ave)
+
+    call kill(tr)
+  end subroutine average_x_i_x_j
+  !_________________________________________________________________________________
+
+  real(dp) function filter(e)   !  Computes <x_i x_j>
+    implicit none
+    integer e(:)
+    integer i
+
+    filter=one
+
+    do i=1,c_%nd
+       if(e(2*i-1)/=e(2*i)) then
+          filter=zero
+          return
+       else
+          filter=filter*dismom(i,e(2*i))
+       endif
+    enddo
+
+  end function filter
+  !_________________________________________________________________________________
+
+
+
+  subroutine make_gaussian(plane,I0)
+    implicit none
+    integer plane,i
+    real(dp) I0
+
+    dismom(plane,0)=one
+
+    do i=1,c_%no/2
+       dismom(plane,i)=i*I0*two*dismom(plane,i-1)
+    enddo
+
+  end   subroutine make_gaussian
+  !_________________________________________________________________________________
+
+  subroutine make_ring(plane,I0)
+    implicit none
+    integer plane,i
+    real(dp) I0
+
+    dismom(plane,0)=one
+
+    do i=1,c_%no/2
+       dismom(plane,i)=I0*two*dismom(plane,i-1)
+    enddo
+
+  end   subroutine make_ring
+  !_________________________________________________________________________________
+  subroutine killparresult
+    implicit none
+    integer       :: i,j
+    
+    if (.not. ALLOCATED(results)) then
+      return
+    endif
+    
+!    remnestant of the taylor type
+!     print*, "killparresult: Shape of the current array: "
+!     print*, "1D",lbound(results,1),ubound(results,1)
+!     print*, "2D",lbound(results,2),ubound(results,2)
+
+     do i=lbound(results,1),ubound(results,1)
+        do j=lbound(results,2),ubound(results,2)
+          results(i,j) = -1
+!           call kill(results(i,j))
+        enddo
+     enddo
+    
+    print*, "Deallocating results "
+    deallocate(results)
+    
+    currentrow = 0
+    
+  end subroutine killparresult
+  !_________________________________________________________________________________
+  subroutine allocparresult(n)
+    implicit none
+    integer       :: n
+    integer       :: nr
+    integer       :: i,j
+
+    nr = ntwisses+nmapels
+    print*, "Allocating results ",n,nr
+    allocate(results(n,nr))
+!    remnestant of the taylor type
+!     do i=1,n
+!        do j=1,nr
+!           call alloc(results(i,j))
+!        enddo
+!     enddo
+    
+     
+  end subroutine allocparresult
+  !_________________________________________________________________________________
+  subroutine writeparresults(filenameIA)
+    implicit none
+    include 'twissa.fi'
+    integer   filenameIA(*)
+    integer       :: mf !macro file descriptor
+    character(48) :: filename
+    character(48) :: fmat
+    integer       :: i,j
+    logical       :: fmt_ptc, fmt_tex
+    real(kind(1d0))            :: get_value
+    integer                    :: get_string
+
+    if (.not. ALLOCATED(results)) then
+      call fort_warn("writeparresults","Array with parametric results is not present.")
+      print*, "writeparresults tip: it might have been erased the ptc_end command."
+      return
+    endif
+    
+    if (filenameIA(1) > 0) then
+      filename = charconv(filenameIA)
+      call kanalnummer(mf)
+      open(unit=mf,file=filename)
+    else
+      mf = 6
+    endif
+
+    fmt_ptc = .false.
+    fmt_tex = .false.
+    
+    i = get_string('ptc_printparametric ','format ',fmat)
+    if (i > 0) then
+       print*,"format is ", fmat(1:i)
+
+       select case(fmat(1:i))
+         case ('ptc')
+           print*, "Recognized PTC native format"
+           fmt_ptc = .true.
+         case ('tex')
+           print*, "Recognized PTC native format"
+           fmt_tex = .true.
+         case default
+           print*, "Format not recognized - using default PTC"
+           fmt_ptc = .true.
+       end select
+     else
+       print*, "Got empty Format - using default PTC"
+       fmt_ptc = .true.
+     endif
+       
+    
+    
+    do i=1,currentrow-1
+      write(mf,*) "Magnet ", i
+      
+      
+      do j=1,ntwisses
+!        print*, "Writing i,j",i,j
+        write(mf,*) twissnames(j)
+        if (fmt_ptc)  call daprint(results(i,j),mf)
+        if (fmt_tex)  call printpareq(results(i,j),mf)
+        write(mf,*) " "
+      enddo
+
+
+      do j=1,npushes
+        if (pushes(j)%index < 1 ) cycle
+!        print*, "Writing i, j->index",i,j,pushes(j)%index
+        write(mf,*) pushes(j)%colname
+        if (fmt_ptc)  call daprint(results(i,pushes(j)%index),mf)
+        if (fmt_tex)  call printpareq(results(i,pushes(j)%index),mf)
+        write(mf,*) " "
+        enddo
+      write(mf,*) "======================================="  
+    enddo
+    
+    if (mf /= 6) close(mf)
+
+  end subroutine writeparresults
+  !_________________________________________________________________________________
+    
+
+  subroutine printunitaylor(ut,iunit)
+    implicit none
+    type(universal_taylor) :: ut
+    integer                :: iunit
+    integer                :: i,ii
+    
+    if (.not. associated(ut%n)) then
+         write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSICIATED)'
+    endif 
+    
+    write(iunit,'(/1X,A,I5,A,I5,A/1X,A/)') 'UNIV_TAYLOR   NO =',ut%n,', NV =',ut%nv,', INA = unita',&
+         '*********************************************'
+    if(ut%n /= 0) then
+         write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
+    else 
+         write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+    endif     
+    
+    do i = 1,ut%n
+       write(iunit,'(I6,2X,G20.14,I5,4X,18(2I2,1X))') i,ut%c(i),sum(ut%j(i,:)),(ut%j(i,ii),ii=1,ut%nv)
+       if( .not. print77) then
+          write(iunit,*)  ut%c(i)
+       endif
+    enddo
+
+    write(iunit,'(A)') '                                      '
+    
+  end subroutine printunitaylor
+  !_________________________________________________________________________________
+
+  function getparname(n)
+    implicit none
+    character*(20)  :: getparname
+    integer        :: n
+    
+    write(getparname,'(a1,i2.2)') "p",n
+    
+  end function getparname    
+  !_________________________________________________________________________________
+    
+
+  subroutine printpareq(ut,iunit)
+    implicit none
+    type(universal_taylor) :: ut
+    integer                :: iunit
+    integer                :: i,ii
+    integer                :: fp
+    character              :: sign
+    character*(20)         :: parname
+
+    if(ut%nv /= c_%nv) then
+         call fort_warn("printpareq",&
+          "number of variables of this universal taylor is different from currnet TPSA")
+         return
+    endif     
+    
+    if (.not. associated(ut%n)) then
+         write(iunit,'(A)') ' 0 '
+         return
+    endif 
+
+    if(ut%n == 0) then
+         write(iunit,'(A)') ' 0 '
+         return
+    endif     
+    
+    sign = ' '
+    do i = 1,ut%n
+       
+       if ( ut%c(i) < zero ) then
+         sign = ' '
+       endif
+       
+       write(iunit,'(a1,G20.14)', ADVANCE='NO') sign,ut%c(i)
+       do ii = 1, ut%nv
+
+         if (ut%j(i,ii) /= 0) then
+           write(iunit,'(A1)', ADVANCE='NO') "*"
+           parname = getparname(ii)
+           write(iunit,'(a)', ADVANCE='NO') parname(1:LEN_TRIM(parname))
+           
+           if (ut%j(i,ii) /= 1) then
+             write(iunit,'(a1)', ADVANCE='NO')  "^"
+             write(parname,'(i3)')  ut%j(i,ii) 
+             parname = ADJUSTL(parname)
+             write(iunit,'(a)', ADVANCE='NO')  parname(1:LEN_TRIM(parname))
+           endif
+         endif
+
+       enddo
+
+       sign = '+'
+    enddo
+
+    write(iunit,'(A)') ''
+
+     
+  end subroutine printpareq
+  
+  
+ 
 end module madx_ptc_knobs_module
+
+
+
+! backup code for the results verification
+!     call twissfctn(scv,ave)
+!     print*, "==============================================================="
+!     print*, "==============================================================="
+!     print*, "==============================================================="
+!     print*, "==============================================================="
+!     do ii=1,c_%nd2
+!       do jj=ii,c_%nd2
+!         do kk=1,c_%nd
+! 
+!          if (ave(ii,jj,kk) /= zero) then
+!            write(6,'(a3,i1,i1,i1,a3,f16.8)') 'ave', ii,jj,kk,' = ',ave(ii,jj,kk)
+!            do ll=1,3
+!              do mm=1,3
+! 
+!                v = abs(ave(ii,jj,kk) - tw%beta(ll,mm))
+!                if ( v < 1e-16_dp) then
+!                  print*, "v(",ll,",",mm,")=",v
+!                  write(6,'(a3,i1,i1,i1,a7,i1,i1)') 'ave', ii,jj,kk,' = beta',ll,mm
+!                endif
+! 
+!                v = abs(ave(ii,jj,kk) + tw%alfa(ll,mm))
+!                if ( v < 1e-16_dp) then
+!                  print*, "v(",ll,",",mm,")=",v
+!                  write(6,'(a3,i1,i1,i1,a7,i1,i1)') 'ave', ii,jj,kk,' = alfa',ll,mm
+!                endif
+! 
+! 
+!                v = abs(ave(ii,jj,kk) - tw%gama(ll,mm))
+!                if ( v < 1e-16_dp) then
+!                  print*, "v(",ll,",",mm,")=",v
+!                  write(6,'(a3,i1,i1,i1,a7,i1,i1)') 'ave', ii,jj,kk,' = gama',ll,mm
+!                endif
+! 
+!              enddo
+! 
+!              v = abs(ave(ii,jj,kk) - tw%mu(ll))
+!              if ( v < 1e-16_dp) then
+!                print*, "v(",ll,",",mm,")=",v
+!                write(6,'(a3,i1,i1,i1,a7,i1)') 'ave', ii,jj,kk,' = mu',ll
+!              endif
+! 
+!              v = abs(ave(ii,jj,kk) - tw%disp(ll))
+!              if ( v < 1e-16_dp) then
+!                print*, "v(",ll,",",mm,")=",v
+!                write(6,'(a3,i1,i1,i1,a7,i1)') 'ave', ii,jj,kk,' = disp',ll
+!              endif
+! 
+!              v = abs(ave(ii,jj,kk) - tw%disp(ll+1))
+!              if ( v < 1e-16_dp) then
+!                print*, "v(",ll,",",mm,")=",v
+!                write(6,'(a3,i1,i1,i1,a7,i1)') 'ave', ii,jj,kk,' = disp',ll+1
+!              endif
+!             
+!              
+!            enddo  
+! 
+!          endif  
+! 
+!       enddo
+!    enddo
+! enddo
+! 
+!     print*, "==============================================================="
+!     print*, "==============================================================="
+!     print*, "==============================================================="
+!     print*, "==============================================================="

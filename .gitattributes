@@ -59,7 +59,6 @@
 /madx_ptc_module.f90 -text
 /madx_ptc_script.f90 -text
 /madx_ptc_setcavs.f90 -text
-/madx_ptc_tablepush.f90 -text
 /madx_ptc_track_run.f90 -text
 /madx_ptc_trackcavs.f90 -text
 /madxc.c -text

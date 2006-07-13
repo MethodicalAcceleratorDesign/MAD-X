@@ -381,18 +381,23 @@ char command_def[] =
 "amatrixfilename = [s, {none}] ; "
 " "
 "ptc_select: ptc_select none 0 0 "
-"table    = [s, none, ptc_summ], "
-"column   = [s, none, none], "
+"table      = [s, none, none], "
+"column     = [s, none, none], "
 "polynomial = [i, none] , "/*defines the element of the tracked 6D array of polynomials */
-"monomial = [s, none] , "/*defines the monomial that coefficient will be sent to table */
+"monomial   = [s, none] , "/*defines the monomial that coefficient will be sent to table */
+"parametric = [l, false, true], "/*Tells if the result should be stored in a parametric form if knobs are present*/
 /*"place    = [s, none], "*/
-"quantity = [s, none] ; "
+"quantity   = [s, none] ; "
 " "
 "ptc_knob: ptc_knob none 0 0 "
 "elementname = [s, none] , "/* */
 "kn    = [i, {-1}], "
 "ks    = [i, {-1}], "
 "exactmatch = [l, true, true] ; "
+" "
+"ptc_printparametric: ptc_printparametric none 0 0 "
+"filename = [s, none] , "/* */
+"format = [s, ptc] ; "
 " "
 "ptc_eplacement: ptc_eplacement none 0 0 "
 "range = [s, none] , "/* */

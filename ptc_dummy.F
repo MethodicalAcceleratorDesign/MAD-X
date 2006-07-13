@@ -150,6 +150,12 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine  w_ptc_writeparresults()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
       subroutine w_ptc_eplacement(elementidx,rf)
       implicit none
       integer elementidx

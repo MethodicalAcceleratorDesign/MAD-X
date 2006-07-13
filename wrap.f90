@@ -153,6 +153,18 @@ subroutine w_ptc_addknob(fibre)
 
 end subroutine w_ptc_addknob
 
+
+subroutine w_ptc_writeparresults(filename)
+  use madx_ptc_knobs_module
+  implicit none
+  integer filename(*)
+
+  call writeparresults(filename)
+
+end subroutine w_ptc_writeparresults
+
+
+
 subroutine w_ptc_printframes(filename)
   use pointer_lattice
   implicit none
@@ -182,7 +194,7 @@ subroutine w_ptc_eplacement(elementidx,rf)
 end subroutine w_ptc_eplacement
 
 subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
-  use madx_ptc_tablepush_module
+  use madx_ptc_knobs_module
   implicit none
   integer tabname(*)
   integer colname(*)

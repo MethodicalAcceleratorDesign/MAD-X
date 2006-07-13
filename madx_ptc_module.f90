@@ -14,7 +14,6 @@ END MODULE ptc_results
 MODULE madx_ptc_module
   USE madx_keywords
   USE madx_ptc_setcavs_module
-  USE madx_ptc_tablepush_module
   USE madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
 
@@ -1207,7 +1206,7 @@ CONTAINS
     real(kind(1d0)) get_value,suml
     integer  geterrorflag !C function that returns errorflag value
     type(real_8) y(6)
-    type(twiss) tw
+    type(twiss) :: tw
     type(fibre), POINTER :: current
     type(work)   :: startfen !Fibre energy at the start
     real(dp) r,re(6,6),dt
@@ -1215,7 +1214,9 @@ CONTAINS
     integer n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
     integer row,double_from_table
     integer  :: charge    ! charge of an accelerated particle
-    
+    type(real_8)            ::scv(6)
+    real(dp) ave(6,6,3), v
+    integer jj,kk,ll,mm
 
     if (getdebug() > 1) print*,"ptc_twiss"
     !------------------------------------------------------------------------------
@@ -1234,8 +1235,9 @@ CONTAINS
        return
     endif
 
-    call cleartables() !defined in madx_ptc_tablepush
-
+    call cleartables() !defined in madx_ptc_knobs
+    
+    call kill_para(my_ring) !removes all the previous parameters
     nda = getnknobs() !defined in madx_ptc_knobs
     suml=zero
 
@@ -1273,7 +1275,7 @@ CONTAINS
     no = get_value('ptc_twiss ','no ')
 
     call init(default,no,nda,BERZ,mynd2,npara)
-    
+
     call alloc(y)
     y=npara
     Y=X
@@ -1369,6 +1371,8 @@ CONTAINS
     
     
     call alloc(tw)
+    call alloc(scv)
+ 
     tw=y
     y=npara
     Y=X
@@ -1384,7 +1388,7 @@ CONTAINS
        print *, "ptc_twiss: internal state is:"
        call print(default,6)
     endif
-
+   
     do i=1,MY_RING%n
 
        if (getdebug() > 1) then
@@ -1394,7 +1398,6 @@ CONTAINS
        endif
        
        if (nda > 0) then
-         print*, " Parametric track "
          call track(my_ring,y,i,i+1,+default)
        else
          call track(my_ring,y,i,i+1, default)
@@ -1418,22 +1421,27 @@ CONTAINS
           goto 100
        endif
 
-       call putusertable(i,current%mag%name,y)
-
-       if (nda > 0) then
-         call resultswithknobs(i,current%mag%name,y)
-       endif  
 
        suml=suml+current%MAG%P%ld
        tw=y
-       
        call puttwisstable()
+       
+       !the tracked polimorph is not normalized to the input beam parameters
+       !we need to drag it from the twiss object, where it is normalized with A matrix of the normal form
+
+       do ii=1, c_%nd2
+         scv(ii) = tw%junk%v(ii)
+       enddo  
+
+       call putusertable(i,current%mag%name,scv)
        
        iii=advance_node()
        current=>current%next
     enddo
 100 continue
+
     c_%watch_user=.false.
+    call kill(scv)
     call kill(tw)
     CALL kill(y)
     call f90flush(20,my_false)
@@ -1455,6 +1463,7 @@ CONTAINS
       real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
       type(work) :: cfen !current fibre energy
+      
 
       cfen = 0 ! do not remove -> if it is removed energy is wrong because = adds energy to the previous value
 
@@ -1576,6 +1585,7 @@ CONTAINS
       ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
+
 
     end subroutine puttwisstable
     !____________________________________________________________________________________________
@@ -2136,8 +2146,7 @@ CONTAINS
     implicit none
     logical(lp) closed_orbit,normal,maptable
     integer no,mynd2,npara,nda,icase,flag_index,why(9)
-    integer i, ii, iii, j1, jj, ja(6), k, l, starti
-    integer,parameter :: i_map_coor=10
+    integer i, ii, iii, j1, jj, k, l, starti
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2,map_term
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
          string_from_table, double_from_table, result_from_normal
@@ -2147,8 +2156,7 @@ CONTAINS
     integer :: ord(3), indexa(4)
     integer :: row_haml(101)
     integer :: index1(1000,2)
-    real(dp) coef
-    real(kind(1d0)) get_value,val_ptc,map_coor(i_map_coor)
+    real(kind(1d0)) get_value,val_ptc
     character(len = 4) name_var
     !------------------------------------------------------------------------------
 
@@ -2205,49 +2213,7 @@ CONTAINS
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
-       map_term=42
-       call  make_map_table(map_term)
-       call liepeek(iia,icoast)
-       allocate(j(c_%npara))
-       ja(:)    = 0
-       j(:)     = 0
-       do iii=1,c_%npara
-          coef = y(iii)%T.sub.j
-          map_coor(1)=coef
-          map_coor(2)=iii
-          map_coor(3)=c_%npara
-          map_coor(4)=0
-          map_coor(5)=ja(1)
-          map_coor(6)=ja(2)
-          map_coor(7)=ja(3)
-          map_coor(8)=ja(4)
-          map_coor(9)=ja(5)
-          map_coor(10)=ja(6)
-          call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-          call augment_count("map_table ")
-       enddo
-       do i = 1,c_%npara
-          do ii = 1,c_%npara
-             j(ii) = 1
-             ja(ii) = j(ii)
-             coef = y(i)%T.sub.j
-             map_coor(1)=coef
-             map_coor(2)=i
-             map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
-             map_coor(4)=no
-             map_coor(5)=ja(1)
-             map_coor(6)=ja(2)
-             map_coor(7)=ja(3)
-             map_coor(8)=ja(4)
-             map_coor(9)=ja(5)
-             map_coor(10)=ja(6)
-             call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-             call augment_count("map_table ")
-             j(:)  = 0
-             ja(ii) = j(ii)
-          enddo
-       enddo
-       deallocate(j)
+      call makemaptable(y)
     endif
 
     normal = get_value('ptc_normal ','normal ') .ne. 0
@@ -2472,6 +2438,8 @@ CONTAINS
        return
     endif
 
+    call killparresult()
+
     call kill_universe(m_u)
     call kill_tpsa
     do i=1,size(s_b)
@@ -2536,7 +2504,6 @@ CONTAINS
 
              s1%junk%v(i)=s2(i)
           enddo
-          !          call daprint(s1%junk,6)
           s1%n=s1%junk
           s1%a1=s1%n%a1
           s1%a_t=s1%n%a_t
@@ -2557,6 +2524,7 @@ CONTAINS
     endif
 
 
+  
     if(nd2.eq.4.and.np.ge.1) then
        do i=1,nd2
           do j=1,nd2
@@ -2574,9 +2542,6 @@ CONTAINS
     endif
 
     if(nd.eq.3) then
-       if (getdebug() > 2) then
-          call daprint(s1%junk,6)
-       endif
        s1%junk1=s1%junk**(-1)
     endif
     ind(:)=0
@@ -2632,10 +2597,10 @@ CONTAINS
           aui(2)=s1%junk1%v(5).sub.string(6)
           if(j.lt.3) then
              s1%disp(ii-1)=au(i3-1,i3-1)*aui(1)+au(i3-1,i3)*aui(2)
-             s1%disp(ii)=au(i3,i3-1)*aui(1)+au(i3,i3)*aui(2)
+             s1%disp(ii)  =au(i3  ,i3-1)*aui(1)+au(i3,i3)  *aui(2)
           else
              s1%disp(5)=angp(1,ii-1)*aui(1)+angp(1,ii)*aui(2)
-             s1%disp(6)=au(ii,ii-1)*aui(1)+au(ii,ii)*aui(2)
+             s1%disp(6)=au(ii,ii-1)*aui(1) +au(ii,ii)*aui(2)
           endif
        endif
 
@@ -2970,5 +2935,62 @@ CONTAINS
 
   END SUBROUTINE Convert_dp_to_dt
   !=============================================================================
+  
+  subroutine makemaptable(y)
+    implicit none
+    type(real_8):: y(6)
+    integer,parameter :: i_map_coor=10
+    integer           :: map_term, ja(6),i,ii,iii
+    real(dp)          :: coef
+    real(kind(1d0))   :: map_coor(i_map_coor)
+
+
+       map_term=42
+       call  make_map_table(map_term)
+       call liepeek(iia,icoast)
+       allocate(j(c_%npara))
+       ja(:)    = 0
+       j(:)     = 0
+       do iii=1,c_%npara
+          coef = y(iii)%T.sub.j
+          map_coor(1)=coef
+          map_coor(2)=iii
+          map_coor(3)=c_%npara
+          map_coor(4)=0
+          map_coor(5)=ja(1)
+          map_coor(6)=ja(2)
+          map_coor(7)=ja(3)
+          map_coor(8)=ja(4)
+          map_coor(9)=ja(5)
+          map_coor(10)=ja(6)
+          call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+          call augment_count("map_table ")
+       enddo
+       do i = 1,c_%npara
+          do ii = 1,c_%npara
+             j(ii) = 1
+             ja(ii) = j(ii)
+             coef = y(i)%T.sub.j
+             map_coor(1)=coef
+             map_coor(2)=i
+             map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
+             map_coor(4)=no
+             map_coor(5)=ja(1)
+             map_coor(6)=ja(2)
+             map_coor(7)=ja(3)
+             map_coor(8)=ja(4)
+             map_coor(9)=ja(5)
+             map_coor(10)=ja(6)
+             call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+             call augment_count("map_table ")
+             j(:)  = 0
+             ja(ii) = j(ii)
+          enddo
+       enddo
+       deallocate(j)
+
+
+
+  end subroutine makemaptable
 
 END MODULE madx_ptc_module

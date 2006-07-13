@@ -7830,6 +7830,53 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
 }
 /********************************************************************************/
 
+void pro_ptc_printparametric(struct in_cmd* cmd)
+{
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+
+  char*                          filename    = 0x0;
+  struct int_array*              filenameIA      = 0x0;
+  static int                     zeroint = 0;
+  int*                           filep = 0x0;
+
+  pos   = name_list_pos("filename", c_parnames);
+  if (pos < 0)
+  {
+    
+    filep = &zeroint;
+  }
+  else
+   {
+     filename  = c_parameters->parameters[pos]->string;
+     if ( filename == 0x0 )
+      {
+        filep = &zeroint;
+      }
+     else
+      {
+        filenameIA = new_int_array(1+strlen(filename));
+        conv_char(filename,filenameIA);
+        filep = filenameIA->i;
+      }
+    }
+
+  pos   = name_list_pos("format", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_printparametric: format parameter does not exist.\n");
+    return;
+  }
+
+  w_ptc_writeparresults(filep);
+
+  delete_int_array(filenameIA);
+  
+  
+}
+/********************************************************************************/
+
 void pro_ptc_printframes(struct in_cmd* cmd)
 {
   struct command_parameter_list* c_parameters= cmd->clone->par;
@@ -8046,66 +8093,123 @@ void pro_ptc_select(struct in_cmd* cmd)
    The most important one is the matching module.
  */
 
-  struct table*                  aTable      = 0x0;
-  struct command_parameter_list* c_parameters= cmd->clone->par;
-  struct name_list*              c_parnames  = cmd->clone->par_names;
-  int                            pos         = 0;
-  char*                          tablename   = 0x0;
-  char*                          columnname  = 0x0;
   int                            element     = 0;
+  int                            parametric  = 0;
+  int*                           tablep      = 0;
+  int*                           columnp     = 0; 
+  static int                     zeroint     = 0;/*if there is no column name or table name these are passed as null strings */
   char*                          monomial    = 0x0;
   struct int_array*              tabnameIA   = 0x0;/*string passing to fortran is tricky*/
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
+  
 /*
   int                            i           = 0;
   struct node*                   nodes[2]    = {0x0,0x0};
   char                           buff[NAME_L];
   char                           placestring[NAME_L];
 */
-  /*extracts table specified by the user*/
-  pos   = name_list_pos("table", c_parnames);
-  if (pos < 0)
-  {
-    printf("madxn.c: pro_ptc_select: table parameter does not exist.\n");
-    return;
-  }
 
-  tablename  = c_parameters->parameters[pos]->string;
-  if ( tablename == 0x0 )
-  {
-    warning("madxn.c: pro_ptc_select: no table name: ", "ignored");
-    return;
-  }
+  element = (int)command_par_value("polynomial",cmd->clone);
+  monomial = command_par_string("monomial",cmd->clone);
+  if (monomial == 0x0)
+   {
+     warning("madxn.c: pro_ptc_select: monomial is NULL ", "ignored");
+     return;
+   }
+  monoIA = new_int_array(1+strlen(monomial));
+  conv_char(monomial,monoIA);
 
-  pos = name_list_pos(tablename, table_register->names);
-  if (pos < 0)
-  {
-    printf("madxn.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
-    return;
-  }
+  pro_ptc_select_checkpushtable(cmd,&tabnameIA,&colnameIA);
 
-  aTable = table_register->tables[pos];
-  if (aTable == 0x0)
-  {
-    printf("madxn.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
-    return;
-  }
+  if ( tabnameIA )
+   {
+     tablep = tabnameIA->i;
+   }
+  else
+   {
+     tablep = &zeroint;
+   } 
+
+  if ( colnameIA )
+   {
+     columnp = colnameIA->i;
+   }
+  else
+   {
+     columnp = &zeroint;
+   } 
+
+  w_ptc_addpush_(tablep,columnp,&element,monoIA->i);
+
+  delete_int_array(tabnameIA);
+  delete_int_array(colnameIA); 
+  delete_int_array(monoIA);
+   
+
+}
+/********************************************************************************/
+int pro_ptc_select_checkpushtable(struct in_cmd* cmd,
+                                  struct int_array** tabnameIA, struct int_array** colnameIA)
+{
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  struct table*                  aTable      = 0x0;
+  int                            pos         = 0;
+  char*                          tablename   = 0x0;
+  char*                          columnname  = 0x0;
+
 
   /*extracts column specified by the user*/
   pos        = name_list_pos("column", c_parnames);
   if (pos < 0)
   {
     printf("madxn.c: pro_ptc_select: column parameter does not exist.\n");
-    return;
+    return 5;
   }
 
   columnname  = c_parameters->parameters[pos]->string;
   if ( columnname == 0x0 )
   {
-    warning("madxn.c: pro_ptc_select: Column name is empty: ", "ignored");
-    return;
+/*    warning("madxn.c: pro_ptc_select: Column name is empty: ", "ignored");*/
+    return 6;
   }
+
+  *colnameIA = new_int_array(1+strlen(columnname));
+  conv_char(columnname,*colnameIA);
+
+
+  /*extracts table specified by the user*/
+  pos   = name_list_pos("table", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_select: table parameter does not exist.\n");
+    return 1;
+  }
+
+  tablename  = c_parameters->parameters[pos]->string;
+  if ( tablename == 0x0 )
+  {
+     return -1;/*This means that table name was not specified at all*/
+  }
+  if ( tablename[0] == 0 )
+   {
+     return -1; /*This means that table name was not specified at all*/
+   }
+  pos = name_list_pos(tablename, table_register->names);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
+    return 3;
+  }
+
+  aTable = table_register->tables[pos];
+  if (aTable == 0x0)
+  {
+    printf("madxn.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
+    return 4;
+  }
+
 
   /*checks if the specified column exists*/
   pos = name_list_pos(columnname,aTable->columns);
@@ -8113,36 +8217,24 @@ void pro_ptc_select(struct in_cmd* cmd)
   {
     error("madxn.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
           columnname,aTable->name);
-    return;
+    return 7;
   }
 
   pos = name_list_pos("name",aTable->columns);
   if (pos < 0)
   {
-    warning("madxn.c: pro_ptc_selectaTable->name: There column named <<name>> in table <<%s>>.",aTable->name);
-    return;
+    warning("madxn.c: pro_ptc_selectaTable->name: There is no column named <<name>> in table <<%s>>.",aTable->name);
+    return 8;
   }
 
   /*so none of the columns is filled */
   aTable->org_cols = aTable->num_cols;
 
 
-  element = (int)command_par_value("polynomial",cmd->clone);
-  monomial = command_par_string("monomial",cmd->clone);
+  *tabnameIA = new_int_array(1+strlen(tablename));
+  conv_char(tablename,*tabnameIA);
 
-  tabnameIA = new_int_array(1+strlen(tablename));
-  colnameIA = new_int_array(1+strlen(columnname));
-  monoIA = new_int_array(1+strlen(monomial));
-  conv_char(tablename,tabnameIA);
-  conv_char(columnname,colnameIA);
-  conv_char(monomial,monoIA);
-
-  w_ptc_addpush_(tabnameIA->i,colnameIA->i,&element,monoIA->i);
-
-  delete_int_array(tabnameIA);
-  delete_int_array(colnameIA);
-  delete_int_array(monoIA);
-
+  return 0;
 }
 /********************************************************************************/
 

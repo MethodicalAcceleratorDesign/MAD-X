@@ -80,6 +80,7 @@
 #define w_ptc_track             w_ptc_track_
 #define w_ptc_start             w_ptc_start_
 #define w_ptc_select            w_ptc_select_
+#define w_ptc_writeparresults   w_ptc_writeparresults_
 #define w_ptc_printframes       w_ptc_printframes_
 #define w_ptc_printlayout_rootm w_ptc_printlayout_rootm_
 #define w_ptc_eplacement        w_ptc_eplacement_
@@ -724,6 +725,7 @@ void w_ptc_settime(int* boolflag);
 void w_ptc_setnocavity(int* boolflag);
 void w_ptc_addknob(int* fibrename);
 void w_ptc_eplacement(int* eidx,int* refframe);
+void w_ptc_writeparresults(int* filename);
 void w_ptc_printframes(int* filename);
 void w_ptc_printlayout_rootm(int* filename);
 void w_ptc_script(int* scriptname);

@@ -1485,6 +1485,11 @@ void exec_command()
         if (kSkowronDebug) printf("madxp.c: Command is ptc_select, calling pro_ptc_select\n");
         pro_ptc_select(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_printparametric") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_printparametric, calling pro_ptc_printparametric\n");
+        pro_ptc_printparametric(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)
       {
         if (kSkowronDebug) printf("madxp.c: Command is ptc_knob, calling pro_ptc_knob\n");
@@ -2358,7 +2363,20 @@ int get_string(char* name, char* par, char* string)
   else
   {
 /*     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);*/
-    if ((cmd = find_command(c_dum->c, stored_commands)) != NULL)
+
+    cmd = find_command(c_dum->c, stored_commands);
+    if (cmd == NULL)
+     {
+       if (current_command != NULL)
+        {
+          if ( strcmp(c_dum->c, current_command->name) == 0)
+           {
+             cmd = current_command;
+           }
+        }
+     }
+    
+    if (cmd != NULL)
     {
 /*        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);*/
       mycpy(c_dum->c, par);
@@ -2372,6 +2390,7 @@ int get_string(char* name, char* par, char* string)
         printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
       }
     }
+    
     else
     {
       printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
