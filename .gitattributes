@@ -56,6 +56,7 @@
 /madx_ptc_eplacement.f90 -text
 /madx_ptc_intstate.f90 -text
 /madx_ptc_knobs.f90 -text
+/madx_ptc_knobs.inc -text
 /madx_ptc_module.f90 -text
 /madx_ptc_script.f90 -text
 /madx_ptc_setcavs.f90 -text
