@@ -72,6 +72,7 @@
 /madxp.c -text
 /madxreg.c -text
 /madxreg.h -text
+/madxsdds.c -text
 /madxu.c -text
 /makethin.c -text
 /match.F -text
