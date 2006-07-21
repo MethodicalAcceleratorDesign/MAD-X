@@ -129,7 +129,7 @@ madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
 madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
 madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
-	madx_ptc_setcavs.o madx_ptc_trackcavs.o madx_ptc_tablepush.o \
+	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_knobs.o \
 	madx_ptc_script.o pointers.o \
 	wrap.f90
