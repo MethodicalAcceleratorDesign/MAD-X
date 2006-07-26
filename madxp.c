@@ -22,6 +22,15 @@
 #include "madxd.h"
 #include "madxdict.h"
 
+/*
+#include "mdb.h"
+#include "scan.h"
+#include "table.h"
+*/
+#ifdef _ONLINE
+#include "sdds.h"
+#endif
+
 /* JMJ 7/11/2002 moved this here from c6t.c */
 /* FS & TdA 15.03.2004 plot upgrade, bugs correction, ptc_twiss upgrade, touschek preparation */
 #include "c6t.h"
@@ -1418,6 +1427,14 @@ void exec_command()
       else if (strcmp(p->cmd_def->module, "emit") == 0)
       {
         pro_emit(p);
+      }
+      else if (strcmp(p->cmd_def->module, "sdds") == 0)
+      {
+#ifdef _ONLINE
+        pro_sdds(p);
+#else
+        warning("ignored, only available in ONLINE model:", "SDDS conversion");
+#endif
       }
       else if (strcmp(p->cmd_def->module, "error") == 0)
       {
