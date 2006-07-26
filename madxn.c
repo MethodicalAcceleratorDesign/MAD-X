@@ -21,6 +21,10 @@
 
 #include "madxc.c"
 
+#ifdef _ONLINE     
+#include "madxsdds.c"
+#endif
+
 #include "sxf.c"
 
 #include "makethin.c"
@@ -7027,6 +7031,10 @@ void store_savebeta(struct in_cmd* cmd)
 
 void store_select(struct in_cmd* cmd)
 {
+
+  char *sdds_pattern;
+  char sdum[1000];
+
   char* flag_name;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -7071,6 +7079,33 @@ void store_select(struct in_cmd* cmd)
       cmd->clone_flag = 1; /* do not drop */
     }
   }
+  else if (strcmp(flag_name, "sdds") == 0)
+  #ifdef _ONLINE     
+   {
+    if (log_val("clear", cmd->clone))
+    {
+         if (get_option("debug")) printf("here CLEAR all selected arrays\n");
+         if(sdds_pat != NULL) sdds_pat = delete_char_p_array(sdds_pat, 1);
+         if (get_option("debug")) printf("ptr after clear: %d\n",(long)sdds_pat);
+    }
+    else
+    {
+         if(sdds_pat == NULL) sdds_pat = new_char_p_array(100);
+         if (get_option("debug")) printf("current selections %d\n",sdds_pat->curr);
+         sdds_pattern = command_par_string("pattern",cmd->clone);
+         if(sdds_pattern != NULL) {
+         if (get_option("debug")) printf("pattern in select: %s\n",sdds_pattern);
+         strcpy(sdum,sdds_pattern);
+         sdds_pat->p[sdds_pat->curr++] = tmpbuff(sdum);
+         }
+    }
+   }
+  #else
+   {
+     warning("ignored, only available in ONLINE model:", "FLAG=SDDS");
+   }
+  #endif
+
   else if (strcmp(flag_name, "makethin") == 0)
   {
     if (log_val("clear", cmd->clone))
