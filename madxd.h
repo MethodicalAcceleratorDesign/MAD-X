@@ -815,7 +815,25 @@ void error_esave(struct in_cmd* cmd);
 void error_seterr(struct in_cmd* cmd);
 void f_ctof(int *j, char *string, int *nel);
 void pro_error_make_efield_table();
-                                                                                                          
+
+/* routines for SDDS */
+void sel_table(char* tname, struct table* t);
+void set_selected_rows_tab(struct table* t, struct command_list* select,
+                       struct command_list* deselect);
+                                                                                                    
+void pro_sdds(struct in_cmd* cmd);
+int  sdds_ior(struct in_cmd* cmd);
+int  sdds_iow(struct in_cmd* cmd);
+int sdds_readt(char *filename, char *tfsname);
+int sdds_writet_sel(char *filename, struct table *tfstab);
+int head_split(char* buf, struct char_p_array* list);
+void sel_table(char* tname, struct table* t);
+void set_selected_rows_tab(struct table* t, struct command_list* select,
+                       struct command_list* deselect);
+int pass_select_tab(char* name, struct command* sc);
+
+
+
 /* regular expression match routines */
 
 struct reg_token* add_tok(char, struct reg_token*);
