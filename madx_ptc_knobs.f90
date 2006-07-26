@@ -30,6 +30,10 @@ module madx_ptc_knobs_module
   public                         :: writeparresults
   public                         :: killparresult
   public                         :: twissfctn
+  public                         :: getknobsnames
+  public                         :: getfctnsnames
+  public                         :: getfunctionat
+  public                         :: getlengthat
   
   interface daprint
     module procedure printunitaylor
@@ -92,6 +96,7 @@ contains
 
     !    print *,"madx_ptc_tablepush :putusertable "
     !    call daprint(y(1),6)
+
     
     if ((getnknobs() > 0) .and. (currentrow > 0)) then
       !if there are any knobs and knobs where initialized (i.e. currentrow > 0)
@@ -213,6 +218,17 @@ contains
   subroutine inittables()
     implicit none
     integer  :: i ! iterator
+
+!     print*, " no=",c_%no
+!     print*, " nv=",c_%nv
+!     print*, " nd=",c_%nd
+!     print*, " nd2=",c_%nd2
+!     print*, " ndpt=",c_%ndpt
+!     print*, " npara_fpp=",c_%npara_fpp
+!     print*, " npara=",c_%npara
+!     print*, " np_pol=",c_%np_pol
+!     print*, " setknob=",c_%setknob
+! 
 
     deallocate(dismom)
     allocate(dismom(c_%nd,0:c_%no/2))
@@ -418,6 +434,10 @@ contains
       print*, "setknobs: There is ", npolblocks, "pol_blocks"
     endif  
     
+    if (npolblocks == 0) then
+      return
+    endif
+    
     do i=1, npolblocks
       pb => polblocks(i)
       if (getdebug() > 2 ) then
@@ -455,6 +475,111 @@ contains
 
   end function getnknobs
   !____________________________________________________________________________________________
+  subroutine getfctnsnames
+    implicit none
+    character*(100) ::name
+    character*(7) ::twname
+    integer i,j,n
+    integer last
+
+    do i=1, ntwisses
+      twname = twissnames(i)
+      twname(7:7) = achar(0)
+      call madxv_setfctnname(i,twname)
+    enddo
+    
+    do i=ntwisses, ntwisses+nmapels
+       do j=1,npushes
+         if (pushes(j)%index /= i ) cycle
+         
+         name = pushes(j)%colname
+
+         last = len_trim(name) + 1
+         if (last > 100) last = 100
+         name(last:last) = achar(0)
+
+         call madxv_setfctnname(i, name)
+         
+       enddo 
+      
+    enddo
+    
+    
+  end subroutine getfctnsnames  
+  !____________________________________________________________________________________________
+
+  subroutine getknobsnames()
+    implicit none
+    character*(100) ::name
+    character*(100) ::fmt
+    integer last
+    integer i,j,n
+    
+    n = 0
+    do i=1, npolblocks
+      do j=1, nmax
+        if (polblocks(i)%ian(j) /= 0 ) then
+          n = n + 1
+          write(name,'(A,A,I2)') polblocks(i)%name(1:len_trim(polblocks(i)%name)), " skew ",polblocks(i)%ian(j)
+
+          print*, "n=",n, name
+
+          last = len_trim(name) + 1
+          if (last > 100) last = 100
+          name(last:last) = achar(0)
+
+          call madxv_setknobname(n,name)
+        endif
+
+        if (polblocks(i)%ibn(j) /= 0 ) then
+          n = n + 1
+          write(name,'(A,A,I2)') polblocks(i)%name(1:len_trim(polblocks(i)%name)) , " normal ",polblocks(i)%ian(j)
+          
+          print*, "n=",n, name
+
+          last = len_trim(name) + 1
+          if (last > 100) last = 100
+          name(last:last) = achar(0)
+          call madxv_setknobname(n,name)
+        endif
+
+      enddo  
+    enddo
+
+
+  end subroutine getknobsnames
+  !____________________________________________________________________________________________
+
+  subroutine getfunctionat( el, n)
+    implicit none
+    integer n, el
+    character*(1200) eq
+    integer eqlength
+
+    if (.not. ALLOCATED(results)) then
+      return
+    endif
+    
+
+    if ( (el < lbound(results,1)) .or. (el > ubound(results,1)) ) then
+      return
+    endif
+
+    if ( (n < lbound(results,2)) .or. (n > ubound(results,2)) ) then
+      return
+    endif
+    
+    
+    call getpareq(results(el,n),eq)
+    
+    
+    
+    eqlength = LEN_TRIM(eq) + 1
+    if (eqlength > 1200) eqlength = 1200
+    eq(eqlength:eqlength) = achar(0)
+    call madxv_setfunctionat(el, n, eq)
+    
+  end subroutine getfunctionat
   !____________________________________________________________________________________________
   !____________________________________________________________________________________________
   !____________________________________________________________________________________________
@@ -880,10 +1005,21 @@ contains
     implicit none
     character*(20)  :: getparname
     integer        :: n
-    
-    write(getparname,'(a1,i2.2)') "p",n
+
+    write(getparname,'(a1,i2.2)') "p",n - c_%npara
     
   end function getparname    
+  !_________________________________________________________________________________
+
+  
+  function getlengthat(n)
+    implicit none
+    real(kind(1d0))  :: getlengthat
+    integer          :: n
+    
+    getlengthat = 1.1
+    
+  end function getlengthat    
   !_________________________________________________________________________________
     
 
@@ -891,10 +1027,40 @@ contains
     implicit none
     type(universal_taylor) :: ut
     integer                :: iunit
+    character*(1200)       :: polyeq
+
+    if(ut%nv /= c_%nv) then
+         call fort_warn("printpareq",&
+          "number of variables of this universal taylor is different from currnet TPSA")
+         return
+    endif     
+
+    call getpareq(ut,polyeq)
+    write(iunit,'(A)')  polyeq
+
+     
+  end subroutine printpareq
+  !_________________________________________________________________________________
+
+  subroutine getpareq(ut,string)
+    implicit none
+    type(universal_taylor) :: ut
+    integer                :: iunit
     integer                :: i,ii
-    integer                :: fp
+    integer                :: cpos, last
     character              :: sign
     character*(20)         :: parname
+    character*(*)          :: string
+
+!    print*,"getpareq"
+
+    if (.not. associated(ut%n)) then
+         call fort_warn("printpareq",&
+          "provided taylor is not allocated")
+         write(string,'(A)') ' 0 '
+         return
+    endif 
+    
 
     if(ut%nv /= c_%nv) then
          call fort_warn("printpareq",&
@@ -902,49 +1068,50 @@ contains
          return
     endif     
     
-    if (.not. associated(ut%n)) then
-         write(iunit,'(A)') ' 0 '
-         return
-    endif 
 
     if(ut%n == 0) then
-         write(iunit,'(A)') ' 0 '
+         write(string,'(A)') ' 0 '
+         print*,"no coefficients in the taylor"
          return
     endif     
     
+    cpos = 1
+    last = len(string)
     sign = ' '
+    print*,"There is ", ut%n, " coefficients "
     do i = 1,ut%n
        
        if ( ut%c(i) < zero ) then
          sign = ' '
        endif
        
-       write(iunit,'(a1,G20.14)', ADVANCE='NO') sign,ut%c(i)
+       write(string(cpos:last),'(a2,G20.14)') sign,ut%c(i); cpos = len_trim(string) + 1;
+       
        do ii = 1, ut%nv
 
          if (ut%j(i,ii) /= 0) then
-           write(iunit,'(A1)', ADVANCE='NO') "*"
+           write(string(cpos:last),'(A1)') "*"; cpos = len_trim(string) + 1;
            parname = getparname(ii)
-           write(iunit,'(a)', ADVANCE='NO') parname(1:LEN_TRIM(parname))
+           write(string(cpos:last),'(a)') parname(1:LEN_TRIM(parname)); cpos = len_trim(string) + 1;
            
            if (ut%j(i,ii) /= 1) then
-             write(iunit,'(a1)', ADVANCE='NO')  "^"
+             write(string(cpos:last),'(a1)')  "^"; cpos = len_trim(string) + 1;
              write(parname,'(i3)')  ut%j(i,ii) 
              parname = ADJUSTL(parname)
-             write(iunit,'(a)', ADVANCE='NO')  parname(1:LEN_TRIM(parname))
+             write(string(cpos:last),'(a)')  parname(1:LEN_TRIM(parname)); cpos = len_trim(string) + 1;
            endif
          endif
 
        enddo
-
+       
+       write(string(cpos:last),'(A1)') " "; cpos = len_trim(string) + 1;
        sign = '+'
     enddo
 
-    write(iunit,'(A)') ''
-
-     
-  end subroutine printpareq
-  
+   
+!    print*, string
+    print*," "
+  end subroutine getpareq
   
  
 end module madx_ptc_knobs_module
@@ -1018,3 +1185,73 @@ end module madx_ptc_knobs_module
 !     print*, "==============================================================="
 !     print*, "==============================================================="
 !     print*, "==============================================================="
+
+
+!____________________________________________________________________________________________
+!____________________________________________________________________________________________
+!____________________________________________________________________________________________
+!____________________________________________________________________________________________
+
+
+function w_ptc_getnknobs()
+  use madx_ptc_knobs_module
+  implicit none
+  integer w_ptc_getnknobs
+
+  w_ptc_getnknobs = getnknobs()
+
+end function w_ptc_getnknobs
+!____________________________________________________________________________________________
+
+ 
+function w_ptc_getlengthat(n)
+  use madx_ptc_knobs_module
+  implicit none
+  real(kind(1d0)) :: w_ptc_getlengthat
+  integer         :: n
+
+  w_ptc_getlengthat = getlengthat(n)
+
+end function w_ptc_getlengthat
+!____________________________________________________________________________________________
+
+
+subroutine w_ptc_getfctnsnames()
+  use madx_ptc_knobs_module
+  implicit none
+
+  call getfctnsnames()
+
+end subroutine w_ptc_getfctnsnames
+!____________________________________________________________________________________________
+
+subroutine w_ptc_getknobsnames()
+  use madx_ptc_knobs_module
+  implicit none
+
+  call getknobsnames()
+
+end subroutine w_ptc_getknobsnames
+!____________________________________________________________________________________________
+
+
+subroutine w_ptc_getfunctionat(e,n)
+  use madx_ptc_knobs_module
+  implicit none
+  integer e,n
+
+  call getfunctionat(e,n)
+
+end subroutine w_ptc_getfunctionat
+
+!____________________________________________________________________________________________
+
+
+subroutine w_ptc_rviewer()
+  implicit none
+  integer :: rviewer
+  integer :: res
+  res =  rviewer()
+end subroutine w_ptc_rviewer
+
+

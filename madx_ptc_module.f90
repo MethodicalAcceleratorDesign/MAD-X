@@ -2441,6 +2441,7 @@ CONTAINS
     call killparresult()
 
     call kill_universe(m_u)
+    nullify(my_ring)
     call kill_tpsa
     do i=1,size(s_b)
        call nul_coef(s_b(i))

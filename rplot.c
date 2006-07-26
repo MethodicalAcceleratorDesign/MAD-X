@@ -2,31 +2,7 @@
 
 #include <stdio.h>
 
-/*
-  #define ROOT_PLOT
-*/
 
-#ifdef ROOT_PLOT
-#include <MadxPlotter.h>
-#define type_OfExtern "C"
-#else
-#define type_OfExtern
-#endif
-
-
-#ifndef WIN32
-# define newrplot newrplot_
-# define plottrack plottrack_
-# define plottwiss plottwiss_
-# define rplotfinish rplotfinish_
-# define type_ofCall
-#else
-# define newrplot NEWRPLOT
-# define plottrack PLOTTRACK
-# define plottwiss PLOTTWISS
-# define rplotfinish RPLOTFINISH
-# define type_ofCall  _stdcall
-#endif
 
 
 extern type_OfExtern
@@ -48,6 +24,7 @@ void type_ofCall plottrack(int* particleno, int* obspoint,
   MadxPlotter::Instance()->Fill(*particleno, *obspoint, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
 #endif
 }
+/*_________________________________________________________________________________________*/
 
 extern type_OfExtern
 void type_ofCall  plottwiss(int* obspoint,
@@ -68,6 +45,7 @@ void type_ofCall  plottwiss(int* obspoint,
   MadxPlotter::Instance()->Fill(*obspoint, *betax, *alfax, *betay, *alfay, *betaz, *alfaz, *length);
 #endif
 }
+/*_________________________________________________________________________________________*/
 
 
 
@@ -79,6 +57,7 @@ extern type_OfExtern void type_ofCall rplotfinish()
 #endif
 
 }
+/*_________________________________________________________________________________________*/
 
 extern type_OfExtern void type_ofCall newrplot()
 {
@@ -87,8 +66,7 @@ extern type_OfExtern void type_ofCall newrplot()
   MadxPlotter::Instance()->NewPlot();
 #endif
 }
-
-
+/*_________________________________________________________________________________________*/
 
 extern type_OfExtern void type_ofCall plotter()
 {
@@ -97,3 +75,54 @@ extern type_OfExtern void type_ofCall plotter()
   MadxPlotter::Instance()->Plotter();
 #endif
 }
+/*_________________________________________________________________________________________*/
+
+
+extern type_OfExtern void type_ofCall print()
+{
+/*adds new plotter*/
+#ifdef ROOT_PLOT
+  MadxPlotter::Instance()->Plotter();
+#endif
+}
+/*_________________________________________________________________________________________*/
+
+
+extern type_OfExtern void type_ofCall rviewer()
+{
+/*adds new plotter*/
+#ifdef ROOT_PLOT
+  
+  MadxViewer::Instance();
+#endif
+}
+/*_________________________________________________________________________________________*/
+
+extern type_OfExtern 
+void type_ofCall madxv_setknobname(int* n, const char* name)
+{
+#ifdef ROOT_PLOT
+  MadxViewer::Instance()->SetKnobName(*n,name);
+#endif
+}
+/*_________________________________________________________________________________________*/
+
+
+extern type_OfExtern 
+void type_ofCall madxv_setfctnname(int* n, const char* name)
+{
+#ifdef ROOT_PLOT
+  MadxViewer::Instance()->SetFunctionName(*n,name);
+#endif
+}
+/*_________________________________________________________________________________________*/
+
+
+extern type_OfExtern 
+void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
+{
+#ifdef ROOT_PLOT
+  MadxViewer::Instance()->SetFunctionAt(*el,*n,name);
+#endif
+}
+
