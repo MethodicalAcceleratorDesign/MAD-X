@@ -4749,6 +4749,558 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      integer beamshape
+      logical fsec,ftrk,fmap
+      double precision orbit(6),re(6,6),te(6,6,6),node_value
+!     if x > explim, exp(-x) is outside machine limits.
+
+!---- chose beamshape
+      beamshape = node_value('bbshape ')
+      if(beamshape.eq.1) call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te)
+      if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te)
+      if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,&
+     &re,te)
+      if(beamshape.lt.1.or.beamshape.gt.3) then
+        beamshape=1
+        call aawarn('TMBB: ','beamshape out of range, set to default=1')
+      endif
+      end
+      subroutine tmbb_gauss(fsec,ftrk,orbit,fmap,re,te)
+
+      implicit none
+      include 'twissl.fi'
+      include 'bb.fi'
+      logical fsec,ftrk,fmap,bborbit
+      integer get_option
+      double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,sx,sy,  &
+     &xm,ym,sx2,sy2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,    &
+     &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
+     &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
+     &orbit0(6),three,ten3m,explim
+      double precision orbit00(6),re00(6,6),te00(6,6,6)
+      parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
+     &explim=150d0)
+!     if x > explim, exp(-x) is outside machine limits.
+
+!---- initialize.
+      bborbit = get_option('bborbit ') .ne. 0
+      if (bbd_flag .ne. 0 .and. .not. bborbit)  then
+        if (bbd_cnt .eq. bbd_max)  then
+          call aawarn('TMBB: ','maximum bb number reached')
+        else
+          bbd_cnt = bbd_cnt + 1
+          bbd_loc(bbd_cnt) = bbd_pos
+          bb_kick(1,bbd_cnt) = zero
+          bb_kick(2,bbd_cnt) = zero
+        endif
+      endif
+      pi=get_variable('pi ')
+      fmap = .true.
+      sx = node_value('sigx ')
+      sy = node_value('sigy ')
+      xm = node_value('xma ')
+      ym = node_value('yma ')
+!--- standard 4D
+      parvec(5)=get_value('probe ', 'arad ')
+      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+      parvec(7)=get_value('probe ','gamma ')
+      fk = two * parvec(5) * parvec(6) / parvec(7)
+      if (fk .ne. zero)  then
+!---- if tracking is desired ...
+        if (ftrk) then
+          sx2 = sx * sx
+          sy2 = sy * sy
+          xs  = orbit(1) - xm
+          ys  = orbit(3) - ym
+
+!---- limit formulas for sigma(x) = sigma(y).
+          if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
+            rho2 = xs * xs + ys * ys
+
+!---- limit case for xs = ys = 0.
+            if (rho2 .eq. zero) then
+              re(2,1) = fk / (two * sx2)
+              re(4,3) = fk / (two * sx2)
+
+!---- general case.
+            else
+              tk = rho2 / (two * sx2)
+              if (tk .gt. explim) then
+                exk  = zero
+                exkc = one
+                phix = xs * fk / rho2
+                phiy = ys * fk / rho2
+              else
+                exk  = exp(-tk)
+                exkc = one - exk
+                phix = xs * fk / rho2 * exkc
+                phiy = ys * fk / rho2 * exkc
+              endif
+
+!---- orbit kick - only applied if option bborbit (HG 5/12/01),
+!     else stored
+              if (bborbit) then
+                orbit(2) = orbit(2) + phix
+                orbit(4) = orbit(4) + phiy
+              elseif (bbd_flag .ne. 0)  then
+                bb_kick(1,bbd_cnt) = phix
+                bb_kick(2,bbd_cnt) = phiy
+              endif
+!---- first-order effects.
+              rho4 = rho2 * rho2
+              phixx = fk * (- exkc * (xs*xs - ys*ys) / rho4             &
+     &+ exk * xs*xs / (rho2 * sx2))
+              phixy = fk * (- exkc * two * xs * ys / rho4               &
+     &+ exk * xs*ys / (rho2 * sx2))
+              phiyy = fk * (+ exkc * (xs*xs - ys*ys) / rho4             &
+     &+ exk * ys*ys / (rho2 * sx2))
+              re(2,1) = phixx
+              re(2,3) = phixy
+              re(4,1) = phixy
+              re(4,3) = phiyy
+
+!---- second-order effects.
+              if (fsec) then
+                rho6 = rho4 * rho2
+                phixxx = fk*xs * (+ exkc * (xs*xs - three*ys*ys) / rho6 &
+     &- exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
+     &- exk * xs*xs / (two * rho2 * sx2**2))
+                phixxy = fk*ys * (+ exkc * (three*xs*xs - ys*ys) / rho6 &
+     &- exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
+     &- exk * xs*xs / (two * rho2 * sx2**2))
+                phixyy = fk*xs * (- exkc * (xs*xs - three*ys*ys) / rho6 &
+     &+ exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
+     &- exk * ys*ys / (two * rho2 * sx2**2))
+                phiyyy = fk*ys * (- exkc * (three*xs*xs - ys*ys) / rho6 &
+     &+ exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
+     &- exk * ys*ys / (two * rho2 * sx2**2))
+                te(2,1,1) = phixxx
+                te(2,1,3) = phixxy
+                te(2,3,1) = phixxy
+                te(4,1,1) = phixxy
+                te(2,3,3) = phixyy
+                te(4,1,3) = phixyy
+                te(4,3,1) = phixyy
+                te(4,3,3) = phiyyy
+              endif
+            endif
+
+!---- case sigma(x) > sigma(y).
+          else
+            r2 = two * (sx2 - sy2)
+            if (sx2 .gt. sy2) then
+              r  = sqrt(r2)
+              rk = fk * sqrt(pi) / r
+              xr = abs(xs) / r
+              yr = abs(ys) / r
+              call ccperrf(xr, yr, crx, cry)
+              tk = (xs * xs / sx2 + ys * ys / sy2) / two
+              if (tk .gt. explim) then
+                exk = zero
+                cbx = zero
+                cby = zero
+              else
+                exk = exp(-tk)
+                xb  = (sy / sx) * xr
+                yb  = (sx / sy) * yr
+                call ccperrf(xb, yb, cbx, cby)
+              endif
+
+!---- case sigma(x) < sigma(y).
+            else
+              r  = sqrt(-r2)
+              rk = fk * sqrt(pi) / r
+              xr = abs(xs) / r
+              yr = abs(ys) / r
+              call ccperrf(yr, xr, cry, crx)
+              tk = (xs * xs / sx2 + ys * ys / sy2) / two
+              if (tk .gt. explim) then
+                exk = zero
+                cbx = zero
+                cby = zero
+              else
+                exk = exp(-tk)
+                xb  = (sy / sx) * xr
+                yb  = (sx / sy) * yr
+                call ccperrf(yb, xb, cby, cbx)
+              endif
+            endif
+
+            phix = rk * (cry - exk * cby) * sign(one, xs)
+            phiy = rk * (crx - exk * cbx) * sign(one, ys)
+!---- orbit kick - only applied if option bborbit (HG 5/12/01),
+!     else stored
+            if (bborbit) then
+              orbit(2) = orbit(2) + phix
+              orbit(4) = orbit(4) + phiy
+            elseif (bbd_flag .ne. 0)  then
+              bb_kick(1,bbd_cnt) = phix
+              bb_kick(2,bbd_cnt) = phiy
+            endif
+
+!---- first-order effects.
+            phixx = (two / r2) * (- (xs * phix + ys * phiy)             &
+     &+ fk * (one - (sy / sx) * exk))
+            phixy = (two / r2) * (- (xs * phiy - ys * phix))
+            phiyy = (two / r2) * (+ (xs * phix + ys * phiy)             &
+     &- fk * (one - (sx / sy) * exk))
+            re(2,1) = phixx
+            re(2,3) = phixy
+            re(4,1) = phixy
+            re(4,3) = phiyy
+
+!---- second-order effects.
+            if (fsec) then
+              phixxx = (- phix - (xs * phixx + ys * phixy)              &
+     &+ fk * xs * sy * exk / sx**3) / r2
+              phixxy = (- phiy - (xs * phixy - ys * phixx)) / r2
+              phixyy = (+ phix - (xs * phiyy - ys * phixy)) / r2
+              phiyyy = (+ phiy + (xs * phixy + ys * phiyy)              &
+     &- fk * ys * sx * exk / sy**3) / r2
+              te(2,1,1) = phixxx
+              te(2,1,3) = phixxy
+              te(2,3,1) = phixxy
+              te(4,1,1) = phixxy
+              te(2,3,3) = phixyy
+              te(4,1,3) = phixyy
+              te(4,3,1) = phixyy
+              te(4,3,3) = phiyyy
+            endif
+          endif
+
+!---- no tracking desired.
+        else
+          re(2,1) = fk / (sx * (sx + sy))
+          re(4,3) = fk / (sy * (sx + sy))
+        endif
+!---- centre option
+        if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
+          if(centre_cptk) then
+            call dcopy(orbit,orbit0,6)
+            call twcptk(re,orbit0)
+          endif
+          if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
+        endif
+      endif
+
+      end
+      subroutine tmbb_flattop(fsec,ftrk,orbit,fmap,re,te)
+      implicit none
+      include 'twissl.fi'
+      include 'bb.fi'
+      logical fsec,ftrk,fmap,bborbit
+      integer get_option
+      double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
+     &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,  &
+     &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
+     &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
+     &orbit0(6),three,ten3m,explim,rmin,rmax,wi,width,rho,wx,wy,norm,   &
+     &phir,phirr,phirrr
+      double precision orbit00(6),re00(6,6),te00(6,6,6)
+      parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
+     &explim=150.0d0)
+!     if x > explim, exp(-x) is outside machine limits.
+
+!---- initialize.
+      bborbit = get_option('bborbit ') .ne. 0
+      if (bbd_flag .ne. 0 .and. .not. bborbit)  then
+        if (bbd_cnt .eq. bbd_max)  then
+          call aawarn('TMBB: ','maximum bb number reached')
+        else
+          bbd_cnt = bbd_cnt + 1
+          bbd_loc(bbd_cnt) = bbd_pos
+          bb_kick(1,bbd_cnt) = zero
+          bb_kick(2,bbd_cnt) = zero
+        endif
+      endif
+      pi=get_variable('pi ')
+      fmap = .true.
+      r0x = node_value('sigx ')
+      r0y = node_value('sigy ')
+      wi = node_value('width ')
+      xm = node_value('xma ')
+      ym = node_value('yma ')
+!--- standard 4D
+      parvec(5)=get_value('probe ', 'arad ')
+      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+      parvec(7)=get_value('probe ','gamma ')
+      fk = two * parvec(5) * parvec(6) / parvec(7)
+      if (fk .ne. zero)  then
+!---- if tracking is desired ...
+        if (ftrk) then
+          r0x2 = r0x * r0x
+          r0y2 = r0y * r0y
+          wx  = r0x * wi
+          wy  = r0y * wi
+          xs  = orbit(1) - xm
+          ys  = orbit(3) - ym
+!---- limit formulas for sigma(x) = sigma(y).
+!-----      preliminary the only case considered.
+          if (abs(r0x2 - r0y2) .le. ten3m * (r0x2 + r0y2)) then
+            rho2 = xs * xs + ys * ys
+            rho  = sqrt(rho2)
+            norm = (12.0*r0x**2+wx**2)/24.0
+            if(rho.le.r0x-wx/2.0) then
+              phir=0.5/norm
+              phix=phir*xs
+              phiy=phir*ys
+              phixx=0.5/norm
+              phixy=zero
+              phiyy=0.5/norm
+              re(2,1) = phixx
+              re(2,3) = phixy
+              re(4,1) = phixy
+              re(4,3) = phiyy
+              if(fsec) then
+                te(2,1,1) = zero
+                te(2,1,3) = zero
+                te(2,3,1) = zero
+                te(4,1,1) = zero
+                te(2,3,3) = zero
+                te(4,1,3) = zero
+                te(4,3,1) = zero
+                te(4,3,3) = zero
+              endif
+            else if(rho.gt.r0x-wx/2.0.and.rho.gt.r0x+wx/2.0) then
+              phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +        &
+     &wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
+     &rho/3.0/wx)/norm
+              phix = phir*xs
+              phiy = phir*ys
+              phirr = - (2.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 + &
+     &wx**2/48.0)/rho2**2 + 1.0/rho/3.0/wx)/norm
+              phixx = phir + xs*xs*phirr
+              phixy = xs*ys*phirr
+              phiyy = phir + ys*ys*phirr
+              re(2,1) = phixx
+              re(2,3) = phixy
+              re(4,1) = phixy
+              re(4,3) = phiyy
+! 2nd order effects
+              if(fsec) then
+                phirrr =  (8.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 &
+     &+ wx**2/48.0)/rho2**3 + 1.0/3.0/wx/rho**3)/norm
+                phixxx = 3.0*xs*phirr + xs**3*phirrr
+                phixxy = ys*phirr + xs*xs*ys*phirrr
+                phixyy = xs*phirr + xs*ys*ys*phirrr
+                phiyyy = 3.0*ys*phirr + ys**3*phirrr
+                te(2,1,1) = phixxx
+                te(2,1,3) = phixxy
+                te(2,3,1) = phixxy
+                te(4,1,1) = phixxy
+                te(2,3,3) = phixyy
+                te(4,1,3) = phixyy
+                te(4,3,1) = phixyy
+                te(4,3,3) = phiyyy
+              endif
+            else if(rho.ge.r0x+wx/2.0) then
+              phir = 1.0/rho2
+              phix = xs*phir
+              phiy = ys*phir
+              phirr = -2.0/rho2**2
+              phixx = phir+xs*xs*phirr
+              phixy = xs*ys*phirr
+              phiyy = phir+ys*ys*phirr
+              re(2,1) = phixx
+              re(2,3) = phixy
+              re(4,1) = phixy
+              re(4,3) = phiyy
+! 2nd order effects
+              if(fsec) then
+                phirrr = 8.0/rho2**3
+                phixxx = 3.0*xs*phirr + xs**3*phirrr
+                phixxy = ys*phirr + xs*xs*ys*phirrr
+                phixyy = xs*phirr + xs*ys*ys*phirrr
+                phiyyy = 3.0*ys*phirr + ys**3*phirrr
+                te(2,1,1) = phixxx
+                te(2,1,3) = phixxy
+                te(2,3,1) = phixxy
+                te(4,1,1) = phixxy
+                te(2,3,3) = phixyy
+                te(4,1,3) = phixyy
+                te(4,3,1) = phixyy
+                te(4,3,3) = phiyyy
+              end if
+            endif
+          endif
+!---- no tracking desired.
+        else 
+          phixx=0.5/norm
+          phiyy=0.5/norm
+          re(2,1) = phixx
+          re(4,3) = phiyy
+        endif
+      endif
+!
+      end
+      subroutine tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te)
+      implicit none
+      include 'twissl.fi'
+      include 'bb.fi'
+      logical fsec,ftrk,fmap,bborbit
+      integer get_option
+      double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
+     &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,  &
+     &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
+     &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
+     &orbit0(6),three,ten3m,explim,rmin,rmax,wi,width,rho,wx,wy,norm,   &
+     &phir,phirr,phirrr
+      double precision orbit00(6),re00(6,6),te00(6,6,6)
+      parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
+     &explim=150.0d0)
+!     if x > explim, exp(-x) is outside machine limits.
+
+!---- initialize.
+      bborbit = get_option('bborbit ') .ne. 0
+      if (bbd_flag .ne. 0 .and. .not. bborbit)  then
+        if (bbd_cnt .eq. bbd_max)  then
+          call aawarn('TMBB: ','maximum bb number reached')
+        else
+          bbd_cnt = bbd_cnt + 1
+          bbd_loc(bbd_cnt) = bbd_pos
+          bb_kick(1,bbd_cnt) = zero
+          bb_kick(2,bbd_cnt) = zero
+        endif
+      endif
+      pi=get_variable('pi ')
+      fmap = .true.
+      r0x = node_value('sigx ')
+      r0y = node_value('sigy ')
+! width is given as FWHM of the parabolic density profile, but formulas 
+! were derived with half width at the bottom of this density profile
+      wi = node_value('width ')
+      wi = wi/sqrt(2.0)
+      xm = node_value('xma ')
+      ym = node_value('yma ')
+!--- standard 4D
+      parvec(5)=get_value('probe ', 'arad ')
+      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+      parvec(7)=get_value('probe ','gamma ')
+      fk = two * parvec(5) * parvec(6) / parvec(7)
+      if (fk .ne. zero)  then
+!---- if tracking is desired ...
+        if (ftrk) then
+          r0x2 = r0x * r0x
+          r0y2 = r0y * r0y
+          wx  = r0x * wi
+          wy  = r0y * wi
+          xs  = orbit(1) - xm
+          ys  = orbit(3) - ym
+!---- limit formulas for sigma(x) = sigma(y).
+!-----      preliminary the only case considered.
+          if (abs(r0x2 - r0y2) .le. ten3m * (r0x2 + r0y2)) then
+            rho2 = xs * xs + ys * ys
+            rho  = sqrt(rho2)
+            if(rho.le.r0x-wx) then
+              re(2,1) = zero
+              re(4,3) = zero
+              re(2,3) = zero
+              re(4,1) = zero
+              if(fsec) then
+                te(2,1,1) = zero
+                te(2,1,3) = zero
+                te(2,3,1) = zero
+                te(4,1,1) = zero
+                te(2,3,3) = zero
+                te(4,1,3) = zero
+                te(4,3,1) = zero
+                te(4,3,3) = zero
+              end if
+            else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
+              phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0+    &
+     &2.0*r0x*wx/3.0 - wx**2/4.0 + rho2/2.0*(1.0 -                      &
+     &r0x**2/wx**2) + rho**3/3.0*2.0*r0x/wx**2 -                        &
+     &rho**4/4.0/wx**2)
+              phix = phir*xs
+              phiy = phir*ys
+              phirr = 0.75/wx/r0x*(-2.0/rho**4*(r0x**4/12.0/wx**2-      &
+     &r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0)+                             &
+     &2.0*r0x/wx**2/3.0/rho-0.5/wx**2)
+              phixx = phir+xs*xs*phirr
+              phixy = xs*ys*phirr
+              phiyy = phir+ys*ys*phirr
+              re(2,1) = phixx
+              re(2,3) = phixy
+              re(4,1) = phixy
+              re(4,3) = phiyy
+! 2nd order effects
+              if(fsec) then
+                phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/         &
+     &wx**2-r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) -                      &
+     &2.0*r0x/3.0/wx**2/rho**3)
+                phixxx = 3.0*xs*phirr + xs**3*phirrr
+                phixxy = ys*phirr + xs*xs*ys*phirrr
+                phixyy = xs*phirr + xs*ys*ys*phirrr
+                phiyyy = 3.0*ys*phirr + ys**3*phirrr
+                te(2,1,1) = phixxx
+                te(2,1,3) = phixxy
+                te(2,3,1) = phixxy
+                te(4,1,1) = phixxy
+                te(2,3,3) = phixyy
+                te(4,1,3) = phixyy
+                te(4,3,1) = phixyy
+                te(4,3,3) = phiyyy
+              end if
+            else if(rho.ge.r0x+wx) then
+              phir = 1.0/rho2
+              phix = xs*phir
+              phiy = ys*phir
+              phirr = -2.0/rho2**2
+              phixx = phir+xs*xs*phirr
+              phixy = xs*ys*phirr
+              phiyy = phir+ys*ys*phirr
+              re(2,1) = phixx
+              re(2,3) = phixy
+              re(4,1) = phixy
+              re(4,3) = phiyy
+! 2nd order effects
+              if(fsec) then
+                phirrr = 8.0/rho2**3
+                phixxx = 3.0*xs*phirr + xs**3*phirrr
+                phixxy = ys*phirr + xs*xs*ys*phirrr
+                phixyy = xs*phirr + xs*ys*ys*phirrr
+                phiyyy = 3.0*ys*phirr + ys**3*phirrr
+                te(2,1,1) = phixxx
+                te(2,1,3) = phixxy
+                te(2,3,1) = phixxy
+                te(4,1,1) = phixxy
+                te(2,3,3) = phixyy
+                te(4,1,3) = phixyy
+                te(4,3,1) = phixyy
+                te(4,3,3) = phiyyy
+              end if
+            endif
+          endif
+!---- no tracking desired.
+        else
+          re(2,1) = zero
+          re(4,3) = zero
+        endif
+      endif
+!
+      end
+      subroutine tmbb_old(fsec,ftrk,orbit,fmap,re,te)
+
+      implicit none
+!----------------------------------------------------------------------*
+! purpose:                                                             *
+!   transport map for beam-beam element.                               *
+! input:                                                               *
+!   fsec      (logical) must be .true. for this purpose                *
+!   ftrk      (logical) must be true for this purpose                  *
+! input/output:                                                        *
+!   orbit(6)  (double)  closed orbit (only kick is added since BB thin)*
+! output:                                                              *
+!   fmap      (logical) if map has been calculated correctly           *
+!   re(6,6)   (double)  transfer matrix.                               *
+!   te(6,6,6) (double)  second-order terms.                            *
+!----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'bb.fi'
       logical fsec,ftrk,fmap,bborbit
