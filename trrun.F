@@ -62,7 +62,7 @@
 !      print *," "
 !      print *," AK special version 2006/04/23"
 !      print *," ============================="
-!      print *," Full 6D formulae internally only."      
+!      print *," Full 6D formulae internally only."
 
 
       if(fsecarb) then
@@ -700,7 +700,7 @@
         do j = 1, 2
 !          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
 !     &/ (one + deltas)
-          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          
+          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))
           if (field(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
@@ -799,12 +799,12 @@
 !        track(5,jtrk) = track(5,jtrk)                                   &
 !     &- (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
         track(2,jtrk) = track(2,jtrk) -                                 &
-     &   (dbr + dxt(jtrk) - dipr * (ttt - one))
+     &(dbr + dxt(jtrk) - dipr * (ttt - one))
         track(4,jtrk) = track(4,jtrk) +                                 &
-     &   (dbi + dyt(jtrk) - dipi * (ttt - one))
+     &(dbi + dyt(jtrk) - dipi * (ttt - one))
         track(5,jtrk) = track(5,jtrk) -                                 &
-     &   (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *                    &
-     &   ((one + bet0*track(6,jtrk))/ttt)*bet0i
+     &(dipr*track(1,jtrk) - dipi*track(3,jtrk)) *                       &
+     &((one + bet0*track(6,jtrk))/ttt)*bet0i
       enddo
 
 !---- Radiation loss at exit.
@@ -1067,7 +1067,7 @@
 !---- AK 20060413
 !---- Ripken DESY-95-189 p.36
         track(5,itrack) = track(5,itrack)                               &
-     &                  + bet0i*(el - (one + bet0*pt) * ttt)
+     &+ bet0i*(el - (one + bet0*pt) * ttt)
       enddo
       end
       subroutine ttrf(track,ktrack)
@@ -1323,7 +1323,7 @@
 !      enddo
 
 !---- Kick at dipole corrector magnet
-!     including PT-dependence 
+!     including PT-dependence
       do itrack = 1, ktrack
         px = track(2,itrack)
         py = track(4,itrack)
@@ -1344,10 +1344,10 @@
 !        yp = py/ttt + dpyy/ddd
 !
 !        ttt = sqrt(one + xp**2 + yp**2)
-!        
+!
 !        px = xp*ddd/ttt ! Transform back to canonical coordinates
 !        py = yp*ddd/ttt
-!        
+!
 !        track(2,itrack) = px
 !        track(4,itrack) = py
 
@@ -1358,7 +1358,7 @@
 !        track(5,itrack) = track(5,itrack) -                             &
 !     &   (dpxx*track(1,itrack) - dpyy*track(3,itrack)) *                &
 !     &   ((one + bet0*track(6,itrack))/ddd)*bet0i
-        
+
       enddo
 
 !---- Half radiation effects at exit.
@@ -1442,17 +1442,24 @@
 !----------------------------------------------------------------------*
       integer ktrack,beamshape
       double precision track(6,*),parvec(*),node_value
+      logical first
+      save first
+      data first / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
 !---- chose beamshape
       beamshape = node_value('bbshape ')
+      if(beamshape.lt.1.or.beamshape.gt.3) then
+        beamshape=1
+        if(first) then
+          first = .false.
+          call aawarn('TTBB: ',                                         &
+     &'beamshape out of range, set to default=1')
+        endif
+      endif
       if(beamshape.eq.1) call ttbb_gauss(track,ktrack,parvec)
       if(beamshape.eq.2) call ttbb_flattop(track,ktrack,parvec)
       if(beamshape.eq.3) call ttbb_hollowparabolic(track,ktrack,parvec)
-      if(beamshape.lt.1.or.beamshape.gt.3) then
-        beamshape=1
-        call aawarn('TTBB: ','beamshape out of range, set to default=1')
-      endif
 
       end
       subroutine ttbb_gauss(track,ktrack,parvec)
@@ -1591,14 +1598,16 @@
 ! input and output as those of subroutine ttbb                         *
 ! ---------------------------------------------------------------------*
       include 'bb.fi'
-      logical bborbit
+      logical bborbit,first
       integer ktrack,itrack,ipos,get_option,beamshape
       double precision track(6,*),parvec(*),pi,r0x,r0y,wi,wx,wy,xm,ym,  &
      &r0x2,r0y2,xs,ys,rho,rho2,fk,tk,phir,phix,phiy,rk,xb,yb,crx,       &
      &cry,xr,yr,r,r2,cbx,cby,get_variable,node_value,zero,one,two,      &
-     &three,ten3m,explim,norm,r0,r1
+     &three,ten3m,explim,norm,r0,r1,zz
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
+      save first
+      data first / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
 !---- initialize.
@@ -1628,33 +1637,42 @@
 !---- limit formulae for mean radius(x) = mean radius(y),
 !-----      preliminary the only case considered.
 !
-      if (abs(r0x2 - r0y2) .le. ten3m * (r0x2 + r0y2)) then
-        norm = (12.0*r0x**2 + wx**2)/24.0
-        r1=r0x-wx/2.0
-        do itrack = 1, ktrack
-          xs = track(1,itrack) - xm
-          ys = track(3,itrack) - ym
-          rho2 = xs * xs + ys * ys
-          rho  = sqrt(rho2)
-          if(rho.le.r1) then
-            phir = 0.5/norm
-            phix = phir*xs
-            phiy = phir*ys
-          else if(rho.gt.r1.and.rho.lt.r1+wx) then
-            phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +          &
+      if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+        zz = 0.5*(r0x + r0y)
+        r0x=zz
+        r0y=zz
+        r0x2=r0x*r0x
+        r0y2=r0y*r0y
+        if(first) then
+          first=.false.
+          call aawarn('TTBB_FLATTOP: ','beam is assumed to be circular')
+        endif
+      endif
+      norm = (12.0*r0x**2 + wx**2)/24.0
+      r1=r0x-wx/2.0
+      do itrack = 1, ktrack
+        xs = track(1,itrack) - xm
+        ys = track(3,itrack) - ym
+        rho2 = xs * xs + ys * ys
+        rho  = sqrt(rho2)
+        if(rho.le.r1) then
+          phir = 0.5/norm
+          phix = phir*xs
+          phiy = phir*ys
+        else if(rho.gt.r1.and.rho.lt.r1+wx) then
+          phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +            &
      &wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
      &rho/3.0/wx)/norm
-            phix = phir*xs
-            phiy = phir*ys
-          else if(rho.ge.r1+wx) then
-            phir = 1.0/rho2
-            phix = xs*phir
-            phiy = ys*phir
-          endif
-          track(2,itrack) = track(2,itrack)+phix*fk
-          track(4,itrack) = track(4,itrack)+phiy*fk
-        end do
-      end if
+          phix = phir*xs
+          phiy = phir*ys
+        else if(rho.ge.r1+wx) then
+          phir = 1.0/rho2
+          phix = xs*phir
+          phiy = ys*phir
+        endif
+        track(2,itrack) = track(2,itrack)+phix*fk
+        track(4,itrack) = track(4,itrack)+phiy*fk
+      end do
 
       end
       subroutine ttbb_hollowparabolic(track,ktrack,parvec)
@@ -1666,14 +1684,16 @@
 ! input and output as those of subroutine ttbb                         *
 ! ---------------------------------------------------------------------*
       include 'bb.fi'
-      logical bborbit
+      logical bborbit,first
       integer ktrack,itrack,ipos,get_option,beamshape
       double precision track(6,*),parvec(*),pi,r0x,r0y,wi,wx,wy,xm,ym,  &
      &r0x2,r0y2,xs,ys,rho,rho2,fk,tk,phir,phix,phiy,rk,xb,yb,crx,cry,xr,&
      &yr,r,r2,cbx,cby,get_variable,node_value,zero,one,two,three,ten3m, &
-     &explim
+     &explim,zz
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
+      save first
+      data first / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
 !---- initialize.
@@ -1706,31 +1726,41 @@
 !---- limit formulae for mean radius(x) = mean radius(y),
 !-----      preliminary the only case considered.
 !
-      if (abs(r0x2 - r0y2) .le. ten3m * (r0x2 + r0y2)) then
-        do itrack = 1, ktrack
-          xs = track(1,itrack) - xm
-          ys = track(3,itrack) - ym
-          rho2 = xs * xs + ys * ys
-          rho  = sqrt(rho2)
-          if(rho.le.r0x-wx) then
-            phix = zero
-            phiy = zero
-          else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
-            phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0 +     &
+      if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+        zz = 0.5*(r0x + r0y)
+        r0x=zz
+        r0y=zz
+        r0x2=r0x*r0x
+        r0y2=r0y*r0y
+        if(first) then
+          first=.false.
+          call aawarn('TTBB_HOLLOWPARABOLIC: ',                         &
+     &         'beam is assumed to be circular')
+        endif
+      endif
+      do itrack = 1, ktrack
+        xs = track(1,itrack) - xm
+        ys = track(3,itrack) - ym
+        rho2 = xs * xs + ys * ys
+        rho  = sqrt(rho2)
+        if(rho.le.r0x-wx) then
+          phix = zero
+          phiy = zero
+        else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
+          phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0 +       &
      &2.0*r0x*wx/3.0 - wx**2/4.0 + rho2/2.0*(1.0 -                      &
      &r0x**2/wx**2) + rho**3/3.0*2.0*r0x/wx**2 -                        &
      &rho**4/4.0/wx**2)
-            phix = phir*xs
-            phiy = phir*ys
-          else
-            phir = 1.0/rho2
-            phix = xs*phir
-            phiy = ys*phir
-          endif
-          track(2,itrack) = track(2,itrack)+phix*fk
-          track(4,itrack) = track(4,itrack)+phiy*fk
-        end do
-      end if
+          phix = phir*xs
+          phiy = phir*ys
+        else
+          phir = 1.0/rho2
+          phix = xs*phir
+          phiy = ys*phir
+        endif
+        track(2,itrack) = track(2,itrack)+phix*fk
+        track(4,itrack) = track(4,itrack)+phiy*fk
+      end do
 
       end
       subroutine ttbb_old(track,ktrack,parvec)
@@ -1979,18 +2009,18 @@
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
       data table / 'track.obs$$$$.p$$$$' /
 
-      tt = turn 
+      tt = turn
       tn = npart
-      
+
       write(table(10:13), '(i4.4)') nobs
       write(table(16:19), '(i4.4)') npart
-      
+
       energy = get_value('probe ','energy ')
-      
-      call double_to_table(table, 'turn ', tt)   ! the number of the current turn
-      call double_to_table(table, 'number ', tn) ! the number of the current particle
+
+      call double_to_table(table, 'turn ', tt)   ! the number of the cur
+      call double_to_table(table, 'number ', tn) ! the number of the cur
       call double_to_table(table, 'e ', energy)
-      
+
       do j = 1, 6
         tmp = orbit(j) - orbit0(j)
         call double_to_table(table, vec_names(j), tmp)
@@ -2093,18 +2123,18 @@
       ey = get_value('probe ','ey ')
       et = get_value('probe ','et ')
 !-----get x add-on for lyaponuv calculation from dynap table
-        deltax = get_value('dynap ', 'lyapunov ')
+      deltax = get_value('dynap ', 'lyapunov ')
  1    continue
       jt  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
       if (switch.gt.1) then
-      j = 2*jt-1
+        j = 2*jt-1
       else
-      j = jt
+        j = jt
       endif
       if (j .ne. -1 .and. j.ne.0)  then
         if (switch .lt. 3 .or. j .eq. 1)  then
           jend = j
-          if (switch.gt.1) jend=jend+1 
+          if (switch.gt.1) jend=jend+1
 !---- Get start coordinates
           track(1) = x
           track(2) = px
@@ -2162,23 +2192,23 @@
             z(k,j) = orbit0(k) + zstart(k)
           enddo
           if (switch.gt.1) then
-          do k = 1, 6
-            z(k,j+1) = z(k,j)
-          enddo
+            do k = 1, 6
+              z(k,j+1) = z(k,j)
+            enddo
             z(1,j+1) = z(1,j) + deltax
           endif
         endif
         goto 1
       endif
-c      if (switch .eq. 3)  then
+!      if (switch .eq. 3)  then
 !--- create second particle with x add-on
-c        deltax = get_value('dynap ', 'lyapunov ')
-c        jend = 2
-c        z(1,jend) = z(1,1) + deltax
-c        do k = 2, 6
-c          z(k,jend) = z(k,1)
-c        enddo
-c      endif
+!        deltax = get_value('dynap ', 'lyapunov ')
+!        jend = 2
+!        z(1,jend) = z(1,1) + deltax
+!        do k = 2, 6
+!          z(k,jend) = z(k,1)
+!        enddo
+!      endif
       end
       subroutine trbegn(rt,eigen)
       implicit none
@@ -2341,12 +2371,12 @@ c      endif
       do  itrack = 1, ktrack
 !
 !     Add vector to particle coordinates
-        track(1,itrack) = track(1,itrack) + t_x       
-        track(2,itrack) = track(2,itrack) + t_px      
-        track(3,itrack) = track(3,itrack) + t_y      
-        track(4,itrack) = track(4,itrack) + t_py      
-        track(5,itrack) = track(5,itrack) + t_sig      
-        track(6,itrack) = track(6,itrack) + t_psig      
+        track(1,itrack) = track(1,itrack) + t_x
+        track(2,itrack) = track(2,itrack) + t_px
+        track(3,itrack) = track(3,itrack) + t_y
+        track(4,itrack) = track(4,itrack) + t_py
+        track(5,itrack) = track(5,itrack) + t_sig
+        track(6,itrack) = track(6,itrack) + t_psig
 !
       enddo
       end

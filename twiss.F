@@ -4750,20 +4750,26 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       integer beamshape
-      logical fsec,ftrk,fmap
+      logical fsec,ftrk,fmap,first
       double precision orbit(6),re(6,6),te(6,6,6),node_value
+      save first
+      data first / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
 !---- chose beamshape
       beamshape = node_value('bbshape ')
+      if(beamshape.lt.1.or.beamshape.gt.3) then
+        beamshape=1
+        if(first) then
+          first = .false.
+          call aawarn('TMBB: ',                                         &
+     &'beamshape out of range, set to default=1')
+        endif
+      endif
       if(beamshape.eq.1) call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te)
       if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te)
       if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,&
      &re,te)
-      if(beamshape.lt.1.or.beamshape.gt.3) then
-        beamshape=1
-        call aawarn('TMBB: ','beamshape out of range, set to default=1')
-      endif
       end
       subroutine tmbb_gauss(fsec,ftrk,orbit,fmap,re,te)
 
@@ -4994,17 +5000,19 @@
       implicit none
       include 'twissl.fi'
       include 'bb.fi'
-      logical fsec,ftrk,fmap,bborbit
+      logical fsec,ftrk,fmap,bborbit,firstflag
       integer get_option
       double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
      &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,  &
      &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
      &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
      &orbit0(6),three,ten3m,explim,rmin,rmax,wi,width,rho,wx,wy,norm,   &
-     &phir,phirr,phirrr
+     &phir,phirr,phirrr,zz
       double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
      &explim=150.0d0)
+      save firstflag
+      data firstflag / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
 !---- initialize.
@@ -5042,95 +5050,105 @@
           ys  = orbit(3) - ym
 !---- limit formulas for sigma(x) = sigma(y).
 !-----      preliminary the only case considered.
-          if (abs(r0x2 - r0y2) .le. ten3m * (r0x2 + r0y2)) then
-            rho2 = xs * xs + ys * ys
-            rho  = sqrt(rho2)
-            norm = (12.0*r0x**2+wx**2)/24.0
-            if(rho.le.r0x-wx/2.0) then
-              phir=0.5/norm
-              phix=phir*xs
-              phiy=phir*ys
-              phixx=0.5/norm
-              phixy=zero
-              phiyy=0.5/norm
-              re(2,1) = phixx
-              re(2,3) = phixy
-              re(4,1) = phixy
-              re(4,3) = phiyy
-              if(fsec) then
-                te(2,1,1) = zero
-                te(2,1,3) = zero
-                te(2,3,1) = zero
-                te(4,1,1) = zero
-                te(2,3,3) = zero
-                te(4,1,3) = zero
-                te(4,3,1) = zero
-                te(4,3,3) = zero
-              endif
-            else if(rho.gt.r0x-wx/2.0.and.rho.gt.r0x+wx/2.0) then
-              phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +        &
-     &wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
-     &rho/3.0/wx)/norm
-              phix = phir*xs
-              phiy = phir*ys
-              phirr = - (2.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 + &
-     &wx**2/48.0)/rho2**2 + 1.0/rho/3.0/wx)/norm
-              phixx = phir + xs*xs*phirr
-              phixy = xs*ys*phirr
-              phiyy = phir + ys*ys*phirr
-              re(2,1) = phixx
-              re(2,3) = phixy
-              re(4,1) = phixy
-              re(4,3) = phiyy
-! 2nd order effects
-              if(fsec) then
-                phirrr =  (8.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 &
-     &+ wx**2/48.0)/rho2**3 + 1.0/3.0/wx/rho**3)/norm
-                phixxx = 3.0*xs*phirr + xs**3*phirrr
-                phixxy = ys*phirr + xs*xs*ys*phirrr
-                phixyy = xs*phirr + xs*ys*ys*phirrr
-                phiyyy = 3.0*ys*phirr + ys**3*phirrr
-                te(2,1,1) = phixxx
-                te(2,1,3) = phixxy
-                te(2,3,1) = phixxy
-                te(4,1,1) = phixxy
-                te(2,3,3) = phixyy
-                te(4,1,3) = phixyy
-                te(4,3,1) = phixyy
-                te(4,3,3) = phiyyy
-              endif
-            else if(rho.ge.r0x+wx/2.0) then
-              phir = 1.0/rho2
-              phix = xs*phir
-              phiy = ys*phir
-              phirr = -2.0/rho2**2
-              phixx = phir+xs*xs*phirr
-              phixy = xs*ys*phirr
-              phiyy = phir+ys*ys*phirr
-              re(2,1) = phixx
-              re(2,3) = phixy
-              re(4,1) = phixy
-              re(4,3) = phiyy
-! 2nd order effects
-              if(fsec) then
-                phirrr = 8.0/rho2**3
-                phixxx = 3.0*xs*phirr + xs**3*phirrr
-                phixxy = ys*phirr + xs*xs*ys*phirrr
-                phixyy = xs*phirr + xs*ys*ys*phirrr
-                phiyyy = 3.0*ys*phirr + ys**3*phirrr
-                te(2,1,1) = phixxx
-                te(2,1,3) = phixxy
-                te(2,3,1) = phixxy
-                te(4,1,1) = phixxy
-                te(2,3,3) = phixyy
-                te(4,1,3) = phixyy
-                te(4,3,1) = phixyy
-                te(4,3,3) = phiyyy
-              end if
+          if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+            zz = 0.5*(r0x + r0y)
+            r0x=zz
+            r0y=zz
+            r0x2=r0x*r0x
+            r0y2=r0y*r0y
+            if(firstflag) then
+              firstflag=.false.
+              call aawarn('TMBB_FLATTOP: ',                             &
+     &             'beam is assumed to be circular')
             endif
           endif
+          rho2 = xs * xs + ys * ys
+          rho  = sqrt(rho2)
+          norm = (12.0*r0x**2+wx**2)/24.0
+          if(rho.le.r0x-wx/2.0) then
+            phir=0.5/norm
+            phix=phir*xs
+            phiy=phir*ys
+            phixx=0.5/norm
+            phixy=zero
+            phiyy=0.5/norm
+            re(2,1) = phixx
+            re(2,3) = phixy
+            re(4,1) = phixy
+            re(4,3) = phiyy
+            if(fsec) then
+              te(2,1,1) = zero
+              te(2,1,3) = zero
+              te(2,3,1) = zero
+              te(4,1,1) = zero
+              te(2,3,3) = zero
+              te(4,1,3) = zero
+              te(4,3,1) = zero
+              te(4,3,3) = zero
+            endif
+          else if(rho.gt.r0x-wx/2.0.and.rho.gt.r0x+wx/2.0) then
+            phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +          &
+     &wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
+     &rho/3.0/wx)/norm
+            phix = phir*xs
+            phiy = phir*ys
+            phirr = - (2.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +   &
+     &wx**2/48.0)/rho2**2 + 1.0/rho/3.0/wx)/norm
+            phixx = phir + xs*xs*phirr
+            phixy = xs*ys*phirr
+            phiyy = phir + ys*ys*phirr
+            re(2,1) = phixx
+            re(2,3) = phixy
+            re(4,1) = phixy
+            re(4,3) = phiyy
+! 2nd order effects
+            if(fsec) then
+              phirrr =  (8.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0   &
+     &+ wx**2/48.0)/rho2**3 + 1.0/3.0/wx/rho**3)/norm
+              phixxx = 3.0*xs*phirr + xs**3*phirrr
+              phixxy = ys*phirr + xs*xs*ys*phirrr
+              phixyy = xs*phirr + xs*ys*ys*phirrr
+              phiyyy = 3.0*ys*phirr + ys**3*phirrr
+              te(2,1,1) = phixxx
+              te(2,1,3) = phixxy
+              te(2,3,1) = phixxy
+              te(4,1,1) = phixxy
+              te(2,3,3) = phixyy
+              te(4,1,3) = phixyy
+              te(4,3,1) = phixyy
+              te(4,3,3) = phiyyy
+            endif
+          else if(rho.ge.r0x+wx/2.0) then
+            phir = 1.0/rho2
+            phix = xs*phir
+            phiy = ys*phir
+            phirr = -2.0/rho2**2
+            phixx = phir+xs*xs*phirr
+            phixy = xs*ys*phirr
+            phiyy = phir+ys*ys*phirr
+            re(2,1) = phixx
+            re(2,3) = phixy
+            re(4,1) = phixy
+            re(4,3) = phiyy
+! 2nd order effects
+            if(fsec) then
+              phirrr = 8.0/rho2**3
+              phixxx = 3.0*xs*phirr + xs**3*phirrr
+              phixxy = ys*phirr + xs*xs*ys*phirrr
+              phixyy = xs*phirr + xs*ys*ys*phirrr
+              phiyyy = 3.0*ys*phirr + ys**3*phirrr
+              te(2,1,1) = phixxx
+              te(2,1,3) = phixxy
+              te(2,3,1) = phixxy
+              te(4,1,1) = phixxy
+              te(2,3,3) = phixyy
+              te(4,1,3) = phixyy
+              te(4,3,1) = phixyy
+              te(4,3,3) = phiyyy
+            end if
+          endif
 !---- no tracking desired.
-        else 
+        else
           phixx=0.5/norm
           phiyy=0.5/norm
           re(2,1) = phixx
@@ -5143,17 +5161,19 @@
       implicit none
       include 'twissl.fi'
       include 'bb.fi'
-      logical fsec,ftrk,fmap,bborbit
+      logical fsec,ftrk,fmap,bborbit,firstflag
       integer get_option
       double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
      &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,  &
      &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
      &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
      &orbit0(6),three,ten3m,explim,rmin,rmax,wi,width,rho,wx,wy,norm,   &
-     &phir,phirr,phirrr
+     &phir,phirr,phirrr,zz
       double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
      &explim=150.0d0)
+      save firstflag
+      data firstflag / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
 !---- initialize.
@@ -5172,7 +5192,7 @@
       fmap = .true.
       r0x = node_value('sigx ')
       r0y = node_value('sigy ')
-! width is given as FWHM of the parabolic density profile, but formulas 
+! width is given as FWHM of the parabolic density profile, but formulas
 ! were derived with half width at the bottom of this density profile
       wi = node_value('width ')
       wi = wi/sqrt(2.0)
@@ -5194,88 +5214,98 @@
           ys  = orbit(3) - ym
 !---- limit formulas for sigma(x) = sigma(y).
 !-----      preliminary the only case considered.
-          if (abs(r0x2 - r0y2) .le. ten3m * (r0x2 + r0y2)) then
-            rho2 = xs * xs + ys * ys
-            rho  = sqrt(rho2)
-            if(rho.le.r0x-wx) then
-              re(2,1) = zero
-              re(4,3) = zero
-              re(2,3) = zero
-              re(4,1) = zero
-              if(fsec) then
-                te(2,1,1) = zero
-                te(2,1,3) = zero
-                te(2,3,1) = zero
-                te(4,1,1) = zero
-                te(2,3,3) = zero
-                te(4,1,3) = zero
-                te(4,3,1) = zero
-                te(4,3,3) = zero
-              end if
-            else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
-              phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0+    &
+          if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+            zz = 0.5*(r0x + r0y)
+            r0x=zz
+            r0y=zz
+            r0x2=r0x*r0x
+            r0y2=r0y*r0y
+            if(firstflag) then
+              firstflag=.false.
+              call aawarn('TMBB_HOLLOWPARABOLIC: ',                     &
+     &             'beam is assumed to be circular')
+            endif
+          endif
+          rho2 = xs * xs + ys * ys
+          rho  = sqrt(rho2)
+          if(rho.le.r0x-wx) then
+            re(2,1) = zero
+            re(4,3) = zero
+            re(2,3) = zero
+            re(4,1) = zero
+            if(fsec) then
+              te(2,1,1) = zero
+              te(2,1,3) = zero
+              te(2,3,1) = zero
+              te(4,1,1) = zero
+              te(2,3,3) = zero
+              te(4,1,3) = zero
+              te(4,3,1) = zero
+              te(4,3,3) = zero
+            end if
+          else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
+            phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0+      &
      &2.0*r0x*wx/3.0 - wx**2/4.0 + rho2/2.0*(1.0 -                      &
      &r0x**2/wx**2) + rho**3/3.0*2.0*r0x/wx**2 -                        &
      &rho**4/4.0/wx**2)
-              phix = phir*xs
-              phiy = phir*ys
-              phirr = 0.75/wx/r0x*(-2.0/rho**4*(r0x**4/12.0/wx**2-      &
+            phix = phir*xs
+            phiy = phir*ys
+            phirr = 0.75/wx/r0x*(-2.0/rho**4*(r0x**4/12.0/wx**2-        &
      &r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0)+                             &
      &2.0*r0x/wx**2/3.0/rho-0.5/wx**2)
-              phixx = phir+xs*xs*phirr
-              phixy = xs*ys*phirr
-              phiyy = phir+ys*ys*phirr
-              re(2,1) = phixx
-              re(2,3) = phixy
-              re(4,1) = phixy
-              re(4,3) = phiyy
-! 2nd order effects
-              if(fsec) then
-                phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/         &
+            phixx = phir+xs*xs*phirr
+            phixy = xs*ys*phirr
+            phiyy = phir+ys*ys*phirr
+            re(2,1) = phixx
+            re(2,3) = phixy
+            re(4,1) = phixy
+            re(4,3) = phiyy
+            ! 2nd order effects
+            if(fsec) then
+              phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/           &
      &wx**2-r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) -                      &
      &2.0*r0x/3.0/wx**2/rho**3)
-                phixxx = 3.0*xs*phirr + xs**3*phirrr
-                phixxy = ys*phirr + xs*xs*ys*phirrr
-                phixyy = xs*phirr + xs*ys*ys*phirrr
-                phiyyy = 3.0*ys*phirr + ys**3*phirrr
-                te(2,1,1) = phixxx
-                te(2,1,3) = phixxy
-                te(2,3,1) = phixxy
-                te(4,1,1) = phixxy
-                te(2,3,3) = phixyy
-                te(4,1,3) = phixyy
-                te(4,3,1) = phixyy
-                te(4,3,3) = phiyyy
-              end if
-            else if(rho.ge.r0x+wx) then
-              phir = 1.0/rho2
-              phix = xs*phir
-              phiy = ys*phir
-              phirr = -2.0/rho2**2
-              phixx = phir+xs*xs*phirr
-              phixy = xs*ys*phirr
-              phiyy = phir+ys*ys*phirr
-              re(2,1) = phixx
-              re(2,3) = phixy
-              re(4,1) = phixy
-              re(4,3) = phiyy
+              phixxx = 3.0*xs*phirr + xs**3*phirrr
+              phixxy = ys*phirr + xs*xs*ys*phirrr
+              phixyy = xs*phirr + xs*ys*ys*phirrr
+              phiyyy = 3.0*ys*phirr + ys**3*phirrr
+              te(2,1,1) = phixxx
+              te(2,1,3) = phixxy
+              te(2,3,1) = phixxy
+              te(4,1,1) = phixxy
+              te(2,3,3) = phixyy
+              te(4,1,3) = phixyy
+              te(4,3,1) = phixyy
+              te(4,3,3) = phiyyy
+            end if
+          else if(rho.ge.r0x+wx) then
+            phir = 1.0/rho2
+            phix = xs*phir
+            phiy = ys*phir
+            phirr = -2.0/rho2**2
+            phixx = phir+xs*xs*phirr
+            phixy = xs*ys*phirr
+            phiyy = phir+ys*ys*phirr
+            re(2,1) = phixx
+            re(2,3) = phixy
+            re(4,1) = phixy
+            re(4,3) = phiyy
 ! 2nd order effects
-              if(fsec) then
-                phirrr = 8.0/rho2**3
-                phixxx = 3.0*xs*phirr + xs**3*phirrr
-                phixxy = ys*phirr + xs*xs*ys*phirrr
-                phixyy = xs*phirr + xs*ys*ys*phirrr
-                phiyyy = 3.0*ys*phirr + ys**3*phirrr
-                te(2,1,1) = phixxx
-                te(2,1,3) = phixxy
-                te(2,3,1) = phixxy
-                te(4,1,1) = phixxy
-                te(2,3,3) = phixyy
-                te(4,1,3) = phixyy
-                te(4,3,1) = phixyy
-                te(4,3,3) = phiyyy
-              end if
-            endif
+            if(fsec) then
+              phirrr = 8.0/rho2**3
+              phixxx = 3.0*xs*phirr + xs**3*phirrr
+              phixxy = ys*phirr + xs*xs*ys*phirrr
+              phixyy = xs*phirr + xs*ys*ys*phirrr
+              phiyyy = 3.0*ys*phirr + ys**3*phirrr
+              te(2,1,1) = phixxx
+              te(2,1,3) = phixxy
+              te(2,3,1) = phixxy
+              te(4,1,1) = phixxy
+              te(2,3,3) = phixyy
+              te(4,1,3) = phixyy
+              te(4,3,1) = phixyy
+              te(4,3,3) = phiyyy
+            end if
           endif
 !---- no tracking desired.
         else
