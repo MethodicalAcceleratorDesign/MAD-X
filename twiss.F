@@ -4792,7 +4792,7 @@
       bborbit = get_option('bborbit ') .ne. 0
       if (bbd_flag .ne. 0 .and. .not. bborbit)  then
         if (bbd_cnt .eq. bbd_max)  then
-          call aawarn('TMBB: ','maximum bb number reached')
+          call aawarn('TMBB_GAUSS: ','maximum bb number reached')
         else
           bbd_cnt = bbd_cnt + 1
           bbd_loc(bbd_cnt) = bbd_pos
@@ -5019,7 +5019,7 @@
       bborbit = get_option('bborbit ') .ne. 0
       if (bbd_flag .ne. 0 .and. .not. bborbit)  then
         if (bbd_cnt .eq. bbd_max)  then
-          call aawarn('TMBB: ','maximum bb number reached')
+          call aawarn('TMBB_FLATTOP: ','maximum bb number reached')
         else
           bbd_cnt = bbd_cnt + 1
           bbd_loc(bbd_cnt) = bbd_pos
@@ -5040,31 +5040,31 @@
       parvec(7)=get_value('probe ','gamma ')
       fk = two * parvec(5) * parvec(6) / parvec(7)
       if (fk .ne. zero)  then
-!---- if tracking is desired ...
-        if (ftrk) then
-          r0x2 = r0x * r0x
-          r0y2 = r0y * r0y
-          wx  = r0x * wi
-          wy  = r0y * wi
-          xs  = orbit(1) - xm
-          ys  = orbit(3) - ym
+        r0x2 = r0x * r0x
+        r0y2 = r0y * r0y
+        wx  = r0x * wi
+        wy  = r0y * wi
+        xs  = orbit(1) - xm
+        ys  = orbit(3) - ym
 !---- limit formulas for sigma(x) = sigma(y).
 !-----      preliminary the only case considered.
-          if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
-            zz = 0.5*(r0x + r0y)
-            r0x=zz
-            r0y=zz
-            r0x2=r0x*r0x
-            r0y2=r0y*r0y
-            if(firstflag) then
-              firstflag=.false.
-              call aawarn('TMBB_FLATTOP: ',                             &
-     &             'beam is assumed to be circular')
-            endif
+        if (dabs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+          zz = 0.5*(r0x + r0y)
+          r0x=zz
+          r0y=zz
+          r0x2=r0x*r0x
+          r0y2=r0y*r0y
+          if(firstflag) then
+            firstflag=.false.
+            call aawarn('TMBB_FLATTOP: ',                               &
+     &'beam is assumed to be circular')
           endif
+        endif
+        norm = (12.0*r0x**2+wx**2)/24.0
+!---- if tracking is desired ...
+        if (ftrk) then
           rho2 = xs * xs + ys * ys
           rho  = sqrt(rho2)
-          norm = (12.0*r0x**2+wx**2)/24.0
           if(rho.le.r0x-wx/2.0) then
             phir=0.5/norm
             phix=phir*xs
@@ -5086,7 +5086,7 @@
               te(4,3,1) = zero
               te(4,3,3) = zero
             endif
-          else if(rho.gt.r0x-wx/2.0.and.rho.gt.r0x+wx/2.0) then
+          else if(rho.gt.r0x-wx/2.0.and.rho.lt.r0x+wx/2.0) then
             phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +          &
      &wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
      &rho/3.0/wx)/norm
@@ -5180,7 +5180,8 @@
       bborbit = get_option('bborbit ') .ne. 0
       if (bbd_flag .ne. 0 .and. .not. bborbit)  then
         if (bbd_cnt .eq. bbd_max)  then
-          call aawarn('TMBB: ','maximum bb number reached')
+          call aawarn('TMBB_HOLLOWPARABOLIC: ',                         &
+     &'maximum bb number reached')
         else
           bbd_cnt = bbd_cnt + 1
           bbd_loc(bbd_cnt) = bbd_pos
@@ -5223,7 +5224,7 @@
             if(firstflag) then
               firstflag=.false.
               call aawarn('TMBB_HOLLOWPARABOLIC: ',                     &
-     &             'beam is assumed to be circular')
+     &'beam is assumed to be circular')
             endif
           endif
           rho2 = xs * xs + ys * ys
