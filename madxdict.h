@@ -1971,6 +1971,7 @@ char command_def[] =
 /* "fast     = [l, false, true], " */
 "aperture = [l, false, true], "
 "onetable = [l, false, true], "
+"recloss  = [l, false, true], "
 "file     = [s, track, track], "
 "extension= [s, none, none]; "
 " "

@@ -445,6 +445,17 @@ char* tracksumm_table_cols[] =
   " "  /* blank terminates */
 };
 
+int trackloss_table_types[] =
+{
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3
+};
+
+char* trackloss_table_cols[] =
+{
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e", "element",
+  " "  /* blank terminates */
+};
+
 int dynap_table_types[] =
 {
   2,2,2,2,2,

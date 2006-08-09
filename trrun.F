@@ -197,8 +197,8 @@
           endif
         endif
 !-------- Track through element  // suppress dxt 13.12.04
-        call ttmap(code,el,z,jmax,dxt,dyt,sum,turn,part_id, last_turn,  &
-     &last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
+        call ttmap(code,el,z,orbit0,jmax,dxt,dyt,sum,turn,part_id,      &
+     &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
 !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. 1)  then
           if (n_align .ne. 0)  then
@@ -314,7 +314,9 @@
         call augment_count('tracksumm ')
       enddo
  999  end
-      subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
+      
+      
+      subroutine ttmap(code,el,track,z0,ktrack,dxt,dyt,sum,turn,part_id,&
      &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,        &
      &onepass)                                                          &
       implicit none
@@ -339,7 +341,7 @@
       double precision apx,apy,el,sum,node_value,track(6,*),            &
      &last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
      &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
-     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*)
+     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),z0
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
@@ -372,7 +374,7 @@
           apy=maxaper(3)
         endif
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, z0, ktrack,al_errors)
         go to 502
       endif
 !---- Collimator with rectangular aperture.
@@ -386,7 +388,7 @@
           apy=maxaper(3)
         endif
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, z0, ktrack,al_errors)
         go to 502
       endif
 !---- Beam-beam,  standard 4D, no aperture
@@ -412,7 +414,7 @@
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track, z0, ktrack,al_errors)
 !------------  circle case ----------------------------------
         else if(aptype.eq.'circle') then
           apx = aperture(1)
@@ -424,13 +426,13 @@
           apy = apx
 !        print *,"circle, radius= ",apx
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !------------  rectangle case ----------------------------------
         else if(aptype.eq.'rectangle') then
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !------------  LHC screen case ----------------------------------
         else if(aptype.eq.'lhcscreen') then
 !        print *, "LHC screen start, Xrect= ",
@@ -441,7 +443,7 @@
 !JMJ!     this tests whether the particle is outside the circumscribing
 !JMJ!     circle.
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !JMJ!
 !JMJ!     This tests whether particles are outside the space bounded by
 !JMJ!     two or four lines intersecting the circle.
@@ -459,31 +461,31 @@
           if(aperture(1).gt.0.) apx = aperture(1)
           if(aperture(2).gt.0.) apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !        print *, "LHC screen end"
 !------------  marguerite case ----------------------------------
         else if(aptype.eq.'marguerite') then
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !------------  rectellipse case ----------------------------------
         else if(aptype.eq.'rectellipse') then
 !*****         test ellipse
           apx = aperture(3)
           apy = aperture(4)
           call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !*****         test rectangle
           apx = aperture(1)
           apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-     &last_pos, last_orbit, track, ktrack,al_errors)
+     &last_pos, last_orbit, track,z0, ktrack,al_errors)
 !       print*, " test apertures"
 !       print*, "      apx=",apx, " apy=",apy," apxell=",apxell,
 !     &         " apyell=",apyell
 !          call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
-!     &    last_pos, last_orbit, track, ktrack,al_errors)
+!     &    last_pos, last_orbit, track,z0, ktrack,al_errors)
         endif
       endif
 !----  END OF IF(APERFLAG)  ----------------
@@ -1895,21 +1897,30 @@
       endif
       end
 
+
+      
+
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
-     &last_turn, last_pos, last_orbit, z,aptype)
+     &last_turn, last_pos, last_orbit, z, z0, aptype)
 
 !hbu--- kill particle:  print, modify part_id list
       implicit none
       include 'name_len.fi'
-      integer i,j,n,turn,part_id(*),jmax,last_turn(*)
-      double precision sum, z(6,*), last_pos(*), last_orbit(6,*)
+      
+      logical recloss
+      integer i,j,n,k,turn,part_id(*),jmax,last_turn(*),get_option
+      double precision sum, z(6,*), last_pos(*), last_orbit(6,*),z0(6), &
+     &torb(6)
       character*(name_len) aptype
 !hbu
       character*(name_len) el_name
 
+      recloss = get_option('recloss ') .ne. 0
+      
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
       do j = 1, 6
+        torb(j) = z(j,n)
         last_orbit(j,part_id(n)) = z(j,n)
       enddo
 
@@ -1921,6 +1932,10 @@
      &part_id(n),turn,sum,el_name,aptype
       print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
 
+      if(recloss) then
+        call tt_ploss(part_id(n),part_id,turn,sum,torb,z0,el_name)
+      endif
+      
       do i = n+1, jmax
         part_id(i-1) = part_id(i)
         do j = 1, 6
@@ -1928,8 +1943,60 @@
         enddo
       enddo
       jmax = jmax - 1
+      
       end
 
+
+      subroutine tt_ploss(npart,part_id,turn,spos,orbit,orbit0,el_name)
+
+!hbu added spos
+      implicit none
+!----------------------------------------------------------------------*
+!--- purpose: enter lost particle coordinates in table                 *
+!    input:                                                            *
+!    npart  (int)           particle number                            *
+!    turn   (int)           turn number                                *
+!    spos    (double)       s-coordinate when loss happens             *
+!    orbit  (double array)  particle orbit                             *
+!    orbit0 (double array)  reference orbit                            *
+!----------------------------------------------------------------------*
+      include 'name_len.fi'
+      integer npart,turn,j, part_id(*),turnit
+      double precision orbit(6),orbit0(6),tmp,tt,tn
+      double precision energy, get_value, sum
+      character*36 table
+      character*(name_len) el_name
+!hbu
+      double precision spos
+!hbu
+      character*4 vec_names(7)
+!hbu
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
+      data table / 'trackloss' /
+ 
+      tn = npart
+      tt = turn
+      
+      energy = get_value('probe ','energy ')
+      
+      
+      call double_to_table(table, 'number ', tn) ! the number of the current particle
+      call double_to_table(table, 'turn ', tt)   ! the number of the current turn
+!hbu spos
+      
+      call double_to_table(table,vec_names(7),spos)
+      
+      do j = 1, 6
+        tmp = orbit(j) - orbit0(j)
+        call double_to_table(table, vec_names(j), tmp)
+      enddo
+      call double_to_table(table, 'e ', energy)
+      call string_to_table(table, 'element ', el_name)
+
+      call augment_count(table)
+      end
+
+      
       subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
      &spos,ielem,el_name)
 
@@ -1984,6 +2051,9 @@
         call augment_count(table)
       enddo
       end
+
+
+      
       subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
 
 !hbu added spos
@@ -2030,7 +2100,7 @@
       call augment_count(table)
       end
       subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
-     &last_pos, last_orbit, z, ntrk,al_errors)
+     &last_pos, last_orbit, z, z0, ntrk,al_errors)
 
       implicit none
 !----------------------------------------------------------------------*
@@ -2055,7 +2125,7 @@
       include 'name_len.fi'
       integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
-     &one,al_errors(align_max)
+     &z0, one,al_errors(align_max)
       parameter(one=1d0)
       character*(name_len) aptype
 
@@ -2082,7 +2152,7 @@
         nn=name_len
         call node_string('apertype ',aptype,nn)
         call trkill(n, turn, sum, ntrk, part_id,                        &
-     &last_turn, last_pos, last_orbit, z,aptype)
+     &last_turn, last_pos, last_orbit, z, z0, aptype)
         goto 10
  98     continue
       enddo
