@@ -2083,10 +2083,8 @@ contains
     integer,dimension(:)::roi
     real(dp),dimension(ndim)::co,si,ang,ra
     if(.not.c_%stable_da) return
-
-    do i=1,10
-       j(i)=0
-    enddo
+    
+    j=0
 
     call daclrd(roi)
     do i=1,nd-ndc
