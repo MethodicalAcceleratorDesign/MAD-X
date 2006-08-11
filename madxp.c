@@ -1478,7 +1478,7 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackline, calling pro_ptc_dumpmaps\n");
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_dumpmaps, calling pro_ptc_dumpmaps\n");
         ptc_dumpmaps(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_twiss_linac") == 0)
@@ -1511,6 +1511,16 @@ void exec_command()
       {
         if (kSkowronDebug) printf("madxp.c: Command is ptc_knob, calling pro_ptc_knob\n");
         pro_ptc_knob(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is ptc_setknobvalue, calling pro_ptc_setknobvalue\n");
+        pro_ptc_setknobvalue(p);
+      }
+      else if (strcmp(p->cmd_def->module, "rviewer") == 0)
+      {
+        if (kSkowronDebug) printf("madxp.c: Command is rviewer, calling rviewer\n");
+        w_ptc_rviewer();
       }
       else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)
       {

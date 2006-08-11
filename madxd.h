@@ -85,6 +85,8 @@
 #define w_ptc_printlayout_rootm w_ptc_printlayout_rootm_
 #define w_ptc_eplacement        w_ptc_eplacement_
 #define w_ptc_addknob           w_ptc_addknob_
+#define w_ptc_setknobvalue w_ptc_setknobvalue_
+#define w_ptc_rviewer           w_ptc_rviewer_
 #define w_ptc_script            w_ptc_script_
 #define w_ptc_addpush           w_ptc_addpush_
 #define w_ptc_end               w_ptc_end_
@@ -103,6 +105,7 @@
 
 #define seterrorflagfort        seterrorflagfort_  /*sets the dglobal error flag*/
 #define geterrorflag            geterrorflag_  /*returns the dglobal error flag*/
+#define getcurrentelementname   getcurrentelementname_
 #define stolower                stolower_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
@@ -606,6 +609,9 @@ void pro_track(struct in_cmd*);
 void pro_twiss();
 void pro_ptc_twiss();
 void pro_ptc_track(struct in_cmd*);
+void pro_ptc_trackline(struct in_cmd*);
+int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);
+
 void put_info(char*, char*);
 int quote_level(char*, char*);
 struct table* read_table(struct in_cmd*);
@@ -724,6 +730,8 @@ void w_ptc_settotalpath(int* boolflag);
 void w_ptc_settime(int* boolflag);
 void w_ptc_setnocavity(int* boolflag);
 void w_ptc_addknob(int* fibrename);
+void w_ptc_setknobvalue(int* fibrename);
+void w_ptc_rviewer();
 void w_ptc_eplacement(int* eidx,int* refframe);
 void w_ptc_writeparresults(int* filename);
 void w_ptc_printframes(int* filename);
@@ -731,6 +739,7 @@ void w_ptc_printlayout_rootm(int* filename);
 void w_ptc_script(int* scriptname);
 void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
 void w_ptc_enforce6d(int* flag);
+const char* getcurrentelementname();
 
 int twiss_input(struct command*);
 void update_beam();

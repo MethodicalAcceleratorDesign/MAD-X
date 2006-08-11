@@ -1433,7 +1433,7 @@ CONTAINS
          scv(ii) = tw%junk%v(ii)
        enddo  
 
-       call putusertable(i,current%mag%name,scv)
+       call putusertable(i,current%mag%name,suml,scv)
        
        iii=advance_node()
        current=>current%next

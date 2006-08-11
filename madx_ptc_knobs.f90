@@ -33,7 +33,10 @@ module madx_ptc_knobs_module
   public                         :: getknobsnames
   public                         :: getfctnsnames
   public                         :: getfunctionat
+  public                         :: getfunctionvalueat
   public                         :: getlengthat
+  public                         :: setparvalue
+  public                         :: setknobvalue
   
   interface daprint
     module procedure printunitaylor
@@ -61,8 +64,16 @@ module madx_ptc_knobs_module
   integer                               ::  nmapels = 0 
   type(mapelresult),target              ::  mapels(maxpar)
               
-  type(universal_taylor), allocatable   ::  results(:,:)
+  real(kind(1d0)), allocatable          ::  spos(:)
+  real(kind(1d0)), allocatable          ::  parvals(:) ! temp array with parameter values, to find out a function value for some parameters
 !  type(taylor), allocatable             ::  results(:,:)
+  type(universal_taylor), allocatable, target   ::  results(:,:)
+
+  character(48)                         ::  twisstablename
+  
+  integer, parameter                    ::  textbufferlength = 100000
+  character(textbufferlength)           ::  textbuffer
+
 
   integer                               ::  currentrow = 0 
   type(taylor), allocatable             ::  oldy(:)
@@ -82,11 +93,12 @@ module madx_ptc_knobs_module
 contains
   !____________________________________________________________________________________________
 
-  subroutine putusertable(n,name,y)
+  subroutine putusertable(n,name,s,y)
     !puts the coefficients in tables as defined in array pushes
     implicit none
-    integer         :: n !fibre number
-    character(*)   :: name !fibre name
+    integer              :: n !fibre number
+    character(*)         :: name !fibre name
+    real(kind(1d0))      :: s  !position along the orbit
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
     type(real_8),pointer :: e !element in array
     real(kind(1d0))      :: coeff
@@ -102,6 +114,7 @@ contains
       !if there are any knobs and knobs where initialized (i.e. currentrow > 0)
       ! otherwise the results table is not allocated
       pblockson = .true.  !it means there are parameters on
+      spos(currentrow) = s
       call parametrictwiss(y)
     else  
       pblockson = .false.
@@ -114,7 +127,7 @@ contains
     else
        do i=1,npushes
 
-          e => y(pushes(i)%element)
+         e => y(pushes(i)%element)
 
          if (pushes(i)%pushtab) then
             coeff  = e.sub.(pushes(i)%monomial)
@@ -213,6 +226,68 @@ contains
     !____________________________________________________________________________________________
 
   end subroutine putusertable
+  !____________________________________________________________________________________________
+
+  subroutine fillusertables()
+    implicit none
+    integer                         :: i,e
+    integer                         :: nelems
+    real(kind(1d0))                 :: coeff
+    type(universal_taylor), pointer :: t
+    
+    call cleartables()    
+
+    nelems = ubound(results,1)
+    do e=1, nelems
+       do i=1,npushes
+         if ( (pushes(i)%pushtab) .and. (pushes(i)%index > 0) ) then
+           t => results(e,pushes(i)%index)
+           coeff = gettaylorvalue(t)
+           call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+         endif
+       enddo
+       
+       call augment_counts()
+  
+     enddo  
+  end subroutine fillusertables
+  !____________________________________________________________________________________________
+
+  subroutine filltwisstable()
+    !puts the coefficients in tables as defined in array pushes
+    implicit none
+    integer         :: n !fibre number
+    real(kind(1d0))      :: s  !position along the orbit
+    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
+    type(real_8),pointer :: e !element in array
+    real(kind(1d0))      :: coeff
+    integer              :: i,ii !iterator
+    integer              :: nelems !iterator
+    logical              :: pblockson
+    real(kind(1d0))      :: opt_fun(72)
+    type(universal_taylor), pointer :: t
+
+    if (.not. ALLOCATED(results)) then
+      return
+    endif
+    
+    call reset_count(twisstablename)
+    
+    nelems = ubound(results,1)
+    do i=1, nelems
+
+      do ii=beta11,ntwisses
+        t => results(i,ii)
+        opt_fun(ii)=  gettaylorvalue(t)
+      enddo 
+!      write(6,'(a,3(f8.4,1x))')  "betas ", opt_fun(1),opt_fun(2),opt_fun(3)
+      call vector_to_table(twisstablename, 'beta11 ', ntwisses, opt_fun(1))
+      call augmentcountonly(twisstablename)
+    
+    enddo  
+
+  end subroutine filltwisstable
+
   !____________________________________________________________________________________________
 
   subroutine inittables()
@@ -387,7 +462,7 @@ contains
     
     fibrename = charconv(fibrenameIA)
     
-    print *,"addknob: fibrename is ", fibrename
+!    print *,"addknob: fibrename is ", fibrename
     pb%name = fibrename
 !    pb%n_name =  fibrenameIA(1)  !firt element of this array contatins length of the string
     
@@ -426,15 +501,22 @@ contains
 
   subroutine setknobs(alayout)
     implicit none
+    include 'twissa.fi'
     type(layout),pointer       :: alayout
     type (pol_block), pointer  :: pb
     integer     :: i
+    
+    twisstablename = table_name !defined in twissa.fi
+    print*, "Table name is ",twisstablename
+    
+    currentrow = 1 
     
     if (getdebug() > 2 ) then
       print*, "setknobs: There is ", npolblocks, "pol_blocks"
     endif  
     
     if (npolblocks == 0) then
+      currentrow = -1 
       return
     endif
     
@@ -449,10 +531,71 @@ contains
    if (ALLOCATED(results)) call killparresult()
 
    call allocparresult(alayout%n)
-   currentrow = 1 
 !    print*, "setknobs: All pol_blocks set"
      
   end subroutine setknobs
+  !_________________________________________________________________________________
+  subroutine allocparresult(n)
+    implicit none
+    integer       :: n
+    integer       :: nr, np
+    integer       :: i,j
+
+    np = c_%nv - c_%npara
+    print*, "There is ",np, " parameters "
+    if (np <= 0) then
+      call fort_warn("addpush","Number of parameters is 0")
+      currentrow = -1  ! this is the signal that initialization has failed
+      return;
+    endif
+
+    allocate(parvals(np))
+    parvals(:) = zero
+    
+    nr = ntwisses+nmapels
+    print*, "Allocating results ",n,nr
+    allocate(results(n,nr))
+    allocate(spos(n))
+    
+
+!    remnestant of the taylor type
+!     do i=1,n
+!        do j=1,nr
+!           call alloc(results(i,j))
+!        enddo
+!     enddo
+    
+     
+  end subroutine allocparresult
+  !_________________________________________________________________________________
+
+  subroutine killparresult
+    implicit none
+    integer       :: i,j
+    
+    if (.not. ALLOCATED(results)) then
+      return
+    endif
+    
+!    remnestant of the taylor type
+!     print*, "killparresult: Shape of the current array: "
+!     print*, "1D",lbound(results,1),ubound(results,1)
+!     print*, "2D",lbound(results,2),ubound(results,2)
+
+     do i=lbound(results,1),ubound(results,1)
+        do j=lbound(results,2),ubound(results,2)
+          results(i,j) = -1
+!           call kill(results(i,j))
+        enddo
+     enddo
+    
+    print*, "Deallocating results "
+    deallocate(spos)
+    deallocate(results)
+    
+    currentrow = 0
+    
+  end subroutine killparresult
   !____________________________________________________________________________________________
 
   subroutine resetknobs()
@@ -512,6 +655,7 @@ contains
     implicit none
     character*(100) ::name
     character*(100) ::fmt
+    character*(10) ::pname
     integer last
     integer i,j,n
     
@@ -520,7 +664,8 @@ contains
       do j=1, nmax
         if (polblocks(i)%ian(j) /= 0 ) then
           n = n + 1
-          write(name,'(A,A,I2)') polblocks(i)%name(1:len_trim(polblocks(i)%name)), " skew ",polblocks(i)%ian(j)
+          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ian(j),": ",&
+                         polblocks(i)%name(1:len_trim(polblocks(i)%name)), " skew ",j
 
           print*, "n=",n, name
 
@@ -533,7 +678,8 @@ contains
 
         if (polblocks(i)%ibn(j) /= 0 ) then
           n = n + 1
-          write(name,'(A,A,I2)') polblocks(i)%name(1:len_trim(polblocks(i)%name)) , " normal ",polblocks(i)%ian(j)
+          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ibn(j),": ",&
+                       polblocks(i)%name(1:len_trim(polblocks(i)%name)) , " normal ",j
           
           print*, "n=",n, name
 
@@ -553,7 +699,6 @@ contains
   subroutine getfunctionat( el, n)
     implicit none
     integer n, el
-    character*(1200) eq
     integer eqlength
 
     if (.not. ALLOCATED(results)) then
@@ -569,18 +714,119 @@ contains
       return
     endif
     
+    call getpareq(results(el,n),textbuffer)
     
-    call getpareq(results(el,n),eq)
+    eqlength = ( LEN_TRIM(textbuffer) + 1 )
+
+    if (eqlength > textbufferlength) eqlength = textbufferlength
+    textbuffer(eqlength:eqlength) = achar(0)
+    call madxv_setfunctionat(el, n, textbuffer)
     
-    
-    
-    eqlength = LEN_TRIM(eq) + 1
-    if (eqlength > 1200) eqlength = 1200
-    eq(eqlength:eqlength) = achar(0)
-    call madxv_setfunctionat(el, n, eq)
-    
+     
   end subroutine getfunctionat
   !____________________________________________________________________________________________
+
+
+
+  !____________________________________________________________________________________________
+
+  function getfunctionvalueat( n, el)
+    implicit none
+    real(kind(1d0))                 :: getfunctionvalueat
+    integer                         :: n, el
+    type(universal_taylor), pointer :: t
+
+    if (.not. ALLOCATED(results)) then
+      return
+    endif
+
+    if ( (el < lbound(results,1)) .or. (el > ubound(results,1)) ) then
+      return
+    endif
+
+    if ( (n < lbound(results,2)) .or. (n > ubound(results,2)) ) then
+      return
+    endif
+    
+    getfunctionvalueat = zero
+    
+!    print*,"Getting function ",n," at el ",el
+    t => results(el,n)
+    
+    getfunctionvalueat = gettaylorvalue(t)
+    
+    
+  end function getfunctionvalueat
+  !____________________________________________________________________________________________
+
+  function gettaylorvalue(ut)
+    implicit none
+    real(kind(1d0))       :: gettaylorvalue
+    type(universal_taylor), pointer :: ut
+    integer i,ii,np
+    real(dp)   ::  c,p
+    
+
+    if (.not. associated(ut)) then
+         call fort_warn("printpareq",&
+          "provided taylor is not associated")
+
+         gettaylorvalue = zero
+         return
+    endif 
+
+    if (.not. associated(ut%n)) then
+         call fort_warn("printpareq",&
+          "provided taylor is not allocated")
+
+         gettaylorvalue = zero
+         return
+    endif 
+
+    if(ut%n == 0) then
+         if (getdebug() > 3) then
+            print*,"no coefficients in the taylor"
+         endif   
+
+         gettaylorvalue = zero
+         return
+    endif     
+    
+    gettaylorvalue = zero
+
+    do i = 1,ut%n
+       
+       c = ut%c(i)
+!       print*, "coef",i," is ",c
+       
+       do ii = c_%npara + 1, ut%nv
+         
+         if (ut%j(i,ii) /= 0) then
+           
+           np =  ii - c_%npara
+           p = parvals(np)
+!           print*, "par",np," is ",p
+           if (ut%j(i,ii) /= 1) then
+             p = p**ut%j(i,ii)
+!             print*, "par",np," to power",ut%j(i,ii), " is ",p
+           endif
+
+           c = c*p
+!           print*,"coef",i, "X par",np," to power",ut%j(i,ii), " is ",c
+
+         endif
+
+       enddo
+!       print*,"COEF",i, " is ",c
+       gettaylorvalue = gettaylorvalue + c
+!       print*,"FUNCTION after ", i," is ",gettaylorvalue
+
+    enddo
+
+
+  
+  end function gettaylorvalue
+
   !____________________________________________________________________________________________
   !____________________________________________________________________________________________
   !____________________________________________________________________________________________
@@ -646,7 +892,6 @@ contains
     integer i,j,k
     integer, allocatable :: e(:)
     
-    print*, "parametrictwiss"
     allocate(e(c_%npara_fpp))
     
     do i=1,c_%nd2
@@ -844,52 +1089,6 @@ contains
 
   end   subroutine make_ring
   !_________________________________________________________________________________
-  subroutine killparresult
-    implicit none
-    integer       :: i,j
-    
-    if (.not. ALLOCATED(results)) then
-      return
-    endif
-    
-!    remnestant of the taylor type
-!     print*, "killparresult: Shape of the current array: "
-!     print*, "1D",lbound(results,1),ubound(results,1)
-!     print*, "2D",lbound(results,2),ubound(results,2)
-
-     do i=lbound(results,1),ubound(results,1)
-        do j=lbound(results,2),ubound(results,2)
-          results(i,j) = -1
-!           call kill(results(i,j))
-        enddo
-     enddo
-    
-    print*, "Deallocating results "
-    deallocate(results)
-    
-    currentrow = 0
-    
-  end subroutine killparresult
-  !_________________________________________________________________________________
-  subroutine allocparresult(n)
-    implicit none
-    integer       :: n
-    integer       :: nr
-    integer       :: i,j
-
-    nr = ntwisses+nmapels
-    print*, "Allocating results ",n,nr
-    allocate(results(n,nr))
-!    remnestant of the taylor type
-!     do i=1,n
-!        do j=1,nr
-!           call alloc(results(i,j))
-!        enddo
-!     enddo
-    
-     
-  end subroutine allocparresult
-  !_________________________________________________________________________________
   subroutine writeparresults(filenameIA)
     implicit none
     include 'twissa.fi'
@@ -1003,21 +1202,105 @@ contains
 
   function getparname(n)
     implicit none
-    character*(20)  :: getparname
+    character*(3)  :: getparname
     integer        :: n
 
-    write(getparname,'(a1,i2.2)') "p",n - c_%npara
+    write(getparname,'(A1,i2.2)') "p",n - c_%npara
     
   end function getparname    
   !_________________________________________________________________________________
+
+  subroutine setparvalue(n,v)
+    implicit none
+    integer :: n
+    real :: v
+
+!    print*, "Setting parameter ",n," to ", v
+
+    if ( (n < 1) .and. (n > ubound(spos,1)) ) then
+      call fort_warn("setparvalue","Array index out of range")
+    endif
+
+    parvals(n) = v
+
+  end subroutine setparvalue
+  !____________________________________________________________________________________________
+
+  subroutine setknobvalue(fibrenameIA)
+    implicit none
+    include 'twissa.fi'
+    integer                    :: fibrenameIA(*)
+    character(48)              :: fibrename
+    integer                    :: i
+    integer                    :: kn, ks, par
+    real                       :: v
+    real(kind(1d0))            :: get_value
+    
+    par = -1
+    fibrename = charconv(fibrenameIA)
+    
+!    print *,"setknobvalue: fibrename is ", fibrename
+    
+    do i=1, npolblocks
+      if ( polblocks(i)%name == fibrename(1:nlp)) then
+         
+        kn = get_value('ptc_setknobvalue ','kn ')
+        ks = get_value('ptc_setknobvalue ','ks ')
+        if ( (kn>0) .and. (ks>0) ) then
+          call fort_warn("setknobbalue","Both kn and ks can not be specified together");
+          return
+        endif
+        
+        if ( kn>0 ) then
+          par = polblocks(i)%ibn(kn)
+        elseif ( ks>0 ) then
+          par = polblocks(i)%ian(ks)
+        else
+          call fort_warn("setknobbalue","Neither kn nor ks is specified");
+          return
+        endif
+          
+        exit
+      endif
+    enddo
+
+    if (par < 0) then
+      call fort_warn("setknobbalue","There is no knob defined on such element");
+      return
+    endif
+    
+    v = get_value('ptc_setknobvalue ','value ')
+    call setparvalue(par, v)
+    
+    call filltwisstable()
+    
+!    call cleartables()
+    call fillusertables()
+    
+    
+  end subroutine setknobvalue
+  !____________________________________________________________________________________________
 
   
   function getlengthat(n)
     implicit none
     real(kind(1d0))  :: getlengthat
     integer          :: n
+
+    print*, "getlengthat, n is ", n
+
+    if (.not. ALLOCATED(spos)) then
+      return
+    endif
     
-    getlengthat = 1.1
+    if ( (n < 1) .and. (n > ubound(spos,1)) ) then
+      call fort_warn("getlengthat","position out of range")
+      getlengthat = -one  
+    endif
+
+    print*, "getlengthat, spos at n is ", spos(n)
+
+    getlengthat = spos(n)
     
   end function getlengthat    
   !_________________________________________________________________________________
@@ -1025,18 +1308,18 @@ contains
 
   subroutine printpareq(ut,iunit)
     implicit none
-    type(universal_taylor) :: ut
-    integer                :: iunit
-    character*(1200)       :: polyeq
-
+    type(universal_taylor)  :: ut
+    integer                 :: iunit
+    
     if(ut%nv /= c_%nv) then
          call fort_warn("printpareq",&
           "number of variables of this universal taylor is different from currnet TPSA")
          return
     endif     
 
-    call getpareq(ut,polyeq)
-    write(iunit,'(A)')  polyeq
+    
+    call getpareq(ut,textbuffer)
+    write(iunit,'(A)')  textbuffer
 
      
   end subroutine printpareq
@@ -1050,7 +1333,7 @@ contains
     integer                :: cpos, last
     character              :: sign
     character*(20)         :: parname
-    character*(*)          :: string
+    character(*)           :: string
 
 !    print*,"getpareq"
 
@@ -1071,24 +1354,37 @@ contains
 
     if(ut%n == 0) then
          write(string,'(A)') ' 0 '
-         print*,"no coefficients in the taylor"
+         if (getdebug() > 3) then
+            print*,"no coefficients in the taylor"
+         endif   
          return
     endif     
     
     cpos = 1
     last = len(string)
     sign = ' '
-    print*,"There is ", ut%n, " coefficients "
+    
+    if (getdebug() > 3) then
+      print*,"There is ", ut%n, " coefficients "
+    endif  
+
     do i = 1,ut%n
        
        if ( ut%c(i) < zero ) then
          sign = ' '
        endif
-       
-       write(string(cpos:last),'(a2,G20.14)') sign,ut%c(i); cpos = len_trim(string) + 1;
-       
-       do ii = 1, ut%nv
 
+       write(string(cpos:last),'(A1,A1,G20.14)') " ",sign,ut%c(i); 
+       cpos = len_trim(string) + 1;
+       
+       if ( ( cpos + 200) > last) then
+         call fort_warn("routine madx_ptc_knobs.f90::getpareq",&
+               "Buffer for taylor equation is too small! Bailing out!")
+         stop;
+       endif
+              
+       do ii = 1, ut%nv
+!         print*, "cpos=",cpos," last=",last
          if (ut%j(i,ii) /= 0) then
            write(string(cpos:last),'(A1)') "*"; cpos = len_trim(string) + 1;
            parname = getparname(ii)
@@ -1110,7 +1406,6 @@ contains
 
    
 !    print*, string
-    print*," "
   end subroutine getpareq
   
  
@@ -1216,6 +1511,7 @@ end function w_ptc_getlengthat
 !____________________________________________________________________________________________
 
 
+
 subroutine w_ptc_getfctnsnames()
   use madx_ptc_knobs_module
   implicit none
@@ -1247,11 +1543,38 @@ end subroutine w_ptc_getfunctionat
 !____________________________________________________________________________________________
 
 
+function w_ptc_getfunctionvalueat(n,e)
+  use madx_ptc_knobs_module
+  implicit none
+  real(kind(1d0)) :: w_ptc_getfunctionvalueat
+  integer e,n
+  
+  
+  w_ptc_getfunctionvalueat = getfunctionvalueat(n,e)
+  
+end function w_ptc_getfunctionvalueat
+
+!____________________________________________________________________________________________
+
+
 subroutine w_ptc_rviewer()
   implicit none
   integer :: rviewer
   integer :: res
   res =  rviewer()
 end subroutine w_ptc_rviewer
+
+!____________________________________________________________________________________________
+
+
+subroutine w_ptc_setparvalue(n,v)
+  use madx_ptc_knobs_module
+  implicit none
+  integer :: n
+  real    :: v
+  
+  call setparvalue(n,v)
+  
+end subroutine w_ptc_setparvalue
 
 

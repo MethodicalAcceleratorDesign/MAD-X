@@ -7596,6 +7596,7 @@ void ptc_dumpmaps(struct in_cmd* cmd)
 {
   w_ptc_dumpmaps_();
 }
+/********************************************************************************/
 
 void pro_ptc_trackline(struct in_cmd* cmd)
 {
@@ -8119,6 +8120,48 @@ void pro_ptc_knob(struct in_cmd* cmd)
   delete_int_array(elementIA);
  
 }
+/********************************************************************************/
+
+void pro_ptc_setknobvalue(struct in_cmd* cmd)
+{/*
+  Sets a parameter value
+ */
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+
+  char*                          element    = 0x0;
+  struct int_array*              elementIA      = 0x0;
+
+  pos   = name_list_pos("elementname", c_parnames);
+  if (pos < 0)
+   {
+     printf("madxn.c: pro_ptc_knob: elementname parameter does not exist.\n");
+     return;
+   }
+
+  element  = c_parameters->parameters[pos]->string;
+  if ( element == 0x0 )
+   {
+     warning("madxn.c: pro_ptc_knob: no element name: ", "ignored");
+     return;
+   }
+  mycpy(c_dum->c, element);
+  
+  stoupper(c_dum->c);
+  
+  elementIA = new_int_array(1+strlen(c_dum->c));
+
+  conv_char(c_dum->c,elementIA);
+
+  w_ptc_setknobvalue(elementIA->i);
+
+  delete_int_array(elementIA);
+  
+
+}
+
+/********************************************************************************/
 
 void pro_ptc_select(struct in_cmd* cmd)
 {/*
@@ -8129,7 +8172,6 @@ void pro_ptc_select(struct in_cmd* cmd)
  */
 
   int                            element     = 0;
-  int                            parametric  = 0;
   int*                           tablep      = 0;
   int*                           columnp     = 0; 
   static int                     zeroint     = 0;/*if there is no column name or table name these are passed as null strings */
@@ -8702,6 +8744,20 @@ int getnumberoftracks()
   return stored_track_start->curr;
 
 }
+
+const char* getcurrentelementname()
+{
+/*returns number of input tracks */
+  
+  if (current_node == 0x0)
+  {
+    return 0x0;
+  }
+
+  return current_node->name;
+
+}
+
 /***************************************************************************/
 
 int copytrackstoarray()

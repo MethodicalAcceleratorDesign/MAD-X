@@ -138,6 +138,12 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine  w_ptc_setknobvalue()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
       subroutine  w_ptc_printlayout_rootm()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
@@ -164,10 +170,17 @@
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_eplacement
 
-
+ 
       subroutine w_ptc_end()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end
+
+      subroutine w_ptc_rviewer()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC')
+      end
+
 

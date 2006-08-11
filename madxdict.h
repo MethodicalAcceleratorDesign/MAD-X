@@ -395,6 +395,16 @@ char command_def[] =
 "ks    = [i, {-1}], "
 "exactmatch = [l, true, true] ; "
 " "
+"ptc_setknobvalue: ptc_setknobvalue none 0 0 "
+"elementname = [s, none] , "/* */
+"kn    = [i, -1], "
+"ks    = [i, -1], "
+"value = [r] ; "
+" "
+"rviewer: rviewer none 0 0 "
+"elementname = [s, none] , "/* */
+"exactmatch = [l, true, true] ; "
+" "
 "ptc_printparametric: ptc_printparametric none 0 0 "
 "filename = [s, none] , "/* */
 "format = [s, ptc] ; "
@@ -487,6 +497,7 @@ char command_def[] =
 "file     = [s, track, track], "
 "gcs   = [l, false, true], "
 "extension= [s, none, none], "
+"rootntuple = [l, false, true], "/*writes all the tracks in ROOT NTuple -> works only if program is dynamically linked and RPLOT plugin is present */
 "onetable = [l, false, true]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_dumpmaps: ptc_dumpmaps none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/

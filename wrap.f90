@@ -144,6 +144,17 @@ subroutine w_ptc_end()
   call ptc_end()
 end subroutine w_ptc_end
 
+
+
+subroutine w_ptc_setknobvalue(fibre)
+  use madx_ptc_knobs_module
+  implicit none
+  integer fibre(*)
+
+  call setknobvalue(fibre)
+
+end subroutine w_ptc_setknobvalue
+
 subroutine w_ptc_addknob(fibre)
   use madx_ptc_knobs_module
   implicit none
@@ -213,3 +224,4 @@ subroutine w_ptc_script(scriptname)
   call execscript(scriptname)
 
 end subroutine w_ptc_script
+
