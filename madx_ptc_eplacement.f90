@@ -576,7 +576,6 @@ contains
     endif
     
   end function 
-
   !____________________________________________________________________________________________
 
   subroutine rotmatrixfromeuler(phi, theta, eta, ent)
@@ -613,3 +612,40 @@ contains
   
   
 end module madx_ptc_eplacement_module
+!____________________________________________________________________________________________
+!____________________________________________________________________________________________
+!____________________________________________________________________________________________
+!____________________________________________________________________________________________
+
+
+integer function w_ptc_getnelements()
+  use madx_ptc_module, only: my_ring;
+  implicit none
+  integer :: n
+  
+  if (associated(my_ring)) then
+    print*, "There is ", my_ring%n ,"elements in the ring and"
+    print*, " n is ",n
+    n = my_ring%n
+    print*, "Now n is ",n
+  else
+    n = 0.0
+  endif
+  
+  w_ptc_getnelements = n
+
+end function w_ptc_getnelements
+!____________________________________________________________________________________________
+
+subroutine w_ptc_getelname(n)
+  use madx_ptc_module, only: my_ring;
+  implicit none
+  integer n
+  
+  if (associated(my_ring)) then
+    n = my_ring%n
+  endif   
+
+end subroutine w_ptc_getelname
+
+
