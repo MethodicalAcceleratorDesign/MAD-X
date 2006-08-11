@@ -40,7 +40,7 @@
 void *rplot_handle = 0x0;
 
 /*pointer to rplotter function, C intrtface to MadxPlotter::Fill, see MadxPlotter for details */
-typedef void (*rplot_plottrack_fctn)(int,int,double, double,double,double,double,double,double);/*function type definition*/
+typedef void (*rplot_plottrack_fctn)(int,int,int,double, double,double,double,double,double,double);/*function type definition*/
 rplot_plottrack_fctn rplot_plottrack = 0x0; /*pointer to function*/
 
 
@@ -48,7 +48,7 @@ rplot_plottrack_fctn rplot_plottrack = 0x0; /*pointer to function*/
 void loadrplotlib();
  
 extern type_OfExtern
-void type_ofCall plottrack(int* particleno, int* obspoint, double* x, double* xp,
+void type_ofCall plottrack(int* particleno, int* obspoint,  int* turn, double* x, double* xp,
                            double* y, double* yp, double* dpOverP,  double* p,
                            double* length); 
 

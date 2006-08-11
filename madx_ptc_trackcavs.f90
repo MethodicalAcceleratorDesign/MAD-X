@@ -187,9 +187,9 @@ contains
 
                   write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
-                  call plottrack(n, e, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                  call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
                else
-                  call plottrack(n, e, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                  call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
                endif
              endif             
              

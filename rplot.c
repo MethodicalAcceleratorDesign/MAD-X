@@ -70,7 +70,7 @@ void unloadrplotlib()
 }
 
 extern type_OfExtern
-void type_ofCall plottrack(int* particleno, int* obspoint,
+void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
                            double* x, double* xp,
                            double* y, double* yp,
                            double* dpOverP,  double* p,
@@ -81,16 +81,16 @@ void type_ofCall plottrack(int* particleno, int* obspoint,
 
   if (MadxPlotter::GetDebug() >9)
   {
-    printf("rlot.c: plottrack: %d      %d   %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f  %10.7f \n",
-           *particleno, *obspoint, *x,     *xp,    *y,     *yp,    *dpOverP, *p, *length);
+    printf("rlot.c: plottrack: %d    %d %d %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f  %10.7f \n",
+           *particleno, *obspoint,*turn, *x,     *xp,    *y,     *yp,    *dpOverP, *p, *length);
   }
 
-  MadxPlotter::Instance()->Fill(*particleno, *obspoint, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
+  MadxPlotter::Instance()->Fill(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
 #elif PLUGIN_SUPPORT
  
  if (rplot_plottrack == 0x0) return;
  
- (*rplot_plottrack)(*particleno, *obspoint, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
+ (*rplot_plottrack)(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
    
 #endif
 }
