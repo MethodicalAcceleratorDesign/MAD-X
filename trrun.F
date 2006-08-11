@@ -341,7 +341,7 @@
       double precision apx,apy,el,sum,node_value,track(6,*),            &
      &last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
      &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
-     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),z0
+     &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),z0(6)
       character*(name_len) aptype
       parameter(zero = 0.d0, one=1d0)
 
@@ -2125,7 +2125,7 @@
       include 'name_len.fi'
       integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
       double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
-     &z0, one,al_errors(align_max)
+     &z0(6), one,al_errors(align_max)
       parameter(one=1d0)
       character*(name_len) aptype
 
