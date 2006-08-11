@@ -42,6 +42,7 @@ contains
     integer              :: nturns = 1
     integer              :: t = 1
     logical(lp)          :: gcs
+    logical(lp)          :: rplot
     real (dp)            :: gposx, gposy, gposz
     integer              :: e
     integer              :: apertflag
@@ -85,6 +86,8 @@ contains
 
     gcs = get_value('ptc_trackline ','gcs ') .ne. 0
 
+    rplot = get_value('ptc_trackline ','rootntuple ') .ne. 0
+    
     intstate = getintstate()
     if (gcs .and.  intstate%TOTALPATH) then
        call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
@@ -133,8 +136,10 @@ contains
        print *, '###################################################'
        print *, '###################################################'
     endif
-
-    call newrplot()
+    
+    if (rplot) then
+      call newrplot()
+    endif  
 
     n=1
     npart = getnumberoftracks()
@@ -169,34 +174,25 @@ contains
              xp = x(2)/pz
              yp = x(4)/pz
 
-             if (getdebug() > 3) then
-                write(6,*) p%mag%name
-                write(6,'(a12,3f8.4)') "Chart  B ", p%chart%f%b(1), p%chart%f%b(2), p%chart%f%b(3)
-                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-                write(6,'(a12,3f8.4)') "Chart Exi1 ", p%chart%f%exi(1,1), p%chart%f%exi(1,2), p%chart%f%exi(1,3)
-                write(6,'(a12,3f8.4)') "Chart Exi2 ", p%chart%f%exi(2,1), p%chart%f%exi(2,2), p%chart%f%exi(2,3)
-                write(6,'(a12,3f8.4)') "Chart Exi2 ", p%chart%f%exi(3,1), p%chart%f%exi(3,2), p%chart%f%exi(3,3)
-                write(6,'(a12,3f8.4)') "mag Exi1 ", p%mag%p%f%exi(1,1), p%mag%p%f%exi(1,2), p%mag%p%f%exi(1,3)
-                write(6,'(a12,3f8.4)') "mag Exi2 ", p%mag%p%f%exi(2,1), p%mag%p%f%exi(2,2), p%mag%p%f%exi(2,3)
-                write(6,'(a12,3f8.4)') "mag Exi2 ", p%mag%p%f%exi(3,1), p%mag%p%f%exi(3,2), p%mag%p%f%exi(3,3)
-             endif
+             if (rplot) then
+               if (gcs) then
+  !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+                  gposx = x(1)*p%mag%p%f%exi(1,1) + x(3)*p%mag%p%f%exi(1,2) + x(6)*p%mag%p%f%exi(1,3)
+                  gposy = x(1)*p%mag%p%f%exi(2,1) + x(3)*p%mag%p%f%exi(2,2) + x(6)*p%mag%p%f%exi(2,3)
+                  gposz = x(1)*p%mag%p%f%exi(3,1) + x(3)*p%mag%p%f%exi(3,2) + x(6)*p%mag%p%f%exi(3,3)
+  !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                  gposx = gposx + p%mag%p%f%b(1)
+                  gposy = gposy + p%mag%p%f%b(2)
+                  gposz = gposz + p%mag%p%f%b(3)
 
-             if (gcs) then
-!                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-                gposx = x(1)*p%mag%p%f%exi(1,1) + x(3)*p%mag%p%f%exi(1,2) + x(6)*p%mag%p%f%exi(1,3)
-                gposy = x(1)*p%mag%p%f%exi(2,1) + x(3)*p%mag%p%f%exi(2,2) + x(6)*p%mag%p%f%exi(2,3)
-                gposz = x(1)*p%mag%p%f%exi(3,1) + x(3)*p%mag%p%f%exi(3,2) + x(6)*p%mag%p%f%exi(3,3)
-!                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
-                gposx = gposx + p%mag%p%f%b(1)
-                gposy = gposy + p%mag%p%f%b(2)
-                gposz = gposz + p%mag%p%f%b(3)
+                  write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
-                write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
-
-                call plottrack(n, e, gposx, xp , gposy, yp , x(5), p0 , gposz)
-             else
-                call plottrack(n, e, x(1), xp , x(3), yp , x(5), p0 , x(6))
-             endif
+                  call plottrack(n, e, gposx, xp , gposy, yp , x(5), p0 , gposz)
+               else
+                  call plottrack(n, e, x(1), xp , x(3), yp , x(5), p0 , x(6))
+               endif
+             endif             
+             
              if ( observedelements(e) .gt. 0) then
                 call putintracktable(n,t,observedelements(e),x(1), xp , x(3), yp , x(6), x(5), pathlegth, p0)
              endif
@@ -225,7 +221,7 @@ contains
        enddo !loop over turns
     enddo !loop over tracks
 
-    call rplotfinish()   !skowron                                                           ! m
+    if (rplot) call rplotfinish()   
     call deletetrackstrarpositions()
 
     c_%x_prime=.false.
@@ -931,3 +927,17 @@ contains
 
 
 end module madx_ptc_trackline_module
+
+
+!              if (getdebug() > 3) then
+!                 write(6,*) p%mag%name
+!                 write(6,'(a12,3f8.4)') "Chart  B ", p%chart%f%b(1), p%chart%f%b(2), p%chart%f%b(3)
+!                 write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+!                 write(6,'(a12,3f8.4)') "Chart Exi1 ", p%chart%f%exi(1,1), p%chart%f%exi(1,2), p%chart%f%exi(1,3)
+!                 write(6,'(a12,3f8.4)') "Chart Exi2 ", p%chart%f%exi(2,1), p%chart%f%exi(2,2), p%chart%f%exi(2,3)
+!                 write(6,'(a12,3f8.4)') "Chart Exi2 ", p%chart%f%exi(3,1), p%chart%f%exi(3,2), p%chart%f%exi(3,3)
+!                 write(6,'(a12,3f8.4)') "mag Exi1 ", p%mag%p%f%exi(1,1), p%mag%p%f%exi(1,2), p%mag%p%f%exi(1,3)
+!                 write(6,'(a12,3f8.4)') "mag Exi2 ", p%mag%p%f%exi(2,1), p%mag%p%f%exi(2,2), p%mag%p%f%exi(2,3)
+!                 write(6,'(a12,3f8.4)') "mag Exi2 ", p%mag%p%f%exi(3,1), p%mag%p%f%exi(3,2), p%mag%p%f%exi(3,3)
+!              endif
+! 
