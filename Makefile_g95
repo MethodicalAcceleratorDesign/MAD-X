@@ -4,7 +4,7 @@
 #
 #######################################################################
 
-PLUGIN_SUPPORT=YES
+PLUGIN_SUPPORT=NO
 
 # compilers
 CC=gcc
