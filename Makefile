@@ -4,6 +4,8 @@
 #
 #######################################################################
 
+PLUGIN_SUPPORT=YES
+
 # compilers
 CC=gcc
 FC=g77
@@ -45,9 +47,9 @@ FFLAGS77= --o1 --tp -c
 FP=-static
 
 # NAG f95 link options
-#f95_FOPT=
+# LDOPT=
 # LF95 f95 link options
-f95_FOPT=-static
+LDOPT=-static
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
@@ -57,6 +59,17 @@ LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 #LIBX_ext= -lgcc
 # LF95 f95 lib extension
 LIBX_ext=
+
+ifeq ($(PLUGIN_SUPPORT),YES)
+  GCCP_FLAGS+= -DPLUGIN_SUPPORT
+  #linker options to make dynamic linking
+  #Lahey lf95
+  LDOPT=
+  #g95
+  #LDOPT=-rdynamic
+  
+endif
+
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
@@ -172,7 +185,7 @@ madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxpf.o gxx11c.o rplot.o \
 	$(madx_objectsf95)
 madxp: $(madxp_objects)
-	$(f95) $(f95_FOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
+	$(f95) $(LDOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
 
 clean:
 	rm -f *.o

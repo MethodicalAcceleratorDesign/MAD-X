@@ -4,6 +4,8 @@
 
 #######################################################################
 
+PLUGIN_SUPPORT=NO
+
 # parameters
 
 f95=lf95
@@ -20,9 +22,22 @@ FC=lf95
 FCP=$(FFLAGS77)
 
 CC=gcc
-FOPT=-static
+FOPT=
+
+CXX=$(CC)
 
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
+
+INCLUDES=-I.
+
+
+ifeq ($(PLUGIN_SUPPORT),YES)
+  GCCP_FLAGS+= -DPLUGIN_SUPPORT
+  LDOPT=
+endif
+
+GCCP_FLAGS += $(INCLUDES)
+
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
@@ -301,6 +316,7 @@ madxp: \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o pointers.o \
 	$(LIBX) -lm -lc
+
 
 clean:
 	rm -f *.o

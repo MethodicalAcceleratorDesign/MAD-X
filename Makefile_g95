@@ -4,10 +4,13 @@
 #
 #######################################################################
 
+PLUGIN_SUPPORT=YES
+
 # compilers
 CC=gcc
 # g95 for replacement of g77
 FC=g95
+CXX=$(CC)
 f95=g95
 
 # default fortran compiler options
@@ -32,13 +35,23 @@ FFLAGS77= -c -O4 -fno-second-underscore -funroll-loops -I.
 FP=-static
 
 # g95 Fortran90 link options
-#f95_FOPT=-static
-f95_FOPT=
+LDOPT=
 
 # libraries
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 LIBX_ext=
+
+LIBS += $(LIBX) $(LIBX_ext)
+
+INCLUDES=-I.
+
+ifeq ($(PLUGIN_SUPPORT),YES)
+  GCCP_FLAGS+= -DPLUGIN_SUPPORT
+  LDOPT=-rdynamic
+endif
+
+GCCP_FLAGS += $(INCLUDES)
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
@@ -56,7 +69,12 @@ madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c maketh
 	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
 
 madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+	echo $(CC)
+	echo $(GCCP_FLAGS)
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
+
+rplot.o: rplot.c rplot.h
+	$(CXX) $(GCCP_FLAGS) -c -o rplot.o rplot.c
 
 # fortran code dependencies on header files fi
 twiss_f77.o twiss.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
@@ -152,8 +170,9 @@ madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst
 madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxpf.o gxx11c.o rplot.o \
 	$(madx_objectsf95)
-madxp: $(madxp_objects)
-	$(f95) $(f95_FOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
+madxp: $(madxp_objects) 
+	$(f95) $(LDOPT) -o $@ $(madxp_objects) $(LIBS)
+
 
 clean:
 	rm -f *.o

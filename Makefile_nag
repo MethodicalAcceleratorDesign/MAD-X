@@ -4,6 +4,8 @@
 
 #######################################################################
 
+PLUGIN_SUPPORT=NO
+
 # parameters
 
 f95=f95
@@ -20,6 +22,11 @@ CC=gcc
 FOPT=-Bstatic
 
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
+
+ifeq ($(PLUGIN_SUPPORT),YES)
+  GCCP_FLAGS+= -DPLUGIN_SUPPORT
+  FOPT=-Bdynamic
+endif
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10

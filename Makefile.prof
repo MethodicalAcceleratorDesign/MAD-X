@@ -4,7 +4,7 @@
 #
 #######################################################################
 
-RPLOT=YES
+RPLOT=NO
 PROFILE=NO
 
 LDOPS=-static
@@ -224,12 +224,6 @@ c_objs = madxpf.o gxx11c.o rplot.o
 f90_objs = $(patsubst %.f90,%.o,$(wildcard *.f90))
 madxp_objects = $(f90_objs) $(c_objs) $(madx_objectsf95)
 
-rplot::
-ifdef RPLOT
-	echo Making rplot;
-	make -C rplot;
-endif
-
 madxp_deps=$(f90_objs) $(c_objs) $(madx_objectsf95) 
 ifdef RPLOT
   madxp_deps+=lib/tgt_linux/librplot.so
@@ -246,6 +240,11 @@ madxp_prof: $(f90_objs) $(c_objs) $(madx_objectsf95)
 madx_prof: $(madx_objectsf77) 
 	$(LD) -pg  $(LDOPS) -o madx_prof $(madx_objectsf77) $(LIBX) -lpthread -lm -lc
 
+rplot::
+ifdef RPLOT
+	echo Making rplot;
+	make -C rplot;
+endif
 
 clean:
 	rm -f *.o
