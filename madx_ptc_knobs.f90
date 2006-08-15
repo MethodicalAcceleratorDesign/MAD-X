@@ -1309,7 +1309,7 @@ contains
   subroutine printpareq(ut,iunit)
     implicit none
     type(universal_taylor)  :: ut
-    integer                 :: iunit
+    integer                 :: iunit, eqlen
     
     if(ut%nv /= c_%nv) then
          call fort_warn("printpareq",&
@@ -1319,7 +1319,8 @@ contains
 
     
     call getpareq(ut,textbuffer)
-    write(iunit,'(A)')  textbuffer
+    eqlen = len_trim(textbuffer) + 1;
+    write(iunit,'(A)')  textbuffer(1:eqlen)
 
      
   end subroutine printpareq
