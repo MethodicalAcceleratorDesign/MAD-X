@@ -64,7 +64,7 @@ ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
   #linker options to make dynamic linking
   #Lahey lf95
-  LDOPT=
+  LDOPT=--export
   #g95
   #LDOPT=-rdynamic
   
