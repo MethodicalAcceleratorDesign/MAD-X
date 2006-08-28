@@ -618,18 +618,15 @@ end module madx_ptc_eplacement_module
 !____________________________________________________________________________________________
 
 
-integer function w_ptc_getnelements()
+function w_ptc_getnelements()
   use madx_ptc_module, only: my_ring;
   implicit none
-  integer :: n
-  
+  integer ::  w_ptc_getnelements
+  integer :: n 
+ 
+  n = 0
   if (associated(my_ring)) then
-    print*, "There is ", my_ring%n ,"elements in the ring and"
-    print*, " n is ",n
     n = my_ring%n
-    print*, "Now n is ",n
-  else
-    n = 0.0
   endif
   
   w_ptc_getnelements = n
@@ -647,5 +644,6 @@ subroutine w_ptc_getelname(n)
   endif   
 
 end subroutine w_ptc_getelname
+
 
 
