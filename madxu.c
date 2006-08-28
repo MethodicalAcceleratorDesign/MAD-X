@@ -618,8 +618,12 @@ delete_command_parameter_list(struct command_parameter_list* parl)
   if (parl->parameters != NULL)
   {
     for (i = 0; i < parl->curr; i++)
+     {
       if (parl->parameters[i] != NULL)
-        parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
+       {
+         parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
+       } 
+     }   
     if (parl->parameters)  myfree(rout_name, parl->parameters);
   }
   myfree(rout_name, parl);
@@ -2390,6 +2394,7 @@ struct command_parameter* new_command_parameter(char* name, int type)
 
 struct command_parameter_list* new_command_parameter_list(int length)
 {
+  int i;
   char rout_name[] = "new_command_parameter_list";
   struct command_parameter_list* il =
     (struct command_parameter_list*)
@@ -2403,6 +2408,7 @@ struct command_parameter_list* new_command_parameter_list(int length)
   {
     il->parameters = (struct command_parameter**)
       mycalloc(rout_name,length, sizeof(struct command_parameter*));
+    for (i = 0; i < length; i++) il->parameters[i] = NULL;
   }
   return il;
 }
