@@ -1,3 +1,6 @@
+#ifndef MADX_H
+#define MADX_H
+
 struct aper_node        /* aperture limit node */
 {
   char name[NAME_L];
@@ -475,3 +478,7 @@ struct orb_cor2 {
   struct id_mic2 *cor_table;
   struct id_mic2 *mon_table;
 };
+
+enum Match_Mode{kMatch_NoMatch = 0, kMatch_Std, kMatch_UseMacro, kMatch_PTCknobs};
+
+#endif
