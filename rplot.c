@@ -6,12 +6,10 @@
 
 extern type_OfExtern void type_ofCall warning(const char*, const char*);
 
-
 void loadrplotlib()
 {
 #if PLUGIN_SUPPORT
    void *handle;
-   
    /*simple check if the library was linked dynamically*/
    handle = dlopen( 0,  RTLD_GLOBAL | RTLD_LAZY);
    if (handle == 0x0)
@@ -20,13 +18,11 @@ void loadrplotlib()
        "Most probobly yur binary is statically linked, what disables plugin support.\n");
       return;
     }
-    
 /*   printf("0 loading Done\n");*/
    if (!handle) {
        fprintf (stderr, "%s\n", dlerror());
        return;
    }
-
 
    
    handle = dlopen( "libCore.so",   RTLD_GLOBAL | RTLD_NOW);
@@ -59,6 +55,7 @@ void loadrplotlib()
            "Plugin support is not enabled in this version. Unable to use rplot.");
 #endif
 }
+/*_________________________________________________________________________________________*/
 
 void unloadrplotlib()
 {
@@ -68,6 +65,7 @@ void unloadrplotlib()
    rplot_plottrack = 0x0;
 #endif   
 }
+/*_________________________________________________________________________________________*/
 
 extern type_OfExtern
 void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
@@ -326,4 +324,8 @@ void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
   
 #endif
 }
+
+/*_________________________________________________________________________________________*/
+
+
 
