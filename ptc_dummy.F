@@ -144,6 +144,13 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine w_ptc_setfieldcomp(fibreidx)
+      implicit none
+      integer fibreidx
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end subroutine w_ptc_setfieldcomp
+
       subroutine  w_ptc_printlayout_rootm()
       implicit none
       call fort_warn('PTC command skipped! ',                           &

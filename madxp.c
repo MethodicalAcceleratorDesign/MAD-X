@@ -35,7 +35,6 @@
 /* FS & TdA 15.03.2004 plot upgrade, bugs correction, ptc_twiss upgrade, touschek preparation */
 #include "c6t.h"
 
-static const int kSkowronDebug = 0;
 
 void madx()
 {
@@ -1443,12 +1442,26 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_create_universe") == 0)
       {
-        w_ptc_create_universe_();
-        curr_obs_points = 1;  /* default: always observe at machine end */
+        if (match_is_on == kMatch_PTCknobs) 
+         { 
+           madx_mpk_setcreateuniverse(p);
+         } 
+        else 
+         {
+           w_ptc_create_universe_();
+           curr_obs_points = 1;  /* default: always observe at machine end */
+         }  
       }
       else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
       {
-        w_ptc_create_layout_();
+        if (match_is_on == kMatch_PTCknobs) 
+         { 
+           madx_mpk_setcreatelayout(p);
+         }  
+        else
+         {  
+           w_ptc_create_layout_();
+         } 
       }
       else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
       {
@@ -1473,73 +1486,63 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_trackline") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_trackline, calling pro_ptc_trackline\n");
         pro_ptc_trackline(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_dumpmaps, calling pro_ptc_dumpmaps\n");
         ptc_dumpmaps(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_twiss_linac") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_twiss_linac, calling pro_ptc_trackline\n");
         current_twiss = p->clone;
         pro_ptc_twiss_linac(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_track, calling pro_ptc_track\n");
         pro_ptc_track(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_setswitch") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_setswitch, calling pro_ptc_setswitch\n");
         pro_ptc_setswitch(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_select") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_select, calling pro_ptc_select\n");
         pro_ptc_select(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_printparametric") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_printparametric, calling pro_ptc_printparametric\n");
         pro_ptc_printparametric(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_knob, calling pro_ptc_knob\n");
         pro_ptc_knob(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_setknobvalue, calling pro_ptc_setknobvalue\n");
         pro_ptc_setknobvalue(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)
+      {
+        pro_ptc_setfieldcomp(p);
       }
       else if (strcmp(p->cmd_def->module, "rviewer") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is rviewer, calling rviewer\n");
         w_ptc_rviewer();
       }
       else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_printframes, calling pro_ptc_printframes\n");
         pro_ptc_printframes(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_eplacement") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_eplacement, calling pro_ptc_eplacement\n");
         pro_ptc_eplacement(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_script") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_script, calling pro_ptc_script\n");
         pro_ptc_script(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)
       {
-        if (kSkowronDebug) printf("madxp.c: Command is ptc_enforce6d, calling pro_ptc_enforce6d\n");
         pro_ptc_enforce6d(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_observe") == 0)

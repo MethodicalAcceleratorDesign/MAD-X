@@ -47,6 +47,10 @@ madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c maketh
 madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS) -o madxpf.o madxp.c
 
+matchptcknobs.o: matchptcknobs.c matchptcknobs.h madx.h
+	$(CC) $(GCCP_FLAGS) -o matchptcknobs.o matchptcknobs.c
+
+
 twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
 	$(FC) $(FCP) -o twissp.o twiss.F
 
@@ -258,17 +262,17 @@ mpars: madxm.o madxp.o
 	$(FC) $(FOPT) -o mpars madxm.o madxp.o $(LIBX) -lm -lc
 
 madx: \
-	madxm.o madxpf.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o \
+	madxm.o madxpf.o matchptcknobs.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o \
 	utilp.o matchp.o matchsap.o matchjcp.o matchlibp.o touschekp.o plotp.o \
 	soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
 	gxx11c.o resindexp.o timel.o
-	$(FC) $(FOPT) -o madx madxm.o madxpf.o twissp.o ptc_dummy.o \
+	$(FC) $(FOPT) -o madx madxm.o madxpf.o matchptcknobs.o twissp.o ptc_dummy.o \
 	surveyp.o matchp.o matchsap.o matchjcp.o matchlibp.o touschekp.o plotp.o \
 	soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
 	gxx11c.o resindexp.o timel.o $(LIBX) -lm -lc
 
 madxp: \
-	madx_main.o run_madx.o madxpf.o twiss.o survey.o orbf.o emit.o util.o \
+	madx_main.o run_madx.o madxpf.o matchptcknobs.o twiss.o survey.o orbf.o emit.o util.o \
 	match.o matchsa.o matchjc.o matchlibp.o touschek.o dynap.o plot.o sodd.o \
 	ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o timest.o timex.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
@@ -285,7 +289,7 @@ madxp: \
 	madx_ptc_script.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o pointers.o 
-	$(f95) $(FOPT) -o madxp madx_main.o run_madx.o madxpf.o twiss.o \
+	$(f95) $(FOPT) -o madxp madx_main.o run_madx.o madxpf.o matchptcknobs.o twiss.o \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlibp.o \
 	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
 	timest.o timex.o \

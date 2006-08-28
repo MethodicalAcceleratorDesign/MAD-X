@@ -81,6 +81,8 @@
 /matchc2.c -text
 /matchjc.F -text
 /matchlib.F -text
+/matchptcknobs.c -text
+/matchptcknobs.h -text
 /matchsa.F -text
 /n_complex_polymorph.f90 -text
 /name_len.fi -text

@@ -22,7 +22,7 @@ FCM=-O2 -fno-second-underscore -funroll-loops
 FCDB=-g -O0 -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -fno-second-underscore -D_CATCH_MEM -I.
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 
 # alternative for development
@@ -75,7 +75,7 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
+  GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
   FP=
 endif
@@ -83,11 +83,14 @@ endif
 default: madx
 
 # dependencies of madxpf which combines the C-code
-madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
+
+
+matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
 
 # fortran code dependencies on header files fi
 twiss_f77.o twiss.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
@@ -173,7 +176,8 @@ mpars: madxm.F madxp.o
 
 # madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
-madx_objectsf77 = madxpf.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+madx_objectsf77 = madxpf.o gxx11c.o timel.o matchptcknobs.o \
+	$(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 
 madx: $(madx_objectsf77) ;
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
@@ -182,7 +186,7 @@ madx: $(madx_objectsf77) ;
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxp_objects. All *.f90 , some c and F
 madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
-	madxpf.o gxx11c.o rplot.o \
+	madxpf.o gxx11c.o matchptcknobs.o rplot.o \
 	$(madx_objectsf95)
 madxp: $(madxp_objects)
 	$(f95) $(LDOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)

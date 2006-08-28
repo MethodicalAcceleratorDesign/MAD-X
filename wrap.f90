@@ -144,7 +144,12 @@ subroutine w_ptc_end()
   call ptc_end()
 end subroutine w_ptc_end
 
-
+subroutine w_ptc_setfieldcomp(fibreidx)
+  use madx_ptc_module
+  implicit none
+  integer fibreidx
+  call ptc_setfieldcomp(fibreidx)
+end subroutine w_ptc_setfieldcomp
 
 subroutine w_ptc_setknobvalue(fibre)
   use madx_ptc_knobs_module

@@ -390,24 +390,34 @@ char command_def[] =
 "quantity   = [s, none] ; "
 " "
 "ptc_knob: ptc_knob none 0 0 "
-"elementname = [s, none] , "/* */
+"element = [s, none] , "/* */
 "kn    = [i, {-1}], "
 "ks    = [i, {-1}], "
-"exactmatch = [l, true, true] ; "
+"exactmatch = [l, true, true], "
+"step     = [r, 0.0], " /*used in matching only*/
+"lower    = [r, -1.e20], " /*used in matching only*/
+"upper    = [r,  1.e20]; "/*used in matching only*/
 " "
 "ptc_setknobvalue: ptc_setknobvalue none 0 0 "
-"elementname = [s, none] , "/* */
+"element = [s, none] , "/* */
 "kn    = [i, -1], "
 "ks    = [i, -1], "
 "value = [r] ; "
 " "
 "rviewer: rviewer none 0 0 "
-"elementname = [s, none] , "/* */
 "exactmatch = [l, true, true] ; "
 " "
 "ptc_printparametric: ptc_printparametric none 0 0 "
 "filename = [s, none] , "/* */
 "format = [s, ptc] ; "
+" "
+"ptc_setfieldcomp: ptc_setfieldcomp none 0 0 "
+"fromerrtable    = [s, none, efield], "
+"add             = [l, false, true], "
+"element = [s, none] , "/* */
+"kn    = [i, -1], "
+"ks    = [i, -1], "
+"value = [r] ; "
 " "
 "ptc_eplacement: ptc_eplacement none 0 0 "
 "range = [s, none] , "/* */
@@ -1761,6 +1771,7 @@ char command_def[] =
 " "
 "match: match match 1 0 "
 "use_macro= [l, false, true], "
+"use_ptcknob = [l, false, true], "
 "betx     = [r, {0}], alfx     = [r, {0}], mux      = [r, {0}], "
 "bety     = [r, {0}], alfy     = [r, {0}], muy      = [r, {0}], "
 "x        = [r, {0}], px       = [r, {0}], "

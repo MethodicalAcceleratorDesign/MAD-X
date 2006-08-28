@@ -1,3 +1,4 @@
+
 void match2_match(struct in_cmd* cmd)
 {
   int i,j;
@@ -37,12 +38,16 @@ void match2_end(struct in_cmd* cmd)
              match2_cons_value_rhs[i][j],
              match2_cons_value[i][j]);
       penalty+=pow(match2_cons_value[i][j],2);
-      free(match2_cons_name[i][j]);
-      delete_expression(match2_cons_rhs[i][j]);
-      delete_expression(match2_cons_lhs[i][j]);
+
     }
   }
-
+  
+  if (!match2_keepexpressions) 
+   {
+     match2_delete_expressions();
+   }  
+   
+  
   fprintf(prt_file, "\n\n");
   fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
 
@@ -155,7 +160,7 @@ void match2_constraint(struct in_cmd* cmd)
   start=start+2;
   nitem = end-start+1;
   cname=spec_join(&toks[start], nitem);
-  match2_cons_name[i][j]=(char*) malloc(strlen(cname)+1);
+  match2_cons_name[i][j]=(char*) mymalloc("match2_constraint",strlen(cname)+1);
 /*  strcpy(match2_cons_name[i][j],cname);*/
   n=0;
   for(k=0;k<strlen(cname);k++){
@@ -170,4 +175,43 @@ void match2_constraint(struct in_cmd* cmd)
   printf("%d %d: %s\n",i,j,match2_cons_name[i][j]);
 /*  printf("%e\n",expression_value(match2_cons_expr[i][j],type));*/
   return;
+}
+
+int match2_evaluate_exressions(int i, double* fun_vec)
+{
+  int j,k=0;
+  double rhs,lhs,r;/* RDM fork */
+  char s;
+  printf("\n");  
+  for(j=0;match2_cons_name[i][j]!=NULL;j++) {
+    rhs=expression_value(match2_cons_rhs[i][j],2);
+    lhs=expression_value(match2_cons_lhs[i][j],2);
+    s =match2_cons_sign[i][j];
+    r=lhs - rhs;
+    fun_vec[k]=match2_cons_weight[i][j]*r;
+    if (s == '>' && r > 0) fun_vec[k]=0;
+    else if (s == '<'  && r < 0) fun_vec[k]=0;
+    match2_cons_value[i][j]=fun_vec[k];
+    match2_cons_value_rhs[i][j]=rhs;
+    match2_cons_value_lhs[i][j]=lhs;
+    k++;
+  }
+
+  return k-1;
+}
+
+void match2_delete_expressions()
+{
+  char rout_name[] = "match2_delete_expressions";
+
+  int i,j;
+  
+  for(i=0;match2_macro_name[i]!=NULL;i++) {
+    for(j=0;match2_cons_name[i][j]!=NULL;j++) {
+      myfree(rout_name,match2_cons_name[i][j]);
+      delete_expression(match2_cons_rhs[i][j]);
+      delete_expression(match2_cons_lhs[i][j]);
+    }
+  }
+
 }

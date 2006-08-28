@@ -116,13 +116,18 @@ default: rplot madxp
 
 # dependencies of madxpf which combines the C-code
 madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c \
-         c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+         c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h \
+	 matchptcknobs.c matchptcknobs.h
 	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
 
 madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c \
-          c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
+          c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h \
+	  matchptcknobs.c matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
 
+matchptcknobs.o: matchptcknobs.c matchptcknobs.h
+	$(CC) $(GCCP_FLAGS) -c -o matchptcknobs.o matchptcknobs.c 
+	
 rplot.o: rplot.c
 	$(CXX) $(CXX_FLAGS) -c -o rplot.o rplot.c
 
@@ -211,7 +216,8 @@ mpars: madxm.F madxp.o
 # madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
 
-madx_objectsf77 = madxpf.o gxx11c.o timel.o $(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+madx_objectsf77 = madxpf.o matchptcknobs.o gxx11c.o timel.o \
+	$(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 madx: $(madx_objectsf77) 
 	$(LD) $(LDOPS) -o $@ $(madx_objectsf77) $(LIBX) -lpthread -lm -lc
 
@@ -220,7 +226,7 @@ madx: $(madx_objectsf77)
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 
 # madxp_objects. All *.f90 , some c and F
-c_objs = madxpf.o gxx11c.o rplot.o
+c_objs = madxpf.o matchptcknobs.o gxx11c.o rplot.o
 f90_objs = $(patsubst %.f90,%.o,$(wildcard *.f90))
 madxp_objects = $(f90_objs) $(c_objs) $(madx_objectsf95)
 

@@ -961,6 +961,137 @@ CONTAINS
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
   !----------------------------------------------------------------
 
+  subroutine ptc_setfieldcomp(fibreidx)
+    implicit none
+    include 'twissa.fi'
+    integer              :: fibreidx
+    type(fibre), pointer :: p
+    integer              :: j, i
+    integer              :: kn, ks
+    real(dp)             :: v
+    real(kind(1d0))      :: tmpv
+    real(kind(1d0)) get_value
+    
+    if ( .not. associated(my_ring) ) then
+      call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
+      return
+    endif
+    
+    if (getdebug()>2) then
+      print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
+    endif  
+
+    if ( (fibreidx .lt. 1) .and. (fibreidx .gt. my_ring%n) ) then
+      call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
+      return
+    endif
+    
+    p=>my_ring%start
+    do j=1, fibreidx
+      p=>p%next
+    enddo
+
+    if (getdebug() > 1 ) then
+       print*,"Found element no. ", fibreidx," named ", p%mag%name, &
+             &" of kind ", p%mag%kind, mytype(p%mag%kind)
+       print*,"Currently nmul is ", p%mag%p%nmul
+
+       write(6,*) "BNs",p%mag%BN
+       write(6,*) "ANs",p%mag%AN
+
+       DO i=1,p%mag%p%nmul
+         print*, "Polimorphic BN(",i,")"
+         call print(p%mag%BN(i),6)
+         print*, "Polimorphic AN(",i,")"
+         call print(p%mag%AN(i),6)
+       ENDDO
+
+    endif
+    
+    kn = get_value('ptc_setfieldcomp ','kn ')
+    v = get_value('ptc_setfieldcomp ','value ')
+    
+    if (kn >= 0) then
+      kn = kn + 1
+!      print*,"Setting up normal field component ", kn," to ", v
+      
+      call add(p%mag, kn,1,v)
+      call add(p%magp,kn,1,v)
+      
+    else
+      ks = get_value('ptc_setfieldcomp ','ks ')
+      if (ks < 0) then
+        call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
+        return
+      endif
+      ks = ks + 1
+
+!      print*,"Setting up skew field component ", ks," to ", v
+
+      call add(p%mag, -ks,1,v)
+      call add(p%magp,-ks,1,v)
+
+    endif
+
+    if (getdebug() > 1 ) then
+      write(6,*) "BNs",p%mag%BN
+      write(6,*) "ANs",p%mag%AN
+      write(6,*) ""
+    endif  
+  end subroutine ptc_setfieldcomp
+  
+
+
+  subroutine extendnmul(f,n)
+    implicit none
+      type(fibre),  pointer               :: f !fiber
+      integer                             :: n !order 
+      real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
+      type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
+      integer                             :: i !iterator
+      !P.Sk
+      
+      if (.not. associated(f)) then
+        return
+      endif
+
+      ALLOCATE(ANR(n),BNR(n)) 
+      ALLOCATE(ANP(n),BNP(n))
+      CALL ALLOC(ANP,n)
+      CALL ALLOC(BNP,n)
+
+      DO I=1,f%mag%P%NMUL
+        ANR(I)=f%mag%AN(I)
+        BNR(I)=f%mag%BN(I)
+
+        ANP(I)=f%magp%AN(I)
+        ANP(I)=f%magp%BN(I)
+      ENDDO
+
+      DO I=f%mag%P%NMUL+1, n
+        ANR(I)=zero
+        BNR(I)=zero
+
+        ANP(I)=zero
+        ANP(I)=zero
+      ENDDO
+
+      call kill(f%magp%AN,f%magp%p%nmul)
+      call kill(f%magp%BN,f%magp%p%nmul)
+      deallocate(f%magp%AN,f%magp%BN)
+      deallocate(f%mag%AN,f%mag%BN)
+
+      f%mag%p%nmul  = n
+      f%magp%p%nmul = n
+
+      f%mag%AN=>ANR
+      f%mag%BN=>BNR
+
+      f%magp%AN=>ANP
+      f%magp%BN=>BNP
+
+
+  end subroutine extendnmul
 
   subroutine ptc_align()
     implicit none
@@ -970,6 +1101,8 @@ CONTAINS
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
     !---------------------------------------------------------------
+    
+    
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -1265,8 +1398,25 @@ CONTAINS
        return
     endif
 
+
     if(closed_orbit) then
+
+       if ( .not. c_%stable_da) then
+          call fort_warn('ptc_twiss: ','DA got unstable even before normal')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable even before normal");
+          stop
+          return
+       endif
+    
        call find_orbit(my_ring,x,1,default,c_1d_7)
+
+       if ( .not. c_%stable_da) then
+          call fort_warn('ptc_twiss: ','DA got unstable after normal')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable after normal");
+          stop
+          return
+       endif
+
        CALL write_closed_orbit(icase,x)
     endif
 
@@ -1433,7 +1583,7 @@ CONTAINS
          scv(ii) = tw%junk%v(ii)
        enddo  
 
-       call putusertable(i,current%mag%name,suml,scv)
+       call putusertable(i,current%mag%name,suml,y,scv)
        
        iii=advance_node()
        current=>current%next
@@ -2438,8 +2588,9 @@ CONTAINS
        return
     endif
 
-    call killparresult()
-
+!    call killparresult() 
+    call resetknobs()  !remove the knobs
+    
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa

@@ -85,7 +85,8 @@
 #define w_ptc_printlayout_rootm w_ptc_printlayout_rootm_
 #define w_ptc_eplacement        w_ptc_eplacement_
 #define w_ptc_addknob           w_ptc_addknob_
-#define w_ptc_setknobvalue w_ptc_setknobvalue_
+#define w_ptc_setknobvalue      w_ptc_setknobvalue_
+#define w_ptc_setfieldcomp      w_ptc_setfieldcomp_
 #define w_ptc_rviewer           w_ptc_rviewer_
 #define w_ptc_script            w_ptc_script_
 #define w_ptc_addpush           w_ptc_addpush_
@@ -611,6 +612,7 @@ void pro_ptc_twiss();
 void pro_ptc_track(struct in_cmd*);
 void pro_ptc_trackline(struct in_cmd*);
 int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);
+void pro_ptc_knob(struct in_cmd* cmd);
 
 void put_info(char*, char*);
 int quote_level(char*, char*);
@@ -731,6 +733,7 @@ void w_ptc_settime(int* boolflag);
 void w_ptc_setnocavity(int* boolflag);
 void w_ptc_addknob(int* fibrename);
 void w_ptc_setknobvalue(int* fibrename);
+void w_ptc_setfieldcomp(int* fibreidx);
 void w_ptc_rviewer();
 void w_ptc_eplacement(int* eidx,int* refframe);
 void w_ptc_writeparresults(int* filename);
@@ -1259,7 +1262,6 @@ time_t start_time;
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
-double** trackstrarpositions = 0x0;/* two dimensional array with track positions*/
 
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
@@ -1270,6 +1272,9 @@ void match2_match(struct in_cmd*);
 void match2_end(struct in_cmd*);
 void match2_macro(struct in_cmd*);
 void match2_constraint(struct in_cmd*);
+int  match2_evaluate_exressions(int i, double* fun_vec);
+void match2_delete_expressions();
+char match2_keepexpressions = 0; /*do not delete expressions at the end matching used by match with PTC knobs*/
 char* match2_macro_name[10];
 char* match2_cons_name[10][30];
 double match2_cons_value[10][30];

@@ -55,7 +55,7 @@ module madx_ptc_knobs_module
   real(dp), private, allocatable        ::  Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
 
 
-  integer, parameter                    ::  maxnpolblocks=10
+  integer, parameter                    ::  maxnpolblocks=20
   type (pol_block), target              ::  polblocks(maxnpolblocks) 
   integer                               ::  npolblocks=0
   integer                               ::  nknobs=0
@@ -77,6 +77,7 @@ module madx_ptc_knobs_module
 
   integer                               ::  currentrow = 0 
   type(taylor), allocatable             ::  oldy(:)
+  integer, allocatable                  ::  E(:)  !array to pick taylor coefficients with .sub. and .par.
   
   !============================================================================================
   !  PRIVATE
@@ -93,13 +94,14 @@ module madx_ptc_knobs_module
 contains
   !____________________________________________________________________________________________
 
-  subroutine putusertable(n,name,s,y)
+  subroutine putusertable(n,name,s,yc,y)
     !puts the coefficients in tables as defined in array pushes
     implicit none
     integer              :: n !fibre number
     character(*)         :: name !fibre name
     real(kind(1d0))      :: s  !position along the orbit
-    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
+    type(real_8),target  :: yc(6)!input 6 dimensional function (polynomial) : Coordinates
+    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
     type(real_8),pointer :: e !element in array
     real(kind(1d0))      :: coeff
     integer              :: i,ii !iterator
@@ -115,6 +117,7 @@ contains
       ! otherwise the results table is not allocated
       pblockson = .true.  !it means there are parameters on
       spos(currentrow) = s
+      call parametric_coord(yc)
       call parametrictwiss(y)
     else  
       pblockson = .false.
@@ -263,6 +266,7 @@ contains
     real(kind(1d0))      :: coeff
     integer              :: i,ii !iterator
     integer              :: nelems !iterator
+    integer, parameter   :: fillntwisses = gama33 - beta11 + 1
     logical              :: pblockson
     real(kind(1d0))      :: opt_fun(72)
     type(universal_taylor), pointer :: t
@@ -281,7 +285,9 @@ contains
         opt_fun(ii)=  gettaylorvalue(t)
       enddo 
 !      write(6,'(a,3(f8.4,1x))')  "betas ", opt_fun(1),opt_fun(2),opt_fun(3)
-      call vector_to_table(twisstablename, 'beta11 ', ntwisses, opt_fun(1))
+      call vector_to_table(twisstablename, 'beta11 ', fillntwisses, opt_fun(beta11))
+      call vector_to_table(twisstablename, 'x ', 6, opt_fun(kn_x))
+      
       call augmentcountonly(twisstablename)
     
     enddo  
@@ -456,6 +462,11 @@ contains
     real(kind(1d0))            :: get_value
     
     
+    if (npolblocks >= maxnpolblocks) then
+       call fort_warn("addknob","Can not add more knobs, array with pol_blocks if full")
+       return
+    endif
+    
     npolblocks = npolblocks + 1
     pb => polblocks(npolblocks)
     pb = 0
@@ -475,25 +486,27 @@ contains
     endif
 
     call comm_para('kn ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-    print*, "there is ",nint, " kn's: ", int_arr(1:nint)
+    if (getdebug()>2) print*, "there is ",nint, " kn's: ", int_arr(1:nint)
     do i = 1, nint
-     if (int_arr(i) < 1) then
+     if (int_arr(i) < 0) then
        exit
      endif
+     int_arr(i) = int_arr(i) + 1 !madx numerates from 0
      nknobs = nknobs + 1
      pb%ibn(int_arr(i)) = nknobs
-     print*, "Set normal mulitpole component ", int_arr(i),"as ", nknobs, "parameter of PTC"
+     if (getdebug()>0) print*, "Set normal mulitpole component ", int_arr(i),"as ", nknobs, "parameter of PTC"
     enddo
     
     call comm_para('ks ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-    print*, "there is ",nint, " ks's: ", int_arr(1:nint)
+    if (getdebug()>2) print*, "there is ",nint, " ks's: ", int_arr(1:nint)
     do i = 1, nint
-     if (int_arr(i) < 1) then
+     if (int_arr(i) < 0) then
        exit
      endif
+     int_arr(i) = int_arr(i) + 1 !madx numerates from 0
      nknobs = nknobs + 1
      pb%ian(int_arr(i)) = nknobs
-     print*, "Set skew mulitpole component ", int_arr(i)," as ", nknobs, "parameter of PTC"
+     if (getdebug()>0) print*, "Set skew mulitpole component ", int_arr(i)," as ", nknobs, "parameter of PTC"
     enddo
 
   end subroutine addknob
@@ -506,16 +519,19 @@ contains
     type (pol_block), pointer  :: pb
     integer     :: i
     
-    twisstablename = table_name !defined in twissa.fi
-    print*, "Table name is ",twisstablename
+    if (.not. associated(alayout)) then
+      call fort_warn("setknobs","Passed pointer to a layout is not associated")
+      return
+    endif
     
-    currentrow = 1 
+    twisstablename = table_name !defined in twissa.fi
     
     if (getdebug() > 2 ) then
-      print*, "setknobs: There is ", npolblocks, "pol_blocks"
+      print*, "setknobs: There are ", npolblocks, "pol_blocks"
     endif  
     
     if (npolblocks == 0) then
+      if (ALLOCATED(results)) call killparresult()
       currentrow = -1 
       return
     endif
@@ -531,6 +547,10 @@ contains
    if (ALLOCATED(results)) call killparresult()
 
    call allocparresult(alayout%n)
+
+
+   currentrow = 1 
+
 !    print*, "setknobs: All pol_blocks set"
      
   end subroutine setknobs
@@ -553,19 +573,11 @@ contains
     parvals(:) = zero
     
     nr = ntwisses+nmapels
-    print*, "Allocating results ",n,nr
     allocate(results(n,nr))
     allocate(spos(n))
+    allocate(e(c_%npara_fpp))
     
-
-!    remnestant of the taylor type
-!     do i=1,n
-!        do j=1,nr
-!           call alloc(results(i,j))
-!        enddo
-!     enddo
     
-     
   end subroutine allocparresult
   !_________________________________________________________________________________
 
@@ -578,23 +590,27 @@ contains
     endif
     
 !    remnestant of the taylor type
-!     print*, "killparresult: Shape of the current array: "
-!     print*, "1D",lbound(results,1),ubound(results,1)
-!     print*, "2D",lbound(results,2),ubound(results,2)
-
-     do i=lbound(results,1),ubound(results,1)
-        do j=lbound(results,2),ubound(results,2)
-          results(i,j) = -1
-!           call kill(results(i,j))
-        enddo
-     enddo
+    if(getdebug() > 2) then
+      print*, "killparresult: Shape of the current array: "
+      print*, "1D",lbound(results,1),ubound(results,1)
+      print*, "2D",lbound(results,2),ubound(results,2)
+    endif
     
-    print*, "Deallocating results "
+    do i=lbound(results,1),ubound(results,1)
+       do j=lbound(results,2),ubound(results,2)
+!          print*,i,j
+         results(i,j) = -1
+!           call kill(results(i,j))
+       enddo
+    enddo
+    
     deallocate(spos)
     deallocate(results)
+    deallocate(parvals)
+    deallocate(e)
     
     currentrow = 0
-    
+
   end subroutine killparresult
   !____________________________________________________________________________________________
 
@@ -664,8 +680,8 @@ contains
       do j=1, nmax
         if (polblocks(i)%ian(j) /= 0 ) then
           n = n + 1
-          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ian(j),": ",&
-                         polblocks(i)%name(1:len_trim(polblocks(i)%name)), " skew ",j
+          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ian(j),": ",& !convertion to madx counting 
+                         polblocks(i)%name(1:len_trim(polblocks(i)%name)), " skew ",j-1
 
           print*, "n=",n, name
 
@@ -678,8 +694,8 @@ contains
 
         if (polblocks(i)%ibn(j) /= 0 ) then
           n = n + 1
-          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ibn(j),": ",&
-                       polblocks(i)%name(1:len_trim(polblocks(i)%name)) , " normal ",j
+          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ibn(j),": ",& !convertion to madx counting 
+                       polblocks(i)%name(1:len_trim(polblocks(i)%name)) , " normal ",j-1
           
           print*, "n=",n, name
 
@@ -777,11 +793,20 @@ contains
 
     if (.not. associated(ut%n)) then
          call fort_warn("printpareq",&
-          "provided taylor is not allocated")
+          "provided taylor is not associated")
 
          gettaylorvalue = zero
          return
     endif 
+
+    if (.not. allocated(parvals)) then
+         call fort_warn("printpareq",&
+          "array with parameter values is not allocated")
+
+         gettaylorvalue = zero
+         return
+    endif 
+
 
     if(ut%n == 0) then
          if (getdebug() > 3) then
@@ -882,6 +907,32 @@ contains
 
 
   end subroutine twissfctn
+
+  !_________________________________________________________________________________
+  subroutine parametric_coord(y)   !  Computes <x_i x_j> assuming linearity and with parameters
+    implicit none
+    type(real_8) y(6)
+
+    e(:)=0
+
+    results(currentrow, kn_x)  = y(1).par.e
+    results(currentrow, kn_px) = y(2).par.e
+
+    results(currentrow, kn_y)  = y(3).par.e
+    results(currentrow, kn_py) = y(4).par.e
+    
+    if (c_%npara_fpp == 5) then
+      results(currentrow, kn_dp) = y(5).par.e
+      results(currentrow, kn_t)  = zero
+    else if(c_%npara_fpp == 6) then
+      results(currentrow, kn_dp) = y(5).par.e
+      results(currentrow, kn_t)  = y(6).par.e
+    else
+      results(currentrow, kn_dp) = zero
+      results(currentrow, kn_t)  = zero
+    endif
+  
+  end subroutine parametric_coord
   
   !_________________________________________________________________________________
   subroutine parametrictwiss(y)   !  Computes <x_i x_j> assuming linearity and with parameters
@@ -890,9 +941,6 @@ contains
     type(taylor) :: ave(6,6,3)
     type(universal_taylor) :: unita
     integer i,j,k
-    integer, allocatable :: e(:)
-    
-    allocate(e(c_%npara_fpp))
     
     do i=1,c_%nd2
        do j=1,c_%nd2
@@ -969,6 +1017,8 @@ contains
     results(currentrow, beta33) = ave(6,6,2)  !-
     results(currentrow, gama33) = ave(5,5,2)  !-
     
+    
+    
 !     j=1
 !     ii = 2*j ! == 2                  100000
 !     angp(1,ii-1) = y(ii-1).sub.string(ii-1)
@@ -987,7 +1037,6 @@ contains
 ! 
 !     print*, "Beta Z"
 !     call daprint(ave(5,5,3),6)
-    
 
     do i=1,c_%nd2
        do j=1,c_%nd2
@@ -997,7 +1046,6 @@ contains
        enddo
     enddo
 
-    deallocate(e)
       
   end subroutine parametrictwiss
   !_________________________________________________________________________________
@@ -1120,17 +1168,17 @@ contains
     
     i = get_string('ptc_printparametric ','format ',fmat)
     if (i > 0) then
-       print*,"format is ", fmat(1:i)
+       print*,"ptc_printparametric: format is ", fmat(1:i)
 
        select case(fmat(1:i))
          case ('ptc')
-           print*, "Recognized PTC native format"
+           print*, "ptc_printparametric: Recognized PTC native format"
            fmt_ptc = .true.
          case ('tex')
-           print*, "Recognized PTC native format"
+           print*, "ptc_printparametric: Recognized LaTeX native format"
            fmt_tex = .true.
          case default
-           print*, "Format not recognized - using default PTC"
+           print*, "ptc_printparametric: Format not recognized - using default PTC"
            fmt_ptc = .true.
        end select
      else
@@ -1139,6 +1187,7 @@ contains
      endif
        
     
+    print*,"ptc_printparametric : currentrow is ", currentrow
     
     do i=1,currentrow-1
       write(mf,*) "Magnet ", i
@@ -1215,9 +1264,13 @@ contains
     integer :: n
     real :: v
 
-!    print*, "Setting parameter ",n," to ", v
+    if (.not. allocated(parvals)) then
+         call fort_warn("setparvalue",&
+          "array with parameter values is not allocated")
+         return
+    endif 
 
-    if ( (n < 1) .and. (n > ubound(spos,1)) ) then
+    if ( (n < 1) .and. (n > ubound(parvals,1)) ) then
       call fort_warn("setparvalue","Array index out of range")
     endif
 
@@ -1244,10 +1297,10 @@ contains
     do i=1, npolblocks
       if ( polblocks(i)%name == fibrename(1:nlp)) then
          
-        kn = get_value('ptc_setknobvalue ','kn ')
-        ks = get_value('ptc_setknobvalue ','ks ')
+        kn = get_value('ptc_setknobvalue ','kn ') + 1 !madx numerates from 0
+        ks = get_value('ptc_setknobvalue ','ks ') + 1
         if ( (kn>0) .and. (ks>0) ) then
-          call fort_warn("setknobbalue","Both kn and ks can not be specified together");
+          call fort_warn("setknobvalue","Both kn and ks can not be specified together");
           return
         endif
         
@@ -1256,7 +1309,7 @@ contains
         elseif ( ks>0 ) then
           par = polblocks(i)%ian(ks)
         else
-          call fort_warn("setknobbalue","Neither kn nor ks is specified");
+          call fort_warn("setknobvalue","Neither kn nor ks is specified");
           return
         endif
           
@@ -1265,11 +1318,16 @@ contains
     enddo
 
     if (par < 0) then
-      call fort_warn("setknobbalue","There is no knob defined on such element");
+      call fort_warn("setknobvalue","There is no knob defined on such element");
       return
     endif
     
     v = get_value('ptc_setknobvalue ','value ')
+    
+    if (getdebug() > 1) then
+       print*, "Setting parameter ",par,"(el=",fibrename(1:16),", kn=",kn,", ks=",ks," ) to ", v
+    endif
+    
     call setparvalue(par, v)
     
     call filltwisstable()

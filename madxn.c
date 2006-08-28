@@ -32,6 +32,9 @@
 #include "matchc.c"
 #include "matchc2.c"
 
+double** trackstrarpositions = 0x0;/* two dimensional array with track positions*/
+
+
 void adjust_beam()
   /* adjusts beam parameters to current beta, gamma, bcurrent, npart */
 {
@@ -4520,6 +4523,7 @@ void pro_match(struct in_cmd* cmd)
 {
   /* OB 12.2.2002: changed the sequence of if statements so that MAD
      can go through the whole matching sequence */
+  
   if (strcmp(cmd->tok_list->p[0], "match") == 0)
   {
     match_match(cmd);
@@ -4764,8 +4768,8 @@ void pro_twiss()
   /* controls twiss module */
 {
   struct command* keep_beam = current_beam;
-  struct name_list* nl = current_twiss->par_names;
-  struct command_parameter_list* pl = current_twiss->par;
+  struct name_list* nl;
+  struct command_parameter_list* pl;
   struct int_array* tarr;
   struct node *nodes[2], *use_range[2];
   char *filename = NULL, *name, *table_name, *sector_name;
@@ -4774,6 +4778,33 @@ void pro_twiss()
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
+
+  if (current_twiss == 0x0)
+   {
+     seterrorflag(2,"pro_twiss","No twiss command seen yet");
+     warning("pro_twiss","No twiss command seen yet!");
+     return;
+   }
+
+  if (current_twiss->par_names == 0x0)
+   {
+     seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
+     warning("pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
+     return;
+   }
+
+  if (current_twiss->par == 0x0)
+   {
+     seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
+     warning("pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
+     return;
+   }
+   
+   
+  nl = current_twiss->par_names;
+  pl = current_twiss->par;
+
+
   /*
     start command decoding
   */
@@ -7031,10 +7062,10 @@ void store_savebeta(struct in_cmd* cmd)
 
 void store_select(struct in_cmd* cmd)
 {
-
+#ifdef _ONLINE     
   char *sdds_pattern;
   char sdum[1000];
-
+#endif
   char* flag_name;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -7640,8 +7671,32 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
   int l;
   char *table_name, *filename = NULL;
   int pos, w_file;
-  struct name_list* nl = current_twiss->par_names;
-  struct command_parameter_list* pl = current_twiss->par;
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+
+  if (current_twiss == 0x0)
+   {
+     seterrorflag(2,"pro_ptc_twiss_linac","No twiss command seen yet");
+     warning("pro_ptc_twiss_linac","No twiss command seen yet!");
+     return;
+   }
+
+  if (current_twiss->par_names == 0x0)
+   {
+     seterrorflag(3,"pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
+     warning("pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
+     return;
+   }
+
+  if (current_twiss->par == 0x0)
+   {
+     seterrorflag(4,"pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
+     warning("pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
+     return;
+   }
+   
+  nl = current_twiss->par_names;
+  pl = current_twiss->par;
 
   table_name = "ptc_twiss";
   pos = name_list_pos("table", nl);
@@ -7734,7 +7789,6 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
   int i;
   double switchvalue;
   struct name_list* nl;
-  int debuglevel = 0;
 
   if (cmd == 0x0)
   {
@@ -7748,6 +7802,11 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     return;
   }
 
+  if (match_is_on == kMatch_PTCknobs) 
+   { 
+     madx_mpk_setsetswitch(cmd);
+     return;
+   }  
 
   nl = cmd->clone->par_names;
 
@@ -7986,7 +8045,7 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
   pos   = name_list_pos("refframe", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_knob: refframe parameter does not exist.\n");
+    printf("madxn.c: pro_ptc_eplacement: refframe parameter does not exist.\n");
     return;
   }
 
@@ -8019,7 +8078,7 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
   pos   = name_list_pos("range", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_knob: range parameter does not exist.\n");
+    printf("madxn.c: pro_ptc_eplacement: range parameter does not exist.\n");
     return;
   }
 
@@ -8092,11 +8151,17 @@ void pro_ptc_knob(struct in_cmd* cmd)
   char*                          element    = 0x0;
   struct int_array*              elementIA      = 0x0;
  
-
-  pos   = name_list_pos("elementname", c_parnames);
+  
+  if (match_is_on == kMatch_PTCknobs)
+   {
+     madx_mpk_addvariable(cmd);
+     return;
+   }
+  
+  pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_knob: elementname parameter does not exist.\n");
+    printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
     return;
   }
 
@@ -8133,10 +8198,10 @@ void pro_ptc_setknobvalue(struct in_cmd* cmd)
   char*                          element    = 0x0;
   struct int_array*              elementIA      = 0x0;
 
-  pos   = name_list_pos("elementname", c_parnames);
+  pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
    {
-     printf("madxn.c: pro_ptc_knob: elementname parameter does not exist.\n");
+     printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
      return;
    }
 
@@ -8160,7 +8225,84 @@ void pro_ptc_setknobvalue(struct in_cmd* cmd)
   
 
 }
+/********************************************************************************/
 
+
+void pro_ptc_setfieldcomp(struct in_cmd* cmd)
+{/*
+  Sets a parameter value
+ */
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+  int                            k         = 0;
+  struct node*                   nodes[2]={0x0,0x0};
+  struct node*                   anode=0x0;
+  char*                          element;
+
+
+
+  pos   = name_list_pos("element", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_setfieldcomp: range parameter does not exist.\n");
+    return;
+  }
+
+  if ( c_parnames->inform[pos] == 0 )
+   {
+    printf("madxn.c: pro_ptc_setfieldcomp: inform for range is 0.\n");
+    return;
+   }
+
+  element  = c_parameters->parameters[pos]->string;
+  if ( element == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_setfieldcomp: no element name: ", "ignored");
+    return;
+  }
+ 
+  
+  k = get_range(element, current_sequ, nodes);  
+  if ( k != 1)
+    {
+      if (k > 1)
+       {
+         warningnew("pro_ptc_setfieldcomp","More then one element correstponds to the range <<%s>>.",element);
+         seterrorflag(1,"pro_ptc_setfieldcomp","More then one element correstponds to the range");
+         return;
+       }
+      else
+       {
+         warningnew("pro_ptc_setfieldcomp","Element <<%s>> not found",element);
+         seterrorflag(1,"pro_ptc_setfieldcomp","Element not found");
+         return;
+       } 
+    } 
+
+
+  
+  pos = 0;
+  anode=current_sequ->range_start;
+  while( anode != 0x0  )
+   { 
+     if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
+      {
+       /* printf("Element is at pos %d !\n",pos);*/
+        break;
+      }
+
+     if (current_sequ->nodes->nodes[pos] == current_sequ->range_end) 
+      {
+         warningnew("pro_ptc_setfieldcomp","Reached the end of sequence - Element <<%s>> not found",element);
+         return;
+      }
+     pos++; /*before if because fortran numerates from 1*/
+   }  
+
+  w_ptc_setfieldcomp(&pos);
+
+}
 /********************************************************************************/
 
 void pro_ptc_select(struct in_cmd* cmd)
@@ -8842,3 +8984,5 @@ void deletetrackstrarpositions()
   trackstrarpositions = 0x0;
 }
 /***************************************************************************/
+
+  

@@ -77,8 +77,16 @@ integer, parameter                ::   gama31=25
 integer, parameter                ::   gama32=26
 integer, parameter                ::   gama33=27
 
+integer, parameter                ::   kn_x  =28 !kn prefix is added to limit crashes with the other modules name space
+integer, parameter                ::   kn_px =29
+integer, parameter                ::   kn_y  =30
+integer, parameter                ::   kn_py =31
+integer, parameter                ::   kn_t  =32
+integer, parameter                ::   kn_dp =33
 
-integer, parameter                ::   ntwisses = 27
+
+
+integer, parameter                ::   ntwisses = 33
 
 CHARACTER*(6), parameter          ::   twissnames(ntwisses) = (/ &
 	                  'beta11','beta12','beta13',&
@@ -89,4 +97,7 @@ CHARACTER*(6), parameter          ::   twissnames(ntwisses) = (/ &
 	                  'alfa31','alfa32','alfa33',&
 	                  'gama11','gama12','gama13',&
 	                  'gama21','gama22','gama23',&
-	                  'gama31','gama32','gama33'/)
+	                  'gama31','gama32','gama33',&
+	                  'x     ','px    ',&
+	                  'y     ','py    ',&
+	                  'pt    ','t     '          /)
