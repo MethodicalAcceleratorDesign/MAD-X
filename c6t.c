@@ -1269,6 +1269,7 @@ void equiv_elem()
             if (eln->flag > 0
                 && eln->equiv == eln
                 && ident_el(el, eln) == 0
+                && eln->nf_err == el->nf_err
                 && strcmp(eln->base_name,"marker") != 0
                 && strstr(eln->base_name,"colli") == NULL)
               eln->equiv = el;
@@ -2346,12 +2347,6 @@ void write_f8_errors()
               0.0,
               1000*tiltval);
     }
-    else if (current_element->nf_err > 0 && current_element->ref_delta != zero)
-    {
-      if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
-              0.0, 0.0, 0.0);
-    }
     current_element = current_element->next;
   }
 }
@@ -2600,16 +2595,10 @@ void write_f3_mult(struct c6t_element* el)
     }
   }
   if (++i_max > 0)  i_max += i_max%2;
-/*
   for (i = 0; i < i_max; i++)
   {
     fprintf(f3,"%4.0f.%4.0f.", 0., error_matrix[i]);
     if ((i+1)%2 == 0) fprintf(f3,"\n");
-  }
-*/
-  for (i = 0; i < 11; i++)
-  {
-    fprintf(f3,"%4.0f.%4.0f.%4.0f.%4.0f.\n", 0., 1., 0., 1.);
   }
   fprintf(f3,"NEXT\n");
 }
