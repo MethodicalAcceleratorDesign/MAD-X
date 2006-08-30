@@ -3,9 +3,12 @@
 
 #include <stdio.h>
 
-#ifndef WIN32
+#define WIN32 _WIN32
+
+#ifndef _WIN32
   #include <dlfcn.h>
 #endif  
+
 
 extern type_OfExtern void type_ofCall warning(const char*, const char*);
 
