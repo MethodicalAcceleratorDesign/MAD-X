@@ -87,8 +87,9 @@ int            madx_mpk_variable_KSs[MAX_KNOBS]; /*ks component */
 struct in_cmd* madx_mpk_comm_createuniverse;
 struct in_cmd* madx_mpk_comm_createlayout;
 struct in_cmd* madx_mpk_comm_setswitch;
-char           madx_mpk_comm_calculate[COMM_LENGTH];/*ptc_twiss or ptc_normal*/
+struct in_cmd* madx_mpk_comm_calculate;/*ptc_twiss or ptc_normal*/
 
+char twisscommand[]="ptc_twiss, table=ptc_twiss, icase=6, no=2, betx=10, alfx=.0,  bety=10., alfy=0, betz=10., alfz=0;";
 
 void makestdmatchfile(char* fname, struct in_cmd* cmd);
 int run_ptccalculation(double* currentvalues,int setknobs);
@@ -157,7 +158,7 @@ void madx_mpk_run(struct in_cmd* cmd)
      warningnew("matchknobs.c: madx_mpk_run","Tolerance is less then 0. Command ignored.");
      return;
    } 
-  maxcalls = (int)command_par_value("tolerance",cmd->clone);
+  maxcalls = (int)command_par_value("calls",cmd->clone);
   
   if(madx_mpk_comm_createuniverse == 0x0)
    {
@@ -168,6 +169,12 @@ void madx_mpk_run(struct in_cmd* cmd)
   if(madx_mpk_comm_createlayout == 0x0)
    {
      warningnew("matchknobs.c: madx_mpk_run","ptc_createlayout is missing.");
+     return;
+   }
+
+  if(madx_mpk_comm_calculate == 0x0)
+   {
+     warningnew("matchknobs.c: madx_mpk_run","Neither ptc_twiss nor ptc_normal seen since \"match, use_ptcknob;\"");
      return;
    }
 
@@ -182,6 +189,7 @@ void madx_mpk_run(struct in_cmd* cmd)
      warningnew("matchknobs.c: madx_mpk_run","no variables seen yet.");
      return;
    }
+  
   
   
   makestdmatchfile(matchfilename,cmd);
@@ -337,6 +345,7 @@ void madx_mpk_run(struct in_cmd* cmd)
   myfree(rout_name,function_vector2);
 /*  remove(matchfilename);    */
 }
+/*_________________________________________________________________________*/
 
 void madx_mpk_prepare()
 {
@@ -349,9 +358,7 @@ void madx_mpk_prepare()
   madx_mpk_comm_createuniverse = 0x0;
   madx_mpk_comm_createlayout = 0x0;
   madx_mpk_comm_setswitch = 0x0;
-  
-  strcpy(madx_mpk_comm_calculate,
-         "ptc_twiss, table=ptc_twiss, icase=6, no=4, betx=10, alfx=.0,  bety=10., alfy=0, betz=10., alfz=0;");
+  madx_mpk_comm_calculate = 0x0;
   
   return;
   
@@ -527,6 +534,16 @@ void madx_mpk_setsetswitch(struct in_cmd* cmd)
   strcpy(cmd->label,"matchptcknob_ptc_SSW");
   madx_mpk_comm_setswitch = cmd;
 }
+/*_________________________________________________________________________*/
+
+void madx_mpk_setcalc(struct in_cmd* cmd)
+{
+  cmd->clone_flag = 1; /* do not delete for the moment*/
+  cmd->label =  (char*)mymalloc("madx_mpk_setcalc",24*sizeof(char));
+  strcpy(cmd->label,"matchptcknob_ptc_CMD");
+  madx_mpk_comm_calculate = cmd;
+}
+/*_________________________________________________________________________*/
 
 void madx_mpk_end()
 {
@@ -663,7 +680,12 @@ int run_ptccalculation(double* currentvalues,int setknobs)
         pro_ptc_knob(madx_mpk_knobs[i]);
      }
    }
-  pro_input(madx_mpk_comm_calculate);
+   
+/*  pro_input(twisscommand);*/
+  
+  this_cmd = madx_mpk_comm_calculate;
+  current_command =  madx_mpk_comm_calculate->clone;
+  process();
   
   return 0;
 } 

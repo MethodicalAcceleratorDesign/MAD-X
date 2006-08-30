@@ -2,7 +2,10 @@
 /*Piotr Skowronski, CERN*/
 
 #include <stdio.h>
-#include <dlfcn.h>
+
+#ifndef WIN32
+  #include <dlfcn.h>
+#endif  
 
 extern type_OfExtern void type_ofCall warning(const char*, const char*);
 
@@ -84,7 +87,7 @@ void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
   }
 
   MadxPlotter::Instance()->Fill(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
  
  if (rplot_plottrack == 0x0) return;
  
@@ -122,7 +125,7 @@ extern type_OfExtern void type_ofCall rplotfinish()
 /*terminates plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->Finish();/*writes and deletes the current plot*/
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
   typedef void (*rvfun)();   
   rvfun rfinish;
   char *error;
@@ -148,7 +151,7 @@ extern type_OfExtern void type_ofCall newrplot()
 /*adds new plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->NewPlot();
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
  
  typedef void (*rvfun)();   
  rvfun newrplot;
@@ -217,7 +220,7 @@ extern type_OfExtern void type_ofCall rviewer()
   
    MadxViewer::Instance();
 
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
    
    typedef void (*rvfun)();   
    rvfun viewer;
@@ -252,7 +255,7 @@ void type_ofCall madxv_setknobname(int* n, const char* name)
 {
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetKnobName(*n,name);
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
   typedef void (*sknfctn)(int*,const char*);
   sknfctn fctn;
   char *error;
@@ -278,7 +281,7 @@ void type_ofCall madxv_setfctnname(int* n, const char* name)
 {
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetFunctionName(*n,name);
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
 
   typedef void (*sknfctn)(int*,const char*);
   sknfctn fctn;
@@ -305,7 +308,7 @@ void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
 {
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetFunctionAt(*el,*n,name);
-#elif PLUGIN_SUPPORT
+#elif defined PLUGIN_SUPPORT
 
   typedef void (*sknfctn)(int*,int*,const char*);
   sknfctn fctn;

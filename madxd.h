@@ -1,3 +1,6 @@
+
+#ifndef WIN32
+
 /* should work unchanged on _win32 using Lahey */
 #define advance_node          advance_node_
 #define advance_to_pos        advance_to_pos_
@@ -116,6 +119,138 @@
 #define minimum_acceptable_order minimum_acceptable_order_ /* ETDA 17 nov 2004 */
 
 #define augmentfwarn            augmentfwarn_
+
+
+#define type_ofCall 
+
+
+#else
+
+#define madx                  MADX
+
+/* should work unchanged on _win32 using Lahey */
+#define advance_node          ADVANCE_NODE
+#define advance_to_pos        ADVANCE_TO_POS
+#define augment_count         AUGMENT_COUNT
+#define augmentcountonly      AUGMENTCOUNTONLY
+#define char_from_table       CHAR_FROM_TABLE  /* OB 2.4.2002 */
+#define comment_to_table      COMMENT_TO_TABLE
+#define comm_para             COMM_PARA
+#define double_from_table     DOUBLE_FROM_TABLE
+#define string_from_table     STRING_FROM_TABLE  /* ETDA 8 nov 2004 */
+#define double_to_table_row   DOUBLE_TO_TABLE_ROW  /* ETDA 11 nov 2004 */
+#define double_table          DOUBLE_TABLE    /* ETDA 25 aug 2004 */
+#define double_to_table       DOUBLE_TO_TABLE
+
+/* added by E. T. d'Amico on jan. 21st, 2004 */
+#define interp_node           INTERP_NODE
+#define reset_interpolation   RESET_INTERPOLATION
+#define embedded_twiss        EMBEDDED_TWISS
+/* added by E. T. d'Amico on jan. 21stmay 19th, 2004 */
+#define embedded_plot         EMBEDDED_PLOT
+/* end additions */
+
+#define element_name          ELEMENT_NAME
+#define frndm                 FRNDM
+#define madx                  MADX
+#define madx_init             MADX_INIT
+#define f_ctof                F_CTOF
+#define get_disp0             GET_DISP0
+#define get_node_vector       GET_NODE_VECTOR
+#define get_option            GET_OPTION
+#define get_string            GET_STRING
+#define get_title             GET_TITLE
+#define get_variable          GET_VARIABLE
+#define get_vector            GET_VECTOR
+#define get_value             GET_VALUE
+#define get_version           GET_VERSION
+#define grndm                 GRNDM
+#define intrac                INTRAC
+#define mtcond                MTCOND
+#define next_constraint       NEXT_CONSTRAINT
+#define next_global           NEXT_GLOBAL
+#define getnumberoftracks     GETNUMBEROFTRACKS
+#define next_start            NEXT_START
+#define next_vary             NEXT_VARY
+/* RDM 20.1.2006 BEGIN jacobian strategy (match) */
+#define constraint_name       CONSTRAINT_NAME
+#define vary_name             VARY_NAME
+/* RDM 20.1.2006 END jacobian strategy (match) */
+#define node_al_errors        NODE_AL_ERRORS
+#define node_fd_errors        NODE_FD_ERRORS
+#define node_string           NODE_STRING
+#define node_value            NODE_VALUE
+#define plot_option           PLOT_OPTION
+#define reset_count           RESET_COUNT
+#define restart_sequ          RESTART_SEQU
+#define retreat_node          RETREAT_NODE
+#define sector_out            SECTOR_OUT
+#define sequence_name         SEQUENCE_NAME
+#define set_option            SET_OPTION
+#define set_value             SET_VALUE
+#define set_variable          SET_VARIABLE
+#define spec_node_value       SPEC_NODE_VALUE
+#define store_node_value      STORE_NODE_VALUE
+#define store_node_vector     STORE_NODE_VECTOR
+#define string_to_table       STRING_TO_TABLE
+#define table_length          TABLE_LENGTH
+#define table_org             TABLE_ORG
+#define table_range           TABLE_RANGE
+#define track_pteigen         TRACK_PTEIGEN
+#define vector_to_table       VECTOR_TO_TABLE
+#define vdot                  VDOT
+#define vmod                  VMOD
+#define w_ptc_create_universe   W_PTC_CREATE_UNIVERSE
+#define w_ptc_create_layout     W_PTC_CREATE_LAYOUT
+#define w_ptc_move_to_layout    W_PTC_MOVE_TO_LAYOUT
+#define w_ptc_input             W_PTC_INPUT
+#define w_ptc_align             W_PTC_ALIGN
+#define w_ptc_twiss             W_PTC_TWISS
+#define w_ptc_normal            W_PTC_NORMAL
+#define w_ptc_track             W_PTC_TRACK
+#define w_ptc_start             W_PTC_START
+#define w_ptc_select            W_PTC_SELECT
+#define w_ptc_writeparresults   W_PTC_WRITEPARRESULTS
+#define w_ptc_printframes       W_PTC_PRINTFRAMES
+#define w_ptc_printlayout_rootm W_PTC_PRINTLAYOUT_ROOTM
+#define w_ptc_eplacement        W_PTC_EPLACEMENT
+#define w_ptc_addknob           W_PTC_ADDKNOB
+#define w_ptc_setknobvalue      W_PTC_SETKNOBVALUE
+#define w_ptc_setfieldcomp      W_PTC_SETFIELDCOMP
+#define w_ptc_rviewer           W_PTC_RVIEWER
+#define w_ptc_script            W_PTC_SCRIPT
+#define w_ptc_addpush           W_PTC_ADDPUSH
+#define w_ptc_end               W_PTC_END
+#define w_ptc_dumpmaps          W_PTC_DUMPMAPS
+#define w_ptc_trackline         W_PTC_TRACKLINE
+#define w_ptc_twiss_linac       W_PTC_TWISS_LINAC
+#define w_ptc_setdebuglevel     W_PTC_SETDEBUGLEVEL
+#define w_ptc_enforce6d         W_PTC_ENFORCE6D
+#define w_ptc_setaccel_method   W_PTC_SETACCEL_METHOD
+#define w_ptc_setexactmis       W_PTC_SETEXACTMIS
+#define w_ptc_setradiation      W_PTC_SETRADIATION
+#define w_ptc_setfringe         W_PTC_SETFRINGE
+#define w_ptc_settotalpath      W_PTC_SETTOTALPATH
+#define w_ptc_settime           W_PTC_SETTIME
+#define w_ptc_setnocavity       W_PTC_SETNOCAVITY
+
+#define seterrorflagfort        SETERRORFLAGFORT  /*sets the dglobal error flag*/
+#define geterrorflag            GETERRORFLAG  /*returns the dglobal error flag*/
+#define getcurrentelementname   GETCURRENTELEMENTNAME
+#define stolower                STOLOWER
+#define cf77flush               CF77FLUSH
+#define select_ptc_idx          SELECT_PTC_IDX  /* ETDA 10 nov 2004 */
+#define min_order               MIN_ORDER       /* ETDA 17 nov 2004 */
+#define result_from_normal      RESULT_FROM_NORMAL  /* ETDA 11 nov 2004 */
+#define make_map_table          MAKE_MAP_TABLE  /* KZ 28.06.2005 table for maps */
+#define minimum_acceptable_order MINIMUM_ACCEPTABLE_ORDER /* ETDA 17 nov 2004 */
+
+#define augmentfwarn            AUGMENTFWARN
+
+
+#define type_ofCall _stdcall 
+#endif
+
 /* short utility routines */
 int is_operand(char c) { return (isalnum(c) || c == '_' || c == '.');}
 int is_operator(char c) {return (strchr("-+*/^", c) ? 1 : 0);}
@@ -124,6 +259,8 @@ int mymax(int a, int b) {return (a > b ? a : b);}
 int mymin(int a, int b) {return (a < b ? a : b);}
 int str_pos(const char s[], char c)
 {unsigned int i; for (i = 0; i < strlen(s); i++) if (s[i] == c) return i; return -1;}
+
+
 
 /* Fortran routines called from C */
 extern void dynap_(double*, double*, int*, int*, double*, double*, double*,
@@ -181,20 +318,23 @@ extern void trrun_(int*,int*,double*,double*,int*,int*,
                    double*,int*, int*, double*);
 extern void twiss_(double*, double*, int*);
 
+
+
+
 /* C routines called from Fortran and C */
-int advance_node();
-int advance_to_pos(char*, int*);
-char* alias(char*);
-int aperture_count(struct sequence*);
-void augment_count(char*);
-int char_from_table(char*, char*, int*, char*); /* OB 2.4.2002 */
-void comment_to_table(char*, char*, int*);
-void comm_para(char*, int*, int*, int*, int*, double*, char*, int*);
-int double_from_table(char*, char*, int*, double*);
-int string_from_table(char*, char*, int*, char*);
-void double_to_table(char*, char*, double*);
-void double_to_table_row(char*, char*, int*, double*); /* ETDA 11 nov 2004 */
-int result_from_normal(char*, int*, double*); /* ETDA 11 nov 2004 */
+int    type_ofCall advance_node();
+int    type_ofCall advance_to_pos(char*, int*);
+char*  type_ofCall alias(char*);
+int    type_ofCall aperture_count(struct sequence*);
+void   type_ofCall augment_count(char*);
+int    type_ofCall char_from_table(char*, char*, int*, char*); /* OB 2.4.2002 */
+void   type_ofCall comment_to_table(char*, char*, int*);
+void   type_ofCall comm_para(char*, int*, int*, int*, int*, double*, char*, int*);
+int    type_ofCall double_from_table(char*, char*, int*, double*);
+int    type_ofCall string_from_table(char*, char*, int*, char*);
+void   type_ofCall double_to_table(char*, char*, double*);
+void   type_ofCall double_to_table_row(char*, char*, int*, double*); /* ETDA 11 nov 2004 */
+int    type_ofCall result_from_normal(char*, int*, double*); /* ETDA 11 nov 2004 */
 void make_map_table(int*); /* KZ 28.06.2005 table for maps */
 void element_name(char*, int*);
 double frndm();
@@ -431,7 +571,7 @@ struct variable* find_variable(char*, struct var_list*);
 double find_value(char*, int, char**);
 int force_pos(char*);
 void ftoi_array(struct double_array*, struct int_array*);
-void madx();
+void type_ofCall madx();
 void madx_finish();
 int get_token_list(char*, char**,int);
 void madx_init();

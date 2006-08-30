@@ -1452,7 +1452,7 @@ void exec_command()
            curr_obs_points = 1;  /* default: always observe at machine end */
          }  
       }
-      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0) 
       {
         if (match_is_on == kMatch_PTCknobs) 
          { 
@@ -1473,12 +1473,27 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
       {
-        current_twiss = p->clone;
-        pro_ptc_twiss();
+        
+        if (match_is_on == kMatch_PTCknobs) 
+         { 
+           madx_mpk_setcalc(p);
+         }
+        else
+         {
+           current_twiss = p->clone;
+           pro_ptc_twiss();
+         }  
       }
       else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
       {
-        w_ptc_normal_();
+        if (match_is_on == kMatch_PTCknobs) 
+         { 
+           madx_mpk_setcalc(p);
+         }
+        else
+         {
+           w_ptc_normal_();
+         }  
       }
       else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)
       {
