@@ -574,6 +574,11 @@ contains
     
     nr = ntwisses+nmapels
     allocate(results(n,nr))
+    do i=1,n
+      do j=1,nr
+        results(i,j)=0
+      enddo
+    enddo  
     allocate(spos(n))
     allocate(e(c_%npara_fpp))
     
@@ -914,7 +919,7 @@ contains
     type(real_8) y(6)
 
     e(:)=0
-
+    
     results(currentrow, kn_x)  = y(1).par.e
     results(currentrow, kn_px) = y(2).par.e
 
