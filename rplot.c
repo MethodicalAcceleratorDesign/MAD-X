@@ -31,13 +31,50 @@ void loadrplotlib()
    }
 
    
-   handle = dlopen( "libCore.so",   RTLD_GLOBAL | RTLD_NOW);
+   handle = dlopen( "libCint.so",   RTLD_GLOBAL | RTLD_LAZY);
    if (!handle) {
        fprintf (stderr, "%s\n", dlerror());
        return;
    }
    
-   handle = dlopen( "libGpad.so",   RTLD_GLOBAL | RTLD_NOW);
+   handle = dlopen( "libCore.so",   RTLD_GLOBAL | RTLD_LAZY);
+   if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+   }
+
+
+   handle = dlopen( "libTree.so",   RTLD_GLOBAL | RTLD_LAZY);
+   if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+   }
+
+   handle = dlopen( "libGui.so",   RTLD_GLOBAL | RTLD_LAZY);
+   if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+   }
+
+   handle = dlopen( "libMatrix.so",   RTLD_GLOBAL | RTLD_LAZY);
+   if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+   }
+
+   handle = dlopen( "libHist.so",   RTLD_GLOBAL | RTLD_LAZY);
+   if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+   }
+
+   handle = dlopen( "libGraf.so",   RTLD_GLOBAL | RTLD_LAZY);
+   if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+   }
+   
+   handle = dlopen( "libGpad.so",   RTLD_GLOBAL | RTLD_LAZY);
    if (!handle) {
        fprintf (stderr, "%s\n", dlerror());
        return;
