@@ -1574,7 +1574,6 @@ CONTAINS
 
        suml=suml+current%MAG%P%ld
        tw=y
-       call puttwisstable()
        
        !the tracked polimorph is not normalized to the input beam parameters
        !we need to drag it from the twiss object, where it is normalized with A matrix of the normal form
@@ -1585,6 +1584,8 @@ CONTAINS
 
        call putusertable(i,current%mag%name,suml,y,scv)
        
+       call puttwisstable()
+
        iii=advance_node()
        current=>current%next
     enddo
