@@ -53,7 +53,7 @@
 !      write(*,*) nrep
       do i=1,nrep
         if (strategy .ge. 1) then
-          calls=0
+!          calls=0
           call jacob(mtfcn,ncon,nvar,strategy,calls,call_lim,           &
      &vect,fun_vec,tol,                                                 &
      &w_ifjac,w_iwa4,fval,                                              &
