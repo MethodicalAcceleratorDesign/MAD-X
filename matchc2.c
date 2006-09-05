@@ -182,7 +182,6 @@ int match2_evaluate_exressions(int i, double* fun_vec)
   int j,k=0;
   double rhs,lhs,r;/* RDM fork */
   char s;
-  printf("\n");  
   for(j=0;match2_cons_name[i][j]!=NULL;j++) {
     rhs=expression_value(match2_cons_rhs[i][j],2);
     lhs=expression_value(match2_cons_lhs[i][j],2);
