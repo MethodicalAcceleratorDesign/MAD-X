@@ -25,20 +25,20 @@ void match2_end(struct in_cmd* cmd)
 
   fprintf(prt_file, "\n");
   fprintf(prt_file, "MATCH SUMMARY\n\n");
-  fprintf(prt_file, "Macro Constraint            Value                     Penalty\n");
+/*  fprintf(prt_file, "Macro Constraint            Value                     Penalty\n");*/
   fprintf(prt_file, "--------------------------------------------------------------------\n");
   penalty=0;
   for(i=0;match2_macro_name[i]!=NULL;i++) {
+    printf("macro: %-20s\n",match2_macro_name[i]);
     for(j=0;match2_cons_name[i][j]!=NULL;j++) {
-      printf("%-5s %-20s %12.5e%c%12.5e %12.5e\n",
-             match2_macro_name[i],
-             match2_cons_name[i][j],
-             match2_cons_value_lhs[i][j],
-             match2_cons_sign[i][j],
-             match2_cons_value_rhs[i][j],
-             match2_cons_value[i][j]);
+      printf("  constraint: %-40s\n",match2_cons_name[i][j]);
+      printf("  values:     %+12.5e%c%+12.5e\n",
+              match2_cons_value_lhs[i][j],
+              match2_cons_sign[i][j],
+              match2_cons_value_rhs[i][j]);
+      printf("  weight:     %+12.5e\n", match2_cons_weight[i][j]);
+      printf("  penalty:    %+12.5e\n\n",match2_cons_value[i][j]);
       penalty+=pow(match2_cons_value[i][j],2);
-
     }
   }
   
@@ -47,7 +47,6 @@ void match2_end(struct in_cmd* cmd)
      match2_delete_expressions();
    }  
    
-  
   fprintf(prt_file, "\n\n");
   fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
 
