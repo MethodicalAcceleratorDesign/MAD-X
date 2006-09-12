@@ -1529,9 +1529,8 @@ CONTAINS
  
     tw=y
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       call fort_warn('ptc_twiss: ','DA in twiss got unstable')
-       call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
-       return
+       call fort_warn('ptc_twiss: ','Fatal Error: DA in twiss got unstable')
+       stop
     endif
     y=npara
     Y=X
@@ -1825,7 +1824,7 @@ CONTAINS
       call eig6(re,reval,aieval,revec,aievec)
       do i=1,iia(4)-icoast(2)
          if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
-            call fort_warn("ptc_twiss","Fatal: Eigenvalues off the unit circle!")
+            call fort_warn("ptc_twiss","Fatal Error: Eigenvalues off the unit circle!")
             stop
          endif
       enddo
@@ -1914,7 +1913,7 @@ CONTAINS
       betz_flg = .false.
       if (icase .eq. 6) then
          if (betz .le. 0) then
-            call fort_warn("ptc_twiss","Fatal: 6D requested and betz is smaller then or equal to 0!")
+            call fort_warn("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0!")
             stop
          else
             betz_flg = .true.
@@ -1988,7 +1987,7 @@ CONTAINS
 
       do i=1,iia(4)-icoast(2)
          if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
-            call fort_warn("ptc_twiss","Fatal: Eigenvalues off the unit circle!")
+            call fort_warn("ptc_twiss","Fatal Error: Eigenvalues off the unit circle!")
             stop
          endif
       enddo
@@ -2464,9 +2463,8 @@ CONTAINS
 
        n=y
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_normal: ','DA in NormalForm got unstable')
-          call seterrorflag(10,"ptc_normal ","DA got unstable in NormalForm ");
-          return
+          call fort_warn('ptc_normal: ','Fatal Error: DA in NormalForm got unstable')
+          stop
        endif
        if (n_gnfu > 0) pbrg = n%a%pb
        if (n_haml > 0) pbrh = n%normal%pb
