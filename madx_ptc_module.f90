@@ -1166,7 +1166,7 @@ CONTAINS
 
           call track(my_ring,y2,i,i+1,getintstate())
 
-          if ( .not. c_%stable_da) then
+          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
              return
@@ -1185,7 +1185,7 @@ CONTAINS
           endif
 
           call track(my_ring,xt,i,i+1,getintstate())
-          if ( .not. c_%stable_da) then
+          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
              return
@@ -1205,6 +1205,11 @@ CONTAINS
           if (getdebug() > 2) print *, 'Track Cavity...'
 
           call track(my_ring,y2,i,i+2,getintstate())
+          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+             call fort_warn('ptc_dumpmaps: ','DA got unstable')
+             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             return
+          endif
 
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
@@ -1218,7 +1223,7 @@ CONTAINS
           endif
 
           call track(my_ring,xt,i,i+2,getintstate())
-          if ( .not. c_%stable_da) then
+          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
              return
@@ -1483,8 +1488,7 @@ CONTAINS
     else
        c_%watch_user=.true.
        call track(my_ring,y,1,default)
-
-       if ( .not. c_%stable_da) then
+       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_twiss: ','DA got unstable')
           call seterrorflag(10,"ptc_twiss ","DA got unstable");
           return
@@ -1524,6 +1528,11 @@ CONTAINS
     call alloc(scv)
  
     tw=y
+    if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+       call fort_warn('ptc_twiss: ','DA in twiss got unstable')
+       call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
+       return
+    endif
     y=npara
     Y=X
     current=>MY_RING%start
@@ -1552,9 +1561,7 @@ CONTAINS
        else
          call track(my_ring,y,i,i+1, default)
        endif   
-         
-
-       if ( .not. c_%stable_da) then
+       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_twiss: ','DA got unstable')
           call seterrorflag(10,"ptc_twiss ","DA got unstable ");
           return
@@ -1574,6 +1581,11 @@ CONTAINS
 
        suml=suml+current%MAG%P%ld
        tw=y
+       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+          call fort_warn('ptc_twiss: ','DA in twiss got unstable')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
+          return
+       endif
        
        !the tracked polimorph is not normalized to the input beam parameters
        !we need to drag it from the twiss object, where it is normalized with A matrix of the normal form
@@ -2350,6 +2362,11 @@ CONTAINS
     Y=X
     c_%watch_user=.true.
     call track(my_ring,y,1,default)
+    if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+       call fort_warn('ptc_normal: ','DA got unstable')
+       call seterrorflag(10,"ptc_normal ","DA got unstable ");
+       return
+    endif
     call PRODUCE_APERTURE_FLAG(flag_index)
     if(flag_index/=0) then
        call ANALYSE_APERTURE_FLAG(flag_index,why)
@@ -2446,6 +2463,11 @@ CONTAINS
        !------------------------------------------------------------------------
 
        n=y
+       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+          call fort_warn('ptc_normal: ','DA in NormalForm got unstable')
+          call seterrorflag(10,"ptc_normal ","DA got unstable in NormalForm ");
+          return
+       endif
        if (n_gnfu > 0) pbrg = n%a%pb
        if (n_haml > 0) pbrh = n%normal%pb
        if (getdebug() > 1) then
@@ -2558,6 +2580,11 @@ CONTAINS
     c_%watch_user=.true.
     do i=1,turns
        call track(my_ring,x,1,default)
+       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+          call fort_warn('ptc_track: ','DA got unstable')
+          call seterrorflag(10,"ptc_track ","DA got unstable ");
+          return
+       endif
        call PRODUCE_APERTURE_FLAG(flag_index)
        if(flag_index/=0) then
           call ANALYSE_APERTURE_FLAG(flag_index,why)
