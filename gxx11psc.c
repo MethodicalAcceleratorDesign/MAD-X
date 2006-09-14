@@ -26,7 +26,7 @@ void mydtime(int* year, int* month, int* day, int* hour, int* minute,
   time(&_time); /* initialize timing */
   tm = localtime(&_time); /* split system time */
   *year = tm->tm_year%100;
-  *month = tm->tm_mon;
+  *month = tm->tm_mon+1;
   *day = tm->tm_mday;
   *hour = tm->tm_hour;
   *minute = tm->tm_min;
