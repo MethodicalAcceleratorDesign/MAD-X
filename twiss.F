@@ -4064,7 +4064,7 @@
 !----------------------------------------------------------------------*
       logical fsec,ftrk,fmap,cplxy
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),deltap,el,sks,  &
-     &sk,gamma,skl,beta,co,si,sibk,temp,dtbyds,node_value,get_value,    &
+     &sk,gamma,skl,beta,co,si,sibk,temp,dtbyds,node_value,get_value,bvk,&
      &zero,one,two,three,six,ten5m
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,ten5m=1d-5)
 
@@ -4081,6 +4081,10 @@
       if (sks .ne. zero) then
         cplxy = .true.
       endif
+
+!---- BV flag
+      bvk = node_value('other_bv ')
+      sks = sks * bvk
 
 !---- Set up C's and S's.
       sk = sks / two / (one + deltap)
@@ -5741,7 +5745,7 @@
 !     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,fmap
-      double precision orbit(6),el,ek(6),re(6,6),te(6,6,6),deltap,      &
+      double precision orbit(6),el,ek(6),re(6,6),te(6,6,6),deltap,bvk,  &
      &get_value,node_value,sk,skl,sks,sksl,cosTh,sinTh,Q0,Q,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
 
@@ -5754,6 +5758,11 @@
 !---- Get solenoid parameters
       sksl    = node_value('ksi ')
       sks     = node_value('ks ')
+
+!---- BV flag
+      bvk = node_value('other_bv ')
+      sks = sks * bvk
+      sksl = sksl * bvk
 
 !---- Set up strengths
       sk    = sks / two

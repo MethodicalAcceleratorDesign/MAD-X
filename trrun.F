@@ -2355,7 +2355,7 @@
       double precision get_value, node_value
       double precision el,track(6,*),one,two,elrad
       double precision sk,skl,sks,sksl,cosTh,sinTh,Q,R,Z
-      double precision xf,yf,pxf,pyf,sigf,psigf
+      double precision xf,yf,pxf,pyf,sigf,psigf,bvk
       double precision onedp,fpsig,fppsig
       parameter(one=1d0,two=2d0)
 !
@@ -2369,6 +2369,12 @@
 !      elrad   = node_value('lrad ')
       sksl    = node_value('ksi ')
       sks     = node_value('ks ')
+
+!---- BV flag
+      bvk = node_value('other_bv ')
+      sks = sks * bvk
+      sksl = sksl * bvk
+
 !
 !---- Set up strengths
 !      sk    = sks / two / (one + deltap)
