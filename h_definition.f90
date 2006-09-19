@@ -52,9 +52,10 @@ module definition
   END TYPE taylor
   !@2  UNIVERSAL_TAYLOR is used by Sagan in BMAD Code at Cornell
   TYPE UNIVERSAL_TAYLOR
-     INTEGER, POINTER:: N,NV    !  Number of coeeficients and number of variables
-     REAL(DP), POINTER,dimension(:)::C  ! Coefficients C(N)
-     INTEGER, POINTER,dimension(:,:)::J ! Exponents of each coefficients J(N,NV)
+     INTEGER, POINTER:: N => NULL()    !  Number of coeeficients a
+     INTEGER, POINTER:: NV => NULL()     ! number of variables
+     REAL(DP), POINTER,dimension(:)::C => NULL() ! Coefficients C(N)
+     INTEGER, POINTER,dimension(:,:)::J => NULL() ! Exponents of each coefficients J(N,NV)
   END TYPE UNIVERSAL_TAYLOR
   !@3 ---------------------------------------------</br>
   TYPE complextaylor
