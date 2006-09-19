@@ -1529,9 +1529,11 @@ CONTAINS
  
     tw=y
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       call fort_warn('ptc_twiss: ','Fatal Error: DA in twiss got unstable')
-       stop
+       call fort_warn('ptc_twiss: ','Error: DA in twiss got unstable during Normal Form')
+       call seterrorflag(10,"ptc_twiss ","DA in twiss got unstable during Normal Form");
+       return
     endif
+
     y=npara
     Y=X
     current=>MY_RING%start
