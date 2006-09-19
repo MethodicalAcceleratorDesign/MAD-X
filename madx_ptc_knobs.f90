@@ -278,6 +278,15 @@ contains
     call reset_count(twisstablename)
     
     nelems = ubound(results,1)
+    
+    if (nelems .lt. (currentrow-1)) then
+      call fort_warn("filltwisstable",&
+          "It seems the last ptc_twiss has failed")
+      nelems = currentrow - 1
+    endif
+     
+     
+    
     do i=1, nelems
 
       do ii=beta11,ntwisses
@@ -789,7 +798,7 @@ contains
     
 
     if (.not. associated(ut)) then
-         call fort_warn("printpareq",&
+         call fort_warn("gettaylorvalue",&
           "provided taylor is not associated")
 
          gettaylorvalue = zero
@@ -797,7 +806,7 @@ contains
     endif 
 
     if (.not. associated(ut%n)) then
-         call fort_warn("printpareq",&
+         call fort_warn("gettaylorvalue",&
           "provided taylor is not associated")
 
          gettaylorvalue = zero
@@ -805,7 +814,7 @@ contains
     endif 
 
     if (.not. allocated(parvals)) then
-         call fort_warn("printpareq",&
+         call fort_warn("gettaylorvalue",&
           "array with parameter values is not allocated")
 
          gettaylorvalue = zero
@@ -955,7 +964,7 @@ contains
        enddo
     enddo
     
-
+    
     e=0
     do i=1,c_%nd2
        do j=i,c_%nd2
@@ -968,6 +977,7 @@ contains
              ave(i,j,k)=morph(ave(i,j,k))+ (y(i).par.e)*(y(j).par.e) !line * does the same, here taylor is morphed to polimorph,
              e(2*k)=0                                                !and above taylor component of polimorph is used explicitely
              ave(j,i,k)=ave(i,j,k)
+             
           enddo
        enddo
     enddo
@@ -982,12 +992,18 @@ contains
     results(currentrow, alfa12) = ave(3,4,2) !-
     results(currentrow, beta12) = ave(3,3,2) !- 
     results(currentrow, gama12) = ave(4,4,2)  
-
-    ave(5,6,3) = -ave(5,6,3)
-    results(currentrow, alfa13) = ave(5,6,3) !-
-    results(currentrow, beta13) = ave(6,6,3) !-
-    results(currentrow, gama13) = ave(5,5,3)  
-
+    
+    if ( c_%nd2 .ge. 6 ) then
+      ave(5,6,3) = -ave(5,6,3)
+      results(currentrow, alfa13) = ave(5,6,3) !-
+      results(currentrow, beta13) = ave(6,6,3) !-
+      results(currentrow, gama13) = ave(5,5,3)  
+    else
+      results(currentrow, alfa13) = zero
+      results(currentrow, beta13) = zero
+      results(currentrow, gama13) = zero
+    endif
+    
     !----------------
 
     ave(1,2,2) = -ave(1,2,2)
@@ -1000,29 +1016,48 @@ contains
     results(currentrow, beta22) = ave(3,3,1)  !-  
     results(currentrow, gama22) = ave(4,4,1) 
 
-    ave(5,6,1) = -ave(5,6,1)
-    results(currentrow, alfa23) = ave(5,6,1) !-
-    results(currentrow, beta23) = ave(6,6,1)  !-
-    results(currentrow, gama23) = ave(5,5,1)  !-
-
+    if ( c_%nd2 .ge. 6 ) then
+      ave(5,6,1) = -ave(5,6,1)
+      results(currentrow, alfa23) = ave(5,6,1) !-
+      results(currentrow, beta23) = ave(6,6,1)  !-
+      results(currentrow, gama23) = ave(5,5,1)  !-
+    else
+      results(currentrow, alfa23) = zero
+      results(currentrow, beta23) = zero
+      results(currentrow, gama23) = zero
+    endif
+    
     !----------------
 
-    ave(1,2,3) = -ave(1,2,3)
-    results(currentrow, alfa31) = ave(1,2,3) !-
-    results(currentrow, beta31) = ave(1,1,3)  !-
-    results(currentrow, gama31) = ave(2,2,3)  !-
+    if ( c_%nd == 3) then
+       ave(1,2,3) = -ave(1,2,3)
+       results(currentrow, alfa31) = ave(1,2,3) !-
+       results(currentrow, beta31) = ave(1,1,3)  !-
+       results(currentrow, gama31) = ave(2,2,3)  !-
 
-    ave(3,4,3) =-ave(3,4,3)
-    results(currentrow, alfa32) = ave(3,4,3) !-  
-    results(currentrow, beta32) = ave(3,3,3)  !-
-    results(currentrow, gama32) = ave(4,4,3)  !-
+       ave(3,4,3) =-ave(3,4,3)
+       results(currentrow, alfa32) = ave(3,4,3) !-  
+       results(currentrow, beta32) = ave(3,3,3)  !-
+       results(currentrow, gama32) = ave(4,4,3)  !-
 
-    ave(5,6,2) =-ave(5,6,2)
-    results(currentrow, alfa33) = ave(5,6,2) !
-    results(currentrow, beta33) = ave(6,6,2)  !-
-    results(currentrow, gama33) = ave(5,5,2)  !-
-    
-    
+
+       ave(5,6,2) =-ave(5,6,2)
+       results(currentrow, alfa33) = ave(5,6,2) !
+       results(currentrow, beta33) = ave(6,6,2)  !-
+       results(currentrow, gama33) = ave(5,5,2)  !-
+     else
+
+       results(currentrow, alfa31) = zero
+       results(currentrow, beta31) = zero
+       results(currentrow, gama31) = zero
+       results(currentrow, alfa32) = zero
+       results(currentrow, beta32) = zero
+       results(currentrow, gama32) = zero
+       results(currentrow, alfa33) = zero
+       results(currentrow, beta33) = zero
+       results(currentrow, gama33) = zero  !-
+         
+     endif    
     
 !     j=1
 !     ii = 2*j ! == 2                  100000
@@ -1402,7 +1437,7 @@ contains
 !    print*,"getpareq"
 
     if (.not. associated(ut%n)) then
-         call fort_warn("printpareq",&
+         call fort_warn("getpareq",&
           "provided taylor is not allocated")
          write(string,'(A)') ' 0 '
          return
@@ -1410,7 +1445,7 @@ contains
     
 
     if(ut%nv /= c_%nv) then
-         call fort_warn("printpareq",&
+         call fort_warn("getpareq",&
           "number of variables of this universal taylor is different from currnet TPSA")
          return
     endif     
