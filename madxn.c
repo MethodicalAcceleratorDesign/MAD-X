@@ -21,7 +21,7 @@
 
 #include "madxc.c"
 
-#ifdef _ONLINE     
+#ifdef _ONLINE
 #include "madxsdds.c"
 #endif
 
@@ -209,7 +209,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   int truepos=0, true_cnt, offspos, offs_cnt;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
   double surv_init[6]={0, 0, 0, 0, 0, 0};
-  double surv_x, surv_y, elem_x=0, elem_y=0;
+  double surv_x=zero, surv_y=zero, elem_x=0, elem_y=0;
   double xa=0, xb=0, xc=0, ya=0, yb=0, yc=0;
   double on_ap=1, on_elem=0;
   double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
@@ -1750,7 +1750,7 @@ int result_from_normal(char* name_var, int* order, double* val)
 {
   int row,k,found,pos;
   char string[AUX_LG],n_var[AUX_LG];
-  double d_val;
+  double d_val=zero;
   struct table* t;
 
   pos = name_list_pos("normal_results", table_register->names);
@@ -2090,7 +2090,7 @@ void exec_plot(struct in_cmd* cmd)
     pos = name_list_pos("vaxis", nl_plot);
 
     vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
-    
+
     /* get interpolation */
 
     pos = name_list_pos("interpolation", nl_plot);
@@ -4523,7 +4523,7 @@ void pro_match(struct in_cmd* cmd)
 {
   /* OB 12.2.2002: changed the sequence of if statements so that MAD
      can go through the whole matching sequence */
-  
+
   if (strcmp(cmd->tok_list->p[0], "match") == 0)
   {
     match_match(cmd);
@@ -4780,27 +4780,27 @@ void pro_twiss()
   set_option("info", &i);
 
   if (current_twiss == 0x0)
-   {
-     seterrorflag(2,"pro_twiss","No twiss command seen yet");
-     warning("pro_twiss","No twiss command seen yet!");
-     return;
-   }
+  {
+    seterrorflag(2,"pro_twiss","No twiss command seen yet");
+    warning("pro_twiss","No twiss command seen yet!");
+    return;
+  }
 
   if (current_twiss->par_names == 0x0)
-   {
-     seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
-     warning("pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
-     return;
-   }
+  {
+    seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
+    warning("pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
+    return;
+  }
 
   if (current_twiss->par == 0x0)
-   {
-     seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
-     warning("pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
-     return;
-   }
-   
-   
+  {
+    seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
+    warning("pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
+    return;
+  }
+
+
   nl = current_twiss->par_names;
   pl = current_twiss->par;
 
@@ -5038,7 +5038,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   double betx,bety,alfx,mux,alfy,muy,x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,
     phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
     r11,r12,r21,r22,s;
-  int i, jt, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
+  int i, jt=0, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
   int ks, w_file, beta_def, err = 0, inval = 1;
   int keep_info = get_option("info");
 
@@ -7062,7 +7062,7 @@ void store_savebeta(struct in_cmd* cmd)
 
 void store_select(struct in_cmd* cmd)
 {
-#ifdef _ONLINE     
+#ifdef _ONLINE
   char *sdds_pattern;
   char sdum[1000];
 #endif
@@ -7111,31 +7111,31 @@ void store_select(struct in_cmd* cmd)
     }
   }
   else if (strcmp(flag_name, "sdds") == 0)
-  #ifdef _ONLINE     
-   {
+#ifdef _ONLINE
+  {
     if (log_val("clear", cmd->clone))
     {
-         if (get_option("debug")) printf("here CLEAR all selected arrays\n");
-         if(sdds_pat != NULL) sdds_pat = delete_char_p_array(sdds_pat, 1);
-         if (get_option("debug")) printf("ptr after clear: %d\n",(long)sdds_pat);
+      if (get_option("debug")) printf("here CLEAR all selected arrays\n");
+      if(sdds_pat != NULL) sdds_pat = delete_char_p_array(sdds_pat, 1);
+      if (get_option("debug")) printf("ptr after clear: %d\n",(long)sdds_pat);
     }
     else
     {
-         if(sdds_pat == NULL) sdds_pat = new_char_p_array(100);
-         if (get_option("debug")) printf("current selections %d\n",sdds_pat->curr);
-         sdds_pattern = command_par_string("pattern",cmd->clone);
-         if(sdds_pattern != NULL) {
-         if (get_option("debug")) printf("pattern in select: %s\n",sdds_pattern);
-         strcpy(sdum,sdds_pattern);
-         sdds_pat->p[sdds_pat->curr++] = tmpbuff(sdum);
-         }
+      if(sdds_pat == NULL) sdds_pat = new_char_p_array(100);
+      if (get_option("debug")) printf("current selections %d\n",sdds_pat->curr);
+      sdds_pattern = command_par_string("pattern",cmd->clone);
+      if(sdds_pattern != NULL) {
+        if (get_option("debug")) printf("pattern in select: %s\n",sdds_pattern);
+        strcpy(sdum,sdds_pattern);
+        sdds_pat->p[sdds_pat->curr++] = tmpbuff(sdum);
+      }
     }
-   }
-  #else
-   {
-     warning("ignored, only available in ONLINE model:", "FLAG=SDDS");
-   }
-  #endif
+  }
+#else
+  {
+    warning("ignored, only available in ONLINE model:", "FLAG=SDDS");
+  }
+#endif
 
   else if (strcmp(flag_name, "makethin") == 0)
   {
@@ -7675,26 +7675,26 @@ void pro_ptc_twiss_linac(struct in_cmd* cmd)
   struct command_parameter_list* pl;
 
   if (current_twiss == 0x0)
-   {
-     seterrorflag(2,"pro_ptc_twiss_linac","No twiss command seen yet");
-     warning("pro_ptc_twiss_linac","No twiss command seen yet!");
-     return;
-   }
+  {
+    seterrorflag(2,"pro_ptc_twiss_linac","No twiss command seen yet");
+    warning("pro_ptc_twiss_linac","No twiss command seen yet!");
+    return;
+  }
 
   if (current_twiss->par_names == 0x0)
-   {
-     seterrorflag(3,"pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
-     warning("pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
-     return;
-   }
+  {
+    seterrorflag(3,"pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
+    warning("pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
+    return;
+  }
 
   if (current_twiss->par == 0x0)
-   {
-     seterrorflag(4,"pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
-     warning("pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
-     return;
-   }
-   
+  {
+    seterrorflag(4,"pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
+    warning("pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
+    return;
+  }
+
   nl = current_twiss->par_names;
   pl = current_twiss->par;
 
@@ -7802,11 +7802,11 @@ void pro_ptc_setswitch(struct in_cmd* cmd)
     return;
   }
 
-  if (match_is_on == kMatch_PTCknobs) 
-   { 
-     madx_mpk_setsetswitch(cmd);
-     return;
-   }  
+  if (match_is_on == kMatch_PTCknobs)
+  {
+    madx_mpk_setsetswitch(cmd);
+    return;
+  }
 
   nl = cmd->clone->par_names;
 
@@ -7939,23 +7939,23 @@ void pro_ptc_printparametric(struct in_cmd* cmd)
   pos   = name_list_pos("filename", c_parnames);
   if (pos < 0)
   {
-    
+
     filep = &zeroint;
   }
   else
-   {
-     filename  = c_parameters->parameters[pos]->string;
-     if ( filename == 0x0 )
-      {
-        filep = &zeroint;
-      }
-     else
-      {
-        filenameIA = new_int_array(1+strlen(filename));
-        conv_char(filename,filenameIA);
-        filep = filenameIA->i;
-      }
+  {
+    filename  = c_parameters->parameters[pos]->string;
+    if ( filename == 0x0 )
+    {
+      filep = &zeroint;
     }
+    else
+    {
+      filenameIA = new_int_array(1+strlen(filename));
+      conv_char(filename,filenameIA);
+      filep = filenameIA->i;
+    }
+  }
 
   pos   = name_list_pos("format", c_parnames);
   if (pos < 0)
@@ -7967,8 +7967,8 @@ void pro_ptc_printparametric(struct in_cmd* cmd)
   w_ptc_writeparresults(filep);
 
   delete_int_array(filenameIA);
-  
-  
+
+
 }
 /********************************************************************************/
 
@@ -8011,26 +8011,26 @@ void pro_ptc_printframes(struct in_cmd* cmd)
 
   conv_char(filename,filenameIA);
 
-  
+
   if (strcmp(format,"rootmacro") == 0)
-   {
-     w_ptc_printlayout_rootm(filenameIA->i);
-   }
+  {
+    w_ptc_printlayout_rootm(filenameIA->i);
+  }
   else
-   { 
+  {
     w_ptc_printframes(filenameIA->i);
-   } 
+  }
 
   delete_int_array(filenameIA);
-  
-  
+
+
 }
 /********************************************************************************/
-        
+
 
 void pro_ptc_eplacement(struct in_cmd* cmd)
 {/*
-  Sets a parameter
+   Sets a parameter
  */
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
@@ -8050,30 +8050,30 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
   }
 
   if ( c_parnames->inform[pos] != 0 )
-   {
-     /*if it is zero it is not specified*/
-     
-     if ( c_parameters->parameters[pos]->string == 0x0 )
+  {
+    /*if it is zero it is not specified*/
+
+    if ( c_parameters->parameters[pos]->string == 0x0 )
+    {
+      warning("madxn.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
+      refframe = 0;
+    }
+    else
+    {
+      /*printf("refframe is %s.\n", c_parameters->parameters[pos]->string );*/
+
+      if ( strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
       {
-        warning("madxn.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
-        refframe = 0;
+        refframe = 1;
       }
-     else
+
+      if ( strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
       {
-       /*printf("refframe is %s.\n", c_parameters->parameters[pos]->string );*/
+        refframe = 2;
+      }
+    }
+  }
 
-       if ( strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
-        {
-          refframe = 1;
-        }
-
-       if ( strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
-        {
-          refframe = 2;
-        }
-      } 
-   }  
-  
 
   pos   = name_list_pos("range", c_parnames);
   if (pos < 0)
@@ -8083,10 +8083,10 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
   }
 
   if ( c_parnames->inform[pos] == 0 )
-   {
+  {
     printf("madxn.c: pro_ptc_eplacement: inform for range is 0.\n");
     return;
-   }
+  }
 
   element  = c_parameters->parameters[pos]->string;
   if ( element == 0x0 )
@@ -8094,55 +8094,55 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
     warning("madxn.c: pro_ptc_eplacement: no element name: ", "ignored");
     return;
   }
- 
-  
-  k = get_range(element, current_sequ, nodes);  
+
+
+  k = get_range(element, current_sequ, nodes);
   if ( k != 1)
+  {
+    if (k > 1)
     {
-      if (k > 1)
-       {
-         warningnew("pro_ptc_eplacement","More then one element correstponds to the range <<%s>>.",element);
-         seterrorflag(1,"pro_ptc_eplacement","More then one element correstponds to the range");
-         return;
-       }
-      else
-       {
-         warningnew("pro_ptc_eplacement","Element <<%s>> not found",element);
-         seterrorflag(1,"pro_ptc_eplacement","Element not found");
-         return;
-       } 
-    } 
+      warningnew("pro_ptc_eplacement","More then one element correstponds to the range <<%s>>.",element);
+      seterrorflag(1,"pro_ptc_eplacement","More then one element correstponds to the range");
+      return;
+    }
+    else
+    {
+      warningnew("pro_ptc_eplacement","Element <<%s>> not found",element);
+      seterrorflag(1,"pro_ptc_eplacement","Element not found");
+      return;
+    }
+  }
 
 
-  
+
   pos = 0;
   anode=current_sequ->range_start;
   while( anode != 0x0  )
-   { 
-     if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
-      {
-       /* printf("Element is at pos %d !\n",pos);*/
-        break;
-      }
+  {
+    if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
+    {
+      /* printf("Element is at pos %d !\n",pos);*/
+      break;
+    }
 
-     if (current_sequ->nodes->nodes[pos] == current_sequ->range_end) 
-      {
-         warningnew("pro_ptc_eplacement","Reached the end of sequence - Element <<%s>> not found",element);
-         return;
-      }
-     pos++; /*before if because fortran numerates from 1*/
-   }  
+    if (current_sequ->nodes->nodes[pos] == current_sequ->range_end)
+    {
+      warningnew("pro_ptc_eplacement","Reached the end of sequence - Element <<%s>> not found",element);
+      return;
+    }
+    pos++; /*before if because fortran numerates from 1*/
+  }
 
-   
+
   w_ptc_eplacement(&pos,&refframe);
 
- 
+
 }
 /********************************************************************************/
 
 void pro_ptc_knob(struct in_cmd* cmd)
 {/*
-  Sets a parameter
+   Sets a parameter
  */
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
@@ -8150,14 +8150,14 @@ void pro_ptc_knob(struct in_cmd* cmd)
 
   char*                          element    = 0x0;
   struct int_array*              elementIA      = 0x0;
- 
-  
+
+
   if (match_is_on == kMatch_PTCknobs)
-   {
-     madx_mpk_addvariable(cmd);
-     return;
-   }
-  
+  {
+    madx_mpk_addvariable(cmd);
+    return;
+  }
+
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
   {
@@ -8173,9 +8173,9 @@ void pro_ptc_knob(struct in_cmd* cmd)
   }
 
   mycpy(c_dum->c, element);
-  
+
   stoupper(c_dum->c);
-  
+
   elementIA = new_int_array(1+strlen(c_dum->c));
 
   conv_char(c_dum->c,elementIA);
@@ -8183,13 +8183,13 @@ void pro_ptc_knob(struct in_cmd* cmd)
   w_ptc_addknob(elementIA->i);
 
   delete_int_array(elementIA);
- 
+
 }
 /********************************************************************************/
 
 void pro_ptc_setknobvalue(struct in_cmd* cmd)
 {/*
-  Sets a parameter value
+   Sets a parameter value
  */
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
@@ -8200,21 +8200,21 @@ void pro_ptc_setknobvalue(struct in_cmd* cmd)
 
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
-   {
-     printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
-     return;
-   }
+  {
+    printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
+    return;
+  }
 
   element  = c_parameters->parameters[pos]->string;
   if ( element == 0x0 )
-   {
-     warning("madxn.c: pro_ptc_knob: no element name: ", "ignored");
-     return;
-   }
+  {
+    warning("madxn.c: pro_ptc_knob: no element name: ", "ignored");
+    return;
+  }
   mycpy(c_dum->c, element);
-  
+
   stoupper(c_dum->c);
-  
+
   elementIA = new_int_array(1+strlen(c_dum->c));
 
   conv_char(c_dum->c,elementIA);
@@ -8222,7 +8222,7 @@ void pro_ptc_setknobvalue(struct in_cmd* cmd)
   w_ptc_setknobvalue(elementIA->i);
 
   delete_int_array(elementIA);
-  
+
 
 }
 /********************************************************************************/
@@ -8230,7 +8230,7 @@ void pro_ptc_setknobvalue(struct in_cmd* cmd)
 
 void pro_ptc_setfieldcomp(struct in_cmd* cmd)
 {/*
-  Sets a parameter value
+   Sets a parameter value
  */
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
@@ -8250,10 +8250,10 @@ void pro_ptc_setfieldcomp(struct in_cmd* cmd)
   }
 
   if ( c_parnames->inform[pos] == 0 )
-   {
+  {
     printf("madxn.c: pro_ptc_setfieldcomp: inform for range is 0.\n");
     return;
-   }
+  }
 
   element  = c_parameters->parameters[pos]->string;
   if ( element == 0x0 )
@@ -8261,44 +8261,44 @@ void pro_ptc_setfieldcomp(struct in_cmd* cmd)
     warning("madxn.c: pro_ptc_setfieldcomp: no element name: ", "ignored");
     return;
   }
- 
-  
-  k = get_range(element, current_sequ, nodes);  
+
+
+  k = get_range(element, current_sequ, nodes);
   if ( k != 1)
+  {
+    if (k > 1)
     {
-      if (k > 1)
-       {
-         warningnew("pro_ptc_setfieldcomp","More then one element correstponds to the range <<%s>>.",element);
-         seterrorflag(1,"pro_ptc_setfieldcomp","More then one element correstponds to the range");
-         return;
-       }
-      else
-       {
-         warningnew("pro_ptc_setfieldcomp","Element <<%s>> not found",element);
-         seterrorflag(1,"pro_ptc_setfieldcomp","Element not found");
-         return;
-       } 
-    } 
+      warningnew("pro_ptc_setfieldcomp","More then one element correstponds to the range <<%s>>.",element);
+      seterrorflag(1,"pro_ptc_setfieldcomp","More then one element correstponds to the range");
+      return;
+    }
+    else
+    {
+      warningnew("pro_ptc_setfieldcomp","Element <<%s>> not found",element);
+      seterrorflag(1,"pro_ptc_setfieldcomp","Element not found");
+      return;
+    }
+  }
 
 
-  
+
   pos = 0;
   anode=current_sequ->range_start;
   while( anode != 0x0  )
-   { 
-     if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
-      {
-       /* printf("Element is at pos %d !\n",pos);*/
-        break;
-      }
+  {
+    if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
+    {
+      /* printf("Element is at pos %d !\n",pos);*/
+      break;
+    }
 
-     if (current_sequ->nodes->nodes[pos] == current_sequ->range_end) 
-      {
-         warningnew("pro_ptc_setfieldcomp","Reached the end of sequence - Element <<%s>> not found",element);
-         return;
-      }
-     pos++; /*before if because fortran numerates from 1*/
-   }  
+    if (current_sequ->nodes->nodes[pos] == current_sequ->range_end)
+    {
+      warningnew("pro_ptc_setfieldcomp","Reached the end of sequence - Element <<%s>> not found",element);
+      return;
+    }
+    pos++; /*before if because fortran numerates from 1*/
+  }
 
   w_ptc_setfieldcomp(&pos);
 
@@ -8315,13 +8315,13 @@ void pro_ptc_select(struct in_cmd* cmd)
 
   int                            element     = 0;
   int*                           tablep      = 0;
-  int*                           columnp     = 0; 
+  int*                           columnp     = 0;
   static int                     zeroint     = 0;/*if there is no column name or table name these are passed as null strings */
   char*                          monomial    = 0x0;
   struct int_array*              tabnameIA   = 0x0;/*string passing to fortran is tricky*/
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
-  
+
 /*
   int                            i           = 0;
   struct node*                   nodes[2]    = {0x0,0x0};
@@ -8332,39 +8332,39 @@ void pro_ptc_select(struct in_cmd* cmd)
   element = (int)command_par_value("polynomial",cmd->clone);
   monomial = command_par_string("monomial",cmd->clone);
   if (monomial == 0x0)
-   {
-     warning("madxn.c: pro_ptc_select: monomial is NULL ", "ignored");
-     return;
-   }
+  {
+    warning("madxn.c: pro_ptc_select: monomial is NULL ", "ignored");
+    return;
+  }
   monoIA = new_int_array(1+strlen(monomial));
   conv_char(monomial,monoIA);
 
   pro_ptc_select_checkpushtable(cmd,&tabnameIA,&colnameIA);
 
   if ( tabnameIA )
-   {
-     tablep = tabnameIA->i;
-   }
+  {
+    tablep = tabnameIA->i;
+  }
   else
-   {
-     tablep = &zeroint;
-   } 
+  {
+    tablep = &zeroint;
+  }
 
   if ( colnameIA )
-   {
-     columnp = colnameIA->i;
-   }
+  {
+    columnp = colnameIA->i;
+  }
   else
-   {
-     columnp = &zeroint;
-   } 
+  {
+    columnp = &zeroint;
+  }
 
   w_ptc_addpush_(tablep,columnp,&element,monoIA->i);
 
   delete_int_array(tabnameIA);
-  delete_int_array(colnameIA); 
+  delete_int_array(colnameIA);
   delete_int_array(monoIA);
-   
+
 
 }
 /********************************************************************************/
@@ -8409,12 +8409,12 @@ int pro_ptc_select_checkpushtable(struct in_cmd* cmd,
   tablename  = c_parameters->parameters[pos]->string;
   if ( tablename == 0x0 )
   {
-     return -1;/*This means that table name was not specified at all*/
+    return -1;/*This means that table name was not specified at all*/
   }
   if ( tablename[0] == 0 )
-   {
-     return -1; /*This means that table name was not specified at all*/
-   }
+  {
+    return -1; /*This means that table name was not specified at all*/
+  }
   pos = name_list_pos(tablename, table_register->names);
   if (pos < 0)
   {
@@ -8890,7 +8890,7 @@ int getnumberoftracks()
 const char* getcurrentelementname()
 {
 /*returns number of input tracks */
-  
+
   if (current_node == 0x0)
   {
     return 0x0;
@@ -8984,5 +8984,3 @@ void deletetrackstrarpositions()
   trackstrarpositions = 0x0;
 }
 /***************************************************************************/
-
-  
