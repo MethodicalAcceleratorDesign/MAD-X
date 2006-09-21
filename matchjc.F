@@ -39,6 +39,8 @@
       include 'match.fi'
       external mtfcn
 
+      fval(1)=0
+
 ! mtfcn store the parameter using mtputi(x) and compute the function
 ! using mtcond
 
@@ -56,7 +58,7 @@
 !          calls=0
           call jacob(mtfcn,ncon,nvar,strategy,calls,call_lim,           &
      &vect,fun_vec,tol,                                                 &
-     &w_ifjac,w_iwa4,fval,                                              &
+     &w_ifjac,w_iwa4,                                                   &
      &xstart,xold,cool,balance,random,bisec,match_mode)
         endif
       enddo
@@ -65,7 +67,7 @@
 
       subroutine jacob(fcn,m,n,strategy,calls,call_lim,                 &
      &x,fvec,epsfcn,                                                    &
-     &fjac,wa4,fval,                                                    &
+     &fjac,wa4,                                                         &
      &xstart,xold,cool,balance,random,bisec,match_mode)
       implicit none
 !----------------------------------------------------------------------*
@@ -93,7 +95,7 @@
       integer izero
       integer i,iflag,info,j,level,m,n,calls,call_lim
       integer ireset,strategy,bisec,match_mode
-      double precision fval(m),fmin_old,epsfcn
+      double precision fmin_old,epsfcn
       double precision fnorm,ftol,gtol
       double precision dxnorm,xnorm,dx(n),fmin_start,fmin_old2
       double precision vmod
@@ -557,11 +559,11 @@
      &'  Penalty function = ',e16.8)
       end
 
-      subroutine jacob_print2(m,n,fjac,match_mode)
+      subroutine jacob_print2(m,n,fjac)
 
       implicit none
 
-      integer m,n,ivar,nvar,match_mode
+      integer m,n
       double precision fjac(m,n)
       integer i,j
 
