@@ -9,8 +9,8 @@ PLUGIN_SUPPORT=NO
 # parameters
 
 f95=f95
-GCC_FLAGS=-c -g -Wall -fno-second-underscore -D_CATCH_MEM
-GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -fno-second-underscore -Wall -pedantic -D_CATCH_MEM
+GCC_FLAGS=-c -g -Wall -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-c -g -O3 -funroll-loops -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan -ieee=full
 FFLAGS77=-gline -g90 -c -fpp -maxcontin=100 -nan -ieee=stop
@@ -21,6 +21,8 @@ FCP=$(FFLAGS77)
 CC=gcc
 FOPT=-Bstatic
 
+#FC5
+#LIBX= -lX11 -lXdmcp -lXau -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 ifeq ($(PLUGIN_SUPPORT),YES)

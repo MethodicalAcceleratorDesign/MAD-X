@@ -22,11 +22,11 @@ FCM=-O2 -fno-second-underscore -funroll-loops
 FCDB=-g -O0 -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -fno-second-underscore -D_CATCH_MEM -I.
+GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I.
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 
 # alternative for development
-GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM -D_FULL
+GCC_FLAGS=-g -Wall -D_CATCH_MEM -D_FULL
 
 # NAG default f95 compiler options
 #f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan
@@ -53,6 +53,8 @@ LDOPT=-static
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
+#FC5
+#LIBX= -lX11 -lXdmcp -lXau -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 # NAG f95 lib extension
@@ -67,7 +69,6 @@ ifeq ($(PLUGIN_SUPPORT),YES)
   LDOPT=--export
   #g95
   #LDOPT=-rdynamic
-  
 endif
 
 

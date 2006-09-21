@@ -51,11 +51,11 @@ FCM=-g -fno-second-underscore -funroll-loops
 FCDB=-g -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -funroll-loops -fno-second-underscore -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -funroll-loops -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL $(INCLUDES)
 
 # alternative for development
-GCC_FLAGS=-g -Wall -fno-second-underscore -D_CATCH_MEM -D_FULL
+GCC_FLAGS=-g -Wall -D_CATCH_MEM -D_FULL
 
 #NAG
 #FFLAGS77=-gline -g -c -fpp -maxcontin=100 -nan -ieee=stop
@@ -90,6 +90,8 @@ f95_FOPT=
 
 LIBS = -L/usr/lib/ -ldl -lpthread
 
+#FC5
+#LIBX= -lX11 -lXdmcp -lXau -lpthread
 LIBX=-L/usr/X11R6/lib -lX11 -lXm -lXt
 
 LIBX_ext=
