@@ -453,7 +453,7 @@ void att_aperture(struct c6t_element* el)
 
 void att_beambeam(struct c6t_element* el)
 {
-  double beamx,beamy;
+  double beamx=zero,beamy=zero;
   if (double_from_table("twiss","x",&(el->twtab_row),&beamx) != 0 ||
       double_from_table("twiss","y",&(el->twtab_row),&beamy) != 0)
   {
@@ -466,7 +466,7 @@ void att_beambeam(struct c6t_element* el)
 }
 
 void att_colli(struct c6t_element* el)
-  /* ecollim. + rcollim. - make drift, do not concatenate */
+/* ecollim. + rcollim. - make drift, do not concatenate */
 {
   el->out_1 = 0; el->out_4 = el->value[0];
 }
@@ -1884,8 +1884,8 @@ void process_c6t()  /* steering routine */
 }
 
 void pro_elem(struct node* cnode)
-  /* processes one element, makes linked list */
-  /* converts MADX linked list to c6t internal linked list */
+/* processes one element, makes linked list */
+/* converts MADX linked list to c6t internal linked list */
 {
   int i;
   char t_key[KEY_LENGTH];
@@ -2143,7 +2143,7 @@ void split_other(struct c6t_element* el)
 }
 
 void split_special(struct c6t_element* el)
-  /* -> two lin. halves with multipole at centre */
+/* -> two lin. halves with multipole at centre */
 {
   struct c6t_element *d1, *mt;
   double length = el->value[0] / two, mt_position = el->position;
@@ -2400,7 +2400,7 @@ void write_f34_special()
   char* t_list[NT34];
   char t_name[NAME_L];
   char* cp;
-  double spos,betx,bety,mux,muy;
+  double spos=zero,betx=zero,bety=zero,mux=zero,muy=zero;
   int err;
 
   t_list[0] = &mpole_names[1][0];
