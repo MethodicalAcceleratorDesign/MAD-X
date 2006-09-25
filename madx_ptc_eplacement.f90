@@ -230,22 +230,35 @@ contains
       print*, ".C found at ",i," function name is ", fctname
     endif  
 
+    write(mf,*) '#include "TROOT.h"'
+    write(mf,*) '#include "TCanvas.h"'
+    write(mf,*) '#include "Riostream.h"'
+
+
+    write(mf,*) '#include "TBRIK.h"'
+    write(mf,*) '#include "TShape.h"'
+    write(mf,*) '#include "TNode.h"'
+    write(mf,*) '#include "TCanvas.h"'
+    write(mf,*) '#include "TGLViewer.h"'
+    write(mf,*) '#include "TPoints3DABC.h"'
+    write(mf,*) '#include "TTUBE.h"'
+    write(mf,*) '#include "TRotMatrix.h"'
+    write(mf,*) ''
     write(mf,*) "void ", fctname,'()'
     write(mf,*) "{"
-    write(mf,*) 'TBRIK* l;'
     write(mf,*) 'TShape* s;'
     write(mf,*) 'TNode* mn;'
     write(mf,*) 'TNode* n;'
-    write(mf,*) 'TPoints3DABC* pts;'
     write(mf,*) 'Double_t rotmatrix[9];'
     write(mf,*) 'TRotMatrix* m;'
-    
+    write(mf,*) ''
     write(mf,*) 'TCanvas* c = new TCanvas("c","PTC Layout",10,10,800,600);'
-
+    write(mf,*) ''
     write(mf,*) 's = new TBRIK("START","START","void",0.01,0.01,0.01);'
     write(mf,*) 's->SetLineColor(2);'
     write(mf,*) 'mn = new TNode("NODE1","NODE1","START");'
     write(mf,*) 'mn->cd();'
+    write(mf,*) ''
 
 
     
@@ -270,17 +283,20 @@ contains
     xmax = xmax +1
     ymax = ymax +1
     
+    write(mf,*) ''
     write(mf,*) 'c->Range(', xmin, ',', ymin, ',', xmax, ',', ymax,');'
+    write(mf,*) ''
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
     p=>r%start
     do i=1,r%n
-      write(mf,*) 'cout<<"',p%mag%name,'"<<endl;'
+      write(mf,*) 'cout<<',i,'<<" ',p%mag%name,'"<<endl;'
+      print*, i,p%mag%name
       if (getdebug() > 2) then
         print*, i,p%mag%name
         print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
       endif  
       
-      if (p%mag%l == 0) goto 100;
+      if (p%mag%l == zero) goto 100;
       
       select case(p%mag%kind)
        
@@ -333,11 +349,10 @@ contains
       P=>P%NEXT
     enddo
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
-
-    write(mf,*) 'mn->Draw();'
-    write(mf,*) 'c->Update();'
-    write(mf,*) 'c->GetViewer3D("ogl");'
-
+    
+    write(mf,*) ''
+    write(mf,*) 'mn->Draw("ogl");'
+    write(mf,*) ''
     write(mf,*) "}"
     close(mf)
 
@@ -348,9 +363,9 @@ contains
       type(fibre), pointer :: p
       integer      :: mf !macro file descriptor
       integer      :: color = blue
-      character(9) :: fname
-      character(8) :: nodname
-      character(7) :: mtxname
+      character(10) :: fname
+      character(9) :: nodname
+      character(8) :: mtxname
       real(dp)     :: x,y,z,r, xx,yy, phi
       !To be finished - need more information about SBEND frames in PTC
       
@@ -383,19 +398,26 @@ contains
       endif
 
       r = (z + y*y)/(two*y)
+      if (r > 100000) then
+       print*, "SBEND curvature is almost null. DRAWING AS RBEND"
+       call drawboxm(p,mf,color)
+       return
+      endif
       
       phi = two*arcsin(z/r)
-!      print*, "R is ", r," phi is ", phi," z is ", z," y ",y
-      
-      write(fname,'(a5,i4.4)') 'SBEND',i
+      print*, "R is ", r," phi is ", phi," z is ", z," y ",y
+            
+      write(fname,'(a5,i5.5)') 'SBEND',i
       write(mf,*) 's = new TTUBS("',fname, '","',  fname,'","void",',&
                       &  r-0.25_dp,',',r+0.25_dp,',0.25,0,',phi,');'
       write(mf,*) 's->SetLineColor(',color,');'
     
-      write(mtxname,'(a3,i4.4)') 'mtx',i
+      write(mtxname,'(a3,i5.5)') 'mtx',i
+      print*, fname, " ",mtxname
+
       call setmatrix(P%mag%p%f%mid,mtxname,mf)
       
-      write(nodname,'(a4,i4.4)') 'NODE',i
+      write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
                                  & x,',',y, ',',z,',m);'
     
@@ -408,12 +430,12 @@ contains
       real(dp)     :: m(3,3)
       real(dp)     :: a(3)
       integer      :: color
-      character(9) :: fname
-      character(8) :: nodname
-      character(7) :: mtxname
+      character(10) :: fname
+      character(9) :: nodname
+      character(8) :: mtxname
       real(dp)     :: x,y,z
 
-      write(fname,'(a5,i4.4)') 'RECTA',i
+      write(fname,'(a5,i5.5)') 'RECTA',i
       write(mf,*) 's = new TBRIK("',fname, '","',  fname,'","void",0.5,0.5,',p%mag%l/2_dp,');'
       write(mf,*) 's->SetLineColor(',color,');'
 
@@ -422,10 +444,12 @@ contains
       z = a(3)
       
 
-      write(mtxname,'(a3,i4.4)') 'mtx',i
+      write(mtxname,'(a3,i5.5)') 'mtx',i
+      print*, fname," ",mtxname
+
       call setmatrix(m,mtxname,mf)
       
-      write(nodname,'(a4,i4.4)') 'NODE',i
+      write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
                                  & x,',',y, ',',z,',m);'
       
@@ -448,12 +472,12 @@ contains
       integer      :: mf !macro file descriptor
       real(dp)     :: r
       integer      :: color
-      character(9) :: fname
-      character(8) :: nodname
-      character(7) :: mtxname
+      character(10) :: fname
+      character(9) :: nodname
+      character(8) :: mtxname
       real(dp)     :: x,y,z
   
-      write(fname,'(a5,i4.4)') 'DRIFT',i
+      write(fname,'(a5,i5.5)') 'DRIFT',i
       write(mf,*) 's = new TTUBE("',fname, '","',  fname,'","void",',r,',',p%mag%l/2_dp,');'
       write(mf,*) 's->SetLineColor(',color,');'
       
@@ -462,10 +486,12 @@ contains
       z = P%mag%p%f%o(3)
       
 
-      write(mtxname,'(a3,i4.4)') 'mtx',i
+      write(mtxname,'(a3,i5.5)') 'mtx',i
+      print*, fname," ", mtxname
+
       call setmatrix(P%mag%p%f%mid,mtxname,mf)
       
-      write(nodname,'(a4,i4.4)') 'NODE',i
+      write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
                                  & x,',',y, ',',z,',m);'
       
@@ -476,7 +502,7 @@ contains
     subroutine setmatrix(m,name,mf)
       implicit none
       real(dp)     :: m(3,3)
-      character(6) :: name
+      character(8) :: name
       integer      :: mf !macro file descriptor
       
       
