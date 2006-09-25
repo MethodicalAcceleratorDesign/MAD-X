@@ -230,19 +230,25 @@ contains
       print*, ".C found at ",i," function name is ", fctname
     endif  
 
-    write(mf,*) '#include "TROOT.h"'
-    write(mf,*) '#include "TCanvas.h"'
-    write(mf,*) '#include "Riostream.h"'
-
-
-    write(mf,*) '#include "TBRIK.h"'
-    write(mf,*) '#include "TShape.h"'
-    write(mf,*) '#include "TNode.h"'
-    write(mf,*) '#include "TCanvas.h"'
-    write(mf,*) '#include "TGLViewer.h"'
-    write(mf,*) '#include "TPoints3DABC.h"'
-    write(mf,*) '#include "TTUBE.h"'
-    write(mf,*) '#include "TRotMatrix.h"'
+    write(mf,*) '#ifndef __MAKECINT__'
+    write(mf,*) ' #ifndef __CINT__'
+    write(mf,*) ''
+    write(mf,*) ' #include "TROOT.h"'
+    write(mf,*) ' #include "TCanvas.h"'
+    write(mf,*) ' #include "Riostream.h"'
+    write(mf,*) ''
+    write(mf,*) ' #include "TBRIK.h"'
+    write(mf,*) ' #include "TShape.h"'
+    write(mf,*) ' #include "TNode.h"'
+    write(mf,*) ' #include "TCanvas.h"'
+    write(mf,*) ' #include "TGLViewer.h"'
+    write(mf,*) ' #include "TPoints3DABC.h"'
+    write(mf,*) ' #include "TTUBE.h"'
+    write(mf,*) ' #include "TRotMatrix.h"'
+    write(mf,*) ''
+    write(mf,*) ' #endif'
+    write(mf,*) '#endif'
+    write(mf,*) ''
     write(mf,*) ''
     write(mf,*) "void ", fctname,'()'
     write(mf,*) "{"
@@ -251,6 +257,9 @@ contains
     write(mf,*) 'TNode* n;'
     write(mf,*) 'Double_t rotmatrix[9];'
     write(mf,*) 'TRotMatrix* m;'
+    write(mf,*) ''
+    write(mf,*) 'gSystem->Load("libGed");'
+    write(mf,*) 'gSystem->Load("libRGL");'
     write(mf,*) ''
     write(mf,*) 'TCanvas* c = new TCanvas("c","PTC Layout",10,10,800,600);'
     write(mf,*) ''
@@ -289,8 +298,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
     p=>r%start
     do i=1,r%n
-      write(mf,*) 'cout<<',i,'<<" ',p%mag%name,'"<<endl;'
-      print*, i,p%mag%name
+!      write(mf,*) 'cout<<',i,'<<" ',p%mag%name,'"<<endl;'
+!      print*, i,p%mag%name
       if (getdebug() > 2) then
         print*, i,p%mag%name
         print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
@@ -352,6 +361,9 @@ contains
     
     write(mf,*) ''
     write(mf,*) 'mn->Draw("ogl");'
+    write(mf,*) 'TGLViewer * v = (TGLViewer *)c->GetViewer3D();'
+    write(mf,*) 'v->SetDrawStyle(TGLDrawFlags::kOutline);'
+    
     write(mf,*) ''
     write(mf,*) "}"
     close(mf)
@@ -392,14 +404,14 @@ contains
       y = sqrt(x*x + y*y)
 
       if (y == 0) then
-       print*, "All three reference frames are inline. DRAWING AS RBEND"
+       print*,i,p%mag%name, "All three reference frames are inline. DRAWING AS RBEND"
        call drawboxm(p,mf,color)
        return
       endif
 
       r = (z + y*y)/(two*y)
       if (r > 100000) then
-       print*, "SBEND curvature is almost null. DRAWING AS RBEND"
+       print*,i,p%mag%name, "SBEND curvature is almost null. DRAWING AS RBEND"
        call drawboxm(p,mf,color)
        return
       endif
@@ -413,7 +425,7 @@ contains
       write(mf,*) 's->SetLineColor(',color,');'
     
       write(mtxname,'(a3,i5.5)') 'mtx',i
-      print*, fname, " ",mtxname
+!      print*, fname, " ",mtxname
 
       call setmatrix(P%mag%p%f%mid,mtxname,mf)
       
@@ -445,7 +457,7 @@ contains
       
 
       write(mtxname,'(a3,i5.5)') 'mtx',i
-      print*, fname," ",mtxname
+!      print*, fname," ",mtxname
 
       call setmatrix(m,mtxname,mf)
       
@@ -487,7 +499,7 @@ contains
       
 
       write(mtxname,'(a3,i5.5)') 'mtx',i
-      print*, fname," ", mtxname
+!      print*, fname," ", mtxname
 
       call setmatrix(P%mag%p%f%mid,mtxname,mf)
       
