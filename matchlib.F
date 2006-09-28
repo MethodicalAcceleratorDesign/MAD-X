@@ -3516,8 +3516,8 @@
 !     ..
 !     .. Executable Statements ..
 !
-      OPTS="a"
-      N3=0
+!      OPTS="a"
+!      N3=0
       
       GO TO ( 100, 100, 100, 400, 500, 600, 700, 800, 900, 1000,        &
      &1100 ) ISPEC
