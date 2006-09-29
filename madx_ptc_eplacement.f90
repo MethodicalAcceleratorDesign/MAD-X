@@ -305,24 +305,42 @@ contains
         print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
       endif  
       
-      if (p%mag%l == zero) goto 100;
+      if (p%mag%l == zero) then
+!       print*, i,p%mag%name
+       goto 100;
+      endif 
       
       select case(p%mag%kind)
        
        case(kind1)
          call drawtube(p,mf,0.05_dp,lgrey)
 
-       case(kind11)
+       case(kind11) !monitor
          call drawtube(p,mf,0.05_dp,magenta)
 
-       case(kind10)
+       case(kind12) !monitor
+         call drawtube(p,mf,0.05_dp,magenta)
+
+       case(kind13) !monitor
+         call drawtube(p,mf,0.05_dp,magenta)
+
+       case(kind10) !SBEND
          call drawsbend(p,mf)
 
-       case(kind20)
+       case(kind20) !stright exact bend
          call drawboxm(p,mf,magenta)
 
-       case(kind21)
-         call drawtube(p,mf,0.25_dp,yellow)
+       case(kind15)!septum (electric)
+         call drawboxm(p,mf,cyan)
+
+       case(kind21) !TW CAV
+         call drawtube(p,mf,0.25_dp,yellow) 
+
+       case(kind4) !TW CAV
+         call drawtube(p,mf,0.25_dp,yellow) !TW CAV
+
+       case(kind5) !solenoid
+         call drawtube(p,mf,0.25_dp,darkgreen) 
          
        case(kind16)
          if (getdebug() > 3) then 
