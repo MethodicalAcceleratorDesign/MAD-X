@@ -177,13 +177,13 @@ contains
              if (rplot) then
                if (gcs) then
   !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-                  gposx = x(1)*p%mag%p%f%exi(1,1) + x(3)*p%mag%p%f%exi(1,2) + x(6)*p%mag%p%f%exi(1,3)
-                  gposy = x(1)*p%mag%p%f%exi(2,1) + x(3)*p%mag%p%f%exi(2,2) + x(6)*p%mag%p%f%exi(2,3)
-                  gposz = x(1)*p%mag%p%f%exi(3,1) + x(3)*p%mag%p%f%exi(3,2) + x(6)*p%mag%p%f%exi(3,3)
+                  gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
+                  gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
+                  gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
   !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
-                  gposx = gposx + p%mag%p%f%b(1)
-                  gposy = gposy + p%mag%p%f%b(2)
-                  gposz = gposz + p%mag%p%f%b(3)
+                  gposx = gposx + p%chart%f%b(1)
+                  gposy = gposy + p%chart%f%b(2)
+                  gposz = gposz + p%chart%f%b(3)
 
                   write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
@@ -778,7 +778,7 @@ contains
           do k=1,c_%nd
              ave(i,j,k)=zero
              e(k*2-1)=1
-             ave(i,j,k)=      ave(i,j,k) + (y(i)%t.par.e)*(y(j)%t.par.e) !*
+             ave(i,j,k)= ave(i,j,k) + (y(i)%t.par.e)*(y(j)%t.par.e) !*
              e(k*2-1)=0
              e(k*2)=1
              ave(i,j,k)=morph(ave(i,j,k))+ (y(i).par.e)*(y(j).par.e) !line * does the same, here taylor is morphed to polimorph,
