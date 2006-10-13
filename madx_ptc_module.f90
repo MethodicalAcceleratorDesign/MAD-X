@@ -1957,9 +1957,6 @@ CONTAINS
          enddo
       enddo
       deallocate(j)
-      do i=1,c_%npara
-         x(i) = 0
-      enddo
 
       if ( getdebug() > 2) then
          print*," Read the following BETA0 block in module ptc_twiss"
