@@ -38,9 +38,6 @@ module madx_ptc_knobs_module
   public                         :: setparvalue
   public                         :: setknobvalue
   
-  interface daprint
-    module procedure printunitaylor
-  end interface daprint
 
 
   !============================================================================================
@@ -154,7 +151,7 @@ contains
 	&        " at named ", pushes(i)%colname, &
 	&        " for fibre no ",n
                write(6,*) "currentrow is ", currentrow," index ",pushes(i)%index
-               call daprint(results(currentrow,pushes(i)%index),6)
+               call print(results(currentrow,pushes(i)%index),6)
             endif
          endif
           
@@ -218,7 +215,7 @@ contains
 	&        " at named ", pushes(i)%colname, &
 	&        " for fibre no ",n
                write(6,*) "currentrow is ", currentrow," index ",pushes(i)%index
-               call daprint(results(currentrow,pushes(i)%index),6)
+               call print(results(currentrow,pushes(i)%index),6)
            endif
 
          endif
@@ -1222,7 +1219,7 @@ contains
       do j=1,ntwisses
 !        print*, "Writing i,j",i,j
         write(mf,*) twissnames(j)
-        if (fmt_ptc)  call daprint(results(i,j),mf)
+        if (fmt_ptc)  call print(results(i,j),mf)
         if (fmt_tex)  call printpareq(results(i,j),mf)
         write(mf,*) " "
       enddo
@@ -1232,7 +1229,7 @@ contains
         if (pushes(j)%index < 1 ) cycle
 !        print*, "Writing i, j->index",i,j,pushes(j)%index
         write(mf,*) pushes(j)%colname
-        if (fmt_ptc)  call daprint(results(i,pushes(j)%index),mf)
+        if (fmt_ptc)  call print(results(i,pushes(j)%index),mf)
         if (fmt_tex)  call printpareq(results(i,pushes(j)%index),mf)
         write(mf,*) " "
         enddo
@@ -1244,36 +1241,6 @@ contains
   end subroutine writeparresults
   !_________________________________________________________________________________
     
-
-  subroutine printunitaylor(ut,iunit)
-    implicit none
-    type(universal_taylor) :: ut
-    integer                :: iunit
-    integer                :: i,ii
-    
-    if (.not. associated(ut%n)) then
-         write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSICIATED)'
-    endif 
-    
-    write(iunit,'(/1X,A,I5,A,I5,A/1X,A/)') 'UNIV_TAYLOR   NO =',ut%n,', NV =',ut%nv,', INA = unita',&
-         '*********************************************'
-    if(ut%n /= 0) then
-         write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-    else 
-         write(iunit,'(A)') '   ALL COMPONENTS ZERO '
-    endif     
-    
-    do i = 1,ut%n
-       write(iunit,'(I6,2X,G20.14,I5,4X,18(2I2,1X))') i,ut%c(i),sum(ut%j(i,:)),(ut%j(i,ii),ii=1,ut%nv)
-       if( .not. print77) then
-          write(iunit,*)  ut%c(i)
-       endif
-    enddo
-
-    write(iunit,'(A)') '                                      '
-    
-  end subroutine printunitaylor
-  !_________________________________________________________________________________
 
   function getparname(n)
     implicit none

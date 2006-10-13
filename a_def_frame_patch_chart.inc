@@ -1,10 +1,10 @@
 TYPE MAGNET_FRAME
-   REAL(DP), POINTER,DIMENSION(:,:)::   ENT
    REAL(DP), POINTER,DIMENSION(:)  ::   A
-   REAL(DP), POINTER,DIMENSION(:,:)::   EXI
-   REAL(DP), POINTER,DIMENSION(:)  ::   B
-   REAL(DP), POINTER,DIMENSION(:,:)::   MID
+   REAL(DP), POINTER,DIMENSION(:,:)::   ENT
    REAL(DP), POINTER,DIMENSION(:)  ::   O
+   REAL(DP), POINTER,DIMENSION(:,:)::   MID
+   REAL(DP), POINTER,DIMENSION(:)  ::   B
+   REAL(DP), POINTER,DIMENSION(:,:)::   EXI
 END TYPE MAGNET_FRAME
 
 TYPE PATCH
@@ -20,9 +20,6 @@ END TYPE PATCH
 
 TYPE CHART
    type(magnet_frame), pointer :: f
-   !     real(dp), POINTER:: A_XY
-   !     real(dp), POINTER:: L
-   !     real(dp), POINTER:: ALPHA
    !  FIBRE MISALIGNMENTS
    real(dp),dimension(:),  POINTER::   D_IN,ANG_IN
    real(dp),dimension(:),  POINTER::   D_OUT,ANG_OUT

@@ -27,6 +27,10 @@ module pointer_lattice
   REAL(DP) SIG(6)
   type(beam), allocatable:: my_beams(:)
   INTEGER :: N_BEAM=0,USE_BEAM=1
+
+  TYPE(REAL_8),private :: Y(6)
+  TYPE(DAMAP),PRIVATE :: ID
+  integer nd2,npara
   !  PRIVATE POWER_CAVITY,RADIA
 contains
 
@@ -36,10 +40,11 @@ contains
     CHARACTER*(120) com,COMT,filename,name_root,title,name_root_res,filetune,FILESMEAR
     character*(4) suffix,SUFFIX_res
     character(*) ptc_fichier
-    integer i,mf,i_layout_temp,LIM(2),IB,NO
+    integer i,ii,mf,i_layout_temp,LIM(2),IB,NO
     !  FITTING FAMILIES
     INTEGER NPOL,J,NMUL,K,ICN,N,np,MRESO(3)
     type(pol_block), ALLOCATABLE :: pol_(:)
+    type(pol_block) :: pb
     CHARACTER*(NLP) NAME,flag
     real(dp) targ_tune(2),targ_chrom(2),epsf
     real(dp) targ_RES(4)
@@ -69,7 +74,7 @@ contains
     ! APERTURE
     REAL(DP)  APER_R,APER_X,APER_Y
     INTEGER KINDAPER
-    TYPE(THIN_LENS), POINTER :: TL
+    TYPE(integration_node), POINTER :: TL
     type(internal_state),target :: my_default
     ! DYN APERTURE
     REAL(DP) r_in,del_in,DLAM,ang_in,ang_out
@@ -78,16 +83,24 @@ contains
     type(fibre),pointer ::p
     ! TRACKING RAYS
     INTEGER NRAYS
-    REAL(DP) X(6)
+    INTEGER IBN,N_name
+    REAL(DP) X(6),DT(3),x_ref(6),sc
     REAL(DP)VOLT,PHASE
     INTEGER HARMONIC_NUMBER
-
+    ! changing magnet
+    logical(lp) bend_like
+    integer              :: apertflag
+    character(200)       :: whymsg
+    integer              :: why(9)
+    ! remove_patches
+    logical(lp) do_not_remove,put_geo_patch
+    real(dp) :: lmax=1.e38_dp
     save my_default
+    integer :: limit_int(2) =(/4,18/)
 
-
-    my_default=default0
+    my_default=default
     my_state=>my_default
-    skip=my_false
+    skip=.false.
     call kanalnummer(mf)
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
@@ -116,13 +129,13 @@ contains
        ENDIF
        if(.not.skip) then
           if(com(1:2)=="!!") then
-             skip=my_true
+             skip=.true.
              cycle
           endif
        endif
        if(skip) then !1
           if(com(1:2)=="!!") then
-             skip=my_false
+             skip=.false.
           endif
           cycle
        endif         ! 1
@@ -191,22 +204,42 @@ contains
           CALL FILL_BETA(MY_RING,MY_STATE,pos,BETA,IB,DBETA,tune,tunenew)
        case('FITBENDS')
           CALL fit_all_bends(MY_RING,MY_STATE)
+       case('LIMITFORCUTTING')
+          READ(MF,*) limit_int
+          WRITE(6,*) "limit_int =",limit_int
+       case('LMAX')
+          READ(MF,*) LMAX
+          WRITE(6,*) "LMAX FOR SPACE CHARGE =",LMAX
+       case('FUZZYLMAX')
+          READ(MF,*) FUZZY_SPLIT
+          WRITE(6,*) "FUZZY LMAX FOR SPACE CHARGE =",LMAX,LMAX*FUZZY_SPLIT
+       case('KIND7WITHMETHOD1')
+          CALL PUT_method1_in_kind7(MY_ring,1000)
+       case('THINLENS=1')
+          call THIN_LENS_restart(MY_RING)
        case('THINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN)
+          CALL THIN_LENS_resplit(MY_RING,THIN,lim=limit_int,lmax=lmax)
        case('EVENTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=MY_TRUE)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=.TRUE.,lim=limit_int,lmax=lmax)
        case('ODDTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=MY_FALSE)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=.FALSE.,lim=limit_int,lmax=lmax)
           ! thin layout stuff
-       case('MAKE_THIN_LAYOUT','MAKETHINLAYOUT')
+       case('MAKE_THIN_LAYOUT','MAKELAYOUT','MAKE_NODE_LAYOUT')
 
-          CALL MAKE_THIN_LAYOUT(MY_RING)
+          if(.not.associated(MY_RING%t)) CALL MAKE_node_LAYOUT(MY_RING)
+       case('SURVEY_THIN_LAYOUT','SURVEYLAYOUT','SURVEY_NODE_LAYOUT')
+
+          IF(associated(MY_RING%t)) THEN
+             CALL fill_survey_data_in_NODE_LAYOUT(MY_RING)
+          ELSE
+             WRITE(6,*) " NO NODE LAYOUT PRESENT "
+          ENDIF
 
 
           ! BEAMS STUFF
@@ -285,16 +318,6 @@ contains
           CALL assign_one_aperture(MY_RING,pos,kindaper,APER_R,APER_X,APER_Y)
           ! end of layout stuff
           ! random stuff
-       case('BEAMBEAMKICK')
-          READ(MF,*) POS
-          CALL move_to_THIN_LENS(MY_RING%T,TL,POS)
-          IF(.NOT.ASSOCIATED(TL%BT)) THEN
-             ALLOCATE(TL%BT)
-          ELSE
-             CALL KILL_BEAM(TL%BT)
-          ENDIF
-          CALL ALLOCATE_BEAM(TL%BT,1)
-          READ(MF,*)TL%BT%BBPAR,TL%BT%SIGMA(1),TL%BT%SIGMA(3),TL%BT%DX(1:2)
        case('TURNONBEAMBEAMKICK','TURNONBEAMBEAM')
           READ(MF,*) USE_BEAM
           MY_BEAMS(USE_BEAM)%BEAM_BEAM=my_true
@@ -319,8 +342,16 @@ contains
           ALLOCATE(pol_(NPOL))
           DO J=1,NPOL
              READ(MF,*) NMUL,NAME
+             CALL CONTEXT(NAME)
+             N_NAME=0
+             IF(NAME(1:2)=='NO') THEN
+                READ(MF,*) NAME
+                call context(name)
+                N_NAME=len_trim(name)
+             ENDIF
              POL_(J)=0
              POL_(J)%NAME=NAME
+             POL_(J)%N_NAME=N_NAME
              DO K=1,NMUL
                 READ(MF,*) N,ICN
                 if(icn>np) np=icn
@@ -340,7 +371,7 @@ contains
           if(targ_tune(1)<=zero) targ_tune=tune(1:2)
           call lattice_fit_TUNE_gmap(my_ring,my_state,epsf,pol_,NPOL,targ_tune,NP)
        case('SCANTUNE')
-          STRAIGHT=MY_FALSE
+          STRAIGHT=.FALSE.
           read(mf,*) epsf
           read(mf,*) nstep
           read(mf,*) tune_ini,tune_fin
@@ -352,7 +383,7 @@ contains
           ELSE
              dtu(1)=(tune_fin(1)-tune_ini(1))/(nstep(1)-1)
              dtu(2)=(tune_fin(2)-tune_ini(2))/(nstep(1)-1)
-             STRAIGHT=MY_TRUE
+             STRAIGHT=.TRUE.
              NSTEP(2)=1
           ENDIF
 
@@ -379,26 +410,14 @@ contains
           read(mf,*) epsf
           read(mf,*) targ_chrom
           call lattice_fit_CHROM_gmap(my_ring,my_state,EPSF,pol_,NPOL,targ_chrom,NP)
-       case('FITSEXTUPOLERESONANCE')
-          read(mf,*) epsf,neq
-          call context(flag)
-          READ(MF,*) MRESO
-          read(mf,*) targ_RES
-          call lattice_fit_SEXT_RES_from_a_gmap_vec(my_ring,my_state,EPSF,MRESO,pol_,NPOL,targ_RES,NP,neq)
-       case('FITSEXTUPOLERESONANCE1')
-          read(mf,*) epsf,neq
-          call context(flag)
-          READ(MF,*) MRESO
-          read(mf,*) targ_RES
-          call lattice_fit_SEXT_RES_from_a_gmap_vec1(my_ring,my_state,EPSF,MRESO,pol_,NPOL,targ_RES,NP,neq)
        case('GETCHROMATICITY')
           call lattice_GET_CHROM(my_ring,my_state,CHROM)
        case('PAUSE')
           WRITE(6,*) " Type enter to continue execution "
           READ(5,*)
        case('PRINTONCE')
-          print77=my_true
-          read77=my_true
+          print77=.true.
+          read77=.true.
        CASE('4DMAP')
           READ(MF,*) NO
           READ(MF,*) POS, DEL
@@ -412,8 +431,8 @@ contains
        case('PRINTSTATE')
           CALL PRINT(MY_STATE,6)
        case('PRINTTWICE')
-          print77=my_false
-          read77=my_false
+          print77=.false.
+          read77=.false.
        case('PRINTBNAN','PRINTANBN','PRINTBN','PRINTAN')
           read(mf,*) title
           read(mf,*) nmul,filename
@@ -488,10 +507,57 @@ contains
           open(unit=mfr,file=filename)
           CALL dyn_aper(MY_RING,r_in,n_in,ang_in,ang_out,del_in,dlam,pos,nturn,ite,my_state,MFR)
           close(mfr)
-       case('TRACKRAYS')
-          READ(MF,*) NRAYS,POS, NTURN,FILENAME,name
-301       FORMAT(6(1X,E15.8))
 
+       case('KNOB')
+
+          READ(MF,*) POS, IBN
+
+          if (pos > MY_RING%n) stop;
+
+          p=>MY_RING%start
+          do ii=1,pos
+             p=>p%next
+          enddo
+
+
+          write(6,*) "El name ", p%mag%name
+
+
+          CALL INIT(default,3,1,BERZ,ND2,NPARA)
+
+          print*, "Npara is ", c_%NPARA
+
+          pb = 0
+          pb%name = p%mag%name
+          write(6,*) "IBN ", IBN
+          pb%ibn(ibn) = 1
+
+          my_ring = pb
+
+          CALL ALLOC(ID)
+          CALL ALLOC(Y)
+          x(:)=0
+          ID=1
+          Y=X+ID
+
+          p=>MY_RING%start
+          do ii=1,MY_RING%n
+             write(6,*) "##########################################"
+             write(6,'(i4, 1x,a, f10.6)') ii,p%mag%name
+             write(6,'(a, f9.6, a)') "Ref Momentum ",p%mag%p%p0c," GeV/c"
+
+             call track(my_ring,y,ii,ii+1,default)
+             call daprint(y(1),6)
+             p=>p%next
+
+          enddo
+
+
+       case('TRACKRAYS')
+          READ(MF,*) NRAYS,POS, NTURN, FILENAME, name
+301       FORMAT(6(1X,E15.8))
+          print*,"TRACKRAYS", NRAYS,POS, NTURN, FILENAME
+          print*,"TRACKRAYS name ",  name
           call context(name)
           if(name(1:11)/='NONAMEGIVEN') then
              posr=pos
@@ -505,12 +571,45 @@ contains
           call kanalnummer(mfr)
           open(unit=mfr,file=filename)
 
+          MY_STATE = MY_STATE + EXACTMIS0 + NOCAVITY0 + TIME + FRINGE
+          call print(MY_STATE,6)
+          EXACT_MODEL = my_true
+
+
           DO I1=1,NRAYS
              READ(MF,*) X
              WRITE(MFR,301) X
              DO I2=1,NTURN
-                CALL TRACK(MY_RING,X,POS,MY_STATE)
-                WRITE(MFR,301) X
+                p=>MY_RING%start
+                do ii=1,MY_RING%n
+                   write(6,*) "##########################################"
+                   write(6,'(i4, 1x,a)') ii,p%mag%name
+
+                   call track(my_ring,X,ii,ii+1,MY_STATE)
+
+                   write(6,'(6E8.4)') x
+
+                   write(MFR,'(i4, 1x,a)') ii,p%mag%name
+                   WRITE(MFR,301) X
+
+
+                   call produce_aperture_flag(apertflag)
+                   write(6,*) "apertflag ", apertflag
+                   if (apertflag/=0) then
+                      print *, 'Particle out of aperture!'
+
+                      call ANALYSE_APERTURE_FLAG(apertflag,why)
+                      Write(6,*) "ptc_trackline: APERTURE error for element: ",ii," name: ",p%MAG%name
+                      Write(6,*) "Message: ",c_%message
+                      write(whymsg,*) 'APERTURE error: ',why
+
+                      exit; !goes to the ne
+                   endif
+
+                   p=>p%next
+
+                enddo
+
              ENDDO
           ENDDO
 
@@ -520,6 +619,19 @@ contains
 
           READ(MF,*) FILENAME
           CALL print_frames(MY_RING,filename)
+
+       case('READFLATFILE')
+
+          READ(MF,*) FILENAME
+          CALL  READ_AND_APPEND_VIRGIN_LAYOUT(M_U,filename)
+
+          WRITE(6,*) M_U%END%N, M_U%END%END%POS
+       case('PRINTFLATFILE')
+
+          READ(MF,*) FILENAME
+          CALL  print_LAYOUT(MY_RING,filename)
+
+          WRITE(6,*) M_U%END%N, M_U%END%END%POS
 
        case('PSREXAMPLEOFPATCHING')
 
@@ -532,10 +644,35 @@ contains
 
           WRITE(6,*) MY_RING%N , m_u%END%N
 
+       case('REMOVEPATCHESFORPIOTR')
+          read(mf,*)do_not_remove, put_geo_patch
+          read(mf,*) x_ref
+          read(mf,*) x
+          read(mf,*) sc,FILENAME
+
+          call remove_patches(my_ring,x_ref,x,sc,do_not_remove,put_geo_patch,FILENAME)
+
        case('NORMALFORM')
           READ(MF,*)POS,name
           READ(MF,*) FILENAME
 
+       case('TRANSLATELAYOUT')
+          READ(MF,*)DT
+          CALL TRANSLATE(MY_RING,DT)
+       case('TRANSLATEFIBREANDPATCH')
+          READ(MF,*)POS
+          READ(MF,*)DT
+          CALL MOVE_TO(MY_RING,P,POS)
+          CALL TRANSLATE_Fibre(P,DT,ORDER=1,BASIS=P%MAG%P%F%MID)
+          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+          CALL FIND_PATCH(P,P%NEXT,NEXT=.FALSE.,ENERGY_PATCH=.FALSE.)
+       case('POWERMULTIPOLE')
+          READ(MF,*)POS
+          READ(MF,*)n,cns, bend_like
+          CALL MOVE_TO(MY_RING,P,POS)
+          CALL ADD(P,N,0,CNS)
+          p%mag%p%bend_fringe=bend_like
+          p%magp%p%bend_fringe=bend_like
        case('COMPUTEMAP')
           READ(MF,*)POS,DEL,NO
           READ(MF,*) FILENAME
@@ -704,12 +841,12 @@ contains
     TYPE(LAYOUT) R
 
     REAL(DP) X(6),m,as(6,6),energy,deltap
-    TYPE(REAL_8) Y(6)
     TYPE(ENV_8) YS(6)
     type(beamenvelope) env
     CHARACTER(*) FILE1,FILE2
     type(normalform) normal
     integer nd2,npara,i,j,js(6),n1,n2
+    TYPE(REAL_8) Y(6)
     TYPE(DAMAP) ID
     TYPE(INTERNAL_STATE) state
     integer no,loc,mf1,mf2
@@ -757,7 +894,7 @@ contains
 
     CALL TRACK(R,YS,loc,state)
     if(.not.check_stable) write(6,*) " unstable tracking envelope "
-    env%stochastic=my_true
+    env%stochastic=.true.
     env=ys
     if(.not.check_stable) write(6,*) " unstable in normalizing envelope "
 
@@ -920,8 +1057,8 @@ contains
        P=>P%NEXT
     ENDDO
 
-    NR%closed=my_true
-    doneit=my_true
+    NR%closed=.true.
+    doneit=.true.
     call ring_l(NR,doneit)
 
 
@@ -932,11 +1069,11 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
+       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
 
        P=>P%NEXT
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
+    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
 
     ! avoiding putting a patch on the very first fibre since survey does not allow it....
 
@@ -961,8 +1098,8 @@ contains
 
           CALL APPEND( NR, P )
        elseif(P%MAG%p%b0/=zero) then
-          bend%mag%p%bend_fringe=my_true
-          bend%magp%p%bend_fringe=my_true
+          bend%mag%p%bend_fringe=.true.
+          bend%magp%p%bend_fringe=.true.
           bend%mag%L=P%MAG%p%lc
           bend%magp%L=P%MAG%p%lc   ! give it correct arc length
           bend%mag%p%Lc=P%MAG%p%lc
@@ -991,8 +1128,8 @@ contains
        P=>P%NEXT
     ENDDO
 
-    NR%closed=my_true
-    doneit=my_true
+    NR%closed=.true.
+    doneit=.true.
     call ring_l(NR,doneit)
 
 
@@ -1000,17 +1137,78 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
+       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
 
        P=>P%NEXT
 
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
+    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
 
     ! avoiding putting a patch on the very first fibre since survey is not a self-check in that case
 
 
   end SUBROUTINE remove_drifts_bends
+
+  SUBROUTINE remove_patches(R,x0,x,sc,do_not_remove,patch_everywhere,FILENAME)  ! special example to be removed later
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer I,mf
+    real(dp) x(6),x0(6),sc
+    type(fibre), pointer :: P
+    type(INTEGRATION_NODE), pointer :: T
+    logical(lp) do_not_remove,patch_everywhere
+    type(three_d_info) v
+    character(*) FILENAME
+
+    if(do_not_remove) then
+       p=>r%start
+       do i=1,r%n
+          p%patch=-1
+          p%patch=0
+
+          p=>p%next
+       enddo
+
+       if(patch_everywhere) then
+
+          p=>r%start
+          do i=1,r%n-1
+             CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+             p=>p%next
+          enddo
+
+       endif
+    endif
+    CALL MAKE_NODE_LAYOUT(MY_RING)
+
+    CALL fill_survey_data_in_NODE_LAYOUT(MY_RING)
+
+    T=>MY_RING%T%start
+
+    call alloc_three_d_info(v)
+
+    V%reference_ray=x0
+    V%X=x
+    V%SCALE=sc
+    call kanalnummer(mf)
+    OPEN(UNIT=mf,FILE=FILENAME)
+    t=>my_ring%t%start
+    DO I=1,MY_RING%T%n
+       CALL TRACK( my_ring,V,DEFAULT,POS1=I,POS2=I+1 )
+       IF(V%U(1)) THEN
+          WRITE(6,*) " UNSTABLE ",I
+          goto 12
+       ENDIF
+       WRITE(mf,*) V%r(3),V%r(1),t%parent_fibre%mag%name,t%cas
+       t=>t%next
+    ENDDO
+12  CLOSE(mf)
+
+
+  end SUBROUTINE remove_patches
+
+
+
 
   SUBROUTINE print_frames(R,filename)
     IMPLICIT NONE
@@ -1112,14 +1310,16 @@ contains
   subroutine printframes(filenameIA)
     use madx_ptc_module
     implicit none
-    include 'twissa.fi'
+    character*48 charconv
+    !   include 'twissa.fi'
     integer   filenameIA(*)
     character(48) filename
 
-      filename = charconv(filenameIA)
-      call print_frames(MY_RING,filename)
+    filename = charconv(filenameIA)
+    call print_frames(MY_RING,filename)
 
   end subroutine printframes
+
 
 
 end module pointer_lattice

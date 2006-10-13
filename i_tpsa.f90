@@ -17,17 +17,19 @@ MODULE TPSA
   private mulsc,scmul,imulsc,iscmul
   private div,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
   private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd
-  private  unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
+  private unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
   private allocda,KILLda,A_OPT,K_opt
-  priVATE dexpt,dcost,dsint,dsqrtt,dtant
+  private dexpt,dcost,dsint,dsqrtt,dtant
   PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_j,dsinHt,dCOSHt
   private GETintnd2t
   PRIVATE DEQUAL,REQUAL,varf,varf001  !,CHARINT
   !  PUBLIC VAR,ASS
   private pbbra,full_absT,asstaylor,getcharnd2s,GETintnd2s,GETintk
   private shiftda,shift000
-  PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
-  private FILL_R ! new sagan
+  !PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
+!  public, alloc_uni, null_uni, fill_uni, refill_uni
+
+  private fill_uni_r ! new sagan
 
   private NO,ND,ND2,NP,NDPT,NV
   integer NP,NO,ND,ND2,NDPT,NV
@@ -53,11 +55,21 @@ MODULE TPSA
      MODULE PROCEDURE equaldacon
      MODULE PROCEDURE Iequaldacon
      ! UNIVERSAL_TAYLOR
-     MODULE PROCEDURE null_0
-     MODULE PROCEDURE FILL_N
-     MODULE PROCEDURE FILL_R  ! new sagan
-     MODULE PROCEDURE REFILL_N
+     
+     MODULE PROCEDURE fill_uni_r
+     MODULE PROCEDURE null_uni
+     MODULE PROCEDURE fill_uni  ! new sagan
+     MODULE PROCEDURE refill_uni
   end  INTERFACE
+
+   
+
+  INTERFACE print
+     MODULE PROCEDURE printunitaylor
+  END INTERFACE
+
+
+  
 
   !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber2" width="400" height="135">
   !@      <tr>
@@ -627,12 +639,14 @@ MODULE TPSA
      MODULE PROCEDURE allocda
      MODULE PROCEDURE A_OPT
      MODULE PROCEDURE allocdas
+     MODULE PROCEDURE alloc_u  
   END INTERFACE
 
   INTERFACE KILL
      MODULE PROCEDURE KILLda
      MODULE PROCEDURE KILLdas
      MODULE PROCEDURE K_opt
+     MODULE PROCEDURE kill_uni  
   END INTERFACE
 
   INTERFACE alloctpsa
@@ -2961,8 +2975,17 @@ CONTAINS
 
 
   ! Universal Taylor Routines   (Sagan's Stuff)
+  
+  SUBROUTINE  kill_uni(S2)
+    implicit none
+    type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
 
-  SUBROUTINE  null_0(S2,S1)
+       DEALLOCATE(S2%N,S2%NV,S2%C,S2%J)
+       NULLIFY(S2%N,S2%NV,S2%C,S2%J)
+    
+  END SUBROUTINE  kill_uni
+
+  SUBROUTINE  null_uni(S2,S1)
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     integer, intent(in):: s1
@@ -2972,7 +2995,8 @@ CONTAINS
        DEALLOCATE(S2%N,S2%NV,S2%C,S2%J)
        NULLIFY(S2%N,S2%NV,S2%C,S2%J)
     ENDIF
-  END SUBROUTINE null_0
+  END SUBROUTINE null_uni
+
 
   SUBROUTINE  ALLOC_U(S2,N,NV)
     implicit none
@@ -2988,7 +3012,7 @@ CONTAINS
     S2%NV=NV
   END SUBROUTINE ALLOC_U
 
-  SUBROUTINE  FILL_R(S2,S1)  !new sagan
+  SUBROUTINE  fill_uni_r(S2,S1)  !new sagan
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     real (dp), intent(in):: s1
@@ -3004,9 +3028,9 @@ CONTAINS
     ENDDO
     S2%C(1)=S1
 
-  END SUBROUTINE FILL_R
+  END SUBROUTINE fill_uni_r
 
-  SUBROUTINE  FILL_N(S2,S1)
+  SUBROUTINE  FILL_UNI(S2,S1)
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     type (TAYLOR), intent(in):: s1
@@ -3039,40 +3063,9 @@ CONTAINS
           S2%J(i,N)=J(N)
        ENDDO
     ENDDO
-    !    else
-    !       N=0
-    !       DO i=1,SIZE(S1%J%R)
-    !          IF(PACKING) THEN
-    !             IF(S1%J%YES(I)) N=N+1
-    !          ELSE
-    !             IF(S1%J%R(I)/=zero)  N=N+1
-    !          ENDIF
-    !       ENDDO
-    !       CALL ALLOC_U(S2,N,nv)
-    !       N=0
-    !       DO i=1,SIZE(S1%J%R)
-    !          DOIT=.FALSE.
-    !          IF(PACKING) THEN
-    !             IF(S1%J%YES(I)) DOIT=.TRUE.
-    !          ELSE
-    !             IF(S1%J%R(I)/=zero)  DOIT=.TRUE.
-    !          ENDIF
-    !
-    !          IF(DOIT) THEN
-    !
-    !             N=N+1
-    !             CALL newdancd(I,j)
-    !             DO K=1,S2%NV
-    !                S2%J(N,K)=J(K)
-    !             ENDDO
-    !             S2%C(N)=S1%J%R(I)
-    !          ENDIF
-    !       ENDDO
-    !
-    !    ENDIF
-  END SUBROUTINE FILL_N
+  END SUBROUTINE FILL_UNI
 
-  SUBROUTINE  REFILL_N(S1,S2)
+  SUBROUTINE  REFILL_UNI(S1,S2)
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(IN)::S2
     type (TAYLOR), intent(inOUT):: s1
@@ -3114,7 +3107,41 @@ CONTAINS
        ENDIF
     ENDDO
 
-  END SUBROUTINE REFILL_N
+  END SUBROUTINE REFILL_UNI
+
+
+  !_________________________________________________________________________________
+    
+
+  subroutine printunitaylor(ut,iunit)
+    implicit none
+    type(universal_taylor) :: ut
+    integer                :: iunit
+    integer                :: i,ii
+    
+    if (.not. associated(ut%n)) then
+         write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSICIATED)'
+    endif 
+    
+    write(iunit,'(/1X,A,I5,A,I5,A/1X,A/)') 'UNIV_TAYLOR   NO =',ut%n,', NV =',ut%nv,', INA = unita',&
+         '*********************************************'
+    if(ut%n /= 0) then
+         write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
+    else 
+         write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+    endif     
+    
+    do i = 1,ut%n
+       write(iunit,'(I6,2X,G20.14,I5,4X,18(2I2,1X))') i,ut%c(i),sum(ut%j(i,:)),(ut%j(i,ii),ii=1,ut%nv)
+       if( .not. print77) then
+          write(iunit,*)  ut%c(i)
+       endif
+    enddo
+
+    write(iunit,'(A)') '                                      '
+    
+  end subroutine printunitaylor
+
 
   ! End of Universal Taylor Routines
 

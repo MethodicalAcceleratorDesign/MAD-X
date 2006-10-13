@@ -6,7 +6,7 @@ module S_def_all_kinds
   use S_status
   implicit none
   public
-  private XMIDR,XMIDP,GMIDR,GMIDP
+  private XMIDR,GMIDR
   include "a_def_worm.inc"
   !  include "a_def_all_kind.inc"
   !  include "a_def_sagan.inc"
@@ -14,27 +14,23 @@ module S_def_all_kinds
   !!  include "a_def_arbitrary.inc"
   !  include "a_def_user2.inc"
   !  include "a_def_element_fibre_layout.inc"
-  private ALLOC_midr,ALLOC_midp,KILL_midr,KILL_midP
+  private ALLOC_midr,KILL_midr
 
 
   INTERFACE XMID
      MODULE PROCEDURE XMIDR
-     MODULE PROCEDURE XMIDP
   END  INTERFACE
 
   INTERFACE GMID
      MODULE PROCEDURE GMIDR
-     MODULE PROCEDURE GMIDP
   END  INTERFACE
 
   INTERFACE ALLOC
      MODULE PROCEDURE ALLOC_midr
-     MODULE PROCEDURE ALLOC_midP
   END  INTERFACE
 
   INTERFACE KILL
      MODULE PROCEDURE KILL_midr
-     MODULE PROCEDURE KILL_midP
   END  INTERFACE
 
 
@@ -123,25 +119,6 @@ contains
   END SUBROUTINE XMIDR
 
 
-  SUBROUTINE XMIDP(X_IN,X,I)
-    IMPLICIT NONE
-    TYPE(WORM_8), INTENT(INOUT):: X_IN
-    TYPE(REAL_8), INTENT(IN) :: X(6)
-    INTEGER, INTENT(IN):: i
-    INTEGER J
-
-    X_IN%nst=i
-
-    IF(I<=SIZE(X_IN%RAY,2)) THEN
-       DO J=1,6
-          X_IN%RAY(J,I)=X(J)
-       ENDDO
-    ELSE
-       WRITE(6,*) I
-       STOP 9
-    ENDIF
-
-  END SUBROUTINE XMIDP
 
   SUBROUTINE gMIDR(X_IN,X,I)
     IMPLICIT NONE
@@ -161,24 +138,6 @@ contains
   END SUBROUTINE gMIDR
 
 
-  SUBROUTINE gMIDP(X_IN,X,I)
-    IMPLICIT NONE
-    TYPE(WORM_8), INTENT(IN):: X_IN
-    TYPE(REAL_8), INTENT(INOUT) :: X(6)
-    INTEGER, INTENT(IN):: i
-    INTEGER J
-
-
-    IF(I<=SIZE(X_IN%RAY,2)) THEN
-       DO J=1,6
-          X(J)=  X_IN%RAY(J,I)
-       ENDDO
-    ELSE
-       WRITE(6,*) I
-       STOP 10
-    ENDIF
-
-  END SUBROUTINE gMIDP
 
   SUBROUTINE ALLOC_midr(X_IN,R)
     IMPLICIT NONE
@@ -214,45 +173,6 @@ contains
 
   END SUBROUTINE ALLOC_midr
 
-  SUBROUTINE ALLOC_midP(X_IN,R)
-    IMPLICIT NONE
-    TYPE(WORM_8), INTENT(INOUT):: X_IN
-    TYPE(LAYOUT), INTENT(IN):: R
-    INTEGER I,J
-    TYPE(FIBRE), POINTER:: P
-
-    P=>R%START
-    allocate(x_in%nst)
-    X_IN%NST=3
-    DO I=1,R%N
-       X_IN%nst= MAX(P%MAG%p%NST,X_IN%NST)
-       P=>P%NEXT
-    ENDDO
-
-    allocate(x_in%RAY(6,-6:X_IN%nst+6))
-    allocate(x_in%E)
-    allocate(x_in%E%L(-1:X_IN%nst))
-    allocate(x_in%POS(4))
-
-    allocate(x_in%E%FRAME(3,3,-7:X_IN%nst+6))
-    allocate(x_in%E%ORIGIN(3,-7:X_IN%nst+6))
-    x_in%POS=0
-    !x_in%RAY=zero
-    DO I=1,6
-       DO J=lbound(x_in%RAY,2),ubound(x_in%RAY,2)
-          call alloc(x_in%RAY(I,J))
-       ENDDO
-    ENDDO
-    ALLOCATE(x_in%E%DO_SURVEY)
-    x_in%E%DO_SURVEY=.TRUE.
-    x_in%nst=0
-    x_in%E%L=zero
-    x_in%E%FRAME=zero
-    x_in%E%ORIGIN=zero
-    x_in%e%nst=>x_in%nst
-
-  END SUBROUTINE ALLOC_midP
-
   SUBROUTINE KILL_midr(X_IN)
     IMPLICIT NONE
     TYPE(worm), INTENT(INOUT):: X_IN
@@ -269,32 +189,6 @@ contains
     DEallocate(x_in%E)
 
   END SUBROUTINE KILL_midr
-
-  SUBROUTINE KILL_midP(X_IN)
-    IMPLICIT NONE
-    TYPE(WORM_8), INTENT(INOUT):: X_IN
-    INTEGER I,J
-
-
-    DO I=1,6
-       DO J=lbound(x_in%RAY,2),ubound(x_in%RAY,2)
-          call KILL(x_in%RAY(I,J))
-       ENDDO
-    ENDDO
-
-    DEallocate(x_in%nst)
-
-    DEallocate(x_in%RAY)
-    DEallocate(x_in%POS)
-
-    DEallocate(x_in%E%FRAME)
-    DEallocate(x_in%E%ORIGIN)
-    DEallocate(x_in%E%L)
-    DEallocate(x_in%E%DO_SURVEY)
-    DEallocate(x_in%E)
-
-
-  END SUBROUTINE KILL_midP
 
 
   SUBROUTINE SURVEY_CHART(C,P,DIR,MAGNETFRAME,E_IN)
@@ -537,7 +431,7 @@ contains
           !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
           !             STOP 331
           !          ENDIF
-       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21)
+       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,kindwiggler)
           LH=P%LC/TWO
           A=O
           D=ZERO;D(3)=-LH
@@ -689,7 +583,7 @@ contains
           !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
           !             STOP 330
           !          ENDIF
-       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21)
+       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,kindwiggler)
           E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
           DO I=1,NST
              start=start+E_IN%F%dir

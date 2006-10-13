@@ -697,11 +697,12 @@ CONTAINS
 
 
 
-  SUBROUTINE SETFAMILYR(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  !  SUBROUTINE SETFAMILYR(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYR(EL,T,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT) ::EL
     INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
-    type(tree_element),OPTIONAL :: T(:),t_ax(:),t_ay(:)
+    type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
 
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1097,16 +1098,17 @@ CONTAINS
        !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        !       EL%mu%AN=>EL%AN
        !       EL%mu%BN=>EL%BN
-       CALL POINTERS_pancake(EL%pa,T,t_ax,t_ay)
+       CALL POINTERS_pancake(EL%pa,T) !,t_ax,t_ay)
     END SELECT
   END SUBROUTINE SETFAMILYR
 
 
-  SUBROUTINE SETFAMILYP(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYP(EL,T,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+    !  SUBROUTINE SETFAMILYP(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENTP), INTENT(INOUT) ::EL
     INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
-    type(tree_element),OPTIONAL :: T(:),t_ax(:),t_ay(:)
+    type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
 
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1506,7 +1508,7 @@ CONTAINS
        !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        !       EL%mu%AN=>EL%AN
        !       EL%mu%BN=>EL%BN
-       CALL POINTERS_pancake(EL%pa,T,t_ax,t_ay)
+       CALL POINTERS_pancake(EL%pa,T)  !,t_ax,t_ay)
        CALL ALLOC(EL%pa%SCALE)
     END SELECT
 
@@ -1856,6 +1858,7 @@ CONTAINS
     nullify(EL%FINT);nullify(EL%HGAP);
     nullify(EL%H1);nullify(EL%H2);
     nullify(EL%VOLT);nullify(EL%FREQ);nullify(EL%PHAS);nullify(EL%DELTA_E);
+    nullify(EL%lag);
     nullify(EL%B_SOL);
     nullify(EL%THIN);
     nullify(EL%MIS);nullify(EL%EXACTMIS);
@@ -1955,6 +1958,7 @@ CONTAINS
        IF(ASSOCIATED(EL%H1)) DEALLOCATE(EL%H1)
        IF(ASSOCIATED(EL%H2)) DEALLOCATE(EL%H2)
        IF(ASSOCIATED(EL%VOLT)) DEALLOCATE(EL%VOLT)
+       IF(ASSOCIATED(EL%lag)) DEALLOCATE(EL%lag)
        IF(ASSOCIATED(EL%FREQ)) DEALLOCATE(EL%FREQ)
        IF(ASSOCIATED(EL%PHAS)) DEALLOCATE(EL%PHAS)
        IF(ASSOCIATED(EL%DELTA_E)) DEALLOCATE(EL%DELTA_E)
@@ -2039,7 +2043,7 @@ CONTAINS
        ENDIF
 
        IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-          DEALLOCATE(EL%PARENT_FIBRE)
+          nullify(EL%PARENT_FIBRE)
        ENDIF
 
 
@@ -2059,6 +2063,9 @@ CONTAINS
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);ALLOCATE(EL%EXACTMIS);EL%MIS=.FALSE.;EL%EXACTMIS=ALWAYS_EXACTMIS;
+       allocate(el%r(3));allocate(el%d(3));
+       el%r=zero;el%d=zero;
+
        EL=DEFAULT;
        !   ANBN
        CALL ZERO_ANBN(EL,I)
@@ -2192,7 +2199,7 @@ CONTAINS
        ENDIF
 
        IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-          DEALLOCATE(EL%PARENT_FIBRE)
+          nullify(EL%PARENT_FIBRE)
        ENDIF
 
 
@@ -2236,6 +2243,8 @@ CONTAINS
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);CALL ALLOC(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);ALLOCATE(EL%EXACTMIS);EL%MIS=.FALSE.;EL%EXACTMIS=ALWAYS_EXACTMIS;
+       allocate(el%r(3));allocate(el%d(3));
+       el%r=zero;el%d=zero;
        EL=DEFAULT;
        !   ANBN
        CALL ZERO_ANBN(EL,I)
@@ -2482,7 +2491,7 @@ CONTAINS
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
     IF(EL%KIND==KINDPA) THEN         !
-       CALL SETFAMILY(ELP,EL%PA%B,EL%PA%ax,EL%PA%ay)
+       CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
     IF(ASSOCIATED(EL%PARENT_FIBRE))        then
@@ -2698,7 +2707,7 @@ CONTAINS
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
     IF(EL%KIND==KINDPA) THEN         !
-       CALL SETFAMILY(ELP,EL%PA%B,EL%PA%ax,EL%PA%ay)
+       CALL SETFAMILY(ELP,EL%PA%B) !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
@@ -2789,6 +2798,8 @@ CONTAINS
        ELP%C4=0
        if(.not.ASSOCIATED(ELP%VOLT)) ALLOCATE(ELP%VOLT,ELP%FREQ,ELP%PHAS,ELP%DELTA_E       )
        if(.not.ASSOCIATED(ELP%THIN)) ALLOCATE(ELP%THIN       )
+       if(.not.ASSOCIATED(ELP%lag)) ALLOCATE(ELP%lag       )
+       ELP%lag = EL%lag
        ELP%VOLT = EL%VOLT
        ELP%FREQ = EL%FREQ
        ELP%PHAS = EL%PHAS
@@ -2803,6 +2814,8 @@ CONTAINS
        ELP%CAV21=0
        if(.not.ASSOCIATED(ELP%VOLT)) ALLOCATE(ELP%VOLT,ELP%FREQ,ELP%PHAS,ELP%DELTA_E       )
        if(.not.ASSOCIATED(ELP%THIN)) ALLOCATE(ELP%THIN       )
+       if(.not.ASSOCIATED(ELP%lag)) ALLOCATE(ELP%lag       )
+       ELP%lag = EL%lag
        ELP%VOLT = EL%VOLT
        ELP%FREQ = EL%FREQ
        ELP%PHAS = EL%PHAS
@@ -2913,7 +2926,7 @@ CONTAINS
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
     IF(EL%KIND==KINDPA) THEN         !
-       CALL SETFAMILY(ELP,EL%PA%B,EL%PA%ax,EL%PA%ay)
+       CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 

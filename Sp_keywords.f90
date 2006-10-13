@@ -7,7 +7,7 @@ module madx_keywords
   implicit none
   public
   logical(lp)::mad8=my_false
-
+  integer :: ifield_name=0
   type keywords
      character*20 magnet
      character*20 model
@@ -182,6 +182,14 @@ contains
     FIBRE_FLIP= FIBRE_FLIP0
     FIBRE_DIR=FIBRE_DIR0
     MAD=MAD0
+
+    !    IF(ASSOCIATED(EL%PREVIOUS)) THEN
+    !     if(.not.associated(EL%POS))allocate(EL%POS)
+    !     EL%POS=EL%PREVIOUS%POS+1
+    !    ELSE
+    !     if(.not.associated(EL%POS))allocate(EL%POS)
+    !     EL%POS=1
+    !    ENDIF
   end subroutine create_fibre
 
   subroutine zero_key(key)
@@ -213,367 +221,743 @@ contains
 
   end subroutine zero_key
 
-  !  Printing universes
+  !  PRINTING FIBRES FOR FLAT FILES
 
-  subroutine print_universe(universe,style,time_patch_i,print_mis)
+  subroutine print_LAYOUT(L,FILENAME,LMAX)
     implicit none
-    type(mad_universe) universe
-    INTEGER N,J,I,i_tot,i_L,POS, NU,nb,style,dirb,dira
-    TYPE(LAYOUT), POINTER :: REC,rec1
-    TYPE(FIBRE), POINTER :: P
-    TYPE(MAGNET_CHART), POINTER :: MC
-    REAL(DP) MASS,BRHO
-    CHARACTER*11 FILER
-    CHARACTER*100 NUT,nut0
-    INTEGER MINIMAL,MINIMAL_RICH_AT_PATCHES,ROOT_ONLY,ROOT_PLUS_PATCHES
-    LOGICAL(LP) FRAME,PATCH,TIME_PATCH,time_patch_i,check,printmis
-    LOGICAL(LP), optional :: print_mis
+    character(*) filename
+    integer I,MF
+    type(LAYOUT), TARGET :: L
+    type(FIBRE), pointer :: P
+    REAL(DP),OPTIONAL :: LMAX
+    character*255 line
 
-    printmis=.false.
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
 
-    if(present(print_mis)) printmis=print_mis
-
-    TIME_PATCH=TIME_PATCH_i
-
-    CALL GET_ONE(MASS=MASS)
-
-    MINIMAL=0     !  PATCHES ONLY AT SKELETON MALFORMATION   ELSEWHERE      MAD8 SURVEY ASSUMED
-    MINIMAL_RICH_AT_PATCHES=1  !  PATCHES AND NECESSARY FRAMES T SKELETON MALFORMATION  ELSEWHERE MAD8 IN BETWEEN
-    ROOT_ONLY=2                !  NO PATCHES, ONLY FRAMES  EVERYWHERE
-    ROOT_PLUS_PATCHES=3   !  EVERYTHING!
-
-    FRAME=.FALSE.
-    IF(STYLE>=1) FRAME=.TRUE.
-    PATCH=.TRUE.
-    IF(ROOT_ONLY/=2) PATCH=.FALSE.
-
-    FILER='real_system'
-
-    open(unit=40,file='real_magnet.txt')
-    rec=>universe%start
-    n=0
-
-    write(40,195) " CHARGE = ",1," MASS = ",MASS
-
-    do j=1,universe%SHARED
-
-       p=>rec%start; MC=>P%MAG%P;
-       do i=1,rec%n
-          n=n+1
-          write(40,210) 'Magnet # = ', n,' for etienne: layout # = ',j,' position in layout = ',i,' name = ',P%MAG%NAME
-          write(40,211) "SKELETON ARC LENGTH = ",   MC%LD,' ANGLE = ',MC%LD*MC%B0,' ROLL = ',MC%TILTD,  ' P0C = ',MC%P0C
-          if(p%mag%mis) then
-             write(40,209) " MISALIGNEMENTS D AND R = ",p%mag%D,p%mag%R
-          else
-             write(40,*) " MISALIGNEMENTS NO PRESENT "
-          endif
-          write(40,*) " "
-          p=>p%next;MC=>P%MAG%P;
-       enddo
-       rec=>rec%next
-
-    enddo
-
-    close(40)
-
-209 FORMAT(A16,6(1x,E15.8))
-210 FORMAT(a11,i4,A25,i4,a22,i4,a8,A16)
-    !211 FORMAT(A40,E15.8 ,1x,E15.8 ,1x,E15.8 ,1x,E15.8 )
-211 FORMAT(A22,E15.8 ,A9,E15.8 ,A8,E15.8, A7,E15.8 )
-
-204 FORMAT(A15,i2)
-202 FORMAT(A15,I2)
-200 FORMAT(A16,3(E15.8,1X))
-201 FORMAT(A50,2(I4,1X))
-203 FORMAT(A23,E15.8)
-199 FORMAT(A6,I4)
-197 FORMAT(A16,I4,A24,A16)
-198 FORMAT(A59,3(1X,I4))
-196 FORMAT(A30,I4,A13,I4,A13,I4 )
-195 FORMAT(A10,I4,A8,E15.8)
-194 FORMAT(A36,3(1X,I2))
+    IF(PRESENT(LMAX)) THEN
+       WRITE(MF,*) L%N, LMAX, " NUMBER OF FIBRES AND L_MAX  "
+    ELSE
+       WRITE(MF,*) L%N, 0, " NUMBER OF FIBRES AND L_MAX  "
+    ENDIF
+    write(MF,*) " $$$$$$$ GLOBAL DATA $$$$$$$$$$"
+    write(MF,*) l%mass,L%START%mag%p%p0c, "MASS, P0C"
+    write(MF,*) phase0,stoch_in_rec,l%charge, "PHASE0, STOCH_IN_REC, CHARGE"
+    write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
+         "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
+    write(line,*) SECTOR_NMUL_MAX,SECTOR_NMUL,&
+         OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE,&
+         " SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE"
+    write(mf,'(a255)')line
+    write(MF,*) wedge_coeff, "wedge_coeff"
+    write(MF,*) MAD8_WEDGE, "MAD8_WEDGE"
+    write(MF,*) " $$$$$$$ END GLOBAL DATA $$$$$$$$$$"
 
 
-    WRITE(nut0,'(I4,a6,i4)') UNIVERSE%N-UNIVERSE%SHARED,'_style',style
-
-    nb=0
-    nut=' '
-    do i=1,LEN_TRIM(NUT0)
-       if(nut0(i:i)/=' ') then
-          nb=nb+1
-          nut(nb:nb)=nut0(i:i)
-       endif
-    enddo
-
-    rec1=>rec
-    check=.true.
-
-    DO NU=1,UNIVERSE%N-UNIVERSE%SHARED
-       p=>rec1%start;
-       do i=1,rec1%n
-          if(p%patch%patch+p%patch%energy/=0) then
-             check=.false.
-             exit
-          endif
-          p=>p%next
-       enddo
-       if(.not.check) exit
-       rec1=>rec1%next
+    P=>L%START
+    DO I=1,L%N
+       CALL print_FIBRE(P,mf)
+       P=>P%NEXT
     ENDDO
 
+    CLOSE(MF)
 
+  END subroutine print_LAYOUT
 
-    DO NU=1,UNIVERSE%N-UNIVERSE%SHARED
+  subroutine READ_LAYOUT(L,filename)
+    implicit none
+    character(*) filename
+    integer mf,I
+    type(LAYOUT), TARGET :: L
+    type(FIBRE), pointer :: P
+    character*120 line
+    real(dp) p0c
 
-       open(unit=40,file=FILER//NUT(1:NB)//'.txt')
-       WRITE(40,*) " STYLE OF FILE = ",STYLE
-       p=>rec%start;
-       IF(TIME_PATCH.or.check) THEN
-          write(40,'(a72)') "THIS BEAM LINE    --> CAN <--         BE TRACKED WITH RELATIVE TIME OR PATH LENGTH"
-          write(40,'(a72)') " BECAUSE THE TIME PATCHES ARE EITHER SET OR NOT NEEDED (STANDARD MAD8 SKELETON)   "
-       ELSE
-          write(40,'(a72)') "THIS BEAM LINE    --> CANNOT <--      BE TRACKED WITH RELATIVE TIME OR PATH LENGTH"
-          write(40,'(a72)') " BECAUSE THE TIME PATCHES ARE NOT SET AND ARE NEEDED. (MAD8 SKELETON IS DEFORMED) "
-       ENDIF
-       write(40,*) "  "
-       write(40,'(a40)') "POSITION OF THE ORIGIN OF THIS BEAM LINE"
-       CALL PRINT_INITIAL_FRAME(P,40)
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+    READ(MF,*) I
+    read(MF,'(a120)') line
+    read(MF,*) l%mass,p0c
+    read(MF,*) phase0,stoch_in_rec,l%charge
+    read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
+    read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
+    read(MF,*) wedge_coeff
+    read(MF,*) MAD8_WEDGE
+    read(MF,'(a120)') line
 
-       write(40,'(a90)') "******************************************************************************************"
-       write(40,'(a90)') "******************************************************************************************"
-       write(40,'(a90)') "******************************************************************************************"
+    P=>L%START
 
-
-       do i=1,rec%n
-          write(40,*) " "
-          write(40,197) " FIBRE NUMBER = ", i," NAME OF MAGNET IN IT = ",p%mag%name
-          call locate_in_universe(P,i_tot,i_L,POS)
-          write(40,196)  " POSITION IN REAL MAGNET FILE ", i_tot, " BEAM LINE # ", I_L, " MAGNET # ",POS
-
-          dirb=0;dira=0;
-          if(associated(P%PREVIOUS)) dirb=P%PREVIOUS%DIR
-          if(associated(P%NEXT))     dira=P%NEXT%DIR
-          WRITE(40,198) " PROPAGATION DIRECTION OF PREVIOUS, PRESENT AND NEXT FIBRE ",dirb,P%DIR,dira
-
-          write(40,194) " PATCHES FLAGS (ENERGY,TIME,FRAMES) ", p%patch%energy,p%patch%TIME,p%patch%patch
-
-
-          if(p%patch%energy/=0) WRITE(40,204)   " ENERGY FLAG = ", P%PATCH%ENERGY
-          ! TIME PATCHES
-          select case(p%patch%TIME)
-          case(1)
-             IF(TIME_PATCH) THEN
-                WRITE(40,204) "  TIME FLAG  = ",P%PATCH%TIME
-                WRITE(40,203) " TIME PATCH ENTRANCE = ",P%PATCH%A_T
-             ENDIF
-
-          case(2)
-             IF(TIME_PATCH) THEN
-                WRITE(40,204) "  TIME FLAG  = ",P%PATCH%TIME
-                WRITE(40,203) " TIME PATCH EXIT     = ",P%PATCH%B_T
-             ENDIF
-          case(3)
-             IF(TIME_PATCH) THEN
-                WRITE(40,204) "  TIME FLAG  = ",P%PATCH%TIME
-                WRITE(40,203) " TIME PATCH ENTRANCE = ",P%PATCH%A_T
-                WRITE(40,203) " TIME PATCH EXIT     = ",P%PATCH%B_T
-             ENDIF
-          END SELECT
-
-
-
-          ! GEOMETRICAL PATCHES
-          select case(p%patch%patch)
-          CASE(0)
-
-             IF(STYLE==ROOT_ONLY.OR.STYLE==ROOT_PLUS_PATCHES) THEN
-                write(40,'(a90)')    "##########################################################################################"
-                CALL PRINT_INITIAL_FRAME(P,40)
-                write(40,'(a90)')    "##########################################################################################"
-             ENDIF
-          case(1)
-             IF(FRAME) THEN
-                write(40,*) "**************** EXIT FRAME OF THE PREVIOUS FIBRE ********************"
-                CALL PRINT_INITIAL_FRAME(P%PREVIOUS,40)
-                write(40,*) "**********************************************************************"
-                write(40,*) "*********************** FRAME OF THE FIBRE ***************************"
-                CALL PRINT_INITIAL_FRAME(P,40)
-                write(40,*) "**********************************************************************"
-             ENDIF
-             IF(PATCH) THEN
-                write(40,*)  "$$$$$$$$$$$$$$$$$$$ ALMOST MINIMALIST TYPE OF INFORMATION $$$$$$$$$$$$$$$$$$"
-                WRITE(40,*)  " FRONTAL PATCH NEEDED"
-                WRITE(40,200)   " TRANSLATION = ",P%PATCH%A_D
-                WRITE(40,200)   "   ROTATION  = ",P%PATCH%A_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_X1,P%PATCH%A_X2
-                write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-             ENDIF
-          case(2)
-             IF(FRAME) THEN
-                write(40,*) "*********************** FRAME OF THE FIBRE ***************************"
-                CALL PRINT_INITIAL_FRAME(P,40)
-                write(40,*) "**********************************************************************"
-                write(40,*) "**************** ENTRANCE FRAME OF THE NEXT FIBRE ********************"
-                CALL PRINT_INITIAL_FRAME(P%NEXT,40)
-                write(40,*) "**********************************************************************"
-             ENDIF
-             IF(PATCH) THEN
-                write(40,*)  "$$$$$$$$$$$$$$$$$$$ ALMOST MINIMALIST TYPE OF INFORMATION $$$$$$$$$$$$$$$$$$"
-                WRITE(40,*)  " EXIT PATCH NEEDED"
-                WRITE(40,200)   " TRANSLATION = ",P%PATCH%B_D
-                WRITE(40,200)   "   ROTATION  = ",P%PATCH%B_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_X1,P%PATCH%B_X2
-                write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-             ENDIF
-          case(3)
-             IF(FRAME) THEN
-                write(40,*) "**************** ENTRANCE FRAME OF THE NEXT FIBRE ********************"
-                CALL PRINT_INITIAL_FRAME(P%PREVIOUS,40)
-                write(40,*) "*********************** FRAME OF THE FIBRE ***************************"
-                CALL PRINT_INITIAL_FRAME(P,40)
-                write(40,*) "**************** ENTRANCE FRAME OF THE NEXT FIBRE ********************"
-                CALL PRINT_INITIAL_FRAME(P%NEXT,40)
-                write(40,*) "**********************************************************************"
-             ENDIF
-             IF(PATCH) THEN
-                write(40,*)  "$$$$$$$$$$$$$$$$$$$ ALMOST MINIMALIST TYPE OF INFORMATION $$$$$$$$$$$$$$$$$$"
-                WRITE(40,*)  " FRONTAL PATCH NEEDED"
-                WRITE(40,200)   " TRANSLATION = ",P%PATCH%A_D
-                WRITE(40,200)   "   ROTATION  = ",P%PATCH%A_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%A_X1,P%PATCH%A_X2
-                WRITE(40,*)  " EXIT PATCH NEEDED"
-                WRITE(40,200)   " TRANSLATION = ",P%PATCH%B_D
-                WRITE(40,200)   "   ROTATION  = ",P%PATCH%B_ANG
-                WRITE(40,201)   " DIRECTIONAL 180 DEGREES ROTATIONS X AND Y AXIS = ", P%PATCH%B_X1,P%PATCH%B_X2
-                write(40,*)  "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-             ENDIF
-          END SELECT
-          if(printmis) then
-             if(P%mag%mis) then
-                CALL PRINT_INITIAL_FRAME_mag(p,40)
-             endif
-          endif
-
-
-
-
-          p=>p%next
-       enddo
-       close(40)
-
-       rec=>rec%next
+    DO I=1,L%N
+       CALL READ_FIBRE(P,mf)
+       P=>P%NEXT
     ENDDO
 
-  END subroutine print_universe
+    CLOSE(MF)
+  END subroutine READ_LAYOUT
 
-
-  SUBROUTINE PRINT_INITIAL_FRAME(F,MF)
+  subroutine READ_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX)
     implicit none
-    INTEGER MF
-    TYPE(FIBRE) F
-    IF(F%DIR==1) THEN
-       WRITE(MF,*) F%CHART%F%A
-       WRITE(MF,*) F%CHART%F%ENT
+    character(*) filename
+    integer mf,I,N
+    type(LAYOUT), TARGET :: L
+    type(FIBRE), pointer :: P
+    LOGICAL(LP), OPTIONAL :: RING
+    REAL(DP), OPTIONAL :: LMAX
+    LOGICAL(LP) RING_IT,doneit
+    character*120 line
+    real(dp) p0c,MASSF
+    type(internal_state) original
+
+    RING_IT=MY_TRUE
+
+    IF(PRESENT(RING)) RING_IT=RING
+
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+
+    IF(PRESENT(LMAX)) then
+       READ(MF,*) N,LMAX
     ELSE
-       WRITE(MF,*) F%CHART%F%B
-       WRITE(MF,*) F%CHART%F%EXI
+       READ(MF,*) N
     ENDIF
-
-  END SUBROUTINE PRINT_INITIAL_FRAME
-
-  SUBROUTINE PRINT_INITIAL_FRAME_mag(F,MF)
-    implicit none
-    INTEGER MF
-    TYPE(FIBRE) F
-
-209 FORMAT(A25,6(1x,E15.8))
-    Write(mf,*) " &&&&&&&&&&&&&   Misalignment Information  &&&&&&&&&&&&&  "
-    Write(mf,*) "  See Routine MIS_FIBR for actual ordering of Euclidean operators  "
-    IF(F%DIR==1) THEN
-       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_IN,f%CHART%ANG_IN
-       Write(mf,*) " Front Frame "
-       WRITE(MF,*) F%mag%p%F%A
-       WRITE(MF,*) F%mag%p%F%ENT
-       Write(mf,*) " Back Frame "
-       WRITE(MF,*) F%mag%p%F%B
-       WRITE(MF,*) F%mag%p%F%EXI
-       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_out,f%CHART%ANG_out
-    ELSE
-       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_out,f%CHART%ANG_out
-       Write(mf,*) " Back Frame (Reverse Propagator)"
-       WRITE(MF,*) F%mag%p%F%B
-       WRITE(MF,*) F%mag%p%F%EXI
-       Write(mf,*) " Front Frame (Reverse Propagator) "
-       WRITE(MF,*) F%mag%p%F%A
-       WRITE(MF,*) F%mag%p%F%ENT
-       write(mf,209) " d(3),angle(3) to front = ",f%CHART%d_IN,f%CHART%ANG_IN
-    ENDIF
-    Write(mf,*) " &&&&&&&&&&&&&   End Misalignment Information  &&&&&&&&&&&&&  "
-
-  END SUBROUTINE PRINT_INITIAL_FRAME_mag
-
-  SUBROUTINE SURVEY_nikolai(basis,OMEGA,b0,ld,roll,DIR,ent,a,mid,o,exi,b)
-    ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
-    IMPLICIT NONE
-
-    INTEGER, INTENT(IN) ::DIR
-    REAL(DP) ENT(3,3),EXI(3,3),HA,D(3),BASIS(3,3),OMEGA(3),Ang(3),N(3),out(3,3),a(3),b(3),mid(3,3),o(3)
-    real(dp) angle,roll,lc,ld,b0
-
-    INTEGER I,J
-
-
-    angle=ld*b0
-    HA=DIR*angle/TWO
-    if(angle==zero) then
-       lc=ld
-    else
-       lc=two*ld/angle*sin(angle/two)
+    read(MF,'(a120)') line
+    read(MF,*) MASSF,p0c
+    read(MF,*) phase0,stoch_in_rec,l%charge
+    read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
+    read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
+    read(MF,*) wedge_coeff
+    read(MF,*) MAD8_WEDGE
+    read(MF,'(a120)') line
+    original=default
+    if(allocated(s_b)) then
+       firsttime_coef=.true.
+       deallocate(s_b)
     endif
+    L%MASS=MASSF
+    MASSF=MASSF/pmae
+    CALL MAKE_STATES(MASSF)
+    default=original
+    call Set_madx(p0c=p0c)
+    DO I=1,N
+       CALL APPEND_CLONE(L)
+       CALL READ_FIBRE(L%END,mf)
+       CALL COPY(L%END%MAG,L%END%MAGP)
+    ENDDO
 
-    D=ZERO
-    D(3)=DIR*LC/TWO
-    IF(DIR==1) THEN
-       Ang=ZERO;Ang(3)=roll  ;
-       CALL GEO_ROT(basis,ENT    ,Ang  ,basis)
-       Ang=ZERO;Ang(2)=HA ;
-       CALL GEO_ROT(ENT     ,MID ,Ang     ,ENT)
-       CALL GEO_ROT(MID,EXI     , Ang     ,MID)
+    CLOSE(MF)
 
-       Ang=ZERO;Ang(3)=-roll ;
-       CALL GEO_ROT(EXI     ,out ,Ang,EXI)
+    L%closed=RING_IT
 
-       O=OMEGA
-       CALL GEO_TRA(O,MID,D,1)
-       B=O
-       CALL GEO_TRA(B,MID,D,1)
+    doneit=.true.
+    call ring_l(L,doneit)
 
-       a=OMEGA
-       ent=basis
-       exi=out
+
+  END subroutine READ_INTO_VIRGIN_LAYOUT
+
+
+  subroutine READ_AND_APPEND_VIRGIN_LAYOUT(U,filename,RING)
+    implicit none
+    character(*) filename
+    integer mf,I,N
+    type(MAD_UNIVERSE), TARGET :: U
+    type(FIBRE), pointer :: P
+    LOGICAL(LP), OPTIONAL :: RING
+
+
+    call APPEND_EMPTY_LAYOUT(U)
+
+    CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING)
+
+  END subroutine READ_AND_APPEND_VIRGIN_LAYOUT
+
+  subroutine print_FIBRE(m,mf)
+    implicit none
+    integer mf,I
+    type(FIBRE), pointer :: m
+
+    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
+    WRITE(MF,*) " DIRECTION ", M%DIR
+    CALL print_chart(m%CHART,mf)
+    CALL print_PATCH(m%PATCH,mf)
+    CALL print_element(M%MAG,mf)
+    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
+
+  END subroutine print_FIBRE
+
+  subroutine READ_FIBRE(m,mf)
+    implicit none
+    integer mf,I
+    type(FIBRE), pointer :: m
+    character*255 line
+
+    READ(MF,*) LINE
+    READ(MF,*) LINE(1:9), M%DIR
+    CALL READ_chart(m%CHART,mf)
+    CALL READ_PATCH(m%PATCH,mf)
+    CALL READ_element(M%MAG,mf)
+    READ(MF,*) LINE
+
+  END subroutine READ_FIBRE
+
+  subroutine print_PATCH(m,mf)
+    implicit none
+    integer mf,I
+    type(PATCH), pointer :: m
+    character*255 line
+
+    WRITE(MF,*) " >>>>>>>>>>>>>>>>>> PATCH <<<<<<<<<<<<<<<<<<"
+    WRITE(MF,*) M%PATCH,M%ENERGY,M%TIME," patch,energy,time"
+    WRITE(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2," discrete 180 rotations"
+    WRITE(LINE,*) M%A_D,M%A_ANG,"  a_d, a_ang "
+    WRITE(MF,'(A255)') LINE
+    WRITE(LINE,*) M%B_D,M%B_ANG,"  b_d, b_ang "
+    WRITE(MF,'(A255)') LINE
+    WRITE(MF,*) M%A_T,M%B_T,"  time patches a_t and b_t "
+    WRITE(MF,*) " >>>>>>>>>>>>>>>>>>  END  <<<<<<<<<<<<<<<<<<"
+
+  END subroutine print_PATCH
+
+  subroutine READ_PATCH(m,mf)
+    implicit none
+    integer mf,I
+    type(PATCH), pointer :: m
+    character*255 line
+
+    READ(MF,*)LINE
+    READ(MF,*) M%PATCH,M%ENERGY,M%TIME
+    READ(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2
+    READ(MF,*) M%A_D,M%A_ANG
+    READ(MF,*) M%B_D,M%B_ANG
+    READ(MF,*) M%A_T,M%B_T
+    READ(MF,*) LINE
+
+  END subroutine READ_PATCH
+
+  subroutine print_chart(m,mf)
+    implicit none
+    integer mf,I
+    type(CHART), pointer :: m
+    character*255 line
+    write(mf,*) " THIS IS A CHART THIS IS A CHART THIS IS A CHART THIS IS A CHART "
+    CALL print_magnet_frame(m%F,mf)
+    WRITE(LINE,*) M%D_IN,M%ANG_IN
+    WRITE(MF,'(A255)') LINE
+    WRITE(LINE,*) M%D_OUT,M%ANG_OUT
+    WRITE(MF,'(A255)') LINE
+    write(mf,*) " END OF A CHART  END OF A CHART  END OF A CHART  END OF A CHART  "
+  end subroutine print_chart
+
+  subroutine READ_chart(m,mf)
+    implicit none
+    integer mf,I
+    type(CHART), pointer :: m
+    character*60 line
+    READ(mf,*) LINE
+    CALL READ_magnet_frame(m%F,mf)
+    READ(MF,*) M%D_IN,M%ANG_IN
+    READ(MF,*) M%D_OUT,M%ANG_OUT
+    READ(mf,*) LINE
+  end subroutine READ_chart
+
+  subroutine print_element(m,mf)
+    implicit none
+    integer mf,I
+    type(element), pointer :: m
+    character*255 line
+
+    WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ELEMENT $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    if(m%vorname(1:1)==' ') then
+       WRITE(MF,*) M%KIND,M%NAME, 'NOVORNAME'
     ELSE
-       Ang=ZERO;Ang(3)=roll  ;
-       CALL GEO_ROT(basis,EXI      ,Ang  ,basis)
-       Ang=ZERO;Ang(2)=HA ;
-       CALL GEO_ROT(EXI     ,MID ,Ang     ,EXI)
-       CALL GEO_ROT(MID,ENT     , Ang     ,MID)
+       WRITE(MF,*) M%KIND,M%NAME,M%VORNAME
+    ENDIF
+    WRITE(MF,*) M%L,M%PERMFRINGE,M%MIS,M%EXACTMIS, " L,PERMFRINGE,MIS,EXACTMIS "
+    WRITE(LINE,*) M%FINT,M%HGAP,M%H1,M%H2, " FINT,HGAP,H1,H2 "
+    WRITE(MF,'(A255)') LINE
+    WRITE(LINE,*) M%R,M%D , " r(3), d(3) "
+    WRITE(MF,'(A255)') LINE
+    IF(ASSOCIATED(M%FREQ)) THEN
+       WRITE(MF,*) " CAVITY INFORMATION "
+       WRITE(LINE,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN, "VOLT,FREQ, PHAS, DELTA_E, LAG, THIN"
+       WRITE(MF,'(A255)') LINE
+    ELSEIF(ASSOCIATED(M%VOLT)) THEN
+       WRITE(MF,*) " ELECTRIC SEPTUM INFORMATION "
+       WRITE(MF,*) M%VOLT,M%PHAS, "VOLT, PHAS(rotation angle) "
+    ELSE
+       WRITE(MF,*) " NO ELECTRIC ELEMENT INFORMATION "
+    ENDIF
+    IF(ASSOCIATED(M%B_SOL)) THEN
+       WRITE(MF,*)  " SOLENOID_PRESENT ",M%B_SOL, " B_SOL"
+    ELSE
+       WRITE(MF,*) " NO_SOLENOID_PRESENT ",zero
+    ENDIF
+    CALL print_magnet_chart(m%P,mf)
+    IF(ASSOCIATED(M%an)) THEN
+       do i=1,m%p%NMUL
+          write(mf,*) m%bn(i),m%an(i), " BN AN ",I
+       enddo
+    endif
+    call print_specific_element(m,mf)
+    WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   END   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+  end subroutine print_element
 
-       Ang=ZERO;A(3)=-roll ;
-       CALL GEO_ROT(ENT     ,out ,Ang ,ENT)
+  subroutine print_pancake(el,mf)
+    implicit none
+    type(pancake), pointer :: el
+    integer mf
+    character*120 filename
 
-       O=OMEGA
-       CALL GEO_TRA(O,MID,D,1)
-       A=O
-       CALL GEO_TRA(A,MID,D,1)
+    ifield_name=ifield_name+1
+    filename(1:8)="fieldmap"
+    write(filename(9:120),*) ifield_name
+    call context(filename)
+    filename=filename(1:len_trim(filename))//'.TXT'
+    call context(filename)
+    write(mf,*) filename
+    call print_pancake_field(el,filename)
+  end subroutine print_pancake
 
-       b=OMEGA
-       exi=basis
-       ent=out
+
+  subroutine print_pancake_field(el,filename)
+    implicit none
+    type(pancake), pointer :: el
+    integer mf,nst,i,j
+    character(*) filename
+    real(dp) brho,cl
+    type(real_8) b(3)
 
 
-    ENDIf
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
 
-  END SUBROUTINE SURVEY_nikolai
+    nst=2*el%p%nst+1
+
+    cl=(clight/c_1d8)
+    BRHO=el%p%p0c*ten/cl
+
+    call init(EL%B(1)%no,2)
+    CALL ALLOC(B)
+
+    write(mf,*) nst,el%p%ld,el%p%b0,EL%B(1)%no,.false.
+    do i=1,nst
+       B(1)=morph(1.d0.mono.1)
+       B(2)=morph(1.d0.mono.2)
+       B(3)=ZERO;
+       CALL trackg(EL%B(i),B)
+       do j=1,3
+          b(j)=b(j)*brho
+          call print(b(j),mf)
+       enddo
+
+    enddo
+    CALL kill(B)
+
+    close(mf)
+
+  end subroutine print_pancake_field
+
+
+
+
+  subroutine print_wig(el,mf)
+    implicit none
+    type(SAGAN), pointer :: el
+    integer mf
+    write(mf,*) el%internal
+    call print_undu_R(el%w,mf)
+  end subroutine print_wig
+
+  subroutine read_wig(el,mf)
+    implicit none
+    type(SAGAN), pointer :: el
+    integer mf
+    if(.not.associated(el%internal)) allocate(el%internal(3))
+    read(mf,*) el%internal
+    call read_undu_R(el%w,mf)
+  end subroutine read_wig
+
+  subroutine print_undu_R(el,mf)
+    implicit none
+    type(undu_R), pointer :: el
+    integer mf,n,i
+    character*255 line
+
+    write(mf,*) " Undulator internal type undu_R"
+    n=size(EL%FORM)
+
+    write(mf,*) n,EL%offset
+    do i=1,n
+       write(line,*) el%a(i),el%f(i),EL%FORM(i),EL%K(1:3,i)
+       write(mf,'(a255)') line
+    enddo
+
+    write(mf,*) " End of Undulator internal type undu_R"
+
+  end subroutine print_undu_R
+
+  subroutine read_undu_R(el,mf)
+    implicit none
+    type(undu_R), pointer :: el
+    integer mf,n,i
+    character*255 line
+    real(dp) offset
+
+    read(mf,'(a255)') line
+    read(mf,*) n,offset
+    call INIT_SAGAN_POINTERS(EL,N)
+    el%offset=offset
+    do i=1,n
+       read(mf,*) el%a(i),el%f(i),EL%FORM(i),EL%K(1:3,i)
+    enddo
+
+    read(mf,'(a255)') line
+
+  end subroutine read_undu_R
+
+
+  subroutine print_specific_element(el,mf)
+    implicit none
+    type(element), pointer :: el
+    integer mf
+    character*255 line
+
+    select case(el%kind)
+    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
+    case(kind3)
+       WRITE(LINE,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
+       WRITE(MF,'(A255)') LINE
+    case(kind4)
+       WRITE(MF,*) el%c4%N_BESSEL
+    case(kind10)
+       WRITE(MF,*) el%tp10%DRIFTKICK
+    case(kind16,kind20)
+       WRITE(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD, " driftkick,likemad"
+    case(kind18)
+       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
+       CALL print_aperture(EL%RCOL18%A,mf)
+    case(kind19)
+       WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
+       CALL print_aperture(EL%ECOL19%A,mf)
+    case(kind21)
+       WRITE(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
+    case(KINDWIGGLER)
+       call print_wig(el%wi,mf)
+    case(KINDpa)
+       call print_pancake(el%pa,mf)
+    case default
+       write(6,*) " not supported in print_specific_element",el%kind
+       stop 101
+    end select
+
+  end subroutine print_specific_element
+
+  subroutine read_specific_element(el,mf)
+    implicit none
+    type(element), pointer :: el
+    integer mf
+    character*255 line
+
+    select case(el%kind)
+    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+    case(kind3)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       read(mf,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
+    case(kind4)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       read(MF,*) el%c4%N_BESSEL
+    case(kind10)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       read(MF,*) el%tp10%DRIFTKICK
+    case(kind16,kind20)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       read(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD
+    case(kind18)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       READ(MF,*) LINE
+       CALL READ_aperture(EL%RCOL18%A,mf)
+    case(kind19)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       READ(MF,*) LINE
+       CALL READ_aperture(EL%ECOL19%A,mf)
+    case(kind21)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       read(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
+    case(KINDWIGGLER)
+       CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
+       call read_wig(el%wi,mf)
+    case(KINDpa)
+       call read_pancake(el,mf)  ! SET FAMILY DONE INSIDE
+    case default
+       write(6,*) " not supported in read_specific_element"
+       stop 102
+    end select
+
+  end subroutine read_specific_element
+
+  subroutine read_pancake(el,mf)
+    implicit none
+    type(ELEMENT), pointer :: el
+    integer mf
+    character*120 filename
+    read(mf,*) filename
+    call context(filename)
+
+    call read_pancake_field(el,filename)
+  end subroutine read_pancake
+
+
+  subroutine read_pancake_field(el,filename)
+    implicit none
+    type(ELEMENT), pointer :: el
+    integer mf,nst,ORDER,I
+    real(dp)  L,hc,cl,BRHO
+    logical(lp) REPEAT
+    character(*) filename
+    TYPE(TAYLOR) B(3)
+    type(tree_element), allocatable :: t_e(:)
+
+    cl=(clight/c_1d8)
+    BRHO=el%p%p0c*ten/cl
+
+
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+    read(mf,*) nst,L,hc, ORDER,REPEAT
+    CALL INIT(ORDER,2)
+    CALL ALLOC(B)
+    ALLOCATE(T_E(NST))
+    DO I=1,NST
+       CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
+       B(1)=B(1)/BRHO
+       B(2)=B(2)/BRHO
+       B(3)=B(3)/BRHO
+       CALL SET_TREE_g(T_E(i),B)
+    ENDDO
+    close(mf)
+    CALL KILL(B)
+    CALL SETFAMILY(EL,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
+    deallocate(T_E)
+
+  end subroutine read_pancake_field
+
+
+
+  subroutine READ_element(m,mf)
+    implicit none
+    integer mf,I
+    type(element), pointer :: m
+    character*120 line
+    CHARACTER*21 SOL
+    REAL(DP) B_SOL
+
+    READ(MF,*) LINE
+    READ(MF,*) M%KIND,M%NAME,M%VORNAME
+    CALL CONTEXT(M%NAME);
+    CALL CONTEXT(M%VORNAME);
+    IF(M%VORNAME(1:9)=='NOVORNAME') M%VORNAME=' '
+
+    READ(MF,*) M%L,M%PERMFRINGE,M%MIS,M%EXACTMIS
+    READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
+    READ(MF,*) M%R,M%D
+    READ(MF,*) LINE
+    CALL CONTEXT(LINE)
+    IF(LINE(1:1)=='C') THEN
+       IF(.NOT.ASSOCIATED(M%VOLT)) ALLOCATE(M%VOLT)
+       IF(.NOT.ASSOCIATED(M%FREQ)) ALLOCATE(M%FREQ)
+       IF(.NOT.ASSOCIATED(M%PHAS)) ALLOCATE(M%PHAS)
+       IF(.NOT.ASSOCIATED(M%DELTA_E))ALLOCATE(M%DELTA_E)
+       IF(.NOT.ASSOCIATED(M%LAG))   ALLOCATE(M%LAG)
+       IF(.NOT.ASSOCIATED(M%THIN))  ALLOCATE(M%THIN)
+       READ(MF,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN
+    ELSEIF(LINE(1:1)=='E') THEN
+       IF(.NOT.ASSOCIATED(M%VOLT)) ALLOCATE(M%VOLT)
+       IF(.NOT.ASSOCIATED(M%PHAS)) ALLOCATE(M%PHAS)
+       READ(MF,*) M%VOLT, M%PHAS
+    ENDIF
+    READ(mf,*) SOL,B_SOL
+    CALL CONTEXT(SOL)
+    IF(SOL(1:2)=='SO') THEN
+       IF(.NOT.ASSOCIATED(M%B_SOL))ALLOCATE(M%B_SOL)
+       M%B_SOL=B_SOL
+    ENDIF
+    CALL  READ_magnet_chart(m%P,mf)
+    IF(M%P%NMUL/=0) THEN
+       IF(.NOT.ASSOCIATED(M%AN)) THEN
+          ALLOCATE(M%AN(M%P%NMUL))
+          ALLOCATE(M%BN(M%P%NMUL))
+       ELSE
+          DEALLOCATE(M%AN)
+          DEALLOCATE(M%BN)
+          ALLOCATE(M%AN(M%P%NMUL))
+          ALLOCATE(M%BN(M%P%NMUL))
+       ENDIF
+       !     write(6,*) M%KIND,M%NAME,M%VORNAME
+
+       !     write(6,*) M%P%NMUL
+       !          READ(MF,'(a120)') LINE
+       !     write(6,'(a120)') line
+       !     pause 1
+       do i=1,m%p%NMUL
+          READ(mf,*) m%bn(i),m%an(i)
+       enddo
+    endif
+    call read_specific_element(m,mf)
+
+    READ(MF,*) LINE
+
+
+  end subroutine READ_element
+
+  subroutine print_magnet_chart(m,mf)
+    implicit none
+    type(magnet_chart), pointer :: m
+    integer mf
+    character*200 line
+
+    WRITE(MF,*) "MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART "
+    WRITE(MF,*) M%EXACT,M%METHOD,M%NST,M%NMUL, " EXACT METHOD NST NMUL"
+    WRITE(line,*) M%LD, M%LC, M%B0, " LD LC B0"
+    WRITE(MF,'(A200)') LINE
+    WRITE(LINE,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C, " BETA0 GAMMA0I GAMBET P0C"
+    WRITE(MF,'(A200)') LINE
+    WRITE(MF,*) M%EDGE, " EDGES"
+    WRITE(MF,*) M%KILL_ENT_FRINGE,M%KILL_EXI_FRINGE,M%bend_fringe, " Kill_ent_fringe, kill_exi_fringe, bend_fringe "
+
+    CALL print_magnet_frame(m%F,mf)
+    CALL print_aperture(m%APERTURE,mf)
+    write(mf,'(a68)') "END MAGNET CHART END MAGNET CHART END MAGNET CHART END MAGNET CHART "
+  end subroutine print_magnet_chart
+
+  subroutine READ_magnet_chart(m,mf)
+    implicit none
+    type(magnet_chart), pointer :: m
+    integer mf
+    character*120 line
+
+    READ(MF,*) LINE
+    READ(MF,*) M%EXACT,M%METHOD,M%NST,M%NMUL
+    READ(MF,*) M%LD, M%LC, M%B0
+    READ(MF,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C
+    READ(MF,*) M%EDGE
+    READ(MF,*) M%KILL_ENT_FRINGE,M%KILL_EXI_FRINGE,M%bend_fringe
+
+    CALL READ_magnet_frame(m%F,mf)
+    CALL READ_aperture(m%APERTURE,mf)
+    READ(MF,*) LINE
+  end subroutine READ_magnet_chart
+
+  subroutine print_magnet_frame(m,mf)
+    implicit none
+    type(magnet_frame), pointer :: m
+    integer mf,i
+    write(mf,'(a72)') "MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME "
+    WRITE(MF,*) m%a
+    do i=1,3
+       WRITE(MF,*) m%ent(i,1:3)
+    enddo
+    WRITE(MF,*) m%o
+    do i=1,3
+       WRITE(MF,*) m%mid(i,1:3)
+    enddo
+    WRITE(MF,*) m%b
+    do i=1,3
+       WRITE(MF,*) m%exi(i,1:3)
+    enddo
+    write(mf,'(a68)') "END MAGNET FRAME END MAGNET FRAME END MAGNET FRAME END MAGNET FRAME "
+  end subroutine print_magnet_frame
+
+  subroutine read_magnet_frame(m,mf)
+    implicit none
+    type(magnet_frame), pointer :: m
+    integer mf,i
+    character*120 line
+
+    read(mf,'(a120)') line
+    read(MF,*) m%a
+    do i=1,3
+       read(MF,*) m%ent(i,1:3)
+    enddo
+    read(MF,*) m%o
+    do i=1,3
+       read(MF,*) m%mid(i,1:3)
+    enddo
+    read(MF,*) m%b
+    do i=1,3
+       read(MF,*) m%exi(i,1:3)
+    enddo
+    read(mf,'(a120)') line
+  end subroutine read_magnet_frame
+
+  subroutine print_aperture(m,mf)
+    implicit none
+    type(MADX_APERTURE), pointer :: m
+    integer mf
+    IF(.NOT.ASSOCIATED(M)) THEN
+       write(mf,'(a20)') " NO MAGNET APERTURE "
+    ELSE
+       write(mf,'(a20)') "    MAGNET APERTURE "
+       WRITE(MF,*) m%KIND   ! 1,2,3,4
+       WRITE(MF,*) m%R
+       WRITE(MF,*) m%X,m%Y
+       write(mf,'(a23)')  " END OF MAGNET APERTURE"
+    ENDIF
+
+  end subroutine print_aperture
+
+
+  subroutine READ_aperture(m,mf)
+    implicit none
+    type(MADX_APERTURE), pointer :: m
+    integer mf
+    character*120 line
+
+    READ(mf,'(a120)') LINE
+
+    CALL CONTEXT(LINE)
+
+    IF(LINE(1:2)/='NO') THEN
+       IF(.NOT.ASSOCIATED(M)) THEN
+          CALL alloc(M)
+       ENDIF
+
+       READ(MF,*) m%KIND   ! 1,2,3,4
+       READ(MF,*) m%R
+       READ(MF,*) m%X,m%Y
+       READ(mf,'(a120)') LINE
+    ENDIF
+
+  end subroutine READ_aperture
+
+  SUBROUTINE PUT_method1_in_kind7(ring,nmul)
+    IMPLICIT NONE
+    type(layout), intent(inout):: ring
+    integer i,nmul0
+    integer, optional :: nmul
+    type(fibre) , pointer :: p
+    nmul0=1000
+    if(present(nmul))nmul0=nmul
+    p=>ring%start
+    do i=1,ring%n
+       if(p%mag%kind==kind7) then
+          if(p%mag%p%nmul<=nmul0) then
+             if(mod(p%mag%p%nst,2)==1) p%mag%p%nst=p%mag%p%nst+1
+             p%mag%p%method=1
+             p%mag%p%nst=p%mag%p%nst
+             p%magp%p%method=1
+             p%magp%p%nst=p%mag%p%nst
+             !       call add(p,1,1,0.0_dp)
+
+             CALL SETFAMILY(p%mag)
+             CALL SETFAMILY(p%magp)
+             call GETMAT7(p%mag%T7)
+             call GETMAT7(p%magp%T7)
+          endif
+       endif
+       p=>p%next
+    enddo
+  END SUBROUTINE PUT_method1_in_kind7
+
 
 
 end module madx_keywords

@@ -51,11 +51,11 @@ module definition
      !     type (taylorlow) j !@1   Taylorlow is an experimental type not supported
   END TYPE taylor
   !@2  UNIVERSAL_TAYLOR is used by Sagan in BMAD Code at Cornell
+  !@2  Also used by MAD-XP
   TYPE UNIVERSAL_TAYLOR
-     INTEGER, POINTER:: N => NULL()    !  Number of coeeficients a
-     INTEGER, POINTER:: NV => NULL()     ! number of variables
-     REAL(DP), POINTER,dimension(:)::C => NULL() ! Coefficients C(N)
-     INTEGER, POINTER,dimension(:,:)::J => NULL() ! Exponents of each coefficients J(N,NV)
+     INTEGER, POINTER:: N,NV    !  Number of coeeficients and number of variables
+     REAL(DP), POINTER,dimension(:)::C  ! Coefficients C(N)
+     INTEGER, POINTER,dimension(:,:)::J ! Exponents of each coefficients J(N,NV)
   END TYPE UNIVERSAL_TAYLOR
   !@3 ---------------------------------------------</br>
   TYPE complextaylor
@@ -232,10 +232,10 @@ module definition
   END TYPE beamenvelope
 
 
-  type  tree_element
+  type  tree_element   !@1  USED FOR FAST TRACKING IN O_TREE_ELEMENT.F90
      real(dp) ,  DIMENSION(:), POINTER :: CC
      integer,  DIMENSION(:), POINTER :: JL,JV
-     INTEGER,POINTER :: N,ND2
+     INTEGER,POINTER :: N,ND2,no
   end  type tree_element
 
 

@@ -97,13 +97,15 @@ MODULE S_DEF_KIND
   PRIVATE copypancake_el_elp,copypancake_elp_el,copypancake_el_el
   PRIVATE POINTERS_pancakeR,POINTERS_pancakep
   PRIVATE ZEROr_PANCAKE,ZEROP_PANCAKE
-  PRIVATE rk4_pancaker,rk4_pancakeP
-  PRIVATE FEVAL_pancaker,FEVAL_pancakeP
-  PRIVATE INTPANCAKER,INTPANCAKEP
-  private DRIFT_pancaker,DRIFT_pancakep,KICKPATH_pancaker,KICKPATH_pancakep
+  PRIVATE rk4_pancaker,rk4_pancakeP,rk4_pancakes
+  PRIVATE FEVAL_pancaker,FEVAL_pancakeP,feval_PANCAkEs
+  PRIVATE INTPANCAKER,INTPANCAKEP,INTPANCAKEs,conv_to_xpr,conv_to_xpp,conv_to_pxr
+  private conv_to_pxp
+
+  !  private DRIFT_pancaker,DRIFT_pancakep,KICKPATH_pancaker,KICKPATH_pancakep
   ! using x and x'
-  private fxr,fxp,f_m
-  PRIVATE feval,rk4_m
+  private fxr,fxp,fxs,f_m
+  PRIVATE feval       !,rk4_m
   !  FOR CAV_TRAV
   PRIVATE A_TRANSR,A_TRANSP,A_TRANS
   PRIVATE feval_CAVr,feval_CAVP,feval_CAV
@@ -120,6 +122,7 @@ MODULE S_DEF_KIND
   real(dp), target :: wedge_coeff(2)
   logical(lp), target :: MAD8_WEDGE=.TRUE.
   INTEGER , target :: CAVITY_TOTALPATH=1
+  logical(lp) :: bug_intentional=.true.
   ! stochastic radiation in straigth
 
   !include "def_all_kind.f90"
@@ -200,6 +203,7 @@ MODULE S_DEF_KIND
      ! PANCAKE
      MODULE PROCEDURE INTPANCAKER
      MODULE PROCEDURE INTPANCAKEP
+     MODULE PROCEDURE INTPANCAKES
   END INTERFACE
 
   INTERFACE DRIFT
@@ -209,10 +213,10 @@ MODULE S_DEF_KIND
   END INTERFACE
 
 
-  INTERFACE DRIFT_pancake
-     MODULE PROCEDURE DRIFT_pancaker
-     MODULE PROCEDURE DRIFT_pancakep
-  END INTERFACE
+  !@  INTERFACE DRIFT_pancake
+  !    MODULE PROCEDURE DRIFT_pancaker
+  !    MODULE PROCEDURE DRIFT_pancakep
+  ! END INTERFACE
 
   INTERFACE MONTI
      MODULE PROCEDURE MONTIR
@@ -572,8 +576,8 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE KICKPATH6TR
      MODULE PROCEDURE KICKPATH6TP
      MODULE PROCEDURE KICKPATH6TS
-     MODULE PROCEDURE KICKPATH_pancaker
-     MODULE PROCEDURE KICKPATH_pancakep
+     !     MODULE PROCEDURE KICKPATH_pancaker
+     !     MODULE PROCEDURE KICKPATH_pancakep
   END INTERFACE
 
   INTERFACE INTTKT7
@@ -636,22 +640,31 @@ MODULE S_DEF_KIND
   INTERFACE F_M
      MODULE PROCEDURE FXR
      MODULE PROCEDURE FXP
+     MODULE PROCEDURE FXS
   END INTERFACE
 
   INTERFACE feval
      MODULE PROCEDURE FEVAL_pancaker
      MODULE PROCEDURE FEVAL_pancakeP
+     MODULE PROCEDURE FEVAL_pancakes
   END INTERFACE
+
+  INTERFACE conv_to_xp
+     MODULE PROCEDURE conv_to_xpr
+     MODULE PROCEDURE conv_to_xpp
+  END INTERFACE
+  INTERFACE conv_to_px
+     MODULE PROCEDURE conv_to_pxr
+     MODULE PROCEDURE conv_to_pxp
+  END INTERFACE
+
 
   INTERFACE RK4_M
      MODULE PROCEDURE rk4_pancaker
      MODULE PROCEDURE rk4_pancakeP
+     MODULE PROCEDURE rk4_pancakes
   END INTERFACE
 
-  INTERFACE f_Mt
-     MODULE PROCEDURE f_Mtr
-     MODULE PROCEDURE f_Mtp
-  END INTERFACE
 
 
 contains
@@ -689,16 +702,16 @@ contains
 
 
 
-  SUBROUTINE DRIFT_INTEP(EL,X,MID)
+  SUBROUTINE DRIFT_INTEP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(DRIFT1P),INTENT(IN):: EL
     TYPE(REAL_8) DH
     real(dp) DD
     INTEGER I
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    ! IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     SELECT CASE(EL%P%METHOD)
     CASE(2,4,6)
@@ -708,7 +721,7 @@ contains
 
        DO I=1,EL%P%NST
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DH)
 
@@ -856,10 +869,10 @@ contains
 
   END SUBROUTINE CAVER
 
-  SUBROUTINE CAVEP(EL,X,MID)
+  SUBROUTINE CAVEP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(CAV4P),INTENT(INOUT):: EL
     TYPE(REAL_8) D,DH
     real(dp) DD
@@ -881,7 +894,7 @@ contains
 
 
     IF(EL%P%FRINGE) CALL FRINGECAV(EL,1,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
@@ -895,7 +908,7 @@ contains
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           CALL KICKCAV (EL,D,X)
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DH)
        CALL KILL(D)
@@ -919,7 +932,7 @@ contains
           CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           CALL KICKCAV (EL,DK1,X)
           CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(D1)
        CALL KILL(D2)
@@ -946,7 +959,7 @@ contains
              CALL KICKCAV (EL,DK(J),X)
              CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           ENDDO
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DF,4)
        CALL KILL(DK,4)
@@ -1010,20 +1023,20 @@ contains
 
   END SUBROUTINE CAVITYR
 
-  SUBROUTINE CAVITYP(EL,X,MID)
+  SUBROUTINE CAVITYP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(CAV4P),INTENT(INOUT):: EL
 
     IF(EL%P%NOCAVITY) RETURN
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
     x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
     x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+phase0)/EL%P%P0C
     !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
   END SUBROUTINE CAVITYP
 
@@ -1431,10 +1444,10 @@ contains
 
   END SUBROUTINE KICKTR
 
-  SUBROUTINE KICKTP(EL,X,MID)
+  SUBROUTINE KICKTP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(KICKT3P),INTENT(IN):: EL
     TYPE(REAL_8) X1,X3,BBYTW,BBXTW,BBYTWT
     TYPE(REAL_8) pz
@@ -1465,57 +1478,57 @@ contains
        BBXTW=zero
     ENDIF
 
-    IF(PRESENT(MID)) THEN
-       CALL XMID(MID,X,0)
-       if(EL%P%TIME) then
-          call alloc(pz)
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
-          call kill(pz)
-       else
-          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
-       endif
-       X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
-       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
+    !    IF(PRESENT(MID)) THEN
+    !       CALL XMID(MID,X,0)
+    !       if(EL%P%TIME) then
+    !          call alloc(pz)
+    !          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
+    !          call kill(pz)
+    !       else
+    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
+    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
+    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
+    !       endif
+    !      X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
+    !       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
+    !
+    !!       CALL XMID(MID,X,1)
+    !
+    !       if(EL%P%TIME) then
+    !          call alloc(pz)
+    !          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
+    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
+    !          call kill(pz)
+    !       else
+    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
+    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
+    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
+    !       endif
+    !       X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
+    !       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
+    !!       CALL XMID(MID,X,1)
+    !    ELSE
+    if(EL%P%TIME) then
+       call alloc(pz)
+       PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
+       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
+       call kill(pz)
+    else
+       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
+       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
+    endif
 
-       CALL XMID(MID,X,1)
-
-       if(EL%P%TIME) then
-          call alloc(pz)
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
-          call kill(pz)
-       else
-          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
-       endif
-       X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
-       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
-       CALL XMID(MID,X,1)
-    ELSE
-       if(EL%P%TIME) then
-          call alloc(pz)
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
-          call kill(pz)
-       else
-          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
-       endif
-
-       X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
-       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
-    ENDIF
+    X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
+    X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
+    !    ENDIF
 
 
 
@@ -2511,7 +2524,7 @@ contains
           B(2)=BBYTW
           B(3)=zero
           CALL B2PERP(EL%P,B,X,X5,B2)
-          X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)
           if(EL%P%TIME) then
              X(2)=X(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
              X(4)=X(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -2528,7 +2541,7 @@ contains
           B(2)=BBYTW !+EL%BN(1)  !
           B(3)=zero
           CALL B2PERP(EL%P,B,X,X5,B2)
-          X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
           if(EL%P%TIME) then
              X(2)=X(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
              X(4)=X(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -2599,7 +2612,7 @@ contains
           B(2)=BBYTW
           B(3)=zero
           CALL B2PERP(EL%P,B,X,X5,B2)
-          X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
           if(EL%P%TIME) then
              X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
              X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -2620,7 +2633,7 @@ contains
           B(2)=BBYTW !+EL%BN(1)  !
           B(3)=zero
           CALL B2PERP(EL%P,B,X,X5,B2)
-          X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
           if(EL%P%TIME) then
              X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
              X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -2717,7 +2730,7 @@ contains
           B(2)=BBYTW
           B(3)=zero
           CALL B2PERP(EL%P,B,X,X5,B2)
-          X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
 
           if(EL%P%TIME) then
              X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -2738,7 +2751,7 @@ contains
           B(2)=BBYTW  !+EL%BN(1)
           B(3)=zero
           CALL B2PERP(EL%P,B,X,X5,B2)
-          X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
 
           if(EL%P%TIME) then
              X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -2769,7 +2782,7 @@ contains
        endif
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*yl
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -2801,7 +2814,7 @@ contains
              else
                 denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
              endif
-             denf=DENF*cfluc*yl*b2**c_1_5
+             denf=DENF*cflucf(el%p)*yl*b2**c_1_5
           else
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              if(EL%P%EXACT) then
@@ -2811,7 +2824,7 @@ contains
              endif
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*yl
           endif
        endif
@@ -2933,10 +2946,10 @@ contains
 
 
 
-  SUBROUTINE INTEP(EL,X,MID)
+  SUBROUTINE INTEP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(DKD2P),INTENT(IN):: EL
     TYPE(REAL_8) D,DH
     real(dp) DD
@@ -2946,7 +2959,7 @@ contains
     real(dp) DDF(4)
     INTEGER I,J
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
@@ -2960,7 +2973,7 @@ contains
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           CALL KICK (EL,D,X)
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DH)
        CALL KILL(D)
@@ -2984,7 +2997,7 @@ contains
           CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           CALL KICK (EL,DK1,X)
           CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(D1)
        CALL KILL(D2)
@@ -3011,7 +3024,7 @@ contains
              CALL KICK (EL,DK(J),X)
              CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           ENDDO
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
        ENDDO
        CALL KILL(DF,4)
@@ -3142,22 +3155,22 @@ contains
 
   END SUBROUTINE SYMPINTR
 
-  SUBROUTINE SYMPINTP(EL,X,MID)
+  SUBROUTINE SYMPINTP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(DKD2P),INTENT(IN):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
 
     if(EL%P%DIR==1) THEN
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
-       CALL INTE(EL,X,MID)
+       CALL INTE(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
     ELSE
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
-       CALL INTE(EL,X,MID)
+       CALL INTE(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
     ENDIF
@@ -3211,7 +3224,7 @@ contains
        CALL GETMULB_SOL(EL,B,X)
        CALL B2PERP(EL%P,B,X_MEC,X5,B2)
        X5=X(5)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
        X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
        X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
     ENDIF
@@ -3254,7 +3267,7 @@ contains
        CALL GETMULB_SOL(EL,B,X)
        CALL B2PERP(EL%P,B,X_MEC,X5,B2)
        X5=X(5)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
        X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
        X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
        CALL KILL(X_MEC,6)
@@ -3318,7 +3331,7 @@ contains
        CALL GETMULB_SOL(EL,B,X)
        CALL B2PERP(EL%P,B,X_MEC,X5,B2)
        X5=X(5)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
        X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
        X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
     ENDIF
@@ -3328,7 +3341,7 @@ contains
        denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*yl
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -3356,13 +3369,13 @@ contains
              xr=xt+V
              CALL B2PERP(EL%P,B,xr,X5,B2)
              denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
-             denf=DENF*cfluc*yl*b2**c_1_5
+             denf=DENF*cflucf(el%p)*yl*b2**c_1_5
           else
              CALL B2PERP(EL%P,B,X_MEC,X5,B2)
              denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*yl
           endif
        endif
@@ -3522,10 +3535,27 @@ contains
     real(dp) myCOS,mySIN,ANG,XT(6)
     INTEGER I
 
+    !    if(bug_intentional) then
+    !      Write(6,*) " this PTC version has an intentional bug in SOL5 "
+    !      Write(6,*) " Look for bug_intentional to remove it  "
+    !      Write(6,*) " this PTC version has an intentional bug in SOL5 "
+    !      Write(6,*) " Look for bug_intentional to remove it  "
+    !      Write(6,*) " this PTC version has an intentional bug in SOL5 "
+    !      Write(6,*) " Look for bug_intentional to remove it  "
+    !      Write(6,*) " this PTC version has an intentional bug in SOL5 "
+    !      Write(6,*) " Look for bug_intentional to remove it  "
+    !      Write(6,*) " this PTC version has an intentional bug in SOL5 "
+    !      Write(6,*) " Look for bug_intentional to remove it  "
+    !      Write(6,*) " this PTC version has an intentional bug in SOL5 "
+    !      Write(6,*) " Look for bug_intentional to remove it  "
+    !      bug_intentional=.false.
+    !    endif
     if(EL%P%TIME) then   ! bug 2006.1.8
        ANG=YL*EL%B_SOL*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2)
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
        ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
     mySIN=SIN(ANG)
@@ -3561,8 +3591,10 @@ contains
     CALL ALLOC(XT,6)
     if(EL%P%TIME) then   ! bug 2006.1.8
        ANG=YL*EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
        ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
     mySIN=SIN(ANG)
@@ -3604,8 +3636,10 @@ contains
     X=Y
     if(EL%P%TIME) then   ! bug 2006.1.8
        ANG=YL*EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
        ANG=YL*EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
     mySIN=SIN(ANG)
@@ -3741,17 +3775,17 @@ contains
 
   END SUBROUTINE INTESOLR
 
-  SUBROUTINE INTESOLP(EL,X,MID)
+  SUBROUTINE INTESOLP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SOL5P),INTENT(IN):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
     TYPE(REAL_8) D,DH,D1,D2,D2H,DK1,DK2,DK(4),DF(4)
     real(dp) DD
     real(dp) DD1,DD2,DDF(4)
     INTEGER I,J
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
@@ -3768,7 +3802,7 @@ contains
           CALL KICK_SOL(EL,DH,X)
           CALL SOL_ROT (EL,DH,X)
           CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
        CALL KILL(D,DH)
@@ -3804,7 +3838,7 @@ contains
           CALL KICK_SOL(EL,D1,X)
           CALL SOL_ROT (EL,D1,X)
           CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(D1,D2,D2H,DK1,DK2)
     CASE(6)
@@ -3834,7 +3868,7 @@ contains
              CALL SOL_ROT (EL,DF(J),X)
              CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
           ENDDO
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DK,4)
        CALL KILL(DF,4)
@@ -3974,22 +4008,22 @@ contains
 
   END SUBROUTINE SYMPINTSOLR
 
-  SUBROUTINE SYMPINTSOLP(EL,X,MID)
+  SUBROUTINE SYMPINTSOLP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SOL5P),INTENT(INOUT):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
 
     IF(EL%P%DIR==1) THEN
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
-       CALL INTESOL(EL,X,MID)
+       CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
-       CALL INTESOL(EL,X,MID)
+       CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
@@ -4673,15 +4707,15 @@ contains
   END SUBROUTINE INTSOLR
 
 
-  SUBROUTINE INTSOLP(EL,X,MID)
+  SUBROUTINE INTSOLP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
     TYPE(SOLTP),INTENT(INOUT):: EL
     INTEGER I
     TYPE(REAL_8) DK,DK2,DK4,DK5,DK6,DKT
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     CALL ALLOC(DKT)
     DKT=EL%L/EL%P%NST
     CALL ALLOC(EL)
@@ -4704,7 +4738,7 @@ contains
           ENDIF
           CALL KICKPATH(EL,DK,X)
           CALL KICKMUL(EL,DK,X)  ! NEW
-          IF(PRESENT(MID))CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID))CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DK);CALL KILL(DK2);
     CASE(4)
@@ -4727,7 +4761,7 @@ contains
              CALL KICK_SOL(EL,DKT,X)  ! RADIATION
              CALL GETMATSOL(EL,X)
           ENDIF
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DK,DK2,DK6);
     CASE(6)
@@ -4766,7 +4800,7 @@ contains
              CALL KICK_SOL(EL,DKT,X)  ! RADIATION
              CALL GETMATSOL(EL,X)
           ENDIF
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
        ENDDO
 
@@ -4926,22 +4960,22 @@ contains
 
   END SUBROUTINE SYMPINTSOLTR
 
-  SUBROUTINE SYMPINTSOLTP(EL,X,MID)
+  SUBROUTINE SYMPINTSOLTP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SOLTP),INTENT(INOUT):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
 
     IF(EL%P%DIR==1) THEN
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
-       CALL INTESOL(EL,X,MID)
+       CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
     ELSE
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X)                    ! Added May 31st 2004
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
-       CALL INTESOL(EL,X,MID)
+       CALL INTESOL(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL FRINGE_(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X)                    ! Added May 31st 2004
     ENDIF
@@ -5100,7 +5134,7 @@ contains
        CALL GETMULB_SOL(EL,B,X)
        CALL B2PERP(EL%P,B,X_MEC,X5,B2)
        X5=X(5)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
        X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
        X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
     ENDIF
@@ -5133,7 +5167,7 @@ contains
        CALL GETMULB_SOL(EL,B,X)
        CALL B2PERP(EL%P,B,X_MEC,X5,B2)
        X5=X(5)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
        X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
        X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
        CALL KILL(X_MEC,6)
@@ -5187,7 +5221,7 @@ contains
        CALL GETMULB_SOL(EL,B,X)
        CALL B2PERP(EL%P,B,X_MEC,X5,B2)
        X5=X(5)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*YL
        X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
        X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
 
@@ -5196,7 +5230,7 @@ contains
           denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
           b20=b2
           b30=b20**c_1_5
-          bf=cfluc*b30
+          bf=cflucf(el%p)*b30
           denf=denf*bf*yl
           done_stoch=.true.
        elseif(EL%P%B0/=zero)   then
@@ -5224,13 +5258,13 @@ contains
                 xr=xt+V
                 CALL B2PERP(EL%P,B,xr,X5,B2)
                 denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
-                denf=DENF*cfluc*yl*b2**c_1_5
+                denf=DENF*cflucf(el%p)*yl*b2**c_1_5
              else
                 CALL B2PERP(EL%P,B,X_MEC,X5,B2)
                 denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
                 b20=b2
                 b30=b20**c_1_5
-                bf=cfluc*b30
+                bf=cflucf(el%p)*b30
                 denf=denf*bf*yl
              endif
           endif
@@ -5947,16 +5981,16 @@ contains
 
   END SUBROUTINE INTKTKR
 
-  SUBROUTINE INTKTKD(EL,X,MID)
+  SUBROUTINE INTKTKD(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(KTKP),INTENT(INOUT):: EL
     INTEGER I
     TYPE(REAL_8) DK,DK2,DK6,DK4,DK5
 
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     CALL ALLOC(EL)
     CALL ALLOC(DK,DK2,DK6,DK4,DK5);
@@ -5977,7 +6011,7 @@ contains
              CALL KICKPATH(EL,DK,X)
              if(EL%P%RADIATION) CALL GETMAT(EL,X)
              CALL KICKKTK(EL,DK,X)  ! NEW
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
        ELSE
           DO I=1,EL%P%NST  !-1
@@ -5987,7 +6021,7 @@ contains
              CALL KICKPATH(EL,DK,X)
              CALL PUSHKTK(EL,X)
              if(EL%P%RADIATION) CALL GETMAT(EL,X)
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
        ENDIF
 
@@ -6007,7 +6041,7 @@ contains
           CALL KICKPATH(EL,DK,X)
           CALL KICKKTK(EL,DK,X) ! NEW
           if(EL%P%RADIATION) CALL GETMAT(EL,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
     CASE(6)
        DK2=c_14*EL%L/EL%P%NST/c_90
@@ -6041,7 +6075,7 @@ contains
           CALL KICKPATH(EL,DK,X)
           CALL KICKKTK(EL,DK,X)   ! NEW
           if(EL%P%RADIATION) CALL GETMAT(EL,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
        ENDDO
 
@@ -6268,7 +6302,7 @@ contains
        B(2)=BBYTW  !+EL%BN(1)
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
        if(EL%P%TIME) then
           X(2)=X(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -6334,7 +6368,7 @@ contains
        B(2)=BBYTW   !+EL%BN(1)
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -6429,7 +6463,7 @@ contains
        B(2)=BBYTW     !+EL%BN(1)
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
 
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -6447,7 +6481,7 @@ contains
        denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*yl
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -6474,13 +6508,13 @@ contains
              xr=xt+V
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
-             denf=DENF*cfluc*yl*b2**c_1_5
+             denf=DENF*cflucf(el%p)*yl*b2**c_1_5
           else
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*yl
           endif
        endif
@@ -6545,23 +6579,23 @@ contains
 
   END SUBROUTINE SYMPINTKTKR
 
-  SUBROUTINE SYMPINTKTKD(EL,X,MID)
+  SUBROUTINE SYMPINTKTKD(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(KTKP),INTENT(INOUT):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
 
 
     IF(EL%P%DIR==1) THEN
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
-       CALL INTKTK(EL,X,MID)
+       CALL INTKTK(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
     ELSE
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
-       CALL INTKTK(EL,X,MID)
+       CALL INTKTK(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
     ENDIF
@@ -6612,7 +6646,7 @@ contains
     INTEGER S_OMEGA
 
     IF(EL%P%METHOD/=6) THEN
-       DH=EL%L/EL%P%NST/two
+       DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
     ELSE
        DH=EL%L/EL%P%NST/four
     ENDIF
@@ -6858,7 +6892,7 @@ contains
 
 
     IF(EL%P%METHOD/=6) THEN
-       DH=EL%L/EL%P%NST/two
+       DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
     ELSE
        DH=EL%L/EL%P%NST/four
     ENDIF
@@ -7236,9 +7270,9 @@ contains
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
        IF(EL%P%EXACT) THEN
-          X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)
        ELSE
-          X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
        ENDIF
        if(EL%P%TIME) then
           X(2)=X(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -7311,9 +7345,9 @@ contains
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
        IF(EL%P%EXACT) THEN
-          X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
        ELSE
-          X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
        ENDIF
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -7410,9 +7444,9 @@ contains
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
        IF(EL%P%EXACT) THEN
-          X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
        ELSE
-          X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
+          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+X1*EL%P%B0+half*(X(2)**2+X(4)**2)/(one+X(5))**2)*YL
        ENDIF
 
        if(EL%P%TIME) then
@@ -7435,7 +7469,7 @@ contains
        endif
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*yl
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -7467,7 +7501,7 @@ contains
              else
                 denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
              endif
-             denf=DENF*cfluc*yl*b2**c_1_5
+             denf=DENF*cflucf(el%p)*yl*b2**c_1_5
           else
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              if(EL%P%EXACT) then
@@ -7477,7 +7511,7 @@ contains
              endif
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*yl
           endif
        endif
@@ -7707,17 +7741,36 @@ contains
 
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       DK=EL%L/EL%P%NST
+       DK2=two*dk
+
+       DO I=1,EL%P%NST/2
+          CALL PUSHTKT7(EL,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL KICKTKT7(EL,DK2,X)
+          CALL KICKPATH(EL,DK,X)
+          IF(PRESENT(MID)) CALL XMID(MID,X,2*I-1)
+          CALL PUSHTKT7(EL,X)
+          IF(PRESENT(MID)) CALL XMID(MID,X,2*I)
+       ENDDO
+
     CASE(2)
        DK2=EL%L/EL%P%NST
        DK=DK2/two
 
        DO I=1,EL%P%NST
+          !       CALL KICKTKT7(EL,DK2,X)
+          !       CALL KICKPATH(EL,DK2,X)
+          !       CALL PUSHTKT7(EL,X)
+          !       CALL KICKPATH(EL,DK2,X)
+          !       CALL KICKTKT7(EL,DK2,X)
           CALL PUSHTKT7(EL,X)
           CALL KICKPATH(EL,DK,X)
           CALL KICKTKT7(EL,DK2,X)
-
           CALL KICKPATH(EL,DK,X)
           CALL PUSHTKT7(EL,X)
+
           IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
@@ -7820,10 +7873,10 @@ contains
 
   END SUBROUTINE INTTKT7R
 
-  SUBROUTINE INTTKT7D(EL,X,MID)
+  SUBROUTINE INTTKT7D(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(TKTFP),INTENT(INOUT):: EL
     INTEGER I
     logical(lp) BN,L
@@ -7833,9 +7886,23 @@ contains
        CALL GETMAT7(EL)                                      ! RECOMPUTES ONLY IF KNOB (SPEED)
     ENDIF
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       CALL ALLOC(DK);CALL ALLOC(DK2);
+       DK=EL%L/EL%P%NST
+       DK2=two*dk
+
+       DO I=1,EL%P%NST/2
+          CALL PUSHTKT7(EL,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL KICKTKT7(EL,DK2,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL PUSHTKT7(EL,X)
+       ENDDO
+       CALL KILL(DK);CALL KILL(DK2);
+
     CASE(2)
        CALL ALLOC(DK);CALL ALLOC(DK2);
        DK2=EL%L/EL%P%NST
@@ -7849,7 +7916,7 @@ contains
           CALL KICKTKT7(EL,DK2,X)
           CALL KICKPATH(EL,DK,X)
           CALL PUSHTKT7(EL,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+
        ENDDO
 
 
@@ -7874,7 +7941,7 @@ contains
           CALL KICKPATH(EL,DK,X)
           !          CALL KICKTKT7(EL,DK2,X)
           CALL KICKTKT7(EL,DK,X)   ! NEW
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        !       CALL KICKPATH(EL,DK,X)
        !       CALL PUSHTKT7(EL,X)
@@ -7921,7 +7988,7 @@ contains
           CALL KICKPATH(EL,DK,X)
           !          CALL KICKTKT7(EL,DK2,X)
           CALL KICKTKT7(EL,DK,X)   ! NEW
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
        ENDDO
        !       CALL KICKPATH(EL,DK,X)
@@ -7993,6 +8060,19 @@ contains
        CALL GETMAT7(EL)                                      ! RECOMPUTES ONLY IF KNOB (SPEED)
     ENDIF
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       CALL ALLOC(DK);CALL ALLOC(DK2);
+       DK=EL%L/EL%P%NST
+       DK2=two*dk
+
+       DO I=1,EL%P%NST/2
+          CALL PUSHTKT7(EL,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL KICKTKT7(EL,DK2,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL PUSHTKT7(EL,X)
+       ENDDO
+       CALL KILL(DK);CALL KILL(DK2);
     CASE(2)
        CALL ALLOC(DK);CALL ALLOC(DK2);
        DK2=EL%L/EL%P%NST
@@ -8153,22 +8233,22 @@ contains
 
   END SUBROUTINE SYMPINTTKT7R
 
-  SUBROUTINE SYMPINTTKT7D(EL,X,MID)
+  SUBROUTINE SYMPINTTKT7D(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(TKTFP),INTENT(INOUT):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
 
     IF(EL%P%DIR==1) THEN
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
-       CALL INTTKT7(EL,X,MID)
+       CALL INTTKT7(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
     ELSE
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
-       CALL INTTKT7(EL,X,MID)
+       CALL INTTKT7(EL,X)
        IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X)
     ENDIF
@@ -8702,14 +8782,14 @@ contains
        X(4)=X(4)-EKK*CIKVE
     END SELECT
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
   end subroutine push_Nsmi_r
 
-  subroutine push_Nsmi_D(el,x,MID)
+  subroutine push_Nsmi_D(el,x)
     implicit none
     TYPE (NSMIP),INTENT(IN)::EL
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(real_8) ,INTENT(INOUT)::x(6)
     TYPE(real_8)ekk,CRKVE,CIKVE,CRKVEUK,XL,ZL
 
@@ -8723,7 +8803,7 @@ contains
 
     EKK=-EL%P%DIR*EL%P%CHARGE*EL%BN(EL%P%NMUL)/TWO                      ! ANTI-SIXTRACK UNIT
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     select case(el%P%NMUL)
 
@@ -8877,7 +8957,7 @@ contains
        X(4)=X(4)-EKK*CIKVE
     END SELECT
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
     select case(el%P%NMUL)
 
@@ -9031,7 +9111,7 @@ contains
        X(4)=X(4)-EKK*CIKVE
     END SELECT
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
     CALL KILL(ekk);CALL KILL(CRKVE);CALL KILL(CIKVE);
     CALL KILL(CRKVEUK);CALL KILL(XL);CALL KILL(ZL);
@@ -9375,14 +9455,14 @@ contains
        X(4)=X(4)+EKK*CRKVE
 
     END SELECT
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
   end subroutine push_Ssmi_r
 
-  subroutine push_Ssmi_D(el,x,MID)
+  subroutine push_Ssmi_D(el,x)
     implicit none
     TYPE (SSMIP),INTENT(IN)::EL
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(real_8) ,INTENT(INOUT)::x(6)
     TYPE(real_8)ekk,CRKVE,CIKVE,CRKVEUK,XL,ZL
 
@@ -9395,7 +9475,7 @@ contains
     CIKVE=ZL
 
     EKK=EL%P%DIR*EL%P%CHARGE*EL%AN(EL%P%NMUL)/TWO
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     select case(el%P%NMUL)
 
@@ -9549,7 +9629,7 @@ contains
 
     END SELECT
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
     select case(el%P%NMUL)
 
@@ -9702,7 +9782,7 @@ contains
        X(4)=X(4)+EKK*CRKVE
 
     END SELECT
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
     CALL KILL(ekk);CALL KILL(CRKVE);CALL KILL(CIKVE);
     CALL KILL(CRKVEUK);CALL KILL(XL);CALL KILL(ZL);
@@ -10234,7 +10314,7 @@ contains
        B(2)=-BX/(one+EL%P%B0*X(1))
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)*(one+EL%P%B0*X(1))
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)*(one+EL%P%B0*X(1))
        if(EL%P%TIME) then
           X(2)=X(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -10340,7 +10420,7 @@ contains
        B(2)=-BX/(one+EL%P%B0*X(1))
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)*(one+EL%P%B0*X(1))
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)*(one+EL%P%B0*X(1))
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -10365,6 +10445,7 @@ contains
     INTEGER J,M,A,K,I,DIR
     real(dp) B20,B30,BF, v(6)  !,R1,R2,DEN0
     logical(lp) done_stoch
+    real(dp) :: tot=0.d0
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -10449,7 +10530,7 @@ contains
        B(2)=-BX/(one+EL%P%B0*X(1))
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)*(one+EL%P%B0*X(1))
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)*(one+EL%P%B0*X(1))
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -10467,7 +10548,7 @@ contains
        denf=(one+xr(5))**5/SQRT((one+Xr(5))**2-Xr(2)**2-Xr(4)**2)*(one+EL%P%B0*Xr(1))
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*yl
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -10495,14 +10576,15 @@ contains
              xr=xt+V
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              denf=(one+xr(5))**5/SQRT((one+Xr(5))**2-Xr(2)**2-Xr(4)**2)*(one+EL%P%B0*Xr(1))
-             denf=DENF*cfluc*yl*b2**c_1_5
+             denf=DENF*cflucf(el%p)*yl*b2**c_1_5
           else
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              denf=(one+xr(5))**5/SQRT((one+Xr(5))**2-Xr(2)**2-Xr(4)**2)*(one+EL%P%B0*Xr(1))
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*yl
+
           endif
        endif
 
@@ -10613,11 +10695,11 @@ contains
 
   END SUBROUTINE SINTER
 
-  SUBROUTINE SINTEP(EL,X,MID)
+  SUBROUTINE SINTEP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(TEAPOTP),INTENT(INOUT):: EL
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(REAL_8) D,DH
     real(dp) DD
     TYPE(REAL_8) D1,D2,DK1,DK2
@@ -10628,7 +10710,7 @@ contains
     logical(lp) CHECK_KNOB
     logical(lp), ALLOCATABLE,dimension(:)::AN,BN
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     IF(KNOB) THEN
        CALL CHECKPOTKNOB(EL,CHECK_KNOB) ! RECOMPUTES ONLY IF KNOB (SPEED)
@@ -10656,7 +10738,7 @@ contains
           CALL SSECH1(EL,DH,DD,X)
           CALL SKICK(EL,D,X)
           CALL SSECH1(EL,DH,DD,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DH)
        CALL KILL(D)
@@ -10680,7 +10762,7 @@ contains
           CALL SSECH1(EL,D2,DD2,X)
           CALL SKICK (EL,DK1,X)
           CALL SSECH1(EL,D1,DD1,X)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(D1)
        CALL KILL(D2)
@@ -10707,7 +10789,7 @@ contains
              CALL SKICK (EL,DK(J),X)
              CALL SSECH1(EL,DF(J),DDF(J),X)
           ENDDO
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
        CALL KILL(DF,4)
        CALL KILL(DK,4)
@@ -11011,12 +11093,12 @@ contains
 
   END SUBROUTINE SSYMPINTR
 
-  SUBROUTINE SSYMPINTP(EL,X,MID)
+  SUBROUTINE SSYMPINTP(EL,X)
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(TEAPOTP),INTENT(INOUT):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
 
 
     IF(EL%P%DIR==1) THEN
@@ -11040,7 +11122,7 @@ contains
           IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X)
        ENDIF
 
-       CALL SINTE(EL,X,MID)
+       CALL SINTE(EL,X)
 
        IF(EL%P%EDGE(2)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(2),X,EL2=EL)
@@ -11083,7 +11165,7 @@ contains
           IF(EL%P%FRINGE) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X)
        ENDIF
 
-       CALL SINTE(EL,X,MID)
+       CALL SINTE(EL,X)
 
        IF(EL%P%EDGE(1)/=zero) THEN
           CALL WEDGE(-EL%P%EDGE(1),X,EL2=EL)
@@ -11294,15 +11376,15 @@ contains
 
   END SUBROUTINE MARTINR
 
-  SUBROUTINE MARTINP(EL,X,MID)
+  SUBROUTINE MARTINP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(MARTIN),INTENT(INOUT):: EL
     TYPE(REAL_8) L0,BETA
 
     CALL ALLOC(L0,BETA)
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     L0=X(6)
 
     if(EL%P%TIME.and.EL%DELTAMAP) then
@@ -11356,7 +11438,7 @@ contains
        X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD
     endif
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
     CALL KILL(L0,BETA)
 
@@ -11413,16 +11495,16 @@ contains
 
 
 
-  SUBROUTINE MONTP(EL,X,MID)
+  SUBROUTINE MONTP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(monP),INTENT(INOUT):: EL
     INTEGER I
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     DO I=1,EL%P%NST
-       CALL MONTI(EL,X,I,MID)
+       CALL MONTI(EL,X,I)
     ENDDO
     !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
@@ -11472,10 +11554,10 @@ contains
   END SUBROUTINE MONTIR
 
 
-  SUBROUTINE MONTIP(EL,X,I,MID)
+  SUBROUTINE MONTIP(EL,X,I)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(monP),INTENT(INOUT):: EL
     real(dp) DD
     TYPE(REAL_8) DH
@@ -11499,7 +11581,7 @@ contains
           EL%X=X(1);EL%Y=X(3);
        ENDIF
     endif
-    IF(PRESENT(MID)) CALL XMID(MID,X,i)
+    !       IF(PRESENT(MID)) CALL XMID(MID,X,i)
 
     CALL KILL(DH)
 
@@ -11548,23 +11630,23 @@ contains
     DO I=1,EL%P%NST
        CALL RCOLLIMATORi(EL,X,i,MID)
     ENDDO
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
   END SUBROUTINE RCOLLIMATORR
 
-  SUBROUTINE RCOLLIMATORP(EL,X,MID)
+  SUBROUTINE RCOLLIMATORP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(RCOLP),INTENT(INOUT):: EL
 
     INTEGER I
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     DO I=1,EL%P%NST
-       CALL RCOLLIMATORi(EL,X,i,MID)
+       CALL RCOLLIMATORi(EL,X,i)
     ENDDO
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
 
   END SUBROUTINE RCOLLIMATORP
 
@@ -11601,27 +11683,29 @@ contains
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     if(mod(el%p%nst,2)==1) then
-       IF(PRESENT(MID)) THEN
-          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       !       ENDIF
     endif
     CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     if(mod(el%p%nst,2)==0) then
-       IF(PRESENT(MID)) THEN
-          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       !       ENDIF
     endif
+
+    IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
     APERTURE_FLAG=aper
 
   END SUBROUTINE RCOLLIMATORiR
 
-  SUBROUTINE RCOLLIMATORiP(EL,X,i,MID)
+  SUBROUTINE RCOLLIMATORiP(EL,X,i)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(RCOLP),INTENT(INOUT):: EL
     real(dp) DD
     TYPE(REAL_8) DH
@@ -11637,18 +11721,20 @@ contains
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     if(mod(el%p%nst,2)==1) then
-       IF(PRESENT(MID)) THEN
-          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       !       ENDIF
     endif
     CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
     if(mod(el%p%nst,2)==0) then
-       IF(PRESENT(MID)) THEN
-          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       !       ENDIF
     endif
+
+    !IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
     APERTURE_FLAG=aper
 
@@ -11691,47 +11777,65 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
     TYPE(ECOL),INTENT(INOUT):: EL
-    logical(lp) aper
-    real(dp) DH,DD
+    !   logical(lp) aper
+    !   real(dp) DH,DD
+    INTEGER I
 
-    DH=EL%L/two
-    DD=EL%P%LD/two
-    aper=APERTURE_FLAG
-    APERTURE_FLAG=.true.
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    CALL CHECK_APERTURE(EL%A,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
-    APERTURE_FLAG=aper
+    DO I=1,EL%P%NST
+       CALL ECOLLIMATORi(EL,X,i,MID)
+    ENDDO
+
+
+    !    DH=EL%L/two
+    !    DD=EL%P%LD/two
+    !    aper=APERTURE_FLAG
+    !    APERTURE_FLAG=.true.
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    !    CALL CHECK_APERTURE(EL%A,X)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    APERTURE_FLAG=aper
 
 
   END SUBROUTINE ECOLLIMATORR
 
-  SUBROUTINE ECOLLIMATORP(EL,X,MID)
+  SUBROUTINE ECOLLIMATORP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(ECOLP),INTENT(INOUT):: EL
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
-    real(dp) DD
-    TYPE(REAL_8) DH
-    logical(lp) aper
-    CALL ALLOC(DH)
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    !    real(dp) DD
+    !    TYPE(REAL_8) DH
+    !    logical(lp) aper
+    INTEGER I
+    !    CALL ALLOC(DH)
 
-    DH=EL%L/two
-    DD=EL%P%LD/two
-    aper=APERTURE_FLAG
-    APERTURE_FLAG=.true.
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    CALL CHECK_APERTURE(EL%A,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,2)
-    APERTURE_FLAG=aper
 
-    CALL KILL(DH)
+
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    DO I=1,EL%P%NST
+       CALL ECOLLIMATORi(EL,X,i)
+    ENDDO
+
+
+
+
+    !    DH=EL%L/two
+    !    DD=EL%P%LD/two
+    !    aper=APERTURE_FLAG
+    !    APERTURE_FLAG=.true.
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    !    CALL CHECK_APERTURE(EL%A,X)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,2)
+    !    APERTURE_FLAG=aper
+
+    !    CALL KILL(DH)
 
   END SUBROUTINE ECOLLIMATORP
 
@@ -11739,21 +11843,30 @@ contains
     IMPLICIT NONE
     TYPE(ENV_8),INTENT(INOUT):: X(6)
     TYPE(ECOLP),INTENT(INOUT):: EL
-    real(dp) DD
-    TYPE(REAL_8) DH
-    logical(lp) aper
-    CALL ALLOC(DH)
 
-    DH=EL%L/two
-    DD=EL%P%LD/two
-    aper=APERTURE_FLAG
-    APERTURE_FLAG=.true.
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    CALL CHECK_APERTURE(EL%A,X)
-    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    APERTURE_FLAG=aper
+    INTEGER I
 
-    CALL KILL(DH)
+    DO I=1,EL%P%NST
+       CALL ECOLLIMATORi(EL,X,i)
+    ENDDO
+
+
+
+    !    real(dp) DD
+    !    TYPE(REAL_8) DH
+    !    logical(lp) aper
+    !    CALL ALLOC(DH)
+
+    !    DH=EL%L/two
+    !    DD=EL%P%LD/two
+    !    aper=APERTURE_FLAG
+    !    APERTURE_FLAG=.true.
+    !    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    !    CALL CHECK_APERTURE(EL%A,X)
+    !    CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
+    !    APERTURE_FLAG=aper
+
+    !    CALL KILL(DH)
 
   END SUBROUTINE ECOLLIMATORS
 
@@ -11791,10 +11904,10 @@ contains
 
   END SUBROUTINE ECOLLIMATORiR
 
-  SUBROUTINE ECOLLIMATORiP(EL,X,i,MID)
+  SUBROUTINE ECOLLIMATORiP(EL,X,i)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(ECOLP),INTENT(INOUT):: EL
     real(dp) DD
     TYPE(REAL_8) DH
@@ -11809,19 +11922,19 @@ contains
     APERTURE_FLAG=.true.
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    if(mod(el%p%nst,2)==1) then
-       IF(PRESENT(MID)) THEN
-          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-       ENDIF
-    endif
+    !    if(mod(el%p%nst,2)==1) then
+    !       IF(PRESENT(MID)) THEN
+    !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+    !       ENDIF
+    !    endif
     CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-    if(mod(el%p%nst,2)==0) then
-       IF(PRESENT(MID)) THEN
-          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-       ENDIF
-    endif
+    !    if(mod(el%p%nst,2)==0) then
+    !       IF(PRESENT(MID)) THEN
+    !          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+    !       ENDIF
+    !    endif
 
     APERTURE_FLAG=aper
 
@@ -12031,11 +12144,11 @@ contains
 
   END SUBROUTINE SEPR
 
-  SUBROUTINE SEPP(EL,X,I,MID)
+  SUBROUTINE SEPP(EL,X,I)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(REAL_8) K,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
     LOGICAL(LP) EXACT
     integer, intent(IN) ::i
@@ -12079,11 +12192,11 @@ contains
           X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
-       IF(PRESENT(MID)) THEN
-          if(mod(el%p%nst,2)==1) then
-             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-          endif
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(mod(el%p%nst,2)==1) then
+       !             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       !          endif
+       !       ENDIF
 
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
@@ -12117,11 +12230,11 @@ contains
        else
           X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
-       IF(PRESENT(MID)) THEN
-          if(mod(el%p%nst,2)==0) then
-             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-          endif
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(mod(el%p%nst,2)==0) then
+       !             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       !          endif
+       !       ENDIF
 
 
        CALL KILL( K,SH_X,SH,CH,CHM,PZ,E1,ARG)
@@ -12163,11 +12276,11 @@ contains
           X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
-       IF(PRESENT(MID)) THEN
-          if(mod(el%p%nst,2)==1) then
-             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
-          endif
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(mod(el%p%nst,2)==1) then
+       !             if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
+       !          endif
+       !       ENDIF
 
 
        K=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
@@ -12202,11 +12315,11 @@ contains
           X(6)=X(6)-(1-EL%P%TOTALPATH)*EL%P%LD/TWO/el%p%nst
        endif
 
-       IF(PRESENT(MID)) THEN
-          if(mod(el%p%nst,2)==0) then
-             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
-          endif
-       ENDIF
+       !       IF(PRESENT(MID)) THEN
+       !          if(mod(el%p%nst,2)==0) then
+       !             if(i==el%p%nst/2)  CALL XMID(MID,X,1)
+       !          endif
+       !       ENDIF
 
 
        CALL KILL( K,SH_X,SH,CH,CHM,PZ,E1,ARG)
@@ -12248,18 +12361,18 @@ contains
 
   END SUBROUTINE SYMPSEPR
 
-  SUBROUTINE SYMPSEPP(EL,X,MID)
+  SUBROUTINE SYMPSEPP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
-    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     integer i
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     do i=1,el%p%nst
-       CALL SEPTTRACK(EL,X,i,MID)
+       CALL SEPTTRACK(EL,X,i)
     enddo
-    IF(PRESENT(MID)) CALL XMID(MID,X,1)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,1)
 
 
   END SUBROUTINE SYMPSEPP
@@ -12323,7 +12436,7 @@ contains
        B(2)=BBYTW
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/ROOT((one+X(5))**2-X(2)**2-X(4)**2)
        if(EL%P%TIME) then
           X(2)=X(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -12390,7 +12503,7 @@ contains
        B(2)=BBYTW
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
           X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -12483,7 +12596,7 @@ contains
        B(2)=BBYTW
        B(3)=zero
        CALL B2PERP(EL%P,B,X,X5,B2)
-       X(5)=X(5)-CRAD*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*YL/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
 
        if(EL%P%TIME) then
           X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)
@@ -12506,7 +12619,7 @@ contains
        denf=(one+xR(5))**5/SQRT((one+XR(5))**2-XR(2)**2-XR(4)**2)
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*yl
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -12535,13 +12648,13 @@ contains
 
              denf=(one+xR(5))**5/SQRT((one+XR(5))**2-XR(2)**2-XR(4)**2)
 
-             denf=DENF*cfluc*yl*b2**c_1_5
+             denf=DENF*cflucf(el%p)*yl*b2**c_1_5
           else
              CALL B2PERP(EL%P,B,Xr,X5,B2)
              denf=(one+xR(5))**5/SQRT((one+XR(5))**2-XR(2)**2-XR(4)**2)
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*yl
           endif
        endif
@@ -12726,11 +12839,11 @@ contains
 
 
 
-  SUBROUTINE INTEEXP(EL,X,MID)
+  SUBROUTINE INTEEXP(EL,X)
     IMPLICIT NONE
     TYPE(STREXP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(REAL_8) D,DH
     real(dp) DD
     TYPE(REAL_8) D1,D2,DK1,DK2
@@ -12739,7 +12852,7 @@ contains
     real(dp) DDF(4)
     INTEGER I,J
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     IF(EL%DRIFTKICK) THEN
        SELECT CASE(EL%P%METHOD)
@@ -12754,7 +12867,7 @@ contains
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              CALL KICKEX (EL,D,X)
              CALL DRIFT(DH,DD,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
           CALL KILL(DH)
           CALL KILL(D)
@@ -12778,7 +12891,7 @@ contains
              CALL DRIFT(D2,DD2,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              CALL KICKEX (EL,DK1,X)
              CALL DRIFT(D1,DD1,EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
           CALL KILL(D1)
           CALL KILL(D2)
@@ -12805,7 +12918,7 @@ contains
                 CALL KICKEX (EL,DK(J),X)
                 CALL DRIFT(DF(J),DDF(J),EL%P%beta0,EL%P%TOTALPATH,EL%P%EXACT,EL%P%TIME,X)
              ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
           CALL KILL(DF,4)
           CALL KILL(DK,4)
@@ -12831,7 +12944,7 @@ contains
              CALL SPAR(EL,DH,DD,X)
              CALL KICKEX (EL,D,X)
              CALL SPAR(EL,DH,DD,X)
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
           CALL KILL(DH)
           CALL KILL(D)
@@ -12855,7 +12968,7 @@ contains
              CALL SPAR(EL,D2,DD2,X)
              CALL KICKEX (EL,DK1,X)
              CALL SPAR(EL,D1,DD1,X)
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
           CALL KILL(D1)
           CALL KILL(D2)
@@ -12882,7 +12995,7 @@ contains
                 CALL KICKEX (EL,DK(J),X)
                 CALL SPAR(EL,DF(J),DDF(J),X)
              ENDDO
-             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+             !             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
           CALL KILL(DF,4)
           CALL KILL(DK,4)
@@ -13145,12 +13258,12 @@ contains
 
   END SUBROUTINE SYMPINTEXR
 
-  SUBROUTINE SYMPINTEXP(EL,X,MID)
+  SUBROUTINE SYMPINTEXP(EL,X)
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(STREXP),INTENT(IN):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     real(dp) ANGH
 
     IF(EL%P%DIR==1) THEN
@@ -13171,7 +13284,7 @@ contains
        ENDIF
 
 
-       CALL INTE_strex(EL,X,MID)
+       CALL INTE_strex(EL,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
@@ -13203,7 +13316,7 @@ contains
        ENDIF
 
 
-       CALL INTE_strex(EL,X,MID)
+       CALL INTE_strex(EL,X)
 
        IF(EL%LIKEMAD) THEN
           ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
@@ -13795,10 +13908,10 @@ contains
 
   END SUBROUTINE CAVER_TRAV
 
-  SUBROUTINE CAVEP_TRAV(EL,X,MID)
+  SUBROUTINE CAVEP_TRAV(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     TYPE(REAL_8) D1
     INTEGER I,J
@@ -13809,7 +13922,7 @@ contains
 
     !    IF(EL%P%FRINGE)
     CALL FRINGECAV_TRAV(EL,EL%P%DIR,X)
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     IF(EL%P%DIR==1) THEN
        Z0=ZERO
@@ -13827,7 +13940,7 @@ contains
        D1=EL%L/EL%P%NST
        DO I=1,EL%P%NST
           call rk2_cav(z0,d1,el,x)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
        CALL KILL(D1)
@@ -13837,7 +13950,7 @@ contains
        D1=EL%L/EL%P%NST
        DO I=1,EL%P%NST
           call rk4_cav(z0,d1,el,x)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
        CALL KILL(D1)
@@ -13848,7 +13961,7 @@ contains
        D1=EL%L/EL%P%NST
        DO I=1,EL%P%NST
           call rk6_cav(z0,d1,el,x)
-          IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          !          IF(PRESENT(MID)) CALL XMID(MID,X,I)
        ENDDO
 
        CALL KILL(D1)
@@ -14719,9 +14832,9 @@ contains
   subroutine fxr(f,x,b,p)
     implicit none
 
-    real(dp)  d(3),c(6),BETA0,GAMMA0I,hcurv
+    real(dp)  d(3),c(6),BETA0,GAMMA0I,hcurv,b2
     real(dp) ,intent(in) :: b(3)
-    type(MAGNET_CHART), intent(in) :: p
+    type(MAGNET_CHART), pointer:: p
     real(dp) ,intent(inout) :: x(6)
     real(dp), intent(out):: f(6)
 
@@ -14749,25 +14862,36 @@ contains
     f(2)=(c(4)*c(5)-c(2)*c(6))/d(3)
     f(3)=x(4)
     f(4)=(c(1)*c(6)-c(3)*c(5))/d(3)
-    f(5)=0
     d(2)=one+two*x(5)/beta0+x(5)**2
-
-
-
     d(2)=gamma0I/beta0/d(2)
     f(6)=root((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
+
+    if(p%radiation) then
+       !    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
+       c(1)=x(2)/d(1)
+       c(2)=x(4)/d(1)
+       c(3)=one/d(1)
+       B2=zero
+       B2=(B(2)*c(3)-B(3)*c(2))**2+B2
+       B2=(B(1)*c(2)-B(2)*c(1))**2+B2
+       B2=(B(3)*c(1)-B(1)*c(3))**2+B2
+       f(5)=-CRADF(P)*(one+X(5))**2*B2*f(6)
+    else
+       f(5)=zero
+    endif
+
 
   end subroutine fxr
 
   subroutine fxp(f,x,b,p)
     implicit none
 
-    type(real_8)  d(3),c(6)
+    type(real_8)  d(3),c(6),b2
     type(real_8) ,intent(inout) :: x(6)
     type(real_8) ,intent(in) :: b(3)
     real(dp)   BETA0,GAMMA0I,hcurv
     type(real_8), intent(out):: f(6)
-    type(MAGNET_CHART), intent(in) :: p
+    type(MAGNET_CHART), pointer:: p
 
     call alloc(d,3)
     call alloc(c,6)
@@ -14794,52 +14918,103 @@ contains
     f(2)=(c(4)*c(5)-c(2)*c(6))/d(3)
     f(3)=x(4)
     f(4)=(c(1)*c(6)-c(3)*c(5))/d(3)
-    f(5)=0
+    f(5)=zero
     d(2)=one+two*x(5)/beta0+x(5)**2
     !   d(2)=SQRT((one+d(2)*gambet)/d(2)/gambet)
     !   f(6)=d(2)*d(1)
 
     d(2)=gamma0I/beta0/d(2)
     f(6)=SQRT((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
+
+    if(p%radiation) then
+       !    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
+       c(1)=x(2)/d(1)
+       c(2)=x(4)/d(1)
+       c(3)=one/d(1)
+       call alloc(b2)
+
+       B2=zero
+       B2=(B(2)*c(3)-B(3)*c(2))**2+B2
+       B2=(B(1)*c(2)-B(2)*c(1))**2+B2
+       B2=(B(3)*c(1)-B(1)*c(3))**2+B2
+       f(5)=-CRADF(P)*(one+X(5))**2*B2*f(6)
+       call kill(b2)
+    else
+       f(5)=zero
+    endif
+
     call kill(d,3)
     call kill(c,6)
   end subroutine fxp
 
-  subroutine f_Mtr(f,x,b,p)
+  subroutine fxs(f,y,b,p)
     implicit none
 
-    real(dp) ,intent(in) :: b(3)
-    type(MAGNET_CHART), intent(in) :: p
-    real(dp) ,intent(inout) :: x(7)
-    real(dp), intent(out):: f(7)
-
-    f(1)=x(2)
-    f(3)=x(4)
-    f(5)=x(6)
-    f(2)=x(4)*b(3)-x(6)*b(2)
-    f(4)=x(6)*b(1)-x(2)*b(3)
-    f(6)=x(2)*b(2)-x(4)*b(1)
-    f(7)=zero
-
-  end subroutine f_Mtr
-
-  subroutine f_Mtp(f,x,b,p)
-    implicit none
-
+    type(real_8)  d(3),c(6),b2,x(6)
+    type(env_8) ,intent(inout) :: y(6)
     type(real_8) ,intent(in) :: b(3)
-    type(MAGNET_CHART), intent(in) :: p
-    type(real_8) ,intent(inout) :: x(7)
-    type(real_8), intent(out):: f(7)
+    real(dp)   BETA0,GAMMA0I,hcurv
+    type(real_8), intent(out):: f(6)
+    type(MAGNET_CHART), pointer:: p
 
+    call alloc(d,3)
+    call alloc(c,6)
+    call alloc(x,6)
+    x=y
+    hcurv=p%b0
+    if(p%time) then
+       beta0=p%beta0;GAMMA0I=p%GAMMA0I;
+    else
+       beta0=one;GAMMA0I=zero;
+    endif
+
+    d(1)=SQRT(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
+    d(2)=(d(1)**3)/SQRT(one+2*x(5)/beta0+x(5)**2)
+    d(3)=one+hcurv*x(1)
+
+    c(1)=d(1)**2-x(2)**2
+    c(2)=-x(2)*x(4)
+    c(3)= x(2)*x(4)
+    c(4)=-d(1)**2+x(4)**2
+    c(5)=d(2)*(x(4)*b(3)-d(3)*b(2)) +hcurv*d(3)*(d(1)**2+x(2)**2)
+    c(6)=d(2)*(x(2)*b(3)-d(3)*b(1)) -hcurv*d(3)*c(3)
+
+    d(3)=c(1)*c(4)-c(2)*c(3)
     f(1)=x(2)
+    f(2)=(c(4)*c(5)-c(2)*c(6))/d(3)
     f(3)=x(4)
-    f(5)=x(6)
-    f(2)=x(4)*b(3)-x(6)*b(2)
-    f(4)=x(6)*b(1)-x(2)*b(3)
-    f(6)=x(2)*b(2)-x(4)*b(1)
-    f(7)=zero
+    f(4)=(c(1)*c(6)-c(3)*c(5))/d(3)
+    f(5)=zero
+    d(2)=one+two*x(5)/beta0+x(5)**2
+    !   d(2)=SQRT((one+d(2)*gambet)/d(2)/gambet)
+    !   f(6)=d(2)*d(1)
 
-  end subroutine f_Mtp
+    d(2)=gamma0I/beta0/d(2)
+    f(6)=SQRT((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
+
+    if(p%radiation) then
+       !    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
+       c(1)=x(2)/d(1)
+       c(2)=x(4)/d(1)
+       c(3)=one/d(1)
+       call alloc(b2)
+
+       B2=zero
+       B2=(B(2)*c(3)-B(3)*c(2))**2+B2
+       B2=(B(1)*c(2)-B(2)*c(1))**2+B2
+       B2=(B(3)*c(1)-B(1)*c(3))**2+B2
+       f(5)=-CRADF(P)*(one+X(5))**3*B2/SQRT((one+X(5))**2-X(2)**2-X(4)**2)*(one+P%B0*X(1))
+       call kill(b2)
+    else
+       f(5)=zero
+    endif
+    y=x
+
+    call kill(d,3)
+    call kill(x,6)
+    call kill(c,6)
+  end subroutine fxs
+
 
 
 
@@ -14854,27 +15029,28 @@ contains
     !integer k
     IF(I==-1) THEN
        if(ASSOCIATED(EL%B)) then
+          CALL KILL(EL%B)    ! forgotten???
           deallocate(EL%B)
-          deallocate(EL%Ax)
-          deallocate(EL%Ay)
+          !          deallocate(EL%Ax)
+          !          deallocate(EL%Ay)
 
           deallocate(EL%SCALE)
-          deallocate(EL%D_IN)
-          deallocate(EL%D_OUT)
-          deallocate(EL%ANG_IN)
-          deallocate(EL%ANG_OUT)
+          !          deallocate(EL%D_IN)
+          !          deallocate(EL%D_OUT)
+          !          deallocate(EL%ANG_IN)
+          !          deallocate(EL%ANG_OUT)
        endif
 
     elseif(i==0)       then          ! nullifies
 
        NULLIFY(EL%B)
        NULLIFY(EL%SCALE)
-       NULLIFY(EL%Ax)
-       NULLIFY(EL%Ay)
-       NULLIFY(EL%D_IN)
-       NULLIFY(EL%D_OUT)
-       NULLIFY(EL%ANG_IN)
-       NULLIFY(EL%ANG_OUT)
+       !       NULLIFY(EL%Ax)
+       !       NULLIFY(EL%Ay)
+       !       NULLIFY(EL%D_IN)
+       !       NULLIFY(EL%D_OUT)
+       !       NULLIFY(EL%ANG_IN)
+       !       NULLIFY(EL%ANG_OUT)
     endif
 
   END SUBROUTINE ZEROr_PANCAKE
@@ -14888,125 +15064,127 @@ contains
        if(ASSOCIATED(EL%B)) then
           CALL KILL(EL%SCALE)
           CALL KILL(EL%B)
-          CALL KILL(EL%Ax)
-          CALL KILL(EL%Ay)
+          !          CALL KILL(EL%Ax)
+          !          CALL KILL(EL%Ay)
 
-          deallocate(EL%Ax)
-          deallocate(EL%Ay)
+          !          deallocate(EL%Ax)
+          !          deallocate(EL%Ay)
           deallocate(EL%B)
           deallocate(EL%SCALE)
-          deallocate(EL%D_IN)
-          deallocate(EL%D_OUT)
-          deallocate(EL%ANG_IN)
-          deallocate(EL%ANG_OUT)
+          !          deallocate(EL%D_IN)
+          !          deallocate(EL%D_OUT)
+          !          deallocate(EL%ANG_IN)
+          !          deallocate(EL%ANG_OUT)
        endif
 
     elseif(i==0)       then          ! nullifies
 
        NULLIFY(EL%B)
-       NULLIFY(EL%Ax)
-       NULLIFY(EL%Ay)
+       !       NULLIFY(EL%Ax)
+       !       NULLIFY(EL%Ay)
        NULLIFY(EL%SCALE)
-       NULLIFY(EL%D_IN)
-       NULLIFY(EL%D_OUT)
-       NULLIFY(EL%ANG_IN)
-       NULLIFY(EL%ANG_OUT)
+       !       NULLIFY(EL%D_IN)
+       !       NULLIFY(EL%D_OUT)
+       !       NULLIFY(EL%ANG_IN)
+       !       NULLIFY(EL%ANG_OUT)
     endif
 
   END SUBROUTINE ZEROP_PANCAKE
 
-  SUBROUTINE POINTERS_PANCAKER(EL,T,t_ax,t_ay)
+  SUBROUTINE POINTERS_PANCAKER(EL,T) !,t_ax,t_ay)
     IMPLICIT NONE
     TYPE(PANCAKE), INTENT(INOUT)::EL
-    TYPE(TREE_ELEMENT), INTENT(IN)::T(:) ,T_ax(:) ,T_ay(:)  ! DATA PASSED HERE SPECIAL
+    TYPE(TREE_ELEMENT), INTENT(IN)::T(:) !,T_ax(:) ,T_ay(:)  ! DATA PASSED HERE SPECIAL
     INTEGER I
 
-    ALLOCATE(EL%B(el%p%NST))
-    ALLOCATE(EL%Ax(el%p%NST))
-    ALLOCATE(EL%Ay(el%p%NST))
+    ALLOCATE(EL%B(2*el%p%NST+1))
+    !    ALLOCATE(EL%Ax(el%p%NST))
+    !    ALLOCATE(EL%Ay(el%p%NST))
     ALLOCATE(  EL%SCALE )
-    ALLOCATE(  EL%D_IN(3) )
-    ALLOCATE(  EL%D_OUT(3) )
-    ALLOCATE(  EL%ANG_IN(3) )
-    ALLOCATE(  EL%ANG_OUT(3) )
+    !    ALLOCATE(  EL%D_IN(3) )
+    !    ALLOCATE(  EL%D_OUT(3) )
+    !    ALLOCATE(  EL%ANG_IN(3) )
+    !    ALLOCATE(  EL%ANG_OUT(3) )
 
-    DO I=1,el%p%NST
+    DO I=1,2*el%p%NST+1
        CALL ALLOC_TREE(EL%B(I),T(I)%N,3)
-       CALL ALLOC_TREE(EL%Ax(I),T_ax(I)%N,2)
-       CALL ALLOC_TREE(EL%Ay(I),T_ay(I)%N,2)
+       !       CALL ALLOC_TREE(EL%Ax(I),T_ax(I)%N,2)
+       !       CALL ALLOC_TREE(EL%Ay(I),T_ay(I)%N,2)
        EL%B(I)%CC=T(I)%CC
        EL%B(I)%JL=T(I)%JL
        EL%B(I)%JV=T(I)%JV
        EL%B(I)%N=T(I)%N
        EL%B(I)%ND2=T(I)%ND2
-       EL%ax(I)%CC=t_ax(I)%CC
-       EL%ax(I)%JL=t_ax(I)%JL
-       EL%ax(I)%JV=t_ax(I)%JV
-       EL%ax(I)%N=t_ax(I)%N
-       EL%ax(I)%ND2=t_ax(I)%ND2
-
-       EL%ay(I)%CC=t_ay(I)%CC
-       EL%ay(I)%JL=t_ay(I)%JL
-       EL%ay(I)%JV=t_ay(I)%JV
-       EL%ay(I)%N=t_ay(I)%N
-       EL%ay(I)%ND2=t_ay(I)%ND2
+       EL%B(I)%no=T(I)%no
+       !       EL%ax(I)%CC=t_ax(I)%CC
+       !       EL%ax(I)%JL=t_ax(I)%JL
+       !       EL%ax(I)%JV=t_ax(I)%JV
+       !       EL%ax(I)%N=t_ax(I)%N
+       !       EL%ax(I)%ND2=t_ax(I)%ND2
+       !
+       !       EL%ay(I)%CC=t_ay(I)%CC
+       !       EL%ay(I)%JL=t_ay(I)%JL
+       !       EL%ay(I)%JV=t_ay(I)%JV
+       !       EL%ay(I)%N=t_ay(I)%N
+       !       EL%ay(I)%ND2=t_ay(I)%ND2
     ENDDO
 
 
 
     EL%SCALE=ONE
-    EL%D_IN=ZERO
-    EL%D_OUT=ZERO
-    EL%ANG_IN=ZERO
-    EL%ANG_OUT=ZERO
+    !    EL%D_IN=ZERO
+    !    EL%D_OUT=ZERO
+    !    EL%ANG_IN=ZERO
+    !    EL%ANG_OUT=ZERO
 
   END SUBROUTINE POINTERS_PANCAKER
 
-  SUBROUTINE POINTERS_PANCAKEP(EL,T,t_ax,t_ay)
+  SUBROUTINE POINTERS_PANCAKEP(EL,T) !,t_ax,t_ay)
     IMPLICIT NONE
     TYPE(PANCAKEP), INTENT(INOUT)::EL
-    TYPE(TREE_ELEMENT), INTENT(IN)::T(:),t_ax(:),t_ay(:) ! DATA PASSED HERE SPECIAL
+    TYPE(TREE_ELEMENT), INTENT(IN)::T(:) !,t_ax(:),t_ay(:) ! DATA PASSED HERE SPECIAL
     INTEGER I
 
 
 
-    ALLOCATE(EL%B(el%p%NST))
-    ALLOCATE(EL%Ax(el%p%NST))
-    ALLOCATE(EL%Ay(el%p%NST))
+    ALLOCATE(EL%B(2*el%p%NST+1))
+    !    ALLOCATE(EL%Ax(el%p%NST))
+    !    ALLOCATE(EL%Ay(el%p%NST))
     ALLOCATE(  EL%SCALE )
-    ALLOCATE(  EL%D_IN(3) )
-    ALLOCATE(  EL%D_OUT(3) )
-    ALLOCATE(  EL%ANG_IN(3) )
-    ALLOCATE(  EL%ANG_OUT(3) )
+    !    ALLOCATE(  EL%D_IN(3) )
+    !    ALLOCATE(  EL%D_OUT(3) )
+    !    ALLOCATE(  EL%ANG_IN(3) )
+    !    ALLOCATE(  EL%ANG_OUT(3) )
 
-    DO I=1,el%p%NST
+    DO I=1,2*el%p%NST+1
        CALL ALLOC_TREE(EL%B(I),T(I)%N,3)
-       CALL ALLOC_TREE(EL%Ax(I),T_ax(I)%N,2)
-       CALL ALLOC_TREE(EL%Ay(I),T_ay(I)%N,2)
+       !       CALL ALLOC_TREE(EL%Ax(I),T_ax(I)%N,2)
+       !       CALL ALLOC_TREE(EL%Ay(I),T_ay(I)%N,2)
        EL%B(I)%CC=T(I)%CC
        EL%B(I)%JL=T(I)%JL
        EL%B(I)%JV=T(I)%JV
        EL%B(I)%N=T(I)%N
        EL%B(I)%ND2=T(I)%ND2
-       EL%ax(I)%CC=t_ax(I)%CC
-       EL%ax(I)%JL=t_ax(I)%JL
-       EL%ax(I)%JV=t_ax(I)%JV
-       EL%ax(I)%N=t_ax(I)%N
-       EL%ax(I)%ND2=t_ax(I)%ND2
-
-       EL%ay(I)%CC=t_ay(I)%CC
-       EL%ay(I)%JL=t_ay(I)%JL
-       EL%ay(I)%JV=t_ay(I)%JV
-       EL%ay(I)%N=t_ay(I)%N
-       EL%ay(I)%ND2=t_ay(I)%ND2
+       EL%B(I)%no=T(I)%no
+       !       EL%ax(I)%CC=t_ax(I)%CC
+       !       EL%ax(I)%JL=t_ax(I)%JL
+       !       EL%ax(I)%JV=t_ax(I)%JV
+       !       EL%ax(I)%N=t_ax(I)%N
+       !       EL%ax(I)%ND2=t_ax(I)%ND2
+       !
+       !       EL%ay(I)%CC=t_ay(I)%CC
+       !       EL%ay(I)%JL=t_ay(I)%JL
+       !       EL%ay(I)%JV=t_ay(I)%JV
+       !       EL%ay(I)%N=t_ay(I)%N
+       !       EL%ay(I)%ND2=t_ay(I)%ND2
     ENDDO
 
 
 
-    EL%D_IN=ZERO
-    EL%D_OUT=ZERO
-    EL%ANG_IN=ZERO
-    EL%ANG_OUT=ZERO
+    !    EL%D_IN=ZERO
+    !    EL%D_OUT=ZERO
+    !    EL%ANG_IN=ZERO
+    !    EL%ANG_OUT=ZERO
     ! EL%SCALE MUST BE CREATED IN SETFAMILYP
   END SUBROUTINE POINTERS_PANCAKEP
 
@@ -15016,13 +15194,13 @@ contains
     TYPE(PANCAKEP), INTENT(inout)::ELP
 
     CALL COPY_TREE_N(EL%B,ELP%B)
-    CALL COPY_TREE_N(EL%ax,ELP%ax)
-    CALL COPY_TREE_N(EL%ay,ELP%ay)
-
-    ELP%D_IN    =  EL%D_IN
-    ELP%D_OUT    =  EL%D_OUT
-    ELP%ANG_IN    =  EL%ANG_IN
-    ELP%ANG_OUT    =  EL%ANG_OUT
+    !    CALL COPY_TREE_N(EL%ax,ELP%ax)
+    !    CALL COPY_TREE_N(EL%ay,ELP%ay)
+    !
+    !!    ELP%D_IN    =  EL%D_IN
+    !    ELP%D_OUT    =  EL%D_OUT
+    !    ELP%ANG_IN    =  EL%ANG_IN
+    !    ELP%ANG_OUT    =  EL%ANG_OUT
     ELP%SCALE  = EL%SCALE
   END SUBROUTINE copyPANCAKE_el_elp
 
@@ -15032,13 +15210,13 @@ contains
     TYPE(PANCAKE), INTENT(inout)::ELP
 
     CALL COPY_TREE_N(EL%B,ELP%B)
-    CALL COPY_TREE_N(EL%ax,ELP%ax)
-    CALL COPY_TREE_N(EL%ay,ELP%ay)
-
-    ELP%D_IN    =  EL%D_IN
-    ELP%D_OUT    =  EL%D_OUT
-    ELP%ANG_IN    =  EL%ANG_IN
-    ELP%ANG_OUT    =  EL%ANG_OUT
+    !    CALL COPY_TREE_N(EL%ax,ELP%ax)
+    !    CALL COPY_TREE_N(EL%ay,ELP%ay)
+    !
+    !!    ELP%D_IN    =  EL%D_IN
+    !    ELP%D_OUT    =  EL%D_OUT
+    !    ELP%ANG_IN    =  EL%ANG_IN
+    !    ELP%ANG_OUT    =  EL%ANG_OUT
     ELP%SCALE  = EL%SCALE
   END SUBROUTINE copyPANCAKE_el_el
 
@@ -15048,13 +15226,13 @@ contains
     TYPE(PANCAKE), INTENT(inout)::ELP
 
     CALL COPY_TREE_N(EL%B,ELP%B)
-    CALL COPY_TREE_N(EL%ax,ELP%ax)
-    CALL COPY_TREE_N(EL%ay,ELP%ay)
-
-    ELP%D_IN    =  EL%D_IN
-    ELP%D_OUT    =  EL%D_OUT
-    ELP%ANG_IN    =  EL%ANG_IN
-    ELP%ANG_OUT    =  EL%ANG_OUT
+    !    CALL COPY_TREE_N(EL%ax,ELP%ax)
+    !    CALL COPY_TREE_N(EL%ay,ELP%ay)
+    !
+    !!    ELP%D_IN    =  EL%D_IN
+    !    ELP%D_OUT    =  EL%D_OUT
+    !    ELP%ANG_IN    =  EL%ANG_IN
+    !    ELP%ANG_OUT    =  EL%ANG_OUT
     ELP%SCALE  = EL%SCALE
   END SUBROUTINE copyPANCAKE_elP_el
 
@@ -15083,8 +15261,9 @@ contains
     !       CALL track3(EL%B(POS),B)
     CALL trackg(EL%B(POS),B)
 
-    b(1)=EL%SCALE*el%p%charge*b(1)
-    b(2)=EL%SCALE*el%p%charge*b(2)
+    b(1)=EL%SCALE*el%p%charge*el%p%dir*b(1)
+    b(2)=EL%SCALE*el%p%charge*el%p%dir*b(2)
+    !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
     b(3)=EL%SCALE*el%p%charge*b(3)
 
     CALL f_M(f,x,b,EL%p)
@@ -15106,8 +15285,9 @@ contains
     !       CALL track3(EL%B(POS),B)
     CALL trackg(EL%B(POS),B)
 
-    b(1)=EL%SCALE*el%p%charge*b(1)
-    b(2)=EL%SCALE*el%p%charge*b(2)
+    b(1)=EL%SCALE*el%p%charge*el%p%dir*b(1)
+    b(2)=EL%SCALE*el%p%charge*el%p%dir*b(2)
+    !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
     b(3)=EL%SCALE*el%p%charge*b(3)
 
     CALL f_M(f,x,b,EL%p)
@@ -15116,6 +15296,36 @@ contains
 
   END subroutine feval_PANCAkEP
 
+  subroutine feval_PANCAkEs(POS,y,f,EL)
+    IMPLICIT NONE
+    TYPE(REAL_8)  X(6)
+    TYPE(env_8), INTENT(INout) :: y(6)
+    INTEGER, INTENT(INOUT) :: POS
+    TYPE(REAL_8), INTENT(OUT) :: F(6)
+    TYPE(PANCAKEP),  INTENT(INOUT) :: EL
+    TYPE(REAL_8) B(3)
+    CALL ALLOC(B)
+
+    call alloc(x,6)
+    x=y
+    B(1)=X(1);
+    B(2)=X(3);
+    B(3)=ZERO;
+
+    !       CALL track3(EL%B(POS),B)
+    CALL trackg(EL%B(POS),B)
+
+    b(1)=EL%SCALE*el%p%charge*el%p%dir*b(1)
+    b(2)=EL%SCALE*el%p%charge*el%p%dir*b(2)
+    !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
+    b(3)=EL%SCALE*el%p%charge*b(3)
+    y=x
+    CALL f_M(f,y,b,EL%p)
+
+    CALL KILL(B)
+    call kill(x,6)
+
+  END subroutine feval_PANCAkEs
 
   ! 4 order Runge
   subroutine rk4_pancaker(ti,h,GR,y)
@@ -15140,7 +15350,7 @@ contains
        yt(j)=y(j)+a(j)/two
     enddo
 
-    tt=tI+1
+    tt=tI+GR%p%dir
     call feval(tt,yt,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -15150,7 +15360,7 @@ contains
     enddo
 
 
-    tt=tI+1
+    tt=tI+GR%p%dir
     call feval(tt,yt,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
@@ -15159,17 +15369,22 @@ contains
        yt(j)=y(j)+c(j)
     enddo
 
-    tt=tI+2
+    tt=tI+2*GR%p%dir
     call feval(tt,yt,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
-
     do  j=1,ne
        y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
     enddo
-    tI=ti+2
+    tI=ti+2*GR%p%dir
+
+    if(GR%P%TIME) then
+       Y(6)=Y(6)-(1-GR%P%TOTALPATH)*GR%P%LD/GR%P%beta0/GR%P%nst
+    else
+       Y(6)=Y(6)-(1-GR%P%TOTALPATH)*GR%P%LD/GR%P%nst
+    endif
 
     return
   end  subroutine rk4_pancaker
@@ -15202,7 +15417,7 @@ contains
        yt(j)=y(j)+a(j)/two
     enddo
 
-    tt=tI+1
+    tt=tI+GR%p%dir
     call feval(tt,yt,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -15212,7 +15427,7 @@ contains
     enddo
 
 
-    tt=tI+1
+    tt=tI+GR%p%dir
     call feval(tt,yt,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
@@ -15221,7 +15436,7 @@ contains
        yt(j)=y(j)+c(j)
     enddo
 
-    tt=tI+2
+    tt=tI+2*GR%p%dir
     call feval(tt,yt,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
@@ -15231,7 +15446,13 @@ contains
     do  j=1,ne
        y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
     enddo
-    tI=ti+2
+    tI=ti+2*GR%p%dir
+
+    if(GR%P%TIME) then
+       Y(6)=Y(6)-(1-GR%P%TOTALPATH)*GR%P%LD/GR%P%beta0/GR%P%nst
+    else
+       Y(6)=Y(6)-(1-GR%P%TOTALPATH)*GR%P%LD/GR%P%nst
+    endif
 
     call KILL(yt,ne)
     call KILL(f,ne)
@@ -15243,361 +15464,505 @@ contains
     return
   end  subroutine rk4_pancakeP
 
+  subroutine rk4_pancakes(ti,h,GR,x)
+    IMPLICIT none
+
+    integer ne
+    parameter (ne=6)
+    TYPE(env_8), INTENT(INOUT)::  x(ne)
+    TYPE(REAL_8)  y(ne)
+    TYPE(REAL_8)  yt(ne),f(ne),a(ne),b(ne),c(ne),d(ne)
+    type (pancakeP) ,INTENT(INOUT)::  GR
+    TYPE(REAL_8), intent(inout) :: h
+    integer, intent(inout) :: ti
+    INTEGER TT
+    TYPE(REAL_8) X1,X3,X5,Bs(3),B2,DENF,XR(6)
+    TYPE(DAMAP) XP,ID,DISP,XT
+    INTEGER J,I    !,M,K,DIR
+    real(dp) B20,B30,BFf, v(6)  !,R1,R2,DEN0
+    logical(lp) done_stoch
+    real(dp) :: tot=0.d0
+
+
+    call alloc(y,ne)
+    call alloc(yt,ne)
+    call alloc(f,ne)
+    call alloc(a,ne)
+    call alloc(b,ne)
+    call alloc(c,ne)
+    call alloc(d,ne)
+
+    CALL ALLOC(X1,X3,X5,B2)
+    CALL ALLOC(BS,3)
+    CALL ALLOC(XP)
+    CALL ALLOC(denf)
+    CALL ALLOC(XR)
+    CALL ALLOC(ID)
+    CALL ALLOC(DISP)
+    CALL ALLOC(XT)
+
+    y=x
+    call feval(tI,y,f,gr)
+    do  j=1,ne
+       a(j)=h*f(j)
+    enddo
+    do  j=1,ne
+       yt(j)=y(j)+a(j)/two
+    enddo
+
+    tt=tI+GR%p%dir
+    call feval(tt,yt,f,gr)
+    do  j=1,ne
+       b(j)=h*f(j)
+    enddo
+    do   j=1,ne
+       yt(j)=y(j) + b(j)/two
+    enddo
+
+
+    tt=tI+GR%p%dir
+    call feval(tt,yt,f,gr)
+    do  j=1,ne
+       c(j)=h*f(j)
+    enddo
+    do  j=1,ne
+       yt(j)=y(j)+c(j)
+    enddo
+
+    tt=tI+2*GR%p%dir
+    call feval(tt,yt,f,gr)
+    do  j=1,ne
+       d(j)=h*f(j)
+    enddo
+
+    XP=y
+    XR=y
+    if(gr%P%TIME) then
+       X5=SQRT(one+two*y(5)/gr%P%beta0+y(5)**2)-one
+    else
+       X5=y(5)
+    endif
+
+
+    do  j=1,ne
+       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+    enddo
+    c(6)=(a(6)+two*b(6)+two*c(6)+d(6))/six
+    tI=ti+2*GR%p%dir
+
+    if(GR%P%TIME) then
+       Y(6)=Y(6)-(1-GR%P%TOTALPATH)*GR%P%LD/GR%P%beta0/GR%P%nst
+    else
+       Y(6)=Y(6)-(1-GR%P%TOTALPATH)*GR%P%LD/GR%P%nst
+    endif
+
+    done_stoch=.false.
+    if(GR%P%B0==zero.and.stoch_in_rec) then
+
+       ! b2perp
+       d(1)=sqrt(xr(2)**2+xr(4)**2+(one+gR%P%B0*xr(1))**2)
+       c(1)=xr(2)/d(1)
+       c(2)=xr(4)/d(1)
+       c(3)=one/d(1)
+       Bs(1)=xr(1);
+       Bs(2)=xr(3);
+       Bs(3)=ZERO;
+
+       CALL trackg(gr%B(ti-GR%p%dir),Bs)
+
+       B2=zero
+       B2=(Bs(2)*c(3)-Bs(3)*c(2))**2+B2
+       B2=(Bs(1)*c(2)-Bs(2)*c(1))**2+B2
+       B2=(Bs(3)*c(1)-Bs(1)*c(3))**2+B2
+
+       denf=(one+xr(5))**4*c(6)
+       b20=b2
+       b30=b20**c_1_5
+       bfF=cflucf(gr%p)*b30
+       denf=denf*bfF
+       done_stoch=.true.
+    elseif(GR%P%B0/=zero)   then
+       done_stoch=.true.
+    endif
+
+    if(done_stoch) then
+
+       if(GR%P%B0/=zero) then
+          !
+          if(knob) then
+             v=XR
+             DISP=xp*id
+             id=1
+             DISP=ID-DISP
+             XP=DISP*XP
+
+             id=0
+             XT=XR
+             DISP=XT*ID
+             ID=1
+             DISP=ID-DISP
+             XT=DISP*XT
+
+             xr=xt+V
+             ! b2perp
+             d(1)=sqrt(xr(2)**2+xr(4)**2+(one+gR%P%B0*xr(1))**2)
+             c(1)=xr(2)/d(1)
+             c(2)=xr(4)/d(1)
+             c(3)=one/d(1)
+             Bs(1)=xr(1);
+             Bs(2)=xr(3);
+             Bs(3)=ZERO;
+
+             CALL trackg(gr%B(ti-GR%p%dir),Bs)
+
+             B2=zero
+             B2=(Bs(2)*c(3)-Bs(3)*c(2))**2+B2
+             B2=(Bs(1)*c(2)-Bs(2)*c(1))**2+B2
+             B2=(Bs(3)*c(1)-Bs(1)*c(3))**2+B2
+
+
+             denf=(one+xr(5))**4*c(6)
+
+             denf=DENF*cflucf(gr%p)*b2**c_1_5
+          else
+
+             ! b2perp
+             d(1)=sqrt(xr(2)**2+xr(4)**2+(one+gR%P%B0*xr(1))**2)
+             c(1)=xr(2)/d(1)
+             c(2)=xr(4)/d(1)
+             c(3)=one/d(1)
+             Bs(1)=xr(1);
+             Bs(2)=xr(3);
+             Bs(3)=ZERO;
+
+             CALL trackg(gr%B(ti-GR%p%dir),Bs)
+
+             B2=zero
+             B2=(Bs(2)*c(3)-Bs(3)*c(2))**2+B2
+             B2=(Bs(1)*c(2)-Bs(2)*c(1))**2+B2
+             B2=(Bs(3)*c(1)-Bs(1)*c(3))**2+B2
+
+             denf=(one+xr(5))**4*c(6)
+             b20=b2
+             b30=b20**c_1_5
+             bfF=cflucf(gr%p)*b30
+             denf=denf*bfF
+          endif
+       endif
+
+       xp=xp**(-1)
+       do i=1,6
+          do j=1,6
+             X1=(xp%v(i)).par.'000010'
+             X3=(xp%v(j)).par.'000010'
+             denf=denf.par.'000000'
+             x(I)%E(J)=x(I)%E(J)+denf*x1*x3
+          enddo
+       enddo
+    endif
+
+    x=y
+
+    call KILL(y,ne)
+    call KILL(yt,ne)
+    call KILL(f,ne)
+    call KILL(a,ne)
+    call KILL(b,ne)
+    call KILL(c,ne)
+    call KILL(d,ne)
+
+    CALL KILL(X1,X3,X5,B2)
+    CALL KILL(BS,3)
+    CALL KILL(XP)
+    CALL KILL(denf)
+    CALL KILL(XR)
+    CALL KILL(ID)
+    CALL KILL(DISP)
+    CALL KILL(XT)
+
+    return
+  end  subroutine rk4_pancakes
+
+  SUBROUTINE conv_to_xpr(EL,X)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+    real(dp) ti
+    if(el%p%time) then
+       ti=ROOT(one+two*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
+       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
+       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+    else
+       ti=ROOT((one+x(5))**2-X(2)**2-X(4)**2)
+       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
+       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+    endif
+
+  end SUBROUTINE conv_to_xpr
+
+  SUBROUTINE conv_to_xpp(EL,X)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(PANCAKEp),INTENT(INOUT):: EL
+    type(real_8) ti
+    call alloc(ti)
+    if(el%p%time) then
+       ti=sqrt(one+two*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
+       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
+       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+    else
+       ti=sqrt((one+x(5))**2-X(2)**2-X(4)**2)
+       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
+       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+    endif
+    call kill(ti)
+
+  end SUBROUTINE conv_to_xpp
+
+  SUBROUTINE conv_to_pxr(EL,X)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+    real(dp) ti
+    ti=ROOT((ONE+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
+    if(el%p%time) then
+       x(2)=x(2)*ROOT(one+two*X(5)/el%p%beta0+x(5)**2)/ti
+       x(4)=x(4)*ROOT(one+two*X(5)/el%p%beta0+x(5)**2)/ti
+    else
+       x(2)=x(2)*(one+x(5))/ti
+       x(4)=x(4)*(one+x(5))/ti
+    endif
+  end SUBROUTINE conv_to_pxr
+
+  SUBROUTINE conv_to_pxp(EL,X)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(PANCAKEp),INTENT(INOUT):: EL
+    type(real_8) ti
+    call alloc(ti)
+    ti=SQRT((ONE+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
+    if(el%p%time) then
+       x(2)=x(2)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
+       x(4)=x(4)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
+    else
+       x(2)=x(2)*(one+x(5))/ti
+       x(4)=x(4)*(one+x(5))/ti
+    endif
+    call kill(ti)
+
+  end SUBROUTINE conv_to_pxp
+
+
+  ! ETIENNE_PANCAKE
   SUBROUTINE INTPANCAKER(EL,X,MID)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
     TYPE(PANCAKE),INTENT(INOUT):: EL
     INTEGER I,IS
-    real(dp) ti,h,hh,hf,a(2)
+    real(dp) ti,h
 
-    IF((MOD(el%p%NST,2)/=1.OR.el%p%NST<3).and.EL%P%METHOD/=2) THEN
-       WRITE(6,*) " IN PANCAKE NST MUST BE ODD AND > 3 "
-       STOP
-    ELSE
-       Hh=el%L/(el%p%NST-1)/two
-       Hf=two*hh
-       H=two*hf
-    ENDIF
+    H=el%L/el%p%NST
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-    IF(EL%P%DIR==1) THEN
-       SELECT CASE(EL%P%METHOD)
-       CASE(0:1,3:6)
-          if(el%p%time) then
-             ti=sqrt(one+two*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
-             x(2)=x(2)/ti
-             x(4)=x(4)/ti
-          else
-             ti=sqrt((one+x(5))**2-X(2)**2-X(4)**2)
-             x(2)=x(2)/ti
-             x(4)=x(4)/ti
-          endif
+    SELECT CASE(EL%P%METHOD)
+    CASE(4)
+       call conv_to_xp(EL,X)
+       IF(EL%P%DIR==1) THEN
           IS=1
-          DO I=1,(el%p%NST-1)/2
+          DO I=1,el%p%NST
              call rk4_m(IS,h,el,X)
+             IF(PRESENT(MID)) CALL XMID(MID,X,I)
+          ENDDO
+       else
+          IS=2*el%p%NST+1
+          DO I=1,el%p%NST
+             call rk4_m(IS,h,el,X)
+             IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
 
-          ti=sqrt(one+X(2)**2+X(4)**2)
-          if(el%p%time) then
-             x(2)=x(2)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
-             x(4)=x(4)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
-          else
-             x(2)=x(2)*(one+x(5))/ti
-             x(4)=x(4)*(one+x(5))/ti
-          endif
-       CASE(2)
-          IS=1
-          call DRIFT_pancake(EL,hh,is,1,X)
-          call DRIFT_pancake(EL,hh,is,2,X)
-          call KICKPATH(EL,hf,X)
-          DO I=1,el%p%NST-2
-             IS=is+1
-             call DRIFT_pancake(EL,hh,is,2,X)
-             call DRIFT_pancake(EL,hf,is,1,X)
-             call DRIFT_pancake(EL,hh,is,2,X)
-             call KICKPATH(EL,hf,X)
-          ENDDO
-          IS=is+1
-          call DRIFT_pancake(EL,hh,is,2,X)
-          call DRIFT_pancake(EL,hf,is,1,X)
-          a(1)=x(1)
-          a(2)=x(3)
-          CALL trackg(EL%ax(is),A)
-          X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
-          a(1)=x(1)
-          a(2)=x(3)
-          CALL trackg(EL%ay(is),A)
-          X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
+       ENDIF
+       call conv_to_px(EL,X)
 
-       CASE DEFAULT
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-          call write_e(357)
-       END SELECT
+       !       CASE(2)
+       !
+       !          IS=1
+       !          call DRIFT_pancake(EL,hh,is,1,X)
+       !          call DRIFT_pancake(EL,hh,is,2,X)
+       !          call KICKPATH(EL,hf,X)
+       !          DO I=1,el%p%NST-2
+       !             IS=is+1
+       !             call DRIFT_pancake(EL,hh,is,2,X)
+       !             call DRIFT_pancake(EL,hf,is,1,X)
+       !             call DRIFT_pancake(EL,hh,is,2,X)
+       !             call KICKPATH(EL,hf,X)
+       !          ENDDO
+       !          IS=is+1
+       !          call DRIFT_pancake(EL,hh,is,2,X)
+       !          call DRIFT_pancake(EL,hf,is,1,X)
+       !          a(1)=x(1)
+       !          a(2)=x(3)
+       !          CALL trackg(EL%ax(is),A)
+       !          X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
+       !          a(1)=x(1)
+       !          a(2)=x(3)
+       !          CALL trackg(EL%ay(is),A)
+       !          X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
+       !
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
 
 
-    ENDIF
 
 
   END SUBROUTINE INTPANCAKER
 
-  SUBROUTINE INTPANCAKEP(EL,X,MID)
+  SUBROUTINE INTPANCAKEP(EL,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
+    ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
     TYPE(PANCAKEP),INTENT(INOUT):: EL
     INTEGER I,IS
-    TYPE(REAL_8) ti,h,hh,hf
+    TYPE(REAL_8) ti,h
     REAL(DP) a(2)
 
-    CALL ALLOC(TI,H,hh,hf)
+    CALL ALLOC(TI,H)
 
 
-    IF((MOD(el%p%NST,2)/=1.OR.el%p%NST<3).and.EL%P%METHOD/=2) THEN
-       WRITE(6,*) " IN PANCAKE NST MUST BE ODD AND > 3 "
-       STOP
-    ELSE
-       Hh=el%L/(el%p%NST-1)/two
-       Hf=two*hh
-       H=two*hf
-    ENDIF
+    H=el%L/el%p%NST
 
 
 
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-    IF(EL%P%DIR==1) THEN
-       SELECT CASE(EL%P%METHOD)
-       CASE(0:1,3:6)
-          if(el%p%time) then
-             ti=sqrt(one+two*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
-             x(2)=x(2)/ti
-             x(4)=x(4)/ti
-          else
-             ti=sqrt((one+x(5))**2-X(2)**2-X(4)**2)
-             x(2)=x(2)/ti
-             x(4)=x(4)/ti
-          endif
-
+    SELECT CASE(EL%P%METHOD)
+    CASE(4)
+       call conv_to_xp(EL,X)
+       IF(EL%P%DIR==1) THEN
           IS=1
-          DO I=1,(el%p%NST-1)/2
+          DO I=1,el%p%NST
+             call rk4_m(IS,h,el,X)
+          ENDDO
+       else
+          IS=2*el%p%NST+1
+          DO I=1,el%p%NST
              call rk4_m(IS,h,el,X)
           ENDDO
 
-          ti=sqrt(one+X(2)**2+X(4)**2)
-          if(el%p%time) then
-             x(2)=x(2)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
-             x(4)=x(4)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
-          else
-             x(2)=x(2)*(one+x(5))/ti
-             x(4)=x(4)*(one+x(5))/ti
-          endif
-       CASE(2)
-          IS=1
-          call DRIFT_pancake(EL,hh,is,1,X)
-          call DRIFT_pancake(EL,hh,is,2,X)
-          call KICKPATH(EL,hf,X)
-          DO I=1,el%p%NST-2
-             IS=is+1
-             call DRIFT_pancake(EL,hh,is,2,X)
-             call DRIFT_pancake(EL,hf,is,1,X)
-             call DRIFT_pancake(EL,hh,is,2,X)
-             call KICKPATH(EL,hf,X)
-          ENDDO
-          IS=is+1
-          call DRIFT_pancake(EL,hh,is,2,X)
-          call DRIFT_pancake(EL,hf,is,1,X)
-          a(1)=x(1)
-          a(2)=x(3)
-          CALL trackg(EL%ax(is),A)
-          X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
-          a(1)=x(1)
-          a(2)=x(3)
-          CALL trackg(EL%ay(is),A)
-          X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
+       ENDIF
 
 
-       CASE DEFAULT
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1(1X,A72))'
-          WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-          call write_e(357)
-       END SELECT
+       call conv_to_px(EL,X)
+       !       CASE(2)
+       !          IS=1
+       !          call DRIFT_pancake(EL,hh,is,1,X)
+       !          call DRIFT_pancake(EL,hh,is,2,X)
+       !          call KICKPATH(EL,hf,X)
+       !          DO I=1,el%p%NST-2
+       !             IS=is+1
+       !             call DRIFT_pancake(EL,hh,is,2,X)
+       !             call DRIFT_pancake(EL,hf,is,1,X)
+       !             call DRIFT_pancake(EL,hh,is,2,X)
+       !             call KICKPATH(EL,hf,X)
+       !          ENDDO
+       !          IS=is+1
+       !          call DRIFT_pancake(EL,hh,is,2,X)
+       !          call DRIFT_pancake(EL,hf,is,1,X)
+       !          a(1)=x(1)
+       !          a(2)=x(3)
+       !          CALL trackg(EL%ax(is),A)
+       !          X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
+       !          a(1)=x(1)
+       !          a(2)=x(3)
+       !          CALL trackg(EL%ay(is),A)
+       !          X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
+       !
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
 
 
-    ENDIF
 
 
-    CALL KILL(TI,H,hh,hf)
+    CALL KILL(TI,H)
 
   END SUBROUTINE INTPANCAKEP
 
-
-  ! split drifts doe symplectic pancake
-  SUBROUTINE DRIFT_pancakeR(EL,L,Z,PLANE,X)
+  SUBROUTINE INTPANCAKEs(EL,Y)
     IMPLICIT NONE
-    TYPE(pancake),INTENT(IN):: EL
-    real(dp),INTENT(INOUT):: X(6)
-    real(dp), INTENT(IN):: L
-    integer, INTENT(INout):: Z
-    INTEGER, INTENT(IN)::PLANE
-    real(dp) PZ,A(2)
+    TYPE(env_8),INTENT(INOUT):: Y(6)
+    TYPE(REAL_8)  X(6)
+    TYPE(PANCAKEP),INTENT(INOUT):: EL
+    INTEGER I,IS
+    TYPE(REAL_8) ti,h
+    REAL(DP) a(2)
+
+    CALL ALLOC(TI,H)
+    CALL ALLOC(X)
 
 
-    IF(PLANE==1) THEN
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ax(z),A)
-       X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
-       X(4)=X(4)-EL%SCALE*el%p%charge*A(2)
-       if(EL%P%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
+    H=el%L/el%p%NST
+
+
+
+
+    !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+
+    SELECT CASE(EL%P%METHOD)
+    CASE(4)
+       X=Y
+       call conv_to_xp(EL,X)
+       Y=X
+       IF(EL%P%DIR==1) THEN
+          IS=1
+          DO I=1,el%p%NST
+             call rk4_m(IS,h,el,Y)
+          ENDDO
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
-       endif
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ax(z),A)
-       X(2)=X(2)+EL%SCALE*el%p%charge*A(1)
-       X(4)=X(4)+EL%SCALE*el%p%charge*A(2)
-    ELSE
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ay(z),A)
-       X(2)=X(2)-EL%SCALE*el%p%charge*A(2)
-       X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
-       if(EL%P%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
-       else
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
-       endif
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ay(z),A)
-       X(2)=X(2)+EL%SCALE*el%p%charge*A(2)
-       X(4)=X(4)+EL%SCALE*el%p%charge*A(1)
-    ENDIF
-  END SUBROUTINE DRIFT_pancakeR
+          IS=2*el%p%NST+1
+          DO I=1,el%p%NST
+             call rk4_m(IS,h,el,Y)
+          ENDDO
 
-  SUBROUTINE DRIFT_pancakep(EL,L,Z,PLANE,X)
-    IMPLICIT NONE
-    TYPE(pancakep),INTENT(IN):: EL
-    type(real_8),INTENT(INOUT):: X(6)
-    type(real_8), INTENT(IN):: L
-    integer, INTENT(INout):: Z
-    INTEGER, INTENT(IN)::PLANE
-    type(real_8)  PZ,A(2)
-    CALL ALLOC(A)
+       ENDIF
 
-    call alloc(pz)
-
-    IF(PLANE==1) THEN
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ax(z),A)
-       X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
-       X(4)=X(4)-EL%SCALE*el%p%charge*A(2)
-       if(EL%P%TIME) then
-          PZ=sqrt(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
-       else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
-       endif
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ax(z),A)
-       X(2)=X(2)+EL%SCALE*el%p%charge*A(1)
-       X(4)=X(4)+EL%SCALE*el%p%charge*A(2)
-    ELSE
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ay(z),A)
-       X(2)=X(2)-EL%SCALE*el%p%charge*A(2)
-       X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
-       if(EL%P%TIME) then
-          PZ=sqrt(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
-       else
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
-       endif
-       a(1)=x(1)
-       a(2)=x(3)
-       CALL trackg(EL%ay(z),A)
-       X(2)=X(2)+EL%SCALE*el%p%charge*A(2)
-       X(4)=X(4)+EL%SCALE*el%p%charge*A(1)
-    ENDIF
-
-    call kill(pz)
-    CALL kill(A)
-
-  END SUBROUTINE DRIFT_pancakep
-
-  SUBROUTINE KICKPATH_pancakeR(EL,L,X)
-    IMPLICIT NONE
-    real(dp),INTENT(INOUT):: X(6)
-    TYPE(pancake),INTENT(IN):: EL
-    real(dp),INTENT(IN):: L
-    real(dp) PZ,PZ0
-    ! ETIENNE
-    IF(EL%P%EXACT) THEN
-       if(EL%P%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+EL%P%TOTALPATH*L/EL%P%BETA0
-       else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-          PZ0=one+X(5)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+EL%P%TOTALPATH*L
-       endif
-    ELSE
-       if(EL%P%TIME) then
-          X(6)=X(6)+EL%P%TOTALPATH*L/EL%P%BETA0
-       else
-          X(6)=X(6)+EL%P%TOTALPATH*L
-       endif
-    ENDIF
-
-  END SUBROUTINE KICKPATH_pancakeR
-
-  SUBROUTINE KICKPATH_pancakep(EL,L,X)
-    IMPLICIT NONE
-    TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(pancakep),INTENT(IN):: EL
-    TYPE(REAL_8),INTENT(IN):: L
-    TYPE(REAL_8) PZ,PZ0
-    ! ETIENNE
-    IF(EL%P%EXACT) THEN
-       CALL ALLOC(PZ,PZ0)
-       if(EL%P%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+EL%P%TOTALPATH*L/EL%P%BETA0
-       else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          PZ0=one+X(5)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+EL%P%TOTALPATH*L
-       endif
-       CALL KILL(PZ,PZ0)
-    ELSE
-       if(EL%P%TIME) then
-          X(6)=X(6)+EL%P%TOTALPATH*L/EL%P%BETA0
-       else
-          X(6)=X(6)+EL%P%TOTALPATH*L
-       endif
-    ENDIF
+       X=Y
+       call conv_to_px(EL,X)
+       Y=X
 
 
-  END SUBROUTINE KICKPATH_pancakep
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
+
+
+
+    CALL KILL(X)
+
+    CALL KILL(TI,H)
+
+  END SUBROUTINE INTPANCAKEs
+
+
+
+
 
   ! cav_trav
 

@@ -2407,7 +2407,8 @@ CONTAINS
     ! S2%B0=S1%B0
     s2%P%tiltd=S1%tilt
     if(s1%kind==kind4) then
-       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%DELTA_E,S2%THIN)
+       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%DELTA_E,S2%THIN,S2%lag)
+       S2%lag=zero
        S2%volt=flip*S1%volt
        S2%freq=S1%freq0*S1%harmon
        S2%phas=-S1%lag
@@ -2424,7 +2425,8 @@ CONTAINS
     endif
 
     if(s1%kind==kind21) then
-       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%LAG,S2%DELTA_E,S2%THIN)
+       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%LAG,S2%DELTA_E,S2%THIN,S2%lag)
+       S2%lag=zero
        S2%volt=flip*S1%volt
        S2%freq=S1%freq0*S1%harmon
        S2%phas=-S1%lag
@@ -2483,7 +2485,7 @@ CONTAINS
     if(s2%kind/=kindpa) then
        CALL SETFAMILY(S2,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
     else
-       CALL SETFAMILY(S2,t=T_E,T_ax=T_ax,T_ay=T_ay)
+       CALL SETFAMILY(S2,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
        S2%P%METHOD=4
        deallocate(T_E,t_ax,t_ay)
     endif
@@ -2545,8 +2547,16 @@ CONTAINS
        IF(THICKKICKTEMP)   S2%K16%DRIFTKICK=.FALSE.
     ENDIF
 
-    IF(S2%KIND==KIND18) S2%RCOL18%A%KIND=2
-    IF(S2%KIND==KIND19) S2%ECOL19%A%KIND=1
+    IF(S2%KIND==KIND18) THEN
+       S2%RCOL18%A%KIND=2
+       S2%RCOL18%A%X=ABSOLUTE_APERTURE
+       S2%RCOL18%A%Y=ABSOLUTE_APERTURE
+    ENDIF
+    IF(S2%KIND==KIND19) THEN
+       S2%ECOL19%A%KIND=1
+       S2%ECOL19%A%R(1)=ABSOLUTE_APERTURE
+       S2%ECOL19%A%R(2)=ABSOLUTE_APERTURE
+    ENDIF
 
     IF(MADX) then
        s2%fint=s1%FINT
@@ -2936,7 +2946,7 @@ CONTAINS
     endif
     if(brho<0) then
        brho=-brho
-       p0c=SQRT(BRHO**2*(cl/ten)**2)
+       p0c=BRHO*(cl/ten)    !SQRT(BRHO**2*(cl/ten)**2)
     endif
     if(beta0<0) then
        beta0=-beta0
@@ -2962,8 +2972,8 @@ CONTAINS
     write(W_P%C(3),'(A7,G20.14)') ' gamma ',gamma
     write(W_P%C(4),'(A7,G20.14)')' beta0 ',BETa0
     CON=three*CU*CGAM*HBC/two*TWOPII/XMC2**3
-    CRAD=CGAM*ERG**3*TWOPII
-    CFLUC=CON*ERG**5
+    CRAD=CGAM*TWOPII   !*ERG**3
+    CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     BRHO=SQRT(ERG**2-XMC2**2)*ten/cl
     write(W_P%C(5),'(A7,G20.14)') ' p0c = ',p0c
@@ -3317,31 +3327,32 @@ CONTAINS
 
     call kanalnummer(mf)
     open(unit=mf,file=file_fitted)
-    read(mf,*) nst,L,ANGLE, ORDER,REPEAT
+    read(mf,*) nst,L,hc, ORDER,REPEAT
     if(present(no)) order=no
     CALL INIT(ORDER,2)
     CALL ALLOC(B)
     CALL ALLOC(ax)
     CALL ALLOC(ay)
 
+    IF(REPEAT.AND.NST==0) NST=NSTD
 
     ALLOCATE(T_E(NST),T_ax(NST),T_ay(NST))
 
     DO I=1,NST
        IF(I==1.or.(.not.repeat)) THEN
           CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
-          CALL READ(Ax(1),mf);CALL READ(Ay(1),mf);CALL READ(Ax(2),mf);CALL READ(Ay(2),mf);
+          !          CALL READ(Ax(1),mf);CALL READ(Ay(1),mf);CALL READ(Ax(2),mf);CALL READ(Ay(2),mf);
+          B(1)=B(1)/BRHO
+          B(2)=B(2)/BRHO
+          B(3)=B(3)/BRHO
+          Ax(1)=Ax(1)/BRHO
+          Ax(2)=Ax(2)/BRHO
+          Ay(1)=Ay(1)/BRHO
+          Ay(2)=Ay(2)/BRHO
        ENDIF
-       B(1)=B(1)/BRHO
-       B(2)=B(2)/BRHO
-       B(3)=B(3)/BRHO
-       Ax(1)=Ax(1)/BRHO
-       Ax(2)=Ax(2)/BRHO
-       Ay(1)=Ay(1)/BRHO
-       Ay(2)=Ay(2)/BRHO
        CALL SET_TREE_g(T_E(i),B)
-       CALL SET_TREE_g(T_ax(i),ax)
-       CALL SET_TREE_g(T_ay(i),ay)
+       !       CALL SET_TREE_g(T_ax(i),ax)
+       !       CALL SET_TREE_g(T_ay(i),ay)
     enddo
     call KILL(B)
     CALL KILL(ax)
@@ -3350,12 +3361,11 @@ CONTAINS
     close(MF)
 
 
-
-    HC=ANGLE/L
+    ANGLE=L*HC
 
 
     !    IF(ANG/=zero.AND.R/=zero) THEN
-    if(hc>zero) then
+    if(hc/=zero) then
        arbitrary_tilt%LC=two*SIN(ANGLE/two)/hc
     else
        arbitrary_tilt%LC=L
@@ -3376,7 +3386,11 @@ CONTAINS
        arbitrary_tilt%NAME=NAME
     ENDIF
 
-    arbitrary_tilt%nst=NST
+    IF(NST<3.OR.MOD(NST,2)/=1) THEN
+       WRITE(6,*) "NUMBER OF SLICES IN 'arbitrary'  MUST BE ODD AND >= 3 ",NST
+       STOP 101
+    ENDIF
+    arbitrary_tilt%nst=(NST-1)/2
     arbitrary_tilt%KIND=KINDPA
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN

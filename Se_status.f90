@@ -193,6 +193,18 @@ module S_status
 
 CONTAINS
 
+  real(dp) function cradf(p)
+    implicit none
+    type (MAGNET_CHART), pointer:: P
+    cradf=crad*p%p0c**3
+  end function cradf
+
+  real(dp) function cflucf(p)
+    implicit none
+    type (MAGNET_CHART), pointer:: P
+    cflucf=cfluc*p%p0c**5
+  end function cflucf
+
 
   SUBROUTINE  NULL_A(p)
     implicit none
@@ -445,8 +457,9 @@ CONTAINS
     USE   definition
     USE   da_arrays
     IMPLICIT NONE
-    LOGICAL(lp) particle
+    LOGICAL(lp) particle,verb
     integer i
+
     W_P=>W_I
 
 
@@ -524,6 +537,7 @@ CONTAINS
     enddo
     !  SECTOR_B AND SECTOR_NMUL FOR TYPE TEAPOT
     IF(SECTOR_NMUL>0.and.firsttime_coef) THEN
+       verb=global_verbose
        global_verbose=.false.
        if(firsttime_coef.or.(.not.allocated(S_B))) then
           !          SECTOR_B%firsttime=0   !slightly unsafe
@@ -550,6 +564,7 @@ CONTAINS
     ENDIF
 
     call clear_states
+    global_verbose=verb
 
   END  SUBROUTINE MAKE_STATES_0
 

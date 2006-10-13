@@ -7,12 +7,12 @@ module ptc_multiparticle
   PRIVATE INTER_CAV_TRAV,ADJUST_WI
   PRIVATE INTER_DRIFT1,INTER_dkd2,INTER_KICKT3,INTER_CAV4,INTER_SOL5,INTER_KTK,INTER_TEAPOT &
        ,INTER_STREX,INTER_SOLT,INTER_NSMI,INTER_SSMI,INTER_MON_11_14,INTER_ESEPTUM,INTER_RCOL18 &
-       ,INTER_ECOL19,INTER_WI
+       ,INTER_ECOL19,INTER_WI,INTER_TKTF
   PRIVATE INTEP_DRIFT1,INTEP_dkd2,INTEP_KICKT3,INTEP_CAV4,INTEP_SOL5,INTEP_KTK,INTEP_TEAPOT &
        ,INTEP_STREX,INTEP_SOLT,INTEP_NSMI,INTEP_SSMI,INTEP_MON_11_14,INTEP_ESEPTUM,INTEP_RCOL18 &
-       ,INTEP_ECOL19,INTEP_WI
-  PRIVATE TRACK_THIN_LAYOUT_1,TRACK_THIN_LAYOUT_12,TRACK_LAYOUT_12,TRACK_LAYOUT_S12
-  INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2,CASE3=3
+       ,INTEP_ECOL19,INTEP_WI,INTEp_TKTF
+  PRIVATE TRACK_NODE_LAYOUT_S1,TRACK_NODE_LAYOUT_S12,TRACK_LAYOUT_ONE_12,TRACK_NODE_LAYOUT_S
+  INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2  !,CASE3=3
   INTEGER, PRIVATE :: TOTALPATH_FLAG
   integer :: index =0
   CHARACTER*27 CASE_NAME(-2:3)
@@ -22,9 +22,12 @@ module ptc_multiparticle
   PRIVATE FRINGER_CAV4,FRINGEP_CAV4,fringeR_STRAIGHT,fringeP_STRAIGHT
   PRIVATE fringer_STREX,fringep_STREX,fringer_TEAPOT,fringeP_TEAPOT
   PRIVATE FRINGER_CAV_TRAV,FRINGEP_CAV_TRAV
-  PRIVATE TRACKR_THIN_SINGLE,TRACKP_THIN_SINGLE
+  PRIVATE TRACKR_NODE_SINGLE,TRACKP_NODE_SINGLE
   PRIVATE ADJUST_TIME_CAV4,ADJUSTR_TIME_CAV4,ADJUSTP_TIME_CAV4
-  private DRIFTr_BACK_TO_POSITION,DRIFTp_BACK_TO_POSITION,DRIFT_BACK_TO_POSITION
+  private DRIFTr_BACK_TO_POSITION,DRIFTp_BACK_TO_POSITION,DRIFT_BACK_TO_POSITION,DRIFT_BEAM_BACK_TO_POSITION
+  PRIVATE TRACK_LAYOUT_XR_12,TRACK_LAYOUT_XP_12
+  PRIVATE ADJUSTR_PANCAKE,ADJUSTP_PANCAKE,ADJUST_PANCAKE,INTER_PANCAKE,INTEP_PANCAKE
+  private MAKE_NODE_LAYOUT_2,DRIFT_TO_TIME
 
   INTERFACE ADJUST_WI
      MODULE PROCEDURE ADJUSTR_WI
@@ -45,6 +48,13 @@ module ptc_multiparticle
      MODULE PROCEDURE ADJUSTR_TIME_CAV_TRAV_OUT
      MODULE PROCEDURE ADJUSTP_TIME_CAV_TRAV_OUT
   END INTERFACE
+
+  INTERFACE ADJUST_PANCAKE
+     MODULE PROCEDURE ADJUSTR_PANCAKE
+     MODULE PROCEDURE ADJUSTP_PANCAKE
+  END INTERFACE
+
+
 
   INTERFACE TRACK_FIBRE_FRONT
      MODULE PROCEDURE TRACK_FIBRE_FRONTR
@@ -76,6 +86,7 @@ module ptc_multiparticle
      MODULE PROCEDURE INTER_RCOL18
      MODULE PROCEDURE INTER_ECOL19
      MODULE PROCEDURE INTER_WI
+     MODULE PROCEDURE INTER_PANCAKE
 
      MODULE PROCEDURE INTEP_DRIFT1
      MODULE PROCEDURE INTEP_dkd2
@@ -95,6 +106,7 @@ module ptc_multiparticle
      MODULE PROCEDURE INTEP_RCOL18
      MODULE PROCEDURE INTEP_ECOL19
      MODULE PROCEDURE INTEP_WI
+     MODULE PROCEDURE INTEP_PANCAKE
   END INTERFACE
 
   INTERFACE TRACK_FRINGE
@@ -110,26 +122,37 @@ module ptc_multiparticle
      MODULE PROCEDURE FRINGEP_CAV_TRAV
   END INTERFACE
 
-  INTERFACE TRACK_THIN_SINGLE
-     MODULE PROCEDURE TRACKR_THIN_SINGLE
-     MODULE PROCEDURE TRACKP_THIN_SINGLE
+  INTERFACE TRACK_NODE_SINGLE
+     MODULE PROCEDURE TRACKR_NODE_SINGLE
+     MODULE PROCEDURE TRACKP_NODE_SINGLE
   END INTERFACE
 
-  INTERFACE TRACK_THIN_LAYOUT_S
-     MODULE PROCEDURE TRACK_THIN_LAYOUT_12
-     MODULE PROCEDURE TRACK_THIN_LAYOUT_1
+  !  INTERFACE TRACK
+  !     MODULE PROCEDURE TRACKR_NODE_SINGLE
+  !     MODULE PROCEDURE TRACKP_NODE_SINGLE
+  !  END INTERFACE
+
+  INTERFACE TRACK_NODE_LAYOUT_S
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_S12
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_S1
   END INTERFACE
 
 
-  INTERFACE TRACK_LAYOUT_USING_THIN_S
-     MODULE PROCEDURE TRACK_LAYOUT_12
-     MODULE PROCEDURE TRACK_LAYOUT_S12
+  INTERFACE TRACK_LAYOUT_USING_NODE_S
+     MODULE PROCEDURE TRACK_LAYOUT_XV_12
+     MODULE PROCEDURE TRACK_LAYOUT_XR_12
+     MODULE PROCEDURE TRACK_LAYOUT_XP_12
+     MODULE PROCEDURE TRACK_LAYOUT_ONE_12
+     !     MODULE PROCEDURE TRACK_LAYOUT_S12
   END INTERFACE
 
   INTERFACE TRACK
-     MODULE PROCEDURE TRACK_LAYOUT_12
-     MODULE PROCEDURE TRACK_LAYOUT_S12
-     MODULE PROCEDURE TRACK_THIN_T
+     MODULE PROCEDURE TRACK_LAYOUT_XV_12
+     MODULE PROCEDURE TRACK_LAYOUT_XR_12
+     MODULE PROCEDURE TRACK_LAYOUT_XP_12
+     MODULE PROCEDURE TRACK_LAYOUT_ONE_12
+     !     MODULE PROCEDURE TRACK_LAYOUT_S12
+     MODULE PROCEDURE TRACK_NODE_T
   END INTERFACE
 
   INTERFACE COPY
@@ -143,6 +166,20 @@ module ptc_multiparticle
      MODULE PROCEDURE fuzzy_neq
   END INTERFACE
 
+  type three_d_info
+     !   character(nlp),pointer :: name
+     real(dp)  a(3),b(3)   ! Centre of entrance and exit faces
+     real(dp)  ent(3,3),exi(3,3)  ! entrace and exit frames for drawing magnet faces
+     real(dp)  wx,wy ! width of box for plotting purposes
+     real(dp)  o(3),mid(3,3)   ! frames at the point of tracking
+     real(dp)  reference_ray(6)  !
+     real(dp) x(6)   ! ray tracked with reference_ray using a  type(beam)
+     real(dp) r0(3),r(3)  ! ray position global returned
+     real(dp) scale     !  magnification using reference_ray
+     logical(lp) u(2)   ! unstable flag for both ray and reference_ray
+  END type three_d_info
+
+  real :: ttime0,ttime1,dt1=0.0,dt2=0.0;
 
 CONTAINS
 
@@ -166,10 +203,10 @@ CONTAINS
 
   end FUNCTION fuzzy_neq
 
-  SUBROUTINE move_to_s( L,s,current,i,ds ) ! Moves current to the i^th position
+  SUBROUTINE move_to_s( L,s,current,i,ds ) ! Moves position s
     implicit none
-    TYPE (THIN_LENS), POINTER :: Current
-    TYPE (THIN_layout) L
+    TYPE (INTEGRATION_NODE), POINTER :: Current
+    TYPE (NODE_LAYOUT) L
     real(dp) s,sp,ds
     integer i,k
     logical(lp) DOIT !,track_it
@@ -2036,24 +2073,43 @@ CONTAINS
 
   END SUBROUTINE INTEP_KTK
 
-  SUBROUTINE INTER_TKTF(EL,X)
+  SUBROUTINE INTER_TKTF(EL,X,pos_in_fibre)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(TKTF),INTENT(INOUT):: EL
-    INTEGER I
+    INTEGER I,pos_in_fibre
     real(dp) DK,DK2,DK6,DK4,DK5
 
 
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       DK=EL%L/EL%P%NST
+       DK2=two*dk
+
+
+       if(mod(pos_in_fibre,2)==1) then
+          CALL PUSHTKT7(EL,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL KICKTKT7(EL,DK2,X)
+          CALL KICKPATH(EL,DK,X)
+       else
+          CALL PUSHTKT7(EL,X)
+       endif
+
     CASE(2)
        DK2=EL%L/EL%P%NST
        DK=DK2/two
 
+       !       CALL KICKTKT7(EL,DK2,X)
+       !       CALL KICKPATH(EL,DK2,X)
+       !       CALL PUSHTKT7(EL,X)
+       !       CALL KICKPATH(EL,DK2,X)
+       !       CALL KICKTKT7(EL,DK2,X)
+
        CALL PUSHTKT7(EL,X)
        CALL KICKPATH(EL,DK,X)
        CALL KICKTKT7(EL,DK2,X)
-
        CALL KICKPATH(EL,DK,X)
        CALL PUSHTKT7(EL,X)
 
@@ -2114,16 +2170,32 @@ CONTAINS
 
   END SUBROUTINE INTER_TKTF
 
-  SUBROUTINE INTEP_TKTF(EL,X)
+  SUBROUTINE INTEP_TKTF(EL,X,pos_in_fibre)
     IMPLICIT NONE
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(TKTFP),INTENT(INOUT):: EL
-    INTEGER I
+    INTEGER I,pos_in_fibre
     TYPE(REAL_8) DK,DK2,DK6,DK4,DK5
 
 
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       CALL ALLOC(DK,DK2)
+       DK=EL%L/EL%P%NST
+       DK2=two*dk
+
+
+       if(mod(pos_in_fibre,2)==1) then
+          CALL PUSHTKT7(EL,X)
+          CALL KICKPATH(EL,DK,X)
+          CALL KICKTKT7(EL,DK2,X)
+          CALL KICKPATH(EL,DK,X)
+       else
+          CALL PUSHTKT7(EL,X)
+       endif
+
+       CALL KILL(DK,DK2)
     CASE(2)
        CALL ALLOC(DK,DK2)
 
@@ -2133,9 +2205,9 @@ CONTAINS
        CALL PUSHTKT7(EL,X)
        CALL KICKPATH(EL,DK,X)
        CALL KICKTKT7(EL,DK2,X)
-
        CALL KICKPATH(EL,DK,X)
        CALL PUSHTKT7(EL,X)
+
 
        CALL KILL(DK,DK2)
 
@@ -2846,6 +2918,69 @@ CONTAINS
 
   END SUBROUTINE INTEP_ESEPTUM
 
+  SUBROUTINE INTER_PANCAKE(EL,X,POS)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+    INTEGER I,IS,POS
+    real(dp) ti,h
+
+    H=el%L/el%p%NST
+
+    SELECT CASE(EL%P%METHOD)
+    CASE(4)
+       IF(EL%P%DIR==1) THEN
+          IS=-5+2*POS    ! POS=3 BEGINNING
+          call rk4_m(IS,h,el,X)
+       else
+          IS=el%p%NST-2*POS+6
+          call rk4_m(IS,h,el,X)
+       ENDIF
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
+
+
+  END SUBROUTINE INTER_PANCAKE
+
+  SUBROUTINE INTEP_PANCAKE(EL,X,POS)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(PANCAKEP),INTENT(INOUT):: EL
+    INTEGER I,IS,POS
+    TYPE(REAL_8) ti,h
+
+    CALL ALLOC(TI,H)
+
+    H=el%L/el%p%NST
+
+    SELECT CASE(EL%P%METHOD)
+    CASE(4)
+       IF(EL%P%DIR==1) THEN
+          IS=-5+2*POS    ! POS=3 BEGINNING
+          call rk4_m(IS,h,el,X)
+       else
+          IS=el%p%NST-2*POS+6
+          call rk4_m(IS,h,el,X)
+       ENDIF
+
+    CASE DEFAULT
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1(1X,A72))'
+       WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
+       call write_e(357)
+    END SELECT
+
+    CALL KILL(TI,H)
+
+  END SUBROUTINE INTEP_PANCAKE
+
   SUBROUTINE INTER_CAV_TRAV(EL,X,Z)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
@@ -3010,6 +3145,39 @@ CONTAINS
 
   END SUBROUTINE INTEP_WI
 
+  SUBROUTINE ADJUSTR_PANCAKE(EL,X,J)
+    IMPLICIT NONE
+    real(dp), INTENT(INOUT) :: X(6)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+
+    INTEGER, INTENT(IN) :: J
+    INTEGER I
+
+    IF(J==1) then
+       call conv_to_xp(el,x)
+    else
+       call conv_to_px(el,x)
+    endif
+
+  END SUBROUTINE ADJUSTR_PANCAKE
+
+  SUBROUTINE ADJUSTP_PANCAKE(EL,X,J)
+    IMPLICIT NONE
+    TYPE(REAL_8), INTENT(INOUT) :: X(6)
+    TYPE(PANCAKEP),INTENT(INOUT):: EL
+
+    INTEGER, INTENT(IN) :: J
+    INTEGER I
+
+    IF(J==1) then
+       call conv_to_xp(el,x)
+    else
+       call conv_to_px(el,x)
+    endif
+
+  END SUBROUTINE ADJUSTP_PANCAKE
+
+
   SUBROUTINE ADJUSTR_WI(EL,X,J)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
@@ -3053,7 +3221,8 @@ CONTAINS
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     real(dp), INTENT(INOUT) :: X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
@@ -3068,7 +3237,6 @@ CONTAINS
     !       C%MAG%P%CHARGE=>CHARGE1
     !    endif
     !
-
 
     !FRONTAL PATCH
     IF(ASSOCIATED(C%PATCH)) THEN
@@ -3132,7 +3300,8 @@ CONTAINS
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
@@ -3215,7 +3384,8 @@ CONTAINS
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     real(dp), INTENT(INOUT) :: X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
@@ -3277,7 +3447,8 @@ CONTAINS
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     type(real_8), INTENT(INOUT) :: X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
@@ -3333,25 +3504,38 @@ CONTAINS
 
   ! thin lens tracking
 
-  SUBROUTINE TRACKR_THIN_SINGLE(T,X,K,CHARGE)
+  SUBROUTINE TRACKR_NODE_SINGLE(T,X,K,CHARGE)
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
     implicit none
-    TYPE(THIN_LENS), TARGET, INTENT(INOUT):: T
+    TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT):: T
     REAL(DP),INTENT(INOUT):: X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
-    INTEGER, TARGET :: CHARGE
+    INTEGER, optional, TARGET :: CHARGE
+    integer, target :: CHARGE1
     INTEGER I
 
+    ! call cpu_time(ttime0)
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
        CHECK_STABLE=.false.
     endif
 
+
     T%PARENT_FIBRE%MAG=K
     T%PARENT_FIBRE%MAG%P%DIR=>T%PARENT_FIBRE%DIR
-    T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE
-    if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+    if(present(charge))  then
+       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE
+    else
+       charge1=1
+       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE1
+    endif
+
+    !call cpu_time(ttime1)
+
+    !dt1=ttime1-ttime0+dt1
+
 
     SELECT CASE(T%CAS)
     CASE(CASEP1)
@@ -3390,12 +3574,15 @@ CONTAINS
           CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDWIGGLER)
           CALL ADJUST_WI(EL%WI,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+       case(KINDPA)
+          CALL ADJUST_PANCAKE(EL%PA,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 666
        END SELECT
 
     CASE(CASE0)
+       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
        el=>T%PARENT_FIBRE%MAG
        SELECT CASE(EL%KIND)
        CASE(KIND0)
@@ -3412,7 +3599,7 @@ CONTAINS
        case(KIND6)
           CALL TRACK_SLICE(EL%T6,X)
        case(KIND7)
-          CALL TRACK_SLICE(EL%T7,X)
+          CALL TRACK_SLICE(EL%T7,X,t%pos_in_fibre)
        case(KIND8)
           CALL TRACK_SLICE(EL%S8,X)
        case(KIND9)
@@ -3435,6 +3622,8 @@ CONTAINS
           CALL TRACK_SLICE(EL%CAV21,X,T%S(2))
        case(KINDWIGGLER)
           CALL TRACK_SLICE(EL%WI,X,T%S(2))
+       case(KINDPA)
+          CALL TRACK_SLICE(EL%PA,X,T%POS_IN_FIBRE)
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
@@ -3446,24 +3635,172 @@ CONTAINS
     END SELECT
     T%PARENT_FIBRE%MAG=DEFAULT
 
-  END SUBROUTINE TRACKR_THIN_SINGLE
+  END SUBROUTINE TRACKR_NODE_SINGLE
 
-  SUBROUTINE TRACKP_THIN_SINGLE(T,X,K,CHARGE)
+  SUBROUTINE TRACKR_NODE_SINGLE_orbit(T,X,K,CHARGE)
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
     implicit none
-    TYPE(THIN_LENS), TARGET, INTENT(INOUT):: T
-    TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    type(elementp),pointer :: el
+    TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT):: T
+    REAL(DP),INTENT(INOUT):: X(6)
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    type(element),pointer :: el
     INTEGER, TARGET :: CHARGE
+    integer, target :: CHARGE1
     INTEGER I
+
+    ! call cpu_time(ttime0)
+
+
+    !    T%PARENT_FIBRE%MAG=K
+    !!   T%PARENT_FIBRE%MAG%P%DIR=>T%PARENT_FIBRE%DIR    only standard lattice
+    !    if(present(charge))  then
+    !!    T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE            only standard lattice
+
+    !    else
+    !       charge1=1
+    !      T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE1
+    !    endif
+
+    !call cpu_time(ttime1)
+
+    !dt1=ttime1-ttime0+dt1
+
+
+    SELECT CASE(T%CAS)
+    CASE(CASEP1)
+       if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+          CHECK_STABLE=.false.
+       endif
+       if((T%PARENT_FIBRE%mag%mis)) CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
+    CASE(CASEP2)
+       if((T%PARENT_FIBRE%mag%mis)) CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
+
+    CASE(CASE1,CASE2)
+       el=>T%PARENT_FIBRE%MAG
+       SELECT CASE(EL%KIND)
+       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
+       case(KIND2)
+          CALL TRACK_FRINGE(EL=EL%K2,X=X,J=T%CAS)
+       case(KIND4)
+          IF(T%CAS==CASE1) THEN
+             CALL ADJUST_TIME_CAV4(EL%C4,X,1)
+             CALL TRACK_FRINGE(EL%C4,X,J=1)
+          ELSE
+             CALL TRACK_FRINGE(EL%C4,X,J=2)
+             CALL ADJUST_TIME_CAV4(EL%C4,X,2)
+          ENDIF
+       case(KIND5)
+          CALL TRACK_FRINGE(EL5=EL%S5,X=X,J=T%CAS)
+       case(KIND6)
+          CALL TRACK_FRINGE(EL6=EL%T6,X=X,J=T%CAS)
+       case(KIND7)
+          CALL TRACK_FRINGE(EL7=EL%T7,X=X,J=T%CAS)
+       case(KIND10)
+          CALL TRACK_FRINGE(EL%TP10,X,T%CAS)
+       case(KIND16,KIND20)
+          CALL TRACK_FRINGE(EL%K16,X,T%CAS)
+       case(KIND17)
+          CALL TRACK_FRINGE(EL17=EL%S17,X=X,J=T%CAS)
+       case(KIND21)
+          CALL TRACK_FRINGE(EL%CAV21,X=X,J=T%CAS)
+          CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+       case(KINDWIGGLER)
+          CALL ADJUST_WI(EL%WI,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+       case(KINDPA)
+          CALL ADJUST_PANCAKE(EL%PA,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+       CASE DEFAULT
+          WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
+          stop 666
+       END SELECT
+
+    CASE(CASE0)
+       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+       el=>T%PARENT_FIBRE%MAG
+       SELECT CASE(EL%KIND)
+       CASE(KIND0)
+       case(KIND1)
+          CALL TRACK_SLICE(EL%D0,X)
+       case(KIND2)
+          CALL TRACK_SLICE(EL%K2,X)
+       case(KIND3)
+          CALL TRACK_SLICE(EL%K3,X)
+       case(KIND4)
+          CALL TRACK_SLICE(EL%C4,X)
+       case(KIND5)
+          CALL TRACK_SLICE(EL%S5,X)
+       case(KIND6)
+          CALL TRACK_SLICE(EL%T6,X)
+       case(KIND7)
+          CALL TRACK_SLICE(EL%T7,X,t%pos_in_fibre)
+       case(KIND8)
+          CALL TRACK_SLICE(EL%S8,X)
+       case(KIND9)
+          CALL TRACK_SLICE(EL%S9,X)
+       case(KIND10)
+          CALL TRACK_SLICE(EL%TP10,X)
+       case(KIND11:KIND14)
+          CALL TRACK_SLICE(EL%MON14,X)
+       case(KIND15)
+          CALL TRACK_SLICE(EL%SEP15,X)
+       case(KIND16,KIND20)
+          CALL TRACK_SLICE(EL%K16,X)
+       case(KIND17)
+          CALL TRACK_SLICE(EL%S17,X)
+       case(KIND18)
+          CALL TRACK_SLICE(EL%RCOL18,X)
+       case(KIND19)
+          CALL TRACK_SLICE(EL%ECOL19,X)
+       case(KIND21)
+          CALL TRACK_SLICE(EL%CAV21,X,T%S(2))
+       case(KINDWIGGLER)
+          CALL TRACK_SLICE(EL%WI,X,T%S(2))
+       case(KINDPA)
+          CALL TRACK_SLICE(EL%PA,X,T%POS_IN_FIBRE)
+       CASE DEFAULT
+          WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
+          stop 999
+       END SELECT
+
+       ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
+
+
+    END SELECT
+    !    T%PARENT_FIBRE%MAG=DEFAULT
+
+  END SUBROUTINE TRACKR_NODE_SINGLE_orbit
+
+  SUBROUTINE TRACKP_NODE_SINGLE(T,X,K,CHARGE)
+    ! This routines tracks a single thin lens
+    ! it is supposed to reproduce plain PTC
+    implicit none
+    TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT):: T
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    type(elementp),pointer :: el
+    INTEGER, optional, TARGET :: CHARGE
+    integer, target :: CHARGE1
+    INTEGER I
+    logical(lp) BN2,L
+    logical(lp) CHECK_KNOB
+    logical(lp), ALLOCATABLE,dimension(:)::AN,BN
 
 
     T%PARENT_FIBRE%MAGP=K
+    IF(K%PARA_IN ) KNOB=.TRUE.
+
     T%PARENT_FIBRE%MAGP%P%DIR=>T%PARENT_FIBRE%DIR
+
+    if(present(charge))  then
+       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE
+    else
+       charge1=1
+       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE1
+    endif
     T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE
-    if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
+
 
     SELECT CASE(T%CAS)
     CASE(CASEP1)
@@ -3502,12 +3839,15 @@ CONTAINS
           CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDWIGGLER)
           CALL ADJUST_WI(EL%WI,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+       case(KINDPA)
+          CALL ADJUST_PANCAKE(EL%PA,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 666
        END SELECT
 
     CASE(CASE0)
+       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
        el=>T%PARENT_FIBRE%MAGP
        SELECT CASE(EL%KIND)
        CASE(KIND0)
@@ -3524,12 +3864,47 @@ CONTAINS
        case(KIND6)
           CALL TRACK_SLICE(EL%T6,X)
        case(KIND7)
-          CALL TRACK_SLICE(EL%T7,X)
+          IF((EL%T7%BN(2)%KIND==3.OR.EL%T7%L%KIND==3).AND.KNOB) THEN
+             CALL GETMAT7(EL%T7)                                      ! RECOMPUTES ONLY IF KNOB (SPEED)
+          ENDIF
+          CALL TRACK_SLICE(EL%T7,X,t%pos_in_fibre)
+          IF(KNOB) THEN
+             BN2=.FALSE.
+             L=.FALSE.
+             IF(EL%T7%BN(2)%KIND==3) THEN
+                BN2=.TRUE.
+             ENDIF
+             IF(EL%T7%L%KIND==3) THEN
+                L=.TRUE.
+             ENDIF
+             IF(BN2.OR.L) THEN
+                EL%T7%BN(2)%KIND=1
+                EL%T7%L%KIND=1
+                CALL KILL(EL%T7)                               ! RECOMPUTES ONLY IF KNOB (SPEED)
+                CALL ALLOC(EL%T7)                               ! KNOB IS REMOVED THE SLOW WAY(SPEED)
+                CALL GETMAT7(EL%T7)
+                IF(BN2) EL%T7%BN(2)%KIND=3
+                IF(L)  EL%T7%L%KIND=3
+             ENDIF
+          ENDIF
        case(KIND8)
           CALL TRACK_SLICE(EL%S8,X)
        case(KIND9)
           CALL TRACK_SLICE(EL%S9,X)
        case(KIND10)
+          IF(KNOB) THEN
+             CALL CHECKPOTKNOB(EL%TP10,CHECK_KNOB) ! RECOMPUTES ONLY IF KNOB (SPEED)
+             IF(CHECK_KNOB) THEN
+                ALLOCATE(AN(EL%TP10%P%NMUL),BN(EL%TP10%P%NMUL))
+                DO I=1,EL%TP10%P%NMUL
+                   BN(I)=.FALSE.
+                   AN(I)=.FALSE.
+                   IF(EL%TP10%BN(I)%KIND==3) BN(I)=.TRUE.
+                   IF(EL%TP10%AN(I)%KIND==3) AN(I)=.TRUE.
+                ENDDO
+                call GETANBN(EL%TP10)
+             ENDIF
+          ENDIF
           CALL TRACK_SLICE(EL%TP10,X)
        case(KIND11:KIND14)
           CALL TRACK_SLICE(EL%MON14,X)
@@ -3547,6 +3922,8 @@ CONTAINS
           CALL TRACK_SLICE(EL%CAV21,X,T%S(2))
        case(KINDWIGGLER)
           CALL TRACK_SLICE(EL%WI,X,T%S(2))
+       case(KINDPA)
+          CALL TRACK_SLICE(EL%PA,X,T%POS_IN_FIBRE)
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
@@ -3556,21 +3933,27 @@ CONTAINS
 
 
     END SELECT
+
     T%PARENT_FIBRE%MAGP=DEFAULT
+    ! KNOB IS RETURNED TO THE PTC DEFAULT
+    ! NEW STUFF WITH KIND=3
+    KNOB=.FALSE.
+    ! END NEW STUFF WITH KIND=3
 
-  END SUBROUTINE TRACKP_THIN_SINGLE
+  END SUBROUTINE TRACKP_NODE_SINGLE
 
 
-  SUBROUTINE TRACK_THIN_SINGLE_FOR_time(B,I,DT,K)
+  SUBROUTINE TRACK_NODE_SINGLE_FOR_time(B,I,DT,K)
     ! Tracks a single particle "I" of the beam for a time DT
-    ! The particle is a location defined by the thin lens B%POS(I)%THINLENS
+    ! The particle is a location defined by the thin lens B%POS(I)%NODE
     ! and located B%X(I,7) metres in from of that thin lens
     implicit none
-    TYPE(THIN_LENS), POINTER:: T
+    TYPE(INTEGRATION_NODE), POINTER:: T
     TYPE(BEAM),INTENT(INOUT):: B
     REAL(DP), INTENT(IN) :: DT
     REAL(DP) X(6),XT(6),DT0,YL,DT_BEFORE
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
     LOGICAL(LP) END_OF_LINE
     INTEGER I
@@ -3580,7 +3963,7 @@ CONTAINS
     IF(B%U(i)) RETURN
 
     X=BEAM_IN_X(B,I)
-    T=>B%POS(I)%THINLENS
+    T=>B%POS(I)%NODE
     T%PARENT_FIBRE%MAG=K
     T%PARENT_FIBRE%MAG%P%DIR=>T%PARENT_FIBRE%DIR
     T%PARENT_FIBRE%MAG%P%CHARGE=>B%CHARGE
@@ -3598,7 +3981,7 @@ CONTAINS
        DT_BEFORE=DT0
        !         WRITE(6,*) " POS ",T%s(1),t%pos_in_fibre
        !         WRITE(6,*) " POS ",T%POS,T%CAS,T%PARENT_FIBRE%MAG%NAME
-       CALL TRACK_THIN_SINGLE(T,X,K,B%CHARGE)
+       CALL TRACK_NODE_SINGLE(T,X,K,B%CHARGE)
        DT0=DT0+(X(6)-XT(6))
        T=>T%NEXT
        IF(.NOT.ASSOCIATED(T%NEXT)) THEN
@@ -3609,117 +3992,344 @@ CONTAINS
 
     IF(.NOT.END_OF_LINE) THEN
        IF(DT0/=DT) THEN
-          B%POS(I)%THINLENS=>T%PREVIOUS
+          B%POS(I)%NODE=>T%PREVIOUS
           X=XT
           DT0=DT-DT_BEFORE
           !           WRITE(6,*) " DT0 ", DT0
           CALL DRIFT_TO_TIME(T,YL,DT0,X)
        ELSE
-          B%POS(I)%THINLENS=>T
+          B%POS(I)%NODE=>T
        ENDIF
     ELSE
 
 
        IF(DT0<DT) THEN
-          B%POS(I)%THINLENS=>T%PREVIOUS
+          B%POS(I)%NODE=>T%PREVIOUS
           X=XT
           DT0=DT-DT_BEFORE
           CALL DRIFT_TO_TIME(T,YL,DT0,X)
        ELSE
-          B%POS(I)%THINLENS=>T
+          B%POS(I)%NODE=>T
        ENDIF
 
     ENDIF
 
 
 
-    CALL X_IN_BEAM(X,B,I,DL=YL)
+    CALL X_IN_BEAM(B,X,I,DL=YL)
 
 
 
     B%TIME_INSTEAD_OF_S=.TRUE.
 
 
-  END SUBROUTINE TRACK_THIN_SINGLE_FOR_time
+  END SUBROUTINE TRACK_NODE_SINGLE_FOR_time
 
-  SUBROUTINE TRACK_THIN_SINGLE_FOR_S(T,B,K)
+  SUBROUTINE TRACK_NODE_SINGLE_FOR_MAP(T,B,K)
+    ! Tracks a full beam across a map representing several thin lenses
+
+    implicit none
+    TYPE(INTEGRATION_NODE),POINTER :: T
+    TYPE(BEAM),INTENT(INOUT):: B
+    REAL(DP) X(6)
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    type(element),pointer :: el
+    INTEGER I
+
+    !    IF(ASSOCIATED(T%BT)) THEN
+    !       IF(B%BEAM_BEAM) THEN
+    !          CALL BBKICK(b,t)
+    !       ENDIF
+    !    ENDIF
+
+    DO I=1,B%N
+       IF(B%U(i)) CYCLE
+       X=BEAM_IN_X(B,I)
+       X=X-T%ORBIT
+       CALL TRACK(T%TPSA_MAP,X)
+
+       CALL X_IN_BEAM(B,X,I,DL=ZERO,T=T%INTEGRATION_NODE_AFTER_MAP)
+       !       B%POS(I)%NODE=>T%INTEGRATION_NODE_AFTER_MAP
+
+    ENDDO
+
+    IF(ASSOCIATED(B%Y)) THEN
+       DO I=1,6
+          B%Y(I)=B%Y(I)-T%ORBIT(I)
+       ENDDO
+       CALL TRACK(T%TPSA_MAP,B%Y)
+       CALL X_IN_BEAM(B,I=0,T=T%INTEGRATION_NODE_AFTER_MAP)
+       !       B%POS(0)%NODE=>T%INTEGRATION_NODE_AFTER_MAP
+    ENDIF
+
+    B%TIME_INSTEAD_OF_S=.FALSE.
+
+  END SUBROUTINE TRACK_NODE_SINGLE_FOR_MAP
+
+
+
+  SUBROUTINE TRACK_NODE_SINGLE_FOR_S(T,B,K)
     ! Tracks a full beam across a single thin lens
     ! Position of macroparticle put at next thin lens
 
     implicit none
-    TYPE(THIN_LENS),POINTER :: T
+    TYPE(INTEGRATION_NODE),POINTER :: T
     TYPE(BEAM),INTENT(INOUT):: B
     REAL(DP) X(6)
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
     INTEGER I
 
-    IF(ASSOCIATED(T%BT)) THEN
-       IF(B%BEAM_BEAM) THEN
-          CALL BBKICK(b,t)
-       ENDIF
-    ENDIF
+    !    IF(ASSOCIATED(T%BT)) THEN
+    !       IF(B%BEAM_BEAM) THEN
+    !          CALL BBKICK(b,t)
+    !       ENDIF
+    !    ENDIF
 
     DO I=1,B%N
        IF(B%U(i)) CYCLE
        X=BEAM_IN_X(B,I)
 
-       CALL TRACK_THIN_SINGLE(T,X,K,B%CHARGE)
-       CALL X_IN_BEAM(X,B,I,DL=ZERO)
-       B%POS(I)%THINLENS=>T%NEXT
+       CALL TRACK_NODE_SINGLE(T,X,K,B%CHARGE)
+       CALL X_IN_BEAM(B,X,I,DL=ZERO,T=T%NEXT)
+       !       B%POS(I)%NODE=>T%NEXT
 
     ENDDO
 
     IF(ASSOCIATED(B%Y)) THEN
-       CALL TRACK_THIN_SINGLE(T,B%Y,K,B%CHARGE)
-       B%POS(0)%THINLENS=>T%NEXT
+       CALL TRACK_NODE_SINGLE(T,B%Y,K,B%CHARGE)
+       CALL X_IN_BEAM(B,I=0,T=T%NEXT)
+       !       B%POS(0)%NODE=>T%NEXT
     ENDIF
 
     B%TIME_INSTEAD_OF_S=.FALSE.
 
-  END SUBROUTINE TRACK_THIN_SINGLE_FOR_S
+  END SUBROUTINE TRACK_NODE_SINGLE_FOR_S
 
-  SUBROUTINE TRACK_THIN_T(B,DT,K)
+  SUBROUTINE TRACK_NODE_T(B,DT,K)
     ! Tracks to full beam for a time DT
     ! All the particles are at different locations
     ! Notice that the layout is hidden: this is consistant with time tracking
     ! Magnets are not ontological objects
+    ! calls TRACK_NODE_SINGLE_FOR_time
 
     implicit none
     TYPE(BEAM),INTENT(INOUT):: B
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     real(dp),INTENT(IN):: DT
 
     INTEGER I
     DO I=1,B%N
        IF(B%U(i)) CYCLE
-       call TRACK_THIN_SINGLE_FOR_time(B,I,DT,K)
+       call TRACK_NODE_SINGLE_FOR_time(B,I,DT,K)
     ENDDO
     B%TIME_INSTEAD_OF_S=.TRUE.
 
-  END SUBROUTINE TRACK_THIN_T
+  END SUBROUTINE TRACK_NODE_T
 
-  SUBROUTINE TRACK_LAYOUT_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2 )
+  SUBROUTINE TRACK_LAYOUT_XV_12( R,V,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE )
     ! Tracks through the thin lens structure R%T of the layout R if it exists.
     ! Several posibilities:
     !1) Pos1 and Pos2 are given :  tracks from thin lens position pos1 to thin lens position pos2
     !2) Thin lens points T1 and T2 are given: Same as above pos1 and pos2 are derived from T1 and T2
     !3) P1 and P2 are fibres: Tracks from the first thin lens of P1 to the first of P2. Results should agree
     !   with plain PTC.
-    !4) P1, IN_P1 and P2 , IN_P2 are give: movies to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
+    !4) P1, IN_P1 and P2 , IN_P2 are give: moves to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
     !  For example, if the input is (P1,1) and (P2,1) the results is same as item #3 (same as plain PTC).
+    !4) POS1_FIBRE and POS2_FIBRE are given: same as standard PTC
 
     ! In all the above cases one can elect to give only the first input. Then it tracks one turn around as in
     ! plain PTC.
-    ! interfaced as TRACK_LAYOUT_USING_THIN_S
+    ! interfaced as TRACK_LAYOUT_USING_NODE_S
+
+    ! V is of type three_d_info: position in 3d space is provided
+
+    implicit none
+    TYPE (LAYOUT), TARGET :: R
+    TYPE(BEAM) B
+    INTEGER, OPTIONAL,INTENT(IN):: POS1,POS2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE
+    TYPE(FIBRE), OPTIONAL,POINTER :: P1,P2
+    TYPE(INTEGRATION_NODE),POINTER, OPTIONAL :: T1,T2
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    REAL(DP) SC,reference_ray(6),x(6)
+    type(three_d_info)  v
+    TYPE(INTEGRATION_NODE),POINTER:: t,mag_in,mag_out
+
+    IF(.NOT.ASSOCIATED(R%T)) THEN
+       WRITE(6,*) " NO THIN LAYOUT: TRACKING IMPOSSIBLE "
+       RETURN
+    ENDIF
+
+    CALL ALLOCATE_BEAM(B,2,MY_FALSE)
+    B%X=ZERO
+    B%X(1,1:6)=V%X
+    B%X(2,1:6)=V%reference_ray
+    x=V%X
+    reference_ray=V%reference_ray
+    CALL TRACK_LAYOUT_ONE_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE )
+
+    V%X=B%X(1,1:6)
+    V%reference_ray=B%X(2,1:6)
+
+    IF(.NOT.ASSOCIATED(B%POS(1)%NODE%B)) THEN
+       WRITE(6,*) " NO FRAMES IN INTEGRATION NODES "
+       STOP 101
+    ENDIF
+    SC=ONE
+    IF(v%SCALE/=zero) SC=v%SCALE
+    t=>B%POS(1)%NODE%previous
+
+    V%r0=t%A+(reference_ray(1)-SC*reference_ray(1))*t%ENT(1,1:3)+ SC*X(1)*t%ENT(1,1:3)
+    V%r0=v%r0+(reference_ray(3)-SC*reference_ray(3))*t%ENT(2,1:3)+ SC*X(3)*t%ENT(2,1:3)
+
+    V%r=t%B+(V%reference_ray(1)-SC*V%reference_ray(1))*t%EXI(1,1:3)+ SC*V%X(1)*t%EXI(1,1:3)
+    V%r=v%r+(V%reference_ray(3)-SC*V%reference_ray(3))*t%EXI(2,1:3)+ SC*V%X(3)*t%EXI(2,1:3)
+    mag_in=>t%previous%parent_fibre%t1%next%next
+    mag_out=>t%previous%parent_fibre%t2%previous%previous
+    v%a=mag_in%a
+    v%ent=mag_in%ent
+    v%b=mag_in%b
+    v%exi=mag_in%exi
+    v%o=t%B
+    v%mid=t%exi
+    v%U=B%U(1:2)
+
+
+
+    IF(MAG_IN%PREVIOUS%CAS/=CASE1) STOP 201
+    IF(MAG_OUT%NEXT%CAS/=CASE2) STOP 202
+
+    CALL KILL_BEAM(B)
+
+  END SUBROUTINE TRACK_LAYOUT_XV_12
+
+  SUBROUTINE TRACK_LAYOUT_XR_12( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE,S1,S2 )
+    ! Tracks through the thin lens structure R%T of the layout R if it exists.
+    ! Several posibilities:
+    !1) Pos1 and Pos2 are given :  tracks from thin lens position pos1 to thin lens position pos2
+    !2) Thin lens points T1 and T2 are given: Same as above pos1 and pos2 are derived from T1 and T2
+    !3) P1 and P2 are fibres: Tracks from the first thin lens of P1 to the first of P2. Results should agree
+    !   with plain PTC.
+    !4) P1, IN_P1 and P2 , IN_P2 are give: moves to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
+    !  For example, if the input is (P1,1) and (P2,1) the results is same as item #3 (same as plain PTC).
+    !4) POS1_FIBRE and POS2_FIBRE are given: same as standard PTC
+
+    ! In all the above cases one can elect to give only the first input. Then it tracks one turn around as in
+    ! plain PTC.
+    ! interfaced as TRACK_LAYOUT_USING_NODE_S
+
+    ! Here a usual trajectory is computed     REAL(DP),INTENT(INOUT):: X(6)
+
+    implicit none
+    TYPE (LAYOUT), TARGET :: R
+    REAL(DP),INTENT(INOUT):: X(6)
+    TYPE(BEAM) B
+    INTEGER, OPTIONAL,INTENT(IN):: POS1,POS2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE
+    TYPE(FIBRE), OPTIONAL,POINTER :: P1,P2
+    TYPE(INTEGRATION_NODE),POINTER, OPTIONAL :: T1,T2
+    REAL(DP), OPTIONAL :: S1,S2
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    LOGICAL(LP) U
+
+    IF(.NOT.ASSOCIATED(R%T)) THEN
+       WRITE(6,*) " NO THIN LAYOUT: TRACKING IMPOSSIBLE "
+       RETURN
+    ENDIF
+
+    CALL ALLOCATE_BEAM(B,1,MY_FALSE)
+    B%X=ZERO
+    B%X(1,1:6)=X
+
+    CALL TRACK_LAYOUT_ONE_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE,S1,S2)
+
+    X=B%X(1,1:6)
+    U=B%U(1)
+
+
+    CALL KILL_BEAM(B)
+
+  END SUBROUTINE TRACK_LAYOUT_XR_12
+
+  SUBROUTINE TRACK_LAYOUT_XP_12( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
+    ! Tracks through the thin lens structure R%T of the layout R if it exists.
+    ! Several posibilities:
+    !1) Pos1 and Pos2 are given :  tracks from thin lens position pos1 to thin lens position pos2
+    !2) Thin lens points T1 and T2 are given: Same as above pos1 and pos2 are derived from T1 and T2
+    !3) P1 and P2 are fibres: Tracks from the first thin lens of P1 to the first of P2. Results should agree
+    !   with plain PTC.
+    !4) P1, IN_P1 and P2 , IN_P2 are give: moves to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
+    !  For example, if the input is (P1,1) and (P2,1) the results is same as item #3 (same as plain PTC).
+    !4) POS1_FIBRE and POS2_FIBRE are given: same as standard PTC
+
+    ! In all the above cases one can elect to give only the first input. Then it tracks one turn around as in
+    ! plain PTC.
+    ! interfaced as TRACK_LAYOUT_USING_NODE_S
+
+    ! Here a usual polymorphic trajectory is computed  TYPE(REAL_8),TARGET,INTENT(INOUT):: X(6)
+
+    implicit none
+    TYPE (LAYOUT), TARGET :: R
+    TYPE(REAL_8),TARGET,INTENT(INOUT):: X(6)
+    TYPE(BEAM) B
+    INTEGER, OPTIONAL,INTENT(IN):: POS1,POS2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE
+    TYPE(FIBRE), OPTIONAL,POINTER :: P1,P2
+    TYPE(INTEGRATION_NODE),POINTER, OPTIONAL :: T1,T2
+    TYPE(INTERNAL_STATE) K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    LOGICAL(LP) U
+
+    IF(.NOT.ASSOCIATED(R%T)) THEN
+       WRITE(6,*) " NO THIN LAYOUT: TRACKING IMPOSSIBLE "
+       RETURN
+    ENDIF
+    CALL ALLOCATE_BEAM(B,1,MY_FALSE)
+    B%X=ZERO
+    B%X(1,1:6)=X
+    B%Y=>X
+
+    CALL TRACK_LAYOUT_ONE_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE )
+
+    U=B%U(0)
+
+    NULLIFY(B%Y)
+
+    CALL KILL_BEAM(B)
+
+  END SUBROUTINE TRACK_LAYOUT_XP_12
+
+
+  SUBROUTINE TRACK_LAYOUT_ONE_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE,S1,S2 )
+    ! Tracks through the thin lens structure R%T of the layout R if it exists.
+    ! Several posibilities:
+    !1) Pos1 and Pos2 are given :  tracks from thin lens position pos1 to thin lens position pos2
+    !2) Thin lens points T1 and T2 are given: Same as above pos1 and pos2 are derived from T1 and T2
+    !3) P1 and P2 are fibres: Tracks from the first thin lens of P1 to the first of P2. Results should agree
+    !   with plain PTC.
+    !4) P1, IN_P1 and P2 , IN_P2 are give: moves to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
+    !  For example, if the input is (P1,1) and (P2,1) the results is same as item #3 (same as plain PTC).
+    !4) POS1_FIBRE and POS2_FIBRE are given: same as standard PTC
+
+    ! In all the above cases one can elect to give only the first input. Then it tracks one turn around as in
+    ! plain PTC.
+    ! interfaced as TRACK_LAYOUT_USING_NODE_S
+
     implicit none
     TYPE (LAYOUT), TARGET :: R
     TYPE(BEAM),INTENT(INOUT):: B
-    INTEGER, OPTIONAL,INTENT(IN):: POS1,POS2,IN_P1,IN_P2
+    INTEGER, OPTIONAL,INTENT(IN):: POS1,POS2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE
     TYPE(FIBRE), OPTIONAL,POINTER :: P1,P2
-    TYPE(THIN_LENS),POINTER, OPTIONAL :: T1,T2
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTEGRATION_NODE),POINTER, OPTIONAL :: T1,T2
+    REAL(DP), OPTIONAL :: S1,S2
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     INTEGER I1,I2
+    TYPE(FIBRE), POINTER :: C
+
     IF(.NOT.ASSOCIATED(R%T)) THEN
        WRITE(6,*) " NO THIN LAYOUT: TRACKING IMPOSSIBLE "
        RETURN
@@ -3729,6 +4339,14 @@ CONTAINS
     IF(PRESENT(POS2)) I2=POS2
     IF(PRESENT(T1))   I1=T1%POS
     IF(PRESENT(T2))   I2=T2%POS
+    IF(PRESENT(POS1_FIBRE)) THEN
+       call move_to(r,c,POS1_FIBRE)
+       I1=C%T1%POS
+    ENDIF
+    IF(PRESENT(POS2_FIBRE)) THEN
+       call move_to(r,c,POS2_FIBRE)
+       I2=C%T1%POS
+    ENDIF
     IF(PRESENT(P1))   I1=P1%T1%POS
     IF(PRESENT(P2))   I2=P2%T1%POS
     IF(PRESENT(IN_P1))I1=I1-1+IN_P1
@@ -3741,18 +4359,22 @@ CONTAINS
 
     IF(I2>0) THEN
        IF(I2<I1) I2=I2+R%T%N
-       CALL TRACK_THIN_LAYOUT_S( R%T,B,I1,I2,K )
+       CALL TRACK_NODE_LAYOUT_S( R%T,B,I1,I2,K )
+    ELSEIF(I1>0) THEN
+       CALL TRACK_NODE_LAYOUT_S( R%T,B,I1,K )
+    ELSEIF(PRESENT(S1).AND.PRESENT(S2)) THEN
+       CALL TRACK_LAYOUT_S12( R,B,K,S1,S2 )
     ELSE
-       CALL TRACK_THIN_LAYOUT_S( R%T,B,I1,K )
+       CALL TRACK_LAYOUT_S12( R,B,K,S1 )
     ENDIF
     B%TIME_INSTEAD_OF_S=.FALSE.
-  END SUBROUTINE TRACK_LAYOUT_12
+  END SUBROUTINE TRACK_LAYOUT_ONE_12
 
   SUBROUTINE TRACK_LAYOUT_S12( R,B,K,S1,S2 )
     ! Tracks through the thin lens structure from position S1 to position S2 (defined as the S(3) variables
     ! of the thin lens.
     ! The final position is stored as in time tracking but is obviously the same for all the particles.
-    ! interfaced as TRACK_LAYOUT_USING_THIN_S
+    ! interfaced as TRACK_LAYOUT_USING_NODE_S
 
     implicit none
     TYPE (LAYOUT), TARGET :: R
@@ -3760,9 +4382,10 @@ CONTAINS
     REAL(DP),INTENT(IN) :: S1
     REAL(DP),OPTIONAL :: S2
     REAL(DP) DS1,DS2,SFINAL
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     INTEGER I1,I2,NTURN,I
-    TYPE(THIN_LENS), POINTER :: LAST
+    TYPE(INTEGRATION_NODE), POINTER :: LAST
     IF(.NOT.ASSOCIATED(R%T)) THEN
        WRITE(6,*) " NO THIN LAYOUT: TRACKING IMPOSSIBLE "
        RETURN
@@ -3794,16 +4417,16 @@ CONTAINS
     ENDIF
 
     DO I=1,NTURN
-       CALL TRACK_THIN_LAYOUT_S( R%T,B,I1,K )
+       CALL TRACK_NODE_LAYOUT_S( R%T,B,I1,K )
     ENDDO
 
     IF(I2>0) THEN
        if(i2<i1) then
           i2=r%t%n+i2
        endif
-       CALL TRACK_THIN_LAYOUT_S( R%T,B,I1,I2,K )
+       CALL TRACK_NODE_LAYOUT_S( R%T,B,I1,I2,K )
     ELSE
-       CALL TRACK_THIN_LAYOUT_S( R%T,B,I1,K )
+       CALL TRACK_NODE_LAYOUT_S( R%T,B,I1,K )
     ENDIF
 
     IF(DS2/=ZERO) THEN
@@ -3816,16 +4439,18 @@ CONTAINS
 
 
 
-  SUBROUTINE TRACK_THIN_LAYOUT_12( R,B,I1,I2,K) ! T
+  SUBROUTINE TRACK_NODE_LAYOUT_S12( R,B,I1,I2,K) ! T
     implicit none
-    TYPE (THIN_LAYOUT), TARGET :: R
-    TYPE (THIN_LENS), POINTER ::  C
+    TYPE (NODE_LAYOUT), TARGET :: R
+    TYPE (INTEGRATION_NODE), POINTER ::  C
     TYPE(BEAM),INTENT(INOUT):: B
     INTEGER, INTENT(IN):: I1,I2
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    INTEGER I,J
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    INTEGER I,J,J2
 
-    call move_to_THIN_LENS(r,c,I1)
+
+    call move_to_INTEGRATION_NODE(r,c,I1)
 
 
     if(i2>i1) then
@@ -3833,24 +4458,38 @@ CONTAINS
 
        DO  WHILE(J<I2.AND.ASSOCIATED(C))
 
-          CALL TRACK_THIN_SINGLE_FOR_S(C,B,K)
+          IF(C%USE_TPSA_MAP) THEN !1
 
-          C=>C%NEXT
-          J=J+1
+             CALL TRACK_NODE_SINGLE_FOR_MAP(C,B,K)
+             J2=C%INTEGRATION_NODE_AFTER_MAP%POS
+             IF(J2<C%POS) THEN
+                J2=J2+R%N
+             ENDIF
+             IF(J2>I2) STOP 481
+             C=>C%INTEGRATION_NODE_AFTER_MAP
+             J=J2
+
+          ELSE  !1
+             CALL TRACK_NODE_SINGLE_FOR_S(C,B,K)
+             C=>C%NEXT
+             J=J+1
+
+          ENDIF  !1
        ENDDO
     ELSEIF(I1>I2) THEN
-       WRITE(6,*) " BACKWARDS FORBIDDEN IN TRACK_THIN_LAYOUT"
+       WRITE(6,*) " BACKWARDS FORBIDDEN IN TRACK_NODE_LAYOUT"
        STOP 666
     ENDIF
     B%TIME_INSTEAD_OF_S=.FALSE.
-  end SUBROUTINE TRACK_THIN_LAYOUT_12
+  end SUBROUTINE TRACK_NODE_LAYOUT_S12
 
-  SUBROUTINE TRACK_THIN_LAYOUT_1( R,B,I1,K ) ! TRACKS LAYOUT WITHOUT ANY COLLECTIVE FRIVOLITES
+  SUBROUTINE TRACK_NODE_LAYOUT_S1( R,B,I1,K ) ! TRACKS LAYOUT WITHOUT ANY COLLECTIVE FRIVOLITES
     implicit none
-    TYPE (THIN_LAYOUT), TARGET :: R
+    TYPE (NODE_LAYOUT), TARGET :: R
     TYPE(BEAM),INTENT(INOUT):: B
     INTEGER, INTENT(IN):: I1
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    TYPE(INTERNAL_STATE)  K
+    !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     INTEGER II1,II2
 
     II1=I1
@@ -3860,53 +4499,54 @@ CONTAINS
        II2=R%N+1
     ENDIF
 
-    CALL TRACK_THIN_LAYOUT_s(R,B,II1,II2,k)
+    CALL TRACK_NODE_LAYOUT_s(R,B,II1,II2,k)
 
     B%TIME_INSTEAD_OF_S=.FALSE.
 
-  end SUBROUTINE TRACK_THIN_LAYOUT_1
+  end SUBROUTINE TRACK_NODE_LAYOUT_S1
 
   !  STUFF ABOUT LIST AND STRUCTURES
 
-  SUBROUTINE MAKE_THIN_LAYOUT( R) !
-    ! Creates the thin layout and puts in R%T by calling MAKE_THIN_LAYOUT_2
+  SUBROUTINE MAKE_NODE_LAYOUT( R) !
+    ! Creates the thin layout and puts in R%T by calling MAKE_NODE_LAYOUT_2
+    ! At this point large patches would be problematic; i.e. |d(3)|>>>0 .
     implicit none
     TYPE (LAYOUT), TARGET :: R
 
-    call MAKE_THIN_LAYOUT_2( R,R%T )
+    call MAKE_NODE_LAYOUT_2( R,R%T )
 
-  end SUBROUTINE MAKE_THIN_LAYOUT
+  end SUBROUTINE MAKE_NODE_LAYOUT
 
 
 
-  SUBROUTINE MAKE_THIN_LAYOUT_2( R,L ) !
+  SUBROUTINE MAKE_NODE_LAYOUT_2( R,L ) !
     ! Creates a thin layout.
-    ! At this point large patches would be problematic.
+    ! At this point large patches would be problematic; i.e. |d(3)|>>>0 .
 
     implicit none
     TYPE (LAYOUT), TARGET :: R
-    TYPE (THIN_LAYOUT), pointer :: L
+    TYPE (NODE_LAYOUT), pointer :: L
     TYPE(FIBRE), POINTER :: P
     INTEGER I,J,k,TEAPOT_LIKE
     REAL(DP) S,DLD,DL,LI,SL
     LOGICAL(LP) CIRCULAR
-    TYPE(THIN_LENS), POINTER :: T1,T2
+    TYPE(INTEGRATION_NODE), POINTER :: T1,T2
 
     CASE_NAME(CASEP1)="THE ENTRANCE PATCH"
     CASE_NAME(CASEP2)="THE EXIT PATCH  "
     CASE_NAME(CASE1)= "THE ENTRANCE FRINGE"
     CASE_NAME(CASE2)="THE EXIT FRINGE"
     CASE_NAME(CASE0)="A STEP OF INTEGRATION BODY"
-    CASE_NAME(CASE3)="BEAM BEAM PANCAKE"
+    !    CASE_NAME(CASE3)="BEAM BEAM PANCAKE"
 
     if(associated(L)) then
-       CALL kill_THIN_Layout(L)
+       CALL kill_NODE_LAYOUT(L)
        DEALLOCATE(L);
        NULLIFY(L);
     endif
 
     allocate(L)
-    CALL Set_Up_THIN_LAYOUT( L )
+    CALL Set_Up_NODE_LAYOUT( L )
     S=zero
     SL=ZERO  !  INTEGRATION LENGTH
     P=>R%START
@@ -3916,7 +4556,11 @@ CONTAINS
        TEAPOT_LIKE=0
        IF(P%MAG%P%B0/=ZERO) TEAPOT_LIKE=1
        IF(P%MAG%KIND==KIND16.OR.P%MAG%KIND==KIND16)TEAPOT_LIKE=0
-
+       IF(P%MAG%KIND==KIND0.AND.P%MAG%P%NST/=1) THEN
+          WRITE(6,*) "MARKER SHOULD HAVE NST=1 OTHERWISE PROBLEMS "
+          WRITE(6,*) "WILL OCCUR WITH THE WORM AND THE NODE_LAYOUT SURVEY "
+          STOP 500
+       ENDIF
        IF(P%DIR==1) THEN
           LI=zero;
        ELSE
@@ -3932,7 +4576,7 @@ CONTAINS
        L%END%CAS=CASEP1                                             ! s(4) end of step =  DL
        L%END%pos_in_fibre=1
        L%END%pos=k;k=k+1;
-       L%END%PARENT_THIN_LAYOUT=>L
+       L%END%PARENT_NODE_LAYOUT=>L
        L%END%PARENT_FIBRE=>P
 
        CALL APPEND_EMPTY_THIN( L )
@@ -3941,7 +4585,7 @@ CONTAINS
        L%END%CAS=CASE1
        L%END%pos_in_fibre=2
        L%END%pos=k;k=k+1;
-       L%END%PARENT_THIN_LAYOUT=>L
+       L%END%PARENT_NODE_LAYOUT=>L
        L%END%PARENT_FIBRE=>P
 
        DO J=1,P%MAG%P%NST
@@ -3951,7 +4595,7 @@ CONTAINS
           L%END%CAS=CASE0
           L%END%pos_in_fibre=J+2
           L%END%pos=k;k=k+1;
-          L%END%PARENT_THIN_LAYOUT=>L
+          L%END%PARENT_NODE_LAYOUT=>L
           L%END%PARENT_FIBRE=>P
           S=S+DLD
           LI=LI+DL
@@ -3972,7 +4616,7 @@ CONTAINS
        L%END%CAS=CASEP2
        L%END%pos_in_fibre=P%MAG%P%NST+4
        L%END%pos=k;k=k+1;
-       L%END%PARENT_THIN_LAYOUT=>L
+       L%END%PARENT_NODE_LAYOUT=>L
        L%END%PARENT_FIBRE=>P
        T2=>L%END
 
@@ -3991,14 +4635,14 @@ CONTAINS
        CALL RING_L_THIN(L,CIRCULAR)
     ENDIF
 
-    call stat_THIN_LAYOUT(l)
+    call stat_NODE_LAYOUT(l)
 
-  END SUBROUTINE MAKE_THIN_LAYOUT_2
+  END SUBROUTINE MAKE_NODE_LAYOUT_2
 
 
-  SUBROUTINE stat_THIN_LAYOUT( L )
+  SUBROUTINE stat_NODE_LAYOUT( L )
     implicit none
-    TYPE (THIN_LAYOUT), pointer :: L
+    TYPE (NODE_LAYOUT), pointer :: L
 
     WRITE(6,*)  " PARENT LAYOUT NAME :", L%PARENT_LAYOUT%NAME(1:len_trim(L%PARENT_LAYOUT%NAME))
     WRITE(6,*) " NUMBER OF ORIGINAL LAYOUT ELEMENTS :", L%PARENT_LAYOUT%N
@@ -4006,7 +4650,7 @@ CONTAINS
     WRITE(6,*) " TOTAL IDEAL LENGTH OF STRUCTURE :", L%END%S(1)
     WRITE(6,*) " TOTAL INTEGERATION LENGTH OF STRUCTURE (mad8 style survey) :", L%END%S(3)
 
-  end SUBROUTINE stat_THIN_LAYOUT
+  end SUBROUTINE stat_NODE_LAYOUT
 
 
   SUBROUTINE DRIFT_TO_TIME(T,YL,DT,X)
@@ -4017,7 +4661,7 @@ CONTAINS
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(INOUT):: YL
     real(dp),INTENT(IN):: DT
-    TYPE(THIN_LENS), pointer :: T
+    TYPE(INTEGRATION_NODE), pointer :: T
     TYPE(magnet_chart), pointer :: p
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
@@ -4070,12 +4714,12 @@ CONTAINS
   SUBROUTINE DRIFTr_BACK_TO_POSITION(T,YL,X)
     ! This is a regular drift
     ! It is used in time tracking to project back to the beginning of the thin lens
-    ! and it is used in S tracking to drift in the middle of an step.
+    ! and it is used in S tracking to drift in the middle of a step.
 
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN):: YL
-    TYPE(THIN_LENS), pointer :: T
+    TYPE(INTEGRATION_NODE), pointer :: T
     TYPE(magnet_chart), pointer :: p
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
@@ -4132,7 +4776,7 @@ CONTAINS
     IMPLICIT NONE
     type(real_8),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN):: YL
-    TYPE(THIN_LENS), pointer :: T
+    TYPE(INTEGRATION_NODE), pointer :: T
     TYPE(magnet_chart), pointer :: p
     type(real_8) XN(6),PZ,PT
     real(dp)  A,b,R
@@ -4184,12 +4828,14 @@ CONTAINS
   END SUBROUTINE DRIFTp_BACK_TO_POSITION
 
   SUBROUTINE DRIFT_BEAM_BACK_TO_POSITION(T,YL,B)
-    ! Same routine as above but applies to a beam
+    ! This is a regular drift
+    ! It is used in time tracking to project back to the beginning of the thin lens
+    ! and it is used in S tracking to drift in the middle of an step.
     IMPLICIT NONE
     real(dp)  X(6)
     TYPE(BEAM), INTENT(INOUT) :: B
     real(dp),INTENT(IN):: YL
-    TYPE(THIN_LENS), pointer :: T
+    TYPE(INTEGRATION_NODE), pointer :: T
     INTEGER I
 
     DO I=1,B%N
@@ -4198,16 +4844,17 @@ CONTAINS
 
        CALL DRIFT_BACK_TO_POSITION(T,YL,X)
 
-       B%POS(I)%THINLENS=>T
+       !       B%POS(I)%NODE=>T
 
-       CALL X_IN_BEAM(X,B,I,DL=ZERO)
+       CALL X_IN_BEAM(B,X,I,DL=ZERO,T=T)
 
 
     ENDDO
 
     IF(ASSOCIATED(B%Y)) THEN
        CALL DRIFT_BACK_TO_POSITION(T,YL,B%Y)
-       B%POS(0)%THINLENS=>T%NEXT
+       CALL X_IN_BEAM(B,I=0,T=T)
+       !       B%POS(0)%NODE=>T%NEXT    LOOKS LIKE ERROR
     ENDIF
 
 
@@ -4216,14 +4863,20 @@ CONTAINS
 
   !  Survey still worm like
 
-  subroutine fill_survey_data_in_thin_layout(r)
+  SUBROUTINE FILL_SURVEY_DATA_IN_NODE_LAYOUT(R)
+    ! THIS SUBROUTINE ALLOCATES NODE FRAMES IF NEEDED
+    ! IT SURVEYS THE NODES USING THE OLD REAL WORMS
+    ! SHOULD BE CALLED AFTER MISALIGNMENTS OR MOVING PART OF LATTICE
+
     IMPLICIT NONE
     type(layout),target:: r
     type(fibre), pointer ::c
-    type(thin_lens), pointer ::t
+    type(INTEGRATION_NODE), pointer ::t
     type(worm) vers
     integer k,my_start,ic,j
     real(dp) x(6),ent(3,3),a(3)
+
+    CALL  allocate_node_frame( R)
 
     call survey(r)
 
@@ -4246,7 +4899,7 @@ CONTAINS
 
        t=>t%next
        if(t%cas/=case1) then
-          write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+          write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
           stop 665
        endif
        j=vers%POS(2)
@@ -4269,14 +4922,14 @@ CONTAINS
              t%previous%exi=ent
              t%previous%b=a
              if(t%previous%cas/=case0) then
-                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%previous%cas
+                write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%previous%cas
                 stop 666
              endif
           else
              t%previous%exi=ent
              t%previous%b=a
              if(t%previous%cas/=case1) then
-                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%previous%cas
+                write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%previous%cas
                 stop 664
              endif
           endif
@@ -4285,14 +4938,16 @@ CONTAINS
              t%ent=ent
              t%a=a
              if(t%cas/=case0) then
-                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+                write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
                 stop 666
              endif
           else
              t%ent=ent
              t%a=a
              if(t%cas/=case2) then
-                write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+                write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
+                write(6,*)t%POS,T%PARENT_FIBRE%MAG%NAME
+                write(6,*)T%PARENT_FIBRE%T1%POS,T%PARENT_FIBRE%T2%POS
                 stop 668
              endif
           endif
@@ -4319,7 +4974,7 @@ CONTAINS
        t%ent=ent
        t%a=a
        if(t%previous%cas/=case2) then
-          write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+          write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
           stop 669
        endif
        !      t=>t%next
@@ -4332,13 +4987,13 @@ CONTAINS
        t%b=a
 
        if(t%cas/=casep2) then
-          write(6,*)" error in fill_survey_data_in_thin_layout",j,t%cas
+          write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
           stop 670
        endif
 
 
        if(ic/=c%mag%p%nst+1) then
-          write(6,*)" error in fill_survey_data_in_thin_layout"
+          write(6,*)" error in fill_survey_data_in_NODE_LAYOUT"
           write(6,*)k, ic,c%mag%name,c%mag%p%nst
           stop 888
        endif
@@ -4348,7 +5003,7 @@ CONTAINS
     CALL kill(vers)
 
 
-  end  subroutine fill_survey_data_in_thin_layout
+  end  subroutine fill_survey_data_in_NODE_LAYOUT
 
   ! BEAM STUFF
 
@@ -4358,7 +5013,7 @@ CONTAINS
     INTEGER N,I,J
     REAL(DP) CUT,SIG,X
     TYPE(BEAM) B
-    TYPE (THIN_LENS),optional,target::  T
+    TYPE (INTEGRATION_NODE),optional,target::  T
 
     IF(.NOT.ASSOCIATED(B%N)) THEN
        CALL ALLOCATE_BEAM(B,N)
@@ -4377,8 +5032,8 @@ CONTAINS
 
     if(present(t)) then
        DO I=1,N
-          if(associated(B%POS(I)%THINLENS))then
-             B%POS(I)%THINLENS=>T
+          if(associated(B%POS(I)%NODE))then
+             B%POS(I)%NODE=>T
           endif
        ENDDO
 
@@ -4392,7 +5047,7 @@ CONTAINS
     INTEGER N,I,J
     REAL(DP) CUT,SIG(6),X,Y(LNV),beta(2)
     TYPE(BEAM) B
-    TYPE (THIN_LENS),optional,target::  T
+    TYPE (INTEGRATION_NODE),optional,target::  T
     TYPE (DAMAP),OPTIONAL :: A
     TYPE (tree) monkey
 
@@ -4443,8 +5098,8 @@ CONTAINS
 
     if(present(t)) then
        DO I=1,N
-          if(associated(B%POS(I)%THINLENS))then
-             B%POS(I)%THINLENS=>T
+          if(associated(B%POS(I)%NODE))then
+             B%POS(I)%NODE=>T
           endif
        ENDDO
 
@@ -4469,8 +5124,8 @@ CONTAINS
     B2%CHARGE=B1%CHARGE
     B2%LOST=B1%LOST
     DO I=0,B1%N
-       if(associated(B1%POS(I)%THINLENS))then
-          B2%POS(I)%THINLENS=>B1%POS(I)%THINLENS
+       if(associated(B1%POS(I)%NODE))then
+          B2%POS(I)%NODE=>B1%POS(I)%NODE
        endif
     ENDDO
 
@@ -4480,13 +5135,13 @@ CONTAINS
     implicit none
     INTEGER k,mf
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(THIN_LENS),POINTER::T
+    TYPE(INTEGRATION_NODE),POINTER::T
     TYPE(FIBRE),POINTER::F
 
     DO K=1,b%n
        IF(.not.B%U(K)) THEN
-          if(associated(b%pos(k)%thinlens)) then
-             WRITE(MF,100) B%X(K,1:6),b%pos(k)%thinlens%s(3)+B%X(K,7)
+          if(associated(b%pos(k)%NODE)) then
+             WRITE(MF,100) B%X(K,1:6),b%pos(k)%NODE%s(3)+B%X(K,7)
           else
              WRITE(MF,100) B%X(K,1:6),B%X(K,7)
           endif
@@ -4499,13 +5154,13 @@ CONTAINS
     implicit none
     INTEGER k,mf
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(THIN_LENS),POINTER::T
+    TYPE(INTEGRATION_NODE),POINTER::T
     TYPE(FIBRE),POINTER::F
 
     DO K=1,b%n
        IF(.not.B%U(K)) THEN
-          if(associated(b%pos(k)%thinlens)) then
-             WRITE(MF,100) B%X(K,1:6),b%pos(k)%thinlens%s(3)+B%X(K,7)
+          if(associated(b%pos(k)%NODE)) then
+             WRITE(MF,100) B%X(K,1:6),b%pos(k)%NODE%s(3)+B%X(K,7)
           else
              WRITE(MF,100) B%X(K,1:6),B%X(K,7)
           endif
@@ -4518,7 +5173,7 @@ CONTAINS
     implicit none
     INTEGER i,j,k,mf,NOTlost,N
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(THIN_LENS),POINTER::T
+    TYPE(INTEGRATION_NODE),POINTER::T
     TYPE(FIBRE),POINTER::F
     real(dp), allocatable :: av(:,:)
     real(dp) em(2),beta(2)
@@ -4580,7 +5235,7 @@ CONTAINS
     INTEGER K,MF,I1,I2
     INTEGER,OPTIONAL:: I
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(THIN_LENS),POINTER::T
+    TYPE(INTEGRATION_NODE),POINTER::T
     TYPE(FIBRE),POINTER::F
 
     I1=1
@@ -4600,7 +5255,7 @@ CONTAINS
        IF(B%U(K)) THEN
           WRITE(MF,*) " PARTICLE # ",K, " IS LOST "
        ELSE
-          T=>B%POS(K)%THINLENS
+          T=>B%POS(K)%NODE
           F=>T%PARENT_FIBRE
           WRITE(MF,*) "_________________________________________________________________________"
           WRITE(MF,*) " PARTICLE # ",K, " IS LOCATED AT SLICE # ",T%POS," IN FIBRE  ",F%MAG%NAME
@@ -4650,6 +5305,26 @@ CONTAINS
 
   END SUBROUTINE NULLIFY_BEAMS
 
+  subroutine alloc_three_d_info(v)
+    IMPLICIT NONE
+    TYPE(three_d_info) , INTENT (INOUT) :: V
+    v%a=zero
+    v%b=zero
+    v%o=zero
+    v%ent=global_frame
+    v%exi=global_frame
+    v%mid=global_frame
+    v%reference_ray=zero
+    v%r0=zero
+    v%r=zero
+    v%x=zero
+    v%scale=one
+    v%u=my_false
+    v%wx=0.1_dp
+    v%wy=0.1_dp
+
+  end subroutine alloc_three_d_info
+
   SUBROUTINE ALLOCATE_BEAM(B,N,POLYMORPH)
     IMPLICIT NONE
     TYPE(BEAM) , INTENT (INOUT) :: B
@@ -4663,18 +5338,20 @@ CONTAINS
     B%LOST=0
     NULLIFY(B%Y)
     IF(PRESENT(POLYMORPH)) THEN
-       IF(POLYMORPH) ALLOCATE(B%Y(6))
-       CALL ALLOC(B%Y)
+       IF(POLYMORPH) then
+          ALLOCATE(B%Y(6))
+          CALL ALLOC(B%Y)
+       endif
     ENDIF
     ALLOCATE(B%X(N,7))
-    ALLOCATE(B%U(N))
+    ALLOCATE(B%U(0:N))
     ALLOCATE(B%POS(0:N))
     ALLOCATE(B%SIGMA(6))
     ALLOCATE(B%DX(3))
     ALLOCATE(B%ORBIT(6))
     ALLOCATE(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
     DO I=0,N
-       NULLIFY(B%POS(i)%THINLENS)
+       NULLIFY(B%POS(i)%NODE)
     ENDDO
     ALLOCATE(B%CHARGE)
     ALLOCATE(B%TIME_INSTEAD_OF_S)
@@ -4725,17 +5402,17 @@ CONTAINS
 
   END  FUNCTION BEAM_IN_X
 
-  SUBROUTINE X_IN_BEAM(X,B,I,DL,T)
+  SUBROUTINE X_IN_BEAM(B,X,I,DL,T)
     IMPLICIT NONE
-    REAL(DP) X(6)
+    REAL(DP),OPTIONAL:: X(6)
     REAL(DP),OPTIONAL:: DL
     TYPE(BEAM), INTENT(INOUT) ::B
-    TYPE(THIN_LENS),OPTIONAL,POINTER :: T
+    TYPE(INTEGRATION_NODE),OPTIONAL,POINTER :: T
     INTEGER, INTENT(IN) :: I
 
-    B%X(I,1:6)=X(1:6)
+    if(PRESENT(X)) B%X(I,1:6)=X(1:6)
     IF(PRESENT(DL)) B%X(I,7)=DL
-    IF(PRESENT(T)) B%POS(I)%THINLENS=>T
+    IF(PRESENT(T)) B%POS(I)%NODE=>T
     if(.not.CHECK_STABLE) then
        !       write(6,*) "unstable "
        CALL RESET_APERTURE_FLAG
@@ -4782,10 +5459,10 @@ CONTAINS
     real(dp) sx2,sy2,xs,ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,&
          bbpar,cbx,cby,ten3m,explim,sx,sy,xm,ym,DZ
     TYPE(BEAM), INTENT(INOUT) ::B
-    TYPE(thin_lens),POINTER ::th
+    TYPE(INTEGRATION_NODE),POINTER ::th
     parameter(ten3m=1.0e-3_dp,explim=150.0_dp)
 
-    CALL BEAM_BEAM(B,TH%BT,sx,sy,xm,ym,bbpar,BBORBIT,MY_TRUE)
+    !    CALL BEAM_BEAM(B,TH%BT,sx,sy,xm,ym,bbpar,BBORBIT,MY_TRUE)
     !---- initialize.
     !      bborbit = get_option('bborbit ') .ne. 0
     !      pi=get_variable('pi ')   ! value of pi
@@ -4808,9 +5485,9 @@ CONTAINS
 
 
     if (fk == zero)  return
-    DZ=-TH%BT%DX(3)
-    IF(DZ/=ZERO) CALL DRIFT_BEAM_BACK_TO_POSITION(th,DZ,B)
-    DZ=-DZ
+    !    DZ=-TH%BT%DX(3)
+    !    IF(DZ/=ZERO) CALL DRIFT_BEAM_BACK_TO_POSITION(th,DZ,B)
+    !    DZ=-DZ
     if (.not. bborbit)  then
        !What counts is that if (.not. bborbit) then subtract closed orbit THIS IS THE DEFAULT
        !closed is tricky and really should be treated selfconsistently, I.e. out of reach here
@@ -5013,7 +5690,6 @@ CONTAINS
     endif
 
   end SUBROUTINE ccperrf
-
 
 
 end module ptc_multiparticle

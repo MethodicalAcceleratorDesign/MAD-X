@@ -217,7 +217,11 @@ CONTAINS
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
           IF(P%MAG%FREQ/=zero) THEN
-             FREQ=P%MAG%FREQ
+             IF(FREQ==ZERO) THEN
+                FREQ=P%MAG%FREQ
+             ELSEIF(FREQ>P%MAG%FREQ) THEN
+                FREQ=P%MAG%FREQ
+             ENDIF
           ENDIF
        ENDIF
        P=>P%NEXT
@@ -857,10 +861,10 @@ CONTAINS
     ENDDO
 
 
-    IF(PRESENT(ENT)) THEN
-       ENT=ENTT
-       A=AT
-    ENDIF
+    !    IF(PRESENT(ENT)) THEN
+    !       ENT=ENTT
+    !       A=AT
+    !    ENDIF
 
 
 
@@ -1053,13 +1057,15 @@ CONTAINS
 
     CALL LINE_L(R1,DONEIT)
 
-
     IF(ASSOCIATED(R2%N)) CALL KILL(R2)
     CALL SET_UP(R2)
 
     R2%CLOSED=.FALSE.
     R2%NTHIN=R1%NTHIN
     R2%THIN=R1%THIN
+    R2%charge=R1%charge
+    R2%mass=R1%mass
+    R2%HARMONIC_NUMBER=R1%HARMONIC_NUMBER
     !    if(associated(r1%parent_universe)) R2%parent_universe=> r1%parent_universe
     C=> R1%START
     DO WHILE(ASSOCIATED(C))
@@ -1095,6 +1101,8 @@ CONTAINS
     R2%CLOSED=.FALSE.
     R2%NTHIN=R1%NTHIN
     R2%THIN=R1%THIN
+    R2%charge=R1%charge
+    R2%mass=R1%mass
     !    if(associated(r1%parent_universe)) R2%parent_universe=> r1%parent_universe
 
     CALL MOVE_TO(R1,C,I)

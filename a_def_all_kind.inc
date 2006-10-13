@@ -59,8 +59,8 @@ TYPE CAV_TRAV
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp) , POINTER ::L                    !  Storage space for computed
-   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,DVDS
-   real(dp), POINTER :: PSI,DPHAS
+   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E
+   real(dp), POINTER :: PSI,DPHAS,DVDS
 END  TYPE CAV_TRAV
 
 
@@ -68,8 +68,8 @@ TYPE CAV_TRAVP
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8) , POINTER ::L                    !  Storage space for computed
-   TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS,DVDS
-   TYPE(REAL_8), POINTER :: PSI,DPHAS
+   TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS
+   TYPE(REAL_8), POINTER :: PSI,DPHAS,DVDS
    real(dp), POINTER :: DELTA_E                        ! Cavity information
 END  TYPE CAV_TRAVP
 
@@ -145,6 +145,7 @@ TYPE TKTF
    real(dp), POINTER ::L
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    real(dp),  DIMENSION(:,:), POINTER :: MATX,MATY !LINEAR MATRIX
+   real(dp),  DIMENSION(:,:), POINTER :: MATX2,MATY2 !LINEAR MATRIX
    !frs     real(dp), DIMENSION(:), POINTER :: lx(:)
    real(dp), DIMENSION(:), POINTER :: lx
    real(dp), DIMENSION(:,:), POINTER :: RMATX,RMATY !LINEAR MATRIX
@@ -159,6 +160,7 @@ TYPE TKTFP
    TYPE(REAL_8), POINTER ::L
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8),  DIMENSION(:,:), POINTER :: MATX,MATY !LINEAR MATRIX
+   TYPE(REAL_8),  DIMENSION(:,:), POINTER :: MATX2,MATY2 !LINEAR MATRIX
    !frs     TYPE(REAL_8), DIMENSION(:), POINTER :: lx(:)
    TYPE(REAL_8), DIMENSION(:), POINTER :: lx
    TYPE(REAL_8), DIMENSION(:,:), POINTER :: RMATX,RMATY !LINEAR MATRIX
@@ -297,20 +299,20 @@ TYPE PANCAKE
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp),  POINTER ::L
    type(tree_element),  POINTER :: B(:)
-   type(tree_element),  POINTER :: Ax(:)
-   type(tree_element),  POINTER :: Ay(:)
+   !   type(tree_element),  POINTER :: Ax(:)
+   !   type(tree_element),  POINTER :: Ay(:)
    REAL(DP), POINTER :: SCALE
-   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
-   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
+   !   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
+   !   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
 END  TYPE PANCAKE
 
 TYPE PANCAKEP
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8),  POINTER ::L
    type(tree_element),  POINTER :: B(:)
-   type(tree_element),  POINTER :: Ax(:)
-   type(tree_element),  POINTER :: Ay(:)
+   !   type(tree_element),  POINTER :: Ax(:)
+   !   type(tree_element),  POINTER :: Ay(:)
    TYPE(REAL_8), POINTER :: SCALE
-   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
-   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
+   !   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
+   !   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
 END  TYPE PANCAKEP

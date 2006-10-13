@@ -2083,8 +2083,10 @@ contains
     integer,dimension(:)::roi
     real(dp),dimension(ndim)::co,si,ang,ra
     if(.not.c_%stable_da) return
-    
+
+    !    do i=1,10
     j=0
+    !    enddo
 
     call daclrd(roi)
     do i=1,nd-ndc
@@ -2419,6 +2421,7 @@ contains
     real(dp),dimension(ndim2,ndim2)::cr,xj,sa,sai,cm,w,vr,vi,s1
     real(dp),dimension(ndim)::x,xx,st
     real(dp),dimension(ndim2)::rr,ri,p
+    logical hyp
     if(.not.c_%stable_da) return
 
     n1=0
@@ -2478,6 +2481,24 @@ contains
        CALL WRITE_i
     endif
     call eig6(cr,rr,ri,vr,vi)
+    if(no_hyperbolic_in_normal_form) then
+       hyp=.false.
+       !      write(6,*) " checking no_hyperbolic_in_normal_form "
+       do i=1,nd2-ndc2
+          if(ri(i)==zero) then
+             hyp=.true.
+             c_%stable_da=.false.
+          endif
+       enddo
+       if(hyp) then
+          write(6,*) " Eigenvalues are "
+          do i=1,nd2-ndc2
+             write(6,*) i,rr(i),ri(i)
+          enddo
+          write(6,*) " All TPSA/DA/LIE CALCULATIONS INTERRUPTED AT YOUR REQUEST "
+          write(6,*) " RESET STABLE FLAGS "
+       endif
+    endif
     if(idpr.ge.0) then
        w_p=0
        w_p%nc=3

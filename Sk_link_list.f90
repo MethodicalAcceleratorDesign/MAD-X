@@ -29,6 +29,8 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE kill_layout
      MODULE PROCEDURE dealloc_fibre
      MODULE PROCEDURE kill_info
+     MODULE PROCEDURE kill_NODE_LAYOUT
+     MODULE PROCEDURE de_Set_Up_ORBIT_LATTICE
   END INTERFACE
 
   INTERFACE alloc
@@ -155,8 +157,8 @@ CONTAINS
     CALL LINE_L(L,doneit)
     nullify(current)
     IF(ASSOCIATED(L%T)) THEN
-       CALL kill_THIN_Layout(L%T)  !  KILLING THIN LAYOUT
-       WRITE(6,*) " THIN LAYOUT HAS BEEN KILLED "
+       CALL kill_NODE_LAYOUT(L%T)  !  KILLING THIN LAYOUT
+       WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
     ENDIF
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
@@ -182,8 +184,10 @@ CONTAINS
     call copy(el%magp,current%mag)
     call copy(current%mag,current%magp)
     call copy(el%mag,current%mag)
-    if(associated(current%CHART)) call copy(el%CHART,current%CHART)
-    if(associated(current%patch))call copy(el%PATCH,current%PATCH)
+    !if(associated(current%CHART))
+    call copy(el%CHART,current%CHART)
+    !if(associated(current%patch))
+    call copy(el%PATCH,current%PATCH)
     if(use_info.and.associated(current%patch)) call copy(el%i,current%i)
     current%dir=el%dir
     !    current%P0C=el%P0C
@@ -200,10 +204,41 @@ CONTAINS
 
     L % end => Current
     if(L%N==1) L%start=> Current
+    current%pos=l%n
 
     L%LASTPOS=L%N ; L%LAST=>CURRENT;
     CALL RING_L(L,doneit)
   END SUBROUTINE APPEND_fibre
+
+  SUBROUTINE APPEND_clone( L ) ! Standard append that clones everything
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), TARGET,intent(inout):: L
+    logical(lp) doneit
+    CALL LINE_L(L,doneit)
+    L%N=L%N+1
+    nullify(current)
+    call alloc_fibre(current)
+    !    if(use_info.and.associated(current%patch)) call copy(el%i,current%i)
+    current%dir=1
+
+    current%pos=l%n
+
+    current%PARENT_LAYOUT=>L
+    current%mag%PARENT_FIBRE=>current
+    current%magp%PARENT_FIBRE=>current
+    if(L%N==1) current%next=> L%start
+    Current % previous => L % end  ! point it to next fibre
+    if(L%N>1)  THEN
+       L % end % next => current      !
+    ENDIF
+
+    L % end => Current
+    if(L%N==1) L%start=> Current
+
+    L%LASTPOS=L%N ; L%LAST=>CURRENT;
+    CALL RING_L(L,doneit)
+  END SUBROUTINE APPEND_clone
 
 
 
@@ -361,7 +396,7 @@ CONTAINS
     TYPE (layout) L
     CALL NULLIFY_LAYOUT(L)
     ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);ALLOCATE(L%HARMONIC_NUMBER);
-    ALLOCATE(L%NTHIN);ALLOCATE(L%THIN);ALLOCATE(L%INDEX);ALLOCATE(L%CHARGE);
+    ALLOCATE(L%NTHIN);ALLOCATE(L%THIN);ALLOCATE(L%INDEX);ALLOCATE(L%CHARGE);ALLOCATE(L%mass);
     ALLOCATE(L%n);
     L%closed=.false.;
     L%NTHIN=0;L%THIN=zero;
@@ -371,6 +406,11 @@ CONTAINS
     L%INDEX=INDEX
     L%CHARGE=1
     L%HARMONIC_NUMBER=0
+    if(electron) then
+       L%mass=muon*pmae
+    else
+       L%mass=pmap
+    endif
   END SUBROUTINE Set_Up
 
 
@@ -380,9 +420,10 @@ CONTAINS
     implicit none
     TYPE (layout) L
     deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);deallocate(L%HARMONIC_NUMBER);
-    deallocate(L%INDEX);    deallocate(L%CHARGE);
+    deallocate(L%INDEX);    deallocate(L%CHARGE);deallocate(L%mass);
     deallocate(L%NTHIN);deallocate(L%THIN);
     deallocate(L%n);          !deallocate(L%parent_universe)   left out
+    IF(ASSOCIATED(L%T)) deallocate(L%T);
   END SUBROUTINE de_Set_Up
 
 
@@ -395,6 +436,7 @@ CONTAINS
     nullify(L%parent_universe)
     nullify(L%INDEX)
     nullify(L%CHARGE)
+    nullify(L%mass)
     nullify(L%HARMONIC_NUMBER)
     nullify(L%NAME)
     nullify(L%CLOSED,L%N )
@@ -502,6 +544,8 @@ CONTAINS
 
     L % end => Current
     if(L%N==1) L%start=> Current
+    if(.not.associated(current%pos)) allocate(current%pos)
+    current%pos=l%n
 
     L%LASTPOS=L%N ;
     L%LAST=>CURRENT;
@@ -526,6 +570,8 @@ CONTAINS
 
     L % end => Current
     if(L%N==1) L%start=> Current
+    if(.not.associated(current%pos)) allocate(current%pos)
+    current%pos=l%n
 
     L%LASTPOS=L%N ;
     L%LAST=>CURRENT;
@@ -540,7 +586,7 @@ CONTAINS
     nullify(current%next);nullify(current%previous);
     nullify(current%PARENT_LAYOUT);
     nullify(current%T1,current%T2);
-    !    nullify(current%PARENT_PATCH);
+    nullify(current%i,current%pos);
     !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
 
@@ -560,6 +606,7 @@ CONTAINS
 
     ALLOCATE(Current%CHART);
     ALLOCATE(Current%PATCH);
+    ALLOCATE(Current%pos);
   END SUBROUTINE ALLOCATE_DATA_FIBRE
 
   SUBROUTINE alloc_fibre( c ) ! Does the full allocation of fibre and initialization of internal variables
@@ -576,8 +623,10 @@ CONTAINS
     !  c%BETA0=zero
     c%mag=0
     c%magp=0
-    if(associated(c%CHART)) c%CHART=0
-    if(associated(c%PATCH)) c%PATCH=0
+    !if(associated(c%CHART))
+    c%CHART=0
+    !if(associated(c%PATCH))
+    c%PATCH=0
   end SUBROUTINE alloc_fibre
 
   SUBROUTINE zero_fibre( c,i ) ! Does the full allocation of fibre and initialization of internal variables
@@ -1096,52 +1145,63 @@ CONTAINS
 
   SUBROUTINE NULL_THIN(T)  ! nullifies THIN content
     implicit none
-    TYPE (THIN_LENS), POINTER :: T
-    NULLIFY(T%PARENT_THIN_LAYOUT)
+    TYPE (INTEGRATION_NODE), POINTER :: T
+    NULLIFY(T%PARENT_NODE_LAYOUT)
     NULLIFY(T%PARENT_FIBRE)
     NULLIFY(T%S)
-    NULLIFY(T%ORBIT)
+    !    NULLIFY(T%ORBIT)
     NULLIFY(T%a,T%ENT)
     NULLIFY(T%B,T%EXI)
-    NULLIFY(T%BT)
+    !    NULLIFY(T%BT)
     NULLIFY(T%NEXT)
     NULLIFY(T%PREVIOUS)
-
+    NULLIFY(T%USE_TPSA_MAP)
+    NULLIFY(T%TPSA_MAP)
+    NULLIFY(T%INTEGRATION_NODE_AFTER_MAP)
   END SUBROUTINE NULL_THIN
 
   SUBROUTINE ALLOCATE_THIN(CURRENT)   ! allocates and nullifies current's content
     implicit none
-    TYPE (THIN_LENS), POINTER :: Current
+    TYPE (INTEGRATION_NODE), POINTER :: Current
     NULLIFY(CURRENT)
     ALLOCATE(Current)
     CALL NULL_THIN(CURRENT)
 
     ALLOCATE(CURRENT%S(4))
-    ALLOCATE(CURRENT%ORBIT(6))
+    !    ALLOCATE(CURRENT%ORBIT(6))
     ALLOCATE(CURRENT%pos_in_fibre)
     ALLOCATE(CURRENT%pos)
     ALLOCATE(CURRENT%CAS)
     ALLOCATE(CURRENT%TEAPOT_LIKE)
-    ALLOCATE(CURRENT%A(3),CURRENT%ENT(3,3))
-    ALLOCATE(CURRENT%B(3),CURRENT%EXI(3,3))
-    CURRENT%A=ZERO
-    CURRENT%ENT=GLOBAL_FRAME
-    CURRENT%B=ZERO
-    CURRENT%EXI=GLOBAL_FRAME
-    CURRENT%S=ZERO
-    CURRENT%ORBIT=ZERO
+    ALLOCATE(CURRENT%USE_TPSA_MAP)
+
+    !    ALLOCATE(CURRENT%A(3),CURRENT%ENT(3,3))
+    !    ALLOCATE(CURRENT%B(3),CURRENT%EXI(3,3))
+    !    CURRENT%A=ZERO
+    !    CURRENT%ENT=GLOBAL_FRAME
+    !    CURRENT%B=ZERO
+    !    CURRENT%EXI=GLOBAL_FRAME
+
     CURRENT%pos_in_fibre=-100
     CURRENT%pos=-100
     CURRENT%CAS=-100
     CURRENT%TEAPOT_LIKE=-100
-
+    CURRENT%USE_TPSA_MAP=MY_FALSE
   END SUBROUTINE ALLOCATE_THIN
 
+  SUBROUTINE ALLOCATE_NODE_MAP(CURRENT)   ! allocates and nullifies current's content
+    implicit none
+    TYPE (INTEGRATION_NODE), POINTER :: Current
+    ALLOCATE(CURRENT%ORBIT(6))
+    ALLOCATE(CURRENT%TPSA_MAP)
+    CURRENT%USE_TPSA_MAP=MY_FALSE
+    CURRENT%ORBIT=ZERO
+  END SUBROUTINE ALLOCATE_NODE_MAP
 
-  SUBROUTINE nullIFY_THIN_LAYOUT( L ) ! Nullifies layout content,i
+  SUBROUTINE nullIFY_NODE_LAYOUT( L ) ! Nullifies layout content,i
     implicit none
     !   integer , intent(in) :: i
-    TYPE (THIN_layout), intent(inout) :: L
+    TYPE (NODE_layout), intent(inout) :: L
     !   if(i==0) then
     nullify(L%INDEX)
     nullify(L%NAME)
@@ -1154,14 +1214,16 @@ CONTAINS
     nullify(L%START_GROUND )! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
     nullify(L%END_GROUND )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
     nullify(L%parent_LAYOUT )!
+    nullify(L%ORBIT_LATTICE )!
 
 
-  END SUBROUTINE nullIFY_THIN_LAYOUT
 
-  SUBROUTINE Set_Up_THIN_LAYOUT( L ) ! Sets up a layout: gives a unique  index
+  END SUBROUTINE nullIFY_NODE_LAYOUT
+
+  SUBROUTINE Set_Up_NODE_LAYOUT( L ) ! Sets up a layout: gives a unique  index
     implicit none
-    TYPE (THIN_LAYOUT) L
-    CALL NULLIFY_THIN_LAYOUT(L)
+    TYPE (NODE_LAYOUT) L
+    CALL NULLIFY_NODE_LAYOUT(L)
     ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);
     ALLOCATE(L%INDEX);
     ALLOCATE(L%n);
@@ -1171,12 +1233,12 @@ CONTAINS
     NULLIFY(L%LAST)
     INDEX=INDEX+1
     L%INDEX=INDEX
-  END SUBROUTINE Set_Up_THIN_LAYOUT
+  END SUBROUTINE Set_Up_NODE_LAYOUT
 
   SUBROUTINE APPEND_EMPTY_THIN( L )  ! Creates an empty fibre to be filled later
     implicit none
-    TYPE (THIN_LENS), POINTER :: Current
-    TYPE (THIN_LAYOUT) L
+    TYPE (INTEGRATION_NODE), POINTER :: Current
+    TYPE (NODE_LAYOUT) L
     !    LOGICAL(LP) doneit
 
     L%N=L%N+1
@@ -1195,9 +1257,31 @@ CONTAINS
 
   END SUBROUTINE APPEND_EMPTY_THIN
 
+
+  SUBROUTINE allocate_node_frame( L )  ! Creates an empty fibre to be filled later
+    implicit none
+    TYPE (INTEGRATION_NODE), POINTER :: Current
+    TYPE (LAYOUT) L
+    integer i
+
+
+    Current=>L%T%START
+    do i=1,L%T%N
+       IF(.NOT.ASSOCIATED(CURRENT%A)) THEN
+          ALLOCATE(CURRENT%A(3),CURRENT%ENT(3,3))
+          ALLOCATE(CURRENT%B(3),CURRENT%EXI(3,3))
+          CURRENT%A=ZERO
+          CURRENT%ENT=GLOBAL_FRAME
+          CURRENT%B=ZERO
+          CURRENT%EXI=GLOBAL_FRAME
+       ENDIF
+       Current=>CURRENT%NEXT
+    ENDDO
+  end SUBROUTINE allocate_node_frame
+
   SUBROUTINE LINE_L_THIN(L,doneit) ! makes into line temporarily
     implicit none
-    TYPE (THIN_layout) L
+    TYPE (NODE_LAYOUT) L
     logical(lp) doneit
     doneit=.false.
     if(L%closed)  then
@@ -1213,7 +1297,7 @@ CONTAINS
 
   SUBROUTINE RING_L_THIN(L,doit) ! Brings back to ring if needed
     implicit none
-    TYPE (THIN_layout) L
+    TYPE (NODE_LAYOUT) L
     logical(lp) doit
     if(L%closed.and.doit)  then
        if(.NOT.(associated(L%end%next))) then
@@ -1227,52 +1311,172 @@ CONTAINS
     endif
   END SUBROUTINE RING_L_THIN
 
-  SUBROUTINE  DEALLOC_THIN_LENS(T)
+  SUBROUTINE  DEALLOC_INTEGRATION_NODE(T)
     IMPLICIT NONE
-    TYPE(THIN_LENS), TARGET, INTENT(INOUT) :: T
+    TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT) :: T
 
     IF(ASSOCIATED(T%a)) DEALLOCATE(T%a)
     IF(ASSOCIATED(T%ent)) DEALLOCATE(T%ent)
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)
     IF(ASSOCIATED(T%exi)) DEALLOCATE(T%exi)
     IF(ASSOCIATED(T%S)) DEALLOCATE(T%S)
-    IF(ASSOCIATED(T%ORBIT)) DEALLOCATE(T%ORBIT)
+    !    IF(ASSOCIATED(T%ORBIT)) DEALLOCATE(T%ORBIT)
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
     IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)
     IF(ASSOCIATED(T%CAS)) DEALLOCATE(T%CAS)
-    IF(ASSOCIATED(T%TEAPOT_LIKE)) DEALLOCATE(T%TEAPOT_LIKE)
+    IF(ASSOCIATED(T%USE_TPSA_MAP)) DEALLOCATE(T%USE_TPSA_MAP)
+    IF(ASSOCIATED(T%TPSA_MAP)) THEN
+       CALL KILL(T%TPSA_MAP)
+       DEALLOCATE(T%TPSA_MAP)
+    ENDIF
 
-  END SUBROUTINE  DEALLOC_THIN_LENS
+  END SUBROUTINE  DEALLOC_INTEGRATION_NODE
 
-  SUBROUTINE kill_THIN_Layout( L )  ! Destroys a layout
+  SUBROUTINE kill_NODE_LAYOUT( L )  ! Destroys a layout
     implicit none
-    TYPE (THIN_LENS), POINTER :: Current
-    TYPE (THIN_layout) L
+    TYPE (INTEGRATION_NODE), POINTER :: Current
+    TYPE (NODE_LAYOUT), POINTER ::  L
     logical(lp) doneit
     CALL LINE_L_THIN(L,doneit)
+
+    IF(ASSOCIATED(L%ORBIT_LATTICE)) THEN
+       CALL de_Set_Up_ORBIT_LATTICE(L%ORBIT_LATTICE)  !  KILLING ORBIT LATTICE
+       !(NO LINKED LIST DE_SET_UP_... = KILL_... )
+       WRITE(6,*) " ORBIT LATTICE HAS BEEN KILLED "
+    ENDIF
+
+
     nullify(current)
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
        L % end => Current % previous  ! update the end before disposing
-       call DEALLOC_THIN_LENS(Current)
+       call DEALLOC_INTEGRATION_NODE(Current)
        Current => L % end     ! alias of last fibre again
        L%N=L%N-1
     END DO
-    call de_Set_Up_THIN_LAYOUT(L)
-  END SUBROUTINE kill_THIN_Layout
+    call de_Set_Up_NODE_LAYOUT(L)
+    DEALLOCATE(L);
+  END SUBROUTINE kill_NODE_LAYOUT
 
-  SUBROUTINE de_Set_Up_THIN_LAYOUT( L ) ! deallocates layout content
+  SUBROUTINE de_Set_Up_ORBIT_LATTICE( L ) ! deallocates layout content
     implicit none
-    TYPE (THIN_layout) L
+    TYPE (ORBIT_LATTICE),POINTER :: L
+    INTEGER I,N
+
+    DO I=1,L%ORBIT_N_NODE
+       CALL KILL_ORBIT_NODE(L%ORBIT_NODES,I)
+    ENDDO
+    deallocate(L%ORBIT_NODES)
+    deallocate(L%ORBIT_N_NODE)
+    deallocate(L%ORBIT_USE_ORBIT_UNITS)
+    deallocate(L%ORBIT_WARNING)
+    deallocate(L%ORBIT_P0C)
+    deallocate(L%ORBIT_BETA0)
+    deallocate(L%ORBIT_LMAX)
+    deallocate(L%orbit_kinetic)
+    deallocate(L%ORBIT_MAX_PATCH_TZ)
+    deallocate(L%ORBIT_mass_in_amu)
+    deallocate(L%ORBIT_gammat)
+    deallocate(L%ORBIT_harmonic)
+    deallocate(L%ORBIT_L)
+    deallocate(L%ORBIT_L)
+    deallocate(L%ORBIT_CHARGE)
+    deallocate(L%STATE)
+
+    deallocate(L%NP)
+    deallocate(L%TURN)
+    deallocate(L%NV0)
+    deallocate(L%NV1)
+    deallocate(L%DV0)
+    deallocate(L%DV1)
+    deallocate(L%L_TOT)
+
+    deallocate(L)
+
+  END SUBROUTINE de_Set_Up_ORBIT_LATTICE
+
+  SUBROUTINE KILL_ORBIT_NODE(ORBIT_LAYOUT,I)
+    IMPLICIT NONE
+    TYPE(ORBIT_NODE),POINTER :: ORBIT_LAYOUT(:)
+    INTEGER I
+    DEALLOCATE(ORBIT_LAYOUT(I)%LATTICE)
+    DEALLOCATE(ORBIT_LAYOUT(I)%DPOS)
+    DEALLOCATE(ORBIT_LAYOUT(I)%ENTERING_TASK)
+    DEALLOCATE(ORBIT_LAYOUT(I)%PTC_TASK)
+    DEALLOCATE(ORBIT_LAYOUT(I)%CAVITY)
+  END SUBROUTINE KILL_ORBIT_NODE
+
+  SUBROUTINE ALLOC_ORBIT_NODE(ORBIT_LAYOUT,I,NL)
+    IMPLICIT NONE
+    TYPE(ORBIT_NODE),POINTER :: ORBIT_LAYOUT(:)
+    INTEGER I,NL
+
+    ALLOCATE(ORBIT_LAYOUT(I)%LATTICE(NL))
+    ALLOCATE(ORBIT_LAYOUT(I)%DPOS)
+    ALLOCATE(ORBIT_LAYOUT(I)%ENTERING_TASK)
+    ALLOCATE(ORBIT_LAYOUT(I)%PTC_TASK)
+    ALLOCATE(ORBIT_LAYOUT(I)%CAVITY)
+
+    ORBIT_LAYOUT(I)%LATTICE(NL)=ZERO
+    ORBIT_LAYOUT(I)%DPOS=0
+    ORBIT_LAYOUT(I)%ENTERING_TASK=0
+    ORBIT_LAYOUT(I)%PTC_TASK=0
+    ORBIT_LAYOUT(I)%CAVITY=MY_FALSE
+
+  END SUBROUTINE ALLOC_ORBIT_NODE
+
+  SUBROUTINE Set_Up_ORBIT_LATTICE(O,N,U)
+    IMPLICIT NONE
+    TYPE(ORBIT_LATTICE),POINTER :: O
+    INTEGER N,I
+    INTEGER  ::  ORBIT_N_NODE
+    LOGICAL(lp)  ::  U
+
+    if(N>0) THEN
+       ALLOCATE(O%ORBIT_NODES(N))
+    ELSE
+       ALLOCATE(O%ORBIT_N_NODE);O%ORBIT_N_NODE=N
+       ALLOCATE(O%ORBIT_USE_ORBIT_UNITS);O%ORBIT_USE_ORBIT_UNITS=U
+       ALLOCATE(O%ORBIT_WARNING);O%ORBIT_WARNING=0
+       ALLOCATE(O%ORBIT_OMEGA);O%ORBIT_OMEGA=ONE
+       ALLOCATE(O%ORBIT_P0C);O%ORBIT_P0C=ONE
+       ALLOCATE(O%ORBIT_BETA0);O%ORBIT_BETA0=ONE
+       ALLOCATE(O%ORBIT_LMAX);O%ORBIT_LMAX=ZERO
+       ALLOCATE(O%orbit_kinetic);O%orbit_kinetic=ZERO
+       ALLOCATE(O%ORBIT_MAX_PATCH_TZ);O%ORBIT_MAX_PATCH_TZ=ZERO
+       ALLOCATE(O%ORBIT_mass_in_amu);O%ORBIT_mass_in_amu=ZERO
+       ALLOCATE(O%ORBIT_gammat);O%ORBIT_gammat=ZERO
+       ALLOCATE(O%ORBIT_L);O%ORBIT_L=ZERO
+       ALLOCATE(O%ORBIT_harmonic);O%ORBIT_harmonic=ONE
+       ALLOCATE(O%ORBIT_CHARGE);O%ORBIT_CHARGE=1
+       ALLOCATE(O%STATE);O%STATE=DEFAULT
+
+
+       ALLOCATE(O%NP);O%NP=0
+       ALLOCATE(O%TURN);O%TURN=0
+       ALLOCATE(O%NV0);O%NV0=0
+       ALLOCATE(O%NV1);O%NV1=0
+       ALLOCATE(O%DV0);O%DV0=ZERO
+       ALLOCATE(O%DV1);O%DV1=ZERO
+       ALLOCATE(O%L_TOT);O%L_TOT=ZERO
+
+    ENDIF
+  END SUBROUTINE Set_Up_ORBIT_LATTICE
+
+
+  SUBROUTINE de_Set_Up_NODE_LAYOUT( L ) ! deallocates layout content
+    implicit none
+    TYPE (NODE_LAYOUT), POINTER :: L
     deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);
     deallocate(L%INDEX);
     deallocate(L%n);          !deallocate(L%parent_universe)   left out
-  END SUBROUTINE de_Set_Up_THIN_LAYOUT
+    IF(ASSOCIATED(L%ORBIT_LATTICE)) deallocate(L%ORBIT_LATTICE);
+  END SUBROUTINE de_Set_Up_NODE_LAYOUT
 
-  SUBROUTINE move_to_THIN_LENS( L,current,POS ) ! Moves current to the i^th position
+  SUBROUTINE move_to_INTEGRATION_NODE( L,current,POS ) ! Moves current to the i^th position
     implicit none
-    TYPE (THIN_lENS), POINTER :: Current
-    TYPE (THIN_layout) L
+    TYPE (INTEGRATION_NODE), POINTER :: Current
+    TYPE (NODE_LAYOUT) L
     integer i,k,POS
     logical(lp) doneit
 
@@ -1307,7 +1511,7 @@ CONTAINS
     ENDIF
     L%LASTPOS=I; L%LAST => Current;
     CALL RING_L_THIN(L,doneit)
-  END SUBROUTINE move_to_THIN_LENS
+  END SUBROUTINE move_to_INTEGRATION_NODE
 
 
 END MODULE S_FIBRE_BUNDLE

@@ -980,6 +980,7 @@ contains
     c_%check_y_max => check_y_max
     c_%hyperbolic_aperture => hyperbolic_aperture
     c_%WATCH_USER => WATCH_USER
+    c_%no_hyperbolic_in_normal_form => no_hyperbolic_in_normal_form
 
   end subroutine set_da_pointers
 

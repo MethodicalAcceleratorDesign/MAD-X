@@ -37,7 +37,8 @@ module precision_constants
   !Logicals
   logical(lp),parameter:: my_true=.true.
   logical(lp),parameter:: my_false=.false.
-  logical(lp),target :: global_verbose=.true.
+  logical(lp),target :: global_verbose=.false.
+  logical(lp),target :: no_hyperbolic_in_normal_form=.false.
   !Numbers double
   real(dp),parameter::zero=0e0_dp,one=1e0_dp,two=2e0_dp,three=3e0_dp,four=4e0_dp,five=5e0_dp
   real(dp),parameter::six=6e0_dp,seven=7e0_dp,eight=8e0_dp,nine=9e0_dp,ten=10e0_dp
@@ -72,6 +73,7 @@ module precision_constants
   real(dp),parameter::RAD_TO_DEG_=c_180/pi,DEG_TO_RAD_=pi/c_180
   !Physical Constants
   real(dp),parameter::pmae=5.10998902e-4_dp
+  real(dp),parameter::pmae_amu=5.48579903e-4_dp
   ![GeV]
   real(dp),parameter::pmap=0.938271998e0_dp
   ![GeV]
@@ -157,7 +159,7 @@ module precision_constants
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
   real(dp),target ::  da_absolute_aperture=c_1d6
-  real(dp) :: crash=-one
+  real(dp),pointer :: crash
   type info_window
      character(3) adv
      integer nc,nr,ni
@@ -250,6 +252,7 @@ module precision_constants
      logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK  !=.true.
      real(dp),pointer :: phase0 ! default phase in cavity
      logical(lp), pointer :: global_verbose
+     logical(lp), pointer :: no_hyperbolic_in_normal_form ! unstable produces exception
      character*120 message
   end type CONTROL
 

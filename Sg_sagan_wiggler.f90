@@ -175,6 +175,7 @@ contains
     INTEGER I,J
 
     !    CALL SET_W(EL%W)
+    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     IF(EL%P%DIR==1) THEN
        Z=zero
@@ -195,6 +196,7 @@ contains
           CALL DRIFT(EL,DH,Z,2,X)
           CALL DRIFT(EL,DH,Z,1,X)
           Z=Z+EL%P%DIR*DH
+          IF(PRESENT(MID)) CALL XMID(MID,X,i)
        ENDDO
     CASE(4)
        D=EL%L/EL%P%NST
@@ -230,6 +232,7 @@ contains
           CALL DRIFT(EL,D1,Z,2,X)
           CALL DRIFT(EL,D1,Z,1,X)
           Z=Z+EL%P%DIR*D1
+          IF(PRESENT(MID)) CALL XMID(MID,X,i)
        ENDDO
 
     CASE(6)
@@ -260,6 +263,7 @@ contains
              CALL DRIFT(EL,DF(J),Z,1,X)
              Z=Z+EL%P%DIR*DF(J)
           ENDDO
+          IF(PRESENT(MID)) CALL XMID(MID,X,i)
        ENDDO
 
     CASE DEFAULT
@@ -371,12 +375,11 @@ contains
 
 
 
-  SUBROUTINE INTP(EL,X,mid)
+  SUBROUTINE INTP(EL,X)
     IMPLICIT NONE
     integer ipause, mypause
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(INOUT):: EL
-    TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: mid
     TYPE(REAL_8) Z
     TYPE(REAL_8) D,DH
     TYPE(REAL_8) D1,D2,DK1,DK2
@@ -1674,7 +1677,7 @@ contains
        CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
 
 
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
        if(EL%P%TIME) then
           X(2)=X_MEC(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+A
           X(4)=X_MEC(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+B
@@ -1720,7 +1723,7 @@ contains
        CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
 
 
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
        if(EL%P%TIME) then
           X(2)=X_MEC(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+A
           X(4)=X_MEC(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+B
@@ -1793,7 +1796,7 @@ contains
        XP%V(4)=X_MEC(4)/(one+X5)
 
 
-       X(5)=X(5)-CRAD*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
+       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
        if(EL%P%TIME) then
           X(2)=X_MEC(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+A
           X(4)=X_MEC(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+B
@@ -1809,7 +1812,7 @@ contains
        denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
        b20=b2
        b30=b20**c_1_5
-       bf=cfluc*b30
+       bf=cflucf(el%p)*b30
        denf=denf*bf*L
        done_stoch=.true.
     elseif(EL%P%B0/=zero)   then
@@ -1838,14 +1841,14 @@ contains
              CALL B2PERP(EL%P,B_F,xr,X5,B2)
 
              denf=(one+xr(5))**4*(one+xr(1)*EL%P%B0+half*(xr(2)**2+xr(4)**2)/(one+xr(5))**2)
-             denf=DENF*cfluc*L*b2**c_1_5
+             denf=DENF*cflucf(el%p)*L*b2**c_1_5
           else
              CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
 
              denf=(one+xR(5))**4*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+XR(5))**2)
              b20=b2
              b30=b20**c_1_5
-             bf=cfluc*b30
+             bf=cflucf(el%p)*b30
              denf=denf*bf*L
           endif
        endif

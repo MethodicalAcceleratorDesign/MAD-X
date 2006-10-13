@@ -8,7 +8,7 @@ module S_fitting
   PRIVATE FIND_ORBIT_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
   logical(lp), PRIVATE :: VERBOSE = .false.
   integer :: max_fit_iter=20, ierror_fit=0
-
+  real(dp) :: fuzzy_split=one
 
   INTERFACE FIND_ORBIT
      ! LINKED
@@ -629,448 +629,6 @@ contains
 
   end subroutine lattice_fit_CHROM_gmap
 
-  subroutine lattice_fit_SEXT_RES_from_a_gmap_vec(R,my_state,EPSF,MRES,POLY,NPOLY,TARG,NP,neq)
-    IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
-    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
-    INTEGER, intent(in):: NPOLY,NP
-    real(dp) , intent(IN),dimension(:)::TARG
-    real(dp) CLOSED(6)
-    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
-    TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,more
-    TYPE(TAYLOR), allocatable:: EQ(:)
-    TYPE(REAL_8) Y(6)
-    TYPE(NORMALFORM) NORM
-    integer :: neq, no=3,nt,j,it,MRES(3)
-    type(damap) id,B,N,NC
-    type(gmap) g
-    TYPE(TAYLOR)t,Q1,P1,Q2,P2
-    TYPE(PBFIELD)H
-    TYPE(PBresonance)Hr
-    TYPE(VECRESONANCE)HRES_a,hres_n
-    TYPE(ONELIEEXPONENT)HC
-    real(dp) epsf,epsr,epsnow,CHROM(2),ARES(2),TR,PREC
-    INTEGER, ALLOCATABLE :: EXPON(:),JEXP(:)
-    integer i_look
-    epsr=abs(epsf)
-    PREC=c_1d_10
-    allocate(eq(neq))
-
-    nt=neq+np
-    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
-
-    CALL INIT(STATE,no,NP,BERZ)
-
-    SET_TPSAFIT=.FALSE.
-
-    DO I=1,NPOLY
-       R=POLY(i)
-    ENDDO
-    CLOSED(:)=zero
-    it=0
-    EPSNOW=mybig
-100 continue
-    it=it+1
-
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
-    write(6,*) "closed orbit "
-    write(6,*) CLOSED
-
-
-    CALL INIT(STATE,no,NP,BERZ)
-    CALL ALLOC(NORM)
-    CALL ALLOC(Y)
-    CALL ALLOC(EQ)
-    call alloc(id,B,N,NC)    ! LOOK AT PAGE 143 OF THE BOOK
-    CALL ALLOC(H)
-    CALL ALLOC(HC)
-    CALL ALLOC(HRES_a)
-    CALL ALLOC(hres_n)
-    ALLOCATE(EXPON(C_%NV))
-    ALLOCATE(JEXP(C_%NPARA))
-    call alloc(hr)
-    WRITE(6,*) " NPARA = ",C_%NPARA
-    id=1
-    Y=CLOSED+id
-
-    CALL TRACK(R,Y,1,+STATE)
-
-    ! ETIENNE
-
-    NORM=Y
-
-
-    HRES_a=NORM%a%nonlinear
-    hr=NORM%a%pb
-
-    CALL PRINT(HR%COS,6,PREC)
-    CALL PRINT(HR%SIN,6,PREC)
-    if(neq==4) then
-       HRES_n=NORM%normal%nonlinear
-       hr=NORM%normal%pb
-
-       CALL PRINT(HR%COS,6,PREC)
-    endif
-    EXPON=0
-    IF(MRES(1)==0) THEN
-       expon(3)=iabs(mres(2))-1
-       i_look=4
-    ELSEIF(MRES(2)==0) THEN
-       expon(1)=iabs(mres(1))-1
-       i_look=2
-    ELSEIF(MRES(1)*MRES(2)>0) THEN
-       expon(1)=iabs(mres(1))-1
-       i_look=2
-       expon(3)= iabs(mres(2))
-    ELSE
-       expon(1)=iabs(mres(1))-1
-       i_look=2
-       expon(4)= iabs(mres(2))
-    ENDIF
-
-    ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-(EXPON(i_look-1)+1))/two
-    ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(EXPON(i_look-1)+1)/two
-    !   WRITE(6,*) " STRENGTH OF RESONANCE = ",ARES
-    ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-mres(i_look/2))/two
-    ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(mres(i_look/2))/two
-    JEXP=0
-    JEXP(1:C_%NPARA)=EXPON(1:C_%NPARA)
-    CHROM(1)=(HRES_n%sin%v(2).SUB.'01001')/(PI)/two
-    CHROM(2)=(HRES_n%sin%v(4).SUB.'00011')/(PI)/two
-
-    !    write(6,*) " CHROM ",CHROM
-    WRITE(6,*) " STRENGTH OF RESONANCE = ",ARES
-    WRITE(6,*) " CHROMATICITIES  = ",CHROM
-
-
-    eq(1)=       ( (HRES_a%sin%v(i_look).par.jexp)/(-mres(i_look/2))/two)-targ(1)
-    eq(2)=       ((HRES_a%cos%v(i_look).par.jexp)/(mres(i_look/2))/two)-targ(2)
-    if(neq==4) then
-       eq(3)=       (HRES_n%sin%v(2).par.'01001')/(PI)/two-targ(3)
-       eq(4)=       (HRES_n%sin%v(4).par.'00011')/(PI)/two-targ(4)
-    endif
-    epsnow=zero
-    do i=1,neq
-       epsnow=abs(eq(i))+epsnow
-    enddo
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-
-    do i=1,neq
-       eq(i)=eq(i)<=c_%npara
-    enddo
-    do i=1,neq
-       call daprint(eq(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-    CALL KILL(NORM)
-    CALL KILL(Y)
-    CALL KILL(HC)
-    CALL KILL(id,B,N,NC)
-    CALL KILL(EQ)
-    CALL KILL(H)
-    CALL KILL(HRES_a)
-    CALL KILL(hres_n)
-
-    call KILL(hr)
-
-    DEALLOCATE(EXPON)
-    DEALLOCATE(JEXP)
-
-
-
-    CALL INIT(1,nt)
-    call alloc(g,nt)
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    do i=np+1,nt
-       call read(g%v(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-
-    call alloc(t)
-    do i=1,np
-       g%v(i)=one.mono.i
-       do j=np+1,nt
-          t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
-       enddo
-    enddo
-    CALL KILL(t)
-
-    g=g.oo.(-1)
-    tpsafit(1:nt)=g
-
-    SET_TPSAFIT=.true.
-
-    DO I=1,NPOLY
-       R=POLY(i)
-    ENDDO
-    SET_TPSAFIT=.false.
-
-    CALL ELP_TO_EL(R)
-
-    !    write(6,*) " more "
-    !    read(5,*) more
-    if(it>=max_fit_iter) goto 101
-    if(epsnow<=epsr) goto 102
-    GOTO 100
-
-101 continue
-    write(6,*) " warning did not converge "
-
-102 continue
-    CALL KILL_PARA(R)
-    deallocate(eq)
-
-  end subroutine lattice_fit_SEXT_RES_from_a_gmap_vec
-
-  subroutine lattice_fit_SEXT_RES_from_a_gmap_vec1(R,my_state,EPSF,MRES,POLY,NPOLY,TARG,NP,neq)
-    IMPLICIT NONE
-    integer ipause, mypause
-    TYPE(layout), intent(inout):: R
-    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
-    INTEGER, intent(in):: NPOLY,NP
-    real(dp) , intent(IN),dimension(:)::TARG
-    real(dp) CLOSED(6)
-    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
-    TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,more
-    TYPE(TAYLOR), allocatable:: EQ(:)
-    TYPE(REAL_8) Y(6)
-    TYPE(NORMALFORM) NORM
-    integer :: neq, no=5,nt,j,it,MRES(3)
-    type(damap) id,B,N,NC
-    type(gmap) g
-    TYPE(TAYLOR)t,Q1,P1,Q2,P2
-    TYPE(PBFIELD)H
-    TYPE(PBresonance)Hr
-    TYPE(VECRESONANCE)HRES_a,hres_n
-    TYPE(ONELIEEXPONENT)HC
-    real(dp) epsf,epsr,epsnow,CHROM(2),ARES(2),TR,PREC,emit
-    INTEGER, ALLOCATABLE :: EXPON(:),JEXP(:),JEXP5_x(:),JEXP5_y(:)
-    integer i_look
-    TYPE(TAYLOR)  r5_cos(2),r5_sin(2)
-
-    write(6,*) " give r**2  for fit "
-    read(5,*) emit
-    !   emit=22.e-6_dp
-    epsr=abs(epsf)
-    PREC=c_1d_10
-    allocate(eq(neq))
-
-    nt=neq+np
-    if(neq==4) then
-       STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
-    else
-       STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
-    endif
-    CALL INIT(STATE,no,NP,BERZ)
-
-    SET_TPSAFIT=.FALSE.
-
-    DO I=1,NPOLY
-       R=POLY(i)
-    ENDDO
-    CLOSED(:)=zero
-    it=0
-    EPSNOW=mybig
-100 continue
-    it=it+1
-
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
-    write(6,*) "closed orbit "
-    write(6,*) CLOSED
-
-
-    CALL INIT(STATE,no,NP,BERZ)
-    CALL ALLOC(NORM)
-    CALL ALLOC(Y)
-    CALL ALLOC(EQ)
-    call alloc(id,B,N,NC)    ! LOOK AT PAGE 143 OF THE BOOK
-    CALL ALLOC(H)
-    CALL ALLOC(HC)
-    CALL ALLOC(HRES_a)
-    CALL ALLOC(hres_n)
-    call alloc(r5_cos)
-    call alloc(r5_sin)
-    ALLOCATE(JEXP5_x(C_%NPARA))
-    ALLOCATE(JEXP5_y(C_%NPARA))
-    ALLOCATE(EXPON(C_%NV))
-    ALLOCATE(JEXP(C_%NPARA))
-    call alloc(hr)
-    WRITE(6,*) " NPARA = ",C_%NPARA
-    id=1
-    Y=CLOSED+id
-
-    CALL TRACK(R,Y,1,+STATE)
-
-    ! ETIENNE
-
-    NORM=Y
-
-
-    HRES_a=NORM%a%nonlinear
-    hr=NORM%a%pb
-    !          open(unit=36,file='junk.txt')
-    ! CALL PRINT(HR%COS,36,PREC)
-    ! CALL PRINT(HR%SIN,36,PREC)
-    if(neq==4) then
-       HRES_n=NORM%normal%nonlinear
-       hr=NORM%normal%pb
-
-       CALL PRINT(HR%COS,6,PREC)
-    endif
-    EXPON=0
-    IF(MRES(1)==0) THEN
-       expon(3)=iabs(mres(2))-1
-       i_look=4
-    ELSEIF(MRES(2)==0) THEN
-       expon(1)=iabs(mres(1))-1
-       i_look=2
-    ELSEIF(MRES(1)*MRES(2)>0) THEN
-       expon(1)=iabs(mres(1))-1
-       i_look=2
-       expon(3)= iabs(mres(2))
-    ELSE
-       expon(1)=iabs(mres(1))-1
-       i_look=2
-       expon(4)= iabs(mres(2))
-    ENDIF
-
-    ARES(1)=(HRES_a%sin%v(i_look).SUB.EXPON)/(-(EXPON(i_look-1)+1))/two
-    ARES(2)=(HRES_a%cos%v(i_look).SUB.EXPON)/(EXPON(i_look-1)+1)/two
-    JEXP=0
-    JEXP(1:C_%NPARA)=EXPON(1:C_%NPARA)
-    if(neq==4)  CHROM(1)=(HRES_n%sin%v(2).SUB.'01001')/(PI)/two
-    if(neq==4)   CHROM(2)=(HRES_n%sin%v(4).SUB.'00011')/(PI)/two
-
-    !    write(6,*) " CHROM ",CHROM
-    WRITE(6,*) " STRENGTH OF RESONANCE = ",ARES
-    if(neq==4)    WRITE(6,*) " CHROMATICITIES  = ",CHROM
-
-
-    eq(1)=       ( (HRES_a%sin%v(i_look).par.jexp)/(-mres(i_look/2))/two)-targ(1)
-    eq(2)=       ((HRES_a%cos%v(i_look).par.jexp)/(mres(i_look/2))/two)-targ(2)
-    JEXP5_x=jexp
-    JEXP5_x(1)=JEXP5_x(1)+1
-    JEXP5_x(2)=JEXP5_x(2)+1
-    r5_cos(1)=( (HRES_a%sin%v(i_look).par.JEXP5_x)/(-(JEXP5_x(i_look-1)+1))/two)
-    r5_sin(1)=( (HRES_a%cos%v(i_look).par.JEXP5_x)/((JEXP5_x(i_look-1)+1))/two)
-    JEXP5_y=jexp
-    JEXP5_y(3)=JEXP5_y(3)+1
-    JEXP5_y(4)=JEXP5_y(4)+1
-    r5_cos(2)=( (HRES_a%sin%v(i_look).par.JEXP5_y)/(-(JEXP5_y(i_look-1)+1))/two)
-    r5_sin(2)=( (HRES_a%cos%v(i_look).par.JEXP5_y)/((JEXP5_y(i_look-1)+1))/two)
-
-    call print(eq(1),6)
-    call print(r5_cos(1),6)
-    call print(r5_cos(2),6)
-    ipause=mypause(12)
-    !      pause 11
-    !      call print(r5_sin(1),36)
-    !      pause 12
-    !      call print(r5_cos(2),36)
-    !      pause 13
-    !      call print(r5_sin(2),36)
-    !      close(36)
-    !      pause 14
-    eq(1)=eq(1)+emit*(r5_cos(1)+r5_cos(2))
-    eq(2)=eq(2)+emit*(r5_sin(1)+r5_sin(2))
-    ares(1)=eq(1)
-    ares(2)=eq(2)
-    WRITE(6,*) " STRENGTH OF the combined RESONANCE = ",ARES
-    if(neq==4) then
-       eq(3)=       (HRES_n%sin%v(2).par.'01001')/(PI)/two-targ(3)
-       eq(4)=       (HRES_n%sin%v(4).par.'00011')/(PI)/two-targ(4)
-    endif
-    epsnow=zero
-    do i=1,neq
-       epsnow=abs(eq(i))+epsnow
-    enddo
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-
-    do i=1,neq
-       eq(i)=eq(i)<=c_%npara
-    enddo
-    do i=1,neq
-       call daprint(eq(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-    CALL KILL(NORM)
-    CALL KILL(Y)
-    CALL KILL(HC)
-    CALL KILL(id,B,N,NC)
-    CALL KILL(EQ)
-    CALL KILL(H)
-    CALL KILL(HRES_a)
-    CALL KILL(hres_n)
-    call KILL(r5_cos)
-    call KILL(r5_sin)
-
-    call KILL(hr)
-
-    DEALLOCATE(EXPON)
-    DEALLOCATE(JEXP)
-    DEALLOCATE(JEXP5_x)
-    DEALLOCATE(JEXP5_y)
-
-
-
-
-    CALL INIT(1,nt)
-    call alloc(g,nt)
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    do i=np+1,nt
-       call read(g%v(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-
-    call alloc(t)
-    do i=1,np
-       g%v(i)=one.mono.i
-       do j=np+1,nt
-          t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
-       enddo
-    enddo
-    CALL KILL(t)
-
-    g=g.oo.(-1)
-    tpsafit(1:nt)=g
-
-    SET_TPSAFIT=.true.
-
-    DO I=1,NPOLY
-       R=POLY(i)
-    ENDDO
-    SET_TPSAFIT=.false.
-
-    CALL ELP_TO_EL(R)
-
-    !    write(6,*) " more "
-    !    read(5,*) more
-    if(it>=max_fit_iter) goto 101
-    if(epsnow<=epsr) goto 102
-    GOTO 100
-
-101 continue
-    write(6,*) " warning did not converge "
-
-102 continue
-    CALL KILL_PARA(R)
-    deallocate(eq)
-
-  end subroutine lattice_fit_SEXT_RES_from_a_gmap_vec1
 
   subroutine lattice_PRINT_RES_FROM_A(R,my_state,NO,EMIT0,MRES,FILENAME)
     IMPLICIT NONE
@@ -1453,7 +1011,7 @@ contains
     if(.not.present(STATE)) then
        IF(default%NOCAVITY) THEN
           !    ND1=2
-          stat=default+only_4d
+          stat=default+    only_4d
        ELSE
           !   ND1=3
           STAT=default
@@ -1552,7 +1110,7 @@ contains
        endif
 
     ENDDO
-
+    !    write(6,*) x
     x(6)=x(6)-freq*turns0
 
     mx=zero
@@ -1615,6 +1173,8 @@ contains
     do iu=1,ND2
        xdix=abs(dix(iu))+xdix
     enddo
+    !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
+    !    pause 123321
     w_p=0
     w_p%nc=1
     w_p%fc='((1X,a72))'
@@ -2216,13 +1776,13 @@ contains
   end SUBROUTINE  track_aperture
 
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout), intent(inout) :: R
-    real(dp), OPTIONAL, intent(inout) :: THIN
-    real(dp) gg,RHOI,XL,QUAD,THI
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc  !,limit0(2)
+    real(dp), OPTIONAL, intent(inout) :: THIN,lmax
+    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec  !,limit0(2)
     integer, optional :: lim(2)
     logical(lp) MANUAL,eject,doit
     TYPE (fibre), POINTER :: C
@@ -2231,6 +1791,8 @@ contains
     nullify(C)
     parity=0
     inc=0
+    lm=1.0e38_dp
+    if(present(lmax)) lm=lmax
     if(present(even)) then
        inc=1
        if(even) then
@@ -2271,6 +1833,7 @@ contains
     MK2=0
     MK3=0
     r%NTHIN=0
+    nst_tot=0
 
     C=>R%START
     do   WHILE(ASSOCIATED(C))
@@ -2294,15 +1857,17 @@ contains
           END SELECT
           r%NTHIN=r%NTHIN+1   !C%MAG%NST
        endif
+       NST_tot=NST_tot+C%MAG%P%nst
 
        C=>C%NEXT
 
     enddo
-    write(6,*) "Present of cutable Elements ",r%NTHIN
+    write(6,*) "Previous of cutable Elements ",r%NTHIN
     write(6,*) "METHOD 2 ",M1,MK1
     write(6,*) "METHOD 4 ",M2,MK2
     write(6,*) "METHOD 6 ",M3,MK3
     write(6,*)   "number of Slices ", MK1+MK2+MK3
+    write(6,*)   "Total NST ", NST_tot
 
     if(eject) then
        !      limit(1)=limit0(1)
@@ -2320,15 +1885,27 @@ contains
     r%NTHIN=0
     r%THIN=THI
 
+    nst_tot=0
     C=>R%START
     do   WHILE(ASSOCIATED(C))
+
 
        doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
        DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
        DOIT=DOIT.OR.(C%MAG%KIND==kind17)
 
+
        if(doit)  then
+
+
+          dl=(C%MAG%P%ld/C%MAG%P%nst)
+          ntec=C%MAG%P%NST
+          if(dl>lmax*fuzzy_split) then
+             ntec=int(C%MAG%P%ld/lmax)+1
+             if(mod(nte,2)/=parity) ntec=ntec+inc
+             C%MAG%P%NST=ntec
+          endif
 
 
           xl=C%MAG%L
@@ -2345,37 +1922,62 @@ contains
           GG=XL*(RHOI**2+ABS(QUAD))
           GG=GG/THI
           NTE=INT(GG)
+
           IF(NTE.LT.limit(1)) THEN
              M1=M1+1
-             C%MAG%P%METHOD=2
              IF(NTE.EQ.0) NTE=1
              if(mod(nte,2)/=parity) nte=nte+inc
-             C%MAG%P%NST=NTE
+             if(nte>ntec) then
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=2
+             endif
              MK1=MK1+NTE
           ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
              M2=M2+1
-             C%MAG%P%METHOD=4
              NTE=NTE/3
              IF(NTE.EQ.0) NTE=1
              if(mod(nte,2)/=parity) nte=nte+inc
-             C%MAG%P%NST=NTE
+             if(nte>ntec) then
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=4
+             endif
              MK2=MK2+NTE*3
           ELSEIF(NTE.GE.limit(2)) THEN
              M3=M3+1
-             C%MAG%P%METHOD=6
              NTE=NTE/7
              IF(NTE.EQ.0) NTE=1
              if(mod(nte,2)/=parity) nte=nte+inc
-             C%MAG%P%NST=NTE
+             if(nte>ntec) then
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=6
+             endif
              MK3=MK3+NTE*7
           ENDIF
+
+
           r%NTHIN=r%NTHIN+1  !C%MAG%NST
 
+          if(nte>ntec) then
+             call add(C%MAG,C%MAG%P%nmul,1,zero)
+             call COPY(C%MAG,C%MAGP)
+          endif
+       else
+          dl=(C%MAG%P%ld/C%MAG%P%nst)
+          if(dl>lmax*fuzzy_split.and.C%MAG%KIND/=kindpa) then
+             nte=int(C%MAG%P%ld/lmax)+1
+             if(mod(nte,2)/=parity) nte=nte+inc
+             C%MAG%P%NST=nte
+             if(associated(C%MAG%bn))call add(C%MAG,C%MAG%P%nmul,1,zero)
+             call COPY(C%MAG,C%MAGP)
+          elseif(dl>lmax.and.C%MAG%KIND==kindpa) then
+             write(6,*) " Pancake cannot be recut "
+          endif
 
-          call add(C%MAG,C%MAG%P%nmul,1,zero)
-          call COPY(C%MAG,C%MAGP)
-       ENDIF
 
+
+
+       endif
+       NST_tot=NST_tot+C%MAG%P%nst
        C=>C%NEXT
     enddo
 
@@ -2385,6 +1987,7 @@ contains
     write(6,*) "METHOD 4 ",M2,MK2
     write(6,*) "METHOD 6 ",M3,MK3
     write(6,*)   "number of Slices ", MK1+MK2+MK3
+    write(6,*)   "Total NST ", NST_tot
 
 
 
@@ -2409,6 +2012,87 @@ contains
 
   END SUBROUTINE  THIN_LENS_resplit
 
+  SUBROUTINE  THIN_LENS_restart(R) ! A re-splitting routine
+    IMPLICIT NONE
+    INTEGER NTE
+    TYPE(layout), intent(inout) :: R
+    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec  !,limit0(2)
+    logical(lp) doit
+    TYPE (fibre), POINTER :: C
+    logical(lp) doneit
+    nullify(C)
+
+    CALL LINE_L(R,doneit)
+
+
+
+
+
+
+    M1=0
+    M2=0
+    M3=0
+    MK1=0
+    MK2=0
+    MK3=0
+
+
+    r%NTHIN=0
+
+    nst_tot=0
+    C=>R%START
+    do   WHILE(ASSOCIATED(C))
+
+
+       doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind17)
+
+
+       if(doit)  then
+
+
+
+
+
+          M1=M1+1
+          NTE=1
+          C%MAG%P%NST=NTE
+          MK1=MK1+NTE
+          C%MAG%P%METHOD=2
+
+
+          r%NTHIN=r%NTHIN+1  !C%MAG%NST
+
+          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call COPY(C%MAG,C%MAGP)
+       else
+          if(C%MAG%KIND/=kindpa) then
+             C%MAG%P%NST=1
+             if(associated(C%MAG%bn))call add(C%MAG,C%MAG%P%nmul,1,zero)
+             call COPY(C%MAG,C%MAGP)
+          endif
+       endif
+
+       NST_tot=NST_tot+C%MAG%P%nst
+       C=>C%NEXT
+    enddo
+
+
+    write(6,*) "Present of cutable Elements ",r%NTHIN
+    write(6,*) "METHOD 2 ",M1,MK1
+    write(6,*) "METHOD 4 ",M2,MK2
+    write(6,*) "METHOD 6 ",M3,MK3
+    write(6,*)   "number of Slices ", MK1+MK2+MK3
+    write(6,*)   "Total NST ", NST_tot
+
+
+
+    CALL RING_L(R,doneit)
+
+  END SUBROUTINE  THIN_LENS_restart
 
 
   SUBROUTINE  print_bn_an(r,n,title,filename)
@@ -2651,7 +2335,7 @@ contains
     TYPE(LAYOUT),TARGET :: R
     integer i1,i2,MF,i,IT1,IT2,INSIDE_POS1,INSIDE_POS2
     type(fibre), pointer :: FIBRE1,FIBRE2
-    TYPE(THIN_LENS),POINTER :: SLICE1,SLICE2
+    TYPE(INTEGRATION_NODE),POINTER :: SLICE1,SLICE2
     TYPE(INTERNAL_STATE) IN_STATE
     TYPE(INTERNAL_STATE) STATE
     real(dp) X(6),S_INITIAL,S_FINAL,TOTAL_LENGTH
@@ -2746,7 +2430,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_layout_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -2785,7 +2469,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_layout_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -2808,7 +2492,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_layout_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF,I=1)
     CALL COPY_BEAM(B(2),B(1))
@@ -2832,9 +2516,9 @@ contains
 
 
     S_INITIAL = ONE
-    S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%THINLENS%S(3)+B(2)%X(1,7)
+    S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%NODE%S(3)+B(2)%X(1,7)
 
-    CALL TRACK(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_layout_S12(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
 
     CALL PRINT_beam(B(1),MF,I=1)
 
