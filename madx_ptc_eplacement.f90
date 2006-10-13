@@ -199,17 +199,7 @@ contains
   !____________________________________________________________________________________________
   !____________________________________________________________________________________________
   !____________________________________________________________________________________________
-  
-  function getfirstin(p)
-   implicit none
-   type (integration_node), pointer :: getfirstin
-   type (fibre), pointer :: p
 
-   getfirstin => p%t1%next%next
-   
-  end function getfirstin
-   
-  
   subroutine printlayout_rootm(filenameIA)
     implicit none
     include 'twissa.fi'
@@ -222,16 +212,9 @@ contains
     TYPE(LAYOUT),pointer :: r
     type(fibre), pointer :: p
     real(dp)     :: z, a(3)
-    type (integration_node), pointer :: entin => null()
-    type (integration_node), pointer :: exiin => null()
     
+     
     r=>my_ring
-    
-    if ( .not. associated(r%t) ) then
-      call make_node_layout(r)
-    endif
-
-    call fill_survey_data_in_node_layout(r)
     
     filename = charconv(filenameIA)
     
@@ -322,10 +305,6 @@ contains
         print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
       endif  
       
-      entin => getfirstin(p)
-      
-      print*, entin%parent_fibre%mag%name
-      
       if (p%mag%l == zero) then
 !       print*, i,p%mag%name
        goto 100;
@@ -363,17 +342,17 @@ contains
        case(kind5) !solenoid
          call drawtube(p,mf,0.25_dp,darkgreen) 
          
-       case(kind16) 
+       case(kind16)
          if (getdebug() > 3) then 
            print*, "KIND16: likemad is ", p%mag%k16%likemad
            print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
            print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
          endif
          if (p%mag%bn(1) /= zero ) then
-           a(1)= entin%ent(3,1)*p%mag%l/two + entin%a(1)
-           a(2)= entin%ent(3,2)*p%mag%l/two + entin%a(2)
-           a(3)= entin%ent(3,3)*p%mag%l/two + entin%a(3)
-           call drawbox(p,mf, entin%ent,a,blue)
+           a(1)= P%mag%p%f%ent(3,1)*p%mag%l/two + P%mag%p%f%a(1)
+           a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
+           a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
+           call drawbox(p,mf,P%mag%p%f%ent,a,blue)
          else    
            if (p%mag%bn(2) .gt. zero ) then
              call drawboxm(p,mf,red)  !QUAD foc
