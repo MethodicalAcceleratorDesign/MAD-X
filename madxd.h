@@ -121,7 +121,7 @@
 #define augmentfwarn            augmentfwarn_
 
 
-#define type_ofCall 
+#define type_ofCall
 
 
 #else
@@ -248,7 +248,7 @@
 #define augmentfwarn            AUGMENTFWARN
 
 
-#define type_ofCall _stdcall 
+#define type_ofCall _stdcall
 #endif
 
 /* short utility routines */
@@ -628,6 +628,7 @@ int in_spec_list(char*);
 int int_in_array(int, int, int*);
 void insert_elem(struct sequence*, struct node*);
 void install_one(struct element*, char*, double, struct expression*, double);
+int is_token(char*, char*, int);
 char* join(char**, int);
 char* join_b(char**, int);
 int join_prefix(char*, int, char**);
@@ -898,7 +899,7 @@ int v_length(char*);
 char* v_format(char*);
 double vmod(int*, double*);
 void error(char* t1, register char* fmt, ...);
-void warningnew(char* t1, char* fmt, ...); 
+void warningnew(char* t1, char* fmt, ...);
 void warning(char*, char*);
 void warningOld(char*, char*);
 void augmentfwarn() ;
@@ -972,7 +973,7 @@ void pro_error_make_efield_table();
 void sel_table(char* tname, struct table* t);
 void set_selected_rows_tab(struct table* t, struct command_list* select,
                        struct command_list* deselect);
-                                                                                                    
+
 void pro_sdds(struct in_cmd* cmd);
 int  sdds_ior(struct in_cmd* cmd);
 int  sdds_iow(struct in_cmd* cmd);
@@ -1232,9 +1233,9 @@ FILE* fddata;
 FILE* fcdata;
 FILE* ftdata;
 FILE* fgdata;
-                                                                                                          
+
 struct char_p_array* sdds_pat; /* array for selected sdds patterns */
-                                                                                                          
+
 FILE* debug_file;              /* for debug output */
 FILE* stamp_file;              /* for debug output */
 FILE* out_file;                /* for table output */
@@ -1252,8 +1253,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.24";
-char code_mod_date[] = "Code Modification Date: 13.10.2006";
+char myversion[] = "MAD-X 3.03.25";
+char code_mod_date[] = "Code Modification Date: 15.10.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

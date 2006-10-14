@@ -23,9 +23,9 @@
 #include "madxdict.h"
 
 /*
-#include "mdb.h"
-#include "scan.h"
-#include "table.h"
+  #include "mdb.h"
+  #include "scan.h"
+  #include "table.h"
 */
 #ifdef _ONLINE
 #include "sdds.h"
@@ -305,21 +305,24 @@ void check_table(char* string)
   pa = string;
   while ((pb = strstr(pa, "table")) != NULL)
   {
-    if (quote_level(pa, pb) == 0)
+    if (is_token(pb, string, 5))
     {
-      mystrcpy(c_join, pa);
-      pt = strstr(c_join->c, "table");
-      if ((pl = strchr(pt, '(')) == NULL) return;
-      if ((pr = strchr(pl, ')')) == NULL) return;
-      *pl = '\0';
-      *pr = '\0';
-      sv = make_string_variable(++pl);
-      *pa ='\0';
-      strcat(string, c_join->c);
-      strcat(string, " ( ");
-      strcat(string, sv);
-      strcat(string, " ) ");
-      strcat(string, ++pr);
+      if (quote_level(pa, pb) == 0)
+      {
+        mystrcpy(c_join, pa);
+        pt = strstr(c_join->c, "table");
+        if ((pl = strchr(pt, '(')) == NULL) return;
+        if ((pr = strchr(pl, ')')) == NULL) return;
+        *pl = '\0';
+        *pr = '\0';
+        sv = make_string_variable(++pl);
+        *pa ='\0';
+        strcat(string, c_join->c);
+        strcat(string, " ( ");
+        strcat(string, sv);
+        strcat(string, " ) ");
+        strcat(string, ++pr);
+      }
     }
     pa = ++pb;
   }
@@ -334,18 +337,21 @@ void check_tabstring(char* string)
   pa = string;
   while ((pb = strstr(pa, "tabstring")) != NULL)
   {
-    if (quote_level(pa, pb) == 0)
+    if (is_token(pb, string, 9))
     {
-      mystrcpy(c_join, pa);
-      pt = strstr(c_join->c, "tabstring");
-      if ((pl = strchr(pt, '(')) == NULL) return;
-      if ((pr = strchr(pl, ')')) == NULL) return;
-      if ((sv = get_table_string(pl,pr)) == NULL) sv = permbuff("_void_");
-      *pt = '\0';
-      *pa ='\0';
-      strcat(string, c_join->c);
-      strcat(string, sv);
-      strcat(string, ++pr);
+      if (quote_level(pa, pb) == 0)
+      {
+        mystrcpy(c_join, pa);
+        pt = strstr(c_join->c, "tabstring");
+        if ((pl = strchr(pt, '(')) == NULL) return;
+        if ((pr = strchr(pl, ')')) == NULL) return;
+        if ((sv = get_table_string(pl,pr)) == NULL) sv = permbuff("_void_");
+        *pt = '\0';
+        *pa ='\0';
+        strcat(string, c_join->c);
+        strcat(string, sv);
+        strcat(string, ++pr);
+      }
     }
     pa = ++pb;
   }
@@ -1442,26 +1448,26 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_create_universe") == 0)
       {
-        if (match_is_on == kMatch_PTCknobs) 
-         { 
-           madx_mpk_setcreateuniverse(p);
-         } 
-        else 
-         {
-           w_ptc_create_universe_();
-           curr_obs_points = 1;  /* default: always observe at machine end */
-         }  
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0) 
-      {
-        if (match_is_on == kMatch_PTCknobs) 
-         { 
-           madx_mpk_setcreatelayout(p);
-         }  
+        if (match_is_on == kMatch_PTCknobs)
+        {
+          madx_mpk_setcreateuniverse(p);
+        }
         else
-         {  
-           w_ptc_create_layout_();
-         } 
+        {
+          w_ptc_create_universe_();
+          curr_obs_points = 1;  /* default: always observe at machine end */
+        }
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
+      {
+        if (match_is_on == kMatch_PTCknobs)
+        {
+          madx_mpk_setcreatelayout(p);
+        }
+        else
+        {
+          w_ptc_create_layout_();
+        }
       }
       else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
       {
@@ -1473,27 +1479,27 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
       {
-        
-        if (match_is_on == kMatch_PTCknobs) 
-         { 
-           madx_mpk_setcalc(p);
-         }
+
+        if (match_is_on == kMatch_PTCknobs)
+        {
+          madx_mpk_setcalc(p);
+        }
         else
-         {
-           current_twiss = p->clone;
-           pro_ptc_twiss();
-         }  
+        {
+          current_twiss = p->clone;
+          pro_ptc_twiss();
+        }
       }
       else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
       {
-        if (match_is_on == kMatch_PTCknobs) 
-         { 
-           madx_mpk_setcalc(p);
-         }
+        if (match_is_on == kMatch_PTCknobs)
+        {
+          madx_mpk_setcalc(p);
+        }
         else
-         {
-           w_ptc_normal_();
-         }  
+        {
+          w_ptc_normal_();
+        }
       }
       else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)
       {
@@ -2411,16 +2417,16 @@ int get_string(char* name, char* par, char* string)
 
     cmd = find_command(c_dum->c, stored_commands);
     if (cmd == NULL)
-     {
-       if (current_command != NULL)
+    {
+      if (current_command != NULL)
+      {
+        if ( strcmp(c_dum->c, current_command->name) == 0)
         {
-          if ( strcmp(c_dum->c, current_command->name) == 0)
-           {
-             cmd = current_command;
-           }
+          cmd = current_command;
         }
-     }
-    
+      }
+    }
+
     if (cmd != NULL)
     {
 /*        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);*/
@@ -2435,7 +2441,7 @@ int get_string(char* name, char* par, char* string)
         printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
       }
     }
-    
+
     else
     {
       printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);

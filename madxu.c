@@ -618,12 +618,12 @@ delete_command_parameter_list(struct command_parameter_list* parl)
   if (parl->parameters != NULL)
   {
     for (i = 0; i < parl->curr; i++)
-     {
+    {
       if (parl->parameters[i] != NULL)
-       {
-         parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
-       } 
-     }   
+      {
+        parl->parameters[i] = delete_command_parameter(parl->parameters[i]);
+      }
+    }
     if (parl->parameters)  myfree(rout_name, parl->parameters);
   }
   myfree(rout_name, parl);
@@ -2031,6 +2031,14 @@ void irngen()
     irn_rand[i] = j;
   }
   next_rand = 0;
+}
+
+int is_token(char* pb, char* string, int slen)
+{
+  char* pbl = pb;
+  if ((pbl == string || *(--pbl) == ' ')
+      && (*(pb+slen) == '\0' || *(pb+slen) == ' '))  return 1;
+  else return 0;
 }
 
 char* join(char** it_list, int n)
