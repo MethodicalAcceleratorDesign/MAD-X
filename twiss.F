@@ -314,6 +314,8 @@
           call vector_to_table(table_name, 's ', i, opt_fun(2))
           i = 5
           call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
+          i = 2
+          call vector_to_table(table_name, 'kmax ', i, opt_fun(70))
           if(rmatrix) then
             i = 36
             call vector_to_table(table_name, 're11 ', i, opt_fun(34))
@@ -1018,6 +1020,8 @@
       el = node_value('l ')
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
+      opt_fun(70) = node_value('kmax ')
+      opt_fun(71) = node_value('imax ')
       n_align = node_al_errors(al_errors)
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)
