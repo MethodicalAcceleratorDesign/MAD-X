@@ -1021,7 +1021,7 @@
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
       opt_fun(70) = node_value('kmax ')
-      opt_fun(71) = node_value('imax ')
+      opt_fun(71) = node_value('calib ')
       n_align = node_al_errors(al_errors)
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)

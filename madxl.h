@@ -1,4 +1,3 @@
-
 /* preparation of Touschek */
 /* defined constants for word lengths etc. */
 #define ALIGN_MAX 14        /* alignment error array length */
@@ -239,7 +238,7 @@ char* twiss_table_cols[] =
   "re41", "re42", "re43", "re44", "re45", "re46",
   "re51", "re52", "re53", "re54", "re55", "re56",
   "re61", "re62", "re63", "re64", "re65", "re66",
-  "kmax", "imax",
+  "kmax", "calib",
   "beta11", "beta12", "beta13",
   "beta21", "beta22", "beta23",
   "beta31", "beta32", "beta33",
