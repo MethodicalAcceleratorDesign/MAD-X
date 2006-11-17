@@ -2908,7 +2908,7 @@ contains
     IMPLICIT NONE
     call KILL(varc1)
     call KILL(varc2)
-    CALL KILL_BERZ_ETIENNE   ! IN TPSALIE_ANALISYS
+    CALL KILL_fpp   ! IN TPSALIE_ANALISYS
     first_time=.true.
   END subroutine KILL_TPSA
 

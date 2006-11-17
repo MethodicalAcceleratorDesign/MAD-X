@@ -1310,14 +1310,14 @@ contains
 
 
 
-  subroutine KILL_BERZ_ETIENNE()
+  subroutine KILL_fpp()
     implicit none
 
     call kill(varf1)
     call kill(varf2)
     call DATERMINATE  ! IN THIS MODULE
-    CALL KILL_BERZ    ! IN DABNEW
-  END  subroutine KILL_BERZ_ETIENNE
+    CALL dealloc_all    ! IN DABNEW
+  END  subroutine KILL_fpp
 
 
   subroutine init_tpsa(NO1,NP1,log1)

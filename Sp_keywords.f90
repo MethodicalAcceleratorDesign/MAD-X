@@ -929,6 +929,28 @@ contains
 
   end subroutine READ_aperture
 
+!!!!!
+
+  SUBROUTINE change_fibre(p)
+    IMPLICIT NONE
+    INTEGER MF
+    TYPE(FIBRE), POINTER :: P
+
+    CALL KANALNUMMER(MF)
+
+    OPEN(UNIT=MF,FILE='JUNK_CHANGE_FIBRE.TXT')
+
+    CALL print_FIBRE(P,mf)
+    P=-1
+    REWIND MF
+    CALL alloc_fibre( P )
+    CALL READ_FIBRE(P,mf)
+
+
+    CLOSE(MF)
+  END SUBROUTINE change_fibre
+
+
   SUBROUTINE PUT_method1_in_kind7(ring,nmul)
     IMPLICIT NONE
     type(layout), intent(inout):: ring
@@ -957,7 +979,5 @@ contains
        p=>p%next
     enddo
   END SUBROUTINE PUT_method1_in_kind7
-
-
 
 end module madx_keywords

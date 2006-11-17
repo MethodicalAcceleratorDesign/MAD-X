@@ -9,6 +9,9 @@ module S_fitting
   logical(lp), PRIVATE :: VERBOSE = .false.
   integer :: max_fit_iter=20, ierror_fit=0
   real(dp) :: fuzzy_split=one
+  real(dp) :: max_ds=zero
+  integer :: resplit_cutting = 0    ! 0 just magnets , 1 magnets as before / drifts separately
+  ! 2  space charge algorithm
 
   INTERFACE FIND_ORBIT
      ! LINKED
@@ -283,6 +286,7 @@ contains
        Y=CLOSED+id
 
        CALL TRACK(R,Y,1,STATE)
+       write(6,*) " stability ", c_%check_stable
        id=y
     else
        call kanalnummer(mf)
@@ -1788,10 +1792,13 @@ contains
     TYPE (fibre), POINTER :: C
     logical(lp),optional :: even
     logical(lp) doneit
+
     nullify(C)
     parity=0
     inc=0
     lm=1.0e38_dp
+    ntec=0
+    max_ds=zero
     if(present(lmax)) lm=lmax
     if(present(even)) then
        inc=1
@@ -1838,10 +1845,11 @@ contains
     C=>R%START
     do   WHILE(ASSOCIATED(C))
 
-       doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
        DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
        DOIT=DOIT.OR.(C%MAG%KIND==kind17)
+       doit=doit.and.C%MAG%recut
 
        if(doit) then
           select case(C%MAG%P%METHOD)
@@ -1887,99 +1895,238 @@ contains
 
     nst_tot=0
     C=>R%START
-    do   WHILE(ASSOCIATED(C))
+    do   WHILE(ASSOCIATED(C))   !
 
 
-       doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
-       doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
-       DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
-       DOIT=DOIT.OR.(C%MAG%KIND==kind17)
 
 
-       if(doit)  then
+       !       if(doit)  then
 
+       select case(resplit_cutting)
 
-          dl=(C%MAG%P%ld/C%MAG%P%nst)
-          ntec=C%MAG%P%NST
-          if(dl>lmax*fuzzy_split) then
-             ntec=int(C%MAG%P%ld/lmax)+1
-             if(mod(nte,2)/=parity) ntec=ntec+inc
-             C%MAG%P%NST=ntec
-          endif
+       case(0)
 
+          doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+          doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind17)
+          doit=doit.and.C%MAG%recut
 
-          xl=C%MAG%L
-          RHOI=C%MAG%P%B0
-          IF(C%MAG%P%NMUL>=2) THEN
-             QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
-          ELSE
-             QUAD=zero
-          ENDIF
-          if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-             quad=quad+(C%MAG%b_sol)**2/four
-          endif
+          if(doit) then
+             xl=C%MAG%L
+             RHOI=C%MAG%P%B0
+             IF(C%MAG%P%NMUL>=2) THEN
+                QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
+             ELSE
+                QUAD=zero
+             ENDIF
+             if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
+                quad=quad+(C%MAG%b_sol)**2/four
+             endif
 
-          GG=XL*(RHOI**2+ABS(QUAD))
-          GG=GG/THI
-          NTE=INT(GG)
+             GG=XL*(RHOI**2+ABS(QUAD))
+             GG=GG/THI
+             NTE=INT(GG)
 
-          IF(NTE.LT.limit(1)) THEN
-             M1=M1+1
-             IF(NTE.EQ.0) NTE=1
-             if(mod(nte,2)/=parity) nte=nte+inc
-             if(nte>ntec) then
+             IF(NTE.LT.limit(1)) THEN
+                M1=M1+1
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=2
-             endif
-             MK1=MK1+NTE
-          ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
-             M2=M2+1
-             NTE=NTE/3
-             IF(NTE.EQ.0) NTE=1
-             if(mod(nte,2)/=parity) nte=nte+inc
-             if(nte>ntec) then
+                MK1=MK1+NTE
+             ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+                M2=M2+1
+                NTE=NTE/3
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=4
-             endif
-             MK2=MK2+NTE*3
-          ELSEIF(NTE.GE.limit(2)) THEN
-             M3=M3+1
-             NTE=NTE/7
-             IF(NTE.EQ.0) NTE=1
-             if(mod(nte,2)/=parity) nte=nte+inc
-             if(nte>ntec) then
+                MK2=MK2+NTE*3
+             ELSEIF(NTE.GE.limit(2)) THEN
+                M3=M3+1
+                NTE=NTE/7
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=6
-             endif
-             MK3=MK3+NTE*7
-          ENDIF
+                MK3=MK3+NTE*7
+             ENDIF
 
 
-          r%NTHIN=r%NTHIN+1  !C%MAG%NST
-
-          if(nte>ntec) then
+             r%NTHIN=r%NTHIN+1  !C%MAG%NST
+             !         write(6,*)"nte>ntec", nte,ntec
              call add(C%MAG,C%MAG%P%nmul,1,zero)
              call COPY(C%MAG,C%MAGP)
-          endif
-       else
-          dl=(C%MAG%P%ld/C%MAG%P%nst)
-          if(dl>lmax*fuzzy_split.and.C%MAG%KIND/=kindpa) then
-             nte=int(C%MAG%P%ld/lmax)+1
-             if(mod(nte,2)/=parity) nte=nte+inc
-             C%MAG%P%NST=nte
-             if(associated(C%MAG%bn))call add(C%MAG,C%MAG%P%nmul,1,zero)
+             if(gg>zero) then
+                if(c%mag%l/c%mag%p%nst>max_ds) max_ds=c%mag%l/c%mag%p%nst
+             endif
+
+          endif  ! doit
+
+       case(1)
+
+          doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+          doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind17)
+          doit=doit.and.C%MAG%recut
+
+          if(doit) then
+             xl=C%MAG%L
+             RHOI=C%MAG%P%B0
+             IF(C%MAG%P%NMUL>=2) THEN !
+                QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
+             ELSE
+                QUAD=zero
+             ENDIF
+             if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
+                quad=quad+(C%MAG%b_sol)**2/four
+             endif
+
+             GG=XL*(RHOI**2+ABS(QUAD))
+             GG=GG/THI
+             NTE=INT(GG)
+
+             IF(NTE.LT.limit(1)) THEN
+                M1=M1+1
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=2
+                MK1=MK1+NTE
+             ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+                M2=M2+1
+                NTE=NTE/3
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=4
+                MK2=MK2+NTE*3
+             ELSEIF(NTE.GE.limit(2)) THEN
+                M3=M3+1
+                NTE=NTE/7
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=6
+                MK3=MK3+NTE*7
+             ENDIF
+
+
+             r%NTHIN=r%NTHIN+1  !C%MAG%NST
+
+             if(present(lmax).and.c%mag%kind==kind1) then
+                dl=(C%MAG%P%ld/C%MAG%P%nst)
+                if(dl>lm*fuzzy_split) then
+                   ntec=int(C%MAG%P%ld/lm)+1
+                   if(mod(nte,2)/=parity) ntec=ntec+inc
+                   C%MAG%P%NST=ntec
+                endif
+             endif
+
+             call add(C%MAG,C%MAG%P%nmul,1,zero)
              call COPY(C%MAG,C%MAGP)
-          elseif(dl>lmax.and.C%MAG%KIND==kindpa) then
-             write(6,*) " Pancake cannot be recut "
+             if(gg>zero) then
+                if(c%mag%l/c%mag%p%nst>max_ds) max_ds=c%mag%l/c%mag%p%nst
+             endif
           endif
 
+       case(2)
 
 
+          doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+          doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind17)
+          doit=doit.and.C%MAG%recut
 
-       endif
+          if(doit) then
+             xl=C%MAG%L
+             RHOI=C%MAG%P%B0
+             IF(C%MAG%P%NMUL>=2) THEN
+                QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
+             ELSE
+                QUAD=zero
+             ENDIF
+             if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
+                quad=quad+(C%MAG%b_sol)**2/four
+             endif
+
+             GG=XL*(RHOI**2+ABS(QUAD))
+             GG=GG/THI
+             NTE=INT(GG)
+
+             IF(NTE.LT.limit(1)) THEN
+                M1=M1+1
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
+                if(nte>ntec.or.(.not.present(lmax)) ) then
+                   C%MAG%P%NST=NTE
+                   C%MAG%P%METHOD=2
+                endif
+                MK1=MK1+NTE
+             ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+                M2=M2+1
+                NTE=NTE/3
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
+                if(nte>ntec.or.(.not.present(lmax)) ) then
+                   C%MAG%P%NST=NTE
+                   C%MAG%P%METHOD=4
+                endif
+                MK2=MK2+NTE*3
+             ELSEIF(NTE.GE.limit(2)) THEN
+                M3=M3+1
+                NTE=NTE/7
+                IF(NTE.EQ.0) NTE=1
+                if(mod(nte,2)/=parity) nte=nte+inc
+                if(nte>ntec.or.(.not.present(lmax)) ) then
+                   C%MAG%P%NST=NTE
+                   C%MAG%P%METHOD=6
+                endif
+                MK3=MK3+NTE*7
+             ENDIF
+
+
+             r%NTHIN=r%NTHIN+1  !C%MAG%NST
+             !         write(6,*)"nte>ntec", nte,ntec
+             if(nte>ntec.or.(.not.present(lmax)) ) then
+                call add(C%MAG,C%MAG%P%nmul,1,zero)
+                call COPY(C%MAG,C%MAGP)
+             endif
+             if(gg>zero) then
+                if(c%mag%l/c%mag%p%nst>max_ds) max_ds=c%mag%l/c%mag%p%nst
+             endif
+
+             if(present(lmax)) then
+                dl=(C%MAG%P%ld/C%MAG%P%nst)
+                if(dl>lm*fuzzy_split.and.C%MAG%KIND/=kindpa) then
+                   nte=int(C%MAG%P%ld/lm)+1
+                   if(mod(nte,2)/=parity) nte=nte+inc
+                   if(nte > C%MAG%P%NST ) then
+                      C%MAG%P%NST=nte
+                      call add(C%MAG,C%MAG%P%nmul,1,zero)
+                      call COPY(C%MAG,C%MAGP)
+                   endif
+
+                elseif(dl>lm.and.C%MAG%KIND==kindpa) then
+                   write(6,*) " Pancake cannot be recut "
+                endif
+             endif
+
+
+          endif
+
+       case default
+          stop 988
+       end select
+
+
+       !      endif
        NST_tot=NST_tot+C%MAG%P%nst
        C=>C%NEXT
-    enddo
+    enddo   !   end of do   WHILE
 
 
     write(6,*) "Present of cutable Elements ",r%NTHIN
@@ -1988,6 +2135,7 @@ contains
     write(6,*) "METHOD 6 ",M3,MK3
     write(6,*)   "number of Slices ", MK1+MK2+MK3
     write(6,*)   "Total NST ", NST_tot
+    write(6,*)   "Biggest ds ", max_ds
 
 
 
@@ -2045,7 +2193,7 @@ contains
     do   WHILE(ASSOCIATED(C))
 
 
-       doit=(C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       doit=(C%MAG%KIND==kind1.and.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
        DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
        DOIT=DOIT.OR.(C%MAG%KIND==kind17)
@@ -2053,16 +2201,11 @@ contains
 
        if(doit)  then
 
-
-
-
-
           M1=M1+1
           NTE=1
           C%MAG%P%NST=NTE
           MK1=MK1+NTE
           C%MAG%P%METHOD=2
-
 
           r%NTHIN=r%NTHIN+1  !C%MAG%NST
 
@@ -2430,7 +2573,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_layout_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_LAYOUT_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -2469,7 +2612,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_layout_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_LAYOUT_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -2492,7 +2635,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_layout_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_LAYOUT_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF,I=1)
     CALL COPY_BEAM(B(2),B(1))
@@ -2518,7 +2661,7 @@ contains
     S_INITIAL = ONE
     S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%NODE%S(3)+B(2)%X(1,7)
 
-    CALL TRACK_layout_S12(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_LAYOUT_S12(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
 
     CALL PRINT_beam(B(1),MF,I=1)
 

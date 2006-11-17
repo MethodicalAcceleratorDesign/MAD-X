@@ -31,12 +31,14 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE kill_info
      MODULE PROCEDURE kill_NODE_LAYOUT
      MODULE PROCEDURE de_Set_Up_ORBIT_LATTICE
+     MODULE PROCEDURE kill_BEAM_BEAM_NODE
   END INTERFACE
 
   INTERFACE alloc
      !     MODULE PROCEDURE set_up
      MODULE PROCEDURE alloc_fibre
      MODULE PROCEDURE alloc_info
+     MODULE PROCEDURE ALLOC_BEAM_BEAM_NODE
   END INTERFACE
 
   INTERFACE copy
@@ -1148,6 +1150,7 @@ CONTAINS
     TYPE (INTEGRATION_NODE), POINTER :: T
     NULLIFY(T%PARENT_NODE_LAYOUT)
     NULLIFY(T%PARENT_FIBRE)
+    NULLIFY(T%BB)
     NULLIFY(T%S)
     !    NULLIFY(T%ORBIT)
     NULLIFY(T%a,T%ENT)
@@ -1379,7 +1382,6 @@ CONTAINS
     deallocate(L%ORBIT_gammat)
     deallocate(L%ORBIT_harmonic)
     deallocate(L%ORBIT_L)
-    deallocate(L%ORBIT_L)
     deallocate(L%ORBIT_CHARGE)
     deallocate(L%STATE)
 
@@ -1394,6 +1396,25 @@ CONTAINS
     deallocate(L)
 
   END SUBROUTINE de_Set_Up_ORBIT_LATTICE
+
+
+
+  SUBROUTINE de_Set_Up_BEAM_BEAM_LATTICE( L ) ! deallocates layout content
+    implicit none
+    TYPE (BEAM_BEAM_LATTICE),target :: L
+    INTEGER I,N
+
+    DO I=1,L%N_KICKS
+       CALL KILL_BEAM_BEAM_NODE(L%KICKS(I))
+    ENDDO
+    deallocate(L%KICKS)
+    deallocate(L%BEAM_BEAM_WARNING)
+    deallocate(L%BEAM_BEAM_DSMAX)
+    deallocate(L%STATE)
+    deallocate(L%CHARGE)
+
+  END SUBROUTINE de_Set_Up_BEAM_BEAM_LATTICE
+
 
   SUBROUTINE KILL_ORBIT_NODE(ORBIT_LAYOUT,I)
     IMPLICIT NONE
@@ -1463,6 +1484,33 @@ CONTAINS
     ENDIF
   END SUBROUTINE Set_Up_ORBIT_LATTICE
 
+  SUBROUTINE Set_Up_beam_beam_lattice(L,O,N)
+    IMPLICIT NONE
+    TYPE(layout),target :: L
+    TYPE(BEAM_BEAM_LATTICE),target :: O
+    INTEGER N,I
+       
+
+
+       ALLOCATE(O%KICKS(N))
+       ALLOCATE(O%NEXT_KICK(L%T%N))
+       ALLOCATE(O%BEAM_BEAM_WARNING);O%BEAM_BEAM_WARNING=0
+       ALLOCATE(O%BEAM_BEAM_DSMAX);O%BEAM_BEAM_DSMAX=ZERO
+       ALLOCATE(O%STATE);
+       ALLOCATE(O%CHARGE);
+       ALLOCATE(O%N_KICKS)
+       O%N_KICKS=N
+
+       O%STATE=DEFAULT
+       O%CHARGE=1
+
+       DO I=1,N
+        CALL ALLOC(O%KICKS(I))
+       ENDDO
+       O%NEXT_KICK=0
+  END SUBROUTINE Set_Up_beam_beam_lattice
+
+
 
   SUBROUTINE de_Set_Up_NODE_LAYOUT( L ) ! deallocates layout content
     implicit none
@@ -1512,6 +1560,48 @@ CONTAINS
     L%LASTPOS=I; L%LAST => Current;
     CALL RING_L_THIN(L,doneit)
   END SUBROUTINE move_to_INTEGRATION_NODE
+
+!  Beam beam stuff
+
+  SUBROUTINE ALLOC_BEAM_BEAM_NODE(B)
+    IMPLICIT NONE
+    TYPE(BEAM_BEAM_NODE),TARGET :: B
+
+    ALLOCATE(B%DS)
+    ALLOCATE(B%S)
+    ALLOCATE(B%FK)
+    ALLOCATE(B%SX)
+    ALLOCATE(B%SY)
+    ALLOCATE(B%XM)
+    ALLOCATE(B%YM)
+    ALLOCATE(B%DPOS)
+    ALLOCATE(B%bbk(2))
+     B%bbk=zero
+     B%SX=one
+     B%Sy=one
+     B%XM=zero
+     B%YM=zero
+     B%DS=ZERO
+     B%S=zero
+     B%DPOS=0
+     B%FK=ZERO
+  END SUBROUTINE ALLOC_BEAM_BEAM_NODE
+
+  SUBROUTINE KILL_BEAM_BEAM_NODE(B)
+    IMPLICIT NONE
+    TYPE(BEAM_BEAM_NODE),TARGET :: B
+
+    DEALLOCATE(B%DS)
+    DEALLOCATE(B%FK)
+    DEALLOCATE(B%SX)
+    DEALLOCATE(B%SY)
+    DEALLOCATE(B%XM)
+    DEALLOCATE(B%YM)
+    DEALLOCATE(B%s)
+    DEALLOCATE(B%DPOS)
+    DEALLOCATE(B%bbk)
+
+  END SUBROUTINE KILL_BEAM_BEAM_NODE
 
 
 END MODULE S_FIBRE_BUNDLE

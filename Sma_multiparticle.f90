@@ -22,12 +22,13 @@ module ptc_multiparticle
   PRIVATE FRINGER_CAV4,FRINGEP_CAV4,fringeR_STRAIGHT,fringeP_STRAIGHT
   PRIVATE fringer_STREX,fringep_STREX,fringer_TEAPOT,fringeP_TEAPOT
   PRIVATE FRINGER_CAV_TRAV,FRINGEP_CAV_TRAV
-  PRIVATE TRACKR_NODE_SINGLE,TRACKP_NODE_SINGLE
+  PRIVATE TRACKR_NODE_SINGLE,TRACKP_NODE_SINGLE,TRACKV_NODE_SINGLE
   PRIVATE ADJUST_TIME_CAV4,ADJUSTR_TIME_CAV4,ADJUSTP_TIME_CAV4
   private DRIFTr_BACK_TO_POSITION,DRIFTp_BACK_TO_POSITION,DRIFT_BACK_TO_POSITION,DRIFT_BEAM_BACK_TO_POSITION
   PRIVATE TRACK_LAYOUT_XR_12,TRACK_LAYOUT_XP_12
   PRIVATE ADJUSTR_PANCAKE,ADJUSTP_PANCAKE,ADJUST_PANCAKE,INTER_PANCAKE,INTEP_PANCAKE
   private MAKE_NODE_LAYOUT_2,DRIFT_TO_TIME
+  PRIVATE TRACK_NODE_LAYOUT_FLAG_R
 
   INTERFACE ADJUST_WI
      MODULE PROCEDURE ADJUSTR_WI
@@ -125,6 +126,7 @@ module ptc_multiparticle
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE
      MODULE PROCEDURE TRACKP_NODE_SINGLE
+     MODULE PROCEDURE TRACKV_NODE_SINGLE
   END INTERFACE
 
   !  INTERFACE TRACK
@@ -135,6 +137,11 @@ module ptc_multiparticle
   INTERFACE TRACK_NODE_LAYOUT_S
      MODULE PROCEDURE TRACK_NODE_LAYOUT_S12
      MODULE PROCEDURE TRACK_NODE_LAYOUT_S1
+  END INTERFACE
+
+  INTERFACE TRACK_NODE_LAYOUT
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_R
+!     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_P
   END INTERFACE
 
 
@@ -3504,6 +3511,57 @@ CONTAINS
 
   ! thin lens tracking
 
+  SUBROUTINE TRACKV_NODE_SINGLE(T,V,K,CHARGE)
+    implicit none
+    TYPE(INTEGRATION_NODE),POINTER :: T
+    TYPE(INTERNAL_STATE)  K
+    INTEGER, optional, TARGET :: CHARGE
+    REAL(DP) SC,reference_ray(6),x(6)
+    type(three_d_info)  v
+    TYPE(INTEGRATION_NODE),POINTER:: mag_in,mag_out
+
+    x=V%X
+    reference_ray=V%reference_ray
+
+    CALL TRACK_NODE_SINGLE(T,V%X,K,CHARGE)
+
+    IF(.NOT.CHECK_STABLE)      V%U(1)=.TRUE.
+
+    CALL TRACK_NODE_SINGLE(T,V%reference_ray,K,CHARGE)
+
+    IF(.NOT.CHECK_STABLE)   V%U(2)=.TRUE.
+    IF(V%U(1).OR.V%U(2)) RETURN
+
+    IF(.NOT.ASSOCIATED(T%B)) THEN
+       WRITE(6,*) " NO FRAMES IN INTEGRATION NODES "
+       STOP 101
+    ENDIF
+
+    SC=ONE
+    IF(v%SCALE/=zero) SC=v%SCALE
+    !      t=>B%POS(1)%NODE%previous
+
+    V%r0=t%A+(reference_ray(1)-SC*reference_ray(1))*t%ENT(1,1:3)+ SC*X(1)*t%ENT(1,1:3)
+    V%r0=v%r0+(reference_ray(3)-SC*reference_ray(3))*t%ENT(2,1:3)+ SC*X(3)*t%ENT(2,1:3)
+
+    V%r=t%B+(V%reference_ray(1)-SC*V%reference_ray(1))*t%EXI(1,1:3)+ SC*V%X(1)*t%EXI(1,1:3)
+    V%r=v%r+(V%reference_ray(3)-SC*V%reference_ray(3))*t%EXI(2,1:3)+ SC*V%X(3)*t%EXI(2,1:3)
+    mag_in=>t%parent_fibre%t1%next%next
+    mag_out=>t%parent_fibre%t2%previous%previous
+    v%a=mag_in%a
+    v%ent=mag_in%ent
+    v%b=mag_in%b
+    v%exi=mag_in%exi
+    v%o=t%B
+    v%mid=t%exi
+
+
+    IF(MAG_IN%PREVIOUS%CAS/=CASE1) STOP 201
+    IF(MAG_OUT%NEXT%CAS/=CASE2) STOP 202
+
+
+  END SUBROUTINE TRACKV_NODE_SINGLE
+
   SUBROUTINE TRACKR_NODE_SINGLE(T,X,K,CHARGE)
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
@@ -3794,12 +3852,12 @@ CONTAINS
     T%PARENT_FIBRE%MAGP%P%DIR=>T%PARENT_FIBRE%DIR
 
     if(present(charge))  then
-       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE
+       T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE
     else
        charge1=1
-       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE1
+       T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE1
     endif
-    T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE
+    !    T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE
 
 
     SELECT CASE(T%CAS)
@@ -5422,274 +5480,41 @@ CONTAINS
 
   END  SUBROUTINE X_IN_BEAM
 
-  SUBROUTINE BEAM_BEAM(B,BT,sx,sy,xm,ym,BBPAR,BBORBIT,fake)
+  SUBROUTINE TRACK_NODE_LAYOUT_FLAG_R(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
-    REAL(DP)sx,sy,xm,ym,BBPAR
-    TYPE(BEAM), INTENT(IN) ::B
-    TYPE(BEAM), INTENT(IN) ::BT
-    logical(lp) fake,BBORBIT
+    TYPE(layout),INTENT(INOUT):: R
+    real(dp), INTENT(INOUT):: X(6)
+    TYPE(INTERNAL_STATE) K
+    INTEGER, INTENT(IN):: I1,I2
+    INTEGER J,i22
+    TYPE (INTEGRATION_NODE), POINTER :: C
 
-    if(fake) then
-       sx=bt%sigma(1)
-       sy=bt%sigma(3)
-       xm=bt%dx(1)
-       ym=bt%dx(2)
-       BBPAR=BT%BBPAR
-       BBORBIT=B%BBORBIT
+
+    CALL RESET_APERTURE_FLAG
+
+    CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
+
+
+
+    if(i2>=i1) then
+       i22=i2
     else
-       write(6,*) 'NOT IMPLEMENTED IN BEAM_BEAM'
-       STOP 999
-    endif
-  END  SUBROUTINE BEAM_BEAM
-
-  subroutine BBKICK(b,th)
-
-    implicit none
-    !----------------------------------------------------------------------*
-    ! purpose:                                                             *
-    !   track a set of particle through a beam-beam interaction region.    *
-    !   see mad physicist's manual for the formulas used.                  *
-    !input:                                                                *
-    ! input/output:                                                        *
-    !   b%x(:,6)(double)  track coordinates: (x, px, y, py,  pt,t).      *
-    !   b%n    (integer) number of tracks.                              *
-    !----------------------------------------------------------------------*
-    logical(lp) bborbit
-    integer itrack
-    real(dp) sx2,sy2,xs,ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,&
-         bbpar,cbx,cby,ten3m,explim,sx,sy,xm,ym,DZ
-    TYPE(BEAM), INTENT(INOUT) ::B
-    TYPE(INTEGRATION_NODE),POINTER ::th
-    parameter(ten3m=1.0e-3_dp,explim=150.0_dp)
-
-    !    CALL BEAM_BEAM(B,TH%BT,sx,sy,xm,ym,bbpar,BBORBIT,MY_TRUE)
-    !---- initialize.
-    !      bborbit = get_option('bborbit ') .ne. 0
-    !      pi=get_variable('pi ')   ! value of pi
-    !      sx = node_value('sigx ') ! Sigma-x
-    !      sy = node_value('sigy ') ! Sigma-y
-    !      xm = node_value('xma ')  ! x-offset between beams
-    !      ym = node_value('yma ')  ! y-offset between beams
-    fk = two * bbpar !parvec(5) * parvec(6) / parvec(7)
-    !parvec(5)=get_value('probe ', 'arad ')
-    !arad = 1.e-16 * charge * charge * get_variable("qelect")
-    !qelect=1.602176462e-19
-    !parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-    !parvec(7)=get_value('probe ','gamma ')
-    !Yes, it is all in a_scratch_size
-    !
-    !parvec(5) = c_1d_16 * charge * charge * qelect
-    ! The "npart" is the number of particles in the other beam and has to be  passed
-    !parvec(6) = charge * get_value('probe ', 'npart ')
-    !parvec(7) = gamma
-
-
-    if (fk == zero)  return
-    !    DZ=-TH%BT%DX(3)
-    !    IF(DZ/=ZERO) CALL DRIFT_BEAM_BACK_TO_POSITION(th,DZ,B)
-    !    DZ=-DZ
-    if (.not. bborbit)  then
-       !What counts is that if (.not. bborbit) then subtract closed orbit THIS IS THE DEFAULT
-       !closed is tricky and really should be treated selfconsistently, I.e. out of reach here
-       !--- find position of closed orbit bb_kick
-       !        do ipos = 1, bbd_cnt
-       !          if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
-       !        enddo
-       !        ipos = 0
-       !    1   continue
-    endif
-    sx2 = sx*sx
-    sy2 = sy*sy
-    !---- limit formulae for sigma(x) = sigma(y).
-    if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then !ten3m = 1.0d-3
-       do itrack = 1, b%n
-          IF(B%U(itrack)) CYCLE
-          !          xs = track(1,itrack) - xm
-          !          ys = track(3,itrack) - ym
-          xs = b%x(itrack,1) - xm
-          ys = b%x(itrack,3) - ym
-          rho2 = xs * xs + ys * ys
-          tk = rho2 / (two * sx2)
-          if (tk .gt. explim) then
-             phix = xs * fk / rho2
-             phiy = ys * fk / rho2
-          else if (rho2 .ne. zero) then
-             phix = xs * fk / rho2 * (one - exp(-tk) )
-             phiy = ys * fk / rho2 * (one - exp(-tk) )
-          else
-             phix = zero
-             phiy = zero
-          endif
-          if (.NOT.bborbit)  then
-             !--- subtract closed orbit kick
-             phix = phix - TH%ORBIT(1) ! subtract horizontal co
-             phiy = phiy - TH%ORBIT(3) ! subtract vertical co
-          endif
-          !          track(2,itrack) = track(2,itrack) + phix
-          !          track(4,itrack) = track(4,itrack) + phiy
-          b%x(itrack,2) = b%x(itrack,2) + phix
-          b%x(itrack,4) = b%x(itrack,4) + phiy
-       enddo
-
-       !---- case sigma(x) > sigma(y).
-    else if (sx2 > sy2) then
-       r2 = two * (sx2 - sy2)
-       r  = sqrt(r2)
-       rk = fk * sqrt(pi) / r
-       do itrack = 1, b%n
-          IF(B%U(itrack)) CYCLE
-          !          xs = track(1,itrack) - xm
-          !          ys = track(3,itrack) - ym
-          xs = b%x(itrack,1) - xm
-          ys = b%x(itrack,3) - ym
-          xr = abs(xs) / r
-          yr = abs(ys) / r
-          call ccperrf(xr, yr, crx, cry)
-          tk = (xs * xs / sx2 + ys * ys / sy2) / two
-          if (tk .gt. explim) then
-             phix = rk * cry
-             phiy = rk * crx
-          else
-             xb = (sy / sx) * xr
-             yb = (sx / sy) * yr
-             call ccperrf(xb, yb, cbx, cby)
-             phix = rk * (cry - exp(-tk) * cby)
-             phiy = rk * (crx - exp(-tk) * cbx)
-          endif
-          !          track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
-          !          track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
-          b%x(itrack,2) = b%x(itrack,2) + phix * sign(one,xs)
-          b%x(itrack,4) = b%x(itrack,4) + phiy * sign(one,ys)
-          if (.NOT.bborbit)  then
-             !--- subtract closed orbit kick
-             !            track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-             !            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-             b%x(itrack,2) = b%x(itrack,2) - TH%ORBIT(1)
-             b%x(itrack,4) = b%x(itrack,4) - TH%ORBIT(3)
-          endif
-       enddo
-
-       !---- case sigma(x) < sigma(y).
-    else
-       r2 = two * (sy2 - sx2)
-       r  = sqrt(r2)
-       rk = fk * sqrt(pi) / r
-       do itrack = 1, b%n
-          IF(B%U(itrack)) CYCLE
-          !          xs = track(1,itrack) - xm
-          !          ys = track(3,itrack) - ym
-          xs = b%x(itrack,1) - xm
-          ys = b%x(itrack,3) - ym
-          xr = abs(xs) / r
-          yr = abs(ys) / r
-          call ccperrf(yr, xr, cry, crx)
-          tk = (xs * xs / sx2 + ys * ys / sy2) / two
-          if (tk .gt. explim) then
-             phix = rk * cry
-             phiy = rk * crx
-          else
-             xb  = (sy / sx) * xr
-             yb  = (sx / sy) * yr
-             call ccperrf(yb, xb, cby, cbx)
-             phix = rk * (cry - exp(-tk) * cby)
-             phiy = rk * (crx - exp(-tk) * cbx)
-          endif
-          !          track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
-          !          track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
-          b%x(itrack,2) = b%x(itrack,2) + phix * sign(one,xs)
-          b%x(itrack,4) = b%x(itrack,4) + phiy * sign(one,ys)
-          if (.NOT.bborbit)  then
-             !--- subtract closed orbit kick
-             !            track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-             !            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-             b%x(itrack,2) = b%x(itrack,2) - TH%ORBIT(1)
-             b%x(itrack,4) = b%x(itrack,4) - TH%ORBIT(3)
-          endif
-       enddo
-    endif
-    IF(DZ/=ZERO) CALL DRIFT_BEAM_BACK_TO_POSITION(th,DZ,B)
-
-  end subroutine BBKICK
-
-  subroutine ccperrf(xx, yy, wx, wy)
-    implicit none
-    !----------------------------------------------------------------------*
-    ! purpose:                                                             *
-    !   modification of wwerf, double precision complex error function,    *
-    !   written at cern by K. Koelbig.                                     *
-    ! input:                                                               *
-    !   xx, yy    (double)    real + imag argument                         *
-    ! output:                                                              *
-    !   wx, wy    (double)    real + imag function result                  *
-    !----------------------------------------------------------------------*
-    integer n,nc,nu
-    real(dp) xx,yy,wx,wy,x,y,q,h,xl,xh,yh,tx,ty,tn,sx,sy,saux,&
-         &rx(33),ry(33),cc,xlim,ylim,fac1,fac2,fac3
-    parameter(cc=1.12837916709551_dp,        &
-         xlim=5.33_dp,ylim=4.29_dp,fac1=3.2_dp,fac2=23.0_dp,fac3=21.0_dp)
-
-    x = abs(xx)
-    y = abs(yy)
-
-    if (y .lt. ylim  .and.  x .lt. xlim) then
-       q  = (one - y / ylim) * sqrt(one - (x/xlim)**2)
-       h  = one / (fac1 * q)
-       nc = 7 + int(fac2*q)
-       xl = h**(1 - nc)
-       xh = y + half/h
-       yh = x
-       nu = 10 + int(fac3*q)
-       rx(nu+1) = zero
-       ry(nu+1) = zero
-
-       do n = nu, 1, -1
-          tx = xh + n * rx(n+1)
-          ty = yh - n * ry(n+1)
-          tn = tx*tx + ty*ty
-          rx(n) = half * tx / tn
-          ry(n) = half * ty / tn
-       enddo
-
-       sx = zero
-       sy = zero
-
-       do n = nc, 1, -1
-          saux = sx + xl
-          sx = rx(n) * saux - ry(n) * sy
-          sy = rx(n) * sy + ry(n) * saux
-          xl = h * xl
-       enddo
-
-       wx = cc * sx
-       wy = cc * sy
-    else
-       xh = y
-       yh = x
-       rx(1) = zero
-       ry(1) = zero
-
-       do n = 9, 1, -1
-          tx = xh + n * rx(1)
-          ty = yh - n * ry(1)
-          tn = tx*tx + ty*ty
-          rx(1) = half * tx / tn
-          ry(1) = half * ty / tn
-       enddo
-
-       wx = cc * rx(1)
-       wy = cc * ry(1)
+       i22=r%T%n+i2
     endif
 
-    !      if(y .eq. zero) wx = exp(-x**2)
-    if(yy .lt. zero) then
-       wx =   two * exp(y*y-x*x) * cos(two*x*y) - wx
-       wy = - two * exp(y*y-x*x) * sin(two*x*y) - wy
-       if(xx .gt. zero) wy = -wy
-    else
-       if(xx .lt. zero) wy = -wy
-    endif
+    J=I1
 
-  end SUBROUTINE ccperrf
+    DO  WHILE(J<I22.AND.ASSOCIATED(C))
+
+      CALL TRACK_NODE_SINGLE(C,X,K,R%CHARGE)
+
+       C=>C%NEXT
+       J=J+1
+    ENDDO
+
+    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+
+  END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_R
 
 
 end module ptc_multiparticle

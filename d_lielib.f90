@@ -39,7 +39,6 @@ contains
     real(dp),dimension(ndim)::ang,ra,st
     integer ipause,mypauses
 
-    !      call daexter    not necessary
     do i=1,ndim
        nplane(i)=2*i-1
        ang(i)=zero
@@ -523,7 +522,6 @@ contains
     integer,dimension(:)::x
     if(.not.c_%stable_da) return
 
-    !*DAEXT(NO,NV) X(NDIM2)
     do i=1,nd2
        call davar(x(i),zero,i)
     enddo
@@ -883,25 +881,7 @@ contains
     enddo
     return
   end subroutine daprid
-  !  real(dp) function filtres(j)
-  !    implicit none
-  !    integer i,ic
-  !    !      INTEGER J(NTT)
-  !    integer,dimension(:)::j
-  !    if(.not.c_%stable_da) return
-  !
-  !    filtres=one
-  !    ic=0
-  !    do i=1,(nd2-ndc2)
-  !       ic=ic+j(i)*(-1)**(i+1)
-  !    enddo
-  !    ic=ic+ifilt
-  !    if(ic.lt.0) filtres=zero
-  !   if(ic.eq.0.and.ifilt.eq.1) then
-  !      filtres=zero
-  !   endif
-  !   return
-  ! end function filtres
+
   subroutine daflo(h,x,y)
     implicit none
     ! LIE EXPONENT ROUTINES WITH FLOW OPERATORS
@@ -1978,7 +1958,6 @@ contains
     implicit none
     ! POKES IN \VEC{H}  ANGLES AND DAMPING COEFFFICIENTS
     !
-    !*DAEXT(NO,NV) H
     integer i
     integer,dimension(ntt)::j
     integer,dimension(:)::h
@@ -2330,7 +2309,6 @@ contains
     implicit none
     ! LINEAR EXACT NORMALIZATION USING EIGENVALUE PACKAGE OF NERI
     !
-    !*DAEXT(NO,NV) C(NDIM2),A2(NDIM2),A2I(NDIM2)
     integer i,j
     integer,dimension(ntt)::jx
     integer,dimension(:)::c,a2,a2i
@@ -3018,6 +2996,9 @@ contains
     call dadal(rel,nd2)
     return
   end subroutine etcjg
+
+! Neri's Routine below
+
   subroutine eig6(fm,reval,aieval,revec,aievec)
     implicit none
     !**************************************************************************

@@ -181,10 +181,10 @@ module precision_constants
      integer,pointer :: nv       ! number of variables
      integer,pointer :: nd       ! degrees of freedom
      integer,pointer :: nd2      ! phase space dimension
-     integer,pointer :: np       ! number of parameters
+     integer,pointer :: np       ! number of parameters in fpp
      integer,pointer :: ndpt     ! constant energy variable position is different from zero
-     integer,pointer :: NPARA     ! PARAMETER LOCATION IN PTC
-     integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP
+     integer,pointer :: NPARA     ! PARAMETER LOCATION IN PTC in fpp
+     integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP or PTC
      integer,pointer :: np_pol     ! parameters produced through pol_block
      logical(lp),pointer :: knob
      logical(lp),pointer :: OTHER_PROGRAM
