@@ -574,6 +574,9 @@ char command_def[] =
 "ptc_script: ptc_script none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_script.f90*/
 "file     = [s, script.ptc, script.ptc]; "
 " "
+"ptc_open_gino: ptc_open_gino 0 0 "
+"command     = [s, dothis, dothis]; "
+" "
 "ptc_end: ptc_end none 0 0; "
 " "
 "correct: correct correct 0 0 "

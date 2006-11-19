@@ -132,6 +132,12 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine  w_ptc_open_gino()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
       subroutine  w_ptc_addknob()
       implicit none
       call fort_warn('PTC command skipped! ',                           &

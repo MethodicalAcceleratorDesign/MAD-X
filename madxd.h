@@ -91,6 +91,7 @@
 #define w_ptc_setfieldcomp      w_ptc_setfieldcomp_
 #define w_ptc_rviewer           w_ptc_rviewer_
 #define w_ptc_script            w_ptc_script_
+#define w_ptc_open_gino         w_ptc_open_gino_
 #define w_ptc_addpush           w_ptc_addpush_
 #define w_ptc_end               w_ptc_end_
 #define w_ptc_dumpmaps          w_ptc_dumpmaps_
@@ -218,6 +219,7 @@
 #define w_ptc_setfieldcomp      W_PTC_SETFIELDCOMP
 #define w_ptc_rviewer           W_PTC_RVIEWER
 #define w_ptc_script            W_PTC_SCRIPT
+#define w_ptc_open_gino         W_PTC_OPEN_GINO
 #define w_ptc_addpush           W_PTC_ADDPUSH
 #define w_ptc_end               W_PTC_END
 #define w_ptc_dumpmaps          W_PTC_DUMPMAPS
@@ -880,6 +882,7 @@ void w_ptc_writeparresults(int* filename);
 void w_ptc_printframes(int* filename);
 void w_ptc_printlayout_rootm(int* filename);
 void w_ptc_script(int* scriptname);
+void w_ptc_open_gino(int* scriptname);
 void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
 void w_ptc_enforce6d(int* flag);
 const char* getcurrentelementname();
@@ -1253,7 +1256,7 @@ char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 3.03.28";
-char code_mod_date[] = "Code Modification Date: 16.11.2006";
+char code_mod_date[] = "Code Modification Date: 19.11.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

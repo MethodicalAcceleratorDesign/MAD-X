@@ -9,7 +9,7 @@ module madx_ptc_script_module
 
   !============================================================================================
   !  PUBLIC INTERFACE
-  public                                      :: execscript
+  public                                      :: execscript, execginoscript 
 
 
   !============================================================================================
@@ -35,5 +35,18 @@ contains
     print*, "Exiting execscript"
 
   end subroutine execscript
+
+  subroutine execginoscript(scriptname)
+    implicit none
+    include 'twissa.fi'
+    integer   scriptname(*)
+    character(48) scriptfilename
+
+    scriptfilename = charconv(scriptname)
+    print*, "I am in execginosript: Script name is ", scriptfilename
+    CALL gino_ptc_command77(scriptfilename)
+    print*, "Exiting execginoscript"
+
+  end subroutine execginoscript
 
 end module madx_ptc_script_module

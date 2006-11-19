@@ -230,3 +230,11 @@ subroutine w_ptc_script(scriptname)
 
 end subroutine w_ptc_script
 
+subroutine w_ptc_open_gino(scriptname)
+  use madx_ptc_script_module
+  implicit none
+  integer scriptname(*)
+
+  call execginoscript(scriptname)
+
+end subroutine w_ptc_open_gino

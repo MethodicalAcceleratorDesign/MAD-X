@@ -8494,6 +8494,45 @@ void pro_ptc_script(struct in_cmd* cmd)
   delete_int_array(scriptnameIA);
 
 }
+
+/********************************************************************************/
+
+void pro_ptc_open_gino(struct in_cmd* cmd)
+{
+/*
+  processes ptc_open_gino command
+*/
+
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;
+  char*                          scriptname   = 0x0;
+  struct int_array*              scriptnameIA = 0x0;/*string passing to fortran is tricky*/
+
+  /*extracts table specified by the user*/
+  pos   = name_list_pos("command", c_parnames);
+  if (pos < 0)
+  {
+    printf("madxn.c: pro_ptc_open_gino: file parameter does not exist.\n");
+    return;
+  }
+
+  scriptname  = c_parameters->parameters[pos]->string;
+  if ( scriptname == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_open_gino: no script name: ", "ignored");
+    return;
+  }
+
+  scriptnameIA = new_int_array(1+strlen(scriptname));
+  conv_char(scriptname,scriptnameIA);
+
+  w_ptc_open_gino_(scriptnameIA->i);/*calls the fortran*/
+
+  delete_int_array(scriptnameIA);
+
+}
+
 /********************************************************************************/
 void pro_ptc_track(struct in_cmd* cmd)
 {

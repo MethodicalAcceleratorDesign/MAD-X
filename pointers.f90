@@ -1343,3 +1343,13 @@ end  subroutine read_ptc_command77
 !It has one parameter named "file". Hence, you call sth like
 !ptc_script, file="directptctweaks.ptc";
 !It executes subroutine execscript in file madx_ptc_script.f90.
+
+subroutine gino_ptc_command77(gino_command)
+ use pointer_lattice
+ implicit none
+ character(*) gino_command
+
+!  Etienne puts garbage here
+ print*,"Fuck it works! ",gino_command
+
+end  subroutine gino_ptc_command77

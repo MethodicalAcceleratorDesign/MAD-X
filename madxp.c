@@ -1562,6 +1562,10 @@ void exec_command()
       {
         pro_ptc_script(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_open_gino") == 0)
+      {
+        pro_ptc_open_gino(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)
       {
         pro_ptc_enforce6d(p);
