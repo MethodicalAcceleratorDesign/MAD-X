@@ -8509,14 +8509,7 @@ void pro_ptc_open_gino(struct in_cmd* cmd)
   char*                          scriptname   = 0x0;
   struct int_array*              scriptnameIA = 0x0;/*string passing to fortran is tricky*/
 
-  /*extracts table specified by the user*/
   pos   = name_list_pos("command", c_parnames);
-  if (pos < 0)
-  {
-    printf("madxn.c: pro_ptc_open_gino: file parameter does not exist.\n");
-    return;
-  }
-
   scriptname  = c_parameters->parameters[pos]->string;
   if ( scriptname == 0x0 )
   {
