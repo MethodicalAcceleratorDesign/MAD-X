@@ -2713,6 +2713,9 @@ void expand_line(struct char_p_array* l_buff)
     }
   }
   /* get bracket pointers including new ones */
+  while (b_level->max < l_buff->curr) grow_int_array(b_level);
+  while (lbpos->max < l_buff->curr) grow_int_array(lbpos);
+  while (rbpos->max < l_buff->curr) grow_int_array(rbpos);
   level = b_cnt = 0;
   for (i = 0; i < l_buff->curr; i++)
   {
