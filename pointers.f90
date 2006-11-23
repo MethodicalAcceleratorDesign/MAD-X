@@ -46,14 +46,14 @@ contains
     type(pol_block), ALLOCATABLE :: pol_(:)
     type(pol_block) :: pb
     CHARACTER*(NLP) NAME,flag
-    real(dp) targ_tune(2),targ_chrom(2),epsf
+    real(dp) targ_tune(2),targ_chrom(2),EPSF
     real(dp) targ_RES(4)
     !  END FITTING FAMILIES
     real(dp),allocatable :: beta(:,:,:)
     REAL(DP) DBETA,tune(3),tunenew(2),CHROM(2),DEL
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2)
-    integer nstep(2),i1,i2,I3,neq
+    integer nstep(2),i1,i2,I3,neq,i4,i5,I6,it
     LOGICAL(LP) STRAIGHT,skip
     ! end
     ! TRACK 4D NORMALIZED
@@ -80,7 +80,7 @@ contains
     REAL(DP) r_in,del_in,DLAM,ang_in,ang_out
     INTEGER ITE,n_in,POSR
     logical(lp) found_it
-    type(fibre),pointer ::p
+    type(fibre),pointer ::p,p1
     ! TRACKING RAYS
     INTEGER NRAYS
     INTEGER IBN,N_name
@@ -97,7 +97,14 @@ contains
     real(dp) :: lmax=1.e38_dp
     save my_default
     integer :: limit_int(2) =(/4,18/)
+    LOGICAL :: track_k,CLOSED_ORBIT=MY_FALSE
+    REAL(DP) CLOSED(6),XP(6),te(6)
+    ! automatic track
+    integer lim_t(6,2),IEXT
+    real(dp) dlim_t(6)
+    type(internal_state),pointer :: my_old_state
 
+    if(associated(my_state)) my_old_state=>my_state
     my_default=default
     my_state=>my_default
     skip=.false.
@@ -162,6 +169,9 @@ contains
           read(mf,*) NAME
 
           MY_RING%NAME=NAME
+       case('RESTOREMYSTATE')
+          my_default=my_OLD_state
+          my_state=>my_OLD_state
        case('DEFAULT')
           MY_STATE=DEFAULT0
        case('+NOCAVITY')
@@ -410,6 +420,10 @@ contains
           read(mf,*) epsf
           read(mf,*) targ_chrom
           call lattice_fit_CHROM_gmap(my_ring,my_state,EPSF,pol_,NPOL,targ_chrom,NP)
+       case('FITTUNECHROMATICITY')
+          read(mf,*) epsf
+          read(mf,*) targ_RES
+          call lattice_fit_CHROM_gmap(my_ring,my_state,EPSF,pol_,NPOL,targ_RES,NP)
        case('GETCHROMATICITY')
           call lattice_GET_CHROM(my_ring,my_state,CHROM)
        case('PAUSE')
@@ -552,10 +566,249 @@ contains
 
           enddo
 
+       case('PREISNERAUTOTRACK')
+          READ(MF,*) POS, NTURN, FILENAME,filesmear, name
+          READ(MF,*) CLOSED_ORBIT
+          read(mf,*) title
+          do i1=1,6
+             read(mf,*) LIM_T(i1,1:2),dlim_t(i1)
+          enddo
 
+          if(name(1:11)/='NONAMEGIVEN') then
+             posr=pos
+             call move_to( my_ring,p,name,posR,POS)
+             if(pos==0) then
+                write(6,*) name, " not found "
+                stop
+             endif
+          else
+             call move_to(my_ring,p1,POS)
+          endif
+
+          call kanalnummer(mfr)
+          if(title(1:1)=='A') then
+             open(unit=mfr,file=filename,position='APPEND',status='OLD')
+          ELSE
+             open(unit=mfr,file=filename)
+          endif
+
+          call kanalnummer(ib)
+
+          if(title(1:1)=='A') then
+             open(unit=ib,file=filesmear,position='APPEND',status='OLD')
+          ELSE
+             open(unit=ib,file=filesmear)
+          endif
+
+          IEXT=0
+          CLOSED=ZERO
+          IF((.NOT.MY_STATE%NOCAVITY).AND.CLOSED_ORBIT) THEN
+             IEXT=FIND_ORBIT_FLAG(MY_RING,CLOSED,POS,MY_STATE,c_1d_5)
+          ENDIF
+
+          IF(IEXT==0) THEN
+             DO I5=LIM_T(5,1),LIM_T(5,2)
+
+                IF(MY_STATE%NOCAVITY.AND.CLOSED_ORBIT) THEN
+                   CLOSED(5) = I5*dlim_t(5)
+                   IEXT=FIND_ORBIT_FLAG(MY_RING,CLOSED,POS,MY_STATE,c_1d_5)
+                ENDIF
+                IF(MY_STATE%NOCAVITY.AND.CLOSED_ORBIT) THEN
+                   WRITE(6,*) " ENERGY X(5) = ",CLOSED(5)
+                ELSE
+                   WRITE(6,*) " ENERGY X(5) = ",I5*dlim_t(5)+CLOSED(5)
+                ENDIF
+                IF(IEXT/=0) THEN
+                   WRITE(6,*) " 4D CLOSED ORBIT NOT FOUND "
+                   CYCLE
+                ENDIF
+                DO I6=LIM_T(6,1),LIM_T(6,2)
+                   DO I4=LIM_T(4,1),LIM_T(4,2)
+                      DO I3=LIM_T(3,1),LIM_T(3,2)
+                         DO I2=LIM_T(2,1),LIM_T(2,2)
+                            DO I1=LIM_T(1,1),LIM_T(1,2)
+                               XP(1)=I1*dlim_t(1)+CLOSED(1)
+                               XP(2)=I2*dlim_t(2)+CLOSED(2)
+                               XP(3)=I3*dlim_t(3)+CLOSED(3)
+                               XP(4)=I4*dlim_t(4)+CLOSED(4)
+                               XP(6)=I6*dlim_t(6)+CLOSED(6)
+                               IF(MY_STATE%NOCAVITY.AND.CLOSED_ORBIT) THEN
+                                  CLOSED(5) = I5*dlim_t(5)
+                                  CALL FIND_ORBIT(MY_RING,CLOSED,POS,MY_STATE,c_1d_5)
+                                  XP(5)=CLOSED(5)
+                               ELSE
+                                  XP(5)=I5*dlim_t(5)+CLOSED(5)
+                               ENDIF
+                               track_k=.true.
+                               te(1)=I1*dlim_t(1)
+                               te(2)=I2*dlim_t(2)
+                               te(3)=I3*dlim_t(3)
+                               te(4)=I4*dlim_t(4)
+                               te(5)=I5*dlim_t(5)
+                               te(6)=I6*dlim_t(6)
+                               DO It=1,NTURN ! it
+                                  p=>p1
+                                  do ii=1,MY_RING%n  !ii
+
+                                     call track(my_ring,XP,ii,ii+1,MY_STATE)
+
+
+                                     call produce_aperture_flag(apertflag)
+                                     if (apertflag/=0) then
+                                        !     print *, 'Particle out of aperture!'
+
+                                        call ANALYSE_APERTURE_FLAG(apertflag,why)
+                                        !    Write(6,*) "PREISNER: paticle : ",i1, " lost"
+                                        !    Write(6,301) te
+                                        !     Write(6,*) "PREISNER: APERTURE error for element: ",ii," name: ",p%MAG%name
+                                        !    Write(6,*) "Message: ",c_%message
+                                        !                      write(whymsg,*) 'APERTURE error: ',why
+                                        track_k=.false.
+                                        goto 3001
+                                        exit; !goes to the ne
+                                     endif
+
+                                     p=>p%next
+
+                                  enddo ! ii
+
+
+                               ENDDO  ! it
+3001                           continue
+                               if (track_k) then
+                                  !                       Write(6,*) "PREISNER: particle  stable"
+                                  !                       Write(6,301) te
+                                  Write(mfr,302) te
+                               else
+                                  !                       Write(6,*) "PREISNER: particle  unstable"
+                                  !                       Write(6,301) te
+                                  Write(ib,302) te
+                               endif
+
+
+                            ENDDO  !1
+                         ENDDO  !2
+                      ENDDO  !3
+                   ENDDO  !4
+                ENDDO  !6
+             ENDDO  !5
+          ELSE
+             WRITE(6,*) "NO TRACDKING DONE : 6D CLOSED ORBIT WITH CAVITY NOT FOUND "
+          ENDIF ! IEXT
+          close(ib)
+          close(mfr)
+
+       case('PREISNERTRACK')
+          READ(MF,*) NRAYS,POS, NTURN, FILENAME,filesmear, name
+          READ(MF,*) CLOSED_ORBIT
+          read(mf,*) title
+          print*,"PREISNER TRACK", NRAYS,POS, NTURN, FILENAME
+          print*,"PREISNER TRACK name ",  name
+          call context(name)
+          call context(FILENAME)
+          call context(filesmear)
+          call context(title)
+          CLOSED=0.D0
+          if(name(1:11)/='NONAMEGIVEN') then
+             posr=pos
+             call move_to( my_ring,p,name,posR,POS)
+             if(pos==0) then
+                write(6,*) name, " not found "
+                stop
+             endif
+          else
+             call move_to(my_ring,p1,POS)
+          endif
+          call kanalnummer(mfr)
+          if(title(1:1)=='A') then
+             open(unit=mfr,file=filename,position='APPEND',status='OLD')
+          ELSE
+             open(unit=mfr,file=filename)
+          endif
+
+          call kanalnummer(ib)
+
+          if(title(1:1)=='A') then
+             open(unit=ib,file=filesmear,position='APPEND',status='OLD')
+          ELSE
+             open(unit=ib,file=filesmear)
+          endif
+
+
+          DO I1=1,NRAYS
+             track_k=.true.
+             READ(MF,*) XP
+             te=xp
+             WRITE(MFR,301) XP
+             IF(CLOSED_ORBIT) THEN
+                CLOSED(5)=XP(5)
+                CALL FIND_ORBIT(MY_RING,CLOSED,POS,MY_STATE,c_1d_5)
+                IF(MY_STATE%NOCAVITY) THEN
+                   X(1:4)=XP(1:4)+CLOSED(1:4)
+                   X(5)=CLOSED(5)
+                   X(6)=0.D0
+                ELSE
+                   XP=X+CLOSED
+                ENDIF
+             ELSE
+                X=XP
+             ENDIF
+
+             DO I2=1,NTURN
+                p=>p1
+                do ii=1,MY_RING%n
+
+                   call track(my_ring,X,ii,ii+1,MY_STATE)
+
+
+                   call produce_aperture_flag(apertflag)
+                   if (apertflag/=0) then
+                      print *, 'Particle out of aperture!'
+
+                      call ANALYSE_APERTURE_FLAG(apertflag,why)
+                      Write(6,*) "PREISNER: particle : ",i1, " lost"
+                      Write(6,301) te
+                      Write(6,*) "PREISNER: APERTURE error for element: ",ii," name: ",p%MAG%name
+                      Write(6,*) "Message: ",c_%message
+                      !                      write(whymsg,*) 'APERTURE error: ',why
+                      track_k=.false.
+                      goto 2001
+                      exit; !goes to the ne
+                   endif
+
+                   p=>p%next
+
+                enddo
+
+                IF(CLOSED_ORBIT) THEN
+                   IF(MY_STATE%NOCAVITY) THEN
+                      XP(1:4)=X(1:4)-CLOSED(1:4)
+                      XP(5:6)=X(5:6)
+                   ELSE
+                      XP=X-CLOSED
+                   ENDIF
+                ELSE
+                   XP=X
+                ENDIF
+                WRITE(MFR,301) XP
+
+             ENDDO
+2001         continue
+             if (track_k) then
+                Write(6,*) "PREISNER: particle : ",i1, " stable"
+                Write(6,301) te
+                Write(ib,302) te,i1
+             endif
+
+             write(6,*) " particle",i1 ," done "
+          ENDDO
+          write(6,*) " tracking done "
+          CLOSE(MFR)
+          CLOSE(ib)
        case('TRACKRAYS')
           READ(MF,*) NRAYS,POS, NTURN, FILENAME, name
 301       FORMAT(6(1X,E15.8))
+302       FORMAT(6(1X,E15.8),1x,i4)
           print*,"TRACKRAYS", NRAYS,POS, NTURN, FILENAME
           print*,"TRACKRAYS name ",  name
           call context(name)
@@ -659,6 +912,25 @@ contains
        case('TRANSLATELAYOUT')
           READ(MF,*)DT
           CALL TRANSLATE(MY_RING,DT)
+       case('TRANSLATEPARTOFLAYOUT')
+          READ(MF,*)DT
+          READ(MF,*) I1,I2
+          CALL TRANSLATE(MY_RING,DT,I1,I2)
+          CALL MOVE_TO(MY_RING,P,i1)
+          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+          CALL MOVE_TO(MY_RING,P,i2)
+          CALL FIND_PATCH(P,P%NEXT,NEXT=.FALSE.,ENERGY_PATCH=.FALSE.)
+       case('ROTATEPARTOFLAYOUT')
+
+          READ(MF,*)DT
+          READ(MF,*) I1,I2
+          CALL MOVE_TO(MY_RING,P,i1)
+          call ROTATE_LAYOUT(my_ring,P%mag%p%f%ent,DT,I1,I2)
+          CALL MOVE_TO(MY_RING,P,i1)
+          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+          CALL MOVE_TO(MY_RING,P,i2)
+          CALL FIND_PATCH(P,P%NEXT,NEXT=.FALSE.,ENERGY_PATCH=.FALSE.)
+
        case('TRANSLATEFIBREANDPATCH')
           READ(MF,*)POS
           READ(MF,*)DT
@@ -1330,9 +1602,17 @@ subroutine read_ptc_command77(ptc_fichier)
   use pointer_lattice
   implicit none
   character(*) ptc_fichier
+  integer m
+
+  call kanalnummer(m)
+
+  open(unit=m,file=ptc_fichier,status='old',err=2001)
 
   call read_ptc_command(ptc_fichier)
+  return
+2001 continue
 
+  write(6,*) " Warning: command file does not exit "
 
 end  subroutine read_ptc_command77
 
@@ -1345,11 +1625,14 @@ end  subroutine read_ptc_command77
 !It executes subroutine execscript in file madx_ptc_script.f90.
 
 subroutine gino_ptc_command77(gino_command)
- use pointer_lattice
- implicit none
- character(*) gino_command
+  use pointer_lattice
+  implicit none
+  character(*) gino_command
 
-!  Etienne puts garbage here
- print*,"Fuck it works! ",gino_command
+  !  Etienne puts garbage here
+  ! print*,"Fuck it works! ",gino_command
+
+  call context(gino_command)
+  call call_gino(gino_command)
 
 end  subroutine gino_ptc_command77
