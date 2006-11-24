@@ -355,6 +355,26 @@
         call ttdrf(el,track,ktrack)
         go to 502
       endif
+
+!--- Note: First 'if' below could be taken out, we have no thick elements (bends)      
+      bend = code .eq. 2 .or. code .eq. 3
+      if (.not. bend)  then
+        theta = node_value('tilt ')
+        if (theta .ne. zero)  then
+!--- rotate trajectory before entry
+          st = sin(theta)
+          ct = cos(theta)
+          do jtrk = 1,ktrack
+            tmp = track(1,jtrk)
+            track(1,jtrk) = ct * tmp + st * track(3,jtrk)
+            track(3,jtrk) = ct * track(3,jtrk) - st * tmp
+            tmp = track(2,jtrk)
+            track(2,jtrk) = ct * tmp + st * track(4,jtrk)
+            track(4,jtrk) = ct * track(4,jtrk) - st * tmp
+          enddo
+        endif
+      endif      
+      
 !---- Translation of particles // AK 23.02.2006
 !---- useful for combination of different transfer lines or rings
       if(code.eq.36) then
@@ -489,23 +509,7 @@
         endif
       endif
 !----  END OF IF(APERFLAG)  ----------------
-      bend = code .eq. 2 .or. code .eq. 3
-      if (.not. bend)  then
-        theta = node_value('tilt ')
-        if (theta .ne. zero)  then
-!--- rotate trajectory before entry
-          st = sin(theta)
-          ct = cos(theta)
-          do jtrk = 1,ktrack
-            tmp = track(1,jtrk)
-            track(1,jtrk) = ct * tmp + st * track(3,jtrk)
-            track(3,jtrk) = ct * track(3,jtrk) - st * tmp
-            tmp = track(2,jtrk)
-            track(2,jtrk) = ct * tmp + st * track(4,jtrk)
-            track(4,jtrk) = ct * track(4,jtrk) - st * tmp
-          enddo
-        endif
-      endif
+
 !-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
 !-- 500 has been specified at the relevant places in go to below
 !-- code =1 for drift, treated above, go to 500 directly
@@ -1910,12 +1914,27 @@
       logical recloss
       integer i,j,n,k,turn,part_id(*),jmax,last_turn(*),get_option
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
-     &torb(6)
+     &torb(6), theta, node_value, st, ct, tmp
       character*(name_len) aptype
 !hbu
       character*(name_len) el_name
 
       recloss = get_option('recloss ') .ne. 0
+
+!--- As elements might have a tilt we have to transform back 
+!--- into the original coordinate system!
+      theta = node_value('tilt ')
+      if (theta .ne. 0.d0)  then
+          st = sin(theta)
+          ct = cos(theta)
+!--- rotate trajectory (at exit)
+            tmp = z(1,n)
+            z(1,n) = ct * tmp - st * z(3,n)
+            z(3,n) = ct * z(3,n) + st * tmp
+            tmp = z(2,n)
+            z(2,n) = ct * tmp - st * z(4,n)
+            z(4,n) = ct * z(4,n) + st * tmp
+      endif      
       
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
