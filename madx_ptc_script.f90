@@ -9,7 +9,7 @@ module madx_ptc_script_module
 
   !============================================================================================
   !  PUBLIC INTERFACE
-  public                                      :: execscript, execginoscript 
+  public                                      :: execscript, execginoscript
 
 
   !============================================================================================

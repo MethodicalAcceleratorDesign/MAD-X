@@ -1,7 +1,7 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest 
-! Based on an original Fortran77 prototype 
-! developed 
+!Copyright (C) Etienne Forest
+! Based on an original Fortran77 prototype
+! developed
 
 module da_arrays
   use precision_constants

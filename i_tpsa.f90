@@ -27,7 +27,7 @@ MODULE TPSA
   private pbbra,full_absT,asstaylor,getcharnd2s,GETintnd2s,GETintk
   private shiftda,shift000
   !PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
-!  public, alloc_uni, null_uni, fill_uni, refill_uni
+  !  public, alloc_uni, null_uni, fill_uni, refill_uni
 
   private fill_uni_r ! new sagan
 
@@ -55,21 +55,21 @@ MODULE TPSA
      MODULE PROCEDURE equaldacon
      MODULE PROCEDURE Iequaldacon
      ! UNIVERSAL_TAYLOR
-     
+
      MODULE PROCEDURE fill_uni_r
      MODULE PROCEDURE null_uni
      MODULE PROCEDURE fill_uni  ! new sagan
      MODULE PROCEDURE refill_uni
   end  INTERFACE
 
-   
+
 
   INTERFACE print
      MODULE PROCEDURE printunitaylor
   END INTERFACE
 
 
-  
+
 
   !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber2" width="400" height="135">
   !@      <tr>
@@ -639,14 +639,14 @@ MODULE TPSA
      MODULE PROCEDURE allocda
      MODULE PROCEDURE A_OPT
      MODULE PROCEDURE allocdas
-     MODULE PROCEDURE alloc_u  
+     MODULE PROCEDURE alloc_u
   END INTERFACE
 
   INTERFACE KILL
      MODULE PROCEDURE KILLda
      MODULE PROCEDURE KILLdas
      MODULE PROCEDURE K_opt
-     MODULE PROCEDURE kill_uni  
+     MODULE PROCEDURE kill_uni
   END INTERFACE
 
   INTERFACE alloctpsa
@@ -2975,14 +2975,14 @@ CONTAINS
 
 
   ! Universal Taylor Routines   (Sagan's Stuff)
-  
+
   SUBROUTINE  kill_uni(S2)
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
 
-       DEALLOCATE(S2%N,S2%NV,S2%C,S2%J)
-       NULLIFY(S2%N,S2%NV,S2%C,S2%J)
-    
+    DEALLOCATE(S2%N,S2%NV,S2%C,S2%J)
+    NULLIFY(S2%N,S2%NV,S2%C,S2%J)
+
   END SUBROUTINE  kill_uni
 
   SUBROUTINE  null_uni(S2,S1)
@@ -3111,26 +3111,26 @@ CONTAINS
 
 
   !_________________________________________________________________________________
-    
+
 
   subroutine printunitaylor(ut,iunit)
     implicit none
     type(universal_taylor) :: ut
     integer                :: iunit
     integer                :: i,ii
-    
+
     if (.not. associated(ut%n)) then
-         write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSICIATED)'
-    endif 
-    
+       write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSICIATED)'
+    endif
+
     write(iunit,'(/1X,A,I5,A,I5,A/1X,A/)') 'UNIV_TAYLOR   NO =',ut%n,', NV =',ut%nv,', INA = unita',&
          '*********************************************'
     if(ut%n /= 0) then
-         write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-    else 
-         write(iunit,'(A)') '   ALL COMPONENTS ZERO '
-    endif     
-    
+       write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
+    else
+       write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+    endif
+
     do i = 1,ut%n
        write(iunit,'(I6,2X,G20.14,I5,4X,18(2I2,1X))') i,ut%c(i),sum(ut%j(i,:)),(ut%j(i,ii),ii=1,ut%nv)
        if( .not. print77) then
@@ -3139,7 +3139,7 @@ CONTAINS
     enddo
 
     write(iunit,'(A)') '                                      '
-    
+
   end subroutine printunitaylor
 
 

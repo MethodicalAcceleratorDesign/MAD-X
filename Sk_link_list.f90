@@ -1489,25 +1489,25 @@ CONTAINS
     TYPE(layout),target :: L
     TYPE(BEAM_BEAM_LATTICE),target :: O
     INTEGER N,I
-       
 
 
-       ALLOCATE(O%KICKS(N))
-       ALLOCATE(O%NEXT_KICK(L%T%N))
-       ALLOCATE(O%BEAM_BEAM_WARNING);O%BEAM_BEAM_WARNING=0
-       ALLOCATE(O%BEAM_BEAM_DSMAX);O%BEAM_BEAM_DSMAX=ZERO
-       ALLOCATE(O%STATE);
-       ALLOCATE(O%CHARGE);
-       ALLOCATE(O%N_KICKS)
-       O%N_KICKS=N
 
-       O%STATE=DEFAULT
-       O%CHARGE=1
+    ALLOCATE(O%KICKS(N))
+    ALLOCATE(O%NEXT_KICK(L%T%N))
+    ALLOCATE(O%BEAM_BEAM_WARNING);O%BEAM_BEAM_WARNING=0
+    ALLOCATE(O%BEAM_BEAM_DSMAX);O%BEAM_BEAM_DSMAX=ZERO
+    ALLOCATE(O%STATE);
+    ALLOCATE(O%CHARGE);
+    ALLOCATE(O%N_KICKS)
+    O%N_KICKS=N
 
-       DO I=1,N
-        CALL ALLOC(O%KICKS(I))
-       ENDDO
-       O%NEXT_KICK=0
+    O%STATE=DEFAULT
+    O%CHARGE=1
+
+    DO I=1,N
+       CALL ALLOC(O%KICKS(I))
+    ENDDO
+    O%NEXT_KICK=0
   END SUBROUTINE Set_Up_beam_beam_lattice
 
 
@@ -1561,7 +1561,7 @@ CONTAINS
     CALL RING_L_THIN(L,doneit)
   END SUBROUTINE move_to_INTEGRATION_NODE
 
-!  Beam beam stuff
+  !  Beam beam stuff
 
   SUBROUTINE ALLOC_BEAM_BEAM_NODE(B)
     IMPLICIT NONE
@@ -1576,15 +1576,15 @@ CONTAINS
     ALLOCATE(B%YM)
     ALLOCATE(B%DPOS)
     ALLOCATE(B%bbk(2))
-     B%bbk=zero
-     B%SX=one
-     B%Sy=one
-     B%XM=zero
-     B%YM=zero
-     B%DS=ZERO
-     B%S=zero
-     B%DPOS=0
-     B%FK=ZERO
+    B%bbk=zero
+    B%SX=one
+    B%Sy=one
+    B%XM=zero
+    B%YM=zero
+    B%DS=ZERO
+    B%S=zero
+    B%DPOS=0
+    B%FK=ZERO
   END SUBROUTINE ALLOC_BEAM_BEAM_NODE
 
   SUBROUTINE KILL_BEAM_BEAM_NODE(B)

@@ -971,124 +971,124 @@ CONTAINS
     real(dp)             :: v
     real(kind(1d0))      :: tmpv
     real(kind(1d0)) get_value
-    
+
     if ( .not. associated(my_ring) ) then
-      call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
-      return
+       call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
+       return
     endif
-    
+
     if (getdebug()>2) then
-      print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
-    endif  
+       print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
+    endif
 
     if ( (fibreidx .lt. 1) .and. (fibreidx .gt. my_ring%n) ) then
-      call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
-      return
+       call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
+       return
     endif
-    
+
     p=>my_ring%start
     do j=1, fibreidx
-      p=>p%next
+       p=>p%next
     enddo
 
     if (getdebug() > 1 ) then
        print*,"Found element no. ", fibreidx," named ", p%mag%name, &
-             &" of kind ", p%mag%kind, mytype(p%mag%kind)
+            &" of kind ", p%mag%kind, mytype(p%mag%kind)
        print*,"Currently nmul is ", p%mag%p%nmul
 
        write(6,*) "BNs",p%mag%BN
        write(6,*) "ANs",p%mag%AN
 
        DO i=1,p%mag%p%nmul
-         print*, "Polimorphic BN(",i,")"
-         call print(p%mag%BN(i),6)
-         print*, "Polimorphic AN(",i,")"
-         call print(p%mag%AN(i),6)
+          print*, "Polimorphic BN(",i,")"
+          call print(p%mag%BN(i),6)
+          print*, "Polimorphic AN(",i,")"
+          call print(p%mag%AN(i),6)
        ENDDO
 
     endif
-    
+
     kn = get_value('ptc_setfieldcomp ','kn ')
     v = get_value('ptc_setfieldcomp ','value ')
-    
+
     if (kn >= 0) then
-      kn = kn + 1
-!      print*,"Setting up normal field component ", kn," to ", v
-      
-      call add(p%mag, kn,1,v)
-      call add(p%magp,kn,1,v)
-      
+       kn = kn + 1
+       !      print*,"Setting up normal field component ", kn," to ", v
+
+       call add(p%mag, kn,1,v)
+       call add(p%magp,kn,1,v)
+
     else
-      ks = get_value('ptc_setfieldcomp ','ks ')
-      if (ks < 0) then
-        call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
-        return
-      endif
-      ks = ks + 1
+       ks = get_value('ptc_setfieldcomp ','ks ')
+       if (ks < 0) then
+          call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
+          return
+       endif
+       ks = ks + 1
 
-!      print*,"Setting up skew field component ", ks," to ", v
+       !      print*,"Setting up skew field component ", ks," to ", v
 
-      call add(p%mag, -ks,1,v)
-      call add(p%magp,-ks,1,v)
+       call add(p%mag, -ks,1,v)
+       call add(p%magp,-ks,1,v)
 
     endif
 
     if (getdebug() > 1 ) then
-      write(6,*) "BNs",p%mag%BN
-      write(6,*) "ANs",p%mag%AN
-      write(6,*) ""
-    endif  
+       write(6,*) "BNs",p%mag%BN
+       write(6,*) "ANs",p%mag%AN
+       write(6,*) ""
+    endif
   end subroutine ptc_setfieldcomp
-  
+
 
 
   subroutine extendnmul(f,n)
     implicit none
-      type(fibre),  pointer               :: f !fiber
-      integer                             :: n !order 
-      real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
-      type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
-      integer                             :: i !iterator
-      !P.Sk
-      
-      if (.not. associated(f)) then
-        return
-      endif
+    type(fibre),  pointer               :: f !fiber
+    integer                             :: n !order
+    real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
+    type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
+    integer                             :: i !iterator
+    !P.Sk
 
-      ALLOCATE(ANR(n),BNR(n)) 
-      ALLOCATE(ANP(n),BNP(n))
-      CALL ALLOC(ANP,n)
-      CALL ALLOC(BNP,n)
+    if (.not. associated(f)) then
+       return
+    endif
 
-      DO I=1,f%mag%P%NMUL
-        ANR(I)=f%mag%AN(I)
-        BNR(I)=f%mag%BN(I)
+    ALLOCATE(ANR(n),BNR(n))
+    ALLOCATE(ANP(n),BNP(n))
+    CALL ALLOC(ANP,n)
+    CALL ALLOC(BNP,n)
 
-        ANP(I)=f%magp%AN(I)
-        ANP(I)=f%magp%BN(I)
-      ENDDO
+    DO I=1,f%mag%P%NMUL
+       ANR(I)=f%mag%AN(I)
+       BNR(I)=f%mag%BN(I)
 
-      DO I=f%mag%P%NMUL+1, n
-        ANR(I)=zero
-        BNR(I)=zero
+       ANP(I)=f%magp%AN(I)
+       ANP(I)=f%magp%BN(I)
+    ENDDO
 
-        ANP(I)=zero
-        ANP(I)=zero
-      ENDDO
+    DO I=f%mag%P%NMUL+1, n
+       ANR(I)=zero
+       BNR(I)=zero
 
-      call kill(f%magp%AN,f%magp%p%nmul)
-      call kill(f%magp%BN,f%magp%p%nmul)
-      deallocate(f%magp%AN,f%magp%BN)
-      deallocate(f%mag%AN,f%mag%BN)
+       ANP(I)=zero
+       ANP(I)=zero
+    ENDDO
 
-      f%mag%p%nmul  = n
-      f%magp%p%nmul = n
+    call kill(f%magp%AN,f%magp%p%nmul)
+    call kill(f%magp%BN,f%magp%p%nmul)
+    deallocate(f%magp%AN,f%magp%BN)
+    deallocate(f%mag%AN,f%mag%BN)
 
-      f%mag%AN=>ANR
-      f%mag%BN=>BNR
+    f%mag%p%nmul  = n
+    f%magp%p%nmul = n
 
-      f%magp%AN=>ANP
-      f%magp%BN=>BNP
+    f%mag%AN=>ANR
+    f%mag%BN=>BNR
+
+    f%magp%AN=>ANP
+    f%magp%BN=>BNP
 
 
   end subroutine extendnmul
@@ -1101,8 +1101,8 @@ CONTAINS
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
     !---------------------------------------------------------------
-    
-    
+
+
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -1374,7 +1374,7 @@ CONTAINS
     endif
 
     call cleartables() !defined in madx_ptc_knobs
-    
+
     call kill_para(my_ring) !removes all the previous parameters
     nda = getnknobs() !defined in madx_ptc_knobs
     suml=zero
@@ -1412,7 +1412,7 @@ CONTAINS
           stop
           return
        endif
-    
+
        call find_orbit(my_ring,x,1,default,c_1d_7)
 
        if ( .not. c_%stable_da) then
@@ -1516,17 +1516,17 @@ CONTAINS
           return
        endif
     endif
-     
+
     call setknobs(my_ring)
 
     !############################################################################
     !############################################################################
     !############################################################################
-    
-    
+
+
     call alloc(tw)
     call alloc(scv)
- 
+
     tw=y
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
        call fort_warn('ptc_twiss: ','Error: DA in twiss got unstable during Normal Form')
@@ -1548,7 +1548,7 @@ CONTAINS
        print *, "ptc_twiss: internal state is:"
        call print(default,6)
     endif
-   
+
     do i=1,MY_RING%n
 
        if (getdebug() > 1) then
@@ -1556,12 +1556,12 @@ CONTAINS
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
           write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
        endif
-       
+
        if (nda > 0) then
-         call track(my_ring,y,i,i+1,+default)
+          call track(my_ring,y,i,i+1,+default)
        else
-         call track(my_ring,y,i,i+1, default)
-       endif   
+          call track(my_ring,y,i,i+1, default)
+       endif
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_twiss: ','DA got unstable')
           call seterrorflag(10,"ptc_twiss ","DA got unstable ");
@@ -1587,16 +1587,16 @@ CONTAINS
           call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
           return
        endif
-       
+
        !the tracked polimorph is not normalized to the input beam parameters
        !we need to drag it from the twiss object, where it is normalized with A matrix of the normal form
 
        do ii=1, c_%nd2
-         scv(ii) = tw%junk%v(ii)
-       enddo  
+          scv(ii) = tw%junk%v(ii)
+       enddo
 
        call putusertable(i,current%mag%name,suml,y,scv)
-       
+
        call puttwisstable()
 
        iii=advance_node()
@@ -1627,7 +1627,7 @@ CONTAINS
       real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
       type(work) :: cfen !current fibre energy
-      
+
 
       cfen = 0 ! do not remove -> if it is removed energy is wrong because = adds energy to the previous value
 
@@ -1810,7 +1810,7 @@ CONTAINS
          write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
          print*, "c_%npara is ", c_%npara
       endif
-      
+
       allocate(j(c_%npara))
       j(:)=0
       do i = 1,c_%npara
@@ -1944,8 +1944,8 @@ CONTAINS
          write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
          print*, "c_%npara is ", c_%npara
       endif
-       
-      
+
+
       allocate(j(c_%npara))
       j(:)=0
       do i = 1,c_%npara
@@ -2379,7 +2379,7 @@ CONTAINS
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
-      call makemaptable(y)
+       call makemaptable(y)
     endif
 
     normal = get_value('ptc_normal ','normal ') .ne. 0
@@ -2613,9 +2613,9 @@ CONTAINS
        return
     endif
 
-!    call killparresult() 
+    !    call killparresult()
     call resetknobs()  !remove the knobs
-    
+
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
@@ -2701,7 +2701,7 @@ CONTAINS
     endif
 
 
-  
+
     if(nd2.eq.4.and.np.ge.1) then
        do i=1,nd2
           do j=1,nd2
@@ -3112,7 +3112,7 @@ CONTAINS
 
   END SUBROUTINE Convert_dp_to_dt
   !=============================================================================
-  
+
   subroutine makemaptable(y)
     implicit none
     type(real_8):: y(6)
@@ -3122,18 +3122,36 @@ CONTAINS
     real(kind(1d0))   :: map_coor(i_map_coor)
 
 
-       map_term=42
-       call  make_map_table(map_term)
-       call liepeek(iia,icoast)
-       allocate(j(c_%npara))
-       ja(:)    = 0
-       j(:)     = 0
-       do iii=1,c_%npara
-          coef = y(iii)%T.sub.j
+    map_term=42
+    call  make_map_table(map_term)
+    call liepeek(iia,icoast)
+    allocate(j(c_%npara))
+    ja(:)    = 0
+    j(:)     = 0
+    do iii=1,c_%npara
+       coef = y(iii)%T.sub.j
+       map_coor(1)=coef
+       map_coor(2)=iii
+       map_coor(3)=c_%npara
+       map_coor(4)=0
+       map_coor(5)=ja(1)
+       map_coor(6)=ja(2)
+       map_coor(7)=ja(3)
+       map_coor(8)=ja(4)
+       map_coor(9)=ja(5)
+       map_coor(10)=ja(6)
+       call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+       call augment_count("map_table ")
+    enddo
+    do i = 1,c_%npara
+       do ii = 1,c_%npara
+          j(ii) = 1
+          ja(ii) = j(ii)
+          coef = y(i)%T.sub.j
           map_coor(1)=coef
-          map_coor(2)=iii
-          map_coor(3)=c_%npara
-          map_coor(4)=0
+          map_coor(2)=i
+          map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
+          map_coor(4)=no
           map_coor(5)=ja(1)
           map_coor(6)=ja(2)
           map_coor(7)=ja(3)
@@ -3142,29 +3160,11 @@ CONTAINS
           map_coor(10)=ja(6)
           call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
           call augment_count("map_table ")
+          j(:)  = 0
+          ja(ii) = j(ii)
        enddo
-       do i = 1,c_%npara
-          do ii = 1,c_%npara
-             j(ii) = 1
-             ja(ii) = j(ii)
-             coef = y(i)%T.sub.j
-             map_coor(1)=coef
-             map_coor(2)=i
-             map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
-             map_coor(4)=no
-             map_coor(5)=ja(1)
-             map_coor(6)=ja(2)
-             map_coor(7)=ja(3)
-             map_coor(8)=ja(4)
-             map_coor(9)=ja(5)
-             map_coor(10)=ja(6)
-             call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-             call augment_count("map_table ")
-             j(:)  = 0
-             ja(ii) = j(ii)
-          enddo
-       enddo
-       deallocate(j)
+    enddo
+    deallocate(j)
 
 
 

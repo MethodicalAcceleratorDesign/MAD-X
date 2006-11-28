@@ -7,7 +7,7 @@ type tablepush_poly
    integer       :: element  !defines the element of 6D function
    character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3
 end type tablepush_poly
-!describes result 
+!describes result
 
 type resultdescr
    integer       :: index ! column in 2D array of taylors of the result
@@ -23,14 +23,14 @@ end type mapelement
 
 type mapelresult
    type (resultdescr)  :: descr
-   type (mapelement)   :: r   
+   type (mapelement)   :: r
 end type mapelresult
 !_____________________________________________________________
 
 
-!defines a file 
+!defines a file
 type file
-   character(20) :: name  !file name  
+   character(20) :: name  !file name
    integer       :: fd !file descriptor
 end type file
 !_____________________________________________________________
@@ -89,15 +89,15 @@ integer, parameter                ::   kn_dp =33
 integer, parameter                ::   ntwisses = 33
 
 CHARACTER*(6), parameter          ::   twissnames(ntwisses) = (/ &
-	                  'beta11','beta12','beta13',&
-	                  'beta21','beta22','beta23',&
-	                  'beta31','beta32','beta33',&
-	                  'alfa11','alfa12','alfa13',&
-	                  'alfa21','alfa22','alfa23',&
-	                  'alfa31','alfa32','alfa33',&
-	                  'gama11','gama12','gama13',&
-	                  'gama21','gama22','gama23',&
-	                  'gama31','gama32','gama33',&
-	                  'x     ','px    ',&
-	                  'y     ','py    ',&
-	                  'pt    ','t     '          /)
+     'beta11','beta12','beta13',&
+     'beta21','beta22','beta23',&
+     'beta31','beta32','beta33',&
+     'alfa11','alfa12','alfa13',&
+     'alfa21','alfa22','alfa23',&
+     'alfa31','alfa32','alfa33',&
+     'gama11','gama12','gama13',&
+     'gama21','gama22','gama23',&
+     'gama31','gama32','gama33',&
+     'x     ','px    ',&
+     'y     ','py    ',&
+     'pt    ','t     '          /)

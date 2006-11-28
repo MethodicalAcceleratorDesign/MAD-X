@@ -1,5 +1,5 @@
 module madx_ptc_eplacement_module
-  !This module enables the user to PLACE an element in arbitrary position 
+  !This module enables the user to PLACE an element in arbitrary position
   use madx_keywords
   use madx_ptc_intstate_module, only : getdebug
   use madx_ptc_module, only: my_ring;
@@ -48,50 +48,50 @@ contains
     real(dp),target      :: idm(3,3),ent(3,3),rotm(3,3)
     real(dp),pointer     :: base(:,:)
     logical              :: onlyposition, onlyorientation, autoplace, surveyall
-    
+
     idm(:,:) = zero
     idm(1,1) = one
     idm(2,2) = one
     idm(3,3) = one
-    
+
     a(:) = 0
     nullify(mvf)
-    
+
     j=restart_sequ()
     j=0
     p=>my_ring%start
-    
+
     elementidx = elementidx + 1
     if (getdebug()>2) then
-      print*, "I am in placeelement: Element index is ", elementidx
-      print*, "refframe is", refframe
-    endif  
-    
-    if ( (elementidx .lt. 1) .and. (elementidx .gt. my_ring%n) ) then
-      call fort_warn("place_element","element out of range of the current layout")
-      return
+       print*, "I am in placeelement: Element index is ", elementidx
+       print*, "refframe is", refframe
     endif
-    
-    do 
-      j=j+1
-      
-      if (elementidx == j) then
-        exit
-      endif
-      
-      if(advance_node().eq.0) then
-        return
-      endif
 
-      p=>p%next
+    if ( (elementidx .lt. 1) .and. (elementidx .gt. my_ring%n) ) then
+       call fort_warn("place_element","element out of range of the current layout")
+       return
+    endif
+
+    do
+       j=j+1
+
+       if (elementidx == j) then
+          exit
+       endif
+
+       if(advance_node().eq.0) then
+          return
+       endif
+
+       p=>p%next
     enddo
 
     if (getdebug() > 1 ) then
        print*,"Found element no. ", elementidx," named ", p%mag%name, &
-             &" of kind ", p%mag%kind, mytype(p%mag%kind)
+            &" of kind ", p%mag%kind, mytype(p%mag%kind)
     endif
 
-    
+
     onlyorientation = get_value('ptc_eplacement ','onlyorientation ') .ne. 0
     if (onlyorientation .eqv. .false.) then
        a(1) = get_value('ptc_eplacement ','x ')
@@ -99,38 +99,38 @@ contains
        a(3) = get_value('ptc_eplacement ','z ')
        write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: Read position ',a
     endif
-    
-    select case(refframe)
-      case(0) 
-        if (getdebug() > 2) then
-          print*,"ptc_eplacement: Reference frame: Global Coordinate System"
-        endif
-        a = a - p%chart%f%a
-        base => idm
-      case(1) 
-        !reference frame of the passed parameters is the current magnet position
-        if (getdebug() > 2) then
-          print*,"ptc_eplacement: Reference frame: the current magnet position"
-        endif
 
-        ent = p%chart%f%ent  !we need to make copy because it may be overwritten at the time of rotation
-        base => ent 
-      case(2) 
-        !reference frame of the passed parameters is the end face of the preceding magnet
-        if (getdebug() > 2) then
+    select case(refframe)
+    case(0)
+       if (getdebug() > 2) then
+          print*,"ptc_eplacement: Reference frame: Global Coordinate System"
+       endif
+       a = a - p%chart%f%a
+       base => idm
+    case(1)
+       !reference frame of the passed parameters is the current magnet position
+       if (getdebug() > 2) then
+          print*,"ptc_eplacement: Reference frame: the current magnet position"
+       endif
+
+       ent = p%chart%f%ent  !we need to make copy because it may be overwritten at the time of rotation
+       base => ent
+    case(2)
+       !reference frame of the passed parameters is the end face of the preceding magnet
+       if (getdebug() > 2) then
           print*,"ptc_eplacement: Reference frame: the end face of the preceding magnet"
-        endif
-        base => P%previous%chart%f%exi 
-      case default
-        refframe = 0
-        call fort_warn("ptc_eplacement","Such reference frame is not supported. Using global")
-        a = a - p%chart%f%a
-        base => idm
+       endif
+       base => P%previous%chart%f%exi
+    case default
+       refframe = 0
+       call fort_warn("ptc_eplacement","Such reference frame is not supported. Using global")
+       a = a - p%chart%f%a
+       base => idm
     end select
 
 
 
-        
+
     onlyposition = get_value('ptc_eplacement ','onlyposition ') .ne. 0
     if (onlyposition .eqv. .false.) then
 
@@ -141,38 +141,38 @@ contains
 
 
        if (refframe /=  1) then
-         !brings it to the ref system
-         CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,base,ANGE)
-         write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
-         CALL ROTATE_Fibre(p,p%chart%f%a,ange) 
-         
-       endif  
+          !brings it to the ref system
+          CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,base,ANGE)
+          write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
+          CALL ROTATE_Fibre(p,p%chart%f%a,ange)
+
+       endif
 
        ange(1) = theta
        ange(2) = phi
        ange(3) = eta
 
-       CALL ROTATE_Fibre(p,p%chart%f%a,ange,1,base) 
-       
+       CALL ROTATE_Fibre(p,p%chart%f%a,ange,1,base)
+
     endif
-    
-    if (onlyorientation .eqv. .false.) then 
+
+    if (onlyorientation .eqv. .false.) then
        if (refframe ==  2) then ! face translation of the moved one to the end of the previous one
-         CALL TRANSLATE_Fibre(p,p%previous%chart%f%b - p%chart%f%a) 
-       endif    
+          CALL TRANSLATE_Fibre(p,p%previous%chart%f%b - p%chart%f%a)
+       endif
        CALL TRANSLATE_Fibre(p,a,1,base)
     endif
-       
-    
+
+
     p%patch=0
     CALL FIND_PATCH(P%PREVIOUS,P,NEXT=my_true,ENERGY_PATCH=MY_FALSE)
 
     autoplace = get_value('ptc_eplacement ','autoplacedownstream ') .ne. 0
     if (autoplace) then
-      call survey(my_ring,j+1,my_ring%n)
+       call survey(my_ring,j+1,my_ring%n)
     else
-      CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
-    endif  
+       CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
+    endif
 
     mvf=>p
 
@@ -187,12 +187,12 @@ contains
 
     surveyall = get_value('ptc_eplacement ','surveyall ') .ne. 0
     if (surveyall) then
-      call survey(my_ring)
+       call survey(my_ring)
     endif
-    
-!    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
-    
-!    print*, "Exiting placeelement"
+
+    !    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
+
+    !    print*, "Exiting placeelement"
   end subroutine place_element
 
 
@@ -212,23 +212,23 @@ contains
     TYPE(LAYOUT),pointer :: r
     type(fibre), pointer :: p
     real(dp)     :: z, a(3)
-    
-     
+
+
     r=>my_ring
-    
+
     filename = charconv(filenameIA)
-    
-!    print*, "I am in printlayout_rootm: Macro name is is ", filename
+
+    !    print*, "I am in printlayout_rootm: Macro name is is ", filename
 
     call kanalnummer(mf)
     open(unit=mf,file=filename)
-    
+
     i=index(filename,'.C')
     fctname = filename(1:i-1)
-    
+
     if (getdebug() > 2 ) then
-      print*, ".C found at ",i," function name is ", fctname
-    endif  
+       print*, ".C found at ",i," function name is ", fctname
+    endif
 
     write(mf,*) '#ifndef __MAKECINT__'
     write(mf,*) ' #ifndef __CINT__'
@@ -270,123 +270,123 @@ contains
     write(mf,*) ''
 
 
-    
-    
+
+
     xmin = 0
     xmax = 0
     ymin = 0
     ymax = 0
     p=>r%start
     do i=1,r%n
-      
-      if ( P%mag%p%f%a(1) .lt. xmin) xmin = P%mag%p%f%a(1)
-      if ( P%mag%p%f%b(1) .lt. xmin) xmin = P%mag%p%f%b(1)
-      if ( P%mag%p%f%a(3) .gt. ymax) ymax = P%mag%p%f%a(3)
-      if ( P%mag%p%f%b(3) .gt. ymax) ymax = P%mag%p%f%b(3)
-      
-      P=>P%NEXT
+
+       if ( P%mag%p%f%a(1) .lt. xmin) xmin = P%mag%p%f%a(1)
+       if ( P%mag%p%f%b(1) .lt. xmin) xmin = P%mag%p%f%b(1)
+       if ( P%mag%p%f%a(3) .gt. ymax) ymax = P%mag%p%f%a(3)
+       if ( P%mag%p%f%b(3) .gt. ymax) ymax = P%mag%p%f%b(3)
+
+       P=>P%NEXT
     enddo
     xmin = xmin -1
     ymin = ymin -1
 
     xmax = xmax +1
     ymax = ymax +1
-    
+
     write(mf,*) ''
     write(mf,*) 'c->Range(', xmin, ',', ymin, ',', xmax, ',', ymax,');'
     write(mf,*) ''
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     p=>r%start
     do i=1,r%n
-!      write(mf,*) 'cout<<',i,'<<" ',p%mag%name,'"<<endl;'
-!      print*, i,p%mag%name
-      if (getdebug() > 2) then
-        print*, i,p%mag%name
-        print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
-      endif  
-      
-      if (p%mag%l == zero) then
-!       print*, i,p%mag%name
-       goto 100;
-      endif 
-      
-      select case(p%mag%kind)
-       
+       !      write(mf,*) 'cout<<',i,'<<" ',p%mag%name,'"<<endl;'
+       !      print*, i,p%mag%name
+       if (getdebug() > 2) then
+          print*, i,p%mag%name
+          print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
+       endif
+
+       if (p%mag%l == zero) then
+          !       print*, i,p%mag%name
+          goto 100;
+       endif
+
+       select case(p%mag%kind)
+
        case(kind1)
-         call drawtube(p,mf,0.05_dp,lgrey)
+          call drawtube(p,mf,0.05_dp,lgrey)
 
        case(kind11) !monitor
-         call drawtube(p,mf,0.05_dp,magenta)
+          call drawtube(p,mf,0.05_dp,magenta)
 
        case(kind12) !monitor
-         call drawtube(p,mf,0.05_dp,magenta)
+          call drawtube(p,mf,0.05_dp,magenta)
 
        case(kind13) !monitor
-         call drawtube(p,mf,0.05_dp,magenta)
+          call drawtube(p,mf,0.05_dp,magenta)
 
        case(kind10) !SBEND
-         call drawsbend(p,mf)
+          call drawsbend(p,mf)
 
        case(kind20) !stright exact bend
-         call drawboxm(p,mf,magenta)
+          call drawboxm(p,mf,magenta)
 
        case(kind15)!septum (electric)
-         call drawboxm(p,mf,cyan)
+          call drawboxm(p,mf,cyan)
 
        case(kind21) !TW CAV
-         call drawtube(p,mf,0.25_dp,yellow) 
+          call drawtube(p,mf,0.25_dp,yellow)
 
        case(kind4) !TW CAV
-         call drawtube(p,mf,0.25_dp,yellow) !TW CAV
+          call drawtube(p,mf,0.25_dp,yellow) !TW CAV
 
        case(kind5) !solenoid
-         call drawtube(p,mf,0.25_dp,darkgreen) 
-         
+          call drawtube(p,mf,0.25_dp,darkgreen)
+
        case(kind16)
-         if (getdebug() > 3) then 
-           print*, "KIND16: likemad is ", p%mag%k16%likemad
-           print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
-           print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
-         endif
-         if (p%mag%bn(1) /= zero ) then
-           a(1)= P%mag%p%f%ent(3,1)*p%mag%l/two + P%mag%p%f%a(1)
-           a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
-           a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
-           call drawbox(p,mf,P%mag%p%f%ent,a,blue)
-         else    
-           if (p%mag%bn(2) .gt. zero ) then
-             call drawboxm(p,mf,red)  !QUAD foc
-           else
-             call drawboxm(p,mf,green)!QUAD defoc
-           endif 
-         endif
-         
-         
+          if (getdebug() > 3) then
+             print*, "KIND16: likemad is ", p%mag%k16%likemad
+             print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
+             print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
+          endif
+          if (p%mag%bn(1) /= zero ) then
+             a(1)= P%mag%p%f%ent(3,1)*p%mag%l/two + P%mag%p%f%a(1)
+             a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
+             a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
+             call drawbox(p,mf,P%mag%p%f%ent,a,blue)
+          else
+             if (p%mag%bn(2) .gt. zero ) then
+                call drawboxm(p,mf,red)  !QUAD foc
+             else
+                call drawboxm(p,mf,green)!QUAD defoc
+             endif
+          endif
+
+
        case default
-         print*, "################# "
-         print*, "################# "
-         print*, "Unrecognized kind ", p%mag%kind, mytype(p%mag%kind)
-         print*, "################# "
-         print*, "################# "
-      end select
-      
-      
-      
-100   continue      
-      P=>P%NEXT
+          print*, "################# "
+          print*, "################# "
+          print*, "Unrecognized kind ", p%mag%kind, mytype(p%mag%kind)
+          print*, "################# "
+          print*, "################# "
+       end select
+
+
+
+100    continue
+       P=>P%NEXT
     enddo
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
-    
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     write(mf,*) ''
     write(mf,*) 'mn->Draw("ogl");'
     write(mf,*) 'TGLViewer * v = (TGLViewer *)c->GetViewer3D();'
     write(mf,*) 'v->SetDrawStyle(TGLDrawFlags::kOutline);'
-    
+
     write(mf,*) ''
     write(mf,*) "}"
     close(mf)
 
-  contains 
+  contains
 
     subroutine  drawsbend(p,mf)
       implicit none
@@ -398,12 +398,12 @@ contains
       character(8) :: mtxname
       real(dp)     :: x,y,z,r, xx,yy, phi
       !To be finished - need more information about SBEND frames in PTC
-      
-      
+
+
       if (P%mag%p%f%a(2) .ne. P%mag%p%f%b(2) ) then
-       print*, "Not able yet to drow horizonthally skewed SBEND. DRAWING AS RBEND"
-       call drawboxm(p,mf,color)
-       return
+         print*, "Not able yet to drow horizonthally skewed SBEND. DRAWING AS RBEND"
+         call drawboxm(p,mf,color)
+         return
       endif
 
       x = P%mag%p%f%b(1) - P%mag%p%f%a(1)
@@ -414,43 +414,43 @@ contains
       x = P%mag%p%f%a(1) + x/two !x coord of the half of distance between ent and exi
       y = P%mag%p%f%a(3) + y/two !z coord of the half of distance between ent and exi
 
-      !!!!!!!!!!!!!!!!!!!
-      
+!!!!!!!!!!!!!!!!!!!
+
       x = x - P%mag%p%f%o(1)
       y = y - P%mag%p%f%o(3)
-      
+
       y = sqrt(x*x + y*y)
 
       if (y == 0) then
-       print*,i,p%mag%name, "All three reference frames are inline. DRAWING AS RBEND"
-       call drawboxm(p,mf,color)
-       return
+         print*,i,p%mag%name, "All three reference frames are inline. DRAWING AS RBEND"
+         call drawboxm(p,mf,color)
+         return
       endif
 
       r = (z + y*y)/(two*y)
       if (r > 100000) then
-       print*,i,p%mag%name, "SBEND curvature is almost null. DRAWING AS RBEND"
-       call drawboxm(p,mf,color)
-       return
+         print*,i,p%mag%name, "SBEND curvature is almost null. DRAWING AS RBEND"
+         call drawboxm(p,mf,color)
+         return
       endif
-      
+
       phi = two*arcsin(z/r)
       print*, "R is ", r," phi is ", phi," z is ", z," y ",y
-            
+
       write(fname,'(a5,i5.5)') 'SBEND',i
       write(mf,*) 's = new TTUBS("',fname, '","',  fname,'","void",',&
-                      &  r-0.25_dp,',',r+0.25_dp,',0.25,0,',phi,');'
+           &  r-0.25_dp,',',r+0.25_dp,',0.25,0,',phi,');'
       write(mf,*) 's->SetLineColor(',color,');'
-    
+
       write(mtxname,'(a3,i5.5)') 'mtx',i
-!      print*, fname, " ",mtxname
+      !      print*, fname, " ",mtxname
 
       call setmatrix(P%mag%p%f%mid,mtxname,mf)
-      
+
       write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
-                                 & x,',',y, ',',z,',m);'
-    
+           & x,',',y, ',',z,',m);'
+
     end subroutine  drawsbend
 
     subroutine  drawbox(p,mf,m,a,color)
@@ -472,18 +472,18 @@ contains
       x = a(1)
       y = a(2)
       z = a(3)
-      
+
 
       write(mtxname,'(a3,i5.5)') 'mtx',i
-!      print*, fname," ",mtxname
+      !      print*, fname," ",mtxname
 
       call setmatrix(m,mtxname,mf)
-      
+
       write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
-                                 & x,',',y, ',',z,',m);'
-      
-    end subroutine  drawbox  
+           & x,',',y, ',',z,',m);'
+
+    end subroutine  drawbox
 
     subroutine  drawboxm(p,mf,color)
       implicit none
@@ -492,10 +492,10 @@ contains
       integer      :: color
 
       call drawbox(p,mf, P%mag%p%f%mid, P%mag%p%f%o, color)
-      
+
     end subroutine  drawboxm
-    
-    
+
+
     subroutine  drawtube(p,mf,r,color)
       implicit none
       type(fibre), pointer :: p
@@ -506,27 +506,27 @@ contains
       character(9) :: nodname
       character(8) :: mtxname
       real(dp)     :: x,y,z
-  
+
       write(fname,'(a5,i5.5)') 'DRIFT',i
       write(mf,*) 's = new TTUBE("',fname, '","',  fname,'","void",',r,',',p%mag%l/2_dp,');'
       write(mf,*) 's->SetLineColor(',color,');'
-      
+
       x = P%mag%p%f%o(1)
       y = P%mag%p%f%o(2)
       z = P%mag%p%f%o(3)
-      
+
 
       write(mtxname,'(a3,i5.5)') 'mtx',i
-!      print*, fname," ", mtxname
+      !      print*, fname," ", mtxname
 
       call setmatrix(P%mag%p%f%mid,mtxname,mf)
-      
+
       write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
-                                 & x,',',y, ',',z,',m);'
-      
-      
-      
+           & x,',',y, ',',z,',m);'
+
+
+
     end subroutine  drawtube
 
     subroutine setmatrix(m,name,mf)
@@ -534,8 +534,8 @@ contains
       real(dp)     :: m(3,3)
       character(8) :: name
       integer      :: mf !macro file descriptor
-      
-      
+
+
       write(mf,*) 'rotmatrix[0] = ', m(1,1),';'
       write(mf,*) 'rotmatrix[1] = ', m(1,2),';'
       write(mf,*) 'rotmatrix[2] = ', m(1,3),';'
@@ -548,9 +548,9 @@ contains
       write(mf,*) 'rotmatrix[7] = ', m(3,2),';'
       write(mf,*) 'rotmatrix[8] = ', m(3,3),';'
       write(mf,*) 'm = new TRotMatrix("',name,'","',name,'",rotmatrix);'
-      
+
     end subroutine setmatrix
-    
+
 
   end subroutine printlayout_rootm
 
@@ -583,30 +583,30 @@ contains
     implicit none
     real(dp)             :: rot(3)
     real(dp)             :: a(3),m(3,3)
-    
+
     rot(1) = m(1,1)*a(1) + m(2,1)*a(2) + m(3,1)*a(3)
     rot(2) = m(1,2)*a(1) + m(2,2)*a(2) + m(3,2)*a(3)
     rot(3) = m(1,3)*a(1) + m(2,3)*a(2) + m(3,3)*a(3)
 
     if (getdebug() > 3) then
-      write(6,*) " Vector Rotation  "
-      write(6,'(a26, f8.4)')             " ", a(1)
-      write(6,'(a26, f8.4)')             " ", a(2)
-      write(6,'(a26, f8.4)')             " ", a(3)
-      write(6,*) "     x "
-      write(6,'(3f8.4,a2,f8.4)') m(:,1), " ", rot(1)
-      write(6,'(3f8.4,a2,f8.4)') m(:,2), " ", rot(2)
-      write(6,'(3f8.4,a2,f8.4)') m(:,3), " ", rot(3)
+       write(6,*) " Vector Rotation  "
+       write(6,'(a26, f8.4)')             " ", a(1)
+       write(6,'(a26, f8.4)')             " ", a(2)
+       write(6,'(a26, f8.4)')             " ", a(3)
+       write(6,*) "     x "
+       write(6,'(3f8.4,a2,f8.4)') m(:,1), " ", rot(1)
+       write(6,'(3f8.4,a2,f8.4)') m(:,2), " ", rot(2)
+       write(6,'(3f8.4,a2,f8.4)') m(:,3), " ", rot(3)
     endif
-        
-  end function   
+
+  end function rot
   !____________________________________________________________________________________________
 
   function rotm(a,m)
     implicit none
     real(dp)             :: rotm(3,3)
     real(dp)             :: a(3,3),m(3,3)
-    
+
     rotm(1,1) = a(1,1)*m(1,1) + a(1,2)*m(2,1) + a(1,3)*m(3,1)
     rotm(2,1) = a(2,1)*m(1,1) + a(2,2)*m(2,1) + a(2,3)*m(3,1)
     rotm(3,1) = a(3,1)*m(1,1) + a(3,2)*m(2,1) + a(3,3)*m(3,1)
@@ -619,19 +619,19 @@ contains
     rotm(2,3) = a(2,1)*m(1,3) + a(2,2)*m(2,3) + a(2,3)*m(3,3)
     rotm(3,3) = a(3,1)*m(1,3) + a(3,2)*m(2,3) + a(3,3)*m(3,3)
 
-    
+
     if (getdebug() > 3) then
-      write(6,*) " 2 Rotation MATRIX product "
-      write(6,'(a26, 3f8.4)')             " ", a(:,1)
-      write(6,'(a26, 3f8.4)')             " ", a(:,2)
-      write(6,'(a26, 3f8.4)')             " ", a(:,3)
-      write(6,*) "     x "
-      write(6,'(3f8.4,a2,3f8.4)') m(:,1), " ", rotm(:,1)
-      write(6,'(3f8.4,a2,3f8.4)') m(:,2), " ", rotm(:,2)
-      write(6,'(3f8.4,a2,3f8.4)') m(:,3), " ", rotm(:,3)
+       write(6,*) " 2 Rotation MATRIX product "
+       write(6,'(a26, 3f8.4)')             " ", a(:,1)
+       write(6,'(a26, 3f8.4)')             " ", a(:,2)
+       write(6,'(a26, 3f8.4)')             " ", a(:,3)
+       write(6,*) "     x "
+       write(6,'(3f8.4,a2,3f8.4)') m(:,1), " ", rotm(:,1)
+       write(6,'(3f8.4,a2,3f8.4)') m(:,2), " ", rotm(:,2)
+       write(6,'(3f8.4,a2,3f8.4)') m(:,3), " ", rotm(:,3)
     endif
-    
-  end function 
+
+  end function rotm
   !____________________________________________________________________________________________
 
   subroutine rotmatrixfromeuler(phi, theta, eta, ent)
@@ -639,34 +639,34 @@ contains
     real(dp)             :: phi, theta, eta
     real(dp)             :: ent(3,3)
     real(dp)             :: sinphi, cosphi, sintheta, costheta
-     
-     eta = zero ! we do not support rotations around the magnet axis yet
-     
 
-     sinphi = sin(phi)
-     cosphi = cos(phi)
-     sintheta = sin(theta)
-     costheta = cos(theta)
+    eta = zero ! we do not support rotations around the magnet axis yet
 
-     ent(1,1) = cosphi 
-     ent(1,2) = 0
-     ent(1,3) = sinphi
 
-     ent(2,1) =  sintheta*sinphi
-     ent(2,2) =  costheta
-     ent(2,3) = -sintheta*cosphi
+    sinphi = sin(phi)
+    cosphi = cos(phi)
+    sintheta = sin(theta)
+    costheta = cos(theta)
 
-     ent(3,1) = -costheta*sinphi
-     ent(3,2) =  sintheta
-     ent(3,3) =  costheta*cosphi
+    ent(1,1) = cosphi
+    ent(1,2) = 0
+    ent(1,3) = sinphi
 
-     write(6,*) " Rotation MATRIX  "
-     write(6,'(3f8.4)') ent(1,:)
-     write(6,'(3f8.4)') ent(2,:)
-     write(6,'(3f8.4)') ent(3,:)
+    ent(2,1) =  sintheta*sinphi
+    ent(2,2) =  costheta
+    ent(2,3) = -sintheta*cosphi
+
+    ent(3,1) = -costheta*sinphi
+    ent(3,2) =  sintheta
+    ent(3,3) =  costheta*cosphi
+
+    write(6,*) " Rotation MATRIX  "
+    write(6,'(3f8.4)') ent(1,:)
+    write(6,'(3f8.4)') ent(2,:)
+    write(6,'(3f8.4)') ent(3,:)
   end subroutine rotmatrixfromeuler
-  
-  
+
+
 end module madx_ptc_eplacement_module
 !____________________________________________________________________________________________
 !____________________________________________________________________________________________
@@ -678,13 +678,13 @@ function w_ptc_getnelements()
   use madx_ptc_module, only: my_ring;
   implicit none
   integer ::  w_ptc_getnelements
-  integer :: n 
- 
+  integer :: n
+
   n = 0
   if (associated(my_ring)) then
-    n = my_ring%n
+     n = my_ring%n
   endif
-  
+
   w_ptc_getnelements = n
 
 end function w_ptc_getnelements
@@ -694,12 +694,9 @@ subroutine w_ptc_getelname(n)
   use madx_ptc_module, only: my_ring;
   implicit none
   integer n
-  
+
   if (associated(my_ring)) then
-    n = my_ring%n
-  endif   
+     n = my_ring%n
+  endif
 
 end subroutine w_ptc_getelname
-
-
-

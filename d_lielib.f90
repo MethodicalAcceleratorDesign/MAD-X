@@ -2997,7 +2997,7 @@ contains
     return
   end subroutine etcjg
 
-! Neri's Routine below
+  ! Neri's Routine below
 
   subroutine eig6(fm,reval,aieval,revec,aievec)
     implicit none

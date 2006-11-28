@@ -55,7 +55,7 @@ subroutine w_ptc_twiss_linac(tab_name)
   use madx_ptc_trackline_module
   implicit none
   integer tab_name(*)
-   call ptc_twiss_linac(tab_name)
+  call ptc_twiss_linac(tab_name)
 end subroutine w_ptc_twiss_linac
 
 subroutine w_ptc_trackline(max_obs)
@@ -238,16 +238,3 @@ subroutine w_ptc_open_gino(scriptname)
   call execginoscript(scriptname)
 
 end subroutine w_ptc_open_gino
-
-subroutine call_gino(GINO_COMMAND)
-  implicit none
-  CHARACTER(*) GINO_COMMAND
-
-  Write(6,*) "  "
-  Write(6,*) " This is not available for this version  of MAD-X"
-  Write(6,*) " The code for the Windows Operating System is available at"
-  Write(6,*) " http://mad.web.cern.ch/mad/PTC_proper/mad-xp-gino/"
-  Write(6,*) "  All questions and complaints should be directed to "
-  Write(6,*) "  Etienne Forest at jceepf@hushmail.com  "
-  Write(6,*) "  "
-End subroutine call_gino
