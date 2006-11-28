@@ -1914,27 +1914,27 @@
       logical recloss
       integer i,j,n,k,turn,part_id(*),jmax,last_turn(*),get_option
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
-     &torb(6), theta, node_value, st, ct, tmp
+     &torb(6) !, theta, node_value, st, ct, tmp
       character*(name_len) aptype
 !hbu
       character*(name_len) el_name
 
       recloss = get_option('recloss ') .ne. 0
 
-!--- As elements might have a tilt we have to transform back 
-!--- into the original coordinate system!
-      theta = node_value('tilt ')
-      if (theta .ne. 0.d0)  then
-          st = sin(theta)
-          ct = cos(theta)
-!--- rotate trajectory (at exit)
-            tmp = z(1,n)
-            z(1,n) = ct * tmp - st * z(3,n)
-            z(3,n) = ct * z(3,n) + st * tmp
-            tmp = z(2,n)
-            z(2,n) = ct * tmp - st * z(4,n)
-            z(4,n) = ct * z(4,n) + st * tmp
-      endif      
+!!--- As elements might have a tilt we have to transform back 
+!!--- into the original coordinate system!
+!      theta = node_value('tilt ')
+!      if (theta .ne. 0.d0)  then
+!          st = sin(theta)
+!          ct = cos(theta)
+!!--- rotate trajectory (at exit)
+!            tmp = z(1,n)
+!            z(1,n) = ct * tmp - st * z(3,n)
+!            z(3,n) = ct * z(3,n) + st * tmp
+!            tmp = z(2,n)
+!            z(2,n) = ct * tmp - st * z(4,n)
+!            z(4,n) = ct * z(4,n) + st * tmp
+!      endif      
       
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
