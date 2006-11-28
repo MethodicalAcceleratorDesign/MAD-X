@@ -234,11 +234,11 @@ contains
        case('EVENTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=.TRUE.,lim=limit_int,lmax=lmax)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=my_TRUE,lim=limit_int,lmax=lmax)
        case('ODDTHINLENS')
           READ(MF,*) THIN
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=.FALSE.,lim=limit_int,lmax=lmax)
+          CALL THIN_LENS_resplit(MY_RING,THIN,EVEN=my_FALSE,lim=limit_int,lmax=lmax)
           ! thin layout stuff
        case('MAKE_THIN_LAYOUT','MAKELAYOUT','MAKE_NODE_LAYOUT')
 
@@ -917,9 +917,9 @@ contains
           READ(MF,*) I1,I2
           CALL TRANSLATE(MY_RING,DT,I1,I2)
           CALL MOVE_TO(MY_RING,P,i1)
-          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=my_TRUE,ENERGY_PATCH=my_FALSE)
           CALL MOVE_TO(MY_RING,P,i2)
-          CALL FIND_PATCH(P,P%NEXT,NEXT=.FALSE.,ENERGY_PATCH=.FALSE.)
+          CALL FIND_PATCH(P,P%NEXT,NEXT=my_FALSE,ENERGY_PATCH=my_FALSE)
        case('ROTATEPARTOFLAYOUT')
 
           READ(MF,*)DT
@@ -927,17 +927,17 @@ contains
           CALL MOVE_TO(MY_RING,P,i1)
           call ROTATE_LAYOUT(my_ring,P%mag%p%f%ent,DT,I1,I2)
           CALL MOVE_TO(MY_RING,P,i1)
-          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
           CALL MOVE_TO(MY_RING,P,i2)
-          CALL FIND_PATCH(P,P%NEXT,NEXT=.FALSE.,ENERGY_PATCH=.FALSE.)
+          CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
 
        case('TRANSLATEFIBREANDPATCH')
           READ(MF,*)POS
           READ(MF,*)DT
           CALL MOVE_TO(MY_RING,P,POS)
           CALL TRANSLATE_Fibre(P,DT,ORDER=1,BASIS=P%MAG%P%F%MID)
-          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
-          CALL FIND_PATCH(P,P%NEXT,NEXT=.FALSE.,ENERGY_PATCH=.FALSE.)
+          CALL FIND_PATCH(P%PREVIOUS,P,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
+          CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
        case('POWERMULTIPOLE')
           READ(MF,*)POS
           READ(MF,*)n,cns, bend_like
@@ -1341,11 +1341,11 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
 
        P=>P%NEXT
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
+    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
 
     ! avoiding putting a patch on the very first fibre since survey does not allow it....
 
@@ -1409,12 +1409,12 @@ contains
     p=>nr%start
 
     do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
 
        P=>P%NEXT
 
     ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=.false.,ENERGY_PATCH=.FALSE.)
+    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
 
     ! avoiding putting a patch on the very first fibre since survey is not a self-check in that case
 
@@ -1445,7 +1445,7 @@ contains
 
           p=>r%start
           do i=1,r%n-1
-             CALL FIND_PATCH(P,P%next,NEXT=.TRUE.,ENERGY_PATCH=.FALSE.)
+             CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
              p=>p%next
           enddo
 
