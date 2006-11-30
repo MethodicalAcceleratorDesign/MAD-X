@@ -4,6 +4,7 @@
 /Makefile.prof -text
 /Makefile_develop -text
 /Makefile_g95 -text
+/Makefile_gdb -text
 /Makefile_nag -text
 /Sa_extend_poly.f90 -text
 /Sb_sagan_pol_arbitrary.f90 -text
