@@ -58,6 +58,7 @@
         dvect(j) = dval
         goto 1
       endif
+!  830 format(a23,1x,1p,'=',e16.8,';!',2x,e16.8,2x,e16.8)
   830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
   831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
