@@ -1415,7 +1415,7 @@ void match2_match(struct in_cmd*);
 void match2_end(struct in_cmd*);
 void match2_macro(struct in_cmd*);
 void match2_constraint(struct in_cmd*);
-int  match2_evaluate_exressions(int i, double* fun_vec);
+int  match2_evaluate_exressions(int i, int k, double* fun_vec);
 void match2_delete_expressions();
 char match2_keepexpressions = 0; /*do not delete expressions at the end matching used by match with PTC knobs*/
 char* match2_macro_name[10];

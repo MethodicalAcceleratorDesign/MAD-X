@@ -122,7 +122,7 @@ extern void             set_variable_(char*, double*);
 extern void*            mymalloc(char* caller, size_t size);
 extern void             myfree(char* rout_name, void* p);
 extern void             warningnew(char* t1, char* fmt, ...); 
-extern int              match2_evaluate_exressions(int i, double* fun_vec);
+extern int              match2_evaluate_exressions(int i, int k, double* fun_vec);
 extern int              name_list_pos(char*, struct name_list*);
 extern void             pro_ptc_knob(struct in_cmd* cmd);
 /*_________________________________________________________________________*/
@@ -242,7 +242,7 @@ void madx_mpk_run(struct in_cmd* cmd)
      pro_input(callmatchfile);
      
      printf("\n\nPeeking Function_Vector 1\n");
-     i = match2_evaluate_exressions(0,function_vector1);
+     i = match2_evaluate_exressions(0,0,function_vector1);
      printf("match2_evaluate_exressions returned fun_vector of length %d\n",i);
 
      
@@ -280,7 +280,7 @@ void madx_mpk_run(struct in_cmd* cmd)
      run_ptccalculation(matchedvalues,0);
      
      printf("\n\nPeeking Function_Vector 2\n");
-     i = match2_evaluate_exressions(0,function_vector2);
+     i = match2_evaluate_exressions(0,0,function_vector2);
 
      pro_input(ptcend);
     

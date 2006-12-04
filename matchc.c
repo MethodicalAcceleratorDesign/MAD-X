@@ -149,7 +149,7 @@ void match_action(struct in_cmd* cmd)
 
 void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
 {
-  int i,j;
+  int i,j, k=0;
   char execute[40];/* RDM fork */
   static int nconserrs = 0; /*number of call finihed with error*/
 
@@ -160,7 +160,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       if (errorflag == 0)
       {
         *stab_flag=0;
-        match2_evaluate_exressions(i,fun_vec);
+        k=match2_evaluate_exressions(i,k,fun_vec);
         nconserrs = 0;
       }
       else

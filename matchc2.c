@@ -176,9 +176,10 @@ void match2_constraint(struct in_cmd* cmd)
   return;
 }
 
-int match2_evaluate_exressions(int i, double* fun_vec)
+int match2_evaluate_exressions(int i, int k, double* fun_vec)
 {
-  int j,k=0;
+  int j;
+  
   double rhs,lhs,r;/* RDM fork */
   char s;
   for(j=0;match2_cons_name[i][j]!=NULL;j++) {
@@ -195,7 +196,7 @@ int match2_evaluate_exressions(int i, double* fun_vec)
     k++;
   }
 
-  return k-1;
+  return k;
 }
 
 void match2_delete_expressions()
