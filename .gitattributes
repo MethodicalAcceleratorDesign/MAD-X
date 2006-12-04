@@ -6,6 +6,7 @@
 /Makefile_g95 -text
 /Makefile_gdb -text
 /Makefile_nag -text
+/Makeonline -text
 /Sa_extend_poly.f90 -text
 /Sb_sagan_pol_arbitrary.f90 -text
 /Sc_euclidean.f90 -text
@@ -105,6 +106,7 @@
 /rplot.c -text
 /rplot.h -text
 /run_madx.f90 -text
+/sdds.h -text
 /sodd.F -text
 /survey.F -text
 /sxf.c -text
