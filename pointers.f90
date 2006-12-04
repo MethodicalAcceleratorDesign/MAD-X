@@ -1630,7 +1630,6 @@ subroutine gino_ptc_command77(gino_command)
   character(*) gino_command
 
   !  Etienne puts garbage here
-  ! print*,"Fuck it works! ",gino_command
 
   call context(gino_command)
   call call_gino(gino_command)
