@@ -4,9 +4,9 @@ MODULE madx_ptc_track_run_module
   ! SUBROUTINE ptc_track_run and called from it
   ! external subroutines calculating particle interactions
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
-                                !                          ! shorts for <double precision>, <logical>, 0D0 etc.
-       doublenum ! am temprorary double number for I/O with C-procedures
-  implicit none
+  !                          ! shorts for <double precision>, <logical>, 0D0 etc.
+                   doublenum ! am temprorary double number for I/O with C-procedures  
+implicit none
   SAVE
   PRIVATE
 
@@ -89,7 +89,7 @@ MODULE madx_ptc_track_run_module
   CHARACTER(24), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
   !                                                  ! contrary to <character (16)> in c-code
 
-  !real(kind(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
+  !real(kind(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures 
 
 CONTAINS
 
@@ -112,7 +112,7 @@ CONTAINS
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
          Find_Envelope, &                                                                  !
-                                ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
+         ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
@@ -220,7 +220,7 @@ CONTAINS
     ! ELSE (default) output tables with standard coord.
     Normal_Order_n0=1   !
     x_coord_co(:)=zero
-    x_input_0_by_ptc_track_command(:)=zero
+                     x_input_0_by_ptc_track_command(:)=zero
     CALL Values_from_ptc_track_command ! Int. proc. in this subr.(see below in the file)
     ! read command line from input file :
     ! Example: ptc_track,icase=5, coord=0.01,0.,0.01,0.,0.,0.;
@@ -242,8 +242,8 @@ CONTAINS
     Print *,'  ================================================================'; Print *;
 
     warn_coordinate_system_changed: IF((.NOT. mytime) .AND.(icase_ptc.gt.4) ) THEN
-       CALL FORT_WARN('time=false => coord. system: {-pathlength, delta_p} ', &
-            'the table headers mean:  PT -> delta_p, T -> pathlength')
+      CALL FORT_WARN('time=false => coord. system: {-pathlength, delta_p} ', &
+                     'the table headers mean:  PT -> delta_p, T -> pathlength')
     ENDIF warn_coordinate_system_changed
 
     ! initialize the closed orbit coordinates  at START of the ring
@@ -258,8 +258,8 @@ CONTAINS
        !                                                         !
        call Get_map_from_NormalForm &                            !
             (ptc_track_debug, Normal_Order_n0, x_coord_co, &     !
-                                !INTENT:   IN,             IN,             IN        !
-                                !               1=> Normal_Order_n0  for Linear      !
+            !INTENT:   IN,             IN,             IN        !
+            !               1=> Normal_Order_n0  for Linear      !
             Map_Y, Normal_Form_N, A_t_map,   A_t_map_rev)        !
        !     OUT,     OUT,          OUT,       OUT               !
        !                                                         !
@@ -403,7 +403,7 @@ CONTAINS
 
 
     Output_observ_with_PTC: IF(closed_orbit .AND. &
-         (.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
+                               (.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
        debug_print_5: if (ptc_track_debug) then !----------------!                         !
           Print *, 'element_by_element=', element_by_element, &  !                         !
                ' Radiation_PTC=',Radiation_PTC                   !                         !
@@ -539,7 +539,7 @@ CONTAINS
       ! "norm_no  = [i, 1], "
       ! "debug    = [l, false, true]; " - only for developer (not for User)
 
-
+      
       icase_ptc    = get_value('ptc_track ','icase ')
 
       turns        = get_value('ptc_track ','turns ')
@@ -550,16 +550,16 @@ CONTAINS
 
       element_by_element = get_value('ptc_track ', 'element_by_element ') .ne. 0
 
-      IF(max_obs.gt.1.AND.(.NOT.CLOSED_ORBIT).AND.(.NOT. ELEMENT_BY_ELEMENT)) THEN
-         Print *, ' '
-         Print *, '===================================================================='
-         Print *,'To perform tracking with observation points the option'
-         Print *,'ELEMENT_BY_ELEMENT must be ON, if the option CLOSED_ORBIT is OFF'
-         call fort_warn(' ELEMENT_BY_ELEMENT',' has been switched ON by the code')
-         Print *, '===================================================================='
-         Print *, ' '
-         ELEMENT_BY_ELEMENT=.TRUE.
-      ENDIF
+    IF(max_obs.gt.1.AND.(.NOT.CLOSED_ORBIT).AND.(.NOT. ELEMENT_BY_ELEMENT)) THEN
+      Print *, ' '
+      Print *, '===================================================================='
+      Print *,'To perform tracking with observation points the option'
+      Print *,'ELEMENT_BY_ELEMENT must be ON, if the option CLOSED_ORBIT is OFF' 
+      call fort_warn(' ELEMENT_BY_ELEMENT',' has been switched ON by the code')
+      Print *, '===================================================================='
+      Print *, ' '
+      ELEMENT_BY_ELEMENT=.TRUE.
+    ENDIF
 
       Radiation_PTC = get_value('ptc_track ','radiation ') .ne. 0
 
@@ -747,7 +747,7 @@ CONTAINS
       end if !----------------------------------------------!              !
       !                                                                    !
       if(icase_ptc.eq.5) THEN !------------------------!                   !
-         if(mytime) then !----------------------!      !                   !
+         if(mytime) then !----------------------!      !                   !                   
             call Convert_dp_to_dt (deltap, dt)  !      !                   !
          else                                   !      !                   !
             dt=deltap                           !      !                   !
@@ -962,7 +962,7 @@ CONTAINS
          DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>!   !
             doublenum  = X_MAD(k_th_coord)                                    !   !
             !                                                                 !   !
-            call double_to_table('tracksumm ',vec_names(k_th_coord),doublenum) !   !
+           call double_to_table('tracksumm ',vec_names(k_th_coord),doublenum) !   !
             !madxn.c:1385: void                                               !   !
             !double_to_table(char* table,char* name,double* val)              !   !
             ! /* puts val at current position in column                       !   !
@@ -971,11 +971,11 @@ CONTAINS
          enddo !>>>>> END loop over components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!   !
          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C, &                   !
               gamma0I,gambet) ! to get "energy" value                             !
-         doublenum=energy                !
+                                                  doublenum=energy                !
          call double_to_table('tracksumm ', 'e ', doublenum)                      !
          !                                                                        !
-         !hbu add s                                                               !
-         doublenum = spos_current_position             !
+         !hbu add s                                                               !  
+                                    doublenum = spos_current_position             !
          call double_to_table('tracksumm ',vec_names(7),doublenum)                !
          ! madxd.h:12:#define double_to_table       double_to_table_              !
          ! madxd.h:150:void double_to_table(char*, char*, double*);               !
@@ -1462,11 +1462,11 @@ CONTAINS
                   x_coord_co_temp(k_th_coord)= &                                  !    #              *
                        x_co_at_all_observ(k_th_coord,number_observation_point)    !    #              *
                ENDDO extract_CO_at_observ_point                                   !    #              *
-               if (ptc_track_debug) THEN !+++debug print+++++++!               !    #              *
-                  Print *,'obs.No=',number_observation_point    !               !    #              *
-                  Print *,'CO=', x_coord_co_temp                !               !    #              *
-                  Print *,'x_coord_incl_co=', x_coord_incl_co   !               !    #              *
-               endif !+++++++++++++++++++++++++++++++++++++++++!               !    #              *
+                  if (ptc_track_debug) THEN !+++debug print+++++++!               !    #              *
+                    Print *,'obs.No=',number_observation_point    !               !    #              *
+                    Print *,'CO=', x_coord_co_temp                !               !    #              *
+                    Print *,'x_coord_incl_co=', x_coord_incl_co   !               !    #              *                     
+                  endif !+++++++++++++++++++++++++++++++++++++++++!               !    #              *
                !                                                                  !    #              *
                if (ptc_onetable) then !>>>>> onetable=.TRUE.>>>>>>>>>>>>>>>>!     !    #              *
                   !                                                         !     !    #              *
@@ -1628,7 +1628,7 @@ CONTAINS
          ! remember last turn and position of particles          !
          !                                                       !
          !do j = 1, 6 !>>> loop over coord. components >>>>>>>!  !
-         do i_coord = 1, 6! icase_ptc                        !  !
+          do i_coord = 1, 6! icase_ptc                        !  !
             !last_orbit(j,part_id(i)) = z(j,i)                !  !
             last_orbit_of_lost_particle(i_coord,    &         !  !
                  particle_ID(j_part_tmp))=  &                 !  !
@@ -1746,13 +1746,13 @@ CONTAINS
          !  spos                  = last_pos(i)                                     !
          spos_current_position = last_position_of_lost_particle(j_part_tmp)         !
          !hbu                                                                       !
-         doublenum = spos_current_position  !
+                                                 doublenum = spos_current_position  !
          call double_to_table('tracksumm ',vec_names(7),doublenum)                  !
          !                                                                          !
          ! to get "energy" value                                                    !
          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
          !                                                                          !
-         doublenum= energy                !
+                                                   doublenum= energy                !
          call double_to_table('tracksumm ', 'e ',  doublenum)                       !
          !                                                                          !
          call augment_count('tracksumm ')                                           !
@@ -1969,10 +1969,10 @@ CONTAINS
 
          find_CO_for_el_by_el: IF (element_by_element) THEN !===!
             IF (closed_orbit) THEN !-------------------------!  !
-               Call track(my_ring,x_coord_co_temp, &          !  !
-                    i_ring_element, i_ring_element+1, default )    !  !
+              Call track(my_ring,x_coord_co_temp, &          !  !
+              i_ring_element, i_ring_element+1, default )    !  !
             ELSE                                             !  !
-               x_coord_co_temp(:)=zero                        !  !
+              x_coord_co_temp(:)=zero                        !  !
             ENDIF !------------------------------------------!  !
          ENDIF find_CO_for_el_by_el !===========================!
 
@@ -1995,13 +1995,13 @@ CONTAINS
                  length_current_element_f90, &
                  ' name_c=', name_16, ' &_f90=', current%MAG%name
             Print *, 'x_coord_co_temp=', x_coord_co_temp
-
+                 
          endif
 
 
          iii_c_code=advance_node() ! c-code go to the next node
          current=>current%next     ! f90-code bring to the next mode
-      ENDDO element_number
+      ENDDO element_number 
 
       debug_print_2: if (ptc_track_debug) then
          Print *, 'elem_number_at_observ(i_obs)= ', elem_number_at_observ
@@ -2304,11 +2304,11 @@ CONTAINS
       call comment_to_table(table_putone, comment, length)
       Call GET_ONE(MASS_GeV,energy,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
       do i = 1, npart
-         doublenum=turn
+                                                     doublenum=turn
          call double_to_table(table_putone, 'turn ', doublenum)
-         doublenum=energy
+                                                  doublenum=energy
          call double_to_table(table_putone, 'e ', doublenum)
-         doublenum = part_id(i)
+                                                       doublenum = part_id(i)
          call double_to_table(table_putone, 'number ', doublenum)
 
          do j = 1, 6
@@ -2343,7 +2343,7 @@ CONTAINS
          END IF
 
          !hbu spos
-         doublenum=spos
+                                                        doublenum=spos
          call double_to_table(table_putone,vec_names(7),doublenum)
          call augment_count(table_putone)
       enddo
@@ -2392,11 +2392,11 @@ CONTAINS
       write(table_puttab(16:19), '(i4.4)') npart   ! "@NAME ... "TRACK.OBS0001.P0005"
 
       Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
-      doublenum=energy
+                                               doublenum=energy
       call double_to_table(table_puttab, 'e ', doublenum)
-      doublenum=npart
+                                                    doublenum=npart
       call double_to_table(table_puttab, 'number ', doublenum) ! number of the current particle
-      doublenum=turn
+                                                  doublenum=turn
       call double_to_table(table_puttab, 'turn ', doublenum)   ! the number of the current turn
       do j = 1, 6
          tmp=zero
@@ -2427,7 +2427,7 @@ CONTAINS
          END IF
       enddo
       !hbu spos
-      doublenum=spos
+                                                     doublenum=spos
       call double_to_table(table_puttab,vec_names(7),doublenum)
       call augment_count(table_puttab)
     END SUBROUTINE tt_puttab_coord
@@ -2599,7 +2599,7 @@ CONTAINS
             X_MAD(5)=t_input; X_MAD(6)=deltae_input                           ! t   r   !
             !                                                                 ! c   t   f
             IF(icase_ptc.eq.5 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
-               if(mytime) then !----------------------!          !              !
+               if(mytime) then !----------------------!          !              !                   
                   call Convert_dp_to_dt (deltap, dt)  !          !              !
                else                                   !          !              !
                   dt=deltap                           !          !              !
@@ -2805,8 +2805,8 @@ CONTAINS
 
       X_PTC=X_MAD ! for all elements
 
-      if (ptc_track_debug) print *, &
-           'Coord_MAD_to_PTC icase_ptc=', icase_ptc, ' mytimec=', mytime
+        if (ptc_track_debug) print *, &
+         'Coord_MAD_to_PTC icase_ptc=', icase_ptc, ' mytimec=', mytime
 
       if (icase_ptc.eq.6) THEN
          X_PTC(5)=X_MAD(6); X_PTC(6)=X_MAD(5);
@@ -2814,7 +2814,7 @@ CONTAINS
       elseif(icase_ptc.eq.5) THEN
          X_PTC(5)=X_MAD(6); X_PTC(6)=zero
       elseif(icase_ptc.eq.4) THEN
-         X_PTC(5)=zero; X_PTC(6)=zero
+         X_PTC(5)=zero; X_PTC(6)=zero      
       ENDIF
     END SUBROUTINE Coord_MAD_to_PTC
 
@@ -2827,16 +2827,16 @@ CONTAINS
       X_MAD=X_PTC ! for all elements
 
       if (ptc_track_debug) print *, &
-           'Coord_PTC_to_MAD icase_ptc=', icase_ptc, ' mytime=', mytime
+          'Coord_PTC_to_MAD icase_ptc=', icase_ptc, ' mytime=', mytime
 
       IF (icase_ptc.eq.6) THEN
          X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5);
-         if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
+         if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign         
       elseif(icase_ptc.eq.5) THEN
          X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5)
          if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
       elseif(icase_ptc.eq.4) THEN
-         X_MAD(5)=zero; X_MAD(6)=zero
+         X_MAD(5)=zero; X_MAD(6)=zero      
       ENDIF
     END SUBROUTINE Coord_PTC_to_MAD
     !=============================================================================
@@ -2873,9 +2873,8 @@ CONTAINS
     integer :: mynd2,nda, flag_index,why(9) ! icase,
     ! integer :: npara ! Global in module
 
-    REAL (dp) :: d_val(6)
-    INTEGER   :: i_vec, i_comp, ind(6)
-
+    REAL (dp) :: d_val(6) 
+    INTEGER   :: i_vec, i_comp, ind(6), Number_of_eigenvectors
     !------------------------------------------------------------------------------
     IF (ptc_track_debug)  print *, 'Start Subr.  Get_map_from_NormalForm '
 
@@ -2934,19 +2933,21 @@ CONTAINS
        ! CALL TEST_PTC_Normal(Normal_Form_N)
     end if
 
-    !EigenVectors
+   !EigenVectors
     !allocate (d_val(1:icase_ptc))
-    do i_vec=1,icase_ptc
-       do i_comp=1,6 !icase_ptc
-          ind(:)=0; ind(i_comp)=1
-          d_val(i_comp)=Normal_Form_N%A_t%V(i_vec).sub.ind
-       enddo
-       if (ptc_track_debug) then
-          WRITE(17,*) 'EigenVector V(',i_vec,')=', d_val
-       endif
-       !enddo
-    end do
-    !DEallocate (d_val)
+    Number_of_eigenvectors=icase_ptc
+    if (icase_ptc .eq. 5) Number_of_eigenvectors=4
+    do i_vec=1,Number_of_eigenvectors ! icase_ptc
+      do i_comp=1,6 !icase_ptc
+        ind(:)=0; ind(i_comp)=1
+        d_val(i_comp)=Normal_Form_N%A_t%V(i_vec).sub.ind
+      enddo
+        if (ptc_track_debug) then
+         WRITE(17,*) 'EigenVector V(',i_vec,')=', d_val  
+        endif
+      !enddo  
+     end do
+     !DEallocate (d_val)
   END subroutine Get_map_from_NormalForm
   !==============================================================================
 
