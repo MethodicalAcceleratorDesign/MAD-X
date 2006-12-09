@@ -308,6 +308,9 @@ void add_vars_to_table(struct table* t)
       if (strstr(t->columns->names[i], "aper_"))
         t->d_cols[i][t->curr]
           = get_aperture(current_node, t->columns->names[i]);
+      else if (strstr(t->columns->names[i], "aptol_"))
+        t->d_cols[i][t->curr]
+          = get_apertol(current_node, t->columns->names[i]);
       else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
     }
     else if ((p = command_par_string(t->columns->names[i],

@@ -340,6 +340,7 @@ void make_map_table(int*); /* KZ 28.06.2005 table for maps */
 void element_name(char*, int*);
 double frndm();
 double get_aperture(struct node*, char*);
+double get_apertol(struct node*, char*);
 void get_disp0(double*);
 void get_node_vector(char*, int*, double*);
 int get_option(char*);
@@ -1255,8 +1256,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.32";
-char code_mod_date[] = "Code Modification Date: 05.12.2006";
+char myversion[] = "MAD-X 3.03.33";
+char code_mod_date[] = "Code Modification Date: 09.12.2006";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

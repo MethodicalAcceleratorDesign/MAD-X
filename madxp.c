@@ -2103,6 +2103,19 @@ struct variable* find_variable(char* name, struct var_list* varl)
   return varl->vars[pos];
 }
 
+double get_apertol(struct node* node, char* par)
+  /* returns aper_tol parameter 'i' where i is integer at the end of par;
+     e.g. aptol_1 gives i = 1 etc. (count starts at 1) */
+{
+  int i, k, n = strlen(par);
+  double val = zero, vec[100];
+  for (i = 0; i < n; i++)  if(isdigit(par[i])) break;
+  if (i == n) return val;
+  sscanf(&par[i], "%d", &k); k--;
+  if ((n = element_vector(node->p_elem, "aper_tol", vec)) > k)  val = vec[k];
+  return val;
+}
+
 double get_aperture(struct node* node, char* par)
   /* returns aperture parameter 'i' where i is integer at the end of par;
      e.g. aper_1 gives i = 1 etc. (count starts at 1) */
