@@ -1415,7 +1415,7 @@ int  copytrackstoarray();
 void deletetrackstrarpositions();
 
 /*Riccardo de Maria (CERN)*/
-#define MAX_MATCH_CONS 300
+#define MAX_MATCH_CONS 350
 #define MAX_MATCH_MACRO 10
 void match2_match(struct in_cmd*);
 void match2_end(struct in_cmd*);
