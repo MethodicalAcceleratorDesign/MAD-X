@@ -1,5 +1,5 @@
       subroutine mtjac(ncon,nvar,strategy,cool,balance,random,          &
-     &nrep,bisec,match_mode,                                            &
+     &nrep,bisec,cond,match_mode,                                       &
      &tol,calls,call_lim,                                               &
      &vect,dvect,fun_vec,                                               &
      &w_ifjac,w_iwa4,fval,xstart,xold)
@@ -17,6 +17,7 @@
 !   cool      (real)    # cooling factor                               *
 !   random    (real)    # random  factor                               *
 !   bisec     (int)     # bisec iteration number                       *
+!   cond      (real)    # condition number for rank                    *
 !   match_mode(int)     # mode use_macro=2                             *
 !   nrep      (int)     # number of repetition                         *
 !   tol       (real)    Final tolerance for match.                     *
@@ -34,7 +35,7 @@
       double precision tol,vect(*),dvect(*),fun_vec(*)
       double precision w_ifjac(*),w_iwa4(*)
       double precision fval(*),xold(*),xstart(*)
-      double precision random,cool,balance
+      double precision random,cool,balance,cond
       integer bisec,match_mode
       include 'match.fi'
       external mtfcn
@@ -59,7 +60,7 @@
           call jacob(mtfcn,ncon,nvar,strategy,calls,call_lim,           &
      &vect,fun_vec,tol,                                                 &
      &w_ifjac,w_iwa4,                                                   &
-     &xstart,xold,cool,balance,random,bisec,match_mode)
+     &xstart,xold,cool,balance,random,bisec,cond,match_mode)
         endif
       enddo
       end
@@ -68,7 +69,7 @@
       subroutine jacob(fcn,m,n,strategy,calls,call_lim,                 &
      &x,fvec,epsfcn,                                                    &
      &fjac,wa4,                                                         &
-     &xstart,xold,cool,balance,random,bisec,match_mode)
+     &xstart,xold,cool,balance,random,bisec,cond,match_mode)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -89,6 +90,7 @@
 !   balance   (real)    # balance cooling factor                       *
 !   random    (real)    # random  factor                               *
 !   bisec     (int)     # bisec iteration number                       *
+!   cond      (real)    # condition number for rank                    *
 !   match_mode(int)     # mode use_macro=2                             *
 !----------------------------------------------------------------------*
 
@@ -100,6 +102,7 @@
       double precision dxnorm,xnorm,dx(n),fmin_start,fmin_old2
       double precision vmod
       double precision xtol,x(n),xstart(n),xold(n),fvec(m)
+      double precision xopt(n)
       double precision fjac(m,n),wa4(m),zero,one,two
       double precision epsil,epsmch,cool,balance,random
       parameter(zero=0d0,one=1d0,two=2d0, epsil=1d-9,epsmch=1d-16)
@@ -108,7 +111,10 @@
 
 !      double precision xdiff(n)
       double precision effjac(M,N),effsol(M+N),effrhs(M+N)
-      double precision work(2*(M+N)),DNRM2
+      double precision DNRM2
+      double precision WORK(1000*(N+M)),SV(N+M),COND
+      double precision U(M,M),VT(N,N)
+      integer IWORK(30*(N+M)),RANK
       integer effcon, effvar,coninfo(M),varinfo(N)
 
       ireset = 0
@@ -126,7 +132,7 @@
 
 !---- Apply a cooling factor: reduce distance from solution to a point
 !---- defined by balance and the limit or opt values
-      call mtcool(x,cool,balance)
+      call mtcool(x,cool,balance,xopt)
 
 !---- Apply a random factor:
       call mtrandom(x,random)
@@ -194,9 +200,11 @@
 !---- Calculate the jacobian
       call fdjac2(fcn,m,n,x,fvec,fjac,m,iflag,xtol,wa4)
       if (strategy.eq.2) then
+!        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &
+!     & WORK, 1000*(N+M), IWORK, INFO )
 !---- Print the jacobian and exit
-        call jacob_print(m,n,fjac,match_mode)
-        goto 300
+        call jacob_print(m,n,fjac,sv,u,vt,match_mode)
+      goto 300
       endif
 
 !---- Reset solution vector
@@ -227,14 +235,16 @@
           coninfo(i)=0
 !---- Increase constraint counter
           effcon=effcon+1
-          do j=1,N
 !---- Copy RHS in the solution vector
-            effsol(effcon)=fvec(i)
-!---- Save a copy of RHS
-            effrhs(effcon)=fvec(i)
+          effsol(effcon)=fvec(i)
+          do j=1,N
 !---- Update the effective jacobian
             effjac(effcon,j)=fjac(i,j)
+!---- Translate the variable vector to the optimal varables
+!            effsol(effcon)=effsol(effcon)+fjac(i,j)*xopt(j)
           enddo
+!---- Save a copy of RHS
+          effrhs(effcon)=effsol(effcon)
 !        write(*,*) i," effective constraint"
         endif
       end do
@@ -247,6 +257,7 @@
 !        write(*,*) "Warning: underdetermined system"
 !        write(*,*) "constraints:",effcon,"  variables:",effvar
 !      endif
+
 
 !---- Solve the least square problem and put solution in effsol vector
 !---- Debug
@@ -263,8 +274,15 @@
 !---- CALL DGELS(TRANSA, M, N, NRHS, DA, LDA, DB, LDB, DWORK,
 !---- LDWORK,INFO)
       write(*,*) "Solve system with ",effcon,"con,",effvar,"var"
-      call DGELS ('N',effcon,effvar,1,effjac,M,effsol,N+M,              &
-     &WORK,2*(N+M),INFO)
+!      call DGELS ('N',effcon,effvar,1,effjac,M,effsol,N+M,              &
+!     &WORK,2*(N+M),INFO)
+!      DGELSD( M, N, NRHS, A, LDA, B, LDB, S,  RCOND,
+!      RANK,  WORK, LWORK, IWORK, INFO )
+      call DGELSD (effcon,effvar,1,effjac,M,effsol,N+M,SV,COND,         &
+     &RANK,WORK,1000*(N+M),IWORK,INFO)
+!      call DGELSS (effcon,effvar,1,effjac,M,effsol,N+M,SV,RCOND,        &
+!     &RANK,WORK,1000*(N+M),INFO)
+      write(*,*) "Rank  ",RANK
 !---- Debug
 !      write(*,*) "!!! solve routine"
 !      write(*,*) "!!!",info,effsol(1)
@@ -292,6 +310,8 @@
         xold(i)=x(i)
         if (varinfo(i).eq.0) then
           effvar=effvar+1
+!         In case the starting point is the optimal
+!          x(i)=x(i)-effsol(effvar)+xopt(i)
           x(i)=x(i)-effsol(effvar)
 !          write(*,*) "!!!",i,x(i),effvar,effsol(effvar)
         endif
@@ -514,7 +534,7 @@
       endif
       ! Iteration do not converge
       ! For the first calls it can happens due to not fisical penalty
-      if(fmin.ge.fmin_old .and. fmin.lt.1D-18) then
+      if(fmin.ge.fmin_old .and. fmin.lt.(.1*ftol)) then
         ! go back to the preovius solution
         do i=1,N
           x(i)=x(i)+effsol(i)
@@ -552,7 +572,7 @@
 
       xnorm=DNRM2(N, x, 1)
       dxnorm=sqrt(DNRM2(N, dx, 1)/xnorm)
-      write(*,*) 'final relative difference norm:',dxnorm
+      write(*,*) 'Final relative difference norm:',dxnorm
 
   831 format('Initial Penalty Function = ',e16.8,//)
   830 format('call: ',I5, ' Dx = ', e16.8,                              &
@@ -575,13 +595,13 @@
 
       end
 
-      subroutine jacob_print(m,n,fjac,match_mode)
+      subroutine jacob_print(m,n,fjac,sv,u,vt,match_mode)
 !      subroutine jacob_print(ncon,fsum,fvect)
 
       implicit none
 
       integer m,n,ivar,nvar,match_mode
-      double precision fjac(m,n)
+      double precision fjac(m,n),sv(m+n),u(m,m),vt(n,n)
       logical local
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,name_l,char_from_table
@@ -592,26 +612,34 @@
       character*(name_len) namevar,name,node_name
       integer next_vary,slope
       double precision step,opt
+      character*(30) num1,num2,num3
+      integer oldpos,nnode,mtputconsname,void
 
 
       if(match_mode.eq.1) then
 
-        write(*,997) "Node Name    ","Constraint      ",                &
-     &"Variable        ","Derivative    "
-        write(*,996) "------------------------------------------------  &
-     &----                                                              &
-     &----------------"
+!        write(*,997) "Node Name    ","Constraint      ",                &
+!     &"Variable        ","Derivative    "
+!        write(*,996) "--------------------------------------------------&
+!     &-------------------"
 !      write(25,*) "# ", m,n
         ncon=1
+        nnode=0
         local=get_option('match_local ') .ne. 0
         call table_range('twiss ','#s/#e ',range)
         if(local) then
           j=restart_sequ()
+          oldpos=range(1)
           do pos=range(1),range(2)
             j=advance_to_pos('twiss ',pos)
  20         continue
             i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
             if(i.ne.0)  then
+              if (pos.ne.oldpos) then
+                nnode=nnode+1
+                ncon=1
+                oldpos=pos
+              endif
               flag=char_from_table('twiss ','name ',pos,node_name)
               do nvar=1,n
  22             ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,   &
@@ -619,7 +647,9 @@
                 if (ivar.eq.0) then
                   goto 22
                 endif
-                write (*,998) node_name,name,namevar,fjac(ncon,ivar)
+!                write (*,998) node_name,name,namevar,fjac(ncon,ivar)
+!               write(*,*) nnode,ncon
+               void=mtputconsname(node_name,nnode,name,ncon)
 !            write(25,999) ncon,ivar,fjac(ncon,ivar)
               enddo
               ncon=ncon+1
@@ -627,6 +657,7 @@
             endif
           enddo
         endif
+        nnode=nnode+1
  30     continue
         i=next_global(name,name_l,type,value,c_min,c_max,weight)
 !      write(*,*) i,name
@@ -638,12 +669,43 @@
             if (ivar.eq.0) then
               goto 32
             endif
-!            write(*,*) ncon,ivar,fjac(ncon,ivar)
-            write (*,998) 'Global',name,namevar,fjac(ncon,ivar)
+            write(*,*) nnode,ncon,ivar,fjac(ncon,ivar)
+            write (*,998) 'Global   ',name,namevar,fjac(ncon,ivar)
+               void=mtputconsname('Global   ',nnode,name,ncon)
           enddo
           ncon=ncon+1
           goto 30
         endif
+
+!      write(*,*)
+!      write(*,*)
+!      write(*,*) "Singular value decomposition:"
+!      write(*,*)
+!      num1="Constraint vector="
+!      num2="Singular value *"
+!      num3="Variable vector"
+!      write(*,'(3A20)') num1,num2,num3
+!      do i=1,max(n,m)
+!        do j=1,max(n,m)
+!          if ((i.le.m).and.(j.le.m)) then
+!            write(num1,*) U(i,j)
+!          else
+!            write(num1,*) "     "
+!          endif
+!          if ((i.le.min(n,m)).and.(j.eq.1)) then
+!            write(num2,*) SV(i)
+!          else
+!            write(num2,*) "     "
+!          endif
+!          if ((i.le.n).and.(j.le.n)) then
+!            write(num3,*) VT(j,i)
+!          else
+!            write(num3,*) "     "
+!          endif
+!          write(*,'(3A20)') num1,num2,num3
+!        enddo
+!        write(*,*)
+!      enddo
 
 !      do nvar=1,n
 ! 23   ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
@@ -661,27 +723,57 @@
   999 format(i3,i3,e16.8)
       end
 
-
-
-      subroutine mtcool(vect,cool,balance)
-
+      subroutine mtmove(vect,varinfo,dir,balance)
       implicit none
-
-
       integer j,next_vary,name_l,slope
+      integer varinfo,effvar
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,opt
-      double precision val,cool,balance
+      double precision val,dir,balance
       include 'name_len.fi'
       character*(name_len) name
 
+      effvar=0
  1    continue
       j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
-        if (balance.ge.0) then
-          val = (1-cool)*vect(j)+cool*((1-balance)*c_max+balance*c_min)
+        if (varinfo(j).eq.0) then
+          effvar=effvar+1
+          if (opt.ge.0) then
+            val =vect(effvar)+dir*opt
+          else
+            val =vect(effvar)+dir*((1-balance)*c_max+balance*c_min)
+          endif
+          vect(effvar) = val
+          goto 1
+        endif
+      endif
+      end
+
+
+      subroutine mtcool(vect,cool,balance,xopt)
+      implicit none
+      integer j,next_vary,name_l,slope
+      parameter(name_l=24)
+      double precision vect(*),c_min,c_max,step,opt
+      double precision val,xopt(*),cool,balance
+      include 'name_len.fi'
+      character*(name_len) name
+
+      if (cool.gt.0) then
+        write(*,'(4a16)') "name","oldvalue","opt value","new value"
+      endif
+ 1    continue
+      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      if (j .ne. 0)  then
+        if (opt.gt.0) then
+          xopt(j)=opt
         else
-          val =(1-cool)*vect(j)+cool*opt
+          xopt(j)=(1-balance)*c_max+balance*c_min
+        endif
+        val=(1-cool)*vect(j)+cool*xopt(j)
+        if (cool.gt.0) then
+          write(*,'(a15,3e16.5)') name,vect(j),xopt(j),val
         endif
         vect(j) = val
         goto 1
@@ -689,10 +781,7 @@
       end
 
       subroutine mtrandom(vect,random)
-
       implicit none
-
-
       integer j,next_vary,name_l,slope
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,opt
@@ -761,18 +850,18 @@
         if (slope.ne.0) then
           diff=val-oldval
           if(slope*diff.lt.0) then
-            write(*,*) "exlude parameter:",name,"bad slope"
+            write(*,*) "exclude parameter:",name,"bad slope"
             varinfo(j)=1
             effvar=effvar-1
           endif
         endif
         if (val.lt.c_min) then
-          write(*,*) "exlude parameter:",name,"hit minimum"
+          write(*,*) "exclude parameter:",name,"hit minimum"
           varinfo(j)=1
           effvar=effvar-1
         endif
         if (val.gt.c_max) then
-          write(*,*) "exlude parameter:",name,"hit maximum"
+          write(*,*) "exclude parameter:",name,"hit maximum"
           varinfo(j)=1
           effvar=effvar-1
         endif
@@ -788,3 +877,10 @@
 !  Loop for divide the funtion in steps
 
 
+
+      subroutine mtsvd(M,N,fjac,SV,U,VT)
+      integer M,N,IWORK,INFO
+      double precision fjac(m,n),SV(N+M),U(M,M),VT(N,N),WORK(1000*(N+M))
+        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &
+     & WORK, 1000*(N+M), IWORK, INFO )
+      end

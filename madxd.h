@@ -47,6 +47,7 @@
 /* RDM 20.1.2006 BEGIN jacobian strategy (match) */
 #define constraint_name       constraint_name_
 #define vary_name             vary_name_
+#define mtputconsname         mtputconsname_
 /* RDM 20.1.2006 END jacobian strategy (match) */
 #define node_al_errors        node_al_errors_
 #define node_fd_errors        node_fd_errors_
@@ -293,7 +294,7 @@ extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*);
 extern void mtjac_(int*, int*,
                   int*, double*, double*, double*,
-                   int*, int*, int*,
+                   int*, int*, double*, int*,
                    double*, int*, int*, double*, double*, double*,
                    double*, double*, double*,
                    double*, double*);
@@ -360,6 +361,7 @@ int next_start(double*,double*,double*,double*,double*,double*,double*,
 int next_vary(char*, int*, double*, double*, double*, int*, double*);
 int vary_name(char*, int*, int*);
 int constraint_name(char*, int*, int*);
+int mtputconsname(char*, int*, char*,int*);
 /* RDM 20.1.2006 END */
 int node_al_errors(double*);
 int node_fd_errors(double*);
@@ -1347,6 +1349,7 @@ double jac_cool;            /* RDM 24.8.2005 jacobian cool factor (match) */
 double jac_balance;         /* RDM 24.8.2005 jacobian balance cool factor (match) */
 double jac_random;         /* RDM 24.8.2005 jacobian random factor (match) */
 int jac_bisec;             /* RDM 16.3.2006 jacobian bisec factor (match) */
+double jac_cond;              /* RDM 17.11.2006 jacobian svd cond. num (match) */
 int new_name_count = 0;     /* to make internal names */
 int next_rand = 0;          /* for random generator */
 int plots_made = 0;         /* set to 1 if plots are made */
@@ -1412,6 +1415,8 @@ int  copytrackstoarray();
 void deletetrackstrarpositions();
 
 /*Riccardo de Maria (CERN)*/
+#define MAX_MATCH_CONS 300
+#define MAX_MATCH_MACRO 10
 void match2_match(struct in_cmd*);
 void match2_end(struct in_cmd*);
 void match2_macro(struct in_cmd*);
@@ -1419,15 +1424,15 @@ void match2_constraint(struct in_cmd*);
 int  match2_evaluate_exressions(int i, int k, double* fun_vec);
 void match2_delete_expressions();
 char match2_keepexpressions = 0; /*do not delete expressions at the end matching used by match with PTC knobs*/
-char* match2_macro_name[10];
-char* match2_cons_name[10][30];
-double match2_cons_value[10][30];
-double match2_cons_value_rhs[10][30];
-double match2_cons_value_lhs[10][30];
-double match2_cons_weight[10][30];
-char match2_cons_sign[10][30];
+char* match2_macro_name[MAX_MATCH_MACRO];
+char* match2_cons_name[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+double match2_cons_value[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+double match2_cons_value_rhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+double match2_cons_value_lhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+double match2_cons_weight[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+char match2_cons_sign[MAX_MATCH_MACRO][MAX_MATCH_CONS];
 int match2_cons_curr[3];
-struct expression* match2_cons_rhs[10][30];
-struct expression* match2_cons_lhs[10][30];
+struct expression* match2_cons_rhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+struct expression* match2_cons_lhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
 
 /* end of definitions */

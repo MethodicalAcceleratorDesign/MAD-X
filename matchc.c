@@ -9,14 +9,14 @@ void match_action(struct in_cmd* cmd)
 {
   int i;
   int iseed, iprint;
-   
-  if (match_is_on == kMatch_PTCknobs) 
-   { 
+
+  if (match_is_on == kMatch_PTCknobs)
+   {
      madx_mpk_run(cmd);
      return;
-   }  
-   
-   
+   }
+
+
   if (stored_match_var->curr == 0)
   {
     warning("no vary command seen,","match command terminated");
@@ -73,6 +73,7 @@ void match_action(struct in_cmd* cmd)
     jac_balance = command_par_value("balance", cmd->clone);
     jac_random = command_par_value("random", cmd->clone);
     jac_bisec = command_par_value("bisec", cmd->clone);
+    jac_cond = command_par_value("cond", cmd->clone);
     match_work[0] = new_double_array(total_vars*total_const);
     match_work[1] = new_double_array(total_const);
     match_work[2] = new_double_array(total_const);
@@ -81,13 +82,13 @@ void match_action(struct in_cmd* cmd)
     fprintf(prt_file, "START JACOBIAN:\n\n");
     mtjac_(&total_const, &total_vars,
            &jac_strategy, &jac_cool,&jac_balance, &jac_random,
-           &jac_repeat,&jac_bisec,&match_is_on,
+           &jac_repeat,&jac_bisec,&jac_cond,&match_is_on,
            &match_tol, &current_calls, &current_call_lim,
            vary_vect->a, vary_dvect->a, fun_vect->a,
            match_work[0]->a,match_work[1]->a,match_work[2]->a,
            match_work[3]->a,match_work[4]->a);
-    if (jac_strategy==2 && match_is_on==2) {
-      printf("Print Jacobian\n");
+/*    if (jac_strategy==2 && match_is_on==2) {*/
+    if (jac_strategy==2) {
       mtjacprint(total_const,total_vars,match_work[0]->a);
     }
   }
@@ -149,7 +150,7 @@ void match_action(struct in_cmd* cmd)
 
 void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
 {
-  int i,j, k=0;
+  int i,j,k=0;
   char execute[40];/* RDM fork */
   static int nconserrs = 0; /*number of call finihed with error*/
 
@@ -387,7 +388,7 @@ void match_end(struct in_cmd* cmd)
   set_option("twiss_print", &keep_tw_print);
 
 
-  fprintf(prt_file, "EVALUATING \"tar= %16.8e;\"\n",penalty);
+  fprintf(prt_file, "VARIABLE \"TAR\" SET TO %16.8e\n",penalty);
 /*  sprintf(assign_cmd,"tar= %16.8e ;",penalty);*/
 /*  pro_input(assign_cmd);*/
   set_variable("tar",&penalty);
@@ -880,19 +881,74 @@ void match_weight(struct in_cmd* cmd)
 
 void mtjacprint(int m, int n,double* jac){
   int i,j,k,l;
+  double *SV,*U,*VT;
   k=0;
-  printf("Macro Constraint Variable Derivative\n");
-  printf("------------------------------------\n");
+  printf("\n\nJACOBIAN:\n");
+  printf("%4s %16s %10s %20s\n","Node","Constraint","Variable","Derivative");
+  printf("---------------------------------------------------------------\n");
   for(i=0;match2_macro_name[i]!=NULL;i++) {
     for(j=0;match2_cons_name[i][j]!=NULL;j++) {
       for(l=0;l<n;l++){
-        printf("%10s ",match2_macro_name[i]);
-        printf("%10s ",match2_cons_name[i][j]);
+        printf("%4s ",match2_macro_name[i]);
+        printf("%16s ",match2_cons_name[i][j]);
         printf("%10s ",command_par_string("name",stored_match_var->commands[l]));
-        printf("%e",jac[l*m+k]);
+        printf("%20.10e",jac[l*m+k]);
         printf("\n");
       }
       k++;
     }
   }
+  printf("\n\nSINGULAR VALUE DECOMPOSITION:\n");
+  SV=(double *)mymalloc("match_match",(total_const+total_vars)*sizeof(double));
+  VT=(double *)mymalloc("match_match",(total_vars*total_vars)*sizeof(double));
+  U=(double *)mymalloc("match_match",(total_const*total_const)*sizeof(double));
+  mtsvd_(&total_const,&total_vars,jac,SV,U,VT);
+  k=0;
+  l=0;
+  printf("%-25s %12s %-34s\n","Variable vector","* Sing. val.","---> Node constraint vector");
+  printf("--------------------------------------------------------------------\n");
+  for(i=0;i<mymax(n,m);i++){
+    for(j=0;j<mymax(n,m);j++){
+      if (match2_cons_name[k][l]==NULL) {
+        k++;
+        l=0;
+      }
+      if ( (i<n)&&(j<n)) {
+        printf("%-12s",command_par_string("name",stored_match_var->commands[j]));
+        printf("%12.6g ",VT[i*n+j]);
+      }
+      else { printf("%22s",""); }
+      if ( (i<mymin(n,m)) &&(j==0))   {
+        printf("%12.6g ",SV[i]);
+      }
+      else { printf("%12s ",""); }
+      if ( (i<m)&&(j<m) ) {
+/*        printf("%i %i",k,l);*/
+        printf("%12.6g ",U[j*m+i]);
+        printf("%10s ",match2_macro_name[k]);
+        printf("%10s ",match2_cons_name[k][l]);
+      }
+      else { printf("%34s",""); }
+      printf("\n");
+      l++;
+    }
+    l=0;
+    k=0;
+  printf("\n");
+  printf("\n");
+  }
 }
+
+int mtputconsname(char* noden, int* nodei , char* consn, int* consi) {
+  int i,j;
+  char* test;
+  i=(*nodei)-1;
+  j=(*consi)-1;
+match2_macro_name[i]=(char *)mymalloc("match_match",20);
+strncpy(match2_macro_name[i],noden,20);
+match2_macro_name[i][19]='\0';
+match2_cons_name[i][j]=(char *)mymalloc("match_match",20);
+strncpy(match2_cons_name[i][j],consn,20);
+match2_cons_name[i][j][19]='\0';
+}
+

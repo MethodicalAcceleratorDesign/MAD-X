@@ -5,15 +5,15 @@ void match2_match(struct in_cmd* cmd)
   match_is_on = 2;
   total_const=0;
   printf("Inside USE_MACRO mode\n");
-  for(i=0;i<10;i++) match2_macro_name[i]=NULL;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_name[i][j]=NULL;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_rhs[i][j]=NULL;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_lhs[i][j]=NULL;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_value[i][j]=0;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_value_lhs[i][j]=0;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_value_rhs[i][j]=0;
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_sign[i][j]='n';
-  for(i=0;i<10;i++)  for(j=0;j<30;j++) match2_cons_weight[i][j]=0;
+  for(i=0;i<MAX_MATCH_MACRO;i++) match2_macro_name[i]=NULL;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_name[i][j]=NULL;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_rhs[i][j]=NULL;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_lhs[i][j]=NULL;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_value[i][j]=0;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_value_lhs[i][j]=0;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_value_rhs[i][j]=0;
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_sign[i][j]='n';
+  for(i=0;i<MAX_MATCH_MACRO;i++)  for(j=0;j<MAX_MATCH_CONS;j++) match2_cons_weight[i][j]=0;
   for(i=0;i<3;i++) match2_cons_curr[i]=0;
   return;
 }
@@ -75,7 +75,7 @@ void match2_end(struct in_cmd* cmd)
   set_option("match_summary", &print_match_summary);
 
 
-  fprintf(prt_file, "EVALUATING \"tar= %16.8e;\"\n",penalty);
+  fprintf(prt_file, "VARIABLE \"TAR\" SET TO %16.8e\n",penalty);
 /*  sprintf(assign_cmd,"tar= %16.8e ;",penalty);*/
 /*  pro_input(assign_cmd);*/
   set_variable("tar",&penalty);
@@ -179,7 +179,6 @@ void match2_constraint(struct in_cmd* cmd)
 int match2_evaluate_exressions(int i, int k, double* fun_vec)
 {
   int j;
-  
   double rhs,lhs,r;/* RDM fork */
   char s;
   for(j=0;match2_cons_name[i][j]!=NULL;j++) {
@@ -204,7 +203,7 @@ void match2_delete_expressions()
   char rout_name[] = "match2_delete_expressions";
 
   int i,j;
-  
+
   for(i=0;match2_macro_name[i]!=NULL;i++) {
     for(j=0;match2_cons_name[i][j]!=NULL;j++) {
       myfree(rout_name,match2_cons_name[i][j]);
