@@ -89,9 +89,14 @@ void match2_macro(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int i;
 
+
   pos = name_list_pos("name", nl);
   if (nl->inform[pos]) {
     for(i=0;match2_macro_name[i]!=NULL;i++);
+     if (i>(MAX_MATCH_MACRO-2)) {
+        printf("WARNING: Max number of match macros reached. Command ignored.\n");
+        return;
+     }
 /*    printf("%d\n",i);*/
     match2_macro_name[i]=pl->parameters[pos]->string;
     printf("%d: exec, %s;\n",i,pl->parameters[pos]->string);
@@ -112,6 +117,15 @@ void match2_constraint(struct in_cmd* cmd)
   char s;
 
   i=0;j=0;s='n';
+
+ for(i=0;match2_macro_name[i]!=NULL;i++);i--;
+ for(j=0;match2_cons_lhs[i][j]!=NULL;j++);
+ if (j > (MAX_MATCH_CONS-1)) {
+   printf("WARNING: Max number of constraints reached. Command ignored.\n");
+   return;
+ };
+
+  
   for(start=0; start<n; start++) {
     if (strcmp(toks[start],"expr")==0) break;
   }

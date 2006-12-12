@@ -186,7 +186,11 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
   /* RDM new matching*/
   if (match_is_on==2) {
     for(j=0;match2_macro_name[j]!=NULL;j++);
-    match2_macro_name[j]=macro->name;
+    if (j>(MAX_MATCH_MACRO-2)) {
+      printf("WARNING: Max number of match macros reached. Command ignored.\n");}
+    else {
+      match2_macro_name[j]=macro->name;
+    }
   }
   /* RDM new matching*/
 }
