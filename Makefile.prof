@@ -5,7 +5,7 @@
 #######################################################################
 
 RPLOT=NO
-PROFILE=NO
+PROFILE=YES
 
 LDOPS=-static
 # compilers
@@ -35,7 +35,7 @@ FCP=-g -fno-second-underscore -I.
 INCLUDES=-I.
 
 
-ifdef RPLOT
+ifeq ($(RPLOT),YES)
 #include rplot/GeneralDef
 #include rplot/MachineDef.Linux
 INCLUDES += -I$(ROOTSYS)/include -I$(MADX_ROOT)/rplot
@@ -72,11 +72,13 @@ ifeq ($(PROFILE),YES)
    f95_FLAGS+= -pg
    FFLAGS77+= -pg
    GCCP_FLAGS+= -pg
+   LDOPS+= -pg
  else 
    ifeq ($(f95),g95)
      f95_FLAGS+= -pg
      FFLAGS77+= -pg
      GCCP_FLAGS+= -pg
+     LDOPS+= -pg
    endif 
  endif 
 endif
@@ -98,7 +100,7 @@ LIBX_ext=
 
 LIBS += $(LIBX) $(LIBX_ext)
 
-ifdef RPLOT
+ifeq ($(RPLOT),YES)
 ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --glibs) -lMinuit 
 LIBS +=  $(ROOTLIBS) -L$(MADX_ROOT)/lib/tgt_linux -lgcc -lm -lc -lrplot
 GCCP_FLAGS += -DROOT_PLOT
@@ -151,7 +153,7 @@ a_scratch_size.o: a_scratch_size.f90
 b_da_arrays_all.o: a_scratch_size.o b_da_arrays_all.f90
 c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
 d_lielib.o: c_dabnew.o d_lielib.f90
-h_definition.o: h_definition.f90
+h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90
 i_tpsa.o: h_definition.o i_tpsa.f90
 j_tpsalie.o: i_tpsa.o j_tpsalie.f90
 k_tpsalie_analysis.o: j_tpsalie.o k_tpsalie_analysis.f90
@@ -183,11 +185,14 @@ madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
 madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
-madx_ptc_knobs.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
+madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
 madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
+madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o  madx_ptc_distrib.o madx_ptc_knobs.o madx_ptc_twiss.f90
+madx_ptc_distrib.o: Sp_keywords.o madx_ptc_distrib.f90
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
-	madx_ptc_eplacement.o madx_ptc_knobs.o \
+	madx_ptc_twiss.o            madx_ptc_distrib.o \
+	madx_ptc_knobs.o \
 	madx_ptc_script.o pointers.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
@@ -234,7 +239,7 @@ f90_objs = $(patsubst %.f90,%.o,$(wildcard *.f90))
 madxp_objects = $(f90_objs) $(c_objs) $(madx_objectsf95)
 
 madxp_deps=$(f90_objs) $(c_objs) $(madx_objectsf95) 
-ifdef RPLOT
+ifeq ($(RPLOT),YES)
   madxp_deps+=lib/tgt_linux/librplot.so
 endif
 
@@ -242,17 +247,20 @@ endif
 madxp: $(madxp_deps)
 	$(LD) $(LDOPS) -o $@ $(madxp_objects) $(LIBS) 
 
-madxp_prof: $(f90_objs) $(c_objs) $(madx_objectsf95) 
-	echo ENTERING PROFILE
-	$(LD) -pg $(LDOPS) -o madxp_prof $(madxp_objects) $(LIBS) 
-
-madx_prof: $(madx_objectsf77) 
-	$(LD) -pg  $(LDOPS) -o madx_prof $(madx_objectsf77) $(LIBX) -lpthread -lm -lc
+#madxp_prof: $(f90_objs) $(c_objs) $(madx_objectsf95) 
+#	echo ENTERING PROFILE
+#	$(LD) -pg $(LDOPS) -o madxp_prof $(madxp_objects) $(LIBS) 
+#
+#madx_prof: $(madx_objectsf77) 
+#	$(LD) -pg  $(LDOPS) -o madx_prof $(madx_objectsf77) $(LIBX) -lpthread -lm -lc
 
 rplot::
-ifdef RPLOT
+	@echo Doing or not
+ifeq ($(RPLOT),YES)
 	echo Making rplot;
 	make -C rplot;
+else
+	@echo Not making rplot
 endif
 
 clean:
@@ -262,7 +270,7 @@ clean:
 	rm -f core
 	rm -f *~
 	rm -f madx madxp
-ifdef RPLOT
+ifeq ($(RPLOT),YES)
 	echo Cleaning rplot;
 	make -C rplot clean;
 endif

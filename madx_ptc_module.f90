@@ -16,7 +16,7 @@ MODULE madx_ptc_module
   USE madx_ptc_setcavs_module
   USE madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
-
+   
   implicit none
   public
   logical(lp) mytime
@@ -28,53 +28,20 @@ MODULE madx_ptc_module
   real(kind(1d0)) get_value,node_value
   type(layout),pointer :: MY_RING
   type(mad_universe) m_u
-  integer, private, parameter :: ndd=ndim2,mynreso=20
+  integer, private, parameter :: mynreso=20
   integer, private, dimension(4) :: iia,icoast
-  integer, private, allocatable :: J(:)
-  integer, private :: NO,ND,ND2,NP,NDPT,NV,icount=0
-  real(dp), private, dimension(ndim2,5) :: rdd
-  real(dp), private, dimension(ndim2) :: dicu
-  real(dp), private, dimension(2,ndim2) :: angp
-  character(len=4), private, dimension(4), target :: str4 = (/'1000','0100','0010','0001'/)
-  character(len=5), private, dimension(5), parameter :: str5 = (/'10000','01000','00100','00010','00001'/)
-  character(len=6), private, dimension(6), target :: str6 = (/'100000','010000','001000','000100','000001','000010'/)
-  private zerotwiss,equaltwiss,alloctwiss,killtwiss
+  integer, private :: NO,ND,ND2,NP,NDPT,NV
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
-  type twiss
-     type(damap) a1
-     type(damap) a_t
-     type(damap) junk
-     type(damap) junk1
-     type(normalform) n
-     logical(lp) nf
-     real(dp), dimension(3,3) ::  beta,alfa,gama
-     real(dp), dimension(3)   ::  mu
-     real(dp), dimension(6)   ::  disp
-     real(dp), dimension(3)   ::  tune
-     real(dp), dimension(6,6) ::  eigen
-  end type twiss
+  integer, private, allocatable :: J(:)
 
-  interface assignment (=)
-     module procedure equaltwiss
-     module procedure zerotwiss
-     module procedure normalform_normalform
-  end interface
-
-  interface alloc
-     module procedure alloctwiss
-  end interface
-
-  interface kill
-     module procedure killtwiss
-  end interface
 
 CONTAINS
 
   subroutine ptc_create_universe()
     implicit none
 
-    print77=.false.
-    read77 =.false.
+    print77=.true.
+    read77 =.true.
 
     if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
@@ -193,7 +160,7 @@ CONTAINS
        print '(a20, f8.4)', '      Momentum :',e0f
     endif
 
-
+ 
 
     beta0=e0f/ENERGY
 
@@ -971,124 +938,123 @@ CONTAINS
     real(dp)             :: v
     real(kind(1d0))      :: tmpv
     real(kind(1d0)) get_value
-
+    
     if ( .not. associated(my_ring) ) then
-       call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
-       return
+      call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
+      return
     endif
-
+    
     if (getdebug()>2) then
-       print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
-    endif
+      print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
+    endif  
 
     if ( (fibreidx .lt. 1) .and. (fibreidx .gt. my_ring%n) ) then
-       call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
-       return
+      call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
+      return
     endif
-
+    
     p=>my_ring%start
     do j=1, fibreidx
-       p=>p%next
+      p=>p%next
     enddo
 
     if (getdebug() > 1 ) then
        print*,"Found element no. ", fibreidx," named ", p%mag%name, &
-            &" of kind ", p%mag%kind, mytype(p%mag%kind)
+             &" of kind ", p%mag%kind, mytype(p%mag%kind)
        print*,"Currently nmul is ", p%mag%p%nmul
 
        write(6,*) "BNs",p%mag%BN
        write(6,*) "ANs",p%mag%AN
 
        DO i=1,p%mag%p%nmul
-          print*, "Polimorphic BN(",i,")"
-          call print(p%mag%BN(i),6)
-          print*, "Polimorphic AN(",i,")"
-          call print(p%mag%AN(i),6)
+         print*, "Polimorphic BN(",i,")"
+         call print(p%mag%BN(i),6)
+         print*, "Polimorphic AN(",i,")"
+         call print(p%mag%AN(i),6)
        ENDDO
 
     endif
-
+    
     kn = get_value('ptc_setfieldcomp ','kn ')
     v = get_value('ptc_setfieldcomp ','value ')
-
+    
     if (kn >= 0) then
-       kn = kn + 1
-       !      print*,"Setting up normal field component ", kn," to ", v
-
-       call add(p%mag, kn,1,v)
-       call add(p%magp,kn,1,v)
-
+      kn = kn + 1
+!      print*,"Setting up normal field component ", kn," to ", v
+      
+      call add(p%mag, kn,1,v)
+      call add(p%magp,kn,1,v)
+      
     else
-       ks = get_value('ptc_setfieldcomp ','ks ')
-       if (ks < 0) then
-          call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
-          return
-       endif
-       ks = ks + 1
+      ks = get_value('ptc_setfieldcomp ','ks ')
+      if (ks < 0) then
+        call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
+        return
+      endif
+      ks = ks + 1
 
-       !      print*,"Setting up skew field component ", ks," to ", v
+!      print*,"Setting up skew field component ", ks," to ", v
 
-       call add(p%mag, -ks,1,v)
-       call add(p%magp,-ks,1,v)
+      call add(p%mag, -ks,1,v)
+      call add(p%magp,-ks,1,v)
 
     endif
 
     if (getdebug() > 1 ) then
-       write(6,*) "BNs",p%mag%BN
-       write(6,*) "ANs",p%mag%AN
-       write(6,*) ""
-    endif
+      write(6,*) "BNs",p%mag%BN
+      write(6,*) "ANs",p%mag%AN
+      write(6,*) ""
+    endif  
   end subroutine ptc_setfieldcomp
-
-
+  !----------------------------------------------------------------
 
   subroutine extendnmul(f,n)
     implicit none
-    type(fibre),  pointer               :: f !fiber
-    integer                             :: n !order
-    real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
-    type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
-    integer                             :: i !iterator
-    !P.Sk
+      type(fibre),  pointer               :: f !fiber
+      integer                             :: n !order 
+      real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
+      type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
+      integer                             :: i !iterator
+      !P.Sk
+      
+      if (.not. associated(f)) then
+        return
+      endif
 
-    if (.not. associated(f)) then
-       return
-    endif
+      ALLOCATE(ANR(n),BNR(n)) 
+      ALLOCATE(ANP(n),BNP(n))
+      CALL ALLOC(ANP,n)
+      CALL ALLOC(BNP,n)
 
-    ALLOCATE(ANR(n),BNR(n))
-    ALLOCATE(ANP(n),BNP(n))
-    CALL ALLOC(ANP,n)
-    CALL ALLOC(BNP,n)
+      DO I=1,f%mag%P%NMUL
+        ANR(I)=f%mag%AN(I)
+        BNR(I)=f%mag%BN(I)
 
-    DO I=1,f%mag%P%NMUL
-       ANR(I)=f%mag%AN(I)
-       BNR(I)=f%mag%BN(I)
+        ANP(I)=f%magp%AN(I)
+        ANP(I)=f%magp%BN(I)
+      ENDDO
 
-       ANP(I)=f%magp%AN(I)
-       ANP(I)=f%magp%BN(I)
-    ENDDO
+      DO I=f%mag%P%NMUL+1, n
+        ANR(I)=zero
+        BNR(I)=zero
 
-    DO I=f%mag%P%NMUL+1, n
-       ANR(I)=zero
-       BNR(I)=zero
+        ANP(I)=zero
+        ANP(I)=zero
+      ENDDO
 
-       ANP(I)=zero
-       ANP(I)=zero
-    ENDDO
+      call kill(f%magp%AN,f%magp%p%nmul)
+      call kill(f%magp%BN,f%magp%p%nmul)
+      deallocate(f%magp%AN,f%magp%BN)
+      deallocate(f%mag%AN,f%mag%BN)
 
-    call kill(f%magp%AN,f%magp%p%nmul)
-    call kill(f%magp%BN,f%magp%p%nmul)
-    deallocate(f%magp%AN,f%magp%BN)
-    deallocate(f%mag%AN,f%mag%BN)
+      f%mag%p%nmul  = n
+      f%magp%p%nmul = n
 
-    f%mag%p%nmul  = n
-    f%magp%p%nmul = n
+      f%mag%AN=>ANR
+      f%mag%BN=>BNR
 
-    f%mag%AN=>ANR
-    f%mag%BN=>BNR
-
-    f%magp%AN=>ANP
-    f%magp%BN=>BNP
+      f%magp%AN=>ANP
+      f%magp%BN=>BNP
 
 
   end subroutine extendnmul
@@ -1101,8 +1067,8 @@ CONTAINS
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
     !---------------------------------------------------------------
-
-
+    
+    
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -1126,9 +1092,11 @@ CONTAINS
     type(fibre), pointer :: p
     type(damap)          :: id !identity map used for calculating maps for each element
     type(real_8)         :: y2(6)  !polimorphes array used for calculating maps for each element
+    type(real_8)         :: yfull(6)  !polimorphes array used for calculating maps for each element
     real(dp)             :: xt(6)
     integer              :: i, ii  !iterators
     character(200)       :: filename='ptcmaps.txt'
+    character(200)       :: filenamefull='ptcmaps'
     integer              :: get_string
     real(kind(1d0))      :: get_value
     integer              :: flag_index,why(9)
@@ -1148,17 +1116,27 @@ CONTAINS
     if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
     open(unit=42,file=filename)
 
+!    write(filenamefull,*) filename,".",my_ring%start%mag%name,"-",my_ring%end%mag%name,".txt"
+    filenamefull="ptcmaps.start-end.txt"
+    print*, filenamefull
+    open(unit=43,file=filenamefull)
+    
     print*, "no=1"," mynd2=",c_%nd2," npara=",c_%npara
     call init(getintstate(),1,c_%np_pol,berz)
 
     call alloc(id);
     call alloc(y2);
+    call alloc(yfull);
 
     xt(:) = zero
     id    = 1     ! making identity map
-
+    
+    yfull  = xt + id
+    
     p=>my_ring%start
     do i=1,my_ring%n
+
+
 
        y2=xt+id ! we track identity map from the current position
 
@@ -1240,6 +1218,30 @@ CONTAINS
              return
           endif
        endif
+
+
+       call track(my_ring,yfull,i,i+1,getintstate())
+
+       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+          call fort_warn('ptc_dumpmaps: ','DA got unstable')
+          call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+          return
+       endif
+
+       call PRODUCE_APERTURE_FLAG(flag_index)
+       if(flag_index/=0) then
+          call ANALYSE_APERTURE_FLAG(flag_index,why)
+
+          Write(6,*) "ptc_dumpmaps: APERTURE error for element: ",i," name: ",p%MAG%name
+          write(whymsg,*) 'APERTURE error: ',why
+          call fort_warn('ptc_dumpmaps: ',whymsg)
+          call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
+          c_%watch_user=.false.
+          return
+       endif
+       
+       write(43,*) p%mag%name, suml,' m ==========================='
+       call print(yfull,43)
 
        suml=suml+p%MAG%P%ld
 
@@ -1329,673 +1331,6 @@ CONTAINS
 
 
   end subroutine ptc_dumpmaps
-
-  !_________________________________________________________________
-
-  subroutine ptc_twiss(tab_name)
-    implicit none
-    include 'twissa.fi'
-    logical(lp) closed_orbit,beta_flg,betz_flg
-    integer k,i,ii,no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
-    character(200)       :: whymsg
-    integer inval,ioptfun,iii,restart_sequ,advance_node,get_option
-    integer tab_name(*)
-    real(dp) x(6),deltap0,deltap,betx,alfx,mux,bety,alfy,muy,betz,alfz,muz,dx,dpx,dy,dpy,d_val
-    real(kind(1d0)) get_value,suml
-    integer  geterrorflag !C function that returns errorflag value
-    type(real_8) y(6)
-    type(twiss) :: tw
-    type(fibre), POINTER :: current
-    type(work)   :: startfen !Fibre energy at the start
-    real(dp) r,re(6,6),dt
-    logical(lp) initial_matrix_manual, initial_matrix_table
-    integer n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
-    integer row,double_from_table
-    integer  :: charge    ! charge of an accelerated particle
-    type(real_8)            ::scv(6)
-    real(dp) ave(6,6,3), v
-    integer jj,kk,ll,mm
-
-    if (getdebug() > 1) print*,"ptc_twiss"
-    !------------------------------------------------------------------------------
-    table_name = charconv(tab_name)
-
-    if (getdebug() > 1) print*,"ptc_twiss: Table name is ",table_name
-
-    if(universe.le.0) then
-       call fort_warn('return from ptc_twiss: ',' no universe created')
-       call seterrorflag(1,"ptc_twiss ","no universe created till now");
-       return
-    endif
-    if(index.le.0) then
-       call fort_warn('return from ptc_twiss: ',' no layout created')
-       call seterrorflag(2,"ptc_twiss ","no layout created till now");
-       return
-    endif
-
-    call cleartables() !defined in madx_ptc_knobs
-
-    call kill_para(my_ring) !removes all the previous parameters
-    nda = getnknobs() !defined in madx_ptc_knobs
-    suml=zero
-
-    icase = get_value('ptc_twiss ','icase ')
-    deltap0 = get_value('ptc_twiss ','deltap ')
-
-    deltap = zero
-    call my_state(icase,deltap,deltap0)
-    CALL UPDATE_STATES
-
-
-    x(:)=zero
-    if(mytime) then
-       call Convert_dp_to_dt (deltap, dt)
-    else
-       dt=deltap
-    endif
-    if(icase.eq.5) x(5)=dt
-
-    closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
-
-    if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
-       call fort_warn('return from ptc_twiss: ',' Closed orbit requested on not closed layout.')
-       call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.");
-       return
-    endif
-
-
-    if(closed_orbit) then
-
-       if ( .not. c_%stable_da) then
-          call fort_warn('ptc_twiss: ','DA got unstable even before normal')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable even before normal");
-          stop
-          return
-       endif
-
-       call find_orbit(my_ring,x,1,default,c_1d_7)
-
-       if ( .not. c_%stable_da) then
-          call fort_warn('ptc_twiss: ','DA got unstable after normal')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable after normal");
-          stop
-          return
-       endif
-
-       CALL write_closed_orbit(icase,x)
-    endif
-
-    mynd2 = 0
-    npara = 0
-    no = get_value('ptc_twiss ','no ')
-
-    call init(default,no,nda,BERZ,mynd2,npara)
-
-    call alloc(y)
-    y=npara
-    Y=X
-
-    beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
-
-
-    initial_matrix_manual = get_value('ptc_twiss ','initial_matrix_manual ') .ne. 0
-    initial_matrix_table = get_value('ptc_twiss ','initial_matrix_table ') .ne. 0
-
-    if(initial_matrix_table) then
-       k = double_from_table("map_table ", "nv ", 1, doublenum)
-       if(k.ne.-1) then
-          call liepeek(iia,icoast)
-          my_nv=int(doublenum)
-          nv_min=min(c_%npara,my_nv)
-       else
-          initial_matrix_table=.false.
-       endif
-    endif
-
-    if(initial_matrix_table) then
-       x(:)=zero
-       allocate(j(c_%npara))
-       j(:)=0
-       do i = 1,my_nv
-          k   = double_from_table("map_table ", "coef ", i, doublenum)
-          d_val=doublenum
-          if(i.le.c_%npara) then
-             x(i)  = d_val-(y(i)%T.sub.j)
-          endif
-       enddo
-       do i = 1,nv_min
-          do ii = 1,nv_min
-             j(ii)  = 1
-             row    = i*my_nv+ii
-             k   = double_from_table("map_table ", "coef ", row, doublenum)
-             d_val=doublenum
-             d_val  = d_val-(y(i)%T.sub.j)
-             y(i)%T = y(i)%T+(d_val.mono.j)
-             j(ii)=0
-          enddo
-       enddo
-       deallocate(j)
-    elseif(initial_matrix_manual) then
-       call readinitialmatrix()
-       if (geterrorflag() /= 0) then
-          return
-       endif
-    elseif(beta_flg) then
-       call readinitialtwiss()
-       if (geterrorflag() /= 0) then
-          return
-       endif
-    else
-       c_%watch_user=.true.
-       call track(my_ring,y,1,default)
-       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_twiss: ','DA got unstable')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable");
-          return
-       endif
-
-       call PRODUCE_APERTURE_FLAG(flag_index)
-       if(flag_index/=0) then
-          call ANALYSE_APERTURE_FLAG(flag_index,why)
-
-          write(whymsg,*) 'APERTURE unstable (map production) - programs continues: ',why
-          call fort_warn('ptc_twiss: ',whymsg)
-          call seterrorflag(10,"ptc_twiss: ",whymsg);
-          !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
-          !          Write(6,*) why ! See produce aperture flag routine in sd_frame
-          c_%watch_user=.false.
-          CALL kill(y)
-          return
-       endif
-    endif
-
-
-    if (cavsareset .eqv. .false.) then
-       call setcavities(my_ring,maxaccel)
-       if (geterrorflag() /= 0) then
-          return
-       endif
-    endif
-
-    call setknobs(my_ring)
-
-    !############################################################################
-    !############################################################################
-    !############################################################################
-
-
-    call alloc(tw)
-    call alloc(scv)
-
-    tw=y
-    if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       call fort_warn('ptc_twiss: ','Error: DA in twiss got unstable during Normal Form')
-       call seterrorflag(10,"ptc_twiss ","DA in twiss got unstable during Normal Form");
-       return
-    endif
-
-    y=npara
-    Y=X
-    current=>MY_RING%start
-    startfen = 0
-    startfen = current!setting up start energy for record
-    suml=zero
-    iii=restart_sequ()
-    print77=.false.
-
-    if (getdebug() > 2) then
-       open(unit=21,file='ptctwiss.txt')
-       print *, "ptc_twiss: internal state is:"
-       call print(default,6)
-    endif
-
-    do i=1,MY_RING%n
-
-       if (getdebug() > 1) then
-          write(6,*) "##########################################"
-          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-          write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
-       endif
-
-       if (nda > 0) then
-          call track(my_ring,y,i,i+1,+default)
-       else
-          call track(my_ring,y,i,i+1, default)
-       endif
-       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_twiss: ','DA got unstable')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable ");
-          return
-       endif
-
-       call PRODUCE_APERTURE_FLAG(flag_index)
-       if(flag_index/=0) then
-          call ANALYSE_APERTURE_FLAG(flag_index,why)
-          Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
-          write(whymsg,*) 'APERTURE error: ',why
-          call fort_warn('ptc_twiss: ',whymsg)
-          call seterrorflag(10,"ptc_twiss: ",whymsg);
-          !          Write(6,*) why ! See produce aperture flag routine in sd_frame
-          goto 100
-       endif
-
-
-       suml=suml+current%MAG%P%ld
-       tw=y
-       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_twiss: ','DA in twiss got unstable')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
-          return
-       endif
-
-       !the tracked polimorph is not normalized to the input beam parameters
-       !we need to drag it from the twiss object, where it is normalized with A matrix of the normal form
-
-       do ii=1, c_%nd2
-          scv(ii) = tw%junk%v(ii)
-       enddo
-
-       call putusertable(i,current%mag%name,suml,y,scv)
-
-       call puttwisstable()
-
-       iii=advance_node()
-       current=>current%next
-    enddo
-100 continue
-
-    c_%watch_user=.false.
-    call kill(scv)
-    call kill(tw)
-    CALL kill(y)
-    call f90flush(20,my_false)
-
-    if (getdebug() > 2) close(21)
-
-    !****************************************************************************************
-    !*********  E N D   O F   PTC_TWISS      ************************************************
-    !****************************************************************************************
-    !________________________________________________________________________________________
-
-  contains  ! what follows are internal subroutines of ptc_twiss
-    !____________________________________________________________________________________________
-
-    subroutine puttwisstable()
-      implicit none
-      include 'twissa.fi'
-      integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(72),myx
-      real(dp)   :: deltae
-      type(work) :: cfen !current fibre energy
-
-
-      cfen = 0 ! do not remove -> if it is removed energy is wrong because = adds energy to the previous value
-
-      if ( (associated(current%next) .eqv. .false. ) .or. (associated( current%next, my_ring%start)) ) then
-         ! if current is the last element in the sequence i.e.
-         ! p%next == NULL (LINE) OR
-         ! p%next points the first element (CIRCLE)
-         cfen=current
-
-         if (getdebug()>1) then
-            !if it is the last element in the line
-            print *, 'It is the last element  ', current%mag%name
-            !(it is always marker, i.e element that does not change reference energy)
-            print *, 'Its reference energy is ', cfen%p0c
-         endif
-
-         !take its reference energy
-      else
-         cfen=current%next      ! energy after passing this element
-      endif
-
-      deltae = cfen%energy/startfen%energy
-
-      if (getdebug() > 2) then
-         write(21,*) "##########################################"
-         write(21,*) ""
-         write(21,'(i4, 1x,a, f10.6)') i,current%mag%name,suml
-         write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",deltae
-         write(21,*) ""
-         call print(y,21)
-      endif
-
-      call double_to_table(table_name, 's ', suml)
-      doublenum=current%mag%p%p0c
-      call double_to_table(table_name, 'energy ', doublenum)
-
-      opt_fun(:)=zero
-
-      call liepeek(iia,icoast)
-      allocate(j(c_%npara))
-      j(:)=0
-      do ii=1,c_%npara ! fish
-         opt_fun(ii)=y(ii)%T.sub.j
-      enddo
-
-      myx=opt_fun(6)
-      opt_fun(6)=opt_fun(5)
-      opt_fun(5)=myx
-      deallocate(j)
-
-      ioptfun=6
-      call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
-
-      opt_fun(1)= tw%beta(1,1) * deltae
-      opt_fun(2)= tw%beta(2,1) * deltae
-      opt_fun(3)= tw%beta(3,1) * deltae
-      opt_fun(4)= tw%beta(2,2) * deltae
-      opt_fun(5)= tw%beta(1,2) * deltae
-      opt_fun(6)= tw%beta(3,2) * deltae
-      opt_fun(7)= tw%beta(2,3) * deltae
-      opt_fun(8)= tw%beta(3,3) * deltae
-      opt_fun(9)= tw%beta(1,3) * deltae
-      opt_fun(10)=tw%alfa(1,1) * deltae
-      opt_fun(11)=tw%alfa(2,1) * deltae
-      opt_fun(12)=tw%alfa(3,1) * deltae
-      opt_fun(13)=tw%alfa(2,2) * deltae
-      opt_fun(14)=tw%alfa(1,2) * deltae
-      opt_fun(15)=tw%alfa(3,2) * deltae
-      opt_fun(16)=tw%alfa(2,3) * deltae
-      opt_fun(17)=tw%alfa(3,3) * deltae
-      opt_fun(18)=tw%alfa(1,3) * deltae
-      opt_fun(19)=tw%gama(1,1) * deltae
-      opt_fun(20)=tw%gama(2,1) * deltae
-      opt_fun(21)=tw%gama(3,1) * deltae
-      opt_fun(22)=tw%gama(2,2) * deltae
-      opt_fun(23)=tw%gama(1,2) * deltae
-      opt_fun(24)=tw%gama(3,2) * deltae
-      opt_fun(25)=tw%gama(2,3) * deltae
-      opt_fun(26)=tw%gama(3,3) * deltae
-      opt_fun(27)=tw%gama(1,3) * deltae
-      opt_fun(28)=tw%mu(1) !* deltae
-      opt_fun(29)=tw%mu(2) !* deltae
-      opt_fun(30)=tw%mu(3) !* deltae
-      opt_fun(31)=tw%disp(1)
-      opt_fun(32)=tw%disp(2)
-      opt_fun(33)=tw%disp(3)
-      opt_fun(34)=tw%disp(4)
-      opt_fun(35)=tw%disp(5)
-      opt_fun(36)=tw%disp(6)
-      do i1=1,nd2
-         if(i1.le.4) then
-            i1a=i1
-         elseif(i1.eq.5) then
-            i1a=6
-         else
-            i1a=5
-         endif
-         do i2=1,nd2
-            if(i2.le.4) then
-               i2a=i2
-            elseif(i2.eq.5) then
-               i2a=6
-            else
-               i2a=5
-            endif
-            ii=36+(i1a-1)*6+i2a
-            opt_fun(ii)=tw%eigen(i1,i2) * deltae
-            if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
-         enddo
-      enddo
-
-      if (getdebug() > 2)  then
-         write(6,'(a,(f8.4,1x))') current%MAG%name,suml
-         write(6,'(a,3(f8.4,1x))')  "betas ", opt_fun(1),opt_fun(2),opt_fun(3)
-         write(6,'(a,3(f8.4,1x))')  "disps ", opt_fun(31),opt_fun(33),opt_fun(35)
-         write(6,'(a,3(f8.4,1x))')  "tunes ", tw%mu(1),tw%mu(2),tw%mu(3)
-      endif
-
-      ioptfun=72
-      call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
-      call augment_count(table_name)
-
-
-    end subroutine puttwisstable
-    !____________________________________________________________________________________________
-
-    subroutine readinitialmatrix
-      !reads initial map elements from MAD-X ptc_twiss command parameters
-      implicit none
-      real(dp),dimension(6)::reval,aieval
-      real(dp),dimension(6,6)::revec,aievec
-
-      re(1,1) = get_value('ptc_twiss ','re11 ')
-      re(1,2) = get_value('ptc_twiss ','re12 ')
-      re(1,3) = get_value('ptc_twiss ','re13 ')
-      re(1,4) = get_value('ptc_twiss ','re14 ')
-      re(1,5) = get_value('ptc_twiss ','re16 ')
-      re(1,6) = get_value('ptc_twiss ','re15 ')
-      re(2,1) = get_value('ptc_twiss ','re21 ')
-      re(2,2) = get_value('ptc_twiss ','re22 ')
-      re(2,3) = get_value('ptc_twiss ','re23 ')
-      re(2,4) = get_value('ptc_twiss ','re24 ')
-      re(2,5) = get_value('ptc_twiss ','re26 ')
-      re(2,6) = get_value('ptc_twiss ','re25 ')
-      re(3,1) = get_value('ptc_twiss ','re31 ')
-      re(3,2) = get_value('ptc_twiss ','re32 ')
-      re(3,3) = get_value('ptc_twiss ','re33 ')
-      re(3,4) = get_value('ptc_twiss ','re34 ')
-      re(3,5) = get_value('ptc_twiss ','re36 ')
-      re(3,6) = get_value('ptc_twiss ','re35 ')
-      re(4,1) = get_value('ptc_twiss ','re41 ')
-      re(4,2) = get_value('ptc_twiss ','re42 ')
-      re(4,3) = get_value('ptc_twiss ','re43 ')
-      re(4,4) = get_value('ptc_twiss ','re44 ')
-      re(4,5) = get_value('ptc_twiss ','re46 ')
-      re(4,6) = get_value('ptc_twiss ','re45 ')
-      re(5,1) = get_value('ptc_twiss ','re61 ')
-      re(5,2) = get_value('ptc_twiss ','re62 ')
-      re(5,3) = get_value('ptc_twiss ','re63 ')
-      re(5,4) = get_value('ptc_twiss ','re64 ')
-      re(5,5) = get_value('ptc_twiss ','re66 ')
-      re(5,6) = get_value('ptc_twiss ','re65 ')
-      re(6,1) = get_value('ptc_twiss ','re51 ')
-      re(6,2) = get_value('ptc_twiss ','re52 ')
-      re(6,3) = get_value('ptc_twiss ','re53 ')
-      re(6,4) = get_value('ptc_twiss ','re54 ')
-      re(6,5) = get_value('ptc_twiss ','re56 ')
-      re(6,6) = get_value('ptc_twiss ','re55 ')
-      x(:)=zero
-      x(1)=get_value('ptc_twiss ','x ')
-      x(2)=get_value('ptc_twiss ','px ')
-      x(3)=get_value('ptc_twiss ','y ')
-      x(4)=get_value('ptc_twiss ','py ')
-      x(5)=get_value('ptc_twiss ','t ')
-      x(6)=get_value('ptc_twiss ','pt ')
-
-      call liepeek(iia,icoast)
-      if (getdebug() > 1) then
-         write (6,'(8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
-         write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
-         print*, "c_%npara is ", c_%npara
-      endif
-
-      allocate(j(c_%npara))
-      j(:)=0
-      do i = 1,c_%npara
-         do ii = 1,c_%npara
-            j(ii)=1
-            r=re(i,ii)-(y(i)%T.sub.j)
-            y(i)%T=y(i)%T+(r.mono.j)
-            j(ii)=0
-         enddo
-      enddo
-      deallocate(j)
-
-      call eig6(re,reval,aieval,revec,aievec)
-      do i=1,iia(4)-icoast(2)
-         if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
-            call fort_warn("ptc_twiss","Fatal Error: Eigenvalues off the unit circle!")
-            stop
-         endif
-      enddo
-
-
-    end subroutine readinitialmatrix
-    !_________________________________________________________________
-
-    subroutine readinitialtwiss
-      !Reads initial twiss parameters from MAD-X command
-      implicit none
-      integer get_option
-      real(dp),dimension(6)::reval,aieval
-      real(dp),dimension(6,6)::revec,aievec
-
-      betx = get_value('ptc_twiss ','betx ')
-      bety = get_value('ptc_twiss ','bety ')
-      betz = get_value('ptc_twiss ','betz ')
-      alfx = get_value('ptc_twiss ','alfx ')
-      alfy = get_value('ptc_twiss ','alfy ')
-      alfz = get_value('ptc_twiss ','alfz ')
-      dx   = get_value('ptc_twiss ','dx ')
-      dpx  = get_value('ptc_twiss ','dpx ')
-      dy   = get_value('ptc_twiss ','dy ')
-      dpy  = get_value('ptc_twiss ','dpy ')
-      mux  = get_value('ptc_twiss ','mux ')
-      muy  = get_value('ptc_twiss ','muy ')
-      muz  = get_value('ptc_twiss ','muz ')
-
-
-      x(:)=zero
-      x(1)=get_value('ptc_twiss ','x ')
-      x(2)=get_value('ptc_twiss ','px ')
-      x(3)=get_value('ptc_twiss ','y ')
-      x(4)=get_value('ptc_twiss ','py ')
-      x(5)=get_value('ptc_twiss ','t ')
-      x(6)=get_value('ptc_twiss ','pt ')
-
-
-      inval = get_option('twiss_inval ')
-      if( (inval.eq.1) .and. (getdebug() > 1)) then
-         print*," Read BETA0 block in module ptc_twiss"
-      endif
-
-
-      if(mux.eq.zero.or.fraction(mux).eq.zero) mux=mux_default
-      if(muy.eq.zero.or.fraction(muy).eq.zero) muy=muy_default
-      re(1,1) = cos(twopi*mux)+alfx*sin(twopi*mux)
-      re(1,2) = betx*sin(twopi*mux)
-      re(1,3) = zero
-      re(1,4) = zero
-      re(1,5) = (one-re(1,1))*dx-re(1,2)*dpx
-      re(1,6) = zero
-      re(2,1) = -(one+alfx**2)*sin(twopi*mux)/betx
-      re(2,2) = cos(twopi*mux)-alfx*sin(twopi*mux)
-      re(2,3) = zero
-      re(2,4) = zero
-      re(2,5) = -re(2,1)*dx+(1-re(2,2))*dpx
-      re(2,6) = zero
-      re(3,1) = zero
-      re(3,2) = zero
-      re(3,3) = cos(twopi*muy)+alfy*sin(twopi*muy)
-      re(3,4) = bety*sin(twopi*muy)
-      re(3,5) = (1-re(3,3))*dy-re(3,4)*dpy
-      re(3,6) = zero
-      re(4,1) = zero
-      re(4,2) = zero
-      re(4,3) = -(1+alfy**2)*sin(twopi*muy)/bety
-      re(4,4) = cos(twopi*muy)-alfy*sin(twopi*muy)
-      re(4,5) = -re(4,3)*dy+(1-re(4,4))*dpy
-      re(4,6) = zero
-      re(5,1) = zero
-      re(5,2) = zero
-      re(5,3) = zero
-      re(5,4) = zero
-      re(5,5) = one
-      re(5,6) = zero
-      re(6,1) = zero
-      re(6,2) = zero
-      re(6,3) = zero
-      re(6,4) = zero
-      re(6,5) = zero
-      re(6,6) = one
-
-
-      betz_flg = .false.
-      if (icase .eq. 6) then
-         if (betz .le. 0) then
-            call fort_warn("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0!")
-            stop
-         else
-            betz_flg = .true.
-         endif
-      endif
-
-      if(betz_flg) then
-         betz = get_value('ptc_twiss ','betz ')
-         alfz = get_value('ptc_twiss ','alfz ')
-         muz  = get_value('ptc_twiss ','muz ')
-         if(muz.eq.zero.or.fraction(muz).eq.zero) muz=muz_default
-         re(1,5) = zero
-         re(2,5) = zero
-         re(3,5) = zero
-         re(4,5) = zero
-         re(6,6) = cos(twopi*muz)+alfz*sin(twopi*muz)
-         re(6,5) = betz*sin(twopi*muz)
-         re(5,6) = -(1+alfz**2)*sin(twopi*muz)/betz
-         re(5,5) = cos(twopi*muz)-alfz*sin(twopi*muz)
-
-      endif
-
-      call liepeek(iia,icoast)
-      if (getdebug() > 1) then
-         write (6,'(2x,8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
-         write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
-         print*, "c_%npara is ", c_%npara
-      endif
-
-
-      allocate(j(c_%npara))
-      j(:)=0
-      do i = 1,c_%npara
-         do ii = 1,c_%npara
-            j(ii)=1
-            r=re(i,ii)-(y(i)%T.sub.j)
-            y(i)%T=y(i)%T+(r.mono.j)
-            j(ii)=0
-         enddo
-      enddo
-      deallocate(j)
-
-      if ( getdebug() > 2) then
-         print*," Read the following BETA0 block in module ptc_twiss"
-         print*," R matrix (PTC notation):"
-         write (6,'(6f8.4)') re(1,1),re(1,2),re(1,3),re(1,4),re(1,5),re(1,6)
-         write (6,'(6f8.4)') re(2,1),re(2,2),re(2,3),re(2,4),re(2,5),re(2,6)
-         write (6,'(6f8.4)') re(3,1),re(3,2),re(3,3),re(3,4),re(3,5),re(3,6)
-         write (6,'(6f8.4)') re(4,1),re(4,2),re(4,3),re(4,4),re(4,5),re(4,6)
-         write (6,'(6f8.4)') re(5,1),re(5,2),re(5,3),re(5,4),re(5,5),re(5,6)
-         write (6,'(6f8.4)') re(6,1),re(6,2),re(6,3),re(6,4),re(6,5),re(6,6)
-
-         print*," Twiss parameters:"
-         write (6,'(6a8)')   "betx","alfx","bety","alfy","betz","alfz"
-         write (6,'(6f8.4)')  betx,  alfx,  bety,  alfy,  betz,  alfz
-         write (6,'(4a8)')   "dx","dpx","dy","dpy"
-         write (6,'(4f8.4)')  dx,dpx,dy,dpy
-         write (6,'(3a8)')   "mux","muy","muz"
-         write (6,'(3f8.4)')  mux , muy , muz
-
-         print*," Track:"
-         write(6,'(6f8.4)') x
-
-      endif
-
-      !Check if the input parameters does make any sense
-      call eig6(re,reval,aieval,revec,aievec)
-
-      do i=1,iia(4)-icoast(2)
-         if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
-            call fort_warn("ptc_twiss","Fatal Error: Eigenvalues off the unit circle!")
-            stop
-         endif
-      enddo
-
-
-    end subroutine readinitialtwiss
-
-  END subroutine ptc_twiss
-  !_________________________________________________________________
 
 
   FUNCTION double_from_ptc(var, column)
@@ -2318,7 +1653,7 @@ CONTAINS
     integer :: row_haml(101)
     integer :: index1(1000,2)
     real(kind(1d0)) get_value,val_ptc
-    character(len = 4) name_var
+    character(len = 5) name_var
     !------------------------------------------------------------------------------
 
     if(universe.le.0) then
@@ -2353,8 +1688,10 @@ CONTAINS
     endif
 
     no = get_value('ptc_normal ','no ')
-
+    
     call init(default,no,nda,BERZ,mynd2,npara)
+
+
     call alloc(y)
     y=npara
     Y=X
@@ -2379,8 +1716,9 @@ CONTAINS
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
-       call makemaptable(y)
+      call makemaptable(y)
     endif
+
 
     normal = get_value('ptc_normal ','normal ') .ne. 0
     if(normal) then
@@ -2391,17 +1729,22 @@ CONTAINS
        n_rows = select_ptc_idx()
        n_haml = 0
        n_gnfu = 0
+
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
-             k = string_from_table("normal_results ", "name ", row, name_var)
+             k = string_from_table('normal_results ', 'name ', row, name_var)
+             
              if (name_var .eq. 'gnfu') n_gnfu = n_gnfu + 1
              if (name_var .eq. 'haml') then
                 n_haml = n_haml + 1
                 row_haml(n_haml) = row
              endif
-          enddo
+         enddo
+
+
           if (n_gnfu > 0) call alloc(pbrg)
+
           if (n_haml > 0) then
              call alloc(pbrh)
              do j1 =1,n_haml
@@ -2428,7 +1771,7 @@ CONTAINS
                    starti = 2
                 endif
                 !============ nres is the number of resonances to be set
-
+ 
                 if (mynres .ge. starti) then
                    do i = starti,mynres
                       ii = row + 3*(i-1)
@@ -2457,8 +1800,10 @@ CONTAINS
              enddo
              n%nres = nres
           endif
+          
        endif
        !------------------------------------------------------------------------
+
 
        n=y
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -2474,14 +1819,14 @@ CONTAINS
 
        !------ get values and store them in the table 'normal_results' ---------
 
+
        n_rows = select_ptc_idx()
-       if (no .ne. minimum_acceptable_order()) then
-          print *,"The minimum required order is ",minimum_acceptable_order(), &
-               "while the 'no' attribute in the command ptc_normal is ",no
-       endif
        if (no < minimum_acceptable_order()) then
-          print *,"ptc_normal failed. MAD-X continues."
-          stop
+         print*, "minimum acceptable order: ", minimum_acceptable_order()
+         call seterrorflag(11,"ptc_normal ","Order of calculation is not sufficient to calculate required parameters")
+         call fort_warn('ptc_normal: ',&
+                  'Order of calculation (parameter no) is not sufficient to calculate required parameters')
+         return
        endif
 
        if (n_rows > 0) then
@@ -2613,9 +1958,9 @@ CONTAINS
        return
     endif
 
-    !    call killparresult()
+!    call killparresult() 
     call resetknobs()  !remove the knobs
-
+    
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
@@ -2626,214 +1971,6 @@ CONTAINS
     firsttime_coef=.true.
   end subroutine ptc_end
 
-  !________________________________________________________________________________
-
-  subroutine zerotwiss(s1,i)
-    implicit none
-    type(twiss), intent(inout)::s1
-    integer, intent(in)::i
-
-    if(i==0) then
-
-       call liepeek(iia,icoast)
-       NO=iia(1)
-       ND=iia(3)
-       ND2=iia(3)*2
-       NP=iia(2)-nd2
-       NDPT=icoast(4)
-       NV=iia(2)
-
-       s1%a1=1
-       s1%a_t=1
-       s1%nf=.false.
-       s1%beta(:,:)=zero
-       s1%alfa(:,:)=zero
-       s1%gama(:,:)=zero
-       s1%mu(:)=zero
-       s1%disp(:)=zero
-       s1%tune(:)=zero
-       s1%eigen(:,:)=zero
-       dicu(:)=zero
-       angp(:,:)=zero
-    endif
-
-  end subroutine zerotwiss
-
-  !________________________________________________________________________________
-
-  subroutine equaltwiss(s1,s2)
-    implicit none
-    type(twiss), intent(inout)::s1
-    type(real_8), intent(in)::s2(ndd)
-    integer i,j,j1,ii,ii1,ii2,iii,i2,i3,i1,ei2
-    integer ind(6)
-    real(dp) au(6,6),aui(2),sx,cx,dphi(3)
-    character(len=nd2), dimension(:), pointer :: string
-
-    icount=icount+1
-    if(nd2.eq.4) string=>str4
-    if(nd2.eq.6) string=>str6
-    if(s2(1)%kind.eq.2) then
-
-       if(.not.s1%nf) then
-          s1%nf=.true.
-          do i=1,nd2
-
-             s1%junk%v(i)=s2(i)
-          enddo
-          s1%n=s1%junk
-          s1%a1=s1%n%a1
-          s1%a_t=s1%n%a_t
-          s1%tune(:)=s1%n%tune(:)
-          s1%junk=s1%n%a_t
-          do i=1,nd2
-             dicu(i)=s1%n%a1%v(i).sub.str5(5)
-          enddo
-       else
-          do i=1,nd2
-             s1%junk%v(i)=s2(i)
-          enddo
-          s1%junk=s1%junk*s1%a_t
-       endif
-    else
-       print*,'A Taylor Map is needed as input for the Twiss calculation'
-       return
-    endif
-
-
-
-    if(nd2.eq.4.and.np.ge.1) then
-       do i=1,nd2
-          do j=1,nd2
-             rdd(i,j)=s2(i).sub.str5(j)
-          enddo
-          rdd(i,5)=s2(i).sub.str5(5)
-       enddo
-       do j1=1,2
-          ii=2*j1
-
-          iii=2*j1-1
-          s1%disp(iii)=rdd(ii-1,1)*dicu(1)+rdd(ii-1,2)*dicu(2)+rdd(ii-1,3)*dicu(3)+rdd(ii-1,4)*dicu(4)+rdd(ii-1,5)
-          s1%disp(ii)=rdd(ii,1)*dicu(1)+rdd(ii,2)*dicu(2)+rdd(ii,3)*dicu(3)+rdd(ii,4)*dicu(4)+rdd(ii,5)
-       enddo
-    endif
-
-    if(nd.eq.3) then
-       s1%junk1=s1%junk**(-1)
-    endif
-    ind(:)=0
-    do j=1,nd
-       ii=2*j
-       ii1=ii-1
-       ii2=ii
-       if(j.eq.1) then
-          i2=4
-          i3=6
-       elseif(j.eq.2) then
-          i2=2
-          i3=6
-       elseif(j.eq.3) then
-          i2=2
-          i3=4
-          ii1=ii
-          ii2=ii-1
-       endif
-
-       do ei2=1,nd2
-          ind(ei2)=1
-          s1%eigen(ii1,ei2)=s1%junk%V(ii1).sub.ind
-          s1%eigen(ii,ei2)=s1%junk%V(ii).sub.ind
-          ind(ei2)=0
-       enddo
-
-       angp(1,ii-1)=s1%junk%v(ii1).sub.string(ii-1)
-       au(ii,ii-1)=s1%junk%v(ii2).sub.string(ii-1)
-       angp(1,ii)=s1%junk%v(ii1).sub.string(ii)
-
-       au(ii,ii)=s1%junk%v(ii2).sub.string(ii)
-       au(i2-1,i2-1)=s1%junk%v(ii1).sub.string(i2-1)
-       au(i2,i2-1)=s1%junk%v(ii2).sub.string(i2-1)
-       au(i2-1,i2)=s1%junk%v(ii1).sub.string(i2)
-       au(i2,i2)=s1%junk%v(ii2).sub.string(i2)
-
-       s1%beta(1,j)=angp(1,ii-1)*angp(1,ii-1)+angp(1,ii)*angp(1,ii)
-       s1%beta(2,j)=au(i2-1,i2-1)*au(i2-1,i2-1)+au(i2-1,i2)*au(i2-1,i2)
-       s1%alfa(1,j)=-(angp(1,ii-1)*au(ii,ii-1)+angp(1,ii)*au(ii,ii))
-       s1%alfa(2,j)=-(au(i2-1,i2-1)*au(i2,i2-1)+au(i2-1,i2)*au(i2,i2))
-       s1%gama(1,j)=au(ii,ii-1)*au(ii,ii-1)+au(ii,ii)*au(ii,ii)
-       s1%gama(2,j)=au(i2,i2-1)*au(i2,i2-1)+au(i2,i2)*au(i2,i2)
-       if(nd.eq.3) then
-          au(i3-1,i3-1)=s1%junk%v(ii1).sub.string(i3-1)
-          au(i3,i3-1)=s1%junk%v(ii2).sub.string(i3-1)
-          au(i3-1,i3)=s1%junk%v(ii1).sub.string(i3)
-          au(i3,i3)=s1%junk%v(ii2).sub.string(i3)
-          s1%beta(3,j)=au(i3-1,i3-1)*au(i3-1,i3-1)+au(i3-1,i3)*au(i3-1,i3)
-          s1%alfa(3,j)=-(au(i3-1,i3-1)*au(i3,i3-1)+au(i3-1,i3)*au(i3,i3))
-          s1%gama(3,j)=au(i3,i3-1)*au(i3,i3-1)+au(i3,i3)*au(i3,i3)
-          aui(1)=s1%junk1%v(6).sub.string(6)
-          aui(2)=s1%junk1%v(5).sub.string(6)
-          if(j.lt.3) then
-             s1%disp(ii-1)=au(i3-1,i3-1)*aui(1)+au(i3-1,i3)*aui(2)
-             s1%disp(ii)  =au(i3  ,i3-1)*aui(1)+au(i3,i3)  *aui(2)
-          else
-             s1%disp(5)=angp(1,ii-1)*aui(1)+angp(1,ii)*aui(2)
-             s1%disp(6)=au(ii,ii-1)*aui(1) +au(ii,ii)*aui(2)
-          endif
-       endif
-
-       sx=angp(2,ii-1)*angp(1,ii)-angp(1,ii-1)*angp(2,ii)
-       cx=angp(1,ii-1)*angp(2,ii-1)+angp(1,ii)*angp(2,ii)
-       if(abs(sx).gt.c_1d_15.or.abs(cx).gt.c_1d_15) then
-          dphi(j)=atan2(sx,cx)*twopii
-       else
-          dphi(j)=zero
-       endif
-       s1%mu(j)=s1%mu(j)+dphi(j)
-    enddo
-    if(icount.gt.1) then
-       do i=1,ndim2
-          angp(2,i)=angp(1,i)
-       enddo
-    endif
-
-  end subroutine equaltwiss
-  !_________________________________________________________________
-
-  subroutine  alloctwiss(s1)
-    implicit none
-    type (twiss),intent(inout)::s1
-
-    call alloc(s1%a1)
-    call alloc(s1%a_t)
-    call alloc(s1%n)
-    call alloc(s1%junk)
-    call alloc(s1%junk1)
-
-    s1=0
-  end subroutine alloctwiss
-  !_________________________________________________________________
-
-  subroutine  killtwiss(s1)
-    implicit none
-    type (twiss),intent(inout)::s1
-
-    call kill(s1%a1)
-    call kill(s1%a_t)
-    call kill(s1%n)
-    call kill(s1%junk)
-    call kill(s1%junk1)
-
-    s1%nf=.false.
-    s1%beta(:,:)=zero
-    s1%alfa(:,:)=zero
-    s1%gama(:,:)=zero
-    s1%mu(:)=zero
-    s1%disp(:)=zero
-    s1%tune(:)=zero
-    s1%eigen(:,:)=zero
-
-  end subroutine killtwiss
-  !_________________________________________________________________
 
   subroutine normalform_normalform(s1,s2)
     implicit none
@@ -3010,6 +2147,11 @@ CONTAINS
        default=default+delta0
        deltap=deltap0
        i=5
+    CASE(56)
+       if (getdebug()>1) print*, "my_state: Enforcing coasting beam"
+       default=default+NOCAVITY0
+       deltap=deltap0
+       i=56
     CASE(6)
        i=6
     CASE DEFAULT
@@ -3018,10 +2160,10 @@ CONTAINS
     END SELECT
 
     if (i==6) then
-       if ( (icav==0) .and. (getenforce6D() .eqv. .false.)) then
+       if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
           default=default + only_4d0 + NOCAVITY0
-          call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 4')
-          i=4
+          call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
+          i=56
        else
           default = default - delta0 - only_4d0 - NOCAVITY0 !enforcing nocavity to false
        endif
@@ -3112,7 +2254,7 @@ CONTAINS
 
   END SUBROUTINE Convert_dp_to_dt
   !=============================================================================
-
+  
   subroutine makemaptable(y)
     implicit none
     type(real_8):: y(6)
@@ -3120,38 +2262,20 @@ CONTAINS
     integer           :: map_term, ja(6),i,ii,iii
     real(dp)          :: coef
     real(kind(1d0))   :: map_coor(i_map_coor)
+!    type(universal_taylor) :: ut
 
-
-    map_term=42
-    call  make_map_table(map_term)
-    call liepeek(iia,icoast)
-    allocate(j(c_%npara))
-    ja(:)    = 0
-    j(:)     = 0
-    do iii=1,c_%npara
-       coef = y(iii)%T.sub.j
-       map_coor(1)=coef
-       map_coor(2)=iii
-       map_coor(3)=c_%npara
-       map_coor(4)=0
-       map_coor(5)=ja(1)
-       map_coor(6)=ja(2)
-       map_coor(7)=ja(3)
-       map_coor(8)=ja(4)
-       map_coor(9)=ja(5)
-       map_coor(10)=ja(6)
-       call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-       call augment_count("map_table ")
-    enddo
-    do i = 1,c_%npara
-       do ii = 1,c_%npara
-          j(ii) = 1
-          ja(ii) = j(ii)
-          coef = y(i)%T.sub.j
+       map_term=42
+       call  make_map_table(map_term)
+       call liepeek(iia,icoast)
+       allocate(j(c_%npara))
+       ja(:)    = 0
+       j(:)     = 0
+       do iii=1,c_%npara
+          coef = y(iii)%T.sub.j
           map_coor(1)=coef
-          map_coor(2)=i
-          map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
-          map_coor(4)=no
+          map_coor(2)=iii
+          map_coor(3)=c_%npara
+          map_coor(4)=0
           map_coor(5)=ja(1)
           map_coor(6)=ja(2)
           map_coor(7)=ja(3)
@@ -3160,11 +2284,48 @@ CONTAINS
           map_coor(10)=ja(6)
           call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
           call augment_count("map_table ")
-          j(:)  = 0
-          ja(ii) = j(ii)
        enddo
-    enddo
-    deallocate(j)
+       
+       do i = 1,c_%npara
+          
+          do ii = 1,c_%npara
+             j(ii) = 1
+             ja(ii) = j(ii)
+             coef = y(i)%T.sub.j
+             map_coor(1)=coef
+             map_coor(2)=i
+             map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
+             map_coor(4)=sum(ja(:))
+             map_coor(5)=ja(1)
+             map_coor(6)=ja(2)
+             map_coor(7)=ja(3)
+             map_coor(8)=ja(4)
+             map_coor(9)=ja(5)
+             map_coor(10)=ja(6)
+             call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+             call augment_count("map_table ")
+             j(:)  = 0
+             ja(ii) = j(ii)
+          enddo
+
+!           ut = y(i)
+!           do ii = 1,ut%n
+!              map_coor(1)=ut%c(ii) !coef
+!              map_coor(2)=i !index of taylor
+!              map_coor(3)=c_%npara
+!              map_coor(4)=sum(ut%j(i,:)) !order
+!              map_coor(5)=ut%j(ii,1)
+!              map_coor(6)=ut%j(ii,2)
+!              map_coor(7)=ut%j(ii,3)
+!              map_coor(8)=ut%j(ii,4)
+!              map_coor(9)=ut%j(ii,5)
+!              map_coor(10)=ut%j(ii,6)
+!           enddo
+        
+
+       enddo
+       
+       deallocate(j)
 
 
 

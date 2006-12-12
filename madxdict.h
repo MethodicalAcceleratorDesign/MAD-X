@@ -378,6 +378,10 @@ char command_def[] =
 "ddy      = [r, 0], ddpy     = [r, 0], "
 "t        = [r, 0], pt       = [r, 0], "
 "table    = [s, none, twiss], "
+"moments   = [s, none, moments], " /*stores in the table with specified name  */
+"xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
+"ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
+"zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
 "amatrixfilename = [s, {none}] ; "
 " "
 "ptc_select: ptc_select none 0 0 "
@@ -387,13 +391,24 @@ char command_def[] =
 "monomial   = [s, none] , "/*defines the monomial that coefficient will be sent to table */
 "parametric = [l, false, true], "/*Tells if the result should be stored in a parametric form if knobs are present*/
 /*"place    = [s, none], "*/
-"quantity   = [s, none] ; "
+"quantity   = [s, {none}] ; "
+" "
+"ptc_select_moment: ptc_select_moment none 0 0 "
+"table      = [s, moments, none], "
+"column     = [s, none, none], "
+"parametric = [l, false, true], "/*Tells if the result should be stored in a parametric form if knobs are present*/
+/*"place    = [s, none], "*/
+"moment_s   = [s, {none}], "
+"moment     = [i, {0}], "
+"quantity   = [s, {none}] ; "
 " "
 "ptc_knob: ptc_knob none 0 0 "
+"initial = [s, none] , "/* */
 "element = [s, none] , "/* */
 "kn    = [i, {-1}], "
 "ks    = [i, {-1}], "
 "exactmatch = [l, true, true], "
+"trustrange    = [r, 0.1], " /*used in matching only -  defines the range the expansion is trusted*/
 "step     = [r, 0.0], " /*used in matching only*/
 "lower    = [r, -1.e20], " /*used in matching only*/
 "upper    = [r,  1.e20]; "/*used in matching only*/
@@ -452,6 +467,13 @@ char command_def[] =
 "energy   = [r, 0], "
 "file     = [s, none, ptc_twiss], "
 "table    = [s, none, ptc_twiss], "
+"moments  = [s, none, moments], " /*stores in the table with specified name  */
+"xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
+"ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
+"zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
+"deltapreadsize= [r, 0], " /*size on delta */
+"bunchlegngth= [r, 0], " /*size in Z/T*/
+"initial_moments_manual= [l, false, true], " /*name of the table containing moments, 21 in case of 3DGauss, or 10 in fully coupled */
 "deltap = [r, 0], "
 "range    = [s, #s/#e, none], "
 "icase = [i, 4], "
@@ -459,8 +481,9 @@ char command_def[] =
 "time = [l, false, true], "
 "no = [i, 1], "
 "closed_orbit = [l, false, true], "
-"initial_matrix_table = [l,false,true], "
-"initial_matrix_manual = [l,false,true], "
+"initial_matrix_table = [l, false, true], "
+"initial_matrix_manual = [l, false, true], "
+"initial_ascript_manual = [l, false, true], "
 "re11     = [r, 1], re12     = [r, 0], re13     = [r, 0], "
 "re14     = [r, 0], re15     = [r, 0], re16     = [r, 0], "
 "re21     = [r, 0], re22     = [r, 1], re23     = [r, 0], "
@@ -511,7 +534,9 @@ char command_def[] =
 "onetable = [l, false, true]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_dumpmaps: ptc_dumpmaps none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/
-"file     = [s, ptcmaps, ptcmaps]; "
+"range    = [s,  #s/#e], "
+"frombegin     = [s, ptcmaps, ptcmaps], "
+"file     = [s, ptcmap, ptcmaps]; "
 " "
 "ptc_track_shape: ptc_track_shape none 0 0 "
 "debug = [i, 0, 1]; "
@@ -1954,8 +1979,7 @@ char command_def[] =
 "random   = [r, 0.0], "
 "repeat   = [r, 1], "
 "bisec   = [i, 1], "
-"strategy = [i, 3], "
-"cond = [r, 1E-8]; "
+"strategy = [i, 3]; "
 " "
 "rmatrix: match match 0 0 "
 "range    = [s, #s/#e, none], "

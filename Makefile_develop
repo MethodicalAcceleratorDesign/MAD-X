@@ -235,7 +235,14 @@ madx_ptc_knobs.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
 madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
 	$(f95) $(f95_FLAGS) madx_ptc_eplacement.f90
 
+madx_ptc_twiss.o: madx_ptc_module.o  madx_ptc_setcavs.o  madx_ptc_distrib.o madx_ptc_knobs.o madx_ptc_twiss.f90
+	$(f95) $(f95_FLAGS) madx_ptc_twiss.f90
+	
+madx_ptc_distrib.o: Sp_keywords.o madx_ptc_distrib.f90
+	$(f95) $(f95_FLAGS) madx_ptc_distrib.f90
+	
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
+	madx_ptc_twiss.o            madx_ptc_distrib.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_eplacement.o madx_ptc_knobs.o \
 	madx_ptc_script.o pointers.o \
@@ -303,7 +310,7 @@ madxp: \
 	Sn_mad_like.o So_fitting.o Sp_keywords.o Spb_fake_gino_sub.o \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
-	madx_ptc_script.o \
+	madx_ptc_script.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o pointers.o 
 	$(f95) $(LDOPT) -o madxp madx_main.o run_madx.o madxpf.o matchptcknobs.o twiss.o \
@@ -321,7 +328,7 @@ madxp: \
 	Sn_mad_like.o So_fitting.o Sp_keywords.o Spb_fake_gino_sub.o \
 	madx_ptc_module.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
-	madx_ptc_script.o \
+	madx_ptc_script.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o pointers.o \
 	$(LIBX) -lm -lc

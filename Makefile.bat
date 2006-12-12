@@ -1,13 +1,13 @@
 REM User Input - you may need to change the following folder locations
 REM This is for the case where WinCVS checks out to F:\MAD\MADXLahey\source
 REM
-SET user_main=F:\MAD\MADXLahey\source\madX
+SET user_main=D:\programs\madxpiotr1212
 REM FPP code
-SET FPP=F:\MAD\MADXLahey\source\madX
+SET FPP=D:\programs\madxpiotr1212
 REM PTC code
-SET PTC=F:\MAD\MADXLahey\source\madX
+SET PTC=D:\programs\madxpiotr1212
 REM MAD-X proper code
-SET MADX=F:\MAD\MADXLahey\source\madX
+SET MADX=D:\programs\madxpiotr1212
 
 set INCLUDE=C:\PROGRA~1\Microsoft Visual Studio\VC98\Include
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %MADX%\madxp.c
@@ -64,9 +64,11 @@ lf95 -c -o1 -tp %FPP%\Sn_mad_like.f90
 lf95 -c -o1 -tp %FPP%\So_fitting.f90
 lf95 -c -o1 -tp %FPP%\Sp_keywords.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_intstate.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_distrib.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_setcavs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_knobs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_module.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_twiss.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_script.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_trackcavs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_track_run.f90
@@ -79,7 +81,7 @@ lf95 -c -o1 -tp %MADX%\timest.f90
 lf95 -c -o1 -tp %MADX%\timex.f90
 lf95 -c -o1 -tp %MADX%\run_madx.f90
 lf95 -c -o1 -tp %MADX%\madx_main.f90
-lf95 -out %user_main%\madx madxm.obj madxp.obj matchptcknobs.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchlib.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
-lf95 -out %user_main%\madxp madx_main.obj run_madx.obj madxp.obj matchptcknobs.obj rplot.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchlib.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_sagan_pol_arbitrary.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_sagan_wiggler.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sma_multiparticle.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj madx_ptc_module.obj madx_ptc_track_run.obj madx_ptc_intstate.obj madx_ptc_script.obj madx_ptc_setcavs.obj madx_ptc_eplacement.obj madx_ptc_knobs.obj madx_ptc_trackcavs.obj user2_photon.obj poisson.obj wrap.obj pointers.obj Spb_fake_gino_sub.obj timest.obj timex.obj
+lf95 -out %user_main%\madx madxm.obj madxp.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchlib.obj matchsa.obj matchptcknobs.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj ptc_dummy.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj timest.obj timex.obj
+lf95 -out %user_main%\madxp madx_main.obj run_madx.obj madxp.obj matchptcknobs.obj rplot.obj dynap.obj emit.obj twiss.obj match.obj matchjc.obj matchlib.obj matchsa.obj touschek.obj survey.obj trrun.obj util.obj orbf.obj ibsdb.obj resindex.obj plot.obj sodd.obj gxx11ps.obj gxx11psc.obj a_scratch_size.obj b_da_arrays_all.obj c_dabnew.obj d_lielib.obj h_definition.obj i_tpsa.obj j_tpsalie.obj k_tpsalie_analysis.obj l_complex_taylor.obj m_real_polymorph.obj n_complex_polymorph.obj o_tree_element.obj Sa_extend_poly.obj Sb_sagan_pol_arbitrary.obj Sc_euclidean.obj Sd_frame.obj Se_status.obj Sf_def_all_kinds.obj Sg_sagan_wiggler.obj Sh_def_kind.obj Si_def_element.obj Sj_elements.obj Sk_link_list.obj Sl_family.obj Sm_tracking.obj Sma_multiparticle.obj Sn_mad_like.obj So_fitting.obj Sp_keywords.obj madx_ptc_module.obj madx_ptc_twiss.obj madx_ptc_track_run.obj madx_ptc_intstate.obj madx_ptc_script.obj madx_ptc_setcavs.obj madx_ptc_eplacement.obj madx_ptc_knobs.obj madx_ptc_trackcavs.obj madx_ptc_distrib.obj user2_photon.obj poisson.obj wrap.obj Spb_fake_gino_sub.obj pointers.obj timest.obj timex.obj
 cl -c /Zm1000 -D_CATCH_MEM_W -D_WIN32 %MADX%\madxp.c
 lf95 -out %user_main%\mpars madxm.obj madxp.obj

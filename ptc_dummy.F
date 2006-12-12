@@ -33,13 +33,16 @@
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end
-
       subroutine w_ptc_normal()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end
-
+      subroutine w_ptc_initmoments()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
       subroutine w_ptc_trackline()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
@@ -139,6 +142,41 @@
       end
 
       subroutine  w_ptc_addknob()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
+      subroutine w_ptc_addmoment(x,px,y,py,dp,t,                        &
+     &                         tableIA,columnIA,parametric )
+      implicit none
+      integer               :: x,px,y,py,dp,t
+      integer               :: columnIA(*)
+      integer               :: tableIA(*)
+      integer               :: parametric
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
+      integer function w_ptc_getnmoments()
+      implicit none
+C     Implemented in madx_ptc_distrib.f90
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      w_ptc_getnmoments = -1
+      end
+
+      subroutine  w_ptc_getmomentstabcol(n, tabn, coln)
+      implicit none
+C     Implemented in madx_ptc_distrib.f90
+      integer              :: n
+      character(20)        :: tabn
+      character(17)        :: coln
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
+      subroutine  w_ptc_addknob_i()
       implicit none
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')

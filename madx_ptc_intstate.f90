@@ -118,7 +118,6 @@ contains
   subroutine setenforce6D(flag)
     implicit none
     integer     :: flag
-
     if (flag == 0) then
        if (getdebug() > 1) print *, "Switching off ENFORCE6D"
        enforce6D = .false.
@@ -132,7 +131,10 @@ contains
 
   logical(lp) function getenforce6D()
     implicit none
+
     getenforce6D = enforce6D
+    print *, getenforce6D
+
   end function getenforce6D
 
   !____________________________________________________________________________________________

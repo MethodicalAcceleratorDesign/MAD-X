@@ -4,7 +4,7 @@
 #
 #######################################################################
 
-PLUGIN_SUPPORT=NO
+PLUGIN_SUPPORT=YES
 
 # compilers
 CC=gcc
@@ -137,7 +137,7 @@ Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
 Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
-madx_ptc_module.o: Sp_keywords.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90 
+madx_ptc_module.o: Sp_keywords.o madx_ptc_knobs.o madx_ptc_setcavs.o madx_ptc_module.f90 
 madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
@@ -145,7 +145,11 @@ madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
 madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
 madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
 madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
+madx_ptc_twiss.o: madx_ptc_module.o  madx_ptc_setcavs.o  madx_ptc_distrib.o madx_ptc_knobs.o madx_ptc_twiss.f90
+madx_ptc_distrib.o: Sp_keywords.o madx_ptc_distrib.f90
+
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
+	madx_ptc_twiss.o          madx_ptc_distrib.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_knobs.o \
 	madx_ptc_script.o pointers.o \
@@ -155,7 +159,7 @@ pointers.o: Sp_keywords.o madx_ptc_module.o pointers.f90
 Spb_fake_gino_sub.o: pointers.o Spb_fake_gino_sub.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
-
+Sq_orbit_ptc.o:  madx_ptc_module.o Sq_orbit_ptc.f90
 # implicit rule to compile with C
 %.o : %.c
 	$(CC) $(GCCP_FLAGS) -c -o $(@) $<

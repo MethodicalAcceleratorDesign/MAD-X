@@ -26,6 +26,7 @@
 #define frndm                 frndm_
 #define madx                  madx_
 #define madx_init             madx_init_
+#define madx_start            madx_start_
 #define f_ctof                f_ctof_
 #define get_disp0             get_disp0_
 #define get_node_vector       get_node_vector_
@@ -82,12 +83,17 @@
 #define w_ptc_normal            w_ptc_normal_
 #define w_ptc_track             w_ptc_track_
 #define w_ptc_start             w_ptc_start_
+#define w_ptc_initmoments       w_ptc_initmoments_
 #define w_ptc_select            w_ptc_select_
 #define w_ptc_writeparresults   w_ptc_writeparresults_
 #define w_ptc_printframes       w_ptc_printframes_
 #define w_ptc_printlayout_rootm w_ptc_printlayout_rootm_
 #define w_ptc_eplacement        w_ptc_eplacement_
 #define w_ptc_addknob           w_ptc_addknob_
+#define w_ptc_addknob_i         w_ptc_addknob_i_
+#define w_ptc_addmoment         w_ptc_addmoment_
+#define w_ptc_getnmoments       w_ptc_getnmoments_
+#define w_ptc_getmomentstabcol  w_ptc_getmomentstabcol_
 #define w_ptc_setknobvalue      w_ptc_setknobvalue_
 #define w_ptc_setfieldcomp      w_ptc_setfieldcomp_
 #define w_ptc_rviewer           w_ptc_rviewer_
@@ -118,8 +124,9 @@
 #define result_from_normal      result_from_normal_ /* ETDA 11 nov 2004 */
 #define make_map_table          make_map_table_ /* KZ 28.06.2005 table for maps */
 #define minimum_acceptable_order minimum_acceptable_order_ /* ETDA 17 nov 2004 */
-
 #define augmentfwarn            augmentfwarn_
+
+#define makemomentstables  makemomentstables_
 
 
 #define type_ofCall
@@ -155,6 +162,7 @@
 #define frndm                 FRNDM
 #define madx                  MADX
 #define madx_init             MADX_INIT
+#define madx_start            MADX_START
 #define f_ctof                F_CTOF
 #define get_disp0             GET_DISP0
 #define get_node_vector       GET_NODE_VECTOR
@@ -210,12 +218,16 @@
 #define w_ptc_normal            W_PTC_NORMAL
 #define w_ptc_track             W_PTC_TRACK
 #define w_ptc_start             W_PTC_START
+#define w_ptc_initmoments       W_PTC_INITMOMENTS
 #define w_ptc_select            W_PTC_SELECT
 #define w_ptc_writeparresults   W_PTC_WRITEPARRESULTS
 #define w_ptc_printframes       W_PTC_PRINTFRAMES
 #define w_ptc_printlayout_rootm W_PTC_PRINTLAYOUT_ROOTM
 #define w_ptc_eplacement        W_PTC_EPLACEMENT
 #define w_ptc_addknob           W_PTC_ADDKNOB
+#define w_ptc_addmoment         W_PTC_ADDMOMENT
+#define w_ptc_getnmoments       W_PTC_GETNMOMENTS
+#define w_ptc_getmomentstabcol  W_PTC_GETMOMENTSTABCOL
 #define w_ptc_setknobvalue      W_PTC_SETKNOBVALUE
 #define w_ptc_setfieldcomp      W_PTC_SETFIELDCOMP
 #define w_ptc_rviewer           W_PTC_RVIEWER
@@ -754,6 +766,7 @@ void pro_survey(struct in_cmd*);
 void pro_track(struct in_cmd*);
 void pro_twiss();
 void pro_ptc_twiss();
+void make_momentstable(char* momentstablename, int no);
 void pro_ptc_track(struct in_cmd*);
 void pro_ptc_trackline(struct in_cmd*);
 int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);
@@ -865,6 +878,7 @@ void w_ptc_normal();
 void w_ptc_track();
 void w_ptc_start();
 void w_ptc_end();
+void w_ptc_initmoments();
 void w_ptc_dumpmaps();
 void w_ptc_trackline(int* nobspoints);
 void w_ptc_twiss_linac(int* tabname);
@@ -877,6 +891,10 @@ void w_ptc_settotalpath(int* boolflag);
 void w_ptc_settime(int* boolflag);
 void w_ptc_setnocavity(int* boolflag);
 void w_ptc_addknob(int* fibrename);
+void w_ptc_addknob_i(int* iniparmetername);
+void w_ptc_addmoment(int* xi, int* pxi, int* yi, int* pyi, int* dpi, int* ti, int* tabn, int* coln, int* pm);
+int  w_ptc_getnmoments();
+void w_ptc_getmomentstabcol(int* n, char* tabname, char* colname );
 void w_ptc_setknobvalue(int* fibrename);
 void w_ptc_setfieldcomp(int* fibreidx);
 void w_ptc_rviewer();
@@ -889,6 +907,8 @@ void w_ptc_open_gino(int* scriptname);
 void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
 void w_ptc_enforce6d(int* flag);
 const char* getcurrentelementname();
+
+int makemomentstables();
 
 int twiss_input(struct command*);
 void update_beam();
@@ -1048,7 +1068,7 @@ void fill_dump(FILE*, int, char*, double*, int, int);
 void pro_elem_sxf(FILE*);
 void put_line(FILE*, char*);
 void accu_line(FILE*, char*);
-void get_sxf_names();
+void get_sxf_names(); 
 int kl_trans(char*, char*, double*, int*);
 void r_indent();
 void s_indent(int);
@@ -1077,6 +1097,11 @@ void seterrorflag (int  errcode, const char* from, const char* descr);
 int  geterrorflag();
 int debuglevel = 1;
 int errorflag = 0;
+
+char* geterrrormessage();
+#define MAX_MSGLEN  1000
+char  errormessage[MAX_MSGLEN];
+
 
 /* Global structure variables by type (alphabetic) */
 struct char_array* aux_buff;       /* temporary buffer for many purposes */

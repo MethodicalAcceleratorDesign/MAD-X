@@ -1,5 +1,5 @@
 subroutine w_ptc_create_universe()
-  use madx_ptc_module
+  use madx_ptc_module 
   implicit none
   call ptc_create_universe()
 end subroutine w_ptc_create_universe
@@ -25,11 +25,17 @@ subroutine w_ptc_align()
 end subroutine w_ptc_align
 
 subroutine w_ptc_twiss(tab_name)
-  use madx_ptc_module
+  use madx_ptc_twiss_module
   implicit none
   integer tab_name(*)
   call ptc_twiss(tab_name)
 end subroutine w_ptc_twiss
+
+subroutine w_ptc_initmoments()
+  use madx_ptc_distrib_module
+  implicit none
+  call initmoments()
+end subroutine w_ptc_initmoments
 
 subroutine w_ptc_dumpmaps()
   use madx_ptc_module
@@ -55,7 +61,7 @@ subroutine w_ptc_twiss_linac(tab_name)
   use madx_ptc_trackline_module
   implicit none
   integer tab_name(*)
-  call ptc_twiss_linac(tab_name)
+   call ptc_twiss_linac(tab_name)
 end subroutine w_ptc_twiss_linac
 
 subroutine w_ptc_trackline(max_obs)
@@ -169,6 +175,27 @@ subroutine w_ptc_addknob(fibre)
 
 end subroutine w_ptc_addknob
 
+subroutine w_ptc_addknob_i(paramn)
+  use madx_ptc_knobs_module
+  implicit none
+  integer paramn(*)
+
+  call addknobi(paramn)
+
+end subroutine w_ptc_addknob_i
+
+
+subroutine w_ptc_addmoment(x,px,y,py,dp,t,tableIA, columnIA, parametric )
+  use madx_ptc_distrib_module
+  implicit none
+  integer               :: x,px,y,py,dp,t
+  integer               :: columnIA(*)
+  integer               :: tableIA(*)
+  integer               :: parametric
+
+  call addmoment(x,px,y,py,dp,t,tableIA, columnIA, parametric )
+
+end subroutine w_ptc_addmoment
 
 subroutine w_ptc_writeparresults(filename)
   use madx_ptc_knobs_module
@@ -238,3 +265,4 @@ subroutine w_ptc_open_gino(scriptname)
   call execginoscript(scriptname)
 
 end subroutine w_ptc_open_gino
+

@@ -4693,7 +4693,9 @@ void pro_ptc_twiss()
   struct node *nodes[2], *use_range[2];
   double ptc_deltap;
   char *filename = NULL, *table_name;
+  char *momentstablename = 0x0;
   int j,l ,pos, w_file,beta_def;
+  int order = 0;
   /*
     start command decoding
   */
@@ -4712,13 +4714,41 @@ void pro_ptc_twiss()
   {
     if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
   }
+
   pos = name_list_pos("table", nl);
   if(nl->inform[pos]) /* table name specified - overrides save */
-  {
-    if ((table_name = pl->parameters[pos]->string) == NULL)
-      table_name = pl->parameters[pos]->call_def->string;
-  }
-  else table_name = "ptc_twiss";
+   {
+     table_name = pl->parameters[pos]->string;
+     if (table_name == NULL)
+      {
+        table_name = pl->parameters[pos]->call_def->string;
+      }  
+   }
+  else 
+   {
+    table_name = "ptc_twiss";
+   } 
+  
+
+  pos = name_list_pos("moments", nl);
+  if(nl->inform[pos]) /* table name specified - overrides save */
+   {
+     momentstablename = pl->parameters[pos]->string;
+     if (momentstablename == NULL)
+      {
+        printf("pro_ptc_twiss: moments table name is NULL\n");
+      }
+     else
+      {   
+        printf("pro_ptc_twiss: moments table name is %s\n",momentstablename);
+  /*      makemomentstable(momentstablename,order); */
+        w_ptc_initmoments(); /*initializes fortran module that manages moments calculations*/
+      }   
+   }
+  
+  
+  
+  
   pos = name_list_pos("file", nl);
   if (nl->inform[pos])
   {
@@ -4742,6 +4772,7 @@ void pro_ptc_twiss()
     /*      set_variable("twiss_tol", &tol_keep); */
     return;
   }
+  
   set_option("twiss_inval", &beta_def);
   adjust_beam();
   probe_beam = clone_command(current_beam);
@@ -4751,8 +4782,12 @@ void pro_ptc_twiss()
   l = strlen(table_name);
   tarr = new_int_array(l+1);
   conv_char(table_name, tarr);
+
   twiss_table = make_table(table_name, "twiss", twiss_table_cols,
                            twiss_table_types, current_sequ->n_nodes);
+  
+  makemomentstables();
+         
   twiss_table->dynamic = 1;
   add_to_table_list(twiss_table, table_register);
   current_sequ->tw_table = twiss_table;
@@ -8153,6 +8188,8 @@ void pro_ptc_knob(struct in_cmd* cmd)
 
   char*                          element    = 0x0;
   struct int_array*              elementIA      = 0x0;
+  char*                          initialp    = 0x0;
+  struct int_array*              initialpIA      = 0x0;
 
 
   if (match_is_on == kMatch_PTCknobs)
@@ -8167,26 +8204,53 @@ void pro_ptc_knob(struct in_cmd* cmd)
     printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
     return;
   }
-
   element  = c_parameters->parameters[pos]->string;
-  if ( element == 0x0 )
+
+  pos   = name_list_pos("initial", c_parnames);
+  if (pos < 0)
   {
-    warning("madxn.c: pro_ptc_knob: no element name: ", "ignored");
+    printf("madxn.c: pro_ptc_knob: initial parameter does not exist.\n");
     return;
   }
 
-  mycpy(c_dum->c, element);
+  initialp  = c_parameters->parameters[pos]->string;
+  
+  if ( (element == 0x0) && (initialp == 0x0) )
+  {
+    warning("madxn.c: pro_ptc_knob: no element name neither initial pareter specified: ", 
+           "command ignored");
+    return;
+  }
 
-  stoupper(c_dum->c);
+  if (initialp)
+   {
+     mycpy(c_dum->c, initialp);
 
-  elementIA = new_int_array(1+strlen(c_dum->c));
+     stolower(c_dum->c);
 
-  conv_char(c_dum->c,elementIA);
+     initialpIA = new_int_array(1+strlen(c_dum->c));
 
-  w_ptc_addknob(elementIA->i);
+     conv_char(c_dum->c,initialpIA);
 
-  delete_int_array(elementIA);
+     w_ptc_addknob_i(initialpIA->i);
 
+     delete_int_array(initialpIA);
+     
+   }
+  else
+   {
+     mycpy(c_dum->c, element);
+
+     stoupper(c_dum->c);
+
+     elementIA = new_int_array(1+strlen(c_dum->c));
+
+     conv_char(c_dum->c,elementIA);
+
+     w_ptc_addknob(elementIA->i);
+
+     delete_int_array(elementIA);
+   }
 }
 /********************************************************************************/
 
@@ -8316,31 +8380,28 @@ void pro_ptc_select(struct in_cmd* cmd)
    The most important one is the matching module.
  */
 
+  char*                          monomial    = 0x0;
+
   int                            element     = 0;
   int*                           tablep      = 0;
   int*                           columnp     = 0;
   static int                     zeroint     = 0;/*if there is no column name or table name these are passed as null strings */
-  char*                          monomial    = 0x0;
   struct int_array*              tabnameIA   = 0x0;/*string passing to fortran is tricky*/
   struct int_array*              colnameIA   = 0x0;/*and is done via integer arrays*/
   struct int_array*              monoIA      = 0x0;
 
-/*
-  int                            i           = 0;
-  struct node*                   nodes[2]    = {0x0,0x0};
-  char                           buff[NAME_L];
-  char                           placestring[NAME_L];
-*/
-
-  element = (int)command_par_value("polynomial",cmd->clone);
   monomial = command_par_string("monomial",cmd->clone);
+
   if (monomial == 0x0)
   {
     warning("madxn.c: pro_ptc_select: monomial is NULL ", "ignored");
     return;
   }
+
   monoIA = new_int_array(1+strlen(monomial));
   conv_char(monomial,monoIA);
+
+  element = (int)command_par_value("polynomial",cmd->clone);
 
   pro_ptc_select_checkpushtable(cmd,&tabnameIA,&colnameIA);
 
@@ -8368,9 +8429,9 @@ void pro_ptc_select(struct in_cmd* cmd)
   delete_int_array(colnameIA);
   delete_int_array(monoIA);
 
-
 }
 /********************************************************************************/
+
 int pro_ptc_select_checkpushtable(struct in_cmd* cmd,
                                   struct int_array** tabnameIA, struct int_array** colnameIA)
 {
@@ -8456,6 +8517,204 @@ int pro_ptc_select_checkpushtable(struct in_cmd* cmd,
   *tabnameIA = new_int_array(1+strlen(tablename));
   conv_char(tablename,*tabnameIA);
 
+  return 0;
+}
+
+/********************************************************************************/
+int pro_ptc_select_moment(struct in_cmd* cmd)
+{
+  /*adds a moment or more moments to the list
+  if parametric switch is present they will be stored also as Taylor Series*/
+  
+  int pos, tablepos;
+  int i, j;
+  int mdefi[6];
+  char* mdefin, *pchar;
+  char  tablename[48];
+  struct int_array*              colIA      = 0x0;
+  struct int_array*              tabIA      = 0x0;
+  struct int_array*              mdefIA      = 0x0;
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            parametric = 0;
+  int                            int_arr[100];
+
+
+  tablepos = name_list_pos("table", c_parnames);
+  if ( tablepos < 0)  
+   { 
+     printf("Weired: table parameter is not defined\n");
+     return 1;
+   }
+
+  pchar  = c_parameters->parameters[tablepos]->string;
+  if ( pchar == 0x0 )
+  {
+    strcpy(tablename,"moments");
+  }
+  else if ( pchar[0] == 0 )
+  {
+    strcpy(tablename,"moments");
+  }
+  else
+  {
+    strcpy(tablename,pchar);
+  }
+  
+  tabIA = new_int_array(1+strlen(tablename));
+  conv_char(tablename,tabIA);
+
+  pos = name_list_pos("moment_s", c_parnames);
+  if ( pos < 0)  
+   { 
+     printf("Weired: moments parameter is not defined\n");
+     return 1;
+   }
+    
+  if (c_parnames->inform[pos])
+    {
+      for (j = 0; j < c_parameters->parameters[pos]->m_string->curr; j++)
+       {
+         mdefin = c_parameters->parameters[pos]->m_string->p[j];
+
+         printf("String no %d is %s\n", j, mdefin);
+
+         mdefIA = new_int_array(1+strlen(mdefin));
+         conv_char(mdefin,mdefIA);
+         
+         /*the loop below decodes string monomial to integer monomial */
+         for (i = 0; i<6; i++)
+          {
+           if (mdefIA->i[0] > i) 
+            { 
+              mdefi[i] = mdefIA->i[i+1] - '0'; 
+            }
+           else
+            {
+              mdefi[i] = 0;
+            }   
+          } 
+         w_ptc_addmoment(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
+                  	    tabIA->i, mdefIA->i, &parametric);
+       
+         delete_int_array(mdefIA);
+
+       }
+     }
+        
+
+  pos = name_list_pos("moment", c_parnames);
+  /*i is dummy... we know there is no strings or doubles */
+  comm_para_("moment", &pos, &i, &i, int_arr, 0x0, 0x0, 0x0);
+
+  printf("pos is %d\n",pos);
+  if (pos > 6) pos = 6;
+/*if there is something and it is not only one zero */
+  if ( (pos >= 0)       && !((pos == 1) && (int_arr[0] == 0))  )  
+   { 
+
+     for (i=0;i<pos;i++)
+      {
+        if (int_arr[i] < 0) break;
+        
+        mdefi[i] = int_arr[i];
+      }
+
+     for (i=pos; i<6;i++)
+      {
+        mdefi[i] = 0;
+      } 
+      
+     tablepos = name_list_pos("column", c_parnames);
+     if ( tablepos < 0)  
+      { 
+        printf("Weired: column parameter is not defined\n");
+        return 1;
+      }
+     
+     tablename[0] = 0;
+     pchar  = c_parameters->parameters[tablepos]->string;
+     if ( pchar != 0x0 )
+     { 
+       if ( pchar[0] != 0 )
+        {
+           strcpy(tablename,pchar);
+        }
+     }
+     
+     if (tablename[0] == 0)
+      {
+        sprintf(tablename,"%d_%d_%d_%d_%d_%d",
+            mdefi[0],mdefi[1],mdefi[2],mdefi[3],mdefi[4],mdefi[5]);
+        printf("pro_ptc_select_moment: Column name not provied, generated one is %s",tablename);
+      }
+      
+     mdefIA = new_int_array(1+strlen(tablename));
+
+     conv_char(tablename,mdefIA);
+     w_ptc_addmoment(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
+                  	tabIA->i, mdefIA->i, &parametric);
+   
+     delete_int_array(mdefIA);
+   }
+
+  
+  
+  delete_int_array(tabIA);
+  
+  return 0;
+
+}
+/********************************************************************************/
+
+int makemomentstables()
+{
+  static const int maxtables = 100; 
+  static const int maxcols = 1000; 
+  char* tables[100];        /*tables[maxtables];*/
+  char* cols[100][1000];    /*cols[maxtables][maxcols];*/
+  int   ncols[100];         /*ncols[maxtables];*/
+  char  tabname[20];
+  char  colname[17];
+  int types[1000];          /*types[maxcols];*/
+  int ntables = 0;
+  int nmom;
+  int i,j;
+  
+  types[0] = 3;
+  for (i=1;i<maxcols;i++) types[i] = 2;
+   
+  memset(tables,0x0,maxtables*sizeof(char*));
+  memset(ncols,0x0,maxtables*sizeof(int));
+   
+   
+  nmom = w_ptc_getnmoments();
+  printf("There is %d moments:\n",nmom);
+  for (i = 1; i <= nmom; i++)
+   {
+      w_ptc_getmomentstabcol(&i, tabname, colname);
+      printf(" mom %d: %s %s\n",i, tabname, colname);
+      for(j=0; tables[j] != 0x0 ;j++)
+       {
+         if ((strcmp(tables[j],tabname) == 0)) break;
+       }
+      printf(" index of this table ois %d \n",j);
+      
+      if (tables[j] == 0x0) 
+       {
+         tables[j] = (char*)mycalloc("makemomentstables",strlen(tabname),sizeof(char));
+       }
+      strcpy(tables[j],tabname); 
+      
+      cols[j][ncols[j]] = (char*)mycalloc("makemomentstables",strlen(colname),sizeof(char));
+      strcpy(cols[j][ncols[j]],colname); 
+      
+      
+   }  
+    
+  
+/*  make_table("moments", "twiss", twiss_table_cols,
+                           twiss_table_types, current_sequ->n_nodes); */
   return 0;
 }
 /********************************************************************************/

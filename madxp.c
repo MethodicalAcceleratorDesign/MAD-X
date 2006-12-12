@@ -1530,6 +1530,10 @@ void exec_command()
       {
         pro_ptc_select(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_select_moment") == 0)
+      {
+        pro_ptc_select_moment(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_printparametric") == 0)
       {
         pro_ptc_printparametric(p);
@@ -3655,7 +3659,7 @@ void pro_input(char* statement)
       }
       if((code = act_special(type, &statement[start])) < 0)
       {
-        if (get_option("warn"))
+        if (get_option("warn")) 
         {
           switch (code)
           {
@@ -4874,6 +4878,11 @@ int  geterrorflag()
 {
   /*returns errorflag status - used by fortran code to check if error occured*/
   return errorflag;
+}
+
+char* geterrrormessage()
+{
+  return errormessage;
 }
 
 void warningnew(char* t1, char* fmt, ...)

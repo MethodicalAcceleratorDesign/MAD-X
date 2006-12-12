@@ -65,7 +65,7 @@ ______________________________________________________________*/
 #include "string.h"
 
 #define MAX_CONTRAINS  100
-#define MAX_KNOBS  20
+#define MAX_KNOBS  100
 #define COMM_LENGTH  500
 
 
@@ -134,6 +134,7 @@ extern void             pro_ptc_knob(struct in_cmd* cmd);
 
 void madx_mpk_run(struct in_cmd* cmd)
 {
+/*the main routine of the module, called after at matching action (migrad, lmdif. etc...) */
   char rout_name[] = "madx_mpk_run";
   int i;
   double  tolerance;

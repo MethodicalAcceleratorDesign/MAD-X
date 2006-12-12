@@ -1,4 +1,7 @@
 !_____________________________________________________________
+ 
+
+
 type tablepush_poly
    character(20) :: tabname  !table name  to put the coefficients
    logical       :: pushtab  ! if true it should be pushed to table
@@ -7,7 +10,7 @@ type tablepush_poly
    integer       :: element  !defines the element of 6D function
    character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3
 end type tablepush_poly
-!describes result
+!describes result 
 
 type resultdescr
    integer       :: index ! column in 2D array of taylors of the result
@@ -23,14 +26,14 @@ end type mapelement
 
 type mapelresult
    type (resultdescr)  :: descr
-   type (mapelement)   :: r
+   type (mapelement)   :: r   
 end type mapelresult
 !_____________________________________________________________
 
 
-!defines a file
+!defines a file 
 type file
-   character(20) :: name  !file name
+   character(20) :: name  !file name  
    integer       :: fd !file descriptor
 end type file
 !_____________________________________________________________
@@ -77,27 +80,41 @@ integer, parameter                ::   gama31=25
 integer, parameter                ::   gama32=26
 integer, parameter                ::   gama33=27
 
-integer, parameter                ::   kn_x  =28 !kn prefix is added to limit crashes with the other modules name space
-integer, parameter                ::   kn_px =29
-integer, parameter                ::   kn_y  =30
-integer, parameter                ::   kn_py =31
-integer, parameter                ::   kn_t  =32
-integer, parameter                ::   kn_dp =33
+integer, parameter                ::   disp1=28
+integer, parameter                ::   disp2=29
+integer, parameter                ::   disp3=30
+integer, parameter                ::   disp4=31
+
+integer, parameter                ::   mu1=32
+integer, parameter                ::   mu2=33
+integer, parameter                ::   mu3=34
 
 
 
-integer, parameter                ::   ntwisses = 33
+integer, parameter                ::   kn_x  =35 !kn prefix is added to limit crashes with the other modules name space
+integer, parameter                ::   kn_px =36
+integer, parameter                ::   kn_y  =37
+integer, parameter                ::   kn_py =38
+integer, parameter                ::   kn_t  =39
+integer, parameter                ::   kn_dp =40
+
+
+
+integer, parameter                ::   ntwisses = 40
+integer, parameter                ::   ninparams = 27 !possible initial conditions as parameters
 
 CHARACTER*(6), parameter          ::   twissnames(ntwisses) = (/ &
-     'beta11','beta12','beta13',&
-     'beta21','beta22','beta23',&
-     'beta31','beta32','beta33',&
-     'alfa11','alfa12','alfa13',&
-     'alfa21','alfa22','alfa23',&
-     'alfa31','alfa32','alfa33',&
-     'gama11','gama12','gama13',&
-     'gama21','gama22','gama23',&
-     'gama31','gama32','gama33',&
-     'x     ','px    ',&
-     'y     ','py    ',&
-     'pt    ','t     '          /)
+	                  'beta11','beta12','beta13',&
+	                  'beta21','beta22','beta23',&
+	                  'beta31','beta32','beta33',&
+	                  'alfa11','alfa12','alfa13',&
+	                  'alfa21','alfa22','alfa23',&
+	                  'alfa31','alfa32','alfa33',&
+	                  'gama11','gama12','gama13',&
+	                  'gama21','gama22','gama23',&
+	                  'gama31','gama32','gama33',&
+	                  'disp1 ','disp2 ','disp3 ','disp4 ',&
+	                  'mu1   ','mu2   ','mu3   ',&
+	                  'x     ','px    ',&
+	                  'y     ','py    ',&
+	                  'pt    ','t     '          /)
