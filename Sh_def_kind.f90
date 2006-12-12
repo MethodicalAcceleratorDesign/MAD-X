@@ -6647,6 +6647,7 @@ contains
 
     IF(EL%P%METHOD/=6) THEN
        DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
+       IF(EL%P%METHOD==4) DH=DH*TWO
     ELSE
        DH=EL%L/EL%P%NST/four
     ENDIF
@@ -6893,6 +6894,7 @@ contains
 
     IF(EL%P%METHOD/=6) THEN
        DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
+       IF(EL%P%METHOD==4) DH=DH*TWO
     ELSE
        DH=EL%L/EL%P%NST/four
     ENDIF
