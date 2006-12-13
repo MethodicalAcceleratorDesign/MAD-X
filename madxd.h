@@ -310,6 +310,9 @@ extern void mtjac_(int*, int*,
                    double*, int*, int*, double*, double*, double*,
                    double*, double*, double*,
                    double*, double*);
+extern void mtsvd_(int*, int*,
+                  double*, double*,
+                   double*, double*);
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*);

@@ -941,7 +941,6 @@ void mtjacprint(int m, int n,double* jac){
 
 int mtputconsname(char* noden, int* nodei , char* consn, int* consi) {
   int i,j;
-  char* test;
   i=(*nodei)-1;
   j=(*consi)-1;
 match2_macro_name[i]=(char *)mymalloc("match_match",20);
@@ -950,5 +949,6 @@ match2_macro_name[i][19]='\0';
 match2_cons_name[i][j]=(char *)mymalloc("match_match",20);
 strncpy(match2_cons_name[i][j],consn,20);
 match2_cons_name[i][j][19]='\0';
+return 0;
 }
 
