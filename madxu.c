@@ -202,7 +202,9 @@ int add_to_name_list(char* name, int inf, struct name_list* vlist)
   int j, num, low = 0, mid, high = vlist->curr - 1, pos = 0, ret;
 
   if (name == NULL) return -1;
-  if ((ret = name_list_pos(name, vlist)) < 0)
+
+  ret = name_list_pos(name, vlist);
+  if ( ret < 0)
   {
     while (low <= high)
     {
@@ -2723,6 +2725,7 @@ struct table* new_table(char* name, char* type, int rows,
   int i, n = cols->curr;
   struct table* t
     = (struct table*) mycalloc(rout_name,1, sizeof(struct table));
+    
   strcpy(t->name, name);
   strcpy(t->type, type);
   t->stamp = 123456;
@@ -2758,6 +2761,7 @@ struct table_list* new_table_list(int size)
   tl->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tl->name);
   tl->max = size;
+  tl->curr = 0;
   tl->names = new_name_list(tl->name, size);
   tl->tables
     = (struct table**) mycalloc(rout_name,size, sizeof(struct table*));
