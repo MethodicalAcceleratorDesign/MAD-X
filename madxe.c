@@ -655,10 +655,9 @@ void error_eoption(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   int i, debug;
-  int val, val2, pos, seed;
+  int val, pos, seed;
   int is, ia;
   static  int  ia_seen = 0;
-  static  int  is_seen = 0;
 
   is = 0; ia = 0;
   
@@ -672,7 +671,7 @@ void error_eoption(struct in_cmd* cmd)
      }
      i++;
   }
-  if (debug=get_option("debug")) printf("FOUND: %d %d \n",ia,is);
+  if ((debug=get_option("debug"))) printf("FOUND: %d %d \n",ia,is);
 
   if ((debug=get_option("debug")))  {
      fprintf(prt_file, "in eoption routine\n");
@@ -706,7 +705,7 @@ void error_eoption(struct in_cmd* cmd)
 
   if(ia == 1) ia_seen = 1;
 
-  if (debug=get_option("debug")) printf("err_add eoption: %d seen: %d\n",add_error_opt,ia_seen);
+  if ((debug=get_option("debug"))) printf("err_add eoption: %d seen: %d\n",add_error_opt,ia_seen);
 
 }
 
