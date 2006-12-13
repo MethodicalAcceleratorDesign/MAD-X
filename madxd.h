@@ -5,6 +5,7 @@
 #define advance_to_pos        advance_to_pos_
 #define augment_count         augment_count_
 #define augmentcountonly      augmentcountonly_
+#define augmentcountmomtabs   augmentcountmomtabs_
 #define char_from_table       char_from_table_  /* OB 2.4.2002 */
 #define comment_to_table      comment_to_table_
 #define comm_para             comm_para_
@@ -141,6 +142,7 @@
 #define advance_to_pos        ADVANCE_TO_POS
 #define augment_count         AUGMENT_COUNT
 #define augmentcountonly      AUGMENTCOUNTONLY
+#define augmentcountmomtabs   AUGMENTCOUNTMOMTABS
 #define char_from_table       CHAR_FROM_TABLE  /* OB 2.4.2002 */
 #define comment_to_table      COMMENT_TO_TABLE
 #define comm_para             COMM_PARA
@@ -344,6 +346,8 @@ int    type_ofCall advance_to_pos(char*, int*);
 char*  type_ofCall alias(char*);
 int    type_ofCall aperture_count(struct sequence*);
 void   type_ofCall augment_count(char*);
+void   type_ofCall augmentcountonly(char* table);
+void   type_ofCall augmentcountmomtabs(double* s);
 int    type_ofCall char_from_table(char*, char*, int*, char*); /* OB 2.4.2002 */
 void   type_ofCall comment_to_table(char*, char*, int*);
 void   type_ofCall comm_para(char*, int*, int*, int*, int*, double*, char*, int*);
@@ -769,7 +773,6 @@ void pro_survey(struct in_cmd*);
 void pro_track(struct in_cmd*);
 void pro_twiss();
 void pro_ptc_twiss();
-void make_momentstable(char* momentstablename, int no);
 void pro_ptc_track(struct in_cmd*);
 void pro_ptc_trackline(struct in_cmd*);
 int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);
@@ -1218,6 +1221,7 @@ struct table* twiss_table_beam1;  /* current twiss table beam1 */
 struct table* twiss_table_beam2;  /* current twiss table beam2 */
 struct table* map_table;          /* added for twiss_input_table */
 struct table_list* table_register;/* added by kzhang 26/06/2005 */
+struct table_list* moments_tables = 0x0;/* skowron - tables for moments */
 
 
 /* E. T. d'Amico 2 feb 2004 */
@@ -1441,6 +1445,7 @@ time_t start_time;
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();
 void deletetrackstrarpositions();
+
 
 /*Riccardo de Maria (CERN)*/
 #define MAX_MATCH_CONS 350

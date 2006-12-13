@@ -18,6 +18,7 @@ module madx_ptc_distrib_module
   public                         :: aremomentson
   public                         :: putmoments
   public                         :: initmoments
+  public                         :: allocmoments
   public                         :: killmoments
   public                         :: getdistrtype
   public                         :: setemittances
@@ -33,11 +34,12 @@ module madx_ptc_distrib_module
   real(dp)                       ::  sigmas(6)
   integer                        ::  distributiontype(3)
   
-  character(48)                  ::  momentstablename
-
   integer, parameter             ::  maxnmoments=100
   type (momentdef), private      ::  moments(maxnmoments)
   integer                        ::  nmoments = 0
+
+  type(damap)                    :: damapa  !da map needed to calculation initialized with sigmas
+  type(taylor)                   :: function_to_average ! taylor used to calculate averages
   
   !============================================================================================
   !  PRIVATE
@@ -149,10 +151,10 @@ contains
     integer              :: n !fibre number
     character(*)         :: name !fibre name
     real(kind(1d0))      :: s  !position along the orbit
-    type(damap)          :: damapa
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
-    type(taylor)         :: function_to_average
-    
+    real(dp)             :: v
+    logical              :: set
+    integer              :: i,j,k
     
     
     
@@ -160,37 +162,46 @@ contains
       return
     endif
     
-    print*, "#################################################"
-    print*, "#################################################"
-    print*, "#################################################"
-
-!    print*, sigmas
-!    call print(y,6)
-
-    print*, "Moments for fibre ", n,name," at ", s,"m"
+!     print*, "#################################################"
+!     print*, "#################################################"
+!     print*, "#################################################"
+!     print*, "Moments for fibre ", n,name," at ", s,"m"
+     
     
-    call alloc(damapa)
-    
-    damapa = sigmas
-    
-!    call print(damapa,6)
-    
-    call alloc(function_to_average)
-    
-    function_to_average=y(1)*y(1) ! just a function (taylor series)
-!    function_to_average=1.d0.mono.'202'
 
-    
-    call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function 
-    function_to_average=function_to_average.o.damapa ! replaces x px y py ... by sigma1, sigma2, etc
+    do i=1, nmoments
+       
+       set = .false.
+       do j=1,c_%nd2
+         do k = 1, moments(i)%iarray(j)
+           
+           if (set) then
+             function_to_average = function_to_average*y(j)%t
+           else
+             function_to_average = y(j)%t
+             set = .true.
+           endif  
+         enddo
+       enddo
 
-    call print(function_to_average,6)
+!       function_to_average=y(1)*y(1) ! just a function (taylor series)
 
-!    write(6,*) 10*sigmas(1)**2+1.2d0**2*sigmas(1)**2/10
-!    write(6,*) 10.d0*sigmas(1)**2+1.2d0**2*sigmas(1)**2/10.d0+3*1.2d0**2*sigmas(1)**4/100.d0
-     call kill(damapa)
-     call kill(function_to_average)
+       call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function 
+       function_to_average=function_to_average.o.damapa ! replaces x px y py ... by sigma1, sigma2, etc
 
+       
+       v = function_to_average.sub.0
+       
+       call double_to_table(moments(i)%table,moments(i)%column,v)
+
+!       print*,moments(i)%iarray
+!       call print(function_to_average,6)
+!       print*, v
+!       print*,"----------------------------------"
+     
+    enddo    
+
+    call augmentcountmomtabs(s)
     
   end subroutine putmoments
 
@@ -243,20 +254,24 @@ contains
     character(len=48), dimension(3) :: disttypes
     integer, dimension(3)           :: stringlength
     character(48)                   :: tmpstring
-    logical                         :: initmomsmanual
     real(kind(1d0))                 :: get_value
-
+    ! This routine must be called before any init in ptc_twiss is performed
+    ! since it initialize Bertz for its purpose
+    !
+    !
     if ( associated(normmoments) ) then
       deallocate(normmoments)
     endif
     
-    i = get_string('ptc_twiss ','moments ',momentstablename)
-    if (i < 1) then
-      call fort_warn("initmoments","Table for moments not specified")
+    
+    
+    i = get_value('ptc_twiss ','moments ')
+
+    if (i .eq. 0 ) then
+      call fort_warn("initmoments","Moments are not requested.")
       return
     endif
 
-    print*, "Table name is ", momentstablename
 
     stringlength(1) = get_string('ptc_twiss ','xdistr ',disttypes(1))
     stringlength(2) = get_string('ptc_twiss ','ydistr ',disttypes(2))
@@ -302,10 +317,34 @@ contains
 
   end subroutine initmoments
   !_________________________________________________________________________________
-  subroutine killmoments  
+  subroutine allocmoments
     implicit none
+    !allocates variables needed for moments calculations
+    ! namely damapa and fucntion_to_avarage
+
+      if ( .not. associated(normmoments) ) then
+        return
+      endif
+      
+      call alloc(damapa)
+      damapa = sigmas
+      call alloc(function_to_average)
     
-    deallocate(normmoments)
+  end subroutine allocmoments
+
+  !_________________________________________________________________________________
+  subroutine killmoments
+    implicit none
+    !cleans everything allocated in in initmoments and allocmoments
+      
+      if ( .not. associated(normmoments) ) then
+        return
+      endif
+      
+      deallocate(normmoments)
+
+      call kill(damapa)
+      call kill(function_to_average)
 
   end subroutine killmoments  
   !_________________________________________________________________________________

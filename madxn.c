@@ -4693,9 +4693,7 @@ void pro_ptc_twiss()
   struct node *nodes[2], *use_range[2];
   double ptc_deltap;
   char *filename = NULL, *table_name;
-  char *momentstablename = 0x0;
   int j,l ,pos, w_file,beta_def;
-  int order = 0;
   /*
     start command decoding
   */
@@ -4726,28 +4724,11 @@ void pro_ptc_twiss()
    }
   else 
    {
-    table_name = "ptc_twiss";
+    /*strcpy(table_name,"ptc_twiss");*/
+      table_name = "ptc_twiss";
    } 
   
 
-  pos = name_list_pos("moments", nl);
-  if(nl->inform[pos]) /* table name specified - overrides save */
-   {
-     momentstablename = pl->parameters[pos]->string;
-     if (momentstablename == NULL)
-      {
-        printf("pro_ptc_twiss: moments table name is NULL\n");
-      }
-     else
-      {   
-        printf("pro_ptc_twiss: moments table name is %s\n",momentstablename);
-  /*      makemomentstable(momentstablename,order); */
-        w_ptc_initmoments(); /*initializes fortran module that manages moments calculations*/
-      }   
-   }
-  
-  
-  
   
   pos = name_list_pos("file", nl);
   if (nl->inform[pos])
@@ -8531,14 +8512,15 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
   int mdefi[6];
   char* mdefin, *pchar;
   char  tablename[48];
-  struct int_array*              colIA      = 0x0;
+  char  colname[8];
+  int   clen = 0;
   struct int_array*              tabIA      = 0x0;
   struct int_array*              mdefIA      = 0x0;
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            parametric = 0;
   int                            int_arr[100];
-
+  
 
   tablepos = name_list_pos("table", c_parnames);
   if ( tablepos < 0)  
@@ -8575,25 +8557,32 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
     {
       for (j = 0; j < c_parameters->parameters[pos]->m_string->curr; j++)
        {
+         strcpy(colname,"mu000000");
+       
          mdefin = c_parameters->parameters[pos]->m_string->p[j];
 
          printf("String no %d is %s\n", j, mdefin);
-
-         mdefIA = new_int_array(1+strlen(mdefin));
-         conv_char(mdefin,mdefIA);
          
+         clen = strlen(mdefin);
+
          /*the loop below decodes string monomial to integer monomial */
-         for (i = 0; i<6; i++)
+         for (i = 0; i< 6; i++)
           {
-           if (mdefIA->i[0] > i) 
+           if (clen > i) 
             { 
-              mdefi[i] = mdefIA->i[i+1] - '0'; 
+              mdefi[i] = mdefin[i] - '0';
+              colname[2+i] = mdefin[i];
             }
            else
             {
               mdefi[i] = 0;
             }   
-          } 
+          }
+           
+         
+         mdefIA = new_int_array(9);/*size + "mu" + 6charnumbers*/
+         conv_char(colname,mdefIA);
+         
          w_ptc_addmoment(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
                   	    tabIA->i, mdefIA->i, &parametric);
        
@@ -8640,11 +8629,12 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
         {
            strcpy(tablename,pchar);
         }
+       
      }
      
      if (tablename[0] == 0)
       {
-        sprintf(tablename,"%d_%d_%d_%d_%d_%d",
+        sprintf(tablename,"mu_%d_%d_%d_%d_%d_%d",
             mdefi[0],mdefi[1],mdefi[2],mdefi[3],mdefi[4],mdefi[5]);
         printf("pro_ptc_select_moment: Column name not provied, generated one is %s",tablename);
       }
@@ -8670,22 +8660,16 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
 int makemomentstables()
 {
   static const int maxtables = 100; 
-  static const int maxcols = 1000; 
-  char* tables[100];        /*tables[maxtables];*/
-  char* cols[100][1000];    /*cols[maxtables][maxcols];*/
-  int   ncols[100];         /*ncols[maxtables];*/
-  char  tabname[20];
-  char  colname[17];
-  int types[1000];          /*types[maxcols];*/
-  int ntables = 0;
-  int nmom;
-  int i,j;
+  char*             tables[100];           /*tables[maxtables];*/
+  struct name_list* cols[100];  /*cols[maxtables][maxcols];*/
+  struct table*     t; 
+  char              tabname[20];
+  char              colname[17];
+  int               nmom;
+  int i,j,k;
   
-  types[0] = 3;
-  for (i=1;i<maxcols;i++) types[i] = 2;
    
   memset(tables,0x0,maxtables*sizeof(char*));
-  memset(ncols,0x0,maxtables*sizeof(int));
    
    
   nmom = w_ptc_getnmoments();
@@ -8694,23 +8678,45 @@ int makemomentstables()
    {
       w_ptc_getmomentstabcol(&i, tabname, colname);
       printf(" mom %d: %s %s\n",i, tabname, colname);
+      
       for(j=0; tables[j] != 0x0 ;j++)
        {
          if ((strcmp(tables[j],tabname) == 0)) break;
        }
-      printf(" index of this table ois %d \n",j);
+      printf(" index of this table is %d \n",j);
       
       if (tables[j] == 0x0) 
        {
-         tables[j] = (char*)mycalloc("makemomentstables",strlen(tabname),sizeof(char));
+         tables[j] = (char*)mycalloc("makemomentstables",strlen(tabname) + 1, sizeof(char));
+         strcpy(tables[j],tabname); 
+         cols[j] = new_name_list("columns", 15);
+         add_to_name_list(permbuff("name"),3,cols[j]);
+         add_to_name_list(permbuff("s"),2,cols[j]);
        }
-      strcpy(tables[j],tabname); 
       
-      cols[j][ncols[j]] = (char*)mycalloc("makemomentstables",strlen(colname),sizeof(char));
-      strcpy(cols[j][ncols[j]],colname); 
-      
+      k = add_to_name_list(permbuff(colname),2,cols[j]);
       
    }  
+  
+  if (moments_tables) 
+   {
+     myfree("",moments_tables->tables);
+     delete_name_list(moments_tables->names);
+     myfree("",moments_tables);
+   }
+
+  moments_tables = new_table_list(10);
+  
+  for(j=0; tables[j] != 0x0 ;j++)
+   {
+     printf("Making table %s\n",tables[j]);
+     
+     t = new_table(tables[j], "usermoments", current_sequ->n_nodes, cols[j]);
+     t->org_cols = cols[j]->curr;
+     print_table(t);
+     add_to_table_list(t, table_register);
+     add_to_table_list(t, moments_tables);
+   }
     
   
 /*  make_table("moments", "twiss", twiss_table_cols,
@@ -8718,6 +8724,26 @@ int makemomentstables()
   return 0;
 }
 /********************************************************************************/
+void augmentcountmomtabs(double* s)
+{
+  int i;
+  struct table* t;
+  
+  if (moments_tables == 0x0)
+   {
+     warning("augmentcountmomtabs","moments_tables is NULL\n");
+     return;
+   }
+  
+  for ( i = 0; i <  moments_tables->curr; i++)
+   {
+     t = table_register->tables[i];
+     t->s_cols[0][t->curr] = tmpbuff(current_node->name);
+     t->d_cols[1][t->curr] = *s;
+     if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+     if (++t->curr == t->max) grow_table(t);
+   }
+}
 
 void pro_ptc_script(struct in_cmd* cmd)
 {/*
@@ -9216,11 +9242,11 @@ int copytrackstoarray()
     printf("ERROR: copytrackstoarray: number of tracks is 0! Nothing to copy!");
     return 0;
   }
-  trackstrarpositions =  (double**)malloc(ntracks*sizeof(double*));
+  trackstrarpositions =  (double**)mymalloc("copytrackstoarray",ntracks*sizeof(double*));
 
   for (n = 0; n < ntracks; n++)
   {
-    trackstrarpositions[n] = (double*)malloc(6*sizeof(double));
+    trackstrarpositions[n] = (double*)mymalloc("copytrackstoarray",6*sizeof(double));
 
     comm = stored_track_start->commands[n];
     trackstrarpositions[n][0] = command_par_value("x",  comm);
@@ -9271,9 +9297,9 @@ void deletetrackstrarpositions()
   int i;
   for ( i = 0; i < stored_track_start->curr; i++)
   {
-    free(trackstrarpositions[i]);
+    myfree("deletetrackstrarpositions",trackstrarpositions[i]);
   }
-  free(trackstrarpositions);
+  myfree("deletetrackstrarpositions",trackstrarpositions);
 
   trackstrarpositions = 0x0;
 }

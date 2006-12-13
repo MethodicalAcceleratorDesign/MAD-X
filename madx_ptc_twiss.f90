@@ -138,18 +138,15 @@ contains
 !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
       if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
         !when there is no cavity it gives us dispersions
-        print*, "DISP CALC c_%npara == 5 and ndpt/=0"
         do i=1,4
           lat(0,i,1)=(Y(i)%t.sub.J5)
         enddo
       elseif (c_%nd2 == 6) then
-        print*, "DISP CALC c_%nd2 == 6"
         do i=1,4
           lat(0,i,1) =              (Y(i)%t.sub.J5)*(Y(6)%t.sub.J6) 
           lat(0,i,1) = lat(0,i,1) + (Y(i)%t.sub.J6)*(Y(5)%t.sub.J5) 
         enddo
       else
-        print*, "DISP CALC SKIPPED"  
         do i=1,4
           lat(0,i,1)=zero
         enddo
@@ -344,6 +341,9 @@ contains
     call cleartables() !defined in madx_ptc_knobs
     
     call kill_para(my_ring) !removes all the previous parameters
+
+    call initmoments() !defined in madx_ptc_distrib
+    
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
 
@@ -354,7 +354,8 @@ contains
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
 
-
+    
+    
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -445,6 +446,7 @@ contains
     !############################################################################
     !############################################################################
     
+    call allocmoments() 
     
     call alloc(tw)
 
@@ -452,8 +454,6 @@ contains
     
 
     tw=y 
-
-    call print(Y,6)
 
     current=>MY_RING%start
     startfen = 0
@@ -517,6 +517,8 @@ contains
 100 continue
 
     c_%watch_user=.false.
+
+    call killmoments()
     call kill(tw)
     CALL kill(y)
     do i=1,6
@@ -538,24 +540,28 @@ contains
     subroutine initmap
       implicit none
       integer  :: double_from_table
-      integer  :: mman, mtab, mascr !these variable allow to check if the user did not put too many options
+      integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
         
         beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
         
         mman  = get_value('ptc_twiss ','initial_matrix_manual ')
         mtab  = get_value('ptc_twiss ','initial_matrix_table ')
         mascr = get_value('ptc_twiss ','initial_ascript_manual ')
+        mdistr = get_value('ptc_twiss ','initial_ascript_manual ')
+        
         
         initial_matrix_manual = mman .ne. 0
         initial_matrix_table = mtab .ne. 0
         initial_ascript_manual = mascr .ne. 0
         
+        
         if ( (mman + mtab + mascr) > 1) then
            call seterrorflag(11,"ptc_twiss ","Ambigous option comman options");
            print*, "Only one of the following switches might be on:"
-           print*, "initial_matrix_manual = ",initial_matrix_manual
-           print*, "initial_matrix_table = ",  initial_matrix_table 
+           print*, "initial_matrix_manual  = ", initial_matrix_manual
+           print*, "initial_matrix_table   = ", initial_matrix_table 
            print*, "initial_ascript_manual = ", initial_ascript_manual
+           print*, "initial_distrib_manual = ", initial_distrib_manual
         endif
         
 !        print*, "initial_distrib_manual is ",initial_distrib_manual
@@ -581,7 +587,9 @@ contains
               return
            endif
         elseif(initial_matrix_manual) then
+
            call readinitialmatrix()
+
            if (geterrorflag() /= 0) then
               return
            endif
@@ -599,6 +607,11 @@ contains
            endif
         elseif(beta_flg) then
            call readinitialtwiss()
+
+           open(unit=121,file='line.map')
+           call print(y,121)
+           close(121)
+
            if (geterrorflag() /= 0) then
               return
            endif
@@ -625,6 +638,16 @@ contains
            endif
            
            call maptoascript()
+
+           open(unit=121,file='ring.map')
+           call print(y,121)
+           close(121)
+
+           
+           if (moments) then
+             call reademittance()
+           endif 
+
            
         endif
     end subroutine initmap
@@ -974,7 +997,9 @@ contains
       call readrematrix() !reads re
       call readreforbit() !reads x
       call initmapfrommatrix()
+
       call maptoascript()
+
       
       if (moments) then
         call reademittance()
@@ -1033,8 +1058,8 @@ contains
       
       allocate(j(c_%nv))
       j(:)=0
-      do i = 1,c_%nd2
-         do ii = 1,c_%nd2
+      do i = 1,c_%npara
+         do ii = 1,c_%npara
             j(ii)=1
             r=re(i,ii)-(y(i)%T.sub.j)
             y(i)%T=y(i)%T+(r.mono.j)
@@ -1165,7 +1190,9 @@ contains
        (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
       enddo
       
-      if (c_%nd < 3) then
+      
+      if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
+!      if (c_%nd < 3) then
         y(5) = morph((one.mono.5))
         y(6) = morph((one.mono.5))
       endif
