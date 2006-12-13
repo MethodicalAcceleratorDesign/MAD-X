@@ -12,7 +12,7 @@ FC=g77 -g
 # NAG for testing
 #f95=f95
 # LF95 for production
-f95=lf95
+f95=lf95 -g
 
 # default fortran compiler options
 FCP= -fno-second-underscore -funroll-loops -I.
@@ -33,7 +33,7 @@ GCC_FLAGS=-g -Wall -D_CATCH_MEM -D_FULL
 # NAG alternative
 #f95_FLAGS=-c -O4 -maxcontin=100 -w=unused
 # LF95 default f95 compiler options
-f95_FLAGS= --o1 --tp -c
+f95_FLAGS= --tp -c
 
 # NAG f95 compiler options to compile f77 code
 #FFLAGS77=-gline -g90 -c -maxcontin=100 -nan
@@ -41,7 +41,7 @@ f95_FLAGS= --o1 --tp -c
 #FFLAGS77=-gline -g90 -c -maxcontin=100 -nan -ieee=full
 #FFLAGS77=-g90 -c -O4 -maxcontin=100 -w=unused
 # LF95 f95 compiler options to compile f77 code
-FFLAGS77= --o1 --tp -c
+FFLAGS77=  --tp -c
 
 # g77 link options
 FP=-static
