@@ -118,7 +118,7 @@ CONTAINS
     integer get_option,double_from_table
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: nt0=20000,length=16
-    real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad
+    real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
     real(dp) f_errors(0:50),aperture(maxnaper),normal(0:maxmul)
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
@@ -150,6 +150,7 @@ CONTAINS
 
     energy=get_value('beam ','energy ')
     pma=get_value('beam ','mass ')
+    charge=get_value('beam ','charge ')
     e0f=sqrt(ENERGY**2-pma**2)
 
     if (getdebug() > 0) then
@@ -271,6 +272,9 @@ CONTAINS
        print *, '    method        ',method0
        print *, '    Num. of steps ',nst0
     endif
+
+    my_ring%mass=pma
+    my_ring%charge=charge
 
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
 
