@@ -84,6 +84,7 @@
 #define w_ptc_normal            w_ptc_normal_
 #define w_ptc_track             w_ptc_track_
 #define w_ptc_start             w_ptc_start_
+#define w_ptc_moments           w_ptc_moments_
 #define w_ptc_initmoments       w_ptc_initmoments_
 #define w_ptc_select            w_ptc_select_
 #define w_ptc_writeparresults   w_ptc_writeparresults_
@@ -118,6 +119,7 @@
 #define seterrorflagfort        seterrorflagfort_  /*sets the dglobal error flag*/
 #define geterrorflag            geterrorflag_  /*returns the dglobal error flag*/
 #define getcurrentelementname   getcurrentelementname_
+#define getcurrentcmdname       getcurrentcmdname_
 #define stolower                stolower_
 #define cf77flush               cf77flush_
 #define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
@@ -220,6 +222,7 @@
 #define w_ptc_normal            W_PTC_NORMAL
 #define w_ptc_track             W_PTC_TRACK
 #define w_ptc_start             W_PTC_START
+#define w_ptc_moments           W_PTC_MOMENTS
 #define w_ptc_initmoments       W_PTC_INITMOMENTS
 #define w_ptc_select            W_PTC_SELECT
 #define w_ptc_writeparresults   W_PTC_WRITEPARRESULTS
@@ -253,6 +256,8 @@
 #define seterrorflagfort        SETERRORFLAGFORT  /*sets the dglobal error flag*/
 #define geterrorflag            GETERRORFLAG  /*returns the dglobal error flag*/
 #define getcurrentelementname   GETCURRENTELEMENTNAME
+#define getcurrentcmdname       GETCURRENTCMDNAME
+
 #define stolower                STOLOWER
 #define cf77flush               CF77FLUSH
 #define select_ptc_idx          SELECT_PTC_IDX  /* ETDA 10 nov 2004 */
@@ -884,6 +889,7 @@ void w_ptc_normal();
 void w_ptc_track();
 void w_ptc_start();
 void w_ptc_end();
+void w_ptc_moments(int* order);
 void w_ptc_initmoments();
 void w_ptc_dumpmaps();
 void w_ptc_trackline(int* nobspoints);
@@ -913,6 +919,7 @@ void w_ptc_open_gino(int* scriptname);
 void w_ptc_addpush(int* tabname, int* colname, int* polinomial, int* monomial);
 void w_ptc_enforce6d(int* flag);
 const char* getcurrentelementname();
+int  getcurrentcmdname(char*);
 
 int makemomentstables();
 

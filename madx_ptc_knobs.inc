@@ -20,7 +20,7 @@ end type resultdescr
 
 type mapelement
    integer       :: element  !defines the element of 6D function
-   character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3
+   character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3 
 end type mapelement
 !_____________________________________________________________
 

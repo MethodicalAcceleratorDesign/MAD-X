@@ -31,6 +31,13 @@ subroutine w_ptc_twiss(tab_name)
   call ptc_twiss(tab_name)
 end subroutine w_ptc_twiss
 
+subroutine w_ptc_moments(no)
+  use madx_ptc_distrib_module
+  implicit none
+  integer no
+  call ptc_moments(no)
+end subroutine w_ptc_moments
+
 subroutine w_ptc_initmoments()
   use madx_ptc_distrib_module
   implicit none

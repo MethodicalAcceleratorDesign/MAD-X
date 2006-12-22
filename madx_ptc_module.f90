@@ -34,6 +34,15 @@ MODULE madx_ptc_module
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
   integer, private, allocatable :: J(:)
 
+  type mapbuffer
+    type(universal_taylor)  :: unimap(6)
+    real(dp)                :: s
+    character(nlp+1)        :: name
+  end type mapbuffer 
+  
+  type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
+  integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
+
 
 CONTAINS
 
@@ -1699,6 +1708,7 @@ CONTAINS
     call alloc(y)
     y=npara
     Y=X
+
     c_%watch_user=.true.
     call track(my_ring,y,1,default)
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -1716,7 +1726,10 @@ CONTAINS
        return
     endif
     c_%watch_user=.false.
-    if (getdebug()>1) call daprint(y,18)
+    !if (getdebug()>1)
+    print77=.false.
+ 
+    call daprint(y,18)
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
@@ -1962,6 +1975,8 @@ CONTAINS
        return
     endif
 
+    call killsavedmaps() !module ptc_twiss -> kill buffered maps
+    
 !    call killparresult() 
     call resetknobs()  !remove the knobs
     
@@ -2334,5 +2349,27 @@ CONTAINS
 
 
   end subroutine makemaptable
+
+
+  !_________________________________________________________________
+
+  subroutine killsavedmaps
+    implicit none
+    integer i,ii
+    
+    if (.not. associated(maps)) then
+      return
+    endif  
+    
+    do i=lbound(maps,1),ubound(maps,1)
+      do ii=1,6
+       call kill(maps(i)%unimap(ii))
+      enddo 
+    enddo 
+    deallocate(maps)
+    nullify(maps)
+
+  end subroutine killsavedmaps
+  !_________________________________________________________________
 
 END MODULE madx_ptc_module

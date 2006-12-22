@@ -12,13 +12,13 @@ module madx_ptc_twiss_module
 
   implicit none
 
-
   save
   private
 
   !============================================================================================
   !  PUBLIC INTERFACE
   public                         :: ptc_twiss
+  
 
 
   !============================================================================================
@@ -27,7 +27,7 @@ module madx_ptc_twiss_module
   
   type(universal_taylor)  :: unimap(6)
   
-   type twiss
+  type twiss
 
       logical(lp) nf
       real(dp), dimension(3,3) ::  beta,alfa,gama
@@ -303,12 +303,11 @@ contains
     real(dp)                :: r,re(6,6),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
-    logical(lp)             :: moments
+    logical(lp)             :: savemaps
     integer                 :: n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
     integer                 :: row,double_from_table
     integer                 :: charge    ! charge of an accelerated particle
     real(dp)                :: ave(6,6,3), v
-    character(48)           :: momentstablename
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform
     
@@ -342,7 +341,6 @@ contains
     
     call kill_para(my_ring) !removes all the previous parameters
 
-    call initmoments() !defined in madx_ptc_distrib
     
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
@@ -400,7 +398,7 @@ contains
     mynd2 = 0
     npara = 0
     no = get_value('ptc_twiss ','no ')
-    if ( no < 1 ) then
+    if ( no .lt. 1 ) then
       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
       print*, "Order is ", no
       return
@@ -408,14 +406,9 @@ contains
     
     !this must be before initialization of the Bertz 
 
-    moments = aremomentson()
-    if (moments) then
-      initial_distrib_manual = get_value('ptc_twiss ','initial_moments_manual ') .ne. 0
-      if (initial_distrib_manual) then
-        call readinitialdistrib()
-      endif
-    else
-      initial_distrib_manual =  my_false 
+    initial_distrib_manual = get_value('ptc_twiss ','initial_moments_manual ') .ne. 0
+    if (initial_distrib_manual) then
+      call readinitialdistrib()
     endif
     
     
@@ -446,7 +439,6 @@ contains
     !############################################################################
     !############################################################################
     
-    call allocmoments() 
     
     call alloc(tw)
 
@@ -469,9 +461,22 @@ contains
        call print(default,6)
     endif
    
-   
-    do i=1,MY_RING%n
+    call killsavedmaps() !delete all maps, if present
+    mapsorder = 0 !it is set at the end, so we are sure the twiss was successful
 
+    savemaps = get_value('ptc_twiss ','savemaps ') .ne. 0
+    allocate(maps(MY_RING%n))
+
+    if (savemaps) then
+      do i=1,MY_RING%n
+        do ii=1,6
+         maps(i)%unimap(ii) = zero !this initializes and allocates the varables
+        enddo 
+      enddo 
+    endif
+    
+    do i=1,MY_RING%n
+       
        if (getdebug() > 1) then
           write(6,*) "##########################################"
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
@@ -505,9 +510,17 @@ contains
        call print(y,21)
 
        suml=suml+current%MAG%P%ld
+       
+       if (savemaps) then
+         do ii=1,6
+          maps(i)%unimap(ii) = y(ii)
+         enddo 
+         maps(i)%s = suml
+         maps(i)%name = current%mag%name
+       endif
+              
        tw=y
        call putusertable(i,current%mag%name,suml,y,y)
-       call putmoments(i,current%mag%name,suml,y)
 
        call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
 
@@ -515,15 +528,29 @@ contains
        current=>current%next
     enddo
 100 continue
+    
+    
+    print77=.true.
+
+    open(unit=121,file='end.map')
+    call print(y,121)
+    close(121)
 
     c_%watch_user=.false.
 
-    call killmoments()
     call kill(tw)
     CALL kill(y)
     do i=1,6
      call kill(unimap(i))
     enddo 
+
+    
+    if (savemaps) then  !do it at the end, so we are sure the twiss was successful
+      mapsorder = no
+      call ptc_moments(no*2) !calcualate moments with the maximum available order
+    endif
+    
+    
     call f90flush(20,my_false)
 
     !if (getdebug() > 2) 
@@ -608,18 +635,14 @@ contains
         elseif(beta_flg) then
            call readinitialtwiss()
 
-           open(unit=121,file='line.map')
-           call print(y,121)
-           close(121)
-
            if (geterrorflag() /= 0) then
               return
            endif
         else
            call track(my_ring,y,1,default)
            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-              call fort_warn('ptc_twiss: ','DA got unstable')
-              call seterrorflag(10,"ptc_twiss ","DA got unstable");
+              call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
+              call seterrorflag(10,"ptc_twiss ","DA got unstable (one turn map production)");
               return
            endif
 
@@ -627,7 +650,7 @@ contains
            if(flag_index/=0) then
               call ANALYSE_APERTURE_FLAG(flag_index,why)
 
-              write(whymsg,*) 'APERTURE unstable (map production) - programs continues: ',why
+              write(whymsg,*) 'APERTURE unstable (one turn map production) - programs continues: ',why
               call fort_warn('ptc_twiss: ',whymsg)
               call seterrorflag(10,"ptc_twiss: ",whymsg);
               !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
@@ -639,14 +662,7 @@ contains
            
            call maptoascript()
 
-           open(unit=121,file='ring.map')
-           call print(y,121)
-           close(121)
-
-           
-           if (moments) then
-             call reademittance()
-           endif 
+           call reademittance()
 
            
         endif
@@ -926,7 +942,7 @@ contains
       
       lam=10.d0*full_abs(ht)
       ht=ht/lam
-      if(fake_3) then
+      if(fake_3) then !1959 is the yearh of birth of Etienne (just a number)
         ht=ht+(0.1959e0_dp.mono.'000020')+(0.1959e0_dp.mono.'000002')
       endif
       h=ht
@@ -939,11 +955,9 @@ contains
       
 
       do i = 1,c_%nd2
-        call print(norm%a_t%v(i),6)
+        !call print(norm%a_t%v(i),6)
         unimap(i) = norm%a_t%v(i)
       enddo
-      
-      
       
 !      re=id      
       call setemittances(emi(1),emi(2),emi(3))
@@ -994,17 +1008,12 @@ contains
     subroutine readinitialmatrix
       !reads initial map elements from MAD-X ptc_twiss command parameters
       implicit none
+
       call readrematrix() !reads re
       call readreforbit() !reads x
       call initmapfrommatrix()
-
       call maptoascript()
-
-      
-      if (moments) then
-        call reademittance()
-      endif 
-      
+      call reademittance()
       
     end subroutine readinitialmatrix
     !_________________________________________________________________
@@ -1015,11 +1024,7 @@ contains
       call readrematrix() !reads re
       call readreforbit() !reads x
       call initmapfrommatrix()
-      
-      if (moments) then
-        call reademittance()
-      endif 
-      
+      call reademittance() 
       
     end subroutine readinitialascript
     !_________________________________________________________________
@@ -1037,7 +1042,6 @@ contains
         if ((emix + emiy + emiz) .le. zero) then
           call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
           call killmoments()  !switches 
-          moments = my_false
         endif
         call setemittances(emix,emiy,emiz)
     end subroutine reademittance
@@ -1146,15 +1150,12 @@ contains
 
       CALL write_closed_orbit(icase,x)
 
-      if (moments) then
-        call reademittance()
-      endif 
+      call reademittance()
       
       !Here we initialize Y(6)
       
       call alloc(be); call alloc(al); call alloc(di)
 
-            
       !  code to power knows
       ! 
       k_system=0
@@ -1224,7 +1225,6 @@ contains
     end subroutine readinitialtwiss
 
   END subroutine ptc_twiss
-  !_________________________________________________________________
 
 end module madx_ptc_twiss_module
  

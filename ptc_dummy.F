@@ -38,6 +38,12 @@
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end
+      subroutine w_ptc_moments(no)
+      implicit none
+      integer no
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end 
       subroutine w_ptc_initmoments()
       implicit none
       call fort_warn('PTC command skipped! ',                           &

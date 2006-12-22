@@ -467,7 +467,7 @@ char command_def[] =
 "energy   = [r, 0], "
 "file     = [s, none, ptc_twiss], "
 "table    = [s, none, ptc_twiss], "
-"moments  = [l, false, true], " /*stores in the table with specified name  */
+"savemaps = [l, true, true], " /*buffers maps for future usage as universal_taylors */
 "xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
 "ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
 "zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
@@ -498,6 +498,12 @@ char command_def[] =
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "betz     = [r, 0], alfz     = [r, 0], muz      = [r, 0], "
 "beta0    = [s, none, beta0]; "
+" "
+"ptc_moments: ptc_moments none 0 0 "
+"no = [i, 1], "
+"xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
+"ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
+"zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
 " "
 "select_ptc_normal: select_ptc_normal none 0 0 "
 "dx =   [s, {none}], "
@@ -536,6 +542,16 @@ char command_def[] =
 "ptc_dumpmaps: ptc_dumpmaps none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/
 "range    = [s,  #s/#e], "
 "frombegin     = [s, ptcmaps, ptcmaps], "
+"file     = [s, ptcmap, ptcmaps]; "
+" "
+"ptc_oneturnmap: ptc_oneturnmap none 0 0 " /*implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90*/
+"x        = [r, 0], "
+"px       = [r, 0], "
+"y        = [r, 0], "
+"py       = [r, 0], "
+"t        = [r, 0], "
+"pt       = [r, 0], "
+"range    = [s,  #s/#e], "
 "file     = [s, ptcmap, ptcmaps]; "
 " "
 "ptc_track_shape: ptc_track_shape none 0 0 "

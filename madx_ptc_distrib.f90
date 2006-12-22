@@ -6,6 +6,8 @@ module madx_ptc_distrib_module
 ! This module contains service for trackin
 
   use madx_keywords
+  use madx_ptc_module
+  USE madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
   implicit none
 
@@ -15,7 +17,8 @@ module madx_ptc_distrib_module
 
   !============================================================================================
   !  PUBLIC INTERFACE
-  public                         :: aremomentson
+  public                         :: aremomentson 
+  public                         :: ptc_moments 
   public                         :: putmoments
   public                         :: initmoments
   public                         :: allocmoments
@@ -130,7 +133,7 @@ contains
    coln = moments(n)%column  
     
     
-  end subroutine 
+  end subroutine getmomentstabcol
   !____________________________________________________________________________________________
 
 
@@ -144,7 +147,66 @@ contains
       endif
     
   end function aremomentson
+  !_________________________________________________________________
+
+  subroutine ptc_moments(order)
+    implicit none
+    integer       :: order,mynd2,npara,nda
+    integer       :: i,ii,iii
+    type(real_8)  :: y(6)
+    integer       :: restart_sequ,advance_node
+
+    if (mapsorder < 1) then
+      call seterrorflag(1,"mapsorder",&
+         "Maps are not available. Did you run ptc_twiss with savemaps=true ?")
+      return   
+    endif
+    
+    if (.not. associated(maps)) then
+      return
+    endif 
+
+    call initmoments() !defined in madx_ptc_distrib
+    call makemomentstables();
+    
+    nda = getnknobsall() !defined in madx_ptc_knobs
+    
+    !print*, "In moments order ", order
+    mynd2 = 0
+    npara = 0
+    call init(default,order,nda,BERZ,mynd2,npara)
+
+    call allocmoments() 
+
+    call alloc(y)
+
+    iii=restart_sequ()
+
+    do i=lbound(maps,1),ubound(maps,1)
+
+!       if (i == MY_RING%n) then
+!         call ptc_setdebuglevel(1)
+!       endif
+
+       do ii=1,6
+         y(ii) = maps(i)%unimap(ii) 
+       enddo
+
+       call putmoments(i,maps(i)%name,maps(i)%s,y)
+
+       iii=advance_node()
+
+    enddo
+100 continue
+    
+    call ptc_setdebuglevel(0)
+    
+    call kill(y)
+    call killmoments()
+
+  end subroutine ptc_moments
   !____________________________________________________________________________________________
+
 
   subroutine putmoments(n,name,s,y)
     implicit none
@@ -154,7 +216,7 @@ contains
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
     real(dp)             :: v
     logical              :: set
-    integer              :: i,j,k
+    integer              :: i,j,k,e(6)
     
     
     
@@ -171,34 +233,73 @@ contains
 
     do i=1, nmoments
        
+       function_to_average = zero
        set = .false.
+       
        do j=1,c_%nd2
+!         write(*,'(a6,i1,a6,i1,a6,i1)',ADVANCE='NO') "nmom=",i," ndim=",j," pow=",moments(i)%iarray(j)
          do k = 1, moments(i)%iarray(j)
-           
            if (set) then
              function_to_average = function_to_average*y(j)%t
+!             write(*,'(a1)',ADVANCE='NO') "*"  
            else
              function_to_average = y(j)%t
              set = .true.
+!             write(*,'(a1)',ADVANCE='NO') "|"  
            endif  
          enddo
+!         write(*,*) "->"
        enddo
 
 !       function_to_average=y(1)*y(1) ! just a function (taylor series)
 
+       if (getdebug() > 0) then
+
+         print*, "Function"
+         call print(y(1),6)
+         print*, "Function2"
+         call print(function_to_average,6)
+       endif  
+
+         
        call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function 
+
+       if (getdebug() > 1) then
+         print*, "After cfu"
+         call print(function_to_average,6)
+       endif  
+
        function_to_average=function_to_average.o.damapa ! replaces x px y py ... by sigma1, sigma2, etc
 
-       
        v = function_to_average.sub.0
        
-       call double_to_table(moments(i)%table,moments(i)%column,v)
+       if (c_%npara == 5) then
+         e = 0
+         do k=1,c_%no
 
-!       print*,moments(i)%iarray
-!       call print(function_to_average,6)
-!       print*, v
-!       print*,"----------------------------------"
-     
+           e(5) = k
+
+           if (getdebug() > 0) then
+             print*, "5D k=",k
+             print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
+           endif  
+
+           v = v + (function_to_average.sub.e) * (sigmas(5)**(2*k))
+         enddo  
+       endif
+       
+       
+       call double_to_table(moments(i)%table,moments(i)%column,v)
+       
+       if (getdebug() > 0) then
+         print*, "Final: "
+         print*,moments(i)%iarray
+         call print(function_to_average,6)
+         print*, v
+         print*,"----------------------------------"
+       endif   
+       
+            
     enddo    
 
     call augmentcountmomtabs(s)
@@ -239,7 +340,7 @@ contains
     sigmas(5) = sqrt(emiz)
     sigmas(6) = sigmas(5)
 
-    print*, sigmas
+    print*,"Sigmas:", sigmas
     
     
   end subroutine setemittances
@@ -252,9 +353,11 @@ contains
     integer                         :: i ! dimension
     integer                         :: get_string 
     character(len=48), dimension(3) :: disttypes
+    character(len=48)               :: cmdname
     integer, dimension(3)           :: stringlength
     character(48)                   :: tmpstring
     real(kind(1d0))                 :: get_value
+    integer                         :: getcurrentcmdname
     ! This routine must be called before any init in ptc_twiss is performed
     ! since it initialize Bertz for its purpose
     !
@@ -262,26 +365,31 @@ contains
     if ( associated(normmoments) ) then
       deallocate(normmoments)
     endif
-    
-    
-    
-    i = get_value('ptc_twiss ','moments ')
 
-    if (i .eq. 0 ) then
-      call fort_warn("initmoments","Moments are not requested.")
+    if (nmoments < 1) then
+      call fort_warn("initmoments","No moments specified for calculation.")
       return
     endif
-
-
-    stringlength(1) = get_string('ptc_twiss ','xdistr ',disttypes(1))
-    stringlength(2) = get_string('ptc_twiss ','ydistr ',disttypes(2))
-    stringlength(3) = get_string('ptc_twiss ','zdistr ',disttypes(3))
     
-    no = get_value('ptc_twiss ','no ')
-    if ( no <= 1 ) then
+    
+    i = getcurrentcmdname(cmdname);
+    
+    if (i .eq. 0 ) then
+      call fort_warn("initmoments","Can not get the current command name.")
+      return
+    endif
+    
+    stringlength(1) = get_string(cmdname,'xdistr ',disttypes(1))
+    stringlength(2) = get_string(cmdname,'ydistr ',disttypes(2))
+    stringlength(3) = get_string(cmdname,'zdistr ',disttypes(3))
+    
+    !we take what was available in the last ptc_twiss and go to maximum order we can go
+    no =  mapsorder 
+    if ( no < 1 ) then
       call fort_warn('madx_ptc_distrib.f90 <initmoments>:','Order in twiss is smaller then 1')
       return
     endif
+    no = no*2 !we take what was available in the last ptc_twiss and go to maximum order we can go
     
     allocate(normmoments(3, 0:no, 0:no))
     normmoments = zero
@@ -290,15 +398,15 @@ contains
        tmpstring = disttypes(i)
        select case(tmpstring(1:stringlength(i)))
          case ('gauss')
-           print*, "initmoments: Gauss distribution for dimension ", i
+           if (getdebug() > 1) print*, "initmoments: Gauss distribution for dimension ", i
            call makegaus(no,i)
            distributiontype(i) = distr_gauss
          case ('flat5')
-           print*, "initmoments: Flat distribution for dimension ", i
+           if (getdebug() > 1) print*, "initmoments: Flat distribution for dimension ", i
            call makeflat5(no,i)
            distributiontype(i) = distr_flat5
          case ('flat56')
-           print*, "initmoments: Flat distribution for dimension ", i
+           if (getdebug() > 1) print*, "initmoments: Flat distribution for dimension ", i
            call makeflat56(no,i)
            distributiontype(i) = distr_flat56
          case default
@@ -310,10 +418,6 @@ contains
        end select
       
     enddo
-
-
-     
-    
 
   end subroutine initmoments
   !_________________________________________________________________________________
@@ -355,12 +459,21 @@ contains
     integer i
 
     filter=one
+    
 
     do i=1,c_%nd
      
      filter=filter*normmoments(i,e(2*i-1),e(2*i))
-     
+     if (getdebug() > 1) then
+        print*, "normmoments(",i, e(2*i-1), e(2*i),")=", normmoments(i,e(2*i-1),e(2*i))
+     endif
     enddo
+
+    if (getdebug() > 1) then
+      
+      print*,"f(",e(1:6),")=",filter
+      print*,"=================="
+    endif
 
   end function filter
 
@@ -377,7 +490,7 @@ contains
    type(taylor) x,p,f
    type(Taylorresonance) fr
 
-      print*, "Making Gauss distributions"
+      if (getdebug() > 1) print*, "Making Gauss distributions"
 
       call init(no,1,0,0)
 
@@ -403,7 +516,7 @@ contains
          normmoments(d,i,j)=normmoments(d,i,j)*singlefac(jn(1))*two**(jn(1))
          normmoments(d,j,i)=normmoments(d,i,j)
          
-         print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+         if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
        enddo
       enddo
       call kill(x,p,f)
@@ -420,7 +533,7 @@ contains
    real(dp), allocatable :: m(:,:)
    integer i,j 
 
-    print*, "Making flat distribution "
+    if (getdebug() > 1) print*, "Making flat distribution "
 
      do i=0,no
        do j=i,no
@@ -429,7 +542,7 @@ contains
 
         normmoments(d,i,j)=(three)**(i/2)/(i+1) !delta assumed flat distribution and
         normmoments(d,j,i)=normmoments(d,i,j)   !and L is the delta function
-        print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+        if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
 
        enddo
      enddo
@@ -445,7 +558,7 @@ contains
    real(dp), allocatable :: m(:,:)
    integer i,j 
 
-    print*, "Making flat in delta and T distributions"
+    if (getdebug() > 1) print*, "Making flat in delta and T distributions"
 
      do i=0,no,2
        do j=i,no,2
@@ -455,7 +568,7 @@ contains
         
         normmoments(d,j,i)=normmoments(d,i,j)   !and L is the delta function
 
-        print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+        if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
 
        enddo
      enddo

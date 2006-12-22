@@ -1513,6 +1513,10 @@ void exec_command()
       {
         ptc_dumpmaps(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_oneturnmap") == 0)
+      {
+        ptc_oneturnmap(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_twiss_linac") == 0)
       {
         current_twiss = p->clone;
@@ -1529,6 +1533,10 @@ void exec_command()
       else if (strcmp(p->cmd_def->module, "ptc_select") == 0)
       {
         pro_ptc_select(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_moments") == 0)
+      {
+        pro_ptc_moments(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_select_moment") == 0)
       {

@@ -4767,8 +4767,6 @@ void pro_ptc_twiss()
   twiss_table = make_table(table_name, "twiss", twiss_table_cols,
                            twiss_table_types, current_sequ->n_nodes);
   
-  makemomentstables();
-         
   twiss_table->dynamic = 1;
   add_to_table_list(twiss_table, table_register);
   current_sequ->tw_table = twiss_table;
@@ -7647,6 +7645,10 @@ void ptc_dumpmaps(struct in_cmd* cmd)
   w_ptc_dumpmaps_();
 }
 /********************************************************************************/
+void ptc_oneturnmap(struct in_cmd* cmd)
+{
+}
+/********************************************************************************/
 
 void pro_ptc_trackline(struct in_cmd* cmd)
 {
@@ -8500,6 +8502,17 @@ int pro_ptc_select_checkpushtable(struct in_cmd* cmd,
 
   return 0;
 }
+/********************************************************************************/
+int pro_ptc_moments(struct in_cmd* cmd)
+{
+   
+  int no = (int)command_par_value("no", cmd->clone); 
+  
+  w_ptc_moments(&no);
+  
+  return 1;
+}
+        
 
 /********************************************************************************/
 int pro_ptc_select_moment(struct in_cmd* cmd)
@@ -8673,17 +8686,16 @@ int makemomentstables()
    
    
   nmom = w_ptc_getnmoments();
-  printf("There is %d moments:\n",nmom);
   for (i = 1; i <= nmom; i++)
    {
       w_ptc_getmomentstabcol(&i, tabname, colname);
-      printf(" mom %d: %s %s\n",i, tabname, colname);
+      /*printf(" mom %d: %s %s\n",i, tabname, colname);*/
       
       for(j=0; tables[j] != 0x0 ;j++)
        {
          if ((strcmp(tables[j],tabname) == 0)) break;
        }
-      printf(" index of this table is %d \n",j);
+      /*printf(" index of this table is %d \n",j);*/
       
       if (tables[j] == 0x0) 
        {
@@ -8709,11 +8721,11 @@ int makemomentstables()
   
   for(j=0; tables[j] != 0x0 ;j++)
    {
-     printf("Making table %s\n",tables[j]);
+     /*printf("Making table %s\n",tables[j]);*/
      
      t = new_table(tables[j], "usermoments", current_sequ->n_nodes, cols[j]);
      t->org_cols = cols[j]->curr;
-     print_table(t);
+     /*print_table(t);*/
      add_to_table_list(t, table_register);
      add_to_table_list(t, moments_tables);
    }
@@ -8737,7 +8749,7 @@ void augmentcountmomtabs(double* s)
   
   for ( i = 0; i <  moments_tables->curr; i++)
    {
-     t = table_register->tables[i];
+     t = moments_tables->tables[i];
      t->s_cols[0][t->curr] = tmpbuff(current_node->name);
      t->d_cols[1][t->curr] = *s;
      if (t->num_cols > t->org_cols)  add_vars_to_table(t);
@@ -9204,6 +9216,18 @@ int getnumberoftracks()
   }
 
   return stored_track_start->curr;
+
+}
+
+int  getcurrentcmdname(char* string)
+{
+  if (current_command == 0x0)
+   {
+     return 0;
+   }
+   
+  strcpy(string, current_command->name); 
+  return strlen(current_command->name);
 
 }
 
