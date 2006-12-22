@@ -280,10 +280,11 @@ CONTAINS
        print *, '    energy        ',energy
        print *, '    method        ',method0
        print *, '    Num. of steps ',nst0
+       print *, '    charge        ',charge
     endif
 
     my_ring%mass=pma
-    my_ring%charge=charge
+!    my_ring%charge=charge -> Makes DA ustable in twiss!!!
 
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
 

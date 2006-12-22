@@ -8574,7 +8574,7 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
        
          mdefin = c_parameters->parameters[pos]->m_string->p[j];
 
-         printf("String no %d is %s\n", j, mdefin);
+         /*printf("String no %d is %s\n", j, mdefin);*/
          
          clen = strlen(mdefin);
 
@@ -8609,7 +8609,6 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
   /*i is dummy... we know there is no strings or doubles */
   comm_para_("moment", &pos, &i, &i, int_arr, 0x0, 0x0, 0x0);
 
-  printf("pos is %d\n",pos);
   if (pos > 6) pos = 6;
 /*if there is something and it is not only one zero */
   if ( (pos >= 0)       && !((pos == 1) && (int_arr[0] == 0))  )  

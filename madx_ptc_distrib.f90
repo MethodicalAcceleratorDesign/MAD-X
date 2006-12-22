@@ -96,11 +96,11 @@ contains
     endif    
     
     
-!    if (getdebug()>3) then
+    if (getdebug()>3) then
        print  *,"addmoment : <", moments(nmoments)%iarray(1:6) ,&
       &                   ">,<", moments(nmoments)%column,&
       &                   ">,<", moments(nmoments)%table, ">)"
-!    endif
+    endif
 
 
 

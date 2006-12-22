@@ -408,6 +408,9 @@ contains
 
     initial_distrib_manual = get_value('ptc_twiss ','initial_moments_manual ') .ne. 0
     if (initial_distrib_manual) then
+      if (getdebug() > 1) then
+        print*,"Initializing map with initial_moments_manual=true" 
+      endif
       call readinitialdistrib()
     endif
     
@@ -465,11 +468,12 @@ contains
     mapsorder = 0 !it is set at the end, so we are sure the twiss was successful
 
     savemaps = get_value('ptc_twiss ','savemaps ') .ne. 0
-    allocate(maps(MY_RING%n))
 
     if (savemaps) then
+      allocate(maps(MY_RING%n))
       do i=1,MY_RING%n
         do ii=1,6
+         call alloc(maps(i)%unimap(ii),0,0)
          maps(i)%unimap(ii) = zero !this initializes and allocates the varables
         enddo 
       enddo 
@@ -574,7 +578,7 @@ contains
         mman  = get_value('ptc_twiss ','initial_matrix_manual ')
         mtab  = get_value('ptc_twiss ','initial_matrix_table ')
         mascr = get_value('ptc_twiss ','initial_ascript_manual ')
-        mdistr = get_value('ptc_twiss ','initial_ascript_manual ')
+        mdistr = get_value('ptc_twiss ','initial_moments_manual ')
         
         
         initial_matrix_manual = mman .ne. 0
@@ -582,13 +586,13 @@ contains
         initial_ascript_manual = mascr .ne. 0
         
         
-        if ( (mman + mtab + mascr) > 1) then
+        if ( (mman + mtab + mascr + mdistr) > 1) then
            call seterrorflag(11,"ptc_twiss ","Ambigous option comman options");
            print*, "Only one of the following switches might be on:"
            print*, "initial_matrix_manual  = ", initial_matrix_manual
            print*, "initial_matrix_table   = ", initial_matrix_table 
            print*, "initial_ascript_manual = ", initial_ascript_manual
-           print*, "initial_distrib_manual = ", initial_distrib_manual
+           print*, "initial_moments_manual = ", mdistr
         endif
         
 !        print*, "initial_distrib_manual is ",initial_distrib_manual
@@ -606,15 +610,26 @@ contains
 
         if(initial_matrix_table) then
            
+           if (getdebug() > 1) then
+             print*,"Initializing map with initial_matrix_table=true" 
+           endif
            call readmatrixfromtable()
            
         elseif(initial_ascript_manual) then
+
+           if (getdebug() > 1) then
+             print*,"Initializing map with initial_ascript_manual=true" 
+           endif
            call readinitialascript()
            if (geterrorflag() /= 0) then
               return
            endif
+
         elseif(initial_matrix_manual) then
 
+           if (getdebug() > 1) then
+             print*,"Initializing map with initial_matrix_manual=true" 
+           endif
            call readinitialmatrix()
 
            if (geterrorflag() /= 0) then
@@ -622,7 +637,10 @@ contains
            endif
         elseif (initial_distrib_manual) then
            !matrix is already prepared beforehand
-           print*, "Initializing map from prepared UniTaylor"
+           if (getdebug() > 1) then
+             print*,"Initializing map with initial_moments_manual=true" 
+             print*, "Initializing map from prepared UniTaylor"
+           endif
            call readreforbit() !reads x
 
            do i=1, c_%nd2
@@ -633,12 +651,22 @@ contains
               return
            endif
         elseif(beta_flg) then
+
+           if (getdebug() > 1) then
+             print*,"Initializing map with initial twiss parameters" 
+           endif
+
            call readinitialtwiss()
 
            if (geterrorflag() /= 0) then
               return
            endif
         else
+
+           if (getdebug() > 1) then
+             print*,"Initializing map from one turn map" 
+           endif
+
            call track(my_ring,y,1,default)
            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
               call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
