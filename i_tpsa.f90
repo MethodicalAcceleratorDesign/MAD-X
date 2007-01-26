@@ -1,6 +1,6 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file a_scratch_size
+!Copyright (C) Etienne Forest
+
 
 MODULE TPSA
   !use newda
@@ -33,6 +33,8 @@ MODULE TPSA
 
   private NO,ND,ND2,NP,NDPT,NV
   integer NP,NO,ND,ND2,NDPT,NV
+  integer, TARGET :: NSPIN=0
+  integer, TARGET :: SPIN_pos=0
   private old
   logical(lp) old
   logical(lp),target  :: real_warning =.true.

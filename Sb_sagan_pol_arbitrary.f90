@@ -1,3 +1,6 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
+
 module S_pol_sagan
   use precision_constants
   implicit none

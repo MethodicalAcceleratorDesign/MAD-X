@@ -1,6 +1,5 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
 
 module madx_keywords
   use S_fitting
@@ -313,7 +312,7 @@ contains
     IF(PRESENT(RING)) RING_IT=RING
 
     call kanalnummer(mf)
-    open(unit=mf,file=filename)
+    open(unit=mf,file=filename,status='OLD',err=2001)
 
     IF(PRESENT(LMAX)) then
        READ(MF,*) N,LMAX
@@ -350,7 +349,11 @@ contains
 
     doneit=.true.
     call ring_l(L,doneit)
+    return
 
+2001 continue
+
+    Write(6,*) " File ",filename(1:len_trim(filename)) ," does not exist "
 
   END subroutine READ_INTO_VIRGIN_LAYOUT
 

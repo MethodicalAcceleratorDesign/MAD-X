@@ -1,6 +1,5 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
 
 MODULE S_DEF_KIND
   USE S_def_all_kinds   ! not needed because of things below

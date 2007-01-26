@@ -1,6 +1,6 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file a_scratch_size
+!Copyright (C) Etienne Forest
+
 module tpsalie
   use tpsa
   implicit none
@@ -380,9 +380,13 @@ contains
   SUBROUTINE  allocmap(S1)
     implicit none
     type (damap),INTENT(INOUT)::S1
+    INTEGER I
 
+    DO I=1,ND2
+       CALL ALLOC(S1%V(I))
+    ENDDO
     ! if(old) then
-    call etall(s1%v%i,nd2)
+    ! call etall(s1%v%i,nd2)
     !    else
     !       call NEWetall(s1%v%j,nd2)
     !    endif
@@ -447,8 +451,12 @@ contains
   SUBROUTINE  KILLmap(S1)
     implicit none
     type (damap),INTENT(INOUT)::S1
+    INTEGER I
     ! if(old) then
-    call DADAL(s1%v%i,nd2)
+    DO I=1,ND2
+       CALL KILL(s1%v(I))
+    ENDDO
+    !    call DADAL(s1%v%i,nd2)
     !    else
     !       call newDADAL(s1%v%j,nd2)
     !    endif

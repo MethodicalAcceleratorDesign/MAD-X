@@ -1,3 +1,6 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
+
 TYPE MAGNET_FRAME
    REAL(DP), POINTER,DIMENSION(:)  ::   A
    REAL(DP), POINTER,DIMENSION(:,:)::   ENT

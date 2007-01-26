@@ -1,6 +1,8 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file a_scratch_size
+!Copyright (C) Etienne Forest
+! Taylor polymorphism at execution is based on an idea
+! and C++ prototype developed  by J. Bengtsson circa 1990
+
 module polymorphic_taylor
   use complex_taylor
   implicit none
@@ -4541,7 +4543,10 @@ contains
              s2%kind=2
              s2%alloc=t
           else
-             write(6,*) "EQUAL IN m_POLYMORPH ",s2%i
+             write(6,*) "EQUAL IN m_POLYMORPH ",s2%i,S2%KIND,S2%ALLOC
+             WRITE(6,*) " I "
+             READ(5,*) s2%i
+             WRITE(6,*) SQRT(FLOAT(s2%i))
              stop 777
           endif
 

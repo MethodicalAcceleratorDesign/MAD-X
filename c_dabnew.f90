@@ -9,16 +9,17 @@ module dabnew
   implicit none
   private
   public ppushstore,ppushprint,ppushGETN
-  public bran
+  public bran,DEALLOC_ALL
   PUBLIC DAINI,DANOT,DAALLNO,DAVAR,DAALL1,PPUSH,MTREE,DADAL,DACCT,DADER,DASQR
   PUBLIC DAMUL,DAADD,DACOP,DAINV,DAPIN,DAPEK,DAPOK,DACFU,DASUB,DACON,DADAL1
   PUBLIC DACLR,DACMU,DALIN,DAREA,DAPRI,DAABS,DAEPS,DATRA,MATINV,DAFUN
   PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR,DAPOI
-  PUBLIC DACFUI,DAPRI77,DAREA77,DAINF,GET_C_J,PPUSH1,dacycle
-  public count_da,DEALLOC_ALL
+  PUBLIC DACFUI,DAPRI77,DAREA77,DAINF,GET_C_J,PPUSH1,DALLSTA,dacycle
+  public count_da
 
   integer,private,parameter::nmax=400,lsw=1
   real(dp),private,parameter::tiny=c_1d_20
+  character(120) line
 
 contains
   !******************************************************************************
@@ -446,6 +447,47 @@ contains
     return
   end subroutine daini
 
+  subroutine daexter
+    implicit none
+    !     *****************************
+    !
+    !-----------------------------------------------------------------------------
+    !     integer i1,i2,ia1,ia2,idall,idalm,idano,idanv,idapo,ie1,ie2,ieo,ifi,lfi,nda,ndamaxi,nmmax,nocut,nomax,nst,nvmax
+    !-----------------------------------------------------------------------------
+    !
+    integer i
+    !
+    if(.not.notallocated) then
+       do i=1, lda
+          allvec(i)=.false.
+       enddo
+    endif
+
+    return
+  end subroutine daexter
+
+  subroutine dallsta(ldanow)
+    implicit none
+    !     *****************************
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,ldanow
+    !
+    ldanow=0
+    do i=1, lda
+       if(allvec(i)) ldanow=ldanow+1
+    enddo
+
+    w_p=0
+    w_p%nc=1
+    write(w_p%c(1),'(a11,i8)') ' ALLOCATED ',ldanow
+    w_p%fc='(1((1X,A72)))'
+    CALL WRITE_i
+
+    return
+  end subroutine dallsta
+
   !
   ! EXAMPLE: ARRAYS I1 THROUGH I20, IE1,IE2,IEO (NOMAX=3,NVMAX=4)
   ! *************************************************************
@@ -503,6 +545,551 @@ contains
   !   11         0         0
   !   12        10        34   NOMAX = 3,  NVMAX = 4, NMMAX = 35
   !
+  subroutine daallno(ic,l,ccc)
+    implicit none
+    !     ********************************
+    !
+    !     THIS SUBROUTINE ALLOCATES STORAGE FOR A DA VECTOR WITH
+    !     ORDER NOmax AND NUMBER OF VARIABLES NVmax
+    !
+    !-----------------------------------------------------------------------------
+    !
+    logical(lp) incnda
+    integer i,ind,l,ndanum,no,nv,ipause,mypauses
+    integer,dimension(:)::ic
+    real(dp) x
+    character(10) c,ccc
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    !
+    no=nomax
+    nv=nvmax
+    ind = 1
+    do i=1,l
+       if(ic(i).gt.0.and.ic(i).le.nda) then
+          !         DANAME(IC(I)) = C
+          !         IF(IDANO(IC(I)).EQ.NO.AND.IDANV(IC(I)).EQ.NV) THEN
+       else
+          if(nv.ne.0.and.(no.gt.nomax.or.nv.gt.nvmax)) then
+             write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
+                  &' NOMAX, NVMAX = ',nomax,nvmax
+             ipause=mypauses(5,line)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+          !
+          if(nhole.gt.0) then
+             ind=nda
+20           if (allvec(ind)) then
+                ind = ind - 1
+                goto 20
+             endif
+             incnda = .false.
+             nhole=nhole-1
+          else
+             incnda = .true.
+             nda = nda + 1
+             ind=nda
+             if(nda.gt.lda) then
+                write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                ipause=mypauses(6,line)
+                call dadeb(31,'ERR DAALL ',1)
+             endif
+          endif
+
+          allvec(ind) = .true.
+          ic(i) = ind
+          !
+          if(nv.ne.0) then
+             call danum(no,nv,ndanum)
+          else
+             ndanum = no
+          endif
+
+          c = ccc
+          if(l.ne.1) write(c(6:10),'(I5)') i
+          daname(ind) = c
+
+          if (incnda) then
+             if(ind.gt.nomax+2) then
+                idano(ind) = nomax
+                idanv(ind) = nvmax
+                idapo(ind) = nst + 1
+                idalm(ind) = nmmax
+                idall(ind) = 0
+                nst = nst + nmmax
+             else
+                idano(ind) = no
+                idanv(ind) = nv
+                idapo(ind) = nst + 1
+                idalm(ind) = ndanum
+                idall(ind) = 0
+                nst = nst + ndanum
+             endif
+          endif
+          !
+          if(nst.gt.lst) then
+             x=-one
+             w_p=0
+             w_p%nc=5
+             w_p%fc='(4(1X,a72,/),(1X,a72))'
+             w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
+             w_p%c(2)=  ' NST,LST '
+             write(w_p%c(3),'(i8,1x,i8)') NST,LST
+             w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
+             write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda,ndanum,nda*ndanum
+             CALL WRITE_E(124)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+          !
+          if(nv.eq.0.or.nomax.eq.1) then
+             call daclr(ic(i))
+             idall(ic(i)) = idalm(ic(i))
+          endif
+       endif
+    enddo
+    !
+    if(nda.gt.ndamaxi) ndamaxi=nda
+
+    return
+  end subroutine daallno
+
+  subroutine daallno1(ic,ccc)
+    implicit none
+    !     ********************************
+    !
+    !     THIS SUBROUTINE ALLOCATES STORAGE FOR A DA VECTOR WITH
+    !     ORDER NOmax AND NUMBER OF VARIABLES NVmax
+    !
+    !-----------------------------------------------------------------------------
+    !
+    logical(lp) incnda
+    integer ind,ndanum,no,nv,ic,ipause,mypauses
+    character(10) c,ccc
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    !
+    no=nomax
+    nv=nvmax
+    ind = 1
+    if(ic.gt.0.and.ic.le.nda) then
+       !         DANAME(IC(I)) = C
+       !         IF(IDANO(IC(I)).EQ.NO.AND.IDANV(IC(I)).EQ.NV) THEN
+    else
+       if(nv.ne.0.and.(no.gt.nomax.or.nv.gt.nvmax)) then
+          write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
+               &' NOMAX, NVMAX = ',nomax,nvmax
+          ipause=mypauses(7,line)
+          call dadeb(31,'ERR DAALL ',1)
+       endif
+       !
+       if(nhole.gt.0) then
+          ind=nda
+20        if (allvec(ind)) then
+             ind = ind - 1
+             goto 20
+          endif
+          incnda = .false.
+          nhole=nhole-1
+       else
+          incnda = .true.
+          nda = nda + 1
+          ind=nda
+          if(nda.gt.lda) then
+             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             ipause=mypauses(8,line)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+       endif
+
+       allvec(ind) = .true.
+       ic = ind
+       !
+       if(nv.ne.0) then
+          call danum(no,nv,ndanum)
+       else
+          ndanum = no
+       endif
+
+       c = ccc
+       write(c(6:10),'(I5)') 1
+       daname(ind) = c
+
+       if (incnda) then
+          if(ind.gt.nomax+2) then
+             idano(ind) = nomax
+             idanv(ind) = nvmax
+             idapo(ind) = nst + 1
+             idalm(ind) = nmmax
+             idall(ind) = 0
+             nst = nst + nmmax
+          else
+             idano(ind) = no
+             idanv(ind) = nv
+             idapo(ind) = nst + 1
+             idalm(ind) = ndanum
+             idall(ind) = 0
+             nst = nst + ndanum
+          endif
+       endif
+       !
+       if(nst.gt.lst) then
+          w_p=0
+          w_p%nc=5
+          w_p%fc='(4(1X,a72,/),(1X,a72))'
+          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
+          w_p%c(2)=  ' NST,LST '
+          write(w_p%c(3),'(i8,1x,i8)') NST,LST
+          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
+          write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda,ndanum,nda*ndanum
+          CALL WRITE_E(125)
+          call dadeb(31,'ERR DAALL ',1)
+       endif
+       !
+       if(nv.eq.0.or.nomax.eq.1) then
+          call daclr(ic)
+          idall(ic) = idalm(ic)
+       endif
+    endif
+
+    !
+    if(nda.gt.ndamaxi) ndamaxi=nda
+
+    return
+  end subroutine daallno1
+
+  subroutine daall(ic,l,ccc,no,nv)
+    implicit none
+    !     ********************************
+    !
+    !     THIS SUBROUTINE ALLOCATES STORAGE FOR A DA VECTOR WITH
+    !     ORDER NO AND NUMBER OF VARIABLES NV
+    !
+    !-----------------------------------------------------------------------------
+    !
+    logical(lp) incnda
+    integer i,ind,l,ndanum,no,nv,ipause,mypauses
+    integer,dimension(:)::ic
+    character(10) c,ccc
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    !
+    ind = 1
+
+    do i=1,l
+       if(ic(i).gt.0.and.ic(i).le.nda) then
+          !         DANAME(IC(I)) = C
+          !         IF(IDANO(IC(I)).EQ.NO.AND.IDANV(IC(I)).EQ.NV) THEN
+       else
+          if(nv.ne.0.and.(no.gt.nomax.or.nv.gt.nvmax)) then
+             write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
+                  &' NOMAX, NVMAX = ',nomax,nvmax
+             ipause=mypauses(9,line)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+          !
+          if(nhole.gt.0) then
+             ind=nda
+20           if (allvec(ind)) then
+                ind = ind - 1
+                goto 20
+             endif
+             incnda = .false.
+             nhole=nhole-1
+          else
+             incnda = .true.
+             nda = nda + 1
+             ind=nda
+             if(nda.gt.lda) then
+                write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                ipause=mypauses(10,line)
+                call dadeb(31,'ERR DAALL ',1)
+             endif
+          endif
+
+          allvec(ind) = .true.
+
+          ic(i) = ind
+          !
+          if(nv.ne.0) then
+             call danum(no,nv,ndanum)
+          else
+             ndanum = no
+          endif
+
+          c = ccc
+          if(l.ne.1) write(c(6:10),'(I5)') i
+
+          daname(ind) = c
+
+          if (incnda) then
+             if(ind.gt.nomax+2) then
+                idano(ind) = nomax
+                idanv(ind) = nvmax
+                idapo(ind) = nst + 1
+                idalm(ind) = nmmax
+                idall(ind) = 0
+                nst = nst + nmmax
+             else
+                idano(ind) = no
+                idanv(ind) = nv
+                idapo(ind) = nst + 1
+                idalm(ind) = ndanum
+                idall(ind) = 0
+                nst = nst + ndanum
+             endif
+          endif
+          !
+          if(nst.gt.lst) then
+             w_p=0
+             w_p%nc=5
+             w_p%fc='(4(1X,a72,/),(1X,a72))'
+             w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
+             w_p%c(2)=  ' NST,LST '
+             write(w_p%c(3),'(i8,1x,i8)') NST,LST
+             w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
+             write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda,ndanum,nda*ndanum
+             CALL WRITE_E(126)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+          !
+          !          IF(NV.EQ.0) THEN
+          if(nv.eq.0.or.nomax.eq.1) then
+             call daclr(ic(i))
+             idall(ic(i)) = idalm(ic(i))
+          endif
+       endif
+    enddo
+    !
+    if(nda.gt.ndamaxi) ndamaxi=nda
+
+    return
+  end subroutine daall
+
+  subroutine daall1(ic,ccc,no,nv)
+    implicit none
+    !     ********************************
+    !
+    !     THIS SUBROUTINE ALLOCATES STORAGE FOR A DA VECTOR WITH
+    !     ORDER NO AND NUMBER OF VARIABLES NV
+    !
+    !-----------------------------------------------------------------------------
+    !
+    logical(lp) incnda
+    integer ic,ind,ndanum,no,nv,ipause,mypauses
+    character(10) c,ccc
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    !
+    ind = 1
+
+    if(ic.gt.0.and.ic.le.nda) then
+       !         DANAME(ic) = C
+       !         IF(IDANO(ic).EQ.NO.AND.IDANV(ic).EQ.NV) THEN
+    else
+       if(nv.ne.0.and.(no.gt.nomax.or.nv.gt.nvmax)) then
+          write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
+               &' NOMAX, NVMAX = ',nomax,nvmax
+          ipause=mypauses(11,line)
+          call dadeb(31,'ERR DAALL ',1)
+       endif
+       !
+       if(nhole.gt.0) then
+          ind=nda
+20        if (allvec(ind)) then
+             ind = ind - 1
+             goto 20
+          endif
+          incnda = .false.
+          nhole=nhole-1
+       else
+          incnda = .true.
+          nda = nda + 1
+          ind=nda
+          if(nda.gt.lda) then
+             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             ipause=mypauses(12,line)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+       endif
+
+       allvec(ind) = .true.
+
+       ic = ind
+       !
+       if(nv.ne.0) then
+          call danum(no,nv,ndanum)
+       else
+          ndanum = no
+       endif
+
+       c = ccc
+       write(c(6:10),'(I5)') 1
+
+       daname(ind) = c
+
+       if (incnda) then
+          if(ind.gt.nomax+2) then
+             idano(ind) = nomax
+             idanv(ind) = nvmax
+             idapo(ind) = nst + 1
+             idalm(ind) = nmmax
+             idall(ind) = 0
+             nst = nst + nmmax
+          else
+             idano(ind) = no
+             idanv(ind) = nv
+             idapo(ind) = nst + 1
+             idalm(ind) = ndanum
+             idall(ind) = 0
+             nst = nst + ndanum
+          endif
+       endif
+       !
+       if(nst.gt.lst) then
+          w_p=0
+          w_p%nc=5
+          w_p%fc='(4(1X,a72,/),(1X,a72))'
+          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
+          w_p%c(2)=  ' NST,LST '
+          write(w_p%c(3),'(i8,1x,i8)') NST,LST
+          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
+          write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda,ndanum,nda*ndanum
+          CALL WRITE_E(127)
+          call dadeb(31,'ERR DAALL ',1)
+       endif
+       !
+       !          IF(NV.EQ.0) THEN
+       if(nv.eq.0.or.nomax.eq.1) then
+          call daclr(ic)
+          idall(ic) = idalm(ic)
+       endif
+    endif
+    !
+    if(nda.gt.ndamaxi) ndamaxi=nda
+
+    return
+  end subroutine daall1
+  !
+  subroutine dadal(idal,l)
+    implicit none
+    !     ************************
+    !
+    !     THIS SUBROUTINE DEALLOCATES THE VECTORS IDAL
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,l,ipause,mypauses
+    integer,dimension(:)::idal
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    do i=l,1,-1
+       if(idal(i).le.nomax+2.or.idal(i).gt.nda) then
+          write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda
+          ipause=mypauses(13,line)
+          call dadeb(31,'ERR DADAL ',1)
+       endif
+       if(idal(i).eq.nda) then
+          !       deallocate
+          nst = idapo(nda) - 1
+          nda = nda - 1
+       else
+          nhole=nhole+1
+       endif
+
+       allvec(idal(i)) = .false.
+
+       !        IDANO(IDAL(I)) = 0
+       !        IDANV(IDAL(I)) = 0
+       !        IDAPO(IDAL(I)) = 0
+       !        IDALM(IDAL(I)) = 0
+       idall(idal(i)) = 0
+
+       idal(i) = 0
+    enddo
+
+    return
+  end subroutine dadal
+
+  subroutine dadal1(idal)
+    implicit none
+    !     ************************
+    !
+    !     THIS SUBROUTINE DEALLOCATES THE VECTORS IDAL
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer idal,ipause,mypauses
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    if(idal.le.nomax+2.or.idal.gt.nda) then
+       write(line,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,nda
+       ipause=mypauses(14,line)
+       call dadeb(31,'ERR DADAL ',1)
+    endif
+    if(idal.eq.nda) then
+       !       deallocate
+       nst = idapo(nda) - 1
+       nda = nda - 1
+    else
+       nhole=nhole+1
+    endif
+
+    allvec(idal) = .false.
+
+    !        IDANO(IDAL(I)) = 0
+    !        IDANV(IDAL(I)) = 0
+    !        IDAPO(IDAL(I)) = 0
+    !        IDALM(IDAL(I)) = 0
+    idall(idal) = 0
+
+    idal = 0
+
+    return
+  end subroutine dadal1
+
+  subroutine count_da(n)
+    implicit none
+    !     ************************
+    !
+    !     THIS SUBROUTINE counts allocate da
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,n
+    !
+    n=0
+    do i=1,lda
+       if(allvec(i)) n=n+1
+    enddo
+    return
+  end subroutine count_da
+
   subroutine davar(ina,ckon,i)
     implicit none
     !     ****************************
@@ -982,6 +1569,40 @@ contains
     return
     !
   end subroutine dapok
+  !
+  subroutine daclr(inc)
+    implicit none
+    !     *********************
+    !
+    !     THIS SUBROUTINE SETS ALL THE STACK SPACE RESERVED FOR VARIABLE
+    !     C TO ZERO
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,illc,ilmc,inc,inoc,invc,ipoc
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    call dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    !
+    do i=ipoc,ipoc+ilmc-1
+       !
+       cc(i) = zero
+       !
+    enddo
+    !
+    return
+  end subroutine daclr
   !
   subroutine dacop(ina,inb)
     implicit none
@@ -4688,7 +5309,58 @@ contains
     return
   end subroutine darea77
 
-
+  subroutine dadeb(iunit,c,istop)
+    implicit none
+    !     *******************************
+    !
+    !     THIS SUBROUTINE SERVES AS A DEBUGGING TOOL. IT PRINTS ALL
+    !     NONZERO INFORMATION IN THE COMMON BLOCKS AND ALL DA  VECTORS.
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer istop,iunit,I
+    !integer,dimension(0:1)::i8
+    character(10) c
+    !
+    !etienne
+    !    if(check_da) then
+    C_%STABLE_DA=.false.
+    return
+    !    endif
+    !READ(*,*) I
+    !I=SQRT(DBLE(I))
+    !    stop
+  end subroutine dadeb
+  !
+  !
+  !
+  !
+  subroutine dainf(inc,inoc,invc,ipoc,ilmc,illc)
+    implicit none
+    !     **********************************************
+    !
+    !     THIS SUBROUTINE SEARCHES THE NUMBER OF DA VECTOR C
+    !     AND RETURS THE INFORMATION IN COMMON DA
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer illc,ilmc,inc,inoc,invc,ipoc,ipause,mypauses
+    !
+    if(inc.ge.1.and.inc.le.nda) then
+       inoc = idano(inc)
+       invc = idanv(inc)
+       ipoc = idapo(inc)
+       ilmc = idalm(inc)
+       illc = idall(inc)
+       return
+    endif
+    !
+    write(line,'(a26,1x,i8,1x,a11)')  'ERROR IN DAINF, DA VECTOR ',inc,' NOT FOUND '
+    ipause=mypauses(35,line)
+    call dadeb(31,'ERR DAINF ',1)
+    !
+    return
+  end subroutine dainf
   !
   subroutine dapac(inc)
     implicit none
@@ -4996,6 +5668,48 @@ contains
     return
   end subroutine datra
 
+  subroutine etred(no1,nv1,ic1,ic2,no2,nv2,i11,i21)
+    implicit none
+    !     ****************************
+    !
+    !     THIS SUBROUTINE CODES THE EXPONENTS IN JJ INTO THEIR DA CODES I1,I2.
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,i11,i21,ic,ic1,ic2,no1,no2,nv1,nv2,ipause,mypauses
+    integer,dimension(lnv)::jj
+    !
+    if(nv1.gt.lnv.or.nv2.gt.lnv) then
+       write(line,'(a18)')  'ERROR IN RECODING '
+       ipause=mypauses(35,line)
+       stop 123
+    endif
+    call dehash(no1,nv1,ic1,ic2,jj)
+    ic=0
+
+    do i=nv1+1,nv2
+       if(jj(i).gt.0) then
+          i11=-1
+          i21=0
+          return
+       endif
+    enddo
+
+    do i=1,nv2
+       ic=ic+jj(i)
+    enddo
+
+    if(ic.gt.no2) then
+       i11=-1
+       i21=0
+       return
+    endif
+
+    call hash(no2,nv2,jj,i11,i21)
+
+    !
+    return
+  end subroutine etred
 
   subroutine hash(no1,nv1,jj,ic1,ic2)
     implicit none
@@ -5056,6 +5770,56 @@ contains
     !
     return
   end subroutine dehash
+
+  subroutine daswap(j1,j2,inb)
+    implicit none
+    !     *************************
+    !
+    !     SWAP A DA VECTOR
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer ia,ic,ic1,ic2,illb,ilmb,inb,inob,invb,ipob,j1,j2,k1,k2
+    integer,dimension(lnv)::jj
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    call dainf(inb,inob,invb,ipob,ilmb,illb)
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+
+    call daclr(1)
+    !
+
+    do ia = ipob,ipob+illb-1
+
+       call dehash(nomax,nvmax,i1(ia),i2(ia),jj)
+       k1=jj(j1)
+       k2=jj(j2)
+       jj(j1)=k2
+       jj(j2)=k1
+       call hash(nomax,nvmax,jj,ic1,ic2)
+
+       ic=ia1(ic1)+ia2(ic2)
+
+       cc(ic) = cc(ia)
+       i1(ic) = ic1
+       i2(ic) = ic2
+       !
+    enddo
+    !
+    !
+    call dapac(inb)
+    return
+  end subroutine daswap
 
   subroutine daran(ina,cm,xran)
     implicit none

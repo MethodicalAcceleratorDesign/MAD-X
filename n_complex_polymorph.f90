@@ -1,6 +1,8 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file a_scratch_size
+!Copyright (C) Etienne Forest
+! Taylor polymorphism at execution is based on an idea
+! and C++ prototype developed  by J. Bengtsson circa 1990
+
 module polymorphic_complextaylor
   use polymorphic_taylor
   implicit none
@@ -960,6 +962,9 @@ contains
     c_%nd => nd
     c_%nd2 => nd2
     c_%np => np
+    c_%NSPIN => NSPIN
+    c_%SPIN_POS => SPIN_POS
+    c_%track_spint_mat => track_spint_mat
     c_%ndpt => ndpt
     c_%npara_fpp => npara_fpp
     c_%knob => knob

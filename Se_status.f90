@@ -1,6 +1,5 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
 module S_status
   use s_frame
   USE S_extend_poly
@@ -88,26 +87,30 @@ module S_status
   include "a_def_element_fibre_layout.inc"
   TYPE(INTERNAL_STATE), target ::  DEFAULT
   TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME,EXACTMIS
-  TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA
+  TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,SPIN_ONLY
 
   TYPE (INTERNAL_STATE), PARAMETER :: DEFAULT0 = INTERNAL_STATE &
-       &(f,f,f,f,f,f,f,f,f)
+       &(f,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TOTALPATH0 = INTERNAL_STATE &
-       &(t,f,f,f,f,f,f,f,f)
+       &(t,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TIME0 = INTERNAL_STATE &
-       &(f,t,f,f,f,f,f,f,f)
+       &(f,t,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: RADIATION0 = INTERNAL_STATE &
-       &(f,f,t,f,f,f,f,f,f)
+       &(f,f,t,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: NOCAVITY0 = INTERNAL_STATE &
-       &(f,f,f,t,f,f,f,f,f)
+       &(f,f,f,t,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: FRINGE0 = INTERNAL_STATE &
-       &(f,f,f,f,t,f,f,f,f)
+       &(f,f,f,f,t,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: EXACTMIS0 = INTERNAL_STATE &
-       &(f,f,f,f,f,t,f,f,f)
+       &(f,f,f,f,f,t,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: ONLY_4d0 = INTERNAL_STATE &
-       &(f,f,f,t,f,f,f,t,f)
+       &(f,f,f,t,f,f,f,t,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: DELTA0   = INTERNAL_STATE &
-       &(f,f,f,t,f,f,f,t,t)
+       &(f,f,f,t,f,f,f,t,t,f,f,3)
+  TYPE (INTERNAL_STATE), PARAMETER :: SPIN0   = INTERNAL_STATE &
+       &(f,f,f,f,f,f,f,f,f,t,f,3)
+  TYPE (INTERNAL_STATE), PARAMETER :: SPIN_ONLY0   = INTERNAL_STATE &
+       &(f,f,f,f,f,f,f,f,f,f,t,3)
   private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
@@ -579,11 +582,13 @@ CONTAINS
     EXACTMIS=EXACTMIS0
     ONLY_4D=ONLY_4d0
     DELTA=DELTA0
+    SPIN=SPIN0
+    SPIN_ONLY=SPIN_ONLY0
   end subroutine clear_states  !%nxyz
 
   subroutine print_s(S,MF)
     implicit none
-    type (INTERNAL_STATE),INTENT(INOUT)::S
+    type (INTERNAL_STATE) S
     INTEGER MF
 
 
@@ -616,6 +621,9 @@ CONTAINS
     write(mf,'((1X,a20,1x,a5))' ) "      PARA_IN     = ", CONV(S%PARA_IN  )
     write(mf,'((1X,a20,1x,a5))' ) "      ONLY_4D     = ", CONV(S%ONLY_4D   )
     write(mf,'((1X,a20,1x,a5))' ) "      DELTA       = ", CONV(S%DELTA    )
+    write(mf,'((1X,a20,1x,a5))' ) "      SPIN        = ", CONV(S%SPIN    )
+    write(mf,'((1X,a20,1x,a5))' ) "      SPIN_ONLY   = ", CONV(S%SPIN_ONLY    )
+    write(mf,'((1X,a20,1x,I4))' ) " SPIN DIMENSION   = ", S%SPIN_DIM
     !   CALL WRITE_I
   end subroutine print_s
 
@@ -657,6 +665,10 @@ CONTAINS
 
     EXACTMIS= EXACTMIS+DEFAULT
 
+    SPIN= SPIN+DEFAULT
+
+    SPIN_ONLY= SPIN_ONLY+DEFAULT
+
   END  SUBROUTINE update_STATES
 
 
@@ -674,6 +686,9 @@ CONTAINS
     S2%PARA_IN=     S1%PARA_IN
     S2%ONLY_4D=      S1%ONLY_4D
     S2%DELTA=       S1%DELTA
+    S2%SPIN=       S1%SPIN
+    S2%SPIN_ONLY=       S1%SPIN_ONLY
+    S2%spin_dim=       S1%spin_dim
   END SUBROUTINE EQUALt
 
 
@@ -693,7 +708,10 @@ CONTAINS
     add%FRINGE   =       S1%FRINGE.OR.S2%FRINGE
     add%ONLY_4D  =       S1%ONLY_4D.OR.S2%ONLY_4D
     add%DELTA  =       S1%DELTA.OR.S2%DELTA
+    add%SPIN  =       S1%SPIN.OR.S2%SPIN
+    add%SPIN_ONLY  =       S1%SPIN_ONLY.OR.S2%SPIN_ONLY
     add%PARA_IN  =       S1%PARA_IN.OR.S2%PARA_IN
+    add%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(add%DELTA) THEN
        add%ONLY_4D=T
        add%NOCAVITY =  T
@@ -703,7 +721,6 @@ CONTAINS
        add%RADIATION  =  F
        add%NOCAVITY =  T
     ENDIF
-
   END FUNCTION add
 
   FUNCTION sub( S1, S2 )
@@ -720,7 +737,10 @@ CONTAINS
     sub%FRINGE   =       S1%FRINGE.min.S2%FRINGE
     sub%ONLY_4D  =       S1%ONLY_4D.min.S2%ONLY_4D
     sub%DELTA  =       S1%DELTA.min.S2%DELTA
+    sub%SPIN  =       S1%SPIN.min.S2%SPIN
+    sub%SPIN_ONLY  = S1%SPIN_ONLY.min.S2%SPIN_ONLY
     sub%PARA_IN  =       S1%PARA_IN.MIN.S2%PARA_IN
+    sub%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(sub%DELTA) THEN
        sub%ONLY_4D=T
        sub%NOCAVITY =  T
@@ -753,44 +773,119 @@ CONTAINS
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
     INTEGER,optional :: ND2,NPARA
-    INTEGER  ND2l,NPARAl
+    INTEGER  ND2l,NPARAl,NSPIN1
 
-    NDEL=0
-    NDPT1=0
-    IF(STATE%NOCAVITY)  THEN
-       IF(STATE%ONLY_4D) THEN
-          IF(STATE%DELTA) THEN
-             ND1=2
-             NDEL=1
-             !             MAPINT=5
-          ELSE
-             ND1=2
-             NDEL=0
-             !            MAPINT=4
-          ENDIF
-       ELSE
-          ND1=3
-          NDEL=0
-          NDPT1=5+C_%NDPT_OTHER
-          !         MAPINT=6
-       ENDIF
-    ELSE              ! CAVITY IN RING
-       ND1=3
+    IF(STATE%SPIN_ONLY) THEN
+
+       NDEL=0
        NDPT1=0
-       !       MAPINT=6
+       ND1=0
+       IF(STATE%NOCAVITY)  THEN
+          IF(STATE%ONLY_4D) THEN
+             IF(STATE%DELTA) THEN
+                NDEL=1
+                !             MAPINT=5
+             ELSE
+                NDEL=0
+                !            MAPINT=4
+             ENDIF
+          ELSE
+             NDEL=0
+             !         MAPINT=6
+          ENDIF
+       ENDIF
+       NSPIN1=STATE%SPIN_DIM
+       CALL init_SPIN(NO1,ND1,NP1+NDEL,NSPIN1,NDPT1,PACKAGE)
+
+
+       ND2l=ND1*2
+       NPARAl=ND2l+NDEL+C_%NSPIN
+       C_%NPARA=NPARAl
+       C_%ND2=ND2l
+       C_%npara_fpp=NPARAl
+       C_%SPIN_POS=C_%NPARA-C_%NSPIN+1
+
+       if(present(nd2)) nd2=nd2l
+       if(present(npara)) npara=nparal
+    ELSEIF(STATE%SPIN.AND.(.NOT.STATE%SPIN_ONLY)) THEN
+       NDEL=0
+       NDPT1=0
+       IF(STATE%NOCAVITY)  THEN
+          IF(STATE%ONLY_4D) THEN
+             IF(STATE%DELTA) THEN
+                ND1=2
+                NDEL=1
+                !             MAPINT=5
+             ELSE
+                ND1=2
+                NDEL=0
+                !            MAPINT=4
+             ENDIF
+          ELSE
+             ND1=3
+             NDEL=0
+             NDPT1=5+C_%NDPT_OTHER
+             !         MAPINT=6
+          ENDIF
+       ELSE              ! CAVITY IN RING
+          ND1=3
+          NDPT1=0
+          !       MAPINT=6
+       ENDIF
+
+       NSPIN1=STATE%SPIN_DIM
+       CALL init_SPIN(NO1,ND1,NP1+NDEL,NSPIN1,NDPT1,PACKAGE)
+
+       ND2l=ND1*2
+       NPARAl=ND2l+NDEL+C_%NSPIN
+       C_%NPARA=NPARAl
+       C_%ND2=ND2l
+       C_%npara_fpp=NPARAl
+       C_%SPIN_POS=C_%NPARA-C_%NSPIN+1
+
+       if(present(nd2)) nd2=nd2l
+       if(present(npara)) npara=nparal
+    ELSE
+       NDEL=0
+       NDPT1=0
+       IF(STATE%NOCAVITY)  THEN
+          IF(STATE%ONLY_4D) THEN
+             IF(STATE%DELTA) THEN
+                ND1=2
+                NDEL=1
+                !             MAPINT=5
+             ELSE
+                ND1=2
+                NDEL=0
+                !            MAPINT=4
+             ENDIF
+          ELSE
+             ND1=3
+             NDEL=0
+             NDPT1=5+C_%NDPT_OTHER
+             !         MAPINT=6
+          ENDIF
+       ELSE              ! CAVITY IN RING
+          ND1=3
+          NDPT1=0
+          !       MAPINT=6
+       ENDIF
+
+       CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
+
+       ND2l=ND1*2
+       NPARAl=ND2l+NDEL
+       C_%NPARA=NPARAl
+       C_%ND2=ND2l
+       C_%npara_fpp=NPARAl
+       C_%SPIN_POS=0
+       C_%NSPIN=0
+
+       if(present(nd2)) nd2=nd2l
+       if(present(npara)) npara=nparal
     ENDIF
-
-    CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
-
-    ND2l=ND1*2
-    NPARAl=ND2l+NDEL
-    C_%NPARA=NPARAl
-    C_%ND2=ND2l
-    C_%npara_fpp=NPARAl
-
-    if(present(nd2)) nd2=nd2l
-    if(present(npara)) npara=nparal
   END  subroutine S_init
+
 
   subroutine init_default(STATE,NO1,NP1)
     implicit none
@@ -803,7 +898,6 @@ CONTAINS
     IF(PRESENT(STATE))      STATE2=STATE
     IF(PRESENT(NO1))      NO2=NO1
     IF(PRESENT(NP1))      NP2=NP1
-
     call init(STATE2,NO2,NP2,my_true,ND2,NPARA)
     C_%NPARA=NPARA
     C_%ND2=ND2

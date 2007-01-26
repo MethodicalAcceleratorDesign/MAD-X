@@ -1,13 +1,13 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file Sa_rotation_mis
+!Copyright (C) Etienne Forest and CERN
+
 module S_fitting
   USE MAD_LIKE
   IMPLICIT NONE
   public
   PRIVATE FIND_ORBIT_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
   logical(lp), PRIVATE :: VERBOSE = .false.
-  integer :: max_fit_iter=20, ierror_fit=0
+  integer :: max_fit_iter=20, ierror_fit=0, max_fiND_iter=40
   real(dp) :: fuzzy_split=one
   real(dp) :: max_ds=zero
   integer :: resplit_cutting = 0    ! 0 just magnets , 1 magnets as before / drifts separately
@@ -316,12 +316,12 @@ contains
        do i=pos,pos+r%n-1
 
           CALL TRACK(R,Y,i,i+1,STATE)
-          beta(IB,1,i)=(y(1).sub.'1')**2   + (y(1).sub.'01')**2
-          beta(iB,2,i)=(y(3).sub.'001')**2 + (y(3).sub.'0001')**2
+          beta(IB,1,i-pos+1)=(y(1).sub.'1')**2   + (y(1).sub.'01')**2
+          beta(iB,2,i-pos+1)=(y(3).sub.'001')**2 + (y(3).sub.'0001')**2
 
           IF(IB==2) THEN
-             db1=ABS(beta(2,1,i)-beta(1,1,i))/beta(1,1,i)
-             db2=ABS(beta(2,2,i)-beta(1,2,i))/beta(1,2,i)
+             db1=ABS(beta(2,1,i-pos+1)-beta(1,1,i-pos+1))/beta(1,1,i-pos+1)
+             db2=ABS(beta(2,2,i-pos+1)-beta(1,2,i-pos+1))/beta(1,2,i-pos+1)
              DBETA=(db1+db2)/TWO+dbeta
              if( db1>dbetamax) dbetamax=db1
              if( db2>dbetamax) dbetamax=db2
@@ -545,7 +545,7 @@ contains
     it=it+1
 
     CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
-    write(6,*) "closed orbit "
+    write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) CLOSED
 
 
@@ -560,7 +560,7 @@ contains
 
     CALL TRACK(R,Y,1,+STATE)
     NORM=Y
-    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2)
+    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2), CHECK_STABLE
     CHROM(1)=(NORM%dhdj%v(1)).SUB.'00001'
     CHROM(2)=(NORM%dhdj%v(2)).SUB.'00001'
     write(6,*) " CHROM ",CHROM
@@ -632,6 +632,137 @@ contains
     deallocate(eq)
 
   end subroutine lattice_fit_CHROM_gmap
+
+  subroutine lattice_fit_tune_CHROM_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,NP
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE,more
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq=4, no=3,nt,j,it
+    type(damap) id
+    type(gmap) g
+    TYPE(TAYLOR)t
+    real(dp) epsf,epsr,epsnow,tune(2),CHROM(2)
+    !    EPSF=.0001
+    epsr=abs(epsf)
+
+    allocate(eq(neq))
+
+    nt=neq+np
+    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+
+    CALL INIT(STATE,no,NP,BERZ)
+
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    CLOSED(:)=zero
+    it=0
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit ", CHECK_STABLE
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP,BERZ)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+    NORM=Y
+    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2), CHECK_STABLE
+    tune(1)=(NORM%dhdj%v(1)).SUB.'0000'
+    tune(2)=(NORM%dhdj%v(2)).SUB.'0000'
+    CHROM(1)=(NORM%dhdj%v(1)).SUB.'00001'
+    CHROM(2)=(NORM%dhdj%v(2)).SUB.'00001'
+    write(6,*) " CHROM ",CHROM
+
+    eq(1)=       ((NORM%dhdj%v(1)).par.'00000')-targ(1)
+    eq(2)=       ((NORM%dhdj%v(2)).par.'00000')-targ(2)
+    eq(3)=       ((NORM%dhdj%v(1)).par.'00001')-targ(3)
+    eq(4)=       ((NORM%dhdj%v(2)).par.'00001')-targ(4)
+    epsnow=abs(eq(1))+abs(eq(2))+abs(eq(3))+abs(eq(4))
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(id)
+    CALL KILL(EQ)
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+
+  end subroutine lattice_fit_tune_CHROM_gmap
 
 
   subroutine lattice_PRINT_RES_FROM_A(R,my_state,NO,EMIT0,MRES,FILENAME)
@@ -955,9 +1086,11 @@ contains
     call find_orbit(RING,FIX,LOC,STATE,eps,TURNS)
 
     call PRODUCE_APERTURE_FLAG(FIND_ORBIT_flag)
-    if(.not.c_%stable_da) then
-       c_%stable_da=.true.
-    endif
+
+    CALL RESET_APERTURE_FLAG
+    !    if(.not.c_%stable_da) then
+    !       c_%stable_da=.true.
+    !    endif
     !   resets Da on its own here only
 
   END function  FIND_ORBIT_flag
@@ -978,7 +1111,7 @@ contains
 
     real(dp)  DIX(6),xdix,xdix0,tiny,freq
     real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
-    integer NO1,ND2,I,IU,ITE,ier,j
+    integer NO1,ND2,I,IU,ITE,ier,j,ITEM
     TYPE (fibre), POINTER :: C
     logical(lp) APERTURE
     INTEGER TURNS0,trackflag
@@ -1089,29 +1222,30 @@ contains
 
 
 
-
+    ITEM=0
 3   continue
-
+    ITEM=ITEM+1
     X=FIX
 
     DO I=1,TURNS0
        !       CALL TRACK(RING,X,LOC,STAT)
        trackflag=TRACK_flag(RING,X,LOC,STAT)
        if(trackflag/=0) then
-          CALL RESET_APERTURE_FLAG
-          c_%APERTURE_FLAG=APERTURE
-          write(6,*) " Unstable in find_orbit without TPSA"
-          return
+          !          CALL RESET_APERTURE_FLAG
+          !          c_%APERTURE_FLAG=APERTURE
+          !          write(6,*) " Unstable in find_orbit without TPSA"
+          !          return
+          ITEM=MAX_FIND_ITER+100
        endif
-       if(.not.check_stable) then
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",2
-          call write_i
+       !       if(.not.check_stable) then
+       !          w_p=0
+       !          w_p%nc=1
+       !          w_p%fc='((1X,a72))'
+       !          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",2
+       !          call write_i
 
-          return
-       endif
+       !          return
+       !       endif
 
     ENDDO
     !    write(6,*) x
@@ -1124,15 +1258,15 @@ contains
        Y(J)=FIX(J)+EPS
        DO I=1,TURNS0
           CALL TRACK(RING,Y,LOC,STAT)
-          if(.not.check_stable) then
-             w_p=0
-             w_p%nc=1
-             w_p%fc='((1X,a72))'
-             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
-             call write_i
+          !          if(.not.check_stable) then
+          !             w_p=0
+          !             w_p%nc=1
+          !             w_p%fc='((1X,a72))'
+          !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
+          !             call write_i
 
-             return
-          endif
+          !             return
+          !          endif
        ENDDO
        y(6)=y(6)-freq*turns0
 
@@ -1194,6 +1328,17 @@ contains
           xdix0=xdix
        endif
     endif
+
+    if(iteM>=MAX_FIND_ITER)  then
+       C_%stable_da=.FALSE.
+       IF(iteM==MAX_FIND_ITER+100) THEN
+          write(6,*) " Unstable in find_orbit without TPSA"
+       ELSE
+          write(6,*) " maximum number of iterations in find_orbit without TPSA"
+       ENDIF
+       ITE=0
+    endif
+
     if(ite.eq.1)  then
        GOTO 3
 
@@ -1462,7 +1607,7 @@ contains
 
   end SUBROUTINE fit_all_bends
 
-  SUBROUTINE fit_bare_bend(f,state,charge)
+  SUBROUTINE fit_bare_bend(f,state,charge,next)
     IMPLICIT NONE
     TYPE(fibre),INTENT(INOUT):: f
     TYPE(real_8) y(6)
@@ -1470,12 +1615,20 @@ contains
     integer,optional,target :: charge
     real(dp) kf,x(6),xdix,xdix0,tiny
     integer ite
+    logical(lp), optional :: next
+    logical(lp) nex
+    nex=my_false
+    if(present(next)) nex=next
     tiny=c_1d_40
     xdix0=c_1d4*DEPS_tracking
 
     KF=ZERO   ;
     F%MAGP%BN(1)%KIND=3
     F%MAGP%BN(1)%I=1
+    if(nex) then
+       F%next%MAGP%BN(1)%KIND=3
+       F%next%MAGP%BN(1)%I=1
+    endif
 
     CALL INIT(1,1,BERZ)
 
@@ -1485,13 +1638,20 @@ contains
     X=ZERO
     Y=X
     CALL TRACK(f,Y,+state,CHARGE)
+    if(nex) CALL TRACK(f%next,Y,+state,CHARGE)
     x=y
     !    write(6,'(A10,6(1X,G14.7))') " ORBIT IS ",x
     kf=-(y(2).sub.'0')/(y(2).sub.'1')
     xdix=abs(y(2).sub.'0')
     f%MAGP%BN(1) = f%MAGP%BN(1)+KF
     f%MAG%BN(1) = f%MAG%BN(1)+KF
+    if(nex) then
+       f%next%MAGP%BN(1) = f%next%MAGP%BN(1)+KF
+       f%next%MAG%BN(1) = f%next%MAG%BN(1)+KF
+    endif
+
     CALL ADD(f,1,1,zero)     !etienne
+    if(nex) CALL ADD(f%next,1,1,zero)     !etienne
 
     if(xdix.gt.deps_tracking) then
        ite=1
@@ -1507,6 +1667,10 @@ contains
 
     F%MAGP%BN(1)%KIND=1
     F%MAGP%BN(1)%I=0
+    if(nex) then
+       F%next%MAGP%BN(1)%KIND=1
+       F%next%MAGP%BN(1)%I=0
+    endif
     !    write(6,'(A10,1(1X,g14.7))') " BN(1) IS ",    f%MAG%BN(1)
 
 
@@ -1586,7 +1750,7 @@ contains
     xn(4)=sqrt(emit(2))
     X=zero
 
-    x=(a*xn)+closed
+    x=matmul(a,xn)+closed
 
     WRITE(6,*) " INITIAL X"
     WRITE(6,200) X
@@ -1613,7 +1777,7 @@ contains
        endif
        write(80,*) x(1:4)
        if(flag/=0) exit
-       xn=ai*(x-closed)
+       xn=matmul(ai,(x-closed))
        ra(1)=xn(1)**2+xn(2)**2
        ra(2)=xn(3)**2+xn(4)**2
        IF(RA(1)>JMAX(1)) JMAX(1)=RA(1)
@@ -1952,7 +2116,6 @@ contains
                 C%MAG%P%METHOD=6
                 MK3=MK3+NTE*7
              ENDIF
-
 
              r%NTHIN=r%NTHIN+1  !C%MAG%NST
              !         write(6,*)"nte>ntec", nte,ntec

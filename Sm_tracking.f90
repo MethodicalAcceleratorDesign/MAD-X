@@ -1,6 +1,6 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
+
 
 MODULE S_TRACKING
   USE S_FAMILY
@@ -757,7 +757,7 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-5)
 
     ! The chart frame of reference is located here implicitely
-    IF(PATCHG/=0.AND.PATCHG/=2) THEN
+    IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
@@ -801,7 +801,7 @@ contains
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHG/=0.AND.PATCHG/=1) THEN
+    IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
@@ -979,7 +979,7 @@ contains
 
 
     ! POSITION PATCH
-    IF(PATCHG/=0.AND.PATCHG/=2) THEN
+    IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
@@ -1030,7 +1030,7 @@ contains
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     ! POSITION PATCH
-    IF(PATCHG/=0.AND.PATCHG/=1) THEN
+    IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
@@ -1227,7 +1227,7 @@ contains
 
 
 
-    IF(PATCHG/=0.AND.PATCHG/=2) THEN
+    IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
@@ -1275,7 +1275,7 @@ contains
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHG/=0.AND.PATCHG/=1) THEN
+    IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF

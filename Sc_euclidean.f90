@@ -1,7 +1,6 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
-module S_euclidean   ! and module rotation_mis
+!Copyright (C) Etienne Forest and CERN
+module S_euclidean
   use S_extend_poly
   implicit none
   public

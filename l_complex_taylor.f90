@@ -1,6 +1,6 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file a_scratch_size
+!Copyright (C) Etienne Forest
+
 module complex_taylor
   use tpsalie_analysis
   implicit none

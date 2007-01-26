@@ -1,3 +1,6 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
+
 module ptc_multiparticle
   use S_TRACKING  !,FRINGE_=>FRINGE__MULTI !,FACE=>FACE_MULTI
 
@@ -28,7 +31,7 @@ module ptc_multiparticle
   PRIVATE TRACK_LAYOUT_XR_12,TRACK_LAYOUT_XP_12
   PRIVATE ADJUSTR_PANCAKE,ADJUSTP_PANCAKE,ADJUST_PANCAKE,INTER_PANCAKE,INTEP_PANCAKE
   private MAKE_NODE_LAYOUT_2,DRIFT_TO_TIME
-  PRIVATE TRACK_NODE_LAYOUT_FLAG_R
+  private TRACK_fibre_LAYOUT_FLAG_Beam_R
 
   INTERFACE ADJUST_WI
      MODULE PROCEDURE ADJUSTR_WI
@@ -129,20 +132,15 @@ module ptc_multiparticle
      MODULE PROCEDURE TRACKV_NODE_SINGLE
   END INTERFACE
 
-  !  INTERFACE TRACK
-  !     MODULE PROCEDURE TRACKR_NODE_SINGLE
-  !     MODULE PROCEDURE TRACKP_NODE_SINGLE
-  !  END INTERFACE
+  INTERFACE TRACK_fibre_beam
+     MODULE PROCEDURE TRACK_fibre_LAYOUT_FLAG_Beam_R
+  END INTERFACE
 
   INTERFACE TRACK_NODE_LAYOUT_S
      MODULE PROCEDURE TRACK_NODE_LAYOUT_S12
      MODULE PROCEDURE TRACK_NODE_LAYOUT_S1
   END INTERFACE
 
-  INTERFACE TRACK_NODE_LAYOUT
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_R
-     !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_P
-  END INTERFACE
 
 
   INTERFACE TRACK_LAYOUT_USING_NODE_S
@@ -612,19 +610,12 @@ CONTAINS
     O=EL%freq*twopi/CLIGHT
     V=jC*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
-
-
     C1=COS(O*(x(6))+EL%PHAS+phase0)
     S1=SIN(O*(x(6))+EL%PHAS+phase0)
-
-
 
     X(2)=X(2)+V*S1*X(1)
     X(4)=X(4)+V*S1*X(3)
     x(5)=x(5)-HALF*(X(1)**2+X(3)**2)*V*C1*O
-
-
-
 
   END SUBROUTINE FRINGER_CAV4
 
@@ -1470,6 +1461,7 @@ CONTAINS
     real(dp) DF(4),DK(4),DDF(4)
     INTEGER I,J
 
+    IF(EL%THIN) return
 
     TOTALPATH_FLAG=EL%P%TOTALPATH
     EL%P%TOTALPATH=CAVITY_TOTALPATH
@@ -1562,7 +1554,7 @@ CONTAINS
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     INTEGER I,J
 
-
+    IF(EL%THIN) return
     TOTALPATH_FLAG=EL%P%TOTALPATH
     EL%P%TOTALPATH=CAVITY_TOTALPATH
 
@@ -3281,7 +3273,7 @@ CONTAINS
     ENDIF
 
     ! The chart frame of reference is located here implicitely
-    IF(PATCHG/=0.AND.PATCHG/=2) THEN
+    IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
@@ -3361,7 +3353,7 @@ CONTAINS
     ENDIF
 
     ! The chart frame of reference is located here implicitely
-    IF(PATCHG/=0.AND.PATCHG/=2) THEN
+    IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
@@ -3419,7 +3411,7 @@ CONTAINS
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
 
-    IF(PATCHG/=0.AND.PATCHG/=1) THEN
+    IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
@@ -3482,7 +3474,7 @@ CONTAINS
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
 
-    IF(PATCHG/=0.AND.PATCHG/=1) THEN
+    IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
        CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
     ENDIF
@@ -5065,12 +5057,14 @@ CONTAINS
 
   ! BEAM STUFF
 
-  subroutine create_beam(B,N,CUT,SIG,T)
+  subroutine create_beam(B,N,CUT,SIG,A,C,T)
     USE gauss_dis
     implicit none
-    INTEGER N,I,J
-    REAL(DP) CUT,SIG,X
+    INTEGER N,I,J,K
+    REAL(DP) CUT,SIG(6),X
     TYPE(BEAM) B
+    REAL(DP), OPTIONAL :: A(6,6),C(6)
+    REAL(DP)  AS(6,6),CL(6),XT(6)
     TYPE (INTEGRATION_NODE),optional,target::  T
 
     IF(.NOT.ASSOCIATED(B%N)) THEN
@@ -5080,10 +5074,25 @@ CONTAINS
        CALL ALLOCATE_BEAM(B,N)
     ENDIF
 
+    CL=ZERO; AS=ZERO;
+    DO I=1,6
+       AS(I,I)=ONE
+    ENDDO
+
+    IF(PRESENT(A)) AS=A
+    IF(PRESENT(C)) CL=C
+
     DO I=1,N
        DO J=1,6
           CALL GRNF(X,cut)
-          B%X(I,J)=X*SIG
+          XT(J)=X*SIG(J)
+       ENDDO
+       B%X(I,1:6)=CL(:)
+       DO J=1,6
+          DO K=1,6
+             B%X(I,J)=AS(J,K)*XT(K)+B%X(I,J)
+          ENDDO
+
        ENDDO
     ENDDO
 
@@ -5227,19 +5236,25 @@ CONTAINS
 100 FORMAT(7(1x,e13.6))
   END subroutine PRINT_beam_raw
 
-  subroutine stat_beam_raw(B,n,MF)
+  subroutine stat_beam_raw(B,n,MF,xm)
     implicit none
     INTEGER i,j,k,mf,NOTlost,N
     TYPE(BEAM), INTENT(IN):: B
     TYPE(INTEGRATION_NODE),POINTER::T
     TYPE(FIBRE),POINTER::F
+    real(dp), optional :: xm(6)
     real(dp), allocatable :: av(:,:)
-    real(dp) em(2),beta(2)
+    real(dp) em(2),beta(2),xma(6)
     allocate(av(n,n))
     av=zero
     notlost=0
+    xma(:)=-one
     DO K=1,b%n
        IF(.not.B%U(K)) THEN
+          do i=1,6
+             if(abs(b%x(k,i))>xma(i)) xma(i)=abs(b%x(k,i))
+          enddo
+
           do i=1,n
              do j=i,n
                 av(i,j)= b%x(k,i)*b%x(k,j)+av(i,j)
@@ -5282,6 +5297,12 @@ CONTAINS
        write(6,*) "betas ",beta
        write(6,*) "emittances ",em
     endif
+    write(6,*) " limits "
+    write(6,*) xma(1:2)
+    write(6,*) xma(3:4)
+    write(6,*) xma(5:6)
+    if(present(xm)) xm=xma
+
 100 FORMAT(7(1x,e13.6))
 
     deallocate(av)
@@ -5480,41 +5501,38 @@ CONTAINS
 
   END  SUBROUTINE X_IN_BEAM
 
-  SUBROUTINE TRACK_NODE_LAYOUT_FLAG_R(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
+  !  plain fibre tracking
+
+  SUBROUTINE TRACK_fibre_LAYOUT_FLAG_Beam_R(R,b,I1,I2,k) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
-    real(dp), INTENT(INOUT):: X(6)
+    TYPE(BEAM),INTENT(INOUT):: B
+    REAL(DP) X(6)
     TYPE(INTERNAL_STATE) K
     INTEGER, INTENT(IN):: I1,I2
-    INTEGER J,i22
-    TYPE (INTEGRATION_NODE), POINTER :: C
+    INTEGER J,i22,i
 
 
     CALL RESET_APERTURE_FLAG
 
-    CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
 
 
 
-    if(i2>=i1) then
-       i22=i2
-    else
-       i22=r%T%n+i2
-    endif
 
-    J=I1
 
-    DO  WHILE(J<I22.AND.ASSOCIATED(C))
+    DO I=1,B%N
+       IF(B%U(i)) CYCLE
+       X=BEAM_IN_X(B,I)!
 
-       CALL TRACK_NODE_SINGLE(C,X,K,R%CHARGE)
+       CALL TRACK(R,X,i1,i2,K )
+       CALL X_IN_BEAM(B,X,I,DL=ZERO)
 
-       C=>C%NEXT
-       J=J+1
     ENDDO
+
 
     if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
-  END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_R
+  END SUBROUTINE TRACK_fibre_LAYOUT_FLAG_Beam_R
 
 
 end module ptc_multiparticle

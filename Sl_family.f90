@@ -1,6 +1,5 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
 
 MODULE S_FAMILY
   USE S_FIBRE_BUNDLE
@@ -901,7 +900,7 @@ CONTAINS
     IF(.NOT.SKIPT) THEN
        IF(ASSOCIATED(C%PATCH)) THEN
           P=>C%PATCH
-          IF(P%PATCH/=0) THEN
+          IF(P%PATCH==1.or.P%PATCH==2.or.P%PATCH==3) THEN
              ANG=ZERO
              ANG=P%A_ANG ;
 
@@ -951,7 +950,7 @@ CONTAINS
 
 
     IF(ASSOCIATED(C%PATCH)) THEN
-       IF(P%PATCH/=0) THEN
+       IF(P%PATCH==1.or.P%PATCH==2.or.P%PATCH==3) THEN
           ANG=ZERO
           ANG=P%B_ANG ;
 

@@ -1,6 +1,6 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
+
 
 MODULE S_DEF_ELEMENT
   USE S_DEF_KIND

@@ -72,6 +72,9 @@ module precision_constants
   real(dp)::rpi4
   real(dp),parameter::RAD_TO_DEG_=c_180/pi,DEG_TO_RAD_=pi/c_180
   !Physical Constants
+  real(dp),parameter::A_ELECTRON=1.159652e-3_dp
+  real(dp),parameter::A_MUON=1.165923e-3_dp
+  real(dp),parameter::A_PROTON=1.7928474e-0_dp
   real(dp),parameter::pmae=5.10998902e-4_dp
   real(dp),parameter::pmae_amu=5.48579903e-4_dp
   ![GeV]
@@ -158,6 +161,7 @@ module precision_constants
   REAL(dp),TARGET   :: absolute_aperture=c_1d3
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
+  integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=c_1d6
   real(dp),pointer :: crash
   type info_window
@@ -182,6 +186,9 @@ module precision_constants
      integer,pointer :: nd       ! degrees of freedom
      integer,pointer :: nd2      ! phase space dimension
      integer,pointer :: np       ! number of parameters in fpp
+     integer,pointer :: nspin       ! number of spin variables (0 or 3)
+     integer,pointer :: SPIN_pos       ! position of spin variables (0 or 3)
+     LOGICAL(LP),POINTER :: track_spint_mat  ! TRACKS A SPIN MATRIX WITHOUT DA
      integer,pointer :: ndpt     ! constant energy variable position is different from zero
      integer,pointer :: NPARA     ! PARAMETER LOCATION IN PTC in fpp
      integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP or PTC

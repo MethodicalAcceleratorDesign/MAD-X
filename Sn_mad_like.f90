@@ -1,6 +1,6 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
+
 
 module Mad_like
   USE ptc_multiparticle,drifter=>drift
@@ -2334,7 +2334,7 @@ CONTAINS
        nullify(s22%dir);allocate(s22%dir);
        !     nullify(s22%P0C);allocate(s22%P0C);
        !    nullify(s22%BETA0);allocate(s22%BETA0);
-       nullify(s22%PARENT_LAYOUT);
+       !       nullify(s22%PARENT_LAYOUT);   !So as to preserve what is in append_empty
        !       nullify(s22%PARENT_PATCH);
        !       nullify(s22%PARENT_CHART);nullify(s22%PARENT_MAG);
        NULLIFY(S22%I)
@@ -3630,10 +3630,14 @@ CONTAINS
     TYPE (fibre), INTENT (IN) :: S2
     INTEGER I
     call Set_Up_MAD(MUL_E)
+    !  write(6,*) 1,associated(mul_e%mass)
+    !  if(associated(mul_e%mass)) write(6,*) mul_e%mass
 
     do I=1,IABS(s1)
        call APPEND_mad_like(MUL_E,S2)
     enddo
+    !   write(6,*)2, associated(mul_e%mass)
+    !   if(associated(mul_e%mass)) write(6,*) mul_e%mass
 
   END FUNCTION MUL_E
 

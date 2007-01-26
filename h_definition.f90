@@ -1,6 +1,5 @@
 !The Full Polymorphic Package
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file a_scratch_size
+!Copyright (C) Etienne Forest
 
 module definition
   !  use define_newda
@@ -38,6 +37,7 @@ module definition
   logical(lp) :: knob_numerical=.false.
   real(dp) ::  knob_eps(lnv)=c_1d_6
   integer ::  knob_i =0
+  logical(LP), target :: track_spint_mat=MY_FALSE
 
   !
   TYPE sub_taylor
@@ -96,6 +96,25 @@ module definition
      type (REAL_8) sigma0(ndim2)
      type (REAL_8) sigmaf(ndim2)
   END TYPE ENV_8
+
+  type spinor
+     real(dp) x(3)
+  end type spinor
+
+  type spinor_8
+     type(real_8) x(3)
+     type(real_8) m(3,3)
+  end type spinor_8
+
+  type probe
+     real(dp) x(6)
+     type(spinor) s
+  end type probe
+
+  type probe_8
+     type(real_8) x(6)
+     type(spinor_8) s
+  end type probe_8
 
   !    scratch levels of DA using linked list
 
@@ -237,6 +256,20 @@ module definition
      integer,  DIMENSION(:), POINTER :: JL,JV
      INTEGER,POINTER :: N,ND2,no
   end  type tree_element
+
+  type daspin
+     REAL(DP) X(6)
+     type(damap) M
+     type(real_8) s(3,3)
+  end type daspin
+
+  type normal_spin
+     type(normalform) N
+     type(real_8) NS(3,3)
+     type(real_8) AS(3,3)
+     real(dp) tune
+
+  end type normal_spin
 
 
 end module definition

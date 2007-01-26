@@ -1,3 +1,6 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
+
 TYPE INNER_FRAME
    INTEGER, POINTER ::   NST
    REAL(DP), POINTER :: ORIGIN(:,:)

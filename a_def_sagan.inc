@@ -1,3 +1,6 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
+
 TYPE undu_R
    real(dp), DIMENSION(:,:), pointer :: K
    real(dp), DIMENSION(:), pointer :: A

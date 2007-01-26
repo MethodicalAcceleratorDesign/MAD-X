@@ -1,6 +1,5 @@
 !The Polymorphic Tracking Code
-!Copyright (C) Etienne Forest and Frank Schmidt
-! See file A_SCRATCH_SIZE.F90
+!Copyright (C) Etienne Forest and CERN
 
 MODULE S_FIBRE_BUNDLE
   USE S_DEF_ELEMENT
@@ -561,7 +560,7 @@ CONTAINS
   SUBROUTINE append_EMPTY_FIBRE( L )  ! Creates an empty fibre to be filled later
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout) L
+    TYPE (layout),target :: L
     L%N=L%N+1
     CALL ALLOCATE_FIBRE(Current)
     if(L%N==1) current%next=> L%start
@@ -577,7 +576,7 @@ CONTAINS
 
     L%LASTPOS=L%N ;
     L%LAST=>CURRENT;
-
+    current%parent_layout=>L
   END SUBROUTINE append_EMPTY_FIBRE
 
   SUBROUTINE NULL_FIBRE(CURRENT)  ! nullifies fibre content
@@ -1015,6 +1014,24 @@ CONTAINS
     L%SHARED=0;
   END SUBROUTINE Set_Up_UNIVERSE
 
+  SUBROUTINE kill_last_layout( L )  ! Destroys a layout
+    implicit none
+    TYPE (LAYOUT), POINTER :: Current,Current1
+    TYPE (MAD_UNIVERSE) L
+    nullify(current)
+    nullify(current1)
+    Current => L % end      ! end at the end
+    !    DO WHILE (ASSOCIATED(L % end))
+    Current1 => L % end      ! end at the end
+    L % end => Current % previous  ! update the end before disposing
+    call kill_layout(Current)
+    Current => L % end     ! alias of last fibre again
+    L%N=L%N-1
+    deallocate(Current1)
+    !   END DO
+    !    call de_Set_Up_UNIVERSE(L)
+  END SUBROUTINE kill_last_layout
+
   SUBROUTINE kill_UNIVERSE( L )  ! Destroys a layout
     implicit none
     TYPE (LAYOUT), POINTER :: Current,Current1
@@ -1318,6 +1335,10 @@ CONTAINS
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT) :: T
 
+    IF(ASSOCIATED(T%bb)) then
+       CALL KILL(t%bb)
+       DEALLOCATE(T%bb)
+    endif
     IF(ASSOCIATED(T%a)) DEALLOCATE(T%a)
     IF(ASSOCIATED(T%ent)) DEALLOCATE(T%ent)
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)
@@ -1399,22 +1420,6 @@ CONTAINS
 
 
 
-  SUBROUTINE de_Set_Up_BEAM_BEAM_LATTICE( L ) ! deallocates layout content
-    implicit none
-    TYPE (BEAM_BEAM_LATTICE),target :: L
-    INTEGER I,N
-
-    DO I=1,L%N_KICKS
-       CALL KILL_BEAM_BEAM_NODE(L%KICKS(I))
-    ENDDO
-    deallocate(L%KICKS)
-    deallocate(L%BEAM_BEAM_WARNING)
-    deallocate(L%BEAM_BEAM_DSMAX)
-    deallocate(L%STATE)
-    deallocate(L%CHARGE)
-
-  END SUBROUTINE de_Set_Up_BEAM_BEAM_LATTICE
-
 
   SUBROUTINE KILL_ORBIT_NODE(ORBIT_LAYOUT,I)
     IMPLICIT NONE
@@ -1484,33 +1489,6 @@ CONTAINS
     ENDIF
   END SUBROUTINE Set_Up_ORBIT_LATTICE
 
-  SUBROUTINE Set_Up_beam_beam_lattice(L,O,N)
-    IMPLICIT NONE
-    TYPE(layout),target :: L
-    TYPE(BEAM_BEAM_LATTICE),target :: O
-    INTEGER N,I
-
-
-
-    ALLOCATE(O%KICKS(N))
-    ALLOCATE(O%NEXT_KICK(L%T%N))
-    ALLOCATE(O%BEAM_BEAM_WARNING);O%BEAM_BEAM_WARNING=0
-    ALLOCATE(O%BEAM_BEAM_DSMAX);O%BEAM_BEAM_DSMAX=ZERO
-    ALLOCATE(O%STATE);
-    ALLOCATE(O%CHARGE);
-    ALLOCATE(O%N_KICKS)
-    O%N_KICKS=N
-
-    O%STATE=DEFAULT
-    O%CHARGE=1
-
-    DO I=1,N
-       CALL ALLOC(O%KICKS(I))
-    ENDDO
-    O%NEXT_KICK=0
-  END SUBROUTINE Set_Up_beam_beam_lattice
-
-
 
   SUBROUTINE de_Set_Up_NODE_LAYOUT( L ) ! deallocates layout content
     implicit none
@@ -1565,8 +1543,9 @@ CONTAINS
 
   SUBROUTINE ALLOC_BEAM_BEAM_NODE(B)
     IMPLICIT NONE
-    TYPE(BEAM_BEAM_NODE),TARGET :: B
+    TYPE(BEAM_BEAM_NODE),POINTER :: B
 
+    allocate(B)
     ALLOCATE(B%DS)
     ALLOCATE(B%S)
     ALLOCATE(B%FK)
@@ -1589,7 +1568,7 @@ CONTAINS
 
   SUBROUTINE KILL_BEAM_BEAM_NODE(B)
     IMPLICIT NONE
-    TYPE(BEAM_BEAM_NODE),TARGET :: B
+    TYPE(BEAM_BEAM_NODE),POINTER :: B
 
     DEALLOCATE(B%DS)
     DEALLOCATE(B%FK)
@@ -1600,8 +1579,8 @@ CONTAINS
     DEALLOCATE(B%s)
     DEALLOCATE(B%DPOS)
     DEALLOCATE(B%bbk)
+    DEALLOCATE(B)
 
   END SUBROUTINE KILL_BEAM_BEAM_NODE
-
 
 END MODULE S_FIBRE_BUNDLE

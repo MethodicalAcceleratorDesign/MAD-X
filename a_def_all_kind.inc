@@ -1,5 +1,7 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
 
-! New stuff SixTrack90-like
+
 TYPE DRIFT1
    TYPE(MAGNET_CHART), POINTER :: P
    real(dp) , POINTER ::L                    !  Storage space for computed

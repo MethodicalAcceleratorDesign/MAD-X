@@ -1,6 +1,19 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
+! The concept of the fibre and the concept of the
+! integration node, with their resulting link list types,
+! the layout and the node_layout,
+! are based on concepts first ellaborated  with J. Bengtsson.
+! The node_layout is similar to the Lagrangian class that
+! Bengtsson and Forest contemplated around 1990 for the
+! C++ collaboration later known as CLASSIC.
+
+
+
 TYPE INTERNAL_STATE
    LOGICAL(lp) TOTALPATH,TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS
-   LOGICAL(lp) PARA_IN,ONLY_4D,DELTA  ! DA related
+   LOGICAL(lp) PARA_IN,ONLY_4D,DELTA,SPIN,SPIN_ONLY  ! DA related
+   INTEGER  SPIN_DIM
 END TYPE INTERNAL_STATE
 
 type work
@@ -262,7 +275,7 @@ TYPE INTEGRATION_NODE
    TYPE (INTEGRATION_NODE), POINTER :: PREVIOUS
    TYPE (NODE_LAYOUT), POINTER :: PARENT_NODE_LAYOUT
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
-   TYPE(BEAM_BEAM_NODE), POINTER :: BB   
+   TYPE(BEAM_BEAM_NODE), POINTER :: BB
    !  potential DAMAP attached to a thin lens
    LOGICAL(LP),POINTER :: USE_TPSA_MAP
    TYPE(TREE_ELEMENT), POINTER :: TPSA_MAP
@@ -337,13 +350,3 @@ TYPE BEAM_BEAM_NODE
    REAL(DP), POINTER :: BBK(:)
    integer, POINTER :: DPOS
 END TYPE BEAM_BEAM_NODE
-
-TYPE BEAM_BEAM_LATTICE
-   TYPE(BEAM_BEAM_NODE), pointer :: KICKS(:)
-   INTEGER, POINTER :: NEXT_KICK(:)
-   INTEGER, pointer  ::  N_KICKS
-   INTEGER, pointer  ::   BEAM_BEAM_WARNING
-   REAL(DP), pointer  ::  BEAM_BEAM_DSMAX
-   TYPE(INTERNAL_STATE),pointer :: STATE
-   INTEGER,pointer ::  CHARGE
-END TYPE BEAM_BEAM_LATTICE

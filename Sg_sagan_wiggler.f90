@@ -1,3 +1,5 @@
+!The Polymorphic Tracking Code
+!Copyright (C) Etienne Forest and CERN
 module sagan_WIGGLER
   use S_def_all_kinds
   implicit none
