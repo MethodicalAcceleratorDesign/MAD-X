@@ -25,6 +25,7 @@
 /So_fitting.f90 -text
 /Sp_keywords.f90 -text
 /Spb_fake_gino_sub.f90 -text
+/Spc_pointers.f90 -text
 /a_def_all_kind.inc -text
 /a_def_element_fibre_layout.inc -text
 /a_def_frame_patch_chart.inc -text
