@@ -312,13 +312,13 @@ extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
                     double*, double*, double*, double*, double*);
 extern void mtjac_(int*, int*,
-                  int*, double*, double*, double*,
+                   int*, double*, double*, double*,
                    int*, int*, double*, int*,
                    double*, int*, int*, double*, double*, double*,
                    double*, double*, double*,
                    double*, double*);
 extern void mtsvd_(int*, int*,
-                  double*, double*,
+                   double*, double*,
                    double*, double*);
 extern void mtmigr_(int*, int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
@@ -1010,7 +1010,7 @@ void pro_error_make_efield_table();
 /* routines for SDDS */
 void sel_table(char* tname, struct table* t);
 void set_selected_rows_tab(struct table* t, struct command_list* select,
-                       struct command_list* deselect);
+                           struct command_list* deselect);
 
 void pro_sdds(struct in_cmd* cmd);
 int  sdds_ior(struct in_cmd* cmd);
@@ -1020,7 +1020,7 @@ int sdds_writet_sel(char *filename, struct table *tfstab);
 int head_split(char* buf, struct char_p_array* list);
 void sel_table(char* tname, struct table* t);
 void set_selected_rows_tab(struct table* t, struct command_list* select,
-                       struct command_list* deselect);
+                           struct command_list* deselect);
 int pass_select_tab(char* name, struct command* sc);
 
 
@@ -1081,7 +1081,7 @@ void fill_dump(FILE*, int, char*, double*, int, int);
 void pro_elem_sxf(FILE*);
 void put_line(FILE*, char*);
 void accu_line(FILE*, char*);
-void get_sxf_names(); 
+void get_sxf_names();
 int kl_trans(char*, char*, double*, int*);
 void r_indent();
 void s_indent(int);

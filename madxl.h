@@ -12,8 +12,8 @@
 #define FREECODE 380226     /* check-code to avoid multiple "free" */
 #ifdef _MEM_LEAKS
 #define MTABLE_SIZE 1000000
-  int item_no=-1;
-  int* mtable[MTABLE_SIZE];
+int item_no=-1;
+int* mtable[MTABLE_SIZE];
 #endif
 #define AUX_LG 10000        /* initial size for ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
@@ -171,7 +171,7 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 61; /* last standard column filled
+int twiss_fill_end = 68; /* last standard column filled
                             by twiss_table_complete */
 /* warning: modify routine twiss_table_complete in case of changes */
 int twiss_table_types[] =
@@ -188,7 +188,8 @@ int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2, 3,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 3,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -231,8 +232,9 @@ char* twiss_table_cols[] =
   "k4sl", "k5l", "k5sl", "k6l", "k6sl",
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
   "k9sl", "k10l", "k10sl", "ks", "hkick",
-  "vkick", "tilt", "parent",
-  "re11", "re12", "re13", "re14", "re15", "re16", 
+  "vkick", "tilt", "e1", "e2", "h1",
+  "h2", "hgap", "fint", "fintx", "parent",
+  "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",
   "re41", "re42", "re43", "re44", "re45", "re46",
@@ -251,10 +253,10 @@ char* twiss_table_cols[] =
   "mu1", "mu2", "mu3",
   "disp1", "disp2", "disp3",
   "disp4", "disp5", "disp6",
-  "eign11", "eign12", "eign13", "eign14", "eign15", "eign16", 
-  "eign21", "eign22", "eign23", "eign24", "eign25", "eign26", 
-  "eign31", "eign32", "eign33", "eign34", "eign35", "eign36", 
-  "eign41", "eign42", "eign43", "eign44", "eign45", "eign46", 
+  "eign11", "eign12", "eign13", "eign14", "eign15", "eign16",
+  "eign21", "eign22", "eign23", "eign24", "eign25", "eign26",
+  "eign31", "eign32", "eign33", "eign34", "eign35", "eign36",
+  "eign41", "eign42", "eign43", "eign44", "eign45", "eign46",
   "eign51", "eign52", "eign53", "eign54", "eign55", "eign56",
   "eign61", "eign62", "eign63", "eign64", "eign65", "eign66",
   "n1",
