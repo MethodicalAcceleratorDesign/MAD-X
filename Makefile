@@ -152,11 +152,11 @@ wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_twiss.o          madx_ptc_distrib.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_knobs.o \
-	madx_ptc_script.o pointers.o \
+	madx_ptc_script.o Spc_pointers.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
-pointers.o: Sp_keywords.o madx_ptc_module.o pointers.f90
-Spb_fake_gino_sub.o: pointers.o Spb_fake_gino_sub.f90
+Spc_pointers.o: Sp_keywords.o madx_ptc_module.o Spc_pointers.f90
+Spb_fake_gino_sub.o: Spc_pointers.o Spb_fake_gino_sub.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
 Sq_orbit_ptc.o:  madx_ptc_module.o Sq_orbit_ptc.f90
