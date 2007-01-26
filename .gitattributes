@@ -101,7 +101,6 @@
 /plot_b.fi -text
 /plot_c.fi -text
 /plot_math.fi -text
-/pointers.f90 -text
 /poisson.F -text
 /ptc_dummy.F -text
 /resindex.F -text
