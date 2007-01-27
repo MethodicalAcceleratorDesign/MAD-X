@@ -1,13 +1,13 @@
 REM User Input - you may need to change the following folder locations
 REM This is for the case where WinCVS checks out to F:\MAD\MADXLahey\source
 REM
-SET user_main=D:\programs\madxpiotr1212
+SET user_main=.
 REM FPP code
-SET FPP=D:\programs\madxpiotr1212
+SET FPP=.
 REM PTC code
-SET PTC=D:\programs\madxpiotr1212
+SET PTC=.
 REM MAD-X proper code
-SET MADX=D:\programs\madxpiotr1212
+SET MADX=.
 
 set INCLUDE=C:\PROGRA~1\Microsoft Visual Studio\VC98\Include
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %MADX%\madxp.c
@@ -64,19 +64,19 @@ lf95 -c -o1 -tp %FPP%\Sn_mad_like.f90
 lf95 -c -o1 -tp %FPP%\So_fitting.f90
 lf95 -c -o1 -tp %FPP%\Sp_keywords.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_intstate.f90
-lf95 -c -o1 -tp %MADX%\madx_ptc_distrib.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_setcavs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_knobs.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_module.f90
-lf95 -c -o1 -tp %MADX%\madx_ptc_twiss.f90
-lf95 -c -o1 -tp %MADX%\madx_ptc_script.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_trackcavs.f90
-lf95 -c -o1 -tp %MADX%\madx_ptc_track_run.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_script.f90
 lf95 -c -o1 -tp %MADX%\madx_ptc_eplacement.f90
-lf95 -c -o1 -tp %MADX%\user2_photon.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_distrib.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_twiss.f90
+lf95 -c -o1 -tp %MADX%\madx_ptc_track_run.f90
 lf95 -c -o1 -tp %MADX%\Spc_pointers.f90
 lf95 -c -o1 -tp %FPP%\Spb_fake_gino_sub.f90
 lf95 -c -o1 -tp %MADX%\wrap.f90
+lf95 -c -o1 -tp %MADX%\user2_photon.f90
 lf95 -c -o1 -tp %MADX%\timest.f90
 lf95 -c -o1 -tp %MADX%\timex.f90
 lf95 -c -o1 -tp %MADX%\run_madx.f90
