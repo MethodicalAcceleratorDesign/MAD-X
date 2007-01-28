@@ -284,7 +284,8 @@ CONTAINS
     endif
 
     my_ring%mass=pma
-!    my_ring%charge=charge -> Makes DA ustable in twiss!!!
+! preliminary setting
+    my_ring%charge=1
 
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
 
