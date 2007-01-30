@@ -14,28 +14,28 @@ CXX=$(CC)
 f95=g95
 
 # default fortran compiler options
-FCP=-O4 -fno-second-underscore -funroll-loops -I.
+FCP=-O4 -Xassembler "--32" -fno-second-underscore -funroll-loops -I.
 
 # alternative for development and debug
-FCM=-O2 -fno-second-underscore -funroll-loops
-FCDB=-g -O0 -fno-second-underscore
+FCM=-O2 -Xassembler "--32" -fno-second-underscore -funroll-loops
+FCDB=-g -O0 -Xassembler "--32" -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 
 # alternative for development
-GCC_FLAGS=-g -Wall -D_CATCH_MEM -D_FULL
+GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 
-f95_FLAGS= -c -O4 -fno-second-underscore -funroll-loops -I.
+f95_FLAGS= -c -O4 -Xassembler "--32" -fno-second-underscore -funroll-loops -I.
 
-FFLAGS77= -c -O4 -fno-second-underscore -funroll-loops -I.
+FFLAGS77= -c -O4 -Xassembler "--32" -fno-second-underscore -funroll-loops -I.
 
 # g95 link options
-FP=-static
+FP=-static -m32
 
 # g95 Fortran90 link options
-LDOPT=-static
+LDOPT=-static -m32
 
 # libraries
 #FC5
@@ -50,7 +50,7 @@ INCLUDES=-I.
 
 ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
-  LDOPT=-rdynamic
+  LDOPT=-rdynamic -m32
 endif
 
 
@@ -60,9 +60,9 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
+  GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-  FP=
+  FP=-m32
 endif
 
 default: madx

@@ -15,46 +15,47 @@ FC=g77
 f95=lf95
 
 # default fortran compiler options
-FCP=-O4 -fno-second-underscore -funroll-loops -I.
+FCP=-O4 -m32 -fno-second-underscore -funroll-loops -I.
 
 # alternative for development and debug
-FCM=-O2 -fno-second-underscore -funroll-loops
-FCDB=-g -O0 -fno-second-underscore
+FCM=-O2 -m32 -fno-second-underscore -funroll-loops
+FCDB=-g -O0 -m32 -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I.
+GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I.
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 
 # alternative for development
-GCC_FLAGS=-g -Wall -D_CATCH_MEM -D_FULL
+GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 
 # NAG default f95 compiler options
-#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan
+#f95_FLAGS=-gline -g90 -c -m32 -C=all -maxcontin=100 -nan
 # NAG alternative
-#f95_FLAGS=-c -O4 -maxcontin=100 -w=unused
+#f95_FLAGS=-c -O4 -m32 -maxcontin=100 -w=unused
 # LF95 default f95 compiler options
-f95_FLAGS= --o1 --tp -c
+f95_FLAGS= --o1 --tp -c -Wa,--32
 
 # NAG f95 compiler options to compile f77 code
-#FFLAGS77=-gline -g90 -c -maxcontin=100 -nan
+#FFLAGS77=-gline -g90 -c -m32 -maxcontin=100 -nan
 # NAG f95 alternatives for development and debug
-#FFLAGS77=-gline -g90 -c -maxcontin=100 -nan -ieee=full
-#FFLAGS77=-g90 -c -O4 -maxcontin=100 -w=unused
+#FFLAGS77=-gline -g90 -c -m32 -maxcontin=100 -nan -ieee=full
+#FFLAGS77=-g90 -c -O4 -m32 -maxcontin=100 -w=unused
 # LF95 f95 compiler options to compile f77 code
-FFLAGS77= --o1 --tp -c
+FFLAGS77= --o1 --tp -c -Wa,--32
 
 # g77 link options
-FP=-static
+FP=-static -m32
 
 # NAG f95 link options
-# LDOPT=
+# LDOPT=-m32
 # LF95 f95 link options
-LDOPT=-static
+LDOPT=-static -m32
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
 #FC5
 #LIBX= -lX11 -lXdmcp -lXau -lpthread
+#LIBX="-L/usr/X11R6/lib64" -lX11 "-L/usr/lib64/" -ldl -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 # NAG f95 lib extension
@@ -66,9 +67,9 @@ ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
   #linker options to make dynamic linking
   #Lahey lf95
-  LDOPT=--export
+  LDOPT=--export -m32
   #g95
-  #LDOPT=-rdynamic
+  #LDOPT=-rdynamic -m32
 endif
 
 
@@ -76,9 +77,9 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -O4 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/
+  GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-  FP=
+  FP=-m32
 endif
 
 default: madx

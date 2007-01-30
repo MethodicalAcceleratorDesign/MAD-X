@@ -7,7 +7,7 @@
 RPLOT=NO
 PROFILE=YES
 
-LDOPS=-static
+LDOPS=-static -m32
 # compilers
 CC=gcc
 # g95 for replacement of g77
@@ -18,19 +18,19 @@ CXX=$(CC)
 LD=$(f95)
 
 #G95
-f95_FLAGS= -c -g -fno-second-underscore -I. -ftrace=full
+f95_FLAGS= -c -g -Xassembler "--32" -m32 -fno-second-underscore -I. -ftrace=full
 # NAG default f95 compiler options
-#f95_FLAGS=-gline -g90 -c -C=all -maxcontin=100 -nan
+#f95_FLAGS=-gline -g90 -c -m32 -C=all -maxcontin=100 -nan
 # NAG alternative
-#f95_FLAGS=-c -maxcontin=100 -w=unused
+#f95_FLAGS=-c -m32 -maxcontin=100 -w=unused
 # Lahey default
-#f95_FLAGS= --o1 --tp -c
+#f95_FLAGS= --o1 --tp -c -Wa,--32
 # Lahey debugging FDEB
 #FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
-#f95_FLAGS= --tp4 -c $(FDEB)
+#f95_FLAGS= --tp4 -c -Wa,--32 $(FDEB)
 
 # default fortran compiler options
-FCP=-g -fno-second-underscore -I.
+FCP=-g --Xassembler "--32" -fno-second-underscore -I.
 
 INCLUDES=-I.
 
@@ -39,30 +39,30 @@ ifeq ($(RPLOT),YES)
 #include rplot/GeneralDef
 #include rplot/MachineDef.Linux
 INCLUDES += -I$(ROOTSYS)/include -I$(MADX_ROOT)/rplot
-LDOPS=-rdynamic
+LDOPS=-rdynamic -m32
 CXX=g++
 else
-LDOPS=-static
+LDOPS=-static -m32 
 endif
 
 
 # alternative for development and debug
-FCM=-g -fno-second-underscore -funroll-loops
-FCDB=-g -fno-second-underscore
+FCM=-g -Xassembler "--32" -fno-second-underscore -funroll-loops
+FCDB=-g -Xassembler "--32" -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -funroll-loops -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-g -m32 -funroll-loops -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL $(INCLUDES)
 
 # alternative for development
-GCC_FLAGS=-g -Wall -D_CATCH_MEM -D_FULL
+GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 
 #NAG
-#FFLAGS77=-gline -g -c -fpp -maxcontin=100 -nan -ieee=stop
+#FFLAGS77=-gline -g -c -m32 -fpp -maxcontin=100 -nan -ieee=stop
 #Lahey
-#FFLAGS77= --tp4 -c $(FDEB)
+#FFLAGS77= --tp4 -c -Wa,--32 $(FDEB)
 #G77
-FFLAGS77=-g -c -fno-second-underscore  -ieee=full
+FFLAGS77=-g -c -m32 -fno-second-underscore -ieee=full
 
 CXX_FLAGS= $(GCCP_FLAGS)
 
@@ -86,7 +86,7 @@ endif
 # g95 link options
 
 # g95 Fortran90 link options
-f95_FOPT=
+f95_FOPT= -m32
 
 # libraries
 
@@ -111,9 +111,9 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
+  GCCP_FLAGS_MPARS=-g -m32 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-  LDOPS=
+  LDOPS=-m32
 endif
 
 default: rplot madxp
