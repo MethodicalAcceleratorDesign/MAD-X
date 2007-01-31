@@ -14,7 +14,7 @@ CXX=$(CC)
 f95=g95
 
 # default fortran compiler options
-FCP=-O4 -Wa,--32 -fno-second-underscore -funroll-loops -I.
+FCP=-O4 -Wa,--32 -fno-second-underscore -funroll-loops -I. -D_G95
 
 # alternative for development and debug
 FCM=-O2 -Wa,--32 -fno-second-underscore -funroll-loops
@@ -29,7 +29,7 @@ GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 
 f95_FLAGS= -c -O4 -Wa,--32 -fno-second-underscore -funroll-loops -I.
 
-FFLAGS77= -c -O4 -Wa,--32 -fno-second-underscore -funroll-loops -I.
+FFLAGS77= -c -O4 -Wa,--32 -fno-second-underscore -funroll-loops -I. -D_G95
 
 # g95 link options
 FP=-static -m32

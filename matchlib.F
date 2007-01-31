@@ -40724,6 +40724,20 @@ CIBM           PREFER SCALAR
 *
       END
 *
+#ifdef _G95
+      SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )
+      implicit none
+!...
+      LOGICAL            IEEE1, RND
+      INTEGER            BETA, T
+!...
+      BETA = RADIX(0.0D0)
+      T = DIGITS(0.0D0)
+      RND = .TRUE.
+      IEEE1 = .TRUE.
+
+      END
+#else
 ************************************************************************
 *
       SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )
@@ -40910,6 +40924,7 @@ CIBM           PREFER SCALAR
 *
       END
 *
+#endif
 ************************************************************************
 *
       SUBROUTINE DLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX, RMAX )
