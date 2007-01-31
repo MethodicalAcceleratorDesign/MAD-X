@@ -463,7 +463,7 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-       if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
+       if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
        ptcrbend=node_value('ptcrbend ').ne.0
        if(ptcrbend) then
           call context(key%list%name)
@@ -529,7 +529,7 @@ CONTAINS
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-       if(tempdp.gt.0) key%tiltd=key%tiltd + asin(skew_0123(0)/tempdp)
+       if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
 
     case(5) ! PTC accepts mults
        key%magnet="quadrupole"
@@ -555,7 +555,7 @@ CONTAINS
        if (sk1s .eq. zero)  then                                  !
           tilt = zero                                             !
        else                                                       !
-          tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two          !
+          tilt = -atan2(sk1s,sk1) / two                           !
        endif                                                      !
        !                                                          !
        !if(l.ne.0) then                                           !
@@ -593,7 +593,7 @@ CONTAINS
        if (sk2s .eq. zero)  then                                  !
           tilt = zero                                             !
        else                                                       !
-          tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three        !
+          tilt = -atan2(sk2s,sk2) / three                         !
        endif                                                      !
        !                                                          !
        !if(l.ne.0) then                                           !
@@ -628,7 +628,7 @@ CONTAINS
        if (sk3s .eq. zero)  then                                  !
           tilt = zero                                             !
        else                                                       !
-          tilt = asin(sk3s/sqrt(sk3**2 + sk3s**2)) / four         !
+          tilt = -atan2(sk3s,sk3) / four                          !
        endif                                                      !
        !                                                          !
        !if(l.ne.0) then                                           !
