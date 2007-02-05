@@ -338,6 +338,8 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   int cntc2 = {0};
   int cntm12 = {0};
   int cntc12 = {0};
+  
+  double ounits;
 
   static char atm[6][4] = {"hmon","vmon","moni","hkic","vkic","kick"};
 
@@ -385,6 +387,13 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 
   correct_orbit12->cor_table = (struct id_mic2 *)mycalloc("pro_correct2_gettables_cor",5200, sizeof(struct id_mic2));
   correct_orbit12->mon_table = (struct id_mic2 *)mycalloc("pro_correct2_gettables_mon",5200, sizeof(struct id_mic2));
+
+/* orbit table available, get units, if defined */
+   if((ounits = command_par_value("units",cmd->clone)) > 0) {
+          correct_orbit12->units=ounits;                      
+   } else {
+          correct_orbit12->units=1.0;      
+   }
 
   ttb = model_table;
 /* no more need, we have b1 and b2 as pointers .. */
@@ -605,6 +614,9 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
   double **da2;
   double xlimit;
 
+  char   strx[40];
+  char   stry[40];
+
   int    posx, posy, pospx, pospy;
 
   da1 = twiss_table_beam1->d_cols;
@@ -614,13 +626,25 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
 
   m = correct_orbit12->mon_table;
 
-  
-  posx = name_list_pos("x",twiss_table_beam1->columns);
-  posy = name_list_pos("y",twiss_table_beam1->columns);
-  pospx = name_list_pos("px",twiss_table_beam1->columns);
-  pospy = name_list_pos("py",twiss_table_beam1->columns);
+  strcpy(strx,"x");
+  strcpy(stry,"y");
 
-  printf("=======>  %d %d %d %d \n",posx,posy,pospx,pospy);
+  if((posx = name_list_pos(strx,twiss_table_beam1->columns)) < 0) { 
+      fatal_error("orbit x not found in input table",", MAD-X terminates ");
+  }
+  if((posy = name_list_pos(stry,twiss_table_beam1->columns)) < 0) { 
+      fatal_error("orbit y not found in input table",", MAD-X terminates ");
+  }
+  if (get_option("debug")) {
+    if((pospx = name_list_pos("px",twiss_table_beam1->columns)) < 0) { 
+        warning("orbit px not found in input table",", MAD-X continues ");
+    }
+    if((pospy = name_list_pos("py",twiss_table_beam1->columns)) < 0) { 
+        warning("orbit py not found in input table",", MAD-X continues ");
+    }
+    printf("====c1===>  %d %d %d %d \n",posx,posy,pospx,pospy);
+  }
+
 
   while(m) {
 
@@ -1044,7 +1068,7 @@ void correct_correct1(struct in_cmd* cmd)
 {
   char rout_name[] = "correct_correct";
   int ix, im, ip, it, idrop;
-  int j,err,nnnseq;
+  int i,j,err,nnnseq;
   int imon, icor;
   int ncorr, nmon;
   int niter;
@@ -1062,6 +1086,7 @@ void correct_correct1(struct in_cmd* cmd)
   int     *sing;             /* array to store pointer to singular correctors */
   static int     *nm, *nx, *nc;
   struct id_mic  *corl;
+struct id_mic   *m;
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct_gettables(ip, cmd);
@@ -1183,7 +1208,8 @@ void correct_correct1(struct in_cmd* cmd)
   }
   else if(strcmp("line",command_par_string("flag",cmd->clone)) == 0) {
     if(dmat != NULL) myfree(rout_name,dmat);
-    dmat = (double *)pro_correct_response_line(ip,ncorr,nmon); }
+          printf("make response for line\n");
+    dmat = (double *)pro_correct_response_line(ip,icor,imon); }
   else { printf("INVALID MACHINE TYPE\n"); exit(-1);
   }
 
@@ -1237,6 +1263,7 @@ void correct_correct1(struct in_cmd* cmd)
     /* printf("Time before micado:  %-6.3f\n",fextim());  */
     ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
     /* printf("Time after micado:  %-6.3f\n",fextim());   */
+
     if(ifail != 0) {
        printf("MICADO correction completed with error code %d\n\n",ifail);
     }
@@ -1346,6 +1373,8 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
   int set0;
   int cntm = {0};
   int cntc = {0};
+
+  double ounits;
 
   static char atm[6][4] = {"hmon","vmon","moni","hkic","vkic","kick"};
 
@@ -1470,6 +1499,13 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
   correct_orbit->cor_table = (struct id_mic *)mycalloc("pro_correct_gettables_cor",5200, sizeof(struct id_mic));
   correct_orbit->mon_table = (struct id_mic *)mycalloc("pro_correct_gettables_mon",5200, sizeof(struct id_mic));
 
+/* orbit table available, get units, if defined */
+   if((ounits = command_par_value("units",cmd->clone)) > 0) {
+          correct_orbit->units=ounits;                      
+   } else {
+          correct_orbit->units=1.0;      
+   }
+
   ttb = model_table;
   correct_orbit->mon_table->previous = NULL;
   correct_orbit->mon_table->next = NULL;
@@ -1532,6 +1568,9 @@ int pro_correct_getorbit(struct in_cmd* cmd)
   double xlimit;
   double rx, ry, dpsi;
 
+  char   strx[40];
+  char   stry[40];
+
   int    posx, posy, pospx, pospy;
   int    tosx = -1;
   int    tosy = -1;
@@ -1549,11 +1588,13 @@ int pro_correct_getorbit(struct in_cmd* cmd)
 
   m = correct_orbit->mon_table;
 
-  
-  if((posx = name_list_pos("x",ttb->columns)) < 0) { 
+  strcpy(strx,"x");
+  strcpy(stry,"y");
+                                                                                                          
+  if((posx = name_list_pos(strx,ttb->columns)) < 0) { 
       fatal_error("orbit x not found in input table",", MAD-X terminates ");
   }
-  if((posy = name_list_pos("y",ttb->columns)) < 0) { 
+  if((posy = name_list_pos(stry,ttb->columns)) < 0) { 
       fatal_error("orbit y not found in input table",", MAD-X terminates ");
   }
   if (get_option("debug")) {
@@ -1591,13 +1632,13 @@ int pro_correct_getorbit(struct in_cmd* cmd)
   if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
     m->val.before[0] =  da1[posx][m->id_ttb] - da2[tosx][m->id_ttb];
     m->val.before[1] =  da1[posy][m->id_ttb] - da2[tosy][m->id_ttb];
-    m->val.before[0] = (da1[posx][m->id_ttb] - da2[tosx][m->id_ttb])*1000.;
-    m->val.before[1] = (da1[posy][m->id_ttb] - da2[tosy][m->id_ttb])*1000.;
+    m->val.before[0] = (da1[posx][m->id_ttb] - da2[tosx][m->id_ttb])*1000.*correct_orbit->units;
+    m->val.before[1] = (da1[posy][m->id_ttb] - da2[tosy][m->id_ttb])*1000.*correct_orbit->units;
   } else {
     m->val.before[0] = da1[posx][m->id_ttb];
     m->val.before[1] = da1[posy][m->id_ttb];
-    m->val.before[0] = da1[posx][m->id_ttb]*1000.;
-    m->val.before[1] = da1[posy][m->id_ttb]*1000.;
+    m->val.before[0] = da1[posx][m->id_ttb]*1000.*correct_orbit->units;
+    m->val.before[1] = da1[posy][m->id_ttb]*1000.*correct_orbit->units;
   }
 
     pos = name_list_pos("monon", nl);
@@ -1672,6 +1713,14 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
   char   l4name[NAME_L];
   double rx, ry, dpsi;
 
+  char   *nam_col;
+  char   *x_col;
+  char   *y_col;
+
+  char   strx[40];
+  char   stry[40];
+  char   strn[40];
+
   int    posx, posy, pospx, pospy;
   int    tosx = -1;
   int    tosy = -1;
@@ -1691,11 +1740,29 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
 
   m = correct_orbit->mon_table;
 
+  if ((x_col = command_par_string("x_col",cmd->clone)) != NULL) {
+         printf("X orbit in column: %s\n",x_col);
+         strcpy(strx,x_col);
+  } else {
+         strcpy(strx,"x");
+  }
+  if ((y_col = command_par_string("y_col",cmd->clone)) != NULL) {
+         printf("y orbit in column: %s\n",y_col);
+         strcpy(stry,y_col);
+  } else {
+         strcpy(stry,"y");
+  }
+  if ((nam_col = command_par_string("name_col",cmd->clone)) != NULL) {
+         printf("names in column: %s\n",nam_col);
+         strcpy(strn,"name");
+  } else {
+         strcpy(strn,"name");
+  }
   
-  if((posx = name_list_pos("x",ttb->columns)) < 0) { 
+  if((posx = name_list_pos(strx,ttb->columns)) < 0) { 
       fatal_error("orbit x not found in input table",", MAD-X terminates ");
   }
-  if((posy = name_list_pos("y",ttb->columns)) < 0) { 
+  if((posy = name_list_pos(stry,ttb->columns)) < 0) { 
       fatal_error("orbit y not found in input table",", MAD-X terminates ");
   }
   if (get_option("debug")) {
@@ -1759,13 +1826,13 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
      if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
        m->val.before[0] =  da1[posx][jjx] - da2[tosx][jjx];
        m->val.before[1] =  da1[posy][jjx] - da2[tosy][jjx];
-       m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjx])*1000.;
-       m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjx])*1000.;
+       m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjx])*1000.*correct_orbit->units;
+       m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjx])*1000.*correct_orbit->units;
      } else {
        m->val.before[0] = da1[posx][jjx];
        m->val.before[1] = da1[posy][jjx];
-       m->val.before[0] = da1[posx][jjx]*1000.;
-       m->val.before[1] = da1[posy][jjx]*1000.;
+       m->val.before[0] = da1[posx][jjx]*1000.*correct_orbit->units;
+       m->val.before[1] = da1[posy][jjx]*1000.*correct_orbit->units;
      }
 
     pos = name_list_pos("monon", nl);
@@ -2125,9 +2192,6 @@ double* pro_correct_response_line(int ip, int nc, int nm)
             } else {
               respx = 0.0;
             }
-          /*          printf("resp: %d %d %f\n",im,ic,respx);
-      printf("++ %s %s %le   \n",m->p_node->name,c->p_node->name,respx);
-            */
             setup_(&respx, dmat, &im, &ic, &nm, &nc);
         }  else if (ip == 2) {
             if(piy_m > piy_c) {
