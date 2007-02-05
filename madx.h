@@ -468,6 +468,7 @@ struct id_mic2 {
 struct orb_cor {
   double qx0;
   double qy0;
+  double units;
   struct id_mic *cor_table;
   struct id_mic *mon_table;
 };
@@ -475,6 +476,7 @@ struct orb_cor {
 struct orb_cor2 {
   double qx0;
   double qy0;
+  double units;
   struct id_mic2 *cor_table;
   struct id_mic2 *mon_table;
 };
