@@ -58,13 +58,14 @@ GCCP_FLAGS += $(INCLUDES)
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under macosx
-# -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
   GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
   ifeq ($(MACHTYPE),powerpc)
-#  no -Wa,--32 for ppc
+#   no -Wa,--32 option for ppc
     FCP=-O4 -fno-second-underscore -funroll-loops -I. -D_G95
+    f95_FLAGS= -c -O4 -fno-second-underscore -funroll-loops -I.
+    FFLAGS77= -c -O4 -fno-second-underscore -funroll-loops -I. -D_G95
   endif
   FP=-m32
 endif
