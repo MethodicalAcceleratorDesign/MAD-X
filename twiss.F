@@ -447,7 +447,7 @@
       opt_fun0(13)=zero
       opt_fun0(14)=zero
       goto 999
-  820 continue
+ 820  continue
       print *, 'Singular matrix occurred during closed orbit search.'
       eflag = 1
  999  end
@@ -668,7 +668,7 @@
         goto 10
       endif
       bbd_flag=0
-  999 end
+ 999  end
       subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
       implicit none
 
@@ -884,9 +884,9 @@
       opt_fun0(31)=r0mat(2,1)
       opt_fun0(32)=r0mat(2,2)
 
-  910 format('Mode ',i1,' is unstable for delta(p)/p =',f12.6,          &
+ 910  format('Mode ',i1,' is unstable for delta(p)/p =',f12.6,          &
      &', cosmux = ',f12.6,', cosmuy = ',f12.6)
-  920 format('Both modes are unstable for delta(p)/p = ',f12.6,         &
+ 920  format('Both modes are unstable for delta(p)/p = ',f12.6,         &
      &', cosmux = ',f12.6,', cosmuy = ',f12.6)
  9999 end
       subroutine twdisp(rt,vect,disp)
@@ -1128,7 +1128,7 @@
         call aawarn('TWCPGO: ',msg)
       endif
 
-  910 format('TWISS uses the RF system or synchrotron radiation ',      &
+ 910  format('TWISS uses the RF system or synchrotron radiation ',      &
      &'only to find the closed orbit, for optical calculations it ',    &
      &'ignores both.')
 
@@ -1484,9 +1484,9 @@
         call aawarn('TWCHGO: ',msg)
       endif
 
-  910 format('TWISS found transverse coupling for delta(p)/p =',f12.6,  &
+ 910  format('TWISS found transverse coupling for delta(p)/p =',f12.6,  &
      &'chromatic functions may be wrong.')
-  920 format('TWISS uses the RF system or synchrotron radiation ',      &
+ 920  format('TWISS uses the RF system or synchrotron radiation ',      &
      &'only to find the closed orbit, for optical calculations it ',    &
      &'ignores both.')
 
@@ -1831,9 +1831,9 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       integer code
-      logical fsec, ftrk, fmap, bend
+      logical fsec, ftrk, fmap
       double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
-      double precision theta,st,ct,tmp,plot_tilt,zero
+      double precision plot_tilt,zero
       parameter (zero = 0.d0)
 !---- Initialization
       call dzero(ek,6)
@@ -1841,22 +1841,7 @@
       call dzero(te,216)
       plot_tilt=zero
       fmap=.false.
-      bend = code .eq. 2 .or. code .eq. 3
       el = node_value('l ')
-      if (.not. bend)  then
-        theta = node_value('tilt ')
-        if (theta .ne. zero)  then
-!--- rotate orbit before entry
-          st = sin(theta)
-          ct = cos(theta)
-          tmp = orbit(1)
-          orbit(1) = ct * tmp + st * orbit(3)
-          orbit(3) = ct * orbit(3) - st * tmp
-          tmp = orbit(2)
-          orbit(2) = ct * tmp + st * orbit(4)
-          orbit(4) = ct * orbit(4) - st * tmp
-        endif
-      endif
 !---- Select element type.
       go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,          &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
@@ -1864,76 +1849,76 @@
      &310, 310, 300, 310, 310, 310, 310, 310, 310, 310), code
 
 !---- Drift space, monitor, collimator, or beam instrument.
-   10 continue
-  170 continue
-  180 continue
-  190 continue
-  200 continue
-  210 continue
-  240 continue
+ 10   continue
+ 170  continue
+ 180  continue
+ 190  continue
+ 200  continue
+ 210  continue
+ 240  continue
       call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Bending magnet.
-   20 continue
-   30 continue
+ 20   continue
+ 30   continue
       call tmbend(ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Arbitrary matrix.
-   40 continue
+ 40   continue
       call tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Quadrupole.
-   50 continue
+ 50   continue
       call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Sextupole.
-   60 continue
+ 60   continue
       call tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Octupole.
-   70 continue
+ 70   continue
       call tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Multipole.
-   80 continue
+ 80   continue
       call tmmult(fsec,ftrk,orbit,fmap,re,te)
       go to 500
 
 !---- Solenoid.
-   90 continue
+ 90   continue
       call tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- RF cavity.
-  100 continue
+ 100  continue
       call tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Electrostatic separator.
-  110 continue
+ 110  continue
       call tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
 !---- Rotation around s-axis.
-  120 continue
+ 120  continue
       call tmsrot(ftrk,orbit,fmap,ek,re,te)
       go to 500
 
 !---- Rotation around y-axis.
-  130 continue
+ 130  continue
       call tmyrot(ftrk,orbit,fmap,ek,re,te)
       go to 500
 
 !---- Correctors.
-  140 continue
-  150 continue
-  160 continue
+ 140  continue
+ 150  continue
+ 160  continue
       call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
       go to 500
 
@@ -1944,44 +1929,32 @@
       go to 500
 
 !---- Lump.
-  230 continue
+ 230  continue
       go to 500
 
 !---- Marker.
-  250 continue
+ 250  continue
       go to 500
 
 !---- General bend (dipole, quadrupole, and skew quadrupole).
-  260 continue
+ 260  continue
       go to 500
 
 !---- LCAV cavity.
-  270 continue
+ 270  continue
 
 !---- Reserved.
-  280 continue
-  290 continue
+ 280  continue
+ 290  continue
       go to 500
-  300 call tmdpdg(ftrk,orbit,fmap,re)
+ 300  call tmdpdg(ftrk,orbit,fmap,re)
       go to 500
 
 !---- User-defined elements.
-  310 continue
+ 310  continue
 
 !---- End of element calculation;
-  500 continue
-      if (.not. bend)  then
-        if (theta .ne. zero)  then
-          call tmtilt(.true., -theta, ek, re, te)
-!--- rotate orbit at exit
-          tmp = orbit(1)
-          orbit(1) = ct * tmp - st * orbit(3)
-          orbit(3) = ct * orbit(3) + st * tmp
-          tmp = orbit(2)
-          orbit(2) = ct * tmp - st * orbit(4)
-          orbit(4) = ct * orbit(4) + st * tmp
-        endif
-      endif
+ 500  continue
       end
       subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
@@ -2032,7 +2005,7 @@
         gamma = get_value('probe ','gamma ')
         dorad = get_value('probe ','radiate ') .ne. zero
         an = bv0 * node_value('angle ') * el/node_value('l ')
-        tilt = -node_value('tilt ')
+        tilt = node_value('tilt ')
         e1 = bv0 * node_value('e1 ')
         e2 = bv0 * node_value('e2 ')
 
@@ -2595,7 +2568,7 @@
      &t2jk,ti1k,ti2k,tij1,tij2,tilt,xx
 
       c = cos(tilt)
-      s = -sin(tilt)
+      s = sin(tilt)
 
 !---- Rotate at entrance.
       do i = 1, 6
@@ -2968,6 +2941,7 @@
 !   ftrk      (logical) if true, track orbit.                          *
 ! Input/output:                                                        *
 !   orbit(6)  (double)  closed orbit.                                  *
+! Remark: the orbit is NOT rotated before and after this routine       *
 ! Output:                                                              *
 !   fmap      (logical) if true, element has a map.                    *
 !   el        (double)  element length.                                *
@@ -3008,11 +2982,7 @@
         dorad = get_value('probe ','radiate ') .ne. zero
         sk3 = bvk * node_value('k3 ')
         sk3s = bvk * node_value('k3s ')
-        if (sk3s .eq. zero)  then
-          tilt4 = zero
-        else
-          tilt4 = asin(sk3s/sqrt(sk3**2 + sk3s**2))
-        endif
+        tilt4 = 4*node_value('tilt ')
         sk3 = sk3 + bvk * field(1,3)/el
         sk3s = sk3s + bvk * field(2,3)/el
         if (tilt4 .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)
@@ -3132,7 +3102,7 @@
         endif
         call tmcat(fsec,rw,tw,re,te,re,te)
 
-!---- Not orbit track requested, use drift map.
+!---- No orbit track requested, use drift map.
       else
         call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
       endif
@@ -3451,6 +3421,7 @@
 !   plot_tilt (double)  external tilt needed for plot                  *
 ! Input/output:                                                        *
 !   orbit(6)  (double)  closed orbit.                                  *
+! Remark: the orbit is rotated (in tmmap) before and after this routine*
 ! Output:                                                              *
 !   fmap      (logical) if true, element has a map.                    *
 !   el        (double)  element length.                                *
@@ -3462,6 +3433,7 @@
       include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
+      double precision ct, st, tmp
       double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
      &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
      &bvk,field(2,0:1),node_value,get_value,plot_tilt,zero,one,two,three
@@ -3472,6 +3444,18 @@
       cplxy=.false.
       fmap = el .ne. zero
       if (.not. fmap) return
+      tilt = node_value('tilt ')
+      if (tilt .ne. zero)  then
+!--- rotate orbit before entry
+        st = sin(tilt)
+        ct = cos(tilt)
+        tmp = orbit(1)
+        orbit(1) = ct * tmp + st * orbit(3)
+        orbit(3) = ct * orbit(3) - st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp + st * orbit(4)
+        orbit(4) = ct * orbit(4) - st * tmp
+      endif
 !---- Field error.
       call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
@@ -3484,12 +3468,7 @@
       bvk = node_value('other_bv ')
       sk1 = bvk * node_value('k1 ')
       sk1s = bvk * node_value('k1s ')
-      if (sk1s .eq. zero)  then
-        tilt = zero
-      else
-        cplxy = cplxy .or. sk1 .ne. zero
-        tilt = asin(sk1s/sqrt(sk1**2 + sk1s**2)) / two
-      endif
+      cplxy = cplxy .or. tilt .ne. zero
       sk1 = sk1 + bvk * field(1,1)/el
       sk1s = sk1s + bvk * field(2,1)/el
       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
@@ -3500,7 +3479,7 @@
       dorad = get_value('probe ','radiate ') .ne. zero
       sk1 = sk1 / (one + deltap)
 
-!---- Half radiation effect at exit.
+!---- Half radiation effect at entry.
       if (dorad.and.ftrk) then
         rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
      &orbit(3)**2)
@@ -3537,6 +3516,15 @@
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
         orbit(6) = orbit(6) - rfac * (one + pt) ** 2
       endif
+      if (tilt .ne. zero)  then
+!--- rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+      endif
 
       end
       subroutine qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
@@ -3563,7 +3551,6 @@
      &gamma,beta,dtbyds,qk,qkl,qkl2,cx,sx,cy,sy,biby4,get_value,zero,   &
      &one,two,four,six,ten3m
       parameter(zero=0d0,one=1d0,two=2d0,four=4d0,six=6d0,ten3m=1d-3)
-
 !---- Initialize.
       beta = get_value('probe ','beta ')
       gamma = get_value('probe ','gamma ')
@@ -3601,7 +3588,6 @@
       re(4,4) = cy
       re(5,6) = el/(beta*gamma)**2
       ek(5) = el*dtbyds
-
 !---- Second-order terms.
       if (fsec) then
         biby4 = one / (four * beta)
@@ -3634,12 +3620,10 @@
         te(5,6,6) = (- six * re(5,6)) * biby4
       endif
 
-!---- Apply tilt.
-
-      if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
-
 !---- Track orbit.
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+!---- Apply tilt.
+      if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
       end
       subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
@@ -3653,6 +3637,7 @@
 !   ftrk      (logical) if true, track orbit.                          *
 ! Input/output:                                                        *
 !   orbit(6)  (double)  closed orbit.                                  *
+! Remark: the orbit is rotated (in tmmap) before and after this routine*
 ! Output:                                                              *
 !   fmap      (logical) if true, element has a map.                    *
 !   el        (double)  element length.                                *
@@ -3662,6 +3647,7 @@
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical fsec,ftrk,fmap,cplxy
+      double precision ct, st, tmp
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
      &get_value,zero,one,two,ten3m
@@ -3676,23 +3662,30 @@
 
       fmap = el .ne. zero
       if (.not. fmap) return
-
 !---- Strength and tilt.
-      tilt = zero
-      efield = zero
       if (ftrk) then
+        tilt = node_value('tilt ')
+        if (tilt .ne. zero)  then
+!--- rotate orbit before entry
+          st = sin(tilt)
+          ct = cos(tilt)
+          tmp = orbit(1)
+          orbit(1) = ct * tmp + st * orbit(3)
+          orbit(3) = ct * orbit(3) - st * tmp
+          tmp = orbit(2)
+          orbit(2) = ct * tmp + st * orbit(4)
+          orbit(4) = ct * orbit(4) - st * tmp
+        endif
         exfld = node_value('ex ')
         eyfld = node_value('ey ')
-        if (eyfld .ne. zero)  then
-          tilt = asin(eyfld/sqrt(exfld**2 + eyfld**2))
-          efield = sqrt(exfld**2 + eyfld**2)
-        endif
+        efield = sqrt(exfld**2 + eyfld**2)
       else
         exfld = zero
         eyfld = zero
         efield = zero
+        tilt = zero
       endif
-      cplxy = cplxy .or. (exfld .ne. zero .and. eyfld .ne. zero)
+      cplxy = cplxy .or. tilt .ne. zero
 
       ekick  = efield * ten3m * charge / (pc * (one + deltap))
 !---- centre option
@@ -3712,6 +3705,15 @@
         call dcopy(te00,te,216)
       endif
       call spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
+      if (tilt .ne. zero)  then
+!--- rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+      endif
 
       end
       subroutine spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
@@ -3812,11 +3814,10 @@
         call tmsymm(te)
       endif
 
-!---- Apply tilt.
-      if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
-
 !---- Track orbit.
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+!---- Apply tilt.
+      if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
       end
       subroutine tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
@@ -3832,6 +3833,7 @@
 !   ftrk      (logical) if true, track orbit.                          *
 ! Input/output:                                                        *
 !   orbit(6)  (double)  closed orbit.                                  *
+! Remark: the orbit is rotated (in tmmap) before and after this routine*
 ! Output:                                                              *
 !   fmap      (logical) if true, element has a map.                    *
 !   el        (double)  element length.                                *
@@ -3843,6 +3845,7 @@
       include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
       integer i,j,n_ferr,node_fd_errors
+      double precision ct, st, tmp
       double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
      &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s, &
      &bvk,field(2,0:2),node_value,get_value,zero,one,two,three,twelve
@@ -3853,6 +3856,18 @@
       cplxy=.false.
       fmap = el .ne. zero
       if (.not. fmap) return
+      tilt = node_value('tilt ')
+      if (tilt .ne. zero)  then
+!--- rotate orbit before entry
+        st = sin(tilt)
+        ct = cos(tilt)
+        tmp = orbit(1)
+        orbit(1) = ct * tmp + st * orbit(3)
+        orbit(3) = ct * orbit(3) - st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp + st * orbit(4)
+        orbit(4) = ct * orbit(4) - st * tmp
+      endif
 !---- Field error.
       call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
@@ -3865,12 +3880,7 @@
       bvk = node_value('other_bv ')
       sk2 = bvk * node_value('k2 ')
       sk2s = bvk * node_value('k2s ')
-      if (sk2s .eq. zero)  then
-        tilt = zero
-      else
-        tilt = asin(sk2s/sqrt(sk2**2 + sk2s**2)) / three
-        cplxy = cplxy .or. sk2 .ne. zero
-      endif
+      cplxy = cplxy .or. tilt .ne. zero
       sk2 = sk2 + bvk * field(1,2)/el
       sk2s = sk2s + bvk * field(2,2)/el
       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)
@@ -3918,6 +3928,15 @@
           orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
           orbit(6) = orbit(6) - rfac * (one + pt) ** 2
         endif
+      endif
+      if (tilt .ne. zero)  then
+!--- rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
       endif
 
       end
@@ -3995,11 +4014,10 @@
         call tmsymm(te)
       endif
 
-!---- Apply tilt.
-      if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
-
 !---- Track orbit.
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+!---- Apply tilt.
+      if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
       end
       subroutine tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)

@@ -1318,47 +1318,114 @@ void export_el_def(struct element* el, char* string)
 void export_el_def_8(struct element* el, char* string)
   /* exports an element definition in mad-8 format */
 {
-  int i;
   struct command* def = el->def;
   struct command_parameter* par;
+  int i, div = 1;
+  double val[] = {zero, zero, zero};
+  char* base_name = el->base_type->name;
+  char num[2*NAME_L];
+  /* special treatment for tilt */
   for (i = 0; i < def->par->curr; i++)
   {
     par = def->par->parameters[i];
-    if (def->par_names->inform[i]
-        && par_out_flag(el->base_type->name, par->name))
-      export_el_par_8(par, string);
+    if (def->par_names->inform[i])
+    {
+      if (strcmp(base_name, "quadrupole") == 0)
+      {
+        div = 2;
+        if (strcmp(par->name,"k1") == 0) val[0] = command_par_special("k1", el);
+        else if (strcmp(par->name,"k1s") == 0)
+          val[1] = command_par_special("k1s", el);
+        else if (strcmp(par->name,"tilt") == 0)
+          val[2] = command_par_special("tilt", el);
+        else if(par_out_flag(el->base_type->name, par->name))
+          export_el_par_8(par, string);
+      }
+      else if (strcmp(base_name, "sextupole") == 0)
+      {
+        div = 3;
+        if (strcmp(par->name,"k2") == 0) val[0] = command_par_special("k2", el);
+        else if (strcmp(par->name,"k2s") == 0)
+          val[1] = command_par_special("k2s", el);
+        else if (strcmp(par->name,"tilt") == 0)
+          val[2] = command_par_special("tilt", el);
+        else if(par_out_flag(el->base_type->name, par->name))
+          export_el_par_8(par, string);
+      }
+      else if (strcmp(base_name, "octupole") == 0)
+      {
+        div = 4;
+        if (strcmp(par->name,"k3") == 0) val[0] = command_par_special("k3", el);
+        else if (strcmp(par->name,"k3s") == 0)
+          val[1] = command_par_special("k3s", el);
+        else if (strcmp(par->name,"tilt") == 0)
+          val[2] = command_par_special("tilt", el);
+        else if(par_out_flag(el->base_type->name, par->name))
+          export_el_par_8(par, string);
+      }
+      else if (strcmp(base_name, "elseparator") == 0)
+      {
+        if (strcmp(par->name,"ex") == 0) val[0] = command_par_special("ex", el);
+        else if (strcmp(par->name,"ey") == 0)
+          val[1] = command_par_special("ey", el);
+        else if(par_out_flag(el->base_type->name, par->name))
+          export_el_par_8(par, string);
+      }
+      else if(par_out_flag(el->base_type->name, par->name))
+        export_el_par_8(par, string);
+    }
+  }
+  if (val[1] != zero)
+    val[2] = atan2(val[1], val[0]) / div;
+  if (val[2] != zero) val[0] = sqrt(val[0]*val[0]+val[1]*val[1]);
+  if (val[0] != zero)
+  {
+    strcat(string, ",");
+    if (strcmp(base_name, "quadrupole") == 0)
+    {
+      strcat(string, "k1 =");
+    }
+    else if (strcmp(base_name, "sextupole") == 0)
+    {
+      strcat(string, "k2 =");
+    }
+    else if (strcmp(base_name, "octupole") == 0)
+    {
+      strcat(string, "k3 =");
+    }
+    else if (strcmp(base_name, "elseparator") == 0)
+    {
+      strcat(string, "e =");
+    }
+    sprintf(num, v_format("%F"), val[0]);
+    strcat(string, supp_tb(num));
+    if (val[2] != zero)
+    {
+      strcat(string, ",tilt =");
+      sprintf(num, v_format("%F"), val[2]);
+      strcat(string, supp_tb(num));
+    }
   }
 }
 
 void export_el_par_8(struct command_parameter* par, char* string)
   /* exports an element parameter in mad-8 format */
 {
-  int i, k, lp, last, tilt = 0, vtilt = 0;
-  char* const kskew[] = {"k1s", "k2s", "k3s", ""};
-  char* const knorm[] = {"k1", "k2", "k3", ""};
+  int i, k, last, vtilt = 0;
   char num[2*NAME_L], tmp[8], tmpt[8];
   switch(par->type)
   {
     case 0:
       strcat(string, ",");
       strcat(string, par->name);
-      strcat(string, "=");
+      strcat(string, " =");
       if (par->double_value == zero) strcat(string, "false");
       else                           strcat(string, "true");
       break;
     case 1:
     case 2:
       strcat(string, ",");
-      lp = 0;
-      while (strlen(kskew[lp]))
-      {
-        if (strcmp(kskew[lp], par->name) == 0)
-        {
-          strcat(string, knorm[lp]); tilt = 1; break;
-        }
-        lp++;
-      }
-      if (tilt == 0) strcat(string, par->name);
+      strcat(string, par->name);
       strcat(string, "=");
       if (par->expr != NULL && strcmp(par->name, "harmon") != 0)
         strcat(string, par->expr->string);
@@ -1420,7 +1487,6 @@ void export_el_par_8(struct command_parameter* par, char* string)
         }
       }
   }
-  if (tilt) strcat(string, ", tilt");
 }
 
 void export_sequence(struct sequence* sequ, FILE* file)
@@ -1430,6 +1496,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
+  int exp_par_flag;
   char rpos[3][6] = {"exit", "centre", "entry"};
   *c_dum->c = '\0';
   if (sequ->share) strcat(c_dum->c, "shared ");
@@ -1455,6 +1522,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
   write_nice(c_dum->c, file);
   while(c_node != NULL)
   {
+    exp_par_flag = 0;
     *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
         && strcmp(c_node->base_name, "drift") != 0)
@@ -1466,6 +1534,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
           strcat(c_dum->c, el->name);
           strcat(c_dum->c, ": ");
           strcat(c_dum->c, el->parent->name);
+          exp_par_flag = 1;
         }
         else strcat(c_dum->c, el->name);
       }
@@ -1483,7 +1552,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
         strcat(c_dum->c, ", from = ");
         strcat(c_dum->c, c_node->from_name);
       }
-      export_el_def(c_node->p_elem, c_dum->c);
+      if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c);
       write_nice(c_dum->c, file);
     }
     if (c_node == sequ->end)  break;
@@ -1497,6 +1566,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   /* exports sequence in mad-8 format */
 {
   char num[2*NAME_L];
+  int exp_par_flag;
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
@@ -1504,9 +1574,11 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   *c_dum->c = '\0';
   strcat(c_dum->c, sequ->name);
   strcat(c_dum->c, ": sequence");
+  if (sequ->ref_flag ==1)  strcat(c_dum->c, ", refer=entry");
   write_nice_8(c_dum->c, file);
   while(c_node != NULL)
   {
+    exp_par_flag = 0;
     *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
         && strcmp(c_node->base_name, "drift") != 0)
@@ -1518,6 +1590,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
           strcat(c_dum->c, el->name);
           strcat(c_dum->c, ": ");
           strcat(c_dum->c, el->parent->name);
+          exp_par_flag = 1;
         }
         else strcat(c_dum->c, el->name);
       }
@@ -1535,7 +1608,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
         strcat(c_dum->c, ", from = ");
         strcat(c_dum->c, c_node->from_name);
       }
-      export_el_def_8(c_node->p_elem, c_dum->c);
+      if (exp_par_flag)  export_el_def_8(c_node->p_elem, c_dum->c);
       write_nice_8(c_dum->c, file);
     }
     if (c_node == sequ->end)  break;
@@ -2725,7 +2798,7 @@ struct table* new_table(char* name, char* type, int rows,
   int i, n = cols->curr;
   struct table* t
     = (struct table*) mycalloc(rout_name,1, sizeof(struct table));
-    
+
   strcpy(t->name, name);
   strcpy(t->type, type);
   t->stamp = 123456;

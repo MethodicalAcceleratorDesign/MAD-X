@@ -402,6 +402,45 @@ struct expression* command_par_expr(char* parameter, struct command* cmd)
   return expr;
 }
 
+double command_par_special(char* parameter, struct element* el)
+/* construct missing tilt from normal and skew  */
+{
+  double normal, skew, val = zero;
+
+  if (strcmp(parameter, "tilt") == 0)
+  {
+    if ((val = command_par_value("tilt", el->def)) == zero)
+    {
+      if (strcmp(el->base_type->name, "quadrupole") == 0)
+      {
+        normal = command_par_value("k1", el->def);
+        skew   = command_par_value("k1s", el->def);
+        if (skew != zero) val = atan2(skew, normal) / 2;
+      }
+      else if (strcmp(el->base_type->name, "sextupole") == 0)
+      {
+        normal = command_par_value("k2", el->def);
+        skew   = command_par_value("k2s", el->def);
+        if (skew != zero) val = atan2(skew, normal) / 3;
+      }
+      else if (strcmp(el->base_type->name, "octupole") == 0)
+      {
+        normal = command_par_value("k3", el->def);
+        skew   = command_par_value("k3s", el->def);
+        if (skew != zero) val = atan2(skew, normal) / 4;
+      }
+      else if (strcmp(el->base_type->name, "elseparator") == 0)
+      {
+        normal = command_par_value("ex", el->def);
+        skew   = command_par_value("ey", el->def);
+        if (skew != zero) val = atan2(skew, normal);
+      }
+    }
+  }
+  else val = command_par_value(parameter, el->def);
+  return val;
+}
+
 char* command_par_string(char* parameter, struct command* cmd)
   /* returns a command parameter string if found, else NULL */
 {
@@ -954,7 +993,7 @@ double el_par_value(char* par, struct element* el)
     }
     else val = command_par_value(par, el->def);
   }
-  else val = command_par_value(par, el->def);
+  else val = command_par_special(par, el);
   /* extra code for kickers */
   if (val == zero && strcmp(el->base_type->name, "hkicker") == 0)
   {
@@ -3667,7 +3706,7 @@ void pro_input(char* statement)
       }
       if((code = act_special(type, &statement[start])) < 0)
       {
-        if (get_option("warn")) 
+        if (get_option("warn"))
         {
           switch (code)
           {

@@ -489,6 +489,7 @@ struct command_parameter_list*
 delete_command_parameter_list(struct command_parameter_list*);
 struct double_array* command_par_array(char*, struct command*);
 struct expression* command_par_expr(char*, struct command*);
+double command_par_special(char*, struct element*);
 char* command_par_string(char*, struct command*);
 double command_par_value(char*, struct command*);
 int command_par_value2(char* parameter, struct command* cmd, double* val);
@@ -1297,8 +1298,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.38";
-char code_mod_date[] = "Code Modification Date: 31.01.2006";
+char myversion[] = "MAD-X 3.03.39";
+char code_mod_date[] = "Code Modification Date: 10.02.2007";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
