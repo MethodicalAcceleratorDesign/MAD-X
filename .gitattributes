@@ -5,6 +5,7 @@
 /Makefile_develop -text
 /Makefile_g95 -text
 /Makefile_gdb -text
+/Makefile_gfortran -text
 /Makefile_nag -text
 /Makeonline -text
 /Sa_extend_poly.f90 -text
