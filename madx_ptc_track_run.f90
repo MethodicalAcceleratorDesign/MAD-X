@@ -1145,9 +1145,9 @@ CONTAINS
                     jmax_numb_particl_at_i_th_turn                                 !         !   ^
             END if ! debug printing -----------------------------------------------!         !   !
             !                                                                                !   !
-            if (ptc_track_debug) &                                                           !   !
-                 print*,"before printing aperture flag!!!!!!!!",flag_index_ptc_aperture      !   !
             call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                              !   !
+            if(flag_index_ptc_aperture/=0) c_%watch_user=.false.                             !   !
+            !                                                                                !   ! 
             if (ptc_track_debug) then                                                        !   !
                print*,"ready for printing aperture flag!!!!!!!",flag_index_ptc_aperture      !   !
                print*,"real aperture flag: ",c_%aperture_flag                                !   !
