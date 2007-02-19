@@ -42,7 +42,7 @@ MODULE madx_ptc_module
   
   type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
-
+  integer                   :: mapsicase = 0
 
 CONTAINS
 
@@ -2160,7 +2160,8 @@ CONTAINS
     deltap = zero
     select case(icase)
     CASE(4)
-       if (getdebug()>1) print*, "my_state: Enforcing ONLY_4D+NOCAVITY"
+       if (getdebug()>1) print*, "my_state: Enforcing ONLY_4D+NOCAVITY and NO DELTA"
+       default=default-delta0
        default=default+only_4d0+NOCAVITY0
        i=4
     CASE(5)
