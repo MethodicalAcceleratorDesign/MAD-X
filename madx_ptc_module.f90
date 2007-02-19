@@ -2171,7 +2171,8 @@ CONTAINS
        i=5
     CASE(56)
        if (getdebug()>1) print*, "my_state: Enforcing coasting beam"
-       default=default+NOCAVITY0
+       default = default - delta0 - only_4d0
+       default = default + NOCAVITY0
        deltap=deltap0
        i=56
     CASE(6)
@@ -2183,7 +2184,8 @@ CONTAINS
 
     if (i==6) then
        if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
-          default=default + only_4d0 + NOCAVITY0
+          default = default - delta0 - only_4d0
+          default=default +  NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
           i=56
        else
