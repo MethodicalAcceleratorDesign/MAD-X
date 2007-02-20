@@ -192,7 +192,7 @@ subroutine w_ptc_addknob_i(paramn)
 end subroutine w_ptc_addknob_i
 
 
-subroutine w_ptc_addmoment(x,px,y,py,dp,t,tableIA, columnIA, parametric )
+subroutine w_ptc_addmoment(x,px,y,py,t,dp,tableIA, columnIA, parametric )
   use madx_ptc_distrib_module
   implicit none
   integer               :: x,px,y,py,dp,t
@@ -200,7 +200,7 @@ subroutine w_ptc_addmoment(x,px,y,py,dp,t,tableIA, columnIA, parametric )
   integer               :: tableIA(*)
   integer               :: parametric
 
-  call addmoment(x,px,y,py,dp,t,tableIA, columnIA, parametric )
+  call addmoment(x,px,y,py,t,dp,tableIA, columnIA, parametric )
 
 end subroutine w_ptc_addmoment
 
