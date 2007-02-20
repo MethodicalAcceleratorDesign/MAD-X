@@ -110,8 +110,8 @@ contains
 
       ndel=0
       if(c_%ndpt/=0)  then
-       print*, "We are at the mode 6D + nocav"
-       ndel=1  !this is 6D without cavity (MADX icase=5???)
+!       print*, "We are at the mode 6D + nocav"
+       ndel=1  !this is 6D without cavity (MADX icase=56)
       endif
 
       J=0;
@@ -391,7 +391,7 @@ contains
 
     elseif(my_ring%closed .eqv. .true.) then
        print*, "Closed orbit specified by the user:"
-       CALL write_closed_orbit(icase,x)
+       !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
 
 
@@ -416,6 +416,7 @@ contains
     
     
     call init(default,no,nda,BERZ,mynd2,npara)
+
     call alloc(y)
     y=npara
     Y=X
@@ -551,7 +552,8 @@ contains
     
     if (savemaps) then  !do it at the end, so we are sure the twiss was successful
       mapsorder = no
-      call ptc_moments(no*2) !calcualate moments with the maximum available order
+      mapsicase = icase
+      if (getnmoments() > 0) call ptc_moments(no*2) !calcualate moments with the maximum available order
     endif
     
     
@@ -657,7 +659,7 @@ contains
            endif
 
            call readinitialtwiss()
-
+           
            if (geterrorflag() /= 0) then
               return
            endif
@@ -1061,17 +1063,19 @@ contains
       !initializes Y(6) from re(6,6)
       implicit none
       real(dp) :: emix,emiy,emiz
+      real(dp) :: sigt, sige
 
         emix = get_value('beam ','ex ')
         emiy = get_value('beam ','ey ')
         emiz = get_value('beam ','et ')
-  
-        print*,"Read emittances: ", emix,emiy,emiz
+
         if ((emix + emiy + emiz) .le. zero) then
           call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
           call killmoments()  !switches 
         endif
+        
         call setemittances(emix,emiy,emiz)
+        
     end subroutine reademittance
     !_________________________________________________________________
 
@@ -1133,10 +1137,11 @@ contains
       !Reads initial twiss parameters from MAD-X command
       implicit none
       integer get_option
-      real(dp) alpha(3),beta(3),disp(4),mu(3), gam3
+      real(dp) alpha(3),beta(3),disp(4),mu(3)
       type(real_8) al(3),be(3),di(4)
       type(pol_block_inicond) :: inicondknobs
       integer k_system
+      real(dp)  sizept, gam3, emiz
       
       k_system = getnknobis()     
  
@@ -1219,11 +1224,55 @@ contains
        (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
       enddo
       
-      
+
+
+    !--moments--!    
       if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
-!      if (c_%nd < 3) then
-        y(5) = morph((one.mono.5))
-        y(6) = morph((one.mono.5))
+
+        if ( beta(3) .gt. zero ) then
+  
+          !Option one: sigma(5) is sqrt of emittance as in other two dimensions
+
+!          print*, "Init X5 with betaz ", beta(3)
+          
+          if (c_%nd < 3) then !otherwise it was already done, to be cleaned cause it is ugly and bug prone
+            beta(3) = (one+alpha(3)**2)/beta(3)
+            alpha(3) =-alpha(3) 
+          endif  
+
+          y(5) = x(5) +  sqrt( beta(3) )*morph((one.mono.5))
+          y(6)= x(6) + one/sqrt(beta(3)) * (morph(  (one.mono.6) )-(alpha(3)) * morph(one.mono.5))
+
+          emiz = get_value('beam ','et ')
+          if ( emiz .le. 0  ) then
+            sizept = get_value('beam ','sige ') 
+            emiz = sizept/sqrt(beta(3))
+!            print*, "Calculated Emittance ", emiz
+          else
+            emiz = sqrt(emiz)
+!            print*, "Read Emittance ", emiz
+          endif  
+
+          call setsigma(5, emiz)
+          call setsigma(6, emiz)
+           
+        else
+          !by default we have no knowledge about longitudinal phase space, so init dp/p to ident
+!          print*, "Init X5 with ONE"
+          y(5) = morph((one.mono.5))
+          y(6) = morph((one.mono.5))
+          call setsigma(5, get_value('beam ','sige '))
+          call setsigma(6, get_value('beam ','sigt '))
+        endif
+
+      endif
+      
+      if ( (icase .gt. 5) .and. (get_value('beam ','et ') .le. 0) ) then !6 and 56
+          !beta(3) is converted to gamma already (in 3rd coord the canonical planes are swapped)
+          emiz = get_value('beam ','sige ')/sqrt(beta(3))
+          print*, "icase=",icase," nd=",c_%nd, "sigma(5)=", emiz
+          call setsigma(5, emiz)
+          call setsigma(6, emiz)
       endif
       
 
@@ -1235,7 +1284,7 @@ contains
       endif      
 
 
-!      if ( getdebug() > 2) then
+      if ( getdebug() > 2) then
          print*," Read the following BETA0 block in module ptc_twiss"
          print*," Twiss parameters:"
          write (6,'(6a8)')   "betx","alfx","bety","alfy","betz","alfz"
@@ -1247,7 +1296,7 @@ contains
 
          print*," Track:"
          write(6,'(6f8.4)') x
-!      endif
+      endif
 
 
     end subroutine readinitialtwiss
