@@ -89,6 +89,7 @@
 /matchc2.c -text
 /matchjc.F -text
 /matchlib.F -text
+/matchlib2.F -text
 /matchptcknobs.c -text
 /matchptcknobs.h -text
 /matchsa.F -text
