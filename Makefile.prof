@@ -18,7 +18,7 @@ CXX=$(CC)
 LD=$(f95)
 
 #G95
-f95_FLAGS= -c -g -Xassembler "--32" -m32 -fno-second-underscore -I. -ftrace=full
+f95_FLAGS= -c -g -Wa,--32 -fno-second-underscore -I. -ftrace=full
 # NAG default f95 compiler options
 #f95_FLAGS=-gline -g90 -c -m32 -C=all -maxcontin=100 -nan
 # NAG alternative
@@ -30,7 +30,7 @@ f95_FLAGS= -c -g -Xassembler "--32" -m32 -fno-second-underscore -I. -ftrace=full
 #f95_FLAGS= --tp4 -c -Wa,--32 $(FDEB)
 
 # default fortran compiler options
-FCP=-g --Xassembler "--32" -fno-second-underscore -I.
+FCP=-g -Wa,--32 -fno-second-underscore -I. -D_G95
 
 INCLUDES=-I.
 
@@ -47,8 +47,8 @@ endif
 
 
 # alternative for development and debug
-FCM=-g -Xassembler "--32" -fno-second-underscore -funroll-loops
-FCDB=-g -Xassembler "--32" -fno-second-underscore
+FCM=-g -Wa,--32 -fno-second-underscore -funroll-loops
+FCDB=-g -Wa,--32 -fno-second-underscore
 
 # default C compiler flag options
 GCCP_FLAGS_MPARS=-g -m32 -funroll-loops -D_CATCH_MEM
@@ -58,11 +58,11 @@ GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL $(INCLUDES)
 GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 
 #NAG
-#FFLAGS77=-gline -g -c -m32 -fpp -maxcontin=100 -nan -ieee=stop
+#FFLAGS77=-gline -g -c -Wa,--32 -fpp -maxcontin=100 -nan -ieee=stop
 #Lahey
 #FFLAGS77= --tp4 -c -Wa,--32 $(FDEB)
 #G77
-FFLAGS77=-g -c -m32 -fno-second-underscore -ieee=full
+FFLAGS77=-g -c -Wa,--32 -fno-second-underscore -ieee=full -D_G95
 
 CXX_FLAGS= $(GCCP_FLAGS)
 
@@ -94,7 +94,7 @@ LIBS = -L/usr/lib/ -ldl -lpthread
 
 #FC5
 #LIBX= -lX11 -lXdmcp -lXau -lpthread
-LIBX=-L/usr/X11R6/lib -lX11 -lXm -lXt
+LIBX=-L/usr/X11R6/lib -lX11 -lXt
 
 LIBX_ext=
 
@@ -225,13 +225,13 @@ mpars: madxm.F madxp.o
 # Append f77 to distinguish from objects compiled with f95
 
 madx_objectsf77 = madxpf.o matchptcknobs.o gxx11c.o timel.o \
-	$(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
+	$(filter-out gxx11ps_f77.o madxp.o matchlib2_f77.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 madx: $(madx_objectsf77) 
 	$(LD) $(LDOPS) -o $@ $(madx_objectsf77) $(LIBX) -lpthread -lm -lc
 
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
-madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
+madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o matchlib2_f77.o matchlib2.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 
 # madxp_objects. All *.f90 , some c and F
 c_objs = madxpf.o matchptcknobs.o gxx11c.o rplot.o

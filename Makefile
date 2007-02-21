@@ -41,7 +41,7 @@ f95_FLAGS= --o1 --tp -c -Wa,--32
 #FFLAGS77=-gline -g90 -c -m32 -maxcontin=100 -nan -ieee=full
 #FFLAGS77=-g90 -c -O4 -m32 -maxcontin=100 -w=unused
 # LF95 f95 compiler options to compile f77 code
-FFLAGS77= --o1 --tp -c -Wa,--32
+FFLAGS77= --o1 --tp -c -Wa,--32 -D_G95
 
 # g77 link options
 FP=-static -m32
@@ -161,6 +161,11 @@ Spb_fake_gino_sub.o: Spc_pointers.o Spb_fake_gino_sub.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
 Sq_orbit_ptc.o:  madx_ptc_module.o Sq_orbit_ptc.f90
+
+# matchlib2 for madx only
+matchlib2_f77.o: matchlib2.F
+	$(FC) -m32 -c -o $@ $<
+
 # implicit rule to compile with C
 %.o : %.c
 	$(CC) $(GCCP_FLAGS) -c -o $(@) $<
@@ -190,7 +195,7 @@ madx: $(madx_objectsf77) ;
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
-madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o, $(patsubst %.F,%.o,$(wildcard *.F)))
+madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o matchlib2_f77.o matchlib2.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxp_objects. All *.f90 , some c and F
 madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	madxpf.o gxx11c.o matchptcknobs.o rplot.o \

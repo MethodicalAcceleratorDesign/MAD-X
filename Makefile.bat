@@ -22,7 +22,7 @@ lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\emit.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\twiss.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\match.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\matchjc.F
-lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\matchlib.F
+lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp -D_G95 %MADX%\matchlib.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\matchsa.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\touschek.F
 lf95 -c -o1 -nconcc -lfe "-Cpp" -fix -tp %MADX%\poisson.F

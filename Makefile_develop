@@ -16,7 +16,7 @@ GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 #FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap --chk a,e,s,u,x --chkglobal --info
 FDEB= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
 f95_FLAGS= --o1 --tp -c -Wa,--32 $(FDEB)
-FFLAGS77= --o1 --tp -c -Wa,--32 $(FDEB)
+FFLAGS77= --o1 --tp -c -Wa,--32 $(FDEB) -D_G95
 
 FC=lf95
 FCP=$(FFLAGS77)
