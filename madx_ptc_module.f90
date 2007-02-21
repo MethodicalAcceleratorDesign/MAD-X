@@ -540,35 +540,20 @@ CONTAINS
        ! summs of multipoles and errors
 
        ! quadrupole components
-       sk1=node_value('k1 ')
+       sk1= node_value('k1 ')
        sk1s=node_value('k1s ')
+       tilt=node_value('tilt ')
+       dum1=key%list%k(2)-normal_0123(1)
+       dum2=key%list%ks(2)-skew_0123(1)
 
-       ! A sum of quadrupole components from K1 & K1S and ========!
-       ! from multipoles on the bench (without errors) defines    !
-       ! a tilt angle of normal Q                                 !
-       !if(l.ne.0) then                                           !
-       !sk1 = sk1 +  normal(1)/l                                  !
-       sk1 = sk1 +  normal_0123(1)                                !
-       !sk1s = sk1s + skew(1)/l                                   !
-       sk1s = sk1s + skew_0123(1)                                 !
-       !endif                                                     !
-       if (sk1s .eq. zero)  then                                  !
-          tilt = zero                                             !
-       else                                                       !
-          tilt = -atan2(sk1s,sk1) / two                           !
+       if(dum1.ne.zero.or.dum2.ne.zero) then                      ! 
+          sk1= sk1 +dum1                                          !
+          sk1s=sk1s+dum2                                          !
        endif                                                      !
-       !                                                          !
-       !if(l.ne.0) then                                           !
-       !sk1  = sk1  + field(1,1)/l                                !
-       sk1  = sk1  + (key%list%k(2)-normal_0123(1))               !
-       !sk1s = sk1s + field(2,1)/l                                !
-       sk1s = sk1s + (key%list%ks(2)-skew_0123(1))                !
-       !endif                                                     !
-       !                                                          !
-       if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
-       key%list%k(2)=sk1                                          !
+       if (sk1s .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
+       key%list%k(2) =sk1                                         !
        key%list%ks(2)=zero  ! added by VK                         !
-       key%tiltd=node_value('tilt ')+tilt  !======================!
+       key%tiltd=tilt  !==========================================!
 
        !================================================================
 
@@ -577,70 +562,46 @@ CONTAINS
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
 
-       sk2=node_value('k2 ')
+       ! sextupole components
+       sk2= node_value('k2 ')
        sk2s=node_value('k2s ')
+       tilt=node_value('tilt ')
+       dum1=key%list%k(3)-normal_0123(2)
+       dum2=key%list%ks(3)-skew_0123(2)
 
-       ! A sum of sextupole components from K2 & K2S and  ========!
-       ! from multipoles on the bench (without errors) defines    !
-       ! a tilt angle of normal Sextupole                         !
-       !if(l.ne.0) then                                           !
-       !sk2 = sk2 +  normal(2)/l                                  !
-       sk2 = sk2 +  normal_0123(2)                                !
-       !sk2s = sk2s + skew(2)/l                                   !
-       sk2s = sk2s + skew_0123(2)                                 !
-       !endif                                                     !
-       !                                                          !
-       if (sk2s .eq. zero)  then                                  !
-          tilt = zero                                             !
-       else                                                       !
-          tilt = -atan2(sk2s,sk2) / three                         !
+       if(dum1.ne.zero.or.dum2.ne.zero) then                      ! 
+          sk2= sk2 +dum1                                          !
+          sk2s=sk2s+dum2                                          !
        endif                                                      !
-       !                                                          !
-       !if(l.ne.0) then                                           !
-       !sk2  = sk2 + field(1,2)/l                                 !
-       sk2  = sk2 + (key%list%k(3)-normal_0123(2))                !
-       !sk2s = sk2s + field(2,2)/l                                !
-       sk2s = sk2s + (key%list%ks(3)-skew_0123(2))                !
-       !endif                                                     !
-       if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           !
-       key%list%k(3)=sk2                                          !
+       if (sk2s .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           !
+       key%list%k(3) =sk2                                         !
        key%list%ks(3)=zero  ! added by VK                         !
-       key%tiltd=node_value('tilt ')+tilt !-----------------------!
+       key%tiltd=tilt  !==========================================!
+
+       !================================================================
 
     case(7) ! PTC accepts mults
        key%magnet="octupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
 
-       sk3=node_value('k3 ')
+       ! octupole components
+       sk3= node_value('k3 ')
        sk3s=node_value('k3s ')
+       tilt=node_value('tilt ')
+       dum1=key%list%k(4)-normal_0123(3)
+       dum2=key%list%ks(4)-skew_0123(3)
 
-       ! A sum of octupole components from K3 & K3S and ==========!
-       ! from multipoles on the bench (without errors) defines    !
-       ! a tilt angle of normal Octupole                          !
-       !if(l.ne.0) then                                           !
-       !sk3 = sk3 +  normal(3)/l                                  !
-       sk3 = sk3 +  normal_0123(3)                                !
-       !sk3s = sk3s + skew(3)/l                                   !
-       sk3s = sk3s + skew_0123(3)                                 !
-       !endif                                                     !
-       !                                                          !
-       if (sk3s .eq. zero)  then                                  !
-          tilt = zero                                             !
-       else                                                       !
-          tilt = -atan2(sk3s,sk3) / four                          !
+       if(dum1.ne.zero.or.dum2.ne.zero) then                      ! 
+          sk3= sk3 +dum1                                          !
+          sk3s=sk3s+dum2                                          !
        endif                                                      !
-       !                                                          !
-       !if(l.ne.0) then                                           !
-       !sk3 = sk3 + field(1,3)/l                                  !
-       sk3 = sk3 + (key%list%k(4)-normal_0123(3))                 !
-       !sk3s = sk3s + field(2,3)/l                                !
-       sk3s = sk3s + (key%list%ks(3)-skew_0123(3))                !
-       !endif                                                     !
-       if (tilt .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
-       key%list%k(4)=sk3                                          !
+       if (sk3s .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
+       key%list%k(4) =sk3                                         !
        key%list%ks(4)=zero  ! added by VK                         !
-       key%tiltd=node_value('tilt ')+tilt !-----------------------!
+       key%tiltd=tilt  !==========================================!
+
+       !================================================================
 
     case(8)
        key%magnet="multipole"
