@@ -146,7 +146,7 @@ CONTAINS
     integer             model
     integer             method0,method1
     integer             nst0,nst1
-    REAL (dp) :: tempdp
+    REAL (dp) :: tempdp, dum1, dum2
     logical(lp):: ptcrbend,truerbend
     !---------------------------------------------------------------
     if (getdebug() > 1) then
