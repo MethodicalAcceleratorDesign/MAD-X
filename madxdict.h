@@ -503,7 +503,7 @@ char command_def[] =
 "no = [i, 1], "
 "xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
 "ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
-"zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
+"zdistr   = [s, gauss, gauss]; " /* type of distribution in Z plane*/
 " "
 "select_ptc_normal: select_ptc_normal none 0 0 "
 "dx =   [s, {none}], "
