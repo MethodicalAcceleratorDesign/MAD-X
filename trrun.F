@@ -2211,6 +2211,8 @@
       ex = get_value('probe ','ex ')
       ey = get_value('probe ','ey ')
       et = get_value('probe ','et ')
+      bet0  = get_value('beam ','beta ')
+      bet0i = one / bet0
 !-----get x add-on for lyaponuv calculation from dynap table
       deltax = get_value('dynap ', 'lyapunov ')
  1    continue
