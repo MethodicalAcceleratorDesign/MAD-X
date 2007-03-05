@@ -15,7 +15,7 @@ module madx_ptc_eplacement_module
   !============================================================================================
   !  PRIVATE
   !    data structures
-  integer, parameter                          :: black  = 2
+  integer, parameter                          :: black  = 1
   integer, parameter                          :: red    = 2
   integer, parameter                          :: green  = 3
   integer, parameter                          :: blue   = 4
@@ -23,9 +23,14 @@ module madx_ptc_eplacement_module
   integer, parameter                          :: magenta= 6
   integer, parameter                          :: cyan = 7
   integer, parameter                          :: darkgreen = 8
+  integer, parameter                          :: violet = 9 
+  integer, parameter                          :: color_n_sext = 46 
+  integer, parameter                          :: color_s_sext = 30
   integer, parameter                          :: dgrey = 14
   integer, parameter                          :: grey = 16
   integer, parameter                          :: lgrey = 18
+  integer, parameter                          :: color_of_ghost = 19
+  
   !    routines
   private                                     :: rot
   private                                     :: printfframes
@@ -212,7 +217,7 @@ contains
     TYPE(LAYOUT),pointer :: r
     type(fibre), pointer :: p
     real(dp)     :: z, a(3)
-
+    integer      :: nmul
 
     r=>my_ring
 
@@ -298,7 +303,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     p=>r%start
     do i=1,r%n
-       !      write(mf,*) 'cout<<',i,'<<" ',p%mag%name,'"<<endl;'
+       write(mf,*) 
+       write(mf,*) '//cout<<',i,'<<" ',p%mag%name,'"<<endl;'
        !      print*, i,p%mag%name
        if (getdebug() > 2) then
           print*, i,p%mag%name
@@ -348,17 +354,35 @@ contains
              print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
              print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
           endif
+          nmul = p%mag%p%nmul
           if (p%mag%bn(1) /= zero ) then
+             !BEND
              a(1)= P%mag%p%f%ent(3,1)*p%mag%l/two + P%mag%p%f%a(1)
              a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
              a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
              call drawbox(p,mf,P%mag%p%f%ent,a,blue)
-          else
+
+          elseif ( (p%mag%bn(2) /= zero) .and. (nmul >= 2) ) then
+             !QUAD
              if (p%mag%bn(2) .gt. zero ) then
                 call drawboxm(p,mf,red)  !QUAD foc
-             else
+             else 
                 call drawboxm(p,mf,green)!QUAD defoc
              endif
+          elseif ( ((p%mag%bn(3) /= zero) .or. (p%mag%an(3) /= zero)) .and. (nmul >=3) ) then
+             !SEXTUPOLE
+             call drawboxm(p,mf,color_n_sext)
+
+          elseif ( ((p%mag%bn(4) /= zero) .or. (p%mag%an(4) /= zero)) .and. (nmul >= 4) ) then
+
+             !OCTUPOLE
+             print*,"OCTUPOLE ",p%mag%bn(4),p%mag%an(4)
+             call drawboxm(p,mf,color_s_sext)
+
+          else
+            !!not powered element of very high order multipole
+             call drawboxm(p,mf,color_of_ghost)
+             call drawtube(p,mf,0.05_dp,color_of_ghost)
           endif
 
 
