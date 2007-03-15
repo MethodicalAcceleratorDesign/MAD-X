@@ -3975,17 +3975,46 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
   int i, ncp, nbl;
   struct constraint* c_c;
   int j,k;/* RDM fork */
-  char s; /* RDM fork */
+  char s, takenextmacro, nomore; /* RDM fork */
   /* RDM fork */
   if (match_is_on==2) {
     i=match2_cons_curr[0];
     j=match2_cons_curr[1];
     k=match2_cons_curr[2];
-    if(match2_cons_name[i][j]==NULL) {
+    if(match2_cons_name[i][j]==NULL) 
+     {
       j++;
-      if(match2_cons_name[i][j]==NULL) {
+      if(j>=MAX_MATCH_CONS)
+       {
+         takenextmacro = 1;
+       }
+      else if (match2_cons_name[i][j]==NULL) /*if above is true this one can cause seg fault*/
+       {
+         takenextmacro = 1;
+       }
+      else
+       {
+         takenextmacro = 0;
+       } 
+       
+      if(takenextmacro) 
+       {
         i++;j=0;
-        if(match2_cons_name[i][j]!=NULL){
+        
+        if(i>=MAX_MATCH_MACRO)
+         {
+           nomore = 1;
+         }
+        else if(match2_cons_name[i][j]==NULL)
+         {
+           nomore = 1;
+         }
+        else
+         {/*i,j is the next constraint*/
+           nomore = 0;
+         } 
+        
+        if( nomore == 0 ){
           name=match2_cons_name[i][j];
           *name_l=strlen(name);
           *type=2; /* to be changed according to s or <,=,>*/

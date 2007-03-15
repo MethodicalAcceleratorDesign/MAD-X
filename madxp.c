@@ -2808,7 +2808,10 @@ void madx_finish()
 {
   int nwarnings = warn_numb+warn_numbf;
   /* should work with Lahey on windows 24.03.2004 */
-
+  
+  match2_delete_expressions();
+  match2_delete_arrays();
+  
   if (final_message == 0)
   {
     final_message = 1;

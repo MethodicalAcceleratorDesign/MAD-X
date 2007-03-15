@@ -1456,24 +1456,38 @@ void deletetrackstrarpositions();
 
 
 /*Riccardo de Maria (CERN)*/
-#define MAX_MATCH_CONS 350
-#define MAX_MATCH_MACRO 10
+/*  modifications Piotr Skowronski (CERN)*/
+
+int MAX_MATCH_CONS =  0; /*these are set to proper values at the initialization of the match2 module*/
+int MAX_MATCH_MACRO = 0; /*zero values means that it is not initialized yet*/
+
 void match2_match(struct in_cmd*);
 void match2_end(struct in_cmd*);
 void match2_macro(struct in_cmd*);
 void match2_constraint(struct in_cmd*);
+void match2_setconstrinrange(struct node** nodes, double w, char* parname, char s, char* rexpr);
+void match2_disasambleconstraint(struct in_cmd* cmd);
 int  match2_evaluate_exressions(int i, int k, double* fun_vec);
 void match2_delete_expressions();
+int match2_augmentnmacros();   /*increases space in the working arrays*/
+int match2_augmentnconstraints();/*increases space in the working arrays*/
+
+void match2_delete_arrays();
+void match2_alloc_arrays();
+void match2_init_arrays();
+
 char match2_keepexpressions = 0; /*do not delete expressions at the end matching used by match with PTC knobs*/
-char* match2_macro_name[MAX_MATCH_MACRO];
-char* match2_cons_name[MAX_MATCH_MACRO][MAX_MATCH_CONS];
-double match2_cons_value[MAX_MATCH_MACRO][MAX_MATCH_CONS];
-double match2_cons_value_rhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
-double match2_cons_value_lhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
-double match2_cons_weight[MAX_MATCH_MACRO][MAX_MATCH_CONS];
-char match2_cons_sign[MAX_MATCH_MACRO][MAX_MATCH_CONS];
+
+char* *  match2_macro_name;
+char* ** match2_cons_name;
+double **match2_cons_value;
+double **match2_cons_value_rhs;
+double **match2_cons_value_lhs;
+double **match2_cons_weight;
+char   **match2_cons_sign;
+struct expression* **match2_cons_rhs;
+struct expression* **match2_cons_lhs;
+
 int match2_cons_curr[3];
-struct expression* match2_cons_rhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
-struct expression* match2_cons_lhs[MAX_MATCH_MACRO][MAX_MATCH_CONS];
 
 /* end of definitions */
