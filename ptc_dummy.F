@@ -194,6 +194,25 @@ C     Implemented in madx_ptc_distrib.f90
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+
+      subroutine w_ptc_getnfieldcomp(fibreidx,ncomp,nval)
+      implicit none
+      real nval
+      integer fibreidx
+      integer ncomp
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end subroutine w_ptc_getnfieldcomp
+
+      subroutine w_ptc_getsfieldcomp(fibreidx,ncomp,nval)
+      implicit none
+      real nval
+      integer fibreidx
+      integer ncomp
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end subroutine w_ptc_getsfieldcomp
+
       subroutine w_ptc_setfieldcomp(fibreidx)
       implicit none
       integer fibreidx
