@@ -16,7 +16,7 @@ MODULE madx_ptc_module
   USE madx_ptc_setcavs_module
   USE madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
-   
+
   implicit none
   public
   logical(lp) mytime
@@ -35,11 +35,11 @@ MODULE madx_ptc_module
   integer, private, allocatable :: J(:)
 
   type mapbuffer
-    type(universal_taylor)  :: unimap(6)
-    real(dp)                :: s
-    character(nlp+1)        :: name
-  end type mapbuffer 
-  
+     type(universal_taylor)  :: unimap(6)
+     real(dp)                :: s
+     character(nlp+1)        :: name
+  end type mapbuffer
+
   type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
@@ -170,7 +170,7 @@ CONTAINS
        print '(a20, f8.4)', '      Momentum :',e0f
     endif
 
- 
+
 
     beta0=e0f/ENERGY
 
@@ -284,7 +284,7 @@ CONTAINS
     endif
 
     my_ring%mass=pma
-! preliminary setting
+    ! preliminary setting
     my_ring%charge=1
 
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
@@ -305,7 +305,7 @@ CONTAINS
     endif
 
     call zero_key(key)
-    
+
     j=j+1
     nt=nt+1
     if(nt==nt0) then
@@ -430,10 +430,10 @@ CONTAINS
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
        key%list%b0=node_value('angle ')+tempdp*l
-       
-!       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
-!       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
-       
+
+       !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
+       !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
+
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
@@ -550,7 +550,7 @@ CONTAINS
        dum1=key%list%k(2)-normal_0123(1)
        dum2=key%list%ks(2)-skew_0123(1)
 
-       if(dum1.ne.zero.or.dum2.ne.zero) then                      ! 
+       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
        endif                                                      !
@@ -573,7 +573,7 @@ CONTAINS
        dum1=key%list%k(3)-normal_0123(2)
        dum2=key%list%ks(3)-skew_0123(2)
 
-       if(dum1.ne.zero.or.dum2.ne.zero) then                      ! 
+       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk2= sk2 +dum1                                          !
           sk2s=sk2s+dum2                                          !
        endif                                                      !
@@ -581,9 +581,9 @@ CONTAINS
        key%list%k(3) =sk2                                         !
        key%list%ks(3)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
-       
-!       print*, "SEXT: from MADX normal: ",normal_0123(2)," skew: ",skew_0123(2)," Tilt: ",node_value('tilt ')
-!       print*, "SEXT: for  PTC  normal: ",key%list%k(3)," skew: ",key%list%ks(3)," Tilt: ",key%tiltd
+
+       !       print*, "SEXT: from MADX normal: ",normal_0123(2)," skew: ",skew_0123(2)," Tilt: ",node_value('tilt ')
+       !       print*, "SEXT: for  PTC  normal: ",key%list%k(3)," skew: ",key%list%ks(3)," Tilt: ",key%tiltd
        !================================================================
 
     case(7) ! PTC accepts mults
@@ -598,12 +598,12 @@ CONTAINS
        print*,sk3
        print*,sk3s
        print*, "node_value('tilt ')",node_value('tilt ')
-       
+
        tilt=node_value('tilt ')
        dum1=key%list%k(4)-normal_0123(3)
        dum2=key%list%ks(4)-skew_0123(3)
 
-       if(dum1.ne.zero.or.dum2.ne.zero) then                      ! 
+       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk3= sk3 +dum1                                          !
           sk3s=sk3s+dum2                                          !
        endif                                                      !
@@ -613,9 +613,9 @@ CONTAINS
 
        key%tiltd=tilt  !==========================================!
 
-!       print*, "key%list%k(4)",key%list%k(4)
-!       print*, "key%list%ks(4)",key%list%ks(4)
-!       print*, "tiltd , ",key%tiltd
+       !       print*, "key%list%k(4)",key%list%k(4)
+       !       print*, "key%list%ks(4)",key%list%ks(4)
+       !       print*, "tiltd , ",key%tiltd
 
        !================================================================
 
@@ -916,9 +916,9 @@ CONTAINS
           endif                                                !
        enddo                                                   !
     endif !====================================================!
-    
-    
-    
+
+
+
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
   !----------------------------------------------------------------
 
@@ -937,16 +937,16 @@ CONTAINS
 
     p=>my_ring%start
     do j=1, fibreidx
-      p=>p%next
+       p=>p%next
     enddo
-    
+
     ncomp = ncomp + 1
     print*," Mag Name ",p%mag%name
     print*," ncomp ",ncomp
     print*," BN ",p%mag%BN
     nval = p%mag%BN(ncomp)
     print*, "Returning BN",nval
-    
+
   end subroutine  ptc_getnfieldcomp
   !----------------------------------------------------------------
 
@@ -965,15 +965,15 @@ CONTAINS
 
     p=>my_ring%start
     do j=1, fibreidx
-      p=>p%next
+       p=>p%next
     enddo
-    
+
     ncomp = ncomp + 1
-    
+
     nval = p%mag%AN(ncomp)
     print*, "Returning AN",nval," for ",p%mag%name
-    
-    
+
+
   end subroutine  ptc_getsfieldcomp
   !----------------------------------------------------------------
 
@@ -987,124 +987,124 @@ CONTAINS
     real(dp)             :: v
     real(kind(1d0))      :: tmpv
     real(kind(1d0)) get_value
-    
+
     if ( .not. associated(my_ring) ) then
-      call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
-      return
+       call fort_warn("ptc_setfieldcomp","No active PTC layout/period")
+       return
     endif
-    
+
     if (getdebug()>2) then
-      print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
-    endif  
+       print*, "I am in ptc_setfieldcomp: Element index is ", fibreidx
+    endif
 
     if ( (fibreidx .lt. 1) .and. (fibreidx .gt. my_ring%n) ) then
-      call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
-      return
+       call fort_warn("ptc_setfieldcomp","element out of range of the current layout")
+       return
     endif
-    
+
     p=>my_ring%start
     do j=1, fibreidx
-      p=>p%next
+       p=>p%next
     enddo
 
     if (getdebug() > 1 ) then
        print*,"Found element no. ", fibreidx," named ", p%mag%name, &
-             &" of kind ", p%mag%kind, mytype(p%mag%kind)
+            &" of kind ", p%mag%kind, mytype(p%mag%kind)
        print*,"Currently nmul is ", p%mag%p%nmul
 
        write(6,*) "BNs",p%mag%BN
        write(6,*) "ANs",p%mag%AN
 
        DO i=1,p%mag%p%nmul
-         print*, "Polimorphic BN(",i,")"
-         call print(p%mag%BN(i),6)
-         print*, "Polimorphic AN(",i,")"
-         call print(p%mag%AN(i),6)
+          print*, "Polimorphic BN(",i,")"
+          call print(p%mag%BN(i),6)
+          print*, "Polimorphic AN(",i,")"
+          call print(p%mag%AN(i),6)
        ENDDO
 
     endif
-    
+
     kn = get_value('ptc_setfieldcomp ','kn ')
     v = get_value('ptc_setfieldcomp ','value ')
-    
+
     if (kn >= 0) then
-      kn = kn + 1
-      print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
-      
-      call add(p%mag, kn,0,v)
-      call add(p%magp,kn,0,v)
+       kn = kn + 1
+       print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
 
-      
+       call add(p%mag, kn,0,v)
+       call add(p%magp,kn,0,v)
+
+
     else
-      ks = get_value('ptc_setfieldcomp ','ks ')
-      if (ks < 0) then
-        call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
-        return
-      endif
-      ks = ks + 1
+       ks = get_value('ptc_setfieldcomp ','ks ')
+       if (ks < 0) then
+          call fort_warn("ptc_setfieldcomp","neither kn nor ks specified")
+          return
+       endif
+       ks = ks + 1
 
-!      print*,"Setting up skew field component ", ks," to ", v
+       !      print*,"Setting up skew field component ", ks," to ", v
 
-      call add(p%mag, -ks,0,v)
-      call add(p%magp,-ks,0,v)
+       call add(p%mag, -ks,0,v)
+       call add(p%magp,-ks,0,v)
 
     endif
 
     if (getdebug() > 1 ) then
-      write(6,*) "BNs",p%mag%BN
-      write(6,*) "ANs",p%mag%AN
-      write(6,*) ""
-    endif  
+       write(6,*) "BNs",p%mag%BN
+       write(6,*) "ANs",p%mag%AN
+       write(6,*) ""
+    endif
   end subroutine ptc_setfieldcomp
   !----------------------------------------------------------------
 
   subroutine extendnmul(f,n)
     implicit none
-      type(fibre),  pointer               :: f !fiber
-      integer                             :: n !order 
-      real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
-      type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
-      integer                             :: i !iterator
-      !P.Sk
-      
-      if (.not. associated(f)) then
-        return
-      endif
+    type(fibre),  pointer               :: f !fiber
+    integer                             :: n !order
+    real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
+    type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
+    integer                             :: i !iterator
+    !P.Sk
 
-      ALLOCATE(ANR(n),BNR(n)) 
-      ALLOCATE(ANP(n),BNP(n))
-      CALL ALLOC(ANP,n)
-      CALL ALLOC(BNP,n)
+    if (.not. associated(f)) then
+       return
+    endif
 
-      DO I=1,f%mag%P%NMUL
-        ANR(I)=f%mag%AN(I)
-        BNR(I)=f%mag%BN(I)
+    ALLOCATE(ANR(n),BNR(n))
+    ALLOCATE(ANP(n),BNP(n))
+    CALL ALLOC(ANP,n)
+    CALL ALLOC(BNP,n)
 
-        ANP(I)=f%magp%AN(I)
-        ANP(I)=f%magp%BN(I)
-      ENDDO
+    DO I=1,f%mag%P%NMUL
+       ANR(I)=f%mag%AN(I)
+       BNR(I)=f%mag%BN(I)
 
-      DO I=f%mag%P%NMUL+1, n
-        ANR(I)=zero
-        BNR(I)=zero
+       ANP(I)=f%magp%AN(I)
+       ANP(I)=f%magp%BN(I)
+    ENDDO
 
-        ANP(I)=zero
-        ANP(I)=zero
-      ENDDO
+    DO I=f%mag%P%NMUL+1, n
+       ANR(I)=zero
+       BNR(I)=zero
 
-      call kill(f%magp%AN,f%magp%p%nmul)
-      call kill(f%magp%BN,f%magp%p%nmul)
-      deallocate(f%magp%AN,f%magp%BN)
-      deallocate(f%mag%AN,f%mag%BN)
+       ANP(I)=zero
+       ANP(I)=zero
+    ENDDO
 
-      f%mag%p%nmul  = n
-      f%magp%p%nmul = n
+    call kill(f%magp%AN,f%magp%p%nmul)
+    call kill(f%magp%BN,f%magp%p%nmul)
+    deallocate(f%magp%AN,f%magp%BN)
+    deallocate(f%mag%AN,f%mag%BN)
 
-      f%mag%AN=>ANR
-      f%mag%BN=>BNR
+    f%mag%p%nmul  = n
+    f%magp%p%nmul = n
 
-      f%magp%AN=>ANP
-      f%magp%BN=>BNP
+    f%mag%AN=>ANR
+    f%mag%BN=>BNR
+
+    f%magp%AN=>ANP
+    f%magp%BN=>BNP
 
 
   end subroutine extendnmul
@@ -1117,8 +1117,8 @@ CONTAINS
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
     !---------------------------------------------------------------
-    
-    
+
+
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -1166,11 +1166,11 @@ CONTAINS
     if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
     open(unit=42,file=filename)
 
-!    write(filenamefull,*) filename,".",my_ring%start%mag%name,"-",my_ring%end%mag%name,".txt"
+    !    write(filenamefull,*) filename,".",my_ring%start%mag%name,"-",my_ring%end%mag%name,".txt"
     filenamefull="ptcmaps.start-end.txt"
     print*, filenamefull
     open(unit=43,file=filenamefull)
-    
+
     print*, "no=1"," mynd2=",c_%nd2," npara=",c_%npara
     call init(getintstate(),1,c_%np_pol,berz)
 
@@ -1180,9 +1180,9 @@ CONTAINS
 
     xt(:) = zero
     id    = 1     ! making identity map
-    
+
     yfull  = xt + id
-    
+
     p=>my_ring%start
     do i=1,my_ring%n
 
@@ -1289,7 +1289,7 @@ CONTAINS
           c_%watch_user=.false.
           return
        endif
-       
+
        write(43,*) p%mag%name, suml,' m ==========================='
        call print(yfull,43)
 
@@ -1738,7 +1738,7 @@ CONTAINS
     endif
 
     no = get_value('ptc_normal ','no ')
-    
+
     call init(default,no,nda,BERZ,mynd2,npara)
 
 
@@ -1765,12 +1765,12 @@ CONTAINS
     c_%watch_user=.false.
     !if (getdebug()>1)
     print77=.false.
- 
+
     call daprint(y,18)
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
-      call makemaptable(y)
+       call makemaptable(y)
     endif
 
 
@@ -1788,13 +1788,13 @@ CONTAINS
           do row = 1,n_rows
              name_var=" "
              k = string_from_table('normal_results ', 'name ', row, name_var)
-             
+
              if (name_var .eq. 'gnfu') n_gnfu = n_gnfu + 1
              if (name_var .eq. 'haml') then
                 n_haml = n_haml + 1
                 row_haml(n_haml) = row
              endif
-         enddo
+          enddo
 
 
           if (n_gnfu > 0) call alloc(pbrg)
@@ -1825,7 +1825,7 @@ CONTAINS
                    starti = 2
                 endif
                 !============ nres is the number of resonances to be set
- 
+
                 if (mynres .ge. starti) then
                    do i = starti,mynres
                       ii = row + 3*(i-1)
@@ -1854,7 +1854,7 @@ CONTAINS
              enddo
              n%nres = nres
           endif
-          
+
        endif
        !------------------------------------------------------------------------
 
@@ -1876,11 +1876,11 @@ CONTAINS
 
        n_rows = select_ptc_idx()
        if (no < minimum_acceptable_order()) then
-         print*, "minimum acceptable order: ", minimum_acceptable_order()
-         call seterrorflag(11,"ptc_normal ","Order of calculation is not sufficient to calculate required parameters")
-         call fort_warn('ptc_normal: ',&
-                  'Order of calculation (parameter no) is not sufficient to calculate required parameters')
-         return
+          print*, "minimum acceptable order: ", minimum_acceptable_order()
+          call seterrorflag(11,"ptc_normal ","Order of calculation is not sufficient to calculate required parameters")
+          call fort_warn('ptc_normal: ',&
+               'Order of calculation (parameter no) is not sufficient to calculate required parameters')
+          return
        endif
 
        if (n_rows > 0) then
@@ -2013,15 +2013,15 @@ CONTAINS
     endif
 
     call killsavedmaps() !module ptc_twiss -> kill buffered maps
-    
-!    call killparresult() 
+
+    !    call killparresult()
     call resetknobs()  !remove the knobs
-    
+
     if ( associated(m_u%n) .eqv. .false. ) then
-      print*, "We attempt to kill not initialized universe!"
+       print*, "We attempt to kill not initialized universe!"
     endif
-    
-    
+
+
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
@@ -2030,7 +2030,7 @@ CONTAINS
     enddo
     deallocate(s_b)
     firsttime_coef=.true.
-    
+
     universe=universe-1
   end subroutine ptc_end
 
@@ -2320,7 +2320,7 @@ CONTAINS
 
   END SUBROUTINE Convert_dp_to_dt
   !=============================================================================
-  
+
   subroutine makemaptable(y)
     implicit none
     type(real_8):: y(6)
@@ -2328,20 +2328,40 @@ CONTAINS
     integer           :: map_term, ja(6),i,ii,iii
     real(dp)          :: coef
     real(kind(1d0))   :: map_coor(i_map_coor)
-!    type(universal_taylor) :: ut
+    !    type(universal_taylor) :: ut
 
-       map_term=42
-       call  make_map_table(map_term)
-       call liepeek(iia,icoast)
-       allocate(j(c_%npara))
-       ja(:)    = 0
-       j(:)     = 0
-       do iii=1,c_%npara
-          coef = y(iii)%T.sub.j
+    map_term=42
+    call  make_map_table(map_term)
+    call liepeek(iia,icoast)
+    allocate(j(c_%npara))
+    ja(:)    = 0
+    j(:)     = 0
+    do iii=1,c_%npara
+       coef = y(iii)%T.sub.j
+       map_coor(1)=coef
+       map_coor(2)=iii
+       map_coor(3)=c_%npara
+       map_coor(4)=0
+       map_coor(5)=ja(1)
+       map_coor(6)=ja(2)
+       map_coor(7)=ja(3)
+       map_coor(8)=ja(4)
+       map_coor(9)=ja(5)
+       map_coor(10)=ja(6)
+       call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+       call augment_count("map_table ")
+    enddo
+
+    do i = 1,c_%npara
+
+       do ii = 1,c_%npara
+          j(ii) = 1
+          ja(ii) = j(ii)
+          coef = y(i)%T.sub.j
           map_coor(1)=coef
-          map_coor(2)=iii
-          map_coor(3)=c_%npara
-          map_coor(4)=0
+          map_coor(2)=i
+          map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
+          map_coor(4)=sum(ja(:))
           map_coor(5)=ja(1)
           map_coor(6)=ja(2)
           map_coor(7)=ja(3)
@@ -2350,48 +2370,28 @@ CONTAINS
           map_coor(10)=ja(6)
           call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
           call augment_count("map_table ")
+          j(:)  = 0
+          ja(ii) = j(ii)
        enddo
-       
-       do i = 1,c_%npara
-          
-          do ii = 1,c_%npara
-             j(ii) = 1
-             ja(ii) = j(ii)
-             coef = y(i)%T.sub.j
-             map_coor(1)=coef
-             map_coor(2)=i
-             map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
-             map_coor(4)=sum(ja(:))
-             map_coor(5)=ja(1)
-             map_coor(6)=ja(2)
-             map_coor(7)=ja(3)
-             map_coor(8)=ja(4)
-             map_coor(9)=ja(5)
-             map_coor(10)=ja(6)
-             call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-             call augment_count("map_table ")
-             j(:)  = 0
-             ja(ii) = j(ii)
-          enddo
 
-!           ut = y(i)
-!           do ii = 1,ut%n
-!              map_coor(1)=ut%c(ii) !coef
-!              map_coor(2)=i !index of taylor
-!              map_coor(3)=c_%npara
-!              map_coor(4)=sum(ut%j(i,:)) !order
-!              map_coor(5)=ut%j(ii,1)
-!              map_coor(6)=ut%j(ii,2)
-!              map_coor(7)=ut%j(ii,3)
-!              map_coor(8)=ut%j(ii,4)
-!              map_coor(9)=ut%j(ii,5)
-!              map_coor(10)=ut%j(ii,6)
-!           enddo
-        
+       !           ut = y(i)
+       !           do ii = 1,ut%n
+       !              map_coor(1)=ut%c(ii) !coef
+       !              map_coor(2)=i !index of taylor
+       !              map_coor(3)=c_%npara
+       !              map_coor(4)=sum(ut%j(i,:)) !order
+       !              map_coor(5)=ut%j(ii,1)
+       !              map_coor(6)=ut%j(ii,2)
+       !              map_coor(7)=ut%j(ii,3)
+       !              map_coor(8)=ut%j(ii,4)
+       !              map_coor(9)=ut%j(ii,5)
+       !              map_coor(10)=ut%j(ii,6)
+       !           enddo
 
-       enddo
-       
-       deallocate(j)
+
+    enddo
+
+    deallocate(j)
 
 
 
@@ -2403,16 +2403,16 @@ CONTAINS
   subroutine killsavedmaps
     implicit none
     integer i,ii
-    
+
     if (.not. associated(maps)) then
-      return
-    endif  
-    
+       return
+    endif
+
     do i=lbound(maps,1),ubound(maps,1)
-      do ii=1,6
-       call kill(maps(i)%unimap(ii))
-      enddo 
-    enddo 
+       do ii=1,6
+          call kill(maps(i)%unimap(ii))
+       enddo
+    enddo
     deallocate(maps)
     nullify(maps)
 
