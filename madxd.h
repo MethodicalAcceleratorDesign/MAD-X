@@ -97,6 +97,8 @@
 #define w_ptc_getnmoments       w_ptc_getnmoments_
 #define w_ptc_getmomentstabcol  w_ptc_getmomentstabcol_
 #define w_ptc_setknobvalue      w_ptc_setknobvalue_
+#define w_ptc_getnfieldcomp     w_ptc_getnfieldcomp_
+#define w_ptc_getsfieldcomp     w_ptc_getsfieldcomp_
 #define w_ptc_setfieldcomp      w_ptc_setfieldcomp_
 #define w_ptc_rviewer           w_ptc_rviewer_
 #define w_ptc_script            w_ptc_script_
@@ -234,6 +236,8 @@
 #define w_ptc_getnmoments       W_PTC_GETNMOMENTS
 #define w_ptc_getmomentstabcol  W_PTC_GETMOMENTSTABCOL
 #define w_ptc_setknobvalue      W_PTC_SETKNOBVALUE
+#define w_ptc_getnfieldcomp     W_PTC_GETNFIELDCOMP
+#define w_ptc_getsfieldcomp     W_PTC_GETSFIELDCOMP
 #define w_ptc_setfieldcomp      W_PTC_SETFIELDCOMP
 #define w_ptc_rviewer           W_PTC_RVIEWER
 #define w_ptc_script            W_PTC_SCRIPT
@@ -909,6 +913,8 @@ void w_ptc_addmoment(int* xi, int* pxi, int* yi, int* pyi, int* dpi, int* ti, in
 int  w_ptc_getnmoments();
 void w_ptc_getmomentstabcol(int* n, char* tabname, char* colname );
 void w_ptc_setknobvalue(int* fibrename);
+void w_ptc_getnfieldcomp(int* fibreidx, int* ncomp, double*);
+void w_ptc_getsfieldcomp(int* fibreidx, int* ncomp, double*);
 void w_ptc_setfieldcomp(int* fibreidx);
 void w_ptc_rviewer();
 void w_ptc_eplacement(int* eidx,int* refframe);
@@ -1109,8 +1115,8 @@ void cf77flush();
 void seterrorflagfort(int* errcode, const char* from, int *lf, const char* descr, int *ld);
 void seterrorflag (int  errcode, const char* from, const char* descr);
 int  geterrorflag();
-int debuglevel = 1;
-int errorflag = 0;
+int  debuglevel = 1;
+int  errorflag = 0;
 
 char* geterrrormessage();
 #define MAX_MSGLEN  1000
@@ -1449,6 +1455,8 @@ time_t start_time;
 #define gettrack gettrack_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
+char filenames[100][500];
+int  currentline[100];
 
 int  gettrack(int* n, double* x,double* px,double* y,double* py,double* t,double* pt);
 int  copytrackstoarray();

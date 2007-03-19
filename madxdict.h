@@ -407,11 +407,18 @@ char command_def[] =
 "element = [s, none] , "/* */
 "kn    = [i, {-1}], "
 "ks    = [i, {-1}], "
+"exactmatch = [l, true, true]; "
+" "
+"ptc_varyknob: ptc_varyknob none 0 0 "
+"initial = [s, none] , "/* */
+"element = [s, none] , "/* */
+"kn    = [i, -1], "
+"ks    = [i, -1], "
 "exactmatch = [l, true, true], "
-"trustrange    = [r, 0.1], " /*used in matching only -  defines the range the expansion is trusted*/
-"step     = [r, 0.0], " /*used in matching only*/
-"lower    = [r, -1.e20], " /*used in matching only*/
-"upper    = [r,  1.e20]; "/*used in matching only*/
+"trustrange    = [r, 0.1], " /*defines the range the expansion is trusted*/
+"step     = [r, 0.0], " 
+"lower    = [r, -1.e20], " 
+"upper    = [r,  1.e20]; "
 " "
 "ptc_setknobvalue: ptc_setknobvalue none 0 0 "
 "element = [s, none] , "/* */

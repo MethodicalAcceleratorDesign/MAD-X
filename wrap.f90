@@ -157,6 +157,24 @@ subroutine w_ptc_end()
   call ptc_end()
 end subroutine w_ptc_end
 
+subroutine w_ptc_getnfieldcomp(fibreidx,ncomp,nval)
+  use madx_ptc_module
+  implicit none
+  real(kind(1d0)) nval
+  integer fibreidx
+  integer ncomp
+  call ptc_getnfieldcomp(fibreidx,ncomp,nval)
+end subroutine w_ptc_getnfieldcomp
+
+subroutine w_ptc_getsfieldcomp(fibreidx,ncomp,nval)
+  use madx_ptc_module
+  implicit none
+  real(kind(1d0)) nval
+  integer fibreidx
+  integer ncomp
+  call ptc_getsfieldcomp(fibreidx,ncomp,nval)
+end subroutine w_ptc_getsfieldcomp
+
 subroutine w_ptc_setfieldcomp(fibreidx)
   use madx_ptc_module
   implicit none

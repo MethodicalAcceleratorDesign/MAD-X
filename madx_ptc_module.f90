@@ -305,6 +305,7 @@ CONTAINS
     endif
 
     call zero_key(key)
+    
     j=j+1
     nt=nt+1
     if(nt==nt0) then
@@ -429,7 +430,10 @@ CONTAINS
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
        key%list%b0=node_value('angle ')+tempdp*l
-
+       
+!       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
+!       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
+       
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
@@ -577,7 +581,9 @@ CONTAINS
        key%list%k(3) =sk2                                         !
        key%list%ks(3)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
-
+       
+!       print*, "SEXT: from MADX normal: ",normal_0123(2)," skew: ",skew_0123(2)," Tilt: ",node_value('tilt ')
+!       print*, "SEXT: for  PTC  normal: ",key%list%k(3)," skew: ",key%list%ks(3)," Tilt: ",key%tiltd
        !================================================================
 
     case(7) ! PTC accepts mults
@@ -588,6 +594,11 @@ CONTAINS
        ! octupole components
        sk3= node_value('k3 ')
        sk3s=node_value('k3s ')
+
+       print*,sk3
+       print*,sk3s
+       print*, "node_value('tilt ')",node_value('tilt ')
+       
        tilt=node_value('tilt ')
        dum1=key%list%k(4)-normal_0123(3)
        dum2=key%list%ks(4)-skew_0123(3)
@@ -599,7 +610,12 @@ CONTAINS
        if (sk3s .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
        key%list%k(4) =sk3                                         !
        key%list%ks(4)=zero  ! added by VK                         !
+
        key%tiltd=tilt  !==========================================!
+
+!       print*, "key%list%k(4)",key%list%k(4)
+!       print*, "key%list%ks(4)",key%list%ks(4)
+!       print*, "tiltd , ",key%tiltd
 
        !================================================================
 
@@ -900,8 +916,65 @@ CONTAINS
           endif                                                !
        enddo                                                   !
     endif !====================================================!
-
+    
+    
+    
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
+  !----------------------------------------------------------------
+
+  subroutine ptc_getnfieldcomp(fibreidx, ncomp, nval)
+    implicit none
+    include 'twissa.fi'
+    real(kind(1d0))      :: nval
+    integer              :: fibreidx
+    integer              :: ncomp
+    type(fibre), pointer :: p
+    integer              :: j, i
+    integer              :: kn, ks
+    real(dp)             :: v
+    real(kind(1d0))      :: tmpv
+    real(kind(1d0)) get_value
+
+    p=>my_ring%start
+    do j=1, fibreidx
+      p=>p%next
+    enddo
+    
+    ncomp = ncomp + 1
+    print*," Mag Name ",p%mag%name
+    print*," ncomp ",ncomp
+    print*," BN ",p%mag%BN
+    nval = p%mag%BN(ncomp)
+    print*, "Returning BN",nval
+    
+  end subroutine  ptc_getnfieldcomp
+  !----------------------------------------------------------------
+
+  subroutine ptc_getsfieldcomp(fibreidx, ncomp, nval)
+    implicit none
+    include 'twissa.fi'
+    real(kind(1d0))      :: nval
+    integer              :: fibreidx
+    integer              :: ncomp
+    type(fibre), pointer :: p
+    integer              :: j, i
+    integer              :: kn, ks
+    real(dp)             :: v
+    real(kind(1d0))      :: tmpv
+    real(kind(1d0)) get_value
+
+    p=>my_ring%start
+    do j=1, fibreidx
+      p=>p%next
+    enddo
+    
+    ncomp = ncomp + 1
+    
+    nval = p%mag%AN(ncomp)
+    print*, "Returning AN",nval," for ",p%mag%name
+    
+    
+  end subroutine  ptc_getsfieldcomp
   !----------------------------------------------------------------
 
   subroutine ptc_setfieldcomp(fibreidx)
@@ -956,10 +1029,11 @@ CONTAINS
     
     if (kn >= 0) then
       kn = kn + 1
-!      print*,"Setting up normal field component ", kn," to ", v
+      print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
       
-      call add(p%mag, kn,1,v)
-      call add(p%magp,kn,1,v)
+      call add(p%mag, kn,0,v)
+      call add(p%magp,kn,0,v)
+
       
     else
       ks = get_value('ptc_setfieldcomp ','ks ')
@@ -971,8 +1045,8 @@ CONTAINS
 
 !      print*,"Setting up skew field component ", ks," to ", v
 
-      call add(p%mag, -ks,1,v)
-      call add(p%magp,-ks,1,v)
+      call add(p%mag, -ks,0,v)
+      call add(p%magp,-ks,0,v)
 
     endif
 
@@ -1943,6 +2017,11 @@ CONTAINS
 !    call killparresult() 
     call resetknobs()  !remove the knobs
     
+    if ( associated(m_u%n) .eqv. .false. ) then
+      print*, "We attempt to kill not initialized universe!"
+    endif
+    
+    
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
@@ -1951,6 +2030,8 @@ CONTAINS
     enddo
     deallocate(s_b)
     firsttime_coef=.true.
+    
+    universe=universe-1
   end subroutine ptc_end
 
 

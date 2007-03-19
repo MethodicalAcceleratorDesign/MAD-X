@@ -923,6 +923,8 @@ int down_unit(char* file_name)
   }
   if (in->curr+1 == in->max) grow_in_buff_list(in);
   in->input_files[++in->curr] = new;
+  strcpy(filenames[in->curr],file_name);
+  currentline[in->curr] = 0;
   return 1;
 }
 
@@ -1588,6 +1590,10 @@ void exec_command()
       else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)
       {
         pro_ptc_knob(p);
+      }
+      else if (strcmp(p->cmd_def->module, "ptc_varyknob") == 0)
+      {
+        pro_ptc_varyknob(p);
       }
       else if (strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)
       {
@@ -2352,6 +2358,7 @@ int get_stmt(FILE* file, int supp_flag)
     next:
     if (ca->max - ca->curr < MAX_LINE) grow_char_array(ca);
     if (!fgets(&ca->c[ca->curr], MAX_LINE, file)) return 0;
+    currentline[in->curr]++;
     if (get_option("echo")) puts(&ca->c[ca->curr]);
     c_cc = mystrstr(&ca->c[ca->curr], "//");
     c_ex = mystrchr(&ca->c[ca->curr], '!');
@@ -3440,6 +3447,13 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
               break;
             case 18: /* function "exist" */
               continue; /* value in stack not changed */
+              break;
+            case 19:
+              stack[c_stack] = floor(stack[c_stack]);
+              break;
+            case 20:
+              stack[c_stack] = abs(stack[c_stack]);
+              stack[c_stack] = stack[c_stack] - floor(stack[c_stack]);
               break;
             default:
               fatal_error("polish_value:",

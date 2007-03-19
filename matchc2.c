@@ -290,7 +290,6 @@ void match2_end(struct in_cmd* cmd)
   match_is_on = 0;
   current_call_lim = 0;
   current_calls = 0;
-  total_const = 0;
   set_option("twiss_print", &keep_tw_print);
   print_match_summary = 0;
   set_option("match_summary", &print_match_summary);
@@ -306,6 +305,7 @@ void match2_end(struct in_cmd* cmd)
    {
       match2_delete_expressions();
       match2_delete_arrays();
+      total_const = 0;
    }  
    
   

@@ -8192,6 +8192,24 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
 }
 /********************************************************************************/
 
+void pro_ptc_varyknob(struct in_cmd* cmd)
+{/*
+   Sets a variable based on parameter
+ */
+  
+  printf("pro_ptc_varyknob\n");
+  
+  if (match_is_on != kMatch_PTCknobs)
+  {
+    warningnew("pro_ptc_varyknob","Match with ptcknobs is not active, command ignored");
+    return;
+  }
+
+ madx_mpk_addvariable(cmd);
+
+} 
+/********************************************************************************/
+
 void pro_ptc_knob(struct in_cmd* cmd)
 {/*
    Sets a parameter
@@ -8205,12 +8223,6 @@ void pro_ptc_knob(struct in_cmd* cmd)
   char*                          initialp    = 0x0;
   struct int_array*              initialpIA      = 0x0;
 
-
-  if (match_is_on == kMatch_PTCknobs)
-  {
-    madx_mpk_addvariable(cmd);
-    return;
-  }
 
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
