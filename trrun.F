@@ -314,8 +314,8 @@
         call augment_count('tracksumm ')
       enddo
  999  end
-      
-      
+
+
       subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,        &
      &onepass)                                                          &
@@ -356,7 +356,7 @@
         go to 502
       endif
 
-!--- Note: First 'if' below could be taken out, we have no thick elements (bends)      
+!--- Note: First 'if' below could be taken out, we have no thick elements (bends)
       bend = code .eq. 2 .or. code .eq. 3
       if (.not. bend)  then
         theta = node_value('tilt ')
@@ -373,8 +373,8 @@
             track(4,jtrk) = ct * track(4,jtrk) - st * tmp
           enddo
         endif
-      endif      
-      
+      endif
+
 !---- Translation of particles // AK 23.02.2006
 !---- useful for combination of different transfer lines or rings
       if(code.eq.36) then
@@ -796,7 +796,7 @@
 
 !---- Apply multipole effect including dipole.
       do jtrk = 1,ktrack
-!       Added for correct Ripken implementation of formulae      	
+!       Added for correct Ripken implementation of formulae
         ttt = sqrt(one+two*track(6,jtrk)*bet0i+track(6,jtrk)**2)
 !        track(2,jtrk) = track(2,jtrk) -                                 &
 !     &(dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
@@ -1902,7 +1902,7 @@
       end
 
 
-      
+
 
       subroutine trkill(n, turn, sum, jmax, part_id,                    &
      &last_turn, last_pos, last_orbit, z, aptype)
@@ -1910,7 +1910,7 @@
 !hbu--- kill particle:  print, modify part_id list
       implicit none
       include 'name_len.fi'
-      
+
       logical recloss
       integer i,j,n,k,turn,part_id(*),jmax,last_turn(*),get_option
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
@@ -1921,7 +1921,7 @@
 
       recloss = get_option('recloss ') .ne. 0
 
-!!--- As elements might have a tilt we have to transform back 
+!!--- As elements might have a tilt we have to transform back
 !!--- into the original coordinate system!
 !      theta = node_value('tilt ')
 !      if (theta .ne. 0.d0)  then
@@ -1934,8 +1934,8 @@
 !            tmp = z(2,n)
 !            z(2,n) = ct * tmp - st * z(4,n)
 !            z(4,n) = ct * z(4,n) + st * tmp
-!      endif      
-      
+!      endif
+
       last_turn(part_id(n)) = turn
       last_pos(part_id(n)) = sum
       do j = 1, 6
@@ -1954,7 +1954,7 @@
       if(recloss) then
         call tt_ploss(part_id(n),part_id,turn,sum,torb,el_name)
       endif
-      
+
       do i = n+1, jmax
         part_id(i-1) = part_id(i)
         do j = 1, 6
@@ -1962,7 +1962,7 @@
         enddo
       enddo
       jmax = jmax - 1
-      
+
       end
 
 
@@ -1992,19 +1992,19 @@
 !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
       data table / 'trackloss' /
- 
+
       tn = npart
       tt = turn
-      
+
       energy = get_value('probe ','energy ')
-      
-      
+
+
       call double_to_table(table, 'number ', tn) ! the number of the current particle
       call double_to_table(table, 'turn ', tt)   ! the number of the current turn
 !hbu spos
-      
+
       call double_to_table(table,vec_names(7),spos)
-      
+
       do j = 1, 6
         tmp = orbit(j)
         call double_to_table(table, vec_names(j), tmp)
@@ -2015,7 +2015,7 @@
       call augment_count(table)
       end
 
-      
+
       subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
      &spos,ielem,el_name)
 
@@ -2072,7 +2072,7 @@
       end
 
 
-      
+
       subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
 
 !hbu added spos
