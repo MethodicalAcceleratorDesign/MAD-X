@@ -2690,6 +2690,7 @@ CONTAINS
     c_%wedge_coeff => wedge_coeff
     c_%MAD8_WEDGE => MAD8_WEDGE
     c_%phase0 => phase0
+    c_%ALWAYS_knobs => ALWAYS_knobs
 
   end subroutine set_pointers
 

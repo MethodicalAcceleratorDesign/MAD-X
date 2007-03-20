@@ -13,7 +13,9 @@
 TYPE INTERNAL_STATE
    LOGICAL(lp) TOTALPATH,TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS
    LOGICAL(lp) PARA_IN,ONLY_4D,DELTA,SPIN,SPIN_ONLY  ! DA related
+
    INTEGER  SPIN_DIM
+
 END TYPE INTERNAL_STATE
 
 type work
@@ -315,27 +317,34 @@ END TYPE ORBIT_NODE
 
 TYPE ORBIT_LATTICE
    TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
-   INTEGER, pointer  ::  ORBIT_N_NODE
-   LOGICAL(lp), pointer  ::  ORBIT_USE_ORBIT_UNITS
+   INTEGER, pointer  ::  ORBIT_N_NODE  ! GET_N_NODE
+   LOGICAL(lp), pointer  ::  ORBIT_USE_ORBIT_UNITS,first,accel
    INTEGER, pointer  ::  ORBIT_WARNING
-   REAL(DP), pointer  ::  ORBIT_OMEGA
-   REAL(DP), pointer  ::  ORBIT_P0C
-   REAL(DP), pointer  ::  ORBIT_BETA0
-   REAL(DP), pointer  ::  ORBIT_LMAX
-   REAL(DP), pointer  ::  orbit_kinetic
+   REAL(DP), pointer  ::  ORBIT_LMAX    ! GET_LMAX
    REAL(DP), pointer  ::  ORBIT_MAX_PATCH_TZ
-   REAL(DP), pointer  ::  ORBIT_mass_in_amu
-   REAL(DP), pointer  ::  ORBIT_gammat
-   REAL(DP), pointer  ::  ORBIT_harmonic
-   REAL(DP), pointer  ::  ORBIT_L
-   INTEGER,pointer ::  ORBIT_CHARGE
+   REAL(DP), pointer  ::  ORBIT_mass_in_amu  ! GET_MASS_AMU
+   REAL(DP), pointer  ::  ORBIT_gammat    ! GET_GAMMAT
+   REAL(DP), pointer  ::  ORBIT_harmonic  ! GET_HARMONIC
+   REAL(DP), pointer  ::  ORBIT_L    ! GET_CIRCUMFERENCE
+   INTEGER,pointer ::  ORBIT_CHARGE  ! GET_CHARGE
+   REAL(DP), pointer  ::  ORBIT_OMEGA  ! GET_omega
+   REAL(DP), pointer  ::  ORBIT_P0C   ! GET_P0C
+   REAL(DP), pointer  ::  ORBIT_BETA0 ! GET_BETA0
+   REAL(DP), pointer  ::  orbit_kinetic  ! GET_kinetic
+   REAL(DP), pointer  ::  orbit_brho   ! GET_brho
+   REAL(DP), pointer  ::  orbit_energy ! GET_total_energy
+   REAL(DP), pointer  ::  orbit_gamma ! GET_gamma
+   REAL(DP), pointer  ::  orbit_dppfac ! GET_dppfac
+   REAL(DP), pointer  ::  orbit_deltae ! GET_deltae
+   REAL(DP), pointer  ::  ORBIT_OMEGA_after
+   REAL(DP), pointer  ::  freqb,freqa,voltb,volta,phasa,phasb,xs6,dxs6
    TYPE(INTERNAL_STATE),pointer :: STATE
    ! acceleration stuff AND LOCALISATION STUFF
-   INTEGER, pointer  ::  NP   ! PARTICLE IN HERD
-   INTEGER, pointer  ::  TURN   ! PRESENT TURN NUMBER
-   INTEGER, pointer  ::  NV1,NV0     ! QUADRATIC RAMPING UNTIL NV1
-   REAL(DP), POINTER ::   DV0,DV1 ! DV0= TURN*DV1 UNTIL NV1 THEN STAYS CONSTANT UNTIL NV0
-   REAL(DP), POINTER ::   L_TOT !
+   ! INTEGER, pointer  ::  NP   ! PARTICLE IN HERD
+   ! INTEGER, pointer  ::  TURN   ! PRESENT TURN NUMBER
+   ! INTEGER, pointer  ::  NV1,NV0     ! QUADRATIC RAMPING UNTIL NV1
+   ! REAL(DP), POINTER ::   DV0,DV1 ! DV0= TURN*DV1 UNTIL NV1 THEN STAYS CONSTANT UNTIL NV0
+   ! REAL(DP), POINTER ::   L_TOT !
 
 END TYPE ORBIT_LATTICE
 

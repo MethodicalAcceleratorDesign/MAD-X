@@ -115,7 +115,6 @@ module S_status
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
   PRIVATE B2PERPR,B2PERPP !,S_init_berz0
-
   type(tilting) tilt
   private minu
   real(dp) MADFAC(NMAX)
@@ -461,7 +460,7 @@ CONTAINS
     USE   da_arrays
     IMPLICIT NONE
     LOGICAL(lp) particle,verb
-    integer i
+    integer i,MF,lda_old
 
     W_P=>W_I
 
@@ -540,11 +539,13 @@ CONTAINS
     enddo
     !  SECTOR_B AND SECTOR_NMUL FOR TYPE TEAPOT
     IF(SECTOR_NMUL>0.and.firsttime_coef) THEN
-       verb=global_verbose
-       global_verbose=.false.
+       !  verb=global_verbose
+       !  global_verbose=.false.
        if(firsttime_coef.or.(.not.allocated(S_B))) then
           !          SECTOR_B%firsttime=0   !slightly unsafe
           ALLOCATE(S_B(SECTOR_NMUL_MAX))
+          lda_old=lda_used
+          lda_used=3000
           DO I=1,SECTOR_NMUL_MAX
              !             if(i==SECTOR_NMUL_MAX)     global_verbose=.true.
              S_B(I)%firsttime=0
@@ -552,7 +553,14 @@ CONTAINS
              call make_coef(S_B(I),I)
              call curvebend(S_B(I),I)
           ENDDO
+          lda_used=lda_old
        endif
+
+       ! integer firsttime
+       !  integer, POINTER ::  nmul,n_mono
+       ! integer, DIMENSION(:), POINTER   :: i,j
+       ! real(dp), DIMENSION(:,:), POINTER   :: a_x,a_y,b_x,b_y
+
        !       call nul_coef(SECTOR_B)
        !       call make_coef(SECTOR_B,SECTOR_NMUL)
        !       call curvebend(SECTOR_B,SECTOR_NMUL)
@@ -567,7 +575,7 @@ CONTAINS
     ENDIF
 
     call clear_states
-    global_verbose=verb
+    !  global_verbose=verb
 
   END  SUBROUTINE MAKE_STATES_0
 
@@ -710,7 +718,7 @@ CONTAINS
     add%DELTA  =       S1%DELTA.OR.S2%DELTA
     add%SPIN  =       S1%SPIN.OR.S2%SPIN
     add%SPIN_ONLY  =       S1%SPIN_ONLY.OR.S2%SPIN_ONLY
-    add%PARA_IN  =       S1%PARA_IN.OR.S2%PARA_IN
+    add%PARA_IN  =       S1%PARA_IN.OR.S2%PARA_IN.or.ALWAYS_knobs
     add%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(add%DELTA) THEN
        add%ONLY_4D=T
@@ -739,7 +747,7 @@ CONTAINS
     sub%DELTA  =       S1%DELTA.min.S2%DELTA
     sub%SPIN  =       S1%SPIN.min.S2%SPIN
     sub%SPIN_ONLY  = S1%SPIN_ONLY.min.S2%SPIN_ONLY
-    sub%PARA_IN  =       S1%PARA_IN.MIN.S2%PARA_IN
+    sub%PARA_IN  =       (S1%PARA_IN.MIN.S2%PARA_IN).or.ALWAYS_knobs
     sub%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(sub%DELTA) THEN
        sub%ONLY_4D=T

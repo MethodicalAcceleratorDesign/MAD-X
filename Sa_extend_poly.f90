@@ -9,6 +9,7 @@ module S_extend_poly
   private real_8REAL6,REAL6real_8,env_8map,real_8REAL_8,env_8benv
   private print6,PRINTenv
   private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8,scdadd,daddsc
+  logical(lp), target :: ALWAYS_knobs=.false.
 
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE REAL_8REAL6

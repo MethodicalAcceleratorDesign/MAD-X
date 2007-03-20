@@ -268,6 +268,7 @@ module definition
      type(real_8) NS(3,3)
      type(real_8) AS(3,3)
      real(dp) tune
+     integer NRES,M(NDIM)
 
   end type normal_spin
 

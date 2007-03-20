@@ -93,7 +93,7 @@ contains
     logical(lp) bend_like
     integer              :: apertflag
     character(200)       :: whymsg
-    integer              :: why(9)
+    integer              :: why(9),stable_ray
     ! remove_patches
     logical(lp) do_not_remove,put_geo_patch
     real(dp) :: lmax=1.e38_dp
@@ -227,6 +227,11 @@ contains
        case('FUZZYLMAX')
           READ(MF,*) FUZZY_SPLIT
           WRITE(6,*) "FUZZY LMAX FOR SPACE CHARGE =",LMAX,LMAX*FUZZY_SPLIT
+       case('CUTTINGALGORITHM')
+          READ(MF,*) resplit_cutting
+          IF(resplit_cutting==0) WRITE(6,*) " RESPLITTING NORMALLY"
+          IF(resplit_cutting==1) WRITE(6,*) " CUTTING DRIFT USING LMAX"
+          IF(resplit_cutting==2) WRITE(6,*) " CUTTING EVERYTHING USING LMAX"
        case('KIND7WITHMETHOD1')
           CALL PUT_method1_in_kind7(MY_ring,1000)
        case('THINLENS=1')
@@ -340,15 +345,20 @@ contains
           READ(MF,*) I1
           CALL gaussian_seed(i1)
        case('RANDOMMULTIPOLE')
-          read(mf,*) name
-          read(mf,*) n,cns,cn
+          read(mf,*) name,i1,i2
+          read(mf,*) n,cns,cn,sc     ! sc percentage
           read(mf,*) addi,integrated
           read(mf,*) cut
           write(6,*) " Distribution cut at ",cut," sigmas"
-          call lattice_random_error(my_ring,name,cut,n,addi,integrated,cn,cns)
+          call lattice_random_error(my_ring,name,i1,i2,cut,n,addi,integrated,cn,cns,sc)
        case('MISALIGNEVERYTHING')
           read(mf,*) SIG(1:6),cut
           CALL MESS_UP_ALIGNMENT(my_ring,SIG,cut)
+          ! end of random stuff
+       case('MISALIGN','MISALIGNONE')
+          read(mf,*) name,i1,i2
+          read(mf,*) SIG(1:6),cut
+          CALL MESS_UP_ALIGNMENT_name(my_ring,name,i1,i2,SIG,cut)
           ! end of random stuff
        case('SETFAMILIES')
           np=0
@@ -820,59 +830,66 @@ contains
           call context(name)
           if(name(1:11)/='NONAMEGIVEN') then
              posr=pos
-             call move_to( my_ring,p,name,posR,POS)
+             call move_to( my_ring,p1,name,posR,POS)
              if(pos==0) then
                 write(6,*) name, " not found "
                 stop
              endif
+          else
+             call move_to(my_ring,p1,pos)
           endif
 
           call kanalnummer(mfr)
           open(unit=mfr,file=filename)
 
-          MY_STATE = MY_STATE + EXACTMIS0 + NOCAVITY0 + TIME + FRINGE
-          call print(MY_STATE,6)
-          EXACT_MODEL = my_true
+          !    MY_STATE = MY_STATE + EXACTMIS0 + NOCAVITY0 + TIME + FRINGE
+          !    call print(MY_STATE,6)
+          !    EXACT_MODEL = my_true
 
 
           DO I1=1,NRAYS
              READ(MF,*) X
-             WRITE(MFR,301) X
+             dlim_t=X
+             stable_ray=0
+             !             WRITE(MFR,301) dlim_t
              DO I2=1,NTURN
-                p=>MY_RING%start
-                do ii=1,MY_RING%n
-                   write(6,*) "##########################################"
-                   write(6,'(i4, 1x,a)') ii,p%mag%name
+                !                p=>p1
+                !                do ii=POS,POS+MY_RING%n-1
+                !   write(6,*) "##########################################"
+                !   write(6,'(i4, 1x,a)') ii,p%mag%name
 
-                   call track(my_ring,X,ii,ii+1,MY_STATE)
+                !                  call track(my_ring,X,ii,ii+1,MY_STATE)
+                stable_ray=track_flag(my_ring,X,POS,pos+MY_RING%n,MY_STATE)
+                if(stable_ray/=0) exit
+                !    write(6,'(6E8.4)') x
 
-                   write(6,'(6E8.4)') x
-
-                   write(MFR,'(i4, 1x,a)') ii,p%mag%name
-                   WRITE(MFR,301) X
+                !  write(MFR,'(i4, 1x,a)') ii,p%mag%name
+                !  WRITE(MFR,301) X
 
 
-                   call produce_aperture_flag(apertflag)
-                   write(6,*) "apertflag ", apertflag
-                   if (apertflag/=0) then
-                      print *, 'Particle out of aperture!'
+                !                   call produce_aperture_flag(apertflag)
+                !    write(6,*) "apertflag ", apertflag
+                !                   if (apertflag/=0) then
+                !                      print *, 'Particle out of aperture!'
 
-                      call ANALYSE_APERTURE_FLAG(apertflag,why)
-                      Write(6,*) "ptc_trackline: APERTURE error for element: ",ii," name: ",p%MAG%name
-                      Write(6,*) "Message: ",c_%message
-                      write(whymsg,*) 'APERTURE error: ',why
+                !                      call ANALYSE_APERTURE_FLAG(apertflag,why)
+                !                      Write(6,*) "ptc_trackline: APERTURE error for element: ",ii," name: ",p%MAG%name
+                !                      Write(6,*) "Message: ",c_%message
+                !                      write(whymsg,*) 'APERTURE error: ',why
 
-                      exit; !goes to the ne
-                   endif
+                !                      exit; !goes to the ne
+                !                   endif
 
-                   p=>p%next
+                !                   p=>p%next
 
-                enddo
+                !                enddo
 
              ENDDO
+             if(stable_ray==0) WRITE(MFR,301) dlim_t
           ENDDO
 
           CLOSE(MFR)
+
 
        case('PRINTFRAMES')
 
@@ -977,6 +994,11 @@ contains
              endif
           endif
           CALL radia(MY_RING,POS,FILENAME,fileTUNE)
+
+       case('SPECIALALEX')
+          READ(MF,*) I1,I2
+
+          CALL special_alex_main_ring(MY_RING,i1,i2)
 
        case('THINEXAMPLE')
           READ(MF,*) I1,I2,FILENAME

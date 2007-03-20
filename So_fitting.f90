@@ -838,41 +838,139 @@ contains
 
   end subroutine lattice_PRINT_RES_FROM_A
 
-  subroutine lattice_random_error(R,nom,cut,n,addi,integrated,cn,cns)
+  !          call lattice_random_error(my_ring,name,i1,i2,cut,n,addi,integrated,cn,cns,sc)
+
+  subroutine lattice_random_error(R,nom,i1,i2,cut,n,addi,integrated,cn,cns,per)
     use gauss_dis
     IMPLICIT NONE
     TYPE(layout), intent(inout):: R
-    integer n,addi,ic,i
+    integer n,addi,ic,i,i1,i2,j
     character(nlp) nom
     type(fibre), pointer :: p
-    logical(lp) integrated
-    real(dp) x,bn,cn,cns,cut
+    logical(lp) integrated,f1,f2
+    real(dp) x,bn,cn,cns,cut,per
 
-
+    if(i1>i2) then
+       Write(6,*) " error i1 > i2 ",i1,i2
+       return
+    elseif(i2>nlp)then
+       Write(6,*) " error i2 > nlp ",i2,nlp
+       return
+    endif
 
     call context(nom)
+
     ic=0
     p=>r%start
     do i=1,r%n
-       if(p%mag%name==nom) then
+       f1=.false.
+       f2=.false.
+       if(i1>=0) then
+          f1=(p%mag%name(i1:i2)==nom(i1:i2))
+       else
+          f1=(p%mag%name ==nom )
+       endif
+
+
+       if(f1) then
           call GRNF(X,cut)
           bn=cns+cn*x
           if(integrated.and.p%mag%p%ld/=zero) then
              bn=bn/p%mag%l
           endif
           call add(p,n,addi,bn)
-          ic=ic+1
+          f2=.true.
        endif
+
+       if(f1.and.per/=zero ) then
+          do j=p%mag%p%nmul,1,-1
+             call GRNF(X,cut)
+             if(n>0) then
+                bn=p%mag%bn(j)
+                bn=bn*(one+x*per)
+             else
+                bn=p%mag%an(j)
+                bn=bn*(one+x*per)
+             endif
+             call add(p,n,0,bn)
+
+          enddo
+          f2=.true.
+       endif
+       if(f2) ic=ic+1
        p=>P%next
     enddo
 
     write(6,*) ic," Magnets modified "
+
   end  subroutine lattice_random_error
 
   subroutine toggle_verbose
     implicit none
     verbose=.not.verbose
   end   subroutine toggle_verbose
+
+  subroutine special_alex_main_ring(r,i1,i2)
+    implicit none
+    TYPE(layout), target, intent(inout):: R
+    integer  i1,i2,it1,it2,I,N,NU,N2,NP2
+    type(fibre), pointer :: p1,p2
+    TYPE(POL_BLOCK) QC(10)
+    TYPE(REAL_8) Y(6)
+    TYPE(DAMAP) ID
+    REAL(DP) X(6)
+    TYPE(INTERNAL_STATE) STATE
+    LOGICAL(LP) U
+    type(normalform) nf
+    N=10
+    NU=4
+
+    if(.not.associated(r%t)) then
+       write(6,*) " thin lens lattice not made "
+       stop 300
+    endif
+
+    call move_to(r,p1,i1)
+    call move_to(r,p2,i2)
+
+    write(6,*) p1%mag%name,p1%mag%p%nst
+    write(6,*) p2%mag%name,p2%mag%p%nst
+
+    IT1=p1%T1%POS+2 + (p1%mag%p%nst/2 )
+    IT2=p2%T1%POS+2 + (p2%mag%p%nst/2 )
+
+    write(6,*) IT1,IT2
+
+    DO I=1,NU
+       QC(I)=0
+    ENDDO
+    QC(1)%NAME='QFX'
+    QC(2)%NAME='QDX'
+    QC(3)%NAME='QFN'
+    QC(4)%NAME='QDN'
+
+    DO I=1,NU
+       QC(I)%IBN(2)=I
+    ENDDO
+
+    DO I=1,NU
+       R=QC(I)
+    ENDDO
+
+    STATE=DEFAULT0+ONLY_4D0
+    X=0.D0
+    CALL INIT(STATE,2,4,BERZ,N2,NP2)
+    CALL ALLOC(ID); call alloc(nf);
+    ID=1
+    Y=X+ID
+    !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
+    CALL TRACK(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
+    CALL PRINT(Y(1),6)
+    nf=y
+    call print(nf%dhdj%v(1),6)
+    call print(nf%dhdj%v(2),6)
+    CALL KILL_PARA(R)
+  end   subroutine special_alex_main_ring
 
 
 
@@ -2546,6 +2644,59 @@ contains
        P=>P%NEXT
     ENDDO
   end SUBROUTINE MESS_UP_ALIGNMENT
+
+
+  !          CALL MESS_UP_ALIGNMENT_name(my_ring,name,i1,i2,SIG,cut)
+
+  subroutine MESS_UP_ALIGNMENT_name(R,nom,i1,i2,sig,cut)
+    use gauss_dis
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    integer i1,i2,j,ic,i
+    character(nlp) nom
+    type(fibre), pointer :: p
+    logical(lp) integrated,f1
+    real(dp) cut,sig(6),mis(6),x
+
+    if(i1>i2) then
+       Write(6,*) " error i1 > i2 ",i1,i2
+       return
+    elseif(i2>nlp) then
+       Write(6,*) " error i2 > nlp ",i2,nlp
+       return
+    endif
+
+    call context(nom)
+
+    ic=0
+
+
+    p=>r%start
+    do i=1,r%n
+
+       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1) THEN
+          f1=.false.
+          if(i1>=0) then
+             f1=(p%mag%name(i1:i2)==nom(i1:i2))
+          else
+             f1=(p%mag%name ==nom )
+          endif
+          if(f1) then
+             ic=ic+1
+             DO J=1,6
+                call GRNF(X,cut)
+                MIS(J)=X*SIG(J)
+             ENDDO
+             call MISALIGN_FIBRE(p,mis)
+          endif
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+
+    write(6,*) ic," Magnets misalgned "
+
+  end  subroutine MESS_UP_ALIGNMENT_name
+
 
 
 

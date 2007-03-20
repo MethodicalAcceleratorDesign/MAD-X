@@ -470,9 +470,9 @@ contains
 
     WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ELEMENT $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     if(m%vorname(1:1)==' ') then
-       WRITE(MF,*) M%KIND,M%NAME, 'NOVORNAME'
+       WRITE(MF,*) M%KIND,M%NAME, ' NOVORNAME'
     ELSE
-       WRITE(MF,*) M%KIND,M%NAME,M%VORNAME
+       WRITE(MF,*) M%KIND,M%NAME,' ',M%VORNAME
     ENDIF
     WRITE(MF,*) M%L,M%PERMFRINGE,M%MIS,M%EXACTMIS, " L,PERMFRINGE,MIS,EXACTMIS "
     WRITE(LINE,*) M%FINT,M%HGAP,M%H1,M%H2, " FINT,HGAP,H1,H2 "

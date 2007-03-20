@@ -812,12 +812,13 @@ contains
              nda = nda + 1
              ind=nda
              if(nda.gt.lda) then
-                write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
-                ipause=mypauses(10,line)
+                write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                !    ipause=mypauses(10,line)
                 call dadeb(31,'ERR DAALL ',1)
+                stop 111
              endif
           endif
-
+          !write(30,*) no,ind,lda,size(allvec)
           allvec(ind) = .true.
 
           ic(i) = ind

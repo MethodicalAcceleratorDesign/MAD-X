@@ -880,7 +880,7 @@ CONTAINS
           ipause=mypause(0)
        enddo
 
-       call res_bas_spin(tunes,n0,b)
+       call res_bas_spin(R,tunes,n0,b)
        theta0=one
        call exp_n_theta(theta0,b,s1)
        call inv_as(s1,s1i)
@@ -945,17 +945,42 @@ CONTAINS
 
   END subroutine EQUAL_NORMAL_DASPIN
 
-  subroutine res_bas_spin(tunes,n0,b)
+  subroutine CHECK_RES_ORBIT(J,NRES,M,SKIP)
+    implicit none
+    INTEGER M(:,:),NRES
+    LOGICAL SKIP,SKIP1,SKIP2
+    INTEGER I,K,J(:)
+
+    SKIP=.FALSE.
+    IF(NRES==0) RETURN
+
+    DO I=1,NRES
+       SKIP1=.TRUE.
+       SKIP2=.TRUE.
+       DO K=1,C_%ND
+          SKIP1=((J(2*K)-J(2*K-1))==M(k,i)).AND.SKIP1
+          SKIP2=((J(2*K)-J(2*K-1))==-M(k,i)).AND.SKIP2
+       ENDDO
+       IF(SKIP1.OR.SKIP2) THEN
+          SKIP=.TRUE.
+          RETURN
+       ENDIF
+    ENDDO
+
+  END subroutine CHECK_RES_ORBIT
+
+  subroutine res_bas_spin(R,tunes,n0,b)
     implicit none
     type(real_8) n0(3),b(3)
     real(dp) tunes(4)
+    type(NORMAL_SPIN) R
     type(taylorresonance) tr
     type(complextaylor) nc(2),ni(2),nr(2),ax(2),az(2)
     integer n,i,k,ndc,kk
     integer, allocatable :: j(:)
     real(dp) val
     complex(dp) r1,r2,ex
-    logical(lp) reso
+    logical(lp) reso,SKIP
     type(taylor) t
 
     ndc=0
@@ -975,7 +1000,7 @@ CONTAINS
     nc(1)=zero
     nc(2)=zero
     call taylor_cycle(tr%cos,N)
-    kk=0
+    kk=1
     do i=1,n
        call taylor_cycle(tr%cos,kk,val,J)
        ex=one
@@ -992,7 +1017,7 @@ CONTAINS
     ni(1)=zero
     ni(2)=zero
     call taylor_cycle(tr%sin,N)
-    kk=0
+    kk=1
     do i=1,n
        call taylor_cycle(tr%sin,kk,val,J)
 
@@ -1014,7 +1039,7 @@ CONTAINS
     nc(1)=zero
     nc(2)=zero
     call taylor_cycle(tr%cos,N)
-    kk=0
+    kk=1
     do i=1,n
        call taylor_cycle(tr%cos,kk,val,J)
        ex=one
@@ -1030,7 +1055,7 @@ CONTAINS
     ni(1)=zero
     ni(2)=zero
     call taylor_cycle(tr%sin,N)
-    kk=0
+    kk=1
     do i=1,n
        call taylor_cycle(tr%sin,kk,val,J)
        ex=one
@@ -1064,37 +1089,43 @@ CONTAINS
 
     nc(1)=zero
     call taylor_cycle(tr%cos,N)
-    kk=0
+    kk=1
     do i=1,n
        call taylor_cycle(tr%cos,kk,val,J)
-       ex=one
-       reso=.true.
-       do k=1,c_%nd-ndc
-          ex=ex*exp(i_*(j(2*k-1)-j(2*k))*tunes(k)  )
-          reso=reso.and.(j(2*k-1)==j(2*k))
-       enddo
-       r1=(one- ex )
-       if(.not.reso) then
-          nc(1)=nc(1)+((val/r1).mono.j)
-       endif
+       CALL CHECK_RES_ORBIT(J,R%N%NRES,R%N%M,SKIP)
+       IF(.NOT.SKIP) THEN ! SKIP
+          ex=one
+          reso=.true.
+          do k=1,c_%nd-ndc
+             ex=ex*exp(i_*(j(2*k-1)-j(2*k))*tunes(k)  )
+             reso=reso.and.(j(2*k-1)==j(2*k))
+          enddo
+          r1=(one- ex )
+          if(.not.reso) then
+             nc(1)=nc(1)+((val/r1).mono.j)
+          endif
+       ENDIF ! SKIP
     enddo
 
     ni(1)=zero
     call taylor_cycle(tr%sin,N)
-    kk=0
+    kk=1
     do i=1,n
        call taylor_cycle(tr%sin,kk,val,J)
-       ex=one
-       reso=.true.
-       do k=1,c_%nd-ndc
-          ex=ex*exp(i_*(j(2*k-1)-j(2*k))*tunes(k)  )
-          reso=reso.and.(j(2*k-1)==j(2*k))
-       enddo
-       r1=(one- ex )
-       if(.not.reso) then
-          ni(1)=ni(1)+((val/r1).mono.j)
-       endif
+       CALL  CHECK_RES_ORBIT(J,R%N%NRES,R%N%M,SKIP)
+       IF(.NOT.SKIP) THEN ! SKIP
+          ex=one
+          reso=.true.
+          do k=1,c_%nd-ndc
+             ex=ex*exp(i_*(j(2*k-1)-j(2*k))*tunes(k)  )
+             reso=reso.and.(j(2*k-1)==j(2*k))
+          enddo
+          r1=(one- ex )
+          if(.not.reso) then
+             ni(1)=ni(1)+((val/r1).mono.j)
+          endif
 
+       ENDIF ! SKIP
     enddo
 
     az(1)=nc(1)+i_*ni(1)
@@ -1843,6 +1874,8 @@ CONTAINS
     CALL alloc(D%n)
     CALL alloc_33(D%ns)
     CALL alloc_33(D%as)
+    D%NRES=0
+    D%M=0
 
   END    subroutine alloc_normal_spin
 

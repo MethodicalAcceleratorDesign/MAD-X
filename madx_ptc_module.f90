@@ -48,13 +48,16 @@ CONTAINS
 
   subroutine ptc_create_universe()
     implicit none
+    real(kind(1d0)) get_value
 
     print77=.true.
     read77 =.true.
 
     if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
-
+    sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
+    sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
+    if(sector_nmul_max.lt.sector_nmul) call aafail('sector_nmul_max must be larger than sector_n: ','check your ptc_create_universe input')
     call set_up_universe(m_u)
     universe=universe+1
 
@@ -145,7 +148,7 @@ CONTAINS
     integer             sector_nmul_max0,sector_nmul0,sector_nmul1
     integer             model
     integer             method0,method1
-    integer             nst0,nst1
+    integer             nst0,nst1,ord_max
     REAL (dp) :: tempdp
     logical(lp):: ptcrbend,truerbend
     !---------------------------------------------------------------
@@ -208,10 +211,10 @@ CONTAINS
        print *, 'INPUT PARAMETERS ARE:'
     endif
 
-    sector_nmul_max0 = get_value('ptc_create_layout ','sector_nmul_max ')
+    sector_nmul_max0 = get_value('ptc_create_universe ','sector_nmul_max ')
     if (getdebug() > 1) print*,'  Global max sector_nmul: ',sector_nmul_max0
 
-    sector_nmul0 = get_value('ptc_create_layout ','sector_nmul ')
+    sector_nmul0 = get_value('ptc_create_universe ','sector_nmul ')
     if (getdebug() > 1) print*,'  Global sector_nmul: ',sector_nmul0
 
 
@@ -426,7 +429,7 @@ CONTAINS
        endif
        key%magnet="rbend"
        !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
        key%list%b0=node_value('angle ')+tempdp*l
@@ -496,7 +499,9 @@ CONTAINS
        endif
        key%magnet="sbend"
        !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
+       if(sector_nmul_max.lt.ord_max.and.EXACT_MODEL) call aafail('the order of multipoles in a sbend in exact mode cannot be ',&
+            &'larger than sector_mul_max: check your ptc_create_universe input')
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
        key%list%b0=node_value('angle ')+ tempdp*l
@@ -538,7 +543,7 @@ CONTAINS
     case(5) ! PTC accepts mults
        key%magnet="quadrupole"
        !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! Read data & fill %k(:), %ks(:) arrays which are
        ! summs of multipoles and errors
@@ -564,7 +569,7 @@ CONTAINS
     case(6)
        key%magnet="sextupole"
        !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! sextupole components
        sk2= node_value('k2 ')
@@ -589,7 +594,7 @@ CONTAINS
     case(7) ! PTC accepts mults
        key%magnet="octupole"
        !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! octupole components
        sk3= node_value('k3 ')
@@ -667,7 +672,7 @@ CONTAINS
           stop
        endif
        !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123)
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
     case(10)
        key%magnet="rfcavity"
@@ -816,7 +821,7 @@ CONTAINS
   END subroutine ptc_input
   !_________________________________________________________________
 
-  SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123)
+  SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123,ord_max)
     implicit none
     ! 1) read multipole coeff. and errors for a current thick element
     ! 2) fill the error and multiploes arrays of data-bases
@@ -828,7 +833,7 @@ CONTAINS
          f_errors(0:50), field(2,0:maxmul)
     INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
     INTEGER :: node_fd_errors ! function
-    integer :: i_count, n_dim_mult_err
+    integer :: i_count, n_dim_mult_err, ord_max
 
     !initialization
     normal_0123(:)=zero
@@ -844,6 +849,9 @@ CONTAINS
     ! Assign values from the command line                       !
     call get_node_vector('knl ',n_norm,normal)                  !
     call get_node_vector('ksl ',n_skew,skew)                    !
+    if(n_norm.ge.maxmul) n_norm=maxmul-1       !
+    if(n_skew.ge.maxmul) n_skew=maxmul-1       !
+    ord_max=max(n_norm,n_skew)
     ! void get_node_vector(char*par,int*length,double* vector)  !
     ! /* returns vector for parameter par of current element */ !
     !                                                           !

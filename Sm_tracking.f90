@@ -1102,7 +1102,7 @@ contains
 
     ! KNOB IS RETURNED TO THE PTC DEFAULT
     ! NEW STUFF WITH KIND=3
-    KNOB=.FALSE.
+    KNOB=ALWAYS_knobs
     ! END NEW STUFF WITH KIND=3
 
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
@@ -1346,7 +1346,7 @@ contains
     lost_fibre=>c
 
     ! new stuff with kind=3
-    knob=.FALSE.
+    knob=ALWAYS_knobs
     ! end new stuff with kind=3
     if(COMPUTE) then
        ! Radiation

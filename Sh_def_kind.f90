@@ -120,7 +120,7 @@ MODULE S_DEF_KIND
   real(dp), target :: phase0=-pi
   real(dp), target :: wedge_coeff(2)
   logical(lp), target :: MAD8_WEDGE=.TRUE.
-  INTEGER , target :: CAVITY_TOTALPATH=1
+  INTEGER , target :: CAVITY_TOTALPATH=0   !  default is fake
   logical(lp) :: bug_intentional=.true.
   ! stochastic radiation in straigth
 
@@ -9810,26 +9810,28 @@ contains
   SUBROUTINE GETANBNR(EL)
     IMPLICIT NONE
     TYPE(TEAPOT),INTENT(INOUT):: EL
-    INTEGER I,J,K,POW
+    INTEGER I,J,K,POW,nmul
 
-    IF(EL%P%NMUL> SECTOR_NMUL_MAX) THEN
-       WRITE(6,*) " EL%P%NMUL > SECTOR_NMUL_MAX : CANNOT CONTINUE"
-       STOP 1
+    nmul=EL%P%NMUL
+    IF(EL%P%NMUL> SECTOR_NMUL) THEN
+       !  WRITE(6,*) " EL%P%NMUL > SECTOR_NMUL_MAX : CANNOT CONTINUE"
+       nmul=SECTOR_NMUL
+       !      STOP 1
     ENDIF
 
-    DO I=1,S_B(EL%P%NMUL)%N_MONO
+    DO I=1,S_B(NMUL)%N_MONO
        EL%BF_X(I)=zero
        EL%BF_Y(I)=zero
     ENDDO
-    DO I=1,EL%P%NMUL
-       DO J=1,S_B(EL%P%NMUL)%N_MONO
-          K=S_B(EL%P%NMUL)%I(J)+S_B(EL%P%NMUL)%J(J)
+    DO I=1,NMUL
+       DO J=1,S_B(NMUL)%N_MONO
+          K=S_B(NMUL)%I(J)+S_B(NMUL)%J(J)
           POW=K+1-I
           IF(K+1>=I) THEN
 
 
-             EL%BF_X(J)=EL%BF_X(J)+(EL%AN(I)*S_B(EL%P%NMUL)%A_X(I,J)+EL%BN(I)*S_B(EL%P%NMUL)%B_X(I,J))*EL%P%B0**POW
-             EL%BF_Y(J)=EL%BF_Y(J)+(EL%AN(I)*S_B(EL%P%NMUL)%A_Y(I,J)+EL%BN(I)*S_B(EL%P%NMUL)%B_Y(I,J))*EL%P%B0**POW
+             EL%BF_X(J)=EL%BF_X(J)+(EL%AN(I)*S_B(NMUL)%A_X(I,J)+EL%BN(I)*S_B(NMUL)%B_X(I,J))*EL%P%B0**POW
+             EL%BF_Y(J)=EL%BF_Y(J)+(EL%AN(I)*S_B(NMUL)%A_Y(I,J)+EL%BN(I)*S_B(NMUL)%B_Y(I,J))*EL%P%B0**POW
 
           ENDIF
        ENDDO
@@ -9841,30 +9843,33 @@ contains
   SUBROUTINE GETANBNP(EL)
     IMPLICIT NONE
     TYPE(TEAPOTP),INTENT(INOUT):: EL
-    INTEGER I,J,K,POW
+    INTEGER I,J,K,POW,nmul
 
-    IF(EL%P%NMUL> SECTOR_NMUL_MAX) THEN
-       WRITE(6,*) " EL%P%NMUL > SECTOR_NMUL_MAX : CANNOT CONTINUE"
-       STOP 1
+    nmul=EL%P%NMUL
+    IF(EL%P%NMUL> SECTOR_NMUL) THEN
+       !  WRITE(6,*) " EL%P%NMUL > SECTOR_NMUL_MAX : CANNOT CONTINUE"
+       nmul=SECTOR_NMUL
+       !      STOP 1
     ENDIF
 
-    DO I=1,S_B(EL%P%NMUL)%N_MONO
+    DO I=1,S_B(NMUL)%N_MONO
        EL%BF_X(I)=zero
        EL%BF_Y(I)=zero
     ENDDO
-    DO I=1,EL%P%NMUL
-       DO J=1,S_B(EL%P%NMUL)%N_MONO
-          K=S_B(EL%P%NMUL)%I(J)+S_B(EL%P%NMUL)%J(J)
+    DO I=1,NMUL
+       DO J=1,S_B(NMUL)%N_MONO
+          K=S_B(NMUL)%I(J)+S_B(NMUL)%J(J)
           POW=K+1-I
           IF(K+1>=I) THEN
 
 
-             EL%BF_X(J)=EL%BF_X(J)+(EL%AN(I)*S_B(EL%P%NMUL)%A_X(I,J)+EL%BN(I)*S_B(EL%P%NMUL)%B_X(I,J))*EL%P%B0**POW
-             EL%BF_Y(J)=EL%BF_Y(J)+(EL%AN(I)*S_B(EL%P%NMUL)%A_Y(I,J)+EL%BN(I)*S_B(EL%P%NMUL)%B_Y(I,J))*EL%P%B0**POW
+             EL%BF_X(J)=EL%BF_X(J)+(EL%AN(I)*S_B(NMUL)%A_X(I,J)+EL%BN(I)*S_B(NMUL)%B_X(I,J))*EL%P%B0**POW
+             EL%BF_Y(J)=EL%BF_Y(J)+(EL%AN(I)*S_B(NMUL)%A_Y(I,J)+EL%BN(I)*S_B(NMUL)%B_Y(I,J))*EL%P%B0**POW
 
           ENDIF
        ENDDO
     ENDDO
+
 
 
 
@@ -10242,7 +10247,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN):: YL
     TYPE(TEAPOT),INTENT(IN):: EL
-    real(dp) X1,X3,X5,BX,BY,BTX,BTY,B(3),B2
+    real(dp) X1,X3,X5,BX,BY,BTX,BTY,B(3),B2,BtYT
     INTEGER J,M,A,K,DIR
 
     !    if(abs(x(1))+abs(x(3))+abs(x(2))+abs(x(4))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
@@ -10268,7 +10273,9 @@ contains
     BY=zero
 
     k=0
-    m=EL%P%nmul-1
+
+    m=SECTOR_NMUL-1
+    !    m=EL%P%nmul-1
     do a=m,1,-1
        BTX=zero
        BTY=zero
@@ -10303,6 +10310,30 @@ contains
     BX= BX+BTX+EL%BF_X(k)  !+X3
     BY= BY+BTY+EL%BF_Y(k)  !+X3
 
+    ! etienne
+    IF(EL%P%NMUL>SECTOR_NMUL) THEN
+       BtY=EL%BN(EL%P%NMUL)
+       BtX=EL%AN(EL%P%NMUL)
+
+
+       DO  J=EL%P%NMUL-1,SECTOR_NMUL+1,-1
+          BtYT=X1*BtY-X3*BtX+EL%BN(J)
+          BtX =X3*BtY+X1*BtX+EL%AN(J)
+          BtY =BtYT
+       ENDDO
+
+       DO  J=SECTOR_NMUL, 1,-1
+          BtYT=X1*BtY-X3*BtX
+          BtX =X3*BtY+X1*BtX
+          BtY =BtYT
+       ENDDO
+
+       BX= BX-BTX
+       BY= BY+BTY
+
+    ENDIF
+
+
 
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
@@ -10334,14 +10365,14 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8),INTENT(IN):: YL
     TYPE(TEAPOTP),INTENT(IN):: EL
-    TYPE(REAL_8) X1,X3,BX,BY,BTX,BTY,X5,B(3),B2
+    TYPE(REAL_8) X1,X3,BX,BY,BTX,BTY,X5,B(3),B2,BTYt
     INTEGER J,M,A,K,DIR
 
     real(dp) junk
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
-    CALL ALLOC(X1,X3,BX,BY,BTX,BTY,X5,B2)
+    CALL ALLOC(X1,X3,BX,BY,BTX,BTY,X5,B2,BTYt)
     CALL ALLOC(B,3)
     X1=X(1)
     X3=X(3)
@@ -10359,7 +10390,8 @@ contains
     ! x1=one.mono.'1'
     ! x3=one.mono.'01'
     k=0
-    m=EL%P%nmul-1
+    m=SECTOR_NMUL-1
+    !    m=EL%P%nmul-1
     do a=m,1,-1
        BTX=zero
        BTY=zero
@@ -10394,21 +10426,28 @@ contains
     BX= BX+BTX+EL%BF_X(k)  !+X3
     BY= BY+BTY+EL%BF_Y(k)  !+X3
 
+    ! etienne
+    IF(EL%P%NMUL>SECTOR_NMUL) THEN
+       BtY=EL%BN(EL%P%NMUL)
+       BtX=EL%AN(EL%P%NMUL)
 
-    !    do k=1,sector_b%n_mono
-    !     bx=bx+EL%BF_X(k)*x1**sector_b%i(k)*x3**sector_b%j(k)
-    !     by=by+EL%BF_y(k)*x1**sector_b%i(k)*x3**sector_b%j(k)
-    !    enddo
-    ! junk=el%p%b0
-    ! write(16,*)"el%p%b0 = ", junk
-    ! call print(bx,16)
-    ! call print(by,16)
-    ! B(1)=BY/morph(one+(one.mono.'1')*EL%P%B0)
-    ! B(2)=-Bx/morph(one+(one.mono.'1')*EL%P%B0)
-    ! write(16,*) "******************************"
-    ! call print(b(1),16)
-    ! call print(b(2),16)
-    ! stop 999
+
+       DO  J=EL%P%NMUL-1,SECTOR_NMUL+1,-1
+          BtYT=X1*BtY-X3*BtX+EL%BN(J)
+          BtX =X3*BtY+X1*BtX+EL%AN(J)
+          BtY =BtYT
+       ENDDO
+
+       DO  J=SECTOR_NMUL, 1,-1
+          BtYT=X1*BtY-X3*BtX
+          BtX =X3*BtY+X1*BtX
+          BtY =BtYT
+       ENDDO
+
+       BX= BX-BTX
+       BY= BY+BTY
+
+    ENDIF
 
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
@@ -10431,7 +10470,7 @@ contains
        endif
     ENDIF
 
-    CALL KILL(X1,X3,BX,BY,BTX,BTY,X5,B2)
+    CALL KILL(X1,X3,BX,BY,BTX,BTY,X5,B2,BtYT)
     CALL KILL(B,3)
 
   END SUBROUTINE SKICKP
@@ -10441,7 +10480,7 @@ contains
     TYPE(ENV_8),INTENT(INOUT):: Y(6)
     TYPE(REAL_8),INTENT(IN):: YL
     TYPE(TEAPOTP),INTENT(IN):: EL
-    TYPE(REAL_8) X1,X3,BX,BY,BTX,BTY,X5,B(3),B2,X(6),DENF,XR(6)
+    TYPE(REAL_8) X1,X3,BX,BY,BTX,BTY,X5,B(3),B2,X(6),DENF,XR(6),BtYT
     TYPE(DAMAP) XP,ID,DISP,XT
     INTEGER J,M,A,K,I,DIR
     real(dp) B20,B30,BF, v(6)  !,R1,R2,DEN0
@@ -10450,7 +10489,7 @@ contains
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
-    CALL ALLOC(X1,X3,BX,BY,BTX,BTY,X5,B2)
+    CALL ALLOC(X1,X3,BX,BY,BTX,BTY,X5,B2,BtYT)
     CALL ALLOC(B,3)
     CALL ALLOC(X)
     CALL ALLOC(XP)
@@ -10479,7 +10518,8 @@ contains
     BY=zero
 
     k=0
-    m=EL%P%nmul-1
+    m=SECTOR_NMUL-1
+    !    m=EL%P%nmul-1
     do a=m,1,-1
        BTX=zero
        BTY=zero
@@ -10513,6 +10553,31 @@ contains
     !    b%j(k)=0
     BX= BX+BTX+EL%BF_X(k)  !+X3
     BY= BY+BTY+EL%BF_Y(k)  !+X3
+
+    ! etienne
+    IF(EL%P%NMUL>SECTOR_NMUL) THEN
+       BtY=EL%BN(EL%P%NMUL)
+       BtX=EL%AN(EL%P%NMUL)
+
+
+       DO  J=EL%P%NMUL-1,SECTOR_NMUL+1,-1
+          BtYT=X1*BtY-X3*BtX+EL%BN(J)
+          BtX =X3*BtY+X1*BtX+EL%AN(J)
+          BtY =BtYT
+       ENDDO
+
+       DO  J=SECTOR_NMUL, 1,-1
+          BtYT=X1*BtY-X3*BtX
+          BtX =X3*BtY+X1*BtX
+          BtY =BtYT
+       ENDDO
+
+       BX= BX-BTX
+       BY= BY+BTY
+
+    ENDIF
+
+
 
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
@@ -10604,7 +10669,7 @@ contains
 
 
     Y=X
-    CALL KILL(X1,X3,BX,BY,BTX,BTY,X5,B2)
+    CALL KILL(X1,X3,BX,BY,BTX,BTY,X5,B2,BtYT)
     CALL KILL(B,3)
     CALL KILL(denf)
     CALL KILL(X)
@@ -12430,7 +12495,6 @@ contains
        BBYTW=zero
        BBXTW=zero
     ENDIF
-
 
     IF(EL%P%RADIATION) THEN
        B(1)=BBXTW
@@ -14632,11 +14696,13 @@ contains
 
     IF(I==-1) THEN
        if(ASSOCIATED(EL%bf_x)) then
-          CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
+          CALL KILL(EL%bf_x,S_B(SECTOR_NMUL)%N_MONO)   ! not used, will be used locally only
+          !          CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
           deallocate(EL%bf_x)
        endif
        if(ASSOCIATED(EL%bf_Y)) then
-          CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
+          CALL KILL(EL%bf_Y,S_B(SECTOR_NMUL)%N_MONO)   ! not used, will be used locally only
+          !          CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
           deallocate(EL%bf_Y)
        endif
        if(ASSOCIATED(EL%DRIFTKICK)) then

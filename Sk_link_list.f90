@@ -1398,6 +1398,7 @@ CONTAINS
     deallocate(L%ORBIT_BETA0)
     deallocate(L%ORBIT_LMAX)
     deallocate(L%orbit_kinetic)
+    deallocate(L%orbit_brho)
     deallocate(L%ORBIT_MAX_PATCH_TZ)
     deallocate(L%ORBIT_mass_in_amu)
     deallocate(L%ORBIT_gammat)
@@ -1405,14 +1406,13 @@ CONTAINS
     deallocate(L%ORBIT_L)
     deallocate(L%ORBIT_CHARGE)
     deallocate(L%STATE)
+    deallocate(L%orbit_energy)
+    deallocate(L%orbit_gamma)
+    deallocate(L%orbit_dppfac)
+    deallocate(L%orbit_deltae)
+    deallocate(L%ORBIT_OMEGA_after,L%accel)
 
-    deallocate(L%NP)
-    deallocate(L%TURN)
-    deallocate(L%NV0)
-    deallocate(L%NV1)
-    deallocate(L%DV0)
-    deallocate(L%DV1)
-    deallocate(L%L_TOT)
+    deallocate(L%dxs6,L%xs6,L%first,L%freqb,L%freqa,L%voltb,L%volta,L%phasa,L%phasb)
 
     deallocate(L)
 
@@ -1476,16 +1476,24 @@ CONTAINS
        ALLOCATE(O%ORBIT_harmonic);O%ORBIT_harmonic=ONE
        ALLOCATE(O%ORBIT_CHARGE);O%ORBIT_CHARGE=1
        ALLOCATE(O%STATE);O%STATE=DEFAULT
-
-
-       ALLOCATE(O%NP);O%NP=0
-       ALLOCATE(O%TURN);O%TURN=0
-       ALLOCATE(O%NV0);O%NV0=0
-       ALLOCATE(O%NV1);O%NV1=0
-       ALLOCATE(O%DV0);O%DV0=ZERO
-       ALLOCATE(O%DV1);O%DV1=ZERO
-       ALLOCATE(O%L_TOT);O%L_TOT=ZERO
-
+       ALLOCATE(O%orbit_brho);O%orbit_brho=one
+       ALLOCATE(O%orbit_energy);O%orbit_energy=zero;
+       ALLOCATE(O%orbit_gamma);O%orbit_gamma=zero;
+       ALLOCATE(O%orbit_dppfac);O%orbit_dppfac=zero;
+       ALLOCATE(O%orbit_deltae);O%orbit_deltae=zero;
+       ALLOCATE(O%ORBIT_OMEGA_after);O%ORBIT_OMEGA_after=one
+       ALLOCATE(O%dxs6,O%xs6,O%first,O%freqb,O%freqa,O%voltb,O%volta,O%phasa,O%phasb)
+       ALLOCATE(O%accel);
+       O%freqb=zero
+       O%freqa=zero
+       O%voltb=zero
+       O%volta=zero
+       O%phasa=zero
+       O%phasb=zero
+       O%xs6=zero
+       O%dxs6=zero
+       O%first=my_true
+       O%accel=my_false
     ENDIF
   END SUBROUTINE Set_Up_ORBIT_LATTICE
 

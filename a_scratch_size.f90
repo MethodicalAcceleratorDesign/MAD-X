@@ -226,8 +226,9 @@ module precision_constants
      logical(lp), pointer :: MADLENGTH   ! =.false. rbend crazy length in mad8 as input
      logical(lp), pointer :: MAD         !=.false. mad definition of multipole for input only
      logical(lp), pointer :: EXACT_MODEL != .false. exact model used
-     logical(lp),pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
-     integer, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0
+     logical(lp), pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
+     logical(lp),pointer :: ALWAYS_knobs  !=.false. ptc knob default status
+     integer, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0  default
      integer,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
      ! creates a reverse propagator
      integer,pointer ::FIBRE_DIR         !=1 or -1 for reversed

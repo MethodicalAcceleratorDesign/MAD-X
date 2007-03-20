@@ -4009,10 +4009,14 @@ CONTAINS
     INTEGER I
     END_OF_LINE=.FALSE.
 
-    IF(.NOT.K%TOTALPATH) STOP 451
+    IF(.NOT.K%TOTALPATH) then
+       write(6,*) " Must used totalpath in tracking state "
+       STOP 451
+    endif
     IF(B%U(i)) RETURN
 
     X=BEAM_IN_X(B,I)
+
     T=>B%POS(I)%NODE
     T%PARENT_FIBRE%MAG=K
     T%PARENT_FIBRE%MAG%P%DIR=>T%PARENT_FIBRE%DIR
@@ -4725,37 +4729,37 @@ CONTAINS
     ENDIF
 
 
-    if(P%B0/=zero.AND.T%TEAPOT_LIKE==1) then
+    !   if(P%B0/=zero.AND.T%TEAPOT_LIKE==1) then
+    !
+
+    !       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+    !       R=one/P%B0
+    !       A=(X(1)+R)*(one/b+x(5))/PZ
+    !       A=ATAN(DT/(A+DT*X(2)/PZ) )
+    !       YL=A/P%B0
+    !       PT=one-X(2)*TAN(A)/PZ
+    !       XN(1)=(X(1)+R)/COS(A)/PT-R
+    !       XN(2)=X(2)*COS(A)+SIN(A)*PZ
+    !       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+    !       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+    !       X(1)=XN(1)
+    !       X(2)=XN(2)
+    !       X(3)=XN(3)
+    !       X(6)=XN(6)
+    !    else
 
 
-       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       R=one/P%B0
-       A=(X(1)+R)*(one/b+x(5))/PZ
-       A=ATAN(DT/(A+DT*X(2)/PZ) )
-       YL=A/P%B0
-       PT=one-X(2)*TAN(A)/PZ
-       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(6)=XN(6)
-    else
+    PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
 
+    YL=DT/(one/b+X(5))*PZ
 
-       PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
-
-       YL=DT/(one/b+X(5))*PZ
-
-       X(1)=X(1)+YL*X(2)/PZ
-       X(3)=X(3)+YL*X(4)/PZ
-       X(6)=X(6)+YL*(one/b+X(5))/PZ
+    X(1)=X(1)+YL*X(2)/PZ
+    X(3)=X(3)+YL*X(4)/PZ
+    X(6)=X(6)+YL*(one/b+X(5))/PZ
 
 
 
-    endif
+    !    endif
 
 
 
@@ -4783,35 +4787,35 @@ CONTAINS
     ENDIF
 
 
-    if(P%B0/=zero.AND.T%TEAPOT_LIKE==1) then
+    !    if(P%B0/=zero.AND.T%TEAPOT_LIKE==1) then
 
 
 
-       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       R=one/P%B0
-       A=-YL*P%B0
+    !      PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+    !      R=one/P%B0
+    !      A=-YL*P%B0
 
-       PT=one-X(2)*TAN(A)/PZ
-       !       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
-       !          WRITE(6,*) "XN(6)-X(6)-DT , DT",DT,XN(6)-X(6)-DT
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(6)=XN(6)
-    else
-       !       CALL DRIFT(YL,DL,P%beta0,1,P%EXACT,P%TIME,X)
-       PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+    !       PT=one-X(2)*TAN(A)/PZ
+
+    !       XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+    !       XN(2)=X(2)*COS(A)+SIN(A)*PZ
+    !       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+    !       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+    !          WRITE(6,*) "XN(6)-X(6)-DT , DT",DT,XN(6)-X(6)-DT
+    !      X(1)=XN(1)
+    !      X(2)=XN(2)
+    !      X(3)=XN(3)
+    !      X(6)=XN(6)
+    !   else
+    !       CALL DRIFT(YL,DL,P%beta0,1,P%EXACT,P%TIME,X)
+    PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
 
 
-       X(1)=X(1)-YL*X(2)/PZ
-       X(3)=X(3)-YL*X(4)/PZ
-       X(6)=X(6)-YL*(one/b+X(5))/PZ
+    X(1)=X(1)-YL*X(2)/PZ
+    X(3)=X(3)-YL*X(4)/PZ
+    X(6)=X(6)-YL*(one/b+X(5))/PZ
 
-    endif
+    !  endif
 
 
 
@@ -4841,35 +4845,35 @@ CONTAINS
 
     call alloc(xn,6); call alloc(pz,pt);
 
-    if(P%B0/=zero.AND.T%TEAPOT_LIKE==1) then
+    !    if(P%B0/=zero.AND.T%TEAPOT_LIKE==1) then
 
 
 
-       PZ=sqrt(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-       R=one/P%B0
-       A=-YL*P%B0
+    !       PZ=sqrt(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+    !       R=one/P%B0
+    !       A=-YL*P%B0
 
-       PT=one-X(2)*TAN(A)/PZ
-       !       XN(1)=(X(1)+R)/COS(A)/PT-R
-       XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
-       XN(2)=X(2)*COS(A)+SIN(A)*PZ
-       XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-       XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
-       !          WRITE(6,*) "XN(6)-X(6)-DT , DT",DT,XN(6)-X(6)-DT
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(6)=XN(6)
-    else
-       !       CALL DRIFT(YL,DL,P%beta0,1,P%EXACT,P%TIME,X)
-       PZ=sqrt(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+    !      PT=one-X(2)*TAN(A)/PZ
+
+    !      XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+    !      XN(2)=X(2)*COS(A)+SIN(A)*PZ
+    !      XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
+    !      XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+    !          WRITE(6,*) "XN(6)-X(6)-DT , DT",DT,XN(6)-X(6)-DT
+    !      X(1)=XN(1)
+    !      X(2)=XN(2)
+    !      X(3)=XN(3)
+    !      X(6)=XN(6)
+    !   else
+    !       CALL DRIFT(YL,DL,P%beta0,1,P%EXACT,P%TIME,X)
+    PZ=sqrt(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
 
 
-       X(1)=X(1)-YL*X(2)/PZ
-       X(3)=X(3)-YL*X(4)/PZ
-       X(6)=X(6)-YL*(one/b+X(5))/PZ
+    X(1)=X(1)-YL*X(2)/PZ
+    X(3)=X(3)-YL*X(4)/PZ
+    X(6)=X(6)-YL*(one/b+X(5))/PZ
 
-    endif
+    !   endif
 
     call kill(xn,6); call kill(pz,pt);
 
@@ -5099,9 +5103,9 @@ CONTAINS
 
     if(present(t)) then
        DO I=1,N
-          if(associated(B%POS(I)%NODE))then
-             B%POS(I)%NODE=>T
-          endif
+          ! if(associated(B%POS(I)%NODE))then
+          B%POS(I)%NODE=>T
+          ! endif
        ENDDO
 
     endif
