@@ -1304,8 +1304,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.43";
-char code_mod_date[] = "Code Modification Date: 05.03.2007";
+char myversion[] = "MAD-X 3.03.44";
+char code_mod_date[] = "Code Modification Date: 20.03.2007";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
