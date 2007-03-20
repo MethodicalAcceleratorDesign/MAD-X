@@ -600,10 +600,6 @@ CONTAINS
        sk3= node_value('k3 ')
        sk3s=node_value('k3s ')
 
-       print*,sk3
-       print*,sk3s
-       print*, "node_value('tilt ')",node_value('tilt ')
-
        tilt=node_value('tilt ')
        dum1=key%list%k(4)-normal_0123(3)
        dum2=key%list%ks(4)-skew_0123(3)
