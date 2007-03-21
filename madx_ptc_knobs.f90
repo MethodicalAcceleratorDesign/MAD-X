@@ -586,10 +586,10 @@ contains
     
     exactmatch = get_value('ptc_knob ','exactmatch ') .ne. 0
     if (exactmatch) then
-      print*,"addknob: Using Exact name match: ", fibrename
+!      print*,"addknob: Using Exact name match: ", fibrename
       pb%vorname = fibrename
-    else
-      print*,"addknob: Using Not Exact name match: all elements starting with ", fibrename
+!    else
+!      print*,"addknob: Using Not Exact name match: all elements starting with ", fibrename
     endif
 
     call comm_para('kn ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
@@ -637,7 +637,7 @@ contains
       print*, "setknobs: There are ", npolblocks, "pol_blocks"
     endif  
     
-    if ((npolblocks == 0) .and. (nknobs == 0) ) then
+    if ((npolblocks == 0) .and. (nknobs == 0) .and. (nknobi == 0)) then
       if (ALLOCATED(results)) call killparresult()
       currentrow = -1 
       return
@@ -927,10 +927,14 @@ contains
     
     getfunctionvalueat = zero
     
-!    print*,"Getting function ",n," at el ",el
     t => results(el,n)
-    
-    getfunctionvalueat = gettaylorvalue(t)
+
+    if (.not. associated(t)) then
+      print*,"Getting function ",n," at el ",el
+      getfunctionvalueat = zero
+    else
+      getfunctionvalueat = gettaylorvalue(t)
+    endif  
     
     
   end function getfunctionvalueat
@@ -1493,34 +1497,70 @@ contains
     fibrename = charconv(fibrenameIA)
     
 !    print *,"setknobvalue: fibrename is ", fibrename
-    
-    do i=1, npolblocks
-      if ( polblocks(i)%name == fibrename(1:nlp)) then
-         
-        kn = get_value('ptc_setknobvalue ','kn ') + 1 !madx numerates from 0
-        ks = get_value('ptc_setknobvalue ','ks ') + 1
-        if ( (kn>0) .and. (ks>0) ) then
-          call fort_warn("setknobvalue","Both kn and ks can not be specified together");
-          return
-        endif
-        
-        if ( kn>0 ) then
-          par = polblocks(i)%ibn(kn)
-        elseif ( ks>0 ) then
-          par = polblocks(i)%ian(ks)
-        else
-          call fort_warn("setknobvalue","Neither kn nor ks is specified");
-          return
-        endif
-          
-        exit
-      endif
-    enddo
 
-    if (par < 0) then
-      call fort_warn("setknobvalue","There is no knob defined on such element");
+
+    kn = get_value('ptc_setknobvalue ','kn ') + 1 !madx numerates from 0
+    ks = get_value('ptc_setknobvalue ','ks ') + 1
+
+    if ( (kn>0) .and. (ks>0) ) then
+      call fort_warn("setknobvalue","Both kn and ks can not be specified together");
       return
     endif
+
+    if ( (kn<=0) .and. (ks<=0) ) then
+       
+       print*, "Here we have an initial parameter"
+       
+       select case(fibrename(1:6))
+         case ('BETA11')
+           par = knobi%beta(1) 
+         case ('BETA22')
+           par = knobi%beta(2)
+         case ('BETA33')
+           par = knobi%beta(3)
+         case ('ALFA11')
+           par = knobi%ALFA(1)
+         case ('ALFA22')
+           par = knobi%ALFA(2)
+         case ('ALFA33')
+           par = knobi%alfa(3)
+         case ('DISP1 ')
+           par = knobi%DISPersion(1)
+         case ('DISP2 ')
+           par = knobi%DISPersion(2)
+         case ('DISP3 ')
+           par = knobi%DISPersion(3)
+         case ('DISP4 ')
+           par = knobi%dispersion(4)
+
+         case default
+           print*, "Name of initial condition parameter ",fibrename," not recognized"
+           return
+       end select
+       
+       par = par + getnknobsm() !init cond starts as parameters after field components
+    else
+
+       do i=1, npolblocks
+         if ( polblocks(i)%name == fibrename(1:nlp)) then
+
+           if ( kn>0 ) then
+             par = polblocks(i)%ibn(kn)
+           elseif ( ks>0 ) then
+             par = polblocks(i)%ian(ks)
+           endif
+
+           exit
+         endif
+       enddo
+
+       if (par < 0) then
+         call fort_warn("setknobvalue","There is no knob defined on such element");
+         return
+       endif
+
+    endif
+    
     
     v = get_value('ptc_setknobvalue ','value ')
     
@@ -1528,6 +1568,7 @@ contains
        print*, "Setting parameter ",par,"(el=",fibrename(1:16),", kn=",kn,", ks=",ks," ) to ", v
     endif
     
+    print*, "Setting par ", par, " to ", v, fibrename(1:6)
     call setparvalue(par, v)
     
     call filltwisstable()

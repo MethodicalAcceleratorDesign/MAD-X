@@ -420,6 +420,9 @@ contains
     call alloc(y)
     y=npara
     Y=X
+
+
+    call setknobs(my_ring)
     
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !  INIT Y that is tracked          !
@@ -436,8 +439,7 @@ contains
           return
        endif
     endif
-     
-    call setknobs(my_ring)
+
 
     !############################################################################
     !############################################################################
@@ -489,6 +491,8 @@ contains
        endif
        
        if (nda > 0) then
+!         if (getnknobis() > 0) c_%knob = my_true
+         !print*, "parametric",i,c_%knob
          call track(my_ring,y,i,i+1,+default)
        else
          call track(my_ring,y,i,i+1, default)
@@ -1142,8 +1146,6 @@ contains
       type(pol_block_inicond) :: inicondknobs
       integer k_system
       real(dp)  sizept, gam3, emiz
-      
-      k_system = getnknobis()     
  
       beta(1)  = get_value('ptc_twiss ','betx ')
       beta(2)  = get_value('ptc_twiss ','bety ')
@@ -1158,6 +1160,9 @@ contains
       mu(1)    = get_value('ptc_twiss ','mux ')
       mu(2)    = get_value('ptc_twiss ','muy ')
       mu(3)    = get_value('ptc_twiss ','muz ')
+
+      print*,"TW: Ini betas ",beta      
+      print*,"TW: Ini alfas ",alpha
       
       if (c_%nd == 3) then
         if (beta(3) <= zero) then
@@ -1191,30 +1196,46 @@ contains
 
       !  code to power knows
       ! 
-      k_system=0
-      inicondknobs = getknobinicond()
+      
+
       do i=1,c_%nd
         be(i)=beta(i)
         al(i)=alpha(i)
-
-        if(inicondknobs%beta(i)/=0) then
-          print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
-          call make_it_knob(be(i),k_system+inicondknobs%beta(i))
-        endif  
-
-        if(inicondknobs%alfa(i)/=0) then
-          print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
-          call make_it_knob(al(i),k_system+inicondknobs%alfa(i))
-        endif  
       enddo
-      
+
       do i=1,4
         di(i)=disp(i)
-        if(inicondknobs%dispersion(i)/=0) then
-          print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
-          call make_it_knob(di(i),k_system+inicondknobs%dispersion(i))
-        endif  
       enddo
+      
+      if (getnknobis() > 0) then
+        !POWER KNOBS
+        c_%knob = my_true
+
+        k_system= (c_%npara - c_%nd2) + getnknobsm()
+        inicondknobs = getknobinicond()
+
+        do i=1,c_%nd
+
+          if(inicondknobs%beta(i)/=0) then
+            print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
+            call make_it_knob(be(i),k_system+inicondknobs%beta(i))
+          endif  
+
+          if(inicondknobs%alfa(i)/=0) then
+            print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
+            call make_it_knob(al(i),k_system+inicondknobs%alfa(i))
+          endif  
+        enddo
+
+        do i=1,4
+          if(inicondknobs%dispersion(i)/=0) then
+            print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
+            call make_it_knob(di(i),k_system+inicondknobs%dispersion(i))
+          endif  
+        enddo
+
+      endif
+      
       
       y=x
       
@@ -1222,6 +1243,8 @@ contains
        y(2*i-1)= x(2*i-1) + sqrt(be(i)) * morph((one.mono.(2*i-1))    )
        y(2*i)= x(2*i) + one/sqrt(be(i)) * &
        (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
+!       call print(y(2*i-1),6)
+!       call print(y(2*i  ),6)
       enddo
       
 
