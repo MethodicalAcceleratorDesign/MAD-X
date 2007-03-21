@@ -128,6 +128,7 @@ int  run_ptccalculation(int setknobs,char* readstartval);
 void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks);
 int  madx_mpk_scalelimits(struct madx_mpk_variable* v);
 int  findsetknob(char* ename, int exactnamematch,char* initialpar);
+int  mapptctomad(char* ptcname,char* madxname);
 int  readstartvalues();
 /*******************************************/
 /*MAD-X Global Variables used in this file */
@@ -137,11 +138,11 @@ extern int              debuglevel;
 extern int              match_is_on;
 extern struct in_cmd*   this_cmd;
 extern struct command*  current_command;
+extern struct command*  current_twiss;
 extern char             match2_keepexpressions;
 extern int              total_const;
 extern struct sequence* current_sequ;  /* pointer to currently used sequence */
 extern struct el_list*  element_list;
-
 /************************************/
 /*MAD-X Functions used in this file */
 /************************************/
@@ -155,6 +156,7 @@ extern void             comm_para_(char*, int*, int*, int*, int*, double*, char*
 extern double           get_variable_(char*);
 extern void             set_variable_(char*, double*);
 extern void*            mymalloc(char* caller, size_t size);
+extern void*            mycalloc(char* caller, int n, size_t size);
 extern void             myfree(char* rout_name, void* p);
 extern void             warning(char* t1, char* fmt, ...); 
 extern void             warningnew(char* t1, char* fmt, ...); 
@@ -571,7 +573,7 @@ int madx_mpk_init()
         sprintf(&(vary[strlen(vary)]),"initial=%s; ",madx_mpk_knobs[i].initial);
       }  
 
-     madx_mpk_setknobs[i] = (char*)mymalloc("madx_mpk_addvariable",strlen(vary)*sizeof(char));
+     madx_mpk_setknobs[i] = (char*)mymalloc("madx_mpk_addvariable",1+strlen(vary)*sizeof(char));
      strcpy(madx_mpk_setknobs[i],vary);
 
      printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
@@ -651,6 +653,7 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
   
   exactnamematch = command_par_value("exactmatch",cmd->clone);
   
+  printf("Calling findsetknob %s %d %s\n",ename,exactnamematch,initialpar);
   knobidx = findsetknob(ename,exactnamematch,initialpar);
   
   if (knobidx < 0)
@@ -671,17 +674,18 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (initialpar)
    {
-     madx_mpk_knobs[madx_mpk_Nknobs].initial = (char*)mymalloc("madx_mpk_addvariable",strlen(initialpar)*sizeof(char));
+     printf("initialpar %s size %d\n",initialpar,strlen(initialpar));
+     madx_mpk_knobs[knobidx].initial = (char*)mycalloc("madx_mpk_addvariable",1+strlen(initialpar),sizeof(char));
      strcpy(madx_mpk_knobs[knobidx].initial, initialpar);
      
-     sprintf(vary,"%mpk_%s",initialpar);
-     v->name = (char*)mymalloc("madx_mpk_addvariable",strlen(vary)*sizeof(char));  
+     sprintf(vary,"mpk_%s",initialpar);
+     v->name = (char*)mycalloc("madx_mpk_addvariable",1+strlen(vary),sizeof(char));  
      strcpy(v->name,vary);
 
-     sprintf(vary,"%mpk_%s_0",initialpar);
-     v->namecv = (char*)mymalloc("madx_mpk_addvariable",strlen(vary)*sizeof(char));  
+     sprintf(vary,"mpk_%s_0",initialpar);
+     v->namecv = (char*)mycalloc("madx_mpk_addvariable",1+strlen(vary),sizeof(char));  
      strcpy(v->namecv,vary);
-     
+     printf("v name %s namecv %s\n",v->name, v->namecv);
      v->IsIniCond = 1;
      v->kn = -1;
      v->ks = -1;
@@ -691,7 +695,7 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (ename)
    {
-     madx_mpk_knobs[knobidx].elname = (char*)mymalloc("madx_mpk_addvariable",strlen(ename)*sizeof(char));
+     madx_mpk_knobs[knobidx].elname = (char*)mymalloc("madx_mpk_addvariable",1+strlen(ename)*sizeof(char));
      strcpy(madx_mpk_knobs[knobidx].elname, ename);
   
 
@@ -765,7 +769,7 @@ int findsetknob(char* ename, int exactnamematch, char* initialpar)
    {
      for (i = 0; i < madx_mpk_Nknobs; i++)
       {
-        
+        if (madx_mpk_knobs[i].elname == 0x0) continue;
         cmpres = strcmp(ename,madx_mpk_knobs[i].elname);
         if (cmpres == 0)
          {
@@ -816,7 +820,15 @@ int findsetknob(char* ename, int exactnamematch, char* initialpar)
   
   if (result == madx_mpk_Nknobs) 
    {
-     printf("findsetknob: returning fresh setknob for %s.\n", ename);
+     printf("findsetknob: returning fresh setknob for ");
+     if(ename)
+      {
+        printf("%s\n",ename);
+      }  
+     else
+      {
+        printf("%s\n",initialpar);
+      } 
      madx_mpk_Nknobs++;  /*we have not found a setknob to add this vary knob*/
    }
   else
@@ -865,6 +877,75 @@ void madx_mpk_setcalc(struct in_cmd* cmd)
 }
 /*_________________________________________________________________________*/
 
+int mapptctomad(char* ptcname, char* madxname)
+{
+  
+  if( strcmp(ptcname,"beta11") == 0 )
+   {
+    strcpy(madxname,"betx");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"beta22") == 0 )
+   {
+    strcpy(madxname,"bety");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"beta33") == 0 )
+   {
+    strcpy(madxname,"betz");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"alfa11") == 0 )
+   {
+    strcpy(madxname,"alfx");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"alfa22") == 0 )
+   {
+    strcpy(madxname,"alfy");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"alfa33") == 0 )
+   {
+    strcpy(madxname,"alfz");
+    return 0;
+   }
+
+
+  if( strcmp(ptcname,"disp1") == 0 )
+   {
+    strcpy(madxname,"dx");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"disp2") == 0 )
+   {
+    strcpy(madxname,"dpz");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"disp3") == 0 )
+   {
+    strcpy(madxname,"dy");
+    return 0;
+   }
+
+  if( strcmp(ptcname,"disp4") == 0 )
+   {
+    strcpy(madxname,"dpy");
+    return 0;
+   }
+
+  
+  return 1; 
+}
+/*_________________________________________________________________________*/
+
 int  readstartvalues()
 {
 /*
@@ -888,7 +969,8 @@ int  readstartvalues()
      
      if (v->IsIniCond)
       {
-        v->currentvalue = command_par_value(kn->initial, madx_mpk_comm_calculate->clone);
+        mapptctomad(kn->initial,buff);
+        v->currentvalue = command_par_value(buff, madx_mpk_comm_calculate->clone);
         printf("Initialized current value for %s to %f\n", 
                 kn->initial,v->currentvalue);
       }
@@ -1090,9 +1172,9 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
    }
 
   printf("Std Match file name is %s\n",fname);
-  
+/*  
   fprintf(f,"assign, echo=/tmp/mpk_stdmatch.out;\n");
-  
+*/  
   fprintf(f,"match, use_macro;\n");
   
   for (i = 0; i<madx_mpk_Nvariables; i++)
@@ -1141,7 +1223,7 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
    {
      if (madx_mpk_variables[i].IsIniCond )
       {
-        fprintf(f,"      ptc_setknobvalue ,element=%s, kn=-1 ,ks=-1, value=%s;\n",
+        fprintf(f,"      ptc_setknobvalue ,element=%s, value=%s;\n",
                     	   madx_mpk_knobs[ madx_mpk_variables[i].knobidx ].initial, 
                           	   madx_mpk_variables[i].name);
       }
@@ -1158,8 +1240,8 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
    }
 
 
-  fprintf(f,"      value , table(ptc_twiss,theend,beta11);\n");
-  fprintf(f,"      value , table(ptc_twiss,qf1,beta11);\n");
+  fprintf(f,"      value , table(twiss,theend,beta11);\n");
+  fprintf(f,"      value , table(twiss,theend,beta22);\n");
   
   fprintf(f,"     };\n");
 
@@ -1174,8 +1256,9 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
 
   fprintf(f,"endmatch;\n");
 
+/*  
   fprintf(f,"assign, echo=\terminal;\n");
-  
+*/  
   fclose(f);
 
 }
@@ -1186,6 +1269,10 @@ int run_ptccalculation(int setknobs, char* readstartval)
   int i;
   char buff[500];
   char* iniparname;
+
+  char **toks=madx_mpk_comm_calculate->tok_list->p;
+  int ntoks = madx_mpk_comm_calculate->tok_list->curr;
+  int start;
   
   this_cmd = madx_mpk_comm_createuniverse;
   current_command =  madx_mpk_comm_createuniverse->clone;
@@ -1208,8 +1295,27 @@ int run_ptccalculation(int setknobs, char* readstartval)
       {
         if (madx_mpk_variables[i].IsIniCond)
          { /*Set the initial parameter in ptc_twiss*/
+         
             iniparname = madx_mpk_knobs[ madx_mpk_variables[i].knobidx ].initial;
-            set_command_par_value( iniparname, madx_mpk_comm_calculate->clone ,madx_mpk_variables[i].currentvalue);
+            mapptctomad(iniparname,buff);
+
+            for(start=0; start<ntoks; start++) 
+             {
+               if (strcmp(toks[start],buff)==0) 
+                {
+                  printf("tok + 1 is %s\n",toks[start+1]);
+                  printf("tok + 2 is %s\n",toks[start+2]);
+                  printf("tok + 3 is %s\n",toks[start+3]);
+                  break;
+                }
+             }
+         
+            set_command_par_value( buff, madx_mpk_comm_calculate->clone ,madx_mpk_variables[i].currentvalue);
+            
+            printf("Setting Initial %s to CV %f, now it is %f\n",
+                     buff,madx_mpk_variables[i].currentvalue,
+	 command_par_value(buff, madx_mpk_comm_calculate->clone));
+            
          }
         else
          { 
@@ -1244,7 +1350,10 @@ int run_ptccalculation(int setknobs, char* readstartval)
   
   this_cmd = madx_mpk_comm_calculate;
   current_command =  madx_mpk_comm_calculate->clone;
-  process();
+  current_twiss = current_command;
+  
+  pro_ptc_twiss();
+/*  process();*/
 
 
   if ( *readstartval )
