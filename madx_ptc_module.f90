@@ -57,7 +57,10 @@ CONTAINS
     if (getdebug()>0) print*,"Now PTC"
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
     sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
-    if(sector_nmul_max.lt.sector_nmul) call aafail('sector_nmul_max must be larger than sector_n: ','check your ptc_create_universe input')
+    if(sector_nmul_max.lt.sector_nmul) then
+       call aafail('sector_nmul_max must be larger than sector_n: ',&
+                   'check your ptc_create_universe input')
+    endif   
     call set_up_universe(m_u)
     universe=universe+1
 
