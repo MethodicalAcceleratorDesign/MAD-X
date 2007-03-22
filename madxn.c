@@ -8230,11 +8230,11 @@ void pro_ptc_knob(struct in_cmd* cmd)
   struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
 
-  char*                          element    = 0x0;
-  struct int_array*              elementIA      = 0x0;
+  char*                          element     = 0x0;
+  struct int_array*              elementIA   = 0x0;
   char*                          initialp    = 0x0;
-  struct int_array*              initialpIA      = 0x0;
-
+  struct int_array*              initialpIA  = 0x0;
+  char*                                   p  = 0x0;
 
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
@@ -8278,7 +8278,30 @@ void pro_ptc_knob(struct in_cmd* cmd)
   else
   {
     mycpy(c_dum->c, element);
-
+    
+    if (command_par_value("exactmatch",cmd->clone) != 0)
+     {
+       p = strstr(c_dum->c,"[");
+       if (p)
+        {
+          *p = ':';
+          p = strstr(c_dum->c,"]");
+          if (p == 0x0)
+           {
+             warningnew("madxn.c: pro_ptc_knob:","element %s is bady defned. Commnad ignored.",element);
+             return; 
+           }
+          *p=0;
+        }
+       else
+        { /*assume it is the first element*/
+          p = &(c_dum->c[strlen(c_dum->c)]);
+          p[0]=':';
+          p[1]='1';
+          p[2]= 0;
+        } 
+       
+     }
     stoupper(c_dum->c);
 
     elementIA = new_int_array(1+strlen(c_dum->c));

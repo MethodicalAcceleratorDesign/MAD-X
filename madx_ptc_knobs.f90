@@ -580,16 +580,26 @@ contains
     
     fibrename = charconv(fibrenameIA)
     
-!    print *,"addknob: fibrename is ", fibrename
-    pb%name = fibrename
-!    pb%n_name =  fibrenameIA(1)  !firt element of this array contatins length of the string
+    print *,"addknob: fibrename is ", fibrename
+    k = index(fibrename,':')
+    if (k > 0) then
+      pb%name = fibrename(1:k-1)
+    else
+      pb%name = fibrename
+    endif  
+
+    print *,"addknob: pb%name is ", pb%name
+
     
     exactmatch = get_value('ptc_knob ','exactmatch ') .ne. 0
     if (exactmatch) then
-!      print*,"addknob: Using Exact name match: ", fibrename
+      print*,"addknob: Using Exact name match: ", fibrename
       pb%vorname = fibrename
-!    else
-!      print*,"addknob: Using Not Exact name match: all elements starting with ", fibrename
+    else
+      pb%n_name =  len_trim(pb%name)
+      print*,"addknob: Using Not Exact name match:"
+      print*,"    all elements starting with ", pb%name
+      print*,"    number of first letters    ", pb%n_name
     endif
 
     call comm_para('kn ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
@@ -809,6 +819,49 @@ contains
     integer i,j,n
     
     n = 0
+
+    !magnets properties
+    do i=1, npolblocks
+      do j=1, nmax
+        if (polblocks(i)%ian(j) /= 0 ) then
+          n = n + 1
+          
+          if (polblocks(i)%vorname == ' ') then
+           write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ian(j),": ",& !convertion to madx counting 
+                          polblocks(i)%name(1:len_trim(polblocks(i)%name)), "* skew ",j-1
+          else
+           write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ian(j),": ",& !convertion to madx counting 
+                          polblocks(i)%vorname(1:len_trim(polblocks(i)%vorname)), " skew ",j-1
+          endif
+          print*, "n=",n, name
+
+          last = len_trim(name) + 1
+          if (last > 100) last = 100
+          name(last:last) = achar(0)
+
+          call madxv_setknobname(n,name)
+        endif
+
+        if (polblocks(i)%ibn(j) /= 0 ) then
+          n = n + 1
+          if (polblocks(i)%vorname == ' ') then
+            write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ibn(j),": ",& !convertion to madx counting 
+                         polblocks(i)%name(1:len_trim(polblocks(i)%name)) , "* normal ",j-1
+          else
+            write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ibn(j),": ",& !convertion to madx counting 
+                         polblocks(i)%vorname(1:len_trim(polblocks(i)%vorname)) , " normal ",j-1
+          endif
+          print*, "n=",n, name
+
+          last = len_trim(name) + 1
+          if (last > 100) last = 100
+          name(last:last) = achar(0)
+          call madxv_setknobname(n,name)
+        endif
+
+      enddo  
+    enddo
+
     !initial conditions
     do i=1, nknobi
       n = n + 1
@@ -818,7 +871,7 @@ contains
       if (knobi%beta(3) == i) pname='initial beta33'
       if (knobi%alfa(1) == i) pname='initial alfa11'
       if (knobi%alfa(2) == i) pname='initial alfa22'
-      if (knobi%alfa(3) == i) pname='alfa_{33 i}'
+      if (knobi%alfa(3) == i) pname='initial alfa33'
       if (knobi%dispersion(1) == i) pname='initial disp1'
       if (knobi%dispersion(2) == i) pname='initial disp2'
       if (knobi%dispersion(3) == i) pname='initial disp3'
@@ -834,39 +887,6 @@ contains
       if (last > 48) last = 48
       name(last:last) = achar(0)
       call madxv_setknobname(n,name)
-    enddo
-
-    !magnets properties
-    do i=1, npolblocks
-      do j=1, nmax
-        if (polblocks(i)%ian(j) /= 0 ) then
-          n = n + 1
-          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ian(j),": ",& !convertion to madx counting 
-                         polblocks(i)%name(1:len_trim(polblocks(i)%name)), " skew ",j-1
-
-          print*, "n=",n, name
-
-          last = len_trim(name) + 1
-          if (last > 100) last = 100
-          name(last:last) = achar(0)
-
-          call madxv_setknobname(n,name)
-        endif
-
-        if (polblocks(i)%ibn(j) /= 0 ) then
-          n = n + 1
-          write(name,'(A1,i2.2,A2,A,A,I2)') "p",polblocks(i)%ibn(j),": ",& !convertion to madx counting 
-                       polblocks(i)%name(1:len_trim(polblocks(i)%name)) , " normal ",j-1
-          
-          print*, "n=",n, name
-
-          last = len_trim(name) + 1
-          if (last > 100) last = 100
-          name(last:last) = achar(0)
-          call madxv_setknobname(n,name)
-        endif
-
-      enddo  
     enddo
     
 
