@@ -459,8 +459,8 @@ void madx_mpk_run(struct in_cmd* cmd)
   printf("==========================================================================\n");
   
   cleaning:
-  myfree(rout_name,function_vector1);
-  myfree(rout_name,function_vector2);
+  if (function_vector1) myfree(rout_name,function_vector1);
+  if (function_vector2) myfree(rout_name,function_vector2);
   
   function_vector1 = 0x0;
   function_vector2 = 0x0;
