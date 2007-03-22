@@ -327,6 +327,9 @@ CONTAINS
     call element_name(name,length)
     key%list%name=name
 
+    call node_name(name,length)
+    key%list%vorname=name
+    
     !local, if present, superseed global at current node
     sector_nmul1=node_value("sector_nmul ")
     if(sector_nmul1.gt.0) then

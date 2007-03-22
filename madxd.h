@@ -24,6 +24,7 @@
 /* end additions */
 
 #define element_name          element_name_
+#define node_name             node_name_
 #define frndm                 frndm_
 #define madx                  madx_
 #define madx_init             madx_init_
@@ -165,6 +166,7 @@
 /* end additions */
 
 #define element_name          ELEMENT_NAME
+#define node_name             NODE_NAME
 #define frndm                 FRNDM
 #define madx                  MADX
 #define madx_init             MADX_INIT
@@ -367,6 +369,7 @@ void   type_ofCall double_to_table_row(char*, char*, int*, double*); /* ETDA 11 
 int    type_ofCall result_from_normal(char*, int*, double*); /* ETDA 11 nov 2004 */
 void make_map_table(int*); /* KZ 28.06.2005 table for maps */
 void element_name(char*, int*);
+void node_name(char* name, int* l);
 double frndm();
 double get_aperture(struct node*, char*);
 double get_apertol(struct node*, char*);

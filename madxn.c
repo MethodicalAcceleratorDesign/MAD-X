@@ -1811,6 +1811,18 @@ void element_name(char* name, int* l)
   for (i = 0; i < ncp; i++) name[i] = current_node->p_elem->name[i];
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
 }
+ 
+void node_name(char* name, int* l)
+  /* returns current node name in Fortran format */
+  /* l is max. allowed length in name */
+{
+  int ename_l = strlen(current_node->name);
+  int i, ncp = ename_l < *l ? ename_l : *l;
+  int nbl = *l - ncp;
+  for (i = 0; i < ncp; i++) name[i] = toupper(current_node->name[i]);
+  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+}
+
 
 int embedded_plot()
   /* returns the embedded_flag */
