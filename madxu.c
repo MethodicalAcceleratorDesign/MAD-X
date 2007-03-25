@@ -137,16 +137,16 @@ void add_to_el_list( /* adds element to alphabetic element list */
     else
     {
       if (flag > 0) 
-       {
-         put_info("element redefined:", (*el)->name);
+      {
+        put_info("element redefined:", (*el)->name);
 /*
-         printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
-         printf("Old Definition:\n");
-         dump_element(ell->elem[pos]);
-         printf("New Definition:\n");
-         dump_element(*el);
+  printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
+  printf("Old Definition:\n");
+  dump_element(ell->elem[pos]);
+  printf("New Definition:\n");
+  dump_element(*el);
 */         
-       } 
+      } 
       if (flag >= 0 && ell == element_list)
       {
         for (j = 0; j < ell->curr; j++) /* set existing pointers to new */
@@ -195,26 +195,26 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
   }
   /* RDM new matching*/
   if (match_is_on==2) 
-   {
+  {
 
-     for(j=0; j < MAX_MATCH_MACRO;j++)
+    for(j=0; j < MAX_MATCH_MACRO;j++)
+    {
+      if (match2_macro_name[j]==NULL)
       {
-        if (match2_macro_name[j]==NULL)
-         {
-           break;
-         }
+        break;
       }
+    }
 
-     if (j  >= MAX_MATCH_MACRO  ) 
-       {
-         printf("Max number of match macros reached. Augmenting.\n");
-         match2_augmentnmacros();
-         j = MAX_MATCH_MACRO -1;
-       }
+    if (j  >= MAX_MATCH_MACRO  ) 
+    {
+      printf("Max number of match macros reached. Augmenting.\n");
+      match2_augmentnmacros();
+      j = MAX_MATCH_MACRO -1;
+    }
 
-     match2_macro_name[j]=macro->name;
+    match2_macro_name[j]=macro->name;
 
-   }
+  }
   /* RDM new matching*/
 }
 
@@ -311,16 +311,16 @@ void add_to_var_list( /* adds variable to alphabetic variable list */
     if (flag == 1)
     {
       if (varl->list->inform[pos] == 1)
-       {
-         put_info(var->name, "redefined");
+      {
+        put_info(var->name, "redefined");
 /*
-         printf("Old Value:\n");
-         export_variable(varl->vars[pos], stdout);
-         printf("New Value:\n");
-         export_variable(var, stdout);
-         printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
+  printf("Old Value:\n");
+  export_variable(varl->vars[pos], stdout);
+  printf("New Value:\n");
+  export_variable(var, stdout);
+  printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
 */         
-       }  
+      }  
       else varl->list->inform[pos] = flag;
     }
     if (flag < 2) delete_variable(varl->vars[pos]);
@@ -1558,6 +1558,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
     exp_par_flag = 0;
     *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
+        && strstr(c_node->name, "_p_") == NULL
         && strcmp(c_node->base_name, "drift") != 0)
     {
       if ((el = c_node->p_elem) != NULL)
@@ -3754,10 +3755,10 @@ int match2_augmentnmacros()
   struct expression* ** new_match2_cons_lhs;
 
   if(MAX_MATCH_MACRO == 0)
-   {
-     error("match2_augmentnconstraints","match with use_maco was not initialized");
-     return 1;
-   }
+  {
+    error("match2_augmentnconstraints","match with use_maco was not initialized");
+    return 1;
+  }
 
   new_match2_macro_name     = (char**)  mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char*));
   new_match2_cons_name      = (char* **)mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char**));
@@ -3771,21 +3772,21 @@ int match2_augmentnmacros()
 
   /*copy old pointers to arrays*/
   for(i=0;i<MAX_MATCH_MACRO;i++)  
-   {
-     new_match2_cons_name[i]      = match2_cons_name[i];
+  {
+    new_match2_cons_name[i]      = match2_cons_name[i];
 
-     new_match2_cons_value[i]     = match2_cons_value[i];
+    new_match2_cons_value[i]     = match2_cons_value[i];
 
-     new_match2_cons_value_rhs[i] = match2_cons_value_rhs[i];
-     new_match2_cons_value_lhs[i] = match2_cons_value_lhs[i];
-     new_match2_cons_weight[i]    = match2_cons_weight[i];
-     new_match2_cons_sign[i]      = match2_cons_sign[i];
+    new_match2_cons_value_rhs[i] = match2_cons_value_rhs[i];
+    new_match2_cons_value_lhs[i] = match2_cons_value_lhs[i];
+    new_match2_cons_weight[i]    = match2_cons_weight[i];
+    new_match2_cons_sign[i]      = match2_cons_sign[i];
 
-     new_match2_cons_rhs[i]       = match2_cons_rhs[i];
-     new_match2_cons_lhs[i]       = match2_cons_lhs[i];
+    new_match2_cons_rhs[i]       = match2_cons_rhs[i];
+    new_match2_cons_lhs[i]       = match2_cons_lhs[i];
 
-     new_match2_macro_name[i]     = match2_macro_name[i];
-   } 
+    new_match2_macro_name[i]     = match2_macro_name[i];
+  } 
 
   /*free the old arrays*/
   myfree(fn,match2_cons_name);
@@ -3832,18 +3833,18 @@ int match2_augmentnmacros()
   match2_macro_name[MAX_MATCH_MACRO]=NULL;
 
   for(j=0;j<MAX_MATCH_CONS;j++) 
-   { 
-     match2_cons_name     [MAX_MATCH_MACRO][j]=0x0;
+  { 
+    match2_cons_name     [MAX_MATCH_MACRO][j]=0x0;
 
-     match2_cons_value    [MAX_MATCH_MACRO][j]=0.0;
-     match2_cons_value_lhs[MAX_MATCH_MACRO][j]=0.0;
-     match2_cons_value_rhs[MAX_MATCH_MACRO][j]=0.0;
-     match2_cons_weight   [MAX_MATCH_MACRO][j]=0.0;
-     match2_cons_sign     [MAX_MATCH_MACRO][j]='n';
+    match2_cons_value    [MAX_MATCH_MACRO][j]=0.0;
+    match2_cons_value_lhs[MAX_MATCH_MACRO][j]=0.0;
+    match2_cons_value_rhs[MAX_MATCH_MACRO][j]=0.0;
+    match2_cons_weight   [MAX_MATCH_MACRO][j]=0.0;
+    match2_cons_sign     [MAX_MATCH_MACRO][j]='n';
 
-     match2_cons_rhs      [MAX_MATCH_MACRO][j]=0x0;
-     match2_cons_lhs      [MAX_MATCH_MACRO][j]=0x0;
-   }  
+    match2_cons_rhs      [MAX_MATCH_MACRO][j]=0x0;
+    match2_cons_lhs      [MAX_MATCH_MACRO][j]=0x0;
+  }  
   
   
   return ++MAX_MATCH_MACRO;
@@ -3860,17 +3861,17 @@ void match2_delete_arrays()
   if(MAX_MATCH_MACRO <= 0) return;
   
   for(i=0;i<MAX_MATCH_MACRO;i++)  
-   {
-     if(match2_cons_name[i] == 0x0) break;
-     myfree(fn,match2_cons_name     [i]);
-     myfree(fn,match2_cons_value    [i]);
-     myfree(fn,match2_cons_value_lhs[i]);
-     myfree(fn,match2_cons_value_rhs[i]);
-     myfree(fn,match2_cons_weight   [i]);
-     myfree(fn,match2_cons_sign     [i]);
-     myfree(fn,match2_cons_rhs      [i]);
-     myfree(fn,match2_cons_lhs      [i]);
-   }
+  {
+    if(match2_cons_name[i] == 0x0) break;
+    myfree(fn,match2_cons_name     [i]);
+    myfree(fn,match2_cons_value    [i]);
+    myfree(fn,match2_cons_value_lhs[i]);
+    myfree(fn,match2_cons_value_rhs[i]);
+    myfree(fn,match2_cons_weight   [i]);
+    myfree(fn,match2_cons_sign     [i]);
+    myfree(fn,match2_cons_rhs      [i]);
+    myfree(fn,match2_cons_lhs      [i]);
+  }
 
   myfree(fn,match2_cons_name);
   myfree(fn,match2_cons_value);
@@ -3908,17 +3909,17 @@ void match2_delete_expressions()
   int i,j;
 
   for(i=0;i<MAX_MATCH_MACRO;i++)  
-   {
+  {
     if ( match2_cons_name[i][0] == 0x0) break;
     for(j=0;j<MAX_MATCH_CONS;j++) 
-     {
-       if ( match2_cons_name[i][j] == 0x0) break;
-       myfree(rout_name,match2_cons_name[i][j]);
-       delete_expression(match2_cons_rhs[i][j]);
-       delete_expression(match2_cons_lhs[i][j]);
-       match2_cons_rhs[i][j] = 0x0;
-       match2_cons_lhs[i][j] = 0x0;
-     }
+    {
+      if ( match2_cons_name[i][j] == 0x0) break;
+      myfree(rout_name,match2_cons_name[i][j]);
+      delete_expression(match2_cons_rhs[i][j]);
+      delete_expression(match2_cons_lhs[i][j]);
+      match2_cons_rhs[i][j] = 0x0;
+      match2_cons_lhs[i][j] = 0x0;
+    }
   }
 
 }
