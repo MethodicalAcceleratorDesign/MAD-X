@@ -2759,7 +2759,7 @@
      &y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
      &skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bv0,bvk,  &
-     &dpxr,dpyr,zero,one,two,three
+     &dpxr,dpyr,zero,one,two,three, tilt, angle, dtmp
       double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
@@ -2783,6 +2783,7 @@
       call dzero(skew,maxmul+1)
       call get_node_vector('knl ',nn,normal)
       call get_node_vector('ksl ',ns,skew)
+      tilt = node_value('tilt ')
       call dzero(vals,2*(maxmul+1))
       do iord = 0, nn
         vals(1,iord) = normal(iord)
@@ -2798,23 +2799,52 @@
       nd = 2 * max(nn, ns, n_ferr/2-1)
 
 !---- Dipole error.
-      dbr = bv0 * field(1,0) / (one + deltap)
-      dbi = bv0 * field(2,0) / (one + deltap)
+      dbr = field(1,0) / (one + deltap)
+      dbi = field(2,0) / (one + deltap)
 
 !---- Nominal dipole strength.
-      dipr = bv0 * vals(1,0) / (one + deltap)
-      dipi = bv0 * vals(2,0) / (one + deltap)
+      dipr = vals(1,0) / (one + deltap)
+      dipi = vals(2,0) / (one + deltap)
+
+      if (tilt .ne. zero)  then
+        angle = atan2(dipi, dipr) - tilt
+        dtmp = sqrt(dipi**2+dipr**2)
+        dipr = dtmp * cos(angle)
+        dipi = dtmp * sin(angle)
+        dtmp = sqrt(dbi**2+dbr**2)
+        dbr = dtmp * cos(angle)
+        dbi = dtmp * sin(angle)
+      endif
+
+      dbr = bv0 * dbr
+      dbi = bv0 * dbi
+      dipr = bv0 * dipr
+      dipi = bv0 * dipi
 
 !---- Other components and errors.
       nord = 0
       do iord = 1, nd/2
         do j = 1, 2
-          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     &/ (one + deltap)
           if (field(j,iord) .ne. zero)  nord = iord
+          if (vals(j,iord) .ne. zero)  nord = iord
         enddo
       enddo
-
+      do iord = 1, nord
+        do j = 1, 2
+          field(j,iord) = (vals(j,iord) + field(j,iord))                &
+     &/ (one + deltap)
+        enddo
+        if (tilt .ne. zero)  then
+          angle = atan2(field(2,iord), field(1,iord))/(iord+1) - tilt
+          dtmp = sqrt(field(1,iord)**2+field(2,iord)**2)
+          angle = (iord+1) * angle
+          field(1,iord) = dtmp * cos(angle)
+          field(2,iord) = dtmp * sin(angle)
+        endif
+        do j = 1, 2
+          field(j,iord) = bvk * field(j,iord)
+        enddo
+      enddo
 !---- Track orbit.
       if (ftrk) then
         x = orbit(1)
@@ -2982,7 +3012,7 @@
         dorad = get_value('probe ','radiate ') .ne. zero
         sk3 = bvk * node_value('k3 ')
         sk3s = bvk * node_value('k3s ')
-        tilt4 = 4*node_value('tilt ')
+        tilt4 = -4*node_value('tilt ')
         sk3 = sk3 + bvk * field(1,3)/el
         sk3s = sk3s + bvk * field(2,3)/el
         if (tilt4 .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)
@@ -2991,7 +3021,6 @@
 !---- Normal and skew components of octupole.
         octr = sk3l * cos(tilt4)
         octi = sk3l * sin(tilt4)
-
 !---- Half kick at entrance.
         posr = orbit(1) * (orbit(1)**2 - three*orbit(3)**2) / six
         posi = orbit(3) * (three*orbit(1)**2 - orbit(3)**2) / six

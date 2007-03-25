@@ -570,7 +570,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
   add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
-  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("tilt",thick_elem),"tilt",1);
   /* create element with this command */
   if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
   else
