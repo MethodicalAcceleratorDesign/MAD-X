@@ -76,10 +76,10 @@ struct madx_mpk_variable
  {
    char*  name; /*variable name, if initial parameter just copy with mpk_ prefix, if field comp then {elname}_{"kn"/"ks"}{number}*/
    char*  namecv; 
-   float  upper;
-   float  lower;
-   float  trustrange;
-   float  step;
+   double upper;
+   double lower;
+   double trustrange;
+   double step;
    int    knobidx; /*index of the knob that makes paramter of this variable */
    double currentvalue;
    int    kn; /*if a field component then different from -1*/
@@ -101,6 +101,8 @@ struct madx_mpk_knob
 /************************************/
 /*          DATA structure          */
 /************************************/
+
+int                        madx_mpk_debug;
 /*constraints*/
 int                        madx_mpk_Nconstraints;
 char*                      madx_mpk_constraints[MAX_CONTRAINS];
@@ -126,10 +128,12 @@ char twisscommand[]="ptc_twiss, table=ptc_twiss, icase=6, no=2, betx=10, alfx=.0
 void makestdmatchfile(char* fname, char* matchactioncommand);
 int  run_ptccalculation(int setknobs,char* readstartval);
 void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks);
-int  madx_mpk_scalelimits(struct madx_mpk_variable* v);
+int  madx_mpk_scalelimits(int nv);
 int  findsetknob(char* ename, int exactnamematch,char* initialpar);
 int  mapptctomad(char* ptcname,char* madxname);
 int  readstartvalues();
+int  factorial(int v);
+double match2_summary();
 /*******************************************/
 /*MAD-X Global Variables used in this file */
 /*******************************************/
@@ -160,6 +164,7 @@ extern void*            mycalloc(char* caller, int n, size_t size);
 extern void             myfree(char* rout_name, void* p);
 extern void             warning(char* t1, char* fmt, ...); 
 extern void             warningnew(char* t1, char* fmt, ...); 
+extern void             fatal_error(char*, char*);
 extern void             error(char* t1, char* fmt, ...); 
 extern int              match2_evaluate_exressions(int i, int k, double* fun_vec);
 extern int              name_list_pos(char*, struct name_list*);
@@ -172,8 +177,25 @@ extern double           el_par_value(char*, struct element*);
 extern void             w_ptc_getnfieldcomp_(int* fibreidx, int* ncomp, double*);
 extern void             w_ptc_getsfieldcomp_(int* fibreidx, int* ncomp, double*);
 
-extern int    errorflag;
-extern char  *errormessage;
+extern int              errorflag;
+extern char*            errormessage;
+
+/*_________________________________________________________________________*/
+
+
+extern int MAX_MATCH_CONS;
+extern int MAX_MATCH_MACRO;
+extern char match2_keepexpressions;
+extern char* *  match2_macro_name;
+extern char* ** match2_cons_name;
+extern double **match2_cons_value;
+extern double **match2_cons_value_rhs;
+extern double **match2_cons_value_lhs;
+extern double **match2_cons_weight;
+extern char   **match2_cons_sign;
+extern struct expression* **match2_cons_rhs;
+extern struct expression* **match2_cons_lhs;
+extern int match2_cons_curr[3];
 
 /*_________________________________________________________________________*/
 /*_________________________________________________________________________*/
@@ -204,6 +226,7 @@ void madx_mpk_run(struct in_cmd* cmd)
   char    matched = 0;
   char    readstartval = 1;
   int     retval;
+  int     fieldorder;
   FILE*   fdbg = fopen("currentvalues.txt","w");
 
   matchfilename[0] = 0; /*sign for makestdmatchfile to generate a new file name*/
@@ -252,13 +275,11 @@ void madx_mpk_run(struct in_cmd* cmd)
   while(cmd->tok_list->p[i] != 0x0)
    {
      sprintf(&(matchactioncommand[strlen(matchactioncommand)])," %s",cmd->tok_list->p[i]);
-     printf("%s",cmd->tok_list->p[i]);
+     if (debuglevel)  printf("%s",cmd->tok_list->p[i]);
      i++;
    }
   
   sprintf(&(matchactioncommand[strlen(matchactioncommand)]),";");
-  printf("\n");
-    
   
   retval = madx_mpk_init();
   
@@ -278,18 +299,7 @@ void madx_mpk_run(struct in_cmd* cmd)
      maxNCallsExceeded =  ( (maxcalls > 0)&&(calls > maxcalls) );
      
      printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
      printf("\n\n\n Call %d\n",calls);
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
-     printf("###########################################################################################\n"); 
      printf("###########################################################################################\n"); 
      
      printf("\n CURRENT VALUES \n");
@@ -303,8 +313,9 @@ void madx_mpk_run(struct in_cmd* cmd)
         printf("%16f   ",madx_mpk_variables[i].currentvalue);
       }
      
+     fflush(0);
     
-     printf("\n\nCalling TWISS with KNOBS\n");
+     if (debuglevel)  printf("\n\nCalling TWISS with KNOBS\n");
      run_ptccalculation(1,&readstartval);
      
      if (errorflag)
@@ -319,50 +330,48 @@ void madx_mpk_run(struct in_cmd* cmd)
      for (i=0;i<madx_mpk_Nvariables;i++)
       {
         set_variable_(madx_mpk_variables[i].name, &var);
-        set_variable_(madx_mpk_variables[i].namecv, &(madx_mpk_variables[i].currentvalue));
       }
      
-     printf("\n\nDoing Match on KNOBS\n");
+     if (debuglevel)  printf("\n\nDoing Match on KNOBS\n");
      makestdmatchfile(matchfilename,matchactioncommand);
-     printf("matchfilename is %s\n",matchfilename);
+     if (debuglevel)  printf("matchfilename is %s\n",matchfilename);
   
      sprintf(callmatchfile,"call, file=\"%s\" ;",matchfilename);
      pro_input(callmatchfile);
      
      if (function_vector1 == 0x0)
       { 
-        printf("total_const is %d\n",total_const);
         function_vector1 = (double*)mymalloc("madx_mpk_run",(total_const+1)*sizeof(double));
         function_vector2 = (double*)mymalloc("madx_mpk_run",(total_const+1)*sizeof(double));
       } 
      
-     printf("\n\nPeeking Function_Vector 1\n");
      i = match2_evaluate_exressions(0,0,function_vector1);
-     printf("match2_evaluate_exressions returned fun_vector of length %d\n",i);
+     if (debuglevel)  printf("match2_evaluate_exressions returned fun_vector 1 of length %d\n",i);
 
      
      pro_input(ptcend);
 
-     printf("\n\n\n");
-     printf("\nFunction_Vector 1:\n");
+     if (debuglevel)  printf("\nFunction_Vector 1:\n");
    
      ktar = 0.0;
      fprintf(fdbg,"%d",calls);
+     printf("MPK STEP %d",calls);
      for (i=0;i<madx_mpk_Nvariables;i++)
       {
         var = get_variable_(madx_mpk_variables[i].name);
         madx_mpk_variables[i].currentvalue += var;
-        printf("Matched knob %s = %f, new current val %f  \n",
-                       madx_mpk_variables[i].name, var, 
-                       madx_mpk_variables[i].currentvalue);
-        fprintf(fdbg," %f ", madx_mpk_variables[i].currentvalue);
+        if (debuglevel)  printf("Matched knob %s = %E, new current val %E  \n",
+                                 madx_mpk_variables[i].name, var, 
+                                 madx_mpk_variables[i].currentvalue);
+        printf(" %20.16f ",       madx_mpk_variables[i].currentvalue);             
+        fprintf(fdbg," %20.16f ", madx_mpk_variables[i].currentvalue);
         ktar += var*var;
       }
-     printf("\n");
      tar = get_variable_("tar");
-     fprintf(fdbg," KTAR=%E TAR=%E\n",ktar, tar);
+     fprintf(fdbg," KTAR=%20.16E TAR=%20.16E\n",ktar, tar);
+     printf(" KTAR=%20.16E TAR=%20.16E\n",ktar, tar);
      fflush(0x0);
-     printf("KTAR=%E \n", ktar ); 
+     if (debuglevel)  printf("KTAR=%E \n", ktar ); 
      
      if ( (oldtar > 0) && (tar > oldtar))
        {
@@ -378,81 +387,112 @@ void madx_mpk_run(struct in_cmd* cmd)
      if (ktar < tolerance)
       { 
         knobsatmatchedpoint = 1;
-        printf("Matched values of knobs are close to zeroes within the tolerance\n");
+        if (debuglevel)  printf("Matched values of knobs are close to zeroes within the tolerance\n");
       }  
      else
       {
         knobsatmatchedpoint = 0;
-        printf("Matched values of knobs are NOT close to zeroes within the tolerance\n");
+        if (debuglevel)  printf("Matched values of knobs are NOT close to zeroes within the tolerance\n");
         if (!maxNCallsExceeded) continue;
       }
 
      
-     printf("\n\nCalling TWISS with NO knobs\n");
+     
+     if (debuglevel)  printf("\n\nCalling TWISS with NO knobs\n");
      run_ptccalculation(0,&readstartval);
      
-     printf("\n\nPeeking Function_Vector 2\n");
      i = match2_evaluate_exressions(0,0,function_vector2);
+     if (debuglevel)  printf("match2_evaluate_exressions returned fun_vector 2 of length %d\n",i);
 
      pro_input(ptcend);
-    
-     
      
      penalty  = 0.0;
      penalty2 = 0.0;
 
-     printf("\n Function_Vector 2:\n");
-     
      for (i=0; i< total_const; i++)
       {
         penalty += function_vector2[i]*function_vector2[i];
         var = function_vector2[i] - function_vector1[i];
-        if (debuglevel>1) printf("Constraint%d: %f diff=%f \n",i,function_vector2[i],var);
+        /*if (debuglevel>1) */
+        if (debuglevel)  printf("Constraint%d: v1=%f v2=%f diff=%f \n",i,function_vector1[i],function_vector2[i],var);
         penalty2 += var*var;
       }
      
+     if (debuglevel > 1) match2_summary();
+     
      fprintf(fdbg,"Verification: penalty=%E  penalty2=%E \n",penalty, penalty2);
 
-     printf("Closenes of the function vectors with and without knobs %e\n",penalty2);
+     if (debuglevel)  printf("Closenes of the function vectors with and without knobs %e\n",penalty2);
      
      if (penalty2 < tolerance)
       { 
         matched2 = 1;
-        printf("Constraints values with and without knobs within the tolerance\n");
+        if (debuglevel)  printf("Constraints values with and without knobs within the tolerance\n");
       }  
      else
       {
         matched2 = 0;
-        printf("Constraints values with and without knobs NOT within the tolerance\n");
+        if (debuglevel)  printf("Constraints values with and without knobs NOT within the tolerance\n");
       }
     
      matched = matched2 && knobsatmatchedpoint;
    
      
-     printf("matched=%d, maxNCallsExceeded=%d\n",matched,maxNCallsExceeded);
+     if (debuglevel)  printf("matched=%d, maxNCallsExceeded=%d\n",matched,maxNCallsExceeded);
      
    }
-  while( !(matched || maxNCallsExceeded) );
-  
+  while( ( !(matched || maxNCallsExceeded ))  &&  (ktar != 0.0) );
+                                                   /*if ktar is 0.0 we can not make better, because next iteration will be the same*/
   match2_keepexpressions = 0;
   match_is_on = kMatch_PTCknobs;   
   
   fflush(0);
+  tar = match2_summary();
   printf("\n\n");
-  printf("========================================================================== \n");
-  printf("== Matching finished successfully after %3.3d calls                       == \n",calls);
+  printf("================================================================================== \n");
+  printf("== Matching finished successfully after %3.3d calls                               == \n",calls);
+  printf("== Final penalty function TAR = %E                                    == \n", tar);
   
-  printf("== Precision of Taylor expansion the result point = %E        ==\n",ktar);
-  printf("==----------------------------------------------------------------------== \n");
-  printf("==      Variable                   Final Value                          == \n");
+  printf("== Precision of Taylor expansion at the result point = %E             ==\n",ktar);
+  printf("==------------------------------------------------------------------------------== \n");
+  printf("==           Variable      Final Value                                          == \n");
   printf("\n");
   
   
   for (i=0;i<madx_mpk_Nvariables;i++)
    {
      set_variable_(madx_mpk_variables[i].name,&(madx_mpk_variables[i].currentvalue));
-     printf("== %d %16s          %+f                                  == \n",
+     printf("== %2d %16s    %+12.8E",
              i,madx_mpk_variables[i].name, madx_mpk_variables[i].currentvalue);
+     
+     if (madx_mpk_variables[i].IsIniCond)
+      {
+         printf("                                      == \n");
+      }
+     else
+      {
+         fieldorder = 0;
+         if (madx_mpk_variables[i].kn >= 0)
+          {
+            fieldorder = factorial(madx_mpk_variables[i].kn);
+          }
+         if (madx_mpk_variables[i].ks >= 0)
+          {
+            fieldorder = factorial(madx_mpk_variables[i].ks);
+          }
+
+         if (fieldorder >= 0)
+          {
+          
+            printf("  PTC units -> MADX: %+12.8E  == \n",
+               fieldorder*madx_mpk_variables[i].currentvalue);
+               
+          }
+         else
+          {
+            printf("                                    == \n");
+          }
+       }   
      printf("\n");           
    }
   
@@ -474,8 +514,6 @@ void madx_mpk_prepare()
 {
 /* prepares the internal variables*/
   int i; /**/
-  
-  printf("I am in MATCH PTC WITH KNOBS\n");
 
   madx_mpk_Nconstraints = 0;
   madx_mpk_Nknobs = 0;
@@ -498,6 +536,7 @@ void madx_mpk_prepare()
      madx_mpk_knobs[i].exactnamematch = 1;
 
      madx_mpk_variables[i].name          = 0x0;
+     madx_mpk_variables[i].namecv        = 0x0;
      madx_mpk_variables[i].upper         = 0.0;
      madx_mpk_variables[i].lower         = 0.0;
      madx_mpk_variables[i].trustrange    = 0.0;
@@ -576,7 +615,7 @@ int madx_mpk_init()
      madx_mpk_setknobs[i] = (char*)mymalloc("madx_mpk_addvariable",1+strlen(vary)*sizeof(char));
      strcpy(madx_mpk_setknobs[i],vary);
 
-     printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
+     if (debuglevel)  printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
 
      
    }
@@ -595,7 +634,6 @@ void madx_mpk_addconstraint(const char* constr)
   l++;
   buff = (char*)mymalloc("madx_mpk_addconstraint",l*sizeof(char));
   strcpy(buff,constr);
-  printf("madx_mpk_addconstraint: got %s\n",buff);
   madx_mpk_constraints[madx_mpk_Nconstraints++] = buff;
   
 }
@@ -603,8 +641,6 @@ void madx_mpk_addconstraint(const char* constr)
 
 void madx_mpk_addvariable(struct in_cmd* cmd)
 {
-  struct command_parameter_list* c_parameters;
-  struct name_list*              c_parnames;
   char                           vary[COMM_LENGTH];
   int                            slen;
   char*                          string;
@@ -621,8 +657,6 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
   
   if (cmd == 0x0) return;
 
-  c_parameters = cmd->clone->par;
-  c_parnames   = cmd->clone->par_names;
 
   /*get a name for the variable*/
   ename  = command_par_string("element",cmd->clone);
@@ -653,7 +687,6 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
   
   exactnamematch = command_par_value("exactmatch",cmd->clone);
   
-  printf("Calling findsetknob %s %d %s\n",ename,exactnamematch,initialpar);
   knobidx = findsetknob(ename,exactnamematch,initialpar);
   
   if (knobidx < 0)
@@ -664,7 +697,7 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
   
   /*so we make a new variable...*/
 
-  v = &madx_mpk_variables[madx_mpk_Nvariables];
+  v = &(madx_mpk_variables[madx_mpk_Nvariables]);
   
   v->upper = command_par_value("upper",cmd->clone);
   v->lower = command_par_value("lower",cmd->clone);
@@ -674,7 +707,6 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (initialpar)
    {
-     printf("initialpar %s size %d\n",initialpar,strlen(initialpar));
      madx_mpk_knobs[knobidx].initial = (char*)mycalloc("madx_mpk_addvariable",1+strlen(initialpar),sizeof(char));
      strcpy(madx_mpk_knobs[knobidx].initial, initialpar);
      
@@ -685,7 +717,6 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
      sprintf(vary,"mpk_%s_0",initialpar);
      v->namecv = (char*)mycalloc("madx_mpk_addvariable",1+strlen(vary),sizeof(char));  
      strcpy(v->namecv,vary);
-     printf("v name %s namecv %s\n",v->name, v->namecv);
      v->IsIniCond = 1;
      v->kn = -1;
      v->ks = -1;
@@ -724,7 +755,7 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
 
      
      slen = strlen(vary);
-     string = (char*)mymalloc("madx_mpk_addvariable",slen*sizeof(char));  
+     string = (char*)mymalloc("madx_mpk_addvariable",(slen+1)*sizeof(char));  
      strcpy(string,vary);
      v->name = string;
 
@@ -733,7 +764,7 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
      vary[slen+2] =  0;/*end of string*/
      slen  = slen+2;
      
-     string = (char*)mymalloc("madx_mpk_addvariable",slen*sizeof(char));  
+     string = (char*)mymalloc("madx_mpk_addvariable",(slen+1)*sizeof(char));  
      strcpy(string,vary);
      v->namecv = string;
 
@@ -741,15 +772,15 @@ void madx_mpk_addvariable(struct in_cmd* cmd)
      v->ks = ks;
      v->IsIniCond = 0;
      
-     madx_mpk_scalelimits(v);
+     madx_mpk_scalelimits(madx_mpk_Nvariables);
     
    }
 
   madx_mpk_Nvariables++;
   
   
-  printf("Added new knobs: now there is\n  knobs: %d\n  variables: %d\n",
-          madx_mpk_Nknobs,madx_mpk_Nvariables);
+  if (debuglevel)  printf("Added new knobs: now there is\n  knobs: %d\n  variables: %d\n",
+                           madx_mpk_Nknobs,madx_mpk_Nvariables);
 }
 /*_________________________________________________________________________*/
 
@@ -820,21 +851,8 @@ int findsetknob(char* ename, int exactnamematch, char* initialpar)
   
   if (result == madx_mpk_Nknobs) 
    {
-     printf("findsetknob: returning fresh setknob for ");
-     if(ename)
-      {
-        printf("%s\n",ename);
-      }  
-     else
-      {
-        printf("%s\n",initialpar);
-      } 
      madx_mpk_Nknobs++;  /*we have not found a setknob to add this vary knob*/
    }
-  else
-   {
-     printf("findsetknob: Found an old setknob for %s.\n", ename);
-   } 
 
   return   result;
  
@@ -962,6 +980,8 @@ int  readstartvalues()
   char  buff[50];
   char* p;
   
+  if (debuglevel)  printf("\n\n\n  READING INITIAL VALUES \n\n\n");
+  
   for (i = 0; i < madx_mpk_Nvariables; i++)
    {
      v = &(madx_mpk_variables[i]);
@@ -971,12 +991,90 @@ int  readstartvalues()
       {
         mapptctomad(kn->initial,buff);
         v->currentvalue = command_par_value(buff, madx_mpk_comm_calculate->clone);
-        printf("Initialized current value for %s to %f\n", 
-                kn->initial,v->currentvalue);
+        if (debuglevel)  printf("Initialized current value for %s to %f\n", kn->initial,v->currentvalue);
+      }
+     else if(kn->exactnamematch == 0)
+      {
+        if (debuglevel)  printf("Family here\n");
+        n =  0;
+        node = current_sequ->range_start;
+        
+        while (node != 0x0)
+         {
+           strcpy(buff,node->name);
+           
+           p = strstr(buff,kn->elname);
+           if ( p == buff )
+            {
+              break;
+            }
+
+           n++;
+           node = node->next;
+
+           if ( node == current_sequ->range_start )
+            { 
+              fatal_error("readstartvalues: Can not find element: ",kn->elname);
+              return 1; 
+            }
+         }
+        
+        if (v->kn >=0)
+         {
+           ncomp = v->kn;
+           w_ptc_getnfieldcomp_(&n,&ncomp, &nvalue);
+           v->currentvalue = nvalue;
+         }
+        else
+         {
+           ncomp = v->ks;
+           w_ptc_getsfieldcomp_(&n,&ncomp, &nvalue);
+           v->currentvalue = nvalue;
+         }   
+        if (debuglevel)  printf("Got first element %s of family %s, field is %f\n",kn->elname,buff,v->currentvalue);
+                
+        n++;
+        node = node->next;
+       
+        while (node != 0x0)
+         {
+           strcpy(buff,node->name);
+           
+           p = strstr(buff,kn->elname);
+           if ( p == buff )
+            { 
+              if (debuglevel)  printf("Got another element %s of the family %s\n",node->name,kn->elname);
+              
+              if (v->kn >=0)
+               {
+                 ncomp = v->kn;
+                 w_ptc_getnfieldcomp_(&n,&ncomp, &nvalue);
+               }
+              else
+               {
+                 ncomp = v->ks;
+                 w_ptc_getsfieldcomp_(&n,&ncomp, &nvalue);
+               }
+              
+              if (v->currentvalue != nvalue)
+               {
+                 warningnew("matchptcknobs",
+                            "Element %s has incoherent field %f strngth with its family %f.\n",
+                             node->name, nvalue,v->currentvalue);
+               }
+            }
+
+           n++;
+           node = node->next;
+
+           if ( node == current_sequ->range_start )
+            { 
+              break; 
+            }
+         }
       }
      else
       {
-        printf("Achtung! Ignoring families for the time being\n");
         n =  0;
         node = current_sequ->range_start;
         
@@ -986,7 +1084,6 @@ int  readstartvalues()
            p = strstr(buff,":");
            if (p) *p = 0;
            
-           printf("Comparing %s %s\n",node->name,kn->elname); 
            if ( strcmp(buff,kn->elname) == 0 )
             {
               break;
@@ -1016,7 +1113,7 @@ int  readstartvalues()
            v->currentvalue = nvalue;
          }   
 
-        printf("Got %f for %s\n",v->currentvalue,kn->elname);
+        if (debuglevel)  printf("Got %f for %s\n",v->currentvalue,kn->elname);
 
       } 
    }
@@ -1025,64 +1122,107 @@ int  readstartvalues()
   return 0;
 }
 
-int madx_mpk_scalelimits(struct madx_mpk_variable* v)
+int madx_mpk_scalelimits(int nv)
 {
+  /*User specifies uppper and lower limits of the matched k-values
+    here they are converted to the PTC units */
 
-  double nvect[FIELD_MAX];
-  double svect[FIELD_MAX];
-  
-  struct element* el = 0x0;
-  double bn=0,bs=0, tmpf;
+/*
   double l;
-  int    n;
-  int    fieldorder = 1 + (v->kn >= 0)?v->kn:v->ks;/*PTC nomenclature, 1 dipol, 2 quad ...*/
+  struct element* el = 0x0;
+  char*  p;
+  struct node*                node = 0x0;
+*/
+  int    fieldorder;/*PTC nomenclature, 1 dipol, 2 quad ...*/
+  float  fact = 0.0;
+
+  struct madx_mpk_variable*     v = 0x0;
+  struct madx_mpk_knob*         kn = 0x0;
+
+  if ( (nv < 0) || (nv >= MAX_KNOBS) )
+   {
+     error("madx_mpk_scalelimits","Passed variable out of range");
+     return 1;
+   }
   
+  
+  v = &(madx_mpk_variables[nv]);
+  kn = &(madx_mpk_knobs[v->knobidx]);
+
+  fieldorder = 1 + (v->kn >= 0)?v->kn:v->ks;/*PTC nomenclature, 1 dipol, 2 quad ...*/ 
+  
+  fact = factorial(fieldorder);
   
   if ( ( v->kn == 0) || (v->ks == 0) )
    {
-     printf("Dipol limits don't need to be scaled\n");
+     printf("madx_mpk_scalelimits: Dipol limits don't need to be scaled\n");
      return 1;
    }
   
-  if (v == 0x0)
-   {
-     error("madx_mpk_scalelimits","Passed pointer to variable is NULL");
-     return 1;
-   }
-
-  el = find_element(madx_mpk_knobs[v->knobidx].elname, element_list);
-  if (el == 0x0)
-   {
-     error("madx_mpk_scalelimits","Can not find element named %s in the current sequence",madx_mpk_knobs[v->knobidx].elname);
-     return 1;
-   }
-  
-  /* n = element_vector(el, "knl", nvect);*/
-  /* n = element_vector(el, "ksl", svect);*/
-  
-  printf("Element %s\n",el->name);
-  if (el->parent)
-    printf("Parent name %s def_type %d\n", el->parent->name, el->parent->def_type);
-
-  if (el->base_type)
-    printf("base_type name %s def_type %d\n", el->base_type->name, el->base_type->def_type);
-  
-  l = el_par_value("l",el);
-  if (l <= 0.0)
-   {
-     l = 1.0; /*zero lentgh elements has field defined such, compatible with madx_ptc_module.f90:SUMM_MULTIPOLES_AND_ERRORS*/
-   }
-  v->upper = v->upper/tgamma(fieldorder)/l;
-  v->lower = v->lower/tgamma(fieldorder)/l;
-        
-  printf("Set limits to field order (PTC) %d: %f %f\n", fieldorder, v->lower, v->upper ); 
+/* If lenght of the magnet will be needed, thin elements ???
+ *   if(kn->exactnamematch)
+ *    {
+ *      el = find_element(kn->elname, element_list);
+ *    }
+ *   else
+ *    {
+ *      node = current_sequ->range_start;
+ *      while (node != 0x0)
+ *       {
+ *         p = strstr(node->name,kn->elname);
+ *         if ( p == node->name )
+ *          {
+ *            el = node->p_elem;
+ *            break;
+ *          }
+ * 
+ *         node = node->next;
+ *         if ( node == current_sequ->range_start )
+ *          { 
+ *            fatal_error("madx_mpk_scalelimits: Can not find element starting with: ",kn->elname);
+ *            return 1; 
+ *          }
+ *       }
+ * 
+ * 
+ *    }   
+ *   if (el == 0x0)
+ *    {
+ *      error("madx_mpk_scalelimits","Can not find element named %s in the current sequence",madx_mpk_knobs[v->knobidx].elname);
+ *      return 1;
+ *    }
+ *   
+ *   if (debuglevel)  printf("Element %s\n",el->name);
+ * 
+ *   l = el_par_value("l",el);
+ *   if (l <= 0.0)
+ *    {
+ *      printf("Element %s has zero lenght\n",el->name);
+ *      l = 1.0; /*zero lentgh elements has field defined such, compatible with madx_ptc_module.f90:SUMM_MULTIPOLES_AND_ERRORS
+ *    
+ */
    
-     
+  v->upper = v->upper/fact;
+  v->lower = v->lower/fact;
+        
+  if (debuglevel)  printf("Set limits to field order (PTC) %d, fact=%f: %f %f\n", 
+                        fieldorder, fact, v->lower, v->upper ); 
   
   return 0;
   
 }  
 
+int factorial(int v)
+{
+  if (v <= 1 ) 
+   {
+     return  1;
+   }
+  else
+   {
+     return v*factorial(v-1);
+   }   
+}
 void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks)
 {
 /*
@@ -1150,9 +1290,9 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
   struct madx_mpk_variable*      v = 0x0;
   int  i;
   unsigned int anumber = abs(time(0x0)*rand());
-  float lower, upper;
+  double lower, upper;
   
-  printf("I am in makestdmatchfile, file name is >%s<\n", fname);
+  if (debuglevel)  printf("I am in makestdmatchfile, file name is >%s<\n", fname);
   
   while(f == 0x0)
    {/*repeat until generate unique file name*/
@@ -1165,26 +1305,20 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
       {
         warningnew("makestdmatchfile","Could not open file %s",fname);
       }
-     else
-      {
-        printf("makestdmatchfile: Knob Matching file in %s\n",fname); 
-      } 
    }
 
-  printf("Std Match file name is %s\n",fname);
-/*  
-  fprintf(f,"assign, echo=/tmp/mpk_stdmatch.out;\n");
-*/  
+  if (debuglevel < 2) fprintf(f,"assign, echo=/tmp/mpk_stdmatch.out;\n");
+
   fprintf(f,"match, use_macro;\n");
   
   for (i = 0; i<madx_mpk_Nvariables; i++)
    {
 
-     v = &madx_mpk_variables[i];
+     v = &(madx_mpk_variables[i]);
      
      /*create vary command as string*/
-     printf("\ncurrentvalue=%f trustrange=%f lower=%f upper=%f\n",
-           v->currentvalue, v->trustrange , v->lower ,v->upper);
+     if (debuglevel)  printf("\ncurrentvalue=%f trustrange=%f lower=%f upper=%f\n",
+                               v->currentvalue, v->trustrange , v->lower ,v->upper);
            
      if ( (v->currentvalue - v->trustrange) < v->lower )
       {
@@ -1203,9 +1337,6 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
       {
         upper =  v->trustrange;
       }
-
-     printf("   vary, name=%s, lower= %g, upper = %g;\n",
-                      v->name,  lower,     upper);
      
      fprintf(f,"   vary, name=%s, step= %g, lower= %g, upper = %g;\n",
                       v->name,  v->step, lower,     upper);
@@ -1215,33 +1346,27 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
 
   fprintf(f,"   m1: macro =  \n");
   fprintf(f,"     {\n");
-
-  printf("Std Match file name is %s\n",fname);
-  printf("There is %d variables.\n",madx_mpk_Nvariables);
   
   for (i = 0; i<madx_mpk_Nvariables; i++)
    {
      if (madx_mpk_variables[i].IsIniCond )
       {
-        fprintf(f,"      ptc_setknobvalue ,element=%s, value=%s;\n",
+        fprintf(f,"      ptc_setknobvalue ,element=%s, value=%s, refreshtables=false;\n",
                     	   madx_mpk_knobs[ madx_mpk_variables[i].knobidx ].initial, 
                           	   madx_mpk_variables[i].name);
       }
      else
       { 
-        fprintf(f,"      ptc_setknobvalue ,element=%s, kn=%d ,ks=%d, value=%s;\n",
+        fprintf(f,"      ptc_setknobvalue ,element=%s, kn=%d ,ks=%d, value=%s, refreshtables=false;\n",
                     	   madx_mpk_knobs[ madx_mpk_variables[i].knobidx ].elname, 
 		   madx_mpk_variables[i].kn,
 		   madx_mpk_variables[i].ks,
                           	   madx_mpk_variables[i].name);
       }
-   /*  if (debuglevel)*/
-        fprintf(f,"      value , %s, %s;\n", madx_mpk_variables[i].name, madx_mpk_variables[i].namecv );
+     if (debuglevel)  fprintf(f,"      value , %s, %s;\n", madx_mpk_variables[i].name, madx_mpk_variables[i].namecv );
    }
 
-
-  fprintf(f,"      value , table(twiss,theend,beta11);\n");
-  fprintf(f,"      value , table(twiss,theend,beta22);\n");
+  fprintf(f,"      ptc_refreshpartables;\n");
   
   fprintf(f,"     };\n");
 
@@ -1256,9 +1381,8 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
 
   fprintf(f,"endmatch;\n");
 
-/*  
-  fprintf(f,"assign, echo=\terminal;\n");
-*/  
+  if (debuglevel < 2) fprintf(f,"assign, echo=\terminal;\n");
+
   fclose(f);
 
 }
@@ -1266,13 +1390,20 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
 
 int run_ptccalculation(int setknobs, char* readstartval)
 {
-  int i;
+  int i,n;
   char buff[500];
+  char comd[500];
   char* iniparname;
 
   char **toks=madx_mpk_comm_calculate->tok_list->p;
   int ntoks = madx_mpk_comm_calculate->tok_list->curr;
   int start;
+
+  struct madx_mpk_variable*      v = 0x0;
+  struct madx_mpk_knob*         kn = 0x0;
+  struct node*                node = 0x0;
+  char* p;
+
   
   this_cmd = madx_mpk_comm_createuniverse;
   current_command =  madx_mpk_comm_createuniverse->clone;
@@ -1293,39 +1424,75 @@ int run_ptccalculation(int setknobs, char* readstartval)
    { 
      for(i=0;i<madx_mpk_Nvariables;i++)
       {
-        if (madx_mpk_variables[i].IsIniCond)
+         
+        v = &(madx_mpk_variables[i]);
+        kn = &(madx_mpk_knobs[v->knobidx]);
+        set_variable_(v->namecv, &(v->currentvalue));
+        
+        if (v->IsIniCond)
          { /*Set the initial parameter in ptc_twiss*/
          
-            iniparname = madx_mpk_knobs[ madx_mpk_variables[i].knobidx ].initial;
+            iniparname = kn->initial;
             mapptctomad(iniparname,buff);
 
             for(start=0; start<ntoks; start++) 
              {
                if (strcmp(toks[start],buff)==0) 
                 {
-                  printf("tok + 1 is %s\n",toks[start+1]);
-                  printf("tok + 2 is %s\n",toks[start+2]);
-                  printf("tok + 3 is %s\n",toks[start+3]);
                   break;
                 }
              }
          
-            set_command_par_value( buff, madx_mpk_comm_calculate->clone ,madx_mpk_variables[i].currentvalue);
+            set_command_par_value( buff, madx_mpk_comm_calculate->clone ,v->currentvalue);
             
-            printf("Setting Initial %s to CV %f, now it is %f\n",
-                     buff,madx_mpk_variables[i].currentvalue,
-	 command_par_value(buff, madx_mpk_comm_calculate->clone));
+            if (debuglevel)   printf("Setting Initial %s to CV %f, now it is %f\n",
+                              buff,v->currentvalue,
+	          command_par_value(buff, madx_mpk_comm_calculate->clone));
             
          }
         else
          { 
-            sprintf(buff,"ptc_setfieldcomp, element=%s, kn=%d, ks=%d, value=%f;",
-                    	    madx_mpk_knobs[ madx_mpk_variables[i].knobidx ].elname, 
-		    madx_mpk_variables[i].kn,
-		    madx_mpk_variables[i].ks,
-                    	    madx_mpk_variables[i].currentvalue);
-            /*printf("%s\n",buff);*/
-            pro_input(buff);
+            
+            if(kn->exactnamematch == 0)
+             {
+               n =  0;
+               node = current_sequ->range_start;
+
+               while (node != 0x0)
+                {
+                  strcpy(buff,node->name);
+
+                  p = strstr(buff,kn->elname);
+                  if ( p == buff )
+                   {
+	  p = strstr(buff,":");
+	  if (p) *p = 0;
+
+
+	  sprintf(comd,"ptc_setfieldcomp, element=%s, kn=%d, ks=%d, value=%s;",
+                    	              buff, v->kn,v->ks,v->namecv);
+	  if (debuglevel)  printf("%s\n",comd);
+	  pro_input(comd);
+
+                   }
+
+                  n++;
+                  node = node->next;
+
+                  if ( node == current_sequ->range_start )
+                   { 
+	 break; 
+                   }
+                }
+              
+             }
+            else
+             {
+               sprintf(comd,"ptc_setfieldcomp, element=%s, kn=%d, ks=%d, value=%s;",
+                    	       kn->elname, v->kn,v->ks,v->namecv);
+               if (debuglevel)  printf("%s\n",comd);
+               pro_input(comd);
+             }
          }
       }
    }
@@ -1341,12 +1508,12 @@ int run_ptccalculation(int setknobs, char* readstartval)
    }
   else
    {
-     printf("Knob Setting Is not requested this time.\n");
+     if (debuglevel)  printf("Knob Setting Is not requested this time.\n");
    }
    
 /*  pro_input(twisscommand);*/
 
-  printf("Running ptc_twiss or ptc_normal.\n");
+  if (debuglevel)  printf("Running ptc_twiss or ptc_normal.\n");
   
   this_cmd = madx_mpk_comm_calculate;
   current_command =  madx_mpk_comm_calculate->clone;
@@ -1365,3 +1532,37 @@ int run_ptccalculation(int setknobs, char* readstartval)
   
   return 0;
 } 
+
+
+double match2_summary()
+{
+  int i,j;
+
+  double penalty;
+  
+  printf("\n");
+  printf("MATCH SUMMARY\n\n");
+/*  fprintf(prt_file, "Macro Constraint            Value                     Penalty\n");*/
+  printf("--------------------------------------------------------------------\n");
+  penalty=0;
+  for(i=0;i<MAX_MATCH_MACRO;i++) 
+   {
+     if(match2_macro_name[i]==NULL) break;
+     printf("macro: %-20s\n",match2_macro_name[i]);
+     for(j=0;j<MAX_MATCH_CONS;j++) 
+     {
+      if (match2_cons_name[i][j]==NULL) break;
+      printf("  constraint: %-40s\n",match2_cons_name[i][j]);
+      printf("  values:     %+12.5e%c%+12.5e\n",
+              match2_cons_value_lhs[i][j],
+              match2_cons_sign[i][j],
+              match2_cons_value_rhs[i][j]);
+      printf("  weight:     %+12.5e\n", match2_cons_weight[i][j]);
+      printf("  penalty:    %+12.5e\n\n",match2_cons_value[i][j]);
+      penalty+=pow(match2_cons_value[i][j],2);
+    }
+  }
+  
+  
+  return penalty;
+}
