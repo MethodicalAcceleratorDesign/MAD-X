@@ -98,6 +98,7 @@
 #define w_ptc_getnmoments       w_ptc_getnmoments_
 #define w_ptc_getmomentstabcol  w_ptc_getmomentstabcol_
 #define w_ptc_setknobvalue      w_ptc_setknobvalue_
+#define w_ptc_refreshtables     w_ptc_refreshtables_
 #define w_ptc_getnfieldcomp     w_ptc_getnfieldcomp_
 #define w_ptc_getsfieldcomp     w_ptc_getsfieldcomp_
 #define w_ptc_setfieldcomp      w_ptc_setfieldcomp_
@@ -238,6 +239,7 @@
 #define w_ptc_getnmoments       W_PTC_GETNMOMENTS
 #define w_ptc_getmomentstabcol  W_PTC_GETMOMENTSTABCOL
 #define w_ptc_setknobvalue      W_PTC_SETKNOBVALUE
+#define w_ptc_refreshtables     W_PTC_REFRESHTABLES
 #define w_ptc_getnfieldcomp     W_PTC_GETNFIELDCOMP
 #define w_ptc_getsfieldcomp     W_PTC_GETSFIELDCOMP
 #define w_ptc_setfieldcomp      W_PTC_SETFIELDCOMP
@@ -916,6 +918,7 @@ void w_ptc_addmoment(int* xi, int* pxi, int* yi, int* pyi, int* dpi, int* ti, in
 int  w_ptc_getnmoments();
 void w_ptc_getmomentstabcol(int* n, char* tabname, char* colname );
 void w_ptc_setknobvalue(int* fibrename);
+void w_ptc_refreshtables();
 void w_ptc_getnfieldcomp(int* fibreidx, int* ncomp, double*);
 void w_ptc_getsfieldcomp(int* fibreidx, int* ncomp, double*);
 void w_ptc_setfieldcomp(int* fibreidx);

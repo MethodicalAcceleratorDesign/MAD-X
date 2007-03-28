@@ -33,6 +33,7 @@ module madx_ptc_knobs_module
   
   public                         :: writeparresults
   public                         :: killparresult
+  public                         :: finishknobs
   public                         :: twissfctn
   public                         :: getknobsnames
   public                         :: getfctnsnames
@@ -41,7 +42,7 @@ module madx_ptc_knobs_module
   public                         :: getlengthat
   public                         :: setparvalue
   public                         :: setknobvalue
-  
+  public                         :: filltables
 
 
   !============================================================================================
@@ -81,10 +82,15 @@ module madx_ptc_knobs_module
 
   integer                               ::  currentrow = 0 
 
-  type(real_8), private, dimension(3)       :: testold
-  type(real_8), private, dimension(3)       :: phase
+  type(real_8), private, dimension(3)   ::  testold
+  type(real_8), private, dimension(3)   ::  phase
 
-  integer, allocatable                  ::  E(:)  !array to pick taylor coefficients with .sub. and .par.
+  integer, private, allocatable         ::  E(:)  !array to pick taylor coefficients with .sub. and .par.
+  type(taylor), private                 ::  ave(6,6,3)
+  type(real_8), private                 ::  tx, ty
+  type(real_8), private                 ::  dph
+  type(real_8), private                 ::  test
+  integer, private                      ::  taylorsallocated = 0
   
   integer, private, dimension(6)        :: j1 = (/1,0,0,0,0,0/) 
   integer, private, dimension(6)        :: j2 = (/0,1,0,0,0,0/) 
@@ -353,7 +359,6 @@ contains
 
   subroutine inittables()
     implicit none
-    integer  :: i ! iterator
 
 !     print*, " no=",c_%no
 !     print*, " nv=",c_%nv
@@ -520,7 +525,6 @@ contains
     endif
     
     name = charconv(nameIA)
-    print*, "User has given :", name
     select case(name(1:6))
       case ('beta11')
         knobi%beta(1) = nknobi+1
@@ -548,8 +552,6 @@ contains
         print*,"parameter ",name,"not recognized"
         return
     end select
-    
-    print*, "Found twiss function ", name
     
     nknobi = nknobi + 1
     
@@ -580,7 +582,6 @@ contains
     
     fibrename = charconv(fibrenameIA)
     
-    print *,"addknob: fibrename is ", fibrename
     k = index(fibrename,':')
     if (k > 0) then
       pb%name = fibrename(1:k-1)
@@ -588,18 +589,20 @@ contains
       pb%name = fibrename
     endif  
 
-    print *,"addknob: pb%name is ", pb%name
+    if (getdebug() > 1) print *,"addknob: pb%name is ", pb%name," npolblocks=",npolblocks
 
     
     exactmatch = get_value('ptc_knob ','exactmatch ') .ne. 0
     if (exactmatch) then
-      print*,"addknob: Using Exact name match: ", fibrename
+      if (getdebug() > 1) print*,"addknob: Using Exact name match: ", fibrename
       pb%vorname = fibrename
     else
       pb%n_name =  len_trim(pb%name)
-      print*,"addknob: Using Not Exact name match:"
-      print*,"    all elements starting with ", pb%name
-      print*,"    number of first letters    ", pb%n_name
+      if (getdebug() > 1) then
+        print*,"addknob: Using Not Exact name match:"
+        print*,"    all elements starting with ", pb%name
+        print*,"    number of first letters    ", pb%n_name
+      endif  
     endif
 
     call comm_para('kn ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
@@ -625,7 +628,7 @@ contains
      pb%ian(int_arr(i)) = nknobs
      if (getdebug()>0) print*, "Set skew mulitpole component ", int_arr(i)," as ", nknobs, "parameter of PTC"
     enddo
-
+    
   end subroutine addknob
   !____________________________________________________________________________________________
 
@@ -634,7 +637,7 @@ contains
     include 'twissa.fi'
     type(layout),pointer       :: alayout
     type (pol_block), pointer  :: pb
-    integer     :: i
+    integer     :: i,j,k
     
     if (.not. associated(alayout)) then
       call fort_warn("setknobs","Passed pointer to a layout is not associated")
@@ -665,7 +668,22 @@ contains
 
    call allocparresult(alayout%n)
 
+   do i=1,c_%nd2
+      do j=1,c_%nd2
+         do k=1,c_%nd
+            call alloc(ave(i,j,k))
+         enddo
+      enddo
+   enddo
 
+   call alloc(phase)
+   call alloc(testold)
+   call alloc(test)
+   call alloc(dph)
+   call alloc(tx, ty)
+   
+   taylorsallocated = 1
+   
    currentrow = 1 
 
 !    print*, "setknobs: All pol_blocks set"
@@ -679,7 +697,6 @@ contains
     integer       :: i,j
 
     np = c_%nv - c_%npara
-    print*, "There is ",np, " parameters "
     if (np <= 0) then
       call fort_warn("addpush","Number of parameters is 0")
       currentrow = -1  ! this is the signal that initialization has failed
@@ -698,7 +715,7 @@ contains
     enddo  
     allocate(spos(n))
     allocate(e(c_%npara_fpp))
-    
+
     
   end subroutine allocparresult
   !_________________________________________________________________________________
@@ -1123,22 +1140,9 @@ contains
   subroutine parametrictwiss(y)   !  Computes <x_i x_j> assuming linearity and with parameters
     implicit none
     type(real_8) y(6)
-    type(taylor) :: ave(6,6,3)
-    type(real_8) :: tx, ty
-    type(real_8) :: dph 
-    type(real_8) :: test
     real(dp) :: epsil=1e-12, realdph, realtest, realtestold  !
     type(universal_taylor) :: unita
     integer i,j,k
-    
-    do i=1,c_%nd2
-       do j=1,c_%nd2
-          do k=1,c_%nd
-             call alloc(ave(i,j,k))
-          enddo
-       enddo
-    enddo
-    
     
     e=0
     do i=1,c_%nd2
@@ -1255,11 +1259,6 @@ contains
      ! phase advance!
      !!!!!!!!!!!!!!!!
      
-     call alloc(phase)
-     call alloc(testold)
-     call alloc(test)
-     call alloc(dph)
-     call alloc(tx, ty)
      
      k = 2
      if(c_%nd2==6.and.c_%ndpt==0) k = 3
@@ -1294,18 +1293,39 @@ contains
 !     print*, "Beta Z"
 !     call daprint(ave(5,5,3),6)
 
-    do i=1,c_%nd2
-       do j=1,c_%nd2
-          do k=1,c_%nd
-             call kill(ave(i,j,k))
-          enddo
-       enddo
-    enddo
 
       
   end subroutine parametrictwiss
   !_________________________________________________________________________________
 
+  subroutine finishknobs
+    implicit none
+     integer i,j,k
+     
+     
+     if (taylorsallocated == 0) then
+       return
+     endif
+     
+     call kill(phase)
+     call kill(testold)
+     call kill(test)
+     call kill(dph)
+     call kill(tx, ty)
+
+     do i=1,c_%nd2
+        do j=1,c_%nd2
+           do k=1,c_%nd
+              call kill(ave(i,j,k))
+           enddo
+        enddo
+     enddo
+
+     taylorsallocated = 0
+  
+  end subroutine finishknobs
+  !_________________________________________________________________________________
+  
   subroutine resultswithknobs(n,name,y)
     implicit none
     integer              :: n !fibre number
@@ -1319,79 +1339,7 @@ contains
 !    call print(y(1),6)
 
   end subroutine resultswithknobs
-  
-  !____________________________________________________________________________________________
 
-  !____________________________________________________________________________________________
-
-  subroutine average_x_i_x_j(y,ave,i,j)   !  Computes <x_i x_j>
-    implicit none
-    type(real_8) y(6)
-    type(taylor) ave
-    type(taylorresonance) tr
-    integer i,j
-
-    call alloc(tr)
-
-    if(j/=0) then
-       tr=y(i)%t*y(j)%t
-    else
-       tr=y(i)%t
-    endif
-
-    call cfu(tr%cos,filter,ave)
-
-    call kill(tr)
-  end subroutine average_x_i_x_j
-  !_________________________________________________________________________________
-
-  real(dp) function filter(e)   !  Computes <x_i x_j>
-    implicit none
-    integer e(:)
-    integer i
-
-    filter=one
-
-    do i=1,c_%nd
-       if(e(2*i-1)/=e(2*i)) then
-          filter=zero
-          return
-       else
-          filter=filter*dismom(i,e(2*i))
-       endif
-    enddo
-
-  end function filter
-  !_________________________________________________________________________________
-
-
-
-  subroutine make_gaussian(plane,I0)
-    implicit none
-    integer plane,i
-    real(dp) I0
-
-    dismom(plane,0)=one
-
-    do i=1,c_%no/2
-       dismom(plane,i)=i*I0*two*dismom(plane,i-1)
-    enddo
-
-  end   subroutine make_gaussian
-  !_________________________________________________________________________________
-
-  subroutine make_ring(plane,I0)
-    implicit none
-    integer plane,i
-    real(dp) I0
-
-    dismom(plane,0)=one
-
-    do i=1,c_%no/2
-       dismom(plane,i)=I0*two*dismom(plane,i-1)
-    enddo
-
-  end   subroutine make_ring
   !_________________________________________________________________________________
   subroutine writeparresults(filenameIA)
     implicit none
@@ -1400,11 +1348,14 @@ contains
     integer       :: mf !macro file descriptor
     character(48) :: filename
     character(48) :: fmat
-    integer       :: i,j
+    integer       :: i,j, nel
     logical       :: fmt_ptc, fmt_tex
+    integer, parameter         :: length=16
+    character(length)          :: name
     real(kind(1d0))            :: get_value
     integer                    :: get_string
-
+    integer                    :: restart_sequ,advance_node
+    
     if (.not. ALLOCATED(results)) then
       call fort_warn("writeparresults","Array with parametric results is not present.")
       print*, "writeparresults tip: it might have been erased the ptc_end command."
@@ -1445,8 +1396,13 @@ contains
     
     print*,"ptc_printparametric : currentrow is ", currentrow
     
+    nel = restart_sequ()
+    
     do i=1,currentrow-1
-      write(mf,*) "Magnet ", i
+      
+      call node_name(name,length)
+      
+      write(mf,*) "Magnet ", i," ",name(1:length)
       
       
       do j=1,ntwisses
@@ -1467,6 +1423,9 @@ contains
         write(mf,*) " "
         enddo
       write(mf,*) "======================================="  
+      
+      nel = advance_node()
+      
     enddo
     
     if (mf /= 6) close(mf)
@@ -1512,7 +1471,7 @@ contains
     integer                    :: kn, ks, par
     real                       :: v
     real(kind(1d0))            :: get_value
-    
+    logical(lp)                :: refreshtables
     par = -1
     fibrename = charconv(fibrenameIA)
     
@@ -1528,8 +1487,6 @@ contains
     endif
 
     if ( (kn<=0) .and. (ks<=0) ) then
-       
-       print*, "Here we have an initial parameter"
        
        select case(fibrename(1:6))
          case ('BETA11')
@@ -1588,18 +1545,26 @@ contains
        print*, "Setting parameter ",par,"(el=",fibrename(1:16),", kn=",kn,", ks=",ks," ) to ", v
     endif
     
-    print*, "Setting par ", par, " to ", v, fibrename(1:6)
+    if (getdebug() > 1) print*, "Setting par ", par, " to ", v, fibrename(1:16)
     call setparvalue(par, v)
+
+    refreshtables = get_value('ptc_setknobvalue ','refreshtables ') .ne. 0
     
-    call filltwisstable()
-    
-!    call cleartables()
-    call fillusertables()
+    if (refreshtables) then
+      call filltables()
+    endif  
     
     
   end subroutine setknobvalue
   !____________________________________________________________________________________________
-
+  
+  subroutine filltables
+    implicit none
+      call filltwisstable()
+!    call cleartables()
+      call fillusertables()
+  end subroutine filltables
+  !____________________________________________________________________________________________
   
   function getlengthat(n)
     implicit none
@@ -1896,5 +1861,7 @@ subroutine w_ptc_setparvalue(n,v)
   call setparvalue(n,v)
   
 end subroutine w_ptc_setparvalue
+
+
 
 

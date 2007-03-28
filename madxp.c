@@ -1599,6 +1599,10 @@ void exec_command()
       {
         pro_ptc_setknobvalue(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_refreshpartables") == 0)
+      {
+        w_ptc_refreshtables();
+      }
       else if (strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)
       {
         pro_ptc_setfieldcomp(p);

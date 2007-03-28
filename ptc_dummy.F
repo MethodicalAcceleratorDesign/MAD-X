@@ -194,6 +194,11 @@ C     Implemented in madx_ptc_distrib.f90
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine  w_ptc_refreshtables()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
 
       subroutine w_ptc_getnfieldcomp(fibreidx,ncomp,nval)
       implicit none

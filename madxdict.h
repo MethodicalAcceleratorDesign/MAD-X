@@ -424,7 +424,11 @@ char command_def[] =
 "element = [s, none] , "/* */
 "kn    = [i, -1], "
 "ks    = [i, -1], "
+"refreshtables  = [l, true, true], "
 "value = [r] ; "
+" "
+"ptc_refreshpartables: ptc_refreshpartables none 0 0 "
+"refreshtables  = [l, true, true] ;"
 " "
 "rviewer: rviewer none 0 0 "
 "exactmatch = [l, true, true] ; "
