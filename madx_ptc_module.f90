@@ -951,11 +951,7 @@ CONTAINS
     enddo
 
     ncomp = ncomp + 1
-    print*," Mag Name ",p%mag%name
-    print*," ncomp ",ncomp
-    print*," BN ",p%mag%BN
     nval = p%mag%BN(ncomp)
-    print*, "Returning BN",nval
 
   end subroutine  ptc_getnfieldcomp
   !----------------------------------------------------------------
@@ -1039,7 +1035,8 @@ CONTAINS
 
     if (kn >= 0) then
        kn = kn + 1
-       print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
+       
+       if (getdebug() > 1) print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
 
        call add(p%mag, kn,0,v)
        call add(p%magp,kn,0,v)
@@ -1055,6 +1052,7 @@ CONTAINS
 
        !      print*,"Setting up skew field component ", ks," to ", v
 
+       if (getdebug() > 1) print*,"Setting up KS ", ks, " from ", p%mag%AN(ks) ," to ", v
        call add(p%mag, -ks,0,v)
        call add(p%magp,-ks,0,v)
 
