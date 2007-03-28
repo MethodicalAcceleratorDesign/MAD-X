@@ -8209,8 +8209,6 @@ void pro_ptc_varyknob(struct in_cmd* cmd)
    Sets a variable based on parameter
  */
   
-  printf("pro_ptc_varyknob\n");
-  
   if (match_is_on != kMatch_PTCknobs)
   {
     warningnew("pro_ptc_varyknob","Match with ptcknobs is not active, command ignored");
