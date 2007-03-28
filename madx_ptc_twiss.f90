@@ -421,6 +421,13 @@ contains
     y=npara
     Y=X
 
+    if (cavsareset .eqv. .false.) then
+       call setcavities(my_ring,maxaccel)
+       if (geterrorflag() /= 0) then
+          return
+       endif
+    endif
+
 
     call setknobs(my_ring)
     
@@ -433,14 +440,6 @@ contains
        return
     endif
     
-    if (cavsareset .eqv. .false.) then
-       call setcavities(my_ring,maxaccel)
-       if (geterrorflag() /= 0) then
-          return
-       endif
-    endif
-
-
     !############################################################################
     !############################################################################
     !############################################################################
@@ -477,9 +476,11 @@ contains
       do i=1,MY_RING%n
         do ii=1,6
          call alloc(maps(i)%unimap(ii),0,0)
-         maps(i)%unimap(ii) = zero !this initializes and allocates the varables
+         maps(i)%unimap(ii) = zero !this initializes and allocates the variables
         enddo 
       enddo 
+    else
+      nullify(maps) !assurance   
     endif
     
     do i=1,MY_RING%n
@@ -487,7 +488,9 @@ contains
        if (getdebug() > 1) then
           write(6,*) "##########################################"
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-          write(6,'(a, f9.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
+          write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
+          write(6,'(a, f12.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
+!          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
        endif
        
        if (nda > 0) then
@@ -552,7 +555,8 @@ contains
     do i=1,6
      call kill(unimap(i))
     enddo 
-
+    
+    call finishknobs()
     
     if (savemaps) then  !do it at the end, so we are sure the twiss was successful
       mapsorder = no
@@ -1160,9 +1164,11 @@ contains
       mu(1)    = get_value('ptc_twiss ','mux ')
       mu(2)    = get_value('ptc_twiss ','muy ')
       mu(3)    = get_value('ptc_twiss ','muz ')
-
-      print*,"TW: Ini betas ",beta      
-      print*,"TW: Ini alfas ",alpha
+      
+      if (getdebug() > 1) then
+        print*,"TW: Ini betas ",beta      
+        print*,"TW: Ini alfas ",alpha
+      endif  
       
       if (c_%nd == 3) then
         if (beta(3) <= zero) then
@@ -1217,19 +1223,19 @@ contains
         do i=1,c_%nd
 
           if(inicondknobs%beta(i)/=0) then
-            print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
+            if (getdebug() > 1) print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
             call make_it_knob(be(i),k_system+inicondknobs%beta(i))
           endif  
 
           if(inicondknobs%alfa(i)/=0) then
-            print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
+            if (getdebug() > 1) print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
             call make_it_knob(al(i),k_system+inicondknobs%alfa(i))
           endif  
         enddo
 
         do i=1,4
           if(inicondknobs%dispersion(i)/=0) then
-            print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
+            if (getdebug() > 1) print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
             call make_it_knob(di(i),k_system+inicondknobs%dispersion(i))
           endif  
         enddo
