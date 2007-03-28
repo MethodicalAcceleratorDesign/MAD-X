@@ -191,6 +191,14 @@ subroutine w_ptc_setknobvalue(fibre)
 
 end subroutine w_ptc_setknobvalue
 
+subroutine w_ptc_refreshtables()
+  use madx_ptc_knobs_module
+  implicit none
+
+    call filltables()
+  
+end subroutine w_ptc_refreshtables
+
 subroutine w_ptc_addknob(fibre)
   use madx_ptc_knobs_module
   implicit none
