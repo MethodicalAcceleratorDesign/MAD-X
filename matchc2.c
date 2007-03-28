@@ -3,7 +3,6 @@ void match2_match(struct in_cmd* cmd)
 {
   match_is_on = 2;
   total_const=0;
-  printf("Inside USE_MACRO mode\n");
   
   if (MAX_MATCH_MACRO == 0)
    {
@@ -138,17 +137,17 @@ void match2_end(struct in_cmd* cmd)
   for(i=0;i<MAX_MATCH_MACRO;i++) 
    {
      if(match2_macro_name[i]==NULL) break;
-     printf("macro: %-20s\n",match2_macro_name[i]);
+     fprintf(prt_file,"macro: %-20s\n",match2_macro_name[i]);
      for(j=0;j<MAX_MATCH_CONS;j++) 
      {
       if (match2_cons_name[i][j]==NULL) break;
-      printf("  constraint: %-40s\n",match2_cons_name[i][j]);
-      printf("  values:     %+12.5e%c%+12.5e\n",
+      fprintf(prt_file,"  constraint: %-40s\n",match2_cons_name[i][j]);
+      fprintf(prt_file,"  values:     %+12.5e%c%+12.5e\n",
               match2_cons_value_lhs[i][j],
               match2_cons_sign[i][j],
               match2_cons_value_rhs[i][j]);
-      printf("  weight:     %+12.5e\n", match2_cons_weight[i][j]);
-      printf("  penalty:    %+12.5e\n\n",match2_cons_value[i][j]);
+      fprintf(prt_file,"  weight:     %+12.5e\n", match2_cons_weight[i][j]);
+      fprintf(prt_file,"  penalty:    %+12.5e\n\n",match2_cons_value[i][j]);
       penalty+=pow(match2_cons_value[i][j],2);
     }
   }

@@ -894,9 +894,9 @@ void mtjacprint(int m, int n,double* jac){
   int i,j,k,l;
   double *SV,*U,*VT;
   k=0;
-  printf("\n\nJACOBIAN:\n");
-  printf("%4s %16s %10s %20s\n","Node","Constraint","Variable","Derivative");
-  printf("---------------------------------------------------------------\n");
+  fprintf(prt_file, "\n\nJACOBIAN:\n");
+  fprintf(prt_file, "%4s %16s %10s %20s\n","Node","Constraint","Variable","Derivative");
+  fprintf(prt_file, "---------------------------------------------------------------\n");
   for(i=0;i<MAX_MATCH_MACRO;i++) 
    {
     if (match2_macro_name[i]==NULL) break;
@@ -905,24 +905,24 @@ void mtjacprint(int m, int n,double* jac){
      if (match2_cons_name[i][j]==NULL) break;
       for(l=0;l<n;l++)
       {
-        printf("%4s ",match2_macro_name[i]);
-        printf("%16s ",match2_cons_name[i][j]);
-        printf("%10s ",command_par_string("name",stored_match_var->commands[l]));
-        printf("%20.10e",jac[l*m+k]);
-        printf("\n");
+        fprintf(prt_file, "%4s ",match2_macro_name[i]);
+        fprintf(prt_file, "%16s ",match2_cons_name[i][j]);
+        fprintf(prt_file, "%10s ",command_par_string("name",stored_match_var->commands[l]));
+        fprintf(prt_file, "%20.10e",jac[l*m+k]);
+        fprintf(prt_file, "\n");
       }
       k++;
     }
   }
-  printf("\n\nSINGULAR VALUE DECOMPOSITION:\n");
+  fprintf(prt_file, "\n\nSINGULAR VALUE DECOMPOSITION:\n");
   SV=(double *)mymalloc("match_match",(total_const+total_vars)*sizeof(double));
   VT=(double *)mymalloc("match_match",(total_vars*total_vars)*sizeof(double));
   U=(double *)mymalloc("match_match",(total_const*total_const)*sizeof(double));
   mtsvd_(&total_const,&total_vars,jac,SV,U,VT);
   k=0;
   l=0;
-  printf("%-25s %12s %-34s\n","Variable vector","* Sing. val.","---> Node constraint vector");
-  printf("--------------------------------------------------------------------\n");
+  fprintf(prt_file, "%-25s %12s %-34s\n","Variable vector","* Sing. val.","---> Node constraint vector");
+  fprintf(prt_file, "--------------------------------------------------------------------\n");
   for(i=0;i<mymax(n,m);i++){
     for(j=0;j<mymax(n,m);j++){
       if (match2_cons_name[k][l]==NULL) {
@@ -930,28 +930,28 @@ void mtjacprint(int m, int n,double* jac){
         l=0;
       }
       if ( (i<n)&&(j<n)) {
-        printf("%-12s",command_par_string("name",stored_match_var->commands[j]));
-        printf("%12.6g ",VT[i*n+j]);
+        fprintf(prt_file, "%-12s",command_par_string("name",stored_match_var->commands[j]));
+        fprintf(prt_file, "%12.6g ",VT[i*n+j]);
       }
-      else { printf("%22s",""); }
+      else { fprintf(prt_file, "%22s",""); }
       if ( (i<mymin(n,m)) &&(j==0))   {
-        printf("%12.6g ",SV[i]);
+        fprintf(prt_file, "%12.6g ",SV[i]);
       }
-      else { printf("%12s ",""); }
+      else { fprintf(prt_file, "%12s ",""); }
       if ( (i<m)&&(j<m) ) {
-/*        printf("%i %i",k,l);*/
-        printf("%12.6g ",U[j*m+i]);
-        printf("%10s ",match2_macro_name[k]);
-        printf("%10s ",match2_cons_name[k][l]);
+/*        fprintf(prt_file, "%i %i",k,l);*/
+        fprintf(prt_file, "%12.6g ",U[j*m+i]);
+        fprintf(prt_file, "%10s ",match2_macro_name[k]);
+        fprintf(prt_file, "%10s ",match2_cons_name[k][l]);
       }
-      else { printf("%34s",""); }
-      printf("\n");
+      else { fprintf(prt_file, "%34s",""); }
+      fprintf(prt_file, "\n");
       l++;
     }
     l=0;
     k=0;
-  printf("\n");
-  printf("\n");
+  fprintf(prt_file, "\n");
+  fprintf(prt_file, "\n");
   }
 }
 
