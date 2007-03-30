@@ -317,7 +317,7 @@ void madx_mpk_run(struct in_cmd* cmd)
     
      if (debuglevel)  printf("\n\nCalling TWISS with KNOBS\n");
      run_ptccalculation(1,&readstartval);
-     
+
      if (errorflag)
       {
         error("Matching With Knobs","PTC calculation ended with an error. Check your setting and matching limits.");
@@ -400,7 +400,7 @@ void madx_mpk_run(struct in_cmd* cmd)
      
      if (debuglevel)  printf("\n\nCalling TWISS with NO knobs\n");
      run_ptccalculation(0,&readstartval);
-     
+
      i = match2_evaluate_exressions(0,0,function_vector2);
      if (debuglevel)  printf("match2_evaluate_exressions returned fun_vector 2 of length %d\n",i);
 
@@ -1381,7 +1381,7 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
 
   fprintf(f,"endmatch;\n");
 
-  if (debuglevel < 2) fprintf(f,"assign, echo=\terminal;\n");
+  if (debuglevel < 2) fprintf(f,"assign, echo=terminal;\n");
 
   fclose(f);
 
