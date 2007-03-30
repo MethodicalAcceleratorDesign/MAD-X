@@ -532,7 +532,7 @@ contains
        endif
               
        tw=y
-       call putusertable(i,current%mag%name,suml,y,y)
+       call putusertable(i,current%mag%name,suml,getdeltae(),y)
 
        call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
 
@@ -541,6 +541,15 @@ contains
     enddo
 100 continue
     
+
+    if (getdebug() > 1) then
+       write(6,*) "##########################################"
+       write(6,*) "##########################################"
+       write(6,*) "###  END  OF  PTC_TWISS            #######"
+       write(6,*) "##########################################"
+       write(6,*) "##########################################"
+!          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
+    endif
     
     print77=.true.
 
@@ -706,17 +715,12 @@ contains
         endif
     end subroutine initmap
     !____________________________________________________________________________________________
-    subroutine puttwisstable()
+    
+    function getdeltae()
       implicit none
-      include "madx_ptc_knobs.inc"
-      include 'twissa.fi'
-      integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(72),myx
-      real(dp)   :: deltae
-      type(work) :: cfen !current fibre energy
+      real(dp)   :: getdeltae
+      type(work)              :: cfen !current fibre energy
       
-      
-
       cfen = 0 ! do not remove -> if it is removed energy is wrong because = adds energy to the previous value
 
       if ( (associated(current%next) .eqv. .false. ) .or. (associated( current%next, my_ring%start)) ) then
@@ -737,16 +741,33 @@ contains
          cfen=current%next      ! energy after passing this element
       endif
 
-      deltae = cfen%energy/startfen%energy
+      getdeltae = cfen%energy/startfen%energy
+
+      if (getdebug() > 2) then
+         write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
+      endif
+        
+    end function getdeltae
+    !____________________________________________________________________________________________
+    
+    subroutine puttwisstable()
+      implicit none
+      include "madx_ptc_knobs.inc"
+      include 'twissa.fi'
+      integer i1,i2,ii,i1a,i2a
+      real(kind(1d0))   :: opt_fun(72),myx
+      real(dp)   :: deltae
+
 
       if (getdebug() > 2) then
          write(21,*) "##########################################"
          write(21,*) ""
          write(21,'(i4, 1x,a, f10.6)') i,current%mag%name,suml
-         write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",deltae
          write(21,*) ""
          call print(y,21)
       endif
+
+      deltae = getdeltae()
 
       call double_to_table(table_name, 's ', suml)
       doublenum=current%mag%p%p0c
@@ -832,12 +853,13 @@ contains
       enddo
 
       if (getdebug() > 2)  then
-         write(6,'(a,(f8.4,1x))') current%MAG%name,suml
+         write(6,'(a,1(f8.4,1x))') current%MAG%name,suml
+         write(6,'(a,1(f10.8,1x))') "Delta E ", deltae 
          write(6,'(a,3(i8.0,1x))')  "idxes ", beta11,beta22,beta33
-         write(6,'(a,3(f8.4,1x))')  "betas ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
-         write(6,'(a,3(f8.4,1x))')  "betas ", opt_fun(1),opt_fun(5),opt_fun(9)
-         write(6,'(a,3(f8.4,1x))')  "disps ", opt_fun(31),opt_fun(33),opt_fun(35)
-         write(6,'(a,3(f8.4,1x))')  "tunes ", tw%mu(1),tw%mu(2),tw%mu(3)
+         write(6,'(a,3(f8.4,1x))')  "betas raw   ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
+         write(6,'(a,3(f8.4,1x))')  "betas w/ener", opt_fun(1),opt_fun(5),opt_fun(9)
+         write(6,'(a,3(f8.4,1x))')  "disps       ", opt_fun(31),opt_fun(33),opt_fun(35)
+         write(6,'(a,3(f8.4,1x))')  "tunes       ", tw%mu(1),tw%mu(2),tw%mu(3)
       endif
 
       ioptfun=72
@@ -917,7 +939,6 @@ contains
       integer nd,nd_m
       logical fake_3
       integer jc(6)
-      
       type(real_8) yy(6)
       integer :: dodo = 0
       real(dp) x(6)

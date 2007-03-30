@@ -80,14 +80,15 @@ integer, parameter                ::   gama31=25
 integer, parameter                ::   gama32=26
 integer, parameter                ::   gama33=27
 
-integer, parameter                ::   disp1=28
-integer, parameter                ::   disp2=29
-integer, parameter                ::   disp3=30
-integer, parameter                ::   disp4=31
+integer, parameter                ::   mu1=28
+integer, parameter                ::   mu2=29
+integer, parameter                ::   mu3=30
 
-integer, parameter                ::   mu1=32
-integer, parameter                ::   mu2=33
-integer, parameter                ::   mu3=34
+
+integer, parameter                ::   disp1=31
+integer, parameter                ::   disp2=32
+integer, parameter                ::   disp3=33
+integer, parameter                ::   disp4=34
 
 
 

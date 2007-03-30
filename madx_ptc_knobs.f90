@@ -70,6 +70,7 @@ module madx_ptc_knobs_module
   type(mapelresult),target              ::  mapels(maxpar)
               
   real(kind(1d0)), allocatable          ::  spos(:)
+  real(dp), allocatable                 ::  deltaes(:) !array with energy increase for each element with respect to the beginning
   real(kind(1d0)), allocatable          ::  parvals(:) ! temp array with parameter values, to find out a function value for some parameters
 !  type(taylor), allocatable             ::  results(:,:)
   type(universal_taylor), allocatable, target   ::  results(:,:)
@@ -146,13 +147,13 @@ contains
       
   end subroutine nullify
   
-  subroutine putusertable(n,name,s,yc,y)
+  subroutine putusertable(n,name,s,denergy,y)
     !puts the coefficients in tables as defined in array pushes
     implicit none
     integer              :: n !fibre number
     character(*)         :: name !fibre name
     real(kind(1d0))      :: s  !position along the orbit
-    type(real_8),target  :: yc(6)!input 6 dimensional function (polynomial) : Coordinates
+    real(dp)             :: denergy
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
     type(real_8),pointer :: e !element in array
     real(kind(1d0))      :: coeff
@@ -169,7 +170,8 @@ contains
       ! otherwise the results table is not allocated
       pblockson = .true.  !it means there are parameters on
       spos(currentrow) = s
-      call parametric_coord(yc)
+      deltaes(currentrow) = denergy
+      call parametric_coord(y)
       call parametrictwiss(y)
     else  
       pblockson = .false.
@@ -318,7 +320,8 @@ contains
     real(kind(1d0))      :: coeff
     integer              :: i,ii !iterator
     integer              :: nelems !iterator
-    integer, parameter   :: fillntwisses = gama33 - beta11 + 1
+    integer, parameter   :: fillntwisses  = disp4 - beta11 + 1
+    integer, parameter   :: ntwissesde = gama33 - beta11 + 1
     logical              :: pblockson
     real(kind(1d0))      :: opt_fun(72)
     type(universal_taylor), pointer :: t
@@ -345,7 +348,11 @@ contains
         t => results(i,ii)
         opt_fun(ii)=  gettaylorvalue(t)
       enddo 
-!      write(6,'(a,3(f8.4,1x))')  "betas ", opt_fun(1),opt_fun(2),opt_fun(3)
+    
+      do ii=beta11,ntwissesde
+        opt_fun(ii) = opt_fun(ii)*deltaes(i)
+      enddo 
+
       call vector_to_table(twisstablename, 'beta11 ', fillntwisses, opt_fun(beta11))
       call vector_to_table(twisstablename, 'x ', 6, opt_fun(kn_x))
       
@@ -714,6 +721,7 @@ contains
       enddo
     enddo  
     allocate(spos(n))
+    allocate(deltaes(n))
     allocate(e(c_%npara_fpp))
 
     
@@ -744,6 +752,7 @@ contains
     enddo
     
     deallocate(spos)
+    deallocate(deltaes)
     deallocate(results)
     deallocate(parvals)
     deallocate(e)
@@ -1161,7 +1170,6 @@ contains
        enddo
     enddo
 
-    
     ave(1,2,1) = -ave(1,2,1)
     results(currentrow, alfa11) = ave(1,2,1)
     results(currentrow, beta11) = ave(1,1,1) 
