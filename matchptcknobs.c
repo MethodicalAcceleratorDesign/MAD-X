@@ -312,6 +312,7 @@ void madx_mpk_run(struct in_cmd* cmd)
       {
         printf("%16f   ",madx_mpk_variables[i].currentvalue);
       }
+     printf("\n"); 
      
      fflush(0);
     
