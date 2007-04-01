@@ -120,7 +120,7 @@ MODULE S_DEF_KIND
   real(dp), target :: phase0=-pi
   real(dp), target :: wedge_coeff(2)
   logical(lp), target :: MAD8_WEDGE=.TRUE.
-  INTEGER , target :: CAVITY_TOTALPATH=0   !  default is fake
+  INTEGER , target :: CAVITY_TOTALPATH=1   !  default is fake
   logical(lp) :: bug_intentional=.true.
   ! stochastic radiation in straigth
 
