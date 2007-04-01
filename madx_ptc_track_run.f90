@@ -339,6 +339,8 @@ CONTAINS
 
     !hbu
     real(dp) :: spos_current_position ! s-position   =spos
+    REAL(dp) :: summ_ring_length      ! saved ring-length calculated before tracking 
+                                      ! at the last element in subr. Prepare_Observation_points    
     integer ::  nlm_current_element_number    ! line position =nlm
     character*(name_len) el_name
     !hbu
@@ -1708,12 +1710,17 @@ CONTAINS
       ! IMPLICIT NONE => in the host
 
       INTEGER :: j_th_part ! local
+
+     el_name='end             ' 
+     nlm_current_element_number = MY_RING%n   
+     
       if (ptc_track_debug) then
          Print *, ' Start SUBR. <Write_tables_after_total_turn>'
          Print *, ' jmax=', jmax_numb_particl_at_i_th_turn
          Print *, ' spos_current_position=', spos_current_position
          Print *, ' nlm_current_element_number=', nlm_current_element_number
          Print *, ' el_name=', el_name
+         Print *, ' summ_ring_length=', summ_ring_length        
       end if
 
       if (mod(i_th_turn, ptc_ffile).EQ.0) then !:::: if(turn/ffile)=int ::::!     !       e
@@ -1727,7 +1734,8 @@ CONTAINS
          !                                                                  !     !       s
          if (ptc_onetable) then !>>>>> onetable=.TRUE.>>>>>>>>>>>>>>>>>!    !     !       !
             !                                                          !    !     !       !
-            spos_current_position = zero ! sum_length                  !    !     !       !
+            !spos_current_position = zero ! sum_length                 !    !     !       !
+            spos_current_position = summ_ring_length !VK 20070401      !    !     !       !
             ! (dble) initial s position ???                            !    !     !       !
             ! sum (dble) (in subr. ttmap) Accumulated length           !    !     !       !
             !hbu spos added                                            !    !     !       !
@@ -2174,6 +2182,7 @@ CONTAINS
                  
          endif
 
+         if (i_ring_element .EQ. my_ring%n) summ_ring_length = Sum_length_S
 
          iii_c_code=advance_node() ! c-code go to the next node
          current=>current%next     ! f90-code bring to the next mode
