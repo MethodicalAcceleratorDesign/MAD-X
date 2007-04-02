@@ -55,7 +55,7 @@ default: madx
 # files
 
 timel.o: timel.c
-	$(CC) $(GCCP_FLAGS) -o timel.c
+	$(CC) $(GCCP_FLAGS) timel.c
 
 madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS_MPARS) madxp.c
