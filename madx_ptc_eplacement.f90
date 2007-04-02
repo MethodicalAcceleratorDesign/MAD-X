@@ -23,14 +23,14 @@ module madx_ptc_eplacement_module
   integer, parameter                          :: magenta= 6
   integer, parameter                          :: cyan = 7
   integer, parameter                          :: darkgreen = 8
-  integer, parameter                          :: violet = 9 
-  integer, parameter                          :: color_n_sext = 46 
+  integer, parameter                          :: violet = 9
+  integer, parameter                          :: color_n_sext = 46
   integer, parameter                          :: color_s_sext = 30
   integer, parameter                          :: dgrey = 14
   integer, parameter                          :: grey = 16
   integer, parameter                          :: lgrey = 18
   integer, parameter                          :: color_of_ghost = 19
-  
+
   !    routines
   private                                     :: rot
   private                                     :: printfframes
@@ -303,7 +303,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     p=>r%start
     do i=1,r%n
-       write(mf,*) 
+       write(mf,*)
        write(mf,*) '//cout<<',i,'<<" ',p%mag%name,'"<<endl;'
        !      print*, i,p%mag%name
        if (getdebug() > 2) then
@@ -366,7 +366,7 @@ contains
              !QUAD
              if (p%mag%bn(2) .gt. zero ) then
                 call drawboxm(p,mf,red)  !QUAD foc
-             else 
+             else
                 call drawboxm(p,mf,green)!QUAD defoc
              endif
           elseif ( ((p%mag%bn(3) /= zero) .or. (p%mag%an(3) /= zero)) .and. (nmul >=3) ) then
@@ -380,7 +380,7 @@ contains
              call drawboxm(p,mf,color_s_sext)
 
           else
-            !!not powered element of very high order multipole
+             !!not powered element of very high order multipole
              call drawboxm(p,mf,color_of_ghost)
              call drawtube(p,mf,0.05_dp,color_of_ghost)
           endif

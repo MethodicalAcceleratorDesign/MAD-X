@@ -1,9 +1,9 @@
 module madx_ptc_twiss_module
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-! madx_ptc_distrib module
-! Piotr K. Skowronski , Frank Schmidt (CERN)
-! 
-! This module contains service for twiss distributions with PTC
+  ! madx_ptc_distrib module
+  ! Piotr K. Skowronski , Frank Schmidt (CERN)
+  !
+  ! This module contains service for twiss distributions with PTC
   use madx_ptc_module
   use madx_ptc_intstate_module, only : getdebug
   USE madx_ptc_setcavs_module
@@ -18,38 +18,38 @@ module madx_ptc_twiss_module
   !============================================================================================
   !  PUBLIC INTERFACE
   public                         :: ptc_twiss
-  
+
 
 
   !============================================================================================
   !  PRIVATE
   !    data structures
-  
+
   type(universal_taylor)  :: unimap(6)
-  
+
   type twiss
 
-      logical(lp) nf
-      real(dp), dimension(3,3) ::  beta,alfa,gama
-      real(dp), dimension(3)   ::  mu
-      real(dp), dimension(6)   ::  disp
-      real(dp), dimension(3)   ::  tune
-      real(dp), dimension(6,6) ::  eigen
-   end type twiss
+     logical(lp) nf
+     real(dp), dimension(3,3) ::  beta,alfa,gama
+     real(dp), dimension(3)   ::  mu
+     real(dp), dimension(6)   ::  disp
+     real(dp), dimension(3)   ::  tune
+     real(dp), dimension(6,6) ::  eigen
+  end type twiss
 
-   interface assignment (=)
-      module procedure equaltwiss
-      module procedure zerotwiss
-      module procedure normalform_normalform
-   end interface
+  interface assignment (=)
+     module procedure equaltwiss
+     module procedure zerotwiss
+     module procedure normalform_normalform
+  end interface
 
-   interface alloc
-      module procedure alloctwiss
-   end interface
+  interface alloc
+     module procedure alloctwiss
+  end interface
 
-   interface kill
-      module procedure killtwiss
-   end interface
+  interface kill
+     module procedure killtwiss
+  end interface
 
   type(normalform)                      :: Normal
   real(dp), private, dimension(2,ndim2) :: angp
@@ -58,31 +58,31 @@ module madx_ptc_twiss_module
   integer,  private, parameter          :: ndd=ndim2
   integer,  private, dimension(4)       :: iia,icoast
   integer,  private                     :: np,icount=0
-  
-  !new lattice function 
+
+  !new lattice function
   real(dp), private, dimension(3)       :: testold
   real(dp), private, dimension(3)       :: phase
-  
+
   character(len=4), private, dimension(4), target :: str4 = (/'1000','0100','0010','0001'/)
   character(len=5), private, dimension(5), parameter :: str5 = (/'10000','01000','00100','00010','00001'/)
   character(len=6), private, dimension(6), target :: str6 = (/'100000','010000','001000','000100','000001','000010'/)
 
 
   integer, private, allocatable          :: J(:)
-  integer, private, dimension(6)         :: j1 = (/1,0,0,0,0,0/) 
-  integer, private, dimension(6)         :: j2 = (/0,1,0,0,0,0/) 
-  integer, private, dimension(6)         :: j3 = (/0,0,1,0,0,0/) 
-  integer, private, dimension(6)         :: j4 = (/0,0,0,1,0,0/) 
-  integer, private, dimension(6)         :: j5 = (/0,0,0,0,1,0/) 
+  integer, private, dimension(6)         :: j1 = (/1,0,0,0,0,0/)
+  integer, private, dimension(6)         :: j2 = (/0,1,0,0,0,0/)
+  integer, private, dimension(6)         :: j3 = (/0,0,1,0,0,0/)
+  integer, private, dimension(6)         :: j4 = (/0,0,0,1,0,0/)
+  integer, private, dimension(6)         :: j5 = (/0,0,0,0,1,0/)
   integer, private, dimension(6)         :: j6 = (/0,0,0,0,0,1/)
   integer, private, dimension(6,6)       :: fo = &
-                              reshape(          (/1,0,0,0,0,0,&
-                                                  0,1,0,0,0,0,&
-                                                  0,0,1,0,0,0,&
-                                                  0,0,0,1,0,0,&
-                                                  0,0,0,0,1,0,&
-                                                  0,0,0,0,0,1 /), &
-                                             (/6,6/) )
+       reshape(          (/1,0,0,0,0,0,&
+       0,1,0,0,0,0,&
+       0,0,1,0,0,0,&
+       0,0,0,1,0,0,&
+       0,0,0,0,1,0,&
+       0,0,0,0,0,1 /), &
+       (/6,6/) )
   !============================================================================================
   !  PRIVATE
   !    routines
@@ -100,72 +100,72 @@ contains
     type(real_8), intent(in)::Y(ndd)
     integer jj,i,k, ndel, n
     real(dp) :: lat(0:6,6,3)
-    real(dp) :: test, dph 
+    real(dp) :: test, dph
     real(dp) :: epsil=1e-12  !
     integer  :: J(lnv)
-    
-      lat = zero
 
-      n=3  ! 1 2 3 are tunes
+    lat = zero
 
-      ndel=0
-      if(c_%ndpt/=0)  then
-!       print*, "We are at the mode 6D + nocav"
+    n=3  ! 1 2 3 are tunes
+
+    ndel=0
+    if(c_%ndpt/=0)  then
+       !       print*, "We are at the mode 6D + nocav"
        ndel=1  !this is 6D without cavity (MADX icase=56)
-      endif
+    endif
 
-      J=0;
-      do i=1,c_%nd2-2*ndel
-        do jj=i,c_%nd2-2*ndel
+    J=0;
+    do i=1,c_%nd2-2*ndel
+       do jj=i,c_%nd2-2*ndel
           do k=1,c_%nd-ndel
-            n=n+1
-            J(2*k-1)=1
-            lat(i,jj,k)=              (Y(i)%t.sub.J)*(Y(jj)%t.sub.J)
-            J(2*k-1)=0;
+             n=n+1
+             J(2*k-1)=1
+             lat(i,jj,k)=              (Y(i)%t.sub.J)*(Y(jj)%t.sub.J)
+             J(2*k-1)=0;
 
-            J(2*k)=1
-            lat(i,jj,k)=lat(i,jj,k) + (Y(i)%t.sub.J)*(Y(jj)%t.sub.J)
-!            print*,"lat(",i,",",jj,",",k,")=",lat(i,jj,k)
-            lat(jj,i,k)=lat(i,jj,k)
-            J(2*k)=0
-!            write(6,*) i,jj,k,lat(i,jj,k)
+             J(2*k)=1
+             lat(i,jj,k)=lat(i,jj,k) + (Y(i)%t.sub.J)*(Y(jj)%t.sub.J)
+             !            print*,"lat(",i,",",jj,",",k,")=",lat(i,jj,k)
+             lat(jj,i,k)=lat(i,jj,k)
+             J(2*k)=0
+             !            write(6,*) i,jj,k,lat(i,jj,k)
           enddo
-        enddo
-      enddo
+       enddo
+    enddo
 
-      J=0 
-      !here ND2=4 and delta is present      nd2=6 and delta is a constant
-!      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
-      if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
-        !when there is no cavity it gives us dispersions
-        do i=1,4
+    J=0
+    !here ND2=4 and delta is present      nd2=6 and delta is a constant
+    !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
+    if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
+       !when there is no cavity it gives us dispersions
+       do i=1,4
           lat(0,i,1)=(Y(i)%t.sub.J5)
-        enddo
-      elseif (c_%nd2 == 6) then
-        do i=1,4
-          lat(0,i,1) =              (Y(i)%t.sub.J5)*(Y(6)%t.sub.J6) 
-          lat(0,i,1) = lat(0,i,1) + (Y(i)%t.sub.J6)*(Y(5)%t.sub.J5) 
-        enddo
-      else
-        do i=1,4
+       enddo
+    elseif (c_%nd2 == 6) then
+       do i=1,4
+          lat(0,i,1) =              (Y(i)%t.sub.J5)*(Y(6)%t.sub.J6)
+          lat(0,i,1) = lat(0,i,1) + (Y(i)%t.sub.J6)*(Y(5)%t.sub.J5)
+       enddo
+    else
+       do i=1,4
           lat(0,i,1)=zero
-        enddo
-      endif
-      
+       enddo
+    endif
 
-     !!!!!!!!!!!!!!!!
-     ! phase advance!
-     !!!!!!!!!!!!!!!!
-     
-     k = 2
-     if(c_%nd2==6.and.c_%ndpt==0) k = 3
 
-     j=0
-     do i=1, k
+!!!!!!!!!!!!!!!!
+    ! phase advance!
+!!!!!!!!!!!!!!!!
+
+    k = 2
+    if(c_%nd2==6.and.c_%ndpt==0) k = 3
+
+    j=0
+    do i=1, k
        jj=2*i -1
        TEST=ATAN2((Y(2*i -1).SUB.fo(2*i,:)),(Y(2*i-1).SUB.fo(2*i-1,:)))/TWOPI
-       
-       
+
+
        IF(TEST<0.D0.AND.abs(TEST)>EPSIL)TEST=TEST+1.D0
        DPH=TEST-TESTOLD(i)
        IF(DPH<0.D0.AND.abs(DPH)>EPSIL) DPH=DPH+1.D0
@@ -174,55 +174,55 @@ contains
        PHASE(i)=PHASE(i)+DPH
        TESTOLD(i)=TEST
 
-     enddo
-     
+    enddo
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     do i=1,c_%nd
+    do i=1,c_%nd
        do k=1,c_%nd
-        s1%beta(k,i)= lat(2*k-1,2*k-1,i)
-        s1%alfa(k,i)=-lat(2*k-1,2*k  ,i)
-        s1%gama(k,i)= lat(2*k  ,2*k  ,i)
+          s1%beta(k,i)= lat(2*k-1,2*k-1,i)
+          s1%alfa(k,i)=-lat(2*k-1,2*k  ,i)
+          s1%gama(k,i)= lat(2*k  ,2*k  ,i)
        enddo
-     enddo
+    enddo
 
-     
-     !when there is no cavity it gives us dispersions
-     do i=1,c_%nd2-2*ndel
+
+    !when there is no cavity it gives us dispersions
+    do i=1,c_%nd2-2*ndel
        s1%disp(i)=lat(0,i,1)
-     enddo
+    enddo
 
 
-     if (c_%nd == 3) then
+    if (c_%nd == 3) then
        do i=1,c_%nd
           test = s1%beta(3,i)
           s1%beta(3,i) = s1%gama(3,i)
           s1%gama(3,i) = test
        enddo
-     endif
-     
+    endif
 
 
-     s1%mu=phase
-                
-     do k=1,c_%nd
+
+    s1%mu=phase
+
+    do k=1,c_%nd
        do i=1,c_%nd2
-           s1%eigen(k*2-1,i) = Y(k*2-1).sub.fo(i,:)
-           s1%eigen(k*2  ,i) = Y(k*2  ).sub.fo(i,:)
+          s1%eigen(k*2-1,i) = Y(k*2-1).sub.fo(i,:)
+          s1%eigen(k*2  ,i) = Y(k*2  ).sub.fo(i,:)
        enddo
-     enddo
+    enddo
 
 
-     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-        call fort_warn('ptc_twiss: ','DA in twiss got unstable')
-        call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
-        return
-     endif
+    if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+       call fort_warn('ptc_twiss: ','DA in twiss got unstable')
+       call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
+       return
+    endif
 
   end subroutine equaltwiss
-  
+
 
 
   subroutine  alloctwiss(s1)
@@ -310,16 +310,16 @@ contains
     real(dp)                :: ave(6,6,3), v
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform
-    
+
     skipnormalform = my_false
-     
+
     !all zeroing
     testold = zero
     phase = zero
     do i=1,6
-      unimap(i) = zero
+       unimap(i) = zero
     enddo
-    
+
     if (getdebug() > 1) print*,"ptc_twiss"
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
@@ -338,10 +338,10 @@ contains
     endif
 
     call cleartables() !defined in madx_ptc_knobs
-    
+
     call kill_para(my_ring) !removes all the previous parameters
 
-    
+
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
 
@@ -352,8 +352,8 @@ contains
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
 
-    
-    
+
+
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -378,7 +378,7 @@ contains
           stop
           return
        endif
-      
+
        call find_orbit(my_ring,x,1,default,c_1d_7)
 
        if ( .not. c_%stable_da) then
@@ -399,22 +399,22 @@ contains
     npara = 0
     no = get_value('ptc_twiss ','no ')
     if ( no .lt. 1 ) then
-      call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
-      print*, "Order is ", no
-      return
+       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
+       print*, "Order is ", no
+       return
     endif
-    
-    !this must be before initialization of the Bertz 
+
+    !this must be before initialization of the Bertz
 
     initial_distrib_manual = get_value('ptc_twiss ','initial_moments_manual ') .ne. 0
     if (initial_distrib_manual) then
-      if (getdebug() > 1) then
-        print*,"Initializing map with initial_moments_manual=true" 
-      endif
-      call readinitialdistrib()
+       if (getdebug() > 1) then
+          print*,"Initializing map with initial_moments_manual=true"
+       endif
+       call readinitialdistrib()
     endif
-    
-    
+
+
     call init(default,no,nda,BERZ,mynd2,npara)
 
     call alloc(y)
@@ -430,27 +430,27 @@ contains
 
 
     call setknobs(my_ring)
-    
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !  INIT Y that is tracked          !
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  INIT Y that is tracked          !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     call initmap()
     if (geterrorflag() /= 0) then
        !if arror occured then return
        return
     endif
-    
+
     !############################################################################
     !############################################################################
     !############################################################################
-    
-    
+
+
     call alloc(tw)
 
-    !Y 
-    
+    !Y
 
-    tw=y 
+
+    tw=y
 
     current=>MY_RING%start
     startfen = 0
@@ -465,41 +465,41 @@ contains
        print *, "ptc_twiss: internal state is:"
        call print(default,6)
     endif
-   
+
     call killsavedmaps() !delete all maps, if present
     mapsorder = 0 !it is set at the end, so we are sure the twiss was successful
 
     savemaps = get_value('ptc_twiss ','savemaps ') .ne. 0
 
     if (savemaps) then
-      allocate(maps(MY_RING%n))
-      do i=1,MY_RING%n
-        do ii=1,6
-         call alloc(maps(i)%unimap(ii),0,0)
-         maps(i)%unimap(ii) = zero !this initializes and allocates the variables
-        enddo 
-      enddo 
+       allocate(maps(MY_RING%n))
+       do i=1,MY_RING%n
+          do ii=1,6
+             call alloc(maps(i)%unimap(ii),0,0)
+             maps(i)%unimap(ii) = zero !this initializes and allocates the variables
+          enddo
+       enddo
     else
-      nullify(maps) !assurance   
+       nullify(maps) !assurance
     endif
-    
+
     do i=1,MY_RING%n
-       
+
        if (getdebug() > 1) then
           write(6,*) "##########################################"
           write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
           write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
           write(6,'(a, f12.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
-!          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
+          !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
        endif
-       
+
        if (nda > 0) then
-!         if (getnknobis() > 0) c_%knob = my_true
-         !print*, "parametric",i,c_%knob
-         call track(my_ring,y,i,i+1,+default)
+          !         if (getnknobis() > 0) c_%knob = my_true
+          !print*, "parametric",i,c_%knob
+          call track(my_ring,y,i,i+1,+default)
        else
-         call track(my_ring,y,i,i+1, default)
-       endif   
+          call track(my_ring,y,i,i+1, default)
+       endif
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_twiss: ','DA got unstable')
           call seterrorflag(10,"ptc_twiss ","DA got unstable ");
@@ -516,21 +516,21 @@ contains
           !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           goto 100
        endif
-      
+
        write(21,*) "##########################################"
        write(21,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
        call print(y,21)
 
        suml=suml+current%MAG%P%ld
-       
+
        if (savemaps) then
-         do ii=1,6
-          maps(i)%unimap(ii) = y(ii)
-         enddo 
-         maps(i)%s = suml
-         maps(i)%name = current%mag%name
+          do ii=1,6
+             maps(i)%unimap(ii) = y(ii)
+          enddo
+          maps(i)%s = suml
+          maps(i)%name = current%mag%name
        endif
-              
+
        tw=y
        call putusertable(i,current%mag%name,suml,getdeltae(),y)
 
@@ -540,7 +540,7 @@ contains
        current=>current%next
     enddo
 100 continue
-    
+
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"
@@ -548,9 +548,9 @@ contains
        write(6,*) "###  END  OF  PTC_TWISS            #######"
        write(6,*) "##########################################"
        write(6,*) "##########################################"
-!          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
+       !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
     endif
-    
+
     print77=.true.
 
     open(unit=121,file='end.map')
@@ -562,21 +562,21 @@ contains
     call kill(tw)
     CALL kill(y)
     do i=1,6
-     call kill(unimap(i))
-    enddo 
-    
+       call kill(unimap(i))
+    enddo
+
     call finishknobs()
-    
+
     if (savemaps) then  !do it at the end, so we are sure the twiss was successful
-      mapsorder = no
-      mapsicase = icase
-      if (getnmoments() > 0) call ptc_moments(no*2) !calcualate moments with the maximum available order
+       mapsorder = no
+       mapsicase = icase
+       if (getnmoments() > 0) call ptc_moments(no*2) !calcualate moments with the maximum available order
     endif
-    
-    
+
+
     call f90flush(20,my_false)
 
-    !if (getdebug() > 2) 
+    !if (getdebug() > 2)
     close(21)
 
     !****************************************************************************************
@@ -591,136 +591,136 @@ contains
       implicit none
       integer  :: double_from_table
       integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
-        
-        beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
-        
-        mman  = get_value('ptc_twiss ','initial_matrix_manual ')
-        mtab  = get_value('ptc_twiss ','initial_matrix_table ')
-        mascr = get_value('ptc_twiss ','initial_ascript_manual ')
-        mdistr = get_value('ptc_twiss ','initial_moments_manual ')
-        
-        
-        initial_matrix_manual = mman .ne. 0
-        initial_matrix_table = mtab .ne. 0
-        initial_ascript_manual = mascr .ne. 0
-        
-        
-        if ( (mman + mtab + mascr + mdistr) > 1) then
-           call seterrorflag(11,"ptc_twiss ","Ambigous option comman options");
-           print*, "Only one of the following switches might be on:"
-           print*, "initial_matrix_manual  = ", initial_matrix_manual
-           print*, "initial_matrix_table   = ", initial_matrix_table 
-           print*, "initial_ascript_manual = ", initial_ascript_manual
-           print*, "initial_moments_manual = ", mdistr
-        endif
-        
-!        print*, "initial_distrib_manual is ",initial_distrib_manual
 
-        if(initial_matrix_table) then
-           k = double_from_table("map_table ", "nv ", 1, doublenum)
-           if(k.ne.-1) then
-              call liepeek(iia,icoast)
-              my_nv=int(doublenum)
-              nv_min=min(c_%npara,my_nv)
-           else
-              initial_matrix_table=.false.
-           endif
-        endif
+      beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
-        if(initial_matrix_table) then
-           
-           if (getdebug() > 1) then
-             print*,"Initializing map with initial_matrix_table=true" 
-           endif
-           call readmatrixfromtable()
-           
-        elseif(initial_ascript_manual) then
+      mman  = get_value('ptc_twiss ','initial_matrix_manual ')
+      mtab  = get_value('ptc_twiss ','initial_matrix_table ')
+      mascr = get_value('ptc_twiss ','initial_ascript_manual ')
+      mdistr = get_value('ptc_twiss ','initial_moments_manual ')
 
-           if (getdebug() > 1) then
-             print*,"Initializing map with initial_ascript_manual=true" 
-           endif
-           call readinitialascript()
-           if (geterrorflag() /= 0) then
-              return
-           endif
 
-        elseif(initial_matrix_manual) then
+      initial_matrix_manual = mman .ne. 0
+      initial_matrix_table = mtab .ne. 0
+      initial_ascript_manual = mascr .ne. 0
 
-           if (getdebug() > 1) then
-             print*,"Initializing map with initial_matrix_manual=true" 
-           endif
-           call readinitialmatrix()
 
-           if (geterrorflag() /= 0) then
-              return
-           endif
-        elseif (initial_distrib_manual) then
-           !matrix is already prepared beforehand
-           if (getdebug() > 1) then
-             print*,"Initializing map with initial_moments_manual=true" 
-             print*, "Initializing map from prepared UniTaylor"
-           endif
-           call readreforbit() !reads x
+      if ( (mman + mtab + mascr + mdistr) > 1) then
+         call seterrorflag(11,"ptc_twiss ","Ambigous option comman options");
+         print*, "Only one of the following switches might be on:"
+         print*, "initial_matrix_manual  = ", initial_matrix_manual
+         print*, "initial_matrix_table   = ", initial_matrix_table
+         print*, "initial_ascript_manual = ", initial_ascript_manual
+         print*, "initial_moments_manual = ", mdistr
+      endif
 
-           do i=1, c_%nd2
+      !        print*, "initial_distrib_manual is ",initial_distrib_manual
+
+      if(initial_matrix_table) then
+         k = double_from_table("map_table ", "nv ", 1, doublenum)
+         if(k.ne.-1) then
+            call liepeek(iia,icoast)
+            my_nv=int(doublenum)
+            nv_min=min(c_%npara,my_nv)
+         else
+            initial_matrix_table=.false.
+         endif
+      endif
+
+      if(initial_matrix_table) then
+
+         if (getdebug() > 1) then
+            print*,"Initializing map with initial_matrix_table=true"
+         endif
+         call readmatrixfromtable()
+
+      elseif(initial_ascript_manual) then
+
+         if (getdebug() > 1) then
+            print*,"Initializing map with initial_ascript_manual=true"
+         endif
+         call readinitialascript()
+         if (geterrorflag() /= 0) then
+            return
+         endif
+
+      elseif(initial_matrix_manual) then
+
+         if (getdebug() > 1) then
+            print*,"Initializing map with initial_matrix_manual=true"
+         endif
+         call readinitialmatrix()
+
+         if (geterrorflag() /= 0) then
+            return
+         endif
+      elseif (initial_distrib_manual) then
+         !matrix is already prepared beforehand
+         if (getdebug() > 1) then
+            print*,"Initializing map with initial_moments_manual=true"
+            print*, "Initializing map from prepared UniTaylor"
+         endif
+         call readreforbit() !reads x
+
+         do i=1, c_%nd2
             y(i) = unimap(i)
-           enddo
+         enddo
 
-           if (geterrorflag() /= 0) then
-              return
-           endif
-        elseif(beta_flg) then
+         if (geterrorflag() /= 0) then
+            return
+         endif
+      elseif(beta_flg) then
 
-           if (getdebug() > 1) then
-             print*,"Initializing map with initial twiss parameters" 
-           endif
+         if (getdebug() > 1) then
+            print*,"Initializing map with initial twiss parameters"
+         endif
 
-           call readinitialtwiss()
-           
-           if (geterrorflag() /= 0) then
-              return
-           endif
-        else
+         call readinitialtwiss()
 
-           if (getdebug() > 1) then
-             print*,"Initializing map from one turn map" 
-           endif
+         if (geterrorflag() /= 0) then
+            return
+         endif
+      else
 
-           call track(my_ring,y,1,default)
-           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-              call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
-              call seterrorflag(10,"ptc_twiss ","DA got unstable (one turn map production)");
-              return
-           endif
+         if (getdebug() > 1) then
+            print*,"Initializing map from one turn map"
+         endif
 
-           call PRODUCE_APERTURE_FLAG(flag_index)
-           if(flag_index/=0) then
-              call ANALYSE_APERTURE_FLAG(flag_index,why)
+         call track(my_ring,y,1,default)
+         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+            call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
+            call seterrorflag(10,"ptc_twiss ","DA got unstable (one turn map production)");
+            return
+         endif
 
-              write(whymsg,*) 'APERTURE unstable (one turn map production) - programs continues: ',why
-              call fort_warn('ptc_twiss: ',whymsg)
-              call seterrorflag(10,"ptc_twiss: ",whymsg);
-              !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
-              !          Write(6,*) why ! See produce aperture flag routine in sd_frame
-              c_%watch_user=.false.
-              CALL kill(y)
-              return
-           endif
-           
-           call maptoascript()
+         call PRODUCE_APERTURE_FLAG(flag_index)
+         if(flag_index/=0) then
+            call ANALYSE_APERTURE_FLAG(flag_index,why)
 
-           call reademittance()
+            write(whymsg,*) 'APERTURE unstable (one turn map production) - programs continues: ',why
+            call fort_warn('ptc_twiss: ',whymsg)
+            call seterrorflag(10,"ptc_twiss: ",whymsg);
+            !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
+            !          Write(6,*) why ! See produce aperture flag routine in sd_frame
+            c_%watch_user=.false.
+            CALL kill(y)
+            return
+         endif
 
-           
-        endif
+         call maptoascript()
+
+         call reademittance()
+
+
+      endif
     end subroutine initmap
     !____________________________________________________________________________________________
-    
+
     function getdeltae()
       implicit none
       real(dp)   :: getdeltae
       type(work)              :: cfen !current fibre energy
-      
+
       cfen = 0 ! do not remove -> if it is removed energy is wrong because = adds energy to the previous value
 
       if ( (associated(current%next) .eqv. .false. ) .or. (associated( current%next, my_ring%start)) ) then
@@ -746,10 +746,10 @@ contains
       if (getdebug() > 2) then
          write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
       endif
-        
+
     end function getdeltae
     !____________________________________________________________________________________________
-    
+
     subroutine puttwisstable()
       implicit none
       include "madx_ptc_knobs.inc"
@@ -790,36 +790,36 @@ contains
       ioptfun=6
       call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
 
-      opt_fun(beta11)= tw%beta(1,1) * deltae 
+      opt_fun(beta11)= tw%beta(1,1) * deltae
       opt_fun(beta12)= tw%beta(1,2) * deltae
       opt_fun(beta13)= tw%beta(1,3) * deltae
-      opt_fun(beta21)= tw%beta(2,1) * deltae 
+      opt_fun(beta21)= tw%beta(2,1) * deltae
       opt_fun(beta22)= tw%beta(2,2) * deltae
       opt_fun(beta23)= tw%beta(2,3) * deltae
       opt_fun(beta31)= tw%beta(3,1) * deltae
       opt_fun(beta32)= tw%beta(3,2) * deltae
-      opt_fun(beta33)= tw%beta(3,3) * deltae 
-      
-      opt_fun(alfa11)= tw%alfa(1,1) * deltae 
+      opt_fun(beta33)= tw%beta(3,3) * deltae
+
+      opt_fun(alfa11)= tw%alfa(1,1) * deltae
       opt_fun(alfa12)= tw%alfa(1,2) * deltae
       opt_fun(alfa13)= tw%alfa(1,3) * deltae
-      opt_fun(alfa21)= tw%alfa(2,1) * deltae 
+      opt_fun(alfa21)= tw%alfa(2,1) * deltae
       opt_fun(alfa22)= tw%alfa(2,2) * deltae
       opt_fun(alfa23)= tw%alfa(2,3) * deltae
       opt_fun(alfa31)= tw%alfa(3,1) * deltae
       opt_fun(alfa32)= tw%alfa(3,2) * deltae
-      opt_fun(alfa33)= tw%alfa(3,3) * deltae 
-      
-      opt_fun(gama11)= tw%gama(1,1) * deltae 
+      opt_fun(alfa33)= tw%alfa(3,3) * deltae
+
+      opt_fun(gama11)= tw%gama(1,1) * deltae
       opt_fun(gama12)= tw%gama(1,2) * deltae
       opt_fun(gama13)= tw%gama(1,3) * deltae
-      opt_fun(gama21)= tw%gama(2,1) * deltae 
+      opt_fun(gama21)= tw%gama(2,1) * deltae
       opt_fun(gama22)= tw%gama(2,2) * deltae
       opt_fun(gama23)= tw%gama(2,3) * deltae
       opt_fun(gama31)= tw%gama(3,1) * deltae
       opt_fun(gama32)= tw%gama(3,2) * deltae
-      opt_fun(gama33)= tw%gama(3,3) * deltae 
-      
+      opt_fun(gama33)= tw%gama(3,3) * deltae
+
 
       opt_fun(28)=tw%mu(1) !* deltae
       opt_fun(29)=tw%mu(2) !* deltae
@@ -854,7 +854,7 @@ contains
 
       if (getdebug() > 2)  then
          write(6,'(a,1(f8.4,1x))') current%MAG%name,suml
-         write(6,'(a,1(f10.8,1x))') "Delta E ", deltae 
+         write(6,'(a,1(f10.8,1x))') "Delta E ", deltae
          write(6,'(a,3(i8.0,1x))')  "idxes ", beta11,beta22,beta33
          write(6,'(a,3(f8.4,1x))')  "betas raw   ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
          write(6,'(a,3(f8.4,1x))')  "betas w/ener", opt_fun(1),opt_fun(5),opt_fun(9)
@@ -915,7 +915,7 @@ contains
     !_________________________________________________________________
 
     subroutine readreforbit
-      !reads covariance 
+      !reads covariance
       implicit none
       x(:)=zero
       x(1)=get_value('ptc_twiss ','x ')
@@ -926,7 +926,7 @@ contains
       x(6)=get_value('ptc_twiss ','pt ')
     end subroutine readreforbit
     !_________________________________________________________________
-    
+
     subroutine readinitialdistrib
       !reads covariance matrix of the initial distribution
       implicit none
@@ -944,10 +944,10 @@ contains
       real(dp) x(6)
 
       if(dodo==1) then
-       x=0.d0
-       call find_orbit(my_ring,x,1,default,c_1d_7)
-       write(6,*) x
-          call init(default,1,0,berz)          
+         x=0.d0
+         call find_orbit(my_ring,x,1,default,c_1d_7)
+         write(6,*) x
+         call init(default,1,0,berz)
          call alloc(yy)
          call alloc(id)
          id=1
@@ -956,53 +956,53 @@ contains
          call print(yy,6)
          stop 999
       endif
-      
+
       jc(1)=2
       jc(2)=1
       jc(3)=4
       jc(4)=3
       jc(5)=6
       jc(6)=5
-      
+
       print*, "We are at initialization with moments of the distribution"
-      
+
       call readrematrix()
-      
+
       print*, re(1,:)
       print*, re(2,:)
       print*, re(3,:)
       print*, re(4,:)
       print*, re(5,:)
       print*, re(6,:)
-      
+
       nd=2
       if(icase==6) nd=3
-       nd_m=nd
-       fake_3=.false.
+      nd_m=nd
+      fake_3=.false.
       if (getdistrtype(3) /= distr_gauss.and.nd==3) then
-        !here we have flat in delta 
-        nd_m=2
-       fake_3=.true.
-     endif
+         !here we have flat in delta
+         nd_m=2
+         fake_3=.true.
+      endif
 
-     call init(2,nd,0,0)
-      
+      call init(2,nd,0,0)
+
       call alloc(ht)
       call alloc(h)
       call alloc(id)
       call alloc(norm)
-       
+
       do i = 1,nd_m*2
          do ii = 1,nd_m*2
             ht=ht+re(i,ii)*(-1)**(ii+i)*(1.0_dp.mono.jc(i))*(1.0_dp.mono.jc(ii))
          enddo
       enddo
       ht=-ht*pi
-      
+
       lam=10.d0*full_abs(ht)
       ht=ht/lam
       if(fake_3) then !1959 is the yearh of birth of Etienne (just a number)
-        ht=ht+(0.1959e0_dp.mono.'000020')+(0.1959e0_dp.mono.'000002')
+         ht=ht+(0.1959e0_dp.mono.'000020')+(0.1959e0_dp.mono.'000002')
       endif
       h=ht
       id=1
@@ -1011,14 +1011,14 @@ contains
       emi=zero
       emi(1:nd_m)=norm%tune(1:nd_m)*lam
       re=norm%a_t
-      
+
 
       do i = 1,c_%nd2
-        !call print(norm%a_t%v(i),6)
-        unimap(i) = norm%a_t%v(i)
+         !call print(norm%a_t%v(i),6)
+         unimap(i) = norm%a_t%v(i)
       enddo
-      
-!      re=id      
+
+      !      re=id
       call setemittances(emi(1),emi(2),emi(3))
 
       call kill(h)
@@ -1026,7 +1026,7 @@ contains
       call kill(id)
       call kill(norm)
 
-      
+
     end subroutine readinitialdistrib
     !_________________________________________________________________
 
@@ -1034,33 +1034,33 @@ contains
       implicit none
       integer  :: double_from_table
 
-        x(:)=zero
-        allocate(j(c_%npara))
-        j(:)=0
+      x(:)=zero
+      allocate(j(c_%npara))
+      j(:)=0
 
-        do i = 1,my_nv
-           k   = double_from_table("map_table ", "coef ", i, doublenum)
-           d_val=doublenum
-           if(i.le.c_%npara) then
-              x(i) = d_val-(y(i)%T.sub.j)
-           endif
-        enddo
-        
-        do i = 1,nv_min
-           do ii = 1,nv_min
-              j(ii)  = 1
-              row    = i*my_nv+ii
-              k   = double_from_table("map_table ", "coef ", row, doublenum)
-              d_val=doublenum
-              d_val  = d_val-(y(i)%T.sub.j)
-              y(i)%T = y(i)%T + (d_val.mono.j)
-              j(ii)=0
-           enddo
-        enddo
-        
-        call maptoascript()
-        
-        deallocate(j)
+      do i = 1,my_nv
+         k   = double_from_table("map_table ", "coef ", i, doublenum)
+         d_val=doublenum
+         if(i.le.c_%npara) then
+            x(i) = d_val-(y(i)%T.sub.j)
+         endif
+      enddo
+
+      do i = 1,nv_min
+         do ii = 1,nv_min
+            j(ii)  = 1
+            row    = i*my_nv+ii
+            k   = double_from_table("map_table ", "coef ", row, doublenum)
+            d_val=doublenum
+            d_val  = d_val-(y(i)%T.sub.j)
+            y(i)%T = y(i)%T + (d_val.mono.j)
+            j(ii)=0
+         enddo
+      enddo
+
+      call maptoascript()
+
+      deallocate(j)
     end subroutine readmatrixfromtable
     !_________________________________________________________________
 
@@ -1073,7 +1073,7 @@ contains
       call initmapfrommatrix()
       call maptoascript()
       call reademittance()
-      
+
     end subroutine readinitialmatrix
     !_________________________________________________________________
 
@@ -1083,8 +1083,8 @@ contains
       call readrematrix() !reads re
       call readreforbit() !reads x
       call initmapfrommatrix()
-      call reademittance() 
-      
+      call reademittance()
+
     end subroutine readinitialascript
     !_________________________________________________________________
 
@@ -1094,17 +1094,17 @@ contains
       real(dp) :: emix,emiy,emiz
       real(dp) :: sigt, sige
 
-        emix = get_value('beam ','ex ')
-        emiy = get_value('beam ','ey ')
-        emiz = get_value('beam ','et ')
+      emix = get_value('beam ','ex ')
+      emiy = get_value('beam ','ey ')
+      emiz = get_value('beam ','et ')
 
-        if ((emix + emiy + emiz) .le. zero) then
-          call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
-          call killmoments()  !switches 
-        endif
-        
-        call setemittances(emix,emiy,emiz)
-        
+      if ((emix + emiy + emiz) .le. zero) then
+         call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
+         call killmoments()  !switches
+      endif
+
+      call setemittances(emix,emiy,emiz)
+
     end subroutine reademittance
     !_________________________________________________________________
 
@@ -1120,7 +1120,7 @@ contains
          write (6,'(8i8)') iia(1),iia(2),iia(3),iia(4),icoast(1),icoast(2),icoast(3),icoast(4)
          print*, "c_%npara is ", c_%npara
       endif
-      
+
       allocate(j(c_%nv))
       j(:)=0
       do i = 1,c_%npara
@@ -1146,22 +1146,22 @@ contains
     subroutine maptoascript
       !Performes normal form on a map, and plugs A_ in its place
       implicit none
-      
-         call alloc(normal)
-         normal = y
 
-         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-            call fort_warn('ptc_twiss: ','Error: DA in twiss got unstable during Normal Form')
-            call seterrorflag(10,"ptc_twiss ","DA in twiss got unstable during Normal Form");
-            return
-         endif
+      call alloc(normal)
+      normal = y
 
-         y = x + normal%a_t
-         call kill(normal)
-        
+      if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+         call fort_warn('ptc_twiss: ','Error: DA in twiss got unstable during Normal Form')
+         call seterrorflag(10,"ptc_twiss ","DA in twiss got unstable during Normal Form");
+         return
+      endif
+
+      y = x + normal%a_t
+      call kill(normal)
+
     end subroutine maptoascript
     !_________________________________________________________________
-    
+
     subroutine readinitialtwiss
       !Reads initial twiss parameters from MAD-X command
       implicit none
@@ -1171,7 +1171,7 @@ contains
       type(pol_block_inicond) :: inicondknobs
       integer k_system
       real(dp)  sizept, gam3, emiz
- 
+
       beta(1)  = get_value('ptc_twiss ','betx ')
       beta(2)  = get_value('ptc_twiss ','bety ')
       beta(3)  = get_value('ptc_twiss ','betz ')
@@ -1185,153 +1185,153 @@ contains
       mu(1)    = get_value('ptc_twiss ','mux ')
       mu(2)    = get_value('ptc_twiss ','muy ')
       mu(3)    = get_value('ptc_twiss ','muz ')
-      
+
       if (getdebug() > 1) then
-        print*,"TW: Ini betas ",beta      
-        print*,"TW: Ini alfas ",alpha
-      endif  
-      
+         print*,"TW: Ini betas ",beta
+         print*,"TW: Ini alfas ",alpha
+      endif
+
       if (c_%nd == 3) then
-        if (beta(3) <= zero) then
+         if (beta(3) <= zero) then
             call fort_warn("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0!")
             stop
-        endif
-        
-        beta(3) = (one+alpha(3)**2)/beta(3)
-        alpha(3) =-alpha(3) 
-        
+         endif
+
+         beta(3) = (one+alpha(3)**2)/beta(3)
+         alpha(3) =-alpha(3)
+
       endif
-      
+
 
       x(:)=zero
       x(1)=get_value('ptc_twiss ','x ')
       x(2)=get_value('ptc_twiss ','px ')
       x(3)=get_value('ptc_twiss ','y ')
       x(4)=get_value('ptc_twiss ','py ')
-!      x(5)=get_value('ptc_twiss ','t ')
-!      x(6)=get_value('ptc_twiss ','pt ')
+      !      x(5)=get_value('ptc_twiss ','t ')
+      !      x(6)=get_value('ptc_twiss ','pt ')
       x(6)=get_value('ptc_twiss ','t ')
       x(5)=get_value('ptc_twiss ','pt ')
 
       CALL write_closed_orbit(icase,x)
 
       call reademittance()
-      
+
       !Here we initialize Y(6)
-      
+
       call alloc(be); call alloc(al); call alloc(di)
 
       !  code to power knows
-      ! 
-      
+      !
+
 
       do i=1,c_%nd
-        be(i)=beta(i)
-        al(i)=alpha(i)
+         be(i)=beta(i)
+         al(i)=alpha(i)
       enddo
 
       do i=1,4
-        di(i)=disp(i)
+         di(i)=disp(i)
       enddo
-      
+
       if (getnknobis() > 0) then
-        !POWER KNOBS
-        c_%knob = my_true
+         !POWER KNOBS
+         c_%knob = my_true
 
-        k_system= (c_%npara - c_%nd2) + getnknobsm()
-        inicondknobs = getknobinicond()
+         k_system= (c_%npara - c_%nd2) + getnknobsm()
+         inicondknobs = getknobinicond()
 
-        do i=1,c_%nd
+         do i=1,c_%nd
 
-          if(inicondknobs%beta(i)/=0) then
-            if (getdebug() > 1) print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
-            call make_it_knob(be(i),k_system+inicondknobs%beta(i))
-          endif  
+            if(inicondknobs%beta(i)/=0) then
+               if (getdebug() > 1) print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
+               call make_it_knob(be(i),k_system+inicondknobs%beta(i))
+            endif
 
-          if(inicondknobs%alfa(i)/=0) then
-            if (getdebug() > 1) print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
-            call make_it_knob(al(i),k_system+inicondknobs%alfa(i))
-          endif  
-        enddo
+            if(inicondknobs%alfa(i)/=0) then
+               if (getdebug() > 1) print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
+               call make_it_knob(al(i),k_system+inicondknobs%alfa(i))
+            endif
+         enddo
 
-        do i=1,4
-          if(inicondknobs%dispersion(i)/=0) then
-            if (getdebug() > 1) print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
-            call make_it_knob(di(i),k_system+inicondknobs%dispersion(i))
-          endif  
-        enddo
+         do i=1,4
+            if(inicondknobs%dispersion(i)/=0) then
+               if (getdebug() > 1) print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
+               call make_it_knob(di(i),k_system+inicondknobs%dispersion(i))
+            endif
+         enddo
 
       endif
-      
-      
+
+
       y=x
-      
+
       do i=1,c_%nd
-       y(2*i-1)= x(2*i-1) + sqrt(be(i)) * morph((one.mono.(2*i-1))    )
-       y(2*i)= x(2*i) + one/sqrt(be(i)) * &
-       (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
-!       call print(y(2*i-1),6)
-!       call print(y(2*i  ),6)
+         y(2*i-1)= x(2*i-1) + sqrt(be(i)) * morph((one.mono.(2*i-1))    )
+         y(2*i)= x(2*i) + one/sqrt(be(i)) * &
+              (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
+         !       call print(y(2*i-1),6)
+         !       call print(y(2*i  ),6)
       enddo
-      
 
 
-    !--moments--!    
+
+      !--moments--!
       if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
 
-        if ( beta(3) .gt. zero ) then
-  
-          !Option one: sigma(5) is sqrt of emittance as in other two dimensions
+         if ( beta(3) .gt. zero ) then
 
-!          print*, "Init X5 with betaz ", beta(3)
-          
-          if (c_%nd < 3) then !otherwise it was already done, to be cleaned cause it is ugly and bug prone
-            beta(3) = (one+alpha(3)**2)/beta(3)
-            alpha(3) =-alpha(3) 
-          endif  
+            !Option one: sigma(5) is sqrt of emittance as in other two dimensions
 
-          y(5) = x(5) +  sqrt( beta(3) )*morph((one.mono.5))
-          y(6)= x(6) + one/sqrt(beta(3)) * (morph(  (one.mono.6) )-(alpha(3)) * morph(one.mono.5))
+            !          print*, "Init X5 with betaz ", beta(3)
 
-          emiz = get_value('beam ','et ')
-          if ( emiz .le. 0  ) then
-            sizept = get_value('beam ','sige ') 
-            emiz = sizept/sqrt(beta(3))
-!            print*, "Calculated Emittance ", emiz
-          else
-            emiz = sqrt(emiz)
-!            print*, "Read Emittance ", emiz
-          endif  
+            if (c_%nd < 3) then !otherwise it was already done, to be cleaned cause it is ugly and bug prone
+               beta(3) = (one+alpha(3)**2)/beta(3)
+               alpha(3) =-alpha(3)
+            endif
 
-          call setsigma(5, emiz)
-          call setsigma(6, emiz)
-           
-        else
-          !by default we have no knowledge about longitudinal phase space, so init dp/p to ident
-!          print*, "Init X5 with ONE"
-          y(5) = morph((one.mono.5))
-          y(6) = morph((one.mono.5))
-          call setsigma(5, get_value('beam ','sige '))
-          call setsigma(6, get_value('beam ','sigt '))
-        endif
+            y(5) = x(5) +  sqrt( beta(3) )*morph((one.mono.5))
+            y(6)= x(6) + one/sqrt(beta(3)) * (morph(  (one.mono.6) )-(alpha(3)) * morph(one.mono.5))
+
+            emiz = get_value('beam ','et ')
+            if ( emiz .le. 0  ) then
+               sizept = get_value('beam ','sige ')
+               emiz = sizept/sqrt(beta(3))
+               !            print*, "Calculated Emittance ", emiz
+            else
+               emiz = sqrt(emiz)
+               !            print*, "Read Emittance ", emiz
+            endif
+
+            call setsigma(5, emiz)
+            call setsigma(6, emiz)
+
+         else
+            !by default we have no knowledge about longitudinal phase space, so init dp/p to ident
+            !          print*, "Init X5 with ONE"
+            y(5) = morph((one.mono.5))
+            y(6) = morph((one.mono.5))
+            call setsigma(5, get_value('beam ','sige '))
+            call setsigma(6, get_value('beam ','sigt '))
+         endif
 
       endif
-      
+
       if ( (icase .gt. 5) .and. (get_value('beam ','et ') .le. 0) ) then !6 and 56
-          !beta(3) is converted to gamma already (in 3rd coord the canonical planes are swapped)
-          emiz = get_value('beam ','sige ')/sqrt(beta(3))
-          print*, "icase=",icase," nd=",c_%nd, "sigma(5)=", emiz
-          call setsigma(5, emiz)
-          call setsigma(6, emiz)
+         !beta(3) is converted to gamma already (in 3rd coord the canonical planes are swapped)
+         emiz = get_value('beam ','sige ')/sqrt(beta(3))
+         print*, "icase=",icase," nd=",c_%nd, "sigma(5)=", emiz
+         call setsigma(5, emiz)
+         call setsigma(6, emiz)
       endif
-      
+
 
 
       if(icase/=4) then
-       do i=1,4
-        y(i)= y(i) + di(i) * morph((one.mono.5))
-       enddo
-      endif      
+         do i=1,4
+            y(i)= y(i) + di(i) * morph((one.mono.5))
+         enddo
+      endif
 
 
       if ( getdebug() > 2) then
@@ -1354,4 +1354,3 @@ contains
   END subroutine ptc_twiss
 
 end module madx_ptc_twiss_module
- 

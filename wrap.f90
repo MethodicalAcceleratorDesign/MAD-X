@@ -1,23 +1,27 @@
 subroutine w_ptc_create_universe()
-  use madx_ptc_module 
+  use madx_ptc_module
   implicit none
   call ptc_create_universe()
 end subroutine w_ptc_create_universe
+
 subroutine w_ptc_create_layout()
   use madx_ptc_module
   implicit none
   call ptc_create_layout()
 end subroutine w_ptc_create_layout
+
 subroutine w_ptc_move_to_layout()
   use madx_ptc_module
   implicit none
   call ptc_move_to_layout()
 end subroutine w_ptc_move_to_layout
+
 subroutine w_ptc_input()
   use madx_ptc_module
   implicit none
   call ptc_input()
 end subroutine w_ptc_input
+
 subroutine w_ptc_align()
   use madx_ptc_module
   implicit none
@@ -68,7 +72,7 @@ subroutine w_ptc_twiss_linac(tab_name)
   use madx_ptc_trackline_module
   implicit none
   integer tab_name(*)
-   call ptc_twiss_linac(tab_name)
+  call ptc_twiss_linac(tab_name)
 end subroutine w_ptc_twiss_linac
 
 subroutine w_ptc_trackline(max_obs)
@@ -92,14 +96,12 @@ subroutine w_ptc_enforce6D(level)
   call setenforce6D(level)
 end subroutine w_ptc_enforce6D
 
-
 subroutine w_ptc_setaccel_method(method)
   use madx_ptc_intstate_module
   implicit none
   integer method
   call ptc_setaccel_method(method)
 end subroutine w_ptc_setaccel_method
-
 
 subroutine w_ptc_setexactmis(method)
   use precision_constants
@@ -116,7 +118,6 @@ subroutine w_ptc_setradiation(method)
   logical(lp) method
   call ptc_setradiation(method)
 end subroutine w_ptc_setradiation
-
 
 subroutine w_ptc_settotalpath(method)
   use precision_constants
@@ -186,37 +187,28 @@ subroutine w_ptc_setknobvalue(fibre)
   use madx_ptc_knobs_module
   implicit none
   integer fibre(*)
-
   call setknobvalue(fibre)
-
 end subroutine w_ptc_setknobvalue
 
 subroutine w_ptc_refreshtables()
   use madx_ptc_knobs_module
   implicit none
-
-    call filltables()
-  
+  call filltables()
 end subroutine w_ptc_refreshtables
 
 subroutine w_ptc_addknob(fibre)
   use madx_ptc_knobs_module
   implicit none
   integer fibre(*)
-
   call addknob(fibre)
-
 end subroutine w_ptc_addknob
 
 subroutine w_ptc_addknob_i(paramn)
   use madx_ptc_knobs_module
   implicit none
   integer paramn(*)
-
   call addknobi(paramn)
-
 end subroutine w_ptc_addknob_i
-
 
 subroutine w_ptc_addmoment(x,px,y,py,t,dp,tableIA, columnIA, parametric )
   use madx_ptc_distrib_module
@@ -225,38 +217,28 @@ subroutine w_ptc_addmoment(x,px,y,py,t,dp,tableIA, columnIA, parametric )
   integer               :: columnIA(*)
   integer               :: tableIA(*)
   integer               :: parametric
-
   call addmoment(x,px,y,py,t,dp,tableIA, columnIA, parametric )
-
 end subroutine w_ptc_addmoment
 
 subroutine w_ptc_writeparresults(filename)
   use madx_ptc_knobs_module
   implicit none
   integer filename(*)
-
   call writeparresults(filename)
-
 end subroutine w_ptc_writeparresults
-
-
 
 subroutine w_ptc_printframes(filename)
   use pointer_lattice
   implicit none
   integer filename(*)
-
   call printframes(filename)
-
 end subroutine w_ptc_printframes
 
 subroutine w_ptc_printlayout_rootm(filename)
   use madx_ptc_eplacement_module
   implicit none
   integer filename(*)
-
   call printlayout_rootm(filename)
-
 end subroutine w_ptc_printlayout_rootm
 
 subroutine w_ptc_eplacement(elementidx,rf)
@@ -264,9 +246,7 @@ subroutine w_ptc_eplacement(elementidx,rf)
   implicit none
   integer elementidx
   integer rf
-
   call place_element(elementidx,rf)
-
 end subroutine w_ptc_eplacement
 
 subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
@@ -276,26 +256,19 @@ subroutine w_ptc_addpush(tabname, colname, polinomial, monomial)
   integer colname(*)
   integer polinomial
   integer monomial(*)
-
   call addpush(tabname, colname, polinomial, monomial)
-
 end subroutine w_ptc_addpush
 
 subroutine w_ptc_script(scriptname)
   use madx_ptc_script_module
   implicit none
   integer scriptname(*)
-
   call execscript(scriptname)
-
 end subroutine w_ptc_script
 
 subroutine w_ptc_open_gino(scriptname)
   use madx_ptc_script_module
   implicit none
   integer scriptname(*)
-
   call execginoscript(scriptname)
-
 end subroutine w_ptc_open_gino
-

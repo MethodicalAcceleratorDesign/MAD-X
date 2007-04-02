@@ -2331,7 +2331,7 @@
 !----------------------------------------------------------------------*
 ! Purpose: computes the effect of the dipole edge                      *
 ! Input/Output:  ktrack , number of surviving trajectories             *
-!                 track , trajectory coordinates
+!                 track , trajectory coordinates                       *
 !----------------------------------------------------------------------*
       integer ktrack,itrack
       double precision fint,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),       &

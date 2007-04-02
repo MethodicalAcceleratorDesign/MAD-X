@@ -28,14 +28,14 @@ char predef_constants[] =
    up to "energy" included */
 
 /* format as follows: <...> optional, missing defaults become 0
-                      "none" stands for empty string
+   "none" stands for empty string
    name : module group type mad_8
-          module = the module this command belongs to
-          group  = the command group this command belongs to
-          type   = 0: default
-                   1: start of group
-                   2: end of group
-          mad_8  = mad-8 element code
+   module = the module this command belongs to
+   group  = the command group this command belongs to
+   type   = 0: default
+            1: start of group
+            2: end of group
+   mad_8  = mad-8 element code
    remark: sequence ... endsequence is NOT a group
 
    parameter 1 = (type <,default<, call default>>),
@@ -46,12 +46,12 @@ char predef_constants[] =
    l = (r) means: default l = 0, l in command without value -> 0
    energy = (r, 1) means: default energy is 1, in command without value -> 0
    file = (s, none, twiss) means: default no file,
-                                  file in command without value -> twiss
+   file in command without value -> twiss
 
    types: l=logical, i=int, r=real, s=string
    integer and real arrays of arbitrary length can be defined via {...};
    arrays must be defined with maximum length.
-   */
+*/
 
 /* threader tolerances and maxima: xmax,ymax:  orbit excursion at which
    threader is switched on; att: attenuation factor for kicks.
@@ -416,8 +416,8 @@ char command_def[] =
 "ks    = [i, -1], "
 "exactmatch = [l, true, true], "
 "trustrange    = [r, 0.1], " /*defines the range the expansion is trusted*/
-"step     = [r, 0.0], " 
-"lower    = [r, -1.e20], " 
+"step     = [r, 0.0], "
+"lower    = [r, -1.e20], "
 "upper    = [r,  1.e20]; "
 " "
 "ptc_setknobvalue: ptc_setknobvalue none 0 0 "

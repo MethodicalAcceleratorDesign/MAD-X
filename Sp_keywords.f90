@@ -169,7 +169,7 @@ contains
        WRITE(6,*)  " IS NOT PERMITTED "
        STOP 666
     END SELECT
-    
+
     BLANK%VORNAME = KEY%LIST%VORNAME
     CALL EL_Q_FOR_MADX(EL,BLANK)
 

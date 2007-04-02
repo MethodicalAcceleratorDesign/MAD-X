@@ -136,7 +136,7 @@ void add_to_el_list( /* adds element to alphabetic element list */
     }
     else
     {
-      if (flag > 0) 
+      if (flag > 0)
       {
         put_info("element redefined:", (*el)->name);
 /*
@@ -145,8 +145,8 @@ void add_to_el_list( /* adds element to alphabetic element list */
   dump_element(ell->elem[pos]);
   printf("New Definition:\n");
   dump_element(*el);
-*/         
-      } 
+*/
+      }
       if (flag >= 0 && ell == element_list)
       {
         for (j = 0; j < ell->curr; j++) /* set existing pointers to new */
@@ -194,7 +194,7 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
     nll->macros[nll->curr++] = macro;
   }
   /* RDM new matching*/
-  if (match_is_on==2) 
+  if (match_is_on==2)
   {
 
     for(j=0; j < MAX_MATCH_MACRO;j++)
@@ -205,7 +205,7 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
       }
     }
 
-    if (j  >= MAX_MATCH_MACRO  ) 
+    if (j  >= MAX_MATCH_MACRO  )
     {
       printf("Max number of match macros reached. Augmenting.\n");
       match2_augmentnmacros();
@@ -305,7 +305,7 @@ void add_to_var_list( /* adds variable to alphabetic variable list */
      2: separate list, do not drop variable */
 {
   int pos, j;
-  
+
   if ((pos = name_list_pos(var->name, varl->list)) > -1)
   {
     if (flag == 1)
@@ -319,8 +319,8 @@ void add_to_var_list( /* adds variable to alphabetic variable list */
   printf("New Value:\n");
   export_variable(var, stdout);
   printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
-*/         
-      }  
+*/
+      }
       else varl->list->inform[pos] = flag;
     }
     if (flag < 2) delete_variable(varl->vars[pos]);
@@ -3733,13 +3733,13 @@ void cf77flush()
 }
 
 /************************************************************************/
-/* The functions below belongs to matchc2, but were moved here to make 
+/* The functions below belongs to matchc2, but were moved here to make
    mpars compile */
-   
+
 /************************************************************************/
 int match2_augmentnmacros()
-{ 
-  /*makes place in the working arrays for a new macro 
+{
+  /*makes place in the working arrays for a new macro
     Piotr Skowronski Mar 2007
   */
   int i,j;
@@ -3771,7 +3771,7 @@ int match2_augmentnmacros()
   new_match2_cons_lhs       = (struct expression* **) mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(struct expression**));
 
   /*copy old pointers to arrays*/
-  for(i=0;i<MAX_MATCH_MACRO;i++)  
+  for(i=0;i<MAX_MATCH_MACRO;i++)
   {
     new_match2_cons_name[i]      = match2_cons_name[i];
 
@@ -3786,7 +3786,7 @@ int match2_augmentnmacros()
     new_match2_cons_lhs[i]       = match2_cons_lhs[i];
 
     new_match2_macro_name[i]     = match2_macro_name[i];
-  } 
+  }
 
   /*free the old arrays*/
   myfree(fn,match2_cons_name);
@@ -3801,7 +3801,7 @@ int match2_augmentnmacros()
 
 
   /*assign freed pointers to the new arrays*/
-  
+
   match2_cons_name = new_match2_cons_name  ;
   match2_cons_value = new_match2_cons_value  ;
   match2_cons_value_rhs = new_match2_cons_value_rhs  ;
@@ -3812,7 +3812,7 @@ int match2_augmentnmacros()
   match2_cons_lhs = new_match2_cons_lhs  ;
   match2_macro_name = new_match2_macro_name  ;
 
-  
+
 
   /*make arrays in the new row*/
 
@@ -3832,8 +3832,8 @@ int match2_augmentnmacros()
 
   match2_macro_name[MAX_MATCH_MACRO]=NULL;
 
-  for(j=0;j<MAX_MATCH_CONS;j++) 
-  { 
+  for(j=0;j<MAX_MATCH_CONS;j++)
+  {
     match2_cons_name     [MAX_MATCH_MACRO][j]=0x0;
 
     match2_cons_value    [MAX_MATCH_MACRO][j]=0.0;
@@ -3844,11 +3844,11 @@ int match2_augmentnmacros()
 
     match2_cons_rhs      [MAX_MATCH_MACRO][j]=0x0;
     match2_cons_lhs      [MAX_MATCH_MACRO][j]=0x0;
-  }  
-  
-  
+  }
+
+
   return ++MAX_MATCH_MACRO;
-  
+
 }
 /************************************************************************/
 
@@ -3857,10 +3857,10 @@ void match2_delete_arrays()
   /*clean the stuff;*/
   int i;
   char fn[]={"match2_delete_arrays"};
-  
+
   if(MAX_MATCH_MACRO <= 0) return;
-  
-  for(i=0;i<MAX_MATCH_MACRO;i++)  
+
+  for(i=0;i<MAX_MATCH_MACRO;i++)
   {
     if(match2_cons_name[i] == 0x0) break;
     myfree(fn,match2_cons_name     [i]);
@@ -3882,7 +3882,7 @@ void match2_delete_arrays()
   myfree(fn,match2_cons_rhs);
   myfree(fn,match2_cons_lhs);
   myfree(fn,match2_macro_name);
-     
+
 
   match2_cons_name = 0x0;
   match2_cons_value = 0x0;
@@ -3893,7 +3893,7 @@ void match2_delete_arrays()
   match2_cons_rhs = 0x0;
   match2_cons_lhs = 0x0;
   match2_macro_name = 0x0;
-     
+
   /*for security so we can not add more consraints if the module is not initialized*/
   MAX_MATCH_CONS =  0;
   MAX_MATCH_MACRO = 0;
@@ -3908,10 +3908,10 @@ void match2_delete_expressions()
 
   int i,j;
 
-  for(i=0;i<MAX_MATCH_MACRO;i++)  
+  for(i=0;i<MAX_MATCH_MACRO;i++)
   {
     if ( match2_cons_name[i][0] == 0x0) break;
-    for(j=0;j<MAX_MATCH_CONS;j++) 
+    for(j=0;j<MAX_MATCH_CONS;j++)
     {
       if ( match2_cons_name[i][j] == 0x0) break;
       myfree(rout_name,match2_cons_name[i][j]);

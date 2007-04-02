@@ -1,5 +1,5 @@
 !_____________________________________________________________
- 
+
 
 
 type tablepush_poly
@@ -10,7 +10,7 @@ type tablepush_poly
    integer       :: element  !defines the element of 6D function
    character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3
 end type tablepush_poly
-!describes result 
+!describes result
 
 type resultdescr
    integer       :: index ! column in 2D array of taylors of the result
@@ -20,20 +20,20 @@ end type resultdescr
 
 type mapelement
    integer       :: element  !defines the element of 6D function
-   character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3 
+   character(10) :: monomial !defiens the monomial f.g. 100000 is coeff of x, and 020300 is coeff of px^2*py^3
 end type mapelement
 !_____________________________________________________________
 
 type mapelresult
    type (resultdescr)  :: descr
-   type (mapelement)   :: r   
+   type (mapelement)   :: r
 end type mapelresult
 !_____________________________________________________________
 
 
-!defines a file 
+!defines a file
 type file
-   character(20) :: name  !file name  
+   character(20) :: name  !file name
    integer       :: fd !file descriptor
 end type file
 !_____________________________________________________________

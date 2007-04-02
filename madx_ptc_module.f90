@@ -59,8 +59,8 @@ CONTAINS
     sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
     if(sector_nmul_max.lt.sector_nmul) then
        call aafail('sector_nmul_max must be larger than sector_n: ',&
-                   'check your ptc_create_universe input')
-    endif   
+            'check your ptc_create_universe input')
+    endif
     call set_up_universe(m_u)
     universe=universe+1
 
@@ -214,10 +214,10 @@ CONTAINS
        print *, 'INPUT PARAMETERS ARE:'
     endif
 
-    sector_nmul_max0 = get_value('ptc_create_universe ','sector_nmul_max ')
+    sector_nmul_max0 = sector_nmul_max
     if (getdebug() > 1) print*,'  Global max sector_nmul: ',sector_nmul_max0
 
-    sector_nmul0 = get_value('ptc_create_universe ','sector_nmul ')
+    sector_nmul0 = sector_nmul
     if (getdebug() > 1) print*,'  Global sector_nmul: ',sector_nmul0
 
 
@@ -329,7 +329,7 @@ CONTAINS
 
     call node_name(name,length)
     key%list%vorname=name
-    
+
     !local, if present, superseed global at current node
     sector_nmul1=node_value("sector_nmul ")
     if(sector_nmul1.gt.0) then
@@ -1035,7 +1035,7 @@ CONTAINS
 
     if (kn >= 0) then
        kn = kn + 1
-       
+
        if (getdebug() > 1) print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
 
        call add(p%mag, kn,0,v)

@@ -11,10 +11,10 @@ void match_action(struct in_cmd* cmd)
   int iseed, iprint;
 
   if (match_is_on == kMatch_PTCknobs)
-   {
-     madx_mpk_run(cmd);
-     return;
-   }
+  {
+    madx_mpk_run(cmd);
+    return;
+  }
 
 
   if (stored_match_var->curr == 0)
@@ -155,39 +155,39 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
   static int nconserrs = 0; /*number of call finihed with error*/
 
   if (match_is_on==2) /* RDM fork */
-   { 
-    for(i=0; i<MAX_MATCH_MACRO; i++) 
-     {
-       if (match2_macro_name[i]==NULL) break;
-       
-       sprintf(execute,"exec, %s;",match2_macro_name[i]);
-       pro_input(execute);
-       if (errorflag == 0)
-        {
-         *stab_flag=0;
-         k=match2_evaluate_exressions(i,k,fun_vec);
-         nconserrs = 0;
+  {
+    for(i=0; i<MAX_MATCH_MACRO; i++)
+    {
+      if (match2_macro_name[i]==NULL) break;
+
+      sprintf(execute,"exec, %s;",match2_macro_name[i]);
+      pro_input(execute);
+      if (errorflag == 0)
+      {
+        *stab_flag=0;
+        k=match2_evaluate_exressions(i,k,fun_vec);
+        nconserrs = 0;
+      }
+      else
+      {
+        nconserrs++;
+        if (nconserrs > 5)
+        { /*return the error code only after 5 consecutive fails*/
+          *stab_flag=1; return;
         }
-       else
-        {
-         nconserrs++;
-         if (nconserrs > 5)
-         { /*return the error code only after 5 consecutive fails*/
-           *stab_flag=1; return;
-         }
-         else
-         { /*otherwise just put all the constraints to max double value*/
-           *stab_flag=0;
-           for(j=0; j < *nf; j++)
-           {
-             fun_vec[j] = DBL_MAX;
-           }
-         }
+        else
+        { /*otherwise just put all the constraints to max double value*/
+          *stab_flag=0;
+          for(j=0; j < *nf; j++)
+          {
+            fun_vec[j] = DBL_MAX;
+          }
         }
-     }
-   } 
-  else 
-   { /* RDM old match */
+      }
+    }
+  }
+  else
+  { /* RDM old match */
     current_const = 0;
     penalty = zero;
     set_option("match_print", print_flag);
@@ -241,38 +241,38 @@ void match_constraint(struct in_cmd* cmd)
   struct node* c_node;
   int pos, k, n, low, up;
 
-  if(match_is_on==2) 
-   { /* RDM fork */
+  if(match_is_on==2)
+  { /* RDM fork */
     match2_constraint(cmd);
-   }
+  }
   else if (match_is_on == kMatch_PTCknobs)
-   { /*PSk fork*/
-     madx_mpk_addconstraint(in->buffers[in->curr]->c_a->c);
-   }
-  else 
-   { /* RDM old match */
+  { /*PSk fork*/
+    madx_mpk_addconstraint(in->buffers[in->curr]->c_a->c);
+  }
+  else
+  { /* RDM old match */
     pos = name_list_pos("sequence", nl);
     if(nl->inform[pos]) /* sequence specified */
-     {
+    {
       cp = cmd->clone->par->parameters[pos];
       for (n = 0; n < match_sequs->curr; n++)
-       {
-        if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0) 
-         {
-           break;
-         }  
-       }
+      {
+        if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0)
+        {
+          break;
+        }
+      }
       if (n == match_sequs->curr)
-       {
+      {
         warning(cp->string," :sequence not selected by MATCH, skipped");
         return;
-       }
+      }
       low = up = n;
-     }
+    }
     else
-     {
+    {
       low = 0; up = match_sequs->curr - 1;
-     }
+    }
     for (n = low; n <= up; n++)
     {
       sequ = match_sequs->sequs[n];
@@ -504,7 +504,7 @@ void match_match(struct in_cmd* cmd)
   }/* RDM FORK */
 
 
- /* RDM  old match */
+  /* RDM  old match */
   match_is_on = 1;
   pos = name_list_pos("sequence", nl);
   fprintf(prt_file, "START MATCHING\n\n");
@@ -897,12 +897,12 @@ void mtjacprint(int m, int n,double* jac){
   fprintf(prt_file, "\n\nJACOBIAN:\n");
   fprintf(prt_file, "%4s %16s %10s %20s\n","Node","Constraint","Variable","Derivative");
   fprintf(prt_file, "---------------------------------------------------------------\n");
-  for(i=0;i<MAX_MATCH_MACRO;i++) 
-   {
+  for(i=0;i<MAX_MATCH_MACRO;i++)
+  {
     if (match2_macro_name[i]==NULL) break;
-    for(j=0;j<MAX_MATCH_CONS;j++) 
-     {
-     if (match2_cons_name[i][j]==NULL) break;
+    for(j=0;j<MAX_MATCH_CONS;j++)
+    {
+      if (match2_cons_name[i][j]==NULL) break;
       for(l=0;l<n;l++)
       {
         fprintf(prt_file, "%4s ",match2_macro_name[i]);
@@ -950,8 +950,8 @@ void mtjacprint(int m, int n,double* jac){
     }
     l=0;
     k=0;
-  fprintf(prt_file, "\n");
-  fprintf(prt_file, "\n");
+    fprintf(prt_file, "\n");
+    fprintf(prt_file, "\n");
   }
 }
 
@@ -959,12 +959,11 @@ int mtputconsname(char* noden, int* nodei , char* consn, int* consi) {
   int i,j;
   i=(*nodei)-1;
   j=(*consi)-1;
-match2_macro_name[i]=(char *)mymalloc("match_match",20);
-strncpy(match2_macro_name[i],noden,20);
-match2_macro_name[i][19]='\0';
-match2_cons_name[i][j]=(char *)mymalloc("match_match",20);
-strncpy(match2_cons_name[i][j],consn,20);
-match2_cons_name[i][j][19]='\0';
-return 0;
+  match2_macro_name[i]=(char *)mymalloc("match_match",20);
+  strncpy(match2_macro_name[i],noden,20);
+  match2_macro_name[i][19]='\0';
+  match2_cons_name[i][j]=(char *)mymalloc("match_match",20);
+  strncpy(match2_cons_name[i][j],consn,20);
+  match2_cons_name[i][j][19]='\0';
+  return 0;
 }
-

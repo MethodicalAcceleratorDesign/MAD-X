@@ -17,8 +17,8 @@ module madx_ptc_distrib_module
 
   !============================================================================================
   !  PUBLIC INTERFACE
-  public                         :: aremomentson 
-  public                         :: ptc_moments 
+  public                         :: aremomentson
+  public                         :: ptc_moments
   public                         :: putmoments
   public                         :: initmoments
   public                         :: allocmoments
@@ -38,14 +38,14 @@ module madx_ptc_distrib_module
   real(dp), pointer              ::  normmoments(:,:,:)
   real(dp)                       ::  sigmas(6)
   integer                        ::  distributiontype(3)
-  
+
   integer, parameter             ::  maxnmoments=100
   type (momentdef), private      ::  moments(maxnmoments)
   integer                        ::  nmoments = 0
 
   type(damap)                    :: damapa  !da map needed to calculation initialized with sigmas
   type(taylor)                   :: function_to_average ! taylor used to calculate averages
-  
+
   !============================================================================================
   !  PRIVATE
   !    routines
@@ -54,8 +54,8 @@ module madx_ptc_distrib_module
   public                         :: makeflat5
   public                         :: makeflat56
   private                        :: filter
-  
-     
+
+
 contains
   !____________________________________________________________________________________________
 
@@ -73,8 +73,8 @@ contains
     integer               :: i
     real(kind(1d0))       :: get_value
     ! name of the column corresponds to MADX nomenclature (5 col is dp/p)
-    ! iarray corresponds to 
-    
+    ! iarray corresponds to
+
     nmoments = nmoments + 1
 
     moments(nmoments)%iarray(1) =  x
@@ -83,7 +83,7 @@ contains
     moments(nmoments)%iarray(4) =  py
     moments(nmoments)%iarray(5) =  dp
     moments(nmoments)%iarray(6) =  t
-    
+
     moments(nmoments)%table = charconv(tableIA)
     moments(nmoments)%column = charconv(columnIA)
 
@@ -92,12 +92,12 @@ contains
 
     if (parametric /= 0) then
       print*,"To be made as parametric variable"
-      moments(nmoments)%index = nmoments !for the time being it is the same as the index 
+      moments(nmoments)%index = nmoments !for the time being it is the same as the index
     else
-      moments(nmoments)%index = 0   
-    endif    
-    
-    
+      moments(nmoments)%index = 0
+    endif
+
+
     if (getdebug()>0) then
        print  *,"addmoment : <", moments(nmoments)%iarray(1:6) ,&
       &                   ">,<", moments(nmoments)%column,&
@@ -121,20 +121,20 @@ contains
     integer              :: n
     character(20)        :: tabn
     character(17)        :: coln
-    
+
     if ( (n < 1) .and. (n > nmoments ) ) then
-      
+
       tabn(1:1) = achar(0)
       coln(1:1) = achar(0)
       call fort_warn("getmomentstabcol","index out of range")
       return
     endif
-    
-   
-   tabn = moments(n)%table  
-   coln = moments(n)%column  
-    
-    
+
+
+   tabn = moments(n)%table
+   coln = moments(n)%column
+
+
   end subroutine getmomentstabcol
   !____________________________________________________________________________________________
 
@@ -144,10 +144,10 @@ contains
 
       if ( associated(normmoments) ) then
          aremomentson = my_true
-      else   
+      else
          aremomentson = my_false
       endif
-    
+
   end function aremomentson
   !_________________________________________________________________
 
@@ -162,22 +162,22 @@ contains
       call fort_info("ptc_moments","No moments specified for calculation.")
       return
     endif
-    
+
     if (mapsorder < 1) then
       call seterrorflag(1,"ptc_moments",&
          "Maps are not available. Did you run ptc_twiss with savemaps=true ?")
-      return   
+      return
     endif
-    
+
     if (.not. associated(maps)) then
       return
-    endif 
-    
+    endif
+
     if (mapsicase == 5) then
       call fort_warn("ptc_moments","For the time being the calculation of moments is not available in 5D case.")
       return
-    endif 
-    
+    endif
+
     if ((mapsicase == 5) .and. (sigmas(5) .le. 0)) then
       call fort_warn("ptc_moments","Spread in dp/p in undefined and it won't be taken taken to the account")
       print*,"In 5D case you have to specify either"
@@ -189,19 +189,19 @@ contains
       call fort_warn("ptc_moments","Spread in dp/p in undefined and it won't be taken taken to the account")
       print*,"In 6D case you have to specify longitudinal emittance SIGE in the BEAM command"
     endif
-    
-    
-    call initmoments() 
+
+
+    call initmoments()
     call makemomentstables();
-    
+
     nda = getnknobsall() !defined in madx_ptc_knobs
-    
+
     !print*, "In moments order ", order
     mynd2 = 0
     npara = 0
     call init(default,order,nda,BERZ,mynd2,npara)
 
-    call allocmoments() 
+    call allocmoments()
 
     call alloc(y)
 
@@ -214,7 +214,7 @@ contains
 !       endif
 
        do ii=1,6
-         y(ii) = maps(i)%unimap(ii) 
+         y(ii) = maps(i)%unimap(ii)
        enddo
 
        call putmoments(i,maps(i)%name,maps(i)%s,y)
@@ -223,9 +223,9 @@ contains
 
     enddo
 100 continue
-    
+
     call ptc_setdebuglevel(0)
-    
+
     call kill(y)
     call killmoments()
 
@@ -245,27 +245,27 @@ contains
     integer              :: debug
     integer              :: last
     integer              :: index !standarf function
-    
+
 !    last = index(name,'$END')
 !    if ( last == 0) then
       debug = getdebug()
-!    else  
+!    else
 !      debug = 10;
 !    endif
 
     if ( .not. associated(normmoments) ) then
       return
     endif
-    
+
 !     if (debug .gt. 3) then
-! 
+!
 !       print*, "#################################################"
 !       print*, "#################################################"
 !       print*, "#################################################"
 !       print*, "Moments for fibre ", n,name," at ", s,"m"
 !       print*, "ND2=",c_%nd2
 !       print*, "NPARA=",c_%npara
-! 
+!
 !       print*, "Function 1"
 !       call print(y(1),6)
 !       print*, ""
@@ -275,26 +275,26 @@ contains
 !       print*, "Function 6"
 !       call print(y(6),6)
 !       print*, ""
-! 
-!     endif 
+!
+!     endif
 
-    !--moments--!    
+    !--moments--!
     do i=1, nmoments
-       
+
        function_to_average = zero
        set = .false.
-       
+
        do j=1,c_%npara
 !         if (debug .gt. 3) write(*,'(a6,i1,a6,i1,a6,i1)',ADVANCE='NO') "nmom=",i," ndim=",j," pow=",moments(i)%iarray(j)
          do k = 1, moments(i)%iarray(j)
            if (set) then
              function_to_average = function_to_average*y(j)%t
-!             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "*"  
+!             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "*"
            else
              function_to_average = y(j)%t
              set = .true.
-!             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "|"  
-           endif  
+!             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "|"
+           endif
          enddo
 !         if (debug .gt. 3) write(*,*) "->"
        enddo
@@ -304,15 +304,15 @@ contains
 !        if (debug > 3) then
 !          print*, "function_to_average"
 !          call print(function_to_average,6)
-!        endif  
+!        endif
 
-         
-       call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function 
+
+       call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function
 
 !        if (debug > 3) then
 !          print*, "After cfu"
 !          call print(function_to_average,6)
-!        endif  
+!        endif
 
        function_to_average=function_to_average.o.damapa ! replaces x px y py ... by sigma1, sigma2, etc
 
@@ -320,41 +320,41 @@ contains
 !          print*, "stage 2"
 !          call print(function_to_average,6)
 !        endif
-       
+
        v = function_to_average.sub.0
-       
+
        if (c_%npara == 5) then
 !         if (debug > 3) print*, v
          e = 0
          do k=1,c_%no
            e(5) = k
 !           if (debug > 3) then
-!             print*, "s^",k,"=",(sigmas(5)**(k)) 
+!             print*, "s^",k,"=",(sigmas(5)**(k))
 !             print*, "f = ", (function_to_average.sub.e)
 !             print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
-!           endif  
+!           endif
            v = v + (function_to_average.sub.e) * (sigmas(5)**(k)) !was to 2*k
 !           if (debug > 9) print*, v
-         enddo  
-!         if (debug > 9) print*, 
+         enddo
+!         if (debug > 9) print*,
        endif
-       
-       
+
+
        call double_to_table(moments(i)%table,moments(i)%column,v)
-       
+
 !        if (debug > 3) then
 !          print*, "Final  ",i," =  ", v
 !          print*,moments(i)%iarray
 !          call print(function_to_average,6)
 !          print*,"######################################################################################"
-!        endif   
-       
-            
-    enddo    
+!        endif
+
+
+    enddo
 
     call augmentcountmomtabs(s)
-    
-    
+
+
   end subroutine putmoments
 
   !_________________________________________________________________________________
@@ -364,7 +364,7 @@ contains
     real(dp)         :: emix
     real(dp)         :: emiy
     real(dp)         :: emiz
-    
+
     if (emix .lt. zero) then
       print *, "X Emittance is less then 0"
       return
@@ -379,8 +379,8 @@ contains
       print *, "Z Emittance is less then 0"
       return
     endif
-    
-    
+
+
     sigmas(1) = sqrt(emix)
     sigmas(2) = sigmas(1)
     sigmas(3) = sqrt(emiy)
@@ -389,17 +389,17 @@ contains
     sigmas(5) = sqrt(emiz)
     sigmas(6) = sigmas(5)
 
-    
-    
+
+
   end subroutine setemittances
   !_________________________________________________________________________________
 
-  
+
   subroutine setsigma(ndim,sig)
     implicit none
     integer          :: ndim
     real(dp)         :: sig
-    
+
     if (sig .lt. zero) then
       print *, "X Emittance is less then 0"
       return
@@ -409,9 +409,9 @@ contains
       print *, "Unknown dimension code", ndim
       return
     endif
-    
+
     sigmas(ndim) = sig
-    
+
   end subroutine setsigma
   !_________________________________________________________________________________
 
@@ -426,7 +426,7 @@ contains
     implicit none
     integer                         :: no
     integer                         :: i ! dimension
-    integer                         :: get_string 
+    integer                         :: get_string
     character(len=48), dimension(3) :: disttypes
     character(len=48)               :: cmdname
     integer, dimension(3)           :: stringlength
@@ -445,30 +445,30 @@ contains
 !      call fort_warn("initmoments","No moments specified for calculation.")
       return
     endif
-    
-    
+
+
     i = getcurrentcmdname(cmdname);
-    
+
     if (i .eq. 0 ) then
       call fort_warn("initmoments","Can not get the current command name.")
       return
     endif
-    
+
     stringlength(1) = get_string(cmdname,'xdistr ',disttypes(1))
     stringlength(2) = get_string(cmdname,'ydistr ',disttypes(2))
     stringlength(3) = get_string(cmdname,'zdistr ',disttypes(3))
-    
+
     !we take what was available in the last ptc_twiss and go to maximum order we can go
-    no =  mapsorder 
+    no =  mapsorder
     if ( no < 1 ) then
       call fort_warn('madx_ptc_distrib.f90 <initmoments>:','Order in twiss is smaller then 1')
       return
     endif
     no = no*2 !we take what was available in the last ptc_twiss and go to maximum order we can go
-    
+
     allocate(normmoments(3, 0:no, 0:no))
     normmoments = zero
-    
+
     do i=1,3
        tmpstring = disttypes(i)
        select case(tmpstring(1:stringlength(i)))
@@ -491,7 +491,7 @@ contains
            call makegaus(no,i)
            distributiontype(i) = distr_gauss
        end select
-      
+
     enddo
 
   end subroutine initmoments
@@ -504,40 +504,40 @@ contains
       if ( .not. associated(normmoments) ) then
         return
       endif
-      
+
       call alloc(damapa)
       damapa = sigmas
       call alloc(function_to_average)
-    
+
   end subroutine allocmoments
 
   !_________________________________________________________________________________
   subroutine killmoments
     implicit none
     !cleans everything allocated in in initmoments and allocmoments
-      
+
       if ( .not. associated(normmoments) ) then
         return
       endif
-      
+
       deallocate(normmoments)
 
       call kill(damapa)
       call kill(function_to_average)
 
-  end subroutine killmoments  
+  end subroutine killmoments
   !_________________________________________________________________________________
 
-  real(dp) function filter(e)  
+  real(dp) function filter(e)
     implicit none
     integer e(:)
     integer i
 
     filter=one
-    
+
 
     do i=1,c_%nd
-     
+
      filter=filter*normmoments(i,e(2*i-1),e(2*i))
      if (getdebug() > 1) then
         print*, "normmoments(",i, e(2*i-1), e(2*i),")=", normmoments(i,e(2*i-1),e(2*i))
@@ -545,7 +545,7 @@ contains
     enddo
 
     if (getdebug() > 1) then
-      
+
       print*,"f(",e(1:6),")=",filter
       print*,"=================="
     endif
@@ -556,7 +556,7 @@ contains
   !_________________________________________________________________________________
   !_________________________________________________________________________________
   !_________________________________________________________________________________
-!!  
+!!
    subroutine makegaus(no,d)
    implicit none
    integer no !order
@@ -590,7 +590,7 @@ contains
          normmoments(d,i,j)=(fr%cos.sub.jn)
          normmoments(d,i,j)=normmoments(d,i,j)*singlefac(jn(1))*two**(jn(1))
          normmoments(d,j,i)=normmoments(d,i,j)
-         
+
          if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
        enddo
       enddo
@@ -606,7 +606,7 @@ contains
    integer no
    integer d !dimension number
    real(dp), allocatable :: m(:,:)
-   integer i,j 
+   integer i,j
 
     if (getdebug() > 1) print*, "Making flat distribution "
 
@@ -617,7 +617,7 @@ contains
 
          normmoments(d,i,j)=(three)**(i/2)/(i+1) !delta assumed flat distribution and
          normmoments(d,j,i)=normmoments(d,i,j)   !and L is the delta function
-        
+
          if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
 
        enddo
@@ -632,7 +632,7 @@ contains
    integer no
    integer d !dimension number
    real(dp), allocatable :: m(:,:)
-   integer i,j 
+   integer i,j
 
     if (getdebug() > 1) print*, "Making flat in delta and T distributions"
 
@@ -641,7 +641,7 @@ contains
 
         normmoments(d,i,j)=(three)**(i/2)/(i+1) !delta assumed flat distribution and
         normmoments(d,i,j)=normmoments(d,i,j)*(three)**(j/2)/(j+1) !delta assumed flat distribution and
-        
+
         normmoments(d,j,i)=normmoments(d,i,j)   !and L is the delta function
 
         if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
@@ -654,9 +654,9 @@ contains
   !_________________________________________________________________________________
   !_________________________________________________________________________________
 
-  
+
   !_________________________________________________________________________________
-   
+
    real(dp) function singlefac(n)
    implicit none
    integer n,i
@@ -672,25 +672,25 @@ contains
 
    integer function getdistrtype(axis)
    implicit none
-   integer axis  
-   
+   integer axis
+
      getdistrtype =  distributiontype(axis)
-   end function getdistrtype 
-   
+   end function getdistrtype
+
 
   !_________________________________________________________________________________
-   
-   
+
+
    real(dp) function getsigma(axis)
    implicit none
-   integer axis  
-     
+   integer axis
+
      if ( (axis > 0) .and. (axis < 7) ) then
        getsigma = sigmas(axis)
      else
        getsigma = zero
-     endif 
-     
+     endif
+
    end function getsigma
 
 end module madx_ptc_distrib_module
@@ -700,7 +700,7 @@ end module madx_ptc_distrib_module
 
 
 integer function w_ptc_getnmoments()
-  use madx_ptc_distrib_module 
+  use madx_ptc_distrib_module
   implicit none
       w_ptc_getnmoments = getnmoments()
 end function w_ptc_getnmoments
@@ -708,7 +708,7 @@ end function w_ptc_getnmoments
 !_________________________________________________________________________________
 
 subroutine  w_ptc_getmomentstabcol(n, tabn, coln)
-  use madx_ptc_distrib_module 
+  use madx_ptc_distrib_module
   implicit none
   integer              :: n
   character(20)        :: tabn

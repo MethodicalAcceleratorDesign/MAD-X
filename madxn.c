@@ -1811,7 +1811,7 @@ void element_name(char* name, int* l)
   for (i = 0; i < ncp; i++) name[i] = current_node->p_elem->name[i];
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
 }
- 
+
 void node_name(char* name, int* l)
   /* returns current node name in Fortran format */
   /* l is max. allowed length in name */
@@ -3993,39 +3993,39 @@ int next_constraint(char* name, int* name_l, int* type, double* value,
     i=match2_cons_curr[0];
     j=match2_cons_curr[1];
     k=match2_cons_curr[2];
-    if(match2_cons_name[i][j]==NULL) 
-     {
+    if(match2_cons_name[i][j]==NULL)
+    {
       j++;
       if(j>=MAX_MATCH_CONS)
-       {
-         takenextmacro = 1;
-       }
+      {
+        takenextmacro = 1;
+      }
       else if (match2_cons_name[i][j]==NULL) /*if above is true this one can cause seg fault*/
-       {
-         takenextmacro = 1;
-       }
+      {
+        takenextmacro = 1;
+      }
       else
-       {
-         takenextmacro = 0;
-       } 
-       
-      if(takenextmacro) 
-       {
+      {
+        takenextmacro = 0;
+      }
+
+      if(takenextmacro)
+      {
         i++;j=0;
-        
+
         if(i>=MAX_MATCH_MACRO)
-         {
-           nomore = 1;
-         }
+        {
+          nomore = 1;
+        }
         else if(match2_cons_name[i][j]==NULL)
-         {
-           nomore = 1;
-         }
+        {
+          nomore = 1;
+        }
         else
-         {/*i,j is the next constraint*/
-           nomore = 0;
-         } 
-        
+        {/*i,j is the next constraint*/
+          nomore = 0;
+        }
+
         if( nomore == 0 ){
           name=match2_cons_name[i][j];
           *name_l=strlen(name);
@@ -8208,16 +8208,16 @@ void pro_ptc_varyknob(struct in_cmd* cmd)
 {/*
    Sets a variable based on parameter
  */
-  
+
   if (match_is_on != kMatch_PTCknobs)
   {
     warningnew("pro_ptc_varyknob","Match with ptcknobs is not active, command ignored");
     return;
   }
 
- madx_mpk_addvariable(cmd);
+  madx_mpk_addvariable(cmd);
 
-} 
+}
 /********************************************************************************/
 
 void pro_ptc_knob(struct in_cmd* cmd)
@@ -8276,30 +8276,30 @@ void pro_ptc_knob(struct in_cmd* cmd)
   else
   {
     mycpy(c_dum->c, element);
-    
+
     if (command_par_value("exactmatch",cmd->clone) != 0)
-     {
-       p = strstr(c_dum->c,"[");
-       if (p)
+    {
+      p = strstr(c_dum->c,"[");
+      if (p)
+      {
+        *p = ':';
+        p = strstr(c_dum->c,"]");
+        if (p == 0x0)
         {
-          *p = ':';
-          p = strstr(c_dum->c,"]");
-          if (p == 0x0)
-           {
-             warningnew("madxn.c: pro_ptc_knob:","element %s is bady defned. Commnad ignored.",element);
-             return; 
-           }
-          *p=0;
+          warningnew("madxn.c: pro_ptc_knob:","element %s is bady defned. Commnad ignored.",element);
+          return;
         }
-       else
-        { /*assume it is the first element*/
-          p = &(c_dum->c[strlen(c_dum->c)]);
-          p[0]=':';
-          p[1]='1';
-          p[2]= 0;
-        } 
-       
-     }
+        *p=0;
+      }
+      else
+      { /*assume it is the first element*/
+        p = &(c_dum->c[strlen(c_dum->c)]);
+        p[0]=':';
+        p[1]='1';
+        p[2]= 0;
+      }
+
+    }
     stoupper(c_dum->c);
 
     elementIA = new_int_array(1+strlen(c_dum->c));
