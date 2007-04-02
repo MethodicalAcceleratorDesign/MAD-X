@@ -1219,14 +1219,14 @@
       tempa = a(2,1) * betx - a(2,2) * alfx
       alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
       betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
-      amux = amux + atan2(a(1,2),tempb)
+      if(a(1,2).ne.zero.or.tempb.ne.zero) amux=amux+atan2(a(1,2),tempb)
 
 !---- Mode 2.
       tempb = c(1,1) * bety - c(1,2) * alfy
       tempa = c(2,1) * bety - c(2,2) * alfy
       alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
       bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
-      amuy = amuy + atan2(c(1,2),tempb)
+      if(c(1,2).ne.zero.or.tempb.ne.zero) amuy=amuy+atan2(c(1,2),tempb)
 
       if(.not.centre.or.centre_cptk) then
         opt_fun(3 )=betx
@@ -1582,7 +1582,7 @@
 !---- Linear functions.
       alfx = - (tb*ta + fre(1,2)*fre(2,2)) / betx
       betx = t2 / betx
-      amux = amux + atan2(fre(1,2), tb)
+      if(fre(1,2).ne.zero.or.tb.ne.zero) amux=amux+atan2(fre(1,2),tb)
       bx1 = wx*cos(phix)
       ax1 = wx*sin(phix)
       bx2 = ((tb**2 - fre(1,2)**2)*bx1                                  &
@@ -1607,7 +1607,7 @@
 !---- Linear functions.
       alfy = - (tb*ta + fre(3,4)*fre(4,4)) / bety
       bety = t2 / bety
-      amuy = amuy + atan2(fre(3,4), tb)
+      if(fre(3,4).ne.zero.or.tb.ne.zero) amuy=amuy+atan2(fre(3,4),tb)
 
       by1 = wy*cos(phiy)
       ay1 = wy*sin(phiy)
@@ -2807,7 +2807,11 @@
       dipi = vals(2,0) / (one + deltap)
 
       if (tilt .ne. zero)  then
-        angle = atan2(dipi, dipr) - tilt
+        if(dipi.ne.zero.or.dipr.ne.zero) then
+          angle = atan2(dipi, dipr) - tilt
+        else
+          angle = -tilt
+        endif
         dtmp = sqrt(dipi**2+dipr**2)
         dipr = dtmp * cos(angle)
         dipi = dtmp * sin(angle)
@@ -2835,7 +2839,11 @@
      &/ (one + deltap)
         enddo
         if (tilt .ne. zero)  then
-          angle = atan2(field(2,iord), field(1,iord))/(iord+1) - tilt
+          if(field(2,iord).ne.zero.or.field(1,iord).ne.zero) then
+            angle = atan2(field(2,iord), field(1,iord))/(iord+1) - tilt
+          else
+            angle = -tilt
+          endif
           dtmp = sqrt(field(1,iord)**2+field(2,iord)**2)
           angle = (iord+1) * angle
           field(1,iord) = dtmp * cos(angle)
