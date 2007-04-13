@@ -1784,13 +1784,15 @@
 
 !--- Acquire deltap
 
-      k = double_from_table('summ ','deltap ',1,deltap)
-      deltap = deltap*100.0
-      write(ch,'(f9.4)') deltap
-      if(dpp_flag) then
-        slocn = ' <#>'
-      else
-        slocn = 'Momentum offset = '//ch(:7)//' %'//'&'//'<#>'
+      if(.not.ptc_flag) then
+        k = double_from_table('summ ','deltap ',1,deltap)
+        deltap = deltap*100.0
+        write(ch,'(f9.4)') deltap
+        if(dpp_flag) then
+          slocn = ' <#>'
+        else
+          slocn = 'Momentum offset = '//ch(:7)//' %'//'&'//'<#>'
+        endif
       endif
 
 !--- reset axis and curve defaults
