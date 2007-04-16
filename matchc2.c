@@ -402,9 +402,9 @@ void match2_setconstrinrange(struct node** nodes, double w, char* parname, char 
   struct node* c_node;
   char tablecmd[500];
   char buff[500];
-  c_node = nodes[0];
   char* p;
 
+  c_node = nodes[0];
   do
   {
     strcpy(buff,c_node->name);
