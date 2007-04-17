@@ -413,7 +413,7 @@ void match2_setconstrinrange(struct node** nodes, double w, char* parname, char 
     if ( p )
     {
       if (p[1] == '0') /*it means that this is a drift automatically added to a sequence*/
-      {               /*this guy does not work with table command so we do not care about them*/
+      {               /*this guy does not work with table command so we do not care about him*/
         c_node = c_node->next;
         continue;
       }
