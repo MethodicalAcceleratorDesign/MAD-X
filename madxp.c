@@ -3456,7 +3456,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
               stack[c_stack] = floor(stack[c_stack]);
               break;
             case 20:
-              stack[c_stack] = abs(stack[c_stack]);
+              stack[c_stack] = fabs(stack[c_stack]);
               stack[c_stack] = stack[c_stack] - floor(stack[c_stack]);
               break;
             default:
