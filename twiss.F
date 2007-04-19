@@ -3020,10 +3020,13 @@
         dorad = get_value('probe ','radiate ') .ne. zero
         sk3 = bvk * node_value('k3 ')
         sk3s = bvk * node_value('k3s ')
-        tilt4 = -4*node_value('tilt ')
         sk3 = sk3 + bvk * field(1,3)/el
         sk3s = sk3s + bvk * field(2,3)/el
-        if (tilt4 .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)
+        tilt4 = -4*node_value('tilt ')
+        if(sk3s.ne.zero) then
+          tilt4 = atan2(sk3s, sk3) + tilt4
+          sk3 = sqrt(sk3**2 + sk3s**2)
+        endif          
         sk3l = (el * sk3) / (one + deltap)
 
 !---- Normal and skew components of octupole.
@@ -3481,18 +3484,6 @@
       cplxy=.false.
       fmap = el .ne. zero
       if (.not. fmap) return
-      tilt = node_value('tilt ')
-      if (tilt .ne. zero)  then
-!--- rotate orbit before entry
-        st = sin(tilt)
-        ct = cos(tilt)
-        tmp = orbit(1)
-        orbit(1) = ct * tmp + st * orbit(3)
-        orbit(3) = ct * orbit(3) - st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp + st * orbit(4)
-        orbit(4) = ct * orbit(4) - st * tmp
-      endif
 !---- Field error.
       call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
@@ -3505,10 +3496,25 @@
       bvk = node_value('other_bv ')
       sk1 = bvk * node_value('k1 ')
       sk1s = bvk * node_value('k1s ')
-      cplxy = cplxy .or. tilt .ne. zero
       sk1 = sk1 + bvk * field(1,1)/el
       sk1s = sk1s + bvk * field(2,1)/el
-      if (tilt .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)
+      tilt = node_value('tilt ')
+      if(sk1s.ne.zero) then
+        tilt = -atan2(sk1s, sk1)/two + tilt
+        sk1 = sqrt(sk1**2 + sk1s**2)
+      endif
+      if (tilt .ne. zero)  then
+!--- rotate orbit before entry
+        st = sin(tilt)
+        ct = cos(tilt)
+        tmp = orbit(1)
+        orbit(1) = ct * tmp + st * orbit(3)
+        orbit(3) = ct * orbit(3) - st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp + st * orbit(4)
+        orbit(4) = ct * orbit(4) - st * tmp
+      endif
+      cplxy = cplxy .or. tilt .ne. zero
       tilt=tilt+plot_tilt
       arad = get_value('probe ','arad ')
       gamma = get_value('probe ','gamma ')
@@ -3701,7 +3707,12 @@
       if (.not. fmap) return
 !---- Strength and tilt.
       if (ftrk) then
+        exfld = node_value('ex ')
+        eyfld = node_value('ey ')
         tilt = node_value('tilt ')
+        if(eyfld.ne.zero) then
+          tilt = -atan2(eyfld, exfld) + tilt
+        endif
         if (tilt .ne. zero)  then
 !--- rotate orbit before entry
           st = sin(tilt)
@@ -3713,8 +3724,6 @@
           orbit(2) = ct * tmp + st * orbit(4)
           orbit(4) = ct * orbit(4) - st * tmp
         endif
-        exfld = node_value('ex ')
-        eyfld = node_value('ey ')
         efield = sqrt(exfld**2 + eyfld**2)
       else
         exfld = zero
@@ -3893,18 +3902,6 @@
       cplxy=.false.
       fmap = el .ne. zero
       if (.not. fmap) return
-      tilt = node_value('tilt ')
-      if (tilt .ne. zero)  then
-!--- rotate orbit before entry
-        st = sin(tilt)
-        ct = cos(tilt)
-        tmp = orbit(1)
-        orbit(1) = ct * tmp + st * orbit(3)
-        orbit(3) = ct * orbit(3) - st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp + st * orbit(4)
-        orbit(4) = ct * orbit(4) - st * tmp
-      endif
 !---- Field error.
       call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
@@ -3917,10 +3914,25 @@
       bvk = node_value('other_bv ')
       sk2 = bvk * node_value('k2 ')
       sk2s = bvk * node_value('k2s ')
-      cplxy = cplxy .or. tilt .ne. zero
       sk2 = sk2 + bvk * field(1,2)/el
       sk2s = sk2s + bvk * field(2,2)/el
-      if (tilt .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)
+      tilt = node_value('tilt ')
+      if (sk2s .ne. zero) then
+        tilt = -atan2(sk2s, sk2)/three + tilt
+        sk2 = sqrt(sk2**2 + sk2s**2)
+      endif
+      if (tilt .ne. zero)  then
+!--- rotate orbit before entry
+        st = sin(tilt)
+        ct = cos(tilt)
+        tmp = orbit(1)
+        orbit(1) = ct * tmp + st * orbit(3)
+        orbit(3) = ct * orbit(3) - st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp + st * orbit(4)
+        orbit(4) = ct * orbit(4) - st * tmp
+      endif
+      cplxy = cplxy .or. tilt .ne. zero
       arad = get_value('probe ','arad ')
       gamma = get_value('probe ','gamma ')
       deltap = get_value('probe ','deltap ')

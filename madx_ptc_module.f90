@@ -546,7 +546,7 @@ CONTAINS
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
 
-    case(5) ! PTC accepts mults
+    case(5)
        key%magnet="quadrupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
@@ -565,7 +565,10 @@ CONTAINS
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
        endif                                                      !
-       if (sk1s .ne. zero) sk1 = sqrt(sk1**2 + sk1s**2)           !
+       if (sk1s .ne. zero) then                                   !
+          tilt = -atan2(sk1s, sk1)/two + tilt                     !
+          sk1 = sqrt(sk1**2 + sk1s**2)                            !
+       endif                                                      !
        key%list%k(2) =sk1                                         !
        key%list%ks(2)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
@@ -588,16 +591,17 @@ CONTAINS
           sk2= sk2 +dum1                                          !
           sk2s=sk2s+dum2                                          !
        endif                                                      !
-       if (sk2s .ne. zero) sk2 = sqrt(sk2**2 + sk2s**2)           !
+       if (sk2s .ne. zero) then                                   !
+          tilt = -atan2(sk2s, sk2)/three + tilt                   !
+          sk2 = sqrt(sk2**2 + sk2s**2)                            !
+       endif                                                      !
        key%list%k(3) =sk2                                         !
        key%list%ks(3)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
-       !       print*, "SEXT: from MADX normal: ",normal_0123(2)," skew: ",skew_0123(2)," Tilt: ",node_value('tilt ')
-       !       print*, "SEXT: for  PTC  normal: ",key%list%k(3)," skew: ",key%list%ks(3)," Tilt: ",key%tiltd
        !================================================================
 
-    case(7) ! PTC accepts mults
+    case(7)
        key%magnet="octupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
@@ -614,15 +618,14 @@ CONTAINS
           sk3= sk3 +dum1                                          !
           sk3s=sk3s+dum2                                          !
        endif                                                      !
-       if (sk3s .ne. zero) sk3 = sqrt(sk3**2 + sk3s**2)           !
+       if (sk3s .ne. zero) then                                   !
+          tilt = -atan2(sk3s, sk3)/four + tilt                    !
+          sk3 = sqrt(sk3**2 + sk3s**2)                            !
+       endif                                                      !
        key%list%k(4) =sk3                                         !
        key%list%ks(4)=zero  ! added by VK                         !
 
        key%tiltd=tilt  !==========================================!
-
-       !       print*, "key%list%k(4)",key%list%k(4)
-       !       print*, "key%list%ks(4)",key%list%ks(4)
-       !       print*, "tiltd , ",key%tiltd
 
        !================================================================
 

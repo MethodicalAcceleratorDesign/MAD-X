@@ -411,6 +411,8 @@ double command_par_special(char* parameter, struct element* el)
   {
     if ((val = command_par_value("tilt", el->def)) == zero)
     {
+      val = zero;
+/*
       if (strcmp(el->base_type->name, "quadrupole") == 0)
       {
         normal = command_par_value("k1", el->def);
@@ -435,6 +437,7 @@ double command_par_special(char* parameter, struct element* el)
         skew   = command_par_value("ey", el->def);
         if (skew != zero) val = -atan2(skew, normal);
       }
+*/
     }
   }
   else val = command_par_value(parameter, el->def);
