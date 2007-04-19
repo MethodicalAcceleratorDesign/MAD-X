@@ -1793,6 +1793,8 @@
         else
           slocn = 'Momentum offset = '//ch(:7)//' %'//'&'//'<#>'
         endif
+      else
+        slocn = ' '
       endif
 
 !--- reset axis and curve defaults
