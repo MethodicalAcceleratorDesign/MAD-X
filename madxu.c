@@ -359,6 +359,24 @@ void add_vars_to_table(struct table* t)
   }
 }
 
+void set_vars_from_table(struct table* t)
+  /* set variables from current table_row) */
+{
+  int i;
+
+  for (i = 0; i < t->num_cols; i++)
+  {
+    if (t->columns->inform[i] ==2)
+    {
+      set_variable(t->columns->names[i],&t->d_cols[i][t->curr]) ;
+    }
+  }
+}
+
+
+
+
+
 int char_cnt(char c, char* string)
   /* returns number of occurrences of character c in string */
 {

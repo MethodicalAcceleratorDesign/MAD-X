@@ -1973,6 +1973,7 @@ void exec_fill_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
+  int row,curr;
   if (nl->inform[pos] == 0)
   {
     warning("no table name:", "ignored");
@@ -1983,11 +1984,63 @@ void exec_fill_table(struct in_cmd* cmd)
     warning("no table name: ", "ignored");
     return;
   }
+  pos=name_list_pos("row", nl);
+  row=(int) pl->parameters[pos]->double_value;
   if ((pos = name_list_pos(name, table_register->names)) > -1)
   {
     t = table_register->tables[pos];
-    add_vars_to_table(t);
-    if (++t->curr == t->max) grow_table(t);
+    if (row<0) {
+      add_vars_to_table(t);
+      if (++t->curr == t->max) grow_table(t);
+    } else {
+      row--;
+      curr=t->curr;
+      if (row < t->curr) { 
+        t->curr=row;}
+      else {
+        t->curr--;
+      }
+      add_vars_to_table(t);
+      t->curr=curr;
+    }
+  }
+  else warning("table not found: ", "ignored");
+  return;
+}
+
+void exec_setvars_table(struct in_cmd* cmd)
+  /* set variables from a table */
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("table", nl);
+  char* name = NULL;
+  int row,curr;
+  if (nl->inform[pos] == 0)
+  {
+    warning("no table name:", "ignored");
+    return;
+  }
+  if ((name = pl->parameters[pos]->string) == NULL)
+  {
+    warning("no table name: ", "ignored");
+    return;
+  }
+  pos=name_list_pos("row", nl);
+  row=(int) pl->parameters[pos]->double_value;
+  if ((pos = name_list_pos(name, table_register->names)) > -1)
+  {
+    t = table_register->tables[pos];
+    row--;
+    curr=t->curr;
+    if ((row < t->curr) && (row >-1)) { 
+      t->curr=row;}
+    else {
+      t->curr--;
+    }
+    set_vars_from_table(t);
+    t->curr=curr;
   }
   else warning("table not found: ", "ignored");
   return;
@@ -5597,6 +5650,14 @@ struct table* read_table(struct in_cmd* cmd)
         {
           if ((name = strtok(NULL, " \"\n")) != NULL)
             type = permbuff(stolower(name));
+        }
+      }
+      else if (strcmp(tmp, "NAME") == 0)
+      {
+        if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
+        {
+          if ((name = strtok(NULL, " \"\n")) != NULL)
+            namtab = permbuff(stolower(name));
         }
       }
     }

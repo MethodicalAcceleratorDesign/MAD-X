@@ -529,6 +529,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
+  else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
   else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
