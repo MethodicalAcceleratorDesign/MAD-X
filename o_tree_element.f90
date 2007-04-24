@@ -12,7 +12,7 @@ module tree_element_MODULE
   PRIVATE KILL_SPINOR_8,KILL_RAY_8,KILL_DASPIN
   PRIVATE EQUAL_RAY8_SPINOR8,EQUAL_SPINOR8_SPINOR8,EQUAL_IDENTITY_SPINOR_8,EQUAL_SPINOR8_RAY8
   PRIVATE  EQUAL_IDENTITY_RAY_8,ALLOC_daspin,EQUAL_DASPIN_RAY8,EQUAL_RAY8_DASPIN
-  private alloc_normal_spin,kill_normal_spin,EQUAL_NORMAL_DASPIN
+  private alloc_normal_spin,kill_normal_spin !,EQUAL_NORMAL_DASPIN
   private READ_DASPIN,PRINT_DASPIN
 
   private power_rotr,find_ar,norm_matr,anti_matr
@@ -30,7 +30,7 @@ module tree_element_MODULE
      MODULE PROCEDURE EQUAL_SPINOR8_SPINOR8
      MODULE PROCEDURE EQUAL_DASPIN_RAY8
      MODULE PROCEDURE EQUAL_RAY8_DASPIN
-     MODULE PROCEDURE EQUAL_NORMAL_DASPIN
+     !     MODULE PROCEDURE EQUAL_NORMAL_DASPIN
   end  INTERFACE
 
   INTERFACE exp_n_theta
@@ -620,15 +620,9 @@ CONTAINS
     INTEGER, INTENT(IN) :: R
     INTEGER I,j
 
-    DO I=1,3
-       DO J=1,3
-          S%M(I,J)=ZERO
-       ENDDO
-    ENDDO
     IF(R==1) THEN
 
        DO I=1,C_%NSPIN
-          S%M(I,I)=ONE
           S%X(I)=ONE.MONO.(c_%npara_fpp-C_%NSPIN+I)
        ENDDO
     ELSEIF(R==0) THEN
@@ -681,13 +675,10 @@ CONTAINS
     implicit none
     TYPE(SPINOR_8), INTENT(IN) :: S
     TYPE(SPINOR_8), INTENT(INOUT) :: R
-    INTEGER I,J
+    INTEGER I
 
     DO I=1,3
        R%X(I)=S%X(I)
-       DO J=1,3
-          R%M(I,J)=S%M(I,J)
-       ENDDO
     ENDDO
 
   END    subroutine EQUAL_SPINOR8_SPINOR8
@@ -706,19 +697,11 @@ CONTAINS
        DS%M%V(I)=R%X(I)
     ENDDO
 
-    IF(C_%track_spint_mat) THEN
-       DO I=1,3
-          DO J=1,3
-             DS%S(I,J)=R%S%M(I,J)
-          ENDDO
+    DO I=1,3
+       DO J=1,3
+          DS%S(I,J)=(R%S%X(I)%T).D.(C_%SPIN_POS+J-1)
        ENDDO
-    ELSE
-       DO I=1,3
-          DO J=1,3
-             DS%S(I,J)=(R%S%X(I)%T).D.(C_%SPIN_POS+J-1)
-          ENDDO
-       ENDDO
-    ENDIF
+    ENDDO
   END subroutine EQUAL_DASPIN_RAY8
 
   subroutine EQUAL_RAY8_DASPIN(R,DS)
@@ -735,19 +718,11 @@ CONTAINS
        R%X(I)= MORPH(DS%M%V(I))+R%X(I)
     ENDDO
 
-    IF(C_%track_spint_mat) THEN
-       DO I=1,3
-          DO J=1,3
-             R%S%M(I,J)=DS%S(I,J)
-          ENDDO
+    DO I=1,3
+       DO J=1,3
+          R%S%X(I)=DS%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))
        ENDDO
-    ELSE
-       DO I=1,3
-          DO J=1,3
-             R%S%X(I)=DS%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))
-          ENDDO
-       ENDDO
-    ENDIF
+    ENDDO
 
 
   END subroutine EQUAL_RAY8_DASPIN
@@ -800,17 +775,19 @@ CONTAINS
 
 
 
-  subroutine EQUAL_NORMAL_DASPIN(R,DS)
+  subroutine NORMAL_DASPIN(R,DS)
     implicit none
     integer ipause, mypause
     TYPE(normal_spin), INTENT(INOUT) :: R
-    TYPE(DASPIN), INTENT(IN) :: DS
+    TYPE(DASPIN), INTENT(INout) :: DS
     real(dp) s00(3,3),tunes(4)
     integer i,j
     type(real_8) n0(3),theta0,a(3,3),ai(3,3),s0(3,3),s0i(3,3),b(3)
     type(real_8) s1(3,3),s1i(3,3)
     type(damap) ri
     type(taylor) t
+    type(taylorresonance) tr
+    type(pbfield) h
     call alloc_33(s1)
     call alloc_33(s1i)
     call alloc_33(s0)
@@ -824,6 +801,12 @@ CONTAINS
     call alloc(t)
 
     !   normalize orbital map
+    global_verbose=.true.
+    r%n%auto=.false.
+    ! call alloc(h)
+    ! h=-pi*(0.00133623d0)*((1.d0.mono.'0020')+(1.d0.mono.'0002'))
+    ! h%h=h%h+pi*(0.0013622341d0)*((1.d0.mono.'000020')+(1.d0.mono.'000002'))
+    ! ds%m =exp(h,ds%m)
     r%n=ds%m
     ri=r%n%normal
     ri=ri**(-1)
@@ -847,6 +830,7 @@ CONTAINS
 
     call find_n_theta(s0,theta0,n0)  ! s0=exp(theta0*n0.L)
     tunes(4)=theta0
+
     !    finds a
     call find_a(n0,a)
     call inv_as(a,ai)  ! a0**(-1) * s0 * a0 = exp(theta0*Ly)
@@ -896,7 +880,21 @@ CONTAINS
 
     ri=(r%n%a_t)**(-1)
     call trans_mat(r%as,ri,r%as)
+    call matmulp(r%ns,s0,r%ns)
 
+    call find_n_theta(r%ns,theta0,n0)  ! s0=exp(theta0*n0.L)
+    call print(theta0,17)
+    theta0=theta0.cut.c_%no
+    do i=1,3
+       n0(i)=n0(i).cut.c_%no
+       call print(n0(i),17)
+    enddo
+    n0(1)=cos(theta0)
+    n0(2)=sin(theta0)
+    do i=1,2
+       n0(i)=n0(i).cut.c_%no
+       call print(n0(i),17)
+    enddo
     ! checking
 
     call matmulp(ds%s,r%as,s0)
@@ -916,7 +914,7 @@ CONTAINS
 
        enddo
     enddo
-
+    call alloc(tr)
     call trans_mat(s1i,r%n%a_t,s1i)
     do i=1,3
        do j=1,3
@@ -925,8 +923,11 @@ CONTAINS
           t=s1i(i,j)%t
           !     t=s0(i,j)%t-s0i(i,j)%t
           t=t.cut.c_%no
-          call print(t,6)
-          ipause=mypause(0)
+          tr=t
+          call print(tr%cos,6)
+          ipause=mypause(1)
+          call print(tr%sin,6)
+          ipause=mypause(2)
 
        enddo
     enddo
@@ -942,13 +943,13 @@ CONTAINS
     call kill(ri)
     call kill(t)
 
-
-  END subroutine EQUAL_NORMAL_DASPIN
+    r%tune=tunes(4)/twopi
+  END subroutine NORMAL_DASPIN
 
   subroutine CHECK_RES_ORBIT(J,NRES,M,SKIP)
     implicit none
     INTEGER M(:,:),NRES
-    LOGICAL SKIP,SKIP1,SKIP2
+    LOGICAL(lp) SKIP,SKIP1,SKIP2
     INTEGER I,K,J(:)
 
     SKIP=.FALSE.
@@ -1893,46 +1894,49 @@ CONTAINS
   subroutine ALLOC_SPINOR_8(S)
     implicit none
     TYPE(SPINOR_8), INTENT(INOUT) :: S
-    INTEGER I,J
+
     CALL ALLOC(S%X,3)
-    DO I=1,3
-       DO J=1,3
-          CALL ALLOC(S%M(I,J))
-       ENDDO
-    ENDDO
 
   END    subroutine ALLOC_SPINOR_8
 
   subroutine ALLOC_RAY_8(R)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
+    ! INTEGER I,J
 
     CALL ALLOC(R%S)
     CALL ALLOC(R%X,6)
+
+    !  DO I=1,6
+    !  DO J=1,6
+    !   CALL ALLOC(R%E_IJ(I,J))
+    !  ENDDO
+    !  ENDDO
 
   END    subroutine ALLOC_RAY_8
 
   subroutine KILL_SPINOR_8(S)
     implicit none
     TYPE(SPINOR_8), INTENT(INOUT) :: S
-    INTEGER I,J
 
     CALL KILL(S%X,3)
 
-    DO I=1,3
-       DO J=1,3
-          CALL KILL(S%M(I,J))
-       ENDDO
-    ENDDO
 
   END    subroutine KILL_SPINOR_8
 
   subroutine KILL_RAY_8(R)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
+    ! INTEGER I,J
 
     CALL KILL(R%S)
     CALL KILL(R%X,6)
+
+    !  DO I=1,6
+    !  DO J=1,6
+    !   CALL KILL(R%E_IJ(I,J))
+    !  ENDDO
+    !  ENDDO
 
   END    subroutine KILL_RAY_8
 

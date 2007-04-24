@@ -138,7 +138,13 @@ Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
 Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
-madx_ptc_module.o: Sp_keywords.o madx_ptc_knobs.o madx_ptc_setcavs.o madx_ptc_module.f90 
+Spb_fake_gino_sub.o: Sp_keywords.o Spb_fake_gino_sub.f90
+Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
+Sqa_beam_beam_ptc.o: Sq_orbit_ptc.o Sqa_beam_beam_ptc.f90
+Sqb_accel_ptc.o: Sqa_beam_beam_ptc.o Sqb_accel_ptc.f90
+Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
+madx_ptc_module.o: Sr_spin.o madx_ptc_knobs.o madx_ptc_setcavs.o madx_ptc_module.f90 
+St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
 madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
@@ -153,14 +159,11 @@ wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_twiss.o          madx_ptc_distrib.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_knobs.o \
-	madx_ptc_script.o Spc_pointers.o \
+	madx_ptc_script.o St_pointers.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
-Spc_pointers.o: Sp_keywords.o madx_ptc_module.o Spc_pointers.f90
-Spb_fake_gino_sub.o: Spc_pointers.o Spb_fake_gino_sub.f90
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
-Sq_orbit_ptc.o:  madx_ptc_module.o Sq_orbit_ptc.f90
 
 # matchlib2 for madx only
 matchlib2_f77.o: matchlib2.F

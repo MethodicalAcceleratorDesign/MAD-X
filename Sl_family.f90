@@ -1147,6 +1147,7 @@ CONTAINS
     C=>R%START
 
     DO WHILE(ASSOCIATED(C))
+       if(mfpolbloc/=0)  call ELp_POL_print(C%MAGP)
        CALL RESET31(C%MAGP)
        C=>C%NEXT
     ENDDO
@@ -1186,6 +1187,7 @@ CONTAINS
        C=>C%NEXT
     ENDDO
     CALL RING_L(R,DONEIT)
+
 
   END SUBROUTINE SCAN_FOR_POLYMORPHS
 

@@ -153,7 +153,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
   LOGICAL(lp) :: ALLOW_TRACKING=.true.
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
-  LOGICAL(lp),TARGET  :: APERTURE_FLAG=.FALSE.
+  LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
   LOGICAL(lp),TARGET  :: check_x_min  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
@@ -164,6 +164,11 @@ module precision_constants
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=c_1d6
   real(dp),pointer :: crash
+  character*255 :: initial_setting="FINAL_SETTINGS.TXT"
+  character*255 :: final_setting="FINAL_SETTINGS.TXT"
+  character*255 :: def_orbit_node="def_orbit_node.txt"
+  character*255 :: file_block_name="noprint"
+
   type info_window
      character(3) adv
      integer nc,nr,ni
@@ -188,7 +193,6 @@ module precision_constants
      integer,pointer :: np       ! number of parameters in fpp
      integer,pointer :: nspin       ! number of spin variables (0 or 3)
      integer,pointer :: SPIN_pos       ! position of spin variables (0 or 3)
-     LOGICAL(LP),POINTER :: track_spint_mat  ! TRACKS A SPIN MATRIX WITHOUT DA
      integer,pointer :: ndpt     ! constant energy variable position is different from zero
      integer,pointer :: NPARA     ! PARAMETER LOCATION IN PTC in fpp
      integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP or PTC
@@ -203,7 +207,7 @@ module precision_constants
      logical(lp),pointer  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
      logical(lp),pointer  :: CHECK_STABLE !=.TRUE. particle status
      logical(lp),pointer  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
-     logical(lp),pointer  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done
+     logical(lp),pointer  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done (default)
      logical(lp),pointer  :: check_iteration       ! checks iteration in fitted magnet for symplectic tracking (not used)
      logical(lp),pointer  :: check_interpolate_x       ! check if lost by being outside the interpolation region
      logical(lp),pointer  :: check_interpolate_y      ! check if lost by being outside the interpolation region

@@ -964,7 +964,6 @@ contains
     c_%np => np
     c_%NSPIN => NSPIN
     c_%SPIN_POS => SPIN_POS
-    c_%track_spint_mat => track_spint_mat
     c_%ndpt => ndpt
     c_%npara_fpp => npara_fpp
     c_%knob => knob

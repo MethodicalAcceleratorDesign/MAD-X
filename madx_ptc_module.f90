@@ -12,7 +12,8 @@ MODULE ptc_results
 END MODULE ptc_results
 
 MODULE madx_ptc_module
-  USE madx_keywords
+  use ptc_spin
+!  USE madx_keywords
   USE madx_ptc_setcavs_module
   USE madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug

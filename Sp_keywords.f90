@@ -242,15 +242,15 @@ contains
     ENDIF
     write(MF,*) " $$$$$$$ GLOBAL DATA $$$$$$$$$$"
     write(MF,*) l%mass,L%START%mag%p%p0c, "MASS, P0C"
-    write(MF,*) phase0,stoch_in_rec,l%charge, "PHASE0, STOCH_IN_REC, CHARGE"
+    write(MF,*) phase0,stoch_in_rec,l%charge, " PHASE0, STOCH_IN_REC, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
          "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
     write(line,*) SECTOR_NMUL_MAX,SECTOR_NMUL,&
          OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE,&
          " SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE"
     write(mf,'(a255)')line
-    write(MF,*) wedge_coeff, "wedge_coeff"
-    write(MF,*) MAD8_WEDGE, "MAD8_WEDGE"
+    write(MF,*) wedge_coeff, " wedge_coeff"
+    write(MF,*) MAD8_WEDGE, " MAD8_WEDGE"
     write(MF,*) " $$$$$$$ END GLOBAL DATA $$$$$$$$$$"
 
 
@@ -482,7 +482,7 @@ contains
     WRITE(MF,'(A255)') LINE
     IF(ASSOCIATED(M%FREQ)) THEN
        WRITE(MF,*) " CAVITY INFORMATION "
-       WRITE(LINE,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN, "VOLT,FREQ, PHAS, DELTA_E, LAG, THIN"
+       WRITE(LINE,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN, " VOLT,FREQ, PHAS, DELTA_E, LAG, THIN"
        WRITE(MF,'(A255)') LINE
     ELSEIF(ASSOCIATED(M%VOLT)) THEN
        WRITE(MF,*) " ELECTRIC SEPTUM INFORMATION "

@@ -32,6 +32,7 @@ MODULE S_DEF_ELEMENT
   integer, TARGET :: np_pol=0
   !  logical(lp) :: isomorphism_MIS=.TRUE.  !Not needed anymore always should be true
   private put_aperture_el,put_aperture_elp
+  integer :: mfpolbloc=0
 
   TYPE MUL_BLOCK
      ! stuff for setting multipole
@@ -459,6 +460,7 @@ CONTAINS
     CHARACTER(nlp) S1NAME
     CHARACTER(vp)    S1VORNAME
 
+
     IF(S2%P%NMUL>NMAX) THEN
        w_p=0
        w_p%nc=1
@@ -508,6 +510,7 @@ CONTAINS
     TYPE(ELEMENTP),INTENT(inOUT):: S2
     INTEGER I,S1NMUL
     logical(lp) DOIT,DONEIT                    !,checkname
+    type(work) w
 
     IF(S2%P%NMUL>NMAX) THEN
        w_p=0
@@ -662,6 +665,54 @@ CONTAINS
 
 
   END SUBROUTINE ELp_POL_force
+
+  SUBROUTINE  ELp_POL_print(S2)
+    implicit none
+    TYPE(ELEMENTP),INTENT(inOUT):: S2
+    INTEGER I
+    type(work) w
+
+
+
+    !          CALL SET_FALSE(S1%CHECK_NMUL)
+    !        ENDIF
+
+    DO I=1,S2%P%NMUL
+       IF(s2%AN(I)%KIND==3) THEN
+          w=s2
+          write(mfpolbloc,'(a16,a8,1x,i4,2(1x,e18.8))') s2%name, ' MAD AN ',i,s2%aN(I)%R*MADFAC(I),s2%aN(I)%R*w%brho*MADFAC(I)
+       ENDIF
+       IF(s2%bN(I)%KIND==3) THEN
+          w=s2
+          write(mfpolbloc,'(a16,a8,1x,i4,2(1x,e18.8))') s2%name, ' MAD BN ',i,s2%BN(I)%R*MADFAC(I),s2%BN(I)%R*w%brho*MADFAC(I)
+       endif
+    ENDDO
+    IF(S2%KIND==KIND4.or.S2%KIND==KIND21) THEN    ! CAVITY
+       IF(s2%VOLT%KIND==3) THEN
+          write(mfpolbloc,*) s2%name, ' VOLT ',s2%VOLT%R
+       ENDIF
+       IF(s2%FREQ%KIND==3) THEN
+          write(mfpolbloc,*) s2%name, ' FREQ ',s2%FREQ%R
+       ENDIF
+       IF(s2%PHAS%KIND==3) THEN
+          write(mfpolbloc,*) s2%name, ' PHAS ',s2%PHAS%R
+       ENDIF
+    ENDIF
+    IF(S2%KIND==KIND5) THEN    ! SOLENOID
+       IF(s2%B_SOL%KIND==3) THEN
+          write(mfpolbloc,*) s2%name, ' B_SOL ',s2%B_SOL%R
+       ENDIF
+    ENDIF
+
+    !    IF(S2%KIND==KINDWIGGLER) THEN    ! new element
+    !       DONEIT=.FALSE.                     ! NOT USED HERE
+    !       call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
+    !    ENDIF
+
+
+
+  END SUBROUTINE ELp_POL_print
+
 
 
 
@@ -1589,7 +1640,7 @@ CONTAINS
     INTEGER, INTENT(IN) ::NM,F
     INTEGER I,N
     real(dp), ALLOCATABLE,dimension(:)::AN,BN
-    if(EL%KIND==kind1) return
+    if(EL%KIND==kind1.or.EL%KIND==kind4) return
     N=NM
     IF(NM<0) N=-N
     ! ALREADY THERE
@@ -1704,7 +1755,7 @@ CONTAINS
     INTEGER, INTENT(IN) ::NM,F
     INTEGER I,N
     TYPE(REAL_8), ALLOCATABLE,dimension(:)::AN,BN
-    if(EL%KIND==kind1) return
+    if(EL%KIND==kind1.or.EL%KIND==kind4) return
 
     N=NM
     IF(NM<0) N=-N
@@ -1827,6 +1878,9 @@ CONTAINS
     EL%P%TIME=S%TIME
     EL%P%NOCAVITY=S%NOCAVITY
     EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
+    EL%P%RADIATION_new=S%RADIATION_new
+    EL%P%SPIN=S%SPIN
+    !    EL%P%SPIN_ONLY=S%SPIN_ONLY
   END SUBROUTINE MAGSTATE
 
 
@@ -1844,6 +1898,10 @@ CONTAINS
     EL%P%TIME=S%TIME
     EL%P%NOCAVITY=S%NOCAVITY
     EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
+    EL%P%RADIATION_new=S%RADIATION_new
+    EL%P%SPIN=S%SPIN
+    !    EL%P%SPIN_ONLY=S%SPIN_ONLY
+
   END SUBROUTINE MAGPSTATE
 
 

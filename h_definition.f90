@@ -37,7 +37,6 @@ module definition
   logical(lp) :: knob_numerical=.false.
   real(dp) ::  knob_eps(lnv)=c_1d_6
   integer ::  knob_i =0
-  logical(LP), target :: track_spint_mat=MY_FALSE
 
   !
   TYPE sub_taylor
@@ -103,7 +102,7 @@ module definition
 
   type spinor_8
      type(real_8) x(3)
-     type(real_8) m(3,3)
+     !   type(real_8) m(3,3)
   end type spinor_8
 
   type probe
@@ -114,6 +113,8 @@ module definition
   type probe_8
      type(real_8) x(6)
      type(spinor_8) s
+     !  type (REAL_8) E_ij(ndim2,ndim2)
+     real(dp) E_ij(ndim2,ndim2)
   end type probe_8
 
   !    scratch levels of DA using linked list
