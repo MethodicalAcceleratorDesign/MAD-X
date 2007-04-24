@@ -2729,7 +2729,8 @@ struct macro* new_macro(int n_formal, int length, int p_length)
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", m->name);
   if ((m->n_formal  = n_formal) > 0) m->formal = new_char_p_array(n_formal);
   if (p_length > 0) m->tokens = new_char_p_array(p_length);
-  m->body = new_char_array(++length);
+  ++length;
+  m->body = new_char_array(length + 1);
   return m;
 }
 
