@@ -6771,54 +6771,6 @@ double sss_variable(char* name)
   return val;
 }
 
-void set_variable(char* name, double* value)
-{
-  /* sets variable name to value */
-  char comm[NAME_L];
-  char par[NAME_L];
-  struct variable* var;
-  double val = *value;
-  struct element* el;
-  struct command* cmd;
-  char *p, *n = c_dum->c, *q = comm;
-  mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
-  {
-    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
-    {
-      if (var->type == 0)
-        warning("ignored: attempt to redefine constant:", var->name);
-      else if (var->type < 3)
-      {
-        var->value = val;
-        var->type = 1;
-        if (var->expr != NULL)  var->expr = delete_expression(var->expr);
-      }
-    }
-    else
-    {
-      var = new_variable(c_dum->c, val, 1, 1, NULL, NULL);
-      add_to_var_list(var, variable_list, 1);
-    }
-  }
-  else /* element or command parameter */
-  {
-    while (n < p)  *(q++) = *(n++);
-    *q = '\0';
-    q = par; n++; n++;
-    while (*n != '\0')  *(q++) = *(n++);
-    *q = '\0';
-    if ((el = find_element(comm, element_list)) != NULL)
-      set_command_par_value(par, el->def, val);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
-      set_command_par_value(par, cmd, val);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      set_command_par_value(par, cmd, val);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      set_command_par_value(par, cmd, val);
-  }
-}
-
 int set_enable(char* type, struct in_cmd* cmd)
 {
   char* name;
