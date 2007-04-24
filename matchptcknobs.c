@@ -82,6 +82,7 @@ struct madx_mpk_variable
    double step;
    int    knobidx; /*index of the knob that makes paramter of this variable */
    double currentvalue;
+   double oldvalue;
    int    kn; /*if a field component then different from -1*/
    int    ks;
    char   IsIniCond; /**/
@@ -227,7 +228,7 @@ void madx_mpk_run(struct in_cmd* cmd)
   char    readstartval = 1;
   int     retval;
   int     fieldorder;
-  FILE*   fdbg = fopen("currentvalues.txt","w");
+  FILE*   fdbg = fopen("currentvalues.txt","a+");
 
   matchfilename[0] = 0; /*sign for makestdmatchfile to generate a new file name*/
   
@@ -291,6 +292,12 @@ void madx_mpk_run(struct in_cmd* cmd)
 
   match2_keepexpressions = 1;
   
+  fprintf(fdbg,"\n###############################################\n");
+  for (i=0;i<madx_mpk_Nvariables;i++)
+   {
+     fprintf(fdbg,"%16s   ",madx_mpk_variables[i].name);
+   }
+  fprintf(fdbg,"\n"); fflush(0);
   
   do
    {
@@ -326,6 +333,7 @@ void madx_mpk_run(struct in_cmd* cmd)
         goto cleaning;
       }
      
+     
      /*set all variables to 0*/
      var = 0.0;
      for (i=0;i<madx_mpk_Nvariables;i++)
@@ -351,37 +359,76 @@ void madx_mpk_run(struct in_cmd* cmd)
 
      
      pro_input(ptcend);
+    
+     /* END OF STD MATCHING*/
 
-     if (debuglevel)  printf("\nFunction_Vector 1:\n");
-   
+     /* CALCULATE KTAR*/
+
      ktar = 0.0;
-     fprintf(fdbg,"%d",calls);
+     fprintf(fdbg,"\n%d V ",calls);
      printf("MPK STEP %d",calls);
      for (i=0;i<madx_mpk_Nvariables;i++)
       {
         var = get_variable_(madx_mpk_variables[i].name);
-        madx_mpk_variables[i].currentvalue += var;
-        if (debuglevel)  printf("Matched knob %s = %E, new current val %E  \n",
-                                 madx_mpk_variables[i].name, var, 
-                                 madx_mpk_variables[i].currentvalue);
-        printf(" %20.16f ",       madx_mpk_variables[i].currentvalue);             
-        fprintf(fdbg," %20.16f ", madx_mpk_variables[i].currentvalue);
+        fprintf(fdbg," %20.16f ", var);
         ktar += var*var;
       }
+     fprintf(fdbg,"\n");
+
+
+     /* BIG  KTAR*/
+       /*BIG TAR*/
+          /*SCALE AND BRING BACK OLD VALUES*/
+
      tar = get_variable_("tar");
-     fprintf(fdbg," KTAR=%20.16E TAR=%20.16E\n",ktar, tar);
-     printf(" KTAR=%20.16E TAR=%20.16E\n",ktar, tar);
-     fflush(0x0);
-     if (debuglevel)  printf("KTAR=%E \n", ktar ); 
      
-     if ( (oldtar > 0) && (tar > oldtar))
-       {
-        fprintf(fdbg,"Narrowing trust ranges\n"); 
+     if ( (oldtar <= 0) || (tar < 10.0*oldtar)) /*correct within order of magnitude - we can not truest the oldtar */
+      {                                         /*because it also bears error of approximation*/
+         for (i=0;i<madx_mpk_Nvariables;i++)
+          {
+            madx_mpk_variables[i].oldvalue = madx_mpk_variables[i].currentvalue;
+
+            var = get_variable_(madx_mpk_variables[i].name);
+            madx_mpk_variables[i].currentvalue += var;
+          }
+      }
+     else
+      {
+        fprintf(fdbg,"Narrowing trust ranges Bringing back the previous step values\n"); 
         for (i=0;i<madx_mpk_Nvariables;i++)
          {
            madx_mpk_variables[i].trustrange /= 2.0;
+           madx_mpk_variables[i].step       /= 2.0;
+
+           madx_mpk_variables[i].currentvalue = madx_mpk_variables[i].oldvalue;
+
          }
-       }
+        
+      }
+
+       /*SMALL TAR*/
+          /*ADD DELTAS*/
+      
+       /*CONTINUE*/
+          
+     /* SMALL KTAR*/
+       /*VERIFY*/
+
+
+     fprintf(fdbg,"%d CV",calls);
+     for (i=0;i<madx_mpk_Nvariables;i++)
+      {
+        fprintf(fdbg," %20.16f ", madx_mpk_variables[i].currentvalue);
+      }      
+     fprintf(fdbg,"\n");
+
+     fprintf(fdbg," KTAR=%20.16E TAR=%20.16E OLDTAR=%20.16E \n",ktar, tar, oldtar);
+     printf(" KTAR=%20.16E TAR=%20.16E OLDTAR=%20.16E \n",ktar, tar, oldtar);
+
+     if (debuglevel)  printf("KTAR=%E \n", ktar ); 
+
+     fflush(0x0);
+
 
      oldtar = tar;
      
@@ -392,6 +439,7 @@ void madx_mpk_run(struct in_cmd* cmd)
       }  
      else
       {
+
         knobsatmatchedpoint = 0;
         if (debuglevel)  printf("Matched values of knobs are NOT close to zeroes within the tolerance\n");
         if (!maxNCallsExceeded) continue;
@@ -1308,7 +1356,7 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
       }
    }
 
-  if (debuglevel < 2) fprintf(f,"assign, echo=/tmp/mpk_stdmatch.out;\n");
+  /*if (debuglevel < 2) fprintf(f,"assign, echo=/tmp/mpk_stdmatch.out;\n");*/
 
   fprintf(f,"match, use_macro;\n");
   
@@ -1382,7 +1430,7 @@ void makestdmatchfile(char* fname, char* matchactioncommand)
 
   fprintf(f,"endmatch;\n");
 
-  if (debuglevel < 2) fprintf(f,"assign, echo=terminal;\n");
+  /*if (debuglevel < 2) fprintf(f,"assign, echo=terminal;\n");*/
 
   fclose(f);
 
