@@ -758,7 +758,6 @@ contains
       real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
 
-
       if (getdebug() > 2) then
          write(21,*) "##########################################"
          write(21,*) ""
@@ -770,9 +769,11 @@ contains
       deltae = getdeltae()
 
       call double_to_table(table_name, 's ', suml)
-      doublenum=current%mag%p%p0c
-      call double_to_table(table_name, 'energy ', doublenum)
 
+      doublenum = deltae * startfen%energy
+      call double_to_table(table_name, 'energy ', doublenum)
+      
+      
       opt_fun(:)=zero
 
       call liepeek(iia,icoast)
