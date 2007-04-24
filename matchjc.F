@@ -574,9 +574,9 @@
       dxnorm=sqrt(DNRM2(N, dx, 1)/xnorm)
       write(*,*) 'Final relative difference norm:',dxnorm
 
-  831 format('Initial Penalty Function = ',e16.8,//)
-  830 format('call: ',I5, ' Dx = ', e16.8,                              &
-     &'  Penalty function = ',e16.8)
+  831 format('Initial Penalty Function = ',e24.16,//)
+  830 format('call: ',I5, ' Dx = ', e24.16,                              &
+     &'  Penalty function = ',e24.16)
       end
 
       subroutine jacob_print2(m,n,fjac)
