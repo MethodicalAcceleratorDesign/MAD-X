@@ -417,13 +417,12 @@
       call FCN(M,N,x,fvec,IFLAG)
       calls=calls+1
 
-      fmin_old=fmin
       fmin = vdot(m,fvec,fvec)
 
       xnorm=DNRM2(N, x, 1)
       dxnorm=DNRM2(effvar, effsol, 1)/xnorm
       write(*,"('call: ',I5,' Dx = ', e16.8,                            &
-     &'  Penalty function =',e16.8)")  calls,dxnorm,fmin
+     &'  Penalty function =',e24.16)")  calls,dxnorm,fmin
 
 !      Store the best point:
       if ((fmin .lt. fminbest)) then
@@ -446,7 +445,8 @@
       endif
       ! Iteration do not converge
       ! For the first calls it can happen due to not fisical penalty
-      if(abs(1-fmin/fmin_old).lt.1D-15 ) then
+      if((calls.ge.3).and.(abs(1-fmin/fmin_old).lt.1D-15) ) then
+!        print *, 'dbg',fmin,fmin_old,abs(1-fmin/fmin_old)
         print *, '++++++++++ JACOBIAN ended: minimum found'
         goto 300
       endif
