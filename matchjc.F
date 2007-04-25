@@ -98,11 +98,11 @@
       integer i,iflag,info,j,level,m,n,calls,call_lim
       integer ireset,strategy,bisec,match_mode
       double precision fmin_old,epsfcn
-      double precision fnorm,ftol,gtol
+      double precision ftol,gtol
       double precision dxnorm,xnorm,dx(n),fmin_start,fmin_old2
-      double precision vmod
+      double precision vdot
       double precision xtol,x(n),xstart(n),xold(n),fvec(m)
-      double precision xopt(n)
+      double precision xopt(n),xbest(n),fminbest,condnum
       double precision fjac(m,n),wa4(m),zero,one,two
       double precision epsil,epsmch,cool,balance,random
       parameter(zero=0d0,one=1d0,two=2d0, epsil=1d-9,epsmch=1d-16)
@@ -137,13 +137,11 @@
 !---- Apply a random factor:
       call mtrandom(x,random)
 
-
 !---- Check if the limit is within the constraint and
 !---- reset the illegal values
       call mtlimit(x,ireset)
 
 !---- Compute matching functions in fvec (penalty values)
-!      call mtcond(izero, m, fvec, iflag)
       call FCN(M,N,X,fvec,IFLAG)
       calls=calls+1
       if (iflag .ne. 0) then
@@ -153,19 +151,18 @@
       endif
 
 !---- Compute the norm of the function values (penalty values)
-      fnorm = vmod(m, fvec)
-      fmin = fnorm**2
-      write(*,831) fmin
+      fmin = vdot(m,fvec,fvec)
+      write(*,'("Initial Penalty Function = ",e24.16,//)') fmin
       fmin_start=fmin
-!      fmin_old = fmin
-!      edm = fmin
-!     the first calls usually have a worse penalty due perhaps
-!      to dimensional problems
-!      fmin = 1E24
 
+!---- store the first best set
+      fminbest=fmin
+      do j = 1, n
+        xbest(j) = x(j)
+      enddo
 
 !---- Check the input parameters for errors.
-      if (n .le. 0                                                      &
+      if (n .lt. 0                                                      &
      &.or. ftol .lt. zero .or. xtol .lt. zero .or. gtol .lt. zero       &
      &.or. call_lim .le. 0                      ) then
         call aawarn('JACOBIAN', ' error in the input parameters')
@@ -173,7 +170,7 @@
       endif
 
 !---- Quit, when initial value is already OK
-!---- Do not aprly for calculating jacobian
+!---- Do not apply for calculating jacobian
       if (strategy.ne.2) then
         if (fmin .le. ftol) then
           call aawarn('JACOBIAN', ' penalty function already ok')
@@ -182,27 +179,20 @@
       endif
       if (ilevel .ge. 1) call mtprnt('old', n, x)
 
-!---- Quit when call==1 (call set to 0)
-!      if (calls .eq. 1) then
-!        info=5
-!        go to 300
-!      endif
 
-!      write(*,*) "fvec=",fvec
-!      write(*,*) fmin,ftol
-!      write(*,*) "x=",x
-
-!---- Start loop
+!---- Start main loop
   20  continue
+
 !---- Reset ireset
       ireset=0
 
 !---- Calculate the jacobian
       call fdjac2(fcn,m,n,x,fvec,fjac,m,iflag,xtol,wa4)
+
       if (strategy.eq.2) then
 !        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &
 !     & WORK, 1000*(N+M), IWORK, INFO )
-!---- Print the jacobian and exit
+!---- Print the jacobian on the match2 variables and exit
         call jacob_print(m,n,fjac,sv,u,vt,match_mode)
       goto 300
       endif
@@ -227,10 +217,8 @@
 !---- Assume bad constraint: coninfo=1
         coninfo(i)=1
 !---- Compute the norm of a row
-!---- DNRM2 (N, DX, INCX)
 !---- 2-dim array are stored by colums
         if (DNRM2(N,fjac(i,1),M).ge.1D-16) then
-!      if (DNRM2(N,fjac(i,1),M).ge.0) then
 !---- Good constraint: coninfo=0
           coninfo(i)=0
 !---- Increase constraint counter
@@ -240,23 +228,13 @@
           do j=1,N
 !---- Update the effective jacobian
             effjac(effcon,j)=fjac(i,j)
-!---- Translate the variable vector to the optimal varables
-!            effsol(effcon)=effsol(effcon)+fjac(i,j)*xopt(j)
           enddo
 !---- Save a copy of RHS
           effrhs(effcon)=effsol(effcon)
-!        write(*,*) i," effective constraint"
         endif
       end do
 
  33   continue
-!---- Check dimension of the system
-!      if(effvar .lt. effcon) then
-!        write(*,*) "constraints:",effcon,"  variables:",effvar
-!      else
-!        write(*,*) "Warning: underdetermined system"
-!        write(*,*) "constraints:",effcon,"  variables:",effvar
-!      endif
 
 
 !---- Solve the least square problem and put solution in effsol vector
@@ -265,9 +243,9 @@
 !      write(*,*) "!!!effcon,effvar"
 !      write(*,*) "!!!",effcon,effvar
 !      write(*,*) "!!!i,j,effjac(i,j),effsol(j)"
-!      do i=1,m
-!      do j=1,n
-!      write(*,*) "!!!",i,j,effjac(i,j),effsol(j)
+!      do i=1,effcon
+!      do j=1,effvar
+!      write(*,*) "!!!",i,j,effjac(i,j)
 !      enddo
 !      enddo
 !---- Debug
@@ -280,9 +258,12 @@
 !      RANK,  WORK, LWORK, IWORK, INFO )
       call DGELSD (effcon,effvar,1,effjac,M,effsol,N+M,SV,COND,         &
      &RANK,WORK,1000*(N+M),IWORK,INFO)
+      condnum=SV(1)/SV(min(effcon,effvar))
 !      call DGELSS (effcon,effvar,1,effjac,M,effsol,N+M,SV,RCOND,        &
 !     &RANK,WORK,1000*(N+M),INFO)
-      write(*,*) "Rank  ",RANK
+      write(*,*) "Rank  ",RANK,
+     &           "  Condition number",condnum
+
 !---- Debug
 !      write(*,*) "!!! solve routine"
 !      write(*,*) "!!!",info,effsol(1)
@@ -292,7 +273,7 @@
 !---- Debug
       if (info.lt.0) then
         call aawarn('JACOBIAN', ' system solving routine failure')
-        print *, '++++++++++ JACOBIAN ended: DGELS failure'
+        print *, '++++++++++ JACOBIAN ended: DGELSD failure'
         print *, '++++++++++ JACOBIAN ended: info = ', info
         goto 300
       endif
@@ -304,16 +285,12 @@
 
 !---- Update the starting point
       effvar=0
-!      write(*,*) "!!!,i,x(i),effvar,effsol(effvar)"
       do i=1,N
 !----   Save in xold
         xold(i)=x(i)
         if (varinfo(i).eq.0) then
           effvar=effvar+1
-!         In case the starting point is the optimal
-!          x(i)=x(i)-effsol(effvar)+xopt(i)
           x(i)=x(i)-effsol(effvar)
-!          write(*,*) "!!!",i,x(i),effvar,effsol(effvar)
         endif
       enddo
 
@@ -324,14 +301,9 @@
         call mtvarinfo(x,xstart,varinfo,effvar)
       endif
 
-!      write(*,*) "!!! post info routne"
-!      write(*,*) "!!!effcon,effvar,N"
-!      write(*,*) "!!!",effcon,effvar,M,N
-
 !     If needed recalculate the solution excluding some variables
       if ((effvar.lt.N).and.(effvar.ge.effcon)) then
         write(*,*) "Reset system to ",effcon,"con,",effvar,"var"
-!      write(*,*) "effcon,effvar,i,j,effrhs(effcon),fjac(i,j)"
 
 !----   Recalculate  effvar
         effvar=0
@@ -363,16 +335,11 @@
           if (coninfo(i).eq.0) then
             effcon=effcon+1
             effvar=0
-!            write(*,*) i,effcon
             do j=1,N
-              !reset the arrays
-!            write(*,*) i,effcon,j
               if (varinfo(j).eq.0) then
                 effvar=effvar+1
-!                write(*,*) i,effcon,j,effvar
                 effsol(effcon)=effrhs(effcon)
                 effjac(effcon,effvar)=fjac(i,j)
-!                write(*,*) "!!!",effcon,effvar,i,j,effrhs(effcon),fjac(i,j)
               endif
             enddo
           endif
@@ -387,7 +354,7 @@
           ireset=ireset+1
         endif
 
-        if (effvar.lt.effcon) then
+        if ((effvar.lt.effcon+1).or.(condnum.gt.1E10)) then
 !----     Impossible to get  better
           write(*,*) "Too var to exclude, set strategy=1"
           strategy=1
@@ -401,7 +368,6 @@
 
   34  continue
 
-!      if(strategy.ne.3) then
 !---- Check if the solution respect the slope and
 !---- reset the illegal values
       call mtslope(x,xstart)
@@ -409,28 +375,17 @@
 !---- Check if the limit is within the constraint and
 !---- reset the illegal values
       call mtlimit(x,ireset)
-!      write(*,*) "effsol=",effsol
 
-!      endif
-
-      ! HERE
 !----- Calculate the penalty function
       call FCN(M,N,x,fvec,IFLAG)
-      fnorm = vmod(m, fvec)
+
       fmin_old=fmin
-      fmin = fnorm**2
+      fmin = vdot(m, fvec,fvec)
 
       xnorm=DNRM2(N, x, 1)
       dxnorm=DNRM2(effvar, effsol, 1)/xnorm
       write(*,*) 'Step length', dxnorm
-!      write(*,*) "tar=",fmin,fmin_old,ftol
-!      write(*,830) calls,fmin,effcon,N
-!      do i=1,N
-!        xdiff(i)=xstart(i)-x(i)
-!      enddo
-!      write(*,830) calls,fmin,DNRM2(N, xdiff, 1)/DNRM2(N, xstart, 1)
 
-      ! first fmin_old equal to fmin_start
       ! Bisection search
       fmin_old2=1E20
       j=0
@@ -443,22 +398,9 @@
         enddo
         j=j+1
         call FCN(M,N,x,fvec,IFLAG)
-!        calls=calls+1
-        fnorm = vmod(m, fvec)
-        fmin = fnorm**2
-        xnorm=DNRM2(N, x, 1)
-        dxnorm=DNRM2(N, dx, 1)/xnorm
-!        write(*,*) dxnorm,xnorm,fmin,fmin_old2
+        fmin = vdot(m,fvec,fvec)
+        dxnorm=sqrt(vdot(N, dx, dx)/vdot(N, x, x))
         if (fmin.gt.fmin_old2) then
-!          do i=1,N
-!            x(i)=2*x(i)-xold(i)
-!          enddo
-!          call FCN(M,N,x,fvec,IFLAG)
-!!        calls=calls+1
-!          fnorm = vmod(m, fvec)
-!          fmin = fnorm**2
-!          xnorm=DNRM2(N, x, 1)
-!          write(*,*) dxnorm,xnorm,fmin,fmin_old2
           goto 37
         endif
         fmin_old2=fmin
@@ -471,58 +413,28 @@
       endif
 
 
-      ! HERE
-
-
 !---- calculate the target function and set new values
       call FCN(M,N,x,fvec,IFLAG)
       calls=calls+1
-!      write(*,*) "fvec=",fvec
 
-      fnorm = vmod(m, fvec)
       fmin_old=fmin
-      fmin = fnorm**2
+      fmin = vdot(m,fvec,fvec)
 
       xnorm=DNRM2(N, x, 1)
       dxnorm=DNRM2(effvar, effsol, 1)/xnorm
-!      write(*,*) "tar=",fmin,fmin_old,ftol
-!      write(*,830) calls,fmin,effcon,N
-      write(*,830) calls,dxnorm,fmin
-!      do i=1,N
-!        xdiff(i)=xstart(i)-x(i)
-!      enddo
-!      write(*,830) calls,fmin,DNRM2(N, xdiff, 1)/DNRM2(N, xstart, 1)
+      write(*,"('call: ',I5,' Dx = ', e16.8,                            &
+     &'  Penalty function =',e16.8)")  calls,dxnorm,fmin
 
-!      ! Bisection search
-!35    continue
-!      if(fmin.ge.fmin_old .and. dxnorm.gt. bisec ) then
-!        ! go back to average solution
-!        do i=1,N
-!          x(i)=(x(i)+xold(i))*.5
-!          dx(i)=(x(i)-xold(i))*.5
-!        enddo
-!        call FCN(M,N,x,fvec,IFLAG)
-!!        calls=calls+1
-!        fnorm = vmod(m, fvec)
-!        fmin = fnorm**2
-!        xnorm=DNRM2(N, x, 1)
-!        dxnorm=DNRM2(N, dx, 1)/xnorm
-!        write(*,829) dxnorm,fmin
-!        fmin_old=fmin
-!!        write(*,*) "iterating",oldxnorm,xnorm,fmin_old,fmin
-!        goto 35
-!      endif
-
+!      Store the best point:
+      if ((fmin .lt. fminbest)) then
+        do i=1,N
+          xbest(i)=x(i)
+        enddo
+        fminbest=fmin
+      endif
 
       ! check if the target explode
       if((fmin .gt. 1D20)) then
-!       write(*,*) fmin, 1/xtol, (fmin .gt. 1D30)
-        ! go back to the preovius solution
-        do i=1,N
-          x(i)=xold(i)
-        enddo
-        ! set values to the previous solution
-        call FCN(M,N,X,fvec,IFLAG)
         print *, '++++++++++ JACOBIAN ended: infinity penalty function'
         goto 300
       endif
@@ -533,15 +445,9 @@
         goto 300
       endif
       ! Iteration do not converge
-      ! For the first calls it can happens due to not fisical penalty
-      if(fmin.ge.fmin_old .and. fmin.lt.(.1*ftol)) then
-        ! go back to the preovius solution
-        do i=1,N
-          x(i)=x(i)+effsol(i)
-        enddo
-        ! set values to the previous solution
-        call FCN(M,N,X,fvec,IFLAG)
-        print *, '++++++++++ JACOBIAN ended: low penalty oscillations'
+      ! For the first calls it can happen due to not fisical penalty
+      if(abs(1-fmin/fmin_old).lt.1D-15 ) then
+        print *, '++++++++++ JACOBIAN ended: minimum found'
         goto 300
       endif
       if(calls.ge.call_lim) then
@@ -549,7 +455,7 @@
         goto 300
       endif
 
-!     restart loop
+!     restart main loop
       goto 20
 
 !      open(25,file="jacobian.dat")
@@ -565,6 +471,13 @@
 !  999 format(i3,i3,e16.8)
   300 continue
 
+!     go back to the best solution
+      do i=1,N
+        x(i)=xbest(i)
+      enddo
+      ! set values to the previous solution
+      call FCN(M,N,X,fvec,IFLAG)
+
 !---- Store the final distance
       do i = 1, n
         dx(i)=(x(i)-xstart(i))
@@ -574,29 +487,9 @@
       dxnorm=sqrt(DNRM2(N, dx, 1)/xnorm)
       write(*,*) 'Final relative difference norm:',dxnorm
 
-  831 format('Initial Penalty Function = ',e24.16,//)
-  830 format('call: ',I5, ' Dx = ', e24.16,                              &
-     &'  Penalty function = ',e24.16)
-      end
-
-      subroutine jacob_print2(m,n,fjac)
-
-      implicit none
-
-      integer m,n
-      double precision fjac(m,n)
-      integer i,j
-
-      do i=1,m
-        do j=1,n
-          write(*,*) i,j,fjac(i,j)
-        enddo
-      enddo
-
       end
 
       subroutine jacob_print(m,n,fjac,sv,u,vt,match_mode)
-!      subroutine jacob_print(ncon,fsum,fvect)
 
       implicit none
 
@@ -618,11 +511,6 @@
 
       if(match_mode.eq.1) then
 
-!        write(*,997) "Node Name    ","Constraint      ",                &
-!     &"Variable        ","Derivative    "
-!        write(*,996) "--------------------------------------------------&
-!     &-------------------"
-!      write(25,*) "# ", m,n
         ncon=1
         nnode=0
         local=get_option('match_local ') .ne. 0
@@ -647,10 +535,7 @@
                 if (ivar.eq.0) then
                   goto 22
                 endif
-!                write (*,998) node_name,name,namevar,fjac(ncon,ivar)
-!               write(*,*) nnode,ncon
                void=mtputconsname(node_name,nnode,name,ncon)
-!            write(25,999) ncon,ivar,fjac(ncon,ivar)
               enddo
               ncon=ncon+1
               goto 20
@@ -660,61 +545,19 @@
         nnode=nnode+1
  30     continue
         i=next_global(name,name_l,type,value,c_min,c_max,weight)
-!      write(*,*) i,name
         if(i.ne.0)  then
           pos=1
-!          flag=double_from_table('summ ',name,pos,val)
           do nvar=1,n
  32         ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
             if (ivar.eq.0) then
               goto 32
             endif
-            write(*,*) nnode,ncon,ivar,fjac(ncon,ivar)
-            write (*,998) 'Global   ',name,namevar,fjac(ncon,ivar)
-               void=mtputconsname('Global   ',nnode,name,ncon)
+             void=mtputconsname('Global              ',nnode,name,ncon)
           enddo
           ncon=ncon+1
           goto 30
         endif
 
-!      write(*,*)
-!      write(*,*)
-!      write(*,*) "Singular value decomposition:"
-!      write(*,*)
-!      num1="Constraint vector="
-!      num2="Singular value *"
-!      num3="Variable vector"
-!      write(*,'(3A20)') num1,num2,num3
-!      do i=1,max(n,m)
-!        do j=1,max(n,m)
-!          if ((i.le.m).and.(j.le.m)) then
-!            write(num1,*) U(i,j)
-!          else
-!            write(num1,*) "     "
-!          endif
-!          if ((i.le.min(n,m)).and.(j.eq.1)) then
-!            write(num2,*) SV(i)
-!          else
-!            write(num2,*) "     "
-!          endif
-!          if ((i.le.n).and.(j.le.n)) then
-!            write(num3,*) VT(j,i)
-!          else
-!            write(num3,*) "     "
-!          endif
-!          write(*,'(3A20)') num1,num2,num3
-!        enddo
-!        write(*,*)
-!      enddo
-
-!      do nvar=1,n
-! 23   ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
-!      if (ivar.eq.0) then
-!        goto 23
-!      endif
-!      write(25,*) namevar
-!      enddo
-!      close(25)
       endif
 
   996 format(a)
