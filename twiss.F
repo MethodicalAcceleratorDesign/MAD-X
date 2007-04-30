@@ -71,6 +71,7 @@
       synch_4=zero
       synch_5=zero
       suml=zero
+      circ=zero
       eta=zero
       alfa=zero
       gamtr=zero
@@ -87,11 +88,19 @@
 !---- Create internal table for summary data.
       summ=get_option('twiss_summ ')
 
-!---- Initial value flag.
-      inval=get_option('twiss_inval ')
-!--- flags for writing cumulative or lumped matrices
+!---- flags for writing cumulative or lumped matrices
       rmatrix=get_value('twiss ','rmatrix ').ne.zero
       sectormap=get_option('twiss_sector ').ne.zero
+
+!---- Get circumference
+      circ=get_value('probe ','circ ')
+      if(circ.eq.zero)                                                  &
+     &call aafail('TWISS: ',                                            &
+     &'Zero length sequence.')
+
+!---- Initial value flag.
+      inval=get_option('twiss_inval ')
+
 !---- Initial values from command attributes.
 !      if (inval.ne.0) then
 
@@ -314,7 +323,7 @@
           call vector_to_table(table_name, 's ', i, opt_fun(2))
           i = 5
           call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
-          i = 3
+          i = 4
           call vector_to_table(table_name, 'kmax ', i, opt_fun(70))
           if(rmatrix) then
             i = 36
@@ -951,7 +960,7 @@
       double precision rt(6,6),ek(6),re(6,6),rm(6,6),rwi(6,6),rc(6,6),  &
      &te(6,6,6),el,elh,orbit(6),orbit0(6),betas,gammas,                 &
      &al_errors(align_max),bv0,bvk,sumloc,pos0,node_value,get_value,    &
-     &zero,one,two
+     &sd,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 
@@ -1046,6 +1055,13 @@
           call tmali2(elh,orbit0,al_errors,betas,gammas,orbit0,rm)
           call twcptk(rm,orbit0)
         endif
+        sd = rt(5,6)
+        do i = 1, 4
+          sd = sd + rt(5,i) * disp(i)
+        enddo
+        eta = - sd * betas**2 / circ
+        alfa = one / gammas**2 + eta
+        opt_fun(73)=alfa
         if(save.ne.0) call twfill(1,opt_fun,currpos, 1)
       endif
       centre_cptk=.false.
@@ -1060,6 +1076,13 @@
       endif
       sumloc = sumloc + el
       if (sector_sel) call twwmap(sumloc, orbit)
+      sd = rt(5,6)
+      do i = 1, 4
+        sd = sd + rt(5,i) * disp(i)
+      enddo
+      eta = - sd * betas**2 / circ
+      alfa = one / gammas**2 + eta
+      opt_fun(73)=alfa
       if(centre) then
         bxmax =max(opt_fun(3)      ,bxmax)
         bymax =max(opt_fun(6)      ,bymax)
