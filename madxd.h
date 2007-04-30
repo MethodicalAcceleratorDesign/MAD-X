@@ -40,6 +40,7 @@
 #define get_value             get_value_
 #define get_version           get_version_
 #define grndm                 grndm_
+#define headvalue             headvalue_
 #define intrac                intrac_
 #define mtcond                mtcond_
 #define next_constraint       next_constraint_
@@ -183,6 +184,7 @@
 #define get_value             GET_VALUE
 #define get_version           GET_VERSION
 #define grndm                 GRNDM
+#define headvalue             HEADVALUE
 #define intrac                INTRAC
 #define mtcond                MTCOND
 #define next_constraint       NEXT_CONSTRAINT
@@ -385,6 +387,7 @@ double get_variable(char*);
 int get_vector(char*, char*, double*);
 void get_version(char*, int*);
 double grndm();
+void headvalue(char*, char*, double*);
 int intrac();
 int next_constraint(char*, int*, int*, double*, double*, double*, double*);
 int next_global(char*, int*, int*, double*, double*, double*, double*);
@@ -468,6 +471,7 @@ struct node* clone_node(struct node*, int);
 void copy_double(double*, double*, int);
 void copy_name_list(struct name_list*, struct name_list*);
 int cmd_match(int, char**, int*, int*);
+int compare_no_case(char*, char*); /* like strcmp, case-independent */
 void complete_twiss_table(struct table*);
 char* compound(char*, int);
 struct expression* compound_expr(struct expression*, double, char*,
@@ -1312,8 +1316,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.03.50";
-char code_mod_date[] = "Code Modification Date: 24.04.2007";
+char myversion[] = "MAD-X 3.03.51";
+char code_mod_date[] = "Code Modification Date: 30.04.2007";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

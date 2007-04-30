@@ -3708,6 +3708,36 @@ void get_version(char* tlt, int* l)
   *l = n + 19;
 }
 
+void headvalue(char* table_name, char* par, double* value)
+/* returns the value of header parameter par from table table_name if present,
+   else 10^12 */
+{
+  int i, pos;
+  char lpar[NAME_L], ltab[NAME_L];
+  struct table* tab;
+  *value = ten_p_12;
+  mycpy(ltab, table_name);
+  stolower(ltab);
+  if ((pos = name_list_pos(ltab, table_register->names)) > -1)
+   {
+    tab = table_register->tables[pos];
+    mycpy(lpar, par);
+    for (i = 0; i < tab->header->curr; i++)
+     {
+      strcpy(aux_buff->c, &tab->header->p[i][1]);
+      if (compare_no_case(strtok(aux_buff->c, " \"\n"), lpar) == 0)
+       {
+	if (strstr(strtok(NULL, " \"\n"), "%le") != NULL)
+	 {
+	  sscanf(strtok(NULL, " \"\n"), "%le", value);
+          break;
+	 }
+       }
+     }
+   }
+  return;
+}
+
 int int_in_array(int k, int n, int* array)
   /* returns 1 if k in first n elements of array, else 0 */
 {
@@ -5747,6 +5777,24 @@ struct table* read_table(struct in_cmd* cmd)
         }
       }
       t->curr++;
+    }
+  }
+  fclose(tab_file);
+  if ((tab_file = fopen(filename, "r")) == NULL)
+  {
+    warning("cannot open file:", filename); return NULL;
+  }
+/* read & store table header */
+  t->header = new_char_p_array(50);
+  while (fgets(aux_buff->c, aux_buff->max, tab_file))
+  {
+    supp_char('\r', aux_buff->c);
+    if (*aux_buff->c != ' ')
+    {
+     if (t->header->curr == t->header->max) grow_char_p_array(t->header);
+     t->header->p[t->header->curr] 
+       = (char*) mymalloc("read_table", strlen(aux_buff->c));
+     strcpy(t->header->p[t->header->curr++], aux_buff->c);
     }
   }
   fclose(tab_file);

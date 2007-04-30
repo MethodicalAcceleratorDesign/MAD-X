@@ -734,6 +734,20 @@ delete_command_parameter_list(struct command_parameter_list* parl)
   return NULL;
 }
 
+int compare_no_case(char* string_1, char* string_2)
+/* like strcmp, but ignoring case */
+{
+ int ret;
+ char rout_name[] = "compare_no_case";
+ char* s1 = mymalloc(rout_name, strlen(string_1)+1);
+ char* s2 = mymalloc(rout_name, strlen(string_2)+1);
+ strcpy(s1, string_1); stolower(s1);
+ strcpy(s2, string_2); stolower(s2);
+ ret = strcmp(s1, s2);
+ myfree(rout_name, s1); myfree(rout_name, s2);
+ return ret;
+}
+
 struct constraint* delete_constraint(struct constraint* cst)
 {
   char rout_name[] = "delete_constraint";
