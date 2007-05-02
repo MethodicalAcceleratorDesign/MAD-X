@@ -7628,6 +7628,7 @@ void ptc_track_observe(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   struct node* nodes[2];
   int pos;
+  
   pos = name_list_pos("place", nl);
   if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
   {
@@ -7764,110 +7765,63 @@ void pro_ptc_trackline(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
 
   pos = name_list_pos("file", nl);
-  if (nl->inform[pos]) set_option("track_dump", &one);
+
+  if (nl->inform[pos]) 
+   {
+     set_option("track_dump", &one);
+   }  
+
   if ((track_filename = pl->parameters[pos]->string) == NULL)
-  {
+   {
     if (pl->parameters[pos]->call_def != NULL)
-      track_filename = pl->parameters[pos]->call_def->string;
-    else track_filename = permbuff("dummy");
-  }
+     {
+       track_filename = pl->parameters[pos]->call_def->string;
+     }  
+    else 
+     {
+       track_filename = permbuff("dummy");
+     }  
+   }
   track_filename = permbuff(track_filename);
   track_fileext = NULL;
   pos = name_list_pos("extension", nl);
+
   if ((track_fileext = pl->parameters[pos]->string) == NULL)
   {
     if (pl->parameters[pos]->call_def != NULL)
-      track_fileext = pl->parameters[pos]->call_def->string;
-    if (track_fileext == NULL)  track_fileext = permbuff("\0");
+     {
+       track_fileext = pl->parameters[pos]->call_def->string;
+     }  
+    if (track_fileext == NULL)  
+     {
+       track_fileext = permbuff("\0");
+     }  
   }
+
   track_fileext = permbuff(track_fileext);
 
+  if (command_par_value("everystep",cmd->clone) != 0)
+   {
+     printf("Enforcing onetable=true, current is %f\n", command_par_value("onetable",cmd->clone));
+     set_command_par_value("onetable", cmd->clone, 1.0);
+     printf("Now is %f\n", command_par_value("onetable",cmd->clone));
+   }
+  
   track_tables_create(cmd);
-  w_ptc_trackline_(&curr_obs_points);
+  
+  
+  if (command_par_value("everystep",cmd->clone) != 0)
+   {
+     printf("Calling PTC track line every step\n");
+     w_ptc_track_everystep(&curr_obs_points);
+   }
+  else
+   {  
+     printf("Calling STD PTC track line\n");
+     w_ptc_trackline(&curr_obs_points);
+   }  
+
   track_tables_dump();
-}
-/********************************************************************************/
-
-void pro_ptc_twiss_linac(struct in_cmd* cmd)
-{
-  /*Does PTC twiss taking to the account acceleration */
-  /*it is basically wrapper to subroutine ptc_twiss_linac() in madx_ptc_trackline.f90*/
-  struct int_array* tarr;
-  int l;
-  char *table_name, *filename = NULL;
-  int pos, w_file;
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-
-  if (current_twiss == 0x0)
-  {
-    seterrorflag(2,"pro_ptc_twiss_linac","No twiss command seen yet");
-    warning("pro_ptc_twiss_linac","No twiss command seen yet!");
-    return;
-  }
-
-  if (current_twiss->par_names == 0x0)
-  {
-    seterrorflag(3,"pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
-    warning("pro_ptc_twiss_linac","Last twiss has NULL par_names pointer. Can not proceed further.");
-    return;
-  }
-
-  if (current_twiss->par == 0x0)
-  {
-    seterrorflag(4,"pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
-    warning("pro_ptc_twiss_linac","Last twiss has NULL par pointer. Can not proceed further.");
-    return;
-  }
-
-  nl = current_twiss->par_names;
-  pl = current_twiss->par;
-
-  table_name = "ptc_twiss";
-  pos = name_list_pos("table", nl);
-  if (pos >=0)
-  {
-    if(nl->inform[pos]) /* table name specified - overrides save */
-    {
-      if ((table_name = pl->parameters[pos]->string) == NULL)
-        table_name = pl->parameters[pos]->call_def->string;
-    }
-  }
-
-  pos = name_list_pos("file", nl);
-
-  w_file = 0;
-
-  if (pos >=0)
-  {
-    if (nl->inform[pos])
-    {
-      if ((filename = pl->parameters[pos]->string) == NULL)
-      {
-        if (pl->parameters[pos]->call_def != NULL)
-          filename = pl->parameters[pos]->call_def->string;
-      }
-      if (filename == NULL) filename = permbuff("dummy");
-      w_file = 1;
-    }
-  }
-  l = strlen(table_name);
-  tarr = new_int_array(l+1);
-  conv_char(table_name, tarr);
-  twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                           twiss_table_types, current_sequ->n_nodes);
-  twiss_table->dynamic = 1;
-  add_to_table_list(twiss_table, table_register);
-  current_sequ->tw_table = twiss_table;
-  twiss_table->org_sequ = current_sequ;
-  twiss_table->curr= 0;
-  current_node = current_sequ->ex_start;
-
-
-  printf("obs_points ptc_twiss_linac: %d \n",curr_obs_points);
-  w_ptc_twiss_linac_(tarr->i);
-  printf("obs_points ptc_twiss_linac Done");
-
 }
 /********************************************************************************/
 

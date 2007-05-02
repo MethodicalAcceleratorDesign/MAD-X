@@ -110,7 +110,7 @@
 #define w_ptc_end               w_ptc_end_
 #define w_ptc_dumpmaps          w_ptc_dumpmaps_
 #define w_ptc_trackline         w_ptc_trackline_
-#define w_ptc_twiss_linac       w_ptc_twiss_linac_
+#define w_ptc_track_everystep   w_ptc_track_everystep_
 #define w_ptc_setdebuglevel     w_ptc_setdebuglevel_
 #define w_ptc_enforce6d         w_ptc_enforce6d_
 #define w_ptc_setaccel_method   w_ptc_setaccel_method_
@@ -252,7 +252,7 @@
 #define w_ptc_end               W_PTC_END
 #define w_ptc_dumpmaps          W_PTC_DUMPMAPS
 #define w_ptc_trackline         W_PTC_TRACKLINE
-#define w_ptc_twiss_linac       W_PTC_TWISS_LINAC
+#define w_ptc_track_everystep   W_PTC_TRACK_EVERYSTEP
 #define w_ptc_setdebuglevel     W_PTC_SETDEBUGLEVEL
 #define w_ptc_enforce6d         W_PTC_ENFORCE6D
 #define w_ptc_setaccel_method   W_PTC_SETACCEL_METHOD
@@ -909,7 +909,7 @@ void w_ptc_moments(int* order);
 void w_ptc_initmoments();
 void w_ptc_dumpmaps();
 void w_ptc_trackline(int* nobspoints);
-void w_ptc_twiss_linac(int* tabname);
+void w_ptc_track_everystep(int* nobspoints);
 void w_ptc_setdebuglevel(int* level);
 void w_ptc_setaccel_method(int* method);
 void w_ptc_setexactmis(int* boolflag);

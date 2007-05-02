@@ -373,22 +373,6 @@ char command_def[] =
 " "
 "ptc_align: ptc_align none 0 0; "
 " "
-"ptc_twiss_linac: ptc_twiss_linac none 0 0 "
-"betx     = [r, 0], alfx     = [r, 0], "
-"bety     = [r, 0], alfy     = [r, 0], "
-"gamdelta = [r, 0], alfdelta = [r, 0], "
-"x        = [r, 0], px       = [r, 0], "
-"y        = [r, 0], py       = [r, 0], "
-"ddx      = [r, 0], ddpx     = [r, 0], "
-"ddy      = [r, 0], ddpy     = [r, 0], "
-"t        = [r, 0], pt       = [r, 0], "
-"table    = [s, none, twiss], "
-"moments   = [s, none, moments], " /*stores in the table with specified name  */
-"xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
-"ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
-"zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
-"amatrixfilename = [s, {none}] ; "
-" "
 "ptc_select: ptc_select none 0 0 "
 "table      = [s, none, none], "
 "column     = [s, none, none], "
@@ -551,6 +535,7 @@ char command_def[] =
 "ffile    = [i, 1], "
 "file     = [s, track, track], "
 "gcs   = [l, false, true], "
+"everystep   = [l, false, true], "
 "extension= [s, none, none], "
 "rootntuple = [l, false, true], "/*writes all the tracks in ROOT NTuple -> works only if program is dynamically linked and RPLOT plugin is present */
 "onetable = [l, false, true]; "

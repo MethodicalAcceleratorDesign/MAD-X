@@ -1562,11 +1562,6 @@ void exec_command()
       {
         ptc_oneturnmap(p);
       }
-      else if (strcmp(p->cmd_def->module, "ptc_twiss_linac") == 0)
-      {
-        current_twiss = p->clone;
-        pro_ptc_twiss_linac(p);
-      }
       else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
       {
         pro_ptc_track(p);

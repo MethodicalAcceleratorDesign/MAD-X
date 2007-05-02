@@ -65,6 +65,12 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
+      subroutine w_ptc_track_everystep()
+      implicit none
+      call fort_warn('PTC command skipped! ',                           &
+     &' Please use proper MAD-X version that includes PTC.')
+      end
+
       subroutine  w_ptc_twiss_linac()
       implicit none
       call fort_warn('PTC command skipped! ',                           &

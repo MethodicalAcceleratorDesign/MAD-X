@@ -68,19 +68,19 @@ subroutine w_ptc_track(max_obs)
   call ptc_track_run(max_obs)
 end subroutine w_ptc_track
 
-subroutine w_ptc_twiss_linac(tab_name)
-  use madx_ptc_trackline_module
-  implicit none
-  integer tab_name(*)
-  call ptc_twiss_linac(tab_name)
-end subroutine w_ptc_twiss_linac
-
 subroutine w_ptc_trackline(max_obs)
   use madx_ptc_trackline_module
   implicit none
   integer max_obs
   call ptc_trackline(max_obs)
 end subroutine w_ptc_trackline
+
+subroutine w_ptc_track_everystep(max_obs)
+  use madx_ptc_trackline_module
+  implicit none
+  integer max_obs
+  call ptc_track_everystep(max_obs)
+end subroutine w_ptc_track_everystep
 
 subroutine w_ptc_setdebuglevel(level)
   use madx_ptc_intstate_module
