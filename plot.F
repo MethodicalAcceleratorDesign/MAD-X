@@ -1784,14 +1784,14 @@
 !--- Routine body
 
 !--- Acquire deltap
-
+      deltap=zero
       if(.not.ptc_flag) then
-        if(tabname.eq."summ") then
+!        if(tabname.eq."summ") then
           k = double_from_table('summ ','deltap ',1,deltap)
-        else
-          call headvalue(tabname,'deltap ', deltap)
-          if(deltap.eq.1d+12) deltap=zero
-        endif
+!        else
+!          call headvalue(tabname,'deltap ', deltap)
+!          if(deltap.eq.1d+12) deltap=zero
+!        endif
       else
         call headvalue(tabname,'deltap ', deltap)
         if(deltap.eq.1d+12) deltap=zero
