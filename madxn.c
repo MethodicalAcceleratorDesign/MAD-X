@@ -1995,7 +1995,7 @@ void exec_fill_table(struct in_cmd* cmd)
     } else {
       row--;
       curr=t->curr;
-      if (row < t->curr) { 
+      if (row < t->curr) {
         t->curr=row;}
       else {
         t->curr--;
@@ -2034,7 +2034,7 @@ void exec_setvars_table(struct in_cmd* cmd)
     t = table_register->tables[pos];
     row--;
     curr=t->curr;
-    if ((row < t->curr) && (row >-1)) { 
+    if ((row < t->curr) && (row >-1)) {
       t->curr=row;}
     else {
       t->curr--;
@@ -3714,27 +3714,29 @@ void headvalue(char* table_name, char* par, double* value)
 {
   int i, pos;
   char lpar[NAME_L], ltab[NAME_L];
+  char* tp;
   struct table* tab;
   *value = ten_p_12;
   mycpy(ltab, table_name);
   stolower(ltab);
   if ((pos = name_list_pos(ltab, table_register->names)) > -1)
-   {
+  {
     tab = table_register->tables[pos];
     mycpy(lpar, par);
     for (i = 0; i < tab->header->curr; i++)
-     {
+    {
       strcpy(aux_buff->c, &tab->header->p[i][1]);
-      if (compare_no_case(strtok(aux_buff->c, " \"\n"), lpar) == 0)
-       {
+      if ((tp =strtok(aux_buff->c, " \"\n")) &&
+	  compare_no_case(tp, lpar) == 0)
+      {
 	if (strstr(strtok(NULL, " \"\n"), "%le") != NULL)
-	 {
+	{
 	  sscanf(strtok(NULL, " \"\n"), "%le", value);
           break;
-	 }
-       }
-     }
-   }
+	}
+      }
+    }
+  }
   return;
 }
 
@@ -5791,10 +5793,10 @@ struct table* read_table(struct in_cmd* cmd)
     supp_char('\r', aux_buff->c);
     if (*aux_buff->c != ' ')
     {
-     if (t->header->curr == t->header->max) grow_char_p_array(t->header);
-     t->header->p[t->header->curr] 
-       = (char*) mymalloc("read_table", strlen(aux_buff->c));
-     strcpy(t->header->p[t->header->curr++], aux_buff->c);
+      if (t->header->curr == t->header->max) grow_char_p_array(t->header);
+      t->header->p[t->header->curr]
+	= (char*) mymalloc("read_table", strlen(aux_buff->c));
+      strcpy(t->header->p[t->header->curr++], aux_buff->c);
     }
   }
   fclose(tab_file);
@@ -7628,7 +7630,7 @@ void ptc_track_observe(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   struct node* nodes[2];
   int pos;
-  
+
   pos = name_list_pos("place", nl);
   if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
   {
@@ -7766,22 +7768,22 @@ void pro_ptc_trackline(struct in_cmd* cmd)
 
   pos = name_list_pos("file", nl);
 
-  if (nl->inform[pos]) 
-   {
-     set_option("track_dump", &one);
-   }  
+  if (nl->inform[pos])
+  {
+    set_option("track_dump", &one);
+  }
 
   if ((track_filename = pl->parameters[pos]->string) == NULL)
-   {
+  {
     if (pl->parameters[pos]->call_def != NULL)
-     {
-       track_filename = pl->parameters[pos]->call_def->string;
-     }  
-    else 
-     {
-       track_filename = permbuff("dummy");
-     }  
-   }
+    {
+      track_filename = pl->parameters[pos]->call_def->string;
+    }
+    else
+    {
+      track_filename = permbuff("dummy");
+    }
+  }
   track_filename = permbuff(track_filename);
   track_fileext = NULL;
   pos = name_list_pos("extension", nl);
@@ -7789,37 +7791,37 @@ void pro_ptc_trackline(struct in_cmd* cmd)
   if ((track_fileext = pl->parameters[pos]->string) == NULL)
   {
     if (pl->parameters[pos]->call_def != NULL)
-     {
-       track_fileext = pl->parameters[pos]->call_def->string;
-     }  
-    if (track_fileext == NULL)  
-     {
-       track_fileext = permbuff("\0");
-     }  
+    {
+      track_fileext = pl->parameters[pos]->call_def->string;
+    }
+    if (track_fileext == NULL)
+    {
+      track_fileext = permbuff("\0");
+    }
   }
 
   track_fileext = permbuff(track_fileext);
 
   if (command_par_value("everystep",cmd->clone) != 0)
-   {
-     printf("Enforcing onetable=true, current is %f\n", command_par_value("onetable",cmd->clone));
-     set_command_par_value("onetable", cmd->clone, 1.0);
-     printf("Now is %f\n", command_par_value("onetable",cmd->clone));
-   }
-  
+  {
+    printf("Enforcing onetable=true, current is %f\n", command_par_value("onetable",cmd->clone));
+    set_command_par_value("onetable", cmd->clone, 1.0);
+    printf("Now is %f\n", command_par_value("onetable",cmd->clone));
+  }
+
   track_tables_create(cmd);
-  
-  
+
+
   if (command_par_value("everystep",cmd->clone) != 0)
-   {
-     printf("Calling PTC track line every step\n");
-     w_ptc_track_everystep(&curr_obs_points);
-   }
+  {
+    printf("Calling PTC track line every step\n");
+    w_ptc_track_everystep(&curr_obs_points);
+  }
   else
-   {  
-     printf("Calling STD PTC track line\n");
-     w_ptc_trackline(&curr_obs_points);
-   }  
+  {
+    printf("Calling STD PTC track line\n");
+    w_ptc_trackline(&curr_obs_points);
+  }
 
   track_tables_dump();
 }
