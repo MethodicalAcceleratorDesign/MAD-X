@@ -5791,12 +5791,14 @@ struct table* read_table(struct in_cmd* cmd)
   while (fgets(aux_buff->c, aux_buff->max, tab_file))
   {
     supp_char('\r', aux_buff->c);
-    if (*aux_buff->c != ' ')
+    if ((*aux_buff->c != ' ') && 
+	((*aux_buff->c == '@') || (*aux_buff->c == '*')))
     {
       if (t->header->curr == t->header->max) grow_char_p_array(t->header);
       t->header->p[t->header->curr]
-	= (char*) mymalloc("read_table", strlen(aux_buff->c));
-      strcpy(t->header->p[t->header->curr++], aux_buff->c);
+	= (char*) mymalloc("read_table", strlen(aux_buff->c)+1);
+      strcpy(t->header->p[t->header->curr], aux_buff->c);
+      t->header->curr++;
     }
   }
   fclose(tab_file);
