@@ -109,7 +109,7 @@
 !                          order of horizontal Emittance
 !                          order of vertical Emittance
 !      ----------------------------------------------------------------
-!      73     2      2      first multipole order
+!      73     1      2      first multipole order
 !                          second multipole order
 !                          vertical detuning
 !                          order of horizontal Emittance
@@ -377,10 +377,14 @@
      &iostat=ier)
           if(ier.ne.0) call prror(0,16,70)
           write(70,10070)
-          open(72,file='detune_2_end',form='formatted',status='unknown',&
+          open(72,file='detune_2_hor',form='formatted',status='unknown',&
      &iostat=ier)
           if(ier.ne.0) call prror(0,16,72)
           write(72,10072)
+          open(73,file='detune_2_ver',form='formatted',                 &
+     &status='unknown',iostat=ier)
+          if(ier.ne.0) call prror(0,16,73)
+          write(73,10073)
         endif
         if(disto1.eq.1) then
           open(74,file='distort_1_f_end',form='formatted',              &
@@ -410,10 +414,6 @@
      &status='unknown',iostat=ier)
           if(ier.ne.0) call prror(0,16,71)
           write(71,10070)
-          open(73,file='detune_2_all',form='formatted',                 &
-     &status='unknown',iostat=ier)
-          if(ier.ne.0) call prror(0,16,73)
-          write(73,10072)
         endif
         if(disto1.eq.1) then
           open(76,file='distort_1_f_all',form='formatted',              &
@@ -478,6 +478,8 @@
      &' second(s) of Execution Time'//80('-')//)
 10070 format('MulOrd ',' Plane',4x,'Hor/Vert detuning',3x,'Hinv Vinv')
 10072 format('MulOrd1 ','MulOrd2 ',3x,'Horizontal detuning',            &
+     &2x,'Hinv Vinv')
+10073 format('MulOrd1 ','MulOrd2 ',3x,'Vertical detuning  ',            &
      &2x,'Hinv Vinv')
 10074 format('MulOrd',11x,'Cosine',17x,'Sine',19x,'Amplitude',          &
      &8x,'j',3x,'k',3x,'l',3x,'m',1x)
@@ -2643,11 +2645,11 @@
 
 !--- Second order multiple strength order
 
-!---  handle unit 72 (detune_2_end)
+!---  handle unit 72 (detune_2_hor)
 
-        write(6,10000)
         if(iu_on.eq.1.or.iu_on.eq.3) then
-          table_name = 'detune_2_end '
+          write(6,10000)
+          table_name = 'detune_2_hor '
           data_size = ih1+1+j72
           call fit_table(table_name,data_size,table_size_72)
         endif
@@ -2666,11 +2668,11 @@
           endif
         enddo
 
-!---  handle unit 73 (detune_2_all)
+!---  handle unit 73 (detune_2_ver)
 
-        if(iu_on.eq.2.or.iu_on.eq.3) then
+        if(iu_on.eq.1.or.iu_on.eq.3) then
           write(6,10020)
-          table_name = 'detune_2_all '
+          table_name = 'detune_2_ver '
           data_size = ih1+2+j73
           call fit_table(table_name,data_size,table_size_73)
         endif

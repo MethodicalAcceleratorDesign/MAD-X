@@ -2466,11 +2466,11 @@ void exec_sodd(struct in_cmd* cmd)
                              sodd_detune_5_types, 2);
   sodd_table_71->dynamic = 1;
   add_to_table_list(sodd_table_71, table_register);
-  sodd_table_72 = make_table("detune_2_end", "sodd_detune_5", sodd_detune_5_cols,
+  sodd_table_72 = make_table("detune_2_hor", "sodd_detune_5", sodd_detune_5_cols,
                              sodd_detune_5_types, 2);
   sodd_table_72->dynamic = 1;
   add_to_table_list(sodd_table_72, table_register);
-  sodd_table_73 = make_table("detune_2_all", "sodd_detune_5", sodd_detune_5_cols,
+  sodd_table_73 = make_table("detune_2_ver", "sodd_detune_5", sodd_detune_5_cols,
                              sodd_detune_5_types, 2);
   sodd_table_73->dynamic = 1;
   add_to_table_list(sodd_table_73, table_register);
