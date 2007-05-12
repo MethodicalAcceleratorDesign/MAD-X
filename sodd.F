@@ -2478,7 +2478,6 @@
             etl(itype,isize)=et
             strn(itype,isize)=name
             factor = 10**(3*(iabs(itype)-2))
-            print *,"itype, factor = ",itype,factor
             bstr(itype,isize)=str*factor
             beta(1,itype,isize)=betx
             beta(2,itype,isize)=bety
