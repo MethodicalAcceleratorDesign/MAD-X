@@ -190,7 +190,7 @@ contains
     !!!!!!!!!      TRACKING       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
     
-    open(unit=41,file='thintracking_ptc.txt')
+    open(unit=41,file='thintracking_ptc.txt',POSITION='APPEND'  , STATUS='OLD')
 
     do t=1, nturns
        print*, "TURN NUMBER ",t
@@ -199,8 +199,14 @@ contains
        PREV_SLICE => my_ring%start%T1
        CURR_SLICE => prev_slice%next
        e = 1
-       do ni=1, my_ring%last%T2%pos
 
+!       print*,"Name of the first element ", my_ring%start%mag%name
+!       print*,"Position of the first element ", my_ring%start%T2%pos
+!       print*,"Name of the last element ", my_ring%end%mag%name
+!       print*,"Position of the last element ", my_ring%end%T2%pos
+       
+       do ni=1, my_ring%end%T2%pos
+           
           if ( .not. associated(CURR_SLICE%PARENT_FIBRE, PREV_SLICE%PARENT_FIBRE) ) then
             e = e + 1 
             p=>p%next
@@ -317,39 +323,50 @@ contains
     integer  :: npart,turn,nobs
     real(kind(1d0)) :: tt
     character*36 table_puttab
+    character*36 table
     !hbu
     real(dp) :: x,px,y,py,t,pt
     real(kind(1d0)) :: spos,e
+    integer :: get_option
     !hbu
     data table_puttab / 'track.obs$$$$.p$$$$' /
+    data table        / 'trackone           ' /
 
-
+    if ( get_option('onetable ') .ne. 0 ) then
+      table='trackone'
+      table(9:9)= achar(0)
+    else
+      table=table_puttab
+      write(table(10:13), '(i4.4)') nobs
+      write(table(16:19), '(i4.4)') npart
+    endif
+    
+    
     tt = turn
-    write(table_puttab(10:13), '(i4.4)') nobs
-    write(table_puttab(16:19), '(i4.4)') npart
+    
 
-    call double_to_table(table_puttab, 'turn ', tt)
+    call double_to_table(table, 'turn ', tt)
     doublenum = x
-    call double_to_table(table_puttab, 'x ' , doublenum)
+    call double_to_table(table, 'x ' , doublenum)
 
     doublenum = px
-    call double_to_table(table_puttab, 'px ', doublenum)
+    call double_to_table(table, 'px ', doublenum)
 
     doublenum = y
-    call double_to_table(table_puttab, 'y ' , doublenum)
+    call double_to_table(table, 'y ' , doublenum)
 
     doublenum = py
-    call double_to_table(table_puttab, 'py ', doublenum)
+    call double_to_table(table, 'py ', doublenum)
 
     doublenum = t
-    call double_to_table(table_puttab, 't ' , doublenum)
+    call double_to_table(table, 't ' , doublenum)
 
     doublenum = pt
-    call double_to_table(table_puttab, 'pt ', doublenum)
+    call double_to_table(table, 'pt ', doublenum)
 
-    call double_to_table(table_puttab, 's ' , spos)
-    call double_to_table(table_puttab, 'e ' , e)
-    call augment_count(table_puttab)
+    call double_to_table(table, 's ' , spos)
+    call double_to_table(table, 'e ' , e)
+    call augment_count(table)
 
   end subroutine putintracktable
 
