@@ -17,7 +17,7 @@ module madx_ptc_twiss_module
 
   !============================================================================================
   !  PUBLIC INTERFACE
-  public                         :: ptc_twiss
+  public                         :: twiss,ptc_twiss
 
 
 
@@ -87,7 +87,7 @@ module madx_ptc_twiss_module
   !  PRIVATE
   !    routines
 
-  private zerotwiss,equaltwiss,alloctwiss,killtwiss
+  private zerotwiss,equaltwiss,killtwiss
 
 
 
