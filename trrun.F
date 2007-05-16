@@ -1741,7 +1741,7 @@
         if(first) then
           first=.false.
           call aawarn('TTBB_HOLLOWPARABOLIC: ',                         &
-     &         'beam is assumed to be circular')
+     &'beam is assumed to be circular')
         endif
       endif
       do itrack = 1, ktrack

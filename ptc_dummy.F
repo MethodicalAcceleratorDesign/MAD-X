@@ -169,7 +169,7 @@
       end subroutine  w_ptc_addknob
 
       subroutine w_ptc_addmoment(x,px,y,py,dp,t,                        &
-     &                         tableIA,columnIA,parametric )
+     &tableIA,columnIA,parametric )
       implicit none
       integer               :: x,px,y,py,dp,t
       integer               :: columnIA(*)

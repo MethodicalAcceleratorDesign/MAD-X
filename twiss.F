@@ -757,7 +757,7 @@
       endif
       node = node -1
       error = 0
-  999 end
+ 999  end
       subroutine twcpin(rt,disp0,r0mat,eflag)
       implicit none
 
@@ -3050,7 +3050,7 @@
         if(sk3s.ne.zero) then
           tilt4 = atan2(sk3s, sk3) + tilt4
           sk3 = sqrt(sk3**2 + sk3s**2)
-        endif          
+        endif
         sk3l = (el * sk3) / (one + deltap)
 
 !---- Normal and skew components of octupole.
