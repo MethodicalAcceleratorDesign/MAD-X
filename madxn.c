@@ -3723,16 +3723,19 @@ void headvalue(char* table_name, char* par, double* value)
   {
     tab = table_register->tables[pos];
     mycpy(lpar, par);
-    for (i = 0; i < tab->header->curr; i++)
+    if (tab->header)
     {
-      strcpy(aux_buff->c, &tab->header->p[i][1]);
-      if ((tp =strtok(aux_buff->c, " \"\n")) &&
-	  compare_no_case(tp, lpar) == 0)
+      for (i = 0; i < tab->header->curr; i++)
       {
-	if (strstr(strtok(NULL, " \"\n"), "%le") != NULL)
+	strcpy(aux_buff->c, &tab->header->p[i][1]);
+	if ((tp =strtok(aux_buff->c, " \"\n")) &&
+	    compare_no_case(tp, lpar) == 0)
 	{
-	  sscanf(strtok(NULL, " \"\n"), "%le", value);
-          break;
+	  if (strstr(strtok(NULL, " \"\n"), "%le") != NULL)
+	  {
+	    sscanf(strtok(NULL, " \"\n"), "%le", value);
+	    break;
+	  }
 	}
       }
     }

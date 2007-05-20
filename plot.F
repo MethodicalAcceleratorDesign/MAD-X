@@ -1786,15 +1786,23 @@
 !--- Acquire deltap
       deltap=zero
       if(.not.ptc_flag) then
-!        if(tabname.eq."summ") then
+        if(tabname.eq."summ") then
         k = double_from_table('summ ','deltap ',1,deltap)
-!        else
-!          call headvalue(tabname,'deltap ', deltap)
-!          if(deltap.eq.1d+12) deltap=zero
-!        endif
+        else
+          call headvalue(tabname,'deltap ', deltap)
+          if(deltap.eq.1d+12) then
+            call aawarn('PEPLOT: ',                                     &
+     &'deltap is not part of the twiss header')
+            deltap=zero
+          endif
+        endif
       else
         call headvalue(tabname,'deltap ', deltap)
-        if(deltap.eq.1d+12) deltap=zero
+        if(deltap.eq.1d+12) then
+          call aawarn('PEPLOT: ',                                       &
+     &'deltap is not part of the ptc_twiss header')
+          deltap=zero
+        endif
       endif
       deltap = deltap*100.0
       write(ch,'(f9.4)') deltap
