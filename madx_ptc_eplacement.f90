@@ -102,7 +102,9 @@ contains
        a(1) = get_value('ptc_eplacement ','x ')
        a(2) = get_value('ptc_eplacement ','y ')
        a(3) = get_value('ptc_eplacement ','z ')
-       write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: Read position ',a
+       if (getdebug() > 2 ) then
+          write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: Read position ',a
+       endif   
     endif
 
     select case(refframe)
@@ -142,13 +144,19 @@ contains
        phi   = get_value('ptc_eplacement ','phi ')
        theta = get_value('ptc_eplacement ','theta ')
        eta   = zero
-       write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
+       if (getdebug() > 2 ) then
+         write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
+       endif  
 
 
        if (refframe /=  1) then
           !brings it to the ref system
           CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,base,ANGE)
-          write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
+          
+          if (getdebug() > 2 ) then
+             write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
+          endif
+             
           CALL ROTATE_Fibre(p,p%chart%f%a,ange)
 
        endif
@@ -169,7 +177,8 @@ contains
     endif
 
 
-    p%patch=0
+    p%patch=-1
+    p%patch= 0
     CALL FIND_PATCH(P%PREVIOUS,P,NEXT=my_true,ENERGY_PATCH=MY_FALSE)
 
     autoplace = get_value('ptc_eplacement ','autoplacedownstream ') .ne. 0
@@ -185,6 +194,8 @@ contains
     p=>p%next
 
     do i=j,my_ring%n-1
+
+       p%patch =-1
        p%patch = 0
        CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
        P=>P%NEXT
@@ -332,6 +343,9 @@ contains
 
        case(kind10) !SBEND
           call drawsbend(p,mf)
+
+       case(32) !Drift Kick Drift what ever it is 
+          call drawboxm(p,mf,dgrey)
 
        case(kind20) !stright exact bend
           call drawboxm(p,mf,magenta)
