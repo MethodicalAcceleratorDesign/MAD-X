@@ -378,7 +378,8 @@ contains
           stop
           return
        endif
-
+       
+       !print*, "Looking for orbit"
        call find_orbit(my_ring,x,1,default,c_1d_7)
 
        if ( .not. c_%stable_da) then
@@ -390,7 +391,7 @@ contains
        CALL write_closed_orbit(icase,x)
 
     elseif(my_ring%closed .eqv. .true.) then
-       print*, "Closed orbit specified by the user:"
+       print*, "Closed orbit specified by the user!"
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
 
@@ -1216,7 +1217,9 @@ contains
       x(6)=get_value('ptc_twiss ','t ')
       x(5)=get_value('ptc_twiss ','pt ')
 
-      CALL write_closed_orbit(icase,x)
+      if (getdebug() > 0 ) then
+         CALL write_closed_orbit(icase,x)
+      endif
 
       call reademittance()
 
