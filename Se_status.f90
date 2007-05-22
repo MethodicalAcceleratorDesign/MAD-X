@@ -716,6 +716,7 @@ CONTAINS
     !    add%EXACT    =       S1%EXACT.OR.S2%EXACT
     add%EXACTMIS    =       S1%EXACTMIS.OR.S2%EXACTMIS
     add%RADIATION  =  S1%RADIATION.OR.S2%RADIATION
+    add%RADIATION_new  =  S1%RADIATION_new.OR.S2%RADIATION_new
     add%NOCAVITY =  S1%NOCAVITY.OR.S2%NOCAVITY
     add%TIME     =  S1%TIME.OR.S2%TIME
     add%FRINGE   =       S1%FRINGE.OR.S2%FRINGE
@@ -732,6 +733,7 @@ CONTAINS
     IF(add%ONLY_4D) THEN
        add%TOTALPATH=  F
        add%RADIATION  =  F
+       add%RADIATION_new  =  F
        add%NOCAVITY =  T
     ENDIF
   END FUNCTION add
@@ -745,6 +747,7 @@ CONTAINS
     sub%TOTALPATH=  S1%TOTALPATH.min.S2%TOTALPATH
     sub%EXACTMIS    =       S1%EXACTMIS.min.S2%EXACTMIS
     sub%RADIATION  =  S1%RADIATION.min.S2%RADIATION
+    sub%RADIATION_new  =  S1%RADIATION_new.min.S2%RADIATION_new
     sub%NOCAVITY =  S1%NOCAVITY.min.S2%NOCAVITY
     sub%TIME     =  S1%TIME.min.S2%TIME
     sub%FRINGE   =       S1%FRINGE.min.S2%FRINGE
@@ -761,6 +764,7 @@ CONTAINS
     IF(sub%ONLY_4D) THEN
        sub%TOTALPATH=  F
        sub%RADIATION  =  F
+       sub%RADIATION_new  =  F
        sub%NOCAVITY =  T
     ENDIF
 

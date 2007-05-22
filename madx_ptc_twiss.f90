@@ -457,7 +457,8 @@ contains
     startfen = current!setting up start energy for record
     suml=zero
     iii=restart_sequ()
-    print77=.true.
+    print77=.false.
+    read77=.false.
 
     open(unit=21,file='ptctwiss.txt')
 
@@ -551,7 +552,8 @@ contains
        !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
     endif
 
-    print77=.true.
+    print77=.false.
+    read77=.false.
 
     open(unit=121,file='end.map')
     call print(y,121)

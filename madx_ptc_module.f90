@@ -51,8 +51,8 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
 
-    print77=.true.
-    read77 =.true.
+    print77=.false.
+    read77 =.false.
 
     if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
@@ -1777,6 +1777,7 @@ CONTAINS
     c_%watch_user=.false.
     !if (getdebug()>1)
     print77=.false.
+    read77 =.false.
 
     call daprint(y,18)
 
@@ -1801,8 +1802,9 @@ CONTAINS
              name_var=" "
              k = string_from_table('normal_results ', 'name ', row, name_var)
 
-             if (name_var .eq. 'gnfu') n_gnfu = n_gnfu + 1
-             if (name_var .eq. 'haml') then
+
+             if (name_var(:4) .eq. 'gnfu') n_gnfu = n_gnfu + 1
+             if (name_var(:4) .eq. 'haml') then
                 n_haml = n_haml + 1
                 row_haml(n_haml) = row
              endif
@@ -1900,7 +1902,7 @@ CONTAINS
              name_var=" "
              k = string_from_table("normal_results ", "name ", row, name_var)
              val_ptc = double_from_ptc_normal(name_var,row,icase)
-             if (name_var .ne. 'haml'.and.name_var .ne. 'gnfu')    &
+             if (name_var(:4) .ne. 'haml'.and.name_var(:4) .ne. 'gnfu')    &
                   call double_to_table_row("normal_results ", "value ", row, val_ptc)
           enddo
        endif
