@@ -171,10 +171,10 @@ CONTAINS
 
     if (getdebug() > 0) then
        print *, 'MAD-X Beam Parameters'
-       print '(a20, f8.4)', '      Energy :',energy
-       print '(a20, f8.4)', '      Kinetic Energy :',energy-pma
-       print '(a20, f8.4)', '      Partice Rest Mass :',pma
-       print '(a20, f8.4)', '      Momentum :',e0f
+       print '(a26, e13.6)', '      Energy :',energy
+       print '(a26, e13.6)', '      Kinetic Energy :',energy-pma
+       print '(a26, e13.6)', '      Particle Rest Mass :',pma
+       print '(a26, e13.6)', '      Momentum :',e0f
     endif
 
 
