@@ -161,7 +161,9 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       if (match2_macro_name[i]==NULL) break;
 
       sprintf(execute,"exec, %s;",match2_macro_name[i]);
+      match_is_on=0;
       pro_input(execute);
+      match_is_on=2;
       if (errorflag == 0)
       {
         *stab_flag=0;

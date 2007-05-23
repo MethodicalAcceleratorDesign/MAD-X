@@ -209,7 +209,7 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
     {
       printf("Max number of match macros reached. Augmenting.\n");
       match2_augmentnmacros();
-      j = MAX_MATCH_MACRO -1;
+      j = MAX_MATCH_MACRO - 1;
     }
 
     match2_macro_name[j]=macro->name;
@@ -2386,7 +2386,8 @@ void* mymalloc(char* caller, size_t size)
   /* calls malloc, checks for memory granted */
   void* p;
   int* i_p;
-  size_t l_size = size + sizeof(double);
+  size_t l_size = size + sizeof(double)+2;
+/*  printf("xxxx %d xxxx\n",l_size);*/
   if ((p = malloc(l_size)) == NULL)
     fatal_error("memory overflow, called from routine:", caller);
   i_p = (int*) p; *i_p = FREECODE;
