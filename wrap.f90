@@ -35,6 +35,12 @@ subroutine w_ptc_twiss(tab_name)
   call ptc_twiss(tab_name)
 end subroutine w_ptc_twiss
 
+subroutine w_ptc_normal()
+  use madx_ptc_normal_module
+  implicit none
+  call ptc_normal()
+end subroutine w_ptc_normal
+
 subroutine w_ptc_moments(no)
   use madx_ptc_distrib_module
   implicit none
@@ -53,12 +59,6 @@ subroutine w_ptc_dumpmaps()
   implicit none
   call ptc_dumpmaps()
 end subroutine w_ptc_dumpmaps
-
-subroutine w_ptc_normal()
-  use madx_ptc_module
-  implicit none
-  call ptc_normal()
-end subroutine w_ptc_normal
 
 subroutine w_ptc_track(max_obs)
   use madx_ptc_module
