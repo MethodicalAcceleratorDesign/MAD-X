@@ -70,7 +70,7 @@ contains
     x(:)=zero
 
     call locate_all_twcav(my_ring,poscav)
-    if ( getdebug() > 2 ) write(6,*) "There is ", size(poscav), " Cavities in the line."
+    if ( getdebug() > 2 ) write(6,*) "There are ", size(poscav), " Cavities in the line."
     if ( size(poscav) == 0) then
        if (getdebug() > 1) then
           close(21);close(24);
@@ -339,14 +339,16 @@ contains
       if (getdebug()>2) print *, 'arrivtime = ', arrivtime
 
       if( (f%mag%kind/=kind21) .and. (f%mag%kind/=kind4) ) then
-         write(6,*) " fatal error: not a twcavity "
+         write(6,*) " fatal error: not a Cavity "
          stop
       endif
 
-      if(f%mag%cav21%psi/=zero) then
-         write(6,*) " warning: backwards wave present ",f%mag%cav21%psi
-         f%mag%cav21%psi=zero   ! removing backward waves
-         f%magp%cav21%psi=zero   ! removing backward waves
+      if(f%mag%kind/=kind21) then
+         if(f%mag%cav21%psi/=zero) then
+            write(6,*) " warning: backwards wave present ",f%mag%cav21%psi
+            f%mag%cav21%psi=zero   ! removing backward waves
+            f%magp%cav21%psi=zero   ! removing backward waves
+         endif
       endif
 
 
