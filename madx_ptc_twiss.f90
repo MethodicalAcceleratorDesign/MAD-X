@@ -303,7 +303,6 @@ contains
     real(dp)                :: r,re(6,6),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
-    logical(lp)             :: savemaps
     integer                 :: n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
     integer                 :: row,double_from_table
     integer                 :: charge    ! charge of an accelerated particle
