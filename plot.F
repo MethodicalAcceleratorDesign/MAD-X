@@ -1847,16 +1847,20 @@
 !--- find variable name in list
 
       svar = horname
+      slname = "_"
       call pegetn (1, svar, itbv, vdum, sdum, slname)
       call gxpnbl(slname, k1dum, k2dum)
       k3dum = 31
       if (dpp_flag) k3dum = 4
-      do idum = k1dum, k2dum
-        if (slname(idum:idum) .ne. '_') then
-          k3dum = k3dum + 1
-          slocn(k3dum:k3dum) = slname(idum:idum)
-        endif
-      enddo
+      slocn = ' '
+      if(k1dum.gt.0.and.k2dum.gt.0) then
+        do idum = k1dum, k2dum
+          if (slname(idum:idum) .ne. '_') then
+            k3dum = k3dum + 1
+            slocn(k3dum:k3dum) = slname(idum:idum)
+          endif
+        enddo
+      endif
 
 !--- prepare horizontal axis
 
@@ -2019,16 +2023,19 @@
 !--- find variable name in list for annotation
 
         svar = slabl(ivvar)
+        slname = "_"
         call pegetn (2, svar, itbv, vdum, sdum, slname)
-        slocn = ' '
         call gxpnbl(slname, k1dum, k2dum)
         k3dum = 0
-        do idum = k1dum, k2dum
-          if (slname(idum:idum) .ne. '_') then
-            k3dum = k3dum + 1
-            slocn(k3dum:k3dum) = slname(idum:idum)
-          endif
-        enddo
+        slocn = ' '
+        if(k1dum.gt.0.and.k2dum.gt.0) then
+          do idum = k1dum, k2dum
+            if (slname(idum:idum) .ne. '_') then
+              k3dum = k3dum + 1
+              slocn(k3dum:k3dum) = slname(idum:idum)
+            endif
+          enddo
+        endif
 
 !--- character height including user request
 
