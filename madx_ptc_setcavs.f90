@@ -342,15 +342,14 @@ contains
          write(6,*) " fatal error: not a Cavity "
          stop
       endif
-
-      if(f%mag%kind/=kind21) then
-         if(f%mag%cav21%psi/=zero) then
-            write(6,*) " warning: backwards wave present ",f%mag%cav21%psi
-            f%mag%cav21%psi=zero   ! removing backward waves
-            f%magp%cav21%psi=zero   ! removing backward waves
-         endif
+       
+      if ( f%mag%kind==kind21) then
+        if(f%mag%cav21%psi/=zero) then
+           write(6,*) " warning: backwards wave present ",f%mag%cav21%psi
+           f%mag%cav21%psi=zero   ! removing backward waves
+           f%magp%cav21%psi=zero   ! removing backward waves
+        endif
       endif
-
 
       if(ene) then
 
