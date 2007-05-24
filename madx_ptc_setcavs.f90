@@ -135,7 +135,7 @@ contains
        enddo
 
        if (associated(p%next)) then
-          if (p%next%mag%kind==kind21) then
+          if ( (p%next%mag%kind==kind21) .or. (p%next%mag%kind==kind4) ) then
              write(6,*) "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
              write(6,*) "!!!                                     !!!"
              write(6,*) "!!!    CONESCUTIVE        CAVITIES      !!!"
@@ -287,7 +287,7 @@ contains
           write(6,*) 'Name: ', p%mag%name, ' Kind: ', p%mag%kind
        endif
 
-       if(p%mag%kind == kind21) then
+       if( (p%mag%kind == kind21) .or. (p%mag%kind == kind4)) then
 
           if(p%next%patch%energy==1) then
              p%patch%energy=2
@@ -323,7 +323,7 @@ contains
 
     subroutine setcavity(f, x, phase_rel, charge, ene)
       implicit none
-      type(fibre),intent(inout):: f         ! fiber -> here must be twcavity, i.e. kind21
+      type(fibre),intent(inout):: f         ! fiber -> here must be a cavity, i.e. kind21 (tw) or kind4 (rf)
       real(dp)                 :: x(6)      ! reference particle coordinates (closed orbit for a circular machine)
       real(dp)                 :: phase_rel ! final relative phase
       integer, target          :: charge    ! charge of an particle
@@ -338,7 +338,7 @@ contains
       arrivtime = x(6)/clight
       if (getdebug()>2) print *, 'arrivtime = ', arrivtime
 
-      if(f%mag%kind/=kind21) then
+      if( (f%mag%kind/=kind21) .and. (f%mag%kind/=kind4) ) then
          write(6,*) " fatal error: not a twcavity "
          stop
       endif
@@ -394,7 +394,7 @@ contains
       ic=0
       p=>r%start
       do i=1,r%n
-         if(p%mag%kind==kind21) then
+         if( (p%mag%kind==kind21) .or. (p%mag%kind==kind4) ) then
             if(p%mag%freq/=zero) then
                ic=ic+1
             endif
@@ -406,7 +406,7 @@ contains
       ic=0
       p=>r%start
       do i=1,r%n
-         if(p%mag%kind==kind21) then
+         if( (p%mag%kind==kind21) .or. (p%mag%kind==kind4) ) then
             if(p%mag%freq/=zero) then
                ic=ic+1
                pos(ic)=i

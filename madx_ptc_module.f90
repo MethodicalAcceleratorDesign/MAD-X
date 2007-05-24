@@ -54,7 +54,9 @@ CONTAINS
 
     print77=.false.
     read77 =.false.
-
+    
+    nullify(maps)
+    
     if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
@@ -1200,10 +1202,9 @@ CONTAINS
     do i=1,my_ring%n
 
 
-
        y2=xt+id ! we track identity map from the current position
 
-       if(p%mag%kind/=kind21) then
+       if( (p%mag%kind/=kind21) .and. (p%mag%kind/=kind4) ) then
 
           call track(my_ring,y2,i,i+1,getintstate())
 
