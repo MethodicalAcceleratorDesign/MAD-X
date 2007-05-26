@@ -839,7 +839,7 @@
       end
 !***********************************************************************
 
-      subroutine  pegetn (iflag, svar, it, ipflg, sovar, reqann)
+      subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
 !   Finds variable, dependent variables, axis and curve annotations    *
@@ -968,7 +968,7 @@
      &'D<?>y<?>''', 'D<?>py<?>''', 'W<?>y<?>',                          &
      &'XI<?>y<?>', 'x<?>ns<?>', 'p<?>x_ns<?>', 'W<?>xs<?>',             &
      &'y<?>ns<?>', 'p<?>y_ns<?>', 'W<?>ys<?>',                          &
-     &' ', ' ',                                                         &
+     &'E', ' ',                                                         &
      &'p<?>tot<?>', 'p<?>diff_x<?>', 'p<?>diff_y<?>', 'p<?>diff_s<?>'/
 
       data (iproc(j,1), j = 1, 32) /                                    &
@@ -2070,7 +2070,7 @@
       end
 !***********************************************************************
 
-      subroutine  peschm (nel, ityp, hr, es, ee, actwin)
+      subroutine peschm (nel, ityp, hr, es, ee, actwin)
 !----------------------------------------------------------------------*
 ! Purpose:
 !   Plot schema
