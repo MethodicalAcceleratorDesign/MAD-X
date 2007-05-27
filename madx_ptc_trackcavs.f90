@@ -1,6 +1,6 @@
 module madx_ptc_trackline_module
   use madx_ptc_module
-  use madx_ptc_intstate_module 
+  use madx_ptc_intstate_module
   use madx_ptc_setcavs_module
   implicit none
   save
@@ -8,7 +8,7 @@ module madx_ptc_trackline_module
 
   public                              :: ptc_trackline       ! subroutine inside the module
   public                              :: ptc_track_everystep
-  
+
   ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
   private filter
@@ -62,7 +62,7 @@ contains
     TYPE(BEAM) :: TheBEAM
     TYPE(INTEGRATION_NODE),POINTER :: CURR_SLICE,PREV_SLICE
 
-    
+
     !------------------------------------------------------
     !initialization
     npart = 1
@@ -92,9 +92,9 @@ contains
     gcs = get_value('ptc_trackline ','gcs ') .ne. 0
 
     rplot = get_value('ptc_trackline ','rootntuple ') .ne. 0
-    
+
     intstate = getintstate()
-    if (gcs .and.  intstate%TOTALPATH) then
+    if (gcs .and.  intstate%TOTALPATH==1) then
        call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
        gcs = .false.
     endif
@@ -141,55 +141,55 @@ contains
        print *, '###################################################'
        print *, '###################################################'
     endif
-    
+
     if (rplot) then
-      call newrplot()
-    endif  
+       call newrplot()
+    endif
 
 
     if(.not.associated(my_ring%t))  then
-      CALL MAKE_node_LAYOUT(my_ring)
+       CALL MAKE_node_LAYOUT(my_ring)
     endif
-    
+
     n=1
     npart = getnumberoftracks()
     if (getdebug() > 0) print *, 'There is ', npart,' tracks'
-    
-!     IF(.NOT.ASSOCIATED(TheBeam%N)) THEN
-        CALL ALLOCATE_BEAM(TheBeam,npart)
-!     ELSEIF(TheBeam%N/=npart) THEN
-!        CALL KILL_BEAM(TheBeam)
-!        CALL ALLOCATE_BEAM(TheBeam,npart)
-!     ENDIF
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
-    !!!!!!!!!    READS DATA FROM MADX         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
+    !     IF(.NOT.ASSOCIATED(TheBeam%N)) THEN
+    CALL ALLOCATE_BEAM(TheBeam,npart)
+    !     ELSEIF(TheBeam%N/=npart) THEN
+    !        CALL KILL_BEAM(TheBeam)
+    !        CALL ALLOCATE_BEAM(TheBeam,npart)
+    !     ENDIF
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!    READS DATA FROM MADX         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     do n=1, npart
 
        pathlegth = zero
 
-       !if (getdebug() > 3 ) 
+       !if (getdebug() > 3 )
        print *, 'Getting track ',n
 
        call gettrack(n,TheBeam%X(n,1),TheBeam%X(n,2),TheBeam%X(n,3),TheBeam%X(n,4),TheBeam%X(n,6),TheBeam%X(n,5))
 
-       !if (getdebug() > 0 ) 
+       !if (getdebug() > 0 )
        write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,TheBeam%X(n,1:6)
-       
+
        TheBeam%X(n,7)=ZERO
-       
+
        if( associated(TheBeam%POS(n)%NODE) ) then
-             TheBeam%POS(n)%NODE=>my_ring%start%t1
+          TheBeam%POS(n)%NODE=>my_ring%start%t1
        endif
 
     enddo !loop over tracks
-       
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
-    !!!!!!!!!      TRACKING       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
-    
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!      TRACKING       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     open(unit=41,file='thintracking_ptc.txt',POSITION='APPEND'  , STATUS='OLD')
 
     do t=1, nturns
@@ -200,20 +200,20 @@ contains
        CURR_SLICE => prev_slice%next
        e = 1
 
-!       print*,"Name of the first element ", my_ring%start%mag%name
-!       print*,"Position of the first element ", my_ring%start%T2%pos
-!       print*,"Name of the last element ", my_ring%end%mag%name
-!       print*,"Position of the last element ", my_ring%end%T2%pos
-       
+       !       print*,"Name of the first element ", my_ring%start%mag%name
+       !       print*,"Position of the first element ", my_ring%start%T2%pos
+       !       print*,"Name of the last element ", my_ring%end%mag%name
+       !       print*,"Position of the last element ", my_ring%end%T2%pos
+
        do ni=1, my_ring%end%T2%pos
-           
+
           if ( .not. associated(CURR_SLICE%PARENT_FIBRE, PREV_SLICE%PARENT_FIBRE) ) then
-            e = e + 1 
-            p=>p%next
+             e = e + 1
+             p=>p%next
           endif
 
 
-          call track(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
+          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
           pathlegth = curr_slice%s(3)
 
           if (getdebug() > 2 ) then
@@ -221,9 +221,9 @@ contains
           endif
 
           do n=1, npart
-             
+
              x = TheBeam%X(n,1:6)
-             
+
              p0=(1+x(5))
              pz=sqrt(p0**2 - x(2)**2 - x(4)**2)
              p0 = p0*p%mag%p%p0c
@@ -231,75 +231,75 @@ contains
              yp = x(4)/pz
 
 
-!             write(41,'(i8, 1x, a16, i4 ,1x, 2f8.4, 1x, 6f8.4)') ni, p%mag%name, e,&
-!                    pathlegth, TheBeam%X(n,7), &
-!	x(1), xp , x(3), yp , x(5), p0 , x(6)
+             !             write(41,'(i8, 1x, a16, i4 ,1x, 2f8.4, 1x, 6f8.4)') ni, p%mag%name, e,&
+             !                    pathlegth, TheBeam%X(n,7), &
+             !     x(1), xp , x(3), yp , x(5), p0 , x(6)
 
              write(41,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
-                        pathlegth, TheBeam%X(n,7), &  
-                        x(1), xp , x(3), yp , x(5), p0 , x(6)
-             
-             
+                  pathlegth, TheBeam%X(n,7), &
+                  x(1), xp , x(3), yp , x(5), p0 , x(6)
+
+
              if (rplot) then
-               gcs = my_false
-               if (gcs) then
-   !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-                  gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
-                  gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
-                  gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
-   !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
-                  gposx = gposx + p%chart%f%b(1)
-                  gposy = gposy + p%chart%f%b(2)
-                  gposz = gposz + p%chart%f%b(3)
+                gcs = my_false
+                if (gcs) then
+                   !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+                   gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
+                   gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
+                   gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
+                   !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                   gposx = gposx + p%chart%f%b(1)
+                   gposy = gposy + p%chart%f%b(2)
+                   gposz = gposz + p%chart%f%b(3)
 
-                  write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
+                   write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
-                  call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
-               else
-                  call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
-               endif
-             endif             
+                   call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                else
+                   call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                endif
+             endif
 
              if ( observedelements(e) .gt. 0 ) then
-               if ( associated(CURR_SLICE, p%t2 ) ) then
-                 print*, "Sending to table", n, e, pathlegth
-                 call putintracktable(n,t,observedelements(e),x(1), xp , x(3), yp , x(6), x(5), pathlegth, p0)
-               endif 
+                if ( associated(CURR_SLICE, p%t2 ) ) then
+                   print*, "Sending to table", n, e, pathlegth
+                   call putintracktable(n,t,observedelements(e),x(1), xp , x(3), yp , x(6), x(5), pathlegth, p0)
+                endif
              endif
              !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
-          
-          enddo
-          
-!               call produce_aperture_flag(apertflag)
-!               if (apertflag/=0) then
-!                  print *, 'Particle out of aperture!'
-! 
-!                  call ANALYSE_APERTURE_FLAG(apertflag,why)
-!                  Write(6,*) "ptc_trackline: APERTURE error for element: ",e," name: ",p%MAG%name
-!                  Write(6,*) "Message: ",c_%message
-!                  write(whymsg,*) 'APERTURE error: ',why
-!                  call fort_warn('ptc_twiss: ',whymsg)
-!                  call seterrorflag(10,"ptc_twiss: ",whymsg);
-! 
-!                  exit; !goes to the ne
-!               endif
 
-         if (associated(CURR_SLICE%next)) then
-           PREV_SLICE => CURR_SLICE
-           CURR_SLICE => CURR_SLICE%next
-         else
-           exit;
-         endif  
+          enddo
+
+          !               call produce_aperture_flag(apertflag)
+          !               if (apertflag/=0) then
+          !                  print *, 'Particle out of aperture!'
+          !
+          !                  call ANALYSE_APERTURE_FLAG(apertflag,why)
+          !                  Write(6,*) "ptc_trackline: APERTURE error for element: ",e," name: ",p%MAG%name
+          !                  Write(6,*) "Message: ",c_%message
+          !                  write(whymsg,*) 'APERTURE error: ',why
+          !                  call fort_warn('ptc_twiss: ',whymsg)
+          !                  call seterrorflag(10,"ptc_twiss: ",whymsg);
+          !
+          !                  exit; !goes to the ne
+          !               endif
+
+          if (associated(CURR_SLICE%next)) then
+             PREV_SLICE => CURR_SLICE
+             CURR_SLICE => CURR_SLICE%next
+          else
+             exit;
+          endif
 
        enddo !over elements
 
     enddo !loop over turns
-    
+
     close(41)
-    
-    if (rplot) call rplotfinish()   
+
+    if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
-    
+
     c_%x_prime=.false.
 
     CALL KILL_BEAM(TheBeam)
@@ -333,17 +333,17 @@ contains
     data table        / 'trackone           ' /
 
     if ( get_option('onetable ') .ne. 0 ) then
-      table='trackone'
-      table(9:9)= achar(0)
+       table='trackone'
+       table(9:9)= achar(0)
     else
-      table=table_puttab
-      write(table(10:13), '(i4.4)') nobs
-      write(table(16:19), '(i4.4)') npart
+       table=table_puttab
+       write(table(10:13), '(i4.4)') nobs
+       write(table(16:19), '(i4.4)') npart
     endif
-    
-    
+
+
     tt = turn
-    
+
 
     call double_to_table(table, 'turn ', tt)
     doublenum = x
@@ -436,9 +436,9 @@ contains
     gcs = get_value('ptc_trackline ','gcs ') .ne. 0
 
     rplot = get_value('ptc_trackline ','rootntuple ') .ne. 0
-    
+
     intstate = getintstate()
-    if (gcs .and.  intstate%TOTALPATH) then
+    if (gcs .and.  intstate%TOTALPATH==1) then
        call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
        gcs = .false.
     endif
@@ -485,10 +485,10 @@ contains
        print *, '###################################################'
        print *, '###################################################'
     endif
-    
+
     if (rplot) then
-      call newrplot()
-    endif  
+       call newrplot()
+    endif
 
     n=1
     npart = getnumberoftracks()
@@ -524,24 +524,24 @@ contains
              yp = x(4)/pz
 
              if (rplot) then
-               if (gcs) then
-  !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-                  gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
-                  gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
-                  gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
-  !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
-                  gposx = gposx + p%chart%f%b(1)
-                  gposy = gposy + p%chart%f%b(2)
-                  gposz = gposz + p%chart%f%b(3)
+                if (gcs) then
+                   !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+                   gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
+                   gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
+                   gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
+                   !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                   gposx = gposx + p%chart%f%b(1)
+                   gposy = gposy + p%chart%f%b(2)
+                   gposz = gposz + p%chart%f%b(3)
 
-                  write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
+                   write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
-                  call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
-               else
-                  call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
-               endif
-             endif             
-             
+                   call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                else
+                   call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                endif
+             endif
+
              if ( observedelements(e) .gt. 0) then
                 call putintracktable(n,t,observedelements(e),x(1), xp , x(3), yp , x(6), x(5), pathlegth, p0)
              endif
@@ -557,7 +557,7 @@ contains
                 write(whymsg,*) 'APERTURE error: ',why
                 call fort_warn('ptc_twiss: ',whymsg)
                 call seterrorflag(10,"ptc_twiss: ",whymsg);
-                
+
                 exit; !goes to the ne
              endif
              p=>p%next
@@ -570,7 +570,7 @@ contains
        enddo !loop over turns
     enddo !loop over tracks
 
-    if (rplot) call rplotfinish()   
+    if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
 
     c_%x_prime=.false.
@@ -1247,4 +1247,4 @@ end module madx_ptc_trackline_module
 !                 write(6,'(a12,3f8.4)') "mag Exi2 ", p%mag%p%f%exi(2,1), p%mag%p%f%exi(2,2), p%mag%p%f%exi(2,3)
 !                 write(6,'(a12,3f8.4)') "mag Exi2 ", p%mag%p%f%exi(3,1), p%mag%p%f%exi(3,2), p%mag%p%f%exi(3,3)
 !              endif
-! 
+!
