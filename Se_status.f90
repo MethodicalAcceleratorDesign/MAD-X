@@ -111,7 +111,8 @@ module S_status
        &(0,f,f,f,f,f,f,f,f,t,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN_ONLY0   = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,t,3)
-  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
+!  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
+  private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
   PRIVATE B2PERPR,B2PERPP !,S_init_berz0
@@ -154,7 +155,7 @@ module S_status
   INTERFACE init
      MODULE PROCEDURE s_init
      !     MODULE PROCEDURE S_init_berz0
-     MODULE PROCEDURE S_init_berz
+     !     MODULE PROCEDURE S_init_berz
   END INTERFACE
 
   INTERFACE print
@@ -623,7 +624,7 @@ CONTAINS
        write(mf,*) "This is a proton "
     endif
     write(mf, '((1X,a20,1x,a5))' )  "      EXACT_MODEL = ", CONV(EXACT_MODEL    )
-    write(mf, '((1X,a20,1x,i5))' )  "      TOTALPATH   = ", S%TOTALPATH
+    write(mf, '((1X,a20,1x,i4))' )  "      TOTALPATH   = ", S%TOTALPATH
     write(mf, '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
     write(mf,'((1X,a20,1x,a5))' ) "      RADIATION   = ", CONV(S%RADIATION  )
     write(mf,'((1X,a20,1x,a5))' ) "      NOCAVITY    = ", CONV(S%NOCAVITY )
@@ -788,7 +789,7 @@ CONTAINS
     !  subroutine S_init(STATE,NO1,NP1,PACKAGE,MAPINT,ND2,NPARA)
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
-    LOGICAL(lp), INTENT(IN):: pack
+    LOGICAL(lp), optional, INTENT(IN):: pack
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
     INTEGER,optional :: ND2,NPARA
@@ -926,16 +927,16 @@ CONTAINS
     C_%npara_fpp=NPARA
   END  subroutine init_default
 
-  subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
-    implicit none
-    TYPE (INTERNAL_STATE), INTENT(IN):: STATE
-    INTEGER, INTENT(IN):: NO1,NP1
-    INTEGER, INTENT(OUT)::    ND2,NPARA
+!  subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
+!    implicit none
+!    TYPE (INTERNAL_STATE), INTENT(IN):: STATE
+!    INTEGER, INTENT(IN):: NO1,NP1
+!    INTEGER, INTENT(OUT)::    ND2,NPARA
 
-    call init(STATE,NO1,NP1,my_true,ND2,NPARA)
-    C_%NPARA=NPARA
-    C_%npara_fpp=NPARA
-  END  subroutine S_init_berz
+!    call init(STATE,NO1,NP1,my_true,ND2,NPARA)
+!    C_%NPARA=NPARA
+!    C_%npara_fpp=NPARA
+!  END  subroutine S_init_berz
 
 
   SUBROUTINE B2PERPR(P,B,X,X5,B2)
