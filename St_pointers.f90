@@ -214,9 +214,48 @@ contains
           read(mf,*) NAME
           call kill_last_layout(m_u)
           my_ering%NAME=NAME
-       case('RESTOREMYSTATE')
+       case('RESTOREMYSTATE','RESTORE')
           my_default=my_OLD_state
           my_estate=>my_OLD_state
+          ! Orbit stuff
+       case('SETORBITSTATE')
+          my_ORBIT_LATTICE%state=my_estate
+       case('PRINTPTCNODES','PRINTORBITNODES')
+          call kanalnummer(ii)
+          open(unit=ii,file=def_orbit_node)
+
+          tL=>my_ORBIT_LATTICE%ORBIT_NODES(1)%NODE
+          write(ii,*) " Number of PTC Nodes  ",my_ORBIT_LATTICE%ORBIT_N_NODE-1
+
+          do j=1,my_ORBIT_LATTICE%ORBIT_N_NODE
+             write(ii,*) "****************************************************"
+             write(ii,*) " Node Number ",j-1
+             write(ii,*) " Number of PTC Integration Nodes",my_ORBIT_LATTICE%ORBIT_NODES(j)%dpos
+             DO I1=1,my_ORBIT_LATTICE%ORBIT_NODES(j)%dpos
+                write(ii,*) tL%S(1),tL%parent_fibre%mag%name,' ',tL%parent_fibre%pos,tL%cas
+                TL=>TL%NEXT
+             ENDDO
+          enddo
+          close(ii)
+
+       case('PUTDEFAULTINPARENTLAYOUT')
+          call PUT_state(DEFAULT,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
+       case('PTCNODEFILE','PTCNODE')  ! ACCELERATION FILE
+          READ(MF,*) def_orbit_node
+          INQUIRE (FILE = def_orbit_node, EXIST = exists)
+          if(exists) then
+             write(6,*) "file ", def_orbit_node(1:len_trim(def_orbit_node)), &
+                  " exists, interrupt execution if you do not want to overwrite!"
+             !    write(6,*) " you have 2 seconds to do so "
+             !    CALL DATE_AND_TIME(values=temps)
+             !    i1=temps(7)
+1            if(i1>=58) i1=i1-58
+             !    do while(.true.)
+             !     CALL DATE_AND_TIME(values=temps)
+             !     if(temps(7)>i1+2) exit
+             !    enddo
+          endif
+          ! end Orbit stuff
        case('DEFAULT')
           my_estate=DEFAULT0
        case('+NOCAVITY')
@@ -247,6 +286,10 @@ contains
           my_estate=my_estate+RADIATION0
        case('-RADIATION')
           my_estate=my_estate-RADIATION0
+       case('+EXACTMIS')
+          my_estate=my_estate+EXACTMIS0
+       case('-EXACTMIS')
+          my_estate=my_estate-EXACTMIS0
 
 
        case('ALLOCATEBETA')
@@ -347,7 +390,7 @@ contains
              OPEN(UNIT=MFR,FILE=FILENAME)
           endif
           DO I1=1,NTURN
-             call track( my_ering,MY_BEAMS(USE_BEAM),my_estate,POS)
+             call TRACK_BEAM( my_ering,MY_BEAMS(USE_BEAM),my_estate,POS)
              if(mod(i1,printmod)==0) then
                 write(6,*) " turn ",i1
                 CALL Stat_beam_raw(MY_BEAMS(USE_BEAM),4,mfr)
@@ -400,7 +443,11 @@ contains
           read(mf,*) name,i1,i2
           read(mf,*) SIG(1:6),cut
           CALL MESS_UP_ALIGNMENT_name(my_ering,name,i1,i2,SIG,cut)
+       case('ALWAYS_EXACTMIS',"ALWAYSEXACTMISALIGNMENTS")
           ! end of random stuff
+          read(mf,*) ALWAYS_EXACTMIS
+          if(ALWAYS_EXACTMIS) write(6,*) " ALWAYS EXACT MISALIGNMENTS "
+          if(.NOT.ALWAYS_EXACTMIS) write(6,*) " EXACT MISALIGNMENTS SET USING STATE "
        case('SETFAMILIES')
           np=0
           READ(MF,*) NPOL
@@ -485,21 +532,6 @@ contains
           call lattice_GET_CHROM(my_ering,my_estate,CHROM)
        case('GETTUNE')
           call lattice_GET_tune(my_ering,my_estate)
-       case('PTCNODE')  ! ACCELERATION FILE
-          READ(MF,*) def_orbit_node
-          INQUIRE (FILE = def_orbit_node, EXIST = exists)
-          if(exists) then
-             write(6,*) "file ", def_orbit_node(1:len_trim(def_orbit_node)), &
-                  " exists, interrupt execution if you do not want to overwrite!"
-             write(6,*) " you have 5 seconds to do so "
-             CALL DATE_AND_TIME(values=temps)
-             i1=temps(7)
-             if(i1>=55) i1=i1-55
-             do while(.true.)
-                CALL DATE_AND_TIME(values=temps)
-                if(temps(7)>i1+5) exit
-             enddo
-          endif
        case('STRENGTH','STRENGTHFILE')  !
           IF(mfpolbloc/=0) CLOSE(mfpolbloc)
 
@@ -520,14 +552,14 @@ contains
           if(exists) then
              write(6,*) "file ", FINAL_setting(1:len_trim(FINAL_setting)), &
                   " exists, interrupt execution if you do not want to overwrite!"
-             write(6,*) " you have 5 seconds to do so "
-             CALL DATE_AND_TIME(values=temps)
-             i1=temps(7)
-             if(i1>=55) i1=i1-55
-             do while(.true.)
-                CALL DATE_AND_TIME(values=temps)
-                if(temps(7)>i1+5) exit
-             enddo
+             !     write(6,*) " you have 2 seconds to do so "
+             !     CALL DATE_AND_TIME(values=temps)
+             !     i1=temps(7)
+             !      if(i1>=58) i1=i1-58
+             !     do while(.true.)
+             !      CALL DATE_AND_TIME(values=temps)
+             !      if(temps(7)>i1+2) exit
+             !     enddo
           endif
        case('INITIALSETTING') ! ACCELERATION FILE
           READ(MF,*) initial_setting
@@ -781,13 +813,14 @@ contains
                 stop
              endif
           endif
-          CALL radia(my_ering,POS,FILENAME,fileTUNE)
+          !   CALL radia(my_ering,POS,FILENAME,fileTUNE)
 
        case('SPECIALALEX')
           READ(MF,*) I1
           READ(MF,*) targ_tune(1:2),sc
 
           CALL special_alex_main_ring(my_ering,i1,targ_tune,sc)
+
 
        case('THINEXAMPLE')
           READ(MF,*) I1,I2,FILENAME
@@ -937,208 +970,6 @@ contains
 
   end subroutine charge_dir
 
-  SUBROUTINE radia(R,loc,FILE1,FILE2)
-    USE madx_keywords
-    implicit none
-    TYPE(LAYOUT) R
-
-    REAL(DP) X(6),m,as(6,6),energy,deltap
-    TYPE(ENV_8) YS(6)
-    type(beamenvelope) env
-    CHARACTER(*) FILE1,FILE2
-    type(normalform) normal
-    integer nd2,npara,i,j,js(6),n1,n2
-    TYPE(REAL_8) Y(6)
-    TYPE(DAMAP) ID
-    TYPE(INTERNAL_STATE) state
-    integer no,loc,mf1,mf2
-    real(dp) av(6,6),e(3)
-    type(fibre), pointer :: p
-    no=0
-    call kanalnummer(mf1)
-    open(mf1,file=FILE1)
-    call kanalnummer(mf2)
-    open(mf2,file=FILE2)
-
-    state=(my_estate-nocavity0)+radiation0
-    x=0.d0;
-    CALL FIND_ORBIT(R,X,loc,STATE,1.0e-5_dp)
-    WRITE(6,*) " CLOSED ORBIT AT LOCATION ",loc
-    write(6,*) x
-    if(track_flag(r,x,loc,state)==0) then
-       write(6,*) " stable closed orbit tracked "
-    else
-       write(6,*) " unstable closed orbit tracked "
-       stop 333
-    endif
-
-    open(unit=30,file='junk.txt')
-    call move_to(r,p,loc)
-    do i=loc,loc+r%n
-       call track(r,x,i,i+1,state)
-       p=>p%next
-       write(30,205) i,p%mag%name(1:8),x
-    enddo
-    close(30)
-205 FORMAT(1x,i4,1x,a8,1x,6(1X,D18.11))
-
-    call GET_loss(r,energy,deltap)
-    write(6,*) x
-    write(6,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
-
-    CALL INIT(state,2,0,BERZ,ND2,NPARA)
-    CALL ALLOC(Y);CALL ALLOC(NORMAL);call alloc(ys);call alloc(env);  ! ALLOCATE VARIABLES
-    !Y=NPARA
-    CALL ALLOC(ID)
-    ID=1
-    Y=X+ID
-    ys=y
-
-    CALL TRACK(R,YS,loc,state)
-    if(.not.check_stable) write(6,*) " unstable tracking envelope "
-    env%stochastic=.true.
-    env=ys
-    if(.not.check_stable) write(6,*) " unstable in normalizing envelope "
-
-    y=ys
-    normal=y
-    if(.not.check_stable) write(6,*) " unstable in normalizing map "
-    as=normal%a_t
-
-    !  TYPE beamenvelope
-    !     ! radiation normalization
-    !     type (damap) transpose    ! Transpose of map which acts on polynomials
-    !     type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
-    !     TYPE (pbresonance) bijnr   !  Equilibrium beam sizes in resonance basis
-    !     type (taylor) sij0  !  equilibrium beam sizes
-    !     real(dp) emittance(3),tune(3),damping(3)
-    !     logical AUTO,STOCHASTIC
-    !     real(dp)  KICK(3)
-    !     type (damap) STOCH
-    !  END TYPE beamenvelope
-
-    write(6,*) " Chao emittance "
-    write(6,*) env%emittance
-    write(6,*) " tunes "
-    write(6,*) env%tune
-    write(6,*) " damping decrements "
-    write(6,*) env%damping
-    write(mf1,*) " Chao emittance "
-    write(mf1,*) env%emittance
-    write(mf1,*) " tunes "
-    write(mf1,*) env%tune
-    write(mf1,*) " damping decrements "
-    write(mf1,*) env%damping
-    js=0
-    do i=1,6
-       do j=1,6
-          js(j)=1
-          m=env%STOCH%v(i).sub.js
-          write(mf1,*) m,i,j
-          js(j)=0
-       enddo
-    enddo
-    js=0
-    do i=1,6
-       do j=1,6
-          js(j)=1
-          m=ys(i)%v.sub.js
-          ! write(mf1,*) m,i,j
-          js(j)=0
-       enddo
-    enddo
-    write(mf1,*) env%kick
-    write(mf1,*) "B matrix"
-    call print(env%STOCH,mf1)
-    write(mf1,*) "m matrix"
-    call print(ys%v,mf1)
-    write(mf1,*) "equilibrium <X_i X_j>"
-    call print(env%sij0,mf1)
-    write(mf1,*) " Resonance Fluctuation "
-    call print(env%bijnr,mf1)
-    ! for etienne
-    write(mf2,*) env%kick
-    call print(env%STOCH,mf2)
-    env%STOCH=env%STOCH**(-1)
-    call print(env%STOCH,mf2)
-    call print(ys%v,mf2)
-    write(mf2,*) " Damping  "
-    write(mf2,*) env%damping
-    write(mf2,*) " Stochastic Theta "
-    call print(env%bij,mf2)
-
-    js=0
-    av=0.d0
-    e=env%emittance
-    write(mf1,*) " emmitances "
-    write(mf1,*) e
-    av(1,1)=(as(1,1)**2+as(1,2)**2)*e(1)+(as(1,3)**2+as(1,4)**2)*e(2)+ &
-         (as(1,5)**2+as(1,6)**2)*e(3)
-    av(3,3)=(as(3,1)**2+as(3,2)**2)*e(1)+(as(3,3)**2+as(3,4)**2)*e(2)+ &
-         (as(3,5)**2+as(3,6)**2)*e(3)
-    av(5,5)=(as(5,1)**2+as(5,2)**2)*e(1)+(as(5,3)**2+as(5,4)**2)*e(2)+ &
-         (as(5,5)**2+as(5,6)**2)*e(3)
-    av(3,5)=(as(3,1)*as(5,1)+as(3,2)*as(5,2))*e(1)+(as(3,3)*as(5,3)+as(3,4)*as(5,4))*e(2)+ &
-         (as(3,5)*as(5,5)+as(3,6)*as(5,6))*e(3)
-    n1=1;n2=3;
-    av(n1,n2)=(as(n1,1)*as(n2,1)+as(n1,2)*as(n2,2))*e(1)+(as(n1,3)*as(n2,3)+as(n1,4)*as(n2,4))*e(2)+ &
-         (as(n1,5)*as(n2,5)+as(n1,6)*as(n2,6))*e(3)
-    n1=3;n2=6;
-    av(n1,n2)=(as(n1,1)*as(n2,1)+as(n1,2)*as(n2,2))*e(1)+(as(n1,3)*as(n2,3)+as(n1,4)*as(n2,4))*e(2)+ &
-         (as(n1,5)*as(n2,5)+as(n1,6)*as(n2,6))*e(3)
-
-    m=env%sij0.sub.'2'
-
-    write(mf1,*) " <X**2> exact and alex "
-    write(mf1,*) m
-    write(mf1,*) av(1,1)
-    m=env%sij0.sub.'002'
-    write(mf1,*) " <y**2> exact and alex "
-    write(mf1,*) m
-    write(mf1,*) av(3,3)
-    m=env%sij0.sub.'00002'
-    write(mf1,*) " <L**2> exact and alex "
-    write(mf1,*) m
-    write(mf1,*) av(5,5)
-    m=env%sij0.sub.'001010'
-    write(mf1,*) " <y delta> exact and alex "
-    write(mf1,*) m/2.d0
-    write(mf1,*) av(3,5)
-    n1=1;n2=3;
-    m=env%sij0.sub.'101000'
-    write(mf1,*) " <x y> exact and alex "
-    write(mf1,*) m/2.d0
-    write(mf1,*) av(n1,n2)
-    n1=3;n2=6;
-    m=env%sij0.sub.'001001'
-    write(mf1,*) " <y L> exact and alex "
-    write(mf1,*) m/2.d0
-    write(mf1,*) av(n1,n2)
-
-
-
-    CALL KILL(Y);CALL KILL(Ys);CALL KILL(NORMAL);CALL KILL(env);
-
-    ! compute map with radiation minus the cavity!
-    ! cavity must be at the end and only one cavity
-
-    if(no>0) then
-       CALL INIT(STATE,no,0,BERZ,ND2,NPARA)
-       CALL ALLOC(Y);  ! ALLOCATE VARIABLES
-       write(17,*) x(1),x(2),x(3)
-       write(17,*) x(4),x(5),x(6)
-       Y=NPARA
-       Y=X
-
-       CALL TRACK(R,Y,1,r%n,STATE)
-
-       call print(y,17)
-       call kill(y)
-    endif
-    close(mf1)
-    close(mf2)
-
-  end subroutine radia
 
   SUBROUTINE remove_drifts(R,NR)
     IMPLICIT NONE
@@ -1296,7 +1127,7 @@ contains
     OPEN(UNIT=mf,FILE=FILENAME)
     t=>my_ering%t%start
     DO I=1,my_ering%T%n
-       CALL TRACK( my_ering,V,DEFAULT,POS1=I,POS2=I+1 )
+       CALL TRACK_BEAM_x( my_ering,V,DEFAULT,POS1=I,POS2=I+1 )
        IF(V%U(1)) THEN
           WRITE(6,*) " UNSTABLE ",I
           goto 12

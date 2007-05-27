@@ -380,7 +380,7 @@ contains
     type(FIBRE), pointer :: m
 
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
-    WRITE(MF,*) " DIRECTION ", M%DIR
+    WRITE(MF,'(A11,I4)') " DIRECTION ", M%DIR
     CALL print_chart(m%CHART,mf)
     CALL print_PATCH(m%PATCH,mf)
     CALL print_element(M%MAG,mf)
@@ -393,9 +393,8 @@ contains
     integer mf,I
     type(FIBRE), pointer :: m
     character*255 line
-
     READ(MF,*) LINE
-    READ(MF,*) LINE(1:9), M%DIR
+    READ(MF,'(A11,I4)') LINE(1:11),M%DIR
     CALL READ_chart(m%CHART,mf)
     CALL READ_PATCH(m%PATCH,mf)
     CALL READ_element(M%MAG,mf)

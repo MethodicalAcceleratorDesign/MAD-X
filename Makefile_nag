@@ -183,10 +183,7 @@ Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
 Si_def_element.o: Sh_def_kind.o Si_def_element.f90
 	$(f95) $(f95_FLAGS) Si_def_element.f90
 
-Sj_elements.o: Si_def_element.o Sj_elements.f90
-	$(f95) $(f95_FLAGS) Sj_elements.f90
-
-Sk_link_list.o: Sj_elements.o Sk_link_list.f90
+Sk_link_list.o: Si_def_element.o Sk_link_list.f90
 	$(f95) $(f95_FLAGS) Sk_link_list.f90
 
 Sl_family.o: Sk_link_list.o Sl_family.f90
@@ -309,7 +306,7 @@ madxp: \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
 	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
 	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
-	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o Sm_tracking.o \
+	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
 	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
 	Sr_spin.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
@@ -326,7 +323,7 @@ madxp: \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
 	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
 	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
-	Si_def_element.o Sj_elements.o Sk_link_list.o Sl_family.o Sm_tracking.o \
+	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
 	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
 	Sr_spin.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \

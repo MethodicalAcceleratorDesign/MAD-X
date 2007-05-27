@@ -90,27 +90,27 @@ module S_status
   TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,SPIN_ONLY
 
   TYPE (INTERNAL_STATE), PARAMETER :: DEFAULT0 = INTERNAL_STATE &
-       &(f,f,f,f,f,f,f,f,f,f,f,F,3)
+       &(0,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TOTALPATH0 = INTERNAL_STATE &
-       &(t,f,f,f,f,f,f,f,f,f,f,F,3)
+       &(1,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TIME0 = INTERNAL_STATE &
-       &(f,t,f,f,f,f,f,f,f,f,f,F,3)
+       &(0,t,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: RADIATION0 = INTERNAL_STATE &
-       &(f,f,t,f,f,f,f,f,f,f,f,F,3)
+       &(0,f,t,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: NOCAVITY0 = INTERNAL_STATE &
-       &(f,f,f,t,f,f,f,f,f,f,f,F,3)
+       &(0,f,f,t,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: FRINGE0 = INTERNAL_STATE &
-       &(f,f,f,f,t,f,f,f,f,f,f,F,3)
+       &(0,f,f,f,t,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: EXACTMIS0 = INTERNAL_STATE &
-       &(f,f,f,f,f,t,f,f,f,f,f,F,3)
+       &(0,f,f,f,f,t,f,f,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: ONLY_4d0 = INTERNAL_STATE &
-       &(f,f,f,t,f,f,f,t,f,f,f,F,3)
+       &(0,f,f,t,f,f,f,t,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: DELTA0   = INTERNAL_STATE &
-       &(f,f,f,t,f,f,f,t,t,f,f,F,3)
+       &(0,f,f,t,f,f,f,t,t,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN0   = INTERNAL_STATE &
-       &(f,f,f,f,f,f,f,f,f,t,f,F,3)
+       &(0,f,f,f,f,f,f,f,f,t,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN_ONLY0   = INTERNAL_STATE &
-       &(f,f,f,f,f,f,f,f,f,f,t,F,3)
+       &(0,f,f,f,f,f,f,f,f,f,t,3)
   private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
@@ -247,7 +247,7 @@ CONTAINS
     nullify(P%beta0);nullify(P%gamma0I);nullify(P%gambet);nullify(P%P0C);
     nullify(P%EDGE)
     nullify(P%TOTALPATH)
-    nullify(P%EXACT);nullify(P%RADIATION);nullify(P%RADIATION_NEW);nullify(P%NOCAVITY);
+    nullify(P%EXACT);nullify(P%RADIATION);nullify(P%NOCAVITY);
     nullify(P%FRINGE);nullify(P%KILL_ENT_FRINGE);nullify(P%KILL_EXI_FRINGE);nullify(P%bend_fringe);nullify(P%TIME);
     nullify(P%METHOD);nullify(P%NST);
     nullify(P%NMUL);nullify(P%spin);
@@ -273,7 +273,7 @@ CONTAINS
     P%beta0 =one;P%gamma0I=zero;P%gambet =zero;P%P0C =zero;
     ALLOCATE(P%EDGE(2));P%EDGE(1)=zero;P%EDGE(2)=zero;
     ALLOCATE(P%TOTALPATH); ! PART OF A STATE INITIALIZED BY EL=DEFAULT
-    ALLOCATE(P%EXACT);ALLOCATE(P%RADIATION);ALLOCATE(P%RADIATION_NEW);ALLOCATE(P%NOCAVITY);
+    ALLOCATE(P%EXACT);ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
     ALLOCATE(P%FRINGE);ALLOCATE(P%KILL_ENT_FRINGE);ALLOCATE(P%KILL_EXI_FRINGE);ALLOCATE(P%bend_fringe);ALLOCATE(P%TIME);
     ALLOCATE(P%METHOD);ALLOCATE(P%NST);P%METHOD=2;P%NST=1;
     ALLOCATE(P%NMUL);P%NMUL=0;
@@ -307,7 +307,7 @@ CONTAINS
     endif
     DEALLOCATE(P%EDGE);
     DEALLOCATE(P%TOTALPATH);
-    DEALLOCATE(P%EXACT);DEALLOCATE(P%RADIATION);DEALLOCATE(P%RADIATION_NEW);DEALLOCATE(P%NOCAVITY);
+    DEALLOCATE(P%EXACT);DEALLOCATE(P%RADIATION);DEALLOCATE(P%NOCAVITY);
     DEALLOCATE(P%FRINGE);DEALLOCATE(P%KILL_ENT_FRINGE);DEALLOCATE(P%KILL_EXI_FRINGE);DEALLOCATE(P%bend_fringe);DEALLOCATE(P%TIME);
     DEALLOCATE(P%METHOD);DEALLOCATE(P%spin);DEALLOCATE(P%NST);
     DEALLOCATE(P%NMUL)
@@ -340,7 +340,6 @@ CONTAINS
     elp%P0C =el%P0C
     elp%EXACT=el%EXACT
     elp%RADIATION=el%RADIATION
-    elp%RADIATION_NEW=el%RADIATION_NEW
     elp%TIME=el%TIME
     elp%NOCAVITY=el%NOCAVITY
     elp%spin=el%spin
@@ -439,7 +438,7 @@ CONTAINS
     logical(lp), INTENT (IN) :: S2
 
     minu=.false.
-    if(s1.and.(.not.s2)) minu=.true.
+    if(s1.and.(.not.s2)) minu=my_true
 
   END FUNCTION minu
 
@@ -624,7 +623,7 @@ CONTAINS
        write(mf,*) "This is a proton "
     endif
     write(mf, '((1X,a20,1x,a5))' )  "      EXACT_MODEL = ", CONV(EXACT_MODEL    )
-    write(mf, '((1X,a20,1x,a5))' )  "      TOTALPATH   = ", CONV(S%TOTALPATH)
+    write(mf, '((1X,a20,1x,a5))' )  "      TOTALPATH   = ", S%TOTALPATH
     write(mf, '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
     write(mf,'((1X,a20,1x,a5))' ) "      RADIATION   = ", CONV(S%RADIATION  )
     write(mf,'((1X,a20,1x,a5))' ) "      NOCAVITY    = ", CONV(S%NOCAVITY )
@@ -692,7 +691,6 @@ CONTAINS
     S2%TOTALPATH=   S1%TOTALPATH
     S2%EXACTMIS=       S1%EXACTMIS
     S2%RADIATION=     S1%RADIATION
-    S2%RADIATION_NEW=     S1%RADIATION_NEW
     S2%NOCAVITY=    S1%NOCAVITY
     S2%TIME=        S1%TIME
     S2%FRINGE=           S1%FRINGE
@@ -712,11 +710,12 @@ CONTAINS
     TYPE (INTERNAL_STATE), INTENT (IN) :: S1, S2
 
 
-    add%TOTALPATH=  S1%TOTALPATH.OR.S2%TOTALPATH
+    add%TOTALPATH=0
+    if((S1%TOTALPATH==1).OR.(S2%TOTALPATH==1)) add%TOTALPATH=1
+
     !    add%EXACT    =       S1%EXACT.OR.S2%EXACT
     add%EXACTMIS    =       S1%EXACTMIS.OR.S2%EXACTMIS
     add%RADIATION  =  S1%RADIATION.OR.S2%RADIATION
-    add%RADIATION_new  =  S1%RADIATION_new.OR.S2%RADIATION_new
     add%NOCAVITY =  S1%NOCAVITY.OR.S2%NOCAVITY
     add%TIME     =  S1%TIME.OR.S2%TIME
     add%FRINGE   =       S1%FRINGE.OR.S2%FRINGE
@@ -731,9 +730,8 @@ CONTAINS
        add%NOCAVITY =  T
     ENDIF
     IF(add%ONLY_4D) THEN
-       add%TOTALPATH=  F
+       add%TOTALPATH=  0
        add%RADIATION  =  F
-       add%RADIATION_new  =  F
        add%NOCAVITY =  T
     ENDIF
   END FUNCTION add
@@ -742,12 +740,17 @@ CONTAINS
     implicit none
     TYPE (INTERNAL_STATE) sub
     TYPE (INTERNAL_STATE), INTENT (IN) :: S1, S2
+    logical(lp) dum1,dum2
 
+    sub%TOTALPATH=0
+    dum1=S1%TOTALPATH==1
+    dum2=S2%TOTALPATH==1
+    if(dum1.min.dum2) sub%TOTALPATH=1
 
-    sub%TOTALPATH=  S1%TOTALPATH.min.S2%TOTALPATH
+    !    sub%TOTALPATH=  S1%TOTALPATH.min.S2%TOTALPATH
+
     sub%EXACTMIS    =       S1%EXACTMIS.min.S2%EXACTMIS
     sub%RADIATION  =  S1%RADIATION.min.S2%RADIATION
-    sub%RADIATION_new  =  S1%RADIATION_new.min.S2%RADIATION_new
     sub%NOCAVITY =  S1%NOCAVITY.min.S2%NOCAVITY
     sub%TIME     =  S1%TIME.min.S2%TIME
     sub%FRINGE   =       S1%FRINGE.min.S2%FRINGE
@@ -762,9 +765,8 @@ CONTAINS
        sub%NOCAVITY =  T
     ENDIF
     IF(sub%ONLY_4D) THEN
-       sub%TOTALPATH=  F
+       sub%TOTALPATH=  0
        sub%RADIATION  =  F
-       sub%RADIATION_new  =  F
        sub%NOCAVITY =  T
     ENDIF
 
@@ -782,15 +784,18 @@ CONTAINS
 
 
 
-  subroutine S_init(STATE,NO1,NP1,PACKAGE,ND2,NPARA)
+  subroutine S_init(STATE,NO1,NP1,pack,ND2,NPARA)
     !  subroutine S_init(STATE,NO1,NP1,PACKAGE,MAPINT,ND2,NPARA)
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
-    LOGICAL(lp), INTENT(IN):: PACKAGE
+    LOGICAL(lp), INTENT(IN):: pack
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
     INTEGER,optional :: ND2,NPARA
     INTEGER  ND2l,NPARAl,NSPIN1
+    LOGICAL(lp) package
+
+    package=my_true
 
     IF(STATE%SPIN_ONLY) THEN
 

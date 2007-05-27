@@ -98,16 +98,19 @@ module definition
 
   type spinor
      real(dp) x(3)
+     !  real(dp) G
   end type spinor
 
   type spinor_8
      type(real_8) x(3)
      !   type(real_8) m(3,3)
+     ! real(dp) G
   end type spinor_8
 
   type probe
      real(dp) x(6)
      type(spinor) s
+     logical u
   end type probe
 
   type probe_8
@@ -115,6 +118,7 @@ module definition
      type(spinor_8) s
      !  type (REAL_8) E_ij(ndim2,ndim2)
      real(dp) E_ij(ndim2,ndim2)
+     logical u
   end type probe_8
 
   !    scratch levels of DA using linked list
@@ -258,17 +262,18 @@ module definition
      INTEGER,POINTER :: N,ND2,no
   end  type tree_element
 
-  type daspin
+  type damapspin
      REAL(DP) X(6)
      type(damap) M
      type(real_8) s(3,3)
-  end type daspin
+  end type damapspin
 
   type normal_spin
      type(normalform) N
      type(real_8) NS(3,3)
      type(real_8) AS(3,3)
      real(dp) tune
+     type(damapspin) a_t
      integer NRES,M(NDIM)
 
   end type normal_spin

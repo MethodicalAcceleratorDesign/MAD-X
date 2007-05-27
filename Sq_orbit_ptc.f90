@@ -16,9 +16,9 @@ module orbit_ptc
 
   INTERFACE ORBIT_TRACK_NODE
      !LINKED
-     ! MODULE PROCEDURE ORBIT_TRACK_NODER
-     ! MODULE PROCEDURE ORBIT_TRACK_NODEP
-     MODULE PROCEDURE ORBIT_TRACK_NODER
+     MODULE PROCEDURE ORBIT_TRACK_NODE_Standard_R
+     ! for speed
+     !          MODULE PROCEDURE ORBIT_TRACK_NODER
      MODULE PROCEDURE ORBIT_TRACK_NODEP
   END INTERFACE
 
@@ -514,7 +514,11 @@ contains
     T=>R%T%START
     DO I=1,R%T%N-1
        cav=.false.
-       doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+       if(t%parent_fibre%mag%kind==kind4) then
+          doit=.false.
+       else
+          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+       endif
        if(T%CAS==CASEP1.AND.t%parent_fibre%mag%kind==kind4) cav=.true.
        if(T%CAS==CASEP1.AND.t%previous%parent_fibre%mag%kind==kind4) cav=.true.
        doit=doit.or.cav
@@ -522,7 +526,7 @@ contains
        IF(doit) THEN    !
           K=K+1
           DL=T%S(1)-L
-          IF(DL>DLMAX) DLMAX=DL
+          IF(DL>DLMAX.and.t%previous%parent_fibre%mag%kind/=kind4) DLMAX=DL
           L=T%S(1)
        ENDIF
        T=>T%NEXT
@@ -549,7 +553,11 @@ contains
     IF(t%parent_fibre%mag%kind==kind4) ORBIT_NODES(K)%CAVITY=MY_TRUE;
     DO I=1,R%T%N-1
        cav=.false.
-       doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+       if(t%parent_fibre%mag%kind==kind4) then
+          doit=.false.
+       else
+          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+       endif
        if(T%CAS==CASEP1.AND.t%parent_fibre%mag%kind==kind4) cav=.true.
        if(T%CAS==CASEP1.AND.t%previous%parent_fibre%mag%kind==kind4) cav=.true.
        doit=doit.or.cav
@@ -579,9 +587,11 @@ contains
     my_ORBIT_LATTICE%ORBIT_CHARGE=R%CHARGE
     my_ORBIT_LATTICE%ORBIT_N_NODE=k-1
 
-    write(6,*) size(ORBIT_NODES),my_ORBIT_LATTICE%ORBIT_N_NODE,k
+    !    write(6,*) size(ORBIT_NODES),my_ORBIT_LATTICE%ORBIT_N_NODE,k
 
     IF(DLMAX>LMAX) THEN
+       WRITE(6,*) " DLMAX > LMAX ",DLMAX
+       WRITE(6,*)  "CONSIDER RESPLITTING LATTICE "
        my_ORBIT_LATTICE%ORBIT_WARNING=10+my_ORBIT_LATTICE%ORBIT_WARNING
     ENDIF
 
@@ -599,10 +609,14 @@ contains
     P=>R%START
     DO K=1,R%N
        IF(P%PATCH%PATCH/=0) THEN
-          IF(ABS(P%PATCH%A_D(3))>my_ORBIT_LATTICE%ORBIT_MAX_PATCH_TZ) &
-               my_ORBIT_LATTICE%ORBIT_WARNING=100+my_ORBIT_LATTICE%ORBIT_WARNING
-          IF(ABS(P%PATCH%B_D(3))>my_ORBIT_LATTICE%ORBIT_MAX_PATCH_TZ) &
-               my_ORBIT_LATTICE%ORBIT_WARNING=1000+my_ORBIT_LATTICE%ORBIT_WARNING
+          IF(ABS(P%PATCH%A_D(3))>my_ORBIT_LATTICE%ORBIT_MAX_PATCH_TZ) THEN
+             my_ORBIT_LATTICE%ORBIT_WARNING=100+my_ORBIT_LATTICE%ORBIT_WARNING
+             WRITE(6,*)  "LARGE FRONT PATCH "
+          ENDIF
+          IF(ABS(P%PATCH%B_D(3))>my_ORBIT_LATTICE%ORBIT_MAX_PATCH_TZ) THEN
+             my_ORBIT_LATTICE%ORBIT_WARNING=1000+my_ORBIT_LATTICE%ORBIT_WARNING
+             WRITE(6,*)  "LARGE BACK PATCH "
+          ENDIF
        ENDIF
        P=>P%NEXT
     ENDDO

@@ -2489,17 +2489,6 @@ CONTAINS
        S2%P%METHOD=4
        deallocate(T_E,t_ax,t_ay)
     endif
-    IF(S2%KIND==KIND22) THEN
-       S2%M22%DELTAMAP=MAD_TREE_DELTAMAP
-       if(associated(s2%m22%t)) call copy_tree(mad_tree,s2%m22%t)
-       call KILL(mad_tree)
-       if(associated(s2%m22%t_rad)) call copy_tree(mad_tree_rad,s2%m22%t_rad)
-       call KILL(mad_tree_rad)
-       if(associated(s2%m22%t_rev)) call copy_tree(mad_tree_rev,s2%m22%t_rev)
-       call KILL(mad_tree_rev)
-       if(associated(s2%m22%t_rad_rev)) call copy_tree(mad_tree_rad_rev,s2%m22%t_rad_rev)
-       call KILL(mad_tree_rad_rev)
-    ENDIF
 
     IF(S2%KIND==KIND4) THEN
        S2%C4%N_BESSEL=S1%N_BESSEL

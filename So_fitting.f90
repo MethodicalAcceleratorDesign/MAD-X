@@ -5,7 +5,7 @@ module S_fitting
   USE MAD_LIKE
   IMPLICIT NONE
   public
-  PRIVATE FIND_ORBIT_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
+  PRIVATE FIND_ORBIT_LAYOUT, FIND_ORBIT_LAYOUT_noda
   logical(lp), PRIVATE :: VERBOSE = .false.
   integer :: max_fit_iter=20, ierror_fit=0, max_fiND_iter=40
   real(dp) :: fuzzy_split=one
@@ -17,8 +17,6 @@ module S_fitting
      ! LINKED
      ! no use of TPSA
      MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda
-     !RETURN QUADRATIC YS
-     MODULE PROCEDURE FIND_ENV_LAYOUT
   END INTERFACE
 
 
@@ -1078,7 +1076,7 @@ contains
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
+    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
     nf=y
     TA(1)=0.75d0
     TA(2)=0.68d0
@@ -1108,7 +1106,7 @@ contains
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
+    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
     eq(1)=(eq(1)*8 + (1.d0+nf%dhdj%v(1)))*3-targ(1)
     eq(2)=(eq(2)*8 + (1.d0+nf%dhdj%v(2)))*3-targ(2)
@@ -1255,7 +1253,7 @@ contains
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
+    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
     nf=y
     TA(1)=0.75d0
     TA(2)=0.68d0
@@ -1356,7 +1354,7 @@ contains
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
+    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     write(6,*) "before stable nf=y", check_stable
     !    global_verbose=.true.
     nf=y
@@ -1527,7 +1525,7 @@ contains
     endif
 101 continue
     !    ND2=2*ND1
-    if(stat%totalpath.and.(.not.stat%nocavity)) then
+    if(stat%totalpath==1.and.(.not.stat%nocavity)) then
        C=>RING%START
        freq=zero
        i=1
@@ -1759,7 +1757,7 @@ contains
 101 continue
 
 
-    if(stat%totalpath.and.(.not.stat%nocavity)) then
+    if(stat%totalpath==1.and.(.not.stat%nocavity)) then
        C=>RING%START
        freq=zero
        i=1
@@ -1919,249 +1917,6 @@ contains
 
   END SUBROUTINE FIND_ORBIT_LAYOUT_noda
 
-  SUBROUTINE FIND_ENV_LAYOUT(RING,YS,FIX,LOC,STATE,emit) ! Finds envelope with TPSA in State or compatible state
-    IMPLICIT NONE
-    logical(lp) :: doneitt=.true.
-    TYPE(layout),INTENT(inOUT):: RING
-    real(dp)  FIX(6),DIX(6),xdix0,mat(6,6),flu(6,6)
-    TYPE(REAL_8) X(6)
-    TYPE(ENV_8),INTENT(INOUT)::YS(6)
-    TYPE(DAMAP) MX,SX,SXI,IS
-    type(beamenvelope) env
-    integer NO1,ND2,ND1 ,I,LOC ,J
-    INTEGER  JJ(LNV)
-    real(dp),optional, intent(inout)::emit(3)
-    type(internal_state),optional, intent(in)::STATE
-    type(internal_state) sss
-    TYPE (fibre), POINTER :: C
-    logical(lp) APERTURE
-    APERTURE=c_%APERTURE_FLAG
-    c_%APERTURE_FLAG=.false.
-
-    Nullify(C);
-
-    if(.not.ring%closed) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1) = " This line is not ring : FIND_ENV_LAYOUT "
-       call write_e(100)
-    endif
-    dix(:)=zero
-
-    if(present(state)) then
-       if(state%nocavity.or.(.not.state%radiation)) then
-          sss=(STATE-nocavity0-only_4d0-delta0)+radiation0
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72))'
-          w_p%c(1) = " Inputed State modified temporarily "
-          w_p%c(2) = " to be compatible with Beam Envelope"
-          if(verbose) call write_i
-       else
-          sss=STATE
-       endif
-    else
-       if(default%nocavity.or.(.not.default%radiation)) then
-          sss=(default-nocavity0-only_4d0-delta0)+radiation0
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72))'
-          w_p%c(1) = " Inputed State modified temporarily "
-          w_p%c(2) = " to be compatible with Beam Envelope"
-          if(verbose) call write_i
-       else
-          sss=default
-       endif
-    endif
-
-    C=>RING%START
-    do i=1,RING%n
-       if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
-       C=>C%NEXT
-    enddo
-    w_p=0
-    w_p%nc=2
-    w_p%fc='((1X,a72))'
-    w_p%c(1) = " No Cavity in the Line "
-    w_p%c(2) = " FIND_ENV_LAYOUT will crash "
-    call write_e(111)
-101 continue
-
-    xdix0=c_1d4*DEPS_tracking
-
-    NO1=1
-    ND1=3
-    ND2=2*ND1
-    DO I=1,LNV
-       JJ(I)=0
-    ENDDO
-    call init(NO1,ND1,0,0,doneitt)
-
-    CALL ALLOC(X,6)
-    CALL ALLOC(MX)
-    CALL ALLOC(SX)
-    CALL ALLOC(SXI)
-    CALL ALLOC(IS)
-    CALL ALLOC(YS,6)
-    CALL FIND_ORBIT(RING,FIX,LOC,SSS,c_1d_8)
-    X=ND2
-    DO I=1,6
-       X(I)=FIX(I)
-    ENDDO
-
-    YS=X
-
-    CALL TRACK(RING,YS,LOC,SSS)
-
-    DO I=1,6
-       DO J=1,6
-          JJ(J)=1
-          CALL PEK(YS(i)%V%T,JJ,mat(i,j))
-          JJ(J)=0
-       ENDDO
-    ENDDO
-
-    DO I=1,6
-       DO J=1,6
-          flu(i,j)=YS(i)%e(j)
-       ENDDO
-    ENDDO
-
-    CALL KILL(X,6)
-    CALL KILL(MX)
-    CALL KILL(SX)
-    CALL KILL(SXI)
-    CALL KILL(IS)
-    CALL KILL(YS,6)
-
-    call init(2,ND1,0,0,doneitt)
-
-    CALL alloc(YS)
-    CALL alloc(MX)
-    call alloc(env)
-
-    DO I=1,6
-       mx%v(i)=mx%v(i)+fix(i)
-       DO J=1,6
-          JJ(J)=1
-          CALL POK(mx%v(i),JJ,mat(i,j))
-          JJ(J)=0
-       ENDDO
-    ENDDO
-    !ys%v=mx
-    !do i=1,6
-    !ys(i)%v=mx%v(i)       ! this works
-    !enddo
-    ys=mx       ! implemented in extend_poly.f90
-    DO I=1,6
-       DO J=1,6
-          YS(i)%e(j)=flu(i,j)
-       ENDDO
-    ENDDO
-    env=ys
-    ys=env
-    DO I=1,6
-       DO J=1,6
-          JJ(J)=1
-          flu(i,j)=ys(i)%sigma0(j)
-          JJ(J)=0
-       ENDDO
-    ENDDO
-    if(present(emit)) emit=env%emittance
-    CALL kill(env)
-    CALL kill(MX)
-    CALL kill(YS)
-    call init(1,ND1,0,0,doneitt)
-    CALL alloc(YS)
-    CALL alloc(MX)
-    mx=1
-    DO I=1,6
-       mx%v(i)=mx%v(i)+fix(i)
-    ENDDO
-    ys=mx       ! implemented in extend_poly.f90
-    DO I=1,6
-       DO J=1,6
-          ys(i)%sigma0(j)=flu(i,j)
-       ENDDO
-    ENDDO
-    CALL kill(MX)
-
-
-    c_%APERTURE_FLAG=APERTURE
-
-  END SUBROUTINE FIND_ENV_LAYOUT
-
-  SUBROUTINE find_ENVELOPE(RING,YS,A1,FIX,LOC,STATE)
-    ! Finds Envelope with TPSA in state supplied by user which may include parameters
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: RING
-    TYPE(real_8),INTENT(INOUT)::A1(6)
-    TYPE(ENV_8),INTENT(INOUT)::YS(6)
-    real(dp),INTENT(INOUT)::FIX(6)
-    INTEGER,INTENT(IN) :: LOC
-    TYPE(INTERNAL_STATE),INTENT(IN) :: STATE
-    TYPE(REAL_8) Y(6)
-    TYPE(DAMAP) ID
-    TYPE(NORMALFORM) NORMAL
-    logical(lp) APERTURE
-    APERTURE=c_%APERTURE_FLAG
-    c_%APERTURE_FLAG=.false.
-
-
-    CALL ALLOC(Y)
-    CALL ALLOC(ID)
-    CALL ALLOC(NORMAL)
-
-    y=6
-    y=FIX
-
-    CALL TRACK(RING,Y,LOC,STATE)
-    if(.not.check_stable) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       write(w_p%c(1),'(a16)') " find_ENVELOPE 1"
-       call write_i
-       CALL KILL(NORMAL)
-       CALL KILL(ID)
-       CALL KILL(Y)
-
-       return
-    endif
-    normal= y
-    y=normal%a1+FIX
-
-    a1=y
-    ys=y
-    CALL TRACK(RING,Ys,loc,STATE)
-    if(.not.check_stable) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       write(w_p%c(1),'(a16)') " find_ENVELOPE 2"
-       call write_i
-       CALL KILL(NORMAL)
-       CALL KILL(ID)
-       CALL KILL(Y)
-
-       return
-    endif
-
-    y=YS
-    id=y
-    id=(normal%a1**(-1))*id
-    y=id+FIX
-    ys=y
-
-
-    CALL KILL(NORMAL)
-    CALL KILL(ID)
-    CALL KILL(Y)
-    c_%APERTURE_FLAG=APERTURE
-
-
-  END SUBROUTINE find_ENVELOPE
 
   SUBROUTINE fit_all_bends(r,state)
     IMPLICIT NONE
@@ -3296,7 +3051,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) "  TRACK(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 ) "
     WRITE(MF,*) "                                            "
-    CALL TRACK(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    CALL TRACK_BEAM(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
 
 
 
@@ -3333,7 +3088,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) "  INDEX OF THE FIRST SLICE   =",IT1
     WRITE(MF,*) "  INDEX OF THE FINAL SLICE   =",IT2
-    CALL TRACK(R,B(2),STATE,POS1=IT1,POS2=IT2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    CALL TRACK_BEAM(R,B(2),STATE,POS1=IT1,POS2=IT2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -3347,7 +3102,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) "  TRACK(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) "
     WRITE(MF,*) "                                            "
-    CALL TRACK(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    CALL TRACK_BEAM(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -3362,7 +3117,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_LAYOUT_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_BEAM_S(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -3385,7 +3140,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) "  TRACK(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )  "
     WRITE(MF,*) "                                            "
-    CALL TRACK(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
+    CALL TRACK_BEAM(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -3401,7 +3156,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_LAYOUT_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_BEAM_S(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF)
 
@@ -3424,7 +3179,7 @@ contains
     WRITE(MF,*) "                                            "
     WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
     WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_LAYOUT_S12(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_BEAM_S(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
     ! WE PRINT THE RESULTS
     CALL PRINT_beam(B(2),MF,I=1)
     CALL COPY_BEAM(B(2),B(1))
@@ -3435,7 +3190,7 @@ contains
     WRITE(MF,*) "  TRACK(B(2),TOTAL_LENGTH,STATE) "
     WRITE(MF,*) "                                            "
 
-    CALL TRACK(B(2),TOTAL_LENGTH,STATE)       !  TRACK_THIN_T(B,DT,K)
+    CALL TRACK_BEAM_T(B(2),TOTAL_LENGTH,STATE)       !  TRACK_THIN_T(B,DT,K)
 
     CALL PRINT_beam(B(2),MF,I=1)
 
@@ -3450,7 +3205,7 @@ contains
     S_INITIAL = ONE
     S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%NODE%S(3)+B(2)%X(1,7)
 
-    CALL TRACK_LAYOUT_S12(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
+    CALL TRACK_BEAM_S(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
 
     CALL PRINT_beam(B(1),MF,I=1)
 

@@ -57,6 +57,8 @@ module polymorphic_taylor
   !private assp
   PRIVATE SINH_HR
   PRIVATE SIN_HR
+  ! PROBE_8 STUFF
+  PRIVATE RADTAYLORprobe_8,beamprobe_8
   real(dp) :: sinhx_x_min=c_0_0001
   real(dp) :: sinhx_x_minp=one  !  1.e-9  !c_0_0001
 
@@ -91,7 +93,8 @@ module polymorphic_taylor
      !  allowing normalization of polymorphic arrays directly
      MODULE PROCEDURE beamENV_8
      MODULE PROCEDURE normal_p
-
+     MODULE PROCEDURE RADTAYLORprobe_8
+     MODULE PROCEDURE beamprobe_8
   end  INTERFACE
 
 
@@ -5967,6 +5970,45 @@ contains
     enddo
 
   END SUBROUTINE RADTAYLORENV_8
+
+  SUBROUTINE  RADTAYLORprobe_8(S1,S2)
+    implicit none
+    type (probe_8),INTENT(in) ::S2
+    type (RADTAYLOR),INTENT(inout),dimension(:)::S1
+    integer i,J
+
+    call check_snake
+
+    do i=1,nd2
+       s1(i)%V= s2%X(I)        !%t
+    enddo
+    do i=1,nd2
+       do J=1,nd2
+          s1(i)%E(J)=s2%E_IJ(i,J)          !%t
+       enddo
+    enddo
+
+  END SUBROUTINE RADTAYLORprobe_8
+
+  SUBROUTINE  beamprobe_8(S2,Sprobe_8)
+    implicit none
+    type (beamenvelope),INTENT(inout)::S2
+    type (radtaylor) S1(ndim2)
+    type (probe_8),INTENT(IN)::Sprobe_8
+
+    call alloc(s1,nd2)
+
+    call check_snake
+
+    S1=Sprobe_8
+
+
+    s2=s1
+
+    call kill(s1,nd2)
+
+
+  END SUBROUTINE beamprobe_8
 
   SUBROUTINE  resetenv(S2)
     implicit none

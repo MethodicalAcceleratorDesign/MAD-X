@@ -345,7 +345,7 @@ CONTAINS
     do i=nd2+1,ndd
        localmaster=master
        call ass(daddsc(i))
-       if(nd2==4.and.c_%npara==5) then
+       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
           daddsc(i)=s2(i)+(one.mono.'00001')
        else
           daddsc(i)=s2(i)
@@ -373,7 +373,7 @@ CONTAINS
     do i=nd2+1,ndd
        localmaster=master
        call ass(scdadd(i))
-       if(nd2==4.and.c_%npara==5) then
+       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
           scdadd(i)=s2(i)+(one.mono.'00001')
        else
           scdadd(i)=s2(i)

@@ -1066,34 +1066,34 @@ CONTAINS
        EL%ECOL19%P=>EL%P
        EL%ECOL19%L=>EL%L
        nullify(EL%ECOL19%A);ALLOCATE(EL%ECOL19%A);CALL ALLOC(EL%ECOL19%A)
-    CASE(KIND22)
-       if(.not.ASSOCIATED(EL%M22)) THEN
-          ALLOCATE(EL%M22)
-          el%M22=0
-       ELSE
-          el%M22=-1
-          el%M22=0
-       ENDIF
-       EL%M22%P=>EL%P
-       !       CALL NULL_TREE(EL%M22%T)
-       allocate(EL%M22%DELTAMAP)
-       EL%M22%DELTAMAP=.TRUE.
-       if(NTOT/=0) then
-          allocate(EL%M22%T)
-          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
-       endif
-       if(NTOT_rad/=0) then
-          allocate(EL%M22%T_rad)
-          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
-       endif
-       if(NTOT_REV/=0) then
-          allocate(EL%M22%T_REV)
-          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
-       endif
-       if(NTOT_rad_REV/=0) then
-          allocate(EL%M22%T_rad_REV)
-          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
-       endif
+       !    CASE(KIND22)
+       !       if(.not.ASSOCIATED(EL%M22)) THEN
+       !          ALLOCATE(EL%M22)
+       !          el%M22=0
+       !       ELSE
+       !          el%M22=-1
+       !          el%M22=0
+       !       ENDIF
+       !       EL%M22%P=>EL%P
+       !
+       !       allocate(EL%M22%DELTAMAP)
+       !       EL%M22%DELTAMAP=.TRUE.
+       !       if(NTOT/=0) then
+       !          allocate(EL%M22%T)
+       !          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
+       !       endif
+       !       if(NTOT_rad/=0) then
+       !          allocate(EL%M22%T_rad)
+       !          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
+       !       endif
+       !       if(NTOT_REV/=0) then
+       !          allocate(EL%M22%T_REV)
+       !          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
+       !       endif
+       !       if(NTOT_rad_REV/=0) then
+       !          allocate(EL%M22%T_rad_REV)
+       !          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
+       !       endif
        !    CASE(KINDUSER1)
        !       if(.not.ASSOCIATED(EL%U1)) THEN
        !          ALLOCATE(EL%U1)
@@ -1474,33 +1474,33 @@ CONTAINS
        EL%ECOL19%P=>EL%P
        EL%ECOL19%L=>EL%L
        nullify(EL%ECOL19%A);ALLOCATE(EL%ECOL19%A);CALL ALLOC(EL%ECOL19%A)
-    CASE(KIND22)
-       if(.not.ASSOCIATED(EL%M22)) THEN
-          ALLOCATE(EL%M22)
-          el%M22=0
-       ELSE
-          el%M22=-1
-          el%M22=0
-       ENDIF
-       EL%M22%P=>EL%P
-       allocate(EL%M22%DELTAMAP)
-       EL%M22%DELTAMAP=.TRUE.
-       if(NTOT/=0) then
-          allocate(EL%M22%T)
-          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
-       endif
-       if(NTOT_rad/=0) then
-          allocate(EL%M22%T_rad)
-          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
-       endif
-       if(NTOT_REV/=0) then
-          allocate(EL%M22%T_REV)
-          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
-       endif
-       if(NTOT_rad_REV/=0) then
-          allocate(EL%M22%T_rad_REV)
-          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
-       endif
+       !    CASE(KIND22)
+       !       if(.not.ASSOCIATED(EL%M22)) THEN
+       !          ALLOCATE(EL%M22)
+       !          el%M22=0
+       !       ELSE
+       !          el%M22=-1
+       !          el%M22=0
+       !       ENDIF
+       !       EL%M22%P=>EL%P
+       !       allocate(EL%M22%DELTAMAP)
+       !       EL%M22%DELTAMAP=.TRUE.
+       !       if(NTOT/=0) then
+       !          allocate(EL%M22%T)
+       !          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
+       !       endif
+       !       if(NTOT_rad/=0) then
+       !          allocate(EL%M22%T_rad)
+       !          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
+       !       endif
+       !       if(NTOT_REV/=0) then
+       !          allocate(EL%M22%T_REV)
+       !          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
+       !       endif
+       !       if(NTOT_rad_REV/=0) then
+       !          allocate(EL%M22%T_rad_REV)
+       !          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
+       !       endif
        !    CASE(KINDUSER1)
        !       if(.not.ASSOCIATED(EL%U1)) THEN
        !          ALLOCATE(EL%U1)
@@ -1869,16 +1869,15 @@ CONTAINS
     TYPE(ELEMENT), INTENT(INOUT)::EL
     TYPE(INTERNAL_STATE), INTENT(IN)::S
 
-    IF(S%TOTALPATH) THEN
-       EL%P%TOTALPATH=1
-    ELSE
-       EL%P%TOTALPATH=0
-    ENDIF
+    !    IF(S%TOTALPATH) THEN
+    EL%P%TOTALPATH=S%TOTALPATH
+    !    ELSE
+    !       EL%P%TOTALPATH=S%TOTALPATH
+    !    ENDIF
     EL%P%RADIATION=S%RADIATION
     EL%P%TIME=S%TIME
     EL%P%NOCAVITY=S%NOCAVITY
     EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
-    EL%P%RADIATION_new=S%RADIATION_new
     EL%P%SPIN=S%SPIN
     !    EL%P%SPIN_ONLY=S%SPIN_ONLY
   END SUBROUTINE MAGSTATE
@@ -1889,16 +1888,15 @@ CONTAINS
     TYPE(ELEMENTP), INTENT(INOUT)::EL
     TYPE(INTERNAL_STATE), INTENT(IN)::S
 
-    IF(S%TOTALPATH) THEN
-       EL%P%TOTALPATH=1
-    ELSE
-       EL%P%TOTALPATH=0
-    ENDIF
+    !    IF(S%TOTALPATH) THEN
+    EL%P%TOTALPATH=S%TOTALPATH
+    !    ELSE
+    !       EL%P%TOTALPATH=S%TOTALPATH
+    !    ENDIF
     EL%P%RADIATION=S%RADIATION
     EL%P%TIME=S%TIME
     EL%P%NOCAVITY=S%NOCAVITY
     EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
-    EL%P%RADIATION_new=S%RADIATION_new
     EL%P%SPIN=S%SPIN
     !    EL%P%SPIN_ONLY=S%SPIN_ONLY
 
@@ -1930,7 +1928,7 @@ CONTAINS
     nullify(EL%CAV21);
     nullify(EL%S5);
     nullify(EL%T6);
-    nullify(EL%M22);
+    !    nullify(EL%M22);
     nullify(EL%S17);
     nullify(EL%T7);
     nullify(EL%S8);
@@ -1974,7 +1972,7 @@ CONTAINS
     nullify(EL%CAV21);
     nullify(EL%S5);
     nullify(EL%T6);
-    nullify(EL%M22);
+    !    nullify(EL%M22);
     nullify(EL%S17);
     nullify(EL%T7);
     nullify(EL%S8);
@@ -2046,10 +2044,10 @@ CONTAINS
           EL%T6=-1
           DEALLOCATE(EL%T6)   ! thick sixtrack
        ENDIF
-       IF(ASSOCIATED(EL%M22)) THEN
-          EL%M22=-1
-          DEALLOCATE(EL%M22)   ! thick sixtrack
-       ENDIF
+       !       IF(ASSOCIATED(EL%M22)) THEN
+       !          EL%M22=-1
+       !          DEALLOCATE(EL%M22)   ! thick sixtrack
+       !       ENDIF
        IF(ASSOCIATED(EL%S17)) THEN
           EL%S17=-1
           DEALLOCATE(EL%S17)   ! thick sixtrack
@@ -2205,10 +2203,10 @@ CONTAINS
           EL%T6=-1
           DEALLOCATE(EL%T6)       ! INTEGRATOR
        endif
-       IF(ASSOCIATED(EL%M22)) then
-          EL%M22=-1
-          DEALLOCATE(EL%M22)       ! INTEGRATOR
-       endif
+       !       IF(ASSOCIATED(EL%M22)) then
+       !          EL%M22=-1
+       !          DEALLOCATE(EL%M22)       ! INTEGRATOR
+       !       endif
        IF(ASSOCIATED(EL%S17)) then
           EL%S17=-1
           DEALLOCATE(EL%S17)       ! INTEGRATOR
@@ -2470,19 +2468,19 @@ CONTAINS
 
     IF(EL%KIND==KIND6) CALL SETFAMILY(ELP)
 
-    IF(EL%KIND==KIND22) THEN
-       i=0;j=0;k=0;l=0;
-       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
-       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
-       if(associated(EL%M22%T)) k=EL%M22%T%N
-       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
-       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
-       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
-       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
-       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
-       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
-       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
-    ENDIF
+    !    IF(EL%KIND==KIND22) THEN
+    !       i=0;j=0;k=0;l=0;
+    !       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
+    !       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
+    !       if(associated(EL%M22%T)) k=EL%M22%T%N
+    !       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
+    !       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
+    !       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
+    !       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
+    !       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
+    !       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
+    !       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
+    !    ENDIF
 
     IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
@@ -2685,20 +2683,20 @@ CONTAINS
 
     IF(EL%KIND==KIND6) CALL SETFAMILY(ELP)
 
-    IF(EL%KIND==KIND22) THEN
-       i=0;j=0;k=0;l=0;
-       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
-       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
-       if(associated(EL%M22%T)) k=EL%M22%T%N
-       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
-       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
-       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
-
-       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
-       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
-       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
-       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
-    ENDIF
+    !    IF(EL%KIND==KIND22) THEN
+    !       i=0;j=0;k=0;l=0;
+    !       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
+    !       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
+    !       if(associated(EL%M22%T)) k=EL%M22%T%N
+    !       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
+    !       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
+    !       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
+    !
+    !       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
+    !       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
+    !       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
+    !       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
+    !    ENDIF
 
     IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
@@ -2905,20 +2903,20 @@ CONTAINS
 
     IF(EL%KIND==KIND6) CALL SETFAMILY(ELP)
 
-    IF(EL%KIND==KIND22) THEN
-       i=0;j=0;k=0;l=0;
-       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
-       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
-       if(associated(EL%M22%T)) k=EL%M22%T%N
-       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
-       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
-       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
-
-       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
-       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
-       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
-       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
-    ENDIF
+    !    IF(EL%KIND==KIND22) THEN
+    !       i=0;j=0;k=0;l=0;
+    !       if(associated(EL%M22%T_REV)) i=EL%M22%T_REV%N
+    !       if(associated(EL%M22%T_rad_REV)) j=EL%M22%T_rad_REV%N
+    !       if(associated(EL%M22%T)) k=EL%M22%T%N
+    !       if(associated(EL%M22%T_rad)) l=EL%M22%T_rad%N
+    !       CALL SETFAMILY(ELP,NTOT=k,ntot_rad=l,NTOT_REV=i,ntot_rad_REV=j,ND2=6)
+    !       ELP%M22%DELTAMAP=EL%M22%DELTAMAP
+    !
+    !       if(associated(EL%M22%T))  CALL COPY_TREE(EL%M22%T,ELP%M22%T)
+    !       if(associated(EL%M22%T_rad)) CALL COPY_TREE(EL%M22%T_rad,ELP%M22%T_rad)
+    !       if(associated(EL%M22%T_REV)) CALL COPY_TREE(EL%M22%T_REV,ELP%M22%T_REV)
+    !       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
+    !    ENDIF
 
     IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.

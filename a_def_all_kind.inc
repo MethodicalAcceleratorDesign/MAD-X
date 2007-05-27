@@ -284,16 +284,16 @@ END  TYPE STREXP
 ! fitted magnet stuff
 
 !  NO POLYMORPH NECESSARY: DESCRIBES A TAYLOR MAP AS IN COSY-INFINITY
-TYPE MARTIN
-   TYPE(MAGNET_CHART), POINTER :: P
-   TYPE(tree_element), POINTER :: T
-   TYPE(tree_element), POINTER :: T_RAD
-   TYPE(tree_element), POINTER :: T_REV
-   TYPE(tree_element), POINTER :: T_RAD_REV
-   real(dp),pointer :: E(:,:)
-   real(dp),pointer :: E_REV(:,:)
-   logical(lp), POINTER :: deltamap
-END  TYPE MARTIN
+!TYPE MARTIN
+!   TYPE(MAGNET_CHART), POINTER :: P
+!   TYPE(tree_element), POINTER :: T
+!   TYPE(tree_element), POINTER :: T_RAD
+!   TYPE(tree_element), POINTER :: T_REV
+!   TYPE(tree_element), POINTER :: T_RAD_REV
+!   real(dp),pointer :: E(:,:)
+!   real(dp),pointer :: E_REV(:,:)
+!   logical(lp), POINTER :: deltamap
+!END  TYPE MARTIN
 
 ! GENERAL PANCAKE
 

@@ -183,165 +183,172 @@ contains
   end subroutine accel_ORBIT_up_grade_mag_all
 
 
-end module accel_ptc
 
 
 !!!!!!!!!!! fake orbit !!!!!!!!!!!!!!!!!!
 
-subroutine accel_orbit_beam(ring)
-  use accel_ptc
-  implicit none
-  integer n_turn,i,k,npart,j,kk
-  type(layout), target :: ring
-  TYPE(BEAM),target :: RAYS
-  real(dp) sig0(6),x(6)
-  integer mf
-  type(fibre), pointer :: p
-  npart=1
-  sig0=1.e-6
+  subroutine accel_orbit_beam(ring)
+    !use accel_ptc
+    implicit none
+    integer n_turn,i,k,npart,j,kk
+    type(layout), target :: ring
+    TYPE(BEAM),target :: RAYS
+    real(dp) sig0(6),x(6)
+    integer mf
+    type(fibre), pointer :: p
+    npart=9
+    sig0=1.e-6
 
-  CALL create_beam(RAYS,npart,2.D0,SIG0)
+    CALL create_beam(RAYS,npart,2.D0,SIG0)
 
-  my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
-  open(unit=mf, file='40kV.dat')
-  if(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) then
-     do i=1,RAYS%n
-        read(mf,*) RAYS%x(i,1:4), RAYS%x(i,5), RAYS%x(i,6)
-     enddo
-  else
-     stop 999
-     do i=1,RAYS%n
-        read(mf,*) RAYS%x(i,1:4), RAYS%x(i,6), RAYS%x(i,5)
-        RAYS%x(i,1:4)=RAYS%x(i,1:4)/1.0e3_dp
-        RAYS%x(i,5)=RAYS%x(i,5)/my_ORBIT_LATTICE%orbit_p0c
-        RAYS%x(i,6)=RAYS%x(i,6)/my_ORBIT_LATTICE%ORBIT_omega
-     enddo
-  endif
+    my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
+    open(unit=mf, file='wp2_029_300kW_J54_INJALL_TRM_210kVM_Bf016.dat')
+    if(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) then
+       do i=1,RAYS%n
+          read(mf,*) RAYS%x(i,1:4), RAYS%x(i,5), RAYS%x(i,6)
+       enddo
+    else
+       stop 999
+       do i=1,RAYS%n
+          read(mf,*) RAYS%x(i,1:4), RAYS%x(i,6), RAYS%x(i,5)
+          RAYS%x(i,1:4)=RAYS%x(i,1:4)/1.0e3_dp
+          RAYS%x(i,5)=RAYS%x(i,5)/my_ORBIT_LATTICE%orbit_p0c
+          RAYS%x(i,6)=RAYS%x(i,6)/my_ORBIT_LATTICE%ORBIT_omega
+       enddo
+    endif
 
-  close(mf)
+    close(mf)
 
-  call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
-  !call make_table("ACCWAVE_40kV_280kV_350ms.DAT")
-  !call make_table("ACCWAVE_210KVH9_350ms.DAT")
-  !call make_table("noaccel.DAT")
+    !call make_table("NOACC_ACC_210.DAT")
+    call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
+    !call make_table("ACCWAVE_40kV_280kV_350ms.DAT")
+    !call make_table("ACCWAVE_210KVH9_350ms.DAT")
+    !call make_table("noaccel.DAT")
 
-  write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
-  write(6,*) my_ORBIT_LATTICE%ORBIT_omega
-  write(6,*) c_%phase0
-  default=my_ORBIT_LATTICE%state
+    write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
+    write(6,*) my_ORBIT_LATTICE%ORBIT_omega
+    write(6,*) c_%phase0
+    default=my_ORBIT_LATTICE%state
 
-  IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
-     call kanalnummer(mf)
-     open(unit=mf,file='crazy_orbit_unit.dat')
-  else
-     stop 998
-     call kanalnummer(mf)
-     open(unit=mf,file='crazy_ptc_unit.dat')
-  endif
-  WRITE(6,*) " n_TURN "
-  READ(5,*) N_TURN
-  !n_turn=20
+    IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+       call kanalnummer(mf)
+       open(unit=mf,file='crazy_orbit_unit.dat')
+    else
+       stop 998
+       call kanalnummer(mf)
+       open(unit=mf,file='crazy_ptc_unit.dat')
+    endif
+    WRITE(6,*) " n_TURN "
+    READ(5,*) N_TURN
+    !n_turn=20
 
-  !rays%x(2,1:6)=0.d0
-  !rays%x(2,6)=0.00001d0
+    !rays%x(2,1:6)=0.d0
+    !rays%x(2,6)=0.00001d0
 
-  call ptc_synchronous_set(-1)
-  write(6,*) " reading rays after some turns ?"
-  read(5,*) i
-  if(i==1) then
-     call ptc_synchronous_set(-2)
-     if(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) then
-        do i=1,RAYS%n
-           read(mf,*) RAYS%x(i,1:4), RAYS%x(i,5), RAYS%x(i,6)
-        enddo
-     else
-        stop 997
-        do i=1,RAYS%n
-           read(mf,*) RAYS%x(i,1:4), RAYS%x(i,6), RAYS%x(i,5)
-           RAYS%x(i,1:4)=RAYS%x(i,1:4)/1.0e3_dp
-           RAYS%x(i,5)=RAYS%x(i,5)/my_ORBIT_LATTICE%orbit_p0c
-           RAYS%x(i,6)=RAYS%x(i,6)/my_ORBIT_LATTICE%ORBIT_omega
-        enddo
-     endif
+    call ptc_synchronous_set(-1)
+    write(6,*) " reading rays after some turns ?"
+    read(5,*) i
+    if(i==1) then
+       call ptc_synchronous_set(-2)
+       if(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) then
+          do i=1,RAYS%n
+             read(mf,*) RAYS%x(i,1:4), RAYS%x(i,5), RAYS%x(i,6)
+          enddo
+       else
+          stop 997
+          do i=1,RAYS%n
+             read(mf,*) RAYS%x(i,1:4), RAYS%x(i,6), RAYS%x(i,5)
+             RAYS%x(i,1:4)=RAYS%x(i,1:4)/1.0e3_dp
+             RAYS%x(i,5)=RAYS%x(i,5)/my_ORBIT_LATTICE%orbit_p0c
+             RAYS%x(i,6)=RAYS%x(i,6)/my_ORBIT_LATTICE%ORBIT_omega
+          enddo
+       endif
 
-     close(mf)
-     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
-        call kanalnummer(mf)
-        open(unit=mf,file='crazy_orbit_unit2.dat')
-     else
-        stop 996
-        call kanalnummer(mf)
-        open(unit=mf,file='crazy_ptc_unit2.dat')
-     endif
+       close(mf)
+       IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+          call kanalnummer(mf)
+          open(unit=mf,file='crazy_orbit_unit2.dat')
+       else
+          stop 996
+          call kanalnummer(mf)
+          open(unit=mf,file='crazy_ptc_unit2.dat')
+       endif
 
-  endif
+    endif
 
-  !       write(6,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
-  !       write(6,*)x_orbit(5),my_ORBIT_LATTICE%dxs6
-  !       write(6,*)my_ORBIT_LATTICE%freqa,my_ORBIT_LATTICE%freqb
-  !!       write(6,*)my_ORBIT_LATTICE%volta,my_ORBIT_LATTICE%voltb
-  !      write(6,*)my_ORBIT_LATTICE%phasa,my_ORBIT_LATTICE%phasb
-  !      write(6,*)x_orbit(5),my_ORBIT_LATTICE%dxs6
-  !      write(6,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    !       write(6,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    !       write(6,*)x_orbit(5),my_ORBIT_LATTICE%dxs6
+    !       write(6,*)my_ORBIT_LATTICE%freqa,my_ORBIT_LATTICE%freqb
+    !!       write(6,*)my_ORBIT_LATTICE%volta,my_ORBIT_LATTICE%voltb
+    !      write(6,*)my_ORBIT_LATTICE%phasa,my_ORBIT_LATTICE%phasb
+    !      write(6,*)x_orbit(5),my_ORBIT_LATTICE%dxs6
+    !      write(6,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    call print(my_ORBIT_LATTICE%state,6)
+
+    do j=1,n_turn
+       !if(j==2) my_ORBIT_LATTICE%accel=.false.
+       if(mod(j,100)==0) then
+          write(6,*) " turn ",j,rays%x(1,6),x_orbit_sync(6)
+       endif
+       do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
+
+          call ptc_synchronous_set(i)
+          do k=1,rays%n
+
+             IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+
+                call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
+                     rays%x(k,5),rays%x(k,6))
+             else
+                stop 990
+                call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
+                     rays%x(k,5),rays%x(k,6))
+
+             endif
+
+          enddo
+
+          call ptc_synchronous_after(i)
+
+       enddo
+       write(25,*)  rays%x(1,5),rays%x(1,6)
+       kk=2
+       !IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+       ! write(mf,'(E15.8,1x,E15.8,1x)') rays%x(kk,5)/my_ORBIT_LATTICE%ORBIT_OMEGA,rays%x(kk,6)/my_ORBIT_LATTICE%ORBIT_P0C
+    enddo
+    call ptc_synchronous_after(-2)
+
+    DO KK=1,RAYS%N
+       !write(mf,'(6(E15.8,1x))') rays%x(kk,1:6)
+       write(mf,*) rays%x(kk,1:6)
+    ENDDO
+    !do kk=1,rays%n
+    !IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+    ! write(mf,'(6(E15.8,1x))') rays%x(kk,1:6)
+    ! write(mf,'(E15.8,1x,E15.8,1x)') rays%x(kk,5)/my_ORBIT_LATTICE%ORBIT_OMEGA,rays%x(kk,6)/my_ORBIT_LATTICE%ORBIT_P0C
+    !else
+    ! write(mf,'(E15.8,1x,E15.8,1x)') rays%x(kk,6),rays%x(kk,5)
+    !endif
+    !enddo
+    close(mf)
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(6,*) x_orbit_sync
+    write(6,*) rays%x(1,1:6)
+    !write(6,*) rays%x(2,1:6)
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
+    write(6,*) my_ORBIT_LATTICE%ORBIT_omega
+    write(6,*) c_%phase0
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    !stop
+  end subroutine accel_orbit_beam
 
 
-  do j=1,n_turn
-     !if(j==2) my_ORBIT_LATTICE%accel=.false.
-     if(mod(j,100)==0) then
-        write(6,*) " turn ",j,rays%x(1,6),x_orbit_sync(6)
-     endif
-     do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
 
-        call ptc_synchronous_set(i)
-        do k=1,rays%n
+end module accel_ptc
 
-           IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
 
-              call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
-                   rays%x(k,5),rays%x(k,6))
-           else
-              stop 990
-              call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
-                   rays%x(k,5),rays%x(k,6))
 
-           endif
-
-        enddo
-
-        call ptc_synchronous_after(i)
-
-     enddo
-     write(25,*)  rays%x(1,5),rays%x(1,6)
-     kk=2
-     !IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
-     ! write(mf,'(E15.8,1x,E15.8,1x)') rays%x(kk,5)/my_ORBIT_LATTICE%ORBIT_OMEGA,rays%x(kk,6)/my_ORBIT_LATTICE%ORBIT_P0C
-  enddo
-  call ptc_synchronous_after(-2)
-
-  DO KK=1,RAYS%N
-     !write(mf,'(6(E15.8,1x))') rays%x(kk,1:6)
-     write(mf,*) rays%x(kk,1:6)
-  ENDDO
-  !do kk=1,rays%n
-  !IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
-  ! write(mf,'(6(E15.8,1x))') rays%x(kk,1:6)
-  ! write(mf,'(E15.8,1x,E15.8,1x)') rays%x(kk,5)/my_ORBIT_LATTICE%ORBIT_OMEGA,rays%x(kk,6)/my_ORBIT_LATTICE%ORBIT_P0C
-  !else
-  ! write(mf,'(E15.8,1x,E15.8,1x)') rays%x(kk,6),rays%x(kk,5)
-  !endif
-  !enddo
-  close(mf)
-  write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-  write(6,*) x_orbit_sync
-  write(6,*) rays%x(1,1:6)
-  !write(6,*) rays%x(2,1:6)
-  write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-  write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
-  write(6,*) my_ORBIT_LATTICE%ORBIT_omega
-  write(6,*) c_%phase0
-  write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-  !stop
-end subroutine accel_orbit_beam
 
 !===========================================================
 ! This subroutine should be called before particle tracking.
@@ -352,14 +359,12 @@ end subroutine accel_orbit_beam
 !===========================================================
 SUBROUTINE ptc_synchronous_set(i_node)
 
-!  USE accel_ptc ,vrff=>vrf,freqf=>freq
-  USE accel_ptc ,myvrf=>vrf,freqf=>freq
+  USE accel_ptc     !,vrff=>vrf,freqf=>freq
   IMPLICIT NONE
   INTEGER  i_node
   INTEGER  i_node1,i,mf,j
   type(internal_state) state
-!  real(dp) p0,vrf,dphat,freq,dphase0,dphase
-  real(dp) p0,dphat,freq,dphase0,dphase
+  real(dp) p0,vrfx,dphat,freqf,dphase0,dphase
   TYPE(INTEGRATION_NODE), POINTER  :: T
 
 
@@ -374,8 +379,9 @@ SUBROUTINE ptc_synchronous_set(i_node)
      default=my_ORBIT_LATTICE%state
      my_ORBIT_LATTICE%first=my_true
      my_ORBIT_LATTICE%xs6=-1.e38_dp  ! very big number
-
-     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
+     !for speed
+     !     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
+     !  end for speed
      return
   elseif(i_node>=0) then
 
@@ -384,11 +390,11 @@ SUBROUTINE ptc_synchronous_set(i_node)
      state=my_ORBIT_LATTICE%state
      my_ORBIT_LATTICE%state=my_ORBIT_LATTICE%state+totalpath0
      ! for speed
-     t=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE
-     DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%dpos
-        t%parent_fibre%mag=my_ORBIT_LATTICE%state
-        T=>T%NEXT
-     ENDDO
+     !       t=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE
+     !       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%dpos
+     !          t%parent_fibre%mag=my_ORBIT_LATTICE%state
+     !          T=>T%NEXT
+     !       ENDDO
      ! end for speed
      if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
         p_orbit=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE%parent_fibre
@@ -424,18 +430,18 @@ SUBROUTINE ptc_synchronous_set(i_node)
         my_ORBIT_LATTICE%orbit_deltae=zero
         w1_orbit=p_orbit
         w2_orbit=0
-        call get_from_table_volt(x_orbit_sync(6),p0,myvrf,dphat)
+        call get_from_table_volt(x_orbit_sync(6),p0,vrfx,dphat)
 
         call find_energy(w2_orbit,p0c=p0)
         my_ORBIT_LATTICE%orbit_deltae=(w2_orbit%energy-w1_orbit%energy)
-        freq=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
-        p_orbit%mag%freq=freq
+        freqf=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
+        p_orbit%mag%freq=freqf
         if(p_orbit%mag%l/=zero) then
-           p_orbit%mag%volt=-myvrf/p_orbit%mag%l
-           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%parent_laYOUT%CHARGE/&
-                p_orbit%mag%volt/c_1d_3/p_orbit%mag%L)-c_%phase0
+           p_orbit%mag%volt=-vrfx/p_orbit%mag%l
+           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%parent_laYOUT%CHARGE &
+                /p_orbit%mag%volt/c_1d_3/p_orbit%mag%L)-c_%phase0
         else
-           p_orbit%mag%volt=-myvrf
+           p_orbit%mag%volt=-vrfx
            dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%parent_laYOUT%CHARGE/p_orbit%mag%volt/c_1d_3)-c_%phase0
         endif
         dphase=dphase0-twopi*p_orbit%mag%freq*x_orbit_sync(6)/CLIGHT
@@ -443,11 +449,11 @@ SUBROUTINE ptc_synchronous_set(i_node)
         call ptc_to_orbit(x_orbit_sync)
 
      endif
-
+     ! for speed
      CALL ORBIT_TRACK_NODE(i_node1,x_orbit_sync)
 
      if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
-        if(.not.state%totalpath) then
+        if(.not.state%totalpath==1) then
            p_orbit%mag%phas=dphase0
            p_orbit%magp%phas=dphase0
         endif
@@ -485,11 +491,11 @@ SUBROUTINE ptc_synchronous_set(i_node)
 
      my_ORBIT_LATTICE%state=state
      ! for speed
-     t=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE
-     DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%dpos
-        t%parent_fibre%mag=my_ORBIT_LATTICE%state
-        T=>T%NEXT
-     ENDDO
+     !       t=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE
+     !       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%dpos
+     !          t%parent_fibre%mag=my_ORBIT_LATTICE%state
+     !          T=>T%NEXT
+     !       ENDDO
      ! end for speed
   elseif(i_node==-2) then
      if(.not.my_ORBIT_LATTICE%accel) return
@@ -535,25 +541,11 @@ SUBROUTINE ptc_synchronous_set(i_node)
      call accel_ORBIT_up_grade_mag_all
      return
   elseif(i_node==-3) then
+     stop 553
      call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
      return
   elseif(i_node==-4) then
-     call kanalnummer(mf)
-     open(unit=mf,file=def_orbit_node)
-
-     t=>my_ORBIT_LATTICE%ORBIT_NODES(1)%NODE
-     write(mf,*) " Number of PTC Nodes  ",my_ORBIT_LATTICE%ORBIT_N_NODE-1
-
-     do j=1,my_ORBIT_LATTICE%ORBIT_N_NODE
-        write(mf,*) "****************************************************"
-        write(mf,*) " Node Number ",j-1
-        write(mf,*) " Number of PTC Integration Nodes",my_ORBIT_LATTICE%ORBIT_NODES(j)%dpos
-        DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(j)%dpos
-           write(mf,*) t%S(1),t%parent_fibre%mag%name,' ',t%parent_fibre%pos,t%cas
-           T=>T%NEXT
-        ENDDO
-     enddo
-     close(mf)
+     stop 554
      return
   elseif(i_node==-5) then
      !    my_ORBIT_LATTICE%state=my_estate
@@ -639,7 +631,7 @@ subroutine ptc_track_particle(node_index, x,xp,y,yp,phi,dE)
   if(my_ORBIT_LATTICE%accel) then
      !  goto 111
      if(my_ORBIT_LATTICE%ORBIT_NODES(i)%CAVITY) then
-        if(my_ORBIT_LATTICE%state%totalpath) then
+        if(my_ORBIT_LATTICE%state%totalpath==1) then
            if(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) then
               x6=(x_orbit(5)- my_ORBIT_LATTICE%xs6)/my_ORBIT_LATTICE%dxs6
            else

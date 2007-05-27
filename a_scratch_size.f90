@@ -75,6 +75,7 @@ module precision_constants
   real(dp),parameter::A_ELECTRON=1.159652e-3_dp
   real(dp),parameter::A_MUON=1.165923e-3_dp
   real(dp),parameter::A_PROTON=1.7928474e-0_dp
+  real(dp),parameter::A_particle=A_ELECTRON
   real(dp),parameter::pmae=5.10998902e-4_dp
   real(dp),parameter::pmae_amu=5.48579903e-4_dp
   ![GeV]

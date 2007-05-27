@@ -11,15 +11,15 @@ MODULE S_TRACKING
   type(fibre), pointer :: lost_fibre
 
   ! linked
-  PRIVATE TRACK_LAYOUT_FLAG_R,TRACK_LAYOUT_FLAG_P,TRACK_LAYOUT_FLAG_S
+  PRIVATE TRACK_LAYOUT_FLAG_R,TRACK_LAYOUT_FLAG_P
   !  PRIVATE FIND_ORBIT_LAYOUT,FIND_ORBIT_M_LAYOUT,FIND_ENV_LAYOUT, FIND_ORBIT_LAYOUT_noda
-  PRIVATE TRACK_LAYOUT_FLAG_R1,TRACK_LAYOUT_FLAG_P1,TRACK_LAYOUT_FLAG_S1
-  PRIVATE MIS_FIBR,MIS_FIBP,MIS_FIBS,PATCH_FIBR,PATCH_FIBP,PATCH_FIBS
-  PRIVATE TRACK_FIBRE_R,TRACK_FIBRE_P,TRACK_FIBRE_S
-  PRIVATE TRACK_LAYOUT_FLAG_R1f,TRACK_LAYOUT_FLAG_P1f,TRACK_LAYOUT_FLAG_S1f
-  PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf,TRACK_LAYOUT_FLAG_Sf
+  PRIVATE TRACK_LAYOUT_FLAG_R1,TRACK_LAYOUT_FLAG_P1
+  PRIVATE MIS_FIBR,MIS_FIBP,PATCH_FIBR,PATCH_FIBP
+  PRIVATE TRACK_FIBRE_R,TRACK_FIBRE_P
+  PRIVATE TRACK_LAYOUT_FLAG_R1f,TRACK_LAYOUT_FLAG_P1f
+  PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf
   ! old Sj_elements
-  PRIVATE TRACKR,TRACKP,TRACKS
+  PRIVATE TRACKR,TRACKP
   logical(lp),TARGET :: other_program=.false.
   logical(lp),TARGET :: x_prime=.false.
   integer j_global
@@ -39,18 +39,14 @@ MODULE S_TRACKING
      ! linked
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_R
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_P
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_S
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_R1
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_P1
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_S1
      MODULE PROCEDURE TRACK_FIBRE_R
      MODULE PROCEDURE TRACK_FIBRE_P
-     MODULE PROCEDURE TRACK_FIBRE_S
      ! old Sj_elements
      !  INTERFACE TRACK
      MODULE PROCEDURE TRACKR
      MODULE PROCEDURE TRACKP
-     MODULE PROCEDURE TRACKS
      !  END INTERFACE
      ! END old Sj_elements
   END INTERFACE
@@ -59,23 +55,19 @@ MODULE S_TRACKING
   INTERFACE TRACK_FLAG
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_R1f
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_P1f
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_S1f
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_Rf
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_Pf
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_Sf
   END INTERFACE
 
 
   INTERFACE PATCH_FIB
      MODULE PROCEDURE PATCH_FIBR
      MODULE PROCEDURE PATCH_FIBP
-     MODULE PROCEDURE PATCH_FIBS
   END INTERFACE
 
   INTERFACE MIS_FIB
      MODULE PROCEDURE MIS_FIBR
      MODULE PROCEDURE MIS_FIBP
-     MODULE PROCEDURE MIS_FIBS
   END INTERFACE
 
 
@@ -133,8 +125,6 @@ contains
        call TRACK(EL%ECOL19,X,MID)
     CASE(KIND21)
        call TRACK(EL%CAV21,X,MID)
-    CASE(KIND22)
-       call TRACK(EL%M22,X,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,MID)
     case(KINDPA)
@@ -197,8 +187,6 @@ contains
        call TRACK(EL%ECOL19,X)
     CASE(KIND21)
        call TRACK(EL%CAV21,X)
-    CASE(KIND22)
-       call TRACK(EL%M22,X)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X)
     case(KINDPA)
@@ -211,84 +199,6 @@ contains
        CALL WRITE_E(0)
     END SELECT
   END SUBROUTINE TRACKP
-
-  SUBROUTINE TRACKS(EL,X,K)
-    IMPLICIT NONE
-    TYPE(ENV_8),INTENT(INOUT):: X(6)
-    TYPE(ELEMENTP),INTENT(INOUT):: EL
-    !    TYPE(INNER_ENV_8_DATA),OPTIONAL, INTENT(INOUT):: MID
-    TYPE(INTERNAL_STATE) K
-
-    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
-    if(other_program) then
-       write(6,*) " OTHER PROGRAM FORBIDDEN "
-       STOP 350
-    endif
-    SELECT CASE(EL%KIND)
-    CASE(KIND0)
-       !       IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    case(KIND1)
-       CALL TRACK(EL%D0,X)
-    case(KIND2)
-       CALL TRACK(EL%K2,X)
-    case(KIND3)
-       CALL TRACK(EL%K3,X)
-    case(KIND4)
-       CALL TRACK(EL%C4,X)
-    case(KIND5)
-       CALL TRACK(EL%S5,X)
-    case(KIND6)
-       CALL TRACK(EL%T6,X)
-    case(KIND7)
-       CALL TRACK(EL%T7,X)
-    case(KIND8)
-       CALL TRACK(EL%S8,X)
-    case(KIND9)
-       CALL TRACK(EL%S9,X)
-    case(KIND10)
-       CALL TRACK(EL%TP10,X)
-    CASE(KIND11:KIND14)
-       call TRACK(EL%MON14,X)
-    CASE(KIND15)
-       call TRACK(EL%SEP15,X)
-    CASE(KIND16,KIND20)
-       call TRACK(EL%K16,X)
-    CASE(KIND17)
-       call TRACK(EL%S17,X)
-    CASE(KIND18)
-       call TRACK(EL%RCOL18,X)
-    CASE(KIND19)
-       call TRACK(EL%ECOL19,X)
-    CASE(KIND21)
-       call TRACK(EL%CAV21,X)
-    CASE(KIND22)
-       call TRACK(EL%M22,X)
-       !    CASE(KIND23)
-       !       if(el%p%dir==1) then
-       !!          call TRACK(EL%G23,X,1,K)
-       !      else
-       !          call TRACK(EL%G23,X,EL%G23%N,0,K)
-       !       endif
-       !    case(KINDUSER1)
-       !       call TRACK(EL%U1,X)
-       !    case(KINDUSER2)
-       !       call TRACK(EL%U2,X)
-    case(KINDWIGGLER)
-       call TRACK(EL%WI,X)
-    case(KINDPA)
-       call TRACK(EL%PA,X)
-
-    case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKS"
-       CALL WRITE_E(0)
-    END SELECT
-
-
-
-  END SUBROUTINE TRACKS
 
   ! END old Sj_elements
 
@@ -319,21 +229,6 @@ contains
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_P1f)
 
   end  function TRACK_LAYOUT_FLAG_P1f
-
-  !  recursive
-  integer function TRACK_LAYOUT_FLAG_S1f(R,X,II1,k)
-    implicit none
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE(ENV_8), INTENT(INOUT):: X(6)
-    !    TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: II1
-
-
-    call track(R,X,II1,k)
-    call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_S1f)
-
-  end  function TRACK_LAYOUT_FLAG_S1f
 
   !  recursive
   SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
@@ -381,29 +276,6 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_P1
 
   !  recursive
-  SUBROUTINE TRACK_LAYOUT_FLAG_S1(R,X,II1,k) ! Tracks envelope from II1 to the end or back to II1 if closed
-    implicit none
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE(ENV_8), INTENT(INOUT):: X(6)
-    !    TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: II1
-    INTEGER II2
-
-
-    CALL RESET_APERTURE_FLAG
-
-    IF(R%CLOSED) THEN
-       II2=II1+R%N
-    ELSE
-       II2=R%N+1
-    ENDIF
-
-    CALL TRACK(R,X,II1,II2,k)
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
-  END SUBROUTINE TRACK_LAYOUT_FLAG_S1
-
-  !  recursive
   integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: R
@@ -428,21 +300,6 @@ contains
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_Pf)
 
   end  function TRACK_LAYOUT_FLAG_Pf
-
-  !  recursive
-  integer function TRACK_LAYOUT_FLAG_Sf(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE(ENV_8), INTENT(INOUT):: X(6)
-    !    TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: I1,I2
-
-    call track(R,X,I1,I2,k)
-    call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_Sf)
-
-  end  function TRACK_LAYOUT_FLAG_Sf
-
 
   !  recursive
   SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
@@ -556,110 +413,6 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_P
 
   !  recursive
-  SUBROUTINE TRACK_LAYOUT_FLAG_S(R,X,I1,I2,k) ! Tracks envelopes from i1 to i2 in state k
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE(ENV_8), INTENT(INOUT):: X(6)
-    !    TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: I1,I2
-    INTEGER I,J,M,N,I22
-    ! YS SPECIFIC STUFF
-    TYPE(DAMAP) ID,XT,DISP
-    TYPE(REAL_8) XR(6),X1,X3
-    real(dp) V(6)
-    TYPE (fibre), POINTER :: C
-
-
-
-    CALL RESET_APERTURE_FLAG
-
-    call move_to(r,c,I1)
-
-    !    ! new stuff with kind=3
-    !    IF(k%para_in ) knob=.true.
-    !    ! end new stuff with kind=3
-
-
-    if(i2>=i1) then
-       i22=i2
-    else
-       i22=r%n+i2
-    endif
-
-    !    if(i2>i1) then
-    J=I1
-
-    DO  WHILE(J<I22.AND.ASSOCIATED(C))
-       j_global=j
-
-       CALL TRACK(C,X,K,R%CHARGE)
-
-       C=>C%NEXT
-       J=J+1
-    ENDDO
-    !    else
-    !       J=I1
-
-    !       DO  WHILE(J>I2.AND.ASSOCIATED(C))
-    !          j_global=j
-
-    !          c%dir=-c%dir
-    !          CALL TRACK(C,X,K,R%CHARGE,X_IN)
-    !          c%dir=-c%dir
-
-    !          C=>C%previous
-    !          J=J-1
-    !       ENDDO
-
-    !    endif
-    !    ! new stuff with kind=3
-    !    knob=.FALSE.
-    !    ! end new stuff with kind=3
-
-    ! Radiation
-
-    CALL ALLOC(ID);CALL ALLOC(XT);CALL ALLOC(DISP);
-    CALL ALLOC(X1,X3);CALL ALLOC(XR);
-    xr=x
-    v=xr
-    id=0
-    XT=XR
-    DISP=XT*ID
-    ID=1
-    DISP=ID-DISP
-    XT=DISP*XT
-
-    xr=xt+v
-
-
-    do i=1,6
-       do j=1,6
-          X(I)%SIGMAf(J)=zero
-       enddo
-    enddo
-
-    do i=1,6
-       do j=1,6
-          DO M=1,6
-             DO N=1,6
-                X1=(xr(I)).par.ind_stoc(M)
-                X3=(xr(j)).par.ind_stoc(n)
-                X(I)%SIGMAf(J)=X(m)%E(n)*x1*x3+X(I)%SIGMAf(J)
-                X(I)%SIGMAf(J)=X(m)%SIGMA0(n)*x1*x3+X(I)%SIGMAf(J)
-             enddo
-          enddo
-       enddo
-    enddo
-
-    CALL KILL(XT);CALL KILL(DISP);
-    CALL KILL(X1,X3);CALL KILL(XR);
-
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
-  END SUBROUTINE TRACK_LAYOUT_FLAG_S
-
-
-  !  recursive
   SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
     implicit none
     logical(lp) :: doneitt=.true.
@@ -762,7 +515,7 @@ contains
        CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH/=0)) THEN
        X(6)=X(6)+C%PATCH%a_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
@@ -796,7 +549,7 @@ contains
     CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH/=0)) THEN
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -985,7 +738,7 @@ contains
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     ! TIME PATCH
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH/=0)) THEN
        X(6)=X(6)+C%PATCH%A_T
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
@@ -1024,7 +777,7 @@ contains
 
     !EXIT PATCH
     ! TIME PATCH
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH/=0)) THEN
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -1114,284 +867,6 @@ contains
   END SUBROUTINE TRACK_FIBRE_P
 
 
-  !  recursive
-  SUBROUTINE TRACK_FIBRE_S(C,X,K,CHARGE)   !,UPDATE
-    implicit none
-    logical(lp) :: doneitt=.true.
-    logical(lp) :: doneitf=.false.
-    TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    TYPE(ENV_8), INTENT(INOUT):: X(6)
-    !    TYPE(INNER_ENV_8_DATA), OPTIONAL,INTENT(INOUT):: X_IN
-    TYPE(REAL_8)  Y(6)
-    INTEGER, optional,target, INTENT(IN) :: CHARGE
-    TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    logical(lp) ou,patch
-    INTEGER(2) PATCHT,PATCHG,PATCHE
-    !    TYPE(UPDATING), optional,intent(in):: UPDATE
-    TYPE (fibre), POINTER :: CN
-    real(dp), POINTER :: P0,B0
-    ! YS SPECIFIC STUFF
-    TYPE(DAMAP) ID,XT,DISP
-    TYPE(REAL_8) XR(6),X1,X3
-    real(dp) V(6)
-    INTEGER I,J,M,N
-    integer,target :: charge1
-    TYPE(REAL_8) xp
-
-    IF(.NOT.CHECK_STABLE) return
-    C%MAGP=K
-
-    if(c_%x_prime) then
-       call alloc(xp)  ! deallocated below
-       call alloc(y)
-       P0=>C%MAGP%P%P0C
-       B0=>C%MAGP%P%BETA0
-       IF(C%MAGP%P%exact)THEN
-          IF(C%MAGP%P%TIME)THEN
-             xp=y(2)/sqrt(one+two*y(5)/B0+y(5)**2-y(2)**2-y(4)**2)
-             y(4)=y(4)/sqrt(one+two*y(5)/B0+y(5)**2-y(2)**2-y(4)**2)
-             y(2)=xp
-          else
-             xp=y(2)/sqrt((one+y(5))**2-y(2)**2-y(4)**2)
-             y(4)=y(4)/sqrt((one+y(5))**2-y(2)**2-y(4)**2)
-             y(2)=xp
-          endif
-       else
-          IF(C%MAGP%P%TIME)THEN
-             y(2)=y(2)/sqrt(one+two*y(5)/B0+y(5)**2)
-             y(4)=y(4)/sqrt(one+two*y(5)/B0+y(5)**2)
-          else
-             y(2)=y(2)/(one+y(5))
-             y(4)=y(4)/(one+y(5))
-          endif
-       endif
-       call kill(y)
-    endif
-
-
-
-    ! new stuff with kind=3
-    IF(k%para_in ) knob=.true.
-    ! end new stuff with kind=3
-
-    ! DIRECTIONAL VARIABLE
-    C%MAGP%P%DIR=>C%DIR
-    if(present(charge)) then
-       C%MAGP%P%CHARGE=>CHARGE
-    else
-       charge1=1
-       C%MAGP%P%CHARGE=>CHARGE1
-    endif
-    !
-
-    !FRONTAL PATCH
-    IF(ASSOCIATED(C%PATCH)) THEN
-       PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
-    ELSE
-       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
-    ENDIF
-
-
-    !   IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-6)
-
-    IF(PATCHE/=0.AND.PATCHE/=2) THEN
-       CALL ALLOC(Y)
-       Y=X
-       NULLIFY(P0);NULLIFY(B0);
-       CN=>C%PREVIOUS
-       IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
-          !          IF(.NOT.CN%PATCH%ENERGY) THEN   ! No need to patch IF PATCHED BEFORE
-          IF(CN%PATCH%ENERGY==0) THEN   ! No need to patch IF PATCHED BEFORE
-             P0=>CN%MAGP%P%P0C
-             B0=>CN%MAGP%P%BETA0
-
-             Y(2)=Y(2)*P0/C%MAGP%P%P0C
-             Y(4)=Y(4)*P0/C%MAGP%P%P0C
-             IF(C%MAGP%P%TIME)THEN
-                Y(5)=SQRT(one+two*Y(5)/B0+Y(5)**2)  !Y(5) = 1+DP/P0C_OLD
-                Y(5)=Y(5)*P0/C%MAGP%P%P0C-one !Y(5) = DP/P0C_NEW
-                Y(5)=(two*Y(5)+Y(5)**2)/(SQRT(one/C%MAGP%P%BETA0**2+two*Y(5)+Y(5)**2)+one/C%MAGP%P%BETA0)
-             ELSE
-                Y(5)=(one+Y(5))*P0/C%MAGP%P%P0C-one
-             ENDIF
-          ENDIF ! No need to patch
-       ENDIF ! ASSOCIATED
-
-       X=Y
-       CALL KILL(Y)
-    ENDIF
-    !       IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-5)
-
-
-
-
-
-
-    IF(PATCHG==1.or.PATCHG==3) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
-       CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
-    ENDIF
-    !       IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
-
-
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(.NOT.K%TOTALPATH)) THEN
-       CALL ALLOC(Y)
-       Y=X
-       Y(6)=Y(6)+C%PATCH%A_T
-       X=Y
-       CALL KILL(Y)
-    ENDIF
-
-    !       IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
-
-
-    CALL DTILTD(C%DIR,C%MAGP%P%TILTD,1,X)
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
-
-    IF(C%MAGP%MIS) THEN
-       ou = K%EXACTMIS.or.C%MAGP%EXACTMIS
-       CALL MIS_FIB(C,X,OU,DONEITT)
-    ENDIF
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-1)
-
-    CALL TRACK(C%MAGP,X,K)
-
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-
-    IF(C%MAGP%MIS) THEN
-       CALL MIS_FIB(C,X,OU,DONEITF)
-    ENDIF
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-
-    CALL DTILTD(C%DIR,C%MAGP%P%TILTD,2,X)
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-
-    IF(PATCHT/=0.AND.PATCHT/=1.AND.(.NOT.K%TOTALPATH)) THEN
-       CALL ALLOC(Y)
-       Y=X
-       Y(6)=Y(6)+C%PATCH%b_T
-       X=Y
-       CALL KILL(Y)
-    ENDIF
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-
-    IF(PATCHG==2.or.PATCHG==3) THEN
-       patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
-       CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
-    ENDIF
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-
-    IF(PATCHE/=0.AND.PATCHE/=1) THEN
-       CALL ALLOC(Y)
-       Y=X
-       NULLIFY(P0);NULLIFY(B0);
-       CN=>C%NEXT
-       IF(.NOT.ASSOCIATED(CN)) CN=>C
-       P0=>CN%MAGP%P%P0C
-       B0=>CN%MAGP%P%BETA0
-       Y(2)=Y(2)*C%MAGP%P%P0C/P0
-       Y(4)=Y(4)*C%MAGP%P%P0C/P0
-       IF(C%MAGP%P%TIME)THEN
-          Y(5)=SQRT(one+two*Y(5)/C%MAGP%P%BETA0+Y(5)**2)  !Y(5) = 1+DP/P0C_OLD
-          Y(5)=Y(5)*C%MAGP%P%P0C/P0-one !Y(5) = DP/P0C_NEW
-          Y(5)=(two*Y(5)+Y(5)**2)/(SQRT(one/B0**2+two*Y(5)+Y(5)**2)+one/B0)
-       ELSE
-          Y(5)=(one+Y(5))*C%MAGP%P%P0C/P0-one
-       ENDIF
-       X=Y
-       CALL KILL(Y)
-    ENDIF
-
-
-    nullify(C%MAGP%P%DIR)
-    nullify(C%MAGP%P%CHARGE)
-
-
-    if(c_%x_prime) then
-       call alloc(y)
-       P0=>C%MAGP%P%P0C
-       B0=>C%MAGP%P%BETA0
-       IF(C%MAGP%P%exact)THEN
-          IF(C%MAGP%P%TIME)THEN
-             xp=sqrt(one+two*y(5)/B0+y(5)**2)*y(2)/sqrt(one+y(2)**2+y(4)**2)
-             y(4)=sqrt(one+two*y(5)/B0+y(5)**2)*y(4)/sqrt(one+y(2)**2+y(4)**2)
-             y(2)=xp
-          else
-             xp=(one+y(5))*y(2)/sqrt(one+y(2)**2+y(4)**2)
-             y(4)=(one+y(5))*y(4)/sqrt(one+y(2)**2+y(4)**2)
-             y(2)=xp
-          endif
-       else
-          IF(C%MAGP%P%TIME)THEN
-             y(2)=sqrt(one+two*y(5)/B0+y(5)**2)*y(2)
-             y(4)=sqrt(one+two*y(5)/B0+y(5)**2)*y(4)
-          else
-             y(2)=(one+y(5))*y(2)
-             y(4)=(one+y(5))*y(4)
-          endif
-       endif
-       call kill(xp)
-       call kill(y)
-    endif
-
-
-
-    C%MAGP=DEFAULT
-
-
-    if(abs(x(1)%v)+abs(x(3)%v)>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
-       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_S"
-       CHECK_STABLE=.false.
-    endif
-    lost_fibre=>c
-
-    ! new stuff with kind=3
-    knob=ALWAYS_knobs
-    ! end new stuff with kind=3
-    if(COMPUTE) then
-       ! Radiation
-
-       CALL ALLOC(ID);CALL ALLOC(XT);CALL ALLOC(DISP);
-       CALL ALLOC(X1,X3);CALL ALLOC(XR);
-       xr=x
-       v=xr
-       id=0
-       XT=XR
-       DISP=XT*ID
-       ID=1
-       DISP=ID-DISP
-       XT=DISP*XT
-
-       xr=xt+v
-
-
-       do i=1,6
-          do j=1,6
-             X(I)%SIGMAf(J)=zero
-          enddo
-       enddo
-
-       do i=1,6
-          do j=1,6
-             DO M=1,6
-                DO N=1,6
-                   X1=(xr(I)).par.ind_stoc(M)
-                   X3=(xr(j)).par.ind_stoc(n)
-                   X(I)%SIGMAf(J)=X(m)%E(n)*x1*x3+X(I)%SIGMAf(J)
-                   X(I)%SIGMAf(J)=X(m)%SIGMA0(n)*x1*x3+X(I)%SIGMAf(J)
-                enddo
-             enddo
-          enddo
-       enddo
-
-       CALL KILL(XT);CALL KILL(DISP);
-       CALL KILL(X1,X3);CALL KILL(XR);
-
-    endif
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-
-  END SUBROUTINE TRACK_FIBRE_S
-
 
   SUBROUTINE PATCH_FIBR(C,X,PATCH,ENTERING)
     implicit none
@@ -1445,28 +920,6 @@ contains
 
 
   END SUBROUTINE PATCH_FIBP
-
-  SUBROUTINE PATCH_FIBS(C,Y,PATCH,ENTERING)
-    implicit none
-    ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
-    TYPE(FIBRE),INTENT(INOUT):: C
-    TYPE(ENV_8), INTENT(INOUT):: Y(6)
-    TYPE(REAL_8) X(6)
-    logical(lp),INTENT(IN):: PATCH,ENTERING
-
-    CALL ALLOC(X)
-    X=Y
-    CALL PATCH_FIB(C,X,PATCH,ENTERING)
-
-    Y=X
-
-    CALL KILL(X)
-
-  END SUBROUTINE PATCH_FIBS
-
-
-
-
 
   !   Misalignment routines
   SUBROUTINE MIS_FIBR(C,X,OU,ENTERING)
@@ -1563,20 +1016,6 @@ contains
        ENDIF
     ENDIF
   END SUBROUTINE MIS_FIBP
-
-
-  SUBROUTINE MIS_FIBS(C,Y,OU,ENTERING) ! Misaligns envelope fibres in PTC order for forward and backward fibres
-    implicit none
-    TYPE(FIBRE),INTENT(INOUT):: C
-    type(ENV_8), INTENT(INOUT):: Y(6)
-    type(REAL_8) X(6)
-    logical(lp),INTENT(IN):: OU,ENTERING
-    CALL ALLOC(X,6)
-    X=Y
-    CALL MIS_FIB(C,X,OU,ENTERING)
-    Y=X
-    CALL KILL(X,6)
-  END SUBROUTINE MIS_FIBS
 
   SUBROUTINE TRACK_R(X)
     IMPLICIT NONE

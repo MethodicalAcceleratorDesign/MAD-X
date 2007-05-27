@@ -292,6 +292,7 @@ contains
     zero_(:)=zero
     !    if(old) then
     if(s2%normal%linear%V(1)%i==0)  call crap1("normalMAP 1") !call allocw(s2%normal%linear%V(1))  ! changed
+
     if(S2%auto) then
        !     call setidpr(-100,S2%plane)
        if(print77) then
@@ -302,6 +303,8 @@ contains
     else
        call setidpr(0,S2%plane)
     endif
+    ! global_verbose=.true.
+    !    call setidpr(0,S2%plane)
     CALL INPUTRES(S2%M,S2%NRES)
     JUNK=S1
     S2%a%CONSTANT=JUNK

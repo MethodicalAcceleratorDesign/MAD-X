@@ -13,25 +13,41 @@ module tree_element_MODULE
   PRIVATE EQUAL_RAY8_SPINOR8,EQUAL_SPINOR8_SPINOR8,EQUAL_IDENTITY_SPINOR_8,EQUAL_SPINOR8_RAY8
   PRIVATE  EQUAL_IDENTITY_RAY_8,ALLOC_daspin,EQUAL_DASPIN_RAY8,EQUAL_RAY8_DASPIN
   private alloc_normal_spin,kill_normal_spin !,EQUAL_NORMAL_DASPIN
-  private READ_DASPIN,PRINT_DASPIN
+  private READ_DASPIN,PRINT_DASPIN,EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
+  PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
+  private EQUAL_IDENTITY_SPINOR_8_r3
 
   private power_rotr,find_ar,norm_matr,anti_matr
   private power_rotp,find_ap,norm_matp,anti_matp
   private  find_n_thetar,find_n_thetap
   !  private smatp,smatmulp
   private exp_n_thetar,exp_n_thetap,inv_asr,inv_asp !,inv_as
+  PRIVATE EQUAL_DASPIN,daddsc,scdadd,EQUAL_PROBE8_PROBE8,PRINT_probe8
 
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL_IDENTITY_RAY_8
      MODULE PROCEDURE EQUAL_IDENTITY_SPINOR_8
+     MODULE PROCEDURE EQUAL_IDENTITY_SPINOR
+     MODULE PROCEDURE EQUAL_PROBE_REAL6
+     MODULE PROCEDURE EQUAL_PROBE8_REAL6
+     MODULE PROCEDURE EQUAL_PROBE8_PROBE
      MODULE PROCEDURE EQUAL_RAY8_SPINOR8
      MODULE PROCEDURE EQUAL_SPINOR8_RAY8
      MODULE PROCEDURE EQUAL_SPINOR8_SPINOR8
+     MODULE PROCEDURE EQUAL_SPINOR8_SPINOR
      MODULE PROCEDURE EQUAL_DASPIN_RAY8
      MODULE PROCEDURE EQUAL_RAY8_DASPIN
+     MODULE PROCEDURE EQUAL_IDENTITY_SPINOR_8_r3
+     MODULE PROCEDURE EQUAL_DASPIN
+     MODULE PROCEDURE EQUAL_PROBE8_PROBE8
      !     MODULE PROCEDURE EQUAL_NORMAL_DASPIN
   end  INTERFACE
+
+  INTERFACE operator (+)
+     MODULE PROCEDURE scdadd
+     MODULE PROCEDURE daddsc
+  END  INTERFACE
 
   INTERFACE exp_n_theta
      MODULE PROCEDURE exp_n_thetar
@@ -70,6 +86,7 @@ module tree_element_MODULE
 
   INTERFACE PRINT
      MODULE PROCEDURE PRINT_DASPIN
+     MODULE PROCEDURE PRINT_probe8
   END INTERFACE
 
   INTERFACE READ
@@ -620,6 +637,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: R
     INTEGER I,j
 
+    !     S%G=A_PARTICLE
     IF(R==1) THEN
 
        DO I=1,C_%NSPIN
@@ -634,6 +652,105 @@ CONTAINS
     ENDIF
 
   END    subroutine EQUAL_IDENTITY_SPINOR_8
+
+
+  subroutine EQUAL_IDENTITY_SPINOR_8_r3(S,R)
+    implicit none
+    TYPE(SPINOR_8), INTENT(INOUT) :: S
+    real(dp), INTENT(IN) :: R(3)
+    INTEGER I,j
+
+    !     S%G=A_PARTICLE
+
+    DO I=1,C_%NSPIN
+       S%X(I)=r(i)+(ONE.MONO.(c_%npara_fpp-C_%NSPIN+I))
+    ENDDO
+
+  END    subroutine EQUAL_IDENTITY_SPINOR_8_r3
+
+  subroutine EQUAL_IDENTITY_SPINOR (S,R)
+    implicit none
+    TYPE(SPINOR), INTENT(INOUT) :: S
+    INTEGER, INTENT(IN) :: R
+    INTEGER I,j
+
+    !     S%G=A_PARTICLE
+    IF(R==1) THEN
+
+       DO I=1,C_%NSPIN
+          S%X(I)=ZERO
+       ENDDO
+    ELSEIF(R==0) THEN
+       DO I=1,C_%NSPIN
+          S%X(I)=ZERO
+       enddo
+    ELSE
+       STOP 100
+    ENDIF
+
+  END    subroutine EQUAL_IDENTITY_SPINOR
+
+  subroutine EQUAL_PROBE_REAL6 (P,X)
+    implicit none
+    TYPE(PROBE), INTENT(INOUT) :: P
+    REAL(DP), INTENT(IN) :: X(6)
+    INTEGER I,j
+
+    P%u=my_false
+    P%S=0
+    P%X=X
+
+  END    subroutine EQUAL_PROBE_REAL6
+
+  subroutine EQUAL_PROBE8_REAL6 (P,X)
+    implicit none
+    TYPE(PROBE_8), INTENT(INOUT) :: P
+    REAL(DP), INTENT(IN) :: X(6)
+    INTEGER I
+
+    P%u=my_false
+    P%S=0
+    DO I=1,6
+       P%X(i)=X(i)
+    enddo
+  END    subroutine EQUAL_PROBE8_REAL6
+
+  subroutine EQUAL_PROBE8_PROBE8(P8,P)
+    implicit none
+    TYPE(PROBE_8), INTENT(IN) :: P
+    TYPE(PROBE_8), INTENT(INOUT) :: P8
+    INTEGER I,J
+
+    DO I=1,6
+       P8%X(I)=P%X(I)
+    ENDDO
+    DO I=1,3
+       P8%S%X(I)=P%S%X(I)
+    ENDDO
+
+    DO I=1,6
+       DO j=1,6
+          P8%E_ij(I,j)=P%E_ij(I,j)
+       ENDDO
+    ENDDO
+
+    P8%S=P%S
+    P8%u=P%u
+
+  END subroutine EQUAL_PROBE8_PROBE8
+
+  subroutine EQUAL_PROBE8_PROBE (P8,P)
+    implicit none
+    TYPE(PROBE), INTENT(IN) :: P
+    TYPE(PROBE_8), INTENT(INOUT) :: P8
+    INTEGER I
+    DO I=1,6
+       P8%X(I)=P%X(I)
+    ENDDO
+    P8%S=P%S
+    P8%u=P%u
+
+  END subroutine EQUAL_PROBE8_PROBE
 
   subroutine EQUAL_IDENTITY_RAY_8(R,S)
     implicit none
@@ -660,6 +777,7 @@ CONTAINS
     TYPE(probe_8), INTENT(IN) :: R
 
     S=R%S
+    !     S%G=R%S%G
 
   END    subroutine EQUAL_SPINOR8_RAY8
 
@@ -668,6 +786,7 @@ CONTAINS
     TYPE(SPINOR_8), INTENT(IN) :: S
     TYPE(probe_8), INTENT(INOUT) :: R
     R%S=S
+    !     R%S%G=S%G
 
   END    subroutine EQUAL_RAY8_SPINOR8
 
@@ -680,13 +799,25 @@ CONTAINS
     DO I=1,3
        R%X(I)=S%X(I)
     ENDDO
-
+    !    R%G=S%G
   END    subroutine EQUAL_SPINOR8_SPINOR8
+
+  subroutine EQUAL_SPINOR8_SPINOR(R,S)
+    implicit none
+    TYPE(SPINOR), INTENT(IN) :: S
+    TYPE(SPINOR_8), INTENT(INOUT) :: R
+    INTEGER I
+
+    DO I=1,3
+       R%X(I)=S%X(I)
+    ENDDO
+    !    R%G=S%G
+  END    subroutine EQUAL_SPINOR8_SPINOR
 
   subroutine EQUAL_DASPIN_RAY8(DS,R)
     implicit none
     TYPE(probe_8), INTENT(IN) :: R
-    TYPE(DASPIN), INTENT(INOUT) :: DS
+    TYPE(damapspin), INTENT(INOUT) :: DS
     INTEGER I,J
 
     DO I=1,6
@@ -702,12 +833,13 @@ CONTAINS
           DS%S(I,J)=(R%S%X(I)%T).D.(C_%SPIN_POS+J-1)
        ENDDO
     ENDDO
+    !     DS%G=R%S%G
   END subroutine EQUAL_DASPIN_RAY8
 
   subroutine EQUAL_RAY8_DASPIN(R,DS)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
-    TYPE(DASPIN), INTENT(IN) :: DS
+    TYPE(damapspin), INTENT(IN) :: DS
     INTEGER I,J
 
     DO I=1,6
@@ -724,12 +856,145 @@ CONTAINS
        ENDDO
     ENDDO
 
+    !    R%S%G=DS%G
 
   END subroutine EQUAL_RAY8_DASPIN
 
+  subroutine EQUAL_DASPIN(DS,I1)
+    implicit none
+    TYPE(damapspin), INTENT(INOUT) :: DS
+    INTEGER, INTENT(IN) :: I1
+    INTEGER I
+
+    !       type daspin
+    !   REAL(DP) X(6)
+    !   type(damap) M
+    !   type(real_8) s(3,3)
+    !  end type daspin
+
+    DS%X=ZERO
+    DS%M=I1
+    CALL ALLOC_33(DS%S)
+
+    DO I=1,3
+       DS%S(I,I)=ONE
+    ENDDO
+
+
+  END SUBROUTINE EQUAL_DASPIN
+
+  FUNCTION scdadd( S2,S1  )
+    implicit none
+    TYPE (probe_8) scdadd
+    TYPE (damapspin), INTENT (IN) :: S1
+    type(probe) , INTENT (IN) :: S2
+    integer localmaster,iia(4),ico(4),nd2,i,j
+    type(real_8) d
+
+
+    call liepeek(iia,ico)
+    nd2=iia(4)
+
+    scdadd%u=my_false
+    scdadd%E_ij=zero
+
+    do i=1,nd2
+       localmaster=master
+       call ass(scdadd%x(i))
+       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       master=localmaster
+    enddo
+    do i=nd2+1,6
+       localmaster=master
+       call ass(scdadd%x(i))
+       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
+          scdadd%x(i)=s2%x(i)+(one.mono.'00001')
+       else
+          scdadd%x(i)=s2%x(i)
+       endif
+       master=localmaster
+    enddo
+
+
+    if(C_%SPIN_POS/=0) then
+       DO I=1,3
+          localmaster=master
+          call ass(scdadd%s%x(i))
+          scdadd%s%x(i)=S2%s%x(i)
+          DO J=1,3
+             scdadd%s%x(i)=S1%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))+scdadd%s%x(i)
+          ENDDO
+          master=localmaster
+       ENDDO
+    endif
+
+    call alloc(d)
+    !       d=sqrt(scdadd%s%x(1)**2+scdadd%s%x(2)**2+scdadd%s%x(3)**2)
+
+    do i=1,3
+       !     scdadd%s%x(i)=scdadd%s%x(i)/d
+    enddo
+
+    call kill(d)
+  END FUNCTION scdadd
+
+  FUNCTION daddsc( S1,S2  )
+    implicit none
+    TYPE (probe_8) daddsc
+    TYPE (damapspin), INTENT (IN) :: S1
+    type(probe) , INTENT (IN) :: S2
+    integer localmaster,iia(4),ico(4),nd2,i,j,jb
+    type(real_8) d
+
+    call liepeek(iia,ico)
+    nd2=iia(4)
+    daddsc%u=my_false
+    daddsc%E_ij=zero
+
+    do i=1,nd2
+       localmaster=master
+       call ass(daddsc%x(i))
+       daddsc%x(i)=s1%m%v(i)+s2%x(i)
+       master=localmaster
+    enddo
+    do i=nd2+1,6
+       localmaster=master
+       call ass(daddsc%x(i))
+       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
+          daddsc%x(i)=s2%x(i)+(one.mono.'00001')
+       else
+          daddsc%x(i)=s2%x(i)
+       endif
+       master=localmaster
+    enddo
+
+    if(C_%SPIN_POS/=0) then
+       DO I=1,3
+          localmaster=master
+          call ass(daddsc%s%x(i))
+          daddsc%s%x(i)=S2%s%x(i)
+          DO J=1,3
+             daddsc%s%x(i)=S1%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))+daddsc%s%x(i)
+          ENDDO
+          master=localmaster
+       ENDDO
+
+    endif
+    call alloc(d)
+    !d=sqrt(daddsc%s%x(1)**2+daddsc%x(2)**2+daddsc%s%x(3)**2)
+
+    do i=1,3
+       !  daddsc%s%x(i)=daddsc%s%x(i)/d
+    enddo
+
+    call kill(d)
+  END FUNCTION daddsc
+
+
+
   subroutine print_DASPIN(DS,MF)
     implicit none
-    TYPE(DASPIN), INTENT(INOUT) :: DS
+    TYPE(damapspin), INTENT(INOUT) :: DS
     INTEGER MF,I,J
 
     WRITE(MF,*) " ORBIT "
@@ -747,9 +1012,28 @@ CONTAINS
 
   END subroutine print_DASPIN
 
+  subroutine print_probe8(DS,MF)
+    implicit none
+    TYPE(probe_8), INTENT(INOUT) :: DS
+    INTEGER MF,I
+
+    WRITE(MF,*) " ORBIT "
+    do i=1,6
+       write(mf,*) ' Variable ',i
+       call print(ds%x(i),mf)
+    enddo
+    WRITE(MF,*) " SPIN "
+    do i=1,3
+       write(mf,*) ' Spin Variable ',i
+       call print(ds%s%x(i),mf)
+    enddo
+
+
+  END subroutine print_probe8
+
   subroutine READ_DASPIN(DS,MF)
     implicit none
-    TYPE(DASPIN), INTENT(INOUT) :: DS
+    TYPE(damapspin), INTENT(INOUT) :: DS
     INTEGER MF,I,J
     CHARACTER*20 LINE
     TYPE(TAYLOR) T
@@ -777,9 +1061,8 @@ CONTAINS
 
   subroutine NORMAL_DASPIN(R,DS)
     implicit none
-    integer ipause, mypause
     TYPE(normal_spin), INTENT(INOUT) :: R
-    TYPE(DASPIN), INTENT(INout) :: DS
+    TYPE(damapspin), INTENT(INout) :: DS
     real(dp) s00(3,3),tunes(4)
     integer i,j
     type(real_8) n0(3),theta0,a(3,3),ai(3,3),s0(3,3),s0i(3,3),b(3)
@@ -858,10 +1141,10 @@ CONTAINS
        !    call print(theta0,6)
 
        do j=1,3
-          write(6,*) i,j
+          !     write(6,*) i,j
           t=(n0(j)%t).cut.c_%no
-          call print(t,6)
-          ipause=mypause(0)
+          !     call print(t,6)
+          !    pause
        enddo
 
        call res_bas_spin(R,tunes,n0,b)
@@ -883,17 +1166,17 @@ CONTAINS
     call matmulp(r%ns,s0,r%ns)
 
     call find_n_theta(r%ns,theta0,n0)  ! s0=exp(theta0*n0.L)
-    call print(theta0,17)
+    !    call print(theta0,17)
     theta0=theta0.cut.c_%no
     do i=1,3
        n0(i)=n0(i).cut.c_%no
-       call print(n0(i),17)
+       !    call print(n0(i),17)
     enddo
     n0(1)=cos(theta0)
     n0(2)=sin(theta0)
     do i=1,2
        n0(i)=n0(i).cut.c_%no
-       call print(n0(i),17)
+       !    call print(n0(i),17)
     enddo
     ! checking
 
@@ -909,8 +1192,8 @@ CONTAINS
           t=s1i(i,j)%t
           !     t=s0(i,j)%t-s0i(i,j)%t
           t=t.cut.c_%no
-          call print(t,6)
-          ipause=mypause(0)
+          !     call print(t,6)
+          !    pause
 
        enddo
     enddo
@@ -924,13 +1207,17 @@ CONTAINS
           !     t=s0(i,j)%t-s0i(i,j)%t
           t=t.cut.c_%no
           tr=t
-          call print(tr%cos,6)
-          ipause=mypause(1)
-          call print(tr%sin,6)
-          ipause=mypause(2)
+          !     call print(tr%cos,6)
+          !     pause 1
+          !     call print(tr%sin,6)
+          !     pause 2
 
        enddo
     enddo
+
+    r%a_t%m=r%n%a_t
+    call smatp(one,r%as,r%a_t%s)
+
     call kill_33(s1)
     call kill_33(s1i)
     call kill_33(s0)
@@ -1840,7 +2127,7 @@ CONTAINS
 
   subroutine ALLOC_DASPIN(D)
     implicit none
-    TYPE(DASPIN), INTENT(INOUT) :: D
+    TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
 
     D%X=ZERO
@@ -1855,7 +2142,7 @@ CONTAINS
 
   subroutine KILL_DASPIN(D)
     implicit none
-    TYPE(DASPIN), INTENT(INOUT) :: D
+    TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
 
     D%X=ZERO
@@ -1873,6 +2160,7 @@ CONTAINS
     TYPE(normal_spin), INTENT(INOUT) :: D
 
     CALL alloc(D%n)
+    CALL alloc(D%a_t)
     CALL alloc_33(D%ns)
     CALL alloc_33(D%as)
     D%NRES=0
@@ -1885,6 +2173,7 @@ CONTAINS
     TYPE(normal_spin), INTENT(INOUT) :: D
 
     CALL KILL(D%n)
+    CALL KILL(D%a_t)
     CALL KILL_33(D%ns)
     CALL KILL_33(D%as)
 
@@ -1896,7 +2185,7 @@ CONTAINS
     TYPE(SPINOR_8), INTENT(INOUT) :: S
 
     CALL ALLOC(S%X,3)
-
+    !     S%G=A_PARTICLE
   END    subroutine ALLOC_SPINOR_8
 
   subroutine ALLOC_RAY_8(R)

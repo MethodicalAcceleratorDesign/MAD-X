@@ -128,8 +128,7 @@ Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
 Sg_sagan_wiggler.o: Sf_def_all_kinds.o Sg_sagan_wiggler.f90
 Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
 Si_def_element.o: Sh_def_kind.o Si_def_element.f90
-Sj_elements.o: Si_def_element.o Sj_elements.f90
-Sk_link_list.o: Sj_elements.o Sk_link_list.f90
+Sk_link_list.o: Si_def_element.o Sk_link_list.f90
 Sl_family.o: Sk_link_list.o Sl_family.f90
 Sm_tracking.o: Sl_family.o Sm_tracking.f90
 Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
