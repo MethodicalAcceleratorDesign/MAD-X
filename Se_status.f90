@@ -623,7 +623,7 @@ CONTAINS
        write(mf,*) "This is a proton "
     endif
     write(mf, '((1X,a20,1x,a5))' )  "      EXACT_MODEL = ", CONV(EXACT_MODEL    )
-    write(mf, '((1X,a20,1x,a5))' )  "      TOTALPATH   = ", S%TOTALPATH
+    write(mf, '((1X,a20,1x,i5))' )  "      TOTALPATH   = ", S%TOTALPATH
     write(mf, '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
     write(mf,'((1X,a20,1x,a5))' ) "      RADIATION   = ", CONV(S%RADIATION  )
     write(mf,'((1X,a20,1x,a5))' ) "      NOCAVITY    = ", CONV(S%NOCAVITY )
