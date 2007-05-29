@@ -434,7 +434,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  INIT Y that is tracked          !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    call initmap()
+    call initmap(dt)
+
     if (geterrorflag() /= 0) then
        !if arror occured then return
        return
@@ -589,10 +590,11 @@ contains
   contains  ! what follows are internal subroutines of ptc_twiss
     !____________________________________________________________________________________________
 
-    subroutine initmap
+    subroutine initmap(dt)
       implicit none
       integer  :: double_from_table
       integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
+      real(dp) dt
 
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
@@ -677,7 +679,7 @@ contains
             print*,"Initializing map with initial twiss parameters"
          endif
 
-         call readinitialtwiss()
+         call readinitialtwiss(dt)
 
          if (geterrorflag() /= 0) then
             return
@@ -1165,7 +1167,7 @@ contains
     end subroutine maptoascript
     !_________________________________________________________________
 
-    subroutine readinitialtwiss
+    subroutine readinitialtwiss(dt)
       !Reads initial twiss parameters from MAD-X command
       implicit none
       integer get_option
@@ -1174,6 +1176,7 @@ contains
       type(pol_block_inicond) :: inicondknobs
       integer k_system
       real(dp)  sizept, gam3, emiz
+      real(dp) dt
 
       beta(1)  = get_value('ptc_twiss ','betx ')
       beta(2)  = get_value('ptc_twiss ','bety ')
@@ -1215,6 +1218,9 @@ contains
       !      x(6)=get_value('ptc_twiss ','pt ')
       x(6)=get_value('ptc_twiss ','t ')
       x(5)=get_value('ptc_twiss ','pt ')
+!frs plug deltap
+      if(icase.eq.5) x(5) = x(5) + dt
+
 
       if (getdebug() > 0 ) then
          CALL write_closed_orbit(icase,x)
@@ -1314,7 +1320,8 @@ contains
          else
             !by default we have no knowledge about longitudinal phase space, so init dp/p to ident
             !          print*, "Init X5 with ONE"
-            y(5) = morph((one.mono.5))
+!frs we need here the initial value of pt
+!frs             y(5) = morph((one.mono.5))
             y(6) = morph((one.mono.5))
             call setsigma(5, get_value('beam ','sige '))
             call setsigma(6, get_value('beam ','sigt '))
