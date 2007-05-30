@@ -81,6 +81,7 @@ contains
 
   ! Single precision test for NaN
   elemental function sisnan(x) result(res)
+    implicit none
     real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(ibclr(transfer(x,sNan),SPSB), sNaN) == 0
@@ -88,6 +89,7 @@ contains
 
   ! Double precision test for NaN
   elemental function disnan(d) result(res)
+    implicit none
     real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(ibclr(transfer(d,dNaN),DPSB), dNaN) == 0
@@ -95,6 +97,7 @@ contains
 
   ! Single precision test for Inf
   elemental function sisinf(x) result(res)
+    implicit none
     real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(ibclr(transfer(x,sPosInf),SPSB), sPosInf) == 0
@@ -102,6 +105,7 @@ contains
 
   ! Double precision test for Inf
   elemental function disinf(d) result(res)
+    implicit none
     real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(ibclr(transfer(d,dPosInf),DPSB), dPosInf) == 0
@@ -109,6 +113,7 @@ contains
 
   ! Single precision test for +Inf
   elemental function sisposinf(x) result(res)
+    implicit none
     real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(transfer(x,sPosInf), sPosInf) == 0
@@ -116,6 +121,7 @@ contains
 
   ! Double precision test for +Inf
   elemental function disposinf(d) result(res)
+    implicit none
     real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(transfer(d,dPosInf), dPosInf) == 0
@@ -123,6 +129,7 @@ contains
 
   ! Single precision test for -Inf
   elemental function sisneginf(x) result(res)
+    implicit none
     real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(transfer(x,sNegInf), sNegInf) == 0
@@ -130,6 +137,7 @@ contains
 
   ! Double precision test for -Inf
   elemental function disneginf(d) result(res)
+    implicit none
     real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(transfer(d,dNegInf), dNegInf) == 0
@@ -603,7 +611,7 @@ CONTAINS
 
     SUBROUTINE Check_ptc_universe_and_layout ! before_tracking => Int. proc. (f95)
       ! USE madx_ptc_module, ONLY: universe, index
-      ! IMPLICIT NONE ! it already exists in the host
+      implicit none
 
       ! It checks that the following commands has been performed
       ! before calling subr. ptc_track
@@ -638,9 +646,10 @@ CONTAINS
 
     SUBROUTINE Values_from_ptc_track_command ! Internal procedure (f95)
       USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
-      ! IMPLICIT NONE => in host
+      implicit none
       ! local variables
       !real(kind(1d0)) :: maxaper(1:6) move to HOST
+      character*4 text
       character*12 tol_a, char_a
       integer :: nint,ndble, nchar, int_arr(1),char_l
       data tol_a,char_a / 'maxaper ', ' ' /
@@ -684,7 +693,11 @@ CONTAINS
 
 
       icase_ptc    = get_value('ptc_track ','icase ')
-
+      if(icase_ptc.eq.56) icase_ptc=5
+      if(icase_ptc.ne.4.and.icase_ptc.ne.5.and.icase_ptc.ne.6) then
+         write(text, '(i4)') icase_ptc
+         call aafail('Values_from_ptc_track_command: ',' ICASE not 4, 5 or 6 found: ' // text)
+      endif
       turns        = get_value('ptc_track ','turns ')
 
       closed_orbit = get_value('ptc_track ','closed_orbit ') .ne. 0
@@ -841,7 +854,8 @@ CONTAINS
 
     SUBROUTINE Call_my_state_and_update_states
       ! USE  madx_ptc_module, ONLY:  my_state, UPDATE_STATES, default, print
-      ! IMPLICIT NONE  => in host
+      implicit none
+      character*4 text
 
       debug_print_1: if (ptc_track_debug) then
          print *,"before <call my_state(icase,deltap,deltap0)>", &
@@ -851,8 +865,13 @@ CONTAINS
          print*, 'my_state printing:'
       end if debug_print_1
       call my_state(icase_ptc,deltap,deltap0)
+      if(icase_ptc.eq.56) icase_ptc=5
+      if(icase_ptc.ne.4.and.icase_ptc.ne.5.and.icase_ptc.ne.6) then
+         write(text, '(i4)') icase_ptc
+         call aafail('Call_my_state_and_update_states: ',' ICASE not 4, 5 or 6 found: ' // text)
+      endif
       !      IF (Radiation_PTC) DEFAULT=DEFAULT+RADIATION
-      Print *, 'Radiation_PTC=', Radiation_PTC
+      Print *, ' Radiation_PTC    =     ', Radiation_PTC
 
       debug_print_2: if (ptc_track_debug) then
          print *, &
@@ -878,7 +897,7 @@ CONTAINS
     !=============================================================================
     SUBROUTINE Find_Closed_Orbit
       ! USE madx_ptc_module, ONLY: dp, zero, find_orbit, my_ring,default
-      ! IMPLICIT NONE => in the host
+      implicit none
       INTEGER :: i_tmp ! the local counter in the DO-loop
       !====================================================================!
       !   initialize the closed orbit coordinates                          !
@@ -922,7 +941,7 @@ CONTAINS
     !=============================================================================
     SUBROUTINE DeAllocate_local_and_PTC_arrays
       ! USE madx_ptc_module, ONLY: kill
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       if(closed_orbit) then
          call kill (Map_Y)
@@ -959,7 +978,7 @@ CONTAINS
       ! switch  (int) = 1: RUN,
       !                 2: DYNAP fastune,
       !                 3: dynap aperture
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       if (ptc_switch .eq. 1)  then  ! like the "switch => =========================!
          !                                           input to the subroutine trrun !
@@ -1005,7 +1024,7 @@ CONTAINS
 
     !=============================================================================
     SUBROUTINE Set_initial_particle_ID
-      ! IMPLICIT NONE => in the host subr.
+      implicit none
 
       integer :: j_th_particle ! local loop counter
 
@@ -1074,7 +1093,7 @@ CONTAINS
     !=============================================================================
 
     SUBROUTINE Start_Coord_to_TrackSum_Table
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       integer :: j_th_particle, k_th_coord ! counter
       ! real(dp) :: tmp_d ! temprorary dble vaiable
@@ -1133,7 +1152,7 @@ CONTAINS
     !=============================================================================
 
     SUBROUTINE Enter_0st_turn_in_tables
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       ! Local:
       integer :: j_th_particle ! loop counter
@@ -1218,7 +1237,7 @@ CONTAINS
     !=============================================================================
 
     SUBROUTINE One_turn_track_with_PTC  ! int.subroutine
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       ! variables from the HOST subroutine (no need to be declared in int.subr !):
 
@@ -1379,7 +1398,7 @@ CONTAINS
          (n_particle_kill,i_th_turn_kill,sum_accum_length_kill,j_max_kill, &
          part_ID_kill, last_turn_kill, last_position_of_kill,last_orbit_of_kill, &
          x_coord_incl_co_kill)
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       ! the next variables are local
       Integer, intent (IN)    :: n_particle_kill, & ! number of particle to be kill
@@ -1435,7 +1454,7 @@ CONTAINS
 
     !=============================================================================
     SUBROUTINE track_beam_elementwise_with_PTC ! int.subroutine
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       ! variables from the HOST subroutine (no need to be declared in int.subr !):
 
@@ -1707,7 +1726,7 @@ CONTAINS
     !=============================================================================
     SUBROUTINE Write_tables_after_total_turn
       ! segment of trrun.F
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       INTEGER :: j_th_part ! local
 
@@ -1782,7 +1801,7 @@ CONTAINS
       !'trackone' filled before by by tt_puttab_coord, 'track.obs$$$$.p$$$$' by
       ! tt_putone_coord  and, the summary table 'tracksumm'
 
-      ! IMPLICIT NONE => in the host
+      implicit none
       ! Local variables
       !real(dp) :: tmp_dble ! temprorary dble vaiable => global
       INTEGER :: j_part_tmp, turn_final, i_coord
@@ -1949,7 +1968,7 @@ CONTAINS
     SUBROUTINE Particle_Interactions_Ini
       !USE ptc_track_run_common, ONLY: &
       !            Energy_rest_MeV, Energy_total_MeV
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
 
@@ -1972,7 +1991,7 @@ CONTAINS
       !USE madx_ptc_track_run_common, ONLY: &
       !    Energy_rest_MeV, Energy_total_MeV
       ! USE madx_ptc_module, ONLY: dp
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       INTEGER, INTENT(IN)       :: i_current_elem
       CHARACTER(16), INTENT(IN) :: name_curr_elem !      current%MAG%    name
@@ -2097,7 +2116,7 @@ CONTAINS
       ! finding the closed orbits at observations for element_by_element tracking
 
       ! USE  madx_ptc_module, ONLY: dp, my_ring, track, default
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       !type(fibre), POINTER :: current ! advance node in PTC - global in <PTC_TRACK_RUN>
       EXTERNAL             :: element_name
@@ -2212,7 +2231,7 @@ CONTAINS
       !                            assignment(=), track, lnv, zero,  & !print, sub,
       !                            PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &
       !                            fibre, daprint, operator(*), operator(.sub.)
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       integer, intent (IN) :: max_obs ! the maximum number of observation points >=1
       ! one point at the end (beginning) plus
@@ -2440,7 +2459,7 @@ CONTAINS
       !hbu added spos, ielem, el_name
 
       ! USE  madx_ptc_module, ONLY: dp,lnv,zero, operator(*), assignment(=)
-      ! IMPLICIT NONE => in the host
+      implicit none
       !----------------------------------------------------------------------*
       !--- purpose: enter all particle coordinates in one table              *
       !    input:                                                            *
@@ -2540,7 +2559,7 @@ CONTAINS
       ! copied from TRRUN.F( tt_puttab) and renamed to tt_puttab_coord
       !
       ! USE  madx_ptc_module, ONLY: dp, lnv, zero, operator(*), assignment(=)
-      ! IMPLICIT NONE => in the host
+      implicit none
       !----------------------------------------------------------------------*
       !--- purpose: enter particle coordinates in table                      *
       !    input:                                                            *
@@ -2624,7 +2643,7 @@ CONTAINS
       !use madx_ptc_module, ONLY: BEAMENVELOPE, ENV_8, REAL_8, &
       !                           Find_Envelope, my_ring, default, track, &
       !                           assignment(=), operator(+)
-      ! IMPLICIT NONE => in the host
+      implicit none
 
       TYPE (BEAMENVELOPE) :: ENV
       TYPE (ENV_8) :: YS(6)
@@ -2668,7 +2687,7 @@ CONTAINS
       !
       ! USE madx_ptc_module, ONLY: dp, lnv, zero, twopi, &
       !                           operator(*), assignment(=)
-      ! IMPLICIT NONE => in the host subr.
+      implicit none
 
       !----------------------------------------------------------------------*
       ! Purpose:                                                             *
