@@ -927,8 +927,8 @@ contains
       x(2)=get_value('ptc_twiss ','px ')
       x(3)=get_value('ptc_twiss ','y ')
       x(4)=get_value('ptc_twiss ','py ')
-      x(5)=get_value('ptc_twiss ','t ')
-      x(6)=get_value('ptc_twiss ','pt ')
+      x(5)=get_value('ptc_twiss ','pt ')
+      x(6)=get_value('ptc_twiss ','t ')
     end subroutine readreforbit
     !_________________________________________________________________
 
@@ -1320,9 +1320,9 @@ contains
          else
             !by default we have no knowledge about longitudinal phase space, so init dp/p to ident
             !          print*, "Init X5 with ONE"
-!frs we need here the initial value of pt
-!frs             y(5) = morph((one.mono.5))
-            y(6) = morph((one.mono.5))
+!frs we need here the initial value of pt and t should not hurt
+            y(5) = x(5) + morph((one.mono.5))
+            y(6) = x(6) + morph((one.mono.5))
             call setsigma(5, get_value('beam ','sige '))
             call setsigma(6, get_value('beam ','sigt '))
          endif
