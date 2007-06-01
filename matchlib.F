@@ -740,6 +740,7 @@
 !
       END
       INTEGER FUNCTION IDAMAX(N,DX,INCX)
+      implicit none
 !     .. Scalar Arguments ..
       INTEGER INCX,N
 !     ..
@@ -2885,6 +2886,7 @@
 !
       END
       INTEGER FUNCTION ILAENV( ISPEC, NAME, OPTS, N1, N2, N3, N4 )
+      implicit none
 !
 !  -- LAPACK auxiliary routine (version 3.1) --
 !     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd..
@@ -3373,7 +3375,7 @@
 !
       ILAENV = 2
       RETURN
-!     
+!
  100  CONTINUE
 !
 !     ISPEC = 6:  crossover point for SVD (used by xGELSS and xGESVD)
@@ -3585,6 +3587,7 @@
       RETURN
       END
       INTEGER FUNCTION IPARMQ( ISPEC, NAME, OPTS, N, ILO, IHI, LWORK )
+      implicit none
 !
 !  -- LAPACK auxiliary routine (version 3.1) --
 !     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd..
@@ -3763,21 +3766,21 @@
 !
 !        ==== Set the number simultaneous shifts ====
 !
-      NH = IHI - ILO + 1
-      NS = 2
-      IF( NH.GE.30 )                                                    &
+        NH = IHI - ILO + 1
+        NS = 2
+        IF( NH.GE.30 )                                                  &
      &NS = 4
-      IF( NH.GE.60 )                                                    &
+        IF( NH.GE.60 )                                                  &
      &NS = 10
-      IF( NH.GE.150 )                                                   &
+        IF( NH.GE.150 )                                                 &
      &NS = MAX( 10, NH / NINT( LOG( REAL( NH ) ) / LOG( TWO ) ) )
-      IF( NH.GE.590 )                                                   &
+        IF( NH.GE.590 )                                                 &
      &NS = 64
-      IF( NH.GE.3000 )                                                  &
+        IF( NH.GE.3000 )                                                &
      &NS = 128
-      IF( NH.GE.6000 )                                                  &
+        IF( NH.GE.6000 )                                                &
      &NS = 256
-      NS = MAX( 2, NS-MOD( NS, 2 ) )
+        NS = MAX( 2, NS-MOD( NS, 2 ) )
       END IF
 !
       IF( ISPEC.EQ.INMIN ) THEN
@@ -3787,7 +3790,7 @@
 !        .     to xLAHQR, the classic double shift algorithm.
 !        .     This must be at least 11. ====
 !
-      IPARMQ = NMIN
+        IPARMQ = NMIN
 !
       ELSE IF( ISPEC.EQ.INIBL ) THEN
 !
@@ -3795,23 +3798,23 @@
 !        .    whenever aggressive early deflation finds
 !        .    at least (NIBBLE*(window size)/100) deflations. ====
 !
-      IPARMQ = NIBBLE
+        IPARMQ = NIBBLE
 !
       ELSE IF( ISPEC.EQ.ISHFTS ) THEN
 !
 !        ==== NSHFTS: The number of simultaneous shifts =====
 !
-      IPARMQ = NS
+        IPARMQ = NS
 !
       ELSE IF( ISPEC.EQ.INWIN ) THEN
 !
 !        ==== NW: deflation window size.  ====
 !
-      IF( NH.LE.KNWSWP ) THEN
-      IPARMQ = NS
-      ELSE
-      IPARMQ = 3*NS / 2
-      END IF
+        IF( NH.LE.KNWSWP ) THEN
+          IPARMQ = NS
+        ELSE
+          IPARMQ = 3*NS / 2
+        END IF
 !
       ELSE IF( ISPEC.EQ.IACC22 ) THEN
 !
@@ -3822,15 +3825,15 @@
 !        .     by making this choice dependent also upon the
 !        .     NH=IHI-ILO+1.
 !
-      IPARMQ = 0
-      IF( NS.GE.KACMIN )                                                &
+        IPARMQ = 0
+        IF( NS.GE.KACMIN )                                              &
      &IPARMQ = 1
-      IF( NS.GE.K22MIN )                                                &
+        IF( NS.GE.K22MIN )                                              &
      &IPARMQ = 2
 !
       ELSE
 !        ===== invalid value of ispec =====
-      IPARMQ = -1
+        IPARMQ = -1
 !
       END IF
 !
@@ -3894,18 +3897,18 @@
 !        ASCII is assumed - ZCODE is the ASCII code of either lower or
 !        upper case 'Z'.
 !
-      IF( INTA.GE.97 .AND. INTA.LE.122 ) INTA = INTA - 32
-      IF( INTB.GE.97 .AND. INTB.LE.122 ) INTB = INTB - 32
+        IF( INTA.GE.97 .AND. INTA.LE.122 ) INTA = INTA - 32
+        IF( INTB.GE.97 .AND. INTB.LE.122 ) INTB = INTB - 32
 !
       ELSE IF( ZCODE.EQ.233 .OR. ZCODE.EQ.169 ) THEN
 !
 !        EBCDIC is assumed - ZCODE is the EBCDIC code of either lower or
 !        upper case 'Z'.
 !
-      IF( INTA.GE.129 .AND. INTA.LE.137 .OR.                            &
+        IF( INTA.GE.129 .AND. INTA.LE.137 .OR.                          &
      &INTA.GE.145 .AND. INTA.LE.153 .OR.                                &
      &INTA.GE.162 .AND. INTA.LE.169 ) INTA = INTA + 64
-      IF( INTB.GE.129 .AND. INTB.LE.137 .OR.                            &
+        IF( INTB.GE.129 .AND. INTB.LE.137 .OR.                          &
      &INTB.GE.145 .AND. INTB.LE.153 .OR.                                &
      &INTB.GE.162 .AND. INTB.LE.169 ) INTB = INTB + 64
 !
@@ -3914,8 +3917,8 @@
 !        ASCII is assumed, on Prime machines - ZCODE is the ASCII code
 !        plus 128 of either lower or upper case 'Z'.
 !
-      IF( INTA.GE.225 .AND. INTA.LE.250 ) INTA = INTA - 32
-      IF( INTB.GE.225 .AND. INTB.LE.250 ) INTB = INTB - 32
+        IF( INTA.GE.225 .AND. INTA.LE.250 ) INTA = INTA - 32
+        IF( INTB.GE.225 .AND. INTB.LE.250 ) INTB = INTB - 32
       END IF
       LSAME = INTA.EQ.INTB
 !

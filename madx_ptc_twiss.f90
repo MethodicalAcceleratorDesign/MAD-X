@@ -377,7 +377,7 @@ contains
           stop
           return
        endif
-       
+
        !print*, "Looking for orbit"
        call find_orbit(my_ring,x,1,default,c_1d_7)
 
@@ -432,7 +432,7 @@ contains
     call setknobs(my_ring)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!  INIT Y that is tracked          !
+    !  INIT Y that is tracked          !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     call initmap(dt)
 
@@ -776,8 +776,8 @@ contains
 
       doublenum = deltae * startfen%energy
       call double_to_table(table_name, 'energy ', doublenum)
-      
-      
+
+
       opt_fun(:)=zero
 
       call liepeek(iia,icoast)
@@ -1218,7 +1218,7 @@ contains
       !      x(6)=get_value('ptc_twiss ','pt ')
       x(6)=get_value('ptc_twiss ','t ')
       x(5)=get_value('ptc_twiss ','pt ')
-!frs plug deltap
+      !frs plug deltap
       if(icase.eq.5) x(5) = x(5) + dt
 
 
@@ -1320,7 +1320,7 @@ contains
          else
             !by default we have no knowledge about longitudinal phase space, so init dp/p to ident
             !          print*, "Init X5 with ONE"
-!frs we need here the initial value of pt and t should not hurt
+            !frs we need here the initial value of pt and t should not hurt
             y(5) = x(5) + morph((one.mono.5))
             y(6) = x(6) + morph((one.mono.5))
             call setsigma(5, get_value('beam ','sige '))

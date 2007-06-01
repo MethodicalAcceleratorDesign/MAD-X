@@ -54,9 +54,9 @@ CONTAINS
 
     print77=.false.
     read77 =.false.
-    
+
     nullify(maps)
-    
+
     if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')

@@ -356,7 +356,7 @@
         go to 502
       endif
 
-!--- Note: First 'if' below could be taken out, 
+!--- Note: First 'if' below could be taken out,
 !--- we have no thick elements (bends)
       bend = code .eq. 2 .or. code .eq. 3
       if (.not. bend)  then
@@ -2001,9 +2001,9 @@
 
 
 ! the number of the current particle
-      call double_to_table(table, 'number ', tn) 
+      call double_to_table(table, 'number ', tn)
 ! the number of the current turn
-      call double_to_table(table, 'turn ', tt)   
+      call double_to_table(table, 'turn ', tt)
 !hbu spos
 
       call double_to_table(table,vec_names(7),spos)

@@ -104,7 +104,7 @@ contains
        a(3) = get_value('ptc_eplacement ','z ')
        if (getdebug() > 2 ) then
           write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: Read position ',a
-       endif   
+       endif
     endif
 
     select case(refframe)
@@ -145,18 +145,18 @@ contains
        theta = get_value('ptc_eplacement ','theta ')
        eta   = zero
        if (getdebug() > 2 ) then
-         write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
-       endif  
+          write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
+       endif
 
 
        if (refframe /=  1) then
           !brings it to the ref system
           CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,base,ANGE)
-          
+
           if (getdebug() > 2 ) then
              write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
           endif
-             
+
           CALL ROTATE_Fibre(p,p%chart%f%a,ange)
 
        endif
@@ -344,7 +344,7 @@ contains
        case(kind10) !SBEND
           call drawsbend(p,mf)
 
-       case(32) !Drift Kick Drift what ever it is 
+       case(32) !Drift Kick Drift what ever it is
           call drawboxm(p,mf,dgrey)
 
        case(kind20) !stright exact bend

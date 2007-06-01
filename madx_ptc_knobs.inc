@@ -105,17 +105,17 @@ integer, parameter                ::   ntwisses = 40
 integer, parameter                ::   ninparams = 27 !possible initial conditions as parameters
 
 CHARACTER*(6), parameter          ::   twissnames(ntwisses) = (/ &
-	                  'beta11','beta12','beta13',&
-	                  'beta21','beta22','beta23',&
-	                  'beta31','beta32','beta33',&
-	                  'alfa11','alfa12','alfa13',&
-	                  'alfa21','alfa22','alfa23',&
-	                  'alfa31','alfa32','alfa33',&
-	                  'gama11','gama12','gama13',&
-	                  'gama21','gama22','gama23',&
-	                  'gama31','gama32','gama33',&
-	                  'disp1 ','disp2 ','disp3 ','disp4 ',&
-	                  'mu1   ','mu2   ','mu3   ',&
-	                  'x     ','px    ',&
-	                  'y     ','py    ',&
-	                  'pt    ','t     '          /)
+     'beta11','beta12','beta13',&
+     'beta21','beta22','beta23',&
+     'beta31','beta32','beta33',&
+     'alfa11','alfa12','alfa13',&
+     'alfa21','alfa22','alfa23',&
+     'alfa31','alfa32','alfa33',&
+     'gama11','gama12','gama13',&
+     'gama21','gama22','gama23',&
+     'gama31','gama32','gama33',&
+     'disp1 ','disp2 ','disp3 ','disp4 ',&
+     'mu1   ','mu2   ','mu3   ',&
+     'x     ','px    ',&
+     'y     ','py    ',&
+     'pt    ','t     '          /)

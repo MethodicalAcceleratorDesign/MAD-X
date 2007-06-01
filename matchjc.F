@@ -194,7 +194,7 @@
 !     & WORK, 1000*(N+M), IWORK, INFO )
 !---- Print the jacobian on the match2 variables and exit
         call jacob_print(m,n,fjac,sv,u,vt,match_mode)
-      goto 300
+        goto 300
       endif
 
 !---- Reset solution vector
@@ -261,8 +261,8 @@
       condnum=SV(1)/SV(min(effcon,effvar))
 !      call DGELSS (effcon,effvar,1,effjac,M,effsol,N+M,SV,RCOND,        &
 !     &RANK,WORK,1000*(N+M),INFO)
-      write(*,*) "Rank  ",RANK,
-     &           "  Condition number",condnum
+      write(*,*) "Rank  ",RANK,                                         &
+     &"  Condition number",condnum
 
 !---- Debug
 !      write(*,*) "!!! solve routine"
@@ -535,7 +535,7 @@
                 if (ivar.eq.0) then
                   goto 22
                 endif
-               void=mtputconsname(node_name,nnode,name,ncon)
+                void=mtputconsname(node_name,nnode,name,ncon)
               enddo
               ncon=ncon+1
               goto 20
@@ -552,7 +552,7 @@
             if (ivar.eq.0) then
               goto 32
             endif
-             void=mtputconsname('Global              ',nnode,name,ncon)
+            void=mtputconsname('Global              ',nnode,name,ncon)
           enddo
           ncon=ncon+1
           goto 30
@@ -722,8 +722,9 @@
 
 
       subroutine mtsvd(M,N,fjac,SV,U,VT)
+      implicit none
       integer M,N,IWORK,INFO
       double precision fjac(m,n),SV(N+M),U(M,M),VT(N,N),WORK(1000*(N+M))
-        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &
-     & WORK, 1000*(N+M), IWORK, INFO )
+      call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                           &
+     &WORK, 1000*(N+M), IWORK, INFO )
       end
