@@ -74,12 +74,12 @@
 !--- ieltyp set in routine pefill, used in routine psplot.
 
       common / peaddi / itbv, nivvar, nelmach, numax, interf, noline,   &
-     &                  nqval(mxcurv), nvvar(4), nrrang(2),             &
-     &                  proc_flag(2, mxcurv), ipparm(mpparm,mxcurv),    &
-     &                  naxref(mxcurv), ieltyp(maxseql)
+     &nqval(mxcurv), nvvar(4), nrrang(2),                               &
+     &proc_flag(2, mxcurv), ipparm(mpparm,mxcurv),                      &
+     &naxref(mxcurv), ieltyp(maxseql)
       integer itbv, nivvar, nelmach, numax, interf, noline,             &
-     &        nqval, nvvar, nrrang, proc_flag,                          &
-     &        ipparm, naxref, ieltyp
+     &nqval, nvvar, nrrang, proc_flag,                                  &
+     &ipparm, naxref, ieltyp
 
 !--- Definition of common / peaddr /
 !--- qascl set in routine pesopt, used in routine peplot.
@@ -101,12 +101,12 @@
 !--- eend set in routine pefill, used in routine peplot.
 
       common / peaddr / qascl, qlscl, qsscl, qtscl,                     &
-     &                  hrange(2), vrange(2,4), hmima(2), vmima(2,4),   &
-     &                  qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),   &
-     &                  estart(maxseql), eend(maxseql)
+     &hrange(2), vrange(2,4), hmima(2), vmima(2,4),                     &
+     &qhval(maxseql,mxcurv), qvval(maxseql,mxcurv),                     &
+     &estart(maxseql), eend(maxseql)
 
       real qascl, qlscl, qsscl, qtscl,                                  &
-     &     hrange, vrange, hmima, vmima, qhval, qvval, estart, eend
+     &hrange, vrange, hmima, vmima, qhval, qvval, estart, eend
 
 !--- Definition of common / peaddc /
 !--- horname set in routine pesopt,
@@ -122,7 +122,7 @@
 !---         used in routines peplot, pemima and pesopt.
 
       common / peaddc / horname, tabname, toptitle, plfnam, axlabel(4), &
-     &                  sname(mxcurv), slabl(mxcurv)
+     &sname(mxcurv), slabl(mxcurv)
 
       character * (mfile) plfnam
       character * (mcnam) horname, tabname, sname, slabl
