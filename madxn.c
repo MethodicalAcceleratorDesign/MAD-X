@@ -3118,7 +3118,7 @@ void fill_twiss_header(struct table* t)
 void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, pos, h_length = 39; /* change adding header lines ! */
+  int i, h_length = 39; /* change adding header lines ! */
   double dtmp;
   /*  struct table* s; */
   char tmp[16];

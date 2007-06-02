@@ -1430,7 +1430,7 @@ void export_el_def_8(struct element* el, char* string)
   struct command* def = el->def;
   struct command_parameter* par;
   int i, div = 1;
-  double val[] = {zero, zero, zero};
+  double val[] = {0, 0, 0};
   char* base_name = el->base_type->name;
   char num[2*NAME_L];
   /* special treatment for tilt */
