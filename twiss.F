@@ -484,7 +484,6 @@
 !   thr_on    (integer) if > 0, use threader                           *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       include 'bb.fi'
       include 'name_len.fi'
@@ -772,7 +771,6 @@
 !   eflag        (integer) error flag.                                 *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       integer eflag,stabx,staby
       double precision rt(6,6),disp0(6),r0mat(2,2),a(2,2),arg,aux(2,2), &
@@ -951,7 +949,6 @@
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
       logical fmap,cplxy,cplxt,dorad,sector_sel
@@ -1169,7 +1166,6 @@
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
       integer i,i1,i2,j,inval,get_option
@@ -1300,7 +1296,6 @@
 !   tt(6,6,6) (double)  second order terms.                            *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       logical stabx,staby
       integer i,k,j
@@ -1527,7 +1522,6 @@
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       integer save,i,j,k,get_option
       double precision re(6,6),te(6,6,6),aux(6),auxp(6),ax1,ax2,ay1,ay2,&
@@ -1701,7 +1695,6 @@
 !   tt(6,6,6) (double)  second order terms.                            *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
-      include 'twissa.fi'
       include 'twissc.fi'
       integer i,inval,get_option
       double precision rt(6,6),tt(6,6,6),deltap,sd,betas,gammas,        &
@@ -1891,7 +1884,7 @@
 
 !---- Arbitrary matrix.
  40   continue
-      call tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
       go to 500
 
 !---- Quadrupole.
@@ -3172,7 +3165,7 @@
       endif
 
       end
-      subroutine tmarb(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      subroutine tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
       implicit none
 ! Purpose:                                                             *
 !   TRANSPORT map for arbitrary element.                               *
@@ -3190,7 +3183,7 @@
       include 'track.fi'
       logical fsec,ftrk,fmap
       integer i1,i2,i3
-      double precision orbit(6),el,ek(6),re(6,6),te(6,6,6),node_value,  &
+      double precision orbit(6),ek(6),re(6,6),te(6,6,6),node_value,     &
      &test,zero
       parameter(zero=0d0)
 
@@ -4118,7 +4111,7 @@
       parameter(zero=0d0,two=2d0)
 
       if(el.eq.zero) then
-        call tmsol_th(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmsol_th(ftrk,orbit,fmap,ek,re,te)
       else
 !---- centre option
         if(centre_cptk.or.centre_bttk) then
@@ -5102,12 +5095,9 @@
       logical fsec,ftrk,fmap,bborbit,firstflag
       integer get_option
       double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
-     &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,  &
-     &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
-     &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
-     &orbit0(6),three,ten3m,explim,rmin,rmax,wi,width,rho,wx,wy,norm,   &
-     &phir,phirr,phirrr,zz
-      double precision orbit00(6),re00(6,6),te00(6,6,6)
+     &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,phix,phiy,phixx,phixy,phiyy,phixxx, &
+     &phixxy,phixyy,phiyyy,get_variable,get_value,node_value,zero,one,  &
+     &two,three,ten3m,explim,wi,rho,wx,wy,norm,phir,phirr,phirrr,zz
       parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
      &explim=150.0d0)
       save firstflag
@@ -5263,12 +5253,9 @@
       logical fsec,ftrk,fmap,bborbit,firstflag
       integer get_option
       double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
-     &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,  &
-     &phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
-     &yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
-     &orbit0(6),three,ten3m,explim,rmin,rmax,wi,width,rho,wx,wy,norm,   &
-     &phir,phirr,phirrr,zz
-      double precision orbit00(6),re00(6,6),te00(6,6,6)
+     &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,phix,phiy,phixx,phixy,phiyy,phixxx, &
+     &phixxy,phixyy,phiyyy,get_variable,get_value,node_value,zero,one,  &
+     &two,three,ten3m,explim,wi,rho,wx,wy,phir,phirr,phirrr,zz
       parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
      &explim=150.0d0)
       save firstflag
@@ -5821,26 +5808,24 @@
       endif
       return
       end
-      subroutine tmsol_th(fsec,ftrk,orbit,fmap,el,ek,re,te)
+      subroutine tmsol_th(ftrk,orbit,fmap,ek,re,te)
 ! Stolen from trrun.F courtesy Alex Koschick
       implicit none
 !----------------------------------------------------------------------*
 !  Purpose:                                                            *
 !     TRANSPORT map for solenoid element, no centre option.            *
 !  Input:                                                              *
-!     fsec      (logical) if true, return second order terms.          *
 !     ftrk      (logical) if true, track orbit.                        *
 !  Input/output:                                                       *
 !     orbit(6)  (double)  closed orbit.                                *
 !     Output:                                                          *
 !     fmap      (logical) if true, element has a map.                  *
-!     el        (double)  element length.                              *
 !     ek(6)     (double)  kick due to element.                         *
 !     re(6,6)   (double)  transfer matrix.                             *
 !     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
-      logical fsec,ftrk,fmap
-      double precision orbit(6),el,ek(6),re(6,6),te(6,6,6),deltap,bvk,  &
+      logical ftrk,fmap
+      double precision orbit(6),ek(6),re(6,6),te(6,6,6),deltap,bvk,     &
      &get_value,node_value,sk,skl,sks,sksl,cosTh,sinTh,Q0,Q,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
 

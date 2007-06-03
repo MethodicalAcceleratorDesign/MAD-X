@@ -505,7 +505,6 @@
       character*(name_len) namevar,name,node_name
       integer next_vary,slope
       double precision step,opt
-      character*(30) num1,num2,num3
       integer oldpos,nnode,mtputconsname,void
 
 

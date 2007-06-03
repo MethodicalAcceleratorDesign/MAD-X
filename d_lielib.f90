@@ -19,7 +19,7 @@ module lielib_berz
   PUBLIC DAPOK0,FACFLO,EXPFLOD
   integer,public,parameter::ndim=3,nreso=20
   integer,public::no,nv,nd,nd2,ndpt
-  integer ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
+  integer ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres
   integer,dimension(ndim)::nplane,idsta,ista
   real(dp),dimension(0:20)::xintex
   real(dp),dimension(ndim)::dsta,sta,angle,rad,ps,rads

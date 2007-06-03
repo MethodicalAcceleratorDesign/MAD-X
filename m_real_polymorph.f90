@@ -908,7 +908,6 @@ contains
     real(dp) GETchar
     TYPE (real_8), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
-    integer i,j
     !  integer localmaster
 
     GETchar=zero
@@ -4107,7 +4106,6 @@ contains
 
   SUBROUTINE  printdouble(S2,i)
     implicit none
-    integer ipause, mypauses
     real(dp),INTENT(INOUT)::S2
     integer i
 
@@ -4117,7 +4115,6 @@ contains
 
   SUBROUTINE  printsingle(S2,i)
     implicit none
-    integer ipause, mypauses
     real(sp),INTENT(INOUT)::S2
     integer i
 

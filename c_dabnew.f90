@@ -3550,7 +3550,6 @@ contains
     integer,dimension(:), intent(in)::mc
     integer,dimension(:), intent(out)::ml,mv
     real(dp),dimension(:),intent(out)::coef
-    character(20) line
     !
     jc=0
     jl=0;jv=0;
@@ -4915,7 +4914,7 @@ contains
     !
     !-----------------------------------------------------------------------------
     !
-    integer i,ii,illa,ilma,ina,inoa,inva,ioa,iout,ipoa,iunit,ipause,mypauses
+    integer i,ii,illa,ilma,ina,inoa,inva,ioa,iout,ipoa,iunit
     integer,dimension(lnv)::j
     character(10) c10,k10
     !
@@ -5013,7 +5012,7 @@ contains
     !-----------------------------------------------------------------------------
     !
     integer i,ii,illa,ilma,ina,inoa,inva,ioa,iout,ipoa,inb,ishift,ich,&
-         ik,inc,ipause,mypauses,k
+         ik,inc,k
     integer,dimension(lnv)::j,jd
     !
     if((.not.C_%STABLE_DA)) then
@@ -5239,7 +5238,7 @@ contains
     !-----------------------------------------------------------------------------
     !
     integer i,ic,iche,ii,ii1,ii2,iin,illa,ilma,ina,inoa,inva,ipoa,iunit,&
-         k,nojoh,nvjoh,ipause,mypauses
+         k,nojoh,nvjoh
     integer,dimension(lnv)::j
     real(dp) c
     character(10) c10,k10
@@ -5319,7 +5318,7 @@ contains
     !
     !-----------------------------------------------------------------------------
     !
-    integer istop,iunit,I
+    integer istop,iunit
     !integer,dimension(0:1)::i8
     character(10) c
     !

@@ -1368,7 +1368,7 @@ CONTAINS
     TYPE (taylor) dputint0
     real(dp), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2
-    integer j(lnv),i
+    integer j(lnv)
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -2679,7 +2679,7 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     type(sub_taylor), INTENT (IN) :: S22
     integer s2(lnv)
-    integer i,k
+    integer i
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -2744,7 +2744,7 @@ CONTAINS
     integer, intent(inout):: n
     integer,optional, intent(inout)::J(:)
     real(dp), OPTIONAL, intent(inout):: value
-    INTEGER ipresent,ILLA,I
+    INTEGER ipresent,ILLA!,I
     real(dp) VALUE0
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) THEN
@@ -3037,7 +3037,6 @@ CONTAINS
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     type (TAYLOR), intent(in):: s1
     INTEGER inoc,invc,ipoc,k,n,I,J(LNV)
-    logical(lp) DOIT
 
     call check_snake
 

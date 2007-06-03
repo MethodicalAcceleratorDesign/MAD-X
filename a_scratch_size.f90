@@ -741,7 +741,6 @@ CONTAINS
 
   SUBROUTINE  ZEROFILE
     implicit none
-    integer ipause, mypause
     integer i
 
     DO I=MFI,MFO
@@ -813,7 +812,6 @@ CONTAINS
 
   SUBROUTINE create_name(name_root,ind,suffix,filename)
     implicit none
-    logical(lp) :: opened, exists, named
     CHARACTER(*) name_root,suffix,filename
     integer :: ind
     character(20) temp
@@ -1262,7 +1260,7 @@ contains
 
   SUBROUTINE GRNF(X,cut)
     implicit none
-    real(dp) r1,r2,x,y,cut
+    real(dp) r1,r2,x,cut
 
 
 1   R1 = -LOG(one-RANF())

@@ -21,14 +21,12 @@ contains
     implicit none
     logical(lp) closed_orbit,normal,maptable
     integer no,mynd2,npara,nda,icase,flag_index,why(9)
-    integer i, ii, iii, j1, jj, k, l, starti
-    integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2,map_term
+    integer i,ii,j1,k,l,starti
+    integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
          string_from_table, double_from_table, result_from_normal
     real(dp) x(6),deltap0,deltap,dt
-    !type(real_8) y(6)
-    integer :: column(6) = (/1,0,0,0,0,0/)
-    integer :: ord(3), indexa(4)
+    integer :: indexa(4)
     integer :: row_haml(101)
     integer :: index1(1000,2)
     real(kind(1d0)) get_value,val_ptc
@@ -251,7 +249,7 @@ contains
     logical(lp) name_l
     integer,intent(IN) ::  row,icase
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
-    integer idx,ii,i1,i2,jj
+    integer ii,i1,i2,jj
     integer j,k,ind(6)
     integer double_from_table
     character(len = 4)  name_var

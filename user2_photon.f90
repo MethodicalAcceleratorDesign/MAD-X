@@ -198,7 +198,7 @@ double precision function   ran2(idum)
   !   (Numerical Recipies ran3(idumy), pg. 273.)
   !
   !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-  USE precision_constants, ONLY:CLIGHT,dhbar,pmae,dp,sp,qelect,c_1d6,c_1d_10,c_1d_3,c_0_3079,c_137,one,two,three,five
+  USE precision_constants, ONLY:one
   implicit none
   integer    idum
   integer    mbig, mseed, mz

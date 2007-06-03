@@ -238,7 +238,7 @@ CONTAINS
     TYPE(TREE_ELEMENT), INTENT(IN) :: T
     REAL(DP), INTENT(INOUT) :: XI(:)
     REAL(DP) XT(lno),XF(lnv),XM(lno+1),XX
-    INTEGER JC,I,IV,ng
+    INTEGER JC,I,IV
 
     XT=zero
     XF=zero
@@ -575,7 +575,7 @@ CONTAINS
   subroutine find_exp(p,ju,no,nv)
     implicit none
     integer ju(:),no,nv
-    integer i,k,nk,nvk,p,p0,p1,pg
+    integer i,nk,nvk,p,p0,p1,pg
 
     ju=0
 
@@ -635,7 +635,7 @@ CONTAINS
     implicit none
     TYPE(SPINOR_8), INTENT(INOUT) :: S
     INTEGER, INTENT(IN) :: R
-    INTEGER I,j
+    INTEGER I
 
     !     S%G=A_PARTICLE
     IF(R==1) THEN
@@ -658,7 +658,7 @@ CONTAINS
     implicit none
     TYPE(SPINOR_8), INTENT(INOUT) :: S
     real(dp), INTENT(IN) :: R(3)
-    INTEGER I,j
+    INTEGER I
 
     !     S%G=A_PARTICLE
 
@@ -672,7 +672,7 @@ CONTAINS
     implicit none
     TYPE(SPINOR), INTENT(INOUT) :: S
     INTEGER, INTENT(IN) :: R
-    INTEGER I,j
+    INTEGER I
 
     !     S%G=A_PARTICLE
     IF(R==1) THEN
@@ -694,7 +694,6 @@ CONTAINS
     implicit none
     TYPE(PROBE), INTENT(INOUT) :: P
     REAL(DP), INTENT(IN) :: X(6)
-    INTEGER I,j
 
     P%u=my_false
     P%S=0
@@ -943,7 +942,7 @@ CONTAINS
     TYPE (probe_8) daddsc
     TYPE (damapspin), INTENT (IN) :: S1
     type(probe) , INTENT (IN) :: S2
-    integer localmaster,iia(4),ico(4),nd2,i,j,jb
+    integer localmaster,iia(4),ico(4),nd2,i,j
     type(real_8) d
 
     call liepeek(iia,ico)
@@ -1070,7 +1069,6 @@ CONTAINS
     type(damap) ri
     type(taylor) t
     type(taylorresonance) tr
-    type(pbfield) h
     call alloc_33(s1)
     call alloc_33(s1i)
     call alloc_33(s0)
@@ -1443,7 +1441,7 @@ CONTAINS
     real(dp),intent(inout):: s0(3,3),theta0,n0(3)
     real(dp) om(3,3),xx(3,3)
     real(dp) deps,nb,n,dn,dnb
-    integer i,j
+    integer i
 
     deps=1.d-7
 
@@ -1556,7 +1554,7 @@ CONTAINS
     implicit none
     real(dp) s0(3,3),theta0,n0(3)
     real(dp) ss(3,3),sc,ln(3,3),xx(3,3),an,anb
-    integer i,j
+    integer i
     sc=0.1_dp
 
     ss=s0
@@ -1693,7 +1691,7 @@ CONTAINS
     implicit none
     real(dp)  n2(3),n1(3),n3(3)
     real(dp) a(3,3),s,n
-    integer i,j,is
+    integer i,is
 
     ! here we find smallest value of n2
     is=2
@@ -1749,7 +1747,7 @@ CONTAINS
     implicit none
     type(real_8)  n2(3),n1(3),n3(3)
     type(real_8)  a(3,3),s,n
-    integer i,j,is
+    integer i,is
     call alloc(n1,3)
     call alloc(n3,3)
     call alloc(s,n)

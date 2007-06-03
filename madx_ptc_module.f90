@@ -31,7 +31,6 @@ MODULE madx_ptc_module
   type(mad_universe) m_u
   integer, private, parameter :: mynreso=20
   integer, private, dimension(4) :: iia,icoast
-  integer, private :: NO,ND,ND2,NP,NDPT,NV
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
   integer, private, allocatable :: J(:)
   logical(lp)             :: savemaps=.false.
@@ -134,7 +133,8 @@ CONTAINS
     include 'twiss0.fi'
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd
-    integer get_option,double_from_table
+!    integer get_option
+    integer double_from_table
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: nt0=20000,length=16
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
@@ -941,16 +941,11 @@ CONTAINS
 
   subroutine ptc_getnfieldcomp(fibreidx, ncomp, nval)
     implicit none
-    include 'twissa.fi'
     real(kind(1d0))      :: nval
     integer              :: fibreidx
     integer              :: ncomp
     type(fibre), pointer :: p
-    integer              :: j, i
-    integer              :: kn, ks
-    real(dp)             :: v
-    real(kind(1d0))      :: tmpv
-    real(kind(1d0)) get_value
+    integer              :: j
 
     p=>my_ring%start
     do j=1, fibreidx
@@ -965,16 +960,11 @@ CONTAINS
 
   subroutine ptc_getsfieldcomp(fibreidx, ncomp, nval)
     implicit none
-    include 'twissa.fi'
     real(kind(1d0))      :: nval
     integer              :: fibreidx
     integer              :: ncomp
     type(fibre), pointer :: p
-    integer              :: j, i
-    integer              :: kn, ks
-    real(dp)             :: v
-    real(kind(1d0))      :: tmpv
-    real(kind(1d0)) get_value
+    integer              :: j
 
     p=>my_ring%start
     do j=1, fibreidx
@@ -992,13 +982,11 @@ CONTAINS
 
   subroutine ptc_setfieldcomp(fibreidx)
     implicit none
-    include 'twissa.fi'
     integer              :: fibreidx
     type(fibre), pointer :: p
     integer              :: j, i
     integer              :: kn, ks
     real(dp)             :: v
-    real(kind(1d0))      :: tmpv
     real(kind(1d0)) get_value
 
     if ( .not. associated(my_ring) ) then
@@ -1159,11 +1147,9 @@ CONTAINS
     type(real_8)         :: y2(6)  !polimorphes array used for calculating maps for each element
     type(real_8)         :: yfull(6)  !polimorphes array used for calculating maps for each element
     real(dp)             :: xt(6)
-    integer              :: i, ii  !iterators
+    integer              :: i !iterators
     character(200)       :: filename='ptcmaps.txt'
     character(200)       :: filenamefull='ptcmaps'
-    integer              :: get_string
-    real(kind(1d0))      :: get_value
     integer              :: flag_index,why(9)
     character(200)       :: whymsg
     real(kind(1d0))      :: suml=zero
@@ -1397,14 +1383,12 @@ CONTAINS
   end subroutine ptc_dumpmaps
 
 
-  FUNCTION double_from_ptc(var, column)
+  FUNCTION double_from_ptc(column)
     USE ptc_results
     implicit none
     real(dp) double_from_ptc
-    character (len = *) var
     integer :: column(*)
-    integer j,k,n1,n2,nn,var_length,ptc_variable_length,ind(6)
-    integer double_from_table, string_from_table
+    integer j,k,nn,var_length,ptc_variable_length,ind(6)
     logical(lp) var_check
 
     double_from_ptc = zero

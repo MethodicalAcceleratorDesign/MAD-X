@@ -54,25 +54,17 @@ module madx_ptc_twiss_module
   type(normalform)                      :: Normal
   real(dp), private, dimension(2,ndim2) :: angp
   real(dp), private, dimension(ndim2)   :: dicu
-  real(dp), private, dimension(ndim2,5) :: rdd
   integer,  private, parameter          :: ndd=ndim2
   integer,  private, dimension(4)       :: iia,icoast
-  integer,  private                     :: np,icount=0
+  integer,  private                     :: np
 
   !new lattice function
   real(dp), private, dimension(3)       :: testold
   real(dp), private, dimension(3)       :: phase
 
-  character(len=4), private, dimension(4), target :: str4 = (/'1000','0100','0010','0001'/)
   character(len=5), private, dimension(5), parameter :: str5 = (/'10000','01000','00100','00010','00001'/)
-  character(len=6), private, dimension(6), target :: str6 = (/'100000','010000','001000','000100','000001','000010'/)
-
 
   integer, private, allocatable          :: J(:)
-  integer, private, dimension(6)         :: j1 = (/1,0,0,0,0,0/)
-  integer, private, dimension(6)         :: j2 = (/0,1,0,0,0,0/)
-  integer, private, dimension(6)         :: j3 = (/0,0,1,0,0,0/)
-  integer, private, dimension(6)         :: j4 = (/0,0,0,1,0,0/)
   integer, private, dimension(6)         :: j5 = (/0,0,0,0,1,0/)
   integer, private, dimension(6)         :: j6 = (/0,0,0,0,0,1/)
   integer, private, dimension(6,6)       :: fo = &
@@ -283,19 +275,16 @@ contains
   subroutine ptc_twiss(tab_name)
     implicit none
     include 'twissa.fi'
-    logical(lp)             :: closed_orbit,beta_flg,betz_flg
-    integer                 :: k,i,ii,jj,kk,ll,mm
+    logical(lp)             :: closed_orbit,beta_flg
+    integer                 :: k,i,ii
     integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
     character(200)          :: whymsg
-    integer                 :: inval,ioptfun,iii,restart_sequ,advance_node,get_option
+    integer                 :: ioptfun,iii,restart_sequ,advance_node
     integer                 :: tab_name(*)
     real(dp)                :: x(6)
-    real(dp)                :: deltap0,deltap
-    real(dp)                :: betx,alfx,mux,bety,alfy,muy,betz,alfz,muz
-    real(dp)                :: dx,dpx,dy,dpy,d_val
+    real(dp)                :: deltap0,deltap,d_val
     real(kind(1d0))         :: get_value,suml
     integer                 :: geterrorflag !C function that returns errorflag value
-    integer                 :: get_string
     type(real_8)            :: y(6)
     type(twiss)             :: tw
     type(fibre), POINTER    :: current
@@ -303,10 +292,7 @@ contains
     real(dp)                :: r,re(6,6),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
-    integer                 :: n_vector,order,nx,nxp,ny,nyp,nt,ndeltap
-    integer                 :: row,double_from_table
-    integer                 :: charge    ! charge of an accelerated particle
-    real(dp)                :: ave(6,6,3), v
+    integer                 :: row
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform
 
@@ -757,7 +743,6 @@ contains
     subroutine puttwisstable()
       implicit none
       include "madx_ptc_knobs.inc"
-      include 'twissa.fi'
       integer i1,i2,ii,i1a,i2a
       real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
@@ -1097,7 +1082,6 @@ contains
       !initializes Y(6) from re(6,6)
       implicit none
       real(dp) :: emix,emiy,emiz
-      real(dp) :: sigt, sige
 
       emix = get_value('beam ','ex ')
       emiy = get_value('beam ','ey ')
@@ -1170,12 +1154,11 @@ contains
     subroutine readinitialtwiss(dt)
       !Reads initial twiss parameters from MAD-X command
       implicit none
-      integer get_option
       real(dp) alpha(3),beta(3),disp(4),mu(3)
       type(real_8) al(3),be(3),di(4)
       type(pol_block_inicond) :: inicondknobs
       integer k_system
-      real(dp)  sizept, gam3, emiz
+      real(dp)  sizept, emiz
       real(dp) dt
 
       beta(1)  = get_value('ptc_twiss ','betx ')
