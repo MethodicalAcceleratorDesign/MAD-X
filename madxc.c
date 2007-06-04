@@ -1068,7 +1068,7 @@ void correct_correct1(struct in_cmd* cmd)
 {
   char rout_name[] = "correct_correct";
   int ix, im, ip, it, idrop;
-  int i,j,err,nnnseq;
+  int j,err,nnnseq;
   int imon, icor;
   int ncorr, nmon;
   int niter;
@@ -1086,7 +1086,6 @@ void correct_correct1(struct in_cmd* cmd)
   int     *sing;             /* array to store pointer to singular correctors */
   static int     *nm, *nx, *nc;
   struct id_mic  *corl;
-struct id_mic   *m;
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct_gettables(ip, cmd);
