@@ -1,5 +1,4 @@
 #include "matchptcknobs.h"
-void pro_ptc_twiss();
 /*______________________________________________________________
   matchptcknobs.c
   Piotr Skowronski (CERN) 2006
@@ -155,6 +154,7 @@ extern struct el_list*  element_list;
 
 extern void             pro_input(char* statement);
 extern void             process();
+extern void             pro_ptc_twiss();
 extern struct command*  clone_command(struct command*);
 extern double           command_par_value(char*, struct command*);
 extern char*            command_par_string(char*, struct command*);
