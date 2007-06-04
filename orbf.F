@@ -137,8 +137,8 @@
       return
       end
       subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-     &                    ws,wvec,sortw,                                &
-     &                    im,ic,iflag,sing,dbg)
+     &ws,wvec,sortw,                                                    &
+     &im,ic,iflag,sing,dbg)
 ! ****************************************************
 !                                                    *
 !    Performs SVD and analysis for matrix with more  *
@@ -169,8 +169,8 @@
       parameter(sngcut = 50.)
       parameter(sngval = 2.0000)
 !      data svdtest/3,8,8,8,4,9,9,2,8,8,                                 &
-!     &             4,1,7,2,6,1,6,4,6,2,                                 &
-!     &             1,9,7,2,2,6,9,8,3,5/
+!     &4,1,7,2,6,1,6,4,6,2,                                              &
+!     &1,9,7,2,2,6,9,8,3,5/
 
       MATU = .TRUE.
       MATV = .TRUE.
@@ -193,7 +193,7 @@
       enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,                 &
-     &         matv,vmat,amater,ws)
+     &matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -246,8 +246,8 @@
       return
       end
       subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-     &                    ws,wvec,sortw,                                &
-     &                    im,ic,iflag,sing,dbg)
+     &ws,wvec,sortw,                                                    &
+     &im,ic,iflag,sing,dbg)
 ! ****************************************************
 !                                                    *
 !    Performs SVD and analysis for matrix with more  *
@@ -303,7 +303,7 @@
       enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,                 &
-     &         matv,vmat,amater,ws)
+     &matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -356,8 +356,8 @@
       return
       end
       subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
-     &                       xin,xc,xout,xa,xb,xpred,ws,wvec,           &
-     &                       sortw,nx,im,ic,iflag,dbg)
+     &xin,xc,xout,xa,xb,xpred,ws,wvec,                                  &
+     &sortw,nx,im,ic,iflag,dbg)
 ! ******************************************************
 !                                                      *
 !    Performs SVD and correction for matrix with more  *
@@ -409,7 +409,7 @@
         enddo
       endif
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,                 &
-     &         matv,vmat,amater,ws)
+     &matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -478,13 +478,13 @@
       endif
 
       call dmmpy(im,im,utmat(1,1),utmat(1,2),utmat(2,1),                &
-     &           xin(1),xin(2),xa(1),xa(2))
+     &xin(1),xin(2),xa(1),xa(2))
       call dmmpy(ic,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),                &
-     &           xa(1),xa(2),xb(1),xb(2))
+     &xa(1),xa(2),xb(1),xb(2))
       call dmmpy(ic,ic,vmat(1,1),vmat(1,2),vmat(2,1),                   &
-     &           xb(1),xb(2),xc(1),xc(2))
+     &xb(1),xb(2),xc(1),xc(2))
       call dmmpy(im,ic,svdmat(1,1),svdmat(1,2),svdmat(2,1),             &
-     &           xc(1),xc(2),xpred(1),xpred(2))
+     &xc(1),xc(2),xpred(1),xpred(2))
       if(dbg.eq.1) then
         write(*,*) xc
         write(*,*) xpred
@@ -501,8 +501,8 @@
       end
 
       subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
-     &                       xin,xc,xout,xa,xb,xpred,ws,wvec,           &
-     &                       sortw,nx,im,ic,iflag,dbg)
+     &xin,xc,xout,xa,xb,xpred,ws,wvec,                                  &
+     &sortw,nx,im,ic,iflag,dbg)
 ! ******************************************************
 !                                                      *
 !    Performs SVD and correction for matrix with more  *
@@ -557,7 +557,7 @@
       endif
 
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,                 &
-     &         matv,vmat,amater,ws)
+     &matv,vmat,amater,ws)
  6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
  6002 format('UMAT: ',I4,I4,5X,F12.6,2X,F12.6)
  6003 format(16(2X,F7.2))
@@ -625,16 +625,16 @@
       endif
 
       call dmmpy(im,im,vtmat(1,1),vtmat(1,2),vtmat(2,1),                &
-     &           xin(1),xin(2),xa(1),xa(2))
+     &xin(1),xin(2),xa(1),xa(2))
 !     write(*,*) 'xa: ',xa
       call dmmpy(im,im,wtmat(1,1),wtmat(1,2),wtmat(2,1),                &
-     &           xa(1),xa(2),xb(1),xb(2))
+     &xa(1),xa(2),xb(1),xb(2))
 !     write(*,*) 'xb: ',xb
       call dmmpy(ic,im,umat(1,1),umat(1,2),umat(2,1),                   &
-     &           xb(1),xb(2),xc(1),xc(2))
+     &xb(1),xb(2),xc(1),xc(2))
 !     write(*,*) 'xc: ',xc
       call dmmpy(im,ic,a(1,1),a(1,2),a(2,1),                            &
-     &           xc(1),xc(2),xpred(1),xpred(2))
+     &xc(1),xc(2),xpred(1),xpred(2))
 
       if(dbg.eq.1) then
          write(*,*) xc
@@ -982,19 +982,19 @@
           endif
    52     FORMAT(/' ***********    start MICADO    ***********'/)
    54     FORMAT(' iter',5X,'corrector',13X,A4,6X,'mrad',               &
-     &    5X,"  rms",10X," ptop",/)
+     &5X,"  rms",10X," ptop",/)
         endif
 
         if (prtlev .ge. 2) then
-!         write(61,'(/,1x,72("-"),/,                                    &
-!    &    1x,i4,3x,38(" "),1x,f12.8,f15.8)')k,rmss(k),ptop(k)
+!         write(61,'(/,1x,72("-"),/,                                     &
+!    &1x,i4,3x,38(" "),1x,f12.8,f15.8)')k,rmss(k),ptop(k)
         endif
 
         do kkk = 1,k
           xxcal=x(kkk)
           if (prtlev .ge. 2) then
-!           write(61,'(I3,1X,A16,9x,f8.4,2x,f8.4)')                     &
-!    &      kkk,conm(ipiv(kkk)),x(kkk),xxcal
+!           write(61,'(I3,1X,A16,9x,f8.4,2x,f8.4)')                      &
+!    &kkk,conm(ipiv(kkk)),x(kkk),xxcal
           endif
         enddo
 
