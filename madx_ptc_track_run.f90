@@ -1272,6 +1272,7 @@ CONTAINS
       integer :: n_temp, j_last_particle_buffer,jmax_at_loop_start, j_particle
 
       LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                 NaN_coord_after_track_VK=.False. !
 
       if (ptc_track_debug) then ! debug printing --------------------------!
          print *; print *, 'Start SUBR.<One_turn_track_with_PTC>'
@@ -1496,6 +1497,7 @@ CONTAINS
       real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
 
       LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                 NaN_coord_after_track_VK=.False. !
 
       x_coord_co_temp=zero
 
