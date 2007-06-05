@@ -1097,9 +1097,9 @@
 !   TTLCAV to change the nominal energy                                *
 !----------------------------------------------------------------------*
       integer itrack,ktrack
-      double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
-     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
-     &get_variable,node_value,get_value,one,two,half,ten3m,ten6p
+      double precision omega,phirf,pt,rff,rfl,rfv,track(6,*),clight,    &
+     &twopi,vrf,pc0,get_variable,node_value,get_value,one,two,half,     &
+     &ten3m,ten6p
 !      double precision px,py,ttt,beti,el1
       parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
 
@@ -1217,11 +1217,11 @@
       include 'twtrr.fi'
 !      logical dorad,dodamp,dorand
       integer itrack,ktrack,n_ferr,node_fd_errors,code,bv0,i,get_option
-      double precision bi2gi2,bil2,curv,d,dpx,dpy,el,pt,px,py,rfac,rpt, &
+      double precision bi2gi2,bil2,curv,dpx,dpy,el,pt,px,py,rfac,rpt,   &
      &rpx,rpy,track(6,*),xkick,ykick, !deltas,arad,betas,gammas,dtbyds, &
      &div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
      &node_value,zero,one,two,three,half
-      double precision dpxx,dpyy,ttt,ddd,xp,yp,pxx,pyy
+      double precision dpxx,dpyy
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
 
 !---- Initialize.
@@ -1479,7 +1479,7 @@
 ! ---------------------------------------------------------------------*
       include 'bb.fi'
       logical bborbit
-      integer ktrack,itrack,ipos,get_option,beamshape
+      integer ktrack,itrack,ipos,get_option
       double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
      &ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
      &get_variable,node_value,zero,one,two,three,ten3m,explim
@@ -1606,11 +1606,10 @@
 ! ---------------------------------------------------------------------*
       include 'bb.fi'
       logical bborbit,first
-      integer ktrack,itrack,ipos,get_option,beamshape
+      integer ktrack,itrack,ipos,get_option
       double precision track(6,*),parvec(*),pi,r0x,r0y,wi,wx,wy,xm,ym,  &
-     &r0x2,r0y2,xs,ys,rho,rho2,fk,tk,phir,phix,phiy,rk,xb,yb,crx,       &
-     &cry,xr,yr,r,r2,cbx,cby,get_variable,node_value,zero,one,two,      &
-     &three,ten3m,explim,norm,r0,r1,zz
+     &r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,          &
+     &node_value,zero,one,two,three,ten3m,explim,norm,r1,zz
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
       save first
@@ -1692,11 +1691,10 @@
 ! ---------------------------------------------------------------------*
       include 'bb.fi'
       logical bborbit,first
-      integer ktrack,itrack,ipos,get_option,beamshape
+      integer ktrack,itrack,ipos,get_option
       double precision track(6,*),parvec(*),pi,r0x,r0y,wi,wx,wy,xm,ym,  &
-     &r0x2,r0y2,xs,ys,rho,rho2,fk,tk,phir,phix,phiy,rk,xb,yb,crx,cry,xr,&
-     &yr,r,r2,cbx,cby,get_variable,node_value,zero,one,two,three,ten3m, &
-     &explim,zz
+     &r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,          &
+     &node_value,zero,one,two,three,ten3m,explim,zz
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
      &explim=150d0)
       save first
@@ -1913,7 +1911,7 @@
       include 'name_len.fi'
 
       logical recloss
-      integer i,j,n,k,turn,part_id(*),jmax,last_turn(*),get_option
+      integer i,j,n,turn,part_id(*),jmax,last_turn(*),get_option
       double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
      &torb(6) !, theta, node_value, st, ct, tmp
       character*(name_len) aptype
@@ -1953,7 +1951,7 @@
       print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
 
       if(recloss) then
-        call tt_ploss(part_id(n),part_id,turn,sum,torb,el_name)
+        call tt_ploss(part_id(n),turn,sum,torb,el_name)
       endif
 
       do i = n+1, jmax
@@ -1967,7 +1965,7 @@
       end
 
 
-      subroutine tt_ploss(npart,part_id,turn,spos,orbit,el_name)
+      subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 
 !hbu added spos
       implicit none
@@ -1981,9 +1979,9 @@
 !    orbit0 (double array)  reference orbit                            *
 !----------------------------------------------------------------------*
       include 'name_len.fi'
-      integer npart,turn,j, part_id(*),turnit
+      integer npart,turn,j
       double precision orbit(6),tmp,tt,tn
-      double precision energy, get_value, sum
+      double precision energy,get_value
       character*36 table
       character*(name_len) el_name
 !hbu
@@ -2375,9 +2373,9 @@
 !   EL        (double)    Length of solenoid.                          *
 !----------------------------------------------------------------------*
       integer itrack,ktrack
-      double precision dtbyds,gamma,beta,deltap
+      double precision beta
       double precision get_value, node_value
-      double precision el,track(6,*),one,two,elrad
+      double precision track(6,*),one,two
       double precision sk,skl,sks,sksl,cosTh,sinTh,Q,R,Z
       double precision xf,yf,pxf,pyf,sigf,psigf,bvk
       double precision onedp,fpsig,fppsig
@@ -2452,7 +2450,7 @@
 !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
 !----------------------------------------------------------------------*
       integer itrack,ktrack
-      double precision get_value, node_value
+      double precision node_value
       double precision track(6,*)
       double precision t_x,t_px,t_y,t_py,t_sig,t_psig
 !
