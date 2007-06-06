@@ -62,7 +62,7 @@ void match_action(struct in_cmd* cmd)
             vary_vect->a, vary_dvect->a, fun_vect->a, match_work[0]->a,
             match_work[1]->a, match_work[2]->a, match_work[3]->a,
             match_work[4]->a, match_work[5]->a, match_work[6]->a,
-            match_work[7]->a,match_work[8]->a,match_work[9]->a);
+            match_work[7]->a,match_work[9]->a);
   }
   else if (strcmp(cmd->tok_list->p[0], "jacobian") == 0)
   {

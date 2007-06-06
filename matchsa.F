@@ -542,7 +542,7 @@
                 XP(I) = LB(I) + (UB(I) - LB(I))*RANMAR()
                 LNOBDS = LNOBDS + 1
                 NOBDS = NOBDS + 1
-                IF(IPRINT .GE. 3) CALL PRT3(MAX,N,XP,X,FP,F)
+                IF(IPRINT .GE. 3) CALL PRT3(MAX,N,XP,X,F)
               END IF
 
             enddo
@@ -551,7 +551,7 @@
               XP(h) = LB(h) + (UB(h) - LB(h))*RANMAR()
               LNOBDS = LNOBDS + 1
               NOBDS = NOBDS + 1
-              IF(IPRINT .GE. 3) CALL PRT3(MAX,N,XP,X,FP,F)
+              IF(IPRINT .GE. 3) CALL PRT3(MAX,N,XP,X,F)
             END IF
 
 
@@ -809,10 +809,10 @@
       RETURN
       END
 
-      SUBROUTINE PRT3(MAX,N,XP,X,FP,F)
+      SUBROUTINE PRT3(MAX,N,XP,X,F)
       implicit none
 
-      DOUBLE PRECISION  XP(*), X(*), FP, F
+      DOUBLE PRECISION  XP(*),X(*),F
       INTEGER  N
       LOGICAL  MAX
 

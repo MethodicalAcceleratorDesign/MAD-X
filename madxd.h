@@ -320,7 +320,7 @@ extern void micit_(double *,char *,double *,double *,double *,int *,float *,
                    float *,float *,float *,float *,float *,int *);
 extern void mtlmdf_(int*, int*, double*, int*, int*, double*, double*,
                     double*, double*, double*, double*, double*, double*,
-                    double*, double*, double*, double*, double*);
+                    double*, double*, double*, double*);
 extern void mtjac_(int*, int*,
                    int*, double*, double*, double*,
                    int*, int*, double*, int*,

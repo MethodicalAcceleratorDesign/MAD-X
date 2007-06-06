@@ -113,7 +113,6 @@
       double precision effjac(M,N),effsol(M+N),effrhs(M+N)
       double precision DNRM2
       double precision WORK(1000*(N+M)),SV(N+M),COND
-      double precision U(M,M),VT(N,N)
       integer IWORK(30*(N+M)),RANK
       integer effcon, effvar,coninfo(M),varinfo(N)
 
@@ -193,7 +192,7 @@
 !        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &
 !     & WORK, 1000*(N+M), IWORK, INFO )
 !---- Print the jacobian on the match2 variables and exit
-        call jacob_print(m,n,fjac,sv,u,vt,match_mode)
+        call jacob_print(n,match_mode)
         goto 300
       endif
 
@@ -467,7 +466,7 @@
 !      enddo
 !      close(25)
 
-!      call jacob_print(m,n,fjac,match_mode)
+!      call jacob_print(n,match_mode)
 !  999 format(i3,i3,e16.8)
   300 continue
 
@@ -489,12 +488,11 @@
 
       end
 
-      subroutine jacob_print(m,n,fjac,sv,u,vt,match_mode)
+      subroutine jacob_print(n,match_mode)
 
       implicit none
 
-      integer m,n,ivar,nvar,match_mode
-      double precision fjac(m,n),sv(m+n),u(m,m),vt(n,n)
+      integer n,ivar,nvar,match_mode
       logical local
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,name_l,char_from_table

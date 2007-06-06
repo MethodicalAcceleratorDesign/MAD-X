@@ -173,11 +173,11 @@
       qs = atan2(aival(5), reval(5)) / twopi
       if (qs .lt. zero) qs = - qs
 !---- Summary output.
-      call emsumm('EMIT', rd, em, bmax, gmax, dismax, stabt, frad,      &
-     &u0, emit_v, nemit_v, tunes, sig_v, pdamp)
+      call emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,tunes,   &
+     &sig_v,pdamp)
       end
-      subroutine emsumm(comand, rd, em, bmax, gmax, dismax,stabt,frad,  &
-     &u0, emit_v, nemit_v, tunes, sig_v, pdamp)
+      subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
+     &tunes,sig_v,pdamp)
       implicit none
 
 
@@ -185,12 +185,10 @@
 ! Purpose:                                                             *
 !   Finish radiation damping calculation and print summary.            *
 ! Input:                                                               *
-!   COMAND    (name)    Name of command.                               *
 !   RD(6,6)   (real)    Damped one-turn transfer matrix.               *
 !   EM(6,6)   (real)    Undamped eigenvectors.                         *
 !   BMAX(3,3) (real)    Maximum extents of modes.                      *
 !   GMAX(3,3) (real)    Maximum divergences of modes.                  *
-!   DISMAX(6) (real)    Maximum dispersion.                            *
 !   STABT     (logical) anti-STATIC flag
 !   FRAD      (logical) radiation flag
 ! Output:
@@ -208,9 +206,8 @@
       double precision ten3p,tenp6,tenp9,three,twopi,one,two,zero,four
       double precision ex,ey,et,exn,eyn,sigx,sigy,sige,sigt
       double precision rd(6,6), em(6,6), bmax(3,3), gmax(3,3),pdamp(3)
-      double precision dismax(4),get_variable,get_value
+      double precision get_variable,get_value
       double precision emit_v(3), nemit_v(3), tunes(3), sig_v(4)
-      character*(*) comand
       logical stabt, frad
       double precision reval(6), aival(6), alj(3), tau(3), tune(3)
       double precision sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)

@@ -245,7 +245,7 @@
       endif
       end
       subroutine mtlmdf(ncon,nvar,tol,calls,call_lim,vect,dvect,fun_vec,&
-     &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,xold)
+     &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -266,7 +266,7 @@
 ! ilevel: print level
       double precision tol,vect(*),dvect(*),fun_vec(*),diag(*),         &
      &w_ifjac(*),w_qtf(*),w_iwa1(*),w_iwa2(*),w_iwa3(*),w_iwa4(*),one,  &
-     &fval(*),xold(*)
+     &xold(*)
       parameter(one=1d0)
       include 'match.fi'
       external mtfcn
@@ -275,13 +275,12 @@
       ilevel = 0
       call mtgeti(vect,dvect)
       call lmdif(mtfcn,ncon,nvar,calls,call_lim,vect,fun_vec,tol,diag,  &
-     &one,w_ifjac,ncon,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,fval,   &
-     &xold)
+     &one,w_ifjac,ncon,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
 
  9999 end
 
       subroutine lmdif(fcn,m,n,calls,call_lim,x,fvec,epsfcn,diag,factor,&
-     &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,fval,xold)
+     &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,xold)
 
       implicit none
 
@@ -377,11 +376,11 @@
       integer izero
       integer i,iflag,info,iter,j,l,ldfjac,level,m,n,calls,call_lim,    &
      &ipvt(n), ireset
-      double precision fval(m),fmin_old,actred,delta,dirder,epsfcn,     &
-     &factor,fnorm,fnorm1,ftol,gnorm,gtol,par,pnorm,prered,ratio,sum,   &
-     &temp,temp1,temp2,vmod,xnorm,xtol,x(n),xold(n),fvec(m),diag(n),    &
-     &fjac(ldfjac,n),qtf(n),wa1(n),wa2(n),wa3(n),wa4(m),zero,one,two,   &
-     &p1,p25,p5,p75,p90,p0001,epsil,epsmch
+      double precision fmin_old,actred,delta,dirder,epsfcn,factor,fnorm,&
+     &fnorm1,ftol,gnorm,gtol,par,pnorm,prered,ratio,sum,temp,temp1,     &
+     &temp2,vmod,xnorm,xtol,x(n),xold(n),fvec(m),diag(n),fjac(ldfjac,n),&
+     &qtf(n),wa1(n),wa2(n),wa3(n),wa4(m),zero,one,two,p1,p25,p5,p75,p90,&
+     &p0001,epsil,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,p1=0.1d0,p5=0.5d0,p25=0.25d0,  &
      &p75=0.75d0,p90=0.9d0,p0001=0.0001d0,epsil=1d-8,epsmch=1d-16)
       include 'match.fi'
