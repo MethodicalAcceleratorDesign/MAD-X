@@ -42,6 +42,7 @@ module Inf_NaN_Detection
   integer, parameter :: Single = selected_int_kind(precision(1.e0))
   integer, parameter :: Double = selected_int_kind(precision(1.d0))
 
+  !VK20070611: The below lines are not accepted by NAG-compiler with <Makefile_nag>
   ! Single precision IEEE values
   integer(Single), parameter :: sNaN    = Z"7FC00000"
   integer(Single), parameter :: sPosInf = Z"7F800000"
@@ -151,7 +152,7 @@ MODULE madx_ptc_track_run_module
   ! SUBROUTINE ptc_track_run and called from it
   ! external subroutines calculating particle interactions
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
-                                !                          ! shorts for <double precision>, <logical>, 0D0 etc.
+                             ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
   implicit none
   SAVE
@@ -263,7 +264,7 @@ CONTAINS
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
-         c_1d_7,c_1D3,one,two, twopi, zero                                                 !
+         c_1d_7,c_1D3,one, twopi, zero !, two                                              !
     !======================================================================================!
 
     USE Inf_NaN_Detection !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -304,9 +305,9 @@ CONTAINS
     real (dp):: x_input_0_by_ptc_track_command(1:6)
     ! buffer for input coordinates of the track command line VK
 
-    integer :: mad8_code_current_node  ! = code <in trrun.F>
+    !integer :: mad8_code_current_node  ! = code <in trrun.F>
     ! code_of_the_current_node_as_mad8
-    REAL(dp) :: el_element_length       ! = el
+    ! REAL(dp) :: el_element_length       ! = el
 
     Integer, allocatable  :: last_turn_of_lost_particle(:)! (1:N_particle_max)  != last_turn
 
@@ -898,7 +899,7 @@ CONTAINS
     SUBROUTINE Find_Closed_Orbit
       ! USE madx_ptc_module, ONLY: dp, zero, find_orbit, my_ring,default
       implicit none
-      INTEGER :: i_tmp ! the local counter in the DO-loop
+      !
       !====================================================================!
       !   initialize the closed orbit coordinates                          !
       ! x0(:)=zero                                                         !
@@ -2475,10 +2476,10 @@ CONTAINS
       !----------------------------------------------------------------------*
       include 'name_len.fi'
       integer i,j,npart,turn,tot_segm,segment,part_id(*),length
-      REAL(dp) :: z(6,*),orbit0(6),tmp,tt, ss
+      REAL(dp) :: z(6,*),orbit0(6),tmp !, tt, ss
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       !vvk
-      REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv), tmp_norm
+      REAL(dp) :: tmp_coord_array(lnv), tmp_norm_array(lnv) ! tmp_norm
 
       REAL (dp) :: X_MAD(6), X_PTC(6)
 
