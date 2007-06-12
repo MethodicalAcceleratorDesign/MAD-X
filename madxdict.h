@@ -218,6 +218,7 @@ char command_def[] =
 "trace    = [l, false, true], "
 "verify   = [l, false, true], "
 "no_fatal_stop= [l, false, true], "
+"freemematstop= [l, false, true], "
 "warn     = [l, true, true]; "
 " "
 "plot: control none 0 0 "
@@ -536,6 +537,7 @@ char command_def[] =
 "file     = [s, track, track], "
 "gcs   = [l, false, true], "
 "everystep   = [l, false, true], "
+"tableallsteps  = [l, false, true], "
 "extension= [s, none, none], "
 "rootntuple = [l, false, true], "/*writes all the tracks in ROOT NTuple -> works only if program is dynamically linked and RPLOT plugin is present */
 "onetable = [l, false, true]; "
