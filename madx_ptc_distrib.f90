@@ -647,7 +647,6 @@ contains
     implicit none
     integer no
     integer d !dimension number
-    real(dp), allocatable :: m(:,:)
     integer i,j
 
     if (getdebug() > 1) print*, "Making flat in delta and T distributions"

@@ -20,7 +20,7 @@ contains
     logical(lp)          :: maxaccel
     integer              :: charge    ! charge of an accelerated particle
     !      use madx_keywords
-    integer              :: i,j,currentelement=1       !iterators
+    integer              :: i,j!,currentelement=1       !iterators
     type(fibre), pointer :: p     ! skowron: temporary variable: current fibre
     type(work)           :: startfen
     type(work)           :: nfen      ! New Fibre ENergy
