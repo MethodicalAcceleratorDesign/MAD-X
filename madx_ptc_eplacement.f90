@@ -344,8 +344,11 @@ contains
        case(kind10) !SBEND
           call drawsbend(p,mf)
 
-       case(32) !Drift Kick Drift what ever it is
-          call drawboxm(p,mf,dgrey)
+       case(32) !SBEND (Multipole) with model 1 ( Kick Drift Kick) and NON-exact
+          call drawsbend(p,mf)
+
+       case(37) !SBEND (Multipole) with model 2 (Matrix Kick Matrix)  and NON-exact
+          call drawsbend(p,mf)
 
        case(kind20) !stright exact bend
           call drawboxm(p,mf,magenta)
@@ -375,28 +378,41 @@ contains
              a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
              a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
              call drawbox(p,mf,P%mag%p%f%ent,a,blue)
+          elseif (nmul < 2)  then 
+             !not powered element or very high order multipole
+             call drawboxm(p,mf,color_of_ghost)
+             cycle
 
-          elseif ( (p%mag%bn(2) /= zero) .and. (nmul >= 2) ) then
+          elseif (   (p%mag%bn(2) /= zero) ) then
              !QUAD
              if (p%mag%bn(2) .gt. zero ) then
                 call drawboxm(p,mf,red)  !QUAD foc
              else
                 call drawboxm(p,mf,green)!QUAD defoc
              endif
-          elseif ( ((p%mag%bn(3) /= zero) .or. (p%mag%an(3) /= zero)) .and. (nmul >=3) ) then
+
+          elseif (nmul < 3)  then 
+             !not powered element or very high order multipole
+             call drawboxm(p,mf,color_of_ghost)
+             cycle
+
+          elseif ( (p%mag%bn(3) /= zero) .or. (p%mag%an(3) /= zero)  ) then
              !SEXTUPOLE
              call drawboxm(p,mf,color_n_sext)
 
-          elseif ( ((p%mag%bn(4) /= zero) .or. (p%mag%an(4) /= zero)) .and. (nmul >= 4) ) then
+          elseif (nmul < 4)  then 
+             !not powered element or very high order multipole
+             call drawboxm(p,mf,color_of_ghost)
+             cycle
+          elseif ( (p%mag%bn(4) /= zero) .or. (p%mag%an(4) /= zero) ) then
 
              !OCTUPOLE
              print*,"OCTUPOLE ",p%mag%bn(4),p%mag%an(4)
              call drawboxm(p,mf,color_s_sext)
 
           else
-             !!not powered element of very high order multipole
+             !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
-             call drawtube(p,mf,0.05_dp,color_of_ghost)
           endif
 
 
