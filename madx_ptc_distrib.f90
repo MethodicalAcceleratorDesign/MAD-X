@@ -43,7 +43,7 @@ module madx_ptc_distrib_module
   type (momentdef), private      ::  moments(maxnmoments)
   integer                        ::  nmoments = 0
 
-  type(damap)                    :: damapa  !da map needed to calculation initialized with sigmas
+  type(gmap)                     :: gmapa  !da map needed to calculation initialized with sigmas
   type(taylor)                   :: function_to_average ! taylor used to calculate averages
 
   !============================================================================================
@@ -256,27 +256,31 @@ contains
     if ( .not. associated(normmoments) ) then
        return
     endif
+    
+    if (debug > 3) then
 
-    !     if (debug .gt. 3) then
-    !
-    !       print*, "#################################################"
-    !       print*, "#################################################"
-    !       print*, "#################################################"
-    !       print*, "Moments for fibre ", n,name," at ", s,"m"
-    !       print*, "ND2=",c_%nd2
-    !       print*, "NPARA=",c_%npara
-    !
-    !       print*, "Function 1"
-    !       call print(y(1),6)
-    !       print*, ""
-    !       print*, "Function 5"
-    !       call print(y(5),6)
-    !       print*, ""
-    !       print*, "Function 6"
-    !       call print(y(6),6)
-    !       print*, ""
-    !
-    !     endif
+      print*, "#################################################"
+      print*, "#################################################"
+      print*, "#################################################"
+      print*, "Moments for fibre ", n,name," at ", s,"m"
+      print*, "ND2=",c_%nd2
+      print*, "NPARA=",c_%npara
+
+      print*, "Function 1"
+      call print(y(1),6)
+      print*, ""
+      print*, "Function 5"
+      call print(y(5),6)
+      print*, ""
+      print*, "Function 6"
+      call print(y(6),6)
+      print*, ""
+
+      print*, "GMap"
+      call print(gmapa,6)
+      print*, ""
+
+    endif 
 
     !--moments--!
     do i=1, nmoments
@@ -285,18 +289,21 @@ contains
        set = .false.
 
        do j=1,c_%npara
-          !         if (debug .gt. 3) write(*,'(a6,i1,a6,i1,a6,i1)',ADVANCE='NO') "nmom=",i," ndim=",j," pow=",moments(i)%iarray(j)
-          do k = 1, moments(i)%iarray(j)
-             if (set) then
-                function_to_average = function_to_average*y(j)%t
-                !             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "*"
-             else
-                function_to_average = y(j)%t
-                set = .true.
-                !             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "|"
-             endif
-          enddo
-          !         if (debug .gt. 3) write(*,*) "->"
+       
+       
+         if (debug .gt. 3) write(*,'(a6,i1,a6,i1,a6,i1)',ADVANCE='NO') "nmom=",i," ndim=",j," pow=",moments(i)%iarray(j)
+         do k = 1, moments(i)%iarray(j)
+           if (set) then
+             function_to_average = function_to_average*y(j)%t
+             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "*"  
+           else
+             function_to_average = y(j)%t
+             set = .true.
+             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "|"  
+           endif  
+         enddo
+         if (debug .gt. 3) write(*,*) "->"
+
        enddo
 
        !       function_to_average=y(1)*y(1) ! just a function (taylor series)
@@ -306,51 +313,56 @@ contains
        !          call print(function_to_average,6)
        !        endif
 
+       if (debug > 5) then
+         print*, "Function to average"
+         call print(function_to_average,6)
+       endif  
+
 
        call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function
 
-       !        if (debug > 3) then
-       !          print*, "After cfu"
-       !          call print(function_to_average,6)
-       !        endif
+       if (debug > 4) then
+         print*, "After cfu"
+         call print(function_to_average,6)
+       endif  
 
-       function_to_average=function_to_average.o.damapa ! replaces x px y py ... by sigma1, sigma2, etc
+       function_to_average=function_to_average.o.gmapa ! replaces x px y py ... by sigma1, sigma2, etc
 
-       !        if (debug > 3) then
-       !          print*, "stage 2"
-       !          call print(function_to_average,6)
-       !        endif
+       if (debug > 3) then
+         print*, "Averaging (gmapped)"
+         call print(function_to_average,6)
 
+       endif
+       
        v = function_to_average.sub.0
 
        if (c_%npara == 5) then
-          !         if (debug > 3) print*, v
-          e = 0
-          do k=1,c_%no
-             e(5) = k
-             !           if (debug > 3) then
-             !             print*, "s^",k,"=",(sigmas(5)**(k))
-             !             print*, "f = ", (function_to_average.sub.e)
-             !             print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
-             !           endif
-             v = v + (function_to_average.sub.e) * (sigmas(5)**(k)) !was to 2*k
-             !           if (debug > 9) print*, v
-          enddo
-          !         if (debug > 9) print*,
+         if (debug > 3) print*, v
+         e = 0
+         do k=1,c_%no
+           e(5) = k
+          if (debug > 3) then
+            print*, "s^",k,"=",(sigmas(5)**(k)) 
+            print*, "f = ", (function_to_average.sub.e)
+            print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
+          endif  
+           v = v + (function_to_average.sub.e) * (sigmas(5)**(k)) !was to 2*k
+           if (debug > 9) print*, v
+         enddo  
        endif
 
 
        call double_to_table(moments(i)%table,moments(i)%column,v)
-
-       !        if (debug > 3) then
-       !          print*, "Final  ",i," =  ", v
-       !          print*,moments(i)%iarray
-       !          call print(function_to_average,6)
-       !          print*,"######################################################################################"
-       !        endif
-
-
-    enddo
+       
+       if (debug > 2) then
+         print*, "Final  ",i," =  ", v
+         print*,moments(i)%iarray
+         call print(function_to_average,6)
+         print*,"######################################################################################"
+       endif   
+       
+            
+    enddo    
 
     call augmentcountmomtabs(s)
 
@@ -381,6 +393,8 @@ contains
     endif
 
 
+    print*, "Setting Sigmas (Emittances)"
+
     sigmas(1) = sqrt(emix)
     sigmas(2) = sigmas(1)
     sigmas(3) = sqrt(emiy)
@@ -388,6 +402,8 @@ contains
 
     sigmas(5) = sqrt(emiz)
     sigmas(6) = sigmas(5)
+
+    print *, "Current sigmas setemittances ", sigmas
 
 
 
@@ -409,6 +425,10 @@ contains
        print *, "Unknown dimension code", ndim
        return
     endif
+
+
+    print *, "Setting sigma for ", ndim
+    print *, "Current sigmas (setsigma) ", sigmas
 
     sigmas(ndim) = sig
 
@@ -499,15 +519,15 @@ contains
   subroutine allocmoments
     implicit none
     !allocates variables needed for moments calculations
-    ! namely damapa and fucntion_to_avarage
+    ! namely gmapa and fucntion_to_avarage
 
-    if ( .not. associated(normmoments) ) then
-       return
-    endif
-
-    call alloc(damapa)
-    damapa = sigmas
-    call alloc(function_to_average)
+      if ( .not. associated(normmoments) ) then
+        return
+      endif
+      
+      call alloc(gmapa,c_%nv)
+      gmapa = sigmas
+      call alloc(function_to_average)
 
   end subroutine allocmoments
 
@@ -522,8 +542,8 @@ contains
 
     deallocate(normmoments)
 
-    call kill(damapa)
-    call kill(function_to_average)
+      call kill(gmapa)
+      call kill(function_to_average)
 
   end subroutine killmoments
   !_________________________________________________________________________________
@@ -538,16 +558,16 @@ contains
 
     do i=1,c_%nd
 
-       filter=filter*normmoments(i,e(2*i-1),e(2*i))
-       if (getdebug() > 1) then
-          print*, "normmoments(",i, e(2*i-1), e(2*i),")=", normmoments(i,e(2*i-1),e(2*i))
-       endif
+     filter=filter*normmoments(i,e(2*i-1),e(2*i))
+     if (getdebug() > 4) then
+        print*, "normmoments(",i, e(2*i-1), e(2*i),")=", normmoments(i,e(2*i-1),e(2*i))
+     endif
     enddo
 
-    if (getdebug() > 1) then
+    if (getdebug() > 3) then
 
-       print*,"f(",e(1:6),")=",filter
-       print*,"=================="
+      print*,"filter(",e(1:6),")=",filter
+      print*,"=================="
     endif
 
   end function filter
