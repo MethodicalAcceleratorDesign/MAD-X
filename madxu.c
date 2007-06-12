@@ -140,12 +140,13 @@ void add_to_el_list( /* adds element to alphabetic element list */
       {
         put_info("element redefined:", (*el)->name);
 /*
-  printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
-  printf("Old Definition:\n");
-  dump_element(ell->elem[pos]);
-  printf("New Definition:\n");
-  dump_element(*el);
-*/
+ *         printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
+ *         printf("Old Definition:\n");
+ *         dump_element(ell->elem[pos]);
+ *         printf("New Definition:\n");
+ *         dump_element(*el);
+ */
+
       }
       if (flag >= 0 && ell == element_list)
       {
@@ -2523,6 +2524,7 @@ struct char_p_array* new_char_p_array(int length)
   il->curr = 0;
   il->max = length;
   il->p = (char**) mycalloc(rout_name,length, sizeof(char*));
+  memset(il->p,0,length*sizeof(char*));
   return il;
 }
 
@@ -2580,6 +2582,30 @@ struct command_list_list* new_command_list_list(int length)
     mycalloc(rout_name,length, sizeof(struct command_list*));
   return il;
 }
+
+
+struct command_list_list* delete_command_list_list( struct command_list_list* ll)
+{
+  char rout_name[] = "delete_command_list_list";
+  
+  int i;
+  
+  if (ll == 0x0) return 0x0;
+  
+  for (i = 0; i < ll->curr; i++)
+   {
+     delete_command_list(ll->command_lists[i]);
+   }
+
+  myfree(rout_name, ll->command_lists );
+  
+  delete_name_list(ll->list);
+
+  myfree(rout_name, ll );
+
+  return 0x0;
+}
+
 
 struct command_parameter* new_command_parameter(char* name, int type)
 {
@@ -2662,6 +2688,9 @@ struct element* new_element(char* name)
     = (struct element*) mycalloc(rout_name,1, sizeof(struct element));
   strcpy(el->name, name);
   el->stamp = 123456;
+  el->def = 0x0;
+  el->parent = 0x0;
+  el->base_type = 0x0;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", el->name);
   return el;
 }
@@ -3376,7 +3405,10 @@ void stolower_nq(char* s)
     {
       toggle = 1; quote = *c;
     }
-    else *c = (char) tolower((int) *c);
+    else 
+     {
+       *c = (char) tolower((int) *c);
+     }  
     c++;
   }
 }
