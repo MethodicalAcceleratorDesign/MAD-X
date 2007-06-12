@@ -47,10 +47,9 @@ contains
     integer              :: restart_sequ,advance_node
     real(kind(1d0))      :: get_value
     type(fibre), pointer :: p
-    type(fibre), pointer :: mvf !moved fibre
-    real(dp),target      :: a(3), ange(3), rotpoint(3)
+    real(dp),target      :: a(3), ange(3)
     real(dp)             :: phi, theta, eta
-    real(dp),target      :: idm(3,3),ent(3,3),rotm(3,3)
+    real(dp),target      :: idm(3,3),ent(3,3)
     real(dp),pointer     :: base(:,:)
     logical              :: onlyposition, onlyorientation, autoplace, surveyall
 
@@ -60,7 +59,6 @@ contains
     idm(3,3) = one
 
     a(:) = 0
-    nullify(mvf)
 
     j=restart_sequ()
     j=0
@@ -188,7 +186,6 @@ contains
        CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
     endif
 
-    mvf=>p
 
     j=j+1
     p=>p%next
@@ -227,7 +224,7 @@ contains
     character(48) :: fctname
     TYPE(LAYOUT),pointer :: r
     type(fibre), pointer :: p
-    real(dp)     :: z, a(3)
+    real(dp)     :: a(3)
     integer      :: nmul
 
     r=>my_ring
@@ -450,7 +447,7 @@ contains
       character(10) :: fname
       character(9) :: nodname
       character(8) :: mtxname
-      real(dp)     :: x,y,z,r, xx,yy, phi
+      real(dp)     :: x,y,z,r, phi
       !To be finished - need more information about SBEND frames in PTC
 
 

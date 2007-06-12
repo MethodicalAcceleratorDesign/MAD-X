@@ -4,7 +4,7 @@
 #
 #######################################################################
 
-PLUGIN_SUPPORT=no
+PLUGIN_SUPPORT=YES
 
 # compilers
 CC=gcc
@@ -205,6 +205,9 @@ madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
 	$(madx_objectsf95)
 madxp: $(madxp_objects)
 	$(f95) $(LDOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
+
+xx: madx_ptc_module.o
+	$(f95) $(LDOPT) -o  madxp $(madxp_objects) $(LIBX) $(LIBX_ext)
 
 clean:
 	rm -f *.o

@@ -46,17 +46,12 @@ contains
     logical(lp)          :: rplot
     real (dp)            :: gposx, gposy, gposz
     integer              :: e, ni
-    integer              :: apertflag
-    character(200)       :: whymsg
-    integer              :: why(9)
-    !    integer              :: rplotno
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
     type(internal_state)  :: intstate
-    real(kind(1d0))      :: get_value,get_variable
-    integer, external    :: get_option, &   !  int get_option(char*);
-         restart_sequ, & !  restart beamline and return number of beamline node
-         advance_node    !  advance to the next node in expanded sequence
+    real(kind(1d0))      :: get_value
+    integer, external    :: restart_sequ, & !  restart beamline and return number of beamline node
+                            advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
     TYPE(BEAM) :: TheBEAM
@@ -72,6 +67,7 @@ contains
 
     if(universe.le.0) then
        call fort_warn('return from ptc_trackline: ',' no universe created')
+       print*,"Max number of nobs ", nobs 
        return
     endif
     if(index.le.0) then
@@ -270,20 +266,6 @@ contains
 
           enddo
 
-          !               call produce_aperture_flag(apertflag)
-          !               if (apertflag/=0) then
-          !                  print *, 'Particle out of aperture!'
-          !
-          !                  call ANALYSE_APERTURE_FLAG(apertflag,why)
-          !                  Write(6,*) "ptc_trackline: APERTURE error for element: ",e," name: ",p%MAG%name
-          !                  Write(6,*) "Message: ",c_%message
-          !                  write(whymsg,*) 'APERTURE error: ',why
-          !                  call fort_warn('ptc_twiss: ',whymsg)
-          !                  call seterrorflag(10,"ptc_twiss: ",whymsg);
-          !
-          !                  exit; !goes to the ne
-          !               endif
-
           if (associated(CURR_SLICE%next)) then
              PREV_SLICE => CURR_SLICE
              CURR_SLICE => CURR_SLICE%next
@@ -401,10 +383,9 @@ contains
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
     type(internal_state)  :: intstate
-    real(kind(1d0))      :: get_value,get_variable
-    integer, external    :: get_option, &   !  int get_option(char*);
-         restart_sequ, & !  restart beamline and return number of beamline node
-         advance_node    !  advance to the next node in expanded sequence
+    real(kind(1d0))      :: get_value
+    integer, external    :: restart_sequ, & !  restart beamline and return number of beamline node
+                            advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
     !------------------------------------------------------
@@ -416,6 +397,7 @@ contains
 
     if(universe.le.0) then
        call fort_warn('return from ptc_trackline: ',' no universe created')
+       print *, nobs
        return
     endif
     if(index.le.0) then
@@ -593,17 +575,15 @@ contains
     integer              :: tab_name(*)
     include 'twissa.fi'
     integer              :: charge    ! charge of an accelerated particle
-    real(dp)             :: x0(6),betd,beta(3),gamma(3),ave(6,6,3),x1(6),xt(6)
+    real(dp)             :: x0(6),betd,ave(6,6,3),x1(6),xt(6)
     type(real_8)         :: y_pol(6), y2(6)
     type(damap)          :: mapA, id
     type(fibre), pointer :: p
-    integer              :: n,no,np, iflag, i,j,k
+    integer              :: no,np, iflag, i,j,k
     integer, allocatable :: ePP(:),ee(:) ! exponents of a monomial for x_1^{2}*x_3^{4}, j is [0,2,0,4]
-    logical(lp)          :: sixd
     type(taylor)         :: mom,r2,I1,dispt(4),avet(6,6,3)
-    real(kind(1d0))      :: get_value,get_variable ! c functions
+    real(kind(1d0))      :: get_value! c functions
     real(dp)             :: s
-    integer              :: get_option ! c function
     real (dp)            :: disp(4)
     type(pol_block)      :: pb !pol_block - it enables additional parameter dependences (variable) for polynomials
     integer              :: ioptfun !number of parameters tu put in table using vector_to_table c-func
@@ -1183,9 +1163,6 @@ contains
   subroutine knobs
     implicit none
     type (pol_block) :: pb1,pb2
-    real (dp)        :: x(6)
-    integer          :: id
-    type (real_8)    :: y
 
     pb1=0
     pb1%name='qf' ! STICKING NAME OF FAMILY

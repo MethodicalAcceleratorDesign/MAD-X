@@ -23,9 +23,7 @@ contains
     integer              :: i,j,currentelement=1       !iterators
     type(fibre), pointer :: p     ! skowron: temporary variable: current fibre
     type(work)           :: startfen
-    type(work)           :: endfen    ! END Fibre ENergy: energy description at start and end of a line
     type(work)           :: nfen      ! New Fibre ENergy
-    type(work)           :: cfen      ! Current Fibre ENergy
     integer, pointer     :: poscav(:) !array keeping indexes of cavities
     real(dp),allocatable :: phasecav(:) !array keeping phases of cavities
     real(dp)             :: patchprecision=c_1d_8
@@ -34,10 +32,8 @@ contains
     real(dp)             :: prevbeta0  !just a temporary real variable
     real (dp)            :: x(1:6)   ! track vector -
     ! here we always use closed orbit track, that is all its relative coordinates are 0
-    real(dp)             :: sparivtime=zero !synchronous particle arrival time
     real(dp)             :: position=zero !synchronous particle position
     real(kind(1d0))     :: get_value
-    integer              :: get_option
     !------------------------------------------------------
 100 format (a20, f10.4, a10, f10.4, a10, f10.4)
 110 format (8f10.4, l2, i3)
@@ -327,10 +323,10 @@ contains
       real(dp)                 :: x(6)      ! reference particle coordinates (closed orbit for a circular machine)
       real(dp)                 :: phase_rel ! final relative phase
       integer, target          :: charge    ! charge of an particle
-      integer(4)               :: tmp
       logical(lp)              :: ene       ! switches if cavity should always maximally accelerate
       ! the reference track; lag is calculated
-      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;
+!      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;
+!      integer(4)               :: tmp
       ! volt is calculated; lag and freq is preserved
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival

@@ -70,8 +70,6 @@ contains
     integer               :: tableIA(*)
     integer               :: parametric
     integer, parameter    :: zeroasciicode = IACHAR ( '0' )
-    integer               :: i
-    real(kind(1d0))       :: get_value
     ! name of the column corresponds to MADX nomenclature (5 col is dp/p)
     ! iarray corresponds to
 
@@ -243,8 +241,8 @@ contains
     logical              :: set
     integer              :: i,j,k,e(6)
     integer              :: debug
-    integer              :: last
-    integer              :: index !standarf function
+!    integer              :: last
+!    integer              :: index !standarf function
 
     !    last = index(name,'$END')
     !    if ( last == 0) then
@@ -451,7 +449,6 @@ contains
     character(len=48)               :: cmdname
     integer, dimension(3)           :: stringlength
     character(48)                   :: tmpstring
-    real(kind(1d0))                 :: get_value
     integer                         :: getcurrentcmdname
     ! This routine must be called before any init in ptc_twiss is performed
     ! since it initialize Bertz for its purpose
@@ -625,7 +622,6 @@ contains
     implicit none
     integer no
     integer d !dimension number
-    real(dp), allocatable :: m(:,:)
     integer i,j
 
     if (getdebug() > 1) print*, "Making flat distribution "

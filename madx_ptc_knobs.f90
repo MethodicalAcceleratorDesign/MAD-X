@@ -11,7 +11,7 @@ module madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
   implicit none
 
-  include "madx_ptc_knobs.inc"
+  include "madx_ptc_knobs.inc" 
   save
   private
   !============================================================================================
@@ -67,7 +67,7 @@ module madx_ptc_knobs_module
 
   integer, parameter                    ::  maxpar = 100
   integer                               ::  nmapels = 0
-  type(mapelresult),target              ::  mapels(maxpar)
+!  type(mapelresult),target              ::  mapels(maxpar)
 
   real(kind(1d0)), allocatable          ::  spos(:)
   real(dp), allocatable                 ::  deltaes(:) !array with energy increase for each element with respect to the beginning
@@ -93,10 +93,10 @@ module madx_ptc_knobs_module
   type(real_8), private                 ::  test
   integer, private                      ::  taylorsallocated = 0
 
-  integer, private, dimension(6)        :: j1 = (/1,0,0,0,0,0/)
-  integer, private, dimension(6)        :: j2 = (/0,1,0,0,0,0/)
-  integer, private, dimension(6)        :: j3 = (/0,0,1,0,0,0/)
-  integer, private, dimension(6)        :: j4 = (/0,0,0,1,0,0/)
+!  integer, private, dimension(6)        :: j1 = (/1,0,0,0,0,0/)
+!  integer, private, dimension(6)        :: j2 = (/0,1,0,0,0,0/)
+!  integer, private, dimension(6)        :: j3 = (/0,0,1,0,0,0/)
+!  integer, private, dimension(6)        :: j4 = (/0,0,0,1,0,0/)
   integer, private, dimension(6)        :: j5 = (/0,0,0,0,1,0/)
   integer, private, dimension(6)        :: j6 = (/0,0,0,0,0,1/)
   integer, private, dimension(6,6)       :: fo = &
@@ -157,12 +157,12 @@ contains
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
     type(real_8),pointer :: e !element in array
     real(kind(1d0))      :: coeff
-    integer              :: i,ii !iterator
-    integer              :: at !iterator
+    integer              :: i !iterator
     logical              :: pblockson
-
-    !    print *,"madx_ptc_tablepush :putusertable "
-    !    call daprint(y(1),6)
+    
+    if (getdebug() > 3) then
+        print *,"madx_ptc_tablepush :putusertable n ",n," name ", name
+    endif
 
 
     if ((getnknobsall() > 0) .and. (currentrow > 0)) then
@@ -227,7 +227,6 @@ contains
     !____________________________________________________________________________________________
     subroutine sixdmode()
       implicit none
-      integer ele
       character bufchar
       character*(6) monstr
 
@@ -313,16 +312,10 @@ contains
   subroutine filltwisstable()
     !puts the coefficients in tables as defined in array pushes
     implicit none
-    integer         :: n !fibre number
-    real(kind(1d0))      :: s  !position along the orbit
-    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
-    type(real_8),pointer :: e !element in array
-    real(kind(1d0))      :: coeff
     integer              :: i,ii !iterator
     integer              :: nelems !iterator
     integer, parameter   :: fillntwisses  = disp4 - beta11 + 1
     integer, parameter   :: ntwissesde = gama33 - beta11 + 1
-    logical              :: pblockson
     real(kind(1d0))      :: opt_fun(72)
     type(universal_taylor), pointer :: t
 
@@ -523,8 +516,6 @@ contains
     include 'twissa.fi'
     integer     :: nameIA(*)
     character(48)              :: name
-    character*(6) ::twname
-    logical                    :: found
 
     if (nknobi >= maxnpolblocks) then
        call fort_warn("addknob","Can not add more knobs, array with initial knobs if full")
@@ -807,7 +798,7 @@ contains
     implicit none
     character*(100) ::name
     character*(7) ::twname
-    integer i,j,n
+    integer i,j
     integer last
 
     do i=1, ntwisses
@@ -839,7 +830,6 @@ contains
   subroutine getknobsnames()
     implicit none
     character*(100) ::name
-    character*(100) ::fmt
     character*(48)  ::pname
     integer last
     integer i,j,n
@@ -1072,7 +1062,7 @@ contains
     type(real_8) y(6)
     real(dp) ave(6,6,3)
     integer e(6)
-    integer i,j,k,l,m
+    integer i,j,k
 
     print*,"c_%nd2 is ", c_%nd2
     print*,"c_%nd is ", c_%nd
@@ -1149,8 +1139,7 @@ contains
   subroutine parametrictwiss(y)   !  Computes <x_i x_j> assuming linearity and with parameters
     implicit none
     type(real_8) y(6)
-    real(dp) :: epsil=1e-12, realdph, realtest, realtestold  !
-    type(universal_taylor) :: unita
+    real(dp) :: epsil=1e-12
     integer i,j,k
 
     e=0
@@ -1339,12 +1328,12 @@ contains
     integer              :: n !fibre number
     character(*)         :: name !fibre name
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
-    real(kind(1d0))      :: coeff
-    integer              :: i,ii,j,k !iterator
-    type(taylor)         :: ave(6,6,3)
+!    real(kind(1d0))      :: coeff
+!    integer              :: i,ii,j,k !iterator
+!    type(taylor)         :: ave(6,6,3)
 
-
-    !    call print(y(1),6)
+     print*," resultswithknobs not yet implemented ",n,name
+       call print(y(1),6)
 
   end subroutine resultswithknobs
 
@@ -1360,7 +1349,6 @@ contains
     logical       :: fmt_ptc, fmt_tex
     integer, parameter         :: length=16
     character(length)          :: name
-    real(kind(1d0))            :: get_value
     integer                    :: get_string
     integer                    :: restart_sequ,advance_node
 
@@ -1621,7 +1609,6 @@ contains
   subroutine getpareq(ut,string)
     implicit none
     type(universal_taylor) :: ut
-    integer                :: iunit
     integer                :: i,ii
     integer                :: cpos, last
     character              :: sign
