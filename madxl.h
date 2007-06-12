@@ -448,6 +448,16 @@ char* tracksumm_table_cols[] =
   " "  /* blank terminates */
 };
 
+
+int ptcnodetrack_table_types[] =
+{  1,        3,      1,         1,           1,      2,       2,   2,   2,    2,   2,    2,   2,    2 };
+
+char* ptcnodetrack_table_cols[] =
+{"number", "name", "elnumber","trnumber" , "turn","s_slice", "s", "x", "px", "y", "py", "t", "pt", "s",
+  " "  /* blank terminates */
+};
+
+
 int trackloss_table_types[] =
 {
   1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3
