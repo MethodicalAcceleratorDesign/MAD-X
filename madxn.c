@@ -1225,13 +1225,30 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
   if (*quarterlength) napex=4;
   else napex=19;
 
+  /*check apertures for zero*/
+  if((*ap1) == 0)
+  {
+    fatal_error("aper_rectellipse ", "ap1 should not be zero");
+  }
+  if((*ap2) == 0)
+  {
+    fatal_error("aper_rectellipse ", "ap2 should not be zero");
+  }
+  if((*ap3) == 0)
+  {
+    fatal_error("aper_rectellipse ", "ap3 should not be zero");
+  }
+  if((*ap4) == 0)
+  {
+    fatal_error("aper_rectellipse ", "ap4 should not be zero");
+  }
   /*find angle to first point where rectangle and circle crosses*/
   y=sqrt(((*ap4)*(*ap4)) * (1 - ((*ap1)*(*ap1)) / ((*ap3)*(*ap3))));
   alfa=atan(y/(*ap1));
 
   /*find angle to second point where rectangle and circle crosses*/
   x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
-  theta=pi/2-atan((*ap2)/x);
+  theta=atan(x/(*ap2));
 
   dangle=(pi/2-(alfa+theta))/napex;
 
