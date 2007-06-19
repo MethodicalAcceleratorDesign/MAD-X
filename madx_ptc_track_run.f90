@@ -2042,7 +2042,8 @@ CONTAINS
               ( (i_elem_type.EQ.3).AND.(.NOT.Radiation_Quad) ) ) THEN
             rad_curv_m = 1D0/B0_dipole
             Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
-                 Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2))
+                ! Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
+                  Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
             DO j_partic=1, jmax_numb_particl_at_i_th_turn
                IF (Entry_not_Exit) THEN
                   x_coord_incl_co(5,j_partic)=x_coord_incl_co(5,j_partic)+d_loss(1)
@@ -2063,7 +2064,8 @@ CONTAINS
                rad_curv_m = 1D0/Quadr_k/SQRT_X2_Y2
 
                Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
-                    Energy_total_MeV, Energy_rest_MeV, ieave,iquasto,d_loss(1), d_loss(2))
+                 !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
+                  Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
                IF (Entry_not_Exit) THEN
                   x_coord_incl_co(5,j_partic)=x_coord_incl_co(5,j_partic)+d_loss(1)
                ELSE
@@ -2084,7 +2086,8 @@ CONTAINS
                rad_curv_m = SQRT(x_comp*x_comp+ y_comp*y_comp)
 
                Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
-                    Energy_total_MeV, Energy_rest_MeV,ieave,iquasto, d_loss(1), d_loss(2))
+                   !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
+                    Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
                IF (Entry_not_Exit) THEN
                   x_coord_incl_co(5,j_partic)=x_coord_incl_co(5,j_partic)+d_loss(1)
                ELSE
@@ -2093,7 +2096,7 @@ CONTAINS
             ENDDO
          END IF
 
-         ! Call photon (i_Mag_type, rad_curv_m, dl_length, Energy_beam_MeV, Rest_mass_MeV,
+         ! Call photon (i_Mag_type, rad_curv_m, dl_length, Energy_beam_MeV, 
          !                                                           ieave,iquasto,d1, d2)
          ! Radiation_Energy_Loss=TRUE => ieave=1; Radiation_Energy_Loss=FALSE => ieave=0;
          ! Radiation_Quad     =TRUE => iquasto=1; Radiation_Quad     =FALSE => iquasto=0
