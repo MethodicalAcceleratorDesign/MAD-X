@@ -1,5 +1,5 @@
 !===================================================================================
-subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
+subroutine photon(iele,rad,dlength,energy,ieave,iquasto,d1,d2)
   !SUBROUTINE photon (i_elem_type, rad_curv_m, length_curr_elem, &
   !                        Energy_beam_MeV, mass_rest_MeV, d1, d2)
   !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -18,7 +18,6 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !
   !            dlength - length of element
   !            energy - beam energy in MeV
-  !            dmass - particle mass in MeV
   !     output:
   !            d1 - momentum loss at entrance (normalized to beam energy)
   !            d2 - momentum loss at exit (normalized to beam energy)
@@ -30,7 +29,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   include 'photoni.inc'
 
   INTEGER, INTENT(IN) :: iele, ieave, iquasto
-  REAL(dp), INTENT(IN) :: dlength,energy,dmass
+  REAL(dp), INTENT(IN) :: dlength,energy
   REAL(dp), INTENT(OUT) :: d1,d2
   REAL(dp), INTENT(INOUT) :: rad
 
@@ -43,7 +42,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   !      integer i,j,nmax,n1,n2,npmax,iseed,idumy,ieave,iquasto,iele
   !      double precision pi,vl,dhbar,el,gamma,energy,xilog,sollog,b,sol,  &
   !     &xil,sll,ak,bk,theta,dlength,rad,dnpho,dnphohalf,ec,eave,ep1,ep2,  &
-  !     &dmass,d1,d2,ra2,ran,ran2,xl,en,gamfac
+  !     &d1,d2,ra2,ran,ran2,xl,en,gamfac
   !      parameter (nmax=100)
 
   !      common / lookup / xil(nmax), sll(nmax)
@@ -58,7 +57,7 @@ subroutine photon(iele,rad,dlength,energy,dmass,ieave,iquasto,d1,d2)
   external rnpset, rnpssn
   ierr=0
   rad=abs(rad)
-  !      print*,"RRRRRRRRRRRRRRRRRad in photon",iele,rad,dlength,energy,dmass
+  !      print*,"RRRRRRRRRRRRRRRRRad in photon",iele,rad,dlength,energy
 
   ! for electrons
   gamma=energy/pmae*c_1d_3
