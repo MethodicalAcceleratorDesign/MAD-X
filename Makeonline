@@ -82,10 +82,10 @@ endif
 default: madx
 
 # dependencies of madxpf which combines the C-code
-madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c madxsdds.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
+madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c madxsdds.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS_MPARS) -c -pedantic madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
+madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -pedantic -o madxpf.o madxp.c
 
 

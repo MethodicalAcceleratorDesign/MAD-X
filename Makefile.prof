@@ -119,12 +119,12 @@ endif
 default: rplot madxp
 
 # dependencies of madxpf which combines the C-code
-madxp.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c \
+madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c sxf.c makethin.c \
          c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h \
 	 matchptcknobs.c matchptcknobs.h
 	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c madxe.c madxc.c matchc.c sxf.c makethin.c \
+madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c sxf.c makethin.c \
           c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h \
 	  matchptcknobs.c matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
