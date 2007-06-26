@@ -712,7 +712,7 @@ void match_tmatrix(struct in_cmd*);
 void match_vary(struct in_cmd*);
 void match_weight(struct in_cmd*);
 void mtcond(int*, int*, double*, int*);
-void mtjacprint(int, int, double*);
+void mtjacprint(int, int, double*, struct in_cmd*);
 double mult_par(char*, struct element*);
 void mycpy(char*, char*);
 void* mycalloc(char*, size_t, size_t);

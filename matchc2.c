@@ -566,7 +566,12 @@ void match2_constraint(struct in_cmd* cmd)
 
   start=start+2;
   nitem = end-start+1;
-  cname=spec_join(&toks[start], nitem);
+  if ( (cname=command_par_string("name",cmd->clone) ) == NULL) {
+/*    printf("not-given-name\n");*/
+    cname=spec_join(&toks[start], nitem);
+  } else {
+/*    printf("given-name %s\n",cname);*/
+  };
   match2_cons_name[i][j]=(char*) mymalloc("match2_constraint",strlen(cname)+1);
 /*  strcpy(match2_cons_name[i][j],cname);*/
   n=0;

@@ -89,7 +89,7 @@ void match_action(struct in_cmd* cmd)
            match_work[3]->a,match_work[4]->a);
 /*    if (jac_strategy==2 && match_is_on==2) {*/
     if (jac_strategy==2) {
-      mtjacprint(total_const,total_vars,match_work[0]->a);
+      mtjacprint(total_const,total_vars,match_work[0]->a,cmd);
     }
   }
   else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 && total_vars <= total_const)
@@ -892,9 +892,11 @@ void match_weight(struct in_cmd* cmd)
   }
 }
 
-void mtjacprint(int m, int n,double* jac){
-  int i,j,k,l;
+void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
+  int i,j,k,l,t;
   double *SV,*U,*VT;
+  double tmp;
+  FILE* knobfile;
   k=0;
   fprintf(prt_file, "\n\nJACOBIAN:\n");
   fprintf(prt_file, "%4s %16s %10s %20s\n","Node","Constraint","Variable","Derivative");
@@ -943,7 +945,7 @@ void mtjacprint(int m, int n,double* jac){
       if ( (i<m)&&(j<m) ) {
 /*        fprintf(prt_file, "%i %i",k,l);*/
         fprintf(prt_file, "%12.6g ",U[j*m+i]);
-        fprintf(prt_file, "%10s ",match2_macro_name[k]);
+/*        fprintf(prt_file, "%10s ",match2_macro_name[k]);*/
         fprintf(prt_file, "%10s ",match2_cons_name[k][l]);
       }
       else { fprintf(prt_file, "%34s",""); }
@@ -955,6 +957,29 @@ void mtjacprint(int m, int n,double* jac){
     fprintf(prt_file, "\n");
     fprintf(prt_file, "\n");
   }
+  knobfile=fopen(command_par_string("file",cmd->clone),"w");
+  k=0;
+  l=0;
+  for(i=0;i<n;i++){
+    k=0; l=0;
+    fprintf(knobfile, "%-12s=%-12s",command_par_string("name",stored_match_var->commands[i]),command_par_string("name",stored_match_var->commands[i]));
+    for(j=0;j<m;j++){
+      if (match2_cons_name[k][l]==NULL) { k++; l=0; }
+      /* Compute sum_k VT[t,i] / SV[t]* U[j,k] = M-1[i,j]*/
+      tmp=0;
+      for(t=0;t<mymin(m,n);t++) {
+        if (SV[t]>jac_cond) { tmp+=VT[i*n+t]/SV[t]*U[j*m+t]; }
+/*        fprintf(prt_file,"VT %d,%d,%e \n",i,t,VT[i*n+t]);*/
+/*        fprintf(prt_file,"SV %d,%e \n",t,SV[t]);*/
+/*        fprintf(prt_file,"U %d,%d,%e \n",j,t,U[i*n+t]);*/
+/*        fprintf(prt_file,"M-1 %d,%d,%e \n",i,j,tmp);*/
+        }
+      fprintf(knobfile, "%+e * %s",tmp,match2_cons_name[k][l]);
+      l++;
+    }
+    fprintf(knobfile, ";\n");
+  }
+  fclose(knobfile);
 }
 
 int mtputconsname(char* noden, int* nodei , char* consn, int* consi) {
