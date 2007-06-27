@@ -962,7 +962,7 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
   l=0;
   for(i=0;i<n;i++){
     k=0; l=0;
-    fprintf(knobfile, "%-12s=%-12s",command_par_string("name",stored_match_var->commands[i]),command_par_string("name",stored_match_var->commands[i]));
+    fprintf(knobfile, "%-12s:=%-12s",command_par_string("name",stored_match_var->commands[i]),command_par_string("name",stored_match_var->commands[i]));
     for(j=0;j<m;j++){
       if (match2_cons_name[k][l]==NULL) { k++; l=0; }
       /* Compute sum_k VT[t,i] / SV[t]* U[j,k] = M-1[i,j]*/
