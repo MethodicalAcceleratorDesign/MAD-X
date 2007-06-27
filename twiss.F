@@ -5098,6 +5098,7 @@
      &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,phix,phiy,phixx,phixy,phiyy,phixxx, &
      &phixxy,phixyy,phiyyy,get_variable,get_value,node_value,zero,one,  &
      &two,three,ten3m,explim,wi,rho,wx,wy,norm,phir,phirr,phirrr,zz
+      double precision orbit0(6),orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
      &explim=150.0d0)
       save firstflag
@@ -5236,12 +5237,35 @@
               te(4,3,3) = phiyyy
             end if
           endif
+!---- orbit kick - only applied if option bborbit (HG 5/12/01),
+!     else stored
+          if (bborbit) then
+             orbit(2) = orbit(2) + phix
+             orbit(4) = orbit(4) + phiy
+          elseif (bbd_flag .ne. 0)  then
+             bb_kick(1,bbd_cnt) = phix
+             bb_kick(2,bbd_cnt) = phiy
+          endif
 !---- no tracking desired.
         else
           phixx=0.5/norm
           phiyy=0.5/norm
           re(2,1) = phixx
           re(4,3) = phiyy
+        endif
+!---- centre option
+        if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
+          if(centre_cptk) then
+            call dcopy(orbit,orbit0,6)
+            call twcptk(re,orbit0)
+          endif
+          if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
         endif
       endif
 !
@@ -5255,7 +5279,8 @@
       double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
      &xm,ym,r0x2,r0y2,xs,ys,rho2,fk,phix,phiy,phixx,phixy,phiyy,phixxx, &
      &phixxy,phixyy,phiyyy,get_variable,get_value,node_value,zero,one,  &
-     &two,three,ten3m,explim,wi,rho,wx,wy,phir,phirr,phirrr,zz
+     &two,orbit0(6),three,ten3m,explim,wi,rho,wx,wy,phir,phirr,phirrr,zz
+      double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
      &explim=150.0d0)
       save firstflag
@@ -5394,10 +5419,33 @@
               te(4,3,3) = phiyyy
             end if
           endif
+!---- orbit kick - only applied if option bborbit (HG 5/12/01),
+!     else stored
+          if (bborbit) then
+             orbit(2) = orbit(2) + phix
+             orbit(4) = orbit(4) + phiy
+          elseif (bbd_flag .ne. 0)  then
+             bb_kick(1,bbd_cnt) = phix
+             bb_kick(2,bbd_cnt) = phiy
+          endif
 !---- no tracking desired.
         else
           re(2,1) = zero
           re(4,3) = zero
+        endif
+!---- centre option
+        if(centre_cptk.or.centre_bttk) then
+          call dcopy(orbit,orbit00,6)
+          call dcopy(re,re00,36)
+          call dcopy(te,te00,216)
+          if(centre_cptk) then
+            call dcopy(orbit,orbit0,6)
+            call twcptk(re,orbit0)
+          endif
+          if(centre_bttk) call twbttk(re,te)
+          call dcopy(orbit00,orbit,6)
+          call dcopy(re00,re,36)
+          call dcopy(te00,te,216)
         endif
       endif
 !
