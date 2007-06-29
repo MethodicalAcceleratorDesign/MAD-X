@@ -529,7 +529,7 @@
       go to 500
 !---- Arbitrary matrix. OBSOLETE, to be kept for go to
    40 continue
-      call tmarb(.false.,.false.,craporb,fmap,el,ek,re,te)
+      call tmarb(.false.,.false.,craporb,fmap,ek,re,te)
       call tttrak(ek,re,track,ktrack)
       go to 500
 !---- Quadrupole. OBSOLETE, to be kept for go to
