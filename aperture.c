@@ -45,8 +45,8 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
   {
     printf("\nApertype %s not working , use rectellipse with\n(h,v,0.99(h**2+v**2)^0.5,0.99(h**2+v**2)^0.5)", apertype);
     err=-1;
-/*    *ap1 = get_aperture(current_node, "var1"); /*half width rect*/
-/*    *ap2 = get_aperture(current_node, "var2"); /*half height rect*/
+/*    *ap1 = get_aperture(current_node, "var1");*/ /*half width rect*/
+/*    *ap2 = get_aperture(current_node, "var2");*/ /*half height rect*/
 /* next changed 19 june 2007 bj */
 /*    *ap3 = *ap4 = sqrt((*ap1) * (*ap1) + ((*ap2) * (*ap2)));*/
 /*    *ap3 = *ap4 = -1.0;*/
