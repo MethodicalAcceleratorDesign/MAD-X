@@ -1448,13 +1448,32 @@
 !   ktrack    (integer) number of tracks.                              *
 !----------------------------------------------------------------------*
       integer ktrack,beamshape
-      double precision track(6,*),parvec(*),node_value
+      double precision track(6,*),parvec(*),fk,dp
+      double precision gamma0,beta0,beta_dp,ptot,b_dir
+      double precision q,q_prime,get_value,node_value,get_variable
+      double precision zero,one,two
       logical first
       save first
       data first / .true. /
+      parameter(zero=0.0d0,one=1.0d0,two=2.0d0)
 !     if x > explim, exp(-x) is outside machine limits.
 
-!---- chose beamshape
+!---- Calculate momentum deviation and according changes 
+!     of the relativistic factor beta0 
+      dp  = get_variable('track_deltap ')
+      q = get_value('probe ','charge ')
+      q_prime = node_value('charge ')
+      gamma0 = parvec(7)
+      beta0 = sqrt(one-one/gamma0**2)
+      ptot = beta0*gamma0*(one+dp)
+      beta_dp = ptot / sqrt(one + ptot**2)
+      b_dir = node_value('bbdir ')
+      b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-20)
+!---- pre-factor, if zero, anything else does not need to be calculated
+      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/beta_dp*    &
+     &(one-beta0*beta_dp*b_dir)/dabs(q)
+      if (fk .eq. zero)  return
+!---- choose beamshape: 1-Gaussian, 2-flattop=trapezoidal, 3-hollow-parabolic
       beamshape = node_value('bbshape ')
       if(beamshape.lt.1.or.beamshape.gt.3) then
         beamshape=1
@@ -1464,12 +1483,12 @@
      &'beamshape out of range, set to default=1')
         endif
       endif
-      if(beamshape.eq.1) call ttbb_gauss(track,ktrack,parvec)
-      if(beamshape.eq.2) call ttbb_flattop(track,ktrack,parvec)
-      if(beamshape.eq.3) call ttbb_hollowparabolic(track,ktrack,parvec)
+      if(beamshape.eq.1) call ttbb_gauss(track,ktrack,fk)
+      if(beamshape.eq.2) call ttbb_flattop(track,ktrack,fk)
+      if(beamshape.eq.3) call ttbb_hollowparabolic(track,ktrack,fk)
 
       end
-      subroutine ttbb_gauss(track,ktrack,parvec)
+      subroutine ttbb_gauss(track,ktrack,fk)
 
       implicit none
 ! ---------------------------------------------------------------------*
@@ -1480,7 +1499,7 @@
       include 'bb.fi'
       logical bborbit
       integer ktrack,itrack,ipos,get_option
-      double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
+      double precision track(6,*),pi,sx,sy,xm,ym,sx2,sy2,xs,            &
      &ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
      &get_variable,node_value,zero,one,two,three,ten3m,explim
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
@@ -1494,8 +1513,6 @@
       sy = node_value('sigy ')
       xm = node_value('xma ')
       ym = node_value('yma ')
-      fk = two * parvec(5) * parvec(6) / parvec(7)
-      if (fk .eq. zero)  return
       ipos = 0
       if (.not. bborbit)  then
 !--- find position of closed orbit bb_kick
@@ -1596,7 +1613,7 @@
         enddo
       endif
       end
-      subroutine ttbb_flattop(track,ktrack,parvec)
+      subroutine ttbb_flattop(track,ktrack,fk)
 
       implicit none
 ! ---------------------------------------------------------------------*
@@ -1607,7 +1624,7 @@
       include 'bb.fi'
       logical bborbit,first
       integer ktrack,itrack,ipos,get_option
-      double precision track(6,*),parvec(*),pi,r0x,r0y,wi,wx,wy,xm,ym,  &
+      double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,            &
      &r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,          &
      &node_value,zero,one,two,three,ten3m,explim,norm,r1,zz
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
@@ -1625,8 +1642,6 @@
       wi = node_value('width ')
       xm = node_value('xma ')
       ym = node_value('yma ')
-      fk = two * parvec(5) * parvec(6) / parvec(7)
-      if (fk .eq. zero)  return
       ipos = 0
       if (.not. bborbit)  then
 !--- find position of closed orbit bb_kick
@@ -1681,7 +1696,7 @@
       end do
 
       end
-      subroutine ttbb_hollowparabolic(track,ktrack,parvec)
+      subroutine ttbb_hollowparabolic(track,ktrack,fk)
 
       implicit none
 ! ---------------------------------------------------------------------*
@@ -1692,7 +1707,7 @@
       include 'bb.fi'
       logical bborbit,first
       integer ktrack,itrack,ipos,get_option
-      double precision track(6,*),parvec(*),pi,r0x,r0y,wi,wx,wy,xm,ym,  &
+      double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,            &
      &r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,          &
      &node_value,zero,one,two,three,ten3m,explim,zz
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
@@ -1713,8 +1728,6 @@
       wi = wi/sqrt(2.0)
       xm = node_value('xma ')
       ym = node_value('yma ')
-      fk = two * parvec(5) * parvec(6) / parvec(7)
-      if (fk .eq. zero)  return
       ipos = 0
       if (.not. bborbit)  then
 !--- find position of closed orbit bb_kick
