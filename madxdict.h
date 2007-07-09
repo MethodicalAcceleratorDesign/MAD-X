@@ -1440,6 +1440,7 @@ char command_def[] =
 "kmax     = [r, 0], "
 "calib    = [r, 0], "
 "polarity = [r, 0], "
+"bbdir = [r, 0], "
 "sector_nmul     = [i, 5], "
 "model           = [i, -1], "
 "method          = [i, -1], "
