@@ -4841,13 +4841,35 @@
 !   re(6,6)   (double)  transfer matrix.                               *
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
+      include 'track.fi'
       integer beamshape
       logical fsec,ftrk,fmap,first
-      double precision orbit(6),re(6,6),te(6,6,6),node_value
+      double precision orbit(6),re(6,6),te(6,6,6),node_value,get_value
+      double precision fk,parvec(26),q,q_prime,dp,get_variable
+      double precision gamma0,beta0,beta_dp,ptot,b_dir
+      double precision zero,one,two
+      parameter(zero=0.0d0,one=1.0d0,two=2.0d0)
       save first
       data first / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
+!--- standard 4D
+      parvec(5)=get_value('probe ', 'arad ')
+      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
+      parvec(7)=get_value('probe ','gamma ')
+!---- Calculate momentum deviation and according changes 
+!     of the relativistic factor beta0 
+      dp  = get_variable('track_deltap ')
+      q = get_value('probe ','charge ')
+      q_prime = node_value('charge ')
+      gamma0 = parvec(7)
+      beta0 = sqrt(one-one/gamma0**2)
+      ptot = beta0*gamma0*(one+dp)
+      beta_dp = ptot / sqrt(one + ptot**2)
+      b_dir = node_value('bbdir ')
+      b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-20)
+      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/beta_dp*    &
+     &(one-beta0*beta_dp*b_dir)/q
 !---- chose beamshape
       beamshape = node_value('bbshape ')
       if(beamshape.lt.1.or.beamshape.gt.3) then
@@ -4858,12 +4880,13 @@
      &'beamshape out of range, set to default=1')
         endif
       endif
-      if(beamshape.eq.1) call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te)
-      if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te)
+      if(beamshape.eq.1) call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
+      if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,  &
+     &fk)
       if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,&
-     &re,te)
+     &re,te,fk)
       end
-      subroutine tmbb_gauss(fsec,ftrk,orbit,fmap,re,te)
+      subroutine tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
       implicit none
       include 'twissl.fi'
@@ -4898,11 +4921,6 @@
       sy = node_value('sigy ')
       xm = node_value('xma ')
       ym = node_value('yma ')
-!--- standard 4D
-      parvec(5)=get_value('probe ', 'arad ')
-      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-      parvec(7)=get_value('probe ','gamma ')
-      fk = two * parvec(5) * parvec(6) / parvec(7)
       if (fk .ne. zero)  then
 !---- if tracking is desired ...
         if (ftrk) then
@@ -5088,7 +5106,7 @@
       endif
 
       end
-      subroutine tmbb_flattop(fsec,ftrk,orbit,fmap,re,te)
+      subroutine tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
       implicit none
       include 'twissl.fi'
       include 'bb.fi'
@@ -5124,11 +5142,6 @@
       wi = node_value('width ')
       xm = node_value('xma ')
       ym = node_value('yma ')
-!--- standard 4D
-      parvec(5)=get_value('probe ', 'arad ')
-      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-      parvec(7)=get_value('probe ','gamma ')
-      fk = two * parvec(5) * parvec(6) / parvec(7)
       if (fk .ne. zero)  then
         r0x2 = r0x * r0x
         r0y2 = r0y * r0y
@@ -5270,7 +5283,7 @@
       endif
 !
       end
-      subroutine tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te)
+      subroutine tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
       implicit none
       include 'twissl.fi'
       include 'bb.fi'
@@ -5310,11 +5323,6 @@
       wi = wi/sqrt(2.0)
       xm = node_value('xma ')
       ym = node_value('yma ')
-!--- standard 4D
-      parvec(5)=get_value('probe ', 'arad ')
-      parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-      parvec(7)=get_value('probe ','gamma ')
-      fk = two * parvec(5) * parvec(6) / parvec(7)
       if (fk .ne. zero)  then
 !---- if tracking is desired ...
         if (ftrk) then
