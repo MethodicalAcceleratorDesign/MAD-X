@@ -264,11 +264,11 @@
       if(dy    .ne.zero) opt_fun0(17)=dy
       if(dpy   .ne.zero) opt_fun0(18)=dpy
       if(wx    .ne.zero) opt_fun0(19)=wx
-      if(phix  .ne.zero) opt_fun0(20)=phix
-      if(dmux  .ne.zero) opt_fun0(21)=dmux
+      if(phix  .ne.zero) opt_fun0(20)=phix * twopi
+      if(dmux  .ne.zero) opt_fun0(21)=dmux * twopi
       if(wy    .ne.zero) opt_fun0(22)=wy
-      if(phiy  .ne.zero) opt_fun0(23)=phiy
-      if(dmuy  .ne.zero) opt_fun0(24)=dmuy
+      if(phiy  .ne.zero) opt_fun0(23)=phiy * twopi
+      if(dmuy  .ne.zero) opt_fun0(24)=dmuy * twopi
       if(ddx   .ne.zero) opt_fun0(25)=ddx
       if(ddpx  .ne.zero) opt_fun0(26)=ddpx
       if(ddy   .ne.zero) opt_fun0(27)=ddy
@@ -306,8 +306,8 @@
       include 'twissl.fi'
       include 'twissotm.fi'
       integer case,i,flag
-      double precision opt_fun(*),position,twopi,opt5,opt8,get_variable,&
-     &zero
+      double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21, &
+     &opt23,opt24,get_variable,zero
       parameter(zero=0d0)
 
 !---- Initialize
@@ -332,8 +332,20 @@
           opt_fun(5)= opt5
           opt_fun(8)= opt8
         elseif(case.eq.2) then
+          opt20 = opt_fun(20)
+          opt_fun(20)= opt_fun(20) / twopi
+          opt21 = opt_fun(21)
+          opt_fun(21)= opt_fun(21) / twopi
+          opt23 = opt_fun(23)
+          opt_fun(23)= opt_fun(23) / twopi
+          opt24 = opt_fun(24)
+          opt_fun(24)= opt_fun(24) / twopi
           i = 10
           call vector_to_table(table_name, 'wx ', i, opt_fun(19))
+          opt_fun(20)= opt20
+          opt_fun(21)= opt21
+          opt_fun(23)= opt23
+          opt_fun(24)= opt24
         endif
 
 !---- Augment table twiss
@@ -1047,7 +1059,7 @@
           orbit0(4)=opt_fun(12)
           orbit0(5)=opt_fun(13)
           orbit0(6)=opt_fun(14)
-          call m66one(rm)
+          call dcopy(re,rm,36)
           elh=el/two
           call tmali2(elh,orbit0,al_errors,betas,gammas,orbit0,rm)
           call twcptk(rm,orbit0)
@@ -1300,10 +1312,12 @@
       logical stabx,staby
       integer i,k,j
       double precision rt(6,6),tt(6,6,6),disp0(6),ddisp0(6),rtp(6,6),   &
-     &sinmu2,bx,ax,by,ay,eps,temp,aux(6),zero,one,two,fourth
+     &sinmu2,bx,ax,by,ay,eps,temp,aux(6),zero,one,two,fourth,           &
+     &get_variable,twopi
       parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0,fourth=0.25d0)
 
 !---- Initialization
+      twopi=get_variable('twopi ')
       betx   =opt_fun0(3 )
       alfx   =opt_fun0(4 )
       amux   =opt_fun0(5 )
@@ -1402,10 +1416,10 @@
       logical fmap,cplxy,cplxt,dorad
       integer i,code,save,restart_sequ,advance_node,get_option,n_align, &
      &node_al_errors
-      double precision orbit(6),ek(6),re(6,6),te(6,6,6),                &
-     &al_errors(align_max),deltap,el,betas,gammas,node_value,get_value, &
-     &zero,one
-      parameter(zero=0d0,one=1d0)
+      double precision orbit(6),orbit0(6),ek(6),re(6,6),rm(6,6),        &
+     &te(6,6,6),tm(6,6,6),al_errors(align_max),deltap,el,betas,gammas,  &
+     &node_value,get_value,pos0,elh,zero,one,two
+      parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 
 !---- If save requested reset table
@@ -1467,8 +1481,25 @@
       endif
       if(centre) centre_bttk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
+      if(centre) then
+        pos0=currpos
+        currpos=currpos+el/two
+        if (n_align.ne.0)  then
+          orbit0(1)=opt_fun(9 )
+          orbit0(2)=opt_fun(10)
+          orbit0(3)=opt_fun(11)
+          orbit0(4)=opt_fun(12)
+          orbit0(5)=opt_fun(13)
+          orbit0(6)=opt_fun(14)
+          call dcopy(re,rm,36)
+          call dcopy(te,tm,216)
+          elh=el/two
+          call tmali2(elh,orbit0,al_errors,betas,gammas,orbit0,rm)
+          call twbttk(rm,tm)
+        endif
+        if(save.ne.0) call twfill(2,opt_fun,currpos, 1)
+      endif
       centre_bttk=.false.
-      if(save.ne.0.and.centre) call twfill(2,opt_fun,zero,1)
       if (fmap) then
         call twbttk(re,te)
       endif
@@ -1478,8 +1509,24 @@
       endif
       if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero,1)
       if(centre) then
-        opt_fun(5)=amux
-        opt_fun(8)=amuy
+        currpos=pos0+el
+        opt_fun(2 )=currpos
+        opt_fun(3 )=betx
+        opt_fun(4 )=alfx
+        opt_fun(5 )=amux
+        opt_fun(6 )=bety
+        opt_fun(7 )=alfy
+        opt_fun(8 )=amuy
+        opt_fun(9 )=orbit(1)
+        opt_fun(10)=orbit(2)
+        opt_fun(11)=orbit(3)
+        opt_fun(12)=orbit(4)
+        opt_fun(13)=orbit(5)
+        opt_fun(14)=orbit(6)
+        opt_fun(15)=disp(1)
+        opt_fun(16)=disp(2)
+        opt_fun(17)=disp(3)
+        opt_fun(18)=disp(4)
         opt_fun(19)=wx
         opt_fun(20)=phix
         opt_fun(21)=dmux
@@ -1490,6 +1537,10 @@
         opt_fun(26)=ddisp(2)
         opt_fun(27)=ddisp(3)
         opt_fun(28)=ddisp(4)
+        opt_fun(29)=rmat(1,1)
+        opt_fun(30)=rmat(1,2)
+        opt_fun(31)=rmat(2,1)
+        opt_fun(32)=rmat(2,2)
       endif
       if (advance_node().ne.0)  goto 10
 
@@ -1527,7 +1578,8 @@
       double precision re(6,6),te(6,6,6),aux(6),auxp(6),ax1,ax2,ay1,ay2,&
      &bx1,bx2,by1,by2,proxim,rep(6,6),t2,ta,tb,temp,tg,fre(6,6),        &
      &frep(6,6),curlyh,detl,f,rhoinv,blen,alfx0,alfy0,betx0,bety0,amux0,&
-     &amuy0,wx0,wy0,dmux0,dmuy0,rmat0(2,2),node_value,eps,zero,one,two
+     &amuy0,wx0,wy0,dmux0,dmuy0,rmat0(2,2),phix0,phiy0,node_value,eps,  &
+     &zero,one,two
       parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0)
 
 !---- Create internal table for lattice functions if requested
@@ -1574,6 +1626,8 @@
         wy0=wy
         dmux0=dmux
         dmuy0=dmuy
+        phix0=phix
+        phiy0=phiy
         do i=1,2
           do j=1,2
             rmat0(i,j)=rmat(i,j)
@@ -1666,6 +1720,8 @@
         wy=wy0
         dmux=dmux0
         dmuy=dmuy0
+        phix=phix0
+        phiy=phiy0
         do i=1,2
           do j=1,2
             rmat(i,j)=rmat0(i,j)
@@ -1791,10 +1847,6 @@
       sigxco = sigxco
       ycomax = ycomax
       sigyco = sigyco
-      phix = phix/twopi
-      phiy = phiy/twopi
-      dmux = dmux/twopi
-      dmuy = dmuy/twopi
 
 !---- Fill summary table
       call double_to_table('summ ','length ' ,suml)
