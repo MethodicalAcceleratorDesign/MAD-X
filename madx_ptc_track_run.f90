@@ -1273,7 +1273,7 @@ CONTAINS
       integer :: n_temp, j_last_particle_buffer,jmax_at_loop_start, j_particle
 
       LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                 NaN_coord_after_track_VK=.False. !
+                !NaN_coord_after_track_VK=.False. !
 
       if (ptc_track_debug) then ! debug printing --------------------------!
          print *; print *, 'Start SUBR.<One_turn_track_with_PTC>'
@@ -1285,6 +1285,8 @@ CONTAINS
          !(instead of <10 continue> in trrun.f)                                                  !
          !                                                                                       !
          Particle_loop: DO j_particle=n_temp, jmax_numb_particl_at_i_th_turn  !++++++++++++++!   !
+            !                                                                                !   ! 
+            NaN_coord_after_track_VK=.False. !VK20070709 XXXXXXXXXXXXXXXXXXXXX               !   !
             !                                                                                !   !
             jmax_at_loop_start = jmax_numb_particl_at_i_th_turn                              !   ^
             j_last_particle_buffer=j_particle ! remember index value after END DO            !   !
@@ -1300,14 +1302,14 @@ CONTAINS
             ! there is no any other an explicit description in KEK 2002-3 report             +   !
             !                                                                                !   ^
             do k_th_coord=1,6 ! save coordinates for the current particle ---!               +   !
-               if (ISNAN(current_x_coord_incl_co(k_th_coord))) then !VK20070328 XXXXXXXXXXXXXXXXXXXXX
-                  ! BUG !? Aperture does not work, if lattice with spread multipoles XXXXXXXXXXXXXXXXX
-                  NaN_coord_after_track_VK=.TRUE.                                                !X
-                  x_coord_incl_co(k_th_coord,j_particle)=999                                     !X
-               else  !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+               if (ISNAN(current_x_coord_incl_co(k_th_coord))) then !VK20070328 XXXXXXXXX    +   !
+                  ! BUG !? Aperture does not work, if lattice with spread multipoles XXXX    +   !
+                  NaN_coord_after_track_VK=.TRUE.                                   !XXXX    +   !
+                  x_coord_incl_co(k_th_coord,j_particle)=999                        !XXXX    !   !
+               else  !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    !   !
                   x_coord_incl_co(k_th_coord,j_particle)=  &                 !               +   !
                        current_x_coord_incl_co(k_th_coord)                   !               +   !
-               endif !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+               endif !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    +   !
                !                                                             !               +   !
             end do !---------------------------------------------------------!               !   ^
             !                                                                                !   !
@@ -1315,24 +1317,24 @@ CONTAINS
                Print *,'DO j_particle=n_temp, jmax_numb_particl_at_i_th_turn:'     !         !   !
                Print *, 'DO ',j_particle,'=',n_temp,',', &                         !         !   !
                     jmax_numb_particl_at_i_th_turn                                 !         !   ^
-               !
-               do k_th_coord=1,6  !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                  if (ISNAN(current_x_coord_incl_co(k_th_coord))) then         !X
-                     Print *, 'NAN-value for coordinate number ', k_th_coord   !X
-                  else                                                         !X
-                     Print*, 'k_th_coord=', k_th_coord, &                      !X
-                          'current_x_coord_incl_co=', &                     !X
-                          current_x_coord_incl_co(k_th_coord)              !X
-                  endif                                                        !X
-               enddo !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX!X
+               !                                                                   !         +   !  
+               do k_th_coord=1,6  !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  !         +   !
+                  if (ISNAN(current_x_coord_incl_co(k_th_coord))) then         !X  !         +   !
+                     Print *, 'NAN-value for coordinate number ', k_th_coord   !X  !         +   !
+                  else                                                         !X  !         +   !
+                     Print*, 'k_th_coord=', k_th_coord, &                      !X  !         +   !
+                          'current_x_coord_incl_co=', &                        !X  !         !   ^
+                          current_x_coord_incl_co(k_th_coord)                  !X  !         !   !
+                  endif                                                        !X  !         !   !
+               enddo !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX!X  !         !   !
             END if ! debug printing -----------------------------------------------!         !   !
             !                                                                                !   !
             call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                              !   !
-
-            if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXXXXXXX
-            if (ptc_track_debug) &                                                         !X
-                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX
-
+            !                                                                                !   !
+            if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  !   !
+            if (ptc_track_debug) &                                                    !XXXX  !   !
+                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
+            !                                                                                !   !
             if(flag_index_ptc_aperture/=0) c_%watch_user=.false.                             !   !
             !                                                                                !   !
             if (ptc_track_debug) then                                                        !   !
@@ -1497,8 +1499,8 @@ CONTAINS
       REAL(dp) :: length_curr_elem
       real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
 
-      LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                 NaN_coord_after_track_VK=.False. !
+      LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXX
+                !NaN_coord_after_track_VK=.False.
 
       x_coord_co_temp=zero
 
@@ -1543,6 +1545,8 @@ CONTAINS
             !                                                                                       ! *
             Particle_loop: DO j_th_partic=n_temp, jmax_numb_particl_at_i_th_turn !+++++++++++++++!  ! !
                !                                                                                 !  ! !
+               NaN_coord_after_track_VK=.False. !VK20070709 XXXXXXXXXXXXXXXXXXXXXX               !  ! !
+               !                                                                                 !  ! !
                jmax_at_loop_start = jmax_numb_particl_at_i_th_turn                               !  ^ !
                j_last_particle_buffer=j_th_partic   ! remember index value after END DO          !  ! !
                !                                                                                 !  ! l
@@ -1558,14 +1562,14 @@ CONTAINS
                !Print *, 'x=', current_x_coord_incl_co                                           +  ! r
                !                                                                                 !  ! !
                do k_th_coord=1,6 ! save coordinates for the current particle ---!                +  ! !
-                  if (ISNAN(current_x_coord_incl_co(k_th_coord))) then !VK20070328 XXXXXXXXXXXXXXXXXXXXX
-                     ! BUG !? Aperture does not work, if lattice with spread multipoles XXXXXXXXXXXXXXXXX
-                     NaN_coord_after_track_VK=.TRUE.                                                 !X
-                     x_coord_incl_co(k_th_coord,j_th_partic)=999                                     !X
-                  else  !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  if (ISNAN(current_x_coord_incl_co(k_th_coord))) then !VK20070328 XXXXXXXXX     +  ! !
+                     ! BUG !? Aperture does not work, if lattice with spread multipoles XXXX     +  ! !
+                     NaN_coord_after_track_VK=.TRUE.                            !XXXXXXXXXXX     +  ! !
+                     x_coord_incl_co(k_th_coord,j_th_partic)=999                !XXXXXXXXXXX     +  ! !
+                  else  !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     +  ! !
                      x_coord_incl_co(k_th_coord,j_th_partic)=  &                !                +  ! !
                           current_x_coord_incl_co(k_th_coord)                   !                +  ! !
-                  endif !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  endif !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     +  ! !
                   !                                                             !                +  ! !
                end do !---------------------------------------------------------!                !  ^ !
                !                                                                                 !  ! !
@@ -1577,12 +1581,14 @@ CONTAINS
                !     print*,"ready for printing aperture flag!!!!!!!",flag_index_ptc_aperture    !  ! m
                !     print*,"real aperture flag: ",c_%aperture_flag                              !  ! e
                !end if                                                                           !  ! n
-               !                                                                                 !  ! t
-               if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXXXXXXX
-               if (ptc_track_debug) &                                                         !X
-                    print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX
-               !
-               if (ptc_track_debug) then ! debug printing ----------------------------!          !  ^ s
+               !                                                                                 +  ^ t
+               if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX   +  ! s
+               if (ptc_track_debug) &                                                    !XXXX   +  ! !
+                    print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX   !  ! !
+               !                                                                                 !  ! !
+               if(flag_index_ptc_aperture/=0) c_%watch_user=.false. !VK20070709 XXXXXXXXXXXXXX   !  ! !   
+               !                                                                                 !  ! !
+               if (ptc_track_debug) then ! debug printing ----------------------------!          !  ^ !
                   !print *, 'PTC: <PRODUCE_APERTURE_FLAG> => flag_index', &           !          +  ! !
                   !                               flag_index_ptc_aperture             !          +  ! !
                   !                                                                   !          +  ! !
