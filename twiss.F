@@ -974,6 +974,8 @@
       character*130 msg
 
 !---- Initialization
+      amux=zero
+      amuy=zero
       currpos=zero
       sumloc = zero
       dorad = get_value('probe ','radiate ').ne.zero
@@ -1430,6 +1432,8 @@
       centre = get_value('twiss ','centre ').ne.zero
 
 !---- Initial values for lattice functions.
+      amux=zero
+      amuy=zero
       orbit(1) =opt_fun0(9 )
       orbit(2) =opt_fun0(10)
       orbit(3) =opt_fun0(11)
