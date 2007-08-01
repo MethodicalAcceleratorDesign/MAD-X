@@ -1447,7 +1447,7 @@
 !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
 !   ktrack    (integer) number of tracks.                              *
 !----------------------------------------------------------------------*
-      integer ktrack,beamshape
+      integer ktrack,beamshape,b_dir_int
       double precision track(6,*),parvec(*),fk,dp
       double precision gamma0,beta0,beta_dp,ptot,b_dir
       double precision q,q_prime,get_value,node_value,get_variable
@@ -1467,11 +1467,13 @@
       beta0 = sqrt(one-one/gamma0**2)
       ptot = beta0*gamma0*(one+dp)
       beta_dp = ptot / sqrt(one + ptot**2)
-      b_dir = node_value('bbdir ')
-      b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-20)
+      b_dir_int = node_value('bbdir ')
+      b_dir=dble(b_dir_int)
+      b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-32)
 !---- pre-factor, if zero, anything else does not need to be calculated
-      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/beta_dp*    &
-     &(one-beta0*beta_dp*b_dir)/dabs(q)
+      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
+     &(one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
+!
       if (fk .eq. zero)  return
 !---- choose beamshape: 1-Gaussian, 2-flattop=trapezoidal, 3-hollow-parabolic
       beamshape = node_value('bbshape ')
