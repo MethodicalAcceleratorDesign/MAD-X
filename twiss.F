@@ -4898,7 +4898,7 @@
 !   te(6,6,6) (double)  second-order terms.                            *
 !----------------------------------------------------------------------*
       include 'track.fi'
-      integer beamshape
+      integer beamshape, b_dir_int
       logical fsec,ftrk,fmap,first
       double precision orbit(6),re(6,6),te(6,6,6),node_value,get_value
       double precision fk,parvec(26),q,q_prime,dp,get_variable
@@ -4910,22 +4910,24 @@
 !     if x > explim, exp(-x) is outside machine limits.
 
 !--- standard 4D
+      q=get_value('probe ','charge ')
+      q_prime=node_value('charge ')
       parvec(5)=get_value('probe ', 'arad ')
       parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
       parvec(7)=get_value('probe ','gamma ')
 !---- Calculate momentum deviation and according changes 
 !     of the relativistic factor beta0 
       dp  = get_variable('track_deltap ')
-      q = get_value('probe ','charge ')
-      q_prime = node_value('charge ')
       gamma0 = parvec(7)
       beta0 = sqrt(one-one/gamma0**2)
       ptot = beta0*gamma0*(one+dp)
       beta_dp = ptot / sqrt(one + ptot**2)
-      b_dir = node_value('bbdir ')
-      b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-20)
-      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/beta_dp*    &
-     &(one-beta0*beta_dp*b_dir)/q
+      b_dir_int = node_value('bbdir ')
+      b_dir = dble(b_dir_int)
+      b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-32)
+!
+      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
+     &(one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
 !---- chose beamshape
       beamshape = node_value('bbshape ')
       if(beamshape.lt.1.or.beamshape.gt.3) then
