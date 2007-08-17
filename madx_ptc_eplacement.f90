@@ -313,7 +313,8 @@ contains
     do i=1,r%n
        write(mf,*)
        write(mf,*) '//cout<<',i,'<<" ',p%mag%name,'"<<endl;'
-       !      print*, i,p%mag%name
+       
+       !print*, i,p%mag%name
        if (getdebug() > 2) then
           print*, i,p%mag%name
           print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
@@ -332,19 +333,20 @@ contains
        case(kind11) !monitor
           call drawtube(p,mf,0.05_dp,magenta)
 
-       case(kind12) !monitor
+       case(kind12) !H monitor
           call drawtube(p,mf,0.05_dp,magenta)
 
-       case(kind13) !monitor
+       case(kind13) !V monitor
+          call drawtube(p,mf,0.05_dp,magenta)
+
+       case(kind14) !instrument
           call drawtube(p,mf,0.05_dp,magenta)
 
        case(kind10) !SBEND
           call drawsbend(p,mf)
 
        case(32) !SBEND (Multipole) with model 1 ( Kick Drift Kick) and NON-exact
-          call drawsbend(p,mf)
-
-       case(37) !SBEND (Multipole) with model 2 (Matrix Kick Matrix)  and NON-exact
+          print*,"This is type 32"
           call drawsbend(p,mf)
 
        case(kind20) !stright exact bend
@@ -362,12 +364,13 @@ contains
        case(kind5) !solenoid
           call drawtube(p,mf,0.25_dp,darkgreen)
 
-       case(kind16)
-          if (getdebug() > 3) then
+       case(kind16,kind7)
+          if ( p%mag%kind==kind16 .and. getdebug() > 3) then
              print*, "KIND16: likemad is ", p%mag%k16%likemad
              print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
              print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
           endif
+          
           nmul = p%mag%p%nmul
           if (p%mag%bn(1) /= zero ) then
              !BEND
@@ -391,7 +394,7 @@ contains
           elseif (nmul < 3)  then 
              !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
-             cycle
+             goto 100
 
           elseif ( (p%mag%bn(3) /= zero) .or. (p%mag%an(3) /= zero)  ) then
              !SEXTUPOLE
@@ -400,7 +403,7 @@ contains
           elseif (nmul < 4)  then 
              !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
-             cycle
+             goto 100
           elseif ( (p%mag%bn(4) /= zero) .or. (p%mag%an(4) /= zero) ) then
 
              !OCTUPOLE
@@ -452,7 +455,7 @@ contains
 
 
       if (P%mag%p%f%a(2) .ne. P%mag%p%f%b(2) ) then
-         print*, "Not able yet to drow horizonthally skewed SBEND. DRAWING AS RBEND"
+         print*, "Not able yet to draw horizonthally skewed SBEND. DRAWING AS RBEND"
          call drawboxm(p,mf,color)
          return
       endif
