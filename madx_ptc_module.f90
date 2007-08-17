@@ -1061,57 +1061,6 @@ CONTAINS
   end subroutine ptc_setfieldcomp
   !----------------------------------------------------------------
 
-  subroutine extendnmul(f,n)
-    implicit none
-    type(fibre),  pointer               :: f !fiber
-    integer                             :: n !order
-    real(dp)    , DIMENSION(:), POINTER :: ANR,BNR !real arrays for regular element
-    type(real_8), DIMENSION(:), POINTER :: ANP,BNP !polimorphic arrays for polimorphic element
-    integer                             :: i !iterator
-    !P.Sk
-
-    if (.not. associated(f)) then
-       return
-    endif
-
-    ALLOCATE(ANR(n),BNR(n))
-    ALLOCATE(ANP(n),BNP(n))
-    CALL ALLOC(ANP,n)
-    CALL ALLOC(BNP,n)
-
-    DO I=1,f%mag%P%NMUL
-       ANR(I)=f%mag%AN(I)
-       BNR(I)=f%mag%BN(I)
-
-       ANP(I)=f%magp%AN(I)
-       ANP(I)=f%magp%BN(I)
-    ENDDO
-
-    DO I=f%mag%P%NMUL+1, n
-       ANR(I)=zero
-       BNR(I)=zero
-
-       ANP(I)=zero
-       ANP(I)=zero
-    ENDDO
-
-    call kill(f%magp%AN,f%magp%p%nmul)
-    call kill(f%magp%BN,f%magp%p%nmul)
-    deallocate(f%magp%AN,f%magp%BN)
-    deallocate(f%mag%AN,f%mag%BN)
-
-    f%mag%p%nmul  = n
-    f%magp%p%nmul = n
-
-    f%mag%AN=>ANR
-    f%mag%BN=>BNR
-
-    f%magp%AN=>ANP
-    f%magp%BN=>BNP
-
-
-  end subroutine extendnmul
-
   subroutine ptc_align()
     implicit none
     include 'twiss0.fi'
