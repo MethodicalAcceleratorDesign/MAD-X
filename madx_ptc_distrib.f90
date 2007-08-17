@@ -391,7 +391,7 @@ contains
     endif
 
 
-    print*, "Setting Sigmas (Emittances)"
+    if (getdebug() > 1) print*, "Setting Sigmas (Emittances)"
 
     sigmas(1) = sqrt(emix)
     sigmas(2) = sigmas(1)
@@ -401,7 +401,7 @@ contains
     sigmas(5) = sqrt(emiz)
     sigmas(6) = sigmas(5)
 
-    print *, "Current sigmas setemittances ", sigmas
+    if (getdebug() > 1) print *, "Current sigmas setemittances ", sigmas
 
 
 
@@ -425,8 +425,10 @@ contains
     endif
 
 
-    print *, "Setting sigma for ", ndim
-    print *, "Current sigmas (setsigma) ", sigmas
+    if (getdebug() > 1) then
+      print *, "Setting sigma for ", ndim
+      print *, "Current sigmas (setsigma) ", sigmas
+    endif  
 
     sigmas(ndim) = sig
 

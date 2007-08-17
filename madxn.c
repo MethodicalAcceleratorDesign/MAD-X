@@ -6896,7 +6896,7 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
   }
 
 
-  k = get_range(element, current_sequ, nodes);
+  k = get_ex_range(element, current_sequ, nodes);
   if ( k != 1)
   {
     if (k > 1)
@@ -6917,20 +6917,24 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
 
   pos = 0;
   anode=current_sequ->range_start;
-  while( anode != 0x0  )
+  while(anode)
   {
-    if ( nodes[0]  == current_sequ->nodes->nodes[pos]  )
+    /*printf("%d: Comparing %#x %s with  %#x %s \n",pos, nodes[0], nodes[0]->name, anode, anode->name);*/
+    if ( nodes[0]  == anode  )
     {
-      /* printf("Element is at pos %d !\n",pos);*/
+      /*printf("Element is at pos %d !\n",pos);*/
       break;
     }
 
-    if (current_sequ->nodes->nodes[pos] == current_sequ->range_end)
+    if (anode == current_sequ->range_end)
     {
       warningnew("pro_ptc_eplacement","Reached the end of sequence - Element <<%s>> not found",element);
       return;
     }
+    
+    anode = anode->next;
     pos++; /*before if because fortran numerates from 1*/
+    
   }
 
 
