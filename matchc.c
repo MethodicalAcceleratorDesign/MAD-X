@@ -896,8 +896,9 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
   int i,j,k,l,t;
   double *SV,*U,*VT;
   double tmp;
-  FILE* knobfile;
+  FILE *knobfile, *jacfile;
   k=0;
+  jacfile=fopen(command_par_string("jacfile",cmd->clone),"w");
   fprintf(prt_file, "\n\nJACOBIAN:\n");
   fprintf(prt_file, "%4s %16s %10s %20s\n","Node","Constraint","Variable","Derivative");
   fprintf(prt_file, "---------------------------------------------------------------\n");
@@ -912,12 +913,15 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
         fprintf(prt_file, "%4s ",match2_macro_name[i]);
         fprintf(prt_file, "%16s ",match2_cons_name[i][j]);
         fprintf(prt_file, "%10s ",command_par_string("name",stored_match_var->commands[l]));
+        fprintf(jacfile, "%20.10e",jac[l*m+k]);
         fprintf(prt_file, "%20.10e",jac[l*m+k]);
         fprintf(prt_file, "\n");
+        fprintf(jacfile, "\n");
       }
       k++;
     }
   }
+  fclose(jacfile);
   fprintf(prt_file, "\n\nSINGULAR VALUE DECOMPOSITION:\n");
   SV=(double *)mymalloc("match_match",(total_const+total_vars)*sizeof(double));
   VT=(double *)mymalloc("match_match",(total_vars*total_vars)*sizeof(double));
@@ -925,39 +929,42 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
   mtsvd_(&total_const,&total_vars,jac,SV,U,VT);
   k=0;
   l=0;
-  fprintf(prt_file, "%-25s %12s %-34s\n","Variable vector","* Sing. val.","---> Node constraint vector");
+  fprintf(prt_file, "%-25s %12s %-34s\n","Variable vector","---> Sing. val.","* Node constraint vector");
   fprintf(prt_file, "--------------------------------------------------------------------\n");
   for(i=0;i<mymax(n,m);i++){
     for(j=0;j<mymax(n,m);j++){
-      if (match2_cons_name[k][l]==NULL) {
-        k++;
-        l=0;
-      }
       if ( (i<n)&&(j<n)) {
         fprintf(prt_file, "%-12s",command_par_string("name",stored_match_var->commands[j]));
-        fprintf(prt_file, "%12.6g ",VT[i*n+j]);
+        fprintf(prt_file, "%12.5g ",VT[j*n+i]);
       }
-      else { fprintf(prt_file, "%22s",""); }
+      else { fprintf(prt_file, "%24s",""); }
+
       if ( (i<mymin(n,m)) &&(j==0))   {
-        fprintf(prt_file, "%12.6g ",SV[i]);
+        fprintf(prt_file, "%12.5g ",SV[i]);
       }
       else { fprintf(prt_file, "%12s ",""); }
+
       if ( (i<m)&&(j<m) ) {
+        if (match2_cons_name[k][l]==NULL) {
+          k++;
+          l=0;
+        }
 /*        fprintf(prt_file, "%i %i",k,l);*/
-        fprintf(prt_file, "%12.6g ",U[j*m+i]);
+        fprintf(prt_file, "%12.5g ",U[i*m+j]);
 /*        fprintf(prt_file, "%10s ",match2_macro_name[k]);*/
         fprintf(prt_file, "%10s ",match2_cons_name[k][l]);
+        l++;
       }
-      else { fprintf(prt_file, "%34s",""); }
+      else { fprintf(prt_file, "%22s",""); }
       fprintf(prt_file, "\n");
-      l++;
     }
     l=0;
     k=0;
     fprintf(prt_file, "\n");
     fprintf(prt_file, "\n");
   }
-  knobfile=fopen(command_par_string("file",cmd->clone),"w");
+/* Print knob file */
+  knobfile=fopen(command_par_string("knobfile",cmd->clone),"w");
   k=0;
   l=0;
   for(i=0;i<n;i++){
@@ -965,16 +972,21 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
     fprintf(knobfile, "%-12s := %e ",command_par_string("name",stored_match_var->commands[i]),get_variable(command_par_string("name",stored_match_var->commands[i])));
     for(j=0;j<m;j++){
       if (match2_cons_name[k][l]==NULL) { k++; l=0; }
-      /* Compute sum_k VT[t,i] / SV[t]* U[j,k] = M-1[i,j]*/
+      /* Compute M-1=V SV-1 UT/
+      /* M-1[i,j] = sum_t^min(m,n)   V[i,t]  / SV[t] * U[j,t] ) */
+      /*          = sum_t^min(m,n)  VT[t,i] / SV[t] * U[j,t]  ) */
+      /* in fortran M[i,j]=M[i+j*n] */
       tmp=0;
       for(t=0;t<mymin(m,n);t++) {
-        if (SV[t]>jac_cond) { tmp+=VT[i*n+t]/SV[t]*U[j*m+t]; }
-/*        fprintf(prt_file,"VT %d,%d,%e \n",i,t,VT[i*n+t]);*/
-/*        fprintf(prt_file,"SV %d,%e \n",t,SV[t]);*/
-/*        fprintf(prt_file,"U %d,%d,%e \n",j,t,U[i*n+t]);*/
-/*        fprintf(prt_file,"M-1 %d,%d,%e \n",i,j,tmp);*/
+        if (SV[t]>jac_cond) { tmp+=VT[t+n*i]/SV[t]*U[j+t*m]; }
+/*        fprintf(prt_file,"VT %d,%d,%12.5e ",t,i,VT[t+n*i]);*/
+/*        fprintf(prt_file,"SV %d,%12.5e ",t,SV[t]);*/
+/*        fprintf(prt_file,"U  %d,%d,%12.5e\n",j,t,U[j+t*m]);*/
         }
-      fprintf(knobfile, "%+e * %s",tmp,match2_cons_name[k][l]);
+/*      fprintf(prt_file,"M-1 %d,%d,%e \n",i,j,tmp);*/
+      if ( strcmp(match2_cons_name[k][l],"0")!=0 ) {
+        fprintf(knobfile, "%+15.8e*%s",tmp,match2_cons_name[k][l]);
+      };
       l++;
     }
     fprintf(knobfile, ";\n");
