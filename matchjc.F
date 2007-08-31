@@ -482,9 +482,9 @@
         dx(i)=(x(i)-xstart(i))
       enddo
 
-      xnorm=DNRM2(N, x, 1)
-      dxnorm=sqrt(DNRM2(N, dx, 1)/xnorm)
-      write(*,*) 'Final relative difference norm:',dxnorm
+!      xnorm=DNRM2(N, x, 1)
+      dxnorm=sqrt(DNRM2(N, dx, 1))
+      write(*,*) 'Final difference norm:',dxnorm
 
       end
 
