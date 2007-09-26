@@ -23,7 +23,7 @@ MODULE madx_ptc_module
   logical(lp) mytime
   integer icav
 
-  integer :: universe=0,index=0,EXCEPTION=0
+  integer :: universe=0,index_mad=0,EXCEPTION=0
   integer ipause
   integer,external :: mypause
   real(kind(1d0)) get_value,node_value
@@ -81,7 +81,7 @@ CONTAINS
     endif
 
     call append_empty_layout(m_u)
-    index=index+1
+    index_mad=index_mad+1
     my_ring=>m_u%end
 
     call ptc_input()
@@ -115,9 +115,9 @@ CONTAINS
 
     my_index = get_value('ptc_move_to_layout ','index ')
 
-    if(my_index.gt.index.or.my_index.le.0) then
+    if(my_index.gt.index_mad.or.my_index.le.0) then
        call fort_warn('return from ptc_move_to_layout: ',' layout outside allowed range')
-       print*,"   Allowed range 0 < ",index
+       print*,"   Allowed range 0 < ",index_mad
        return
     endif
 
@@ -704,6 +704,28 @@ CONTAINS
        !     key%list%volt=node_value('ex ')
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
+    case(12)
+! actually our SROT element
+       key%magnet="CHANGEREF"
+       call dzero(patch_ang,3)
+       call dzero(patch_trans,3)
+       patch_ang(3)=node_value('angle ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+    case(13)
+! actually our YROT element
+       key%magnet="CHANGEREF"
+       call dzero(patch_ang,3)
+       call dzero(patch_trans,3)
+       patch_ang(2)=node_value('angle ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
     case(14,15,16) ! PTC accepts mults
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
@@ -1400,7 +1422,7 @@ CONTAINS
        call fort_warn('return from ptc_track: ',' no universe created')
        return
     endif
-    if(index.le.0) then
+    if(index_mad.le.0) then
        call fort_warn('return from ptc_track: ',' no layout created')
        return
     endif

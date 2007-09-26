@@ -316,7 +316,7 @@ contains
        call seterrorflag(1,"ptc_twiss ","no universe created till now");
        return
     endif
-    if(index.le.0) then
+    if(index_mad.le.0) then
        call fort_warn('return from ptc_twiss: ',' no layout created')
        call seterrorflag(2,"ptc_twiss ","no layout created till now");
        return

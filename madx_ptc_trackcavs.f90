@@ -70,7 +70,7 @@ contains
        print*,"Max number of nobs ", nobs 
        return
     endif
-    if(index.le.0) then
+    if(index_mad.le.0) then
        call fort_warn('return from ptc_trackline: ',' no layout created')
        return
     endif
@@ -400,7 +400,7 @@ contains
        print *, nobs
        return
     endif
-    if(index.le.0) then
+    if(index_mad.le.0) then
        call fort_warn('return from ptc_trackline: ',' no layout created')
        return
     endif
@@ -609,7 +609,7 @@ contains
        call fort_warn('return from ptc_twiss: ',' no universe created')
        return
     endif
-    if(index.le.0) then
+    if(index_mad.le.0) then
        call fort_warn('return from ptc_twiss: ',' no layout created')
        return
     endif

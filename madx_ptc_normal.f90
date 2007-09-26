@@ -37,7 +37,7 @@ contains
        call fort_warn('return from ptc_normal: ',' no universe created')
        return
     endif
-    if(index.le.0) then
+    if(index_mad.le.0) then
        call fort_warn('return from ptc_normal: ',' no layout created')
        return
     endif
