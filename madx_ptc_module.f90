@@ -720,7 +720,7 @@ CONTAINS
        key%magnet="CHANGEREF"
        call dzero(patch_ang,3)
        call dzero(patch_trans,3)
-       patch_ang(2)=node_value('angle ')
+       patch_ang(2)=-node_value('angle ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
