@@ -972,7 +972,7 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
     fprintf(knobfile, "%-12s := %e ",command_par_string("name",stored_match_var->commands[i]),get_variable(command_par_string("name",stored_match_var->commands[i])));
     for(j=0;j<m;j++){
       if (match2_cons_name[k][l]==NULL) { k++; l=0; }
-      /* Compute M-1=V SV-1 UT/
+      /* Compute M-1=V SV-1 UT */
       /* M-1[i,j] = sum_t^min(m,n)   V[i,t]  / SV[t] * U[j,t] ) */
       /*          = sum_t^min(m,n)  VT[t,i] / SV[t] * U[j,t]  ) */
       /* in fortran M[i,j]=M[i+j*n] */
