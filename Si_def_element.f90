@@ -18,7 +18,7 @@ MODULE S_DEF_ELEMENT
   PRIVATE copy_el_elp,copy_elp_el,copy_el_el
   PRIVATE cop_el_elp,cop_elp_el,cop_el_el
   private ZERO_EL,ZERO_ELP
-  PRIVATE MAGPSTATE,MAGSTATE
+  !  PRIVATE MAGPSTATE,MAGSTATE
   PRIVATE SETFAMILYR,SETFAMILYP
   PRIVATE ADDR_ANBN,ADDP_ANBN,bL_0,EL_BL,ELp_BL,COPY_BL,UNARYP_BL
   PRIVATE ELp_POL,bLPOL_0
@@ -33,15 +33,13 @@ MODULE S_DEF_ELEMENT
   !  logical(lp) :: isomorphism_MIS=.TRUE.  !Not needed anymore always should be true
   private put_aperture_el,put_aperture_elp
   integer :: mfpolbloc=0
-
-  TYPE MUL_BLOCK
-     ! stuff for setting multipole
-     real(dp) AN(NMAX),BN(NMAX)
-     INTEGER NMUL,NATURAL,ADD
-  END TYPE MUL_BLOCK
-
+  logical(lp),target :: recirculator_cheat=my_false
+  PRIVATE TRACKR,TRACKP
+  logical(lp),TARGET :: other_program=.false.
+  integer j_global
 
   ! Old home for element and elementp, now in sh_def_kind
+
 
 
 
@@ -100,8 +98,8 @@ MODULE S_DEF_ELEMENT
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE ZERO_EL                 ! NEED UPGRADE
      MODULE PROCEDURE ZERO_ELP                  ! NEED UPGRADE
-     MODULE PROCEDURE MAGSTATE              ! need upgrade IF STATES EXPANDED
-     MODULE PROCEDURE MAGPSTATE             ! need upgrade IF STATES EXPANDED
+     !     MODULE PROCEDURE MAGSTATE              ! need upgrade IF STATES EXPANDED
+     !     MODULE PROCEDURE MAGPSTATE             ! need upgrade IF STATES EXPANDED
      ! Multipole block setting
      MODULE PROCEDURE BL_0
      MODULE PROCEDURE EL_BL
@@ -121,10 +119,198 @@ MODULE S_DEF_ELEMENT
   END INTERFACE
 
 
+  INTERFACE TRACK
+     !  INTERFACE TRACK
+     MODULE PROCEDURE TRACKR
+     MODULE PROCEDURE TRACKP
+     !  END INTERFACE
+     ! END old Sj_elements
+  END INTERFACE
+
+
 
 
 
 CONTAINS
+
+
+  SUBROUTINE TRACKR(EL,X,K,MID)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(ELEMENT),INTENT(INOUT):: EL
+    TYPE(WORM),OPTIONAL, INTENT(INOUT):: MID
+    TYPE(INTERNAL_STATE) K
+
+    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    if(other_program) then
+       call track_R(x)
+       return
+    endif
+    SELECT CASE(EL%KIND)
+    CASE(KIND0)
+       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+       IF(PRESENT(MID)) CALL XMID(MID,X,1)   ! ADDED FOR NST=1 IN MARKER FOR THIN_LAYOUT SURVEY
+    case(KIND1)
+       CALL TRACK(EL%D0,X,K,MID)
+    case(KIND2)
+       CALL TRACK(EL%K2,X,k,MID)
+    case(KIND3)
+       CALL TRACK(EL%K3,X,k,MID)
+    case(KIND4)
+       CALL TRACK(EL%C4,X,k,MID)
+    case(KIND5)
+       CALL TRACK(EL%S5,X,k,MID)
+    case(KIND6)
+       CALL TRACK(EL%T6,X,k,MID)
+    case(KIND7)
+       CALL TRACK(EL%T7,X,k,MID)
+    case(KIND8)
+       CALL TRACK(EL%S8,X,k,MID)
+    case(KIND9)
+       CALL TRACK(EL%S9,X,k,MID)
+    case(KIND10)
+       CALL TRACK(EL%TP10,X,k,MID)
+    CASE(KIND11:KIND14)
+       call TRACK(EL%MON14,X,k,MID)
+    CASE(KIND15)
+       call TRACK(EL%SEP15,X,k,MID)
+    CASE(KIND16,KIND20)
+       call TRACK(EL%K16,X,k,MID)
+    CASE(KIND17)
+       call TRACK(EL%S17,X,k,MID)
+    CASE(KIND18)
+       call TRACK(EL%RCOL18,X,k,MID)
+    CASE(KIND19)
+       call TRACK(EL%ECOL19,X,k,MID)
+    CASE(KIND21)
+       call TRACK(EL%CAV21,X,k,MID)
+    case(KINDWIGGLER)
+       call TRACK(EL%WI,X,k,MID)
+    case(KINDPA)
+       call TRACK(EL%PA,X,k,MID)
+    case default
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKR"
+       CALL WRITE_E(0)
+    END SELECT
+  END SUBROUTINE TRACKR
+
+  SUBROUTINE TRACKP(EL,X,K)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(ELEMENTP),INTENT(INOUT):: EL
+    !    TYPE(WORM_8),OPTIONAL, INTENT(INOUT):: MID
+    TYPE(INTERNAL_STATE) K
+
+    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    if(other_program) then
+       call track_p(x)
+       return
+    endif
+    SELECT CASE(EL%KIND)
+    CASE(KIND0)
+       !       IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    case(KIND1)
+       CALL TRACK(EL%D0,X,K)
+    case(KIND2)
+       CALL TRACK(EL%K2,X,k)
+    case(KIND3)
+       CALL TRACK(EL%K3,X,k)
+    case(KIND4)
+       CALL TRACK(EL%C4,X,k)
+    case(KIND5)
+       CALL TRACK(EL%S5,X,k)
+    case(KIND6)
+       CALL TRACK(EL%T6,X,k)
+    case(KIND7)
+       CALL TRACK(EL%T7,X,k)
+    case(KIND8)
+       CALL TRACK(EL%S8,X,k)
+    case(KIND9)
+       CALL TRACK(EL%S9,X,k)
+    case(KIND10)
+       CALL TRACK(EL%TP10,X,k)
+    CASE(KIND11:KIND14)
+       call TRACK(EL%MON14,X,k)
+    CASE(KIND15)
+       call TRACK(EL%SEP15,X,k)
+    CASE(KIND16,KIND20)
+       call TRACK(EL%K16,X,k)
+    CASE(KIND17)
+       call TRACK(EL%S17,X,k)
+    CASE(KIND18)
+       call TRACK(EL%RCOL18,X,k)
+    CASE(KIND19)
+       call TRACK(EL%ECOL19,X,k)
+    CASE(KIND21)
+       call TRACK(EL%CAV21,X,k)
+    case(KINDWIGGLER)
+       call TRACK(EL%WI,X,k)
+    case(KINDPA)
+       call TRACK(EL%PA,X,k)
+    case default
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKP"
+       CALL WRITE_E(0)
+    END SELECT
+  END SUBROUTINE TRACKP
+
+  SUBROUTINE TRACK_R(X)
+    IMPLICIT NONE
+    REAL(DP) X(6),x6,xp,yp,x5
+    INTEGER icharef
+    COMMON/ptc/ icharef
+
+
+    if(j_global==1) return  ! skipping OBJECT OF ZGOUBI = TRACKING COMMAND INTERNAL TO ZGOUBI
+    icharef=0
+
+    x(1)=x(1)*c_100
+    x(3)=x(3)*c_100
+    x6=x(6)*c_100
+
+    xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
+    yp=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
+    x(2)=atan(xp)*c_1d3
+    x(4)=atan(yp/root(one+xp**2))*c_1d3
+
+    x(6)=x(5)
+    x(5)=x6
+
+    !call track_z(x,j_global,j_global)
+
+    x6=x(5)/c_100
+    x(5)=x(6)
+    x(6)=x6
+
+    x(1)=x(1)/c_100
+    x(3)=x(3)/c_100
+    xp=tan(x(2)/c_1d3)
+    yp=tan(x(4)/c_1d3)*root(one+xp**2)
+
+    x(2)=(one+x(5))*xp/root(one+xp**2+yp**2)
+    x(4)=(one+x(5))*yp/root(one+xp**2+yp**2)
+
+    icharef=1
+
+  END SUBROUTINE TRACK_R
+
+  SUBROUTINE TRACK_P(X)
+    IMPLICIT NONE
+    TYPE(REAL_8) X(6)
+
+    ! track_zp is a fortran external routine using numerical differentiation
+    !call track_zp(x,j_global,j_global)
+    WRITE(6,*) " NOT SUPPORTED "
+    STOP 111
+  END SUBROUTINE TRACK_P
+
+
+
 
   SUBROUTINE  work_0(S2,S1)
     implicit none
@@ -749,12 +935,12 @@ CONTAINS
 
 
   !  SUBROUTINE SETFAMILYR(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
-  SUBROUTINE SETFAMILYR(EL,T,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYR(EL,T)  !,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT) ::EL
-    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
+    !    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
     type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
-
+    EL%P%permfringe=>EL%permfringe
     SELECT CASE(EL%KIND)
     CASE(KIND1)
        if(.not.ASSOCIATED(EL%D0))ALLOCATE(EL%D0)
@@ -812,6 +998,8 @@ CONTAINS
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
        ALLOCATE(EL%C4%N_BESSEL);EL%C4%N_BESSEL=0
+       ALLOCATE(EL%C4%cavity_totalpath);EL%C4%cavity_totalpath=cavity_totalpath
+       ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
           ALLOCATE(EL%CAV21)
@@ -831,6 +1019,8 @@ CONTAINS
        ALLOCATE(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
        ALLOCATE(EL%CAV21%DVDS);EL%CAV21%DVDS=ZERO
        ALLOCATE(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
+       ALLOCATE(EL%CAV21%cavity_totalpath);EL%CAV21%cavity_totalpath=cavity_totalpath
+       ALLOCATE(EL%CAV21%phase0);EL%CAV21%phase0=phase0
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -1154,13 +1344,14 @@ CONTAINS
   END SUBROUTINE SETFAMILYR
 
 
-  SUBROUTINE SETFAMILYP(EL,T,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYP(EL,T)  !,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     !  SUBROUTINE SETFAMILYP(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENTP), INTENT(INOUT) ::EL
-    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
+    !    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
     type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
 
+    EL%P%permfringe=>EL%permfringe
     SELECT CASE(EL%KIND)
     CASE(KIND1)
        if(.not.ASSOCIATED(EL%D0))ALLOCATE(EL%D0)
@@ -1218,6 +1409,8 @@ CONTAINS
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
        ALLOCATE(EL%C4%N_BESSEL);EL%C4%N_BESSEL=0
+       ALLOCATE(EL%C4%cavity_totalpath);EL%C4%cavity_totalpath=cavity_totalpath
+       ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
           ALLOCATE(EL%CAV21)
@@ -1237,6 +1430,8 @@ CONTAINS
        ALLOCATE(EL%CAV21%PSI);CALL ALLOC(EL%CAV21%PSI);EL%CAV21%PSI=ZERO
        ALLOCATE(EL%CAV21%DVDS);CALL ALLOC(EL%CAV21%DVDS);EL%CAV21%DVDS=ZERO
        ALLOCATE(EL%CAV21%DPHAS);CALL ALLOC(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
+       ALLOCATE(EL%CAV21%cavity_totalpath);EL%CAV21%cavity_totalpath=cavity_totalpath
+       ALLOCATE(EL%CAV21%phase0);EL%CAV21%phase0=phase0
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -1864,43 +2059,43 @@ CONTAINS
 
 
 
-  SUBROUTINE MAGSTATE(EL,S)
-    IMPLICIT NONE
-    TYPE(ELEMENT), INTENT(INOUT)::EL
-    TYPE(INTERNAL_STATE), INTENT(IN)::S
+  ! SUBROUTINE MAGSTATE(EL,S)
+  !   IMPLICIT NONE
+  !   TYPE(ELEMENT), INTENT(INOUT)::EL
+  !   TYPE(INTERNAL_STATE), INTENT(IN)::S
 
-    !    IF(S%TOTALPATH) THEN
-    EL%P%TOTALPATH=S%TOTALPATH
-    !    ELSE
-    !       EL%P%TOTALPATH=S%TOTALPATH
-    !    ENDIF
-    EL%P%RADIATION=S%RADIATION
-    EL%P%TIME=S%TIME
-    EL%P%NOCAVITY=S%NOCAVITY
-    EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
-    EL%P%SPIN=S%SPIN
-    !    EL%P%SPIN_ONLY=S%SPIN_ONLY
-  END SUBROUTINE MAGSTATE
+  !    IF(S%TOTALPATH) THEN
+  !       EL%P%TOTALPATH=S%TOTALPATH
+  !    ELSE
+  !       EL%P%TOTALPATH=S%TOTALPATH
+  !    ENDIF
+  !    EL%P%RADIATION=S%RADIATION
+  !    EL%P%TIME=S%TIME
+  !    EL%P%NOCAVITY=S%NOCAVITY
+  !    EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
+  !    EL%P%SPIN=S%SPIN
+  !    EL%P%SPIN_ONLY=S%SPIN_ONLY
+  !  END SUBROUTINE MAGSTATE
 
 
-  SUBROUTINE MAGPSTATE(EL,S)
-    IMPLICIT NONE
-    TYPE(ELEMENTP), INTENT(INOUT)::EL
-    TYPE(INTERNAL_STATE), INTENT(IN)::S
+  !  SUBROUTINE MAGPSTATE(EL,S)
+  !   IMPLICIT NONE
+  !   TYPE(ELEMENTP), INTENT(INOUT)::EL
+  !   TYPE(INTERNAL_STATE), INTENT(IN)::S
 
-    !    IF(S%TOTALPATH) THEN
-    EL%P%TOTALPATH=S%TOTALPATH
-    !    ELSE
-    !       EL%P%TOTALPATH=S%TOTALPATH
-    !    ENDIF
-    EL%P%RADIATION=S%RADIATION
-    EL%P%TIME=S%TIME
-    EL%P%NOCAVITY=S%NOCAVITY
-    EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
-    EL%P%SPIN=S%SPIN
-    !    EL%P%SPIN_ONLY=S%SPIN_ONLY
+  !    IF(S%TOTALPATH) THEN
+  !       EL%P%TOTALPATH=S%TOTALPATH
+  !    ELSE
+  !       EL%P%TOTALPATH=S%TOTALPATH
+  !    ENDIF
+  !    EL%P%RADIATION=S%RADIATION
+  !    EL%P%TIME=S%TIME
+  !    EL%P%NOCAVITY=S%NOCAVITY
+  !    EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
+  !    EL%P%SPIN=S%SPIN
+  !    EL%P%SPIN_ONLY=S%SPIN_ONLY
 
-  END SUBROUTINE MAGPSTATE
+  !  END SUBROUTINE MAGPSTATE
 
 
   SUBROUTINE null_EL(EL)
@@ -1918,7 +2113,7 @@ CONTAINS
     nullify(EL%lag);
     nullify(EL%B_SOL);
     nullify(EL%THIN);
-    nullify(EL%MIS);nullify(EL%EXACTMIS);
+    nullify(EL%MIS); !nullify(EL%EXACTMIS);
     nullify(EL%D);nullify(EL%R);
     nullify(EL%D0);
     nullify(EL%K2);
@@ -1943,6 +2138,7 @@ CONTAINS
     nullify(EL%WI);
     nullify(EL%PA);
     nullify(EL%P);
+    nullify(EL%siamese);
     nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_EL
 
@@ -1962,7 +2158,7 @@ CONTAINS
     nullify(EL%VOLT);nullify(EL%FREQ);nullify(EL%PHAS);nullify(EL%DELTA_E);
     nullify(EL%B_SOL);
     nullify(EL%THIN);
-    nullify(EL%MIS);nullify(EL%EXACTMIS);
+    nullify(EL%MIS);  !nullify(EL%EXACTMIS);
     nullify(EL%D);nullify(EL%R);
     nullify(EL%D0);
     nullify(EL%K2);
@@ -1988,23 +2184,25 @@ CONTAINS
     nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
+    nullify(EL%siamese);
   end SUBROUTINE null_ELp
 
 
 
   SUBROUTINE ZERO_EL(EL,I)
     IMPLICIT NONE
-    TYPE(ELEMENT), INTENT(INOUT)::EL
+    TYPE(ELEMENT),target, INTENT(INOUT)::EL
     INTEGER, INTENT(IN)::I
 
     IF(I==-1) THEN
 
        DEALLOCATE(EL%KIND);
        DEALLOCATE(EL%recut);
+       DEALLOCATE(EL%even);
        DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);
        DEALLOCATE(EL%PERMFRINGE);
        DEALLOCATE(EL%L);
-       DEALLOCATE(EL%MIS);DEALLOCATE(EL%EXACTMIS);
+       DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
 
        call kill(EL%P)    ! AIMIN MS 4.0
        IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
@@ -2103,6 +2301,7 @@ CONTAINS
        IF(ASSOCIATED(EL%PARENT_FIBRE))        then
           nullify(EL%PARENT_FIBRE)
        ENDIF
+       nullify(EL%siamese);
 
 
     elseif(I>=0)       then
@@ -2115,17 +2314,21 @@ CONTAINS
 
        ALLOCATE(EL%KIND);EL%KIND=0;
        ALLOCATE(EL%RECUT);EL%RECUT=MY_TRUE;
+       ALLOCATE(EL%even);EL%even=MY_false;
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
 
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=zero;
-       ALLOCATE(EL%MIS);ALLOCATE(EL%EXACTMIS);EL%MIS=.FALSE.;EL%EXACTMIS=ALWAYS_EXACTMIS;
+       ALLOCATE(EL%MIS);
+       !       ALLOCATE(EL%EXACTMIS);
+       EL%MIS=.FALSE.;
+       !       EL%EXACTMIS=ALWAYS_EXACTMIS;
        allocate(el%r(3));allocate(el%d(3));
        el%r=zero;el%d=zero;
 
-       EL=DEFAULT;
+       !       EL=DEFAULT;
        !   ANBN
        CALL ZERO_ANBN(EL,I)
        ALLOCATE(EL%FINT);EL%FINT=half;
@@ -2139,7 +2342,7 @@ CONTAINS
 
   SUBROUTINE ZERO_ELP(EL,I)
     IMPLICIT NONE
-    TYPE(ELEMENTP), INTENT(INOUT)::EL
+    TYPE(ELEMENTP),target, INTENT(INOUT)::EL
     INTEGER, INTENT(IN)::I
     INTEGER J
 
@@ -2260,6 +2463,7 @@ CONTAINS
        IF(ASSOCIATED(EL%PARENT_FIBRE))        then
           nullify(EL%PARENT_FIBRE)
        ENDIF
+       nullify(EL%siamese);
 
 
        DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);
@@ -2270,7 +2474,7 @@ CONTAINS
        CALL KILL(EL%HGAP);DEALLOCATE(EL%HGAP);
        CALL KILL(EL%H1);DEALLOCATE(EL%H1);
        CALL KILL(EL%H2);DEALLOCATE(EL%H2);
-       DEALLOCATE(EL%MIS);DEALLOCATE(EL%EXACTMIS);
+       DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
 
        call kill(EL%P)        ! call kill(EL%P)    ! AIMIN MS 4.0
 
@@ -2301,10 +2505,13 @@ CONTAINS
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);CALL ALLOC(EL%L);EL%L=zero;
-       ALLOCATE(EL%MIS);ALLOCATE(EL%EXACTMIS);EL%MIS=.FALSE.;EL%EXACTMIS=ALWAYS_EXACTMIS;
+       ALLOCATE(EL%MIS);
+       ! ALLOCATE(EL%EXACTMIS);
+       EL%MIS=.FALSE.;
+       !  EL%EXACTMIS=ALWAYS_EXACTMIS;
        allocate(el%r(3));allocate(el%d(3));
        el%r=zero;el%d=zero;
-       EL=DEFAULT;
+       !      EL=DEFAULT;
        !   ANBN
        CALL ZERO_ANBN(EL,I)
        ALLOCATE(EL%FINT);CALL ALLOC(EL%FINT);EL%FINT=half;
@@ -2353,7 +2560,7 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
-
+    if(associated(el%siamese)) elp%siamese=>el%siamese
 
 
     IF(EL%P%NMUL>0) THEN
@@ -2378,7 +2585,7 @@ CONTAINS
 
     ! MISALIGNMENTS
     ELP%MIS=EL%MIS
-    ELP%EXACTMIS=EL%EXACTMIS
+    !    ELP%EXACTMIS=EL%EXACTMIS
 
     IF(ASSOCIATED(EL%R)) THEN
        if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
@@ -2429,6 +2636,8 @@ CONTAINS
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
+       ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
+       ELP%C4%phase0 = EL%C4%phase0
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2448,6 +2657,8 @@ CONTAINS
        ELP%CAV21%PSI = EL%CAV21%PSI
        ELP%CAV21%DVDS = EL%CAV21%DVDS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
+       ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
+       ELP%CAV21%phase0 = EL%CAV21%phase0
     ENDIF
 
 
@@ -2570,6 +2781,7 @@ CONTAINS
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
     INTEGER I,J,k,l
 
+    if(associated(el%siamese)) elp%siamese=>el%siamese
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
     ELP%vorname=EL%vorname
@@ -2600,7 +2812,7 @@ CONTAINS
 
     ! MISALIGNMENTS
     ELP%MIS=EL%MIS
-    ELP%EXACTMIS=EL%EXACTMIS
+    !    ELP%EXACTMIS=EL%EXACTMIS
 
     IF(ASSOCIATED(EL%R)) THEN
        if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
@@ -2649,6 +2861,8 @@ CONTAINS
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
+       ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
+       ELP%C4%phase0 = EL%C4%phase0
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2665,6 +2879,8 @@ CONTAINS
        ELP%CAV21%PSI = EL%CAV21%PSI
        ELP%CAV21%DVDS = EL%CAV21%DVDS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
+       ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
+       ELP%CAV21%phase0 = EL%CAV21%phase0
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -2786,10 +3002,12 @@ CONTAINS
     INTEGER I,J,k,l
 
 
+    if(associated(el%siamese)) elp%siamese=>el%siamese
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
     ELP%vorname=EL%vorname
     ELP%RECUT=EL%RECUT
+    ELP%even=EL%even
     ELP%KIND=EL%KIND
     ELP%L=EL%L
     ELP%FINT=EL%FINT
@@ -2818,7 +3036,7 @@ CONTAINS
 
     ! MISALIGNMENTS
     ELP%MIS=EL%MIS
-    ELP%EXACTMIS=EL%EXACTMIS
+    !    ELP%EXACTMIS=EL%EXACTMIS
 
     IF(ASSOCIATED(EL%R)) THEN
        if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
@@ -2867,6 +3085,8 @@ CONTAINS
        ELP%THIN = EL%THIN
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
+       ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
+       ELP%C4%phase0 = EL%C4%phase0
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2885,6 +3105,8 @@ CONTAINS
        ELP%CAV21%PSI = EL%CAV21%PSI
        ELP%CAV21%DVDS = EL%CAV21%DVDS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
+       ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
+       ELP%CAV21%phase0 = EL%CAV21%phase0
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !

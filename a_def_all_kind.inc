@@ -44,8 +44,8 @@ TYPE CAV4
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp) , POINTER ::L                    !  Storage space for computed
-   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E
-   integer, POINTER :: N_BESSEL                        ! Cavity information
+   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0
+   integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH     ! Cavity information
 END  TYPE CAV4
 
 TYPE CAV4P
@@ -53,16 +53,17 @@ TYPE CAV4P
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8) , POINTER ::L
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS      ! Cavity Information
-   real(dp), POINTER :: DELTA_E                        ! Cavity information
-   integer, POINTER :: N_BESSEL                        ! Cavity information
+   real(dp), POINTER :: DELTA_E,phase0                        ! Cavity information
+   integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH  ! Cavity information
 END  TYPE CAV4P
 
 TYPE CAV_TRAV
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp) , POINTER ::L                    !  Storage space for computed
-   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E
+   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0
    real(dp), POINTER :: PSI,DPHAS,DVDS
+   integer, POINTER :: CAVITY_TOTALPATH     ! Cavity information
 END  TYPE CAV_TRAV
 
 
@@ -72,7 +73,8 @@ TYPE CAV_TRAVP
    TYPE(REAL_8) , POINTER ::L                    !  Storage space for computed
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS
    TYPE(REAL_8), POINTER :: PSI,DPHAS,DVDS
-   real(dp), POINTER :: DELTA_E                        ! Cavity information
+   real(dp), POINTER :: DELTA_E ,phase0                       ! Cavity information
+   integer, POINTER :: CAVITY_TOTALPATH     ! Cavity information
 END  TYPE CAV_TRAVP
 
 

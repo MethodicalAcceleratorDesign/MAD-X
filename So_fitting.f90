@@ -280,7 +280,7 @@ contains
     IMPLICIT NONE
     TYPE(layout),INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
-    REAL(DP), ALLOCATABLE :: BETA(:,:,:)
+    REAL(DP), pointer :: BETA(:,:,:)
     REAL(DP)DBETA,tune(:),tune2(:)
     type(fibre),pointer :: p
     integer i,IB,pos,mf
@@ -292,7 +292,7 @@ contains
     real(dp) dbetamax,db1,db2
     real(dp),optional :: a(6,6),ai(6,6),mat(6,6),clos(6)
 
-    if(.not.allocated(beta))   ALLOCATE(BETA(2,2,R%N))
+    if(.not.associated(beta))   ALLOCATE(BETA(2,2,R%N))
 
 
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
@@ -945,505 +945,6 @@ contains
     verbose=.not.verbose
   end   subroutine toggle_verbose
 
-  subroutine special_alex_main_ring(r,n_name,targ,sc)
-    implicit none
-    TYPE(layout), target, intent(inout):: R
-    integer  i1,i2,I3,I4,it1,it2,it3,it4
-    INTEGER I,N,NU,N2,NP2,mf,nt,NP,J,n_name
-    type(fibre), pointer :: p1,p2
-    TYPE(POL_BLOCK) QC(11)
-    TYPE(REAL_8) Y(6)
-    TYPE(DAMAP) ID
-    REAL(DP) X(6),targ(2),xx  ,tas(6)
-    TYPE(INTERNAL_STATE) STATE
-    LOGICAL(LP) U
-    type(normalform) nf
-    type(gmap) g
-    type(TAYLOR) T,eq(5)
-
-    REAL(DP) ALX,ALY,BEX,BEY,NUX,NUY,TA(2),sc
-
-    !targ(1)=22.43d0
-    !targ(2)=20.82d0
-
-    N=10
-    NU=11
-    if(.not.associated(r%t)) then
-       write(6,*) " thin lens lattice not made "
-       stop 300
-    endif
-    p1=>r%start
-    do i=1,r%n
-       if(p1%mag%name(1:3)=='QDX') then
-          i1=i
-          exit
-       endif
-       p1=>p1%next
-    enddo
-    p2=>p1%next
-    do i=i1+1,r%n
-       if(p2%mag%name(1:3)=='QDX') then
-          i2=i
-          exit
-       endif
-       p2=>p2%next
-    enddo
-    !    call move_to(r,p1,i1)
-    !    call move_to(r,p2,i2)
-
-    write(6,*) p1%mag%name,p1%mag%p%nst
-    write(6,*) p2%mag%name,p2%mag%p%nst
-
-    IT1=p1%T1%POS+2 + (p1%mag%p%nst/2 )
-    IT2=p2%T1%POS+2 + (p2%mag%p%nst/2 )
-
-    write(6,*) i1,IT1,i2,IT2
-
-    if(mod(p1%mag%p%nst,2)/=0.or.mod(p2%mag%p%nst,2)/=0) then
-       write(6,*) " Even number of split needed for fitting in Alex_special "
-       stop 100
-    endif
-    !    call move_to(r,p1,i3)
-    !    call move_to(r,p2,i4)
-    p1=>p2%next
-    do i=i2+1,r%n
-       if(p1%mag%name(1:3)=='QFS') then
-          i1=i
-          exit
-       endif
-       p1=>p1%next
-    enddo
-
-    do i=i1,1,-1
-       if(p1%mag%name(1:3)=='QDX') then
-          i1=i
-          exit
-       endif
-       p1=>p1%previous
-    enddo
-
-
-    p2=>p1%next
-    do i=i1+1,r%n
-       if(p2%mag%name(1:3)=='QDX') then
-          i2=i
-          exit
-       endif
-       p2=>p2%next
-    enddo
-
-    write(6,*) p1%mag%name,p1%mag%p%nst
-    write(6,*) p2%mag%name,p2%mag%p%nst
-
-    IT3=p1%T1%POS+2 + (p1%mag%p%nst/2 )
-    IT4=p2%T1%POS+2 + (p2%mag%p%nst/2 )
-
-    write(6,*) i1,IT3,i2,IT4
-    if(mod(p1%mag%p%nst,2)/=0.or.mod(p2%mag%p%nst,2)/=0) then
-       write(6,*) " Even number of split needed for fitting in Alex_special "
-       stop 101
-    endif
-
-    DO I=1,NU
-       QC(I)=0
-       QC(I)%n_name=n_name
-    ENDDO
-    QC(1)%NAME='QFX'
-    QC(2)%NAME='QDX'
-    QC(3)%NAME='QFN'
-    QC(4)%NAME='QDN'
-    QC(5)%NAME='QFS'
-    QC(6)%NAME='QDS'
-    QC(7)%NAME='QFT'
-    QC(8)%NAME='QFP'
-    QC(9)%NAME='QDT'
-    QC(10)%NAME='QFR'
-    QC(11)%NAME='QDR'
-
-    DO I=1,NU
-       QC(I)%IBN(2)=I
-    ENDDO
-
-    DO I=1,NU
-       R=QC(I)
-    ENDDO
-
-111 STATE=DEFAULT0+ONLY_4D0
-
-    X=0.D0
-    CALL INIT(STATE,2,NU,BERZ,N2,NP2)
-    CALL ALLOC(ID); call alloc(nf);call alloc(Y);call alloc(eq,5);
-    ID=1
-    Y=X+ID
-    !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
-    nf=y
-    TA(1)=0.75d0
-    TA(2)=0.68d0
-    write(6,*) " arc tunes ",nf%tune(1:2)
-    eq(1)=nf%dhdj%v(1) !-TA(1)
-    eq(2)=nf%dhdj%v(2) !-TA(2)
-    eq(3)=nf%dhdj%v(1)
-
-    !   call print(nf%dhdj%v(1),6)
-    !   call print(nf%dhdj%v(2),6)
-
-    ! nf%dhdj%v(1)=(nf%dhdj%v(1)<=4)
-    ! nf%dhdj%v(2)=(nf%dhdj%v(2)<=4)
-
-    call kanalnummer(mf)
-    open(unit=mf,file='eq.txt')
-    eq(4)=(nf%A_T%V(1).par.'1000')**2+(nf%A_T%V(1).par.'0100')**2
-    eq(5)=(nf%A_T%V(3).par.'0010')**2+(nf%A_T%V(3).par.'0001')**2
-    !call print(eq(4),6)
-    !call print(eq(5),6)
-    ALX=-(nf%A_T%V(1).SUB.'1')*(nf%A_T%V(2).SUB.'1')-(nf%A_T%V(1).SUB.'01')*(nf%A_T%V(2).SUB.'01')
-    ALY=-(nf%A_T%V(3).SUB.'001')*(nf%A_T%V(4).SUB.'001')-(nf%A_T%V(3).SUB.'0001')*(nf%A_T%V(4).SUB.'0001')
-
-    !WRITE(6,*) BEX,BEY
-    !WRITE(6,*) ALX,ALY
-    x=0.d0
-    ID=1
-    Y=X+ID
-    !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
-    nf=y
-    eq(1)=(eq(1)*8 + (1.d0+nf%dhdj%v(1)))*3-targ(1)
-    eq(2)=(eq(2)*8 + (1.d0+nf%dhdj%v(2)))*3-targ(2)
-    eq(3)=eq(3)-ta(1)
-
-    eq(4)=eq(4)-(nf%A_T%V(1).par.'1000')**2-(nf%A_T%V(1).par.'0100')**2
-    eq(5)=eq(5)-(nf%A_T%V(3).par.'0010')**2-(nf%A_T%V(3).par.'0001')**2
-    !call print(eq(4),6)
-    !call print(eq(5),6)
-
-    do i=1,5
-       eq(i)=eq(i)<=4
-       xx=eq(i)
-       write(6,*) i,xx
-    enddo
-    do i=1,5
-       call print(eq(i),mf)
-    enddo
-
-    close(mf)
-    CALL kill(ID); call kill(nf);call kill(Y);call kill(eq,5);
-
-
-    NP=nu
-    nt=NP+5
-
-    CALL INIT(1,nt)
-    call alloc(g,nt)
-    call alloc(T)
-
-    call kanalnummer(mf)
-    open(unit=mf,file='eq.txt')
-    do i=np+1,nt
-       call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
-    enddo
-
-    call alloc(t)
-    do i=1,np
-       g%v(i)=one.mono.i
-       do j=np+1,nt
-          t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
-       enddo
-    enddo
-    CALL KILL(t)
-    write(6,*) "stable ", check_stable
-    g=g.oo.(-1)
-    write(6,*) "stable ", check_stable,nu
-    tpsafit(1:nt)=g
-    write(6,*) tpsafit(1:nu)
-    CALL KILL(G)
-
-    SET_TPSAFIT=.true.
-    DO I=1,NU
-       R=QC(I)
-    ENDDO
-    SET_TPSAFIT=.false.
-    close(mf)
-
-    WRITE(6,*) " MORE "
-    READ(5,*) MF
-    IF(MF==1) GOTO 111
-
-
-    CALL KILL_PARA(R)
-
-    CALL ELP_TO_EL(R)
-
-  end   subroutine special_alex_main_ring
-
-
-  subroutine special_alex_main_ring1(r,i1,i2,I3,I4,targ,sc)
-    implicit none
-    TYPE(layout), target, intent(inout):: R
-    integer  i1,i2,I3,I4,it1,it2,it3,it4
-    INTEGER I,N,NU,N2,NP2,mf,nt,NP,J
-    type(fibre), pointer :: p1,p2
-    TYPE(POL_BLOCK) QC(10)
-    TYPE(REAL_8) Y(6)
-    TYPE(DAMAP) ID
-    REAL(DP) X(6),targ(2),xx  ,tas(6)
-    TYPE(INTERNAL_STATE) STATE
-    LOGICAL(LP) U
-    type(normalform) nf
-    type(gmap) g
-    type(TAYLOR) T,eq(6)
-
-    REAL(DP) ALX,ALY,BEX,BEY,NUX,NUY,TA(2),sc
-
-    !targ(1)=22.43d0
-    !targ(2)=20.82d0
-
-    N=10
-    NU=4
-    if(.not.associated(r%t)) then
-       write(6,*) " thin lens lattice not made "
-       stop 300
-    endif
-
-    call move_to(r,p1,i1)
-    call move_to(r,p2,i2)
-
-    write(6,*) p1%mag%name,p1%mag%p%nst
-    write(6,*) p2%mag%name,p2%mag%p%nst
-
-    IT1=p1%T1%POS+2 + (p1%mag%p%nst/2 )
-    IT2=p2%T1%POS+2 + (p2%mag%p%nst/2 )
-
-    write(6,*) IT1,IT2
-
-    call move_to(r,p1,i3)
-    call move_to(r,p2,i4)
-
-    write(6,*) p1%mag%name,p1%mag%p%nst
-    write(6,*) p2%mag%name,p2%mag%p%nst
-
-    IT3=p1%T1%POS+2 + (p1%mag%p%nst/2 )
-    IT4=p2%T1%POS+2 + (p2%mag%p%nst/2 )
-
-    write(6,*) IT3,IT4
-
-    DO I=1,NU
-       QC(I)=0
-    ENDDO
-    QC(1)%NAME='QFX'
-    QC(2)%NAME='QDX'
-    QC(3)%NAME='QFN'
-    QC(4)%NAME='QDN'
-
-    DO I=1,NU
-       QC(I)%IBN(2)=I
-    ENDDO
-
-    DO I=1,NU
-       R=QC(I)
-    ENDDO
-
-111 STATE=DEFAULT0+ONLY_4D0
-
-    X=0.D0
-    CALL INIT(STATE,2,NU,BERZ,N2,NP2)
-    CALL ALLOC(ID); call alloc(nf);call alloc(Y);
-    ID=1
-    Y=X+ID
-    !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
-    nf=y
-    TA(1)=0.75d0
-    TA(2)=0.68d0
-    write(6,*) " arc tunes ",nf%tune(1:2)
-    nf%dhdj%v(1)=nf%dhdj%v(1)-TA(1)
-    nf%dhdj%v(2)=nf%dhdj%v(2)-TA(2)
-    call print(nf%dhdj%v(1),6)
-    call print(nf%dhdj%v(2),6)
-
-    nf%dhdj%v(1)=(nf%dhdj%v(1)<=4)
-    nf%dhdj%v(2)=(nf%dhdj%v(2)<=4)
-
-    call kanalnummer(mf)
-    open(unit=mf,file='eq.txt')
-    call print(nf%dhdj%v(1),mf)
-    call print(nf%dhdj%v(2),mf)
-    BEX=(nf%A_T%V(1).SUB.'1')**2+(nf%A_T%V(1).SUB.'01')**2
-    BEY=(nf%A_T%V(3).SUB.'001')**2+(nf%A_T%V(3).SUB.'0001')**2
-    ALX=-(nf%A_T%V(1).SUB.'1')*(nf%A_T%V(2).SUB.'1')-(nf%A_T%V(1).SUB.'01')*(nf%A_T%V(2).SUB.'01')
-    ALY=-(nf%A_T%V(3).SUB.'001')*(nf%A_T%V(4).SUB.'001')-(nf%A_T%V(3).SUB.'0001')*(nf%A_T%V(4).SUB.'0001')
-
-    WRITE(6,*) BEX,BEY
-    WRITE(6,*) ALX,ALY
-    tas(1:2)=TARG(1:2)
-    tas(3)=BEX
-    tas(4)=BEY
-    tas(5)=ALX
-    tas(6)=ALY
-    close(mf)
-    CALL kill(ID); call kill(nf);call kill(Y);
-
-    NP=nu
-    nt=NP+2
-
-    CALL INIT(1,nt)
-    call alloc(g,nt)
-    call alloc(T)
-
-    call kanalnummer(mf)
-    open(unit=mf,file='eq.txt')
-    do i=np+1,nt
-       call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
-    enddo
-
-
-    call alloc(t)
-    do i=1,np
-       g%v(i)=one.mono.i
-       do j=np+1,nt
-          t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
-       enddo
-    enddo
-    CALL KILL(t)
-
-    write(6,*) "stable ", check_stable
-    g=g.oo.(-1)
-    write(6,*) "stable ", check_stable,nu
-    tpsafit(1:nt)=g
-    CALL KILL(G)
-    SET_TPSAFIT=.true.
-    DO I=1,NU
-       R=QC(I)
-    ENDDO
-    SET_TPSAFIT=.false.
-    close(mf)
-
-    WRITE(6,*) " MORE "
-    READ(5,*) MF
-    IF(MF==1) GOTO 111
-    CALL KILL_PARA(R)
-
-    NU=7
-    DO I=1,NU
-       QC(I)=0
-    ENDDO
-    QC(1)%NAME='QFS'
-    QC(2)%NAME='QDS'
-    QC(3)%NAME='QFT'
-    QC(4)%NAME='QFP'
-    QC(5)%NAME='QDT'
-    QC(6)%NAME='QFR'
-    QC(7)%NAME='QDR'
-
-    DO I=1,NU
-       QC(I)%IBN(2)=I
-    ENDDO
-
-    DO I=1,NU
-       R=QC(I)
-    ENDDO
-
-112 continue
-    X=0.D0
-    CALL INIT(STATE,2,NU,BERZ,N2,NP2)
-    CALL ALLOC(ID); call alloc(nf);call alloc(Y);
-    ID=1
-    Y=X+ID
-    !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
-    write(6,*) "before stable nf=y", check_stable
-    !    global_verbose=.true.
-    nf=y
-    !   nf%dhdj%v(1)=nf%dhdj%v(1)-0.75_DP
-    !   nf%dhdj%v(2)=nf%dhdj%v(2)-0.68_DP
-    write(6,*) "stable nf=y", check_stable
-
-
-
-    call alloc(eq,4)
-
-    eq(1)=(TA(1)*8 + (1.d0+nf%dhdj%v(1)))*3
-    eq(2)=(TA(2)*8 + (1.d0+nf%dhdj%v(2)))*3
-
-    nux=eq(1)
-    nuy=eq(2)
-
-    eq(1)=eq(1)-targ(1)
-    eq(2)=eq(2)-targ(2)
-
-    WRITE(6,*) NUX,NUY
-    WRITE(6,*) NUX-targ(1),NUY-targ(2)
-
-    eq(3)=(nf%A_T%V(1).par.'1000')**2+(nf%A_T%V(1).par.'0100')**2-bex
-    eq(4)=(nf%A_T%V(3).par.'0010')**2+(nf%A_T%V(3).par.'0001')**2-bey
-    !eq(5)=-alx-(nf%A_T%V(1).par.'1000')*(nf%A_T%V(2).par.'1')-(nf%A_T%V(1).par.'0100')*(nf%A_T%V(2).par.'0100')
-    !eq(6)=-aly-(nf%A_T%V(3).par.'0010')*(nf%A_T%V(4).par.'0010')-(nf%A_T%V(3).par.'0001')*(nf%A_T%V(4).par.'0001')
-
-    do i=1,4
-       eq(i)=(eq(i)<=4)
-       xx=eq(i)
-       write(6,*) i,xx,TAS(I)
-    enddo
-    call kanalnummer(mf)
-    open(unit=mf,file='eq.txt')
-    do i=1,4
-       call print(eq(i),mf)
-    enddo
-    close(mf)
-    CALL kill(ID); call kill(nf);call kill(Y);
-    call kill(eq,4)
-
-    NP=nu
-    nt=NP+4
-
-    CALL INIT(1,nt)
-    call alloc(g,nt)
-    call alloc(T)
-
-    call kanalnummer(mf)
-    open(unit=mf,file='eq.txt')
-    do i=np+1,nt
-       call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
-    enddo
-
-    call alloc(t)
-    do i=1,np
-       g%v(i)=one.mono.i
-       do j=np+1,nt
-          t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
-       enddo
-    enddo
-    CALL KILL(t)
-    write(6,*) "stable ", check_stable
-    g=g.oo.(-1)
-    write(6,*) "stable ", check_stable,nu
-    tpsafit(1:nt)=g
-    write(6,*) tpsafit(1:nu)
-    CALL KILL(G)
-
-    SET_TPSAFIT=.true.
-    DO I=1,NU
-       R=QC(I)
-    ENDDO
-    SET_TPSAFIT=.false.
-    close(mf)
-
-    WRITE(6,*) " MORE "
-    READ(5,*) MF
-    IF(MF==1) GOTO 112
-
-
-    CALL ELP_TO_EL(R)
-
-    CALL KILL_PARA(R)
-
-  end   subroutine special_alex_main_ring1
 
 
 
@@ -1538,7 +1039,11 @@ contains
                 freq=c%magp%freq
              ENDIF
           endif
-          XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
+          IF(stat%TIME) THEN
+             XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
+          ELSE
+             XDIX=XDIX+c%mag%P%LD
+          ENDIF
           c=>c%next
           i=i+1
        enddo
@@ -1552,6 +1057,7 @@ contains
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
           FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
+          stop 475
        ELSE
           XDIX=XDIX*FREQ/CLIGHT
           FREQ=NINT(XDIX)*CLIGHT/FREQ
@@ -1957,7 +1463,7 @@ contains
        F%next%MAGP%BN(1)%I=1
     endif
 
-    CALL INIT(1,1,BERZ)
+    CALL INIT(1,1)
 
     CALL ALLOC(Y)
 
@@ -2012,7 +1518,7 @@ contains
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
     TYPE(layout), intent(inout) :: R
-    REAL(DP), ALLOCATABLE :: BETA(:,:,:)
+    REAL(DP), pointer :: BETA(:,:,:)
     integer pos,nturn,i,flag,ib,MF,mft,j,resmax,it,I1,no
     real(dp) closed(6),MAT(6,6),AI(6,6),A(6,6),emit(2),emit0(6),aper(2),x(6),xn(6),dbeta,tuneold(:)
     real(dp) ra(2),tunenew(2),xda(lnv)
@@ -2271,25 +1777,41 @@ contains
   end SUBROUTINE  track_aperture
 
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout), intent(inout) :: R
-    real(dp), OPTIONAL, intent(inout) :: THIN,lmax
-    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec  !,limit0(2)
+    real(dp), OPTIONAL, intent(inout) :: THIN,lmax0
+    real(dp), OPTIONAL, intent(in) ::xbend
+    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggb,ggbt,xbend1,gf(7)
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb
+    integer incold ,parityold
     integer, optional :: lim(2)
-    logical(lp) MANUAL,eject,doit
+    logical(lp) MANUAL,eject,doit,DOBEND
     TYPE (fibre), POINTER :: C
     logical(lp),optional :: even
-    logical(lp) doneit
+    type(layout), pointer :: L
+
+    if(associated(r%parent_universe)) then
+       l=>r%parent_universe%start
+       do ii=1,r%parent_universe%n
+          call kill(l%t)
+          l=>l%next
+       enddo
+    else
+       call kill(r%t)
+    endif
+    !    logical(lp) doneit
     nullify(C)
     parity=0
     inc=0
     lm=1.0e38_dp
     ntec=0
     max_ds=zero
-    if(present(lmax)) lm=abs(lmax)
+    xbend1=-one
+
+    if(present(xbend)) xbend1=xbend
+    if(present(lmax0)) lm=abs(lmax0)
     if(present(even)) then
        inc=1
        if(even) then
@@ -2298,7 +1820,9 @@ contains
           parity=1
        endIf
     endif
-    CALL LINE_L(R,doneit)
+    parityold=parity
+    incold=inc
+    !   CALL LINE_L(R,doneit)
 
     MANUAL=.FALSE.
     eject=.FALSE.
@@ -2310,8 +1834,8 @@ contains
 
 
     IF(MANUAL) THEN
-       write(6,*) "thi: thin lens factor (THI<0 TO STOP) "
-       read(5,*) thi
+       write(6,*) "thi: thin lens factor (THI<0 TO STOP) and Bend factor "
+       read(5,*) thi,xbend1
        IF(THI<0) eject=.true.
     ENDIF
 
@@ -2333,7 +1857,7 @@ contains
     nst_tot=0
 
     C=>R%START
-    do   WHILE(ASSOCIATED(C))
+    do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
 
        doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
@@ -2380,15 +1904,18 @@ contains
     MK3=0
     ! CAVITY FOCUSING
     ! TEAPOT SPLITTING....
-
+    ggbt=zero
     r%NTHIN=0
     r%THIN=THI
 
     nst_tot=0
     C=>R%START
-    do   WHILE(ASSOCIATED(C))   !
+    do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
 
-
+       if(c%mag%even) then
+          parity=0
+          inc=1
+       endif
 
 
        !       if(doit)  then
@@ -2415,18 +1942,44 @@ contains
                 quad=quad+(C%MAG%b_sol)**2/four
              endif
 
+             DOBEND=MY_FALSE
+             IF(xbend1>ZERO) THEN
+                IF(C%MAG%KIND==kind10) THEN
+                   IF(C%MAG%TP10%DRIFTKICK) THEN
+                      DOBEND=MY_TRUE
+                   ENDIF
+                ENDIF
+                IF(C%MAG%KIND==kind16.OR.C%MAG%KIND==kind20) THEN
+                   IF(C%MAG%K16%DRIFTKICK) THEN
+                      DOBEND=MY_TRUE
+                   ENDIF
+                ENDIF
+             ENDIF
+             !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
              GG=GG/THI
              NTE=INT(GG)
+             metb=0
+             if(dobend) then
+                call check_bend(xl,gg,rhoi,xbend1,gf,metb)
+                if(gf(metb)>gg) then
+                   gg=gf(metb)
+                   NTE=INT(GG)
+                   ggbt=ggbt+NTE
+                else
+                   metb=0
+                endif
+             endif
 
-             IF(NTE.LT.limit(1)) THEN
+
+             IF(NTE.LT.limit(1).or.metb==2) THEN
                 M1=M1+1
                 IF(NTE.EQ.0) NTE=1
                 if(mod(nte,2)/=parity) nte=nte+inc
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=2
                 MK1=MK1+NTE
-             ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+             ELSEIF((NTE.GE.limit(1).AND.NTE.LT.limit(2)).or.metb==4) THEN
                 M2=M2+1
                 NTE=NTE/3
                 IF(NTE.EQ.0) NTE=1
@@ -2434,7 +1987,7 @@ contains
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=4
                 MK2=MK2+NTE*3
-             ELSEIF(NTE.GE.limit(2)) THEN
+             ELSEIF(NTE.GE.limit(2).or.metb==6) THEN
                 M3=M3+1
                 NTE=NTE/7
                 IF(NTE.EQ.0) NTE=1
@@ -2465,7 +2018,7 @@ contains
           if(doit) then
              xl=C%MAG%L
              RHOI=C%MAG%P%B0
-             IF(C%MAG%P%NMUL>=2) THEN !
+             IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
              ELSE
                 QUAD=zero
@@ -2474,18 +2027,44 @@ contains
                 quad=quad+(C%MAG%b_sol)**2/four
              endif
 
+             DOBEND=MY_FALSE
+             IF(xbend1>ZERO) THEN
+                IF(C%MAG%KIND==kind10) THEN
+                   IF(C%MAG%TP10%DRIFTKICK) THEN
+                      DOBEND=MY_TRUE
+                   ENDIF
+                ENDIF
+                IF(C%MAG%KIND==kind16.OR.C%MAG%KIND==kind20) THEN
+                   IF(C%MAG%K16%DRIFTKICK) THEN
+                      DOBEND=MY_TRUE
+                   ENDIF
+                ENDIF
+             ENDIF
+             !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
              GG=GG/THI
              NTE=INT(GG)
+             metb=0
+             if(dobend) then
+                call check_bend(xl,gg,rhoi,xbend1,gf,metb)
+                if(gf(metb)>gg) then
+                   gg=gf(metb)
+                   NTE=INT(GG)
+                   ggbt=ggbt+NTE
+                else
+                   metb=0
+                endif
+             endif
 
-             IF(NTE.LT.limit(1)) THEN
+
+             IF(NTE.LT.limit(1).or.metb==2) THEN
                 M1=M1+1
                 IF(NTE.EQ.0) NTE=1
                 if(mod(nte,2)/=parity) nte=nte+inc
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=2
                 MK1=MK1+NTE
-             ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+             ELSEIF((NTE.GE.limit(1).AND.NTE.LT.limit(2)).or.metb==4) THEN
                 M2=M2+1
                 NTE=NTE/3
                 IF(NTE.EQ.0) NTE=1
@@ -2493,7 +2072,7 @@ contains
                 C%MAG%P%NST=NTE
                 C%MAG%P%METHOD=4
                 MK2=MK2+NTE*3
-             ELSEIF(NTE.GE.limit(2)) THEN
+             ELSEIF(NTE.GE.limit(2).or.metb==6) THEN
                 M3=M3+1
                 NTE=NTE/7
                 IF(NTE.EQ.0) NTE=1
@@ -2506,7 +2085,7 @@ contains
 
              r%NTHIN=r%NTHIN+1  !C%MAG%NST
 
-             if(present(lmax).and.c%mag%kind==kind1) then
+             if(present(lmax0).and.c%mag%kind==kind1) then
                 dl=(C%MAG%P%ld/C%MAG%P%nst)
                 if(dl>lm*fuzzy_split) then
                    ntec=int(C%MAG%P%ld/lm)+1
@@ -2543,45 +2122,65 @@ contains
                 quad=quad+(C%MAG%b_sol)**2/four
              endif
 
+             DOBEND=MY_FALSE
+             IF(xbend1>ZERO) THEN
+                IF(C%MAG%KIND==kind10) THEN
+                   IF(C%MAG%TP10%DRIFTKICK) THEN
+                      DOBEND=MY_TRUE
+                   ENDIF
+                ENDIF
+                IF(C%MAG%KIND==kind16.OR.C%MAG%KIND==kind20) THEN
+                   IF(C%MAG%K16%DRIFTKICK) THEN
+                      DOBEND=MY_TRUE
+                   ENDIF
+                ENDIF
+             ENDIF
+             !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
              GG=GG/THI
              NTE=INT(GG)
+             metb=0
+             if(dobend) then
+                call check_bend(xl,gg,rhoi,xbend1,gf,metb)
+                if(gf(metb)>gg) then
+                   gg=gf(metb)
+                   NTE=INT(GG)
+                   ggbt=ggbt+NTE
+                else
+                   metb=0
+                endif
+             endif
 
-             IF(NTE.LT.limit(1)) THEN
+
+             IF(NTE.LT.limit(1).or.metb==2) THEN
                 M1=M1+1
                 IF(NTE.EQ.0) NTE=1
                 if(mod(nte,2)/=parity) nte=nte+inc
-                if(nte>ntec.or.(.not.present(lmax)) ) then
-                   C%MAG%P%NST=NTE
-                   C%MAG%P%METHOD=2
-                endif
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=2
                 MK1=MK1+NTE
-             ELSEIF(NTE.GE.limit(1).AND.NTE.LT.limit(2)) THEN
+             ELSEIF((NTE.GE.limit(1).AND.NTE.LT.limit(2)).or.metb==4) THEN
                 M2=M2+1
                 NTE=NTE/3
                 IF(NTE.EQ.0) NTE=1
                 if(mod(nte,2)/=parity) nte=nte+inc
-                if(nte>ntec.or.(.not.present(lmax)) ) then
-                   C%MAG%P%NST=NTE
-                   C%MAG%P%METHOD=4
-                endif
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=4
                 MK2=MK2+NTE*3
-             ELSEIF(NTE.GE.limit(2)) THEN
+             ELSEIF(NTE.GE.limit(2).or.metb==6) THEN
                 M3=M3+1
                 NTE=NTE/7
                 IF(NTE.EQ.0) NTE=1
                 if(mod(nte,2)/=parity) nte=nte+inc
-                if(nte>ntec.or.(.not.present(lmax)) ) then
-                   C%MAG%P%NST=NTE
-                   C%MAG%P%METHOD=6
-                endif
+                C%MAG%P%NST=NTE
+                C%MAG%P%METHOD=6
                 MK3=MK3+NTE*7
              ENDIF
 
 
              r%NTHIN=r%NTHIN+1  !C%MAG%NST
              !         write(6,*)"nte>ntec", nte,ntec
-             if(nte>ntec.or.(.not.present(lmax)) ) then
+             if(nte>ntec.or.(.not.present(lmax0)) ) then
                 call add(C%MAG,C%MAG%P%nmul,1,zero)
                 call COPY(C%MAG,C%MAGP)
              endif
@@ -2589,7 +2188,7 @@ contains
              !               if(c%mag%l/c%mag%p%nst>max_ds) max_ds=c%mag%l/c%mag%p%nst
              !            endif
 
-             if(present(lmax)) then
+             if(present(lmax0)) then
                 dl=(C%MAG%P%ld/C%MAG%P%nst)
                 if(dl>lm*fuzzy_split.and.C%MAG%KIND/=kindpa) then
                    nte=int(C%MAG%P%ld/lm)+1
@@ -2616,7 +2215,12 @@ contains
 
        !      endif
        NST_tot=NST_tot+C%MAG%P%nst
+       if(c%mag%even) then
+          parity=parityold
+          inc=incold
+       endif
        C=>C%NEXT
+
     enddo   !   end of do   WHILE
 
 
@@ -2626,13 +2230,14 @@ contains
     write(6,*) "METHOD 6 ",M3,MK3
     write(6,*)   "number of Slices ", MK1+MK2+MK3
     write(6,*)   "Total NST ", NST_tot
+    write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
     write(6,*)   "Biggest ds ", max_ds
 
 
 
     IF(MANUAL) THEN
-       write(6,*) "thi: thin lens factor (THI<0 TO STOP) "
-       read(5,*) thi
+       write(6,*) "thi: thin lens factor (THI<0 TO STOP) and Bend factor "
+       read(5,*) thi,xbend1
        IF(THI<0) THEN
           THI=R%THIN
           !          limit(1)=limit0(1)
@@ -2647,23 +2252,71 @@ contains
     !    limit(1)=limit0(1)
     !    limit(2)=limit0(2)
 
-    CALL RING_L(R,doneit)
+    !    CALL RING_L(R,doneit)
 
   END SUBROUTINE  THIN_LENS_resplit
+
+  SUBROUTINE  check_bend(xl,ggi,rhoi,xbend1,gf,met) ! A re-splitting routine
+    IMPLICIT NONE
+    real(dp) xl,gg,ggi,rhoi,ar,ggb,co(7),xbend1,gf(7)
+    integer i,met
+
+    gg=int(ggi)
+    if(gg==0.d0) gg=1.d0
+    co(3)=1.d0/6.0_dp
+    co(5)=  0.2992989446749238e0_dp
+    co(7)=0.2585213173527224e-1_dp
+    ar=abs(rhoi)
+    gf=zero
+    !     do i=3,7,2
+    !              ggb=((XL/gg) * ar)**(i)*(XL/gg)*co(i)  ! approximate residual orbit
+    !              if(xbend1<ggb) then
+    !                gf(i)=(ar**(i)*co(i)/xbend1)**(one/(i+one))*xl
+    !              write(6,*) i,gf(i)
+    !              pause
+    !              endif
+    !     enddo
+
+    do i=3,7,2
+       ggb=((XL/gg) * ar)**(i-1)*(XL/gg)*co(i)*twopi  ! approximate residual orbit
+       !              if(xbend1<ggb) then
+       gf(i)=(ar**(i-1)*co(i)/xbend1/twopi)**(one/(i+zero))*xl
+       !              endif
+    enddo
+    gf(2)=gf(3)
+    gf(4)=gf(5)*3
+    gf(6)=gf(7)*7
+
+    met=2
+
+    if(gf(4)<gf(2)) met=4
+    if(gf(6)<gf(4).and.gf(6)<gf(2)) met=6
+
+  end SUBROUTINE  check_bend
 
   SUBROUTINE  THIN_LENS_restart(R) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout), intent(inout) :: R
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec  !,limit0(2)
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii  !,limit0(2)
     logical(lp) doit
     TYPE (fibre), POINTER :: C
-    logical(lp) doneit
+    TYPE (layout), POINTER :: l
+    !    logical(lp) doneit
     nullify(C)
 
-    CALL LINE_L(R,doneit)
+    !    CALL LINE_L(R,doneit)
 
+    if(associated(r%parent_universe)) then
+       l=>r%parent_universe%start
+       do ii=1,r%parent_universe%n
+          call kill(l%t)
+          l=>l%next
+       enddo
+    else
+       call kill(r%t)
+    endif
 
 
 
@@ -2681,7 +2334,7 @@ contains
 
     nst_tot=0
     C=>R%START
-    do   WHILE(ASSOCIATED(C))
+    do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
 
 
        doit=(C%MAG%KIND==kind1.and.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5.or.C%MAG%KIND==kind4)
@@ -2724,7 +2377,7 @@ contains
 
 
 
-    CALL RING_L(R,doneit)
+    !    CALL RING_L(R,doneit)
 
   END SUBROUTINE  THIN_LENS_restart
 
@@ -2851,6 +2504,39 @@ contains
     ENDIF
 
   end SUBROUTINE TURN_OFF_ONE_aperture
+
+  SUBROUTINE REVERSE_BEAM_LINE(R, changeanbn )
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer J,I
+    type(fibre), pointer :: P
+    type(layout) temp
+    logical(lp), optional:: changeanbn
+    logical(lp) changeanbn0
+
+    changeanbn0=my_true
+    if(present(changeanbn)) changeanbn0=changeanbn
+
+    p=>r%start
+    do i=1,r%n
+       p%dir=-1
+       if(changeanbn0) then
+          if(associated(p%mag%an)) then
+             do j=1,p%mag%p%nmul
+                p%mag%bn(j)=-p%magp%bn(j)
+                p%mag%an(j)=-p%magp%an(j)
+                p%magp%bn(j)=-p%magp%bn(j)
+                p%magp%an(j)=-p%magp%an(j)
+             enddo
+             if(p%mag%p%nmul>0) call add(p,1,1,0.d0)
+          endif
+          if(associated(p%mag%volt)) p%mag%volt=-p%mag%volt
+          if(associated(p%magp%volt)) p%magp%volt=-p%magp%volt
+       endif
+       P=>P%next
+    ENDDO
+  end SUBROUTINE REVERSE_BEAM_LINE
+
 
   SUBROUTINE MESS_UP_ALIGNMENT(R,SIG,cut)
     use gauss_dis
@@ -3014,237 +2700,6 @@ contains
 
   end SUBROUTINE dyn_aper
 
-
-
-  SUBROUTINE THIN_EXAMPLE(R,B,I1,I2,IN_STATE,MF)
-    IMPLICIT NONE
-    TYPE(BEAM), INTENT(INOUT) :: B(:)
-    TYPE(LAYOUT),TARGET :: R
-    integer i1,i2,MF,i,IT1,IT2,INSIDE_POS1,INSIDE_POS2
-    type(fibre), pointer :: FIBRE1,FIBRE2
-    TYPE(INTEGRATION_NODE),POINTER :: SLICE1,SLICE2
-    TYPE(INTERNAL_STATE) IN_STATE
-    TYPE(INTERNAL_STATE) STATE
-    real(dp) X(6),S_INITIAL,S_FINAL,TOTAL_LENGTH
-
-    STATE=IN_STATE
-
-    CALL COPY_BEAM(B(1),B(2))
-
-
-
-
-
-    !  TRACKING AS IN PTC PROPER
-
-    !   We locate the I1th fibre and the I2th
-
-
-    call move_to(r,FIBRE1,i1)
-    call move_to(r,FIBRE2,i2)
-
-
-    Write(MF,*)"Magnets ",i1," AND ",i2," are ",FIBRE1%mag%name(1:LEN_TRIM(FIBRE1%mag%name))," AND ",&
-         FIBRE2%mag%name(1:LEN_TRIM(FIBRE2%mag%name))
-
-    ! WE TRACK FROM ENTRANCE OF FIBRE1 TO ENTRANCE OF FIBRE2
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 ) "
-    WRITE(MF,*) "                                            "
-    CALL TRACK_BEAM(R,B(2),STATE,P1=FIBRE1,P2=FIBRE2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
-
-
-
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),6)
-
-    ! Regular PTC tracking: it should agree
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "___________________ ORDINARY PTC RESULTS    ____________________________"
-
-    DO I=1,B(2)%N
-       X=B(1)%X(I,1:6)      ! B(2) WAS SAVED IN B(1)
-       CALL TRACK(R,X,I1,I2,STATE)
-       WRITE(MF,*) "_________________________________________________________________________"
-       WRITE(MF,*) " PARTICLE # ",I
-       WRITE(MF,*) " TIME  = ",X(6)
-       WRITE(MF,*) " X,Y = ", X(1),X(3)
-       WRITE(MF,*) " PX,PY = ",X(2),X(4)
-       WRITE(MF,*) " ENERGY VARIABLE = ",X(5)
-
-    ENDDO
-
-
-!!!!!!!
-    ! THESE TWO FIBRES START AT THE SLICE NUMBER IT1 AND IT2 RESPECTIVELY
-    !
-    CALL COPY_BEAM(B(1),B(2))
-
-    IT1=FIBRE1%T1%POS
-    IT2=FIBRE2%T1%POS
-
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,POS1=IT1,POS2=IT2 ) "
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  INDEX OF THE FIRST SLICE   =",IT1
-    WRITE(MF,*) "  INDEX OF THE FINAL SLICE   =",IT2
-    CALL TRACK_BEAM(R,B(2),STATE,POS1=IT1,POS2=IT2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),MF)
-
-    ! TRACKING USING THE POINTERS SLICE1 AND SLICE2 RESPECTIVELY
-    !
-    CALL COPY_BEAM(B(1),B(2))
-
-    SLICE1=>FIBRE1%T1
-    SLICE2=>FIBRE2%T1
-
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) "
-    WRITE(MF,*) "                                            "
-    CALL TRACK_BEAM(R,B(2),STATE,T1=SLICE1,T2=SLICE2 ) ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),MF)
-
-    ! TRACKING USING THE POINTERS S_INITIAL AND S_FINAL RESPECTIVELY
-    !
-    CALL COPY_BEAM(B(1),B(2))
-
-    S_INITIAL = SLICE1%S(3)
-    S_FINAL   = SLICE2%S(3)
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) "
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
-    WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_BEAM_S(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),MF)
-
-    !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$!
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$  going inside a magnet  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    WRITE(MF,*) "                                            "
-    write(mf,*) fibre1%mag%name," has ",fibre1%mag%p%nst," steps "
-    write(mf,*) fibre2%mag%name," has ",fibre2%mag%p%nst," steps "
-    WRITE(MF,*) "                                            "
-    write(mf,*) "$$$$$$$$$$$$$$$$ STARTING AND ENDING IN THE MIDDLE   $$$$$$$$$$$$$$$$$$$$$$$$"
-
-    INSIDE_POS1=3+fibre1%mag%p%nst/2
-    INSIDE_POS2=3+fibre2%mag%p%nst/2
-    CALL COPY_BEAM(B(1),B(2))
-    ! WE TRACK FROM ENTRANCE OF FIBRE1,INSIDE_POS1 TO ENTRANCE OF FIBRE2,INSIDE_POS2
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )  "
-    WRITE(MF,*) "                                            "
-    CALL TRACK_BEAM(R,B(2),STATE,P1=FIBRE1,IN_P1=INSIDE_POS1,P2=FIBRE2,IN_P2=INSIDE_POS2 )   ! LOOK AT ROUTINE TRACK_LAYOUT_12  COMMENTS BELOW
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),MF)
-
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$  going inside a magnet using s $$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-
-    S_INITIAL = SLICE1%S(3)+ FIBRE1%MAG%L/TWO
-    S_FINAL   = SLICE2%S(3)+ FIBRE2%MAG%L/TWO
-    CALL COPY_BEAM(B(1),B(2))
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) "
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
-    WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_BEAM_S(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),MF)
-
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$  NOW WE LOOK AT TIME TRACKING  $$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$    THE AGREEMENT IS PERFECT    $$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$ IF WE LOOK IN A DRIFT SECTION  $$$$$$$$$$$$$$$$$$$$$$"
-    write(mf,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    WRITE(MF,*) " WE USE TOTAL TOTAL TIME BECAUSE THIS IS THE ONLY THING IMPLEMENTED WITH TIME TRACKING"
-    WRITE(MF,*) " STATE=IN_STATE+TOTALPATH0 "
-    STATE=IN_STATE+TOTALPATH0
-
-    CALL COPY_BEAM(B(1),B(2))
-
-    ! FIRST MOVE THE BEAM 1.0 METRE INSIDE D1
-    S_INITIAL = zero
-    S_FINAL   = ONE
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) "
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) " INITIAL POSITION IN METRES =",S_INITIAL
-    WRITE(MF,*) " FINAL POSITION IN METRES   =",S_FINAL
-    CALL TRACK_BEAM_S(R,B(2),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
-    ! WE PRINT THE RESULTS
-    CALL PRINT_beam(B(2),MF,I=1)
-    CALL COPY_BEAM(B(2),B(1))
-
-    ! THEN TRACK FOR A TIME EQUAL TO THE TOTAL LENGTH OF THE MACHINE: THIS PUTS US BACK SOMEWHERE IN D1
-    TOTAL_LENGTH=R%T%END%S(3)
-    WRITE(MF,*) "                                            "
-    WRITE(MF,*) "  TRACK(B(2),TOTAL_LENGTH,STATE) "
-    WRITE(MF,*) "                                            "
-
-    CALL TRACK_BEAM_T(B(2),TOTAL_LENGTH,STATE)       !  TRACK_THIN_T(B,DT,K)
-
-    CALL PRINT_beam(B(2),MF,I=1)
-
-    WRITE(MF,*) " NOW WE REPRODUCE THIS WITH 'S' TRACKING TO SEE IF WE HAVE CONSISTENCY"
-    WRITE(MF,*) " WE DO ONLY THE FIRST PARTICLE: SAME CHECK WOULD APPLY FOR PARTICLE #2"
-
-    WRITE(MF,*) "  S_INITIAL = ONE "
-    WRITE(MF,*) "  S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%THINLENS%S(3)+B(2)%X(1,7)"
-    WRITE(MF,*) "  CALL TRACK(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL )"
-
-
-    S_INITIAL = ONE
-    S_FINAL   = TOTAL_LENGTH+B(2)%POS(1)%NODE%S(3)+B(2)%X(1,7)
-
-    CALL TRACK_BEAM_S(R,B(1),STATE,S1=S_INITIAL,S2=S_FINAL ) ! LOOK AT ROUTINE TRACK_LAYOUT_S12  COMMENTS BELOW
-
-    CALL PRINT_beam(B(1),MF,I=1)
-
-
-  END SUBROUTINE THIN_EXAMPLE
-
-  !  INTERFACE TRACK
-  !     MODULE PROCEDURE TRACK_LAYOUT_12
-  !     MODULE PROCEDURE TRACK_LAYOUT_S12
-  !     MODULE PROCEDURE TRACK_THIN_T
-  !  END INTERFACE
-
-  !  SUBROUTINE TRACK_LAYOUT_12( R,B,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2 ) OF SMA_MULTIPARTICLE.F90
-
-  ! Tracks through the thin lens structure R%T of the layout R if it exists.
-  ! Several posibilities:
-  !1) Pos1 and Pos2 are given :  tracks from thin lens position pos1 to thin lens position pos2
-  !2) Thin lens points T1 and T2 are given: Same as above pos1 and pos2 are derived from T1 and T2
-  !3) P1 and P2 are fibres: Tracks from the first thin lens of P1 to the first of P2. Results should agree
-  !   with plain PTC.
-  !4) P1, IN_P1 and P2 , IN_P2 are give: movies to IN_P1 thin lens in P1 and tracks to IN_P2 position in p2
-  !  For example, if the input is (P1,1) and (P2,1) the results is same as item #3 (same as plain PTC).
-
-  ! In all the above cases one can elect to give only the first input. Then it tracks one turn around as in
-  ! plain PTC.
-  ! interfaced as TRACK_LAYOUT_USING_THIN_S
-
-  !  SUBROUTINE TRACK_LAYOUT_S12( R,B,K,S1,S2 )
-
-  ! Tracks through the thin lens structure from position S1 to position S2 (defined as the S(3) variables
-  ! of the thin lens.
-  ! The final position is stored as in time tracking but is obviously the same for all the particles.
-  ! interfaced as TRACK_LAYOUT_USING_THIN_S
-
-  !  SUBROUTINE TRACK_THIN_T(B,DT,K)
-  ! Tracks to full beam for a time DT
-  ! All the particles are at different locations
-  ! Notice that the layout is hidden: this is consistant with time tracking
-  ! Magnets are not ontological objects
 
 
 

@@ -19,11 +19,7 @@ MODULE S_TRACKING
   PRIVATE TRACK_LAYOUT_FLAG_R1f,TRACK_LAYOUT_FLAG_P1f
   PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf
   ! old Sj_elements
-  PRIVATE TRACKR,TRACKP
-  logical(lp),TARGET :: other_program=.false.
   logical(lp),TARGET :: x_prime=.false.
-  integer j_global
-
   ! END old Sj_elements
 
   ! TYPE UPDATING
@@ -44,10 +40,6 @@ MODULE S_TRACKING
      MODULE PROCEDURE TRACK_FIBRE_R
      MODULE PROCEDURE TRACK_FIBRE_P
      ! old Sj_elements
-     !  INTERFACE TRACK
-     MODULE PROCEDURE TRACKR
-     MODULE PROCEDURE TRACKP
-     !  END INTERFACE
      ! END old Sj_elements
   END INTERFACE
 
@@ -74,131 +66,6 @@ MODULE S_TRACKING
 contains
   ! old Sj_elements
 
-
-  SUBROUTINE TRACKR(EL,X,MID,K)
-    IMPLICIT NONE
-    real(dp),INTENT(INOUT):: X(6)
-    TYPE(ELEMENT),INTENT(INOUT):: EL
-    TYPE(WORM),OPTIONAL, INTENT(INOUT):: MID
-    TYPE(INTERNAL_STATE) K
-
-    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
-    if(other_program) then
-       call track_R(x)
-       return
-    endif
-    SELECT CASE(EL%KIND)
-    CASE(KIND0)
-       IF(PRESENT(MID)) CALL XMID(MID,X,0)
-       IF(PRESENT(MID)) CALL XMID(MID,X,1)   ! ADDED FOR NST=1 IN MARKER FOR THIN_LAYOUT SURVEY
-    case(KIND1)
-       CALL TRACK(EL%D0,X,MID)
-    case(KIND2)
-       CALL TRACK(EL%K2,X,MID)
-    case(KIND3)
-       CALL TRACK(EL%K3,X,MID)
-    case(KIND4)
-       CALL TRACK(EL%C4,X,MID)
-    case(KIND5)
-       CALL TRACK(EL%S5,X,MID)
-    case(KIND6)
-       CALL TRACK(EL%T6,X,MID)
-    case(KIND7)
-       CALL TRACK(EL%T7,X,MID)
-    case(KIND8)
-       CALL TRACK(EL%S8,X,MID)
-    case(KIND9)
-       CALL TRACK(EL%S9,X,MID)
-    case(KIND10)
-       CALL TRACK(EL%TP10,X,MID)
-    CASE(KIND11:KIND14)
-       call TRACK(EL%MON14,X,MID)
-    CASE(KIND15)
-       call TRACK(EL%SEP15,X,MID)
-    CASE(KIND16,KIND20)
-       call TRACK(EL%K16,X,MID)
-    CASE(KIND17)
-       call TRACK(EL%S17,X,MID)
-    CASE(KIND18)
-       call TRACK(EL%RCOL18,X,MID)
-    CASE(KIND19)
-       call TRACK(EL%ECOL19,X,MID)
-    CASE(KIND21)
-       call TRACK(EL%CAV21,X,MID)
-    case(KINDWIGGLER)
-       call TRACK(EL%WI,X,MID)
-    case(KINDPA)
-       call TRACK(EL%PA,X,MID)
-    case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKR"
-       CALL WRITE_E(0)
-    END SELECT
-  END SUBROUTINE TRACKR
-
-  SUBROUTINE TRACKP(EL,X,K)
-    IMPLICIT NONE
-    TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(ELEMENTP),INTENT(INOUT):: EL
-    !    TYPE(WORM_8),OPTIONAL, INTENT(INOUT):: MID
-    TYPE(INTERNAL_STATE) K
-
-    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
-    if(other_program) then
-       call track_p(x)
-       return
-    endif
-    SELECT CASE(EL%KIND)
-    CASE(KIND0)
-       !       IF(PRESENT(MID)) CALL XMID(MID,X,0)
-    case(KIND1)
-       CALL TRACK(EL%D0,X)
-    case(KIND2)
-       CALL TRACK(EL%K2,X)
-    case(KIND3)
-       CALL TRACK(EL%K3,X)
-    case(KIND4)
-       CALL TRACK(EL%C4,X)
-    case(KIND5)
-       CALL TRACK(EL%S5,X)
-    case(KIND6)
-       CALL TRACK(EL%T6,X)
-    case(KIND7)
-       CALL TRACK(EL%T7,X)
-    case(KIND8)
-       CALL TRACK(EL%S8,X)
-    case(KIND9)
-       CALL TRACK(EL%S9,X)
-    case(KIND10)
-       CALL TRACK(EL%TP10,X)
-    CASE(KIND11:KIND14)
-       call TRACK(EL%MON14,X)
-    CASE(KIND15)
-       call TRACK(EL%SEP15,X)
-    CASE(KIND16,KIND20)
-       call TRACK(EL%K16,X)
-    CASE(KIND17)
-       call TRACK(EL%S17,X)
-    CASE(KIND18)
-       call TRACK(EL%RCOL18,X)
-    CASE(KIND19)
-       call TRACK(EL%ECOL19,X)
-    CASE(KIND21)
-       call TRACK(EL%CAV21,X)
-    case(KINDWIGGLER)
-       call TRACK(EL%WI,X)
-    case(KINDPA)
-       call TRACK(EL%PA,X)
-    case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKP"
-       CALL WRITE_E(0)
-    END SELECT
-  END SUBROUTINE TRACKP
 
   ! END old Sj_elements
 
@@ -433,13 +300,13 @@ contains
 
 
     IF(.NOT.CHECK_STABLE) return
-    C%MAG=K
+    !  C%MAG=K
 
     if(c_%x_prime) then
        P0=>C%MAG%P%P0C
        B0=>C%MAG%P%BETA0
        IF(C%MAG%P%exact)THEN
-          IF(C%MAG%P%TIME)THEN
+          IF(k%TIME)THEN
              xp=x(2)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
              x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
              x(2)=xp
@@ -449,7 +316,7 @@ contains
              x(2)=xp
           endif
        else
-          IF(C%MAG%P%TIME)THEN
+          IF(k%TIME)THEN
              x(2)=x(2)/root(one+two*X(5)/B0+X(5)**2)
              x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2)
           else
@@ -496,7 +363,7 @@ contains
 
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
-             IF(C%MAG%P%TIME)THEN
+             IF(k%TIME.or.recirculator_cheat)THEN
                 X(5)=root(one+two*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
                 X(5)=X(5)*P0/C%MAG%P%P0C-one !X(5) = DP/P0C_NEW
                 X(5)=(two*X(5)+X(5)**2)/(root(one/C%MAG%P%BETA0**2+two*X(5)+X(5)**2)+one/C%MAG%P%BETA0)
@@ -512,10 +379,10 @@ contains
     ! The chart frame of reference is located here implicitely
     IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
-       CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
+       CALL PATCH_FIB(C,X,k,PATCH,MY_TRUE)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH/=0)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
        X(6)=X(6)+C%PATCH%a_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
@@ -526,7 +393,7 @@ contains
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
-       ou = K%EXACTMIS.or.C%MAG%EXACTMIS
+       ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
        CALL MIS_FIB(C,X,OU,DONEITT)
     ENDIF
     IF(PRESENT(X_IN)) then
@@ -534,7 +401,7 @@ contains
        X_IN%POS(2)=X_IN%nst
     endif
 
-    CALL TRACK(C%MAG,X,X_IN,K)
+    CALL TRACK(C%MAG,X,K,X_IN)
 
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,X_IN%nst+1)
@@ -549,14 +416,14 @@ contains
     CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH/=0)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
-       CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
+       CALL PATCH_FIB(C,X,k,PATCH,MY_FALSE)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -570,7 +437,7 @@ contains
        B0=>CN%MAG%P%BETA0
        X(2)=X(2)*C%MAG%P%P0C/P0
        X(4)=X(4)*C%MAG%P%P0C/P0
-       IF(C%MAG%P%TIME)THEN
+       IF(k%TIME.or.recirculator_cheat)THEN
           X(5)=root(one+two*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
           X(5)=X(5)*C%MAG%P%P0C/P0-one !X(5) = DP/P0C_NEW
           X(5)=(two*X(5)+X(5)**2)/(root(one/B0**2+two*X(5)+X(5)**2)+one/B0)
@@ -597,7 +464,7 @@ contains
        P0=>C%MAG%P%P0C
        B0=>C%MAG%P%BETA0
        IF(C%MAG%P%exact)THEN
-          IF(C%MAG%P%TIME)THEN
+          IF(k%TIME)THEN
              xp=root(one+two*X(5)/B0+X(5)**2)*x(2)/root(one+x(2)**2+x(4)**2)
              x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)/root(one+x(2)**2+x(4)**2)
              x(2)=xp
@@ -607,7 +474,7 @@ contains
              x(2)=xp
           endif
        else
-          IF(C%MAG%P%TIME)THEN
+          IF(k%TIME)THEN
              x(2)=root(one+two*X(5)/B0+X(5)**2)*x(2)
              x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)
           else
@@ -618,7 +485,7 @@ contains
     endif
 
 
-    C%MAG=DEFAULT
+    !   C%MAG=DEFAULT
     nullify(C%MAG%P%DIR)
     nullify(C%MAG%P%CHARGE)
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
@@ -647,14 +514,14 @@ contains
     TYPE(REAL_8) xp
 
     IF(.NOT.CHECK_STABLE) return
-    C%MAGP=K
+    !    C%MAGP=K
 
     if(c_%x_prime) then
        call alloc(xp)  ! deallocated below
        P0=>C%MAGP%P%P0C
        B0=>C%MAGP%P%BETA0
        IF(C%MAGP%P%exact)THEN
-          IF(C%MAGP%P%TIME)THEN
+          IF(k%TIME)THEN
              xp=x(2)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
              x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
              x(2)=xp
@@ -664,7 +531,7 @@ contains
              x(2)=xp
           endif
        else
-          IF(C%MAGP%P%TIME)THEN
+          IF(k%TIME)THEN
              x(2)=x(2)/sqrt(one+two*X(5)/B0+X(5)**2)
              x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2)
           else
@@ -717,7 +584,7 @@ contains
 
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
-             IF(C%MAGP%P%TIME)THEN
+             IF(k%TIME.or.recirculator_cheat)THEN
                 X(5)=SQRT(ONE+TWO*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
                 X(5)=X(5)*P0/C%MAGP%P%P0C-ONE !X(5) = DP/P0C_NEW
                 X(5)=(TWO*X(5)+X(5)**2)/(SQRT(ONE/C%MAGP%P%BETA0**2+TWO*X(5)+X(5)**2)+ONE/C%MAGP%P%BETA0)
@@ -734,11 +601,11 @@ contains
     ! POSITION PATCH
     IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
-       CALL PATCH_FIB(C,X,PATCH,MY_TRUE)
+       CALL PATCH_FIB(C,X,k,PATCH,MY_TRUE)
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     ! TIME PATCH
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH/=0)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
        X(6)=X(6)+C%PATCH%A_T
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
@@ -747,8 +614,8 @@ contains
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
     ! MISALIGNMENTS AT THE ENTRANCE
     IF(C%MAGP%MIS) THEN
-       OU = K%EXACTMIS.OR.C%MAGP%EXACTMIS
-       CALL MIS_FIB(C,X,OU,DONEITT)
+       OU = K%EXACTMIS.OR.ALWAYS_EXACTMIS
+       CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
     !    IF(PRESENT(X_IN)) then
     !       CALL XMID(X_IN,X,-1)
@@ -768,7 +635,7 @@ contains
 
     ! MISALIGNMENTS AT THE EXIT
     IF(C%MAGP%MIS) THEN
-       CALL MIS_FIB(C,X,OU,DONEITF)
+       CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -777,7 +644,7 @@ contains
 
     !EXIT PATCH
     ! TIME PATCH
-    IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH/=0)) THEN
+    IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
        X(6)=X(6)+C%PATCH%b_T
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
@@ -785,7 +652,7 @@ contains
     ! POSITION PATCH
     IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAGP%P%EXACT
-       CALL PATCH_FIB(C,X,PATCH,MY_FALSE)
+       CALL PATCH_FIB(C,X,k,PATCH,MY_FALSE)
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -798,7 +665,7 @@ contains
        B0=>CN%MAGP%P%BETA0
        X(2)=X(2)*C%MAGP%P%P0C/P0
        X(4)=X(4)*C%MAGP%P%P0C/P0
-       IF(C%MAGP%P%TIME)THEN
+       IF(k%TIME.or.recirculator_cheat)THEN
           X(5)=SQRT(ONE+TWO*X(5)/C%MAGP%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
           X(5)=X(5)*C%MAGP%P%P0C/P0-ONE !X(5) = DP/P0C_NEW
           X(5)=(TWO*X(5)+X(5)**2)/(SQRT(ONE/B0**2+TWO*X(5)+X(5)**2)+ONE/B0)
@@ -825,7 +692,7 @@ contains
        P0=>C%MAGP%P%P0C
        B0=>C%MAGP%P%BETA0
        IF(C%MAGP%P%exact)THEN
-          IF(C%MAGP%P%TIME)THEN
+          IF(k%TIME)THEN
              xp=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)/sqrt(one+x(2)**2+x(4)**2)
              x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)/sqrt(one+x(2)**2+x(4)**2)
              x(2)=xp
@@ -835,7 +702,7 @@ contains
              x(2)=xp
           endif
        else
-          IF(C%MAGP%P%TIME)THEN
+          IF(k%TIME)THEN
              x(2)=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)
              x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)
           else
@@ -847,7 +714,7 @@ contains
     endif
 
     ! ELEMENT IS RESTAURED TO THE DEFAULT STATE
-    C%MAGP=DEFAULT
+    !    C%MAGP=DEFAULT
     ! DIRECTIONAL VARIABLE AND CHARGE ARE ELIMINATED
     NULLIFY(C%MAGP%P%DIR)
     NULLIFY(C%MAGP%P%CHARGE)
@@ -868,26 +735,27 @@ contains
 
 
 
-  SUBROUTINE PATCH_FIBR(C,X,PATCH,ENTERING)
+  SUBROUTINE PATCH_FIBR(C,X,k,PATCH,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
     logical(lp),INTENT(IN):: PATCH,ENTERING
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(ENTERING) THEN
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
-       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
+       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
        CALL ROT_XY(C%PATCH%A_ANG(3),X,PATCH)
-       CALL TRANS(C%PATCH%A_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL TRANS(C%PATCH%A_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%A_X2*X(3);X(4)=C%PATCH%A_X2*X(4);
     ELSE
        X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
-       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
-       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
+       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
        CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
-       CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,C%MAG%P%TIME)
+       CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
 
@@ -895,26 +763,27 @@ contains
   END SUBROUTINE PATCH_FIBR
 
 
-  SUBROUTINE PATCH_FIBP(C,X,PATCH,ENTERING)
+  SUBROUTINE PATCH_FIBP(C,X,k,PATCH,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C
     TYPE(REAL_8), INTENT(INOUT):: X(6)
     logical(lp),INTENT(IN):: PATCH,ENTERING
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(ENTERING) THEN
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
-       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
-       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
+       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAGP%P%BETA0,PATCH,k%TIME)
+       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAGP%P%BETA0,PATCH,k%TIME)
        CALL ROT_XY(C%PATCH%A_ANG(3),X,PATCH)
-       CALL TRANS(C%PATCH%A_D,X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
+       CALL TRANS(C%PATCH%A_D,X,C%MAGP%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%A_X2*X(3);X(4)=C%PATCH%A_X2*X(4);
     ELSE
        X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
-       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
-       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
+       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAGP%P%BETA0,PATCH,k%TIME)
+       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAGP%P%BETA0,PATCH,k%TIME)
        CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
-       CALL TRANS(C%PATCH%B_D,X,C%MAGP%P%BETA0,PATCH,C%MAGP%P%TIME)
+       CALL TRANS(C%PATCH%B_D,X,C%MAGP%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
 
@@ -928,29 +797,30 @@ contains
     TYPE(FIBRE),INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
     logical(lp),INTENT(IN):: OU,ENTERING
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(ASSOCIATED(C%CHART)) THEN
        IF(C%DIR==1) THEN   ! FORWARD PROPAGATION
           IF(ENTERING) THEN
-             CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)   ! ROTATIONS
-             CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)
+             CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
+             CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
              CALL ROT_XY(C%CHART%ANG_IN(3),X,OU)
-             CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)         ! TRANSLATION
+             CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
           ELSE
-             CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)  ! ROTATIONS
-             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)
+             CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
+             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
              CALL ROT_XY(C%CHART%ANG_OUT(3),X,OU)
-             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)        ! TRANSLATION
+             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
           ENDIF
        ELSE
           IF(ENTERING) THEN  ! BACKWARD PROPAGATION
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
-             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)        ! TRANSLATION
+             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
              CALL ROT_XY(C%CHART%ANG_OUT(3),X,OU)
-             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)
-             CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)  ! ROTATIONS
+             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
+             CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
@@ -958,10 +828,10 @@ contains
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
-             CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)         ! TRANSLATION
+             CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
              CALL ROT_XY(C%CHART%ANG_IN(3),X,OU)
-             CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)
-             CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,C%MAG%P%TIME)   ! ROTATIONS
+             CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
+             CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
@@ -970,34 +840,35 @@ contains
     ENDIF
   END SUBROUTINE MIS_FIBR
 
-  SUBROUTINE MIS_FIBP(C,X,OU,ENTERING)  ! Misaligns polymorphic fibres in PTC order for forward and backward fibres
+  SUBROUTINE MIS_FIBP(C,X,k,OU,ENTERING)  ! Misaligns polymorphic fibres in PTC order for forward and backward fibres
     implicit none
     TYPE(FIBRE),INTENT(INOUT):: C
     type(REAL_8), INTENT(INOUT):: X(6)
     logical(lp),INTENT(IN):: OU,ENTERING
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(ASSOCIATED(C%CHART)) THEN
        IF(C%DIR==1) THEN
           IF(ENTERING) THEN
-             CALL ROT_YZ(C%CHART%ang_in(1),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                ! rotations
-             CALL ROT_XZ(C%CHART%ang_in(2),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)
+             CALL ROT_YZ(C%CHART%ang_in(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
+             CALL ROT_XZ(C%CHART%ang_in(2),X,C%MAGP%P%BETA0,OU,k%TIME)
              CALL ROT_XY(C%CHART%ang_in(3),X,OU)
-             CALL TRANS(C%CHART%d_in,X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                       !translation
+             CALL TRANS(C%CHART%d_in,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
           ELSE
-             CALL ROT_YZ(C%CHART%ang_out(1),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                ! rotations
-             CALL ROT_XZ(C%CHART%ang_out(2),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)
+             CALL ROT_YZ(C%CHART%ang_out(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
+             CALL ROT_XZ(C%CHART%ang_out(2),X,C%MAGP%P%BETA0,OU,k%TIME)
              CALL ROT_XY(C%CHART%ang_out(3),X,OU)
-             CALL TRANS(C%CHART%d_out,X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                       !translation
+             CALL TRANS(C%CHART%d_out,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
           ENDIF
        ELSE
           IF(ENTERING) THEN
              C%CHART%d_out(1)=-C%CHART%d_out(1)
              C%CHART%d_out(2)=-C%CHART%d_out(2)
              C%CHART%ang_out(3)=-C%CHART%ang_out(3)
-             CALL TRANS(C%CHART%d_out,X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                       !translation
+             CALL TRANS(C%CHART%d_out,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
              CALL ROT_XY(C%CHART%ang_out(3),X,OU)
-             CALL ROT_XZ(C%CHART%ang_out(2),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)
-             CALL ROT_YZ(C%CHART%ang_out(1),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                ! rotations
+             CALL ROT_XZ(C%CHART%ang_out(2),X,C%MAGP%P%BETA0,OU,k%TIME)
+             CALL ROT_YZ(C%CHART%ang_out(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
              C%CHART%d_out(1)=-C%CHART%d_out(1)
              C%CHART%d_out(2)=-C%CHART%d_out(2)
              C%CHART%ang_out(3)=-C%CHART%ang_out(3)
@@ -1005,10 +876,10 @@ contains
              C%CHART%d_in(1)=-C%CHART%d_in(1)
              C%CHART%d_in(2)=-C%CHART%d_in(2)
              C%CHART%ang_in(3)=-C%CHART%ang_in(3)
-             CALL TRANS(C%CHART%d_in,X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                       !translation
+             CALL TRANS(C%CHART%d_in,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
              CALL ROT_XY(C%CHART%ang_in(3),X,OU)
-             CALL ROT_XZ(C%CHART%ang_in(2),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)
-             CALL ROT_YZ(C%CHART%ang_in(1),X,C%MAGP%P%BETA0,OU,C%MAGP%P%TIME)                ! rotations
+             CALL ROT_XZ(C%CHART%ang_in(2),X,C%MAGP%P%BETA0,OU,k%TIME)
+             CALL ROT_YZ(C%CHART%ang_in(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
              C%CHART%d_in(1)=-C%CHART%d_in(1)
              C%CHART%d_in(2)=-C%CHART%d_in(2)
              C%CHART%ang_in(3)=-C%CHART%ang_in(3)
@@ -1016,56 +887,6 @@ contains
        ENDIF
     ENDIF
   END SUBROUTINE MIS_FIBP
-
-  SUBROUTINE TRACK_R(X)
-    IMPLICIT NONE
-    REAL(DP) X(6),x6,xp,yp,x5
-    INTEGER icharef
-    COMMON/ptc/ icharef
-
-
-    if(j_global==1) return  ! skipping OBJECT OF ZGOUBI = TRACKING COMMAND INTERNAL TO ZGOUBI
-    icharef=0
-
-    x(1)=x(1)*c_100
-    x(3)=x(3)*c_100
-    x6=x(6)*c_100
-
-    xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
-    yp=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
-    x(2)=atan(xp)*c_1d3
-    x(4)=atan(yp/root(one+xp**2))*c_1d3
-
-    x(6)=x(5)
-    x(5)=x6
-
-    !call track_z(x,j_global,j_global)
-
-    x6=x(5)/c_100
-    x(5)=x(6)
-    x(6)=x6
-
-    x(1)=x(1)/c_100
-    x(3)=x(3)/c_100
-    xp=tan(x(2)/c_1d3)
-    yp=tan(x(4)/c_1d3)*root(one+xp**2)
-
-    x(2)=(one+x(5))*xp/root(one+xp**2+yp**2)
-    x(4)=(one+x(5))*yp/root(one+xp**2+yp**2)
-
-    icharef=1
-
-  END SUBROUTINE TRACK_R
-
-  SUBROUTINE TRACK_P(X)
-    IMPLICIT NONE
-    TYPE(REAL_8) X(6)
-
-    ! track_zp is a fortran external routine using numerical differentiation
-    !call track_zp(x,j_global,j_global)
-    WRITE(6,*) " NOT SUPPORTED "
-    STOP 111
-  END SUBROUTINE TRACK_P
 
 
 

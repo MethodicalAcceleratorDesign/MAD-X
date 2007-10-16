@@ -11,18 +11,23 @@ module sagan_WIGGLER
   PRIVATE DRIFTR,DRIFTP,DRIFT
   PRIVATE KICKPATHR,KICKPATHP,KICKPATH
   PRIVATE COMPX_R,COMPX_P,COMPY_R,COMPY_P,COMPZ_R,COMPZ_P,BF_R,BF_P
-  PRIVATE COMPX,COMPY,COMPZ  !,B_FIELD
+  PRIVATE COMPZ  !,B_FIELD
   PRIVATE KICKR,KICKP,KICK
   PRIVATE KILL_WIGGLER
   PRIVATE ALLOC_WIGGLER
   PRIVATE ZEROR_W,ZEROP_W,POINTERS_WP
-  PRIVATE copy_W_WP,copy_WP_W,copy_W_W
+  PRIVATE copy_W_WP,copy_WP_W,copy_W_W,INTR_SAGAN,INTp_SAGAN
   !  PRIVATE SET_R,SET_P,SET_W
+  PRIVATE ADJUSTR_WI,ADJUSTP_WI,get_z_wiR,get_z_wiP
 
   integer, parameter :: hyperbolic_ydollar  = 1
   integer, parameter :: hyperbolic_xydollar = 2
   integer, parameter :: hyperbolic_xdollar  = 3
 
+  INTERFACE get_z_wi
+     MODULE PROCEDURE get_z_wiR
+     MODULE PROCEDURE get_z_wip
+  END INTERFACE
 
   INTERFACE DRIFT
      MODULE PROCEDURE DRIFTR
@@ -119,8 +124,47 @@ module sagan_WIGGLER
      MODULE PROCEDURE ZEROp_W
   END INTERFACE
 
+  INTERFACE TRACK_SLICE
+     MODULE PROCEDURE INTR_SAGAN
+     MODULE PROCEDURE INTP_SAGAN
+  END INTERFACE
+
+  INTERFACE ADJUST_WI
+     MODULE PROCEDURE ADJUSTR_WI
+     MODULE PROCEDURE ADJUSTP_WI
+  END INTERFACE
+
 contains
 
+  SUBROUTINE ADJUSTR_WI(EL,X,J)
+    IMPLICIT NONE
+    real(dp), INTENT(INOUT) :: X(6)
+    TYPE(sagan),INTENT(INOUT):: EL
+
+    INTEGER, INTENT(IN) :: J
+    INTEGER I
+
+    IF(J==1) RETURN
+
+    X(1)=X(1)-EL%INTERNAL(1)
+    X(2)=X(2)-EL%INTERNAL(2)
+
+  END SUBROUTINE ADJUSTR_WI
+
+  SUBROUTINE ADJUSTP_WI(EL,X,J)
+    IMPLICIT NONE
+    TYPE(REAL_8), INTENT(INOUT) :: X(6)
+    TYPE(saganP),INTENT(INOUT):: EL
+
+    INTEGER, INTENT(IN) :: J
+
+
+    IF(J==1) RETURN
+
+    X(1)=X(1)-EL%INTERNAL(1)
+    X(2)=X(2)-EL%INTERNAL(2)
+
+  END SUBROUTINE ADJUSTP_WI
 
   !  SUBROUTINE SET_R(EL)
   !    IMPLICIT NONE
@@ -160,138 +204,86 @@ contains
   !    ENDIF
   !  END SUBROUTINE SET_P
 
-  SUBROUTINE INTR(EL,X,mid)
+  SUBROUTINE INTR(EL,X,k,mid)
     IMPLICIT NONE
-    integer ipause, mypause
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(INOUT):: EL
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: mid
-    real(dp) Z
-    real(dp) D,DH
-    real(dp) D1,D2,DK1,DK2
-    real(dp) DF(4),DK(4)
-    INTEGER I,J
+    INTEGER I
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
 
     !    CALL SET_W(EL%W)
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-    IF(EL%P%DIR==1) THEN
-       Z=zero
-    ELSE
-       Z=EL%L
-    ENDIF
-    SELECT CASE(EL%P%METHOD)
-    CASE(2)
-       DH=EL%L/two/EL%P%NST
-       D=EL%L/EL%P%NST
-       DO I=1,EL%P%NST
-          Z=Z+EL%P%DIR*DH
-          CALL DRIFT(EL,DH,Z,1,X)
-          CALL DRIFT(EL,DH,Z,2,X)
-          CALL KICKPATH(EL,DH,X)
-          CALL KICK(EL,D,Z,X)
-          CALL KICKPATH(EL,DH,X)
-          CALL DRIFT(EL,DH,Z,2,X)
-          CALL DRIFT(EL,DH,Z,1,X)
-          Z=Z+EL%P%DIR*DH
-          IF(PRESENT(MID)) CALL XMID(MID,X,i)
-       ENDDO
-    CASE(4)
-       D=EL%L/EL%P%NST
+    DO I=1,EL%P%NST
+       call track_slice(el,x,k,i)
+       IF(PRESENT(MID)) CALL XMID(MID,X,i)
+    ENDDO
 
-       DK1=D*FK1
-       D1=DK1/two
-       DK2=D*FK2
-       D2=DK2/two
-
-       DO I=1,EL%P%NST
-          Z=Z+EL%P%DIR*D1
-          CALL DRIFT(EL,D1,Z,1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL KICK(EL,DK1,Z,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL DRIFT(EL,D1,Z,1,X)
-          Z=Z+EL%P%DIR*D1+D2
-          CALL DRIFT(EL,D2,Z,1,X)
-          CALL DRIFT(EL,D2,Z,2,X)
-          CALL KICKPATH(EL,D2,X)
-          CALL KICK(EL,DK2,Z,X)
-          CALL KICKPATH(EL,D2,X)
-          CALL DRIFT(EL,D2,Z,2,X)
-          CALL DRIFT(EL,D2,Z,1,X)
-          Z=Z+EL%P%DIR*(D1+D2)
-          CALL DRIFT(EL,D1,Z,1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL KICK(EL,DK1,Z,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL DRIFT(EL,D1,Z,1,X)
-          Z=Z+EL%P%DIR*D1
-          IF(PRESENT(MID)) CALL XMID(MID,X,i)
-       ENDDO
-
-    CASE(6)
-       DO I =1,4
-          DK(I)=EL%L*YOSK(I)/EL%P%NST
-          DF(I)=DK(I)/two
-       ENDDO
-       DO I=1,EL%P%NST
-          DO J=4,1,-1
-             Z=Z+EL%P%DIR*DF(J)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL KICK(EL,DK(J),Z,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             Z=Z+EL%P%DIR*DF(J)
-          ENDDO
-          DO J=2,4
-             Z=Z+EL%P%DIR*DF(J)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL KICK(EL,DK(J),Z,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             Z=Z+EL%P%DIR*DF(J)
-          ENDDO
-          IF(PRESENT(MID)) CALL XMID(MID,X,i)
-       ENDDO
-
-    CASE DEFAULT
-       WRITE(6,*) " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       ipause=mypause(357)
-    END SELECT
-
-    X(1)=X(1)-EL%INTERNAL(1)
-    X(2)=X(2)-EL%INTERNAL(2)
+    call ADJUST_WI(EL,X,2)
 
   END SUBROUTINE INTR
 
-  SUBROUTINE INTR_SAGAN(EL,X,ZI)
+  SUBROUTINE get_z_wir(EL,i,z)
+    IMPLICIT NONE
+    TYPE(SAGAN),INTENT(INOUT):: EL
+    integer i
+    real(dp),INTENT(INOUT):: z
+    real(dp) d
+
+    D=EL%L/EL%P%NST
+    IF(EL%P%DIR==1) THEN
+       Z=(i-1)*d
+    ELSE
+       Z=EL%L-(i-1)*d
+    ENDIF
+
+  end SUBROUTINE get_z_wir
+
+  SUBROUTINE get_z_wip(EL,i,z)
+    IMPLICIT NONE
+    TYPE(SAGANP),INTENT(INOUT):: EL
+    integer i
+    TYPE(REAL_8),INTENT(INOUT):: z
+    TYPE(REAL_8) d
+
+    CALL ALLOC(D)
+
+    D=EL%L/EL%P%NST
+    IF(EL%P%DIR==1) THEN
+       Z=(i-1)*d
+    ELSE
+       Z=EL%L-(i-1)*d
+    ENDIF
+
+    CALL KILL(D)
+
+  end SUBROUTINE get_z_wip
+
+  SUBROUTINE INTR_SAGAN(EL,X,k,i)
     IMPLICIT NONE
     integer ipause, mypause
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(INOUT):: EL
-    real(dp),INTENT(IN):: ZI
+    integer,INTENT(IN):: I
     real(dp) Z
     real(dp) D,DH
     real(dp) D1,D2,DK1,DK2
     real(dp) DF(4),DK(4)
-    INTEGER I,J
+    INTEGER J
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
 
     !    CALL SET_W(EL%W)
-    Z=ZI
+
     SELECT CASE(EL%P%METHOD)
     CASE(2)
        DH=EL%L/two/EL%P%NST
        D=EL%L/EL%P%NST
+       IF(EL%P%DIR==1) THEN
+          Z=(i-1)*d
+       ELSE
+          Z=EL%L-(i-1)*d
+       ENDIF
 
        Z=Z+EL%P%DIR*DH
        CALL DRIFT(EL,DH,Z,1,X)
@@ -301,6 +293,7 @@ contains
        CALL KICKPATH(EL,DH,X)
        CALL DRIFT(EL,DH,Z,2,X)
        CALL DRIFT(EL,DH,Z,1,X)
+       !       Z=Z+EL%P%DIR*DH
 
     CASE(4)
        D=EL%L/EL%P%NST
@@ -309,6 +302,11 @@ contains
        D1=DK1/two
        DK2=D*FK2
        D2=DK2/two
+       IF(EL%P%DIR==1) THEN
+          Z=(i-1)*d
+       ELSE
+          Z=EL%L-(i-1)*d
+       ENDIF
 
        Z=Z+EL%P%DIR*D1
        CALL DRIFT(EL,D1,Z,1,X)
@@ -336,10 +334,16 @@ contains
        CALL DRIFT(EL,D1,Z,1,X)
 
     CASE(6)
-       DO I =1,4
-          DK(I)=EL%L*YOSK(I)/EL%P%NST
-          DF(I)=DK(I)/two
+       DO j =1,4
+          DK(j)=EL%L*YOSK(I)/EL%P%NST
+          DF(j)=DK(j)/two
        ENDDO
+       D=EL%L/EL%P%NST
+       IF(EL%P%DIR==1) THEN
+          Z=(i-1)*d
+       ELSE
+          Z=EL%L-(i-1)*d
+       ENDIF
        DO J=4,1,-1
           Z=Z+EL%P%DIR*DF(J)
           CALL DRIFT(EL,DF(J),Z,1,X)
@@ -373,144 +377,54 @@ contains
 
 
 
-  SUBROUTINE INTP(EL,X)
+  SUBROUTINE INTP(EL,X,k)
     IMPLICIT NONE
-    integer ipause, mypause
+    integer ipause
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(INOUT):: EL
-    TYPE(REAL_8) Z
-    TYPE(REAL_8) D,DH
-    TYPE(REAL_8) D1,D2,DK1,DK2
-    TYPE(REAL_8) DF(4),DK(4)
-    INTEGER I,J
-    CALL ALLOC(Z,D,DH,D1,D2,DK1,DK2)
-    CALL ALLOC(DF,4)
-    CALL ALLOC(DK,4)
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
+
+    INTEGER I
 
     !    CALL SET_W(EL%W)
 
-    IF(EL%P%DIR==1) THEN
-       Z=zero
-    ELSE
-       Z=EL%L
-    ENDIF
-    SELECT CASE(EL%P%METHOD)
-    CASE(2)
-       DH=EL%L/two/EL%P%NST
-       D=EL%L/EL%P%NST
-       DO I=1,EL%P%NST
-          Z=Z+EL%P%DIR*DH
-          CALL DRIFT(EL,DH,Z,1,X)
-          CALL DRIFT(EL,DH,Z,2,X)
-          CALL KICKPATH(EL,DH,X)
-          CALL KICK(EL,D,Z,X)
-          CALL KICKPATH(EL,DH,X)
-          CALL DRIFT(EL,DH,Z,2,X)
-          CALL DRIFT(EL,DH,Z,1,X)
-          Z=Z+EL%P%DIR*DH
-       ENDDO
-    CASE(4)
-       D=EL%L/EL%P%NST
 
-       DK1=D*FK1
-       D1=DK1/two
-       DK2=D*FK2
-       D2=DK2/two
+    DO I=1,EL%P%NST
+       call track_slice(el,x,k,i)
+    ENDDO
 
-       DO I=1,EL%P%NST
-          Z=Z+EL%P%DIR*D1
-          CALL DRIFT(EL,D1,Z,1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL KICK(EL,DK1,Z,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL DRIFT(EL,D1,Z,1,X)
-          Z=Z+EL%P%DIR*D1+D2
-          CALL DRIFT(EL,D2,Z,1,X)
-          CALL DRIFT(EL,D2,Z,2,X)
-          CALL KICKPATH(EL,D2,X)
-          CALL KICK(EL,DK2,Z,X)
-          CALL KICKPATH(EL,D2,X)
-          CALL DRIFT(EL,D2,Z,2,X)
-          CALL DRIFT(EL,D2,Z,1,X)
-          Z=Z+EL%P%DIR*(D1+D2)
-          CALL DRIFT(EL,D1,Z,1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL KICK(EL,DK1,Z,X)
-          CALL KICKPATH(EL,D1,X)
-          CALL DRIFT(EL,D1,Z,2,X)
-          CALL DRIFT(EL,D1,Z,1,X)
-          Z=Z+EL%P%DIR*D1
-       ENDDO
-
-    CASE(6)
-       DO I =1,4
-          DK(I)=EL%L*YOSK(I)/EL%P%NST
-          DF(I)=DK(I)/two
-       ENDDO
-       DO I=1,EL%P%NST
-          DO J=4,1,-1
-             Z=Z+EL%P%DIR*DF(J)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL KICK(EL,DK(J),Z,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             Z=Z+EL%P%DIR*DF(J)
-          ENDDO
-          DO J=2,4
-             Z=Z+EL%P%DIR*DF(J)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL KICK(EL,DK(J),Z,X)
-             CALL KICKPATH(EL,DF(J),X)
-             CALL DRIFT(EL,DF(J),Z,2,X)
-             CALL DRIFT(EL,DF(J),Z,1,X)
-             Z=Z+EL%P%DIR*DF(J)
-          ENDDO
-       ENDDO
-
-    CASE DEFAULT
-       WRITE(6,*) " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       ipause=mypause(357)
-    END SELECT
-
-
-    CALL KILL(Z,D,DH,D1,D2,DK1,DK2)
-    CALL KILL(DF,4)
-    CALL KILL(DK,4)
-
-    X(1)=X(1)-EL%INTERNAL(1)
-    X(2)=X(2)-EL%INTERNAL(2)
+    call ADJUST_WI(EL,X,2)
 
   END SUBROUTINE INTP
 
-  SUBROUTINE INTP_SAGAN(EL,X,ZI)
+  SUBROUTINE INTP_SAGAN(EL,X,k,i)
     IMPLICIT NONE
     integer ipause, mypause
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(INOUT):: EL
-    real(dp),INTENT(IN):: ZI
+    integer,INTENT(IN):: I
     TYPE(REAL_8) Z
     TYPE(REAL_8) D,DH
     TYPE(REAL_8) D1,D2,DK1,DK2
     TYPE(REAL_8) DF(4),DK(4)
-    INTEGER I,J
+    INTEGER J
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
+
     CALL ALLOC(Z,D,DH,D1,D2,DK1,DK2)
     CALL ALLOC(DF,4)
     CALL ALLOC(DK,4)
 
     !    CALL SET_W(EL%W)
-    Z=ZI
     SELECT CASE(EL%P%METHOD)
     CASE(2)
        DH=EL%L/two/EL%P%NST
        D=EL%L/EL%P%NST
+
+       IF(EL%P%DIR==1) THEN
+          Z=(i-1)*d
+       ELSE
+          Z=EL%L-(i-1)*d
+       ENDIF
 
        Z=Z+EL%P%DIR*DH
        CALL DRIFT(EL,DH,Z,1,X)
@@ -528,6 +442,12 @@ contains
        D1=DK1/two
        DK2=D*FK2
        D2=DK2/two
+
+       IF(EL%P%DIR==1) THEN
+          Z=(i-1)*d
+       ELSE
+          Z=EL%L-(i-1)*d
+       ENDIF
 
        Z=Z+EL%P%DIR*D1
        CALL DRIFT(EL,D1,Z,1,X)
@@ -555,10 +475,16 @@ contains
        CALL DRIFT(EL,D1,Z,1,X)
 
     CASE(6)
-       DO I =1,4
-          DK(I)=EL%L*YOSK(I)/EL%P%NST
-          DF(I)=DK(I)/two
+       DO j =1,4
+          DK(j)=EL%L*YOSK(I)/EL%P%NST
+          DF(j)=DK(j)/two
        ENDDO
+       D=EL%L/EL%P%NST
+       IF(EL%P%DIR==1) THEN
+          Z=(i-1)*d
+       ELSE
+          Z=EL%L-(i-1)*d
+       ENDIF
        DO J=4,1,-1
           Z=Z+EL%P%DIR*DF(J)
           CALL DRIFT(EL,DF(J),Z,1,X)
@@ -712,7 +638,6 @@ contains
     IMPLICIT NONE
     TYPE(SAGANP), INTENT(in)::EL
     TYPE(SAGAN), INTENT(inout)::ELP
-    INTEGER I
 
     ELP%INTERNAL(1)    =EL%INTERNAL(1)
     ELP%INTERNAL(2)    =EL%INTERNAL(2)
@@ -1051,20 +976,21 @@ contains
   end SUBROUTINE  scale_SAGANP
 
   ! split drifts
-  SUBROUTINE DRIFTR(EL,L,Z,PLANE,X)
+  SUBROUTINE DRIFTR(EL,L,Z,PLANE,X,k)
     IMPLICIT NONE
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(INOUT):: X(6)
     real(dp), INTENT(IN):: L,Z
     INTEGER, INTENT(IN)::PLANE
     real(dp) PZ,A,B,AP,BP
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
 
 
     IF(PLANE==1) THEN
        CALL  COMPX(EL,Z,X,A,AP)
        X(2)=X(2)-A
        X(4)=X(4)-AP
-       if(EL%P%TIME) then
+       if(k%TIME) then
           PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
           X(6)=X(6)+((X(2)*X(2))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
@@ -1079,7 +1005,7 @@ contains
        CALL  COMPY(EL,Z,X,B,BP)
        X(2)=X(2)-BP
        X(4)=X(4)-B
-       if(EL%P%TIME) then
+       if(k%TIME) then
           PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
           X(6)=X(6)+((X(4)*X(4))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
@@ -1093,20 +1019,21 @@ contains
     ENDIF
   END SUBROUTINE DRIFTR
 
-  SUBROUTINE DRIFTP(EL,L,Z,PLANE,X)
+  SUBROUTINE DRIFTP(EL,L,Z,PLANE,X,k)
     IMPLICIT NONE
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8), INTENT(IN):: L,Z
     INTEGER, INTENT(IN)::PLANE
     TYPE(REAL_8) PZ,A,B,AP,BP
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
 
     CALL ALLOC(PZ,A,B,AP,BP)
     IF(PLANE==1) THEN
        CALL  COMPX(EL,Z,X,A,AP)
        X(2)=X(2)-A
        X(4)=X(4)-AP
-       if(EL%P%TIME) then
+       if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
           X(6)=X(6)+((X(2)*X(2))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
@@ -1121,7 +1048,7 @@ contains
        CALL  COMPY(EL,Z,X,B,BP)
        X(2)=X(2)-BP
        X(4)=X(4)-B
-       if(EL%P%TIME) then
+       if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
           X(6)=X(6)+((X(4)*X(4))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
@@ -1138,71 +1065,73 @@ contains
 
   END SUBROUTINE DRIFTP
 
-  SUBROUTINE KICKPATHR(EL,L,X)
+  SUBROUTINE KICKPATHR(EL,L,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: L
     real(dp) PZ,PZ0
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
     IF(EL%P%EXACT) THEN
-       if(EL%P%TIME) then
+       if(k%TIME) then
           PZ=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
 
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+EL%P%TOTALPATH*EL%P%LD/EL%P%BETA0
+          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*EL%P%LD/EL%P%BETA0
        else
           PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
           PZ0=one+X(5)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+EL%P%TOTALPATH*EL%P%LD
+          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*EL%P%LD
        endif
     ELSE
-       if(EL%P%TIME) then
-          X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD/EL%P%BETA0
+       if(k%TIME) then
+          X(6)=X(6)+k%TOTALPATH*EL%P%LD/EL%P%BETA0
        else
-          X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD
+          X(6)=X(6)+k%TOTALPATH*EL%P%LD
        endif
     ENDIF
 
   END SUBROUTINE KICKPATHR
 
-  SUBROUTINE KICKPATHP(EL,L,X)
+  SUBROUTINE KICKPATHP(EL,L,X,k)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: L
     TYPE(REAL_8) PZ,PZ0
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
     IF(EL%P%EXACT) THEN
        CALL ALLOC(PZ,PZ0)
-       if(EL%P%TIME) then
+       if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
 
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+EL%P%TOTALPATH*EL%P%LD/EL%P%BETA0
+          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*EL%P%LD/EL%P%BETA0
        else
           PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
           PZ0=one+X(5)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+EL%P%TOTALPATH*EL%P%LD
+          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*EL%P%LD
        endif
        CALL KILL(PZ,PZ0)
     ELSE
-       if(EL%P%TIME) then
-          X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD/EL%P%BETA0
+       if(k%TIME) then
+          X(6)=X(6)+k%TOTALPATH*EL%P%LD/EL%P%BETA0
        else
-          X(6)=X(6)+EL%P%TOTALPATH*EL%P%LD
+          X(6)=X(6)+k%TOTALPATH*EL%P%LD
        endif
     ENDIF
 
@@ -1241,7 +1170,7 @@ contains
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: A,B
-    INTEGER I,J
+    INTEGER I
     A=zero
     B=zero
     DO I=1,SIZE(EL%W%A)
@@ -1275,7 +1204,7 @@ contains
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: Z
     TYPE(REAL_8),INTENT(INOUT):: A,B
-    INTEGER I,J
+    INTEGER I
     real(dp) J1,J2,J3
     TYPE(REAL_8) s1,s2,s3
     A=zero
@@ -1318,7 +1247,7 @@ contains
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: A,B
-    INTEGER I,J
+    INTEGER I
     A=zero
     B=zero
     DO I=1,SIZE(EL%W%A)
@@ -1353,7 +1282,7 @@ contains
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: Z
     TYPE(REAL_8),INTENT(INOUT):: A,B
-    INTEGER I,J
+    INTEGER I
     TYPE(REAL_8) s1,s2,s3
     call alloc(s1,s2,s3)
     A=zero
@@ -1391,7 +1320,7 @@ contains
     IMPLICIT NONE
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(INOUT):: B
-    INTEGER I,J
+    INTEGER I
 
     B=zero
 
@@ -1408,7 +1337,7 @@ contains
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: B(3)
-    INTEGER I,J
+    INTEGER I
     B=zero
 
     DO I=1,SIZE(EL%W%A)
@@ -1451,7 +1380,7 @@ contains
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: Z
     TYPE(REAL_8),INTENT(INOUT):: B(3)
-    INTEGER I,J
+    INTEGER I
     B(1)=zero;B(2)=zero;B(3)=zero;
 
     DO I=1,SIZE(EL%W%A)
@@ -1489,41 +1418,18 @@ contains
 
   END SUBROUTINE BF_P
 
-  SUBROUTINE KICKR(EL,L,Z,X)
+  SUBROUTINE KICKR(EL,L,Z,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: L,Z
     real(dp) B_F(3),A,B,AP,BP,C,B2,X_MEC(6),x5
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
 
 
 
 
 
-    IF(EL%P%RADIATION) THEN
-       if(EL%P%TIME) then
-          X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
-       else
-          X5=X(5)
-       endif
-       CALL B_FIELD(EL,Z,X,B_F)
-       CALL COMPX(EL,Z,X,A,AP)
-       X_MEC=zero
-       X_MEC(2)=X(2)-A
-       CALL COMPY(EL,Z,X,B,BP)
-       X_MEC(4)=X(4)-B
-       CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
-
-
-       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
-       if(EL%P%TIME) then
-          X(2)=X_MEC(2)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+A
-          X(4)=X_MEC(4)*ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+B
-       else
-          X(2)=X_MEC(2)*(one+X(5))/(one+X5)+A
-          X(4)=X_MEC(4)*(one+X(5))/(one+X5)+B
-       endif
-    ENDIF
 
 
     CALL COMPZ(EL,Z,X,A,B)
@@ -1533,46 +1439,16 @@ contains
 
   END SUBROUTINE KICKR
 
-  SUBROUTINE KICKP(EL,L,Z,X)
+  SUBROUTINE KICKP(EL,L,Z,X,k)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: L,Z
     TYPE(REAL_8) B_F(3),A,B,AP,BP,C,B2,X_MEC(6),x5
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
 
 
     call alloc(A,B,AP,BP)
-
-    IF(EL%P%RADIATION) THEN
-       CALL ALLOC(B_F,3)
-       CALL ALLOC(X_MEC,6)
-       CALL ALLOC(C,B2,X5)
-
-       if(EL%P%TIME) then
-          X5=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)-one
-       else
-          X5=X(5)
-       endif
-       CALL B_FIELD(EL,Z,X,B_F)
-       CALL COMPX(EL,Z,X,A,AP)
-       X_MEC(2)=X(2)-A
-       CALL COMPY(EL,Z,X,B,BP)
-       X_MEC(4)=X(4)-B
-       CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
-
-
-       X(5)=X(5)-CRADF(EL%P)*(one+X(5))**2*B2*(one+half*(X_MEC(2)**2+X_MEC(4)**2)/(one+X(5))**2)*L
-       if(EL%P%TIME) then
-          X(2)=X_MEC(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+A
-          X(4)=X_MEC(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+X5)+B
-       else
-          X(2)=X_MEC(2)*(one+X(5))/(one+X5)+A
-          X(4)=X_MEC(4)*(one+X(5))/(one+X5)+B
-       endif
-       CALL KILL(B_F,3)
-       CALL KILL(X_MEC,6)
-       CALL KILL(C,B2,X5)
-    ENDIF
 
 
     CALL COMPZ(EL,Z,X,A,B)

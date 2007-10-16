@@ -149,6 +149,7 @@ module precision_constants
   !Initialized numbers
   real(dp)::eps=1e-38_dp
   real(dp)::EPSdol=1e-37_dp
+  LOGICAL(lp),parameter  :: s_aperture_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
   LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
@@ -169,6 +170,7 @@ module precision_constants
   character*255 :: final_setting="FINAL_SETTINGS.TXT"
   character*255 :: def_orbit_node="def_orbit_node.txt"
   character*255 :: file_block_name="noprint"
+  real(dp) :: lmax=1.e38_dp
 
   type info_window
      character(3) adv
@@ -233,6 +235,7 @@ module precision_constants
      logical(lp), pointer :: EXACT_MODEL != .false. exact model used
      logical(lp), pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
      logical(lp),pointer :: ALWAYS_knobs  !=.false. ptc knob default status
+     logical(lp),pointer :: recirculator_cheat  ! =.false.  if true energy patches use the time formula always
      integer, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0  default
      integer,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
      ! creates a reverse propagator
@@ -479,7 +482,10 @@ contains
   REAL(DP) FUNCTION  ROOT(X)  ! REPLACES SQRT(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       ROOT=ONE
+       return
+    endif
 
     IF((X<ZERO).AND.c_%ROOT_CHECK) THEN
        ROOT=ONE
@@ -496,7 +502,10 @@ contains
   REAL(DP) FUNCTION  ARCSIN(X)  ! REPLACES ASIN(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       ARCSIN=ZERO
+       return
+    endif
     IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
        ARCSIN=ZERO
        c_%CHECK_STABLE=.FALSE.
@@ -512,7 +521,10 @@ contains
   REAL(DP) FUNCTION  ARCCOS(X)  ! REPLACES ACOS(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       ARCCOS=ZERO
+       return
+    endif
     IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
        ARCCOS=ZERO
        c_%CHECK_STABLE=.FALSE.
@@ -528,7 +540,10 @@ contains
   REAL(DP) FUNCTION  LOGE(X)  ! REPLACES ACOS(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       LOGE=ZERO
+       return
+    endif
 
     IF(X<=ZERO.AND.c_%ROOT_CHECK) THEN
        LOGE=ZERO
@@ -544,7 +559,10 @@ contains
   REAL(DP) FUNCTION  COSEH(X) ! REPLACES COSH(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       COSEH=ONE
+       return
+    endif
 
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        COSEH=ONE
@@ -561,7 +579,10 @@ contains
   REAL(DP) FUNCTION  SINEH(X) ! REPLACES SINH(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       SINEH=ZERO
+       return
+    endif
 
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        SINEH=ZERO
@@ -578,7 +599,10 @@ contains
   REAL(DP) FUNCTION  arctan(X) ! REPLACES SINH(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       arctan=ZERO
+       return
+    endif
 
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        arctan=ZERO
@@ -591,6 +615,9 @@ contains
     ENDIF
 
   END FUNCTION arctan
+
+
+
 
   SUBROUTINE RESET_APERTURE_FLAG
     IMPLICIT NONE

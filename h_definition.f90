@@ -37,6 +37,9 @@ module definition
   logical(lp) :: knob_numerical=.false.
   real(dp) ::  knob_eps(lnv)=c_1d_6
   integer ::  knob_i =0
+  INTEGER,PARAMETER::NMAX=20
+  integer,private,parameter::n_max=10   ! sagan stuff
+  INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2  !,CASE3=3
 
   !
   TYPE sub_taylor
@@ -106,20 +109,6 @@ module definition
      !   type(real_8) m(3,3)
      ! real(dp) G
   end type spinor_8
-
-  type probe
-     real(dp) x(6)
-     type(spinor) s
-     logical u
-  end type probe
-
-  type probe_8
-     type(real_8) x(6)
-     type(spinor_8) s
-     !  type (REAL_8) E_ij(ndim2,ndim2)
-     real(dp) E_ij(ndim2,ndim2)
-     logical u
-  end type probe_8
 
   !    scratch levels of DA using linked list
 
@@ -263,7 +252,7 @@ module definition
   end  type tree_element
 
   type damapspin
-     REAL(DP) X(6)
+     !   REAL(DP) X(6)
      type(damap) M
      type(real_8) s(3,3)
   end type damapspin
@@ -277,6 +266,34 @@ module definition
      integer NRES,M(NDIM)
 
   end type normal_spin
+
+  include "a_def_frame_patch_chart.inc"
+  include "a_def_all_kind.inc"
+  include "a_def_sagan.inc"
+  include "a_def_element_fibre_layout.inc"
+
+  type probe
+     real(dp) x(6)
+     type(spinor) s
+     logical u
+     type(integration_node),pointer :: lost_node
+  end type probe
+
+  type probe_8
+     type(real_8) x(6)
+     type(spinor_8) s
+     !  type (REAL_8) E_ij(ndim2,ndim2)
+     real(dp) E_ij(ndim2,ndim2)
+     logical u
+     type(integration_node),pointer :: lost_node
+  end type probe_8
+
+  type TEMPORAL_PROBE
+     TYPE(probe)  XS
+     TYPE(INTEGRATION_NODE), POINTER :: NODE
+     real(DP)  DS
+  END type TEMPORAL_PROBE
+
 
 
 end module definition

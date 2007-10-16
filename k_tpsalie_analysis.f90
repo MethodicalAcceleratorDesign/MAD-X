@@ -279,6 +279,19 @@ contains
 
   END FUNCTION map_fd
 
+  SUBROUTINE  go_to_fix_point(m,a1,a1i,nord)
+    implicit none
+    type (damap),INTENT(inOUT)::m,a1,a1i
+    integer nord
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+
+    call gofix(m%v%i,a1%v%i,a1i%v%i,nord)
+
+
+  END SUBROUTINE go_to_fix_point
+
+
   SUBROUTINE  normalMAP(S2,S1)
     implicit none
     type (normalform),INTENT(inOUT)::S2

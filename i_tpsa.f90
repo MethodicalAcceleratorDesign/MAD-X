@@ -2744,7 +2744,7 @@ CONTAINS
     integer, intent(inout):: n
     integer,optional, intent(inout)::J(:)
     real(dp), OPTIONAL, intent(inout):: value
-    INTEGER ipresent,ILLA!,I
+    INTEGER ipresent,ILLA
     real(dp) VALUE0
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) THEN

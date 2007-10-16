@@ -11,7 +11,7 @@ module S_FRAME
   REAL(DP), public :: GLOBAL_FRAME(3,3)= RESHAPE((/1,0,0  ,0,1,0  ,0,0,1/),(/3,3/))
   REAL(DP), public :: GLOBAL_origin(3)= (/0,0,0/)
   integer :: ccc=0
-  include "a_def_frame_patch_chart.inc"
+  !  include "a_def_frame_patch_chart.inc"   ! sept 2007
 
 
   INTERFACE assignment (=)
@@ -348,7 +348,8 @@ CONTAINS
 
 
 
-  SUBROUTINE GEO_TRA(A,ENT,D,I) ! Adds/subtracts D to A where D is expressed in the ENT frame
+  SUBROUTINE GEO_TRA(A,ENT,D,I)
+    ! Adds/subtracts D to A where D is expressed in the ENT frame
     implicit none
     real(dp), INTENT(INOUT):: A(3)
     real(dp), INTENT(IN):: ENT(3,3)
@@ -367,7 +368,8 @@ CONTAINS
 
 
   SUBROUTINE GEO_ROTA_no_vec(ENT,ANG,I,basis)
-    ! Rotates frame ENT by A(3) in the PTC or reverse PTC order using global frame for angle definition
+    ! Rotates frame ENT by A(3) in the PTC or reverse
+    !PTC order using global frame for angle definition
     implicit none
     real(dp), INTENT(INOUT):: ENT(3,3)
     real(dp), INTENT(IN):: ANG(3)
@@ -381,7 +383,8 @@ CONTAINS
   END SUBROUTINE GEO_ROTA_no_vec
 
   SUBROUTINE GEO_ROTA(ENT,A,ANG,I,basis)
-    ! Rotates frame ENT by A(3) in the PTC or reverse PTC order using global frame for angle definition
+    ! Rotates frame ENT by A(3) in the PTC or reverse PTC order
+    !using global frame for angle definition
     implicit none
     real(dp), INTENT(INOUT):: ENT(3,3),A(3)
     real(dp), INTENT(IN):: ANG(3)
@@ -455,7 +458,7 @@ CONTAINS
   END SUBROUTINE ROTATE_FRAME
 
 
-  SUBROUTINE  TRANSLATE_FRAME(R,D,ORDER,BASIS) ! TRANSLATES A LAYOUT
+  SUBROUTINE  TRANSLATE_FRAME(R,D,ORDER,BASIS) ! TRANSLATES A FRAME
     IMPLICIT NONE
     TYPE (MAGNET_FRAME),TARGET, INTENT(INOUT):: R
     REAL(DP),INTENT(IN):: D(3)
@@ -534,7 +537,8 @@ CONTAINS
   end SUBROUTINE make_rot_z
 
 
-  SUBROUTINE GEO_ROTB(ENT,EXI,A,B,ANG,BASIS) ! Rotates ENT into EXI using global frame otherwise uses basis
+  SUBROUTINE GEO_ROTB(ENT,EXI,A,B,ANG,BASIS)
+    ! Rotates ENT into EXI using global frame otherwise uses basis
     implicit none
     real(dp), INTENT(INOUT):: ENT(3,3),EXI(3,3),A(3),B(3)
     real(dp), INTENT(IN):: ANG(3)
@@ -696,7 +700,8 @@ CONTAINS
     endif
   end subroutine make_normal
 
-  SUBROUTINE COMPUTE_ENTRANCE_ANGLE(ENTL,ENTB,A) ! COMPUTES PTC'S ANGLES IN FRAME OF ENTL
+  SUBROUTINE COMPUTE_ENTRANCE_ANGLE(ENTL,ENTB,A)
+    ! COMPUTES PTC'S ANGLES IN FRAME OF ENTL
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: ENTL(3,3), ENTB(3,3)
     REAL(DP), INTENT(OUT) :: A(3)
@@ -756,7 +761,8 @@ CONTAINS
 
 
 
-  SUBROUTINE FIND_PATCH_B(A,ENT,B,EXI,D,ANG) ! FINDS PATCH BETWEEN ENT AND EXI : INTERFACED LATER FOR FIBRES
+  SUBROUTINE FIND_PATCH_B(A,ENT,B,EXI,D,ANG)
+    ! FINDS PATCH BETWEEN ENT AND EXI : INTERFACED LATER FOR FIBRES
     IMPLICIT NONE
     REAL(DP), INTENT(INOUT):: ENT(3,3),EXI(3,3)
     REAL(DP), INTENT(INOUT):: A(3),B(3),D(3),ANG(3)

@@ -15,14 +15,15 @@ module tree_element_MODULE
   private alloc_normal_spin,kill_normal_spin !,EQUAL_NORMAL_DASPIN
   private READ_DASPIN,PRINT_DASPIN,EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
   PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
-  private EQUAL_IDENTITY_SPINOR_8_r3
+  private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8
 
   private power_rotr,find_ar,norm_matr,anti_matr
   private power_rotp,find_ap,norm_matp,anti_matp
   private  find_n_thetar,find_n_thetap
   !  private smatp,smatmulp
   private exp_n_thetar,exp_n_thetap,inv_asr,inv_asp !,inv_as
-  PRIVATE EQUAL_DASPIN,daddsc,scdadd,EQUAL_PROBE8_PROBE8,PRINT_probe8
+  PRIVATE EQUAL_DAmapSPIN_int,daddsc,scdadd,EQUAL_PROBE8_PROBE8,PRINT_probe8
+  PRIVATE concat,assmap,EQUAL_damapspin,CUTORDER,assprobe_8
 
 
   INTERFACE assignment (=)
@@ -39,10 +40,20 @@ module tree_element_MODULE
      MODULE PROCEDURE EQUAL_DASPIN_RAY8
      MODULE PROCEDURE EQUAL_RAY8_DASPIN
      MODULE PROCEDURE EQUAL_IDENTITY_SPINOR_8_r3
-     MODULE PROCEDURE EQUAL_DASPIN
+     MODULE PROCEDURE EQUAL_DAmapSPIN_int
      MODULE PROCEDURE EQUAL_PROBE8_PROBE8
+     MODULE PROCEDURE      EQUAL_damapspin
+     MODULE PROCEDURE     EQUAL_SPINOR_SPINOR8
+     MODULE PROCEDURE     EQUAL_PROBE_PROBE8
      !     MODULE PROCEDURE EQUAL_NORMAL_DASPIN
   end  INTERFACE
+  INTERFACE OPERATOR (*)
+     MODULE PROCEDURE concat
+  END  INTERFACE
+
+  INTERFACE OPERATOR (.cut.)
+     MODULE PROCEDURE CUTORDER
+  END  INTERFACE
 
   INTERFACE operator (+)
      MODULE PROCEDURE scdadd
@@ -124,6 +135,12 @@ module tree_element_MODULE
      MODULE PROCEDURE KILL_TREE
      MODULE PROCEDURE KILL_TREE_N
   END INTERFACE
+
+  INTERFACE ass
+     MODULE PROCEDURE assmap
+     MODULE PROCEDURE assprobe_8
+  END INTERFACE
+
 
 
 
@@ -631,6 +648,208 @@ CONTAINS
   !  SPIN STUFF IS HERE
 
 
+
+
+  subroutine assmap(s1)
+    implicit none
+    TYPE (damapspin) s1
+    integer i,j
+
+    select case(master)
+    case(0:ndumt-1)
+       master=master+1
+    case(ndumt)
+       w_p=0
+       w_p%nc=1
+       w_p=(/" cannot indent anymore "/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(100)
+    end select
+
+    do i=1,3
+       do j=1,3
+          call ass0(s1%s(i,j)%t)
+          s1%s(i,j)%alloc=my_true
+          s1%s(i,j)%kind=2
+          s1%s(i,j)%i=0
+       enddo
+    enddo
+    do i=1,c_%nd2
+       call ass0(s1%m%v(i))
+    enddo
+
+  end subroutine assmap
+
+  subroutine assprobe_8(s1)
+    implicit none
+    TYPE (probe_8) s1
+    integer i
+
+    select case(master)
+    case(0:ndumt-1)
+       master=master+1
+    case(ndumt)
+       w_p=0
+       w_p%nc=1
+       w_p=(/" cannot indent anymore "/)
+       w_p%fc='(1((1X,A72),/))'
+       CALL WRITE_E(100)
+    end select
+
+    if(C_%SPIN_POS/=0) then
+       do i=1,3
+          call ass0(s1%s%x(i)%t)
+          s1%s%x(i)%alloc=my_true
+          s1%s%x(i)%kind=2
+          s1%s%x(i)%i=0
+       enddo
+    endif
+    do i=1,6  !
+       call ass0(s1%x(i)%t)
+       s1%x(i)%alloc=my_true
+       s1%x(i)%kind=1
+       s1%x(i)%i=0
+    enddo
+
+
+  end subroutine assprobe_8
+
+
+
+  FUNCTION concat(S2,S1)
+    implicit none
+    TYPE (damapspin) concat,t2
+    TYPE (damapspin), INTENT (IN) :: S1, S2
+    integer i,j,k
+    integer localmaster
+    type(real_8) s(3,3)
+
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call ass(concat)
+    call alloc(t2);
+    call alloc_33(s);
+
+    t2=s2
+    concat=s2
+
+    do i=1,3
+       do j=1,3
+          if(s2%s(i,j)%kind==2) then
+             t2%s(i,j)=s2%s(i,j)%t*s1%m
+          else
+             t2%s(i,j)=s2%s(i,j)
+          endif
+       enddo
+    enddo
+
+    concat%m=s2%m*s1%m
+
+    !    do i=1,6
+    !     concat%x(i)=s2%x(i)
+    !    enddo
+
+    do i=1,3
+       do j=1,3
+          do k=1,3
+             s(i,j)= t2%s(i,k)*s1%s(k,j)+ s(i,j)
+          enddo
+       enddo
+    enddo
+    call smatp(one,s,concat%s)
+
+    call kill_33(s);
+    call kill(t2);
+    master=localmaster
+
+  END FUNCTION concat
+
+
+  FUNCTION CUTORDER( S1, S2 )
+    implicit none
+    TYPE (damapspin) CUTORDER
+    TYPE (damapspin), INTENT (IN) :: S1
+    integer  , INTENT (IN) ::  S2
+    integer localmaster
+    integer i,j
+
+    localmaster=master
+    call ass(CUTORDER)
+
+    CUTORDER=0
+
+    do i=1,3
+       do j=1,3
+          CUTORDER%s(i,j)=s1%s(i,j).cut.s2
+       enddo
+    enddo
+
+    CUTORDER%m=s1%m.cut.(s2+1)
+
+    master=localmaster
+
+  END FUNCTION CUTORDER
+
+  subroutine inv_damapspin(r,s)
+    implicit none
+    TYPE(damapspin), INTENT(INOUT) :: S
+    TYPE(damapspin), INTENT(IN) :: r
+    TYPE(damapspin) t
+    INTEGER I,j
+
+    call alloc(t)
+
+    t=r
+    s%m=t%m**(-1)
+
+    do i=1,3
+       do j=1,3
+          s%s(i,j)=t%s(j,i)
+          if(s%s(i,j)%kind==2) then
+             s%s(i,j)=s%s(i,j)%t*s%m
+          endif
+       enddo
+    enddo
+
+    call kill(t)
+
+  END    subroutine inv_damapspin
+
+
+  !  type damapspin
+  !   REAL(DP) X(6)
+  !   type(damap) M
+  !   type(real_8) s(3,3)
+  !  end type damapspin
+
+
+
+
+  subroutine EQUAL_damapspin(S,R)
+    implicit none
+    TYPE(damapspin), INTENT(INOUT) :: S
+    TYPE(damapspin), INTENT(IN) :: r
+    INTEGER I,j
+
+    do i=1,3
+       do j=1,3
+          s%s(i,j)=r%s(i,j)
+       enddo
+    enddo
+
+    s%m=r%m
+
+    !     do i=1,6
+    !     s%x(i)=r%x(i)
+    !     enddo
+
+  END    subroutine EQUAL_damapspin
+
+
+
+
   subroutine EQUAL_IDENTITY_SPINOR_8(S,R)
     implicit none
     TYPE(SPINOR_8), INTENT(INOUT) :: S
@@ -748,8 +967,21 @@ CONTAINS
     ENDDO
     P8%S=P%S
     P8%u=P%u
-
+    P8%e_ij=zero
   END subroutine EQUAL_PROBE8_PROBE
+
+  subroutine EQUAL_PROBE_PROBE8 (P,P8)
+    implicit none
+    TYPE(PROBE), INTENT(INOUT) :: P
+    TYPE(PROBE_8), INTENT(IN) :: P8
+    INTEGER I
+    DO I=1,6
+       P%X(I)=P8%X(I)
+    ENDDO
+    P%S=P8%S
+    P%u=P8%u
+
+  END subroutine EQUAL_PROBE_PROBE8
 
   subroutine EQUAL_IDENTITY_RAY_8(R,S)
     implicit none
@@ -801,6 +1033,18 @@ CONTAINS
     !    R%G=S%G
   END    subroutine EQUAL_SPINOR8_SPINOR8
 
+  subroutine EQUAL_SPINOR_SPINOR8(R,S)
+    implicit none
+    TYPE(SPINOR_8), INTENT(IN) :: S
+    TYPE(SPINOR), INTENT(INOUT) :: R
+    INTEGER I
+
+    DO I=1,3
+       R%X(I)=S%X(I)
+    ENDDO
+    !    R%G=S%G
+  END    subroutine EQUAL_SPINOR_SPINOR8
+
   subroutine EQUAL_SPINOR8_SPINOR(R,S)
     implicit none
     TYPE(SPINOR), INTENT(IN) :: S
@@ -819,9 +1063,9 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: DS
     INTEGER I,J
 
-    DO I=1,6
-       DS%X(I)=R%X(I)
-    ENDDO
+    !     DO I=1,6
+    !      DS%X(I)=R%X(I)
+    !     ENDDO
 
     DO I=1,C_%ND2
        DS%M%V(I)=R%X(I)
@@ -841,9 +1085,9 @@ CONTAINS
     TYPE(damapspin), INTENT(IN) :: DS
     INTEGER I,J
 
-    DO I=1,6
-       R%X(I)=DS%X(I)
-    ENDDO
+    !     DO I=1,6
+    !      R%X(I)=DS%X(I)
+    !     ENDDO
 
     DO I=1,C_%ND2
        R%X(I)= MORPH(DS%M%V(I))+R%X(I)
@@ -859,7 +1103,7 @@ CONTAINS
 
   END subroutine EQUAL_RAY8_DASPIN
 
-  subroutine EQUAL_DASPIN(DS,I1)
+  subroutine EQUAL_DAmapSPIN_int(DS,I1)
     implicit none
     TYPE(damapspin), INTENT(INOUT) :: DS
     INTEGER, INTENT(IN) :: I1
@@ -871,7 +1115,7 @@ CONTAINS
     !   type(real_8) s(3,3)
     !  end type daspin
 
-    DS%X=ZERO
+    !    DS%X=ZERO
     DS%M=I1
     CALL ALLOC_33(DS%S)
 
@@ -880,7 +1124,7 @@ CONTAINS
     ENDDO
 
 
-  END SUBROUTINE EQUAL_DASPIN
+  END SUBROUTINE EQUAL_DAmapSPIN_int
 
   FUNCTION scdadd( S2,S1  )
     implicit none
@@ -893,37 +1137,37 @@ CONTAINS
 
     call liepeek(iia,ico)
     nd2=iia(4)
-
+    call ass(scdadd)
     scdadd%u=my_false
     scdadd%E_ij=zero
 
     do i=1,nd2
-       localmaster=master
-       call ass(scdadd%x(i))
+       !       localmaster=master
+       !       call ass(scdadd%x(i))
        scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       master=localmaster
+       !       master=localmaster
     enddo
     do i=nd2+1,6
-       localmaster=master
-       call ass(scdadd%x(i))
+       !       localmaster=master
+       !       call ass(scdadd%x(i))
        if(nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
           scdadd%x(i)=s2%x(i)+(one.mono.'00001')
        else
           scdadd%x(i)=s2%x(i)
        endif
-       master=localmaster
+       !       master=localmaster
     enddo
 
 
     if(C_%SPIN_POS/=0) then
        DO I=1,3
           localmaster=master
-          call ass(scdadd%s%x(i))
+          !       call ass(scdadd%s%x(i))
           scdadd%s%x(i)=S2%s%x(i)
           DO J=1,3
              scdadd%s%x(i)=S1%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))+scdadd%s%x(i)
           ENDDO
-          master=localmaster
+          !       master=localmaster
        ENDDO
     endif
 
@@ -942,40 +1186,42 @@ CONTAINS
     TYPE (probe_8) daddsc
     TYPE (damapspin), INTENT (IN) :: S1
     type(probe) , INTENT (IN) :: S2
-    integer localmaster,iia(4),ico(4),nd2,i,j
+    integer  iia(4),ico(4),nd2,i,j
     type(real_8) d
 
     call liepeek(iia,ico)
     nd2=iia(4)
+
+    call ass(daddsc)
     daddsc%u=my_false
     daddsc%E_ij=zero
 
     do i=1,nd2
-       localmaster=master
-       call ass(daddsc%x(i))
+       !        localmaster=master
+       !        call ass(daddsc%x(i))
        daddsc%x(i)=s1%m%v(i)+s2%x(i)
-       master=localmaster
+       !        master=localmaster
     enddo
     do i=nd2+1,6
-       localmaster=master
-       call ass(daddsc%x(i))
+       !        localmaster=master
+       !        call ass(daddsc%x(i))
        if(nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
           daddsc%x(i)=s2%x(i)+(one.mono.'00001')
        else
           daddsc%x(i)=s2%x(i)
        endif
-       master=localmaster
+       !        master=localmaster
     enddo
 
     if(C_%SPIN_POS/=0) then
        DO I=1,3
-          localmaster=master
-          call ass(daddsc%s%x(i))
+          !        localmaster=master
+          !       call ass(daddsc%s%x(i))
           daddsc%s%x(i)=S2%s%x(i)
           DO J=1,3
              daddsc%s%x(i)=S1%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))+daddsc%s%x(i)
           ENDDO
-          master=localmaster
+          !       master=localmaster
        ENDDO
 
     endif
@@ -996,9 +1242,9 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: DS
     INTEGER MF,I,J
 
-    WRITE(MF,*) " ORBIT "
-    WRITE(MF,*) DS%X(1:3)
-    WRITE(MF,*) DS%X(4:6)
+    !    WRITE(MF,*) " ORBIT "
+    !     WRITE(MF,*) DS%X(1:3)
+    !     WRITE(MF,*) DS%X(4:6)
     WRITE(MF,*) " ORBITAL MAP "
     CALL PRINT(DS%M,MF)
     WRITE(MF,*) " SPIN MATRIX "
@@ -1039,9 +1285,9 @@ CONTAINS
 
     CALL ALLOC(T)
 
-    READ(MF,*) LINE
-    READ(MF,*) DS%X(1:3)
-    READ(MF,*) DS%X(4:6)
+    !    READ(MF,*) LINE
+    !     READ(MF,*) DS%X(1:3)
+    !     READ(MF,*) DS%X(4:6)
     READ(MF,*) LINE
     CALL READ(DS%M,MF)
     READ(MF,*) LINE
@@ -1069,6 +1315,7 @@ CONTAINS
     type(damap) ri
     type(taylor) t
     type(taylorresonance) tr
+
     call alloc_33(s1)
     call alloc_33(s1i)
     call alloc_33(s0)
@@ -2128,7 +2375,7 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
 
-    D%X=ZERO
+    !     D%X=ZERO
     CALL ALLOC(D%M)
     DO I=1,3
        DO J=1,3
@@ -2143,7 +2390,7 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
 
-    D%X=ZERO
+    !     D%X=ZERO
     CALL KILL(D%M)
     DO I=1,3
        DO J=1,3

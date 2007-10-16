@@ -17,7 +17,7 @@ module Mad_like
   PRIVATE rectaETILT,recttilt
   PRIVATE B1,A1,A2,B2,A3,B3,A4,B4,A5,A6,A7,A8,A9,A10,B5,B6,B7,B8,B9,B10,BLTILT
   private fac
-  private Taylor_maptilt
+  !  private Taylor_maptilt
   PRIVATE MONIT,HMONIT,VMONIT,INSTRUMEN
   PRIVATE RCOLIT,ECOLIT
   ! linked
@@ -330,9 +330,9 @@ module Mad_like
   end  INTERFACE
 
   !  Taylor map
-  INTERFACE Taylor_map
-     MODULE PROCEDURE  Taylor_maptilt
-  end  INTERFACE
+  !  INTERFACE Taylor_map
+  !     MODULE PROCEDURE  Taylor_maptilt
+  !  end  INTERFACE
 
 
 
@@ -2317,7 +2317,7 @@ CONTAINS
     type(element),pointer :: s2
     type(elementp), pointer :: s2p
     type(fibre), pointer::el
-    integer ntot,ntot_rad,ntot_REV,ntot_rad_REV
+    !    integer ntot,ntot_rad,ntot_REV,ntot_rad_REV
 
     nullify(el);
     THICKKICKTEMP=.FALSE.
@@ -2473,17 +2473,17 @@ CONTAINS
        THICKKICKTEMP=.TRUE.
     endif
 
-    ntot=0; ntot_rad=0; ntot_REV=0 ; ntot_rad_REV=0;
-    if(S2%KIND==KIND22) then
-       IF(ASSOCIATED(mad_tree%CC)) ntot=mad_tree%n
-       IF(ASSOCIATED(mad_tree_rad%CC)) ntot_rad=mad_tree_rad%n
-       IF(ASSOCIATED(mad_tree_REV%CC)) ntot_REV=mad_tree_REV%n
-       IF(ASSOCIATED(mad_tree_RAD_REV%CC)) ntot_rad_REV=mad_tree_RAD_REV%n
-    endif
+    !    ntot=0; ntot_rad=0; ntot_REV=0 ; ntot_rad_REV=0;
+    !    if(S2%KIND==KIND22) then
+    !       IF(ASSOCIATED(mad_tree%CC)) ntot=mad_tree%n
+    !       IF(ASSOCIATED(mad_tree_rad%CC)) ntot_rad=mad_tree_rad%n
+    !       IF(ASSOCIATED(mad_tree_REV%CC)) ntot_REV=mad_tree_REV%n
+    !       IF(ASSOCIATED(mad_tree_RAD_REV%CC)) ntot_rad_REV=mad_tree_RAD_REV%n
+    !    endif
 
     !    CALL SETFAMILY(S2,ntot,ntot_rad,ntot_REV,ntot_rad_REV,6)
     if(s2%kind/=kindpa) then
-       CALL SETFAMILY(S2,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
+       CALL SETFAMILY(S2)  !,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
     else
        CALL SETFAMILY(S2,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
        S2%P%METHOD=4
@@ -2680,6 +2680,7 @@ CONTAINS
     c_%MAD8_WEDGE => MAD8_WEDGE
     c_%phase0 => phase0
     c_%ALWAYS_knobs => ALWAYS_knobs
+    c_%recirculator_cheat => recirculator_cheat
 
   end subroutine set_pointers
 
@@ -2977,327 +2978,6 @@ CONTAINS
     GAMBET=(XMC2/P0C)**2
     MC2=XMC2
   END SUBROUTINE Set_mad_v
-
-  FUNCTION  Taylor_maptilt(NAME,file,file_rev,T)
-    implicit none
-    type (EL_LIST) Taylor_maptilt
-    CHARACTER(*), INTENT(IN):: NAME
-    CHARACTER(*),optional, INTENT(IN):: file,file_rev
-    type (TILTING),optional, INTENT(IN):: T
-    integer mf,no,n_map,nst
-    real(dp) ld,ang
-    type(damap) m,mr,id,id2
-    INTEGER I,ndpt,time,timefac,K
-    type(taylor) beta,gamma
-    INTEGER  JS(6)
-    Taylor_maptilt=0
-    JS=0
-    Taylor_maptilt%NST=1
-    IF(PRESENT(FILE)) THEN
-       call kanalnummer(mf)
-       open(unit=mf,file=file)
-       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
-       Taylor_maptilt%NST=nst
-       IF(MAD_TREE_DELTAMAP) THEN
-          read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
-       ENDIF
-       if(symplectic_order>0) no=symplectic_order
-       if(symplectify) then
-          if(symplectic_order>no) no=symplectic_order
-       endif
-       call init(NO,3,0,0)
-       call alloc(m,mr,id,id2); call alloc(beta,gamma);
-       IF(MAD_TREE_DELTAMAP) THEN   !
-          !  ndpt=6 is changed
-          id=1
-          if(ndpt==6) then
-             id%v(5)=(one.mono.'000001')
-             id%v(6)=-(one.mono.'00001')
-          endif
-          id%v(5)=id%v(5)*timefac
-          id%v(6)=id%v(6)*timefac
-
-
-
-          ! $$$$$$$$$$$$$$$$$
-          call  dainput_SPECIAL6(m,mf,time); m=id**(-1).o.m.o.id ;
-
-          if(time==2) then   ! make it like time==1   COSY INFINITY MAP
-             id2=1
-             gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
-             id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
-             id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
-             id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
-
-
-             m=id2**(-1).o.m.o.id2 ;
-             DO K=0,NO
-                JS(5)=K
-                M%V(6)=M%V(6)-((M%V(6).SUB.JS).MONO.JS)
-             ENDDO
-             id2%v(5)=(one.mono.'00001')
-             BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
-             m%v(6)=m%v(6)+ LD*(ONE/BETA-ONE/BETA0)
-          endif
-
-
-          if(time==1.or.time==2) then
-             id2=1
-             id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
-             m=id2**(-1).o.m.o.id2 ;
-             id2%v(5)=one.mono.'00001'
-             BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
-             m%v(6)=m%v(6)-((m%v(6).sub.'000001').mono.'000001')
-             m%v(6)=beta*(m%v(6)- LD*(ONE/BETA-ONE/BETA0) )
-             m%v(6)=m%v(6)+(one.mono.'000001')
-          endif
-
-          if(symplectify)call symplectic(m,symplectic_eps,nst)
-
-          call SET_TREE(mad_tree,M)
-
-          if(n_map>=2) then
-             call  dainput_SPECIAL6(mr,mf,time); mr=id**(-1).o.mr.o.id ;
-
-             if(time==2) then   ! make it like time==1   COSY INFINITY MAP
-                id2=1
-                gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
-                id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
-                id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
-                id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
-
-
-                m=id2**(-1).o.m.o.id2 ;
-                DO K=0,NO
-                   JS(5)=K
-                   MR%V(6)=MR%V(6)-((MR%V(6).SUB.JS).MONO.JS)
-                ENDDO
-                id2%v(5)=(one.mono.'00001')
-                BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
-                MR%v(6)=MR%v(6)+ LD*(ONE/BETA-ONE/BETA0)
-             endif
-
-             if(time==1) then
-                id2=1
-                id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
-                mr=id2**(-1).o.mr.o.id2 ;
-                id2%v(5)=one.mono.'00001'
-                BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
-                mr%v(6)=mr%v(6)-((mr%v(6).sub.'000001').mono.'000001')
-                mr%v(6)=beta*(mr%v(6)- LD*(ONE/BETA-ONE/BETA0) )
-                mr%v(6)=mr%v(6)+(one.mono.'000001')
-             endif
-
-             call SET_TREE(mad_tree_rad,Mr)
-          else
-             call SET_TREE(mad_tree_rad,M)
-          endif
-
-       ELSE  ! MAD_TREE_DELTAMAP
-          call  dainput_SPECIAL6(m,mf,time);
-
-          if(symplectify)call symplectic(m,symplectic_eps,nst)
-
-          call SET_TREE(mad_tree,M)
-          if(n_map==2) then
-             call  dainput_SPECIAL6(mr,mf,time);
-             call SET_TREE(mad_tree_rad,Mr)
-          else
-             call SET_TREE(mad_tree_rad,M)
-          endif
-       ENDIF ! MAD_TREE_DELTAMAP
-       close(mf)
-       if(symplectic_print) then
-          call kanalnummer(mf)
-          open(unit=mf,file=file)
-          write(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
-          Taylor_maptilt%NST=nst
-          IF(MAD_TREE_DELTAMAP) THEN
-             read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
-          ENDIF
-          call daprint(m,mf)
-
-          close(mf)
-       endif
-
-
-       call kill(m,mr,id,id2); call kill(beta,gamma);
-
-
-       MAD_TREE_LD=LD   ! put here for the logic of PRESENT(FILE_REV)==false
-       MAD_TREE_ANGLE=ANG
-
-    ELSE  ! PRESENT FILE
-       LD=MAD_TREE_LD
-       ANG=MAD_TREE_ANGLE
-    ENDIF
-
-    IF(PRESENT(FILE_REV)) THEN
-       call kanalnummer(mf)
-       open(unit=mf,file=FILE_REV)
-       read(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
-       Taylor_maptilt%NST=nst
-       IF(MAD_TREE_DELTAMAP) THEN
-          read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
-       ENDIF
-
-       if(symplectic_order>0) no=symplectic_order
-       if(symplectify) then
-          if(symplectic_order>no) no=symplectic_order
-       endif
-
-       call init(NO,3,0,0)
-       call alloc(m,mr,id,id2); call alloc(beta,gamma);
-       IF(MAD_TREE_DELTAMAP) THEN   !
-          !  ndpt=6 is changed
-          id=1
-          if(ndpt==6) then
-             id%v(5)=(one.mono.'000001')
-             id%v(6)=-(one.mono.'00001')
-          endif
-          id%v(5)=id%v(5)*timefac
-          id%v(6)=id%v(6)*timefac
-
-
-          ! $$$$$$$$$$$$$$$$$
-
-          call  dainput_SPECIAL6(m,mf,time); m=id**(-1).o.m.o.id ;
-
-          if(time==2) then   ! make it like time==1   COSY INFINITY MAP
-             id2=1
-             gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
-             id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
-             id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
-             id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
-
-
-             m=id2**(-1).o.m.o.id2 ;
-             DO K=0,NO
-                JS(5)=K
-                M%V(6)=M%V(6)-((M%V(6).SUB.JS).MONO.JS)
-             ENDDO
-             id2%v(5)=(one.mono.'00001')
-             BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
-             m%v(6)=m%v(6)+ LD*(ONE/BETA-ONE/BETA0)
-          endif
-
-          if(time==1) then
-             id2=1
-             id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
-             m=id2**(-1).o.m.o.id2 ;
-             id2%v(5)=one.mono.'00001'
-             BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
-             m%v(6)=m%v(6)-((m%v(6).sub.'000001').mono.'000001')
-             m%v(6)=beta*(m%v(6)- LD*(ONE/BETA-ONE/BETA0) )
-             m%v(6)=m%v(6)+(one.mono.'000001')
-          endif
-
-
-          if(symplectify)call symplectic(m,symplectic_eps,nst)
-
-          call SET_TREE(mad_tree_rev,M)
-
-          if(n_map>=2) then
-             call  dainput_SPECIAL6(mr,mf,time); mr=id**(-1).o.mr.o.id ;
-
-             if(time==2) then   ! make it like time==1   COSY INFINITY MAP
-                id2=1
-                gamma=sqrt(one+ (ONE+TWO*id2%v(5)/beta0+id2%v(5)**2 )/gambet)
-                id2%v(5)=gamma0I*(gamma-one)/(one-gamma0I)-one
-                id2%v(5)=id2%v(5)-(id2%v(5).sub.0)  ! almost useless since -one above does the job
-                id2%v(6)=beta0*id2%v(6)*one/(one+gamma0i)   ! perhaps mistake in cosy manual
-
-
-                m=id2**(-1).o.m.o.id2 ;
-                DO K=0,NO
-                   JS(5)=K
-                   MR%V(6)=MR%V(6)-((MR%V(6).SUB.JS).MONO.JS)
-                ENDDO
-                id2%v(5)=(one.mono.'00001')
-                BETA=SQRT(ONE+TWO*id2%v(5)/BETA0+id2%v(5)**2  )/(ONE/BETA0 +id2%v(5))
-                MR%v(6)=MR%v(6)+ LD*(ONE/BETA-ONE/BETA0)
-             endif
-
-             if(time==1) then
-                id2=1
-                id2%v(5)=(TWO*id2%v(5)+id2%v(5)**2)/(SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )+ONE/BETA0)
-                mr=id2**(-1).o.mr.o.id2 ;
-                id2%v(5)=one.mono.'00001'
-                BETA=(ONE+id2%v(5) )/SQRT(ONE/BETA0**2+TWO*id2%v(5)+id2%v(5)**2  )
-                mr%v(6)=mr%v(6)-((mr%v(6).sub.'000001').mono.'000001')
-                mr%v(6)=beta*(mr%v(6)- LD*(ONE/BETA-ONE/BETA0) )
-                mr%v(6)=mr%v(6)+(one.mono.'000001')
-             endif
-
-             call SET_TREE(mad_tree_rad_rev,Mr)
-          else
-             call SET_TREE(mad_tree_rad_rev,M)
-          endif
-
-       ELSE  ! MAD_TREE_DELTAMAP
-          call  dainput_SPECIAL6(m,mf,time);
-
-          if(symplectify)call symplectic(m,symplectic_eps,nst)
-
-          call SET_TREE(mad_tree_rev,M)
-          if(n_map==2) then
-             call  dainput_SPECIAL6(mr,mf,time);
-             call SET_TREE(mad_tree_rad_rev,Mr)
-          else
-             call SET_TREE(mad_tree_rad_rev,M)
-          endif
-       ENDIF ! MAD_TREE_DELTAMAP
-       close(mf)
-       if(symplectic_print) then
-          call kanalnummer(mf)
-          open(unit=mf,file=file)
-          write(mf,*) n_map,no,ang,ld,MAD_TREE_DELTAMAP,nst   ! number of maps (1,2), no, ld=design length
-          IF(MAD_TREE_DELTAMAP) THEN
-             read(mf,*) ndpt,time,timefac                  ! npdt, time=0,1 (1 uses time), timefac = +/- 1)
-          ENDIF
-          call daprint(m,mf)
-
-          close(mf)
-       endif
-       call kill(m,mr,id,id2); call kill(beta,gamma);
-
-
-    ELSE  ! PRESENT FILE
-       LD=MAD_TREE_LD
-       ANG=MAD_TREE_ANGLE
-    ENDIF
-
-    IF(ang/=zero) THEN
-       Taylor_maptilt%LC=two*SIN(ANG/two)*ld/ang
-       Taylor_maptilt%B0=ang/ld                     !COS(ANG/two)/R
-       Taylor_maptilt%ld= ld
-    ELSE
-       Taylor_maptilt%LC=ld
-       Taylor_maptilt%B0=zero                      !COS(ANG/two)/R
-       Taylor_maptilt%ld= ld
-    ENDIF
-
-    IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:nlp)
-       call write_i
-       Taylor_maptilt%NAME=NAME(1:nlp)
-    ELSE
-       Taylor_maptilt%NAME=NAME
-    ENDIF
-
-    Taylor_maptilt%KIND=kind22
-    IF(PRESENT(t)) then
-       IF(T%NATURAL) THEN
-          Taylor_maptilt%tilt=t%tilt(1)
-       ELSE
-          Taylor_maptilt%tilt=t%tilt(0)
-       ENDIF
-    ENDIF
-  END FUNCTION Taylor_maptilt
 
 
 

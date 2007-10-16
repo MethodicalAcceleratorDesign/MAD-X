@@ -5,7 +5,7 @@ module S_def_all_kinds
   use S_status
   implicit none
   public
-  private XMIDR,GMIDR
+  private XMIDR,GMIDR,ALLOC_FIBRE
   include "a_def_worm.inc"
   !  include "a_def_all_kind.inc"
   !  include "a_def_sagan.inc"
@@ -26,6 +26,7 @@ module S_def_all_kinds
 
   INTERFACE ALLOC
      MODULE PROCEDURE ALLOC_midr
+     MODULE PROCEDURE ALLOC_FIBRE
   END  INTERFACE
 
   INTERFACE KILL
@@ -41,7 +42,7 @@ contains
     TYPE(LAYOUT), INTENT(IN) :: R
     REAL(DP), INTENT(OUT) :: L
     TYPE(FIBRE), POINTER:: P
-    REAL(DP) LG
+
     INTEGER I
     P=>R%START
     L=zero
@@ -171,6 +172,36 @@ contains
     x_in%e%nst=>x_in%nst
 
   END SUBROUTINE ALLOC_midr
+
+  SUBROUTINE ALLOC_FIBRE(X_IN,P)
+    IMPLICIT NONE
+    TYPE(worm), INTENT(INOUT):: X_IN
+    TYPE(FIBRE),TARGET, INTENT(INOUT):: P
+    INTEGER I
+
+    allocate(x_in%nst)
+    X_IN%NST=3
+    X_IN%nst= MAX(P%MAG%p%NST,X_IN%NST)
+
+
+    allocate(x_in%RAY(6,-6:X_IN%nst+6))
+    allocate(x_in%E)
+    allocate(x_in%E%L(-1:X_IN%nst))
+    allocate(x_in%POS(4))
+
+    allocate(x_in%E%FRAME(3,3,-7:X_IN%nst+6))
+    allocate(x_in%E%ORIGIN(3,-7:X_IN%nst+6))
+    ALLOCATE(x_in%E%DO_SURVEY)
+    x_in%E%DO_SURVEY=.TRUE.
+    x_in%nst=0
+    x_in%POS=0
+    x_in%RAY=zero
+    x_in%E%L=zero
+    x_in%E%FRAME=zero
+    x_in%E%ORIGIN=zero
+    x_in%e%nst=>x_in%nst
+
+  END SUBROUTINE ALLOC_FIBRE
 
   SUBROUTINE KILL_midr(X_IN)
     IMPLICIT NONE
@@ -359,9 +390,9 @@ contains
   SUBROUTINE SURVEY_INNER_MAG(e_in) !  Tracks the chart through a magnet
     IMPLICIT NONE
     TYPE(INNER_FRAME), INTENT(INOUT):: e_in
-    REAL(DP) ENT(3,3),A(3),MID(3,3),O(3),D(3),exi(3:3),b(3)
+    REAL(DP) ENT(3,3),A(3),MID(3,3),O(3),D(3)
     LOGICAL(LP) DONE
-    INTEGER NST,I,start,j
+    INTEGER NST,I,start
     REAL(DP) LH,HA,ANG(3),ANGH,RHO
     TYPE(MAGNET_CHART), POINTER :: P
 

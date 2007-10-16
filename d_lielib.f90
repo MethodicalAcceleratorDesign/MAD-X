@@ -16,10 +16,10 @@ module lielib_berz
   PUBLIC IDPRSET,SETIDPR,INPUTRES,MAPNORMF,DHDJFLO,GETTURA
   PUBLIC FLOFACG,FLOFAC,DACMUD,CTORFLO,RTOCFLO,CTOR,RTOC,ETPIN
   PUBLIC LIEINIT,PERTPEEK,FLOWPARA,COMCFU
-  PUBLIC DAPOK0,FACFLO,EXPFLOD
+  PUBLIC DAPOK0,FACFLO,EXPFLOD,gofix
   integer,public,parameter::ndim=3,nreso=20
   integer,public::no,nv,nd,nd2,ndpt
-  integer ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres
+  integer ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
   integer,dimension(ndim)::nplane,idsta,ista
   real(dp),dimension(0:20)::xintex
   real(dp),dimension(ndim)::dsta,sta,angle,rad,ps,rads

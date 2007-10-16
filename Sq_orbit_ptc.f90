@@ -6,7 +6,7 @@ module orbit_ptc
   public
   ! TYPE(INTERNAL_STATE),POINTER :: MY_ORBIT_STATE
 
-  PRIVATE ORBIT_TRACK_NODER,ORBIT_TRACK_NODEP,ORBIT_TRACK_NODE_Standard_R
+  PRIVATE ORBIT_TRACK_NODEP,ORBIT_TRACK_NODE_Standard_R
 
   REAL(dp)  X_ORBIT(6)
   REAL(DP) :: XBIG = 1.D10
@@ -40,23 +40,6 @@ module orbit_ptc
 contains
 
 
-  SUBROUTINE PUT_state(state,ring)
-    IMPLICIT NONE
-    type(internal_state), intent(in):: state
-    type(layout), intent(inout):: ring
-    integer i
-    type(fibre) , pointer :: p
-    logical change7
-    p=>ring%start
-    do i=1,ring%n
-       p%mag=state
-       p%MAG%P%DIR=>p%DIR
-       p%MAG%P%CHARGE=>ring%CHARGE
-       p=>p%next
-    enddo
-    write(6,*) " Only Standard lattice Possible : one direction and one charge"
-    write(6,*) " Put misalignments to activate patches and tilts!!! "
-  END SUBROUTINE PUT_state
 
   SUBROUTINE PUT_RAY(X1,X2,X3,X4,X5,X6)
     IMPLICIT NONE
@@ -276,30 +259,30 @@ contains
     u=my_false
 
     T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
-    IF(T%USE_TPSA_MAP) THEN  ! 2
-       X=X-T%ORBIT
-       CALL TRACK(T%TPSA_MAP,X)
+    !    IF(T%USE_TPSA_MAP) THEN  ! 2
+    !       X=X-T%ORBIT
+    !       CALL TRACK(T%TPSA_MAP,X)
+    !       if(.not.CHECK_STABLE) then
+    !          CALL RESET_APERTURE_FLAG
+    !          u=my_true
+    !          x(1)=XBIG
+    !       endif
+    !    ELSE
+    DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+       if(u) exit
+       IF(PRESENT(STATE)) THEN
+          CALL TRACK_NODE_SINGLE(T,X,STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+       ELSE
+          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+       ENDIF
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
           x(1)=XBIG
        endif
-    ELSE
-       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-          if(u) exit
-          IF(PRESENT(STATE)) THEN
-             CALL TRACK_NODE_SINGLE(T,X,STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
-          ELSE
-             CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
-          ENDIF
-          if(.not.CHECK_STABLE) then
-             CALL RESET_APERTURE_FLAG
-             u=my_true
-             x(1)=XBIG
-          endif
-          T=>T%NEXT
-       ENDDO
-    ENDIF
+       T=>T%NEXT
+    ENDDO
+    !    ENDIF
 
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        x(1:4)=x(1:4)*1.e3_dp
@@ -311,55 +294,6 @@ contains
   end SUBROUTINE ORBIT_TRACK_NODE_Standard_R
 
 
-  SUBROUTINE ORBIT_TRACK_NODER(K,X)
-    IMPLICIT NONE
-    REAL(DP),  INTENT(INOUT) :: X(6)
-    INTEGER K,I
-    LOGICAL(LP) U
-    REAL(DP) X5
-    TYPE(INTEGRATION_NODE), POINTER  :: T
-
-    IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
-       x(1:4)=x(1:4)*1.e-3_dp
-       X5=X(5)
-       X(5)=X(6)/my_ORBIT_LATTICE%ORBIT_P0C
-       X(6)=X5/my_ORBIT_LATTICE%ORBIT_OMEGA
-    ENDIF
-
-
-    u=my_false
-
-    T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
-    IF(T%USE_TPSA_MAP) THEN  ! 2
-       X=X-T%ORBIT
-       CALL TRACK(T%TPSA_MAP,X)
-       if(.not.CHECK_STABLE) then
-          CALL RESET_APERTURE_FLAG
-          u=my_true
-          x(1)=XBIG
-       endif
-    ELSE
-       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-          if(u) exit
-          CALL TRACKR_NODE_SINGLE_orbit(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
-          !    CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
-          if(.not.CHECK_STABLE) then
-             CALL RESET_APERTURE_FLAG
-             u=my_true
-             x(1)=XBIG
-          endif
-          T=>T%NEXT
-       ENDDO
-    ENDIF
-
-    IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
-       x(1:4)=x(1:4)*1.e3_dp
-       X5=X(5)
-       X(5)=X(6)*my_ORBIT_LATTICE%ORBIT_OMEGA
-       X(6)=X5*my_ORBIT_LATTICE%ORBIT_P0C
-    ENDIF
-
-  end SUBROUTINE ORBIT_TRACK_NODER
 
   SUBROUTINE ORBIT_TRACK_NODEP(K,X,STATE)
     IMPLICIT NONE
@@ -384,32 +318,33 @@ contains
     u=my_false
 
     T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
-    IF(T%USE_TPSA_MAP) THEN !1
-       DO I=1,6
-          X(I)=X(I)-T%ORBIT(I)
-       ENDDO
-       CALL TRACK(T%TPSA_MAP,X)
+    !    IF(T%USE_TPSA_MAP) THEN !1
+    !       DO I=1,6
+    !          X(I)=X(I)-T%ORBIT(I)
+    !       ENDDO
+    !       CALL TRACK(T%TPSA_MAP,X)
+    !       if(.not.CHECK_STABLE) then
+    !          CALL RESET_APERTURE_FLAG
+    !          u=my_true
+    !          x(1)=XBIG
+    !       endif
+    !    ELSE
+    DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+       if(u) exit
+       IF(PRESENT(STATE)) THEN
+          CALL TRACK_NODE_SINGLE(T,X,STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+       ELSE
+          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+       ENDIF
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
           x(1)=XBIG
        endif
-    ELSE
-       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-          if(u) exit
-          IF(PRESENT(STATE)) THEN
-             CALL TRACK_NODE_SINGLE(T,X,STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
-          ELSE
-             CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
-          ENDIF
-          if(.not.CHECK_STABLE) then
-             CALL RESET_APERTURE_FLAG
-             u=my_true
-             x(1)=XBIG
-          endif
-          T=>T%NEXT
-       ENDDO
-    ENDIF
+       T=>T%NEXT
+    ENDDO
+    !    ENDIF
+
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        do i=1,4
           x(i)=x(i)*1.e3_dp
@@ -425,25 +360,6 @@ contains
 
 
 
-  SUBROUTINE set_state_in_layout(la,state)
-    implicit none
-    type(layout), target :: la
-    type(internal_state), optional :: state
-    type(fibre), pointer :: p
-    integer i
-
-    p=>la%start
-
-    do i=1,la%n
-       if(present(state)) then
-          p%mag=state
-       else
-          p%mag=la%t%ORBIT_LATTICE%state
-       endif
-       p=>p%next
-    enddo
-
-  END SUBROUTINE set_state_in_layout
 
   SUBROUTINE orbit_to_ptc(x)
     implicit none
@@ -473,12 +389,12 @@ contains
 
   END SUBROUTINE ptc_to_orbit
 
-  SUBROUTINE ORBIT_MAKE_NODE_LAYOUT_accel(R,LMAX,no_end_mag)
+  SUBROUTINE ORBIT_MAKE_NODE_LAYOUT_accel(R,no_end_mag)
     IMPLICIT NONE
     TYPE(LAYOUT),TARGET :: R
     TYPE(FIBRE),POINTER :: P
     TYPE(INTEGRATION_NODE),POINTER :: T
-    REAL(DP) LMAX,DL,L,DLMAX,FREQ,CLOSED(6)
+    REAL(DP) DL,L,DLMAX,FREQ,CLOSED(6)
     LOGICAL(LP) no_end_mag
     LOGICAL(LP) END_MAG
     INTEGER I,K,NL

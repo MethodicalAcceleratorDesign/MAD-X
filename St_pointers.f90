@@ -90,7 +90,7 @@ contains
     real(dp) targ_tune(2),targ_chrom(2),EPSF
     real(dp) targ_RES(4)
     !  END FITTING FAMILIES
-    real(dp),allocatable :: beta(:,:,:)
+    real(dp),pointer :: beta(:,:,:)
     REAL(DP) DBETA,tune(3),tunenew(2),CHROM(2),DEL
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2)
@@ -136,11 +136,10 @@ contains
     integer              :: why(9),stable_ray
     ! remove_patches
     logical(lp) do_not_remove,put_geo_patch
-    real(dp) :: lmax=1.e38_dp
     save my_default
     integer :: limit_int(2) =(/4,18/)
     LOGICAL :: track_k,CLOSED_ORBIT=MY_FALSE
-    REAL(DP) CLOSED(6),XP(6),te(6)
+    REAL(DP) CLOSED(6),XP(6),te(6),xbend
     ! automatic track
     integer lim_t(6,2),IEXT
     real(dp) dlim_t(6)
@@ -208,6 +207,19 @@ contains
              call move_to_layout_i(m_u,my_ering,i_layout)
              write(6,*) "Selected Layout",i_layout,"  called  ---> ",my_ering%name
           endif
+       case('SELECTLASTLAYOUT','SELECTLASTLATTICE')
+          i_layout_temp=m_u%n
+          if(i_layout_temp>m_u%n) then
+             write(6,*) " Universe Size ", m_u%n
+
+             write(6,*) " Selected Layout does not exist "
+
+          else
+
+             i_layout=i_layout_temp
+             call move_to_layout_i(m_u,my_ering,i_layout)
+             write(6,*) "Selected Layout",i_layout,"  called  ---> ",my_ering%name
+          endif
        case('NAMELAYOUT')
           read(mf,*) NAME
        case('KILLLASTLAYOUT')
@@ -238,23 +250,45 @@ contains
           enddo
           close(ii)
 
-       case('PUTDEFAULTINPARENTLAYOUT')
-          call PUT_state(DEFAULT,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
+       case('SETORBITFORACCELERATION')
+          CALL ptc_synchronous_set(-1)
+       case('READORBITINTERMEDIATEDATA')
+          CALL ptc_synchronous_set(-2)
+       case('PRINTORBITINTERMEDIATEDATA')
+          CALL ptc_synchronous_after(-2)
+       case('FILEFORORBITINITIALSETTINGS')  ! ACCELERATION FILE
+          READ(MF,*) initial_setting
+          write(6,*) initial_setting
+
+          !         INQUIRE (FILE = initial_setting, EXIST = exists)
+          !        if(exists) then
+          !         write(6,*) "file ", initial_setting(1:len_trim(def_orbit_node)), &
+          !         " exists, interrupt execution if you do not want to overwrite!"
+          !        endif
+       case('FILEFORORBITFINALSETTINGS')  ! ACCELERATION FILE
+          READ(MF,*) final_setting
+          write(6,*) final_setting
+          !          INQUIRE (FILE = final_setting, EXIST = exists)
+          !         if(exists) then
+          !          write(6,*) "file ", final_setting(1:len_trim(def_orbit_node)), &
+          !          " exists, interrupt execution if you do not want to overwrite!"
+          !         endif
        case('PTCNODEFILE','PTCNODE')  ! ACCELERATION FILE
           READ(MF,*) def_orbit_node
-          INQUIRE (FILE = def_orbit_node, EXIST = exists)
-          if(exists) then
-             write(6,*) "file ", def_orbit_node(1:len_trim(def_orbit_node)), &
-                  " exists, interrupt execution if you do not want to overwrite!"
-             !    write(6,*) " you have 2 seconds to do so "
-             !    CALL DATE_AND_TIME(values=temps)
-             !    i1=temps(7)
-1            if(i1>=58) i1=i1-58
-             !    do while(.true.)
-             !     CALL DATE_AND_TIME(values=temps)
-             !     if(temps(7)>i1+2) exit
-             !    enddo
-          endif
+          write(6,*) def_orbit_node
+          !        INQUIRE (FILE = def_orbit_node, EXIST = exists)
+          !       if(exists) then
+          !        write(6,*) "file ", def_orbit_node(1:len_trim(def_orbit_node)), &
+          !        " exists, interrupt execution if you do not want to overwrite!"
+          !    write(6,*) " you have 2 seconds to do so "
+          !    CALL DATE_AND_TIME(values=temps)
+          !    i1=temps(7)
+1         if(i1>=58) i1=i1-58
+          !    do while(.true.)
+          !     CALL DATE_AND_TIME(values=temps)
+          !     if(temps(7)>i1+2) exit
+          !    enddo
+          !          endif
           ! end Orbit stuff
        case('DEFAULT')
           my_estate=DEFAULT0
@@ -316,22 +350,37 @@ contains
           IF(resplit_cutting==0) WRITE(6,*) " RESPLITTING NORMALLY"
           IF(resplit_cutting==1) WRITE(6,*) " CUTTING DRIFT USING LMAX"
           IF(resplit_cutting==2) WRITE(6,*) " CUTTING EVERYTHING USING LMAX"
-       case('KIND7WITHMETHOD1')
-          CALL PUT_method1_in_kind7(my_ering,1000)
+          !       case('KIND7WITHMETHOD1')
+          !          CALL PUT_method1_in_kind7(my_ering,1000)
        case('THINLENS=1')
           call THIN_LENS_restart(my_ering)
        case('THINLENS')
           READ(MF,*) THIN
+          xbend=-one
+          if(thin<0) then
+             READ(MF,*) xbend
+             thin=-thin
+          endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int,lmax=lmax)
+          CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int,lmax0=lmax,xbend=xbend)
        case('EVENTHINLENS')
           READ(MF,*) THIN
+          xbend=-one
+          if(thin<0) then
+             READ(MF,*) xbend
+             thin=-thin
+          endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_TRUE,lim=limit_int,lmax=lmax)
+          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_TRUE,lim=limit_int,lmax0=lmax,xbend=xbend)
        case('ODDTHINLENS')
           READ(MF,*) THIN
+          xbend=-one
+          if(thin<0) then
+             READ(MF,*) xbend
+             thin=-thin
+          endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_FALSE,lim=limit_int,lmax=lmax)
+          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_FALSE,lim=limit_int,lmax0=lmax,xbend=xbend)
           ! thin layout stuff
        case('MAKE_THIN_LAYOUT','MAKELAYOUT','MAKE_NODE_LAYOUT')
 
@@ -381,24 +430,6 @@ contains
           READ(MF,*) USE_BEAM
 
           CALL Stat_beam_raw(MY_BEAMS(USE_BEAM),4,6)
-       case('TRACKBEAM')
-          READ(MF,*) USE_BEAM,POS, NTURN,printmod,filename
-          IF(FILENAME(1:2)=='NO'.OR.FILENAME(1:2)=='no') THEN
-             mfr=6
-          else
-             CALL  kanalnummer(mfr)
-             OPEN(UNIT=MFR,FILE=FILENAME)
-          endif
-          DO I1=1,NTURN
-             call TRACK_BEAM( my_ering,MY_BEAMS(USE_BEAM),my_estate,POS)
-             if(mod(i1,printmod)==0) then
-                write(6,*) " turn ",i1
-                CALL Stat_beam_raw(MY_BEAMS(USE_BEAM),4,mfr)
-             endif
-          ENDDO
-          if(mfr/=6) close(mfr)
-
-          ! END BEAMS STUFF
 
 
 
@@ -478,12 +509,15 @@ contains
           Write(6,*) " Number of polymorphic blocks = ",NPOL
        case('DEALLOCATEFAMILIES')
           deallocate(POL_)
-
        case('FITTUNE')
           read(mf,*) epsf
           read(mf,*) targ_tune
           if(targ_tune(1)<=zero) targ_tune=tune(1:2)
           call lattice_fit_TUNE_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
+       case('FITTUNECOUPLING')
+          read(mf,*) epsf
+          read(mf,*) targ_tune
+          call lattice_linear_res_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
        case('SCANTUNE')
           STRAIGHT=.FALSE.
           read(mf,*) epsf
@@ -719,15 +753,20 @@ contains
        case('READFLATFILE')
 
           READ(MF,*) FILENAME
-          CALL  READ_AND_APPEND_VIRGIN_LAYOUT(M_U,filename)
+          CALL  READ_AND_APPEND_VIRGIN_general(M_U,filename)
 
           WRITE(6,*) M_U%END%N, M_U%END%END%POS
        case('PRINTFLATFILE')
 
           READ(MF,*) FILENAME
-          CALL  print_LAYOUT(my_ering,filename,lmax)
+          CALL  print_COMPLEX_SINGLE_STRUCTURE(my_ering,filename,lmax0=lmax)
 
           WRITE(6,*) M_U%END%N, M_U%END%END%POS
+       case('REVERSEBEAMLINE')
+
+          CALL  REVERSE_BEAM_LINE(my_ering)
+
+          !         WRITE(6,*) M_U%END%N, M_U%END%END%POS
 
        case('PSREXAMPLEOFPATCHING')
 
@@ -739,14 +778,6 @@ contains
           CALL remove_drifts_bends(my_ering,m_u%END)
 
           WRITE(6,*) my_ering%N , m_u%END%N
-
-       case('REMOVEPATCHESFORPIOTR')
-          read(mf,*)do_not_remove, put_geo_patch
-          read(mf,*) x_ref
-          read(mf,*) x
-          read(mf,*) sc,FILENAME
-
-          call remove_patches(my_ering,x_ref,x,sc,do_not_remove,put_geo_patch,FILENAME)
 
        case('NORMALFORM')
           READ(MF,*)POS,name
@@ -788,6 +819,18 @@ contains
           CALL ADD(P,N,0,CNS)
           p%mag%p%bend_fringe=bend_like
           p%magp%p%bend_fringe=bend_like
+       case('POWERMULTIPOLENAME')
+          READ(MF,*)name   !,POS
+          READ(MF,*)n,cns, bend_like
+          call move_to(my_ering,p,name,POS)
+          if(pos/=0) then
+             CALL ADD(P,N,0,CNS)
+             p%mag%p%bend_fringe=bend_like
+             p%magp%p%bend_fringe=bend_like
+          else
+             write(6,*) name," Not found "
+             stop 555
+          endif
        case('COMPUTEMAP')
           READ(MF,*)POS,DEL,NO
           READ(MF,*) FILENAME
@@ -813,7 +856,7 @@ contains
                 stop
              endif
           endif
-          !   CALL radia(my_ering,POS,FILENAME,fileTUNE)
+          CALL radia(my_ering,POS,FILENAME,fileTUNE)
 
        case('SPECIALALEX')
           READ(MF,*) I1
@@ -822,17 +865,6 @@ contains
           CALL special_alex_main_ring(my_ering,i1,targ_tune,sc)
 
 
-       case('THINEXAMPLE')
-          READ(MF,*) I1,I2,FILENAME
-
-          mfr=0
-          IF(FILENAME(1:6)=='SCREEN'.OR.FILENAME(1:6)=='screen') mfr=6
-          if(mfr==0) then
-             call kanalnummer(mfr)
-             open(unit=mfr,file=filename)
-          endif
-          CALL THIN_EXAMPLE(my_ering,MY_BEAMS,I1,I2,my_estate,MFR)
-          IF(MFR/=6) close(mfr)
        case default
 
           write(6,*) " Command Ignored "
@@ -1082,64 +1114,6 @@ contains
 
   end SUBROUTINE remove_drifts_bends
 
-  SUBROUTINE remove_patches(R,x0,x,sc,do_not_remove,patch_everywhere,FILENAME)  ! special example to be removed later
-    IMPLICIT NONE
-    TYPE(LAYOUT),TARGET :: R
-    integer I,mf
-    real(dp) x(6),x0(6),sc
-    type(fibre), pointer :: P
-    type(INTEGRATION_NODE), pointer :: T
-    logical(lp) do_not_remove,patch_everywhere
-    type(three_d_info) v
-    character(*) FILENAME
-
-    if(do_not_remove) then
-       p=>r%start
-       do i=1,r%n
-          p%patch=-1
-          p%patch=0
-
-          p=>p%next
-       enddo
-
-       if(patch_everywhere) then
-
-          p=>r%start
-          do i=1,r%n-1
-             CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
-             p=>p%next
-          enddo
-
-       endif
-    endif
-    CALL MAKE_NODE_LAYOUT(my_ering)
-
-    CALL fill_survey_data_in_NODE_LAYOUT(my_ering)
-
-    T=>my_ering%T%start
-
-    call alloc_three_d_info(v)
-
-    V%reference_ray=x0
-    V%X=x
-    V%SCALE=sc
-    call kanalnummer(mf)
-    OPEN(UNIT=mf,FILE=FILENAME)
-    t=>my_ering%t%start
-    DO I=1,my_ering%T%n
-       CALL TRACK_BEAM_x( my_ering,V,DEFAULT,POS1=I,POS2=I+1 )
-       IF(V%U(1)) THEN
-          WRITE(6,*) " UNSTABLE ",I
-          goto 12
-       ENDIF
-       WRITE(mf,*) V%r(3),V%r(1),t%parent_fibre%mag%name,t%cas
-       t=>t%next
-    ENDDO
-12  CLOSE(mf)
-
-
-  end SUBROUTINE remove_patches
-
 
 
 
@@ -1254,8 +1228,242 @@ contains
   end subroutine printframes
 
 
+  SUBROUTINE radia(R,loc,FILE1,FILE2)
+    implicit none
+    TYPE(LAYOUT) R
+
+    REAL(DP) X(6),m,as(6,6),energy,deltap
+    TYPE(ENV_8) YS(6)
+    type(beamenvelope) env
+    CHARACTER(*) FILE1,FILE2
+    type(normalform) normal
+    integer nd2,npara,i,j,js(6),n1,n2
+    TYPE(REAL_8) Y(6)
+    TYPE(DAMAP) ID
+    TYPE(INTERNAL_STATE) state
+    integer no,loc,mf1,mf2
+    real(dp) av(6,6),e(3)
+    type(fibre), pointer :: p
+    no=0
+    call kanalnummer(mf1)
+    open(mf1,file=FILE1)
+    call kanalnummer(mf2)
+    open(mf2,file=FILE2)
+
+    state=(my_estate-nocavity0)+radiation0
+    x=0.d0;
+
+    CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
+    WRITE(6,*) " CLOSED ORBIT AT LOCATION ",loc
+    write(6,*) x
+    if(track_flag(r,x,loc,state)==0) then
+       write(6,*) " stable closed orbit tracked "
+    else
+       write(6,*) " unstable closed orbit tracked "
+       stop 333
+    endif
+
+    open(unit=30,file='junk.txt')
+    call move_to(r,p,loc)
+    do i=loc,loc+r%n
+       call track(r,x,i,i+1,state)
+       p=>p%next
+       write(30,205) i,p%mag%name(1:8),x
+    enddo
+    close(30)
+205 FORMAT(1x,i4,1x,a8,1x,6(1X,D18.11))
+
+    call GET_loss(r,energy,deltap)
+    write(6,*) x
+    write(6,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
+
+    CALL INIT(state,2,0,BERZ,ND2,NPARA)
+    CALL ALLOC(Y);CALL ALLOC(NORMAL);call alloc(ys);call alloc(env);  ! ALLOCATE VARIABLES
+    !Y=NPARA
+    CALL ALLOC(ID)
+    ID=1
+    Y=X+ID
+    ys=y
+
+    CALL TRACK(R,YS,loc,state)
+    if(.not.check_stable) write(6,*) " unstable tracking envelope "
+    env%stochastic=.true.
+    env=ys
+    if(.not.check_stable) write(6,*) " unstable in normalizing envelope "
+
+    y=ys
+    normal=y
+    if(.not.check_stable) write(6,*) " unstable in normalizing map "
+    as=normal%a_t
+
+    !  TYPE beamenvelope
+    !     ! radiation normalization
+    !     type (damap) transpose    ! Transpose of map which acts on polynomials
+    !     type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
+    !     TYPE (pbresonance) bijnr   !  Equilibrium beam sizes in resonance basis
+    !     type (taylor) sij0  !  equilibrium beam sizes
+    !     real(dp) emittance(3),tune(3),damping(3)
+    !     logical AUTO,STOCHASTIC
+    !     real(dp)  KICK(3)
+    !     type (damap) STOCH
+    !  END TYPE beamenvelope
+
+    write(6,*) " Chao emittance "
+    write(6,*) env%emittance
+    write(6,*) " tunes "
+    write(6,*) env%tune
+    write(6,*) " damping decrements "
+    write(6,*) env%damping
+    write(mf1,*) " Chao emittance "
+    write(mf1,*) env%emittance
+    write(mf1,*) " tunes "
+    write(mf1,*) env%tune
+    write(mf1,*) " damping decrements "
+    write(mf1,*) env%damping
+    js=0
+    do i=1,6
+       do j=1,6
+          js(j)=1
+          m=env%STOCH%v(i).sub.js
+          write(mf1,*) m,i,j
+          js(j)=0
+       enddo
+    enddo
+    js=0
+    do i=1,6
+       do j=1,6
+          js(j)=1
+          m=ys(i)%v.sub.js
+          ! write(mf1,*) m,i,j
+          js(j)=0
+       enddo
+    enddo
+    write(mf1,*) env%kick
+    write(mf1,*) "B matrix"
+    call print(env%STOCH,mf1)
+    write(mf1,*) "m matrix"
+    call print(ys%v,mf1)
+    write(mf1,*) "equilibrium <X_i X_j>"
+    call print(env%sij0,mf1)
+    write(mf1,*) " Resonance Fluctuation "
+    call print(env%bijnr,mf1)
+    ! for etienne
+    write(mf2,*) env%kick
+    call print(env%STOCH,mf2)
+    env%STOCH=env%STOCH**(-1)
+    call print(env%STOCH,mf2)
+    call print(ys%v,mf2)
+    write(mf2,*) " Damping  "
+    write(mf2,*) env%damping
+    write(mf2,*) " Stochastic Theta "
+    call print(env%bij,mf2)
+
+    js=0
+    av=0.d0
+    e=env%emittance
+    write(mf1,*) " emmitances "
+    write(mf1,*) e
+    av(1,1)=(as(1,1)**2+as(1,2)**2)*e(1)+(as(1,3)**2+as(1,4)**2)*e(2)+ &
+         (as(1,5)**2+as(1,6)**2)*e(3)
+    av(3,3)=(as(3,1)**2+as(3,2)**2)*e(1)+(as(3,3)**2+as(3,4)**2)*e(2)+ &
+         (as(3,5)**2+as(3,6)**2)*e(3)
+    av(5,5)=(as(5,1)**2+as(5,2)**2)*e(1)+(as(5,3)**2+as(5,4)**2)*e(2)+ &
+         (as(5,5)**2+as(5,6)**2)*e(3)
+    av(3,5)=(as(3,1)*as(5,1)+as(3,2)*as(5,2))*e(1)+(as(3,3)*as(5,3)+as(3,4)*as(5,4))*e(2)+ &
+         (as(3,5)*as(5,5)+as(3,6)*as(5,6))*e(3)
+    n1=1;n2=3;
+    av(n1,n2)=(as(n1,1)*as(n2,1)+as(n1,2)*as(n2,2))*e(1)+(as(n1,3)*as(n2,3)+as(n1,4)*as(n2,4))*e(2)+ &
+         (as(n1,5)*as(n2,5)+as(n1,6)*as(n2,6))*e(3)
+    n1=3;n2=6;
+    av(n1,n2)=(as(n1,1)*as(n2,1)+as(n1,2)*as(n2,2))*e(1)+(as(n1,3)*as(n2,3)+as(n1,4)*as(n2,4))*e(2)+ &
+         (as(n1,5)*as(n2,5)+as(n1,6)*as(n2,6))*e(3)
+
+    m=env%sij0.sub.'2'
+
+    write(mf1,*) " <X**2> exact and alex "
+    write(mf1,*) m
+    write(mf1,*) av(1,1)
+    m=env%sij0.sub.'002'
+    write(mf1,*) " <y**2> exact and alex "
+    write(mf1,*) m
+    write(mf1,*) av(3,3)
+    m=env%sij0.sub.'00002'
+    write(mf1,*) " <L**2> exact and alex "
+    write(mf1,*) m
+    write(mf1,*) av(5,5)
+    m=env%sij0.sub.'001010'
+    write(mf1,*) " <y delta> exact and alex "
+    write(mf1,*) m/2.d0
+    write(mf1,*) av(3,5)
+    n1=1;n2=3;
+    m=env%sij0.sub.'101000'
+    write(mf1,*) " <x y> exact and alex "
+    write(mf1,*) m/2.d0
+    write(mf1,*) av(n1,n2)
+    n1=3;n2=6;
+    m=env%sij0.sub.'001001'
+    write(mf1,*) " <y L> exact and alex "
+    write(mf1,*) m/2.d0
+    write(mf1,*) av(n1,n2)
+
+
+
+    CALL KILL(Y);CALL KILL(Ys);CALL KILL(NORMAL);CALL KILL(env);
+
+    ! compute map with radiation minus the cavity!
+    ! cavity must be at the end and only one cavity
+
+    if(no>0) then
+       CALL INIT(STATE,no,0,BERZ,ND2,NPARA)
+       CALL ALLOC(Y);  ! ALLOCATE VARIABLES
+       write(17,*) x(1),x(2),x(3)
+       write(17,*) x(4),x(5),x(6)
+       Y=NPARA
+       Y=X
+
+       CALL TRACK(R,Y,1,r%n,STATE)
+
+       call print(y,17)
+       call kill(y)
+    endif
+    close(mf1)
+    close(mf2)
+
+  end subroutine radia
+
+  subroutine Universe_max_n(n)
+    !use build_lattice
+    implicit none
+    integer n,i
+    type(layout), pointer :: L
+    n=0
+
+    l=>m_u%start
+    do i=1,m_u%n
+       n=n+l%n
+       l=>l%next
+    enddo
+
+  end subroutine Universe_max_n
+
+  subroutine Universe_max_node_n(n)
+    !use build_lattice
+    implicit none
+    integer n,i
+    type(layout), pointer :: L
+    n=0
+
+    l=>m_u%start
+    do i=1,m_u%n
+       if(associated(l%t) ) n=n+l%t%n
+       l=>l%next
+    enddo
+
+  end subroutine Universe_max_node_n
+
 
 end module pointer_lattice
+
 
 
 

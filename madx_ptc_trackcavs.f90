@@ -209,7 +209,8 @@ contains
           endif
 
 
-          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
+          !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
+          call track_beam(my_ring,TheBeam,getintstate(), node1=ni, node2=ni+1)
           pathlegth = curr_slice%s(3)
 
           if (getdebug() > 2 ) then

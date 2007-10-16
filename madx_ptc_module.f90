@@ -12,7 +12,7 @@ MODULE ptc_results
 END MODULE ptc_results
 
 MODULE madx_ptc_module
-  use ptc_spin
+  use S_fitting_new
   !  USE madx_keywords
   USE madx_ptc_setcavs_module
   USE madx_ptc_knobs_module

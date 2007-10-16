@@ -74,17 +74,16 @@ module S_status
   PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt
   !PRIVATE DTILTR,DTILTP,DTILTS
   PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL,DTILTS_EXTERNAL
-  PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P,CHECK_APERTURE_S
+  PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P !,CHECK_APERTURE_S
   LOGICAL(lp), target:: electron
   real(dp), target :: muon=one
   LOGICAL(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
-  INTEGER,PARAMETER::NMAX=20
-  include "a_def_all_kind.inc"
-  include "a_def_sagan.inc"
-  !  include "a_def_user1.inc"
-  !!  include "a_def_arbitrary.inc"
-  !  include "a_def_user2.inc"
-  include "a_def_element_fibre_layout.inc"
+  ! include "a_def_all_kind.inc"    ! sept 2007
+  ! include "a_def_sagan.inc"
+  ! include "a_def_element_fibre_layout.inc"
+  !  !  include "a_def_user1.inc"
+  !  !!  include "a_def_arbitrary.inc"
+  !  !  include "a_def_user2.inc"
   TYPE(INTERNAL_STATE), target ::  DEFAULT
   TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME,EXACTMIS
   TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,SPIN_ONLY
@@ -111,15 +110,21 @@ module S_status
        &(0,f,f,f,f,f,f,f,f,t,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN_ONLY0   = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,t,3)
-!  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
+  !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
-  private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A !,NULL_p
+  private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A
+  PRIVATE KILL_S_APERTURE,ALLOC_S_APERTURE
+  !,NULL_p
   PRIVATE B2PERPR,B2PERPP !,S_init_berz0
   type(tilting) tilt
   private minu
   real(dp) MADFAC(NMAX)
   CHARACTER(24) MYTYPE(-100:100)
+  private check_S_APERTURE_r,check_S_APERTURE_out_r
+  private check_S_APERTURE_p,check_S_APERTURE_out_p
+
+
 
   INTERFACE OPERATOR (.min.)
      MODULE PROCEDURE minu                       ! to define the minus of Schmidt
@@ -149,7 +154,17 @@ module S_status
   INTERFACE CHECK_APERTURE
      MODULE PROCEDURE CHECK_APERTURE_R
      MODULE PROCEDURE CHECK_APERTURE_P
-     MODULE PROCEDURE CHECK_APERTURE_S
+     !     MODULE PROCEDURE CHECK_APERTURE_S
+  END INTERFACE
+
+  INTERFACE check_S_APERTURE
+     MODULE PROCEDURE check_S_APERTURE_r
+     MODULE PROCEDURE check_S_APERTURE_p
+  END INTERFACE
+
+  INTERFACE check_S_APERTURE_out
+     MODULE PROCEDURE check_S_APERTURE_out_r
+     MODULE PROCEDURE check_S_APERTURE_out_p
   END INTERFACE
 
   INTERFACE init
@@ -165,11 +180,13 @@ module S_status
   INTERFACE alloc
      MODULE PROCEDURE alloc_p
      MODULE PROCEDURE alloc_A
+     MODULE PROCEDURE ALLOC_S_APERTURE
   END INTERFACE
 
   INTERFACE kill
      MODULE PROCEDURE dealloc_p
      MODULE PROCEDURE dealloc_A
+     MODULE PROCEDURE KILL_S_APERTURE
   END INTERFACE
 
   INTERFACE B2PERP
@@ -213,7 +230,7 @@ CONTAINS
     implicit none
     type (MADX_APERTURE), pointer:: P
 
-    nullify(P%KIND);nullify(P%R);nullify(P%X);nullify(P%Y);
+    nullify(P%KIND);nullify(P%R);nullify(P%X);nullify(P%Y);nullify(P%dX);nullify(P%dY);
   end subroutine NULL_A
 
   SUBROUTINE  alloc_A(p)
@@ -225,7 +242,8 @@ CONTAINS
     CALL NULL_A(p)
     ALLOCATE(P%R(2));ALLOCATE(P%X);ALLOCATE(P%Y);ALLOCATE(P%KIND);
     P%KIND=0; P%R=ZERO;P%X=ZERO;P%Y=ZERO;
-
+    ALLOCATE(P%DX);ALLOCATE(P%DY);
+    P%DX=ZERO;P%DY=ZERO;
   end subroutine alloc_A
 
   SUBROUTINE  dealloc_A(p)
@@ -234,6 +252,7 @@ CONTAINS
 
     if(associated(p%R)) then
        DEALLOCATE(P%R);DEALLOCATE(P%X);DEALLOCATE(P%Y);DEALLOCATE(P%KIND);
+       DEALLOCATE(P%DX);DEALLOCATE(P%DY);
     endif
   end SUBROUTINE  dealloc_A
 
@@ -247,13 +266,16 @@ CONTAINS
     nullify(P%TILTD);  nullify(P%dir);nullify(P%charge);
     nullify(P%beta0);nullify(P%gamma0I);nullify(P%gambet);nullify(P%P0C);
     nullify(P%EDGE)
-    nullify(P%TOTALPATH)
-    nullify(P%EXACT);nullify(P%RADIATION);nullify(P%NOCAVITY);
-    nullify(P%FRINGE);nullify(P%KILL_ENT_FRINGE);nullify(P%KILL_EXI_FRINGE);nullify(P%bend_fringe);nullify(P%TIME);
+    !    nullify(P%TOTALPATH)
+    nullify(P%EXACT);  !nullify(P%RADIATION);nullify(P%NOCAVITY);
+    nullify(P%permFRINGE);
+    nullify(P%KILL_ENT_FRINGE);nullify(P%KILL_EXI_FRINGE);nullify(P%bend_fringe);  !nullify(P%TIME);
     nullify(P%METHOD);nullify(P%NST);
-    nullify(P%NMUL);nullify(P%spin);
+    nullify(P%NMUL);  !nullify(P%spin);
     nullify(P%F);
     nullify(P%APERTURE);
+    nullify(P%A);
+
   end subroutine NULL_p
 
 
@@ -273,12 +295,13 @@ CONTAINS
     ALLOCATE(P%beta0);ALLOCATE(P%gamma0I);ALLOCATE(P%gambet);ALLOCATE(P%P0C);
     P%beta0 =one;P%gamma0I=zero;P%gambet =zero;P%P0C =zero;
     ALLOCATE(P%EDGE(2));P%EDGE(1)=zero;P%EDGE(2)=zero;
-    ALLOCATE(P%TOTALPATH); ! PART OF A STATE INITIALIZED BY EL=DEFAULT
-    ALLOCATE(P%EXACT);ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
-    ALLOCATE(P%FRINGE);ALLOCATE(P%KILL_ENT_FRINGE);ALLOCATE(P%KILL_EXI_FRINGE);ALLOCATE(P%bend_fringe);ALLOCATE(P%TIME);
+    !    ALLOCATE(P%TOTALPATH); ! PART OF A STATE INITIALIZED BY EL=DEFAULT
+    ALLOCATE(P%EXACT);  !ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
+    ALLOCATE(P%permFRINGE);
+    ALLOCATE(P%KILL_ENT_FRINGE);ALLOCATE(P%KILL_EXI_FRINGE);ALLOCATE(P%bend_fringe); !ALLOCATE(P%TIME);
     ALLOCATE(P%METHOD);ALLOCATE(P%NST);P%METHOD=2;P%NST=1;
     ALLOCATE(P%NMUL);P%NMUL=0;
-    ALLOCATE(P%spin);
+    !    ALLOCATE(P%spin);
     !   ALLOCATE(P%TRACK);P%TRACK=.TRUE.;
     P%KILL_ENT_FRINGE=.FALSE.
     P%KILL_EXI_FRINGE=.FALSE.
@@ -292,12 +315,19 @@ CONTAINS
   SUBROUTINE  dealloc_p(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
+    INTEGER I
+    if(.not.associated(p)) return
 
     !    if(associated(P%dir)) then
     !    endif
-    DEALLOCATE(P%LD);DEALLOCATE(P%B0);DEALLOCATE(P%LC);
-    DEALLOCATE(P%TILTD);
-    DEALLOCATE(P%beta0);DEALLOCATE(P%gamma0I);DEALLOCATE(P%gambet);DEALLOCATE(P%P0C);
+    if(.not.associated(p%LD)) DEALLOCATE(P%LD);
+    if(.not.associated(p%B0)) DEALLOCATE(P%B0);
+    if(.not.associated(p%LC)) DEALLOCATE(P%LC);
+    if(.not.associated(p%TILTD)) DEALLOCATE(P%TILTD);
+    if(.not.associated(p%beta0)) DEALLOCATE(P%beta0);
+    if(.not.associated(p%gamma0I)) DEALLOCATE(P%gamma0I);
+    if(.not.associated(p%gambet)) DEALLOCATE(P%gambet);
+    if(.not.associated(p%P0C)) DEALLOCATE(P%P0C);
     if(associated(p%f)) then
        call kill(p%f)
        DEALLOCATE(P%f);
@@ -306,17 +336,105 @@ CONTAINS
        CALL kill(p%APERTURE)
        DEALLOCATE(p%APERTURE);
     endif
-    DEALLOCATE(P%EDGE);
-    DEALLOCATE(P%TOTALPATH);
-    DEALLOCATE(P%EXACT);DEALLOCATE(P%RADIATION);DEALLOCATE(P%NOCAVITY);
-    DEALLOCATE(P%FRINGE);DEALLOCATE(P%KILL_ENT_FRINGE);DEALLOCATE(P%KILL_EXI_FRINGE);DEALLOCATE(P%bend_fringe);DEALLOCATE(P%TIME);
-    DEALLOCATE(P%METHOD);DEALLOCATE(P%spin);DEALLOCATE(P%NST);
-    DEALLOCATE(P%NMUL)
+    if(associated(p%A)) then
+       CALL KILL(P%A)
+    ENDIF
+
+    if(.not.associated(p%EDGE))DEALLOCATE(P%EDGE);
+    !    DEALLOCATE(P%TOTALPATH);
+    if(.not.associated(p%EXACT))DEALLOCATE(P%EXACT);
+    !DEALLOCATE(P%RADIATION);DEALLOCATE(P%NOCAVITY);
+    if(.not.associated(p%permFRINGE))DEALLOCATE(P%permFRINGE);
+    if(.not.associated(p%KILL_ENT_FRINGE))DEALLOCATE(P%KILL_ENT_FRINGE);
+    if(.not.associated(p%KILL_EXI_FRINGE))DEALLOCATE(P%KILL_EXI_FRINGE);
+    if(.not.associated(p%bend_fringe))DEALLOCATE(P%bend_fringe); !DEALLOCATE(P%TIME);
+    if(.not.associated(p%METHOD))DEALLOCATE(P%METHOD);
+    !DEALLOCATE(P%spin);
+    if(.not.associated(p%NST))DEALLOCATE(P%NST);
+    if(.not.associated(p%NMUL))DEALLOCATE(P%NMUL)
     !    CALL NULL_P(P)
     DEALLOCATE(P)
     nullify(p);
     ! if(junk) ccc=ccc-1
   end subroutine dealloc_p
+
+
+  SUBROUTINE  KILL_S_APERTURE(A)
+    implicit none
+    TYPE(S_APERTURE), POINTER :: A(:)
+    INTEGER I
+    DO I=1,SIZE(A)
+       CALL kill(A(I)%APERTURE)
+       DEALLOCATE(A(I)%APERTURE)
+    ENDDO
+    DEALLOCATE(A)
+  END SUBROUTINE  KILL_S_APERTURE
+
+  SUBROUTINE  ALLOC_S_APERTURE(A,N)
+    implicit none
+    TYPE(S_APERTURE), POINTER :: A(:)
+    INTEGER I,N
+    ALLOCATE(A(N))
+    DO I=1,SIZE(A)
+       CALL ALLOC(A(I)%APERTURE)
+    ENDDO
+  END SUBROUTINE  ALLOC_S_APERTURE
+
+  SUBROUTINE  check_S_APERTURE_r(p,N,x)
+    implicit none
+    TYPE(magnet_chart), POINTER :: p
+    real(dp),intent(inout):: x(6)
+    INTEGER N
+
+    if(p%dir==1) then
+       call CHECK_APERTURE(p%a(n)%aperture,X)
+    else
+       call CHECK_APERTURE(p%a(p%nst+2-n)%aperture,X)
+    endif
+
+    !!   if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2)
+    !       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+  END SUBROUTINE  check_S_APERTURE_r
+
+  SUBROUTINE  check_S_APERTURE_p(p,N,x)
+    implicit none
+    TYPE(magnet_chart), POINTER :: p
+    type(real_8),intent(inout):: x(6)
+    INTEGER N
+
+    if(p%dir==1) then
+       call CHECK_APERTURE(p%a(n)%aperture,X)
+    else
+       call CHECK_APERTURE(p%a(p%nst+2-n)%aperture,X)
+    endif
+
+    !!   if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2)
+    !       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+  END SUBROUTINE  check_S_APERTURE_p
+
+  SUBROUTINE  check_S_APERTURE_out_r(p,N,x)
+    implicit none
+    TYPE(magnet_chart), POINTER :: p
+    real(dp),intent(inout):: x(6)
+    INTEGER N
+    if(p%dir==1.and.n==p%nst) then
+       call CHECK_APERTURE(p%a(n+1)%aperture,X)
+    elseif(p%dir==-1.and.n==p%nst) then
+       call CHECK_APERTURE(p%a(1)%aperture,X)
+    endif
+  END SUBROUTINE  check_S_APERTURE_out_r
+
+  SUBROUTINE  check_S_APERTURE_out_p(p,N,x)
+    implicit none
+    TYPE(magnet_chart), POINTER :: p
+    type(real_8),intent(inout):: x(6)
+    INTEGER N
+    if(p%dir==1.and.n==p%nst) then
+       call CHECK_APERTURE(p%a(n+1)%aperture,X)
+    elseif(p%dir==-1.and.n==p%nst) then
+       call CHECK_APERTURE(p%a(1)%aperture,X)
+    endif
+  END SUBROUTINE  check_S_APERTURE_out_p
 
   SUBROUTINE  equal_A(elp,el)
     implicit none
@@ -326,6 +444,8 @@ CONTAINS
     ELP%R=EL%R
     ELP%X=EL%X
     ELP%Y=EL%Y
+    ELP%DX=EL%DX
+    ELP%DY=EL%DY
   END SUBROUTINE  equal_A
 
 
@@ -340,11 +460,11 @@ CONTAINS
     elp%gambet =el%gambet
     elp%P0C =el%P0C
     elp%EXACT=el%EXACT
-    elp%RADIATION=el%RADIATION
-    elp%TIME=el%TIME
-    elp%NOCAVITY=el%NOCAVITY
-    elp%spin=el%spin
-    elp%FRINGE=el%FRINGE
+    !   elp%RADIATION=el%RADIATION
+    !   elp%TIME=el%TIME
+    !   elp%NOCAVITY=el%NOCAVITY
+    !   elp%spin=el%spin
+    elp%permFRINGE=el%permFRINGE
     elp%KILL_ENT_FRINGE=el%KILL_ENT_FRINGE
     elp%KILL_EXI_FRINGE=el%KILL_EXI_FRINGE
     elp%bend_fringe=el%bend_fringe
@@ -357,7 +477,7 @@ CONTAINS
     elp%EDGE(2)=el%EDGE(2)
     elp%METHOD=el%METHOD
     elp%NST=el%NST
-    ELP%TOTALPATH=EL%TOTALPATH
+    !   ELP%TOTALPATH=EL%TOTALPATH
     ELP%nmul=EL%nmul
     !    ELP%TRACK=EL%TRACK
 
@@ -375,30 +495,39 @@ CONTAINS
     implicit none
     type (MADX_APERTURE),INTENT(IN)::E
     REAL(DP), INTENT(IN):: X(6)
-
+    real(dp) xx,yy,dx,dy,ex,ey
 
 
     IF(CHECK_MADX_APERTURE.AND.APERTURE_FLAG) THEN
 
        SELECT CASE(E%KIND)
        CASE(1)  ! ellipse circles
-          IF(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE) THEN
+          IF((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
        CASE(2)  ! rectangle
-          IF(ABS(X(1))>E%X.OR.ABS(X(3))>E%Y) THEN
+          IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
+             xx=X(1)-E%DX
+             yy=X(3)-E%DY
+             dx=E%DX
+             dy=E%DY
+             ex=E%X
+             ey=E%y
+             write(6,*) xx,ex
+             write(6,*) yy,ey
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
-          IF((ABS(X(1))>E%X).OR.(ABS(X(3))>E%Y).OR.(X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
+          IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
+               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
        CASE(4) ! MARGUERITE
-          IF((X(1)**2/E%R(2)**2+X(3)**2/E%R(1)**2>ONE).OR.  &
-               (X(1)**2/E%R(1)**2+X(3)**2/E%R(2)**2>ONE)) THEN
+          IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>ONE).OR.  &
+               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
@@ -421,16 +550,14 @@ CONTAINS
 
   END SUBROUTINE  CHECK_APERTURE_P
 
-
-  SUBROUTINE  CHECK_APERTURE_S(E,X)
-    implicit none
-    type (MADX_APERTURE),INTENT(IN)::E
-    TYPE(ENV_8), INTENT(IN):: X(6)
-    REAL(DP) Y(6)
-    Y=X
-    CALL CHECK_APERTURE(E,Y)
-
-  END SUBROUTINE  CHECK_APERTURE_S
+  !  SUBROUTINE  CHECK_APERTURE_S(E,X)
+  !    implicit none
+  !    type (MADX_APERTURE),INTENT(IN)::E
+  !    TYPE(ENV_8), INTENT(IN):: X(6)
+  !    REAL(DP) Y(6)
+  !    Y=X
+  !    CALL CHECK_APERTURE(E,Y)
+  !  END SUBROUTINE  CHECK_APERTURE_S
 
   FUNCTION minu( S1,S2  )
     implicit none
@@ -463,8 +590,8 @@ CONTAINS
     USE   definition
     USE   da_arrays
     IMPLICIT NONE
-    LOGICAL(lp) particle,verb
-    integer i,MF,lda_old
+    LOGICAL(lp) particle
+    integer i,lda_old
 
     W_P=>W_I
 
@@ -613,10 +740,12 @@ CONTAINS
     endif
     write(mf,'((1X,a28,1x,i4))' ) ' Default integration method ',METD
     write(mf,'((1X,a28,1x,i4))' ) ' Default integration steps  ',NSTD
+    if(c_%CAVITY_TOTALPATH==1) write(mf,'((1X,a24))' ) ' Real Pill Box Cavities '
+    if(c_%CAVITY_TOTALPATH==0) write(mf,'((1X,a24))' ) ' Fake Pill Box Cavities '
 
     If(electron) then
        if(muon==one)  then
-          write(mf,*)"This is an electron (positron actually) "
+          write(mf,*)"This is an electron (positron actually if charge=1) "
        else
           write(mf,'((1X,a21,1x,G20.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
        endif
@@ -927,16 +1056,16 @@ CONTAINS
     C_%npara_fpp=NPARA
   END  subroutine init_default
 
-!  subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
-!    implicit none
-!    TYPE (INTERNAL_STATE), INTENT(IN):: STATE
-!    INTEGER, INTENT(IN):: NO1,NP1
-!    INTEGER, INTENT(OUT)::    ND2,NPARA
+  !  subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
+  !    implicit none
+  !    TYPE (INTERNAL_STATE), INTENT(IN):: STATE
+  !    INTEGER, INTENT(IN):: NO1,NP1
+  !    INTEGER, INTENT(OUT)::    ND2,NPARA
 
-!    call init(STATE,NO1,NP1,my_true,ND2,NPARA)
-!    C_%NPARA=NPARA
-!    C_%npara_fpp=NPARA
-!  END  subroutine S_init_berz
+  !    call init(STATE,NO1,NP1,my_true,ND2,NPARA)
+  !    C_%NPARA=NPARA
+  !    C_%npara_fpp=NPARA
+  !  END  subroutine S_init_berz
 
 
   SUBROUTINE B2PERPR(P,B,X,X5,B2)

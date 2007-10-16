@@ -219,8 +219,9 @@ contains
 
     close(mf)
 
-    !call make_table("NOACC_ACC_210.DAT")
-    call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
+
+    call make_table("NOACC_ACC_210.DAT")
+    !call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
     !call make_table("ACCWAVE_40kV_280kV_350ms.DAT")
     !call make_table("ACCWAVE_210KVH9_350ms.DAT")
     !call make_table("noaccel.DAT")
@@ -232,7 +233,8 @@ contains
 
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        call kanalnummer(mf)
-       open(unit=mf,file='crazy_orbit_unit.dat')
+       open(unit=mf,file='wp2_029_300kW_J54_INJALL_TRM_210kVM_Bf016.dat')
+       !open(unit=mf,file='crazy_orbit_unit.dat')
     else
        stop 998
        call kanalnummer(mf)
@@ -382,6 +384,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
      !for speed
      !     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
      !  end for speed
+     write(6,*) " Orbit set for acceleration "
      return
   elseif(i_node>=0) then
 
@@ -542,8 +545,8 @@ SUBROUTINE ptc_synchronous_set(i_node)
      return
   elseif(i_node==-3) then
      stop 553
-     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
-     return
+     !     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
+     !     return
   elseif(i_node==-4) then
      stop 554
      return
@@ -643,14 +646,6 @@ subroutine ptc_track_particle(node_index, x,xp,y,yp,phi,dE)
            else
               x6=x_orbit(6)/my_ORBIT_LATTICE%dxs6
            endif
-           !  write(6,*)" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% "
-           !  write(6,*)x_orbit(5),my_ORBIT_LATTICE%dxs6
-           !  write(6,*)my_ORBIT_LATTICE%freqa,my_ORBIT_LATTICE%freqb
-           !  write(6,*)my_ORBIT_LATTICE%volta,my_ORBIT_LATTICE%voltb
-           !  write(6,*)my_ORBIT_LATTICE%phasa,my_ORBIT_LATTICE%phasb
-           !  write(6,*)x_orbit(5),my_ORBIT_LATTICE%dxs6
-           !  write(6,*)" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% "
-           !  pause 12
         endif
         p_orbit%mag%freq=my_ORBIT_LATTICE%freqa+x6*(my_ORBIT_LATTICE%freqa-my_ORBIT_LATTICE%freqb)
         p_orbit%mag%volt=my_ORBIT_LATTICE%volta+x6*(my_ORBIT_LATTICE%volta-my_ORBIT_LATTICE%voltb)

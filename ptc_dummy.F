@@ -46,9 +46,8 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
-      subroutine w_ptc_moments(no)
+      subroutine w_ptc_moments()
       implicit none
-      integer no
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end
@@ -83,9 +82,8 @@
      &' Please use proper MAD-X version that includes PTC.')
       end
 
-      subroutine w_ptc_enforce6D(level)
+      subroutine w_ptc_enforce6D()
       implicit none
-      integer level
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_enforce6D
@@ -168,13 +166,8 @@
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine  w_ptc_addknob
 
-      subroutine w_ptc_addmoment(x,px,y,py,dp,t,                        &
-     &tableIA,columnIA,parametric )
+      subroutine w_ptc_addmoment()
       implicit none
-      integer               :: x,px,y,py,dp,t
-      integer               :: columnIA(*)
-      integer               :: tableIA(*)
-      integer               :: parametric
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_addmoment
@@ -187,12 +180,9 @@
       w_ptc_getnmoments = -1
       end function w_ptc_getnmoments
 
-      subroutine  w_ptc_getmomentstabcol(n, tabn, coln)
+      subroutine  w_ptc_getmomentstabcol()
       implicit none
 !     Implemented in madx_ptc_distrib.f90
-      integer              :: n
-      character(20)        :: tabn
-      character(17)        :: coln
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine  w_ptc_getmomentstabcol
@@ -215,27 +205,20 @@
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine  w_ptc_refreshtables
 
-      subroutine w_ptc_getnfieldcomp(fibreidx,ncomp,nval)
+      subroutine w_ptc_getnfieldcomp()
       implicit none
-      real nval
-      integer fibreidx
-      integer ncomp
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_getnfieldcomp
 
-      subroutine w_ptc_getsfieldcomp(fibreidx,ncomp,nval)
+      subroutine w_ptc_getsfieldcomp()
       implicit none
-      real nval
-      integer fibreidx
-      integer ncomp
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_getsfieldcomp
 
-      subroutine w_ptc_setfieldcomp(fibreidx)
+      subroutine w_ptc_setfieldcomp()
       implicit none
-      integer fibreidx
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_setfieldcomp
@@ -258,10 +241,8 @@
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine  w_ptc_writeparresults
 
-      subroutine w_ptc_eplacement(elementidx,rf)
+      subroutine w_ptc_eplacement()
       implicit none
-      integer elementidx
-      integer rf
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC.')
       end subroutine w_ptc_eplacement

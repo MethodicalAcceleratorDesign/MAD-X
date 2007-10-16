@@ -1,6 +1,18 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and CERN
 
+TYPE POL_sagan
+   INTEGER ia(n_max)
+   real(dp) Sa(n_max)
+END TYPE POL_sagan
+
+
+TYPE POL_BLOCK_sagan
+   INTEGER Iinternal(2)
+   real(dp) SInternal(2)
+   type(POL_sagan) w
+END TYPE POL_BLOCK_sagan
+
 TYPE undu_R
    real(dp), DIMENSION(:,:), pointer :: K
    real(dp), DIMENSION(:), pointer :: A

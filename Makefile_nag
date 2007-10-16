@@ -49,10 +49,6 @@ madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c s
 madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h
 	$(CC) $(GCCP_FLAGS) -o madxpf.o madxp.c
 
-matchptcknobs.o: matchptcknobs.c matchptcknobs.h madx.h
-	$(CC) $(GCCP_FLAGS) -o matchptcknobs.o matchptcknobs.c
-
-
 twissp.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
 	$(FC) $(FCP) -o twissp.o twiss.F
 
@@ -219,7 +215,10 @@ Sqb_accel_ptc.o: Sqa_beam_beam_ptc.o Sqb_accel_ptc.f90
 Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
 	$(f95) $(f95_FLAGS) Sr_spin.f90
 
-madx_ptc_intstate.o: Sr_spin.o madx_ptc_intstate.f90
+Sra_fitting.o: Sr_spin.o Sra_fitting.f90
+	$(f95) $(f95_FLAGS) Sra_fitting.f90
+
+madx_ptc_intstate.o: Sra_fitting.o madx_ptc_intstate.f90
 	$(f95) $(f95_FLAGS) madx_ptc_intstate.f90
 
 madx_ptc_setcavs.o: madx_ptc_intstate.o madx_ptc_setcavs.f90
@@ -234,7 +233,7 @@ madx_ptc_module.o: madx_ptc_knobs.o madx_ptc_module.f90
 St_pointers.o: madx_ptc_module.o madx_ptc_module.o St_pointers.f90
 	$(f95) $(f95_FLAGS) St_pointers.f90
 
-madx_ptc_trackcavs.o: madx_ptc_module.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_trackcavs.f90
+madx_ptc_trackcavs.o: madx_ptc_module.o madx_ptc_intstate.o madx_ptc_setcavs.o madx_ptc_trackcavs.f90
 	$(f95) $(f95_FLAGS) madx_ptc_trackcavs.f90
 
 madx_ptc_script.o: Sp_keywords.o madx_ptc_script.f90
@@ -246,8 +245,7 @@ madx_ptc_eplacement.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_
 madx_ptc_normal.o: madx_ptc_module.o  madx_ptc_normal.f90
 	$(f95) $(f95_FLAGS) madx_ptc_normal.f90
 	
-madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_module.o madx_ptc_setcavs.o \
-	madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_twiss.f90
+madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_distrib.o madx_ptc_knobs.o madx_ptc_twiss.f90
 	$(f95) $(f95_FLAGS) madx_ptc_twiss.f90
 	
 madx_ptc_distrib.o: Sp_keywords.o madx_ptc_distrib.f90
@@ -280,8 +278,11 @@ timest.o: timest.f90
 timex.o: timex.f90
 	$(f95) $(f95_FLAGS) -o timex.o timex.f90
 
-rplot.o: rplot.c
+rplot.o: rplot.c rplot.h
 	$(CC) $(GCCP_FLAGS) -c -o rplot.o rplot.c
+
+matchptcknobs.o: matchptcknobs.c matchptcknobs.h
+	$(CC) $(GCCP_FLAGS) -c -o matchptcknobs.o matchptcknobs.c
 
 #Parser only
 mpars: madxm.o madxp.o
@@ -309,7 +310,7 @@ madxp: \
 	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
 	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
-	Sr_spin.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
+	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
@@ -326,7 +327,7 @@ madxp: \
 	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
 	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
-	Sr_spin.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
+	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \

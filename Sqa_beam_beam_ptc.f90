@@ -5,7 +5,7 @@ module beam_beam_ptc
   public
   private BBKICKP, BBKICKR !,BBKICK
   private ccperrfP, ccperrfr,ccperrf
-  private TRACK_NODE_LAYOUT_FLAG_R,TRACK_NODE_LAYOUT_FLAG_P
+  !  private TRACK_NODE_LAYOUT_FLAG_R,TRACK_NODE_LAYOUT_FLAG_P
 
   INTERFACE ccperrf
      MODULE PROCEDURE ccperrfP
@@ -17,10 +17,10 @@ module beam_beam_ptc
      MODULE PROCEDURE BBKICKP
   END INTERFACE
 
-  INTERFACE track_x_bb
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_R
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_P
-  END INTERFACE
+  !    INTERFACE track_x_bb
+  !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_R
+  !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_P
+  !    END INTERFACE
 
 
 
@@ -541,131 +541,6 @@ contains
     CALL KILL(RY,33)
 
   end SUBROUTINE ccperrfP
-
-!!!!!!!!!!!!!!!  track single node !!!!!!!!!!!!!!!
-
-  SUBROUTINE TRACK_NODE_LAYOUT_FLAG_R(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
-    real(dp), INTENT(INOUT):: X(6)
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: I1,I2
-    INTEGER J,i22
-    TYPE (INTEGRATION_NODE), POINTER :: C
-
-
-    CALL RESET_APERTURE_FLAG
-
-    CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
-
-
-
-    if(i2>=i1) then
-       i22=i2
-    else
-       i22=r%T%n+i2
-    endif
-
-    J=I1
-
-    DO  WHILE(J<I22.AND.ASSOCIATED(C))
-
-       if(associated(c%bb)) call BBKICK(c%BB,X)
-
-       CALL TRACK_NODE_SINGLE(C,X,K,R%CHARGE)
-
-       C=>C%NEXT
-       J=J+1
-    ENDDO
-
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
-
-  END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_R
-
-  SUBROUTINE TRACK_NODE_LAYOUT_FLAG_P(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE(REAL_8), INTENT(INOUT):: X(6)
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: I1,I2
-    INTEGER J,i22
-    TYPE (INTEGRATION_NODE), POINTER :: C
-
-
-    CALL RESET_APERTURE_FLAG
-
-    CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
-
-
-
-    if(i2>=i1) then
-       i22=i2
-    else
-       i22=r%T%n+i2
-    endif
-
-    J=I1
-
-    DO  WHILE(J<I22.AND.ASSOCIATED(C))
-
-       if(associated(c%bb)) call BBKICK(c%BB,X)
-
-       CALL TRACK_NODE_SINGLE(C,X,K,R%CHARGE)
-
-       C=>C%NEXT
-       J=J+1
-    ENDDO
-
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
-
-  END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_P
-
-  SUBROUTINE TRACK_FLAG_Beam_bb(R,b,I1,I2,k) ! Tracks double from i1 to i2 in state k
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
-    TYPE(BEAM),INTENT(INOUT):: B
-    REAL(DP) X(6)
-    TYPE(INTERNAL_STATE) K
-    INTEGER, INTENT(IN):: I1,I2
-    INTEGER J,i22,i
-    TYPE (INTEGRATION_NODE), POINTER :: C
-
-
-    CALL RESET_APERTURE_FLAG
-
-    CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
-
-
-
-    if(i2>=i1) then
-       i22=i2
-    else
-       i22=r%T%n+i2
-    endif
-
-    J=I1
-
-    DO  WHILE(J<I22.AND.ASSOCIATED(C))
-
-       DO I=1,B%N
-          IF(B%U(i)) CYCLE
-          X=BEAM_IN_X(B,I)!
-          if(associated(c%bb)) call BBKICK(c%BB,X)
-
-          CALL TRACK_NODE_SINGLE(C,X,K,R%CHARGE)
-          CALL X_IN_BEAM(B,X,I,DL=ZERO,T=c%NEXT)
-
-       ENDDO
-
-
-
-       C=>C%NEXT
-       J=J+1
-    ENDDO
-
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
-
-  END SUBROUTINE TRACK_FLAG_Beam_bb
 
 
 

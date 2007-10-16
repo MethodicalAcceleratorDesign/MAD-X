@@ -439,6 +439,30 @@ CONTAINS
     ENDIF
 
   END SUBROUTINE WORK_FIBRE
+  !  S-aperture
+
+  SUBROUTINE  alloc_s_aperture(S1)  ! copy full fibre
+    IMPLICIT NONE
+    TYPE (FIBRE),INTENT(INout):: S1
+
+    if(associated(S1%mag%p%a)) call kill(S1%mag%p%a)
+    if(associated(S1%magp%p%a)) call kill(S1%magp%p%a)
+
+    call alloc(S1%mag%p%a,S1%mag%p%nst+1)
+    call alloc(S1%magp%p%a,S1%magp%p%nst+1)
+
+  END SUBROUTINE alloc_s_aperture
+
+  SUBROUTINE  kill_s_aperture(S1)  ! copy full fibre
+    IMPLICIT NONE
+    TYPE (FIBRE),INTENT(INout):: S1
+
+    if(associated(S1%mag%p%a)) call kill(S1%mag%p%a)
+    if(associated(S1%magp%p%a)) call kill(S1%magp%p%a)
+
+
+  END SUBROUTINE kill_s_aperture
+
 
   SUBROUTINE  copy_fibre(S1,S2)  ! copy full fibre
     IMPLICIT NONE
@@ -459,8 +483,45 @@ CONTAINS
 
   END SUBROUTINE  MISALIGN_FIBRE_EQUAL
 
+  SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN):: S1(6)
+    REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
+    TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
+    TYPE(ELEMENT), POINTER :: C,CN
+    TYPE(fibre), POINTER :: P
+    integer k
+    REAL(DP) OMEGAT(3),BASIST(3,3)
+
+    IF(PRESENT(OMEGA)) THEN
+       OMEGAT=OMEGA
+    ELSE
+       OMEGAT=S2%CHART%F%O
+    ENDIF
+    IF(PRESENT(BASIS)) THEN
+       BASIST=BASIS
+    ELSE
+       BASIST=S2%CHART%F%MID
+    ENDIF
 
 
+    CALL MISALIGN_FIBRE(S2,S1,OMEGAT,BASIST)
+    k=1
+
+    IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%SIAMESE
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          P=>CN%PARENT_FIBRE
+          CALL MISALIGN_FIBRE(P,S1,OMEGAT,BASIST)
+          CN=>CN%SIAMESE
+          k=k+1
+       ENDDO
+    ENDIF
+
+    write(6,*) k, " magnet misaligned "
+  END SUBROUTINE  MISALIGN_SIAMESE
 
   SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed
@@ -471,6 +532,7 @@ CONTAINS
     REAL(DP) ANGLE(3),T_GLOBAL(3)
     TYPE(MAGNET_FRAME), POINTER :: F,F0
     REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
+    TYPE(INTEGRATION_NODE),POINTER :: T
     INTEGER I
 
 
@@ -525,9 +587,6 @@ CONTAINS
 
 
 
-
-
-
        CALL COMPUTE_ENTRANCE_ANGLE(F0%ENT,F%ENT,S2%CHART%ANG_IN)
        CALL COMPUTE_ENTRANCE_ANGLE(F%EXI,F0%EXI,S2%CHART%ANG_OUT)
 
@@ -558,6 +617,12 @@ CONTAINS
 
        CALL SURVEY_NO_PATCH(S2)
 
+       IF(ASSOCIATED(S2%T1)) THEN
+          IF(ASSOCIATED(S2%T1%A)) THEN
+             CALL fill_survey_ONE_FIBRE(S2)
+          ENDIF
+       ENDIF
+
     ELSE
        W_P=0
        W_P%NC=1
@@ -565,6 +630,8 @@ CONTAINS
        WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
        CALL WRITE_E(100)
     ENDIF
+
+
   END SUBROUTINE MISALIGN_FIBRE
 
   SUBROUTINE  MAD_MISALIGN_FIBRE(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
@@ -635,6 +702,7 @@ CONTAINS
     INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
     REAL(DP) DD(3)
+    TYPE(INTEGRATION_NODE), POINTER :: T
     ! THIS ROUTINE TRANSLATE THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
     ! GLOBAL FRAME TO DEFINE D
 
@@ -664,6 +732,19 @@ CONTAINS
     ENDIF
 
     !    ENDIF
+
+    IF(ASSOCIATED(R%T1)) THEN
+       IF(ASSOCIATED(R%T1%A)) THEN
+          T=>P%T1
+          DO WHILE(.NOT.ASSOCIATED(R%T2,T))
+             CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
+             CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
+             T=>T%NEXT
+          ENDDO
+          CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
+          CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
+       ENDIF
+    ENDIF
 
 
   END SUBROUTINE TRANSLATE_Fibre
@@ -721,8 +802,8 @@ CONTAINS
     INTEGER IORDER
     INTEGER, OPTIONAL :: ORDER
     REAL(DP), OPTIONAL, INTENT(IN):: BASIS(3,3)
-    real(dp) basist(3,3)
-
+    real(dp) basist(3,3),D(3)
+    TYPE(INTEGRATION_NODE), POINTER :: T
     OMEGAT=OMEGA
     P=>R
     IORDER=1
@@ -749,6 +830,22 @@ CONTAINS
     ENDIF
     !    ENDIF
 
+    IF(ASSOCIATED(R%T1)) THEN
+       IF(ASSOCIATED(R%T1%A)) THEN
+          T=>R%T1
+          DO WHILE(.NOT.ASSOCIATED(R%T2,T))
+             D=T%A-OMEGAT
+             CALL GEO_ROT(T%ENT,D,ANG,IORDER,BASIST)
+             CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
+             T%A=OMEGAT+D
+             T=>T%NEXT
+          ENDDO
+          D=T%A-OMEGAT
+          CALL GEO_ROT(T%ENT,D,ANG,IORDER,BASIST)
+          CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
+          T%A=OMEGAT+D
+       ENDIF
+    ENDIF
 
   END SUBROUTINE ROTATE_FIBRE
 
@@ -1052,9 +1149,9 @@ CONTAINS
     TYPE (FIBRE), POINTER :: C
     LOGICAL(LP) DONEIT
     LOGICAL(LP) :: DONEITT=.TRUE.
+    INTEGER I   !  TGV
     NULLIFY(C)
-
-    CALL LINE_L(R1,DONEIT)
+    !    CALL LINE_L(R1,DONEIT)  !  TGV
 
     IF(ASSOCIATED(R2%N)) CALL KILL(R2)
     CALL SET_UP(R2)
@@ -1067,7 +1164,8 @@ CONTAINS
     R2%HARMONIC_NUMBER=R1%HARMONIC_NUMBER
     !    if(associated(r1%parent_universe)) R2%parent_universe=> r1%parent_universe
     C=> R1%START
-    DO WHILE(ASSOCIATED(C))
+    !    DO WHILE(ASSOCIATED(C))  !  TGV
+    DO I=1,R1%N
        CALL APPEND(R2,C)
        C=>C%NEXT
     ENDDO
@@ -1076,7 +1174,7 @@ CONTAINS
 
     R2%CLOSED=R1%CLOSED
     CALL RING_L(R2,DONEITT)
-    CALL RING_L(R1,DONEIT)
+    !   CALL RING_L(R1,DONEIT)  !  TGV
 
   END SUBROUTINE COPY_LAYOUT
 
@@ -1091,7 +1189,7 @@ CONTAINS
     INTEGER K
     NULLIFY(C)
 
-    CALL LINE_L(R1,DONEIT)
+    !    CALL LINE_L(R1,DONEIT)   !TGV
 
 
     IF(ASSOCIATED(R2%N)) CALL KILL(R2)
@@ -1106,19 +1204,20 @@ CONTAINS
 
     CALL MOVE_TO(R1,C,I)
     K=I
-    DO WHILE(ASSOCIATED(C).AND.K<=J)
+    !    DO WHILE(ASSOCIATED(C).AND.K<=J) !TGV
+    DO K=I,J
        CALL APPEND(R2,C)
        !    CALL APPEND(R2,C%MAG)
        !    CALL EQUAL(R2%END%CHART,C%CHART)
        C=>C%NEXT
-       K=K+1
+       !       K=K+1  !TGV
     ENDDO
     R2%LASTPOS=R2%N
     R2%LAST=>R2%END
 
     R2%CLOSED=R1%CLOSED
     CALL RING_L(R2,DONEITT)
-    CALL RING_L(R1,DONEIT)
+    !   CALL RING_L(R1,DONEIT) !TGV
 
   END SUBROUTINE COPY_LAYOUT_IJ
 
@@ -1139,19 +1238,20 @@ CONTAINS
     TYPE(LAYOUT),INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
     LOGICAL(LP) DONEIT
+    INTEGER I
     c_%np_pol=0
     NULLIFY(C)
 
-    CALL LINE_L(R,DONEIT)
+    !    CALL LINE_L(R,DONEIT)  ! TGV
 
     C=>R%START
-
-    DO WHILE(ASSOCIATED(C))
+    DO I=1,R%N
+       !    DO WHILE(ASSOCIATED(C))  ! TGV
        if(mfpolbloc/=0)  call ELp_POL_print(C%MAGP)
        CALL RESET31(C%MAGP)
        C=>C%NEXT
     ENDDO
-    CALL RING_L(R,DONEIT)
+    !    CALL RING_L(R,DONEIT)  ! TGV
   END       SUBROUTINE KILL_PARA_L
 
   SUBROUTINE  FIBRE_POL(S2,S1)    !  SET POLYMORPH IN A FIBRE UNCONDITIONALLY
@@ -1175,18 +1275,20 @@ CONTAINS
 
     TYPE (FIBRE), POINTER :: C
     LOGICAL(LP) DONEIT
+    INTEGER I
 
     NULLIFY(C)
-    CALL LINE_L(R,DONEIT)
+    !    CALL LINE_L(R,DONEIT)  ! TGV
     C=>R%START
 
-    DO WHILE(ASSOCIATED(C))
+    DO I=1,R%N
+       !    DO WHILE(ASSOCIATED(C))  ! TGV
        !       IF(.NOT.ASSOCIATED(C%PARENT_MAG)) THEN
        C%MAGP=B
        !       ENDIF
        C=>C%NEXT
     ENDDO
-    CALL RING_L(R,DONEIT)
+    !    CALL RING_L(R,DONEIT)
 
 
   END SUBROUTINE SCAN_FOR_POLYMORPHS
@@ -1196,17 +1298,20 @@ CONTAINS
     TYPE(LAYOUT), INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
     LOGICAL(LP) DONEIT
+    INTEGER I
+
     NULLIFY(C)
-    CALL LINE_L(R,DONEIT)
+    !    CALL LINE_L(R,DONEIT)  ! TGV
 
     C=>R%START
-    DO   WHILE(ASSOCIATED(C))
+    DO I=1,R%N
+       !    DO   WHILE(ASSOCIATED(C))  ! TGV
        !       IF(.NOT.ASSOCIATED(C%PARENT_MAG)) CALL COPY(C%MAG,C%MAGP)
        CALL COPY(C%MAG,C%MAGP)
        C=>C%NEXT
     ENDDO
 
-    CALL RING_L(R,DONEIT)
+    !    CALL RING_L(R,DONEIT)  ! TGV
 
   END SUBROUTINE EL_TO_ELP_L
 
@@ -1215,22 +1320,262 @@ CONTAINS
     TYPE(LAYOUT), INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
     LOGICAL(LP) DONEIT
+    INTEGER I
     NULLIFY(C)
 
-    CALL LINE_L(R,DONEIT)
+    !    CALL LINE_L(R,DONEIT) !  ! TGV
     C=>R%START
-    DO   WHILE(ASSOCIATED(C))
-
+    !    DO   WHILE(ASSOCIATED(C))  ! TGV
+    DO I=1,R%N
        !       IF(.NOT.ASSOCIATED(C%PARENT_MAG)) CALL COPY(C%MAGP,C%MAG)
        CALL COPY(C%MAGP,C%MAG)
 
        C=>C%NEXT
     ENDDO
 
-    CALL RING_L(R,DONEIT)
+    !    CALL RING_L(R,DONEIT)  ! TGV
   END SUBROUTINE ELP_TO_EL_L
 
 
+  SUBROUTINE fill_survey_ONE_FIBRE(R)
+    ! THIS SUBROUTINE ALLOCATES NODE FRAMES IF NEEDED
+    ! IT SURVEYS THE NODES USING THE OLD REAL WORMS
+    ! SHOULD BE CALLED AFTER MISALIGNMENTS OR MOVING PART OF LATTICE
+
+    IMPLICIT NONE
+    type(FIBRE),target:: r
+    type(fibre), pointer ::c
+    type(INTEGRATION_NODE), pointer ::t
+    type(worm) vers
+    integer my_start,ic,j
+    real(dp) x(6),ent(3,3),a(3)
+    INTEGER, TARGET :: CHARGE
+    LOGICAL(LP) APER
+
+    aper=APERTURE_FLAG
+    APERTURE_FLAG=.FALSE.
+
+
+    IF(ASSOCIATED(R%PARENT_LAYOUT)) THEN
+       CHARGE=R%PARENT_LAYOUT%CHARGE
+    ELSE
+       CHARGE=1
+    ENDIF
+
+
+    C=>R
+
+    CALL ALLOC(vers,r)
+
+    CALL XFRAME(vers%E,C%chart%f%ent,C%chart%f%A,-7)  ! initializes the survey part of worm
+    vers%E%L(-1)=0.d0 !Starts beam line at z=0   fake distance along ld for cheap work
+
+    !    do k=1,r%n
+    x=zero
+    CALL TRACK_FIBRE_RR(C,x,default,CHARGE,vers)
+
+    t=>c%t1
+    j=-6
+    call gMID(vers,x,j)
+    call G_FRAME(vers%e,ENT,A,j)
+    t%ent=ent
+    t%a=a
+
+    t=>t%next
+    if(t%cas/=case1) then
+       write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
+       stop 665
+    endif
+    j=vers%POS(2)
+    call gMID(vers,x,j)
+    call G_FRAME(vers%e,ENT,A,j)
+    t%ent=ent
+    t%a=a
+    t%previous%exi=ent
+    t%previous%b=a
+    t=>t%next
+    ic=0
+    DO J=vers%POS(2)+1,vers%POS(3)-1     ! pos(2)+1 to pos(3)-1 inside the magnet
+
+       ic=ic+1
+
+       call gMID(vers,x,j)
+       call G_FRAME(vers%e,ENT,A,j)
+
+       if(j/=vers%POS(2)+1) then
+          t%previous%exi=ent
+          t%previous%b=a
+          if(t%previous%cas/=case0) then
+             write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%previous%cas
+             stop 666
+          endif
+       else
+          t%previous%exi=ent
+          t%previous%b=a
+          if(t%previous%cas/=case1) then
+             write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%previous%cas
+             stop 664
+          endif
+       endif
+
+       if(j/=vers%POS(3)-1) then
+          t%ent=ent
+          t%a=a
+          if(t%cas/=case0) then
+             write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
+             stop 666
+          endif
+       else
+          t%ent=ent
+          t%a=a
+          if(t%cas/=case2) then
+             write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
+             write(6,*)t%POS,T%PARENT_FIBRE%MAG%NAME
+             write(6,*)T%PARENT_FIBRE%T1%POS,T%PARENT_FIBRE%T2%POS
+             stop 668
+          endif
+       endif
+
+
+
+       t=>t%next
+    enddo
+    j=vers%POS(3)
+    call gMID(vers,x,j)
+    call G_FRAME(vers%e,ENT,A,j)
+    t%previous%exi=ent
+    t%previous%b=a
+    t%ent=ent
+    t%a=a
+    if(t%previous%cas/=case2) then
+       write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
+       stop 669
+    endif
+    !      t=>t%next
+
+    j=vers%nst
+    call gMID(vers,x,j)
+    call G_FRAME(vers%e,ENT,A,j)
+
+    t%exi=ent
+    t%b=a
+
+    if(t%cas/=casep2) then
+       write(6,*)" error in fill_survey_data_in_NODE_LAYOUT",j,t%cas
+       stop 670
+    endif
+
+
+    if(ic/=c%mag%p%nst+1) then
+       write(6,*)" error in fill_survey_data_in_NODE_LAYOUT"
+       write(6,*) ic,c%mag%name,c%mag%p%nst
+       stop 888
+    endif
+    c=>c%next
+    !    enddo
+
+    CALL kill(vers)
+
+    APERTURE_FLAG=aper
+
+  end  subroutine fill_survey_ONE_FIBRE
+
+  SUBROUTINE TRACK_FIBRE_RR(C,X,K,CHARGE,X_IN)
+    implicit none
+    logical(lp) :: doneitt=.true.
+    logical(lp) :: doneitf=.false.
+    TYPE(FIBRE),TARGET,INTENT(INOUT):: C
+    real(dp), INTENT(INOUT):: X(6)
+    TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
+    INTEGER,optional, target, INTENT(IN) :: CHARGE
+    TYPE(INTERNAL_STATE), INTENT(IN) :: K
+    logical(lp) ou,patch
+    INTEGER(2) PATCHT,PATCHG,PATCHE
+    TYPE (fibre), POINTER :: CN
+    real(dp), POINTER :: P0,B0
+    REAL(DP) ENT(3,3), A(3)
+    integer,target :: charge1
+    real(dp) xp
+
+
+
+
+    IF(PRESENT(X_IN)) then
+       X_IN%F=>c ; X_IN%E%F=>C; X_IN%NST=>X_IN%E%NST;
+    endif
+
+    ! DIRECTIONAL VARIABLE
+    C%MAG%P%DIR=>C%DIR
+    if(present(charge)) then
+       C%MAG%P%CHARGE=>CHARGE
+    else
+       charge1=1
+       C%MAG%P%CHARGE=>CHARGE1
+    endif
+    !
+    !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
+    !FRONTAL PATCH
+    IF(ASSOCIATED(C%PATCH)) THEN
+       PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
+    ELSE
+       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
+    ENDIF
+    IF(PRESENT(X_IN)) then
+       CALL XMID(X_IN,X,-6)
+       X_IN%POS(1)=X_IN%nst
+    endif
+
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-5)
+
+    ! The chart frame of reference is located here implicitely
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
+
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
+    ! The magnet frame of reference is located here implicitely before misalignments
+
+    !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
+    IF(PRESENT(X_IN)) then
+       CALL XMID(X_IN,X,-1)
+       X_IN%POS(2)=X_IN%nst
+    endif
+
+    CALL TRACK(C%MAG,X,K,X_IN)
+
+    IF(PRESENT(X_IN)) then
+       CALL XMID(X_IN,X,X_IN%nst+1)
+       X_IN%POS(3)=X_IN%nst
+    endif
+
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
+    ! The magnet frame of reference is located here implicitely before misalignments
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
+
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
+
+    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
+
+    ! The CHART frame of reference is located here implicitely
+
+    IF(PRESENT(X_IN)) then
+       CALL XMID(X_IN,X,X_IN%nst+1)
+       X_IN%POS(4)=X_IN%nst
+    endif
+
+    IF(PRESENT(X_IN))  THEN
+       IF(X_IN%E%DO_SURVEY) THEN
+          CALL G_FRAME(X_IN%E,ENT,A,-7)
+          CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
+       ELSE
+          CALL SURVEY_INNER_MAG(X_IN%E)
+       ENDIF
+    ENDIF
+
+
+
+    nullify(C%MAG%P%DIR)
+    nullify(C%MAG%P%CHARGE)
+  END SUBROUTINE TRACK_FIBRE_RR
 
 
 END  MODULE        S_FAMILY

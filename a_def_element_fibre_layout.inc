@@ -9,6 +9,19 @@
 ! C++ collaboration later known as CLASSIC.
 
 
+TYPE MUL_BLOCK
+   ! stuff for setting multipole
+   real(dp) AN(NMAX),BN(NMAX)
+   INTEGER NMUL,NATURAL,ADD
+END TYPE MUL_BLOCK
+
+type work
+   real(dp) beta0,energy,kinetic,p0c,brho,gamma0I,gambet
+   real(dp) mass
+   LOGICAL(lp) rescale
+   integer power
+end type work
+
 
 TYPE INTERNAL_STATE
    integer TOTALPATH
@@ -18,12 +31,6 @@ TYPE INTERNAL_STATE
 
 END TYPE INTERNAL_STATE
 
-type work
-   real(dp) beta0,energy,kinetic,p0c,brho,gamma0I,gambet
-   real(dp) mass
-   LOGICAL(lp) rescale
-   integer power
-end type work
 
 
 TYPE POL_BLOCK
@@ -43,8 +50,6 @@ TYPE POL_BLOCK
    real(dp) SB_SOL
    ! User defined Functions
    TYPE(POL_BLOCK_sagan) sagan
-   !   TYPE(POL_BLOCK1) USER1
-   !   TYPE(POL_BLOCK2) USER2
 END TYPE POL_BLOCK
 
 TYPE POL_BLOCK_INICOND
@@ -57,30 +62,33 @@ END TYPE POL_BLOCK_INICOND
 TYPE MADX_APERTURE
    INTEGER,pointer ::  KIND   ! 1,2,3,4
    REAL(DP),pointer :: R(:)
-   REAL(DP),pointer :: X,Y
+   REAL(DP),pointer :: X,Y,DX,DY
 END TYPE MADX_APERTURE
+
+TYPE S_APERTURE
+   type(MADX_APERTURE), pointer:: APERTURE
+END TYPE S_APERTURE
+
 
 TYPE MAGNET_CHART
    type(magnet_frame), pointer:: f
    type(MADX_APERTURE), pointer:: APERTURE
+   type(S_APERTURE), pointer:: A(:)
    integer,pointer :: charge  ! propagator
    integer,pointer :: dir    ! propagator
    real(dp), POINTER :: LD,B0,LC         !
    real(dp), POINTER :: TILTD      ! INTERNAL FRAME
    real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,P0C
-   !frs     real(dp),  DIMENSION(:), POINTER :: EDGE(:)      ! INTERNAL FRAME
    real(dp),  DIMENSION(:), POINTER :: EDGE         ! INTERNAL FRAME
 
    !
-   INTEGER, POINTER :: TOTALPATH                    !
-   LOGICAL(lp), POINTER :: EXACT,RADIATION,NOCAVITY,RADIATION_NEW,spin     !       STATE
-   LOGICAL(lp), POINTER :: FRINGE,KILL_ENT_FRINGE,KILL_EXI_FRINGE,TIME, bend_fringe                  !
+   LOGICAL(lp), POINTER :: EXACT
+   LOGICAL(lp), POINTER :: KILL_ENT_FRINGE,KILL_EXI_FRINGE, bend_fringe,permFRINGE                  !
    !
    INTEGER, POINTER :: METHOD,NST                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA
    INTEGER, POINTER :: NMUL                         ! NUMBER OF MULTIPOLE
 
 END TYPE MAGNET_CHART
-
 
 TYPE tilting
    real(dp) tilt(0:nmax)
@@ -90,7 +98,7 @@ END TYPE tilting
 !   Element
 TYPE ELEMENT
    INTEGER, POINTER :: KIND
-   logical(lp), POINTER :: recut
+   logical(lp), POINTER :: recut,even
    ! common stuff to all element
    type(MAGNET_CHART), pointer :: P
    CHARACTER(nlp), POINTER ::  NAME    ! Identification
@@ -110,7 +118,7 @@ TYPE ELEMENT
    logical(lp), POINTER :: THIN
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
    !  misalignements and rotation
-   logical(lp), POINTER ::  MIS,EXACTMIS
+   logical(lp), POINTER ::  MIS
    real(dp),  DIMENSION(:), POINTER ::d,r                             !  Misalignements
    !storage  space
    !integer  twiss                                                            !
@@ -132,13 +140,10 @@ TYPE ELEMENT
    TYPE(RCOL), POINTER :: RCOL18             ! RCOLLIMATOR
    TYPE(ECOL), POINTER :: ECOL19             ! ECOLLIMATOR
    TYPE(CAV_TRAV), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
-   !   TYPE(USER1), POINTER :: U1                ! USER DEFINED
-   !   TYPE(USER2), POINTER :: U2                ! USER DEFINED
    TYPE(SAGAN), POINTER :: WI                ! USER DEFINED
-   !   TYPE(MARTIN), POINTER :: M22               ! TAYLOR MAP
    TYPE(PANCAKE), POINTER :: PA          ! GENERAL B
-   !   TYPE(layout), POINTER :: g23
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
+   type(element), pointer :: siamese
 END TYPE  ELEMENT
 
 
@@ -163,7 +168,7 @@ TYPE ELEMENTP
    logical(lp), POINTER :: THIN
 
    !  MISALIGNEMENTS AND ROTATION
-   logical(lp), POINTER ::  MIS,EXACTMIS
+   logical(lp), POINTER ::  MIS
    real(dp),  DIMENSION(:), POINTER :: D,R
 
    TYPE(MAGNET_CHART), POINTER :: P
@@ -186,24 +191,19 @@ TYPE ELEMENTP
    TYPE(RCOLP), POINTER :: RCOL18             ! RCOLLIMATOR
    TYPE(ECOLP), POINTER :: ECOL19             ! ECOLLIMATOR
    TYPE(CAV_TRAVP), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
-   !   TYPE(USER1P), POINTER :: U1                ! USER DEFINED
-   !   TYPE(USER2P), POINTER :: U2                ! USER DEFINED
    TYPE(SAGANP), POINTER :: WI                ! USER DEFINED
-   !   TYPE(MARTIN), POINTER :: M22               ! TAYLOR MAP
    TYPE(PANCAKEP), POINTER :: PA          ! GENERAL B
-   !   TYPE(layout), POINTER :: g23
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
+   type(element), pointer :: siamese
 END TYPE  ELEMENTP
 
 
 type info
-   !   character(nlp),pointer :: name
    real(sp),pointer :: s
    real(sp),pointer ::  beta(:)
    real(sp),pointer ::  fix0(:)
    real(sp),pointer ::  fix(:)
    real(sp), pointer:: pos(:)
-   !    type(madx_data), pointer :: d
 END type info
 
 TYPE FIBRE
@@ -220,7 +220,8 @@ TYPE FIBRE
    !  POINTING TO PARENT LAYOUT AND PARENT FIBRE DATA
    TYPE (LAYOUT),POINTER :: PARENT_LAYOUT
    type(info),pointer ::i
-   TYPE(INTEGRATION_NODE),POINTER :: T1,T2   ! FIRST AND LAST THIN_LENS CHILDREN CORRESPOUNDING TO PATCHES
+   TYPE(INTEGRATION_NODE),POINTER :: T1,T2   ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
+   TYPE(INTEGRATION_NODE),POINTER :: TM      ! MIDDLE INTEGRATION_NODE
    INTEGER,POINTER ::pos              ! POSITION IN LAYOUT
 
 END TYPE FIBRE
@@ -245,7 +246,20 @@ TYPE LAYOUT
    TYPE (LAYOUT), POINTER :: PREVIOUS
    type(NODE_LAYOUT), pointer :: T   !  ASSOCIATED  CHILD THIN LENS LAYOUT
    TYPE (MAD_UNIVERSE), POINTER :: parent_universe
+   TYPE(layout_array), POINTER :: DNA(:)
+   TYPE(junction_array), POINTER :: con1(:)
+   TYPE(junction_array), POINTER :: con2(:)
 END TYPE LAYOUT
+
+type layout_array
+   type(layout), pointer :: L
+   integer   :: counter
+END type layout_array
+
+type junction_array
+   type(fibre), pointer :: p
+   integer :: pos
+END type junction_array
 
 TYPE MAD_UNIVERSE             ! THE MOTHER OF ALL STRUCTURES
    INTEGER,  POINTER :: N     ! NUMBERS OF LAYOUT
@@ -270,6 +284,7 @@ TYPE INTEGRATION_NODE
    INTEGER, POINTER :: pos_in_fibre, CAS
    INTEGER, POINTER ::  pos
    real(dp), POINTER :: S(:)
+   real(dp), POINTER :: ref(:)
    real(dp), pointer :: ent(:,:),a(:)
    real(dp), pointer :: exi(:,:),b(:)
    INTEGER, POINTER :: TEAPOT_LIKE
@@ -277,12 +292,7 @@ TYPE INTEGRATION_NODE
    TYPE (INTEGRATION_NODE), POINTER :: PREVIOUS
    TYPE (NODE_LAYOUT), POINTER :: PARENT_NODE_LAYOUT
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
-   TYPE(BEAM_BEAM_NODE), POINTER :: BB
-   !  potential DAMAP attached to a thin lens
-   LOGICAL(LP),POINTER :: USE_TPSA_MAP
-   TYPE(TREE_ELEMENT), POINTER :: TPSA_MAP
-   TYPE(INTEGRATION_NODE), POINTER :: INTEGRATION_NODE_AFTER_MAP
-   real(dp), POINTER :: orbit(:)  ! USED IN MAPS
+   TYPE(EXTRA_WORK), POINTER :: WORK
 END TYPE INTEGRATION_NODE
 
 TYPE BEAM_LOCATION
@@ -339,23 +349,24 @@ TYPE ORBIT_LATTICE
    REAL(DP), pointer  ::  ORBIT_OMEGA_after
    REAL(DP), pointer  ::  freqb,freqa,voltb,volta,phasa,phasb,xs6,dxs6
    TYPE(INTERNAL_STATE),pointer :: STATE
-   ! acceleration stuff AND LOCALISATION STUFF
-   ! INTEGER, pointer  ::  NP   ! PARTICLE IN HERD
-   ! INTEGER, pointer  ::  TURN   ! PRESENT TURN NUMBER
-   ! INTEGER, pointer  ::  NV1,NV0     ! QUADRATIC RAMPING UNTIL NV1
-   ! REAL(DP), POINTER ::   DV0,DV1 ! DV0= TURN*DV1 UNTIL NV1 THEN STAYS CONSTANT UNTIL NV0
-   ! REAL(DP), POINTER ::   L_TOT !
-
 END TYPE ORBIT_LATTICE
 
 
 !  BEAM BEAM
 
 TYPE BEAM_BEAM_NODE
-   TYPE (INTEGRATION_NODE), POINTER :: NODE
    REAL(DP), POINTER :: DS
    REAL(DP), POINTER :: S
    REAL(DP), POINTER :: SX,SY,XM,YM,FK
    REAL(DP), POINTER :: BBK(:)
    integer, POINTER :: DPOS
 END TYPE BEAM_BEAM_NODE
+
+!  Additional work at node
+TYPE EXTRA_WORK
+   INTEGER, POINTER :: KIND
+   TYPE(INTEGRATION_NODE), POINTER :: NODE
+   TYPE(BEAM_BEAM_NODE), POINTER :: BB
+   TYPE(MADX_APERTURE), POINTER :: A
+   REAL(DP), POINTER :: ORB(:)
+END TYPE EXTRA_WORK

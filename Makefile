@@ -85,10 +85,10 @@ endif
 default: madx
 
 # dependencies of madxpf which combines the C-code
-madxp.o: madxp.c madxn.c aperture.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
+madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
 
-madxpf.o: madxp.c madxn.c aperture.c madxu.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
+madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
 
 
@@ -130,8 +130,8 @@ Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
 Sg_sagan_wiggler.o: Sf_def_all_kinds.o Sg_sagan_wiggler.f90
 Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
 Si_def_element.o: Sh_def_kind.o Si_def_element.f90
-Sk_link_list.o: Sk_link_list.f90
-Sl_family.o: Si_def_element.o Sk_link_list.o Sl_family.f90
+Sk_link_list.o: Si_def_element.o Sk_link_list.f90
+Sl_family.o: Sk_link_list.o Sl_family.f90
 Sm_tracking.o: Sl_family.o Sm_tracking.f90
 Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
 Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
@@ -142,7 +142,8 @@ Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
 Sqa_beam_beam_ptc.o: Sq_orbit_ptc.o Sqa_beam_beam_ptc.f90
 Sqb_accel_ptc.o: Sqa_beam_beam_ptc.o Sqb_accel_ptc.f90
 Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
-madx_ptc_module.o: Sr_spin.o madx_ptc_knobs.o madx_ptc_setcavs.o madx_ptc_module.f90 
+Sra_fitting.o: Sr_spin.o Sra_fitting.f90
+madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90 
 St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
 madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
@@ -152,8 +153,8 @@ madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
 madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
 madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
-madx_ptc_twiss.o: madx_ptc_module.o  madx_ptc_setcavs.o  madx_ptc_distrib.o madx_ptc_knobs.o madx_ptc_twiss.f90
-madx_ptc_distrib.o: Sp_keywords.o madx_ptc_distrib.f90
+madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_twiss.f90
+madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.f90
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \

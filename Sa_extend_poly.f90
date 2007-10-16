@@ -120,7 +120,10 @@ CONTAINS
   REAL(DP) FUNCTION  SINEHX_X(X) ! REPLACES SINH(X)/X
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
-    IF(.NOT.CHECK_STABLE) return
+    IF(.NOT.c_%CHECK_STABLE) then
+       sinehx_x=one
+       return
+    endif
 
     IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
        SINEHX_X=ZERO
@@ -128,12 +131,11 @@ CONTAINS
     ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
        sinehx_x = sinhx_x(x)
     ELSE      !  IF X IS NOT A NUMBER
-       sinehx_x=ZERO
+       sinehx_x=one
        CHECK_STABLE=.FALSE.
     ENDIF
 
   END FUNCTION SINEHX_X
-
 
 
   ! Some polymorphism

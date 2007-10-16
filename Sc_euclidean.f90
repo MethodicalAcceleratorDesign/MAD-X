@@ -190,7 +190,7 @@ CONTAINS
           X(6)=X(6)+A(3)*(one+X(5))/PZ
        endif
     ELSE
-       if(ctime) then
+       if(ctime) then     ! THIS IS SIXTRACK HERE
           PZ=ROOT(one+two*X(5)/b+x(5)**2)
           X(1)=X(1)+A(3)*X(2)/pz
           X(3)=X(3)+A(3)*X(4)/pz
@@ -380,21 +380,21 @@ CONTAINS
     real(dp),INTENT(IN):: A
     LOGICAL(lp),INTENT(IN):: EXACT
 
-    IF(EXACT) THEN
-       XN(1)=COS(A)*X(1)+SIN(A)*X(3)
-       XN(3)=COS(A)*X(3)-SIN(A)*X(1)
-       XN(2)=COS(A)*X(2)+SIN(A)*X(4)
-       XN(4)=COS(A)*X(4)-SIN(A)*X(2)
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(4)=XN(4)
-    ELSE
-       X(1)=X(1)+A*X(3)
-       X(4)=X(4)-A*X(2)
-       X(2)=X(2)+A*X(4)
-       X(3)=X(3)-A*X(1)
-    ENDIF
+    !    IF(EXACT) THEN
+    XN(1)=COS(A)*X(1)+SIN(A)*X(3)
+    XN(3)=COS(A)*X(3)-SIN(A)*X(1)
+    XN(2)=COS(A)*X(2)+SIN(A)*X(4)
+    XN(4)=COS(A)*X(4)-SIN(A)*X(2)
+    X(1)=XN(1)
+    X(2)=XN(2)
+    X(3)=XN(3)
+    X(4)=XN(4)
+    !    ELSE
+    !       X(1)=X(1)+A*X(3)
+    !       X(4)=X(4)-A*X(2)
+    !       X(2)=X(2)+A*X(4)
+    !       X(3)=X(3)-A*X(1)
+    !    ENDIF
 
   END SUBROUTINE ROT_XYR
 
@@ -405,23 +405,23 @@ CONTAINS
     real(dp),INTENT(IN):: A
     LOGICAL(lp),INTENT(IN):: EXACT
 
-    IF(EXACT) THEN
-       CALL ALLOC(XN,4)
-       XN(1)=COS(A)*X(1)+SIN(A)*X(3)
-       XN(3)=COS(A)*X(3)-SIN(A)*X(1)
-       XN(2)=COS(A)*X(2)+SIN(A)*X(4)
-       XN(4)=COS(A)*X(4)-SIN(A)*X(2)
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(4)=XN(4)
-       CALL KILL(XN,4)
-    ELSE
-       X(1)=X(1)+A*X(3)
-       X(4)=X(4)-A*X(2)
-       X(2)=X(2)+A*X(4)
-       X(3)=X(3)-A*X(1)
-    ENDIF
+    !    IF(EXACT) THEN
+    CALL ALLOC(XN,4)
+    XN(1)=COS(A)*X(1)+SIN(A)*X(3)
+    XN(3)=COS(A)*X(3)-SIN(A)*X(1)
+    XN(2)=COS(A)*X(2)+SIN(A)*X(4)
+    XN(4)=COS(A)*X(4)-SIN(A)*X(2)
+    X(1)=XN(1)
+    X(2)=XN(2)
+    X(3)=XN(3)
+    X(4)=XN(4)
+    CALL KILL(XN,4)
+    !    ELSE
+    !       X(1)=X(1)+A*X(3)
+    !       X(4)=X(4)-A*X(2)
+    !       X(2)=X(2)+A*X(4)
+    !       X(3)=X(3)-A*X(1)
+    !    ENDIF
   END SUBROUTINE ROT_XYP
 
   SUBROUTINE ROT_XYP_P(A,X,EXACT)
@@ -431,23 +431,23 @@ CONTAINS
     TYPE(REAL_8) XN(4)
     LOGICAL(lp),INTENT(IN):: EXACT
 
-    IF(EXACT) THEN
-       CALL ALLOC(XN,4)
-       XN(1)=COS(A)*X(1)+SIN(A)*X(3)
-       XN(3)=COS(A)*X(3)-SIN(A)*X(1)
-       XN(2)=COS(A)*X(2)+SIN(A)*X(4)
-       XN(4)=COS(A)*X(4)-SIN(A)*X(2)
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(4)=XN(4)
-       CALL KILL(XN,4)
-    ELSE
-       X(1)=X(1)+A*X(3)
-       X(4)=X(4)-A*X(2)
-       X(2)=X(2)+A*X(4)
-       X(3)=X(3)-A*X(1)
-    ENDIF
+    !    IF(EXACT) THEN
+    CALL ALLOC(XN,4)
+    XN(1)=COS(A)*X(1)+SIN(A)*X(3)
+    XN(3)=COS(A)*X(3)-SIN(A)*X(1)
+    XN(2)=COS(A)*X(2)+SIN(A)*X(4)
+    XN(4)=COS(A)*X(4)-SIN(A)*X(2)
+    X(1)=XN(1)
+    X(2)=XN(2)
+    X(3)=XN(3)
+    X(4)=XN(4)
+    CALL KILL(XN,4)
+    !    ELSE
+    !       X(1)=X(1)+A*X(3)
+    !       X(4)=X(4)-A*X(2)
+    !       X(2)=X(2)+A*X(4)
+    !       X(3)=X(3)-A*X(1)
+    !    ENDIF
   END SUBROUTINE ROT_XYP_P
 
   SUBROUTINE ROT_XYS(A,Y,EXACT)
@@ -460,24 +460,24 @@ CONTAINS
 
     CALL ALLOC(X,6)
     X=Y
-    IF(EXACT) THEN
-       CALL ALLOC(XN,4)
-       XN(1)=COS(A)*X(1)+SIN(A)*X(3)
-       XN(3)=COS(A)*X(3)-SIN(A)*X(1)
-       XN(2)=COS(A)*X(2)+SIN(A)*X(4)
-       XN(4)=COS(A)*X(4)-SIN(A)*X(2)
+    !    IF(EXACT) THEN
+    CALL ALLOC(XN,4)
+    XN(1)=COS(A)*X(1)+SIN(A)*X(3)
+    XN(3)=COS(A)*X(3)-SIN(A)*X(1)
+    XN(2)=COS(A)*X(2)+SIN(A)*X(4)
+    XN(4)=COS(A)*X(4)-SIN(A)*X(2)
 
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(4)=XN(4)
-       CALL KILL(XN,4)
-    ELSE
-       X(1)=X(1)+A*X(3)
-       X(4)=X(4)-A*X(2)
-       X(2)=X(2)+A*X(4)
-       X(3)=X(3)-A*X(1)
-    ENDIF
+    X(1)=XN(1)
+    X(2)=XN(2)
+    X(3)=XN(3)
+    X(4)=XN(4)
+    CALL KILL(XN,4)
+    !    ELSE
+    !       X(1)=X(1)+A*X(3)
+    !       X(4)=X(4)-A*X(2)
+    !       X(2)=X(2)+A*X(4)
+    !       X(3)=X(3)-A*X(1)
+    !    ENDIF
     Y=X
     CALL KILL(X,6)
 
@@ -493,24 +493,24 @@ CONTAINS
 
     CALL ALLOC(X,6)
     X=Y
-    IF(EXACT) THEN
-       CALL ALLOC(XN,4)
-       XN(1)=COS(A)*X(1)+SIN(A)*X(3)
-       XN(3)=COS(A)*X(3)-SIN(A)*X(1)
-       XN(2)=COS(A)*X(2)+SIN(A)*X(4)
-       XN(4)=COS(A)*X(4)-SIN(A)*X(2)
+    !    IF(EXACT) THEN
+    CALL ALLOC(XN,4)
+    XN(1)=COS(A)*X(1)+SIN(A)*X(3)
+    XN(3)=COS(A)*X(3)-SIN(A)*X(1)
+    XN(2)=COS(A)*X(2)+SIN(A)*X(4)
+    XN(4)=COS(A)*X(4)-SIN(A)*X(2)
 
-       X(1)=XN(1)
-       X(2)=XN(2)
-       X(3)=XN(3)
-       X(4)=XN(4)
-       CALL KILL(XN,4)
-    ELSE
-       X(1)=X(1)+A*X(3)
-       X(4)=X(4)-A*X(2)
-       X(2)=X(2)+A*X(4)
-       X(3)=X(3)-A*X(1)
-    ENDIF
+    X(1)=XN(1)
+    X(2)=XN(2)
+    X(3)=XN(3)
+    X(4)=XN(4)
+    CALL KILL(XN,4)
+    !    ELSE
+    !       X(1)=X(1)+A*X(3)
+    !       X(4)=X(4)-A*X(2)
+    !       X(2)=X(2)+A*X(4)
+    !       X(3)=X(3)-A*X(1)
+    !    ENDIF
     Y=X
     CALL KILL(X,6)
 
@@ -544,7 +544,7 @@ CONTAINS
        X(3)=XN(3)
        X(6)=XN(6)
     ELSE
-       if(ctime) then
+       if(ctime) then   ! SIXTRACK
           PZ=ROOT(one+two*x(5)/b+X(5)**2)
           X(2)=X(2)+A*PZ
           X(6)=X(6)+A*X(1)*(one/b+x(5))/PZ

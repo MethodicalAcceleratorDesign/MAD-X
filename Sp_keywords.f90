@@ -28,6 +28,8 @@ module madx_keywords
   END type MADX_SURVEY
 
 
+
+
 contains
 
 
@@ -150,16 +152,16 @@ contains
        BLANK=ECOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("WIGGLER        ")
        BLANK=WIGGLER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
-    CASE("TAYLORMAP      ")
-       IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
-          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
-       ELSEIF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev==' ') THEN
-          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,t=tilt.is.KEY%tiltd)
-       ELSEIF(KEY%LIST%file==' '.and.KEY%LIST%file_rev/=' ') THEN
-          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
-       ELSE
-          BLANK=TAYLOR_MAP(KEY%LIST%NAME,t=tilt.is.KEY%tiltd)
-       ENDIF
+       !    CASE("TAYLORMAP      ")
+       !       IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
+       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
+       !       ELSEIF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev==' ') THEN
+       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,t=tilt.is.KEY%tiltd)
+       !       ELSEIF(KEY%LIST%file==' '.and.KEY%LIST%file_rev/=' ') THEN
+       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
+       !       ELSE
+       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,t=tilt.is.KEY%tiltd)
+       !       ENDIF
     CASE DEFAULT
        WRITE(6,*) " "
        WRITE(6,*) " THE MAGNET"
@@ -172,6 +174,10 @@ contains
 
     BLANK%VORNAME = KEY%LIST%VORNAME
     CALL EL_Q_FOR_MADX(EL,BLANK)
+    !  added 2007.07.09
+    el%mag%parent_fibre =>el
+    el%magp%parent_fibre=>el
+    !  end of added 2007.07.09
 
 
     CALL SET_MADX_(f,f)
@@ -222,25 +228,103 @@ contains
   end subroutine zero_key
 
   !  PRINTING FIBRES FOR FLAT FILES
+  subroutine print_COMPLEX_SINGLE_STRUCTURE(L,FILENAME,LMAX0,NL)
+    implicit none
+    character(*) filename
+    integer I,MF,N,n_l,ncon1,ncon2,j
+    type(LAYOUT), TARGET :: L
+    type(LAYOUT), pointer :: CL
+    type(FIBRE), pointer :: P
+    REAL(DP),OPTIONAL :: LMAX0
+    integer,OPTIONAL :: NL
 
-  subroutine print_LAYOUT(L,FILENAME,LMAX)
+    n_l=1
+    if(present(nl)) n_l=nl
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+    IF(ASSOCIATED(L%DNA)) THEN
+       N=SIZE(L%DNA)
+       Write(mf,*) N,N_L, " Number of pointers in the DNA array pointed at layouts"
+
+       DO I=1,N
+          L%DNA(I)%L%INDEX=I
+          CALL print_LAYOUT(L%DNA(I)%L,FILENAME,LMAX0,MF)
+       ENDDO
+       !       ENDIF
+
+       !       write(mf,*) " Beam Line DNA structure "
+       !       do i=1,N
+       !        ncon1=0
+       !        ncon2=0
+       !        if(associated(L%DNA(i)%L%con1)) then
+       !         ncon1=size(L%DNA(i)%L%con1)
+       !         ncon2=size(L%DNA(i)%L%con2)
+       !          write(mf,*) ncon1,ncon2
+
+
+       !          do j=1,max(ncon1,ncon2)
+       !           if(j>ncon1) then
+       !             write(mf,*) 0, L%DNA(i)%L%con2(j)%pos
+       !            elseif(j>ncon2) then
+       !             write(mf,*)  L%DNA(i)%L%con1(j)%pos,0
+       !            else
+       !             write(mf,*)  L%DNA(i)%L%con1(j)%pos, L%DNA(i)%L%con2(j)%pos
+       !           endif
+       !          enddo
+       !        else
+       !          write(mf,*) ncon1,ncon2
+       !        endif
+       !      enddo
+
+       !       write(mf,*) " End of Beam Line DNA structure "
+
+    ENDIF
+
+    CL=>L
+
+
+    if(n_l>0) then
+       do i=1,n_l
+          write(mf,*) " Beam Line DNA structure "
+          write(mf,*) " End of Beam Line DNA structure "
+          CALL print_LAYOUT(CL,FILENAME,LMAX0,MF)
+          CL=>CL%NEXT
+       enddo
+    else
+       CALL print_LAYOUT(L,FILENAME,LMAX0,MF)
+    endif
+
+    CLOSE(MF)
+  END SUBROUTINE print_COMPLEX_SINGLE_STRUCTURE
+
+  subroutine print_LAYOUT(L,FILENAME,LMAX0,MFF)
     implicit none
     character(*) filename
     integer I,MF
+    INTEGER, OPTIONAL :: MFF
     type(LAYOUT), TARGET :: L
     type(FIBRE), pointer :: P
-    REAL(DP),OPTIONAL :: LMAX
+    REAL(DP),OPTIONAL :: LMAX0
     character*255 line
 
-    call kanalnummer(mf)
-    open(unit=mf,file=filename)
+    IF(PRESENT(MFF)) THEN
+       MF=MFF
+    ELSE
+       call kanalnummer(mf)
+       open(unit=mf,file=filename)
+    ENDIF
 
-    IF(PRESENT(LMAX)) THEN
-       WRITE(MF,*) L%N, LMAX, " NUMBER OF FIBRES AND L_MAX  "
+    IF(PRESENT(LMAX0)) THEN
+       WRITE(MF,*) L%N, LMAX0, " NUMBER OF FIBRES AND L_MAX  "
     ELSE
        WRITE(MF,*) L%N, 0, " NUMBER OF FIBRES AND L_MAX  "
     ENDIF
-    write(MF,*) " $$$$$$$ GLOBAL DATA $$$$$$$$$$"
+    if(l%name(1:1)/=' ') then
+       write(MF,'(a17,a16)') " GLOBAL DATA FOR ",l%name
+    else
+       write(MF,*) " $$$$$$$$$ GLOBAL DATA  $$$$$$$$$"
+    endif
+
     write(MF,*) l%mass,L%START%mag%p%p0c, "MASS, P0C"
     write(MF,*) phase0,stoch_in_rec,l%charge, " PHASE0, STOCH_IN_REC, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
@@ -260,7 +344,7 @@ contains
        P=>P%NEXT
     ENDDO
 
-    CLOSE(MF)
+    IF(.NOT.PRESENT(MFF)) CLOSE(MF)
 
   END subroutine print_LAYOUT
 
@@ -295,14 +379,15 @@ contains
     CLOSE(MF)
   END subroutine READ_LAYOUT
 
-  subroutine READ_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX)
+  subroutine READ_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
     implicit none
     character(*) filename
     integer mf,I,N
+    integer, optional :: mf1
     type(LAYOUT), TARGET :: L
     type(FIBRE), pointer :: P
     LOGICAL(LP), OPTIONAL :: RING
-    REAL(DP), OPTIONAL :: LMAX
+    REAL(DP), OPTIONAL :: LMAX0
     LOGICAL(LP) RING_IT,doneit
     character*120 line
     real(dp) p0c,MASSF
@@ -312,15 +397,24 @@ contains
 
     IF(PRESENT(RING)) RING_IT=RING
 
-    call kanalnummer(mf)
-    open(unit=mf,file=filename,status='OLD',err=2001)
+    if(present(mf1)) then
+       mf=mf1
+    else
+       call kanalnummer(mf)
+       open(unit=mf,file=filename,status='OLD',err=2001)
+    endif
 
-    IF(PRESENT(LMAX)) then
-       READ(MF,*) N,LMAX
+    IF(PRESENT(LMAX0)) then
+       READ(MF,*) N,LMAX0
     ELSE
        READ(MF,*) N
     ENDIF
     read(MF,'(a120)') line
+    call context(line)
+
+    if(index(line,"FOR")/=0) then
+       l%name=line(index(line,"FOR")+3:index(line,"FOR")+2+nlp)
+    endif
     read(MF,*) MASSF,p0c
     read(MF,*) phase0,stoch_in_rec,l%charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
@@ -344,7 +438,7 @@ contains
        CALL COPY(L%END%MAG,L%END%MAGP)
     ENDDO
 
-    CLOSE(MF)
+    if(.not.present(mf1)) CLOSE(MF)
 
     L%closed=RING_IT
 
@@ -358,19 +452,49 @@ contains
 
   END subroutine READ_INTO_VIRGIN_LAYOUT
 
-
-  subroutine READ_AND_APPEND_VIRGIN_LAYOUT(U,filename,RING)
+  subroutine READ_AND_APPEND_VIRGIN_general(U,filename,RING,LMAX0)
     implicit none
     character(*) filename
-    integer mf,I,N
+    integer  mf
     type(MAD_UNIVERSE), TARGET :: U
-    type(FIBRE), pointer :: P
     LOGICAL(LP), OPTIONAL :: RING
+    REAL(DP), OPTIONAL :: LMAX0
+    character*120 line
+    integer res
+    res=0
+    call kanalnummer(mf)
+    open(unit=mf,file=filename,status='OLD',err=2001)
+    read(mf,'(a120)') line
+    res=INDEX (line, "DNA")
+    if(res/=0) res=1
+    close(mf)
+
+    if(res==1) then
+       call read_COMPLEX_SINGLE_STRUCTURE(U,filename,RING,LMAX0)
+    else
+       call APPEND_EMPTY_LAYOUT(U)
+
+       CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0)
+    endif
+    return
+2001 continue
+
+    Write(6,*) " File ",filename(1:len_trim(filename)) ," does not exist "
+
+  END subroutine READ_AND_APPEND_VIRGIN_general
+
+  subroutine READ_AND_APPEND_VIRGIN_LAYOUT(U,filename,RING,LMAX0,mf)
+    implicit none
+    character(*) filename
+    integer,optional:: mf
+    type(MAD_UNIVERSE), TARGET :: U
+    LOGICAL(LP), OPTIONAL :: RING
+    REAL(DP), OPTIONAL :: LMAX0
 
 
     call APPEND_EMPTY_LAYOUT(U)
 
-    CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING)
+    CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0=LMAX0,mf1=MF)
 
   END subroutine READ_AND_APPEND_VIRGIN_LAYOUT
 
@@ -380,7 +504,9 @@ contains
     type(FIBRE), pointer :: m
 
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
-    WRITE(MF,'(A11,I4)') " DIRECTION ", M%DIR
+    WRITE(MF,'(A11,4(I4,1x))') " DIRECTION ", M%DIR, &
+         m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
+         m%mag%parent_fibre%parent_layout%n
     CALL print_chart(m%CHART,mf)
     CALL print_PATCH(m%PATCH,mf)
     CALL print_element(M%MAG,mf)
@@ -401,6 +527,21 @@ contains
     READ(MF,*) LINE
 
   END subroutine READ_FIBRE
+
+  subroutine READ_FIBRE_2_lines(mf,DIR,index,pos,n)
+    implicit none
+    integer mf,I
+    character*255 line
+    integer DIR,index,pos,n
+    READ(MF,*) LINE
+
+    READ(MF,'(A11,4(I4,1x))') LINE(1:11),DIR,index,pos,n
+    !    CALL READ_chart(m%CHART,mf)
+    !    CALL READ_PATCH(m%PATCH,mf)
+    !    CALL READ_element(M%MAG,mf)
+    !    READ(MF,*) LINE
+
+  END subroutine READ_FIBRE_2_lines
 
   subroutine print_PATCH(m,mf)
     implicit none
@@ -462,6 +603,26 @@ contains
     READ(mf,*) LINE
   end subroutine READ_chart
 
+
+  subroutine READ_chart_fake(mf)
+    implicit none
+    integer mf,I
+    character*60 line
+    type(magnet_frame), pointer :: f
+    real(dp) d1(3),d2(3)
+
+    call alloc(f)
+
+    READ(mf,*) LINE
+
+    CALL READ_magnet_frame(F,mf)
+    READ(MF,*) d1,d2
+    READ(MF,*) d1,d2
+    READ(mf,*) LINE
+    call kill(f)
+  end subroutine READ_chart_fake
+
+
   subroutine print_element(m,mf)
     implicit none
     integer mf,I
@@ -474,7 +635,7 @@ contains
     ELSE
        WRITE(MF,*) M%KIND,M%NAME,' ',M%VORNAME
     ENDIF
-    WRITE(MF,*) M%L,M%PERMFRINGE,M%MIS,M%EXACTMIS, " L,PERMFRINGE,MIS,EXACTMIS "
+    WRITE(MF,*) M%L,M%PERMFRINGE,M%MIS , " L,PERMFRINGE,MIS "
     WRITE(LINE,*) M%FINT,M%HGAP,M%H1,M%H2, " FINT,HGAP,H1,H2 "
     WRITE(MF,'(A255)') LINE
     WRITE(LINE,*) M%R,M%D , " r(3), d(3) "
@@ -744,8 +905,6 @@ contains
 
   end subroutine read_pancake_field
 
-
-
   subroutine READ_element(m,mf)
     implicit none
     integer mf,I
@@ -760,7 +919,7 @@ contains
     CALL CONTEXT(M%VORNAME);
     IF(M%VORNAME(1:9)=='NOVORNAME') M%VORNAME=' '
 
-    READ(MF,*) M%L,M%PERMFRINGE,M%MIS,M%EXACTMIS
+    READ(MF,*) M%L,M%PERMFRINGE,M%MIS  !,M%EXACTMIS
     READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
     READ(MF,*) M%R,M%D
     READ(MF,*) LINE
@@ -812,6 +971,80 @@ contains
 
   end subroutine READ_element
 
+
+  subroutine READ_fake_element(mf)
+    implicit none
+    integer mf,I
+    type(fibre),pointer ::  f
+    type(element),pointer ::  m
+    character*120 line
+    CHARACTER*21 SOL
+    REAL(DP) B_SOL
+    nullify(m)
+    call alloc(f)
+    m=>f%mag
+    !    m=0
+    READ(MF,*) LINE
+    READ(MF,*) M%KIND,M%NAME,M%VORNAME
+    CALL CONTEXT(M%NAME);
+    CALL CONTEXT(M%VORNAME);
+    IF(M%VORNAME(1:9)=='NOVORNAME') M%VORNAME=' '
+
+    READ(MF,*) M%L,M%PERMFRINGE,M%MIS   !,M%EXACTMIS
+    READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
+    READ(MF,*) M%R,M%D
+    READ(MF,*) LINE
+    CALL CONTEXT(LINE)
+    IF(LINE(1:1)=='C') THEN
+       IF(.NOT.ASSOCIATED(M%VOLT)) ALLOCATE(M%VOLT)
+       IF(.NOT.ASSOCIATED(M%FREQ)) ALLOCATE(M%FREQ)
+       IF(.NOT.ASSOCIATED(M%PHAS)) ALLOCATE(M%PHAS)
+       IF(.NOT.ASSOCIATED(M%DELTA_E))ALLOCATE(M%DELTA_E)
+       IF(.NOT.ASSOCIATED(M%LAG))   ALLOCATE(M%LAG)
+       IF(.NOT.ASSOCIATED(M%THIN))  ALLOCATE(M%THIN)
+       READ(MF,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN
+    ELSEIF(LINE(1:1)=='E') THEN
+       IF(.NOT.ASSOCIATED(M%VOLT)) ALLOCATE(M%VOLT)
+       IF(.NOT.ASSOCIATED(M%PHAS)) ALLOCATE(M%PHAS)
+       READ(MF,*) M%VOLT, M%PHAS
+    ENDIF
+    READ(mf,*) SOL,B_SOL
+    CALL CONTEXT(SOL)
+    IF(SOL(1:2)=='SO') THEN
+       IF(.NOT.ASSOCIATED(M%B_SOL))ALLOCATE(M%B_SOL)
+       M%B_SOL=B_SOL
+    ENDIF
+    CALL  READ_magnet_chart(m%P,mf)
+    IF(M%P%NMUL/=0) THEN
+       IF(.NOT.ASSOCIATED(M%AN)) THEN
+          ALLOCATE(M%AN(M%P%NMUL))
+          ALLOCATE(M%BN(M%P%NMUL))
+       ELSE
+          DEALLOCATE(M%AN)
+          DEALLOCATE(M%BN)
+          ALLOCATE(M%AN(M%P%NMUL))
+          ALLOCATE(M%BN(M%P%NMUL))
+       ENDIF
+       !     write(6,*) M%KIND,M%NAME,M%VORNAME
+
+       !     write(6,*) M%P%NMUL
+       !          READ(MF,'(a120)') LINE
+       !     write(6,'(a120)') line
+       !     pause 1
+       do i=1,m%p%NMUL
+          READ(mf,*) m%bn(i),m%an(i)
+       enddo
+    endif
+    call read_specific_element(m,mf)
+
+    READ(MF,*) LINE
+
+    !          m=-1;
+    call SUPER_zero_fibre(f,-1)
+    !          deallocate(m);
+
+  end subroutine READ_fake_element
+
   subroutine print_magnet_chart(m,mf)
     implicit none
     type(magnet_chart), pointer :: m
@@ -820,7 +1053,7 @@ contains
 
     WRITE(MF,*) "MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART "
     WRITE(MF,*) M%EXACT,M%METHOD,M%NST,M%NMUL, " EXACT METHOD NST NMUL"
-    WRITE(line,*) M%LD, M%LC, M%B0, " LD LC B0"
+    WRITE(line,*) M%LD, M%LC, M%B0,' TILT= ',M%TILTD, " LD LC B0 "
     WRITE(MF,'(A200)') LINE
     WRITE(LINE,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C, " BETA0 GAMMA0I GAMBET P0C"
     WRITE(MF,'(A200)') LINE
@@ -836,11 +1069,21 @@ contains
     implicit none
     type(magnet_chart), pointer :: m
     integer mf
-    character*120 line
+    character*200 line
+    character*5 til
 
     READ(MF,*) LINE
     READ(MF,*) M%EXACT,M%METHOD,M%NST,M%NMUL
-    READ(MF,*) M%LD, M%LC, M%B0
+    READ(MF,'(A200)') LINE
+
+    if(index(line,"TILT=")/=0) then
+       READ(LINE,*) M%LD, M%LC, M%B0,til,M%tiltd
+    else
+       READ(LINE,*) M%LD, M%LC, M%B0
+       M%tiltd=zero
+    endif
+
+
     READ(MF,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C
     READ(MF,*) M%EDGE
     READ(MF,*) M%KILL_ENT_FRINGE,M%KILL_EXI_FRINGE,M%bend_fringe
@@ -953,34 +1196,455 @@ contains
     CLOSE(MF)
   END SUBROUTINE change_fibre
 
+!!!!!!!!!!  pointed at layout !!!!!!!!!!!!!!
+  subroutine read_COMPLEX_SINGLE_STRUCTURE(U,filename,RING,LMAX0)
+    implicit none
+    character(*) filename
+    integer mf,n,i,n_l,J,ncon1,ncon2,k,m,POS1,POS2
+    type(MAD_UNIVERSE), TARGET :: U
+    type(layout), pointer :: L,DNA_END
+    LOGICAL(LP), OPTIONAL :: RING
+    REAL(DP), OPTIONAL :: LMAX0
+    character*120 line
+    type(FIBRE), pointer :: P
 
-  SUBROUTINE PUT_method1_in_kind7(ring,nmul)
-    IMPLICIT NONE
-    type(layout), intent(inout):: ring
-    integer i,nmul0
-    integer, optional :: nmul
-    type(fibre) , pointer :: p
-    nmul0=1000
-    if(present(nmul))nmul0=nmul
-    p=>ring%start
-    do i=1,ring%n
-       if(p%mag%kind==kind7) then
-          if(p%mag%p%nmul<=nmul0) then
-             if(mod(p%mag%p%nst,2)==1) p%mag%p%nst=p%mag%p%nst+1
-             p%mag%p%method=1
-             p%mag%p%nst=p%mag%p%nst
-             p%magp%p%method=1
-             p%magp%p%nst=p%mag%p%nst
-             !       call add(p,1,1,0.0_dp)
+    call kanalnummer(mf)
+    open(unit=mf,file=filename,status='OLD',err=2001)
 
-             CALL SETFAMILY(p%mag)
-             CALL SETFAMILY(p%magp)
-             call GETMAT7(p%mag%T7)
-             call GETMAT7(p%magp%T7)
-          endif
-       endif
-       p=>p%next
+
+    read(mf,*) n,n_l
+
+    do i=1,n
+       call READ_AND_APPEND_VIRGIN_LAYOUT(U,filename,RING,LMAX0,mf)
+       if(i==1) L=> U%END
     enddo
-  END SUBROUTINE PUT_method1_in_kind7
+
+
+    do i=1,n_l
+       call APPEND_EMPTY_LAYOUT(U)
+       allocate(U%END%DNA(N))
+       U%END%DNA(1)%L=>L
+       U%END%DNA(1)%counter=0
+       DO J=2,N
+          U%END%DNA(J)%L=>U%END%DNA(J-1)%L%NEXT
+          U%END%DNA(j)%counter=0
+       ENDDO
+
+       read(mf,'(a120)') line
+       WRITE(6,*) I
+       WRITE(6,*) LINE
+       !       do k=1,N
+       !        read(mf,*) ncon1,ncon2
+       !        if(ncon1/=0) then
+       !          allocate(U%END%DNA(k)%L%con1(ncon1))
+       !          allocate(U%END%DNA(k)%L%con2(ncon2))
+       !          U%END%DNA(k)%L%con1(1:ncon1)%POS=0
+       !          U%END%DNA(k)%L%con2(1:ncon2)%POS=0
+       !        else
+       !          nullify(U%END%DNA(k)%L%con1)
+       !          nullify(U%END%DNA(k)%L%con2)
+       !       endif
+
+       !          do j=1,max(ncon1,ncon2)
+       !            READ(MF,*) POS1,POS2
+       !           IF(POS1/=0) U%END%DNA(k)%L%con1(J)%POS=POS1
+       !           IF(POS2/=0) U%END%DNA(k)%L%con2(J)%POS=POS2
+       !         enddo
+
+       !       enddo
+       read(mf,'(a120)') line
+
+       WRITE(6,*) I
+       WRITE(6,*) LINE
+
+
+       CALL READ_pointed_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0,mf1=MF)
+
+       !     do k=1,N
+       !      DO J=1,SIZE(U%END%DNA(k)%L%con1)
+       !        CALL MOVE_TO(U%END,P,U%END%DNA(k)%L%CON1(J)%POS)
+       !        U%END%DNA(k)%L%CON1(J)%P=>P
+       !     ENDDO
+       !     DO J=1,SIZE(U%END%DNA(k)%L%con2)
+       !       CALL MOVE_TO(U%END,P,U%END%DNA(k)%L%CON2(J)%POS)
+       !       U%END%DNA(k)%L%CON2(J)%P=>P
+       !     ENDDO
+       !    ENDDO
+
+    enddo
+
+    close(mf)
+
+
+
+    return
+2001 continue
+
+    Write(6,*) " File ",filename(1:len_trim(filename)) ," does not exist "
+
+  END subroutine read_COMPLEX_SINGLE_STRUCTURE
+
+  ! MAKES NOT SENSE BECAUSE DNA ARRAY NOT PROVIDED!
+  !  subroutine READ_pointed_AND_APPEND_VIRGIN_LAYOUT(U,filename,RING,mf)
+  !    implicit none
+  !    character(*) filename
+  !    integer,optional :: mf
+  !    type(MAD_UNIVERSE), TARGET :: U
+  !    LOGICAL(LP), OPTIONAL :: RING
+
+
+  !    call APPEND_EMPTY_LAYOUT(U)
+
+  !    CALL READ_pointed_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,mf)
+
+  !  END subroutine READ_pointed_AND_APPEND_VIRGIN_LAYOUT
+
+  subroutine READ_pointed_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
+    implicit none
+    character(*) filename
+    integer I,mf,N,DIR,index,pos,nt,kc
+    type(LAYOUT), TARGET :: L
+    type(FIBRE), pointer :: P,current
+    LOGICAL(LP), OPTIONAL :: RING
+    REAL(DP), OPTIONAL :: LMAX0
+    LOGICAL(LP) RING_IT,doneit
+    character*120 line
+    real(dp) p0c,MASSF,LMAX0t
+    type(internal_state) original
+    integer,optional :: mf1
+
+
+    RING_IT=MY_TRUE
+
+    IF(PRESENT(RING)) RING_IT=RING
+
+    if(present(mf1) ) then
+       mf=mf1
+    else
+       call kanalnummer(mf)
+       open(unit=mf,file=filename,status='OLD',err=2001)
+    endif
+
+    READ(MF,*) N,LMAX0t
+    IF(PRESENT(LMAX0)) then
+       if(LMAX0t/=zero) LMAX0=LMAX0T
+    ENDIF
+    read(MF,'(a120)') line
+    read(MF,*) MASSF,p0c
+    read(MF,*) phase0,stoch_in_rec,l%charge
+    read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
+    read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
+    read(MF,*) wedge_coeff
+    read(MF,*) MAD8_WEDGE
+    read(MF,'(a120)') line
+    original=default
+    if(allocated(s_b)) then
+       firsttime_coef=.true.
+       deallocate(s_b)
+    endif
+    L%MASS=MASSF
+    MASSF=MASSF/pmae
+    CALL MAKE_STATES(MASSF)
+    default=original
+    call Set_madx(p0c=p0c)
+    DO I=1,N
+       call  READ_FIBRE_2_lines(mf,dir,index,pos,nt)
+       call  READ_chart_fake(mf)
+       call move_to(L%DNA(index)%L,p,pos)
+       CALL APPEND_POINT(L,P)
+       current=>l%end
+       current%dir=dir
+
+       !        if(pos==1) then
+       !         if(associated(L%DNA(index)%l%con1)) then
+       !           L%DNA(index)%counter=L%DNA(index)%counter+1
+       !           kc=L%DNA(index)%counter
+       !           L%DNA(index)%l%con1(kc)%p=>current
+       !      write(6,*)  0,index,kc
+       !          endif
+       !        elseif(pos==nt) then
+       !         if(associated(L%DNA(index)%l%con2)) then
+       !           L%DNA(index)%l%con2(kc)%p=>current
+       !     !       write(6,*)  1,index,kc
+       !          endif
+       !        endif
+       CALL READ_PATCH(current%PATCH,mf)
+       call READ_fake_element(mf)
+       READ(MF,*) LINE
+       !
+       ! CALL READ_FIBRE(L%END,mf)
+       !       CALL COPY(L%END%MAG,L%END%MAGP)
+    ENDDO
+
+    if(.not.present(mf1) ) CLOSE(MF)
+
+    L%closed=RING_IT
+
+    doneit=.true.
+    call ring_l(L,doneit)
+    return
+
+2001 continue
+
+    Write(6,*) " File ",filename(1:len_trim(filename)) ," does not exist "
+
+  END subroutine READ_pointed_INTO_VIRGIN_LAYOUT
+
+!!!!  SIXTRACK FLAT FILE !!!!!
+
+  subroutine PRINT_LAYOUT_SIXTRACT(L,FILENAME)
+    implicit none
+    character(*) filename
+    integer I,MF,DI,nt
+    type(LAYOUT), TARGET :: L
+    type(FIBRE), pointer :: P
+    character*255 line
+    REAL(DP) D(3),ANG(3),PREC,DS
+    LOGICAL(LP) ENERGY_PATCH
+
+    P=>L%START
+    i=1
+    nt=0
+    do while(i<=l%n)
+
+       call count_PATCH_sixtrack(di,p)
+       i=i+1+DI
+       nt=nt+1
+    ENDDO
+
+
+
+    PREC=1.D-10
+    call kanalnummer(mf)
+    open(unit=mf,file=filename)
+
+    WRITE(MF,*) L%N, nt, " NUMBER OF FIBRES AND SIXTRACK NODES   "
+    if(l%name(1:1)/=' ') then
+       write(MF,'(a17,a16)') " GLOBAL DATA FOR ",l%name
+    else
+       write(MF,*) " $$$$$$$$$ GLOBAL DATA $$$$$$$$$"
+    endif
+
+    write(MF,*) l%mass,L%START%mag%p%p0c, "MASS, P0C"
+    write(MF,*) phase0,stoch_in_rec,l%charge, " PHASE0, STOCH_IN_REC, CHARGE"
+    write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
+         "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
+    write(MF,*) " $$$$$$$ END GLOBAL DATA $$$$$$$$$$"
+
+    if(.not.associated(L%t)) call make_node_layout(L)
+    CALL FILL_SURVEY_DATA_IN_NODE_LAYOUT(L)
+
+    P=>L%START
+    i=1
+    do while(i<=l%n)
+
+       CALL print_FIBRE_SIXTRACK(P,mf)
+       call FIND_PATCH_sixtrack(di,DS,P,D,ANG,ENERGY_PATCH,PREC)
+       CALL print_chart_SIXTRACK(D,ANG,DS,mf)
+       WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
+       i=i+1+DI
+    ENDDO
+
+
+  END subroutine PRINT_LAYOUT_SIXTRACT
+
+  subroutine print_FIBRE_SIXTRACK(m,mf)
+    implicit none
+    integer mf,I
+    type(FIBRE), pointer :: m
+
+    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
+    WRITE(MF,*)  M%DIR, " DIRECTION "
+    CALL print_element_SIXTRACK(M%MAG,mf)
+    !    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
+
+  END subroutine print_FIBRE_SIXTRACK
+
+  subroutine print_chart_SIXTRACK(D,ANG,DS,mf)
+    implicit none
+    integer mf,I
+    REAL(DP) D(3),ANG(3),DS
+    character*255 line
+
+    write(mf,*) " THESE ARE THE MISALIGNMENTS "
+    WRITE(LINE,*) D,DS,ANG
+    WRITE(MF,'(A255)') LINE
+    write(mf,*) " END OF THE THE MISALIGNMENTS  "
+  end subroutine print_chart_SIXTRACK
+
+
+  SUBROUTINE FIND_PATCH_sixtrack(di,DS,EL1,D,ANG,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
+    IMPLICIT NONE
+    TYPE (FIBRE), POINTER :: EL1
+    TYPE (FIBRE),POINTER :: EL2
+    REAL(DP), INTENT(INOUT) :: D(3),ANG(3)
+    REAL(DP) ENT(3,3),EXI(3,3),DS
+    REAL(DP), POINTER,DIMENSION(:)::A,B
+    LOGICAL(LP), OPTIONAL, INTENT(IN) ::  ENERGY_PATCH
+    REAL(DP), OPTIONAL, INTENT(IN) ::  PREC
+    INTEGER A_YZ,A_XZ,di
+    LOGICAL(LP) ENE,DOIT,DISCRETE
+    INTEGER LOC,I,PATCH_NEEDED
+    REAL(DP) NORM,pix(3)
+    PATCH_NEEDED=1
+    pix=zero
+    pix(1)=pi
+    di=0
+    DS=ZERO
+    EL2=>EL1%NEXT
+    do while(el2%mag%kind==kind1)
+       DS=DS+el2%mag%L
+       el2=>el2%next
+       di=di+1
+    enddo
+    DISCRETE=.FALSE.
+    LOC=1
+    ENE=.FALSE.
+    IF(PRESENT(ENERGY_PATCH)) ENE=ENERGY_PATCH
+    EXI=EL1%t2%previous%previous%EXI
+    B=>EL1%t2%previous%previous%B
+    ENT=EL2%t1%next%next%ENT
+    A=>EL2%t1%next%next%A
+    IF(EL1%DIR*EL2%DIR==1) THEN   !   1
+       IF(EL1%DIR==1) THEN
+          A_XZ=1;A_YZ=1;
+       ELSE
+          call geo_rot(exi,pix,1,basis=exi)
+          call geo_rot(ent,pix,1,basis=ent)
+          A_XZ=-1;A_YZ=-1;
+       ENDIF
+    ELSE                          !   1
+       IF(EL1%DIR==1) THEN
+          call geo_rot(ent,pix,1,basis=ent)
+          A_XZ=1;A_YZ=-1;
+       ELSE
+          call geo_rot(exi,pix,1,basis=exi)
+          A_XZ=-1;A_YZ=1;
+       ENDIF
+    ENDIF                     !   1
+
+    CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
+
+    IF(PRESENT(PREC)) THEN
+       NORM=ZERO
+       DO I=1,3
+          NORM=NORM+ABS(D(I))
+       ENDDO
+       IF(NORM<=PREC) THEN
+          D=ZERO
+          PATCH_NEEDED=PATCH_NEEDED+1
+       ENDIF
+       NORM=ZERO
+       DO I=1,3
+          NORM=NORM+ABS(ANG(I))
+       ENDDO
+       IF(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)) THEN
+          ANG=ZERO
+          PATCH_NEEDED=PATCH_NEEDED+1
+       ENDIF
+       IF(PATCH_NEEDED==3) THEN
+          PATCH_NEEDED=0
+       ELSE
+          PATCH_NEEDED=1
+       ENDIF
+    endif
+
+
+
+    DISCRETE=.false.
+    IF(ANG(1)/TWOPI<-c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(2)/TWOPI<-c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+
+    IF(DISCRETE) THEN
+       W_P=0
+       W_P%NC=1
+       W_P%FC='(2(1X,A72,/),(1X,A72))'
+       W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
+       CALL WRITE_I
+    ENDIF
+
+    EL1=>EL2
+  END SUBROUTINE FIND_PATCH_sixtrack
+
+  subroutine print_element_SIXTRACK(m,mf)
+    implicit none
+    integer mf,I
+    type(element), pointer :: m
+    character*255 line
+
+    WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ELEMENT $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    if(m%vorname(1:1)==' ') then
+       WRITE(MF,*) M%KIND,M%NAME, ' NOVORNAME'
+    ELSE
+       WRITE(MF,*) M%KIND,M%NAME,' ',M%VORNAME
+    ENDIF
+    WRITE(MF,*) M%L
+    IF(ASSOCIATED(M%FREQ)) THEN
+       WRITE(MF,*) " CAVITY INFORMATION "
+       !HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+EL%phase0)/EL%P%P0C
+
+       WRITE(LINE,*) c_1d_3*M%VOLT, twopi*M%FREQ/CLIGHT,M%PHAS+M%C4%phase0
+       WRITE(MF,'(A255)') LINE
+    ELSEIF(ASSOCIATED(M%VOLT)) THEN
+       WRITE(MF,*) " ELECTRIC SEPTUM INFORMATION "
+       WRITE(MF,*) M%VOLT,M%PHAS, "VOLT, PHAS(rotation angle) "
+    ELSE
+       WRITE(MF,*) " NO ELECTRIC ELEMENT INFORMATION "
+    ENDIF
+    IF(ASSOCIATED(M%B_SOL)) THEN
+       WRITE(MF,*)  M%B_SOL, " B_SOL"
+    ELSE
+       WRITE(MF,*) zero
+    ENDIF
+    CALL print_magnet_chart_SIXTRACK(m%P,mf)
+    IF(ASSOCIATED(M%an)) THEN
+       do i=1,m%p%NMUL
+          write(mf,*) m%bn(i),m%an(i), " BN AN ",I
+       enddo
+    endif
+    !    call print_specific_element(m,mf)
+    WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   END   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+  end subroutine print_element_SIXTRACK
+
+  subroutine print_magnet_chart_SIXTRACK(m,mf)
+    implicit none
+    type(magnet_chart), pointer :: m
+    integer mf
+    character*200 line
+
+    WRITE(MF,*) "MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART "
+    WRITE(MF,*) M%METHOD,M%NST,M%NMUL, " METHOD NST NMUL"
+    WRITE(line,*) M%B0, " B0"
+    WRITE(MF,'(A200)') LINE
+    WRITE(LINE,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C, " BETA0 GAMMA0I GAMBET P0C"
+    WRITE(MF,'(A200)') LINE
+
+    write(mf,'(a68)') "END MAGNET CHART END MAGNET CHART END MAGNET CHART END MAGNET CHART "
+  end subroutine print_magnet_chart_SIXTRACK
+
+  SUBROUTINE count_PATCH_sixtrack(di,EL1) ! COMPUTES PATCHES
+    IMPLICIT NONE
+    TYPE (FIBRE), POINTER :: EL1
+    TYPE (FIBRE),POINTER :: EL2
+    INTEGER di
+    di=0
+    EL2=>EL1%NEXT
+    do while(el2%mag%kind==kind1)
+       el2=>el2%next
+       di=di+1
+    enddo
+    EL1=>EL2
+  END SUBROUTINE count_PATCH_sixtrack
+
 
 end module madx_keywords

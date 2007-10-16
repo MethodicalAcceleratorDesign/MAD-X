@@ -15,13 +15,15 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE append_EMPTY_FIBRE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
-  PRIVATE INDEX
-  private FIND_POS_in_universe, FIND_POS_in_layout
+  PRIVATE INDEX_0
+  private FIND_POS_in_universe,FIND_POS_in_layout
+  TYPE(LAYOUT), PRIVATE, POINTER:: LC
 
   logical(lp),TARGET :: use_info=.false.
   integer, target :: nsize_info = 70
   private zero_fibre
-  INTEGER :: INDEX=0
+  INTEGER :: INDEX_0=0
+  INTEGER :: INDEX_node=0
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   real(dp),target :: eps_pos=c_1d_10
 
@@ -81,7 +83,7 @@ CONTAINS
 
   SUBROUTINE alloc_info( c ) ! Does the full allocation of fibre and initialization of internal variables
     implicit none
-    type(info), intent(inout):: c
+    type(info),target, intent(inout):: c
 
     allocate(c%s) ;c%s=zero;
     allocate(c%beta(nsize_info));c%beta=zero;
@@ -94,8 +96,8 @@ CONTAINS
 
   SUBROUTINE copy_info( c,d ) ! Does the full allocation of fibre and initialization of internal variables
     implicit none
-    type(info), intent(in)::c
-    type(info),  intent(inout)::d
+    type(info),target, intent(in)::c
+    type(info),target,  intent(inout)::d
 
     !   d%name=c%name
     d%s=c%s
@@ -108,7 +110,7 @@ CONTAINS
 
   SUBROUTINE kill_info( c ) ! Does the full allocation of fibre and initialization of internal variables
     implicit none
-    type(info), intent(inout):: c
+    type(info),target, intent(inout):: c
 
     !   deallocate(c%name)
     deallocate(c%s)
@@ -123,7 +125,7 @@ CONTAINS
     implicit none
     TYPE (fibre),target :: el
     TYPE (fibre), POINTER :: Current
-    TYPE (layout), TARGET:: L
+    TYPE (layout), TARGET, intent(inout):: L
     L%N=L%N+1
     CALL ALLOCATE_FIBRE(Current);
     current%mag=>el%mag
@@ -154,7 +156,7 @@ CONTAINS
   SUBROUTINE kill_layout( L )  ! Destroys a layout
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout) L
+    TYPE (layout), TARGET, intent(inout):: L
     logical(lp) doneit
     CALL LINE_L(L,doneit)
     nullify(current)
@@ -162,6 +164,24 @@ CONTAINS
        CALL kill_NODE_LAYOUT(L%T)  !  KILLING THIN LAYOUT
        WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
     ENDIF
+    IF(ASSOCIATED(L%DNA)) THEN
+       DEALLOCATE(L%DNA)
+       WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
+    ENDIF
+    !    IF(ASSOCIATED(L%con)) THEN
+    !       DEALLOCATE(L%con)
+    !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN KILLED "
+    !    ENDIF
+    IF(ASSOCIATED(L%con1)) THEN
+       DEALLOCATE(L%con1)
+       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
+    ENDIF
+    IF(ASSOCIATED(L%con2)) THEN
+       DEALLOCATE(L%con2)
+       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
+    ENDIF
+
+    LC=> L  ! USED TO AVOID DNA MEMBERS
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
        L % end => Current % previous  ! update the end before disposing
@@ -175,7 +195,7 @@ CONTAINS
 
   SUBROUTINE APPEND_fibre( L, el ) ! Standard append that clones everything
     implicit none
-    TYPE (fibre), intent(in) :: el
+    TYPE (fibre),target, intent(in) :: el
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET,intent(inout):: L
     logical(lp) doneit
@@ -248,37 +268,15 @@ CONTAINS
 
 
 
-  SUBROUTINE FIND_POS_in_layout(L, C,i )  ! Finds the location "i" of the fibre C in layout L
-    implicit none
-    INTEGER, INTENT(INOUT) :: I
-    logical(lp) doneit
-    TYPE(LAYOUT) L
-    TYPE (fibre), POINTER :: C
-    TYPE (fibre), POINTER :: P
-    NULLIFY(P);
-    P=>C
-    CALL LINE_L(L,doneit)
-    I=0
-    DO WHILE(ASSOCIATED(P))
-       I=I+1
-       P=>P%PREVIOUS
-    ENDDO
-
-    CALL RING_L(L,doneit)
-  END SUBROUTINE FIND_POS_in_layout
-
-
-
-
 
   SUBROUTINE move_to_p( L,current,POS ) ! Moves current to the i^th position
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout) L
+    TYPE (layout), TARGET, intent(inout):: L
     integer i,k,POS
     logical(lp) doneit
 
-    CALL LINE_L(L,doneit)
+    !    CALL LINE_L(L,doneit)  !TGV
     I=mod_n(POS,L%N)
     IF(L%LASTPOS==0) THEN
        w_p=0
@@ -294,25 +292,27 @@ CONTAINS
 
     k=L%LASTPOS
     IF(I>=L%LASTPOS) THEN
-       DO WHILE (ASSOCIATED(Current).and.k<i)
-          k=k+1
+       DO K=L%LASTPOS,I-1
+          !      DO WHILE (ASSOCIATED(Current).and.k<i) !TGV
+          !          k=k+1 !TGV
           Current => Current % next
        END DO
     ELSE
-       DO WHILE (ASSOCIATED(Current).and.k>i)
-          k=k-1
+       DO K=L%LASTPOS,I+1,-1
+          !       DO WHILE (ASSOCIATED(Current).and.k>i) !TGV
+          !          k=k-1 !TGV
           Current => Current % PREVIOUS
        END DO
     ENDIF
     L%LASTPOS=I; L%LAST => Current;
-    CALL RING_L(L,doneit)
+    !    CALL RING_L(L,doneit) ! TGV
   END SUBROUTINE move_to_p
 
 
   SUBROUTINE move_to_name( L,current,name,pos) ! moves to next one in list called name
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout), intent(inout):: L
+    TYPE (layout), TARGET, intent(inout):: L
     integer, intent(inout):: pos
     character(*), intent(in):: name
     CHARACTER(nlp) S1NAME
@@ -351,7 +351,7 @@ CONTAINS
   SUBROUTINE move_to_nameS( L,current,name,posR,POS) ! moves to next one in list called name
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout), intent(inout):: L
+    TYPE (layout), TARGET, intent(inout):: L
     integer, intent(inout):: pos,POSR
     character(*), intent(in):: name
     CHARACTER(nlp) S1NAME
@@ -395,7 +395,7 @@ CONTAINS
 
   SUBROUTINE Set_Up( L ) ! Sets up a layout: gives a unique negative index
     implicit none
-    TYPE (layout) L
+    TYPE (layout),TARGET, INTENT(INOUT):: L
     CALL NULLIFY_LAYOUT(L)
     ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);ALLOCATE(L%HARMONIC_NUMBER);
     ALLOCATE(L%NTHIN);ALLOCATE(L%THIN);ALLOCATE(L%INDEX);ALLOCATE(L%CHARGE);ALLOCATE(L%mass);
@@ -404,8 +404,8 @@ CONTAINS
     L%NTHIN=0;L%THIN=zero;
     L%N=0;
     L%lastpos=0;L%NAME='No name assigned';
-    INDEX=INDEX-1
-    L%INDEX=INDEX
+    INDEX_0=INDEX_0+1
+    L%INDEX=INDEX_0
     L%CHARGE=1
     L%HARMONIC_NUMBER=0
     if(electron) then
@@ -420,7 +420,7 @@ CONTAINS
 
   SUBROUTINE de_Set_Up( L ) ! deallocates layout content
     implicit none
-    TYPE (layout) L
+    TYPE (layout),TARGET, INTENT(INOUT):: L
     deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);deallocate(L%HARMONIC_NUMBER);
     deallocate(L%INDEX);    deallocate(L%CHARGE);deallocate(L%mass);
     deallocate(L%NTHIN);deallocate(L%THIN);
@@ -432,9 +432,13 @@ CONTAINS
   SUBROUTINE nullIFY_LAYOUT( L ) ! Nullifies layout content,i
     implicit none
     !   integer , intent(in) :: i
-    TYPE (layout), intent(inout) :: L
+    TYPE (layout),TARGET, intent(inout) :: L
     !   if(i==0) then
     nullify(L%T)  ! THIN LAYOUT
+    nullify(L%DNA)  ! THIN LAYOUT
+    !    nullify(L%CON)  ! THIN LAYOUT
+    nullify(L%CON1)  ! THIN LAYOUT
+    nullify(L%CON2)  ! THIN LAYOUT
     nullify(L%parent_universe)
     nullify(L%INDEX)
     nullify(L%CHARGE)
@@ -467,7 +471,7 @@ CONTAINS
 
   SUBROUTINE LINE_L(L,doneit) ! makes into line temporarily
     implicit none
-    TYPE (layout) L
+    TYPE (layout), TARGET, intent(inout):: L
     logical(lp) doneit
     doneit=.false.
     if(L%closed)  then
@@ -483,7 +487,7 @@ CONTAINS
 
   SUBROUTINE RING_L(L,doit) ! Brings back to ring if needed
     implicit none
-    TYPE (layout) L
+    TYPE (layout), TARGET, intent(inout):: L
     logical(lp) doit
     if(L%closed.and.doit)  then
        if(.NOT.(associated(L%end%next))) then
@@ -502,7 +506,7 @@ CONTAINS
     implicit none
     TYPE (fibre),POINTER :: el
     TYPE (fibre), POINTER :: Current
-    TYPE (layout), TARGET:: L
+    TYPE (layout), TARGET, intent(inout):: L
     !    type(fibre), pointer :: p
     logical(lp) doneit
     !    nullify(p);
@@ -511,31 +515,26 @@ CONTAINS
     CALL ALLOCATE_FIBRE(Current);
     ALLOCATE(Current%PATCH);
 
-    !  FINDING THE VERY ORIGINAL FIBRE  RECURSIVELY
-    !    p=>el
-    !    do while(associated(p))
-    !       CURRENT%PARENT_MAG=>P
-    !       p=>P%PARENT_MAG
-    !    enddo
-    !    p=>el
-    !    do while(associated(p))
-    !       CURRENT%PARENT_PATCH=>P
-    !       p=>P%PARENT_PATCH
-    !    enddo
-    !    p=>el
-    !    do while(associated(p))
-    !       CURRENT%PARENT_CHART=>P
-    !       p=>P%PARENT_CHART
-    !    enddo
-    !  END OF FINDING THE VERY ORIGINAL FIBRE
-    CURRENT%PARENT_LAYOUT=>EL%PARENT_LAYOUT
+
+    CURRENT%PARENT_LAYOUT=>L     !
     current%mag=>el%mag
     current%magp=>el%magp
     current%CHART=>el%CHART
     current%PATCH=0   ! new patches always belong to fibre  ! this was the error Weishi
-    if(use_info) current%i=>el%i
+    IF(EL%PATCH%PATCH/=0) THEN
+       IF(.NOT.ASSOCIATED(CURRENT%PATCH)) CURRENT%PATCH=0
+       CALL COPY(EL%PATCH,current%PATCH)
+    ENDIF
+    !    if(use_info) current%i=>el%i
+    if(use_info) then
+       allocate(current%i)
+       call alloc(current%i)
+    endif
+
     ALLOCATE(current%DIR)   !;ALLOCATE(current%P0C);ALLOCATE(current%BETA0);
     current%dir=el%dir
+    ALLOCATE(Current%pos);
+    current%pos=l%n
     !    current%P0C=el%P0C
     !    current%BETA0=el%BETA0
     if(L%N==1) current%next=> L%start
@@ -561,7 +560,7 @@ CONTAINS
   SUBROUTINE append_EMPTY_FIBRE( L )  ! Creates an empty fibre to be filled later
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout),target :: L
+    TYPE (layout), TARGET, intent(inout):: L
     L%N=L%N+1
     CALL ALLOCATE_FIBRE(Current)
     if(L%N==1) current%next=> L%start
@@ -582,12 +581,12 @@ CONTAINS
 
   SUBROUTINE NULL_FIBRE(CURRENT)  ! nullifies fibre content
     implicit none
-    TYPE (fibre), POINTER :: Current
+    TYPE (fibre), TARGET, intent(inout):: Current
     nullify(Current%dir); !nullify(Current%P0C);nullify(Current%BETA0);
     nullify(Current%magp);nullify(Current%mag);nullify(Current%CHART);nullify(Current%PATCH);
     nullify(current%next);nullify(current%previous);
     nullify(current%PARENT_LAYOUT);
-    nullify(current%T1,current%T2);
+    nullify(current%T1,current%T2,current%TM);
     nullify(current%i,current%pos);
     !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
@@ -602,7 +601,7 @@ CONTAINS
 
   SUBROUTINE ALLOCATE_DATA_FIBRE(CURRENT) ! Allocates pointers in fibre
     implicit none
-    TYPE (fibre), POINTER :: Current
+    TYPE (fibre), TARGET, intent(inout):: Current
     ALLOCATE(Current%dir); ! ALLOCATE(Current%P0C);ALLOCATE(Current%BETA0);
     ALLOCATE(Current%magp);ALLOCATE(Current%mag);
 
@@ -633,7 +632,7 @@ CONTAINS
 
   SUBROUTINE zero_fibre( c,i ) ! Does the full allocation of fibre and initialization of internal variables
     implicit none
-    type(fibre),intent(inout):: c
+    type(fibre),target,intent(inout):: c
     integer, intent(in) :: i
     if(i==0) then
        c%DIR=1
@@ -644,10 +643,69 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
+       IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT)) THEN    ! ORDINARY
+          IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+             c%mag=-1;
+             deallocate(c%mag);
+          ENDIF
+          IF(ASSOCIATED(c%magP)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+             c%magp=-1;
+             deallocate(c%magP);
+          ENDIF
+          IF(ASSOCIATED(c%CHART)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_CHART))) THEN
+             C%CHART=-1
+             deallocate(c%CHART);
+          ENDIF
+          IF(ASSOCIATED(c%PATCH)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_PATCH))) THEN
+             C%PATCH=-1
+             deallocate(c%PATCH);
+          ENDIF
+       ELSE   ! POINTED LAYOUT
+          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
+             C%CHART=-1
+             deallocate(c%CHART);
+          ENDIF
+          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
+             C%PATCH=-1
+             deallocate(c%PATCH);
+          ENDIF
+       ENDIF
+
+       IF(ASSOCIATED(c%DIR)) THEN
+          deallocate(c%DIR);
+       ENDIF
+       IF(ASSOCIATED(C%T1)) THEN
+          if(associated(C%T1,C%TM)) nullify(C%TM)
+          deallocate(C%T1);
+          deallocate(C%T2);
+       ENDIF
        IF(ASSOCIATED(c%i).and.use_info) THEN
           call kill(c%i);
           deallocate(c%i);
        ENDIF
+
+    else
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       w_p%c(1)= "Error in zero_fibre "
+       CALL WRITE_E(100)
+    endif
+  end SUBROUTINE zero_fibre
+
+  SUBROUTINE SUPER_zero_fibre( c,i ) ! Does the full allocation of fibre and initialization of internal variables
+    implicit none
+    type(fibre),target,intent(inout):: c
+    integer, intent(in) :: i
+    if(i==0) then
+       c%DIR=1
+       !       c%P0C=zero
+       !       c%BETA0=zero
+       c%mag=0
+       c%magp=0
+       if(associated(c%CHART)) c%CHART=0
+       if(associated(c%PATCH)) c%PATCH=0
+    elseif(i==-1) then
        IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
           c%mag=-1;
           deallocate(c%mag);
@@ -664,19 +722,27 @@ CONTAINS
           C%PATCH=-1
           deallocate(c%PATCH);
        ENDIF
+       IF(ASSOCIATED(c%CHART)) then
+          C%CHART=-1
+          deallocate(c%CHART);
+       ENDIF
+       IF(ASSOCIATED(c%PATCH)) then
+          C%PATCH=-1
+          deallocate(c%PATCH);
+       ENDIF
+
        IF(ASSOCIATED(c%DIR)) THEN
           deallocate(c%DIR);
        ENDIF
        IF(ASSOCIATED(C%T1)) THEN
           deallocate(C%T1);
           deallocate(C%T2);
+          deallocate(C%TM);
        ENDIF
-       !      IF(ASSOCIATED(c%P0C)) THEN
-       !         deallocate(c%P0C);
-       !      ENDIF
-       !      IF(ASSOCIATED(c%BETA0)) THEN
-       !         deallocate(c%BETA0);
-       !      ENDIF
+       IF(ASSOCIATED(c%i).and.use_info) THEN
+          call kill(c%i);
+          deallocate(c%i);
+       ENDIF
 
     else
        w_p=0
@@ -685,7 +751,8 @@ CONTAINS
        w_p%c(1)= "Error in zero_fibre "
        CALL WRITE_E(100)
     endif
-  end SUBROUTINE zero_fibre
+  end SUBROUTINE SUPER_zero_fibre
+
 
 
 
@@ -701,7 +768,7 @@ CONTAINS
   !  MORE FUNNY APPENDING
   SUBROUTINE APPEND_FLAT( L, el, NAME )  ! points unless called "name" in which case it clones
     implicit none
-    TYPE (layout), TARGET :: L
+    TYPE (layout), TARGET, intent(inout):: L
     TYPE (fibre), POINTER :: el
     CHARACTER(*) NAME
     CHARACTER(nlp) NAME1
@@ -752,6 +819,122 @@ CONTAINS
   END SUBROUTINE switch_to_kind7
 
   !  EUCLIDEAN ROUTINES
+  SUBROUTINE CHECK_NEED_PATCH(EL1,EL2_NEXT,PREC,PATCH_NEEDED) ! check need of  PATCHES
+    IMPLICIT NONE
+    TYPE (FIBRE), TARGET,INTENT(IN) :: EL1
+    TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
+    TYPE (FIBRE),POINTER :: EL2
+    REAL(DP)  D(3),ANG(3)
+    REAL(DP) ENT(3,3),EXI(3,3)
+    REAL(DP), POINTER,DIMENSION(:)::A,B
+    INTEGER  DIR
+    REAL(DP)   PREC
+    INTEGER A_YZ,A_XZ
+    LOGICAL(LP)  DISCRETE
+    INTEGER I,PATCH_NEEDED
+    REAL(DP) NORM,pix(3)
+
+    PATCH_NEEDED=0
+    pix=zero
+    pix(1)=pi
+    DIR=1
+    DISCRETE=.FALSE.
+    ANG=ZERO
+    D=ZERO
+
+    IF(PRESENT(EL2_NEXT)) THEN
+       EL2=>EL2_NEXT
+    ELSE
+       EL2=>EL1%NEXT
+    ENDIF
+
+
+
+    IF(EL1%DIR*EL2%DIR==1) THEN   !   1
+       IF(EL1%DIR==1) THEN
+          EXI=EL1%CHART%F%EXI
+          B=>EL1%CHART%F%B
+          ENT=EL2%CHART%F%ENT
+          A=>EL2%CHART%F%A
+          A_XZ=1;A_YZ=1;
+       ELSE
+          EXI=EL1%CHART%F%ENT
+          !             call geo_rot(exi,pix,1,basis=exi)
+          B=>EL1%CHART%F%A
+          ENT=EL2%CHART%F%EXI
+          !             call geo_rot(ent,pix,1,basis=ent)
+          A=>EL2%CHART%F%B
+          A_XZ=1;A_YZ=1;
+          !             A_XZ=-1;A_YZ=-1;
+       ENDIF
+    ELSE                          !   1
+       IF(EL1%DIR==1) THEN
+          EXI=EL1%CHART%F%EXI
+          B=>EL1%CHART%F%B
+          ENT=EL2%CHART%F%EXI
+          call geo_rot(ent,pix,1,basis=ent)
+          A=>EL2%CHART%F%B
+          A_XZ=1;A_YZ=-1;
+       ELSE
+          EXI=EL1%CHART%F%ENT
+          call geo_rot(exi,pix,1,basis=exi)
+          B=>EL1%CHART%F%A
+          ENT=EL2%CHART%F%ENT
+          A=>EL2%CHART%F%A
+          A_XZ=-1;A_YZ=1;
+       ENDIF
+    ENDIF                     !   1
+
+    CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
+
+    NORM=ZERO
+    DO I=1,3
+       NORM=NORM+ABS(D(I))
+    ENDDO
+    IF(NORM>=PREC) THEN
+       D=ZERO
+       PATCH_NEEDED=PATCH_NEEDED+1
+    ENDIF
+    NORM=ZERO
+    DO I=1,3
+       NORM=NORM+ABS(ANG(I))
+    ENDDO
+    IF(NORM>PREC.OR.(A_XZ/=1.and.A_YZ/=1)) THEN
+       ANG=ZERO
+       PATCH_NEEDED=PATCH_NEEDED+10
+    ENDIF
+
+
+    if(ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)>PREC) PATCH_NEEDED=PATCH_NEEDED+100
+
+
+    DISCRETE=.false.
+    IF(ANG(1)/TWOPI<-c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(2)/TWOPI<-c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>c_0_25) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+
+    !    IF(DISCRETE) THEN
+    !       WRITE(6,*)  " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
+    !       STOP 1123
+    !    ENDIF
+
+    if(discrete) then
+       PATCH_NEEDED=PATCH_NEEDED-1000
+    endif
+
+
+  END SUBROUTINE CHECK_NEED_PATCH
+
+
 
   SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
@@ -798,12 +981,13 @@ CONTAINS
              A_XZ=1;A_YZ=1;
           ELSE
              EXI=EL1%CHART%F%ENT
-             call geo_rot(exi,pix,1,basis=exi)
+             !             call geo_rot(exi,pix,1,basis=exi)
              B=>EL1%CHART%F%A
              ENT=EL2%CHART%F%EXI
-             call geo_rot(ent,pix,1,basis=ent)
+             !             call geo_rot(ent,pix,1,basis=ent)
              A=>EL2%CHART%F%B
-             A_XZ=-1;A_YZ=-1;
+             A_XZ=1;A_YZ=1;
+             !             A_XZ=-1;A_YZ=-1;
           ENDIF
        ELSE                          !   1
           IF(EL1%DIR==1) THEN
@@ -984,6 +1168,54 @@ CONTAINS
        EL2=>EL1%NEXT
     ENDIF
 
+    el1%PATCH%B_X1=1
+    el1%PATCH%B_X2=1
+    el1%PATCH%B_D=zero
+    el1%PATCH%B_ANG=zero
+    el1%PATCH%B_T=zero
+
+    if(el1%PATCH%patch==3) then
+       el1%PATCH%patch=1
+    elseIF(el1%PATCH%patch==2) then
+       el1%PATCH%patch=0
+    endif
+
+    if(el1%PATCH%energy==3) then
+       el1%PATCH%ENERGY=1
+    elseIF(el1%PATCH%energy==2) then
+       el1%PATCH%ENERGY=0
+    endif
+
+    if(el1%PATCH%time==3) then
+       el1%PATCH%time=1
+    elseIF(el1%PATCH%time==2) then
+       el1%PATCH%time=0
+    endif
+
+    EL2%PATCH%A_X1=1
+    EL2%PATCH%A_X2=1
+    EL2%PATCH%A_D=zero
+    EL2%PATCH%A_ANG=zero
+    EL2%PATCH%A_T=zero
+
+    if(EL2%PATCH%patch==3) then
+       EL2%PATCH%patch=2
+    elseIF(EL2%PATCH%patch==1) then
+       EL2%PATCH%patch=0
+    endif
+
+    if(EL2%PATCH%energy==3) then
+       EL2%PATCH%ENERGY=2
+    elseIF(EL2%PATCH%energy==1) then
+       EL2%PATCH%ENERGY=0
+    endif
+
+    if(EL2%PATCH%time==3) then
+       EL2%PATCH%time=2
+    elseIF(EL2%PATCH%time==1) then
+       EL2%PATCH%time=0
+    endif
+
     NEX=.FALSE.
     ENE=.FALSE.
     IF(PRESENT(NEXT)) NEX=NEXT
@@ -1000,14 +1232,104 @@ CONTAINS
 
   END SUBROUTINE FIND_PATCH_0
 
+  SUBROUTINE find_connections( L) ! Sets up a layout: gives a unique negative index
+    implicit none
+    TYPE (layout), TARGET, intent(inout):: L
+    TYPE (layout), POINTER :: L1,L2
+    TYPE (fibre), POINTER :: P,p1,p2,pstart
+    INTEGER I,i1,i2
+    integer, allocatable :: in1(:),in2(:)
 
+    allocate(in1(size(l%dna)))
+    allocate(in2(size(l%dna)))
 
+    i1=2
+    i2=l%n
+    P=>L%START%next
+    if(l%closed) then
+       P=>L%START
+       i1=1
+       i2=l%n+1
+    endif
+    pstart=>p
+    in1=0
+    in2=0
+
+    DO i=i1,i2
+       P1=>P%PREVIOUS
+       P2=>P
+       !     PO1=>P1%MAG%PARENT_FIBRE
+       !     PO2=>P2%MAG%PARENT_FIBRE
+       L1=>P1%MAG%PARENT_FIBRE%PARENT_LAYOUT
+       L2=>P2%MAG%PARENT_FIBRE%PARENT_LAYOUT
+       IF(.NOT.ASSOCIATED(L1,L2)) THEN
+
+          !    WRITE(6,*) I,L1%INDEX,L2%INDEX
+          !    WRITE(6,*) L1%N,L2%N
+          !    WRITE(6,*) PO1%POS,PO2%POS
+          in1(L1%INDEX)=in1(L1%INDEX)+1
+          in2(L2%INDEX)=in2(L2%INDEX)+1
+          !write(6,*) " ins "
+          !write(6,*) in1
+          !write(6,*) in2
+          !        PAUSE
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+    !write(6,*) in1
+    !write(6,*) in2
+    !pause 777
+    do i=1,size(in1)
+       if(in1(i)>0) then
+          allocate(L%DNA(i)%L%con1(in1(i)) )
+       else
+          nullify(L%DNA(i)%L%con1)
+       endif
+    enddo
+
+    do i=1,size(in2)
+       if(in2(i)>0) then
+          allocate(L%DNA(i)%L%con2(in2(i)) )
+       else
+          nullify(L%DNA(i)%L%con2)
+       endif
+    enddo
+
+    in1=0
+    in2=0
+    p=>pstart
+    DO i=i1,i2
+       P1=>P%PREVIOUS
+       P2=>P
+       !     PO1=>P1%MAG%PARENT_FIBRE
+       !     PO2=>P2%MAG%PARENT_FIBRE
+       L1=>P1%MAG%PARENT_FIBRE%PARENT_LAYOUT
+       L2=>P2%MAG%PARENT_FIBRE%PARENT_LAYOUT
+       IF(.NOT.ASSOCIATED(L1,L2)) THEN
+          in1(L1%INDEX)=in1(L1%INDEX)+1
+          in2(L2%INDEX)=in2(L2%INDEX)+1
+
+          L%DNA(L1%INDEX)%L%con1(in1(L1%INDEX))%p=>p1
+          L%DNA(L1%INDEX)%L%con1(in1(L1%INDEX))%pos=p1%pos
+
+          L%DNA(L2%INDEX)%L%con2(in2(L2%INDEX))%p=>p2
+          L%DNA(L2%INDEX)%L%con2(in2(L2%INDEX))%pos=p2%pos
+          !        write(6,*) p1%pos,p2%pos
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+
+    !    write(6,*) ind
+
+    deallocate(in1)
+    deallocate(in2)
+  END SUBROUTINE find_connections
 
   ! UNIVERSE STUFF
 
   SUBROUTINE Set_Up_UNIVERSE( L ) ! Sets up a layout: gives a unique negative index
     implicit none
-    TYPE (MAD_UNIVERSE) L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     CALL NULLIFY_UNIVERSE(L)
     ALLOCATE(L%n);
     ALLOCATE(L%SHARED);
@@ -1018,7 +1340,7 @@ CONTAINS
   SUBROUTINE kill_last_layout( L )  ! Destroys a layout
     implicit none
     TYPE (LAYOUT), POINTER :: Current,Current1
-    TYPE (MAD_UNIVERSE) L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     nullify(current)
     nullify(current1)
     Current => L % end      ! end at the end
@@ -1036,14 +1358,16 @@ CONTAINS
   SUBROUTINE kill_UNIVERSE( L )  ! Destroys a layout
     implicit none
     TYPE (LAYOUT), POINTER :: Current,Current1
-    TYPE (MAD_UNIVERSE) L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     nullify(current)
     nullify(current1)
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
        Current1 => L % end      ! end at the end
        L % end => Current % previous  ! update the end before disposing
+       WRITE(6,*) ' killing last layout '
        call kill_layout(Current)
+       WRITE(6,*) ' killed last layout '
        Current => L % end     ! alias of last fibre again
        L%N=L%N-1
        deallocate(Current1)
@@ -1071,7 +1395,7 @@ CONTAINS
   SUBROUTINE MOVE_TO_LAYOUT_I( L,current,i ) ! Moves current to the i^th position
     implicit none
     TYPE (LAYOUT), POINTER :: Current
-    TYPE (MAD_UNIVERSE) L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     integer i,k
 
     nullify(current);
@@ -1088,14 +1412,14 @@ CONTAINS
 
   SUBROUTINE de_Set_Up_UNIVERSE( L ) ! deallocates layout content
     implicit none
-    TYPE (MAD_UNIVERSE) L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     deallocate(L%n);
     deallocate(L%SHARED);
   END SUBROUTINE de_Set_Up_UNIVERSE
 
   SUBROUTINE nullIFY_UNIVERSE( L ) ! Nullifies layout content,i
     implicit none
-    TYPE (MAD_UNIVERSE), intent(inout) :: L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     nullify(L%N)
     nullify(L%SHARED)
 
@@ -1107,7 +1431,7 @@ CONTAINS
 
   SUBROUTINE APPEND_EMPTY_LAYOUT( L )   ! Appoints without cloning
     implicit none
-    TYPE (MAD_UNIVERSE), TARGET:: L
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     TYPE (LAYOUT),POINTER :: current
     nullify(current);
     L%N=L%N+1
@@ -1131,32 +1455,38 @@ CONTAINS
   END SUBROUTINE APPEND_EMPTY_LAYOUT
 
 
-  SUBROUTINE locate_in_universe(F,i_tot,i,j)
+  SUBROUTINE locate_in_universe(F,i,j)
     IMPLICIT NONE
     integer i_tot,i,j
     integer k
     TYPE(FIBRE),pointer ::  F
-    TYPE(layout),pointer ::  L
 
 
     call FIND_POS(f%mag%PARENT_FIBRE%parent_layout, f%mag%PARENT_FIBRE,j )
 
     call FIND_POS( f%mag%PARENT_FIBRE%parent_layout,i )
 
-    i_tot=0
-
-    L=>f%mag%PARENT_FIBRE%parent_layout%parent_universe%START
-
-    do k=1,i-1
-       i_tot= L%N+I_TOT
-       L=>L%NEXT
-    enddo
-
-    I_TOT=I_ToT+ J
-
-
 
   END SUBROUTINE locate_in_universe
+
+  SUBROUTINE FIND_POS_in_layout(L, C,i )  ! Finds the location "i" of the fibre C in layout L
+    implicit none
+    INTEGER, INTENT(INOUT) :: I
+    logical(lp) doneit
+    TYPE(LAYOUT) L
+    TYPE (fibre), POINTER :: C
+    TYPE (fibre), POINTER :: P
+    NULLIFY(P);
+    P=>C
+    !    CALL LINE_L(L,doneit)  ! TGV
+
+    DO WHILE(.NOT.ASSOCIATED(P,L%START))
+       I=I+1
+       P=>P%PREVIOUS
+    ENDDO
+    I=I+1
+    !    CALL RING_L(L,doneit)
+  END SUBROUTINE FIND_POS_in_layout
 
 
 
@@ -1165,20 +1495,22 @@ CONTAINS
 
   SUBROUTINE NULL_THIN(T)  ! nullifies THIN content
     implicit none
-    TYPE (INTEGRATION_NODE), POINTER :: T
+    TYPE (INTEGRATION_NODE), TARGET, intent(inout):: T
     NULLIFY(T%PARENT_NODE_LAYOUT)
     NULLIFY(T%PARENT_FIBRE)
-    NULLIFY(T%BB)
+    !    NULLIFY(T%BB)
     NULLIFY(T%S)
+    NULLIFY(T%ref)
     !    NULLIFY(T%ORBIT)
     NULLIFY(T%a,T%ENT)
     NULLIFY(T%B,T%EXI)
     !    NULLIFY(T%BT)
     NULLIFY(T%NEXT)
     NULLIFY(T%PREVIOUS)
-    NULLIFY(T%USE_TPSA_MAP)
-    NULLIFY(T%TPSA_MAP)
-    NULLIFY(T%INTEGRATION_NODE_AFTER_MAP)
+    NULLIFY(T%WORK)
+    !    NULLIFY(T%USE_TPSA_MAP)
+    !    NULLIFY(T%TPSA_MAP)
+    !    NULLIFY(T%INTEGRATION_NODE_AFTER_MAP)
   END SUBROUTINE NULL_THIN
 
   SUBROUTINE ALLOCATE_THIN(CURRENT)   ! allocates and nullifies current's content
@@ -1189,12 +1521,14 @@ CONTAINS
     CALL NULL_THIN(CURRENT)
 
     ALLOCATE(CURRENT%S(4))
+    ALLOCATE(CURRENT%ref(4))
+    CURRENT%ref=zero
     !    ALLOCATE(CURRENT%ORBIT(6))
     ALLOCATE(CURRENT%pos_in_fibre)
     ALLOCATE(CURRENT%pos)
     ALLOCATE(CURRENT%CAS)
     ALLOCATE(CURRENT%TEAPOT_LIKE)
-    ALLOCATE(CURRENT%USE_TPSA_MAP)
+    !    ALLOCATE(CURRENT%USE_TPSA_MAP)
 
     !    ALLOCATE(CURRENT%A(3),CURRENT%ENT(3,3))
     !    ALLOCATE(CURRENT%B(3),CURRENT%EXI(3,3))
@@ -1207,22 +1541,22 @@ CONTAINS
     CURRENT%pos=-100
     CURRENT%CAS=-100
     CURRENT%TEAPOT_LIKE=-100
-    CURRENT%USE_TPSA_MAP=MY_FALSE
+    !    CURRENT%USE_TPSA_MAP=MY_FALSE
   END SUBROUTINE ALLOCATE_THIN
 
-  SUBROUTINE ALLOCATE_NODE_MAP(CURRENT)   ! allocates and nullifies current's content
-    implicit none
-    TYPE (INTEGRATION_NODE), POINTER :: Current
-    ALLOCATE(CURRENT%ORBIT(6))
-    ALLOCATE(CURRENT%TPSA_MAP)
-    CURRENT%USE_TPSA_MAP=MY_FALSE
-    CURRENT%ORBIT=ZERO
-  END SUBROUTINE ALLOCATE_NODE_MAP
+  !  SUBROUTINE ALLOCATE_NODE_MAP(CURRENT)   ! allocates and nullifies current's content
+  !    implicit none
+  !    TYPE (INTEGRATION_NODE), POINTER :: Current
+  !    ALLOCATE(CURRENT%ORBIT(6))
+  !    ALLOCATE(CURRENT%TPSA_MAP)
+  !    CURRENT%USE_TPSA_MAP=MY_FALSE
+  !    CURRENT%ORBIT=ZERO
+  !  END SUBROUTINE ALLOCATE_NODE_MAP
 
   SUBROUTINE nullIFY_NODE_LAYOUT( L ) ! Nullifies layout content,i
     implicit none
     !   integer , intent(in) :: i
-    TYPE (NODE_layout), intent(inout) :: L
+    TYPE (NODE_layout), TARGET, intent(inout):: L
     !   if(i==0) then
     nullify(L%INDEX)
     nullify(L%NAME)
@@ -1243,7 +1577,7 @@ CONTAINS
 
   SUBROUTINE Set_Up_NODE_LAYOUT( L ) ! Sets up a layout: gives a unique  index
     implicit none
-    TYPE (NODE_LAYOUT) L
+    TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
     CALL NULLIFY_NODE_LAYOUT(L)
     ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);
     ALLOCATE(L%INDEX);
@@ -1252,14 +1586,14 @@ CONTAINS
     L%N=0;
     L%lastpos=0;L%NAME='NEMO';
     NULLIFY(L%LAST)
-    INDEX=INDEX+1
-    L%INDEX=INDEX
+    INDEX_node=INDEX_node+1
+    L%INDEX=INDEX_node
   END SUBROUTINE Set_Up_NODE_LAYOUT
 
   SUBROUTINE APPEND_EMPTY_THIN( L )  ! Creates an empty fibre to be filled later
     implicit none
     TYPE (INTEGRATION_NODE), POINTER :: Current
-    TYPE (NODE_LAYOUT) L
+    TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
     !    LOGICAL(LP) doneit
 
     L%N=L%N+1
@@ -1282,7 +1616,7 @@ CONTAINS
   SUBROUTINE allocate_node_frame( L )  ! Creates an empty fibre to be filled later
     implicit none
     TYPE (INTEGRATION_NODE), POINTER :: Current
-    TYPE (LAYOUT) L
+    TYPE (LAYOUT), TARGET, intent(inout):: L
     integer i
 
 
@@ -1302,7 +1636,7 @@ CONTAINS
 
   SUBROUTINE LINE_L_THIN(L,doneit) ! makes into line temporarily
     implicit none
-    TYPE (NODE_LAYOUT) L
+    TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
     logical(lp) doneit
     doneit=.false.
     if(L%closed)  then
@@ -1318,7 +1652,7 @@ CONTAINS
 
   SUBROUTINE RING_L_THIN(L,doit) ! Brings back to ring if needed
     implicit none
-    TYPE (NODE_LAYOUT) L
+    TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
     logical(lp) doit
     if(L%closed.and.doit)  then
        if(.NOT.(associated(L%end%next))) then
@@ -1336,10 +1670,10 @@ CONTAINS
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT) :: T
 
-    IF(ASSOCIATED(T%bb)) then
-       CALL KILL(t%bb)
-       DEALLOCATE(T%bb)
-    endif
+    !    IF(ASSOCIATED(T%bb)) then
+    !      CALL KILL(t%bb)
+    !      DEALLOCATE(T%bb)
+    !    endif
     IF(ASSOCIATED(T%a)) DEALLOCATE(T%a)
     IF(ASSOCIATED(T%ent)) DEALLOCATE(T%ent)
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)
@@ -1349,11 +1683,19 @@ CONTAINS
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
     IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)
     IF(ASSOCIATED(T%CAS)) DEALLOCATE(T%CAS)
-    IF(ASSOCIATED(T%USE_TPSA_MAP)) DEALLOCATE(T%USE_TPSA_MAP)
-    IF(ASSOCIATED(T%TPSA_MAP)) THEN
-       CALL KILL(T%TPSA_MAP)
-       DEALLOCATE(T%TPSA_MAP)
+    IF(ASSOCIATED(T%WORK)) THEN
+       !       CALL KILL(T%WORK)
+       DEALLOCATE(T%WORK)
     ENDIF
+    !    IF(ASSOCIATED(T%TPSA_MAP)) THEN
+    !       CALL KILL(T%TPSA_MAP)
+    !       DEALLOCATE(T%TPSA_MAP)
+    !    ENDIF
+    !    IF(ASSOCIATED(T%USE_TPSA_MAP)) DEALLOCATE(T%USE_TPSA_MAP)
+    !    IF(ASSOCIATED(T%TPSA_MAP)) THEN
+    !       CALL KILL(T%TPSA_MAP)
+    !       DEALLOCATE(T%TPSA_MAP)
+    !    ENDIF
 
   END SUBROUTINE  DEALLOC_INTEGRATION_NODE
 
@@ -1362,6 +1704,7 @@ CONTAINS
     TYPE (INTEGRATION_NODE), POINTER :: Current
     TYPE (NODE_LAYOUT), POINTER ::  L
     logical(lp) doneit
+    IF(.NOT.ASSOCIATED(L)) RETURN
     CALL LINE_L_THIN(L,doneit)
 
     IF(ASSOCIATED(L%ORBIT_LATTICE)) THEN
@@ -1425,7 +1768,7 @@ CONTAINS
 
   SUBROUTINE KILL_ORBIT_NODE1(ORBIT_LAYOUT_node)
     IMPLICIT NONE
-    TYPE(ORBIT_NODE),intent(inout) :: ORBIT_LAYOUT_node
+    TYPE(ORBIT_NODE), TARGET, intent(inout):: ORBIT_LAYOUT_node
     DEALLOCATE(ORBIT_LAYOUT_node%LATTICE)
     DEALLOCATE(ORBIT_LAYOUT_node%DPOS)
     DEALLOCATE(ORBIT_LAYOUT_node%ENTERING_TASK)
@@ -1435,7 +1778,7 @@ CONTAINS
 
   SUBROUTINE ALLOC_ORBIT_NODE1(ORBIT_LAYOUT_node,NL)
     IMPLICIT NONE
-    TYPE(ORBIT_NODE),intent(inout) :: ORBIT_LAYOUT_node
+    TYPE(ORBIT_NODE), TARGET, intent(inout):: ORBIT_LAYOUT_node
     INTEGER NL
 
     ALLOCATE(ORBIT_LAYOUT_node%LATTICE(1:NL))
@@ -1454,7 +1797,7 @@ CONTAINS
 
   SUBROUTINE Set_Up_ORBIT_LATTICE(O,N,U)
     IMPLICIT NONE
-    TYPE(ORBIT_LATTICE),POINTER :: O
+    TYPE(ORBIT_LATTICE), TARGET, intent(inout):: O
     INTEGER N,I
     INTEGER  ::  ORBIT_N_NODE
     LOGICAL(lp)  ::  U
@@ -1501,7 +1844,7 @@ CONTAINS
 
   SUBROUTINE de_Set_Up_NODE_LAYOUT( L ) ! deallocates layout content
     implicit none
-    TYPE (NODE_LAYOUT), POINTER :: L
+    TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
     deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);
     deallocate(L%INDEX);
     deallocate(L%n);          !deallocate(L%parent_universe)   left out
@@ -1511,13 +1854,13 @@ CONTAINS
   SUBROUTINE move_to_INTEGRATION_NODE( L,current,POS ) ! Moves current to the i^th position
     implicit none
     TYPE (INTEGRATION_NODE), POINTER :: Current
-    TYPE (NODE_LAYOUT) L
-    integer i,k,POS
-    logical(lp) doneit
-
+    TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
+    integer i,k,POS,nt
+    logical(lp) doneit,runit
+    nt=l%n
     I=mod_n(POS,L%N)
 
-    CALL LINE_L_THIN(L,doneit)
+    !    CALL LINE_L_THIN(L,doneit)   ! TGV
 
     IF(L%LASTPOS==0) THEN
        w_p=0
@@ -1534,19 +1877,22 @@ CONTAINS
     k=L%LASTPOS
 
     IF(I>=L%LASTPOS) THEN
-       DO WHILE (ASSOCIATED(Current).and.k<i)
+
+       !       DO WHILE (ASSOCIATED(Current).and.k<i)    !TGV
+       DO WHILE (k<nt.and.k<i)
           k=k+1
           Current => Current % next
        END DO
     ELSE
-       DO WHILE (ASSOCIATED(Current).and.k>i)
+       !       DO WHILE (ASSOCIATED(Current).and.k>i)   !TGV
+       DO WHILE (k>1.and.k>i)
           k=k-1
           Current => Current % PREVIOUS
        END DO
     ENDIF
     L%LASTPOS=I; L%LAST => Current;
-    CALL RING_L_THIN(L,doneit)
-  END SUBROUTINE move_to_INTEGRATION_NODE
+    !    CALL RING_L_THIN(L,doneit)
+  END SUBROUTINE move_to_INTEGRATION_NODE    !TGV
 
   !  Beam beam stuff
 

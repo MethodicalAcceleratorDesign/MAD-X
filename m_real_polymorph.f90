@@ -9,7 +9,7 @@ module polymorphic_taylor
   public
   logical(lp),private,parameter::t=.true.,f=.false.
   integer,private::NO,ND,ND2,NP,NDPT,NV          !,lastmaster   ! 2002.12.13
-  INTEGER,PRIVATE::NMAX=100
+  INTEGER,PRIVATE::NMAX_pol=100
   !  real(dp),PRIVATE::EPS=c_1d_6
   ! integer ent,exi
   integer,private,parameter::m1=mmmmmm1,m2=mmmmmm2,m3=mmmmmm3,ms=mmmmmm4
@@ -6188,7 +6188,7 @@ contains
        Y=one
        I=1
        NORM0=c_1d5
-       DO WHILE(I<NMAX.AND.NOTDONE)
+       DO WHILE(I<NMAX_pol.AND.NOTDONE)
           Y=Y*X**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
           SINH_HR0=SINH_HR+Y
           NORM=ABS(SINH_HR-SINH_HR0)
@@ -6205,9 +6205,9 @@ contains
           SINH_HR=SINH_HR0
           I=I+2
        ENDDO
-       IF(I==NMAX) THEN
+       IF(I==NMAX_pol) THEN
           line="NO CONVERGENCE IN SINH_HR"
-          ipause=mypauses(NMAX,line)
+          ipause=mypauses(NMAX_pol,line)
        ENDIF
     else
        SINH_HR=SINH(X)/X
@@ -6232,7 +6232,7 @@ contains
        Y=one
        I=1
        NORM0=c_1d5
-       DO WHILE(I<NMAX.AND.NOTDONE)
+       DO WHILE(I<NMAX_pol.AND.NOTDONE)
           Y=-Y*X**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
           SINH_HR0=SIN_HR+Y
           NORM=ABS(SIN_HR-SINH_HR0)
@@ -6249,9 +6249,9 @@ contains
           SIN_HR=SINH_HR0
           I=I+2
        ENDDO
-       IF(I==NMAX) THEN
+       IF(I==NMAX_pol) THEN
           line="NO CONVERGENCE IN SINH_HR"
-          ipause=mypauses(NMAX,line)
+          ipause=mypauses(NMAX_pol,line)
        ENDIF
     else
        SIN_HR=SIN(X)/X
@@ -6288,7 +6288,7 @@ contains
           Y=one
           I=1
           NORM0=c_1d5
-          DO WHILE(I<NMAX.AND.NOTDONE)
+          DO WHILE(I<NMAX_pol.AND.NOTDONE)
              Y=-Y*S1%T**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
              SINH_HP0=SIN_HP+Y
              NORM=full_abs(SIN_HP-SINH_HP0)
@@ -6305,9 +6305,9 @@ contains
              SIN_HP=SINH_HP0
              I=I+2
           ENDDO
-          IF(I==NMAX) THEN
+          IF(I==NMAX_pol) THEN
              line="NO CONVERGENCE IN SIN_HP"
-             ipause=mypauses(NMAX,line)
+             ipause=mypauses(NMAX_pol,line)
           ENDIF
        else
           SIN_HP=SIN(S1%T)/S1%T
@@ -6329,7 +6329,7 @@ contains
              Y=one
              I=1
              NORM0=c_1d5
-             DO WHILE(I<NMAX.AND.NOTDONE)
+             DO WHILE(I<NMAX_pol.AND.NOTDONE)
                 Y=-Y*varf1**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
                 SINH_HP0=SIN_HP+Y
                 NORM=full_abs(SIN_HP-SINH_HP0)
@@ -6346,9 +6346,9 @@ contains
                 SIN_HP=SINH_HP0
                 I=I+2
              ENDDO
-             IF(I==NMAX) THEN
+             IF(I==NMAX_pol) THEN
                 line="NO CONVERGENCE IN SINH_HP"
-                ipause=mypauses(NMAX,line)
+                ipause=mypauses(NMAX_pol,line)
              ENDIF
           else
              SIN_HP=SIN(varf1)/varf1
@@ -6400,7 +6400,7 @@ contains
           Y=one
           I=1
           NORM0=c_1d5
-          DO WHILE(I<NMAX.AND.NOTDONE)
+          DO WHILE(I<NMAX_pol.AND.NOTDONE)
              Y=Y*S1%T**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
              SINH_HP0=SIN_HP+Y
              NORM=full_abs(SIN_HP-SINH_HP0)
@@ -6417,9 +6417,9 @@ contains
              SIN_HP=SINH_HP0
              I=I+2
           ENDDO
-          IF(I==NMAX) THEN
+          IF(I==NMAX_pol) THEN
              line="NO CONVERGENCE IN SINH_HP"
-             ipause=mypauses(NMAX,line)
+             ipause=mypauses(NMAX_pol,line)
           ENDIF
        else
 
@@ -6442,7 +6442,7 @@ contains
              Y=one
              I=1
              NORM0=c_1d5
-             DO WHILE(I<NMAX.AND.NOTDONE)
+             DO WHILE(I<NMAX_pol.AND.NOTDONE)
                 Y=Y*varf1**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
                 SINH_HP0=SIN_HP+Y
                 NORM=full_abs(SIN_HP-SINH_HP0)
@@ -6459,9 +6459,9 @@ contains
                 SIN_HP=SINH_HP0
                 I=I+2
              ENDDO
-             IF(I==NMAX) THEN
+             IF(I==NMAX_pol) THEN
                 line="NO CONVERGENCE IN SINH_HP"
-                ipause=mypauses(NMAX,line)
+                ipause=mypauses(NMAX_pol,line)
              ENDIF
           else
              SIN_HP=SINH(varf1)/varf1
