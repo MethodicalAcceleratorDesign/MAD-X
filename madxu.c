@@ -1610,7 +1610,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
   char rpos[3][6] = {"exit", "centre", "entry"};
   *c_dum->c = '\0';
   if (sequ->share) strcat(c_dum->c, "shared ");
-  strcat(c_dum->c, sequ->name);
+  strcat(c_dum->c, sequ->export_name);
   strcat(c_dum->c, ": sequence");
   if (sequ->ref_flag)
   {
@@ -1683,7 +1683,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   struct node* c_node = sequ->start;
   if (pass_select_list(sequ->name, cl) == 0)  return;
   *c_dum->c = '\0';
-  strcat(c_dum->c, sequ->name);
+  strcat(c_dum->c, sequ->export_name);
   strcat(c_dum->c, ": sequence");
   if (sequ->ref_flag ==1)  strcat(c_dum->c, ", refer=entry");
   write_nice_8(c_dum->c, file);

@@ -1750,7 +1750,7 @@ void exec_save(struct in_cmd* cmd)
   int i, n = 0, pos, prev = 0, beam_save = log_val("beam", cmd->clone),
     mad8 = log_val("mad8", cmd->clone),
     bare = log_val("bare", cmd->clone), all_sequ = 0;
-  char *name, *filename;
+  char *name, *filename, *new_name = NULL;
   struct element* el;
   struct el_list* ell;
   struct node* c_node;
@@ -1773,6 +1773,10 @@ void exec_save(struct in_cmd* cmd)
     warning("cannot open output file:", filename);
     return;
   }
+/* get export name for sequence (newname in SAVE) HG 15.10.07 */
+  i = name_list_pos("newname", nl);
+  if (nl->inform[i] != 0) new_name = pl->parameters[i]->string;
+/* end -- export name for sequence (newname in SAVE) HG 15.10.07 */
   warning("SAVE makes all previous USE invalid !", " ");
   pos = name_list_pos("sequence", nl);
   clp = cmd->clone->par->parameters[pos];
@@ -1824,6 +1828,11 @@ void exec_save(struct in_cmd* cmd)
   }
   for (i = sql->curr-1; i >= 0; i--) /* loop over sequences, get elements */
   {
+/* set export name for sequence (newname in SAVE) HG 15.10.07 */
+    if (new_name == NULL) 
+         strcpy(sql->sequs[i]->export_name, sql->sequs[i]->name);
+    else strcpy(sql->sequs[i]->export_name, new_name);
+/* end mod HG 15.10.07 */
     c_node = sql->sequs[i]->start;
     while (c_node != NULL)
     {

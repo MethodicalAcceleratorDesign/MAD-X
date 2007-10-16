@@ -334,6 +334,7 @@ struct sequence
 {
   /* original sequence */
   char name[NAME_L];
+  char export_name[NAME_L];
   char* refpos;                 /* reference position for insertion */
   int ref_flag;                 /* -1 for exit, 0 for centre, 1 for entry */
   int share;                    /* 0 normal, 1 if shared */
