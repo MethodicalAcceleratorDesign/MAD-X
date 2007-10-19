@@ -29,6 +29,7 @@
 /Sqa_beam_beam_ptc.f90 -text
 /Sqb_accel_ptc.f90 -text
 /Sr_spin.f90 -text
+/Sra_fitting.f90 -text
 /St_pointers.f90 -text
 /a_def_all_kind.inc -text
 /a_def_element_fibre_layout.inc -text
