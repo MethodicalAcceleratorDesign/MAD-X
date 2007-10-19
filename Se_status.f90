@@ -311,23 +311,21 @@ CONTAINS
 
   end subroutine alloc_p
 
-
   SUBROUTINE  dealloc_p(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
     INTEGER I
     if(.not.associated(p)) return
-
     !    if(associated(P%dir)) then
     !    endif
-    if(.not.associated(p%LD)) DEALLOCATE(P%LD);
-    if(.not.associated(p%B0)) DEALLOCATE(P%B0);
-    if(.not.associated(p%LC)) DEALLOCATE(P%LC);
-    if(.not.associated(p%TILTD)) DEALLOCATE(P%TILTD);
-    if(.not.associated(p%beta0)) DEALLOCATE(P%beta0);
-    if(.not.associated(p%gamma0I)) DEALLOCATE(P%gamma0I);
-    if(.not.associated(p%gambet)) DEALLOCATE(P%gambet);
-    if(.not.associated(p%P0C)) DEALLOCATE(P%P0C);
+    if(associated(p%LD)) DEALLOCATE(P%LD);
+    if(associated(p%B0)) DEALLOCATE(P%B0);
+    if(associated(p%LC)) DEALLOCATE(P%LC);
+    if(associated(p%TILTD)) DEALLOCATE(P%TILTD);
+    if(associated(p%beta0)) DEALLOCATE(P%beta0);
+    if(associated(p%gamma0I)) DEALLOCATE(P%gamma0I);
+    if(associated(p%gambet)) DEALLOCATE(P%gambet);
+    if(associated(p%P0C)) DEALLOCATE(P%P0C);
     if(associated(p%f)) then
        call kill(p%f)
        DEALLOCATE(P%f);
@@ -339,25 +337,23 @@ CONTAINS
     if(associated(p%A)) then
        CALL KILL(P%A)
     ENDIF
-
-    if(.not.associated(p%EDGE))DEALLOCATE(P%EDGE);
+    if(associated(p%EDGE))DEALLOCATE(P%EDGE);
     !    DEALLOCATE(P%TOTALPATH);
-    if(.not.associated(p%EXACT))DEALLOCATE(P%EXACT);
+    if(associated(p%EXACT))DEALLOCATE(P%EXACT);
     !DEALLOCATE(P%RADIATION);DEALLOCATE(P%NOCAVITY);
-    if(.not.associated(p%permFRINGE))DEALLOCATE(P%permFRINGE);
-    if(.not.associated(p%KILL_ENT_FRINGE))DEALLOCATE(P%KILL_ENT_FRINGE);
-    if(.not.associated(p%KILL_EXI_FRINGE))DEALLOCATE(P%KILL_EXI_FRINGE);
-    if(.not.associated(p%bend_fringe))DEALLOCATE(P%bend_fringe); !DEALLOCATE(P%TIME);
-    if(.not.associated(p%METHOD))DEALLOCATE(P%METHOD);
+    !    if(associated(p%permFRINGE))DEALLOCATE(P%permFRINGE);
+    if(associated(p%KILL_ENT_FRINGE))DEALLOCATE(P%KILL_ENT_FRINGE);
+    if(associated(p%KILL_EXI_FRINGE))DEALLOCATE(P%KILL_EXI_FRINGE);
+    if(associated(p%bend_fringe))DEALLOCATE(P%bend_fringe); !DEALLOCATE(P%TIME);
+    if(associated(p%METHOD))DEALLOCATE(P%METHOD);
     !DEALLOCATE(P%spin);
-    if(.not.associated(p%NST))DEALLOCATE(P%NST);
-    if(.not.associated(p%NMUL))DEALLOCATE(P%NMUL)
+    if(associated(p%NST))DEALLOCATE(P%NST);
+    if(associated(p%NMUL))DEALLOCATE(P%NMUL)
     !    CALL NULL_P(P)
     DEALLOCATE(P)
     nullify(p);
     ! if(junk) ccc=ccc-1
   end subroutine dealloc_p
-
 
   SUBROUTINE  KILL_S_APERTURE(A)
     implicit none
