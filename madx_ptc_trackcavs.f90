@@ -186,7 +186,7 @@ contains
 !!!!!!!!!      TRACKING       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    open(unit=41,file='thintracking_ptc.txt',POSITION='APPEND'  , STATUS='OLD')
+    open(unit=441,file='thintracking_ptc.txt',POSITION='APPEND'  , STATUS='OLD')
 
     do t=1, nturns
        print*, "TURN NUMBER ",t
@@ -228,11 +228,11 @@ contains
              yp = x(4)/pz
 
 
-             !             write(41,'(i8, 1x, a16, i4 ,1x, 2f8.4, 1x, 6f8.4)') ni, p%mag%name, e,&
+             !             write(441,'(i8, 1x, a16, i4 ,1x, 2f8.4, 1x, 6f8.4)') ni, p%mag%name, e,&
              !                    pathlegth, TheBeam%X(n,7), &
              !     x(1), xp , x(3), yp , x(5), p0 , x(6)
 
-             write(41,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
+             write(441,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
                   pathlegth, TheBeam%X(n,7), &
                   x(1), xp , x(3), yp , x(5), p0 , x(6)
 
@@ -278,7 +278,7 @@ contains
 
     enddo !loop over turns
 
-    close(41)
+    close(441)
 
     if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
