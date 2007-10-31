@@ -42,7 +42,7 @@ void adjust_beam()
 {
   struct name_list* nl = current_beam->par_names;
   double circ = one, freq0, alfa, beta, gamma, bcurrent = zero, npart = 0;
-  if (current_sequ != NULL && current_sequ->length != zero)
+  if (current_sequ != NULL && sequence_length(current_sequ) != zero)
     circ = current_sequ->length;
   beta = command_par_value("beta", current_beam);
   gamma = command_par_value("gamma", current_beam);
@@ -1660,8 +1660,8 @@ void expand_curr_sequ(int flag)
   char rout_name[] = "expand_curr_sequ";
   struct node* c_node;
   int j;
-  if (current_sequ->l_expr) current_sequ->length = current_sequ->end->at_value
-                              = current_sequ->end->position = expression_value(current_sequ->l_expr, 2);
+  current_sequ->end->at_value = current_sequ->end->position 
+       = sequence_length(current_sequ);
   if (current_sequ->ex_start != NULL)
   {
     current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
@@ -3119,7 +3119,7 @@ void pro_aperture(struct in_cmd* cmd)
   embedded_twiss_cmd = cmd;
 
   /* check for valid sequence, beam and Twiss table */
-  if (current_sequ != NULL && current_sequ->length != zero)
+  if (current_sequ != NULL && sequence_length(current_sequ) != zero)
   {
     if (attach_beam(current_sequ) == 0)
     {
@@ -3168,7 +3168,7 @@ void pro_aperture(struct in_cmd* cmd)
 
   /* approximate # of needed rows in aperture table */
   interval = command_par_value("interval", this_cmd->clone);
-  rows = current_sequ->n_nodes + 2 * (current_sequ->length / interval);
+  rows = current_sequ->n_nodes + 2 * (sequence_length(current_sequ)/interval);
 
   /* make empty aperture table */
   aperture_table=make_table(table, table, ap_table_cols, ap_table_types, rows);
@@ -3650,15 +3650,15 @@ void pro_twiss()
 
   if (current_twiss->par_names == 0x0)
   {
-    seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
-    warning("pro_twiss","Last twiss has NULL par_names pointer. Can not proceed further.");
+    seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
+    warning("pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
     return;
   }
 
   if (current_twiss->par == 0x0)
   {
-    seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
-    warning("pro_twiss","Last twiss has NULL par pointer. Can not proceed further.");
+    seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
+    warning("pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
     return;
   }
 
@@ -5274,7 +5274,7 @@ void seq_reflect(struct in_cmd* cmd)
     c_node->at_expr = NULL;
     c_node->from_name = NULL;
     c_node->position = c_node->at_value
-      = edit_sequ->length - c_node->position;
+      = sequence_length(edit_sequ) - c_node->position;
     if (c_node == edit_sequ->end) break;
     c_node = c_node->next;
   }
@@ -5458,7 +5458,7 @@ void set_new_position(struct sequence* sequ)
     {
       c_node->position -= zero_pos;
       if (c_node->position < zero || (flag && c_node->position == zero))
-        c_node->position += sequ->length;
+        c_node->position += sequence_length(sequ);
       if (c_node->position > zero) flag = 1;
       c_node->at_value = c_node->position;
       c_node->at_expr = NULL;
@@ -5466,7 +5466,7 @@ void set_new_position(struct sequence* sequ)
     if (c_node == sequ->end) break;
     c_node = c_node->next;
   }
-  c_node->position = c_node->at_value = sequ->length;
+  c_node->position = c_node->at_value = sequence_length(sequ);
 }
 
 void set_node_bv(struct sequence* sequ)

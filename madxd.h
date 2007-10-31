@@ -496,6 +496,12 @@ int decode_command();
 int decode_par(struct in_cmd*, int, int, int, int);
 struct char_array* delete_char_array(struct char_array*);
 struct char_p_array* delete_char_p_array(struct char_p_array*, int);
+double combine_expr_expr(struct expression*, char*, struct expression*, 
+                         struct expression**);
+double combine_expr_val(struct expression*, char*, double, 
+                        struct expression**);
+double combine_val_expr(double, char*, struct expression*, 
+                        struct expression**);
 struct command* delete_command(struct command*);
 struct command_list* delete_command_list(struct command_list*);
 struct command_parameter* delete_command_parameter(struct command_parameter*);
@@ -577,6 +583,7 @@ void exec_save(struct in_cmd*);
 void exec_savebeta();
 void exec_show(struct in_cmd*);
 void exec_sodd(struct in_cmd*);
+void exec_split(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
 void expand_curr_sequ(int);
 void expand_line(struct char_p_array*);
@@ -593,6 +600,8 @@ void export_sequence(struct sequence*, FILE*);
 void export_sequ_8(struct sequence*, struct command_list*, FILE*);
 void export_variable(struct variable*, FILE*);
 void export_var_8(struct variable*, FILE*);
+double expr_combine(struct expression*, double, char*, 
+                    struct expression*, double, struct expression**);
 double expression_value(struct expression*, int);
 void fatal_error(char*, char*);
 void fill_beta0(struct command*, struct node*);
@@ -836,6 +845,7 @@ void seq_move(struct in_cmd*);
 void seq_reflect(struct in_cmd*);
 void seq_replace(struct in_cmd*);
 void seq_remove(struct in_cmd*);
+double sequence_length(struct sequence*);
 void set_command_par_value(char*, struct command*, double);
 void set_defaults(char*);
 int set_enable(char*, struct in_cmd*);
@@ -855,6 +865,8 @@ void show_beam(char*);
 double simple_double(char**, int, int);
 int simple_logic_expr(int, char**);
 char* spec_join(char**, int); /* puts table() argument back for output */
+struct sequence* split_sequence(char*, struct sequence*, 
+                                struct node*, struct node*);
 int mysplit(char*, struct char_p_array*);
 char* stolower(char*);  /* string to lower case in place */
 void stolower_nq(char*);  /* string to lower case in place except quotes */
@@ -1316,8 +1328,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.07";
-char code_mod_date[] = "Code Modification Date: 17.10.2007";
+char myversion[] = "MAD-X 3.04.08";
+char code_mod_date[] = "Code Modification Date: 26.10.2007";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

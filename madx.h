@@ -356,7 +356,7 @@ struct sequence
   struct node* ex_end;          /* last node in expanded sequence */
   struct node* range_start;     /* first node of current range in sequence */
   struct node* range_end;       /* last node of current range in sequence */
-  struct node** all_nodes;      /* sequential list off all nodes */
+  struct node** all_nodes;      /* sequential list of all nodes */
   struct node_list* ex_nodes;   /* alphabetic list of nodes (no drifts) */
   struct table* tw_table;       /* pointer to latest twiss table created */
   struct constraint_list* cl;   /* pointer to constraint list during match */

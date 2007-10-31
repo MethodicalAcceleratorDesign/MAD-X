@@ -1010,7 +1010,7 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
   thin_sequ->start = NULL;
   thin_sequ->share = thick_sequ->share;
   thin_sequ->nested = thick_sequ->nested;
-  thin_sequ->length = thick_sequ->length;
+  thin_sequ->length = sequence_length(thick_sequ);
   thin_sequ->refpos = buffer(thick_sequ->refpos);
   thin_sequ->ref_flag = thick_sequ->ref_flag;
   thin_sequ->beam = thick_sequ->beam;

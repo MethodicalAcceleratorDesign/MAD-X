@@ -610,6 +610,40 @@ struct node* clone_node(struct node* p, int flag)
   }
   return clone;
 }
+double combine_expr_expr(struct expression* exp1, char* oper, 
+                         struct expression* exp2, struct expression** comb_exp)
+{
+  strcpy(c_dum->c, exp1->string);
+  strcat(c_dum->c, oper);
+  strcat(c_dum->c, exp2->string);
+  mysplit(c_dum->c, tmp_p_array);
+  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
+  return expression_value(*comb_exp, 2);
+}
+
+double combine_expr_val(struct expression* exp1, char* oper, 
+                        double val2, struct expression** comb_exp)
+{
+  strcpy(c_dum->c, exp1->string);
+  sprintf(aux_buff->c, "%.12g", val2);
+  strcat(c_dum->c, oper);
+  strcat(c_dum->c, aux_buff->c);
+  mysplit(c_dum->c, tmp_p_array);
+  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
+  return expression_value(*comb_exp, 2);
+}
+
+double combine_val_expr(double val1, char* oper, 
+                        struct expression* exp2, struct expression** comb_exp)
+
+{
+  sprintf(c_dum->c, "%.12g", val1);
+  strcat(c_dum->c, oper);
+  strcat(c_dum->c, exp2->string);
+  mysplit(c_dum->c, tmp_p_array);
+  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
+  return expression_value(*comb_exp, 2);
+}
 
 void conv_char(char* string, struct int_array* tint)
   /*converts character string to integer array, using ascii code */
@@ -1267,8 +1301,10 @@ void dump_node(struct node* node)
   char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL";
   if (node->previous != NULL) strcpy(pname, node->previous->name);
   if (node->next != NULL) strcpy(nname, node->next->name);
-  fprintf(prt_file, v_format("name: %S  occ: %I base: %S  position: %F\n"),
-          node->name, node->occ_cnt, node->base_name, node->position);
+  fprintf(prt_file, 
+  v_format("name: %S  occ: %I base: %S  at_value: %F  position: %F\n"),
+          node->name, node->occ_cnt, node->base_name, node->at_value,
+          node->position);
   fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
           pname, nname);
   if (node->cl != NULL)  for (i = 0; i < node->cl->curr; i++)
@@ -1626,7 +1662,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
   if (sequ->l_expr != NULL) strcat(c_dum->c, sequ->l_expr->string);
   else
   {
-    sprintf(num, v_format("%F"), sequ->length);
+    sprintf(num, v_format("%F"), sequence_length(sequ));
     strcat(c_dum->c, supp_tb(num));
   }
   write_nice(c_dum->c, file);
@@ -1727,7 +1763,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   }
   strcpy(c_dum->c, sequ->name);
   strcat(c_dum->c, "_end: marker, at = ");
-  sprintf(num, v_format("%F"), sequ->length);
+  sprintf(num, v_format("%F"), sequence_length(sequ));
   strcat(c_dum->c,num);
   write_nice_8(c_dum->c, file);
   strcpy(c_dum->c, "endsequence");
@@ -2710,6 +2746,30 @@ struct el_list* new_el_list(int length)
   return ell;
 }
 
+double expr_combine(struct expression* exp1, double val1, char* oper, 
+                    struct expression*  exp2, double val2, 
+                    struct expression** exp_comb)
+{
+  double val = 0;
+
+  if (exp1 == NULL && exp2 == NULL)
+  {
+   *exp_comb = NULL;
+   switch(oper[1])
+   {
+    case '+':
+	val = val1 + val2;
+        break;
+    case '-':
+        val = val1 - val2;
+   }
+  }
+  else if(exp1 == NULL) val = combine_val_expr(val1, oper, exp2, exp_comb);
+  else if(exp2 == NULL) val = combine_expr_val(exp1, oper, val2, exp_comb);
+  else                  val = combine_expr_expr(exp1, oper, exp2, exp_comb);
+  return val;
+}
+
 struct node* new_elem_node(struct element* el, int occ_cnt)
 {
   struct node* p;
@@ -2927,7 +2987,7 @@ struct node* new_sequ_node(struct sequence* sequ, int occ_cnt)
   struct node* p;
   p = new_node(compound(sequ->name, occ_cnt));
   p->p_sequ = sequ;
-  p->length = sequ->length;
+  p->length = sequence_length(sequ);
   p->base_name = permbuff("sequence");
   return p;
 }
@@ -3358,6 +3418,18 @@ void replace(char* buf, char in, char out)
 {
   int j, l = strlen(buf);
   for (j = 0; j < l; j++)  if (buf[j] == in)  buf[j] = out;
+}
+
+double sequence_length(struct sequence* sequ)
+{
+  double val = 0;
+  if (sequ)
+  {
+   if (sequ->l_expr)  
+   val = sequ->length = expression_value(sequ->l_expr,2);
+   else val = sequ->length;
+  }
+  return val;
 }
 
 int square_to_colon(char* string)
