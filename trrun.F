@@ -560,7 +560,7 @@
       go to 500
 !---- Electrostatic separator.
   110 continue
-!        call ttsep(el, track, ktrack)
+      call ttsep(el, track, ktrack)
       go to 500
 !---- Rotation around s-axis.
   120 continue
@@ -1200,6 +1200,49 @@
 !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
 ! 20   continue
 !      endif
+      end
+      subroutine ttsep(el,track,ktrack)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+! ttsep tracks particle through an electrostatic separator with an     *
+! homogeneous, purely perpendicularly acting electric field. The       *
+! element is given as a thick element and then sliced by makethin.     *
+! Input:                                                               *
+!   EL         (double)     Length of the element                      *
+!   KTRACK:    (integer)    Number of surviving tracks                 *
+! Input/Output:                                                        *
+!   TRACK(6,*) (double)     Track coordinantes: (X, PX, Y, PY, T, PT)  *
+!----------------------------------------------------------------------*
+      include 'track.fi'
+      include 'twtrr.fi'
+      integer ktrack,itrack
+      double precision el,track(6,*),node_value,get_value,get_variable 
+      double precision ex,ey,tilt,charge,mass,pc,beta,deltap,kick0
+      double precision cos_tilt,sin_tilt,efieldx,efieldy,pt
+      double precision one,ten3m
+      parameter(one=1.0d0,ten3m=1.0d-3)
+!
+      ex=node_value('ex_l ')
+      ey=node_value('ey_l ')
+      tilt=node_value('tilt ')
+      cos_tilt=cos(tilt)
+      sin_tilt=sin(tilt)
+
+      charge=get_value('probe ','charge ')
+      mass  =get_value('probe ','mass ')
+      pc    =get_value('probe ','pc ')
+      beta  =get_value('probe ','beta ')
+      efieldx=ex*cos_tilt + ey*sin_tilt
+      efieldy=-ex*sin_tilt + ey*cos_tilt
+      do itrack = 1, ktrack
+         pt=track(6,itrack)
+         deltap=sqrt(one-one/beta/beta+(pt+one/beta)**2) - one
+         kick0=charge*ten3m/pc/(one+deltap)/beta
+         track(2,itrack) = track(2,itrack) + kick0*efieldx
+         track(4,itrack) = track(4,itrack) + kick0*efieldy
+      end do
+
       end
       subroutine ttcorr(el,track,ktrack)
       implicit none
