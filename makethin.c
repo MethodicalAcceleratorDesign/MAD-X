@@ -685,6 +685,115 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   return thin_elem;
 }
 
+struct element* create_thin_elseparator(struct element* thick_elem, int slice_no)
+/*hbu create thin elseparator element, similar to and made from create_thin_solenoid */
+{
+  struct command_parameter *length_param, *ex_param, *ey_param, *tilt_param, *at_param ,*ex_par, *ey_par;
+  struct element *thin_elem_parent, *thin_elem;
+  struct command* cmd;
+  char *thin_name;
+  int slices,minimizefl;
+
+  if (thick_elem == thick_elem->parent) return NULL;
+  else
+  {
+    thin_elem_parent = create_thin_elseparator(thick_elem->parent,slice_no); /*hbu move up to parent */
+  }
+  thin_elem = get_thin(thick_elem,slice_no);
+  if (thin_elem) return thin_elem; /* is already thin */
+  slices = get_slices_from_elem(thick_elem);
+  /* get parameters from the thick elseparator element */
+  length_param  = return_param_recurse("l",thick_elem);
+  ex_param      = return_param_recurse("ex",thick_elem);
+  ey_param      = return_param_recurse("ey",thick_elem);
+  tilt_param    = return_param_recurse("tilt",thick_elem);
+  at_param      = return_param("at",thick_elem);
+
+  minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  if(minimizefl)
+  {
+    slice_no=slices=1; /* do not slice this one */
+  }
+
+  /* set up new solenoid command */
+  cmd = new_command(buffer("thin_elseparator"), 11, 11, /* max num names, max num param */
+                    buffer("element"), buffer("none"), 0, 11); /* 0 is link, elseparator is 11 */  /*hbu trial */
+  add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
+
+
+  if(!minimizefl)
+  {
+    add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
+    add_cmd_parameter_clone(cmd,return_param("from",thick_elem),"from",1);
+    add_lrad(cmd,length_param,slices);
+  }
+  add_cmd_parameter_clone(cmd,ex_param,"ex",1); /* keep ex */
+  add_cmd_parameter_clone(cmd,ey_param,"ey",1); /* keep ey */
+  add_cmd_parameter_clone(cmd,tilt_param,"tilt",1); /* keep tilt */
+  if(!minimizefl)
+  {
+    /* create ex_l from ex */
+    if (length_param && ex_param) /* in addition provide   ex_l = ex * l /slices */
+    {
+      ex_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(ex_param); /* start from clone of ex */
+      strcpy(ex_par->name,"ex_l"); /* change name to ex_l */
+      if (length_param->expr && ex_par->expr) /* first step is ex * l calculation, expression or value */
+      {
+        ex_par->expr = compound_expr(ex_par->expr,ex_par->double_value,"*",length_param->expr,length_param->double_value); /* multiply expression with length */
+      }
+      else ex_par->double_value *= length_param->double_value; /* multiply value with length */
+      if (slices > 1) /* 2nd step, divide by slices, expression or number */
+      {
+        if (ex_par->expr) ex_par->expr = compound_expr(ex_par->expr,0.,"/",NULL,slices);
+        else ex_par->double_value /= slices;
+      }
+      add_to_name_list("ex_l",1,cmd->par_names);
+      cmd->par->curr++;
+    }
+    /* create ey_l from ey */
+    if (length_param && ey_param) /* in addition provide   ey_l = ey * l /slices */
+    {
+      ey_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(ey_param); /* start from clone of ey */
+      strcpy(ey_par->name,"ey_l"); /* change name to ey_l */
+      if (length_param->expr && ey_par->expr) /* first step is ey * l calculation, expression or value */
+      {
+        ey_par->expr = compound_expr(ey_par->expr,ey_par->double_value,"*",length_param->expr,length_param->double_value); /* multiply expression with length */
+      }
+      else ey_par->double_value *= length_param->double_value; /* multiply value with length */
+      if (slices > 1) /* 2nd step, divide by slices, expression or number */
+      {
+        if (ey_par->expr) ey_par->expr = compound_expr(ey_par->expr,0.,"/",NULL,slices);
+        else ey_par->double_value /= slices;
+      }
+      add_to_name_list("ey_l",1,cmd->par_names);
+      cmd->par->curr++;
+    }
+  }
+  add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
+  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
+  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  /* create element with this command */
+  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  else thin_name = make_thin_name(thick_elem->name,slice_no);
+  if (thin_elem_parent)
+  {
+    thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
+  }
+  else
+  {
+    thin_elem = make_element(thin_name,"elseparator",cmd,-1);
+  }
+  thin_elem->length = 0;
+  thin_elem->bv = el_par_value("bv",thin_elem);
+  if (thin_elem_parent && thin_elem_parent->bv)
+  {
+    thin_elem->bv = thin_elem_parent->bv;
+  }
+  put_thin(thick_elem,thin_elem,slice_no);
+  return thin_elem;
+}
+
 /* put in one of those nice marker kind of things */
 struct node* new_marker(struct node *thick_node, double at, struct expression *at_expr)
 {
@@ -748,6 +857,10 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
   {
     elem = create_thin_solenoid(node->p_elem,1);  /* create the first thin solenoid slice */
   }
+  else if (strstr(node->base_name,"elseparator"))
+  {
+    elem = create_thin_elseparator(node->p_elem,1);  /* create the first thin elseparator slice */
+  }
   else
   {
     elem = create_thin_multipole(node->p_elem,1); /* get info from first slice */
@@ -783,6 +896,10 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
     else if (strstr(node->base_name,"solenoid"))
     {
       elem = create_thin_solenoid(node->p_elem,i+1);
+    }
+    else if (strstr(node->base_name,"elseparator"))
+    {
+      elem = create_thin_elseparator(node->p_elem,i+1);
     }
     else
     {
@@ -964,7 +1081,8 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
                strcmp(thick_node->base_name,"multipole") == 0
                || /* special spliting required. */
                strcmp(thick_node->base_name,"rcollimator") == 0 ||
-               strcmp(thick_node->base_name,"ecollimator") == 0
+               strcmp(thick_node->base_name,"ecollimator") == 0 ||
+               strcmp(thick_node->base_name,"elseparator") == 0
         )
       {
         seq_diet_add_elem(thick_node,thin_sequ);
