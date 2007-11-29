@@ -846,6 +846,7 @@ void seq_reflect(struct in_cmd*);
 void seq_replace(struct in_cmd*);
 void seq_remove(struct in_cmd*);
 double sequence_length(struct sequence*);
+void set_command_par_string(char* parameter, struct command* cmd, char* val);
 void set_command_par_value(char*, struct command*, double);
 void set_defaults(char*);
 int set_enable(char*, struct in_cmd*);

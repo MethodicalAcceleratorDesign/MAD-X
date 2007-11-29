@@ -4221,6 +4221,35 @@ void set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   current_beam = keep_beam;
 }
 
+/* IA 29.11.07 */
+void set_command_par_string(char* parameter, struct command* cmd, char* val)
+{
+  char rout_name[] = "set_command_par_string";
+  struct command_parameter* cp;
+  int i, new_len;
+
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
+  {
+    cp = cmd->par->parameters[i];
+    if (cp->type == 3)
+    {
+      new_len = strlen(val);
+
+      if( strlen(cp->string) < new_len ) 
+	{
+	  myfree(rout_name,cp->string);
+	  cp->string = (char*) mymalloc(rout_name,new_len);
+	}
+
+      strcpy(cp->string,val);
+
+      if (cp->expr != NULL) cp->expr = delete_expression(cp->expr);
+      cmd->par_names->inform[i] = 1; /* mark as set */
+    }
+  }
+}
+
+
 void set_command_par_value(char* parameter, struct command* cmd, double val)
 {
   struct command_parameter* cp;
