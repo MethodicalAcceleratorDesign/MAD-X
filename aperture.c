@@ -1,6 +1,10 @@
 
 /* start of aperture module */
 
+struct aper_e_d* true_tab;
+struct aper_e_d* offs_tab;
+
+
 int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
             int* pipelength, double pipex[], double pipey[])
 {
@@ -236,7 +240,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 {
   int stop=0, nint=1, jslice=1, err, first, ap=1;
   int true_flag, true_node=0, offs_flag, offs_node=0, do_survey=0;
-  int truepos=0, true_cnt, offspos, offs_cnt;
+  int truepos=0, true_cnt=0, offspos, offs_cnt=0;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
   double surv_init[6]={0, 0, 0, 0, 0, 0};
   double surv_x=zero, surv_y=zero, elem_x=0, elem_y=0;
@@ -263,8 +267,15 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   struct node* rng_glob[2];
   struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1},{-1,-1,-1}};
   struct aper_node* lim_pt = &limit_node;
+
+  /* IA */
+  /*
   struct aper_e_d true_tab[E_D_MAX];
   struct aper_e_d offs_tab[E_D_MAX];
+  */
+  true_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
+  offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));
+
   setbuf(stdout,(char*)NULL);
 
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
@@ -297,14 +308,26 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   dangle=twopi/(nco*4);
 
   /* check if trueprofile and offsetelem files exist */
-  true_flag = aper_e_d_read(truefile, true_tab, &true_cnt, name);
-  offs_flag = aper_e_d_read(offsfile, offs_tab, &offs_cnt, refnode);
+  
+  /*printf("addr=%p\n",true_tab);*/
+
+  true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, name); 
+
+  /*printf("addr=%p\n",true_tab);
+    printf("tt=%s\n",true_tab[0].name);*/
+
+  offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1) ;
   else if (aper_rectellipse(&halo[2], &halo[3], &halo[1], &halo[1], &halo_q_length, halox, haloy))
   {
     warning("Not valid parameters for halo. ", "Unable to make polygon.");
+    
+    /* IA */
+    myfree("Aperture",true_tab);
+    myfree("Aperture",offs_tab);
+    
     return lim_pt;
   }
   else aper_fill_quads(halox, haloy, halo_q_length, &halolength);
@@ -331,6 +354,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
     strcpy(name,current_node->name);
     aper_trim_ws(name, NAME_L);
 
+
     /* the first node in a sequence can not be sliced, hence: */
     if (current_sequ->range_start == current_node) first=1; else first=0;
 
@@ -341,6 +365,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
     node_string("apertype", apertype, &namelen);
     aper_trim_ws(apertype, NAME_L);
+
 
     if (!strncmp("drift",name,5))
     {
@@ -424,6 +449,11 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
       if (!nint) nint=1;
 
+      /* don't interpolate 0-length elements*/
+      #define MIN_LENGTH 1.e-16
+      if (fabs(length) < MIN_LENGTH ) nint=0;
+
+ 
       /* slice the node, call survey if necessary, make twiss for slices*/
       err=interp_node(&nint);
 
@@ -554,16 +584,22 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
     if (!advance_node()) stop=1;
   }
 
+  myfree("Aperture",true_tab);
+  myfree("Aperture",offs_tab);
+  
   return lim_pt;
 }
 
-int aper_tab_search(int cnt, struct aper_e_d tab[], char* name, int* pos)
+int aper_tab_search(int cnt, struct aper_e_d* tab, char* name, int* pos)
 {
   /* looks for node *name in tab[], returns 1 if found, and its pos */
   int i=-1, found=0;
 
+  /*printf("seqrhing %s cnt=%d\n",name,cnt);*/
+
   while (i < cnt && found == 0)
   {
+    /*printf("i=%d\n",i);*/
     i++;
     if (strcmp(name,tab[i].name) == 0) found=1;
   }
@@ -714,13 +750,17 @@ int aper_chk_inside(double p, double q, double pipex[], double pipey[], double d
   return 0;
 }
 
-int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* refnode)
+
+int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnode)
 {
   /* Reads data for special displacements of some magnets */
-  int i=1, j, k, e_d_flag=0;
+  int i=1, j, k, l, e_d_flag=0, curr_e_d_max = E_D_LIST_CHUNK, new_e_d_max;
   char comment[100]="empty";
   char *strpt;
   FILE *e_d_pt;
+  struct aper_e_d* e_d_tab_loc;
+  struct aper_e_d* e_d_tab = *e_d_tabp;
+
 
   if (e_d_name != NULL)
   {
@@ -756,11 +796,12 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
       /* end reading reference node */
 
       i=0;
-      while (i != EOF && *cnt < E_D_MAX)
-      {
+      //while (i != EOF && *cnt < E_D_MAX)
+      while (i != EOF)
+      {	
         i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
         /*next while-loop treats comments*/
-        while (e_d_tab[*cnt].name[0] == '!' && i != EOF)
+        while ( e_d_tab[*cnt].name[0] == '!' && i != EOF)
         {
           fgets(comment, 100, e_d_pt);
           i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
@@ -786,17 +827,41 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d e_d_tab[], int* cnt, char* ref
           e_d_tab[*cnt].curr=k-2;
 
           (*cnt)++;
-          if (*cnt == E_D_MAX) printf("\nToo many special elements...\n");
+
+          if (*cnt == curr_e_d_max) /* grow e_d array */
+	    {
+	      /* printf("\nToo many special elements...(less than %d expected)\n", E_D_MAX); */
+	      new_e_d_max = curr_e_d_max + E_D_LIST_CHUNK;
+	      printf("\ngrowin e_d_max array to %d\n", new_e_d_max);
+	      
+	      e_d_tab_loc = (struct aper_e_d*) mycalloc("Aperture",new_e_d_max,sizeof(struct aper_e_d) );
+	      
+	      for( l=0 ; l < curr_e_d_max; l++)
+		{
+		  e_d_tab_loc[l] = e_d_tab[l];		  
+		}	      
+
+
+	      myfree("Aperture",e_d_tab);
+
+	      e_d_tab = e_d_tab_loc;
+	      
+	      curr_e_d_max = new_e_d_max;
+
+	    }
 
           i=j;
         }
-      }
+      } // while !EOF
 
       printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
       e_d_flag=1; fclose(e_d_pt);
       (*cnt)--;
     }
   }
+
+  *e_d_tabp = e_d_tab;
+  
   return e_d_flag;
 }
 

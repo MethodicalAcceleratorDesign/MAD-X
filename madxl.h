@@ -36,7 +36,11 @@ int* mtable[MTABLE_SIZE];
 #define MATCH_WORK 10       /* no. of work spaces in matching */
 #define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
 #define MAXARRAY 1000       /* max. length of apex tables in aperture module*/
-#define E_D_MAX 100         /* max. length of extra displacement tables */
+
+/* IA */
+#define E_D_MAX 500         /* max. length of extra displacement tables (per element) */
+#define E_D_LIST_CHUNK 1000  /* chunk to allocate memory for extra displacement tables */ 
+
 
 #define MADX_LONG      1
 #define MADX_DOUBLE    2

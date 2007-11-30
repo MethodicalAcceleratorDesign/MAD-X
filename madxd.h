@@ -1085,7 +1085,10 @@ double aper_calc(double, double, double*, double*, double*,
                  int, double*, double*, double*, double*,
                  double*, double*, int, double);
 int aper_chk_inside(double, double, double*, double*, double, int);
-int aper_e_d_read(char*, struct aper_e_d*, int*, char*);
+
+/* IA */
+int aper_e_d_read(char*, struct aper_e_d**, int*, char*);
+
 int aper_external_file(char*, double*, double*);
 void aper_fill_quads(double*, double*, int, int*);
 void aper_header(struct table*, struct aper_node*);

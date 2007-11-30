@@ -4,7 +4,8 @@
 #include <stdio.h>
 
 #define NAME_L 24           /* internal name length */
-#define E_D_MAX 100         /* max. length of extra displacement tables */
+#define E_D_MAX 500  /* IA: defined in madxl.h*/         /* max. length of extra displacement tables */ 
+//#define E_DM_MAX 500         /* max. length of extra displacement table per element */
 #define FIELD_MAX 42        /* field error array length */ /*defined in madxl.h*/
 
 #include "madx.h"
