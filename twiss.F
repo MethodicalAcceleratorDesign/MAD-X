@@ -323,7 +323,7 @@
           call vector_to_table(table_name, 's ', i, opt_fun(2))
           i = 5
           call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
-          i = 4
+          i = 5
           call vector_to_table(table_name, 'kmax ', i, opt_fun(70))
           if(rmatrix) then
             i = 36
@@ -1041,8 +1041,9 @@
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
       opt_fun(70) = node_value('kmax ')
-      opt_fun(71) = node_value('calib ')
-      opt_fun(72) = node_value('polarity ')
+      opt_fun(71) = node_value('kmin ')
+      opt_fun(72) = node_value('calib ')
+      opt_fun(73) = node_value('polarity ')
       n_align = node_al_errors(al_errors)
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)
@@ -1072,7 +1073,7 @@
         enddo
         eta = - sd * betas**2 / circ
         alfa = one / gammas**2 + eta
-        opt_fun(73)=alfa
+        opt_fun(74)=alfa
         if(save.ne.0) call twfill(1,opt_fun,currpos, 1)
       endif
       centre_cptk=.false.
@@ -1093,7 +1094,7 @@
       enddo
       eta = - sd * betas**2 / circ
       alfa = one / gammas**2 + eta
-      opt_fun(73)=alfa
+      opt_fun(74)=alfa
       if(centre) then
         bxmax =max(opt_fun(3)      ,bxmax)
         bymax =max(opt_fun(6)      ,bymax)

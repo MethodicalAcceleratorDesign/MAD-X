@@ -572,6 +572,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("tilt",thick_elem),"tilt",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("kmax",    thick_elem),"kmax",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmin",    thick_elem),"kmin",    1);
   add_cmd_parameter_clone(cmd,return_param_recurse("calib",   thick_elem),"calib",   1);
   add_cmd_parameter_clone(cmd,return_param_recurse("polarity",thick_elem),"polarity",1);
   /* create element with this command */
@@ -817,6 +818,7 @@ struct node* new_marker(struct node *thick_node, double at, struct expression *a
     add_cmd_parameter_clone(clone,return_param_recurse("aperture",thick_node->p_elem),"aperture",1);
     add_cmd_parameter_clone(clone,return_param_recurse("aper_tol",thick_node->p_elem),"aper_tol",1);
     add_cmd_parameter_clone(clone,return_param_recurse("kmax",    thick_node->p_elem),"kmax",    1);
+    add_cmd_parameter_clone(clone,return_param_recurse("kmin",    thick_node->p_elem),"kmin",    1);
     add_cmd_parameter_clone(clone,return_param_recurse("calib",   thick_node->p_elem),"calib",   1);
     add_cmd_parameter_clone(clone,return_param_recurse("polarity",thick_node->p_elem),"polarity",1);
     elem = make_element(thick_node->p_elem->name, "marker", clone,-1);
