@@ -308,14 +308,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   dangle=twopi/(nco*4);
 
   /* check if trueprofile and offsetelem files exist */
-  
-  /*printf("addr=%p\n",true_tab);*/
-
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, name); 
-
-  /*printf("addr=%p\n",true_tab);
-    printf("tt=%s\n",true_tab[0].name);*/
-
   offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
@@ -595,11 +588,8 @@ int aper_tab_search(int cnt, struct aper_e_d* tab, char* name, int* pos)
   /* looks for node *name in tab[], returns 1 if found, and its pos */
   int i=-1, found=0;
 
-  /*printf("seqrhing %s cnt=%d\n",name,cnt);*/
-
   while (i < cnt && found == 0)
   {
-    /*printf("i=%d\n",i);*/
     i++;
     if (strcmp(name,tab[i].name) == 0) found=1;
   }
