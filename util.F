@@ -823,6 +823,7 @@
       character*(*) rout,text
 
       print *,  '++++++ warning: ',rout,text
+      call augmentfwarn()
 
       end
       subroutine aafail(rout,text)
