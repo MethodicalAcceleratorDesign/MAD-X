@@ -268,6 +268,8 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1},{-1,-1,-1}};
   struct aper_node* lim_pt = &limit_node;
 
+  int is_zero_len;
+
   /* IA */
   /*
   struct aper_e_d true_tab[E_D_MAX];
@@ -308,7 +310,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   dangle=twopi/(nco*4);
 
   /* check if trueprofile and offsetelem files exist */
-  true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, name); 
+  true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode); 
   offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
@@ -347,6 +349,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
     strcpy(name,current_node->name);
     aper_trim_ws(name, NAME_L);
 
+    is_zero_len = 0;
 
     /* the first node in a sequence can not be sliced, hence: */
     if (current_sequ->range_start == current_node) first=1; else first=0;
@@ -390,6 +393,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
       aper_read_twiss(tw_cp->name, tw_cnt, &s_end,
                       &x, &y, &betx, &bety, &dx, &dy);
+
       aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
                        &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
                        &s_end, &x, &y, &betx, &bety, &dx, &dy, table);
@@ -443,9 +447,11 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       if (!nint) nint=1;
 
       /* don't interpolate 0-length elements*/
+      
+      
       #define MIN_LENGTH 1.e-16
-      if (fabs(length) < MIN_LENGTH ) nint=0;
-
+      if (fabs(length) < MIN_LENGTH ) is_zero_len = 1;
+      
  
       /* slice the node, call survey if necessary, make twiss for slices*/
       err=interp_node(&nint);
@@ -493,9 +499,10 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         }
         else
         {
-          s_curr+=0.001; /*to get correct plot at start of elements*/
+          s_curr+=1.e-12; /*to get correct plot at start of elements*/
           s=0; /*used to calc elem_x elem_y) */
         }
+
 
         /* survey adjustments */
         if (offs_node)
@@ -539,6 +546,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         n1x_m=n1*bbeat*sqrt(betx*ex);
         n1y_m=n1*bbeat*sqrt(bety*ey);
 
+	if ( (is_zero_len == 0) || (jslice == 1) )
         aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
                          &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
                          &x, &y, &betx, &bety, &dx, &dy, table);
