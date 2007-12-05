@@ -1,6 +1,8 @@
 
 /* start of aperture module */
 
+#define MIN_DOUBLE 1.e-36
+
 struct aper_e_d* true_tab;
 struct aper_e_d* offs_tab;
 
@@ -449,8 +451,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       /* don't interpolate 0-length elements*/
       
       
-      #define MIN_LENGTH 1.e-16
-      if (fabs(length) < MIN_LENGTH ) is_zero_len = 1;
+      if (fabs(length) < MIN_DOUBLE ) is_zero_len = 1;
       
  
       /* slice the node, call survey if necessary, make twiss for slices*/
@@ -794,6 +795,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
       /* end reading reference node */
 
       i=0;
+
       while (i != EOF)
       {	
         i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
@@ -849,7 +851,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
 
           i=j;
         }
-      } /* while !EOF*/
+      } /* while !EOF */
 
       printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
       e_d_flag=1; fclose(e_d_pt);
@@ -1062,12 +1064,14 @@ int aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
 {
   int vertical=0;
 
-  *a=(y1-y2)/(x1-x2);
-  *b=y1-(*a)*x1;
-
-  if ((x1-x2) == 0)
+  if ( fabs(x1-x2)< MIN_DOUBLE)
   {
+    *a=0;
+    *b=y1-(*a)*x1;
     vertical=1;
+  } else {
+    *a=(y1-y2)/(x1-x2);
+    *b=y1-(*a)*x1;
   }
 
   return vertical;
