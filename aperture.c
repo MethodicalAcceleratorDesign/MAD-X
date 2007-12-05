@@ -794,7 +794,6 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
       /* end reading reference node */
 
       i=0;
-      //while (i != EOF && *cnt < E_D_MAX)
       while (i != EOF)
       {	
         i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
@@ -850,7 +849,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
 
           i=j;
         }
-      } // while !EOF
+      } /* while !EOF*/
 
       printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
       e_d_flag=1; fclose(e_d_pt);
