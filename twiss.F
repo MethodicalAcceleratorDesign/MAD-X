@@ -2724,7 +2724,7 @@
       integer i, n_ferr,code,node_fd_errors
       double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
      &te(6,6,6),deltap,gamma,arad,el,rfac,pt,xkick,ykick,dpx,dpy,       &
-     &node_value,get_value,bv0,field(2),div,zero,one,three,half
+     &node_value,get_value,bv0,field(2),tilt,xau,div,zero,one,three,half
       parameter(zero=0d0,one=1d0,three=3d0,half=5d-1)
 
 !---- Initialize.
@@ -2741,6 +2741,7 @@
       arad = get_value('probe ','arad ')
       gamma = get_value('probe ','gamma ')
       dorad = get_value('probe ','radiate ') .ne. zero
+      tilt = node_value('tilt ')
 
 !---- Tracking desired, use corrector map.
       if (ftrk) then
@@ -2767,6 +2768,9 @@
           xkick=zero
           ykick=zero
         endif
+        xau=xkick
+        xkick= xkick*cos(tilt)+ykick*sin(tilt)
+        ykick=-xau*sin(tilt)+ykick*cos(tilt)
 !---- Sum up total kicks.
         dpx = xkick / (one + deltap)
         dpy = ykick / (one + deltap)
