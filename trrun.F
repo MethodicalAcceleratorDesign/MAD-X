@@ -150,6 +150,7 @@
 !--- loop over turns
       nobs = 0
       do turn = 1, turns
+        call trupdate(turn)
         j = restart_sequ()
         nlm = 0
         sum=zero
@@ -2571,3 +2572,21 @@
         enddo
       enddo
       end
+      
+      subroutine trupdate(turn)
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Update global turnnumber-VARIABLE,                                 *
+!   which can be used to make other variables turn-dependent.          *
+! Input/output:                                                        *
+!   turn     (integer)    Current turn number.                         *
+!----------------------------------------------------------------------*
+      integer           turn
+      character*50      cmd
+
+!---- call pro_input('TR$TURN := turn;')
+      write(cmd, '(''tr$turni := '',i8,'' ; '')') turn
+      call pro_input(cmd)
+      end      
+            

@@ -152,7 +152,7 @@ extern struct el_list*  element_list;
 /*MAD-X Functions used in this file */
 /************************************/
 
-extern void             pro_input(char* statement);
+extern void             pro_input_(char* statement);
 extern void             process();
 extern void             pro_ptc_twiss();
 extern struct command*  clone_command(struct command*);
@@ -330,7 +330,7 @@ void madx_mpk_run(struct in_cmd* cmd)
     if (errorflag)
     {
       error("Matching With Knobs","PTC calculation ended with an error. Check your setting and matching limits.");
-      pro_input(ptcend);
+      pro_input_(ptcend);
       goto cleaning;
     }
 
@@ -347,7 +347,7 @@ void madx_mpk_run(struct in_cmd* cmd)
     if (debuglevel)  printf("matchfilename is %s\n",matchfilename);
 
     sprintf(callmatchfile,"call, file=\"%s\" ;",matchfilename);
-    pro_input(callmatchfile);
+    pro_input_(callmatchfile);
 
     if (function_vector1 == 0x0)
     {
@@ -359,7 +359,7 @@ void madx_mpk_run(struct in_cmd* cmd)
     if (debuglevel)  printf("match2_evaluate_exressions returned fun_vector 1 of length %d\n",i);
 
 
-    pro_input(ptcend);
+    pro_input_(ptcend);
 
     /* END OF STD MATCHING*/
 
@@ -454,7 +454,7 @@ void madx_mpk_run(struct in_cmd* cmd)
     i = match2_evaluate_exressions(0,0,function_vector2);
     if (debuglevel)  printf("match2_evaluate_exressions returned fun_vector 2 of length %d\n",i);
 
-    pro_input(ptcend);
+    pro_input_(ptcend);
 
     penalty  = 0.0;
     penalty2 = 0.0;
@@ -1522,7 +1522,7 @@ int run_ptccalculation(int setknobs, char* readstartval)
               sprintf(comd,"ptc_setfieldcomp, element=%s, kn=%d, ks=%d, value=%s;",
                       buff, v->kn,v->ks,v->namecv);
               if (debuglevel)  printf("%s\n",comd);
-              pro_input(comd);
+              pro_input_(comd);
 
             }
 
@@ -1541,7 +1541,7 @@ int run_ptccalculation(int setknobs, char* readstartval)
           sprintf(comd,"ptc_setfieldcomp, element=%s, kn=%d, ks=%d, value=%s;",
                   kn->elname, v->kn,v->ks,v->namecv);
           if (debuglevel)  printf("%s\n",comd);
-          pro_input(comd);
+          pro_input_(comd);
         }
       }
     }
@@ -1553,7 +1553,7 @@ int run_ptccalculation(int setknobs, char* readstartval)
     for(i=0;i<madx_mpk_Nknobs;i++)
     {
 /*        printf("Setting knob %d: \n%s\n",i,madx_mpk_setknobs[i]);*/
-      pro_input(madx_mpk_setknobs[i]);
+      pro_input_(madx_mpk_setknobs[i]);
     }
   }
   else
@@ -1561,7 +1561,7 @@ int run_ptccalculation(int setknobs, char* readstartval)
     if (debuglevel)  printf("Knob Setting Is not requested this time.\n");
   }
 
-/*  pro_input(twisscommand);*/
+/*  pro_input_(twisscommand);*/
 
   if (debuglevel)  printf("Running ptc_twiss or ptc_normal.\n");
 

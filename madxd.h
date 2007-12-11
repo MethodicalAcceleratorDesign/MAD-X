@@ -136,6 +136,7 @@
 
 #define makemomentstables  makemomentstables_
 
+#define pro_input               pro_input_  /* AK 20070530*/
 
 #define type_ofCall
 
@@ -278,6 +279,7 @@
 
 #define augmentfwarn            AUGMENTFWARN
 
+#define pro_input               PRO_INPUT   /* AK 20070530*/
 
 #define type_ofCall _stdcall
 #endif
