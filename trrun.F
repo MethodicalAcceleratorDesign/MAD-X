@@ -351,30 +351,26 @@
       call dzero(craporb,6)
       call dzero(re,36)
       call dzero(te,216)
+
 !---- Drift space
       if(code.eq.1) then
         call ttdrf(el,track,ktrack)
         go to 502
       endif
 
-!--- Note: First 'if' below could be taken out,
-!--- we have no thick elements (bends)
-      bend = code .eq. 2 .or. code .eq. 3
-      if (.not. bend)  then
-        theta = node_value('tilt ')
-        if (theta .ne. zero)  then
-!--- rotate trajectory before entry
-          st = sin(theta)
-          ct = cos(theta)
-          do jtrk = 1,ktrack
-            tmp = track(1,jtrk)
-            track(1,jtrk) = ct * tmp + st * track(3,jtrk)
-            track(3,jtrk) = ct * track(3,jtrk) - st * tmp
-            tmp = track(2,jtrk)
-            track(2,jtrk) = ct * tmp + st * track(4,jtrk)
-            track(4,jtrk) = ct * track(4,jtrk) - st * tmp
-          enddo
-        endif
+!---- Rotate trajectory before entry
+      theta = node_value('tilt ')
+      if (theta .ne. zero)  then
+        st = sin(theta)
+        ct = cos(theta)
+        do jtrk = 1,ktrack
+          tmp = track(1,jtrk)
+          track(1,jtrk) = ct * tmp + st * track(3,jtrk)
+          track(3,jtrk) = ct * track(3,jtrk) - st * tmp
+          tmp = track(2,jtrk)
+          track(2,jtrk) = ct * tmp + st * track(4,jtrk)
+          track(4,jtrk) = ct * track(4,jtrk) - st * tmp
+        enddo
       endif
 
 !---- Translation of particles // AK 23.02.2006
@@ -382,47 +378,51 @@
       if(code.eq.36) then
         if (onepass) then
           call tttrans(track,ktrack)
-          go to 502
+          go to 500
         endif
       endif
-!---- Collimator with elliptic aperture.
-      if(code.eq.20) then
-        apx = node_value('xsize ')
-        apy = node_value('ysize ')
-        if(apx.eq.zero) then
-          apx=maxaper(1)
-        endif
-        if(apy.eq.zero) then
-          apy=maxaper(3)
-        endif
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
-     &last_pos, last_orbit, track, ktrack,al_errors)
-        go to 502
-      endif
-!---- Collimator with rectangular aperture.
-      if(code.eq.21) then
-        apx = node_value('xsize ')
-        apy = node_value('ysize ')
-        if(apx.eq.zero) then
-          apx=maxaper(1)
-        endif
-        if(apy.eq.zero) then
-          apy=maxaper(3)
-        endif
-        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
-     &last_pos, last_orbit, track, ktrack,al_errors)
-        go to 502
-      endif
+
 !---- Beam-beam,  standard 4D, no aperture
       if(code.eq.22) then
         parvec(5)=get_value('probe ', 'arad ')
         parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
         parvec(7)=get_value('probe ','gamma ')
         call ttbb(track, ktrack, parvec)
-        go to 502
+        go to 500
       endif
 
-!____ Test aperture. ALL ELEMENTS BUT DRIFTS
+!---- Special colllimator aperture check taken out AK 20071211      
+!!---- Collimator with elliptic aperture.
+!      if(code.eq.20) then
+!        apx = node_value('xsize ')
+!        apy = node_value('ysize ')
+!        if(apx.eq.zero) then
+!          apx=maxaper(1)
+!        endif
+!        if(apy.eq.zero) then
+!          apy=maxaper(3)
+!        endif
+!        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
+!     &last_pos, last_orbit, track, ktrack,al_errors)
+!        go to 500
+!      endif
+!!---- Collimator with rectangular aperture.
+!      if(code.eq.21) then
+!        apx = node_value('xsize ')
+!        apy = node_value('ysize ')
+!        if(apx.eq.zero) then
+!          apx=maxaper(1)
+!        endif
+!        if(apy.eq.zero) then
+!          apy=maxaper(3)
+!        endif
+!        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
+!     &last_pos, last_orbit, track, ktrack,al_errors)
+!        go to 500
+!      endif
+
+
+!---- Test aperture. ALL ELEMENTS BUT DRIFTS
       aperflag = get_option('aperture ') .ne. 0
       if(aperflag) then
         nn=name_len
@@ -509,8 +509,41 @@
 !          call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
 !     &    last_pos, last_orbit, track,ktrack,al_errors)
         endif
+!      else
+!!---- Check on collimator xsize/ysize even if user did not use 'aperture'
+!!---- option in track command. This simulates roughly the old MAD-X 
+!!---- behaviour.      	
+!!---- Collimator with elliptic aperture.
+!      if(code.eq.20) then
+!        apx = node_value('xsize ')
+!        apy = node_value('ysize ')
+!        if(apx.eq.zero) then
+!          apx=maxaper(1)
+!        endif
+!        if(apy.eq.zero) then
+!          apy=maxaper(3)
+!        endif
+!        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
+!     &last_pos, last_orbit, track, ktrack,al_errors)
+!        go to 500
+!      endif
+!!---- Collimator with rectangular aperture.
+!      if(code.eq.21) then
+!        apx = node_value('xsize ')
+!        apy = node_value('ysize ')
+!        if(apx.eq.zero) then
+!          apx=maxaper(1)
+!        endif
+!        if(apy.eq.zero) then
+!          apy=maxaper(3)
+!        endif
+!        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
+!     &last_pos, last_orbit, track, ktrack,al_errors)
+!        go to 500
+!      endif      	
       endif
 !----  END OF IF(APERFLAG)  ----------------
+
 
 !-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
 !-- 500 has been specified at the relevant places in go to below
@@ -616,19 +649,19 @@
 
 
   500 continue
-      if (.not. bend)  then
-        if (theta .ne. zero)  then
-!--- rotate trajectory at exit
-          do jtrk = 1,ktrack
-            tmp = track(1,jtrk)
-            track(1,jtrk) = ct * tmp - st * track(3,jtrk)
-            track(3,jtrk) = ct * track(3,jtrk) + st * tmp
-            tmp = track(2,jtrk)
-            track(2,jtrk) = ct * tmp - st * track(4,jtrk)
-            track(4,jtrk) = ct * track(4,jtrk) + st * tmp
-          enddo
-        endif
+
+!---- Rotate trajectory at exit
+      if (theta .ne. zero)  then
+        do jtrk = 1,ktrack
+          tmp = track(1,jtrk)
+          track(1,jtrk) = ct * tmp - st * track(3,jtrk)
+          track(3,jtrk) = ct * track(3,jtrk) + st * tmp
+          tmp = track(2,jtrk)
+          track(2,jtrk) = ct * tmp - st * track(4,jtrk)
+          track(4,jtrk) = ct * track(4,jtrk) + st * tmp
+        enddo
       endif
+
 !---- Accumulate length.
  502  sum = sum + el
       return
