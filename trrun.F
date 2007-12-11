@@ -163,25 +163,25 @@
           l_buf(nlm+1) = el
 !hbu get current node name
           call element_name(el_name,len(el_name))
+          if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
+            print*," "
+            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
+            sum = node_value('name ')
+            print*," "
+            print*,"Track dies nicely"
+            print*,"Thick lenses will get nowhere"
+            print*,"MAKETHIN will save you"
+            print*," "
+            print*," "
+!           Better to use stop. If use return, irrelevant tracking output is printed
+            stop
+!            call aafail('TRRUN',                                          &
+!     &      '----element with length found : CONVERT STRUCTURE WITH '//   &
+!     &      'MAKETHIN')
+          endif
         else
           el = l_buf(nlm+1)
           code = code_buf(nlm+1)
-        endif
-        if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
-          print*," "
-          print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
-          sum = node_value('name ')
-          print*," "
-          print*,"Track dies nicely"
-          print*,"Thick lenses will get nowhere"
-          print*,"MAKETHIN will save you"
-          print*," "
-          print*," "
-! Better to use stop. If use return, irrelevant tracking output is printed
-          stop
-!          call aafail('TRRUN',                                          &
-!     &    '----element with length found : CONVERT STRUCTURE WITH '//   &
-!     &    'MAKETHIN')
         endif
         if (switch .eq. 1) then
           nobs = node_value('obs_point ')
@@ -2256,7 +2256,7 @@
       include 'bb.fi'
       logical zgiv,zngiv
       integer j,jend,k,kp,kq,next_start,itype(23),switch,turns,jt
-      double precision phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
+      double precision phi,track(12),zstart(12),twopi,z(6,*),zn(6),     &
      &ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
      &ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
       double precision deltap,one
