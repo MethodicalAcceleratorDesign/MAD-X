@@ -934,6 +934,7 @@ double el_par_value(char* par, struct element* el)
   double val = zero, angle = zero, l, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
   int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
+  int mark = strcmp(el->base_type->name, "marker") == 0 ? 1 : 0;
   if (fact != zero || strcmp(el->base_type->name, "sbend") == 0) /* bend */
   {
     if ((l = command_par_value("l", el->def)) == zero)
@@ -961,6 +962,11 @@ double el_par_value(char* par, struct element* el)
   /* all elements except bends */
   else if (strcmp(par, "rhoinv") == 0) val = zero;
   else if (strcmp(par, "blen") == 0) val = zero;
+  else if (mark) /* marker */
+  {
+    if ((l = command_par_value("l", el->def)) != zero)
+      fatal_error("marker with nonzero length:",el->name);
+  }
   else if (mult)  /* multipole */
   {
     if (strcmp(par, "l") == 0) val = zero;
