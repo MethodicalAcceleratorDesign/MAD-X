@@ -1516,7 +1516,7 @@ void expand_line(struct char_p_array* l_buff)
   /* expands a beam line, applies rep. count and inversion */
 {
   /* first get all bracket pairs with their level; keep max. level */
-  int add, i, j, k, n, number, dummy, rep, pos;
+  int add=0, i=0, j=0, k=0, n=0, number=0, dummy=0, rep=-1, pos=0;
   int level = 0, l_max = 0, b_cnt = 0;
   char* p;
   struct int_array* lbpos = new_int_array(l_buff->curr);
@@ -1576,7 +1576,12 @@ void expand_line(struct char_p_array* l_buff)
   {
     if (*l_buff->p[pos] == '*')
     {
-      sscanf(l_buff->p[pos-2], "%d", &rep);
+      rep = -1;
+      sscanf(l_buff->p[pos-1], "%d", &rep);
+      if (rep < 0)
+       {
+         fatal_error("expand_line","Problem with reading number of copies");
+       }
       n = add = rep - 1;
       while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
       for (j = l_buff->curr; j > pos + 1; j--) /* shift upwards */
@@ -4978,9 +4983,9 @@ void seq_cycle(struct in_cmd* cmd)
         clone->p_elem = clone_element(node->p_elem);
         strcpy(clone->p_elem->name, c_dum->c);
 
-	/* IA 29.11.07 : fixes a bug with aperture module*/
-	sprintf(c_dum->c, "");
-	set_command_par_string("apertype", clone->p_elem->def,c_dum->c);
+        /* IA 29.11.07 : fixes a bug with aperture module*/
+        sprintf(c_dum->c, "");
+        set_command_par_string("apertype", clone->p_elem->def,c_dum->c);
 
 
         add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
