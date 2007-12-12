@@ -4,7 +4,7 @@
 #
 #######################################################################
 
-PLUGIN_SUPPORT=no
+PLUGIN_SUPPORT=NO
 
 # compilers
 CC=gcc
@@ -24,6 +24,7 @@ FCDB=-g -O0 -m32 -fno-second-underscore
 # default C compiler flag options
 GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I.
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
+#to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
 
 # alternative for development
 GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
