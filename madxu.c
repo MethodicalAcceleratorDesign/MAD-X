@@ -268,19 +268,43 @@ void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
   /* adds sequence sequ to sequence list sql */
 {
   int i;
+  int firstfreeslot = -1;
   for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  return;
+
+  /*printf("add_to_sequ_list %s \n",sequ->name);*/
+
   for (i = 0; i < sql->curr; i++)
   {
+    if (sql->sequs[i] == 0x0)
+     {
+       /*printf("add_to_sequ_list: pos %d is NULL\n",i);*/
+       firstfreeslot = i;
+       continue;
+     }
+   
     if (strcmp(sql->sequs[i]->name, sequ->name) == 0)
     {
+      /*printf("add_to_sequ_list sequence with this name is already in: %s \n",sequ->name);*/
       sql->sequs[i] = sequ;
       sql->list->names[i] = sequ->name;
       return;
     }
   }
-  if (sql->curr == sql->max) grow_sequence_list(sql);
-  sql->sequs[sql->curr++] = sequ;
+  
+  if (firstfreeslot >= 0)
+   {/*This protects agains problems sequence redefinition*/
+     /*printf("add_to_sequ_list: adding at found free slot\n");*/
+     sql->sequs[firstfreeslot] = sequ;
+   }
+  else
+   { 
+     /*printf("add_to_sequ_list: adding at new slot\n");*/
+     if (sql->curr == sql->max) grow_sequence_list(sql);
+     sql->sequs[sql->curr++] = sequ;
+   }  
+
   add_to_name_list(sequ->name, 0, sql->list);
+  
 }
 
 void add_to_table_list(struct table* t, struct table_list* tl)
@@ -3417,16 +3441,22 @@ int remove_from_name_list(char* name, struct name_list* nl)
   int j, i, k = -1;
   for (i = 0; i < nl->curr; i++)
     if (strcmp(nl->names[nl->index[i]], name) == 0) break;
+  
+  
   if (i < nl->curr)
   {
+   
     k = nl->index[i];
     for (j = i+1; j < nl->curr; j++) nl->index[j-1] = nl->index[j];
+    
     for (j = 0; j < nl->curr-1; j++)
       if(nl->index[j] == nl->curr-1) break;
+      
     nl->index[j] = k;
     nl->inform[k] = nl->inform[nl->curr-1];
     nl->names[k] = nl->names[--nl->curr];
   }
+  
   return k;
 }
 
@@ -3435,9 +3465,10 @@ void remove_from_sequ_list(struct sequence* sequ, struct sequence_list* sql)
 {
   int i;
   for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  break;
-  return;
+
   remove_from_name_list(sequ->name, sql->list);
-  sql->sequs[i] = sql->sequs[sql->curr--];
+  
+  /*sql->sequs[i] = sql->sequs[sql->curr--];*/
   return;
 }
 

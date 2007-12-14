@@ -1106,8 +1106,9 @@ void enter_sequence(struct in_cmd* cmd)
     }
     if ((pos = name_list_pos(toks[aux_pos], sequences->list)) >= 0)
     {
+      /*printf("enter_sequence: removing %s\n", sequences->sequs[pos]->name);*/
       remove_from_sequ_list(sequences->sequs[pos], sequences);
-      delete_sequence(sequences->sequs[pos]);
+      sequences->sequs[pos] = delete_sequence(sequences->sequs[pos]);
     }
     current_sequ = new_sequence(toks[aux_pos], k);
     add_to_sequ_list(current_sequ, sequences);
