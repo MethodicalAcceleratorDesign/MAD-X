@@ -1,6 +1,7 @@
 #include "rplot.h"
 /*Piotr Skowronski, CERN*/
 
+#include <stdlib.h>
 #include <stdio.h>
 
 #define WIN32 _WIN32
@@ -16,6 +17,9 @@ void loadrplotlib()
 {
 #if PLUGIN_SUPPORT
   void *handle;
+  char buff[200];
+  char* homedir = 0x0;
+  
   /*simple check if the library was linked dynamically*/
   handle = dlopen( 0,  RTLD_GLOBAL | RTLD_LAZY);
   if (handle == 0x0)
@@ -42,8 +46,19 @@ void loadrplotlib()
     fprintf (stderr, "%s\n", dlerror());
     return;
   }
-
-
+  
+  handle = dlopen( "libRIO.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
+  
+  handle = dlopen( "libNet.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
+  
   handle = dlopen( "libTree.so",   RTLD_GLOBAL | RTLD_LAZY);
   if (!handle) {
     fprintf (stderr, "%s\n", dlerror());
@@ -86,12 +101,29 @@ void loadrplotlib()
     return;
   }
 
-  printf("Loading librplot.so\n");
-  rplot_handle = dlopen ("librplot.so", RTLD_GLOBAL | RTLD_LAZY );
+
+  printf("Loading $(HOME)/.madx/plugins/librplot.so\n");
+  homedir = getenv("HOME");
+  if (strlen(homedir) > 150)
+   {
+     printf("Home directory name too long: %s",homedir);
+   }
+  
+  sprintf(buff,"%s/.madx/plugins/librplot.so",homedir);
+
+  rplot_handle = dlopen (buff, RTLD_GLOBAL | RTLD_LAZY );
   if (!rplot_handle) {
-    fprintf (stderr, "%s\n", dlerror());
+
+    printf("Loading librplot.so\n");
+    rplot_handle = dlopen ("librplot.so", RTLD_GLOBAL | RTLD_LAZY );
+    if (!rplot_handle) {
+      fprintf (stderr, "%s\n", dlerror());
+      return;
+    }
+
     return;
   }
+
 
 #else
   warning("rplot.c: loadrplotlib()",
