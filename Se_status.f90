@@ -263,8 +263,9 @@ CONTAINS
     type (MAGNET_CHART), pointer:: P
 
     nullify(P%LD);nullify(P%B0);nullify(P%LC);
-    nullify(P%TILTD);  nullify(P%dir);nullify(P%charge);
-    nullify(P%beta0);nullify(P%gamma0I);nullify(P%gambet);nullify(P%P0C);
+    nullify(P%TILTD);  nullify(P%dir);
+    !    nullify(P%beta0);nullify(P%gamma0I);nullify(P%gambet);nullify(P%charge);
+    nullify(P%P0C);
     nullify(P%EDGE)
     !    nullify(P%TOTALPATH)
     nullify(P%EXACT);  !nullify(P%RADIATION);nullify(P%NOCAVITY);
@@ -292,12 +293,19 @@ CONTAINS
     ALLOCATE(P%LD);ALLOCATE(P%B0);ALLOCATE(P%LC);
     P%LD=zero;P%B0=zero;P%LC=zero;
     ALLOCATE(P%TILTD);P%TILTD=zero;
-    ALLOCATE(P%beta0);ALLOCATE(P%gamma0I);ALLOCATE(P%gambet);ALLOCATE(P%P0C);
-    P%beta0 =one;P%gamma0I=zero;P%gambet =zero;P%P0C =zero;
+    ! ALLOCATE(P%beta0);
+    ! ALLOCATE(P%MASS0);
+    ! ALLOCATE(P%gamma0I);
+    ! ALLOCATE(P%gambet);
+    ALLOCATE(P%P0C);
+    ! P%beta0 =one;
+    ! P%MASS0 =one;
+    !P%gamma0I=zero;P%gambet =zero;
+    P%P0C =zero;
     ALLOCATE(P%EDGE(2));P%EDGE(1)=zero;P%EDGE(2)=zero;
     !    ALLOCATE(P%TOTALPATH); ! PART OF A STATE INITIALIZED BY EL=DEFAULT
     ALLOCATE(P%EXACT);  !ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
-    ALLOCATE(P%permFRINGE);
+    !    ALLOCATE(P%permFRINGE);
     ALLOCATE(P%KILL_ENT_FRINGE);ALLOCATE(P%KILL_EXI_FRINGE);ALLOCATE(P%bend_fringe); !ALLOCATE(P%TIME);
     ALLOCATE(P%METHOD);ALLOCATE(P%NST);P%METHOD=2;P%NST=1;
     ALLOCATE(P%NMUL);P%NMUL=0;
@@ -311,20 +319,22 @@ CONTAINS
 
   end subroutine alloc_p
 
+
   SUBROUTINE  dealloc_p(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
     INTEGER I
     if(.not.associated(p)) return
+
     !    if(associated(P%dir)) then
     !    endif
     if(associated(p%LD)) DEALLOCATE(P%LD);
     if(associated(p%B0)) DEALLOCATE(P%B0);
     if(associated(p%LC)) DEALLOCATE(P%LC);
     if(associated(p%TILTD)) DEALLOCATE(P%TILTD);
-    if(associated(p%beta0)) DEALLOCATE(P%beta0);
-    if(associated(p%gamma0I)) DEALLOCATE(P%gamma0I);
-    if(associated(p%gambet)) DEALLOCATE(P%gambet);
+    !    if(associated(p%beta0)) DEALLOCATE(P%beta0);
+    !    if(associated(p%gamma0I)) DEALLOCATE(P%gamma0I);
+    !    if(associated(p%gambet)) DEALLOCATE(P%gambet);
     if(associated(p%P0C)) DEALLOCATE(P%P0C);
     if(associated(p%f)) then
        call kill(p%f)
@@ -337,11 +347,12 @@ CONTAINS
     if(associated(p%A)) then
        CALL KILL(P%A)
     ENDIF
+
     if(associated(p%EDGE))DEALLOCATE(P%EDGE);
     !    DEALLOCATE(P%TOTALPATH);
     if(associated(p%EXACT))DEALLOCATE(P%EXACT);
     !DEALLOCATE(P%RADIATION);DEALLOCATE(P%NOCAVITY);
-    !    if(associated(p%permFRINGE))DEALLOCATE(P%permFRINGE);
+
     if(associated(p%KILL_ENT_FRINGE))DEALLOCATE(P%KILL_ENT_FRINGE);
     if(associated(p%KILL_EXI_FRINGE))DEALLOCATE(P%KILL_EXI_FRINGE);
     if(associated(p%bend_fringe))DEALLOCATE(P%bend_fringe); !DEALLOCATE(P%TIME);
@@ -354,6 +365,7 @@ CONTAINS
     nullify(p);
     ! if(junk) ccc=ccc-1
   end subroutine dealloc_p
+
 
   SUBROUTINE  KILL_S_APERTURE(A)
     implicit none
@@ -451,16 +463,16 @@ CONTAINS
     type (MAGNET_CHART),INTENT(inOUT)::elP
     type (MAGNET_CHART),INTENT(IN)::el
 
-    elp%beta0 =el%beta0
-    elp%gamma0I=el%gamma0I
-    elp%gambet =el%gambet
+    !    elp%beta0 =el%beta0
+    !    elp%gamma0I=el%gamma0I
+    !    elp%gambet =el%gambet
     elp%P0C =el%P0C
     elp%EXACT=el%EXACT
     !   elp%RADIATION=el%RADIATION
     !   elp%TIME=el%TIME
     !   elp%NOCAVITY=el%NOCAVITY
     !   elp%spin=el%spin
-    elp%permFRINGE=el%permFRINGE
+    !   elp%permFRINGE=el%permFRINGE
     elp%KILL_ENT_FRINGE=el%KILL_ENT_FRINGE
     elp%KILL_EXI_FRINGE=el%KILL_EXI_FRINGE
     elp%bend_fringe=el%bend_fringe

@@ -271,9 +271,9 @@ contains
     DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
        if(u) exit
        IF(PRESENT(STATE)) THEN
-          CALL TRACK_NODE_SINGLE(T,X,STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+          CALL TRACK_NODE_SINGLE(T,X,STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
        ELSE
-          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
        ENDIF
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
@@ -332,9 +332,9 @@ contains
     DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
        if(u) exit
        IF(PRESENT(STATE)) THEN
-          CALL TRACK_NODE_SINGLE(T,X,STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+          CALL TRACK_NODE_SINGLE(T,X,STATE)  !,my_ORBIT_LATTICE%ORBIT_CHARGE
        ELSE
-          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE,my_ORBIT_LATTICE%ORBIT_CHARGE)
+          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
        ENDIF
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
@@ -500,7 +500,7 @@ contains
 
     !   write(6,*) k,DLMAX,LMAX
     !      MY_ORBIT_STATE=>DEFAULT
-    my_ORBIT_LATTICE%ORBIT_CHARGE=R%CHARGE
+    my_ORBIT_LATTICE%ORBIT_CHARGE=R%start%CHARGE
     my_ORBIT_LATTICE%ORBIT_N_NODE=k-1
 
     !    write(6,*) size(ORBIT_NODES),my_ORBIT_LATTICE%ORBIT_N_NODE,k
@@ -599,8 +599,9 @@ contains
        my_ORBIT_LATTICE%ORBIT_gammat=sqrt(one/my_ORBIT_LATTICE%ORBIT_gammat)
     endif
 
-    my_ORBIT_LATTICE%ORBIT_mass_in_amu=r%mass/PMAP   *pmae_amu/pmae
-    my_ORBIT_LATTICE%orbit_kinetic=sqrt(r%mass**2+my_ORBIT_LATTICE%ORBIT_P0C**2)-r%mass
+    my_ORBIT_LATTICE%ORBIT_mass_in_amu=r%start%mass/PMAP   *pmae_amu/pmae
+    my_ORBIT_LATTICE%orbit_kinetic=sqrt(r%start%mass**2+my_ORBIT_LATTICE%ORBIT_P0C**2) &
+         -r%start%mass
     my_ORBIT_LATTICE%orbit_harmonic=my_ORBIT_LATTICE%ORBIT_L*my_ORBIT_LATTICE%ORBIT_OMEGA/TWOPI/my_ORBIT_LATTICE%ORBIT_BETA0
     my_ORBIT_LATTICE%ORBIT_LMAX=DLMAX
     !my_ORBIT_LATTICE%ORBIT_BETA0
@@ -626,7 +627,7 @@ contains
     write(6,*) my_ORBIT_LATTICE%orbit_energy
     write(6,*) my_ORBIT_LATTICE%orbit_kinetic
     write(6,*) my_ORBIT_LATTICE%orbit_gamma
-    write(6,*) r%mass,w1_orbit%mass
+    write(6,*) r%start%mass,w1_orbit%mass
     my_ORBIT_LATTICE%state=default
   END SUBROUTINE ORBIT_MAKE_NODE_LAYOUT_accel
 

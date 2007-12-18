@@ -441,11 +441,11 @@ SUBROUTINE ptc_synchronous_set(i_node)
         p_orbit%mag%freq=freqf
         if(p_orbit%mag%l/=zero) then
            p_orbit%mag%volt=-vrfx/p_orbit%mag%l
-           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%parent_laYOUT%CHARGE &
+           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%CHARGE &
                 /p_orbit%mag%volt/c_1d_3/p_orbit%mag%L)-c_%phase0
         else
            p_orbit%mag%volt=-vrfx
-           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%parent_laYOUT%CHARGE/p_orbit%mag%volt/c_1d_3)-c_%phase0
+           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%CHARGE/p_orbit%mag%volt/c_1d_3)-c_%phase0
         endif
         dphase=dphase0-twopi*p_orbit%mag%freq*x_orbit_sync(6)/CLIGHT
         p_orbit%mag%phas=dphase

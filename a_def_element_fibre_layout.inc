@@ -76,9 +76,10 @@ TYPE MAGNET_CHART
    type(S_APERTURE), pointer:: A(:)
    integer,pointer :: charge  ! propagator
    integer,pointer :: dir    ! propagator
+   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS
+   real(dp), POINTER :: P0C
    real(dp), POINTER :: LD,B0,LC         !
    real(dp), POINTER :: TILTD      ! INTERNAL FRAME
-   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,P0C
    real(dp),  DIMENSION(:), POINTER :: EDGE         ! INTERNAL FRAME
 
    !
@@ -99,6 +100,7 @@ END TYPE tilting
 TYPE ELEMENT
    INTEGER, POINTER :: KIND
    logical(lp), POINTER :: recut,even
+   LOGICAL(LP), POINTER :: PLOT
    ! common stuff to all element
    type(MAGNET_CHART), pointer :: P
    CHARACTER(nlp), POINTER ::  NAME    ! Identification
@@ -119,7 +121,7 @@ TYPE ELEMENT
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
    !  misalignements and rotation
    logical(lp), POINTER ::  MIS
-   real(dp),  DIMENSION(:), POINTER ::d,r                             !  Misalignements
+   !   real(dp),  DIMENSION(:), POINTER ::d,r                             !  Misalignements
    !storage  space
    !integer  twiss                                                            !
    ! TYPES OF MAGNETS
@@ -142,6 +144,7 @@ TYPE ELEMENT
    TYPE(CAV_TRAV), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
    TYPE(SAGAN), POINTER :: WI                ! USER DEFINED
    TYPE(PANCAKE), POINTER :: PA          ! GENERAL B
+   TYPE(HELICAL_DIPOLE), POINTER :: HE22          ! GENERAL B
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
    type(element), pointer :: siamese
 END TYPE  ELEMENT
@@ -169,7 +172,7 @@ TYPE ELEMENTP
 
    !  MISALIGNEMENTS AND ROTATION
    logical(lp), POINTER ::  MIS
-   real(dp),  DIMENSION(:), POINTER :: D,R
+   !   real(dp),  DIMENSION(:), POINTER :: D,R
 
    TYPE(MAGNET_CHART), POINTER :: P
 
@@ -191,6 +194,7 @@ TYPE ELEMENTP
    TYPE(RCOLP), POINTER :: RCOL18             ! RCOLLIMATOR
    TYPE(ECOLP), POINTER :: ECOL19             ! ECOLLIMATOR
    TYPE(CAV_TRAVP), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
+   TYPE(HELICAL_DIPOLEP), POINTER :: HE22          ! GENERAL B
    TYPE(SAGANP), POINTER :: WI                ! USER DEFINED
    TYPE(PANCAKEP), POINTER :: PA          ! GENERAL B
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
@@ -223,13 +227,14 @@ TYPE FIBRE
    TYPE(INTEGRATION_NODE),POINTER :: T1,T2   ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
    TYPE(INTEGRATION_NODE),POINTER :: TM      ! MIDDLE INTEGRATION_NODE
    INTEGER,POINTER ::pos              ! POSITION IN LAYOUT
-
+   ! NEW STUFF....
+   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS   !,P0C
+   INTEGER, POINTER :: CHARGE
 END TYPE FIBRE
 
 TYPE LAYOUT
    CHARACTER(120), POINTER ::  NAME ! IDENTIFICATION
-   INTEGER, POINTER ::  INDEX,CHARGE,HARMONIC_NUMBER ! IDENTIFICATION, CHARGE SIGN
-   real(dp), pointer :: mass
+   INTEGER, POINTER ::  INDEX,HARMONIC_NUMBER ! IDENTIFICATION, CHARGE SIGN
    logical(lp),POINTER ::CLOSED
    INTEGER,  POINTER :: N     ! TOTAL ELEMENT IN THE CHAIN
    INTEGER,POINTER ::NTHIN  ! NUMBER IF THIN LENSES IN COLLECTION  (FOR SPEED ESTIMATES)
@@ -247,8 +252,8 @@ TYPE LAYOUT
    type(NODE_LAYOUT), pointer :: T   !  ASSOCIATED  CHILD THIN LENS LAYOUT
    TYPE (MAD_UNIVERSE), POINTER :: parent_universe
    TYPE(layout_array), POINTER :: DNA(:)
-   TYPE(junction_array), POINTER :: con1(:)
-   TYPE(junction_array), POINTER :: con2(:)
+   !   TYPE(siamese_array), POINTER :: girder(:)
+   !   TYPE(junction_array), POINTER :: con2(:)
 END TYPE LAYOUT
 
 type layout_array
@@ -256,10 +261,10 @@ type layout_array
    integer   :: counter
 END type layout_array
 
-type junction_array
-   type(fibre), pointer :: p
-   integer :: pos
-END type junction_array
+!  type siamese_array
+!     type(fibre), pointer :: p
+!      integer :: pos
+!  END type siamese_array
 
 TYPE MAD_UNIVERSE             ! THE MOTHER OF ALL STRUCTURES
    INTEGER,  POINTER :: N     ! NUMBERS OF LAYOUT

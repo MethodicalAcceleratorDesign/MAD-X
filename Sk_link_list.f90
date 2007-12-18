@@ -134,8 +134,13 @@ CONTAINS
     current%PATCH=>el%PATCH
     if(use_info) current%i=>el%i
     current%dir=>el%dir
-    !    current%P0C=>el%P0C
-    !    current%BETA0=>el%BETA0
+    !  OCTOBER 2007
+    !        current%P0C=>el%P0C
+    current%BETA0=>el%BETA0
+    current%GAMMA0I=>el%GAMMA0I
+    current%GAMBET=>el%GAMBET
+    current%MASS=>el%MASS
+    current%CHARGE=>el%CHARGE
 
     current%PARENT_LAYOUT=>L
     if(L%N==1) current%next=> L%start
@@ -172,14 +177,18 @@ CONTAINS
     !       DEALLOCATE(L%con)
     !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN KILLED "
     !    ENDIF
-    IF(ASSOCIATED(L%con1)) THEN
-       DEALLOCATE(L%con1)
-       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
-    ENDIF
-    IF(ASSOCIATED(L%con2)) THEN
-       DEALLOCATE(L%con2)
-       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
-    ENDIF
+    !    IF(ASSOCIATED(L%con1)) THEN
+    !       DEALLOCATE(L%con1)
+    !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
+    !    ENDIF
+    !    IF(ASSOCIATED(L%con2)) THEN
+    !       DEALLOCATE(L%con2)
+    !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
+    !    ENDIF
+    !    IF(ASSOCIATED(L%girder)) THEN
+    !       DEALLOCATE(L%girder)
+    !       WRITE(6,*) " GIRDER CONTENT HAS BEEN DEALLOCATED "
+    !    ENDIF
 
     LC=> L  ! USED TO AVOID DNA MEMBERS
     Current => L % end      ! end at the end
@@ -212,8 +221,12 @@ CONTAINS
     call copy(el%PATCH,current%PATCH)
     if(use_info.and.associated(current%patch)) call copy(el%i,current%i)
     current%dir=el%dir
-    !    current%P0C=el%P0C
-    !    current%BETA0=el%BETA0
+    !        current%P0C    =el%P0C
+    current%BETA0  =el%BETA0
+    current%GAMMA0I=el%GAMMA0I
+    current%GAMBET =el%GAMBET
+    current%MASS  =el%MASS
+    current%CHARGE =el%CHARGE
 
     current%PARENT_LAYOUT=>L
     current%mag%PARENT_FIBRE=>current
@@ -243,6 +256,13 @@ CONTAINS
     call alloc_fibre(current)
     !    if(use_info.and.associated(current%patch)) call copy(el%i,current%i)
     current%dir=1
+    ! OCT 2007
+    !        current%P0C=ONE
+    current%BETA0=ONE
+    current%GAMMA0I=ONE
+    current%GAMBET=ZERO
+    current%MASS=ONE
+    current%CHARGE=1
 
     current%pos=l%n
 
@@ -398,7 +418,7 @@ CONTAINS
     TYPE (layout),TARGET, INTENT(INOUT):: L
     CALL NULLIFY_LAYOUT(L)
     ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);ALLOCATE(L%HARMONIC_NUMBER);
-    ALLOCATE(L%NTHIN);ALLOCATE(L%THIN);ALLOCATE(L%INDEX);ALLOCATE(L%CHARGE);ALLOCATE(L%mass);
+    ALLOCATE(L%NTHIN);ALLOCATE(L%THIN);ALLOCATE(L%INDEX);
     ALLOCATE(L%n);
     L%closed=.false.;
     L%NTHIN=0;L%THIN=zero;
@@ -406,13 +426,7 @@ CONTAINS
     L%lastpos=0;L%NAME='No name assigned';
     INDEX_0=INDEX_0+1
     L%INDEX=INDEX_0
-    L%CHARGE=1
     L%HARMONIC_NUMBER=0
-    if(electron) then
-       L%mass=muon*pmae
-    else
-       L%mass=pmap
-    endif
   END SUBROUTINE Set_Up
 
 
@@ -422,7 +436,7 @@ CONTAINS
     implicit none
     TYPE (layout),TARGET, INTENT(INOUT):: L
     deallocate(L%closed);deallocate(L%lastpos);deallocate(L%NAME);deallocate(L%HARMONIC_NUMBER);
-    deallocate(L%INDEX);    deallocate(L%CHARGE);deallocate(L%mass);
+    deallocate(L%INDEX);
     deallocate(L%NTHIN);deallocate(L%THIN);
     deallocate(L%n);          !deallocate(L%parent_universe)   left out
     IF(ASSOCIATED(L%T)) deallocate(L%T);
@@ -437,12 +451,11 @@ CONTAINS
     nullify(L%T)  ! THIN LAYOUT
     nullify(L%DNA)  ! THIN LAYOUT
     !    nullify(L%CON)  ! THIN LAYOUT
-    nullify(L%CON1)  ! THIN LAYOUT
-    nullify(L%CON2)  ! THIN LAYOUT
+    !    nullify(L%CON1)  ! THIN LAYOUT
+    !    nullify(L%CON2)  ! THIN LAYOUT
+    !    nullify(L%girder)  ! THIN LAYOUT
     nullify(L%parent_universe)
     nullify(L%INDEX)
-    nullify(L%CHARGE)
-    nullify(L%mass)
     nullify(L%HARMONIC_NUMBER)
     nullify(L%NAME)
     nullify(L%CLOSED,L%N )
@@ -531,8 +544,22 @@ CONTAINS
        call alloc(current%i)
     endif
 
-    ALLOCATE(current%DIR)   !;ALLOCATE(current%P0C);ALLOCATE(current%BETA0);
+    ALLOCATE(current%DIR)   !;
+    !    ALLOCATE(current%P0C);
+    ALLOCATE(current%BETA0);
+    ALLOCATE(current%GAMMA0I);
+    ALLOCATE(current%GAMBET);
+    ALLOCATE(current%MASS);
+    ALLOCATE(current%CHARGE);
     current%dir=el%dir
+    !    current%P0C=el%P0C
+    current%BETA0=el%BETA0
+    current%GAMMA0I=el%GAMMA0I
+    current%GAMBET=el%GAMBET
+    current%MASS=el%MASS
+    current%CHARGE=el%CHARGE
+
+
     ALLOCATE(Current%pos);
     current%pos=l%n
     !    current%P0C=el%P0C
@@ -588,6 +615,16 @@ CONTAINS
     nullify(current%PARENT_LAYOUT);
     nullify(current%T1,current%T2,current%TM);
     nullify(current%i,current%pos);
+
+
+    !    nullify(Current%P0C);
+    nullify(Current%BETA0);
+    nullify(Current%GAMMA0I);
+    nullify(Current%GAMBET);
+    nullify(Current%MASS);
+    nullify(Current%CHARGE);
+
+
     !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
 
@@ -608,6 +645,14 @@ CONTAINS
     ALLOCATE(Current%CHART);
     ALLOCATE(Current%PATCH);
     ALLOCATE(Current%pos);
+
+    !    ALLOCATE(Current%P0C);
+    ALLOCATE(Current%BETA0);
+    ALLOCATE(Current%GAMMA0I);
+    ALLOCATE(Current%GAMBET);
+    ALLOCATE(Current%MASS);
+    ALLOCATE(Current%CHARGE);
+
   END SUBROUTINE ALLOCATE_DATA_FIBRE
 
   SUBROUTINE alloc_fibre( c ) ! Does the full allocation of fibre and initialization of internal variables
@@ -620,6 +665,14 @@ CONTAINS
        call alloc(c%i)
     endif
     c%DIR=1
+    !    C%P0C = ONE
+    C%BETA0 = ONE
+    C%GAMMA0I = ONE
+    C%GAMBET = ONE
+    C%MASS = ONE
+    C%CHARGE = 1
+
+
     !  c%P0C=zero
     !  c%BETA0=zero
     c%mag=0
@@ -636,6 +689,12 @@ CONTAINS
     integer, intent(in) :: i
     if(i==0) then
        c%DIR=1
+       !    C%P0C = ONE
+       C%BETA0 = ONE
+       C%GAMMA0I = ONE
+       C%GAMBET = ONE
+       C%MASS = ONE
+       C%CHARGE = 1
        !       c%P0C=zero
        !       c%BETA0=zero
        c%mag=0
@@ -674,11 +733,33 @@ CONTAINS
        IF(ASSOCIATED(c%DIR)) THEN
           deallocate(c%DIR);
        ENDIF
+       !       IF(ASSOCIATED(c%P0C)) THEN
+       !          deallocate(c%P0C);
+       !       ENDIF
+       IF(ASSOCIATED(c%BETA0)) THEN
+          deallocate(c%BETA0);
+       ENDIF
+       IF(ASSOCIATED(c%GAMMA0I)) THEN
+          deallocate(c%GAMMA0I);
+       ENDIF
+       IF(ASSOCIATED(c%GAMBET)) THEN
+          deallocate(c%GAMBET);
+       ENDIF
+       IF(ASSOCIATED(c%MASS)) THEN
+          deallocate(c%MASS);
+       ENDIF
+       IF(ASSOCIATED(c%CHARGE)) THEN
+          deallocate(c%CHARGE);
+       ENDIF
+
        IF(ASSOCIATED(C%T1)) THEN
           if(associated(C%T1,C%TM)) nullify(C%TM)
           deallocate(C%T1);
           deallocate(C%T2);
        ENDIF
+
+       IF(ASSOCIATED(C%TM)) deallocate(C%TM);
+
        IF(ASSOCIATED(c%i).and.use_info) THEN
           call kill(c%i);
           deallocate(c%i);
@@ -699,6 +780,12 @@ CONTAINS
     integer, intent(in) :: i
     if(i==0) then
        c%DIR=1
+       !    C%P0C = ONE
+       C%BETA0 = ONE
+       C%GAMMA0I = ONE
+       C%GAMBET = ONE
+       C%MASS = ONE
+       C%CHARGE = 1
        !       c%P0C=zero
        !       c%BETA0=zero
        c%mag=0
@@ -731,8 +818,27 @@ CONTAINS
           deallocate(c%PATCH);
        ENDIF
 
+
        IF(ASSOCIATED(c%DIR)) THEN
           deallocate(c%DIR);
+       ENDIF
+       !       IF(ASSOCIATED(c%P0C)) THEN
+       !          deallocate(c%P0C);
+       !       ENDIF
+       IF(ASSOCIATED(c%BETA0)) THEN
+          deallocate(c%BETA0);
+       ENDIF
+       IF(ASSOCIATED(c%GAMMA0I)) THEN
+          deallocate(c%GAMMA0I);
+       ENDIF
+       IF(ASSOCIATED(c%GAMBET)) THEN
+          deallocate(c%GAMBET);
+       ENDIF
+       IF(ASSOCIATED(c%MASS)) THEN
+          deallocate(c%MASS);
+       ENDIF
+       IF(ASSOCIATED(c%CHARGE)) THEN
+          deallocate(c%CHARGE);
        ENDIF
        IF(ASSOCIATED(C%T1)) THEN
           deallocate(C%T1);
@@ -1232,98 +1338,6 @@ CONTAINS
 
   END SUBROUTINE FIND_PATCH_0
 
-  SUBROUTINE find_connections( L) ! Sets up a layout: gives a unique negative index
-    implicit none
-    TYPE (layout), TARGET, intent(inout):: L
-    TYPE (layout), POINTER :: L1,L2
-    TYPE (fibre), POINTER :: P,p1,p2,pstart
-    INTEGER I,i1,i2
-    integer, allocatable :: in1(:),in2(:)
-
-    allocate(in1(size(l%dna)))
-    allocate(in2(size(l%dna)))
-
-    i1=2
-    i2=l%n
-    P=>L%START%next
-    if(l%closed) then
-       P=>L%START
-       i1=1
-       i2=l%n+1
-    endif
-    pstart=>p
-    in1=0
-    in2=0
-
-    DO i=i1,i2
-       P1=>P%PREVIOUS
-       P2=>P
-       !     PO1=>P1%MAG%PARENT_FIBRE
-       !     PO2=>P2%MAG%PARENT_FIBRE
-       L1=>P1%MAG%PARENT_FIBRE%PARENT_LAYOUT
-       L2=>P2%MAG%PARENT_FIBRE%PARENT_LAYOUT
-       IF(.NOT.ASSOCIATED(L1,L2)) THEN
-
-          !    WRITE(6,*) I,L1%INDEX,L2%INDEX
-          !    WRITE(6,*) L1%N,L2%N
-          !    WRITE(6,*) PO1%POS,PO2%POS
-          in1(L1%INDEX)=in1(L1%INDEX)+1
-          in2(L2%INDEX)=in2(L2%INDEX)+1
-          !write(6,*) " ins "
-          !write(6,*) in1
-          !write(6,*) in2
-          !        PAUSE
-       ENDIF
-       P=>P%NEXT
-    ENDDO
-    !write(6,*) in1
-    !write(6,*) in2
-    !pause 777
-    do i=1,size(in1)
-       if(in1(i)>0) then
-          allocate(L%DNA(i)%L%con1(in1(i)) )
-       else
-          nullify(L%DNA(i)%L%con1)
-       endif
-    enddo
-
-    do i=1,size(in2)
-       if(in2(i)>0) then
-          allocate(L%DNA(i)%L%con2(in2(i)) )
-       else
-          nullify(L%DNA(i)%L%con2)
-       endif
-    enddo
-
-    in1=0
-    in2=0
-    p=>pstart
-    DO i=i1,i2
-       P1=>P%PREVIOUS
-       P2=>P
-       !     PO1=>P1%MAG%PARENT_FIBRE
-       !     PO2=>P2%MAG%PARENT_FIBRE
-       L1=>P1%MAG%PARENT_FIBRE%PARENT_LAYOUT
-       L2=>P2%MAG%PARENT_FIBRE%PARENT_LAYOUT
-       IF(.NOT.ASSOCIATED(L1,L2)) THEN
-          in1(L1%INDEX)=in1(L1%INDEX)+1
-          in2(L2%INDEX)=in2(L2%INDEX)+1
-
-          L%DNA(L1%INDEX)%L%con1(in1(L1%INDEX))%p=>p1
-          L%DNA(L1%INDEX)%L%con1(in1(L1%INDEX))%pos=p1%pos
-
-          L%DNA(L2%INDEX)%L%con2(in2(L2%INDEX))%p=>p2
-          L%DNA(L2%INDEX)%L%con2(in2(L2%INDEX))%pos=p2%pos
-          !        write(6,*) p1%pos,p2%pos
-       ENDIF
-       P=>P%NEXT
-    ENDDO
-
-    !    write(6,*) ind
-
-    deallocate(in1)
-    deallocate(in2)
-  END SUBROUTINE find_connections
 
   ! UNIVERSE STUFF
 
@@ -1388,9 +1402,7 @@ CONTAINS
        I=I+1
        P=>P%PREVIOUS
     ENDDO
-
   END SUBROUTINE FIND_POS_in_universe
-
 
   SUBROUTINE MOVE_TO_LAYOUT_I( L,current,i ) ! Moves current to the i^th position
     implicit none

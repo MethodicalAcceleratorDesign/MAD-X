@@ -2420,6 +2420,34 @@ contains
 
   END FUNCTION POWMAP_INV
 
+  subroutine checksymp(s1,norm)
+    implicit none
+    TYPE (damap) s1
+    real(dp)  norm,mat(6,6),xj(6,6)
+    integer i,j
+
+    mat=0.d0
+    mat=s1
+    xj=0.d0
+    do i=1,nd
+       xj(2*i-1,2*i)=one
+       xj(2*i,2*i-1)=-one
+    enddo
+
+    xj= MATMUL( transpose(mat),MATMUL(xj,mat))
+
+    norm=0.d0
+    do i=1,nd2
+       write(6,'(6(1x,E15.8))') xj(i,1:nd2)
+       do j=1,nd2
+
+          norm=norm+abs(xj(i,j))
+       enddo
+    enddo
+    norm=norm-nd2
+
+  end subroutine checksymp
+
 
   subroutine checkmap(s1)
     implicit none

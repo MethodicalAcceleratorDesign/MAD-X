@@ -184,6 +184,8 @@ CONTAINS
        call TRACK(EL%ECOL19,X,k,MID)
     CASE(KIND21)
        call TRACK(EL%CAV21,X,k,MID)
+    CASE(KIND22)
+       call TRACK(EL%HE22,X,k,MID)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,k,MID)
     case(KINDPA)
@@ -246,6 +248,8 @@ CONTAINS
        call TRACK(EL%ECOL19,X,k)
     CASE(KIND21)
        call TRACK(EL%CAV21,X,k)
+    CASE(KIND22)
+       call TRACK(EL%HE22,X,k)
     case(KINDWIGGLER)
        call TRACK(EL%WI,X,k)
     case(KINDPA)
@@ -368,7 +372,7 @@ CONTAINS
     integer i
 
     if(s1%rescale) then
-       if(s2%p%nmul/=0) then
+       if(s2%p%nmul/=0) then   ! doing for crab also
           do i=1,s2%P%nmul
              s2%bn(i)=s2%bn(i)*(S2%P%P0C/S1%P0C)**S1%power
              s2%an(i)=s2%an(i)*(S2%P%P0C/S1%P0C)**S1%power
@@ -384,9 +388,9 @@ CONTAINS
     endif
 
     if(S1%power/=-1) then       ! just rescaling  -1=ramping
-       S2%P%BETA0=S1%BETA0
-       S2%P%GAMMA0I=S1%GAMMA0I
-       S2%P%GAMBET=S1%GAMBET
+       !       S2%P%BETA0=S1%BETA0
+       !       S2%P%GAMMA0I=S1%GAMMA0I
+       !       S2%P%GAMBET=S1%GAMBET
        S2%P%P0C=S1%P0C
     endif
 
@@ -414,9 +418,9 @@ CONTAINS
 
 
     if(S1%power/=-1) then       ! just rescaling  -1=ramping
-       S2%P%BETA0=S1%BETA0
-       S2%P%GAMMA0I=S1%GAMMA0I
-       S2%P%GAMBET=S1%GAMBET
+       !       S2%P%BETA0=S1%BETA0
+       !       S2%P%GAMMA0I=S1%GAMMA0I
+       !       S2%P%GAMBET=S1%GAMBET
        S2%P%P0C=S1%P0C
     endif
 
@@ -990,6 +994,9 @@ CONTAINS
           el%C4=0
        ENDIF
        EL%C4%P=>EL%P
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%C4%AN=>EL%AN
+       EL%C4%BN=>EL%BN
        EL%C4%L=>EL%L
        EL%C4%VOLT=>EL%VOLT
        EL%C4%FREQ=>EL%FREQ
@@ -1000,6 +1007,9 @@ CONTAINS
        ALLOCATE(EL%C4%N_BESSEL);EL%C4%N_BESSEL=0
        ALLOCATE(EL%C4%cavity_totalpath);EL%C4%cavity_totalpath=cavity_totalpath
        ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
+       ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
+       ALLOCATE(EL%C4%F(N_CAV4_F));EL%C4%F=ZERO;EL%C4%F(1)=ONE;
+
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
           ALLOCATE(EL%CAV21)
@@ -1021,6 +1031,21 @@ CONTAINS
        ALLOCATE(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
        ALLOCATE(EL%CAV21%cavity_totalpath);EL%CAV21%cavity_totalpath=cavity_totalpath
        ALLOCATE(EL%CAV21%phase0);EL%CAV21%phase0=phase0
+    CASE(KIND22)
+       if(.not.ASSOCIATED(EL%HE22)) THEN
+          ALLOCATE(EL%HE22)
+          el%HE22=0
+       ELSE
+          el%HE22=-1
+          el%HE22=0
+       ENDIF
+       EL%HE22%P=>EL%P
+       EL%HE22%L=>EL%L
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%HE22%AN=>EL%AN
+       EL%HE22%BN=>EL%BN
+       EL%HE22%FREQ=>EL%FREQ
+       EL%HE22%PHAS=>EL%PHAS
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -1164,8 +1189,11 @@ CONTAINS
        EL%TP10%HGAP=>EL%HGAP
        EL%TP10%H1=>EL%H1
        EL%TP10%H2=>EL%H2
-       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
-       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
+
+       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(SECTOR_NMUL)%N_MONO))
+       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(SECTOR_NMUL)%N_MONO))
+       !       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
+       !       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        call GETANBN(EL%TP10)
     CASE(KIND11:KIND14)
@@ -1401,6 +1429,9 @@ CONTAINS
           el%C4=0
        ENDIF
        EL%C4%P=>EL%P
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%C4%AN=>EL%AN
+       EL%C4%BN=>EL%BN
        EL%C4%L=>EL%L
        EL%C4%VOLT=>EL%VOLT
        EL%C4%FREQ=>EL%FREQ
@@ -1411,6 +1442,8 @@ CONTAINS
        ALLOCATE(EL%C4%N_BESSEL);EL%C4%N_BESSEL=0
        ALLOCATE(EL%C4%cavity_totalpath);EL%C4%cavity_totalpath=cavity_totalpath
        ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
+       ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
+       ALLOCATE(EL%C4%F(N_CAV4_F));CALL ALLOC(EL%C4%F,N_CAV4_F);EL%C4%F(1)=ONE;
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
           ALLOCATE(EL%CAV21)
@@ -1432,6 +1465,21 @@ CONTAINS
        ALLOCATE(EL%CAV21%DPHAS);CALL ALLOC(EL%CAV21%DPHAS);EL%CAV21%DPHAS=ZERO
        ALLOCATE(EL%CAV21%cavity_totalpath);EL%CAV21%cavity_totalpath=cavity_totalpath
        ALLOCATE(EL%CAV21%phase0);EL%CAV21%phase0=phase0
+    CASE(KIND22)
+       if(.not.ASSOCIATED(EL%HE22)) THEN
+          ALLOCATE(EL%HE22)
+          el%HE22=0
+       ELSE
+          el%HE22=-1
+          el%HE22=0
+       ENDIF
+       EL%HE22%P=>EL%P
+       EL%HE22%L=>EL%L
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%HE22%AN=>EL%AN
+       EL%HE22%BN=>EL%BN
+       EL%HE22%FREQ=>EL%FREQ
+       EL%HE22%PHAS=>EL%PHAS
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5))ALLOCATE(EL%S5)
        EL%S5%P=>EL%P
@@ -1576,8 +1624,10 @@ CONTAINS
        EL%TP10%HGAP=>EL%HGAP
        EL%TP10%H1=>EL%H1
        EL%TP10%H2=>EL%H2
-       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
-       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
+       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(SECTOR_NMUL)%N_MONO))
+       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(SECTOR_NMUL)%N_MONO))
+       !       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
+       !       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        CALL ALLOC(EL%TP10)
        call GETANBN(EL%TP10)
@@ -1761,39 +1811,39 @@ CONTAINS
   END SUBROUTINE SETFAMILYP
 
 
-  SUBROUTINE MIS_(EL,X)
-    IMPLICIT NONE
-    TYPE(ELEMENT), INTENT(inOUT) ::EL
-    real(dp), INTENT(IN) ::X(6)
-    INTEGER I
+  !  SUBROUTINE MIS_(EL,X)
+  !    IMPLICIT NONE
+  !    TYPE(ELEMENT), INTENT(inOUT) ::EL
+  !    real(dp), INTENT(IN) ::X(6)
+  !    INTEGER I
+  !
+  !    IF(.NOT.ASSOCIATED(EL%D)) ALLOCATE(EL%D(3))
+  !    IF(.NOT.ASSOCIATED(EL%R)) ALLOCATE(EL%R(3))
+  !
+  !
+  !    DO I=1,3
+  !       EL%D(I)=X(I)
+  !       EL%R(I)=X(3+I)
+  !    ENDDO
+  !
+  !  END SUBROUTINE MIS_
 
-    IF(.NOT.ASSOCIATED(EL%D)) ALLOCATE(EL%D(3))
-    IF(.NOT.ASSOCIATED(EL%R)) ALLOCATE(EL%R(3))
-
-
-    DO I=1,3
-       EL%D(I)=X(I)
-       EL%R(I)=X(3+I)
-    ENDDO
-
-  END SUBROUTINE MIS_
-
-  SUBROUTINE MIS_p(EL,X)
-    IMPLICIT NONE
-    TYPE(ELEMENTp), INTENT(inOUT) ::EL
-    real(dp), INTENT(IN) ::X(6)
-    INTEGER I
-
-    IF(.NOT.ASSOCIATED(EL%D)) ALLOCATE(EL%D(3))
-    IF(.NOT.ASSOCIATED(EL%R)) ALLOCATE(EL%R(3))
-
-
-    DO I=1,3
-       EL%D(I)=X(I)
-       EL%R(I)=X(3+I)
-    ENDDO
-
-  END SUBROUTINE MIS_p
+  !  SUBROUTINE MIS_p(EL,X)
+  !    IMPLICIT NONE
+  !    TYPE(ELEMENTp), INTENT(inOUT) ::EL
+  !    real(dp), INTENT(IN) ::X(6)
+  !    INTEGER I
+  !
+  !    IF(.NOT.ASSOCIATED(EL%D)) ALLOCATE(EL%D(3))
+  !    IF(.NOT.ASSOCIATED(EL%R)) ALLOCATE(EL%R(3))
+  !
+  !
+  !    DO I=1,3
+  !       EL%D(I)=X(I)
+  !       EL%R(I)=X(3+I)
+  !    ENDDO
+  !
+  !  END SUBROUTINE MIS_p
 
   SUBROUTINE ZERO_ANBN_R(EL,N)
     IMPLICIT NONE
@@ -1835,7 +1885,7 @@ CONTAINS
     INTEGER, INTENT(IN) ::NM,F
     INTEGER I,N
     real(dp), ALLOCATABLE,dimension(:)::AN,BN
-    if(EL%KIND==kind1.or.EL%KIND==kind4) return
+    if(EL%KIND==kind1) return
     N=NM
     IF(NM<0) N=-N
     ! ALREADY THERE
@@ -1883,24 +1933,27 @@ CONTAINS
     DEALLOCATE(AN);DEALLOCATE(BN);
 
     SELECT CASE(EL%KIND)
-    CASE(KIND2,KIND3,KIND5,KIND6,KIND17)
-       select case(EL%KIND)
-       case(kind2)
-          EL%K2%AN=>EL%AN
-          EL%K2%BN=>EL%BN
-       case(kind3)
-          EL%K3%AN=>EL%AN
-          EL%K3%BN=>EL%BN
-       case(kind5)
-          EL%S5%AN=>EL%AN
-          EL%S5%BN=>EL%BN
-       case(kind6)
-          EL%T6%AN=>EL%AN
-          EL%T6%BN=>EL%BN
-       case(kind17)
-          EL%S17%AN=>EL%AN
-          EL%S17%BN=>EL%BN
-       end select
+       !    CASE(KIND2,KIND3,KIND5,KIND6,KIND17)
+       !       select case(EL%KIND)
+    case(kind2)
+       EL%K2%AN=>EL%AN
+       EL%K2%BN=>EL%BN
+    case(kind3)
+       EL%K3%AN=>EL%AN
+       EL%K3%BN=>EL%BN
+    case(kind4)
+       EL%C4%AN=>EL%AN
+       EL%C4%BN=>EL%BN
+    case(kind5)
+       EL%S5%AN=>EL%AN
+       EL%S5%BN=>EL%BN
+    case(kind6)
+       EL%T6%AN=>EL%AN
+       EL%T6%BN=>EL%BN
+    case(kind17)
+       EL%S17%AN=>EL%AN
+       EL%S17%BN=>EL%BN
+       !       end select
     CASE(KIND7)
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
@@ -1925,6 +1978,9 @@ CONTAINS
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
+    case(kind22)
+       EL%HE22%AN=>EL%AN
+       EL%HE22%BN=>EL%BN
     case default
        w_p=0
        w_p%nc=1
@@ -1950,7 +2006,7 @@ CONTAINS
     INTEGER, INTENT(IN) ::NM,F
     INTEGER I,N
     TYPE(REAL_8), ALLOCATABLE,dimension(:)::AN,BN
-    if(EL%KIND==kind1.or.EL%KIND==kind4) return
+    if(EL%KIND==kind1) return
 
     N=NM
     IF(NM<0) N=-N
@@ -1997,24 +2053,27 @@ CONTAINS
     DEALLOCATE(AN);DEALLOCATE(BN);
 
     SELECT CASE(EL%KIND)
-    CASE(KIND2,KIND3,KIND5,KIND6,KIND17)
-       select case(EL%KIND)
-       case(kind2)
-          EL%K2%AN=>EL%AN
-          EL%K2%BN=>EL%BN
-       case(kind3)
-          EL%K3%AN=>EL%AN
-          EL%K3%BN=>EL%BN
-       case(kind5)
-          EL%S5%AN=>EL%AN
-          EL%S5%BN=>EL%BN
-       case(kind6)
-          EL%T6%AN=>EL%AN
-          EL%T6%BN=>EL%BN
-       case(kind17)
-          EL%S17%AN=>EL%AN
-          EL%S17%BN=>EL%BN
-       end select
+       !   CASE(KIND2,KIND3,KIND5,KIND6,KIND17)
+       !      select case(EL%KIND)
+    case(kind2)
+       EL%K2%AN=>EL%AN
+       EL%K2%BN=>EL%BN
+    case(kind3)
+       EL%K3%AN=>EL%AN
+       EL%K3%BN=>EL%BN
+    case(kind4)
+       EL%C4%AN=>EL%AN
+       EL%C4%BN=>EL%BN
+    case(kind5)
+       EL%S5%AN=>EL%AN
+       EL%S5%BN=>EL%BN
+    case(kind6)
+       EL%T6%AN=>EL%AN
+       EL%T6%BN=>EL%BN
+    case(kind17)
+       EL%S17%AN=>EL%AN
+       EL%S17%BN=>EL%BN
+       !       end select
     CASE(KIND7)
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
@@ -2036,6 +2095,9 @@ CONTAINS
        !    CASE(KINDuser2)
        !       EL%U2%AN=>EL%AN
        !       EL%U2%BN=>EL%BN
+    case(kind22)
+       EL%HE22%AN=>EL%AN
+       EL%HE22%BN=>EL%BN
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
@@ -2102,6 +2164,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT)::EL
     nullify(EL%KIND);
+    nullify(EL%PLOT);
     nullify(EL%NAME);nullify(EL%vorname);
 
     nullify(EL%PERMFRINGE);
@@ -2114,13 +2177,14 @@ CONTAINS
     nullify(EL%B_SOL);
     nullify(EL%THIN);
     nullify(EL%MIS); !nullify(EL%EXACTMIS);
-    nullify(EL%D);nullify(EL%R);
+    !    nullify(EL%D);nullify(EL%R);
     nullify(EL%D0);
     nullify(EL%K2);
     nullify(EL%K16);
     nullify(EL%K3);
     nullify(EL%C4);
     nullify(EL%CAV21);
+    nullify(EL%HE22);
     nullify(EL%S5);
     nullify(EL%T6);
     !    nullify(EL%M22);
@@ -2159,13 +2223,14 @@ CONTAINS
     nullify(EL%B_SOL);
     nullify(EL%THIN);
     nullify(EL%MIS);  !nullify(EL%EXACTMIS);
-    nullify(EL%D);nullify(EL%R);
+    !    nullify(EL%D);nullify(EL%R);
     nullify(EL%D0);
     nullify(EL%K2);
     nullify(EL%K16);
     nullify(EL%K3);
     nullify(EL%C4);
     nullify(EL%CAV21);
+    nullify(EL%HE22);
     nullify(EL%S5);
     nullify(EL%T6);
     !    nullify(EL%M22);
@@ -2197,16 +2262,16 @@ CONTAINS
     IF(I==-1) THEN
 
        DEALLOCATE(EL%KIND);
+       DEALLOCATE(EL%PLOT);
        DEALLOCATE(EL%recut);
        DEALLOCATE(EL%even);
        DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);
-       DEALLOCATE(EL%PERMFRINGE);
        DEALLOCATE(EL%L);
        DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
-
        call kill(EL%P)    ! AIMIN MS 4.0
-       IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
-       IF(ASSOCIATED(EL%D)) DEALLOCATE(EL%D)
+       IF(ASSOCIATED(EL%PERMFRINGE)) DEALLOCATE(EL%PERMFRINGE);
+       !       IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
+       !       IF(ASSOCIATED(EL%D)) DEALLOCATE(EL%D)
        IF(ASSOCIATED(EL%AN)) DEALLOCATE(EL%AN)
        IF(ASSOCIATED(EL%BN)) DEALLOCATE(EL%BN)
        IF(ASSOCIATED(EL%FINT)) DEALLOCATE(EL%FINT)
@@ -2262,6 +2327,10 @@ CONTAINS
           EL%CAV21=-1
           DEALLOCATE(EL%CAV21)   ! MONITOR
        ENDIF
+       IF(ASSOCIATED(EL%HE22)) THEN
+          EL%HE22=-1
+          DEALLOCATE(EL%HE22)   ! MONITOR
+       ENDIF
        IF(ASSOCIATED(EL%TP10)) then
           EL%TP10=-1
           DEALLOCATE(EL%TP10)   ! SECTOR TEAPOT
@@ -2313,6 +2382,7 @@ CONTAINS
        call alloc(el%P);
 
        ALLOCATE(EL%KIND);EL%KIND=0;
+       ALLOCATE(EL%PLOT);EL%PLOT=MY_TRUE;
        ALLOCATE(EL%RECUT);EL%RECUT=MY_TRUE;
        ALLOCATE(EL%even);EL%even=MY_false;
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);
@@ -2325,8 +2395,8 @@ CONTAINS
        !       ALLOCATE(EL%EXACTMIS);
        EL%MIS=.FALSE.;
        !       EL%EXACTMIS=ALWAYS_EXACTMIS;
-       allocate(el%r(3));allocate(el%d(3));
-       el%r=zero;el%d=zero;
+       !       allocate(el%r(3));allocate(el%d(3));
+       !      el%r=zero;el%d=zero;
 
        !       EL=DEFAULT;
        !   ANBN
@@ -2395,6 +2465,15 @@ CONTAINS
           IF(ASSOCIATED(EL%PHAS)) DEALLOCATE(EL%PHAS)
           IF(ASSOCIATED(EL%DELTA_E)) DEALLOCATE(EL%DELTA_E)
           IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
+       ENDIF
+
+       IF(ASSOCIATED(EL%HE22)) THEN
+          EL%HE22=-1
+          DEALLOCATE(EL%HE22)       ! CAVITY
+          CALL KILL(EL%FREQ)
+          CALL KILL(EL%PHAS)
+          IF(ASSOCIATED(EL%FREQ)) DEALLOCATE(EL%FREQ)
+          IF(ASSOCIATED(EL%PHAS)) DEALLOCATE(EL%PHAS)
        ENDIF
 
        IF(ASSOCIATED(EL%S5)) THEN
@@ -2478,8 +2557,8 @@ CONTAINS
 
        call kill(EL%P)        ! call kill(EL%P)    ! AIMIN MS 4.0
 
-       IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
-       IF(ASSOCIATED(EL%D)) DEALLOCATE(EL%D)
+       !       IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
+       !       IF(ASSOCIATED(EL%D)) DEALLOCATE(EL%D)
        !       IF(ASSOCIATED(EL%B_SOL)) DEALLOCATE(EL%B_SOL)  ! sagan
 
        IF(ASSOCIATED(EL%B_SOL)) then ! sagan
@@ -2509,8 +2588,8 @@ CONTAINS
        ! ALLOCATE(EL%EXACTMIS);
        EL%MIS=.FALSE.;
        !  EL%EXACTMIS=ALWAYS_EXACTMIS;
-       allocate(el%r(3));allocate(el%d(3));
-       el%r=zero;el%d=zero;
+       !       allocate(el%r(3));allocate(el%d(3));
+       !       el%r=zero;el%d=zero;
        !      EL=DEFAULT;
        !   ANBN
        CALL ZERO_ANBN(EL,I)
@@ -2587,20 +2666,20 @@ CONTAINS
     ELP%MIS=EL%MIS
     !    ELP%EXACTMIS=EL%EXACTMIS
 
-    IF(ASSOCIATED(EL%R)) THEN
-       if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
+    !    IF(ASSOCIATED(EL%R)) THEN
+    !       if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
 
-       DO I=1,3
-          ELP%R(I)=EL%R(I)
-       ENDDO
-    ENDIF
-    IF(ASSOCIATED(EL%D)) THEN
-       if(.not.ASSOCIATED(ELP%D))  ALLOCATE(ELP%D(3))
+    !       DO I=1,3
+    !          ELP%R(I)=EL%R(I)
+    !       ENDDO
+    !    ENDIF
+    !    IF(ASSOCIATED(EL%D)) THEN
+    !       if(.not.ASSOCIATED(ELP%D))  ALLOCATE(ELP%D(3))
 
-       DO I=1,3
-          ELP%D(I)=EL%D(I)
-       ENDDO
-    ENDIF
+    !       DO I=1,3
+    !          ELP%D(I)=EL%D(I)
+    !       ENDDO
+    !    ENDIF
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
     IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
@@ -2634,10 +2713,14 @@ CONTAINS
        ELP%PHAS = EL%PHAS
        ELP%DELTA_E = EL%DELTA_E               ! DELTA_E IS real(dp)
        ELP%THIN = EL%THIN
+       N_CAV4_F=EL%C4%NF
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
        ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
        ELP%C4%phase0 = EL%C4%phase0
+       DO I=1,EL%C4%NF
+          ELP%C4%F(I)=EL%C4%F(I)
+       ENDDO
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2661,6 +2744,16 @@ CONTAINS
        ELP%CAV21%phase0 = EL%CAV21%phase0
     ENDIF
 
+    IF(EL%KIND==KIND22) THEN         !
+       if(.not.ASSOCIATED(ELP%HE22)) ALLOCATE(ELP%HE22)
+       ELP%HE22=0
+       if(.not.ASSOCIATED(ELP%FREQ)) ALLOCATE(ELP%FREQ,ELP%PHAS)
+       CALL ALLOC( ELP%FREQ)
+       CALL ALLOC( ELP%PHAS)
+       ELP%FREQ = EL%FREQ
+       ELP%PHAS = EL%PHAS
+       CALL SETFAMILY(ELP)
+    ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
        if(.not.ASSOCIATED(ELP%B_SOL)) ALLOCATE(ELP%B_SOL       )
@@ -2814,20 +2907,20 @@ CONTAINS
     ELP%MIS=EL%MIS
     !    ELP%EXACTMIS=EL%EXACTMIS
 
-    IF(ASSOCIATED(EL%R)) THEN
-       if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
+    !    IF(ASSOCIATED(EL%R)) THEN
+    !       if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
 
-       DO I=1,3
-          ELP%R(I)=EL%R(I)
-       ENDDO
-    ENDIF
-    IF(ASSOCIATED(EL%D)) THEN
-       if(.not.ASSOCIATED(ELP%D))  ALLOCATE(ELP%D(3))
+    !       DO I=1,3
+    !          ELP%R(I)=EL%R(I)
+    !       ENDDO
+    !    ENDIF
+    !    IF(ASSOCIATED(EL%D)) THEN
+    !       if(.not.ASSOCIATED(ELP%D))  ALLOCATE(ELP%D(3))
 
-       DO I=1,3
-          ELP%D(I)=EL%D(I)
-       ENDDO
-    ENDIF
+    !       DO I=1,3
+    !          ELP%D(I)=EL%D(I)
+    !       ENDDO
+    !    ENDIF
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
 
@@ -2859,10 +2952,14 @@ CONTAINS
        ELP%PHAS = EL%PHAS
        ELP%DELTA_E = EL%DELTA_E
        ELP%THIN = EL%THIN
+       N_CAV4_F=EL%C4%NF
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
        ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
        ELP%C4%phase0 = EL%C4%phase0
+       DO I=1,EL%C4%NF
+          ELP%C4%F(I)=EL%C4%F(I)
+       ENDDO
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2881,6 +2978,15 @@ CONTAINS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
        ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
        ELP%CAV21%phase0 = EL%CAV21%phase0
+    ENDIF
+
+    IF(EL%KIND==KIND22) THEN         !
+       if(.not.ASSOCIATED(ELP%HE22)) ALLOCATE(ELP%HE22)
+       ELP%HE22=0
+       if(.not.ASSOCIATED(ELP%FREQ)) ALLOCATE(ELP%FREQ,ELP%PHAS)
+       ELP%FREQ = EL%FREQ
+       ELP%PHAS = EL%PHAS
+       CALL SETFAMILY(ELP)
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -3009,6 +3115,7 @@ CONTAINS
     ELP%RECUT=EL%RECUT
     ELP%even=EL%even
     ELP%KIND=EL%KIND
+    ELP%PLOT=EL%PLOT
     ELP%L=EL%L
     ELP%FINT=EL%FINT
     ELP%HGAP=EL%HGAP
@@ -3038,18 +3145,18 @@ CONTAINS
     ELP%MIS=EL%MIS
     !    ELP%EXACTMIS=EL%EXACTMIS
 
-    IF(ASSOCIATED(EL%R)) THEN
-       if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
-       DO I=1,3
-          ELP%R(I)=EL%R(I)
-       ENDDO
-    ENDIF
-    IF(ASSOCIATED(EL%D)) THEN
-       if(.not.ASSOCIATED(ELP%D))  ALLOCATE(ELP%D(3))
-       DO I=1,3
-          ELP%D(I)=EL%D(I)
-       ENDDO
-    ENDIF
+    !    IF(ASSOCIATED(EL%R)) THEN
+    !       if(.not.ASSOCIATED(ELP%R))  ALLOCATE(ELP%R(3))
+    !       DO I=1,3
+    !          ELP%R(I)=EL%R(I)
+    !       ENDDO
+    !    ENDIF
+    !   IF(ASSOCIATED(EL%D)) THEN
+    !       if(.not.ASSOCIATED(ELP%D))  ALLOCATE(ELP%D(3))
+    !       DO I=1,3
+    !          ELP%D(I)=EL%D(I)
+    !       ENDDO
+    !    ENDIF
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
 
@@ -3083,10 +3190,14 @@ CONTAINS
        ELP%PHAS = EL%PHAS
        ELP%DELTA_E = EL%DELTA_E
        ELP%THIN = EL%THIN
+       N_CAV4_F=EL%C4%NF
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
        ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
        ELP%C4%phase0 = EL%C4%phase0
+       DO I=1,EL%C4%NF
+          ELP%C4%F(I)=EL%C4%F(I)
+       ENDDO
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -3107,6 +3218,15 @@ CONTAINS
        ELP%CAV21%DPHAS = EL%CAV21%DPHAS
        ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
        ELP%CAV21%phase0 = EL%CAV21%phase0
+    ENDIF
+
+    IF(EL%KIND==KIND22) THEN         !
+       if(.not.ASSOCIATED(ELP%HE22)) ALLOCATE(ELP%HE22)
+       ELP%HE22=0
+       if(.not.ASSOCIATED(ELP%FREQ)) ALLOCATE(ELP%FREQ,ELP%PHAS)
+       ELP%FREQ = EL%FREQ
+       ELP%PHAS = EL%PHAS
+       CALL SETFAMILY(ELP)
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -3245,6 +3365,10 @@ CONTAINS
        CALL resetpoly_R31(ELP%VOLT)
        CALL resetpoly_R31(ELP%FREQ )
        CALL resetpoly_R31(ELP%PHAS )
+       DO I=1,ELP%C4%NF
+          CALL resetpoly_R31(ELP%C4%F(I))
+       ENDDO
+
        !      CALL resetpoly_R31(ELP%P0C )
     ENDIF
 
@@ -3262,6 +3386,11 @@ CONTAINS
        CALL resetpoly_R31(ELP%CAV21%PSI )
        CALL resetpoly_R31(ELP%CAV21%DVDS )
        CALL resetpoly_R31(ELP%CAV21%DPHAS )
+    ENDIF
+
+    IF(ELP%KIND==KIND22) THEN
+       CALL resetpoly_R31(ELP%FREQ )
+       CALL resetpoly_R31(ELP%PHAS )
     ENDIF
 
     IF(ELP%KIND==KIND15) THEN          ! NEW 2002.11.16

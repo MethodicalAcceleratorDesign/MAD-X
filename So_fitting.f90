@@ -1150,30 +1150,6 @@ contains
 
   END SUBROUTINE FIND_ORBIT_LAYOUT
 
-  integer function FIND_ORBIT_flag(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
-    IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: RING
-    real(dp) , intent(inOUT) :: FIX(6)
-    INTEGER , intent(in) :: LOC
-    INTEGER, OPTIONAL::TURNS
-    real(dp) , optional, intent(in) :: eps
-    TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
-
-    call find_orbit(RING,FIX,LOC,STATE,eps,TURNS)
-
-    call PRODUCE_APERTURE_FLAG(FIND_ORBIT_flag)
-
-    CALL RESET_APERTURE_FLAG
-    !    if(.not.c_%stable_da) then
-    !       c_%stable_da=.true.
-    !    endif
-    !   resets Da on its own here only
-
-  END function  FIND_ORBIT_flag
-
-
-
-
 
   SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
@@ -1434,18 +1410,18 @@ contains
     p=>r%start
 
     do i=1,r%n
-       if(p%mag%p%b0/=zero) call fit_bare_bend(p,state,r%charge)
+       if(p%mag%p%b0/=zero) call fit_bare_bend(p,state)
        p=>p%next
     enddo
 
   end SUBROUTINE fit_all_bends
 
-  SUBROUTINE fit_bare_bend(f,state,charge,next)
+  SUBROUTINE fit_bare_bend(f,state,next)
     IMPLICIT NONE
     TYPE(fibre),INTENT(INOUT):: f
     TYPE(real_8) y(6)
     TYPE(internal_state), intent(in):: state
-    integer,optional,target :: charge
+    !    integer,optional,target :: charge
     real(dp) kf,x(6),xdix,xdix0,tiny
     integer ite
     logical(lp), optional :: next
@@ -1470,8 +1446,8 @@ contains
 3   continue
     X=ZERO
     Y=X
-    CALL TRACK(f,Y,+state,CHARGE)
-    if(nex) CALL TRACK(f%next,Y,+state,CHARGE)
+    CALL TRACK(f,Y,+state)  !,CHARGE)
+    if(nex) CALL TRACK(f%next,Y,+state)  !,CHARGE)
     x=y
     !    write(6,'(A10,6(1X,G14.7))') " ORBIT IS ",x
     kf=-(y(2).sub.'0')/(y(2).sub.'1')
@@ -2538,6 +2514,22 @@ contains
   end SUBROUTINE REVERSE_BEAM_LINE
 
 
+  SUBROUTINE PUTFRINGE(R, changeanbn )
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer I
+    type(fibre), pointer :: P
+    logical(lp) changeanbn
+
+    p=>r%start
+    do i=1,r%n
+       p%mag%PERMFRINGE =changeanbn
+       p%magP%PERMFRINGE=changeanbn
+       P=>P%next
+    ENDDO
+  end SUBROUTINE PUTFRINGE
+
+
   SUBROUTINE MESS_UP_ALIGNMENT(R,SIG,cut)
     use gauss_dis
     IMPLICIT NONE
@@ -2613,6 +2605,53 @@ contains
 
   end  subroutine MESS_UP_ALIGNMENT_name
 
+  subroutine Sigma_of_alignment(r,sig,ave)
+    IMPLICIT NONE
+    TYPE(layout), intent(inout):: R
+    integer i,j,is(6)
+    type(fibre), pointer :: p
+    real(dp) sig(6),ave(6)
+    character*23 lab(6)
+    lab(1)=" Dx Average and Sigma  "
+    lab(2)=" Dy Average and Sigma  "
+    lab(3)=" Dz Average and Sigma  "
+    lab(4)=" Dax Average and Sigma "
+    lab(5)=" Day Average and Sigma "
+    lab(6)=" Daz Average and Sigma "
+
+    AVE=ZERO
+    SIG=ZERO
+    p=>r%start
+    is=0
+    do i=1,r%n
+       do j=1,3
+          if(p%chart%D_IN(j)/=zero) then
+             is(j)=is(j)+1
+             ave(j)=p%chart%D_IN(j)+ave(j)
+             sig(j)=p%chart%D_IN(j)**2+sig(j)
+          endif
+       enddo
+       do j=4,6
+          if(p%chart%ANG_IN(j)/=zero) then
+             is(j)=is(j)+1
+             ave(j)=p%chart%ANG_IN(j)+ave(j)
+             sig(j)=p%chart%ANG_IN(j)**2+sig(j)
+          endif
+       enddo
+       p=>p%next
+    enddo
+
+    do i=1,6
+       if(is(i)/=0) then
+          ave(i)=ave(i)/is(i)
+          sig(i)=sig(i)/is(i)
+          sig(i)=sqrt(sig(i)-ave(i)**2)
+          write(6,*) is(i), " Magnets misaligned "
+          write(6,"(1x,a23,2(1x,E15.8))") lab(i),ave(i),sig(i)
+       endif
+    enddo
+
+  end subroutine Sigma_of_alignment
 
 
 

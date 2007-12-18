@@ -7,6 +7,8 @@ module madx_keywords
   public
   logical(lp)::mad8=my_false
   integer :: ifield_name=0
+  logical(lp),private :: do_survey =.false.
+
   type keywords
      character*20 magnet
      character*20 model
@@ -238,7 +240,7 @@ contains
     REAL(DP),OPTIONAL :: LMAX0
     integer,OPTIONAL :: NL
 
-    n_l=1
+    n_l=0
     if(present(nl)) n_l=nl
     call kanalnummer(mf)
     open(unit=mf,file=filename)
@@ -285,8 +287,8 @@ contains
 
     if(n_l>0) then
        do i=1,n_l
-          write(mf,*) " Beam Line DNA structure "
-          write(mf,*) " End of Beam Line DNA structure "
+          ! write(mf,*) " Beam Line DNA structure "
+          ! write(mf,*) " End of Beam Line DNA structure "
           CALL print_LAYOUT(CL,FILENAME,LMAX0,MF)
           CL=>CL%NEXT
        enddo
@@ -306,6 +308,7 @@ contains
     type(FIBRE), pointer :: P
     REAL(DP),OPTIONAL :: LMAX0
     character*255 line
+    logical(lp) print_temp
 
     IF(PRESENT(MFF)) THEN
        MF=MFF
@@ -325,8 +328,8 @@ contains
        write(MF,*) " $$$$$$$$$ GLOBAL DATA  $$$$$$$$$"
     endif
 
-    write(MF,*) l%mass,L%START%mag%p%p0c, "MASS, P0C"
-    write(MF,*) phase0,stoch_in_rec,l%charge, " PHASE0, STOCH_IN_REC, CHARGE"
+    write(MF,*) l%start%mass,L%START%mag%p%p0c, "MASS, P0C"
+    write(MF,*) phase0,stoch_in_rec,l%start%charge, " PHASE0, STOCH_IN_REC, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
          "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
     write(line,*) SECTOR_NMUL_MAX,SECTOR_NMUL,&
@@ -340,7 +343,14 @@ contains
 
     P=>L%START
     DO I=1,L%N
+       if(i==1) then
+          print_temp=print_frame
+          print_frame=my_true
+       endif
        CALL print_FIBRE(P,mf)
+       if(i==1) then
+          print_frame=print_temp
+       endif
        P=>P%NEXT
     ENDDO
 
@@ -348,36 +358,6 @@ contains
 
   END subroutine print_LAYOUT
 
-  subroutine READ_LAYOUT(L,filename)
-    implicit none
-    character(*) filename
-    integer mf,I
-    type(LAYOUT), TARGET :: L
-    type(FIBRE), pointer :: P
-    character*120 line
-    real(dp) p0c
-
-    call kanalnummer(mf)
-    open(unit=mf,file=filename)
-    READ(MF,*) I
-    read(MF,'(a120)') line
-    read(MF,*) l%mass,p0c
-    read(MF,*) phase0,stoch_in_rec,l%charge
-    read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
-    read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
-    read(MF,*) wedge_coeff
-    read(MF,*) MAD8_WEDGE
-    read(MF,'(a120)') line
-
-    P=>L%START
-
-    DO I=1,L%N
-       CALL READ_FIBRE(P,mf)
-       P=>P%NEXT
-    ENDDO
-
-    CLOSE(MF)
-  END subroutine READ_LAYOUT
 
   subroutine READ_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
     implicit none
@@ -416,7 +396,7 @@ contains
        l%name=line(index(line,"FOR")+3:index(line,"FOR")+2+nlp)
     endif
     read(MF,*) MASSF,p0c
-    read(MF,*) phase0,stoch_in_rec,l%charge
+    read(MF,*) phase0,stoch_in_rec,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
     read(MF,*) wedge_coeff
@@ -427,7 +407,7 @@ contains
        firsttime_coef=.true.
        deallocate(s_b)
     endif
-    L%MASS=MASSF
+    !    L%MASS=MASSF
     MASSF=MASSF/pmae
     CALL MAKE_STATES(MASSF)
     default=original
@@ -444,6 +424,8 @@ contains
 
     doneit=.true.
     call ring_l(L,doneit)
+    ! if(do_survey) call survey(L)
+
     return
 
 2001 continue
@@ -461,6 +443,7 @@ contains
     REAL(DP), OPTIONAL :: LMAX0
     character*120 line
     integer res
+
     res=0
     call kanalnummer(mf)
     open(unit=mf,file=filename,status='OLD',err=2001)
@@ -475,7 +458,9 @@ contains
        call APPEND_EMPTY_LAYOUT(U)
 
        CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0)
+       ! if(do_survey) call survey(u%end)
     endif
+    do_survey=.false.
     return
 2001 continue
 
@@ -500,16 +485,27 @@ contains
 
   subroutine print_FIBRE(m,mf)
     implicit none
-    integer mf,I
+    integer mf,I,siam_pos,siam_index
     type(FIBRE), pointer :: m
-
+    siam_pos=0
+    siam_index=0
+    if(associated(m%mag%siamese)) then
+       siam_index=m%mag%siamese%parent_fibre%parent_layout%index
+       siam_pos=m%mag%siamese%parent_fibre%pos
+    endif
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
-    WRITE(MF,'(A11,4(I4,1x))') " DIRECTION ", M%DIR, &
-         m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
-         m%mag%parent_fibre%parent_layout%n
+    if(siam_index==0) then
+       WRITE(MF,'(A11,4(I4,1x))') " DIRECTION ", M%DIR, &
+            m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
+            m%mag%parent_fibre%parent_layout%n
+    else
+       WRITE(MF,'(A11,4(I4,1x),A9,2(I4,1x))') " DIRECTION ", M%DIR, &
+            m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
+            m%mag%parent_fibre%parent_layout%n," Siamese ",siam_pos,siam_index
+    endif
     CALL print_chart(m%CHART,mf)
     CALL print_PATCH(m%PATCH,mf)
-    CALL print_element(M%MAG,mf)
+    CALL print_element(M,M%MAG,mf)
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
 
   END subroutine print_FIBRE
@@ -523,19 +519,23 @@ contains
     READ(MF,'(A11,I4)') LINE(1:11),M%DIR
     CALL READ_chart(m%CHART,mf)
     CALL READ_PATCH(m%PATCH,mf)
-    CALL READ_element(M%MAG,mf)
+    CALL READ_element(m,M%MAG,mf)
     READ(MF,*) LINE
 
   END subroutine READ_FIBRE
 
-  subroutine READ_FIBRE_2_lines(mf,DIR,index,pos,n)
+  subroutine READ_FIBRE_2_lines(mf,DIR,index,pos,n,siam_index,siam_pos)
     implicit none
     integer mf,I
     character*255 line
-    integer DIR,index,pos,n
-    READ(MF,*) LINE
 
-    READ(MF,'(A11,4(I4,1x))') LINE(1:11),DIR,index,pos,n
+    integer DIR,index,pos,n,siam_index,siam_pos
+    READ(MF,*) LINE
+    siam_index=0
+    siam_pos=0
+
+    READ(MF,'(A11,4(I4,1x),A9,2(I4,1x))') LINE(1:11),DIR,index,pos,n, &
+         LINE(12:20),siam_pos,siam_index
     !    CALL READ_chart(m%CHART,mf)
     !    CALL READ_PATCH(m%PATCH,mf)
     !    CALL READ_element(M%MAG,mf)
@@ -549,16 +549,19 @@ contains
     type(PATCH), pointer :: m
     character*255 line
 
-    WRITE(MF,*) " >>>>>>>>>>>>>>>>>> PATCH <<<<<<<<<<<<<<<<<<"
-    WRITE(MF,*) M%PATCH,M%ENERGY,M%TIME," patch,energy,time"
-    WRITE(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2," discrete 180 rotations"
-    WRITE(LINE,*) M%A_D,M%A_ANG,"  a_d, a_ang "
-    WRITE(MF,'(A255)') LINE
-    WRITE(LINE,*) M%B_D,M%B_ANG,"  b_d, b_ang "
-    WRITE(MF,'(A255)') LINE
-    WRITE(MF,*) M%A_T,M%B_T,"  time patches a_t and b_t "
-    WRITE(MF,*) " >>>>>>>>>>>>>>>>>>  END  <<<<<<<<<<<<<<<<<<"
-
+    IF(IABS(M%PATCH)+iabs(M%energy)+iabs(M%time)/=0) then
+       WRITE(MF,*) " >>>>>>>>>>>>>>>>>> PATCH <<<<<<<<<<<<<<<<<<"
+       WRITE(MF,*) M%PATCH,M%ENERGY,M%TIME," patch,energy,time"
+       WRITE(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2," discrete 180 rotations"
+       WRITE(LINE,*) M%A_D,M%A_ANG,"  a_d, a_ang "
+       WRITE(MF,'(A255)') LINE
+       WRITE(LINE,*) M%B_D,M%B_ANG,"  b_d, b_ang "
+       WRITE(MF,'(A255)') LINE
+       WRITE(MF,*) M%A_T,M%B_T,"  time patches a_t and b_t "
+       WRITE(MF,*) " >>>>>>>>>>>>>>>>>>  END  <<<<<<<<<<<<<<<<<<"
+    else
+       WRITE(MF,*) " NO PATCH "
+    endif
   END subroutine print_PATCH
 
   subroutine READ_PATCH(m,mf)
@@ -568,12 +571,14 @@ contains
     character*255 line
 
     READ(MF,*)LINE
-    READ(MF,*) M%PATCH,M%ENERGY,M%TIME
-    READ(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2
-    READ(MF,*) M%A_D,M%A_ANG
-    READ(MF,*) M%B_D,M%B_ANG
-    READ(MF,*) M%A_T,M%B_T
-    READ(MF,*) LINE
+    if(index(line,"NO")==0) then
+       READ(MF,*) M%PATCH,M%ENERGY,M%TIME
+       READ(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2
+       READ(MF,*) M%A_D,M%A_ANG
+       READ(MF,*) M%B_D,M%B_ANG
+       READ(MF,*) M%A_T,M%B_T
+       READ(MF,*) LINE
+    endif
 
   END subroutine READ_PATCH
 
@@ -582,13 +587,26 @@ contains
     integer mf,I
     type(CHART), pointer :: m
     character*255 line
-    write(mf,*) " THIS IS A CHART THIS IS A CHART THIS IS A CHART THIS IS A CHART "
-    CALL print_magnet_frame(m%F,mf)
-    WRITE(LINE,*) M%D_IN,M%ANG_IN
-    WRITE(MF,'(A255)') LINE
-    WRITE(LINE,*) M%D_OUT,M%ANG_OUT
-    WRITE(MF,'(A255)') LINE
-    write(mf,*) " END OF A CHART  END OF A CHART  END OF A CHART  END OF A CHART  "
+    real(dp) norm
+
+    norm=zero
+    do i=1,3
+       norm=abs(M%D_IN(i))+norm
+       norm=abs(M%ANG_IN(i))+norm
+       norm=abs(M%ANG_OUT(i))+norm
+       norm=abs(M%D_OUT(i))+norm
+    enddo
+    if(norm>zero.OR.print_frame) then
+       write(mf,*) " THIS IS A CHART THIS IS A CHART THIS IS A CHART THIS IS A CHART "
+       CALL print_magnet_frame(m%F,mf)
+       WRITE(LINE,*) M%D_IN,M%ANG_IN
+       WRITE(MF,'(A255)') LINE
+       WRITE(LINE,*) M%D_OUT,M%ANG_OUT
+       WRITE(MF,'(A255)') LINE
+       write(mf,*) " END OF A CHART  END OF A CHART  END OF A CHART  END OF A CHART  "
+    else
+       write(mf,*) " NO CHART "
+    endif
   end subroutine print_chart
 
   subroutine READ_chart(m,mf)
@@ -597,10 +615,14 @@ contains
     type(CHART), pointer :: m
     character*60 line
     READ(mf,*) LINE
-    CALL READ_magnet_frame(m%F,mf)
-    READ(MF,*) M%D_IN,M%ANG_IN
-    READ(MF,*) M%D_OUT,M%ANG_OUT
-    READ(mf,*) LINE
+    if(index(line,"NO")==0) then
+       CALL READ_magnet_frame(m%F,mf)
+       READ(MF,*) M%D_IN,M%ANG_IN
+       READ(MF,*) M%D_OUT,M%ANG_OUT
+       READ(mf,*) LINE
+    else
+       do_survey=.true.
+    endif
   end subroutine READ_chart
 
 
@@ -614,18 +636,22 @@ contains
     call alloc(f)
 
     READ(mf,*) LINE
-
-    CALL READ_magnet_frame(F,mf)
-    READ(MF,*) d1,d2
-    READ(MF,*) d1,d2
-    READ(mf,*) LINE
+    if(index(line,"NO")==0) then
+       CALL READ_magnet_frame(F,mf)
+       READ(MF,*) d1,d2
+       READ(MF,*) d1,d2
+       READ(mf,*) LINE
+    else
+       do_survey=.true.
+    endif
     call kill(f)
   end subroutine READ_chart_fake
 
 
-  subroutine print_element(m,mf)
+  subroutine print_element(P,m,mf)
     implicit none
     integer mf,I
+    type(FIBRE), pointer :: P
     type(element), pointer :: m
     character*255 line
 
@@ -638,7 +664,7 @@ contains
     WRITE(MF,*) M%L,M%PERMFRINGE,M%MIS , " L,PERMFRINGE,MIS "
     WRITE(LINE,*) M%FINT,M%HGAP,M%H1,M%H2, " FINT,HGAP,H1,H2 "
     WRITE(MF,'(A255)') LINE
-    WRITE(LINE,*) M%R,M%D , " r(3), d(3) "
+    WRITE(LINE,*) 0.d0,0.d0,0.d0,0.d0,0.d0,0.d0, " no more mis"
     WRITE(MF,'(A255)') LINE
     IF(ASSOCIATED(M%FREQ)) THEN
        WRITE(MF,*) " CAVITY INFORMATION "
@@ -655,7 +681,7 @@ contains
     ELSE
        WRITE(MF,*) " NO_SOLENOID_PRESENT ",zero
     ENDIF
-    CALL print_magnet_chart(m%P,mf)
+    CALL print_magnet_chart(P,m%P,mf)
     IF(ASSOCIATED(M%an)) THEN
        do i=1,m%p%NMUL
           write(mf,*) m%bn(i),m%an(i), " BN AN ",I
@@ -905,13 +931,14 @@ contains
 
   end subroutine read_pancake_field
 
-  subroutine READ_element(m,mf)
+  subroutine READ_element(p,m,mf)
     implicit none
     integer mf,I
+    type(fibre), pointer :: p
     type(element), pointer :: m
     character*120 line
     CHARACTER*21 SOL
-    REAL(DP) B_SOL
+    REAL(DP) B_SOL,r(3),d(3)
 
     READ(MF,*) LINE
     READ(MF,*) M%KIND,M%NAME,M%VORNAME
@@ -921,7 +948,7 @@ contains
 
     READ(MF,*) M%L,M%PERMFRINGE,M%MIS  !,M%EXACTMIS
     READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
-    READ(MF,*) M%R,M%D
+    READ(MF,*) R,D
     READ(MF,*) LINE
     CALL CONTEXT(LINE)
     IF(LINE(1:1)=='C') THEN
@@ -943,7 +970,7 @@ contains
        IF(.NOT.ASSOCIATED(M%B_SOL))ALLOCATE(M%B_SOL)
        M%B_SOL=B_SOL
     ENDIF
-    CALL  READ_magnet_chart(m%P,mf)
+    CALL  READ_magnet_chart(p,m%P,mf)
     IF(M%P%NMUL/=0) THEN
        IF(.NOT.ASSOCIATED(M%AN)) THEN
           ALLOCATE(M%AN(M%P%NMUL))
@@ -972,14 +999,15 @@ contains
   end subroutine READ_element
 
 
-  subroutine READ_fake_element(mf)
+  subroutine READ_fake_element(p,mf)
     implicit none
     integer mf,I
+    type(fibre),pointer ::  p
     type(fibre),pointer ::  f
     type(element),pointer ::  m
     character*120 line
     CHARACTER*21 SOL
-    REAL(DP) B_SOL
+    REAL(DP) B_SOL,r(3),d(3)
     nullify(m)
     call alloc(f)
     m=>f%mag
@@ -992,7 +1020,7 @@ contains
 
     READ(MF,*) M%L,M%PERMFRINGE,M%MIS   !,M%EXACTMIS
     READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
-    READ(MF,*) M%R,M%D
+    READ(MF,*) R,D
     READ(MF,*) LINE
     CALL CONTEXT(LINE)
     IF(LINE(1:1)=='C') THEN
@@ -1014,7 +1042,7 @@ contains
        IF(.NOT.ASSOCIATED(M%B_SOL))ALLOCATE(M%B_SOL)
        M%B_SOL=B_SOL
     ENDIF
-    CALL  READ_magnet_chart(m%P,mf)
+    CALL  READ_magnet_chart(p,m%P,mf)
     IF(M%P%NMUL/=0) THEN
        IF(.NOT.ASSOCIATED(M%AN)) THEN
           ALLOCATE(M%AN(M%P%NMUL))
@@ -1045,8 +1073,9 @@ contains
 
   end subroutine READ_fake_element
 
-  subroutine print_magnet_chart(m,mf)
+  subroutine print_magnet_chart(P,m,mf)
     implicit none
+    type(FIBRE), pointer :: P
     type(magnet_chart), pointer :: m
     integer mf
     character*200 line
@@ -1055,7 +1084,7 @@ contains
     WRITE(MF,*) M%EXACT,M%METHOD,M%NST,M%NMUL, " EXACT METHOD NST NMUL"
     WRITE(line,*) M%LD, M%LC, M%B0,' TILT= ',M%TILTD, " LD LC B0 "
     WRITE(MF,'(A200)') LINE
-    WRITE(LINE,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C, " BETA0 GAMMA0I GAMBET P0C"
+    WRITE(LINE,*) P%BETA0,P%GAMMA0I, P%GAMBET, M%P0C, " BETA0 GAMMA0I GAMBET P0C"
     WRITE(MF,'(A200)') LINE
     WRITE(MF,*) M%EDGE, " EDGES"
     WRITE(MF,*) M%KILL_ENT_FRINGE,M%KILL_EXI_FRINGE,M%bend_fringe, " Kill_ent_fringe, kill_exi_fringe, bend_fringe "
@@ -1065,12 +1094,15 @@ contains
     write(mf,'(a68)') "END MAGNET CHART END MAGNET CHART END MAGNET CHART END MAGNET CHART "
   end subroutine print_magnet_chart
 
-  subroutine READ_magnet_chart(m,mf)
+  subroutine READ_magnet_chart(p,m,mf)
     implicit none
+    type(fibre), pointer :: p
     type(magnet_chart), pointer :: m
     integer mf
     character*200 line
     character*5 til
+    real(dp) BETA0,GAMMA0I, GAMBET,P0C
+
 
     READ(MF,*) LINE
     READ(MF,*) M%EXACT,M%METHOD,M%NST,M%NMUL
@@ -1084,33 +1116,45 @@ contains
     endif
 
 
-    READ(MF,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C
+    READ(MF,*)BETA0,GAMMA0I, GAMBET, M%P0C
     READ(MF,*) M%EDGE
     READ(MF,*) M%KILL_ENT_FRINGE,M%KILL_EXI_FRINGE,M%bend_fringe
 
     CALL READ_magnet_frame(m%F,mf)
     CALL READ_aperture(m%APERTURE,mf)
     READ(MF,*) LINE
+    p%BETA0=beta0
+    p%GAMBET=GAMBET
+    p%GAMMA0I=GAMMA0I
+    !    p%P0C=M%P0C
+    !    M%BETA0 =>p%BETA0
+    !    M%GAMMA0I => p%GAMMA0I
+    !    M%GAMBET => p%GAMBET
+
   end subroutine READ_magnet_chart
 
   subroutine print_magnet_frame(m,mf)
     implicit none
     type(magnet_frame), pointer :: m
     integer mf,i
-    write(mf,'(a72)') "MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME "
-    WRITE(MF,*) m%a
-    do i=1,3
-       WRITE(MF,*) m%ent(i,1:3)
-    enddo
-    WRITE(MF,*) m%o
-    do i=1,3
-       WRITE(MF,*) m%mid(i,1:3)
-    enddo
-    WRITE(MF,*) m%b
-    do i=1,3
-       WRITE(MF,*) m%exi(i,1:3)
-    enddo
-    write(mf,'(a68)') "END MAGNET FRAME END MAGNET FRAME END MAGNET FRAME END MAGNET FRAME "
+    if(print_frame) then
+       write(mf,'(a72)') "MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME MAGNET FRAME "
+       WRITE(MF,*) m%a
+       do i=1,3
+          WRITE(MF,*) m%ent(i,1:3)
+       enddo
+       WRITE(MF,*) m%o
+       do i=1,3
+          WRITE(MF,*) m%mid(i,1:3)
+       enddo
+       WRITE(MF,*) m%b
+       do i=1,3
+          WRITE(MF,*) m%exi(i,1:3)
+       enddo
+       write(mf,'(a68)') "END MAGNET FRAME END MAGNET FRAME END MAGNET FRAME END MAGNET FRAME "
+    else
+       write(mf,'(a72)') " NO MAGNET FRAME NO MAGNET FRAME NO MAGNET FRAME NO MAGNET FRAME NO MAGNET    "
+    endif
   end subroutine print_magnet_frame
 
   subroutine read_magnet_frame(m,mf)
@@ -1120,19 +1164,25 @@ contains
     character*120 line
 
     read(mf,'(a120)') line
-    read(MF,*) m%a
-    do i=1,3
-       read(MF,*) m%ent(i,1:3)
-    enddo
-    read(MF,*) m%o
-    do i=1,3
-       read(MF,*) m%mid(i,1:3)
-    enddo
-    read(MF,*) m%b
-    do i=1,3
-       read(MF,*) m%exi(i,1:3)
-    enddo
-    read(mf,'(a120)') line
+
+    if(index(line,"NO")==0) then
+
+       read(MF,*) m%a
+       do i=1,3
+          read(MF,*) m%ent(i,1:3)
+       enddo
+       read(MF,*) m%o
+       do i=1,3
+          read(MF,*) m%mid(i,1:3)
+       enddo
+       read(MF,*) m%b
+       do i=1,3
+          read(MF,*) m%exi(i,1:3)
+       enddo
+       read(mf,'(a120)') line
+    else
+       do_survey=.true.
+    endif
   end subroutine read_magnet_frame
 
   subroutine print_aperture(m,mf)
@@ -1213,12 +1263,13 @@ contains
 
 
     read(mf,*) n,n_l
-
+    write(6,*) n,n_l
     do i=1,n
        call READ_AND_APPEND_VIRGIN_LAYOUT(U,filename,RING,LMAX0,mf)
-       if(i==1) L=> U%END
+       if(i==1) L=>U%end
+       write(6,*) " read layout ", i
+       write(6,*) U%end%name
     enddo
-
 
     do i=1,n_l
        call APPEND_EMPTY_LAYOUT(U)
@@ -1230,9 +1281,9 @@ contains
           U%END%DNA(j)%counter=0
        ENDDO
 
-       read(mf,'(a120)') line
-       WRITE(6,*) I
-       WRITE(6,*) LINE
+       !   read(mf,'(a120)') line
+       WRITE(6,*) "LAYOUT ",I
+       !   WRITE(6,*) LINE
        !       do k=1,N
        !        read(mf,*) ncon1,ncon2
        !        if(ncon1/=0) then
@@ -1252,10 +1303,10 @@ contains
        !         enddo
 
        !       enddo
-       read(mf,'(a120)') line
+       !   read(mf,'(a120)') line
 
-       WRITE(6,*) I
-       WRITE(6,*) LINE
+       !   WRITE(6,*) I
+       !   WRITE(6,*) LINE
 
 
        CALL READ_pointed_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0,mf1=MF)
@@ -1302,9 +1353,9 @@ contains
   subroutine READ_pointed_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
     implicit none
     character(*) filename
-    integer I,mf,N,DIR,index,pos,nt,kc
+    integer I,mf,N,DIR,index_,pos,nt,kc,siam_index,siam_pos
     type(LAYOUT), TARGET :: L
-    type(FIBRE), pointer :: P,current
+    type(FIBRE), pointer :: P,current,siam
     LOGICAL(LP), OPTIONAL :: RING
     REAL(DP), OPTIONAL :: LMAX0
     LOGICAL(LP) RING_IT,doneit
@@ -1330,8 +1381,13 @@ contains
        if(LMAX0t/=zero) LMAX0=LMAX0T
     ENDIF
     read(MF,'(a120)') line
+    call context(line)
+
+    if(index(line,"FOR")/=0) then
+       l%name=line(index(line,"FOR")+3:index(line,"FOR")+2+nlp)
+    endif
     read(MF,*) MASSF,p0c
-    read(MF,*) phase0,stoch_in_rec,l%charge
+    read(MF,*) phase0,stoch_in_rec,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
     read(MF,*) wedge_coeff
@@ -1342,19 +1398,24 @@ contains
        firsttime_coef=.true.
        deallocate(s_b)
     endif
-    L%MASS=MASSF
+    !    L%MASS=MASSF
     MASSF=MASSF/pmae
     CALL MAKE_STATES(MASSF)
     default=original
     call Set_madx(p0c=p0c)
     DO I=1,N
-       call  READ_FIBRE_2_lines(mf,dir,index,pos,nt)
+       call  READ_FIBRE_2_lines(mf,dir,index_,pos,nt,siam_index,siam_pos)
        call  READ_chart_fake(mf)
-       call move_to(L%DNA(index)%L,p,pos)
+       call move_to(L%DNA(index_)%L,p,pos)
        CALL APPEND_POINT(L,P)
        current=>l%end
        current%dir=dir
 
+       if(siam_index/=0) then
+          call move_to(L%DNA(siam_index)%L,siam,siam_pos)
+          p%mag%siamese=>siam%mag
+          write(6,*) p%mag%name,' is connected to ', siam%mag%name
+       endif
        !        if(pos==1) then
        !         if(associated(L%DNA(index)%l%con1)) then
        !           L%DNA(index)%counter=L%DNA(index)%counter+1
@@ -1369,7 +1430,7 @@ contains
        !          endif
        !        endif
        CALL READ_PATCH(current%PATCH,mf)
-       call READ_fake_element(mf)
+       call READ_fake_element(current,mf)
        READ(MF,*) LINE
        !
        ! CALL READ_FIBRE(L%END,mf)
@@ -1382,6 +1443,8 @@ contains
 
     doneit=.true.
     call ring_l(L,doneit)
+    if(do_survey) call survey(L)
+
     return
 
 2001 continue
@@ -1402,31 +1465,31 @@ contains
     REAL(DP) D(3),ANG(3),PREC,DS
     LOGICAL(LP) ENERGY_PATCH
 
-    P=>L%START
-    i=1
+    !    P=>L%START
+    !    i=1
+    !    nt=0
+    !    do while(i<=l%n)
+
+    !       call count_PATCH_sixtrack(di,p)
+    !       i=i+1+DI
+    !       nt=nt+1
+    !    ENDDO
+
     nt=0
-    do while(i<=l%n)
-
-       call count_PATCH_sixtrack(di,p)
-       i=i+1+DI
-       nt=nt+1
-    ENDDO
-
-
 
     PREC=1.D-10
     call kanalnummer(mf)
     open(unit=mf,file=filename)
 
-    WRITE(MF,*) L%N, nt, " NUMBER OF FIBRES AND SIXTRACK NODES   "
+    WRITE(MF,*) L%N, " NUMBER OF FIBRES   "
     if(l%name(1:1)/=' ') then
        write(MF,'(a17,a16)') " GLOBAL DATA FOR ",l%name
     else
        write(MF,*) " $$$$$$$$$ GLOBAL DATA $$$$$$$$$"
     endif
 
-    write(MF,*) l%mass,L%START%mag%p%p0c, "MASS, P0C"
-    write(MF,*) phase0,stoch_in_rec,l%charge, " PHASE0, STOCH_IN_REC, CHARGE"
+    write(MF,*) l%start%mass,L%START%mag%p%p0c, "MASS, P0C"
+    write(MF,*) phase0,stoch_in_rec,l%start%charge, " PHASE0, STOCH_IN_REC, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
          "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
     write(MF,*) " $$$$$$$ END GLOBAL DATA $$$$$$$$$$"
@@ -1439,10 +1502,8 @@ contains
     do while(i<=l%n)
 
        CALL print_FIBRE_SIXTRACK(P,mf)
-       call FIND_PATCH_sixtrack(di,DS,P,D,ANG,ENERGY_PATCH,PREC)
-       CALL print_chart_SIXTRACK(D,ANG,DS,mf)
-       WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
-       i=i+1+DI
+       p=>p%next
+       i=i+1    !+DI
     ENDDO
 
 
@@ -1455,130 +1516,17 @@ contains
 
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
     WRITE(MF,*)  M%DIR, " DIRECTION "
-    CALL print_element_SIXTRACK(M%MAG,mf)
-    !    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
+    CALL print_PATCH_MIS_SIXTRACK(M,MF)
+    CALL print_element_SIXTRACK(M,M%MAG,mf)
+    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
 
   END subroutine print_FIBRE_SIXTRACK
 
-  subroutine print_chart_SIXTRACK(D,ANG,DS,mf)
+
+  subroutine print_element_SIXTRACK(P,m,mf)
     implicit none
     integer mf,I
-    REAL(DP) D(3),ANG(3),DS
-    character*255 line
-
-    write(mf,*) " THESE ARE THE MISALIGNMENTS "
-    WRITE(LINE,*) D,DS,ANG
-    WRITE(MF,'(A255)') LINE
-    write(mf,*) " END OF THE THE MISALIGNMENTS  "
-  end subroutine print_chart_SIXTRACK
-
-
-  SUBROUTINE FIND_PATCH_sixtrack(di,DS,EL1,D,ANG,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
-    IMPLICIT NONE
-    TYPE (FIBRE), POINTER :: EL1
-    TYPE (FIBRE),POINTER :: EL2
-    REAL(DP), INTENT(INOUT) :: D(3),ANG(3)
-    REAL(DP) ENT(3,3),EXI(3,3),DS
-    REAL(DP), POINTER,DIMENSION(:)::A,B
-    LOGICAL(LP), OPTIONAL, INTENT(IN) ::  ENERGY_PATCH
-    REAL(DP), OPTIONAL, INTENT(IN) ::  PREC
-    INTEGER A_YZ,A_XZ,di
-    LOGICAL(LP) ENE,DOIT,DISCRETE
-    INTEGER LOC,I,PATCH_NEEDED
-    REAL(DP) NORM,pix(3)
-    PATCH_NEEDED=1
-    pix=zero
-    pix(1)=pi
-    di=0
-    DS=ZERO
-    EL2=>EL1%NEXT
-    do while(el2%mag%kind==kind1)
-       DS=DS+el2%mag%L
-       el2=>el2%next
-       di=di+1
-    enddo
-    DISCRETE=.FALSE.
-    LOC=1
-    ENE=.FALSE.
-    IF(PRESENT(ENERGY_PATCH)) ENE=ENERGY_PATCH
-    EXI=EL1%t2%previous%previous%EXI
-    B=>EL1%t2%previous%previous%B
-    ENT=EL2%t1%next%next%ENT
-    A=>EL2%t1%next%next%A
-    IF(EL1%DIR*EL2%DIR==1) THEN   !   1
-       IF(EL1%DIR==1) THEN
-          A_XZ=1;A_YZ=1;
-       ELSE
-          call geo_rot(exi,pix,1,basis=exi)
-          call geo_rot(ent,pix,1,basis=ent)
-          A_XZ=-1;A_YZ=-1;
-       ENDIF
-    ELSE                          !   1
-       IF(EL1%DIR==1) THEN
-          call geo_rot(ent,pix,1,basis=ent)
-          A_XZ=1;A_YZ=-1;
-       ELSE
-          call geo_rot(exi,pix,1,basis=exi)
-          A_XZ=-1;A_YZ=1;
-       ENDIF
-    ENDIF                     !   1
-
-    CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
-
-    IF(PRESENT(PREC)) THEN
-       NORM=ZERO
-       DO I=1,3
-          NORM=NORM+ABS(D(I))
-       ENDDO
-       IF(NORM<=PREC) THEN
-          D=ZERO
-          PATCH_NEEDED=PATCH_NEEDED+1
-       ENDIF
-       NORM=ZERO
-       DO I=1,3
-          NORM=NORM+ABS(ANG(I))
-       ENDDO
-       IF(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)) THEN
-          ANG=ZERO
-          PATCH_NEEDED=PATCH_NEEDED+1
-       ENDIF
-       IF(PATCH_NEEDED==3) THEN
-          PATCH_NEEDED=0
-       ELSE
-          PATCH_NEEDED=1
-       ENDIF
-    endif
-
-
-
-    DISCRETE=.false.
-    IF(ANG(1)/TWOPI<-c_0_25) THEN
-       DISCRETE=.TRUE.
-    ENDIF
-    IF(ANG(1)/TWOPI>c_0_25) THEN
-       DISCRETE=.TRUE.
-    ENDIF
-    IF(ANG(2)/TWOPI<-c_0_25) THEN
-       DISCRETE=.TRUE.
-    ENDIF
-    IF(ANG(1)/TWOPI>c_0_25) THEN
-       DISCRETE=.TRUE.
-    ENDIF
-
-    IF(DISCRETE) THEN
-       W_P=0
-       W_P%NC=1
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
-       CALL WRITE_I
-    ENDIF
-
-    EL1=>EL2
-  END SUBROUTINE FIND_PATCH_sixtrack
-
-  subroutine print_element_SIXTRACK(m,mf)
-    implicit none
-    integer mf,I
+    type(FIBRE), pointer :: P
     type(element), pointer :: m
     character*255 line
 
@@ -1606,7 +1554,7 @@ contains
     ELSE
        WRITE(MF,*) zero
     ENDIF
-    CALL print_magnet_chart_SIXTRACK(m%P,mf)
+    CALL print_magnet_chart_SIXTRACK(P,m%P,mf)
     IF(ASSOCIATED(M%an)) THEN
        do i=1,m%p%NMUL
           write(mf,*) m%bn(i),m%an(i), " BN AN ",I
@@ -1616,8 +1564,9 @@ contains
     WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   END   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
   end subroutine print_element_SIXTRACK
 
-  subroutine print_magnet_chart_SIXTRACK(m,mf)
+  subroutine print_magnet_chart_SIXTRACK(P,m,mf)
     implicit none
+    type(FIBRE), pointer :: P
     type(magnet_chart), pointer :: m
     integer mf
     character*200 line
@@ -1626,25 +1575,33 @@ contains
     WRITE(MF,*) M%METHOD,M%NST,M%NMUL, " METHOD NST NMUL"
     WRITE(line,*) M%B0, " B0"
     WRITE(MF,'(A200)') LINE
-    WRITE(LINE,*) M%BETA0,M%GAMMA0I, M%GAMBET, M%P0C, " BETA0 GAMMA0I GAMBET P0C"
+    WRITE(LINE,*) P%BETA0,P%GAMMA0I, P%GAMBET, M%P0C,m%tiltd, " BETA0 GAMMA0I GAMBET P0C TILT"
     WRITE(MF,'(A200)') LINE
 
     write(mf,'(a68)') "END MAGNET CHART END MAGNET CHART END MAGNET CHART END MAGNET CHART "
   end subroutine print_magnet_chart_SIXTRACK
 
-  SUBROUTINE count_PATCH_sixtrack(di,EL1) ! COMPUTES PATCHES
-    IMPLICIT NONE
-    TYPE (FIBRE), POINTER :: EL1
-    TYPE (FIBRE),POINTER :: EL2
-    INTEGER di
-    di=0
-    EL2=>EL1%NEXT
-    do while(el2%mag%kind==kind1)
-       el2=>el2%next
-       di=di+1
-    enddo
-    EL1=>EL2
-  END SUBROUTINE count_PATCH_sixtrack
+  subroutine print_PATCH_MIS_SIXTRACK(m,mf)
+    implicit none
+    type(FIBRE), pointer :: m
+    integer mf
+    character*200 line
+
+    write(mf,'(a10)')  " GEOMETRY "
+    WRITE(MF,*) M%PATCH%A_X1,M%PATCH%A_X2,M%PATCH%B_X1,M%PATCH%B_X2
+    WRITE(MF,*) M%PATCH%A_T, M%PATCH%B_T
+    WRITE(LINE,*) M%PATCH%A_ANG,M%PATCH%A_D
+    WRITE(MF,'(a200)') LINE
+    WRITE(LINE,*) M%PATCH%B_ANG,M%PATCH%B_D
+    WRITE(MF,'(a200)') LINE
+    WRITE(LINE,*) M%CHART%ANG_IN,M%CHART%D_IN
+    WRITE(MF,'(a200)') LINE
+    WRITE(LINE,*) M%CHART%ANG_OUT,M%CHART%D_OUT
+    WRITE(MF,'(a200)') LINE
+    WRITE(LINE,*) M%MAG%P%TILTD
+
+    write(mf,'(a14)') " END GEOMETRY "
+  end subroutine print_PATCH_MIS_SIXTRACK
 
 
 end module madx_keywords

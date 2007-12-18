@@ -44,7 +44,10 @@ TYPE CAV4
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp) , POINTER ::L                    !  Storage space for computed
+   real(dp),  DIMENSION(:), POINTER :: AN,BN                 !Multipole component
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0
+   real(dp), POINTER :: F(:)
+   INTEGER , POINTER :: NF
    integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH     ! Cavity information
 END  TYPE CAV4
 
@@ -52,8 +55,11 @@ TYPE CAV4P
    logical(lp), POINTER :: THIN
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8) , POINTER ::L
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS      ! Cavity Information
    real(dp), POINTER :: DELTA_E,phase0                        ! Cavity information
+   TYPE(REAL_8), POINTER :: F(:)
+   INTEGER , POINTER :: NF
    integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH  ! Cavity information
 END  TYPE CAV4P
 
@@ -320,3 +326,20 @@ TYPE PANCAKEP
    !   REAL(DP), POINTER :: D_IN(:),ANG_IN(:)
    !   REAL(DP), POINTER :: D_OUT(:),ANG_OUT(:)
 END  TYPE PANCAKEP
+
+
+TYPE HELICAL_DIPOLE
+   TYPE(MAGNET_CHART), POINTER:: P
+   real(dp), POINTER ::L
+   real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
+   real(dp), POINTER :: FREQ,PHAS
+   integer, POINTER :: N_BESSEL
+END  TYPE HELICAL_DIPOLE
+
+TYPE HELICAL_DIPOLEP
+   TYPE(MAGNET_CHART), POINTER:: P
+   TYPE(REAL_8), POINTER ::L
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN
+   TYPE(REAL_8),  POINTER :: FREQ,PHAS
+   integer, POINTER :: N_BESSEL
+END  TYPE HELICAL_DIPOLEP

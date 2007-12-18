@@ -762,6 +762,14 @@ contains
           CALL  print_COMPLEX_SINGLE_STRUCTURE(my_ering,filename,lmax0=lmax)
 
           WRITE(6,*) M_U%END%N, M_U%END%END%POS
+       case('PERMFRINGEON')
+
+          CALL  PUTFRINGE(my_ering,MY_TRUE)
+
+       case('PERMFRINGEOFF')
+
+          CALL  PUTFRINGE(my_ering,MY_FALSE)
+
        case('REVERSEBEAMLINE')
 
           CALL  REVERSE_BEAM_LINE(my_ering)
@@ -993,7 +1001,6 @@ contains
     TYPE(LAYOUT), POINTER :: r
     type(fibre), pointer :: p
     integer i
-    r%charge= r%charge
     p=>r%start
     do i=1,r%n
        p%dir=-p%dir

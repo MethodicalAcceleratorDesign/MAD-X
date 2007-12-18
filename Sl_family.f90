@@ -418,6 +418,14 @@ CONTAINS
 
     S2%MAG=S1
     S2%MAGP=S1
+    if(S1%power/=-1) then       ! just rescaling  -1=ramping
+       S2%mass=S1%mass
+       S2%BETA0=S1%BETA0
+       S2%GAMMA0I=S1%GAMMA0I
+       S2%GAMBET=S1%GAMBET
+    endif
+
+
     ! S2%PATCH%ENERGY=.TRUE.
 
   END SUBROUTINE FIBRE_WORK
@@ -483,7 +491,7 @@ CONTAINS
 
   END SUBROUTINE  MISALIGN_FIBRE_EQUAL
 
-  SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+  SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
@@ -493,6 +501,11 @@ CONTAINS
     TYPE(fibre), POINTER :: P
     integer k
     REAL(DP) OMEGAT(3),BASIST(3,3)
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
+    LOGICAL(LP) ADDIN
+
+    ADDIN=.FALSE.
+    IF(PRESENT(ADD)) ADDIN=ADD
 
     IF(PRESENT(OMEGA)) THEN
        OMEGAT=OMEGA
@@ -506,7 +519,7 @@ CONTAINS
     ENDIF
 
 
-    CALL MISALIGN_FIBRE(S2,S1,OMEGAT,BASIST)
+    CALL MISALIGN_FIBRE(S2,S1,OMEGAT,BASIST,ADD=ADDIN)
     k=1
 
     IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
@@ -514,7 +527,7 @@ CONTAINS
        CN=>S2%MAG%SIAMESE
        DO WHILE(.NOT.ASSOCIATED(C,CN))
           P=>CN%PARENT_FIBRE
-          CALL MISALIGN_FIBRE(P,S1,OMEGAT,BASIST)
+          CALL MISALIGN_FIBRE(P,S1,OMEGAT,BASIST,ADD=ADDIN)
           CN=>CN%SIAMESE
           k=k+1
        ENDDO
@@ -523,29 +536,34 @@ CONTAINS
     write(6,*) k, " magnet misaligned "
   END SUBROUTINE  MISALIGN_SIAMESE
 
-  SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+  SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
     TYPE(FIBRE),INTENT(INOUT):: S2
-    REAL(DP) ANGLE(3),T_GLOBAL(3)
+    REAL(DP) ANGLE(3),T_GLOBAL(3),d(3),r(3)
     TYPE(MAGNET_FRAME), POINTER :: F,F0
     REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
     TYPE(INTEGRATION_NODE),POINTER :: T
     INTEGER I
+    LOGICAL(LP) ADDIN
 
-
-
-
+    ADDIN=.FALSE.
+    IF(PRESENT(ADD)) ADDIN=ADD
     IF(ASSOCIATED(S2%CHART)) THEN
-       IF(.NOT.ASSOCIATED(S2%MAG%D) ) ALLOCATE(S2%MAG%D(3))
-       IF(.NOT.ASSOCIATED(S2%MAG%R) ) ALLOCATE(S2%MAG%R(3))
-       IF(.NOT.ASSOCIATED(S2%MAGP%D)) ALLOCATE(S2%MAGP%D(3))
-       IF(.NOT.ASSOCIATED(S2%MAGP%R)) ALLOCATE(S2%MAGP%R(3))
+       !       IF(.NOT.ASSOCIATED(S2%MAG%D) ) ALLOCATE(S2%MAG%D(3))
+       !       IF(.NOT.ASSOCIATED(S2%MAG%R) ) ALLOCATE(S2%MAG%R(3))
+       !       IF(.NOT.ASSOCIATED(S2%MAGP%D)) ALLOCATE(S2%MAGP%D(3))
+       !       IF(.NOT.ASSOCIATED(S2%MAGP%R)) ALLOCATE(S2%MAGP%R(3))
+       !       DO I=1,3
+       !          S2%MAG%D(I)=S1(I);   S2%MAGP%D(I)=S1(I);
+       !          S2%MAG%R(I)=S1(3+I); S2%MAGP%R(I)=S1(3+I);
+       !       ENDDO
        DO I=1,3
-          S2%MAG%D(I)=S1(I);   S2%MAGP%D(I)=S1(I);
-          S2%MAG%R(I)=S1(3+I); S2%MAGP%R(I)=S1(3+I);
+          D(I)=S1(I);   D(I)=S1(I);
+          R(I)=S1(3+I); R(I)=S1(3+I);
        ENDDO
        S2%CHART%D_IN=zero;S2%CHART%D_OUT=zero;
        S2%CHART%ANG_IN=zero;S2%CHART%ANG_OUT=zero;
@@ -555,19 +573,25 @@ CONTAINS
        ! ADD CODE HERE
        CALL ALLOC(F)
        CALL ALLOC(F0)
-       CALL SURVEY_NO_PATCH(S2,MAGNETFRAME=F)
        ! MOVE THE ORIGINAL INTERNAL CHART F
-       F0=F
-       ANGLE=S2%MAG%R
+       IF(ADDIN) THEN
+          F=S2%mag%p%f
+          CALL SURVEY_NO_PATCH(S2,MAGNETFRAME=F0)
+       ELSE
+          CALL SURVEY_NO_PATCH(S2,MAGNETFRAME=F0)
+          F=F0
+       ENDIF
+
+       ANGLE=r  !S2%MAG%R
        IF(PRESENT(BASIS)) THEN
           BASIST=BASIS
        ELSE
-          BASIST=F0%MID
+          BASIST=F%MID
        ENDIF
        IF(PRESENT(OMEGA)) THEN
           OMEGAT=OMEGA
        ELSE
-          OMEGAT=F0%O
+          OMEGAT=F%O
        ENDIF
 
        CALL ROTATE_FRAME(F,OMEGAT,ANGLE,1,BASIS=BASIST)
@@ -578,7 +602,8 @@ CONTAINS
           BASIST=F%MID    ! ALREADY ROTATED
        ENDIF
 
-       CALL CHANGE_BASIS(S2%MAG%D,BASIST,T_GLOBAL,GLOBAL_FRAME)
+       !       CALL CHANGE_BASIS(S2%MAG%D,BASIST,T_GLOBAL,GLOBAL_FRAME)
+       CALL CHANGE_BASIS(D,BASIST,T_GLOBAL,GLOBAL_FRAME)
 
 
        F%A=F%A+T_GLOBAL
@@ -634,6 +659,91 @@ CONTAINS
 
   END SUBROUTINE MISALIGN_FIBRE
 
+  SUBROUTINE  NEW_MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN):: S1(6)
+    REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
+    TYPE(FIBRE),INTENT(INOUT):: S2
+    REAL(DP) ANGLE(3),T_GLOBAL(3),d(3),r(3)
+    TYPE(MAGNET_FRAME), POINTER :: F,F0
+    REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3),ENT(3,3),EXI(3,3)
+    TYPE(INTEGRATION_NODE),POINTER :: T
+    INTEGER I
+
+
+    IF(ASSOCIATED(S2%CHART)) THEN
+       angle=S1(4:6)
+       d=S1(1:3)
+
+       if(present(BASIS)) then
+          basist=basis
+       else
+          basist=S2%mag%p%f%mid
+       endif
+
+       if(present(omega)) then
+          omegat=omega
+       else
+          omegat=S2%mag%p%f%o
+       endif
+
+       CALL ALLOC(F)
+       CALL ALLOC(F0)
+       f0%ent=ent
+       f0%a=S2%CHART%F%a
+       f0%exi=ent
+       f0%b=S2%CHART%F%b    ! o and mid not needed... survey_no_patch will get...
+       F=S2%mag%p%f
+       CALL SURVEY_NO_PATCH(S2,MAGNETFRAME=F0)
+       CALL ROTATE_FRAME(F,OMEGAT,ANGLE,1,BASIS=BASIST)
+
+       IF(PRESENT(BASIS)) THEN   ! MUST ROTATE THAT FRAME AS WELL FOR CONSISTENCY IN DEFINITION WHAT A MISALIGNMENT IS IN PTC
+          CALL   GEO_ROT(BASIST,ANGLE,1)
+       ELSE
+          BASIST=F%MID    ! ALREADY ROTATED
+       ENDIF
+
+       CALL CHANGE_BASIS(D,BASIST,T_GLOBAL,GLOBAL_FRAME)
+       F%A=F%A+T_GLOBAL
+       F%O=F%O+T_GLOBAL
+       F%B=F%B+T_GLOBAL
+
+       CALL COMPUTE_ENTRANCE_ANGLE(F0%ENT,F%ENT,S2%CHART%ANG_IN)
+       CALL COMPUTE_ENTRANCE_ANGLE(F%EXI,F0%EXI,S2%CHART%ANG_OUT)
+
+       D_IN=F%A-F0%A
+       D_OUT=F0%B-F%B
+
+       CALL CHANGE_BASIS(D_IN,GLOBAL_FRAME,S2%CHART%D_IN,F%ENT)
+       CALL CHANGE_BASIS(D_OUT,GLOBAL_FRAME,S2%CHART%D_OUT,F0%EXI)
+       CALL kill(F0)
+       CALL kill(F)
+
+       IF(ASSOCIATED(F)) deallocate(f)
+       IF(ASSOCIATED(F0)) deallocate(f0)
+
+       CALL SURVEY_NO_PATCH(S2)
+
+       IF(ASSOCIATED(S2%T1)) THEN
+          IF(ASSOCIATED(S2%T1%A)) THEN
+             CALL fill_survey_ONE_FIBRE(S2)
+          ENDIF
+       ENDIF
+
+    ELSE
+       W_P=0
+       W_P%NC=1
+       W_P%FC='((1X,A72))'
+       WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
+       CALL WRITE_E(100)
+    ENDIF
+
+
+  END SUBROUTINE  NEW_MISALIGN_FIBRE
+
+
+
   SUBROUTINE  MAD_MISALIGN_FIBRE(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
@@ -657,9 +767,14 @@ CONTAINS
     CALL COMPUTE_ENTRANCE_ANGLE(S2%CHART%F%ent,ENT,ANGLE)
     MIS(1:3)=T
     MIS(4:6)=ANGLE
-    call MISALIGN_FIBRE(S2,MIS,S2%CHART%F%A,S2%CHART%F%ent)
+
+    ENT=S2%CHART%F%ent
+    T=S2%CHART%F%A
+    call MISALIGN_SIAMESE(S2,MIS,T,ENT)
+    !    call MISALIGN_FIBRE(S2,MIS,S2%CHART%F%A,S2%CHART%F%ent)
 
   END SUBROUTINE MAD_MISALIGN_FIBRE
+
 
   ! NEW ROUTINES TO CHANGE LAYOUT
 
@@ -1159,8 +1274,6 @@ CONTAINS
     R2%CLOSED=.FALSE.
     R2%NTHIN=R1%NTHIN
     R2%THIN=R1%THIN
-    R2%charge=R1%charge
-    R2%mass=R1%mass
     R2%HARMONIC_NUMBER=R1%HARMONIC_NUMBER
     !    if(associated(r1%parent_universe)) R2%parent_universe=> r1%parent_universe
     C=> R1%START
@@ -1198,8 +1311,6 @@ CONTAINS
     R2%CLOSED=.FALSE.
     R2%NTHIN=R1%NTHIN
     R2%THIN=R1%THIN
-    R2%charge=R1%charge
-    R2%mass=R1%mass
     !    if(associated(r1%parent_universe)) R2%parent_universe=> r1%parent_universe
 
     CALL MOVE_TO(R1,C,I)
@@ -1349,18 +1460,13 @@ CONTAINS
     type(worm) vers
     integer my_start,ic,j
     real(dp) x(6),ent(3,3),a(3)
-    INTEGER, TARGET :: CHARGE
+    !    INTEGER, TARGET :: CHARGE
     LOGICAL(LP) APER
 
     aper=APERTURE_FLAG
     APERTURE_FLAG=.FALSE.
 
 
-    IF(ASSOCIATED(R%PARENT_LAYOUT)) THEN
-       CHARGE=R%PARENT_LAYOUT%CHARGE
-    ELSE
-       CHARGE=1
-    ENDIF
 
 
     C=>R
@@ -1372,7 +1478,7 @@ CONTAINS
 
     !    do k=1,r%n
     x=zero
-    CALL TRACK_FIBRE_RR(C,x,default,CHARGE,vers)
+    CALL TRACK_FIBRE_RR(C,x,default,vers)
 
     t=>c%t1
     j=-6
@@ -1480,21 +1586,21 @@ CONTAINS
 
   end  subroutine fill_survey_ONE_FIBRE
 
-  SUBROUTINE TRACK_FIBRE_RR(C,X,K,CHARGE,X_IN)
+  SUBROUTINE TRACK_FIBRE_RR(C,X,K,X_IN)
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
-    INTEGER,optional, target, INTENT(IN) :: CHARGE
+    !    INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
-    integer,target :: charge1
+    !    integer,target :: charge1
     real(dp) xp
 
 
@@ -1506,12 +1612,12 @@ CONTAINS
 
     ! DIRECTIONAL VARIABLE
     C%MAG%P%DIR=>C%DIR
-    if(present(charge)) then
-       C%MAG%P%CHARGE=>CHARGE
-    else
-       charge1=1
-       C%MAG%P%CHARGE=>CHARGE1
-    endif
+    !    if(present(charge)) then
+    !       C%MAG%P%CHARGE=>CHARGE
+    !    else
+    !       charge1=1
+    C%MAG%P%CHARGE=>C%charge
+    !    endif
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
     !FRONTAL PATCH

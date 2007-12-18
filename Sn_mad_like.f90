@@ -9,7 +9,7 @@ module Mad_like
   public
 
   private QUADTILT, SOLTILT, EL_Q,EL_0,arbitrary_tilt
-  private drft,mark,r_r !,rot
+  private drft,r_r !,rot,mark
   PRIVATE SEXTTILT,OCTUTILT
   private HKICKTILT,VKICKTILT,GKICKTILT
   private GBTILT,SBTILT,pottilt,Set_mad_v
@@ -23,7 +23,7 @@ module Mad_like
   ! linked
   private ADD_EE,EQUAL_L_L,add_Eb,add_BE,add_BB,MUL_B,mul_e,SUB_BB,makeitc,makeits
   private unary_subb
-  PRIVATE GET_GAM
+  PRIVATE GET_GAM,HELICALTILT
   logical(lp),PRIVATE ::  MADX= .FALSE.,MADX_MAGNET_ONLY=.FALSE.
 
   logical(lp),private::LIKEMAD =.false.,mad_list_killed =.true.,setmad = .false.,verbose=.FALSE.,&
@@ -32,7 +32,9 @@ module Mad_like
   logical(lp),TARGET ::FIBRE_flip=.true.
   !  logical(lp) :: FIBRE_SURVEY=.true.
   INTEGER,TARGET ::FIBRE_DIR=1
+  INTEGER,TARGET ::INITIAL_CHARGE=1
   real(dp),PRIVATE::ENERGY,P0C,BRHO,KINETIC,gamma0I,gamBET,beta0,MC2
+
   !real(dp),PRIVATE::TOTAL_EPS
   character(80) file_fitted
   !  type(layout),save::mad_list
@@ -232,6 +234,9 @@ module Mad_like
      MODULE PROCEDURE QUADTILT
   end  INTERFACE
 
+  INTERFACE HELICAL
+     MODULE PROCEDURE HELICALTILT
+  end  INTERFACE
 
   INTERFACE SOLENOID
      MODULE PROCEDURE SOLTILT
@@ -1104,6 +1109,62 @@ CONTAINS
        QUADTILT%NAME=NAME
     ENDIF
   END FUNCTION QUADTILT
+
+  FUNCTION  HELICALTILT(NAME,L,K1,ks1,omega,PHASE,list)
+    implicit none
+    type (EL_LIST) HELICALTILT
+    type (EL_LIST),optional, INTENT(IN)::list
+    CHARACTER(*), INTENT(IN):: NAME
+    real(dp) ,optional, INTENT(IN):: L,K1,ks1,PHASE,omega
+    real(dp) L1,K11,Ks11,LAG1,FREQ01
+    L1=zero
+    K11=zero
+    IF(PRESENT(L)) L1=L
+    IF(PRESENT(K1)) K11=K1
+    IF(PRESENT(Ks1)) Ks11=Ks1
+    IF(PRESENT(PHASE)) LAG1=PHASE
+    IF(PRESENT(omega)) FREQ01=omega
+    if(present(list)) then
+       HELICALTILT=list
+       l1=list%L
+       K11=LIST%K(1)
+       Ks11=LIST%Ks(1)
+       LAG1=LIST%LAG
+       FREQ01=LIST%FREQ0
+    else
+       HELICALTILT=0
+    endif
+    HELICALTILT%L=L1
+    HELICALTILT%LD=L1
+    HELICALTILT%LC=L1
+    HELICALTILT%K(1)=K11
+    HELICALTILT%Ks(1)=Ks11
+    HELICALTILT%LAG=LAG1
+    HELICALTILT%FREQ0=FREQ01
+    !   RFCAVITYL%P0C=P0C
+    IF(L1==zero) THEN
+       stop 999
+    ELSE
+       HELICALTILT%K(1)=K11
+       HELICALTILT%Ks(1)=Ks11
+       HELICALTILT%KIND=KIND22
+    ENDIF
+    HELICALTILT%nmul=1
+
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       call write_i
+       HELICALTILT%NAME=NAME(1:16)
+    ELSE
+       HELICALTILT%NAME=NAME
+    ENDIF
+
+
+  END FUNCTION HELICALTILT
 
 
   FUNCTION  SOLTILT(NAME,L,KS,K1,T,LIST)
@@ -2106,6 +2167,7 @@ CONTAINS
     RFCAVITYL%LD=L1
     RFCAVITYL%LC=L1
     RFCAVITYL%KIND=KIND4
+    RFCAVITYL%nmul=1
     IF(LEN(NAME)>nlp) THEN
        w_p=0
        w_p%nc=2
@@ -2342,6 +2404,13 @@ CONTAINS
           allocate(s22%i);
           call alloc(s22%i)
        endif
+
+       nullify(S22%BETA0);allocate(s22%BETA0);
+       nullify(S22%GAMMA0I);allocate(s22%GAMMA0I);
+       nullify(S22%GAMBET);allocate(s22%GAMBET);
+       !       nullify(S22%P0C);allocate(s22%P0C);
+       nullify(S22%MASS);allocate(s22%MASS);
+       nullify(S22%CHARGE);allocate(s22%CHARGE);
     ENDIF
 
     IF(.NOT.MADX) then
@@ -2444,6 +2513,12 @@ CONTAINS
 
     endif
 
+    if(s1%kind==kind22) then
+       ALLOCATE(S2%FREQ,S2%PHAS)
+       S2%freq=S1%freq0
+       S2%phas=s1%lag
+    endif
+
     if(s1%kind==kind15) then
        ALLOCATE(S2%VOLT)
        S2%volt=S1%volt
@@ -2458,9 +2533,9 @@ CONTAINS
 
 
     CALL CONTEXT( S2%NAME )
-    S2%P%BETA0=BETA0
-    S2%P%gamma0I=gamma0I
-    S2%P%gambet=gambet
+    !    S2%P%BETA0=BETA0
+    !    S2%P%gamma0I=gamma0I
+    !    S2%P%gambet=gambet
     S2%P%p0c=p0c
 
 
@@ -2610,11 +2685,6 @@ CONTAINS
 
 
 
-    IF(.NOT.MADX) THEN
-       el=>s22
-       !    call APPEND_mad_like(mad_list,s22)
-       call APPEND_mad_like(mad_list,el)
-    ENDIF
     madkick=.false.
 
     if(s22%mag%kind==kind3) then
@@ -2625,7 +2695,18 @@ CONTAINS
        s22%mag%p%nst=1
        s22%magp%p%nst=1
     endif
+    !    S22%p0c=p0c
+    S22%BETA0=BETA0
+    S22%gamma0I=gamma0I
+    S22%gambet=gambet
+    S22%MASS=mc2
+    S22%CHARGE=INITIAL_CHARGE
 
+    IF(.NOT.MADX) THEN
+       el=>s22
+       !    call APPEND_mad_like(mad_list,s22)
+       call APPEND_mad_like(mad_list,el)
+    ENDIF
 
   END SUBROUTINE EL_Q
 
@@ -2666,6 +2747,7 @@ CONTAINS
     c_%ALWAYS_EXACTMIS => ALWAYS_EXACTMIS
     c_%HIGHEST_FRINGE => HIGHEST_FRINGE
     c_%FIBRE_DIR => FIBRE_DIR
+    c_%INITIAL_CHARGE => INITIAL_CHARGE
     c_%FIBRE_flip => FIBRE_flip
     c_%eps_pos => eps_pos
     c_%SECTOR_NMUL => SECTOR_NMUL

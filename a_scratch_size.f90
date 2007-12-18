@@ -163,6 +163,7 @@ module precision_constants
   REAL(dp),TARGET   :: absolute_aperture=c_1d3
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
+  logical(lp),TARGET :: print_frame =.true.
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=c_1d6
   real(dp),pointer :: crash
@@ -240,6 +241,7 @@ module precision_constants
      integer,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
      ! creates a reverse propagator
      integer,pointer ::FIBRE_DIR         !=1 or -1 for reversed
+     integer,pointer ::INITIAL_CHARGE         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
      ! creates a reverse propagator and a reversed ring in combination with above
      logical(lp),pointer ::FIBRE_flip    !=.true.
      !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
@@ -259,7 +261,7 @@ module precision_constants
      logical(lp), pointer:: electron     !  electron if true otherwise proton
      real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true
      ! global on the fly
-     logical(lp), pointer :: stoch_in_rec != .false. stochastic radiation in straigth elements (global)
+     logical(lp), pointer :: stoch_in_rec != .false. do stochastic calculation
      logical(lp),pointer :: FEED_P0C   !=.FALSE.  work takes p0c instead of energy
      logical(lp),pointer :: ALWAYS_EXACT_PATCHING  !=.TRUE. patching done correctly
      ! used to output horror messages

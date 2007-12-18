@@ -335,7 +335,7 @@ contains
 
     CASE(6)
        DO j =1,4
-          DK(j)=EL%L*YOSK(I)/EL%P%NST
+          DK(j)=EL%L*YOSK(J)/EL%P%NST
           DF(j)=DK(j)/two
        ENDDO
        D=EL%L/EL%P%NST
@@ -476,7 +476,7 @@ contains
 
     CASE(6)
        DO j =1,4
-          DK(j)=EL%L*YOSK(I)/EL%P%NST
+          DK(j)=EL%L*YOSK(J)/EL%P%NST
           DF(j)=DK(j)/two
        ENDDO
        D=EL%L/EL%P%NST
@@ -993,7 +993,7 @@ contains
        if(k%TIME) then
           PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
        else
           X(1)=X(1)+L*X(2)/(one+X(5))
           X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
@@ -1008,7 +1008,7 @@ contains
        if(k%TIME) then
           PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(4)*X(4))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
        else
           X(3)=X(3)+L*X(4)/(one+X(5))
           X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
@@ -1036,7 +1036,7 @@ contains
        if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
        else
           X(1)=X(1)+L*X(2)/(one+X(5))
           X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
@@ -1051,7 +1051,7 @@ contains
        if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2+one)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(4)*X(4))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
        else
           X(3)=X(3)+L*X(4)/(one+X(5))
           X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
@@ -1081,20 +1081,20 @@ contains
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
 
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*EL%P%LD/EL%P%BETA0
+          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
        else
           PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
           PZ0=one+X(5)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*EL%P%LD
+          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*L
        endif
     ELSE
        if(k%TIME) then
-          X(6)=X(6)+k%TOTALPATH*EL%P%LD/EL%P%BETA0
+          X(6)=X(6)+k%TOTALPATH*L/EL%P%BETA0
        else
-          X(6)=X(6)+k%TOTALPATH*EL%P%LD
+          X(6)=X(6)+k%TOTALPATH*L
        endif
     ENDIF
 
@@ -1117,24 +1117,23 @@ contains
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
 
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*EL%P%LD/EL%P%BETA0
+          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
        else
           PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
           PZ0=one+X(5)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*EL%P%LD
+          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*L
        endif
        CALL KILL(PZ,PZ0)
     ELSE
        if(k%TIME) then
-          X(6)=X(6)+k%TOTALPATH*EL%P%LD/EL%P%BETA0
+          X(6)=X(6)+k%TOTALPATH*L/EL%P%BETA0
        else
-          X(6)=X(6)+k%TOTALPATH*EL%P%LD
+          X(6)=X(6)+k%TOTALPATH*L
        endif
     ENDIF
-
 
   END SUBROUTINE KICKPATHP
 

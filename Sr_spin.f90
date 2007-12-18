@@ -318,7 +318,7 @@ contains
     implicit none
     TYPE(ELEMENTP), POINTER::EL
     TYPE(MAGNET_CHART), POINTER::P
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(REAL_8), INTENT(IN) :: DS
     REAL(DP), INTENT(IN) :: FAC
     TYPE(REAL_8) OM(3),CO(3),SI(3)
@@ -336,13 +336,13 @@ contains
   subroutine radiate_2r(EL,DS,FAC,X,b2,dlds,XP,before,k,POS)
     implicit none
     TYPE(ELEMENT), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     real(dp),INTENT(INOUT) :: X(6),XP(2)
     real(dp), INTENT(IN) :: DS
     REAL(DP), INTENT(IN) :: FAC
     real(dp), intent(in):: B2,dlds
     LOGICAL(LP),intent(in) :: BEFORE
-    real(dp)  st
+    real(dp)  st,z,av(3)
     type(internal_state) k
 
 
@@ -371,6 +371,27 @@ contains
              X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)*(one+X(5))/(one+ST)
              X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/two
           endif
+       ELSEif(el%kind==kind22) then
+
+          IF(EL%HE22%P%DIR==1) THEN
+             Z= pos*el%l/el%p%nst
+          ELSE
+             Z=EL%L-pos*el%l/el%p%nst
+          ENDIF
+          CALL compute_f4(EL%he22,X,Z,A=AV)
+          if(k%TIME) then
+             X(2)=(X(2)+EL%P%CHARGE*AV(1)) *root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(2)=X(2)-EL%P%CHARGE*AV(1)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2)) *root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(4)=X(4)+EL%P%CHARGE*AV(2)
+          else
+             X(2)=(X(2)+EL%P%CHARGE*AV(1))*(one+X(5))/(one+ST)
+             X(2)=X(2)-EL%P%CHARGE*AV(1)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2))*(one+X(5))/(one+ST)
+             X(4)=X(4)+EL%P%CHARGE*AV(2)
+          endif
+
+
        ELSE
           if(k%TIME) then
              X(2)=X(2)*root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
@@ -391,7 +412,7 @@ contains
   subroutine PUSH_SPINR(EL,DS,FAC,S,X,before,k,POS)
     implicit none
     TYPE(ELEMENT), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     REAL(DP),INTENT(INOUT) :: X(6),S(3)
     REAL(DP), INTENT(IN) :: DS,FAC
     REAL(DP) OM(3),CO(3),SI(3),B2,XP(2)
@@ -446,20 +467,21 @@ contains
   subroutine radiate_2p(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
     implicit none
     TYPE(ELEMENTP), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(REAL_8),INTENT(INOUT) :: X(6),XP(2)
     real(dp),INTENT(INOUT) :: E_IJ(6,6)
     TYPE(REAL_8), INTENT(IN) :: DS
     REAL(DP), INTENT(IN) :: FAC
     TYPE(REAL_8), intent(in):: B2,dlds
     LOGICAL(LP),intent(in) :: BEFORE
-    TYPE(REAL_8) st
+    TYPE(REAL_8) st,av(3),z
     logical(lp) done_stoch
     real(dp) b30,x1,x3,denf,b3
     type(damap) xpmap
     integer i,j
     type(internal_state) k
-    if(.not.before) then
+    if(.not.before.and.stoch_in_rec) then
+
        denf=(one+x(5))**5/SQRT((one+X(5))**2-Xp(1)**2-Xp(2)**2)
        b30=b2
        b30=b30**c_1_5
@@ -499,6 +521,7 @@ contains
     !          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
     X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS*DLDS
 
+
     if(el%kind/=kindpa) then
        IF(ASSOCIATED(EL%B_SOL)) THEN
           if(k%TIME) then
@@ -512,6 +535,29 @@ contains
              X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)*(one+X(5))/(one+ST)
              X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/two
           endif
+       ELSEif(el%kind==kind22) then
+          call alloc(av,3)
+          call alloc(z)
+
+          IF(EL%HE22%P%DIR==1) THEN
+             Z= pos*el%l/el%p%nst
+          ELSE
+             Z=EL%L-pos*el%l/el%p%nst
+          ENDIF
+          CALL compute_f4(EL%he22,X,Z,A=AV)
+          if(k%TIME) then
+             X(2)=(X(2)+EL%P%CHARGE*AV(1)) *sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(2)=X(2)-EL%P%CHARGE*AV(1)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2)) *sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(4)=X(4)+EL%P%CHARGE*AV(2)
+          else
+             X(2)=(X(2)+EL%P%CHARGE*AV(1))*(one+X(5))/(one+ST)
+             X(2)=X(2)-EL%P%CHARGE*AV(1)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2))*(one+X(5))/(one+ST)
+             X(4)=X(4)+EL%P%CHARGE*AV(2)
+          endif
+          call kill(av,3)
+          call kill(z)
        ELSE
           if(k%TIME) then
              X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
@@ -527,7 +573,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    if(before) then
+    if(before.and.stoch_in_rec) then
        denf=(one+x(5))**5/SQRT((one+X(5))**2-Xp(1)**2-Xp(2)**2)
        b30=b2
        b30=b30**c_1_5
@@ -560,7 +606,7 @@ contains
   subroutine PUSH_SPIN_fake_fringer(EL,S,X,before,k,POS)
     implicit none
     TYPE(ELEMENT), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     real(dp),INTENT(INOUT) :: X(6),S(3)
 
     real(dp) OM(3),CO(3),SI(3),B2,XP(2)
@@ -615,7 +661,7 @@ contains
   subroutine PUSH_SPIN_fake_fringep(EL,S,X,before,k,POS)
     implicit none
     TYPE(ELEMENTP), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
 
     TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2)
@@ -679,7 +725,7 @@ contains
   subroutine PUSH_SPINP(EL,DS,FAC,S,X,E_IJ,before,k,POS)
     implicit none
     TYPE(ELEMENTP), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
     real(dp),INTENT(INOUT) :: E_IJ(6,6)
     TYPE(REAL_8), INTENT(IN) :: DS
@@ -688,7 +734,6 @@ contains
     TYPE(REAL_8) ST,dlds
     LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
-
     if(.not.(k%radiation.or.k%SPIN)) return
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     if(EL%kind<=kind1) return
@@ -703,6 +748,7 @@ contains
     if(k%radiation.AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
        call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
+
     endif
 
     if(k%SPIN) then
@@ -746,7 +792,7 @@ contains
     implicit none
     TYPE(ELEMENT), POINTER::EL
     TYPE(MAGNET_CHART), POINTER::P
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     REAL(DP),INTENT(INOUT) :: X(6),OM(3),B2,XP(2),DLDS
     REAL(DP)  B(3),E(3),BPA(3),BPE(3),D1,D2,GAMMA,EB(3)
     REAL(DP) BETA0,GAMMA0I,XPA(2)
@@ -813,6 +859,13 @@ contains
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
+    case(KIND22)
+       CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,pos=POS)
+       IF(k%TIME) THEN
+          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+       ELSE
+          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+       ENDIF
     case default
        OM(1)=ZERO
        OM(2)=ZERO
@@ -840,7 +893,7 @@ contains
     implicit none
     TYPE(ELEMENTP), POINTER::EL
     TYPE(MAGNET_CHART), POINTER::P
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(REAL_8), INTENT(INOUT) :: X(6),OM(3),B2,XP(2)
     TYPE(REAL_8)  B(3),E(3),BPA(3),BPE(3),DLDS,D1,D2,GAMMA,EB(3),XPA(2)
     REAL(DP) BETA0,GAMMA0I
@@ -908,6 +961,13 @@ contains
 
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
+    case(KIND22)
+       CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,pos=POS)
+       IF(k%TIME) THEN
+          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+       ELSE
+          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+       ENDIF
     case default
        OM(1)=ZERO
        OM(2)=ZERO
@@ -947,7 +1007,7 @@ contains
   subroutine get_fieldr(EL,B,E,X,k,POS)
     implicit none
     TYPE(ELEMENT), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     REAL(DP),INTENT(INOUT) :: B(3),E(3)
     REAL(DP),INTENT(INOUT) :: X(6)
     REAL(DP) Z
@@ -959,7 +1019,11 @@ contains
     SELECT CASE(EL%KIND)
     case(KIND2,kind5:kind7,KIND16:kind17,KIND20) ! Straight for all practical purposes
        if(present(pos)) then
-          call get_Bfield_fringe(EL,B,X,pos)   ! fringe effect
+          IF(POS<0) THEN
+             call get_Bfield_fringe(EL,B,X,pos)   ! fringe effect
+          ELSE
+             call get_Bfield(EL,B,X)   ! fringe effect
+          ENDIF
        else
           CALL get_Bfield(EL,B,X)
        endif
@@ -975,7 +1039,16 @@ contains
        CALL GET_BE_CAV(EL%C4,B,E,X,k)
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
+    CASE(KIND22)     ! helical dipole
+       IF(EL%HE22%P%DIR==1) THEN
+          Z= pos*el%l/el%p%nst
+       ELSE
+          Z=EL%L-pos*el%l/el%p%nst
+       ENDIF
+       CALL compute_f4(EL%HE22,X,Z,B=B)    !    IF(EL%P%DIR==1) THEN
     case default
+
+
     END SELECT
 
     DO I=1,3
@@ -989,7 +1062,7 @@ contains
   subroutine get_fieldp(EL,B,E,X,k,POS)
     implicit none
     TYPE(ELEMENTP), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(INOUT) ::POS
+    INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(REAL_8),INTENT(INOUT) :: B(3),E(3)
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     INTEGER I
@@ -1004,7 +1077,11 @@ contains
     SELECT CASE(EL%KIND)
     case(KIND2,kind5:kind7,KIND16:kind17,KIND20) ! Straight for all practical purposes
        if(present(pos)) then
-          call get_Bfield_fringe(EL,B,X,pos)   ! fringe effect
+          IF(POS<0) THEN
+             call get_Bfield_fringe(EL,B,X,pos)   ! fringe effect
+          ELSE
+             call get_Bfield(EL,B,X)   ! fringe effect
+          ENDIF
        else
           CALL get_Bfield(EL,B,X)
        endif
@@ -1022,6 +1099,13 @@ contains
        CALL GET_BE_CAV(EL%C4,B,E,X,k)
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
+    CASE(KIND22)     ! helical dipole
+       IF(EL%HE22%P%DIR==1) THEN
+          Z= pos*el%l/el%p%nst
+       ELSE
+          Z=EL%L-pos*el%l/el%p%nst
+       ENDIF
+       CALL compute_f4(EL%HE22,X,Z,B=B)    !    IF(EL%P%DIR==1) THEN
     case default
     END SELECT
 
@@ -1040,8 +1124,8 @@ contains
 
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
-       B(1)=-pos*EL%B_SOL*half*x(1);
-       B(2)=-pos*EL%B_SOL*half*x(3);
+       B(1)=-(2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
+       B(2)=-(2*Pos+3)*EL%B_SOL*half*x(3);
        B(3)=zero;
     else
        b(1)=zero
@@ -1060,8 +1144,8 @@ contains
 
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
-       B(1)=-pos*EL%B_SOL*half*x(1);
-       B(2)=-pos*EL%B_SOL*half*x(3);
+       B(1)=-(2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
+       B(2)=-(2*Pos+3)*EL%B_SOL*half*x(3);
        B(3)=zero;
     else
        b(1)=zero
@@ -1308,6 +1392,8 @@ contains
     real(dp) DF,R2,F,DR2,O,VL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) BBYTWT,BBXTW,BBYTW,x1,x3
+    integer J,dir,ko
 
     E=ZERO
     B=ZERO
@@ -1315,27 +1401,74 @@ contains
 
     O=twopi*EL%freq/CLIGHT
     VL=EL%volt*c_1d_3/EL%P%P0C
+    do ko=1,el%nf
 
-    DF=ZERO
-    F=ONE
-    R2=ONE
+       DF=ZERO
+       F=ONE
+       R2=ONE
 
-    DO I=1,EL%N_BESSEL
-       R2=-R2*O**2/FOUR/(I+1)**2
-       DR2=R2*I
-       DF=DF+DR2*2
-       R2=R2*(X(1)**2+X(3)**2)
-       F=F+R2
-    ENDDO
+       DO I=1,EL%N_BESSEL
+          R2=-R2*(ko*O)**2/FOUR/(I+1)**2
+          DR2=R2*I
+          DF=DF+DR2*2
+          R2=R2*(X(1)**2+X(3)**2)
+          F=F+R2
+       ENDDO
 
-    !    EL%DELTA_E=x(5)
+       !    EL%DELTA_E=x(5)
 
-    IF(EL%N_BESSEL>0) THEN
-       B(2)=-X(1)*DF*VL*COS(O*X(6)+EL%PHAS+phase0)/O
-       B(1)= X(3)*DF*VL*COS(O*X(6)+EL%PHAS+phase0)/O
-    ENDIF
+       IF(EL%N_BESSEL>0) THEN
+          B(2)=B(2)-EL%F(KO)*X(1)*DF*VL*COS(ko*O*X(6)+EL%PHAS+phase0)/(ko*O)
+          B(1)=B(1)+EL%F(KO)*X(3)*DF*VL*COS(ko*O*X(6)+EL%PHAS+phase0)/(ko*O)
+       ENDIF
 
-    E(3)=-F*VL*SIN(O*x(6)+EL%PHAS+phase0)
+       E(3)=E(3)-EL%F(KO)*F*VL*SIN(ko*O*x(6)+EL%PHAS+phase0)
+
+       ! doing crabola
+
+       X1=X(1)
+       X3=X(3)
+
+
+       IF(EL%P%NMUL>=1) THEN
+          BBYTW=EL%BN(EL%P%NMUL)
+          BBXTW=EL%AN(EL%P%NMUL)
+
+          DO  J=EL%P%NMUL-1,1,-1
+             BBYTWT=X1*BBYTW-X3*BBXTW+EL%BN(J)
+             BBXTW=X3*BBYTW+X1*BBXTW+EL%AN(J)
+             BBYTW=BBYTWT
+          ENDDO
+       ELSE
+          BBYTW=zero
+          BBXTW=zero
+       ENDIF
+
+       ! multipole * cos(omega t+ phi)/p0c
+
+       B(2)=B(2)+EL%F(KO)*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+       B(1)=B(1)+EL%F(KO)*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+
+       IF(EL%P%NMUL>=1) THEN
+          BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
+          BBXTW=-EL%AN(EL%P%NMUL)/EL%P%NMUL
+
+
+          DO  J=EL%P%NMUL,2,-1
+             BBYTWT=X1*BBYTW-X3*BBXTW-EL%BN(J-1)/(J-1)
+             BBXTW=X3*BBYTW+X1*BBXTW-EL%AN(J-1)/(J-1)
+             BBYTW=BBYTWT
+          ENDDO
+          BBYTWT=X1*BBYTW-X3*BBXTW
+          BBXTW=X3*BBYTW+X1*BBXTW
+          BBYTW=BBYTWT
+       ELSE
+          BBYTW=zero
+          BBXTW=zero
+       ENDIF
+
+       E(3)=E(3)+EL%F(KO)*ko*O*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
+    enddo
 
   END SUBROUTINE GET_BE_CAVR
 
@@ -1346,6 +1479,8 @@ contains
     TYPE(REAL_8) DF,R2,F,DR2,O,VL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    TYPE(REAL_8) BBYTWT,BBXTW,BBYTW,x1,x3
+    integer J,dir,KO
 
     DO I=1,3
        E(I)=ZERO
@@ -1354,31 +1489,83 @@ contains
 
     IF(k%NOCAVITY) RETURN
     CALL ALLOC(DF,R2,F,DR2,O,VL)
+    CALL ALLOC(BBYTWT,BBXTW,BBYTW,x1,x3)
 
     O=twopi*EL%freq/CLIGHT
     VL=EL%volt*c_1d_3/EL%P%P0C
+    do ko=1,el%nf
 
-    DF=ZERO
-    F=ONE
-    R2=ONE
+       DF=ZERO
+       F=ONE
+       R2=ONE
 
-    DO I=1,EL%N_BESSEL
-       R2=-R2*O**2/FOUR/(I+1)**2
-       DR2=R2*I
-       DF=DF+DR2*2
-       R2=R2*(X(1)**2+X(3)**2)
-       F=F+R2
-    ENDDO
+       DO I=1,EL%N_BESSEL
+          R2=-R2*(ko*O)**2/FOUR/(I+1)**2
+          DR2=R2*I
+          DF=DF+DR2*2
+          R2=R2*(X(1)**2+X(3)**2)
+          F=F+R2
+       ENDDO
 
-    !    EL%DELTA_E=x(5)
+       !    EL%DELTA_E=x(5)
 
-    IF(EL%N_BESSEL>0) THEN
-       B(2)=-X(1)*DF*VL*COS(O*X(6)+EL%PHAS+phase0)/O
-       B(1)= X(3)*DF*VL*COS(O*X(6)+EL%PHAS+phase0)/O
-    ENDIF
+       IF(EL%N_BESSEL>0) THEN
+          B(2)=B(2)-EL%F(KO)*X(1)*DF*VL*COS(ko*O*X(6)+EL%PHAS+phase0)/(ko*O)
+          B(1)=B(1)+EL%F(KO)*X(3)*DF*VL*COS(ko*O*X(6)+EL%PHAS+phase0)/(ko*O)
+       ENDIF
 
-    E(3)=-F*VL*SIN(O*x(6)+EL%PHAS+phase0)
+       E(3)=E(3)-EL%F(KO)*F*VL*SIN(ko*O*x(6)+EL%PHAS+phase0)
 
+       ! doing crabola
+
+       X1=X(1)
+       X3=X(3)
+
+
+       IF(EL%P%NMUL>=1) THEN
+          BBYTW=EL%BN(EL%P%NMUL)
+          BBXTW=EL%AN(EL%P%NMUL)
+
+          DO  J=EL%P%NMUL-1,1,-1
+             BBYTWT=X1*BBYTW-X3*BBXTW+EL%BN(J)
+             BBXTW=X3*BBYTW+X1*BBXTW+EL%AN(J)
+             BBYTW=BBYTWT
+          ENDDO
+       ELSE
+          BBYTW=zero
+          BBXTW=zero
+       ENDIF
+
+       ! multipole * cos(omega t+ phi)/p0c
+
+       B(2)=B(2)+EL%F(KO)*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+       B(1)=B(1)+EL%F(KO)*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+
+       IF(EL%P%NMUL>=1) THEN
+          BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
+          BBXTW=-EL%AN(EL%P%NMUL)/EL%P%NMUL
+
+
+          DO  J=EL%P%NMUL,2,-1
+             BBYTWT=X1*BBYTW-X3*BBXTW-EL%BN(J-1)/(J-1)
+             BBXTW=X3*BBYTW+X1*BBXTW-EL%AN(J-1)/(J-1)
+             BBYTW=BBYTWT
+          ENDDO
+          BBYTWT=X1*BBYTW-X3*BBXTW
+          BBXTW=X3*BBYTW+X1*BBXTW
+          BBYTW=BBYTWT
+       ELSE
+          BBYTW=zero
+          BBXTW=zero
+       ENDIF
+
+       E(3)=E(3)+EL%F(KO)*ko*O*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
+    enddo
+
+
+
+
+    CALL KILL(BBYTWT,BBXTW,BBYTW,x1,x3)
     CALL KILL(DF,R2,F,DR2,O,VL)
 
   END SUBROUTINE GET_BE_CAVP
@@ -1386,7 +1573,7 @@ contains
   subroutine B_PANCAkEr(EL,B,X,POS)
     IMPLICIT NONE
     real(dp), INTENT(INout) :: X(6)
-    INTEGER, INTENT(INOUT) :: POS
+    INTEGER, INTENT(IN) :: POS
     TYPE(PANCAKE),  INTENT(INOUT) :: EL
     real(dp) , INTENT(INOUT) ::B(3)
 
@@ -1406,7 +1593,7 @@ contains
   subroutine B_PANCAkEp(EL,B,X,POS)
     IMPLICIT NONE
     type(real_8), INTENT(INout) :: X(6)
-    INTEGER, INTENT(INOUT) :: POS
+    INTEGER, INTENT(IN) :: POS
     TYPE(PANCAKEP),  INTENT(INOUT) :: EL
     type(real_8), INTENT(INOUT) ::B(3)
 
@@ -1430,7 +1617,7 @@ contains
     TYPE(MAGNET_CHART),  pointer :: P
     REAL(DP),  INTENT(INout) :: B(3),BPA(3),BPE(3),XP(2),XPA(2)
     REAL(DP),  OPTIONAL ::EF(3),EFB(3)
-    integer, optional,intent(inout) :: pos
+    integer, optional,intent(in) :: pos
     INTEGER TEAPOT_LIKE,i
     REAL(DP) e(3),be
     type(internal_state) k
@@ -1470,7 +1657,7 @@ contains
     INTEGER TEAPOT_LIKE,i
     type(real_8) e(3),be
     type(internal_state) k
-    integer, optional,intent(inout) :: pos
+    integer, optional,intent(in) :: pos
 
     P=>EL%P
 
@@ -1506,8 +1693,9 @@ contains
     TYPE(ELEMENT),  pointer :: EL
     TYPE(MAGNET_CHART),  pointer :: P
     REAL(DP),  INTENT(INOUT) ::E(3)
-    REAL(DP) N,H,DP1,A,AP,B,BP,z
-    INTEGER TEAPOT_LIKE,POS
+    REAL(DP) N,H,DP1,A,AP,B,BP,z,AV(3)
+    INTEGER TEAPOT_LIKE
+    integer, optional,intent(in) :: pos
     type(internal_state) k
 
     P=>EL%P
@@ -1552,6 +1740,24 @@ contains
           XP(1)=XPA(1)/N
           XP(2)=XPA(2)/N
 
+       ELSEif(el%kind==kind22) then
+
+          IF(EL%HE22%P%DIR==1) THEN
+             Z= pos*el%l/el%p%nst
+          ELSE
+             Z=EL%L-pos*el%l/el%p%nst
+          ENDIF
+          CALL compute_f4(EL%he22,X,Z,A=AV)
+          Xpa(1)=X(2)-EL%P%CHARGE*AV(1)
+          Xpa(2)=X(4)-EL%P%CHARGE*AV(2)
+          N=SQRT(DP1**2-Xpa(1)**2-Xpa(2)**2)
+
+          E(1)=Xpa(1)/DP1
+          E(2)=Xpa(2)/DP1
+          E(3)=N/DP1
+          XP(1)=XPA(1)/N
+          XP(2)=XPA(2)/N
+
        else
 
 
@@ -1579,6 +1785,8 @@ contains
 
     ENDIF
 
+    E(3)=EL%P%dir*E(3)
+
 
 
   END subroutine DIRECTION_VR
@@ -1589,9 +1797,10 @@ contains
     TYPE(ELEMENTP),  pointer :: EL
     TYPE(MAGNET_CHART),  pointer :: P
     type(real_8), INTENT(INOUT) ::E(3)
-    type(real_8) N,H,DP1,A,AP,B,BP,z
-    INTEGER TEAPOT_LIKE,POS
+    type(real_8) N,H,DP1,A,AP,B,BP,z,AV(3)
+    INTEGER TEAPOT_LIKE
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer, optional,intent(in) :: pos
 
     P=>EL%P
 
@@ -1633,6 +1842,26 @@ contains
 
           call kill(A,AP,B,BP,z)
 
+       ELSEif(el%kind==kind22) then
+          CALL ALLOC(AV,3)
+
+          IF(EL%HE22%P%DIR==1) THEN
+             Z= pos*el%l/el%p%nst
+          ELSE
+             Z=EL%L-pos*el%l/el%p%nst
+          ENDIF
+          CALL compute_f4(EL%he22,X,Z,A=AV)
+          Xpa(1)=X(2)-EL%P%CHARGE*AV(1)
+          Xpa(2)=X(4)-EL%P%CHARGE*AV(2)
+          N=SQRT(DP1**2-Xpa(1)**2-Xpa(2)**2)
+
+          E(1)=Xpa(1)/DP1
+          E(2)=Xpa(2)/DP1
+          E(3)=N/DP1
+          XP(1)=XPA(1)/N
+          XP(2)=XPA(2)/N
+          CALL KILL(AV,3)
+
        else
 
 
@@ -1660,6 +1889,8 @@ contains
 
     ENDIF
 
+    E(3)=EL%P%dir*E(3)
+
 
     CALL KILL(N,H,DP1 )
 
@@ -1674,10 +1905,10 @@ contains
     TYPE (INTEGRATION_NODE),optional, POINTER :: node1,node2
     TYPE (fibre),optional, POINTER :: fibre1,fibre2
     TYPE (INTEGRATION_NODE), POINTER :: C,n1,n2
-    INTEGER,TARGET :: CHARGE
+    !    INTEGER,TARGET :: CHARGE
 
-    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%PARENT_LAYOUT%CHARGE
-    if(present(fibre1))CHARGE=fibre1%PARENT_LAYOUT%CHARGE
+    !    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%CHARGE
+    !    if(present(fibre1))CHARGE=fibre1%CHARGE
 
     CALL RESET_APERTURE_FLAG
 
@@ -1695,7 +1926,7 @@ contains
 
     DO  WHILE(.not.ASSOCIATED(C,n2))
 
-       CALL TRACK_NODE_PROBE(C,XS,K,charge)
+       CALL TRACK_NODE_PROBE(C,XS,K)
 
        C=>C%NEXT
     ENDDO
@@ -1711,10 +1942,10 @@ contains
     TYPE (INTEGRATION_NODE),optional, POINTER :: node1,node2
     TYPE (fibre),optional, POINTER :: fibre1,fibre2
     TYPE (INTEGRATION_NODE), POINTER :: C,n1,n2
-    INTEGER,TARGET :: CHARGE
+    !    INTEGER,TARGET :: CHARGE
 
-    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%PARENT_LAYOUT%CHARGE
-    if(present(fibre1))CHARGE=fibre1%PARENT_LAYOUT%CHARGE
+    !    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%CHARGE
+    !    if(present(fibre1))CHARGE=fibre1%CHARGE
 
     CALL RESET_APERTURE_FLAG
 
@@ -1732,7 +1963,7 @@ contains
 
     DO  WHILE(.not.ASSOCIATED(C,n2))
 
-       CALL TRACK_NODE_PROBE(C,XS,K,charge)
+       CALL TRACK_NODE_PROBE(C,XS,K)
 
        C=>C%NEXT
     ENDDO
@@ -1768,7 +1999,7 @@ contains
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
 
-       CALL TRACK_NODE_PROBE(C,XS,K,R%charge)
+       CALL TRACK_NODE_PROBE(C,XS,K)
 
        C=>C%NEXT
        J=J+1
@@ -1807,7 +2038,7 @@ contains
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
 
-       CALL TRACK_NODE_PROBE(C,XS,K,R%charge)
+       CALL TRACK_NODE_PROBE(C,XS,K)  !,R%charge)
 
        C=>C%NEXT
        J=J+1
@@ -2042,7 +2273,9 @@ contains
     type(env_8),target,intent(INOUT) ::  ys(6)
     TYPE(INTERNAL_STATE) K
     integer i,j
-
+    logical(lp) stoch
+    stoch=stoch_in_rec
+    stoch_in_rec=.true.
     if(.not.associated(r%t)) call MAKE_NODE_LAYOUT(r)
     call alloc(xs)
     xs%u=my_false
@@ -2062,6 +2295,7 @@ contains
           ys(i)%e(j)=xs%e_ij(i,j)
        enddo
     enddo
+    stoch_in_rec=stoch
 
     call kill(xs)
   END SUBROUTINE TRACK_ys
@@ -2142,9 +2376,9 @@ contains
        reference_ray(3)=t%ref(2)
     endif
 
-    CALL TRACK_NODE_PROBE(T,xs,K,t%parent_fibre%parent_layout%CHARGE)
+    CALL TRACK_NODE_PROBE(T,xs,K)  !,t%parent_fibre%CHARGE)
 
-    if(.not.ref0) CALL TRACK_NODE_PROBE(T,XS_REF,K,t%parent_fibre%parent_layout%CHARGE)
+    if(.not.ref0) CALL TRACK_NODE_PROBE(T,XS_REF,K)  !,t%parent_fibre%CHARGE)
 
     v%u(1)=XS%u
 
@@ -2198,7 +2432,7 @@ contains
     xs%u=my_false
     XS=X
 
-    CALL TRACK_NODE_PROBE(T,xs,K,t%parent_fibre%parent_layout%CHARGE)
+    CALL TRACK_NODE_PROBE(T,xs,K)  !t%parent_fibre%CHARGE)
 
     X=XS%X
 
@@ -2217,7 +2451,7 @@ contains
     xs%u=my_false
     XS%x=X
 
-    CALL TRACK_NODE_PROBE(T,xs,K,t%parent_fibre%parent_layout%CHARGE)
+    CALL TRACK_NODE_PROBE(T,xs,K) !,t%parent_fibre%CHARGE)
 
     X=XS%X
 
@@ -2233,33 +2467,40 @@ contains
 
 
 
-  SUBROUTINE TRACK_NODE_FLAG_probe_R(C,XS,K,charge)
+  SUBROUTINE TRACK_NODE_FLAG_probe_R(C,XS,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
     type(probe), INTENT(INOUT) :: xs
-    integer, target :: charge
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC,DS
+
+
     if(xs%u) return
+    C%PARENT_FIBRE%MAG%P%DIR    => C%PARENT_FIBRE%DIR
+    C%PARENT_FIBRE%MAG%P%beta0  => C%PARENT_FIBRE%beta0
+    C%PARENT_FIBRE%MAG%P%GAMMA0I=> C%PARENT_FIBRE%GAMMA0I
+    C%PARENT_FIBRE%MAG%P%GAMBET => C%PARENT_FIBRE%GAMBET
+    C%PARENT_FIBRE%MAGP%P%MASS => C%PARENT_FIBRE%MASS
+    C%PARENT_FIBRE%MAG%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 
     if(c%cas==0) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=half
-       call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_true,k)
-       CALL TRACK_NODE_SINGLE(C,XS%X,K,CHARGE)
-       call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_false,k)
+       call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_true,k,C%POS_IN_FIBRE-3)
+       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
+       call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
        CALL TRACK_FRINGE_spin(C,XS%X,XS%S%X,K)
-       CALL TRACK_NODE_SINGLE(C,XS%X,K,CHARGE)
+       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
           CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS%S%X)
        ELSE
           CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS%S%X)
        ENDIF
-       CALL TRACK_NODE_SINGLE(C,XS%X,K,CHARGE)
+       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
 
     endif
     xs%u=.not.check_stable
@@ -2267,16 +2508,21 @@ contains
 
   END SUBROUTINE TRACK_NODE_FLAG_probe_R
 
-  SUBROUTINE TRACK_NODE_FLAG_probe_P(C,XS,K,charge)
+  SUBROUTINE TRACK_NODE_FLAG_probe_P(C,XS,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
     type(probe_8), INTENT(INOUT) :: xs
-    integer, target :: charge
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC
     type(real_8) ds
 
     if(xs%u) return
+    C%PARENT_FIBRE%MAG%P%DIR    => C%PARENT_FIBRE%DIR
+    C%PARENT_FIBRE%MAG%P%beta0  => C%PARENT_FIBRE%beta0
+    C%PARENT_FIBRE%MAG%P%GAMMA0I=> C%PARENT_FIBRE%GAMMA0I
+    C%PARENT_FIBRE%MAG%P%GAMBET => C%PARENT_FIBRE%GAMBET
+    C%PARENT_FIBRE%MAGP%P%MASS => C%PARENT_FIBRE%MASS
+    C%PARENT_FIBRE%MAG%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
 
     CALL ALLOC(DS)
@@ -2288,20 +2534,20 @@ contains
        ds=c%parent_fibre%MAGp%L/c%parent_fibre%MAG%p%nst
        fac=half
 
-       call PUSH_SPIN(c%parent_fibre%magP,ds,FAC,XS,my_true,k)
-       CALL TRACK_NODE_SINGLE(C,XS%X,K,CHARGE)
-       call PUSH_SPIN(c%parent_fibre%magP,ds,FAC,XS,my_false,k)
+       call PUSH_SPIN(c%parent_fibre%magP,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
+       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
+       call PUSH_SPIN(c%parent_fibre%magP,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
        CALL TRACK_FRINGE_spin(C,XS%X,XS%S%X,K)
        !        CALL TRACK_FRINGE_spin(C,XS,K)
-       CALL TRACK_NODE_SINGLE(C,XS%X,K,CHARGE)
+       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
           CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
        ELSE
           CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
        ENDIF
-       CALL TRACK_NODE_SINGLE(C,XS%X,K,CHARGE)
+       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     endif
 
 
@@ -2327,7 +2573,7 @@ contains
     case(KIND4)
     case(KIND5,KIND17)
        IF(C%CAS==CASE1) THEN
-          pos=1
+          pos=-2
           call PUSH_SPIN_fake_fringe(EL,S,X,my_true,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
@@ -2349,7 +2595,7 @@ contains
           CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ENDIF
 
-    case(KIND21)
+    case(KIND21,kind22)
     case(KINDWIGGLER)
     case(KINDPA)
     CASE DEFAULT
@@ -2375,7 +2621,7 @@ contains
     case(KIND4)
     case(KIND5,KIND17)
        IF(C%CAS==CASE1) THEN
-          pos=1
+          pos=-2
           call PUSH_SPIN_fake_fringe(EL,S,X,my_true,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
@@ -2397,7 +2643,7 @@ contains
           CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ENDIF
 
-    case(KIND21)
+    case(KIND21,kind22)
     case(KINDWIGGLER)
     case(KINDPA)
     CASE DEFAULT
@@ -3093,7 +3339,7 @@ contains
   END SUBROUTINE find_ENVELOPE
 
   ! time tracking
-  SUBROUTINE TRACK_time(xT,DT,K,charge)
+  SUBROUTINE TRACK_time(xT,DT,K)
     ! Tracks a single particle "I" of the beam for a time DT
     ! The particle is a location defined by the thin lens B%POS(I)%NODE
     ! and located B%X(I,7) metres in from of that thin lens
@@ -3101,7 +3347,6 @@ contains
     TYPE(INTEGRATION_NODE), POINTER:: T
     TYPE(temporal_probe),INTENT(INOUT):: xT
     REAL(DP), INTENT(IN) :: DT
-    INTEGER,OPTIONAL, target:: charge
     REAL(DP) XTT(6),DT0,YL,DT_BEFORE   !X(6),
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     type(element),pointer :: el
@@ -3120,11 +3365,7 @@ contains
     T=>XT%NODE
     !    T%PARENT_FIBRE%MAG=K
     !    T%PARENT_FIBRE%MAG%P%DIR=>T%PARENT_FIBRE%DIR
-    IF(PRESENT(CHARGE)) THEN
-       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE
-    ELSE
-       T%PARENT_FIBRE%MAG%P%CHARGE=>T%PARENT_FIBRE%PARENT_LAYOUT%CHARGE
-    ENDIF
+    T%PARENT_FIBRE%MAG%P%CHARGE=>T%PARENT_FIBRE%CHARGE
 
 
     DT0=XT%xs%X(6)
@@ -3141,7 +3382,7 @@ contains
        !         WRITE(6,*) " POS ",T%POS,T%CAS,T%PARENT_FIBRE%MAG%NAME
        !       CALL TRACK_NODE_SINGLE(T,X,K,CHARGE)
        ! puting spin
-       CALL TRACK_NODE_PROBE(t,XT%XS,K,charge)
+       CALL TRACK_NODE_PROBE(t,XT%XS,K) !,charge)
        !
        !
        DT0=DT0+(XT%xs%X(6)-XTT(6))

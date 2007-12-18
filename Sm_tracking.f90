@@ -197,7 +197,8 @@ contains
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
        j_global=j
-       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+       CALL TRACK(C,X,K,X_IN=X_IN)  !,C%CHARGE
+       !       CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
        C=>C%NEXT
        J=J+1
@@ -251,7 +252,8 @@ contains
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
        j_global=j
-       CALL TRACK(C,X,K,R%CHARGE)
+       CALL TRACK(C,X,K)  !,C%CHARGE
+       !       CALL TRACK(C,X,K,R%CHARGE)
 
        C=>C%NEXT
        J=J+1
@@ -297,9 +299,21 @@ contains
     integer,target :: charge1
     real(dp) xp
 
+    ! real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,P0C,MASS0
+    !INTEGER, POINTER :: CHARGE
 
 
     IF(.NOT.CHECK_STABLE) return
+    !    C%MAG%P%p0c=>c%p0c
+    C%MAG%P%beta0=>c%beta0
+    C%MAG%P%GAMMA0I=>c%GAMMA0I
+    C%MAG%P%GAMBET=>c%GAMBET
+    C%MAG%P%CHARGE=>c%CHARGE
+    ! DIRECTIONAL VARIABLE
+    C%MAG%P%DIR=>C%DIR
+    if(present(charge)) then
+       C%MAG%P%CHARGE=>CHARGE
+    endif
     !  C%MAG=K
 
     if(c_%x_prime) then
@@ -331,14 +345,6 @@ contains
        X_IN%F=>c ; X_IN%E%F=>C; X_IN%NST=>X_IN%E%NST;
     endif
 
-    ! DIRECTIONAL VARIABLE
-    C%MAG%P%DIR=>C%DIR
-    if(present(charge)) then
-       C%MAG%P%CHARGE=>CHARGE
-    else
-       charge1=1
-       C%MAG%P%CHARGE=>CHARGE1
-    endif
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
     !FRONTAL PATCH
@@ -359,7 +365,7 @@ contains
           !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! No need to patch IF PATCHED BEFORE
           IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
-             B0=>CN%MAG%P%BETA0
+             B0=>CN%BETA0
 
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
@@ -434,7 +440,7 @@ contains
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
        P0=>CN%MAG%P%P0C
-       B0=>CN%MAG%P%BETA0
+       B0=>CN%BETA0
        X(2)=X(2)*C%MAG%P%P0C/P0
        X(4)=X(4)*C%MAG%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
@@ -486,8 +492,13 @@ contains
 
 
     !   C%MAG=DEFAULT
-    nullify(C%MAG%P%DIR)
-    nullify(C%MAG%P%CHARGE)
+    !    nullify(C%MAG%P%DIR)
+    !    nullify(C%MAG%P%CHARGE)
+    !    nullify(C%MAG%P%beta0)
+    !    nullify(C%MAG%P%GAMMA0I)
+    !    nullify(C%MAG%P%GAMBET)
+    !    nullify(C%MAG%P%CHARGE)
+
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
        if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
        CHECK_STABLE=.false.
@@ -514,6 +525,15 @@ contains
     TYPE(REAL_8) xp
 
     IF(.NOT.CHECK_STABLE) return
+    !    C%MAGp%P%p0c=>c%p0c
+    C%MAGp%P%beta0=>c%beta0
+    C%MAGp%P%GAMMA0I=>c%GAMMA0I
+    C%MAGp%P%GAMBET=>c%GAMBET
+    C%MAGp%P%CHARGE=>c%CHARGE
+    C%MAGP%P%DIR=>C%DIR
+    if(present(charge)) then
+       C%MAGP%P%CHARGE=>CHARGE
+    endif
     !    C%MAGP=K
 
     if(c_%x_prime) then
@@ -552,13 +572,6 @@ contains
 
     ! DIRECTIONAL VARIABLE AND CHARGE IS PASSED TO THE ELEMENT
 
-    C%MAGP%P%DIR=>C%DIR
-    if(present(charge)) then
-       C%MAGP%P%CHARGE=>CHARGE
-    else
-       charge1=1
-       C%MAGP%P%CHARGE=>CHARGE1
-    endif
     !
 
     ! PASSING THE STATE K TO THE ELEMENT
@@ -580,7 +593,7 @@ contains
           !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! NO NEED TO PATCH IF PATCHED BEFORE
           IF(CN%PATCH%ENERGY==0) THEN     ! NO NEED TO PATCH IF PATCHED BEFORE
              P0=>CN%MAGP%P%P0C
-             B0=>CN%MAGP%P%BETA0
+             B0=>CN%BETA0
 
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
@@ -662,7 +675,7 @@ contains
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
        P0=>CN%MAGP%P%P0C
-       B0=>CN%MAGP%P%BETA0
+       B0=>CN%BETA0
        X(2)=X(2)*C%MAGP%P%P0C/P0
        X(4)=X(4)*C%MAGP%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
@@ -716,8 +729,12 @@ contains
     ! ELEMENT IS RESTAURED TO THE DEFAULT STATE
     !    C%MAGP=DEFAULT
     ! DIRECTIONAL VARIABLE AND CHARGE ARE ELIMINATED
-    NULLIFY(C%MAGP%P%DIR)
-    NULLIFY(C%MAGP%P%CHARGE)
+    !    NULLIFY(C%MAGP%P%DIR)
+    !    NULLIFY(C%MAGP%P%CHARGE)
+    !    nullify(C%MAGp%P%beta0)
+    !    nullify(C%MAGp%P%GAMMA0I)
+    !    nullify(C%MAGp%P%GAMBET)
+    !    nullify(C%MAGp%P%CHARGE)
 
 
     ! KNOB IS RETURNED TO THE PTC DEFAULT

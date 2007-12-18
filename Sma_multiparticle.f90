@@ -409,8 +409,10 @@ CONTAINS
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
+       !       P0=>CN%MAG%P%P0C
+       !       B0=>CN%MAG%P%BETA0
        P0=>CN%MAG%P%P0C
-       B0=>CN%MAG%P%BETA0
+       B0=>CN%BETA0
        X(2)=X(2)*C%MAG%P%P0C/P0
        X(4)=X(4)*C%MAG%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
@@ -472,12 +474,14 @@ CONTAINS
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
        IF(.NOT.ASSOCIATED(CN)) CN=>C
+       !       P0=>CN%MAGP%P%P0C
+       !       B0=>CN%MAGP%P%BETA0
        P0=>CN%MAGP%P%P0C
-       B0=>CN%MAGP%P%BETA0
+       B0=>CN%BETA0
        X(2)=X(2)*C%MAGP%P%P0C/P0
        X(4)=X(4)*C%MAGP%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
-          X(5)=sqrt(one+two*X(5)/C%MAGP%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+          X(5)=sqrt(one+two*X(5)/C%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
           X(5)=X(5)*C%MAGP%P%P0C/P0-one !X(5) = DP/P0C_NEW
           X(5)=(two*X(5)+X(5)**2)/(sqrt(one/B0**2+two*X(5)+X(5)**2)+one/B0)
        ELSE
@@ -490,11 +494,10 @@ CONTAINS
 
   ! thin lens tracking
 
-  SUBROUTINE TRACKV_NODE_SINGLE(T,V,K,CHARGE) !!
+  SUBROUTINE TRACKV_NODE_SINGLE(T,V,K) !!
     implicit none
     TYPE(INTEGRATION_NODE),POINTER :: T
     TYPE(INTERNAL_STATE)  K
-    INTEGER, optional, TARGET :: CHARGE
     REAL(DP) SC,reference_ray(6),x(6)
     type(three_d_info),intent(INOUT) ::  v
     TYPE(INTEGRATION_NODE),POINTER:: mag_in,mag_out
@@ -502,11 +505,11 @@ CONTAINS
     x=V%X
     reference_ray=V%reference_ray
 
-    CALL TRACK_NODE_SINGLE(T,V%X,K,CHARGE)
+    CALL TRACK_NODE_SINGLE(T,V%X,K)
 
     IF(.NOT.CHECK_STABLE)      V%U(1)=.TRUE.
 
-    CALL TRACK_NODE_SINGLE(T,V%reference_ray,K,CHARGE)
+    CALL TRACK_NODE_SINGLE(T,V%reference_ray,K)
 
     IF(.NOT.CHECK_STABLE)   V%U(2)=.TRUE.
     IF(V%U(1).OR.V%U(2)) RETURN
@@ -541,7 +544,7 @@ CONTAINS
 
   END SUBROUTINE TRACKV_NODE_SINGLE
 
-  SUBROUTINE TRACKR_NODE_SINGLE(T,X,K,CHARGE) !!
+  SUBROUTINE TRACKR_NODE_SINGLE(T,X,K) !!
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
     implicit none
@@ -550,8 +553,6 @@ CONTAINS
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
-    INTEGER, optional, TARGET :: CHARGE
-    integer, target :: CHARGE1
     INTEGER I
 
     ! call cpu_time(ttime0)
@@ -562,12 +563,13 @@ CONTAINS
 
     !  T%PARENT_FIBRE%MAG=K
     T%PARENT_FIBRE%MAG%P%DIR=>T%PARENT_FIBRE%DIR
-    if(present(charge))  then
-       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE
-    else
-       charge1=1
-       T%PARENT_FIBRE%MAG%P%CHARGE=>CHARGE1
-    endif
+    T%PARENT_FIBRE%MAG%P%beta0=>T%PARENT_FIBRE%beta0
+    T%PARENT_FIBRE%MAG%P%GAMMA0I=>T%PARENT_FIBRE%GAMMA0I
+    T%PARENT_FIBRE%MAG%P%GAMBET=>T%PARENT_FIBRE%GAMBET
+    T%PARENT_FIBRE%MAG%P%MASS=>T%PARENT_FIBRE%MASS
+    T%PARENT_FIBRE%MAG%P%CHARGE=>T%PARENT_FIBRE%CHARGE
+
+
 
     !call cpu_time(ttime1)
 
@@ -584,7 +586,7 @@ CONTAINS
     CASE(CASE1,CASE2)
        el=>T%PARENT_FIBRE%MAG
        SELECT CASE(EL%KIND)
-       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
+       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19,kind22)
        case(KIND2)
           CALL TRACK_FRINGE(EL=EL%K2,X=X,k=k,J=T%CAS)
        case(KIND4)
@@ -661,6 +663,8 @@ CONTAINS
           !          CALL TRACK_SLICE(EL%ECOL19,X,K)
        case(KIND21)
           CALL TRACK_SLICE(EL%CAV21,X,k,t%POS_IN_FIBRE-2)
+       case(KIND22)
+          CALL TRACK_SLICE(EL%he22,X,k,t%POS_IN_FIBRE-2)
        case(KINDWIGGLER)
           CALL TRACK_SLICE(EL%WI,X,k,t%POS_IN_FIBRE-2)
        case(KINDPA)
@@ -676,11 +680,10 @@ CONTAINS
 
     END SELECT
     !    T%PARENT_FIBRE%MAG=DEFAULT
-
   END SUBROUTINE TRACKR_NODE_SINGLE
 
 
-  SUBROUTINE TRACKP_NODE_SINGLE(T,X,K,CHARGE) !!
+  SUBROUTINE TRACKP_NODE_SINGLE(T,X,K) !!
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
     implicit none
@@ -689,8 +692,6 @@ CONTAINS
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(elementp),pointer :: el
-    INTEGER, optional, TARGET :: CHARGE
-    integer, target :: CHARGE1
     INTEGER I
     logical(lp) BN2,L
     logical(lp) CHECK_KNOB
@@ -701,14 +702,12 @@ CONTAINS
     IF(K%PARA_IN ) KNOB=.TRUE.
 
     T%PARENT_FIBRE%MAGP%P%DIR=>T%PARENT_FIBRE%DIR
+    T%PARENT_FIBRE%MAGP%P%beta0=>T%PARENT_FIBRE%beta0
+    T%PARENT_FIBRE%MAGP%P%GAMMA0I=>T%PARENT_FIBRE%GAMMA0I
+    T%PARENT_FIBRE%MAGP%P%GAMBET=>T%PARENT_FIBRE%GAMBET
+    T%PARENT_FIBRE%MAGP%P%MASS=>T%PARENT_FIBRE%MASS
+    T%PARENT_FIBRE%MAGP%P%CHARGE=>T%PARENT_FIBRE%CHARGE
 
-    if(present(charge))  then
-       T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE
-    else
-       charge1=1
-       T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE1
-    endif
-    !    T%PARENT_FIBRE%MAGP%P%CHARGE=>CHARGE
 
 
     SELECT CASE(T%CAS)
@@ -721,7 +720,7 @@ CONTAINS
     CASE(CASE1,CASE2)
        el=>T%PARENT_FIBRE%MAGP
        SELECT CASE(EL%KIND)
-       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
+       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19,kind22)
        case(KIND2)
           CALL TRACK_FRINGE(EL=EL%K2,X=X,k=k,J=T%CAS)
        case(KIND4)
@@ -825,6 +824,8 @@ CONTAINS
           CALL TRACK_SLICE(EL%CAV21,X,k,t%POS_IN_FIBRE-2)
        case(KINDWIGGLER)
           CALL TRACK_SLICE(EL%WI,X,k,t%POS_IN_FIBRE-2)
+       case(KIND22)
+          CALL TRACK_SLICE(EL%he22,X,k,t%POS_IN_FIBRE-2)
        case(KINDPA)
           CALL TRACK_SLICE(EL%PA,X,k,T%POS_IN_FIBRE-2)
        CASE DEFAULT

@@ -461,7 +461,7 @@ contains
           !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
           !             STOP 331
           !          ENDIF
-       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,kindwiggler)
+       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND22,kindwiggler)
           LH=P%LC/TWO
           A=O
           D=ZERO;D(3)=-LH
@@ -543,51 +543,6 @@ contains
              CALL XFRAME(E_IN,MID,A,start)
           ENDDO
 
-       CASE(KIND22)   ! single map
-          IF(P%B0==ZERO) THEN
-             LH=P%LC/TWO
-             A=O
-             D=ZERO;D(3)=-LH
-             CALL GEO_TRA(A,MID,D,1)
-             CALL XFRAME(E_IN,MID,A,start)
-             HA=P%LC/NST
-             D=ZERO;D(3)=HA
-             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-             DO I=1,NST
-                start=start+E_IN%F%dir
-                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-                CALL GEO_TRA(A,MID,D,1)
-                CALL XFRAME(E_IN,MID,A,start)
-             ENDDO
-          ELSE
-             RHO=ONE/P%B0
-             ANG=ZERO; D=ZERO;
-             LH=P%LC/TWO
-             A=O
-             D(3)=-LH
-             ANGH=P%LD*P%B0/two
-             ANG(2)=-ANGH
-             CALL GEO_TRA(A,MID,D,1)
-             O=A
-             CALL GEO_ROT(MID,ENT      ,ANG  ,MID)
-             CALL XFRAME(E_IN,ENT,A,start)
-             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-
-             ANG(2)=TWO*ANGH/NST
-             DO I=1,NST
-                start=start+E_IN%F%dir
-                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-                HA=ANGH-I*ANG(2)
-                CALL GEO_ROT(ENT,ENT      ,ANG  ,MID)
-                D=ZERO
-                D(1)=RHO*(COS(ha)-COS(ANGH))
-                D(3)=P%LC/TWO-sin(ha)*rho
-                A=O
-                CALL GEO_TRA(A,MID,D,1)
-                CALL XFRAME(E_IN,ENT,A,start)
-             ENDDO
-
-          ENDIF
 
        CASE DEFAULT
 
@@ -613,7 +568,7 @@ contains
           !             WRITE(6,*) "ERROR IN SURVEY_INNER_MAG "
           !             STOP 330
           !          ENDIF
-       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND21,kindwiggler)
+       CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND22,kindwiggler)
           E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
           DO I=1,NST
              start=start+E_IN%F%dir
@@ -643,22 +598,6 @@ contains
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
           ENDDO
 
-       CASE(KIND22)   ! single map
-          IF(P%B0==ZERO) THEN
-             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-             DO I=1,NST
-                start=start+E_IN%F%dir
-                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-             ENDDO
-          ELSE
-             E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-
-             DO I=1,NST
-                start=start+E_IN%F%dir
-                E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-             ENDDO
-
-          ENDIF
           !       CASE(kind23)                 ! kind 23 layout
           !          call  GET_LENGTH(E_IN%F%mag%g23,Lh)
           !

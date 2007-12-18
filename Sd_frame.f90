@@ -4,10 +4,10 @@ module S_FRAME
   use S_euclidean
   IMPLICIT NONE
   public
-  PRIVATE ZERO_CHART,COPY_CHART,COPY_CHART1,GEO_ROTA,GEO_ROTB
+  PRIVATE ZERO_CHART,COPY_CHART,COPY_CHART1   !,GEO_ROTA,GEO_ROTB
   PRIVATE COPY_PATCH,COPY_PATCH1,ZERO_PATCH,FIND_PATCH_b
   Private alloc_f,dealloc_f,equal_f
-  private make_rot_x,make_rot_y,make_rot_z,GEO_ROTAB_no_vec,GEO_ROTA_no_vec
+  private make_rot_x,make_rot_y,make_rot_z   !,GEO_ROTAB_no_vec,GEO_ROTA_no_vec
   REAL(DP), public :: GLOBAL_FRAME(3,3)= RESHAPE((/1,0,0  ,0,1,0  ,0,0,1/),(/3,3/))
   REAL(DP), public :: GLOBAL_origin(3)= (/0,0,0/)
   integer :: ccc=0

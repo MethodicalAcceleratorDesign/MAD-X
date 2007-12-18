@@ -298,8 +298,10 @@ contains
     type (damap),INTENT(IN)::S1
     type (damap) JUNK
     real(dp) ZERO_(NDIM2)
-    IF(.NOT.C_%STABLE_DA) RETURN
+    logical(lp) glo
 
+    IF(.NOT.C_%STABLE_DA) RETURN
+    glo=global_verbose
     call check_snake
     call alloc(junk)
     zero_(:)=zero
@@ -307,6 +309,7 @@ contains
     if(s2%normal%linear%V(1)%i==0)  call crap1("normalMAP 1") !call allocw(s2%normal%linear%V(1))  ! changed
 
     if(S2%auto) then
+       global_verbose=.true.
        !     call setidpr(-100,S2%plane)
        if(print77) then
           call idprset(-101)
@@ -363,6 +366,7 @@ contains
     s2%a_t=s2%a1*s2%a_t
     S2%A_T=ZERO_
     CALL KILL(JUNK)
+    if(S2%auto) global_verbose=glo
 
 
   END SUBROUTINE normalMAP
