@@ -118,7 +118,7 @@ contains
 
 
     charge = get_value('beam ', "charge ");
-    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
+    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
@@ -449,7 +449,7 @@ contains
 
 
     charge = get_value('beam ', "charge ");
-    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
+    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
@@ -619,7 +619,7 @@ contains
     print *, "Table name is ", table_name
 
     charge = get_value('beam ', "charge ");
-    if (getdebug() > 3) print *, 'Read charge:', charge,' layout has charge ', my_ring%charge
+    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
