@@ -365,7 +365,7 @@ char command_def[] =
 " "
 "ptc_create_universe: ptc_create_universe none 0 0 "
 "sector_nmul_max = [i, 10], "
-"sector_nmul = [i, 10]; "
+"sector_nmul = [i, 5]; "
 " "
 "ptc_create_layout: ptc_create_layout none 0 0 "
 "time = [l, true, true], "
