@@ -545,11 +545,15 @@ contains
 
   subroutine print_PATCH(m,mf)
     implicit none
-    integer mf,I
+    integer mf,I,myi1,myi2,myi3
     type(PATCH), pointer :: m
     character*255 line
 
-    IF(IABS(M%PATCH)+iabs(M%energy)+iabs(M%time)/=0) then
+    myi1=M%PATCH
+    myi2=M%energy
+    myi3=M%time
+!    IF(IABS(M%PATCH)+iabs(M%energy)+iabs(M%time)/=0) then
+    IF(IABS(myi1)+iabs(myi2)+iabs(myi3)/=0) then
        WRITE(MF,*) " >>>>>>>>>>>>>>>>>> PATCH <<<<<<<<<<<<<<<<<<"
        WRITE(MF,*) M%PATCH,M%ENERGY,M%TIME," patch,energy,time"
        WRITE(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2," discrete 180 rotations"
