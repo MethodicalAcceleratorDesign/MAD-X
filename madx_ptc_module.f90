@@ -59,7 +59,13 @@ CONTAINS
     if (getdebug()==0) global_verbose = .false.
     if (getdebug()>0) print*,"Now PTC"
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
+
+!    print*,">>ss1<< old sector_nmul",sector_nmul
+
     sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
+    
+!    print*,">>ss1<< new sector_nmul",sector_nmul
+    
     if(sector_nmul_max.lt.sector_nmul) then
        call aafail('sector_nmul_max must be larger than sector_nmul: ',&
             'check your ptc_create_universe input')
@@ -293,15 +299,10 @@ CONTAINS
        print *, '    charge        ',charge
     endif
 
-    !    my_ring%mass=pma
     ! preliminary setting
     !    my_ring%charge=1
     initial_charge=1
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-    if (getdebug() > 1) print *, 'MADx is set'
-
-    CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-
     if (getdebug() > 1) print *, 'MADx is set'
 
     icav=0
@@ -339,12 +340,6 @@ CONTAINS
 
 !frs&piotr 18 Dec 2007: sector_nmul must stay global for the time being
     !local, if present, superseed global at current node
-!    sector_nmul1=node_value("sector_nmul ")
-!    if(sector_nmul1.gt.0) then
-!       sector_nmul = sector_nmul1
-!    else
-!       sector_nmul = sector_nmul0
-!    endif
 
 
     !*****************************
