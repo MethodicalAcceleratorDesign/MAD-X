@@ -504,7 +504,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
-  else if (strcmp(toks[k], "split")       == 0) exec_split(cmd);
+  else if (strcmp(toks[k], "extract")       == 0) exec_extract(cmd);
   else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
@@ -1248,7 +1248,8 @@ void enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
         else
         {
           expr = NULL;
-          val = polish_value(deco);
+          val = polish_value(deco, 
+                join(&cmd->tok_list->p[start],end + 1 - start));
         }
         if (val_type == 0)
         {
@@ -1939,15 +1940,15 @@ void exec_show(struct in_cmd* cmd)
 
 }
 
-void exec_split(struct in_cmd* cmd)
+void exec_extract(struct in_cmd* cmd)
   /* "split" command - split sequence in two from marker_1 to marker_2 */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  struct sequence *split_sequ, *part1, *part2;
+  struct sequence *split_sequ, *part;
   int i, j;
-  char *name;
-  char newname1[NAME_L], newname2[NAME_L];
+  char *name, *refpos = NULL;
+  char newname[NAME_L];
   struct node *from, *to;
   /*
     start command decoding
@@ -1964,12 +1965,9 @@ void exec_split(struct in_cmd* cmd)
       return;
     }
   }
-  i = name_list_pos("newname1", nl);
-  if (nl->inform[i] == 0) sprintf(newname1, "%s_1", name);
-  else strcpy(newname1, pl->parameters[i]->string);
-  i = name_list_pos("newname2", nl);
-  if (nl->inform[i] == 0) sprintf(newname2, "%s_2", name);
-  else strcpy(newname2, pl->parameters[i]->string);
+  i = name_list_pos("newname", nl);
+  if (nl->inform[i] == 0) sprintf(newname, "%s_1", name);
+  else strcpy(newname, pl->parameters[i]->string);
   i = name_list_pos("from", nl);
   if (nl->inform[i] == 0)
   {
@@ -1998,13 +1996,130 @@ void exec_split(struct in_cmd* cmd)
    warning("not in sequence:", pl->parameters[i]->string);
    return;
   }
+  i = name_list_pos("refpos", nl);
+  if (nl->inform[i]) refpos = pl->parameters[i]->string;
   /*
     end of command decoding - action!
   */
-  part1 = split_sequence(newname1, split_sequ, from, to);
-  add_to_sequ_list(part1, sequences);
-  part2 = split_sequence(newname2, split_sequ, to, from);
-  add_to_sequ_list(part2, sequences);
+  part = extract_sequence(newname, split_sequ, from, to, refpos);
+  add_to_sequ_list(part, sequences);
+}
+
+struct sequence* extract_sequence(char* name, struct sequence* sequ, 
+                    struct node* from, struct node* to, char* refpos)
+{
+  struct element* el;
+  int pos, marker_pos, from_cond;
+  struct command* clone;
+  struct sequence* keep_curr_sequ = current_sequ; 
+  struct sequence* new_sequ; 
+  struct node *q = from, *from_node;
+  struct node_list* new_nodes;
+  double start_value, end_value;
+  char tmp_name[2*NAME_L];
+
+  if (get_option("info")) printf("+++ extracting sequence %s from %s to %s\n", 
+                                sequ->name, from->name, to->name);
+  current_sequ = new_sequence(name, sequ->ref_flag);
+  current_sequ->share = 1; /* make shared for recombination */
+  current_sequ->refpos = refpos; 
+  current_sequ->cavities = new_el_list(100);
+  new_nodes = new_node_list(1000);
+/* fill new_node list for 'from' references */
+  while (q)
+  {
+   add_to_node_list(q, 0, new_nodes);
+   if (q == to)  break;
+   q = q->next;
+  }
+/* sequence construction */
+  q = from;
+  start_value = get_node_pos(from, sequ);
+  end_value = get_node_pos(to, sequ);
+  current_sequ->l_expr = NULL;
+  current_sequ->length = end_value - start_value;
+  if (current_sequ->length < zero) current_sequ->length += sequ->length;
+  marker_pos = name_list_pos("marker", defined_commands->list);
+  clone = clone_command(defined_commands->commands[marker_pos]);
+  sprintf(c_dum->c, "%s$start", name);
+  el = make_element(c_dum->c, "marker", clone, 0);
+  current_node = NULL;
+  make_elem_node(el, 1);
+  current_sequ->start = current_node;
+  make_elem_node(from->p_elem, from->occ_cnt);
+  current_node->at_value = 0;
+  current_node->at_expr = NULL;
+/* loop over sequ nodes from 'from' to 'to' */
+  while (current_node != NULL)
+  {
+   while (strchr(q->next->name, '$')) q = q->next; /* suppress internal markers */
+   if (q->next->p_elem)
+     make_elem_node(q->next->p_elem, q->next->occ_cnt);
+   else if(q->next->p_sequ)
+     make_sequ_node(q->next->p_sequ, q->next->occ_cnt);
+   else
+       fatal_error("node has neither element nor sequence reference:", q->next->name);
+   q = q->next;
+   if (q->p_elem && strcmp(q->p_elem->base_type->name, "rfcavity") == 0 &&
+      find_element(q->p_elem->name, current_sequ->cavities) == NULL)
+      add_to_el_list(&q->p_elem, 0, current_sequ->cavities, 0);
+   from_cond = 0;
+   if (q->from_name)
+   {
+    strcpy(tmp_name, q->from_name);
+    strcat(tmp_name, ":1");
+    if ((pos = name_list_pos(tmp_name, sequ->nodes->list)) > -1)
+    {
+     from_node = sequ->nodes->nodes[pos];
+     from_cond = 1;
+     if (name_list_pos(tmp_name, new_nodes->list) > -1) 
+       from_cond = 2;
+    }
+   }
+   if (from_cond == 2)
+   {
+    current_node->from_name = q->from_name;
+    current_node->at_value = q->at_value;
+    current_node->at_expr = q->at_expr;
+   }
+   else
+   {
+    if (from_cond == 1)
+     current_node->at_value = expr_combine(q->at_expr, q->at_value, " + ", 
+			      from_node->at_expr, from_node->at_value, 
+                              &current_node->at_expr);
+    else
+    {
+     current_node->at_expr = q->at_expr;
+     current_node->at_value = q->at_value;
+    }
+     current_node->at_value = expr_combine(current_node->at_expr, 
+                              current_node->at_value, " - ", 
+			      NULL, start_value, 
+                              &current_node->at_expr);
+    if (current_node->at_value < zero)
+      current_node->at_value = expr_combine(current_node->at_expr, 
+                               current_node->at_value, " + ", 
+			       sequ->l_expr, sequ->length, 
+                               &current_node->at_expr);
+   }
+   if (q == to) break;
+  }
+  clone = clone_command(defined_commands->commands[marker_pos]);
+  sprintf(c_dum->c, "%s$end", name);
+  el = make_element(c_dum->c, "marker", clone, 0);
+  make_elem_node(el, 1);
+  current_node->at_expr = current_sequ->l_expr;
+  current_node->at_value = current_sequ->length;
+  current_sequ->end = current_node;
+  current_node->next = current_sequ->start;
+  current_sequ->start->previous = current_node;
+  new_sequ = current_sequ;
+  current_sequ = keep_curr_sequ;
+      if (get_option("info"))
+      printf("+++ new sequence: %s  with current length = %le\n\n",
+       new_sequ->name, new_sequ->length);
+  return new_sequ;
 }
 
 struct node* expand_node(struct node* node, struct sequence* top_sequ,
@@ -2083,7 +2198,7 @@ double expression_value(struct expression* expr, int flag) /* recursive */
   {
     if (expr->polish != NULL)
     {
-      val = expr->value = polish_value(expr->polish);
+      val = expr->value = polish_value(expr->polish, expr->string);
       expr->status = 1;
     }
   }
@@ -3383,7 +3498,8 @@ int polish_expr(int c_item, char** item)   /* split input */
   return 0;
 }
 
-double polish_value(struct int_array* deco)  /* coded input (see below) */
+double polish_value(struct int_array* deco, char* expr_string)
+  /* coded input (see below) */
   /* description see polish_expression */
 {
   int i, k, kc, c_stack = -1;
@@ -3391,7 +3507,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
   char tmp[20];
 
   if (++polish_cnt > MAX_LOOP)
-    fatal_error("circular call in expression","evaluation");
+    fatal_error("circular call in expression", expr_string);
   stack[0] = 0;
   for (i = 0; i < deco->curr; i++)   /* decoding loop */
   {
@@ -3400,7 +3516,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
     {
       if (c_stack < 0)
       {
-        fatal_error("polish_value","stack underflow in Polish decoding");
+        fatal_error("stack underflow in expression:", expr_string);
       }
       else if (c_stack == 0)
       {
@@ -3423,11 +3539,9 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
         case 3:
           if (stack[c_stack+1] == 0.0)
           {
-/*            warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!",stack[c_stack+1]);*/
-            warning("polish_value: division by zero","k=3, stack[c_stack+1]=%f. Putting result to 0!");
-            /*fatal_error("Division by zero is not defined","Aborting!");*/
+            warning("division by zero, result set to zero, expr:",
+                    expr_string);
             stack[c_stack] = 0.0;
-            /*stack[c_stack] = nan("");*/
             break;
           }
           stack[c_stack] /= stack[c_stack+1];
@@ -3436,7 +3550,7 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
           stack[c_stack] = pow(stack[c_stack],stack[c_stack+1]);
           break;
         default:
-          fatal_error("polish_value","illegal operator in Polish decoding");
+          fatal_error("illegal operator, Polish, expr.:", expr_string);
       }
     }
     else
@@ -3518,8 +3632,8 @@ double polish_value(struct int_array* deco)  /* coded input (see below) */
               stack[c_stack] = stack[c_stack] - floor(stack[c_stack]);
               break;
             default:
-              fatal_error("polish_value:",
-                          "illegal function in Polish decoding");
+              fatal_error("polish_value: illegal function in expr:",
+                          expr_string);
           }
           break;
         default:
@@ -4206,7 +4320,7 @@ void set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   if (exp_type == 1) /* literal constant */
     val = simple_double(cmd->tok_list->p, start, end);
   else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
-    val = polish_value(deco);
+    val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
   if (strncmp(comm, "beam", 4) == 0)
   {
     command = current_beam = find_command("default_beam", beam_list);
@@ -4331,7 +4445,7 @@ int simple_logic_expr(int nit, char* toks[])
   if (t1 == 2)
   {
     if (polish_expr(l1_end + 1 - l1_start, &toks[l1_start]) == 0)
-      val1 = polish_value(deco);
+      val1 = polish_value(deco, join(&toks[l1_start], l1_end + 1 - l1_start));
     else return -1;
   }
   else  val1 = simple_double(toks, l1_start, l1_end);
@@ -4339,7 +4453,7 @@ int simple_logic_expr(int nit, char* toks[])
   if (t2 == 2)
   {
     if (polish_expr(l2_end + 1 - l2_start, &toks[l2_start]) == 0)
-      val2 = polish_value(deco);
+      val2 = polish_value(deco, join(&toks[l2_start], l2_end + 1 - l2_start));
     else return -1;
   }
   else  val2 = simple_double(toks, l2_start, l2_end);
@@ -4378,120 +4492,6 @@ char* spec_join(char** it_list, int n)
     myfree(rout_name, p);
   }
   return c_join->c;
-}
-
-struct sequence* split_sequence(char* name, struct sequence* sequ, 
-                                struct node* from, struct node* to)
-{
-  struct element* el;
-  int pos, marker_pos, from_cond;
-  struct command* clone;
-  struct sequence* keep_curr_sequ = current_sequ; 
-  struct sequence* new_sequ; 
-  struct node *q = from, *from_node;
-  struct node_list* new_nodes;
-  char tmp_name[2*NAME_L];
-
-  printf("+++ splitting sequence %s from %s to %s\n", sequ->name, from->name,
-	 to->name);
-  current_sequ = new_sequence(name, sequ->ref_flag);
-  current_sequ->share = 1; /* make shared for combination test */
-  current_sequ->cavities = new_el_list(100);
-  new_nodes = new_node_list(1000);
-/* fill new_node list for 'from' references */
-  while (q)
-  {
-   add_to_node_list(q, 0, new_nodes);
-   if (q == to)  break;
-   q = q->next;
-  }
-/* sequence construction */
-  q = from;
-  current_sequ->length = expr_combine(to->at_expr, to->at_value, " - ", 
-                    from->at_expr, from->at_value, &current_sequ->l_expr);
-  if (current_sequ->length < zero)
-      current_sequ->length = expr_combine(current_sequ->l_expr, 
-                               current_sequ->length, " + ", 
-			       sequ->l_expr, sequ->length, 
-                               &current_sequ->l_expr);
-  marker_pos = name_list_pos("marker", defined_commands->list);
-  clone = clone_command(defined_commands->commands[marker_pos]);
-  sprintf(c_dum->c, "%s$start", name);
-  el = make_element(c_dum->c, "marker", clone, 0);
-  current_node = NULL;
-  make_elem_node(el, 1);
-  current_sequ->start = current_node;
-  make_elem_node(from->p_elem, from->occ_cnt);
-/* loop over sequ nodes from 'from' to 'to' */
-  while (current_node != NULL)
-  {
-   while (strchr(q->next->name, '$')) q = q->next; /* suppress internal markers */
-   if (q->next->p_elem)
-     make_elem_node(q->next->p_elem, q->next->occ_cnt);
-   else if(q->next->p_sequ)
-     make_sequ_node(q->next->p_sequ, q->next->occ_cnt);
-   else
-       fatal_error("node has neither element nor sequence reference:", q->next->name);
-   q = q->next;
-   if (q->p_elem && strcmp(q->p_elem->base_type->name, "rfcavity") == 0 &&
-      find_element(q->p_elem->name, current_sequ->cavities) == NULL)
-      add_to_el_list(&q->p_elem, 0, current_sequ->cavities, 0);
-   from_cond = 0;
-   if (q->from_name)
-   {
-    strcpy(tmp_name, q->from_name);
-    strcat(tmp_name, ":1");
-    if ((pos = name_list_pos(tmp_name, sequ->nodes->list)) > -1)
-    {
-     from_node = sequ->nodes->nodes[pos];
-     from_cond = 1;
-     if (name_list_pos(tmp_name, new_nodes->list) > -1) 
-       from_cond = 2;
-    }
-   }
-   if (from_cond == 2)
-   {
-    current_node->from_name = q->from_name;
-    current_node->at_value = q->at_value;
-    current_node->at_expr = q->at_expr;
-   }
-   else
-   {
-    if (from_cond == 1)
-     current_node->at_value = expr_combine(q->at_expr, q->at_value, " + ", 
-			      from_node->at_expr, from_node->at_value, 
-                              &current_node->at_expr);
-    else
-    {
-     current_node->at_expr = q->at_expr;
-     current_node->at_value = q->at_value;
-    }
-     current_node->at_value = expr_combine(current_node->at_expr, 
-                              current_node->at_value, " - ", 
-			      from->at_expr, from->at_value, 
-                              &current_node->at_expr);
-    if (current_node->at_value < zero)
-      current_node->at_value = expr_combine(current_node->at_expr, 
-                               current_node->at_value, " + ", 
-			       sequ->l_expr, sequ->length, 
-                               &current_node->at_expr);
-   }
-   if (q == to) break;
-  }
-  clone = clone_command(defined_commands->commands[marker_pos]);
-  sprintf(c_dum->c, "%s$end", name);
-  el = make_element(c_dum->c, "marker", clone, 0);
-  make_elem_node(el, 1);
-  current_node->at_expr = current_sequ->l_expr;
-  current_node->at_value = current_sequ->length;
-  current_sequ->end = current_node;
-  current_node->next = current_sequ->start;
-  current_sequ->start->previous = current_node;
-  new_sequ = current_sequ;
-  current_sequ = keep_curr_sequ;
-  printf("+++ new sequence: %s  with current length = %le\n",
-       new_sequ->name, new_sequ->length);
-  return new_sequ;
 }
 
 void store_command_def(char* cmd_string)  /* processes command definition */

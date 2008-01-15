@@ -456,7 +456,7 @@ double double_from_expr(char** toks, int s_start, int s_end)
   if (type == 1) /* simple number */
     return simple_double(toks, s_start, end);
   else if (polish_expr(end + 1 - s_start, &toks[s_start]) == 0)
-    return polish_value(deco);
+    return polish_value(deco, join( &toks[s_start],end + 1 - s_start) );
   else return INVALID;
 }
 

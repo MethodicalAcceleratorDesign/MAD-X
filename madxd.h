@@ -585,7 +585,7 @@ void exec_save(struct in_cmd*);
 void exec_savebeta();
 void exec_show(struct in_cmd*);
 void exec_sodd(struct in_cmd*);
-void exec_split(struct in_cmd*);
+void exec_extract(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
 void expand_curr_sequ(int);
 void expand_line(struct char_p_array*);
@@ -780,7 +780,7 @@ int pass_select(char*, struct command*);
 int pass_select_list(char*, struct command_list*);
 char* permbuff(char*);
 int polish_expr(int, char**);
-double polish_value(struct int_array*);
+double polish_value(struct int_array*, char*);
 int predef_const(struct variable*);
 void prepare_table_file(struct table*, struct command_list*);
 void pre_split(char*, struct char_array*, int);
@@ -868,8 +868,8 @@ void show_beam(char*);
 double simple_double(char**, int, int);
 int simple_logic_expr(int, char**);
 char* spec_join(char**, int); /* puts table() argument back for output */
-struct sequence* split_sequence(char*, struct sequence*, 
-                                struct node*, struct node*);
+struct sequence* extract_sequence(char*, struct sequence*, 
+                                struct node*, struct node*, char*);
 int mysplit(char*, struct char_p_array*);
 char* stolower(char*);  /* string to lower case in place */
 void stolower_nq(char*);  /* string to lower case in place except quotes */

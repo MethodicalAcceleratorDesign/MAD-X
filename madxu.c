@@ -1322,13 +1322,15 @@ void dump_name_list(struct name_list* nl)
 void dump_node(struct node* node)
 {
   int i;
-  char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL";
+  char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL", 
+       from_name[NAME_L] = "NULL";
   if (node->previous != NULL) strcpy(pname, node->previous->name);
   if (node->next != NULL) strcpy(nname, node->next->name);
+  if (node->from_name != NULL) strcpy(from_name, node->from_name);
   fprintf(prt_file, 
-  v_format("name: %S  occ: %I base: %S  at_value: %F  position: %F\n"),
-          node->name, node->occ_cnt, node->base_name, node->at_value,
-          node->position);
+  v_format("name: %S  occ: %I base: %S  from_name: %S at_value: %F  position: %F\n"),
+          node->name, node->occ_cnt, node->base_name, from_name, 
+          node->at_value, node->position);
   fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
           pname, nname);
   if (node->cl != NULL)  for (i = 0; i < node->cl->curr; i++)
@@ -2829,6 +2831,7 @@ struct node* new_elem_node(struct element* el, int occ_cnt)
   p->p_elem = el;
   p->length = el->length;
   p->base_name = el->base_type->name;
+  p->occ_cnt = occ_cnt;
   return p;
 }
 
@@ -3378,7 +3381,8 @@ void print_value(struct in_cmd* cmd)
       nitem = end + 1 - s_start;
       if (polish_expr(nitem, &toks[s_start]) == 0)
         fprintf(prt_file, v_format("%s = %F ;\n"),
-                spec_join(&toks[s_start], nitem), polish_value(deco));
+                spec_join(&toks[s_start], nitem), 
+                polish_value(deco, join(&toks[s_start], nitem)));
       else
       {
         warning("invalid expression:", spec_join(&toks[s_start], nitem));
