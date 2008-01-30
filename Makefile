@@ -54,8 +54,8 @@ LDOPT=-static -m32
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
-#FC5
-#LIBX= -lX11 -lXdmcp -lXau -lpthread
+#FC6
+#LIBX= -lX11 -lXdmcp -lXau -lc "-L/usr/lib/gcc/i386-redhat-linux/4.1.1/" -lgcc_eh
 #LIBX="-L/usr/X11R6/lib64" -lX11 "-L/usr/lib64/" -ldl -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 

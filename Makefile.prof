@@ -92,7 +92,7 @@ f95_FOPT= -m32
 
 LIBS = -L/usr/lib/ -ldl -lpthread
 
-#FC5
+#FC6
 #LIBX= -lX11 -lXdmcp -lXau -lpthread
 LIBX=-L/usr/X11R6/lib -lX11 -lXt
 
