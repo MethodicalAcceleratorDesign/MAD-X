@@ -146,7 +146,11 @@ TYPE ELEMENT
    TYPE(PANCAKE), POINTER :: PA          ! GENERAL B
    TYPE(HELICAL_DIPOLE), POINTER :: HE22          ! GENERAL B
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
+   TYPE(fibre_appearance), POINTER :: doko
    type(element), pointer :: siamese
+   type(element), pointer :: girder
+   TYPE(AFFINE_FRAME), POINTER :: SIAMESE_FRAME
+   TYPE(AFFINE_FRAME), POINTER :: girder_FRAME
 END TYPE  ELEMENT
 
 
@@ -197,10 +201,14 @@ TYPE ELEMENTP
    TYPE(HELICAL_DIPOLEP), POINTER :: HE22          ! GENERAL B
    TYPE(SAGANP), POINTER :: WI                ! USER DEFINED
    TYPE(PANCAKEP), POINTER :: PA          ! GENERAL B
-   TYPE(FIBRE), POINTER :: PARENT_FIBRE
-   type(element), pointer :: siamese
+   !   TYPE(FIBRE), POINTER :: PARENT_FIBRE
+   !   TYPE(fibre_appearance), POINTER :: doko
 END TYPE  ELEMENTP
 
+type fibre_appearance
+   TYPE(FIBRE), POINTER :: PARENT_FIBRE
+   TYPE(fibre_appearance), POINTER :: next
+end type fibre_appearance
 
 type info
    real(sp),pointer :: s
@@ -261,10 +269,9 @@ type layout_array
    integer   :: counter
 END type layout_array
 
-!  type siamese_array
-!     type(fibre), pointer :: p
-!      integer :: pos
-!  END type siamese_array
+type girder_siamese
+   type(element), pointer :: mag
+END type girder_siamese
 
 TYPE MAD_UNIVERSE             ! THE MOTHER OF ALL STRUCTURES
    INTEGER,  POINTER :: N     ! NUMBERS OF LAYOUT

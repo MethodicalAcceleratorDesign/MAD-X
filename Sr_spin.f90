@@ -35,9 +35,14 @@ module ptc_spin
   PRIVATE TRACK_LAYOUT_FLAG_probe_spin12R,TRACK_LAYOUT_FLAG_probe_spin12P,TRACK_YS
   private PUSH_SPIN_fake_fringer,PUSH_SPIN_fake_fringep,PUSH_SPIN_fake_fringe
   PRIVATE TRACK_NODE_LAYOUT_FLAG_pr_t12_R,TRACK_NODE_LAYOUT_FLAG_pr_t12_P
-  private TRACK_LAYOUT_FLAG_spint12r_x,TRACK_LAYOUT_FLAG_spint12p_x
-
+  private TRACK_LAYOUT_FLAG_spint12r_x,TRACK_LAYOUT_FLAG_spint12p_x,alloc_temporal_beam
+  private alloc_temporal_probe
   REAL(DP) :: AG=A_ELECTRON
+
+  INTERFACE alloc
+     MODULE PROCEDURE alloc_temporal_probe
+     MODULE PROCEDURE alloc_temporal_beam
+  END INTERFACE
 
   INTERFACE TRACK_PROBE2
      MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_R  !#2  ! probe from node i1 to i2
@@ -3340,9 +3345,7 @@ contains
 
   ! time tracking
   SUBROUTINE TRACK_time(xT,DT,K)
-    ! Tracks a single particle "I" of the beam for a time DT
-    ! The particle is a location defined by the thin lens B%POS(I)%NODE
-    ! and located B%X(I,7) metres in from of that thin lens
+    ! Tracks a single particle   of the beam for a time DT
     implicit none
     TYPE(INTEGRATION_NODE), POINTER:: T
     TYPE(temporal_probe),INTENT(INOUT):: xT
@@ -3380,9 +3383,11 @@ contains
        DT_BEFORE=DT0
        !         WRITE(6,*) " POS ",T%s(1),t%pos_in_fibre
        !         WRITE(6,*) " POS ",T%POS,T%CAS,T%PARENT_FIBRE%MAG%NAME
-       !       CALL TRACK_NODE_SINGLE(T,X,K,CHARGE)
-       ! puting spin
+       ! putting spin and radiation
        CALL TRACK_NODE_PROBE(t,XT%XS,K) !,charge)
+       ! no spin and no radiation
+       !        CALL TRACK_NODE_SINGLE(t,XT%XS%X,K)  !,CHARGE
+
        !
        !
        DT0=DT0+(XT%xs%X(6)-XTT(6))
@@ -3420,15 +3425,269 @@ contains
 
     XT%Ds=yl
     !   xs%x=X
-    XT%NODE=>T
+    !    XT%NODE=>T
     if(.not.CHECK_STABLE) then
        !       write(6,*) "unstable "
        CALL RESET_APERTURE_FLAG
        XT%xs%u=.true.
     endif
 
+    call ptc_global_x_p(xt,k)
 
   END SUBROUTINE TRACK_time
+
+  Subroutine ptc_global_x_p(xt,k)
+    implicit none
+    TYPE(temporal_probe),INTENT(INOUT):: xT
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer i
+    real(dp) p(3),pz,betinv
+
+    if(associated(XT%NODE%ENT)) then
+       ! computing global position
+
+       XT%pos=ZERO
+       DO I=1,3
+          XT%POS(i)=XT%POS(i) + XT%XS%X(1)*XT%NODE%ENT(1,I)     !
+          XT%POS(i)=XT%POS(i) + XT%XS%X(3)*XT%NODE%ENT(2,I)     !
+          XT%POS(i)=XT%POS(i) + XT%Ds*XT%NODE%PARENT_FIBRE%DIR*XT%NODE%ENT(3,I)     !
+       ENDDO
+       XT%pos(1:3) = XT%pos(1:3) + XT%NODE%A
+       ! computing global momentum
+       if(k%time) then
+          betinv=one/XT%NODE%PARENT_FIBRE%beta0
+       ELSE
+          betinv=one
+       ENDIF
+       P(1)=XT%XS%X(2)*XT%NODE%PARENT_FIBRE%mag%p%p0c
+       P(2)=XT%XS%X(4)*XT%NODE%PARENT_FIBRE%mag%p%p0c
+       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c* &
+            (one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-xt%pos(4)**2-xt%pos(5)**2
+       pz=root(pz)*XT%NODE%PARENT_FIBRE%DIR
+       P(3)=PZ
+       DO I=1,3
+          XT%POS(i+3)=XT%POS(i+3) + P(1)*XT%NODE%ENT(1,I)     !
+          XT%POS(i+3)=XT%POS(i+3) + P(2)*XT%NODE%ENT(2,I)     !
+          XT%POS(i+3)=XT%POS(i+3) + P(3)*XT%NODE%ENT(3,I)     !
+       ENDDO
+    else
+       write(6,*) " FILL_SURVEY_DATA_IN_NODE_LAYOUT "
+       write(6,*) " was not called, so no survey data on the nodes "
+       write(6,*) " program will stop inside TRACK_time "
+       stop
+
+    endif
+
+  end Subroutine ptc_global_x_p
+  !  type probe
+  !   real(dp) x(6)
+  !   type(spinor) s
+  !   logical u
+  !    type(integration_node),pointer :: lost_node
+  !  end type probe
+  !type TEMPORAL_PROBE
+  !    TYPE(probe)  XS
+  !    TYPE(INTEGRATION_NODE), POINTER :: NODE
+  !    real(DP)  DS,POS(6)
+  !END type TEMPORAL_PROBE
+
+  !type TEMPORAL_BEAM
+  !    TYPE(TEMPORAL_PROBE), pointer :: TP(:)
+  !    real(DP) a(3),ent(3,3),p0c,total_time
+  !    integer n
+  !    type(integration_node),pointer :: c   ! pointer close to a(3)
+  !END type TEMPORAL_BEAM
+
+  SUBROUTINE  alloc_temporal_beam(b,n,p0c) ! fibre i1 to i2
+    IMPLICIT NONE
+    type(temporal_beam), intent(inout):: b
+    integer i,n
+    real(dp) p0c
+
+
+    allocate(b%tp(n))
+    b%n=n
+    b%a=GLOBAL_origin
+    b%ent=global_frame
+    b%total_time=zero
+    b%p0c=p0c
+    nullify(b%c)
+
+    do i=1,n
+       call alloc(b%tp(i))
+    enddo
+
+  END SUBROUTINE  alloc_temporal_beam
+
+  SUBROUTINE  alloc_temporal_probe(p) ! fibre i1 to i2
+    IMPLICIT NONE
+    type(temporal_probe), intent(inout):: p
+    integer i
+
+    p%xs%u=my_false
+    p%xs%x=zero
+    p%xs%s%x=zero
+    p%ds=zero
+    p%pos=zero
+    nullify(p%node)
+    nullify(p%xs%lost_node)
+
+  end SUBROUTINE  alloc_temporal_probe
+
+  SUBROUTINE  position_temporal_beam(r,b,k) ! fibre i1 to i2
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    type(temporal_beam),intent(INOUT) ::  b
+    type(integration_node), pointer :: t,tw
+    integer i
+    real(dp) norm,d1,ds,p(3)
+    type(internal_state) :: k
+
+    norm=mybig
+    t=>r%t%start
+    b%c=>t
+    do i=1,r%t%n
+
+       if(t%cas==case0) then ! 1
+          d1=sqrt((t%a(1)-b%a(1))**2+(t%a(2)-b%a(2))**2+(t%a(3)-b%a(3))**2 )
+
+          if(d1<norm) then
+             norm=d1
+             b%c=>t
+          endif
+       endif ! 1
+       !     write(16,*) d1,t%parent_fibre%mag%name
+       !     write(16,*) t%a
+       !     write(16,*) b%a
+       t=>t%next
+    enddo
+
+    do i=1,b%n
+       b%tp(i)%pos(1:3)=zero
+       !      GEO_TRA(A,ENT,D,I)    ! A= A +I D*ENT     I=1,-1
+       call GEO_TRA(b%tp(i)%pos(1:3),b%ent,b%tp(i)%xs%x(1:3),1)
+       b%tp(i)%pos(1:3)=b%tp(i)%pos(1:3)+b%a
+
+       call locate_temporal_beam(r,b,tw,i,k)
+
+    enddo
+
+
+  end SUBROUTINE  position_temporal_beam
+
+  SUBROUTINE  locate_temporal_beam(r,b,tw,j,k) !
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    type(temporal_beam),intent(INOUT) ::  b
+    type(integration_node), pointer :: t,tw
+    type(internal_state) :: k
+    real(dp) a(3)
+    integer i,j
+    real(dp) norm,d1,ds,p(3),da(3),dal(3)
+
+    norm=mybig
+    t=> b%c
+    a=b%tp(j)%pos(1:3)
+    do i=1,r%t%n
+       if(t%cas==case0) then ! 1
+          d1=sqrt((t%a(1)-a(1))**2+(t%a(2)-a(2))**2+(t%a(3)-a(3))**2 )
+
+          if(d1<norm) then
+             norm=d1
+             tw=>t
+          endif
+       endif ! 1
+       t=>t%next
+    enddo
+
+    da=a-tw%a
+    call change_basis(DA,global_frame,dal,tw%ent)
+
+    if(tw%parent_fibre%dir>0) then
+
+       if(dal(3)<zero) then
+          tw=>tw%previous
+          do while(tw%cas/=case0)
+             tw=>tw%previous
+          enddo
+          da=a-tw%a
+          call change_basis(DA,global_frame,dal,tw%ent)
+       endif
+
+    else
+
+       if(dal(3)>zero) then
+          tw=>tw%previous
+          do while(tw%cas/=case0)
+             tw=>tw%previous
+          enddo
+          da=a-tw%a
+          call change_basis(DA,b%ent,dal,tw%ent)
+       endif
+    endif
+
+    p=dal
+    b%tp(j)%ds=p(3)
+    b%tp(j)%node=>tw
+
+    call original_p_to_ptc(b,j,p,tw,k)
+
+  end SUBROUTINE  locate_temporal_beam
+
+  SUBROUTINE original_p_to_ptc(b,j,p,tw,k) ! fibre i1 to i2
+    IMPLICIT NONE
+    type(temporal_beam),intent(INOUT) ::  b
+    TYPE(INTERNAL_STATE) K
+    type(integration_node),pointer :: tw
+    integer j
+    real(dp) dal(3),d1,betinv,p(3)
+
+    b%tp(j)%xs%x(4:6)=b%tp(j)%xs%x(4:6)*b%p0c/tw%parent_fibre%mag%p%p0c
+    !    call change_basis(b%tp(j)%xs%x(4:6),global_frame,da,b%ent)
+    call change_basis(b%tp(j)%xs%x(4:6),b%ent,dal,tw%ent)
+
+
+    d1=dal(1)**2+dal(2)**2+dal(3)**2
+    betinv=one/tw%parent_fibre%beta0
+
+    if(k%time) then
+
+       b%tp(j)%xs%x(5)=(d1-one)/ (sqrt(betinv**2-one +d1)+betinv)
+       b%tp(j)%xs%x(2)=dal(1)
+       b%tp(j)%xs%x(4)=dal(2)
+       b%tp(j)%xs%x(1)=p(1)
+       b%tp(j)%xs%x(3)=p(2)
+       b%tp(j)%xs%x(6)=b%total_time
+
+    else
+       b%tp(j)%xs%x(5)=sqrt(d1)-one
+       b%tp(j)%xs%x(2)=dal(1)
+       b%tp(j)%xs%x(4)=dal(2)
+       b%tp(j)%xs%x(1)=p(1)
+       b%tp(j)%xs%x(3)=p(2)
+       b%tp(j)%xs%x(6)=b%total_time
+    endif
+
+  end SUBROUTINE original_p_to_ptc
+
+  SUBROUTINE TRACK_temporaLbeam(b,dt,k) ! fibre i1 to i2
+    IMPLICIT NONE
+    type(temporal_beam),intent(INOUT) ::  b
+    TYPE(INTERNAL_STATE) K
+    real(dp) dt
+    integer i
+    !BEAM_IN_X(B,I)
+    !X_IN_BEAM(B,X,I,DL,T)
+
+    do i=1,b%n
+       if(b%tp(i)%xs%u) cycle
+       call TRACK_time(b%tp(i),DT,K)
+    enddo
+    !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
+  end SUBROUTINE TRACK_temporaLbeam
+
+
+
 
   SUBROUTINE TRACK_beam(r,b,k,t, fibre1,fibre2,node1,node2) ! fibre i1 to i2
     IMPLICIT NONE

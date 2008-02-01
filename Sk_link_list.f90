@@ -16,9 +16,9 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
   PRIVATE INDEX_0
-  private FIND_POS_in_universe,FIND_POS_in_layout
+  private FIND_POS_in_universe,FIND_POS_in_layout,super_dealloc_fibre
   TYPE(LAYOUT), PRIVATE, POINTER:: LC
-
+  logical :: superkill=.false.
   logical(lp),TARGET :: use_info=.false.
   integer, target :: nsize_info = 70
   private zero_fibre
@@ -35,6 +35,10 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE de_Set_Up_ORBIT_LATTICE
      MODULE PROCEDURE kill_BEAM_BEAM_NODE
   END INTERFACE
+
+  INTERFACE super_kill
+     MODULE PROCEDURE super_dealloc_fibre
+  end INTERFACE
 
   INTERFACE alloc
      !     MODULE PROCEDURE set_up
@@ -230,7 +234,7 @@ CONTAINS
 
     current%PARENT_LAYOUT=>L
     current%mag%PARENT_FIBRE=>current
-    current%magp%PARENT_FIBRE=>current
+    !    current%magp%PARENT_FIBRE=>current
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
@@ -268,7 +272,7 @@ CONTAINS
 
     current%PARENT_LAYOUT=>L
     current%mag%PARENT_FIBRE=>current
-    current%magp%PARENT_FIBRE=>current
+    !    current%magp%PARENT_FIBRE=>current
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
@@ -522,6 +526,7 @@ CONTAINS
     TYPE (layout), TARGET, intent(inout):: L
     !    type(fibre), pointer :: p
     logical(lp) doneit
+    TYPE(fibre_appearance), POINTER :: D
     !    nullify(p);
     CALL LINE_L(L,doneit)
     L%N=L%N+1
@@ -579,6 +584,21 @@ CONTAINS
     L%LAST=>CURRENT;
     CALL RING_L(L,doneit)
 
+    IF(.NOT.ASSOCIATED(CURRENT%MAG%DOKO)) THEN
+       ALLOCATE(CURRENT%MAG%DOKO)
+       NULLIFY(CURRENT%MAG%DOKO%NEXT)
+       CURRENT%MAG%DOKO%PARENT_FIBRE=>CURRENT
+    ELSE
+       D=>CURRENT%MAG%DOKO
+       DO WHILE(ASSOCIATED(D%NEXT))
+          D=>D%NEXT
+       ENDDO
+       ALLOCATE(D%NEXT)
+       D=>D%NEXT
+       D%PARENT_FIBRE=>CURRENT
+       NULLIFY(D%NEXT)
+    ENDIF
+
   END SUBROUTINE APPEND_POINT
 
 
@@ -605,6 +625,28 @@ CONTAINS
     L%LAST=>CURRENT;
     current%parent_layout=>L
   END SUBROUTINE append_EMPTY_FIBRE
+
+  SUBROUTINE append_NOT_SO_EMPTY_FIBRE( L )  ! Creates an empty fibre to be filled later
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), TARGET, intent(inout):: L
+    L%N=L%N+1
+    CALL ALLOC(Current)
+    if(L%N==1) current%next=> L%start
+    Current % previous => L % end  ! point it to next fibre
+    if(L%N>1)  THEN
+       L%end%next => current      !
+    ENDIF
+
+    L % end => Current
+    if(L%N==1) L%start=> Current
+    if(.not.associated(current%pos)) allocate(current%pos)
+    current%pos=l%n
+
+    L%LASTPOS=L%N ;
+    L%LAST=>CURRENT;
+    current%parent_layout=>L
+  END SUBROUTINE append_NOT_SO_EMPTY_FIBRE
 
   SUBROUTINE NULL_FIBRE(CURRENT)  ! nullifies fibre content
     implicit none
@@ -652,6 +694,10 @@ CONTAINS
     ALLOCATE(Current%GAMBET);
     ALLOCATE(Current%MASS);
     ALLOCATE(Current%CHARGE);
+    if(use_info) then
+       allocate(Current%i)
+       call alloc(Current%i)
+    endif
 
   END SUBROUTINE ALLOCATE_DATA_FIBRE
 
@@ -660,10 +706,6 @@ CONTAINS
     type(fibre),pointer:: c
     CALL ALLOCATE_FIBRE(C)
     CALL ALLOCATE_DATA_FIBRE(C)
-    if(use_info) then
-       allocate(c%i)
-       call alloc(c%i)
-    endif
     c%DIR=1
     !    C%P0C = ONE
     C%BETA0 = ONE
@@ -702,7 +744,7 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
-       IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT)) THEN    ! ORDINARY
+       IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT).or.superkill) THEN    ! ORDINARY
           IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
              c%mag=-1;
              deallocate(c%mag);
@@ -757,6 +799,9 @@ CONTAINS
           deallocate(C%T1);
           deallocate(C%T2);
        ENDIF
+       IF(ASSOCIATED(c%pos)) THEN
+          deallocate(c%pos);
+       ENDIF
 
        IF(ASSOCIATED(C%TM)) deallocate(C%TM);
 
@@ -793,62 +838,54 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
-       IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
-          c%mag=-1;
-          deallocate(c%mag);
-       ENDIF
-       IF(ASSOCIATED(c%magP)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
-          c%magp=-1;
-          deallocate(c%magP);
-       ENDIF
-       IF(ASSOCIATED(c%CHART)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_CHART))) THEN
-          C%CHART=-1
-          deallocate(c%CHART);
-       ENDIF
-       IF(ASSOCIATED(c%PATCH)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_PATCH))) THEN
-          C%PATCH=-1
-          deallocate(c%PATCH);
-       ENDIF
-       IF(ASSOCIATED(c%CHART)) then
-          C%CHART=-1
-          deallocate(c%CHART);
-       ENDIF
-       IF(ASSOCIATED(c%PATCH)) then
-          C%PATCH=-1
-          deallocate(c%PATCH);
-       ENDIF
-
-
-       IF(ASSOCIATED(c%DIR)) THEN
-          deallocate(c%DIR);
-       ENDIF
-       !       IF(ASSOCIATED(c%P0C)) THEN
-       !          deallocate(c%P0C);
+       !       IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+       c%mag=-1;
+       deallocate(c%mag);
+       !      ENDIF
+       !      IF(ASSOCIATED(c%magP)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+       c%magp=-1;
+       deallocate(c%magP);
        !       ENDIF
-       IF(ASSOCIATED(c%BETA0)) THEN
-          deallocate(c%BETA0);
-       ENDIF
-       IF(ASSOCIATED(c%GAMMA0I)) THEN
-          deallocate(c%GAMMA0I);
-       ENDIF
-       IF(ASSOCIATED(c%GAMBET)) THEN
-          deallocate(c%GAMBET);
-       ENDIF
-       IF(ASSOCIATED(c%MASS)) THEN
-          deallocate(c%MASS);
-       ENDIF
-       IF(ASSOCIATED(c%CHARGE)) THEN
-          deallocate(c%CHARGE);
-       ENDIF
+       !       IF(ASSOCIATED(c%CHART)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_CHART))) THEN
+       C%CHART=-1
+       deallocate(c%CHART);
+       !       ENDIF
+       !       IF(ASSOCIATED(c%PATCH)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_PATCH))) THEN
+       C%PATCH=-1
+       deallocate(c%PATCH);
+       !       ENDIF
+
+
+       !      IF(ASSOCIATED(c%DIR)) THEN
+       deallocate(c%DIR);
+       !      ENDIF
+       !      IF(ASSOCIATED(c%BETA0)) THEN
+       deallocate(c%BETA0);
+       !      ENDIF
+       !      IF(ASSOCIATED(c%GAMMA0I)) THEN
+       deallocate(c%GAMMA0I);
+       !      ENDIF
+       !      IF(ASSOCIATED(c%GAMBET)) THEN
+       deallocate(c%GAMBET);
+       !      ENDIF
+       !      IF(ASSOCIATED(c%MASS)) THEN
+       deallocate(c%MASS);
+       !      ENDIF
+       !      IF(ASSOCIATED(c%CHARGE)) THEN
+       deallocate(c%CHARGE);
+       !      ENDIF
        IF(ASSOCIATED(C%T1)) THEN
           deallocate(C%T1);
           deallocate(C%T2);
           deallocate(C%TM);
        ENDIF
-       IF(ASSOCIATED(c%i).and.use_info) THEN
+       IF(ASSOCIATED(c%i)) THEN
           call kill(c%i);
           deallocate(c%i);
        ENDIF
+       !      IF(ASSOCIATED(c%pos)) THEN
+       deallocate(c%pos);
+       !      ENDIF
 
     else
        w_p=0
@@ -870,6 +907,15 @@ CONTAINS
        deallocate(c);
     ENDIF
   end SUBROUTINE dealloc_fibre
+
+  SUBROUTINE super_dealloc_fibre( c ) ! destroys internal data  if it is not pointing (i.e. not a parent)
+    implicit none
+    type(fibre),pointer :: c
+    IF(ASSOCIATED(C)) THEN
+       CALL super_zero_fibre(c,-1)
+       deallocate(c);
+    ENDIF
+  end SUBROUTINE super_dealloc_fibre
 
   !  MORE FUNNY APPENDING
   SUBROUTINE APPEND_FLAT( L, el, NAME )  ! points unless called "name" in which case it clones
@@ -936,7 +982,7 @@ CONTAINS
     INTEGER  DIR
     REAL(DP)   PREC
     INTEGER A_YZ,A_XZ
-    LOGICAL(LP)  DISCRETE
+    LOGICAL(LP)  DISCRETE,ene
     INTEGER I,PATCH_NEEDED
     REAL(DP) NORM,pix(3)
 
@@ -1037,6 +1083,12 @@ CONTAINS
        PATCH_NEEDED=PATCH_NEEDED-1000
     endif
 
+    norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
+    ene=(norm>prec)
+
+    if(ene) then
+       PATCH_NEEDED=PATCH_NEEDED+100
+    endif
 
   END SUBROUTINE CHECK_NEED_PATCH
 
@@ -1138,6 +1190,10 @@ CONTAINS
              PATCH_NEEDED=1
           ENDIF
        ENDIF
+       if(PRESENT(PREC)) then
+          norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
+          ene=ene.and.(norm>prec)
+       endif
 
        IF(DIR==1) THEN
 
@@ -1152,6 +1208,7 @@ CONTAINS
              EL2%PATCH%PATCH=3*PATCH_NEEDED
           END SELECT
           IF(ENE) THEN
+
              SELECT CASE(EL2%PATCH%ENERGY)
              CASE(0,1)
                 EL2%PATCH%ENERGY=1

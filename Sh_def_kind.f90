@@ -134,7 +134,7 @@ MODULE S_DEF_KIND
   ! stochastic radiation in straigth
   PRIVATE computeR_f4,computeP_f4,ZEROR_HE22,ZEROP_HE22
   PRIVATE DRIFTR_HE,DRIFTP_HE
-  PRIVATE KICKR_HE,KICKP_HE
+  PRIVATE KICKR_HE,KICKP_HE,KICK_HE
   PRIVATE KICKPATHR_HE,KICKPATHP_HE
   PRIVATE INTR_HE,INTP_HE,INTR_HE_TOT,INTP_HE_TOT
 
@@ -696,7 +696,7 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE DRIFTP_HE
   END INTERFACE
 
-  INTERFACE KICK
+  INTERFACE KICK_HE
      MODULE PROCEDURE KICKR_HE
      MODULE PROCEDURE KICKP_HE
   END INTERFACE
@@ -1393,7 +1393,8 @@ contains
 
        do ko=1,el%nf
 
-          x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*x(6)+EL%PHAS+EL%phase0)/EL%P%P0C
+          x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*x(6)+EL%PHAS+EL%PH(KO) &
+               +EL%phase0)/EL%P%P0C
           ! doing crabola
 
           X1=X(1)
@@ -1416,8 +1417,8 @@ contains
 
           ! multipole * cos(omega t+ phi)/p0c
 
-          X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
-          X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+          X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+          X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
           IF(EL%P%NMUL>=1) THEN
              BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1436,7 +1437,7 @@ contains
              BBYTW=zero
              BBXTW=zero
           ENDIF
-          X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
+          X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        enddo
     endif
@@ -1465,7 +1466,8 @@ contains
 
     do ko=1,el%nf
 
-       x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*x(6)+EL%PHAS+EL%phase0)/EL%P%P0C
+       x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*x(6)+EL%PHAS+ &
+            EL%PH(KO)+EL%phase0)/EL%P%P0C
        ! doing crabola
 
        X1=X(1)
@@ -1488,8 +1490,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
-       X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+       X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1508,7 +1510,7 @@ contains
           BBYTW=zero
           BBXTW=zero
        ENDIF
-       X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
+       X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo
 
@@ -1625,12 +1627,12 @@ contains
        !    EL%DELTA_E=x(5)
 
        IF(EL%N_BESSEL>0) THEN
-          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%phase0)/(ko*O)
-          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%phase0)/(ko*O)
+          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
        ENDIF
 
 
-       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*x(6)+EL%PHAS+EL%phase0)
+       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
 
        ! doing crabola
@@ -1656,8 +1658,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
-       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1677,8 +1679,7 @@ contains
           BBXTW=zero
        ENDIF
 
-       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
-
+       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
     enddo    ! over modes
 
 
@@ -1720,12 +1721,12 @@ contains
        !    EL%DELTA_E=x(5)
 
        IF(EL%N_BESSEL>0) THEN
-          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%phase0)/(ko*O)
-          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%phase0)/(ko*O)
+          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
        ENDIF
 
 
-       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*x(6)+EL%PHAS+EL%phase0)
+       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
 
        ! doing crabola
@@ -1751,8 +1752,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
-       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%phase0)
+       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1772,7 +1773,7 @@ contains
           BBXTW=zero
        ENDIF
 
-       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
+       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo    ! over modes
     CALL kill(DF,R2,F,DR2,O,VL)
@@ -11585,6 +11586,9 @@ contains
        if(ASSOCIATED(EL%F)) then
           deallocate(EL%F)
        endif
+       if(ASSOCIATED(EL%PH)) then
+          deallocate(EL%PH)
+       endif
        if(ASSOCIATED(EL%CAVITY_TOTALPATH)) then
           deallocate(EL%CAVITY_TOTALPATH)
        endif
@@ -11598,6 +11602,7 @@ contains
        NULLIFY(EL%N_BESSEL)
        NULLIFY(EL%NF)
        NULLIFY(EL%F)
+       NULLIFY(EL%PH)
     endif
 
   END SUBROUTINE ZEROR_CAV4
@@ -11621,6 +11626,10 @@ contains
           CALL KILL(EL%F,EL%NF)
           deallocate(EL%F)
        endif
+       if(ASSOCIATED(EL%PH)) then
+          CALL KILL(EL%PH,EL%NF)
+          deallocate(EL%PH)
+       endif
        if(ASSOCIATED(EL%NF)) then
           deallocate(EL%NF)
        endif
@@ -11631,6 +11640,7 @@ contains
        NULLIFY(EL%N_BESSEL)
        NULLIFY(EL%NF)
        NULLIFY(EL%F)
+       NULLIFY(EL%PH)
     endif
 
   END SUBROUTINE ZEROP_CAV4
@@ -13484,7 +13494,7 @@ contains
        CALL DRIFT(EL,DH,Z,1,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
        CALL KICKPATH(EL,DH,X,K)
-       CALL KICK(EL,D,Z,X,K)
+       CALL KICK_HE(EL,D,Z,X,K)
        CALL KICKPATH(EL,DH,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
        CALL DRIFT(EL,DH,Z,1,X,K)
@@ -13507,7 +13517,7 @@ contains
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL KICKPATH(EL,D1,X,K)
-       CALL KICK(EL,DK1,Z,X,K)
+       CALL KICK_HE(EL,DK1,Z,X,K)
        CALL KICKPATH(EL,D1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
@@ -13515,7 +13525,7 @@ contains
        CALL DRIFT(EL,D2,Z,1,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
        CALL KICKPATH(EL,D2,X,K)
-       CALL KICK(EL,DK2,Z,X,K)
+       CALL KICK_HE(EL,DK2,Z,X,K)
        CALL KICKPATH(EL,D2,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
        CALL DRIFT(EL,D2,Z,1,X,K)
@@ -13523,7 +13533,7 @@ contains
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL KICKPATH(EL,D1,X,K)
-       CALL KICK(EL,DK1,Z,X,K)
+       CALL KICK_HE(EL,DK1,Z,X,K)
        CALL KICKPATH(EL,D1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
@@ -13544,7 +13554,7 @@ contains
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
-          CALL KICK(EL,DK(J),Z,X,K)
+          CALL KICK_HE(EL,DK(J),Z,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
@@ -13555,7 +13565,7 @@ contains
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
-          CALL KICK(EL,DK(J),Z,X,K)
+          CALL KICK_HE(EL,DK(J),Z,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
@@ -13601,7 +13611,7 @@ contains
        CALL DRIFT(EL,DH,Z,1,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
        CALL KICKPATH(EL,DH,X,K)
-       CALL KICK(EL,D,Z,X,K)
+       CALL KICK_HE(EL,D,Z,X,K)
        CALL KICKPATH(EL,DH,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
        CALL DRIFT(EL,DH,Z,1,X,K)
@@ -13624,7 +13634,7 @@ contains
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL KICKPATH(EL,D1,X,K)
-       CALL KICK(EL,DK1,Z,X,K)
+       CALL KICK_HE(EL,DK1,Z,X,K)
        CALL KICKPATH(EL,D1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
@@ -13632,7 +13642,7 @@ contains
        CALL DRIFT(EL,D2,Z,1,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
        CALL KICKPATH(EL,D2,X,K)
-       CALL KICK(EL,DK2,Z,X,K)
+       CALL KICK_HE(EL,DK2,Z,X,K)
        CALL KICKPATH(EL,D2,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
        CALL DRIFT(EL,D2,Z,1,X,K)
@@ -13640,7 +13650,7 @@ contains
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL KICKPATH(EL,D1,X,K)
-       CALL KICK(EL,DK1,Z,X,K)
+       CALL KICK_HE(EL,DK1,Z,X,K)
        CALL KICKPATH(EL,D1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
@@ -13661,7 +13671,7 @@ contains
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
-          CALL KICK(EL,DK(J),Z,X,K)
+          CALL KICK_HE(EL,DK(J),Z,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
@@ -13672,7 +13682,7 @@ contains
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
-          CALL KICK(EL,DK(J),Z,X,K)
+          CALL KICK_HE(EL,DK(J),Z,X,K)
           CALL KICKPATH(EL,DF(J),X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)

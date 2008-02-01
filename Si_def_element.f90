@@ -1009,6 +1009,7 @@ CONTAINS
        ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
        ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
        ALLOCATE(EL%C4%F(N_CAV4_F));EL%C4%F=ZERO;EL%C4%F(1)=ONE;
+       ALLOCATE(EL%C4%PH(N_CAV4_F));EL%C4%PH=ZERO;
 
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
@@ -1444,6 +1445,7 @@ CONTAINS
        ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
        ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
        ALLOCATE(EL%C4%F(N_CAV4_F));CALL ALLOC(EL%C4%F,N_CAV4_F);EL%C4%F(1)=ONE;
+       ALLOCATE(EL%C4%PH(N_CAV4_F));CALL ALLOC(EL%C4%PH,N_CAV4_F);
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
           ALLOCATE(EL%CAV21)
@@ -2203,7 +2205,10 @@ CONTAINS
     nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%siamese);
-    nullify(EL%PARENT_FIBRE);
+    nullify(EL%girder);
+    nullify(EL%SIAMESE_FRAME);
+    nullify(EL%girder_FRAME);
+    nullify(EL%doko);
   end SUBROUTINE null_EL
 
   SUBROUTINE null_ELp(EL)
@@ -2248,8 +2253,7 @@ CONTAINS
     nullify(EL%WI);
     nullify(EL%PA);
     nullify(EL%P);
-    nullify(EL%PARENT_FIBRE);
-    nullify(EL%siamese);
+    !    nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_ELp
 
 
@@ -2260,7 +2264,6 @@ CONTAINS
     INTEGER, INTENT(IN)::I
 
     IF(I==-1) THEN
-
        DEALLOCATE(EL%KIND);
        DEALLOCATE(EL%PLOT);
        DEALLOCATE(EL%recut);
@@ -2269,7 +2272,7 @@ CONTAINS
        DEALLOCATE(EL%L);
        DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
        call kill(EL%P)    ! AIMIN MS 4.0
-       IF(ASSOCIATED(EL%PERMFRINGE)) DEALLOCATE(EL%PERMFRINGE);
+       DEALLOCATE(EL%PERMFRINGE);
        !       IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
        !       IF(ASSOCIATED(EL%D)) DEALLOCATE(EL%D)
        IF(ASSOCIATED(EL%AN)) DEALLOCATE(EL%AN)
@@ -2370,7 +2373,19 @@ CONTAINS
        IF(ASSOCIATED(EL%PARENT_FIBRE))        then
           nullify(EL%PARENT_FIBRE)
        ENDIF
+       IF(ASSOCIATED(EL%DOKO))        then
+          nullify(EL%DOKO)
+       ENDIF
        nullify(EL%siamese);
+       nullify(EL%girder);
+       IF(ASSOCIATED(EL%SIAMESE_FRAME))        then
+          call kill_af(EL%SIAMESE_FRAME)
+          DEALLOCATE(EL%SIAMESE_FRAME)
+       ENDIF
+       IF(ASSOCIATED(EL%girder_FRAME))        then
+          call kill_af(EL%girder_FRAME)
+          DEALLOCATE(EL%girder_FRAME)
+       ENDIF
 
 
     elseif(I>=0)       then
@@ -2539,10 +2554,9 @@ CONTAINS
           DEALLOCATE(EL%WI)
        ENDIF
 
-       IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-          nullify(EL%PARENT_FIBRE)
-       ENDIF
-       nullify(EL%siamese);
+       !       IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+       !          nullify(EL%PARENT_FIBRE)
+       !       ENDIF
 
 
        DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);
@@ -2639,7 +2653,8 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
-    if(associated(el%siamese)) elp%siamese=>el%siamese
+    !    if(associated(el%siamese)) elp%siamese=>el%siamese
+    !    if(associated(el%girder)) elp%girder=>el%girder
 
 
     IF(EL%P%NMUL>0) THEN
@@ -2720,6 +2735,7 @@ CONTAINS
        ELP%C4%phase0 = EL%C4%phase0
        DO I=1,EL%C4%NF
           ELP%C4%F(I)=EL%C4%F(I)
+          ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
     ENDIF
 
@@ -2857,9 +2873,9 @@ CONTAINS
        CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
-    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
-    ENDIF
+    !    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+    !       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
+    !    ENDIF
 
 
   END SUBROUTINE copy_el_elp
@@ -2874,7 +2890,8 @@ CONTAINS
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
     INTEGER I,J,k,l
 
-    if(associated(el%siamese)) elp%siamese=>el%siamese
+    !    if(associated(el%siamese)) elp%siamese=>el%siamese
+    !    if(associated(el%girder)) elp%girder=>el%girder
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
     ELP%vorname=EL%vorname
@@ -2959,6 +2976,7 @@ CONTAINS
        ELP%C4%phase0 = EL%C4%phase0
        DO I=1,EL%C4%NF
           ELP%C4%F(I)=EL%C4%F(I)
+          ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
     ENDIF
 
@@ -3092,9 +3110,9 @@ CONTAINS
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
-    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
-    ENDIF
+    !    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+    !       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
+    !    ENDIF
 
 
   END SUBROUTINE copy_elp_el
@@ -3108,7 +3126,8 @@ CONTAINS
     INTEGER I,J,k,l
 
 
-    if(associated(el%siamese)) elp%siamese=>el%siamese
+    !    if(associated(el%siamese)) elp%siamese=>el%siamese
+    !    if(associated(el%girder)) elp%girder=>el%girder
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
     ELP%vorname=EL%vorname
@@ -3197,6 +3216,7 @@ CONTAINS
        ELP%C4%phase0 = EL%C4%phase0
        DO I=1,EL%C4%NF
           ELP%C4%F(I)=EL%C4%F(I)
+          ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
     ENDIF
 
@@ -3332,9 +3352,9 @@ CONTAINS
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
-    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
-    ENDIF
+    !    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+    !       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
+    !    ENDIF
 
 
   END SUBROUTINE copy_el_el
@@ -3367,6 +3387,7 @@ CONTAINS
        CALL resetpoly_R31(ELP%PHAS )
        DO I=1,ELP%C4%NF
           CALL resetpoly_R31(ELP%C4%F(I))
+          CALL resetpoly_R31(ELP%C4%PH(I))
        ENDDO
 
        !      CALL resetpoly_R31(ELP%P0C )

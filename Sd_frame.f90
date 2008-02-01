@@ -83,6 +83,63 @@ CONTAINS
 
   end subroutine alloc_f
 
+  SUBROUTINE  NULL_af(p)
+    implicit none
+    type (affine_frame), pointer:: P
+    nullify(P%ANGLE);nullify(P%D);
+    nullify(P%A);nullify(P%ENT);
+    nullify(P%b);nullify(P%EXI);
+  end subroutine NULL_af
+
+  SUBROUTINE  NULL_gs(gs)
+    implicit none
+    integer i
+    type (girder_siamese) :: gs(:)
+    do i=1,size(gs)
+       nullify(gs(i)%mag)
+    enddo
+  end subroutine NULL_gs
+
+  SUBROUTINE  alloc_af(p,girder)
+    implicit none
+    type (affine_frame), pointer:: P
+    logical(lp), optional :: girder
+    logical(lp) gird
+    gird=.false.
+    if(present(girder)) gird=girder
+
+    nullify(p)
+    allocate(p)
+    CALL NULL_af(p)
+    if(gird) then
+       ALLOCATE(P%A(3));ALLOCATE(P%ENT(3,3));
+       ALLOCATE(P%B(3));ALLOCATE(P%EXI(3,3));
+       P%a=global_origin
+       P%ENT=global_FRAME
+       P%B=global_origin
+       P%EXI=global_FRAME
+    else
+       ALLOCATE(P%ANGLE(3));ALLOCATE(P%D(3));
+       P%D=ZERO
+       P%ANGLE=ZERO
+    endif
+
+  end subroutine alloc_af
+
+  SUBROUTINE  kill_af(p)
+    implicit none
+    type (affine_frame), pointer:: P
+
+    if(associated(p%D)) DEALLOCATE(P%D);
+    if(associated(p%ANGLE)) DEALLOCATE(P%ANGLE);
+    if(associated(p%a)) DEALLOCATE(P%A);
+    if(associated(p%a)) DEALLOCATE(P%A);
+    if(associated(p%ENT)) DEALLOCATE(P%ENT);
+    if(associated(p%B)) DEALLOCATE(P%B);
+    if(associated(p%EXI)) DEALLOCATE(P%EXI);
+
+  end subroutine kill_af
+
   SUBROUTINE  dealloc_f(p)
     implicit none
     type (MAGNET_frame), pointer:: P
@@ -772,10 +829,20 @@ CONTAINS
     D=B-A;   CALL CHANGE_BASIS(D,GLOBAL_FRAME,D,EXI);
 
 
-
   END SUBROUTINE FIND_PATCH_B
 
+  SUBROUTINE INVERSE_FIND_PATCH(A,ENT,D,ANG,B,EXI)
+    IMPLICIT NONE
+    REAL(DP), INTENT(INOUT):: ENT(3,3),EXI(3,3)
+    REAL(DP), INTENT(INOUT):: A(3),B(3),D(3),ANG(3)
+    REAL(DP) DD(3)
 
+    EXI=ENT
+    CALL GEO_ROTA_no_vec(EXI,ANG,1,basis=ENT)
+    CALL CHANGE_BASIS(D,EXI,DD,GLOBAL_FRAME)
+    B=A+DD
+
+  END SUBROUTINE INVERSE_FIND_PATCH
 
 
 end module S_FRAME

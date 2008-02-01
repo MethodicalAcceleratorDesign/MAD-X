@@ -1076,15 +1076,16 @@ CONTAINS
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN):: YL
     TYPE(INTEGRATION_NODE), pointer :: T
-    TYPE(magnet_chart), pointer :: p
+    !    TYPE(magnet_chart), pointer :: p
+    !    TYPE(magnet_chart), pointer :: p
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    P=>T%PARENT_FIBRE%MAG%P
+    !    P=>T%PARENT_FIBRE%MAG%P
 
     IF(k%TIME) then
-       B=P%BETA0
+       B=T%PARENT_FIBRE%BETA0
     ELSE
        B=one
     ENDIF

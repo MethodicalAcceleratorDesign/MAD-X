@@ -291,8 +291,15 @@ module definition
   type TEMPORAL_PROBE
      TYPE(probe)  XS
      TYPE(INTEGRATION_NODE), POINTER :: NODE
-     real(DP)  DS
+     real(DP)  DS,POS(6)
   END type TEMPORAL_PROBE
+
+  type TEMPORAL_BEAM
+     TYPE(TEMPORAL_PROBE), pointer :: TP(:)
+     real(DP) a(3),ent(3,3),p0c,total_time
+     integer n
+     type(integration_node),pointer :: c   ! pointer close to a(3)
+  END type TEMPORAL_BEAM
 
 
 

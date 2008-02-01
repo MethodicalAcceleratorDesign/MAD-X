@@ -14,7 +14,7 @@ MODULE S_FAMILY
   PRIVATE COPY_LAYOUT_IJ,PUT_APERTURE_FIB,REMOVE_APERTURE_FIB
   private copy_fibre
   ! old Sj_elements
-  PRIVATE SURVEY_mag
+  PRIVATE SURVEY_mag  !,TRANSLATE_magnet,rot_magnet
   !END old Sj_elements
 
   INTERFACE EL_TO_ELP
@@ -105,6 +105,7 @@ MODULE S_FAMILY
      MODULE PROCEDURE TRANSLATE_layout
      MODULE PROCEDURE TRANSLATE_fibre
      MODULE PROCEDURE TRANSLATE_frame
+     MODULE PROCEDURE TRANSLATE_magnet   !element input
   END  INTERFACE
 
   INTERFACE ROTATE
@@ -112,6 +113,7 @@ MODULE S_FAMILY
      MODULE PROCEDURE ROTATE_LAYOUT
      MODULE PROCEDURE ROTATE_FIBRE
      MODULE PROCEDURE ROTATE_FRAME
+     MODULE PROCEDURE rotate_magnet
   END  INTERFACE
 
   INTERFACE ROTATION
@@ -491,6 +493,64 @@ CONTAINS
 
   END SUBROUTINE  MISALIGN_FIBRE_EQUAL
 
+  SUBROUTINE  FIND_AFFINE_SIAMESE(S2,CN,FOUND) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
+    TYPE(AFFINE_FRAME),POINTER :: AF
+    TYPE(ELEMENT), POINTER :: C,CN
+    INTEGER K
+    LOGICAL(LP),INTENT(INOUT)::FOUND
+
+    NULLIFY(AF)
+    NULLIFY(CN)
+
+
+    FOUND=MY_FALSE
+    K=0
+
+    IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%SIAMESE
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          CN=>CN%SIAMESE
+          IF(ASSOCIATED(CN%SIAMESE_FRAME)) THEN
+             AF=>CN%SIAMESE_FRAME
+             FOUND=MY_TRUE
+             EXIT
+          ENDIF
+          k=k+1
+          IF(K>10000)THEN
+             WRITE(6,*) " TOO MANY IN SIAMESE "
+             STOP 666
+          ENDIF
+       ENDDO
+    ENDIF
+
+  END SUBROUTINE  FIND_AFFINE_SIAMESE
+
+  SUBROUTINE FIND_FRAME_SIAMESE(MAG,B,EXI,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    TYPE(ELEMENT), POINTER :: MAG
+    REAL(DP), INTENT(INOUT) :: B(3),EXI(3,3)
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
+    LOGICAL(LP) ADDIN
+
+    ADDIN=.FALSE.
+
+    IF(PRESENT(ADD)) ADDIN=ADD
+
+    IF(ADDIN) THEN
+       CALL INVERSE_FIND_PATCH(mag%p%F%a,mag%p%F%ENT, &
+            mag%SIAMESE_FRAME%D,mag%SIAMESE_FRAME%ANGLE,B,EXI)
+    ELSE
+       CALL INVERSE_FIND_PATCH(mag%PARENT_FIBRE%CHART%F%a,mag%PARENT_FIBRE%CHART%F%ENT, &
+            mag%SIAMESE_FRAME%D,mag%SIAMESE_FRAME%ANGLE,B,EXI)
+    ENDIF
+
+  END SUBROUTINE FIND_FRAME_SIAMESE
+
   SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed
     IMPLICIT NONE
@@ -500,24 +560,38 @@ CONTAINS
     TYPE(ELEMENT), POINTER :: C,CN
     TYPE(fibre), POINTER :: P
     integer k
-    REAL(DP) OMEGAT(3),BASIST(3,3)
+    REAL(DP) OMEGAT(3),BASIST(3,3),B(3),EXI(3,3)
     LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
     LOGICAL(LP) ADDIN
+    TYPE(AFFINE_FRAME),POINTER :: AF
+    LOGICAL(LP) FOUND
+    !    REAL(DP) D(3),ANG(3)
 
+    FOUND=.FALSE.
     ADDIN=.FALSE.
+    CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)  ! Looking for siamese
+    IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD)
+
     IF(PRESENT(ADD)) ADDIN=ADD
 
-    IF(PRESENT(OMEGA)) THEN
+    IF(PRESENT(OMEGA)) THEN    ! Arbitrary Origin
        OMEGAT=OMEGA
     ELSE
-       OMEGAT=S2%CHART%F%O
-    ENDIF
-    IF(PRESENT(BASIS)) THEN
-       BASIST=BASIS
-    ELSE
-       BASIST=S2%CHART%F%MID
+       OMEGAT=S2%CHART%F%O   ! Centre of magnet otherwise
     ENDIF
 
+    IF(PRESENT(BASIS)) THEN      ! Arbitrary Basis
+       BASIST=BASIS
+    ELSE
+       BASIST=S2%CHART%F%MID  ! Centre of Magnet Otherwise
+    ENDIF
+
+    IF((.NOT.PRESENT(OMEGA)).AND.(.NOT.PRESENT(BASIS))) THEN
+       IF(FOUND) THEN   ! If no special basis and no special origin
+          OMEGAT=B         ! and siamese is found, then it uses the siamese basis
+          BASIST=EXI        ! Notice that if ADD=true, the siamese frames move with the magnets
+       ENDIF
+    ENDIF
 
     CALL MISALIGN_FIBRE(S2,S1,OMEGAT,BASIST,ADD=ADDIN)
     k=1
@@ -532,9 +606,143 @@ CONTAINS
           k=k+1
        ENDDO
     ENDIF
-
+    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
     write(6,*) k, " magnet misaligned "
   END SUBROUTINE  MISALIGN_SIAMESE
+
+  SUBROUTINE  FIND_AFFINE_GIRDER(S2,CN,FOUND) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
+    TYPE(AFFINE_FRAME),POINTER :: AF
+    TYPE(ELEMENT), POINTER :: C,CN
+    INTEGER K
+    LOGICAL(LP),INTENT(INOUT)::FOUND
+
+    NULLIFY(AF)
+    NULLIFY(CN)
+
+
+    FOUND=MY_FALSE
+    K=0
+
+    IF(ASSOCIATED(S2%MAG%GIRDER)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%GIRDER
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          CN=>CN%GIRDER
+          IF(ASSOCIATED(CN%GIRDER_FRAME)) THEN
+             AF=>CN%GIRDER_FRAME
+             FOUND=MY_TRUE
+             EXIT
+          ENDIF
+          k=k+1
+          IF(K>10000)THEN
+             WRITE(6,*) " TOO MANY IN GIRDER "
+             STOP 666
+          ENDIF
+       ENDDO
+    ENDIF
+
+  END SUBROUTINE  FIND_AFFINE_GIRDER
+
+  SUBROUTINE FIND_FRAME_GIRDER(MAG,B,EXI,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    TYPE(ELEMENT), POINTER :: MAG
+    REAL(DP), INTENT(INOUT) :: B(3),EXI(3,3)
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
+    LOGICAL(LP) ADDIN
+
+    ADDIN=.FALSE.
+
+    IF(PRESENT(ADD)) ADDIN=ADD
+
+    IF(.NOT.ADDIN) THEN
+       mag%GIRDER_FRAME%EXI=mag%GIRDER_FRAME%ENT
+       mag%GIRDER_FRAME%B=mag%GIRDER_FRAME%A
+    ENDIF
+    EXI=mag%GIRDER_FRAME%EXI
+    B=mag%GIRDER_FRAME%B
+
+  END SUBROUTINE FIND_FRAME_GIRDER
+
+
+  SUBROUTINE  MISALIGN_GIRDER(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+    ! changed
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN):: S1(6)
+    REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
+    TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
+    TYPE(ELEMENT), POINTER :: C,CN,CAF
+    TYPE(fibre), POINTER :: P
+    integer k
+    REAL(DP) OMEGAT(3),BASIST(3,3),B(3),EXI(3,3),T_GLOBAL(3)
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
+    LOGICAL(LP) ADDIN
+    TYPE(AFFINE_FRAME),POINTER :: AF
+    LOGICAL(LP) FOUND
+    !    REAL(DP) D(3),ANG(3)
+    TYPE(MAGNET_FRAME), POINTER :: F
+
+    FOUND=.FALSE.
+    ADDIN=.FALSE.
+    CALL FIND_AFFINE_GIRDER(S2,CAF,FOUND)
+    IF(FOUND) CALL FIND_FRAME_GIRDER(CAF,B,EXI,ADD)
+
+    IF(PRESENT(ADD)) ADDIN=ADD
+
+    IF(PRESENT(OMEGA)) THEN
+       OMEGAT=OMEGA
+    ELSE
+       OMEGAT=S2%CHART%F%O
+    ENDIF
+
+    IF(PRESENT(BASIS)) THEN
+       BASIST=BASIS
+    ELSE
+       BASIST=S2%CHART%F%MID
+    ENDIF
+
+    IF((.NOT.PRESENT(OMEGA)).AND.(.NOT.PRESENT(BASIS))) THEN
+       IF(FOUND) THEN
+          OMEGAT=B
+          BASIST=EXI
+       ENDIF
+    ENDIF
+
+
+    CALL MISALIGN_FIBRE(S2,S1,OMEGAT,BASIST,ADD=ADDIN)
+    k=1
+
+    IF(ASSOCIATED(S2%MAG%GIRDER)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%GIRDER
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          P=>CN%PARENT_FIBRE
+          CALL MISALIGN_FIBRE(P,S1,OMEGAT,BASIST,ADD=ADDIN)
+          CN=>CN%GIRDER
+          k=k+1
+       ENDDO
+    ENDIF
+
+    IF(FOUND) THEN
+       call alloc(f)
+       f%a=b
+       f%ent=exi
+       CALL ROTATE_FRAME(F,OMEGAT,S1(4:6),1,BASIS=BASIST)
+       CALL   GEO_ROT(BASIST,S1(4:6),1)
+       CALL CHANGE_BASIS(S1(1:3),BASIST,T_GLOBAL,GLOBAL_FRAME)
+       F%A=F%A+T_GLOBAL
+       CAF%GIRDER_FRAME%EXI=F%ent
+       CAF%GIRDER_FRAME%B=F%A
+       call kill(f)
+    ENDIF
+
+    write(6,*) k, " magnet misaligned "
+  END SUBROUTINE  MISALIGN_GIRDER
+
+
 
   SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed
@@ -659,91 +867,6 @@ CONTAINS
 
   END SUBROUTINE MISALIGN_FIBRE
 
-  SUBROUTINE  NEW_MISALIGN_FIBRE(S2,S1,OMEGA,BASIS) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN):: S1(6)
-    REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
-    TYPE(FIBRE),INTENT(INOUT):: S2
-    REAL(DP) ANGLE(3),T_GLOBAL(3),d(3),r(3)
-    TYPE(MAGNET_FRAME), POINTER :: F,F0
-    REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3),ENT(3,3),EXI(3,3)
-    TYPE(INTEGRATION_NODE),POINTER :: T
-    INTEGER I
-
-
-    IF(ASSOCIATED(S2%CHART)) THEN
-       angle=S1(4:6)
-       d=S1(1:3)
-
-       if(present(BASIS)) then
-          basist=basis
-       else
-          basist=S2%mag%p%f%mid
-       endif
-
-       if(present(omega)) then
-          omegat=omega
-       else
-          omegat=S2%mag%p%f%o
-       endif
-
-       CALL ALLOC(F)
-       CALL ALLOC(F0)
-       f0%ent=ent
-       f0%a=S2%CHART%F%a
-       f0%exi=ent
-       f0%b=S2%CHART%F%b    ! o and mid not needed... survey_no_patch will get...
-       F=S2%mag%p%f
-       CALL SURVEY_NO_PATCH(S2,MAGNETFRAME=F0)
-       CALL ROTATE_FRAME(F,OMEGAT,ANGLE,1,BASIS=BASIST)
-
-       IF(PRESENT(BASIS)) THEN   ! MUST ROTATE THAT FRAME AS WELL FOR CONSISTENCY IN DEFINITION WHAT A MISALIGNMENT IS IN PTC
-          CALL   GEO_ROT(BASIST,ANGLE,1)
-       ELSE
-          BASIST=F%MID    ! ALREADY ROTATED
-       ENDIF
-
-       CALL CHANGE_BASIS(D,BASIST,T_GLOBAL,GLOBAL_FRAME)
-       F%A=F%A+T_GLOBAL
-       F%O=F%O+T_GLOBAL
-       F%B=F%B+T_GLOBAL
-
-       CALL COMPUTE_ENTRANCE_ANGLE(F0%ENT,F%ENT,S2%CHART%ANG_IN)
-       CALL COMPUTE_ENTRANCE_ANGLE(F%EXI,F0%EXI,S2%CHART%ANG_OUT)
-
-       D_IN=F%A-F0%A
-       D_OUT=F0%B-F%B
-
-       CALL CHANGE_BASIS(D_IN,GLOBAL_FRAME,S2%CHART%D_IN,F%ENT)
-       CALL CHANGE_BASIS(D_OUT,GLOBAL_FRAME,S2%CHART%D_OUT,F0%EXI)
-       CALL kill(F0)
-       CALL kill(F)
-
-       IF(ASSOCIATED(F)) deallocate(f)
-       IF(ASSOCIATED(F0)) deallocate(f0)
-
-       CALL SURVEY_NO_PATCH(S2)
-
-       IF(ASSOCIATED(S2%T1)) THEN
-          IF(ASSOCIATED(S2%T1%A)) THEN
-             CALL fill_survey_ONE_FIBRE(S2)
-          ENDIF
-       ENDIF
-
-    ELSE
-       W_P=0
-       W_P%NC=1
-       W_P%FC='((1X,A72))'
-       WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
-       CALL WRITE_E(100)
-    ENDIF
-
-
-  END SUBROUTINE  NEW_MISALIGN_FIBRE
-
-
-
   SUBROUTINE  MAD_MISALIGN_FIBRE(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
@@ -774,6 +897,370 @@ CONTAINS
     !    call MISALIGN_FIBRE(S2,MIS,S2%CHART%F%A,S2%CHART%F%ent)
 
   END SUBROUTINE MAD_MISALIGN_FIBRE
+
+  ! NEW ROUTINES TO CHANGE LAYOUT using only magnets!!!!
+
+  SUBROUTINE TRANSLATE_girder(S2,D,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+    IMPLICIT NONE
+    TYPE (fibre),TARGET,INTENT(INOUT):: S2
+    TYPE (element),pointer :: c,cn,caf
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    LOGICAL(LP),OPTIONAL :: PATCH
+    REAL(DP),OPTIONAL :: PREC
+    LOGICAL(LP) PAT,FOUND
+    REAL(DP) PREC0, exi(3,3), BASISt(3,3),b(3),t_global(3)
+    type(fibre_appearance), pointer :: dk
+    integer k
+
+    FOUND=.FALSE.
+    CALL FIND_AFFINE_girder(S2,CAF,FOUND)
+    IF(FOUND) CALL FIND_FRAME_girder(CAF,B,EXI,ADD=my_false)
+
+
+    IF(PRESENT(BASIS)) THEN
+       BASIST=BASIS
+    ELSE
+       if(found) then
+          BASIST=exi
+       else
+          BASIST=global_frame
+       endif
+    ENDIF
+
+    c=>s2%mag
+    CALL TRANSLATE(c,D,ORDER,BASIST,PATCH,PREC)
+    k=1
+
+    IF(ASSOCIATED(S2%MAG%girder)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%girder
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          CALL TRANSLATE(cn,D,ORDER,BASIST,PATCH,PREC)
+          CN=>CN%girder
+          k=k+1
+       ENDDO
+    ENDIF
+
+    !    write(6,*) k, " magnet translate "
+    IF(FOUND) THEN
+       !    write(6,*)CAF%GIRDER_FRAME%a
+       !    write(6,*)CAF%GIRDER_FRAME%b
+       CALL CHANGE_BASIS(D,BASIST,T_GLOBAL,GLOBAL_FRAME)
+       CAF%GIRDER_FRAME%a=CAF%GIRDER_FRAME%a+T_GLOBAL
+       CAF%GIRDER_FRAME%B=CAF%GIRDER_FRAME%b+T_GLOBAL
+       !     write(6,*)CAF%GIRDER_FRAME%a
+       !     write(6,*)CAF%GIRDER_FRAME%b
+       !     pause 8
+    ENDIF
+    CALL FIND_AFFINE_girder(S2,CN,FOUND)
+
+    IF(FOUND) CALL FIND_FRAME_girder(CN,B,EXI,ADD=my_false)
+    !write(6,*) b
+
+  END SUBROUTINE TRANSLATE_girder
+
+
+  SUBROUTINE TRANSLATE_siamese(S2,D,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+    IMPLICIT NONE
+    TYPE (fibre),TARGET,INTENT(INOUT):: S2
+    TYPE (element),pointer :: c,cn
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    LOGICAL(LP),OPTIONAL :: PATCH
+    REAL(DP),OPTIONAL :: PREC
+    LOGICAL(LP) PAT,FOUND
+    REAL(DP) PREC0, exi(3,3), BASISt(3,3),b(3)
+    type(fibre_appearance), pointer :: dk
+    integer k
+
+    FOUND=.FALSE.
+    CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)
+    IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD=my_false)
+
+    IF(PRESENT(BASIS)) THEN
+       BASIST=BASIS
+    ELSE
+       if(found) then
+          BASIST=exi
+       else
+          BASIST=global_frame
+       endif
+    ENDIF
+
+    c=>s2%mag
+    CALL TRANSLATE(c,D,ORDER,BASIST,PATCH,PREC)
+    k=1
+
+    IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%SIAMESE
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          CALL TRANSLATE(cn,D,ORDER,BASIST,PATCH,PREC)
+          CN=>CN%SIAMESE
+          k=k+1
+       ENDDO
+    ENDIF
+    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
+    write(6,*) k, " magnet translate "
+
+  END SUBROUTINE TRANSLATE_siamese
+
+
+  SUBROUTINE TRANSLATE_magnet(R,D,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+    IMPLICIT NONE
+    TYPE (element),TARGET,INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    LOGICAL(LP),OPTIONAL :: PATCH
+    REAL(DP),OPTIONAL :: PREC
+    LOGICAL(LP) PAT
+    REAL(DP) PREC0
+    type(fibre_appearance), pointer :: dk
+    integer k
+
+    PREC0=PUNY
+    PAT=MY_FALSE
+
+    IF(PRESENT(PATCH)) PAT=PATCH
+    IF(PRESENT(PREC)) PREC0=PREC
+
+    p=> r%parent_fibre
+
+    call TRANSLATE(p,D,ORDER,BASIS)
+
+    if(pat) then
+       k=0
+       if(associated(R%doko)) then
+          dk=>r%doko
+          do while(associated(dk))
+             p=> dk%parent_fibre
+             call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
+             call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
+             k=k+1
+             dk=>dk%next
+          enddo
+          write(6,*) "patched ",k,"times using doko"
+       else
+          call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
+          call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
+       endif
+    endif
+
+  END SUBROUTINE TRANSLATE_magnet
+
+  !ROTATE_FIBRE(R,OMEGA,Ang,ORDER,BASIS)
+  SUBROUTINE rotate_magnet(R,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+    IMPLICIT NONE
+    TYPE (element),TARGET,INTENT(INOUT):: R
+    REAL(DP),INTENT(IN):: ang(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3),omega(3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    LOGICAL(LP),OPTIONAL :: PATCH
+    REAL(DP),OPTIONAL :: PREC
+    LOGICAL(LP) PAT
+    REAL(DP) PREC0
+    type(fibre_appearance), pointer :: dk
+    integer k
+
+    PREC0=PUNY
+    PAT=MY_FALSE
+
+    IF(PRESENT(PATCH)) PAT=PATCH
+    IF(PRESENT(PREC)) PREC0=PREC
+
+    p=> r%parent_fibre
+
+    call rotate(p,OMEGA,Ang,ORDER,BASIS)
+
+    if(pat) then
+       k=0
+       if(associated(R%doko)) then
+          dk=>r%doko
+          do while(associated(dk))
+             p=> dk%parent_fibre
+             call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
+             call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
+             k=k+1
+             dk=>dk%next
+          enddo
+          write(6,*) "patched ",k,"times using doko"
+       else
+          call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
+          call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
+       endif
+    endif
+
+  END SUBROUTINE rotate_magnet
+
+  SUBROUTINE rotate_siamese(S2,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+    IMPLICIT NONE
+    TYPE (fibre),TARGET,INTENT(INOUT):: s2
+    REAL(DP),INTENT(IN):: ang(3)
+    TYPE (element),pointer :: c,cn
+    REAL(DP), OPTIONAL :: BASIS(3,3),omega(3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    LOGICAL(LP),OPTIONAL :: PATCH
+    REAL(DP),OPTIONAL :: PREC
+    LOGICAL(LP) PAT,FOUND
+    REAL(DP) PREC0,b(3),exi(3,3), BASISt(3,3),omegat(3)
+    type(fibre_appearance), pointer :: dk
+    integer k
+
+    FOUND=.FALSE.
+    CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)
+    IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD=my_false)
+
+    write(6,*)found, b
+
+    IF(PRESENT(BASIS)) THEN
+       BASIST=BASIS
+    ELSE
+       if(found) then
+          BASIST=exi
+       else
+          BASIST=global_frame
+       endif
+    ENDIF
+
+    IF(PRESENT(OMEGA)) THEN
+       OMEGAT=OMEGA
+    ELSE
+       if(found) then
+          OMEGAT=b
+       else
+          OMEGAT=global_origin
+       endif
+    ENDIF
+
+
+
+    c=>s2%mag
+    CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
+    k=1
+
+    IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%SIAMESE
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
+          CN=>CN%SIAMESE
+          k=k+1
+       ENDDO
+    ENDIF
+    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
+    write(6,*) k, " magnet rotated "
+
+  END SUBROUTINE rotate_siamese
+
+  SUBROUTINE rotate_girder(S2,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+    IMPLICIT NONE
+    TYPE (fibre),TARGET,INTENT(INOUT):: s2
+    REAL(DP),INTENT(IN):: ang(3)
+    TYPE (element),pointer :: c,cn,caf
+    REAL(DP), OPTIONAL :: BASIS(3,3),omega(3)
+    TYPE(FIBRE), POINTER::P
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    LOGICAL(LP),OPTIONAL :: PATCH
+    REAL(DP),OPTIONAL :: PREC
+    LOGICAL(LP) PAT,FOUND
+    REAL(DP) PREC0,b(3),exi(3,3), BASISt(3,3),omegat(3)
+    type(fibre_appearance), pointer :: dk
+    TYPE(MAGNET_FRAME), POINTER :: F
+    integer k
+
+    FOUND=.FALSE.
+    CALL FIND_AFFINE_girder(S2,CAF,FOUND)
+    IF(FOUND) CALL FIND_FRAME_girder(CAF,B,EXI,ADD=my_false)
+
+
+    IF(PRESENT(BASIS)) THEN
+       BASIST=BASIS
+    ELSE
+       if(found) then
+          BASIST=exi
+       else
+          BASIST=global_frame
+       endif
+    ENDIF
+
+    IF(PRESENT(OMEGA)) THEN
+       OMEGAT=OMEGA
+    ELSE
+       if(found) then
+          OMEGAT=b
+       else
+          OMEGAT=global_origin
+       endif
+    ENDIF
+
+
+
+    c=>s2%mag
+    CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
+    k=1
+
+    IF(ASSOCIATED(S2%MAG%girder)) THEN
+       C=>S2%MAG
+       CN=>S2%MAG%girder
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
+          CN=>CN%girder
+          k=k+1
+       ENDDO
+    ENDIF
+
+    IF(FOUND) THEN
+       call alloc(f)
+       !      write(6,*) CAF%GIRDER_FRAME%a
+       !      write(6,*) CAF%GIRDER_FRAME%b
+       !      write(6,*) CAF%GIRDER_FRAME%ent
+       !      write(6,*) CAF%GIRDER_FRAME%exi
+       f%a=CAF%GIRDER_FRAME%a
+       f%ent=CAF%GIRDER_FRAME%ent
+       f%b=CAF%GIRDER_FRAME%B
+       f%exi=CAF%GIRDER_FRAME%exi
+       CALL ROTATE_FRAME(F,OMEGAT,ang,1,BASIS=BASIST)
+       CAF%GIRDER_FRAME%ENT=F%ENT
+       CAF%GIRDER_FRAME%A=F%A
+       CAF%GIRDER_FRAME%EXI=F%EXI
+       CAF%GIRDER_FRAME%B=F%B
+       !      write(6,*) CAF%GIRDER_FRAME%a
+       !      write(6,*) CAF%GIRDER_FRAME%b
+       !      write(6,*) CAF%GIRDER_FRAME%ent
+       !      write(6,*) CAF%GIRDER_FRAME%exi
+       !      pause 2
+       call kill(f)
+    ENDIF
+
+
+
+
+    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
+    !    write(6,*) k, " magnet rotated "
+
+  END SUBROUTINE rotate_girder
+
 
 
   ! NEW ROUTINES TO CHANGE LAYOUT

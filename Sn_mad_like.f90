@@ -2383,22 +2383,18 @@ CONTAINS
 
     nullify(el);
     THICKKICKTEMP=.FALSE.
-
     nullify(s2); nullify(s2p);
     IF(MADX_MAGNET_ONLY) THEN
        S22%MAG=-1;     !  FIBRE AND  MUST ALREADY EXIST
        S22%MAGP=-1;    !  POINTER MUST STAY ALLOCATED OTHERWISE ALL HELL BREAKS LOOSE
     ELSE
+       !    GOTO 111    ! SAGAN CHECK MEMORY
        nullify(s22%mag); nullify(s22%magp);
        allocate(s22%mag);allocate(s22%magp);
        nullify(s22%CHART);nullify(s22%PATCH);
        allocate(s22%CHART);allocate(s22%PATCH);
        nullify(s22%dir);allocate(s22%dir);
-       !     nullify(s22%P0C);allocate(s22%P0C);
-       !    nullify(s22%BETA0);allocate(s22%BETA0);
-       !       nullify(s22%PARENT_LAYOUT);   !So as to preserve what is in append_empty
-       !       nullify(s22%PARENT_PATCH);
-       !       nullify(s22%PARENT_CHART);nullify(s22%PARENT_MAG);
+
        NULLIFY(S22%I)
        if(use_info) then
           allocate(s22%i);
@@ -2411,6 +2407,7 @@ CONTAINS
        !       nullify(S22%P0C);allocate(s22%P0C);
        nullify(S22%MASS);allocate(s22%MASS);
        nullify(S22%CHARGE);allocate(s22%CHARGE);
+       !     111 CONTINUE  ! SAGAN CHECK MEMORY
     ENDIF
 
     IF(.NOT.MADX) then
@@ -2423,8 +2420,10 @@ CONTAINS
        s22%dir=FIBRE_DIR    ! ALL THAT SHIT ALREADY EXISTS
        !     s22%P0C=P0C
        !     s22%BETA0=BETA0
+       !    GOTO 112    ! SAGAN CHECK MEMORY
        s22%CHART=0
        s22%PATCH=0
+       !     112 CONTINUE  ! SAGAN CHECK MEMORY
     ENDIF
     ! New stuff
     !Powering the CHART frame in MAG only
@@ -2642,8 +2641,9 @@ CONTAINS
           s2%p%aperture%y    = s1%APERTURE_y
        endif
     endif
-
+    !   goto 113 ! sagan
     s2p=0
+    ! 113 continue
     call copy(s2,s2p)
 
     ! end of machida stuff here
@@ -2710,14 +2710,14 @@ CONTAINS
 
   END SUBROUTINE EL_Q
 
-
-
-
-
   SUBROUTINE  clean_up
     implicit none
+    logical(lp) crotte
 
+    crotte=superkill
+    superkill=my_true
     call kill(mad_list)
+    superkill=crotte
 
     mad_list_killed=.true.
   end SUBROUTINE  clean_up

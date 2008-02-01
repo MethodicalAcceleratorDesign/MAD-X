@@ -4,6 +4,7 @@ module accel_ptc
   implicit none
   public
   integer n_cav_accel
+  integer :: nvolt=20
   real(dp) :: vrf=210.d-3   !mev
   real(dp),parameter :: dphsa_final=30.0_dp*deg_to_rad_  ! 30.0_dp*deg_to_rad_
   real(dp) :: dphsa_by_dt=dphsa_final/(100.e-3_dp*CLIGHT)
@@ -26,6 +27,8 @@ module accel_ptc
   real(dp) :: as1,as2,slope12
   real(dp) :: vrf0=40.d-3,vrff=280.d-3, slopev    !mev
   integer :: count_cav
+  logical(lp) :: oldway= .true.
+
   TYPE fibre_array
      type(fibre), pointer :: p
      integer, pointer :: pos
@@ -59,7 +62,9 @@ contains
     character*(*) filename
     real(dp)  x
     real(dp) p0c,b0
-    integer k,i,mf,mode,t
+    integer k,i,mf,mode,t,j,imax
+    integer, allocatable :: imode(:)
+    character*120 line
 
     p0c=my_ORBIT_LATTICE%orbit_p0c
     my_ORBIT_LATTICE%accel=my_true
@@ -80,27 +85,40 @@ contains
     allocate(accel(0:k-2))
 
     open(unit=mf,file=filename)
+    read(mf,'(a120)') line
+    read(line,*) mode
+    allocate(imode(mode))
+    imode=0
+    read(line,*) mode,imode
+    imax=mode
+    do i=1,mode
+       if(imode(i)>imax) imax=imode(i)
+    enddo
 
-    read(mf,*) mode
-    mode=1
+    !mode=1
     do i=0,k-2
        allocate(accel(i)%p0c)
-       allocate(accel(i)%volt(mode))
-       allocate(accel(i)%phase(mode))
-       read(mf,* ) t,accel(i)%p0c,accel(i)%volt(1),accel(i)%phase(1)
+       allocate(accel(i)%volt(imax))
+       allocate(accel(i)%phase(imax))
+       accel(i)%volt=zero
+       accel(i)%phase=zero
+       read(mf,* ) t,accel(i)%p0c,( accel(i)%volt(imode(j)),accel(i)%phase(imode(j)),j=1,mode)
        if(i==0) b0=accel(i)%p0c
        accel(i)%p0c=accel(i)%p0c/b0*p0c
-       accel(i)%volt(1)=accel(i)%volt(1)*1.e-3_dp
+       do j=1,  imax
+          accel(i)%volt(j)=accel(i)%volt(j)*1.e-3_dp
+       enddo
+
     enddo
 
     close(mf)
-
+    deallocate(imode)
   end subroutine make_table
 
-  subroutine get_from_table_volt(time,p0,volt,phase)
+  subroutine get_from_table_volt(time,p0,vo)
     implicit none
-    integer ti
-    real(dp) tr,volt,phase,time,p0
+    integer ti,i
+    real(dp) tr,phase,time,p0,vo(nvolt)
 
     !write(6,*) size(accel)
 
@@ -110,12 +128,14 @@ contains
 
     if(ti>size(accel)) stop
 
-    volt= (tr-ti)*(accel(ti+1)%volt(1)-accel(ti)%volt(1)) + accel(ti)%volt(1)
+    vo(1)= (tr-ti)*(accel(ti+1)%volt(1)-accel(ti)%volt(1)) + accel(ti)%volt(1)
     phase= (tr-ti)*(accel(ti+1)%phase(1)-accel(ti)%phase(1)) + accel(ti)%phase(1)
     p0= (tr-ti)*(accel(ti+1)%p0c -accel(ti)%p0c) + accel(ti)%p0c
 
 
-
+    do i=2,size(accel(1)%volt(:))
+       vo(i)= (tr-ti)*(accel(ti+1)%volt(i)-accel(ti)%volt(i)) + accel(ti)%volt(i)
+    enddo
 
 
   end subroutine get_from_table_volt
@@ -196,6 +216,118 @@ contains
     real(dp) sig0(6),x(6)
     integer mf
     type(fibre), pointer :: p
+    npart=1
+    sig0=1.e-6
+    if(oldway) then
+       open(unit=30,file='junkold.txt')
+    else
+       open(unit=30,file='junknew.txt')
+    endif
+    CALL create_beam(RAYS,npart,2.D0,SIG0)
+
+    my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
+    open(unit=mf, file='wp2_029_300kW_J54_INJALL_TRM_210kVM_Bf016.dat')
+    do i=1,RAYS%n
+       read(mf,*) RAYS%x(i,1:4), RAYS%x(i,5), RAYS%x(i,6)
+    enddo
+    close(mf)
+
+
+    call make_table("NOACC_ACC_210.DAT")
+    !call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
+    !call make_table("ACCWAVE_40kV_280kV_350ms.DAT")
+    !call make_table("ACCWAVE_210KVH9_350ms.DAT")
+    !call make_table("noaccel.DAT")
+
+    write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
+    write(6,*) my_ORBIT_LATTICE%ORBIT_omega
+    write(6,*) c_%phase0
+    default=my_ORBIT_LATTICE%state
+
+    call kanalnummer(mf)
+    if(oldway) then
+       open(unit=mf,file='outold.dat')
+    else
+       open(unit=mf,file='outnew.dat')
+    endif
+
+    WRITE(6,*) " n_TURN "
+    READ(5,*) N_TURN
+    !n_turn=20
+
+    !rays%x(2,1:6)=0.d0
+    !rays%x(2,6)=0.00001d0
+
+    call ptc_synchronous_set(-1)
+    write(6,*) " reading rays after some turns ?"
+    read(5,*) i
+
+    if(i==1) then
+
+       call ptc_synchronous_set(-2)
+
+       do i=1,RAYS%n
+          read(mf,*) RAYS%x(i,1:4), RAYS%x(i,5), RAYS%x(i,6)
+       enddo
+
+
+       close(mf)
+
+       call kanalnummer(mf)
+       open(unit=mf,file='out2.dat')
+
+
+    endif
+
+
+    call print(my_ORBIT_LATTICE%state,6)
+
+    do j=1,n_turn
+
+       do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
+
+          call ptc_synchronous_set(i)
+          do k=1,rays%n
+
+
+             call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
+                  rays%x(k,5),rays%x(k,6))
+
+          enddo
+
+          call ptc_synchronous_after(i)
+
+       enddo
+       DO KK=1,RAYS%N
+          write(mf,'(6(1x,E15.8))') rays%x(kk,1:6)
+       ENDDO
+    enddo
+    call ptc_synchronous_after(-2)
+
+
+    close(mf)
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(6,*) x_orbit_sync
+    write(6,*) rays%x(1,1:6)
+    !write(6,*) rays%x(2,1:6)
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
+    write(6,*) my_ORBIT_LATTICE%ORBIT_omega
+    write(6,*) c_%phase0
+    write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    !stop
+    close(30)
+  end subroutine accel_orbit_beam
+
+  subroutine accel_orbit_beam_old(ring)
+    !use accel_ptc
+    implicit none
+    integer n_turn,i,k,npart,j,kk
+    type(layout), target :: ring
+    TYPE(BEAM),target :: RAYS
+    real(dp) sig0(6),x(6)
+    integer mf
+    type(fibre), pointer :: p
     npart=9
     sig0=1.e-6
 
@@ -233,7 +365,8 @@ contains
 
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        call kanalnummer(mf)
-       open(unit=mf,file='wp2_029_300kW_J54_INJALL_TRM_210kVM_Bf016.dat')
+       open(unit=mf,file='out.dat')
+       !open(unit=mf,file='wp2_029_300kW_J54_INJALL_TRM_210kVM_Bf016.dat')
        !open(unit=mf,file='crazy_orbit_unit.dat')
     else
        stop 998
@@ -343,7 +476,8 @@ contains
     write(6,*) c_%phase0
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     !stop
-  end subroutine accel_orbit_beam
+  end subroutine accel_orbit_beam_old
+
 
 
 
@@ -366,7 +500,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
   INTEGER  i_node
   INTEGER  i_node1,i,mf,j
   type(internal_state) state
-  real(dp) p0,vrfx,dphat,freqf,dphase0,dphase
+  real(dp) p0,vrfx,dphat,freqf,dphase0,dphase,x6,vo(nvolt)
   TYPE(INTEGRATION_NODE), POINTER  :: T
 
 
@@ -433,22 +567,34 @@ SUBROUTINE ptc_synchronous_set(i_node)
         my_ORBIT_LATTICE%orbit_deltae=zero
         w1_orbit=p_orbit
         w2_orbit=0
-        call get_from_table_volt(x_orbit_sync(6),p0,vrfx,dphat)
-
+        call get_from_table_volt(x_orbit_sync(6),p0,vo)
         call find_energy(w2_orbit,p0c=p0)
         my_ORBIT_LATTICE%orbit_deltae=(w2_orbit%energy-w1_orbit%energy)
         freqf=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
         p_orbit%mag%freq=freqf
-        if(p_orbit%mag%l/=zero) then
-           p_orbit%mag%volt=-vrfx/p_orbit%mag%l
-           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%CHARGE &
-                /p_orbit%mag%volt/c_1d_3/p_orbit%mag%L)-c_%phase0
+        !write(6,*) my_ORBIT_LATTICE%orbit_deltae,my_ORBIT_LATTICE%orbit_deltae/p0
+        !pause 12
+        ! here
+        if(oldway) then
+           if(p_orbit%mag%l/=zero) then
+              p_orbit%mag%volt=-vo(1)/p_orbit%mag%l
+              dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%CHARGE &
+                   /p_orbit%mag%volt/c_1d_3/p_orbit%mag%L)-p_orbit%mag%c4%phase0
+           else
+              p_orbit%mag%volt=-vo(1)
+              dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%CHARGE/p_orbit%mag%volt/c_1d_3)-p_orbit%mag%c4%phase0
+           endif
+           dphase=dphase0-twopi*p_orbit%mag%freq*x_orbit_sync(6)/CLIGHT
+           !        write(30,*) "dphase ",dphase, mod(dphase,twopi)!
+           !        write(30,*) "volt ",p_orbit%mag%volt
+           !        write(30,*) "dphase0 first ",dphase0
         else
-           p_orbit%mag%volt=-vrfx
-           dphase0=asin(-my_ORBIT_LATTICE%orbit_deltae/p_orbit%DIR/p_orbit%CHARGE/p_orbit%mag%volt/c_1d_3)-c_%phase0
+           call compute_phase(x_orbit_sync(6),vo,dphase)
+           x6=x_orbit_sync(6)
         endif
-        dphase=dphase0-twopi*p_orbit%mag%freq*x_orbit_sync(6)/CLIGHT
         p_orbit%mag%phas=dphase
+
+
         call ptc_to_orbit(x_orbit_sync)
 
      endif
@@ -456,10 +602,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
      CALL ORBIT_TRACK_NODE(i_node1,x_orbit_sync)
 
      if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
-        if(.not.state%totalpath==1) then
-           p_orbit%mag%phas=dphase0
-           p_orbit%magp%phas=dphase0
-        endif
+        call adjust_phase(x6,state,dphase0)
         if(my_ORBIT_LATTICE%first) then
            my_ORBIT_LATTICE%freqb=p_orbit%mag%freq
            my_ORBIT_LATTICE%freqa=p_orbit%mag%freq
@@ -558,6 +701,88 @@ SUBROUTINE ptc_synchronous_set(i_node)
 
 
 END SUBROUTINE  ptc_synchronous_set
+
+SUBROUTINE compute_phase(x6,v,dphase)
+  USE accel_ptc    !,vrff=>vrf,freqf=>freq
+  IMPLICIT NONE
+  real(dp) a,b,v(nvolt),x6,o,dl,sq,dphase,atg
+  integer n,i
+  TYPE(CAV4),pointer :: EL
+
+
+  el=>p_orbit%mag%c4
+  n=size(p_orbit%mag%c4%f)
+  if(n>nvolt) then
+     write(6,*) " stopped in compute_phase "
+     stop 546
+  endif
+  if(p_orbit%mag%l/=zero) then
+     p_orbit%mag%volt=-v(1)/p_orbit%mag%l
+     el%f(1)=one
+     dl=p_orbit%mag%l
+  else
+     p_orbit%mag%volt=-v(1)
+     el%f(1)=one
+     dl=one
+  endif
+
+  do i=2,n
+     el%f(i)=v(i)/v(1)
+  enddo
+
+  a=zero
+  b=zero
+  O=twopi*p_orbit%mag%freq/CLIGHT
+  do i=1,n
+     EL%PH(i)=zero
+     p_orbit%magp%c4%PH(i)=zero
+     a=a-dl*el%f(i)*p_orbit%dir*p_orbit%charge*EL%volt*c_1d_3*sin(i*o*x6+EL%PH(i)+EL%phase0)
+     b=b-dl*el%f(i)*p_orbit%dir*p_orbit%charge*EL%volt*c_1d_3*cos(i*o*x6+EL%PH(i)+EL%phase0)
+  enddo
+  sq=sqrt(a**2+b**2)
+  a=a/sq
+  b=b/sq
+  atg=atan2(a,b)
+
+
+
+
+  dphase=asin(my_ORBIT_LATTICE%orbit_deltae/sq)-atg
+
+  !        write(30,*) "dphase ",dphase
+  !        write(30,*) "volt ",p_orbit%mag%volt
+
+end SUBROUTINE compute_phase
+
+SUBROUTINE adjust_phase(x6,state,dphase0)
+  USE accel_ptc    !,vrff=>vrf,freqf=>freq
+  IMPLICIT NONE
+  real(dp) x6,dphase0
+  integer n,i
+  TYPE(CAV4),pointer :: EL
+  type(internal_state) state
+
+  if(oldway) then
+     if(.not.state%totalpath==1) then
+        p_orbit%mag%phas=dphase0
+        p_orbit%magp%phas=dphase0
+     endif
+     !        write(30,*) "dphase0 ",dphase0
+
+     !       return
+  else
+     if(.not.state%totalpath==1) then
+        el=>p_orbit%mag%c4
+        do i=1,size(el%ph)
+           el%ph(i)=i*twopi*p_orbit%mag%freq*x6/CLIGHT
+           p_orbit%magp%c4%ph(i)=i*twopi*p_orbit%mag%freq*x6/CLIGHT
+           !        write(30,*) i,mod(el%ph(i),twopi),mod(el%ph(i)+p_orbit%mag%phas,twopi)
+        enddo
+     endif
+  endif
+end SUBROUTINE adjust_phase
+
+
 
 SUBROUTINE ptc_synchronous_after(i_node)
 

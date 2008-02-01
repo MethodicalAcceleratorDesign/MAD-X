@@ -178,7 +178,7 @@ contains
     CALL EL_Q_FOR_MADX(EL,BLANK)
     !  added 2007.07.09
     el%mag%parent_fibre =>el
-    el%magp%parent_fibre=>el
+    !    el%magp%parent_fibre=>el
     !  end of added 2007.07.09
 
 
@@ -485,23 +485,30 @@ contains
 
   subroutine print_FIBRE(m,mf)
     implicit none
-    integer mf,I,siam_pos,siam_index
+    integer mf,I,siam_pos,siam_index,GIRD_POS,GIRD_index
     type(FIBRE), pointer :: m
     siam_pos=0
     siam_index=0
+    GIRD_POS=0
+    GIRD_index=0
     if(associated(m%mag%siamese)) then
        siam_index=m%mag%siamese%parent_fibre%parent_layout%index
        siam_pos=m%mag%siamese%parent_fibre%pos
     endif
+    if(associated(m%mag%GIRDER)) then
+       GIRD_index=m%mag%GIRDER%parent_fibre%parent_layout%index
+       GIRD_POS=m%mag%GIRDER%parent_fibre%pos
+    endif
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
-    if(siam_index==0) then
+    if(siam_index==0.AND.GIRD_index==0) then
        WRITE(MF,'(A11,4(I4,1x))') " DIRECTION ", M%DIR, &
             m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
             m%mag%parent_fibre%parent_layout%n
     else
-       WRITE(MF,'(A11,4(I4,1x),A9,2(I4,1x))') " DIRECTION ", M%DIR, &
+       WRITE(MF,'(A11,4(I4,1x),A17,4(I4,1x))') " DIRECTION ", M%DIR, &
             m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
-            m%mag%parent_fibre%parent_layout%n," Siamese ",siam_pos,siam_index
+            m%mag%parent_fibre%parent_layout%n," Siamese, Girder "         &
+            ,siam_pos,siam_index,GIRD_POS,GIRD_index
     endif
     CALL print_chart(m%CHART,mf)
     CALL print_PATCH(m%PATCH,mf)
@@ -524,18 +531,20 @@ contains
 
   END subroutine READ_FIBRE
 
-  subroutine READ_FIBRE_2_lines(mf,DIR,index,pos,n,siam_index,siam_pos)
+  subroutine READ_FIBRE_2_lines(mf,DIR,index,pos,n,siam_index,siam_pos,gird_index,gird_pos)
     implicit none
     integer mf,I
     character*255 line
 
-    integer DIR,index,pos,n,siam_index,siam_pos
+    integer DIR,index,pos,n,siam_index,siam_pos,gird_index,gird_pos
     READ(MF,*) LINE
     siam_index=0
     siam_pos=0
+    gird_index=0
+    gird_pos=0
 
-    READ(MF,'(A11,4(I4,1x),A9,2(I4,1x))') LINE(1:11),DIR,index,pos,n, &
-         LINE(12:20),siam_pos,siam_index
+    READ(MF,'(A11,4(I4,1x),A9,4(I4,1x))') LINE(1:11),DIR,index,pos,n, &
+         LINE(12:20),siam_pos,siam_index,gird_index,gird_pos
     !    CALL READ_chart(m%CHART,mf)
     !    CALL READ_PATCH(m%PATCH,mf)
     !    CALL READ_element(M%MAG,mf)
@@ -545,15 +554,15 @@ contains
 
   subroutine print_PATCH(m,mf)
     implicit none
-    integer mf,I,myi1,myi2,myi3
+    integer mf,I,i1,i2,i3
     type(PATCH), pointer :: m
     character*255 line
 
-    myi1=M%PATCH
-    myi2=M%energy
-    myi3=M%time
-!    IF(IABS(M%PATCH)+iabs(M%energy)+iabs(M%time)/=0) then
-    IF(IABS(myi1)+iabs(myi2)+iabs(myi3)/=0) then
+    i1=M%PATCH
+    i2=M%energy
+    i3=M%time
+
+    IF(IABS(i1)+iabs(i2)+iabs(i3)/=0) then
        WRITE(MF,*) " >>>>>>>>>>>>>>>>>> PATCH <<<<<<<<<<<<<<<<<<"
        WRITE(MF,*) M%PATCH,M%ENERGY,M%TIME," patch,energy,time"
        WRITE(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2," discrete 180 rotations"
@@ -812,7 +821,7 @@ contains
   subroutine print_specific_element(el,mf)
     implicit none
     type(element), pointer :: el
-    integer mf
+    integer mf,i
     character*255 line
 
     select case(el%kind)
@@ -821,7 +830,10 @@ contains
        WRITE(LINE,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
        WRITE(MF,'(A255)') LINE
     case(kind4)
-       WRITE(MF,*) el%c4%N_BESSEL
+       WRITE(MF,*) el%c4%N_BESSEL, "HARMON",el%c4%NF
+       do i=1,el%c4%NF
+          write(mf,*) el%c4%f(i),el%c4%ph(i)
+       enddo
     case(kind10)
        WRITE(MF,*) el%tp10%DRIFTKICK
     case(kind16,kind20)
@@ -848,9 +860,9 @@ contains
   subroutine read_specific_element(el,mf)
     implicit none
     type(element), pointer :: el
-    integer mf
+    integer mf,NB,NH,i
+    CHARACTER*6 HARMON
     character*255 line
-
     select case(el%kind)
     CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
@@ -858,8 +870,22 @@ contains
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        read(mf,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
     case(kind4)
+       NB=0
+       NH=0
+       READ(MF,'(a255)') LINE
+
+       IF(INDEX(LINE, 'HARMON')/=0) THEN
+          read(LINE,*) NB,HARMON,NH
+          N_CAV4_F=NH
+       ELSE
+          read(LINE,*) NB
+       ENDIF
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
-       read(MF,*) el%c4%N_BESSEL
+       el%c4%N_BESSEL=NB
+       N_CAV4_F=1
+       do i=1,nh
+          read(mf,*) el%c4%f(i),el%c4%ph(i)
+       enddo
     case(kind10)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        read(MF,*) el%tp10%DRIFTKICK
@@ -1357,9 +1383,9 @@ contains
   subroutine READ_pointed_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
     implicit none
     character(*) filename
-    integer I,mf,N,DIR,index_,pos,nt,kc,siam_index,siam_pos
+    integer I,mf,N,DIR,index_,pos,nt,kc,siam_index,siam_pos,gird_index,gird_pos
     type(LAYOUT), TARGET :: L
-    type(FIBRE), pointer :: P,current,siam
+    type(FIBRE), pointer :: P,current,siam,gird
     LOGICAL(LP), OPTIONAL :: RING
     REAL(DP), OPTIONAL :: LMAX0
     LOGICAL(LP) RING_IT,doneit
@@ -1408,7 +1434,7 @@ contains
     default=original
     call Set_madx(p0c=p0c)
     DO I=1,N
-       call  READ_FIBRE_2_lines(mf,dir,index_,pos,nt,siam_index,siam_pos)
+       call  READ_FIBRE_2_lines(mf,dir,index_,pos,nt,siam_index,siam_pos,gird_index,gird_pos)
        call  READ_chart_fake(mf)
        call move_to(L%DNA(index_)%L,p,pos)
        CALL APPEND_POINT(L,P)
@@ -1418,7 +1444,12 @@ contains
        if(siam_index/=0) then
           call move_to(L%DNA(siam_index)%L,siam,siam_pos)
           p%mag%siamese=>siam%mag
-          write(6,*) p%mag%name,' is connected to ', siam%mag%name
+          write(6,*) p%mag%name,' is a siamese of ', siam%mag%name
+       endif
+       if(gird_index/=0) then
+          call move_to(L%DNA(gird_index)%L,gird,gird_pos)
+          p%mag%girder=>gird%mag
+          write(6,*) p%mag%name,' is on the girder of ', gird%mag%name
        endif
        !        if(pos==1) then
        !         if(associated(L%DNA(index)%l%con1)) then
