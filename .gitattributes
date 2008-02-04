@@ -121,6 +121,15 @@
 /sodd.F -text
 /survey.F -text
 /sxf.c -text
+testing/MadBuild.pl -text
+testing/MadBuildAndTest.pl -text
+testing/MadTest.pl -text
+testing/MadTestWebStyle.css -text
+testing/Makefile -text
+testing/ProcessScenario.xsl -text
+testing/TestScenario.xml -text
+testing/index.htm -text
+testing/mad_install -text
 /timel.c -text
 /timest.f90 -text
 /timex.f90 -text

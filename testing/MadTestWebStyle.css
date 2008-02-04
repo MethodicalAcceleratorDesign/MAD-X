@@ -1,0 +1,17 @@
+/* ----
+*  Stylesheet for the Mad Test Website
+*  ----
+*/
+
+/* title */
+td.title {color:black; font-weight: bold; text-align: center
+	font-family: sans-serif; font-size: x-large}
+
+/* test entries appearance in table rows */
+tr.test_target	{background-color: #EEEEFF}
+tr.test_case	{background-color: #EEEEEE}
+
+/* test results row colors */
+tr.warning 	{background-color: #FFDDBB}
+tr.failure	{background-color: #FFBBBB}
+tr.success	{background-color: #BBFFBB}
