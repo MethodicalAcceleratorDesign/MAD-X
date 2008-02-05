@@ -8,7 +8,8 @@ INST_SCRIPT_FILES = $(PERL_SCRIPTS) $(XML_DOCS)
 INST_WEB_FILES = $(HTML_DOCS)
 
 # temporary locations
-DELIVERY_TARGET = /user/nougaret/MAD/bin # directory in which cron starts build
+DELIVERY_TARGET = /afs/cern.ch/user/n/nougaret/scratch0/mad-automation 
+# directory in which cron starts build
 WEB_FOLDER_TARGET = /afs/cern.ch/user/n/nougaret/www/mad
 
 install: $(INSTFILES)
