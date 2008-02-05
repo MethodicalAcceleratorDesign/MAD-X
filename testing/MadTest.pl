@@ -137,7 +137,7 @@ foreach $target (@targets) {
     chop $target;
     print "--- testing $target\n";
 
-    $testReport .= "<table width=\"75%\" border=\"1\">\n";
+    $testReport .= "<table width=\"75%\" border=\"0\">\n";
     $testReport .= "<tr class='test_target'><td colspan=\"2\"><div align=\"center\"><strong>Testing $target</strong></div></td></tr>\n";
 
     chdir($localRootDir); # top of the hierarchy
@@ -378,6 +378,7 @@ foreach $target (@targets) {
 	    }
 	    if ($fileCount == 0) {
 		print OUT "# FAIL TO COMPARE $file: no such file for reference => FAILURE\n";
+		$testReport .="<tr class='omit'><td>$file</td><td>NO FILE FOR REFERENCE</td></tr>\n";
 	    } else {
 		if ($sourceSubDir eq "") {
 		    $diffRes = `diff ./$file $samplesRootDir/$target/$file | wc -l`;
