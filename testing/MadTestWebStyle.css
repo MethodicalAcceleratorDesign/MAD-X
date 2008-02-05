@@ -15,3 +15,7 @@ tr.test_case	{background-color: #EEEEEE}
 tr.warning 	{background-color: #FFDDBB}
 tr.failure	{background-color: #FFBBBB}
 tr.success	{background-color: #BBFFBB}
+tr.omit		{background-color: black; color: white}
+
+/* build results colors */
+font.warning	{color: #FFBBAA}
