@@ -37,7 +37,20 @@
         <test input ="lhc_example.madx" output="lhc_example.out"/>
         <!-- missing test input ="asp1b.madx" output="example3.out"/ -->
    </target>
-   <!-- target match missing -->
+   <target name="match">
+        <!-- warning - the list of targets available in the README file is different but specified files do not exist -->
+        <test input ="job.lhc.2chromaticity.madx" output="job.lhc.2chromaticity.out"/>
+        <test input ="job.lhc.chromaticity.madx" output="job.lhc.chromaticity.out"/>
+        <test input ="job.lhc.insertion-upper.madx" output="job.lhc.insertion-upper.out"/>
+        <test input= "job.lhc.insertion.madx" output="job.lhc.insertion.out"/>
+        <test input= "job.lhc.iporbit.madx" output="job.lhc.iporbit.out"/>
+        <test input= "job.lhc.qpp.madx" output="job.lhc.qpp.out"/>
+        <test input= "job.lhc.tune.madx" output="job.lhc.tune.out"/>
+        <test input= "job.lhcV65.ir8squeeze.madx" output="job.lhcV65.ir8squeeze.out"/>
+        <test input= "job.lhcV65.tune.jac.madx" output="job.lhcV65.tune.jac.out"/>
+        <test input= "job.lhcV65.tune.madx" output="job.lhcV65.tune.out"/>
+        <test input= "job.lhcV65.wx.jac.madx" output="job.lhcV65.wx.jac.out" />
+   </target>
    <target name="plot">
 	<test input ="job.plottest_nv.madx" output="job.plottest_nv.out"/>
    </target>
