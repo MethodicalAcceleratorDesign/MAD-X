@@ -1290,6 +1290,7 @@ CONTAINS
     !_________________________________________________________________
     subroutine dump4dmap(y2, fun)
       implicit none
+      double precision a1000,a0100,a0010,a0001
       type(real_8) :: y2(6)  !polimorphes array used for calculating maps for each element
       integer      :: fun !file unit number
       integer      :: ii
@@ -1299,10 +1300,14 @@ CONTAINS
       endif
 
       do ii=1,4
-         write(fun,'(4f13.8)')  y2(ii).sub.'1000', &
-              &                      y2(ii).sub.'0100', &
-              &                      y2(ii).sub.'0010', &
-              &                      y2(ii).sub.'0001'
+         a1000=y2(ii).sub.'1000'
+         a0100=y2(ii).sub.'0100'
+         a0010=y2(ii).sub.'0010'
+         a0001=y2(ii).sub.'0001'
+         write(fun,'(6f13.8)')  a1000, &
+              &                 a0100, &
+              &                 a0010, &
+              &                 a0001
       enddo
 
     end subroutine dump4dmap
@@ -1310,15 +1315,21 @@ CONTAINS
 
     subroutine dump5dmap(y2, fun)
       implicit none
+      double precision a10000,a01000,a00100,a00010,a00001
       type(real_8) :: y2(6)  !polimorphes array used for calculating maps for each element
       integer      :: fun !file unit number
       integer      :: ii
       do ii=1,5
-         write(fun,'(5f13.8)')  y2(ii).sub.'10000', &
-              &                      y2(ii).sub.'01000', &
-              &                      y2(ii).sub.'00100', &
-              &                      y2(ii).sub.'00010', &
-              &                      y2(ii).sub.'00001'    !
+         a10000=y2(ii).sub.'10000'
+         a01000=y2(ii).sub.'01000'
+         a00100=y2(ii).sub.'00100'
+         a00010=y2(ii).sub.'00010'
+         a00001=y2(ii).sub.'00001'
+         write(fun,'(6f13.8)')  a10000, &
+              &                 a01000, &
+              &                 a00100, &
+              &                 a00010, &
+              &                 a00001     !
       enddo
 
     end subroutine dump5dmap
@@ -1326,26 +1337,39 @@ CONTAINS
 
     subroutine dump6dmap(y2, fun)
       implicit none
+      double precision a100000,a010000,a001000,a000100,a000010,a000001
       type(real_8) :: y2(6)  !polimorphes array used for calculating maps for each element
       integer      :: fun !file unit number
       integer      :: ii
 
       do ii=1,4
-         write(fun,'(6f13.8)')  y2(ii).sub.'100000', &
-              &                      y2(ii).sub.'010000', &
-              &                      y2(ii).sub.'001000', &
-              &                      y2(ii).sub.'000100', &
-              &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-              &                      y2(ii).sub.'000010'    !
+         a100000=y2(ii).sub.'100000'
+         a010000=y2(ii).sub.'010000'
+         a001000=y2(ii).sub.'001000'
+         a000100=y2(ii).sub.'000100'
+         a000010=y2(ii).sub.'000010'
+         a000001=y2(ii).sub.'000001'
+         write(fun,'(6f13.8)')  a100000, &
+              &                 a010000, &
+              &                 a001000, &
+              &                 a000100, &
+              &                 a000001, & !madx format has dp/p at the last column
+              &                 a000010    ! 
       enddo
 
       do ii=6,5,-1
-         write(fun,'(6f13.8)')  y2(ii).sub.'100000', &
-              &                      y2(ii).sub.'010000', &
-              &                      y2(ii).sub.'001000', &
-              &                      y2(ii).sub.'000100', &
-              &                      y2(ii).sub.'000001', & !madx format has dp/p at the last column
-              &                      y2(ii).sub.'000010'    !
+         a100000=y2(ii).sub.'100000'
+         a010000=y2(ii).sub.'010000'
+         a001000=y2(ii).sub.'001000'
+         a000100=y2(ii).sub.'000100'
+         a000010=y2(ii).sub.'000010'
+         a000001=y2(ii).sub.'000001'
+         write(fun,'(6f13.8)')  a100000, &
+              &                 a010000, &
+              &                 a001000, &
+              &                 a000100, &
+              &                 a000001, & !madx format has dp/p at the last column
+              &                 a000010    ! 
       enddo
     end subroutine dump6dmap
 
