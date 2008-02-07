@@ -20,7 +20,8 @@ $testReport = ""; # will be stored into an HTML document
 
 $samplesRootDir = '/afs/cern.ch/user/f/frs/public_html/mad-X_examples';
 
-$htmlFile = '/afs/cern.ch/user/n/nougaret/www/mad/test.htm'; # for the time being
+$htmlRootDir = '/afs/cern.ch/user/n/nougaret/www/mad';
+$htmlFile = "$htmlRootDir/test.htm"; # for the time being
 
 $pwd = `pwd`;
 chop $pwd;
@@ -77,7 +78,12 @@ if ( $#ARGV != 0 ) {
 # carried-out on the actual target directories...
 
 foreach $targetDir (@targetDirs) {
+
     chop $targetDir;
+
+    # DBG
+    # if ($targetDir ne "ptc_twiss") {next;}
+
     print "target = '$targetDir'\n";
 
     chdir("$samplesRootDir/$targetDir");
@@ -135,10 +141,13 @@ mkdir($localTestDir, 0777);
 
 foreach $target (@targets) {
     chop $target;
+    # DBG
+    # if ($target ne "ptc_twiss") {next; }
+
     print "--- testing $target\n";
 
     $testReport .= "<table width=\"75%\" border=\"0\">\n";
-    $testReport .= "<tr class='test_target'><td colspan=\"2\"><div align=\"center\"><strong>Testing $target</strong></div></td></tr>\n";
+    $testReport .= "<tr class='test_target'><td colspan=\"2\"><div align=\"center\"><strong>$target</strong></div></td></tr>\n";
 
     chdir($localRootDir); # top of the hierarchy
 
@@ -378,19 +387,52 @@ foreach $target (@targets) {
 	    }
 	    if ($fileCount == 0) {
 		print OUT "# FAIL TO COMPARE $file: no such file for reference => FAILURE\n";
-		$testReport .="<tr class='omit'><td>$file</td><td>NO FILE FOR REFERENCE</td></tr>\n";
+		$testReport .="<tr class='omit'><td>$file</td><td>no file for reference</td></tr>\n";
 	    } else {
+
+		my $detailsLink;
+		my $detailsHtmlFile;
+
+
 		if ($sourceSubDir eq "") {
+
+		    $detailsLink = "./details/DiffResult_"."$target"."_"."$file.htm"; # web
+		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$file.htm"; # delivery
+		} else {
+
+		    $detailsLink = "./details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$file.htm"; # weblink
+		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$file.htm"; # deliver
+		}
+		
+		
+		
+		if ($sourceSubDir eq "") {
+		    # redundant for the time being
+		    # and should make sure we avoid name clashes in naming the HTML
+		    $madDifRes = 
+			`$localRootDir/MadDiff.pl ./$file $samplesRootDir/$target/$file $detailsHtmlFile`;
+		    # debug
+		    print "MADDIF invocation= ./MadDiff.pl ./$file $samplesRootDir/$target/$file $detailsHtmlFile";
+		    print "MADDIFFRES is $madDiffRes\n";
 		    $diffRes = `diff ./$file $samplesRootDir/$target/$file | wc -l`;
 		} else {
+		    # redundant for the time being
+		    # and should make sure we avoid name clashes in naming the HTML
+		    $madDiffRes =
+			`$localRootDir/MadDiff.pl ./$file $samplesRootDir/$target/$sourceSubDir/$file $detailsHtmlFile`;
+		    # debug
+
+		    print "MADDIF invocation= ./MadDiff.pl ./$file $samplesRootDir/$target/$souceSubDir/$file $detailsHtmlFile";		    
+		    print "MADDIFFRES is $madDiffRes\n";
 		    $diffRes =  `diff ./$file $samplesRootDir/$target/$sourceSubDir/$file | wc -l`;
 		}
 		#print OUT $diffRes;
 		chop $diffRes;
-		
+
+
 		if ($diffRes == 0 ) {
-		    print OUT "# COMPARING $file yields $diffRes different lines => SUCCESS\n";
-		    $testReport .= "<tr class='success'><td>$file</td><td>SUCCESS</td></tr>\n";
+		    print OUT "# COMPARING $file yields $diffRes different lines => success\n";
+		    $testReport .= "<tr class='success'><td>$file</td><td><a href=\"$detailsLink\">success</a></td></tr>\n";
 		} else {
 
 		    # attempt juggling with the files' contents to check whether the match is actually
@@ -401,11 +443,11 @@ foreach $target (@targets) {
 			print OUT "# COMPARING $file yields $diffRes different lines";
 			print OUT " => cleaning header/footer yields $secondDiffRes differences =>";
 			if ($secondDiffRes ==0) {
-			    print OUT "WARNING\n";
-			    $testReport .="<tr class='warning'><td>$file</td><td>WARNING</td></tr>\n";
+			    print OUT "warning\n";
+			    $testReport .="<tr class='warning'><td>$file</td><td><a href=\"$detailsLink\">warning</a></td></tr>\n";
 			} else {
-			    print OUT "FAILURE\n";
-			    $testReport .="<tr class='failure'><td>$file</td><td>FAILURE</td></tr>\n";
+			    print OUT "failure\n";
+			    $testReport .="<tr class='failure'><td>$file</td><td><a href=\"$detailsLink\">failure</a></td></tr>\n";
 			}
 		    } else {
 			# this is a 'by-product' output file
@@ -414,11 +456,11 @@ foreach $target (@targets) {
 			print OUT "# COMPARING $file yields $diffRes different lines";
 			print OUT " => tampering with contents yields $secondDiffRes differences =>";
 			if ($secondDiffRes ==0) {
-			    print OUT "WARNING\n";
-			    $testReport .="<tr class='warning'><td>$file</td><td>WARNING</td></tr>\n";
+			    print OUT "warning\n";
+			    $testReport .="<tr class='warning'><td>$file</td><td><a href=\"$detailsLink\">warning</a></td></tr>\n";
 			} else {
-			    print OUT "FAILURE\n";
-			    $testReport .="<tr class='failure'><td>$file</td><td>FAILURE</td></tr>\n";
+			    print OUT "failure\n";
+			    $testReport .="<tr class='failure'><td>$file</td><td><a href=\"$detailsLink\">failure\</a></td></tr>\n";
 			}			
 		    }
 		}
@@ -427,14 +469,14 @@ foreach $target (@targets) {
 	close(OUT);	
       
     } # tests
-    $targetReport .= "</table>\n"; # end of table per target
+    $testReport .= "</table>\n"; # end of table per target
 
 } # targets
 
 $endTime = localtime;
 
 # create web page
-$html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">';
+my $html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">';
 $html .= "<html>\n";
 $html .= "<head>\n";
 $html .= "<title>MAD test result</title>\n";
@@ -442,7 +484,7 @@ $html .= "<link rel=stylesheet href=\"./MadTestWebStyle.css\" type=\"text/css\">
 $html .= "</head>\n";
 $html .= "<!-- automatically generated by the MAD testing script -->\n";
 $html .= "<body>\n";
-$html .= "<p>Test started $startTime, ended $endTime</p>";
+$html .= "<p>Test started $startTime, ended $endTime</p>\n";
 $html .= $testReport;
 $html .= "</body>\n";
 $html .= "</html>\n";
