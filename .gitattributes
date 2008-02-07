@@ -123,6 +123,7 @@
 /sxf.c -text
 testing/MadBuild.pl -text
 testing/MadBuildAndTest.pl -text
+testing/MadDiff.pl -text
 testing/MadTest.pl -text
 testing/MadTestWebStyle.css -text
 testing/Makefile -text
