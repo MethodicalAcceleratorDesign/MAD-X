@@ -82,7 +82,7 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-    # if ($targetDir ne "ptc_twiss") {next;}
+    if ($targetDir ne "ptc_twiss") {next;}
 
     print "target = '$targetDir'\n";
 
@@ -142,7 +142,7 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
-    # if ($target ne "ptc_twiss") {next; }
+    if ($target ne "ptc_twiss") {next; }
 
     print "--- testing $target\n";
 
@@ -393,15 +393,22 @@ foreach $target (@targets) {
 		my $detailsLink;
 		my $detailsHtmlFile;
 
+		# specific case when the HTML file name is of the form XX.map or XX.map.htm 
+		# webserver will fail to display the HTML although one can open it form the webfolder...
+		# to overcome this limitation, we need to juggle with the HTML file name
+		$_ = $file;
+		s/\.map$/\.maAap/g;
+		$f = $_;
+		
 
 		if ($sourceSubDir eq "") {
 
-		    $detailsLink = "./details/DiffResult_"."$target"."_"."$file.htm"; # web
-		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$file.htm"; # delivery
+		    $detailsLink = "./details/DiffResult_"."$target"."_"."$f.htm"; # web
+		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$f.htm"; # delivery
 		} else {
 
-		    $detailsLink = "./details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$file.htm"; # weblink
-		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$file.htm"; # deliver
+		    $detailsLink = "./details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$f.htm"; # weblink
+		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$f.htm"; # deliver
 		}
 		
 		
