@@ -963,7 +963,7 @@
       include 'twissl.fi'
       include 'twissc.fi'
       include 'twissotm.fi'
-      logical fmap,cplxy,cplxt,dorad,sector_sel
+      logical fmap,cplxy,cplxt,dorad,sector_sel,mycentre_cptk
       integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
      &node_al_errors,n_align
       double precision rt(6,6),ek(6),re(6,6),rm(6,6),rwi(6,6),rc(6,6),  &
@@ -1047,7 +1047,10 @@
       n_align = node_al_errors(al_errors)
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)
+        mycentre_cptk = centre_cptk
+        centre_cptk = .false.
         call twcptk(re,orbit)
+        centre_cptk = mycentre_cptk
         if (sectormap) call m66mpy(re,srmat,srmat)
       endif
       if(centre) centre_cptk=.true.
@@ -1055,18 +1058,6 @@
       if(centre) then
         pos0=currpos
         currpos=currpos+el/two
-        if (n_align.ne.0)  then
-          orbit0(1)=opt_fun(9 )
-          orbit0(2)=opt_fun(10)
-          orbit0(3)=opt_fun(11)
-          orbit0(4)=opt_fun(12)
-          orbit0(5)=opt_fun(13)
-          orbit0(6)=opt_fun(14)
-          call dcopy(re,rm,36)
-          elh=el/two
-          call tmali2(elh,orbit0,al_errors,betas,gammas,orbit0,rm)
-          call twcptk(rm,orbit0)
-        endif
         sd = rt(5,6)
         do i = 1, 4
           sd = sd + rt(5,i) * disp(i)
@@ -1083,7 +1074,10 @@
       endif
       if (n_align.ne.0)  then
         call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
+        mycentre_cptk = centre_cptk
+        centre_cptk = .false.
         call twcptk(re,orbit)
+        centre_cptk = mycentre_cptk
         if (sectormap) call m66mpy(re,srmat,srmat)
       endif
       sumloc = sumloc + el
@@ -1416,7 +1410,7 @@
       include 'twissl.fi'
       include 'twissa.fi'
       include 'twissc.fi'
-      logical fmap,cplxy,cplxt,dorad
+      logical fmap,cplxy,cplxt,dorad,mycentre_bttk
       integer i,code,save,restart_sequ,advance_node,get_option,n_align, &
      &node_al_errors
       double precision orbit(6),orbit0(6),ek(6),re(6,6),rm(6,6),        &
@@ -1482,26 +1476,16 @@
       n_align = node_al_errors(al_errors)
       if (n_align.ne.0)  then
         call tmali1(orbit,al_errors,betas,gammas,orbit,re)
+        mycentre_bttk = centre_bttk
+        centre_bttk = .false.
         call twbttk(re,te)
+        centre_bttk = mycentre_bttk
       endif
       if(centre) centre_bttk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       if(centre) then
         pos0=currpos
         currpos=currpos+el/two
-        if (n_align.ne.0)  then
-          orbit0(1)=opt_fun(9 )
-          orbit0(2)=opt_fun(10)
-          orbit0(3)=opt_fun(11)
-          orbit0(4)=opt_fun(12)
-          orbit0(5)=opt_fun(13)
-          orbit0(6)=opt_fun(14)
-          call dcopy(re,rm,36)
-          call dcopy(te,tm,216)
-          elh=el/two
-          call tmali2(elh,orbit0,al_errors,betas,gammas,orbit0,rm)
-          call twbttk(rm,tm)
-        endif
         if(save.ne.0) call twfill(2,opt_fun,currpos, 1)
       endif
       centre_bttk=.false.
@@ -1510,7 +1494,10 @@
       endif
       if (n_align.ne.0)  then
         call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
+        mycentre_bttk = centre_bttk
+        centre_bttk = .false.
         call twbttk(re,te)
+        centre_bttk = mycentre_bttk
       endif
       if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero,1)
       if(centre) then
