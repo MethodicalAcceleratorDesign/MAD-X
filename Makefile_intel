@@ -150,8 +150,8 @@ run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
 
 # matchlib2 for madx only
-matchlib2_f77.o: matchlib2.F
-	$(FC) -m32 -c -o $@ $<
+#matchlib2_f77.o: matchlib2.F
+#	$(FC) -m32 -c -o $@ $<
 
 # implicit rule to compile with C
 %.o : %.c
