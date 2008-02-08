@@ -40,11 +40,38 @@ foreach $line (@lines) {
 
     my @parts = split /[|]/, $line; # look for parts that differ
 
-    $nbParts = scalar(@parts);
+    my $nbParts = scalar(@parts);
 
 
     if ($nbParts == 2) {
-	$diffReport .= "<tr class=\"different\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
+	# before concluding the difference is a failure, check it is not only a warning
+	my @knownPatterns = (
+			     # patterns showing-up in .out files
+			     '^[\s\t]*\+[\s\t]+MAD-X[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
+			     '^[\s\t]*\+[\s\t]+Code Modification Date:[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
+			     '^[\s\t]*\+[\s\t]+Execution Time Stamp:[\s\t]+\d+\.\d+\.\d+[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
+			     '^[\s\t]*\+[\s\t]+MAD-X[\s\t]+\d+\.\d+\.\d+[\s\t]+finished normally[\s\t]+\+[\s\t]*$',
+			     # other patterns that often come together
+			     '^[\s\t]*@[\s\t]+ORIGIN[\s\t]+%',
+			     '^[\s\t]*@[\s\t]+DATE[\s\t]+%',
+			     '^[\s\t]*@[\s\t]+TIME[\s\t]+%'
+			  );
+
+	my $matchKnownPattern = 0; # default
+	foreach $pattern (@knownPatterns) {
+	    if ( $parts[0] =~ /$pattern/) {
+		if ($parts[1] =~ /$pattern/) {
+		    $matchKnownPattern = 1;
+		}
+	    }
+	}
+
+	if ($matchKnownPattern == 1) {
+	    $diffReport .= "<tr class=\"different-warning\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
+	} else {
+	    # before concluding the difference is a failure, check for numerical rounding errors
+	    $diffReport .= "<tr class=\"different-failure\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
+	}
     } else {
 	
 
@@ -94,11 +121,41 @@ foreach $line (@lines) {
 		    $diffReport .= "<tr class=\"almost-identical\"><td>$leftPart</td><td>$rightPart</td></tr>\n";
 		}
 		else {
-		    # keep the line as it is
-		    $diffReport .= "<tr class=\"got-lost\"><td colspan=\"2\">$line</td></tr>\n";
+		    # before concluding we're lost check whether the part only belongs to left or right
+		    # diff --side-by-side issues a '<' for parts belonging to the first file only
+		    # ! remember '<' has already been replaced by '&lt;' earlier on for HTML display...
+		    if ($line =~ /&lt;$/) {
+			# remove the '<' char at the end of the line
+			$_ = $line;
+			s/[\s\t]+&lt;//g;
+			$cleanLine = $_;
+			$diffReport .= "<tr class=\"only-left\"><td>$cleanLine</td><td></td></tr>\n";
+		    }
+		    # also try to the same for part only belonging to the right part...
+		    else {
+			# diff --side-by-side issues a '<' for parts belonging to the first file only
+			# ! remember '>' has already been replaced by '&gt;' earlier on for HTML display...
+			
+			if ($line =~ /^[\s\t]*&gt;/) {
+			   
+			    # remove the '>' char at the beginning of the line
+			    $_ = $line;
+			    
+			    # curious: following fails when trying to add spaces or tabs before ampersand
+			    s/&gt;//g; # there seems to be a trouble around this line
+				$cleanLine = $_;
+			       
+				$diffReport .= "<tr class=\"only-right\"><td></td><td>$cleanLine</td></tr>\n";
+			}	
+			else {
+			    # finally ...
+			    # keep the line as it is - just got lost!
+			    $diffReport .= "<tr class=\"got-lost\"><td colspan=\"2\">$line</td></tr>\n";
+			}
+		    }
 		}
 	    }
-	}
+	} # $nbParts = 1, i.e. could not split as two left and right parts separated by "|" (from diff)
     }
 
 
