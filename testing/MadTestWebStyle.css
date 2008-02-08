@@ -18,11 +18,22 @@ tr.failure		{background-color: #FFBBBB}
 tr.success		{background-color: #BBFFBB}
 tr.omit			{background-color: black; color: white}
 /* details */
-tr.identical		{background-color: #BBFFBB; font-family:Courrier}
-tr.almost-identical 	{background-color: #DDFFDD; font-family:Courrier}
-tr.different    	{background-color: #DDDDDD; font-family:Courrier}
-tr.got-lost		{background-color: #FFFF99; font-family:Courrier; 
-			font-size:small}
+tr.identical		{background-color: #BBFFBB; font-family:Courrier;
+				font-size:small}
+tr.almost-identical 	{background-color: #DDFFDD; font-family:Courrier;
+				font-size:small}
+tr.different-failure    {background-color: #FFBBBB; font-family:Courrier;
+				font-size:small}
+tr.different-warning	{background-color: #FFDDBB; font-family:Courrier;
+				font-size:small}
+tr.only-left		{background-color: #DDDDDD; font-family:Courrier;
+				font-size:small}
+tr.only-right		{background-color: #DDDDDD; font-family:Courrier;
+				font-size:small}
+tr.double-discrepancy	{background-color: #FFFF99; font-family:Courrier;
+				font-size:small}
+tr.got-lost		{color: white; background-color: black;
+				font-family:Courrier; font-size:small}
 
 /* build results colors */
 font.warning	{color: #FFBBAA}
