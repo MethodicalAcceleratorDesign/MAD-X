@@ -3711,8 +3711,17 @@ void pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
         case '>':
           if (cout > 0 && outbuf->c[cout-1] == '-')
           {
-            outbuf->c[cout++] = c; break;
+            outbuf->c[cout++] = c;
           }
+          else
+	  {
+           left_b = 0;
+           new_string = 1;
+           outbuf->c[cout++] = ' ';
+           outbuf->c[cout++] = c;
+           outbuf->c[cout++] = ' ';
+	  }
+          break;
         case ')':
           rb_level--;
           if (fill_flag && cpnb == '(') outbuf->c[cout++] = '0';
