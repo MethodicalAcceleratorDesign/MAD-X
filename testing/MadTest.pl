@@ -7,10 +7,9 @@
 # Still to do :
 # (1) expand call-tree till the leafs
 # (2) accomodate for different directory structures
-# (3) Calling madfile with symbolic name?
-# (4) allow for files loading from different directories in the call-tree
-# (5) check potential troubles with namespace restricted to target name
-# (6) ideally HTML formatting should be moved out of the code, relying on XML, XSLT and CSS instead
+# (3) allow for files loading from different directories in the call-tree
+# (4) check potential troubles with namespace restricted to target name
+# (5) ideally HTML formatting should be moved out of the code, relying on XML, XSLT and CSS instead
 
 use MIME::Lite; # to send e-mail
 
@@ -82,7 +81,7 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-    if ($targetDir ne "ptc_twiss") {next;}
+    # if ($targetDir ne "ptc_twiss") {next;} # only one target
 
     print "target = '$targetDir'\n";
 
@@ -142,7 +141,7 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
-    if ($target ne "ptc_twiss") {next; }
+    #  if ($target ne "ptc_twiss") {next; } # only one target
 
     print "--- testing $target\n";
 
@@ -414,63 +413,17 @@ foreach $target (@targets) {
 		
 		
 		if ($sourceSubDir eq "") {
-		    # redundant for the time being
-		    # and should make sure we avoid name clashes in naming the HTML
-		    $madDifRes = 
+		    $madDiffRes = 
 			`$localRootDir/MadDiff.pl ./$file $samplesRootDir/$target/$file $detailsHtmlFile`;
-		    # debug
-		    print "MADDIF invocation= ./MadDiff.pl ./$file $samplesRootDir/$target/$file $detailsHtmlFile";
-		    print "MADDIFFRES is $madDiffRes\n";
-		    $diffRes = `diff ./$file $samplesRootDir/$target/$file | wc -l`;
 		} else {
-		    # redundant for the time being
-		    # and should make sure we avoid name clashes in naming the HTML
 		    $madDiffRes =
 			`$localRootDir/MadDiff.pl ./$file $samplesRootDir/$target/$sourceSubDir/$file $detailsHtmlFile`;
-		    # debug
-
-		    print "MADDIF invocation= ./MadDiff.pl ./$file $samplesRootDir/$target/$souceSubDir/$file $detailsHtmlFile";		    
-		    print "MADDIFFRES is $madDiffRes\n";
-		    $diffRes =  `diff ./$file $samplesRootDir/$target/$sourceSubDir/$file | wc -l`;
 		}
-		#print OUT $diffRes;
-		chop $diffRes;
 
+		
+		$testReport .= "<tr class='$madDiffRes'><td>$file</td><td><a href=\"$detailsLink\">$madDiffRes</a></td></tr>\n";
+		print OUT "#COMPARING $file yields $madDiffRes\n";
 
-		if ($diffRes == 0 ) {
-		    print OUT "# COMPARING $file yields $diffRes different lines => success\n";
-		    $testReport .= "<tr class='success'><td>$file</td><td><a href=\"$detailsLink\">success</a></td></tr>\n";
-		} else {
-
-		    # attempt juggling with the files' contents to check whether the match is actually
-		    # better than it looks
-		    # if this is an .out output file, comparison should omit the header and footer
-		    if ($file =~ /[\w_\-.\d]+.out/ ){
-			$secondDiffRes = specificOutputComparison("./$file","$sourceSubDir");
-			print OUT "# COMPARING $file yields $diffRes different lines";
-			print OUT " => cleaning header/footer yields $secondDiffRes differences =>";
-			if ($secondDiffRes ==0) {
-			    print OUT "warning\n";
-			    $testReport .="<tr class='warning'><td>$file</td><td><a href=\"$detailsLink\">warning</a></td></tr>\n";
-			} else {
-			    print OUT "failure\n";
-			    $testReport .="<tr class='failure'><td>$file</td><td><a href=\"$detailsLink\">failure</a></td></tr>\n";
-			}
-		    } else {
-			# this is a 'by-product' output file
-			# otherwise by checking the numerical values' precision is preserved
-			$secondDiffRes = roundedOutputComparison("./$file","$sourceSubDir");
-			print OUT "# COMPARING $file yields $diffRes different lines";
-			print OUT " => tampering with contents yields $secondDiffRes differences =>";
-			if ($secondDiffRes ==0) {
-			    print OUT "warning\n";
-			    $testReport .="<tr class='warning'><td>$file</td><td><a href=\"$detailsLink\">warning</a></td></tr>\n";
-			} else {
-			    print OUT "failure\n";
-			    $testReport .="<tr class='failure'><td>$file</td><td><a href=\"$detailsLink\">failure\</a></td></tr>\n";
-			}			
-		    }
-		}
 	    }
 	}
 	close(OUT);	
@@ -549,144 +502,3 @@ sub getListOfDependantFiles {
 }
 
 
-sub specificOutputComparison {
-    # specific matching of the .out files
-    my $outfilename = $_[0];
-    my $sourceSubDir = $_[1];
-     
-    # Specific pre-processing of the outfiles which feature headers and tailers that may change
-    # from one run to the next.
-    my $pwd = `pwd`;
-    chop $pwd;
-    # copy the original reference output file locally since we are going to clean-up from
-    # its more or less standard headers and footers...
-    my $referenceOutfilename = $outfilename . '_ref';
-    
-    if ($sourceSubDir eq "") {
-	`cp $samplesRootDir/$target/$outfilename ./$referenceOutfilename`;
-    } else {
-	`cp $samplesRootDir/$target/$sourceSubDir/$outfilename ./$referenceOutfilename`;
-    }
-
-
-    print "now about to compare '$outfilename' and '$referenceOutfilename' in directory '$pwd'";
-    
-    # before performing the comparison, discard heading comments and tail of the output files
-    # (such cooking required until we manage to have more structured i/o file formats)
-    
-    my $headerEndMark = "Execution Time Stamp";
-    my $footerStartMark = "terminated - total number of elements";
-    
-    print "now about to clean files up\n";
-    @filesToBeCleaned = ($outfilename,$referenceOutfilename);
-    
-    foreach $inputFileName (@filesToBeCleaned) {
-	my $outputFileName = $inputFileName . "_clean";
-	
-	open(INFILE,$inputFileName);
-	open(OUTFILE,">$outputFileName");
-	
-	my $copy = 0 ;
-	my $neverWritten = 1; # to avoid case where no header end-mark is found, yielding to empty files
-
-	while(<INFILE>){
-	    $currentLine = $_;
-	    if (/$footerStartMark/) { $copy = 0;}
-	    if ($copy == 1) { 
-		print OUTFILE $currentLine;
-		$neverWritten = 0 ;
-			  }
-	    if (/$headerEndMark/){ $copy = 1; }
-	}
-	
-	close(INFILE);
-	close (OUTFILE);
-    }
-    print "files have been cleaned-up\n";
-    
-    my $differencesLines;
-
-    if ($neverWritten == 1) {
-	$differencesLines = "EMPTY_FILE";
-    } else {
-
-	my $cleanedOutfilename = $outfilename . "_clean";
-	my $cleanedReferenceOutfilename = $referenceOutfilename . "_clean";
-	
-	$differencesLines = `diff $cleanedOutfilename $cleanedReferenceOutfilename | wc -l `;
-	chop $differencesLines;
-    }
-    $_ = $differencesLines ;
-};
-
-
-sub roundedOutputComparison {
-    my $leastSignificantDigits = 5 ; # for time-being consider 4 least significant digits may differ in exponential notation
-    my $outfilename = $_[0];
-    my $sourceSubDir = $_[1];   
-    # very approximate test
-    # replace all the least significant digits by 'round' mark
-    # and then carry-out the diff once again
-    # alternate test, check that the ratio is equal to one at the specified precision
-     # Specific pre-processing of the outfiles which feature headers and tailers that may change
-    # from one run to the next.
-
-    my $pwd = `pwd`;
-    chop $pwd;
-    # copy the original reference output file locally since we are going to clean-up from
-    # its more or less standard headers and footers...
-    my $referenceOutfilename = join("",$outfilename,'_ref');
-
-    if ($sourceSubDir eq "") {
-	`cp $samplesRootDir/$target/$outfilename ./$referenceOutfilename`;
-    } else {
-	`cp $samplesRootDir/$target/$sourceSubDir/$outfilename ./$referenceOutfilename`;
-    }
-    print "now about to compare '$outfilename' and '$referenceOutfilename' in directory '$pwd'";
-    
-    print "now about to clean roundup files up\n";
-    my @filesToBeRoundedUp = ($outfilename,$referenceOutfilename);
-    
-    foreach $inputFileName (@filesToBeRoundedUp) {
-	my $outputFileName = $inputFileName . "_rounded";
-	
-	open(INFILE,$inputFileName);
-	open(OUTFILE,">$outputFileName");
-	
-	my $copy = 0 ;
-	
-	while(<INFILE>){
-	    goto notest;
-	    if(/(([+-]?\d.\d+)(\d{$leastSignificantDigits})([eE][+-]?\d+))/) {
-		print "pattern found in $1 with ";
-		print "MSD $2, and ";
-		print "LSD $3, and ";
-		print "exponent $4\n"; exit;
-	    }
-	  notest:
-	    # in the future the 'round' marker should be adapted in length so as to match
-	    # the precision expressed in terms of least significant bits...
-	    s/(([+-]?\d.\d+)(\d{$leastSignificantDigits})([eE][+-]?\d+))/\2round\4/g; # \1 stands for $1 in a regexp
-
-	    # a set of comments which depend on the time at which the test is launched
-	    s/@[\s\t]*ORIGIN[\s\t]+[\w\d\-\/_.%\s\t\"]*/@ REPLACED COMMENT THAT CHANGES FROM ONE MAD VERSION TO THE NEXT\n/g;
-	    s/@[\s\t]*DATE[\s\t]+[\w\d\-\/_.%\s\t\"]*/@ REPLACED COMMENT THAT CHANGES FROM ONE RUN TO THE NEXT\n/g;
-	    s/@[\s\t]*TIME[\s\t]+[\w\d\-\/_.%\s\t\"]*/@ REPLACED COMMENT THAT CHANGES FROM ONE RUN TO THE NEXT\n/g;
-
-	    print OUTFILE $_;
-	}
-	
-	close(INFILE);
-	close (OUTFILE);
-    }
-    print "files have been rounded-up\n";
-    
-    my $roundedOutfilename = $outfilename . "_rounded";
-    my $roundedReferenceOutfilename = $referenceOutfilename . "_rounded";
-    
-    my $differencesLines = `diff $roundedOutfilename $roundedReferenceOutfilename | wc -l `;
-    chop $differencesLines;
-
-    $_ = $differencesLines ; 
-
-};
