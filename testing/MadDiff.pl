@@ -3,9 +3,12 @@
 # performs a diff of two files and displays the output in HTML
 
 # inputs: the two files to be compared, and the name of the HTML file to be created (full path)
-# output: prints SUCCESS, WARNING or ERROR of the comparison to stdout
+# output: prints 'success','warning' or 'failure' of the comparison to stdout
 
 my $tolerance = 0.001; # for time-being, hard-code maximum incertitude as 0.1%
+my $maxWidth = 360; # different lines may appear as identical after truncation
+# for instance numerical discrepancies may not show up until width is increased
+# to say 360 or so. In many cases 180 or so would be sufficient.
 
 if ( $#ARGV != 2 ) {
     print "expect 3 arguments: (1) first file (2) second file and (3) target htmlfile! EXIT!\n" ;
@@ -27,7 +30,7 @@ my $diffReport = "";
 $diffReport .= "<table>\n";
 $diffReport .= "<tr><td width=\"50%\">$leftFilename</td><td width=\"50%\">$rightFilename</td></tr>\n";
 
-my $diffResult = `diff --side-by-side --width 180 $leftFilename $rightFilename`; # should not exceed webpage max
+my $diffResult = `diff --side-by-side --width $maxWidth $leftFilename $rightFilename`; # should not exceed webpage max
 my @lines = split /\n/, $diffResult;
 
 
@@ -75,6 +78,9 @@ foreach $line (@lines) {
 	    if ($retStatus ne "failure") { $retStatus = "warning";} # otherwise keep its worst value
 	} else {
 
+	    # should repeat the test for identical left and right here
+
+
 	    # before concluding the difference is a failure, check for numerical rounding errors
 	    $numericalMatch = 1; # default
 	    @leftChunks = split /[\s\t:=]+/, $parts[0];
@@ -92,11 +98,12 @@ foreach $line (@lines) {
 			# for some reason, looks like we have to double the '\' when the pattern is in a string
 			# and also have to add "\" before the right-anchor "$"
 			# ... to be clarified...
-			$numPattern = "^[+-]?\\d*.\\d+[eE]?[+-]?\\d*\$"; # to account for the various formats found with Mad
+			# try to replace " by '
+			$numPattern = '^[+-]?\d*.\d+[eE]?[+-]?\d*$'; # to account for the various formats found with Mad
 			if (($leftChunk =~ /$numPattern/) && ($rightChunk =~ /$numPattern/)) {
 			    $leftValue = $leftChunk;
 			    $rightValue = $rightChunk;
-			
+
 			    if ($tolerance==0) {
 				if ($leftValue == $rightValue ) { $numericalMatch = 1; } 
 				else {
@@ -107,6 +114,7 @@ foreach $line (@lines) {
 			    }
 			    else {
 				# define tolerance as the maximum incertitude between the two values
+
 				if ( (2.0*abs($leftValue-$rightValue)/($leftValue+$rightValue)) < $tolerance ) {
 				    $numericalMatch = 1;
 				} else {
@@ -135,7 +143,8 @@ foreach $line (@lines) {
 		$diffReport .= "<tr class=\"different-failure\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
 		$retStatus = "failure"; # anyway
 	    }
-
+	    
+	    
 	}
     } else {
 	
@@ -187,8 +196,8 @@ foreach $line (@lines) {
 	    } else {
 		if ($alignedLeftPart eq $alignedRightPart) {
 		    $diffReport .= "<tr class=\"almost-identical\"><td>$leftPart</td><td>$rightPart</td></tr>\n";
-		    if (($retStatus eq "undefined") || ($retStatus eq "success")){
-			$retStatus = "warning";
+		    if ($retStatus eq "undefined"){
+			$retStatus = "success";
 		    }# otherwise keep its worst value
 		}
 		else {
