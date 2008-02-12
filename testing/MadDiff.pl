@@ -50,6 +50,25 @@ foreach $line (@lines) {
 
 
     if ($nbParts == 2) {
+
+	my $matchKnownPattern = 0; # default
+
+	# --- specific case: 'Number of warning[s]:(\d)' match in case actual numbers on both sides are equal
+	$warningPattern = '^[\s\t]*Number of warning[s]?[\s\t]*:[\s\t]*(\d+)[\s\t]*$';
+	if ($parts[0] =~ /$warningPattern/){
+	    my $leftWarningNumber = $1;
+	    if ($parts[1] =~ /$warningPattern/){
+		my $rightWarningNumber = $1;
+		if ($leftWarningNumber == $rightWarningNumber){
+		    $matchKnownPattern = 1 ; # will display and return status as a warning, not a failure
+		} else { goto matchKnownPattern; }
+	    } else { goto matchKnownPattern; }
+	} else { goto matchKnownPattern; }
+	# --- 
+
+      matchKnownPattern:
+ 
+
 	# before concluding the difference is a failure, check it is not only a warning
 	# to be checked: looks like patterns do not works a strings in some cases
 	my @knownPatterns = (
@@ -64,7 +83,7 @@ foreach $line (@lines) {
 			     '^[\s\t]*@[\s\t]+TIME[\s\t]+%'
 			  );
 
-	my $matchKnownPattern = 0; # default
+
 	foreach $pattern (@knownPatterns) {
 	    if ( $parts[0] =~ /$pattern/) {
 		if ($parts[1] =~ /$pattern/) {
