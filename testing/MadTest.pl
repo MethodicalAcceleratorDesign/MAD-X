@@ -81,7 +81,8 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-    # if ($targetDir ne "ptc_twiss") {next;} # only one target
+#    if ($targetDir ne "ptc_twiss") {next;} # only one target
+    if ($targetDir ne "c6t") {next;} # only one target
 
     print "target = '$targetDir'\n";
 
@@ -141,7 +142,8 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
-    #  if ($target ne "ptc_twiss") {next; } # only one target
+    # if ($target ne "ptc_twiss") {next; } # only one target
+     if ($target ne "c6t") {next;} # only one target
 
     print "--- testing $target\n";
 
@@ -400,17 +402,9 @@ foreach $target (@targets) {
 		$f = $_;
 		
 
-		if ($sourceSubDir eq "") {
-
-		    $detailsLink = "./details/DiffResult_"."$target"."_"."$f.htm"; # web
-		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$f.htm"; # delivery
-		} else {
-
-		    $detailsLink = "./details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$f.htm"; # weblink
-		    $detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$sourceSubDir"."_"."$f.htm"; # deliver
-		}
-		
-		
+		# handle both cases where there is a $sourceSubDir or not...
+		$detailsLink = "./details/DiffResult_"."$target"."_"."$testCaseDir"."_"."$f.htm"; # weblink
+		$detailsHtmlFile = "$htmlRootDir/details/DiffResult_"."$target"."_"."$testCaseDir"."_"."$f.htm"; # deliver		
 		
 		if ($sourceSubDir eq "") {
 		    $madDiffRes = 
