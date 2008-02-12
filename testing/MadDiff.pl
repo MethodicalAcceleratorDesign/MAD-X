@@ -5,7 +5,7 @@
 # inputs: the two files to be compared, and the name of the HTML file to be created (full path)
 # output: prints 'success','warning' or 'failure' of the comparison to stdout
 
-my $tolerance = 0.001; # for time-being, hard-code maximum incertitude as 0.1%
+my $tolerance = 0.001; # for time-being, hard-code maximum incertitude as 0.1%, i.e. 0.001
 my $maxWidth = 360; # different lines may appear as identical after truncation
 # for instance numerical discrepancies may not show up until width is increased
 # to say 360 or so. In many cases 180 or so would be sufficient.
@@ -266,7 +266,8 @@ $html .= "<p>Test started $startTime, ended $endTime</p>\n";
 $html .="<p>Legend:</p>\n";
 $html .="<table>\n";
 $html .="<tr class=\"identical\"><td>Lines match</td></tr>\n";
-$html .="<tr class=\"numerical-match\"><td>Numerical data match within 0.1% tolerance</td></tr>\n";
+my $tolPercent = $tolerance * 100.0;
+$html .="<tr class=\"numerical-match\"><td>Numerical data match within $tolPercent% tolerance</td></tr>\n";
 $html .="<tr class=\"different-warning\"><td>Lines differ expectedly</td></tr>\n";
 $html .="<tr class=\"different-failure\"><td>Lines differ unexpectedly</td></tr>\n";
 $html .="<tr class=\"only-left\"><td>Part present in one file, absent of the other</td></tr>\n";
