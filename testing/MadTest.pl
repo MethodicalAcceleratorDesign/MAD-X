@@ -82,7 +82,7 @@ foreach $targetDir (@targetDirs) {
 
     # DBG
 #    if ($targetDir ne "ptc_twiss") {next;} # only one target
-    if ($targetDir ne "c6t") {next;} # only one target
+#    if ($targetDir ne "c6t") {next;} # only one target
 
     print "target = '$targetDir'\n";
 
@@ -143,7 +143,7 @@ foreach $target (@targets) {
     chop $target;
     # DBG
     # if ($target ne "ptc_twiss") {next; } # only one target
-     if ($target ne "c6t") {next;} # only one target
+    # if ($target ne "c6t") {next;} # only one target
 
     print "--- testing $target\n";
 
