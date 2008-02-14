@@ -77,6 +77,9 @@ foreach $line (@lines) {
 			     '^[\s\t]*\+[\s\t]+Code Modification Date:[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
 			     '^[\s\t]*\+[\s\t]+Execution Time Stamp:[\s\t]+\d+\.\d+\.\d+[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
 			     '^[\s\t]*\+[\s\t]+MAD-X[\s\t]+\d+\.\d+\.\d+[\s\t]+finished normally[\s\t]+\+[\s\t]*$',
+			     # patterns showing-up in postcript output
+			     '%%CreationDate:[\s\t]*\d\d\/\d\d\/\d\d',
+			     '\(MAD-X[\s\t]+\d+\.\d+.\d+[\s\t]+\d\d\/\d\d\/\d\d[\s\t]+\d\d\.\d\d\.\d\d\)',
 			     # other patterns that often come together
 			     '^[\s\t]*@[\s\t]+ORIGIN[\s\t]+%',
 			     '^[\s\t]*@[\s\t]+DATE[\s\t]+%',
