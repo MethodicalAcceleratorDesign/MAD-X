@@ -9,8 +9,8 @@
    </target>
 
    <target name="c6t">
-        <test input="convert_example_rhic.madx" output="convert_example_rhic.out"/>
-	<test input="convert_example_lhc.madx" output="convert_example_lhc.out"/>
+        <test input="convert_example_rhic.madx" output="convert_example_rhic.out" subdir="RHIC"/>
+	<test input="convert_example_lhc.madx" output="convert_example_lhc.out" subdir="LHC"/>
    </target>
    <target name="cororbit">
 	<test input ="example1.mad" output="example1.out"/>
