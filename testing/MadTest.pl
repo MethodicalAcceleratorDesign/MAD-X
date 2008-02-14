@@ -17,7 +17,9 @@ $startTime = localtime;
 
 $testReport = ""; # will be stored into an HTML document
 
-$samplesRootDir = '/afs/cern.ch/user/f/frs/public_html/mad-X_examples';
+# $samplesRootDir = '/afs/cern.ch/user/f/frs/public_html/mad-X_examples';
+$samplesRootDir = '/afs/cern.ch/user/n/nougaret/scratch0/mad-automation/REF';
+
 
 $htmlRootDir = '/afs/cern.ch/user/n/nougaret/www/mad';
 $htmlFile = "$htmlRootDir/test.htm"; # for the time being
@@ -82,7 +84,9 @@ foreach $targetDir (@targetDirs) {
 
     # DBG
 #    if ($targetDir ne "ptc_twiss") {next;} # only one target
-#    if ($targetDir ne "c6t") {next;} # only one target
+#     if ($targetDir ne "c6t") {next;} # only one target
+    # only a few targets...
+     if (($targetDir ne "ibs") && ($targetDir ne "foot") && ($targetDir ne "cororbit") &&($targetDir ne "ptc_twiss") && ($targetDir ne "c6t") && ($targetDir ne "dynap") && ($targetDir ne "makethin")) {next;}
 
     print "target = '$targetDir'\n";
 
@@ -144,6 +148,8 @@ foreach $target (@targets) {
     # DBG
     # if ($target ne "ptc_twiss") {next; } # only one target
     # if ($target ne "c6t") {next;} # only one target
+    # only a few targets...
+    if (($target ne "ibs")&&($target ne "foot") && ($target ne "cororbit") && ($target ne "ptc_twiss") && ($target ne "c6t") && ($target ne "dynap") && ($target ne "makethin")) {next;}
 
     print "--- testing $target\n";
 
@@ -328,8 +334,7 @@ foreach $target (@targets) {
 	$outfilename = $1 . ".out";
   
 	# list all by-product output files
-	@allFilesNow = `ls -I mad*`; # list of all input + output files after invoking 'mad' command 
-        # ignore the madx/madxp entries which should stay on top
+	@allFilesNow = `ls`; # list of all input + output files after invoking 'mad' command 
 	
 	# remove the madx link from the list of files to be moved
 
@@ -342,10 +347,20 @@ foreach $target (@targets) {
 		    $isInput = 1;
 		} # otherwise the file has been produced upon invoking MAD must go into the ouput subdir
 	    }
-	    if ($isInput == 0) {
+	    if (($isInput == 0) && ($file ne "madx") && ($file ne "madxp")) {        
+		# ignore the madx/madxp entries which should stay on top
 		push (@outputs, $file);
 	    }
 	} ;
+
+	#DBG
+	my $dbg =1 ;
+	if ($dbg==1){
+	    print "--- for $testCaseDir ---\n";
+	    print "list of input files: @inputs\n";
+	    print "list of output files: @outputs\n";
+	    print "------------------------\n";
+	}
 
 	# now move inputs and outputs into dedicated subdirectory
 	$inputSubdir = "$localTestDir/$target/$testCaseDir/input";
