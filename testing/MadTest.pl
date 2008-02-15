@@ -84,9 +84,7 @@ foreach $targetDir (@targetDirs) {
 
     # DBG
 #    if ($targetDir ne "ptc_twiss") {next;} # only one target
-#     if ($targetDir ne "c6t") {next;} # only one target
-    # only a few targets...
-     if (($targetDir ne "ibs") && ($targetDir ne "foot") && ($targetDir ne "cororbit") &&($targetDir ne "ptc_twiss") && ($targetDir ne "c6t") && ($targetDir ne "dynap") && ($targetDir ne "makethin")) {next;}
+
 
     print "target = '$targetDir'\n";
 
@@ -147,9 +145,6 @@ foreach $target (@targets) {
     chop $target;
     # DBG
     # if ($target ne "ptc_twiss") {next; } # only one target
-    # if ($target ne "c6t") {next;} # only one target
-    # only a few targets...
-    if (($target ne "ibs")&&($target ne "foot") && ($target ne "cororbit") && ($target ne "ptc_twiss") && ($target ne "c6t") && ($target ne "dynap") && ($target ne "makethin")) {next;}
 
     print "--- testing $target\n";
 
@@ -225,12 +220,20 @@ foreach $target (@targets) {
 	    $_ = $input;
 	    # SPECIFIC CASE: files that must be stored in a locally replicated hierarchy
 	    # considering the MAD call instructions mention a relative path...
-	    if (/(..\/[\w\d\-_]+)\/([\w\d-_.]+)/) { # ../dir/file format only
-		# file to be called is located up the hierarchy
-		# in which case we need to reflect the directory tree structure
-		# by creating directories if necessary
-		$dependencyDir = $1;
-		$dependencyFile = $2;
+	    # note later-on should also accomodate for situations were the included files
+	    # are below, down the hierarchy... At this stage should re-implement path handling
+	    if (/..\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
+		my $term = $1;
+		if (/(..\/[\w\d\-_]+)\/([\w\d-_\.]+)/) { # ../dir/file format only
+		    # file to be called is located up the hierarchy
+		    # in which case we need to reflect the directory tree structure
+		    # by creating directories if necessary
+		    $dependencyDir = $1;
+		    $dependencyFile = $2;
+		} else {
+		    $dependencyDir = '..';
+		    $dependencyFile = $term;
+		}
 		# print "Found dependency file '$dependencyFile' under '$dependencyDir'\n";		
 		$existsDir = `ls -d $dependencyDir | wc -l`;
 		# print "existsDir now equals $existsDir\n";
@@ -261,9 +264,16 @@ foreach $target (@targets) {
 		foreach $secondLevelInput (@secondLevelInputs) {
 		    print "Second-level copy of $secondLevelInput\n";
 		    $_ = $secondLevelInput;
-		    if (/(..\/[\w\d\-_]+)\/([\w\d-_.]+)/) { # ../dir/file format only
-			$secondDependencyDir = $1;
-			$secondDependencyFile = $2;
+		    if (/..\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
+			my $term;
+			if (/(..\/[\w\d\-_]+)\/([\w\d-_\.]+)/) { # ../dir/file format only
+			    $secondDependencyDir = $1;
+			    $secondDependencyFile = $2;
+			} else {
+			    $secondDependencyDir = '..';
+			    $secondDependencyFile = my $term;
+			}
+
 			$existsSecondDir = `ls -d $dependencyDir/$secondDependencyDir | wc -l`;
 			if ($existsSecondDir) {
 			    print "dependency second directory '$dependencyDir/$secondDependencyDir' already exists\n";
@@ -482,14 +492,14 @@ sub getListOfDependantFiles {
     while(<IN>){
 	# take into account MAD various ways of reading a file, namely using either "call,file" or "readmytable,file"
 	my $fileRetreival = 0 ;
+	my $child;
 	# MAD syntax too permissive: hard to grep commands
-	if (/[Rr][Ee][Aa][Dd][Mm][Yy][Tt][Aa][Bb][Ll][Ee],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w._\-\d\/]+)[\"\']?[\s\t]*;/){
-	    my $child;
+	if (/^[\s\t]*[Rr][Ee][Aa][Dd][Mm][Yy][Tt][Aa][Bb][Ll][Ee],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*/){
 	    $child = $1;
 	    $fileRetreival = 1;
 
 	}
-	if (/[Cc][Aa][Ll][Ll],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w._\-\d\/]+)[\"\']?[\s\t]*;/) {
+	if (/^[\s\t]*[Cc][Aa][Ll][Ll],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w.\_\-\d\/]+)[\"\']?[\s\t]*;/) {
 	    $child = $1;
 	    $fileRetreival = 1;
 	}
