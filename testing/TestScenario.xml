@@ -13,9 +13,9 @@
 	<test input="convert_example_lhc.madx" output="convert_example_lhc.out" subdir="LHC"/>
    </target>
    <target name="cororbit">
-	<test input ="example1.mad" output="example1.out"/>
-        <test input ="example2.mad" output="example2.out"/>
-        <test input ="example3.mad" output="example3.out"/>
+	<test input ="example1.mad" output="example1.out" subdir="Example1"/>
+        <test input ="example2.mad" output="example2.out" subdir="Example2"/>
+        <test input ="example3.mad" output="example3.out" subdir="Example3"/>
    </target>
    <target name="dynap">
 	<test input ="fodo.thin.mad" output="fodo.thin.out"/>
@@ -26,11 +26,11 @@
 	<test input ="footprint.mad" output="footprint.out"/>
    </target>
    <target name="ibs">
-	<test input ="ibs.mad" output="ibs.out"/>
-	<test input ="ibs_ion.mad" output="ibs_ion.out"/>
-	<test input ="ibs_clic_dr.mad" output="ibs_clic_dr.out"/>
-	<test input ="ibs.lhcinjection.mad" output="ibs.lhcinjection.out"/>
-	<test input ="ibs.lhctopenergy.crossingangles.mad" output="ibs.lhctopenergy.crossingangles.out"/>
+	<test input ="ibs.mad" output="ibs.out" subdir="LhcProtonRun"/>
+	<test input ="ibs_ion.mad" output="ibs_ion.out" subdir="LhcProtonIons"/>
+	<test input ="ibs_clic_dr.mad" output="ibs_clic_dr.out" subdir="ClicDampingRing"/>
+	<test input ="ibs.lhcinjection.mad" output="ibs.lhcinjection.out" subdir="LhcInjection"/>
+	<test input ="ibs.lhctopenergy.crossingangles.mad" output="ibs.lhctopenergy.crossingangles.out" subdir="LhcTopEnergy"/>
    </target>
    <target name="makethin">
 	<test input ="fivecell.madx" output="fivecell.out"/>
