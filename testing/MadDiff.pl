@@ -3,7 +3,7 @@
 # performs a diff of two files and displays the output in HTML
 
 # inputs: the two files to be compared, and the name of the HTML file to be created (full path)
-# output: prints 'success','warning' or 'failure' of the comparison to stdout
+# output: prints 'success','quasi-success', 'warning' or 'failure' of the comparison to stdout
 
 my $tolerance = 0.001; # for time-being, hard-code maximum incertitude as 0.1%, i.e. 0.001
 my $maxWidth = 360; # different lines may appear as identical after truncation
@@ -60,7 +60,8 @@ foreach $line (@lines) {
 	    if ($parts[1] =~ /$warningPattern/){
 		my $rightWarningNumber = $1;
 		if ($leftWarningNumber == $rightWarningNumber){
-		    $matchKnownPattern = 1 ; # will display and return status as a warning, not a failure
+		    $matchKnownPattern = 1 ; # will display and return status as a quasi-success, 
+		    # i.e. as no warning nor failure
 		} else { goto matchKnownPattern; }
 	    } else { goto matchKnownPattern; }
 	} else { goto matchKnownPattern; }
@@ -97,7 +98,9 @@ foreach $line (@lines) {
 
 	if ($matchKnownPattern == 1) {
 	    $diffReport .= "<tr class=\"different-warning\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
-	    if ($retStatus ne "failure") { $retStatus = "warning";} # otherwise keep its worst value
+	    if (($retStatus eq "undefined")||($retStatus eq "success")) { 
+		$retStatus = "quasi-success";
+	    } # otherwise keep its worst value
 	} else {
 
 	    # should repeat the test for identical left and right here
