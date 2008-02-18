@@ -84,7 +84,9 @@ foreach $line (@lines) {
 			     # other patterns that often come together
 			     '^[\s\t]*@[\s\t]+ORIGIN[\s\t]+%',
 			     '^[\s\t]*@[\s\t]+DATE[\s\t]+%',
-			     '^[\s\t]*@[\s\t]+TIME[\s\t]+%'
+			     '^[\s\t]*@[\s\t]+TIME[\s\t]+%',
+			     # other patterns
+			     'sec.s since start: \d+[\s\t]+since last call: \d+'
 			  );
 
 
