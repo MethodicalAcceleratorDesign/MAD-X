@@ -7833,6 +7833,10 @@ void track_track(struct in_cmd* cmd)
     fprintf(prt_file, "one pass is on\n");
   set_option("onepass", &k);
 
+  if ((k = get_value(current_command->name,"update")) != 0)
+    fprintf(prt_file, "update is on\n");
+  set_option("update", &k);
+
 
   if ((k = get_value(current_command->name,"damp")) != 0)
     fprintf(prt_file, "damp is on\n");

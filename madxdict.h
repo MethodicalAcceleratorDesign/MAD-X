@@ -2167,6 +2167,7 @@ char command_def[] =
 "track: track track 1 0 "
 "deltap   = [r, 0], "
 "onepass  = [l, false, true], "
+"update   = [l, false, true], "
 "damp     = [l, false, true], "
 "quantum  = [l, false, true], "
 "dump     = [l, false, true], "

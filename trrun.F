@@ -28,7 +28,7 @@
       include 'name_len.fi'
       include 'track.fi'
       include 'bb.fi'
-      logical onepass,onetable,last_out,info,aperflag
+      logical onepass,onetable,last_out,info,aperflag,doupdate
       integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
      &nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
      &nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
@@ -147,10 +147,15 @@
       dodamp = get_option('damp ') .ne. 0
       dorand = get_option('quantum ') .ne. 0
       call dcopy(orbit0,orbit,6)
+      
+      doupdate = get_option('update ') .ne. 0
+      
 !--- loop over turns
       nobs = 0
       do turn = 1, turns
-        call trupdate(turn)
+        
+        if (doupdate) call trupdate(turn)
+        
         j = restart_sequ()
         nlm = 0
         sum=zero
@@ -2621,5 +2626,7 @@
 !---- call pro_input('TR$TURN := turn;')
       write(cmd, '(''tr$turni := '',i8,'' ; '')') turn
       call pro_input(cmd)
+      write(cmd, '(''exec, tr$macro($tr$turni) ; '')')
+      call pro_input(cmd)      
       end      
             
