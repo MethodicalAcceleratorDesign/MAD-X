@@ -18,8 +18,8 @@
         <test input ="example3.mad" output="example3.out" subdir="Example3"/>
    </target>
    <target name="dynap">
-	<test input ="fodo.thin.mad" output="fodo.thin.out"/>
-        <test input ="footprint.mad" output="footprint.out"/>
+	<test input ="fodo.thin.mad" output="fodo.thin.out" subdir="FODO"/>
+        <test input ="footprint.mad" output="footprint.out" subdir="LHC_footprint"/>
    </target>
    <!-- targets emit, error  missing -->
    <target name="foot">
