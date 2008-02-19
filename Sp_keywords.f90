@@ -505,9 +505,10 @@ contains
             m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
             m%mag%parent_fibre%parent_layout%n
     else
-       WRITE(MF,'(A11,4(I4,1x),A17,4(I4,1x))') " DIRECTION ", M%DIR, &
+
+       WRITE(MF,'(A11,4(I4,1x),A16,4(I4,1x))') " DIRECTION ", M%DIR, &
             m%mag%parent_fibre%parent_layout%index,m%mag%parent_fibre%pos, &
-            m%mag%parent_fibre%parent_layout%n," Siamese, Girder "         &
+            m%mag%parent_fibre%parent_layout%n," Siamese/Girder "         &
             ,siam_pos,siam_index,GIRD_POS,GIRD_index
     endif
     CALL print_chart(m%CHART,mf)
@@ -542,9 +543,8 @@ contains
     siam_pos=0
     gird_index=0
     gird_pos=0
-
-    READ(MF,'(A11,4(I4,1x),A9,4(I4,1x))') LINE(1:11),DIR,index,pos,n, &
-         LINE(12:20),siam_pos,siam_index,gird_index,gird_pos
+    READ(MF,'(A11,4(I4,1x),A16,4(I4,1x))') LINE(1:11),DIR,index,pos,n, &
+         LINE(12:27),siam_pos,siam_index,gird_index,gird_pos
     !    CALL READ_chart(m%CHART,mf)
     !    CALL READ_PATCH(m%PATCH,mf)
     !    CALL READ_element(M%MAG,mf)
@@ -831,6 +831,7 @@ contains
        WRITE(MF,'(A255)') LINE
     case(kind4)
        WRITE(MF,*) el%c4%N_BESSEL, "HARMON",el%c4%NF
+       WRITE(MF,*) el%c4%t,el%c4%phase0,el%c4%CAVITY_TOTALPATH
        do i=1,el%c4%NF
           write(mf,*) el%c4%f(i),el%c4%ph(i)
        enddo
@@ -860,9 +861,10 @@ contains
   subroutine read_specific_element(el,mf)
     implicit none
     type(element), pointer :: el
-    integer mf,NB,NH,i
+    integer mf,NB,NH,i,i1
     CHARACTER*6 HARMON
     character*255 line
+    real(dp) x1,x2
     select case(el%kind)
     CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
@@ -876,9 +878,15 @@ contains
 
        IF(INDEX(LINE, 'HARMON')/=0) THEN
           read(LINE,*) NB,HARMON,NH
-          N_CAV4_F=NH
+          if(nh>N_CAV4_F) then
+             N_CAV4_F=NH
+          endif
+          read(MF,*) x1,x2,i1
        ELSE
           read(LINE,*) NB
+          x1=zero
+          x2=c_%phase0
+          i1=CAVITY_TOTALPATH
        ENDIF
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        el%c4%N_BESSEL=NB
@@ -886,6 +894,9 @@ contains
        do i=1,nh
           read(mf,*) el%c4%f(i),el%c4%ph(i)
        enddo
+       el%c4%t=x1
+       el%c4%phase0=x2
+       el%c4%CAVITY_TOTALPATH=i1
     case(kind10)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        read(MF,*) el%tp10%DRIFTKICK
@@ -1300,7 +1311,6 @@ contains
        write(6,*) " read layout ", i
        write(6,*) U%end%name
     enddo
-
     do i=1,n_l
        call APPEND_EMPTY_LAYOUT(U)
        allocate(U%END%DNA(N))
@@ -1407,11 +1417,13 @@ contains
     endif
 
     READ(MF,*) N,LMAX0t
+    write(6,*) N,LMAX0t
     IF(PRESENT(LMAX0)) then
        if(LMAX0t/=zero) LMAX0=LMAX0T
     ENDIF
     read(MF,'(a120)') line
     call context(line)
+    write(6,*) line
 
     if(index(line,"FOR")/=0) then
        l%name=line(index(line,"FOR")+3:index(line,"FOR")+2+nlp)

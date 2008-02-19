@@ -45,7 +45,7 @@ TYPE CAV4
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp) , POINTER ::L                    !  Storage space for computed
    real(dp),  DIMENSION(:), POINTER :: AN,BN                 !Multipole component
-   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0
+   real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0,t
    real(dp), POINTER :: F(:)
    real(dp), POINTER :: PH(:)
    INTEGER , POINTER :: NF
@@ -58,7 +58,7 @@ TYPE CAV4P
    TYPE(REAL_8) , POINTER ::L
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS      ! Cavity Information
-   real(dp), POINTER :: DELTA_E,phase0                        ! Cavity information
+   real(dp), POINTER :: DELTA_E,phase0,t                        ! Cavity information
    TYPE(REAL_8), POINTER :: F(:)
    TYPE(REAL_8), POINTER :: PH(:)
    INTEGER , POINTER :: NF

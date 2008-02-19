@@ -1393,7 +1393,7 @@ contains
 
        do ko=1,el%nf
 
-          x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*x(6)+EL%PHAS+EL%PH(KO) &
+          x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO) &
                +EL%phase0)/EL%P%P0C
           ! doing crabola
 
@@ -1417,8 +1417,8 @@ contains
 
           ! multipole * cos(omega t+ phi)/p0c
 
-          X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
-          X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+          X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+          X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
           IF(EL%P%NMUL>=1) THEN
              BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1437,7 +1437,7 @@ contains
              BBYTW=zero
              BBXTW=zero
           ENDIF
-          X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+          X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        enddo
     endif
@@ -1466,7 +1466,7 @@ contains
 
     do ko=1,el%nf
 
-       x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*x(6)+EL%PHAS+ &
+       x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*(x(6)-EL%t)+EL%PHAS+ &
             EL%PH(KO)+EL%phase0)/EL%P%P0C
        ! doing crabola
 
@@ -1490,8 +1490,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
-       X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1510,7 +1510,7 @@ contains
           BBYTW=zero
           BBXTW=zero
        ENDIF
-       X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo
 
@@ -1627,12 +1627,12 @@ contains
        !    EL%DELTA_E=x(5)
 
        IF(EL%N_BESSEL>0) THEN
-          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
-          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
        ENDIF
 
 
-       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
 
        ! doing crabola
@@ -1658,8 +1658,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
-       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1679,7 +1679,7 @@ contains
           BBXTW=zero
        ENDIF
 
-       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
     enddo    ! over modes
 
 
@@ -1721,12 +1721,12 @@ contains
        !    EL%DELTA_E=x(5)
 
        IF(EL%N_BESSEL>0) THEN
-          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
-          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*X(6)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
        ENDIF
 
 
-       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
 
        ! doing crabola
@@ -1752,8 +1752,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
-       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1773,7 +1773,7 @@ contains
           BBXTW=zero
        ENDIF
 
-       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo    ! over modes
     CALL kill(DF,R2,F,DR2,O,VL)

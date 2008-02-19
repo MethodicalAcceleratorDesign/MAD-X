@@ -340,7 +340,7 @@ END TYPE ORBIT_NODE
 TYPE ORBIT_LATTICE
    TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
    INTEGER, pointer  ::  ORBIT_N_NODE  ! GET_N_NODE
-   LOGICAL(lp), pointer  ::  ORBIT_USE_ORBIT_UNITS,first,accel
+   LOGICAL(lp), pointer  ::  ORBIT_USE_ORBIT_UNITS,accel
    INTEGER, pointer  ::  ORBIT_WARNING
    REAL(DP), pointer  ::  ORBIT_LMAX    ! GET_LMAX
    REAL(DP), pointer  ::  ORBIT_MAX_PATCH_TZ
@@ -356,10 +356,10 @@ TYPE ORBIT_LATTICE
    REAL(DP), pointer  ::  orbit_brho   ! GET_brho
    REAL(DP), pointer  ::  orbit_energy ! GET_total_energy
    REAL(DP), pointer  ::  orbit_gamma ! GET_gamma
-   REAL(DP), pointer  ::  orbit_dppfac ! GET_dppfac
+   !   REAL(DP), pointer  ::  orbit_dppfac ! GET_dppfac
    REAL(DP), pointer  ::  orbit_deltae ! GET_deltae
    REAL(DP), pointer  ::  ORBIT_OMEGA_after
-   REAL(DP), pointer  ::  freqb,freqa,voltb,volta,phasa,phasb,xs6,dxs6
+   !   REAL(DP), pointer  ::  freqb,freqa,voltb,volta,phasa,phasb,xs6,dxs6
    TYPE(INTERNAL_STATE),pointer :: STATE
 END TYPE ORBIT_LATTICE
 

@@ -232,6 +232,16 @@ contains
           ! Orbit stuff
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
+       case('PRINTHERD','OPENHERD')
+          IF(MF_HERD/=0) THEN
+             WRITE(6,*) " CANNOT OPEN HERD FILE TWICE "
+             STOP 55
+          ENDIF
+          call kanalnummer(MF_HERD)
+          open(unit=MF_HERD,file=print_herd)
+       case('CLOSEHERD')
+          CLOSE(MF_HERD)
+          MF_HERD=0
        case('PRINTPTCNODES','PRINTORBITNODES')
           call kanalnummer(ii)
           open(unit=ii,file=def_orbit_node)

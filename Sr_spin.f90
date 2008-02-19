@@ -3543,6 +3543,13 @@ contains
     real(dp) norm,d1,ds,p(3)
     type(internal_state) :: k
 
+    if(k%totalpath/=1) then
+       write(6,*) " One must use total path or time "
+       write(6,*) " execution stopped in position_temporal_beam "
+       stop 101
+    endif
+    b%state=k
+
     norm=mybig
     t=>r%t%start
     b%c=>t
@@ -3556,26 +3563,26 @@ contains
              b%c=>t
           endif
        endif ! 1
-       !     write(16,*) d1,t%parent_fibre%mag%name
-       !     write(16,*) t%a
-       !     write(16,*) b%a
        t=>t%next
     enddo
 
     do i=1,b%n
        b%tp(i)%pos(1:3)=zero
        !      GEO_TRA(A,ENT,D,I)    ! A= A +I D*ENT     I=1,-1
+       ! puts the particle in the frame ent around the point a
        call GEO_TRA(b%tp(i)%pos(1:3),b%ent,b%tp(i)%xs%x(1:3),1)
        b%tp(i)%pos(1:3)=b%tp(i)%pos(1:3)+b%a
+       !  In the array pos(1:3), the particle is in the global frame of PTC
 
-       call locate_temporal_beam(r,b,tw,i,k)
+       ! now we must find the local coordinates
+       call locate_temporal_beam(r,b,tw,i)
 
     enddo
 
 
   end SUBROUTINE  position_temporal_beam
 
-  SUBROUTINE  locate_temporal_beam(r,b,tw,j,k) !
+  SUBROUTINE  locate_temporal_beam(r,b,tw,j) !
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     type(temporal_beam),intent(INOUT) ::  b
@@ -3585,6 +3592,9 @@ contains
     integer i,j
     real(dp) norm,d1,ds,p(3),da(3),dal(3)
 
+
+    ! locating the closest integration node
+    ! pointing at it using tw
     norm=mybig
     t=> b%c
     a=b%tp(j)%pos(1:3)
@@ -3599,10 +3609,16 @@ contains
        endif ! 1
        t=>t%next
     enddo
-
+    !
+    !   Expressing the vector from tw to the particle
+    ! in the entrance frame of tw
     da=a-tw%a
     call change_basis(DA,global_frame,dal,tw%ent)
+    !
+    !
 
+    !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    ! some gymnastic if behind the integration node
     if(tw%parent_fibre%dir>0) then
 
        if(dal(3)<zero) then
@@ -3625,32 +3641,38 @@ contains
           call change_basis(DA,b%ent,dal,tw%ent)
        endif
     endif
+    !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     p=dal
     b%tp(j)%ds=p(3)
     b%tp(j)%node=>tw
 
-    call original_p_to_ptc(b,j,p,tw,k)
+    call original_p_to_ptc(b,j,p,tw)
 
   end SUBROUTINE  locate_temporal_beam
 
-  SUBROUTINE original_p_to_ptc(b,j,p,tw,k) ! fibre i1 to i2
+  SUBROUTINE original_p_to_ptc(b,j,p,tw) ! fibre i1 to i2
     IMPLICIT NONE
     type(temporal_beam),intent(INOUT) ::  b
-    TYPE(INTERNAL_STATE) K
     type(integration_node),pointer :: tw
     integer j
     real(dp) dal(3),d1,betinv,p(3)
 
     b%tp(j)%xs%x(4:6)=b%tp(j)%xs%x(4:6)*b%p0c/tw%parent_fibre%mag%p%p0c
     !    call change_basis(b%tp(j)%xs%x(4:6),global_frame,da,b%ent)
+    ! expressing the momentum in the frame of the node tw
     call change_basis(b%tp(j)%xs%x(4:6),b%ent,dal,tw%ent)
+!!!!!!!!!!!
 
+
+    ! final setting of the PTC coordinates
+    ! Does not take into acoount vector potential yet
+    ! nor x', y' for pancake
 
     d1=dal(1)**2+dal(2)**2+dal(3)**2
     betinv=one/tw%parent_fibre%beta0
 
-    if(k%time) then
+    if(b%state%time) then
 
        b%tp(j)%xs%x(5)=(d1-one)/ (sqrt(betinv**2-one +d1)+betinv)
        b%tp(j)%xs%x(2)=dal(1)
@@ -3670,21 +3692,23 @@ contains
 
   end SUBROUTINE original_p_to_ptc
 
-  SUBROUTINE TRACK_temporaLbeam(b,dt,k) ! fibre i1 to i2
+  SUBROUTINE TRACK_temporal_beam(b,dt,state) ! fibre i1 to i2
     IMPLICIT NONE
     type(temporal_beam),intent(INOUT) ::  b
-    TYPE(INTERNAL_STATE) K
+    TYPE(INTERNAL_STATE), optional:: state
     real(dp) dt
     integer i
+    TYPE(INTERNAL_STATE) K
     !BEAM_IN_X(B,I)
     !X_IN_BEAM(B,X,I,DL,T)
-
+    k=b%state
+    if(present(state)) k=state
     do i=1,b%n
        if(b%tp(i)%xs%u) cycle
        call TRACK_time(b%tp(i),DT,K)
     enddo
     !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
-  end SUBROUTINE TRACK_temporaLbeam
+  end SUBROUTINE TRACK_temporal_beam
 
 
 

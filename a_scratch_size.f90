@@ -167,6 +167,8 @@ module precision_constants
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=c_1d6
   real(dp),pointer :: crash
+  integer :: mf_herd=0
+  character*255 :: print_herd="PRINT_HERD.TXT"
   character*255 :: initial_setting="FINAL_SETTINGS.TXT"
   character*255 :: final_setting="FINAL_SETTINGS.TXT"
   character*255 :: def_orbit_node="def_orbit_node.txt"

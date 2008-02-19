@@ -299,6 +299,7 @@ module definition
      real(DP) a(3),ent(3,3),p0c,total_time
      integer n
      type(integration_node),pointer :: c   ! pointer close to a(3)
+     type(internal_state)  state
   END type TEMPORAL_BEAM
 
 

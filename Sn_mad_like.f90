@@ -38,7 +38,7 @@ module Mad_like
   !real(dp),PRIVATE::TOTAL_EPS
   character(80) file_fitted
   !  type(layout),save::mad_list
-  type(layout),private::mad_list
+  type(layout),target, private::mad_list
   LOGICAL(LP) :: CURVED_ELEMENT=.FALSE.  !  TO SET UP BEND_FRINGE CORRECTLY FOR EXACT
   type(tree_element), PRIVATE :: mad_tree,mad_tree_rad
   type(tree_element),PRIVATE :: mad_tree_REV,mad_tree_rad_REV

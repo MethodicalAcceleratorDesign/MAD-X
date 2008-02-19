@@ -1010,6 +1010,7 @@ CONTAINS
        ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
        ALLOCATE(EL%C4%F(N_CAV4_F));EL%C4%F=ZERO;EL%C4%F(1)=ONE;
        ALLOCATE(EL%C4%PH(N_CAV4_F));EL%C4%PH=ZERO;
+       ALLOCATE(EL%C4%t);EL%C4%t=ZERO;
 
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
@@ -1446,6 +1447,7 @@ CONTAINS
        ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
        ALLOCATE(EL%C4%F(N_CAV4_F));CALL ALLOC(EL%C4%F,N_CAV4_F);EL%C4%F(1)=ONE;
        ALLOCATE(EL%C4%PH(N_CAV4_F));CALL ALLOC(EL%C4%PH,N_CAV4_F);
+       ALLOCATE(EL%C4%t);EL%C4%t=ZERO;
     CASE(KIND21)
        if(.not.ASSOCIATED(EL%CAV21)) THEN
           ALLOCATE(EL%CAV21)
@@ -2737,6 +2739,7 @@ CONTAINS
           ELP%C4%F(I)=EL%C4%F(I)
           ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
+       ELP%C4%t=EL%C4%t
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2978,6 +2981,7 @@ CONTAINS
           ELP%C4%F(I)=EL%C4%F(I)
           ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
+       ELP%C4%t=EL%C4%t
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -3218,6 +3222,7 @@ CONTAINS
           ELP%C4%F(I)=EL%C4%F(I)
           ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
+       ELP%C4%t=EL%C4%t
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !

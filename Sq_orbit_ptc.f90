@@ -123,11 +123,11 @@ contains
     X=my_ORBIT_LATTICE%ORBIT_deltae
   END SUBROUTINE GET_deltae
 
-  SUBROUTINE GET_dppfac(X)
-    IMPLICIT NONE
-    REAL(DP) X
-    X=my_ORBIT_LATTICE%ORBIT_dppfac
-  END SUBROUTINE GET_dppfac
+  !  SUBROUTINE GET_dppfac(X)
+  !    IMPLICIT NONE
+  !    REAL(DP) X
+  !    X=my_ORBIT_LATTICE%ORBIT_dppfac
+  !  END SUBROUTINE GET_dppfac
 
   SUBROUTINE GET_gamma(X)
     IMPLICIT NONE
@@ -420,7 +420,8 @@ contains
        my_ORBIT_LATTICE%ORBIT_WARNING=1
     ENDIF
     my_ORBIT_LATTICE%ORBIT_P0C=R%START%mag%P%P0C
-    my_ORBIT_LATTICE%ORBIT_BETA0=R%START%mag%P%BETA0
+    !    my_ORBIT_LATTICE%ORBIT_BETA0=R%START%mag%P%BETA0
+    my_ORBIT_LATTICE%ORBIT_BETA0=R%START%BETA0
 
     NL=7
     K=1
@@ -616,7 +617,7 @@ contains
     my_ORBIT_LATTICE%orbit_brho=w1_orbit%brho
     my_ORBIT_LATTICE%orbit_energy=w1_orbit%energy
     my_ORBIT_LATTICE%orbit_gamma=one/w1_orbit%gamma0i
-    my_ORBIT_LATTICE%orbit_dppfac=one/sqrt(w1_orbit%beta0)/w1_orbit%energy
+    !    my_ORBIT_LATTICE%orbit_dppfac=one/sqrt(w1_orbit%beta0)/w1_orbit%energy
     my_ORBIT_LATTICE%orbit_deltae=zero;
 
     write(6,*) my_ORBIT_LATTICE%ORBIT_L
