@@ -55,7 +55,7 @@
 	<test input ="job.plottest_nv.madx" output="job.plottest_nv.out"/>
    </target>
    <target name="ptc_normal">
-	<test input ="test_5frs.madx" program="madxp" output="test5_frs.out"/>
+	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
    </target>
    <target name="ptc_track">
 	<test input ="fv9_1.madx" output="fv9_1.out" program="madxp" subdir="Example1"/>
@@ -64,6 +64,26 @@
 	<test input ="fv9_4.madx" output="fv9_4.out" program="madxp" subdir="Example4"/>
 	<test input ="fv9_5.madx" output="fv9_5.out" program="madxp" subdir="Example5"/>
    </target>
-
-
+   <target name="thintrack">
+        <test input="tstTrack_ap_rectellipse.madx" output="tstTrack_ap_rectellipse.out"/>
+        <test input="tstTrack_ap_lhcscreen.madx" output="tstTrack_ap_lhcscreen.out"/>
+        <test input="tstTrack_syn.madx" output="tstTrack_syn.out"/>
+        <test input="tstTrack_matrix.madx" output="tstTrack_matrix.out"/>
+        <test input="tstTrack_synchr_LHC.madx" output="tstTrack_synchr_LHC.out"/>
+   </target>
+   <target name="threader">
+        <test input="threader_example.madx" output="threader_example.out"/>
+   </target>
+   <target name="touschek">
+        <test input="touschek.lhcinjection.madx" output="touschek.lhcinjection.out" subdir="LHC_injection"/>
+        <test input="touschek.lhctopenergy.madx " output="touschek.lhctopenergy.out" subdir="LHC_top_energy"/>
+        <test input="touschek.clicdr.madx  " output="touschek.clicdr.out" subdir="CLIC_damping_ring"/>
+   </target>
+   <target name="twiss">
+        <test input="fv9.madx" output="fv9.out"/>
+        <test input="fv9_matrix.madx" output="fv9_matrix.out"/>
+        <test input="lep.madx " output="lep.out"/>
+        <test input="jvh_twiss.madx  " output="jvh_twiss.out"/>
+        <test input="lhc.madx  " output="lhc.out"/>        
+   </target>
 </test-scenario>
