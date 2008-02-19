@@ -4984,7 +4984,7 @@ void seq_cycle(struct in_cmd* cmd)
         strcpy(clone->p_elem->name, c_dum->c);
 
         /* IA 29.11.07 : fixes a bug with aperture module*/
-        sprintf(c_dum->c, "");
+        sprintf(c_dum->c, " ");
         set_command_par_string("apertype", clone->p_elem->def,c_dum->c);
 
 

@@ -1945,9 +1945,9 @@ void exec_extract(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  struct sequence *split_sequ, *part;
+  struct sequence *split_sequ = NULL, *part;
   int i, j;
-  char *name, *refpos = NULL;
+  char *name = NULL, *refpos = NULL;
   char newname[NAME_L];
   struct node *from, *to;
   /*
@@ -2117,7 +2117,7 @@ struct sequence* extract_sequence(char* name, struct sequence* sequ,
   new_sequ = current_sequ;
   current_sequ = keep_curr_sequ;
       if (get_option("info"))
-      printf("+++ new sequence: %s  with current length = %le\n\n",
+      printf("+++ new sequence: %s  with current length = %.12g\n\n",
        new_sequ->name, new_sequ->length);
   return new_sequ;
 }
