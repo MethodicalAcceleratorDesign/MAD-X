@@ -83,8 +83,8 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-#    if ($targetDir ne "ptc_twiss") {next;} # only one target
-
+    # if ($targetDir ne "twiss") {next;} # only one target
+    
 
     print "target = '$targetDir'\n";
 
@@ -144,7 +144,7 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
-    # if ($target ne "ptc_twiss") {next; } # only one target
+    # if (($target ne "twiss")) {next; } # only one target
 
     print "--- testing $target\n";
 
@@ -488,18 +488,23 @@ sub getListOfDependantFiles {
     my $parentFilename = $_[0];
     my $dependentFileList = "";
     open(IN,$parentFilename);
-    # print "process $parentFilename";
-    while(<IN>){
+
+    LINE: while(<IN>){
 	# take into account MAD various ways of reading a file, namely using either "call,file" or "readmytable,file"
 	my $fileRetreival = 0 ;
 	my $child;
 	# MAD syntax too permissive: hard to grep commands
-	if (/^[\s\t]*[Rr][Ee][Aa][Dd][Mm][Yy][Tt][Aa][Bb][Ll][Ee],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*/){
+	# not left-anchored as can be an action after an 'if'
+	# but make sure it has not been commented (negated !) as is frequently the case...
+
+	if (/^[\s\t]*!/) { next LINE; } # this is a comment (!) - do not bother
+
+	if (/[\s\t]*[Rr][Ee][Aa][Dd][Mm][Yy][Tt][Aa][Bb][Ll][Ee],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*/){
 	    $child = $1;
 	    $fileRetreival = 1;
 
 	}
-	if (/^[\s\t]*[Cc][Aa][Ll][Ll],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w.\_\-\d\/]+)[\"\']?[\s\t]*;/) {
+	if (/[\s\t]*[Cc][Aa][Ll][Ll],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;/) {
 	    $child = $1;
 	    $fileRetreival = 1;
 	}
