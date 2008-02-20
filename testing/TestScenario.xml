@@ -21,6 +21,11 @@
 	<test input ="fodo.thin.mad" output="fodo.thin.out" subdir="FODO"/>
         <test input ="footprint.mad" output="footprint.out" subdir="LHC_footprint"/>
    </target>
+   <target name="emit">
+	<test input ="job.madx" output="job.out" subdir="ALBA"/>
+	<test input ="job.madx" output="job.out" subdir="ALBA-tilt"/>
+	<test input ="lep.madx" output="lep.out" subdir="LEP"/>
+   </target>
    <!-- targets emit, error  missing -->
    <target name="foot">
 	<test input ="footprint.mad" output="footprint.out"/>
@@ -52,10 +57,26 @@
         <test input= "job.lhcV65.wx.jac.madx" output="job.lhcV65.wx.jac.out" />
    </target>
    <target name="plot">
+	<test input ="job.plottest.madx" output="job.plottest.out"/>
 	<test input ="job.plottest_nv.madx" output="job.plottest_nv.out"/>
+	<test input ="job.eberhardt.madx" output="job.eberhardt.out"/>
    </target>
    <target name="ptc_normal">
 	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
+   </target>
+   <target name="special_features">
+	<test input ="setvars.madx" output="setvars.out"/>
+   </target>
+   <target name="survey">
+	<test input ="dipring" output="dipring.out"/>
+	<test input ="vline" output="vline.out"/>
+	<test input ="lhcsrvR0" output="lhcsrvR0.out"/>
+	<test input ="lhcsrvB1" output="lhcsrvB1.out"/>
+	<test input ="lhcsrvB2" output="lhcsrvB2.out"/>
+   </target>
+   <target name="sxf">
+	<test input ="sxfwrite.madx" output="sxfwrite.out"/>
+	<test input ="sxfread.madx" output="sxfread.out"/>
    </target>
    <target name="ptc_track">
 	<test input ="fv9_1.madx" output="fv9_1.out" program="madxp" subdir="Example1"/>
