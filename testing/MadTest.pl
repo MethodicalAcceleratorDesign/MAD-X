@@ -83,7 +83,7 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-    # if ($targetDir ne "twiss") {next;} # only one target
+#    if (($targetDir ne "thintrack")&&($targetDir ne "ptc_normal")) {next;} # only one target
     
 
     print "target = '$targetDir'\n";
@@ -144,7 +144,7 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
-    # if (($target ne "twiss")) {next; } # only one target
+ #   if (($target ne "thintrack")&&($target ne "ptc_normal")) {next; } # only one target
 
     print "--- testing $target\n";
 
@@ -504,10 +504,19 @@ sub getListOfDependantFiles {
 	    $fileRetreival = 1;
 
 	}
+
 	if (/[\s\t]*[Cc][Aa][Ll][Ll],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;/) {
 	    $child = $1;
 	    $fileRetreival = 1;
 	}
+	
+	# another - rare -  instruction that calls a file from another
+	if (/[\s\t]*sxfread[\s\t]*,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;/) {
+	    $child = $1;
+	    $fileRetreival = 1;
+	}
+
+
 
 	if ($fileRetreival == 1) {
 	#    $child = $1;
