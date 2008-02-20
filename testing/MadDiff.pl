@@ -86,7 +86,15 @@ foreach $line (@lines) {
 			     '^[\s\t]*@[\s\t]+DATE[\s\t]+%',
 			     '^[\s\t]*@[\s\t]+TIME[\s\t]+%',
 			     # other patterns
-			     'sec.s since start: \d+[\s\t]+since last call: \d+'
+			     '^[\s\t]*sec.s since start: \d+[\s\t]+since last call: \d+',
+			     # patterns for gnuplot
+			     '^[\s\t]*set title "no-title[\s\t]+MAD-X[\s\t]+\d+\.\d+\.\d+[\s\t]+\d\d\/\d\d\/\d\d[\s\t]+\d\d\.\d\d\.\d\d"',
+			     # patterns specific to ptc_normal
+			     '^[\s\t]*Reading Data took[\s\t]+[\d\.]+[\s\t]+second\(s\) of Execution Time',
+			     '^[\s\t]*Program[\s\t]+&lt;[\w\d]+&gt;[\s\t]+used[\s\t]+[\d\.]+[\s\t]+second\(s\) of Execution Time', 
+                             # above, <> have been replaced by &lt; &gt; respectively
+			     '^[\s\t]*Program[\s\t]+&lt;[\w\d]+&gt;[\s\t]+used a total of[\s\t]+[\d\.]+[\s\t]+second\(s\) of Execution Time' 
+			     # above, <> have been replaced by &lt; &gt; respectively
 			  );
 
 
@@ -189,14 +197,14 @@ foreach $line (@lines) {
 		# odd
 		# to be checked
 		$leftPart = substr $line, 0, ($length-1)/2;
-		$gutter = $line[($length-1)/2];
+		$gutter = substr $line, ($length-1)/2, 1;
 		$rightPart = substr $line, ($length-1)/2+1, ($length-1)/2; 
 	    } else {
 		# even
 		# to be checked
 		# NO GUTTER !!
 		$leftPart = substr $line, 0, ($length/2);
-		$rightPart = substr $line, ($length/2)+1, ($length/2);
+		$rightPart = substr $line, ($length/2), ($length/2);
 	    }
 	    
 	    # rework alignments
@@ -257,6 +265,7 @@ foreach $line (@lines) {
 			    $retStatus = "failure"; # whatever its value so far...
 			}	
 			else {
+
 			    # finally ...
 			    # keep the line as it is - just got lost!
 			    $diffReport .= "<tr class=\"got-lost\"><td colspan=\"2\">$line</td></tr>\n";
