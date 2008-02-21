@@ -83,8 +83,7 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-#    if (($targetDir ne "thintrack")&&($targetDir ne "ptc_normal")) {next;} # only one target
-    
+#    if (($targetDir ne "survey")&&($targetDir ne "sxf")) {next;} # only one target
 
     print "target = '$targetDir'\n";
 
@@ -144,7 +143,7 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
- #   if (($target ne "thintrack")&&($target ne "ptc_normal")) {next; } # only one target
+#   if (($target ne "survey")&&($target ne "sxf")) {next; } # only one target
 
     print "--- testing $target\n";
 
@@ -191,7 +190,7 @@ foreach $target (@targets) {
 	    # and the files will need to be copied from location with the $testSubDir prefix later-on...
 	}
 
-	$testReport .= "<tr class='test_case'><td width=\"70%\">$testCaseDir</td><td width=\"30%\"></td></tr>\n"; 
+	$testReport .= "<tr class='test_case'><td width=\"70%\">$testCaseDir: $command</td><td width=\"30%\"></td></tr>\n"; 
         # above sets column width for the whole table
 
 
@@ -209,10 +208,35 @@ foreach $target (@targets) {
 
 	# now copy additional input files for the test, according to the dependency information retreived above
 	@inputs = split /,/, $dependencyList{"$target/$infilename"}; # prefixed with $target to avoid name clashes
-	
+
 	# now grow the @input list by expanding the dependency and by adding the root node
+
+	# partial treatment: only look for files calling files under the same directory
+	my $reccursionLevels =2;
+
+	for ($i=0;$i<$reccursionLevels;$i++){
+	    foreach $input (@inputs){
+		if ($dependencyList{"$target/$input"} ne "") 
+		{
+		    my @secondLevelInputs = split /,/, $dependencyList{"$target/$input"};
+		    foreach $secondLevelInput (@secondLevelInputs){
+			if (/..\/([\w\d\-_\.\/]+)/) { 
+			    # file located in a directory with path starting above
+			    # currently handled differently by code appearing downthere
+			    # incomplete: should also handle any tree structure
+			} else {
+			    print "Found $secondLevelInput called by $testCaseDir/$input and to be copied locally\n";
+			    # only add if not already present
+			    @inputs = (@inputs, $secondLevelInput);
+			} 
+		    }
+		}
+	    } # grow list of inputs at one level
+	}  # end growing the list of inputs that can be moved to the same input directory
+
 	@inputs = ($infilename, @inputs); # add the root inputfile
 	
+
 
 	# copyping inputs and dependent files locally
 	foreach $input (@inputs) {
@@ -258,7 +282,7 @@ foreach $target (@targets) {
 		    }
 		}
 
-		# check whether this file in turns depends on another file
+
 		@secondLevelInputs = split /,/, $dependencyList{"$target/$dependencyFile"}; 
 		# prefixed with $target to avoid name clashes (may be too coarse!)
 		foreach $secondLevelInput (@secondLevelInputs) {
@@ -308,6 +332,7 @@ foreach $target (@targets) {
 		} else {
 		    `cp $samplesRootDir/$target/$sourceSubDir/$input .`;
 		}
+
 	    }
 
 	}
