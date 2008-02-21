@@ -44,17 +44,17 @@
    </target>
    <target name="match">
         <!-- warning - the list of targets available in the README file is different but specified files do not exist -->
-        <test input ="job.lhc.2chromaticity.madx" output="job.lhc.2chromaticity.out"/>
-        <test input ="job.lhc.chromaticity.madx" output="job.lhc.chromaticity.out"/>
-        <test input ="job.lhc.insertion-upper.madx" output="job.lhc.insertion-upper.out"/>
-        <test input= "job.lhc.insertion.madx" output="job.lhc.insertion.out"/>
-        <test input= "job.lhc.iporbit.madx" output="job.lhc.iporbit.out"/>
-        <test input= "job.lhc.qpp.madx" output="job.lhc.qpp.out"/>
-        <test input= "job.lhc.tune.madx" output="job.lhc.tune.out"/>
-        <test input= "job.lhcV65.ir8squeeze.madx" output="job.lhcV65.ir8squeeze.out"/>
-        <test input= "job.lhcV65.tune.jac.madx" output="job.lhcV65.tune.jac.out"/>
-        <test input= "job.lhcV65.tune.madx" output="job.lhcV65.tune.out"/>
-        <test input= "job.lhcV65.wx.jac.madx" output="job.lhcV65.wx.jac.out" />
+        <test input ="job.lhc.2chromaticity.madx" output="job.lhc.2chromaticity.out" subdir="lhc.2chromaticity"/>
+        <test input ="job.lhc.chromaticity.madx" output="job.lhc.chromaticity.out" subdir="lhc.chromaticity"/>
+        <test input ="job.lhc.insertion-upper.madx" output="job.lhc.insertion-upper.out" subdir="lhc.insertion-upper"/>
+        <test input= "job.lhc.insertion.madx" output="job.lhc.insertion.out" subdir="lhc.insertion"/>
+        <test input= "job.lhc.iporbit.madx" output="job.lhc.iporbit.out" subdir="lhc.iporbit"/>
+        <test input= "job.lhc.qpp.madx" output="job.lhc.qpp.out" subdir="lhc.qpp"/>
+        <test input= "job.lhc.tune.madx" output="job.lhc.tune.out" subdir="lhc.tune"/>
+        <test input= "job.lhcV65.ir8squeeze.madx" output="job.lhcV65.ir8squeeze.out" subdir="lhcV65.ir8squeeze"/>
+        <test input= "job.lhcV65.tune.jac.madx" output="job.lhcV65.tune.jac.out" subdir="lhcV65.tune.jac"/>
+        <test input= "job.lhcV65.tune.madx" output="job.lhcV65.tune.out" subdir="lhcV65.tune"/>
+        <test input= "job.lhcV65.wx.jac.madx" output="job.lhcV65.wx.jac.out" subdir="lhcV65.wx.jac"/>
    </target>
    <target name="plot">
 	<test input ="job.plottest.madx" output="job.plottest.out"/>
@@ -63,6 +63,13 @@
    </target>
    <target name="ptc_normal">
 	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
+   </target>
+   <target name="ptc_track">
+	<test input ="fv9_1.madx" output="fv9_1.out" program="madxp" subdir="Example1"/>
+	<test input ="fv9_2.madx" output="fv9_2.out" program="madxp" subdir="Example2"/>
+	<test input ="fv9_3.madx" output="fv9_3.out" program="madxp" subdir="Example3"/>
+	<test input ="fv9_4.madx" output="fv9_4.out" program="madxp" subdir="Example4"/>
+	<test input ="fv9_5.madx" output="fv9_5.out" program="madxp" subdir="Example5"/>
    </target>
    <target name="special_features">
 	<test input ="setvars.madx" output="setvars.out"/>
@@ -77,13 +84,6 @@
    <target name="sxf">
 	<test input ="sxfwrite.madx" output="sxfwrite.out"/>
 	<test input ="sxfread.madx" output="sxfread.out"/>
-   </target>
-   <target name="ptc_track">
-	<test input ="fv9_1.madx" output="fv9_1.out" program="madxp" subdir="Example1"/>
-	<test input ="fv9_2.madx" output="fv9_2.out" program="madxp" subdir="Example2"/>
-	<test input ="fv9_3.madx" output="fv9_3.out" program="madxp" subdir="Example3"/>
-	<test input ="fv9_4.madx" output="fv9_4.out" program="madxp" subdir="Example4"/>
-	<test input ="fv9_5.madx" output="fv9_5.out" program="madxp" subdir="Example5"/>
    </target>
    <target name="thintrack">
         <test input="tstTrack_ap_rectellipse.madx" output="tstTrack_ap_rectellipse.out"/>
