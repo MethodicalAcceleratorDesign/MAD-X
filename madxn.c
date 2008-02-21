@@ -3465,7 +3465,7 @@ void pro_survey(struct in_cmd* cmd)
     warning("SURVEY, but no active sequence:", "ignored");
     return;
   }
-  fprintf(prt_file, "enter Survey module\n");
+  if (debuglevel > 0) fprintf(prt_file, "enter Survey module\n");
   keep = get_option("rbarc");
   set_option("rbarc", &iarc);
   pos = name_list_pos("file", nl);
