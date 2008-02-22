@@ -84,6 +84,7 @@ foreach $targetDir (@targetDirs) {
 
     # DBG
 #    if (($targetDir ne "survey")&&($targetDir ne "sxf")) {next;} # only one target
+#    if ($targetDir ne "error") {next;}
 
     print "target = '$targetDir'\n";
 
@@ -144,6 +145,7 @@ foreach $target (@targets) {
     chop $target;
     # DBG
 #   if (($target ne "survey")&&($target ne "sxf")) {next; } # only one target
+#    if ($target ne "error") {next;}
 
     print "--- testing $target\n";
 
@@ -190,7 +192,19 @@ foreach $target (@targets) {
 	    # and the files will need to be copied from location with the $testSubDir prefix later-on...
 	}
 
-	$testReport .= "<tr class='test_case'><td width=\"70%\">$testCaseDir: $command</td><td width=\"30%\"></td></tr>\n"; 
+       	# before executing the command, make sure we remove
+	# the optional subdirectory information which shows up after the comma
+	# in case the source test directory contains a subdirectory structure...
+	my $executableCommand;
+	if ($sourceSubDir eq "") {
+	    $executableCommand = $command;
+	} else {
+	    $_ = $command;
+	    s/,[\s\t]*[\w\d.\-_=]+//g;
+	    $executableCommand = $_;
+	}
+
+	$testReport .= "<tr class='test_case'><td width=\"70%\">$testCaseDir: $executableCommand</td><td width=\"30%\"></td></tr>\n"; 
         # above sets column width for the whole table
 
 
@@ -219,15 +233,26 @@ foreach $target (@targets) {
 		if ($dependencyList{"$target/$input"} ne "") 
 		{
 		    my @secondLevelInputs = split /,/, $dependencyList{"$target/$input"};
+		    # or third etc... level according to reccursion level...
 		    foreach $secondLevelInput (@secondLevelInputs){
 			if (/..\/([\w\d\-_\.\/]+)/) { 
 			    # file located in a directory with path starting above
 			    # currently handled differently by code appearing downthere
-			    # incomplete: should also handle any tree structure
+			    # => do nothing for time-being
+			    # (incomplete: should also handle any tree structure)
 			} else {
 			    print "Found $secondLevelInput called by $testCaseDir/$input and to be copied locally\n";
-			    # only add if not already present
-			    @inputs = (@inputs, $secondLevelInput);
+			    # actually, should only add to the list if not already present
+			    my $existsInput = 0;
+			    INPUT_LOOP: foreach $existingInput (@inputs) {
+				if ($secondLevelInput eq $existingInput) {
+				    $existsInput = 1;
+				    next INPUT_LOOP; 
+				}
+			    }
+			    if ($existsInput ==0) {
+				@inputs = (@inputs, $secondLevelInput);
+			    }
 			} 
 		    }
 		}
@@ -235,7 +260,11 @@ foreach $target (@targets) {
 	}  # end growing the list of inputs that can be moved to the same input directory
 
 	@inputs = ($infilename, @inputs); # add the root inputfile
-	
+
+
+	my @inputSubdirectories = (); # list of input subdirectories under the workdir in which MAD is invoked
+	# these subdirectories will later be moved under "inputs" instead of "outputs". In most cases this
+	# list is empty, but not for targets 'error' and 'twiss' for instance.
 
 
 	# copyping inputs and dependent files locally
@@ -246,9 +275,9 @@ foreach $target (@targets) {
 	    # considering the MAD call instructions mention a relative path...
 	    # note later-on should also accomodate for situations were the included files
 	    # are below, down the hierarchy... At this stage should re-implement path handling
-	    if (/..\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
+	    if (/\.\.\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
 		my $term = $1;
-		if (/(..\/[\w\d\-_]+)\/([\w\d-_\.]+)/) { # ../dir/file format only
+		if (/(\.\.\/[\w\d\-_]+)\/([\w\d-_\.]+)/) { # ../dir/file format only
 		    # file to be called is located up the hierarchy
 		    # in which case we need to reflect the directory tree structure
 		    # by creating directories if necessary
@@ -288,7 +317,7 @@ foreach $target (@targets) {
 		foreach $secondLevelInput (@secondLevelInputs) {
 		    print "Second-level copy of $secondLevelInput\n";
 		    $_ = $secondLevelInput;
-		    if (/..\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
+		    if (/\.\.\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
 			my $term;
 			if (/(..\/[\w\d\-_]+)\/([\w\d-_\.]+)/) { # ../dir/file format only
 			    $secondDependencyDir = $1;
@@ -324,29 +353,59 @@ foreach $target (@targets) {
 		} # second level
 	      
 	    } 
-	    else { 
-                # file to be called in the same directory as the input file
-		# print "for target '$target' and test input '$infilename', now copying additional '$input'\n";
-		if ($sourceSubDir eq "") {
-		    `cp $samplesRootDir/$target/$input .`;
-		} else {
-		    `cp $samplesRootDir/$target/$sourceSubDir/$input .`;
-		}
+	    else {
 
+		# --- below to handle the specific case of twiss lhc.madx -> temp contents seem to be cleaned-up from .mad files...
+		if ($input =~ /([\w\-_\d\.]+)\/([\w\d\-_\.]+)/) {
+
+		    # specific case of a file being called in a subdir of current directory
+		    my $calledFileSubDir = $1;
+		    my $calledFile = $2;
+		    # $calledFileSubDir = 'temp'; # FORCE FOR DBG
+		    # with the above, for lhc.out of twiss target, we indeed 
+		    # find the .mad files under 'TEMP', but if we keep the name they disappear
+		    # check if the subdir already exists - if not create it
+		    my $existsDir = `ls -d $calledFileSubDir | wc -l`;
+
+		    my $pwd = `pwd`; chop $pwd;
+		    if ($existsDir==1) {
+		    } else {
+			mkdir($calledFileSubDir,0777);
+			# add this dir to the list of input subdirectories that should be transferred from the workdir
+			# in which the MAD command is executed into the "inputs" directory (otherwise the directory
+			# would later go under "outputs" and undergo the side-by-side comparison...)
+			@inputSubdirectories = ( @inputSubdirectories, $calledFileSubDir );
+
+		    }
+		    # and now do the copy
+		 # print "DIRECTORY: now copying $samplesRootDir/$target/$input into ./$calledFileSubDir\n";
+		    if ($sourceSubDir eq ""){
+			`cp $samplesRootDir/$target/$input ./$calledFileSubDir`;
+		    } else {
+			`cp $samplesRootDir/$target/$sourceSubDir/$input ./$calledFileSubDir`;
+		    }
+
+		#    @what = `ls ./$calledFileSubDir`;
+		#   $howMany = scalar(@what);
+		#    print "DIRECTORY $howMany contents of $pwd/$calledFileSubDir =\n";
+		#    foreach $line (@what ) { print "$line\n"; }
+		# --- above to handle the specific case of twiss lhc.madx
+
+
+		} else {
+		    # file to be called in the same directory as the input file
+		    # print "for target '$target' and test input '$infilename', now copying additional '$input'\n";
+		    if ($sourceSubDir eq "") {
+			`cp $samplesRootDir/$target/$input .`;
+		    } else {
+			`cp $samplesRootDir/$target/$sourceSubDir/$input .`;
+		    }
+		} # file to be called located in the same directory as the command's input file
 	    }
 
 	}
 
-	# before executing the command, make sure we remove
-	# the optional subdirectory information which shows up after the comma
-	# in case the source test directory contains a subdirectory structure...
-	if ($sourceSubDir eq "") {
-	    $executableCommand = $command;
-	} else {
-	    $_ = $command;
-	    s/,[\s\t]*[\w\d.\-_=]+//g;
-	    $executableCommand = $_;
-	}
+
 
 	# check whether we should call madx or madxp
 	my $madLink;
@@ -368,19 +427,25 @@ foreach $target (@targets) {
 	/[\s\t]([\w._\d]*).out/;
 	$outfilename = $1 . ".out";
   
+
 	# list all by-product output files
 	@allFilesNow = `ls`; # list of all input + output files after invoking 'mad' command 
 	
 	# remove the madx link from the list of files to be moved
 
+	# grow the list of input files with the list of subdirectory so that they move together under 'inputs'
+	foreach $dir (@inputSubdirectories){
+	    push (@inputs, $dir);
+	}
+
 	@outputs = ();
 	foreach $file (@allFilesNow){
 	    chop $file;
 	    $isInput = 0;
-	    foreach $input (@inputs) {
+	    foreach $input (@inputs){
 		if ($file eq $input) {
-		    $isInput = 1;
-		} # otherwise the file has been produced upon invoking MAD must go into the ouput subdir
+		    $isInput =1;
+		}
 	    }
 	    if (($isInput == 0) && ($file ne "madx") && ($file ne "madxp")) {        
 		# ignore the madx/madxp entries which should stay on top
@@ -401,7 +466,8 @@ foreach $target (@targets) {
 	$inputSubdir = "$localTestDir/$target/$testCaseDir/input";
 	$outputSubdir = "$localTestDir/$target/$testCaseDir/output";
 	mkdir($inputSubdir, 0777) or die "fail to create directory $inputSubdir\n";
-	mkdir($outputSubdir, 0777) or die "fail to create directory $outputSubdir\n";
+	mkdir($outputSubdir, 0777) or die "fail to create directory $outputSubdir\n";	
+
 	foreach $file (@inputs) { 
 	    # SPECIFIC CASE: files that must be stored in the locally stored hierarchy
 	    # with MAD call instructions referring to a relative path...
