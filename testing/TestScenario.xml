@@ -26,7 +26,11 @@
 	<test input ="job.madx" output="job.out" subdir="ALBA-tilt"/>
 	<test input ="lep.madx" output="lep.out" subdir="LEP"/>
    </target>
-   <!-- targets emit, error  missing -->
+   <target name="error">
+	<test input ="example1.mad" output="example1.out"/>
+	<test input ="example2.mad" output="example2.out"/>
+	<test input ="example3.mad" output="example3.out"/>
+   </target>
    <target name="foot">
 	<test input ="footprint.mad" output="footprint.out"/>
    </target>
