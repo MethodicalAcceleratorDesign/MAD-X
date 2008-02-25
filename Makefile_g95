@@ -180,7 +180,7 @@ madx_main.o: run_madx.o madx_main.f90
 
 #Parser only
 mpars: madxm.o madxp.o
-	$(LL) $(FP) -o mpars madxm.o madxp.o $(LIBX) -lgcc -lm -lc
+	$(LL) $(FP) -o mpars madxm.o madxp.o -lgcc -lm -lc
 
 # madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
