@@ -153,14 +153,7 @@ void match2_end(struct in_cmd* cmd)
 
   fprintf(prt_file, "\n\n");
   fprintf(prt_file, "Final Penalty Function = %16.8e\n\n",penalty);
-
-  fprintf(prt_file, "\n\n");
-  fprintf(prt_file, "Variable                   Final Value        Lower Limit        Upper Limit\n");
-  fprintf(prt_file, "-------------------------------------------------------------------------------\n");
-  print_match_summary=1;
-  set_option("match_summary",&print_match_summary);
-  mtgetc_(vary_vect->a, vary_dvect->a);
-  fprintf(prt_file, "\n");
+  match2_print_var(cmd);
   fprintf(prt_file, "END MATCH SUMMARY\n\n");
   current_gweight = delete_command(current_gweight);
   current_weight = delete_command(current_weight);
@@ -615,4 +608,41 @@ int match2_evaluate_exressions(int i, int k, double* fun_vec)
   }
 
   return k;
+}
+
+int match2_print_var(struct in_cmd* cmd){
+  int n,l;
+  char *varname,*knobfilename,*knobname;
+  double ivalue,fvalue;
+  FILE *knobfile;
+  knobfilename=command_par_string("knobfile",cmd->clone);
+  if (knobfilename){
+      knobfile=fopen(knobfilename,"w");
+  };
+  n=stored_match_var->curr;
+  fprintf(prt_file, "\n\n");
+  fprintf(prt_file, "%-24s %-12s %-12s %-12s %-12s\n",
+                    "Variable", "Final Value",
+                    "Initial Value","Lower Limit",
+                    "Upper Limit");
+  for(l=0;l<80;l++) fprintf(prt_file, "-");
+  fprintf(prt_file,"\n");
+  for(l=0;l<n;l++){
+    varname=command_par_string("name",stored_match_var->commands[l]);
+    ivalue=command_par_value("init",stored_match_var->commands[l]);
+    fvalue=get_variable(varname);
+    knobname=command_par_string("knob",stored_match_var->commands[l]);
+    if (knobfilename){
+      fprintf(knobfile, "%-12s :=%+15.8e%+15.8e*%s;\n",
+                         varname,ivalue,fvalue-ivalue,knobname);
+    }
+    fprintf(prt_file,"%-24s",varname);
+    fprintf(prt_file," %12.5e",fvalue);
+    fprintf(prt_file," %12.5e",ivalue);
+    fprintf(prt_file," %12.5e",command_par_value("lower",stored_match_var->commands[l]));
+    fprintf(prt_file," %12.5e",command_par_value("upper",stored_match_var->commands[l]));
+    fprintf(prt_file,"\n");
+  }
+  fprintf(prt_file,"\n");
+  if ( knobfilename ) fclose(knobfile);
 }
