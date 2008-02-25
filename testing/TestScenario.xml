@@ -65,6 +65,23 @@
 	<test input ="job.plottest_nv.madx" output="job.plottest_nv.out"/>
 	<test input ="job.eberhardt.madx" output="job.eberhardt.out"/>
    </target>
+   <target name="ptc_madx_interface">
+	<test input ="dumpmaps.ptc.madx" output="dumpmaps.ptc.out" program="madxp" subdir="dumpmaps"/>
+        <!-- skip 'eplacement' with contains 'C' files -->
+	<test input ="intstate.ptc.madx" output="intstate.ptc.out" program="madxp" subdir="intstate"/>
+	<test input ="knobs.madx" output="knobs.out" program="madxp" subdir="knobs"/>	
+        <test input ="matchknobs.madx" output="matchknobs.out" program="madxp" subdir="matchknobs"/>
+        <test input ="matchwithknobs.madx" output="matchwithknobs.out" program="madxp" subdir="matchwithknobs"/>
+        <test input ="moments.madx" output="moments.out" program="madxp" subdir="moments"/>
+        <test input ="chicane.madx" output="chicane.out" program="madxp" subdir="ptc_secordmatch"/>
+        <test input ="rviewer.madx" output="rviewer.out" program="madxp" subdir="rviewer"/>
+        <test input ="psr.madx" output="psr.out" program="madxp" subdir="thirdordermatch"/>
+        <!-- for the same 'thirdordermatch' target, omit rhic.madx which generates too big a file for comparison (until we find a workaround...)  -->
+   </target>
+   <target name="ptc_accel">
+       <!-- skip the 'track' test which creates hundreds of files -->
+	<test input ="twiss.ptc.madx" program="madxp" output="twiss.ptc.out" subdir="twiss"/>
+   </target>
    <target name="ptc_normal">
 	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
    </target>
