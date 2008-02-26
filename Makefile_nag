@@ -284,6 +284,9 @@ rplot.o: rplot.c rplot.h
 matchptcknobs.o: matchptcknobs.c matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o matchptcknobs.o matchptcknobs.c
 
+timel.o: timel.c
+	$(CC) $(GCCP_FLAGS) -c -o timel.o timel.c
+
 #Parser only
 mpars: madxm.o madxp.o
 	$(FC) $(FOPT) -o mpars madxm.o madxp.o $(LIBX) -lm -lc
