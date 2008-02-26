@@ -17,16 +17,23 @@ $startTime = localtime;
 
 $testReport = ""; # will be stored into an HTML document
 
+$pwd = `pwd`;
+chop $pwd;
+$localRootDir = $pwd;
+
+# checkout reference examples from the CVS
+my $rmRes = `rm -rf ./madX-examples`;
+my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples`;
+
 # $samplesRootDir = '/afs/cern.ch/user/f/frs/public_html/mad-X_examples';
-$samplesRootDir = '/afs/cern.ch/user/n/nougaret/scratch0/mad-automation/REF';
+
+$samplesRootDir = "$localRootDir/madX-examples/REF";
 
 
 $htmlRootDir = '/afs/cern.ch/user/n/nougaret/www/mad';
 $htmlFile = "$htmlRootDir/test.htm"; # for the time being
 
-$pwd = `pwd`;
-chop $pwd;
-$localRootDir = $pwd;
+
 
 if ( $#ARGV != 0 ) {
     print "expect 1 argument: (1) MAD executable directory! EXIT!\n" ;
@@ -83,8 +90,8 @@ foreach $targetDir (@targetDirs) {
     chop $targetDir;
 
     # DBG
-#    if (($targetDir ne "survey")&&($targetDir ne "sxf")) {next;} # only one target
-#    if ($targetDir ne "error") {next;}
+   # if (($targetDir ne "ptc_accel")&&($targetDir ne "ptc_madx_interface")) {next;} # only one target
+    #if ($targetDir ne "twiss"){next;}
 
     print "target = '$targetDir'\n";
 
@@ -144,8 +151,8 @@ mkdir($localTestDir, 0777);
 foreach $target (@targets) {
     chop $target;
     # DBG
-#   if (($target ne "survey")&&($target ne "sxf")) {next; } # only one target
-#    if ($target ne "error") {next;}
+   # if (($target ne "ptc_accel")&&($target ne "ptc_madx_interface")) {next; } # only one target
+   # if ($target ne "twiss") {next;}
 
     print "--- testing $target\n";
 
@@ -378,12 +385,13 @@ foreach $target (@targets) {
 
 		    }
 		    # and now do the copy
-		 # print "DIRECTORY: now copying $samplesRootDir/$target/$input into ./$calledFileSubDir\n";
+		    # print "DIRECTORY: now copying $samplesRootDir/$target/$input into ./$calledFileSubDir\n";
 		    if ($sourceSubDir eq ""){
 			`cp $samplesRootDir/$target/$input ./$calledFileSubDir`;
 		    } else {
 			`cp $samplesRootDir/$target/$sourceSubDir/$input ./$calledFileSubDir`;
 		    }
+		    
 
 		#    @what = `ls ./$calledFileSubDir`;
 		#   $howMany = scalar(@what);
