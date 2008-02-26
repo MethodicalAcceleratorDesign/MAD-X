@@ -324,6 +324,17 @@ void add_to_table_list(struct table* t, struct table_list* tl)
   }
 }
 
+void add_to_table_list_list(struct table_list* table_list,
+                            struct table_list_list* tll)
+  /* adds a table_list to a list of table_lists */
+{
+  int j;
+  for (j = 0; j < tll->curr; j++) 
+     if (tll->table_lists[j] == table_list) return;
+  if (tll->curr == tll->max) grow_table_list_list(tll);
+  tll->table_lists[tll->curr++] = table_list;
+}
+
 void add_to_var_list( /* adds variable to alphabetic variable list */
   struct variable* var, struct var_list* varl, int flag)
   /* flag = 0: undefined reference in expression, 1: definition
@@ -1365,6 +1376,42 @@ void dump_variable(struct variable* v)
   fprintf(prt_file, "=== dumping variable %s\n", v->name);
 }
 
+void exec_delete_sequ(char* name)
+{
+  struct sequence* keep = current_sequ;
+  int spos;
+  if ((spos = name_list_pos(name, sequences->list)) >= 0)
+  {
+   current_sequ = sequences->sequs[spos];
+   if (current_sequ->ex_start != NULL) /* delete expanded */
+   {
+    current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
+    current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
+    current_sequ->orbits = delete_vector_list(current_sequ->orbits);
+   }
+   sequences->sequs[spos] = delete_sequence(current_sequ);
+   remove_from_sequ_list(current_sequ, sequences);
+   current_sequ = keep;  
+  }
+  else warning("sequence to be deleted does not exist:", name);
+}
+
+void exec_delete_table(char* name)
+{
+  struct table_list* tl;
+  int j, pos;
+  for (j = 0; j < all_table_lists->curr; j++)
+  {
+   tl = all_table_lists->table_lists[j];
+   if ((pos = name_list_pos(name, tl->names)) >= 0)
+   {
+    tl->tables[pos] = delete_table(tl->tables[pos]);
+    remove_from_name_list(name, tl->names);
+    return;
+   }
+  }
+}
+
 void export_element(struct element* el, struct el_list* ell, FILE* file)
   /* recursive to have parents always in front for MAD-8 */
 {
@@ -2195,6 +2242,19 @@ void grow_table_list(struct table_list* tl)
   tl->max = new;
   tl->tables = (struct table**) mycalloc(rout_name,new, sizeof(struct table*));
   for (j = 0; j < tl->curr; j++) tl->tables[j] = t_loc[j];
+  myfree(rout_name, t_loc);
+}
+
+void grow_table_list_list(struct table_list_list* tll)
+{
+  char rout_name[] = "grow_table_list_list";
+  struct table_list** t_loc = tll->table_lists;
+  int j, new = 2*tll->max;
+
+  tll->max = new;
+  tll->table_lists = (struct table_list**) 
+      mycalloc(rout_name,new, sizeof(struct table_list*));
+  for (j = 0; j < tll->curr; j++) tll->table_lists[j] = t_loc[j];
   myfree(rout_name, t_loc);
 }
 
@@ -3094,7 +3154,25 @@ struct table_list* new_table_list(int size)
   tl->names = new_name_list(tl->name, size);
   tl->tables
     = (struct table**) mycalloc(rout_name,size, sizeof(struct table*));
+  add_to_table_list_list(tl, all_table_lists);
   return tl;
+}
+
+struct table_list_list* new_table_list_list(int size)
+{
+  char rout_name[] = "new_table_list_list";
+  struct table_list_list* tll
+    = (struct table_list_list*) 
+        mycalloc(rout_name,1, sizeof(struct table_list_list));
+  strcpy(tll->name, "table_list_list");
+  tll->stamp = 123456;
+  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tll->name);
+  tll->max = size;
+  tll->curr = 0;
+  tll->table_lists
+    = (struct table_list**) 
+      mycalloc(rout_name,size, sizeof(struct table_list*));
+  return tll;
 }
 
 struct variable* new_variable(char* name, double val, int val_type,

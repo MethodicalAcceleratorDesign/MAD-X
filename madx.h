@@ -407,6 +407,15 @@ struct table_list
   int stamp;
 };
 
+struct table_list_list
+{
+  char name[NAME_L];
+  int  max,                     /* max. pointer array size */
+    curr;                    /* current occupation */
+  struct table_list** table_lists;
+  int stamp;
+};
+
 struct variable
 {
   char name[NAME_L];

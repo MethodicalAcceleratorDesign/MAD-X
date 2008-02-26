@@ -444,6 +444,7 @@ int add_to_name_list(char*, int, struct name_list*);
 void add_to_node_list(struct node*, int, struct node_list*);
 void add_to_sequ_list(struct sequence*, struct sequence_list*);
 void add_to_table_list(struct table*, struct table_list*);
+void add_to_table_list_list(struct table_list*, struct table_list_list*);
 void add_to_var_list(struct variable*, struct var_list*, int);
 void add_vars_to_table(struct table*);
 void set_vars_from_table(struct table*);
@@ -572,6 +573,9 @@ void exec_beam(struct in_cmd*, int);
 void exec_call(struct in_cmd*);
 void exec_command();
 void exec_create_table(struct in_cmd*);
+void exec_cmd_delete(struct in_cmd*);
+void exec_delete_sequ(char*);
+void exec_delete_table(char*);
 void exec_dump(struct in_cmd*);
 void exec_dumpsequ(struct in_cmd*);
 void exec_fill_table(struct in_cmd*);
@@ -673,6 +677,7 @@ void grow_node_list(struct node_list*);
 void grow_sequence_list(struct sequence_list*);
 void grow_table(struct table*);
 void grow_table_list(struct table_list*);
+void grow_table_list_list(struct table_list_list*);
 void grow_var_list(struct var_list*);
 void grow_vector_list(struct vector_list*);
 double hidden_node_pos(char*, struct sequence*);
@@ -765,6 +770,7 @@ struct sequence_list* new_sequence_list(int);
 struct node* new_sequ_node(struct sequence*, int);
 struct table* new_table(char*, char*, int, struct name_list*);
 struct table_list* new_table_list(int);
+struct table_list_list* new_table_list_list(int);
 struct variable* new_variable(char*, double, int, int, struct expression*,
                               char*);
 struct var_list* new_var_list(int);
@@ -1299,6 +1305,8 @@ struct table* orbin_table = NULL;        /* current orbit table */
 struct table_list* optics_tables; /* contains optics tables from last twiss */
 struct table_list* table_register; /* contains all tables */
 
+struct table_list_list* all_table_lists; /* all table lists are entered here */
+
 struct variable* current_variable = NULL; /* set by act_value (table access) */
 struct var_list* variable_list;
 
@@ -1334,8 +1342,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.20";
-char code_mod_date[] = "Code Modification Date: 19.02.2008";
+char myversion[] = "MAD-X 3.04.21";
+char code_mod_date[] = "Code Modification Date: 27.02.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

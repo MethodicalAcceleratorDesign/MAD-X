@@ -493,6 +493,7 @@ void control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
   else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
 #ifdef _FULL
+  else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
   else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
   else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
   else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
@@ -1361,6 +1362,27 @@ void exec_call(struct in_cmd* cmd)
     if (down_unit(pl->parameters[pos]->string))  main_input(top);
   }
   else warning("call without filename:", "ignored");
+}
+
+void exec_cmd_delete(struct in_cmd* cmd)
+/* handles all delete request through "delete" command */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos;
+  char* name;
+  pos = name_list_pos("sequence", nl);
+  if (nl->inform[pos])
+  {
+   name = pl->parameters[pos]->string;
+   exec_delete_sequ(name);
+  }
+  pos = name_list_pos("table", nl);
+  if (nl->inform[pos])
+  {
+   name = pl->parameters[pos]->string;
+   exec_delete_table(name);
+  }
 }
 
 void exec_command()
@@ -3066,6 +3088,7 @@ void madx_init()
   tmp_p_array = new_char_p_array(1000); /* dynamic */
   tmp_l_array = new_char_p_array(1000); /* dynamic */
   sxf_list = new_name_list("sxf_list", 50); /* dynamic */
+  all_table_lists = new_table_list_list(10); /* dynamic */
   deco_init();
   get_defined_constants();
   get_defined_commands();
