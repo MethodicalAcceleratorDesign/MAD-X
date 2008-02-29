@@ -22,6 +22,8 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 
   (*ap1)=(*ap2)=(*ap3)=(*ap4)=0;
 
+  /*   printf("-- #%s#\n",apertype); */
+
   if (!strcmp(apertype,"circle"))
   {
     *ap3=get_aperture(current_node, "var1"); /*radius circle*/
@@ -49,15 +51,15 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 
   else if (!strcmp(apertype,"rectangle"))
   {
-    printf("\nApertype %s not working , use rectellipse with\n(h,v,0.99(h**2+v**2)^0.5,0.99(h**2+v**2)^0.5)", apertype);
-    err=-1;
-/*    *ap1 = get_aperture(current_node, "var1");*/ /*half width rect*/
-/*    *ap2 = get_aperture(current_node, "var2");*/ /*half height rect*/
-/* next changed 19 june 2007 bj */
-/*    *ap3 = *ap4 = sqrt((*ap1) * (*ap1) + ((*ap2) * (*ap2)));*/
-/*    *ap3 = *ap4 = -1.0;*/
-/*    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);*/
-/*    if (!err) aper_fill_quads(pipey, pipey, quarterlength, pipelength);*/
+
+    *ap1 = get_aperture(current_node, "var1");      /*half width rect*/
+    *ap2 = get_aperture(current_node, "var2");      /*half height rect*/
+/* next changed 28 feb 2008 BJ */
+    *ap3 = *ap4 = sqrt((*ap1) * (*ap1) + ((*ap2) * (*ap2))) - 1.e-15;
+    /*   printf("-- %10.5f  %10.5f  %10.5f  %10.5f\n",*ap1,*ap2,*ap3,*ap4); */
+
+    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
 
   else if (!strcmp(apertype,"lhcscreen"))
@@ -137,7 +139,10 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
   return err+1;
 }
 
+
+
 /* next function replaced 19 june 2007 BJ */
+/* Improved for potential zero divide 20feb08 BJ */
 
 int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
                      int* quarterlength, double tablex[], double tabley[])
@@ -145,28 +150,39 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
   double x, y, angle, alfa, theta, dangle;
   int i,napex;
 
-  printf("\n++ %10.5f  %10.5f  %10.5f  %10.5f\n\n",*ap1,*ap2,*ap3,*ap4);
+  /*  printf("++ %10.5f  %10.5f  %10.5f  %10.5f\n",*ap1,*ap2,*ap3,*ap4);*/
+
+  if ( *ap1 < MIN_DOUBLE*1.e10 || *ap2 < MIN_DOUBLE*1.e10) {
+    fatal_error("Illegal zero or too small value value for ap1 or ap2"," ");
+  }
+  if ( *ap3 < MIN_DOUBLE*1.e10 || *ap4 < MIN_DOUBLE*1.e10) {
+    fatal_error("Illegal zero or too small value value for ap3 or ap4"," ");
+  }
 
 
   /* Produces a table of only the first quadrant coordinates */
   /* aper_fill_quads() completes the polygon          */
-  	
+
   if (*quarterlength) napex=9;
   else napex=19;
 
-  /* special case : rectangle  */
-  /* does not work -- to be reworked  */
+  /* PIECE OF USELESS CODE NOW THAT CASE RECTANGLE IS CORRECT, BJ 28feb08
+     special case : rectangle
+     does not work -- to be reworked
 
-  if ( *ap3 < 0.) {
-    tablex[0]=(*ap1);
-    tabley[0]=(*ap2-0.0001);
-    tablex[1]=(*ap1-0.00002);
-    tabley[1]=(*ap2-0.00002);
-    tablex[2]=(*ap1-0.0001);
-    tabley[2]=(*ap2);
-    *quarterlength=2;
-    return 0;
-  }
+     if ( *ap3 < 0.) {
+     tablex[0]=(*ap1);
+     tabley[0]=(*ap2-0.0001);
+     tablex[1]=(*ap1-0.00002);
+     tabley[1]=(*ap2-0.00002);
+     tablex[2]=(*ap1-0.0001);
+     tabley[2]=(*ap2);
+     *quarterlength=2;
+     return 0;
+     }
+     END OF PIECE OF USELESS CODE, to be removed after some use
+     (I expect no negative feedback ...)
+  */
 
   /* find angles where rectangle and circle crosses */
 
@@ -174,9 +190,8 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
     alfa = 0.;
   }
   else {
-/*    y=sqrt(((*ap4)*(*ap4)) * (1 - ((*ap1)*(*ap1)) / ((*ap3)*(*ap3)))); */
     y=sqrt((*ap3)*(*ap3)-(*ap1)*(*ap1));
-    alfa=atan(y/(*ap1));
+    alfa=atan2(y,*ap1);
   }
 
   if ( (*ap2) >= (*ap4) ) {
@@ -185,15 +200,14 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
   else {
     x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
     y=sqrt((*ap3)*(*ap3)-x*x);
-    theta=atan(x/y);
-/*    theta=atan(x/(*ap2)); */
+    theta=atan2(x,y);
   }
 
   dangle=(pi/2-(alfa+theta))/napex;
 
   if (!((0 < dangle) && (dangle < pi/2)))
   {
-	return -1;
+    return -1;
   }
 
   /*write coordinates for first quadrant*/
@@ -204,14 +218,16 @@ int aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4,
     tabley[i]=(*ap4)*sin(angle);
 
     if (i >= MAXARRAY/4)
-      {
-	fatal_error("Memory full. ", "Number of coordinates exceeds set limit");      }
+    {
+      fatal_error("Memory full in aper_rectellipse", "Number of coordinates exceeds set limit");      }
   }
 
   *quarterlength=i-1;
 
   return 0;
 }
+
+
 
 void aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
 {
@@ -226,6 +242,8 @@ void aper_adj_quad(double angle, double x, double y, double* xquad, double* yqua
   }
 }
 
+
+
 void aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
                       double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
 {
@@ -237,6 +255,8 @@ void aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbe
     haloysi[j]=haloy[j]*bbeat*sqrt(ey*bety);
   }
 }
+
+
 
 struct aper_node* aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt)
 {
@@ -262,10 +282,13 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY], newhalox[MAXARRAY], newhaloy[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
+  double parxd,paryd,deltap_twiss;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L];
   char apertype[NAME_L];
   char name[NAME_L];
+  char tol_err_mess[80];
+
   struct node* rng_glob[2];
   struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1},{-1,-1,-1}};
   struct aper_node* lim_pt = &limit_node;
@@ -274,8 +297,8 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
   /* IA */
   /*
-  struct aper_e_d true_tab[E_D_MAX];
-  struct aper_e_d offs_tab[E_D_MAX];
+    struct aper_e_d true_tab[E_D_MAX];
+    struct aper_e_d offs_tab[E_D_MAX];
   */
   true_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
   offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));
@@ -307,12 +330,18 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   mass = get_value("beam", "mass");
   energy = get_value("beam", "energy");
 
+  /* fetch deltap as set by user in the former TWISS command */
+  /* will be used below for displacement associated to parasitic dipersion */
+
+  err = double_from_table("summ","deltap",&nint,&deltap_twiss);
+  printf ("+++++++ deltap from TWISS %12.6g\n",deltap_twiss);
+
   /* calculate emittance and delta angle */
   ex=mass*exn/energy; ey=mass*eyn/energy;
   dangle=twopi/(nco*4);
 
   /* check if trueprofile and offsetelem files exist */
-  true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode); 
+  true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
   offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
@@ -320,11 +349,11 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   else if (aper_rectellipse(&halo[2], &halo[3], &halo[1], &halo[1], &halo_q_length, halox, haloy))
   {
     warning("Not valid parameters for halo. ", "Unable to make polygon.");
-    
+
     /* IA */
     myfree("Aperture",true_tab);
     myfree("Aperture",offs_tab);
-    
+
     return lim_pt;
   }
   else aper_fill_quads(halox, haloy, halo_q_length, &halolength);
@@ -340,8 +369,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
   /* calculate initial normal+parasitic disp. */
-  dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
-  dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
+  /* modified 27feb08 BJ */
+  parxd = dparx*sqrt(betx/betaqfx)*dqf;
+  paryd = dpary*sqrt(bety/betaqfx)*dqf;
 
   /* Initialize n1 limit value */
   lim_pt->n1=999999;
@@ -405,8 +435,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       (*tw_cnt)++;
 
       /* calc disp and adj halo to have ready for next node */
-      dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
-      dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
+      /* modified 27feb08 BJ */
+      parxd = dparx*sqrt(betx/betaqfx)*dqf;
+      paryd = dpary*sqrt(bety/betaqfx)*dqf;
 
       aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
@@ -449,11 +480,11 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       if (!nint) nint=1;
 
       /* don't interpolate 0-length elements*/
-      
-      
+
+
       if (fabs(length) < MIN_DOUBLE ) is_zero_len = 1;
-      
- 
+
+
       /* slice the node, call survey if necessary, make twiss for slices*/
       err=interp_node(&nint);
 
@@ -489,8 +520,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
                            haloxsi, haloysi);
 
           /* calculate normal+parasitic disp.*/
-          dispx=sqrt(dx*dx)+dparx*sqrt(betx/betaqfx)*dqf;
-          dispy=sqrt(dy*dy)+dpary*sqrt(bety/betaqfx)*dqf;
+          /* modified 27feb08 BJ */
+          parxd = dparx*sqrt(betx/betaqfx)*dqf;
+          paryd = dpary*sqrt(bety/betaqfx)*dqf;
 
           if (do_survey)
           {
@@ -523,17 +555,29 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
         for (angle=0;angle<twopi;angle+=dangle)
         {
+          /* new 27feb08 BJ */
+          dispx = fabs(dx)*dp + bbeat*parxd*(fabs(deltap_twiss)+dp);
+          dispy = fabs(dy)*dp + bbeat*paryd*(fabs(deltap_twiss)+dp);
+
           /*adjust dispersion to worst-case for quadrant*/
           aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
 
           /*calculate displacement co+tol for each angle*/
           coxadj=cor*cos(angle); coyadj=cor*sin(angle);
+
+          /* Error check added 20feb08 BJ */
+          if ( xshift<0 || yshift < 0 || r<0 ) {
+            sprintf(tol_err_mess,"In element : %s\n",name);
+            fatal_error("Illegal negative tolerance",tol_err_mess);
+          }
           aper_race(xshift,yshift,r,angle,&tolx,&toly);
+
           aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
 
           /* add all displacements */
-          deltax=coxadj+tolxadj+bbeat*dispxadj*dp+x;
-          deltay=coyadj+tolyadj+bbeat*dispyadj*dp+y;
+          /* modified 27feb08 BJ */
+          deltax = coxadj + tolxadj + x + dispxadj;
+          deltay = coyadj + tolyadj + y + dispyadj;
 
           /* send beta adjusted halo and its displacement to aperture calculation */
           aper_calc(deltax,deltay,&ratio,haloxsi,haloysi,
@@ -547,10 +591,10 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         n1x_m=n1*bbeat*sqrt(betx*ex);
         n1y_m=n1*bbeat*sqrt(bety*ey);
 
-	if ( (is_zero_len == 0) || (jslice == 1) )
-        aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
-                         &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
-                         &x, &y, &betx, &bety, &dx, &dy, table);
+        if ( (is_zero_len == 0) || (jslice == 1) )
+          aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
+                           &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
+                           &x, &y, &betx, &bety, &dx, &dy, table);
 
         /* save node minimum n1 */
         if (n1 < node_n1)
@@ -588,9 +632,12 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
   myfree("Aperture",true_tab);
   myfree("Aperture",offs_tab);
-  
+
   return lim_pt;
 }
+/* END OF APERTURE FUNCTION */
+
+
 
 int aper_tab_search(int cnt, struct aper_e_d* tab, char* name, int* pos)
 {
@@ -606,6 +653,8 @@ int aper_tab_search(int cnt, struct aper_e_d* tab, char* name, int* pos)
 
   return found;
 }
+
+
 
 double aper_calc(double p, double q, double* minhl, double halox[], double haloy[],
                  int halolength,double haloxadj[],double haloyadj[],
@@ -713,6 +762,7 @@ double aper_calc(double p, double q, double* minhl, double halox[], double haloy
 }
 
 
+
 int aper_chk_inside(double p, double q, double pipex[], double pipey[], double dist_limit, int pipelength)
 {
   int i;
@@ -748,6 +798,7 @@ int aper_chk_inside(double p, double q, double pipex[], double pipey[], double d
 
   return 0;
 }
+
 
 
 int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnode)
@@ -797,7 +848,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
       i=0;
 
       while (i != EOF)
-      {	
+      {
         i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
         /*next while-loop treats comments*/
         while ( e_d_tab[*cnt].name[0] == '!' && i != EOF)
@@ -828,26 +879,26 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
           (*cnt)++;
 
           if (*cnt == curr_e_d_max) /* grow e_d array */
-	    {
-	      /* printf("\nToo many special elements...(less than %d expected)\n", E_D_MAX); */
-	      new_e_d_max = curr_e_d_max + E_D_LIST_CHUNK;
-	      printf("\ngrowin e_d_max array to %d\n", new_e_d_max);
-	      
-	      e_d_tab_loc = (struct aper_e_d*) mycalloc("Aperture",new_e_d_max,sizeof(struct aper_e_d) );
-	      
-	      for( l=0 ; l < curr_e_d_max; l++)
-		{
-		  e_d_tab_loc[l] = e_d_tab[l];		  
-		}	      
+          {
+            /* printf("\nToo many special elements...(less than %d expected)\n", E_D_MAX); */
+            new_e_d_max = curr_e_d_max + E_D_LIST_CHUNK;
+            printf("\ngrowin e_d_max array to %d\n", new_e_d_max);
+
+            e_d_tab_loc = (struct aper_e_d*) mycalloc("Aperture",new_e_d_max,sizeof(struct aper_e_d) );
+
+            for( l=0 ; l < curr_e_d_max; l++)
+            {
+              e_d_tab_loc[l] = e_d_tab[l];
+            }
 
 
-	      myfree("Aperture",e_d_tab);
+            myfree("Aperture",e_d_tab);
 
-	      e_d_tab = e_d_tab_loc;
-	      
-	      curr_e_d_max = new_e_d_max;
+            e_d_tab = e_d_tab_loc;
 
-	    }
+            curr_e_d_max = new_e_d_max;
+
+          }
 
           i=j;
         }
@@ -860,9 +911,11 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
   }
 
   *e_d_tabp = e_d_tab;
-  
+
   return e_d_flag;
 }
+
+
 
 int aper_external_file(char *file, double tablex[], double tabley[])
 {
@@ -894,6 +947,8 @@ int aper_external_file(char *file, double tablex[], double tabley[])
   }
   return i-1;
 }
+
+
 
 void aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* halolength)
 {
@@ -937,15 +992,22 @@ void aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* hal
   *halolength=i-1;
 }
 
+
+
 void aper_header(struct table* aper_t, struct aper_node* lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
-  int i, h_length = 18;
-  double dtmp, dtmp2, vtmp[4];
+  int i, err, nint=1, h_length = 25;
+  double dtmp, dtmp2, vtmp[4], deltap_twiss,n1min;
   char tmp[NAME_L], *stmp;
 
-  if (aper_t == NULL) return;
+  /* =================================================================*/
   /* ATTENTION: if you add header lines, augment h_length accordingly */
+  /* =================================================================*/
+
+  /* many modif to make the header being standard; BJ 25feb2008 */
+
+  if (aper_t == NULL) return;
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp) h_length++;
 
@@ -985,19 +1047,27 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dparx", this_cmd->clone);
   dtmp2 = command_par_value("dpary", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ P. DISP. X - Y   %%le       %g - %g"), dtmp,dtmp2);
+
+  sprintf(c_dum->c, v_format("@ PARAS_DX         %%le       %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le       %g"), dtmp2);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+
   dtmp = command_par_value("dp", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ DP/BUCKET SIZE   %%le  %F"), dtmp);
+  sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  err = double_from_table("summ","deltap",&nint,&deltap_twiss);
+  sprintf(c_dum->c, v_format("@ TWISS_DELTAP     %%le  %F"), deltap_twiss);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+
   dtmp = command_par_value("cor", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ CO RADIUS        %%le  %F"), dtmp);
+  sprintf(c_dum->c, v_format("@ CO_RADIUS        %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("bbeat", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ BETA BEATING     %%le  %F"), dtmp);
+  sprintf(c_dum->c, v_format("@ BETA_BEATING     %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("nco", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ # OF ANGLES      %%d   %F"), dtmp*4);
+  sprintf(c_dum->c, v_format("@ NB_OF_ANGLES     %%d   %g"), dtmp*4);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
   /* if a filename with halo coordinates is given, need not show halo */
@@ -1010,8 +1080,13 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   else
   {
     i = command_par_vector("halo", this_cmd->clone, vtmp);
-    sprintf(c_dum->c, v_format("@ HALO SHAPE       %%le %g - %g - %g - %g"),
-            vtmp[0],vtmp[1],vtmp[2],vtmp[3]);
+    sprintf(c_dum->c, v_format("@ HALO_PRIM        %%le       %g"),vtmp[0]);
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ HALO_R           %%le       %g"),vtmp[1]);
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ HALO_H           %%le       %g"),vtmp[2]);
+    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+    sprintf(c_dum->c, v_format("@ HALO_V           %%le       %g"),vtmp[3]);
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
   /* show filename with pipe coordinates if given */
@@ -1022,18 +1097,19 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
-  sprintf(c_dum->c, v_format(" "));
+  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), lim->n1);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  n1min = lim->n1;
+  set_value("beam","n1min",&n1min);
+
+
+  strcpy(tmp, lim->name);
+  sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""),strlen(tmp),stoupper(tmp) );
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
-  sprintf(c_dum->c, v_format("@ APERTURE LIMIT: %s, n1: %g, apertype: %s, aperture: %g - %g - %g - %g, tolerance: %g  - %g - %g"),
-          lim->name,lim->n1,lim->apertype,
-          lim->aperture[0],lim->aperture[1],lim->aperture[2],
-          lim->aperture[3],lim->aper_tol[0],lim->aper_tol[1],lim->aper_tol[2]);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-
-  sprintf(c_dum->c, v_format(" "));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 }
+
+
 
 void aper_intersect(double a1, double b1, double a2, double b2, double x1, double y1, double x2, double y2,
                     int ver1, int ver2, double *xm, double *ym)
@@ -1060,6 +1136,9 @@ void aper_intersect(double a1, double b1, double a2, double b2, double x1, doubl
   }
 }
 
+
+
+
 int aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
 {
   int vertical=0;
@@ -1077,10 +1156,12 @@ int aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
   return vertical;
 }
 
+
+
 double aper_online(double xm, double ym, double startx, double starty,
                    double endx, double endy, double dist_limit)
 {
-  double cosfi=1;
+  double cosfi=1 , aaa;
 
   if (sqrt((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) <= dist_limit)
   {
@@ -1088,9 +1169,13 @@ double aper_online(double xm, double ym, double startx, double starty,
   }
   else
   {
-    cosfi=  ((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) /
-      (sqrt((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) *
-       sqrt((xm-endx)*(xm-endx)+(ym-endy)*(ym-endy)));
+    aaa = ((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) *
+      ((xm-endx)*(xm-endx)+(ym-endy)*(ym-endy));
+    if ( aaa < MIN_DOUBLE ) {
+      fatal_error("Attempt to zero divide ", "In aper_online");
+    }
+
+    cosfi=  ((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) / sqrt(aaa);
   }
 
   if (cosfi <= -1+dist_limit)
@@ -1099,6 +1184,10 @@ double aper_online(double xm, double ym, double startx, double starty,
   }
   return cosfi;
 }
+
+
+
+/* NEW VERSION of aper_race, 20feb08 BJ, potemtial zero-divide issues cleared */
 
 void aper_race(double xshift, double yshift, double r, double angle, double* x, double* y)
 {
@@ -1113,62 +1202,67 @@ void aper_race(double xshift, double yshift, double r, double angle, double* x, 
   if (xshift==0 && yshift==0 && r==0)
   {
     *x=0; *y=0;
+    return;
+  }
+
+  switch (quadrant) /*adjusting angle to first quadrant*/
+  {
+    case 1: angle=angle; break;
+    case 2: angle=pi-angle; break;
+    case 3: angle=angle-pi; break;
+    case 4: angle=twopi-angle; break;
+  }
+
+  if (angle==pi/2)
+  {
+    *x=0;
+    *y=yshift+r;
   }
   else
   {
-    switch (quadrant) /*adjusting angle to first quadrant*/
+/*finding where arc starts and ends*/
+    angle0=atan2( yshift , xshift+r );
+    angle1=atan2( r+yshift , xshift );
+
+    /*different methods is needed, depending on angle*/
+    if (angle <= angle0 + MIN_DOUBLE * 1.e10 )
     {
-      case 1: angle=angle; break;
-      case 2: angle=pi-angle; break;
-      case 3: angle=angle-pi; break;
-      case 4: angle=twopi-angle; break;
+      *x=xshift+r;
+      *y=tan(angle)*(xshift+r);
     }
-
-    if (angle==pi/2) /*in this case we should not use the tan()-function*/
+    else if (angle<angle1)
     {
-      *x=0;
-      *y=yshift+r;
-    }
-    else
-    {
-      angle0=atan(yshift/(xshift+r)); /*finding where arc starts and ends*/
-      angle1=atan((r+yshift)/xshift);
+/* if this is a circle, angle2 useless */
+      if (!xshift && !yshift)  angle2 = 0;
+      else angle2 = atan2( yshift , xshift );
 
-      /*different methods is needed, depending on angle*/
-      if (angle<=angle0+0.0000001)
+      alfa = fabs(angle-angle2);
+      if (alfa < MIN_DOUBLE * 1.e10)
       {
-        *x=xshift+r;
-        *y=tan(angle)*(xshift+r);
-      }
-      else if (angle<angle1)
-      {
-        if (!xshift && !yshift) angle2=0; /* if this is a circle, atan */
-        else angle2=atan(yshift/xshift);  /* can not be used */
-
-        alfa=sqrt((angle-angle2)*(angle-angle2));
-        if (alfa<0.0000001)
-        {
-          /*sine rule can not be used if alfa==0*/
-          *x=cos(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
-          *y=sin(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
-        }
-        else
-        {
-          /*solving sine rule w.r.t. gamma*/
-          gamma=asin(sqrt(xshift*xshift+yshift*yshift)/r*sin(alfa));
-          theta=pi-(alfa+gamma); /*theta is the last corner in the triangle*/
-          *x=cos(angle)*r*sin(theta)/sin(alfa);
-          *y=sin(angle)*r*sin(theta)/sin(alfa);
-        }
+/* alfa==0 is a simpler case */
+        *x=cos(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
+        *y=sin(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
       }
       else
       {
-        *x=(r+yshift)/tan(angle);
-        *y=r+yshift;
+/* solving sine rule w.r.t. gamma */
+        gamma=asin(sqrt(xshift*xshift+yshift*yshift)/r*sin(alfa));
+/*theta is the last corner in the triangle*/
+        theta=pi-(alfa+gamma);
+        *x=cos(angle)*r*sin(theta)/sin(alfa);
+        *y=sin(angle)*r*sin(theta)/sin(alfa);
       }
+    }
+/* upper flat part */
+    else
+    {
+      *y=r+yshift;
+      *x=(r+yshift)*tan(pi/2-angle);
     }
   }
 }
+
+
 
 void aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
                      double* betx, double* bety, double* dx, double* dy)
@@ -1181,6 +1275,7 @@ void aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
   double_from_table(table, "dx", jslice, dx);
   double_from_table(table, "dy", jslice, dy);
 }
+
 
 
 void aper_surv(double init[], int nint)
@@ -1238,6 +1333,8 @@ void aper_surv(double init[], int nint)
   double_from_table("survey","psi",&nint, &init[5]);
 }
 
+
+
 void aper_trim_ws(char* string, int len)
 {
   int c=0;
@@ -1251,6 +1348,8 @@ void aper_trim_ws(char* string, int len)
   string[c]='\0';
   if (c<len) string[c+1]=' '; /*adds a ws to avoid two \0 in a row*/
 }
+
+
 
 void aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
                       double* rtol, double* xtol, double* ytol,
