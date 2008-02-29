@@ -1343,7 +1343,7 @@ char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 3.04.21";
-char code_mod_date[] = "Code Modification Date: 27.02.2008";
+char code_mod_date[] = "Code Modification Date: 29.02.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
