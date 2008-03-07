@@ -55,17 +55,18 @@
         harmonl = 1.E+06*rff*circ/clight
 
         pc = get_value('probe ','pc ')
+c        print *, ' pc ', pc
         omega = rff * ten6p * twopi / clight
         vrf   = rfv * ten3m / (pc * (one + deltap))
 
         flag = double_from_table('twiss ','t ',1,orbit5)
         phirf = rfl * twopi - omega * orbit5
-        c0 =   vrf
+        c0 =   vrf*charge 
         if (cos(phirf).lt.0) vrf=-vrf
         eta = alfa - one / gammas**2
         if (uloss.ne.zero) then
-          qover = qover+rfv/uloss
-          vrfsum = vrfsum+rfv/harmonl
+          qover = qover+rfv/uloss*charge
+          vrfsum = vrfsum+rfv/harmonl*charge 
           harmonlm=min(harmonl,harmonlm)
         else
           umt = umt+2d0/(harmonl*eta*pi)*c0
@@ -361,9 +362,12 @@
 
 ! *********************************************************************
 !
-! $Id: touschek.F,v 1.6 2005-08-24 13:42:19 frs Exp $
+! $Id: touschek.F,v 1.7 2008-03-07 10:09:53 frankz Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.6  2005/08/24 13:42:19  frs
+! simple clean-up
+!
 ! Revision 1.5  2005/02/05 00:54:43  frs
 ! Fortran clean-up with mymod, f2c, lf95, f95
 !
@@ -468,9 +472,12 @@
 
 !********************************************************************
 !
-! $Id: touschek.F,v 1.6 2005-08-24 13:42:19 frs Exp $
+! $Id: touschek.F,v 1.7 2008-03-07 10:09:53 frankz Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.6  2005/08/24 13:42:19  frs
+! simple clean-up
+!
 ! Revision 1.5  2005/02/05 00:54:43  frs
 ! Fortran clean-up with mymod, f2c, lf95, f95
 !
