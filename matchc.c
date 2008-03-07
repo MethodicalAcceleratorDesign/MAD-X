@@ -901,7 +901,7 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
   double *SV,*U,*VT;
   double tmp;
   char *knobfilename, *jacfilename;
-  FILE *knobfile, *jacfile;
+  FILE *knobfile=NULL, *jacfile=NULL;
   k=0;
   jacfilename=command_par_string("jacfile",cmd->clone);
   knobfilename=command_par_string("knobfile",cmd->clone);

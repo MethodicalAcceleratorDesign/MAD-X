@@ -614,7 +614,7 @@ int match2_print_var(struct in_cmd* cmd){
   int n,l;
   char *varname,*knobfilename,*knobname;
   double ivalue,fvalue;
-  FILE *knobfile;
+  FILE *knobfile=NULL;
   knobfilename=command_par_string("knobfile",cmd->clone);
   if (knobfilename){
       knobfile=fopen(knobfilename,"w");
@@ -645,4 +645,5 @@ int match2_print_var(struct in_cmd* cmd){
   }
   fprintf(prt_file,"\n");
   if ( knobfilename ) fclose(knobfile);
+  return 0;
 }
