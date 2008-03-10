@@ -556,8 +556,8 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         for (angle=0;angle<twopi;angle+=dangle)
         {
           /* new 27feb08 BJ */
-          dispx = fabs(dx)*dp + bbeat*parxd*(fabs(deltap_twiss)+dp);
-          dispy = fabs(dy)*dp + bbeat*paryd*(fabs(deltap_twiss)+dp);
+          dispx = bbeat*(fabs(dx)*dp + parxd*(fabs(deltap_twiss)+dp) );
+          dispy = bbeat*(fabs(dy)*dp + paryd*(fabs(deltap_twiss)+dp) );
 
           /*adjust dispersion to worst-case for quadrant*/
           aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
