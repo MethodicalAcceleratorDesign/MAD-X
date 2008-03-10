@@ -418,7 +418,10 @@ void complete_twiss_table(struct table* t)
   for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
   {
     el = c_node->length;
+    strcpy(tmp, twiss_table_cols[j]);
     if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
+    else if (strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "beam_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {
       val = mult_par(twiss_table_cols[j], c_node->p_elem);

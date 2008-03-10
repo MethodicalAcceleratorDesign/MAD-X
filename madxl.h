@@ -175,9 +175,9 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 68; /* last standard column filled
-                            by twiss_table_complete */
-/* warning: modify routine twiss_table_complete in case of changes */
+int twiss_fill_end = 70; /* last standard column filled
+                            by complete_twiss_table */
+/* warning: modify routine complete_twiss_table in case of changes */
 int twiss_table_types[] =
 {
   3, 3, 2, 2, 2,
@@ -193,7 +193,8 @@ int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2, 2, 2, 3,
+  2, 2, 2, 2, 
+  1, 2, 3,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -237,7 +238,8 @@ char* twiss_table_cols[] =
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
   "k9sl", "k10l", "k10sl", "ks", "hkick",
   "vkick", "tilt", "e1", "e2", "h1",
-  "h2", "hgap", "fint", "fintx", "parent",
+  "h2", "hgap", "fint", "fintx", 
+  "assembly_id","beam_sep","parent",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",
