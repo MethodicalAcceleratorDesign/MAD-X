@@ -77,6 +77,10 @@ foreach $makefile (@makefiles){
 	$makeResult =~ s/([wW])arning(s?)/<font class=\"warning\">\1arning\2<\/font>/g;
 	# undo the above in case the warning appears as '0 warnings'
 	$makeResult =~ s/([\s\t]+0[\s\t]+)<font class=\"warning\">([Ww])arning(s?)<\/font>/\1\2arning\3/g;
+	# make sure line feeds display correctly in HTML
+	$makeResult =~ s/\n/<\/td><\/tr>\n<tr><td>/g;
+	$makeResult = "<tr><td colspan=\"2\">" . $makeResult . "</td></tr>\n\n";
+
 	
 	my $nbOfTargets = `ls $target | wc -w`;
 	if ($nbOfTargets == 1) {
