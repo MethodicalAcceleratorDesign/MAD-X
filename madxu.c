@@ -3545,12 +3545,12 @@ int remove_from_name_list(char* name, struct name_list* nl)
 void remove_from_sequ_list(struct sequence* sequ, struct sequence_list* sql)
   /* removes sequence sequ from sequence list sql */
 {
-  int i;
+  int i, pos;
   for (i = 0; i < sql->curr; i++) if (sql->sequs[i] == sequ)  break;
-
+  pos = name_list_pos(sequ->name, sql->list);
   remove_from_name_list(sequ->name, sql->list);
-  
-  /*sql->sequs[i] = sql->sequs[sql->curr--];*/
+  for (i = pos+1; i < sql->curr; i++) sql->sequs[i-1] = sql->sequs[i];
+  sql->curr--;  
   return;
 }
 
