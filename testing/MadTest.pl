@@ -91,7 +91,7 @@ foreach $targetDir (@targetDirs) {
 
     # DBG
    # if (($targetDir ne "ptc_accel")&&($targetDir ne "ptc_madx_interface")) {next;} # only one target
-    #if ($targetDir ne "twiss"){next;}
+ #   if ($targetDir ne "twiss"){next;}
 
     print "target = '$targetDir'\n";
 
@@ -152,7 +152,7 @@ foreach $target (@targets) {
     chop $target;
     # DBG
    # if (($target ne "ptc_accel")&&($target ne "ptc_madx_interface")) {next; } # only one target
-   # if ($target ne "twiss") {next;}
+  # if ($target ne "twiss") {next;}
 
     print "--- testing $target\n";
 
@@ -211,7 +211,7 @@ foreach $target (@targets) {
 	    $executableCommand = $_;
 	}
 
-	$testReport .= "<tr class='test_case'><td width=\"70%\">$testCaseDir: $executableCommand</td><td width=\"30%\"></td></tr>\n"; 
+	$testReport .= "<tr class='test_case'><td colspan=\"2\" width=\"100%\">$testCaseDir: $executableCommand</td></tr>\n"; 
         # above sets column width for the whole table
 
 
@@ -377,6 +377,7 @@ foreach $target (@targets) {
 		    my $pwd = `pwd`; chop $pwd;
 		    if ($existsDir==1) {
 		    } else {
+		    	# DBG: where we end-up for specific case of MB.12.mad
 			mkdir($calledFileSubDir,0777);
 			# add this dir to the list of input subdirectories that should be transferred from the workdir
 			# in which the MAD command is executed into the "inputs" directory (otherwise the directory
@@ -385,6 +386,7 @@ foreach $target (@targets) {
 
 		    }
 		    # and now do the copy
+		    # DBG: we end-up copying MB.12.mad into ./temp
 		    # print "DIRECTORY: now copying $samplesRootDir/$target/$input into ./$calledFileSubDir\n";
 		    if ($sourceSubDir eq ""){
 			`cp $samplesRootDir/$target/$input ./$calledFileSubDir`;
@@ -427,8 +429,11 @@ foreach $target (@targets) {
 
 	`ln -s $madLink $madProgram`;
 
-	`$executableCommand`;
-
+	# DBG: for twiss - test 5, MAD.12.mad etc in temp are replaced by MAD.12 etc...
+	# hence temp is removed and rewritten whereas this does not seem to be the case
+	# in the reference directory ... rights?
+	
+	`$executableCommand`; 
 
 	# retrieve the 'output file' name with a regular expression
 	$_ = $command;
@@ -512,7 +517,7 @@ foreach $target (@targets) {
 	    }
 	    if ($fileCount == 0) {
 		print OUT "# FAIL TO COMPARE $file: no such file for reference => FAILURE\n";
-		$testReport .="<tr class='omit'><td>$file</td><td>no file for reference</td></tr>\n";
+		$testReport .="<tr class='omit'><td width=\"70%\">$file</td><td width=\"30%\">no file for reference</td></tr>\n";
 	    } else {
 
 		my $detailsLink;
@@ -539,7 +544,7 @@ foreach $target (@targets) {
 		}
 
 		
-		$testReport .= "<tr class='$madDiffRes'><td>$file</td><td><a href=\"$detailsLink\">$madDiffRes</a></td></tr>\n";
+		$testReport .= "<tr class='$madDiffRes'><td width=\"70%\">$file</td><td width=\"30%\"><a href=\"$detailsLink\">$madDiffRes</a></td></tr>\n";
 		print OUT "#COMPARING $file yields $madDiffRes\n";
 
 	    }
