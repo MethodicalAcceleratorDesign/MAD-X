@@ -27,8 +27,13 @@ my $startTime = localtime;
 
 my $diffReport = "";
 
+# we know $rightFilename can be rather long - of the form .../.../.../REF/...
+# let's only display from ref
+$shortenRightFilename = $rightFilename;
+$shortenRightFilename =~ s/(.+)\/REF\/(.+)/\(cvs\)\/REF\/\2/;
+
 $diffReport .= "<table>\n";
-$diffReport .= "<tr><td width=\"50%\">$leftFilename</td><td width=\"50%\">$rightFilename</td></tr>\n";
+$diffReport .= "<tr><td width=\"50%\">$leftFilename</td><td width=\"50%\">$shortenRightFilename</td></tr>\n";
 
 my $diffResult = `diff --side-by-side --width $maxWidth $leftFilename $rightFilename`; # should not exceed webpage max
 my @lines = split /\n/, $diffResult;
