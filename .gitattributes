@@ -50,6 +50,9 @@
 /dyntab.fi -text
 /emit.F -text
 /emit.fi -text
+/fortran_flush.F -text
+/fortran_wrappers.c -text
+/fortran_wrappers.h -text
 /gxx11.F -text
 /gxx11c.c -text
 /gxx11ps.F -text
