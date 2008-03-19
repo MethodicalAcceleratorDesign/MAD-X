@@ -110,7 +110,7 @@ emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
 match_f77.o match.o: match.F name_len.fi match.fi
 touschek_f77.o touschek.o: touschek.F touschek.fi name_len.fi physcons.fi
 resindex_f77.o resindex.o: resindex.F resindex.fi
-_f77.o: fortran_flush.Ffortran_flush
+fortran_flush_f77.o: fortran_flush.F
 
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
