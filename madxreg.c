@@ -1,3 +1,5 @@
+#include "fortran_wrappers.h"
+
 struct reg_token* add_tok(char c, struct reg_token* rt)
 {
   char rout_name[] = "add_tok";

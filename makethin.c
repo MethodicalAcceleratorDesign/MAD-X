@@ -3,6 +3,8 @@
    Early versions in 2001, 2002 by Mark Hayes
 */
 
+#include "fortran_wrappers.h"
+
 /* define bool like in C++ */
 #ifndef bool_for_c
 #define bool_for_c

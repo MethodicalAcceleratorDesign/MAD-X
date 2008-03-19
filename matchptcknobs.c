@@ -67,6 +67,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "fortran_wrappers.h"
+
 #define MAX_CONTRAINS  100
 #define MAX_KNOBS  100
 #define COMM_LENGTH  500

@@ -1,3 +1,5 @@
+#include "fortran_wrappers.h"
+
 void match2_match(struct in_cmd* cmd)
 {
   match_is_on = 2;

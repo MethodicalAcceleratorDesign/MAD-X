@@ -10,6 +10,7 @@
 #include <dlfcn.h>
 #endif
 
+#include "fortran_wrappers.h"
 
 extern type_OfExtern void type_ofCall warning(const char*, const char*);
 

@@ -1,3 +1,5 @@
+#include "fortran_wrappers.h"
+
 void pro_error(struct in_cmd* cmd)
 {
 

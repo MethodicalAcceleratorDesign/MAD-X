@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <time.h>
+
+#include "fortran_wrappers.h"
+
 #define cbyt     cbyt_
 #define mydtime  mydtime_
 void cbyt(int* source, int* s_pos, int* target, int* t_pos, int* n)

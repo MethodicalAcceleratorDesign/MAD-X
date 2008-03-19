@@ -80,7 +80,7 @@
 
 */
 
-
+#include "fortran_wrappers.h"
 
 /* already defined as 42 in fulll.h */
 /*#define FIELD_MAX 40*/        /* field error array length */

@@ -6,6 +6,8 @@
 #include <ctype.h>
 */
 
+#include "fortran_wrappers.h"
+
 /* define SDDS routine */
 int  treat_tfs_header(SDDS_TABLE *sd,  struct table* t);
 void sel_table(char* tname, struct table* t);

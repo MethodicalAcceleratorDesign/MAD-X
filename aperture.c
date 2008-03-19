@@ -1,5 +1,6 @@
 
 /* start of aperture module */
+#include "fortran_wrappers.h"
 
 #define MIN_DOUBLE 1.e-36
 

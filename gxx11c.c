@@ -9,6 +9,8 @@
 #include <time.h>
 #include <string.h>
 
+#include "fortran_wrappers.h"
+
 #define MAXCOL 256
 
 #define cbyt     cbyt_

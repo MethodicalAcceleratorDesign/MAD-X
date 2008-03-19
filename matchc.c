@@ -2,6 +2,7 @@
 
 #include "matchptcknobs.h"
 
+#include "fortran_wrappers.h"
 
 void mtsa_(int*, int*, double*, int*, int*, double*, double*, int*, int*,
            double*, int*, double*, double*, double*, double*, double*);

@@ -34,6 +34,8 @@
 
 #include "aperture.c"
 
+#include "fortran_wrappers.h"
+
 double** trackstrarpositions = 0x0;/* two dimensional array with track positions*/
 
 
