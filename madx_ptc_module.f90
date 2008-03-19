@@ -406,6 +406,7 @@ CONTAINS
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
+!       case("lhcscreen")
        case("rectellipse")
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
@@ -413,6 +414,11 @@ CONTAINS
           key%list%aperture_y=aperture(3)
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
+!       case("marguerite")
+!          key%list%aperture_on=.true.
+!          key%list%aperture_kind=4
+!          key%list%aperture_r(1)=aperture(1)
+!          key%list%aperture_r(2)=aperture(2)
        case("general")
           key%list%aperture_kind=5
           print*,"General aperture not implemented"
