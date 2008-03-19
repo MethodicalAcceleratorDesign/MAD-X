@@ -86,17 +86,14 @@ endif
 default: madx
 
 # dependencies of madxpf which combines the C-code
-madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h
+madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
 
-madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h
+madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
 
 
 matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
-
-fortran_wrappers.o: fortran_wrappers.c
-	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
 
 # fortran code dependencies on header files fi
 twiss_f77.o twiss.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
@@ -110,7 +107,6 @@ emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
 match_f77.o match.o: match.F name_len.fi match.fi
 touschek_f77.o touschek.o: touschek.F touschek.fi name_len.fi physcons.fi
 resindex_f77.o resindex.o: resindex.F resindex.fi
-_f77.o: fortran_flush.Ffortran_flush
 
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
@@ -174,7 +170,7 @@ madx_main.o: run_madx.o madx_main.f90
 # matchlib2 for madx only
 matchlib2_f77.o: matchlib2.F
 	$(FC) -m32 -c -o $@ $<
-	
+
 # implicit rule to compile with C
 %.o : %.c
 	$(CC) $(GCCP_FLAGS) -c -o $(@) $<
@@ -197,17 +193,17 @@ mpars: madxm.F madxp.o
 
 # madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
 # Append f77 to distinguish from objects compiled with f95
-madx_objectsf77 = madxpf.o gxx11c.o timel.o matchptcknobs.o fortran_wrappers.o\
+madx_objectsf77 = madxpf.o gxx11c.o timel.o matchptcknobs.o \
 	$(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
 
-madx: $(madx_objectsf77);
+madx: $(madx_objectsf77) ;
 	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
 
 # madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
 madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o matchlib2_f77.o matchlib2.o, $(patsubst %.F,%.o,$(wildcard *.F)))
 # madxp_objects. All *.f90 , some c and F
 madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
-	madxpf.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o\
+	madxpf.o gxx11c.o matchptcknobs.o rplot.o \
 	$(madx_objectsf95)
 madxp: $(madxp_objects)
 	$(f95) $(LDOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
