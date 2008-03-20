@@ -1,6 +1,8 @@
-// redirect FORTRAN calls to wrappers that synchronize FORTRAN and C stdout buffering
-// when crossing the border upon calling FORTRAN from C.
-
+#ifndef _FORTRAN_WRAPPERS_H
+#define _FORTRAN_WRAPPERS_H
+/* redirect FORTRAN calls to wrappers that synchronize FORTRAN and C stdout buffering */
+/* when crossing the border upon calling FORTRAN from C. */
+#include "fortran_wrappers_prototypes.h"
 #define dynap_ dynap_wrapper
 #define mtgetc_ mtgetc_wrapper
 #define collect_ collect_wrapper
@@ -64,3 +66,5 @@
 #define w_ptc_addpush_ w_ptc_addpush_wrapper
 #define w_ptc_script_ w_ptc_script_wrapper
 #define w_ptc_open_gino_ w_ptc_open_gino_wrapper
+
+#endif

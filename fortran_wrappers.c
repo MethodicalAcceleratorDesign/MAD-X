@@ -1,8 +1,8 @@
-// a set of wrappers to synchronize FORTRAN and C stdout buffering
-// when crossing the border upon calling FORTRAN from C.
+/* a set of wrappers to synchronize FORTRAN and C stdout buffering */
+/* when crossing the border upon calling FORTRAN from C. */
 
 #include <stdio.h>
-
+#include "fortran_prototypes.h"
 // Wrap 'dynap' defined in 'dynap.F'
 void dynap_wrapper(double* eigen,double* coords,int* turns,int* npart,double* distvect,double* zn,double* dq,double* onelog,double* turnnumber){
 	fflush(stdout);
@@ -184,13 +184,13 @@ void w_ptc_addmoment_wrapper(int* x,int* px,int* y,int* py,int* t,int* dp,int* t
 	call_fortran_flush_();
 }
 // Wrap 'w_ptc_getnfieldcomp' defined in 'wrap.f90'
-void w_ptc_getnfieldcomp_wrapper(int* fibreidx,int* ncomp,float* nval){
+void w_ptc_getnfieldcomp_wrapper(int* fibreidx,int* ncomp,double* nval){
 	fflush(stdout);
 	w_ptc_getnfieldcomp_(fibreidx,ncomp,nval);
 	call_fortran_flush_();
 }
 // Wrap 'w_ptc_getsfieldcomp' defined in 'wrap.f90'
-void w_ptc_getsfieldcomp_wrapper(int* fibreidx,int* ncomp,float* nval){
+void w_ptc_getsfieldcomp_wrapper(int* fibreidx,int* ncomp,double* nval){
 	fflush(stdout);
 	w_ptc_getsfieldcomp_(fibreidx,ncomp,nval);
 	call_fortran_flush_();
