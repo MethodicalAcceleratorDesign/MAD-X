@@ -108,9 +108,6 @@ gxx11c.o: gxx11c.c
 
 resindexp.o: resindex.F resindex.fi
 	$(FC) $(FCP) -o resindexp.o resindex.F
-	
-fortran_flush.o: fortran_flush.F
-	$(FC) $(FCP) -o fortran_flush.o fortran_flush.F
 
 .F.o:
 	$(f95) $(FFLAGS77) $<	
@@ -289,9 +286,6 @@ matchptcknobs.o: matchptcknobs.c matchptcknobs.h
 
 timel.o: timel.c
 	$(CC) $(GCCP_FLAGS) -c -o timel.o timel.c
-	
-fortran_wrappers.o: fortran_wrappers.c
-	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
 
 #Parser only
 mpars: madxm.o madxp.o
@@ -301,11 +295,11 @@ madx: \
 	madxm.o madxpf.o matchptcknobs.o twissp.o ptc_dummy.o surveyp.o orbfp.o emitp.o \
 	utilp.o matchp.o matchsap.o matchjcp.o matchlibp.o touschekp.o plotp.o \
 	soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
-	gxx11c.o resindexp.o timel.o fortran_wrappers.o fortran_flush.o
+	gxx11c.o resindexp.o timel.o
 	$(FC) $(FOPT) -o madx madxm.o madxpf.o matchptcknobs.o twissp.o ptc_dummy.o \
 	surveyp.o matchp.o matchsap.o matchjcp.o matchlibp.o touschekp.o plotp.o \
 	soddp.o ibsdbp.o trrunp.o dynapp.o orbfp.o emitp.o utilp.o gxx11p.o \
-	gxx11c.o resindexp.o timel.o fortran_wrappers.o fortran_flush.o $(LIBX) -lm -lc
+	gxx11c.o resindexp.o timel.o $(LIBX) -lm -lc
 
 madxp: \
 	madx_main.o run_madx.o madxpf.o matchptcknobs.o twiss.o survey.o orbf.o emit.o util.o \
@@ -323,7 +317,7 @@ madxp: \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
-	user2_photon.o poissonp.o wrap.o fortran_wrappers.o fortran_flush.o
+	user2_photon.o poissonp.o wrap.o
 	$(f95) $(FOPT) -o madxp madx_main.o run_madx.o madxpf.o matchptcknobs.o twiss.o \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlibp.o \
 	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
@@ -340,7 +334,7 @@ madxp: \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
-	user2_photon.o poissonp.o wrap.o fortran_wrappers.o fortran_flush.o\
+	user2_photon.o poissonp.o wrap.o \
 	$(LIBX) -lm -lc
 
 clean:
