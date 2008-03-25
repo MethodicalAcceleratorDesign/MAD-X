@@ -102,7 +102,7 @@ foreach $ext (@fortran_extensions){
 		    # we know this routine is called from C
 		    @fortranCalledFromC = (@fortranCalledFromC, "res_index");
 		    $fortranFile{'res_index'}="resindex.F";
-		    $CtypedParameterString{'res_index'} = "int* skew,int* mynorder,int* myn1,int* myn2,int* indexa,int* mynres";
+		    $CtypedParameterString{'res_index'} = "int* skew,int* mynorder,int* myn1,int* myn2,int indexa[4][1000],int* mynres";
 		    $CparameterString{'res_index'} = "skew,mynorder,myn1,myn2,indexa,mynres";
 		    $allTypesKnown{'res_index'} = 1;
 		    $retreiveArgType = 0; # do not attempt to interpret following statements as param defs
