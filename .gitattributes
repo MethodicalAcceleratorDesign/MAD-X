@@ -51,10 +51,6 @@
 /emit.F -text
 /emit.fi -text
 /fortran_flush.F -text
-/fortran_prototypes.h -text
-/fortran_wrappers.c -text
-/fortran_wrappers.h -text
-/fortran_wrappers_prototypes.h -text
 /gxx11.F -text
 /gxx11c.c -text
 /gxx11ps.F -text
