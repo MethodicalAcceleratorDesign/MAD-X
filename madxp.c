@@ -36,8 +36,9 @@
 /* FS & TdA 15.03.2004 plot upgrade, bugs correction, ptc_twiss upgrade, touschek preparation */
 #include "c6t.h"
 
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
-
+#endif
 
 void madx()
 {

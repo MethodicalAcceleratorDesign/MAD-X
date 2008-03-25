@@ -1,7 +1,8 @@
 /* FS & TdA 15.03.2004: fix missing myfree of p_loc in routine grow_table */
 /* TdA 15.03.2004: 2 new routines for plotting "interp_node" and "reset_interpolation" */
-
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 int add_drifts(struct node* c_node, struct node* end)
 {

@@ -1,4 +1,6 @@
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 void pro_error(struct in_cmd* cmd)
 {

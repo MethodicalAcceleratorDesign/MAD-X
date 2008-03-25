@@ -3,7 +3,9 @@
    Early versions in 2001, 2002 by Mark Hayes
 */
 
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 /* define bool like in C++ */
 #ifndef bool_for_c

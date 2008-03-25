@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 #define cbyt     cbyt_
 #define mydtime  mydtime_

@@ -1,4 +1,9 @@
 #include "matchptcknobs.h"
+
+#ifdef _WRAP_FORTRAN_CALLS
+#include "fortran_wrappers.h"
+#endif
+
 /*______________________________________________________________
   matchptcknobs.c
   Piotr Skowronski (CERN) 2006
@@ -66,8 +71,6 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-
-#include "fortran_wrappers.h"
 
 #define MAX_CONTRAINS  100
 #define MAX_KNOBS  100

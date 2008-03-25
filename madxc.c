@@ -1,4 +1,6 @@
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 void setupi_(int*, int*, int*, int*, int*, int*);
 void primat_(int*, int*, int*);
 void prdmat_(double*, int*, int*);

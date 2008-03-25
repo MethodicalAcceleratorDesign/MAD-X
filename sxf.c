@@ -1,6 +1,8 @@
 /* extract SXF file from mad-X, or read SXF file into mad-X */
 
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 void pro_sxf(struct in_cmd* cmd)
   /* controls reading and writing of SXF format files */

@@ -80,7 +80,9 @@
 
 */
 
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 /* already defined as 42 in fulll.h */
 /*#define FIELD_MAX 40*/        /* field error array length */

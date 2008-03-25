@@ -1,4 +1,6 @@
+#ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
+#endif
 
 void match2_match(struct in_cmd* cmd)
 {
