@@ -296,7 +296,7 @@ rplot.o: rplot.c rplot.h
 
 # automatically generated code
 fortran_wrappers.h:
-	wrap_fortran_calls.pl 	# creates fortran_wrappers.c, fortran_prototypes.h
+	perl wrap_fortran_calls.pl 	# creates fortran_wrappers.c, fortran_prototypes.h
 				# and fortran_wrappers_prototypes.h	
 
 fortran_wrappers.o: fortran_wrappers.c
