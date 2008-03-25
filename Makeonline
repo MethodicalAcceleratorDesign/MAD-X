@@ -95,8 +95,8 @@ matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
 
 # automatically generated code
 fortran_wrappers.h:
-	wrap_fortran_calls.pl	# also generates fortran_wrappers.c, fortran_prototypes.h
-				# and fortran_wrappers_prototypes.h
+	perl wrap_fortran_calls.pl	# also generates fortran_wrappers.c, fortran_prototypes.h
+					# and fortran_wrappers_prototypes.h
 fortran_wrappers.o: fortran_wrappers.c
 	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
 
