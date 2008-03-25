@@ -22,12 +22,12 @@ FCM=-O2 -m32 -fno-second-underscore -funroll-loops
 FCDB=-g -O0 -m32 -fno-second-underscore
 
 # default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I.
+GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -I.
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 #to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
 
 # alternative for development
-GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
+GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL -D_WRAP_FORTRAN_CALLS
 
 # NAG default f95 compiler options
 #f95_FLAGS=-gline -g90 -c -m32 -C=all -maxcontin=100 -nan
@@ -94,6 +94,11 @@ madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c 
 
 
 matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
+
+# automatically generated code
+fortran_wrappers.h:
+	wrap_fortran_calls.pl 	# also generates fortran_wrappers.c, fortran_prototypes.h
+				# and fortran_wrappers_prototypes.h
 
 fortran_wrappers.o: fortran_wrappers.c
 	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
@@ -191,6 +196,7 @@ matchlib2_f77.o: matchlib2.F
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $<
 
+	
 #Parser only
 mpars: madxm.F madxp.o
 	$(FC) $(FP) -o mpars madxm.F madxp.o $(LIBX) -lm -lc
@@ -218,6 +224,8 @@ clean:
 	rm -f *.mod
 	rm -f core
 	rm -f *~
+	rm -f fortran_wrappers.c fortran_wrappers.h
+	rm -f fortran_prototypes.h fortran_wrappers_prototypes.h
 
 info:
 	@echo "-------------------------------------"
