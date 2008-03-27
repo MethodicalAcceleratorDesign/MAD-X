@@ -22,14 +22,15 @@ FC=lf95
 FCP=$(FFLAGS77)
 
 CC=gcc
-FOPT=-m32
+FOPT=-static -m32
 
 CXX=$(CC)
 
-LIBX="-L/usr/X11R6/lib" -lX11
+LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 INCLUDES=-I.
 
+LDOPT=-static -m32
 
 ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
