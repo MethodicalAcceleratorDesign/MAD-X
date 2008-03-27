@@ -53,8 +53,8 @@ LDOPT=-static -m32
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
-#FC6
-#LIBX= -lX11 -lXdmcp -lXau -lc "-L/usr/lib/gcc/i386-redhat-linux/4.1.1/" -lgcc_eh
+#FC8
+#LIBX= -lX11 -lXdmcp -lXau -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/4.1.2" -lgcc -lgcc_eh
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 # NAG f95 lib extension

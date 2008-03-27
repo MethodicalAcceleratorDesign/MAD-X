@@ -64,6 +64,11 @@ GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 #G77
 FFLAGS77=-g -c -Wa,--32 -fno-second-underscore -ieee=full -D_G95
 
+#Linker
+LL=g95
+#FC8
+#LL=gcc
+
 CXX_FLAGS= $(GCCP_FLAGS)
 
 
@@ -90,10 +95,10 @@ f95_FOPT= -m32
 
 # libraries
 
-LIBS = -L/usr/lib/ -ldl -lpthread
+# LIBS = -L/usr/lib/ -ldl
 
-#FC6
-#LIBX= -lX11 -lXdmcp -lXau -lpthread
+#FC8
+#LIBX= -lX11 -lXdmcp -lXau "-L/extra/download/g95-install/lib/gcc-lib/i686-pc-linux-gnu/4.0.3" -lf95 -lpthread
 LIBX=-L/usr/X11R6/lib -lX11 -lXt
 
 LIBX_ext=
@@ -251,7 +256,7 @@ endif
 
 
 madxp: $(madxp_deps)
-	$(LD) $(LDOPS) -o $@ $(madxp_objects) $(LIBS) 
+	$(LL) $(LDOPS) -o $@ $(madxp_objects) $(LIBS) -lgcc -lm -lc
 
 #madxp_prof: $(f90_objs) $(c_objs) $(madx_objectsf95) 
 #	echo ENTERING PROFILE

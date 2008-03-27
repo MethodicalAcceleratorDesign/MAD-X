@@ -33,7 +33,7 @@ FFLAGS77= -c -O4 -Wa,--32 -fno-second-underscore -funroll-loops -I. -D_G95
 
 #Linker
 LL=g95
-#FC6
+#FC8
 #LL=gcc
 
 # g95 link options
@@ -44,8 +44,8 @@ LDOPT=-static -m32
 
 # libraries
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
-#FC6
-#LIBX=-lX11 -lXdmcp -lXau "-L/usr/X11R6/lib" -lf95 -lpthread
+#FC8
+#LIBX=-lX11 -lXdmcp -lXau "-L/extra/download/g95-install/lib/gcc-lib/i686-pc-linux-gnu/4.0.3" -lf95 -lpthread
 
 LIBX_ext=
 

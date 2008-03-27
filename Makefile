@@ -54,8 +54,8 @@ LDOPT=-static -m32
 
 # libraries
 #LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
-#FC6
-#LIBX= -lX11 -lXdmcp -lXau -lc "-L/usr/lib/gcc/i386-redhat-linux/4.1.1/" -lgcc_eh
+#FC8
+#LIBX= -lX11 -lXdmcp -lXau -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/4.1.2" -lgcc -lgcc_eh
 #LIBX="-L/usr/X11R6/lib64" -lX11 "-L/usr/lib64/" -ldl -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
@@ -179,7 +179,7 @@ madx_main.o: run_madx.o madx_main.f90
 # matchlib2 for madx only
 matchlib2_f77.o: matchlib2.F
 	$(FC) -m32 -c -o $@ $<
-	
+
 # implicit rule to compile with C
 %.o : %.c
 	$(CC) $(GCCP_FLAGS) -c -o $(@) $<
@@ -196,7 +196,7 @@ matchlib2_f77.o: matchlib2.F
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $<
 
-	
+
 #Parser only
 mpars: madxm.F madxp.o
 	$(FC) $(FP) -o mpars madxm.F madxp.o $(LIBX) -lm -lc
