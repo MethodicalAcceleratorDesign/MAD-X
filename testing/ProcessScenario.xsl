@@ -31,6 +31,9 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:when>
+	<xsl:when test="$what='responsible'">
+		<xsl:value-of select="//target[@name=$target]/@responsible"/>
+	</xsl:when>
 	
 
 </xsl:choose>
