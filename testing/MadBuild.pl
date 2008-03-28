@@ -5,6 +5,14 @@
 
 use MIME::Lite; # to send e-mail
 
+if ( $#ARGV != 0 ) {
+    print "expect 1 argument (1) releaseTag! EXIT!\n" ;
+    exit ;
+} else {
+    $releaseTag = @ARGV[0];
+}
+
+
 $startTime = localtime;
 
 #$htmlFile = '/afs/cern.ch/user/n/nougaret/www/mad/build.htm'; # for the time being
@@ -40,7 +48,7 @@ $cvsDir = ":kserver:isscvs.cern.ch:/local/reps/madx" ;
 foreach(@extractedPackages) {
     my $pack = $_;
     print "Extract package $pack from CVS\n";
-    `cvs -d $cvsDir checkout $pack`;
+    `cvs -d $cvsDir checkout -r $releaseTag $pack`; # now extract for specified release tag
 }
 
 # build
