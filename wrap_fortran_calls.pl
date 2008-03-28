@@ -288,6 +288,8 @@ print WRAPPER_FILE "/* set of $nbRoutines wrappers to synchronize FORTRAN and C 
 print WRAPPER_FILE "/* when crossing the border upon calling FORTRAN from C. */\n\n";
 print WRAPPER_FILE "#include <stdio.h>\n";
 print WRAPPER_FILE "#include \"fortran_prototypes.h\"\n\n";
+print WRAPPER_FILE "extern void call_fortran_flush_()\n\n";
+
 
 print DEFINE_WRAPPER_FILE "\#ifndef _FORTRAN_WRAPPERS_H\n";
 print DEFINE_WRAPPER_FILE "\#define _FORTRAN_WRAPPERS_H\n";
