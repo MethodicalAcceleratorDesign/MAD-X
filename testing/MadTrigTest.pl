@@ -112,7 +112,9 @@ if ($lastTest eq $lastRelease) {
 	# will cause the MadTest.pl script to run.
 }
 
-print $trigger; # output
+# returned strings for MadBuildAndTest.pl
+print "releaseTag=madX-$lastRelease\n"; # \n-terminated
+print "trigger=$trigger\n"; # \n-terminated
 exit 0;
 
 sub byDecreasingReleaseNumber {
