@@ -21,6 +21,7 @@ $pwd = `pwd`;
 chop $pwd;
 $localRootDir = $pwd;
 
+
 # checkout reference examples from the CVS
 my $rmRes = `rm -rf ./madX-examples`;
 my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples`;
@@ -91,7 +92,7 @@ foreach $targetDir (@targetDirs) {
 
     # DBG
    # if (($targetDir ne "ptc_accel")&&($targetDir ne "ptc_madx_interface")) {next;} # only one target
- #   if ($targetDir ne "twiss"){next;}
+ #if ($targetDir ne "foot"){next;}
 
     print "target = '$targetDir'\n";
 
@@ -152,7 +153,7 @@ foreach $target (@targets) {
     chop $target;
     # DBG
    # if (($target ne "ptc_accel")&&($target ne "ptc_madx_interface")) {next; } # only one target
-  # if ($target ne "twiss") {next;}
+  #if ($target ne "foot") {next;}
 
     print "--- testing $target\n";
 
@@ -165,6 +166,10 @@ foreach $target (@targets) {
     mkdir($targetDir, 0777) or die "fail to create directory $targetDir\n";
 
     @tests = `xsltproc --stringparam what list_tests --stringparam target $target ProcessScenario.xsl TestScenario.xml`;
+    
+    # retreive the responsible person for each test target
+    # for contact by e-mail in case the test fails or exhibits warnings
+    $responsible{$target} = `xsltproc --stringparam what responsible --stringparam target $target ProcessScenario.xsl TestScenario.xml`; 
 
     chdir("$localTestDir/$target") or die "fail to chdir to $localTestDir/$target\n"; # after processing stylessheets
 
@@ -577,12 +582,16 @@ close OUTHTML;
 
 
 # then send an e-mail to the MAD team
+my $summary;
+$summary .= "Test that started on $startTime has completed on $endTime\n";
+$summary .= "See detailed report on:\n";
+$summary .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
 
 $msg = MIME::Lite->new(
 		       From     => 'MAD.test.program@cern.ch',
 		       To       => 'Jean-Luc.Nougaret@cern.ch',
 		       Subject  => "Automated MAD Testing",
-		       Data     => "This is an automated message.\nSee report on:\nhttp://test-mad-automation.web.cern.ch/test-mad-automation\n"
+		       Data     => $summary
 		       );
 $msg->send;
 
