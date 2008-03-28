@@ -307,7 +307,7 @@ foreach $subroutine (@fortranCalledFromC){
     if ($allTypesKnown{$subroutine}) {
 	print DEFINE_WRAPPER_FILE "#define $subroutine\_ $subroutine\_wrapper\n";	
 	my $filename = $fortranFile{$subroutine};                                            
-	print WRAPPER_FILE "// Wrap '$subroutine' defined in '$filename'\n";
+	print WRAPPER_FILE "/* Wrap '$subroutine' defined in '$filename' */\n";
 	print WRAPPER_FILE "void $subroutine\_wrapper(";
 	print WRAPPER_FILE $CtypedParameterString{$subroutine};
 	print WRAPPER_FILE "){\n";
@@ -327,7 +327,7 @@ foreach $subroutine (@fortranCalledFromC){
 	print FORTRAN_WRAPPERS_PROTOS_FILE ");\n";
 	
     } else {
-	print WRAPPER_FILE "\n// Skipped '$subroutine' defined in '$fortranFile{$subroutine}' due to incomplete type identification\n\n";
+	print WRAPPER_FILE "\n/* Skipped '$subroutine' defined in '$fortranFile{$subroutine}' due to incomplete type identification */\n\n";
     }
 }
 print DEFINE_WRAPPER_FILE "\#endif\n";
