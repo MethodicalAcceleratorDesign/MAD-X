@@ -972,6 +972,7 @@ double el_par_value(char* par, struct element* el)
   {
     if ((l = command_par_value("l", el->def)) != zero)
       fatal_error("marker with nonzero length:",el->name);
+   val = command_par_value(par, el->def); 
   }
   else if (mult)  /* multipole */
   {
