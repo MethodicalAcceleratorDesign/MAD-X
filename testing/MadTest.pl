@@ -171,6 +171,9 @@ print "madxpLink is $madxpLink\n";
 
 foreach $target (@targets) {
 chop $target;
+
+$outcome{$target} = "success"; # by default, nobody will receive an e-mail about this target
+
 # DBG
 # if (($target ne "ptc_accel")&&($target ne "ptc_madx_interface")) {next; } # only one target
 # if ($target ne "ptc_twiss") {next;}
@@ -189,9 +192,6 @@ mkdir($targetDir, 0777) or die "fail to create directory $targetDir\n";
 
 @tests = `xsltproc --stringparam what list_tests --stringparam target $target ProcessScenario.xsl TestScenario.xml`;
 
-# retreive the responsible person for each test target
-# for contact by e-mail in case the test fails or exhibits warnings
-$responsible{$target} = `xsltproc --stringparam what responsible --stringparam target $target ProcessScenario.xsl TestScenario.xml`; 
 
 chdir("$localTestDir/$target") or die "fail to chdir to $localTestDir/$target\n"; # after processing stylessheets
 
@@ -593,6 +593,19 @@ foreach $test (@tests) {
 		
 			$testReport .= "<tr class='$madDiffRes'><td width=\"70%\">$file</td><td width=\"30%\"><a href=\"$detailsLink\">$madDiffRes</a></td></tr>\n";
 			print OUT "#COMPARING $file yields $madDiffRes\n";
+			
+			# summarize the information in $outcome{$target}
+			if ($madDiffRes eq 'failure'){
+				$outcome{$target}='failure';
+			} else {
+				if ($madDiffRes eq 'warning'){
+					if ($outcome{$target} eq 'success'){
+						$outcome{$target}='warning';
+					}
+					# otherwise, $outcome{$target} shall keep its value
+					# whether it is 'success' or 'failure'
+				}
+			}
 
 		}
 		}
@@ -639,7 +652,6 @@ foreach $test (@tests) {
 		}
 		
 		my $outputStatus; # used by CSS to apply font-color on stderr web page
-		my $fontColor; # eventually applied through font-class
 		
 		if ($existsOutput ==0 ){
 			$outputStatus = 'failure';
@@ -655,9 +667,22 @@ foreach $test (@tests) {
 			}
 		}
 		
-		if ($ouptutStatus eq 'success') { $fontColor = 'black';} # does not work
-		if ($ouptutStatus eq 'warning') { $fontColor = 'orange';} # does not work
-		if ($ouptutStatus eq 'error') { $fontColor = 'red';} # does not work
+		# update $outcome{$target}
+		# summarize the information in $outcome{$target}
+		if ($outputStatus eq 'failure'){
+			$outcome{$target}='failure';
+		} else {
+			if ($outputStatus eq 'warning'){
+				if ($outcome{$target} eq 'success'){
+					$outcome{$target}='warning';
+				}
+				# otherwise, $outcome{$target} shall keep its value
+				# whether it is 'success' or 'failure'
+			}
+		}		
+		
+		
+		
 				
 		# (2) if there is an stderr file, then create an HTML file
 		# and draw a link from the main web page
@@ -721,20 +746,34 @@ open(OUTHTML, ">$htmlFile");
 print OUTHTML $html;
 close OUTHTML;
 
+# back to the initial directory
+chdir $localRootDir;
 
-# then send an e-mail to the MAD team
-my $summary;
-$summary .= "Test that started on $startTime has completed on $endTime\n";
-$summary .= "See detailed report on:\n";
-$summary .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
-
-$msg = MIME::Lite->new(
-		From     => 'MAD.test.program@cern.ch',
-		To       => 'Jean-Luc.Nougaret@cern.ch',
-		Subject  => "Automated MAD Testing",
-		Data     => $summary
+# then send e-mails to the people responsible for the various tests' targets
+foreach $target (@targets){
+	# do we need to notify anyone for this target?
+	if (($outcome{$target} eq 'failure')||($outcome{$target} eq 'warning')){
+		# retreive the responsible person for each test target
+		$responsible{$target} = `xsltproc --stringparam what responsible --stringparam target $target ProcessScenario.xsl TestScenario.xml`;	
+		# retreive e-mail address of the responsible person
+		my $resp = $responsible{$target};
+		my $emailRecipient = `xsltproc --stringparam what email --stringparam who $resp AccessPeople.xsl People.xml`;
+		my $emailSubject = "MAD Unsucessful test for '$target'";
+		my $emailContent .= "The test that started on $startTime and completed on $endTime resulted in a $outcome{$target}.\n";
+		$emailContent .= "See detailed report on:\n";
+		$emailContent .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
+		my $msg = MIME::Lite->new(
+			From	=>	'mad-automation-admin@cern.ch',
+			To	=>	$emailRecipient,
+			Subject	=>	$emailSubject,
+			Data	=>	$emailContent
 		);
-$msg->send;
+		$msg->send;
+		print "sent e-mail to $emailRecipient\n";
+	} else {
+		# for this targets, all tests were sucessful => no need to notify
+	}
+}
 
 print "script terminated\n";
 
