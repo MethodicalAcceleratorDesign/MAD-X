@@ -102,7 +102,7 @@ if ($lastTest eq $lastRelease) {
 	# ... and send a summary to the list of watchers by e-mail
 
 	$msg = MIME::Lite->new(
-		       From     => 'MAD.test.program@cern.ch',
+		       From     => 'mad-automation-admin@cern.ch',
 		       To       => 'mad-build-and-test-watchers@cern.ch',
 		       Subject  => "MAD $lastRelease has been released. Testing starts.",
 		       Data     => $workReport
