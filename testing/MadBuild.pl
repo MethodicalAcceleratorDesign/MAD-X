@@ -72,6 +72,7 @@ foreach $makefile (@makefiles){
 
 	`make clean`;
 	`rm $target`;
+	`rm $target\_$makefile`; # later-on, $target copied into $target\_$makefile ...
 
 	my $warnings = 0; # default
 
@@ -81,10 +82,10 @@ foreach $makefile (@makefiles){
         # system("make -f $makefile $target 1>build_result_stdout 2>build_result_stderr");
 
 	my $warnings = lookForWarnings($makeResult);
-	# colorize warnings (irrespective of whether they are non-zeros) => correct this
-	$makeResult =~ s/([wW])arning(s?)/<font class=\"warning\">\1arning\2<\/font>/g;
+	# colorize warnings
+	$makeResult =~ s/([wW])arning(s?)/<font class=\"warning-font\">\1arning\2<\/font>/g;
 	# undo the above in case the warning appears as '0 warnings'
-	$makeResult =~ s/([\s\t]+0[\s\t]+)<font class=\"warning\">([Ww])arning(s?)<\/font>/\1\2arning\3/g;
+	$makeResult =~ s/([\s\t]+0[\s\t]+)<font class=\"warning\-font\">([Ww])arning(s?)<\/font>/\1\2arning\3/g;
 	# make sure line feeds display correctly in HTML
 	$makeResult =~ s/\n/<\/td><\/tr>\n<tr><td>/g;
 	$makeResult = "<tr><td colspan=\"2\">" . $makeResult . "</td></tr>\n\n";
@@ -129,7 +130,7 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 
 # then send an e-mail to the FESA support team
   $msg = MIME::Lite->new(
-			 From     => 'MAD.test.program@cern.ch',
+			 From     => 'mad-automation-admin@cern.ch',
 			 To       => 'Jean-Luc.Nougaret@cern.ch',
 			 Subject  => "Automated MAD Build $compilationOutcome{'madx'} for madx, $compilationOutcome{'madxp'} for madxp",
 			 Data     => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation"
