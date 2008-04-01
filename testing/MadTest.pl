@@ -765,6 +765,7 @@ foreach $target (@targets){
 		my $msg = MIME::Lite->new(
 			From	=>	'mad-automation-admin@cern.ch',
 			To	=>	$emailRecipient,
+			Cc	=>	'mad-automation-admin@cern.ch',
 			Subject	=>	$emailSubject,
 			Data	=>	$emailContent
 		);
