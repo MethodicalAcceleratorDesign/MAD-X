@@ -92,11 +92,14 @@ foreach $makefile (@makefiles){
 	
 	my $nbOfTargets = `ls $target | wc -w`;
 	if ($nbOfTargets == 1) {
-	    if ($warnings==0) {
-		$compilationOutcome{$target} = 'success';
-	    } else {
-		$compilationOutcome{$target} = 'warning';
-	    }
+		# keep all the targets as madx_Makefile_develop,
+		# madx_Makefile_nag and madx_Makefile, as needed by MadTest.pl
+		`cp $target $target\_$makefile`;
+		if ($warnings==0) {
+			$compilationOutcome{$target} = 'success';
+		} else {
+			$compilationOutcome{$target} = 'warning';
+		}
 	}
 	else { 
 	    $compilationOutcome{$target} = 'failure';
