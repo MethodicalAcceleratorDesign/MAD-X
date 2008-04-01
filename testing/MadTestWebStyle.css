@@ -14,9 +14,9 @@ tr.test_case		{background-color: #EEEEEE}
 /* test results row colors */
 
 /* summary */
-tr.warning 		{background-color: #FFDDBB}
-tr.failure		{background-color: #FFBBBB}
-tr.success		{background-color: #CCFFCC}
+.warning 		{background-color: #FFDDBB}
+.failure		{background-color: #FFBBBB}
+.success		{background-color: #CCFFCC}
 tr.quasi-success	{background-color: #CCFFCC}
 tr.omit			{background-color: black; color: white}
 
