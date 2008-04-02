@@ -411,7 +411,6 @@ contains
      call alloc(transfermap)
      transfermap = npara
      transfermap = X
-     call print(transfermap,6)
     endif 
     
     if (cavsareset .eqv. .false.) then
