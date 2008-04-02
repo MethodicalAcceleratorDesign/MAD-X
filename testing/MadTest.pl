@@ -762,6 +762,7 @@ foreach $target (@targets){
 		my $emailContent .= "The test that started on $startTime and completed on $endTime resulted in a $outcome{$target}.\n";
 		$emailContent .= "See detailed report on:\n";
 		$emailContent .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
+		$emailContent .= "\nThis e-mail has been sent to you because you are registered as the responsible person for the '$target' package\n";
 		my $msg = MIME::Lite->new(
 			From	=>	'mad-automation-admin@cern.ch',
 			To	=>	$emailRecipient,
