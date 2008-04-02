@@ -131,7 +131,7 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 # then send an e-mail to the FESA support team
   $msg = MIME::Lite->new(
 			 From     => 'mad-automation-admin@cern.ch',
-			 To       => 'Jean-Luc.Nougaret@cern.ch',
+			 To       => 'mad-automation-admin@cern.ch',
 			 Subject  => "Automated MAD Build $compilationOutcome{'madx'} for madx, $compilationOutcome{'madxp'} for madxp",
 			 Data     => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation"
 			);
