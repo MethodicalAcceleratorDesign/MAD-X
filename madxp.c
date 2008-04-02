@@ -972,7 +972,7 @@ double el_par_value(char* par, struct element* el)
   {
     if ((l = command_par_value("l", el->def)) != zero)
       fatal_error("marker with nonzero length:",el->name);
-   val = command_par_value(par, el->def); 
+    val = command_par_value(par, el->def); 
   }
   else if (mult)  /* multipole */
   {
@@ -1128,7 +1128,7 @@ void enter_sequence(struct in_cmd* cmd)
     current_sequ->l_expr = command_par_expr("l", cmd->clone);
     current_sequ->length = command_par_value("l", cmd->clone);
     if (current_sequ->l_expr == NULL && sequence_length(current_sequ) == zero)
-	 fatal_error("missing length for sequence:", toks[aux_pos]);
+      fatal_error("missing length for sequence:", toks[aux_pos]);
     pos = name_list_pos("refpos", nl);
     if (nl->inform[pos])
       current_sequ->refpos = permbuff(pl->parameters[pos]->string);
@@ -2114,7 +2114,7 @@ struct sequence* extract_sequence(char* name, struct sequence* sequ,
    {
     if (from_cond == 1)
      current_node->at_value = expr_combine(q->at_expr, q->at_value, " + ", 
-			      from_node->at_expr, from_node->at_value, 
+                              from_node->at_expr, from_node->at_value, 
                               &current_node->at_expr);
     else
     {
@@ -2123,12 +2123,12 @@ struct sequence* extract_sequence(char* name, struct sequence* sequ,
     }
      current_node->at_value = expr_combine(current_node->at_expr, 
                               current_node->at_value, " - ", 
-			      NULL, start_value, 
+                              NULL, start_value, 
                               &current_node->at_expr);
     if (current_node->at_value < zero)
       current_node->at_value = expr_combine(current_node->at_expr, 
                                current_node->at_value, " + ", 
-			       sequ->l_expr, sequ->length, 
+                               sequ->l_expr, sequ->length, 
                                &current_node->at_expr);
    }
    if (q == to) break;
@@ -3743,13 +3743,13 @@ void pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
             outbuf->c[cout++] = c;
           }
           else
-	  {
+          {
            left_b = 0;
            new_string = 1;
            outbuf->c[cout++] = ' ';
            outbuf->c[cout++] = c;
            outbuf->c[cout++] = ' ';
-	  }
+          }
           break;
         case ')':
           rb_level--;
@@ -4395,10 +4395,10 @@ void set_command_par_string(char* parameter, struct command* cmd, char* val)
       new_len = strlen(val);
 
       if( strlen(cp->string) < new_len ) 
-	{
-	  myfree(rout_name,cp->string);
-	  cp->string = (char*) mymalloc(rout_name,new_len);
-	}
+      {
+        myfree(rout_name,cp->string);
+        cp->string = (char*) mymalloc(rout_name,new_len);
+      }
 
       strcpy(cp->string,val);
 
