@@ -30,6 +30,7 @@ module madx_ptc_knobs_module
   public                         :: resultswithknobs ! called by ptc_twiss to dump the requested results
   public                         :: parametrictwiss  ! returns lattice functions with dependence on knobs
   public                         :: getknobinicond
+  public                         :: getnpushes ! returns number of selected parameters to be stored
 
   public                         :: writeparresults
   public                         :: killparresult
@@ -794,6 +795,16 @@ contains
 
   end function getnknobsall
   !____________________________________________________________________________________________
+  
+  function getnpushes()
+    implicit none
+    integer     :: getnpushes
+
+     getnpushes = npushes
+     
+  end function getnpushes
+  !____________________________________________________________________________________________
+  
   subroutine getfctnsnames
     implicit none
     character*(100) ::name

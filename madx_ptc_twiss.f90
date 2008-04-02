@@ -285,7 +285,7 @@ contains
     real(dp)                :: deltap0,deltap,d_val
     real(kind(1d0))         :: get_value,suml
     integer                 :: geterrorflag !C function that returns errorflag value
-    type(real_8)            :: y(6)
+    type(real_8)            :: y(6), transfermap(6)
     type(twiss)             :: tw
     type(fibre), POINTER    :: current
     type(work)              :: startfen !Fibre energy at the start
@@ -407,6 +407,13 @@ contains
     y=npara
     Y=X
 
+    if (getnpushes() > 0) then
+     call alloc(transfermap)
+     transfermap = npara
+     transfermap = X
+     call print(transfermap,6)
+    endif 
+    
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
        if (geterrorflag() /= 0) then
@@ -485,8 +492,14 @@ contains
           !         if (getnknobis() > 0) c_%knob = my_true
           !print*, "parametric",i,c_%knob
           call track(my_ring,y,i,i+1,+default)
+          if (getnpushes() > 0) then
+            call track(my_ring,transfermap,i,i+1,+default)
+          endif
        else
           call track(my_ring,y,i,i+1, default)
+          if (getnpushes() > 0) then
+            call track(my_ring,transfermap,i,i+1,default)
+          endif
        endif
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_twiss: ','DA got unstable')
@@ -520,7 +533,10 @@ contains
        endif
 
        tw=y
-       call putusertable(i,current%mag%name,suml,getdeltae(),y)
+       if (getnpushes() > 0) then
+            call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
+       endif
+
 
        call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
 
@@ -550,6 +566,11 @@ contains
 
     call kill(tw)
     CALL kill(y)
+       
+    if (getnpushes() > 0) then
+       CALL kill(transfermap)
+    endif
+       
     do i=1,6
        call kill(unimap(i))
     enddo
@@ -1261,11 +1282,16 @@ contains
       y=x
 
       do i=1,c_%nd
+!         print*, " ", i, beta(i) 
+!         call print(y(2*i-1),6)
+!         call print(y(2*i  ),6)
+
          y(2*i-1)= x(2*i-1) + sqrt(be(i)) * morph((one.mono.(2*i-1))    )
          y(2*i)= x(2*i) + one/sqrt(be(i)) * &
               (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
-         !       call print(y(2*i-1),6)
-         !       call print(y(2*i  ),6)
+              
+!         call print(y(2*i-1),6)
+!         call print(y(2*i  ),6)
       enddo
 
 
