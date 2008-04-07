@@ -208,13 +208,13 @@ foreach $test (@tests) {
 	# retreive the subdirectory relocation if any (specific subdirs are specified in the XML)
 	$sourceSubDir = ""; # by default
 	$_ = $command;
-	if(/subdirectory=([\w_\-.\d]+)/){
+	if(/subdirectory=([\w_\-\.\d]+)/){
 	$sourceSubDir = $1;
 	}
 
 	# retrieve the 'input file' name with a regular expression
 	$_ = $command;
-	/<[\s\t]+([\w._\d]+)[\s\t]+>/;
+	/<[\s\t]+([\w\.\-_\d]+)[\s\t]+>/;
 	$infilename = $1;
 	print "the input file name is: $infilename\n";
 	
