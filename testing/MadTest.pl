@@ -239,7 +239,7 @@ foreach $test (@tests) {
 	}
 
 	if ($regressionTest) {
-		my $key = $testCaseDir;
+		my $key = $target . "_" . $testCaseDir;
 		$testReport .= "<tr class='test_case'><td width=\"80%\">$testCaseDir: $executableCommand</td><td width=\"20%\"><table width=\"100%\" style=\"text-align: center\"><tr>$dev{$key} $nag{$key}</tr></table></td></tr>\n"; 
 		# above sets column width for the whole table
 	}
@@ -541,7 +541,7 @@ foreach $test (@tests) {
 
 	chdir($outputSubdir) or die "fail to chdir to $outputSubdir\n";
 
-	if ($regressionTest) {
+	if ($regressionTest) { # i.e. makefile == Makefile_develop
 		# now compare desired output and actual output
 
 		# let's try to do a blind diff without trying to cure any 'standard' discrepancy
@@ -697,19 +697,20 @@ foreach $test (@tests) {
 		}
 			
 		# weblink:
-		my $errorLink = "<a href=\"./details/Error_".$m.$target."_".$testCaseDir.".htm"."\">$m</a>";
+		my $errorLink = "<a href=\"./details/Error_".$m."_".$target."_".$testCaseDir.".htm"."\">$m</a>";
 		# deliver: 
-		my $errorHtmlFile = "$htmlRootDir/details/Error_".$m.$target."_".$testCaseDir.".htm"; 
+		my $errorHtmlFile = "$htmlRootDir/details/Error_".$m."_".$target."_".$testCaseDir.".htm"; 
 		`touch $errorHtmlFile`; # for the time-being
 		
 		
 		errorWebPage("$outputSubdir/$stderrFile",$errorHtmlFile,$outputStatus);
 		
+		my $key = $target . "_" . $testCaseDir;
 		if ($makefile eq "Makefile_develop") {
-			$dev{$testCaseDir}="<td class=\"$outputStatus\">$errorLink</td>";
+			$dev{$key}="<td class=\"$outputStatus\">$errorLink</td>";
 		}
 		if ($makefile eq "Makefile_nag"){
-			$nag{$testCaseDir}="<td class=\"$outputStatus\">$errorLink</td>";
+			$nag{$key}="<td class=\"$outputStatus\">$errorLink</td>";
 		}
 
 
