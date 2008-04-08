@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- MAD regression test scenario -->
 <test-scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="TestScenario.xsd">
-   <target name = "ptc_twiss" responsible="unknown">
-      <test input = "example1.madx" output="example1.out" program="madxp" subdir="Example1"/> <!--unspecified program is 'madx'-->
-      <test input = "example2.madx" output="example2.out" program="madxp" subdir="Example2"/>
-      <test input = "example3.madx" output="example3.out" program="madxp" subdir="Example3"/>
-      <test input = "example4.madx" output="example4.out" program="madxp" subdir="Example4"/>
-   </target>
-
    <target name="c6t" responsible="unknown">
         <test input="convert_example_rhic.madx" output="convert_example_rhic.out" subdir="RHIC"/>
 	<test input="convert_example_lhc.madx" output="convert_example_lhc.out" subdir="LHC"/>
@@ -65,6 +58,10 @@
 	<test input ="job.plottest_nv.madx" output="job.plottest_nv.out"/>
 	<test input ="job.eberhardt.madx" output="job.eberhardt.out"/>
    </target>
+   <target name="ptc_accel" responsible="unknown">
+       <!-- skip the 'track' test which creates hundreds of files -->
+	<test input ="twiss.ptc.madx" program="madxp" output="twiss.ptc.out" subdir="twiss"/>
+   </target>   
    <target name="ptc_madx_interface" responsible="unknown">
 	<test input ="dumpmaps.ptc.madx" output="dumpmaps.ptc.out" program="madxp" subdir="dumpmaps"/>
         <!-- skip 'eplacement' with contains 'C' files -->
@@ -78,10 +75,6 @@
         <test input ="psr.madx" output="psr.out" program="madxp" subdir="thirdordermatch"/>
         <!-- for the same 'thirdordermatch' target, omit rhic.madx which generates too big a file for comparison (until we find a workaround...)  -->
    </target>
-   <target name="ptc_accel" responsible="unknown">
-       <!-- skip the 'track' test which creates hundreds of files -->
-	<test input ="twiss.ptc.madx" program="madxp" output="twiss.ptc.out" subdir="twiss"/>
-   </target>
    <target name="ptc_normal" responsible="unknown">
 	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
    </target>
@@ -91,6 +84,12 @@
 	<test input ="fv9_3.madx" output="fv9_3.out" program="madxp" subdir="Example3"/>
 	<test input ="fv9_4.madx" output="fv9_4.out" program="madxp" subdir="Example4"/>
 	<test input ="fv9_5.madx" output="fv9_5.out" program="madxp" subdir="Example5"/>
+   </target>
+     <target name = "ptc_twiss" responsible="unknown">
+      <test input = "example1.madx" output="example1.out" program="madxp" subdir="Example1"/> <!--unspecified program is 'madx'-->
+      <test input = "example2.madx" output="example2.out" program="madxp" subdir="Example2"/>
+      <test input = "example3.madx" output="example3.out" program="madxp" subdir="Example3"/>
+      <test input = "example4.madx" output="example4.out" program="madxp" subdir="Example4"/>
    </target>
    <target name="special_features" responsible="unknown">
 	<test input ="setvars.madx" output="setvars.out"/>
