@@ -120,50 +120,68 @@ foreach $line (@lines) {
 
 	    # should repeat the test for identical left and right here
 
+	    my $leftPart = $parts[0];
+	    $leftPart =~ s/^[\s\t]+//g; # no tab nor space at the beginning
+	    $leftPart =~ s/[\t\s]+/ /g; # replace multiple tabs and space as one space
+	    $leftPart =~ s/[\t\s]+$//g; # no tab nor space at the end
 
-	    # before concluding the difference is a failure, check for numerical rounding errors
-	    $numericalMatch = 1; # default
-	    @leftChunks = split /[\s\t:=]+/, $parts[0];
-	    @rightChunks = split /[\s\t:=]+/, $parts[1];
+	    my $rightPart = $parts[1];
+	    $rightPart =~ s/^[\s\t]+//g; # no tab nor space at the beginning
+	    $rightPart =~ s/[\t\s]+/ /g;
+	    $rightPart =~ s/[\t\s]+$//g; # no tab nor space at the end
+	    
+	    if ( $leftPart eq $rightPart ) {
+	   	$diffReport .= "<tr class=\"quasi-success\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
+	    	if (($retStatus eq "undefined")||($retStatus eq "success")) { 
+		$retStatus = "quasi-success";
+	   	 } # otherwise keep its worst value
+	    } else {
+	    
+		    # before concluding the difference is a failure, check for numerical rounding errors
+		    $numericalMatch = 1; # default
+		    @leftChunks = split /[\s\t:=]+/, $parts[0];
+		    @rightChunks = split /[\s\t:=]+/, $parts[1];
+	    
+		    if (scalar(@leftChunks) == scalar(@rightChunks)) {
 
-	    if (scalar(@leftChunks) == scalar(@rightChunks)) {
-		for ($i=0; $i<scalar(@leftChunks); $i++) {
-		    $leftChunk = $leftChunks[$i];
-		    $rightChunk = $rightChunks[$i];
-		    if ($leftChunk eq $rightChunk) { next; } # substrings match, a fortiori numbers
-		    else {
-			# numerical test
-			# tolerance expressed in %. 0 % means zero tolerance down to double float precision
-
-			# for some reason, looks like we have to double the '\' when the pattern is in a string
-			# and also have to add "\" before the right-anchor "$"
-			# ... to be clarified...
-			# try to replace " by '
-			$numPattern = '^[+-]?\d*.\d+[eE]?[+-]?\d*$'; # to account for the various formats found with Mad
-			if (($leftChunk =~ /$numPattern/) && ($rightChunk =~ /$numPattern/)) {
-			    $leftValue = $leftChunk;
-			    $rightValue = $rightChunk;
-
-			    if ($tolerance==0) {
-				if ($leftValue == $rightValue ) { $numericalMatch = 1; } 
-				else {
-				    $numericalMatch = 0 ;
-				    # force to leave the for-loop
-				    $i = scalar(@leftChunks);
-				}
-			    }
+	    
+			for ($i=0; $i<scalar(@leftChunks); $i++) {
+			    $leftChunk = $leftChunks[$i];
+			    $rightChunk = $rightChunks[$i];
+			    if ($leftChunk eq $rightChunk) { next; } # substrings match, a fortiori numbers
 			    else {
-				# define tolerance as the maximum incertitude between the two values
+				# numerical test
+				# tolerance expressed in %. 0 % means zero tolerance down to double float precision
 
-				if ( (2.0*abs($leftValue-$rightValue)/($leftValue+$rightValue)) < $tolerance ) {
-				    $numericalMatch = 1;
-				} else {
-				    $numericalMatch = 0 ;
-				    # force to leave the for-loop
-				    $i = scalar(@leftChunks); 
-				}
+				# for some reason, looks like we have to double the '\' when the pattern is in a string
+				# and also have to add "\" before the right-anchor "$"
+				# ... to be clarified...
+				# try to replace " by '
+				$numPattern = '^[+-]?\d*.\d+[eE]?[+-]?\d*$'; # to account for the various formats found with Mad
+				if (($leftChunk =~ /$numPattern/) && ($rightChunk =~ /$numPattern/)) {
+				    $leftValue = $leftChunk;
+				    $rightValue = $rightChunk;
+
+				    if ($tolerance==0) {
+					if ($leftValue == $rightValue ) { $numericalMatch = 1; 	} 
+					else {
+					    $numericalMatch = 0 ;
+					    # force to leave the for-loop
+					    $i = scalar(@leftChunks);
+					}
+			    	}
+			    	else {
+					# define tolerance as the maximum incertitude between the two values
+
+					if ( (2.0*abs($leftValue-$rightValue)/($leftValue+$rightValue)) < $tolerance ) {
+				    	$numericalMatch = 1;
+					} else {
+				    	$numericalMatch = 0 ;
+				    	# force to leave the for-loop
+				    	$i = scalar(@leftChunks); 
+					}
 				
-			    }
+				    }
 
 			} else { 
 			    $numericalMatch = 0;
@@ -182,6 +200,8 @@ foreach $line (@lines) {
 	    } else {
 		$diffReport .= "<tr class=\"different-failure\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
 		$retStatus = "failure"; # anyway
+	    }
+	    
 	    }
 	    
 	    
