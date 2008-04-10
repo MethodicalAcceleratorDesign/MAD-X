@@ -757,8 +757,7 @@ foreach $target (@targets){
 		# retreive the responsible person for each test target
 		$responsible{$target} = `xsltproc --stringparam what responsible --stringparam target $target ProcessScenario.xsl TestScenario.xml`;	
 		# retreive e-mail address of the responsible person
-		my $resp = $responsible{$target};
-		my $emailRecipient = `xsltproc --stringparam what email --stringparam who $resp AccessPeople.xsl People.xml`;
+		my $emailRecipient = $responsible{$target};
 		my $emailSubject = "MAD Unsucessful test for '$target'";
 		my $emailContent .= "The test that started on $startTime and completed on $endTime resulted in a $outcome{$target}.\n";
 		$emailContent .= "See detailed report on:\n";
