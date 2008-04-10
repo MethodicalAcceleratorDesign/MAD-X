@@ -290,11 +290,26 @@ foreach $line (@lines) {
 			    $retStatus = "failure"; # whatever its value so far...
 			}	
 			else {
-
-			    # finally ...
-			    # keep the line as it is - just got lost!
-			    $diffReport .= "<tr class=\"got-lost\"><td colspan=\"2\">$line</td></tr>\n";
-			    $retStatus = "failure"; # what ever its value so far...
+				# one last chance: 'left part|' or '|right part'
+				if ($line =~ /^\|/) {
+					$txt = $line;
+					$txt =~ s/^\|//g; # to be checked
+					$diffReport .= "<tr class=\"only-right\"><td></td><td>$txt</td></tr>\n";
+			    		$retStatus = "failure"; # whatever previous val	
+				} else {
+					if ($line =~ /\|$/){
+						$txt = $line;
+						$txt =~ s/\|$//g; # to be checked
+						$diffReport .= "<tr class=\"only-left\"><td></td><td>$txt</td></tr>\n";
+			    			$retStatus = "failure"; # whatever previous val					
+					} else {
+		
+						# finally ...
+			    			# keep the line as it is - just got lost!
+			    			$diffReport .= "<tr class=\"got-lost\"><td colspan=\"2\">$line</td></tr>\n";
+			    			$retStatus = "failure"; # what ever its value so far...			
+					}
+				}
 			}
 		    }
 		}
