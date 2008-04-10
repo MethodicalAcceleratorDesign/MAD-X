@@ -123,7 +123,6 @@
 /sodd.F -text
 /survey.F -text
 /sxf.c -text
-testing/AccessPeople.xsl -text
 testing/MadBuild.pl -text
 testing/MadBuildAndTest.pl -text
 testing/MadDiff.pl -text
@@ -131,7 +130,6 @@ testing/MadTest.pl -text
 testing/MadTestWebStyle.css -text
 testing/MadTrigTest.pl -text
 testing/Makefile -text
-testing/People.xml -text
 testing/ProcessScenario.xsl -text
 testing/TestScenario.xml -text
 testing/index.htm -text
