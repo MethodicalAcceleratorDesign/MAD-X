@@ -31,7 +31,7 @@ $cvsDir = ":kserver:isscvs.cern.ch:/local/reps/madx" ;
 # Do we need to do the check-out or do we rely on FesaBuild.pl instead?
 foreach(@extractedPackages) {
     my $pack = $_;
-    print "Extract package $pack from CVS\n";
+    # print "Extract package $pack from CVS\n";
     `cvs -d $cvsDir checkout $pack`;
 }
 
