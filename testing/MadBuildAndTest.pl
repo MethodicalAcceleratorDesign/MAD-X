@@ -51,4 +51,6 @@ if ($runTest eq "run-test") {
 	# MadTest.pl starts from the location set by calling MadBuildAndTest.pl program
 	
 	`./MadTest.pl ./MadCvsExtract/madX`; # issues e-mail upon completion
+} else {
+	print "No new release detected => no need to run the test-suite\n";
 }
