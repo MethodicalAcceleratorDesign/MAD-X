@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# now supports a specific $debugMode to carry-out tests of a single target.
+# sample invocation: MadTest.pl ./MadCvsExtract/madx debug=match
+# In this case, HTML file becomes test_debug.html instead of test.htm.
+
 # input: directory name in which madx and madxp are present
 # output: a hierachy of directories to hold the tests' inputs and outputs
 # at the same time an HTML document is created and moved to the web folder
@@ -24,34 +28,54 @@ $localRootDir = $pwd;
 # for Makefile_develop and Makefile_nag, stderr is redirected
 my $stderrFile = "stderr_redirected";
 
-if ( $#ARGV != 0 ) {
-print "expect 1 argument: (1) MAD executable directory! EXIT!\n" ;
-exit ;
+my $debugMode; 		# select a specific target and writes summary HTML file
+			# to test_debug.htm instead of test.htm
+my $debugTarget;	# meaningful iff $debugMode is set to 1
+		
+if ( $#ARGV < 0 ) {
+	print "expect at least 1 argument: (1) MAD executable directory [(2) debug:<target>]  EXIT!\n" ;
+	exit ;
 } else {
-$madDir = @ARGV[0];
-# check specified directory indeed contains executable
-$existsMadx = `ls $madDir/madx | wc -l`;
-if ($existsMadx == 0) {
-	print "Madx missing in specified directory => exit!\n";
-	exit;
-}
-$existsMadxp = `ls $madDir/madxp | wc -l`;
-if ($existsMadxp == 0){
-	print "Madxp missing in specified directory => exit!\n";
-	exit;
-}
-# expand the full path
-$_ = $madDir;
-if (/^.\/([\w\d_\-\/.]+)/) {
-	# local path specified
-	$madDir = $localRootDir . "/" . $1;
-} else { 
-	# full path already given 
-}
+	if ($#ARGV == 1) {
+		# second parameter for debug-mode
+		my $option = @ARGV[1];
+		if ($option =~ /^debug=(\w+)/){
+			$debugMode = 1;
+			$debugTarget = $1;
+			print "debug mode set for target '$debugTarget'\n";
+		} else {
+		
+			print "the second optional argument '$option' should be of the form:";
+			print "debug=<target>\n";
+			print "EXIT!\n";
+			exit;
+		}
+	}
 
-# remove last "/" if any
-$_ = $madDir;
-if (/\/$/) { chop $madDir;  } # $ for end anchoring of the string
+	$madDir = @ARGV[0];
+	# check specified directory indeed contains executable
+	$existsMadx = `ls $madDir/madx | wc -l`;
+	if ($existsMadx == 0) {
+		print "Madx missing in specified directory => exit!\n";
+		exit;
+	}
+	$existsMadxp = `ls $madDir/madxp | wc -l`;
+	if ($existsMadxp == 0){
+		print "Madxp missing in specified directory => exit!\n";
+		exit;
+	}
+	# expand the full path
+	$_ = $madDir;
+	if (/^.\/([\w\d_\-\/.]+)/) {
+		# local path specified
+		$madDir = $localRootDir . "/" . $1;
+	} else { 
+		# full path already given 
+	}
+
+	# remove last "/" if any
+	$_ = $madDir;
+	if (/\/$/) { chop $madDir;  } # $ for end anchoring of the string
 
 
 }
@@ -59,7 +83,14 @@ if (/\/$/) { chop $madDir;  } # $ for end anchoring of the string
 
 # checkout reference examples from the CVS
 my $rmRes = `rm -rf ./madX-examples`;
-my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples`;
+
+if ($debugMode ==0){
+	# default: we retrieve all the CVS
+	my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples`;
+} else {
+	# extract only the $debugTarget from the CVS
+	my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples/REF/$debugTarget`;
+}
 
 # $samplesRootDir = '/afs/cern.ch/user/f/frs/public_html/mad-X_examples';
 
@@ -67,8 +98,13 @@ $samplesRootDir = "$localRootDir/madX-examples/REF";
 
 
 $htmlRootDir = '/afs/cern.ch/user/n/nougaret/www/mad';
-$htmlFile = "$htmlRootDir/test.htm"; # for the time being
 
+if ($debugMode == 0) {
+	$htmlFile = "$htmlRootDir/test.htm"; # for the time being
+} else {
+	$htmlFile = "$htmlRootDir/test_debug.htm"; # for the time being
+}
+	
 @targetDirs = `ls $samplesRootDir`;
 
 # search all test examples' directories
@@ -80,13 +116,16 @@ $htmlFile = "$htmlRootDir/test.htm"; # for the time being
 # carried-out on the actual target directories...
 
 # build the call-graph
-foreach $targetDir (@targetDirs) {
+TARGET_DIR: foreach $targetDir (@targetDirs) {
 
 chop $targetDir;
 
-# DBG
-# if (($targetDir ne "ptc_accel")&&($targetDir ne "ptc_madx_interface")) {next;} # only one target
-# if ($targetDir ne "ptc_twiss"){next;}
+if ($debugMode ==1) {
+	if ($targetDir ne $debugTarget){
+		next TARGET_DIR;
+	}
+}
+
 
 print "target = '$targetDir'\n";
 
@@ -169,14 +208,16 @@ print "madxpLink is $madxpLink\n";
 
 @targets = `xsltproc --stringparam what list_targets ProcessScenario.xsl TestScenario.xml`; # all target functionalities
 
-foreach $target (@targets) {
+TARGET: foreach $target (@targets) {
 chop $target;
 
 $outcome{$target} = "success"; # by default, nobody will receive an e-mail about this target
 
-# DBG
-# if (($target ne "ptc_accel")&&($target ne "ptc_madx_interface")) {next; } # only one target
-# if ($target ne "ptc_twiss") {next;}
+if ($debugMode ==1){
+	if ($target ne $debugTarget) {
+		next TARGET;
+	}
+}
 
 print "--- testing $target\n";
 
@@ -479,7 +520,10 @@ foreach $test (@tests) {
 		$executableCommand = $redirectedExecutableCommand;
 	}
 	
+	$testCaseStartTime = localtime;
+	# run the test
 	`$executableCommand`; 
+	$testCaseEndTime = localtime;
 
 	# retrieve the 'output file' name with a regular expression
 	$_ = $command;
@@ -703,7 +747,11 @@ foreach $test (@tests) {
 		`touch $errorHtmlFile`; # for the time-being
 		
 		
-		errorWebPage("$outputSubdir/$stderrFile",$errorHtmlFile,$outputStatus);
+		errorWebPage("$outputSubdir/$stderrFile",
+			$errorHtmlFile,
+			$outputStatus,
+			$testCaseStartTime,
+			$testCaseEndTime);
 		
 		my $key = $target . "_" . $testCaseDir;
 		if ($makefile eq "Makefile_develop") {
@@ -751,32 +799,33 @@ close OUTHTML;
 chdir $localRootDir;
 
 # then send e-mails to the people responsible for the various tests' targets
-foreach $target (@targets){
-	# do we need to notify anyone for this target?
-	if (($outcome{$target} eq 'failure')||($outcome{$target} eq 'warning')){
-		# retreive the responsible person for each test target
-		$responsible{$target} = `xsltproc --stringparam what responsible --stringparam target $target ProcessScenario.xsl TestScenario.xml`;	
-		# retreive e-mail address of the responsible person
-		my $emailRecipient = $responsible{$target};
-		my $emailSubject = "MAD Unsucessful test for '$target'";
-		my $emailContent .= "The test that started on $startTime and completed on $endTime resulted in a $outcome{$target}.\n";
-		$emailContent .= "See detailed report on:\n";
-		$emailContent .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
-		$emailContent .= "\nThis e-mail has been sent to you because you are registered as the responsible person for the '$target' package\n";
-		my $msg = MIME::Lite->new(
-			From	=>	'mad-automation-admin@cern.ch',
-			To	=>	$emailRecipient,
-			Cc	=>	'mad-automation-admin@cern.ch',
-			Subject	=>	$emailSubject,
-			Data	=>	$emailContent
-		);
-		$msg->send;
-		print "sent e-mail to $emailRecipient\n";
-	} else {
-		# for this targets, all tests were sucessful => no need to notify
+if ($debugMode ==0) {
+	foreach $target (@targets){
+		# do we need to notify anyone for this target?
+		if (($outcome{$target} eq 'failure')||($outcome{$target} eq 'warning')){
+			# retreive the responsible person for each test target
+			$responsible{$target} = `xsltproc --stringparam what responsible --stringparam target $target ProcessScenario.xsl TestScenario.xml`;	
+			# retreive e-mail address of the responsible person
+			my $emailRecipient = $responsible{$target};
+			my $emailSubject = "MAD Unsucessful test for '$target'";
+			my $emailContent .= "The test that started on $startTime and completed on $endTime resulted in a $outcome{$target}.\n";
+			$emailContent .= "See detailed report on:\n";
+			$emailContent .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
+			$emailContent .= "\nThis e-mail has been sent to you because you are registered as the responsible person for the '$target' package\n";
+			my $msg = MIME::Lite->new(
+				From	=>	'mad-automation-admin@cern.ch',
+				To	=>	$emailRecipient,
+				Cc	=>	'mad-automation-admin@cern.ch',
+				Subject	=>	$emailSubject,
+				Data	=>	$emailContent
+			);
+			$msg->send;
+			print "sent e-mail to $emailRecipient\n";
+		} else {
+			# for this targets, all tests were sucessful => no need to notify
+		}
 	}
 }
-
 print "script terminated\n";
 
 sub getListOfDependantFiles {
@@ -833,9 +882,12 @@ sub errorWebPage {
 	my $errorFile = $_[0];
 	my $htmlFile = $_[1];
 	my $outputStatus = $_[2];
+	my $startTime = $_[3];
+	my $endTime = $_[4];
 	my $contents ="";
 	
-	$contents .= "<table width=\"75%\" border=\"0\">\n";	
+	$contents .= "<table width=\"75%\" border=\"0\">\n";
+	$contents .= "<p>Test started $startTime, ended $endTime.<p>\n";	
 	$contents .= "<tr class=$outputStatus><td width=\"80%\">Contents of stderr</td><td width=\"20%\">$outputStatus</td></tr>\n";
 
 	open(INERROR, "<$errorFile");
