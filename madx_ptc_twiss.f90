@@ -413,8 +413,13 @@ contains
      transfermap = X
     endif 
     
-    if (cavsareset .eqv. .false.) then
-       call setcavities(my_ring,maxaccel)
+!    if (maxaccel .eqv. .false.) then
+!      cavsareset = .false.
+!    endif
+    
+    if ( (cavsareset .eqv. .false.) .and. (my_ring%closed .eqv. .false.) ) then
+       
+         call setcavities(my_ring,maxaccel)
        if (geterrorflag() /= 0) then
           return
        endif
@@ -1108,7 +1113,7 @@ contains
       emiz = get_value('beam ','et ')
 
       if ((emix + emiy + emiz) .le. zero) then
-         call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
+         !call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
          call killmoments()  !switches
       endif
 
