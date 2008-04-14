@@ -1462,6 +1462,7 @@ contains
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
     dir=EL%P%DIR*EL%P%CHARGE
+    call alloc(BBYTWT,BBXTW,BBYTW,x1,x3,O)
     O=twopi*EL%freq/CLIGHT
 
     do ko=1,el%nf
