@@ -836,7 +836,8 @@ open(IN,$parentFilename);
 LINE: while(<IN>){
 	# take into account MAD various ways of reading a file, namely using either "call,file" or "readmytable,file"
 	my $fileRetreival = 0 ;
-	my $child;
+	my $childCount = 0;
+	my @childs;
 	# MAD syntax too permissive: hard to grep commands
 	# not left-anchored as can be an action after an 'if'
 	# but make sure it has not been commented (negated !) as is frequently the case...
@@ -844,33 +845,49 @@ LINE: while(<IN>){
 	if (/^[\s\t]*!/) { next LINE; } # this is a comment (!) - do not bother
 
 	if (/[\s\t]*[Rr][Ee][Aa][Dd][Mm][Yy][Tt][Aa][Bb][Ll][Ee],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*/){
-	$child = $1;
+	@childs[$childCount++] = $1;
 	$fileRetreival = 1;
 
 	}
 
 	if (/[\s\t]*[Cc][Aa][Ll][Ll],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;/) {
-	$child = $1;
+	@childs[$childCount++] = $1;
 	$fileRetreival = 1;
 	}
 	
+	# another - rare - instruction that calls a script available in the input directory
+	# along the other input files. Such script must be copied locally along the other
+	# files.
+	# this is for instance the case for the read.magnet.errors perl-script
+	# in twiss/test_5/
+	if (/[Ss][Yy][Ss][Tt][Ee][Mm][\s\t]*,?[\s\t]*[\"\']([\w\._\-\d]+)[\s\t]*([\w\.\_\-\d\/]+)[\"\']/){
+		@childs[$childCount++] = $1; # the command ...
+		if ($2 ne "") {
+			@childs[$childCount++] = $2; # as well as its argument if any
+		}
+		$fileRetreival = 1;
+	}
+	# NOTE: the above is FRAGILE. In many cases, one might expect the System call
+	# to start with a command not corresponding to a local file in the input dir.
+	
+	
 	# another - rare -  instruction that calls a file from another
 	if (/[\s\t]*sxfread[\s\t]*,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;/) {
-	$child = $1;
+	@childs[$childCount++] = $1;
 	$fileRetreival = 1;
 	}
-
 
 
 	if ($fileRetreival == 1) {
 	#    $child = $1;
 	# before adding this child, make sure it's not already part of the childs the parent depends from
-	$_ = $dependentFileList;
-	if (/$child,/) {
-		# print "'$child' already belonging to dependentFileList '$dependentFileList' => omit insertion\n";
-	} else {
-		# print "add child '$child' to list '$dependentFileList'\n";
-		$dependentFileList = $dependentFileList . $child . ",";
+	foreach $child (@childs) {
+		if ($dependentFileList =~ /$child,/) {
+			# print "'$child' already belonging to dependentFileList '$dependentFileList' => omit insertion\n";
+		} else {
+			# print "add child '$child' to list '$dependentFileList'\n";
+			$dependentFileList = $dependentFileList . $child . ",";
+		}
 	}
 	}
 }
