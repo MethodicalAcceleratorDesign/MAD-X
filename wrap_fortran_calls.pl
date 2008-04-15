@@ -1,9 +1,42 @@
 #!/usr/bin/perl
+my $os;
+if ($#ARGV>-1){
+	if (@ARGV[0] eq 'MSDOS') {
+		$os = 'MSDOS';
+	} else {
+		# in case the script is invoked on Windows, as from Makefile.bat,
+		# one must pass an additionnal argument so that system calls
+		# are issued as for MSDOS.
+		print "only accept 'MSDOS' as optional argument. Exit!\n";
+		exit;
+	}
+} else {
+	$os = 'unix';
+}
 
 my $dbg = 0; # set to 1 to display messages
 
-@Cfiles = `ls *.c`;
-@Hfiles = `ls *.h`;
+if ($os ne 'MSDOS') {
+	@Cfiles = `ls *.c`;
+	@Hfiles = `ls *.h`;
+} else {
+	# emulate the above in case we run the script on Windows
+	@Cfiles = ();
+	@Hfiles = ();
+	@Cfiles_entries = `dir *.c`;
+	@Hfiles_entries = `dir *.h`;
+	foreach $entry (@Cfiles_entries){
+		if ($entry =~ /[\s\t]+([\w\d_\-]+\.c)/) {
+			@Cfiles = (@Cfiles, $1);
+		}
+	}
+	foreach $entry (@Hfiles_entries){
+		if ($entry =~ /[\s\t]+([\w\d_\-]+\.h)/) {
+			@Hfiles = (@Hfiles, $1);
+		}
+	}
+	# at this stage @Cfiles and @Hfiles contain the list of C and H files
+}
 
 @Cfiles = (@Cfiles, @Hfiles);
 
@@ -68,7 +101,19 @@ my $CparameterString; # C-style parameter string (associative list)
 my $CtypedParameterString; # for signatures; above is for calls
 
 foreach $ext (@fortran_extensions){
-    @files = `ls *.$ext`;
+	if ($os ne 'MSDOS') {
+		@files = `ls *.$ext`;
+	} else {
+		# must emulate the above in case the script runs on Windows instead of Linux
+		@files = ();
+		@files_entries = `dir *.$ext`;
+		foreach $entry (@files_entries){
+			if ($entry =~ /[\s\t]+([\w\d\-_]+\.$ext)/){
+				@files = (@files, $1);
+			}
+		}
+		# at this stage @files contains the list of all Fortran files
+	}
     foreach $file (@files){
 	chop $file;
     	open(MYFILE,"<$file");		
@@ -268,7 +313,12 @@ foreach $ext (@fortran_extensions){
 		} # try to collect args
 	}
 	close MYFILE;
-	`rm $simplifiedFile`;	# delete temporary file
+	
+	if ($os ne 'MSDOS'){
+		`rm $simplifiedFile`;	# delete temporary file (Unix or Linux)
+	} else {
+		`erase $simplifiedFile`; # delete temporary file (Windows)
+	}
     }
 }
 
