@@ -23,14 +23,14 @@ if ($os ne 'MSDOS') {
 	# emulate the above in case we run the script on Windows
 	@Cfiles = ();
 	@Hfiles = ();
-	@Cfiles_entries = `dir *.c`;
-	@Hfiles_entries = `dir *.h`;
-	foreach $entry (@Cfiles_entries){
+	@files_entries = `dir`; # dir *.c or dir *.h failed to return all files
+	# and the results were different on DOS or Linux
+	foreach $entry (@files_entries){
 		if ($entry =~ /[\s\t]+([\w\d_\-]+\.c)/) {
 			@Cfiles = (@Cfiles, $1);
 		}
 	}
-	foreach $entry (@Hfiles_entries){
+	foreach $entry (@files_entries){
 		if ($entry =~ /[\s\t]+([\w\d_\-]+\.h)/) {
 			@Hfiles = (@Hfiles, $1);
 		}
@@ -43,7 +43,7 @@ if ($os ne 'MSDOS') {
 # and what about the #define statements?
 @maybeFortranCalls = ();
 foreach $Cfile (@Cfiles){
-    chop $Cfile;
+    chomp $Cfile; # safer than chop: for DOS, no ending newline
 	open(MYFILE,"<$Cfile");
 	while(<MYFILE>){
 		my $line = $_;
@@ -106,8 +106,12 @@ foreach $ext (@fortran_extensions){
 	} else {
 		# must emulate the above in case the script runs on Windows instead of Linux
 		@files = ();
-		@files_entries = `dir *.$ext`;
+		@files_entries = `dir`; # dir *.$ext failed
 		foreach $entry (@files_entries){
+			chop $entry; # on DOS
+			# we caught the problem: upon invoking dir,
+			# one returns more than one file per line
+			# well, actually not on DOS, only for Linux!
 			if ($entry =~ /[\s\t]+([\w\d\-_]+\.$ext)/){
 				@files = (@files, $1);
 			}
@@ -115,7 +119,8 @@ foreach $ext (@fortran_extensions){
 		# at this stage @files contains the list of all Fortran files
 	}
     foreach $file (@files){
-	chop $file;
+		chomp $file; # safer than chop: for DOS, no ending newline
+
     	open(MYFILE,"<$file");		
 	my @args = (); # will be redefined each time we see a new subroutine with parameters
 
