@@ -499,11 +499,11 @@ int decode_command();
 int decode_par(struct in_cmd*, int, int, int, int);
 struct char_array* delete_char_array(struct char_array*);
 struct char_p_array* delete_char_p_array(struct char_p_array*, int);
-double combine_expr_expr(struct expression*, char*, struct expression*, 
+double combine_expr_expr(struct expression*, char*, struct expression*,
                          struct expression**);
-double combine_expr_val(struct expression*, char*, double, 
+double combine_expr_val(struct expression*, char*, double,
                         struct expression**);
-double combine_val_expr(double, char*, struct expression*, 
+double combine_val_expr(double, char*, struct expression*,
                         struct expression**);
 struct command* delete_command(struct command*);
 struct command_list* delete_command_list(struct command_list*);
@@ -606,7 +606,7 @@ void export_sequence(struct sequence*, FILE*);
 void export_sequ_8(struct sequence*, struct command_list*, FILE*);
 void export_variable(struct variable*, FILE*);
 void export_var_8(struct variable*, FILE*);
-double expr_combine(struct expression*, double, char*, 
+double expr_combine(struct expression*, double, char*,
                     struct expression*, double, struct expression**);
 double expression_value(struct expression*, int);
 void fatal_error(char*, char*);
@@ -874,8 +874,8 @@ void show_beam(char*);
 double simple_double(char**, int, int);
 int simple_logic_expr(int, char**);
 char* spec_join(char**, int); /* puts table() argument back for output */
-struct sequence* extract_sequence(char*, struct sequence*, 
-                                struct node*, struct node*, char*);
+struct sequence* extract_sequence(char*, struct sequence*,
+                                  struct node*, struct node*, char*);
 int mysplit(char*, struct char_p_array*);
 char* stolower(char*);  /* string to lower case in place */
 void stolower_nq(char*);  /* string to lower case in place except quotes */
@@ -1342,8 +1342,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.27";
-char code_mod_date[] = "Code Modification Date: 02.04.2008";
+char myversion[] = "MAD-X 3.04.28";
+char code_mod_date[] = "Code Modification Date: 15.04.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

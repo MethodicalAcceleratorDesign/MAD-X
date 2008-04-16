@@ -39,7 +39,7 @@ int* mtable[MTABLE_SIZE];
 
 /* IA */
 #define E_D_MAX 500         /* max. length of extra displacement tables (per element) */
-#define E_D_LIST_CHUNK 1000  /* chunk to allocate memory for extra displacement tables */ 
+#define E_D_LIST_CHUNK 1000  /* chunk to allocate memory for extra displacement tables */
 
 
 #define MADX_LONG      1
@@ -175,7 +175,7 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_fill_end = 70; /* last standard column filled
+int twiss_fill_end = 71; /* last standard column filled
                             by complete_twiss_table */
 /* warning: modify routine complete_twiss_table in case of changes */
 int twiss_table_types[] =
@@ -193,8 +193,8 @@ int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2, 2, 2, 
-  1, 2, 3,
+  2, 2, 2, 2,
+  1, 2, 2, 3,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -238,8 +238,8 @@ char* twiss_table_cols[] =
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
   "k9sl", "k10l", "k10sl", "ks", "hkick",
   "vkick", "tilt", "e1", "e2", "h1",
-  "h2", "hgap", "fint", "fintx", 
-  "assembly_id","beam_sep","parent",
+  "h2", "hgap", "fint", "fintx",
+  "assembly_id","beam_sep","lrad","parent",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",
@@ -460,7 +460,7 @@ int ptcnodetrack_table_types[] =
 
 char* ptcnodetrack_table_cols[] =
 {"number", "name", "elnumber","trnumber" , "turn","s_slice", "s", "x", "px", "y", "py", "t", "pt", "s",
-  " "  /* blank terminates */
+ " "  /* blank terminates */
 };
 
 
