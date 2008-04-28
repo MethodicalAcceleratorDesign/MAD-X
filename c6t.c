@@ -268,6 +268,10 @@ int           block_count = 0,     /* current block count for naming */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
   radius_flag = 0,     /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
+  mult_auto_off = 1,   /* if 1 code does not process zero value
+                        multipoles; 
+                        if 0 process up to order max_mult_ord */
+  max_mult_ord = 11,   /* Process up to this order for mult_auto_off = 0 */
   multi_type = -1,     /* is set to multipole type if any found */
   cavity_count = 0;    /* count cavities in output */
 
@@ -1340,13 +1344,21 @@ struct block* get_block_equiv(struct block* current)
 
 void get_args(struct in_cmd* my_cmd)
 {
+  int tmp_max_mult_ord;
   double tmp_ref_def;
   if ((aperture_flag = command_par_value("aperture", my_cmd->clone)))
     put_info("c6t - aperture flag selected","");
   if ((cavall_flag = command_par_value("cavall", my_cmd->clone)))
     put_info("c6t - cavall flag selected","");
+  if ((mult_auto_off = command_par_value("mult_auto_off", my_cmd->clone)))
+    put_info("c6t - mult_auto_off flag selected","");
   if ((split_flag = command_par_value("split", my_cmd->clone)))
     put_info("c6t - split flag selected","");
+  if ((tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
+  {
+    max_mult_ord = tmp_max_mult_ord;
+    printf("max_mult_ord set to : %d\n",max_mult_ord);
+  }
   if ((tmp_ref_def = command_par_value("radius", my_cmd->clone))>0.)
   {
     radius_flag = 1;
@@ -2589,14 +2601,28 @@ void write_f3_mult(struct c6t_element* el)
     {
       for (i = 0; i < eln->nf_err; i++)
       {
-        if (eln->p_fd_err->a_dble[i] != zero)
+        if (mult_auto_off)
         {
-          i_max = i; error_matrix[i] = 1.;
+          error_matrix[i] = 1.;
+        }
+        else
+        {
+          if (eln->p_fd_err->a_dble[i] != zero)
+          {
+            i_max = i; error_matrix[i] = 1.;
+          }
         }
       }
     }
   }
-  if (++i_max > 0)  i_max += i_max%2;
+  if (mult_auto_off)
+  {
+    i_max = max_mult_ord * 2;
+  }
+  else
+  {
+    if (++i_max > 0)  i_max += i_max%2;
+  }
   for (i = 0; i < i_max; i++)
   {
     fprintf(f3,"%4.0f.%4.0f.", 0., error_matrix[i]);
