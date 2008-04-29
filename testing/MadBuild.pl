@@ -19,7 +19,7 @@ $startTime = localtime;
 
 $website = "/afs/cern.ch/user/n/nougaret/www/mad/";
 
-# first set environment variables for lf95 compiler
+# first set environment variables for lf95 and NAG compilers
 # this is necessary for the acron job which does not perform a login
 # that would set the variables transparently.
 
@@ -31,6 +31,9 @@ my $ldLibPath = $ENV{'LD_LIBRARY_PATH'}; # should handle case of empty string
 my $newLdLibPath = $ldLlibPath . ":/afs/cern.ch/sw/fortran/lahey/lf9562/lib";
 $ENV{'LD_LIBRARY_PATH'}=$newLdLibPath;
 
+# flexlm license manager for NAG compiler
+$ENV{'NAGF95_ROOT'}="/afs/cern.ch/sw/fortran/nag/f95.5.361";
+$ENV{'LM_LICENSE_FILE'}="/afs/cern.ch/sw/fortran/nag/f95.5.361/license.dat";
 
 @extractedPackages = ('madX');
 
