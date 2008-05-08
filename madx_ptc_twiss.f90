@@ -146,7 +146,7 @@ contains
 
 
 !!!!!!!!!!!!!!!!
-    ! phase advance!
+! phase advance!
 !!!!!!!!!!!!!!!!
 
     k = 2
@@ -156,7 +156,10 @@ contains
     do i=1, k
        jj=2*i -1
        TEST=ATAN2((Y(2*i -1).SUB.fo(2*i,:)),(Y(2*i-1).SUB.fo(2*i-1,:)))/TWOPI
-
+       if (i == 3) then
+         TEST = ATAN2((Y(6).SUB.fo(5,:)),(Y(6).SUB.fo(6,:)))/TWOPI
+       endif
+       
 
        IF(TEST<0.D0.AND.abs(TEST)>EPSIL)TEST=TEST+1.D0
        DPH=TEST-TESTOLD(i)
@@ -447,9 +450,10 @@ contains
 
     !Y
 
-
+    !the initial twiss is needed to initialize propely calculation of some variables f.g. phase advance
     tw=y
-
+    phase = zero !we have to do it after the very initial twiss params calculation above
+                 
     current=>MY_RING%start
     startfen = 0
     startfen = current!setting up start energy for record
@@ -458,9 +462,10 @@ contains
     print77=.false.
     read77=.false.
 
-    open(unit=21,file='ptctwiss.txt')
+    
 
     if (getdebug() > 2) then
+       open(unit=21,file='ptctwiss.txt')
        print *, "ptc_twiss: internal state is:"
        call print(default,6)
     endif
@@ -521,10 +526,12 @@ contains
           !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           goto 100
        endif
-
-       write(21,*) "##########################################"
-       write(21,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-       call print(y,21)
+       
+       if (getdebug() > 2) then
+         write(21,*) "##########################################"
+         write(21,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
+         call print(y,21)
+       endif
 
        suml=suml+current%MAG%P%ld
 
@@ -590,8 +597,7 @@ contains
 
     call f90flush(20,my_false)
 
-    !if (getdebug() > 2)
-    close(21)
+    if (getdebug() > 2) close(21)
 
     !****************************************************************************************
     !*********  E N D   O F   PTC_TWISS      ************************************************
@@ -621,7 +627,7 @@ contains
 
 
       if ( (mman + mtab + mascr + mdistr) > 1) then
-         call seterrorflag(11,"ptc_twiss ","Ambigous option comman options");
+         call seterrorflag(11,"ptc_twiss ","Ambigous command options");
          print*, "Only one of the following switches might be on:"
          print*, "initial_matrix_manual  = ", initial_matrix_manual
          print*, "initial_matrix_table   = ", initial_matrix_table
