@@ -295,9 +295,9 @@ contains
     real(dp)                :: r,re(6,6),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
-    integer                 :: row
+    integer                 :: row, rmatrix
     real(dp)                :: emi(3)
-    logical(lp)             :: skipnormalform
+    logical(lp)             :: skipnormalform, tracktm
 
     skipnormalform = my_false
 
@@ -335,6 +335,8 @@ contains
 
     icase = get_value('ptc_twiss ','icase ')
     deltap0 = get_value('ptc_twiss ','deltap ')
+    
+    rmatrix = get_value('ptc_twiss ','rmatrix ')
 
     deltap = zero
     call my_state(icase,deltap,deltap0)
@@ -410,8 +412,15 @@ contains
     y=npara
     Y=X
 
-    if (getnpushes() > 0) then
-     call alloc(transfermap)
+    call alloc(transfermap)
+    
+    if ( getnpushes() > 0 .or. rmatrix > 0) then
+      tracktm = my_true
+    else
+      tracktm = my_false
+    endif  
+    
+    if (tracktm) then
      transfermap = npara
      transfermap = X
     endif 
@@ -501,12 +510,12 @@ contains
           !         if (getnknobis() > 0) c_%knob = my_true
           !print*, "parametric",i,c_%knob
           call track(my_ring,y,i,i+1,+default)
-          if (getnpushes() > 0) then
+          if (tracktm) then
             call track(my_ring,transfermap,i,i+1,+default)
           endif
        else
           call track(my_ring,y,i,i+1, default)
-          if (getnpushes() > 0) then
+          if (tracktm) then
             call track(my_ring,transfermap,i,i+1,default)
           endif
        endif
@@ -544,12 +553,12 @@ contains
        endif
 
        tw=y
-       if (getnpushes() > 0) then
+       if (tracktm) then
             call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
        endif
 
 
-       call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
+       call puttwisstable(transfermap) ! must be the last since it has tendency for augmenting all tables count
 
        iii=advance_node()
        current=>current%next
@@ -578,9 +587,9 @@ contains
     call kill(tw)
     CALL kill(y)
        
-    if (getnpushes() > 0) then
+!    if (tracktm) then
        CALL kill(transfermap)
-    endif
+!    endif
        
     do i=1,6
        call kill(unimap(i))
@@ -704,9 +713,10 @@ contains
       else
 
          if (getdebug() > 1) then
-            print*,"Initializing map from one turn map"
+            print*,"Initializing map from one turn map: Start Map"
+            call print(y,6)
          endif
-
+         
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
             call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
@@ -726,6 +736,11 @@ contains
             c_%watch_user=.false.
             CALL kill(y)
             return
+         endif
+
+         if (getdebug() > 1) then
+            print*,"Initializing map from one turn map. One Turn Map"
+            call print(y,6)
          endif
 
          call maptoascript()
@@ -771,12 +786,13 @@ contains
     end function getdeltae
     !____________________________________________________________________________________________
 
-    subroutine puttwisstable()
+    subroutine puttwisstable(transfermap)
       implicit none
       include "madx_ptc_knobs.inc"
       integer i1,i2,ii,i1a,i2a
       real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
+      type(real_8), target :: transfermap(6)
 
       if (getdebug() > 2) then
          write(21,*) "##########################################"
@@ -810,6 +826,56 @@ contains
 
       ioptfun=6
       call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
+
+      
+      opt_fun(1) = transfermap(1).sub.fo(1,:)
+      opt_fun(2) = transfermap(1).sub.fo(2,:)
+      opt_fun(3) = transfermap(1).sub.fo(3,:)
+      opt_fun(4) = transfermap(1).sub.fo(4,:)
+      opt_fun(5) = transfermap(1).sub.fo(6,:)
+      opt_fun(6) = transfermap(1).sub.fo(5,:)
+
+
+      opt_fun(7) = transfermap(2).sub.fo(1,:)
+      opt_fun(8) = transfermap(2).sub.fo(2,:)
+      opt_fun(9) = transfermap(2).sub.fo(3,:)
+      opt_fun(10)= transfermap(2).sub.fo(4,:)
+      opt_fun(11)= transfermap(2).sub.fo(6,:)
+      opt_fun(12)= transfermap(2).sub.fo(5,:)
+
+      opt_fun(13)= transfermap(3).sub.fo(1,:)
+      opt_fun(14)= transfermap(3).sub.fo(2,:)
+      opt_fun(15)= transfermap(3).sub.fo(3,:)
+      opt_fun(16)= transfermap(3).sub.fo(4,:)
+      opt_fun(17)= transfermap(3).sub.fo(6,:)
+      opt_fun(18)= transfermap(3).sub.fo(5,:)
+
+      opt_fun(19)= transfermap(4).sub.fo(1,:)
+      opt_fun(20)= transfermap(4).sub.fo(2,:)
+      opt_fun(21)= transfermap(4).sub.fo(3,:)
+      opt_fun(22)= transfermap(4).sub.fo(4,:)
+      opt_fun(23)= transfermap(4).sub.fo(6,:)
+      opt_fun(24)= transfermap(4).sub.fo(5,:)
+
+      opt_fun(25)= transfermap(6).sub.fo(1,:)
+      opt_fun(26)= transfermap(6).sub.fo(2,:)
+      opt_fun(27)= transfermap(6).sub.fo(3,:)
+      opt_fun(28)= transfermap(6).sub.fo(4,:)
+      opt_fun(29)= transfermap(6).sub.fo(6,:)
+      opt_fun(30)= transfermap(6).sub.fo(5,:)
+
+
+      opt_fun(31)= transfermap(5).sub.fo(1,:)
+      opt_fun(32)= transfermap(5).sub.fo(2,:)
+      opt_fun(33)= transfermap(5).sub.fo(3,:)
+      opt_fun(34)= transfermap(5).sub.fo(4,:)
+      opt_fun(35)= transfermap(5).sub.fo(6,:)
+      opt_fun(36)= transfermap(5).sub.fo(5,:)
+
+      ioptfun=36
+      call vector_to_table(table_name, 're11 ', ioptfun, opt_fun(1))
+
+
 
       opt_fun(beta11)= tw%beta(1,1) * deltae
       opt_fun(beta12)= tw%beta(1,2) * deltae
