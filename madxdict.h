@@ -497,6 +497,7 @@ char command_def[] =
 "time = [l, false, true], "
 "no = [i, 1], "
 "closed_orbit = [l, false, true], "
+"rmatrix  = [l, false, true], "
 "initial_matrix_table = [l, false, true], "
 "initial_matrix_manual = [l, false, true], "
 "initial_ascript_manual = [l, false, true], "
