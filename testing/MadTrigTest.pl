@@ -23,7 +23,7 @@ my $trigger;
 
 $pwd = `pwd`;
 chop $pwd;
-$extractDir = $pwd . "/MadCvsExtract" ;
+$extractDir = $pwd . "/MadCvsExtract_trigger" ;
 rmtree($extractDir);
 mkdir($extractDir, 0777);
 chdir($extractDir);
@@ -114,6 +114,7 @@ if ($lastTest eq $lastRelease) {
 	$msg->send;
 	$trigger = 'run-test';
 	# will cause the MadTest.pl script to run.
+	rmtree($extractDir);
 }
 
 # returned strings for MadBuildAndTest.pl
