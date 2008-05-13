@@ -13,6 +13,9 @@
 
 use MIME::Lite; # to send e-mail
 
+use File::Path; # to remove directory trees
+
+
 my $trigger;
 
 
@@ -21,6 +24,7 @@ my $trigger;
 $pwd = `pwd`;
 chop $pwd;
 $extractDir = $pwd . "/MadCvsExtract" ;
+rmtree($extractDir);
 mkdir($extractDir, 0777);
 chdir($extractDir);
 
