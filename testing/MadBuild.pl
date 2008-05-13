@@ -41,6 +41,8 @@ $ENV{'LM_LICENSE_FILE'}="/afs/cern.ch/sw/fortran/nag/f95.5.361/license.dat";
 $pwd = `pwd`;
 chop $pwd;
 $extractDir = join("", $pwd, "/MadCvsExtract") ;
+
+
 mkdir($extractDir, 0777);
 chdir($extractDir);
 
@@ -131,7 +133,7 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 
 
 
-# then send an e-mail to the FESA support team
+# then send an e-mail
   $msg = MIME::Lite->new(
 			 From     => 'mad-automation-admin@cern.ch',
 			 To       => 'mad-automation-admin@cern.ch',
