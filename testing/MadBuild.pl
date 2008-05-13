@@ -122,8 +122,10 @@ foreach $makefile (@makefiles){
 	createWebPage($htmlFile,$detailedBuildReport,$startTime,$endTime);
 
     } # for each target
-
+	
 } # for each makefile
+
+`make clean`; # final make clean, mostly to remove all the .o files
 
 $buildReport .= "</table>\n";
 
