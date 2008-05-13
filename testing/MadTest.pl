@@ -291,9 +291,9 @@ foreach $test (@tests) {
 
 	# copy the input file that corresponds to this specific test case
 	if ($sourceSubDir eq "") {
-	`cp $samplesRootDir/$target/$infilename .`;
+		`cp $samplesRootDir/$target/$infilename .`;
 	} else {
-	`cp $samplesRootDir/$target/$sourceSubDir/$infilename .`;
+		`cp $samplesRootDir/$target/$sourceSubDir/$infilename .`;
 	}
 	
 	$key = "$target/$infilename";
@@ -371,7 +371,7 @@ foreach $test (@tests) {
 		if ($existsDir == 1) {
 		print "dependency directory '$dependencyDir' already exists\n";
 		# simply copy the file
-		if  ($sourceSubDir eq "") {
+		if  ($sourceSubDir eq "") {	
 			`cp $samplesRootDir/$target/$dependencyDir/$dependencyFile ./$dependencyDir`;
 		} else {
 			`cp $samplesRootDir/$target/$sourceSubDir/$dependencyDir/$dependencyFile ./$dependencyDir`; # should merge the two with '.' for $sourceSubDir
@@ -861,11 +861,20 @@ LINE: while(<IN>){
 	# this is for instance the case for the read.magnet.errors perl-script
 	# in twiss/test_5/
 	if (/[Ss][Yy][Ss][Tt][Ee][Mm][\s\t]*,?[\s\t]*[\"\']([\w\._\-\d]+)[\s\t]*([\w\.\_\-\d\/]+)[\"\']/){
-		@childs[$childCount++] = $1; # the command ...
-		if ($2 ne "") {
-			@childs[$childCount++] = $2; # as well as its argument if any
+		if ($1 =~/mkdir/){
+			# command invocation, not implying a file call
+		
+		} else {
+		
+			# ... many other cases like 'mkdir' to be handled before we conclude
+			# the command corresponds to a file...
+		
+			@childs[$childCount++] = $1; # the command ...
+			if ($2 ne "") {
+				@childs[$childCount++] = $2; # as well as its argument if any
+			}
+			$fileRetreival = 1;
 		}
-		$fileRetreival = 1;
 	}
 	# NOTE: the above is FRAGILE. In many cases, one might expect the System call
 	# to start with a command not corresponding to a local file in the input dir.
