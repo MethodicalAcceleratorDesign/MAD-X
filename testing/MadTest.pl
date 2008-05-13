@@ -861,7 +861,10 @@ LINE: while(<IN>){
 	# this is for instance the case for the read.magnet.errors perl-script
 	# in twiss/test_5/
 	if (/[Ss][Yy][Ss][Tt][Ee][Mm][\s\t]*,?[\s\t]*[\"\']([\w\._\-\d]+)[\s\t]*([\w\.\_\-\d\/]+)[\"\']/){
-		if ($1 =~/mkdir/){
+		my $cmd=$1;
+		my $arg=$2;
+		
+		if ($cmd =~/mkdir/){
 			# command invocation, not implying a file call
 		
 		} else {
@@ -869,9 +872,9 @@ LINE: while(<IN>){
 			# ... many other cases like 'mkdir' to be handled before we conclude
 			# the command corresponds to a file...
 		
-			@childs[$childCount++] = $1; # the command ...
-			if ($2 ne "") {
-				@childs[$childCount++] = $2; # as well as its argument if any
+			@childs[$childCount++] = $cmd; # the command ...
+			if ($arg ne "") {
+				@childs[$childCount++] = $arg; # as well as its argument if any
 			}
 			$fileRetreival = 1;
 		}
