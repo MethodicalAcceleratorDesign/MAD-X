@@ -22,6 +22,8 @@
 #include "madxd.h"
 #include "madxdict.h"
 
+#include <stdint.h> /* to use uintptr_t, to fit pointers into integers of correct size */
+
 /*
   #include "mdb.h"
   #include "scan.h"
@@ -2571,7 +2573,7 @@ int get_stmt(FILE* file, int supp_flag)
     c_ex = mystrchr(&ca->c[ca->curr], '!');
     if (c_cc != NULL && c_ex != NULL)
     {
-      c_cc = (int)c_cc < (int)c_ex ? c_cc : c_ex; *c_cc = '\0';
+      c_cc = (uintptr_t)c_cc < (uintptr_t)c_ex ? c_cc : c_ex; *c_cc = '\0';
     }
     else if(c_cc != NULL)
     {
@@ -3965,7 +3967,7 @@ void pro_input(char* statement)
     else
     {
       if ((sem = mystrchr(&statement[start], ';')) == NULL) return;
-      if ((int) sem > (int) &statement[start]) /* skip empty ';' */
+      if ((uintptr_t) sem > (uintptr_t) &statement[start]) /* skip empty ';' */
       {
         *sem = '\0';
         this_cmd = new_in_cmd(400);
@@ -3996,7 +3998,7 @@ void pro_input(char* statement)
         *sem = ';';
       }
       sem++;
-      start = (int)sem - (int)statement;
+      start = (uintptr_t)sem - (uintptr_t)statement;
       if (start < l)
       {
         if ((nnb = next_non_blank_pos(sem)) < 0)  start = l;
@@ -4017,7 +4019,7 @@ void remove_range(char* string, char* s1, char* s2)
 {
   char* ps1 = strstr(string, s1);
   char* ps2 = strstr(string, s2);
-  if (ps1 != NULL && ps2 != NULL && (int) ps1 < (int) ps2)
+  if (ps1 != NULL && ps2 != NULL && (uintptr_t) ps1 < (uintptr_t) ps2)
   {
     ps2++; ps2++;
     while (*ps2 != '\0')  *ps1++ = *ps2++;

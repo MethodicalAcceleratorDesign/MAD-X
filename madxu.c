@@ -4,6 +4,8 @@
 #include "fortran_wrappers.h"
 #endif
 
+#include <stdint.h> /* to use on uintptr_t, to fit pointers into integers of correct size */
+
 int add_drifts(struct node* c_node, struct node* end)
 {
   struct node *d1;
@@ -3776,13 +3778,13 @@ char* v_format(char* string)
   *var_form = '\0';
   while ((p = strpbrk(s, "NIFS")))
   {
-    if ((int)p > (int)q)
+    if ((uintptr_t)p > (uintptr_t)q)
     {
       t = p; t--;
       if (*t == '%')
       {
         c = *p;
-        strncat(var_form, q, (int)p - (int)q);
+        strncat(var_form, q, (uintptr_t)p - (uintptr_t)q);
         if (c == 'N')
         {
           sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
@@ -3838,7 +3840,7 @@ void write_nice(char* string, FILE* file)
     c[pos] = '\0';
     fprintf(file, "%s\n", c);
     c[pos] = k;
-    ssc = (int) &c[pos] - (int) c;
+    ssc = (uintptr_t) &c[pos] - (uintptr_t) c;
     n -= ssc;
     c = &c[pos];
   }
@@ -3864,7 +3866,7 @@ void write_nice_8(char* string, FILE* file)
     c[pos] = '\0';
     fprintf(file, "%s &\n", c);
     c[pos] = k;
-    ssc = (int) &c[pos] - (int) c;
+    ssc = (uintptr_t) &c[pos] - (uintptr_t) c;
     n -= ssc;
     c = &c[pos];
   }

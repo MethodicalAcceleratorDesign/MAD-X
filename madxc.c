@@ -2315,12 +2315,15 @@ void pro_correct_fill_corr_table(int ip ,char *name, double old, double new)
 
 void pro_correct2_fill_corr_table(int b, int ip ,char *name, double old, double new)
 {
+
   struct table *cor = NULL;
 
   int j;
-
+  
+  long longB = b;
+  
   if((b != 1) && (b != 0)) {
-      fatal_error("Invalid beam requested:",(char *)b);
+      fatal_error("Invalid beam requested:",(char *) longB);
   }
 
   if(b == 0) cor =  corr_table1;
@@ -2622,12 +2625,14 @@ double copk(double *r, int m)
   return(xpk);
 }
 
-unsigned int locf_(iadr)           
+unsigned long long locf_(char *iadr) /* always returns 64-bits, even on 32-bit platform */     
 #define NADUPW 4   /* Number of ADdress Units Per Word */
 #define LADUPW 2   /* Logarithm base 2 of ADdress Units Per Word */
-     char *iadr;
+/* iadr is 32-bit long on 32-bit arch. or 64-bit long on 64-bit arch. */
+/* In both cases, Fortran caller passes a ptr to 64-bit double precision */
 {
-  return( ((unsigned) iadr) >> LADUPW );
+	unsigned long long iadrLong = (uintptr_t) iadr;
+	return( iadrLong >> LADUPW );
 }
 
 int c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resvec,int *nx,float rms,int imon,int icor,int niter)
