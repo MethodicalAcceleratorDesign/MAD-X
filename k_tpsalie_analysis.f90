@@ -1325,7 +1325,7 @@ contains
     !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
-    npara_fpp=nd2
+    npara_fpp=nd2+nspin
   end subroutine init_map
 
 
@@ -1404,7 +1404,7 @@ contains
     !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
-    npara_fpp=0
+    npara_fpp=nspin
   end subroutine init_tpsa
 
 

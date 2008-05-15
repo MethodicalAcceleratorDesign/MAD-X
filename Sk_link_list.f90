@@ -11,7 +11,7 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
-  private move_to_p,move_to_name,move_to_nameS
+  private move_to_p,move_to_name,move_to_nameS,move_to_name_FIRSTNAME
   PRIVATE append_EMPTY_FIBRE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
@@ -63,6 +63,7 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE move_to_p
      MODULE PROCEDURE move_to_name
      MODULE PROCEDURE move_to_nameS
+     MODULE PROCEDURE move_to_name_FIRSTNAME
   END INTERFACE
 
   INTERFACE FIND_PATCH
@@ -144,6 +145,7 @@ CONTAINS
     current%GAMMA0I=>el%GAMMA0I
     current%GAMBET=>el%GAMBET
     current%MASS=>el%MASS
+    current%AG=>el%AG
     current%CHARGE=>el%CHARGE
 
     current%PARENT_LAYOUT=>L
@@ -230,6 +232,7 @@ CONTAINS
     current%GAMMA0I=el%GAMMA0I
     current%GAMBET =el%GAMBET
     current%MASS  =el%MASS
+    current%AG  =el%AG
     current%CHARGE =el%CHARGE
 
     current%PARENT_LAYOUT=>L
@@ -266,6 +269,7 @@ CONTAINS
     current%GAMMA0I=ONE
     current%GAMBET=ZERO
     current%MASS=ONE
+    current%AG=A_particle
     current%CHARGE=1
 
     current%pos=l%n
@@ -371,6 +375,86 @@ CONTAINS
        pos=0
     endif
   END SUBROUTINE move_to_name
+
+  SUBROUTINE move_to_partial( L,current,name,pos) ! moves to next one in list called name
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), TARGET, intent(inout):: L
+    integer, intent(inout):: pos
+    character(*), intent(in):: name
+    CHARACTER(nlp) S1NAME
+    integer i
+
+    logical(lp) foundit
+    TYPE (fibre), POINTER :: p
+
+    foundit=.false.
+    S1NAME=name
+    CALL CONTEXT(S1name)
+
+    nullify(p)
+    p=>l%last%next
+
+    if(.not.associated(p)) goto 100
+    do i=1,l%n
+       if(index(p%mag%name,s1name(1:len_trim(s1name)))/=0) then
+          foundit=.true.
+          goto 100
+       endif
+       p=>p%next
+       if(.not.associated(p)) goto 100
+    enddo
+100 continue
+    if(foundit) then
+       current=>p
+       pos=mod_n(l%lastpos+i,l%n)
+       l%lastpos=pos
+       l%last=>current
+    else
+       pos=0
+    endif
+  END SUBROUTINE move_to_partial
+
+  SUBROUTINE move_to_name_FIRSTNAME( L,current,name,VORNAME,pos) ! moves to next one in list called name
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), TARGET, intent(inout):: L
+    integer, intent(inout):: pos
+    character(*), intent(in):: name,VORNAME
+    CHARACTER(nlp) S1NAME,S2NAME
+    integer i
+
+    logical(lp) foundit
+    TYPE (fibre), POINTER :: p
+
+    foundit=.false.
+    S1NAME=name
+    S2NAME=VORNAME
+    CALL CONTEXT(S1name)
+    CALL CONTEXT(S2name)
+
+    nullify(p)
+    p=>l%last%next
+
+    if(.not.associated(p)) goto 100
+    do i=1,l%n
+       if(p%mag%name==s1name.AND.p%mag%VORname==S2NAME) then
+          foundit=.true.
+          goto 100
+       endif
+       p=>p%next
+       if(.not.associated(p)) goto 100
+    enddo
+100 continue
+    if(foundit) then
+       current=>p
+       pos=mod_n(l%lastpos+i,l%n)
+       l%lastpos=pos
+       l%last=>current
+    else
+       pos=0
+    endif
+  END SUBROUTINE move_to_name_FIRSTNAME
 
   SUBROUTINE move_to_nameS( L,current,name,posR,POS) ! moves to next one in list called name
     implicit none
@@ -555,6 +639,7 @@ CONTAINS
     ALLOCATE(current%GAMMA0I);
     ALLOCATE(current%GAMBET);
     ALLOCATE(current%MASS);
+    ALLOCATE(current%AG);
     ALLOCATE(current%CHARGE);
     current%dir=el%dir
     !    current%P0C=el%P0C
@@ -562,6 +647,7 @@ CONTAINS
     current%GAMMA0I=el%GAMMA0I
     current%GAMBET=el%GAMBET
     current%MASS=el%MASS
+    current%AG=el%AG
     current%CHARGE=el%CHARGE
 
 
@@ -664,6 +750,7 @@ CONTAINS
     nullify(Current%GAMMA0I);
     nullify(Current%GAMBET);
     nullify(Current%MASS);
+    nullify(Current%AG);
     nullify(Current%CHARGE);
 
 
@@ -693,6 +780,7 @@ CONTAINS
     ALLOCATE(Current%GAMMA0I);
     ALLOCATE(Current%GAMBET);
     ALLOCATE(Current%MASS);
+    ALLOCATE(Current%AG);
     ALLOCATE(Current%CHARGE);
     if(use_info) then
        allocate(Current%i)
@@ -712,6 +800,7 @@ CONTAINS
     C%GAMMA0I = ONE
     C%GAMBET = ONE
     C%MASS = ONE
+    C%MASS = A_particle
     C%CHARGE = 1
 
 
@@ -736,6 +825,7 @@ CONTAINS
        C%GAMMA0I = ONE
        C%GAMBET = ONE
        C%MASS = ONE
+       C%ag = a_particle
        C%CHARGE = 1
        !       c%P0C=zero
        !       c%BETA0=zero
@@ -790,6 +880,9 @@ CONTAINS
        IF(ASSOCIATED(c%MASS)) THEN
           deallocate(c%MASS);
        ENDIF
+       IF(ASSOCIATED(c%ag)) THEN
+          deallocate(c%ag);
+       ENDIF
        IF(ASSOCIATED(c%CHARGE)) THEN
           deallocate(c%CHARGE);
        ENDIF
@@ -830,6 +923,7 @@ CONTAINS
        C%GAMMA0I = ONE
        C%GAMBET = ONE
        C%MASS = ONE
+       C%ag = a_particle
        C%CHARGE = 1
        !       c%P0C=zero
        !       c%BETA0=zero
@@ -870,6 +964,7 @@ CONTAINS
        !      ENDIF
        !      IF(ASSOCIATED(c%MASS)) THEN
        deallocate(c%MASS);
+       deallocate(c%ag);
        !      ENDIF
        !      IF(ASSOCIATED(c%CHARGE)) THEN
        deallocate(c%CHARGE);
@@ -1569,6 +1664,8 @@ CONTAINS
     NULLIFY(T%PARENT_FIBRE)
     !    NULLIFY(T%BB)
     NULLIFY(T%S)
+    NULLIFY(T%delta_rad_out)
+    NULLIFY(T%delta_rad_in)
     NULLIFY(T%ref)
     !    NULLIFY(T%ORBIT)
     NULLIFY(T%a,T%ENT)
@@ -1590,8 +1687,12 @@ CONTAINS
     CALL NULL_THIN(CURRENT)
 
     ALLOCATE(CURRENT%S(4))
+    ALLOCATE(CURRENT%delta_rad_in)
+    ALLOCATE(CURRENT%delta_rad_out)
     ALLOCATE(CURRENT%ref(4))
     CURRENT%ref=zero
+    CURRENT%delta_rad_in=zero
+    CURRENT%delta_rad_out=zero
     !    ALLOCATE(CURRENT%ORBIT(6))
     ALLOCATE(CURRENT%pos_in_fibre)
     ALLOCATE(CURRENT%pos)

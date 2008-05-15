@@ -329,7 +329,7 @@ module complex_taylor
   !@            <td width="56" height="20" align="center">
   !@             <font size="2" face="Times New Roman">
   !@            <font color="#FF0000">&nbsp;&nbsp;
-  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="#FF0000">I
+  !@            <a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC">&nbsp;</a></font><a style="text-decoration: none; font-style:italic" href="i_tpsa.htm#ISUBSC"><font color="
   !@       </tr>
   !@       <tr>
   !@         <td width="39" height="56" align="center">

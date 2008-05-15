@@ -29,6 +29,7 @@ module accel_ptc
   integer :: count_cav
   logical(lp) :: oldway= .false.
   integer :: slope_sign=1,slope_flip=1
+  logicaL :: autoflip=.False.
   real(dp) :: maximum_phase=one
   TYPE fibre_array
      type(fibre), pointer :: p
@@ -216,6 +217,7 @@ contains
   subroutine accel_orbit_beam(ring)
     !use accel_ptc
     implicit none
+    integer ipause, mypause
     integer n_turn,i,k,npart,j,kk
     type(layout), target :: ring
     TYPE(BEAM),target :: RAYS
@@ -238,12 +240,16 @@ contains
     enddo
     close(mf)
 
+    call make_table("NOACC_ACC_RF.DAT")
 
-    call make_table("NOACC_ACC_210.DAT")
+    !call make_table("NOACC_ACC_210.DAT")
     !call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
     !call make_table("ACCWAVE_40kV_280kV_350ms.DAT")
     !call make_table("ACCWAVE_210KVH9_350ms.DAT")
     !call make_table("noaccel.DAT")
+
+    write(6,*) "Read RF_table ... from RF_file: NOACC_ACC_RF.DAT"
+    ipause=mypause(321)
 
     write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
     write(6,*) my_ORBIT_LATTICE%ORBIT_omega
@@ -252,7 +258,7 @@ contains
     call kanalnummer(mf)
     open(unit=mf,file='outnew.dat')
 
-    WRITE(6,*) " n_TURN "
+    WRITE(6,*) " n_TURN ... pseudo ORBIT debugging"
     READ(5,*) N_TURN
     !n_turn=20
 
@@ -624,7 +630,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
         driv=y(5).sub.'1'
         !     write(6,*) (y(5).sub.'0'),driv,my_ORBIT_LATTICE%orbit_deltae,p_orbit%mag%p%p0c
         !      pause 777
-        if(slope_sign*driv<0) then  !!!!
+        if(slope_sign*driv<0.and.autoflip) then  !!!!
            slope_flip=-slope_flip
            EL%volt=-EL%volt
            ELp%volt=-ELp%volt
@@ -715,8 +721,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
         call GET_RAY(x,xp,y,yp,phi,dE)
      endif
      IF(I==1.AND.MF_HERD/=0) THEN
-        WRITE(MF_HERD,'(4(1X,E15.8))') PHI,DE,my_ORBIT_LATTICE%orbit_energy, &
-             x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000.d0
+        WRITE(MF_HERD,'(4(1X,E15.8))') PHI,DE,my_ORBIT_LATTICE%orbit_p0c, x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000.d0
         !       WRITE(MF_HERD,'(6(1X,E15.8))') PHI,DE,X_ORBIT(6),X_ORBIT(5), &
         !x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000.d0,my_ORBIT_LATTICE%ORBIT_OMEGA
         !        ,my_ORBIT_LATTICE%ORBIT_P0C

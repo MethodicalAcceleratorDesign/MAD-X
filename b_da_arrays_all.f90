@@ -8,6 +8,9 @@ module da_arrays
   implicit none
   public
   integer lda,lea,lia,lst
+  ! johan
+  ! integer,parameter::lno=2,lnv=6,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
+  !
   integer,parameter::lno=200,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
   logical(lp) :: reallocate = .true.
   logical(lp) :: notallocated = .true.
@@ -15,20 +18,20 @@ module da_arrays
 
 
   real(dp), allocatable,dimension(:)::cc                               ! lst
-  integer, allocatable,dimension(:)::i1,i2                             ! lst
+  integer, allocatable,dimension(:)::i_1,i_2                             ! lst
   integer, allocatable,dimension(:)::ie1,ie2,ieo                       !lea
   integer, allocatable,dimension(:)::ia1,ia2                           ! 0:lia
   integer, allocatable,dimension(:)::idano,idanv,idapo,idalm,idall     ! lda
   character(10), allocatable,dimension(:)::daname                      ! daname(lda)*10
   logical(lp), allocatable,dimension(:)::allvec                            !lda
 
-  integer nda
+  integer nda_dab
   integer :: ndamaxi=0
   real(dp),TARGET :: total_da_size = c_300
-  integer nst,nomax,nvmax,nmmax,nocut,lfi
+  integer nst0,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
-  integer,TARGET :: lda_used =1500
+  integer,TARGET :: lda_used =15000
 
 contains
 
@@ -55,7 +58,7 @@ contains
     implicit none
     integer i
     allocate(cc(lst))
-    allocate(i1(lst));allocate(i2(lst));
+    allocate(i_1(lst));allocate(i_2(lst));
     allocate(ie1(lea));allocate(ie2(lea));allocate(ieo(lea));
     allocate(ia1(0:lia));allocate(ia2(0:lia));
     allocate(idano(lda));allocate(idanv(lda));allocate(idapo(lda));
@@ -64,8 +67,8 @@ contains
     allocate(allvec(lda));
     do i=1,lst
        cc(I)=zero  ! ADDED BY ETIENNE
-       i1(i)=0
-       i2(i)=0
+       i_1(i)=0
+       i_2(i)=0
     enddo
     do i=1,lea
        ie1(i)=0
@@ -96,18 +99,18 @@ contains
           ipause=mypauses(100," cc ARRAY not DEALLOCATED : PROBLEMS")
        ENDIF
     ENDIF
-    IF (ALLOCATED(i1)) THEN
-       DEALLOCATE (i1, STAT = error)
+    IF (ALLOCATED(i_1)) THEN
+       DEALLOCATE (i_1, STAT = error)
        IF(ERROR==0) THEN
        ELSE
-          ipause=mypauses(101," i1 ARRAY not DEALLOCATED : PROBLEMS")
+          ipause=mypauses(101," i_1 ARRAY not DEALLOCATED : PROBLEMS")
        ENDIF
     ENDIF
-    IF (ALLOCATED(i2)) THEN
-       DEALLOCATE (i2, STAT = error)
+    IF (ALLOCATED(i_2)) THEN
+       DEALLOCATE (i_2, STAT = error)
        IF(ERROR==0) THEN
        ELSE
-          ipause=mypauses(102," i2 ARRAY not DEALLOCATED : PROBLEMS")
+          ipause=mypauses(102," i_2 ARRAY not DEALLOCATED : PROBLEMS")
        ENDIF
     ENDIF
     IF (ALLOCATED(ie1)) THEN

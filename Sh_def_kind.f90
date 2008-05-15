@@ -1461,8 +1461,8 @@ contains
     IF(k%NOCAVITY) RETURN
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
-    dir=EL%P%DIR*EL%P%CHARGE
     call alloc(BBYTWT,BBXTW,BBYTW,x1,x3,O)
+    dir=EL%P%DIR*EL%P%CHARGE
     O=twopi*EL%freq/CLIGHT
 
     do ko=1,el%nf
@@ -8482,9 +8482,13 @@ contains
 
     CALL ALLOC(X1,X3,BX,BY,BTX,BTY,X5,B2,BTYt)
     CALL ALLOC(B,3)
+!!!!!!!!!!!!!!!!!!!!!!!!!
     X1=X(1)
     X3=X(3)
-
+    !x1=1.d0.mono.1
+    !x3=1.d0.mono.3
+    !pause  23423423
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if(k%TIME) then
        X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
     else
@@ -8556,7 +8560,14 @@ contains
        BY= BY+BTY
 
     ENDIF
-
+!!!!!!!!!!!!!!!!!
+    !bx=-bx/(one+EL%P%B0*X(1))
+    !by=by/(one+EL%P%B0*X(1))
+    !call print(bx,6)
+    !pause 2341
+    !call print(by,6)
+    !pause 2342
+!!!!!!!!!!!!!!
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
     IF(.NOT.EL%DRIFTKICK) THEN
@@ -10815,7 +10826,6 @@ contains
     CASE(6)
 
        call rk6_cav(z0,d1,el,X,k)
-       write(16,*) x(1:2)
     CASE DEFAULT
        w_p=0
        w_p%nc=1
@@ -13258,11 +13268,12 @@ contains
 
   END SUBROUTINE ZEROP_HE22
 
-  SUBROUTINE computeR_f4(EL,X,Z,DA2,B,A,int_ax_dy,int_aY_dX)
+  SUBROUTINE computeR_f4(EL,X,Z,DA2,B,A,d,int_ax_dy,int_aY_dX)
     IMPLICIT NONE
     TYPE(HELICAL_DIPOLE), INTENT(INOUT)::EL
     real(dp),  INTENT(IN)::X(6),Z
     real(dp), OPTIONAL, INTENT(INOUT)::DA2(2),B(3),A(2),int_ax_dy,int_aY_dX
+    real(dp), OPTIONAL, INTENT(INOUT)::d(3,3)
     REAL(DP) R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si,F,FR,DA(3,3)
     REAL(DP) x1,y1,k
     real(dp) int_x2_f_by_x_dy,int_y2_f_by_y_dx,int_f
@@ -13282,36 +13293,36 @@ contains
     CO=COS(PHASE)
     SI=SIN(PHASE)
     PHIR=EL%BN(1)*X(1)*SI +EL%AN(1)*X(3)*CO
-    AR=k*F*PHIR
+    AR=-k*F*PHIR
     IF(PRESENT(A)) THEN
        A(1)=X(1)*AR
        A(2)=X(3)*AR
     ENDIF
 
-    IF(PRESENT(B)) THEN
-       DA(1,1)=k*F*(EL%BN(1)*X(1)*SI +PHIR) &
-            +X(1)**2*k*PHIR*DFR
-       DA(1,2)=k*F*(EL%AN(1)*X(1)*CO ) &
-            +X(1)*X(3)*k*PHIR*DFR
-       DA(2,1)=k*F*(EL%BN(1)*X(1)*SI ) &
-            +X(1)*X(3)*k*PHIR*DFR
-       DA(2,2)=k*F*(EL%AN(1)*X(3)*CO +PHIR) &
-            +X(3)**2*k*PHIR*DFR
+    IF(PRESENT(B).or.present(d)) THEN
+       da=zero
+       DA(1,1)=-k*F*(EL%BN(1)*X(1)*SI +PHIR) &
+            -X(1)**2*k*PHIR*DFR
+       DA(1,2)=-k*F*(EL%AN(1)*X(1)*CO ) &
+            -X(1)*X(3)*k*PHIR*DFR        !!!
+       DA(2,1)=-k*F*(EL%BN(1)*X(3)*SI ) &    !!!! x(3)
+            -X(1)*X(3)*k*PHIR*DFR
+       DA(2,2)=-k*F*(EL%AN(1)*X(3)*CO +PHIR) &
+            -X(3)**2*k*PHIR*DFR
        PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
 
-       DA(1,3)=-k**2*PHIZ*F*X(1)
-       DA(2,3)=-k**2*PHIZ*F*X(3)
+       DA(1,3)=k**2*PHIZ*F*X(1)
+       DA(2,3)=k**2*PHIZ*F*X(3)
 
        DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
        DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
+       if(present(d)) d=da
     ENDIF
-    IF(PRESENT(DA2)) THEN
+    IF(PRESENT(DA2)) THEN  !!
        PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
 
        DA2(1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
        DA2(2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
-       DA2(1)=DA2(1)
-       DA2(2)=DA2(2)
     ENDIF
 
     IF(PRESENT(B)) THEN
@@ -13330,25 +13341,26 @@ contains
        int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_x2_f_by_x_dy=(x1**3*(140*k**4*Y1**3+1680*k**2*Y1)+84*k**4*x1**5*Y1)/20160.0_dp
        int_ax_dy=k*EL%BN(1)*SI*int_x2_f_by_x_dy+ k*EL%AN(1)*CO*(int_f+Y1**2*F)
-       int_ax_dy=int_ax_dy
+       int_ax_dy=-int_ax_dy
     endif
     if(present(int_aY_dX)) then
        int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_y2_f_by_y_dx=(84*k**4*x1*Y1**5+(140*k**4*x1**3+1680*k**2*x1)*Y1**3)/20160.0_dp
        int_aY_dX=k*EL%BN(1)*SI*(int_f+x1**2*F) + k*EL%AN(1)*CO*int_y2_f_by_y_dx
-       int_aY_dX=int_aY_dX
+       int_aY_dX=-int_aY_dX
     endif
   END SUBROUTINE computeR_f4
 
-  SUBROUTINE computeP_f4(EL,X,Z,DA2,B,A,int_ax_dy,int_aY_dX)
+  SUBROUTINE computeP_f4(EL,X,Z,DA2,B,A,d,int_ax_dy,int_aY_dX)
     IMPLICIT NONE
     TYPE(HELICAL_DIPOLEP), INTENT(INOUT)::EL
     type(real_8),  INTENT(IN)::X(6),Z
     type(real_8), OPTIONAL, INTENT(INOUT):: DA2(2),B(3),A(2),int_ax_dy,int_aY_dX
     type(real_8)  R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si
+    type(real_8), OPTIONAL, INTENT(INOUT):: d(3,3)
     type(real_8) x1,y1,k,F,FR,DA(3,3)
     type(real_8) int_x2_f_by_x_dy,int_y2_f_by_y_dx,int_f
-    INTEGER I
+    INTEGER I,j,kk
 
     call alloc(R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si)
     call alloc(x1,y1,k,F,FR )
@@ -13368,45 +13380,54 @@ contains
     CO=COS(PHASE)
     SI=SIN(PHASE)
     PHIR=EL%BN(1)*X(1)*SI +EL%AN(1)*X(3)*CO
-    AR=k*F*PHIR
+    AR=-k*F*PHIR
     IF(PRESENT(A)) THEN
        A(1)=X(1)*AR
        A(2)=X(3)*AR
     ENDIF
 
-    IF(PRESENT(B)) THEN
-       CALL ALLOC_33(DA)
-       DA(1,1)=k*F*(EL%BN(1)*X(1)*SI +PHIR) &
-            +X(1)**2*k*PHIR*DFR
-       DA(1,2)=k*F*(EL%AN(1)*X(1)*CO ) &
-            +X(1)*X(3)*k*PHIR*DFR
-       DA(2,1)=k*F*(EL%BN(1)*X(1)*SI ) &
-            +X(1)*X(3)*k*PHIR*DFR
-       DA(2,2)=k*F*(EL%AN(1)*X(3)*CO +PHIR) &
-            +X(3)**2*k*PHIR*DFR
+    IF(PRESENT(B).or.present(d)) THEN
+       do j=1,3
+          do kk=1,3
+             call alloc(da(j,kk))
+          enddo
+       enddo
+       DA(1,1)=-k*F*(EL%BN(1)*X(1)*SI +PHIR) &
+            -X(1)**2*k*PHIR*DFR
+       DA(1,2)=-k*F*(EL%AN(1)*X(1)*CO ) &
+            -X(1)*X(3)*k*PHIR*DFR        !!!
+       DA(2,1)=-k*F*(EL%BN(1)*X(3)*SI ) &    !!!! x(3)
+            -X(1)*X(3)*k*PHIR*DFR
+       DA(2,2)=-k*F*(EL%AN(1)*X(3)*CO +PHIR) &
+            -X(3)**2*k*PHIR*DFR
        PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
 
-       DA(1,3)=-k**2*PHIZ*F*X(1)
-       DA(2,3)=-k**2*PHIZ*F*X(3)
+       DA(1,3)=k**2*PHIZ*F*X(1)
+       DA(2,3)=k**2*PHIZ*F*X(3)
 
        DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
        DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
-    ENDIF
 
-    IF(PRESENT(DA2)) THEN
+       do j=1,3
+          do kk=1,3
+             if(present(d)) d(j,kk)=da(j,kk)
+             call kill(da(j,kk))
+          enddo
+       enddo
+
+    ENDIF
+    IF(PRESENT(DA2)) THEN  !!
        PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
 
        DA2(1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
        DA2(2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
     ENDIF
-    IF(PRESENT(B)) THEN
 
+    IF(PRESENT(B)) THEN
        B(1)=DA(3,2)-DA(2,3)
        B(2)=DA(1,3)-DA(3,1)
        B(3)=DA(2,1)-DA(1,2)
-       CALL KILL_33(DA)
     ENDIF
-
     !int_x2_f_by_x= (x1**3*(35*k**4*Y1**4+840*k**2*Y1**2+6720)+x1**5*(42*k**4*Y1**2+504 &
     !            *k**2)+15*k**4*x1**7)/20160.0_dp
 
@@ -13418,13 +13439,13 @@ contains
        int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_x2_f_by_x_dy=(x1**3*(140*k**4*Y1**3+1680*k**2*Y1)+84*k**4*x1**5*Y1)/20160.0_dp
        int_ax_dy=k*EL%BN(1)*SI*int_x2_f_by_x_dy+ k*EL%AN(1)*CO*(int_f+Y1**2*F)
-       int_ax_dy=int_ax_dy
+       int_ax_dy=-int_ax_dy
     endif
     if(present(int_aY_dX)) then
        int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_y2_f_by_y_dx=(84*k**4*x1*Y1**5+(140*k**4*x1**3+1680*k**2*x1)*Y1**3)/20160.0_dp
        int_aY_dX=k*EL%BN(1)*SI*(int_f+x1**2*F) + k*EL%AN(1)*CO*int_y2_f_by_y_dx
-       int_aY_dX=int_aY_dX
+       int_aY_dX=-int_aY_dX
     endif
 
 
@@ -13494,9 +13515,9 @@ contains
        Z=Z+EL%P%DIR*DH
        CALL DRIFT(EL,DH,Z,1,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
-       CALL KICKPATH(EL,DH,X,K)
+       CALL KICKPATH(EL,DH,Z,X,K)
        CALL KICK_HE(EL,D,Z,X,K)
-       CALL KICKPATH(EL,DH,X,K)
+       CALL KICKPATH(EL,DH,Z,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
        CALL DRIFT(EL,DH,Z,1,X,K)
        !       Z=Z+EL%P%DIR*DH
@@ -13517,25 +13538,25 @@ contains
        Z=Z+EL%P%DIR*D1
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL KICK_HE(EL,DK1,Z,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
        Z=Z+EL%P%DIR*(D1+D2)
        CALL DRIFT(EL,D2,Z,1,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
-       CALL KICKPATH(EL,D2,X,K)
+       CALL KICKPATH(EL,D2,Z,X,K)
        CALL KICK_HE(EL,DK2,Z,X,K)
-       CALL KICKPATH(EL,D2,X,K)
+       CALL KICKPATH(EL,D2,Z,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
        CALL DRIFT(EL,D2,Z,1,X,K)
        Z=Z+EL%P%DIR*(D1+D2)
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL KICK_HE(EL,DK1,Z,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
 
@@ -13554,9 +13575,9 @@ contains
           Z=Z+EL%P%DIR*DF(J)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL KICK_HE(EL,DK(J),Z,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           Z=Z+EL%P%DIR*DF(J)
@@ -13565,9 +13586,9 @@ contains
           Z=Z+EL%P%DIR*DF(J)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL KICK_HE(EL,DK(J),Z,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           Z=Z+EL%P%DIR*DF(J)
@@ -13611,9 +13632,9 @@ contains
        Z=Z+EL%P%DIR*DH
        CALL DRIFT(EL,DH,Z,1,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
-       CALL KICKPATH(EL,DH,X,K)
+       CALL KICKPATH(EL,DH,Z,X,K)
        CALL KICK_HE(EL,D,Z,X,K)
-       CALL KICKPATH(EL,DH,X,K)
+       CALL KICKPATH(EL,DH,Z,X,K)
        CALL DRIFT(EL,DH,Z,2,X,K)
        CALL DRIFT(EL,DH,Z,1,X,K)
        !       Z=Z+EL%P%DIR*DH
@@ -13634,25 +13655,25 @@ contains
        Z=Z+EL%P%DIR*D1
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL KICK_HE(EL,DK1,Z,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
        Z=Z+EL%P%DIR*(D1+D2)
        CALL DRIFT(EL,D2,Z,1,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
-       CALL KICKPATH(EL,D2,X,K)
+       CALL KICKPATH(EL,D2,Z,X,K)
        CALL KICK_HE(EL,DK2,Z,X,K)
-       CALL KICKPATH(EL,D2,X,K)
+       CALL KICKPATH(EL,D2,Z,X,K)
        CALL DRIFT(EL,D2,Z,2,X,K)
        CALL DRIFT(EL,D2,Z,1,X,K)
        Z=Z+EL%P%DIR*(D1+D2)
        CALL DRIFT(EL,D1,Z,1,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL KICK_HE(EL,DK1,Z,X,K)
-       CALL KICKPATH(EL,D1,X,K)
+       CALL KICKPATH(EL,D1,Z,X,K)
        CALL DRIFT(EL,D1,Z,2,X,K)
        CALL DRIFT(EL,D1,Z,1,X,K)
 
@@ -13671,9 +13692,9 @@ contains
           Z=Z+EL%P%DIR*DF(J)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL KICK_HE(EL,DK(J),Z,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           Z=Z+EL%P%DIR*DF(J)
@@ -13682,9 +13703,9 @@ contains
           Z=Z+EL%P%DIR*DF(J)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL KICK_HE(EL,DK(J),Z,X,K)
-          CALL KICKPATH(EL,DF(J),X,K)
+          CALL KICKPATH(EL,DF(J),Z,X,K)
           CALL DRIFT(EL,DF(J),Z,2,X,K)
           CALL DRIFT(EL,DF(J),Z,1,X,K)
           Z=Z+EL%P%DIR*DF(J)
@@ -13738,16 +13759,28 @@ contains
 
 
   END SUBROUTINE INTP_HE_TOT
-
-  SUBROUTINE KICKPATHR_HE(EL,L,X,k)
+  ! ETIENNE
+  SUBROUTINE KICKPATHR_HE(EL,L,Z,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
-    real(dp),INTENT(IN):: L
+    real(dp),INTENT(IN):: L,Z
     real(dp) PZ,PZ0,DPZ
+    real(dp) A(3),int_ax_dy !,int_aY_dX
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
+    !     CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
+    !      X(2)=X(2)-el%p%charge*A(1)
+    !      X(4)=X(4)-el%p%charge*int_ax_dy
+    !      CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
+    !       X(2)=X(2)+el%p%charge*A(1)
+    !       X(4)=X(4)+el%p%charge*int_ax_dy
+
     IF(EL%P%EXACT) THEN
+       ! CALL compute_f4(EL,X,Z,A=A)    !,int_ax_dy=int_ax_dy)
+       !  X(2)=X(2)-el%p%charge*A(1)
+       !  X(4)=X(4)-el%p%charge*A(2)
+
        if(k%TIME) then
           PZ=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
@@ -13765,6 +13798,9 @@ contains
           X(3)=X(3)+L*X(4)*DPZ
           X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/TWO)+(k%TOTALPATH-1)*L
        endif
+       !      CALL compute_f4(EL,X,Z,A=A) !,int_ax_dy=int_ax_dy)
+       !       X(2)=X(2)+el%p%charge*A(1)
+       !       X(4)=X(4)+el%p%charge*A(2)
     ELSE
        if(k%TIME) then
           PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
@@ -13776,16 +13812,120 @@ contains
 
   END SUBROUTINE KICKPATHR_HE
 
-  SUBROUTINE KICKPATHP_HE(EL,L,X,k)
+  SUBROUTINE KICKPATHR_HE_exact_nonsymp(EL,L,Z,X,k)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
+    real(dp),INTENT(IN):: L,Z
+    real(dp) PZ
+    real(dp) A(3),da(3,3),int_ax_dy !,int_aY_dX
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
+    ! ETIENNE
+
+    IF(EL%P%EXACT) THEN
+       CALL compute_f4(EL,X,Z,A=A,d=da)    !,int_ax_dy=int_ax_dy)
+       X(2)=X(2) -el%p%charge*A(1)
+       X(4)=X(4) -el%p%charge*A(2)
+       if(k%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+L*X(2)/PZ
+          X(3)=X(3)+L*X(4)/PZ
+          ! multiply by el%p%charge forgotten
+          X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
+          X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
+          X(6)=X(6)+L*(one/EL%P%BETA0+X(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+       else
+          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+L*X(2)/PZ
+          X(3)=X(3)+L*X(4)/PZ
+          X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
+          X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
+          X(6)=X(6)+L*(one+X(5))/PZ+(k%TOTALPATH-1)*L
+       endif
+       !      CALL compute_f4(EL,X,Z,A=A) !,int_ax_dy=int_ax_dy)
+       X(2)=X(2) +el%p%charge*A(1)
+       X(4)=X(4) +el%p%charge*A(2)
+    ELSE
+       if(k%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
+          X(6)=X(6)+L*(one/EL%P%BETA0+x(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+       else
+          X(6)=X(6)+k%TOTALPATH*L
+       endif
+    ENDIF
+
+
+  END SUBROUTINE KICKPATHR_HE_exact_nonsymp
+
+  SUBROUTINE KICKPATHP_HE_exact_nonsymp(EL,L,Z,X,k)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(HELICAL_DIPOLEP),INTENT(INOUT):: EL
-    TYPE(REAL_8),INTENT(IN):: L
+    TYPE(REAL_8),INTENT(IN):: L,Z
+    TYPE(REAL_8) PZ,da(3,3),a(3)
+    TYPE(INTERNAL_STATE),OPTIONAL :: K
+    integer j,kk
+    ! ETIENNE
+    CALL ALLOC(PZ)
+    IF(EL%P%EXACT) THEN
+       CALL ALLOC(PZ)
+       do j=1,3
+          do kk=1,3
+             call alloc(da(j,kk))
+          enddo
+       enddo
+       call alloc(a)
+       CALL compute_f4(EL,X,Z,A=A,d=da)    !,int_ax_dy=int_ax_dy)
+       X(2)=X(2) -el%p%charge*A(1)
+       X(4)=X(4) -el%p%charge*A(2)
+       if(k%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+L*X(2)/PZ
+          X(3)=X(3)+L*X(4)/PZ
+          ! multiply by el%p%charge forgotten
+          X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
+          X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
+          X(6)=X(6)+L*(one/EL%P%BETA0+X(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+       else
+          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+L*X(2)/PZ
+          X(3)=X(3)+L*X(4)/PZ
+          X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
+          X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
+          X(6)=X(6)+L*(one+X(5))/PZ+(k%TOTALPATH-1)*L
+       endif
+       do j=1,3
+          do kk=1,3
+             call kill(da(j,kk))
+          enddo
+       enddo
+       !      CALL compute_f4(EL,X,Z,A=A) !,int_ax_dy=int_ax_dy)
+       X(2)=X(2) +el%p%charge*A(1)
+       X(4)=X(4) +el%p%charge*A(2)
+       call kill(a)
+    ELSE
+       if(k%TIME) then
+          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
+          X(6)=X(6)+L*(one/EL%P%BETA0+x(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+       else
+          X(6)=X(6)+k%TOTALPATH*L
+       endif
+    ENDIF
+    CALL KILL(PZ)
+
+
+  END SUBROUTINE KICKPATHP_HE_exact_nonsymp
+
+  SUBROUTINE KICKPATHP_HE(EL,L,Z,X,k)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(HELICAL_DIPOLEP),INTENT(INOUT):: EL
+    TYPE(REAL_8),INTENT(IN):: L,Z
     TYPE(REAL_8) PZ,PZ0,DPZ
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
+    CALL ALLOC(PZ,PZ0,DPZ)
     IF(EL%P%EXACT) THEN
-       CALL ALLOC(PZ,PZ0,DPZ)
        if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
@@ -13803,7 +13943,6 @@ contains
           X(3)=X(3)+L*X(4)*DPZ
           X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/TWO)+(k%TOTALPATH-1)*L
        endif
-       CALL KILL(PZ,PZ0,DPZ)
     ELSE
        if(k%TIME) then
           PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
@@ -13812,6 +13951,7 @@ contains
           X(6)=X(6)+k%TOTALPATH*L
        endif
     ENDIF
+    CALL KILL(PZ,PZ0,DPZ)
 
 
   END SUBROUTINE KICKPATHP_HE
@@ -13825,6 +13965,7 @@ contains
     real(dp) PZ,A(3),int_ax_dy,int_aY_dX
     TYPE(INTERNAL_STATE) K
     !DRIFT(EL,DH,Z,1,X,K)
+    if(el%p%exact) return
     IF(PLANE==1) THEN
        CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
        X(2)=X(2)-el%p%charge*A(1)
@@ -13866,6 +14007,8 @@ contains
     INTEGER, INTENT(IN)::PLANE
     TYPE(REAL_8) PZ,A(3),int_ax_dy,int_aY_dX
     TYPE(INTERNAL_STATE) K
+    if(el%p%exact) return
+
     CALL ALLOC(PZ,int_ax_dy,int_aY_dX)
     CALL ALLOC(A,3)
     IF(PLANE==1) THEN

@@ -3170,11 +3170,9 @@ CONTAINS
 
     w_p=0
     w_p%nc=3
-    w_p%c(1)=" You are using a kind(one) "
-    w_p%c(2)=" set real_warning to false to permit this "
-    w_p%c(3)=" write 1 to continue or -1 for a crash "
-    w_p%fc='(3((1X,A60),/))'
-    CALL WRITE_E
+    write(6,*) " You are using a kind(one) "
+    write(6,*)" set real_warning to false to permit this "
+    write(6,*)" write 1 to continue or -1 for a crash "
     call read(j)
     i(j)=0
     real_warning=.false.

@@ -8,7 +8,8 @@ module lielib_berz
   use dabnew
   use precision_constants
   implicit none
-  private
+  public
+  !  private
   PUBLIC DLIE,FILT,DFILT,XGAM,XGBM,REXT  !,FILTRES
   PUBLIC LIEPEEK,INITPERT,HYPER,MAPFLOL
   PUBLIC ETALL1,TAKE,ETALL,DAPEK0,ETINI,DACLRD,DACOPD,DIFD
@@ -17,19 +18,26 @@ module lielib_berz
   PUBLIC FLOFACG,FLOFAC,DACMUD,CTORFLO,RTOCFLO,CTOR,RTOC,ETPIN
   PUBLIC LIEINIT,PERTPEEK,FLOWPARA,COMCFU
   PUBLIC DAPOK0,FACFLO,EXPFLOD,gofix
+  public getcct,GETINV,gtrx,eig6
+  private respoke
+  private lienot,etallnom,etppulnv,etmtree,etppush,etppush2,ppushlnv,simil
+  private dapokzer,davar0,taked,daread,daprid,daflo,daflod,fexpo,etcom,etpoi
+  private exp1d,expnd2,liefact,mapnorm,orderflo,nuanaflo,h2pluflo,rotflo,rotiflo
+  private ctord,rtocd,resvec,reelflo,compcjg,midbflo,mulnd2,movearou,movemul,cpart
+  private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3
   integer,public,parameter::ndim=3,nreso=20
   integer,public::no,nv,nd,nd2,ndpt
-  integer ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
-  integer,dimension(ndim)::nplane,idsta,ista
-  real(dp),dimension(0:20)::xintex
-  real(dp),dimension(ndim)::dsta,sta,angle,rad,ps,rads
-  real(dp),dimension(ndim,nreso)::mx
+  integer, private :: ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
+  integer, private,dimension(ndim)::nplane,idsta,ista
+  real(dp), private,dimension(0:20)::xintex
+  real(dp), private,dimension(ndim)::dsta,sta,angle,rad,ps,rads
+  real(dp), private,dimension(ndim,nreso)::mx
   !real(dp),private::epsplane
   !real(dp),private,dimension(ndim)::xplane
   !integer,public,parameter::ndim2=2*ndim,ntt=40
-  integer,private,parameter::ndim2=2*ndim,ntt=100
-  character(120) line
-  public getcct,GETINV,gtrx,eig6
+  integer,private,parameter::ndim2=2*ndim,ntt=lnv    ! joahn 2008
+  !  integer,private,parameter::ndim2=2*ndim,ntt=100
+  character(120), private :: line
 contains
 
   subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
@@ -534,7 +542,6 @@ contains
     integer,dimension(ntt)::ie1,ie2,iv1,iv2
     integer,dimension(:)::x,y
     if(.not.c_%stable_da) return
-
     nt=nv-nd2
     if(nt.gt.0) then
        do i=1,nt
@@ -606,6 +613,7 @@ contains
     integer,dimension(ntt)::ie1,ie2,iv1,iv2
     integer,dimension(:)::x,y
     if(.not.c_%stable_da) return
+
 
     nt=nv-n
     if(nt.gt.0) then

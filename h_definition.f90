@@ -22,7 +22,7 @@ module definition
   !  complex(dp)  :: i_ = (zero,one)    ! cmplx(zero,one,kind=dp)
   complex(dp), parameter :: i_ = ( 0.0_dp,1.0_dp )    ! cmplx(zero,one,kind=dp)
   integer master
-  integer,parameter::lnv=100
+  !  integer,parameter::lnv=100
   !  scratch variables
   INTEGER iassdoluser(ndumt)
   integer DUMMY,temp
@@ -254,13 +254,14 @@ module definition
   type damapspin
      !   REAL(DP) X(6)
      type(damap) M
-     type(real_8) s(3,3)
+     !   type(real_8) s(3,3)
+     type(taylor) s(3,3)
   end type damapspin
 
   type normal_spin
      type(normalform) N
-     type(real_8) NS(3,3)
-     type(real_8) AS(3,3)
+     type(taylor) NS(3,3)
+     type(taylor) AS(3,3)
      real(dp) tune
      type(damapspin) a_t
      integer NRES,M(NDIM)

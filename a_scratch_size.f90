@@ -75,7 +75,8 @@ module precision_constants
   real(dp),parameter::A_ELECTRON=1.159652e-3_dp
   real(dp),parameter::A_MUON=1.165923e-3_dp
   real(dp),parameter::A_PROTON=1.7928474e-0_dp
-  real(dp),parameter::A_particle=A_ELECTRON
+  real(dp),parameter:: pmaMUON = 105.658369E-3_DP
+  real(dp) :: A_particle = A_ELECTRON
   real(dp),parameter::pmae=5.10998902e-4_dp
   real(dp),parameter::pmae_amu=5.48579903e-4_dp
   ![GeV]
@@ -782,10 +783,10 @@ CONTAINS
     enddo
   END SUBROUTINE ZEROFILE
 
-  SUBROUTINE KanalNummer(iff)
+  SUBROUTINE KanalNummer(iff,file)
     implicit none
     integer, INTENT(OUT) :: iff
-
+    character(*),optional :: file
     logical :: opened, exists
     integer :: i
 
@@ -798,6 +799,10 @@ CONTAINS
     STOP
 20  CONTINUE
     iff= I
+
+    if(present(file)) then
+       open(unit=iff,file=file)
+    endif
   END SUBROUTINE KanalNummer
 
   SUBROUTINE ReportOpenFiles

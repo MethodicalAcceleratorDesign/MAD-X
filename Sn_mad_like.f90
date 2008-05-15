@@ -2406,6 +2406,7 @@ CONTAINS
        nullify(S22%GAMBET);allocate(s22%GAMBET);
        !       nullify(S22%P0C);allocate(s22%P0C);
        nullify(S22%MASS);allocate(s22%MASS);
+       nullify(S22%ag);allocate(s22%ag);
        nullify(S22%CHARGE);allocate(s22%CHARGE);
        !     111 CONTINUE  ! SAGAN CHECK MEMORY
     ENDIF
@@ -2700,6 +2701,7 @@ CONTAINS
     S22%gamma0I=gamma0I
     S22%gambet=gambet
     S22%MASS=mc2
+    S22%ag=a_particle
     S22%CHARGE=INITIAL_CHARGE
 
     IF(.NOT.MADX) THEN

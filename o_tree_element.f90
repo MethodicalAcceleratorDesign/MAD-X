@@ -2,7 +2,7 @@
 !Copyright (C) Etienne Forest
 
 module tree_element_MODULE
-  USE polymorphic_complextaylor
+  USE polymorphic_complextaylor, mon1=>mon
   IMPLICIT NONE
   public
 
@@ -23,8 +23,10 @@ module tree_element_MODULE
   !  private smatp,smatmulp
   private exp_n_thetar,exp_n_thetap,inv_asr,inv_asp !,inv_as
   PRIVATE EQUAL_DAmapSPIN_int,daddsc,scdadd,EQUAL_PROBE8_PROBE8,PRINT_probe8
-  PRIVATE concat,assmap,EQUAL_damapspin,CUTORDER,assprobe_8
-
+  PRIVATE concat,assmap,EQUAL_damapspin,CUTORDER,assprobe_8,POWMAP
+  private read_probe8,ALLOC_33t,ALLOC_33p,KILL_33t,KILL_33p
+  private purge_transverse,norm_matsr,norm_matsp
+  private get_spin_nx_r,get_spin_nx_t
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL_IDENTITY_RAY_8
@@ -49,6 +51,10 @@ module tree_element_MODULE
   end  INTERFACE
   INTERFACE OPERATOR (*)
      MODULE PROCEDURE concat
+  END  INTERFACE
+
+  INTERFACE OPERATOR (**)
+     MODULE PROCEDURE POWMAP
   END  INTERFACE
 
   INTERFACE OPERATOR (.cut.)
@@ -80,6 +86,11 @@ module tree_element_MODULE
      MODULE PROCEDURE find_ap
   END INTERFACE
 
+  INTERFACE norm_mats
+     MODULE PROCEDURE norm_matsr
+     MODULE PROCEDURE norm_matsp
+  END INTERFACE
+
   INTERFACE norm_mat
      MODULE PROCEDURE norm_matr
      MODULE PROCEDURE norm_matp
@@ -95,6 +106,12 @@ module tree_element_MODULE
      MODULE PROCEDURE inv_asp
   END INTERFACE
 
+  INTERFACE get_spin_nx
+     MODULE PROCEDURE get_spin_nx_r
+     MODULE PROCEDURE get_spin_nx_t
+  END INTERFACE
+
+
   INTERFACE PRINT
      MODULE PROCEDURE PRINT_DASPIN
      MODULE PROCEDURE PRINT_probe8
@@ -102,6 +119,7 @@ module tree_element_MODULE
 
   INTERFACE READ
      MODULE PROCEDURE READ_DASPIN
+     MODULE PROCEDURE read_probe8   ! a bit illegal : reading polymorphs as taylor...
   END INTERFACE
 
   INTERFACE ALLOC
@@ -118,6 +136,15 @@ module tree_element_MODULE
      MODULE PROCEDURE KILL_normal_spin
   END INTERFACE
 
+  INTERFACE ALLOC_33
+     MODULE PROCEDURE ALLOC_33t
+     MODULE PROCEDURE ALLOC_33p
+  END INTERFACE
+
+  INTERFACE KILL_33
+     MODULE PROCEDURE KILL_33t
+     MODULE PROCEDURE KILL_33p
+  END INTERFACE
 
   INTERFACE track
      MODULE PROCEDURE track_TREE
@@ -668,10 +695,10 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          call ass0(s1%s(i,j)%t)
-          s1%s(i,j)%alloc=my_true
-          s1%s(i,j)%kind=2
-          s1%s(i,j)%i=0
+          call ass0(s1%s(i,j))
+          !       s1%s(i,j)%alloc=my_true
+          !       s1%s(i,j)%kind=2
+          !       s1%s(i,j)%i=0
        enddo
     enddo
     do i=1,c_%nd2
@@ -716,56 +743,6 @@ CONTAINS
 
 
 
-  FUNCTION concat(S2,S1)
-    implicit none
-    TYPE (damapspin) concat,t2
-    TYPE (damapspin), INTENT (IN) :: S1, S2
-    integer i,j,k
-    integer localmaster
-    type(real_8) s(3,3)
-
-
-    IF(.NOT.C_%STABLE_DA) RETURN
-    localmaster=master
-
-    call ass(concat)
-    call alloc(t2);
-    call alloc_33(s);
-
-    t2=s2
-    concat=s2
-
-    do i=1,3
-       do j=1,3
-          if(s2%s(i,j)%kind==2) then
-             t2%s(i,j)=s2%s(i,j)%t*s1%m
-          else
-             t2%s(i,j)=s2%s(i,j)
-          endif
-       enddo
-    enddo
-
-    concat%m=s2%m*s1%m
-
-    !    do i=1,6
-    !     concat%x(i)=s2%x(i)
-    !    enddo
-
-    do i=1,3
-       do j=1,3
-          do k=1,3
-             s(i,j)= t2%s(i,k)*s1%s(k,j)+ s(i,j)
-          enddo
-       enddo
-    enddo
-    call smatp(one,s,concat%s)
-
-    call kill_33(s);
-    call kill(t2);
-    master=localmaster
-
-  END FUNCTION concat
-
 
   FUNCTION CUTORDER( S1, S2 )
     implicit none
@@ -807,9 +784,9 @@ CONTAINS
     do i=1,3
        do j=1,3
           s%s(i,j)=t%s(j,i)
-          if(s%s(i,j)%kind==2) then
-             s%s(i,j)=s%s(i,j)%t*s%m
-          endif
+          !          if(s%s(i,j)%kind==2) then
+          s%s(i,j)=s%s(i,j)*s%m
+          !          endif
        enddo
     enddo
 
@@ -1061,21 +1038,37 @@ CONTAINS
     implicit none
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damapspin), INTENT(INOUT) :: DS
+    type(gmap) g
     INTEGER I,J
+    ! if(C_%ND2/=6) then
+    !  write(6,*) " not implemented in EQUAL_DASPIN_RAY8"
+    !  stop
+    ! endif
+    call alloc(g)
+    do i=1,C_%ND2
+       g%v(i)=one.mono.i
+    enddo
 
-    !     DO I=1,6
-    !      DS%X(I)=R%X(I)
-    !     ENDDO
+    do i=C_%SPIN_POS+3,C_%nv
+       g%v(i)=one.mono.(i-3)
+    enddo
+    do i=C_%nv-2,c_%NV
+       g%v(C_%SPIN_POS+I-C_%nv+2)=one.mono.i
+    enddo
 
     DO I=1,C_%ND2
        DS%M%V(I)=R%X(I)
+       DS%M%V(I)=DS%M%V(I)*G
     ENDDO
 
     DO I=1,3
        DO J=1,3
-          DS%S(I,J)=(R%S%X(I)%T).D.(C_%SPIN_POS+J-1)
+          DS%S(I,J)=((R%S%X(I)%T).D.(C_%SPIN_POS+J-1))*G
        ENDDO
     ENDDO
+
+    call kill(g)
+
     !     DS%G=R%S%G
   END subroutine EQUAL_DASPIN_RAY8
 
@@ -1084,20 +1077,52 @@ CONTAINS
     TYPE(probe_8), INTENT(INOUT) :: R
     TYPE(damapspin), INTENT(IN) :: DS
     INTEGER I,J
+    type(taylor) d
+    type(gmap) g
 
-    !     DO I=1,6
-    !      R%X(I)=DS%X(I)
-    !     ENDDO
+    !  if(C_%ND2/=6) then
+    !       write(6,*) " not implemented in EQUAL_DASPIN_RAY8"
+    !       stop
+    !      endif
+
+    call alloc(g)
+    call alloc(d)
+
+    call alloc(g)
+    do i=1,C_%ND2
+       g%v(i)=one.mono.i
+    enddo
+
+    do i=C_%SPIN_POS+3,C_%nv
+       g%v(i)=one.mono.(i-3)
+    enddo
+    do i=C_%nv-2,c_%NV
+       g%v(C_%SPIN_POS+I-C_%nv+2)=one.mono.i
+    enddo
+    g=g**(-1)
 
     DO I=1,C_%ND2
        R%X(I)= MORPH(DS%M%V(I))+R%X(I)
     ENDDO
 
+
     DO I=1,3
        DO J=1,3
-          R%S%X(I)=DS%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))
+          d=DS%S(I,J)*g
+          !       call print(DS%S(I,J),6)
+          !       call print(d,6)
+          R%S%X(I)=morph(d*(ONE.MONO.(C_%SPIN_POS+J-1)))+R%S%X(I)
        ENDDO
     ENDDO
+
+    DO I=1,C_%ND2
+       R%X(I)%t=R%X(I)%t*g
+    ENDDO
+
+
+
+    call kill(d)
+    call kill(g)
 
     !    R%S%G=DS%G
 
@@ -1132,52 +1157,55 @@ CONTAINS
     TYPE (damapspin), INTENT (IN) :: S1
     type(probe) , INTENT (IN) :: S2
     integer localmaster,iia(4),ico(4),nd2,i,j
-    type(real_8) d
+    type(taylor) d
+    TYPE (probe_8) ds1
+    call alloc(ds1)
+
+    ds1=s1
 
 
     call liepeek(iia,ico)
     nd2=iia(4)
-    call ass(scdadd)
+    !   call ass(scdadd)
     scdadd%u=my_false
     scdadd%E_ij=zero
 
+    call alloc(d)
     do i=1,nd2
-       !       localmaster=master
-       !       call ass(scdadd%x(i))
-       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       !       master=localmaster
+       localmaster=master
+       call ass(scdadd%x(i))
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       scdadd%x(i)=ds1%x(i)+s2%x(i)
+       master=localmaster
     enddo
     do i=nd2+1,6
-       !       localmaster=master
-       !       call ass(scdadd%x(i))
+       localmaster=master
+       call ass(scdadd%x(i))
        if(nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
           scdadd%x(i)=s2%x(i)+(one.mono.'00001')
        else
           scdadd%x(i)=s2%x(i)
        endif
-       !       master=localmaster
+       master=localmaster
     enddo
 
 
     if(C_%SPIN_POS/=0) then
        DO I=1,3
           localmaster=master
-          !       call ass(scdadd%s%x(i))
-          scdadd%s%x(i)=S2%s%x(i)
+          call ass(scdadd%s%x(i))
+          d=S2%s%x(i)
           DO J=1,3
-             scdadd%s%x(i)=S1%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))+scdadd%s%x(i)
+             d=S1%S(I,J)*(ONE.MONO.(C_%SPIN_POS+J-1))+d
           ENDDO
-          !       master=localmaster
+          scdadd%s%x(i)=d
+          !         scdadd%s%x(i)=ds1%s%x(i)
+          master=localmaster
        ENDDO
     endif
 
-    call alloc(d)
-    !       d=sqrt(scdadd%s%x(1)**2+scdadd%s%x(2)**2+scdadd%s%x(3)**2)
 
-    do i=1,3
-       !     scdadd%s%x(i)=scdadd%s%x(i)/d
-    enddo
-
+    call kill(ds1)
     call kill(d)
   END FUNCTION scdadd
 
@@ -1186,55 +1214,63 @@ CONTAINS
     TYPE (probe_8) daddsc
     TYPE (damapspin), INTENT (IN) :: S1
     type(probe) , INTENT (IN) :: S2
-    integer  iia(4),ico(4),nd2,i,j
-    type(real_8) d
+    integer localmaster,iia(4),ico(4),nd2,i,j
+    type(taylor) d
+    TYPE (probe_8) ds1
+    call alloc(ds1)
 
+    ds1=s1
     call liepeek(iia,ico)
     nd2=iia(4)
-
-    call ass(daddsc)
+    !   call ass(daddsc)
     daddsc%u=my_false
     daddsc%E_ij=zero
 
+    call alloc(d)
     do i=1,nd2
-       !        localmaster=master
-       !        call ass(daddsc%x(i))
-       daddsc%x(i)=s1%m%v(i)+s2%x(i)
-       !        master=localmaster
+       localmaster=master
+       call ass(daddsc%x(i))
+       daddsc%x(i)=ds1%x(i)+s2%x(i)
+       !       daddsc%x(i)=s1%m%v(i)+s2%x(i)
+       master=localmaster
     enddo
     do i=nd2+1,6
-       !        localmaster=master
-       !        call ass(daddsc%x(i))
+       localmaster=master
+       call ass(daddsc%x(i))
        if(nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
           daddsc%x(i)=s2%x(i)+(one.mono.'00001')
        else
           daddsc%x(i)=s2%x(i)
        endif
-       !        master=localmaster
+       master=localmaster
     enddo
+
 
     if(C_%SPIN_POS/=0) then
        DO I=1,3
-          !        localmaster=master
-          !       call ass(daddsc%s%x(i))
-          daddsc%s%x(i)=S2%s%x(i)
+          localmaster=master
+          call ass(daddsc%s%x(i))
+          d=S2%s%x(i)
           DO J=1,3
-             daddsc%s%x(i)=S1%S(I,J)*MORPH(ONE.MONO.(C_%SPIN_POS+J-1))+daddsc%s%x(i)
+             d=S1%S(I,J)*(ONE.MONO.(C_%SPIN_POS+J-1))+d
           ENDDO
-          !       master=localmaster
+          daddsc%s%x(i)=d
+          !         daddsc%s%x(i)=ds1%s%x(i)
+
+          master=localmaster
        ENDDO
-
     endif
-    call alloc(d)
-    !d=sqrt(daddsc%s%x(1)**2+daddsc%x(2)**2+daddsc%s%x(3)**2)
 
-    do i=1,3
-       !  daddsc%s%x(i)=daddsc%s%x(i)/d
-    enddo
+    !      call alloc(d)
+    !       d=sqrt(daddsc%s%x(1)**2+daddsc%s%x(2)**2+daddsc%s%x(3)**2)
 
+    !       do i=1,3
+    !     daddsc%s%x(i)=daddsc%s%x(i)/d
+    !       enddo
+
+    call kill(ds1)
     call kill(d)
   END FUNCTION daddsc
-
 
 
   subroutine print_DASPIN(DS,MF)
@@ -1276,31 +1312,64 @@ CONTAINS
 
   END subroutine print_probe8
 
-  subroutine READ_DASPIN(DS,MF)
+  subroutine READ_DASPIN(DS,MF,file)
     implicit none
     TYPE(damapspin), INTENT(INOUT) :: DS
-    INTEGER MF,I,J
+    INTEGER MF1,I,J
     CHARACTER*20 LINE
+    CHARACTER(*), optional :: file
+    INTEGER, optional :: MF
     TYPE(TAYLOR) T
 
+    if(present(mf)) mf1=mf
+    if(present(file)) then
+       call kanalnummer(mf1)
+       open(unit=mf1,file=file)
+    endif
     CALL ALLOC(T)
 
     !    READ(MF,*) LINE
     !     READ(MF,*) DS%X(1:3)
     !     READ(MF,*) DS%X(4:6)
-    READ(MF,*) LINE
-    CALL READ(DS%M,MF)
-    READ(MF,*) LINE
+    READ(MF1,*) LINE
+    CALL READ(DS%M,MF1)
+    READ(MF1,*) LINE
     DO I=1,3
        DO J=1,3
-          READ(MF,*) LINE
-          CALL READ(T,MF)
+          READ(MF1,*) LINE
+          CALL READ(T,MF1)
           DS%S(I,J)=MORPH(T)
        ENDDO
     ENDDO
+    if(present(file)) close(mf1)
 
     CALL KILL(T)
   END subroutine READ_DASPIN
+
+  subroutine read_probe8(DS,MF)
+    implicit none
+    TYPE(probe_8), INTENT(INOUT) :: DS
+    INTEGER MF,I
+    character*120 line
+    type(taylor) t
+    call alloc(t)
+
+    read(mf,*) line
+    do i=1,6
+       read(mf,*) line
+       call read(t,mf)
+       ds%x(i)=morph(t)
+    enddo
+    read(mf,*) line
+    do i=1,3
+       read(mf,*) line
+       call read(t,mf)
+       ds%s%x(i)=morph(t)
+    enddo
+
+    call kill(t)
+
+  END subroutine read_probe8
 
 
 
@@ -1310,8 +1379,8 @@ CONTAINS
     TYPE(damapspin), INTENT(INout) :: DS
     real(dp) s00(3,3),tunes(4)
     integer i,j
-    type(real_8) n0(3),theta0,a(3,3),ai(3,3),s0(3,3),s0i(3,3),b(3)
-    type(real_8) s1(3,3),s1i(3,3)
+    type(taylor) n0(3),a(3,3),ai(3,3),s0(3,3),s0i(3,3),b(3),theta0
+    type(taylor) s1(3,3),s1i(3,3)
     type(damap) ri
     type(taylor) t
     type(taylorresonance) tr
@@ -1387,7 +1456,7 @@ CONTAINS
 
        do j=1,3
           !     write(6,*) i,j
-          t=(n0(j)%t).cut.c_%no
+          t=(n0(j)).cut.c_%no
           !     call print(t,6)
           !    pause
        enddo
@@ -1434,7 +1503,7 @@ CONTAINS
        do j=1,3
 
           write(6,*) "final ",i,j
-          t=s1i(i,j)%t
+          t=s1i(i,j)
           !     t=s0(i,j)%t-s0i(i,j)%t
           t=t.cut.c_%no
           !     call print(t,6)
@@ -1448,7 +1517,7 @@ CONTAINS
        do j=1,3
 
           write(6,*) "final normal",i,j
-          t=s1i(i,j)%t
+          t=s1i(i,j)
           !     t=s0(i,j)%t-s0i(i,j)%t
           t=t.cut.c_%no
           tr=t
@@ -1504,7 +1573,7 @@ CONTAINS
 
   subroutine res_bas_spin(R,tunes,n0,b)
     implicit none
-    type(real_8) n0(3),b(3)
+    type(taylor) n0(3),b(3)
     real(dp) tunes(4)
     type(NORMAL_SPIN) R
     type(taylorresonance) tr
@@ -1528,7 +1597,7 @@ CONTAINS
     call alloc(ax,2)
     call alloc(az,2)
 
-    tr=n0(1)%t
+    tr=n0(1)
 
     nc(1)=zero
     nc(2)=zero
@@ -1567,7 +1636,7 @@ CONTAINS
     ax(1)=nc(1)+i_*ni(1)
     ax(2)=nc(2)+i_*ni(2)
 
-    tr=n0(3)%t
+    tr=n0(3)
 
     nc(1)=zero
     nc(2)=zero
@@ -1618,7 +1687,7 @@ CONTAINS
     t=tr
     b(3)=morph(t)
 
-    tr=n0(2)%t
+    tr=n0(2)
 
     nc(1)=zero
     call taylor_cycle(tr%cos,N)
@@ -1735,8 +1804,8 @@ CONTAINS
 
   subroutine exp_n_thetap(theta0,n0,s0)
     implicit none
-    type(real_8),intent(inout):: s0(3,3),theta0,n0(3)
-    type(real_8) om(3,3),xx(3,3)
+    type(taylor),intent(inout):: s0(3,3),theta0,n0(3)
+    type(taylor) om(3,3),xx(3,3)
     real(dp) deps,nb,n,dn,dnb,sc
     integer i,j
 
@@ -1801,11 +1870,11 @@ CONTAINS
     implicit none
     real(dp) s0(3,3),theta0,n0(3)
     real(dp) ss(3,3),sc,ln(3,3),xx(3,3),an,anb
-    integer i
+    integer i,k
     sc=0.1_dp
 
     ss=s0
-    call power_rot(ss,sc)
+    call power_rot(ss,sc,k)
 
     do i=1,3
        ss(i,i)=ss(i,i)-one
@@ -1814,10 +1883,11 @@ CONTAINS
     anb=1.e38_dp
     ln=zero
     xx=ss
+
     do i=1,1000
        ln= xx/i+ln
        xx=-matmul(ss,xx)
-       if(i>10) then
+       if(i>20) then
           call anti_mat(ln,an)
           if(an>=anb) exit
           anb=an
@@ -1834,7 +1904,6 @@ CONTAINS
     n0(2)=ln(1,3)
     n0(3)=ln(2,1)
 
-
     theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
     n0=n0/theta0
 
@@ -1848,16 +1917,18 @@ CONTAINS
 
   end subroutine find_n_thetar
 
-  subroutine find_n_thetap(s0,theta0,n0,powerflag)
+  subroutine find_n_thetap(s0,theta0,n0,powerflag,scc)
     implicit none
-    type(real_8),intent(in) :: s0(3,3)
-    type(real_8)  theta0,n0(3)
-    type(real_8)  ss(3,3),ln(3,3),xx(3,3)
+    type(taylor),intent(in) :: s0(3,3)
+    type(taylor)  theta0,n0(3)
+    type(taylor)  ss(3,3),ln(3,3),xx(3,3)
     real(dp) sc,an,anb
-    integer i,j
+    integer i,j,k
+    integer , optional :: scc
     logical(lp), optional :: powerflag
     logical(lp):: powerf
 
+    k=1
     powerf=my_true
     call alloc_33(ss)
     call alloc_33(ln)
@@ -1873,7 +1944,8 @@ CONTAINS
     enddo
 
     if(present(powerflag)) powerf=powerflag
-    if(powerf) call power_rot(ss,sc)
+    if(powerf) call power_rot(ss,sc,k)
+
 
     do i=1,3
        ss(i,i)=ss(i,i)-one
@@ -1895,7 +1967,8 @@ CONTAINS
        !      xx=-matmul(ss,xx)
        call matmulp(ss,xx,xx)
        call smatp(-one,xx,xx)
-       if(i>10) then
+
+       if(i>20) then
           call anti_mat(ln,an)
           if(an>=anb) exit
           anb=an
@@ -1920,7 +1993,7 @@ CONTAINS
        enddo
 
 
-       if(n0(spin_normal_position)<zero) then
+       if((n0(spin_normal_position).sub.'0')<zero) then
           do i=1,3
              n0(i)=-n0(i)
           enddo
@@ -1932,6 +2005,8 @@ CONTAINS
     call kill_33(ss)
     call kill_33(ln)
     call kill_33(xx)
+
+    if(present(scc)) scc=k
   end subroutine find_n_thetap
 
   subroutine find_ar(n2,a)
@@ -1967,9 +2042,9 @@ CONTAINS
     n3(2)=n1(3)*n2(1)-n1(1)*n2(3)
     n3(3)=n1(1)*n2(2)-n1(2)*n2(1)
 
-    write(6,*) n1
-    write(6,*) n2
-    write(6,*) n3
+    !     write(6,*) n1
+    !     write(6,*) n2
+    !    write(6,*) n3
     ! spin_normal_position
 
     a=zero
@@ -1992,8 +2067,8 @@ CONTAINS
 
   subroutine find_ap(n2,a)
     implicit none
-    type(real_8)  n2(3),n1(3),n3(3)
-    type(real_8)  a(3,3),s,n
+    type(taylor)  n2(3),n1(3),n3(3)
+    type(taylor)  a(3,3),s,n
     integer i,is
     call alloc(n1,3)
     call alloc(n3,3)
@@ -2057,27 +2132,56 @@ CONTAINS
   end subroutine find_ap
 
 
-  subroutine power_rotr(m,deps)
+  subroutine power_rotr(m,deps,k)
     implicit none
     real(dp) m(3,3),a(3,3),deps,n
-    integer i
+    integer i,k
     a=m
 
-    do i=1,1000
+    k=1
+    do i=1,100000
        a=matmul(a,m)
-       call norm_mat(a,n)
-       if(abs(n-3.0_dp)<deps) exit
+       k=k+1
+       call norm_mats(a,n)
+       if(abs(n)<deps) exit
     enddo
 
     !     write(6,*) i,abs(n-3.0_dp)
-    if(i>999) then
+    if(i>100000-1) then
        write(6,*) i,abs(n-3.0_dp)
        stop 999
     endif
+    m=a
 
   end subroutine power_rotr
 
-  subroutine alloc_33(a)
+  subroutine alloc_33t(a)
+    implicit none
+    type(taylor) a(3,3)
+    integer i,j
+
+    do i=1,3
+       do j=1,3
+          call alloc(a(i,j))
+       enddo
+    enddo
+
+  end subroutine alloc_33t
+
+  subroutine kill_33t(a)
+    implicit none
+    type(taylor) a(3,3)
+    integer i,j
+
+    do i=1,3
+       do j=1,3
+          call kill(a(i,j))
+       enddo
+    enddo
+
+  end subroutine kill_33t
+
+  subroutine alloc_33p(a)
     implicit none
     type(real_8) a(3,3)
     integer i,j
@@ -2088,9 +2192,9 @@ CONTAINS
        enddo
     enddo
 
-  end subroutine alloc_33
+  end subroutine alloc_33p
 
-  subroutine kill_33(a)
+  subroutine kill_33p(a)
     implicit none
     type(real_8) a(3,3)
     integer i,j
@@ -2101,13 +2205,13 @@ CONTAINS
        enddo
     enddo
 
-  end subroutine kill_33
+  end subroutine kill_33p
 
-  subroutine power_rotp(m,deps)
+  subroutine power_rotp(m,deps,k)
     implicit none
-    type(real_8) m(3,3),a(3,3)
+    type(taylor) m(3,3),a(3,3)
     real(dp) deps,n
-    integer i,j
+    integer i,j,k
 
     call alloc_33(a)
 
@@ -2117,26 +2221,55 @@ CONTAINS
        enddo
     enddo
 
-    do i=1,1000
+    k=1
+    do i=1,100000
        call matmulp(a,m,a)
-       call norm_mat(a,n)
-       if(abs(n-3.0_dp)<deps) exit
+       k=k+1
+       call norm_mats(a,n)
+       if(abs(n)<deps) exit
     enddo
 
     !     write(6,*) i,abs(n-3.0_dp)
-    if(i>999) then
+    if(i>100000-1) then
        write(6,*) i,abs(n-3.0_dp)
        stop 1999
     endif
 
+    do i=1,3
+       do j=1,3
+          m(i,j)=a(i,j)
+       enddo
+    enddo
 
     call kill_33(a)
 
   end subroutine power_rotp
 
+  subroutine matmulvp(m,n,mo)
+    implicit none
+    type(taylor) m(3,3),n(3),mo(3),a(3)
+    integer i,j
+
+
+    call alloc(a,3)
+
+    do i=1,3
+       do j=1,3
+          a(i)=m(i,j)*n(j)+a(i)
+       enddo
+    enddo
+
+
+    do i=1,3
+       mo(i)=a(i)
+    enddo
+    call kill(a,3)
+
+  end subroutine matmulvp
+
   subroutine matmulp(m,n,mo)
     implicit none
-    type(real_8) m(3,3),n(3,3),mo(3,3),a(3,3)
+    type(taylor) m(3,3),n(3,3),mo(3,3),a(3,3)
     integer i,j,k
 
 
@@ -2162,7 +2295,7 @@ CONTAINS
 
   subroutine smatmulp(sc,m,n,mo)
     implicit none
-    type(real_8) m(3,3),n(3,3),mo(3,3),a(3,3)
+    type(taylor) m(3,3),n(3,3),mo(3,3),a(3,3)
     integer i,j
     real(dp) sc
 
@@ -2186,7 +2319,7 @@ CONTAINS
 
   subroutine smatp(sc,m,mo)
     implicit none
-    type(real_8) m(3,3),mo(3,3),a(3,3)
+    type(taylor) m(3,3),mo(3,3),a(3,3)
     integer i,j
     real(dp) sc
 
@@ -2222,10 +2355,47 @@ CONTAINS
 
   end subroutine norm_matr
 
+  subroutine norm_matsr(m,n)
+    implicit none
+    integer i,j
+    real(dp) m(3,3),n
+
+    n=zero
+    do i=1,3
+       do j=1,3
+          if(i==j) then
+             n=n+abs(m(i,j)-one)
+          else
+             n=n+abs(m(i,j))
+          endif
+       enddo
+    enddo
+
+  end subroutine norm_matsr
+
+  subroutine norm_matsp(m,n)
+    implicit none
+    integer i,j
+    type(taylor) m(3,3)
+    real(dp) n
+
+    n=zero
+    do i=1,3
+       do j=1,3
+          if(i==j) then
+             n=n+abs(m(i,j)-one)
+          else
+             n=n+abs(m(i,j))
+          endif
+       enddo
+    enddo
+
+  end subroutine norm_matsp
+
   subroutine norm_matp(m,n1)
     implicit none
     integer i,j
-    type(real_8) m(3,3),n
+    type(taylor) m(3,3),n
     real(dp) n1
     call alloc(n)
 
@@ -2236,11 +2406,12 @@ CONTAINS
        enddo
     enddo
 
-    if(n%kind==1) then
-       n1=abs(n)
-    else
-       n1=full_abs(n%t)
-    endif
+    !    if(n%kind==1) then
+    !     n1=abs(n)
+    !    else
+    n1=full_abs(n)
+    !     n1=abs(n)
+    !    endif
 
     call kill(n)
 
@@ -2264,9 +2435,9 @@ CONTAINS
   subroutine anti_matp(m,n1)
     implicit none
     integer i,j
-    type(real_8) m(3,3)
+    type(taylor) m(3,3)
     real(dp) n1
-    type(real_8)  n
+    type(taylor)  n
 
     call alloc(n)
 
@@ -2286,7 +2457,136 @@ CONTAINS
     call kill(n)
   end subroutine anti_matp
 
+  subroutine make_unitary_p(m,mi)
+    !  inverse 3x3 rrotation
+    implicit none
+    integer i, nmax
+    type(taylor) m(3,3),mi(3,3)
+    type(taylor) mt(3,3),id(3,3)
+    real(dp) r,eps,rb
+    logical doit
+
+    doit=.true.
+    nmax=100
+    eps=1.e-4_dp
+    call alloc_33(mt)
+    call alloc_33(id)
+
+    do i=1,3
+       id(i,i)=1.5e0_dp
+    enddo
+
+    rb=mybig
+
+    do i=1,nmax
+       call transpose_p(m,mt)
+
+       call matmulp(m,mt,mt)
+
+       call smatp(-half,mt,mt)
+
+       call smatmulp(one,mt,id,mt)
+
+       call matmulp(mt,m,m)
+
+       call transpose_p(m,mt)
+       call matmulp(mt,m,mt)
+       call smatmulp(-one/1.5e0_dp,id,mt,mt)
+       call absolute_p(mt,r)
+       if(r<eps.and.doit) then
+          doit=.false.
+          rb=r
+       else
+          if(rb<=r) exit
+          rb=r
+       endif
+    enddo
+
+    if(i>=nmax) then
+       write(6,*) " Too many iterations "
+       write(6,*) " Perhaps did not converged in make_unitary_p "
+
+    endif
+
+    call kill_33(id)
+    call kill_33(mt)
+
+  end subroutine make_unitary_p
+
+  subroutine check_unitary_p(m,r,rt,cc)
+    !  inverse 3x3 rrotation
+    implicit none
+    integer i, j,c
+    type(taylor) m(3,3)
+    type(taylor) mt(3,3)
+    real(dp) r,rt
+    integer, optional :: cc
+
+    c=c_%no+1
+    if(present(cc)) c=cc
+
+    call alloc_33(mt)
+
+    r=zero
+    rt=zero
+    call transpose_p(m,mt)
+
+    call matmulp(m,mt,mt)
+
+    do i=1,3
+       do j=1,3
+
+          r=r+abs(mt(i,j))
+          rt=rt+full_abs(mt(i,j).cut.c)
+       enddo
+    enddo
+
+
+
+    call kill_33(mt)
+
+  end subroutine check_unitary_p
+
+
+  subroutine absolute_p(m,r)
+    implicit none
+    integer i,j
+    type(taylor) m(3,3)
+    real(dp) r
+
+    r=zero
+
+    do i=1,3
+       do j=1,3
+          r=r+full_abs(m(i,j))
+       enddo
+    enddo
+
+  end subroutine absolute_p
+
+  subroutine transpose_p(m,mi)
+    !  inverse 3x3 rrotation
+    implicit none
+    integer i,j
+    type(taylor), INTENT(INOUT) :: m(3,3),mi(3,3)
+    type(taylor) mt(3,3)
+
+    call alloc_33(mt)
+
+    call smatp(one,m,mt)
+
+    do i=1,3
+       do j=1,3
+          mi(j,i)=mt(i,j)
+       enddo
+    enddo
+
+    call kill_33(mt)
+
+  end subroutine transpose_p
+
   subroutine inv_asr(m,mi)
+    !  inverse 3x3 rrotation
     implicit none
     integer i,j
     real(dp) m(3,3),mi(3,3)
@@ -2309,10 +2609,11 @@ CONTAINS
 
 
   subroutine inv_asp(m,mi)
+    !  inverse 3x3 rrotation
     implicit none
     integer i,j
-    type(real_8) m(3,3),mi(3,3)
-    type(real_8)  n(3,3)
+    type(taylor) m(3,3),mi(3,3)
+    type(taylor)  n(3,3)
 
     call alloc_33(n)
 
@@ -2334,15 +2635,19 @@ CONTAINS
   subroutine  trans_mat(m,ri,mi)
     implicit none
     integer i,j
-    type(real_8) m(3,3),mi(3,3)
-    type(real_8)  n(3,3)
+    type(taylor) m(3,3),mi(3,3)
+    type(taylor)  n(3,3)
     type(damap)  ri
+    type(taylor)  r
 
     call alloc_33(n)
+    call alloc(r)
 
     do i=1,3
        do j=1,3
-          n(i,j)=morph(m(i,j)%t*ri)  ! advances by r**(-1)
+          r=(m(i,j)*ri)
+          n(i,j)=morph(r)
+          ! advances by r**(-1)
        enddo
     enddo
 
@@ -2353,6 +2658,7 @@ CONTAINS
        enddo
     enddo
 
+    call kill(r)
     call kill_33(n)
   end subroutine trans_mat
 
@@ -2374,7 +2680,6 @@ CONTAINS
     implicit none
     TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
-
     !     D%X=ZERO
     CALL ALLOC(D%M)
     DO I=1,3
@@ -2496,6 +2801,299 @@ CONTAINS
     C_%SPIN_POS=C_%ND2+1   ! CAN BE OVERWRITTEN BY PTC
   end subroutine  init_SPIN
 
+!!!!!!!!!!!!!!!!   new stuff
+  subroutine Go_to_closed(N,DS,theta0,n0)
+    implicit none
+    TYPE(normalform), INTENT(INOUT) :: n
+    TYPE(damapspin), INTENT(INout) :: DS
+    type(damapspin) a1i,ds0,A1
+    type(taylor), intent(inout) :: theta0,n0(3)
+    type(taylor) s(3,3),a(3,3),ai(3,3)
+    real(dp) theta0r,n0r(3) !
+    type(real_8) a11,a13
+    integer i,j
+
+    call alloc(a1i)
+    call alloc(a1)
+    call alloc(ds0)
+    call alloc_33(s)
+    call alloc_33(a)
+    call alloc_33(ai)
+    call alloc(a11,a13)
+
+    A1=1   ! damapspin to fix point
+    a1%m=n%a1    ! fix point map a1 of orbital normal form
+    a1i=a1**(-1) ! fix point map a1 of orbital normal form
+
+    DS0=a1i*ds*a1  ! at this stage ds0 is the map around the fixed point
+
+    call clean_orbital_33(ds0%s,s)
+
+    ! at this stage s is the spin map  without dependence on orbital
+
+    call find_n_theta(s,theta0,n0)
+
+    call find_a(n0,a)
+    call inv_as(a,ai)
+
+    call matmulp(ai,s,ai)    !
+    call matmulp(ai,a,s)    !
+
+    a11=morph(s(1,1))
+    a13=morph(s(1,3))
+
+    theta0=atan2(a13,a11)
+
+    call kill(a1i)
+    call kill(a1)
+    call kill(ds0)
+    call kill_33(s)
+    call kill_33(a)
+    call kill_33(ai)
+
+    call kill(a11,a13)
+
+  end subroutine Go_to_closed
+
+!!!!!!!!!!!!!!!!   new stuff
+  subroutine get_spin_nx_t(DS,theta0,n0)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    type(damapspin) a1i,ds0
+    type(taylor), intent(inout) :: theta0,n0(3)
+    type(taylor) s(3,3),a(3,3),ai(3,3)
+    type(real_8) a11,a13
+    integer i,j,nsc
+
+    call alloc(a1i)
+    call alloc(ds0)
+    call alloc_33(s)
+    call alloc_33(a)
+    call alloc_33(ai)
+    call alloc(a11,a13)
+
+    call find_n_theta(ds%s,theta0,n0,scc=nsc)
+
+    !     call print(theta0,6)
+
+
+    call find_a(n0,a)
+
+    call inv_as(a,ai)
+
+
+
+    call matmulp(ai,ds%s,ai)    !
+    call matmulp(ai,a,s)    !
+
+    a11=morph(s(1,1))
+    a13=morph(s(1,3))
+
+    theta0=atan2(a13,a11)
+
+
+    ! at this stage the spin map is:
+
+    !  exp( theta0 n0 L )   where n0 is not the real n but it depends on (x,p)
+
+
+    !     call print(theta0,6)
+
+    !    theta0=theta0*nsc
+
+    !     call print(theta0,6)
+
+    !     write(6,*) mod((theta0.sub.'0'),twopi)+twopi
+
+    call kill(a1i)
+    call kill(ds0)
+    call kill_33(s)
+    call kill_33(a)
+    call kill_33(ai)
+
+    call kill(a11,a13)
+
+  end subroutine get_spin_nx_t
+
+  subroutine get_spin_nx_r(DS,theta0,n0)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    real(dp), intent(inout) :: theta0,n0(3)
+    type(taylor) th,n(3)
+    integer i
+
+    call alloc(th)
+    call alloc(n)
+
+    th=theta0
+    do i=1,3
+       n(i)=n0(i)
+    enddo
+    call get_spin_nx(DS,th,n)
+
+    theta0=th
+    do i=1,3
+       n0(i)=n(i)
+    enddo
+
+    call kill(th)
+    call kill(n)
+
+
+  end subroutine get_spin_nx_r
+
+
+
+!!!!!!!!!!!!!!
+  FUNCTION POWMAP( S1, R2 )
+    implicit none
+    TYPE (damapspin) POWMAP
+    TYPE (damapspin), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2
+    TYPE (damapspin) S11
+    INTEGER I,R22
+    integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+
+    !    call checkdamap(s1)
+
+    call ass(POWMAP)
+
+    call alloc(s11)
+
+    s11=1
+
+
+    R22=IABS(R2)
+    DO I=1,R22
+       s11=s1*s11
+    ENDDO
+
+    IF(R2.LT.0) THEN
+       ! if(old) then
+
+       s11%m=s11%m**(-1)
+       call trans_mat(s11%s,s11%m,s11%s)
+       call inv_as(s11%s,s11%s)
+
+       !      CALL etinv(S11%v%i,S11%v%i)
+       !       else
+       !          CALL newetinv(S11%v%j,S11%v%j)
+       !       endif
+    ENDIF
+
+    powmap=s11
+
+
+    ! powmap=junk
+    call kill(s11)
+
+    master=localmaster
+
+  END FUNCTION POWMAP
+
+  FUNCTION concat(S2,S1)
+    implicit none
+    TYPE (damapspin) concat,t2
+    TYPE (damapspin), INTENT (IN) :: S1, S2
+    integer i,j,k
+    integer localmaster
+    type(taylor) s(3,3)
+
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call ass(concat)
+    call alloc(t2);
+    call alloc_33(s);
+
+    t2=s2
+    concat=s2
+
+    do i=1,3
+       do j=1,3
+          !     if(s2%s(i,j)%kind==2) then
+          t2%s(i,j)=s2%s(i,j)*s1%m
+          !     else
+          !      t2%s(i,j)=s2%s(i,j)
+          !     endif
+       enddo
+    enddo
+
+    concat%m=s2%m*s1%m
+
+    !    do i=1,6
+    !     concat%x(i)=s2%x(i)
+    !    enddo
+
+    do i=1,3
+       do j=1,3
+          do k=1,3
+             s(i,j)= t2%s(i,k)*s1%s(k,j)+ s(i,j)
+          enddo
+       enddo
+    enddo
+    call smatp(one,s,concat%s)
+
+    call kill_33(s);
+    call kill(t2);
+    master=localmaster
+
+  END FUNCTION concat
+
+  real(dp) function purge_transverse(j)
+    implicit none
+    integer i
+    !      INTEGER J(NTT)
+    integer,dimension(:)::j
+    if(.not.c_%stable_da) return
+
+    purge_transverse=one
+
+    do i=1,c_%nd2
+       if(j(i)/=0) then
+          purge_transverse=zero
+          exit
+       endif
+    enddo
+
+    return
+  end function purge_transverse
+
+  subroutine clean_orbital_33(s,sf)
+    implicit none
+    TYPE (taylor), intent(inout) :: s(3,3),sf(3,3)
+    integer i,j
+
+    do i=1,3
+       do j=1,3
+          call cfu(s(i,j),purge_transverse,sf(i,j))
+       enddo
+    enddo
+
+  end  subroutine clean_orbital_33
+
+  subroutine clean_orbital_3(s,sf)
+    implicit none
+    TYPE (taylor), intent(inout) :: s(3),sf(3)
+    integer i
+
+    do i=1,3
+       call cfu(s(i),purge_transverse,sf(i))
+    enddo
+
+  end  subroutine clean_orbital_3
+
+  subroutine clean_orbital(s,sf)
+    implicit none
+    TYPE (taylor), intent(inout) :: s,sf
+
+    call cfu(s,purge_transverse,sf)
+
+  end  subroutine clean_orbital
 
 
 end module tree_element_MODULE

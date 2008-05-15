@@ -1721,21 +1721,24 @@ contains
     TYPE (taylor), INTENT (IN) :: S1
     TYPE (gmap), INTENT (IN) ::  S2
     TYPE (gmap)  S22
-    real(dp) zero_(ndim2)
+    real(dp),allocatable:: zero_(:)
     integer i
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
 
-    do i=1,nd2
-       zero_(i)=zero
-    enddo
-
 
     call assdamap(trxgtaylor)
 
     call alloc(s22,s2%n)
+
+    allocate(zero_(S22%n))
+
+    do i=1,S22%n
+       zero_(i)=zero
+    enddo
+
 
     s22=s2
     s22=zero_
@@ -1748,6 +1751,7 @@ contains
     !   endif
 
     call kill(s22)
+    deallocate(zero_)
     master=localmaster
 
   END FUNCTION trxgtaylor
@@ -2344,7 +2348,6 @@ contains
     ENDDO
 
 
-
     IF(R2.LT.0) THEN
        ! if(old) then
        CALL getinv(S11%v%i,S11%v%i,s11%n)
@@ -2425,7 +2428,7 @@ contains
     TYPE (damap) s1
     real(dp)  norm,mat(6,6),xj(6,6)
     integer i,j
-
+    ! checks symplectic conditions on linear map
     mat=0.d0
     mat=s1
     xj=0.d0

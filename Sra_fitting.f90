@@ -651,4 +651,88 @@ contains
   end subroutine lattice_linear_res_gmap
 
 
+  subroutine special_alex_main_ring_removal(main)
+    IMPLICIT NONE
+
+!!!!!!!!!
+    type(layout),pointer :: main
+    type(fibre),pointer :: p,p1,p2,pp
+    real(dp) an,bn
+    logical doit
+    integer ij,mf,i,k
+
+    call kanalnummer(mf,"diag.txt")
+
+
+    if(associated(main%t)) call kill(main%t)
+
+    ij=0
+    p=>main%start
+    do i=1,main%n
+       p1=>p%next
+       p2=>p1%next
+       doit=p%mag%name(1:len_trim(p%mag%name)-1)==p1%mag%name(1:len_trim(p1%mag%name)-1)
+       doit=doit.and.(p%mag%name(1:len_trim(p%mag%name)-1)==p2%mag%name(1:len_trim(p1%mag%name)-1))
+       if(doit) then
+          ij=ij+1
+          do k=p%mag%p%nmul,1,-1
+             an=p%mag%an(k)/p1%mag%l*2.d0
+             bn=p%mag%bn(k)/p1%mag%l*2.d0
+             call add(p1,-k,1,an)
+             call add(p1,k,1,bn)
+             !   call add(p,-k,0,0.d0)
+             !   call add(p,k,0,0.d0)
+             !   call add(p2,-k,0,0.d0)
+             !   call add(p2,k,0,0.d0)
+          enddo
+          ! el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
+          if(p%mag%kind==kind3) then
+             bn=p%mag%k3%thin_h_angle/p1%mag%l*2.d0
+             call add(p1,1,1,bn)
+             an=p%mag%k3%thin_v_angle/p1%mag%l*2.d0
+             call add(p1,-1,1,an)
+             doit=(p%mag%k3%thin_h_foc/=zero.or.p%mag%k3%thin_v_foc/=zero)  !.or.p%mag%k3%thin_v_angle/=zero)
+             if(doit) then
+                write(6,*) " cannot handle the stuff in kind3 related to fake thinlens tracking of MAD8 "
+                stop 8
+             endif
+          endif
+
+          write(mf,*) p%mag%name,p1%mag%name,p2%mag%name
+          !  goto 200
+          pp=>p%previous
+          pp%next=>p1
+          p1%previous=>pp
+          pp=>p2%next
+          pp%previous=>p1
+          p1%next=>pp
+
+          call super_kill(p)
+          call super_kill(p2)
+          p=>p1
+          !   200 continue
+          !   p=>p2
+       endif
+       p=>p%next
+       if(associated(p,main%start)) exit
+    enddo
+
+    write(mf,*) ij, " magnets done"
+
+    ij=0
+    p=>main%start
+    do i=1,main%n
+       ij=ij+1
+       p%pos=i
+       if(p%mag%l==zero.and.p%mag%kind>kind1) then
+          write(mf,*) i,p%mag%name,p%mag%kind,p%next%mag%name
+       endif
+       p=>p%next
+       if(associated(p,main%start)) exit
+    enddo
+    write(6,*) ij,main%n
+    main%n=ij
+
+    close(mf)
+  end subroutine special_alex_main_ring_removal
 end module S_fitting_new

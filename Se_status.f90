@@ -73,7 +73,7 @@ module S_status
 
   PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt
   !PRIVATE DTILTR,DTILTP,DTILTS
-  PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL,DTILTS_EXTERNAL
+  PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL
   PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P !,CHECK_APERTURE_S
   LOGICAL(lp), target:: electron
   real(dp), target :: muon=one
@@ -85,31 +85,34 @@ module S_status
   !  !!  include "a_def_arbitrary.inc"
   !  !  include "a_def_user2.inc"
   TYPE(INTERNAL_STATE), target ::  DEFAULT
-  TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME,EXACTMIS
+  TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME, &
+       EXACTMIS,STOCHASTIC
   TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,SPIN_ONLY
 
   TYPE (INTERNAL_STATE), PARAMETER :: DEFAULT0 = INTERNAL_STATE &
-       &(0,f,f,f,f,f,f,f,f,f,f,3)
+       &(0,f,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TOTALPATH0 = INTERNAL_STATE &
-       &(1,f,f,f,f,f,f,f,f,f,f,3)
+       &(1,f,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TIME0 = INTERNAL_STATE &
-       &(0,t,f,f,f,f,f,f,f,f,f,3)
+       &(0,t,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: RADIATION0 = INTERNAL_STATE &
-       &(0,f,t,f,f,f,f,f,f,f,f,3)
+       &(0,f,t,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: NOCAVITY0 = INTERNAL_STATE &
-       &(0,f,f,t,f,f,f,f,f,f,f,3)
+       &(0,f,f,t,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: FRINGE0 = INTERNAL_STATE &
-       &(0,f,f,f,t,f,f,f,f,f,f,3)
+       &(0,f,f,f,t,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: EXACTMIS0 = INTERNAL_STATE &
-       &(0,f,f,f,f,t,f,f,f,f,F,3)
+       &(0,f,f,f,f,t,f,f,f,f,f,F,3)
+  TYPE (INTERNAL_STATE), PARAMETER :: STOCHASTIC0 = INTERNAL_STATE &
+       &(0,f,f,f,f,f,t,f,f,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: ONLY_4d0 = INTERNAL_STATE &
-       &(0,f,f,t,f,f,f,t,f,f,F,3)
+       &(0,f,f,t,f,f,f,f,t,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: DELTA0   = INTERNAL_STATE &
-       &(0,f,f,t,f,f,f,t,t,f,F,3)
+       &(0,f,f,t,f,f,f,f,t,t,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN0   = INTERNAL_STATE &
-       &(0,f,f,f,f,f,f,f,f,t,F,3)
+       &(0,f,f,f,f,f,f,f,f,f,t,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN_ONLY0   = INTERNAL_STATE &
-       &(0,f,f,f,f,f,f,f,f,f,t,3)
+       &(0,f,f,f,f,f,f,f,f,f,f,t,3)
   !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
@@ -194,19 +197,9 @@ module S_status
      MODULE PROCEDURE B2PERPP
   END INTERFACE
 
-  !  INTERFACE DTILTD
-  !     MODULE PROCEDURE DTILTR
-  !     MODULE PROCEDURE DTILTP       ! DESIGN TILT
-  !     MODULE PROCEDURE DTILTS
-  !     MODULE PROCEDURE DTILTR_EXTERNAL
-  !     MODULE PROCEDURE DTILTP_EXTERNAL       ! EXTERNAL
-  !     MODULE PROCEDURE DTILTS_EXTERNAL
-  !  END INTERFACE
-
   INTERFACE DTILTD
      MODULE PROCEDURE DTILTR_EXTERNAL
      MODULE PROCEDURE DTILTP_EXTERNAL       ! EXTERNAL
-     MODULE PROCEDURE DTILTS_EXTERNAL
   END INTERFACE
 
 
@@ -524,8 +517,6 @@ CONTAINS
              dy=E%DY
              ex=E%X
              ey=E%y
-             write(6,*) xx,ex
-             write(6,*) yy,ey
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
@@ -663,6 +654,11 @@ CONTAINS
     NSTD=1
     METD=2
     electron=PARTICLE
+    if(electron) then
+       A_particle = A_ELECTRON
+    else
+       A_particle = A_PROTON
+    endif
     !    w_p=0
     !    w_p%nc=1
     !    w_p%fc='(1((1X,A72)))'
@@ -788,10 +784,20 @@ CONTAINS
     USE   definition
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
-    real(dp) muonfactor
+    real(dp) muonfactor,MASSF
     CALL MAKE_YOSHIDA
     muon=muonfactor
+    MASSF=muon*pmae
     call MAKE_STATES_0(doneitt)
+
+    IF(ABS(MASSF-pmap)/PMAP<0.01E0_DP) THEN
+       A_PARTICLE=A_PROTON
+    ELSEIF(ABS(MASSF-pmae)/pmae<0.01E0_DP) THEN
+       A_PARTICLE=A_ELECTRON
+    ELSEIF(ABS(MASSF-pmaMUON)/pmaMUON<0.01E0_DP) THEN
+       A_PARTICLE=A_MUON
+    ENDIF
+
   END  SUBROUTINE MAKE_STATES_m
 
   SUBROUTINE update_STATES
@@ -832,6 +838,7 @@ CONTAINS
     S2%NOCAVITY=    S1%NOCAVITY
     S2%TIME=        S1%TIME
     S2%FRINGE=           S1%FRINGE
+    S2%stochastic=           S1%stochastic
     S2%PARA_IN=     S1%PARA_IN
     S2%ONLY_4D=      S1%ONLY_4D
     S2%DELTA=       S1%DELTA
@@ -857,12 +864,16 @@ CONTAINS
     add%NOCAVITY =  S1%NOCAVITY.OR.S2%NOCAVITY
     add%TIME     =  S1%TIME.OR.S2%TIME
     add%FRINGE   =       S1%FRINGE.OR.S2%FRINGE
+    add%stochastic   =       S1%stochastic.OR.S2%stochastic
     add%ONLY_4D  =       S1%ONLY_4D.OR.S2%ONLY_4D
     add%DELTA  =       S1%DELTA.OR.S2%DELTA
     add%SPIN  =       S1%SPIN.OR.S2%SPIN
     add%SPIN_ONLY  =       S1%SPIN_ONLY.OR.S2%SPIN_ONLY
     add%PARA_IN  =       S1%PARA_IN.OR.S2%PARA_IN.or.ALWAYS_knobs
     add%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
+    IF(add%stochastic) THEN
+       add%RADIATION=T
+    ENDIF
     IF(add%DELTA) THEN
        add%ONLY_4D=T
        add%NOCAVITY =  T
@@ -871,6 +882,7 @@ CONTAINS
        add%TOTALPATH=  0
        add%RADIATION  =  F
        add%NOCAVITY =  T
+       add%stochastic   =  F
     ENDIF
   END FUNCTION add
 
@@ -892,12 +904,16 @@ CONTAINS
     sub%NOCAVITY =  S1%NOCAVITY.min.S2%NOCAVITY
     sub%TIME     =  S1%TIME.min.S2%TIME
     sub%FRINGE   =       S1%FRINGE.min.S2%FRINGE
+    sub%stochastic   =       S1%stochastic.min.S2%stochastic
     sub%ONLY_4D  =       S1%ONLY_4D.min.S2%ONLY_4D
     sub%DELTA  =       S1%DELTA.min.S2%DELTA
     sub%SPIN  =       S1%SPIN.min.S2%SPIN
     sub%SPIN_ONLY  = S1%SPIN_ONLY.min.S2%SPIN_ONLY
     sub%PARA_IN  =       (S1%PARA_IN.MIN.S2%PARA_IN).or.ALWAYS_knobs
     sub%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
+    IF(sub%stochastic) THEN
+       sub%RADIATION=T
+    ENDIF
     IF(sub%DELTA) THEN
        sub%ONLY_4D=T
        sub%NOCAVITY =  T
@@ -906,6 +922,7 @@ CONTAINS
        sub%TOTALPATH=  0
        sub%RADIATION  =  F
        sub%NOCAVITY =  T
+       sub%stochastic   =  F
     ENDIF
 
   END FUNCTION sub
@@ -1064,18 +1081,6 @@ CONTAINS
     C_%npara_fpp=NPARA
   END  subroutine init_default
 
-  !  subroutine S_init_berz(STATE,NO1,NP1,ND2,NPARA)
-  !    implicit none
-  !    TYPE (INTERNAL_STATE), INTENT(IN):: STATE
-  !    INTEGER, INTENT(IN):: NO1,NP1
-  !    INTEGER, INTENT(OUT)::    ND2,NPARA
-
-  !    call init(STATE,NO1,NP1,my_true,ND2,NPARA)
-  !    C_%NPARA=NPARA
-  !    C_%npara_fpp=NPARA
-  !  END  subroutine S_init_berz
-
-
   SUBROUTINE B2PERPR(P,B,X,X5,B2)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: B2
@@ -1173,21 +1178,5 @@ CONTAINS
 
   END SUBROUTINE DTILTP_EXTERNAL
 
-  SUBROUTINE DTILTS_EXTERNAL(DIR,TILTD,I,Y)
-    IMPLICIT NONE
-    TYPE(ENV_8),INTENT(INOUT):: Y(6)
-    INTEGER,INTENT(IN):: I,DIR
-    REAL(DP),INTENT(IN) :: TILTD
-    TYPE(REAL_8) X(6)
-
-    IF(TILTD==zero) RETURN
-
-    CALL ALLOC(X)
-    X=Y
-    CALL DTILTD(DIR,TILTD,I,X)
-    Y=X
-    CALL KILL(X)
-
-  END SUBROUTINE DTILTS_EXTERNAL
 
 end module S_status

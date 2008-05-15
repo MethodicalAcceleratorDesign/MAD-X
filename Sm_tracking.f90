@@ -72,7 +72,7 @@ contains
   !  recursive
   integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k,X_IN)
     implicit none
-    TYPE(layout),INTENT(INOUT):: R
+    TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
@@ -86,7 +86,7 @@ contains
   !  recursive
   integer function TRACK_LAYOUT_FLAG_P1f(R,X,II1,k)
     implicit none
-    TYPE(layout),INTENT(INOUT):: R
+    TYPE(layout),target,INTENT(INOUT):: R
     TYPE(REAL_8), INTENT(INOUT):: X(6)
     !    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
@@ -100,7 +100,7 @@ contains
   !  recursive
   SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
     implicit none
-    TYPE(layout),INTENT(INOUT):: R
+    TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
@@ -122,7 +122,7 @@ contains
   !  recursive
   SUBROUTINE TRACK_LAYOUT_FLAG_P1(R,X,II1,k) ! Tracks polymorphs from II1 to the end or back to II1 if closed
     implicit none
-    TYPE(layout),INTENT(INOUT):: R
+    TYPE(layout),target,INTENT(INOUT):: R
     TYPE(REAL_8), INTENT(INOUT):: X(6)
     !    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
@@ -145,7 +145,7 @@ contains
   !  recursive
   integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
+    TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(INTERNAL_STATE) K
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
@@ -159,7 +159,8 @@ contains
   !  recursive
   integer function TRACK_LAYOUT_FLAG_Pf(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
-    TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
+    TYPE(LAYOUT),target,INTENT(INOUT):: R ;
+    TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
     !    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
 
@@ -171,7 +172,7 @@ contains
   !  recursive
   SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: R
+    TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(INTERNAL_STATE) K
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
@@ -229,7 +230,7 @@ contains
   !  recursive
   SUBROUTINE TRACK_LAYOUT_FLAG_P(R,X,I1,I2,K) ! TRACKS POLYMORPHS FROM I1 TO I2 IN STATE K
     IMPLICIT NONE
-    TYPE(LAYOUT),INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
+    TYPE(LAYOUT),target,INTENT(INOUT):: R ;TYPE(REAL_8), INTENT(INOUT):: X(6);
     INTEGER, INTENT(IN):: I1,I2; TYPE(INTERNAL_STATE) K;
     !    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
     INTEGER J,I22
@@ -400,7 +401,7 @@ contains
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
        ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
-       CALL MIS_FIB(C,X,OU,DONEITT)
+       CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,-1)
@@ -415,7 +416,7 @@ contains
     endif
 
     IF(C%MAG%MIS) THEN
-       CALL MIS_FIB(C,X,OU,DONEITF)
+       CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
     ! The magnet frame of reference is located here implicitely before misalignments
@@ -808,7 +809,7 @@ contains
   END SUBROUTINE PATCH_FIBP
 
   !   Misalignment routines
-  SUBROUTINE MIS_FIBR(C,X,OU,ENTERING)
+  SUBROUTINE MIS_FIBR(C,X,k,OU,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C

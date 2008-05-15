@@ -11,6 +11,7 @@ module S_fitting
   real(dp) :: fuzzy_split=one
   real(dp) :: max_ds=zero
   integer :: resplit_cutting = 0    ! 0 just magnets , 1 magnets as before / drifts separately
+  logical(lp) :: radiation_bend_split=my_false
   ! 2  space charge algorithm
 
   INTERFACE FIND_ORBIT
@@ -23,7 +24,7 @@ module S_fitting
 contains
   SUBROUTINE lattice_GET_CHROM(R,my_state,CHROM)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     REAL(DP) CHROM(:)
     integer i,IB
@@ -63,7 +64,7 @@ contains
 
   SUBROUTINE lattice_GET_tune(R,my_state)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     integer i,IB
     TYPE(internal_state) state
@@ -101,7 +102,7 @@ contains
 
   SUBROUTINE compute_A_4d(r,my_state,filename,pos,del,no,MY_A)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     integer pos,no,imod,ic,I
     TYPE(internal_state) state
@@ -164,7 +165,7 @@ contains
 
   SUBROUTINE compute_map_general(r,my_state,filename,pos,del,no)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     TYPE(internal_state) state
     integer pos,no,is,i,mf
@@ -222,7 +223,7 @@ contains
 
   SUBROUTINE compute_map_4d(r,my_state,filename,pos,del,no)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     integer pos,no,imod,ic,I
     TYPE(internal_state) state
@@ -278,7 +279,7 @@ contains
 
   SUBROUTINE FILL_BETA(r,my_state,pos,BETA,IB,DBETA,tune,tune2,a,ai,mat,clos)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     REAL(DP), pointer :: BETA(:,:,:)
     REAL(DP)DBETA,tune(:),tune2(:)
@@ -378,7 +379,7 @@ contains
 
   SUBROUTINE comp_linear2(r,my_state,a,ai,mat,closed)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     TYPE(internal_state) state
     real(dp) closed(6),a(6,6),ai(6,6),mat(6,6)
@@ -420,7 +421,7 @@ contains
 
   subroutine lattice_fit_TUNE_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout), target,intent(inout):: R
     TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
     INTEGER, intent(in):: NPOLY,NP
     real(dp) , intent(IN),dimension(:)::TARG
@@ -544,7 +545,7 @@ contains
 
   subroutine lattice_fit_CHROM_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout),target, intent(inout):: R
     TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
     INTEGER, intent(in):: NPOLY,NP
     real(dp) , intent(IN),dimension(:)::TARG
@@ -671,7 +672,7 @@ contains
 
   subroutine lattice_fit_tune_CHROM_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout),target, intent(inout):: R
     TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
     INTEGER, intent(in):: NPOLY,NP
     real(dp) , intent(IN),dimension(:)::TARG
@@ -803,7 +804,7 @@ contains
 
   subroutine lattice_PRINT_RES_FROM_A(R,my_state,NO,EMIT0,MRES,FILENAME)
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout),target, intent(inout):: R
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
@@ -878,7 +879,7 @@ contains
   subroutine lattice_random_error(R,nom,i1,i2,cut,n,addi,integrated,cn,cns,per)
     use gauss_dis
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout),target, intent(inout):: R
     integer n,addi,ic,i,i1,i2,j
     character(nlp) nom
     type(fibre), pointer :: p
@@ -913,21 +914,22 @@ contains
           if(integrated.and.p%mag%p%ld/=zero) then
              bn=bn/p%mag%l
           endif
-          call add(p,n,addi,bn)
+          if(bn/=zero) call add(p,n,addi,bn)
           f2=.true.
        endif
 
        if(f1.and.per/=zero ) then
+          call GRNF(X,cut)
           do j=p%mag%p%nmul,1,-1
-             call GRNF(X,cut)
-             if(n>0) then
-                bn=p%mag%bn(j)
-                bn=bn*(one+x*per)
-             else
-                bn=p%mag%an(j)
-                bn=bn*(one+x*per)
-             endif
-             call add(p,n,0,bn)
+             !        if(n>0) then
+             bn=p%mag%bn(j)
+             bn=bn*(one+x*per)
+             call add(p,j,0,bn)
+             !        else
+             bn=p%mag%an(j)
+             bn=bn*(one+x*per)
+             !        endif
+             call add(p,-j,0,bn)
 
           enddo
           f2=.true.
@@ -953,7 +955,7 @@ contains
 
   SUBROUTINE FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE,TURNS)  ! Finds orbit with TPSA in State or compatible state
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: RING
+    TYPE(layout),target,INTENT(INOUT):: RING
     INTEGER, OPTIONAL:: TURNS
     real(dp)  FIX(6),DIX(6),xdix,xdix0,tiny,freq
     TYPE(REAL_8) X(6)
@@ -988,10 +990,10 @@ contains
     if(.not.present(STATE)) then
        IF(default%NOCAVITY) THEN
           !    ND1=2
-          stat=default+only_4d
+          stat=default+only_4d-spin0
        ELSE
           !   ND1=3
-          STAT=default
+          STAT=default-spin0
           C=>RING%START
           do i=1,RING%n
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
@@ -1007,10 +1009,10 @@ contains
     else
        IF(STATE%NOCAVITY) THEN
           !    ND1=2
-          STAT=STATE+only_4d
+          STAT=STATE+only_4d0-spin0
        ELSE
           !   ND1=3
-          STAT=STATE
+          STAT=STATE-spin0
           C=>RING%START
           do i=1,RING%n
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
@@ -1153,7 +1155,7 @@ contains
 
   SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,LOC,STATE,eps,TURNS) ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: RING
+    TYPE(layout),target,INTENT(INOUT):: RING
     real(dp) , intent(inOUT) :: FIX(6)
     INTEGER , intent(in) :: LOC
     INTEGER, OPTIONAL::TURNS
@@ -1200,10 +1202,10 @@ contains
     if(.not.present(STATE)) then
        IF(default%NOCAVITY) THEN
           !    ND1=2
-          stat=default+    only_4d
+          stat=default+    only_4d-spin0
        ELSE
           !   ND1=3
-          STAT=default
+          STAT=default-spin0
           C=>RING%START
           do i=1,RING%n
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
@@ -1219,10 +1221,10 @@ contains
     else
        IF(STATE%NOCAVITY) THEN
           ND2=4
-          STAT=STATE+only_4d
+          STAT=STATE+only_4d0-spin0
        ELSE
           ND2=6
-          STAT=STATE
+          STAT=STATE-spin0
           C=>RING%START
           do i=1,RING%n
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
@@ -1402,7 +1404,7 @@ contains
 
   SUBROUTINE fit_all_bends(r,state)
     IMPLICIT NONE
-    TYPE(layout),INTENT(INOUT):: r
+    TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: state
     type(fibre),pointer :: p
     integer i
@@ -1493,7 +1495,7 @@ contains
     INTEGER NTE
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    TYPE(layout), intent(inout) :: R
+    TYPE(layout),target, intent(inout) :: R
     REAL(DP), pointer :: BETA(:,:,:)
     integer pos,nturn,i,flag,ib,MF,mft,j,resmax,it,I1,no
     real(dp) closed(6),MAT(6,6),AI(6,6),A(6,6),emit(2),emit0(6),aper(2),x(6),xn(6),dbeta,tuneold(:)
@@ -1756,7 +1758,7 @@ contains
   SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
-    TYPE(layout), intent(inout) :: R
+    TYPE(layout),target, intent(inout) :: R
     real(dp), OPTIONAL, intent(inout) :: THIN,lmax0
     real(dp), OPTIONAL, intent(in) ::xbend
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggb,ggbt,xbend1,gf(7)
@@ -1908,7 +1910,11 @@ contains
 
           if(doit) then
              xl=C%MAG%L
-             RHOI=C%MAG%P%B0
+             RHOI=zero
+             IF(C%MAG%P%NMUL>=1) THEN
+                !               RHOI=C%MAG%P%B0
+                RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
+             endif
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
              ELSE
@@ -1930,6 +1936,7 @@ contains
                       DOBEND=MY_TRUE
                    ENDIF
                 ENDIF
+                if(rhoi/=zero.and.radiation_bend_split)DOBEND=MY_TRUE
              ENDIF
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
@@ -1993,7 +2000,11 @@ contains
 
           if(doit) then
              xl=C%MAG%L
-             RHOI=C%MAG%P%B0
+             RHOI=zero
+             IF(C%MAG%P%NMUL>=1) THEN
+                !               RHOI=C%MAG%P%B0
+                RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
+             endif
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
              ELSE
@@ -2015,6 +2026,7 @@ contains
                       DOBEND=MY_TRUE
                    ENDIF
                 ENDIF
+                if(rhoi/=zero.and.radiation_bend_split)DOBEND=MY_TRUE
              ENDIF
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
@@ -2088,7 +2100,11 @@ contains
 
           if(doit) then
              xl=C%MAG%L
-             RHOI=C%MAG%P%B0
+             RHOI=zero
+             IF(C%MAG%P%NMUL>=1) THEN
+                !               RHOI=C%MAG%P%B0
+                RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
+             endif
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
              ELSE
@@ -2110,6 +2126,7 @@ contains
                       DOBEND=MY_TRUE
                    ENDIF
                 ENDIF
+                if(rhoi/=zero.and.radiation_bend_split)DOBEND=MY_TRUE
              ENDIF
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
@@ -2206,7 +2223,12 @@ contains
     write(6,*) "METHOD 6 ",M3,MK3
     write(6,*)   "number of Slices ", MK1+MK2+MK3
     write(6,*)   "Total NST ", NST_tot
-    write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
+    if(radiation_bend_split) then
+       write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
+       write(6,*)   "Restricted to method=2 for radiation or spin "
+    else
+       write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
+    endif
     write(6,*)   "Biggest ds ", max_ds
 
 
@@ -2267,13 +2289,14 @@ contains
 
     if(gf(4)<gf(2)) met=4
     if(gf(6)<gf(4).and.gf(6)<gf(2)) met=6
+    if(radiation_bend_split) met=2
 
   end SUBROUTINE  check_bend
 
   SUBROUTINE  THIN_LENS_restart(R) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
-    TYPE(layout), intent(inout) :: R
+    TYPE(layout),target, intent(inout) :: R
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
     INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii  !,limit0(2)
     logical(lp) doit
@@ -2360,7 +2383,7 @@ contains
 
   SUBROUTINE  print_bn_an(r,n,title,filename)
     implicit none
-    type(layout),intent(inout) ::r
+    type(layout),target,intent(inout) ::r
     character(*) filename
     type(fibre),pointer ::p
     integer n,i,mf,j,ntot
@@ -2393,7 +2416,7 @@ contains
 
   SUBROUTINE  read_bn_an(r,filename)
     implicit none
-    type(layout),intent(inout) ::r
+    type(layout),target,intent(inout) ::r
     character(*) filename
     type(fibre),pointer ::p
     integer n,i,mf,j,nt,jt,ntot
@@ -2559,7 +2582,7 @@ contains
   subroutine MESS_UP_ALIGNMENT_name(R,nom,i1,i2,sig,cut)
     use gauss_dis
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout),target, intent(inout):: R
     integer i1,i2,j,ic,i
     character(nlp) nom
     type(fibre), pointer :: p
@@ -2607,7 +2630,7 @@ contains
 
   subroutine Sigma_of_alignment(r,sig,ave)
     IMPLICIT NONE
-    TYPE(layout), intent(inout):: R
+    TYPE(layout),target, intent(inout):: R
     integer i,j,is(6)
     type(fibre), pointer :: p
     real(dp) sig(6),ave(6)
@@ -2658,7 +2681,7 @@ contains
 
   SUBROUTINE dyn_aper(L,x_in,n_in,ang_in,ang_out,del_in,dlam,pos,nturn,ite,state,mf)
     IMPLICIT NONE
-    type(layout), intent(inout) :: L
+    type(layout),target, intent(inout) :: L
     real(dp) x(6)
     REAL(DP) x_in,del_in,closed(6),r(6),rt(6)
     REAL(DP) lamT,lams,lamu,dlam,DLAMT,DX,ang,ang_in,ang_out

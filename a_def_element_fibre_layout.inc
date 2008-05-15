@@ -25,7 +25,7 @@ end type work
 
 TYPE INTERNAL_STATE
    integer TOTALPATH
-   LOGICAL(lp) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS
+   LOGICAL(lp) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS,STOCHASTIC
    LOGICAL(lp) PARA_IN,ONLY_4D,DELTA,SPIN,SPIN_ONLY  ! DA related
    INTEGER  SPIN_DIM
 
@@ -76,7 +76,7 @@ TYPE MAGNET_CHART
    type(S_APERTURE), pointer:: A(:)
    integer,pointer :: charge  ! propagator
    integer,pointer :: dir    ! propagator
-   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS
+   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS,ag
    real(dp), POINTER :: P0C
    real(dp), POINTER :: LD,B0,LC         !
    real(dp), POINTER :: TILTD      ! INTERNAL FRAME
@@ -238,6 +238,7 @@ TYPE FIBRE
    ! NEW STUFF....
    real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS   !,P0C
    INTEGER, POINTER :: CHARGE
+   real(dp), POINTER :: AG
 END TYPE FIBRE
 
 TYPE LAYOUT
@@ -299,6 +300,8 @@ TYPE INTEGRATION_NODE
    real(dp), POINTER :: ref(:)
    real(dp), pointer :: ent(:,:),a(:)
    real(dp), pointer :: exi(:,:),b(:)
+   real(dp), POINTER :: delta_rad_in
+   real(dp), POINTER :: delta_rad_out
    INTEGER, POINTER :: TEAPOT_LIKE
    TYPE (INTEGRATION_NODE), POINTER :: NEXT
    TYPE (INTEGRATION_NODE), POINTER :: PREVIOUS

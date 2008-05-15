@@ -341,7 +341,7 @@ CONTAINS
     do i=1,nd2
        localmaster=master
        call ass(daddsc(i))
-       daddsc(i)=s1%v(i)+s2(i)
+       daddsc(i)=s1%v(i)+s2(i)-(s1%v(i).sub.'0')
        master=localmaster
     enddo
     do i=nd2+1,ndd
@@ -369,7 +369,7 @@ CONTAINS
     do i=1,nd2
        localmaster=master
        call ass(scdadd(i))
-       scdadd(i)=s1%v(i)+s2(i)
+       scdadd(i)=s1%v(i)+s2(i)-(s1%v(i).sub.'0')
        master=localmaster
     enddo
     do i=nd2+1,ndd
@@ -396,6 +396,7 @@ Module anbn
   use precision_constants
   implicit none
   public
+  PRIVATE OP
   !frs real(dp),private::eps_extend_poly=c_1e_10
 
   TYPE B_CYL

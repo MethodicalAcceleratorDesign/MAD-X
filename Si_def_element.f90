@@ -1815,39 +1815,6 @@ CONTAINS
   END SUBROUTINE SETFAMILYP
 
 
-  !  SUBROUTINE MIS_(EL,X)
-  !    IMPLICIT NONE
-  !    TYPE(ELEMENT), INTENT(inOUT) ::EL
-  !    real(dp), INTENT(IN) ::X(6)
-  !    INTEGER I
-  !
-  !    IF(.NOT.ASSOCIATED(EL%D)) ALLOCATE(EL%D(3))
-  !    IF(.NOT.ASSOCIATED(EL%R)) ALLOCATE(EL%R(3))
-  !
-  !
-  !    DO I=1,3
-  !       EL%D(I)=X(I)
-  !       EL%R(I)=X(3+I)
-  !    ENDDO
-  !
-  !  END SUBROUTINE MIS_
-
-  !  SUBROUTINE MIS_p(EL,X)
-  !    IMPLICIT NONE
-  !    TYPE(ELEMENTp), INTENT(inOUT) ::EL
-  !    real(dp), INTENT(IN) ::X(6)
-  !    INTEGER I
-  !
-  !    IF(.NOT.ASSOCIATED(EL%D)) ALLOCATE(EL%D(3))
-  !    IF(.NOT.ASSOCIATED(EL%R)) ALLOCATE(EL%R(3))
-  !
-  !
-  !    DO I=1,3
-  !       EL%D(I)=X(I)
-  !       EL%R(I)=X(3+I)
-  !    ENDDO
-  !
-  !  END SUBROUTINE MIS_p
 
   SUBROUTINE ZERO_ANBN_R(EL,N)
     IMPLICIT NONE
@@ -2122,46 +2089,6 @@ CONTAINS
 
   END SUBROUTINE ADDP_ANBN
 
-
-
-
-  ! SUBROUTINE MAGSTATE(EL,S)
-  !   IMPLICIT NONE
-  !   TYPE(ELEMENT), INTENT(INOUT)::EL
-  !   TYPE(INTERNAL_STATE), INTENT(IN)::S
-
-  !    IF(S%TOTALPATH) THEN
-  !       EL%P%TOTALPATH=S%TOTALPATH
-  !    ELSE
-  !       EL%P%TOTALPATH=S%TOTALPATH
-  !    ENDIF
-  !    EL%P%RADIATION=S%RADIATION
-  !    EL%P%TIME=S%TIME
-  !    EL%P%NOCAVITY=S%NOCAVITY
-  !    EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
-  !    EL%P%SPIN=S%SPIN
-  !    EL%P%SPIN_ONLY=S%SPIN_ONLY
-  !  END SUBROUTINE MAGSTATE
-
-
-  !  SUBROUTINE MAGPSTATE(EL,S)
-  !   IMPLICIT NONE
-  !   TYPE(ELEMENTP), INTENT(INOUT)::EL
-  !   TYPE(INTERNAL_STATE), INTENT(IN)::S
-
-  !    IF(S%TOTALPATH) THEN
-  !       EL%P%TOTALPATH=S%TOTALPATH
-  !    ELSE
-  !       EL%P%TOTALPATH=S%TOTALPATH
-  !    ENDIF
-  !    EL%P%RADIATION=S%RADIATION
-  !    EL%P%TIME=S%TIME
-  !    EL%P%NOCAVITY=S%NOCAVITY
-  !    EL%P%FRINGE=S%FRINGE.or.EL%PERMFRINGE
-  !    EL%P%SPIN=S%SPIN
-  !    EL%P%SPIN_ONLY=S%SPIN_ONLY
-
-  !  END SUBROUTINE MAGPSTATE
 
 
   SUBROUTINE null_EL(EL)
@@ -3449,20 +3376,22 @@ CONTAINS
 
   END SUBROUTINE reset31
 
-  SUBROUTINE  find_energy(t,KINETIC,ENERGY,P0C,BRHO,beta0)
+  SUBROUTINE  find_energy(t,KINETIC,ENERGY,P0C,BRHO,beta0,gamma)
     implicit none
     type(work) ,INTENT(INout):: t
-    real(dp) XMC2,cl,CU,ERG,beta0i,GAMMA,GAMMA2,CON
+    real(dp) XMC2,cl,CU,ERG,beta0i,GAMMA0,GAMMA2,CON
     logical(lp) PROTON
-    real(dp) KINETIC1,ENERGY1,P0C1,BRHO1,beta01   !  private here
-    real(dp), optional ::   KINETIC,ENERGY,P0C,BRHO,beta0   !  private here
+    real(dp) KINETIC1,ENERGY1,P0C1,BRHO1,beta01,gamma1   !  private here
+    real(dp), optional ::   KINETIC,ENERGY,P0C,BRHO,beta0,gamma   !  private here
     real(dp)  gamma0I,gamBET  ! private here
 
+    gamma1=zero
     kinetic1=zero
     ENERGY1=zero
     beta01=zero
     brho1=zero
     p0c1=zero
+    if(present(gamma)) gamma1=-gamma
     if(present(KINETIC)) kinetic1=-kinetic
     if(present(energy))  energy1=-energy
     if(present(BETa0))   BETa01=-BETa0
@@ -3505,21 +3434,27 @@ CONTAINS
        p0c1=-p0c1
     endif
 
+    if(gamma1<0) then
+       gamma1=-gamma1
+       erg=gamma1*xmc2
+       p0c1=sqrt(erg**2-XMC2**2)
+    endif
+
     erg=SQRT(p0c1**2+XMC2**2)
     kinetic1=ERG-xmc2
     BETa01=SQRT(kinetic1**2+two*kinetic1*XMC2)/erg
     beta0i=one/BETa01
-    GAMMA=erg/XMC2
+    GAMMA0=erg/XMC2
     write(W_P%C(2),'(A16,G20.14)') ' Kinetic Energy ',kinetic1
-    write(W_P%C(3),'(A7,G20.14)') ' gamma ',gamma
+    write(W_P%C(3),'(A7,G20.14)') ' gamma ',gamma0
     write(W_P%C(4),'(A7,G20.14)')' beta0 ',BETa01
     CON=three*CU*CGAM*HBC/two*TWOPII/XMC2**3
-    CRAD=CGAM*ERG**3*TWOPII
-    CFLUC=CON*ERG**5
+    CRAD=CGAM*TWOPII   !*ERG**3
+    CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     brho1=SQRT(ERG**2-XMC2**2)*ten/cl
     write(W_P%C(5),'(A7,G20.14)') ' p0c = ',p0c1
-    write(W_P%C(6),'(A9,G20.14)')' GAMMA = ',SQRT(GAMMA2)
+    write(W_P%C(6),'(A9,G20.14)')' GAMMA0 = ',SQRT(GAMMA2)
     write(W_P%C(7),'(A8,G20.14)')' BRHO = ',brho1
     write(W_P%C(8),'(A15,G20.14,1X,G20.14)')"CRAD AND CFLUC ", crad ,CFLUC
     IF(VERBOSE) CALL WRITE_I

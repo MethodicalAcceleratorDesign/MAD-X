@@ -154,6 +154,8 @@ contains
        BLANK=ECOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("WIGGLER        ")
        BLANK=WIGGLER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+    CASE("HELICALDIPOLE  ")
+       BLANK=HELICAL(KEY%LIST%NAME,LIST=KEY%LIST)
        !    CASE("TAYLORMAP      ")
        !       IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
        !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
@@ -328,7 +330,8 @@ contains
        write(MF,*) " $$$$$$$$$ GLOBAL DATA  $$$$$$$$$"
     endif
 
-    write(MF,*) l%start%mass,L%START%mag%p%p0c, "MASS, P0C"
+    write(line,*) l%start%mass,L%START%mag%p%p0c,l%start%ag, " MASS, P0C, AG(spin)"
+    write(MF,'(a255)') line
     write(MF,*) phase0,stoch_in_rec,l%start%charge, " PHASE0, STOCH_IN_REC, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
          "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
@@ -362,15 +365,16 @@ contains
   subroutine READ_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
     implicit none
     character(*) filename
-    integer mf,I,N
+    integer mf,I,N,RES,se1,se2
     integer, optional :: mf1
     type(LAYOUT), TARGET :: L
     type(FIBRE), pointer :: P
     LOGICAL(LP), OPTIONAL :: RING
     REAL(DP), OPTIONAL :: LMAX0
     LOGICAL(LP) RING_IT,doneit
-    character*120 line
-    real(dp) p0c,MASSF
+    character*255 line
+    character*255 lineg
+    real(dp) p0c,MASSF,ag0
     type(internal_state) original
 
     RING_IT=MY_TRUE
@@ -389,19 +393,45 @@ contains
     ELSE
        READ(MF,*) N
     ENDIF
-    read(MF,'(a120)') line
+    read(MF,'(a255)') line
     call context(line)
 
     if(index(line,"FOR")/=0) then
        l%name=line(index(line,"FOR")+3:index(line,"FOR")+2+nlp)
     endif
-    read(MF,*) MASSF,p0c
+    read(MF,'(A255)') lineg
+    res=INDEX (lineG, "AG(spin)")
+    IF(RES==0) THEN
+       read(lineg,*) MASSF,p0c
+       IF(ABS(MASSF-pmap)/PMAP<0.01E0_DP) THEN
+          A_PARTICLE=A_PROTON
+       ELSEIF(ABS(MASSF-pmae)/pmae<0.01E0_DP) THEN
+          A_PARTICLE=A_ELECTRON
+       ELSEIF(ABS(MASSF-pmaMUON)/pmaMUON<0.01E0_DP) THEN
+          A_PARTICLE=A_MUON
+       ENDIF
+    ELSE
+       read(lineg,*) MASSF,p0c,A_PARTICLE
+    ENDIF
+    ag0=A_PARTICLE
     read(MF,*) phase0,stoch_in_rec,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
-    read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
+    read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
+    if(SECTOR_NMUL_MAX/=se1) then
+       write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX
+       write(6,*) " to ",se1
+       write(6,*) " Watch out : GLOBAL VARIABLE "
+    endif
+    if(SECTOR_NMUL/=se2) then
+       write(6,*) " SECTOR_NMUL is changed from ",SECTOR_NMUL
+       write(6,*) " to ",se2
+       write(6,*) " Watch out : GLOBAL VARIABLE "
+    endif
+    SECTOR_NMUL_MAX=se1
+    SECTOR_NMUL=se2
     read(MF,*) wedge_coeff
     read(MF,*) MAD8_WEDGE
-    read(MF,'(a120)') line
+    read(MF,'(a255)') line
     original=default
     if(allocated(s_b)) then
        firsttime_coef=.true.
@@ -410,6 +440,7 @@ contains
     !    L%MASS=MASSF
     MASSF=MASSF/pmae
     CALL MAKE_STATES(MASSF)
+    A_PARTICLE=ag0
     default=original
     call Set_madx(p0c=p0c)
     DO I=1,N
@@ -679,9 +710,13 @@ contains
     WRITE(MF,'(A255)') LINE
     WRITE(LINE,*) 0.d0,0.d0,0.d0,0.d0,0.d0,0.d0, " no more mis"
     WRITE(MF,'(A255)') LINE
-    IF(ASSOCIATED(M%FREQ)) THEN
+    IF(ASSOCIATED(M%DELTA_E).and.ASSOCIATED(M%FREQ)) THEN
        WRITE(MF,*) " CAVITY INFORMATION "
        WRITE(LINE,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN, " VOLT,FREQ, PHAS, DELTA_E, LAG, THIN"
+       WRITE(MF,'(A255)') LINE
+    ELSEIF(.not.ASSOCIATED(M%DELTA_E).and.ASSOCIATED(M%FREQ)) THEN
+       WRITE(MF,*) " HELICAL DIPOLE INFORMATION "
+       WRITE(LINE,*) M%FREQ,M%PHAS, " K_Z, PHAS"
        WRITE(MF,'(A255)') LINE
     ELSEIF(ASSOCIATED(M%VOLT)) THEN
        WRITE(MF,*) " ELECTRIC SEPTUM INFORMATION "
@@ -825,7 +860,7 @@ contains
     character*255 line
 
     select case(el%kind)
-    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
+    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
     case(kind3)
        WRITE(LINE,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
        WRITE(MF,'(A255)') LINE
@@ -836,7 +871,7 @@ contains
           write(mf,*) el%c4%f(i),el%c4%ph(i)
        enddo
     case(kind10)
-       WRITE(MF,*) el%tp10%DRIFTKICK
+       WRITE(MF,*) el%tp10%DRIFTKICK,  " driftkick "
     case(kind16,kind20)
        WRITE(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD, " driftkick,likemad"
     case(kind18)
@@ -866,7 +901,7 @@ contains
     character*255 line
     real(dp) x1,x2
     select case(el%kind)
-    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
+    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,kind22)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
     case(kind3)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
@@ -1000,6 +1035,10 @@ contains
        IF(.NOT.ASSOCIATED(M%LAG))   ALLOCATE(M%LAG)
        IF(.NOT.ASSOCIATED(M%THIN))  ALLOCATE(M%THIN)
        READ(MF,*) M%VOLT, M%FREQ,M%PHAS,M%DELTA_E,M%LAG,M%THIN
+    ELSEIF(LINE(1:1)=='H') THEN
+       IF(.NOT.ASSOCIATED(M%FREQ)) ALLOCATE(M%FREQ)
+       IF(.NOT.ASSOCIATED(M%PHAS)) ALLOCATE(M%PHAS)
+       READ(MF,*) M%FREQ,M%PHAS
     ELSEIF(LINE(1:1)=='E') THEN
        IF(.NOT.ASSOCIATED(M%VOLT)) ALLOCATE(M%VOLT)
        IF(.NOT.ASSOCIATED(M%PHAS)) ALLOCATE(M%PHAS)
@@ -1400,9 +1439,11 @@ contains
     REAL(DP), OPTIONAL :: LMAX0
     LOGICAL(LP) RING_IT,doneit
     character*120 line
-    real(dp) p0c,MASSF,LMAX0t
+    character*255 lineg
+    real(dp) p0c,MASSF,LMAX0t,ag0
     type(internal_state) original
     integer,optional :: mf1
+    integer res
 
 
     RING_IT=MY_TRUE
@@ -1428,7 +1469,24 @@ contains
     if(index(line,"FOR")/=0) then
        l%name=line(index(line,"FOR")+3:index(line,"FOR")+2+nlp)
     endif
-    read(MF,*) MASSF,p0c
+
+    read(MF,'(A255)') lineg
+    res=INDEX (lineG, "AG(spin)")
+    IF(RES==0) THEN
+       read(lineg,*) MASSF,p0c
+       IF(ABS(MASSF-pmap)/PMAP<0.01E0_DP) THEN
+          A_PARTICLE=A_PROTON
+       ELSEIF(ABS(MASSF-pmae)/pmae<0.01E0_DP) THEN
+          A_PARTICLE=A_ELECTRON
+       ELSEIF(ABS(MASSF-pmaMUON)/pmaMUON<0.01E0_DP) THEN
+          A_PARTICLE=A_MUON
+       ENDIF
+    ELSE
+       read(lineg,*) MASSF,p0c,A_PARTICLE
+    ENDIF
+    ag0=A_PARTICLE
+
+    !    read(MF,*) MASSF,p0c
     read(MF,*) phase0,stoch_in_rec,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
@@ -1443,6 +1501,7 @@ contains
     !    L%MASS=MASSF
     MASSF=MASSF/pmae
     CALL MAKE_STATES(MASSF)
+    A_PARTICLE=ag0
     default=original
     call Set_madx(p0c=p0c)
     DO I=1,N

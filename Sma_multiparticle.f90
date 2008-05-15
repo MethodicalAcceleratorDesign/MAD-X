@@ -285,7 +285,7 @@ CONTAINS
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
        ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
-       CALL MIS_FIB(C,X,OU,DONEITT)
+       CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
 
   END SUBROUTINE TRACK_FIBRE_FRONTR
@@ -389,7 +389,7 @@ CONTAINS
 
     IF(C%MAG%MIS) THEN
        ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
-       CALL MIS_FIB(C,X,OU,DONEITF)
+       CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
     CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)

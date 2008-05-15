@@ -86,7 +86,7 @@ contains
     INTEGER NPOL,J,NMUL,K,ICN,N,np,MRESO(3)
     type(pol_block), ALLOCATABLE :: pol_(:)
     type(pol_block) :: pb
-    CHARACTER*(NLP) NAME,flag
+    CHARACTER*(NLP) NAME,flag,VORNAME
     real(dp) targ_tune(2),targ_chrom(2),EPSF
     real(dp) targ_RES(4)
     !  END FITTING FAMILIES
@@ -125,7 +125,7 @@ contains
     ! TRACKING RAYS
     INTEGER NRAYS
     INTEGER IBN,N_name
-    REAL(DP) X(6),DT(3),x_ref(6),sc
+    REAL(DP) X(6),DT(3),x_ref(6),sc,NLAM,A1,B1,HPHA,B_TESTLA,CUR1,CUR2
     REAL(DP)VOLT,PHASE
     INTEGER HARMONIC_NUMBER
     ! changing magnet
@@ -145,6 +145,7 @@ contains
     real(dp) dlim_t(6)
     type(internal_state),pointer :: my_old_state
     integer temps(8)
+    TYPE(WORK) W
 
     if(associated(my_estate)) my_old_state=>my_estate
     my_default=default
@@ -369,15 +370,24 @@ contains
           xbend=-one
           if(thin<0) then
              READ(MF,*) xbend
+             if(xbend<0) then
+                xbend=-xbend
+                radiation_bend_split=MY_true
+             endif
              thin=-thin
           endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
           CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int,lmax0=lmax,xbend=xbend)
+          radiation_bend_split=MY_false
        case('EVENTHINLENS')
           READ(MF,*) THIN
           xbend=-one
           if(thin<0) then
              READ(MF,*) xbend
+             if(xbend<0) then
+                xbend=-xbend
+                radiation_bend_split=MY_true
+             endif
              thin=-thin
           endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
@@ -387,6 +397,10 @@ contains
           xbend=-one
           if(thin<0) then
              READ(MF,*) xbend
+             if(xbend<0) then
+                xbend=-xbend
+                radiation_bend_split=MY_true
+             endif
              thin=-thin
           endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
@@ -754,6 +768,9 @@ contains
 
           enddo
 
+       case('ALEXREMOVAL')
+          call special_alex_main_ring_removal(my_ering)
+
 
        case('PRINTFRAMES')
 
@@ -849,6 +866,32 @@ contains
              write(6,*) name," Not found "
              stop 555
           endif
+       case('POWERHELICALDIPOLE','POWERHELICAL')
+          READ(MF,*)name, VORNAME   !,POS
+          READ(MF,*) A1,B1    !  A1,B1
+          READ(MF,*) NLAM     ! NUMBER OF WAVES
+          READ(MF,*) HPHA     ! PHASE
+          READ(MF,*) CUR2,CUR1,B_TESTLA   ! ACTUAL CURRENT, REF CURRENT, b FIELD
+          READ(MF,*) I1,I2    ! NST,METHOD
+          call move_to(my_ering,p,name,VORNAME,POS)
+          if(pos/=0) then
+             W=P
+             B_TESTLA=CUR2/CUR1*B_TESTLA/w%brho
+
+             p%mag%bn(1)=B_TESTLA+B1
+             p%magp%bn(1)=B_TESTLA+B1
+             p%mag%an(1)=-B_TESTLA+A1
+             p%magp%an(1)=-B_TESTLA+A1
+             p%mag%freq=twopi/p%mag%l/NLAM
+             p%magp%freq=p%mag%freq
+             p%mag%p%nst=I1
+             p%mag%p%method=I2
+             p%magp%p%nst=I1
+             p%magp%p%method=I2
+          else
+             write(6,*) name," Not found "
+             stop 555
+          endif
        case('COMPUTEMAP')
           READ(MF,*)POS,DEL,NO
           READ(MF,*) FILENAME
@@ -874,7 +917,7 @@ contains
                 stop
              endif
           endif
-          CALL radia(my_ering,POS,FILENAME,fileTUNE)
+          CALL radia(my_ering,POS,FILENAME,fileTUNE,my_estate)
 
        case('SPECIALALEX')
           READ(MF,*) I1
@@ -902,7 +945,7 @@ contains
     implicit none
     TYPE(LAYOUT), POINTER :: r
     type(fibre), pointer :: p
-    integer i,ip,HARM
+    integer i,ip,HARM,j
     type(internal_state) state
     real(dp) closed(6),s,VOLT,PHAS,accuracy,circum,freq
     real(dp),optional :: prec
@@ -959,14 +1002,19 @@ contains
        if(p%mag%kind==kind4) then
           write(6,*) " Before "
 
-          write(6,*) p%mag%name
-          write(6,*) " volt    = ",p%mag%volt
-          write(6,*) " freq    = ",p%mag%freq
-          write(6,*) " phas    = ",p%mag%phas
-          write(6,*) " ref p0c = ",p%mag%p%p0c
-          write(6,*) "electron = ", c_%electron
-          p%mag%volt=VOLT   !/p%mag%l
-          p%magp%volt=p%mag%volt
+          ! write(6,*) p%mag%name
+          ! write(6,*) " volt    = ",p%mag%volt
+          ! write(6,*) " freq    = ",p%mag%freq
+          ! write(6,*) " phas    = ",p%mag%phas
+          ! write(6,*) " ref p0c = ",p%mag%p%p0c
+          ! write(6,*) "electron = ", c_%electron
+          if(p%mag%l/=zero) then
+             p%mag%volt=VOLT/p%mag%l
+             p%magp%volt=p%mag%volt
+          else
+             p%mag%volt=VOLT   !/p%mag%l
+             p%magp%volt=p%mag%volt
+          endif
           p%mag%freq=freq      !CLIGHT*HARM/circum   ! harmonic=120.0_dp
           p%magp%freq=p%mag%freq
           p%mag%phas=PHAS
@@ -978,8 +1026,22 @@ contains
           write(6,*) " freq    = ",p%mag%freq
           write(6,*) " phas    = ",p%mag%phas
           write(6,*) " ref p0c = ",p%mag%p%p0c
-          write(6,*) "electron = ", c_%electron
-          write(6,*) " phase0  = ", c_%phase0
+          p%mag%c4%phase0=zero
+          p%magp%c4%phase0=zero
+          p%mag%c4%f(1)=one
+          p%magp%c4%f(1)=one
+          p%mag%c4%ph(1)=zero
+          p%magp%c4%ph(1)=zero
+          p%mag%c4%CAVITY_TOTALPATH=0
+          p%magp%c4%CAVITY_TOTALPATH=0
+          do j=2,p%mag%c4%nf
+             p%mag%c4%f(j)=zero
+             p%magp%c4%f(j)=zero
+             p%mag%c4%ph(j)=zero
+             p%magp%c4%ph(j)=zero
+          enddo
+          !          write(6,*) "electron = ", c_%electron
+          !          write(6,*) " phase0  = ", c_%phase0
           if(c_%CAVITY_TOTALPATH==0) write(6,*) " fake cavity "
        endif
        p=>P%NEXT
@@ -1245,7 +1307,7 @@ contains
   end subroutine printframes
 
 
-  SUBROUTINE radia(R,loc,FILE1,FILE2)
+  SUBROUTINE radia(R,loc,FILE1,FILE2,estate,ast,asti,kick,mat,mat0,fixrad)
     implicit none
     TYPE(LAYOUT) R
 
@@ -1258,8 +1320,10 @@ contains
     TYPE(REAL_8) Y(6)
     TYPE(DAMAP) ID
     TYPE(INTERNAL_STATE) state
+    TYPE(INTERNAL_STATE), target :: estate
     integer no,loc,mf1,mf2
-    real(dp) av(6,6),e(3)
+    real(dp) av(6,6),e(3),mat0i(6,6)
+    real(dp),optional :: ast(6,6),asti(6,6),kick(6),mat(6,6),mat0(6,6),fixrad(6)
     type(fibre), pointer :: p
     no=0
     call kanalnummer(mf1)
@@ -1267,12 +1331,33 @@ contains
     call kanalnummer(mf2)
     open(mf2,file=FILE2)
 
-    state=(my_estate-nocavity0)+radiation0
+
+    if(present(mat0)) then
+       state=(estate-nocavity0)+radiation0
+       x=0.d0;
+       CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
+       CALL INIT(state,1,0)
+       CALL ALLOC(Y);CALL ALLOC(NORMAL);call alloc(id);  ! ALLOCATE VARIABLES
+       id=1
+       y=id+x
+       CALL TRACK_PROBE_x(r,y,state, fibre1=loc)
+       id=y
+       mat0=id
+       normal=id
+       mat0i=id**(-1)   ! mat0i has inverse
+       write(6,*) "symplectic tunes "
+       write(6,*) normal%tune
+
+       CALL kill(Y);CALL kill(NORMAL);call kill(id);  ! ALLOCATE VARIABLES
+
+    endif
+    state=(estate-nocavity0)+radiation0
     x=0.d0;
 
     CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
     WRITE(6,*) " CLOSED ORBIT AT LOCATION ",loc
     write(6,*) x
+    if(present(fixrad)) fixrad=x
     if(track_flag(r,x,loc,state)==0) then
        write(6,*) " stable closed orbit tracked "
     else
@@ -1280,6 +1365,7 @@ contains
        stop 333
     endif
 
+    goto 100
     open(unit=30,file='junk.txt')
     call move_to(r,p,loc)
     do i=loc,loc+r%n
@@ -1289,6 +1375,7 @@ contains
     enddo
     close(30)
 205 FORMAT(1x,i4,1x,a8,1x,6(1X,D18.11))
+100 continue
 
     call GET_loss(r,energy,deltap)
     write(6,*) x
@@ -1312,7 +1399,18 @@ contains
     normal=y
     if(.not.check_stable) write(6,*) " unstable in normalizing map "
     as=normal%a_t
-
+    ! goto 111
+    id=y
+    open(unit=66,file='crap.txt')
+    call print(id,66)
+    do i=1,6
+       do j=1,6
+          m=ys(i)%e(j)
+          write(66,*) i,j,m
+       enddo
+    enddo
+    close(66)
+111 continue
     !  TYPE beamenvelope
     !     ! radiation normalization
     !     type (damap) transpose    ! Transpose of map which acts on polynomials
@@ -1355,10 +1453,24 @@ contains
           js(j)=0
        enddo
     enddo
+    if(present(kick)) then
+       kick(1)=env%kick(1)
+       kick(2)=env%kick(1)
+       kick(3)=env%kick(2)
+       kick(4)=env%kick(2)
+       kick(5)=env%kick(3)
+       kick(6)=env%kick(3)
+    endif
     write(mf1,*) env%kick
     write(mf1,*) "B matrix"
     call print(env%STOCH,mf1)
     write(mf1,*) "m matrix"
+
+    if(present(mat)) then
+       id=ys%v
+       mat=id
+       mat=matmul(mat,mat0i)
+    endif
     call print(ys%v,mf1)
     write(mf1,*) "equilibrium <X_i X_j>"
     call print(env%sij0,mf1)
@@ -1367,7 +1479,9 @@ contains
     ! for etienne
     write(mf2,*) env%kick
     call print(env%STOCH,mf2)
+    if(present(ast)) ast=env%STOCH
     env%STOCH=env%STOCH**(-1)
+    if(present(asti))asti=env%STOCH
     call print(env%STOCH,mf2)
     call print(ys%v,mf2)
     write(mf2,*) " Damping  "
@@ -1445,6 +1559,38 @@ contains
     endif
     close(mf1)
     close(mf2)
+
+
+    call kanalnummer(mf1)
+    open(mf1,file='barber_stochastic.txt')
+    if(present(mat)) then
+       do i=1,6
+          do j=1,6
+             write(mf1,*) i,j,mat(i,j)," mat"
+          enddo
+       enddo
+    endif
+    if(present(ast)) then
+       do i=1,6
+          do j=1,6
+             write(mf1,*) i,j,ast(i,j)," ast"
+          enddo
+       enddo
+    endif
+    if(present(asti)) then
+       do i=1,6
+          do j=1,6
+             write(mf1,*) i,j,asti(i,j)," asti"
+          enddo
+       enddo
+    endif
+    if(present(kick)) then
+       do i=1,6
+          write(mf1,*) i,kick(i)," kick"
+       enddo
+    endif
+
+    close(mf1)
 
   end subroutine radia
 
