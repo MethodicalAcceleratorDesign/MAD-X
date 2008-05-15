@@ -313,7 +313,7 @@ contains
     do i=1,r%n
        write(mf,*)
        write(mf,*) '//cout<<',i,'<<" ',p%mag%name,'"<<endl;'
-       
+
        !print*, i,p%mag%name
        if (getdebug() > 2) then
           print*, i,p%mag%name
@@ -370,7 +370,7 @@ contains
              print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
              print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
           endif
-          
+
           nmul = p%mag%p%nmul
           if (p%mag%bn(1) /= zero ) then
              !BEND
@@ -378,7 +378,7 @@ contains
              a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
              a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
              call drawbox(p,mf,P%mag%p%f%ent,a,blue)
-          elseif (nmul < 2)  then 
+          elseif (nmul < 2)  then
              !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
              cycle
@@ -391,7 +391,7 @@ contains
                 call drawboxm(p,mf,green)!QUAD defoc
              endif
 
-          elseif (nmul < 3)  then 
+          elseif (nmul < 3)  then
              !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
              goto 100
@@ -400,7 +400,7 @@ contains
              !SEXTUPOLE
              call drawboxm(p,mf,color_n_sext)
 
-          elseif (nmul < 4)  then 
+          elseif (nmul < 4)  then
              !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
              goto 100

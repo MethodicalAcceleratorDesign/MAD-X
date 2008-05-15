@@ -60,12 +60,12 @@ CONTAINS
     if (getdebug()>0) print*,"Now PTC"
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
 
-!    print*,">>ss1<< old sector_nmul",sector_nmul
+    !    print*,">>ss1<< old sector_nmul",sector_nmul
 
     sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
-    
-!    print*,">>ss1<< new sector_nmul",sector_nmul
-    
+
+    !    print*,">>ss1<< new sector_nmul",sector_nmul
+
     if(sector_nmul_max.lt.sector_nmul) then
        call aafail('sector_nmul_max must be larger than sector_nmul: ',&
             'check your ptc_create_universe input')
@@ -139,7 +139,7 @@ CONTAINS
     include 'twiss0.fi'
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd
-!    integer get_option
+    !    integer get_option
     integer double_from_table
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: nt0=20000,length=16
@@ -338,7 +338,7 @@ CONTAINS
     call node_name(name,length)
     key%list%vorname=name
 
-!frs&piotr 18 Dec 2007: sector_nmul must stay global for the time being
+    !frs&piotr 18 Dec 2007: sector_nmul must stay global for the time being
     !local, if present, superseed global at current node
 
 
@@ -406,7 +406,7 @@ CONTAINS
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
-!       case("lhcscreen")
+          !       case("lhcscreen")
        case("rectellipse")
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
@@ -414,11 +414,11 @@ CONTAINS
           key%list%aperture_y=aperture(3)
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
-!       case("marguerite")
-!          key%list%aperture_on=.true.
-!          key%list%aperture_kind=4
-!          key%list%aperture_r(1)=aperture(1)
-!          key%list%aperture_r(2)=aperture(2)
+          !       case("marguerite")
+          !          key%list%aperture_on=.true.
+          !          key%list%aperture_kind=4
+          !          key%list%aperture_r(1)=aperture(1)
+          !          key%list%aperture_r(2)=aperture(2)
        case("general")
           key%list%aperture_kind=5
           print*,"General aperture not implemented"
@@ -705,7 +705,7 @@ CONTAINS
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
     case(12)
-! actually our SROT element
+       ! actually our SROT element
        key%magnet="CHANGEREF"
        call dzero(patch_ang,3)
        call dzero(patch_trans,3)
@@ -716,7 +716,7 @@ CONTAINS
           key%list%t(i)=patch_trans(i)
        enddo
     case(13)
-! actually our YROT element
+       ! actually our YROT element
        key%magnet="CHANGEREF"
        call dzero(patch_ang,3)
        call dzero(patch_trans,3)
@@ -1355,7 +1355,7 @@ CONTAINS
               &                 a001000, &
               &                 a000100, &
               &                 a000001, & !madx format has dp/p at the last column
-              &                 a000010    ! 
+              &                 a000010    !
       enddo
 
       do ii=6,5,-1
@@ -1370,7 +1370,7 @@ CONTAINS
               &                 a001000, &
               &                 a000100, &
               &                 a000001, & !madx format has dp/p at the last column
-              &                 a000010    ! 
+              &                 a000010    !
       enddo
     end subroutine dump6dmap
 

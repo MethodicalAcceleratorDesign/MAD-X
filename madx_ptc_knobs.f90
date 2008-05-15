@@ -11,7 +11,7 @@ module madx_ptc_knobs_module
   use madx_ptc_intstate_module, only : getdebug
   implicit none
 
-  include "madx_ptc_knobs.inc" 
+  include "madx_ptc_knobs.inc"
   save
   private
   !============================================================================================
@@ -68,7 +68,7 @@ module madx_ptc_knobs_module
 
   integer, parameter                    ::  maxpar = 100
   integer                               ::  nmapels = 0
-!  type(mapelresult),target              ::  mapels(maxpar)
+  !  type(mapelresult),target              ::  mapels(maxpar)
 
   real(kind(1d0)), allocatable          ::  spos(:)
   real(dp), allocatable                 ::  deltaes(:) !array with energy increase for each element with respect to the beginning
@@ -94,10 +94,10 @@ module madx_ptc_knobs_module
   type(real_8), private                 ::  test
   integer, private                      ::  taylorsallocated = 0
 
-!  integer, private, dimension(6)        :: j1 = (/1,0,0,0,0,0/)
-!  integer, private, dimension(6)        :: j2 = (/0,1,0,0,0,0/)
-!  integer, private, dimension(6)        :: j3 = (/0,0,1,0,0,0/)
-!  integer, private, dimension(6)        :: j4 = (/0,0,0,1,0,0/)
+  !  integer, private, dimension(6)        :: j1 = (/1,0,0,0,0,0/)
+  !  integer, private, dimension(6)        :: j2 = (/0,1,0,0,0,0/)
+  !  integer, private, dimension(6)        :: j3 = (/0,0,1,0,0,0/)
+  !  integer, private, dimension(6)        :: j4 = (/0,0,0,1,0,0/)
   integer, private, dimension(6)        :: j5 = (/0,0,0,0,1,0/)
   integer, private, dimension(6)        :: j6 = (/0,0,0,0,0,1/)
   integer, private, dimension(6,6)       :: fo = &
@@ -160,9 +160,9 @@ contains
     real(kind(1d0))      :: coeff
     integer              :: i !iterator
     logical              :: pblockson
-    
+
     if (getdebug() > 3) then
-        print *,"madx_ptc_tablepush :putusertable n ",n," name ", name
+       print *,"madx_ptc_tablepush :putusertable n ",n," name ", name
     endif
 
 
@@ -795,16 +795,16 @@ contains
 
   end function getnknobsall
   !____________________________________________________________________________________________
-  
+
   function getnpushes()
     implicit none
     integer     :: getnpushes
 
-     getnpushes = npushes
-     
+    getnpushes = npushes
+
   end function getnpushes
   !____________________________________________________________________________________________
-  
+
   subroutine getfctnsnames
     implicit none
     character*(100) ::name
@@ -1339,12 +1339,12 @@ contains
     integer              :: n !fibre number
     character(*)         :: name !fibre name
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial)
-!    real(kind(1d0))      :: coeff
-!    integer              :: i,ii,j,k !iterator
-!    type(taylor)         :: ave(6,6,3)
+    !    real(kind(1d0))      :: coeff
+    !    integer              :: i,ii,j,k !iterator
+    !    type(taylor)         :: ave(6,6,3)
 
-     print*," resultswithknobs not yet implemented ",n,name
-       call print(y(1),6)
+    print*," resultswithknobs not yet implemented ",n,name
+    call print(y(1),6)
 
   end subroutine resultswithknobs
 

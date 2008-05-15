@@ -44,7 +44,7 @@ contains
     type(internal_state)  :: intstate
     real(kind(1d0))      :: get_value
     integer, external    :: restart_sequ, & !  restart beamline and return number of beamline node
-                            advance_node    !  advance to the next node in expanded sequence
+         advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
     TYPE(BEAM) :: TheBEAM
@@ -60,7 +60,7 @@ contains
 
     if(universe.le.0) then
        call fort_warn('return from ptc_trackline: ',' no universe created')
-       print*,"Max number of nobs ", nobs 
+       print*,"Max number of nobs ", nobs
        return
     endif
     if(index_mad.le.0) then
@@ -178,7 +178,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!      TRACKING       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
+
     call kanalnummer(mf)
 
     open(unit=mf,file='thintracking_ptc.txt',POSITION='APPEND' , STATUS='UNKNOWN')
@@ -233,23 +233,23 @@ contains
 
 
              if (rplot) then
-             !For thin tracking I still do not know how to get global coordinates
-             !   gcs = my_false !For thin tracking 
-             !   if (gcs) then
-             !      !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-             !      gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
-             !      gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
-             !      gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
-             !      !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
-             !      gposx = gposx + p%chart%f%b(1)
-             !      gposy = gposy + p%chart%f%b(2)
-             !      gposz = gposz + p%chart%f%b(3)
-             !
-             !      write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
-             !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
-             !   else
-                   call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
-             !   endif
+                !For thin tracking I still do not know how to get global coordinates
+                !   gcs = my_false !For thin tracking
+                !   if (gcs) then
+                !      !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+                !      gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
+                !      gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
+                !      gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
+                !      !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                !      gposx = gposx + p%chart%f%b(1)
+                !      gposy = gposy + p%chart%f%b(2)
+                !      gposz = gposz + p%chart%f%b(3)
+                !
+                !      write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
+                !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                !   else
+                call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                !   endif
              endif
 
              if ( observedelements(e) .gt. 0 ) then
@@ -381,7 +381,7 @@ contains
     type(internal_state)  :: intstate
     real(kind(1d0))      :: get_value
     integer, external    :: restart_sequ, & !  restart beamline and return number of beamline node
-                            advance_node    !  advance to the next node in expanded sequence
+         advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
     integer              :: mf
@@ -487,11 +487,11 @@ contains
           p=>my_ring%start
 
           do e=1, my_ring%n
-             
+
              !print*, p%mag%name, p%mag%P%KILL_ENT_FRINGE, p%mag%P%KILL_EXI_FRINGE,  &
              !        p%mag%P%BEND_FRINGE,  p%mag%p%PERMFRINGE, p%mag%PERMFRINGE
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
-             
+
              call track(my_ring,x,e,e+1,getintstate())
              pathlegth = pathlegth + p%mag%p%ld
 

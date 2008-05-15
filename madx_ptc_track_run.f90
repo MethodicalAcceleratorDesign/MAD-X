@@ -152,7 +152,7 @@ MODULE madx_ptc_track_run_module
   ! SUBROUTINE ptc_track_run and called from it
   ! external subroutines calculating particle interactions
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
-                             ! shorts for <double precision>, <logical>, 0D0 etc.
+                                ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
   implicit none
   SAVE
@@ -260,7 +260,7 @@ CONTAINS
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
          Find_Envelope, &                                                                  !
-         ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
+                                ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
@@ -410,8 +410,8 @@ CONTAINS
        !                                                         !
        call Get_map_from_NormalForm &                            !
             (ptc_track_debug, Normal_Order_n0, x_coord_co, &     !
-            !INTENT:   IN,             IN,             IN        !
-            !               1=> Normal_Order_n0  for Linear      !
+                                !INTENT:   IN,             IN,             IN        !
+                                !               1=> Normal_Order_n0  for Linear      !
             Map_Y, Normal_Form_N, A_t_map,   A_t_map_rev)        !
        !     OUT,     OUT,          OUT,       OUT               !
        !                                                         !
@@ -1273,7 +1273,7 @@ CONTAINS
       integer :: n_temp, j_last_particle_buffer,jmax_at_loop_start, j_particle
 
       LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                !NaN_coord_after_track_VK=.False. !
+      !NaN_coord_after_track_VK=.False. !
 
       if (ptc_track_debug) then ! debug printing --------------------------!
          print *; print *, 'Start SUBR.<One_turn_track_with_PTC>'
@@ -1285,7 +1285,7 @@ CONTAINS
          !(instead of <10 continue> in trrun.f)                                                  !
          !                                                                                       !
          Particle_loop: DO j_particle=n_temp, jmax_numb_particl_at_i_th_turn  !++++++++++++++!   !
-            !                                                                                !   ! 
+            !                                                                                !   !
             NaN_coord_after_track_VK=.False. !VK20070709 XXXXXXXXXXXXXXXXXXXXX               !   !
             !                                                                                !   !
             jmax_at_loop_start = jmax_numb_particl_at_i_th_turn                              !   ^
@@ -1317,7 +1317,7 @@ CONTAINS
                Print *,'DO j_particle=n_temp, jmax_numb_particl_at_i_th_turn:'     !         !   !
                Print *, 'DO ',j_particle,'=',n_temp,',', &                         !         !   !
                     jmax_numb_particl_at_i_th_turn                                 !         !   ^
-               !                                                                   !         +   !  
+               !                                                                   !         +   !
                do k_th_coord=1,6  !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  !         +   !
                   if (ISNAN(current_x_coord_incl_co(k_th_coord))) then         !X  !         +   !
                      Print *, 'NAN-value for coordinate number ', k_th_coord   !X  !         +   !
@@ -1500,7 +1500,7 @@ CONTAINS
       real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
 
       LOGICAL :: NaN_coord_after_track_VK=.False. !VK20070328 XXXXXXXXXXXXXXXXXX
-                !NaN_coord_after_track_VK=.False.
+      !NaN_coord_after_track_VK=.False.
 
       x_coord_co_temp=zero
 
@@ -1586,7 +1586,7 @@ CONTAINS
                if (ptc_track_debug) &                                                    !XXXX   +  ! !
                     print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX   !  ! !
                !                                                                                 !  ! !
-               if(flag_index_ptc_aperture/=0) c_%watch_user=.false. !VK20070709 XXXXXXXXXXXXXX   !  ! !   
+               if(flag_index_ptc_aperture/=0) c_%watch_user=.false. !VK20070709 XXXXXXXXXXXXXX   !  ! !
                !                                                                                 !  ! !
                if (ptc_track_debug) then ! debug printing ----------------------------!          !  ^ !
                   !print *, 'PTC: <PRODUCE_APERTURE_FLAG> => flag_index', &           !          +  ! !
@@ -2048,8 +2048,8 @@ CONTAINS
               ( (i_elem_type.EQ.3).AND.(.NOT.Radiation_Quad) ) ) THEN
             rad_curv_m = 1D0/B0_dipole
             Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
-                ! Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
-                  Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
+                                ! Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
+                 Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
             DO j_partic=1, jmax_numb_particl_at_i_th_turn
                IF (Entry_not_Exit) THEN
                   x_coord_incl_co(5,j_partic)=x_coord_incl_co(5,j_partic)+d_loss(1)
@@ -2070,8 +2070,8 @@ CONTAINS
                rad_curv_m = 1D0/Quadr_k/SQRT_X2_Y2
 
                Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
-                 !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
-                  Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
+                                !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
+                    Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
                IF (Entry_not_Exit) THEN
                   x_coord_incl_co(5,j_partic)=x_coord_incl_co(5,j_partic)+d_loss(1)
                ELSE
@@ -2092,7 +2092,7 @@ CONTAINS
                rad_curv_m = SQRT(x_comp*x_comp+ y_comp*y_comp)
 
                Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
-                   !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
+                                !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
                     Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
                IF (Entry_not_Exit) THEN
                   x_coord_incl_co(5,j_partic)=x_coord_incl_co(5,j_partic)+d_loss(1)
@@ -2102,7 +2102,7 @@ CONTAINS
             ENDDO
          END IF
 
-         ! Call photon (i_Mag_type, rad_curv_m, dl_length, Energy_beam_MeV, 
+         ! Call photon (i_Mag_type, rad_curv_m, dl_length, Energy_beam_MeV,
          !                                                           ieave,iquasto,d1, d2)
          ! Radiation_Energy_Loss=TRUE => ieave=1; Radiation_Energy_Loss=FALSE => ieave=0;
          ! Radiation_Quad     =TRUE => iquasto=1; Radiation_Quad     =FALSE => iquasto=0

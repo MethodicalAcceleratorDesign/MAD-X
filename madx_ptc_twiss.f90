@@ -146,7 +146,7 @@ contains
 
 
 !!!!!!!!!!!!!!!!
-! phase advance!
+    ! phase advance!
 !!!!!!!!!!!!!!!!
 
     k = 2
@@ -157,9 +157,9 @@ contains
        jj=2*i -1
        TEST=ATAN2((Y(2*i -1).SUB.fo(2*i,:)),(Y(2*i-1).SUB.fo(2*i-1,:)))/TWOPI
        if (i == 3) then
-         TEST = ATAN2((Y(6).SUB.fo(5,:)),(Y(6).SUB.fo(6,:)))/TWOPI
+          TEST = ATAN2((Y(6).SUB.fo(5,:)),(Y(6).SUB.fo(6,:)))/TWOPI
        endif
-       
+
 
        IF(TEST<0.D0.AND.abs(TEST)>EPSIL)TEST=TEST+1.D0
        DPH=TEST-TESTOLD(i)
@@ -295,9 +295,9 @@ contains
     real(dp)                :: r,re(6,6),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
-    integer                 :: row, rmatrix
+    integer                 :: row
     real(dp)                :: emi(3)
-    logical(lp)             :: skipnormalform, tracktm
+    logical(lp)             :: skipnormalform
 
     skipnormalform = my_false
 
@@ -335,8 +335,6 @@ contains
 
     icase = get_value('ptc_twiss ','icase ')
     deltap0 = get_value('ptc_twiss ','deltap ')
-    
-    rmatrix = get_value('ptc_twiss ','rmatrix ')
 
     deltap = zero
     call my_state(icase,deltap,deltap0)
@@ -412,26 +410,19 @@ contains
     y=npara
     Y=X
 
-    call alloc(transfermap)
-    
-    if ( getnpushes() > 0 .or. rmatrix > 0) then
-      tracktm = my_true
-    else
-      tracktm = my_false
-    endif  
-    
-    if (tracktm) then
-     transfermap = npara
-     transfermap = X
-    endif 
-    
-!    if (maxaccel .eqv. .false.) then
-!      cavsareset = .false.
-!    endif
-    
+    if (getnpushes() > 0) then
+       call alloc(transfermap)
+       transfermap = npara
+       transfermap = X
+    endif
+
+    !    if (maxaccel .eqv. .false.) then
+    !      cavsareset = .false.
+    !    endif
+
     if ( (cavsareset .eqv. .false.) .and. (my_ring%closed .eqv. .false.) ) then
-       
-         call setcavities(my_ring,maxaccel)
+
+       call setcavities(my_ring,maxaccel)
        if (geterrorflag() /= 0) then
           return
        endif
@@ -462,7 +453,7 @@ contains
     !the initial twiss is needed to initialize propely calculation of some variables f.g. phase advance
     tw=y
     phase = zero !we have to do it after the very initial twiss params calculation above
-                 
+
     current=>MY_RING%start
     startfen = 0
     startfen = current!setting up start energy for record
@@ -471,7 +462,7 @@ contains
     print77=.false.
     read77=.false.
 
-    
+
 
     if (getdebug() > 2) then
        open(unit=21,file='ptctwiss.txt')
@@ -510,13 +501,13 @@ contains
           !         if (getnknobis() > 0) c_%knob = my_true
           !print*, "parametric",i,c_%knob
           call track(my_ring,y,i,i+1,+default)
-          if (tracktm) then
-            call track(my_ring,transfermap,i,i+1,+default)
+          if (getnpushes() > 0) then
+             call track(my_ring,transfermap,i,i+1,+default)
           endif
        else
           call track(my_ring,y,i,i+1, default)
-          if (tracktm) then
-            call track(my_ring,transfermap,i,i+1,default)
+          if (getnpushes() > 0) then
+             call track(my_ring,transfermap,i,i+1,default)
           endif
        endif
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -535,11 +526,11 @@ contains
           !          Write(6,*) why ! See produce aperture flag routine in sd_frame
           goto 100
        endif
-       
+
        if (getdebug() > 2) then
-         write(21,*) "##########################################"
-         write(21,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-         call print(y,21)
+          write(21,*) "##########################################"
+          write(21,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
+          call print(y,21)
        endif
 
        suml=suml+current%MAG%P%ld
@@ -553,12 +544,12 @@ contains
        endif
 
        tw=y
-       if (tracktm) then
-            call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
+       if (getnpushes() > 0) then
+          call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
        endif
 
 
-       call puttwisstable(transfermap) ! must be the last since it has tendency for augmenting all tables count
+       call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
 
        iii=advance_node()
        current=>current%next
@@ -586,11 +577,11 @@ contains
 
     call kill(tw)
     CALL kill(y)
-       
-!    if (tracktm) then
+
+    if (getnpushes() > 0) then
        CALL kill(transfermap)
-!    endif
-       
+    endif
+
     do i=1,6
        call kill(unimap(i))
     enddo
@@ -713,10 +704,9 @@ contains
       else
 
          if (getdebug() > 1) then
-            print*,"Initializing map from one turn map: Start Map"
-            call print(y,6)
+            print*,"Initializing map from one turn map"
          endif
-         
+
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
             call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
@@ -736,11 +726,6 @@ contains
             c_%watch_user=.false.
             CALL kill(y)
             return
-         endif
-
-         if (getdebug() > 1) then
-            print*,"Initializing map from one turn map. One Turn Map"
-            call print(y,6)
          endif
 
          call maptoascript()
@@ -786,13 +771,12 @@ contains
     end function getdeltae
     !____________________________________________________________________________________________
 
-    subroutine puttwisstable(transfermap)
+    subroutine puttwisstable()
       implicit none
       include "madx_ptc_knobs.inc"
       integer i1,i2,ii,i1a,i2a
       real(kind(1d0))   :: opt_fun(72),myx
       real(dp)   :: deltae
-      type(real_8), target :: transfermap(6)
 
       if (getdebug() > 2) then
          write(21,*) "##########################################"
@@ -826,56 +810,6 @@ contains
 
       ioptfun=6
       call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
-
-      
-      opt_fun(1) = transfermap(1).sub.fo(1,:)
-      opt_fun(2) = transfermap(1).sub.fo(2,:)
-      opt_fun(3) = transfermap(1).sub.fo(3,:)
-      opt_fun(4) = transfermap(1).sub.fo(4,:)
-      opt_fun(5) = transfermap(1).sub.fo(6,:)
-      opt_fun(6) = transfermap(1).sub.fo(5,:)
-
-
-      opt_fun(7) = transfermap(2).sub.fo(1,:)
-      opt_fun(8) = transfermap(2).sub.fo(2,:)
-      opt_fun(9) = transfermap(2).sub.fo(3,:)
-      opt_fun(10)= transfermap(2).sub.fo(4,:)
-      opt_fun(11)= transfermap(2).sub.fo(6,:)
-      opt_fun(12)= transfermap(2).sub.fo(5,:)
-
-      opt_fun(13)= transfermap(3).sub.fo(1,:)
-      opt_fun(14)= transfermap(3).sub.fo(2,:)
-      opt_fun(15)= transfermap(3).sub.fo(3,:)
-      opt_fun(16)= transfermap(3).sub.fo(4,:)
-      opt_fun(17)= transfermap(3).sub.fo(6,:)
-      opt_fun(18)= transfermap(3).sub.fo(5,:)
-
-      opt_fun(19)= transfermap(4).sub.fo(1,:)
-      opt_fun(20)= transfermap(4).sub.fo(2,:)
-      opt_fun(21)= transfermap(4).sub.fo(3,:)
-      opt_fun(22)= transfermap(4).sub.fo(4,:)
-      opt_fun(23)= transfermap(4).sub.fo(6,:)
-      opt_fun(24)= transfermap(4).sub.fo(5,:)
-
-      opt_fun(25)= transfermap(6).sub.fo(1,:)
-      opt_fun(26)= transfermap(6).sub.fo(2,:)
-      opt_fun(27)= transfermap(6).sub.fo(3,:)
-      opt_fun(28)= transfermap(6).sub.fo(4,:)
-      opt_fun(29)= transfermap(6).sub.fo(6,:)
-      opt_fun(30)= transfermap(6).sub.fo(5,:)
-
-
-      opt_fun(31)= transfermap(5).sub.fo(1,:)
-      opt_fun(32)= transfermap(5).sub.fo(2,:)
-      opt_fun(33)= transfermap(5).sub.fo(3,:)
-      opt_fun(34)= transfermap(5).sub.fo(4,:)
-      opt_fun(35)= transfermap(5).sub.fo(6,:)
-      opt_fun(36)= transfermap(5).sub.fo(5,:)
-
-      ioptfun=36
-      call vector_to_table(table_name, 're11 ', ioptfun, opt_fun(1))
-
-
 
       opt_fun(beta11)= tw%beta(1,1) * deltae
       opt_fun(beta12)= tw%beta(1,2) * deltae
@@ -1358,16 +1292,16 @@ contains
       y=x
 
       do i=1,c_%nd
-!         print*, " ", i, beta(i) 
-!         call print(y(2*i-1),6)
-!         call print(y(2*i  ),6)
+         !         print*, " ", i, beta(i)
+         !         call print(y(2*i-1),6)
+         !         call print(y(2*i  ),6)
 
          y(2*i-1)= x(2*i-1) + sqrt(be(i)) * morph((one.mono.(2*i-1))    )
          y(2*i)= x(2*i) + one/sqrt(be(i)) * &
               (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
-              
-!         call print(y(2*i-1),6)
-!         call print(y(2*i  ),6)
+
+         !         call print(y(2*i-1),6)
+         !         call print(y(2*i  ),6)
       enddo
 
 

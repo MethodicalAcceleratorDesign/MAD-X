@@ -325,8 +325,8 @@ contains
       integer, target          :: charge    ! charge of an particle
       logical(lp)              :: ene       ! switches if cavity should always maximally accelerate
       ! the reference track; lag is calculated
-!      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;
-!      integer(4)               :: tmp
+      !      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;
+      !      integer(4)               :: tmp
       ! volt is calculated; lag and freq is preserved
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival

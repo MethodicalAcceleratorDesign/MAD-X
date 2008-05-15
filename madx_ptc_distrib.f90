@@ -241,8 +241,8 @@ contains
     logical              :: set
     integer              :: i,j,k,e(6)
     integer              :: debug
-!    integer              :: last
-!    integer              :: index !standarf function
+    !    integer              :: last
+    !    integer              :: index !standarf function
 
     !    last = index(name,'$END')
     !    if ( last == 0) then
@@ -254,31 +254,31 @@ contains
     if ( .not. associated(normmoments) ) then
        return
     endif
-    
+
     if (debug > 3) then
 
-      print*, "#################################################"
-      print*, "#################################################"
-      print*, "#################################################"
-      print*, "Moments for fibre ", n,name," at ", s,"m"
-      print*, "ND2=",c_%nd2
-      print*, "NPARA=",c_%npara
+       print*, "#################################################"
+       print*, "#################################################"
+       print*, "#################################################"
+       print*, "Moments for fibre ", n,name," at ", s,"m"
+       print*, "ND2=",c_%nd2
+       print*, "NPARA=",c_%npara
 
-      print*, "Function 1"
-      call print(y(1),6)
-      print*, ""
-      print*, "Function 5"
-      call print(y(5),6)
-      print*, ""
-      print*, "Function 6"
-      call print(y(6),6)
-      print*, ""
+       print*, "Function 1"
+       call print(y(1),6)
+       print*, ""
+       print*, "Function 5"
+       call print(y(5),6)
+       print*, ""
+       print*, "Function 6"
+       call print(y(6),6)
+       print*, ""
 
-      print*, "GMap"
-      call print(gmapa,6)
-      print*, ""
+       print*, "GMap"
+       call print(gmapa,6)
+       print*, ""
 
-    endif 
+    endif
 
     !--moments--!
     do i=1, nmoments
@@ -287,20 +287,20 @@ contains
        set = .false.
 
        do j=1,c_%npara
-       
-       
-         if (debug .gt. 3) write(*,'(a6,i1,a6,i1,a6,i1)',ADVANCE='NO') "nmom=",i," ndim=",j," pow=",moments(i)%iarray(j)
-         do k = 1, moments(i)%iarray(j)
-           if (set) then
-             function_to_average = function_to_average*y(j)%t
-             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "*"  
-           else
-             function_to_average = y(j)%t
-             set = .true.
-             if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "|"  
-           endif  
-         enddo
-         if (debug .gt. 3) write(*,*) "->"
+
+
+          if (debug .gt. 3) write(*,'(a6,i1,a6,i1,a6,i1)',ADVANCE='NO') "nmom=",i," ndim=",j," pow=",moments(i)%iarray(j)
+          do k = 1, moments(i)%iarray(j)
+             if (set) then
+                function_to_average = function_to_average*y(j)%t
+                if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "*"
+             else
+                function_to_average = y(j)%t
+                set = .true.
+                if (debug .gt. 3) write(*,'(a1)',ADVANCE='NO') "|"
+             endif
+          enddo
+          if (debug .gt. 3) write(*,*) "->"
 
        enddo
 
@@ -312,55 +312,55 @@ contains
        !        endif
 
        if (debug > 5) then
-         print*, "Function to average"
-         call print(function_to_average,6)
-       endif  
+          print*, "Function to average"
+          call print(function_to_average,6)
+       endif
 
 
        call cfu(function_to_average,filter,function_to_average) !cycling i.e. put the form factor to the function
 
        if (debug > 4) then
-         print*, "After cfu"
-         call print(function_to_average,6)
-       endif  
+          print*, "After cfu"
+          call print(function_to_average,6)
+       endif
 
        function_to_average=function_to_average.o.gmapa ! replaces x px y py ... by sigma1, sigma2, etc
 
        if (debug > 3) then
-         print*, "Averaging (gmapped)"
-         call print(function_to_average,6)
+          print*, "Averaging (gmapped)"
+          call print(function_to_average,6)
 
        endif
-       
+
        v = function_to_average.sub.0
 
        if (c_%npara == 5) then
-         if (debug > 3) print*, v
-         e = 0
-         do k=1,c_%no
-           e(5) = k
-          if (debug > 3) then
-            print*, "s^",k,"=",(sigmas(5)**(k)) 
-            print*, "f = ", (function_to_average.sub.e)
-            print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
-          endif  
-           v = v + (function_to_average.sub.e) * (sigmas(5)**(k)) !was to 2*k
-           if (debug > 9) print*, v
-         enddo  
+          if (debug > 3) print*, v
+          e = 0
+          do k=1,c_%no
+             e(5) = k
+             if (debug > 3) then
+                print*, "s^",k,"=",(sigmas(5)**(k))
+                print*, "f = ", (function_to_average.sub.e)
+                print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
+             endif
+             v = v + (function_to_average.sub.e) * (sigmas(5)**(k)) !was to 2*k
+             if (debug > 9) print*, v
+          enddo
        endif
 
 
        call double_to_table(moments(i)%table,moments(i)%column,v)
-       
+
        if (debug > 2) then
-         print*, "Final  ",i," =  ", v
-         print*,moments(i)%iarray
-         call print(function_to_average,6)
-         print*,"######################################################################################"
-       endif   
-       
-            
-    enddo    
+          print*, "Final  ",i," =  ", v
+          print*,moments(i)%iarray
+          call print(function_to_average,6)
+          print*,"######################################################################################"
+       endif
+
+
+    enddo
 
     call augmentcountmomtabs(s)
 
@@ -426,9 +426,9 @@ contains
 
 
     if (getdebug() > 1) then
-      print *, "Setting sigma for ", ndim
-      print *, "Current sigmas (setsigma) ", sigmas
-    endif  
+       print *, "Setting sigma for ", ndim
+       print *, "Current sigmas (setsigma) ", sigmas
+    endif
 
     sigmas(ndim) = sig
 
@@ -520,13 +520,13 @@ contains
     !allocates variables needed for moments calculations
     ! namely gmapa and fucntion_to_avarage
 
-      if ( .not. associated(normmoments) ) then
-        return
-      endif
-      
-      call alloc(gmapa,c_%nv)
-      gmapa = sigmas
-      call alloc(function_to_average)
+    if ( .not. associated(normmoments) ) then
+       return
+    endif
+
+    call alloc(gmapa,c_%nv)
+    gmapa = sigmas
+    call alloc(function_to_average)
 
   end subroutine allocmoments
 
@@ -541,8 +541,8 @@ contains
 
     deallocate(normmoments)
 
-      call kill(gmapa)
-      call kill(function_to_average)
+    call kill(gmapa)
+    call kill(function_to_average)
 
   end subroutine killmoments
   !_________________________________________________________________________________
@@ -557,16 +557,16 @@ contains
 
     do i=1,c_%nd
 
-     filter=filter*normmoments(i,e(2*i-1),e(2*i))
-     if (getdebug() > 4) then
-        print*, "normmoments(",i, e(2*i-1), e(2*i),")=", normmoments(i,e(2*i-1),e(2*i))
-     endif
+       filter=filter*normmoments(i,e(2*i-1),e(2*i))
+       if (getdebug() > 4) then
+          print*, "normmoments(",i, e(2*i-1), e(2*i),")=", normmoments(i,e(2*i-1),e(2*i))
+       endif
     enddo
 
     if (getdebug() > 3) then
 
-      print*,"filter(",e(1:6),")=",filter
-      print*,"=================="
+       print*,"filter(",e(1:6),")=",filter
+       print*,"=================="
     endif
 
   end function filter
