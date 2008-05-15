@@ -21,8 +21,6 @@ FCP=$(FFLAGS77)
 CC=gcc
 FOPT=-Bstatic -m32
 
-#FC8
-#LIBX= -lX11 -lXdmcp -lXau -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 ifeq ($(PLUGIN_SUPPORT),YES)

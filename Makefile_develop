@@ -26,6 +26,8 @@ FOPT=-static -m32
 
 CXX=$(CC)
 
+#FC8
+#LIBX= -lX11 -lXdmcp -lXau -lpthread
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 INCLUDES=-I.
