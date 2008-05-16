@@ -4934,6 +4934,18 @@ void update_beam(struct command* comm)
       }
     }
   }
+  else if (nlc->inform[name_list_pos("mass", nlc)])
+  {
+   mass = command_par_value("mass", comm);
+   pl->parameters[pos]->string = name = permbuff("default");
+   pos = name_list_pos("charge", nlc);
+   if (nlc->inform[pos]) charge = command_par_value("charge", comm);
+   else
+    {
+     warning("charge +1 given to user particle:", name);
+     charge = 1;
+    }
+  }
   else name = pl->parameters[pos]->string;
   if (strcmp(name, "ion") == 0)
   {
