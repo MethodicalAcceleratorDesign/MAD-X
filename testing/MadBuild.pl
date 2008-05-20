@@ -137,10 +137,11 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 
 # then send an e-mail
   $msg = MIME::Lite->new(
-			 From     => 'mad-automation-admin@cern.ch',
-			 To       => 'mad-automation-admin@cern.ch',
-			 Subject  => "Automated MAD Build $compilationOutcome{'madx'} for madx, $compilationOutcome{'madxp'} for madxp",
-			 Data     => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation"
+			 From       => 'Jean-Luc.Nougaret@cern.ch', # if "" instead of '', '@'->'\@'
+			 'Reply-To' => 'mad-automation-admin@cern.ch',
+			 To         => 'mad-automation-admin@cern.ch',
+			 Subject    => "Automated MAD Build $compilationOutcome{'madx'} for madx, $compilationOutcome{'madxp'} for madxp",
+			 Data       => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation/build.htm"
 			);
   $msg->send;
 

@@ -813,11 +813,12 @@ if ($debugMode ==0) {
 			$emailContent .= "http://test-mad-automation.web.cern.ch/test-mad-automation\n";
 			$emailContent .= "\nThis e-mail has been sent to you because you are registered as the responsible person for the '$target' package\n";
 			my $msg = MIME::Lite->new(
-				From	=>	'mad-automation-admin@cern.ch',
-				To	=>	$emailRecipient,
-				Cc	=>	'mad-automation-admin@cern.ch',
-				Subject	=>	$emailSubject,
-				Data	=>	$emailContent
+				From	   =>	'Jean-Luc.Nougaret@cern.ch',
+				'Reply-To' =>	'mad-automation-admin@cern.ch',
+				To	   =>	$emailRecipient,
+				Cc	   =>	'mad-automation-admin@cern.ch',
+				Subject	   =>	$emailSubject,
+				Data	   =>	$emailContent
 			);
 			$msg->send;
 			print "sent e-mail to $emailRecipient\n";

@@ -106,10 +106,11 @@ if ($lastTest eq $lastRelease) {
 	# ... and send a summary to the list of watchers by e-mail
 
 	$msg = MIME::Lite->new(
-		       From     => 'mad-automation-admin@cern.ch',
-		       To       => 'mad-automation-watchers@cern.ch',
-		       Subject  => "MAD $lastRelease has been released. Testing starts.",
-		       Data     => $workReport
+		       From       => 'Jean-Luc.Nougaret@cern.ch',
+		       'Reply-To' => 'mad-automation-admin@cern.ch',
+		       To         => 'mad-automation-watchers@cern.ch',
+		       Subject    => "MAD $lastRelease has been released. Testing starts.",
+		       Data       => $workReport
 		       );
 	$msg->send;
 	$trigger = 'run-test';
