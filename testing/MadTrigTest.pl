@@ -99,9 +99,9 @@ if ($lastTest eq $lastRelease) {
 	foreach $auth (@authors){
 		$workReport .= "\t\t$auth: +$linesAdded{$auth} -$linesDeleted{$auth}\n";
 	}
-	$workReport .= "\nFrom now on, the test procedure will start and may take a couple of days.\n";
-	$workReport .= "\nAt the end of the test procedure, the above contributors will be informed ";
-	$workReport .= "in case the changes they introduced affected the test's outcome. \n";
+	$workReport .= "\nFrom now on, the test procedure will start and may take several days.\n";
+	$workReport .= "\nAt the end of the test procedure, module keepers will be informed ";
+	$workReport .= "in case of discrepancy between the test's outcome and the reference. \n";
 
 	# ... and send a summary to the list of watchers by e-mail
 
