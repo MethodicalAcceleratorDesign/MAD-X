@@ -8,6 +8,7 @@
 /Makefile_gfortran -text
 /Makefile_intel -text
 /Makefile_nag -text
+/Makefile_nag_leaks -text
 /Makeonline -text
 /Sa_extend_poly.f90 -text
 /Sb_sagan_pol_arbitrary.f90 -text
