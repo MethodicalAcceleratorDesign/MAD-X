@@ -12,14 +12,14 @@ f95=f95
 GCC_FLAGS=-c -g -m32 -Wall -D_CATCH_MEM
 GCCP_FLAGS_MPARS=-c -g -O3 -m32 -funroll-loops -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-f95_FLAGS=-gline -g90 -c -Wc,-m32 -Wl,-m32 -C=all -maxcontin=100 -nan -ieee=full
-FFLAGS77=-gline -g90 -c -Wc,-m32 -Wl,-m32 -fpp -maxcontin=100 -nan -ieee=stop -D_G95
+f95_FLAGS=-gline -c -Wc,-m32 -Wl,-m32 -C=all -maxcontin=100 -nan -ieee=full
+FFLAGS77=-gline -c -Wc,-m32 -Wl,-m32 -fpp -maxcontin=100 -nan -ieee=stop -D_G95
 
 FC=f95
 FCP=$(FFLAGS77)
 
 CC=gcc
-FOPT=-Bstatic -m32
+FOPT=-Bstatic -Wl,-m32
 
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
@@ -312,7 +312,7 @@ madxp: \
 	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
 	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
 	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
-	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o\
+	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o
