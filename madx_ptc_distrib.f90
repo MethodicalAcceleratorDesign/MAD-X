@@ -17,6 +17,7 @@ module madx_ptc_distrib_module
 
   !============================================================================================
   !  PUBLIC INTERFACE
+  public                         :: momfirstinit
   public                         :: aremomentson
   public                         :: ptc_moments
   public                         :: putmoments
@@ -34,7 +35,7 @@ module madx_ptc_distrib_module
   !============================================================================================
   !  PRIVATE
   !    data structures
-
+  integer                        ::  firstinitdone = 0
   real(dp), pointer              ::  normmoments(:,:,:)
   real(dp)                       ::  sigmas(6)
   integer                        ::  distributiontype(3)
@@ -136,6 +137,18 @@ contains
   end subroutine getmomentstabcol
   !____________________________________________________________________________________________
 
+  subroutine momfirstinit()
+    implicit none
+     if (firstinitdone == 1) then
+       return
+     endif
+     
+     nullify(normmoments)
+     firstinitdone = 1
+     
+  end subroutine momfirstinit
+
+  !____________________________________________________________________________________________
 
   logical(lp) function aremomentson()
     implicit none

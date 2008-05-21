@@ -307,8 +307,10 @@ contains
     do i=1,6
        unimap(i) = zero
     enddo
-
+    
     if (getdebug() > 1) print*,"ptc_twiss"
+    call momfirstinit()
+    
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
 
