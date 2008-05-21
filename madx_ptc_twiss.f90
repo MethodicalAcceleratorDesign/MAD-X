@@ -1118,11 +1118,6 @@ contains
       emiy = get_value('beam ','ey ')
       emiz = get_value('beam ','et ')
 
-      if ((emix + emiy + emiz) .le. zero) then
-         !call fort_warn("readinitialmatrix","emmittances are all zero, computation of moments is senseless!")
-         call killmoments()  !switches
-      endif
-
       call setemittances(emix,emiy,emiz)
 
     end subroutine reademittance
