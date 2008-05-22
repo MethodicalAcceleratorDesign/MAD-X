@@ -1567,8 +1567,7 @@
 
 
       implicit none
-      integer*8 ix,jx,jy,iz,locf
-      integer m,n,lxi1,lzi,i,lxij,lyj,j   
+      integer m,n,ix,jx,jy,iz,lxi1,lzi,i,lxij,lyj,j,locf
       double precision x(*),x12(*),x21(*),y(*),y2(*),z(*),z2(*),sum,zero
       parameter(zero=0d0)
 
@@ -1598,11 +1597,9 @@
 
 
       implicit none
-      integer*8 locx,locy,locz,ix,jx,jy,ly,iz,lz,locf
-      integer m,n,k,ly1l,lz1l,l,lxi1,lzil,i,lxij,lyjl
-      integer j,lzii,lxk1,lzik,kdash,lxkj,ltl,lxil,lti,lyil
-      integer lxii,ltk,lxik
-      integer lxki,lzki
+      integer m,n,k,ix,jx,jy,iz,lz,ly1l,lz1l,l,lxi1,lzil,i,lxij,lyjl,   &
+     &j,locf,lzii,lxk1,lzik,kdash,lxkj,ltl,lxil,lti,lyil,lxii,ltk,lxik, &
+     &lxki,locx,locy,ly,lzki,locz
       double precision x(*),x12(*),x21(*),y(*),y12(*),y21(*),z(*),      &
      &z12(*),z21(*),t(*),s11,s21,s22,s31,s41,s51,s52,zero
       parameter(zero=0d0)
