@@ -122,6 +122,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
       occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
     else occ_list->curr = 0;
     current_sequ->cavities = new_el_list(100);
+    current_sequ->crabcavities = new_el_list(100);
     pos = name_list_pos("marker", defined_commands->list);
     clone = clone_command(defined_commands->commands[pos]);
     sprintf(c_dum->c, "%s$start", current_sequ->name);
@@ -156,6 +157,9 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
+  if (strcmp(el->base_type->name, "crabcavity") == 0 &&
+      find_element(el->name, current_sequ->crabcavities) == NULL)
+    add_to_el_list(&el, 0, current_sequ->crabcavities, 0);
   add_to_name_list(el->name, 1, occ_list);
   make_elem_node(el, 1);
   sxf_suml += el->length / 2;

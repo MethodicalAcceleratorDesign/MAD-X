@@ -348,6 +348,7 @@ struct sequence
   struct node* end;             /* last node in sequence */
   struct node_list* nodes;      /* alphabetic list of nodes */
   struct el_list* cavities;     /* alphabetic list of cavities */
+  struct el_list* crabcavities;     /* alphabetic list of crab cavities */
   struct command* beam;         /* pointer to beam attached */
   /* expanded sequence */
   int n_nodes;                  /* number of nodes when expanded */

@@ -88,7 +88,7 @@
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 27          /* no. of valid element types */
+#define N_TYPES 28          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -116,6 +116,7 @@ void att_octupole(struct c6t_element*);
 void att_quadrupole(struct c6t_element*);
 void att_rbend(struct c6t_element*);
 void att_rfcavity(struct c6t_element*);
+void att_crabcavity(struct c6t_element*);
 void att_sbend(struct c6t_element*);
 void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
@@ -158,6 +159,7 @@ void mod_octupole(struct c6t_element*);
 void mod_quadrupole(struct c6t_element*);
 void mod_rbend(struct c6t_element*);
 void mod_rfcavity(struct c6t_element*);
+void mod_crabcavity(struct c6t_element*);
 void mod_sextupole(struct c6t_element*);
 void multi_loop();
 struct c6t_element* new_c6t_element(int, char*, char*);
@@ -243,7 +245,9 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "sextupole    2       2       2       0       1       2",
  "solenoid     0       1       1       2       1       0",
  "vkicker      5       5       5       1       0       3",
- "vmonitor     0       1       1       1       0       0"};
+ "vmonitor     0       1       1       1       0       0",
+ "crabcavity   3       3       3       0       0       2",
+};
 
 char keep_these[MM_KEEP][24] = {"ip", "mt_"};
 char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
@@ -440,6 +444,7 @@ void assign_att()
         else if (strcmp(el->base_name, "rbend") == 0) att_rbend(el);
         else if (strcmp(el->base_name, "rcollimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
+        else if (strcmp(el->base_name, "crabcavity") == 0) att_crabcavity(el);
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
@@ -607,6 +612,22 @@ void att_rbend(struct c6t_element* el)
 void att_rfcavity(struct c6t_element* el)
 {
   double lag = 0.5 - el->value[5];
+  el->out_1 = 12;
+  if (cavall_flag == 0)
+  {
+    el->out_2 = total_voltage;
+    strcpy(el->name, "CAV");
+  }
+  else el->out_2 = el->value[1];
+  el->out_3 = harmon = el->value[11];
+  if (lag < -0.5) lag +=1.;
+  else if (lag > 0.5) lag -=1.;
+  el->out_4 = 360. * lag;
+}
+
+void att_crabcavity(struct c6t_element* el)
+{
+  double lag = el->value[5];
   el->out_1 = 12;
   if (cavall_flag == 0)
   {
@@ -1077,6 +1098,21 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[42] = el_par_value_recurse("rm66",p->p_elem);
   }
   else if ((strcmp(p->base_name,"rfcavity") == 0))
+  {
+    c6t_elem = new_c6t_element(11,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+    c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
+    c6t_elem->value[4] = el_par_value_recurse("freq",p->p_elem);
+    c6t_elem->value[5] = el_par_value_recurse("lag",p->p_elem);
+    c6t_elem->value[7] = el_par_value_recurse("betrf",p->p_elem);
+    c6t_elem->value[8] = el_par_value_recurse("pg",p->p_elem);
+    c6t_elem->value[9] = el_par_value_recurse("shunt",p->p_elem);
+    c6t_elem->value[10] = el_par_value_recurse("tfill",p->p_elem);
+    c6t_elem->value[11] = el_par_value_recurse("harmon",p->p_elem);
+  }
+  else if ((strcmp(p->base_name,"crabcavity") == 0))
   {
     c6t_elem = new_c6t_element(11,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
@@ -1676,6 +1712,11 @@ void mod_rfcavity(struct c6t_element* p)
   total_voltage += p->value[1];  /* accumulate voltage */
 }
 
+void mod_crabcavity(struct c6t_element* p)
+{
+  total_voltage += p->value[1];  /* accumulate voltage */
+}
+
 void mod_sextupole(struct c6t_element* p)
 {
   supp_small_comp(p);
@@ -1918,6 +1959,7 @@ void pro_elem(struct node* cnode)
   else if (strcmp(cnode->base_name, "quadrupole") == 0) mod_quadrupole(current_element);
   else if (strcmp(cnode->base_name, "sextupole") == 0) mod_sextupole(current_element);
   else if (strcmp(cnode->base_name, "rfcavity") == 0) mod_rfcavity(current_element);
+  else if (strcmp(cnode->base_name, "crabcavity") == 0) mod_crabcavity(current_element);
   if (strstr(cnode->base_name, "kicker"))
   {
     if (cnode->p_elem)

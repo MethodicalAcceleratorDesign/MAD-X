@@ -557,7 +557,7 @@
       go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
      &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
      &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,                 &
-     &310, 320, 330, 500, 350, 360, 500, 500, 500, 500), code
+     &310, 320, 330, 500, 350, 360, 370, 500, 500, 500, 500), code
 !
 !---- Make sure that nothing is execute if element is not known
       go to 500
@@ -650,6 +650,10 @@
       go to 500
 !---- Translation
   360 continue
+      go to 500
+!---- Crab cavity.
+  370 continue
+      call ttcrabrf(track,ktrack)
       go to 500
 
 
@@ -1240,6 +1244,56 @@
 ! 20   continue
 !      endif
       end
+      subroutine ttcrabrf(track,ktrack)
+
+      implicit none
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Track a set of trajectories through a thin crab cavity (zero l.)   *
+!   The crab cavity is sandwiched between 2 drift spaces half length.  *
+! Input/output:                                                        *
+!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+!   KTRACK    (integer) number of surviving tracks.                    *
+! Output:                                                              *
+!   EL        (double)    Length of quadrupole.                        *
+!----------------------------------------------------------------------*
+! Added: 10/06 FZ, Modfied: R. Calaga (11/07)                          *
+!----------------------------------------------------------------------*
+      integer itrack,ktrack
+      double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
+     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
+     &get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
+!      double precision px,py,ttt,beti,el1
+      parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
+
+!---- Initialize
+      clight=get_variable('clight ')
+      twopi=get_variable('twopi ')
+
+!---- Fetch data.
+      rfv = node_value('volt ')
+      rff = node_value('freq ')
+      rfl = node_value('lag ')
+      pc0 = get_value('beam ','pc ')
+!---- Set up.
+      omega = rff * (ten6p * twopi / clight)
+      vrf   = rfv * ten3m / pc0
+      phirf = rfl * twopi
+      do itrack = 1, ktrack 
+        px  = track(2,itrack)                                           &
+     &+ vrf * sin(phirf - omega * track(5,itrack))
+        pt = track(6,itrack)                                            &
+     &+ omega* vrf * track(1,itrack) *                                  &
+     &cos(phirf - omega * track(5,itrack))
+
+!---- track(2,jtrk) = track(2,jtrk)
+!        pt = track(6,itrack)
+!        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+
+        track(2,itrack) = px
+        track(6,itrack) = pt
+      enddo
+      end       
       subroutine ttsep(el,track,ktrack)
       implicit none
 !----------------------------------------------------------------------*

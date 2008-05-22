@@ -1068,7 +1068,8 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
           strcmp(thick_node->base_name,"vkicker") == 0     ||
           strcmp(thick_node->base_name,"hkicker") == 0     ||
           strcmp(thick_node->base_name,"kicker") == 0      ||
-          strcmp(thick_node->base_name,"rfcavity") == 0
+          strcmp(thick_node->base_name,"rfcavity") == 0    ||
+	  strcmp(thick_node->base_name,"crabcavity") == 0
         )
       {
         seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
@@ -1077,6 +1078,10 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
         if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
             find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
           add_to_el_list(&thin_node->p_elem, 0, thin_sequ->cavities, 0);
+	/* special crab cavity list stuff */
+        if (strcmp(thin_node->p_elem->base_type->name, "crabcavity") == 0 &&
+            find_element(thin_node->p_elem->name, thin_sequ->crabcavities) == NULL)
+          add_to_el_list(&thin_node->p_elem, 0, thin_sequ->crabcavities, 0);
       }
       else if (strcmp(thick_node->base_name,"rbend") == 0 ||
                strcmp(thick_node->base_name,"sbend") == 0       ||
@@ -1140,6 +1145,8 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
   thin_sequ->beam = thick_sequ->beam;
   if (thin_sequ->cavities != NULL)  thin_sequ->cavities->curr = 0;
   else thin_sequ->cavities = new_el_list(100);
+  if (thin_sequ->crabcavities != NULL)  thin_sequ->crabcavities->curr = 0;
+  else thin_sequ->crabcavities = new_el_list(100);
   thick_node = thick_sequ->start;
   while(thick_node != NULL)
   { /* loop over current sequence */

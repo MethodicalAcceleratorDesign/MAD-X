@@ -797,6 +797,26 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
+    case(37)
+       key%magnet="rfcavity"
+       key%list%volt=zero
+       key%list%k(1)=node_value('volt ')*c_1d_3
+! vertical crab
+! maybe requires a flip of sign
+!       key%list%ks(1)= (+/-)  node_value('volt ')*c_1d_3
+!
+       freq=c_1d6*node_value('freq ')
+       key%list%lag=node_value('lag ')*twopi-pih
+       offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
+       if(offset_deltap.ne.zero) then
+          default = getintstate()
+          default=default+totalpath0
+          call setintstate(default)
+          freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one)
+       endif
+       key%list%freq0=freq
+       key%list%n_bessel=0
+       key%list%harmon=one
     case default
        print*,"Element: ",name," not implemented in PTC"
        stop
