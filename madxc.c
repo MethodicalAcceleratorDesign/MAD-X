@@ -1,6 +1,16 @@
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
 #endif
+
+#ifdef _WIN32
+#ifndef _UINTPTR_T_
+#define _UINTPTR_T_
+#define uintptr_t unsigned int	/* 32 bytes-long (should be 64 on WIN64) */
+#endif
+#else
+#include <stdint.h>		/* uintptr_t, to fit pointers into integers of correct size */
+#endif
+
 void setupi_(int*, int*, int*, int*, int*, int*);
 void primat_(int*, int*, int*);
 void prdmat_(double*, int*, int*);
@@ -2625,14 +2635,11 @@ double copk(double *r, int m)
   return(xpk);
 }
 
-unsigned long long locf_(char *iadr) /* always returns 64-bits, even on 32-bit platform */     
+uintptr_t locf_(char *iadr)    
 #define NADUPW 4   /* Number of ADdress Units Per Word */
 #define LADUPW 2   /* Logarithm base 2 of ADdress Units Per Word */
-/* iadr is 32-bit long on 32-bit arch. or 64-bit long on 64-bit arch. */
-/* In both cases, Fortran caller passes a ptr to 64-bit double precision */
 {
-	unsigned long long iadrLong = (uintptr_t) iadr;
-	return( iadrLong >> LADUPW );
+	return( (uintptr_t) iadr >> LADUPW );
 }
 
 int c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resvec,int *nx,float rms,int imon,int icor,int niter)

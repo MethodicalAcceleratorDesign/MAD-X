@@ -22,7 +22,16 @@
 #include "madxd.h"
 #include "madxdict.h"
 
-#include <stdint.h> /* to use uintptr_t, to fit pointers into integers of correct size */
+#ifdef _WIN32
+#ifndef _UINTPTR_T_
+#define _UINTPTR_T_
+#define uintptr_t unsigned int	/* 32 bytes-long (should be 64 on WIN64) */
+#endif
+#else
+#include <stdint.h>		/* uintptr_t, to fit pointers into integers of correct size */
+#endif
+
+//#include <stdint.h> /* to use uintptr_t, to fit pointers into integers of correct size */
 
 /*
   #include "mdb.h"

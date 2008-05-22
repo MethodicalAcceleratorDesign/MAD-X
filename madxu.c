@@ -4,7 +4,14 @@
 #include "fortran_wrappers.h"
 #endif
 
-#include <stdint.h> /* to use on uintptr_t, to fit pointers into integers of correct size */
+#ifdef _WIN32
+#ifndef _UINTPTR_T_
+#define _UINTPTR_T_
+#define uintptr_t unsigned int	/* 32 bytes-long (should be 64 on WIN64) */
+#endif
+#else
+#include <stdint.h>		/* uintptr_t, to fit pointers into integers of correct size */
+#endif
 
 int add_drifts(struct node* c_node, struct node* end)
 {
