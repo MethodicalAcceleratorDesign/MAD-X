@@ -4910,8 +4910,8 @@
       parvec(5)=get_value('probe ', 'arad ')
       parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
       parvec(7)=get_value('probe ','gamma ')
-!---- Calculate momentum deviation and according changes
-!     of the relativistic factor beta0
+!---- Calculate momentum deviation and according changes 
+!     of the relativistic factor beta0 
       dp  = get_variable('track_deltap ')
       gamma0 = parvec(7)
       beta0 = sqrt(one-one/gamma0**2)
@@ -5228,10 +5228,10 @@
             phixx=0.5/norm
             phixy=zero
             phiyy=0.5/norm
-            re(2,1) = phixx
-            re(2,3) = phixy
-            re(4,1) = phixy
-            re(4,3) = phiyy
+            re(2,1) = phixx*fk
+            re(2,3) = phixy*fk
+            re(4,1) = phixy*fk
+            re(4,3) = phiyy*fk
             if(fsec) then
               te(2,1,1) = zero
               te(2,1,3) = zero
@@ -5253,10 +5253,10 @@
             phixx = phir + xs*xs*phirr
             phixy = xs*ys*phirr
             phiyy = phir + ys*ys*phirr
-            re(2,1) = phixx
-            re(2,3) = phixy
-            re(4,1) = phixy
-            re(4,3) = phiyy
+            re(2,1) = phixx*fk
+            re(2,3) = phixy*fk
+            re(4,1) = phixy*fk
+            re(4,3) = phiyy*fk
 ! 2nd order effects
             if(fsec) then
               phirrr =  (8.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0   &
@@ -5265,14 +5265,14 @@
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
-              te(2,1,1) = phixxx
-              te(2,1,3) = phixxy
-              te(2,3,1) = phixxy
-              te(4,1,1) = phixxy
-              te(2,3,3) = phixyy
-              te(4,1,3) = phixyy
-              te(4,3,1) = phixyy
-              te(4,3,3) = phiyyy
+              te(2,1,1) = phixxx*fk
+              te(2,1,3) = phixxy*fk
+              te(2,3,1) = phixxy*fk
+              te(4,1,1) = phixxy*fk
+              te(2,3,3) = phixyy*fk
+              te(4,1,3) = phixyy*fk
+              te(4,3,1) = phixyy*fk
+              te(4,3,3) = phiyyy*fk
             endif
           else if(rho.ge.r0x+wx/2.0) then
             phir = 1.0/rho2
@@ -5282,10 +5282,10 @@
             phixx = phir+xs*xs*phirr
             phixy = xs*ys*phirr
             phiyy = phir+ys*ys*phirr
-            re(2,1) = phixx
-            re(2,3) = phixy
-            re(4,1) = phixy
-            re(4,3) = phiyy
+            re(2,1) = phixx*fk
+            re(2,3) = phixy*fk
+            re(4,1) = phixy*fk
+            re(4,3) = phiyy*fk
 ! 2nd order effects
             if(fsec) then
               phirrr = 8.0/rho2**3
@@ -5293,31 +5293,31 @@
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
-              te(2,1,1) = phixxx
-              te(2,1,3) = phixxy
-              te(2,3,1) = phixxy
-              te(4,1,1) = phixxy
-              te(2,3,3) = phixyy
-              te(4,1,3) = phixyy
-              te(4,3,1) = phixyy
-              te(4,3,3) = phiyyy
+              te(2,1,1) = phixxx*fk
+              te(2,1,3) = phixxy*fk
+              te(2,3,1) = phixxy*fk
+              te(4,1,1) = phixxy*fk
+              te(2,3,3) = phixyy*fk
+              te(4,1,3) = phixyy*fk
+              te(4,3,1) = phixyy*fk
+              te(4,3,3) = phiyyy*fk
             end if
           endif
 !---- orbit kick - only applied if option bborbit (HG 5/12/01),
 !     else stored
           if (bborbit) then
-            orbit(2) = orbit(2) + phix
-            orbit(4) = orbit(4) + phiy
+             orbit(2) = orbit(2) + phix*fk
+             orbit(4) = orbit(4) + phiy*fk
           elseif (bbd_flag .ne. 0)  then
-            bb_kick(1,bbd_cnt) = phix
-            bb_kick(2,bbd_cnt) = phiy
+             bb_kick(1,bbd_cnt) = phix*fk
+             bb_kick(2,bbd_cnt) = phiy*fk
           endif
 !---- no tracking desired.
         else
           phixx=0.5/norm
           phiyy=0.5/norm
-          re(2,1) = phixx
-          re(4,3) = phiyy
+          re(2,1) = phixx*fk
+          re(4,3) = phiyy*fk
         endif
 !---- centre option
         if(centre_cptk.or.centre_bttk) then
@@ -5429,10 +5429,10 @@
             phixx = phir+xs*xs*phirr
             phixy = xs*ys*phirr
             phiyy = phir+ys*ys*phirr
-            re(2,1) = phixx
-            re(2,3) = phixy
-            re(4,1) = phixy
-            re(4,3) = phiyy
+            re(2,1) = phixx*fk
+            re(2,3) = phixy*fk
+            re(4,1) = phixy*fk
+            re(4,3) = phiyy*fk
             ! 2nd order effects
             if(fsec) then
               phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/           &
@@ -5442,14 +5442,14 @@
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
-              te(2,1,1) = phixxx
-              te(2,1,3) = phixxy
-              te(2,3,1) = phixxy
-              te(4,1,1) = phixxy
-              te(2,3,3) = phixyy
-              te(4,1,3) = phixyy
-              te(4,3,1) = phixyy
-              te(4,3,3) = phiyyy
+              te(2,1,1) = phixxx*fk
+              te(2,1,3) = phixxy*fk
+              te(2,3,1) = phixxy*fk
+              te(4,1,1) = phixxy*fk
+              te(2,3,3) = phixyy*fk
+              te(4,1,3) = phixyy*fk
+              te(4,3,1) = phixyy*fk
+              te(4,3,3) = phiyyy*fk
             end if
           else if(rho.ge.r0x+wx) then
             phir = 1.0/rho2
@@ -5459,10 +5459,10 @@
             phixx = phir+xs*xs*phirr
             phixy = xs*ys*phirr
             phiyy = phir+ys*ys*phirr
-            re(2,1) = phixx
-            re(2,3) = phixy
-            re(4,1) = phixy
-            re(4,3) = phiyy
+            re(2,1) = phixx*fk
+            re(2,3) = phixy*fk
+            re(4,1) = phixy*fk
+            re(4,3) = phiyy*fk
 ! 2nd order effects
             if(fsec) then
               phirrr = 8.0/rho2**3
@@ -5470,24 +5470,24 @@
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
-              te(2,1,1) = phixxx
-              te(2,1,3) = phixxy
-              te(2,3,1) = phixxy
-              te(4,1,1) = phixxy
-              te(2,3,3) = phixyy
-              te(4,1,3) = phixyy
-              te(4,3,1) = phixyy
-              te(4,3,3) = phiyyy
+              te(2,1,1) = phixxx*fk
+              te(2,1,3) = phixxy*fk
+              te(2,3,1) = phixxy*fk
+              te(4,1,1) = phixxy*fk
+              te(2,3,3) = phixyy*fk
+              te(4,1,3) = phixyy*fk
+              te(4,3,1) = phixyy*fk
+              te(4,3,3) = phiyyy*fk
             end if
           endif
 !---- orbit kick - only applied if option bborbit (HG 5/12/01),
 !     else stored
           if (bborbit) then
-            orbit(2) = orbit(2) + phix
-            orbit(4) = orbit(4) + phiy
+             orbit(2) = orbit(2) + phix*fk
+             orbit(4) = orbit(4) + phiy*fk
           elseif (bbd_flag .ne. 0)  then
-            bb_kick(1,bbd_cnt) = phix
-            bb_kick(2,bbd_cnt) = phiy
+             bb_kick(1,bbd_cnt) = phix*fk
+             bb_kick(2,bbd_cnt) = phiy*fk
           endif
 !---- no tracking desired.
         else
