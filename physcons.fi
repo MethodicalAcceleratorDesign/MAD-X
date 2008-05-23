@@ -1,4 +1,0 @@
-      double precision amu0,elamda,emass,eps0,erad,hbar,plamda,pmass,   &
-     &prad,qelect,mumass
-      common /physcons/ amu0,elamda,emass,eps0,erad,hbar,plamda,pmass,  &
-     &prad,qelect,mumass
