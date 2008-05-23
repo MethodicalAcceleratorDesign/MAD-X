@@ -1283,7 +1283,7 @@
         px  = track(2,itrack)                                           &
      &+ vrf * sin(phirf - omega * track(5,itrack))
         pt = track(6,itrack)                                            &
-     &+ omega* vrf * track(1,itrack) *                                  &
+     &- omega* vrf * track(1,itrack) *                                  &
      &cos(phirf - omega * track(5,itrack))
 
 !---- track(2,jtrk) = track(2,jtrk)
