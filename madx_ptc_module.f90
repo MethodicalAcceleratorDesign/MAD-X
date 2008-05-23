@@ -806,7 +806,7 @@ CONTAINS
 !       key%list%ks(1)= (+/-)  node_value('volt ')*c_1d_3
 !
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi-pih
+       key%list%lag=node_value('lag ')*twopi+pih
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
           default = getintstate()
@@ -817,12 +817,15 @@ CONTAINS
        key%list%freq0=freq
        key%list%n_bessel=0
        key%list%harmon=one
+
+       if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
     case default
        print*,"Element: ",name," not implemented in PTC"
        stop
     end select
 100 continue
     call create_fibre(my_ring%end,key,EXCEPTION)
+
     if(advance_node().ne.0)  goto 10
 
     if (getdebug() > 0) then
