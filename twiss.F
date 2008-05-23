@@ -4910,8 +4910,8 @@
       parvec(5)=get_value('probe ', 'arad ')
       parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
       parvec(7)=get_value('probe ','gamma ')
-!---- Calculate momentum deviation and according changes 
-!     of the relativistic factor beta0 
+!---- Calculate momentum deviation and according changes
+!     of the relativistic factor beta0
       dp  = get_variable('track_deltap ')
       gamma0 = parvec(7)
       beta0 = sqrt(one-one/gamma0**2)
@@ -5306,11 +5306,11 @@
 !---- orbit kick - only applied if option bborbit (HG 5/12/01),
 !     else stored
           if (bborbit) then
-             orbit(2) = orbit(2) + phix*fk
-             orbit(4) = orbit(4) + phiy*fk
+            orbit(2) = orbit(2) + phix*fk
+            orbit(4) = orbit(4) + phiy*fk
           elseif (bbd_flag .ne. 0)  then
-             bb_kick(1,bbd_cnt) = phix*fk
-             bb_kick(2,bbd_cnt) = phiy*fk
+            bb_kick(1,bbd_cnt) = phix*fk
+            bb_kick(2,bbd_cnt) = phiy*fk
           endif
 !---- no tracking desired.
         else
@@ -5483,11 +5483,11 @@
 !---- orbit kick - only applied if option bborbit (HG 5/12/01),
 !     else stored
           if (bborbit) then
-             orbit(2) = orbit(2) + phix*fk
-             orbit(4) = orbit(4) + phiy*fk
+            orbit(2) = orbit(2) + phix*fk
+            orbit(4) = orbit(4) + phiy*fk
           elseif (bbd_flag .ne. 0)  then
-             bb_kick(1,bbd_cnt) = phix*fk
-             bb_kick(2,bbd_cnt) = phiy*fk
+            bb_kick(1,bbd_cnt) = phix*fk
+            bb_kick(2,bbd_cnt) = phiy*fk
           endif
 !---- no tracking desired.
         else
