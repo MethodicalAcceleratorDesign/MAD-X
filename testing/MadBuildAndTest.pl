@@ -30,6 +30,18 @@ if ($child_pid==0){
 if ($child_pid) {
 	# non-zero pid means we are in the parent process, which received the child's pid
 
+	my $releaseTag;
+	my $runTest;
+	my $debugMode;
+	
+	my $argsNumber = $#ARGV+1;
+	
+	if ($argsNumber>0){
+		$debugMode = 1;
+	} else {
+		$debugMode = 0;
+	}
+	
 	# retreive directory hosting the Mad program from the command line
 	$thisProgramName = $0;
 	$_ = $thisProgramName;
@@ -42,25 +54,39 @@ if ($child_pid) {
 	}
 	chdir($hostDirectory);
 
-	# should also retreive the latest release tag
-	print "entering MadTrigTest.pl\n";
-	my @return = `./MadTrigTest.pl`; # extracts MAD's CVS repository with no tag
-	print "MadTrigTest.pl completed\n";
+	if ($debugMode==0){
+		# should also retreive the latest release tag
+		print "entering MadTrigTest.pl\n";
+		my @return = `./MadTrigTest.pl`; # extracts MAD's CVS repository with no tag
+		print "MadTrigTest.pl completed\n";
 
-	my $runTest;
-	my $releaseTag;
-	foreach $retString (@return){
-		my $recognized = 0;
-		if ($retString =~ /^trigger[\s\t]*=[\s\t]*([\w\-]+)$/){
-			$runTest = $1;
-			$recognized = 1;
+		foreach $retString (@return){
+			my $recognized = 0;
+			if ($retString =~ /^trigger[\s\t]*=[\s\t]*([\w\-]+)$/){
+				$runTest = $1;
+				$recognized = 1;
+			}
+			if ($retString =~ /^releaseTag[\s\t]*=[\s\t]*([\w\-\d_]+)$/){
+				$releaseTag = $1;
+				$recognized = 1;
+			}
+			if ($recognized == 0 ) {
+				print "Unknown string $retString returned by ./MadTrigTest.pl\n";
+			}
 		}
-		if ($retString =~ /^releaseTag[\s\t]*=[\s\t]*([\w\-\d_]+)$/){
+	} else {
+		# expect "debug=madX-x_yy_zz" where madX-x_yy_zz is the release tag
+		$firstArg = $ARGV[0];
+		if ($firstArg =~ /debug=(madX\-\d_\d\d_\d\d)/){
 			$releaseTag = $1;
-			$recognized = 1;
-		}
-		if ($recognized == 0 ) {
-			print "Unknown string $retString returned by ./MadTrigTest.pl\n";
+			$runTest = 'run-test';
+		} else {
+			print "Expect either no argument (automatic trigger)or argument of form:\n";
+			print "\tdebug=madX-x_yy_zz\n";
+			print "Kill the child process\n";
+			kill 9, $child_pid; # kill the child process
+			print "Exit!\n";
+			exit;
 		}
 	}
 
