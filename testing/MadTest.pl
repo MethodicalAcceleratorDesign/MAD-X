@@ -90,11 +90,13 @@ if ($debugMode ==0){
 	# default: we retrieve all the CVS
 	print REPORT_FILE "extract the complete CVS repository containing examples\n";
 	my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples`;
+	print REPORT_FILE $checkoutRes;
 } else {
 	print REPORT_FILE "extract only the CVS repository containing specific example";
 	print REPORT_FILE " $debugTarget\n";
 	# extract only the $debugTarget from the CVS
 	my $checkoutRes = `cvs -d :kserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples/REF/$debugTarget`;
+	print REPORT_FILE $checkoutRes;
 }
 
 # $samplesRootDir = '/afs/cern.ch/user/f/frs/public_html/mad-X_examples';
