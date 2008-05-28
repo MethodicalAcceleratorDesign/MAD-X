@@ -44,12 +44,12 @@ if ( $#ARGV < 0 ) {
 		if ($option =~ /^debug=(\w+)/){
 			$debugMode = 1;
 			$debugTarget = $1;
-			print REPORT_FILE "debug mode set for target '$debugTarget'\n";
+			print "debug mode set for target '$debugTarget'\n";
 		} else {
 		
-			print REPORT_FILE "the second optional argument '$option' should be of the form:";
-			print REPORT_FILE "debug=<target>\n";
-			print REPORT_FILE "EXIT!\n";
+			print "the second optional argument '$option' should be of the form:";
+			print "debug=<target>\n";
+			print "EXIT!\n";
 			exit;
 		}
 	}
