@@ -17,6 +17,8 @@
 
 use MIME::Lite; # to send e-mail
 
+open REPORT_FILE, ">MadTest_Report.txt";
+
 $startTime = localtime;
 
 $testReport = ""; # will be stored into an HTML document
@@ -33,7 +35,7 @@ my $debugMode; 		# select a specific target and writes summary HTML file
 my $debugTarget;	# meaningful iff $debugMode is set to 1
 		
 if ( $#ARGV < 0 ) {
-	print "expect at least 1 argument: (1) MAD executable directory [(2) debug:<target>]  EXIT!\n" ;
+	print REPORT_FILE "expect at least 1 argument: (1) MAD executable directory [(2) debug:<target>]  EXIT!\n" ;
 	exit ;
 } else {
 	if ($#ARGV == 1) {
@@ -42,12 +44,12 @@ if ( $#ARGV < 0 ) {
 		if ($option =~ /^debug=(\w+)/){
 			$debugMode = 1;
 			$debugTarget = $1;
-			print "debug mode set for target '$debugTarget'\n";
+			print REPORT_FILE "debug mode set for target '$debugTarget'\n";
 		} else {
 		
-			print "the second optional argument '$option' should be of the form:";
-			print "debug=<target>\n";
-			print "EXIT!\n";
+			print REPORT_FILE "the second optional argument '$option' should be of the form:";
+			print REPORT_FILE "debug=<target>\n";
+			print REPORT_FILE "EXIT!\n";
 			exit;
 		}
 	}
@@ -56,12 +58,12 @@ if ( $#ARGV < 0 ) {
 	# check specified directory indeed contains executable
 	$existsMadx = `ls $madDir/madx | wc -l`;
 	if ($existsMadx == 0) {
-		print "Madx missing in specified directory => exit!\n";
+		print REPORT_FILE "Madx missing in specified directory => exit!\n";
 		exit;
 	}
 	$existsMadxp = `ls $madDir/madxp | wc -l`;
 	if ($existsMadxp == 0){
-		print "Madxp missing in specified directory => exit!\n";
+		print REPORT_FILE "Madxp missing in specified directory => exit!\n";
 		exit;
 	}
 	# expand the full path
@@ -127,7 +129,7 @@ if ($debugMode ==1) {
 }
 
 
-print "target = '$targetDir'\n";
+print REPORT_FILE "target = '$targetDir'\n";
 
 chdir("$samplesRootDir/$targetDir");
 @subdirectories =`ls -d */`; # returns directories only (with '/' suffix)
@@ -137,35 +139,35 @@ foreach $dir (@alldirectories) {
 	chop $dir; # end-of-line
 	chop $dir; # /
 	$pwd = `pwd`; # for print below
-	print "process directory $dir in $pwd\n";
+	print REPORT_FILE "process directory $dir in $pwd\n";
 	if ($dir eq "test") { next; } # Very specific case: twiss/test directory causes multiple key error in call-graph
 	chdir("$samplesRootDir/$targetDir/$dir"); # go to subdir to open files with getListOfDependantFiles()
 	@files = `ls`;
 	foreach $file(@files) {
 	chop $file;
-	print "process $file"; 
+	print REPORT_FILE "process $file"; 
 	$dependentFileList = getListOfDependantFiles($file);
 	# avoid name clash by prefixing
 	$fileKey = $targetDir . "/" . $file;
 	if ($dependencyList{$fileKey} ne "") {
 		# actually no trouble if the entry is the same
 		if ($dependencyList{$fileKey} eq $dependentFileList) {
-		print "WARNING: multiple entry $fileKey in call-graph\n";
+		print REPORT_FILE "WARNING: multiple entry $fileKey in call-graph\n";
 		$testReport .= "</p><font color=\"#FFCCBB\">WARNING: multiple entry $fileKey in call-graph</font></p>\n";
 
 		} else {
 		$testReport .= "</p><font color=\"#FFBBBB\">ERROR: multiple incompatible entry $fileKey in call-graph</font></p>\n";
-		print "ERROR: multiple incompatible entry $fileKey in call-graph\n";
-		print "previous entry = '$dependencyList{$fileKey}'\n";
-		print "new entry = $dependentFileList\n";
+		print REPORT_FILE "ERROR: multiple incompatible entry $fileKey in call-graph\n";
+		print REPORT_FILE "previous entry = '$dependencyList{$fileKey}'\n";
+		print REPORT_FILE "new entry = $dependentFileList\n";
 		}
 	} # let's make sure
 	
 	$dependencyList{$fileKey}=$dependentFileList; # comma-separated list of files that depend on key
 	if ($dependencyList{$fileKey} ne "") {
-		print " -> calls $dependencyList{$fileKey}\n";
+		print REPORT_FILE " -> calls $dependencyList{$fileKey}\n";
 	} else {
-		print " -> calls no other file\n";
+		print REPORT_FILE " -> calls no other file\n";
 	}	    
 	}
 	chdir("$samplesRootDir/$targetDir/$dir");
@@ -201,8 +203,8 @@ mkdir($localTestDir, 0777);
 # following executables have been prepared by MadBuid.pl
 $madxLink = $madDir . "/madx_$makefile";
 $madxpLink = $madDir . "/madxp_$makefile";
-print "madxLink is $madxLink\n";
-print "madxpLink is $madxpLink\n";
+print REPORT_FILE "madxLink is $madxLink\n";
+print REPORT_FILE "madxpLink is $madxpLink\n";
 
 
 
@@ -219,7 +221,7 @@ if ($debugMode ==1){
 	}
 }
 
-print "--- testing $target\n";
+print REPORT_FILE "--- testing $target\n";
 
 	if ($regressionTest) {
 	$testReport .= "<table width=\"75%\" border=\"0\">\n";
@@ -244,7 +246,7 @@ foreach $test (@tests) {
 	$autonumber++;
 	chop $test;
 	$command = $test;
-	print "command='$command'\n";	
+	print REPORT_FILE "command='$command'\n";	
 	
 	# retreive the subdirectory relocation if any (specific subdirs are specified in the XML)
 	$sourceSubDir = ""; # by default
@@ -257,7 +259,7 @@ foreach $test (@tests) {
 	$_ = $command;
 	/<[\s\t]+([\w\.\-_\d]+)[\s\t]+>/;
 	$infilename = $1;
-	print "the input file name is: $infilename\n";
+	print REPORT_FILE "the input file name is: $infilename\n";
 	
 	if ($sourceSubDir eq "" ) {
 	$testCaseDir = "test_" . $autonumber;
@@ -319,7 +321,7 @@ foreach $test (@tests) {
 			# => do nothing for time-being
 			# (incomplete: should also handle any tree structure)
 			} else {
-			print "Found $secondLevelInput called by $testCaseDir/$input and to be copied locally\n";
+			print REPORT_FILE "Found $secondLevelInput called by $testCaseDir/$input and to be copied locally\n";
 			# actually, should only add to the list if not already present
 			my $existsInput = 0;
 			INPUT_LOOP: foreach $existingInput (@inputs) {
@@ -347,7 +349,7 @@ foreach $test (@tests) {
 
 	# copyping inputs and dependent files locally
 	foreach $input (@inputs) {
-	print "Input is $input\n";
+	print REPORT_FILE "Input is $input\n";
 	$_ = $input;
 	# SPECIFIC CASE: files that must be stored in a locally replicated hierarchy
 	# considering the MAD call instructions mention a relative path...
@@ -365,11 +367,11 @@ foreach $test (@tests) {
 		$dependencyDir = '..';
 		$dependencyFile = $term;
 		}
-		# print "Found dependency file '$dependencyFile' under '$dependencyDir'\n";		
+		# print REPORT_FILE "Found dependency file '$dependencyFile' under '$dependencyDir'\n";		
 		$existsDir = `ls -d $dependencyDir | wc -l`;
-		# print "existsDir now equals $existsDir\n";
+		# print REPORT_FILE "existsDir now equals $existsDir\n";
 		if ($existsDir == 1) {
-		print "dependency directory '$dependencyDir' already exists\n";
+		print REPORT_FILE "dependency directory '$dependencyDir' already exists\n";
 		# simply copy the file
 		if  ($sourceSubDir eq "") {	
 			`cp $samplesRootDir/$target/$dependencyDir/$dependencyFile ./$dependencyDir`;
@@ -378,7 +380,7 @@ foreach $test (@tests) {
 		}
 
 		} else {
-#		    print "dependency directory '$dependencyDir' will be created\n";
+#		    print REPORT_FILE "dependency directory '$dependencyDir' will be created\n";
 		# first create the directory, then copy the file
 		mkdir($dependencyDir,0777);
 		if ($sourceSubDir eq "") {
@@ -393,7 +395,7 @@ foreach $test (@tests) {
 		@secondLevelInputs = split /,/, $dependencyList{"$target/$dependencyFile"}; 
 		# prefixed with $target to avoid name clashes (may be too coarse!)
 		foreach $secondLevelInput (@secondLevelInputs) {
-		print "Second-level copy of $secondLevelInput\n";
+		print REPORT_FILE "Second-level copy of $secondLevelInput\n";
 		$_ = $secondLevelInput;
 		if (/\.\.\/([\w\d\-_\.\/]+)/) { # ../dir/file or ../file formats
 			my $term;
@@ -407,17 +409,17 @@ foreach $test (@tests) {
 
 			$existsSecondDir = `ls -d $dependencyDir/$secondDependencyDir | wc -l`;
 			if ($existsSecondDir) {
-			print "dependency second directory '$dependencyDir/$secondDependencyDir' already exists\n";
+			print REPORT_FILE "dependency second directory '$dependencyDir/$secondDependencyDir' already exists\n";
 			# simply copy the file
 			if  ($sourceSubDir eq "") {
 				`cp $samplesRootDir/$target/$dependencyDir/$secondDependencyDir/$secondDependencyFile ./$dependencyDir/$secondDependencyDir`;
 			} else {
 				# current focus
 				`cp $samplesRootDir/$target/$sourceSubDir/$dependencyDir/$secondDependencyDir/$secondDependencyFile ./$dependencyDir/$secondDependencyDir`; # should merge the two with '.' for $sourceSubDir
-				print "now copying second-level $samplesRootDir/$target/$sourceSubDir/$dependencyDir/$secondDependencyDir/$secondDependencyFile into ./$dependencyDir/$secondDependencyDir\n";
+				print REPORT_FILE "now copying second-level $samplesRootDir/$target/$sourceSubDir/$dependencyDir/$secondDependencyDir/$secondDependencyFile into ./$dependencyDir/$secondDependencyDir\n";
 			}
 			} else {
-			print "Not ready yet to handle creation of secondary dir/n";
+			print REPORT_FILE "Not ready yet to handle creation of secondary dir/n";
 			$testReport .= "ERROR: ($makefile) Not ready yet to handle creation of second-level dir\n";
 			}
 		} else {
@@ -458,7 +460,7 @@ foreach $test (@tests) {
 		}
 		# and now do the copy
 		# DBG: we end-up copying MB.12.mad into ./temp
-		# print "DIRECTORY: now copying $samplesRootDir/$target/$input into ./$calledFileSubDir\n";
+		# print REPORT_FILE "DIRECTORY: now copying $samplesRootDir/$target/$input into ./$calledFileSubDir\n";
 		if ($sourceSubDir eq ""){
 			`cp $samplesRootDir/$target/$input ./$calledFileSubDir`;
 		} else {
@@ -468,14 +470,14 @@ foreach $test (@tests) {
 
 		#    @what = `ls ./$calledFileSubDir`;
 		#   $howMany = scalar(@what);
-		#    print "DIRECTORY $howMany contents of $pwd/$calledFileSubDir =\n";
-		#    foreach $line (@what ) { print "$line\n"; }
+		#    print REPORT_FILE "DIRECTORY $howMany contents of $pwd/$calledFileSubDir =\n";
+		#    foreach $line (@what ) { print REPORT_FILE "$line\n"; }
 		# --- above to handle the specific case of twiss lhc.madx
 
 
 		} else {
 		# file to be called in the same directory as the input file
-		# print "for target '$target' and test input '$infilename', now copying additional '$input'\n";
+		# print REPORT_FILE "for target '$target' and test input '$infilename', now copying additional '$input'\n";
 		if ($sourceSubDir eq "") {
 			`cp $samplesRootDir/$target/$input .`;
 		} else {
@@ -559,10 +561,10 @@ foreach $test (@tests) {
 	#DBG
 	my $dbg =1 ;
 	if ($dbg==1){
-	print "--- for $testCaseDir ---\n";
-	print "list of input files: @inputs\n";
-	print "list of output files: @outputs\n";
-	print "------------------------\n";
+	print REPORT_FILE "--- for $testCaseDir ---\n";
+	print REPORT_FILE "list of input files: @inputs\n";
+	print REPORT_FILE "list of output files: @outputs\n";
+	print REPORT_FILE "------------------------\n";
 	}
 
 	# now move inputs and outputs into dedicated subdirectory
@@ -821,13 +823,14 @@ if ($debugMode ==0) {
 				Data	   =>	$emailContent
 			);
 			$msg->send;
-			print "sent e-mail to $emailRecipient\n";
+			print REPORT_FILE "sent e-mail to $emailRecipient\n";
 		} else {
 			# for this targets, all tests were sucessful => no need to notify
 		}
 	}
 }
-print "script terminated\n";
+print REPORT_FILE "script terminated\n";
+close REPORT_FILE;
 
 sub getListOfDependantFiles {
 my $parentFilename = $_[0];
@@ -896,9 +899,9 @@ LINE: while(<IN>){
 	# before adding this child, make sure it's not already part of the childs the parent depends from
 	foreach $child (@childs) {
 		if ($dependentFileList =~ /$child,/) {
-			# print "'$child' already belonging to dependentFileList '$dependentFileList' => omit insertion\n";
+			# print REPORT_FILE "'$child' already belonging to dependentFileList '$dependentFileList' => omit insertion\n";
 		} else {
-			# print "add child '$child' to list '$dependentFileList'\n";
+			# print REPORT_FILE "add child '$child' to list '$dependentFileList'\n";
 			$dependentFileList = $dependentFileList . $child . ",";
 		}
 	}

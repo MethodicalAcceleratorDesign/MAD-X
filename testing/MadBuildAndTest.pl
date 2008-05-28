@@ -3,7 +3,7 @@
 my $child_pid = fork();
 
 if (not defined $child_pid){
-	print "no system resources to fork process\n";
+	print REPORT_FILE "no system resources to fork process\n";
 	exit;
 }
 
@@ -30,6 +30,8 @@ if ($child_pid==0){
 if ($child_pid) {
 	# non-zero pid means we are in the parent process, which received the child's pid
 
+	open REPORT_FILE, ">MadBuildAndTest_Report.txt";
+	
 	my $releaseTag;
 	my $runTest;
 	my $debugMode;
@@ -56,9 +58,9 @@ if ($child_pid) {
 
 	if ($debugMode==0){
 		# should also retreive the latest release tag
-		print "entering MadTrigTest.pl\n";
+		print REPORT_FILE "entering MadTrigTest.pl\n";
 		my @return = `./MadTrigTest.pl`; # extracts MAD's CVS repository with no tag
-		print "MadTrigTest.pl completed\n";
+		print REPORT_FILE "MadTrigTest.pl completed\n";
 
 		foreach $retString (@return){
 			my $recognized = 0;
@@ -71,7 +73,7 @@ if ($child_pid) {
 				$recognized = 1;
 			}
 			if ($recognized == 0 ) {
-				print "Unknown string $retString returned by ./MadTrigTest.pl\n";
+				print REPORT_FILE "Unknown string $retString returned by ./MadTrigTest.pl\n";
 			}
 		}
 	} else {
@@ -81,16 +83,16 @@ if ($child_pid) {
 			$releaseTag = $1;
 			$runTest = 'run-test';
 		} else {
-			print "Expect either no argument (automatic trigger)or argument of form:\n";
-			print "\tdebug=madX-x_yy_zz\n";
-			print "Kill the child process\n";
+			print REPORT_FILE "Expect either no argument (automatic trigger)or argument of form:\n";
+			print REPORT_FILE "\tdebug=madX-x_yy_zz\n";
+			print REPORT_FILE "Kill the child process\n";
 			kill 9, $child_pid; # kill the child process
-			print "Exit!\n";
+			print REPORT_FILE "Exit!\n";
 			exit;
 		}
 	}
 
-	# print "\$runTest is '$runTest', and \$releaseTag is '$releaseTag'\n";
+	# print REPORT_FILE "\$runTest is '$runTest', and \$releaseTag is '$releaseTag'\n";
 
 	# at this stage ./MadCvsExtract/madx dir created locally
 	# (currently overwritten by MadBuild.pl)
@@ -103,20 +105,22 @@ if ($child_pid) {
 		# irrespective of which directory MadTrigTest.pl ended in,
 		# MadBuild.pl starts from the location set by calling MadBuildAndTest.pl program
 	
-		print "entering MadBuild.pl\n";	
+		print REPORT_FILE "entering MadBuild.pl\n";	
 		`./MadBuild.pl $releaseTag`; # issues e-mail upon completion
-		print "MadBuild.pl completed\n";
+		print REPORT_FILE "MadBuild.pl completed\n";
 	
 		# irrespective of which directory MadBuild.pl ended in,
 		# MadTest.pl starts from the location set by calling MadBuildAndTest.pl program
 	
-		print "entering MadTest.pl\n";
+		print REPORT_FILE "entering MadTest.pl\n";
 		`./MadTest.pl ./MadCvsExtract/madX`; # issues e-mail upon completion
-		print "MadTest.pl completed\n";
+		print REPORT_FILE "MadTest.pl completed\n";
 	} else {
-		print "No new release detected => no need to run the test-suite\n";
+		print REPORT_FILE "No new release detected => no need to run the test-suite\n";
 	}
 
+	close REPORT_FILE;
+	
 	# kill the child process in charge of refreshing the AFS token every 6 hours	
 	kill 9, $child_pid; # kill the child process
 

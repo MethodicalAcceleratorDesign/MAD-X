@@ -12,6 +12,7 @@ if ( $#ARGV != 0 ) {
     $releaseTag = @ARGV[0];
 }
 
+open REPORT_FILE, ">MadBuild_Report.txt";
 
 $startTime = localtime;
 
@@ -52,7 +53,7 @@ $cvsDir = ":kserver:isscvs.cern.ch:/local/reps/madx" ;
 
 foreach(@extractedPackages) {
     my $pack = $_;
-    print "Extract package $pack from CVS\n";
+    print REPORT_FILE "Extract package $pack from CVS\n";
     `cvs -d $cvsDir checkout -r $releaseTag $pack`; # now extract for specified release tag
 }
 
@@ -145,6 +146,7 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 			);
   $msg->send;
 
+ close REPORT_FILE;
 
 sub lookForWarnings {
 
