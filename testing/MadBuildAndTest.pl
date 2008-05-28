@@ -83,9 +83,9 @@ if ($child_pid) {
 			$releaseTag = $1;
 			$runTest = 'run-test';
 		} else {
-			print REPORT_FILE "Expect either no argument (automatic trigger)or argument of form:\n";
-			print REPORT_FILE "\tdebug=madX-x_yy_zz\n";
-			print REPORT_FILE "Kill the child process\n";
+			print "Expect either no argument (automatic trigger)or argument of form:\n";
+			print "\tdebug=madX-x_yy_zz\n";
+			print "Kill the child process\n";
 			kill 9, $child_pid; # kill the child process
 			print REPORT_FILE "Exit!\n";
 			exit;
