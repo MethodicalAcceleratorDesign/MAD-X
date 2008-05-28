@@ -35,7 +35,7 @@ my $debugMode; 		# select a specific target and writes summary HTML file
 my $debugTarget;	# meaningful iff $debugMode is set to 1
 		
 if ( $#ARGV < 0 ) {
-	print REPORT_FILE "expect at least 1 argument: (1) MAD executable directory [(2) debug:<target>]  EXIT!\n" ;
+	print "expect at least 1 argument: (1) MAD executable directory [(2) debug:<target>]  EXIT!\n" ;
 	exit ;
 } else {
 	if ($#ARGV == 1) {
