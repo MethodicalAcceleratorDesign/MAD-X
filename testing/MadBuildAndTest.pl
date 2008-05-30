@@ -3,28 +3,40 @@
 my $child_pid = fork();
 
 if (not defined $child_pid){
-	print REPORT_FILE "no system resources to fork process\n";
+	print "no system resources to fork process\n";
 	exit;
 }
 
 if ($child_pid==0){
-	# this child process
-	# refresh the AFS token every 6 hours. Otherwise the token
-	# would expire after 25 hours.
-	# (note this trick works for up to 10 days according to IT support)
-	INFINITE_LOOP:
-	sleep 21600; # 6 hours
-	`kinit -R`;
-	`aklog`;
-	
-	# check if the child process' parent is dead, it should also kill itself
-	$parent_pid = getppid(); # get parent process' pid
-	$cnt = kill 0, $parent_pid;
-	if ($cnt == 0){
-		exit;
-	}
-	
-	goto INFINITE_LOOP;
+    # this child process
+    # refresh the AFS token every 6 hours. Otherwise the token
+    # would expire after 25 hours.
+    # (note this trick works for up to 10 days according to IT support)
+    open TICKETS_HISTORY, ">MadBuildAndTest_Tickets_History.txt";
+
+  INFINITE_LOOP:
+
+    my @tokens = `tokens`;
+    my @klist = `klist`;
+    my $now = localtime;
+    print TICKETS_HISTORY "\n\nAFS and Kerberos tickets on $now\n";
+    print TICKETS_HISTORY "======================= running tokens\n";
+    print TICKETS_HISTORY @tokens;
+    print TICKETS_HISTORY "======================= running klist\n";
+    print TICKETS_HISTORY @klist;
+    print TICKETS_HISTORY "now trying to invoke 'kinit -R' and 'aklog'\n";
+    sleep 21600; # 6 hours
+    `kinit -R`;
+    `aklog`;
+    
+    # check if the child process' parent is dead, it should also kill itself
+    $parent_pid = getppid(); # get parent process' pid
+    $cnt = kill 0, $parent_pid;
+    if ($cnt == 0){
+	exit;
+    }
+    
+    goto INFINITE_LOOP;
 }
 
 if ($child_pid) {
