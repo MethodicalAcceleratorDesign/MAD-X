@@ -2481,7 +2481,8 @@ int int_in_array(int k, int n, int* array)
 void insert_elem(struct sequence* sequ, struct node* node)
   /* inserts an element in a sequence as function of its position */
 {
-  struct node* c_node = sequ->start;
+  struct node* c_node = sequ->start->next;
+
   while (c_node != NULL)
   {
     if (node->position <= c_node->position || c_node == sequ->end) break;
