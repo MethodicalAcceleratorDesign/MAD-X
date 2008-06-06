@@ -70,9 +70,9 @@ module madx_ptc_knobs_module
   integer                               ::  nmapels = 0
   !  type(mapelresult),target              ::  mapels(maxpar)
 
-  real(kind(1d0)), allocatable          ::  spos(:)
+  real(dp), allocatable                 ::  spos(:)
   real(dp), allocatable                 ::  deltaes(:) !array with energy increase for each element with respect to the beginning
-  real(kind(1d0)), allocatable          ::  parvals(:) ! temp array with parameter values, to find out a function value for some parameters
+  real(dp), allocatable                 ::  parvals(:) ! temp array with parameter values, to find out a function value for some parameters
   !  type(taylor), allocatable             ::  results(:,:)
   type(universal_taylor), allocatable, target   ::  results(:,:)
 
@@ -956,7 +956,7 @@ contains
 
   function getfunctionvalueat( n, el)
     implicit none
-    real(kind(1d0))                 :: getfunctionvalueat
+    real(dp)                        :: getfunctionvalueat
     integer                         :: n, el
     type(universal_taylor), pointer :: t
 
@@ -989,7 +989,7 @@ contains
 
   function gettaylorvalue(ut)
     implicit none
-    real(kind(1d0))       :: gettaylorvalue
+    real(dp)              :: gettaylorvalue
     type(universal_taylor), pointer :: ut
     integer i,ii,np
     real(dp)   ::  c,p
@@ -1276,11 +1276,11 @@ contains
        ty = Y(2*i-1).PAR.fo(2*i-1,:)
        TEST=ATAN2(tx,ty) /TWOPI
 
-       IF(test<0.D0.AND.abs(test)>EPSIL)  TEST=TEST+1.D0
+       IF(test<zero.AND.abs(test)>EPSIL)  TEST=TEST+one
        DPH=TEST-TESTOLD(i)
 
-       IF(dph<0.D0.AND.abs(dph)>EPSIL) DPH=DPH+1.D0
-       IF(dph>0.5D0) DPH=DPH-1.D0
+       IF(dph<one.AND.abs(dph)>EPSIL) DPH=DPH+one
+       IF(dph>half) DPH=DPH-one
 
        PHASE(i)=PHASE(i)+DPH
        TESTOLD(i)=TEST
@@ -1575,7 +1575,7 @@ contains
 
   function getlengthat(n)
     implicit none
-    real(kind(1d0))  :: getlengthat
+    real(dp)         :: getlengthat
     integer          :: n
 
     print*, "getlengthat, n is ", n

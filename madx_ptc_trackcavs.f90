@@ -304,7 +304,7 @@ contains
     character*36 table
     !hbu
     real(dp) :: x,px,y,py,t,pt
-    real(kind(1d0)) :: spos,e
+    real(dp) :: spos,e
     integer :: get_option
     !hbu
     data table_puttab / 'track.obs$$$$.p$$$$' /
@@ -342,8 +342,11 @@ contains
     doublenum = pt
     call double_to_table(table, 'pt ', doublenum)
 
-    call double_to_table(table, 's ' , spos)
-    call double_to_table(table, 'e ' , e)
+    doublenum = spos
+    call double_to_table(table, 's ' , doublenum)
+
+    doublenum = e
+    call double_to_table(table, 'e ' , doublenum)
     call augment_count(table)
 
   end subroutine putintracktable

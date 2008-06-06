@@ -248,9 +248,9 @@ contains
     implicit none
     integer              :: n !fibre number
     character(*)         :: name !fibre name
-    real(kind(1d0))      :: s  !position along the orbit
+    real(dp)             :: s  !position along the orbit
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
-    real(dp)             :: v
+    real(kind(1d0))      :: v
     logical              :: set
     integer              :: i,j,k,e(6)
     integer              :: debug
@@ -425,7 +425,7 @@ contains
   subroutine setsigma(ndim,sig)
     implicit none
     integer          :: ndim
-    real(dp)         :: sig
+    real(kind(1d0))  :: sig
 
     if (sig .lt. zero) then
        print *, "X Emittance is less then 0"
@@ -604,8 +604,8 @@ contains
     call alloc(x,p,f)
     call alloc(fr)
 
-    x=1.d0.mono.1
-    p=1.d0.mono.2
+    x=one.mono.1
+    p=one.mono.2
 
     f=one
     do i=0,no

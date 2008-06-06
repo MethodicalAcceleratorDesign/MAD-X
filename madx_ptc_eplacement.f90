@@ -520,7 +520,7 @@ contains
       real(dp)     :: x,y,z
 
       write(fname,'(a5,i5.5)') 'RECTA',i
-      write(mf,*) 's = new TBRIK("',fname, '","',  fname,'","void",0.5,0.5,',p%mag%l/2_dp,');'
+      write(mf,*) 's = new TBRIK("',fname, '","',  fname,'","void",0.5,0.5,',p%mag%l/two,');'
       write(mf,*) 's->SetLineColor(',color,');'
 
       x = a(1)
@@ -562,7 +562,7 @@ contains
       real(dp)     :: x,y,z
 
       write(fname,'(a5,i5.5)') 'DRIFT',i
-      write(mf,*) 's = new TTUBE("',fname, '","',  fname,'","void",',r,',',p%mag%l/2_dp,');'
+      write(mf,*) 's = new TTUBE("',fname, '","',  fname,'","void",',r,',',p%mag%l/two,');'
       write(mf,*) 's->SetLineColor(',color,');'
 
       x = P%mag%p%f%o(1)

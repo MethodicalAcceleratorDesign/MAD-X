@@ -151,7 +151,8 @@ CONTAINS
     real(dp) fint,fintx,div,muonfactor
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
-    real(kind(1d0)) get_value,node_value,gammatr
+    real(dp) gammatr
+    real(kind(1d0)) get_value,node_value
     character(length) name
     character(name_len) aptype
     type(keywords) key

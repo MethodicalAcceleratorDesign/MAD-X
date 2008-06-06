@@ -161,10 +161,10 @@ contains
        endif
 
 
-       IF(TEST<0.D0.AND.abs(TEST)>EPSIL)TEST=TEST+1.D0
+       IF(TEST<zero.AND.abs(TEST)>EPSIL)TEST=TEST+one
        DPH=TEST-TESTOLD(i)
-       IF(DPH<0.D0.AND.abs(DPH)>EPSIL) DPH=DPH+1.D0
-       IF(DPH>0.5D0) DPH=DPH-1.D0
+       IF(DPH<zero.AND.abs(DPH)>EPSIL) DPH=DPH+one
+       IF(DPH>half) DPH=DPH-one
 
        PHASE(i)=PHASE(i)+DPH
        TESTOLD(i)=TEST
@@ -778,7 +778,7 @@ contains
       include "madx_ptc_knobs.inc"
       integer i1,i2,ii,i1a,i2a
       real(kind(1d0))   :: opt_fun(72),myx
-      real(dp)   :: deltae
+      real(kind(1d0))   :: deltae
 
       if (getdebug() > 2) then
          write(21,*) "##########################################"
@@ -967,7 +967,7 @@ contains
       real(dp) x(6)
 
       if(dodo==1) then
-         x=0.d0
+         x=zero
          call find_orbit(my_ring,x,1,default,c_1d_7)
          write(6,*) x
          call init(default,1,0,berz)
@@ -1022,7 +1022,7 @@ contains
       enddo
       ht=-ht*pi
 
-      lam=10.d0*full_abs(ht)
+      lam=ten*full_abs(ht)
       ht=ht/lam
       if(fake_3) then !1959 is the yearh of birth of Etienne (just a number)
          ht=ht+(0.1959e0_dp.mono.'000020')+(0.1959e0_dp.mono.'000002')
@@ -1182,11 +1182,12 @@ contains
     subroutine readinitialtwiss(dt)
       !Reads initial twiss parameters from MAD-X command
       implicit none
-      real(dp) alpha(3),beta(3),disp(4),mu(3)
+      real(kind(1d0)) alpha(3),beta(3),disp(4),mu(3)
       type(real_8) al(3),be(3),di(4)
       type(pol_block_inicond) :: inicondknobs
       integer k_system
-      real(dp)  sizept, emiz
+      real(dp)  sizept
+      real(kind(1d0)) emiz
       real(dp) dt
 
       beta(1)  = get_value('ptc_twiss ','betx ')
