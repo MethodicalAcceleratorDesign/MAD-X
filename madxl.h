@@ -125,13 +125,14 @@ char* ap_table_cols[] =
 int survey_table_types[] =
 {
   3, 2, 2, 2, 2,
-  2, 2, 2, 2, 2, 2
+  2, 2, 2, 2, 2, 2, 1, 2
 };
 
 char* survey_table_cols[] =
 {
   "name", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt",
+  "assembly_id", "beam_sep",
   " "  /* blank terminates */
 };
 
