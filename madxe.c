@@ -150,7 +150,7 @@ void error_seterr(struct in_cmd* cmd)
                 nextnode->p_al_err = new_double_array(ALIGN_MAX);
                 nextnode->p_al_err->curr = ALIGN_MAX;
 
-                for (j = 1; j < EFIELD_TAB; j++) {
+                for (j = 1; j < EFIELD_TAB+1; j++) {
              /*   printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]); */
                   nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
                 }
@@ -273,7 +273,7 @@ void error_eprint(struct in_cmd* cmd)
                   pln_alig[4], pln_alig[5],pln_alig[6],pln_alig[7],
                   pln_alig[8], pln_alig[9],pln_alig[10],pln_alig[11],
                   pln_alig[12],pln_alig[13]);
-         for(i=0;i<nextnode->p_al_err->curr;i++) {
+         for(i=0;i<nextnode->p_al_err->curr;i++) { 
             fprintf(prt_file, "%10.6f ",alig_fact[i]*nextnode->p_al_err->a[i]);
          }
          fprintf(prt_file, "\n");
@@ -294,7 +294,7 @@ void error_eprint(struct in_cmd* cmd)
            /* fprintf(prt_file,"%s %d\n",nextnode->name,(int)nextnode->p_fd_err); */
            fprintf(prt_file, "\n\nField errors for element %s \n",nextnode->name);
            fprintf(prt_file, "Multipole order:     Normal:           Skew: \n");
-           for(i=0;i<22;i++) {
+           for(i=0;i<EFIELD_TAB;i++) {
               fprintf(prt_file, "%8d          %8e      %8e\n",i/2,
                      nextnode->p_fd_err->a[i],
                      nextnode->p_fd_err->a[i+1]);
