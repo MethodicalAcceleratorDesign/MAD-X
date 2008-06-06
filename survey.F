@@ -202,6 +202,9 @@
 !     copy over the attributes 'beam_sep' and 'assembly_id'
 !     FT 06.06.2008
 
+      tmp = node_value('slot_id ')
+      call double_to_table('survey ', 'slot_id ',tmp)
+
       tmp = node_value('assembly_id ')
       call double_to_table('survey ', 'assembly_id ',tmp)
 
