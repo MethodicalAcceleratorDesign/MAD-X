@@ -1,7 +1,7 @@
 /* preparation of Touschek */
 /* defined constants for word lengths etc. */
 #define ALIGN_MAX 14        /* alignment error array length */
-#define EFIELD_TAB 22       /* field error array length for ESAVE table */
+#define EFIELD_TAB 42       /* field error array length for ESAVE table */
 #define FIELD_MAX 42        /* field error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 24           /* internal name length */
@@ -135,9 +135,14 @@ char* survey_table_cols[] =
   " "  /* blank terminates */
 };
 
+
 int efield_table_types[] =
 {
   3, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
@@ -154,12 +159,17 @@ char* efield_table_cols[] =
   "k2l", "k2sl", "k3l", "k3sl", "k4l",
   "k4sl", "k5l", "k5sl", "k6l", "k6sl",
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
-  "k9sl", "k10l", "k10sl",
+  "k9sl", "k10l", "k10sl", "k11l", "k11sl",
+  "k12l", "k12sl", "k13l", "k13sl", "k14l",
+  "k14sl", "k15l", "k15sl", "k16l", "k16sl",
+  "k17l", "k17sl", "k18l", "k18sl", "k19l",
+  "k19sl", "k20l", "k20sl",
   "dx", "dy", "ds", "dphi", "dtheta",
   "dpsi", "mrex", "mrey", "mredx", "mredy",
   "arex", "arey", "mscalx", "mscaly",
   " "  /* blank terminates */
 };
+
 
 char* sxf_table_names[] =
 {
