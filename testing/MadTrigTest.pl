@@ -115,8 +115,10 @@ if ($lastTest eq $lastRelease) {
 	$msg->send;
 	$trigger = 'run-test';
 	# will cause the MadTest.pl script to run.
-	rmtree($extractDir);
+
 }
+chdir($pwd); # back to the top menu
+rmtree($extractDir);
 
 # returned strings for MadBuildAndTest.pl
 print "releaseTag=madX-$lastRelease\n"; # \n-terminated
