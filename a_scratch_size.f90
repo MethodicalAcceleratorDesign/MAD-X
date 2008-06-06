@@ -32,8 +32,12 @@ module precision_constants
   integer,parameter::nlp=16
   integer,parameter::vp=16
   integer,parameter::lp=4
+! double precision
   integer,parameter::sp=kind(1e0)
   integer,parameter::dp=selected_real_kind(2*precision(1e0_sp))
+! quadrupole precision
+!  integer,parameter::sp=selected_real_kind(2*precision(1.0))
+!  integer,parameter::dp=selected_real_kind(2*precision(1.0_sp))
   !Logicals
   logical(lp),parameter:: my_true=.true.
   logical(lp),parameter:: my_false=.false.
@@ -165,6 +169,7 @@ module precision_constants
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
   logical(lp),TARGET :: print_frame =.true.
+  logical(lp),TARGET :: sixtrack_compatible =.false.
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=c_1d6
   real(dp),pointer :: crash
@@ -230,6 +235,7 @@ module precision_constants
 
 
      ! influence fibre creation
+
      integer, pointer :: MADTHICK        !
      integer, pointer :: MADTHIN_NORMAL
      integer, pointer :: MADTHIN_SKEW
@@ -240,8 +246,10 @@ module precision_constants
      logical(lp), pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
      logical(lp),pointer :: ALWAYS_knobs  !=.false. ptc knob default status
      logical(lp),pointer :: recirculator_cheat  ! =.false.  if true energy patches use the time formula always
+     logical(lp),pointer :: sixtrack_compatible !  to insure some sixtrack compatibility default=false
      integer, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0  default
      integer,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
+     logical(lp),pointer :: do_beam_beam   ! obvious meaning: false normally
      ! creates a reverse propagator
      integer,pointer ::FIBRE_DIR         !=1 or -1 for reversed
      integer,pointer ::INITIAL_CHARGE         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE

@@ -2195,8 +2195,6 @@ contains
     end select
   END FUNCTION dexpt
 
-
-
   FUNCTION abst( S1 )
     implicit none
     real(dp) abst
@@ -2219,6 +2217,54 @@ contains
        call write_e(0)
     end select
   END FUNCTION abst
+
+  FUNCTION Pabs( S1 )
+    implicit none
+    TYPE (real_8) Pabs
+    TYPE (real_8), INTENT (IN) :: S1
+    integer localmaster
+
+    select case(s1%kind)
+    case(m1)
+       Pabs%R=abs(s1%r)
+       Pabs%kind=1
+    case(m2)
+       localmaster=master
+       call ass(Pabs)
+       IF((s1%t.sub.'0')<0) THEN
+          Pabs%T=-s1%t
+       ELSE
+          Pabs%T=s1%t
+       ENDIF
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(Pabs)
+          call varfk1(S1)
+          IF((s1%t.sub.'0')<0) THEN
+             Pabs%T=-varf1
+          ELSE
+             Pabs%T=varf1
+          ENDIF
+          master=localmaster
+       else
+          PABS%r= ABS(S1%r)
+          PABS%kind=1
+       endif
+    case default
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,A72,/,1x,a72))'
+       w_p%fi='(2((1X,i4)))'
+       w_p%c(1)= " trouble in Pabs "
+       w_p%c(2)= "s1%kind   "
+       w_p=(/s1%kind  /)
+       call write_e(0)
+    end select
+  END FUNCTION Pabs
+
+
 
   FUNCTION full_abst( S1 )
     implicit none
