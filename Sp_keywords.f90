@@ -39,7 +39,7 @@ contains
 
   subroutine create_fibre(el,key,EXCEPTION,magnet_only)
     implicit none
-    integer ipause, mypause
+    integer ipause, mypause,i
     type(fibre), target, intent(inout)::el
     logical(lp), optional :: magnet_only
     type(keywords) key
@@ -51,7 +51,7 @@ contains
     logical(lp) FIBRE_flip0,MAD0
     logical(lp) :: t=.true.,f=.false.
     INTEGER FIBRE_DIR0,IL,multipi
-    real(dp) e1_true
+    real(dp) e1_true,norm
 
 
     IL=15
@@ -83,7 +83,6 @@ contains
        RETURN
     END SELECT
 
-
     !    NSTD0=NSTD
     !    METD0=METD
     EXACT0=EXACT_MODEL
@@ -98,10 +97,38 @@ contains
     FIBRE_DIR  = KEY%FIBRE_DIR
     MADLENGTH=KEY%MADLENGTH
 
+    !     real(dp) L,LD,LC,K(NMAX),KS(NMAX)
+    !     real(dp) ang(3),t(3)
+    !     real(dp) angi(3),ti(3)
+    !     integer patchg
+    !     real(dp) T1,T2,B0
+    !     real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
+    !     real(dp) tilt
+    !     real(dp) FINT,hgap,h1,h2,X_COL,Y_COL
+    !     real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
+    !     CHARACTER(120) file
+    !     CHARACTER(120) file_rev
+    !    CHARACTER(nlp) NAME
+    !     CHARACTER(vp) VORNAME
+    !     INTEGER KIND,nmul,nst,method
+    !     LOGICAL(LP) APERTURE_ON
+    !     INTEGER APERTURE_KIND
+    !     REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
+    !     LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE,PERMFRINGE
+    !     REAL(DP) DPHAS,PSI,dvds
+    !     INTEGER N_BESSEL
+
+    if(sixtrack_compatible) then
+       EXACT_MODEL=.false.
+       KEY%LIST%method=2
+       MADTHICK=drift_kick_drift
+    endif
+
     SELECT CASE(magnet(1:IL))
     CASE("DRIFT          ")
        BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("SOLENOID       ")
+       if(sixtrack_compatible) stop 1
        BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("QUADRUPOLE     ")
        BLANK=QUADRUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
@@ -112,49 +139,92 @@ contains
     CASE("SBEND         ")
        BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("TRUERBEND     ")
+       if(sixtrack_compatible) stop 2
 
        e1_true= KEY%LIST%b0/two+ KEY%LIST%t1
        BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=e1_true,list=KEY%LIST)
 
     CASE("WEDGRBEND     ")
+       if(sixtrack_compatible) stop 3
 
        BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=KEY%LIST%t1,e2=KEY%LIST%t2,list=KEY%LIST)
 
     CASE("RBEND         ")
+       if(sixtrack_compatible) stop 4
        KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
        KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
        BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("KICKER         ","VKICKER        ","HKICKER        ")
        BLANK=KICKER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("MONITOR        ")
-       BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       if(sixtrack_compatible) then
+          BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
+       else
+          BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       endif
     CASE("HMONITOR        ")
-       BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND12;
+       if(sixtrack_compatible) then
+          BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
+       else
+          BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND12;
+       endif
     CASE("VMONITOR       ")
-       BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND13;
+       if(sixtrack_compatible) then
+          BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
+       else
+          BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND13;
+       endif
     CASE("INSTRUMENT     ")
-       BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND14;
+       if(sixtrack_compatible) then
+          BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
+       else
+          BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND14;
+       endif
     CASE("MARKER         ")
        BLANK=MARKER(KEY%LIST%NAME)
     CASE("CHANGEREF      ")
+       if(sixtrack_compatible) stop 5
        BLANK=CHANGEREF(KEY%LIST%NAME,KEY%LIST%ANG,KEY%LIST%T,KEY%LIST%PATCHG)
     CASE("RFCAVITY       ")
+       if(sixtrack_compatible) then
+          If(KEY%LIST%L/=zero) stop 60
+          If(KEY%LIST%N_BESSEL/=zero) stop 61
+          norm=zero
+          do i=1,nmax
+             norm=norm+abs(KEY%LIST%k(i))+abs(KEY%LIST%ks(i))
+          enddo
+          norm=norm-abs(KEY%LIST%k(2))
+          if(norm/=zero) then
+             write(6,*) norm
+             stop 62
+          endif
+       endif
        BLANK=RFCAVITY(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("TWCAVITY       ")
+       if(sixtrack_compatible) stop 7
        BLANK=TWCAVITY(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("ELSEPARATOR    ")
+       if(sixtrack_compatible) stop 8
        BLANK=ELSEPARATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("MULTIPOLE_BLOCK","MULTIPOLE      ")
        BLANK=MULTIPOLE_BLOCK(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("SMI            ","SINGLE_LENS    ")
+       if(sixtrack_compatible) stop 9
        BLANK=SINGLE_LENS(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("RCOLLIMATOR    ")
+       if(sixtrack_compatible) stop 10
        BLANK=RCOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("ECOLLIMATOR    ")
-       BLANK=ECOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       if(sixtrack_compatible) then
+          BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
+       else
+          BLANK=ECOLLIMATOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       endif
     CASE("WIGGLER        ")
+       if(sixtrack_compatible) stop 12
        BLANK=WIGGLER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("HELICALDIPOLE  ")
+       if(sixtrack_compatible) stop 13
        BLANK=HELICAL(KEY%LIST%NAME,LIST=KEY%LIST)
        !    CASE("TAYLORMAP      ")
        !       IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
@@ -444,7 +514,7 @@ contains
     default=original
     call Set_madx(p0c=p0c)
     DO I=1,N
-       CALL APPEND_CLONE(L)
+       CALL APPEND_CLONE(L,muonfactor=massf,charge=initial_charge)
        CALL READ_FIBRE(L%END,mf)
        CALL COPY(L%END%MAG,L%END%MAGP)
     ENDDO
@@ -778,8 +848,8 @@ contains
 
     write(mf,*) nst,el%p%ld,el%p%b0,EL%B(1)%no,.false.
     do i=1,nst
-       B(1)=morph(1.d0.mono.1)
-       B(2)=morph(1.d0.mono.2)
+       B(1)=morph(one.mono.1)
+       B(2)=morph(one.mono.2)
        B(3)=ZERO;
        CALL trackg(EL%B(i),B)
        do j=1,3
@@ -1559,155 +1629,6 @@ contains
 
   END subroutine READ_pointed_INTO_VIRGIN_LAYOUT
 
-!!!!  SIXTRACK FLAT FILE !!!!!
-
-  subroutine PRINT_LAYOUT_SIXTRACT(L,FILENAME)
-    implicit none
-    character(*) filename
-    integer I,MF,DI,nt
-    type(LAYOUT), TARGET :: L
-    type(FIBRE), pointer :: P
-    character*255 line
-    REAL(DP) D(3),ANG(3),PREC,DS
-    LOGICAL(LP) ENERGY_PATCH
-
-    !    P=>L%START
-    !    i=1
-    !    nt=0
-    !    do while(i<=l%n)
-
-    !       call count_PATCH_sixtrack(di,p)
-    !       i=i+1+DI
-    !       nt=nt+1
-    !    ENDDO
-
-    nt=0
-
-    PREC=1.D-10
-    call kanalnummer(mf)
-    open(unit=mf,file=filename)
-
-    WRITE(MF,*) L%N, " NUMBER OF FIBRES   "
-    if(l%name(1:1)/=' ') then
-       write(MF,'(a17,a16)') " GLOBAL DATA FOR ",l%name
-    else
-       write(MF,*) " $$$$$$$$$ GLOBAL DATA $$$$$$$$$"
-    endif
-
-    write(MF,*) l%start%mass,L%START%mag%p%p0c, "MASS, P0C"
-    write(MF,*) phase0,stoch_in_rec,l%start%charge, " PHASE0, STOCH_IN_REC, CHARGE"
-    write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
-         "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
-    write(MF,*) " $$$$$$$ END GLOBAL DATA $$$$$$$$$$"
-
-    if(.not.associated(L%t)) call make_node_layout(L)
-    CALL FILL_SURVEY_DATA_IN_NODE_LAYOUT(L)
-
-    P=>L%START
-    i=1
-    do while(i<=l%n)
-
-       CALL print_FIBRE_SIXTRACK(P,mf)
-       p=>p%next
-       i=i+1    !+DI
-    ENDDO
-
-
-  END subroutine PRINT_LAYOUT_SIXTRACT
-
-  subroutine print_FIBRE_SIXTRACK(m,mf)
-    implicit none
-    integer mf,I
-    type(FIBRE), pointer :: m
-
-    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
-    WRITE(MF,*)  M%DIR, " DIRECTION "
-    CALL print_PATCH_MIS_SIXTRACK(M,MF)
-    CALL print_element_SIXTRACK(M,M%MAG,mf)
-    WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@  END  @@@@@@@@@@@@@@@@@@@@"
-
-  END subroutine print_FIBRE_SIXTRACK
-
-
-  subroutine print_element_SIXTRACK(P,m,mf)
-    implicit none
-    integer mf,I
-    type(FIBRE), pointer :: P
-    type(element), pointer :: m
-    character*255 line
-
-    WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ELEMENT $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    if(m%vorname(1:1)==' ') then
-       WRITE(MF,*) M%KIND,M%NAME, ' NOVORNAME'
-    ELSE
-       WRITE(MF,*) M%KIND,M%NAME,' ',M%VORNAME
-    ENDIF
-    WRITE(MF,*) M%L
-    IF(ASSOCIATED(M%FREQ)) THEN
-       WRITE(MF,*) " CAVITY INFORMATION "
-       !HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+EL%phase0)/EL%P%P0C
-
-       WRITE(LINE,*) c_1d_3*M%VOLT, twopi*M%FREQ/CLIGHT,M%PHAS+M%C4%phase0
-       WRITE(MF,'(A255)') LINE
-    ELSEIF(ASSOCIATED(M%VOLT)) THEN
-       WRITE(MF,*) " ELECTRIC SEPTUM INFORMATION "
-       WRITE(MF,*) M%VOLT,M%PHAS, "VOLT, PHAS(rotation angle) "
-    ELSE
-       WRITE(MF,*) " NO ELECTRIC ELEMENT INFORMATION "
-    ENDIF
-    IF(ASSOCIATED(M%B_SOL)) THEN
-       WRITE(MF,*)  M%B_SOL, " B_SOL"
-    ELSE
-       WRITE(MF,*) zero
-    ENDIF
-    CALL print_magnet_chart_SIXTRACK(P,m%P,mf)
-    IF(ASSOCIATED(M%an)) THEN
-       do i=1,m%p%NMUL
-          write(mf,*) m%bn(i),m%an(i), " BN AN ",I
-       enddo
-    endif
-    !    call print_specific_element(m,mf)
-    WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   END   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-  end subroutine print_element_SIXTRACK
-
-  subroutine print_magnet_chart_SIXTRACK(P,m,mf)
-    implicit none
-    type(FIBRE), pointer :: P
-    type(magnet_chart), pointer :: m
-    integer mf
-    character*200 line
-
-    WRITE(MF,*) "MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART MAGNET CHART "
-    WRITE(MF,*) M%METHOD,M%NST,M%NMUL, " METHOD NST NMUL"
-    WRITE(line,*) M%B0, " B0"
-    WRITE(MF,'(A200)') LINE
-    WRITE(LINE,*) P%BETA0,P%GAMMA0I, P%GAMBET, M%P0C,m%tiltd, " BETA0 GAMMA0I GAMBET P0C TILT"
-    WRITE(MF,'(A200)') LINE
-
-    write(mf,'(a68)') "END MAGNET CHART END MAGNET CHART END MAGNET CHART END MAGNET CHART "
-  end subroutine print_magnet_chart_SIXTRACK
-
-  subroutine print_PATCH_MIS_SIXTRACK(m,mf)
-    implicit none
-    type(FIBRE), pointer :: m
-    integer mf
-    character*200 line
-
-    write(mf,'(a10)')  " GEOMETRY "
-    WRITE(MF,*) M%PATCH%A_X1,M%PATCH%A_X2,M%PATCH%B_X1,M%PATCH%B_X2
-    WRITE(MF,*) M%PATCH%A_T, M%PATCH%B_T
-    WRITE(LINE,*) M%PATCH%A_ANG,M%PATCH%A_D
-    WRITE(MF,'(a200)') LINE
-    WRITE(LINE,*) M%PATCH%B_ANG,M%PATCH%B_D
-    WRITE(MF,'(a200)') LINE
-    WRITE(LINE,*) M%CHART%ANG_IN,M%CHART%D_IN
-    WRITE(MF,'(a200)') LINE
-    WRITE(LINE,*) M%CHART%ANG_OUT,M%CHART%D_OUT
-    WRITE(MF,'(a200)') LINE
-    WRITE(LINE,*) M%MAG%P%TILTD
-
-    write(mf,'(a14)') " END GEOMETRY "
-  end subroutine print_PATCH_MIS_SIXTRACK
 
 
 end module madx_keywords

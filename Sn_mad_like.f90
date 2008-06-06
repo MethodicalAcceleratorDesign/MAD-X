@@ -2747,7 +2747,9 @@ CONTAINS
     c_%MAD => MAD
     c_%EXACT_MODEL => EXACT_MODEL
     c_%ALWAYS_EXACTMIS => ALWAYS_EXACTMIS
+    c_%sixtrack_compatible => sixtrack_compatible
     c_%HIGHEST_FRINGE => HIGHEST_FRINGE
+    c_%do_beam_beam => do_beam_beam
     c_%FIBRE_DIR => FIBRE_DIR
     c_%INITIAL_CHARGE => INITIAL_CHARGE
     c_%FIBRE_flip => FIBRE_flip

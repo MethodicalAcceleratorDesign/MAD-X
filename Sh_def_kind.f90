@@ -11591,6 +11591,9 @@ contains
        if(ASSOCIATED(EL%N_BESSEL)) then
           deallocate(EL%N_BESSEL)
        endif
+       if(ASSOCIATED(EL%t)) then
+          deallocate(EL%t)
+       endif
        if(ASSOCIATED(EL%NF)) then
           deallocate(EL%NF)
        endif
@@ -11608,6 +11611,7 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%t)
        NULLIFY(EL%phase0)
        NULLIFY(EL%CAVITY_TOTALPATH)
        NULLIFY(EL%N_BESSEL)
@@ -11624,6 +11628,9 @@ contains
     INTEGER, INTENT(IN)::I
     !integer k
     IF(I==-1) THEN
+       if(ASSOCIATED(EL%t)) then
+          deallocate(EL%t)
+       endif
        if(ASSOCIATED(EL%N_BESSEL)) then
           deallocate(EL%N_BESSEL)
        endif
@@ -11646,6 +11653,7 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%t)
        NULLIFY(EL%phase0)
        NULLIFY(EL%CAVITY_TOTALPATH)
        NULLIFY(EL%N_BESSEL)

@@ -2,8 +2,8 @@
 !Copyright (C) Etienne Forest and CERN
 
 module ptc_multiparticle
-  use S_TRACKING  !,FRINGE_=>FRINGE__MULTI !,FACE=>FACE_MULTI
-
+  !  use S_TRACKING  !,FRINGE_=>FRINGE__MULTI !,FACE=>FACE_MULTI
+  use beam_beam_ptc
   implicit none
   public
   private index
@@ -16,6 +16,8 @@ module ptc_multiparticle
   PRIVATE TRACKR_NODE_SINGLE,TRACKP_NODE_SINGLE,TRACKV_NODE_SINGLE
   private DRIFTr_BACK_TO_POSITION,DRIFTp_BACK_TO_POSITION  !,DRIFT_BACK_TO_POSITION
   private MAKE_NODE_LAYOUT_2 !,DRIFT_TO_TIME
+
+  logical(lp),private, parameter :: dobb=.true.
 
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
@@ -235,11 +237,11 @@ CONTAINS
     real(dp), POINTER :: P0,B0
 
     !FRONTAL PATCH
-    IF(ASSOCIATED(C%PATCH)) THEN
-       PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
-    ELSE
-       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
-    ENDIF
+    !    IF(ASSOCIATED(C%PATCH)) THEN
+    PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
+    !    ELSE
+    !       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
+    !    ENDIF
 
     ! PUSHING BEAM
     !
@@ -305,11 +307,11 @@ CONTAINS
 
 
     !FRONTAL PATCH
-    IF(ASSOCIATED(C%PATCH)) THEN
-       PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
-    ELSE
-       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
-    ENDIF
+    !    IF(ASSOCIATED(C%PATCH)) THEN
+    PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
+    !    ELSE
+    !       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
+    !    ENDIF
 
     ! PUSHING BEAM
     !
@@ -570,7 +572,6 @@ CONTAINS
     T%PARENT_FIBRE%MAG%P%CHARGE=>T%PARENT_FIBRE%CHARGE
 
 
-
     !call cpu_time(ttime1)
 
     !dt1=ttime1-ttime0+dt1
@@ -624,6 +625,12 @@ CONTAINS
     CASE(CASE0)
        el=>T%PARENT_FIBRE%MAG
        if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
+       if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
+          call TRANS((/t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          call BBKICK(t%bb,X)
+          call TRANS((/-t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+       endif
+
        SELECT CASE(EL%KIND)
        CASE(KIND0)
        case(KIND1)
@@ -758,6 +765,13 @@ CONTAINS
     CASE(CASE0)
        el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
+       if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
+          call TRANS((/t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
+          call BBKICK(t%bb,X)
+          call TRANS((/-t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
+       endif
        SELECT CASE(EL%KIND)
        CASE(KIND0)
        case(KIND1)
@@ -890,7 +904,6 @@ CONTAINS
 
     if(associated(L)) then
        CALL kill_NODE_LAYOUT(L)
-       DEALLOCATE(L);
        NULLIFY(L);
     endif
 

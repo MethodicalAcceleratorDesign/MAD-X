@@ -105,7 +105,7 @@ MODULE S_FAMILY
      MODULE PROCEDURE TRANSLATE_layout
      MODULE PROCEDURE TRANSLATE_fibre
      MODULE PROCEDURE TRANSLATE_frame
-     MODULE PROCEDURE TRANSLATE_magnet   !element input
+     !     MODULE PROCEDURE TRANSLATE_magnet   !element input
   END  INTERFACE
 
   INTERFACE ROTATE
@@ -494,8 +494,8 @@ CONTAINS
 
   END SUBROUTINE  MISALIGN_FIBRE_EQUAL
 
-  SUBROUTINE  FIND_AFFINE_SIAMESE(S2,CN,FOUND) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+  SUBROUTINE  FIND_AFFINE_SIAMESE(S2,CN,FOUND) !
+    ! FIND THE ELEMENT (CN) ON WHICH THE AFFINE_FRAME IS
     IMPLICIT NONE
     TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
     TYPE(AFFINE_FRAME),POINTER :: AF
@@ -542,8 +542,11 @@ CONTAINS
 
   END SUBROUTINE  FIND_AFFINE_SIAMESE
 
-  SUBROUTINE FIND_FRAME_SIAMESE(MAG,B,EXI,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+  SUBROUTINE FIND_FRAME_SIAMESE(MAG,B,EXI,ADD) !
+    ! ACTUALLY CONSTRUCTS THE AFFINE FRAME FOUND PREVIOUSLY ON MAG
+    ! FROM  mag%SIAMESE_FRAME%D,mag%SIAMESE_FRAME%ANGLE
+    ! IF ADD=FALSE, START FROM ORIGINAL FIBRE POSITION
+    ! COMPUTE B,EXI
     IMPLICIT NONE
     TYPE(ELEMENT), POINTER :: MAG
     REAL(DP), INTENT(INOUT) :: B(3),EXI(3,3)
@@ -564,8 +567,14 @@ CONTAINS
 
   END SUBROUTINE FIND_FRAME_SIAMESE
 
-  SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+  SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD)
+    ! SAME AS MISALIGN_FIBRE: DEFAULT IS THE O,MID OF S2
+    !   UNLESS IT FINDS  TYPE(AFFINE_FRAME), POINTER :: SIAMESE_FRAME ON S2%SIAMESE CHAIN
+    ! ON ONE SIAMESE IN THE CHAIN
+
+    ! THIS IS OVERWRITEN IF OMEGA AND BASIS ARE PRESENT
+
+
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
@@ -582,8 +591,8 @@ CONTAINS
 
     FOUND=.FALSE.
     ADDIN=.FALSE.
-    CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)  ! Looking for siamese
-    IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD)
+    CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)  ! Looking for siamese WITH FRAME
+    IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD) ! FIND ACTUAL FRAME
 
     IF(PRESENT(ADD)) ADDIN=ADD
 
@@ -620,11 +629,12 @@ CONTAINS
        ENDDO
     ENDIF
     !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
-    write(6,*) k, " magnet misaligned "
+    if(global_verbose) write(6,*) k, " magnet misaligned "
   END SUBROUTINE  MISALIGN_SIAMESE
 
-  SUBROUTINE  FIND_AFFINE_GIRDER(S2,CN,FOUND) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+  SUBROUTINE  FIND_AFFINE_GIRDER(S2,CN,FOUND) !
+    ! SAME AS FIND_AFFINE_SIAMESE
+    ! LOCATES MAGNET CN WHERE C%GIRDER_FRAME IS
     IMPLICIT NONE
     TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
     TYPE(AFFINE_FRAME),POINTER :: AF
@@ -667,8 +677,8 @@ CONTAINS
 
   END SUBROUTINE  FIND_AFFINE_GIRDER
 
-  SUBROUTINE FIND_FRAME_GIRDER(MAG,B,EXI,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+  SUBROUTINE FIND_FRAME_GIRDER(MAG,B,EXI,ADD) !
+    ! ACTUALLY LOCATES THE FRAME
     IMPLICIT NONE
     TYPE(ELEMENT), POINTER :: MAG
     REAL(DP), INTENT(INOUT) :: B(3),EXI(3,3)
@@ -680,17 +690,68 @@ CONTAINS
     IF(PRESENT(ADD)) ADDIN=ADD
 
     IF(.NOT.ADDIN) THEN
-       mag%GIRDER_FRAME%EXI=mag%GIRDER_FRAME%ENT
-       mag%GIRDER_FRAME%B=mag%GIRDER_FRAME%A
+       mag%GIRDER_FRAME%EXI=mag%GIRDER_FRAME%ENT   ! ORIGINAL FRAME OF GIRDER
+       mag%GIRDER_FRAME%B=mag%GIRDER_FRAME%A       ! ORIGINAL POSITION OF GIRDER
     ENDIF
     EXI=mag%GIRDER_FRAME%EXI
     B=mag%GIRDER_FRAME%B
 
   END SUBROUTINE FIND_FRAME_GIRDER
 
+  SUBROUTINE  EXTRACT_GIRDER_FRAME(S2,A,ENT,FOUND) !
+    ! USED IN PTC_GIRDER
+    IMPLICIT NONE
+    TYPE(element),TARGET,INTENT(INOUT):: S2
+    TYPE(AFFINE_FRAME),POINTER :: AF
+    TYPE(ELEMENT), POINTER :: C,CN
+    INTEGER K
+    LOGICAL(LP),INTENT(INOUT)::FOUND
+    REAL(DP),INTENT(INOUT):: ENT(3,3),A(3)
 
-  SUBROUTINE  MISALIGN_GIRDER(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+    NULLIFY(AF)
+    NULLIFY(CN)
+
+
+    FOUND=MY_FALSE
+    K=0
+
+    IF(ASSOCIATED(S2%GIRDER)) THEN
+       C=>S2
+       CN=>S2%GIRDER
+
+       IF(ASSOCIATED(C%GIRDER_FRAME)) THEN
+          AF=>C%GIRDER_FRAME
+          CN=>C
+          FOUND=MY_TRUE
+          RETURN
+       ENDIF
+
+       DO WHILE(.NOT.ASSOCIATED(C,CN))
+          IF(ASSOCIATED(CN%GIRDER_FRAME)) THEN
+             AF=>CN%GIRDER_FRAME
+             FOUND=MY_TRUE
+             EXIT
+          ENDIF
+          CN=>CN%GIRDER
+          k=k+1
+          IF(K>10000)THEN
+             WRITE(6,*) " TOO MANY IN GIRDER "
+             STOP 666
+          ENDIF
+       ENDDO
+    ENDIF
+
+    IF(FOUND) THEN
+       ENT=AF%ENT
+       A=AF%A
+    ENDIF
+  END SUBROUTINE  EXTRACT_GIRDER_FRAME
+
+
+
+  SUBROUTINE  MISALIGN_GIRDER(S2,S1,OMEGA,BASIS,ADD) !
+    ! SIMILAR TO MISALIGN_SIAMESE
+    ! COMMENT DIFFERENCES ONLY
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
@@ -747,7 +808,10 @@ CONTAINS
        ENDDO
     ENDIF
 
-    IF(FOUND) THEN
+
+
+    IF(FOUND) THEN   !!! THE ORIGINAL GIRDER FRAME IS STILL GIRDER_FRAME%ENT AND GIRDER_FRAME%A
+       !                    FINAL FRAME AFTER MISALIGNMENTS MUST BE COMPUTED
        call alloc(f)
        f%a=b
        f%ent=exi
@@ -760,13 +824,14 @@ CONTAINS
        call kill(f)
     ENDIF
 
-    write(6,*) k, " magnet misaligned "
+    if(global_verbose)     write(6,*) k, " magnet misaligned "
   END SUBROUTINE  MISALIGN_GIRDER
 
 
 
   SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
-    ! changed
+    ! changed  add=true add extra misalignments TO EXISTING ONES
+    ! O AND MID BY DEFAUTL, OTHERWISE OMEGA AND BASIS
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
@@ -954,39 +1019,54 @@ CONTAINS
     ENDIF
 
     c=>s2%mag
-    CALL TRANSLATE(c,D,ORDER,BASIST,PATCH,PREC)
+    !    CALL TRANSLATE_magnet(c,D,ORDER,BASIST,PATCH=.false.)
+    CALL TRANSLATE_magnet(c,D,ORDER,BASIST,PATCH,PREC)
     k=1
 
     IF(ASSOCIATED(S2%MAG%girder)) THEN
        C=>S2%MAG
        CN=>S2%MAG%girder
        DO WHILE(.NOT.ASSOCIATED(C,CN))
-          CALL TRANSLATE(cn,D,ORDER,BASIST,PATCH,PREC)
+          !       CALL TRANSLATE_magnet(cn,D,ORDER,BASIST,PATCH=.false.)
+          CALL TRANSLATE_magnet(cn,D,ORDER,BASIST,PATCH,PREC)
           CN=>CN%girder
           k=k+1
        ENDDO
     ENDIF
 
-    !    write(6,*) k, " magnet translate "
+    if(global_verbose)     write(6,*) k, " magnets translated in girder "
+
+    !    c=>s2%mag
+    !         call patch_magnet(c,PATCH,PREC)
+    !    k=1
+    !
+    !    IF(ASSOCIATED(S2%MAG%girder)) THEN
+    !     C=>S2%MAG
+    !     CN=>S2%MAG%girder
+    !     DO WHILE(.NOT.ASSOCIATED(C,CN))
+    !         call patch_magnet(cn,PATCH,PREC)
+    !!      CN=>CN%girder
+    !     k=k+1
+    !    ENDDO
+    !   ENDIF
+    !if(global_verbose)     write(6,*) k, " magnets patched in translated in girder "
+
+
     IF(FOUND) THEN
-       !    write(6,*)CAF%GIRDER_FRAME%a
-       !    write(6,*)CAF%GIRDER_FRAME%b
        CALL CHANGE_BASIS(D,BASIST,T_GLOBAL,GLOBAL_FRAME)
        CAF%GIRDER_FRAME%a=CAF%GIRDER_FRAME%a+T_GLOBAL
        CAF%GIRDER_FRAME%B=CAF%GIRDER_FRAME%b+T_GLOBAL
-       !     write(6,*)CAF%GIRDER_FRAME%a
-       !     write(6,*)CAF%GIRDER_FRAME%b
-       !     pause 8
     ENDIF
-    CALL FIND_AFFINE_girder(S2,CN,FOUND)
+    !  ETIENNE DOES NOT UNDERSTAND THE CODE BELOW
 
-    IF(FOUND) CALL FIND_FRAME_girder(CN,B,EXI,ADD=my_false)
-    !write(6,*) b
+    !     CALL FIND_AFFINE_girder(S2,CN,FOUND)
+
+    !     IF(FOUND) CALL FIND_FRAME_girder(CN,B,EXI,ADD=my_false)
 
   END SUBROUTINE TRANSLATE_girder
 
 
-  SUBROUTINE TRANSLATE_siamese(S2,D,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+  SUBROUTINE TRANSLATE_siamese(S2,D,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A SIAMESE
     IMPLICIT NONE
     TYPE (fibre),TARGET,INTENT(INOUT):: S2
     TYPE (element),pointer :: c,cn
@@ -1019,20 +1099,37 @@ CONTAINS
     ENDIF
 
     c=>s2%mag
-    CALL TRANSLATE(c,D,ORDER,BASIST,PATCH,PREC)
+    CALL TRANSLATE_magnet(c,D,ORDER,BASIST,PATCH,PREC)
+    !    CALL TRANSLATE_magnet(c,D,ORDER,BASIST,PATCH=.false.)
     k=1
 
     IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
        C=>S2%MAG
        CN=>S2%MAG%SIAMESE
        DO WHILE(.NOT.ASSOCIATED(C,CN))
-          CALL TRANSLATE(cn,D,ORDER,BASIST,PATCH,PREC)
+          CALL TRANSLATE_magnet(cn,D,ORDER,BASIST,PATCH,PREC)
+          !       CALL TRANSLATE_magnet(cn,D,ORDER,BASIST,PATCH=.false.)
           CN=>CN%SIAMESE
           k=k+1
        ENDDO
     ENDIF
-    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
-    write(6,*) k, " magnet translate "
+
+    !if(global_verbose)  write(6,*) k, " magnet translated "
+
+    !    c=>s2%mag
+    !         call patch_magnet(c,PATCH,PREC)
+    !    k=1
+    !
+    !    IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
+    !     C=>S2%MAG
+    !     CN=>S2%MAG%SIAMESE
+    !     DO WHILE(.NOT.ASSOCIATED(C,CN))
+    !         call patch_magnet(cn,PATCH,PREC)
+    !      CN=>CN%SIAMESE
+    !      k=k+1
+    !     ENDDO
+    !    ENDIF
+    !  if(global_verbose)   write(6,*) k, " magnets patched in translated in siamese "
 
   END SUBROUTINE TRANSLATE_siamese
 
@@ -1065,7 +1162,7 @@ CONTAINS
 
     if(pat) then
        k=0
-       if(associated(R%doko)) then
+       if(associated(R%doko)) then  !!! PATCH TO DOKO'S  IF CREATED USING DNA I.E. APPEND_POINT
           dk=>r%doko
           do while(associated(dk))
              p=> dk%parent_fibre
@@ -1074,8 +1171,8 @@ CONTAINS
              k=k+1
              dk=>dk%next
           enddo
-          write(6,*) "patched ",k,"times using doko"
-       else
+          if(global_verbose)    write(6,*) "in translate_magnet patched ",k,"times using doko"
+       else    !!!   FOR COMPATIBILITY MODE   FIBRE=MAGNET
           call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
           call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
        endif
@@ -1083,7 +1180,6 @@ CONTAINS
 
   END SUBROUTINE TRANSLATE_magnet
 
-  !ROTATE_FIBRE(R,OMEGA,Ang,ORDER,BASIS)
   SUBROUTINE rotate_magnet(R,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
     IMPLICIT NONE
     TYPE (element),TARGET,INTENT(INOUT):: R
@@ -1114,15 +1210,15 @@ CONTAINS
        k=0
        if(associated(R%doko)) then
           dk=>r%doko
-          do while(associated(dk))
+          do while(associated(dk))  !!! PATCH TO DOKO'S  IF CREATED USING DNA I.E. APPEND_POINT
              p=> dk%parent_fibre
              call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
              call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
              k=k+1
              dk=>dk%next
           enddo
-          write(6,*) "patched ",k,"times using doko"
-       else
+          if(global_verbose)     write(6,*) "in rotate_magnet patched ",k,"times using doko"
+       else     !!!   FOR COMPATIBILITY MODE   FIBRE=MAGNET
           call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
           call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
        endif
@@ -1130,7 +1226,48 @@ CONTAINS
 
   END SUBROUTINE rotate_magnet
 
-  SUBROUTINE rotate_siamese(S2,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+  !  SUBROUTINE patch_magnet(R,PATCH,PREC) ! TRANSLATES A fibre
+  !    IMPLICIT NONE
+  !    TYPE (element),TARGET,INTENT(INOUT):: R
+  !    TYPE(FIBRE), POINTER::P
+  !    LOGICAL(LP),OPTIONAL :: PATCH
+  !    REAL(DP),OPTIONAL :: PREC
+  !    LOGICAL(LP) PAT
+  !    REAL(DP) PREC0
+  !    type(fibre_appearance), pointer :: dk
+  !    integer k
+  !
+  !    PREC0=PUNY
+  !    PAT=MY_FALSE
+  !
+  !    IF(PRESENT(PATCH)) PAT=PATCH
+  !    IF(PRESENT(PREC)) PREC0=PREC
+  !
+  !    p=> r%parent_fibre
+  !
+  !
+  !    if(pat) then
+  !     k=0
+  !     if(associated(R%doko)) then
+  !      dk=>r%doko
+  !       do while(associated(dk))
+  !         p=> dk%parent_fibre
+  !         call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
+  !         call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
+  !         k=k+1
+  !         dk=>dk%next
+  !
+  !       enddo
+  ! if(global_verbose)      write(6,*) " patched ",k,"times using doko"
+  !     else
+  !      call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)
+  !      call FIND_PATCH(p%previous,p,NEXT=my_true,ENERGY_PATCH=my_true,prec=PREC0)
+  !     endif
+  !    endif
+  !
+  !  END SUBROUTINE patch_magnet
+
+  SUBROUTINE rotate_siamese(S2,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) !
     IMPLICIT NONE
     TYPE (fibre),TARGET,INTENT(INOUT):: s2
     REAL(DP),INTENT(IN):: ang(3)
@@ -1151,7 +1288,7 @@ CONTAINS
     CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)
     IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD=my_false)
 
-    write(6,*)found, b
+    !     write(6,*)found, b
 
     IF(PRESENT(BASIS)) THEN
        BASIST=BASIS
@@ -1177,23 +1314,39 @@ CONTAINS
 
     c=>s2%mag
     CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
+    !    CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH=.false.)
     k=1
 
     IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
        C=>S2%MAG
        CN=>S2%MAG%SIAMESE
        DO WHILE(.NOT.ASSOCIATED(C,CN))
+          !        CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH=.false.)
           CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
           CN=>CN%SIAMESE
           k=k+1
        ENDDO
     ENDIF
-    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
-    write(6,*) k, " magnet rotated "
+
+    !  if(global_verbose)   write(6,*) k, " magnets rotated in siamese"
+    !    c=>s2%mag
+    !         call patch_magnet(c,PATCH,PREC)
+    !    k=1
+    !
+    !    IF(ASSOCIATED(S2%MAG%SIAMESE)) THEN
+    !     C=>S2%MAG
+    !     CN=>S2%MAG%SIAMESE
+    !     DO WHILE(.NOT.ASSOCIATED(C,CN))
+    !         call patch_magnet(cn,PATCH,PREC)
+    !      CN=>CN%SIAMESE
+    !      k=k+1
+    !     ENDDO
+    !    ENDIF
+    !  if(global_verbose)   write(6,*) k, " magnets patched in rotated in siamese "
 
   END SUBROUTINE rotate_siamese
 
-  SUBROUTINE rotate_girder(S2,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) ! TRANSLATES A fibre
+  SUBROUTINE rotate_girder(S2,Ang,OMEGA,ORDER,BASIS,PATCH,PREC) !
     IMPLICIT NONE
     TYPE (fibre),TARGET,INTENT(INOUT):: s2
     REAL(DP),INTENT(IN):: ang(3)
@@ -1239,6 +1392,7 @@ CONTAINS
 
 
     c=>s2%mag
+    !    CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH=.false.)
     CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
     k=1
 
@@ -1246,40 +1400,47 @@ CONTAINS
        C=>S2%MAG
        CN=>S2%MAG%girder
        DO WHILE(.NOT.ASSOCIATED(C,CN))
+          !        CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH=.false.)
           CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
           CN=>CN%girder
           k=k+1
        ENDDO
     ENDIF
+    if(global_verbose)   write(6,*) k, " magnets rotated in girder "
 
+
+    !    c=>s2%mag
+    !         call patch_magnet(c,PATCH,PREC)
+    !    k=1
+
+    !    IF(ASSOCIATED(S2%MAG%girder)) THEN
+    !     C=>S2%MAG
+    !     CN=>S2%MAG%girder
+    !     DO WHILE(.NOT.ASSOCIATED(C,CN))
+    !         call patch_magnet(cn,PATCH,PREC)
+    !      CN=>CN%girder
+    !      k=k+1
+    !     ENDDO
+    !    ENDIF
+    !if(global_verbose)     write(6,*) k, " magnets patched in rotated  girder "
+
+!!! SAME GYMNASTICS AS IN TRANSLATE GIRDER
     IF(FOUND) THEN
        call alloc(f)
-       !      write(6,*) CAF%GIRDER_FRAME%a
-       !      write(6,*) CAF%GIRDER_FRAME%b
-       !      write(6,*) CAF%GIRDER_FRAME%ent
-       !      write(6,*) CAF%GIRDER_FRAME%exi
        f%a=CAF%GIRDER_FRAME%a
        f%ent=CAF%GIRDER_FRAME%ent
        f%b=CAF%GIRDER_FRAME%B
        f%exi=CAF%GIRDER_FRAME%exi
-       CALL ROTATE_FRAME(F,OMEGAT,ang,1,BASIS=BASIST)
+       CALL ROTATE_FRAME(F,OMEGAT,ang,ORDER,BASIS=BASIST)
        CAF%GIRDER_FRAME%ENT=F%ENT
        CAF%GIRDER_FRAME%A=F%A
        CAF%GIRDER_FRAME%EXI=F%EXI
        CAF%GIRDER_FRAME%B=F%B
-       !      write(6,*) CAF%GIRDER_FRAME%a
-       !      write(6,*) CAF%GIRDER_FRAME%b
-       !      write(6,*) CAF%GIRDER_FRAME%ent
-       !      write(6,*) CAF%GIRDER_FRAME%exi
-       !      pause 2
        call kill(f)
     ENDIF
 
 
 
-
-    !    CALL MOVE_SIAMESE_FRAME(S2%MAG)
-    !    write(6,*) k, " magnet rotated "
 
   END SUBROUTINE rotate_girder
 
@@ -1310,14 +1471,16 @@ CONTAINS
 
 
     DO I=1,I22-I11+1
-       CALL TRANSLATE_Fibre(P,D,ORDER,BASIS)
+       CALL TRANSLATE_Fibre(P,D,ORDER,BASIS,dogirder=my_true)   ! DOGIRDER IS SET TO TRUE
        P=>P%NEXT
     ENDDO
 
 
   END SUBROUTINE TRANSLATE_layout
 
-  SUBROUTINE TRANSLATE_Fibre(R,D,ORDER,BASIS) ! TRANSLATES A fibre
+  SUBROUTINE TRANSLATE_Fibre(R,D,ORDER,BASIS,dogirder) ! TRANSLATES A fibre
+    ! THIS ROUTINE TRANSLATE THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
+    ! GLOBAL FRAME TO DEFINE D
     IMPLICIT NONE
     TYPE (FIBRE),TARGET,INTENT(INOUT):: R
     REAL(DP),INTENT(IN):: D(3)
@@ -1325,10 +1488,13 @@ CONTAINS
     TYPE(FIBRE), POINTER::P
     INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    REAL(DP) DD(3)
     TYPE(INTEGRATION_NODE), POINTER :: T
-    ! THIS ROUTINE TRANSLATE THE ENTIRE LINE BY A(3) IN STANDARD ORDER USING THE
-    ! GLOBAL FRAME TO DEFINE D
+    TYPE(element), POINTER::caf
+    logical(lp), OPTIONAL, INTENT(IN) :: dogirder
+    REAL(DP) DD(3),T_GLOBAL(3)
+    logical(lp) dog
+    dog=.false.
+    if(present(dogirder)) dog=dogirder
 
     P=>R
 
@@ -1361,16 +1527,21 @@ CONTAINS
        IF(ASSOCIATED(R%T1%A)) THEN
           T=>P%T1
           DO WHILE(.NOT.ASSOCIATED(R%T2,T))
-             CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
-             CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
+             CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+             CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
              T=>T%NEXT
           ENDDO
-          CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
-          CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,ORDER)    ! A= A +I D*ENT
+          CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+          CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
        ENDIF
     ENDIF
-
-
+    if(dog) then    ! IF  DOGIRDER IS SET TO TRUE
+       if(associated(r%mag%GIRDER_FRAME)) then
+          caf=>r%mag
+          CALL GEO_TRA(CAF%GIRDER_FRAME%a,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+          CALL GEO_TRA(CAF%GIRDER_FRAME%b,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+       endif
+    endif
   END SUBROUTINE TRANSLATE_Fibre
 
 
@@ -1410,13 +1581,13 @@ CONTAINS
 
 
     DO I=1,I22-I11+1
-       CALL ROTATE_FIBRE(P,OMEGA,Ang,ORDER,BASIST)
+       CALL ROTATE_FIBRE(P,OMEGA,Ang,ORDER,BASIST,dogirder=my_true) ! IF  DOGIRDER IS SET TO TRUE, DOES GIRDER
        P=>P%NEXT
     ENDDO
 
   END SUBROUTINE ROTATE_LAYOUT
 
-  SUBROUTINE  ROTATE_FIBRE(R,OMEGA,Ang,ORDER,BASIS) ! ROTATES A FIBRE AROUND OMEGA BY A(3)  IN STANDARD PTC ORDER
+  SUBROUTINE  ROTATE_FIBRE(R,OMEGA,Ang,ORDER,BASIS,dogirder) ! ROTATES A FIBRE AROUND OMEGA BY A(3)  IN STANDARD PTC ORDER
     ! INVERSE => ORDER=-1   USING GLOBAL FRAME IF BASIS NOT SPECIFIED
     IMPLICIT NONE
     TYPE (FIBRE),TARGET,INTENT(INOUT):: R
@@ -1428,6 +1599,13 @@ CONTAINS
     REAL(DP), OPTIONAL, INTENT(IN):: BASIS(3,3)
     real(dp) basist(3,3),D(3)
     TYPE(INTEGRATION_NODE), POINTER :: T
+    TYPE(element), POINTER::caf
+    logical(lp), OPTIONAL, INTENT(IN) :: dogirder
+    logical(lp) dog
+    dog=.false.
+    if(present(dogirder)) dog=dogirder
+
+
     OMEGAT=OMEGA
     P=>R
     IORDER=1
@@ -1460,16 +1638,33 @@ CONTAINS
           DO WHILE(.NOT.ASSOCIATED(R%T2,T))
              D=T%A-OMEGAT
              CALL GEO_ROT(T%ENT,D,ANG,IORDER,BASIST)
-             CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
              T%A=OMEGAT+D
+             D=T%B-OMEGAT     ! ERROR BEFORE  2008.5.20
+             CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
+             D=T%B-OMEGAT
              T=>T%NEXT
           ENDDO
           D=T%A-OMEGAT
           CALL GEO_ROT(T%ENT,D,ANG,IORDER,BASIST)
-          CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
           T%A=OMEGAT+D
+          D=T%B-OMEGAT     ! ERROR BEFORE  2008.5.20
+          CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
+          D=T%B-OMEGAT
        ENDIF
     ENDIF
+
+    if(dog) then   ! IF  DOGIRDER IS SET TO TRUE, TRANSLATE GIRDER FRAME
+       if(associated(r%mag%GIRDER_FRAME)) then
+          caf=>r%mag
+          D=CAF%GIRDER_FRAME%A-OMEGAT
+          CALL GEO_ROT(CAF%GIRDER_FRAME%ENT,D,ANG,IORDER,BASIST)
+          CAF%GIRDER_FRAME%A=OMEGAT+D
+          D=CAF%GIRDER_FRAME%B-OMEGAT
+          CALL GEO_ROT(CAF%GIRDER_FRAME%EXI,D,ANG,IORDER,BASIST)
+          CAF%GIRDER_FRAME%B=OMEGAT+D
+       endif
+    endif
+
 
   END SUBROUTINE ROTATE_FIBRE
 
@@ -1592,18 +1787,30 @@ CONTAINS
 
 
   !recursive
-  SUBROUTINE SURVEY_FIBRE(C,ENT,A,SKIP,E_IN)   !,MAGNETFRAME
+  SUBROUTINE SURVEY_FIBRE(C,ENT,A,nogirder,SKIP,E_IN)   !,MAGNETFRAME
     !changed
     ! SURVEYS A SINGLE ELEMENT FILLS IN CHART AND MAGNET_CHART; LOCATES ORIGIN AT THE ENTRANCE OR EXIT
     IMPLICIT NONE
     TYPE(FIBRE), TARGET , INTENT(INOUT):: C
     !    TYPE(MAGNET_FRAME), OPTIONAL :: MAGNETFRAME
     TYPE(INNER_FRAME), OPTIONAL :: E_IN
+    logical(lp), OPTIONAL :: nogirder
     LOGICAL(LP), OPTIONAL :: SKIP
     REAL(DP), INTENT(INOUT)  :: ENT(3,3),A(3)
     REAL(DP) D(3),ANG(3),DT(3)
-    LOGICAL(LP) SEL,SKIPT
+    LOGICAL(LP) SEL,SKIPT,dog
     TYPE (PATCH), POINTER :: P
+    REAL(DP)dg1(3),ag1(3)
+    REAL(DP)dg2(3),ag2(3)
+    dog=.true.
+    if(present(nogirder)) dog=.not.nogirder     ! IF  DOGIRDER IS SET TO TRUE, MOVES GIRDER FRAME DURING SURVEY
+!!!  RECORDS RELATIVE POSITION OF GIRDER
+    IF(ASSOCIATED(C%MAG%GIRDER_FRAME).and.dog) THEN
+       call FIND_PATCH(C%chart%F%a,C%chart%F%ENT, &
+            C%MAG%GIRDER_FRAME%a, C%MAG%GIRDER_FRAME%ent,dg1,ag1)
+       call FIND_PATCH(C%chart%F%a,C%chart%F%ENT, &
+            C%MAG%GIRDER_FRAME%b, C%MAG%GIRDER_FRAME%exi,dg2,ag2)
+    ENDIF
 
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-6)
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-5)
@@ -1695,6 +1902,13 @@ CONTAINS
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,E_IN%NST)
     IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT,A,-7)
 
+!!!  PLACES INTO THE COMPUTED RELATIVE POSITION OF GIRDER
+    IF(ASSOCIATED(C%MAG%GIRDER_FRAME).and.dog) THEN    ! IF  DOGIRDER IS SET TO TRUE, MOVES GIRDER FRAME DURING SURVEY
+       call INVERSE_FIND_PATCH(C%chart%F%a,C%chart%F%ENT, &
+            dg1,ag1,C%MAG%GIRDER_FRAME%a, C%MAG%GIRDER_FRAME%ent)
+       call INVERSE_FIND_PATCH(C%chart%F%a,C%chart%F%ENT, &
+            dg2,ag2,C%MAG%GIRDER_FRAME%b, C%MAG%GIRDER_FRAME%exi)
+    ENDIF
 
   END SUBROUTINE SURVEY_FIBRE
 

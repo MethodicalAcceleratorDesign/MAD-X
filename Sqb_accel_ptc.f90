@@ -1,5 +1,7 @@
 module accel_ptc
-  use beam_beam_ptc
+  !  use beam_beam_ptc
+  use orbit_ptc
+
   ! use orbit_ptc
   implicit none
   public
@@ -8,18 +10,18 @@ module accel_ptc
   !  real(dp) :: vrf=210.d-3   !mev
   real(dp),parameter :: dphsa_final=30.0_dp*deg_to_rad_  ! 30.0_dp*deg_to_rad_
   real(dp) :: dphsa_by_dt=dphsa_final/(100.e-3_dp*CLIGHT)
-  real(dp) :: harmon=9.d0
-  real(dp) :: freq=0.d0
-  real(dp) :: circum=0.d0
-  real(dp) :: total_cav_L=0.d0
+  real(dp) :: harmon=nine
+  real(dp) :: freq=zero
+  real(dp) :: circum=zero
+  real(dp) :: total_cav_L=zero
   logical(lp) :: enforce_zero_x5=my_false
   logical(lp) :: energy_reached=my_false
-  real(dp) :: present_kinetic_energy=0.d0
-  real(dp) :: final_kinetic_energy=40.d0  !3.1d0
+  real(dp) :: present_kinetic_energy=zero
+  real(dp) :: final_kinetic_energy=40.0_dp  !3.1d0
 
   !   Other mode of acceleration
   real(dp) :: T_parabolic=100.e-3_dp*CLIGHT
-  real(dp) :: T_rise=13.e-3_dp*CLIGHT,T_END_LINEAR=630091002.783574d0,T_END=660070248.583574d0
+  real(dp) :: T_rise=13.e-3_dp*CLIGHT,T_END_LINEAR=630091002.783574_dp,T_END=660070248.583574_dp
   real(dp) :: p0c0
   real(dp) :: p0c1 , kinetic1
   real(dp) :: p01_ratio = .181_dp/.143_dp
@@ -230,7 +232,7 @@ contains
     ! open(unit=30,file='junkold.txt')
     !else
     !endif
-    CALL create_beam(RAYS,npart,2.D0,SIG0)
+    CALL create_beam(RAYS,npart,two,SIG0)
 
     my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
     open(unit=mf, file='init.dat')
@@ -499,7 +501,7 @@ SUBROUTINE ptc_synchronous_after(i_node)
         p_orbit=w2_ORBIT
 
         my_ORBIT_LATTICE%ORBIT_OMEGA=my_ORBIT_LATTICE%orbit_omega_after
-        my_ORBIT_LATTICE%ORBIT_gamma=1.d0/w2_ORBIT%gamma0i
+        my_ORBIT_LATTICE%ORBIT_gamma=one/w2_ORBIT%gamma0i
         my_ORBIT_LATTICE%ORBIT_P0C=p_orbit%mag%P%P0C
         my_ORBIT_LATTICE%ORBIT_BETA0=p_orbit%mag%P%BETA0
         my_ORBIT_LATTICE%orbit_kinetic=w2_ORBIT%kinetic
@@ -625,7 +627,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
 
      do j=1,5; y(j)=x(j); enddo;
 
-        y(6)=dt0+(1.d0.mono.1)
+        y(6)=dt0+(one.mono.1)
         call track(p_orbit,y,local_state)
         driv=y(5).sub.'1'
         !     write(6,*) (y(5).sub.'0'),driv,my_ORBIT_LATTICE%orbit_deltae,p_orbit%mag%p%p0c
@@ -721,7 +723,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
         call GET_RAY(x,xp,y,yp,phi,dE)
      endif
      IF(I==1.AND.MF_HERD/=0) THEN
-        WRITE(MF_HERD,'(4(1X,E15.8))') PHI,DE,my_ORBIT_LATTICE%orbit_p0c, x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000.d0
+        WRITE(MF_HERD,'(4(1X,E15.8))') PHI,DE,my_ORBIT_LATTICE%orbit_p0c, x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*c_1d3
         !       WRITE(MF_HERD,'(6(1X,E15.8))') PHI,DE,X_ORBIT(6),X_ORBIT(5), &
         !x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000.d0,my_ORBIT_LATTICE%ORBIT_OMEGA
         !        ,my_ORBIT_LATTICE%ORBIT_P0C

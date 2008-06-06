@@ -723,6 +723,7 @@ CONTAINS
     FRINGE=FRINGE0
     TIME=TIME0
     EXACTMIS=EXACTMIS0
+    exactmis%exactmis=exactmis%exactmis.and.(.not.sixtrack_compatible)
     ONLY_4D=ONLY_4d0
     DELTA=DELTA0
     SPIN=SPIN0
@@ -859,7 +860,7 @@ CONTAINS
     if((S1%TOTALPATH==1).OR.(S2%TOTALPATH==1)) add%TOTALPATH=1
 
     !    add%EXACT    =       S1%EXACT.OR.S2%EXACT
-    add%EXACTMIS    =       S1%EXACTMIS.OR.S2%EXACTMIS
+    add%EXACTMIS    =       (S1%EXACTMIS.OR.S2%EXACTMIS).and.(.not.sixtrack_compatible)
     add%RADIATION  =  S1%RADIATION.OR.S2%RADIATION
     add%NOCAVITY =  S1%NOCAVITY.OR.S2%NOCAVITY
     add%TIME     =  S1%TIME.OR.S2%TIME
@@ -899,7 +900,7 @@ CONTAINS
 
     !    sub%TOTALPATH=  S1%TOTALPATH.min.S2%TOTALPATH
 
-    sub%EXACTMIS    =       S1%EXACTMIS.min.S2%EXACTMIS
+    sub%EXACTMIS    =       (S1%EXACTMIS.min.S2%EXACTMIS).and.(.not.sixtrack_compatible)
     sub%RADIATION  =  S1%RADIATION.min.S2%RADIATION
     sub%NOCAVITY =  S1%NOCAVITY.min.S2%NOCAVITY
     sub%TIME     =  S1%TIME.min.S2%TIME

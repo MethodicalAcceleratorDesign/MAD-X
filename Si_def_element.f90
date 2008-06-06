@@ -2135,6 +2135,7 @@ CONTAINS
     nullify(EL%P);
     nullify(EL%siamese);
     nullify(EL%girder);
+    nullify(EL%assembly);
     nullify(EL%SIAMESE_FRAME);
     nullify(EL%girder_FRAME);
     nullify(EL%doko);
@@ -2336,6 +2337,7 @@ CONTAINS
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);
+       !       ALLOCATE(EL%girder_index);
        !       ALLOCATE(EL%EXACTMIS);
        EL%MIS=.FALSE.;
        !       EL%EXACTMIS=ALWAYS_EXACTMIS;

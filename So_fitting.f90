@@ -1822,6 +1822,10 @@ contains
     limit(1)=4
     limit(2)=18
     if(present(lim)) limit=lim
+    if(sixtrack_compatible) then
+       limit(1)=1000000
+       limit(2)=1000001
+    endif
     !    limit0(1)=limit(1)
     !    limit0(2)=limit(2)
 
@@ -2290,6 +2294,7 @@ contains
     if(gf(4)<gf(2)) met=4
     if(gf(6)<gf(4).and.gf(6)<gf(2)) met=6
     if(radiation_bend_split) met=2
+    if(sixtrack_compatible) met=2
 
   end SUBROUTINE  check_bend
 
@@ -2527,7 +2532,7 @@ contains
                 p%magp%bn(j)=-p%magp%bn(j)
                 p%magp%an(j)=-p%magp%an(j)
              enddo
-             if(p%mag%p%nmul>0) call add(p,1,1,0.d0)
+             if(p%mag%p%nmul>0) call add(p,1,1,zero)
           endif
           if(associated(p%mag%volt)) p%mag%volt=-p%mag%volt
           if(associated(p%magp%volt)) p%magp%volt=-p%magp%volt

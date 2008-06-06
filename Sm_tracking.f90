@@ -317,29 +317,29 @@ contains
     endif
     !  C%MAG=K
 
-    if(c_%x_prime) then
-       P0=>C%MAG%P%P0C
-       B0=>C%MAG%P%BETA0
-       IF(C%MAG%P%exact)THEN
-          IF(k%TIME)THEN
-             xp=x(2)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-             x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-             x(2)=xp
-          else
-             xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
-             x(4)=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
-             x(2)=xp
-          endif
-       else
-          IF(k%TIME)THEN
-             x(2)=x(2)/root(one+two*X(5)/B0+X(5)**2)
-             x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2)
-          else
-             x(2)=x(2)/(one+x(5))
-             x(4)=x(4)/(one+x(5))
-          endif
-       endif
-    endif
+    !    if(c_%x_prime) then
+    !       P0=>C%MAG%P%P0C
+    !       B0=>C%MAG%P%BETA0
+    !       IF(C%MAG%P%exact)THEN
+    !          IF(k%TIME)THEN
+    !             xp=x(2)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
+    !             x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
+    !             x(2)=xp
+    !          else
+    !             xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
+    !             x(4)=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
+    !             x(2)=xp
+    !          endif
+    !       else
+    !          IF(k%TIME)THEN
+    !             x(2)=x(2)/root(one+two*X(5)/B0+X(5)**2)
+    !             x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2)
+    !          else
+    !             x(2)=x(2)/(one+x(5))
+    !             x(4)=x(4)/(one+x(5))
+    !          endif
+    !       endif
+    !    endif
 
 
     IF(PRESENT(X_IN)) then
@@ -349,11 +349,11 @@ contains
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
     !FRONTAL PATCH
-    IF(ASSOCIATED(C%PATCH)) THEN
-       PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
-    ELSE
-       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
-    ENDIF
+    !    IF(ASSOCIATED(C%PATCH)) THEN
+    PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
+    !    ELSE
+    !       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
+    !    ENDIF
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,-6)
        X_IN%POS(1)=X_IN%nst
@@ -467,29 +467,29 @@ contains
        ENDIF
     ENDIF
 
-    if(c_%x_prime) then
-       P0=>C%MAG%P%P0C
-       B0=>C%MAG%P%BETA0
-       IF(C%MAG%P%exact)THEN
-          IF(k%TIME)THEN
-             xp=root(one+two*X(5)/B0+X(5)**2)*x(2)/root(one+x(2)**2+x(4)**2)
-             x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)/root(one+x(2)**2+x(4)**2)
-             x(2)=xp
-          else
-             xp=(one+x(5))*x(2)/root(one+x(2)**2+x(4)**2)
-             x(4)=(one+x(5))*x(4)/root(one+x(2)**2+x(4)**2)
-             x(2)=xp
-          endif
-       else
-          IF(k%TIME)THEN
-             x(2)=root(one+two*X(5)/B0+X(5)**2)*x(2)
-             x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)
-          else
-             x(2)=(one+x(5))*x(2)
-             x(4)=(one+x(5))*x(4)
-          endif
-       endif
-    endif
+    !    if(c_%x_prime) then
+    !       P0=>C%MAG%P%P0C
+    !       B0=>C%MAG%P%BETA0
+    !       IF(C%MAG%P%exact)THEN
+    !          IF(k%TIME)THEN
+    !             xp=root(one+two*X(5)/B0+X(5)**2)*x(2)/root(one+x(2)**2+x(4)**2)
+    !             x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)/root(one+x(2)**2+x(4)**2)
+    !             x(2)=xp
+    !          else
+    !             xp=(one+x(5))*x(2)/root(one+x(2)**2+x(4)**2)
+    !             x(4)=(one+x(5))*x(4)/root(one+x(2)**2+x(4)**2)
+    !             x(2)=xp
+    !          endif
+    !       else
+    !          IF(k%TIME)THEN
+    !             x(2)=root(one+two*X(5)/B0+X(5)**2)*x(2)
+    !             x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)
+    !          else
+    !             x(2)=(one+x(5))*x(2)
+    !             x(4)=(one+x(5))*x(4)
+    !          endif
+    !       endif
+    !    endif
 
 
     !   C%MAG=DEFAULT
@@ -537,30 +537,30 @@ contains
     endif
     !    C%MAGP=K
 
-    if(c_%x_prime) then
-       call alloc(xp)  ! deallocated below
-       P0=>C%MAGP%P%P0C
-       B0=>C%MAGP%P%BETA0
-       IF(C%MAGP%P%exact)THEN
-          IF(k%TIME)THEN
-             xp=x(2)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-             x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-             x(2)=xp
-          else
-             xp=x(2)/sqrt((one+x(5))**2-x(2)**2-x(4)**2)
-             x(4)=x(4)/sqrt((one+x(5))**2-x(2)**2-x(4)**2)
-             x(2)=xp
-          endif
-       else
-          IF(k%TIME)THEN
-             x(2)=x(2)/sqrt(one+two*X(5)/B0+X(5)**2)
-             x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2)
-          else
-             x(2)=x(2)/(one+x(5))
-             x(4)=x(4)/(one+x(5))
-          endif
-       endif
-    endif
+    !    if(c_%x_prime) then
+    !       call alloc(xp)  ! deallocated below
+    !       P0=>C%MAGP%P%P0C
+    !       B0=>C%MAGP%P%BETA0
+    !       IF(C%MAGP%P%exact)THEN
+    !          IF(k%TIME)THEN
+    !             xp=x(2)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
+    !             x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
+    !             x(2)=xp
+    !          else
+    !             xp=x(2)/sqrt((one+x(5))**2-x(2)**2-x(4)**2)
+    !             x(4)=x(4)/sqrt((one+x(5))**2-x(2)**2-x(4)**2)
+    !             x(2)=xp
+    !          endif
+    !       else
+    !          IF(k%TIME)THEN
+    !             x(2)=x(2)/sqrt(one+two*X(5)/B0+X(5)**2)
+    !             x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2)
+    !          else
+    !             x(2)=x(2)/(one+x(5))
+    !             x(4)=x(4)/(one+x(5))
+    !          endif
+    !       endif
+    !    endif
 
 
     !    IF(PRESENT(X_IN)) then
@@ -577,11 +577,11 @@ contains
 
     ! PASSING THE STATE K TO THE ELEMENT
     !FRONTAL PATCH
-    IF(ASSOCIATED(C%PATCH)) THEN
-       PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
-    ELSE
-       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
-    ENDIF
+    !    IF(ASSOCIATED(C%PATCH)) THEN
+    PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
+    !    ELSE
+    !       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
+    !    ENDIF
     ! ENERGY PATCH
     !    IF(PRESENT(X_IN)) then
     !       CALL XMID(X_IN,X,-6)
@@ -702,30 +702,30 @@ contains
     !       ENDIF
     !   ENDIF
 
-    if(c_%x_prime) then
-       P0=>C%MAGP%P%P0C
-       B0=>C%MAGP%P%BETA0
-       IF(C%MAGP%P%exact)THEN
-          IF(k%TIME)THEN
-             xp=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)/sqrt(one+x(2)**2+x(4)**2)
-             x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)/sqrt(one+x(2)**2+x(4)**2)
-             x(2)=xp
-          else
-             xp=(one+x(5))*x(2)/sqrt(one+x(2)**2+x(4)**2)
-             x(4)=(one+x(5))*x(4)/sqrt(one+x(2)**2+x(4)**2)
-             x(2)=xp
-          endif
-       else
-          IF(k%TIME)THEN
-             x(2)=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)
-             x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)
-          else
-             x(2)=(one+x(5))*x(2)
-             x(4)=(one+x(5))*x(4)
-          endif
-       endif
-       call kill(xp)
-    endif
+    !    if(c_%x_prime) then
+    !       P0=>C%MAGP%P%P0C
+    !       B0=>C%MAGP%P%BETA0
+    !       IF(C%MAGP%P%exact)THEN
+    !          IF(k%TIME)THEN
+    !             xp=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)/sqrt(one+x(2)**2+x(4)**2)
+    !             x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)/sqrt(one+x(2)**2+x(4)**2)
+    !             x(2)=xp
+    !          else
+    !             xp=(one+x(5))*x(2)/sqrt(one+x(2)**2+x(4)**2)
+    !             x(4)=(one+x(5))*x(4)/sqrt(one+x(2)**2+x(4)**2)
+    !             x(2)=xp
+    !          endif
+    !       else
+    !          IF(k%TIME)THEN
+    !             x(2)=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)
+    !             x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)
+    !          else
+    !             x(2)=(one+x(5))*x(2)
+    !             x(4)=(one+x(5))*x(4)
+    !          endif
+    !       endif
+    !       call kill(xp)
+    !    endif
 
     ! ELEMENT IS RESTAURED TO THE DEFAULT STATE
     !    C%MAGP=DEFAULT

@@ -9,6 +9,41 @@
 ! C++ collaboration later known as CLASSIC.
 
 
+TYPE girder
+   INTEGER, pointer :: i
+   INTEGER, pointer :: pos
+   INTEGER, pointer :: mul    ! number of magnets in the girder
+   INTEGER, pointer :: added
+   INTEGER, pointer :: discarded
+   TYPE (girder_info),POINTER :: info
+   TYPE (girder),POINTER :: PREVIOUS   ! Terminated link list
+   TYPE (girder),POINTER :: NEXT
+END TYPE girder
+
+TYPE girder_info
+   CHARACTER(nlp), POINTER ::  NAME    ! Identification
+   real(dp), POINTER ::  d(:)
+   type (element), pointer :: mag
+   type (girder), pointer :: parent_girder
+   TYPE (girder_info),POINTER :: NEXT            ! Terminated link list
+end TYPE girder_info
+
+TYPE girder_list
+   CHARACTER(120), POINTER ::  NAME ! IDENTIFICATION
+   INTEGER,  POINTER :: N     ! TOTAL ELEMENT IN THE CHAIN
+
+   INTEGER, POINTER :: discarded   ! duplicate magnets
+   INTEGER, POINTER :: LASTPOS   ! POSITION OF LAST VISITED
+   TYPE (girder), POINTER :: LAST ! LAST VISITED
+   !
+   TYPE (girder), POINTER :: END
+   TYPE (girder), POINTER :: START
+   type (fibre), pointer :: lastfibre
+
+END TYPE girder_list
+
+
+
 TYPE MUL_BLOCK
    ! stuff for setting multipole
    real(dp) AN(NMAX),BN(NMAX)
@@ -151,6 +186,8 @@ TYPE ELEMENT
    type(element), pointer :: girder
    TYPE(AFFINE_FRAME), POINTER :: SIAMESE_FRAME
    TYPE(AFFINE_FRAME), POINTER :: girder_FRAME
+   !   integer, POINTER ::girder_index
+   type(girder),pointer :: assembly
 END TYPE  ELEMENT
 
 
@@ -239,6 +276,11 @@ TYPE FIBRE
    real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS   !,P0C
    INTEGER, POINTER :: CHARGE
    real(dp), POINTER :: AG
+   ! TO TIE LAYOUTS
+   TYPE (FIBRE),POINTER :: P
+   TYPE (FIBRE),POINTER :: N
+   INTEGER,POINTER :: loc
+
 END TYPE FIBRE
 
 TYPE LAYOUT
@@ -279,6 +321,10 @@ TYPE MAD_UNIVERSE             ! THE MOTHER OF ALL STRUCTURES
    INTEGER,  POINTER :: SHARED     ! NUMBERS OF REPOSITORY LAYOUTS
    TYPE (LAYOUT), POINTER :: END
    TYPE (LAYOUT), POINTER :: START
+   !POINTERS OF UNIVERSE IN CONJUNCTION WITH THE POINTERS N AND P OF THE FIBRES
+   INTEGER, POINTER :: NF   ! number of fibres in tied layouts
+   INTEGER, POINTER :: LASTPOS   ! POSITION OF LAST VISITED
+   TYPE (FIBRE), POINTER :: LAST ! LAST VISITED
 END TYPE MAD_UNIVERSE
 
 TYPE BEAM
@@ -307,7 +353,8 @@ TYPE INTEGRATION_NODE
    TYPE (INTEGRATION_NODE), POINTER :: PREVIOUS
    TYPE (NODE_LAYOUT), POINTER :: PARENT_NODE_LAYOUT
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
-   TYPE(EXTRA_WORK), POINTER :: WORK
+   !   TYPE(EXTRA_WORK), POINTER :: WORK
+   TYPE(BEAM_BEAM_NODE), POINTER :: BB
 END TYPE INTEGRATION_NODE
 
 TYPE BEAM_LOCATION

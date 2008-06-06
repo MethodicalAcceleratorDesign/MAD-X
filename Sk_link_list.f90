@@ -7,11 +7,12 @@ MODULE S_FIBRE_BUNDLE
   ! Implementation of abstract data type as a linked layout
   IMPLICIT NONE
   public
+  private unify_mad_universe
 
   PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
-  private move_to_p,move_to_name,move_to_nameS,move_to_name_FIRSTNAME
+  private move_to_p,move_to_name_old,move_to_nameS,move_to_name_FIRSTNAME
   PRIVATE append_EMPTY_FIBRE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
@@ -61,7 +62,7 @@ MODULE S_FIBRE_BUNDLE
 
   INTERFACE move_to
      MODULE PROCEDURE move_to_p
-     MODULE PROCEDURE move_to_name
+     MODULE PROCEDURE move_to_name_old
      MODULE PROCEDURE move_to_nameS
      MODULE PROCEDURE move_to_name_FIRSTNAME
   END INTERFACE
@@ -173,6 +174,7 @@ CONTAINS
     nullify(current)
     IF(ASSOCIATED(L%T)) THEN
        CALL kill_NODE_LAYOUT(L%T)  !  KILLING THIN LAYOUT
+       nullify(L%T)
        WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
     ENDIF
     IF(ASSOCIATED(L%DNA)) THEN
@@ -252,25 +254,33 @@ CONTAINS
     CALL RING_L(L,doneit)
   END SUBROUTINE APPEND_fibre
 
-  SUBROUTINE APPEND_clone( L ) ! Standard append that clones everything
+  SUBROUTINE APPEND_clone( L, muonfactor,charge ) ! Standard append that clones everything
     implicit none
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET,intent(inout):: L
     logical(lp) doneit
+    integer,optional :: charge
+    real(dp),optional :: muonfactor
+    real(dp) mu
+    integer ch
     CALL LINE_L(L,doneit)
     L%N=L%N+1
     nullify(current)
     call alloc_fibre(current)
     !    if(use_info.and.associated(current%patch)) call copy(el%i,current%i)
     current%dir=1
+    mu=one
+    ch=1
+    if(present(muonfactor)) mu=muonfactor
+    if(present(charge)) ch=charge
     ! OCT 2007
     !        current%P0C=ONE
     current%BETA0=ONE
     current%GAMMA0I=ONE
     current%GAMBET=ZERO
-    current%MASS=ONE
+    current%MASS=mu*pmae
     current%AG=A_particle
-    current%CHARGE=1
+    current%CHARGE=ch
 
     current%pos=l%n
 
@@ -337,7 +347,7 @@ CONTAINS
   END SUBROUTINE move_to_p
 
 
-  SUBROUTINE move_to_name( L,current,name,pos) ! moves to next one in list called name
+  SUBROUTINE move_to_name_old( L,current,name,pos) ! moves to next one in list called name
     implicit none
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
@@ -374,7 +384,7 @@ CONTAINS
     else
        pos=0
     endif
-  END SUBROUTINE move_to_name
+  END SUBROUTINE move_to_name_old
 
   SUBROUTINE move_to_partial( L,current,name,pos) ! moves to next one in list called name
     implicit none
@@ -742,7 +752,7 @@ CONTAINS
     nullify(current%next);nullify(current%previous);
     nullify(current%PARENT_LAYOUT);
     nullify(current%T1,current%T2,current%TM);
-    nullify(current%i,current%pos);
+    nullify(current%i,current%pos,current%loc);
 
 
     !    nullify(Current%P0C);
@@ -753,6 +763,7 @@ CONTAINS
     nullify(Current%AG);
     nullify(Current%CHARGE);
 
+    nullify(current% P,current%N);
 
     !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
@@ -887,6 +898,9 @@ CONTAINS
           deallocate(c%CHARGE);
        ENDIF
 
+       IF(ASSOCIATED(C%N)) nullify(C%N)
+       IF(ASSOCIATED(C%P)) nullify(C%P)
+
        IF(ASSOCIATED(C%T1)) THEN
           if(associated(C%T1,C%TM)) nullify(C%TM)
           deallocate(C%T1);
@@ -894,6 +908,9 @@ CONTAINS
        ENDIF
        IF(ASSOCIATED(c%pos)) THEN
           deallocate(c%pos);
+       ENDIF
+       IF(ASSOCIATED(c%loc)) THEN
+          deallocate(c%loc);
        ENDIF
 
        IF(ASSOCIATED(C%TM)) deallocate(C%TM);
@@ -969,6 +986,9 @@ CONTAINS
        !      IF(ASSOCIATED(c%CHARGE)) THEN
        deallocate(c%CHARGE);
        !      ENDIF
+       IF(ASSOCIATED(C%N)) nullify(C%N)
+       IF(ASSOCIATED(C%P)) nullify(C%P)
+
        IF(ASSOCIATED(C%T1)) THEN
           deallocate(C%T1);
           deallocate(C%T2);
@@ -981,6 +1001,7 @@ CONTAINS
        !      IF(ASSOCIATED(c%pos)) THEN
        deallocate(c%pos);
        !      ENDIF
+       IF(ASSOCIATED(c%loc)) deallocate(c%loc);
 
     else
        w_p=0
@@ -1300,7 +1321,7 @@ CONTAINS
           CASE(0,1)
              EL2%PATCH%PATCH=1*PATCH_NEEDED
           CASE(2,3)
-             EL2%PATCH%PATCH=3*PATCH_NEEDED
+             EL2%PATCH%PATCH=PATCH_NEEDED + 2     ! etienne 2008.05.29
           END SELECT
           IF(ENE) THEN
 
@@ -1322,7 +1343,7 @@ CONTAINS
           CASE(0,2)
              EL1%PATCH%PATCH=2*PATCH_NEEDED
           CASE(1,3)
-             EL1%PATCH%PATCH=3*PATCH_NEEDED
+             EL1%PATCH%PATCH=2*PATCH_NEEDED + 1     ! etienne 2008.05.29
           END SELECT
           IF(ENE) THEN
              SELECT CASE(EL2%PATCH%ENERGY)
@@ -1425,12 +1446,21 @@ CONTAINS
     ELSE
        EL2=>EL1%NEXT
     ENDIF
+    NEX=.FALSE.
+    ENE=.FALSE.
+    IF(PRESENT(NEXT)) NEX=NEXT
 
     el1%PATCH%B_X1=1
     el1%PATCH%B_X2=1
     el1%PATCH%B_D=zero
     el1%PATCH%B_ANG=zero
     el1%PATCH%B_T=zero
+
+    EL2%PATCH%A_X1=1
+    EL2%PATCH%A_X2=1
+    EL2%PATCH%A_D=zero
+    EL2%PATCH%A_ANG=zero
+    EL2%PATCH%A_T=zero
 
     if(el1%PATCH%patch==3) then
        el1%PATCH%patch=1
@@ -1450,11 +1480,6 @@ CONTAINS
        el1%PATCH%time=0
     endif
 
-    EL2%PATCH%A_X1=1
-    EL2%PATCH%A_X2=1
-    EL2%PATCH%A_D=zero
-    EL2%PATCH%A_ANG=zero
-    EL2%PATCH%A_T=zero
 
     if(EL2%PATCH%patch==3) then
        EL2%PATCH%patch=2
@@ -1474,9 +1499,6 @@ CONTAINS
        EL2%PATCH%time=0
     endif
 
-    NEX=.FALSE.
-    ENE=.FALSE.
-    IF(PRESENT(NEXT)) NEX=NEXT
     IF(PRESENT(ENERGY_PATCH)) then
        ENE=ENERGY_PATCH
     else
@@ -1499,8 +1521,12 @@ CONTAINS
     CALL NULLIFY_UNIVERSE(L)
     ALLOCATE(L%n);
     ALLOCATE(L%SHARED);
+    ALLOCATE(L%LASTPOS);
+    ALLOCATE(L%NF);
     L%N=0;
     L%SHARED=0;
+    L%LASTPOS=0;
+    L%NF=0;
   END SUBROUTINE Set_Up_UNIVERSE
 
   SUBROUTINE kill_last_layout( L )  ! Destroys a layout
@@ -1579,6 +1605,8 @@ CONTAINS
     TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
     deallocate(L%n);
     deallocate(L%SHARED);
+    deallocate(L%NF);
+    deallocate(L%LASTPOS);
   END SUBROUTINE de_Set_Up_UNIVERSE
 
   SUBROUTINE nullIFY_UNIVERSE( L ) ! Nullifies layout content,i
@@ -1589,6 +1617,9 @@ CONTAINS
 
     nullify(L%END )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
     nullify(L%START )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+    nullify(L%NF )  ! POSITION OF LAST VISITED
+    nullify(L%LASTPOS )  ! POSITION OF LAST VISITED
+    nullify(L%LAST )! LAST VISITED
 
   END SUBROUTINE nullIFY_UNIVERSE
 
@@ -1652,6 +1683,100 @@ CONTAINS
     !    CALL RING_L(L,doneit)
   END SUBROUTINE FIND_POS_in_layout
 
+  SUBROUTINE unify_mad_universe(M_U,N)
+    implicit none
+    type(MAD_UNIVERSE),TARGET :: M_U
+    type(layout),pointer :: L
+    integer i,k,N0
+    type(fibre),pointer :: c,c0
+    INTEGER, OPTIONAL :: N
+    ! used in TIE_MAD_UNIVERSE
+    N0=M_U%N
+    IF(PRESENT(N)) N0=N
+
+    IF(N0>M_U%N) THEN
+       WRITE(6,*) " ERROR IN unify_mad_universe"
+    ENDIF
+
+    k=0
+    l=>m_u%start
+    do i=1,N0-1
+       k=k+l%n
+       l%end%N=>l%next%start
+       l%next%start%P=>l%end
+       l=>l%next
+    enddo
+    l%end%N=>m_u%start%start
+    m_u%start%start%P=>l%end
+    k=k+l%n
+
+    write(6,*) "universe has ",k," fibres"
+    k=0
+    l=>m_u%start
+
+    k=0
+    c0=>l%start
+    c=>l%start
+    do while(.true.)
+       k=k+1
+       c=>c%N
+       if(associated(c0,c)) exit
+    enddo
+    write(6,*) "universe has ",k," fibres"
+    k=0
+    l=>m_u%start
+
+    k=0
+    c0=>l%start
+    c=>l%start
+    do while(.true.)
+       k=k+1
+       c=>c%P
+       if(associated(c0,c)) exit
+    enddo
+    write(6,*) "universe has ",k," fibres"
+  end  SUBROUTINE unify_mad_universe
+
+  SUBROUTINE TIE_MAD_UNIVERSE(M_U,N)
+    implicit none
+    type(layout),pointer :: L
+    integer i,j,N0,K
+    INTEGER, OPTIONAL :: N
+    type(fibre),pointer :: c
+    type(MAD_UNIVERSE),TARGET :: M_U
+    N0=M_U%N
+    ! ties universe from  layout 1 to layout N; otherwise ties it all
+    ! with new pointers fibre%N and fibre%P. (Next and previous; circular list)
+    ! See move_to_name
+    !  m_u%nf  the numbers of fibres tied together
+    ! fibre%loc  location in the tied universed
+
+    IF(PRESENT(N)) N0=N
+
+    IF(N0>M_U%N) THEN
+       WRITE(6,*) " ERROR IN TIE_MAD_UNIVERSE"
+    ENDIF
+    K=1
+    l=>m_u%start
+    do i=1,N0
+       C=>L%START
+       do j=1,L%N
+          C%N=>C%NEXT
+          C%P=>C%PREVIOUS
+          if(.not.associated(c%loc)) allocate(c%loc)
+          c%loc=k
+          K=K+1
+          C=>C%NEXT
+       enddo
+       L=>L%NEXT
+    enddo
+    k=k-1
+    WRITE(6,*) K," FIBRES COMPUTED IN TIE_MAD_UNIVERSE"
+    CALL unify_mad_universe(M_U,N)
+    m_u%nf=k
+    m_u%last=>m_u%start%start
+    m_u%lastpos=1
+  end SUBROUTINE TIE_MAD_UNIVERSE
 
 
   !  THIN LENS STRUCTURE STUFF
@@ -1673,7 +1798,8 @@ CONTAINS
     !    NULLIFY(T%BT)
     NULLIFY(T%NEXT)
     NULLIFY(T%PREVIOUS)
-    NULLIFY(T%WORK)
+    NULLIFY(T%BB)
+    !    NULLIFY(T%WORK)
     !    NULLIFY(T%USE_TPSA_MAP)
     !    NULLIFY(T%TPSA_MAP)
     !    NULLIFY(T%INTEGRATION_NODE_AFTER_MAP)
@@ -1853,9 +1979,9 @@ CONTAINS
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
     IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)
     IF(ASSOCIATED(T%CAS)) DEALLOCATE(T%CAS)
-    IF(ASSOCIATED(T%WORK)) THEN
-       !       CALL KILL(T%WORK)
-       DEALLOCATE(T%WORK)
+    IF(ASSOCIATED(T%BB)) THEN
+       CALL KILL(T%BB)
+       DEALLOCATE(T%BB)
     ENDIF
     !    IF(ASSOCIATED(T%TPSA_MAP)) THEN
     !       CALL KILL(T%TPSA_MAP)
@@ -1894,6 +2020,7 @@ CONTAINS
     END DO
     call de_Set_Up_NODE_LAYOUT(L)
     DEALLOCATE(L);
+    NULLIFY(L);
   END SUBROUTINE kill_NODE_LAYOUT
 
   SUBROUTINE de_Set_Up_ORBIT_LATTICE( L ) ! deallocates layout content
