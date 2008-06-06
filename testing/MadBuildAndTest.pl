@@ -12,10 +12,13 @@ if ($child_pid==0){
     # refresh the AFS token every 6 hours. Otherwise the token
     # would expire after 25 hours.
     # (note this trick works for up to 10 days according to IT support)
-    open TICKETS_HISTORY, ">MadBuildAndTest_Tickets_History.txt";
+    my $start = localtime;
+    open TICKETS_HISTORY, ">MadBuildAndTest_Tickets_History.txt"; # first time opening
+    print TICKETS_HISTORY "Tracking AFS/Kerberos tickets refreshing since $start\n";
+    close TICKETS_HISTORY; # will be successively opened and closed to force flushing
 
   INFINITE_LOOP:
-
+    open TICKETS_HISTORY, ">>MadBuildAndTest_Tickets_History.txt"; # append   
     my @tokens = `tokens`;
     my @klist = `klist`;
     my $now = localtime;
@@ -25,6 +28,7 @@ if ($child_pid==0){
     print TICKETS_HISTORY "======================= running klist\n";
     print TICKETS_HISTORY @klist;
     print TICKETS_HISTORY "now trying to invoke 'kinit -R' and 'aklog'\n";
+    close TICKETS_HISTORY; # open / close in place of flushing
     sleep 21600; # 6 hours
     `kinit -R`;
     `aklog`;
@@ -34,8 +38,7 @@ if ($child_pid==0){
     $cnt = kill 0, $parent_pid;
     if ($cnt == 0){
 	exit;
-    }
-    
+    }   
     goto INFINITE_LOOP;
 }
 
@@ -43,6 +46,8 @@ if ($child_pid) {
 	# non-zero pid means we are in the parent process, which received the child's pid
 
 	open REPORT_FILE, ">MadBuildAndTest_Report.txt";
+	my $now = localtime;
+	print REPORT_FILE "MadBuildAndTest.pl report from $now\n";
 	
 	my $releaseTag;
 	my $runTest;
