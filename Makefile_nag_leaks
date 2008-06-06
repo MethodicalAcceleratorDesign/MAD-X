@@ -186,7 +186,10 @@ Sl_family.o: Sk_link_list.o Sl_family.f90
 Sm_tracking.o: Sl_family.o Sm_tracking.f90
 	$(f95) $(f95_FLAGS) Sm_tracking.f90
 
-Sma_multiparticle.o: Sm_tracking.o Sma_multiparticle.f90
+Sma0_beam_beam_ptc.o: Sm_tracking.o Sma0_beam_beam_ptc.f90
+	$(f95) $(f95_FLAGS) Sma0_beam_beam_ptc.f90
+	
+Sma_multiparticle.o: Sma0_beam_beam_ptc.o Sma_multiparticle.f90
 	$(f95) $(f95_FLAGS) Sma_multiparticle.f90
 	
 Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
@@ -309,8 +312,8 @@ madxp_leaks: \
 	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
 	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
-	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
-	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
+	Sma0_beam_beam_ptc.o Sma_multiparticle.o Sn_mad_like.o So_fitting.o \
+	Sp_keywords.o Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqb_accel_ptc.o \
 	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
@@ -326,8 +329,8 @@ madxp_leaks: \
 	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
 	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
 	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
-	Sma_multiparticle.o Sn_mad_like.o So_fitting.o Sp_keywords.o \
-	Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqa_beam_beam_ptc.o Sqb_accel_ptc.o \
+	Sma0_beam_beam_ptc.o Sma_multiparticle.o Sn_mad_like.o So_fitting.o \
+	Sp_keywords.o Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqb_accel_ptc.o \
 	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
