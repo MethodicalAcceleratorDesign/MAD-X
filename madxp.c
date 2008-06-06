@@ -31,7 +31,7 @@
 #include <stdint.h>		/* uintptr_t, to fit pointers into integers of correct size */
 #endif
 
-//#include <stdint.h> /* to use uintptr_t, to fit pointers into integers of correct size */
+/* #include <stdint.h> to use uintptr_t, to fit pointers into integers of correct size */
 
 /*
   #include "mdb.h"
