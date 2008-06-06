@@ -21,6 +21,8 @@ open REPORT_FILE, ">MadTest_Report.txt";
 
 $startTime = localtime;
 
+print REPORT_FILE "MadTest.pl report from $startTime\n";
+
 $testReport = ""; # will be stored into an HTML document
 
 $pwd = `pwd`;

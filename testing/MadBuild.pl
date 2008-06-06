@@ -13,6 +13,8 @@ if ( $#ARGV != 0 ) {
 }
 
 open REPORT_FILE, ">MadBuild_Report.txt";
+my $now = localtime;
+print REPORT_FILE "MadBuild.pl report from $now\n";
 
 $startTime = localtime;
 
