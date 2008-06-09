@@ -1,5 +1,18 @@
 #!/usr/bin/perl
 
+# retreive directory hosting the Mad program from the command line
+$thisProgramName = $0;
+$_ = $thisProgramName;
+/^([\w\d\-_.\/]+)\/MadBuildAndTest.pl/;
+
+if ($1 ne "") {
+	$hostDirectory = $1;
+} else {
+	$hostDirectory = ".";
+}
+chdir($hostDirectory);
+
+
 my $child_pid = fork();
 
 if (not defined $child_pid){
@@ -61,17 +74,7 @@ if ($child_pid) {
 		$debugMode = 0;
 	}
 	
-	# retreive directory hosting the Mad program from the command line
-	$thisProgramName = $0;
-	$_ = $thisProgramName;
-	/^([\w\d\-_.\/]+)\/MadBuildAndTest.pl/;
 
-	if ($1 ne "") {
-		$hostDirectory = $1;
-	} else {
-		$hostDirectory = ".";
-	}
-	chdir($hostDirectory);
 
 	if ($debugMode==0){
 		# should also retreive the latest release tag
