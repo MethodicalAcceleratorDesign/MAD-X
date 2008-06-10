@@ -1,4 +1,0 @@
-!----------------------------------------------------------------------*
-      double precision rotm, rw, skick, sorb, srmat, stmat
-      common/twissotm/ rotm(6,6),rw(6,6),skick(6),sorb(6),srmat(6,6),   &
-     &stmat(6,6,6)
