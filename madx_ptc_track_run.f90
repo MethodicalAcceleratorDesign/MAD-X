@@ -42,11 +42,11 @@ module Inf_NaN_Detection
   integer, parameter :: Single = selected_int_kind(precision(1.e0))
   integer, parameter :: Double = selected_int_kind(2*Single)
 ! double precision
-!  integer, parameter :: sp = selected_real_kind(precision(1.e0))
-!  integer, parameter :: dp = selected_real_kind(2*precision(1.e0))
+  integer, parameter :: sp = selected_real_kind(precision(1.e0))
+  integer, parameter :: dp = selected_real_kind(2*precision(1.e0))
 ! quadrupole precision
-  integer, parameter :: sp = selected_real_kind(2*precision(1.e0))
-  integer, parameter :: dp = selected_real_kind(2*sp)
+!  integer, parameter :: sp = selected_real_kind(2*precision(1.e0))
+!  integer, parameter :: dp = selected_real_kind(2*sp)
 
   !VK20070611: The below lines are not accepted by NAG-compiler with <Makefile_nag>
   ! Single precision IEEE values
