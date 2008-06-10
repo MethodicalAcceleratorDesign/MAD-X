@@ -39,23 +39,25 @@ module Inf_NaN_Detection
   public :: isnan, isinf, isposinf, isneginf
 
   ! Kind numbers for single and double precision integer containers
+  integer, parameter :: Single = selected_int_kind(precision(1.e0))
+  integer, parameter :: Double = selected_int_kind(2*Single)
 ! double precision
-  integer, parameter :: sp = selected_real_kind(precision(1.e0))
-  integer, parameter :: dp = selected_real_kind(precision(1.d0))
+!  integer, parameter :: sp = selected_real_kind(precision(1.e0))
+!  integer, parameter :: dp = selected_real_kind(2*precision(1.e0))
 ! quadrupole precision
-!  integer, parameter :: sp = selected_real_kind(2*precision(1.e0))
-!  integer, parameter :: dp = selected_real_kind(2*precision(1.d0))
+  integer, parameter :: sp = selected_real_kind(2*precision(1.e0))
+  integer, parameter :: dp = selected_real_kind(2*sp)
 
   !VK20070611: The below lines are not accepted by NAG-compiler with <Makefile_nag>
   ! Single precision IEEE values
-  integer(4), parameter :: sNaN    = Z"7FC00000"
-  integer(4), parameter :: sPosInf = Z"7F800000"
-  integer(4), parameter :: sNegInf = Z"FF800000"
+  integer(Single), parameter :: sNaN    = Z"7FC00000"
+  integer(Single), parameter :: sPosInf = Z"7F800000"
+  integer(Single), parameter :: sNegInf = Z"FF800000"
 
   ! Double precision IEEE values
-  integer(8), parameter :: dNaN    = Z"7FF8000000000000"
-  integer(8), parameter :: dPosInf = Z"7FF0000000000000"
-  integer(8), parameter :: dNegInf = Z"FFF0000000000000"
+  integer(Double), parameter :: dNaN    = Z"7FF8000000000000"
+  integer(Double), parameter :: dPosInf = Z"7FF0000000000000"
+  integer(Double), parameter :: dNegInf = Z"FFF0000000000000"
 
   ! Locatation of single and double precision sign bit (Intel)
   ! Subtract one because bit numbering starts at zero
