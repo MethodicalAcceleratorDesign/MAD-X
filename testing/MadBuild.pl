@@ -122,6 +122,8 @@ foreach $makefile (@makefiles){
 	my $htmlFile = "build_" . $makefile . "_" . $target . ".htm";
 	$buildReport .= "<tr class=\"$outcome\"><td>make -f $makefile $target</td><td><a href=\"$htmlFile\">$outcome</a></td></tr>\n";
 	
+	print REPORT_FILE "Compiling '$target' with '$makefile' yields $outcome\n";
+	
 	createWebPage($htmlFile,$detailedBuildReport,$startTime,$endTime);
 
     } # for each target
@@ -148,6 +150,7 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 			);
   $msg->send;
 
+ print REPORT_FILE "MadBuild.pl completed\n";
  close REPORT_FILE;
 
 sub lookForWarnings {
