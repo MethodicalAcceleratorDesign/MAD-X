@@ -40,13 +40,7 @@ module Inf_NaN_Detection
 
   ! Kind numbers for single and double precision integer containers
   integer, parameter :: Single = selected_int_kind(precision(1.e0))
-  integer, parameter :: Double = selected_int_kind(2*Single)
-! double precision
-  integer, parameter :: sp = selected_real_kind(precision(1.e0))
-  integer, parameter :: dp = selected_real_kind(2*precision(1.e0))
-! quadrupole precision
-!  integer, parameter :: sp = selected_real_kind(2*precision(1.e0))
-!  integer, parameter :: dp = selected_real_kind(2*sp)
+  integer, parameter :: Double = selected_int_kind(precision(1.d0))
 
   !VK20070611: The below lines are not accepted by NAG-compiler with <Makefile_nag>
   ! Single precision IEEE values
@@ -89,7 +83,7 @@ contains
   ! Single precision test for NaN
   elemental function sisnan(x) result(res)
     implicit none
-    real(sp), intent(in) :: x
+    real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(ibclr(transfer(x,sNan),SPSB), sNaN) == 0
   end function sisnan
@@ -97,7 +91,7 @@ contains
   ! Double precision test for NaN
   elemental function disnan(d) result(res)
     implicit none
-    real(dp), intent(in) :: d
+    real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(ibclr(transfer(d,dNaN),DPSB), dNaN) == 0
   end function disnan
@@ -105,7 +99,7 @@ contains
   ! Single precision test for Inf
   elemental function sisinf(x) result(res)
     implicit none
-    real(sp), intent(in) :: x
+    real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(ibclr(transfer(x,sPosInf),SPSB), sPosInf) == 0
   end function sisinf
@@ -113,7 +107,7 @@ contains
   ! Double precision test for Inf
   elemental function disinf(d) result(res)
     implicit none
-    real(dp), intent(in) :: d
+    real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(ibclr(transfer(d,dPosInf),DPSB), dPosInf) == 0
   end function disinf
@@ -121,7 +115,7 @@ contains
   ! Single precision test for +Inf
   elemental function sisposinf(x) result(res)
     implicit none
-    real(sp), intent(in) :: x
+    real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(transfer(x,sPosInf), sPosInf) == 0
   end function sisposinf
@@ -129,7 +123,7 @@ contains
   ! Double precision test for +Inf
   elemental function disposinf(d) result(res)
     implicit none
-    real(dp), intent(in) :: d
+    real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(transfer(d,dPosInf), dPosInf) == 0
   end function disposinf
@@ -137,7 +131,7 @@ contains
   ! Single precision test for -Inf
   elemental function sisneginf(x) result(res)
     implicit none
-    real(sp), intent(in) :: x
+    real(kind(1.e0)), intent(in) :: x
     logical :: res
     res = ieor(transfer(x,sNegInf), sNegInf) == 0
   end function sisneginf
@@ -145,7 +139,7 @@ contains
   ! Double precision test for -Inf
   elemental function disneginf(d) result(res)
     implicit none
-    real(dp), intent(in) :: d
+    real(kind(1.d0)), intent(in) :: d
     logical :: res
     res = ieor(transfer(d,dNegInf), dNegInf) == 0
   end function disneginf
@@ -243,7 +237,7 @@ MODULE madx_ptc_track_run_module
   CHARACTER(24), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
   !                                                  ! contrary to <character (16)> in c-code
 
-  !real(dp) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
+  !real(kind(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
 
 CONTAINS
 
@@ -286,7 +280,7 @@ CONTAINS
 
     include 'bb.fi'         ! integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max;
     !                       !uses bbd_pos                parameter(bbd_max=200)
-    !                       !real(dp) bb_kick
+    !                       !real(kind(1d0)) bb_kick
     !                       ! common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos
     !                       !common/bbr/bb_kick(2,bbd_max)
 
@@ -328,7 +322,7 @@ CONTAINS
          advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
 
-    REAL(dp), external :: node_value !/*returns value for parameter par of current element */
+    REAL(KIND(1d0)), external :: node_value !/*returns value for parameter par of current element */
 
     EXTERNAL :: comm_para ! subroutine needed for LF95
 
@@ -655,7 +649,7 @@ CONTAINS
       USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
       implicit none
       ! local variables
-      !real(dp) :: maxaper(1:6) move to HOST
+      !real(kind(1d0)) :: maxaper(1:6) move to HOST
       character*4 text
       character*12 tol_a, char_a
       integer :: nint,ndble, nchar, int_arr(1),char_l
@@ -2052,7 +2046,7 @@ CONTAINS
 
          IF ( (i_elem_type .EQ. 1) .OR. &
               ( (i_elem_type.EQ.3).AND.(.NOT.Radiation_Quad) ) ) THEN
-            rad_curv_m = one/B0_dipole
+            rad_curv_m = 1D0/B0_dipole
             Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
                                 ! Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
                  Energy_total_MeV,                  ieave,iquasto, d_loss(1), d_loss(2))
@@ -2073,7 +2067,7 @@ CONTAINS
                SQRT_X2_Y2=SQRT(x_coord_incl_co(1,j_partic)*x_coord_incl_co(1,j_partic)+ &
                     x_coord_incl_co(3,j_partic)*x_coord_incl_co(3,j_partic))
                !IF (SQRT_X2_Y2 .EQ. zero) EXIT
-               rad_curv_m = one/Quadr_k/SQRT_X2_Y2
+               rad_curv_m = 1D0/Quadr_k/SQRT_X2_Y2
 
                Call photon (i_elem_type, rad_curv_m, length_curr_elem, &
                                 !Energy_total_MeV, Energy_rest_MeV, ieave,iquasto, d_loss(1), d_loss(2)) !VK20070617
@@ -2381,7 +2375,7 @@ CONTAINS
 
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
                !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(dp)
+               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(kind(1d0))
                Read_START_coord: DO i_coord=1,icase_ptc
                   X_lnv_START(i_coord)= x_all_incl_co_at0(i_coord, i_turn_tmp, j_part_tmp) - &
                        x_coord_co_at_START(i_coord) ! X_out=M(x0,x)*x_in, where X=x0+x !
@@ -2390,7 +2384,7 @@ CONTAINS
                X_lnv_OBSRV=Map_damap*X_lnv_START
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
                !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(dp)
+               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(kind(1d0))
 
                Loop_coord: DO i_coord=1,icase_ptc
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)%T*X_lnv_START(i_coord)
@@ -2725,7 +2719,7 @@ CONTAINS
       !k      include 'bb.fi': --------------------------------------!
       !k      integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max       !
       !k      parameter(bbd_max=200)                                 !
-      !k      real(dp) bb_kick                                !
+      !k      real(kind(1d0)) bb_kick                                !
       !k      common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos   !
       !k      common/bbr/bb_kick(2,bbd_max !-------------------------!
       !k
@@ -2733,15 +2727,15 @@ CONTAINS
       !k      integer j,jend,k,kp,kq,next_start,itype(23),switch,turns
       INTEGER ::  j_particle_line_counter,kq,kp
       INTEGER ::  next_start ! int. function
-      !k      real(dp) phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
+      !k      real(kind(1d0)) phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
       !k     &ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
       !k     &ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
-      !real(dp) :: twoPi, Ex_horz_emi_m, Ey_vert_emi_m, Et_long_emi_m
+      !real(kind(1d0)) :: twoPi, Ex_horz_emi_m, Ey_vert_emi_m, Et_long_emi_m
       REAL(dp)  :: x_input,px_input,y_input,py_input,t_input,deltae_input, &
            fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input, &
            phi_n
 
-      ! real(dp) :: get_value,get_variable ! dble c-functions in the HOST routine
+      ! real(kind(1d0)) :: get_value,get_variable ! dble c-functions in the HOST routine
       ! local temprorary variables
       INTEGER :: k_th_coord,  j_th_particle, & ! local
            itype_non_zero_flag(12) ! not itype(23)
