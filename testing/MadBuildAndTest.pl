@@ -95,8 +95,8 @@ if ($child_pid==0){
 
   INFINITE_LOOP:
     open TICKETS_HISTORY, ">>MadBuildAndTest_Tickets_History.txt"; # append   
-    my @tokens = `tokens`;
-    my @klist = `klist`;
+    my @tokens = `/usr/bin/tokens`;	# provide path to cope with reduced acron environment
+    my @klist = `/usr/sue/bin/klist`;	# provide path to cope with reduced acron environment
     my $now = localtime;
     print TICKETS_HISTORY "\n\nAFS and Kerberos tickets on $now\n";
     print TICKETS_HISTORY "======================= running tokens\n";
@@ -106,8 +106,10 @@ if ($child_pid==0){
     print TICKETS_HISTORY "now trying to invoke 'kinit -R' and 'aklog'\n";
     close TICKETS_HISTORY; # open / close in place of flushing
     sleep 21600; # 6 hours
-    `kinit -R`;
-    `aklog`;
+    `/usr/sue/bin/kinit -R`;	# provide path to cope with reduced acron environment
+    `/usr/bin/aklog`;		# provide path to cope with reduced acron environment
+    # could also set enviromment variables within perl,
+    # as done within MadBuild.pl for flexlm for instance...
     
     # check if the child process' parent is dead, it should also kill itself
     $parent_pid = getppid(); # get parent process' pid
