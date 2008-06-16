@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- MAD regression test scenario -->
 <test-scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="TestScenario.xsd">
-   <target name="c6t" responsible="unknown">
+   <target name="c6t" responsible="Frank.Schmidt@cern.ch">
         <test input="convert_example_rhic.madx" output="convert_example_rhic.out" subdir="RHIC"/>
 	<test input="convert_example_lhc.madx" output="convert_example_lhc.out" subdir="LHC"/>
    </target>
@@ -78,7 +78,7 @@
    <target name="ptc_normal" responsible="Frank.Schmidt@cern.ch">
 	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
    </target>
-   <target name="ptc_track" responsible="unknown">
+   <target name="ptc_track" responsible="Frank.Schmidt@cern.ch">
 	<test input ="fv9_1.madx" output="fv9_1.out" program="madxp" subdir="Example1"/>
 	<test input ="fv9_2.madx" output="fv9_2.out" program="madxp" subdir="Example2"/>
 	<test input ="fv9_3.madx" output="fv9_3.out" program="madxp" subdir="Example3"/>
