@@ -2220,8 +2220,9 @@ contains
     xs%u=my_false
     XS=X
     if(present(t)) THEN
-       ALLOCATE(xs%lost_node)
-       t=>xs%lost_node
+       !    ALLOCATE(xs%lost_node)
+       !    t=>xs%lost_node
+       nullify(t)
     ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
@@ -2230,7 +2231,7 @@ contains
     X=XS%X
     if(present(t)) THEN
        t=>xs%lost_node
-       deallocate(xs%lost_node)
+       ! deallocate(xs%lost_node)
        NULLIFY(xs%lost_node)
     ENDIF
 
@@ -2251,8 +2252,9 @@ contains
     xs%u=my_false
     XS%x=X
     if(present(t)) THEN
-       ALLOCATE(xs%lost_node)
-       t=>xs%lost_node
+       !    ALLOCATE(xs%lost_node)
+       !    t=>xs%lost_node
+       nullify(t)
     ENDIF
 
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
@@ -2261,7 +2263,7 @@ contains
     if(present(u)) u=xs%u
     if(present(t)) THEN
        t=>xs%lost_node
-       deallocate(xs%lost_node)
+       !       deallocate(xs%lost_node)
        NULLIFY(xs%lost_node)
     ENDIF
 
@@ -2283,8 +2285,9 @@ contains
     xs%u=my_false
     XS=X
     if(present(t)) THEN
-       ALLOCATE(xs%lost_node)
-       t=>xs%lost_node
+       !       ALLOCATE(xs%lost_node)
+       !       t=>xs%lost_node
+       nullify(t)
     ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
@@ -2293,7 +2296,7 @@ contains
     X=XS%X
     if(present(t)) THEN
        t=>xs%lost_node
-       deallocate(xs%lost_node)
+       !       deallocate(xs%lost_node)
        NULLIFY(xs%lost_node)
     ENDIF
 
@@ -2314,8 +2317,9 @@ contains
     xs%u=my_false
     XS%X=X
     if(present(t)) THEN
-       ALLOCATE(xs%lost_node)
-       t=>xs%lost_node
+       !       ALLOCATE(xs%lost_node)
+       !       t=>xs%lost_node
+       nullify(t)
     ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
@@ -2324,7 +2328,7 @@ contains
     X=XS%X
     if(present(t)) THEN
        t=>xs%lost_node
-       deallocate(xs%lost_node)
+       !      deallocate(xs%lost_node)
        NULLIFY(xs%lost_node)
     ENDIF
     call kill(xs)

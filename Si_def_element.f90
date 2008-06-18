@@ -959,7 +959,14 @@ CONTAINS
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
           CALL WRITE_E(222)
        ENDIF
-       if(.not.ASSOCIATED(EL%K2))ALLOCATE(EL%K2)
+       if(.not.ASSOCIATED(EL%K2)) THEN
+          ALLOCATE(EL%K2)
+          EL%K2=0
+       ELSE
+          EL%K2=-1
+          EL%K2=0
+       ENDIF
+       !       if(.not.ASSOCIATED(EL%K2))ALLOCATE(EL%K2)
        EL%K2%P=>EL%P
        EL%K2%L=>EL%L
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
@@ -969,6 +976,7 @@ CONTAINS
        EL%K2%HGAP=>EL%HGAP
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
+       NULLIFY(EL%K2%F);ALLOCATE(EL%K2%F);EL%K2%F=1;
     CASE(KIND3)
        if(.not.ASSOCIATED(EL%K3)) THEN
           ALLOCATE(EL%K3)
@@ -1128,6 +1136,7 @@ CONTAINS
        EL%T7%HGAP=>EL%HGAP
        EL%T7%H1=>EL%H1
        EL%T7%H2=>EL%H2
+       NULLIFY(EL%T7%F);ALLOCATE(EL%T7%F);EL%T7%F=1;
        nullify(EL%T7%MATX);ALLOCATE(EL%T7%MATX(2,3));
        nullify(EL%T7%MATY);ALLOCATE(EL%T7%MATY(2,3));
        nullify(EL%T7%LX);ALLOCATE(EL%T7%LX(3));
@@ -1396,7 +1405,14 @@ CONTAINS
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
           CALL WRITE_E(222)
        ENDIF
-       if(.not.ASSOCIATED(EL%K2))ALLOCATE(EL%K2)
+       if(.not.ASSOCIATED(EL%K2)) THEN
+          ALLOCATE(EL%K2)
+          EL%K2=0
+       ELSE
+          EL%K2=-1
+          EL%K2=0
+       ENDIF
+       !       if(.not.ASSOCIATED(EL%K2))ALLOCATE(EL%K2)
        EL%K2%P=>EL%P
        EL%K2%L=>EL%L
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
@@ -1406,6 +1422,7 @@ CONTAINS
        EL%K2%HGAP=>EL%HGAP
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
+       NULLIFY(EL%K2%F);ALLOCATE(EL%K2%F);EL%K2%F=1;
     CASE(KIND3)
        if(.not.ASSOCIATED(EL%K3)) THEN
           ALLOCATE(EL%K3)
@@ -1564,6 +1581,7 @@ CONTAINS
        EL%T7%HGAP=>EL%HGAP
        EL%T7%H1=>EL%H1
        EL%T7%H2=>EL%H2
+       NULLIFY(EL%T7%F);ALLOCATE(EL%T7%F);EL%T7%F=1;
        nullify(EL%T7%MATX);  ALLOCATE(EL%T7%MATX(2,3));
        nullify(EL%T7%MATY);  ALLOCATE(EL%T7%MATY(2,3));
        nullify(EL%T7%LX);    ALLOCATE(EL%T7%LX(3));
@@ -2628,7 +2646,10 @@ CONTAINS
     !    ENDIF
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
-    IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
+    IF(EL%KIND==KIND2) then
+       CALL SETFAMILY(ELP)
+       ELP%K2%F=EL%K2%F
+    ENDIF
     IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
@@ -2738,6 +2759,7 @@ CONTAINS
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
        IF(.NOT.GEN) THEN !.NOT.GEN
+          ELP%T7%F=EL%T7%F
           DO J=1,3
              ELP%T7%LX(J)=EL%T7%LX(J)
              ELP%T7%RLX(J)=EL%T7%RLX(J)
@@ -2873,7 +2895,10 @@ CONTAINS
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
 
-    IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
+    IF(EL%KIND==KIND2) then
+       CALL SETFAMILY(ELP)
+       ELP%K2%F=EL%K2%F
+    ENDIF
     IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
@@ -2975,6 +3000,7 @@ CONTAINS
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
        IF(.NOT.GEN) THEN !.NOT.GEN
+          ELP%T7%F=EL%T7%F
           DO J=1,3
              ELP%T7%LX(J)=EL%T7%LX(J)
              ELP%T7%RLX(J)=EL%T7%RLX(J)
@@ -3112,7 +3138,10 @@ CONTAINS
 
     IF(EL%KIND==KIND1) CALL SETFAMILY(ELP)
 
-    IF(EL%KIND==KIND2) CALL SETFAMILY(ELP)
+    IF(EL%KIND==KIND2) then
+       CALL SETFAMILY(ELP)
+       ELP%K2%F=EL%K2%F
+    ENDIF
     IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
@@ -3218,6 +3247,7 @@ CONTAINS
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
        IF(.NOT.GEN) THEN !.NOT.GEN
+          ELP%T7%F=EL%T7%F
           DO J=1,3
              ELP%T7%LX(J)=EL%T7%LX(J)
              ELP%T7%RLX(J)=EL%T7%RLX(J)

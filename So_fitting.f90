@@ -2258,6 +2258,87 @@ contains
 
   END SUBROUTINE  THIN_LENS_resplit
 
+
+
+  SUBROUTINE  RECUT_KIND7_one(C,lmax0,drift) ! A re-splitting routine
+    IMPLICIT NONE
+    TYPE(layout),POINTER :: L
+    real(dp) lmax0
+    TYPE(FIBRE),target :: C
+    INTEGER I,f0
+    logical(lp) drift
+
+    if(associated(c%parent_layout%parent_universe)) then
+       l=>c%parent_layout%parent_universe%start
+       do i=1,c%parent_layout%parent_universe%n
+          call kill(l%t)
+          l=>l%next
+       enddo
+    else
+       call kill(c%parent_layout%t)
+    endif
+
+    if(drift.and.C%MAG%KIND==KIND1) then
+       f0=nint(C%MAG%l/lmax0)
+       if(f0==0) f0=1
+       C%MAG%p%nst=f0
+       C%MAGp%p%nst=C%MAG%p%nst
+       call COPY(C%MAG,C%MAGP)
+    endif
+    IF(C%MAG%KIND==KIND7.or.(C%MAG%KIND==KIND2.and.C%MAG%p%method==2)) then
+
+       f0=nint(C%MAG%l/lmax0)
+       if(f0==0) f0=1
+       if(C%MAG%p%method==2) then
+          C%MAG%p%nst=C%MAG%p%nst*f0*2
+          C%MAGp%p%nst=C%MAG%p%nst
+          C%MAG%p%method=1
+          C%MAGp%p%method=1
+       elseif(C%MAG%p%method==4) then
+          C%MAG%p%nst=C%MAG%p%nst*f0*2
+          C%MAGp%p%nst=C%MAG%p%nst
+          C%MAG%p%method=3
+          C%MAGp%p%method=3
+       elseif(C%MAG%p%method==6) then
+          C%MAG%p%nst=C%MAG%p%nst*f0*4
+          C%MAGp%p%nst=C%MAG%p%nst
+          C%MAG%p%method=5
+          C%MAGp%p%method=5
+       endif
+       call add(C%MAG,C%MAG%P%nmul,1,zero)
+       call COPY(C%MAG,C%MAGP)
+       if(C%MAG%KIND==KIND7) then
+          C%MAG%t7%f=f0
+          C%MAGp%t7%f=f0
+       else
+          C%MAG%k2%f=f0
+          C%MAGp%k2%f=f0
+       endif
+    ENDIF
+
+  END SUBROUTINE  RECUT_KIND7_one
+
+
+  SUBROUTINE  RECUT_KIND7(R,lmax0,drift) ! A re-splitting routine
+    IMPLICIT NONE
+    TYPE(layout),target, intent(inout) :: R
+    TYPE(layout),POINTER :: L
+    real(dp) lmax0
+    TYPE(FIBRE),POINTER :: C
+    INTEGER I,f0
+    logical(lp) drift
+
+
+    C=>R%START
+    DO I=1,R%N
+       call RECUT_KIND7_one(c,lmax0,drift)
+       C=>C%NEXT
+    ENDDO
+
+  END SUBROUTINE  RECUT_KIND7
+
+
+
   SUBROUTINE  check_bend(xl,ggi,rhoi,xbend1,gf,met) ! A re-splitting routine
     IMPLICIT NONE
     real(dp) xl,gg,ggi,rhoi,ar,ggb,co(7),xbend1,gf(7)

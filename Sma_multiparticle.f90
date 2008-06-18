@@ -624,7 +624,8 @@ CONTAINS
 
     CASE(CASE0)
        el=>T%PARENT_FIBRE%MAG
-       if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
+       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE)  &
+            call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
        if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
           call TRANS((/t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
           call BBKICK(t%bb,X)
@@ -636,7 +637,7 @@ CONTAINS
        case(KIND1)
           CALL TRACK_SLICE(EL%D0,X,K)
        case(KIND2)
-          CALL TRACK_SLICE(EL%K2,X,K)
+          CALL TRACK_SLICE(EL%K2,X,K,t%POS_IN_FIBRE-2)
        case(KIND3)
           CALL TRACK(EL%K3,X,K)
        case(KIND4)
@@ -646,7 +647,7 @@ CONTAINS
        case(KIND6)
           CALL TRACK_SLICE(EL%T6,X,K)
        case(KIND7)
-          CALL TRACK_SLICE(EL%T7,X,K)
+          CALL TRACK_SLICE(EL%T7,X,K,t%POS_IN_FIBRE-2)
        case(KIND8)
           CALL TRACK(EL%S8,X,K)
        case(KIND9)
@@ -680,7 +681,8 @@ CONTAINS
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
-       if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
+       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
+            call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
 
        ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
 
@@ -764,7 +766,8 @@ CONTAINS
 
     CASE(CASE0)
        el=>T%PARENT_FIBRE%MAGP
-       if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
+       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
+            call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
        if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
           call TRANS((/t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
           !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
@@ -777,7 +780,7 @@ CONTAINS
        case(KIND1)
           CALL TRACK_SLICE(EL%D0,X,K)
        case(KIND2)
-          CALL TRACK_SLICE(EL%K2,X,K)
+          CALL TRACK_SLICE(EL%K2,X,K,t%POS_IN_FIBRE-2)
        case(KIND3)
           CALL TRACK(EL%K3,X,K)
        case(KIND4)
@@ -790,7 +793,7 @@ CONTAINS
           IF((EL%T7%BN(2)%KIND==3.OR.EL%T7%L%KIND==3).AND.KNOB) THEN
              CALL GETMAT7(EL%T7)                                      ! RECOMPUTES ONLY IF KNOB (SPEED)
           ENDIF
-          CALL TRACK_SLICE(EL%T7,X,K)
+          CALL TRACK_SLICE(EL%T7,X,K,t%POS_IN_FIBRE-2)
           IF(KNOB) THEN
              BN2=.FALSE.
              L=.FALSE.
@@ -848,7 +851,8 @@ CONTAINS
        END SELECT
 
        ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
-       if(s_aperture_CHECK.and.associated(el%p%A)) call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
+       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
+            call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
 
 
     END SELECT

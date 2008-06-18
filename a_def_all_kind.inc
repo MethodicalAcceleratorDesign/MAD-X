@@ -18,6 +18,7 @@ TYPE DKD2
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END  TYPE DKD2
 
 TYPE DKD2P
@@ -26,6 +27,7 @@ TYPE DKD2P
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END  TYPE DKD2P
 
 TYPE KICKT3
@@ -165,6 +167,7 @@ TYPE TKTF
    real(dp), DIMENSION(:), POINTER ::   Rlx
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END  TYPE TKTF
 
 TYPE TKTFP
@@ -180,6 +183,7 @@ TYPE TKTFP
    TYPE(REAL_8), DIMENSION(:),   POINTER :: Rlx
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END  TYPE TKTFP
 
 TYPE NSMI

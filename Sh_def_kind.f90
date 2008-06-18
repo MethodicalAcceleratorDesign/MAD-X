@@ -137,7 +137,7 @@ MODULE S_DEF_KIND
   PRIVATE KICKR_HE,KICKP_HE,KICK_HE
   PRIVATE KICKPATHR_HE,KICKPATHP_HE
   PRIVATE INTR_HE,INTP_HE,INTR_HE_TOT,INTP_HE_TOT
-
+  private ZEROr_DKD2,ZEROp_DKD2
   !include "def_all_kind.f90"
   ! New home for element and elementp
 
@@ -477,6 +477,8 @@ MODULE S_DEF_KIND
   END INTERFACE
 
   INTERFACE ASSIGNMENT (=)
+     MODULE PROCEDURE ZEROr_DKD2                 ! need upgrade
+     MODULE PROCEDURE ZEROp_DKD2                  ! need upgrade
      MODULE PROCEDURE ZEROr_KTK                 ! need upgrade
      MODULE PROCEDURE ZEROP_KTK                  ! need upgrade
      MODULE PROCEDURE ZEROr_TKT7                 ! need upgrade
@@ -2885,19 +2887,34 @@ contains
 
   END SUBROUTINE KICKP
 
-  SUBROUTINE INTER_dkd2 (EL,X,k)
+  SUBROUTINE INTER_dkd2 (EL,X,k,pos)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(DKD2),INTENT(IN):: EL
-
+    INTEGER pos
     real(dp) D,DH,DD
     real(dp) D1,D2,DK1,DK2
     real(dp) DD1,DD2
     real(dp) DF(4),DK(4),DDF(4)
-    INTEGER I,J
+    INTEGER I,J,f1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DH=EL%L/EL%P%NST
+       D=EL%L/(EL%P%NST/EL%F/2)
+       DD=EL%P%LD/EL%P%NST
+
+       IF(MOD(POS,2*EL%F)==f1) THEN
+          CALL KICK (EL,D,X,k)
+       ENDIF
+       CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
+
     CASE(2)
        DH=EL%L/two/EL%P%NST
        D=EL%L/EL%P%NST
@@ -2971,7 +2988,7 @@ contains
 
   END SUBROUTINE INTER_dkd2
 
-  SUBROUTINE INTEP_dkd2 (EL,X,k)
+  SUBROUTINE INTEP_dkd2 (EL,X,k,pos)
     IMPLICIT NONE
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(DKD2P),INTENT(IN):: EL
@@ -2982,9 +2999,27 @@ contains
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    INTEGER I,J
+    INTEGER I,J,pos,f1
 
     SELECT CASE(EL%P%METHOD)
+
+    CASE(1)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       CALL ALLOC(DH,D)
+       DH=EL%L/EL%P%NST
+       D=EL%L/(EL%P%NST/EL%F/2)
+       DD=EL%P%LD/EL%P%NST
+
+       IF(MOD(POS,2*EL%F)==f1) THEN
+          CALL KICK (EL,D,X,k)
+       ENDIF
+       CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
+       CALL KILL(DH,D)
+
     CASE(2)
        CALL ALLOC(DH,D)
        DH=EL%L/two/EL%P%NST
@@ -3071,7 +3106,7 @@ contains
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     DO I=1,EL%P%NST
-       IF(.NOT.PRESENT(MID)) CALL TRACK_SLICE(EL,X,k)
+       IF(.NOT.PRESENT(MID)) CALL TRACK_SLICE(EL,X,k,i)
        IF(PRESENT(MID)) CALL XMID(MID,X,I)
     ENDDO
 
@@ -3090,7 +3125,7 @@ contains
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     DO I=1,EL%P%NST
-       CALL TRACK_SLICE(EL,X,k)
+       CALL TRACK_SLICE(EL,X,k,i)
     ENDDO
 
   END SUBROUTINE INTEP
@@ -5480,7 +5515,9 @@ contains
     real(dp) OMEGA, OMEGA2,C,S
     INTEGER S_OMEGA
 
-    IF(EL%P%METHOD/=6) THEN
+    IF(MOD(EL%P%METHOD,2)==1) THEN
+       DH=(EL%L/EL%P%NST)  ! method=1,3,5
+    ELSEIF(EL%P%METHOD/=6) THEN
        DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
        IF(EL%P%METHOD==4) DH=DH*TWO
     ELSE
@@ -5727,7 +5764,9 @@ contains
     CALL ALLOC(DH)
 
 
-    IF(EL%P%METHOD/=6) THEN
+    IF(MOD(EL%P%METHOD,2)==1) THEN
+       DH=(EL%L/EL%P%NST)  ! method=1,2
+    ELSEIF(EL%P%METHOD/=6) THEN
        DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
        IF(EL%P%METHOD==4) DH=DH*TWO
     ELSE
@@ -6293,30 +6332,82 @@ contains
 
   END SUBROUTINE KICKPATHD
 
-  SUBROUTINE INTER_TKTF(EL,X,k)
+  SUBROUTINE INTER_TKTF(EL,X,k,pos)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(TKTF),INTENT(INOUT):: EL
-    INTEGER I
+    integer,optional :: pos
+    INTEGER I,f1
     real(dp) DK,DK2,DK6,DK4,DK5
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    !   if(.not.CHECK_STABLE) return
+    !   if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE)  &
+    !    call check_S_APERTURE(el%p,pos,x)
+
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DK2=EL%L/(EL%P%NST/EL%F/2)
+       DK=DK2/two
+
+       IF(MOD(POS,2*EL%F)==f1) THEN
+          CALL KICKPATH(EL,DK,X,k)
+          CALL KICKTKT7(EL,DK2,X,k)
+          CALL KICKPATH(EL,DK,X,k)
+       ENDIF
+       CALL PUSHTKT7(EL,X,k)
     CASE(2)
        DK2=EL%L/EL%P%NST
        DK=DK2/two
-
-       !       CALL KICKTKT7(EL,DK2,X)
-       !       CALL KICKPATH(EL,DK2,X)
-       !       CALL PUSHTKT7(EL,X)
-       !       CALL KICKPATH(EL,DK2,X)
-       !       CALL KICKTKT7(EL,DK2,X)
 
        CALL PUSHTKT7(EL,X,k)
        CALL KICKPATH(EL,DK,X,k)
        CALL KICKTKT7(EL,DK2,X,k)
        CALL KICKPATH(EL,DK,X,k)
        CALL PUSHTKT7(EL,X,k)
+
+    CASE(3)
+
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DK=EL%L/(EL%P%NST/EL%F/2)/six
+       DK2=DK*two
+       DK6=two*DK2
+
+       if(mod(pos,EL%F*2)==F1) then
+          CALL KICKPATH(EL,DK2,X,k)
+          CALL KICKTKT7(EL,DK6,X,k)    ! 2/3
+          CALL KICKPATH(EL,DK2,X,k)
+          CALL PUSHTKT7(EL,X,k)
+          if(f1==0.and.pos==EL%P%NST) then   ! this becomes nst
+             CALL KICKPATH(EL,DK,X,k)
+             CALL KICKTKT7(EL,DK,X,k)
+          endif
+       elseif(mod(pos,EL%F*2)==1.and.pos/=1) then
+          CALL KICKPATH(EL,DK,X,k)
+          CALL KICKTKT7(EL,DK2,X,k)    ! 1/3
+          CALL KICKPATH(EL,DK,X,k)
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==1) then             ! 1/6
+          CALL KICKTKT7(EL,DK,X,k)
+          CALL KICKPATH(EL,DK,X,k)
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==EL%P%NST) then             ! 1/6
+          CALL PUSHTKT7(EL,X,k)
+          CALL KICKPATH(EL,DK,X,k)
+          CALL KICKTKT7(EL,DK,X,k)
+       else
+          CALL PUSHTKT7(EL,X,k)
+       endif
+
 
     CASE(4)
        DK2=EL%L/EL%P%NST/three
@@ -6334,12 +6425,60 @@ contains
        CALL KICKPATH(EL,DK,X,k)
        CALL KICKTKT7(EL,DK,X,k) ! NEW
 
+    CASE(5)
+
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=3*EL%F+1
+       endif
+
+       DK2=c_14*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 14/90
+       DK4=c_32*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 32/90
+       DK6=twelve*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 12/90
+       DK5=DK6/two  ! 6/90
+       DK=DK2/two    ! 7/90
+
+       if(mod(pos,EL%F*4)==EL%F+1) then
+          CALL KICKTKT7(EL,DK4,X,k)  ! 32/90
+          CALL KICKPATH(EL,DK4,X,k)  ! 32/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(mod(pos,EL%F*4)==f1) then
+          CALL KICKPATH(EL,DK4,X,k)  ! 32/90
+          CALL KICKTKT7(EL,DK4,X,k)  ! 32/90
+          CALL PUSHTKT7(EL,X,k)
+          if(f1==0.and.pos==EL%P%NST) then   ! this becomes nst
+             CALL KICKPATH(EL,DK,X,k)  ! 7/90
+             CALL KICKTKT7(EL,DK,X,k) !  7/90
+          endif
+       elseif(mod(pos,EL%F*4)==2*EL%F+1) then
+          CALL KICKPATH(EL,DK5,X,k)  ! 6/90
+          CALL KICKTKT7(EL,DK6,X,k)  ! 12/90
+          CALL KICKPATH(EL,DK5,X,k)  ! 6/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(mod(pos,EL%F*4)==1.and.pos/=1) then
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL KICKTKT7(EL,DK2,X,k) ! 14/90
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==1) then
+          CALL KICKTKT7(EL,DK,X,k)  ! 7/90
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==EL%P%NST) then
+          CALL PUSHTKT7(EL,X,k)
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL KICKTKT7(EL,DK,X,k) !  7/90
+       else
+          CALL PUSHTKT7(EL,X,k)
+       endif
+
     CASE(6)
-       DK2=c_14*EL%L/EL%P%NST/c_90
-       DK4=c_32*EL%L/EL%P%NST/c_90
-       DK6=twelve*EL%L/EL%P%NST/c_90
-       DK5=DK6/two
-       DK=DK2/two
+       DK2=c_14*EL%L/EL%P%NST/c_90  ! 14/90
+       DK4=c_32*EL%L/EL%P%NST/c_90  ! 32/90
+       DK6=twelve*EL%L/EL%P%NST/c_90  ! 12/90
+       DK5=DK6/two  ! 6/90
+       DK=DK2/two    ! 7/90
 
        CALL KICKTKT7(EL,DK,X,k)  ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -6372,20 +6511,40 @@ contains
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
        call write_e(357)
     END SELECT
+    !       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
+    !        call check_S_APERTURE_out(el%p,pos,x)
 
   END SUBROUTINE INTER_TKTF
 
-  SUBROUTINE INTEP_TKTF(EL,X,k)
+  SUBROUTINE INTEP_TKTF(EL,X,k,pos)
     IMPLICIT NONE
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(TKTFP),INTENT(INOUT):: EL
-    INTEGER I
+    integer,optional :: pos
+    INTEGER I,f1
     TYPE(REAL_8) DK,DK2,DK6,DK4,DK5
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
 
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       CALL ALLOC(DK,DK2)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DK2=EL%L/(EL%P%NST/EL%F/2)
+       DK=DK2/two
+
+       IF(MOD(POS,2*EL%F)==f1) THEN
+          CALL KICKPATH(EL,DK,X,k)
+          CALL KICKTKT7(EL,DK2,X,k)
+          CALL KICKPATH(EL,DK,X,k)
+       ENDIF
+       CALL PUSHTKT7(EL,X,k)
+       CALL KILL(DK,DK2)
     CASE(2)
        CALL ALLOC(DK,DK2)
 
@@ -6400,6 +6559,47 @@ contains
 
 
        CALL KILL(DK,DK2)
+
+    CASE(3)
+
+       CALL ALLOC(DK,DK2,DK6)
+
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DK=EL%L/(EL%P%NST/EL%F/2)/six
+       DK2=DK*two
+       DK6=two*DK2
+
+       if(mod(pos,EL%F*2)==F1) then
+          CALL KICKPATH(EL,DK2,X,k)
+          CALL KICKTKT7(EL,DK6,X,k)    ! 2/3
+          CALL KICKPATH(EL,DK2,X,k)
+          CALL PUSHTKT7(EL,X,k)
+          if(f1==0.and.pos==EL%P%NST) then   ! this becomes nst
+             CALL KICKPATH(EL,DK,X,k)
+             CALL KICKTKT7(EL,DK,X,k)
+          endif
+       elseif(mod(pos,EL%F*2)==1.and.pos/=1) then
+          CALL KICKPATH(EL,DK,X,k)
+          CALL KICKTKT7(EL,DK2,X,k)    ! 1/3
+          CALL KICKPATH(EL,DK,X,k)
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==1) then             ! 1/6
+          CALL KICKTKT7(EL,DK,X,k)
+          CALL KICKPATH(EL,DK,X,k)
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==EL%P%NST) then             ! 1/6
+          CALL PUSHTKT7(EL,X,k)
+          CALL KICKPATH(EL,DK,X,k)
+          CALL KICKTKT7(EL,DK,X,k)
+       else
+          CALL PUSHTKT7(EL,X,k)
+       endif
+
+       CALL KILL(DK,DK2,DK6)
 
     CASE(4)
        CALL ALLOC(DK,DK2,DK6)
@@ -6420,6 +6620,56 @@ contains
        CALL KICKTKT7(EL,DK,X,k) ! NEW
 
        CALL KILL(DK,DK2,DK6)
+
+    CASE(5)
+
+       CALL ALLOC(DK,DK2,DK6,DK4,DK5)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=3*EL%F+1
+       endif
+
+       DK2=c_14*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 14/90
+       DK4=c_32*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 32/90
+       DK6=twelve*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 12/90
+       DK5=DK6/two  ! 6/90
+       DK=DK2/two    ! 7/90
+
+       if(mod(pos,EL%F*4)==EL%F+1) then
+          CALL KICKTKT7(EL,DK4,X,k)  ! 32/90
+          CALL KICKPATH(EL,DK4,X,k)  ! 32/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(mod(pos,EL%F*4)==f1) then
+          CALL KICKPATH(EL,DK4,X,k)  ! 32/90
+          CALL KICKTKT7(EL,DK4,X,k)  ! 32/90
+          CALL PUSHTKT7(EL,X,k)
+          if(f1==0.and.pos==EL%P%NST) then   ! this becomes nst
+             CALL KICKPATH(EL,DK,X,k)  ! 7/90
+             CALL KICKTKT7(EL,DK,X,k) !  7/90
+          endif
+       elseif(mod(pos,EL%F*4)==2*EL%F+1) then
+          CALL KICKPATH(EL,DK5,X,k)  ! 6/90
+          CALL KICKTKT7(EL,DK6,X,k)  ! 12/90
+          CALL KICKPATH(EL,DK5,X,k)  ! 6/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(mod(pos,EL%F*4)==1.and.pos/=1) then
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL KICKTKT7(EL,DK2,X,k) ! 14/90
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==1) then
+          CALL KICKTKT7(EL,DK,X,k)  ! 7/90
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL PUSHTKT7(EL,X,k)
+       elseif(pos==EL%P%NST) then
+          CALL PUSHTKT7(EL,X,k)
+          CALL KICKPATH(EL,DK,X,k)  ! 7/90
+          CALL KICKTKT7(EL,DK,X,k) !  7/90
+       else
+          CALL PUSHTKT7(EL,X,k)
+       endif
+       CALL KILL(DK,DK2,DK6,DK4,DK5)
 
     CASE(6)
        CALL ALLOC(DK,DK2,DK6,DK4,DK5)
@@ -6477,7 +6727,7 @@ contains
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     DO I=1,EL%P%NST
-       IF(.NOT.PRESENT(MID))CALL TRACK_SLICE(EL,X,k)
+       IF(.NOT.PRESENT(MID))CALL TRACK_SLICE(EL,X,k,I)
        IF(PRESENT(MID)) CALL XMID(MID,X,I)
     ENDDO
 
@@ -6498,7 +6748,7 @@ contains
     ENDIF
 
     DO I=1,EL%P%NST
-       CALL TRACK_SLICE(EL,X,k)
+       CALL TRACK_SLICE(EL,X,k,I)
     ENDDO
 
     IF(KNOB) THEN
@@ -11290,6 +11540,32 @@ contains
   ! TYPE multip
 
 
+  SUBROUTINE ZEROr_DKD2(EL,I)
+    IMPLICIT NONE
+    TYPE(DKD2), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
+    elseif(i==0)       then          ! nullifies
+       NULLIFY(EL%F)
+    endif
+
+  END SUBROUTINE ZEROr_DKD2
+
+  SUBROUTINE ZEROp_DKD2(EL,I)
+    IMPLICIT NONE
+    TYPE(DKD2P), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
+    elseif(i==0)       then          ! nullifies
+       NULLIFY(EL%F)
+    endif
+
+  END SUBROUTINE ZEROp_DKD2
+
 
   SUBROUTINE ZEROr_KTK(EL,I)
     IMPLICIT NONE
@@ -11390,6 +11666,7 @@ contains
     INTEGER, INTENT(IN)::I
     !integer k
     IF(I==-1) THEN
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
        if(ASSOCIATED(EL%MATX)) then
           deallocate(EL%MATX)
        endif
@@ -11410,6 +11687,7 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%F)
        NULLIFY(EL%MATX)
        NULLIFY(EL%MATY)
        NULLIFY(EL%LX)
@@ -11427,6 +11705,7 @@ contains
     integer k,j
 
     IF(I==-1) THEN
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
        if(ASSOCIATED(EL%MATX)) then
           DO K=1,2
              DO J=1,3
@@ -11476,6 +11755,7 @@ contains
 
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%F)
        NULLIFY(EL%MATX)
        NULLIFY(EL%MATY)
        NULLIFY(EL%LX)

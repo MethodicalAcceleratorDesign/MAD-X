@@ -1127,13 +1127,13 @@ CONTAINS
           A_XZ=1;A_YZ=1;
        ELSE
           EXI=EL1%CHART%F%ENT
-          !             call geo_rot(exi,pix,1,basis=exi)
+          call geo_rot(exi,pix,1,basis=exi)
           B=>EL1%CHART%F%A
           ENT=EL2%CHART%F%EXI
-          !             call geo_rot(ent,pix,1,basis=ent)
+          call geo_rot(ent,pix,1,basis=ent)
           A=>EL2%CHART%F%B
-          A_XZ=1;A_YZ=1;
-          !             A_XZ=-1;A_YZ=-1;
+          !             A_XZ=1;A_YZ=1;
+          A_XZ=-1;A_YZ=-1;
        ENDIF
     ELSE                          !   1
        IF(EL1%DIR==1) THEN
@@ -1778,6 +1778,63 @@ CONTAINS
     m_u%lastpos=1
   end SUBROUTINE TIE_MAD_UNIVERSE
 
+  SUBROUTINE move_to_name( m_u,current,name,pos)
+    ! moves to next one in list called name in tied universe
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), POINTER :: L
+    TYPE (mad_universe), target :: m_u
+    integer, intent(inout):: pos
+    character(*), intent(in):: name
+    CHARACTER(nlp) S1NAME
+    integer i
+
+    logical(lp) foundit,b
+    TYPE (fibre), POINTER :: p
+    TYPE (fibre), POINTER :: pb
+    TYPE (fibre), POINTER :: pa
+
+    !   locates magnet with name "name"
+    ! it searches back and forth
+
+    foundit=.false.
+    b=.false.
+    S1NAME=name
+    CALL CONTEXT(S1name)
+
+    nullify(p)
+    p=>m_u%last
+    pb=>p%p
+    pa=>p%n
+    if(.not.associated(p)) goto 100
+    do i=1,m_u%nf/2+1
+       if(pb%mag%name==s1name) then
+          foundit=.true.
+          b=.true.
+          goto 100
+       endif
+       if(pa%mag%name==s1name) then
+          foundit=.true.
+          goto 100
+       endif
+       pa=>pa%n
+       pb=>pb%p
+    enddo
+100 continue
+    if(foundit) then
+       if(b) then
+          current=>pb
+          pos=mod_n(m_u%lastpos-i,m_u%nf)
+       else
+          current=>pa
+          pos=mod_n(m_u%lastpos+i,m_u%nf)
+       endif
+       m_u%lastpos=pos
+       m_u%last=>current
+    else
+       pos=0
+    endif
+  END SUBROUTINE move_to_name
 
   !  THIN LENS STRUCTURE STUFF
 
