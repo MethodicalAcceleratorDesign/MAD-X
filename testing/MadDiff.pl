@@ -300,7 +300,7 @@ foreach $line (@lines) {
 					if ($line =~ /\|$/){
 						$txt = $line;
 						$txt =~ s/\|$//g; # to be checked
-						$diffReport .= "<tr class=\"only-left\"><td></td><td>$txt</td></tr>\n";
+						$diffReport .= "<tr class=\"only-left\"><td>$txt</td><td></td></tr>\n";
 			    			$retStatus = "failure"; # whatever previous val					
 					} else {
 		
