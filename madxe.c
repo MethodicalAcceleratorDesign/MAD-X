@@ -73,6 +73,7 @@ void error_seterr(struct in_cmd* cmd)
 
   char*    namtab;
   int      t1;
+  int      new_table_type;
 
   struct   table  *err;
 
@@ -113,6 +114,13 @@ void error_seterr(struct in_cmd* cmd)
   }
  
   err = table_register->tables[t1];
+  if(err->num_cols == (FIELD_MAX + ALIGN_MAX + 1) ) {
+       new_table_type = 1;
+  } else {
+       new_table_type = 0;
+       warning("old type of input error table", "empty fields zeroed ...");
+  }
+
 
 
   i = 1; /* watch out ! i is the ROW number, not the C index !!! */
@@ -151,12 +159,26 @@ void error_seterr(struct in_cmd* cmd)
                 nextnode->p_al_err->curr = ALIGN_MAX;
 
                 for (j = 1; j < EFIELD_TAB+1; j++) {
-             /*   printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]); */
-                  nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
+                  if(new_table_type) {
+                     /* printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]);  */
+                     nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
+                  } else {
+                     if(j < 23) {
+                        /* printf("efield errors: %d %e\n",j,err->d_cols[j][i-1]);  */
+                        nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
+                     }
+                  }
                 }
-                for (j = 1; j < err->num_cols-EFIELD_TAB; j++) {
-             /*   printf("ealign errors: %d %e\n",j,err->d_cols[j+EFIELD_TAB][i-1]); */
-                  nextnode->p_al_err->a[j-1] = err->d_cols[j+EFIELD_TAB][i-1];
+                if(new_table_type) {
+                  for (j = 1; j < err->num_cols-EFIELD_TAB; j++) {
+                     /*printf("ealign errors: %d %e\n",j,err->d_cols[j+EFIELD_TAB][i-1]); */
+                     nextnode->p_al_err->a[j-1] = err->d_cols[j+EFIELD_TAB][i-1];
+                  }
+                } else {
+                  for (j = 1; j < err->num_cols-22; j++) {
+                     /*printf("ealign errors: %d %e\n",j,err->d_cols[j+22][i-1]); */
+                     nextnode->p_al_err->a[j-1] = err->d_cols[j+22][i-1];
+                  }
                 }
                 
 
