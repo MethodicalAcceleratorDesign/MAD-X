@@ -27,7 +27,7 @@ FOPT=-static -m32
 CXX=$(CC)
 
 #FC8
-#LIBX= -lX11 -lXdmcp -lXau -lpthread
+#LIBX= -lX11 -lXdmcp -lXau -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/4.1.2" -lgcc -lgcc_eh
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
 
 INCLUDES=-I.
@@ -358,7 +358,7 @@ madxp: \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o \
-	$(LIBX) -lm -lc
+	$(LIBX)
 
 
 clean:
