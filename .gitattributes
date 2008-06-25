@@ -115,6 +115,7 @@
 /plot_math.fi -text
 /poisson.F -text
 /ptc_dummy.F -text
+/ptc_export_xml.f90 -text
 /resindex.F -text
 /resindex.fi -text
 /rplot.c -text
