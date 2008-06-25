@@ -373,6 +373,9 @@ char command_def[] =
 "sector_nmul_max = [i, 10], "
 "sector_nmul = [i, 5]; "
 " "
+"ptc_export_xml: ptc_export_xml none 0 0 " /* space after 0! */
+"file = [s,output.xml,output.xml] ; " /* defaults to output.xml */
+" "
 "ptc_create_layout: ptc_create_layout none 0 0 "
 "time = [l, true, true], "
 "model = [i, 1], "

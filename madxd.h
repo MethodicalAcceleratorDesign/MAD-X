@@ -79,6 +79,7 @@
 #define vmod                  vmod_
 #define w_ptc_create_universe   w_ptc_create_universe_
 #define w_ptc_create_layout     w_ptc_create_layout_
+#define w_ptc_export_xml	w_ptc_export_xml_
 #define w_ptc_move_to_layout    w_ptc_move_to_layout_
 #define w_ptc_input             w_ptc_input_
 #define w_ptc_align             w_ptc_align_
@@ -223,6 +224,7 @@
 #define vmod                  VMOD
 #define w_ptc_create_universe   W_PTC_CREATE_UNIVERSE
 #define w_ptc_create_layout     W_PTC_CREATE_LAYOUT
+#define w_ptc_export_xml	W_PTC_EXPORT_XML
 #define w_ptc_move_to_layout    W_PTC_MOVE_TO_LAYOUT
 #define w_ptc_input             W_PTC_INPUT
 #define w_ptc_align             W_PTC_ALIGN
@@ -918,6 +920,7 @@ void track_tables_dump();
 void track_track(struct in_cmd*);
 void w_ptc_create_universe();
 void w_ptc_create_layout();
+void w_ptc_export_xml(int * filename);
 void w_ptc_move_to_layout();
 void w_ptc_input();
 void w_ptc_align();

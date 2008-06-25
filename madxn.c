@@ -6846,6 +6846,47 @@ void pro_ptc_printframes(struct in_cmd* cmd)
 
 
 }
+
+/********************************************************************************/
+
+void pro_ptc_export_xml(struct in_cmd* cmd)
+{
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  int                            pos         = 0;  
+  char*                          filename    = 0x0;
+  struct int_array*              filenameIA      = 0x0;
+/*  char*                          format    = 0x0; */
+
+  pos   = name_list_pos("file", c_parnames);
+  if (pos < 0)
+  {
+  	/* should never enter here */
+	printf("madxn.c: pro_ptc_export_xml: file parameter does not exist.\n");
+	return;
+  }
+  
+  filename  = c_parameters->parameters[pos]->string;
+  printf("will write to file %s\n",filename);
+  
+  if ( filename == 0x0 )
+  {
+    warning("madxn.c: pro_ptc_export_xml: no file name: ", "ignored");
+    return;
+  }
+
+  filenameIA = new_int_array(1+strlen(filename));
+
+  conv_char(filename,filenameIA);
+
+    w_ptc_export_xml(filenameIA->i);
+
+  delete_int_array(filenameIA);
+
+}
+
+
+
 /********************************************************************************/
 
 

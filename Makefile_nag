@@ -249,6 +249,8 @@ madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_distrib.o madx_p
 madx_ptc_distrib.o: Sp_keywords.o madx_ptc_distrib.f90
 	$(f95) $(f95_FLAGS) madx_ptc_distrib.f90
 
+ptc_export_xml.o: ptc_export_xml.f90
+	$(f95) $(f95_FLAGS) ptc_export_xml.f90
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
@@ -314,7 +316,7 @@ madxp: \
 	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
-	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
+	ptc_export_xml.o madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o
 	$(f95) $(FOPT) -o madxp madx_main.o run_madx.o madxpf.o matchptcknobs.o twiss.o \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlibp.o \
@@ -331,7 +333,7 @@ madxp: \
 	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
 	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
 	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
-	madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
+	ptc_export_xml.o madx_ptc_knobs.o madx_ptc_eplacement.o rplot.o \
 	user2_photon.o poissonp.o wrap.o \
 	$(LIBX) -lm -lc
 

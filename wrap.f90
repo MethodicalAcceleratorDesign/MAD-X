@@ -10,6 +10,13 @@ subroutine w_ptc_create_layout()
   call ptc_create_layout()
 end subroutine w_ptc_create_layout
 
+subroutine w_ptc_export_xml(filename)
+  use ptc_export_xml_module
+  implicit none
+  integer filename(*)
+  call ptc_export_xml(filename)
+end subroutine w_ptc_export_xml
+
 subroutine w_ptc_move_to_layout()
   use madx_ptc_module
   implicit none

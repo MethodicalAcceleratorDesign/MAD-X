@@ -1526,6 +1526,12 @@ void exec_command()
           curr_obs_points = 1;  /* default: always observe at machine end */
         }
       }
+      /* export XML */
+      else if (strcmp(p->cmd_def->module, "ptc_export_xml") == 0)
+      {
+	/* command with parameters, decoded by dedicated function in madxn.c */
+	pro_ptc_export_xml(p);
+      }      
       else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
       {
         if (match_is_on == kMatch_PTCknobs)

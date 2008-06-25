@@ -165,6 +165,7 @@ madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o mad
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
 madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_twiss.f90
 madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.f90
+ptc_export_xml.o: ptc_export_xml.f90
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
