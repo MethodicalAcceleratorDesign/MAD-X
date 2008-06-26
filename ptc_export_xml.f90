@@ -1,6 +1,5 @@
 module ptc_export_xml_module
 use madx_ptc_module ! to access the layout 'MY_RING'
-use pointer_lattice
 implicit none
 
 private
