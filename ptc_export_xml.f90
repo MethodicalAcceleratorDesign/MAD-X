@@ -63,7 +63,7 @@ nt=0
     call print_XML_beam(L,mf,xml_level+1)
 
     write (MF,*) '</ptc-machine>'
-    
+    close(MF)    
   END subroutine ptc_export_xml
 
   subroutine print_FIBRE_SIXTRACK(fibre_ptr,file_handle,xml_level)
