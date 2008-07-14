@@ -10210,7 +10210,7 @@ contains
 
   END SUBROUTINE KICKEXP
 
-  SUBROUTINE INTER_STREX(EL,X,k)
+  SUBROUTINE INTER_STREX(EL,X,k,pos)
     IMPLICIT NONE
     TYPE(STREX),INTENT(IN):: EL
     real(dp), INTENT(INOUT) ::  X(6)
@@ -10218,12 +10218,26 @@ contains
     real(dp) D1,D2,DK1,DK2
     real(dp) DD1,DD2
     real(dp) DF(4),DK(4),DDF(4)
-    INTEGER I,J
+    INTEGER I,J,f1,pos
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(EL%DRIFTKICK) THEN
 
        SELECT CASE(EL%P%METHOD)
+       CASE(1)
+          if(EL%F==1) then
+             f1=0
+          else
+             f1=EL%F+1
+          endif
+          DH=EL%L/EL%P%NST
+          D=EL%L/(EL%P%NST/EL%F/2)
+          DD=EL%P%LD/EL%P%NST
+
+          IF(MOD(POS,2*EL%F)==f1) THEN
+             CALL KICKEX (EL,D,X,k)
+          ENDIF
+          CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        CASE(2)
           DH=EL%L/two/EL%P%NST
           D=EL%L/EL%P%NST
@@ -10334,7 +10348,7 @@ contains
 
   END SUBROUTINE INTER_STREX
 
-  SUBROUTINE INTEP_STREX(EL,X,k)
+  SUBROUTINE INTEP_STREX(EL,X,k,pos)
     IMPLICIT NONE
     TYPE(STREXP),INTENT(IN):: EL
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
@@ -10342,12 +10356,28 @@ contains
     real(dp) DD1,DD2
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
-    INTEGER I,J
+    INTEGER I,J,f1,pos
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(EL%DRIFTKICK) THEN
 
        SELECT CASE(EL%P%METHOD)
+       CASE(1)
+          if(EL%F==1) then
+             f1=0
+          else
+             f1=EL%F+1
+          endif
+          CALL ALLOC(DH,D)
+          DH=EL%L/EL%P%NST
+          D=EL%L/(EL%P%NST/EL%F/2)
+          DD=EL%P%LD/EL%P%NST
+
+          IF(MOD(POS,2*EL%F)==f1) THEN
+             CALL KICKEX (EL,D,X,k)
+          ENDIF
+          CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
+          CALL kill(DH,D)
        CASE(2)
           CALL ALLOC(DH,D)
           DH=EL%L/two/EL%P%NST
@@ -10482,7 +10512,7 @@ contains
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     DO I=1,EL%P%NST
-       IF(.NOT.PRESENT(MID))CALL TRACK_SLICE(EL,X,k)
+       IF(.NOT.PRESENT(MID))CALL TRACK_SLICE(EL,X,k,i)
        IF(PRESENT(MID)) CALL XMID(MID,X,I)
     ENDDO
 
@@ -10503,7 +10533,7 @@ contains
 
 
     DO I=1,EL%P%NST
-       CALL TRACK_SLICE(EL,X,k)
+       CALL TRACK_SLICE(EL,X,k,i)
     ENDDO
 
   END SUBROUTINE INTEEXP
@@ -10686,7 +10716,7 @@ contains
 
     IF(.NOT.PRESENT(MID))CALL fringe_STREX(EL,X,k,1)
 
-    CALL INTE_strex(EL,X,k,MID)
+    CALL INTE_strex(EL,X,k,mid)
 
     IF(.NOT.PRESENT(MID))CALL fringe_STREX(EL,X,k,2)
 
@@ -12006,8 +12036,10 @@ contains
        if(ASSOCIATED(EL%LIKEMAD)) then
           deallocate(EL%LIKEMAD)
        endif
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%F)
        NULLIFY(EL%DRIFTKICK)
        NULLIFY(EL%LIKEMAD)
     endif
@@ -12026,9 +12058,11 @@ contains
        if(ASSOCIATED(EL%LIKEMAD)) then
           deallocate(EL%LIKEMAD)
        endif
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
        NULLIFY(EL%LIKEMAD)
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%F)
        NULLIFY(EL%DRIFTKICK)
     endif
 

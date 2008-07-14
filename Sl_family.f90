@@ -520,7 +520,7 @@ CONTAINS
           AF=>C%SIAMESE_FRAME
           CN=>C
           FOUND=MY_TRUE
-          WRITE(6,*) " HERE 1 ", FOUND
+          !          WRITE(6,*) " HERE 1 ", FOUND
           RETURN
        ENDIF
 
@@ -528,7 +528,7 @@ CONTAINS
           IF(ASSOCIATED(CN%SIAMESE_FRAME)) THEN
              AF=>CN%SIAMESE_FRAME
              FOUND=MY_TRUE
-             WRITE(6,*) " HERE 2 ", FOUND
+             !             WRITE(6,*) " HERE 2 ", FOUND
              EXIT
           ENDIF
           CN=>CN%SIAMESE
@@ -567,7 +567,7 @@ CONTAINS
 
   END SUBROUTINE FIND_FRAME_SIAMESE
 
-  SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD)
+  RECURSIVE SUBROUTINE  MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD,preserve_girder)
     ! SAME AS MISALIGN_FIBRE: DEFAULT IS THE O,MID OF S2
     !   UNLESS IT FINDS  TYPE(AFFINE_FRAME), POINTER :: SIAMESE_FRAME ON S2%SIAMESE CHAIN
     ! ON ONE SIAMESE IN THE CHAIN
@@ -583,16 +583,42 @@ CONTAINS
     TYPE(fibre), POINTER :: P
     integer k
     REAL(DP) OMEGAT(3),BASIST(3,3),B(3),EXI(3,3)
-    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
-    LOGICAL(LP) ADDIN
+    real(dp) a1(3),e1(3,3),a2(3),e2(3,3),dg1(3),ag1(3),mis(6)
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD,preserve_girder
+    LOGICAL(LP) ADDIN,pres
     TYPE(AFFINE_FRAME),POINTER :: AF
     LOGICAL(LP) FOUND
+    LOGICAL(LP) FOUNDg
+    type(element), pointer :: caf
     !    REAL(DP) D(3),ANG(3)
 
     FOUND=.FALSE.
     ADDIN=.FALSE.
+    pres=.FALSE.
+    if(present(preserve_girder)) pres=preserve_girder
     CALL FIND_AFFINE_SIAMESE(S2,CN,FOUND)  ! Looking for siamese WITH FRAME
     IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD) ! FIND ACTUAL FRAME
+
+    FOUNDg=.false.
+    if(pres.and.associated(s2%mag%girder).and.(.not.addin)) then
+       CALL FIND_AFFINE_GIRDER(S2,CAF,FOUNDg)
+       if(foundg) then
+          a1=caf%girder_frame%a
+          e1=caf%girder_frame%ent
+          a2=caf%girder_frame%b
+          e2=caf%girder_frame%exi
+          !         call INVERSE_FIND_PATCH(a1,e1,dg1,ag1,a2,e2)
+          call FIND_PATCH(a1,e1,a2,e2,dg1,ag1)
+          mis=zero
+          call MISALIGN_siamese(S2,MIS)
+          MIS(1:3)=DG1
+          MIS(4:6)=AG1
+
+          call MISALIGN_SIAMESE(S2,MIS,OMEGA=a1,BASIS=e1)
+          call MISALIGN_SIAMESE(S2,S1,OMEGA,BASIS,ADD=my_true,preserve_girder=my_false)
+          return
+       endif
+    endif
 
     IF(PRESENT(ADD)) ADDIN=ADD
 
@@ -829,23 +855,56 @@ CONTAINS
 
 
 
-  SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS,ADD) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
+  recursive SUBROUTINE  MISALIGN_FIBRE(S2,S1,OMEGA,BASIS,ADD,preserve_girder)
+    ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     ! changed  add=true add extra misalignments TO EXISTING ONES
     ! O AND MID BY DEFAUTL, OTHERWISE OMEGA AND BASIS
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     REAL(DP), OPTIONAL, INTENT(IN) :: OMEGA(3),BASIS(3,3)
-    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD
+    LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD,preserve_girder
     TYPE(FIBRE),target,INTENT(INOUT):: S2
     REAL(DP) ANGLE(3),T_GLOBAL(3),d(3),r(3)
     TYPE(MAGNET_FRAME), POINTER :: F,F0
     REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
     TYPE(INTEGRATION_NODE),POINTER :: T
     INTEGER I
-    LOGICAL(LP) ADDIN
+    LOGICAL(LP) ADDIN,pres
+    TYPE(AFFINE_FRAME),POINTER :: AF
+    LOGICAL(LP) FOUNDg
+    type(element), pointer :: caf
+    real(dp) a1(3),e1(3,3),a2(3),e2(3,3),dg1(3),ag1(3),mis(6)
+
+
 
     ADDIN=.FALSE.
+    pres=.FALSE.
     IF(PRESENT(ADD)) ADDIN=ADD
+    if(present(preserve_girder)) pres=preserve_girder
+
+    FOUNDg=.false.
+    if(pres.and.associated(s2%mag%girder).and.(.not.addin)) then
+       CALL FIND_AFFINE_GIRDER(S2,CAF,FOUNDg)
+       if(foundg) then
+          a1=caf%girder_frame%a
+          e1=caf%girder_frame%ent
+          a2=caf%girder_frame%b
+          e2=caf%girder_frame%exi
+          !         call INVERSE_FIND_PATCH(a1,e1,dg1,ag1,a2,e2)
+          call FIND_PATCH(a1,e1,a2,e2,dg1,ag1)
+          mis=zero
+          call MISALIGN_fibre(S2,MIS)
+          MIS(1:3)=DG1
+          MIS(4:6)=AG1
+
+          call MISALIGN_fibre(S2,MIS,OMEGA=a1,BASIS=e1)
+          call MISALIGN_fibre(S2,S1,OMEGA,BASIS,ADD=my_true,preserve_girder=my_false)
+          return
+       endif
+    endif
+
+
+
     IF(ASSOCIATED(S2%CHART)) THEN
        !       IF(.NOT.ASSOCIATED(S2%MAG%D) ) ALLOCATE(S2%MAG%D(3))
        !       IF(.NOT.ASSOCIATED(S2%MAG%R) ) ALLOCATE(S2%MAG%R(3))
@@ -1184,7 +1243,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE (element),TARGET,INTENT(INOUT):: R
     REAL(DP),INTENT(IN):: ang(3)
-    REAL(DP), OPTIONAL :: BASIS(3,3),omega(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
     TYPE(FIBRE), POINTER::P
     INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
@@ -1192,7 +1251,7 @@ CONTAINS
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
     LOGICAL(LP) PAT
-    REAL(DP) PREC0
+    REAL(DP) PREC0,omega(3)
     type(fibre_appearance), pointer :: dk
     integer k
 
@@ -1485,18 +1544,21 @@ CONTAINS
     TYPE (FIBRE),TARGET,INTENT(INOUT):: R
     REAL(DP),INTENT(IN):: D(3)
     REAL(DP), OPTIONAL :: BASIS(3,3)
-    TYPE(FIBRE), POINTER::P
+    TYPE(FIBRE), POINTER::P,pp
     INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
     TYPE(INTEGRATION_NODE), POINTER :: T
     TYPE(element), POINTER::caf
     logical(lp), OPTIONAL, INTENT(IN) :: dogirder
     REAL(DP) DD(3),T_GLOBAL(3)
+    type(fibre_appearance), pointer :: dk
+
     logical(lp) dog
     dog=.false.
     if(present(dogirder)) dog=dogirder
 
     P=>R
+    Pp=>R
 
     IORDER=1
     DD=D
@@ -1523,6 +1585,26 @@ CONTAINS
 
     !    ENDIF
 
+    if(associated(R%mag%doko).and.associated(p,r%mag%parent_fibre)) then
+       dk=>R%mag%doko
+       do while(associated(dk))  !!! PATCH TO DOKO'S  IF CREATED USING DNA I.E. APPEND_POINT
+          pP=> dk%parent_fibre
+          IF(ASSOCIATED(PP%T1)) THEN
+             IF(ASSOCIATED(PP%T1%A)) THEN
+                T=>PP%T1
+                DO WHILE(.NOT.ASSOCIATED(PP%T2,T))
+                   CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+                   CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+                   T=>T%NEXT
+                ENDDO
+                CALL GEO_TRA(T%A,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+                CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
+             ENDIF
+          ENDIF
+
+          dk=>dk%next
+       enddo
+    endif
     IF(ASSOCIATED(R%T1)) THEN
        IF(ASSOCIATED(R%T1%A)) THEN
           T=>P%T1
@@ -1535,6 +1617,7 @@ CONTAINS
           CALL GEO_TRA(T%B,GLOBAL_FRAME,DD,IORDER)    ! A= A +I D*ENT
        ENDIF
     ENDIF
+
     if(dog) then    ! IF  DOGIRDER IS SET TO TRUE
        if(associated(r%mag%GIRDER_FRAME)) then
           caf=>r%mag
@@ -1592,7 +1675,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE (FIBRE),TARGET,INTENT(INOUT):: R
     REAL(DP),INTENT(IN):: OMEGA(3),Ang(3)
-    TYPE(FIBRE), POINTER::P
+    TYPE(FIBRE), POINTER::P,pp
     REAL(DP) OMEGAT(3)
     INTEGER IORDER
     INTEGER, OPTIONAL :: ORDER
@@ -1602,12 +1685,15 @@ CONTAINS
     TYPE(element), POINTER::caf
     logical(lp), OPTIONAL, INTENT(IN) :: dogirder
     logical(lp) dog
+    type(fibre_appearance), pointer :: dk
+
     dog=.false.
     if(present(dogirder)) dog=dogirder
 
 
     OMEGAT=OMEGA
     P=>R
+    Pp=>R
     IORDER=1
     IF(PRESENT(ORDER)) IORDER=ORDER
     BASIST=GLOBAL_FRAME            ! NECESSARY SINCE BASIS CAN CHANGE DURING THE CALCULATION ASSUMING A POINTER IS PASSED
@@ -1632,6 +1718,34 @@ CONTAINS
     ENDIF
     !    ENDIF
 
+    if(associated(R%mag%doko).and.associated(p,r%mag%parent_fibre)) then
+       dk=>R%mag%doko
+       do while(associated(dk))  !!! PATCH TO DOKO'S  IF CREATED USING DNA I.E. APPEND_POINT
+          pP=> dk%parent_fibre
+          IF(ASSOCIATED(pp%T1)) THEN
+             IF(ASSOCIATED(pp%T1%A)) THEN
+                T=>pp%T1
+                DO WHILE(.NOT.ASSOCIATED(pp%T2,T))
+                   D=T%A-OMEGAT
+                   CALL GEO_ROT(T%ENT,D,ANG,IORDER,BASIST)
+                   T%A=OMEGAT+D
+                   D=T%B-OMEGAT     ! ERROR BEFORE  2008.5.20
+                   CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
+                   D=T%B-OMEGAT
+                   T=>T%NEXT
+                ENDDO
+                D=T%A-OMEGAT
+                CALL GEO_ROT(T%ENT,D,ANG,IORDER,BASIST)
+                T%A=OMEGAT+D
+                D=T%B-OMEGAT     ! ERROR BEFORE  2008.5.20
+                CALL GEO_ROT(T%EXI,D,ANG,IORDER,BASIST)
+                D=T%B-OMEGAT
+             ENDIF
+          ENDIF
+
+          dk=>dk%next
+       enddo
+    endif
     IF(ASSOCIATED(R%T1)) THEN
        IF(ASSOCIATED(R%T1%A)) THEN
           T=>R%T1
@@ -1833,6 +1947,7 @@ CONTAINS
              ANG=P%A_ANG ;
 
              DT=P%A_D
+             ! seems wrong !
              IF(P%A_X1*P%A_X2<0) ANG(1)=ANG(1)+PI
              IF(P%A_X2<0) then
                 ANG(2)=-ANG(2)

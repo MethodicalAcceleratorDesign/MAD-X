@@ -838,7 +838,8 @@ CONTAINS
     REAL(DP) DD(3)
 
     EXI=ENT
-    CALL GEO_ROTA_no_vec(EXI,ANG,1,basis=ENT)
+    CALL GEO_ROT(EXI,ANG,1,basis=ENT)
+    !    CALL GEO_ROTA_no_vec(EXI,ANG,1,basis=ENT)
     CALL CHANGE_BASIS(D,EXI,DD,GLOBAL_FRAME)
     B=A+DD
 

@@ -476,9 +476,9 @@ contains
           CALL assign_one_aperture(my_ering,pos,kindaper,APER_R,APER_X,APER_Y)
           ! end of layout stuff
           ! random stuff
-       case('TURNONBEAMBEAMKICK','TURNONBEAMBEAM')
-          READ(MF,*) USE_BEAM
-          MY_BEAMS(USE_BEAM)%BEAM_BEAM=my_true
+          !       case('TURNONBEAMBEAMKICK','TURNONBEAMBEAM')
+          !          READ(MF,*) USE_BEAM
+          !          MY_BEAMS(USE_BEAM)%BEAM_BEAM=my_true
 
        case('GAUSSIANSEED')
           READ(MF,*) I1

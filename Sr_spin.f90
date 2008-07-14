@@ -3535,9 +3535,10 @@ contains
        ENDIF
        P(1)=XT%XS%X(2)*XT%NODE%PARENT_FIBRE%mag%p%p0c
        P(2)=XT%XS%X(4)*XT%NODE%PARENT_FIBRE%mag%p%p0c
-       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c* &
-            (one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-xt%pos(4)**2-xt%pos(5)**2
-       pz=root(pz)*XT%NODE%PARENT_FIBRE%DIR
+       !       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c* &
+       !            (one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-xt%pos(4)**2-xt%pos(5)**2
+       pz=(one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-XT%XS%X(2)**2-XT%XS%X(4)**2
+       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c*root(pz)*XT%NODE%PARENT_FIBRE%DIR
        P(3)=PZ
        DO I=1,3
           XT%POS(i+3)=XT%POS(i+3) + P(1)*XT%NODE%ENT(1,I)     !

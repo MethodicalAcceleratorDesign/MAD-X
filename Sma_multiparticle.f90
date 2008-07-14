@@ -661,7 +661,7 @@ CONTAINS
           call SEPTTRACK(EL%SEP15,X,k,t%POS_IN_FIBRE-2)
           !          CALL TRACK_SLICE(EL%SEP15,X,K)
        case(KIND16,KIND20)
-          CALL TRACK_SLICE(EL%K16,X,K)
+          CALL TRACK_SLICE(EL%K16,X,K,t%POS_IN_FIBRE-2)
        case(KIND17)
           CALL TRACK_SLICE(EL%S17,X,K)
        case(KIND18)
@@ -828,7 +828,7 @@ CONTAINS
           call SEPTTRACK(EL%SEP15,X,k,t%POS_IN_FIBRE-2)
           !          CALL TRACK_SLICE(EL%SEP15,X,K)
        case(KIND16,KIND20)
-          CALL TRACK_SLICE(EL%K16,X,K)
+          CALL TRACK_SLICE(EL%K16,X,K,t%POS_IN_FIBRE-2)
        case(KIND17)
           CALL TRACK_SLICE(EL%S17,X,K)
        case(KIND18)
@@ -1487,7 +1487,7 @@ CONTAINS
     B2%X=B1%X
     B2%U=B1%U
     B2%N=B1%N
-    B2%CHARGE=B1%CHARGE
+    !    B2%CHARGE=B1%CHARGE
     B2%LOST=B1%LOST
     DO I=0,B1%N
        if(associated(B1%POS(I)%NODE))then
@@ -1623,11 +1623,11 @@ CONTAINS
        I1=I
        I2=I
     ENDIF
-    IF(B%TIME_INSTEAD_OF_S) THEN
-       WRITE(MF,*) "____________________________ TIME TRACKED BEAM __________________________________"
-    ELSE
-       WRITE(MF,*) "_________________ POSITION TRACKED BEAM (AS IN PTC PROPER)_______________________"
-    ENDIF
+    !    IF(B%TIME_INSTEAD_OF_S) THEN
+    !       WRITE(MF,*) "____________________________ TIME TRACKED BEAM __________________________________"
+    !    ELSE
+    WRITE(MF,*) "_________________ POSITION TRACKED BEAM (AS IN PTC PROPER)_______________________"
+    !    ENDIF
 
     DO K=I1,I2
        IF(B%U(K)) THEN
@@ -1642,11 +1642,11 @@ CONTAINS
           IF(T%CAS==CASE0)WRITE(MF,*) " AT THE STEP NUMBER ",T%pos_in_fibre-2
 
           WRITE(MF,*) "........................................................................."
-          IF(B%TIME_INSTEAD_OF_S) THEN
-             WRITE(MF,*) " TIME AND POSITION AFTER THIN SLICE = ",B%X(K,6:7)
-          ELSE
-             WRITE(MF,*) " TIME AND POSITION  = ",B%X(K,6:7)
-          ENDIF
+          !          IF(B%TIME_INSTEAD_OF_S) THEN
+          !             WRITE(MF,*) " TIME AND POSITION AFTER THIN SLICE = ",B%X(K,6:7)
+          !          ELSE
+          WRITE(MF,*) " TIME AND POSITION  = ",B%X(K,6:7)
+          !          ENDIF
           WRITE(MF,*) " X,Y = ",B%X(K,1),B%X(K,3)
           WRITE(MF,*) " PX,PY = ",B%X(K,2),B%X(K,4)
           WRITE(MF,*) " ENERGY VARIABLE = ",B%X(K,5)
@@ -1662,15 +1662,15 @@ CONTAINS
     IMPLICIT NONE
     TYPE(BEAM) , INTENT (INOUT) :: B
     NULLIFY(B%N,B%LOST)
-    NULLIFY(B%Y)
+    !    NULLIFY(B%Y)
     NULLIFY(B%X)
     NULLIFY(B%U)
     NULLIFY(B%POS)
-    NULLIFY(B%CHARGE)
-    NULLIFY(B%TIME_INSTEAD_OF_S)
-    NULLIFY(B%SIGMA)
-    NULLIFY(B%DX,B%ORBIT)
-    NULLIFY(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
+    !    NULLIFY(B%CHARGE)
+    !    NULLIFY(B%TIME_INSTEAD_OF_S)
+    !    NULLIFY(B%SIGMA)
+    !    NULLIFY(B%DX,B%ORBIT)
+    !    NULLIFY(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
   END SUBROUTINE NULLIFY_BEAM
 
   SUBROUTINE NULLIFY_BEAMS(B)
@@ -1703,10 +1703,9 @@ CONTAINS
 
   end subroutine alloc_three_d_info
 
-  SUBROUTINE ALLOCATE_BEAM(B,N,POLYMORPH)
+  SUBROUTINE ALLOCATE_BEAM(B,N)
     IMPLICIT NONE
     TYPE(BEAM) , INTENT (INOUT) :: B
-    LOGICAL(LP), OPTIONAL, INTENT(IN) :: POLYMORPH
     INTEGER , INTENT (IN) :: N
     INTEGER I
 
@@ -1714,49 +1713,50 @@ CONTAINS
 
     B%N=N
     B%LOST=0
-    NULLIFY(B%Y)
-    IF(PRESENT(POLYMORPH)) THEN
-       IF(POLYMORPH) then
-          ALLOCATE(B%Y(6))
-          CALL ALLOC(B%Y)
-       endif
-    ENDIF
+    !    NULLIFY(B%Y)
+    !    IF(PRESENT(POLYMORPH)) THEN
+    !       IF(POLYMORPH) then
+    !          ALLOCATE(B%Y(6))
+    !          CALL ALLOC(B%Y)
+    !       endif
+    !    ENDIF
     ALLOCATE(B%X(N,7))
     ALLOCATE(B%U(0:N))
     ALLOCATE(B%POS(0:N))
-    ALLOCATE(B%SIGMA(6))
-    ALLOCATE(B%DX(3))
-    ALLOCATE(B%ORBIT(6))
-    ALLOCATE(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
+    !    ALLOCATE(B%SIGMA(6))
+    !    ALLOCATE(B%DX(3))
+    !    ALLOCATE(B%ORBIT(6))
+    !    ALLOCATE(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
     DO I=0,N
        NULLIFY(B%POS(i)%NODE)
     ENDDO
-    ALLOCATE(B%CHARGE)
-    ALLOCATE(B%TIME_INSTEAD_OF_S)
+    !   ALLOCATE(B%CHARGE)
+    !   ALLOCATE(B%TIME_INSTEAD_OF_S)
 
     B%X  = ZERO
     B%U  = .FALSE.
-    B%CHARGE=1
-    B%TIME_INSTEAD_OF_S=.FALSE.
+    !    B%CHARGE=1
+    !    B%TIME_INSTEAD_OF_S=.FALSE.
 
-    B%SIGMA=ZERO
-    B%DX=ZERO
-    B%BBPAR=ZERO
-    B%ORBIT=ZERO
-    B%BEAM_BEAM=MY_FALSE
-    B%BBORBIT=MY_FALSE
+    !    B%SIGMA=ZERO
+    !    B%DX=ZERO
+    !    B%BBPAR=ZERO
+    !    B%ORBIT=ZERO
+    !    B%BEAM_BEAM=MY_FALSE
+    !    B%BBORBIT=MY_FALSE
   END SUBROUTINE ALLOCATE_BEAM
 
   SUBROUTINE KILL_BEAM(B)
     IMPLICIT NONE
     TYPE(BEAM) , INTENT (INOUT) :: B
-    IF(ASSOCIATED(B%Y)) THEN
-       CALL KILL(B%Y)
-       DEALLOCATE(B%Y)
-    ENDIF
+    !    IF(ASSOCIATED(B%Y)) THEN
+    !       CALL KILL(B%Y)
+    !       DEALLOCATE(B%Y)
+    !    ENDIF
     IF(ASSOCIATED(B%N)) THEN
-       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS,B%CHARGE,B%TIME_INSTEAD_OF_S)
-       DEALLOCATE(B%SIGMA,B%DX,B%BBPAR,B%ORBIT,B%BEAM_BEAM,B%BBORBIT)
+       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS)
+       !       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS,B%CHARGE,B%TIME_INSTEAD_OF_S)
+       !      DEALLOCATE(B%SIGMA,B%DX,B%BBPAR,B%ORBIT,B%BEAM_BEAM,B%BBORBIT)
     ENDIF
   END SUBROUTINE KILL_BEAM
 

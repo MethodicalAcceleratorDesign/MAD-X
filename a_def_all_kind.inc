@@ -285,6 +285,7 @@ TYPE STREX
    logical(lp), POINTER :: DRIFTKICK,LIKEMAD
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END  TYPE STREX
 
 TYPE STREXP
@@ -294,6 +295,7 @@ TYPE STREXP
    logical(lp),  POINTER :: DRIFTKICK,LIKEMAD
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END  TYPE STREXP
 ! fitted magnet stuff
 

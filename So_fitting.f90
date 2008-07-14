@@ -2266,16 +2266,18 @@ contains
     real(dp) lmax0
     TYPE(FIBRE),target :: C
     INTEGER I,f0
-    logical(lp) drift
+    logical(lp) drift,doit
 
-    if(associated(c%parent_layout%parent_universe)) then
-       l=>c%parent_layout%parent_universe%start
-       do i=1,c%parent_layout%parent_universe%n
-          call kill(l%t)
-          l=>l%next
-       enddo
-    else
-       call kill(c%parent_layout%t)
+    if(associated(c%parent_layout)) then
+       if(associated(c%parent_layout%parent_universe)) then
+          l=>c%parent_layout%parent_universe%start
+          do i=1,c%parent_layout%parent_universe%n
+             call kill(l%t)
+             l=>l%next
+          enddo
+       else
+          call kill(c%parent_layout%t)
+       endif
     endif
 
     if(drift.and.C%MAG%KIND==KIND1) then
@@ -2285,7 +2287,11 @@ contains
        C%MAGp%p%nst=C%MAG%p%nst
        call COPY(C%MAG,C%MAGP)
     endif
-    IF(C%MAG%KIND==KIND7.or.(C%MAG%KIND==KIND2.and.C%MAG%p%method==2)) then
+    doit=C%MAG%KIND==KIND7.or.(C%MAG%KIND==KIND2.and.C%MAG%p%method==2)
+    if(associated(C%MAG%K16)) then
+       doit=(C%MAG%K16%DRIFTKICK.and.C%MAG%p%method==2)
+    endif
+    IF(doit) then
 
        f0=nint(C%MAG%l/lmax0)
        if(f0==0) f0=1
@@ -2310,6 +2316,9 @@ contains
        if(C%MAG%KIND==KIND7) then
           C%MAG%t7%f=f0
           C%MAGp%t7%f=f0
+       elseif(associated(C%MAG%K16)) then
+          C%MAG%K16%f=f0
+          C%MAGp%K16%f=f0
        else
           C%MAG%k2%f=f0
           C%MAGp%k2%f=f0

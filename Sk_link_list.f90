@@ -239,6 +239,7 @@ CONTAINS
 
     current%PARENT_LAYOUT=>L
     current%mag%PARENT_FIBRE=>current
+    current%magP%PARENT_FIBRE=>current
     !    current%magp%PARENT_FIBRE=>current
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
@@ -286,6 +287,7 @@ CONTAINS
 
     current%PARENT_LAYOUT=>L
     current%mag%PARENT_FIBRE=>current
+    current%magP%PARENT_FIBRE=>current
     !    current%magp%PARENT_FIBRE=>current
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
@@ -1132,7 +1134,7 @@ CONTAINS
           ENT=EL2%CHART%F%EXI
           call geo_rot(ent,pix,1,basis=ent)
           A=>EL2%CHART%F%B
-          !             A_XZ=1;A_YZ=1;
+          ! A_XZ=1;A_YZ=1;
           A_XZ=-1;A_YZ=-1;
        ENDIF
     ELSE                          !   1
@@ -1167,7 +1169,8 @@ CONTAINS
     DO I=1,3
        NORM=NORM+ABS(ANG(I))
     ENDDO
-    IF(NORM>PREC.OR.(A_XZ/=1.and.A_YZ/=1)) THEN
+    ene=(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)).or.(NORM<=PREC.and.(A_XZ==-1.and.A_YZ==-1))
+    IF(.not.ene) THEN
        ANG=ZERO
        PATCH_NEEDED=PATCH_NEEDED+10
     ENDIF
@@ -1255,13 +1258,13 @@ CONTAINS
              A_XZ=1;A_YZ=1;
           ELSE
              EXI=EL1%CHART%F%ENT
-             !             call geo_rot(exi,pix,1,basis=exi)
+             call geo_rot(exi,pix,1,basis=exi)
              B=>EL1%CHART%F%A
              ENT=EL2%CHART%F%EXI
-             !             call geo_rot(ent,pix,1,basis=ent)
+             call geo_rot(ent,pix,1,basis=ent)
              A=>EL2%CHART%F%B
-             A_XZ=1;A_YZ=1;
-             !             A_XZ=-1;A_YZ=-1;
+             !  A_XZ=1;A_YZ=1;
+             A_XZ=-1;A_YZ=-1;
           ENDIF
        ELSE                          !   1
           IF(EL1%DIR==1) THEN
@@ -1297,6 +1300,9 @@ CONTAINS
              NORM=NORM+ABS(ANG(I))
           ENDDO
           IF(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)) THEN
+             ANG=ZERO
+             PATCH_NEEDED=PATCH_NEEDED+1
+          ELSEIF(NORM<=PREC.and.(A_XZ==-1.and.A_YZ==-1)) THEN  ! added 2008.6.18
              ANG=ZERO
              PATCH_NEEDED=PATCH_NEEDED+1
           ENDIF

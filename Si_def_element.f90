@@ -13,6 +13,7 @@ MODULE S_DEF_ELEMENT
   logical(lp),PARAMETER::BERZ=.TRUE.,ETIENNE=.NOT.BERZ
   logical(lp) :: USE_TPSAFIT=.TRUE.  ! USE GLOBAL ARRAY INSTEAD OF PERSONAL ARRAY
   logical(lp), target :: set_tpsafit=.false.
+  logical(lp), target :: set_ELEMENT=.false.
   real(dp) , target :: scale_tpsafit=one
   real(dp), target :: tpsafit(lnv) !   used for fitting with tpsa in conjunction with pol_block
   PRIVATE copy_el_elp,copy_elp_el,copy_el_el
@@ -539,9 +540,12 @@ CONTAINS
     s2%VORNAME=' '
     !    s2%CHECK_NMUL=.TRUE.
     nullify(s2%tpsafit);nullify(s2%set_tpsafit);
+    nullify(s2%set_ELEMENT);
+
     IF(USE_TPSAFIT) then
        s2%tpsafit=>tpsafit
        s2%set_tpsafit=>set_tpsafit
+       s2%set_ELEMENT=>set_ELEMENT
     endif
 
     if(s1>0) then
@@ -682,7 +686,7 @@ CONTAINS
 
 
     IF(DOIT) THEN
-       IF(.not.S1%SET_TPSAFIT) THEN
+       IF(.not.S1%SET_TPSAFIT.AND.(.NOT.SET_ELEMENT)) THEN
           if(s2%knob) then
              write(6,'(A45,A16)')" BE CAREFUL USING A POL_BLOCK ON SAME MAGNET ",S2%NAME
           ENDIF
@@ -746,6 +750,9 @@ CONTAINS
           IF(S1%SET_TPSAFIT) THEN
              s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
           ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%aN(I)=s2%aN(I)%R
+          ENDIF
        ENDIF
        IF(S1%IBN(I)>0) THEN
           s2%BN(I)%I=S1%IBN(I)+S1%NPARA
@@ -755,9 +762,12 @@ CONTAINS
           IF(S1%SET_TPSAFIT) THEN
              s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
           ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%BN(I)=s2%BN(I)%R
+          ENDIF
        ENDIF
     ENDDO
-    IF(DONEIT.AND.S1%SET_TPSAFIT) THEN
+    IF(DONEIT.AND.(S1%SET_TPSAFIT.OR.S1%SET_ELEMENT)) THEN
        CALL ADD(S2,1,1,zero)     !etienne
     ENDIF
     IF(S2%KIND==KIND4) THEN    ! CAVITY
@@ -771,6 +781,9 @@ CONTAINS
           IF(S1%SET_TPSAFIT) THEN
              s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
           ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%VOLT=s2%VOLT%R
+          ENDIF
        ENDIF
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
@@ -779,6 +792,9 @@ CONTAINS
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
              s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+          ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%FREQ=s2%FREQ%R
           ENDIF
           DONEIT=.TRUE.
        ENDIF
@@ -790,6 +806,9 @@ CONTAINS
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           IF(S1%SET_TPSAFIT) THEN
              s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+          ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%PHAS=s2%PHAS%R
           ENDIF
        ENDIF
     ENDIF
@@ -804,6 +823,9 @@ CONTAINS
           IF(S1%SET_TPSAFIT) THEN
              s2%VOLT%R=s2%VOLT%R+scale_tpsafit*s2%VOLT%S*s1%TPSAFIT(S1%IVOLT)
           ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%VOLT=s2%VOLT%R
+          ENDIF
        ENDIF
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
@@ -812,6 +834,9 @@ CONTAINS
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
              s2%FREQ%R=s2%FREQ%R+scale_tpsafit*s2%FREQ%S*s1%TPSAFIT(S1%IFREQ)
+          ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%FREQ=s2%FREQ%R
           ENDIF
           DONEIT=.TRUE.
        ENDIF
@@ -823,6 +848,9 @@ CONTAINS
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%PHAS%R=s2%PHAS%R+scale_tpsafit*s2%PHAS%S*s1%TPSAFIT(S1%IPHAS)
+          ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%PHAS=s2%PHAS%R
           ENDIF
        ENDIF
     ENDIF
@@ -837,6 +865,9 @@ CONTAINS
           IF(S1%SET_TPSAFIT) THEN
              s2%B_SOL%R=s2%B_SOL%R+scale_tpsafit*s2%B_SOL%S*s1%TPSAFIT(S1%IB_SOL)
           ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2%PARENT_FIBRE%MAG%B_SOL=s2%B_SOL%R
+          ENDIF
        ENDIF
     ENDIF
     !    IF(S2%KIND==kinduser1) THEN    ! new element
@@ -849,7 +880,7 @@ CONTAINS
     !    ENDIF
     IF(S2%KIND==KINDWIGGLER) THEN    ! new element
        DONEIT=.FALSE.                     ! NOT USED HERE
-       call ELp_POL_SAGAN(S2%WI,S1,DONEIT)
+       call ELp_POL_SAGAN(S2%WI,S2%PARENT_FIBRE%MAG%WI,S1,DONEIT)
     ENDIF
 
 
@@ -1244,6 +1275,7 @@ CONTAINS
        EL%K16%H2=>EL%H2
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
+       NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
     CASE(KIND17)
        call SET_IN
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
@@ -1690,6 +1722,7 @@ CONTAINS
        EL%K16%H2=>EL%H2
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
+       NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
     CASE(KIND17)
        call SET_IN
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
@@ -2201,7 +2234,7 @@ CONTAINS
     nullify(EL%WI);
     nullify(EL%PA);
     nullify(EL%P);
-    !    nullify(EL%PARENT_FIBRE);
+    nullify(EL%PARENT_FIBRE);
   end SUBROUTINE null_ELp
 
 
@@ -2498,6 +2531,9 @@ CONTAINS
        !          DEALLOCATE(EL%U2)
        !       ENDIF
 
+       IF(ASSOCIATED(EL%PARENT_FIBRE))        then
+          nullify(EL%PARENT_FIBRE)
+       ENDIF
        IF(ASSOCIATED(EL%WI))        then
           el%WI=-1
           DEALLOCATE(EL%WI)
@@ -2654,6 +2690,7 @@ CONTAINS
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
+       ELP%K16%F=EL%K16%F
     ENDIF
 
     IF(EL%KIND==KIND3) THEN
@@ -2903,6 +2940,7 @@ CONTAINS
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
+       ELP%K16%F=EL%K16%F
     ENDIF
 
     IF(EL%KIND==KIND3) THEN
@@ -3146,6 +3184,7 @@ CONTAINS
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
        ELP%K16%LIKEMAD=EL%K16%LIKEMAD
+       ELP%K16%F=EL%K16%F
     ENDIF
 
     IF(EL%KIND==KIND3) THEN

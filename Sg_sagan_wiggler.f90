@@ -889,11 +889,12 @@ contains
   END SUBROUTINE reset_WIG
 
 
-  SUBROUTINE  ELp_POL_SAGAN(S2,S1,DONEIT)
+  SUBROUTINE  ELp_POL_SAGAN(S2,S2R,S1,DONEIT)
     implicit none
     integer ipause,mypause
     type (POL_BLOCK),INTENT(IN):: S1
     TYPE(SAGANp),INTENT(inOUT):: S2
+    TYPE(SAGAN),INTENT(inOUT):: S2R
     LOGICAL(lp),INTENT(inOUT)::  DONEIT
     integer i
 
@@ -923,6 +924,9 @@ contains
 
              s2%INTERNAL(I)%R=s2%INTERNAL(I)%R+s2%INTERNAL(I)%S*s1%TPSAFIT(S1%SAGAN%Iinternal(I))
           ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2R%INTERNAL(I)=s2%INTERNAL(I)%R
+          ENDIF
        ENDIF
     ENDDO
     if(size(s2%w%A)>size(S1%SAGAN%w%ia)) then
@@ -939,6 +943,9 @@ contains
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%w%a(i)%R=s2%w%a(i)%R+s2%w%a(i)%S*s1%TPSAFIT(S1%SAGAN%w%ia(i))
+          ENDIF
+          IF(S1%SET_ELEMENT) THEN
+             s2R%w%a(i)=s2%w%a(i)%R
           ENDIF
        ENDIF
     enddo
