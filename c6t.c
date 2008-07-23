@@ -284,6 +284,7 @@ double        sequ_length,         /* length of  sequence */
   sequ_end,
   total_voltage = 0,
   harmon = 0,
+  freq = 0,
   error_matrix[FIELD_MAX],
   tmp_buff[FIELD_MAX];
 
