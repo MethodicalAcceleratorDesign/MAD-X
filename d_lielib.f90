@@ -25,7 +25,7 @@ module lielib_berz
   private exp1d,expnd2,liefact,mapnorm,orderflo,nuanaflo,h2pluflo,rotflo,rotiflo
   private ctord,rtocd,resvec,reelflo,compcjg,midbflo,mulnd2,movearou,movemul,cpart
   private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3
-  integer,public,parameter::ndim=3,nreso=20
+  integer,public,parameter::ndim=3,nreso=100
   integer,public::no,nv,nd,nd2,ndpt
   integer, private :: ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
   integer, private,dimension(ndim)::nplane,idsta,ista

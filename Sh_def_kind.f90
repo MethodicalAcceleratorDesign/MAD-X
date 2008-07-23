@@ -1071,7 +1071,7 @@ contains
 
     IF(J==1) THEN
        EL%DELTA_E=X(5)
-       IF(k%NOCAVITY) RETURN
+       IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
        IF(EL%THIN) THEN
           CALL CAVITY(EL,X,k)
@@ -1103,7 +1103,7 @@ contains
 
     IF(J==1) THEN
        EL%DELTA_E=X(5)
-       IF(k%NOCAVITY) RETURN
+       IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
        IF(EL%THIN) THEN
           CALL CAVITY(EL,X,k)
@@ -1386,7 +1386,7 @@ contains
     real(dp) O,X1,X3,BBYTWT,BBYTW,BBXTW
     integer j,dir,ko
 
-    IF(k%NOCAVITY) RETURN
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
     IF(.NOT.PRESENT(MID)) then
@@ -1419,8 +1419,8 @@ contains
 
           ! multipole * cos(omega t+ phi)/p0c
 
-          X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-          X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+          X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*(el%a+ el%r*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
+          X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*(el%a+ el%r*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
 
           IF(EL%P%NMUL>=1) THEN
              BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1439,7 +1439,7 @@ contains
              BBYTW=zero
              BBXTW=zero
           ENDIF
-          X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+          X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*el%r*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        enddo
     endif
@@ -1460,7 +1460,7 @@ contains
     type(real_8) O,X1,X3,BBYTWT,BBYTW,BBXTW
     INTEGER J,dir,ko
 
-    IF(k%NOCAVITY) RETURN
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
     call alloc(BBYTWT,BBXTW,BBYTW,x1,x3,O)
@@ -1493,8 +1493,10 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-       X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       ! multipole * cos(omega t+ phi)/p0c
+
+       X(2)=X(2)-el%f(ko)*dir*BBYTW/EL%P%P0C*(el%a+ el%r*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
+       X(4)=X(4)+el%f(ko)*DIR*BBXTW/EL%P%P0C*(el%a+ el%r*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1513,7 +1515,7 @@ contains
           BBYTW=zero
           BBXTW=zero
        ENDIF
-       X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*el%r*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo
 
@@ -1535,7 +1537,7 @@ contains
 
     JC=-2*J+3
 
-    IF(k%NOCAVITY) RETURN
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(.NOT.(k%FRINGE.or.el%p%permfringe)) RETURN
     IF(EL%THIN) RETURN
     IF(jC==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
@@ -1571,7 +1573,7 @@ contains
 
     JC=-2*J+3
 
-    IF(k%NOCAVITY) RETURN
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(.NOT.(k%FRINGE.or.el%p%permfringe)) RETURN
     IF(EL%THIN) RETURN
     IF(jC==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
@@ -1606,7 +1608,7 @@ contains
     real(dp) BBYTWT,BBXTW,BBYTW,x1,x3
     integer j,dir,ko
 
-    IF(k%NOCAVITY) RETURN
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -1661,8 +1663,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*(EL%A+EL%R*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
+       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*(EL%A+EL%R*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1682,7 +1684,7 @@ contains
           BBXTW=zero
        ENDIF
 
-       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
     enddo    ! over modes
 
 
@@ -1698,7 +1700,7 @@ contains
     TYPE(REAL_8) BBYTWT,BBXTW,BBYTW,x1,x3
     integer j,dir,ko
 
-    IF(k%NOCAVITY) RETURN
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     CALL ALLOC(DF,R2,F,DR2,O,VL)
     call alloc(BBYTWT,BBXTW,BBYTW,x1,x3)
 
@@ -1755,8 +1757,8 @@ contains
 
        ! multipole * cos(omega t+ phi)/p0c
 
-       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*(EL%A+EL%R*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
+       X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*(EL%A+EL%R*cos(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0))
 
        IF(EL%P%NMUL>=1) THEN
           BBYTW=-EL%BN(EL%P%NMUL)/EL%P%NMUL
@@ -1776,7 +1778,7 @@ contains
           BBXTW=zero
        ENDIF
 
-       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+       X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)-EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo    ! over modes
     CALL kill(DF,R2,F,DR2,O,VL)
@@ -11913,6 +11915,16 @@ contains
        if(ASSOCIATED(EL%PH)) then
           deallocate(EL%PH)
        endif
+       if(ASSOCIATED(EL%A)) then
+          deallocate(EL%A)
+       endif
+       if(ASSOCIATED(EL%R)) then
+          deallocate(EL%R)
+       endif
+       if(ASSOCIATED(EL%always_on)) then
+          deallocate(EL%always_on)
+       endif
+
        if(ASSOCIATED(EL%CAVITY_TOTALPATH)) then
           deallocate(EL%CAVITY_TOTALPATH)
        endif
@@ -11927,6 +11939,9 @@ contains
        NULLIFY(EL%N_BESSEL)
        NULLIFY(EL%NF)
        NULLIFY(EL%F)
+       NULLIFY(EL%A)
+       NULLIFY(EL%R)
+       NULLIFY(EL%always_on)
        NULLIFY(EL%PH)
     endif
 
@@ -11958,6 +11973,17 @@ contains
           CALL KILL(EL%PH,EL%NF)
           deallocate(EL%PH)
        endif
+       if(ASSOCIATED(EL%R)) then
+          CALL KILL(EL%R)
+          deallocate(EL%R)
+       endif
+       if(ASSOCIATED(EL%always_on)) then
+          deallocate(EL%always_on)
+       endif
+       if(ASSOCIATED(EL%A)) then
+          CALL KILL(EL%A)
+          deallocate(EL%A)
+       endif
        if(ASSOCIATED(EL%NF)) then
           deallocate(EL%NF)
        endif
@@ -11969,6 +11995,9 @@ contains
        NULLIFY(EL%N_BESSEL)
        NULLIFY(EL%NF)
        NULLIFY(EL%F)
+       NULLIFY(EL%A)
+       NULLIFY(EL%R)
+       NULLIFY(EL%always_on)
        NULLIFY(EL%PH)
     endif
 

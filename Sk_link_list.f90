@@ -1053,40 +1053,6 @@ CONTAINS
     ENDIF
   END SUBROUTINE APPEND_FLAT
 
-  ! switching routines
-  SUBROUTINE switch_to_kind7( el )  ! switch to kind7
-    implicit none
-    TYPE (fibre), POINTER :: el
-    ! This routines switches to kind7 (not exact) from kind2,10,16
-    select case(el%mag%kind)
-    case(kind10,kind16,kind2,KIND20)
-       el%magp=-1
-       el%mag%L=el%mag%p%ld
-       el%mag%p%lc=el%mag%p%ld
-       el%mag%p%exact=.false.
-       el%magp=0
-    end select
-
-    select case(el%mag%kind)
-    case(kind10)
-       EL%MAG%TP10=-1
-       deallocate(EL%MAG%TP10)
-       el%mag%kind=KIND7
-       CALL SETFAMILY(EL%MAG)
-       CALL COPY(EL%MAG,EL%MAGP)
-    case(kind16,KIND20)
-       EL%MAG%k16=-1
-       deallocate(EL%MAG%k16)
-       el%mag%kind=KIND7
-       CALL SETFAMILY(EL%MAG)
-       CALL COPY(EL%MAG,EL%MAGP)
-    case(KIND2)
-       el%mag%kind=KIND7
-       CALL SETFAMILY(EL%MAG)
-       CALL COPY(EL%MAG,EL%MAGP)
-    end select
-
-  END SUBROUTINE switch_to_kind7
 
   !  EUCLIDEAN ROUTINES
   SUBROUTINE CHECK_NEED_PATCH(EL1,EL2_NEXT,PREC,PATCH_NEEDED) ! check need of  PATCHES

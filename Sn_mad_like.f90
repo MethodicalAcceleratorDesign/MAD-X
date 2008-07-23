@@ -2659,6 +2659,8 @@ CONTAINS
           s22%chart=2
           CALL SURVEY_no_patch(S22)
        endif
+    else
+       CALL SURVEY_no_patch(S22)
     ENDIF
 
 

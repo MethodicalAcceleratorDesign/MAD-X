@@ -1048,6 +1048,9 @@ CONTAINS
        ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
        ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
        ALLOCATE(EL%C4%F(N_CAV4_F));EL%C4%F=ZERO;EL%C4%F(1)=ONE;
+       ALLOCATE(EL%C4%A);EL%C4%A=ZERO;
+       ALLOCATE(EL%C4%R);EL%C4%R=ONE;
+       ALLOCATE(EL%C4%always_on);EL%C4%always_on=my_false;
        ALLOCATE(EL%C4%PH(N_CAV4_F));EL%C4%PH=ZERO;
        ALLOCATE(EL%C4%t);EL%C4%t=ZERO;
 
@@ -1495,6 +1498,9 @@ CONTAINS
        ALLOCATE(EL%C4%phase0);EL%C4%phase0=phase0
        ALLOCATE(EL%C4%NF);EL%C4%NF=N_CAV4_F
        ALLOCATE(EL%C4%F(N_CAV4_F));CALL ALLOC(EL%C4%F,N_CAV4_F);EL%C4%F(1)=ONE;
+       ALLOCATE(EL%C4%A);CALL ALLOC(EL%C4%A);EL%C4%A=ZERO;
+       ALLOCATE(EL%C4%R);CALL ALLOC(EL%C4%R);EL%C4%R=ONE;
+       ALLOCATE(EL%C4%always_on);EL%C4%always_on=my_false;
        ALLOCATE(EL%C4%PH(N_CAV4_F));CALL ALLOC(EL%C4%PH,N_CAV4_F);
        ALLOCATE(EL%C4%t);EL%C4%t=ZERO;
     CASE(KIND21)
@@ -2727,6 +2733,9 @@ CONTAINS
           ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
        ELP%C4%t=EL%C4%t
+       ELP%C4%R=EL%C4%R
+       ELP%C4%A=EL%C4%A
+       ELP%C4%Always_on=EL%C4%Always_on
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -2974,6 +2983,9 @@ CONTAINS
           ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
        ELP%C4%t=EL%C4%t
+       ELP%C4%R=EL%C4%R
+       ELP%C4%A=EL%C4%A
+       ELP%C4%Always_on=EL%C4%Always_on
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -3220,6 +3232,9 @@ CONTAINS
           ELP%C4%PH(I)=EL%C4%PH(I)
        ENDDO
        ELP%C4%t=EL%C4%t
+       ELP%C4%R=EL%C4%R
+       ELP%C4%A=EL%C4%A
+       ELP%C4%Always_on=EL%C4%Always_on
     ENDIF
 
     IF(EL%KIND==KIND21) THEN         !
@@ -3392,6 +3407,8 @@ CONTAINS
           CALL resetpoly_R31(ELP%C4%F(I))
           CALL resetpoly_R31(ELP%C4%PH(I))
        ENDDO
+       CALL resetpoly_R31(ELP%C4%A )
+       CALL resetpoly_R31(ELP%C4%R )
 
        !      CALL resetpoly_R31(ELP%P0C )
     ENDIF

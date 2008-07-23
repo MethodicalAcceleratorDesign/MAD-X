@@ -23,6 +23,7 @@ module pointer_lattice
   integer last_npara
   integer :: i_layout=1
   integer my_lost_position
+  private thin
   real(dp) thin
   !  BEAM STUFF
   REAL(DP) SIG(6)
@@ -365,6 +366,9 @@ contains
           !          CALL PUT_method1_in_kind7(my_ering,1000)
        case('THINLENS=1')
           call THIN_LENS_restart(my_ering)
+       case('MANUALTHINLENS')
+          THIN=-1
+          CALL THIN_LENS_resplit(my_ering,THIN)
        case('THINLENS')
           READ(MF,*) THIN
           xbend=-one

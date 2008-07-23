@@ -250,7 +250,7 @@ contains
     CALL EL_Q_FOR_MADX(EL,BLANK)
     !  added 2007.07.09
     el%mag%parent_fibre =>el
-    !    el%magp%parent_fibre=>el
+    el%magp%parent_fibre=>el
     !  end of added 2007.07.09
 
 
@@ -935,7 +935,8 @@ contains
        WRITE(LINE,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
        WRITE(MF,'(A255)') LINE
     case(kind4)
-       WRITE(MF,*) el%c4%N_BESSEL, "HARMON",el%c4%NF
+       WRITE(line,*) el%c4%N_BESSEL, " HARMON ",el%c4%NF," constant&ripple ",el%c4%a,el%c4%r,el%c4%always_on
+       WRITE(MF,'(A255)') LINE
        WRITE(MF,*) el%c4%t,el%c4%phase0,el%c4%CAVITY_TOTALPATH
        do i=1,el%c4%NF
           write(mf,*) el%c4%f(i),el%c4%ph(i)
@@ -968,8 +969,10 @@ contains
     type(element), pointer :: el
     integer mf,NB,NH,i,i1
     CHARACTER*6 HARMON
+    CHARACTER*15 rip
     character*255 line
-    real(dp) x1,x2
+    real(dp) x1,x2,x3,x4
+    logical(lp) always_on
     select case(el%kind)
     CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,kind22)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
@@ -979,10 +982,16 @@ contains
     case(kind4)
        NB=0
        NH=0
+       x3=zero
+       x4=one
        READ(MF,'(a255)') LINE
 
        IF(INDEX(LINE, 'HARMON')/=0) THEN
-          read(LINE,*) NB,HARMON,NH
+          if(INDEX(LINE, 'ripple')/=0) then
+             read(LINE,*) NB,HARMON,NH,rip,x3,x4,always_on
+          else
+             read(LINE,*) NB,HARMON,NH
+          endif
           if(nh>N_CAV4_F) then
              N_CAV4_F=NH
           endif
@@ -1001,7 +1010,10 @@ contains
        enddo
        el%c4%t=x1
        el%c4%phase0=x2
+       el%c4%a=x3
+       el%c4%r=x4
        el%c4%CAVITY_TOTALPATH=i1
+       el%c4%always_on=always_on
     case(kind10)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        read(MF,*) el%tp10%DRIFTKICK
@@ -1630,5 +1642,173 @@ contains
   END subroutine READ_pointed_INTO_VIRGIN_LAYOUT
 
 
+!!!!!!!!!!!!  switching routines !!!!!!!!!!!!!
+  SUBROUTINE switch_layout_to_cavity( L,name,sext,a,r,freq,t )  ! switch to kind7
+    implicit none
+    TYPE (layout), target :: L
+    TYPE (fibre), pointer :: p
+    character(*) name
+    real(dp),OPTIONAL:: a,r,freq,t
+    INTEGER I
+    logical(lp) sext
+
+
+    p=>L%start
+    do i=1,L%n
+
+       call  switch_to_cavity( p,name,sext,a,r,freq,t)
+
+       p=>p%next
+    enddo
+
+
+
+  end SUBROUTINE switch_layout_to_cavity
+
+
+
+  SUBROUTINE switch_to_cavity( el,name,sext,a,r,freq,t )  ! switch to kind7
+    implicit none
+    TYPE (fibre), target :: el
+    character(*) name
+    integer i,nm,EXCEPTION,met1,nst1
+    real(dp),OPTIONAL:: a,r,freq,t
+    real(dp), allocatable :: an(:),bn(:)
+    type(keywords) key
+    logical(lp) sext
+    ! This routines switches to cavity
+    nm=len_trim(name)
+    select case(el%mag%kind)
+    case(kind10,kind16,kind2,kind7,kind6,KIND20)
+       if(el%mag%name(1:nm)==name(1:nm)) then
+          if(sext.and.el%mag%p%nmul>2)then
+             write(6,*) el%mag%name
+             call add(el,3,0,zero)
+             call add(el,-3,0,zero)
+          else
+             write(6,*) el%mag%name, " not changed "
+          endif
+       endif
+       if(el%mag%p%b0/=zero.or.el%mag%name(1:nm)==name(1:nm)) return
+       write(6,*) el%mag%name
+       if(el%mag%p%nmul/=size(el%mag%an)) then
+          write(6,*) "error in switch_to_cavity "
+          stop 666
+       endif
+       allocate(an(el%mag%p%nmul),bn(el%mag%p%nmul))
+       an=el%mag%an*el%mag%p%p0c
+       bn=el%mag%bn*el%mag%p%p0c
+       call zero_key(key)
+       key%magnet="rfcavity"
+       key%list%volt=zero
+       key%list%lag=zero
+       key%list%freq0=zero
+       IF(PRESENT(FREQ)) THEN
+          key%list%freq0=FREQ
+       ENDIF
+       key%list%n_bessel=0
+       key%list%harmon=one
+       key%list%l=el%mag%L
+       key%list%name=el%mag%name
+       key%list%vorname=el%mag%vorname
+       EXACT_MODEL=el%mag%p%exact
+       key%nstep=el%mag%p%nst
+       key%method=el%mag%p%method
+
+
+       el%mag=-1
+       el%magp=-1
+       el%mag=0
+       el%magp=0
+       call create_fibre(el,key,EXCEPTION,my_true)
+       do i=size(an),1,-1
+          call add(el,-i,0,an(i))
+          call add(el,i,0,bn(i))
+       enddo
+       el%mag%c4%a=one
+       el%magp%c4%a=one
+       IF(PRESENT(a)) THEN
+          el%mag%c4%a=a
+          el%magp%c4%a=a
+       ENDIF
+       el%mag%c4%r=ZERO
+       el%magp%c4%r=ZERO
+       IF(PRESENT(r)) THEN
+          el%mag%c4%r=r
+          el%magp%c4%r=r
+       ENDIF
+       el%mag%c4%PHASE0=ZERO
+       el%mag%c4%PHASE0=ZERO
+       el%mag%c4%always_on=my_true
+       el%magp%c4%always_on=my_true
+       IF(PRESENT(FREQ)) THEN
+          el%mag%FREQ=FREQ
+          el%magP%FREQ=FREQ
+       ENDIF
+       IF(PRESENT(T).and.PRESENT(FREQ)) THEN
+          el%mag%C4%T=T/(el%mag%C4%freq/CLIGHT)
+          el%magP%C4%T=el%mag%C4%T
+       ENDIF
+       deallocate(an,bn)
+    CASE(KIND4)
+       IF(el%mag%c4%always_on) THEN
+          IF(PRESENT(FREQ)) THEN
+             el%mag%FREQ=FREQ
+             el%magP%FREQ=FREQ
+          ENDIF
+          IF(PRESENT(T)) THEN
+             el%mag%C4%T=T/(el%mag%C4%freq/CLIGHT)
+             el%magP%C4%T=el%mag%C4%T
+          ENDIF
+          IF(PRESENT(r)) THEN
+             el%mag%c4%r=r
+             el%magp%c4%r=r
+          ENDIF
+          IF(PRESENT(a)) THEN
+             el%mag%c4%a=a
+             el%magp%c4%a=a
+          ENDIF
+
+       ENDIF
+
+    case default
+       return
+    end select
+
+  END SUBROUTINE switch_to_cavity
+
+  SUBROUTINE switch_to_kind7( el )  ! switch to kind7
+    implicit none
+    TYPE (fibre), target :: el
+    ! This routines switches to kind7 (not exact) from kind2,10,16
+    select case(el%mag%kind)
+    case(kind10,kind16,kind2,KIND20)
+       el%magp=-1
+       el%mag%L=el%mag%p%ld
+       el%mag%p%lc=el%mag%p%ld
+       el%mag%p%exact=.false.
+       el%magp=0
+    end select
+
+    select case(el%mag%kind)
+    case(kind10)
+       EL%MAG%TP10=-1
+       deallocate(EL%MAG%TP10)
+       el%mag%kind=KIND7
+       CALL SETFAMILY(EL%MAG)
+       CALL COPY(EL%MAG,EL%MAGP)
+    case(kind16,KIND20)
+       EL%MAG%k16=-1
+       deallocate(EL%MAG%k16)
+       el%mag%kind=KIND7
+       CALL SETFAMILY(EL%MAG)
+       CALL COPY(EL%MAG,EL%MAGP)
+    case(KIND2)
+       el%mag%kind=KIND7
+       CALL SETFAMILY(EL%MAG)
+       CALL COPY(EL%MAG,EL%MAGP)
+    end select
+
+  END SUBROUTINE switch_to_kind7
 
 end module madx_keywords

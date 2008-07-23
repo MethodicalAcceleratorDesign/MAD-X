@@ -11,8 +11,8 @@ module S_fitting
   real(dp) :: fuzzy_split=one
   real(dp) :: max_ds=zero
   integer :: resplit_cutting = 0    ! 0 just magnets , 1 magnets as before / drifts separately
-  logical(lp) :: radiation_bend_split=my_false
   ! 2  space charge algorithm
+  logical(lp) :: radiation_bend_split=my_false
 
   INTERFACE FIND_ORBIT
      ! LINKED
@@ -1755,12 +1755,14 @@ contains
   end SUBROUTINE  track_aperture
 
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend,fib) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
-    real(dp), OPTIONAL, intent(inout) :: THIN,lmax0
+    real(dp), OPTIONAL, intent(inout) :: THIN
+    real(dp), OPTIONAL, intent(in) :: lmax0
     real(dp), OPTIONAL, intent(in) ::xbend
+    type(fibre), OPTIONAL, target :: fib
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggb,ggbt,xbend1,gf(7)
     INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb
     integer incold ,parityold
@@ -1840,8 +1842,7 @@ contains
 
     C=>R%START
     do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
-
-       doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5)
+       doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
        DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
        DOIT=DOIT.OR.(C%MAG%KIND==kind17)
@@ -1911,6 +1912,9 @@ contains
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
           DOIT=DOIT.OR.(C%MAG%KIND==kind17)
           doit=doit.and.C%MAG%recut
+          if(present(fib)) then
+             doit=doit.and.associated(c,fib)
+          endif
 
           if(doit) then
              xl=C%MAG%L
@@ -2001,6 +2005,9 @@ contains
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
           DOIT=DOIT.OR.(C%MAG%KIND==kind17)
           doit=doit.and.C%MAG%recut
+          if(present(fib)) then
+             doit=doit.and.associated(c,fib)
+          endif
 
           if(doit) then
              xl=C%MAG%L
@@ -2081,7 +2088,7 @@ contains
                 dl=(C%MAG%P%ld/C%MAG%P%nst)
                 if(dl>lm*fuzzy_split) then
                    ntec=int(C%MAG%P%ld/lm)+1
-                   if(mod(nte,2)/=parity) ntec=ntec+inc
+                   if(mod(ntec,2)/=parity) ntec=ntec+inc
                    C%MAG%P%NST=ntec
                 endif
              endif
@@ -2094,6 +2101,9 @@ contains
           endif
 
        case(2)
+          if(present(fib)) then
+             doit=doit.and.associated(c,fib)
+          endif
 
 
           doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)

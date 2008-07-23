@@ -49,9 +49,11 @@ TYPE CAV4
    real(dp),  DIMENSION(:), POINTER :: AN,BN                 !Multipole component
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0,t
    real(dp), POINTER :: F(:)
+   real(dp), POINTER :: A,R
    real(dp), POINTER :: PH(:)
    INTEGER , POINTER :: NF
    integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH     ! Cavity information
+   logical, pointer :: always_on
 END  TYPE CAV4
 
 TYPE CAV4P
@@ -63,8 +65,10 @@ TYPE CAV4P
    real(dp), POINTER :: DELTA_E,phase0,t                        ! Cavity information
    TYPE(REAL_8), POINTER :: F(:)
    TYPE(REAL_8), POINTER :: PH(:)
+   TYPE(REAL_8), POINTER :: A,R
    INTEGER , POINTER :: NF
    integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH  ! Cavity information
+   logical, pointer :: always_on
 END  TYPE CAV4P
 
 TYPE CAV_TRAV
