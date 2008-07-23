@@ -273,8 +273,8 @@ int           block_count = 0,     /* current block count for naming */
   radius_flag = 0,     /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
   mult_auto_off = 1,   /* if 1 code does not process zero value
-                        multipoles; 
-                        if 0 process up to order max_mult_ord */
+                          multipoles;
+                          if 0 process up to order max_mult_ord */
   max_mult_ord = 11,   /* Process up to this order for mult_auto_off = 0 */
   multi_type = -1,     /* is set to multipole type if any found */
   cavity_count = 0;    /* count cavities in output */
@@ -628,14 +628,14 @@ void att_rfcavity(struct c6t_element* el)
 void att_crabcavity(struct c6t_element* el)
 {
   double lag = el->value[5];
-  el->out_1 = 12;
+  el->out_1 = 23;
   if (cavall_flag == 0)
   {
     el->out_2 = total_voltage;
     strcpy(el->name, "CAV");
   }
   else el->out_2 = el->value[1];
-  el->out_3 = harmon = el->value[11];
+  el->out_3 = freq = el->value[4];
   if (lag < -0.5) lag +=1.;
   else if (lag > 0.5) lag -=1.;
   el->out_4 = 360. * lag;
