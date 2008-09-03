@@ -2731,7 +2731,7 @@
       arad = get_value('probe ','arad ')
       gamma = get_value('probe ','gamma ')
       dorad = get_value('probe ','radiate ') .ne. zero
-      tilt = node_value('tilt ')
+      tilt = -node_value('tilt ')
 
 !---- Tracking desired, use corrector map.
       if (ftrk) then
