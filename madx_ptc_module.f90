@@ -163,7 +163,7 @@ CONTAINS
     integer             model
     integer             method0,method1
     integer             nst0,nst1,ord_max
-    REAL (dp) :: tempdp
+    REAL (dp) :: tempdp,bv0,bvk
     logical(lp):: ptcrbend,truerbend
     !---------------------------------------------------------------
     if (getdebug() > 1) then
@@ -312,6 +312,8 @@ CONTAINS
     j=0
     l_machine=zero
 10  continue
+    bvk = node_value('other_bv ')
+    if(bvk.ne.-1) bvk=1
     nst1=node_value("nst ")
     if(nst1.gt.0) then
        nstd = nst1
@@ -439,11 +441,12 @@ CONTAINS
           goto 100
        endif
        key%magnet="rbend"
+       bv0 = node_value('dipole_bv ')
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=node_value('angle ')+tempdp*l
+       key%list%b0=bv0*(node_value('angle ')+tempdp*l)
 
        !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
        !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
@@ -457,8 +460,8 @@ CONTAINS
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
 
        ! Gymnastic needed since PTC expects MAD8 convention
-       key%list%t1=node_value('e1 ')-node_value('angle ')/two
-       key%list%t2=node_value('e2 ')-node_value('angle ')/two
+       key%list%t1=bv0*(node_value('e1 ')-node_value('angle ')/two)
+       key%list%t2=bv0*(node_value('e2 ')-node_value('angle ')/two)
        key%list%hgap=node_value('hgap ')
        !       key%list%fint=node_value('fint ')
        fint=node_value('fint ')
@@ -509,13 +512,14 @@ CONTAINS
           goto 100
        endif
        key%magnet="sbend"
+       bv0 = node_value('dipole_bv ')
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
        if(sector_nmul_max.lt.ord_max.and.EXACT_MODEL) call aafail('the order of multipoles in a sbend in exact mode cannot be ',&
             &'larger than sector_mul_max: check your ptc_create_universe input')
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=node_value('angle ')+ tempdp*l
+       key%list%b0=bv0*(node_value('angle ')+ tempdp*l)
 
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
@@ -525,8 +529,8 @@ CONTAINS
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
 
-       key%list%t1=node_value('e1 ')
-       key%list%t2=node_value('e2 ')
+       key%list%t1=bv0*(node_value('e1 '))
+       key%list%t2=bv0*(node_value('e2 '))
        key%list%hgap=node_value('hgap ')
        !       key%list%fint=node_value('fint ')
        fint=node_value('fint ')
@@ -637,14 +641,16 @@ CONTAINS
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
+       bv0 = node_value('dipole_bv ')
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        call dzero(normal,maxmul+1)
        call dzero(skew,maxmul+1)
        call get_node_vector('knl ',nn,normal)
        call get_node_vector('ksl ',ns,skew)
-       key%list%thin_h_angle=normal(0)
-       key%list%thin_v_angle=skew(0)
+       skew(0)=-skew(0) ! frs error found 30.08.2008
+       key%list%thin_h_angle=bv0*normal(0)
+       key%list%thin_v_angle=bv0*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
@@ -728,6 +734,7 @@ CONTAINS
           key%list%t(i)=patch_trans(i)
        enddo
     case(14,15,16) ! PTC accepts mults
+       bv0 = node_value('dipole_bv ')
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        do i = 1, 2
@@ -741,14 +748,14 @@ CONTAINS
        endif
        if(code.eq.14) then
           key%magnet="hkicker"
-          key%list%k(1)=node_value('kick ')+node_value('chkick ')+fieldk(1)/div
+          key%list%k(1)=bv0*(node_value('kick ')+node_value('chkick ')+fieldk(1)/div)
        else if(code.eq.15) then
           key%magnet="kicker"
-          key%list%k(1)=node_value('hkick ')+node_value('chkick ')+fieldk(1)/div
-          key%list%ks(1)=node_value('vkick ')+node_value('cvkick ')+fieldk(2)/div
+          key%list%k(1)=bv0*(node_value('hkick ')+node_value('chkick ')+fieldk(1)/div)
+          key%list%ks(1)=bv0*(node_value('vkick ')+node_value('cvkick ')+fieldk(2)/div)
        else if(code.eq.16) then
           key%magnet="vkicker"
-          key%list%ks(1)=node_value('kick ')+node_value('cvkick ')+fieldk(2)/div
+          key%list%ks(1)=bv0*(node_value('kick ')+node_value('cvkick ')+fieldk(2)/div)
        else
           key%magnet="marker"
        endif
@@ -825,6 +832,12 @@ CONTAINS
        stop
     end select
 100 continue
+    if(code.ne.14.and.code.ne.15.and.code.ne.16) then
+       do i=1,NMAX
+          key%list%k(i)=bvk*key%list%k(i)
+          key%list%ks(i)=bvk*key%list%ks(i)
+       enddo
+    endif
     call create_fibre(my_ring%end,key,EXCEPTION)
 
     if(advance_node().ne.0)  goto 10
@@ -904,9 +917,10 @@ CONTAINS
     ! Assign values from the command line                       !
     call get_node_vector('knl ',n_norm,normal)                  !
     call get_node_vector('ksl ',n_skew,skew)                    !
-    if(n_norm.ge.maxmul) n_norm=maxmul-1       !
-    if(n_skew.ge.maxmul) n_skew=maxmul-1       !
-    ord_max=max(n_norm,n_skew)
+    skew(0)=-skew(0)                                            ! frs error found 30.08.2008
+    if(n_norm.ge.maxmul) n_norm=maxmul-1                        !
+    if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
+    ord_max=max(n_norm,n_skew)                                  !
     ! void get_node_vector(char*par,int*length,double* vector)  !
     ! /* returns vector for parameter par of current element */ !
     !                                                           !
@@ -1125,7 +1139,7 @@ CONTAINS
     j=j+1
     n_align = node_al_errors(al_errors)
     if (n_align.ne.0)  then
-       write(6,'(6f8.3)')  al_errors(1:6)
+!       write(6,'(6f8.3)')  al_errors(1:6)
        call mad_misalign_fibre(f,al_errors(1:6))
     endif
     f=>f%next
@@ -1959,5 +1973,6 @@ CONTAINS
 
   end subroutine killsavedmaps
   !_________________________________________________________________
+
 
 END MODULE madx_ptc_module
