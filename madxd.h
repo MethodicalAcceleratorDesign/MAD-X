@@ -37,6 +37,7 @@
 #define get_title             get_title_
 #define get_variable          get_variable_
 #define get_vector            get_vector_
+#define get_beam_value        get_beam_value_
 #define get_value             get_value_
 #define get_version           get_version_
 #define grndm                 grndm_
@@ -183,6 +184,7 @@
 #define get_title             GET_TITLE
 #define get_variable          GET_VARIABLE
 #define get_vector            GET_VECTOR
+#define get_beam_value        GET_BEAM_VALUE
 #define get_value             GET_VALUE
 #define get_version           GET_VERSION
 #define grndm                 GRNDM
@@ -387,6 +389,7 @@ int get_option(char*);
 int get_string(char*, char*, char*);
 void get_title(char*, int*);
 double get_value(char*, char*);
+double get_beam_value(char*, char*);
 double get_variable(char*);
 int get_vector(char*, char*, double*);
 void get_version(char*, int*);
@@ -813,6 +816,7 @@ void pro_survey(struct in_cmd*);
 void pro_track(struct in_cmd*);
 void pro_twiss();
 void pro_ptc_twiss();
+void pro_ptc_create_layout();
 void pro_ptc_track(struct in_cmd*);
 void pro_ptc_trackline(struct in_cmd*);
 int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);
@@ -1345,8 +1349,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.42";
-char code_mod_date[] = "Code Modification Date: 31.08.2008";
+char myversion[] = "MAD-X 3.04.43";
+char code_mod_date[] = "Code Modification Date: 11.09.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
