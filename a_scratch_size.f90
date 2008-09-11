@@ -29,8 +29,8 @@ module precision_constants
   !Double precision
   real(kind(1d0)) :: doublenum = 0d0
   !Precision
-  integer,parameter::nlp=16
-  integer,parameter::vp=16
+  integer,parameter::nlp=24
+  integer,parameter::vp=24
   integer,parameter::lp=4
 ! double precision
   integer,parameter::sp=kind(1e0)
