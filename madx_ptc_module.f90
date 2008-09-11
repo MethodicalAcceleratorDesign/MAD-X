@@ -138,13 +138,13 @@ CONTAINS
     include 'name_len.fi'
     include 'twiss0.fi'
     logical(lp) particle,doneit,isclosedlayout
-    integer i,j,k,code,nt,icount,nn,ns,nd
+    integer i,j,k,code,nt,icount,nn,ns,nd,mf1,mf2,mf3,mg,get_string
     !    integer get_option
     integer double_from_table
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
-    integer, parameter :: nt0=20000,length=16
+    integer, parameter :: nt0=20000
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
-    real(dp) f_errors(0:50),aperture(maxnaper),normal(0:maxmul)
+    real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul)
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
@@ -153,18 +153,20 @@ CONTAINS
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
     real(dp) gammatr
     real(kind(1d0)) get_value,node_value
-    character(length) name
+    character(name_len) name
     character(name_len) aptype
     type(keywords) key
     character(20)       keymod0,keymod1
+    character(name_len) magnet_name
+    character(240)      myfilen
     logical(lp)         exact0
     integer             exact1
     integer             sector_nmul_max0,sector_nmul0,sector_nmul1
     integer             model
     integer             method0,method1
-    integer             nst0,nst1,ord_max
+    integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bv0,bvk
-    logical(lp):: ptcrbend,truerbend
+    logical(lp):: ptcrbend,truerbend,errors_in,errors_out
     !---------------------------------------------------------------
     if (getdebug() > 1) then
        print *, '--------------------------------------------------------------'
@@ -174,9 +176,11 @@ CONTAINS
        print *, '--------------------------------------------------------------'
     endif
 
-    energy=get_value('beam ','energy ')
-    pma=get_value('beam ','mass ')
-    charge=get_value('beam ','charge ')
+    energy=get_value('probe ','energy ')
+    pma=get_value('probe ','mass ')
+    charge=get_value('probe ','charge ')
+!    bvk=get_value('probe ','bv ')
+
     e0f=sqrt(ENERGY**2-pma**2)
 
     if (getdebug() > 0) then
@@ -276,7 +280,7 @@ CONTAINS
     mad8      = get_value('ptc_create_layout ','mad8 ') .ne. 0
     if (getdebug() > 1) print*,'  rbend as in mad8 (only global): ',mad8
 
-    gamma     = get_value('beam ','gamma ')
+    gamma     = get_value('probe ','gamma ')
     if (getdebug() > 1) print*,'  gamma: ',gamma
 
     k         = double_from_table('summ ','gammatr ',1,gammatr)
@@ -311,9 +315,120 @@ CONTAINS
     j=restart_sequ()
     j=0
     l_machine=zero
+        
+    errors_in = get_value('ptc_create_layout ','errors_in ').ne.0
+    errors_out = get_value('ptc_create_layout ','errors_out ').ne.0
+    if(errors_in) errors_out=my_false
+    
+    if(errors_in) then
+       magnet_name=" "
+       mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
+       if(get_value('probe ','bv ').eq.1) then
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b1.txt"
+          call kanalnummer(mf1)
+          open(unit=mf1,file=myfilen,status="old",err=999)
+
+       elseif(get_value('probe ','bv ').eq.-1) then
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b2.txt"
+          call kanalnummer(mf1)
+          open(unit=mf1,file=myfilen,status="old",err=999)
+       endif
+
+    elseif(errors_out) then
+       magnet_name=" "
+       mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
+       if(get_value('probe ','bv ').eq.1) then
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b1.txt"
+          call kanalnummer(mf1)
+          open(unit=mf1,file=myfilen)
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_field_b1.txt"
+          call kanalnummer(mf2)
+          open(unit=mf2,file=myfilen)
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_dipole_b1.txt"
+          call kanalnummer(mf3)
+          open(unit=mf3,file=myfilen)
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+
+       elseif(get_value('probe ','bv ').eq.-1) then
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b2.txt"
+          call kanalnummer(mf1)
+          open(unit=mf1,file=myfilen)
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+          write(mf1,*) "blah"
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_field_b2.txt"
+          call kanalnummer(mf2)
+          open(unit=mf2,file=myfilen)
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+          write(mf2,*) "blah"
+
+          myfilen=" "
+          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_dipole_b2.txt"
+          call kanalnummer(mf3)
+          open(unit=mf3,file=myfilen)
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+          write(mf3,*) "blah"
+
+       endif
+    endif
+       
 10  continue
     bvk = node_value('other_bv ')
-    if(bvk.ne.-1) bvk=1
+    if(bvk.ne.-one) bvk=one
     nst1=node_value("nst ")
     if(nst1.gt.0) then
        nstd = nst1
@@ -335,10 +450,10 @@ CONTAINS
     key%list%l=l
     l_machine=l_machine+l
     code=node_value('mad8_type ')
-    call element_name(name,length)
+    call element_name(name,name_len)
     key%list%name=name
 
-    call node_name(name,length)
+    call node_name(name,name_len)
     key%list%vorname=name
 
     !frs&piotr 18 Dec 2007: sector_nmul must stay global for the time being
@@ -506,6 +621,14 @@ CONTAINS
              key%magnet="WEDGRBEND"
           endif
        endif
+       if(errors_out) then
+          if(key%list%name(:len_trim(magnet_name)-1).eq. &
+               magnet_name(:len_trim(magnet_name)-1)) then
+             write(mf3,*) key%list%name,key%list%b0,zero,&
+                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,&
+                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero
+          endif
+       endif
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
        if(l.eq.zero) then
           key%magnet="marker"
@@ -554,7 +677,14 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
-
+       if(errors_out) then
+          if(key%list%name(:len_trim(magnet_name)-1).eq. &
+               magnet_name(:len_trim(magnet_name)-1)) then
+             write(mf3,*) key%list%name,key%list%b0,zero,&
+                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,&
+                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero
+          endif
+       endif
     case(5)
        key%magnet="quadrupole"
        !VK
@@ -648,6 +778,10 @@ CONTAINS
        call dzero(skew,maxmul+1)
        call get_node_vector('knl ',nn,normal)
        call get_node_vector('ksl ',ns,skew)
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
        skew(0)=-skew(0) ! frs error found 30.08.2008
        key%list%thin_h_angle=bv0*normal(0)
        key%list%thin_v_angle=bv0*skew(0)
@@ -679,6 +813,15 @@ CONTAINS
           enddo
        endif
        key%tiltd=node_value('tilt ')
+       if(errors_out) then
+          if(key%list%name(:len_trim(magnet_name)-1).eq. &
+               magnet_name(:len_trim(magnet_name)-1)) then
+             write(mf1,*) key%list%name,&
+                  (bvk*key%list%k(kk),bvk*key%list%ks(kk),kk=1,maxmul)
+             write(mf2,*) key%list%name,&
+                  (bvk*field(1,kk),bvk*field(2,kk),kk=0,maxmul-1)
+          endif
+       endif
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
        if(l.ne.zero) then
@@ -737,6 +880,10 @@ CONTAINS
        bv0 = node_value('dipole_bv ')
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
        do i = 1, 2
           fieldk(i) = zero
        enddo
@@ -808,6 +955,10 @@ CONTAINS
     case(37)
        key%magnet="rfcavity"
        key%list%volt=zero
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
        key%list%k(1)=node_value('volt ')*c_1d_3
 ! vertical crab
 ! maybe requires a flip of sign
@@ -863,6 +1014,10 @@ CONTAINS
     doneit=.true.
     call ring_l(my_ring,doneit)
 
+    if(errors_in) then
+       call fill_errors(my_ring,mf1,myfilen)
+    endif
+
     if (getdebug() > 0) then
        write(6,*) "------------------------------------ PTC Survey ------------------------------------"
        write(6,*) "Before start: ",my_ring%start%chart%f%a
@@ -886,6 +1041,10 @@ CONTAINS
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
 
+    return
+
+999 call aafail("PTC error file with name: >>> "//myfilen(:len_trim(myfilen)-1),' <<< does not exist')
+
   END subroutine ptc_input
   !_________________________________________________________________
 
@@ -898,16 +1057,20 @@ CONTAINS
     type(keywords), INTENT(INOUT) ::  key
     REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;
     REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
-         f_errors(0:50), field(2,0:maxmul)
+         f_errors(0:maxferr), field(2,0:maxmul)
     INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
     INTEGER :: node_fd_errors ! function
-    integer :: i_count, n_dim_mult_err, ord_max
+    integer :: i, i_count, n_dim_mult_err, ord_max
 
     !initialization
     normal_0123(:)=zero
     skew_0123(:)=zero
+    do i=1,NMAX
+       key%list%k(i)=zero
+       key%list%ks(i)=zero
+    enddo
 
-    ! real(dp) f_errors(0:50),normal(0:maxmul),skew(0:maxmul)
+    ! real(dp) f_errors(0:maxferr),normal(0:maxmul),skew(0:maxmul)
     ! Get multipole components on bench !-----------------------!
     call dzero(normal,maxmul+1) ! make zero "normal"            !
     call dzero(skew,maxmul+1)   ! make zero "skew"              !
@@ -1974,5 +2137,61 @@ CONTAINS
   end subroutine killsavedmaps
   !_________________________________________________________________
 
+
+  SUBROUTINE fill_errors(lhc1,mf,filename1)
+    implicit none
+    include 'twtrr.fi'
+    include 'name_len.fi'
+    type(layout),target :: lhc1
+    integer i,mf,k,pos,nfac(maxmul)
+    real(dp) d(maxmul+2),b(maxmul),a(maxmul)
+    character*255 line
+    character(name_len) name
+    character(*) filename1
+    type(fibre),pointer :: p
+
+    nfac(1)=1
+    do i=2,maxmul
+       nfac(i)=nfac(i-1)*(i-1)
+    enddo
+
+    do i=1,8
+       read(mf,'(a255)', end=101) line
+    enddo
+    p=>lhc1%start
+    do while(.true.)
+       read(mf,*, end=102) name,d(:)
+       do k=1,maxmul
+          b(k)=d(2*k-1)/nfac(k)
+          a(k)=d(2*k)/nfac(k)
+       enddo
+       call context(name)
+       call move_to(lhc1,p,name,pos)
+       if(pos/=0.and.p%mag%parent_fibre%dir==1) then
+          if(p%mag%l/=zero) then
+             b=b/p%mag%l
+             a=a/p%mag%l
+          endif
+          do k=maxmul,1,-1
+             if(b(k)/=zero) then
+                call add(p,k,0,b(k))
+             endif
+             if(a(k)/=zero) then
+                call add(p,-k,0,a(k))
+             endif
+          enddo
+       else
+          write(6,*) " name,pos, dir of dna ",name, p%mag%parent_fibre%dir
+       endif
+    enddo
+102 continue
+    close(mf)
+    return
+101 continue
+    call aafail("PTC error file with name: >>> "//filename1(:len_trim(filename1)-1),' <<< is corrupted')
+    close(mf)
+    return
+
+  end SUBROUTINE fill_errors
 
 END MODULE madx_ptc_module
