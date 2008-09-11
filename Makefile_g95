@@ -72,6 +72,7 @@ ifeq ($(OSTYPE),darwin)
   f95_FLAGS= -c -O4 -fno-second-underscore -funroll-loops -I.
   FFLAGS77= -c -O4 -fno-second-underscore -funroll-loops -I. -D_G95
   FP=-m32
+  LDOPT=-m32
 endif
 
 default: madx

@@ -81,6 +81,7 @@ ifeq ($(OSTYPE),darwin)
   GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/
   GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
   FP=-m32
+  LDOPT=-m32
 endif
 
 default: madx
