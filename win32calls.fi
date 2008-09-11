@@ -44,6 +44,8 @@
       external get_string
       !DEC$ ATTRIBUTES C,REFERENCE :: get_title
       external get_title
+      !DEC$ ATTRIBUTES C,REFERENCE :: get_beam_value
+      external get_beam_value
       !DEC$ ATTRIBUTES C,REFERENCE :: get_value
       external get_value
       !DEC$ ATTRIBUTES C,REFERENCE :: get_variable
