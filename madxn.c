@@ -3547,6 +3547,7 @@ void pro_track(struct in_cmd* cmd)
 void pro_ptc_twiss()
   /* controls ptc_twiss module */
 {
+  struct command* keep_beam = current_beam;
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
@@ -3636,9 +3637,26 @@ void pro_ptc_twiss()
   w_ptc_twiss_(tarr->i);
   fill_twiss_header_ptc(twiss_table,ptc_deltap);
   if (w_file) out_table(table_name, twiss_table, filename);
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
   delete_int_array(tarr);
+}
+
+void pro_ptc_create_layout()
+  /* controls ptc_create_layout module */
+{
+  struct command* keep_beam = current_beam;
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("ptc_create_layout - sequence without beam:", current_sequ->name);
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
+  w_ptc_create_layout_();
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
 }
 
 void pro_twiss()
