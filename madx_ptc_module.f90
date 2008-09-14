@@ -1041,6 +1041,10 @@ CONTAINS
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
 
+    close(mf1)
+    close(mf2)
+    close(mf3)
+
     return
 
 999 call aafail("PTC error file with name: >>> "//myfilen(:len_trim(myfilen)-1),' <<< does not exist')
@@ -1320,6 +1324,7 @@ CONTAINS
     type(real_8)         :: yfull(6)  !polimorphes array used for calculating maps for each element
     real(dp)             :: xt(6)
     integer              :: i !iterators
+    integer mf1,mf2
     character(200)       :: filename='ptcmaps.txt'
     character(200)       :: filenamefull='ptcmaps'
     integer              :: flag_index,why(9)
@@ -1337,12 +1342,14 @@ CONTAINS
     endif
 
     if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
-    open(unit=42,file=filename)
+    call kanalnummer(mf1)
+    open(unit=mf1,file=filename)
 
     !    write(filenamefull,*) filename,".",my_ring%start%mag%name,"-",my_ring%end%mag%name,".txt"
     filenamefull="ptcmaps.start-end.txt"
     print*, filenamefull
-    open(unit=43,file=filenamefull)
+    call kanalnummer(mf2)
+    open(unit=mf2,file=filenamefull)
 
     print*, "no=1"," mynd2=",c_%nd2," npara=",c_%npara
     call init(getintstate(),1,c_%np_pol,berz)
@@ -1369,6 +1376,8 @@ CONTAINS
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             close(mf1)
+             close(mf2)
              return
           endif
 
@@ -1381,6 +1390,8 @@ CONTAINS
              call fort_warn('ptc_dumpmaps: ',whymsg)
              call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
+             close(mf1)
+             close(mf2)
              return
           endif
 
@@ -1388,6 +1399,8 @@ CONTAINS
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             close(mf1)
+             close(mf2)
              return
           endif
 
@@ -1399,6 +1412,8 @@ CONTAINS
              call fort_warn('ptc_dumpmaps: ',whymsg)
              call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
+             close(mf1)
+             close(mf2)
              return
           endif
        else
@@ -1408,6 +1423,8 @@ CONTAINS
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             close(mf1)
+             close(mf2)
              return
           endif
 
@@ -1419,6 +1436,8 @@ CONTAINS
              call fort_warn('ptc_dumpmaps: ',whymsg)
              call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
+             close(mf1)
+             close(mf2)
              return
           endif
 
@@ -1426,6 +1445,8 @@ CONTAINS
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_dumpmaps: ','DA got unstable')
              call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             close(mf1)
+             close(mf2)
              return
           endif
 
@@ -1437,6 +1458,8 @@ CONTAINS
              call fort_warn('ptc_dumpmaps: ',whymsg)
              call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
              c_%watch_user=.false.
+             close(mf1)
+             close(mf2)
              return
           endif
        endif
@@ -1447,6 +1470,8 @@ CONTAINS
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_dumpmaps: ','DA got unstable')
           call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+          close(mf1)
+          close(mf2)
           return
        endif
 
@@ -1459,28 +1484,30 @@ CONTAINS
           call fort_warn('ptc_dumpmaps: ',whymsg)
           call seterrorflag(10,"ptc_dumpmaps: ",whymsg);
           c_%watch_user=.false.
+          close(mf1)
+          close(mf2)
           return
        endif
 
-       write(43,*) p%mag%name, suml,' m ==========================='
-       call print(yfull,43)
+       write(mf2,*) p%mag%name, suml,' m ==========================='
+       call print(yfull,mf2)
 
        suml=suml+p%MAG%P%ld
 
-       write(42,*) p%mag%name, suml,' m ==========================='
+       write(mf1,*) p%mag%name, suml,' m ==========================='
        if (c_%npara == 6) then
-          call dump6dmap(y2, 42)
+          call dump6dmap(y2, mf1)
        elseif (c_%npara == 5) then
-          call dump5dmap(y2, 42)
+          call dump5dmap(y2, mf1)
        elseif (c_%npara == 4) then
-          call dump4dmap(y2, 42)
+          call dump4dmap(y2, mf1)
        else
           call fort_warn("ptc_dumpmaps","c_%npara is neither 6,5 nor 4")
        endif
        p=>p%next
     enddo
 
-    close(42)
+    close(mf1)
     call kill(y2);
     call kill(id);
 
@@ -2185,11 +2212,9 @@ CONTAINS
        endif
     enddo
 102 continue
-    close(mf)
     return
 101 continue
     call aafail("PTC error file with name: >>> "//filename1(:len_trim(filename1)-1),' <<< is corrupted')
-    close(mf)
     return
 
   end SUBROUTINE fill_errors
