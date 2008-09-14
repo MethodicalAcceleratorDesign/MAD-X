@@ -3574,6 +3574,8 @@ void pro_ptc_twiss()
     if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
   }
 
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("PTC_TWISS - sequence without beam:", current_sequ->name);
   pos = name_list_pos("table", nl);
   if(nl->inform[pos]) /* table name specified - overrides save */
   {
