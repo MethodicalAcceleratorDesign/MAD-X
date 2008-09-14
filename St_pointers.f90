@@ -535,7 +535,12 @@ contains
           ENDDO
           Write(6,*) " Number of parameters = ",np
           Write(6,*) " Number of polymorphic blocks = ",NPOL
+       case('PUTFAMILY','LAYOUT<=KNOB')
+          do j=1,NPOL
+             my_ering=pol_(j)
+          enddo
        case('DEALLOCATEFAMILIES')
+          call kill_para(my_ering)
           deallocate(POL_)
        case('FITTUNE')
           read(mf,*) epsf
@@ -939,6 +944,8 @@ contains
 
     enddo
 100 continue
+    if(associated(my_old_state)) my_estate=>my_old_state
+
     write(6,*) " Exiting Command File ", ptc_fichier(1:len_trim(ptc_fichier))
 
     close(mf)

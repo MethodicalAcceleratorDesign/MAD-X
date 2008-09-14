@@ -852,7 +852,7 @@ contains
              IF(k%FRINGE.or.el6%p%permfringe) CALL MULTIPOLE_FRINGE(EL6%P,EL6%AN,EL6%BN,1,X,k)
           ELSE
              CALL EDGE(EL6%P,EL6%BN,EL6%H1,EL6%H2,EL6%FINT,EL6%HGAP,2,X,k)
-             IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL6%P,EL6%AN,EL6%BN,2,X,k)
+             IF(k%FRINGE.or.el6%p%permfringe) CALL MULTIPOLE_FRINGE(EL6%P,EL6%AN,EL6%BN,2,X,k)
           ENDIF
        else
           if(EL6%P%DIR==1) THEN
@@ -8831,7 +8831,7 @@ contains
 
   END SUBROUTINE SKICKP
 
-  SUBROUTINE INTER_TEAPOT(EL,X,k)
+  SUBROUTINE INTER_TEAPOT(EL,X,k,pos)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(TEAPOT),INTENT(IN):: EL
@@ -8839,11 +8839,26 @@ contains
     real(dp) D1,D2,DK1,DK2
     real(dp) DD1,DD2
     real(dp) DF(4),DK(4),DDF(4)
-    INTEGER I,J
+    INTEGER I,J,f1
+    integer,optional :: pos
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DH=EL%L/EL%P%NST
+       D=EL%L/(EL%P%NST/EL%F/2)
+       DD=EL%P%LD/EL%P%NST
+
+       IF(MOD(POS,2*EL%F)==f1) THEN
+          CALL SKICK (EL,D,X,k)
+       ENDIF
+       CALL SSECH1(EL,DH,DD,X,k)
     CASE(2)
        DH=EL%L/two/EL%P%NST
        D=EL%L/EL%P%NST
@@ -8903,7 +8918,7 @@ contains
 
   END SUBROUTINE INTER_TEAPOT
 
-  SUBROUTINE INTEP_TEAPOT(EL,X,k)
+  SUBROUTINE INTEP_TEAPOT(EL,X,k,pos)
     IMPLICIT NONE
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(TEAPOTP),INTENT(IN):: EL
@@ -8911,11 +8926,28 @@ contains
     real(dp) DD1,DD2
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
-    INTEGER I,J
+    INTEGER I,J,f1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer,optional :: pos
 
 
     SELECT CASE(EL%P%METHOD)
+    CASE(1)
+       CALL ALLOC(DH,D)
+       if(EL%F==1) then
+          f1=0
+       else
+          f1=EL%F+1
+       endif
+       DH=EL%L/EL%P%NST
+       D=EL%L/(EL%P%NST/EL%F/2)
+       DD=EL%P%LD/EL%P%NST
+
+       IF(MOD(POS,2*EL%F)==f1) THEN
+          CALL SKICK (EL,D,X,k)
+       ENDIF
+       CALL SSECH1(EL,DH,DD,X,k)
+       CALL kill(DH,D)
     CASE(2)
 
        CALL ALLOC(DH,D)
@@ -8993,9 +9025,8 @@ contains
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-
     DO I=1,EL%P%NST
-       IF(.NOT.PRESENT(MID)) CALL TRACK_SLICE(EL,X,k)
+       IF(.NOT.PRESENT(MID))CALL TRACK_SLICE(EL,X,k,I)
        IF(PRESENT(MID)) CALL XMID(MID,X,I)
     ENDDO
 
@@ -9015,7 +9046,7 @@ contains
     CALL MAKEPOTKNOB(EL,CHECK_KNOB,AN,BN)
 
     DO I=1,EL%P%NST
-       CALL TRACK_SLICE(EL,X,k)
+       CALL TRACK_SLICE(EL,X,k,I)
     ENDDO
 
 
@@ -11846,6 +11877,7 @@ contains
     INTEGER, INTENT(IN)::I
     !integer k
     IF(I==-1) THEN
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
        if(ASSOCIATED(EL%bf_x)) then
           deallocate(EL%bf_x)
        endif
@@ -11857,6 +11889,7 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%f)
        NULLIFY(EL%bf_x)
        NULLIFY(EL%bf_y)
        NULLIFY(EL%DRIFTKICK)
@@ -11870,6 +11903,7 @@ contains
     INTEGER, INTENT(IN)::I
 
     IF(I==-1) THEN
+       if(ASSOCIATED(EL%F)) deallocate(EL%F)
        if(ASSOCIATED(EL%bf_x)) then
           CALL KILL(EL%bf_x,S_B(SECTOR_NMUL)%N_MONO)   ! not used, will be used locally only
           !          CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)   ! not used, will be used locally only
@@ -11886,6 +11920,7 @@ contains
 
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%f)
        NULLIFY(EL%bf_x)
        NULLIFY(EL%bf_Y)
        NULLIFY(EL%DRIFTKICK)

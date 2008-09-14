@@ -212,8 +212,10 @@ contains
        write(6,*) "HELP"
        stop
     endif
+    id=y
 
-
+    call print(id,mf)
+    close(mf)
     call kill(id); call kill(norm);call kill(y);call kill(betax,betax2);
     deallocate(expo1,expo2)
     deallocate(expo3,expo4)
@@ -1755,7 +1757,7 @@ contains
   end SUBROUTINE  track_aperture
 
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend,fib) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend,fib,useknob) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
@@ -1763,6 +1765,7 @@ contains
     real(dp), OPTIONAL, intent(in) :: lmax0
     real(dp), OPTIONAL, intent(in) ::xbend
     type(fibre), OPTIONAL, target :: fib
+    logical(lp), OPTIONAL :: useknob
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggb,ggbt,xbend1,gf(7)
     INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb
     integer incold ,parityold
@@ -1894,6 +1897,26 @@ contains
     nst_tot=0
     C=>R%START
     do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
+       doit=.true.
+       if(present(useknob)) then
+          if(useknob) then
+             doit=c%magp%knob
+          else
+             doit=.not.c%magp%knob
+          endif
+       endif
+       if(present(fib)) then
+          doit=associated(c,fib)
+       endif
+       if(.not.doit) then
+          NST_tot=NST_tot+C%MAG%P%nst
+          if(c%mag%even) then
+             parity=parityold
+             inc=incold
+          endif
+          C=>C%NEXT
+          cycle
+       endif
 
        if(c%mag%even) then
           parity=0
@@ -1912,10 +1935,6 @@ contains
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
           DOIT=DOIT.OR.(C%MAG%KIND==kind17)
           doit=doit.and.C%MAG%recut
-          if(present(fib)) then
-             doit=doit.and.associated(c,fib)
-          endif
-
           if(doit) then
              xl=C%MAG%L
              RHOI=zero
@@ -2005,9 +2024,6 @@ contains
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
           DOIT=DOIT.OR.(C%MAG%KIND==kind17)
           doit=doit.and.C%MAG%recut
-          if(present(fib)) then
-             doit=doit.and.associated(c,fib)
-          endif
 
           if(doit) then
              xl=C%MAG%L
@@ -2101,9 +2117,6 @@ contains
           endif
 
        case(2)
-          if(present(fib)) then
-             doit=doit.and.associated(c,fib)
-          endif
 
 
           doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
@@ -2301,9 +2314,14 @@ contains
     if(associated(C%MAG%K16)) then
        doit=(C%MAG%K16%DRIFTKICK.and.C%MAG%p%method==2)
     endif
+    if(associated(C%MAG%TP10)) then
+       doit=(C%MAG%TP10%DRIFTKICK.and.C%MAG%p%method==2)
+    endif
     IF(doit) then
 
-       f0=nint(C%MAG%l/lmax0)
+       !       f0=nint(C%MAG%l/lmax0)
+       f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/2)
+       if(C%MAG%p%method==6) f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/4)
        if(f0==0) f0=1
        if(C%MAG%p%method==2) then
           C%MAG%p%nst=C%MAG%p%nst*f0*2
@@ -2329,6 +2347,9 @@ contains
        elseif(associated(C%MAG%K16)) then
           C%MAG%K16%f=f0
           C%MAGp%K16%f=f0
+       elseif(associated(C%MAG%TP10)) then
+          C%MAG%TP10%f=f0
+          C%MAGp%TP10%f=f0
        else
           C%MAG%k2%f=f0
           C%MAGp%k2%f=f0
@@ -2398,12 +2419,14 @@ contains
 
   end SUBROUTINE  check_bend
 
-  SUBROUTINE  THIN_LENS_restart(R) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_restart(R,fib,useknob) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
     INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii  !,limit0(2)
+    type(fibre), OPTIONAL, target :: fib
+    logical(lp), OPTIONAL :: useknob
     logical(lp) doit
     TYPE (fibre), POINTER :: C
     TYPE (layout), POINTER :: l
@@ -2439,6 +2462,22 @@ contains
     nst_tot=0
     C=>R%START
     do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
+       doit=.true.
+       if(present(useknob)) then
+          if(useknob) then
+             doit=c%magp%knob
+          else
+             doit=.not.c%magp%knob
+          endif
+       endif
+       if(present(fib)) then
+          doit=associated(c,fib)
+       endif
+       if(.not.doit) then
+          NST_tot=NST_tot+C%MAG%P%nst
+          C=>C%NEXT
+          cycle
+       endif
 
 
        doit=(C%MAG%KIND==kind1.and.C%MAG%KIND==kind2.or.C%MAG%KIND==kind5.or.C%MAG%KIND==kind4)

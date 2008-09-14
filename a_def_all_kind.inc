@@ -219,6 +219,7 @@ TYPE TEAPOT
    logical(lp),   POINTER :: DRIFTKICK                   ! Split flag
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END TYPE TEAPOT
 
 TYPE TEAPOTP
@@ -230,6 +231,7 @@ TYPE TEAPOTP
    logical(lp),   POINTER :: DRIFTKICK
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   integer, pointer :: f
 END TYPE TEAPOTP
 
 TYPE MON
