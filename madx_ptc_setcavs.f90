@@ -21,6 +21,7 @@ contains
     integer              :: charge    ! charge of an accelerated particle
     !      use madx_keywords
     integer              :: i,j!,currentelement=1       !iterators
+    integer              :: mf1,mf2
     type(fibre), pointer :: p     ! skowron: temporary variable: current fibre
     type(work)           :: startfen
     type(work)           :: nfen      ! New Fibre ENergy
@@ -56,9 +57,11 @@ contains
     charge = get_value('beam ', "charge ")
 
     if (getdebug() > 1) then
-       open(unit=21,file='sychrpart.txt')
-       open(unit=24,file='twcavsettings.txt')
-       write(24,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
+       call kanalnummer(mf1)
+       call kanalnummer(mf2)
+       open(unit=mf1,file='sychrpart.txt')
+       open(unit=mf2,file='twcavsettings.txt')
+       write(mf2,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
     endif
 
     nfen = 0
@@ -69,7 +72,7 @@ contains
     if ( getdebug() > 2 ) write(6,*) "There are ", size(poscav), " Cavities in the line."
     if ( size(poscav) == 0) then
        if (getdebug() > 1) then
-          close(21);close(24);
+          close(mf1);close(mf2);
        endif
        return
     endif
@@ -108,7 +111,7 @@ contains
              deallocate(poscav);
              deallocate(phasecav);
              if (getdebug() > 1) then
-                close(21);close(24);
+                close(mf1);close(mf2);
              endif
              return
           endif
@@ -122,9 +125,9 @@ contains
           endif
 
           if (getdebug() > 1) then
-             write (21,*) ' '
-             write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-             write (21,'(6f8.4)') x
+             write (mf1,*) ' '
+             write (mf1,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+             write (mf1,'(6f8.4)') x
           endif
 
           p=>p%next
@@ -161,7 +164,7 @@ contains
        call setcavity(p,x,phasecav(j),charge,maxaccel)
 
        if (getdebug() > 1) then
-          write(24,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
+          write(mf2,120) poscav(j), p%mag%p%p0c, p%mag%phas*c_360/twopi, p%mag%freq, p%mag%volt, p%mag%delta_e
        endif
 
        !TRACK CAVITY
@@ -174,15 +177,15 @@ contains
           deallocate(poscav);
           deallocate(phasecav);
           if (getdebug() > 1) then
-             close(21);close(24);
+             close(mf1);close(mf2);
           endif
           return
        endif
 
        if (getdebug() > 1) then
-          write (21,*) ' '
-          write (21,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-          write (21,'(6f8.4)') x
+          write (mf1,*) ' '
+          write (mf1,130) 'poscav(j)=',poscav(j),' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+          write (mf1,'(6f8.4)') x
        endif
 
        if ( getdebug() > 2 ) then
@@ -233,15 +236,15 @@ contains
           deallocate(poscav);
           deallocate(phasecav);
           if (getdebug() > 1) then
-             close(21);close(24);
+             close(mf1);close(mf2);
           endif
           return
        endif
 
        if (getdebug() > 1) then
-          write (21,*) ' '
-          write (21,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
-          write (21,'(6f8.4)') x
+          write (mf1,*) ' '
+          write (mf1,130) 'i=',i,' name=',p%mag%name,' p0c=',p%mag%p%p0c, ' Current energy ',nfen%energy
+          write (mf1,'(6f8.4)') x
        endif
 
        if ( getdebug() > 1 ) then
@@ -257,9 +260,9 @@ contains
 
 
     if (getdebug() > 1) then
-       write (21,*) ' '
-       write (21,*) 'END'
-       write (21,'(6f8.4)') x
+       write (mf1,*) ' '
+       write (mf1,*) 'END'
+       write (mf1,'(6f8.4)') x
 
        write(6,*) 'PARAMETERS AT THE END OF LINE:'
        write(6,'(a, 6f8.4)') ' Track parameters ',x
@@ -306,7 +309,7 @@ contains
     deallocate(phasecav);
 
     if (getdebug() > 1) then
-       close(21);close(24);
+       close(mf1);close(mf2);
     endif
 
     !****************************************************************************************
