@@ -151,6 +151,7 @@ MODULE madx_ptc_track_run_module
   ! It contains variables which exchange data between
   ! SUBROUTINE ptc_track_run and called from it
   ! external subroutines calculating particle interactions
+  use file_handler
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
@@ -2254,14 +2255,15 @@ CONTAINS
 
       TYPE(damap) :: Map_damap
 
-      INTEGER ::  iii_c_code, i_obs_point, i_coord, &
-           i_from, i_till, i_dummy, i_Unit, i_turn_tmp, j_part_tmp, ielem
+      INTEGER ::  iii_c_code, i_obs_point, i_coord, ii, &
+           i_from, i_till, i_dummy, i_turn_tmp, j_part_tmp, ielem
       !INTEGER :: nda, NormOrder, npara, mynd2
       INTEGER :: flag_index,why(9)
 
       INTEGER, ALLOCATABLE :: Temp_particle_ID(:)
 
       ! type(fibre), POINTER :: current ! advance node in PTC - global in <PTC_TRACK_RUN>
+      integer  :: mf1,mf2,mf(max_obs)
 
       REAL(dp) :: spos
 
@@ -2289,14 +2291,18 @@ CONTAINS
       ! nda=0; NormOrder=1 npara=0;mynd2=0;
       ! call init(default,NormOrder,nda,BERZ,mynd2,npara) - already known
       if (ptc_track_debug) then
-         write(31,*) 'Map_Y_obs IN: '; call daprint(Map_Y_obs,31);
+         call kanalnummer(mf1)
+         call kanalnummer(mf2)
+         open(unit=mf1,file='map_y_obs_in.txt')
+         open(unit=mf2,file='map_y_obs.txt')
+         write(mf1,*) 'Map_Y_obs IN: '; call daprint(Map_Y_obs,mf1);
       endif
       Map_Y_obs=npara
       Map_Y_obs=x_coord_co_at_START  ! Y=X
 
       if (ptc_track_debug) then
          Print *, ' x_coord_co_at_START=', x_coord_co_at_START
-         write(32,*) 'Map_Y_obs=x_coord_co_at_START: '; call daprint(Map_Y_obs,32);
+         write(mf2,*) 'Map_Y_obs=x_coord_co_at_START: '; call daprint(Map_Y_obs,mf2);
       endif
 
       Allocate (X_co_observe(1:6,1:max_obs), &
@@ -2313,6 +2319,9 @@ CONTAINS
       current=>MY_RING%start     ! F90 pointer to the CURRENT beamline element is set up
 
       obs_point_loop: DO i_obs_point=1, max_obs-1
+         
+         call kanalnummer(mf(i_obs_point))
+         open(unit=mf(i_obs_point),file="obs_point_"//achar(i_obs_point))
 
          i_from=elem_number_at_observ(i_obs_point)
          i_till=elem_number_at_observ(i_obs_point+1)
@@ -2330,8 +2339,7 @@ CONTAINS
 
          Map_damap=Map_Y_obs
          if (ptc_track_debug) then
-            i_Unit=20+i_obs_point
-            write(i_Unit,*) 'i_Unit=', i_Unit; Call daprint(Map_Y_obs,i_Unit);
+            write(mf(i_obs_point),*) 'i_Unit=', mf(i_obs_point); Call daprint(Map_Y_obs,mf(i_obs_point));
          endif
          call PRODUCE_APERTURE_FLAG(flag_index)
          if(flag_index/=0) then
@@ -2340,6 +2348,11 @@ CONTAINS
             Write(6,*) why ! See produce aperture flag routine in sd_frame
             CALL kill(Map_Y_obs) !CALL kill(y)
             ! c_%watch_user=.false.
+            if (ptc_track_debug) then
+               close(mf1)
+               close(mf2)
+            endif
+            close(mf(i_obs_point))
             return
          endif
 
@@ -2455,11 +2468,16 @@ CONTAINS
             current=>current%next     ! f90-code bring to the next mode
          END DO Jump_to_next_observation_point
          !
+         close(mf(i_obs_point))
       END DO obs_point_loop !####################################################################!
 
       DEALLOCATE( X_co_observe,  Temp_particle_ID)
 
       CALL kill(Map_damap)
+      if (ptc_track_debug) then
+         close(mf1)
+         close(mf2)
+      endif
       !Call kill(Map_Y_obs)
     END SUBROUTINE Observation_with_PTC
     !==============================================================================
@@ -3091,6 +3109,7 @@ CONTAINS
 
     REAL (dp) :: d_val(6)
     INTEGER   :: i_vec, i_comp, ind(6), Number_of_eigenvectors
+    integer   :: mf1,mf2,mf3
     !------------------------------------------------------------------------------
     IF (ptc_track_debug)  print *, 'Start Subr.  Get_map_from_NormalForm '
 
@@ -3107,11 +3126,17 @@ CONTAINS
 
     Map_Y=npara ! y=npara
     Map_Y=x_coord_co  ! Y=X
-    IF (ptc_track_debug) call daprint(Map_Y,16);
+    IF (ptc_track_debug) then
+       call kanalnummer(mf1)
+       call kanalnummer(mf2)
+       open(unit=mf1,file='map_y_ini.txt')
+       open(unit=mf2,file='map_y.txt')
+       call daprint(Map_Y,mf1);
+    endif
     !    c_%watch_user=.true.
 
     call track(my_ring,Map_Y,1,default)
-    IF (ptc_track_debug)call daprint(Map_Y,17);
+    IF (ptc_track_debug)call daprint(Map_Y,mf2);
 
 
     call PRODUCE_APERTURE_FLAG(flag_index)
@@ -3121,6 +3146,10 @@ CONTAINS
        Write(6,*) why ! See produce aperture flag routine in sd_frame
        CALL kill(Map_Y) !CALL kill(y)
        ! c_%watch_user=.false.
+       IF (ptc_track_debug) then
+          close(mf1)
+          close(mf1)
+       endif
        return
     endif
     !    c_%watch_user=.false.
@@ -3139,13 +3168,14 @@ CONTAINS
     A_t_map_rev=Normal_Form_N%A_t**(-1)
 
     if (ptc_track_debug) then
-       OPEN (UNIT=17,FILE='Normal_FORM_A.txt', STATUS='UNKNOWN')
-       write(17,'(/a/)') 'Map_Y: '; call daprint(Map_Y,17);
-       write(17,'(/a/)') 'Linear Normal_Form_N%A: '; call daprint(Normal_Form_N%A,17);     !
-       write(17,'(/a/)') 'Linear Normal_Form_N%A_t: '; call daprint(Normal_Form_N%A_t,17); !
-       write(17,'(/a/)') 'Linear A_t_map: '; call daprint(A_t_map,17);                     !
-       write(17,'(/a/)') 'Linear A_t_map_rev: '; call daprint(A_t_map_rev,17);             !
-       Close (17)
+       call kanalnummer(mf3)
+       OPEN (UNIT=mf3,FILE='normal_form_a.txt', STATUS='UNKNOWN')
+       write(mf3,'(/a/)') 'Map_Y: '; call daprint(Map_Y,mf3);
+       write(mf3,'(/a/)') 'Linear Normal_Form_N%A: '; call daprint(Normal_Form_N%A,mf3);     !
+       write(mf3,'(/a/)') 'Linear Normal_Form_N%A_t: '; call daprint(Normal_Form_N%A_t,mf3); !
+       write(mf3,'(/a/)') 'Linear A_t_map: '; call daprint(A_t_map,mf3);                     !
+       write(mf3,'(/a/)') 'Linear A_t_map_rev: '; call daprint(A_t_map_rev,mf3);             !
+       Close (mf3)
        ! CALL TEST_PTC_Normal(Normal_Form_N)
     end if
 
@@ -3159,11 +3189,15 @@ CONTAINS
           d_val(i_comp)=Normal_Form_N%A_t%V(i_vec).sub.ind
        enddo
        if (ptc_track_debug) then
-          WRITE(17,*) 'EigenVector V(',i_vec,')=', d_val
+          WRITE(mf2,*) 'EigenVector V(',i_vec,')=', d_val
        endif
        !enddo
     end do
     !DEallocate (d_val)
+    IF (ptc_track_debug) then
+       close(mf1)
+       close(mf2)
+    endif
   END subroutine Get_map_from_NormalForm
   !==============================================================================
 
