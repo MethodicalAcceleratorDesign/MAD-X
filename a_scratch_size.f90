@@ -76,25 +76,25 @@ module precision_constants
   real(dp)::rpi4
   real(dp),parameter::RAD_TO_DEG_=c_180/pi,DEG_TO_RAD_=pi/c_180
   !Physical Constants
-  real(dp),parameter::A_ELECTRON=1.159652e-3_dp
-  real(dp),parameter::A_MUON=1.165923e-3_dp
-  real(dp),parameter::A_PROTON=1.7928474e-0_dp
-  real(dp),parameter:: pmaMUON = 105.658369E-3_DP
+  real(dp),parameter::A_ELECTRON=1.15965218111e-3_dp  !frs NIST CODATA 2006
+  real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
+  real(dp),parameter::A_PROTON=1.79284735e-0_dp        !frs (approx) NIST CODATA 2006
+  real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
   real(dp) :: A_particle = A_ELECTRON
-  real(dp),parameter::pmae=5.10998902e-4_dp
-  real(dp),parameter::pmae_amu=5.48579903e-4_dp
+  real(dp),parameter::pmae=5.10998910e-4_dp           !frs NIST CODATA 2006
+  real(dp),parameter::pmae_amu=5.4461702177e-4_dp     !frs NIST CODATA 2006
   ![GeV]
-  real(dp),parameter::pmap=0.938271998e0_dp
+  real(dp),parameter::pmap=0.938272013e0_dp           !frs NIST CODATA 2006
   ![GeV]
-  real(dp),parameter::CLIGHT=2.99792458e8_dp
+  real(dp),parameter::CLIGHT=2.99792458e8_dp          ! exact
   ![m/s]
-  real(dp),parameter::hbar=6.58211889e-25_dp
+  real(dp),parameter::hbar=6.58211889e-25_dp          !frs NIST CODATA 2006
   ![GeV*s]
-  real(dp),parameter::dhbar=1.05457168e-34_dp
+  real(dp),parameter::dhbar=1.054571628e-34_dp        !frs NIST CODATA 2006
   ![J*s]
-  real(dp),parameter::qelect=1.602176462e-19_dp
+  real(dp),parameter::qelect=1.602176487e-19_dp       !frs NIST CODATA 2006
   ![A*s]
-  real(dp),parameter::eps_0=8.854187817e-12_dp
+  real(dp),parameter::eps_0=8.854187817e-12_dp        ! exact
   ![A*S/V*m]
   real(dp),parameter::class_e_radius=qelect/four/pi/eps_0/pmae/c_1d9
   ![m]

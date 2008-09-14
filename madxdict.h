@@ -6,14 +6,14 @@ char predef_constants[] =
 "const raddeg = pi / 180; "
 "const e = exp(1.); "
 "const amu0 = 4.e-7 * pi; "
-"const emass = 0.510998902e-3; "
-"const mumass = 0.1056583568; "
-"const nmass = 0.931494013; " /* unified atomic mass unit [GeV/(c**2)] */
-"const pmass = 0.938271998; "
+"const emass = 0.510998910e-3; "
+"const mumass = 0.1056583668; "
+"const nmass = 0.931494028; " /* unified atomic mass unit [GeV/(c**2)] */
+"const pmass = 0.938272013; "
 "const clight = 299792458.; "
-"const qelect = 1.602176462e-19; "
-"const hbar = 6.58211889e-25; "
-"const erad = 2.817940325e-15; "
+"const qelect = 1.602176487e-19; "
+"const hbar = 6.58211899e-25; "
+"const erad = 2.8179402894e-15; "
 "const prad = erad*emass/pmass; ";
 
 
