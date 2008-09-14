@@ -1,3 +1,0 @@
-!---- maxmul is the maximum multipole order both in twiss and trrun
-      integer maxmul,maxferr,maxnaper
-      parameter(maxmul=20,maxferr=50,maxnaper=100)
