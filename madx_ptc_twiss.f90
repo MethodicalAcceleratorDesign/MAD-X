@@ -282,11 +282,11 @@ contains
     integer                 :: k,i,ii
     integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
     character(200)          :: whymsg
-    integer                 :: ioptfun,iii,restart_sequ,advance_node
+    integer                 :: ioptfun,iii,restart_sequ,advance_node,mf1,mf2
     integer                 :: tab_name(*)
     real(dp)                :: x(6)
     real(dp)                :: deltap0,deltap,d_val
-    real(kind(1d0))         :: get_value,suml
+    real(kind(1d0))         :: get_value,get_beam_value,suml
     integer                 :: geterrorflag !C function that returns errorflag value
     type(real_8)            :: y(6), transfermap(6)
     type(twiss)             :: tw
@@ -330,7 +330,6 @@ contains
     call cleartables() !defined in madx_ptc_knobs
 
     call kill_para(my_ring) !removes all the previous parameters
-
 
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
@@ -467,7 +466,8 @@ contains
 
 
     if (getdebug() > 2) then
-       open(unit=21,file='ptctwiss.txt')
+       call kanalnummer(mf1)
+       open(unit=mf1,file='ptctwiss.txt')
        print *, "ptc_twiss: internal state is:"
        call print(default,6)
     endif
@@ -515,6 +515,7 @@ contains
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_twiss: ','DA got unstable')
           call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+          if (getdebug() > 2) close(mf1)
           return
        endif
 
@@ -530,9 +531,9 @@ contains
        endif
 
        if (getdebug() > 2) then
-          write(21,*) "##########################################"
-          write(21,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-          call print(y,21)
+          write(mf1,*) "##########################################"
+          write(mf1,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
+          call print(y,mf1)
        endif
 
        suml=suml+current%MAG%P%ld
@@ -571,9 +572,10 @@ contains
     print77=.false.
     read77=.false.
 
-    open(unit=121,file='end.map')
-    call print(y,121)
-    close(121)
+    call kanalnummer(mf2)
+    open(unit=mf2,file='end.map')
+    call print(y,mf2)
+    close(mf2)
 
     c_%watch_user=.false.
 
@@ -599,7 +601,7 @@ contains
 
     call f90flush(20,my_false)
 
-    if (getdebug() > 2) close(21)
+    if (getdebug() > 2) close(mf1)
 
     !****************************************************************************************
     !*********  E N D   O F   PTC_TWISS      ************************************************
@@ -767,7 +769,7 @@ contains
       getdeltae = cfen%energy/startfen%energy
 
       if (getdebug() > 2) then
-         write(21,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
+         write(mf1,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
       endif
 
     end function getdeltae
@@ -781,11 +783,11 @@ contains
       real(kind(1d0))   :: deltae
 
       if (getdebug() > 2) then
-         write(21,*) "##########################################"
-         write(21,*) ""
-         write(21,'(i4, 1x,a, f10.6)') i,current%mag%name,suml
-         write(21,*) ""
-         call print(y,21)
+         write(mf1,*) "##########################################"
+         write(mf1,*) ""
+         write(mf1,'(i4, 1x,a, f10.6)') i,current%mag%name,suml
+         write(mf1,*) ""
+         call print(y,mf1)
       endif
 
       deltae = getdeltae()
@@ -1116,9 +1118,9 @@ contains
       implicit none
       real(dp) :: emix,emiy,emiz
 
-      emix = get_value('beam ','ex ')
-      emiy = get_value('beam ','ey ')
-      emiz = get_value('beam ','et ')
+      emix = get_value('probe ','ex ')
+      emiy = get_value('probe ','ey ')
+      emiz = get_value('probe ','et ')
 
       call setemittances(emix,emiy,emiz)
 
@@ -1321,9 +1323,9 @@ contains
             y(5) = x(5) +  sqrt( beta(3) )*morph((one.mono.5))
             y(6)= x(6) + one/sqrt(beta(3)) * (morph(  (one.mono.6) )-(alpha(3)) * morph(one.mono.5))
 
-            emiz = get_value('beam ','et ')
+            emiz = get_value('probe ','et ')
             if ( emiz .le. 0  ) then
-               sizept = get_value('beam ','sige ')
+               sizept = get_value('probe ','sige ')
                emiz = sizept/sqrt(beta(3))
                !            print*, "Calculated Emittance ", emiz
             else
@@ -1340,15 +1342,15 @@ contains
             !frs we need here the initial value of pt and t should not hurt
             y(5) = x(5) + morph((one.mono.5))
             y(6) = x(6) + morph((one.mono.5))
-            call setsigma(5, get_value('beam ','sige '))
-            call setsigma(6, get_value('beam ','sigt '))
+            call setsigma(5, get_value('probe ','sige '))
+            call setsigma(6, get_value('probe ','sigt '))
          endif
 
       endif
 
-      if ( (icase .gt. 5) .and. (get_value('beam ','et ') .le. 0) ) then !6 and 56
+      if ( (icase .gt. 5) .and. (get_value('probe ','et ') .le. 0) ) then !6 and 56
          !beta(3) is converted to gamma already (in 3rd coord the canonical planes are swapped)
-         emiz = get_value('beam ','sige ')/sqrt(beta(3))
+         emiz = get_value('probe ','sige ')/sqrt(beta(3))
          print*, "icase=",icase," nd=",c_%nd, "sigma(5)=", emiz
          call setsigma(5, emiz)
          call setsigma(6, emiz)
