@@ -99,6 +99,8 @@ if ($lastTest eq $lastRelease) {
 	foreach $auth (@authors){
 		$workReport .= "\t\t$auth: +$linesAdded{$auth} -$linesDeleted{$auth}\n";
 	}
+	$workReport .= "\nSee detailed work report on:\n";
+	$workReport .= "http://test-mad-automation.web.cern.ch/test-mad-automation/workReport.html\n";
 	$workReport .= "\nFrom now on, the test procedure will start and may take several days.\n";
 	$workReport .= "\nAt the end of the test procedure, module keepers will be informed ";
 	$workReport .= "in case of discrepancy between the test's outcome and the reference. \n";
