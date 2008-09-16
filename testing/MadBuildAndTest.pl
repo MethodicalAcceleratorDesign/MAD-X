@@ -127,7 +127,10 @@ if ($child_pid) {
 
 	# at this stage ./MadCvsExtract/madx dir created locally
 	# (currently overwritten by MadBuild.pl)
-
+    
+    
+        # first create the work-log report
+        `./MadWorkReport.pl`; # creates and deletes a CVS extract locally
 
 	# the build-and-test procedure always applies to the last release
 	# even if CVS commits took place afterwards. 
