@@ -401,7 +401,6 @@ char command_def[] =
 "polynomial = [i, none] , "/*defines the element of the tracked 6D array of polynomials */
 "monomial   = [s, none] , "/*defines the monomial that coefficient will be sent to table */
 "parametric = [l, false, true], "/*Tells if the result should be stored in a parametric form if knobs are present*/
-/*"place    = [s, none], "*/
 "quantity   = [s, {none}] ; "
 " "
 "ptc_select_moment: ptc_select_moment none 0 0 "
@@ -541,7 +540,8 @@ char command_def[] =
 "haml = [s, {none}], "
 "anhx = [s, {none}], "
 "anhy = [s, {none}], "
-"eign = [s, {none}]; "
+"eign = [s, {none}], "
+"clear = [l, false, true]; "
 " "
 "ptc_normal: ptc_normal none 0 0 "
 "icase = [i, 4], "

@@ -1367,6 +1367,7 @@ void select_ptc_normal(struct in_cmd* cmd)
     reset_count("normal_results");
     pos = name_list_pos("normal_results", table_register->names);
     min_order = 1;
+    min_req_order = 1;
   }
   t = table_register->tables[pos];
 
@@ -1376,6 +1377,14 @@ void select_ptc_normal(struct in_cmd* cmd)
   order[2] = zero;
   order[3] = zero;
   if (t->curr == t->max) grow_table(t);
+
+  if (log_val("clear", cmd->clone))
+  {
+    min_order = 1;
+    min_req_order = 1;
+    return;
+  }
+
   for (j = 0; j < PTC_NAMES_L; j++)
   {
     /* Treat each ptc variable */
