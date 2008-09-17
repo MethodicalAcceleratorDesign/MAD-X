@@ -1357,6 +1357,15 @@ void select_ptc_normal(struct in_cmd* cmd)
 
   nl = this_cmd->clone->par_names;
   pl = this_cmd->clone->par;
+  if (log_val("clear", cmd->clone))
+  {
+    min_order = 1;
+    min_req_order = 1;
+    mynres = 0;
+    skew = 0;
+/*    if ((pos = name_list_pos("normal_results", table_register->names)) > -1) delete_table(table_register->tables[pos]);*/
+    return;
+  }
   if ((pos = name_list_pos("normal_results", table_register->names)) <= -1)
   {
     /* initialise table */
@@ -1377,13 +1386,6 @@ void select_ptc_normal(struct in_cmd* cmd)
   order[2] = zero;
   order[3] = zero;
   if (t->curr == t->max) grow_table(t);
-
-  if (log_val("clear", cmd->clone))
-  {
-    min_order = 1;
-    min_req_order = 1;
-    return;
-  }
 
   for (j = 0; j < PTC_NAMES_L; j++)
   {
@@ -1491,6 +1493,7 @@ void select_ptc_normal(struct in_cmd* cmd)
       }
       else
       {
+        if(((strcmp(names[j], "dq1") == zero)|| (strcmp(names[j], "dq1") == zero)) && order[0] == zero) order[0]=one;
         string_to_table("normal_results", "name", names[j]);
         double_to_table("normal_results", "order1", &order[0]);
         double_to_table("normal_results", "order2", &order[1]);
