@@ -129,6 +129,7 @@ testing/MadBuild.pl -text
 testing/MadBuildAndTest.pl -text
 testing/MadDiff.pl -text
 testing/MadTest.pl -text
+testing/MadTestOverwrite.pl -text
 testing/MadTestWebStyle.css -text
 testing/MadTrigTest.pl -text
 testing/Makefile -text
