@@ -1,10 +1,12 @@
 # installs test suite files
 
 PERL_SCRIPTS = MadBuild.pl MadTest.pl MadDiff.pl MadBuildAndTest.pl MadTrigTest.pl MadWorkReport.pl
+PERL_ADMIN_TOOLS = MadTestOverwrite.pl
+
 XML_DOCS = TestScenario.xml ProcessScenario.xsl
 HTML_DOCS = MadTestWebStyle.css index.htm
 
-INST_SCRIPT_FILES = $(PERL_SCRIPTS) $(XML_DOCS)
+INST_SCRIPT_FILES = $(PERL_SCRIPTS) $(PERL_ADMIN_TOOLS) $(XML_DOCS)
 INST_WEB_FILES = $(HTML_DOCS)
 
 # temporary locations
