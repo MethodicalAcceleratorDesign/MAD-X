@@ -36,7 +36,7 @@ foreach $targ (@targets){
 	foreach $test (@tests){
 	    chop $test;
 	    print "$test\n";
-	    if ($test =~ /\.\/madx(p?)[\s\t]*<[\s\t]*([\w\d\.\_\-]+)[\s\t]*>[\s\t]*([\w\d\.\_\-]+)[\s\t]*,[\s\t]*subdirectory=([\w\d\-\_\.]+)/){
+	    if ($test =~ /\.\/madx(p?)[\s\t]*<[\s\t]*([\w\d\.\_\-]+)[\s\t]*>[\s\t]*([\w\d\.\_\-]+)[\s\t]*(,[\s\t]*subdirectory=([\w\d\-\_\.]+))?/){
 		# chop $test;
 		if ($1 eq 'p'){
 		    $program = 'madxp';
@@ -45,7 +45,11 @@ foreach $targ (@targets){
 		}
 		$input = $2;
 		$output = $3;
-		$subdir = $4;
+		if (defined($4)){
+		    $subdir = $5;
+		} else {
+		    $subdir = ""; # everything takes place in the same, base directory
+		}
 		print "program is '$program' input is '$input', output is '$output', dir is '$subdir'\n";
 		
 		if ($subdir ne ""){
@@ -55,10 +59,10 @@ foreach $targ (@targets){
 		# path for madx/madxp should link to the latest production version
 		my $where = `pwd`; print "invoked from $where\n";
 		my $programRoot = "/user/nougaret/MAD-X/madX"; 
-		my $command = "$programRoot/$program < $input >! $output";
-
-
-		`$command`; # execute the command
+		my $command = "$programRoot/$program < $input > $output";
+		`rm $output`; # remove the output file (as the forced output redirection, does not seem to work from perl)
+		my $outcome = `$command`; # execute the command
+		print "outcome of \"$command\": $outcome\n";
 		print "note: MAD commands will be picked up in $programRoot\n";
 
 		# now look at the list of files that need CVS commit
