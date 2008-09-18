@@ -52,7 +52,7 @@ foreach $targ (@targets){
 		# path for madx/madxp should link to the latest production version
 		my $where = `pwd`; print "invoked from $where\n";
 		my $programRoot = "/user/nougaret/MAD-X/madX"; 
-		my $command = "$programRoot/$program < $input > $output";
+		my $command = "$programRoot/$program < $input >! $output";
 
 
 		`$command`; # execute the command
