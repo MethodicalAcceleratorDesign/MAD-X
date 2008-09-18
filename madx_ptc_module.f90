@@ -1041,9 +1041,11 @@ CONTAINS
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
 
-    close(mf1)
-    close(mf2)
-    close(mf3)
+    if(errors_in.or.errors_out) close(mf1)
+    if(errors_in) then
+       close(mf2)
+       close(mf3)
+    endif
 
     return
 
