@@ -3,6 +3,8 @@
 # the madx-examples CVS repository, to alleviate the task of the people in charge of overwriting
 # test cases whenever a new release brought unsignificant changes...
 
+use File::Path; # to remove directory trees
+
 
 $target = $ARGV[0];
 $root = "/afs/cern.ch/user/n/nougaret/scratch0/mad-automation";
@@ -13,6 +15,7 @@ $localDirectory = `pwd`; chop $localDirectory;
 
 my $found = 0;
 foreach $targ (@targets){
+
     chop $targ; # remove new line char
     if ($target eq $targ){
 	$found = 1;
@@ -62,7 +65,7 @@ foreach $targ (@targets){
 		@locallyModified = `cvs status | grep Locally`;
 		foreach $mod (@locallyModified){
 		    chop $mod;
-		    if ($mod =~ /^File:[\s\t]*([\w\-\_\.]+)[\s\t]*Status: Locally Modified[\s\t]*$/){
+		    if ($mod =~ /^File:[\s\t]*([\w\d\-\_\.]+)[\s\t]*Status: Locally Modified[\s\t]*$/){
 			my $file = $1;
 			# need to commit this file
 			print "now invoke 'cvs commit -m \"automated commit\"' $file\n";
@@ -81,11 +84,12 @@ foreach $targ (@targets){
 		exit 1;
 	    } # failed to match MAD command line
 	} # for each test
-	chdir $targetDir; # back to where we were...
 	# clean-up the location of the extract (rmtree...)
+	chdir $localDirectory; # back to where we were initially...
+	print "now removing $localDirectory/$localCvsExtractDir CVS extract directory\n";
+	rmtree("$localDirectory/$localCvsExtractDir"); # remove the directory in which we did the CVS extract
     } # target found (only once)
 
-    
 }
 
 if ($found eq 0) {
