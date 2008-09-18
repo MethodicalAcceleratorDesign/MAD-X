@@ -1363,6 +1363,7 @@ void select_ptc_normal(struct in_cmd* cmd)
     min_req_order = 1;
     mynres = 0;
     skew = 0;
+    reset_count("normal_results");
 /*    if ((pos = name_list_pos("normal_results", table_register->names)) > -1) delete_table(table_register->tables[pos]);*/
     return;
   }
