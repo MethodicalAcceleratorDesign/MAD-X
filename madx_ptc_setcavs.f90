@@ -15,7 +15,7 @@ module madx_ptc_setcavs_module
 contains
   subroutine setcavities(my_ring, maxaccel)
     implicit                none
-    type(layout)         :: my_ring
+    type(layout),target  :: my_ring
     type(internal_state) :: localis ! internal state to be use in this routine = intstate+totalpath+time
     logical(lp)          :: maxaccel
     integer              :: charge    ! charge of an accelerated particle
@@ -387,7 +387,7 @@ contains
 
     subroutine locate_all_twcav(r,pos)
       implicit none
-      type(layout), intent(inout) :: r
+      type(layout), target, intent(inout) :: r
       type(fibre), pointer:: p
       integer, pointer ::  pos(:)
       integer i,ic

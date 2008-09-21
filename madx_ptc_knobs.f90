@@ -634,14 +634,14 @@ contains
   subroutine setknobs(alayout)
     implicit none
     include 'twissa.fi'
-    type(layout),pointer       :: alayout
+    type(layout),target      :: alayout
     type (pol_block), pointer  :: pb
     integer     :: i,j,k
 
-    if (.not. associated(alayout)) then
-       call fort_warn("setknobs","Passed pointer to a layout is not associated")
-       return
-    endif
+!    if (.not. associated(alayout)) then
+!       call fort_warn("setknobs","Passed pointer to a layout is not associated")
+!       return
+!    endif
 
     twisstablename = table_name !defined in twissa.fi
 
