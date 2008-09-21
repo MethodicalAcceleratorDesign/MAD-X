@@ -14,7 +14,7 @@ module pointer_lattice
   integer, pointer :: n_pol_block
   real(sp) my_scale_planar
   ! end of stuff for main program
-  integer :: lat(0:6,0:6,3)=1,mres(3)
+  integer :: lat(0:6,0:6,3)=1,mres(3),mresp
   character(25) lat_name(81)
   real(dp) r_ap(2),x_ap,y_ap   ! default aperture
   integer :: kind_ap=2,file_ap=0                      ! Single aperture position and kind of aperture + file unit
@@ -1392,6 +1392,10 @@ contains
     write(6,*) x
     write(6,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
 
+    write(mf1,*) " stable closed orbit tracked "
+    write(mf1,"(6(1X,D18.11))") x
+    write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
+
     CALL INIT(state,2,0,BERZ,ND2,NPARA)
     CALL ALLOC(Y);CALL ALLOC(NORMAL);call alloc(ys);call alloc(env);  ! ALLOCATE VARIABLES
     !Y=NPARA
@@ -1410,7 +1414,7 @@ contains
     normal=y
     if(.not.check_stable) write(6,*) " unstable in normalizing map "
     as=normal%a_t
-    ! goto 111
+    goto 111
     id=y
     open(unit=66,file='crap.txt')
     call print(id,66)
@@ -1572,36 +1576,38 @@ contains
     close(mf2)
 
 
-    call kanalnummer(mf1)
-    open(mf1,file='barber_stochastic.txt')
     if(present(mat)) then
-       do i=1,6
-          do j=1,6
-             write(mf1,*) i,j,mat(i,j)," mat"
+       call kanalnummer(mf1)
+       open(mf1,file='barber_stochastic.txt')
+       if(present(mat)) then
+          do i=1,6
+             do j=1,6
+                write(mf1,*) i,j,mat(i,j)," mat"
+             enddo
           enddo
-       enddo
-    endif
-    if(present(ast)) then
-       do i=1,6
-          do j=1,6
-             write(mf1,*) i,j,ast(i,j)," ast"
+       endif
+       if(present(ast)) then
+          do i=1,6
+             do j=1,6
+                write(mf1,*) i,j,ast(i,j)," ast"
+             enddo
           enddo
-       enddo
-    endif
-    if(present(asti)) then
-       do i=1,6
-          do j=1,6
-             write(mf1,*) i,j,asti(i,j)," asti"
+       endif
+       if(present(asti)) then
+          do i=1,6
+             do j=1,6
+                write(mf1,*) i,j,asti(i,j)," asti"
+             enddo
           enddo
-       enddo
-    endif
-    if(present(kick)) then
-       do i=1,6
-          write(mf1,*) i,kick(i)," kick"
-       enddo
-    endif
+       endif
+       if(present(kick)) then
+          do i=1,6
+             write(mf1,*) i,kick(i)," kick"
+          enddo
+       endif
 
-    close(mf1)
+       close(mf1)
+    endif
 
   end subroutine radia
 
