@@ -214,6 +214,28 @@ sub recordWork { # should also pass the output file name
 		$nextParserState = "readComment" ;
 	    }
 
+
+
+	    if ($parserState eq "skipRevisionInfo"){
+		# in case the work has been registered for the previous release, we want to discard it here
+		# (a parallel sequential machine dedicated to rejecting work from previous release)
+		$nextParserState = "skipComment";
+	    }
+	    if ($parserState eq "skipComment"){ # also, just in case the work relates to the previous release
+		# (a parallel sequential machine dedicated to rejecting work from previous release)
+		if ($log =~ /\-\-\-\-(\-)+/){
+		    # actually we find-out we should actually be in "skipLine" state
+		    $nextParserState = "readRev";
+		} else {
+		    if ($log =~ /(========)+/){
+			$nextParserState = "EOF";
+		    } else {
+			$nextParserState = "skipComment"; # until encounter a '---' or '===' marker
+		    }
+		}
+	    }
+
+
 	    
 	    if ($parserState eq "readComment"){
 		
@@ -245,12 +267,20 @@ sub recordWork { # should also pass the output file name
 		    # same number of dots?
 		    my $rev = $1;
 		    
-		    # if we reach this point, the comparison was succesful
-		    # =>advance to the next log line contains the author
+		    if ($rev eq $rev1){
+			# print "revision $rev of $file belongs to last release => skip!\n";
+			# don't want to register work that went in to the previous release: skip
+			$nextParserState = "skipRevisionInfo";
+		    } else {
+			
+			# if we reach this point, the comparison was succesful
+			# =>advance to the next log line contains the author
+			
+			$nextParserState = "readRevisionInfo";
+			# print "$file: contribution found $rev1 < $rev <= $rev2\n";
+
+		    }
 		    
-		    $nextParserState = "readRevisionInfo";
-		    
-		    # print "$file: contribution found $rev1 < $rev <= $rev2\n";
 			
 		} else {
 		    print "Encountered error while parsing file\n";
