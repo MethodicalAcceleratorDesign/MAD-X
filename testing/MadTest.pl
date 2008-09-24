@@ -878,7 +878,7 @@ LINE: while(<IN>){
 		my $cmd=$1;
 		my $arg=$2;
 		
-		if (($cmd =~/mkdir/)||($cmd =~/ls/)||($cmd =~ /cat/)||($cmd =~/rm/)||($cmd =~ /grep/) ||($cmd =~ /echo/) || ($cmd =~ /ln/) || ($cmd =~ /gnuplot/) || ($cmd =~ /cp/)){
+		if (($cmd =~/mkdir/)||($cmd =~/ls/)||($cmd =~ /cat/)||($cmd =~/rm/)||($cmd =~ /grep/) ||($cmd =~ /echo/) || ($cmd =~ /ln/) || ($cmd =~ /cp/)){
 			# command invocation, not implying a file call
 		
 		} else {
@@ -886,7 +886,7 @@ LINE: while(<IN>){
 		    # ... many other cases like 'mkdir' to be handled before we conclude
 		    # the command corresponds to a file...
 
-		    if ($cmd ne "perl"){
+		    if (($cmd ne "perl") && ($cmd ne "gnuplot")){
 			@childs[$childCount++] = $cmd; # the command ...
 		    }
 		    if ($arg ne "") {
