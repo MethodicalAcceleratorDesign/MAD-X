@@ -873,26 +873,30 @@ LINE: while(<IN>){
 	# along the other input files. Such script must be copied locally along the other
 	# files.
 	# this is for instance the case for the read.magnet.errors perl-script
-	# in twiss/test_5/
-	if (/[Ss][Yy][Ss][Tt][Ee][Mm][\s\t]*,?[\s\t]*[\"\']([\w\._\-\d]+)[\s\t]*([\w\.\_\-\d\/]+)[\"\']/){
+	# in twiss/test_5/ or foot
+	if (/[Ss][Yy][Ss][Tt][Ee][Mm][\s\t]*,?[\s\t]*[\"\']([\w\._\-\d]+)[\s\t]*<?[\s\t]*([\w\.\_\-\d\/]*)[\s\t]*>?(.*)[\"\']/){
 		my $cmd=$1;
 		my $arg=$2;
 		
-		if ($cmd =~/mkdir/){
+		if (($cmd =~/mkdir/)||($cmd =~/ls/)||($cmd =~ /cat/)||($cmd =~/rm/)||($cmd =~ /grep/) ||($cmd =~ /echo/) || ($cmd =~ /ln/) || ($cmd =~ /gnuplot/) || ($cmd =~ /cp/)){
 			# command invocation, not implying a file call
 		
 		} else {
 		
-			# ... many other cases like 'mkdir' to be handled before we conclude
-			# the command corresponds to a file...
-		
+		    # ... many other cases like 'mkdir' to be handled before we conclude
+		    # the command corresponds to a file...
+
+		    if ($cmd ne "perl"){
 			@childs[$childCount++] = $cmd; # the command ...
-			if ($arg ne "") {
-				@childs[$childCount++] = $arg; # as well as its argument if any
-			}
-			$fileRetreival = 1;
+		    }
+		    if ($arg ne "") {
+			@childs[$childCount++] = $arg; # as well as its argument if any
+			# print "found command '$cmd', with input argument '$arg'\n";
+		    }
+
+		    $fileRetreival = 1;
 		}
-	}
+	    }
 	# NOTE: the above is FRAGILE. In many cases, one might expect the System call
 	# to start with a command not corresponding to a local file in the input dir.
 	
