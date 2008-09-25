@@ -184,7 +184,7 @@ TYPE ELEMENT
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
    TYPE(fibre_appearance), POINTER :: doko
    type(element), pointer :: siamese
-   type(element), pointer :: girder
+   type(element), pointer :: girders
    TYPE(AFFINE_FRAME), POINTER :: SIAMESE_FRAME
    TYPE(AFFINE_FRAME), POINTER :: girder_FRAME
    !   integer, POINTER ::girder_index

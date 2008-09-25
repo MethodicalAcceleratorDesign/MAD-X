@@ -2193,7 +2193,7 @@ CONTAINS
     nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%siamese);
-    nullify(EL%girder);
+    nullify(EL%girders);
     nullify(EL%assembly);
     nullify(EL%SIAMESE_FRAME);
     nullify(EL%girder_FRAME);
@@ -2366,7 +2366,7 @@ CONTAINS
           nullify(EL%DOKO)
        ENDIF
        nullify(EL%siamese);
-       nullify(EL%girder);
+       nullify(EL%girders);
        IF(ASSOCIATED(EL%SIAMESE_FRAME))        then
           call kill_af(EL%SIAMESE_FRAME)
           DEALLOCATE(EL%SIAMESE_FRAME)

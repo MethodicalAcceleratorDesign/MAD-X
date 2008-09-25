@@ -70,6 +70,7 @@ contains
 
     CALL SET_MADX_(t,magnet0)
 
+
     select case(MODEL)
     CASE("DRIFT_KICK       ")
        MADTHICK=drift_kick_drift
@@ -123,6 +124,7 @@ contains
        KEY%LIST%method=2
        MADTHICK=drift_kick_drift
     endif
+
 
     SELECT CASE(magnet(1:IL))
     CASE("DRIFT          ")
@@ -596,9 +598,9 @@ contains
        siam_index=m%mag%siamese%parent_fibre%parent_layout%index
        siam_pos=m%mag%siamese%parent_fibre%pos
     endif
-    if(associated(m%mag%GIRDER)) then
-       GIRD_index=m%mag%GIRDER%parent_fibre%parent_layout%index
-       GIRD_POS=m%mag%GIRDER%parent_fibre%pos
+    if(associated(m%mag%GIRDERS)) then
+       GIRD_index=m%mag%GIRDERS%parent_fibre%parent_layout%index
+       GIRD_POS=m%mag%GIRDERS%parent_fibre%pos
     endif
     WRITE(MF,*) " @@@@@@@@@@@@@@@@@@@@ FIBRE @@@@@@@@@@@@@@@@@@@@"
     if(siam_index==0.AND.GIRD_index==0) then
@@ -1601,7 +1603,7 @@ contains
        endif
        if(gird_index/=0) then
           call move_to(L%DNA(gird_index)%L,gird,gird_pos)
-          p%mag%girder=>gird%mag
+          p%mag%girderS=>gird%mag
           write(6,*) p%mag%name,' is on the girder of ', gird%mag%name
        endif
        !        if(pos==1) then

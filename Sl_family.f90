@@ -600,7 +600,7 @@ CONTAINS
     IF(FOUND) CALL FIND_FRAME_SIAMESE(CN,B,EXI,ADD) ! FIND ACTUAL FRAME
 
     FOUNDg=.false.
-    if(pres.and.associated(s2%mag%girder).and.(.not.addin)) then
+    if(pres.and.associated(s2%mag%girders).and.(.not.addin)) then
        CALL FIND_AFFINE_GIRDER(S2,CAF,FOUNDg)
        if(foundg) then
           a1=caf%girder_frame%a
@@ -675,9 +675,9 @@ CONTAINS
     FOUND=MY_FALSE
     K=0
 
-    IF(ASSOCIATED(S2%MAG%GIRDER)) THEN
+    IF(ASSOCIATED(S2%MAG%GIRDERS)) THEN
        C=>S2%MAG
-       CN=>S2%MAG%GIRDER
+       CN=>S2%MAG%GIRDERS
 
        IF(ASSOCIATED(C%GIRDER_FRAME)) THEN
           AF=>C%GIRDER_FRAME
@@ -692,7 +692,7 @@ CONTAINS
              FOUND=MY_TRUE
              EXIT
           ENDIF
-          CN=>CN%GIRDER
+          CN=>CN%GIRDERS
           k=k+1
           IF(K>10000)THEN
              WRITE(6,*) " TOO MANY IN GIRDER "
@@ -741,9 +741,9 @@ CONTAINS
     FOUND=MY_FALSE
     K=0
 
-    IF(ASSOCIATED(S2%GIRDER)) THEN
+    IF(ASSOCIATED(S2%GIRDERS)) THEN
        C=>S2
-       CN=>S2%GIRDER
+       CN=>S2%GIRDERS
 
        IF(ASSOCIATED(C%GIRDER_FRAME)) THEN
           AF=>C%GIRDER_FRAME
@@ -758,7 +758,7 @@ CONTAINS
              FOUND=MY_TRUE
              EXIT
           ENDIF
-          CN=>CN%GIRDER
+          CN=>CN%GIRDERS
           k=k+1
           IF(K>10000)THEN
              WRITE(6,*) " TOO MANY IN GIRDER "
@@ -823,13 +823,13 @@ CONTAINS
     CALL MISALIGN_FIBRE(S2,S1,OMEGAT,BASIST,ADD=ADDIN)
     k=1
 
-    IF(ASSOCIATED(S2%MAG%GIRDER)) THEN
+    IF(ASSOCIATED(S2%MAG%GIRDERS)) THEN
        C=>S2%MAG
-       CN=>S2%MAG%GIRDER
+       CN=>S2%MAG%GIRDERS
        DO WHILE(.NOT.ASSOCIATED(C,CN))
           P=>CN%PARENT_FIBRE
           CALL MISALIGN_FIBRE(P,S1,OMEGAT,BASIST,ADD=ADDIN)
-          CN=>CN%GIRDER
+          CN=>CN%GIRDERS
           k=k+1
        ENDDO
     ENDIF
@@ -883,7 +883,7 @@ CONTAINS
     if(present(preserve_girder)) pres=preserve_girder
 
     FOUNDg=.false.
-    if(pres.and.associated(s2%mag%girder).and.(.not.addin)) then
+    if(pres.and.associated(s2%mag%girderS).and.(.not.addin)) then
        CALL FIND_AFFINE_GIRDER(S2,CAF,FOUNDg)
        if(foundg) then
           a1=caf%girder_frame%a
@@ -1082,13 +1082,13 @@ CONTAINS
     CALL TRANSLATE_magnet(c,D,ORDER,BASIST,PATCH,PREC)
     k=1
 
-    IF(ASSOCIATED(S2%MAG%girder)) THEN
+    IF(ASSOCIATED(S2%MAG%girderS)) THEN
        C=>S2%MAG
-       CN=>S2%MAG%girder
+       CN=>S2%MAG%girderS
        DO WHILE(.NOT.ASSOCIATED(C,CN))
           !       CALL TRANSLATE_magnet(cn,D,ORDER,BASIST,PATCH=.false.)
           CALL TRANSLATE_magnet(cn,D,ORDER,BASIST,PATCH,PREC)
-          CN=>CN%girder
+          CN=>CN%girderS
           k=k+1
        ENDDO
     ENDIF
@@ -1455,13 +1455,13 @@ CONTAINS
     CALL rotate_magnet(c,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
     k=1
 
-    IF(ASSOCIATED(S2%MAG%girder)) THEN
+    IF(ASSOCIATED(S2%MAG%girderS)) THEN
        C=>S2%MAG
-       CN=>S2%MAG%girder
+       CN=>S2%MAG%girderS
        DO WHILE(.NOT.ASSOCIATED(C,CN))
           !        CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH=.false.)
           CALL rotate_magnet(cn,Ang,OMEGAt,ORDER,BASISt,PATCH,PREC)
-          CN=>CN%girder
+          CN=>CN%girderS
           k=k+1
        ENDDO
     ENDIF
