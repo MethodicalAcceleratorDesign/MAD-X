@@ -1677,8 +1677,6 @@ void exec_command()
       else if (strcmp(p->cmd_def->module, "ptc_end") == 0)
       {
         if(track_is_on) ptc_track_end();
-        reset_count("normal_results");
-        reset_count("ptc_twiss");
         w_ptc_end_();
       }
       else if (strcmp(p->cmd_def->module, "sxf") == 0)
