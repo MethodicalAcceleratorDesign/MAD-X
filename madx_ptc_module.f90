@@ -812,6 +812,8 @@ CONTAINS
              key%list%ks(i+1)=key%list%ks(i+1)+field(2,i)
           enddo
        endif
+       key%list%k(1)=bv0*key%list%k(1)
+       key%list%ks(1)=bv0*key%list%ks(1)
        key%tiltd=node_value('tilt ')
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
@@ -984,7 +986,7 @@ CONTAINS
     end select
 100 continue
     if(code.ne.14.and.code.ne.15.and.code.ne.16) then
-       do i=1,NMAX
+       do i=2,NMAX
           key%list%k(i)=bvk*key%list%k(i)
           key%list%ks(i)=bvk*key%list%ks(i)
        enddo
