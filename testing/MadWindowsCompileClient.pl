@@ -57,7 +57,7 @@ my $clientSock = new IO::Socket::INET(
 
 die "Could not create client socket: $!\n" unless $clientSock;
 
-print "$thisLinuxHost accepts messages sent throught socket $socketPortLinux\n";
+print "$thisLinuxHost accepts messages sent through socket $socketPortLinux\n";
 my $newClientSock = $clientSock->accept();
 
 while (<$newClientSock>){
@@ -99,8 +99,8 @@ sub checkWindowsCompilationOutcome {
 	my $dayNow = $2;
 	my $time = $3;
 
-	if (0){ # for the time being, always deliver the executables, without checking anything
-#	if (($monthNow != $month)||($dayNow != $day)){
+#	if (0){ # for the time being, always deliver the executables, without checking anything
+	if (($monthNow != $month)||($dayNow != $day)){
 	    print "Mistmatch of day and month => executables were not created\n";
 	} else {
 	    # now check that compilation occured within on hour from now
@@ -116,13 +116,20 @@ sub checkWindowsCompilationOutcome {
 
     # if everything ok...
 
+
+
+
     # now notify that the Windows executables are ready
+    my $grepVersion = `grep myversion $madWindowsCompilationDir/madxd.h`; # hard-coded !?
+    $grepVersion =~ /MAD-X (\d+\.\d+\.\d+)/;
+    my $madVersion = $1;
+
     my $msg = MIME::Lite->new(
 			      From => 'Jean-Luc.Nougaret@cern.ch',
 			      ReplyTo => 'Jean-Luc.Nougaret@cern.ch',
 			      To => 'Jean-Luc.Nougaret@cern.ch',
 			      Subject => 'MAD-X for Windows updated',
-			      Data => "Dear colleagues,\n\nPlease take note that MAD-X version xxx is now available on Windows.\n\nThe new releases are available for download on the usual Web page:\nhttp://cern.ch/project-madwindows/MAD-X/\n\nRegards,\nJean-Luc"
+			      Data => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the usual Web page:\nhttp://cern.ch/project-madwindows/MAD-X/\n\nRegards,\nJean-Luc"
 			      );
     $msg->send;
     

@@ -46,11 +46,13 @@ my $sock = new IO::Socket::INET (
 die "Could not create client socket: $!\n" unless $sock; 
 
 
-print "now accepting messages sent throught socket $socketPortWindows\n";
+print "now accepting messages sent through socket $socketPortWindows\n";
 
-my $receiving = $sock->accept();
+while(1){
 
-my $clientHost;
+    my $receiving = $sock->accept();
+
+    my $clientHost;
 
 while (<$receiving>){
     print $_;
@@ -77,7 +79,7 @@ while (<$receiving>){
 	    print "(for the time-being, skip compilation)\n";
 	    # invoke compilation of madx.exe, madxp.exe and pars.exe
 # monday 29 september 2009: comment/uncomment the following:
-#	    system("Makefile.bat");
+	    system("Makefile.bat");
 	    # moving these files to the proper AFS web folder is left to the calling
 	    # Linux-side Perl script...
 	    # (an e-mail will be sent to observers of the Windows distribution of MAD-X)
@@ -106,10 +108,12 @@ while (<$receiving>){
 
 	#last;
 
-    }
-} # should stay here for ever...
+    } # if client requests MAD compilation on Windows
+} # receiving from the socket
+    
+    print "disconnected from client\n";
 
-
+} # do for ever
 
 
 close($sock);
