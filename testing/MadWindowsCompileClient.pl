@@ -8,15 +8,15 @@
 # output of this program on stdout: SUCCESS or FAILURE:<message>
 
 my $windowsHost = 'abpc10788';
+# $windowsHost = 'abcopl1'; # 29 september 2009 - for test purposes
 
-
-use IO::Socket;
+use IO::Socket::INET;
 
 use Sys::Hostname;
 
 
-$socketPortWindows = '800'; # agreed-up with client (<1024 for non-root)
-$socketPortLinux = '801'; # could be the same as above
+$socketPortWindows = 7070; # agreed-up with client (<1024 for non-root)
+$socketPortLinux = 7071; # could be the same as above
 
 my $thisLinuxHost = hostname;
 
@@ -44,8 +44,8 @@ close($sock);
 
 
 my $clientSock = new IO::Socket::INET(
-					 localHost => $thisLinuxHost,
-					 localPort => $socketPortLinux,
+					 LocalHost => $thisLinuxHost,
+					 LocalPort => $socketPortLinux,
 					 Proto => 'tcp',
 					 Listen => 1,
 					 Reuse => 1

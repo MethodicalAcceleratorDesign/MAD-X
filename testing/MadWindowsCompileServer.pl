@@ -10,16 +10,30 @@
 # together with the other scripts, BUT IF I DO SO IT CAN'T BE VIEWED THROUGH SAMBA
 # HENCE NEED TO FIND SOMETHING ELSE...
 
-
-use IO::Socket;
+#use MIME::Lite;
+use IO::Socket::INET;
 use Cwd; # to get current directory on Windows (would work on Linux as well)
+
+
+# upon start-up, send e-mail
+#my $msg = MIME::Lite->new(
+#			  From => 'Jean-Luc.Nougaret@cern.ch',
+#			  To => 'Jean-Luc.Nougaret@cern.ch',
+#			  Subject => 'MAD windows monitor started'
+#			  Data => 'now waiting for a trigger signal through dedicated socket port'
+#);
+#$msg->send;
+
+use Sys::Hostname;
+
 
 my $os = 'windows';
 
-my $socketPortWindows = '800'; # agreed-up with client
-my $socketPortLinux = '801'; # could be the same as above
+my $socketPortWindows = 7070; # agreed-up with client
+my $socketPortLinux = 7071; # could be the same as above
 
-my $windowsHost = 'abpc10788';
+# my $windowsHost = 'abpc10788';
+$windowsHost = hostname;
 
 my $sock = new IO::Socket::INET ( 
 				  LocalHost => $windowsHost,
@@ -40,7 +54,7 @@ my $clientHost;
 
 while (<$receiving>){
     print $_;
-    if (/([\w\d\-\_]+) asks: Compile MAD for Windows!/){
+    if (/([\w\d\-\_]+) asks: Compile MAD for Windows!/){ # message signalling compilation trigger
 	
 	# following is specific to the DOS system
 	if ($os eq 'windows'){
@@ -60,8 +74,10 @@ while (<$receiving>){
 
 
 	    print "now trigger compilation of madx.exe, madxp.exe and pars.exe\n";
+	    print "(for the time-being, skip compilation)\n";
 	    # invoke compilation of madx.exe, madxp.exe and pars.exe
-	    system("Makefile.bat");
+# monday 29 september 2009: comment/uncomment the following:
+#	    system("Makefile.bat");
 	    # moving these files to the proper AFS web folder is left to the calling
 	    # Linux-side Perl script...
 	    # (an e-mail will be sent to observers of the Windows distribution of MAD-X)
@@ -69,6 +85,7 @@ while (<$receiving>){
 	    # chdir("Z:\\MAD-X\\madX\");
 	}
 
+	sleep 5; # necessary ?????
 
 	$clientHost = $1; 
 	print "clientHost is '$clientHost'\n";
