@@ -12,9 +12,13 @@ my $windowsHost = 'abpc10788';
 
 $executablesAfsWebFolder = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries"; # global
 
+$madForWindowsSambaFolder = "/user/nougaret/MAD-X-WINDOWS/madX"; 
+# problem: won't be seen on pcslux99!!! => cannot automate fully !!!
+# => for the time-being this process will need to be launched manually.
+
 # where binaries are delivered on the web for subsequent retreival by users
 
-my $madWindowsCompilationDir = "/user/nougaret/MAD-X-WINDOWS/madX";
+my $madWindowsCompilationDir = $madForWindowsSambaFolder;
 my $madWindowsDeliveryDir = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries";
 my @windowsTargets = ('madx.exe','madxp.exe','mpars.exe'); # Windows/DOS deliverables
 
@@ -27,6 +31,15 @@ $socketPortWindows = 7070; # agreed-up with client (>1024 for non-root)
 $socketPortLinux = 7071; # could be the same as above
 
 my $thisLinuxHost = hostname;
+
+
+# before asking the Windows host to trigger the compilation, we must first make sure that the
+# Samba folder MAD-X-WINDOWS/madX contains the latest CVS (more precisely the latest released tagged
+# version - for the time being, we'll simply pick-up the latest contents of the repository)
+
+updateMadForWindowsSambaFolder();
+
+
 
 # $thisLinuxHost = 'abcopl1';
 # print "the Linux box is '$thisLinuxHost'\n";
@@ -200,4 +213,15 @@ sub deliverHtmlPage {
 
     # now move HTML file into the AFS target web folder
     
+}
+
+
+sub updateMadForWindowsSambaFolder{
+    my $localDir = `pwd`;
+    chdir($madForWindowsSambaFolder);
+    # ideally we should do a complete clean-up here.
+    print "invoke CVS update in $madForWindowsSambaFolder. Ideally should do a complete clean-up before\n";
+    `cvs update`;
+    chdir ($localDir); # back to where we were before entering the sub
+
 }
