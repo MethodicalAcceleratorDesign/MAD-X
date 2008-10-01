@@ -132,6 +132,7 @@ testing/MadTest.pl -text
 testing/MadTestOverwrite.pl -text
 testing/MadTestWebStyle.css -text
 testing/MadTrigTest.pl -text
+testing/MadTrigWindowsCompilation.pl -text
 testing/MadWindowsCompileClient.pl -text
 testing/MadWindowsCompileServer.pl -text
 testing/MadWorkReport.pl -text
