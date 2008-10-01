@@ -48,3 +48,7 @@ font.warning-font	{color: #FFBBAA}
 tr.work-author 		{color: black; background-color: #CCCCFF}
 tr.work-log-even	{color: black; background-color: #EEEEEE}
 tr.work-log-odd		{color: black; background-color: white}
+
+/* binary targets colors in the HTML web page */
+tr.odd			{color: black; background-color: #EEEEEE}
+tr.even 		{color: black; background-color: white}
