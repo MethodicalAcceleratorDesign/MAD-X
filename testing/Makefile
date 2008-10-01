@@ -1,6 +1,7 @@
 # installs test suite files
 
-PERL_SCRIPTS = MadBuild.pl MadTest.pl MadDiff.pl MadBuildAndTest.pl MadTrigTest.pl MadWorkReport.pl MadWindowsCompileServer.pl MadWindowsCompileClient.pl
+PERL_SCRIPTS = MadBuild.pl MadTest.pl MadDiff.pl MadBuildAndTest.pl MadTrigTest.pl MadWorkReport.pl \
+	MadWindowsCompileServer.pl MadWindowsCompileClient.pl MadTrigWindowsCompilation.pl
 PERL_ADMIN_TOOLS = MadTestOverwrite.pl
 
 XML_DOCS = TestScenario.xml ProcessScenario.xsl
