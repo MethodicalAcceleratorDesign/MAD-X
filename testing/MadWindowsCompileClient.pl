@@ -5,7 +5,58 @@
 # the Client, if not the program should return an error otherwise it would
 # wait for ever!
 
+# accept an argument manual-trigger or automatic-trigger, the former meaning we
+# immediately trigger the compilation, the later meaning the program will listen
+# to port 7075 for a request emanating from the automatic build and test procedure.
+
+if ($#ARGV!=0){
+    die "expect one argument: 'now' or 'wait-for-trigger'\n";
+} else {
+    if ($ARGV[0] eq 'now'){
+	$mode = 'now';
+    } else {
+	if ($ARGV[0] eq 'wait-for-trigger') {
+	    $mode = 'wait-for-trigger';
+	} else {
+	    die "incorrect argument: should be either 'now' or 'wait-for-trigger'\n";
+	}
+    }
+    
+}
+
+# first kill any running instance of this process (considering it is started periodically through as a cron job)
+
+# kill any pre-running instances of this process NO INSTEAD KILL ITSELF IN CASE ALREADY RUNNING
+
+my @check = `ps -aef | grep MadWindowsCompileClient.pl`;
+foreach $line (@check){
+    chop $line;
+    $line =~ /^\w+[\s\t]+(\d+)/; # format of output: username pid parent ...
+    my $pid = $1; # pid of the process being considered
+    my $myPid = $$; # $$ is the pid of this process (special perl variable!#@?)
+   
+    if ($pid ne $myPid){
+	# check this is indeed a perl command
+	if ($line =~ /\/usr\/bin\/perl[\s\t]/) {
+	    # `kill -9 $pid`; # kill process, unless this is this process's pid
+	    # no: instead should kill itself
+	    print "MadWindowsCompileClient.pl already running => abort the new process.\n";
+	    exit;
+	} else {
+	    # skip
+	}
+    } # later-on should send a signal that this process would either accept
+    # to kill itself, or reject in case it is already engaged in a compilation
+    # on the Windows platform => before dying, close the listening socket port
+}
+
+
+
+
 # output of this program on stdout: SUCCESS or FAILURE:<message>
+
+# this program must run on a machine such as abcopl1 on which NFS mounted partitions
+# can be viewed through Samba by the remote Windows machine.
 
 my $windowsHost = 'abpc10788';
 # $windowsHost = 'abcopl1'; # 29 september 2009 - for test purposes
@@ -26,9 +77,12 @@ use IO::Socket::INET;
 use MIME::Lite;
 use Sys::Hostname;
 
-
+# two local and remote ports for communication with the Windows host in the two directions
 $socketPortWindows = 7070; # agreed-up with client (>1024 for non-root)
 $socketPortLinux = 7071; # could be the same as above
+# one local port to listen for requests emanating from the automated build and test process
+my $listeningPort = 7075;
+
 
 my $thisLinuxHost = hostname;
 
@@ -37,65 +91,112 @@ my $thisLinuxHost = hostname;
 # Samba folder MAD-X-WINDOWS/madX contains the latest CVS (more precisely the latest released tagged
 # version - for the time being, we'll simply pick-up the latest contents of the repository)
 
-updateMadForWindowsSambaFolder();
+# wait to be waken-up (or start right now if mode is 'now')
+
+while(1){
+
+    my $invokeCompilation = 0; # default = do nothing
+
+    if ($mode eq 'wait-for-trigger'){
+	my $listeningSocket = new IO::Socket::INET(
+						   LocalHost => $thisLinuxHost,
+						   LocalPort => $listeningPort,
+						   Proto => 'tcp',
+						   Listen => 1,
+						   Reuse => 1
+						   );
+	die "Could not create listening socket: $!\n" unless $listeningSocket;
+	my $receive = $listeningSocket->accept();
+	while (<$receive>){
+	    if (/^Trigger Windows compilation$/){
+		# sent triggering signal via socket to Windows compilation server
+		$invokeCompilation = 1;
+		last;
+	    }
+	}
+	close $listeningSocket;
+    } # else mode is 'now' and we should trigger the remote compilation right now
 
 
-
-# $thisLinuxHost = 'abcopl1';
-# print "the Linux box is '$thisLinuxHost'\n";
-
-my $sock = new IO::Socket::INET ( 
-				  PeerAddr => $windowsHost,
-				  PeerPort => $socketPortWindows,
-				  Proto => 'tcp'
-				  ); 
-
-die "Could not create socket: $!\n" unless $sock; 
-
-print "will now send message to port $socketPortWindows of $windowsHost\n";
-
-print $sock "$thisLinuxHost asks: Compile MAD for Windows!\n";
-
-my $startTime = localtime;
-my $endTime; # will be set later-on
-
-close($sock);
-
-# now wait for the message signalling that the compilation completed
-
-
-
-my $clientSock = new IO::Socket::INET(
-					 LocalHost => $thisLinuxHost,
-					 LocalPort => $socketPortLinux,
-					 Proto => 'tcp',
-					 Listen => 1,
-					 Reuse => 1
-					 );
-
-die "Could not create client socket: $!\n" unless $clientSock;
-
-print "$thisLinuxHost accepts messages sent through socket $socketPortLinux\n";
-my $newClientSock = $clientSock->accept();
-
-
-
-while (<$newClientSock>){
-    print $_;
-    if (/Compilation completed/){
-	$endTime = localtime;
-	print "OK: the compilation completed on Windows side\n";
-	checkWindowsCompilationOutcome();
-	print "=> installed the executables in the AFS web folder\n";
-	last; # leave the while loop
+    if ($mode eq 'now'){
+	$invokeCompilation = 1 ;
     }
 
-    # should leave this loop (timeout) in case there's no reply by the Windows-side server,
-    # in which case, the executables will need to be delivered manually
 
-}
+    if ($invokeCompilation == 1){
+	notify("MadWindowsCompileClient.pl will now forward the compilation request to the Windows host machine.");
 
-close ($clientSock);
+	updateMadForWindowsSambaFolder();
+
+
+
+	# $thisLinuxHost = 'abcopl1';
+	# print "the Linux box is '$thisLinuxHost'\n";
+
+	my $sock = new IO::Socket::INET ( 
+					  PeerAddr => $windowsHost,
+					  PeerPort => $socketPortWindows,
+					  Proto => 'tcp'
+					  ); 
+
+	die "Could not create socket: $!\n" unless $sock; 
+
+	print "will now send message to port $socketPortWindows of $windowsHost\n";
+	
+	print $sock "$thisLinuxHost asks: Compile MAD for Windows!\n";
+	
+	$startTime = localtime; # global
+	$endTime; # global, will be set later-on
+	
+	close($sock);
+	
+	# now wait for the message signalling that the compilation completed
+
+
+
+	my $clientSock = new IO::Socket::INET(
+					      LocalHost => $thisLinuxHost,
+					      LocalPort => $socketPortLinux,
+					      Proto => 'tcp',
+					      Listen => 1,
+					      Reuse => 1
+					      );
+
+	die "Could not create client socket: $!\n" unless $clientSock;
+	
+	print "$thisLinuxHost accepts messages sent through socket $socketPortLinux\n";
+	my $newClientSock = $clientSock->accept();
+
+
+	
+	while (<$newClientSock>){
+	    print $_;
+	    if (/Compilation completed/){
+		$endTime = localtime;
+		print "OK: the compilation completed on Windows side\n";
+		checkWindowsCompilationOutcome();
+		print "=> installed the executables in the AFS web folder\n";
+		last; # leave the while loop. Probably 'last' does not work to exit a while loop in perl
+	    }
+
+	    # should leave this loop (timeout) in case there's no reply by the Windows-side server,
+	    # in which case, the executables will need to be delivered manually
+
+	}
+	
+	close ($clientSock);
+
+    } # if $invokeCompilation == 1
+
+    if ($mode eq 'now') {
+	# should compile only once and then leave the infinite loop to complete the program
+	last;
+    } else {
+	print "now wait for wake-up by next compilation-triggering signal\n";
+    }
+
+} # while(1): wait forever to be woken-up by automated build-and-test program
+
 
 
 sub checkWindowsCompilationOutcome {
@@ -104,6 +205,9 @@ sub checkWindowsCompilationOutcome {
     foreach $target (@windowsTargets){
 	# check that the executable has been created within the last hour
 	my $ls = `ls -l $madWindowsCompilationDir/$target`;
+
+#	notify("for target '$target', we see : '$ls'");
+
 	# pick the date and time at which the executables have been created
 	$ls =~ /(\w{3})[\s\t](\d{1,2})[\s\t](\d+:\d+)[\s\t]/ ;
 
@@ -151,7 +255,6 @@ sub checkWindowsCompilationOutcome {
 
     my $msg = MIME::Lite->new(
 			      From => 'Jean-Luc.Nougaret@cern.ch',
-			      ReplyTo => 'Jean-Luc.Nougaret@cern.ch',
 			      To => 'Jean-Luc.Nougaret@cern.ch',
 			      Subject => 'MAD-X for Windows updated',
 			      Data => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards,\nJean-Luc"
@@ -175,21 +278,35 @@ sub deliverHtmlPage {
 
     # grep size of the binaries located in the AFS web folder
     my @binaries = `ls -l $executablesAfsWebFolder/*.exe`;
+
+#    my $nBinaries = scalar(@binaries);
+#    notify("in '$executablesAfsWebFolder', 'found $nBinaries'");
+	
     $contents .= "Version $madVersion compiled with Lahey Fortran and Microsoft Visual C++:\n";
-    $contents .= "<table>\n";
+    $contents .= "<table width=\"75%\" border=\"0\">\n";
+    my $oddOrEven = 'even'; # to colorize successive lines differently
     foreach $binary (@binaries){
 	chop $binary; # end of line
-	$binary =~ /(\d+)\s(\w{3})\s(\d{1,2})\s(\d+:\d+)\s[^\s]+\/(\w+\.exe)$/;
+#	notify("line:$binary");
+#	notify("in '$executablesAfsWebFolder', 'found $binary'");
+# -rw-r--r--  1 nougaret pz  658664 Oct  1 12:06 /afs/cern.ch/user/n/nougaret/www/mad/windows-binaries/mpars.exe
+	$binary =~ /(\d+)[\s\t]+(\w{3})[\s\t]+(\d{1,2})[\s\t]+(\d+:\d+)[\s\t]+[^\s]+\/(\w+\.exe)$/;
 	my $size = $1;
 	my $megabytes = $size / 1000000;
 	my $month = $2;
 	my $day = $3;
 	my $time = $4;
 	my $executable = $5;
+#	notify("size='$size',exec='$executable',descr='$description{$executable}'");
 	$description{'madx.exe'} = "standard version";
 	$description{'madxp.exe'} = "version including PTC";
 	$description{'mpars.exe'} = "\"parser-only\" version";
-	$contents .= "<tr><td>Download</td><td><a href=\"./$executable\">$executable</a></td><td>($megabytes Megabytes)</td><td>for the $description{$executable}.</td></tr>\n";
+	if ($oddOrEven eq 'odd'){
+	    $oddOrEven = 'even';
+	} else {
+	    $oddOrEven = 'odd';
+	}
+	$contents .= "<tr class=\"$oddOrEven\"><td>Download</td><td><a href=\"./$executable\">$executable</a></td><td>($megabytes Megabytes)</td><td>for the $description{$executable}.</td></tr>\n";
     }
     $contents .= "</table>\n";
 
@@ -223,5 +340,19 @@ sub updateMadForWindowsSambaFolder{
     print "invoke CVS update in $madForWindowsSambaFolder. Ideally should do a complete clean-up before\n";
     `cvs update`;
     chdir ($localDir); # back to where we were before entering the sub
+
+}
+
+
+sub notify{
+    my $message = $_[0];
+    my $msg = MIME::Lite->new(
+			      From => 'MAD-X Windows compilation robot',
+			      ReplyTo => 'Jean-Luc.Nougaret@cern.ch',
+			      To => 'Jean-Luc.Nougaret@cern.ch',
+			      Subject => 'automatic notification',
+			      Data => $message
+			      );
+    $msg->send;    
 
 }
