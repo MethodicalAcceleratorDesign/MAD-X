@@ -416,6 +416,6 @@ sub notify{
 				  Data => $message
 				  );
 	$msg->send;    
-    }
+    } # else do nothing
 
 }
