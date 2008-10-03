@@ -24,9 +24,8 @@ if ($#ARGV!=0){
     
 }
 
-# first kill any running instance of this process (considering it is started periodically through as a cron job)
 
-# kill any pre-running instances of this process NO INSTEAD KILL ITSELF IN CASE ALREADY RUNNING
+# KILL ITSELF IN CASE ALREADY RUNNING
 
 my @check = `ps -aef | grep MadWindowsCompileClient.pl`;
 foreach $line (@check){
@@ -40,7 +39,12 @@ foreach $line (@check){
 	if ($line =~ /\/usr\/bin\/perl[\s\t]/) {
 	    # `kill -9 $pid`; # kill process, unless this is this process's pid
 	    # no: instead should kill itself
-	    print "MadWindowsCompileClient.pl already running => abort the new process.\n";
+	    if ($mode eq 'now') {
+		my $warning = "MadWindowsCompileClient.pl already running => abort new process.\n";
+		print $warning;
+		notify($warning);
+	    } # otherwise don't print the message otherwise the cron job
+	    # will send an e-mail
 	    exit;
 	} else {
 	    # skip
@@ -52,151 +56,193 @@ foreach $line (@check){
 
 
 
+# fork process to spawn a branch that will periodically refresh the AFS kerberos tokens
+my $child_pid = fork();
 
-# output of this program on stdout: SUCCESS or FAILURE:<message>
+if (not defined $child_pid){
+    notify("no system resources to fork process => exit");
+    exit;
+}
 
-# this program must run on a machine such as abcopl1 on which NFS mounted partitions
-# can be viewed through Samba by the remote Windows machine.
-
-my $windowsHost = 'abpc10788';
-# $windowsHost = 'abcopl1'; # 29 september 2009 - for test purposes
-
-$executablesAfsWebFolder = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries"; # global
-
-$madForWindowsSambaFolder = "/user/nougaret/MAD-X-WINDOWS/madX"; 
-# problem: won't be seen on pcslux99!!! => cannot automate fully !!!
-# => for the time-being this process will need to be launched manually.
-
-# where binaries are delivered on the web for subsequent retreival by users
-
-my $madWindowsCompilationDir = $madForWindowsSambaFolder;
-my $madWindowsDeliveryDir = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries";
-my @windowsTargets = ('madx.exe','madxp.exe','mpars.exe'); # Windows/DOS deliverables
-
-use IO::Socket::INET;
-use MIME::Lite;
-use Sys::Hostname;
-
-# two local and remote ports for communication with the Windows host in the two directions
-$socketPortWindows = 7070; # agreed-up with client (>1024 for non-root)
-$socketPortLinux = 7071; # could be the same as above
-# one local port to listen for requests emanating from the automated build and test process
-my $listeningPort = 7075;
-
-
-my $thisLinuxHost = hostname;
-
-
-# before asking the Windows host to trigger the compilation, we must first make sure that the
-# Samba folder MAD-X-WINDOWS/madX contains the latest CVS (more precisely the latest released tagged
-# version - for the time being, we'll simply pick-up the latest contents of the repository)
-
-# wait to be waken-up (or start right now if mode is 'now')
-
-while(1){
-
-    my $invokeCompilation = 0; # default = do nothing
-
-    if ($mode eq 'wait-for-trigger'){
-	my $listeningSocket = new IO::Socket::INET(
-						   LocalHost => $thisLinuxHost,
-						   LocalPort => $listeningPort,
-						   Proto => 'tcp',
-						   Listen => 1,
-						   Reuse => 1
-						   );
-	die "Could not create listening socket: $!\n" unless $listeningSocket;
-	my $receive = $listeningSocket->accept();
-	while (<$receive>){
-	    if (/^Trigger Windows compilation$/){
-		# sent triggering signal via socket to Windows compilation server
-		$invokeCompilation = 1;
-		last;
-	    }
+if ($child_pid==0){
+    # this is the child process
+    # refresh the AFS token every 6 hours. Otherwise the token
+    # would expire after 25 hours.
+    # (note that this trick works for up to 10 days according to IT support)
+    my $start = localtime;
+    while(1){
+	my $now = localtime;
+	sleep 21600; # 6 hours
+	`/usr/sue/bin/kinit -R`;
+	`/usr/bin/aklog`;
+	# check if the child process' parent is dead. If so, should kill itself
+	my $parent_pid = getppid(); # get parent's pid
+	$cnt = kill 0, $parent_pid;
+	if ($cnt == 0){
+	    exit;
 	}
-	close $listeningSocket;
-    } # else mode is 'now' and we should trigger the remote compilation right now
-
-
-    if ($mode eq 'now'){
-	$invokeCompilation = 1 ;
     }
 
+}
 
-    if ($invokeCompilation == 1){
-	notify("MadWindowsCompileClient.pl will now forward the compilation request to the Windows host machine.");
+# else ...
 
-	updateMadForWindowsSambaFolder();
-
-
-
-	# $thisLinuxHost = 'abcopl1';
-	# print "the Linux box is '$thisLinuxHost'\n";
-
-	my $sock = new IO::Socket::INET ( 
-					  PeerAddr => $windowsHost,
-					  PeerPort => $socketPortWindows,
-					  Proto => 'tcp'
-					  ); 
-
-	die "Could not create socket: $!\n" unless $sock; 
-
-	print "will now send message to port $socketPortWindows of $windowsHost\n";
-	
-	print $sock "$thisLinuxHost asks: Compile MAD for Windows!\n";
-	
-	$startTime = localtime; # global
-	$endTime; # global, will be set later-on
-	
-	close($sock);
-	
-	# now wait for the message signalling that the compilation completed
+if ($child_pid){
+    # non-zero pid means we are in the parent process, which received the child's pid
 
 
 
-	my $clientSock = new IO::Socket::INET(
-					      LocalHost => $thisLinuxHost,
-					      LocalPort => $socketPortLinux,
-					      Proto => 'tcp',
-					      Listen => 1,
-					      Reuse => 1
-					      );
+    # output of this program on stdout: SUCCESS or FAILURE:<message>
 
-	die "Could not create client socket: $!\n" unless $clientSock;
-	
-	print "$thisLinuxHost accepts messages sent through socket $socketPortLinux\n";
-	my $newClientSock = $clientSock->accept();
+    # this program must run on a machine such as abcopl1 on which NFS mounted partitions
+    # can be viewed through Samba by the remote Windows machine.
+
+    my $windowsHost = 'abpc10788';
+    # $windowsHost = 'abcopl1'; # 29 september 2009 - for test purposes
+
+    $executablesAfsWebFolder = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries"; # global
+
+    $madForWindowsSambaFolder = "/user/nougaret/MAD-X-WINDOWS/madX"; 
+    # problem: won't be seen on pcslux99!!! => cannot automate fully !!!
+    # => for the time-being this process will need to be launched manually.
+
+    # where binaries are delivered on the web for subsequent retreival by users
+
+    $madWindowsCompilationDir = $madForWindowsSambaFolder; # global used by other routines
+    $madWindowsDeliveryDir = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries"; # global
+    # also used by other routines
+    @windowsTargets = ('madx.exe','madxp.exe','mpars.exe'); # Windows/DOS deliverables
+    # above is global as used by other routines as well
+
+    use IO::Socket::INET;
+    use MIME::Lite;
+    use Sys::Hostname;
+
+    # two local and remote ports for communication with the Windows host in the two directions
+    $socketPortWindows = 7070; # agreed-up with client (>1024 for non-root)
+    $socketPortLinux = 7071; # could be the same as above
+    # one local port to listen for requests emanating from the automated build and test process
+    my $listeningPort = 7075;
 
 
-	
-	while (<$newClientSock>){
-	    print $_;
-	    if (/Compilation completed/){
-		$endTime = localtime;
-		print "OK: the compilation completed on Windows side\n";
-		checkWindowsCompilationOutcome();
-		print "=> installed the executables in the AFS web folder\n";
-		last; # leave the while loop. Probably 'last' does not work to exit a while loop in perl
+    my $thisLinuxHost = hostname;
+
+
+    # before asking the Windows host to trigger the compilation, we must first make sure that the
+    # Samba folder MAD-X-WINDOWS/madX contains the latest CVS (more precisely latest released tagged
+    # version - for the time being, we'll simply pick-up the latest contents of the repository)
+
+    # wait to be waken-up (or start right now if mode is 'now')
+
+    while(1){
+
+	my $invokeCompilation = 0; # default = do nothing
+
+	if ($mode eq 'wait-for-trigger'){
+	    my $listeningSocket = new IO::Socket::INET(
+						       LocalHost => $thisLinuxHost,
+						       LocalPort => $listeningPort,
+						       Proto => 'tcp',
+						       Listen => 1,
+						       Reuse => 1
+						       );
+	    die "Could not create listening socket: $!\n" unless $listeningSocket;
+	    my $receive = $listeningSocket->accept();
+	    while (<$receive>){
+		if (/^Trigger Windows compilation$/){
+		    # sent triggering signal via socket to Windows compilation server
+		    $invokeCompilation = 1;
+		    last;
+		}
 	    }
-
-	    # should leave this loop (timeout) in case there's no reply by the Windows-side server,
-	    # in which case, the executables will need to be delivered manually
-
-	}
+	    close $listeningSocket;
+	} # else mode is 'now' and we should trigger the remote compilation right now
 	
-	close ($clientSock);
+	
+	if ($mode eq 'now'){
+	    $invokeCompilation = 1 ;
+	}
 
-    } # if $invokeCompilation == 1
 
-    if ($mode eq 'now') {
-	# should compile only once and then leave the infinite loop to complete the program
-	last;
-    } else {
-	print "now wait for wake-up by next compilation-triggering signal\n";
-    }
+	if ($invokeCompilation == 1){
+	    notify("MadWindowsCompileClient.pl will now forward the compilation request to the Windows host machine.");
 
-} # while(1): wait forever to be woken-up by automated build-and-test program
+	    updateMadForWindowsSambaFolder();
 
+
+
+	    # $thisLinuxHost = 'abcopl1';
+	    # print "the Linux box is '$thisLinuxHost'\n";
+
+	    my $sock = new IO::Socket::INET ( 
+					      PeerAddr => $windowsHost,
+					      PeerPort => $socketPortWindows,
+					      Proto => 'tcp'
+					      ); 
+
+	    die "Could not create socket: $!\n" unless $sock; 
+	    
+	    print "will now send message to port $socketPortWindows of $windowsHost\n";
+	
+	    print $sock "$thisLinuxHost asks: Compile MAD for Windows!\n";
+	
+	    $startTime = localtime; # global
+	    $endTime; # global, will be set later-on
+	
+	    close($sock);
+	
+	    # now wait for the message signalling that the compilation completed
+
+
+
+	    my $clientSock = new IO::Socket::INET(
+						  LocalHost => $thisLinuxHost,
+						  LocalPort => $socketPortLinux,
+						  Proto => 'tcp',
+						  Listen => 1,
+						  Reuse => 1
+						  );
+
+	    die "Could not create client socket: $!\n" unless $clientSock;
+	    
+	    print "$thisLinuxHost accepts messages sent through socket $socketPortLinux\n";
+	    my $newClientSock = $clientSock->accept();
+
+
+	    
+	    while (<$newClientSock>){
+		print $_;
+		if (/Compilation completed/){
+		    $endTime = localtime;
+		    print "OK: the compilation completed on Windows side\n";
+		    checkWindowsCompilationOutcome();
+		    print "=> installed the executables in the AFS web folder\n";
+		    last; # leave the while loop
+		}
+
+		# should leave loop (timeout) in case there's no reply by the Windows-side server,
+		# in which case, the executables will need to be delivered manually
+
+	    }
+	
+	    close ($clientSock);
+	    
+	} # if $invokeCompilation == 1
+
+	if ($mode eq 'now') {
+	    # should compile only once and then leave the infinite loop to complete the program
+	    last;
+	} else {
+	    print "now wait for wake-up by next compilation-triggering signal\n";
+	}
+
+	# debug:
+	my $whereAmI = `pwd`;
+	notify("at the end of the compilation, the Linux box client is in '$whereAmI'\n");
+
+	
+    } # while(1): wait forever to be woken-up by automated build-and-test program
+} # this is the parent process (not the child forked process refreshing AFS/Kerberos tokens)
 
 
 sub checkWindowsCompilationOutcome {
@@ -206,10 +252,11 @@ sub checkWindowsCompilationOutcome {
 	# check that the executable has been created within the last hour
 	my $ls = `ls -l $madWindowsCompilationDir/$target`;
 
-#	notify("for target '$target', we see : '$ls'");
+	# debug
+	notify("for target '$target', we see : '$ls'");
 
 	# pick the date and time at which the executables have been created
-	$ls =~ /(\w{3})[\s\t](\d{1,2})[\s\t](\d+:\d+)[\s\t]/ ;
+	$ls =~ /(\w{3})[\s\t]+(\d{1,2})[\s\t]+(\d+:\d+)[\s\t]/ ;
 
 	my $month = $1;
 	my $day = $2;
@@ -218,13 +265,15 @@ sub checkWindowsCompilationOutcome {
 	my $now = localtime;
 	print "now=$now\n";
 
-	$now =~ /^\w{3}[\s\t](\w{3})[\s\t](\d{1,2})[\s\t](\d+:\d+:)\d+/ ;
+	$now =~ /^\w{3}[\s\t]+(\w{3})[\s\t]+(\d{1,2})[\s\t]+(\d+:\d+:)\d+/ ;
 	# forget about the year...
 
 	my $monthNow = $1;
 	my $dayNow = $2;
 	my $time = $3;
 
+	# debug
+	notify("monthNow is '$monthNow', month is '$month', dayNow is '$dayNow', day is '$day'");
 #	if (0){ # for the time being, always deliver the executables, without checking anything
 	if (($monthNow != $month)||($dayNow != $day)){
 	    print "Mistmatch of day and month => executables were not created\n";
@@ -234,7 +283,11 @@ sub checkWindowsCompilationOutcome {
 	    # now install the executables in the AFS web folder
 	    my $source = "$madWindowsCompilationDir/$target";
 	    my $destination = "$madWindowsDeliveryDir/$target";
-	    `cp $source $destination`;
+	    my $result = `cp $source $destination`;
+	    
+	    # debug:
+	    notify("just copied '$source' into '$destination' => outcome = '$result'");
+
 	}
 
 
@@ -247,6 +300,10 @@ sub checkWindowsCompilationOutcome {
 
     # now notify that the Windows executables are ready
     my $grepVersion = `grep myversion $madWindowsCompilationDir/madxd.h`; # hard-coded !?
+
+    # debug:
+    notify("now grep my version in '$madWindowsCompilationDir/madx.h'");
+
     $grepVersion =~ /MAD-X (\d+\.\d+\.\d+)/;
     $madVersion = $1; # global, also used in subroutine 'deliverHtmlPage';
 
@@ -263,7 +320,7 @@ sub checkWindowsCompilationOutcome {
     
     chdir($initialDir);
 
-} # subroutine
+} # subroutine checkWindowsCompilationOutcome
 
 
 sub deliverHtmlPage {
@@ -327,7 +384,9 @@ sub deliverHtmlPage {
     print OUTHTML $html;
     close OUTHTML;
 
-
+    # debug
+    notify("created file '$htmlFile'");
+    
     # now move HTML file into the AFS target web folder
     
 }
