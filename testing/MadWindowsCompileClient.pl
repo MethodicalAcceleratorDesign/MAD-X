@@ -9,6 +9,8 @@
 # immediately trigger the compilation, the later meaning the program will listen
 # to port 7075 for a request emanating from the automatic build and test procedure.
 
+$debug = 'no'; # global variable also used by notify() subroutine
+
 if ($#ARGV!=0){
     die "expect one argument: 'now' or 'wait-for-trigger'\n";
 } else {
@@ -404,14 +406,16 @@ sub updateMadForWindowsSambaFolder{
 
 
 sub notify{
-    my $message = $_[0];
-    my $msg = MIME::Lite->new(
-			      From => 'MAD-X Windows compilation robot',
-			      ReplyTo => 'Jean-Luc.Nougaret@cern.ch',
-			      To => 'Jean-Luc.Nougaret@cern.ch',
-			      Subject => 'automatic notification',
-			      Data => $message
-			      );
-    $msg->send;    
+    if ($debug eq 'yes') {
+	my $message = $_[0];
+	my $msg = MIME::Lite->new(
+				  From => 'MAD-X Windows compilation robot',
+				  ReplyTo => 'Jean-Luc.Nougaret@cern.ch',
+				  To => 'Jean-Luc.Nougaret@cern.ch',
+				  Subject => 'automatic notification',
+				  Data => $message
+				  );
+	$msg->send;    
+    }
 
 }
