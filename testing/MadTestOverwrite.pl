@@ -13,6 +13,8 @@ $root = "/afs/cern.ch/user/n/nougaret/scratch0/mad-automation";
 
 $localDirectory = `pwd`; chop $localDirectory;
 
+print "make sure you update the madx/madxp executables in /user/nougaret/MAD-X/madX before running this program.\n";
+
 my $found = 0;
 foreach $targ (@targets){
 
