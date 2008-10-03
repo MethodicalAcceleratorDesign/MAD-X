@@ -699,7 +699,7 @@ foreach $test (@tests) {
 		
 		my $existsStderr = 0;
 		@stderrFiles = `ls $outputSubdir/$stderrFile`;
-		if (scalar(@stderrFiles >0)) {
+		if (scalar(@stderrFiles) >0) {
 			# check if not empty
 			my $linesCount = `wc -l $stderrFile`;
 			if ($linesCount >0) {
