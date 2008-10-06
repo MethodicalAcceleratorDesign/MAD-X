@@ -21,6 +21,12 @@ open REPORT_FILE, ">MadTest_Report.txt";
 
 $startTime = localtime;
 
+my $path = $ENV{'PATH'};
+my $newPath = $path . ":."; # can invoke local commands from MAD-X script
+$ENV{'PATH'}=$newPath;
+
+
+
 print REPORT_FILE "MadTest.pl report from $startTime\n";
 
 $testReport = ""; # will be stored into an HTML document
