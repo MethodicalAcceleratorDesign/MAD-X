@@ -60,6 +60,7 @@
    </target>
    <target name="ptc_accel" responsible="Frank.Schmidt@cern.ch">
        <!-- skip the 'track' test which creates hundreds of files -->
+        <test input = "track.ptc.madx" program="madxp" output="track.ptc.out" subdir="track"/>
 	<test input ="twiss.ptc.madx" program="madxp" output="twiss.ptc.out" subdir="twiss"/>
    </target>   
    <target name="ptc_madx_interface" responsible="Piotr.Skowronski@cern.ch">
