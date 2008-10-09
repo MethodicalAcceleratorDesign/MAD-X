@@ -58,8 +58,8 @@ contains
 
     if (getdebug() > 1) then
        call kanalnummer(mf1)
-       call kanalnummer(mf2)
        open(unit=mf1,file='sychrpart.txt')
+       call kanalnummer(mf2)
        open(unit=mf2,file='twcavsettings.txt')
        write(mf2,'(6a16)') "!ElNo     ","Ref.Momentum","Phase","Frequency [Hz]","Voltage","DeltaE"
     endif
