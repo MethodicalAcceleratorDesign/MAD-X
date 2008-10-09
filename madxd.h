@@ -1287,6 +1287,11 @@ struct table* embedded_twiss_table;        /* current twiss table */
 /* E. T. d'Amico 5 nov 2004 */
 struct table* normal_results;     /* ptc table containing the selected high order functions (such as dx,qx,anhx etc.) */
 /* end additions */
+ 
+struct table* errors_dipole;
+struct table* errors_field;
+struct table* errors_total;
+struct table* errors_read; /* table needed for IO of errors with PTC FS Sep 2008*/
 
 struct table* survey_table;       /* current survey table */
 struct table* corr_table;         /* corrector table after orbit correction */
@@ -1349,8 +1354,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.47";
-char code_mod_date[] = "Code Modification Date: 26.09.2008";
+char myversion[] = "MAD-X 3.04.48";
+char code_mod_date[] = "Code Modification Date: 09.10.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

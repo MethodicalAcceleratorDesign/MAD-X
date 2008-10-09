@@ -3663,11 +3663,46 @@ void pro_ptc_twiss()
 void pro_ptc_create_layout()
   /* controls ptc_create_layout module */
 {
+  int pos;
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
     fatal_error("ptc_create_layout - sequence without beam:", current_sequ->name);
   adjust_beam();
   probe_beam = clone_command(current_beam);
+
+  if ((pos = name_list_pos("errors_dipole", table_register->names)) <= -1)
+  {
+    errors_dipole = make_table("errors_dipole", "efield", efield_table_cols,
+                               efield_table_types, 10000);
+    add_to_table_list(errors_dipole, table_register);
+  }
+  else
+  {
+    reset_count("errors_dipole");
+  }
+
+  if ((pos = name_list_pos("errors_field", table_register->names)) <= -1)
+  {
+    errors_field = make_table("errors_field", "efield", efield_table_cols,
+                               efield_table_types, 10000);
+    add_to_table_list(errors_field, table_register);
+  }
+  else
+  {
+    reset_count("errors_field");
+  }
+
+  if ((pos = name_list_pos("errors_total", table_register->names)) <= -1)
+  {
+    errors_total = make_table("errors_total", "efield", efield_table_cols,
+                               efield_table_types, 10000);
+    add_to_table_list(errors_total, table_register);
+  }
+  else
+  {
+    reset_count("errors_total");
+  }
+
   w_ptc_create_layout_();
   /* cleanup */
   current_beam = keep_beam;
