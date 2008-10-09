@@ -171,9 +171,10 @@
 !   V(3)     (real)    Coordinate at the end of the element            *
 ! theta, phi, psi(real) : the survey angles                            *
 !----------------------------------------------------------------------*
+      include 'twtrr.fi'
       integer code,nn
       double precision ang,el,v(3),theta,phi,psi,node_value,suml,       &
-     &normal(20),globaltilt,tmp
+     &normal(0:maxmul),globaltilt,tmp
 
       el = node_value('l ')
       call string_to_table('survey ', 'name ', 'name ')
@@ -192,7 +193,11 @@
         ang = node_value('angle ')*node_value('dipole_bv ')
       else if(code.eq.8) then
         call get_node_vector('knl ',nn,normal)
-        ang = normal(1)
+        if (nn .ne. 0) then
+           ang = normal(0)
+        else
+           ang = 0d0
+        endif
       else
         ang = 0d0
       endif
