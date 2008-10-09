@@ -2275,6 +2275,8 @@ CONTAINS
       REAL(dp),  allocatable :: Temp_X_incl_co_at_obs(:,:)
       Real(dp):: X_lnv_START(lnv), X_lnv_OBSRV(lnv)
 
+      character*8 ch,ch1
+
       segment_one_table=0 ! for Printing to tables
       last_table_line_out = .false.
 
@@ -2320,8 +2322,14 @@ CONTAINS
 
       obs_point_loop: DO i_obs_point=1, max_obs-1
          
-         call kanalnummer(mf(i_obs_point))
-         open(unit=mf(i_obs_point),file="obs_point_"//achar(i_obs_point))
+         if (ptc_track_debug) then
+            call kanalnummer(mf(i_obs_point))
+            ch=" "
+            ch1=" "
+            write(ch,'(i8)') i_obs_point
+            ch1=adjustl(ch)
+            open(unit=mf(i_obs_point),file="obs_point_"//ch1(:len_trim(ch1)))
+         endif
 
          i_from=elem_number_at_observ(i_obs_point)
          i_till=elem_number_at_observ(i_obs_point+1)
