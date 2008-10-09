@@ -1,4 +1,0 @@
-      logical skew
-      integer mnres,mymorder
-      parameter (mnres=1000,mymorder=20)
-      integer myn1,myn2,indexa(mnres,4),mynres
