@@ -138,7 +138,7 @@ CONTAINS
     include 'name_len.fi'
     include 'twiss0.fi'
     logical(lp) particle,doneit,isclosedlayout
-    integer i,j,k,code,nt,icount,nn,ns,nd,mf1,mf2,mf3,mg,get_string
+    integer i,j,k,code,nt,icount,nn,ns,nd,mg,get_string
     !    integer get_option
     integer double_from_table
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
@@ -146,7 +146,7 @@ CONTAINS
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
     real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul)
     real(dp) patch_ang(3),patch_trans(3)
-    real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2)
+    real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
@@ -158,7 +158,6 @@ CONTAINS
     type(keywords) key
     character(20)       keymod0,keymod1
     character(name_len) magnet_name
-    character(240)      myfilen
     logical(lp)         exact0
     integer             exact1
     integer             sector_nmul_max0,sector_nmul0,sector_nmul1
@@ -179,7 +178,7 @@ CONTAINS
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
     charge=get_value('probe ','charge ')
-!    bvk=get_value('probe ','bv ')
+    !    bvk=get_value('probe ','bv ')
 
     e0f=sqrt(ENERGY**2-pma**2)
 
@@ -315,117 +314,13 @@ CONTAINS
     j=restart_sequ()
     j=0
     l_machine=zero
-        
+
     errors_in = get_value('ptc_create_layout ','errors_in ').ne.0
     errors_out = get_value('ptc_create_layout ','errors_out ').ne.0
     if(errors_in) errors_out=my_false
-    
-    if(errors_in) then
-       magnet_name=" "
-       mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
-       if(get_value('probe ','bv ').eq.1) then
+    magnet_name=" "
+    if(errors_out) mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
 
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b1.txt"
-          call kanalnummer(mf1)
-          open(unit=mf1,file=myfilen,status="old",err=999)
-
-       elseif(get_value('probe ','bv ').eq.-1) then
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b2.txt"
-          call kanalnummer(mf1)
-          open(unit=mf1,file=myfilen,status="old",err=999)
-       endif
-
-    elseif(errors_out) then
-       magnet_name=" "
-       mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
-       if(get_value('probe ','bv ').eq.1) then
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b1.txt"
-          call kanalnummer(mf1)
-          open(unit=mf1,file=myfilen)
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_field_b1.txt"
-          call kanalnummer(mf2)
-          open(unit=mf2,file=myfilen)
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_dipole_b1.txt"
-          call kanalnummer(mf3)
-          open(unit=mf3,file=myfilen)
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-
-       elseif(get_value('probe ','bv ').eq.-1) then
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_tot_b2.txt"
-          call kanalnummer(mf1)
-          open(unit=mf1,file=myfilen)
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-          write(mf1,*) "blah"
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_field_b2.txt"
-          call kanalnummer(mf2)
-          open(unit=mf2,file=myfilen)
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-          write(mf2,*) "blah"
-
-          myfilen=" "
-          myfilen="errors_"//magnet_name(:len_trim(magnet_name)-1)//"_dipole_b2.txt"
-          call kanalnummer(mf3)
-          open(unit=mf3,file=myfilen)
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-          write(mf3,*) "blah"
-
-       endif
-    endif
-       
 10  continue
     bvk = node_value('other_bv ')
     if(bvk.ne.-one) bvk=one
@@ -600,6 +495,8 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
+       key%list%k(1)=bv0*key%list%k(1)
+       key%list%ks(1)=bv0*key%list%ks(1)
        ptcrbend=node_value('ptcrbend ').ne.0
        if(ptcrbend) then
           call context(key%list%name)
@@ -624,9 +521,9 @@ CONTAINS
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             write(mf3,*) key%list%name,key%list%b0,zero,&
-                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,&
-                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero
+             call string_to_table('errors_dipole ', 'name ',key%list%name)
+             call double_to_table('errors_dipole ', 'k01 ',key%list%b0)
+             call augment_count('errors_dipole ')
           endif
        endif
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
@@ -677,12 +574,14 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
+       key%list%k(1)=bv0*key%list%k(1)
+       key%list%ks(1)=bv0*key%list%ks(1)
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             write(mf3,*) key%list%name,key%list%b0,zero,&
-                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,&
-                  zero,zero,zero,zero,zero,zero,zero,zero,zero,zero
+             call string_to_table('errors_dipole ', 'name ',key%list%name)
+             call double_to_table('errors_dipole ', 'k01 ',key%list%b0)
+             call augment_count('errors_dipole ')
           endif
        endif
     case(5)
@@ -818,10 +717,23 @@ CONTAINS
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             write(mf1,*) key%list%name,&
-                  (bvk*key%list%k(kk),bvk*key%list%ks(kk),kk=1,maxmul)
-             write(mf2,*) key%list%name,&
-                  (bvk*field(1,kk),bvk*field(2,kk),kk=0,maxmul-1)
+             call string_to_table('errors_field ', 'name ',key%list%name)
+             call string_to_table('errors_total ', 'name ',key%list%name)
+             i=2*maxmul+2
+             myfield(:) = zero
+             do kk=1,nd+1
+                myfield(2*kk-1) = bvk*field(1,kk-1)
+                myfield(2*kk)   = bvk*field(2,kk-1)
+             enddo
+             call vector_to_table('errors_field ', 'k0l ', i, myfield(1))
+             myfield(:) = zero
+             do kk=1,nd+1
+                myfield(2*kk-1) = bvk*key%list%k(kk)
+                myfield(2*kk)   = bvk*key%list%ks(kk)
+             enddo
+             call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
+             call augment_count('errors_field ')
+             call augment_count('errors_total ')
           endif
        endif
     case(9) ! PTC accepts mults
@@ -962,10 +874,10 @@ CONTAINS
           key%list%ks(i)=zero
        enddo
        key%list%k(1)=node_value('volt ')*c_1d_3
-! vertical crab
-! maybe requires a flip of sign
-!       key%list%ks(1)= (+/-)  node_value('volt ')*c_1d_3
-!
+       ! vertical crab
+       ! maybe requires a flip of sign
+       !       key%list%ks(1)= (+/-)  node_value('volt ')*c_1d_3
+       !
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi+pih
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
@@ -1016,9 +928,7 @@ CONTAINS
     doneit=.true.
     call ring_l(my_ring,doneit)
 
-    if(errors_in) then
-       call fill_errors(my_ring,mf1,myfilen)
-    endif
+    if(errors_in) call fill_errors(my_ring)
 
     if (getdebug() > 0) then
        write(6,*) "------------------------------------ PTC Survey ------------------------------------"
@@ -1043,15 +953,7 @@ CONTAINS
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     endif
 
-    if(errors_in.or.errors_out) close(mf1)
-    if(errors_in) then
-       close(mf2)
-       close(mf3)
-    endif
-
     return
-
-999 call aafail("PTC error file with name: >>> "//myfilen(:len_trim(myfilen)-1),' <<< does not exist')
 
   END subroutine ptc_input
   !_________________________________________________________________
@@ -1310,7 +1212,7 @@ CONTAINS
     j=j+1
     n_align = node_al_errors(al_errors)
     if (n_align.ne.0)  then
-!       write(6,'(6f8.3)')  al_errors(1:6)
+       !       write(6,'(6f8.3)')  al_errors(1:6)
        call mad_misalign_fibre(f,al_errors(1:6))
     endif
     f=>f%next
@@ -2169,33 +2071,54 @@ CONTAINS
   !_________________________________________________________________
 
 
-  SUBROUTINE fill_errors(lhc1,mf,filename1)
+  SUBROUTINE fill_errors(lhc1)
     implicit none
     include 'twtrr.fi'
     include 'name_len.fi'
     type(layout),target :: lhc1
-    integer i,mf,k,pos,nfac(maxmul)
-    real(dp) d(maxmul+2),b(maxmul),a(maxmul)
+    integer i,k,pos,nfac(maxmul+1),flag,string_from_table,double_from_table
+    real(dp) d(2*maxmul+2),b(maxmul+1),a(maxmul+1)
     character*255 line
-    character(name_len) name
-    character(*) filename1
+    character(name_len) name,name2
     type(fibre),pointer :: p
+    character*4 :: mag_index1(10)=(/'k0l ','k1l ','k2l ','k3l ','k4l ','k5l ','k6l ','k7l ','k8l ','k9l '/)
+    character*5 :: mag_index2(10)=(/'k0sl ','k1sl ','k2sl ','k3sl ','k4sl ','k5sl ','k6sl ','k7sl ','k8sl ','k9sl '/)
+    character*5 :: mag_index3(11)=(/'k10l ','k11l ','k12l ','k13l ','k14l ','k15l ','k16l ','k17l ','k18l ','k19l ','k20l '/)
+    character*6 :: mag_index4(11)=(/'k10sl ','k11sl ','k12sl ','k13sl ','k14sl ','k15sl ','k16sl ', &
+         'k17sl ','k18sl ','k19sl ','k20sl '/)
 
     nfac(1)=1
-    do i=2,maxmul
+    do i=2,maxmul+1
        nfac(i)=nfac(i-1)*(i-1)
     enddo
 
-    do i=1,8
-       read(mf,'(a255)', end=101) line
-    enddo
+    flag = string_from_table('errors_read ', 'name ',1,name)
+
+    if(flag.ne.0) call aafail('fill_errors reports: ',' The >>> errors_read <<< table is empty ')
+    i=0
+
     p=>lhc1%start
     do while(.true.)
-       read(mf,*, end=102) name,d(:)
-       do k=1,maxmul
+       i=i+1
+       name2=" "
+       flag = string_from_table('errors_read ', 'name ',i,name2)
+       if(flag.ne.0) goto 100
+       do k=1,maxmul+1
+          if(k<=10) then
+             flag = double_from_table('errors_read ',mag_index1(k),i,d(2*k-1))
+             flag = double_from_table('errors_read ',mag_index2(k),i,d(2*k))
+          else
+             flag = double_from_table('errors_read ',mag_index3(k-10),i,d(2*k-1))
+             flag = double_from_table('errors_read ',mag_index4(k-10),i,d(2*k))
+          endif
+       enddo
+       if(flag.ne.0) goto 100
+       do k=1,maxmul+1
           b(k)=d(2*k-1)/nfac(k)
           a(k)=d(2*k)/nfac(k)
        enddo
+       name=" "
+       name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
        call move_to(lhc1,p,name,pos)
        if(pos/=0.and.p%mag%parent_fibre%dir==1) then
@@ -2203,7 +2126,7 @@ CONTAINS
              b=b/p%mag%l
              a=a/p%mag%l
           endif
-          do k=maxmul,1,-1
+          do k=maxmul+1,1,-1
              if(b(k)/=zero) then
                 call add(p,k,0,b(k))
              endif
@@ -2215,10 +2138,7 @@ CONTAINS
           write(6,*) " name,pos, dir of dna ",name, p%mag%parent_fibre%dir
        endif
     enddo
-102 continue
-    return
-101 continue
-    call aafail("PTC error file with name: >>> "//filename1(:len_trim(filename1)-1),' <<< is corrupted')
+100 continue
     return
 
   end SUBROUTINE fill_errors
