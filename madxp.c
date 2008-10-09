@@ -1541,6 +1541,8 @@ void exec_command()
         else
         {
           pro_ptc_create_layout();
+          reset_count("normal_results");
+          reset_count("ptc_twiss");
         }
       }
       else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
