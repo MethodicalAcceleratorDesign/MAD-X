@@ -110,7 +110,7 @@ if ($lastTest eq $lastRelease) {
 	$msg = MIME::Lite->new(
 		       From       => 'Jean-Luc.Nougaret@cern.ch',
 		       'Reply-To' => 'mad-automation-admin@cern.ch',
-		       To         => 'mad-automation-watchers@cern.ch',
+		       To         => 'hep-project-madx@cern.ch',
 		       Subject    => "MAD $lastRelease has been released. Testing starts.",
 		       Data       => $workReport
 		       );
