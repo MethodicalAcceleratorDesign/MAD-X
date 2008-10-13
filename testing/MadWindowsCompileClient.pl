@@ -314,7 +314,7 @@ sub checkWindowsCompilationOutcome {
 
     my $msg = MIME::Lite->new(
 			      From => 'Jean-Luc.Nougaret@cern.ch',
-			      To => 'Jean-Luc.Nougaret@cern.ch',
+			      To => 'mad-windows-watchers@cern.ch',
 			      Subject => 'MAD-X for Windows updated',
 			      Data => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards,\nJean-Luc"
 			      );
