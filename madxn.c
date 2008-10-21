@@ -1332,8 +1332,14 @@ void exec_sodd(struct in_cmd* cmd)
 
 void make_map_table(int* map_table_max_rows)
 {
-  int pos;
-  if ((pos = name_list_pos("map_table", table_register->names)) > -1) delete_table(table_register->tables[pos]);
+  int k, pos;
+  if ((pos = name_list_pos("map_table", table_register->names)) > -1)
+    {
+     delete_table(table_register->tables[pos]);
+     k = remove_from_name_list(table_register->tables[pos]->name, 
+                           table_register->names);
+     table_register->tables[k] = table_register->tables[--table_register->curr];
+    }
   /* initialise table */
   map_table = make_table("map_table", "map_tab", map_tab_cols,
                          map_tab_types, *map_table_max_rows);

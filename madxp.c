@@ -1543,6 +1543,8 @@ void exec_command()
           pro_ptc_create_layout();
           reset_count("normal_results");
           reset_count("ptc_twiss");
+/*          exec_delete_table("normal_results");
+            exec_delete_table("ptc_twiss");*/
         }
       }
       else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)

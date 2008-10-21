@@ -1412,14 +1412,15 @@ void exec_delete_sequ(char* name)
 void exec_delete_table(char* name)
 {
   struct table_list* tl;
-  int j, pos;
+  int j, k, pos;
   for (j = 0; j < all_table_lists->curr; j++)
   {
    tl = all_table_lists->table_lists[j];
    if ((pos = name_list_pos(name, tl->names)) >= 0)
    {
     tl->tables[pos] = delete_table(tl->tables[pos]);
-    remove_from_name_list(name, tl->names);
+    k = remove_from_name_list(name, tl->names);
+    tl->tables[k] = tl->tables[--tl->curr];
     return;
    }
   }
