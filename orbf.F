@@ -834,9 +834,8 @@
         if(pivt-piv.gt.rzero) then
           piv = pivt
           kpiv=k
-        else
-          k2 = k2 + 1
         endif
+        k2 = k2 + 1
       enddo
 
 ! --- boucle pour chaque iteration
