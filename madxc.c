@@ -10,6 +10,7 @@
 #else
 #include <stdint.h>		/* uintptr_t, to fit pointers into integers of correct size */
 #endif
+/* frs 21.10.2008 revert to old version after Thys Risselada's fix of Micado */ 
 
 void setupi_(int*, int*, int*, int*, int*, int*);
 void primat_(int*, int*, int*);
@@ -234,7 +235,6 @@ void correct_correct2(struct in_cmd* cmd)
   corrl = command_par_value("corrlim",cmd->clone);
   set_variable("corrlim",&corrl);
   if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
-    fatal_error("MICADO correction mode not anymore available"," use mode=lsq or mode=svd instead");
     printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
           printf("Requested %d correctors (\?\?\?) set to %d\n",niter,icor);
@@ -1256,7 +1256,6 @@ void correct_correct1(struct in_cmd* cmd)
   corrl = command_par_value("corrlim",cmd->clone);
   set_variable("corrlim",&corrl);
   if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
-    fatal_error("MICADO correction mode not anymore available"," use mode=lsq or mode=svd instead");
     printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
           printf("Requested %d correctors (\?\?\?) set to %d\n",niter,icor);
