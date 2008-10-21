@@ -33,11 +33,11 @@ module precision_constants
   integer,parameter::vp=24
   integer,parameter::lp=4
 ! double precision
-  integer,parameter::sp=kind(1e0)
-  integer,parameter::dp=selected_real_kind(2*precision(1e0_sp))
+  integer,parameter::sp=kind(1.e0)
+  integer,parameter::dp=selected_real_kind(2*precision(1.e0))
 ! quadrupole precision
 !  integer,parameter::sp=selected_real_kind(2*precision(1.e0))
-!  integer,parameter::dp=selected_real_kind(2*sp)
+!  integer,parameter::dp=selected_real_kind(4*precision(1.e0))
   !Logicals
   logical(lp),parameter:: my_true=.true.
   logical(lp),parameter:: my_false=.false.
