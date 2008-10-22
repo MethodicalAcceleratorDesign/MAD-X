@@ -137,7 +137,8 @@
       return
       end
       subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-     &ws,wvec,sortw,                                                    &
+     &ws,wvec,sortw,                                                     &
+     &sngcut, sngval,                                                    &
      &im,ic,iflag,sing,dbg)
 ! ****************************************************
 !                                                    *
@@ -166,11 +167,16 @@
       integer dbg
       parameter(zero = 0d0)
       parameter(nsing = 5)
-      parameter(sngcut = 50.)
-      parameter(sngval = 2.0000)
 !      data svdtest/3,8,8,8,4,9,9,2,8,8,                                 &
 !     &4,1,7,2,6,1,6,4,6,2,                                              &
 !     &1,9,7,2,2,6,9,8,3,5/
+
+
+      if(dbg.eq.2) then
+        write(*,*) 'SVD parameters: '
+        write(*,*) 'SNGCUT:         ',sngcut
+        write(*,*) 'SNGVAL:         ',sngval
+      endif
 
       MATU = .TRUE.
       MATV = .TRUE.
@@ -186,7 +192,7 @@
         enddo
       enddo
 
-      if(dbg.eq.1) then
+      if(dbg.eq.2) then
           write(*,*) 'A0:'
       do  j = 1,im
           write(*,6003) (svdmat(j,i),i=1,ic)
@@ -216,6 +222,9 @@
       endif
       do  ii = 1,min(nsing,ic)
           i = sortw(ii)
+          if(dbg.eq.1) then
+           write(61,*) wvec(i)
+          endif
           if(abs(wvec(i)).lt.sngval) then
              if(dbg.eq.1) then
              do  j = 1,ic
@@ -225,13 +234,16 @@
              do  j = 1,ic-1
                 do  jj = j+1,ic
                 if(abs(vmat(j,i)).gt.1.0E-4) then
-                   rat = abs(vmat(j,i) - vmat(jj,i))
+                   rat = abs(vmat(j,i)) + abs(vmat(jj,i))
+C                  rat = abs(vmat(j,i) - vmat(jj,i))
+C                  rat = abs(vmat(j,i) + vmat(jj,i))
                    rat = rat/abs(abs(vmat(j,i)) - abs(vmat(jj,i)))
                    if(rat.gt.sngcut) then
                       IF(DBG.EQ.1) THEN
-                      write(*,*) 'dependent pair: ',j,jj,rat
+                      write(*,*) 'dependent pair: ',i,j,jj,rat
+                      write(65,*) 'dependent pair: ',i,j,jj,rat
                       ENDIF
-                      if(iflag.lt.ic) then
+                      if(iflag.lt.(ic*ic*ic)) then
                          iflag = iflag + 1
                          sing(1,iflag) =  j - 1
                          sing(2,iflag) = jj - 1
@@ -242,11 +254,17 @@
              enddo
           endif
       enddo
+      if(dbg.eq.1) then
+        do  j=1,iflag
+          write(66,*) j,sing(1,j),sing(2,j)
+        enddo
+      endif
 
       return
       end
       subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-     &ws,wvec,sortw,                                                    &
+     &ws,wvec,sortw,                                                     &
+     &sngcut, sngval,                                                    &
      &im,ic,iflag,sing,dbg)
 ! ****************************************************
 !                                                    *
@@ -274,8 +292,12 @@
       integer dbg
       parameter(zero = 0d0)
       parameter(nsing = 5)
-      parameter(sngcut = 50.)
-      parameter(sngval = 2.0000)
+
+      if(dbg.eq.2) then
+        write(*,*) 'SVD parameters: '
+        write(*,*) 'SNGCUT:         ',sngcut
+        write(*,*) 'SNGVAL:         ',sngval
+      endif
 
       MATU = .TRUE.
       MATV = .TRUE.
@@ -296,7 +318,7 @@
 
  8373 continue
 
-      if(dbg.eq.1) then
+      if(dbg.eq.2) then
           write(*,*) 'A0:'
       do  j = 1,ic
           write(*,6003) (svdmat(j,i),i=1,im)
@@ -326,6 +348,9 @@
       endif
       do  ii = 1,min(nsing,im)
           i = sortw(ii)
+          if(dbg.eq.1) then
+            write(61,*) wvec(i)
+          endif
           if(abs(wvec(i)).lt.sngval) then
              if(dbg.eq.1) then
              do  j = 1,ic
@@ -335,11 +360,16 @@
              do  j = 1,ic-1
                 do  jj = j+1,ic
                 if(abs(umat(j,i)).gt.1.0E-4) then
-                   rat = abs(umat(j,i) - umat(jj,i))
+C                  rat = abs(umat(j,i) - umat(jj,i))
+                   rat = abs(umat(j,i)) +  abs(umat(jj,i))
                    rat = rat/abs(abs(umat(j,i)) - abs(umat(jj,i)))
+                   if(dbg.eq.1) then
+                     write(62,*) wvec(i),rat
+                   endif
                    if(rat.gt.sngcut) then
                       if(dbg.eq.1) then
                       write(*,*) 'dependent pair: ',j,jj,rat
+                      write(65,*) 'dependent pair: ',j,jj,rat
                       endif
                       if(iflag.lt.ic) then
                          iflag = iflag + 1

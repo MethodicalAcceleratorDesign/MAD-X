@@ -316,8 +316,8 @@ extern void testit_(double *,double *,double *,double *,int *,int *,
                     int *,double *,double *,double *,double *,double *,double *);
 extern void svdcorr_m_(double *,double *, double *,double *,double *, double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *,int *, int *, int *);
 extern void svdcorr_c_(double *,double *, double *,double *,double *, double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *,int *, int *, int *);
-extern void svddec_m_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *, int *);
-extern void svddec_c_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,int *,int *, int *, int *, int *);
+extern void svddec_m_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,double *,double *,int *,int *, int *, int *, int *);
+extern void svddec_c_(double *,double *,double *,double *,double *,double *,double *,double *,double *,double *,int *,double *,double *,int *,int *, int *, int *, int *);
 
 extern void ibs_();
 extern void touschek_();
@@ -1036,7 +1036,7 @@ int str_from_tablet(struct table *t, char* name, int* row, char* val);
 /* C wrapper to allocate memory for Fortran77 */
 int c_micit(double *,char *,double *,double *,double *,int *,float,int,int,int);
 void c_haveit(double *,double *,double *,double *,int *,int,int);
-int  c_svddec(double *,int,int,int *);
+int  c_svddec(double *,int,int,int *, double *, double *);
 int  c_svdcorr(double *, double *, double *, double *, int *, int , int );
 
 /* define error routines */

@@ -673,6 +673,8 @@ char command_def[] =
 "x_col    = [s, none], "
 "y_col    = [s, none], "
 "units    = [r, 1], "
+"sngcut   = [r, 50], "
+"sngval   = [r, 2], "
 "extern   = [l, false, true]; "
 " "
 "getorbit: correct correct 0 0 "

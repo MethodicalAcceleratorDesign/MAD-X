@@ -1088,8 +1088,10 @@ void correct_correct1(struct in_cmd* cmd)
   int niter;
   int resout;
   int twism;
+  int dbg;
   int ifail, sflag, svdflg;
   float  rms;
+  double sngcut, sngval;
   double tmp1, tmp2, tmp3, tmp4;
   double  sigcut;            /* number of sigmas (normalized) for filter cut */
   char    *clist, *mlist;    /* file names for monitor and corrector output */
@@ -1198,15 +1200,25 @@ void correct_correct1(struct in_cmd* cmd)
     /* icor and imon used to set up correct matrix size !! */
     dmat = (double *)pro_correct_response_ring(ip,icor,imon);
     if((svdflg = command_par_value("cond",cmd->clone)) == 1) {
+       sngcut = command_par_value("sngcut", cmd->clone);
+       sngval = command_par_value("sngval", cmd->clone);
        printf("SVD conditioning requested ...\n");
+       if (get_option("debug")) printf("Conditioning parameters: %e %e\n",sngcut, sngval);
+
        /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
-       sflag=c_svddec(dmat,imon,icor,sing);
+       sflag=c_svddec(dmat,imon,icor,sing,&sngcut,&sngval);
+       printf("Initially found %d singular values\n",sflag);
        /* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
        /* printf("sflag: %d\n",sflag); */
+        printf("sflag: %d\n",sflag); 
        for(ix=0;ix<sflag;ix++) {
          corl[nx[sing[2*ix+0]]].enable = 0;
-         printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
+           printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
                  corl[nx[sing[2*ix+0]]].p_node->name);
+         if(dbg == 1) {
+           printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
+                 corl[nx[sing[2*ix+0]]].p_node->name);
+         }
        }
        ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
        icor = ix%10000; imon  = ix/10000;
@@ -1215,14 +1227,45 @@ void correct_correct1(struct in_cmd* cmd)
        if(dmat != NULL) myfree(rout_name,dmat);
        /* icor and imon used to set up correct matrix size !! */
        dmat = (double *)pro_correct_response_ring(ip,icor,imon);
-       sflag=c_svddec(dmat,imon,icor,sing);
-       printf("Found %d singular values\n",sflag);
+       sflag=c_svddec(dmat,imon,icor,sing,&sngcut,&sngval);
+       printf("Finally found %d singular values\n",sflag);
     }
   }
   else if(strcmp("line",command_par_string("flag",cmd->clone)) == 0) {
     if(dmat != NULL) myfree(rout_name,dmat);
           printf("make response for line\n");
-    dmat = (double *)pro_correct_response_line(ip,icor,imon); }
+    dmat = (double *)pro_correct_response_line(ip,icor,imon); 
+
+    if((svdflg = command_par_value("cond",cmd->clone)) == 1) {
+       sngcut = command_par_value("sngcut", cmd->clone);
+       sngval = command_par_value("sngval", cmd->clone);
+       printf("SVD conditioning requested ...\n");
+       if (get_option("debug")) printf("Conditioning parameters: %e %e\n",sngcut, sngval);
+
+       /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
+       sflag=c_svddec(dmat,imon,icor,sing,&sngcut,&sngval);
+       printf("Initially found %d singular values\n",sflag);
+       /* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
+       /* printf("sflag: %d\n",sflag); */
+       for(ix=0;ix<sflag;ix++) {
+         corl[nx[sing[2*ix+0]]].enable = 0;
+         if(dbg == 1) {
+           printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
+                 corl[nx[sing[2*ix+0]]].p_node->name);
+         }
+       }
+       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
+       icor = ix%10000; imon  = ix/10000;
+       printf("After SVD conditioning:             \n");
+       printf("%d monitors and %d correctors enabled\n\n",imon,icor);
+       if(dmat != NULL) myfree(rout_name,dmat);
+       /* icor and imon used to set up correct matrix size !! */
+       dmat = (double *)pro_correct_response_ring(ip,icor,imon);
+       sflag=c_svddec(dmat,imon,icor,sing,&sngcut,&sngval);
+       printf("Finally found %d singular values\n",sflag);
+    }
+  }
+ 
   else { printf("INVALID MACHINE TYPE\n"); exit(-1);
   }
 
@@ -2696,7 +2739,8 @@ void c_haveit(double *dmat,double *monvec,double *corvec,double *resvec,int *nx,
   return;
 }
 
-int  c_svddec(double *dmat, int imon, int icor, int *sing)
+int  c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut, double *sngval)
+
 {
   char rout_name[] = "c_svddev";
   int    flag;
@@ -2720,9 +2764,9 @@ int  c_svddec(double *dmat, int imon, int icor, int *sing)
   dbg = debug_correct_opt;
 
   if(imon >= icor ) {
-      svddec_m_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,&imon,&icor,&flag,sing,&dbg);
+      svddec_m_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,sngcut,sngval,&imon,&icor,&flag,sing,&dbg);
   } else {
-      svddec_c_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,&imon,&icor,&flag,sing,&dbg);
+      svddec_c_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,sngcut,sngval,&imon,&icor,&flag,sing,&dbg);
   }
   myfree(rout_name,s); myfree(rout_name,u);
   myfree(rout_name,v); myfree(rout_name,w);
