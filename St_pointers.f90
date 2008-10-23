@@ -139,7 +139,7 @@ contains
     logical(lp) do_not_remove,put_geo_patch
     save my_default
     integer :: limit_int(2) =(/4,18/)
-    LOGICAL :: track_k,CLOSED_ORBIT=MY_FALSE
+    LOGICAL :: track_k,CLOSED_ORBIT=MY_FALSE,b_b
     REAL(DP) CLOSED(6),XP(6),te(6),xbend
     ! automatic track
     integer lim_t(6,2),IEXT
@@ -410,6 +410,11 @@ contains
           WRITE(6,*) "THIN LENS FACTOR =",THIN
           CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_FALSE,lim=limit_int,lmax0=lmax,xbend=xbend)
           ! thin layout stuff
+
+       case('RECUTKIND7NODRIFT')
+          call RECUT_KIND7(my_ering,lmax,my_false)
+       case('RECUTKIND7ANDDRIFT')
+          call RECUT_KIND7(my_ering,lmax,my_true)
        case('MAKE_THIN_LAYOUT','MAKELAYOUT','MAKE_NODE_LAYOUT')
 
           if(.not.associated(my_ering%t)) CALL MAKE_node_LAYOUT(my_ering)
@@ -480,9 +485,6 @@ contains
           CALL assign_one_aperture(my_ering,pos,kindaper,APER_R,APER_X,APER_Y)
           ! end of layout stuff
           ! random stuff
-          !       case('TURNONBEAMBEAMKICK','TURNONBEAMBEAM')
-          !          READ(MF,*) USE_BEAM
-          !          MY_BEAMS(USE_BEAM)%BEAM_BEAM=my_true
 
        case('GAUSSIANSEED')
           READ(MF,*) I1
@@ -507,6 +509,59 @@ contains
           read(mf,*) ALWAYS_EXACTMIS
           if(ALWAYS_EXACTMIS) write(6,*) " ALWAYS EXACT MISALIGNMENTS "
           if(.NOT.ALWAYS_EXACTMIS) write(6,*) " EXACT MISALIGNMENTS SET USING STATE "
+       case('KILLBEAMBEAM')
+          if(associated(my_ering%T)) then
+             TL=>my_ering%T%START
+             DO j=1,my_ering%T%N
+                if(associated(tl%BB)) then
+                   write(6,*) tl%pos,tl%parent_fibre%mag%name,' killed'
+                   call kill(tl%BB)
+                endif
+                TL=>TL%NEXT
+             ENDDO
+          endif
+       case('BEAMBEAM')
+          READ(MF,*) SC,pos
+          read(mf,*) X_ref(1), X_ref(2), X_ref(3), X_ref(4)
+          IF(.NOT.ASSOCIATED(my_ering%T)) THEN
+             CALL MAKE_NODE_LAYOUT(my_ering)
+          ENDIF
+          ! s(1) total ld
+          ! s(2) local integration distance
+          !          SC=MOD(SC,MY_RING%T%END%S(1))
+          b_b=.false.
+          TL=>my_ering%T%START
+          DO j=1,my_ering%T%N
+             if(pos<1) then
+                IF(TL%S(1)<=SC.AND.TL%NEXT%S(1)>SC) then
+                   b_b=.true.
+                   exit
+                endif
+             else
+                if(j==pos) then
+                   b_b=.true.
+                   exit
+                endif
+             endif
+             TL=>TL%NEXT
+          ENDDO
+          if(b_b.and.tl%cas==case0) then
+             write(6,*) " Beam-Beam position at ",tl%parent_fibre%mag%name
+             if(.not.associated(tl%BB)) call alloc(tl%BB)
+             tl%bb%fk=X_ref(1)* X_ref(4)**2
+             tl%bb%sx=X_ref(2)* X_ref(4)
+             tl%bb%sy=X_ref(3)* X_ref(4)
+             if(pos<1) tl%bb%ds=SC-TL%S(1)
+             write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
+             write(6,*) " ds = ",tl%bb%ds
+          else
+             write(6,*) " Beam-Beam position not found "
+          endif
+
+       case('DOBEAMBEAM')
+          do_beam_beam=my_true
+       case('NOBEAMBEAM')
+          do_beam_beam=my_false
        case('SETFAMILIES')
           np=0
           READ(MF,*) NPOL

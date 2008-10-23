@@ -216,8 +216,7 @@ contains
 
 !!!!!!!!!!! fake orbit !!!!!!!!!!!!!!!!!!
 
-  subroutine accel_orbit_beam(ring)
-    !use accel_ptc
+  subroutine accel_orbit_beam(ring,filetable,npart)
     implicit none
     integer ipause, mypause
     integer n_turn,i,k,npart,j,kk
@@ -226,12 +225,13 @@ contains
     real(dp) sig0(6),x(6)
     integer mf
     type(fibre), pointer :: p
-    npart=1
+    character(*) filetable
+    logical ooo
+
     sig0=1.e-6
-    !if(oldway) then
-    ! open(unit=30,file='junkold.txt')
-    !else
-    !endif
+    write(6,*) " old"
+    read (5,*) ooo
+
     CALL create_beam(RAYS,npart,two,SIG0)
 
     my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
@@ -242,7 +242,7 @@ contains
     enddo
     close(mf)
 
-    call make_table("NOACC_ACC_RF.DAT")
+    call make_table(filetable)
 
     !call make_table("NOACC_ACC_210.DAT")
     !call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
@@ -250,7 +250,7 @@ contains
     !call make_table("ACCWAVE_210KVH9_350ms.DAT")
     !call make_table("noaccel.DAT")
 
-    write(6,*) "Read RF_table ... from RF_file: NOACC_ACC_RF.DAT"
+    write(6,*) "Read RF_table ... from RF_file: ", filetable(1:len_trim(filetable))
     ipause=mypause(321)
 
     write(6,*) my_ORBIT_LATTICE%ORBIT_harmonic
@@ -267,7 +267,11 @@ contains
     !rays%x(2,1:6)=0.d0
     !rays%x(2,6)=0.00001d0
 
-    call ptc_synchronous_set(-1)
+    if(ooo) then
+       call ptc_synchronous_set_old(-1)
+    else
+       call ptc_synchronous_set(-1)
+    endif
     write(6,*) " reading rays after some turns ?"
     read(5,*) i
 
@@ -295,7 +299,11 @@ contains
 
        do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
 
-          call ptc_synchronous_set(i)
+          if(ooo) then
+             call ptc_synchronous_set_old(i)
+          else
+             call ptc_synchronous_set(i)
+          endif
           do k=1,rays%n
 
 
@@ -307,12 +315,18 @@ contains
           call ptc_synchronous_after(i)
 
        enddo
+
+       DO KK=1,RAYS%N
+          X(5)=rays%x(kk,6)+my_ORBIT_LATTICE%ORBIT_P0C
+          X(6)=x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000
+          write(mf,'(1x,E25.17,1x,i8,1x,1(1x,E25.17))') x(6),j,x(5)     !rays%x(kk,1:6)
+       ENDDO
     enddo  ! turn
     call ptc_synchronous_after(-2)
 
-    DO KK=1,RAYS%N
-       write(mf,'(6(1x,E25.17))') rays%x(kk,1:6)
-    ENDDO
+    !   DO KK=1,RAYS%N
+    !      write(mf,'(6(1x,E25.17))') rays%x(kk,1:6)
+    !   ENDDO
     close(mf)
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     write(6,*) x_orbit_sync
@@ -333,15 +347,6 @@ contains
 end module accel_ptc
 
 
-
-
-!===========================================================
-! This subroutine should be called before particle tracking.
-! It tells PTC to do something related to acceleration.
-!
-!
-!
-!===========================================================
 SUBROUTINE ptc_synchronous_set(i_node)
 
   USE accel_ptc     !,vrff=>vrf,freqf=>freq
@@ -381,6 +386,159 @@ SUBROUTINE ptc_synchronous_set(i_node)
         my_ORBIT_LATTICE%orbit_deltae=zero
         w1_orbit=p_orbit
         w2_orbit=0
+        !         write(6,*) "x_orbit_sync(6) ",x_orbit_sync(6)
+        call get_from_table_volt(x_orbit_sync(6),p0,vo,ph)
+        call find_energy(w2_orbit,p0c=p0)
+        my_ORBIT_LATTICE%orbit_deltae=(w2_orbit%energy-w1_orbit%energy)
+        freqf=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
+        p_orbit%mag%freq=freqf
+
+        call compute_phase(x_orbit_sync,my_ORBIT_LATTICE%state,vo,ph,dt0)
+        x6=x_orbit_sync(6)
+
+        x_orbit_sync(5)=x_orbit_sync(5)+my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c
+
+        call ptc_to_orbit(x_orbit_sync)
+
+     endif
+     ! for speed
+     call ORBIT_TRACK_NODE_fake(i_node1,x_orbit_sync)
+
+     if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
+        call adjust_phase(x6,state,dt0)
+
+        p_orbit%magp%freq=p_orbit%mag%freq
+        p_orbit%magp%volt=p_orbit%mag%volt
+        p_orbit%magp%phas=p_orbit%mag%phas
+        dphat=x_orbit_sync(6)/my_ORBIT_LATTICE%ORBIT_P0C
+
+        call find_energy(w2_orbit,ENERGY=dphat*w1_orbit%p0c+w1_orbit%energy)
+        !  Changes the px,py,delta using the new p0C i.e. w2%p0c
+        my_ORBIT_LATTICE%orbit_omega_after=twopi*p_orbit%mag%FREQ/CLIGHT
+        CALL accel_ORBIT_up_grade_x(x_orbit_sync)
+        !  upgrades all the reference energy from after cavity 1 to cavity 2 included
+        call accel_ORBIT_up_grade_mag
+
+     endif
+
+
+     my_ORBIT_LATTICE%state=state
+
+  elseif(i_node==-2) then
+
+     if(.not.my_ORBIT_LATTICE%accel) return
+     call kanalnummer(mf)
+     open(unit=mf,file=initial_setting)
+     read(MF,*)   my_ORBIT_LATTICE%ORBIT_omega
+     read(MF,*)   my_ORBIT_LATTICE%orbit_omega_after
+     read(MF,*)   my_ORBIT_LATTICE%ORBIT_gamma
+     read(MF,*)   my_ORBIT_LATTICE%ORBIT_P0C
+     read(MF,*)   my_ORBIT_LATTICE%ORBIT_BETA0
+     read(MF,*)   my_ORBIT_LATTICE%orbit_kinetic
+     read(MF,*)   my_ORBIT_LATTICE%orbit_energy
+     read(MF,*)   my_ORBIT_LATTICE%orbit_brho
+
+     do i=1,my_ORBIT_LATTICE%ORBIT_N_NODE
+        if(my_ORBIT_LATTICE%ORBIT_NODES(i)%CAVITY) then
+           p_orbit=>my_ORBIT_LATTICE%ORBIT_NODES(i)%NODE%parent_fibre
+           exit
+        endif
+     enddo
+     read(MF,*)  p_orbit%mag%freq
+     read(MF,*)  p_orbit%mag%volt
+     read(MF,*)  p_orbit%mag%phas
+     read(MF,*)  p_orbit%mag%c4%CAVITY_TOTALPATH
+     read(MF,*)  slope_sign
+     read(MF,*)  slope_flip
+     read(MF,*)  maximum_phase
+     p_orbit%magp%freq=p_orbit%mag%freq
+     p_orbit%magp%volt=p_orbit%mag%volt
+     p_orbit%magp%phas=p_orbit%mag%phas
+     p_orbit%magp%c4%CAVITY_TOTALPATH=p_orbit%mag%c4%CAVITY_TOTALPATH
+     read(mf,*) nf
+     if(size(p_orbit%mag%c4%ph)<nf) then
+        write(6,*) " error not a big enough size for modes "
+        stop 476
+     endif
+     do i=1,nf
+        read(mf,*) j,p_orbit%mag%c4%f(i),p_orbit%mag%c4%ph(i)
+        p_orbit%magp%c4%f(i)  = p_orbit%mag%c4%f(i)
+        p_orbit%magp%c4%ph(i) = p_orbit%mag%c4%ph(i)
+     enddo
+     read(MF,*) x_orbit_sync(1:2)
+     read(MF,*) x_orbit_sync(3:4)
+     read(MF,*) x_orbit_sync(5:6)
+     read(MF,*) w1_ORBIT
+     read(MF,*) w2_ORBIT
+     read(MF,*) my_ORBIT_LATTICE%state
+     CLOSE(MF)
+     call accel_ORBIT_up_grade_mag_all
+     return
+  elseif(i_node==-3) then
+     stop 553
+     !     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
+     !     return
+  elseif(i_node==-4) then
+     stop 554
+     return
+  elseif(i_node==-5) then
+     !    my_ORBIT_LATTICE%state=my_estate
+     !    call print(my_ORBIT_LATTICE%state,6)
+     stop 555
+  endif
+
+
+END SUBROUTINE  ptc_synchronous_set
+
+
+
+!===========================================================
+! This subroutine should be called before particle tracking.
+! It tells PTC to do something related to acceleration.
+!
+!
+!
+!===========================================================
+SUBROUTINE ptc_synchronous_set_old(i_node)
+
+  USE accel_ptc     !,vrff=>vrf,freqf=>freq
+  IMPLICIT NONE
+  INTEGER  i_node
+  INTEGER  i_node1,i,mf,j,nf
+  type(internal_state) state
+  real(dp) p0,vrfx,dphat,freqf,dt0,dt,x6,vo(nvolt),ph(nvolt)
+  TYPE(INTEGRATION_NODE), POINTER  :: T
+
+
+  i_node1 = i_node + 1
+
+  if(i_node==-1) then
+     x_orbit_sync=zero
+     w1_orbit=0
+     w2_orbit=0
+     my_ORBIT_LATTICE%orbit_omega_after=my_ORBIT_LATTICE%ORBIT_omega
+     my_ORBIT_LATTICE%state=my_ORBIT_LATTICE%state+time0
+     default=my_ORBIT_LATTICE%state
+
+     write(6,*) " Orbit set for acceleration "
+     return
+  elseif(i_node>=0) then
+
+     if(.not.my_ORBIT_LATTICE%accel) return
+
+     state=my_ORBIT_LATTICE%state
+     my_ORBIT_LATTICE%state=my_ORBIT_LATTICE%state+totalpath0
+
+     if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
+        p_orbit=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE%parent_fibre
+
+
+        call orbit_to_ptc(x_orbit_sync)
+
+        my_ORBIT_LATTICE%orbit_deltae=zero
+        w1_orbit=p_orbit
+        w2_orbit=0
+        !         write(6,*) "x_orbit_sync(6) ",x_orbit_sync(6)
         call get_from_table_volt(x_orbit_sync(6),p0,vo,ph)
         call find_energy(w2_orbit,p0c=p0)
         my_ORBIT_LATTICE%orbit_deltae=(w2_orbit%energy-w1_orbit%energy)
@@ -481,7 +639,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
   endif
 
 
-END SUBROUTINE  ptc_synchronous_set
+END SUBROUTINE  ptc_synchronous_set_old
 
 
 
@@ -629,6 +787,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
 
         y(6)=dt0+(one.mono.1)
         call track(p_orbit,y,local_state)
+
         driv=y(5).sub.'1'
         !     write(6,*) (y(5).sub.'0'),driv,my_ORBIT_LATTICE%orbit_deltae,p_orbit%mag%p%p0c
         !      pause 777
@@ -653,7 +812,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
 
      enddo
 
-
+     !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees ",my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c
      call kill(y)
      if(k>100) then
         write(6,*) " did not converge in compute_phase "

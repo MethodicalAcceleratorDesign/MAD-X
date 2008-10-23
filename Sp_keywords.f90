@@ -770,6 +770,8 @@ contains
     type(FIBRE), pointer :: P
     type(element), pointer :: m
     character*255 line
+    integer f0
+    f0=1
 
     WRITE(MF,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ELEMENT $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     if(m%vorname(1:1)==' ') then
@@ -802,9 +804,25 @@ contains
        WRITE(MF,*) " NO_SOLENOID_PRESENT ",zero
     ENDIF
     CALL print_magnet_chart(P,m%P,mf)
+    if(p%MAG%KIND==KIND7) then
+       f0=p%MAG%t7%f
+    endif
+    if(p%MAG%KIND==KIND2.and.p%MAG%p%method==2) then
+       f0=p%MAG%k2%f
+    endif
+    if(associated(p%MAG%K16)) then
+       if(p%MAG%K16%DRIFTKICK.and.p%MAG%p%method==2)  f0=p%MAG%K16%f
+    endif
+    if(associated(p%MAG%TP10)) then
+       if(p%MAG%TP10%DRIFTKICK.and.p%MAG%p%method==2) f0=p%MAG%TP10%f
+    endif
+    !     if(f0>0) then
+    !      Write(mf,*) f0," Internal Recutting "
+    !     endif
     IF(ASSOCIATED(M%an)) THEN
        do i=1,m%p%NMUL
-          write(mf,*) m%bn(i),m%an(i), " BN AN ",I
+          write(line,*) m%bn(i),m%an(i),f0, "  BN AN %f ",I
+          write(mf,'(a255)') line
        enddo
     endif
     call print_specific_element(m,mf)
@@ -1097,8 +1115,10 @@ contains
     type(fibre), pointer :: p
     type(element), pointer :: m
     character*120 line
+    character*255 linet
     CHARACTER*21 SOL
     REAL(DP) B_SOL,r(3),d(3)
+    integer f0
 
     READ(MF,*) LINE
     READ(MF,*) M%KIND,M%NAME,M%VORNAME
@@ -1135,6 +1155,8 @@ contains
        M%B_SOL=B_SOL
     ENDIF
     CALL  READ_magnet_chart(p,m%P,mf)
+
+    !      Write(mf,*) f0," Internal Recutting "
     IF(M%P%NMUL/=0) THEN
        IF(.NOT.ASSOCIATED(M%AN)) THEN
           ALLOCATE(M%AN(M%P%NMUL))
@@ -1152,13 +1174,33 @@ contains
        !     write(6,'(a120)') line
        !     pause 1
        do i=1,m%p%NMUL
-          READ(mf,*) m%bn(i),m%an(i)
+          READ(MF,'(A255)') LINEt
+          if(index(LINEt,"%f")==0 ) then
+             READ(linet,*) m%bn(i),m%an(i)
+          else
+             READ(linet,*) m%bn(i),m%an(i),f0
+          endif
+          !          READ(mf,*) m%bn(i),m%an(i),f0
        enddo
     endif
     call read_specific_element(m,mf)
 
     READ(MF,*) LINE
 
+    if(f0>0) then
+       if(p%MAG%KIND==KIND7) then
+          p%MAG%t7%f=f0
+       endif
+       if(p%MAG%KIND==KIND2.and.p%MAG%p%method==2) then
+          p%MAG%k2%f=f0
+       endif
+       if(associated(p%MAG%K16)) then
+          if(p%MAG%K16%DRIFTKICK.and.p%MAG%p%method==2)  p%MAG%K16%f=f0
+       endif
+       if(associated(p%MAG%TP10)) then
+          if(p%MAG%TP10%DRIFTKICK.and.p%MAG%p%method==2) p%MAG%TP10%f=f0
+       endif
+    endif
 
   end subroutine READ_element
 

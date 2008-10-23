@@ -627,9 +627,9 @@ CONTAINS
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE)  &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
        if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
-          call TRANS((/t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          call TRANS((/zero,zero,t%bb%ds/),X,el%P%beta0,my_false,k%time)
           call BBKICK(t%bb,X)
-          call TRANS((/-t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          call TRANS((/zero,zero,-t%bb%ds/),X,el%P%beta0,my_false,k%time)
        endif
 
        SELECT CASE(EL%KIND)
@@ -769,10 +769,10 @@ CONTAINS
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
        if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
-          call TRANS((/t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          call TRANS((/zero,zero,t%bb%ds/),X,el%P%beta0,my_false,k%time)
           !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
           call BBKICK(t%bb,X)
-          call TRANS((/-t%bb%ds,zero,zero/),X,el%P%beta0,my_false,k%time)
+          call TRANS((/zero,zero,-t%bb%ds/),X,el%P%beta0,my_false,k%time)
           !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
        endif
        SELECT CASE(EL%KIND)
@@ -937,6 +937,7 @@ CONTAINS
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
        L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;    ! s(1) total ld
+       L%END%S(5)=zero;
        T1=>L%END                            ! s(2) local integration distance
        ! s(3) total integration distance
        L%END%CAS=CASEP1                       ! s(4) end of step =  DL
@@ -947,7 +948,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;
        L%END%CAS=CASE1
        L%END%pos_in_fibre=2
        L%END%pos=k;k=k+1;
@@ -957,7 +958,7 @@ CONTAINS
        DO J=1,P%MAG%P%NST
           CALL APPEND_EMPTY_THIN( L )
           L%END%TEAPOT_LIKE=TEAPOT_LIKE
-          L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=DL;
+          L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=DL;L%END%S(5)=DLD;
           L%END%CAS=CASE0
           L%END%pos_in_fibre=J+2
           L%END%pos=k;k=k+1;
@@ -975,7 +976,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;
        L%END%CAS=CASE2
        L%END%pos_in_fibre=P%MAG%P%NST+3
        L%END%pos=k;k=k+1;
@@ -983,7 +984,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;
        L%END%CAS=CASEP2
        L%END%pos_in_fibre=P%MAG%P%NST+4
        L%END%pos=k;k=k+1;

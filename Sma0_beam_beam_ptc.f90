@@ -4,14 +4,17 @@ module beam_beam_ptc
   ! use madx_ptc_module
   implicit none
   public
-  private BBKICKP, BBKICKR !,BBKICK
-  private ccperrfP, ccperrfr,ccperrf
+  private BBKICKP, BBKICKR
+  private ccperrfP, ccperrfr ,ccperrf
   !  private TRACK_NODE_LAYOUT_FLAG_R,TRACK_NODE_LAYOUT_FLAG_P
+  private imax
+  integer ::imax=1000
 
   INTERFACE ccperrf
      MODULE PROCEDURE ccperrfP
      MODULE PROCEDURE ccperrfr
   END INTERFACE
+
 
   INTERFACE BBKICK
      MODULE PROCEDURE BBKICKR
@@ -51,7 +54,7 @@ contains
     XM=BB%XM
     YM=BB%YM
     FK=BB%FK
-    write(6,*) "bb%FK = " ,bb%FK
+    !    write(6,*) "bb%FK = " ,bb%FK
 
     if (fk == zero)  return
     sx2 = sx*sx
@@ -61,7 +64,7 @@ contains
        xs = x(1) - xm
        ys = x(3) - ym
        rho2 = xs * xs + ys * ys
-       tk = rho2 / (two * sx2)
+       tk = rho2 / (sx2 + sy2)
        if (tk .gt. explim) then
           phix = xs * fk / rho2
           phiy = ys * fk / rho2
@@ -221,6 +224,8 @@ contains
 
   end SUBROUTINE ccperrfr
 
+
+
   subroutine BBKICKP(BB,X)
 
     implicit none
@@ -234,19 +239,20 @@ contains
     !   b%n    (integer) number of tracks.                              *
     !----------------------------------------------------------------------*
     logical(lp) bborbit
-    integer itrack
-    TYPE(REAL_8) sx2,sy2,xs,ys,rho2,tk,phix,phiy,rk,xb,yb,crx,cry
-    TYPE(REAL_8) xr,yr,r,r2,bbpar,cbx,cby,DZ
-    REAL(DP) sx,sy,xm,ym,fk,ten3m,explim,xn1,xn2,xs1,xs2
+    integer itrack,it
+    TYPE(REAL_8) xs,ys,tk,phix,phiy,xb,yb,crx,cry
+    TYPE(REAL_8) xr,yr,cbx,cby,rho2
+    REAL(DP) sx2,sy2,sx,sy,xm,ym,fk,ten3m,explim,xn1,xn2,xs1,xs2,arglim,rk
+    REAL(DP) r,r2,n
     TYPE(BEAM_BEAM_NODE), INTENT(INOUT) ::BB
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
-    parameter(ten3m=1.0e-3_dp,explim=150.0_dp)
+    parameter(ten3m=1.0e-3_dp,arglim=1.0e-2_dp,explim=150.0_dp)
 
     if (BB%fk == zero)  return
 
-    CALL ALLOC(xr,yr,r,r2,bbpar,cbx,cby,DZ)
-    CALL ALLOC(sx2,sy2,xs,ys,rho2,tk,phix,phiy)
-    CALL ALLOC(rk,xb,yb,crx,cry)
+    CALL ALLOC(xr,yr,cbx,cby,rho2)
+    CALL ALLOC(xs,ys,tk,phix,phiy)
+    CALL ALLOC(xb,yb,crx,cry)
 
 
     SX=BB%SX
@@ -266,122 +272,113 @@ contains
        xs = x(1) - xm
        ys = x(3) - ym
        rho2 = xs * xs + ys * ys
-       tk = rho2 / (two * sx2)
+       tk = rho2 / (sx2 + sy2)
        if (tk .gt. explim) then
           phix = xs * fk / rho2
           phiy = ys * fk / rho2
-       else if (rho2 .ne. zero) then
+       else if (tk > arglim) then
           phix = xs * fk / rho2 * (one - exp(-tk) )
           phiy = ys * fk / rho2 * (one - exp(-tk) )
        else
-          phix = zero
-          phiy = zero
+
+          xr=one
+          yr=one
+
+          n=mybig
+          do it=1,imax
+             xr=-xr*tk/(it+1)
+             yr=yr+xr
+             if(it>10)n=full_abs(xr)
+             if(n<=puny) exit
+          enddo
+          if(it>imax-2) then
+             write(6,*) it,n
+             write(6,*) " Stopped in Beam-Beam "
+          endif
+          phix = xs * fk / (two * sx2) * YR ! fudge
+          phiY = Ys * fk / (two * sx2) * YR ! fudge
        endif
-       !          if (.NOT.bborbit)  then
-       !--- subtract closed orbit kick
-       phix = phix - bb%bbk(1) ! subtract horizontal bb kick
-       phiy = phiy - bb%bbk(2) ! subtract vertical co
-       !          endif
+
+       phix = phix - bb%bbk(1)
+       phiy = phiy - bb%bbk(2)
+
        x(2) = x(2) + phix
        x(4) = x(4) + phiy
-       !       enddo
+
 
        !---- case sigma(x) > sigma(y).
-    else if (xs1 > xs2) then
-       r2 = two * (sx2 - sy2)
-       r  = sqrt(r2)
-       rk = fk * sqrt(pi) / r
-       !       do itrack = 1, b%n
-       !          IF(B%U(itrack)) CYCLE
-       !          xs = track(1,itrack) - xm
-       !          ys = track(3,itrack) - ym
-       xs = x(1) - xm
-       ys = x(3) - ym
-       xr = Pabs(xs) / r   !
-       yr = Pabs(ys) / r   !
-       call ccperrf(xr, yr, crx, cry)
-       tk = (xs * xs / sx2 + ys * ys / sy2) / two
-       if (tk .gt. explim) then
-          phix = rk * cry
-          phiy = rk * crx
-       else
-          xb = (sy / sx) * xr
-          yb = (sx / sy) * yr
-          call ccperrf(xb, yb, cbx, cby)
-          phix = rk * (cry - exp(-tk) * cby)
-          phiy = rk * (crx - exp(-tk) * cbx)
-       endif
-       !          track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
-       !          track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
-       IF(XS>=ZERO) THEN
-          x(2) = x(2) + phix
-       ELSE
-          x(2) = x(2) - phix
-       ENDIF
-       IF(YS>=ZERO) THEN
-          x(4) = x(4) + phiy
-       ELSE
-          x(4) = x(4) - phiy
-       ENDIF
-       !          if (.NOT.bborbit)  then
-       !--- subtract closed orbit kick
-       !            track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-       !            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-       x(2) = x(2) - BB%bbk(1)
-       x(4) = x(4) - BB%bbk(2)
-       !          endif
-       !       enddo
-
-       !---- case sigma(x) < sigma(y).
     else
-       r2 = two * (sy2 - sx2)
-       r  = sqrt(r2)
-       rk = fk * sqrt(pi) / r
-       !       do itrack = 1, b%n
-       !         IF(B%U(itrack)) CYCLE
-       !          xs = track(1,itrack) - xm
-       !          ys = track(3,itrack) - ym
+
+
        xs = x(1) - xm
        ys = x(3) - ym
-       xr = PABS(xs) / r !abs
-       yr = PABS(ys) / r !abs
-       call ccperrf(yr, xr, cry, crx)
        tk = (xs * xs / sx2 + ys * ys / sy2) / two
-       if (tk .gt. explim) then
-          phix = rk * cry
-          phiy = rk * crx
-       else
-          xb  = (sy / sx) * xr
-          yb  = (sx / sy) * yr
-          call ccperrf(yb, xb, cby, cbx)
-          phix = rk * (cry - exp(-tk) * cby)
-          phiy = rk * (crx - exp(-tk) * cbx)
-       endif
-       !          track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
-       !          track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
-       IF(XS>=ZERO) THEN
+
+       if(xs1 > xs2) then
+          r2 = two * (sx2 - sy2)
+          r  = sqrt(r2)
+          rk = fk * sqrt(pi) / r
+          xr = xs / r   !
+          yr = ys / r   !
+          call ccperrf(xr, yr, crx, cry)
+          if (tk .gt. explim) then
+             phix = rk * cry
+             phiy = rk * crx
+          else
+             xb = (sy / sx) * xr
+             yb = (sx / sy) * yr
+             call ccperrf(xb, yb, cbx, cby)
+             phix = rk * (cry - exp(-tk) * cby)
+             phiy = rk * (crx - exp(-tk) * cbx)
+          endif
           x(2) = x(2) + phix
-       ELSE
-          x(2) = x(2) - phix
-       ENDIF
-       IF(YS>=ZERO) THEN
           x(4) = x(4) + phiy
-       ELSE
-          x(4) = x(4) - phiy
-       ENDIF
-       !          if (.NOT.bborbit)  then
-       !--- subtract closed orbit kick
-       !            track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-       !            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-       x(2) = x(2) - BB%bbk(1)
-       x(4) = x(4) - BB%bbk(2)
-       !          endif
-       !       enddo
+          !          if (.NOT.bborbit)  then
+          x(2) = x(2) - BB%bbk(1)
+          x(4) = x(4) - BB%bbk(2)
+          !          endif
+          !       enddo
+
+          !---- case sigma(x) < sigma(y).
+       else
+          r2 = two * (sy2 - sx2)
+          r  = sqrt(r2)
+          rk = fk * sqrt(pi) / r
+
+          !       xs = x(1) - xm
+          !       ys = x(3) - ym
+          xr = xs / r !abs
+          yr = ys / r !abs
+          call ccperrf(yr, xr, cry, crx)
+          !       tk = (xs * xs / sx2 + ys * ys / sy2) / two
+          if (tk .gt. explim) then
+             phix = rk * cry
+             phiy = rk * crx
+          else
+             xb  = (sy / sx) * xr
+             yb  = (sx / sy) * yr
+             call ccperrf(yb, xb, cby, cbx)
+             phix = rk * (cry - exp(-tk) * cby)
+             phiy = rk * (crx - exp(-tk) * cbx)
+          endif
+          !          track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+          !          track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+          x(2) = x(2) + phix
+          x(4) = x(4) + phiy
+          !          if (.NOT.bborbit)  then
+          !--- subtract closed orbit kick
+          !            track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+          !            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+          x(2) = x(2) - BB%bbk(1)
+          x(4) = x(4) - BB%bbk(2)
+          !          endif
+          !       enddo
+       endif
     endif
-    !    IF(DZ/=ZERO) CALL DRIFT_BEAM_BACK_TO_POSITION(th,DZ,B)
-    CALL KILL(xr,yr,r,r2,bbpar,cbx,cby,DZ)
-    CALL KILL(sx2,sy2,xs,ys,rho2,tk,phix,phiy)
-    CALL KILL(rk,xb,yb,crx,cry)
+
+    CALL KILL(xr,yr,cbx,cby,rho2)
+    CALL KILL(xs,ys,tk,phix,phiy)
+    CALL KILL(xb,yb,crx,cry)
 
   end subroutine BBKICKP
 
@@ -396,95 +393,48 @@ contains
     ! output:                                                              *
     !   wx, wy    (double)    real + imag function result                  *
     !----------------------------------------------------------------------*
-    integer n,nc,nu
     TYPE(REAL_8),INTENT(INOUT):: xx,yy,wx,wy
-    TYPE(REAL_8) x,y,q,h,xl,xh,yh,tx,ty,tn,sx,sy,saux,rx(33),ry(33)
-    REAL(DP) xlim,ylim,fac1,fac2,fac3,cc,qr
-    parameter(cc=1.12837916709551_dp,        &
-         xlim=5.33_dp,ylim=4.29_dp,fac1=3.2_dp,fac2=23.0_dp,fac3=21.0_dp)
-    CALL ALLOC(x,y,q,h,xl)
-    CALL ALLOC(xh,yh,tx,ty,tn,sx,sy,saux)
-    CALL ALLOC(RX,33)
-    CALL ALLOC(RY,33)
-    x = Pabs(xx)
-    y = Pabs(yy)
+    TYPE(double_complex) z,zt,w
+    complex(dp) z0,w0,w1,wt0
+    real(dp) xx0, yy0, wx0, wy0
+    integer i
+    call alloc( z,zt,w)
 
-    !    IF( XX>=ZERO) THEN
-    !      X=XX
-    !     ELSE
-    !      X=-XX
-    !    ENDIF
-    !    IF( YY>=ZERO) THEN
-    !      Y=YY
-    !     ELSE
-    !      Y=-YY
-    !    ENDIF
-    if (y .lt. ylim  .and.  x .lt. xlim) then
-       q  = (one - y / ylim) * sqrt(one - (x/xlim)**2)
-       h  = one / (fac1 * q)
-       qr=q
-       nc = 7 + int(fac2*qr)
-       xl = h**(1 - nc)
-       xh = y + half/h
-       yh = x
-       nu = 10 + int(fac3*qr)
-       rx(nu+1) = zero
-       ry(nu+1) = zero
+    z=xx+i_*yy
+    z0=z
+    z=z-z0
 
-       do n = nu, 1, -1
-          tx = xh + n * rx(n+1)
-          ty = yh - n * ry(n+1)
-          tn = tx*tx + ty*ty
-          rx(n) = half * tx / tn
-          ry(n) = half * ty / tn
-       enddo
+    xx0=real(z0)
+    yy0=aimag(z0)
+    call ccperrf(xx0, yy0, wx0, wy0)
 
-       sx = zero
-       sy = zero
+    w0=wx0+i_*wy0
 
-       do n = nc, 1, -1
-          saux = sx + xl
-          sx = rx(n) * saux - ry(n) * sy
-          sy = rx(n) * sy + ry(n) * saux
-          xl = h * xl
-       enddo
+    w1=-two*z0*w0+two*i_/sqrt(pi)
 
-       wx = cc * sx
-       wy = cc * sy
-    else
-       xh = y
-       yh = x
-       rx(1) = zero
-       ry(1) = zero
+    w=w0+w1*z
 
-       do n = 9, 1, -1
-          tx = xh + n * rx(1)
-          ty = yh - n * ry(1)
-          tn = tx*tx + ty*ty
-          rx(1) = half * tx / tn
-          ry(1) = half * ty / tn
-       enddo
+    zt=z
 
-       wx = cc * rx(1)
-       wy = cc * ry(1)
-    endif
+    do i=2,c_%no
 
-    !      if(y .eq. zero) wx = exp(-x**2)
-    if(yy .lt. zero) then
-       wx =   two * exp(y*y-x*x) * cos(two*x*y) - wx
-       wy = - two * exp(y*y-x*x) * sin(two*x*y) - wy
-       if(xx .gt. zero) wy = -wy
-    else
-       if(xx .lt. zero) wy = -wy
-    endif
+       zt=z*zt
+       wt0=  -two*(w0+z0*w1)/i
 
-    CALL KILL(x,y,q,h,xl)
-    CALL KILL(xh,yh,tx,ty,tn,sx,sy,saux)
-    CALL KILL(RX,33)
-    CALL KILL(RY,33)
+       w=w+wt0*zt
+
+       w0=w1
+       w1=wt0
+
+    enddo
+
+    wx=real(w)
+    wy=aimag(w)
+
+
+    call kill( z,zt,w)
 
   end SUBROUTINE ccperrfP
-
 
 
 end module  beam_beam_ptc

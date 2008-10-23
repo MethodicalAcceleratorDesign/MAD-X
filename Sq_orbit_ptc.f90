@@ -239,6 +239,56 @@ contains
     ENDDO
   END SUBROUTINE ORBIT_TRACK_ONE_TURN
 
+  SUBROUTINE ORBIT_TRACK_NODE_fake(K,X,STATE)
+    IMPLICIT NONE
+    REAL(DP),  INTENT(INOUT) :: X(6)
+    INTEGER K,I
+    LOGICAL(LP) U
+    REAL(DP) X5
+    TYPE(INTEGRATION_NODE), POINTER  :: T
+    TYPE(INTERNAL_STATE), OPTIONAL :: STATE
+
+    IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+       x(1:4)=x(1:4)*1.e-3_dp
+       X5=X(5)
+       X(5)=X(6)/my_ORBIT_LATTICE%ORBIT_P0C
+       X(6)=X5/my_ORBIT_LATTICE%ORBIT_OMEGA
+    ENDIF
+
+
+
+
+    T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
+    DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+       IF(PRESENT(STATE)) THEN
+          !          CALL TRACK_NODE_SINGLE(T,X,STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
+          if(state%time) then
+             x(6)=x(6)+STATE%totalpath*T%previous%s(5)/t%parent_fibre%beta0
+          else
+             x(6)=x(6)+STATE%totalpath*T%previous%s(5)
+          endif
+       ELSE
+          if(my_ORBIT_LATTICE%STATE%time) then
+             x(6)=x(6)+my_ORBIT_LATTICE%STATE%totalpath*T%previous%s(5)/t%parent_fibre%beta0
+          else
+             x(6)=x(6)+my_ORBIT_LATTICE%STATE%totalpath*T%previous%s(5)
+          endif
+          !          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
+       ENDIF
+       T=>T%NEXT
+    ENDDO
+
+    IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
+       x(1:4)=x(1:4)*1.e3_dp
+       X5=X(5)
+       X(5)=X(6)*my_ORBIT_LATTICE%ORBIT_OMEGA
+       X(6)=X5*my_ORBIT_LATTICE%ORBIT_P0C
+    ENDIF
+
+
+
+  end SUBROUTINE ORBIT_TRACK_NODE_fake
+
   SUBROUTINE ORBIT_TRACK_NODE_Standard_R(K,X,STATE)
     IMPLICIT NONE
     REAL(DP),  INTENT(INOUT) :: X(6)
@@ -292,6 +342,7 @@ contains
     ENDIF
 
   end SUBROUTINE ORBIT_TRACK_NODE_Standard_R
+
 
 
 

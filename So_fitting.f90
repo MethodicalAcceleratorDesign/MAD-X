@@ -2289,7 +2289,7 @@ contains
     real(dp) lmax0
     TYPE(FIBRE),target :: C
     INTEGER I,f0
-    logical(lp) drift,doit
+    logical(lp) drift,doit,doodd
 
     if(associated(c%parent_layout)) then
        if(associated(c%parent_layout%parent_universe)) then
@@ -2310,52 +2310,74 @@ contains
        C%MAGp%p%nst=C%MAG%p%nst
        call COPY(C%MAG,C%MAGP)
     endif
-    doit=C%MAG%KIND==KIND7.or.(C%MAG%KIND==KIND2.and.C%MAG%p%method==2)
-    if(associated(C%MAG%K16)) then
-       doit=(C%MAG%K16%DRIFTKICK.and.C%MAG%p%method==2)
-    endif
-    if(associated(C%MAG%TP10)) then
-       doit=(C%MAG%TP10%DRIFTKICK.and.C%MAG%p%method==2)
-    endif
-    IF(doit) then
-
-       !       f0=nint(C%MAG%l/lmax0)
-       f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/2)
-       if(C%MAG%p%method==6) f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/4)
-       if(f0==0) f0=1
-       if(C%MAG%p%method==2) then
-          C%MAG%p%nst=C%MAG%p%nst*f0*2
-          C%MAGp%p%nst=C%MAG%p%nst
-          C%MAG%p%method=1
-          C%MAGp%p%method=1
-       elseif(C%MAG%p%method==4) then
-          C%MAG%p%nst=C%MAG%p%nst*f0*2
-          C%MAGp%p%nst=C%MAG%p%nst
-          C%MAG%p%method=3
-          C%MAGp%p%method=3
-       elseif(C%MAG%p%method==6) then
-          C%MAG%p%nst=C%MAG%p%nst*f0*4
-          C%MAGp%p%nst=C%MAG%p%nst
-          C%MAG%p%method=5
-          C%MAGp%p%method=5
+    if(mod(C%MAG%p%method,2)==0) then  !!!
+       doit=C%MAG%KIND==KIND7.or.(C%MAG%KIND==KIND2.and.C%MAG%p%method==2)
+       if(associated(C%MAG%K16)) then
+          doit=(C%MAG%K16%DRIFTKICK.and.C%MAG%p%method==2)
        endif
-       call add(C%MAG,C%MAG%P%nmul,1,zero)
-       call COPY(C%MAG,C%MAGP)
-       if(C%MAG%KIND==KIND7) then
-          C%MAG%t7%f=f0
-          C%MAGp%t7%f=f0
-       elseif(associated(C%MAG%K16)) then
-          C%MAG%K16%f=f0
-          C%MAGp%K16%f=f0
-       elseif(associated(C%MAG%TP10)) then
-          C%MAG%TP10%f=f0
-          C%MAGp%TP10%f=f0
-       else
-          C%MAG%k2%f=f0
-          C%MAGp%k2%f=f0
+       if(associated(C%MAG%TP10)) then
+          doit=(C%MAG%TP10%DRIFTKICK.and.C%MAG%p%method==2)
        endif
-    ENDIF
+       IF(doit) then
 
+          !       f0=nint(C%MAG%l/lmax0)
+          f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/2)
+          if(C%MAG%p%method==6) f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/4)
+          if(f0==0) f0=1
+          if(C%MAG%p%method==2) then
+             C%MAG%p%nst=C%MAG%p%nst*f0*2
+             C%MAGp%p%nst=C%MAG%p%nst
+             C%MAG%p%method=1
+             C%MAGp%p%method=1
+          elseif(C%MAG%p%method==4) then
+             C%MAG%p%nst=C%MAG%p%nst*f0*2
+             C%MAGp%p%nst=C%MAG%p%nst
+             C%MAG%p%method=3
+             C%MAGp%p%method=3
+          elseif(C%MAG%p%method==6) then
+             C%MAG%p%nst=C%MAG%p%nst*f0*4
+             C%MAGp%p%nst=C%MAG%p%nst
+             C%MAG%p%method=5
+             C%MAGp%p%method=5
+          endif
+          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call COPY(C%MAG,C%MAGP)
+          if(C%MAG%KIND==KIND7) then
+             C%MAG%t7%f=f0
+             C%MAGp%t7%f=f0
+          elseif(associated(C%MAG%K16)) then
+             C%MAG%K16%f=f0
+             C%MAGp%K16%f=f0
+          elseif(associated(C%MAG%TP10)) then
+             C%MAG%TP10%f=f0
+             C%MAGp%TP10%f=f0
+          else
+             C%MAG%k2%f=f0
+             C%MAGp%k2%f=f0
+          endif
+       ENDIF
+    else !!!
+       f0=nint(C%MAG%l/lmax0/C%MAG%p%nst)
+       if(f0>=1) then
+          C%MAG%p%nst=C%MAG%p%nst*f0
+          C%MAGp%p%nst=C%MAG%p%nst
+          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call COPY(C%MAG,C%MAGP)
+          if(C%MAG%KIND==KIND7) then
+             C%MAG%t7%f=f0*C%MAG%t7%f
+             C%MAGp%t7%f=C%MAG%t7%f
+          elseif(associated(C%MAG%K16)) then
+             C%MAG%K16%f=f0*C%MAG%K16%f
+             C%MAGp%K16%f=C%MAG%K16%f
+          elseif(associated(C%MAG%TP10)) then
+             C%MAG%TP10%f=f0*C%MAG%TP10%f
+             C%MAGp%TP10%f=C%MAG%TP10%f
+          else
+             C%MAG%k2%f=f0*C%MAG%k2%f
+             C%MAGp%k2%f=C%MAG%k2%f
+          endif
+       endif
+    endif !!!
   END SUBROUTINE  RECUT_KIND7_one
 
 
