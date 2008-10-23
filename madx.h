@@ -299,6 +299,7 @@ struct node                /* the sequence is a linked list of nodes */
   int sel_sector;          /* sectormap select flag */
   int con_cnt;             /* constraint counter */
   int enable;              /* flag for correctors and monitors: 0 off, 1 on */
+  int moved;               /* temporary flag during sequence editing */
   int stamp;
   double position;         /* s position in sequence [m] */
   double at_value;

@@ -692,7 +692,8 @@ int inbounds(char*, int, char**);
 int in_spec_list(char*);
 int int_in_array(int, int, int*);
 void insert_elem(struct sequence*, struct node*);
-void install_one(struct element*, char*, double, struct expression*, double);
+struct node* install_one(struct element*, char*, double, 
+                         struct expression*, double);
 int is_token(char*, char*, int);
 char* join(char**, int);
 char* join_b(char**, int);

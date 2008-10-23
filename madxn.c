@@ -2511,7 +2511,7 @@ void insert_elem(struct sequence* sequ, struct node* node)
   link_in_front(node, c_node);
 }
 
-void install_one(struct element* el, char* from_name, double at_value,
+struct node* install_one(struct element* el, char* from_name, double at_value,
                  struct expression* at_expr, double position)
   /* adds an element to a sequence */
 {
@@ -2531,6 +2531,7 @@ void install_one(struct element* el, char* from_name, double at_value,
   node->from_name = from_name;
   set_command_par_value("at", el->def, position);
   insert_elem(edit_sequ, node);
+  return node;
 }
 
 int interp_node(int *nint)
@@ -5250,7 +5251,7 @@ void seq_move(struct in_cmd* cmd)
   char *name, *from_name;
   double at, by, to, from = zero;
   int any = 0, k;
-  struct node *node;
+  struct node *node, *next;
   struct element* el;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -5273,8 +5274,16 @@ void seq_move(struct in_cmd* cmd)
         if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
             == 0) any = 1;
         node = edit_sequ->start;
-        while (node != NULL)
+        while (node != edit_sequ->end)
         {
+	 node = node->next; node->moved = 0;
+	}
+         node = edit_sequ->start;
+        while (node != NULL && node != edit_sequ->end)
+        {
+         next = node->next;
+         if (node->moved == 0)
+	 {
           if (any
               || name_list_pos(node->name, selected_ranges->list) > -1)
           {
@@ -5292,13 +5301,14 @@ void seq_move(struct in_cmd* cmd)
               el = node->p_elem;
               if (remove_one(node) > 0)
               {
-                install_one(el, NULL, at, NULL, at);
+                node = install_one(el, NULL, at, NULL, at);
+                node->moved = 1;
                 seqedit_move++;
               }
             }
           }
-          if (node == edit_sequ->end) break;
-          node = node->next;
+	 }         
+         node = next;
         }
       }
     }
