@@ -12,7 +12,7 @@
       include 'twissc.fi'
       include 'twissotm.fi'
       include 'track.fi'
-      integer i
+      integer i, thr_on
       integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
      &ddisp0(6),r0mat(2,2),zero,one,two,get_value
@@ -27,6 +27,7 @@
       inval=0
       fsecarb=.false.
       i = 6
+      thr_on = get_option('threader ')
       call dzero(orbit0,6)
       call get_node_vector('orbit0 ', i, orbit0)
       call m66one(rt)
@@ -102,14 +103,14 @@
       inval=get_option('twiss_inval ')
 
 !---- Initial values from command attributes.
-!      if (inval.ne.0) then
+      if (inval.ne.0) then
 
 !---- Get transfer matrix.
-!        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
-!        if(eflag.ne.0) go to 900
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,thr_on)
+        if(eflag.ne.0) go to 900
 !---- Initial values from periodic solution.
-!      else
-      if (inval.eq.0) then
+      else
+!      if (inval.eq.0) then
         call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
         if(eflag.ne.0) go to 900
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
@@ -620,6 +621,9 @@
      &.or. kpro .eq. 2 .and. code .ge. pcode)  then
               j = 2*kpro-1
               dorb(j) = orbit(j) - reforb(j)
+!db1
+              if (j.eq.1) write(45,'( g16.8)') dorb(j)
+              if (j.eq.3) write(46,'( g16.8)') dorb(j)
               if (abs(dorb(j)) .gt. vector(kpro)                        &
      &.and. node .ge. corr_pick(kpro))  then
 !--- reset count if new pickup
