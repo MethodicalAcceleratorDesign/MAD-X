@@ -113,17 +113,15 @@ contains
              n=n+1
              J(2*k-1)=1
              lat(i,jj,k)=              (Y(i)%t.sub.J)*(Y(jj)%t.sub.J)
-             J(2*k-1)=0;
-
+             J(2*k-1)=0
              J(2*k)=1
              lat(i,jj,k)=lat(i,jj,k) + (Y(i)%t.sub.J)*(Y(jj)%t.sub.J)
-             !            print*,"lat(",i,",",jj,",",k,")=",lat(i,jj,k)
              lat(jj,i,k)=lat(i,jj,k)
              J(2*k)=0
-             !            write(6,*) i,jj,k,lat(i,jj,k)
           enddo
        enddo
     enddo
+
 
     J=0
     !here ND2=4 and delta is present      nd2=6 and delta is a constant
@@ -189,7 +187,6 @@ contains
        s1%disp(i)=lat(0,i,1)
     enddo
 
-
     if (c_%nd == 3) then
        do i=1,c_%nd
           test = s1%beta(3,i)
@@ -197,9 +194,7 @@ contains
           s1%gama(3,i) = test
        enddo
     endif
-
-
-
+    
     s1%mu=phase
 
     do k=1,c_%nd
@@ -558,6 +553,8 @@ contains
        current=>current%next
     enddo
 100 continue
+
+    call MomentumCompaction()
 
 
     if (getdebug() > 1) then
@@ -1381,6 +1378,121 @@ contains
 
 
     end subroutine readinitialtwiss
+
+    ! jluc
+    ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
+    ! should eventually check this against a proper mathematical formulation ...
+
+    subroutine MomentumCompaction()
+
+      implicit none
+      type(fibre), pointer :: fibrePtr
+      real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
+      real(dp) :: betaRelativistic, gammaRelativistic
+      real(dp) :: suml ! cumulative length along the ring
+      integer :: i,j
+      real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
+      real(dp) :: sd ! as in twiss.F
+      type(real_8) :: oneTurnMap(6)
+      integer, dimension(6,6) :: coeffSelector = &
+           reshape( (/1,0,0,0,0,0, &
+           0,1,0,0,0,0, &
+           0,0,1,0,0,0, &
+           0,0,0,1,0,0, &
+           0,0,0,0,1,0, &
+           0,0,0,0,0,1/), (/6,6/))
+      type(normalform) theNormalForm;
+      real(dp) :: dispersion(3)
+      integer :: debugFiles
+
+      debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
+
+      ! 1. track along the machine to get its cumulative length
+      fibrePtr => my_ring%start
+      suml = zero
+      do i=1,my_ring%n
+         suml = suml+fibrePtr%mag%p%ld
+         fibrePtr => fibrePtr%next
+         ! instead, could loop until we encounter the end-ground of the layout
+      enddo
+
+      ! 2. retreive the relativistic parameters beta and gamma
+      ! (beta=v/c, gamma=E/mc^2 and gamma=1/sqrt(1-beta^2))
+      betaRelativistic = get_value('probe','beta');
+      gammaRelativistic = get_value('probe','gamma');
+            
+      ! 3. need the one-turn map's coefficients to reproduce twiss.F formulas for momentum compaction
+
+      state(:)=zero
+      call find_orbit(my_ring,state,1,default)
+
+      if (.not.c_%stable_da) then
+         call fort_warn('ptc_twiss:','DA got unstable in momentum-compaction routine')
+         call seterrorflag(10,"ptc_twiss","DA got unstable in momentum-compaction routine")
+         stop
+         return
+      endif
+
+      if (debugFiles .eq. 1) then
+         write(21,*) "Closed orbit state=", state(1:6)
+      endif
+
+      call alloc(oneTurnMap)
+      oneTurnMap = npara ! ?
+      oneTurnMap = state
+      ! or should we create it as x+id?
+      call track(my_ring,oneTurnMap,1,default)
+
+      ! now retrieve the one-turn map's coefficients
+      if (debugFiles .eq. 1) then
+         do i=1,6
+            do j=1,6
+               write(21,*) "r(",i,j,")=",oneTurnMap(i).sub.coeffSelector(j,:)
+            enddo
+         enddo
+      endif
+
+      ! 4. retreive the dispersion coefficients
+      ! (may be the coefficient of delta of the map?)
+      ! shall we decompose the map via a normal form to get the dispersion???   
+      call alloc(theNormalForm)
+      theNormalForm = oneTurnMap
+      if (debugFiles .eq. 1) then
+         call daprint(theNormalForm%A1,23) ! supposed to print dispersion's first and higher orders
+         ! according to h_definition.f90: type normalform contains A1 as dispersion
+         ! (would need to go through DHDJ to get the tune...)
+      endif
+      ! first order dispersions !?
+      dispersion(1) = theNormalForm%A1%v(1).sub.'000010'
+      dispersion(2) = theNormalForm%A1%v(2).sub.'000010'
+      dispersion(3) = theNormalForm%A1%v(3).sub.'000010'
+      dispersion(4) = theNormalForm%A1%v(4).sub.'000010'
+
+      if (debugFiles .eq. 1) then
+         do i=1,4
+            write(21,*) "dispersion(",i,")=", dispersion(i)
+         enddo
+      endif
+
+      ! 5. apply formulas from twiss.F: sd = r(5,6)+r(5,1)*disp(1)+...+r(5,4)*disp(4)
+      sd = - oneTurnMap(6).sub.coeffSelector(5,:) ! 5/6 swap MADX/PTC
+      do i=1,4
+         sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i) !???
+      enddo
+      
+      eta_c = -sd * betaRelativistic**2 / suml
+      alpha_c = one / gammaRelativistic**2 + eta_c
+
+
+      call kill(theNormalForm)
+
+      call kill(oneTurnMap)
+
+      write(6,*)
+      write(6,*) "Momentum compaction (momentum compaction factor & phase-slip factor):"
+      write(6,*) "alpha=", alpha_c, "eta=", eta_c
+
+    end subroutine MomentumCompaction
 
   END subroutine ptc_twiss
 
