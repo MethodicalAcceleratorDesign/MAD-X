@@ -6,12 +6,17 @@
 
 PLUGIN_SUPPORT=NO
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# On Linux prior to using this Makefile one has to source
+# source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 # compilers
-CC=gcc
+CC=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/gcc
 # g95 for replacement of g77
-FC=gfortran
+FC=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/gfortran
 CXX=$(CC)
-f95=gfortran
+f95=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/gfortran
 
 # default fortran compiler options
 FCP=-O4 -m32 -fno-second-underscore -funroll-loops -I. -D_G95
@@ -27,7 +32,7 @@ GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 # alternative for development
 GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL
 
-f95_FLAGS= -c -O4 -m32 -fno-second-underscore -funroll-loops -I.
+f95_FLAGS= -c -O4 -m32 -fno-second-underscore -funroll-loops -I. -fno-range-check
 
 FFLAGS77= -c -O4 -m32 -fno-second-underscore -funroll-loops -I. -D_G95
 
