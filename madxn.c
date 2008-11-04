@@ -6030,6 +6030,8 @@ void store_select(struct in_cmd* cmd)
     {
       delete_command_list(seqedit_select);
       seqedit_select = new_command_list("seqedit_select", 10);
+      selected_ranges->curr = 0;
+      selected_ranges->list->curr = 0;
     }
     else
     {
