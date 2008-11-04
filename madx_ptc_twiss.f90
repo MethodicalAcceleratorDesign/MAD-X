@@ -1402,7 +1402,7 @@ contains
            0,0,0,0,1,0, &
            0,0,0,0,0,1/), (/6,6/))
       type(normalform) theNormalForm;
-      real(dp) :: dispersion(3)
+      real(dp) :: dispersion(4)
       integer :: debugFiles
 
       debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
