@@ -1462,7 +1462,6 @@ contains
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     type(real_8) O,X1,X3,BBYTWT,BBYTW,BBXTW
     INTEGER J,dir,ko
-
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
@@ -1879,7 +1878,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
     TYPE(KICKT3),INTENT(IN):: EL
-    real(dp) X1,X3,BBYTW,BBXTW,BBYTWT,pz
+    real(dp) X1,X3,BBYTW,BBXTW,BBYTWT,pz,alfh
     INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -1902,7 +1901,10 @@ contains
        BBYTW=zero
        BBXTW=zero
     ENDIF
-
+    if(el%patch) then
+       alfh=-EL%thin_h_angle/two
+       call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
+    endif
     IF(PRESENT(MID)) THEN
        CALL XMID(MID,X,0)
 
@@ -1925,6 +1927,10 @@ contains
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
     ENDIF
 
+    if(el%patch) then
+       alfh=-EL%thin_h_angle/two
+       call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
+    endif
 
 
 
@@ -1938,6 +1944,7 @@ contains
     TYPE(REAL_8) X1,X3,BBYTW,BBXTW,BBYTWT
     TYPE(REAL_8) pz
     INTEGER J
+    real(dp) alfh
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ALLOC(X1)
@@ -2001,6 +2008,10 @@ contains
     !       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
     !!       CALL XMID(MID,X,1)
     !    ELSE
+    if(el%patch) then
+       alfh=-EL%thin_h_angle/two
+       call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
+    endif
     if(k%TIME) then
        call alloc(pz)
        PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
@@ -2018,6 +2029,10 @@ contains
     X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
     !    ENDIF
 
+    if(el%patch) then
+       alfh=-EL%thin_h_angle/two
+       call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
+    endif
 
 
 
@@ -12054,6 +12069,7 @@ contains
           deallocate(EL%thin_v_foc)
           deallocate(EL%thin_h_angle)
           deallocate(EL%thin_v_angle)
+          deallocate(EL%patch)
        endif
     elseif(i==0)       then          ! nullifies
 
@@ -12061,6 +12077,7 @@ contains
        NULLIFY(EL%thin_v_foc)
        NULLIFY(EL%thin_h_angle)
        NULLIFY(EL%thin_v_angle)
+       NULLIFY(EL%patch)
     endif
 
   END SUBROUTINE ZEROR_KICKT3
@@ -12081,6 +12098,7 @@ contains
           deallocate(EL%thin_v_foc)
           deallocate(EL%thin_h_angle)
           deallocate(EL%thin_v_angle)
+          deallocate(EL%patch)
        endif
     elseif(i==0)       then          ! nullifies
 
@@ -12088,6 +12106,7 @@ contains
        NULLIFY(EL%thin_v_foc)
        NULLIFY(EL%thin_h_angle)
        NULLIFY(EL%thin_v_angle)
+       NULLIFY(EL%patch)
     endif
 
   END SUBROUTINE ZEROP_KICKT3

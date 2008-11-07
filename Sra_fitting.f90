@@ -659,7 +659,7 @@ contains
     type(fibre),pointer :: p,p1,p2,pp
     real(dp) an,bn
     logical doit
-    integer ij,mf,i,k
+    integer ij,mf,i,k,jk
 
     call kanalnummer(mf,"diag.txt")
 
@@ -667,6 +667,7 @@ contains
     if(associated(main%t)) call kill(main%t)
 
     ij=0
+    jk=0
     p=>main%start
     do i=1,main%n
        p1=>p%next
@@ -712,12 +713,32 @@ contains
           p=>p1
           !   200 continue
           !   p=>p2
+       else
+          if(p%mag%kind==kind3) then
+             jk=jk+1
+             bn=p%mag%k3%thin_h_angle
+             call add(p,1,1,bn)
+             an=p%mag%k3%thin_v_angle
+             call add(p,-1,1,an)
+             p%mag%k3%thin_v_angle=zero
+             p%mag%k3%thin_h_angle=zero
+             p%magp%k3%thin_v_angle=zero
+             p%magp%k3%thin_h_angle=zero
+             doit=(p%mag%k3%thin_h_foc/=zero.or.p%mag%k3%thin_v_foc/=zero)
+             if(doit) then
+                write(6,*) " cannot handle the stuff in kind3 related to fake thinlens tracking of MAD8 "
+                stop 9
+             endif
+          endif
        endif
        p=>p%next
        if(associated(p,main%start)) exit
+
+
     enddo
 
-    write(mf,*) ij, " magnets done"
+    write(mf,*) ij, " magnet sandwiches done"
+    write(mf,*) jk, " single magnets done"
 
     ij=0
     p=>main%start

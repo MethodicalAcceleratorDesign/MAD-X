@@ -2399,6 +2399,37 @@ contains
 
   END SUBROUTINE  RECUT_KIND7
 
+  SUBROUTINE  ADD_SURVEY_INFO(R) ! A re-splitting routine
+    IMPLICIT NONE
+    TYPE(layout),target, intent(inout) :: R
+    TYPE(FIBRE),POINTER :: C
+    INTEGER I
+    real(dp) b1
+
+
+
+    C=>R%START
+    DO I=1,R%N
+       if(C%mag%kind==kind3) then
+          b1=C%mag%k3%thin_h_angle
+          if(b1/=zero) then
+             b1=b1/two
+             C%mag%k3%patch=my_true
+             C%magp%k3%patch=my_true
+             c%patch%patch=3
+             c%patch%A_d=0.d0
+             c%patch%B_d=0.d0
+             c%patch%A_ANG=0.d0
+             c%patch%B_ANG=0.d0
+             c%patch%A_ANG(2)=b1
+             c%patch%B_ANG(2)=b1
+          endif
+       endif
+       C=>C%NEXT
+    ENDDO
+
+  END SUBROUTINE  ADD_SURVEY_INFO
+
 
 
   SUBROUTINE  check_bend(xl,ggi,rhoi,xbend1,gf,met) ! A re-splitting routine

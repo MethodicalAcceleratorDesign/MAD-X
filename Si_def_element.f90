@@ -1024,6 +1024,7 @@ CONTAINS
        ALLOCATE(EL%K3%thin_v_foc);EL%K3%thin_v_foc=0
        ALLOCATE(EL%K3%thin_h_angle);EL%K3%thin_h_angle=0
        ALLOCATE(EL%K3%thin_v_angle);EL%K3%thin_v_angle=0
+       ALLOCATE(EL%K3%patch);EL%K3%patch=my_false
     CASE(KIND4)
        if(.not.ASSOCIATED(EL%C4)) THEN
           ALLOCATE(EL%C4)
@@ -1475,6 +1476,7 @@ CONTAINS
        ALLOCATE(EL%K3%thin_v_foc);CALL ALLOC(EL%K3%thin_v_foc);EL%K3%thin_v_foc=ZERO
        ALLOCATE(EL%K3%thin_h_angle);CALL ALLOC(EL%K3%thin_h_angle);EL%K3%thin_h_angle=ZERO
        ALLOCATE(EL%K3%thin_v_angle);CALL ALLOC(EL%K3%thin_v_angle);EL%K3%thin_v_angle=ZERO
+       ALLOCATE(EL%K3%patch);EL%K3%patch=my_false
     CASE(KIND4)
        if(.not.ASSOCIATED(EL%C4)) THEN
           ALLOCATE(EL%C4)
@@ -2286,6 +2288,7 @@ CONTAINS
           IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
           IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
           IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
+          IF(ASSOCIATED(EL%K3%patch)) DEALLOCATE(EL%K3%patch)
           DEALLOCATE(EL%K3)
        endif
 
@@ -2443,6 +2446,7 @@ CONTAINS
           IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
           IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
           IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
+          IF(ASSOCIATED(EL%K3%patch)) DEALLOCATE(EL%K3%patch)
           DEALLOCATE(EL%K3)
        endif
 
@@ -2709,6 +2713,7 @@ CONTAINS
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
        ELP%K3%thin_v_angle=EL%K3%thin_v_angle
+       ELP%K3%patch=EL%K3%patch
     ENDIF
 
 
@@ -2963,6 +2968,7 @@ CONTAINS
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
        ELP%K3%thin_v_angle=EL%K3%thin_v_angle
+       ELP%K3%patch=EL%K3%patch
     ENDIF
 
 
@@ -3211,6 +3217,7 @@ CONTAINS
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
        ELP%K3%thin_v_angle=EL%K3%thin_v_angle
+       ELP%K3%patch=EL%K3%patch
     ENDIF
 
 

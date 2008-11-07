@@ -58,7 +58,7 @@ contains
     my_start_t=>start_t
     start_t=1
     DELT0=0.D0
-    etat=DEFAULT+nocavity0-time0
+    etat=DEFAULT !+nocavity0-time0
     START=1
     FIN=1
     ORDER=1
@@ -410,6 +410,10 @@ contains
           WRITE(6,*) "THIN LENS FACTOR =",THIN
           CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_FALSE,lim=limit_int,lmax0=lmax,xbend=xbend)
           ! thin layout stuff
+
+       case('ADDSURVEYINFO')
+
+          call ADD_SURVEY_INFO(my_ering)
 
        case('RECUTKIND7NODRIFT')
           call RECUT_KIND7(my_ering,lmax,my_false)

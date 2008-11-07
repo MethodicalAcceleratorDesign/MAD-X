@@ -5,34 +5,11 @@ module accel_ptc
   ! use orbit_ptc
   implicit none
   public
-  integer n_cav_accel
+  !  integer n_cav_accel
   integer :: nvolt=20, NHARMON=1
-  !  real(dp) :: vrf=210.d-3   !mev
-  real(dp),parameter :: dphsa_final=30.0_dp*deg_to_rad_  ! 30.0_dp*deg_to_rad_
-  real(dp) :: dphsa_by_dt=dphsa_final/(100.e-3_dp*CLIGHT)
-  real(dp) :: harmon=nine
-  real(dp) :: freq=zero
-  real(dp) :: circum=zero
-  real(dp) :: total_cav_L=zero
-  logical(lp) :: enforce_zero_x5=my_false
-  logical(lp) :: energy_reached=my_false
-  real(dp) :: present_kinetic_energy=zero
-  real(dp) :: final_kinetic_energy=40.0_dp  !3.1d0
-
-  !   Other mode of acceleration
-  real(dp) :: T_parabolic=100.e-3_dp*CLIGHT
-  real(dp) :: T_rise=13.e-3_dp*CLIGHT,T_END_LINEAR=630091002.783574_dp,T_END=660070248.583574_dp
-  real(dp) :: p0c0
-  real(dp) :: p0c1 , kinetic1
-  real(dp) :: p01_ratio = .181_dp/.143_dp
-  real(dp) :: p0c2,kinetic2,p0cf
-  real(dp) :: as1,as2
-  real(dp) :: vrf0=40.d-3,vrff=280.d-3, slopev    !mev
-  integer :: count_cav
-  logical(lp) :: oldway= .false.
   integer :: slope_sign=1,slope_flip=1
-  logicaL :: autoflip=.False.
-  real(dp) :: maximum_phase=one
+  logicaL :: autoflip=.False.,must_stop=.False.,use_time=.False.
+  real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0
   TYPE fibre_array
      type(fibre), pointer :: p
      integer, pointer :: pos
@@ -45,16 +22,6 @@ module accel_ptc
   END TYPE accel_data
   type(accel_data), allocatable :: accel(:)
 
-  ! accel_ptc_locate_accel_cavity
-  ! Locates the cavities and store then in cavity_location: Pointer to fibre and integer position
-  !
-  ! accel_ptc_design_no_accel
-  !
-  !  Sets the phase at the cavity and also c_%phase0 so that VRF>0 => acceleration and stability
-  !
-  !
-  !
-  !
 
 contains
 
@@ -131,6 +98,7 @@ contains
     !write(6,*) size(accel)
 
     tr=time/clight*1000
+    if(tr-time_0>dtime.and.use_time) must_stop=.true.
     ti=int(tr)
     !write(6,*) tr,ti,accel(ti)%p0c
 
@@ -223,14 +191,11 @@ contains
     type(layout), target :: ring
     TYPE(BEAM),target :: RAYS
     real(dp) sig0(6),x(6)
-    integer mf
+    integer mf,mfp
     type(fibre), pointer :: p
     character(*) filetable
-    logical ooo
 
     sig0=1.e-6
-    write(6,*) " old"
-    read (5,*) ooo
 
     CALL create_beam(RAYS,npart,two,SIG0)
 
@@ -259,24 +224,28 @@ contains
 
     call kanalnummer(mf)
     open(unit=mf,file='outnew.dat')
+    call kanalnummer(mfp)
+    open(unit=mfp,file='outplot.dat')
 
     WRITE(6,*) " n_TURN ... pseudo ORBIT debugging"
     READ(5,*) N_TURN
+    if(n_turn<0) then
+       write(6,*)" dtime "
+       read(5,*) dtime
+       time_0=0.d0
+       n_turn=-n_turn
+       use_time=.true.
+    endif
     !n_turn=20
 
     !rays%x(2,1:6)=0.d0
     !rays%x(2,6)=0.00001d0
 
-    if(ooo) then
-       call ptc_synchronous_set_old(-1)
-    else
-       call ptc_synchronous_set(-1)
-    endif
+    call ptc_synchronous_set(-1)
     write(6,*) " reading rays after some turns ?"
     read(5,*) i
 
     if(i==1) then
-
        call ptc_synchronous_set(-2)
 
        do i=1,RAYS%n
@@ -299,11 +268,7 @@ contains
 
        do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
 
-          if(ooo) then
-             call ptc_synchronous_set_old(i)
-          else
-             call ptc_synchronous_set(i)
-          endif
+          call ptc_synchronous_set(i)
           do k=1,rays%n
 
 
@@ -315,19 +280,22 @@ contains
           call ptc_synchronous_after(i)
 
        enddo
-
-       DO KK=1,RAYS%N
-          X(5)=rays%x(kk,6)+my_ORBIT_LATTICE%ORBIT_P0C
-          X(6)=x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000
-          write(mf,'(1x,E25.17,1x,i8,1x,1(1x,E25.17))') x(6),j,x(5)     !rays%x(kk,1:6)
-       ENDDO
+       if(mod(j,10)==0) then
+          DO KK=1,RAYS%N
+             X(5)=rays%x(kk,6)+my_ORBIT_LATTICE%ORBIT_P0C
+             X(6)=x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000
+             write(mfp,'(1x,E25.17,1x,i8,1x,1(1x,E25.17))') x(6),j,x(5)     !rays%x(kk,1:6)
+          ENDDO
+       endif
+       if(must_stop) exit
     enddo  ! turn
     call ptc_synchronous_after(-2)
 
-    !   DO KK=1,RAYS%N
-    !      write(mf,'(6(1x,E25.17))') rays%x(kk,1:6)
-    !   ENDDO
+    DO KK=1,RAYS%N
+       write(mf,'(6(1x,E25.17))') rays%x(kk,1:6)
+    ENDDO
     close(mf)
+    close(mfp)
     write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     write(6,*) x_orbit_sync
     write(6,*) rays%x(1,1:6)
@@ -473,6 +441,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
      read(MF,*) my_ORBIT_LATTICE%state
      CLOSE(MF)
      call accel_ORBIT_up_grade_mag_all
+     time_0=x_orbit_sync(6)/clight*1000
      return
   elseif(i_node==-3) then
      stop 553
@@ -489,157 +458,6 @@ SUBROUTINE ptc_synchronous_set(i_node)
 
 
 END SUBROUTINE  ptc_synchronous_set
-
-
-
-!===========================================================
-! This subroutine should be called before particle tracking.
-! It tells PTC to do something related to acceleration.
-!
-!
-!
-!===========================================================
-SUBROUTINE ptc_synchronous_set_old(i_node)
-
-  USE accel_ptc     !,vrff=>vrf,freqf=>freq
-  IMPLICIT NONE
-  INTEGER  i_node
-  INTEGER  i_node1,i,mf,j,nf
-  type(internal_state) state
-  real(dp) p0,vrfx,dphat,freqf,dt0,dt,x6,vo(nvolt),ph(nvolt)
-  TYPE(INTEGRATION_NODE), POINTER  :: T
-
-
-  i_node1 = i_node + 1
-
-  if(i_node==-1) then
-     x_orbit_sync=zero
-     w1_orbit=0
-     w2_orbit=0
-     my_ORBIT_LATTICE%orbit_omega_after=my_ORBIT_LATTICE%ORBIT_omega
-     my_ORBIT_LATTICE%state=my_ORBIT_LATTICE%state+time0
-     default=my_ORBIT_LATTICE%state
-
-     write(6,*) " Orbit set for acceleration "
-     return
-  elseif(i_node>=0) then
-
-     if(.not.my_ORBIT_LATTICE%accel) return
-
-     state=my_ORBIT_LATTICE%state
-     my_ORBIT_LATTICE%state=my_ORBIT_LATTICE%state+totalpath0
-
-     if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
-        p_orbit=>my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%NODE%parent_fibre
-
-
-        call orbit_to_ptc(x_orbit_sync)
-
-        my_ORBIT_LATTICE%orbit_deltae=zero
-        w1_orbit=p_orbit
-        w2_orbit=0
-        !         write(6,*) "x_orbit_sync(6) ",x_orbit_sync(6)
-        call get_from_table_volt(x_orbit_sync(6),p0,vo,ph)
-        call find_energy(w2_orbit,p0c=p0)
-        my_ORBIT_LATTICE%orbit_deltae=(w2_orbit%energy-w1_orbit%energy)
-        freqf=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
-        p_orbit%mag%freq=freqf
-
-        call compute_phase(x_orbit_sync,my_ORBIT_LATTICE%state,vo,ph,dt0)
-        x6=x_orbit_sync(6)
-
-
-        call ptc_to_orbit(x_orbit_sync)
-
-     endif
-     ! for speed
-     CALL ORBIT_TRACK_NODE(i_node1,x_orbit_sync)
-
-     if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
-        call adjust_phase(x6,state,dt0)
-
-        p_orbit%magp%freq=p_orbit%mag%freq
-        p_orbit%magp%volt=p_orbit%mag%volt
-        p_orbit%magp%phas=p_orbit%mag%phas
-        dphat=x_orbit_sync(6)/my_ORBIT_LATTICE%ORBIT_P0C
-
-        call find_energy(w2_orbit,ENERGY=dphat*w1_orbit%p0c+w1_orbit%energy)
-        !  Changes the px,py,delta using the new p0C i.e. w2%p0c
-        my_ORBIT_LATTICE%orbit_omega_after=twopi*p_orbit%mag%FREQ/CLIGHT
-        CALL accel_ORBIT_up_grade_x(x_orbit_sync)
-        !  upgrades all the reference energy from after cavity 1 to cavity 2 included
-        call accel_ORBIT_up_grade_mag
-
-     endif
-
-
-     my_ORBIT_LATTICE%state=state
-
-  elseif(i_node==-2) then
-
-     if(.not.my_ORBIT_LATTICE%accel) return
-     call kanalnummer(mf)
-     open(unit=mf,file=initial_setting)
-     read(MF,*)   my_ORBIT_LATTICE%ORBIT_omega
-     read(MF,*)   my_ORBIT_LATTICE%orbit_omega_after
-     read(MF,*)   my_ORBIT_LATTICE%ORBIT_gamma
-     read(MF,*)   my_ORBIT_LATTICE%ORBIT_P0C
-     read(MF,*)   my_ORBIT_LATTICE%ORBIT_BETA0
-     read(MF,*)   my_ORBIT_LATTICE%orbit_kinetic
-     read(MF,*)   my_ORBIT_LATTICE%orbit_energy
-     read(MF,*)   my_ORBIT_LATTICE%orbit_brho
-
-     do i=1,my_ORBIT_LATTICE%ORBIT_N_NODE
-        if(my_ORBIT_LATTICE%ORBIT_NODES(i)%CAVITY) then
-           p_orbit=>my_ORBIT_LATTICE%ORBIT_NODES(i)%NODE%parent_fibre
-           exit
-        endif
-     enddo
-     read(MF,*)  p_orbit%mag%freq
-     read(MF,*)  p_orbit%mag%volt
-     read(MF,*)  p_orbit%mag%phas
-     read(MF,*)  p_orbit%mag%c4%CAVITY_TOTALPATH
-     read(MF,*)  slope_sign
-     read(MF,*)  slope_flip
-     read(MF,*)  maximum_phase
-     p_orbit%magp%freq=p_orbit%mag%freq
-     p_orbit%magp%volt=p_orbit%mag%volt
-     p_orbit%magp%phas=p_orbit%mag%phas
-     p_orbit%magp%c4%CAVITY_TOTALPATH=p_orbit%mag%c4%CAVITY_TOTALPATH
-     read(mf,*) nf
-     if(size(p_orbit%mag%c4%ph)<nf) then
-        write(6,*) " error not a big enough size for modes "
-        stop 476
-     endif
-     do i=1,nf
-        read(mf,*) j,p_orbit%mag%c4%f(i),p_orbit%mag%c4%ph(i)
-        p_orbit%magp%c4%f(i)  = p_orbit%mag%c4%f(i)
-        p_orbit%magp%c4%ph(i) = p_orbit%mag%c4%ph(i)
-     enddo
-     read(MF,*) x_orbit_sync(1:2)
-     read(MF,*) x_orbit_sync(3:4)
-     read(MF,*) x_orbit_sync(5:6)
-     read(MF,*) w1_ORBIT
-     read(MF,*) w2_ORBIT
-     read(MF,*) my_ORBIT_LATTICE%state
-     CLOSE(MF)
-     call accel_ORBIT_up_grade_mag_all
-     return
-  elseif(i_node==-3) then
-     stop 553
-     !     call PUT_state(default,my_ORBIT_LATTICE%ORBIT_NODES(1)%node%PARENT_FIBRE%PARENT_LAYOUT)
-     !     return
-  elseif(i_node==-4) then
-     stop 554
-     return
-  elseif(i_node==-5) then
-     !    my_ORBIT_LATTICE%state=my_estate
-     !    call print(my_ORBIT_LATTICE%state,6)
-     stop 555
-  endif
-
-
-END SUBROUTINE  ptc_synchronous_set_old
 
 
 
@@ -852,6 +670,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
         p_orbit%magp%c4%t=-dt0
      endif
    end SUBROUTINE adjust_phase
+
    subroutine ptc_track_particle(node_index, x,xp,y,yp,phi,dE)
 
      USE accel_ptc
