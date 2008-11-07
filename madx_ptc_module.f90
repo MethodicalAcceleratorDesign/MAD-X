@@ -166,6 +166,11 @@ CONTAINS
     integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bv0,bvk
     logical(lp):: ptcrbend,truerbend,errors_in,errors_out
+    !  Etienne helical
+    character(nlp) heli(100)
+    integer mheli,helit,ihelit
+    type(fibre), pointer :: p
+    !---------------------------------------------------------------
     !---------------------------------------------------------------
     if (getdebug() > 1) then
        print *, '--------------------------------------------------------------'
@@ -302,6 +307,28 @@ CONTAINS
        print *, '    Num. of steps ',nst0
        print *, '    charge        ',charge
     endif
+    ! etienne helical
+    helit=0
+    call kanalnummer(mheli)
+    open(unit=mheli,file='helical.txt',status='OLD',err=1001)
+    read(mheli,*) helit
+    if(helit>100) then
+       write(6,*) " too many helical dipole ",helit
+       stop 99
+    endif
+    do ihelit=1,helit
+       read(mheli,*) heli(ihelit)
+       CALL CONTEXT(heli(ihelit))
+    enddo
+    close(mheli)
+1001 continue
+    helit=0
+    call kanalnummer(mheli)
+    open(unit=mheli,file='sixtrack_compatible.txt',status='OLD',err=1002)
+    read(mheli,*) sixtrack_compatible
+    close(mheli)
+1002 continue
+    ! end of etienne helical
 
     ! preliminary setting
     !    my_ring%charge=1
@@ -445,6 +472,15 @@ CONTAINS
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
+       CALL CONTEXT(key%list%name)
+
+       do ihelit=1,helit
+          IF(index(key%list%name,heli(ihelit)(1:len_trim(heli(ihelit))))/=0) then
+             key%magnet="helicaldipole"
+             write(6,*) " drift ",key%list%name, " became helical dipole in PTC "
+          endif
+       enddo
+       ! end etienne Helical
     case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
@@ -768,6 +804,7 @@ CONTAINS
        !     key%list%volt=node_value('ex ')
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
+       m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
@@ -944,6 +981,21 @@ CONTAINS
     endif
 
     call setintstate(default)
+
+    if(my_ring%HARMONIC_NUMBER>0) then
+       call get_length(my_ring,l)
+       p=>my_ring%start
+       do i=1,my_ring%n
+          if(p%mag%kind==kind4) then
+             if(p%mag%freq==zero) then
+                write(6,*) " Bullshitting in MADX with Cavities ",my_ring%HARMONIC_NUMBER
+                p%mag%freq=clight*my_ring%HARMONIC_NUMBER*BETA0/l
+                p%magp%freq=p%mag%freq
+             endif
+          endif
+          p=>p%next
+       enddo
+    endif
 
     if (getdebug() > 1) then
        print *, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
