@@ -204,7 +204,7 @@
       call double_to_table('survey ', 'angle ',ang)
 
 !---------------- --------------------------
-!     copy over the attributes 'beam_sep' and 'assembly_id'
+!     copy over the attributes 'mech_sep' and 'assembly_id'
 !     FT 06.06.2008
 
       tmp = node_value('slot_id ')
@@ -213,8 +213,8 @@
       tmp = node_value('assembly_id ')
       call double_to_table('survey ', 'assembly_id ',tmp)
 
-      tmp = node_value('beam_sep ')
-      call double_to_table('survey ', 'beam_sep ',tmp)
+      tmp = node_value('mech_sep ')
+      call double_to_table('survey ', 'mech_sep ',tmp)
 
       call augment_count('survey ')
       end

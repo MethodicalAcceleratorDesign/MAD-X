@@ -133,7 +133,7 @@ char* survey_table_cols[] =
 {
   "name", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt",
-  "slot_id", "assembly_id", "beam_sep",
+  "slot_id", "assembly_id", "mech_sep",
   " "  /* blank terminates */
 };
 
@@ -251,14 +251,14 @@ char* twiss_table_cols[] =
   "k9sl", "k10l", "k10sl", "ks", "hkick",
   "vkick", "tilt", "e1", "e2", "h1",
   "h2", "hgap", "fint", "fintx",
-  "slot_id","assembly_id","beam_sep","lrad","parent",
+  "slot_id","assembly_id","mech_sep","lrad","parent",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",
   "re41", "re42", "re43", "re44", "re45", "re46",
   "re51", "re52", "re53", "re54", "re55", "re56",
   "re61", "re62", "re63", "re64", "re65", "re66",
-  "kmax", "kmin", "calib", "polarity", "alfa",
+  "bmax", "bmin", "calib", "polarity", "alfa",
   "beta11", "beta12", "beta13",
   "beta21", "beta22", "beta23",
   "beta31", "beta32", "beta33",
