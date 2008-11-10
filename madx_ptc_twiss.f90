@@ -75,10 +75,13 @@ module madx_ptc_twiss_module
        0,0,0,0,1,0,&
        0,0,0,0,0,1 /), &
        (/6,6/) )
+
+  logical :: slice_magnets, computeOneTurnParametersToggle
+  
+
   !============================================================================================
   !  PRIVATE
   !    routines
-
   private zerotwiss,equaltwiss,killtwiss
 
 
@@ -458,8 +461,6 @@ contains
     print77=.false.
     read77=.false.
 
-
-
     if (getdebug() > 2) then
        call kanalnummer(mf1)
        open(unit=mf1,file='ptctwiss.txt')
@@ -484,6 +485,13 @@ contains
        nullify(maps) !assurance
     endif
 
+slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
+
+if (.not. slice_magnets) then
+
+   ! choice is to go one element after the other, instead of through the magnets' inner slices
+   ! option is either absent or set to 'elements'
+   
     do i=1,MY_RING%n
 
        if (getdebug() > 1) then
@@ -554,8 +562,15 @@ contains
     enddo
 100 continue
 
-    call MomentumCompaction()
+    else ! choice is to track along successive inner slices of the magnets
+       call TrackAlongSuccessiveMagnetInnerSlices() ! for time-being, instead of the above
+    endif
 
+    if ( computeOneTurnParametersToggle .eqv. .true. ) then
+       ! only makes sense if the lattice is a ring (skipped for a line lattice)
+       ! problem: seems we enter here even in the case of a line lattice!!!
+       call MomentumCompactionAndOneTurnParameters() 
+    endif
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"
@@ -620,6 +635,9 @@ contains
       mtab  = get_value('ptc_twiss ','initial_matrix_table ')
       mascr = get_value('ptc_twiss ','initial_ascript_manual ')
       mdistr = get_value('ptc_twiss ','initial_moments_manual ')
+
+      computeOneTurnParametersToggle = .false. ! default. will be set to true in the case the map
+      ! is calculated over a ring, about the closed orbit. Later-on in the same subroutine.
 
 
       initial_matrix_manual = mman .ne. 0
@@ -707,6 +725,8 @@ contains
          if (getdebug() > 1) then
             print*,"Initializing map from one turn map"
          endif
+
+         computeOneTurnParametersToggle = .true. ! will compute momemtum compaction factor, tunes, chromaticies for ring
 
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -883,6 +903,11 @@ contains
          write(6,'(a,3(f8.4,1x))')  "disps       ", opt_fun(31),opt_fun(33),opt_fun(35)
          write(6,'(a,3(f8.4,1x))')  "tunes       ", tw%mu(1),tw%mu(2),tw%mu(3)
       endif
+
+      ! the following works : we see the list of all elements in sequence - what about twiss_ptc_line & twiss_ptc_ring?
+      ! jluc debug - begin
+      !write(28,'(a,1(f8.4,1x))') current%MAG%name,suml
+      ! jluc debug - end
 
       ioptfun=72
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
@@ -1379,17 +1404,20 @@ contains
 
     end subroutine readinitialtwiss
 
+
+
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
-    ! should eventually check this against a proper mathematical formulation ...
 
-    subroutine MomentumCompaction()
+    subroutine MomentumCompactionAndOneTurnParameters()
 
       implicit none
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
       real(dp) :: betaRelativistic, gammaRelativistic
       real(dp) :: suml ! cumulative length along the ring
+      real(dp) :: fractionalTunes(3)
+      real(dp) :: chromaticities(2)
       integer :: i,j
       real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
       real(dp) :: sd ! as in twiss.F
@@ -1401,9 +1429,11 @@ contains
            0,0,0,1,0,0, &
            0,0,0,0,1,0, &
            0,0,0,0,0,1/), (/6,6/))
-      type(normalform) theNormalForm;
+      type(normalform) theNormalForm
       real(dp) :: dispersion(4)
       integer :: debugFiles
+
+      ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
 
       debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
 
@@ -1437,6 +1467,12 @@ contains
          write(21,*) "Closed orbit state=", state(1:6)
       endif
 
+      
+      ! need at least order 2 to get the chromaticities
+      ! with an explicit call to init_default
+      ! if we hadn't ned the chromaticities we could have simply discarded the following snippe
+      call init_default(default,2,0)
+
       call alloc(oneTurnMap)
       oneTurnMap = npara ! ?
       oneTurnMap = state
@@ -1454,7 +1490,7 @@ contains
 
       ! 4. retreive the dispersion coefficients
       ! (may be the coefficient of delta of the map?)
-      ! shall we decompose the map via a normal form to get the dispersion???   
+      ! decompose the map via a normal form to get the dispersion...   
       call alloc(theNormalForm)
       theNormalForm = oneTurnMap
       if (debugFiles .eq. 1) then
@@ -1463,6 +1499,7 @@ contains
          ! (would need to go through DHDJ to get the tune...)
       endif
       ! first order dispersions !?
+      ! (at least checked that these values match those computed in twiss.F)
       dispersion(1) = theNormalForm%A1%v(1).sub.'000010'
       dispersion(2) = theNormalForm%A1%v(2).sub.'000010'
       dispersion(3) = theNormalForm%A1%v(3).sub.'000010'
@@ -1483,6 +1520,25 @@ contains
       eta_c = -sd * betaRelativistic**2 / suml
       alpha_c = one / gammaRelativistic**2 + eta_c
 
+      ! also output the tune ...
+      fractionalTunes = theNormalForm%tune
+      ! the above is exactly equivalent to the following two lines (i.e. returns frac.tune)
+      fractionalTunes(1) = theNormalForm%DHDJ%v(1).sub.'0000' ! as in So_fitting.f90
+      fractionalTunes(2) = theNormalForm%DHDJ%v(2).sub.'0000' ! as in So_fitting.f90
+      ! Q: is it possible to get the actual total tune, as returned by twiss.F?
+      ! => no, not with a map...
+
+      ! ... as well as the chromaticities
+      chromaticities(1) = theNormalForm%DHDJ%v(1).sub.'00001' ! as in So_fitting.f90
+      chromaticities(2) = theNormalForm%DHDJ%v(2).sub.'00001' ! as in So_fitting.f90
+      ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
+
+      ! for debug: check the values by printing the map
+      if (debugFiles .eq. 1) then
+         call daprint(oneTurnMap,25) ! prints the one-turn map on file 25
+         call daprint(theNormalForm%dhdj,26) ! print tunes, chromaticities and anharmonicities
+         ! as done in madx_ptc_normal.f90
+      endif
 
       call kill(theNormalForm)
 
@@ -1491,8 +1547,142 @@ contains
       write(6,*)
       write(6,*) "Momentum compaction (momentum compaction factor & phase-slip factor):"
       write(6,*) "alpha=", alpha_c, "eta=", eta_c
+      write(6,*) "fractional tunes=", fractionalTunes
+      write(6,*) "chromaticities=", chromaticities
 
-    end subroutine MomentumCompaction
+    end subroutine MomentumCompactionAndOneTurnParameters
+
+
+    subroutine TrackAlongSuccessiveMagnetInnerSlices()
+
+      ! the ptc_twiss call shall feature an additional flag to decide
+      ! whether or not one evaluate the Twiss functions inside the elements
+      ! or solely at the middle.
+
+      implicit none
+      integer :: initialThinLensPos, thinLensPos
+      type(integration_node), pointer :: nodePtr
+      type(fibre), pointer :: fibrePtr
+      real(dp) :: s
+      integer(dp) :: knobsNumber
+      real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
+      type(real_8) :: theTransferMap(6) ! transfer map between successive inner thin-lenses
+      type(normalform) :: theNormalForm
+      type(real_8) :: theAscript(6) ! the phase-advance
+      integer :: returnedInteger
+
+      knobsNumber = nda ! nda is a semi-global variable !!!
+
+      call make_node_layout(my_ring) ! essential: the way to look inside the magnets
+
+      state = 0.d0
+      call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
+
+      call alloc(theTransferMap) ! transfer map between two successive inner slices
+      ! is it the correct way to initialize, or should we rely on y=x+id??
+      theTransferMap = npara ! to be checked later-on
+      theTransferMap = state
+
+      call track(my_ring, theTransferMap, 1, default)
+
+      call alloc(theNormalForm)
+      call alloc(theAscript)
+
+      theNormalForm = theTransferMap ! decompose into a normal form
+      theAscript = state + theNormalForm%A_t ! linear part of the normal form
+
+      call kill(theNormalForm) ! theAscript only is of interest from now on...
+  
+      ! my_ring%nthin does return 0, instead of the actual value, which we can get from my_ring%t%n
+    
+      fibrePtr => my_ring%start ! uncomment this line and we get a program crash
+      initialThinLensPos = fibrePtr%t1%pos ! t1 points to the first integration node
+      nodePtr => fibrePtr%t1 ! t1 points to the first integration node
+      
+      do thinLensPos = initialThinLensPos, my_ring%t%n+initialThinLensPos-1 
+         ! "t" is the child thin-lens layout according to "type layout" definition
+        
+         ! Is it the correct way to get the curvilign abciss?
+         s = nodePtr%s(3) ! to be checked: why is nodePtr%s a vector?
+         ! %s(1) increases step-wise, as with the magnet's length
+         ! %s(2) ramps up within a magnet and resets to zero right after the start (saw)
+         ! %s(3) seems to be equal to s(1)+s(2), i.e. equal to s along the sliced ring, which is what we need
+
+         if (knobsNumber > 0) then
+            ! to be completed later-on
+            ! call track ...
+              call track_probe_x(my_ring,theAscript,+default, & ! +default in case of extra parameters !?
+                 & node1=thinLensPos,node2=thinLensPos+1)
+              if (getnpushes() > 0) then ! try to understand this part later-on
+                 call track_probe_x(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
+                      & node1=thinLensPos,node2=thinLensPos+1)
+              endif
+         else
+            ! do we really need track_probe_x, or simply track to go along inner slices?
+            call track_probe_x(my_ring,theAscript,default, &
+                 & node1=thinLensPos,node2=thinLensPos+1)
+            !write(27,*) "beta new=", (theTransferMap(1).sub.'1')**2+(theTransferMap(1).sub.'01')**2
+            if (getnpushes() > 0) then ! try to understand this part later-on
+               call track_probe_x(my_ring,theTransferMap,default, &
+                    & node1=thinLensPos,node2=thinLensPos+1)             
+            endif
+         endif
+
+         if ((.not. check_stable) .or. (.not. c_%stable_da)) then
+            call fort_warn('ptc_twiss:','DA got unstable during tracking through the thin-lens slices')
+            call seterrorflag(10,"ptc_twiss","DA got unstable during tracking through the thin-lens slices")
+            return ! try to continue to the next thin-lens position
+         endif
+            
+
+         call produce_aperture_flag(flag_index)
+         if (flag_index/=0) then
+            ! to be completed later-on
+         endif
+
+         tw = theAscript ! set the twiss parameters, with y being equal to the A_ phase advance
+
+         ! update some semi-global values before invoking puttwisstable!!!
+         current => fibrePtr ! current is defined outside the scope of this subroutine and required by puttwisstable!!!
+         suml = s ! another global!!! to be updated later-on with the actual s within the magnet
+         ! suml is used internally to puttwisstable to save the curvilign abciss...
+
+         if (getnpushes() > 0) then ! what is this for ???
+            ! presently, do not enter here anyway
+            call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap) ! what is this for ???
+         endif
+         call puttwisstable() ! writes the resulting tw above to an internal table
+
+         if (associated(nodePtr,fibrePtr%t1)) then
+            write(24,*) thinLensPos, "located at the beginning of the element"
+         endif
+         if (associated(nodePtr,fibrePtr%tm)) then
+            write(24,*) thinLensPos, "located at the middle of the element"
+            ! if option is to evaluate Twiss parameters at the middle, then invoke computation her
+         endif
+         ! Note: sometime looks like beginning is immediately followed by the middle
+
+         nodePtr => nodePtr%next
+
+        if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
+           write(24,*) thinLensPos, "located at the end of the element"
+            fibrePtr => fibrePtr%next
+            ! indicate the complete_twiss_table code in madxn.c that we moved to the next element
+            ! so that the element name on the far left displays correctly
+            returnedInteger = advance_node()
+         endif
+
+      enddo ! for the successive slices / thin-lenses in the magnets' sequence
+
+      call kill(theTransferMap)
+      call kill(theAscript)
+
+    end subroutine TrackAlongSuccessiveMagnetInnerSlices
+
+    subroutine TrackAlongSuccessiveMagnets()
+      ! should cut/paste the tracking part of the ptctwiss main subroutine
+    end subroutine TrackAlongSuccessiveMagnets
+
 
   END subroutine ptc_twiss
 
