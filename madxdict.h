@@ -489,6 +489,7 @@ char command_def[] =
 "file     = [s, none, ptc_twiss], "
 "table    = [s, none, ptc_twiss], "
 "savemaps = [l, true, true], " /*buffers maps for future usage as universal_taylors */
+"slice_magnets =[l,false,true], "
 "xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
 "ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
 "zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/
