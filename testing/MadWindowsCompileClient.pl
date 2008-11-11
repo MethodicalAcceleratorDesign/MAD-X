@@ -9,7 +9,7 @@
 # immediately trigger the compilation, the later meaning the program will listen
 # to port 7075 for a request emanating from the automatic build and test procedure.
 
-$debug = 'no'; # global variable also used by notify() subroutine
+$debug = 'no'; # global variable also used by notify() subroutine and others
 
 if ($#ARGV!=0){
     die "expect one argument: 'now' or 'wait-for-trigger'\n";
@@ -133,6 +133,7 @@ if ($child_pid){
     # before asking the Windows host to trigger the compilation, we must first make sure that the
     # Samba folder MAD-X-WINDOWS/madX contains the latest CVS (more precisely latest released tagged
     # version - for the time being, we'll simply pick-up the latest contents of the repository)
+    # ... well the `cvs update` is actually carried-out in sub updateMadForWindowsSambaFolder() !!!
 
     # wait to be waken-up (or start right now if mode is 'now')
 
@@ -312,13 +313,17 @@ sub checkWindowsCompilationOutcome {
     deliverHtmlPage();
     
 
-    my $msg = MIME::Lite->new(
-			      From => 'Jean-Luc.Nougaret@cern.ch',
-			      To => 'mad-windows-watchers@cern.ch',
-			      Subject => 'MAD-X for Windows updated',
-			      Data => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards,\nJean-Luc"
-			      );
-    $msg->send;
+    if ($debug eq 'no') {
+	my $msg = MIME::Lite->new(
+				  From => 'Jean-Luc.Nougaret@cern.ch',
+				  To => 'mad-windows-watchers@cern.ch',
+				  Subject => 'MAD-X for Windows updated',
+				  Data => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards,\nJean-Luc"
+				  );
+	$msg->send;
+    } else {
+	notify("MAD-X for Windows has been updated");
+    }
     
     chdir($initialDir);
 
@@ -400,6 +405,10 @@ sub updateMadForWindowsSambaFolder{
     # ideally we should do a complete clean-up here.
     print "invoke CVS update in $madForWindowsSambaFolder. Ideally should do a complete clean-up before\n";
     `cvs update`;
+    $cvsStatus = `cvs status`;
+    if ($debug eq 'yes'){
+	notify("outcome of `cvs update`: $cvsStatus");
+    }
     chdir ($localDir); # back to where we were before entering the sub
 
 }
