@@ -86,13 +86,14 @@
 	<test input ="fv9_4.madx" output="fv9_4.out" program="madxp" subdir="Example4"/>
 	<test input ="fv9_5.madx" output="fv9_5.out" program="madxp" subdir="Example5"/>
    </target>
-     <target name = "ptc_twiss" responsible="Frank.Schmidt@cern.ch">
+     <target name = "ptc_twiss" responsible="Jean-Luc.Nougaret@cern.ch">
       <test input = "example1.madx" output="example1.out" program="madxp" subdir="Example1"/> <!--unspecified program is 'madx'-->
       <test input = "example2.madx" output="example2.out" program="madxp" subdir="Example2"/>
       <test input = "example3.madx" output="example3.out" program="madxp" subdir="Example3"/>
       <test input = "example4.madx" output="example4.out" program="madxp" subdir="Example4"/>
       <test input = "diamond.madx" output="diamond.out" program="madxp" subdir="Example5"/>
       <test input = "lhc.madx" output="lhc.out" program="madxp" subdir="Example6"/>
+      <test input = "example.madx" output="example.out" program="madxp" subdir="SliceMagnets"/>
    </target>
    <target name="special_features" responsible="Frank.Schmidt@cern.ch">
 	<test input ="setvars.madx" output="setvars.out"/>
