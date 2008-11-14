@@ -3578,10 +3578,13 @@ void pro_ptc_twiss()
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
+  struct int_array* summary_tarr; /* to pass summary-table name to Fortran */
   struct node *nodes[2], *use_range[2];
   double ptc_deltap;
   char *filename = NULL, *table_name;
+  char *summary_filename = NULL, *summary_table_name; /* for summary table */
   int j,l ,pos, w_file,beta_def;
+  int w_file_summary; /* toggle to write the summary table into a file */
   /*
     start command decoding
   */
@@ -3603,6 +3606,7 @@ void pro_ptc_twiss()
 
   if (attach_beam(current_sequ) == 0)
     fatal_error("PTC_TWISS - sequence without beam:", current_sequ->name);
+
   pos = name_list_pos("table", nl);
   if(nl->inform[pos]) /* table name specified - overrides save */
   {
@@ -3618,7 +3622,19 @@ void pro_ptc_twiss()
     table_name = "ptc_twiss";
   }
 
-
+  /* jluc: begin */
+  /* do the same as above for the table holding summary data after one-turn */
+  pos = name_list_pos("summary_table",nl);
+  if (nl->inform[pos]){ /* summary-table's name specified */
+    summary_table_name = pl->parameters[pos]->string;
+    if (summary_table_name == NULL){
+      summary_table_name = pl->parameters[pos]->call_def->string;
+    }
+  }
+  else {
+    summary_table_name = "ptc_twiss_summary";
+  }
+  /* jluc: end */
 
   pos = name_list_pos("file", nl);
   if (nl->inform[pos])
@@ -3632,6 +3648,20 @@ void pro_ptc_twiss()
     w_file = 1;
   }
   else w_file = 0;
+
+  /* jluc : begin */
+  /* do the same as above for the file to hold the summary-table */
+  pos = name_list_pos("summary_file",nl);
+  if (nl->inform[pos]){
+    if ((summary_filename = pl->parameters[pos]->string) == NULL){
+      if (pl->parameters[pos]->call_def != NULL)
+	summary_filename = pl->parameters[pos]->call_def->string;
+    }
+    if (summary_filename == NULL) summary_filename = permbuff("dummy");
+    w_file_summary = 1; 
+  }
+  else w_file_summary = 0;
+
   /*
     end of command decoding
   */
@@ -3663,15 +3693,46 @@ void pro_ptc_twiss()
   twiss_table->org_sequ = current_sequ;
   twiss_table->curr= 0;
   current_node = current_sequ->ex_start;
-  w_ptc_twiss_(tarr->i);
+  /* w_ptc_twiss_(tarr->i); */
+
+  /* jluc: start */
+  /* create additional table to hold summary data after one-turn */
+  /* such as momentum compaction factor, tune and chromaticities */
+  l = strlen(summary_table_name); /* reuse of l */
+  summary_tarr = new_int_array(l+1);
+  conv_char(summary_table_name, summary_tarr);
+
+  ptc_twiss_summary_table = make_table(summary_table_name, "twiss summary",
+				       ptc_twiss_summary_table_cols, ptc_twiss_summary_table_types,
+				       5); /* only one  row would be enough  */
+  ptc_twiss_summary_table->dynamic = 1; /* actually static for time-being */
+  add_to_table_list( ptc_twiss_summary_table, table_register );
+  /* jluc: end */
+
+  w_ptc_twiss(tarr->i,summary_tarr->i);
+
+  /* upon completion of the Fortran ptc_twiss call ... */
+
   fill_twiss_header_ptc(twiss_table,ptc_deltap);
   if (w_file) out_table(table_name, twiss_table, filename);
+
+  /* jluc: start */
+  /* fill... missing? */
+  if (w_file_summary) out_table(summary_table_name, ptc_twiss_summary_table,
+				summary_filename);
+   /* jluc: end */
+
   /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);
   current_sequ->range_start = use_range[0];
   current_sequ->range_end = use_range[1];
   delete_int_array(tarr);
+
+  /* jluc: start */
+  delete_int_array(summary_tarr);
+  /* jluc: end */
+
 }
 
 void pro_ptc_create_layout()

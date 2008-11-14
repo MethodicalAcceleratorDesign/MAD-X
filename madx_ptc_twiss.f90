@@ -273,7 +273,7 @@ contains
 
   !_________________________________________________________________
 
-  subroutine ptc_twiss(tab_name)
+  subroutine ptc_twiss(tab_name,summary_tab_name)
     implicit none
     include 'twissa.fi'
     logical(lp)             :: closed_orbit,beta_flg
@@ -282,6 +282,7 @@ contains
     character(200)          :: whymsg
     integer                 :: ioptfun,iii,restart_sequ,advance_node,mf1,mf2
     integer                 :: tab_name(*)
+    integer                 :: summary_tab_name(*)
     real(dp)                :: x(6)
     real(dp)                :: deltap0,deltap,d_val
     real(kind(1d0))         :: get_value,get_beam_value,suml
@@ -296,7 +297,7 @@ contains
     integer                 :: row
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform
-
+    character*48           :: summary_table_name
     skipnormalform = my_false
 
     !all zeroing
@@ -311,8 +312,12 @@ contains
     
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
+    summary_table_name = charconv(summary_tab_name)
 
-    if (getdebug() > 1) print*,"ptc_twiss: Table name is ",table_name
+    if (getdebug() > 1) then
+       print*,"ptc_twiss: Table name is ",table_name
+       print*,"ptc_twiss: Summary table name is", summary_table_name
+    endif
 
     if(universe.le.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -1544,11 +1549,20 @@ if (.not. slice_magnets) then
 
       call kill(oneTurnMap)
 
-      write(6,*)
-      write(6,*) "Momentum compaction (momentum compaction factor & phase-slip factor):"
-      write(6,*) "alpha=", alpha_c, "eta=", eta_c
-      write(6,*) "fractional tunes=", fractionalTunes
-      write(6,*) "chromaticities=", chromaticities
+      !write(6,*)
+      !write(6,*) "Momentum compaction (momentum compaction factor & phase-slip factor):"
+      !write(6,*) "alpha=", alpha_c, "eta=", eta_c
+      !write(6,*) "fractional tunes=", fractionalTunes
+      !write(6,*) "chromaticities=", chromaticities
+
+      ! write the data into the ptc_twiss_summary table
+      call double_to_table( summary_table_name, 'alpha_c ', alpha_c ) ! momemtum compaction factor
+      call double_to_table( summary_table_name, 'eta_c', eta_c ) ! associated phase-slip factor
+      call double_to_table( summary_table_name, 'tune_x', fractionalTunes(1))
+      call double_to_table( summary_table_name, 'tune_y', fractionalTunes(2))
+      call double_to_table( summary_table_name, 'chrom_x', chromaticities(1))
+      call double_to_table( summary_table_name, 'chrom_y', chromaticities(2))
+      call augment_count( summary_table_name ); ! only one row actually...
 
     end subroutine MomentumCompactionAndOneTurnParameters
 
@@ -1654,10 +1668,10 @@ if (.not. slice_magnets) then
          call puttwisstable() ! writes the resulting tw above to an internal table
 
          if (associated(nodePtr,fibrePtr%t1)) then
-            write(24,*) thinLensPos, "located at the beginning of the element"
+            write(24,*) s, thinLensPos, "located at the beginning of ", fibrePtr%mag%name
          endif
          if (associated(nodePtr,fibrePtr%tm)) then
-            write(24,*) thinLensPos, "located at the middle of the element"
+            write(24,*) s, thinLensPos, "located at the middle of ", fibrePtr%mag%name
             ! if option is to evaluate Twiss parameters at the middle, then invoke computation her
          endif
          ! Note: sometime looks like beginning is immediately followed by the middle
@@ -1665,7 +1679,7 @@ if (.not. slice_magnets) then
          nodePtr => nodePtr%next
 
         if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
-           write(24,*) thinLensPos, "located at the end of the element"
+           write(24,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
             fibrePtr => fibrePtr%next
             ! indicate the complete_twiss_table code in madxn.c that we moved to the next element
             ! so that the element name on the far left displays correctly

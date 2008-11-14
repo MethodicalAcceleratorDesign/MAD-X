@@ -281,6 +281,15 @@ char* twiss_table_cols[] =
   " "  /* blank terminates */
 };
 
+int ptc_twiss_summary_table_types[] =
+  {
+    2, 2, 2, 2, 2, 2
+  };
+char* ptc_twiss_summary_table_cols[] = {
+  "alpha_c", "eta_c", "tune_x", "tune_y", "chrom_x", "chrom_y",
+  " " /* blank terminates */
+};
+
 int ibs_table_types[] =
 {
   3, 2, 2, 2, 2, 2

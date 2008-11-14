@@ -929,7 +929,7 @@ void w_ptc_export_xml(int * filename);
 void w_ptc_move_to_layout();
 void w_ptc_input();
 void w_ptc_align();
-void w_ptc_twiss();
+void w_ptc_twiss(int * twiss_table, int * summary_table);
 void w_ptc_normal();
 void w_ptc_track();
 void w_ptc_start();
@@ -1277,6 +1277,7 @@ struct table* summ_table;         /* current twiss summary table */
 struct table* twiss_table;        /* current twiss table */
 struct table* twiss_table_beam1;  /* current twiss table beam1 */
 struct table* twiss_table_beam2;  /* current twiss table beam2 */
+struct table* ptc_twiss_summary_table; /* holds summary data after one turn */
 struct table* map_table;          /* added for twiss_input_table */
 struct table_list* table_register;/* added by kzhang 26/06/2005 */
 struct table_list* moments_tables = 0x0;/* skowron - tables for moments */
@@ -1355,8 +1356,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.51";
-char code_mod_date[] = "Code Modification Date: 07.11.2008";
+char myversion[] = "MAD-X 3.04.52";
+char code_mod_date[] = "Code Modification Date: 14.11.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
