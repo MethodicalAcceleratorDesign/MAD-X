@@ -571,7 +571,7 @@ if (.not. slice_magnets) then
        call TrackAlongSuccessiveMagnetInnerSlices() ! for time-being, instead of the above
     endif
 
-    if ( computeOneTurnParametersToggle .eqv. .true. ) then
+    if ( computeOneTurnParametersToggle .eqv. .true.  .and. (getenforce6D() .eqv. .false.)) then
        ! only makes sense if the lattice is a ring (skipped for a line lattice)
        ! problem: seems we enter here even in the case of a line lattice!!!
        call MomentumCompactionAndOneTurnParameters() 
