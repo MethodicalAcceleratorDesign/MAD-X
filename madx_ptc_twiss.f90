@@ -76,7 +76,7 @@ module madx_ptc_twiss_module
        0,0,0,0,0,1 /), &
        (/6,6/) )
 
-  logical :: slice_magnets, computeOneTurnParametersToggle
+  logical :: slice_magnets, momentumCompactionToggle
   
 
   !============================================================================================
@@ -568,13 +568,13 @@ if (.not. slice_magnets) then
 100 continue
 
     else ! choice is to track along successive inner slices of the magnets
-       call TrackAlongSuccessiveMagnetInnerSlices() ! for time-being, instead of the above
+       call TrackAlongInnerSlices() ! for time-being, instead of the above
     endif
 
-    if ( computeOneTurnParametersToggle .eqv. .true.  .and. (getenforce6D() .eqv. .false.)) then
+    if ( momentumCompactionToggle .eqv. .true.  .and. (getenforce6D() .eqv. .false.)) then
        ! only makes sense if the lattice is a ring (skipped for a line lattice)
        ! problem: seems we enter here even in the case of a line lattice!!!
-       call MomentumCompactionAndOneTurnParameters() 
+       call MomentumCompaction() 
     endif
 
     if (getdebug() > 1) then
@@ -641,7 +641,7 @@ if (.not. slice_magnets) then
       mascr = get_value('ptc_twiss ','initial_ascript_manual ')
       mdistr = get_value('ptc_twiss ','initial_moments_manual ')
 
-      computeOneTurnParametersToggle = .false. ! default. will be set to true in the case the map
+      momentumCompactionToggle = .false. ! set to true in the case the map
       ! is calculated over a ring, about the closed orbit. Later-on in the same subroutine.
 
 
@@ -731,7 +731,7 @@ if (.not. slice_magnets) then
             print*,"Initializing map from one turn map"
          endif
 
-         computeOneTurnParametersToggle = .true. ! will compute momemtum compaction factor, tunes, chromaticies for ring
+         momentumCompactionToggle = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
 
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -1414,7 +1414,7 @@ if (.not. slice_magnets) then
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
 
-    subroutine MomentumCompactionAndOneTurnParameters()
+    subroutine MomentumCompaction()
 
       implicit none
       type(fibre), pointer :: fibrePtr
@@ -1564,10 +1564,10 @@ if (.not. slice_magnets) then
       call double_to_table( summary_table_name, 'chrom_y', chromaticities(2))
       call augment_count( summary_table_name ); ! only one row actually...
 
-    end subroutine MomentumCompactionAndOneTurnParameters
+    end subroutine MomentumCompaction
 
 
-    subroutine TrackAlongSuccessiveMagnetInnerSlices()
+    subroutine TrackAlongInnerSlices()
 
       ! the ptc_twiss call shall feature an additional flag to decide
       ! whether or not one evaluate the Twiss functions inside the elements
@@ -1691,11 +1691,11 @@ if (.not. slice_magnets) then
       call kill(theTransferMap)
       call kill(theAscript)
 
-    end subroutine TrackAlongSuccessiveMagnetInnerSlices
+    end subroutine TrackAlongInnerSlices
 
-    subroutine TrackAlongSuccessiveMagnets()
+    subroutine TrackAlongMagnets()
       ! should cut/paste the tracking part of the ptctwiss main subroutine
-    end subroutine TrackAlongSuccessiveMagnets
+    end subroutine TrackAlongMagnets
 
 
   END subroutine ptc_twiss
