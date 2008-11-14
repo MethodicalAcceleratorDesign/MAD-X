@@ -430,9 +430,16 @@ void complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {
-      val = mult_par(twiss_table_cols[j], c_node->p_elem);
-      if (strstr(twiss_table_cols[j], "k0")) val *= c_node->dipole_bv;
-      else val *= c_node->other_bv;
+      if(j<59)
+      {
+        val = mult_par(twiss_table_cols[j], c_node->p_elem);
+        if (strstr(twiss_table_cols[j], "k0")) val *= c_node->dipole_bv;
+        else val *= c_node->other_bv;
+      }
+      else
+      {
+        val = el_par_value(tmp, c_node->p_elem);
+      }
     }
     else
     {
