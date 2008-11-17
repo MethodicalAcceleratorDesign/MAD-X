@@ -712,7 +712,7 @@
       logical fsec,ftrk,m66sta,pflag
       integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on
       parameter(itmax=20)
-      double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,err,&
+      double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,    &
      &orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
      &zero,one,get_variable
       parameter(zero=0d0,one=1d0)
@@ -733,9 +733,7 @@
 !---- Message and convergence test.
         if (pflag)  then
           print *, ' '
-          print '(''open line - error: '',1p,e14.6,'' deltap: ''        &
-     &,                                                                 &
-     &1p,e14.6)',err,deltap
+          print '(''open line - error with deltap: '',1p,e14.6)',deltap
           print '(''end values: '', 1p,6e14.6)', orbit
         endif
 
