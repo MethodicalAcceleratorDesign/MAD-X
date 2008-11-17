@@ -81,7 +81,6 @@
       sinmuy=zero
       xix=zero
       xiy =zero
-
 !---- Track chromatic functions
       chrom=get_option('twiss_chrom ')
 
@@ -102,29 +101,31 @@
       inval=get_option('twiss_inval ')
 
 !---- Initial values from command attributes.
-!      if (inval.ne.0) then
+      if (inval.ne.0) then
 
+!initialize user values
+        call twinifun(opt_fun0, rt)
 !---- Get transfer matrix.
-!        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
-!        if(eflag.ne.0) go to 900
+        call tmpart(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
+        if(eflag.ne.0) go to 900
 !---- Initial values from periodic solution.
-!      else
-      if (inval.eq.0) then
+      else
+       if (inval.eq.0) then
         call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
         if(eflag.ne.0) go to 900
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
         if(eflag.ne.0) go to 900
         call twcpin(rt,disp0,r0mat,eflag)
         if(eflag.ne.0) go to 900
-      endif
-      if (sectormap)  then
+       endif
+       if (sectormap)  then
         call dcopy(orbit0, sorb, 6)
         call m66one(srmat)
         call dzero(stmat, 216)
-      endif
-
+       endif
 !---- Initialize opt_fun0
       call twinifun(opt_fun0,rt)
+      endif
 
 !---- Build table of lattice functions, coupled.
       call twcpgo(rt)
@@ -324,7 +325,7 @@
           i = 5
           call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
           i = 5
-          call vector_to_table(table_name, 'bmax ', i, opt_fun(70))
+          call vector_to_table(table_name, 'kmax ', i, opt_fun(70))
           if(rmatrix) then
             i = 36
             call vector_to_table(table_name, 're11 ', i, opt_fun(34))
@@ -689,6 +690,57 @@
       endif
       bbd_flag=0
  999  end
+
+      subroutine tmpart(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
+
+
+      implicit none
+
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   Find transfer matrix (+ tensor) for an open line                   *
+! Input:                                                               *
+!   guess(6)     (double)  first guess for orbit start                 *
+!   fsec         (logical) if true, return second order terms.         *
+!   ftrk         (logical) if true, track orbit.                       *
+! Output:                                                              *
+!   guess(6)     (double)  final orbit                                 *
+!   rt(6,6)      (double)  transfer matrix.                            *
+!   tt(6,6,6)    (double)  second order terms.                         *
+!   eflag        (integer) error flag (0: OK, else != 0)               *
+!----------------------------------------------------------------------*
+      logical fsec,ftrk,m66sta,pflag
+      integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on
+      parameter(itmax=20)
+      double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,err,&
+     &orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
+     &zero,one,get_variable
+      parameter(zero=0d0,one=1d0)
+      equivalence(a(1,1),b(1,1),as(1,1),bs(1,1))
+
+!---- Initialize.
+      thr_on = get_option('threader ')
+      pflag = get_option('twiss_print ') .ne. 0
+      deltap = get_value('probe ','deltap ')
+      cotol = get_variable('twiss_tol ')
+      eflag = 0
+!---- Initialize guess.
+      call dcopy(guess,orbit0,6)
+!---- Track orbit and transfer matrix.
+        call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
+        if (eflag.ne.0)  return
+
+!---- Message and convergence test.
+        if (pflag)  then
+          print *, ' '
+          print '(''open line - error: '',1p,e14.6,'' deltap: ''        &
+     &,                                                                 &
+     &1p,e14.6)',err,deltap
+          print '(''end values: '', 1p,6e14.6)', orbit
+        endif
+
+ 999  end
+
       subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
       implicit none
 
@@ -784,7 +836,7 @@
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissc.fi'
-      integer eflag,stabx,staby
+      integer eflag,stabx,staby,inval,get_option
       double precision rt(6,6),disp0(6),r0mat(2,2),a(2,2),arg,aux(2,2), &
      &d(2,2),den,det,dtr,sinmu2,betx0,alfx0,amux0,bety0,alfy0,amuy0,    &
      &deltap,get_value,eps,zero,one,two,fourth
@@ -795,7 +847,12 @@
       deltap = get_value('probe ','deltap ')
 
 !---- Initial dispersion.
-      call twdisp(rt,rt(1,6),disp0)
+      inval=get_option('twiss_inval ')
+      if (inval .eq. 0) then
+       call twdisp(rt,rt(1,6),disp0)
+      else
+       call dcopy(opt_fun0(25), disp0, 4)
+      endif
       disp0(5) = zero
       disp0(6) = one
 
@@ -1040,8 +1097,8 @@
       el = node_value('l ')
       bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
-      opt_fun(70) = node_value('bmax ')
-      opt_fun(71) = node_value('bmin ')
+      opt_fun(70) = node_value('kmax ')
+      opt_fun(71) = node_value('kmin ')
       opt_fun(72) = node_value('calib ')
       opt_fun(73) = node_value('polarity ')
       n_align = node_al_errors(al_errors)
@@ -1307,7 +1364,7 @@
       include 'twiss0.fi'
       include 'twissc.fi'
       logical stabx,staby
-      integer i,k,j
+      integer i,k,j,inval,get_option
       double precision rt(6,6),tt(6,6,6),disp0(6),ddisp0(6),rtp(6,6),   &
      &sinmu2,bx,ax,by,ay,eps,temp,aux(6),zero,one,two,fourth,           &
      &get_variable,twopi
@@ -1328,8 +1385,14 @@
       phiy   =opt_fun0(23)
       dmuy   =opt_fun0(24)
 
+!---- Initial value flag.
+      inval=get_option('twiss_inval ')
 !---- Initial dispersion.
-      call twdisp(rt,rt(1,6),disp0)
+      if (inval .eq. 0) then
+        call twdisp(rt,rt(1,6),disp0)
+      else
+        call dcopy(opt_fun0(15),disp0,4)
+      endif
       disp0(5) = zero
       disp0(6) = one
 
@@ -1347,7 +1410,11 @@
       enddo
 
 !---- Derivative of dispersion.
-      call twdisp(rt,aux,ddisp0)
+      if (inval .eq. 0)  then
+        call twdisp(rt,aux,ddisp0)
+      else
+        call dcopy(opt_fun0(25),disp0,4)
+      endif
       ddisp0(5) = zero
       ddisp0(6) = zero
 
