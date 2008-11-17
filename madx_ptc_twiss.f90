@@ -285,7 +285,7 @@ contains
     integer                 :: summary_tab_name(*)
     real(dp)                :: x(6)
     real(dp)                :: deltap0,deltap,d_val
-    real(kind(1d0))         :: get_value,get_beam_value,suml
+    real(kind(1d0))         :: get_value,suml
     integer                 :: geterrorflag !C function that returns errorflag value
     type(real_8)            :: y(6), transfermap(6)
     type(twiss)             :: tw
