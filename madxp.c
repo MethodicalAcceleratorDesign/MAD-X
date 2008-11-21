@@ -4262,12 +4262,12 @@ void scan_in_cmd(struct in_cmd* cmd)
       {
         if ((k = name_list_pos(alias(cmd->tok_list->p[i]),
                                cmd->cmd_def->par_names)) < 0)
-          warning("illegal keyword:", cmd->tok_list->p[i]);
+          fatal_error("illegal keyword:", cmd->tok_list->p[i]);
         break;
       }
       else if ((i = decode_par(cmd, i, n, k, log)) < 0)
       {
-        warning("illegal format near:", cmd->tok_list->p[-i]);
+        fatal_error("illegal format near:", cmd->tok_list->p[-i]);
         break;
       }
       cmd->clone->par_names->inform[k] = ++cnt; /* mark parameter as read */
