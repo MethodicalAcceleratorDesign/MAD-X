@@ -547,8 +547,11 @@ CONTAINS
                 write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
                 write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
                 write(6,*) " with the exit face."
-                write(6,*) " CHANGE YOUR LATTICE FILE."
-                stop 666
+                write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
+                write(6,*) " Make sure that this is what you want!!! "
+!                write(6,*) " CHANGE YOUR LATTICE FILRE."
+!                stop 666
+                key%list%t2=zero
              endif
           else
              key%magnet="WEDGRBEND"
