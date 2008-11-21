@@ -306,10 +306,10 @@ contains
     do i=1,6
        unimap(i) = zero
     enddo
-    
+
     if (getdebug() > 1) print*,"ptc_twiss"
     call momfirstinit()
-    
+
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
     summary_table_name = charconv(summary_tab_name)
@@ -490,91 +490,102 @@ contains
        nullify(maps) !assurance
     endif
 
-slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
+    slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
 
-if (.not. slice_magnets) then
+    if (.not. slice_magnets) then
 
-   ! choice is to go one element after the other, instead of through the magnets' inner slices
-   ! option is either absent or set to 'elements'
-   
-    do i=1,MY_RING%n
+       ! choice is to go one element after the other, instead of through the magnets' inner slices
+       ! option is either absent or set to 'elements'
 
-       if (getdebug() > 1) then
-          write(6,*) "##########################################"
-          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-          write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
-          write(6,'(a, f12.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
-          !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
-       endif
+       do i=1,MY_RING%n
 
-       if (nda > 0) then
-          !         if (getnknobis() > 0) c_%knob = my_true
-          !print*, "parametric",i,c_%knob
-          call track(my_ring,y,i,i+1,+default)
-          if (getnpushes() > 0) then
-             call track(my_ring,transfermap,i,i+1,+default)
+          if (getdebug() > 1) then
+             write(6,*) "##########################################"
+             write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
+             write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
+             write(6,'(a, f12.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
+             !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
           endif
-       else
-          call track(my_ring,y,i,i+1, default)
-          if (getnpushes() > 0) then
-             call track(my_ring,transfermap,i,i+1,default)
+
+          if (nda > 0) then
+             !         if (getnknobis() > 0) c_%knob = my_true
+             !print*, "parametric",i,c_%knob
+             call track(my_ring,y,i,i+1,+default)
+             if (getnpushes() > 0) then
+                call track(my_ring,transfermap,i,i+1,+default)
+             endif
+          else
+             call track(my_ring,y,i,i+1, default)
+             if (getnpushes() > 0) then
+                call track(my_ring,transfermap,i,i+1,default)
+             endif
           endif
-       endif
-       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_twiss: ','DA got unstable')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable ");
-          if (getdebug() > 2) close(mf1)
-          return
-       endif
+          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+             call fort_warn('ptc_twiss: ','DA got unstable')
+             call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+             if (getdebug() > 2) close(mf1)
+             return
+          endif
 
-       call PRODUCE_APERTURE_FLAG(flag_index)
-       if(flag_index/=0) then
-          call ANALYSE_APERTURE_FLAG(flag_index,why)
-          Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
-          write(whymsg,*) 'APERTURE error: ',why
-          call fort_warn('ptc_twiss: ',whymsg)
-          call seterrorflag(10,"ptc_twiss: ",whymsg);
-          !          Write(6,*) why ! See produce aperture flag routine in sd_frame
-          goto 100
-       endif
+          call PRODUCE_APERTURE_FLAG(flag_index)
+          if(flag_index/=0) then
+             call ANALYSE_APERTURE_FLAG(flag_index,why)
+             Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
+             write(whymsg,*) 'APERTURE error: ',why
+             call fort_warn('ptc_twiss: ',whymsg)
+             call seterrorflag(10,"ptc_twiss: ",whymsg);
+             !          Write(6,*) why ! See produce aperture flag routine in sd_frame
+             goto 100
+          endif
 
-       if (getdebug() > 2) then
-          write(mf1,*) "##########################################"
-          write(mf1,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
-          call print(y,mf1)
-       endif
+          if (getdebug() > 2) then
+             write(mf1,*) "##########################################"
+             write(mf1,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
+             call print(y,mf1)
+          endif
 
-       suml=suml+current%MAG%P%ld
+          suml=suml+current%MAG%P%ld
 
-       if (savemaps) then
-          do ii=1,6
-             maps(i)%unimap(ii) = y(ii)
-          enddo
-          maps(i)%s = suml
-          maps(i)%name = current%mag%name
-       endif
+          if (savemaps) then
+             do ii=1,6
+                maps(i)%unimap(ii) = y(ii)
+             enddo
+             maps(i)%s = suml
+             maps(i)%name = current%mag%name
+          endif
 
-       tw=y
-       if (getnpushes() > 0) then
-          call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
-       endif
+          tw=y
+          if (getnpushes() > 0) then
+             call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
+          endif
 
 
-       call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
+          call puttwisstable() ! must be the last since it has tendency for augmenting all tables count
 
-       iii=advance_node()
-       current=>current%next
-    enddo
-100 continue
+          iii=advance_node()
+          current=>current%next
+       enddo
+100    continue
 
     else ! choice is to track along successive inner slices of the magnets
        call TrackAlongInnerSlices() ! for time-being, instead of the above
     endif
 
-    if ( momentumCompactionToggle .eqv. .true.  .and. (getenforce6D() .eqv. .false.)) then
+
+    ! relocated the following here to avoid side-effect
+    print77=.false.
+    read77=.false.
+
+    call kanalnummer(mf2)
+    open(unit=mf2,file='end.map')
+    call print(y,mf2)
+    close(mf2)
+    ! relocated here to avoid side-effect
+
+
+    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
        ! only makes sense if the lattice is a ring (skipped for a line lattice)
-       ! problem: seems we enter here even in the case of a line lattice!!!
-       call MomentumCompaction() 
+       call MomentumCompaction()
     endif
 
     if (getdebug() > 1) then
@@ -585,14 +596,6 @@ if (.not. slice_magnets) then
        write(6,*) "##########################################"
        !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
     endif
-
-    print77=.false.
-    read77=.false.
-
-    call kanalnummer(mf2)
-    open(unit=mf2,file='end.map')
-    call print(y,mf2)
-    close(mf2)
 
     c_%watch_user=.false.
 
@@ -1455,7 +1458,7 @@ if (.not. slice_magnets) then
       ! (beta=v/c, gamma=E/mc^2 and gamma=1/sqrt(1-beta^2))
       betaRelativistic = get_value('probe','beta');
       gammaRelativistic = get_value('probe','gamma');
-            
+
       ! 3. need the one-turn map's coefficients to reproduce twiss.F formulas for momentum compaction
 
       state(:)=zero
@@ -1472,7 +1475,7 @@ if (.not. slice_magnets) then
          write(21,*) "Closed orbit state=", state(1:6)
       endif
 
-      
+
       ! need at least order 2 to get the chromaticities
       ! with an explicit call to init_default
       ! if we hadn't ned the chromaticities we could have simply discarded the following snippe
@@ -1521,7 +1524,7 @@ if (.not. slice_magnets) then
       do i=1,4
          sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i) !???
       enddo
-      
+
       eta_c = -sd * betaRelativistic**2 / suml
       alpha_c = one / gammaRelativistic**2 + eta_c
 
@@ -1569,7 +1572,7 @@ if (.not. slice_magnets) then
 
     subroutine TrackAlongInnerSlices()
 
-      ! the ptc_twiss call shall feature an additional flag to decide
+      ! the ptc_twiss shall feature an additional flag to decide
       ! whether or not one evaluate the Twiss functions inside the elements
       ! or solely at the middle.
 
@@ -1606,31 +1609,39 @@ if (.not. slice_magnets) then
       theAscript = state + theNormalForm%A_t ! linear part of the normal form
 
       call kill(theNormalForm) ! theAscript only is of interest from now on...
-  
+
       ! my_ring%nthin does return 0, instead of the actual value, which we can get from my_ring%t%n
-    
-      fibrePtr => my_ring%start ! uncomment this line and we get a program crash
+
+      fibrePtr => my_ring%start
       initialThinLensPos = fibrePtr%t1%pos ! t1 points to the first integration node
       nodePtr => fibrePtr%t1 ! t1 points to the first integration node
-      
+
       do thinLensPos = initialThinLensPos, my_ring%t%n+initialThinLensPos-1 
          ! "t" is the child thin-lens layout according to "type layout" definition
-        
-         ! Is it the correct way to get the curvilign abciss?
-         s = nodePtr%s(3) ! to be checked: why is nodePtr%s a vector?
-         ! %s(1) increases step-wise, as with the magnet's length
-         ! %s(2) ramps up within a magnet and resets to zero right after the start (saw)
-         ! %s(3) seems to be equal to s(1)+s(2), i.e. equal to s along the sliced ring, which is what we need
 
+         s = nodePtr%next%s(3) ! s(1) is the total arc-length, s(3) the total integration-distance
+         ! From Etienne:
+         ! nodePtr%s(1) is the total arc length (LD)
+         ! nodePtr%s(3) is the total integration distance.... ( LC)  LC=LD unless exact=true and true rbends are present.
+         ! nodePtr%s(4) is the local LC. 
+         ! nodePtr%s(5) is the local LD. 
+
+
+         ! in  a closed-ring, s evaluates to zero when we reach my_ring%t%n+initialThinLensPos -1
+         ! let's omit such final value in case of a closed-ring
+         if ((s .eq. 0d0) .and. (thinLensPos .eq. (my_ring%t%n+initialThinLensPos-1))) then
+            s = nodePtr%s(3) + nodePtr%next%s(5) ! s of previous node + local offset
+         endif
+       
+         ! following part is cut/pasted from the equivalent reference
+         ! code that successively evaluates Twiss at elements' ends
          if (knobsNumber > 0) then
-            ! to be completed later-on
-            ! call track ...
-              call track_probe_x(my_ring,theAscript,+default, & ! +default in case of extra parameters !?
+            call track_probe_x(my_ring,theAscript,+default, & ! +default in case of extra parameters !?
                  & node1=thinLensPos,node2=thinLensPos+1)
-              if (getnpushes() > 0) then ! try to understand this part later-on
-                 call track_probe_x(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
-                      & node1=thinLensPos,node2=thinLensPos+1)
-              endif
+            if (getnpushes() > 0) then ! try to understand this part later-on
+               call track_probe_x(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
+                    & node1=thinLensPos,node2=thinLensPos+1)
+            endif
          else
             ! do we really need track_probe_x, or simply track to go along inner slices?
             call track_probe_x(my_ring,theAscript,default, &
@@ -1647,17 +1658,23 @@ if (.not. slice_magnets) then
             call seterrorflag(10,"ptc_twiss","DA got unstable during tracking through the thin-lens slices")
             return ! try to continue to the next thin-lens position
          endif
-            
 
+         ! following part is cut/pasted from the equivalent reference
+         ! code that successively evaluates Twiss at elements' ends
          call produce_aperture_flag(flag_index)
          if (flag_index/=0) then
-            ! to be completed later-on
+            call analyse_aperture_flag(flag_index, why)
+            write(6,*) "ptc_twiss unstable (Twiss inside magnets) element:",fibrePtr%mag%name,"-program continues"
+            write(whymsg,*) 'APERTURE error:',why
+            call fort_warn('ptc_twiss:', whymsg)
+            call seterrorflag(10,"ptc_twiss:", whymsg)
+            goto 200 ! skip loop altogether
          endif
 
          tw = theAscript ! set the twiss parameters, with y being equal to the A_ phase advance
 
          ! update some semi-global values before invoking puttwisstable!!!
-         current => fibrePtr ! current is defined outside the scope of this subroutine and required by puttwisstable!!!
+         current => fibrePtr ! current defined outside this subroutine and required by puttwisstable!!!
          suml = s ! another global!!! to be updated later-on with the actual s within the magnet
          ! suml is used internally to puttwisstable to save the curvilign abciss...
 
@@ -1665,21 +1682,23 @@ if (.not. slice_magnets) then
             ! presently, do not enter here anyway
             call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap) ! what is this for ???
          endif
+
          call puttwisstable() ! writes the resulting tw above to an internal table
+
 
          if (associated(nodePtr,fibrePtr%t1)) then
             write(24,*) s, thinLensPos, "located at the beginning of ", fibrePtr%mag%name
          endif
          if (associated(nodePtr,fibrePtr%tm)) then
             write(24,*) s, thinLensPos, "located at the middle of ", fibrePtr%mag%name
-            ! if option is to evaluate Twiss parameters at the middle, then invoke computation her
+            ! if option is to evaluate Twiss parameters at the middle, then invoke computation here
          endif
          ! Note: sometime looks like beginning is immediately followed by the middle
 
          nodePtr => nodePtr%next
 
-        if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
-           write(24,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
+         if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
+            write(24,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
             fibrePtr => fibrePtr%next
             ! indicate the complete_twiss_table code in madxn.c that we moved to the next element
             ! so that the element name on the far left displays correctly
@@ -1687,6 +1706,8 @@ if (.not. slice_magnets) then
          endif
 
       enddo ! for the successive slices / thin-lenses in the magnets' sequence
+
+200   continue
 
       call kill(theTransferMap)
       call kill(theAscript)
