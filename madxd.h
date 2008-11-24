@@ -36,6 +36,7 @@
 #define get_string            get_string_
 #define get_title             get_title_
 #define get_variable          get_variable_
+#define get_varstring         get_varstring_
 #define get_vector            get_vector_
 #define get_beam_value        get_beam_value_
 #define get_value             get_value_
@@ -67,6 +68,7 @@
 #define set_option            set_option_
 #define set_value             set_value_
 #define set_variable          set_variable_
+#define set_stringvar         set_stringvar_
 #define spec_node_value       spec_node_value_
 #define store_node_value      store_node_value_
 #define store_node_vector     store_node_vector_
@@ -183,6 +185,7 @@
 #define get_string            GET_STRING
 #define get_title             GET_TITLE
 #define get_variable          GET_VARIABLE
+#define get_varstring         GET_VARSTRING
 #define get_vector            GET_VECTOR
 #define get_beam_value        GET_BEAM_VALUE
 #define get_value             GET_VALUE
@@ -213,6 +216,7 @@
 #define set_option            SET_OPTION
 #define set_value             SET_VALUE
 #define set_variable          SET_VARIABLE
+#define set_stringvar         SET_STRINGVAR
 #define spec_node_value       SPEC_NODE_VALUE
 #define store_node_value      STORE_NODE_VALUE
 #define store_node_vector     STORE_NODE_VECTOR
@@ -391,6 +395,7 @@ void get_title(char*, int*);
 double get_value(char*, char*);
 double get_beam_value(char*, char*);
 double get_variable(char*);
+char* get_varstring(char*);
 int get_vector(char*, char*, double*);
 void get_version(char*, int*);
 double grndm();
@@ -418,6 +423,7 @@ int retreat_node();
 void sequence_name(char*, int*);
 void set_value(char*, char*, double*);
 void set_variable(char*, double*);
+void set_stringvar(char*, char*);
 double spec_node_value(char*, int*);
 void store_node_vector(char*, int*, double*);
 void string_to_table(char*, char*, char*);
@@ -1356,8 +1362,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.53";
-char code_mod_date[] = "Code Modification Date: 17.11.2008";
+char myversion[] = "MAD-X 3.04.54";
+char code_mod_date[] = "Code Modification Date: 21.11.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

@@ -391,7 +391,9 @@ void add_vars_to_table(struct table* t)
 
   for (i = t->org_cols; i < t->num_cols; i++)
   {
-    if (t->columns->inform[i] < 3)
+    if (t->columns->inform[i] == 3)
+      t->s_cols[i][t->curr] = get_varstring(t->columns->names[i]);
+    else if (t->columns->inform[i] < 3)
     {
       if (strstr(t->columns->names[i], "aper_"))
         t->d_cols[i][t->curr]
@@ -418,6 +420,10 @@ void set_vars_from_table(struct table* t)
     if (t->columns->inform[i] ==2)
     {
       set_variable(t->columns->names[i],&t->d_cols[i][t->curr]) ;
+    }
+    else if (t->columns->inform[i] ==3)
+    {
+      set_stringvar(t->columns->names[i],t->s_cols[i][t->curr]) ;
     }
   }
 }
@@ -467,6 +473,28 @@ void set_variable(char* name, double* value)
       set_command_par_value(par, cmd, val);
     else if ((cmd = find_command(comm, defined_commands)) != NULL)
       set_command_par_value(par, cmd, val);
+  }
+}
+
+void set_stringvar(char* name, char* string)
+{
+  /* sets variable name->string to string */
+  char comm[NAME_L];
+  char par[NAME_L];
+  char* p;
+  struct variable* var;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+    {
+      if (var->type == 3) var->string = string;
+    }
+    else
+    {
+      var = new_variable(c_dum->c, zero, 0, 3, NULL, string);
+      add_to_var_list(var, variable_list, 1);
+    }
   }
 }
 

@@ -2915,6 +2915,19 @@ double get_variable(char* name)
   return val;
 }
 
+char* get_varstring(char* name)
+{
+  struct variable* var;
+  char *p, *ret;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+      ret = var->string;
+  }
+  return ret;
+}
+
 double hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
   /* (for 'from' calculation:) returns the position of a node
      in the current or a sub-sequence (hence hidden) */

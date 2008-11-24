@@ -174,7 +174,6 @@ char command_def[] =
 " "
 "create: control none 0 0 "
 "table = [s, none], "
-"withname = [l, false, true], "
 "column   = [s,{none}]; "
 " "
 "delete: control none 0 0 "

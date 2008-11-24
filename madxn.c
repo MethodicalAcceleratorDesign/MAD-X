@@ -522,6 +522,26 @@ void double_to_table_row(char* table, char* name, int* row, double* val)
       && t->columns->inform[pos] < 3) t->d_cols[pos][*row-1] = *val;
 }
 
+void string_to_table_row(char* table, char* name, int* row, char* string)
+  /* puts string at current position in column with name "name".
+     The table count is increased separately with "augment_count" */
+{
+  int pos;
+  struct table* t;
+
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else return;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
+      && t->columns->inform[pos] == 3) 
+    {
+     mycpy(c_dum->c, string);
+     t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
+    }
+}
+
 int double_from_table(char* table, char* name, int* row, double* val)
   /* returns val at position row in column with name "name".
      function value return:
@@ -676,7 +696,6 @@ void exec_create_table(struct in_cmd* cmd)
   char** t_c;
   int j, pos = name_list_pos("table", nl);
   char* name = NULL;
-  char withname = 0; /*specify if table should have column "name" of strings*/
   int  ncols = 0;  /*number of columns*/
 
   if (nl->inform[pos] == 0)
@@ -702,49 +721,30 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
-
-  pos = name_list_pos("withname", nl);
-  printf("Value of withname %d\n",pos);
-  if (pl->parameters[pos] != 0x0)
-  {
-    if (pl->parameters[pos]->double_value != 0.0)
-    {
-      printf("We add <<name>> column\n");
-      withname = 1;
-      ncols = m->curr+1;
-    }
-    else
-    {
-      ncols = m->curr;
-    }
-  }
-
-
+  ncols = m->curr;
+  /* now make table */
   t_types = mymalloc(rout_name, ncols*sizeof(int));
   t_c = mymalloc(rout_name, (ncols+1)*sizeof(char*));
 
   for (j = 0; j < m->curr; j++)
   {
-    t_types[j] = 2; /* type double */
-    t_c[j] = permbuff(m->p[j]);
+    if (*m->p[j] == '_') 
+      {
+       t_types[j] = 3; /* type string */
+       t_c[j] = permbuff(&m->p[j][1]);
+      }
+    else  
+      {
+       t_types[j] = 2; /* type double */
+       t_c[j] = permbuff(m->p[j]);
+      }
   }
-
-  if (withname)
-  {
-    t_types[m->curr] = 3; /* type string */
-    t_c[m->curr] = permbuff("name");
-  }
-
   t_c[ncols] = blank;
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
   t->org_cols = 0;  /* all entries are "added" */
   add_to_table_list(t, table_register);
   myfree(rout_name, t_c); myfree(rout_name, t_types);
-
-  if (withname)
-  {
-    t->dynamic = 1;
-  }
+  t->dynamic = 1;
 }
 
 void exec_store_coguess(struct in_cmd* cmd)
@@ -1528,7 +1528,7 @@ void select_ptc_normal(struct in_cmd* cmd)
       if (min_order < min_req_order) min_order = min_req_order;
     }
   }
-  printf("The minimum required order is %d \n",min_order);
+  printf("The minimum required order is %d \n--------------------------------\n",min_order);
 }
 int select_ptc_idx()
 {
