@@ -1,5 +1,5 @@
 ! FS 15.03.2004: correcting warning printout
-      subroutine twiss(rt,disp0,tab_name)
+      subroutine twiss(rt,disp0,tab_name,sector_tab_name)
 
       implicit none
 !----------------------------------------------------------------------*
@@ -16,11 +16,12 @@
       integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
       double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
      &ddisp0(6),r0mat(2,2),zero,one,two,get_value
+      integer sector_tab_name(*) ! holds sectormap data
       parameter(zero=0d0,one=1d0,two=2d0)
       data izero, ione / 0, 1 /
-
 !---- Initialization
       table_name = charconv(tab_name)
+      sectorTableName = charconv(sector_tab_name)
       chrom=0
       summ=0
       eflag=0
@@ -1005,7 +1006,7 @@
 
       end
       subroutine twcpgo(rt)
-
+      
 
       implicit none
 !----------------------------------------------------------------------*
@@ -1027,7 +1028,6 @@
      &sd,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
-
 !---- Initialization
       amux=zero
       amuy=zero
@@ -5915,6 +5915,7 @@
 !----------------------------------------------------------------------*
       implicit none
       include 'twissotm.fi'
+      include 'twissa.fi'
       integer i, k, l
       double precision sum1, sum2, pos, orbit(6)
       double precision ek(6)
@@ -5933,8 +5934,15 @@
         ek(i) = sum2
       enddo
       call dcopy(orbit, sorb, 6)
+
+!--- jluc: note that twiss can be called through madxn.c's (1) pro_twiss or (2) pro_embedded_twiss
+!     In the first case, sectorTableName is set by the user or by default. In the second case,
+!     the parameter is meaningless and the following sector data storage should be skipped.
+!     To this end, we test whether the passed sectorTableName is equal to 'dummy'
+      if ( sectorTableName .ne. 'dummy') then
 !---- Output.
-      call sector_out(pos, ek, srmat, stmat)
+         call sector_out(sectorTableName, pos, ek, srmat, stmat)
+      endif ! else should ideally issue a warning albeit the condition is almost certainly true
 !      write (99, '(g20.6)') pos
 !      write (99, '(6e16.8)') ek
 !      write (99, '(6e16.8)') srmat

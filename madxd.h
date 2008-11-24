@@ -853,7 +853,7 @@ double rfc_slope();
 void save_beam(struct sequence*, FILE*);
 int scan_expr(int, char**);
 void scan_in_cmd(struct in_cmd*);
-void sector_out(double*, double*, double*, double*);
+void sector_out(char*, double*, double*, double*, double*); /*1st: sectortab*/
 void seq_cycle(struct in_cmd*);
 void seq_edit(struct in_cmd*);
 void seq_edit_ex(struct sequence*);
@@ -1283,6 +1283,7 @@ struct table* summ_table;         /* current twiss summary table */
 struct table* twiss_table;        /* current twiss table */
 struct table* twiss_table_beam1;  /* current twiss table beam1 */
 struct table* twiss_table_beam2;  /* current twiss table beam2 */
+struct table* twiss_sector_table; /* used for sectormap */
 struct table* ptc_twiss_summary_table; /* holds summary data after one turn */
 struct table* map_table;          /* added for twiss_input_table */
 struct table_list* table_register;/* added by kzhang 26/06/2005 */
@@ -1349,7 +1350,7 @@ FILE* debug_file;              /* for debug output */
 FILE* stamp_file;              /* for debug output */
 FILE* out_file;                /* for table output */
 FILE* prt_file;                /* for echo output */
-FILE* sec_file = NULL;         /* for sector output */
+FILE* sec_file = NULL;         /* for sector output in "embedded" twiss */
 FILE* tab_file;                /* for table input */
 
 /* Global simple variables by type */

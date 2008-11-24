@@ -2020,6 +2020,7 @@ char command_def[] =
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "centre   = [l, false, true], "
 "sectormap= [l, false, true], "
+"sectortable= [s, none, sectortable], "
 "sectorfile= [s, sectormap, sectormap], "
 "rmatrix  = [l, false, true], "
 "sequence = [s, none, sequence], "

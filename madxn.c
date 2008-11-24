@@ -198,7 +198,10 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     t = table_register->tables[pos];
-  else return;
+  else {
+    warning("Can not find table",table);
+    return;
+  }
 
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
 
@@ -483,8 +486,8 @@ void double_to_table(char* table, char* name, double* val)
   int pos;
   struct table* t;
 
-/*  printf("double_to_table <%s> <%s> <%f>\n",table,name,*val);*/
-
+  /*  printf("double_to_table <%s> <%s> <%f>\n",table,name,*val);*/
+  
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
   {
@@ -3105,6 +3108,7 @@ void out_table(char* tname, struct table* t, char* filename)
   /* output of a table */
 {
   int j;
+
   struct command_list* scl = find_command_list(tname, table_select);
   struct command_list* dscl = find_command_list(tname, table_deselect);
   while (t->num_cols > t->col_out->max)
@@ -3622,7 +3626,7 @@ void pro_ptc_twiss()
     table_name = "ptc_twiss";
   }
 
-  /* jluc: begin */
+  /* --- */
   /* do the same as above for the table holding summary data after one-turn */
   pos = name_list_pos("summary_table",nl);
   if (nl->inform[pos]){ /* summary-table's name specified */
@@ -3634,7 +3638,7 @@ void pro_ptc_twiss()
   else {
     summary_table_name = "ptc_twiss_summary";
   }
-  /* jluc: end */
+  /* --- */
 
   pos = name_list_pos("file", nl);
   if (nl->inform[pos])
@@ -3649,7 +3653,7 @@ void pro_ptc_twiss()
   }
   else w_file = 0;
 
-  /* jluc : begin */
+  /* --- */
   /* do the same as above for the file to hold the summary-table */
   pos = name_list_pos("summary_file",nl);
   if (nl->inform[pos]){
@@ -3695,7 +3699,7 @@ void pro_ptc_twiss()
   current_node = current_sequ->ex_start;
   /* w_ptc_twiss_(tarr->i); */
 
-  /* jluc: start */
+  /* --- */
   /* create additional table to hold summary data after one-turn */
   /* such as momentum compaction factor, tune and chromaticities */
   l = strlen(summary_table_name); /* reuse of l */
@@ -3707,7 +3711,7 @@ void pro_ptc_twiss()
 				       5); /* only one  row would be enough  */
   ptc_twiss_summary_table->dynamic = 1; /* actually static for time-being */
   add_to_table_list( ptc_twiss_summary_table, table_register );
-  /* jluc: end */
+  /* --- */
 
   w_ptc_twiss(tarr->i,summary_tarr->i);
 
@@ -3716,11 +3720,10 @@ void pro_ptc_twiss()
   fill_twiss_header_ptc(twiss_table,ptc_deltap);
   if (w_file) out_table(table_name, twiss_table, filename);
 
-  /* jluc: start */
-  /* fill... missing? */
+  /* --- */
   if (w_file_summary) out_table(summary_table_name, ptc_twiss_summary_table,
 				summary_filename);
-   /* jluc: end */
+   /* --- */
 
   /* cleanup */
   current_beam = keep_beam;
@@ -3729,9 +3732,9 @@ void pro_ptc_twiss()
   current_sequ->range_end = use_range[1];
   delete_int_array(tarr);
 
-  /* jluc: start */
+  /* --- */
   delete_int_array(summary_tarr);
-  /* jluc: end */
+  /* --- */
 
 }
 
@@ -3791,8 +3794,10 @@ void pro_twiss()
   struct name_list* nl;
   struct command_parameter_list* pl;
   struct int_array* tarr;
+  struct int_array* tarr_sector;
   struct node *nodes[2], *use_range[2];
   char *filename = NULL, *name, *table_name, *sector_name;
+  char *sector_table_name;
   double tol,tol_keep;
   int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k = 1, ks, w_file, beta_def;
   int keep_info = get_option("info");
@@ -3864,15 +3869,24 @@ void pro_twiss()
   if ((ks = get_value(current_command->name,"sectormap")) != 0)
   {
     set_option("twiss_sector", &k);
+    /* sector_table - start */
+    pos = name_list_pos("sectortable",nl);
+    if (nl->inform[pos]) {
+      if ((sector_table_name = pl->parameters[pos]->string) == NULL)
+	sector_table_name = pl->parameters[pos]->call_def->string;
+    }
+    else {
+      sector_table_name = pl->parameters[pos]->call_def->string;
+    }
+    /* sector_table - end */
     pos = name_list_pos("sectorfile", nl);
     if(nl->inform[pos])
     {
       if ((sector_name = pl->parameters[pos]->string) == NULL)
         sector_name = pl->parameters[pos]->call_def->string;
     }
-    else  sector_name = pl->parameters[pos]->call_def->string;
-    if ((sec_file = fopen(sector_name, "w")) == NULL)
-      fatal_error("cannot open output file:", sector_name);
+    else  sector_name = pl->parameters[pos]->call_def->string; /* filename for sector file */
+
   }
   use_range[0] = current_sequ->range_start;
   use_range[1] = current_sequ->range_end;
@@ -3979,11 +3993,24 @@ void pro_twiss()
   add_to_table_list(summ_table, table_register);
   l = strlen(table_name);
   tarr = new_int_array(l+1);
+  l = strlen(sector_table_name); /* reuse l! */
+  tarr_sector = new_int_array(l+1);
+  
   conv_char(table_name, tarr);
   if (get_option("twiss_sector"))
   {
     reset_sector(current_sequ, 0);
     set_sector();
+
+    /* now create the sector table */
+    conv_char(sector_table_name, tarr_sector);
+    /* following call generates a "memory access outside program range" */
+    twiss_sector_table = make_table(sector_table_name, "sectormap", 
+				    twiss_sector_table_cols,
+				    twiss_sector_table_types,
+				    1); /* start with one row at first */
+    twiss_sector_table->dynamic = 1; /* flag for access to current row */
+    add_to_table_list(twiss_sector_table, table_register);
   }
   if (get_option("useorbit"))
     copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
@@ -3994,6 +4021,7 @@ void pro_twiss()
       if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
     }
   }
+
   for (i = 0; i < twiss_deltas->curr; i++)
   {
     twiss_table = make_table(table_name, "twiss", twiss_table_cols,
@@ -4005,7 +4033,10 @@ void pro_twiss()
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
     current_node = current_sequ->ex_start;
-    twiss_(oneturnmat, disp0, tarr->i);
+
+    /* invoke twiss */
+    twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+
     if ((twiss_success = get_option("twiss_success")))
     {
       if (get_option("keeporbit"))  copy_double(orbit0,
@@ -4020,12 +4051,13 @@ void pro_twiss()
       warning("Twiss failed: ", "MAD-X continues");
     }
   }
-  if (sec_file)
-  {
-    fclose(sec_file); sec_file = NULL;
+  if (get_option("twiss_sector")){
+    out_table( sector_table_name, twiss_sector_table, sector_name );
   }
   tarr = delete_int_array(tarr);
+  tarr_sector = delete_int_array(tarr_sector);
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);
+
   /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);
@@ -4050,6 +4082,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
+  struct int_array* dummy_arr; /* for the new signature of the twiss() Fortran function*/
   struct table* twiss_tb;
   struct table* keep_table = NULL;
   char *filename = NULL, *name, *table_name, *sector_name;
@@ -4311,6 +4344,8 @@ void pro_embedded_twiss(struct command* current_global_twiss)
     l = strlen(table_embedded_name);
     tarr = new_int_array(l+1);
     conv_char(table_embedded_name, tarr);
+    dummy_arr = new_int_array(5+1);
+    conv_char("dummy",dummy_arr);
     if (get_option("twiss_sector"))
     {
       reset_sector(current_sequ, 0);
@@ -4349,7 +4384,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
       current_node = current_sequ->range_start;
       set_option("twiss_inval", &inval);
 
-      twiss_(oneturnmat, disp0, tarr->i);
+      twiss_(oneturnmat, disp0, tarr->i, dummy_arr->i); /* different call */
 
       if ((twiss_success = get_option("twiss_success")))
       {
@@ -4367,6 +4402,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
       fclose(sec_file); sec_file = NULL;
     }
     tarr = delete_int_array(tarr);
+    dummy_arr = delete_int_array(dummy_arr);
     if (twiss_success && get_option("twiss_print")) print_table(summ_table);
   }
   else warning("Embedded Twiss failed: ", "MAD-X continues");
@@ -5092,27 +5128,39 @@ double rfc_slope()
   return slope;
 }
 
-void sector_out(double* pos, double* kick, double* rmatrix, double* tmatrix)
-  /* writes a sector map to sec_file */
+void sector_out(char* sector_table_name, double* pos, double* kick, 
+		     double* rmatrix, double* tmatrix)
 {
   int i;
-  fprintf(sec_file, " %-20.6g   %s\n", *pos, current_node->p_elem->name);
-/*  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]);
-    for (i = 0; i < 6; i++) fprintf(sec_file, "%15.8e ", kick[i]); */
-  for (i = 0; i < 6; i++) fprintf(sec_file, v_format("%F"), kick[i]);
-  fprintf(sec_file,"\n");
-  for (i = 0; i < 36; i++)
-  {
-/*    fprintf(sec_file, "%15.8e ", rmatrix[i]); */
-    fprintf(sec_file, v_format("%F"), rmatrix[i]);
-    if ((i+1)%6 == 0)  fprintf(sec_file,"\n");
+
+  /* the name is not \0 finished and displays ugly in C */
+  /* but well, this is how table names are handled... */
+
+  char * elementName = current_node->p_elem->name;
+
+  string_to_table( sector_table_name, "name", elementName );
+  double_to_table( sector_table_name, "pos", pos );
+
+  /* 6 kicks */
+  for (i=0; i<6; i++){
+    char kickStr[2+1];
+    sprintf(kickStr,"k%i\0",i+1);
+    double_to_table( sector_table_name, kickStr,&kick[i]);
   }
-  for (i = 0; i < 216; i++)
-  {
-/*    fprintf(sec_file, "%15.8e ", tmatrix[i]); */
-    fprintf(sec_file, v_format("%F"), tmatrix[i]);
-    if ((i+1)%6 == 0)  fprintf(sec_file,"\n");
+  /* 36 R-matrix terms */
+  for (i=0; i<36; i++){
+    char rStr[3+1];
+    sprintf(rStr,"r%i\0",i+1);
+    double_to_table( sector_table_name, rStr,&rmatrix[i]);
   }
+  /* 216 T-matrix terms */
+  for (i=0; i<216; i++){
+    char tStr[4+1];
+    sprintf(tStr,"t%i\0",i+1);
+    double_to_table( sector_table_name, tStr,&tmatrix[i]);
+  }
+
+  augment_count( sector_table_name ); /* move to next record */
 }
 
 void seq_cycle(struct in_cmd* cmd)
