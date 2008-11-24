@@ -1507,7 +1507,7 @@ void select_ptc_normal(struct in_cmd* cmd)
       }
       else
       {
-        if(((strcmp(names[j], "dq1") == zero)|| (strcmp(names[j], "dq1") == zero)) && order[0] == zero) order[0]=one;
+        if(((strcmp(names[j], "dq1") == zero)|| (strcmp(names[j], "dq2") == zero)) && order[0] == zero) order[0]=one;
         string_to_table("normal_results", "name", names[j]);
         double_to_table("normal_results", "order1", &order[0]);
         double_to_table("normal_results", "order2", &order[1]);
@@ -1521,8 +1521,8 @@ void select_ptc_normal(struct in_cmd* cmd)
         else
         {
           min_req_order = order[0]+order[1]+order[2];
-          if (j >= 9) min_req_order += order[0]+order[1];
-          if (j >= 7) min_req_order += 1;
+          if (j >= 8) min_req_order += order[0]+order[1];
+          if (j >= 6) min_req_order += 1;
         }
       }
       if (min_order < min_req_order) min_order = min_req_order;
