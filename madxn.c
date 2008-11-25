@@ -3796,8 +3796,9 @@ void pro_twiss()
   struct int_array* tarr;
   struct int_array* tarr_sector;
   struct node *nodes[2], *use_range[2];
-  char *filename = NULL, *name, *table_name, *sector_name;
-  char *sector_table_name;
+  char *filename = NULL, *name, *table_name, *sector_name = NULL;
+  char *sector_table_name = "dummy"; /* second string required by twiss() */
+  /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep;
   int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k = 1, ks, w_file, beta_def;
   int keep_info = get_option("info");
@@ -3993,18 +3994,17 @@ void pro_twiss()
   add_to_table_list(summ_table, table_register);
   l = strlen(table_name);
   tarr = new_int_array(l+1);
-  l = strlen(sector_table_name); /* reuse l! */
-  tarr_sector = new_int_array(l+1);
-  
   conv_char(table_name, tarr);
+  /* now create the sector table */
+  l = strlen(sector_table_name);
+  tarr_sector = new_int_array(l+1);
+  conv_char(sector_table_name, tarr_sector);  
+
   if (get_option("twiss_sector"))
   {
     reset_sector(current_sequ, 0);
     set_sector();
 
-    /* now create the sector table */
-    conv_char(sector_table_name, tarr_sector);
-    /* following call generates a "memory access outside program range" */
     twiss_sector_table = make_table(sector_table_name, "sectormap", 
 				    twiss_sector_table_cols,
 				    twiss_sector_table_types,
@@ -4054,8 +4054,10 @@ void pro_twiss()
   if (get_option("twiss_sector")){
     out_table( sector_table_name, twiss_sector_table, sector_name );
   }
+
   tarr = delete_int_array(tarr);
   tarr_sector = delete_int_array(tarr_sector);
+
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);
 
   /* cleanup */
@@ -5144,19 +5146,22 @@ void sector_out(char* sector_table_name, double* pos, double* kick,
   /* 6 kicks */
   for (i=0; i<6; i++){
     char kickStr[2+1];
-    sprintf(kickStr,"k%i\0",i+1);
+    sprintf(kickStr,"k%i",i+1);
+    kickStr[2]='\0';
     double_to_table( sector_table_name, kickStr,&kick[i]);
   }
   /* 36 R-matrix terms */
   for (i=0; i<36; i++){
     char rStr[3+1];
-    sprintf(rStr,"r%i\0",i+1);
+    sprintf(rStr,"r%i",i+1);
+    rStr[3]='\0';
     double_to_table( sector_table_name, rStr,&rmatrix[i]);
   }
   /* 216 T-matrix terms */
   for (i=0; i<216; i++){
     char tStr[4+1];
-    sprintf(tStr,"t%i\0",i+1);
+    sprintf(tStr,"t%i",i+1);
+    tStr[4]='\0';
     double_to_table( sector_table_name, tStr,&tmatrix[i]);
   }
 

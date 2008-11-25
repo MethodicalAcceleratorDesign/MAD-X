@@ -360,7 +360,7 @@ extern void tmrefo_(int*,double*,double*,double*);
 extern void trrun_(int*,int*,double*,double*,int*,int*,
                    double*,double*,double*,double*,double*,double*,
                    double*,int*, int*, double*);
-extern void twiss_(double*, double*, int*);
+extern void twiss_(double*, double*, int*, int*);
 
 
 
