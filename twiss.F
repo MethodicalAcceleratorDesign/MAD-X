@@ -5942,7 +5942,7 @@
       if ( sectorTableName .ne. 'dummy') then
 !---- Output.
          call sector_out(sectorTableName, pos, ek, srmat, stmat)
-      endif ! else should ideally issue a warning albeit the condition is almost certainly true
+      endif ! else should issue a warning albeit the test must be true
 !      write (99, '(g20.6)') pos
 !      write (99, '(6e16.8)') ek
 !      write (99, '(6e16.8)') srmat
