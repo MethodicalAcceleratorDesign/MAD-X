@@ -1,5 +1,0 @@
-!--- Definition of common / e2save /
-!--- e2s initialised in routine pefill, used in routine peelma
-
-      double precision e2s
-      common /e2save/ e2s
