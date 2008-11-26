@@ -2919,6 +2919,7 @@ char* get_varstring(char* name)
 {
   struct variable* var;
   char *p, *ret;
+  ret = NULL;
   mycpy(c_dum->c, name);
   if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
   {
@@ -4869,6 +4870,7 @@ double table_value()
   int ntok, pos, col, row;
   char** toks;
   struct table* table;
+  char temp[NAME_L];
   if (current_variable != NULL && current_variable->string != NULL)
   {
     strcpy(c_dum->c, current_variable->string);
@@ -4890,11 +4892,17 @@ double table_value()
           else row = 0;
           val = table->d_cols[col][row];
         }
-        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1))
+        else if ((ntok == 3) 
+                 && ((col = name_list_pos(toks[1], table->columns)) > -1))
         {
           row = atoi(toks[2])-1;
           if(row < table->curr) val = table->d_cols[col][row];
         }
+        else if(ntok == 2)
+	{
+	 strncpy(temp, toks[1], NAME_L);
+         if (strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
+	}
       }
     }
   }

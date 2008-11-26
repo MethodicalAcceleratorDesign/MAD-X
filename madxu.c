@@ -479,8 +479,6 @@ void set_variable(char* name, double* value)
 void set_stringvar(char* name, char* string)
 {
   /* sets variable name->string to string */
-  char comm[NAME_L];
-  char par[NAME_L];
   char* p;
   struct variable* var;
   mycpy(c_dum->c, name);
@@ -4259,7 +4257,7 @@ void match2_delete_arrays()
   match2_cons_lhs = 0x0;
   match2_macro_name = 0x0;
 
-  /*for security so we can not add more consraints if the module is not initialized*/
+  /*for security so we cannot add more constraints if the module is not initialized*/
   MAX_MATCH_CONS =  0;
   MAX_MATCH_MACRO = 0;
 
