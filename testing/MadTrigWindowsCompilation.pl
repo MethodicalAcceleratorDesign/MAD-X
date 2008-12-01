@@ -10,11 +10,25 @@ use IO::Socket::INET;
 my $intermediateNfsLinuxHost = 'cs-ccr-dev1'; # a.k.a abcopl1
 my $intermediateSocketPort = 7075;
 
-my $socket = new IO::Socket::INET(
-				  PeerAddr => $intermediateNfsLinuxHost,
-				  PeerPort => $intermediateSocketPort,
-				  Proto => 'tcp'
-				  );
+# this value should be such as to allow the acrontab to recreate the
+# MadWindowsCompileClient.pl process in case it just died after 10 days
+# of so or running, after which the AFS and Kerberos tokens can no
+# longer be refreshed and need to be recreated with a brand new process
+
+my $socket;
+my $minutes = 5;
+TWO_TRIALS: for ($i=1; $i<$minutes; $i++) {
+    $socket = new IO::Socket::INET(
+				      PeerAddr => $intermediateNfsLinuxHost,
+				      PeerPort => $intermediateSocketPort,
+				      Proto => 'tcp',
+				      );
+    if ($socket) { last TWO_TRIALS; } else {
+	sleep 60;
+    }# exit the loop
+}
+
+
 
 # die "Could not create socket: $!\n" unless $socket;
 
