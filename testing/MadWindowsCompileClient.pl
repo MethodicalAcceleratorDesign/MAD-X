@@ -72,7 +72,23 @@ if ($child_pid==0){
     # would expire after 25 hours.
     # (note that this trick works for up to 10 days according to IT support)
     my $start = localtime;
+    # the recipe for refresing AFS/Kerberos tokens through a child process is known to work
+    # up to ten days. As a consequence, this process should die gracefully before ten days
+    # of running and wait for the acrontab to relaunch it with a time of grain of 5 min
+    # Hence the NFS client that triggs the remote compilation should have a time-out of the
+    # same order.
+    my $counter = 0;
     while(1){
+	$counter ++; # increment every 6 hours
+	if ($counter > (4*5)) { # life-expectancy set to 5 days (could as well try with 9 days)
+	    # time to die gracefully and let the acrontab restart a new process with
+	    # fresh AFS and Kerberos tokens. In the meantime, the trigger should be able
+	    # to wait for the client socket port to reappear...
+	    # should also kill the parent process...
+	    my $parent_pid = getppid();
+	    kill 9, $parent_pid;
+	    exit;
+	}
 	my $now = localtime;
 	sleep 21600; # 6 hours
 	`/usr/sue/bin/kinit -R`;
@@ -120,6 +136,7 @@ if ($child_pid){
     use MIME::Lite;
     use Sys::Hostname;
 
+
     # two local and remote ports for communication with the Windows host in the two directions
     $socketPortWindows = 7070; # agreed-up with client (>1024 for non-root)
     $socketPortLinux = 7071; # could be the same as above
@@ -137,7 +154,7 @@ if ($child_pid){
 
     # wait to be waken-up (or start right now if mode is 'now')
 
-    while(1){
+    INFINITE_LOOP: while(1){
 
 	my $invokeCompilation = 0; # default = do nothing
 
@@ -147,9 +164,14 @@ if ($child_pid){
 						       LocalPort => $listeningPort,
 						       Proto => 'tcp',
 						       Listen => 1,
-						       Reuse => 1
-						       );
-	    die "Could not create listening socket: $!\n" unless $listeningSocket;
+						       Reuse => 1,
+						       ) or die "Can't bind : $@\n";
+
+	    unless ($listeningSocket) {
+		notify("failed to open TCP socket $listeningPort on $thisLinuxHost to receive command => will die\n");
+		die 'failed to open TCP socket $listeningPort on $thisLinuxHost';
+	    }
+
 	    my $receive = $listeningSocket->accept();
 	    while (<$receive>){
 		if (/^Trigger Windows compilation$/){
@@ -183,8 +205,11 @@ if ($child_pid){
 					      Proto => 'tcp'
 					      ); 
 
-	    die "Could not create socket: $!\n" unless $sock; 
-	    
+	    unless ($sock) {
+		notify("Could not create socket $socketPortWindows to connect to $windowsHost => will die\n");
+		die "Could not create socket: $!\n" unless $sock; 
+	    }
+
 	    print "will now send message to port $socketPortWindows of $windowsHost\n";
 	
 	    print $sock "$thisLinuxHost asks: Compile MAD for Windows!\n";
@@ -220,7 +245,7 @@ if ($child_pid){
 		    print "OK: the compilation completed on Windows side\n";
 		    checkWindowsCompilationOutcome();
 		    print "=> installed the executables in the AFS web folder\n";
-		    last; # leave the while loop
+		    last INFINITE_LOOP; # leave the while loop
 		}
 
 		# should leave loop (timeout) in case there's no reply by the Windows-side server,
@@ -243,8 +268,12 @@ if ($child_pid){
 	my $whereAmI = `pwd`;
 	notify("at the end of the compilation, the Linux box client is in '$whereAmI'\n");
 
-	
     } # while(1): wait forever to be woken-up by automated build-and-test program
+
+    # do we really need to kill the child process?
+    # in principle not, but the child would commit suicide only 6 hours later due to loop duration
+    kill 9, $child_pid;
+
 } # this is the parent process (not the child forked process refreshing AFS/Kerberos tokens)
 
 
@@ -317,6 +346,7 @@ sub checkWindowsCompilationOutcome {
 	my $msg = MIME::Lite->new(
 				  From => 'Jean-Luc.Nougaret@cern.ch',
 				  To => 'mad-windows-watchers@cern.ch',
+#				  To => 'Jean-Luc.Nougaret@cern.ch',
 				  Subject => 'MAD-X for Windows updated',
 				  Data => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards,\nJean-Luc"
 				  );
