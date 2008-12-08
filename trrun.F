@@ -734,6 +734,7 @@
       if (n_ferr .gt. 0) then
         call dcopy(f_errors,field,n_ferr)
       endif
+      nd = 2 * max(nn, ns, n_ferr/2-1)
 !---- Dipole error.
 !      dbr = bv0 * field(1,0) / (one + deltas)
 !      dbi = bv0 * field(2,0) / (one + deltas)
