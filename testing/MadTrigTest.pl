@@ -93,8 +93,8 @@ if ($lastTest eq $lastRelease) {
 	@authors = sort @authors;
 
 	my $workReport = "";
-	$workReport .= "The MAD Build & Test script has detected the release of $lastRelease.\n\n";
-	$workReport .= "Since last release, the following changes have been made:\n";
+	$workReport .= "The MAD Build & Test script has detected a tentative candidate release for $lastRelease.\n\n";
+	$workReport .= "Since last candidate release, the following changes have been made:\n";
 	$workReport .= "\t-Lines-of-code added/deleted between $beforeLastRelease and $lastRelease:\n";
 	foreach $auth (@authors){
 		$workReport .= "\t\t$auth: +$linesAdded{$auth} -$linesDeleted{$auth}\n";
@@ -110,7 +110,7 @@ if ($lastTest eq $lastRelease) {
 	$msg = MIME::Lite->new(
 		       From       => 'Jean-Luc.Nougaret@cern.ch',
 		       'Reply-To' => 'mad-automation-admin@cern.ch',
-		       To         => 'hep-project-madx@cern.ch',
+		       To         => 'mad-module-keepers@cern.ch',
 		       Subject    => "MAD $lastRelease has been released. Testing starts.",
 		       Data       => $workReport
 		       );
