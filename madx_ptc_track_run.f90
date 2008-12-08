@@ -2478,7 +2478,7 @@ CONTAINS
             current=>current%next     ! f90-code bring to the next mode
          END DO Jump_to_next_observation_point
          !
-         close(mf(i_obs_point))
+         if (ptc_track_debug) close(mf(i_obs_point))
       END DO obs_point_loop !####################################################################!
 
       DEALLOCATE( X_co_observe,  Temp_particle_ID)
