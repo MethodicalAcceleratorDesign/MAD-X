@@ -111,7 +111,7 @@ if ($lastTest eq $lastRelease) {
 		       From       => 'Jean-Luc.Nougaret@cern.ch',
 		       'Reply-To' => 'mad-automation-admin@cern.ch',
 		       To         => 'mad-module-keepers@cern.ch',
-		       Subject    => "MAD $lastRelease has been released. Testing starts.",
+		       Subject    => "MAD $lastRelease release candidate ready for testing.",
 		       Data       => $workReport
 		       );
 	$msg->send;
