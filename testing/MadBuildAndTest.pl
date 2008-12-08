@@ -149,12 +149,6 @@ if ($child_pid) {
 	`./MadTest.pl ./MadCvsExtract/madX`; # issues e-mail upon completion
 	print REPORT_FILE "MadTest.pl completed\n";
 
-	print REPORT_FILE "trigger remote compilation on Windows\n";
-	`./MadTrigWindowsCompilation.pl`; # send trigger through socket
-	# to a background process on the intermediate Linux box having
-	# access to an NFS folder mounted on Windows through Samba
-	print REPORT_FILE "completed triggering of remote compilation\n";
-
 	close REPORT_FILE;
 	
 	# kill the child process in charge of refreshing the AFS token every 6 hours	
