@@ -82,7 +82,7 @@
 #define vmod                  vmod_
 #define w_ptc_create_universe   w_ptc_create_universe_
 #define w_ptc_create_layout     w_ptc_create_layout_
-#define w_ptc_export_xml	w_ptc_export_xml_
+#define w_ptc_export_xml        w_ptc_export_xml_
 #define w_ptc_move_to_layout    w_ptc_move_to_layout_
 #define w_ptc_input             w_ptc_input_
 #define w_ptc_align             w_ptc_align_
@@ -230,7 +230,7 @@
 #define vmod                  VMOD
 #define w_ptc_create_universe   W_PTC_CREATE_UNIVERSE
 #define w_ptc_create_layout     W_PTC_CREATE_LAYOUT
-#define w_ptc_export_xml	W_PTC_EXPORT_XML
+#define w_ptc_export_xml        W_PTC_EXPORT_XML
 #define w_ptc_move_to_layout    W_PTC_MOVE_TO_LAYOUT
 #define w_ptc_input             W_PTC_INPUT
 #define w_ptc_align             W_PTC_ALIGN
@@ -698,7 +698,7 @@ int inbounds(char*, int, char**);
 int in_spec_list(char*);
 int int_in_array(int, int, int*);
 void insert_elem(struct sequence*, struct node*);
-struct node* install_one(struct element*, char*, double, 
+struct node* install_one(struct element*, char*, double,
                          struct expression*, double);
 int is_token(char*, char*, int);
 char* join(char**, int);
@@ -1110,10 +1110,11 @@ int aper_chk_inside(double, double, double*, double*, double, int);
 
 /* IA */
 int aper_e_d_read(char*, struct aper_e_d**, int*, char*);
+struct table* aper_e_d_read_tfs(char* , int*, char*);
 
 int aper_external_file(char*, double*, double*);
 void aper_fill_quads(double*, double*, int, int*);
-void aper_header(struct table*, struct aper_node*);
+void aper_header(struct table*, struct aper_node);
 void aper_intersect(double, double, double, double, double, double,
                     double, double, int, int,double*, double*);
 int aper_linepar(double, double, double, double, double*, double*);
@@ -1124,6 +1125,7 @@ void aper_read_twiss(char*, int*, double*, double*, double*,
 int aper_rectellipse(double*, double*, double*, double*, int*, double*, double*);
 void aper_surv(double*, int);
 int aper_tab_search(int, struct aper_e_d*, char*, int*);
+int aper_tab_search_tfs(struct table*, char*, double*);
 void aper_trim_ws(char*, int);
 void aper_write_table(char*, double*, double*, double*, double*, double*, double*,
                       char*, double*, double*, double*, double*,
@@ -1296,7 +1298,7 @@ struct table* embedded_twiss_table;        /* current twiss table */
 /* E. T. d'Amico 5 nov 2004 */
 struct table* normal_results;     /* ptc table containing the selected high order functions (such as dx,qx,anhx etc.) */
 /* end additions */
- 
+
 struct table* errors_dipole;
 struct table* errors_field;
 struct table* errors_total;
@@ -1363,8 +1365,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.56";
-char code_mod_date[] = "Code Modification Date: 26.11.2008";
+char myversion[] = "MAD-X 3.04.57";
+char code_mod_date[] = "Code Modification Date: 09.12.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
