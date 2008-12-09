@@ -190,7 +190,7 @@
 
       code = node_value('mad8_type ')
       if(code.eq.2.or.code.eq.3) then
-        ang = node_value('angle ')*node_value('dipole_bv ')
+        ang = node_value('angle ')*node_value('other_bv ')
       else if(code.eq.8) then
         call get_node_vector('knl ',nn,normal)
         if (nn .ne. 0) then

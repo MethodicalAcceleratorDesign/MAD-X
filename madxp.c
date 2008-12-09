@@ -969,9 +969,9 @@ double el_par_value(char* par, struct element* el)
       else val = l;
     }
     else if (strcmp(par, "e1") == 0)
-      val = command_par_value("e1", el->def) + fact * angle / two;
+      val = command_par_value("e1", el->def);/* + fact * angle / two; dipole_bv kill initiative SF TR FS */
     else if (strcmp(par, "e2") == 0)
-      val = command_par_value("e2", el->def) + fact * angle / two;
+      val = command_par_value("e2", el->def);/* + fact * angle / two; dipole_bv kill initiative SF TR FS */
     else if (strcmp(par, "rhoinv") == 0) val = angle / l;
     else if (strcmp(par, "blen") == 0) val = l;
     else val = command_par_value(par, el->def);
@@ -3417,7 +3417,7 @@ double node_value(char* par)
   char lpar[NAME_L];
   mycpy(lpar, par);
   if (strcmp(lpar, "l") == 0) value = current_node->length;
-  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;
+/*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
   else if (strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
   else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
   else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
@@ -4769,7 +4769,7 @@ void store_node_value(char* par, double* value)
   mycpy(lpar, par);
   if (strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
   else if (strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
-  else if (strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;
+/*  else if (strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;*/
   else if (strcmp(lpar, "other_bv") == 0) current_node->other_bv = *value;
   else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
   else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;

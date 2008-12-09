@@ -1019,56 +1019,56 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
     if(ip == 1) {
       /* Fill horizontal corrections for beam 1  */
       if(c[nc[i]].id_ttb[0] > 0) {
-         c[nc[i]].p_node_s1->chkick += c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1];
+         c[nc[i]].p_node_s1->chkick += c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1];
          pro_correct2_fill_corr_table(0,
                                       ip,
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s1->chkick);
-/*                                    c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]); */
+/*                                    c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
-           fprintf(fcdata,"[1] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]);
+           fprintf(fcdata,"[1] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]);
          }
       }
       /* Fill horizontal corrections for beam 2  */
       if(c[nc[i]].id_ttb[1] > 0) {
-         c[nc[i]].p_node_s2->chkick += c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1];
+         c[nc[i]].p_node_s2->chkick += c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1];
          pro_correct2_fill_corr_table(1,
                                       ip,
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s2->chkick);
-/*                                    c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]); */
+/*                                    c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
-           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]);
+           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]);
          }
       }
 
     } else if (ip == 2) {
       /* Fill vertical corrections for beam 1  */
       if(c[nc[i]].id_ttb[0] > 0) {
-         c[nc[i]].p_node_s1->cvkick += c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1];
+         c[nc[i]].p_node_s1->cvkick += c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1];
          pro_correct2_fill_corr_table(0,
                                       ip,
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s1->cvkick);
-/*                                    c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]); */
+/*                                    c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
-           fprintf(fcdata,"[1] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s1->dipole_bv*0.001*corvec[nx[i]-1]);
+           fprintf(fcdata,"[1] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]);
          }
       }
       if(c[nc[i]].id_ttb[1] > 0) {
       /* Fill vertical corrections for beam 2  */
-         c[nc[i]].p_node_s2->cvkick += c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1];
+         c[nc[i]].p_node_s2->cvkick += c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1];
          pro_correct2_fill_corr_table(1,
                                       ip,
                                       c[nc[i]].p_node->name,
                                       c[nc[i]].val.before[ip-1]*0.001,
                                       c[nc[i]].p_node_s2->cvkick);
-/*                                    c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]); */
+/*                                    c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
-           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->dipole_bv*0.001*corvec[nx[i]-1]);
+           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]);
          }
       }
     }
@@ -1088,7 +1088,7 @@ void correct_correct1(struct in_cmd* cmd)
   int niter;
   int resout;
   int twism;
-  int dbg = 0;
+  int dbg;
   int ifail, sflag, svdflg;
   float  rms;
   double sngcut, sngval;
@@ -2488,24 +2488,24 @@ void pro_correct_write_results(double *monvec, double *resvec, double *corvec, i
 
     c[nc[i]].val.after[ip-1] = corvec[nx[i]-1];
     if(ip == 1) {
-      c[nc[i]].p_node->chkick += c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1];
+      c[nc[i]].p_node->chkick += c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1];
       pro_correct_fill_corr_table(ip,
                                   c[nc[i]].p_node->name,
                                   c[nc[i]].val.before[ip-1]*0.001,
                                   c[nc[i]].p_node->chkick);
-/*                                c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]); */
+/*                                c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if(fcdata != NULL) {
-         fprintf(fcdata,"%s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]);
+         fprintf(fcdata,"%s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]);
       }
     } else if (ip == 2) {
-      c[nc[i]].p_node->cvkick += c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1];
+      c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1];
       pro_correct_fill_corr_table(ip,
                                   c[nc[i]].p_node->name,
                                   c[nc[i]].val.before[ip-1]*0.001,
                                   c[nc[i]].p_node->cvkick);
-/*                                c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]); */
+/*                                c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if(fcdata != NULL) {
-         fprintf(fcdata,"%s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node->dipole_bv*0.001*corvec[nx[i]-1]);
+         fprintf(fcdata,"%s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]);
       }
     }
   } /* end of loop ove correctors */

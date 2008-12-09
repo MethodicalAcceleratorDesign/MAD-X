@@ -802,10 +802,10 @@
       cick = -thrvec(3)*dorb(2*kpro-1)/atemp(lc1,lc2)
 !--- add kick to kicker strengths
       if (kpro .eq. 1)  then
-        cick = node_value('dipole_bv ') * cick + node_value('chkick ')
+        cick = node_value('other_bv ') * cick + node_value('chkick ')
         call store_node_value('chkick ', cick)
       else
-        cick = node_value('dipole_bv ') * cick + node_value('cvkick ')
+        cick = node_value('other_bv ') * cick + node_value('cvkick ')
         call store_node_value('cvkick ', cick)
       endif
 !--- set node for restart in front of kicker
@@ -1024,8 +1024,8 @@
      &node_al_errors,n_align
       double precision rt(6,6),ek(6),re(6,6),rm(6,6),rwi(6,6),rc(6,6),  &
      &te(6,6,6),el,elh,orbit(6),orbit0(6),betas,gammas,                 &
-     &al_errors(align_max),bv0,bvk,sumloc,pos0,node_value,get_value,    &
-     &sd,zero,one,two
+     &al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
+     &one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 !---- Initialization
@@ -1093,7 +1093,6 @@
       sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
       code = node_value('mad8_type ')
       el = node_value('l ')
-      bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
       opt_fun(70) = node_value('kmax ')
       opt_fun(71) = node_value('kmin ')
@@ -2106,16 +2105,17 @@
       include 'twissl.fi'
       include 'twtrr.fi'
       logical ftrk,fmap,cplxy,dorad
-      integer nd,n_ferr,node_fd_errors
+      integer nd,n_ferr,node_fd_errors,code
       double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
      &te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
      &el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
-     &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bv0, &
-     &bvk,el0,orbit0(6),zero,one,two,three
+     &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
+     &el0,orbit0(6),zero,one,two,three
       double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
+      code = node_value('mad8_type ')
       deltap=zero
       call dzero(ek0,6)
       call m66one(rw)
@@ -2127,18 +2127,24 @@
       if (fmap) then
         call dzero(f_errors,maxferr+1)
         n_ferr = node_fd_errors(f_errors)
-        bv0 = node_value('dipole_bv ')
         bvk = node_value('other_bv ')
         arad = get_value('probe ','arad ')
         deltap = get_value('probe ','deltap ')
         gamma = get_value('probe ','gamma ')
         dorad = get_value('probe ','radiate ') .ne. zero
-        an = bv0 * node_value('angle ') * el/node_value('l ')
+        an = bvk * node_value('angle ') * el/node_value('l ')
         tilt = node_value('tilt ')
-        e1 = bv0 * node_value('e1 ')
-        e2 = bv0 * node_value('e2 ')
+        e1 = node_value('e1 ')
+        e2 = node_value('e2 ')
+        print*,"SSSSSSSSSHHHHIIITTT",e1,e2
 
-!--- bvk applied further down
+        if(code.eq.2) then
+          e1 = e1 + bvk * node_value('angle ') / two
+          e2 = e2 + bvk * node_value('angle ') / two
+        endif
+        print*,"SSSSSSSSSHHHHIIITTT22222222",e1,e2
+
+!--- bvk also applied further down
 
         sk1 = node_value('k1 ')
         sk2 = node_value('k2 ')
@@ -2155,7 +2161,7 @@
           nd = n_ferr
           call dzero(field,nd)
           call dcopy(f_errors,field,n_ferr)
-          dh = (- h * deltap + bv0 * field(1,0) / el) / (one + deltap)
+          dh = (- h * deltap + bvk * field(1,0) / el) / (one + deltap)
           sk1 = (sk1 + field(1,1) / el) / (one + deltap)
           sk2 = (sk2 + field(1,2) / el) / (one + deltap)
           sks = (sks + field(2,1) / el) / (one + deltap)
@@ -2779,7 +2785,7 @@
       integer i, n_ferr,code,node_fd_errors
       double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
      &te(6,6,6),deltap,gamma,arad,el,rfac,pt,xkick,ykick,dpx,dpy,       &
-     &node_value,get_value,bv0,field(2),tilt,xau,div,zero,one,three,half
+     &node_value,get_value,bvk,field(2),tilt,xau,div,zero,one,three,half
       parameter(zero=0d0,one=1d0,three=3d0,half=5d-1)
 
 !---- Initialize.
@@ -2790,7 +2796,7 @@
       else
         div = el
       endif
-      bv0 = node_value('dipole_bv ')
+      bvk = node_value('other_bv ')
       deltap = get_value('probe ','deltap ')
       arad = get_value('probe ','arad ')
       arad = get_value('probe ','arad ')
@@ -2807,17 +2813,17 @@
 !---- Original setting.
         code = node_value('mad8_type ')
         if(code.eq.14) then
-          xkick=bv0*(node_value('kick ')+node_value('chkick ')+         &
+          xkick=bvk*(node_value('kick ')+node_value('chkick ')+         &
      &field(1)/div)
           ykick=zero
         else if(code.eq.15) then
-          xkick=bv0*(node_value('hkick ')+node_value('chkick ')+        &
+          xkick=bvk*(node_value('hkick ')+node_value('chkick ')+        &
      &field(1)/div)
-          ykick=bv0*(node_value('vkick ')+node_value('cvkick ')+        &
+          ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+        &
      &field(2)/div)
         else if(code.eq.16) then
           xkick=zero
-          ykick=bv0*(node_value('kick ')+node_value('cvkick ')+         &
+          ykick=bvk*(node_value('kick ')+node_value('cvkick ')+         &
      &field(2)/div)
         else
           xkick=zero
@@ -2891,15 +2897,14 @@
       double precision orbit(6),f_errors(0:maxferr),re(6,6),te(6,6,6),x,&
      &y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
      &vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
-     &skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bv0,bvk,  &
-     &dpxr,dpyr,zero,one,two,three, tilt, angle, dtmp
+     &skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bvk,dpxr, &
+     &dpyr,zero,one,two,three, tilt, angle, dtmp
       double precision orbit00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
 !---- Initialize.
       call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
-      bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
 !---- Multipole length for radiation.
       elrad = node_value('lrad ')
@@ -2953,10 +2958,10 @@
         dbi = dtmp * sin(angle)
       endif
 
-      dbr = bv0 * dbr
-      dbi = bv0 * dbi
-      dipr = bv0 * dipr
-      dipi = bv0 * dipi
+      dbr = bvk * dbr
+      dbi = bvk * dbi
+      dipr = bvk * dipr
+      dipi = bvk * dipi
 
 !---- Other components and errors.
       nord = 0
@@ -4599,7 +4604,7 @@
       double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
      &rw(6,6),tw(6,6,6),el,rfv,rff,rfl,dl,omega,vrf,phirf,pc,deltap,c0, &
      &c1,c2,ek0(6),ten6p,clight,node_value,get_value,twopi,get_variable,&
-     &zero,one,two,half,ten3m
+     &zero,one,two,half,ten3m,bvk
       double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
       parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
      &ten3m=1d-3)
@@ -4611,8 +4616,10 @@
       clight=get_variable('clight ')
       twopi=get_variable('twopi ')
 
+!---- BV flag
+      bvk = node_value('other_bv ')
 !---- Fetch data.
-      rfv = node_value('volt ')
+      rfv = bvk*node_value('volt ')
       rff = node_value('freq ')
       rfl = node_value('lag ')
       deltap = get_value('probe ','deltap ')
@@ -5964,15 +5971,13 @@
 !   rw(6,6)      (double)  transfer matrix.                            *
 !----------------------------------------------------------------------*
       logical ftrk,fmap
-      double precision fint,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),       &
-     &orbit(6),node_value,zero,one
+      double precision fint,e1,h,hgap,corr,rw(6,6),tw(6,6,6),orbit(6),  &
+     &node_value,zero,one
       parameter(zero=0d0,one=1d0)
 
       call m66one(rw)
 
-      bv0 = node_value('dipole_bv ')
-      e1 = bv0 * node_value('e1 ')
-!--- bvk applied further down
+      e1 = node_value('e1 ')
       h = node_value('h ')
       hgap = node_value('hgap ')
       fint = node_value('fint ')

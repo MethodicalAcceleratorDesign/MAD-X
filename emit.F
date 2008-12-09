@@ -433,7 +433,7 @@
       equivalence       (x2, o2(1)), (px2, o2(2))
       equivalence       (y2, o2(3)), (py2, o2(4))
       equivalence       (t2, o2(3)), (pt2, o2(4))
-      double precision  el, node_value, tilt, bv0, bvk
+      double precision  el, node_value, tilt, bvk
       double precision  edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
       double precision  corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
       double precision  tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
@@ -457,7 +457,6 @@
       betas = get_value('probe ','beta ')
       gammas = get_value('probe ','gamma ')
 !---- Prepare data.
-      bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
 !---- Switch on element type.
       go to (500,  20,  30, 500,  50,  60,  70,  80, 500, 100,          &
@@ -481,14 +480,14 @@
 !        sk0 = sqrt(sk0**2 + sk0s**2)
 !        an = sk0 * el
 !      endif
-!      an = bv0 * an
-!      sk0 = bv0 * sk0
-!      sk0s = bv0 * sk0s
+!      an = bvk * an
+!      sk0 = bvk * sk0
+!      sk0s = bvk * sk0s
 ! FRS 16.11.2004 here the correction
-      an = bv0 * node_value('angle ') * el/node_value('l ')
+      an = bvk * node_value('angle ') * el/node_value('l ')
       tilt = -node_value('tilt ')
-      edg1 = bv0 * node_value('e1 ')
-      edg2 = bv0 * node_value('e2 ')
+      edg1 = bvk * node_value('e1 ')
+      edg2 = bvk * node_value('e2 ')
       sk1 = bvk * node_value('k1 ')
       sk2 = bvk * node_value('k2 ')
       hgap = node_value('hgap ')
@@ -695,7 +694,6 @@
 !---- Multipole components.
       call dzero(f_errors,maxferr+1)
       n_ferr = node_fd_errors(f_errors)
-      bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
       call dzero(normal,maxmul+1)
       call dzero(skew,maxmul+1)
@@ -794,17 +792,17 @@
       enddo
       if (n_ferr .gt. 0) call dcopy(f_errors, ferror, min(2, n_ferr))
       if(code.eq.14) then
-        xkick=bv0*(node_value('kick ')+node_value('chkick ')+           &
+        xkick=bvk*(node_value('kick ')+node_value('chkick ')+           &
      &ferror(1))
         ykick=zero
       else if(code.eq.15) then
-        xkick=bv0*(node_value('hkick ')+node_value('chkick ')+          &
+        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+          &
      &ferror(1))
-        ykick=bv0*(node_value('vkick ')+node_value('cvkick ')+          &
+        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+          &
      &ferror(2))
       else if(code.eq.16) then
         xkick=zero
-        ykick=bv0*(node_value('kick ')+node_value('cvkick ')+           &
+        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+           &
      &ferror(2))
       else
         xkick=zero

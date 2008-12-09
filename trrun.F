@@ -696,8 +696,7 @@
      &pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
      &f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
      &ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-     &skew(0:maxmul),bv0,bvk,node_value,zero,one,two,three,half,        &
-     &ttt
+     &skew(0:maxmul),bvk,node_value,zero,one,two,three,half,ttt
 
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
       save first,ordinv
@@ -712,7 +711,6 @@
       endif
       call dzero(f_errors, maxferr+1)
       n_ferr = node_fd_errors(f_errors)
-      bv0 = node_value('dipole_bv ')
       bvk = node_value('other_bv ')
 !---- Multipole length for radiation.
       elrad = node_value('lrad ')
@@ -734,17 +732,16 @@
       if (n_ferr .gt. 0) then
         call dcopy(f_errors,field,n_ferr)
       endif
-      nd = 2 * max(nn, ns, n_ferr/2-1)
 !---- Dipole error.
-!      dbr = bv0 * field(1,0) / (one + deltas)
-!      dbi = bv0 * field(2,0) / (one + deltas)
-      dbr = bv0 * field(1,0)
-      dbi = bv0 * field(2,0)
+!      dbr = bvk * field(1,0) / (one + deltas)
+!      dbi = bvk * field(2,0) / (one + deltas)
+      dbr = bvk * field(1,0)
+      dbi = bvk * field(2,0)
 !---- Nominal dipole strength.
-!      dipr = bv0 * vals(1,0) / (one + deltas)
-!      dipi = bv0 * vals(2,0) / (one + deltas)
-      dipr = bv0 * vals(1,0)
-      dipi = bv0 * vals(2,0)
+!      dipr = bvk * vals(1,0) / (one + deltas)
+!      dipi = bvk * vals(2,0) / (one + deltas)
+      dipr = bvk * vals(1,0)
+      dipi = bvk * vals(2,0)
 !---- Other components and errors.
       nord = 0
       do iord = 1, nd/2
@@ -1142,7 +1139,7 @@
 !----------------------------------------------------------------------*
       integer itrack,ktrack
       double precision omega,phirf,pt,rff,rfl,rfv,track(6,*),clight,    &
-     &twopi,vrf,pc0,get_variable,node_value,get_value,one,two,half,     &
+     &twopi,vrf,pc0,get_variable,node_value,get_value,one,two,half,bvk, &
      &ten3m,ten6p
 !      double precision px,py,ttt,beti,el1
       parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
@@ -1151,10 +1148,13 @@
       clight=get_variable('clight ')
       twopi=get_variable('twopi ')
 
+!---- BV flag
+      bvk = node_value('other_bv ')
+
 !---- Fetch data.
 !      el = node_value('l ')
 !      el1 = node_value('l ')
-      rfv = node_value('volt ')
+      rfv = bvk * node_value('volt ')
       rff = node_value('freq ')
       rfl = node_value('lag ')
 !      deltap = get_value('probe ','deltap ')
@@ -1353,7 +1353,7 @@
       include 'track.fi'
       include 'twtrr.fi'
 !      logical dorad,dodamp,dorand
-      integer itrack,ktrack,n_ferr,node_fd_errors,code,bv0,i,get_option
+      integer itrack,ktrack,n_ferr,node_fd_errors,code,bvk,i,get_option
       double precision bi2gi2,bil2,curv,dpx,dpy,el,pt,px,py,rfac,rpt,   &
      &rpx,rpy,track(6,*),xkick,ykick, !deltas,arad,betas,gammas,dtbyds, &
      &div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
@@ -1362,7 +1362,7 @@
       parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
 
 !---- Initialize.
-      bv0 = node_value('dipole_bv ')
+      bvk = node_value('other_bv ')
       deltas = get_variable('track_deltap ')
       arad = get_value('probe ','arad ')
       betas = get_value('probe ','beta ')
@@ -1385,17 +1385,17 @@
       enddo
       if (n_ferr .gt. 0) call dcopy(f_errors, field, min(2, n_ferr))
       if (code.eq.14) then
-        xkick=bv0*(node_value('kick ')+node_value('chkick ')+           &
+        xkick=bvk*(node_value('kick ')+node_value('chkick ')+           &
      &field(1)/div)
         ykick=zero
       else if (code.eq.15) then
-        xkick=bv0*(node_value('hkick ')+node_value('chkick ')+          &
+        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+          &
      &field(1)/div)
-        ykick=bv0*(node_value('vkick ')+node_value('cvkick ')+          &
+        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+          &
      &field(2)/div)
       else if(code.eq.16) then
         xkick=zero
-        ykick=bv0*(node_value('kick ')+node_value('cvkick ')+           &
+        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+           &
      &field(2)/div)
       else
         xkick=zero
@@ -2487,16 +2487,14 @@
 !                 track , trajectory coordinates                       *
 !----------------------------------------------------------------------*
       integer ktrack,itrack
-      double precision fint,bv0,e1,h,hgap,corr,rw(6,6),tw(6,6,6),       &
-     &track(6,*),node_value,zero,one
+      double precision fint,e1,h,hgap,corr,rw(6,6),tw(6,6,6),track(6,*),&
+     &node_value,zero,one
       parameter(zero=0d0,one=1d0)
 
       call m66one(rw)
 !      call dzero(tw, 216)
 
-      bv0 = node_value('dipole_bv ')
-      e1 = bv0 * node_value('e1 ')
-!--- bvk applied further down
+      e1 = node_value('e1 ')
       h = node_value('h ')
       hgap = node_value('hgap ')
       fint = node_value('fint ')

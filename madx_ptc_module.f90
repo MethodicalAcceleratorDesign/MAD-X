@@ -164,7 +164,7 @@ CONTAINS
     integer             model
     integer             method0,method1
     integer             nst0,nst1,ord_max,kk
-    REAL (dp) :: tempdp,bv0,bvk
+    REAL (dp) :: tempdp,bvk
     logical(lp):: ptcrbend,truerbend,errors_in,errors_out
     !  Etienne helical
     character(nlp) heli(100)
@@ -183,7 +183,7 @@ CONTAINS
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
     charge=get_value('probe ','charge ')
-    !    bvk=get_value('probe ','bv ')
+    bvk=get_value('probe ','bv ')
 
     e0f=sqrt(ENERGY**2-pma**2)
 
@@ -349,8 +349,6 @@ CONTAINS
     if(errors_out) mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
 
 10  continue
-    bvk = node_value('other_bv ')
-    if(bvk.ne.-one) bvk=one
     nst1=node_value("nst ")
     if(nst1.gt.0) then
        nstd = nst1
@@ -487,12 +485,11 @@ CONTAINS
           goto 100
        endif
        key%magnet="rbend"
-       bv0 = node_value('dipole_bv ')
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bv0*(node_value('angle ')+tempdp*l)
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l)
 
        !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
        !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
@@ -506,8 +503,8 @@ CONTAINS
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
 
        ! Gymnastic needed since PTC expects MAD8 convention
-       key%list%t1=bv0*(node_value('e1 ')-node_value('angle ')/two)
-       key%list%t2=bv0*(node_value('e2 ')-node_value('angle ')/two)
+       key%list%t1=node_value('e1 ')
+       key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
        !       key%list%fint=node_value('fint ')
        fint=node_value('fint ')
@@ -531,8 +528,6 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
-       key%list%k(1)=bv0*key%list%k(1)
-       key%list%ks(1)=bv0*key%list%ks(1)
        ptcrbend=node_value('ptcrbend ').ne.0
        if(ptcrbend) then
           call context(key%list%name)
@@ -571,14 +566,13 @@ CONTAINS
           goto 100
        endif
        key%magnet="sbend"
-       bv0 = node_value('dipole_bv ')
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
        if(sector_nmul_max.lt.ord_max.and.EXACT_MODEL) call aafail('the order of multipoles in a sbend in exact mode cannot be ',&
             &'larger than sector_mul_max: check your ptc_create_universe input')
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bv0*(node_value('angle ')+ tempdp*l)
+       key%list%b0=bvk*(node_value('angle ')+ tempdp*l)
 
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
@@ -588,8 +582,8 @@ CONTAINS
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
 
-       key%list%t1=bv0*(node_value('e1 '))
-       key%list%t2=bv0*(node_value('e2 '))
+       key%list%t1=node_value('e1 ')
+       key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
        !       key%list%fint=node_value('fint ')
        fint=node_value('fint ')
@@ -613,8 +607,6 @@ CONTAINS
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
-       key%list%k(1)=bv0*key%list%k(1)
-       key%list%ks(1)=bv0*key%list%ks(1)
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
@@ -709,7 +701,6 @@ CONTAINS
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
-       bv0 = node_value('dipole_bv ')
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        call dzero(normal,maxmul+1)
@@ -721,8 +712,8 @@ CONTAINS
           key%list%ks(i)=zero
        enddo
        skew(0)=-skew(0) ! frs error found 30.08.2008
-       key%list%thin_h_angle=bv0*normal(0)
-       key%list%thin_v_angle=bv0*skew(0)
+       key%list%thin_h_angle=bvk*normal(0)
+       key%list%thin_v_angle=bvk*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
@@ -750,8 +741,6 @@ CONTAINS
              key%list%ks(i+1)=key%list%ks(i+1)+field(2,i)
           enddo
        endif
-       key%list%k(1)=bv0*key%list%k(1)
-       key%list%ks(1)=bv0*key%list%ks(1)
        key%tiltd=node_value('tilt ')
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
@@ -788,7 +777,7 @@ CONTAINS
 
     case(10)
        key%magnet="rfcavity"
-       key%list%volt=node_value('volt ')
+       key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
@@ -831,7 +820,6 @@ CONTAINS
           key%list%t(i)=patch_trans(i)
        enddo
     case(14,15,16) ! PTC accepts mults
-       bv0 = node_value('dipole_bv ')
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        do i=1,NMAX
@@ -849,14 +837,14 @@ CONTAINS
        endif
        if(code.eq.14) then
           key%magnet="hkicker"
-          key%list%k(1)=bv0*(node_value('kick ')+node_value('chkick ')+fieldk(1)/div)
+          key%list%k(1)=(node_value('kick ')+node_value('chkick ')+fieldk(1)/div)
        else if(code.eq.15) then
           key%magnet="kicker"
-          key%list%k(1)=bv0*(node_value('hkick ')+node_value('chkick ')+fieldk(1)/div)
-          key%list%ks(1)=bv0*(node_value('vkick ')+node_value('cvkick ')+fieldk(2)/div)
+          key%list%k(1)=(node_value('hkick ')+node_value('chkick ')+fieldk(1)/div)
+          key%list%ks(1)=(node_value('vkick ')+node_value('cvkick ')+fieldk(2)/div)
        else if(code.eq.16) then
           key%magnet="vkicker"
-          key%list%ks(1)=bv0*(node_value('kick ')+node_value('cvkick ')+fieldk(2)/div)
+          key%list%ks(1)=(node_value('kick ')+node_value('cvkick ')+fieldk(2)/div)
        else
           key%magnet="marker"
        endif
@@ -882,7 +870,7 @@ CONTAINS
        key%tiltd=node_value('tilt ')
     case(27)
        key%magnet="twcavity"
-       key%list%volt=node_value('volt ')
+       key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
@@ -938,7 +926,7 @@ CONTAINS
     end select
 100 continue
     if(code.ne.14.and.code.ne.15.and.code.ne.16) then
-       do i=2,NMAX
+       do i=1,NMAX
           key%list%k(i)=bvk*key%list%k(i)
           key%list%ks(i)=bvk*key%list%ks(i)
        enddo

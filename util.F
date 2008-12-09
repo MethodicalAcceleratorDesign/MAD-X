@@ -1688,7 +1688,8 @@
       call dzero(skew,maxmul+1)
       call get_node_vector('knl ',nn,normal)
 !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
-      angle = normal(0)*node_value('dipole_bv ')
+!      angle = normal(0)*node_value('dipole_bv ')
+      angle = normal(0)*node_value('other_bv ')
       if (abs(angle) .lt. 1d-13) then
         tilt = zero
       else
@@ -1702,7 +1703,8 @@
 !---- Any kind of  bend.
    20 continue
 !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
-      angle = node_value('angle ')*node_value('dipole_bv ')
+!      angle = node_value('angle ')*node_value('dipole_bv ')
+      angle = node_value('angle ')*node_value('other_bv ')
 !      print *,"SUELEM dipole : angle =",angle
       if (abs(angle) .lt. 1d-13) then
         dx = zero
@@ -1716,6 +1718,7 @@
       endif
 !      print *,"SUELEM dipole : tilt =",tilt," length= ",
 !     &el," angv = ",angv," bv =",node_value('dipole_bv ')
+!     &el," angv = ",angv," bv =",node_value('other_bv ')
       go to 490
 
 !---- Rotation around S-axis. SPECIAL CASE
