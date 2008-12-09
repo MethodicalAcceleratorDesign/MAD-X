@@ -426,8 +426,21 @@ void complete_twiss_table(struct table* t)
   {
     el = c_node->length;
     strcpy(tmp, twiss_table_cols[j]);
+    rbend = (strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
     if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
     else if (strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "e1") == 0 || strcmp(tmp, "e2") == 0)
+    { 
+      if(rbend)
+      {
+        val =  el_par_value(tmp, c_node->p_elem) +
+          c_node->other_bv * el_par_value("angle", c_node->p_elem) / two;
+      }
+      else
+      {
+        val =  el_par_value(tmp, c_node->p_elem);
+      }
+    }
     else if (strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "mech_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
@@ -436,8 +449,7 @@ void complete_twiss_table(struct table* t)
       if(j<59)
       {
         val = mult_par(twiss_table_cols[j], c_node->p_elem);
-        if (strstr(twiss_table_cols[j], "k0")) val *= c_node->dipole_bv;
-        else val *= c_node->other_bv;
+        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
       }
       else
       {
@@ -447,14 +459,7 @@ void complete_twiss_table(struct table* t)
     else
     {
       strcpy(tmp, twiss_table_cols[j]);
-      n = strlen(tmp) - 1;
-      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l')
-        tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
       val = el_par_value(tmp, c_node->p_elem);
-      if ((strstr(tmp, "k0"))) {} /* do nothing */
-      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0)
-        val *= c_node->dipole_bv;
-      else if(strcmp(tmp, "tilt")) val *= c_node->other_bv;
       if (el != zero)
       {
         if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
@@ -487,7 +492,7 @@ void double_to_table(char* table, char* name, double* val)
   struct table* t;
 
   /*  printf("double_to_table <%s> <%s> <%f>\n",table,name,*val);*/
-  
+
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
   {
@@ -538,7 +543,7 @@ void string_to_table_row(char* table, char* name, int* row, char* string)
   else return;
   mycpy(c_dum->c, name);
   if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
-      && t->columns->inform[pos] == 3) 
+      && t->columns->inform[pos] == 3)
     {
      mycpy(c_dum->c, string);
      t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
@@ -731,12 +736,12 @@ void exec_create_table(struct in_cmd* cmd)
 
   for (j = 0; j < m->curr; j++)
   {
-    if (*m->p[j] == '_') 
+    if (*m->p[j] == '_')
       {
        t_types[j] = 3; /* type string */
        t_c[j] = permbuff(&m->p[j][1]);
       }
-    else  
+    else
       {
        t_types[j] = 2; /* type double */
        t_c[j] = permbuff(m->p[j]);
@@ -1346,7 +1351,7 @@ void make_map_table(int* map_table_max_rows)
   if ((pos = name_list_pos("map_table", table_register->names)) > -1)
     {
      delete_table(table_register->tables[pos]);
-     k = remove_from_name_list(table_register->tables[pos]->name, 
+     k = remove_from_name_list(table_register->tables[pos]->name,
                            table_register->names);
      table_register->tables[k] = table_register->tables[--table_register->curr];
     }
@@ -1703,7 +1708,7 @@ void expand_curr_sequ(int flag)
   char rout_name[] = "expand_curr_sequ";
   struct node* c_node;
   int j;
-  current_sequ->end->at_value = current_sequ->end->position 
+  current_sequ->end->at_value = current_sequ->end->position
        = sequence_length(current_sequ);
   if (current_sequ->ex_start != NULL)
   {
@@ -2570,6 +2575,9 @@ int interp_node(int *nint)
   rbend = (strcmp(elem_name, "rbend") == 0);
   bend_flag = (strcmp(elem_name, "sbend")*(rbend-1) == 0);
 
+/*  bv = node_value("dipole_bv");*/
+  bvk = node_value("other_bv");
+
   if (bend_flag)
   {
     angle = command_par_value("angle", el->def);
@@ -2583,8 +2591,8 @@ int interp_node(int *nint)
 
     if (rbend)
     {
-      e1 = e1 + angle / two;
-      e2 = e2 + angle / two;
+      e1 = e1 + bvk * angle / two;
+      e2 = e2 + bvk * angle / two;
       strcpy(elem_name,"sbend");
     }
     angle = angle/numint;
@@ -2599,8 +2607,6 @@ int interp_node(int *nint)
   }
   length = first_node->length;
   step = length/numint;
-  bv = node_value("dipole_bv");
-  bvk = node_value("other_bv");
   first_node->length = step;
 
   /* Set first_node in range_start of the sequence */
@@ -2637,7 +2643,7 @@ int interp_node(int *nint)
     current_node = current_node->previous;
     current_node->previous->next = current_node;
     store_node_value("angle",&angle);
-    store_node_value("dipole_bv",&bv);
+/*    store_node_value("dipole_bv",&bv); */
     store_node_value("other_bv",&bvk);
     if (bend_flag)
     {
@@ -3231,7 +3237,7 @@ void pro_aperture(struct in_cmd* cmd)
     file = command_par_string("file", this_cmd->clone);
     if (file != NULL)
     {
-      aper_header(aperture_table, limit_node);
+      aper_header(aperture_table, *limit_node);
       out_table(table, aperture_table, file);
     }
     if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
@@ -3659,10 +3665,10 @@ void pro_ptc_twiss()
   if (nl->inform[pos]){
     if ((summary_filename = pl->parameters[pos]->string) == NULL){
       if (pl->parameters[pos]->call_def != NULL)
-	summary_filename = pl->parameters[pos]->call_def->string;
+        summary_filename = pl->parameters[pos]->call_def->string;
     }
     if (summary_filename == NULL) summary_filename = permbuff("dummy");
-    w_file_summary = 1; 
+    w_file_summary = 1;
   }
   else w_file_summary = 0;
 
@@ -3707,8 +3713,8 @@ void pro_ptc_twiss()
   conv_char(summary_table_name, summary_tarr);
 
   ptc_twiss_summary_table = make_table(summary_table_name, "twiss summary",
-				       ptc_twiss_summary_table_cols, ptc_twiss_summary_table_types,
-				       5); /* only one  row would be enough  */
+                                       ptc_twiss_summary_table_cols, ptc_twiss_summary_table_types,
+                                       5); /* only one  row would be enough  */
   ptc_twiss_summary_table->dynamic = 1; /* actually static for time-being */
   add_to_table_list( ptc_twiss_summary_table, table_register );
   /* --- */
@@ -3722,7 +3728,7 @@ void pro_ptc_twiss()
 
   /* --- */
   if (w_file_summary) out_table(summary_table_name, ptc_twiss_summary_table,
-				summary_filename);
+                                summary_filename);
    /* --- */
 
   /* cleanup */
@@ -3874,7 +3880,7 @@ void pro_twiss()
     pos = name_list_pos("sectortable",nl);
     if (nl->inform[pos]) {
       if ((sector_table_name = pl->parameters[pos]->string) == NULL)
-	sector_table_name = pl->parameters[pos]->call_def->string;
+        sector_table_name = pl->parameters[pos]->call_def->string;
     }
     else {
       sector_table_name = pl->parameters[pos]->call_def->string;
@@ -3998,17 +4004,17 @@ void pro_twiss()
   /* now create the sector table */
   l = strlen(sector_table_name);
   tarr_sector = new_int_array(l+1);
-  conv_char(sector_table_name, tarr_sector);  
+  conv_char(sector_table_name, tarr_sector);
 
   if (get_option("twiss_sector"))
   {
     reset_sector(current_sequ, 0);
     set_sector();
 
-    twiss_sector_table = make_table(sector_table_name, "sectormap", 
-				    twiss_sector_table_cols,
-				    twiss_sector_table_types,
-				    1); /* start with one row at first */
+    twiss_sector_table = make_table(sector_table_name, "sectormap",
+                                    twiss_sector_table_cols,
+                                    twiss_sector_table_types,
+                                    1); /* start with one row at first */
     twiss_sector_table->dynamic = 1; /* flag for access to current row */
     add_to_table_list(twiss_sector_table, table_register);
   }
@@ -4976,7 +4982,7 @@ int reset_interpolation(int *nint)
 {
   struct node *c_node, *second_node;
   int j,bend_flag = 0;
-  double angle,length,e1,e2,numint, h1, h2, fint, fintx, hgap;
+  double angle,length,e1,e2,numint, h1, h2, fint, fintx, hgap, bvk;
 
   /* Deletes the interpolating nodes expanded by the routine interp_node */
 
@@ -5055,13 +5061,16 @@ int reset_interpolation(int *nint)
 
   /* Updates the values of e1 and e2 and stores them in first node */
 
+/*  bv = node_value("dipole_bv");*/
+  bvk = node_value("other_bv");
+
   if (bend_flag)
   {
     if (rbend)
     {
       strcpy(current_node->p_elem->base_type->name,"rbend");
-      e1 = e1 - angle / two;
-      e2 = e2 - angle / two;
+      e1 = e1 - bvk * angle / two;
+      e2 = e2 - bvk * angle / two;
     }
     store_node_value("e1",&e1);
     store_node_value("e2",&e2);
@@ -5130,8 +5139,8 @@ double rfc_slope()
   return slope;
 }
 
-void sector_out(char* sector_table_name, double* pos, double* kick, 
-		     double* rmatrix, double* tmatrix)
+void sector_out(char* sector_table_name, double* pos, double* kick,
+                     double* rmatrix, double* tmatrix)
 {
   int i;
 
@@ -5397,14 +5406,14 @@ void seq_move(struct in_cmd* cmd)
         node = edit_sequ->start;
         while (node != edit_sequ->end)
         {
-	 node = node->next; node->moved = 0;
-	}
+         node = node->next; node->moved = 0;
+        }
          node = edit_sequ->start;
         while (node != NULL && node != edit_sequ->end)
         {
          next = node->next;
          if (node->moved == 0)
-	 {
+         {
           if (any
               || name_list_pos(node->name, selected_ranges->list) > -1)
           {
@@ -5428,7 +5437,7 @@ void seq_move(struct in_cmd* cmd)
               }
             }
           }
-	 }         
+         }
          node = next;
         }
       }
@@ -5706,8 +5715,9 @@ void set_node_bv(struct sequence* sequ)
     if(command_par_value("magnet", c_node->p_elem->def))
     {
       c_node->other_bv = beam_bv;
-      if (c_node->p_elem->bv) c_node->dipole_bv = beam_bv;
-      else                    c_node->dipole_bv = 1;
+/* dipole_bv kill initiative SF TR FS */
+/*      if (c_node->p_elem->bv) c_node->dipole_bv = beam_bv;
+        else                    c_node->dipole_bv = 1;*/
     }
     if (c_node == sequ->ex_end) break;
     c_node = c_node->next;
@@ -7060,7 +7070,7 @@ void pro_ptc_export_xml(struct in_cmd* cmd)
 {
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
-  int                            pos         = 0;  
+  int                            pos         = 0;
   char*                          filename    = 0x0;
   struct int_array*              filenameIA      = 0x0;
 /*  char*                          format    = 0x0; */
@@ -7068,14 +7078,14 @@ void pro_ptc_export_xml(struct in_cmd* cmd)
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
   {
-  	/* should never enter here */
-	printf("madxn.c: pro_ptc_export_xml: file parameter does not exist.\n");
-	return;
+        /* should never enter here */
+        printf("madxn.c: pro_ptc_export_xml: file parameter does not exist.\n");
+        return;
   }
-  
+
   filename  = c_parameters->parameters[pos]->string;
   printf("will write to file %s\n",filename);
-  
+
   if ( filename == 0x0 )
   {
     warning("madxn.c: pro_ptc_export_xml: no file name: ", "ignored");
@@ -7200,10 +7210,10 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
       warningnew("pro_ptc_eplacement","Reached the end of sequence - Element <<%s>> not found",element);
       return;
     }
-    
+
     anode = anode->next;
     pos++; /*before if because fortran numerates from 1*/
-    
+
   }
 
 
