@@ -7,7 +7,9 @@
 #define MIN_DOUBLE 1.e-36
 
 struct aper_e_d* true_tab;
-struct aper_e_d* offs_tab;
+
+//struct aper_e_d* offs_tab;
+struct table* offs_tab;
 
 
 int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
@@ -264,7 +266,7 @@ void aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbe
 struct aper_node* aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt)
 {
   int stop=0, nint=1, jslice=1, err, first, ap=1;
-  int true_flag, true_node=0, offs_flag, offs_node=0, do_survey=0;
+  int true_flag, true_node=0, offs_node=0, do_survey=0;
   int truepos=0, true_cnt=0, offspos, offs_cnt=0;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
   double surv_init[6]={0, 0, 0, 0, 0, 0};
@@ -274,6 +276,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, ex, ey, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
+  double x_end_former,y_end_former;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
   double node_s=-1, node_n1=-1;
@@ -292,19 +295,16 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   char name[NAME_L];
   char tol_err_mess[80];
 
+  double offs_row[8];
+
   struct node* rng_glob[2];
   struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1},{-1,-1,-1}};
   struct aper_node* lim_pt = &limit_node;
 
   int is_zero_len;
 
-  /* IA */
-  /*
-    struct aper_e_d true_tab[E_D_MAX];
-    struct aper_e_d offs_tab[E_D_MAX];
-  */
   true_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
-  offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));
+  //offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));
 
   setbuf(stdout,(char*)NULL);
 
@@ -345,7 +345,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
   /* check if trueprofile and offsetelem files exist */
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
-  offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
+  //offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
+  offs_tab = aper_e_d_read_tfs(offsfile, &offs_cnt, refnode);
+  printf("\nref: %s",refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1) ;
@@ -404,7 +406,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
     }
     else on_elem=1;
 
-    if (offs_flag && (strcmp(refnode, name) == 0)) do_survey=1;
+    if ( (offs_tab!= NULL) && (strcmp(refnode, name) == 0)) do_survey=1;
+    //printf("\nname: %s, ref: %s, do_survey:: %d\n",name,refnode, do_survey);
+
 
     /* read data for tol displacement of halo */
     get_node_vector("aper_tol",&ntol,aper_tol);
@@ -456,7 +460,8 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         current_sequ->range_start = rng_glob[0];
         current_sequ->range_end = rng_glob[1];
       }
-    }
+    }    /* end loop 'if no pipe ' */
+
     else
     {
       node_n1=999999;
@@ -494,18 +499,26 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       /* do survey */
       if (do_survey)
       {
+      //printf("\n using offsets\n");
+
         aper_surv(surv_init, nint);
 
-        offs_node=aper_tab_search(offs_cnt, offs_tab, name, &offspos);
+      offs_node=aper_tab_search_tfs(offs_tab, name, offs_row);
         if (offs_node)
         {
-          xa=offs_tab[offspos].tab[0][0];
-          xb=offs_tab[offspos].tab[0][1];
-          xc=offs_tab[offspos].tab[0][2];
-          ya=offs_tab[offspos].tab[1][0];
-          yb=offs_tab[offspos].tab[1][1];
-          yc=offs_tab[offspos].tab[1][2];
-        }
+        //printf("\nusing offset");
+          xa=offs_row[4];
+          xb=offs_row[3];
+          xc=offs_row[2];
+          ya=offs_row[7];
+          yb=offs_row[6];
+          yc=offs_row[5];
+      }
+      //else {
+        //printf("\nsearch returned: %d",offs_node);
+      //}
+
+
       }
 
       err=embedded_twiss();
@@ -514,10 +527,16 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       for (jslice=0;jslice<=nint;jslice++)
       {
         ratio=999999;
-        if (jslice) /*if jslice==0, parameters from previous node will be used*/
+        if (jslice != 0)
         {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y,
                           &betx, &bety, &dx, &dy);
+        /* BJ added next 4 lines 24oct08 */
+        if (jslice == nint) {
+          x_end_former = x;
+          y_end_former = y;
+        }
+
           s_curr=s_start+s;
           aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength,
                            haloxsi, haloysi);
@@ -534,11 +553,17 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
           }
         }
         else
+        /*  jslice==0, parameters from previous node will be used  */
         {
-          s_curr+=1.e-12; /*to get correct plot at start of elements*/
+          s_curr+=1.e-12;     /*to get correct plot at start of elements*/
           s=0; /*used to calc elem_x elem_y) */
+
+        /* BJ added next 2 lines 24oct08 */
+        x = x_end_former;
+        y = y_end_former;
         }
 
+      /* printf ("%20s  x %13.6f  y %13.6f x_end_former %13.6f y_end_former %13.6f\n",name,x,y,x_end_former,x_end_former); */
 
         /* survey adjustments */
         if (offs_node)
@@ -594,21 +619,31 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         n1x_m=n1*bbeat*sqrt(betx*ex);
         n1y_m=n1*bbeat*sqrt(bety*ey);
 
-        if ( (is_zero_len == 0) || (jslice == 1) )
+/* Change below, BJ 23oct1008                              */
+/* test block 'if (n1 < node_n1)' included in test block   */
+/*   if ( (is_zero_len == 0) ...'                          */
+
+        if ( (is_zero_len == 0) || (jslice == 1) ) {
+
           aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
                            &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
                            &x, &y, &betx, &bety, &dx, &dy, table);
 
         /* save node minimum n1 */
+
         if (n1 < node_n1)
-        {
-          node_n1=n1; node_s=s_curr;
-        }
+          {
+            node_n1=n1; node_s=s_curr;
+          }
+
+      } /* end if 'is_zero_len ... */
+
       }
 
       err=reset_interpolation(&nint);
 
       /* insert minimum node value into Twiss table */
+
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);
       (*tw_cnt)++;
 
@@ -634,7 +669,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   }
 
   myfree("Aperture",true_tab);
-  myfree("Aperture",offs_tab);
+  if (offs_tab != NULL) myfree("Aperture",offs_tab);
 
   return lim_pt;
 }
@@ -655,6 +690,58 @@ int aper_tab_search(int cnt, struct aper_e_d* tab, char* name, int* pos)
   *pos=i;
 
   return found;
+}
+
+int aper_tab_search_tfs(struct table* t, char* name, double* row)
+{
+  /* looks for node *name in tab[], returns 1 if found, and its pos
+     NAME                        S_IP         X_OFF        DX_OFF       DDX_OFF         Y_OFF        DY_OFF       DDY_OFF
+     function value return:
+     1 ok
+     0  not found
+     -1 column does not exist
+  */
+
+  int i=0, found=0;
+  int name_pos, s_ip_pos, x_off_pos, dx_off_pos, ddx_off_pos, y_off_pos, dy_off_pos, ddy_off_pos;
+
+  /* get column positions */
+  mycpy(c_dum->c, "name");
+  if ((name_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "s_ip");
+  if ((s_ip_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "x_off");
+  if ((x_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "dx_off");
+  if ((dx_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "ddx_off");
+  if ((ddx_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "y_off");
+  if ((y_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "dy_off");
+  if ((dy_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+  mycpy(c_dum->c, "ddy_off");
+  if ((ddy_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
+
+  //printf("\n column names ok %d\n",t->curr);
+
+  while (i < t->curr && found == 0)
+    {
+      i++;
+      if( !strcmp(t->s_cols[name_pos][i-1],name)) {
+      row[1] = t->d_cols[s_ip_pos][i-1];
+      row[2] = t->d_cols[x_off_pos][i-1];
+      row[3] = t->d_cols[dx_off_pos][i-1];
+      row[4] = t->d_cols[ddx_off_pos][i-1];
+      row[5] = t->d_cols[y_off_pos][i-1];
+      row[6] = t->d_cols[dy_off_pos][i-1];
+      row[7] = t->d_cols[ddy_off_pos][i-1];
+      found = 1;
+      }
+    }
+
+  return found;
+
 }
 
 
@@ -918,6 +1005,138 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
   return e_d_flag;
 }
 
+struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
+{
+  /* Reads displacement data in tfs format */
+
+  if (e_d_name == NULL) return NULL;
+
+  printf("\n Reading offsets from tfs \"%s\"\n",e_d_name);
+
+  struct table* t = NULL;
+  struct char_p_array* tcpa = NULL;
+  struct name_list* tnl = NULL;
+  int i, k, error = 0;
+  short  sk;
+  char *cc, *tmp, *name;
+
+
+  if ((tab_file = fopen(e_d_name, "r")) == NULL)
+    {
+      warning("cannot open file:", e_d_name); return NULL;
+    }
+
+
+  while (fgets(aux_buff->c, aux_buff->max, tab_file))
+    {
+     cc = strtok(aux_buff->c, " \"\n");
+     if (*cc == '@')
+       {
+       if ((tmp = strtok(NULL, " \"\n")) != NULL
+         && strcmp(tmp, "REFERENCE") == 0) // search for reference node
+        {
+         if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
+           {
+           if ((name = strtok(NULL, " \"\n")) != NULL) {
+             strcpy(refnode, name);
+             stolower(refnode);
+             strcat(refnode, ":1");
+           }
+           }
+        }
+       //printf("\nReference node: %s",refnode);
+       }
+     else if (*cc == '*' && tnl == NULL)
+       {
+      tnl = new_name_list("table_names", 20);
+        while ((tmp = strtok(NULL, " \"\n")) != NULL)
+            add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
+       }
+     else if (*cc == '$' && tcpa == NULL)
+       {
+      if (tnl == NULL)
+        {
+         warning("formats before names","skipped"); return NULL;
+        }
+      tcpa = new_char_p_array(20);
+        while ((tmp = strtok(NULL, " \"\n")) != NULL)
+        {
+         if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
+           if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+           else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+           else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
+           else                              tnl->inform[tcpa->curr] = 2;
+           tcpa->p[tcpa->curr++] = permbuff(tmp);
+        }
+       }
+     else
+       {
+        if(t == NULL)
+          {
+         if (tcpa == NULL)
+           {
+            warning("TFS table without formats,","skipped"); error = 1;
+           }
+         else if (tnl == NULL)
+           {
+            warning("TFS table without column names,","skipped"); error = 1;
+           }
+         else if (tnl->curr == 0)
+           {
+            warning("TFS table: empty column name list,","skipped");
+              error = 1;
+           }
+         else if (tnl->curr != tcpa->curr)
+           {
+            warning("TFS table: number of names and formats differ,",
+                       "skipped");
+              error = 1;
+           }
+           if (error)
+           {
+            delete_name_list(tnl); return NULL;
+           }
+           if(e_d_name != NULL) {
+             t = new_table(e_d_name, "OFFSETS",    500, tnl);
+           } else {
+             t = new_table(e_d_name, "OFFSETS",    500, tnl);
+           }
+        }
+      for (i = 0; i < tnl->curr; i++)
+        {
+         if (t->curr == t->max) grow_table(t);
+         tmp = tcpa->p[i];
+           if (strcmp(tmp,"%s") == 0)  {
+           t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+           strcat(t->s_cols[i][t->curr], ":1");
+         }
+           else if (strcmp(tmp,"%d") == 0 )
+           {
+            sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+           }
+           else if (strcmp(tmp,"%hd") == 0 )
+           {
+            sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
+           }
+           else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
+           if (i+1 < tnl->curr)
+           {
+              if ((cc =strtok(NULL, " \"\n")) == NULL)
+              {
+               warning("incomplete table line starting with:", aux_buff->c);
+                 return NULL;
+              }
+           }
+        }
+        t->curr++;
+       }
+    }
+  fclose(tab_file);
+  t->origin = 1;
+  add_to_table_list(t, table_register);
+  return t;
+}
+
 
 
 int aper_external_file(char *file, double tablex[], double tabley[])
@@ -997,12 +1216,13 @@ void aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* hal
 
 
 
-void aper_header(struct table* aper_t, struct aper_node* lim)
+void aper_header(struct table* aper_t, struct aper_node lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
   int i, err, nint=1, h_length = 25;
   double dtmp, dtmp2, vtmp[4], deltap_twiss,n1min;
   char tmp[NAME_L], *stmp;
+
 
   /* =================================================================*/
   /* ATTENTION: if you add header lines, augment h_length accordingly */
@@ -1013,6 +1233,13 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   if (aper_t == NULL) return;
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp) h_length++;
+  stmp = command_par_string("halofile", this_cmd->clone);
+  if (stmp) h_length += 1; else h_length += 4;
+
+  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",
+           lim.name,lim.n1,lim.s);
+
+  printf("\nheader %d \n",h_length);
 
   /* beam properties */
   if (aper_t->header == NULL)  aper_t->header = new_char_p_array(h_length);
@@ -1035,7 +1262,9 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
   sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
+
   /* aperture command properties */
+
   dtmp = command_par_value("exn", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ EXN              %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
@@ -1100,13 +1329,17 @@ void aper_header(struct table* aper_t, struct aper_node* lim)
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
-  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), lim->n1);
+  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",
+           lim.name,lim.n1,lim.s);
+  printf("\ncurr %d \n",aper_t->header->curr);
+
+
+  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), lim.n1);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  n1min = lim->n1;
+  n1min = lim.n1;
   set_value("beam","n1min",&n1min);
 
-
-  strcpy(tmp, lim->name);
+  strcpy(tmp, lim.name);
   sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""),strlen(tmp),stoupper(tmp) );
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
