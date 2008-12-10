@@ -8,7 +8,7 @@
 
 struct aper_e_d* true_tab;
 
-//struct aper_e_d* offs_tab;
+/* struct aper_e_d* offs_tab;*/
 struct table* offs_tab;
 
 
@@ -267,7 +267,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 {
   int stop=0, nint=1, jslice=1, err, first, ap=1;
   int true_flag, true_node=0, offs_node=0, do_survey=0;
-  int truepos=0, true_cnt=0, offspos, offs_cnt=0;
+  int truepos=0, true_cnt=0, offs_cnt=0;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
   double surv_init[6]={0, 0, 0, 0, 0, 0};
   double surv_x=zero, surv_y=zero, elem_x=0, elem_y=0;
@@ -276,7 +276,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, ex, ey, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
-  double x_end_former,y_end_former;
+  double x_end_former=0,y_end_former=0;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
   double node_s=-1, node_n1=-1;
@@ -304,7 +304,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   int is_zero_len;
 
   true_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
-  //offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));
+  /* offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));*/
 
   setbuf(stdout,(char*)NULL);
 
@@ -345,7 +345,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
   /* check if trueprofile and offsetelem files exist */
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
-  //offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);
+  /* offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);*/
   offs_tab = aper_e_d_read_tfs(offsfile, &offs_cnt, refnode);
   printf("\nref: %s",refnode);
 
@@ -407,7 +407,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
     else on_elem=1;
 
     if ( (offs_tab!= NULL) && (strcmp(refnode, name) == 0)) do_survey=1;
-    //printf("\nname: %s, ref: %s, do_survey:: %d\n",name,refnode, do_survey);
+    /* printf("\nname: %s, ref: %s, do_survey:: %d\n",name,refnode, do_survey);*/
 
 
     /* read data for tol displacement of halo */
@@ -499,14 +499,14 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       /* do survey */
       if (do_survey)
       {
-      //printf("\n using offsets\n");
+        /* printf("\n using offsets\n");*/
 
         aper_surv(surv_init, nint);
 
       offs_node=aper_tab_search_tfs(offs_tab, name, offs_row);
         if (offs_node)
         {
-        //printf("\nusing offset");
+          /* printf("\nusing offset");*/
           xa=offs_row[4];
           xb=offs_row[3];
           xc=offs_row[2];
@@ -514,9 +514,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
           yb=offs_row[6];
           yc=offs_row[5];
       }
-      //else {
-        //printf("\nsearch returned: %d",offs_node);
-      //}
+        /* else {
+        printf("\nsearch returned: %d",offs_node);
+        } */
 
 
       }
@@ -723,7 +723,7 @@ int aper_tab_search_tfs(struct table* t, char* name, double* row)
   mycpy(c_dum->c, "ddy_off");
   if ((ddy_off_pos = name_list_pos(c_dum->c, t->columns)) < 0) return -1;
 
-  //printf("\n column names ok %d\n",t->curr);
+  /* printf("\n column names ok %d\n",t->curr);*/
 
   while (i < t->curr && found == 0)
     {
@@ -1008,17 +1008,17 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
 struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
 {
   /* Reads displacement data in tfs format */
-
-  if (e_d_name == NULL) return NULL;
-
-  printf("\n Reading offsets from tfs \"%s\"\n",e_d_name);
-
   struct table* t = NULL;
   struct char_p_array* tcpa = NULL;
   struct name_list* tnl = NULL;
   int i, k, error = 0;
   short  sk;
   char *cc, *tmp, *name;
+
+
+  if (e_d_name == NULL) return NULL;
+
+  printf("\n Reading offsets from tfs \"%s\"\n",e_d_name);
 
 
   if ((tab_file = fopen(e_d_name, "r")) == NULL)
@@ -1033,7 +1033,7 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
-         && strcmp(tmp, "REFERENCE") == 0) // search for reference node
+           && strcmp(tmp, "REFERENCE") == 0) /* search for reference node */
         {
          if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
            {
@@ -1044,7 +1044,7 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
            }
            }
         }
-       //printf("\nReference node: %s",refnode);
+       /* printf("\nReference node: %s",refnode); */
        }
      else if (*cc == '*' && tnl == NULL)
        {

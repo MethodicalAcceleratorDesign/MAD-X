@@ -264,6 +264,3 @@
       call fort_warn('PTC command skipped! ',                           &
      &' Please use proper MAD-X version that includes PTC')
       end subroutine w_ptc_export_xml
-      
- 
-      

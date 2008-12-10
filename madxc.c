@@ -1088,7 +1088,7 @@ void correct_correct1(struct in_cmd* cmd)
   int niter;
   int resout;
   int twism;
-  int dbg;
+  int dbg = 0;
   int ifail, sflag, svdflg;
   float  rms;
   double sngcut, sngval;

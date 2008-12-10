@@ -410,7 +410,7 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 void complete_twiss_table(struct table* t)
   /* fills all items missing after "twiss" into twiss table */
 {
-  int i, j, mult, n;
+  int i, j, mult;
   double el, val;
   struct node* c_node;
   char tmp[16];
@@ -2557,7 +2557,7 @@ int interp_node(int *nint)
   struct node *first_node, *clone;
   struct element* el;
   int j, number_nodes;
-  double bv, bvk, angle, e1, e2, h1, h2, fint, hgap;
+  double bvk, angle, e1, e2, h1, h2, fint, hgap;
   double zero = 0.0, minus_one = -1.0, length, step, numint;
   char *elem_name;
   int bend_flag = 0;
