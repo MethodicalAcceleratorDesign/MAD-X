@@ -2136,13 +2136,11 @@
         tilt = node_value('tilt ')
         e1 = node_value('e1 ')
         e2 = node_value('e2 ')
-        print*,"SSSSSSSSSHHHHIIITTT",e1,e2
 
         if(code.eq.2) then
           e1 = e1 + bvk * node_value('angle ') / two
           e2 = e2 + bvk * node_value('angle ') / two
         endif
-        print*,"SSSSSSSSSHHHHIIITTT22222222",e1,e2
 
 !--- bvk also applied further down
 
