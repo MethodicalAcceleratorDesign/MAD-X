@@ -4056,11 +4056,15 @@ void write_table(struct table* t, char* filename)
             }
             else if (t->columns->inform[col->i[i]] == 3)
             {
-              *c_dum->c = '\"';
-              strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
-              stoupper(c_dum->c);
-              pc = strip(c_dum->c); /* remove :<occ_count> */
-              k = strlen(pc);
+              *pc = *c_dum->c = '\"';
+              if (t->s_cols[col->i[i]][j] != NULL)
+		{
+                 strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+                 stoupper(c_dum->c);
+                 pc = strip(c_dum->c); /* remove :<occ_count> */
+                 k = strlen(pc);
+		}
+              else k = 1;
               pc[k++] = '\"'; pc[k] = '\0';
               fprintf(out_file, v_format(" %S "), pc);
             }
