@@ -51,6 +51,13 @@
 !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
 
+!-------added by Yipeng SUN 01-12-2008--------------
+      onepass = get_option('onepass ') .ne. 0
+      if(onepass)   then
+      else
+      call trclor(orbit0)
+      endif
+!-------added by Yipeng SUN 01-12-2008--------------
 
 !---- AK 2006 04 23
 !---- This version of trrun.F gets rid of all problems concerning delta_p
@@ -344,7 +351,7 @@
       logical aperflag,bend,fmap,onepass
       integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
      &get_option
-      double precision apx,apy,el,sum,node_value,track(6,*),            &
+      double precision apx,apy,apr,el,sum,node_value,track(6,*),        &
      &last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
      &aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
      &st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*)
@@ -460,6 +467,13 @@
           apy = aperture(2)
           call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
      &last_pos, last_orbit, track,ktrack,al_errors)
+!-------------Racetrack type , added by Yipeng SUN 21-10-2008---
+        else if(aptype.eq.'racetrack') then
+          apx = aperture(1)
+          apy = aperture(2)
+	  apr = aperture(3)
+          call trcoll1(4, apx, apy, turn, sum, part_id, last_turn,      &
+     &last_pos, last_orbit, track,ktrack,al_errors, apr)
 !------------  LHC screen case ----------------------------------
         else if(aptype.eq.'lhcscreen') then
 !        print *, "LHC screen start, Xrect= ",
@@ -732,6 +746,8 @@
       if (n_ferr .gt. 0) then
         call dcopy(f_errors,field,n_ferr)
       endif
+!-----added FrankS, 10-12-2008
+      nd = 2 * max(nn, ns, n_ferr/2-1)
 !---- Dipole error.
 !      dbr = bvk * field(1,0) / (one + deltas)
 !      dbi = bvk * field(2,0) / (one + deltas)
@@ -2330,6 +2346,46 @@
       enddo
       end
 
+      subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
+     &last_pos, last_orbit, z, ntrk,al_errors, apr)
+!----------------------------------------------------------------------*
+! Similar with trcoll, for racetrack type aperture
+!-------------Racetrack type , added by Yipeng SUN 21-10-2008---
+!----------------------------------------------------------------------*
+      implicit none
+
+      include 'twiss0.fi'
+      include 'name_len.fi'
+      integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
+      double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
+     &one,al_errors(align_max),apr
+      parameter(one=1d0)
+      character*(name_len) aptype
+
+      n = 1
+ 10   continue
+      do i = n, ntrk
+!---- Is particle outside aperture?
+        if (flag .eq. 4                                                 &
+     &.and. (abs(z(1,i)-al_errors(11))) .gt. (apr+apx)                  &
+     &.or. abs(z(3,i)-al_errors(12)) .gt. (apy+apr) .or.                &
+     &((((abs(z(1,i)-al_errors(11))-apx)**2+                            &
+     &(abs(z(3,i)-al_errors(12))-apy)**2) .gt. apr**2)                  &
+     &.and. (abs(z(1,i)-al_errors(11))) .gt. apx                        & 
+     &.and. abs(z(3,i)-al_errors(12)) .gt. apy)) then
+          go to 99
+	endif
+        go to 98
+ 99     n = i
+        nn=name_len
+        call node_string('apertype ',aptype,nn)
+        call trkill(n, turn, sum, ntrk, part_id,                        &
+     &last_turn, last_pos, last_orbit, z, aptype)
+        goto 10
+ 98     continue
+      enddo
+      end
+      
       subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
       implicit none
 !----------------------------------------------------------------------*
@@ -2683,3 +2739,272 @@
       call pro_input(cmd)      
       end      
             
+      subroutine trclor(orbit0)
+      implicit none
+
+!----------------------------------------------------------------------*
+! Purpose:                                                             *
+!   -  Find 6D closed orbit                                            *
+!   -  Use Newton approximation                                        *
+!                                                                      *
+! Input/output:                                                        *
+!   ORBIT0(6) (double)  Closed Orbit Coordinates @ sequence start      *
+!                       (X, PX, Y, PY, T, PT)                          *
+!----------------------------------------------------------------------*
+
+      include 'twiss0.fi'
+      include 'name_len.fi'
+      include 'track.fi'
+!      include 'bb.fi'
+      
+      double precision zero, one
+      parameter(zero=0d0,one=1d0)           
+      double precision orbit0(6), z(6,7), z0(6,7), a(6,7),deltap,ddd(6)
+      integer itra, itmax, j, bbd_pos, j_tot
+      integer code
+      double precision el,dxt(200),dyt(200)
+      integer restart_sequ 
+      integer advance_node, get_option, node_al_errors
+      double precision node_value, get_value, get_variable
+      integer n_align
+      double precision al_errors(align_max)
+      double precision re(6,6)
+
+      logical aperflag, onepass, doupdate
+      integer pmax, turn, turnmax, part_id(1),last_turn(1)
+      double precision sum, tmp_d, spos, orbit(6)
+      double precision last_pos(6),last_orbit(6,1),maxaper(6) 
+
+      integer nint, ndble, nchar, int_arr(1), char_l
+      character*12 tol_a, char_a
+      character*4 vec_names(7)
+      character*(name_len) el_name
+      
+      integer i,k, irank
+
+      double precision cotol, err
+      
+      data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+      
+      print *,"madX::trrun.F::trclor()"
+      print *," "
+!      print *," AK special version 2007/12/13"
+!      print *," ============================="
+
+!      print *," Modified by Yipeng SUN 19/11/2008 "
+!      print *," ======================="
+      print *," Full 6D closed orbit search."
+      print*," Initial value of 6-D closed orbit from Twiss: "
+      print*," orbit0 ",orbit0
+
+!---- Initialize needed variables
+      turn    = 1
+      turnmax = 1
+      itmax   = 10
+      pmax    = 7
+      sum     = zero
+      aperflag  = .false. 
+      onepass   = .true.
+
+      do k=1,7
+        call dcopy(orbit0,z(1,k),6)
+      enddo
+
+!      ddd(1) = orbit0(1)/100000      
+!      ddd(2) = orbit0(2)/100000     
+!      ddd(3) = orbit0(3)/100000          
+!      ddd(4) = orbit0(4)/100000    
+!      ddd(5) = orbit0(5)/100000         
+!      ddd(6) = orbit0(6)/100000   
+      
+! for on momentum pt =0
+!      ddd(1) = 1e-15         
+!      ddd(2) = 1e-15      
+!      ddd(3) = 1e-15           
+!      ddd(4) = 1e-15    
+!      ddd(5) = 1e-15       
+!      ddd(6) = 1e-15  
+!--------------------------------------
+      ddd(1) = 1e-15         
+      ddd(2) = 1e-15      
+      ddd(3) = 1e-15           
+      ddd(4) = 1e-15    
+      ddd(5) = 1e-15       
+      ddd(6) = 1e-15      
+      
+!      do k=1,6
+!        z(k,k+1) = z(k,k+1) + ddd(k)
+!      enddo
+
+      do k=1,7
+        call dcopy(z(1,k),z0(1,k),6)
+      enddo
+
+!--- jmax may be reduced by particle loss - keep number in j_tot
+      j_tot = pmax
+!--- get vector of six coordinate maxapers (both RUN and DYNAP)
+      call comm_para('maxaper ',nint,ndble,nchar,int_arr,maxaper,       &
+     &               char_a, char_l)
+!--- set particle id
+      
+
+      
+
+      cotol = get_variable('twiss_tol ')
+     
+!---- Initialize kinematics and orbit
+      bet0  = get_value('beam ','beta ')
+      betas = get_value('probe ','beta ')
+      gammas= get_value('probe ','gamma ')
+      bet0i = one / bet0
+      beti   = one / betas
+      dtbyds = get_value('probe ','dtbyds ')
+      deltas = get_variable('track_deltap ')
+      arad = get_value('probe ','arad ')
+      dorad = get_value('probe ','radiate ') .ne. 0
+      dodamp = get_option('damp ') .ne. 0
+      dorand = get_option('quantum ') .ne. 0
+      call dcopy(orbit0,orbit,6)
+      
+
+
+
+!---- Iteration for closed orbit.
+      do itra = 1, itmax
+!        print*," before tracking "
+!        print*," itra: ",itra, " z: ", z
+        j = restart_sequ()
+
+!---- loop over nodes
+ 10     continue
+
+
+        bbd_pos = j
+        code    = node_value('mad8_type ')
+        el      = node_value('l ')
+
+        if (itra .eq. 1)  then
+          if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
+            print*," "
+            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
+            print*," "
+            print*,"Track dies nicely"
+            print*,"Thick lenses will get nowhere"
+            print*,"MAKETHIN will save you"
+            print*," "
+            print*," "
+            stop
+          endif
+        endif
+        
+
+	        
+!--------  Misalignment at beginning of element (from twissfs.f)
+        if (code .ne. 1)  then
+          call dzero(al_errors, align_max)
+          n_align = node_al_errors(al_errors)
+          if (n_align .ne. 0)  then
+            do i = 1, pmax
+              call tmali1(z(1,i),al_errors, betas, gammas,z(1,i), re)
+            enddo
+          endif
+        endif
+        
+!-------- Track through element
+        call ttmap(code,el,z,pmax,dxt,dyt,sum,turn,part_id,             &
+     &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
+
+!--------  Misalignment at end of element (from twissfs.f)
+        if (code .ne. 1)  then
+          if (n_align .ne. 0)  then
+            do i = 1, pmax
+              call tmali2(el,z(1,i), al_errors, betas, gammas,          &
+     &z(1,i), re)
+            enddo
+          endif 
+        endif       
+
+
+        if (advance_node().ne.0)  then
+          j=j+1
+          goto 10
+        endif
+!---- end of loop over nodes
+    
+
+!---- construct one-turn map
+      do k=1,6
+        do i=1,6
+          a(i,k) = (z(i,k+1) - z(i,1))/ddd(i)
+        enddo
+      enddo   
+!---- Solve for dynamic case.
+      err = zero
+      do i= 1,6
+        a(i,i) = a(i,i) - one
+        a(i,7) = z(i,1) - z0(i,1)
+        err = max(abs(a(i,7)), err)
+      enddo       
+      
+      call solver(a,6,1,irank)
+      if (irank.lt.6) go to 100
+      do i = 1, 6
+        z0(i,1) = z0(i,1) - a(i,7)
+      enddo
+!---- Solve for dynamic case.
+!      do i = 1, 6	
+!      print*," a(i,7) ",a(i,7)
+!      enddo
+             	
+!      if (err.lt.cotol) then
+      
+!      print *, ' '
+!      print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: ''    &
+!     &,                                                                 &
+!     &1p,e14.6)',itra,err,deltap
+!          print '(''orbit: '', 1p,6e14.6)', z0      
+
+!      goto 110
+      
+!      endif
+     
+
+
+      do k=2,7
+        call dcopy(z0(1,1),z0(1,k),6)
+      enddo
+      
+      do k=1,6
+        z0(k,k+1) = z0(k,k+1) + ddd(k)
+      enddo
+
+      do k=1,7
+        call dcopy(z0(1,k),z(1,k),6)
+      enddo
+
+    
+!---- end of Iteration
+      enddo
+      
+      call dcopy(z0(1,1),orbit0,6)
+!      print *,"madX::trrun.F::trclor()"
+!      print *," Iteration maximum reached. NO convergence."
+      goto 110
+
+100   continue      
+      print *,"madX::trrun.F::trclor()"
+      print *," Singular matrix occurred during closed orbit search."
+
+110   continue  
+      print *, ' '    
+      print *, '6D closed orbit found by subroutine trclor '
+      print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: ''    &
+     &,                                                                 &
+     &1p,e14.6)',itra,err,deltap
+          print '(''orbit: '', 1p,6e14.6)', orbit0     
+
+      end
+
+            
+
+
