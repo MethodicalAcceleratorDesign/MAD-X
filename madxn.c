@@ -5712,13 +5712,11 @@ void set_node_bv(struct sequence* sequ)
   beam_bv = command_par_value("bv", current_beam);
   while (c_node != NULL)
   {
-    if(command_par_value("magnet", c_node->p_elem->def))
-    {
-      c_node->other_bv = beam_bv;
+    c_node->other_bv = beam_bv;
+    c_node->dipole_bv = beam_bv;
 /* dipole_bv kill initiative SF TR FS */
 /*      if (c_node->p_elem->bv) c_node->dipole_bv = beam_bv;
         else                    c_node->dipole_bv = 1;*/
-    }
     if (c_node == sequ->ex_end) break;
     c_node = c_node->next;
   }
