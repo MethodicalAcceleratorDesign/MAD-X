@@ -463,7 +463,6 @@ void complete_twiss_table(struct table* t)
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l')
         tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
       val = el_par_value(tmp, c_node->p_elem);
-      n = strlen(tmp) - 1;
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
           val *= c_node->dipole_bv;
       else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0)
