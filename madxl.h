@@ -223,6 +223,17 @@ int twiss_table_types[] =
   2, 2, 2,
   2, 2, 2,
   2, 2, 2,
+  /* delta_p dependency terms */
+  2,2,2, /* beta11p, beta12p, beta13p */
+  2,2,2, /* beta21p, beta22p, beta23p  */
+  2,2,2, /* beta31p, beta32p, beta33p  */
+  2,2,2, /* alfa11p, alfa12p, alfa13p */
+  2,2,2, /* alfa21p, alfa22p, alfa23p */
+  2,2,2, /* alfa31p, alfa32p, alfa33p */
+  2,2,2, /* gama11p, gama12p, gama13p */
+  2,2,2, /* gama21p, gama22p, gama23p */
+  2,2,2, /* gama31p, gama32p, gama33p */
+  /* end of delta_p dependency terms */
   2, 2, 2,
   2, 2, 2,
   2, 2, 2,
@@ -268,6 +279,17 @@ char* twiss_table_cols[] =
   "gama11", "gama12", "gama13",
   "gama21", "gama22", "gama23",
   "gama31", "gama32", "gama33",
+  /* delta_p dependency: derivatives of the above Twiss parameters */
+  "beta11p","beta12p","beta13p",
+  "beta21p","beta22p","beta23p",
+  "beta31p","beta32p","beta33p",
+  "alfa11p", "alfa12p","alfa13p",
+  "alfa21p", "alfa22p","alfa23p",
+  "alfa31p", "alfa32p","alfa33p",
+  "gama11p", "gama12p","alfa33p",
+  "gama21p", "gama22p","gama23p",
+  "gama31p", "gama32p","gama33p",
+  /* end of delta_p dependency */
   "mu1", "mu2", "mu3",
   "disp1", "disp2", "disp3",
   "disp4", "disp5", "disp6",
@@ -381,10 +403,20 @@ char* twiss_sector_table_cols[] = {
 
 int ptc_twiss_summary_table_types[] =
   {
-    2, 2, 2, 2, 2, 2
+    2, 2, 2, 2, 
+    2, 2, 2, 2,
+    2, 2, 2, 2,
+    2,
+    2,2,2,
+    2,2,2
   };
 char* ptc_twiss_summary_table_cols[] = {
-  "alpha_c", "eta_c", "tune_x", "tune_y", "chrom_x", "chrom_y",
+  "length", "alpha_c", "eta_c", "gamma_tr", 
+  "q1", "q2", "dq1", "dq2",
+  "beta_x_min","beta_x_max","beta_y_min","beta_y_max",
+  "deltap",
+  "orbit_x","orbit_px","orbit_y",
+  "orbit_py","orbit_pt","orbit_-cT",
   " " /* blank terminates */
 };
 

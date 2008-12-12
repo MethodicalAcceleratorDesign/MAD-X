@@ -808,13 +808,13 @@ contains
   subroutine getfctnsnames
     implicit none
     character*(100) ::name
-    character*(7) ::twname
+    character*(8) ::twname
     integer i,j
     integer last
 
     do i=1, ntwisses
-       twname = twissnames(i)
-       twname(7:7) = achar(0)
+       twname = twissnames(i) ! twissname now known to be of fixed length 7
+       twname(8:8) = achar(0)
        call madxv_setfctnname(i,twname)
     enddo
 

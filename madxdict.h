@@ -491,6 +491,7 @@ char command_def[] =
 "summary_table = [s, none, ptc_twiss_summary], "
 "savemaps = [l, true, true], " /*buffers maps for future usage as universal_taylors */
 "slice_magnets =[l,false,true], "
+"deltap_dependency = [l,false,true], " /* compute Twiss derivatives w.r.t deltap*/
 "xdistr   = [s, gauss, gauss], " /* type of distribution in X plane*/
 "ydistr   = [s, gauss, gauss], " /* type of distribution in Y plane*/
 "zdistr   = [s, gauss, gauss], " /* type of distribution in Z plane*/

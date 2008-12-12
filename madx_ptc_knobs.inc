@@ -80,42 +80,94 @@ integer, parameter                ::   gama31=25
 integer, parameter                ::   gama32=26
 integer, parameter                ::   gama33=27
 
-integer, parameter                ::   mu1=28
-integer, parameter                ::   mu2=29
-integer, parameter                ::   mu3=30
+! additional parameters for the Twiss derivatives w.r.t delta_p:
+
+integer, parameter		::	beta11p = 28
+integer, parameter		:: 	beta12p = 29
+integer, parameter		::	beta13p = 30
+
+integer, parameter		::	beta21p = 31
+integer, parameter		::	beta22p = 32
+integer, parameter		::	beta23p = 33
+
+integer, parameter		::	beta31p = 34
+integer, parameter		::	beta32p = 35
+integer, parameter		::	beta33p = 36
+
+integer, parameter		::	alfa11p = 37
+integer, parameter		::	alfa12p = 38
+integer, parameter		::	alfa13p = 39
+
+integer, parameter		::	alfa21p = 40
+integer, parameter		::	alfa22p = 41
+integer, parameter		::	alfa23p = 42
+
+integer, parameter		::	alfa31p = 43
+integer, parameter		::	alfa32p = 44
+integer, parameter		::	alfa33p = 45
+
+integer, parameter		::	gama11p = 46
+integer, parameter		::	gama12p = 47
+integer, parameter		::	gama13p = 48
+
+integer, parameter		::	gama21p = 49
+integer, parameter		::	gama22p = 50
+integer, parameter		::	gama23p = 51
+
+integer, parameter		::	gama31p = 52
+integer, parameter		::	gama32p = 53
+integer, parameter		::	gama33p = 54
+
+!---
+
+integer, parameter                ::   mu1=55
+integer, parameter                ::   mu2=56
+integer, parameter                ::   mu3=57
 
 
-integer, parameter                ::   disp1=31
-integer, parameter                ::   disp2=32
-integer, parameter                ::   disp3=33
-integer, parameter                ::   disp4=34
+integer, parameter                ::   disp1=58
+integer, parameter                ::   disp2=59
+integer, parameter                ::   disp3=60
+integer, parameter                ::   disp4=61
 
 
 
-integer, parameter                ::   kn_x  =35 !kn prefix is added to limit crashes with the other modules name space
-integer, parameter                ::   kn_px =36
-integer, parameter                ::   kn_y  =37
-integer, parameter                ::   kn_py =38
-integer, parameter                ::   kn_t  =39
-integer, parameter                ::   kn_dp =40
+integer, parameter                ::   kn_x  =62 !kn prefix is added to limit crashes with the other modules name space
+integer, parameter                ::   kn_px =63
+integer, parameter                ::   kn_y  =64
+integer, parameter                ::   kn_py =65
+integer, parameter                ::   kn_t  =66
+integer, parameter                ::   kn_dp =67
 
 
 
-integer, parameter                ::   ntwisses = 40
-integer, parameter                ::   ninparams = 27 !possible initial conditions as parameters
+integer, parameter                ::   ntwisses = 67 ! increased from 40 to 67 to accomodate additional Twiss derivatives w.r.t delta
+integer, parameter                ::   ninparams = 27 !possible initial conditions as parameters (jluc: do we need to modify this?)
 
-CHARACTER*(6), parameter          ::   twissnames(ntwisses) = (/ &
-     'beta11','beta12','beta13',&
-     'beta21','beta22','beta23',&
-     'beta31','beta32','beta33',&
-     'alfa11','alfa12','alfa13',&
-     'alfa21','alfa22','alfa23',&
-     'alfa31','alfa32','alfa33',&
-     'gama11','gama12','gama13',&
-     'gama21','gama22','gama23',&
-     'gama31','gama32','gama33',&
-     'disp1 ','disp2 ','disp3 ','disp4 ',&
-     'mu1   ','mu2   ','mu3   ',&
-     'x     ','px    ',&
-     'y     ','py    ',&
-     'pt    ','t     '          /)
+
+
+! increase string size from 6 to 7 to accomodate Twiss derivatives w.r.t deltap
+CHARACTER*(7), parameter          ::   twissnames(ntwisses) = (/ &
+     'beta11 ','beta12 ','beta13 ',& ! space-padding to reach 7
+     'beta21 ','beta22 ','beta23 ',&
+     'beta31 ','beta32 ','beta33 ',&
+     'alfa11 ','alfa12 ','alfa13 ',&
+     'alfa21 ','alfa22 ','alfa23 ',&
+     'alfa31 ','alfa32 ','alfa33 ',&
+     'gama11 ','gama12 ','gama13 ',&
+     'gama21 ','gama22 ','gama23 ',&
+     'gama31 ','gama32 ','gama33 ',&
+     'beta11p','beta12p','beta13p',&
+     'beta21p','beta22p','beta23p',&
+     'beta31p','beta32p','beta33p',&
+     'alfa11p','alfa12p','alfa13p',&
+     'alfa21p','alfa22p','alfa23p',&
+     'alfa31p','alfa32p','alfa33p',&
+     'gama11p','gama12p','gama13p',&
+     'gama21p','gama22p','gama23p',&    
+     'gama31p','gama32p','gama33p',&
+     'disp1  ','disp2  ','disp3  ','disp4  ',&
+     'mu1    ','mu2    ','mu3    ',&
+     'x      ','px     ',&
+     'y      ','py     ',&
+     'pt     ','t      '/)

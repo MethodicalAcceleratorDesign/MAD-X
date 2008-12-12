@@ -31,6 +31,7 @@ module madx_ptc_twiss_module
 
      logical(lp) nf
      real(dp), dimension(3,3) ::  beta,alfa,gama
+     real(dp), dimension(3,3) ::  beta_p,alfa_p,gama_p ! derivatives of the above w.r.t delta_p
      real(dp), dimension(3)   ::  mu
      real(dp), dimension(6)   ::  disp
      real(dp), dimension(3)   ::  tune
@@ -76,8 +77,10 @@ module madx_ptc_twiss_module
        0,0,0,0,0,1 /), &
        (/6,6/) )
 
-  logical :: slice_magnets, momentumCompactionToggle
-  
+  logical :: slice_magnets, deltap_dependency, momentumCompactionToggle
+ 
+  real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
+  real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table) 
 
   !============================================================================================
   !  PRIVATE
@@ -125,6 +128,20 @@ contains
        enddo
     enddo
 
+
+! in 4D we get following formulas for Twiss parameters. They can be derived to compute deltap dependency
+! beta[ 1 1 ]=(Y(1)%t.sub.100000)*(Y(1)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(1)%t.sub.010000)
+! alpha[ 1 1 ]=-(Y(1)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(2)%t.sub.010000)
+! gamma[ 1 1 ]=(Y(2)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(2)%t.sub.010000)*(Y(2)%t.sub.010000)
+! beta[ 2 1 ]=(Y(3)%t.sub.100000)*(Y(3)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(3)%t.sub.010000)
+! alpha[ 2 1 ]=-(Y(3)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(4)%t.sub.010000)
+! gamma[ 2 1 ]=(Y(4)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(4)%t.sub.010000)*(Y(4)%t.sub.010000)
+! beta[ 1 2 ]=(Y(1)%t.sub.001000)*(Y(1)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(1)%t.sub.000100)
+! alpha[ 1 2 ]=-(Y(1)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(2)%t.sub.000100)
+! gamma[ 1 2 ]=(Y(2)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(2)%t.sub.000100)*(Y(2)%t.sub.000100)
+! beta[ 2 2 ]=(Y(3)%t.sub.001000)*(Y(3)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(3)%t.sub.000100)
+! alpha[ 2 2 ]=-(Y(3)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(4)%t.sub.000100)
+! gamma[ 2 2 ]=(Y(4)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(4)%t.sub.000100)*(Y(4)%t.sub.000100)
 
     J=0
     !here ND2=4 and delta is present      nd2=6 and delta is a constant
@@ -184,6 +201,14 @@ contains
        enddo
     enddo
 
+    ! --- derivatives of the Twiss parameters w.r.t delta_p
+    if (deltap_dependency) then
+       if( (c_%npara==5) .or. (c_%ndpt/=0) ) then ! condition to be checked
+          call computeDeltapDependency(y,s1)
+       endif
+    endif
+    ! ---
+
 
     !when there is no cavity it gives us dispersions
     do i=1,c_%nd2-2*ndel
@@ -197,7 +222,12 @@ contains
           s1%gama(3,i) = test
        enddo
     endif
-    
+
+    !--- track the Twiss functions' extremas
+    call trackBetaExtrema(1,1,s1%beta(1,1))
+    call trackBetaExtrema(2,2,s1%beta(2,2))
+    !---
+   
     s1%mu=phase
 
     do k=1,c_%nd
@@ -232,8 +262,11 @@ contains
 
     s1%nf=.false.
     s1%beta(:,:)=zero
+    s1%beta_p(:,:)=zero
     s1%alfa(:,:)=zero
+    s1%alfa_p(:,:)=zero
     s1%gama(:,:)=zero
+    s1%gama_p(:,:)=zero
     s1%mu(:)=zero
     s1%disp(:)=zero
     s1%tune(:)=zero
@@ -256,8 +289,11 @@ contains
 
        s1%nf=.false.
        s1%beta(:,:)=zero
+       s1%beta_p(:,:)=zero
        s1%alfa(:,:)=zero
+       s1%alfa_p(:,:)=zero
        s1%gama(:,:)=zero
+       s1%gama_p(:,:)=zero
        s1%mu(:)=zero
        s1%disp(:)=zero
        s1%tune(:)=zero
@@ -297,7 +333,8 @@ contains
     integer                 :: row
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform
-    character*48           :: summary_table_name
+    character*48            :: summary_table_name
+
     skipnormalform = my_false
 
     !all zeroing
@@ -491,6 +528,7 @@ contains
     endif
 
     slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
+    deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
 
     if (.not. slice_magnets) then
 
@@ -585,7 +623,10 @@ contains
 
     if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
        ! only makes sense if the lattice is a ring (skipped for a line lattice)
-       call MomentumCompaction()
+       call oneTurnSummary()
+       call set_option('ptc_twiss_summary ', 1)
+    else
+       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
     endif
 
     if (getdebug() > 1) then
@@ -804,7 +845,8 @@ contains
       implicit none
       include "madx_ptc_knobs.inc"
       integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(72),myx
+      real(kind(1d0))   :: opt_fun(150),myx ! opt_fun(72) -> opt_fun(81) 
+      ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
       real(kind(1d0))   :: deltae
 
       if (getdebug() > 2) then
@@ -870,16 +912,50 @@ contains
       opt_fun(gama32)= tw%gama(3,2) * deltae
       opt_fun(gama33)= tw%gama(3,3) * deltae
 
+      ! --- derivatives of Twiss paramters w.r.t delta_p
+      ! NOW why do we need to multiply by deltae, as for the other Twiss parameters?
+      if (deltap_dependency) then
+         opt_fun(beta11p)= tw%beta_p(1,1) * deltae
+         opt_fun(beta12p)= tw%beta_p(1,2) * deltae
+         opt_fun(beta13p)= tw%beta_p(1,3) * deltae
+         opt_fun(beta22p)= tw%beta_p(2,1) * deltae
+         opt_fun(beta22p)= tw%beta_p(2,2) * deltae
+         opt_fun(beta23p)= tw%beta_p(2,3) * deltae
+         opt_fun(beta32p)= tw%beta_p(3,2) * deltae
+         opt_fun(beta33p)= tw%beta_p(3,3) * deltae
 
-      opt_fun(28)=tw%mu(1) !* deltae
-      opt_fun(29)=tw%mu(2) !* deltae
-      opt_fun(30)=tw%mu(3) !* deltae
-      opt_fun(31)=tw%disp(1)
-      opt_fun(32)=tw%disp(2)
-      opt_fun(33)=tw%disp(3)
-      opt_fun(34)=tw%disp(4)
-      opt_fun(35)=zero
-      opt_fun(36)=zero
+         opt_fun(alfa11p)= tw%alfa_p(1,1) * deltae
+         opt_fun(alfa12p)= tw%alfa_p(1,2) * deltae
+         opt_fun(alfa13p)= tw%alfa_p(1,3) * deltae
+         opt_fun(alfa21p)= tw%alfa_p(2,1) * deltae
+         opt_fun(alfa22p)= tw%alfa_p(2,2) * deltae
+         opt_fun(alfa23p)= tw%alfa_p(2,3) * deltae
+         opt_fun(alfa31p)= tw%alfa_p(3,1) * deltae
+         opt_fun(alfa32p)= tw%alfa_p(3,2) * deltae
+         opt_fun(alfa33p)= tw%alfa_p(3,3) * deltae
+
+         opt_fun(gama11p)= tw%gama_p(1,1) * deltae
+         opt_fun(gama12p)= tw%gama_p(1,2) * deltae
+         opt_fun(gama13p)= tw%gama_p(1,3) * deltae
+         opt_fun(gama21p)= tw%gama_p(2,1) * deltae
+         opt_fun(gama22p)= tw%gama_p(2,2) * deltae
+         opt_fun(gama23p)= tw%gama_p(2,3) * deltae
+         opt_fun(gama31p)= tw%gama_p(3,1) * deltae
+         opt_fun(gama32p)= tw%gama_p(3,2) * deltae
+         opt_fun(gama33p)= tw%gama_p(3,3) * deltae
+      endif
+      ! --- end
+
+      ! gama33p is the 53rd entry in opt_fun
+      opt_fun(54)=tw%mu(1) !* deltae
+      opt_fun(55)=tw%mu(2) !* deltae
+      opt_fun(56)=tw%mu(3) !* deltae
+      opt_fun(57)=tw%disp(1) ! was 31 instead of 57
+      opt_fun(58)=tw%disp(2) ! was 32 instead of 58
+      opt_fun(59)=tw%disp(3) ! was 33 instead of 59
+      opt_fun(60)=tw%disp(4) ! was 34 instead of 60
+      opt_fun(61)=zero
+      opt_fun(62)=zero ! was 36 instead of 62
       do i1=1,c_%nd2
          if(i1.le.4) then
             i1a=i1
@@ -896,7 +972,7 @@ contains
             else
                i2a=5
             endif
-            ii=36+(i1a-1)*6+i2a
+            ii=62+(i1a-1)*6+i2a ! was 36 instead of 62
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
          enddo
@@ -908,7 +984,7 @@ contains
          write(6,'(a,3(i8.0,1x))')  "idxes ", beta11,beta22,beta33
          write(6,'(a,3(f8.4,1x))')  "betas raw   ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
          write(6,'(a,3(f8.4,1x))')  "betas w/ener", opt_fun(1),opt_fun(5),opt_fun(9)
-         write(6,'(a,3(f8.4,1x))')  "disps       ", opt_fun(31),opt_fun(33),opt_fun(35)
+         write(6,'(a,3(f8.4,1x))')  "disps       ", opt_fun(57),opt_fun(58),opt_fun(59),opt_fun(60)
          write(6,'(a,3(f8.4,1x))')  "tunes       ", tw%mu(1),tw%mu(2),tw%mu(3)
       endif
 
@@ -917,7 +993,7 @@ contains
       !write(28,'(a,1(f8.4,1x))') current%MAG%name,suml
       ! jluc debug - end
 
-      ioptfun=72
+      ioptfun=81 !72->81 to accomodate additional derivatives w.r.t. delta_p
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
 
@@ -1417,11 +1493,14 @@ contains
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
 
-    subroutine MomentumCompaction()
+    subroutine oneTurnSummary()
 
       implicit none
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
+      real(dp) :: gamma_tr ! gamma_transition, or "transition energy" above which the particles' arrival time
+      !  with respect to other particles is determined by its path length instead of by its velocity 
+      real(dp) :: deltap
       real(dp) :: betaRelativistic, gammaRelativistic
       real(dp) :: suml ! cumulative length along the ring
       real(dp) :: fractionalTunes(3)
@@ -1463,6 +1542,8 @@ contains
 
       state(:)=zero
       call find_orbit(my_ring,state,1,default)
+
+      ! write(6,*) 'NOW ORBIT IS ',state(:) => y, py, pt, -cT all ZERO !!! (idem in ptc_twiss)
 
       if (.not.c_%stable_da) then
          call fort_warn('ptc_twiss:','DA got unstable in momentum-compaction routine')
@@ -1527,6 +1608,7 @@ contains
 
       eta_c = -sd * betaRelativistic**2 / suml
       alpha_c = one / gammaRelativistic**2 + eta_c
+      gamma_tr = one / sqrt(alpha_c)
 
       ! also output the tune ...
       fractionalTunes = theNormalForm%tune
@@ -1552,22 +1634,44 @@ contains
 
       call kill(oneTurnMap)
 
+
       !write(6,*)
       !write(6,*) "Momentum compaction (momentum compaction factor & phase-slip factor):"
       !write(6,*) "alpha=", alpha_c, "eta=", eta_c
       !write(6,*) "fractional tunes=", fractionalTunes
       !write(6,*) "chromaticities=", chromaticities
 
+      deltap = get_value('ptc_twiss ','deltap ')
+
       ! write the data into the ptc_twiss_summary table
+      call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
       call double_to_table( summary_table_name, 'alpha_c ', alpha_c ) ! momemtum compaction factor
-      call double_to_table( summary_table_name, 'eta_c', eta_c ) ! associated phase-slip factor
-      call double_to_table( summary_table_name, 'tune_x', fractionalTunes(1))
-      call double_to_table( summary_table_name, 'tune_y', fractionalTunes(2))
-      call double_to_table( summary_table_name, 'chrom_x', chromaticities(1))
-      call double_to_table( summary_table_name, 'chrom_y', chromaticities(2))
+      call double_to_table( summary_table_name, 'eta_c ', eta_c ) ! associated phase-slip factor
+      call double_to_table( summary_table_name, 'gamma_tr ', gamma_tr) ! associated transition energy
+      call double_to_table( summary_table_name, 'q1 ', fractionalTunes(1))
+      call double_to_table( summary_table_name, 'q2 ', fractionalTunes(2))
+      call double_to_table( summary_table_name, 'dq1 ', chromaticities(1))
+      call double_to_table( summary_table_name, 'dq2 ', chromaticities(2))
+      ! write the extremas of the Twiss functions
+      ! for the time-being, do not bother about the coupling terms
+      call double_to_table( summary_table_name, 'beta_x_min ', minBeta(1,1))
+      call double_to_table( summary_table_name, 'beta_x_max ', maxBeta(1,1))
+      call double_to_table( summary_table_name, 'beta_y_min ', minBeta(2,2))
+      call double_to_table( summary_table_name, 'beta_y_max ', maxBeta(2,2))
+      call double_to_table( summary_table_name, 'deltap ', deltap)
+      ! the 6-d closed orbit
+      call double_to_table( summary_table_name,'orbit_x ',state(1))
+      call double_to_table( summary_table_name,'orbit_px ', state(2))
+      call double_to_table( summary_table_name,'orbit_y ', state(3))
+      call double_to_table( summary_table_name,'orbit_py ', state(4))
+      ! warning: if 'time=false', the last two phase-space state-variables
+      ! should be deltap/p and path-length respectively
+      call double_to_table( summary_table_name,'orbit_pt ', state(5))
+      call double_to_table( summary_table_name,'orbit_-cT ', state(6))
+
       call augment_count( summary_table_name ); ! only one row actually...
 
-    end subroutine MomentumCompaction
+    end subroutine oneTurnSummary
 
 
     subroutine TrackAlongInnerSlices()
@@ -1717,8 +1821,102 @@ contains
     subroutine TrackAlongMagnets()
       ! should cut/paste the tracking part of the ptctwiss main subroutine
     end subroutine TrackAlongMagnets
-
-
+  
   END subroutine ptc_twiss
 
+  subroutine computeDeltapDependency(y,s1)
+    implicit none
+    type(real_8), intent(in)  :: y(ndd)
+    type(twiss),  intent(inout)  :: s1
+    integer :: k,i
+    integer :: J(lnv) ! the map's coefficient selector, as usual
+    integer :: Jderiv(lnv) ! to store the map's coefficient selector of the derivative w.r.t deltap
+    real(kind(1d0)) :: get_value ! C-function
+    integer :: no ! order must be at equal to 2 to be able to get terms of the form x*deltap
+    ! required to evaluate the derivatives of Twiss parameters w.r.t deltap
+
+
+    ! in order to avoid this message, should prevent entering this subroutine
+    ! in case none of the Twiss derivatives is selected...
+
+    no = get_value('ptc_twiss ','no ')
+    if ( no .lt. 2 ) then
+       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in computeDeltapDependency() is smaller then 2')
+       print*, "Order is ", no
+       return
+    endif
+
+    J=0
+    do i=1,c_%nd ! c_%nd is global variable
+       do k=1,c_%nd ! the same
+          J(2*i-1)=1
+          Jderiv = J ! vector copy
+          Jderiv(5)=1 ! the delta_p coefficient
+          s1%beta_p(k,i)= (Y(2*k-1).sub.Jderiv)*(Y(2*k-1).sub.J) + (Y(2*k-1).sub.J)*(Y(2*k-1).sub.Jderiv)
+          s1%alfa_p(k,i)= -(Y(2*k-1).sub.Jderiv)*(Y(2*k).sub.J) - (Y(2*k-1).sub.J)*(Y(2*k).sub.Jderiv)
+          s1%gama_p(k,i)= (Y(2*k).sub.Jderiv)*(Y(2*k).sub.J) + (Y(2*k).sub.J)*(Y(2*k).sub.Jderiv)
+          J(2*i-1)=0
+          J(2*i)=1
+          Jderiv = J ! vector copy
+          Jderiv(5)=1 ! the delta_p coefficient
+          s1%beta_p(k,i) = s1%beta_p(k,i) &
+               + (Y(2*k-1).sub.Jderiv)*(Y(2*k-1).sub.J) + (Y(2*k-1).sub.J)*(Y(2*k-1).sub.Jderiv)
+          s1%alfa_p(k,i)= s1%alfa_p(k,i) &
+               - (Y(2*k-1).sub.Jderiv)*(Y(2*k).sub.J) - (Y(2*k-1).sub.J)*(Y(2*k).sub.Jderiv)
+          s1%gama_p(k,i)= s1%gama_p(k,i) &
+               + (Y(2*k).sub.Jderiv)*(Y(2*k).sub.J)+(Y(2*k).sub.J)*(Y(2*k).sub.Jderiv)
+          J(2*i)=0 
+       enddo
+    enddo
+
+! the computations above match the following formulas, obtained by derivation of the Twiss parameters using the chain-rule
+! beta derivatives w.r.t delta_p
+!    beta11 = two * (y(1)%t.sub.'100000')*(y(1)%t.sub.'100010') + two * (y(1)%t.sub.'010000')*(y(1)%t.sub.'010010')
+!    beta12 = two * (y(1)%t.sub.'001000')*(y(1)%t.sub.'001010') + two * (y(1)%t.sub.'000100')*(y(1)%t.sub.'000110')
+!    beta21 = two * (y(3)%t.sub.'100000')*(y(3)%t.sub.'100010') + two * (y(3)%t.sub.'010000')*(y(3)%t.sub.'010010')
+!    beta22 = two * (y(3)%t.sub.'001000')*(y(3)%t.sub.'001010') + two * (y(3)%t.sub.'000100')*(y(3)%t.sub.'000110')
+! alpha derivatives w.r.t delta_p
+!    alfa11 = -((y(1)%t.sub.'100010')*(y(2)%t.sub.'100000')+(y(1)%t.sub.'100000')*(y(2).sub.'100010')+&
+!         (y(1)%t.sub.'010010')*(y(2)%t.sub.'010000')+(y(1)%t.sub.'010000')*(y(2)%t.sub.'010010'))
+!    alfa12 = -((y(1)%t.sub.'001010')*(y(2)%t.sub.'001000')+(y(1)%t.sub.'001000')*(y(2)%t.sub.'001010')+&
+!         (y(1)%t.sub.'000110')*(y(2)%t.sub.'000100')+(y(1)%t.sub.'000100')*(y(2)%t.sub.'000110'))
+!    alfa21 = -((y(3)%t.sub.'100010')*(y(4)%t.sub.'100000')+(y(3)%t.sub.'100000')*(y(4)%t.sub.'100010')+&
+!         (y(3)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(3)%t.sub.'010000')*(y(4)%t.sub.'010010'))
+!    alfa22 = -((y(3)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(3)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
+!         (y(3)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(3)%t.sub.'000100')*(y(4)%t.sub.'000110'))
+! gamma derivatives w.r.t delta_p
+!    gama11 = (y(2)%t.sub.'100010')*(y(2)%t.sub.'100000')+(y(2)%t.sub.'100000')*(y(2)%t.sub.'100010')+&
+!         (y(2)%t.sub.'010010')*(y(2)%t.sub.'010000')+(y(2)%t.sub.'010000')*(y(2)%t.sub.'010010')
+!    gama12 = (y(2)%t.sub.'001010')*(y(2)%t.sub.'001000')+(y(2)%t.sub.'001000')*(y(2)%t.sub.'001010')+&
+!         (y(2)%t.sub.'000110')*(y(2)%t.sub.'000100')+(y(2)%t.sub.'000100')*(y(2)%t.sub.'000110')
+!    gama21 = (y(4)%t.sub.'100010')*(y(4)%t.sub.'100000')+(y(4)%t.sub.'100000')*(y(4)%t.sub.'100010')+&
+!         (y(4)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(4)%t.sub.'010000')*(y(4)%t.sub.'010010')
+!    gama22 = (y(4)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(4)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
+!         (y(4)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(4)%t.sub.'000100')*(y(4)%t.sub.'000110')
+
+  end subroutine computeDeltapDependency
+
+! --- a set of routines to track extremas of Twiss functions
+subroutine trackBetaExtrema(i,j,value)
+  implicit none
+  logical, save :: firstTime(3,3) = .true.
+  integer :: i,j
+  real(dp) :: value
+  if (firstTime(i,j)) then
+     firstTime(i,j) = .false.
+     minBeta(i,j) = value
+     maxBeta(i,j) = value
+!     write(80,*) 'first time in trackBetaExtrema for ',i,j
+  else
+     if (minBeta(i,j) .gt. value) then
+        minBeta(i,j) = value
+     elseif (maxBeta(i,j) .lt. value) then
+        maxBeta(i,j) = value
+     endif
+  endif
+end subroutine trackBetaExtrema
+! --- end of set of routines
+
 end module madx_ptc_twiss_module
+
+

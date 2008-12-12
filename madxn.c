@@ -736,6 +736,7 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
+
   ncols = m->curr;
   /* now make table */
   t_types = mymalloc(rout_name, ncols*sizeof(int));
@@ -3595,6 +3596,7 @@ void pro_ptc_twiss()
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
+  int ptc_twiss_summary = 0 ; /* set to 1 when a summary-table is filled-in */
   struct int_array* summary_tarr; /* to pass summary-table name to Fortran */
   struct node *nodes[2], *use_range[2];
   double ptc_deltap;
@@ -3749,6 +3751,11 @@ void pro_ptc_twiss()
   delete_int_array(summary_tarr);
   /* --- */
 
+  /* For the time-being, summary data are only available in case of a closed machine */
+  ptc_twiss_summary = get_option("ptc_twiss_summary");
+  if (ptc_twiss_summary) {
+    print_table(ptc_twiss_summary_table);
+  }
 }
 
 void pro_ptc_create_layout()
