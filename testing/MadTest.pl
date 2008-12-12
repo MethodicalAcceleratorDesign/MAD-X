@@ -892,7 +892,7 @@ LINE: while(<IN>){
 		    # ... many other cases like 'mkdir' to be handled before we conclude
 		    # the command corresponds to a file...
 
-		    if (($cmd ne "perl") && ($cmd ne "gnuplot")){
+		    if (($cmd ne "perl") && ($cmd ne "gnuplot") && ($cmd ne "python")){
 			@childs[$childCount++] = $cmd; # the command ...
 		    }
 		    if ($arg ne "") {
