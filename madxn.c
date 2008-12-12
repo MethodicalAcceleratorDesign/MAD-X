@@ -410,7 +410,7 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 void complete_twiss_table(struct table* t)
   /* fills all items missing after "twiss" into twiss table */
 {
-  int i, j, mult;
+  int i, j, mult, n;
   double el, val;
   struct node* c_node;
   char tmp[16];
@@ -459,7 +459,15 @@ void complete_twiss_table(struct table* t)
     else
     {
       strcpy(tmp, twiss_table_cols[j]);
+      n = strlen(tmp) - 1;
+      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l')
+        tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
       val = el_par_value(tmp, c_node->p_elem);
+      n = strlen(tmp) - 1;
+      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
+          val *= c_node->dipole_bv;
+      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0)
+          val *= c_node->dipole_bv;
       if (el != zero)
       {
         if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
