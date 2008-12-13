@@ -187,6 +187,8 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
+int twiss_mult_end = 58; /* last multipole column filled
+                            by complete_twiss_table */
 int twiss_fill_end = 72; /* last standard column filled
                             by complete_twiss_table */
 /* warning: modify routine complete_twiss_table in case of changes */

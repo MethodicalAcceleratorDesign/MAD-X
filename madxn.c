@@ -446,7 +446,7 @@ void complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {
-      if(j<59)
+      if(j<=twiss_mult_end)
       {
         val = mult_par(twiss_table_cols[j], c_node->p_elem);
         val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
@@ -465,8 +465,9 @@ void complete_twiss_table(struct table* t)
       val = el_par_value(tmp, c_node->p_elem);
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
           val *= c_node->dipole_bv;
-      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0)
-          val *= c_node->dipole_bv;
+      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 || 
+               strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0)
+        val *= c_node->dipole_bv;
       if (el != zero)
       {
         if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
@@ -736,7 +737,6 @@ void exec_create_table(struct in_cmd* cmd)
     return;
   }
   m = pl->parameters[pos]->m_string;
-
   ncols = m->curr;
   /* now make table */
   t_types = mymalloc(rout_name, ncols*sizeof(int));
@@ -875,6 +875,7 @@ void exec_setvars_table(struct in_cmd* cmd)
     warning("no table name: ", "ignored");
     return;
   }
+  current_node = NULL; /* to distinguish from other table fills */
   pos=name_list_pos("row", nl);
   row=(int) pl->parameters[pos]->double_value;
   if ((pos = name_list_pos(name, table_register->names)) > -1)
@@ -2824,7 +2825,7 @@ double mult_par(char* par, struct element* el)
   char tmp[12];
   char* p;
   double val = zero, vect[FIELD_MAX];
-  int k, l, skew = 0;
+  int k = 0, l, skew = 0;
   strcpy(tmp, par);
   if (*tmp == 'k' && (p = strchr(tmp, 'l')) != NULL)
   {

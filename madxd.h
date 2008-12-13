@@ -637,7 +637,6 @@ void fill_twiss_header_ptc(struct table*, double);
 struct command* find_command(char*, struct command_list*);
 struct command_list* find_command_list(char*, struct command_list_list*);
 struct element* find_element(char*, struct el_list*);
-char* find_string(char*, char**);
 struct variable* find_variable(char*, struct var_list*);
 double find_value(char*, int, char**);
 int force_pos(char*);
@@ -1366,8 +1365,8 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 3.04.59";
-char code_mod_date[] = "Code Modification Date: 11.12.2008";
+char myversion[] = "MAD-X 3.04.60";
+char code_mod_date[] = "Code Modification Date: 13.12.2008";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

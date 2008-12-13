@@ -401,7 +401,7 @@ void add_vars_to_table(struct table* t)
           = get_apertol(current_node, t->columns->names[i]);
       else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
     }
-    else if (find_string(t->columns->names[i], ap_table_cols))
+    else if (current_node)
       {
        if ((p = command_par_string(t->columns->names[i],
                                      current_node->p_elem->def)) == NULL)
@@ -1957,16 +1957,6 @@ double find_value(char* name, int ntok, char** toks)
     }
   }
   return val;
-}
-
-char* find_string(char* string, char** list)
-{
-  /* finds a string in an unordered, blank string terminated list of strings.
-     Returns pointer to string or NULL */
-  int i = 0;
-  while (*list[i++] != ' ') 
-      if (strcmp(string, list[i-1]) == 0) return list[i-1];
-  return NULL;
 }
 
 double frndm()
