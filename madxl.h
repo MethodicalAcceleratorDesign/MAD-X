@@ -288,7 +288,7 @@ char* twiss_table_cols[] =
   "alfa11p", "alfa12p","alfa13p",
   "alfa21p", "alfa22p","alfa23p",
   "alfa31p", "alfa32p","alfa33p",
-  "gama11p", "gama12p","alfa33p",
+  "gama11p", "gama12p","gama13p",
   "gama21p", "gama22p","gama23p",
   "gama31p", "gama32p","gama33p",
   /* end of delta_p dependency */
