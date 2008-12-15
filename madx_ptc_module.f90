@@ -767,7 +767,7 @@ CONTAINS
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
        if(l.ne.zero) then
-          key%list%bsol=node_value('ks ')
+          key%list%bsol=bvk*node_value('ks ')
        else
           print*,"Thin solenoid: ",name," not implemented in PTC"
           stop
