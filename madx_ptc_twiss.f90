@@ -946,15 +946,15 @@ contains
       endif
       ! --- end
 
-      ! gama33p is the 53rd entry in opt_fun
-      opt_fun(54)=tw%mu(1) !* deltae
-      opt_fun(55)=tw%mu(2) !* deltae
-      opt_fun(56)=tw%mu(3) !* deltae
-      opt_fun(57)=tw%disp(1) ! was 31 instead of 57
-      opt_fun(58)=tw%disp(2) ! was 32 instead of 58
-      opt_fun(59)=tw%disp(3) ! was 33 instead of 59
-      opt_fun(60)=tw%disp(4) ! was 34 instead of 60
-      opt_fun(61)=zero
+      opt_fun(mu1)=tw%mu(1) !* deltae
+      opt_fun(mu2)=tw%mu(2) !* deltae
+      opt_fun(mu3)=tw%mu(3) !* deltae
+      opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
+      opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
+      opt_fun(disp3)=tw%disp(3) ! was 33 instead of 59
+      opt_fun(disp4)=tw%disp(4) ! was 34 instead of 60
+      ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
+      ! jluc: left the following umodified, except 36->62
       opt_fun(62)=zero ! was 36 instead of 62
       do i1=1,c_%nd2
          if(i1.le.4) then
@@ -994,6 +994,7 @@ contains
       ! jluc debug - end
 
       ioptfun=81 !72->81 to accomodate additional derivatives w.r.t. delta_p
+      ! actually 3*21 elements from beta11 to include up to disp6
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
 
