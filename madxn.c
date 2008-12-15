@@ -462,6 +462,8 @@ void complete_twiss_table(struct table* t)
       n = strlen(tmp) - 1;
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l')
         tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
+      if (el != zero && n > 1 && tmp[0] == 'k' && tmp[1] == 's' && tmp[n] == 'i')
+        tmp[n] = '\0'; /* suppress trailing i in ksi */
       val = el_par_value(tmp, c_node->p_elem);
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
           val *= c_node->dipole_bv;

@@ -272,7 +272,7 @@ char* twiss_table_cols[] =
   "k14l", "k14sl", "k15l", "k15sl", 
   "k16l", "k16sl", "k17l", "k17sl", 
   "k18l", "k18sl", "k19l", "k19sl", 
-  "k20l", "k20sl", "ks", "hkick",
+  "k20l", "k20sl", "ksi", "hkick",
   "vkick", "tilt", "e1", "e2", "h1",
   "h2", "hgap", "fint", "fintx",
   "volt", "lag", "freq", "harmon",
