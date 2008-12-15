@@ -187,9 +187,9 @@ char* sxf_table_names[] =
 };
 
 int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_mult_end = 58; /* last multipole column filled
+int twiss_mult_end = 78; /* last multipole column filled
                             by complete_twiss_table */
-int twiss_fill_end = 72; /* last standard column filled
+int twiss_fill_end = 96; /* last standard column filled
                             by complete_twiss_table */
 /* warning: modify routine complete_twiss_table in case of changes */
 int twiss_table_types[] =
@@ -206,7 +206,13 @@ int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
+  2, 2, 2, 2,
+  2, 2, 2, 2,
+  2, 2, 2, 2,
+  2, 2, 2, 2,
+  2, 2, 2, 2,
   2, 2, 2, 2, 2,
+  2, 2, 2, 2,
   2, 2, 2, 2,
   1, 1, 2, 2, 3,
   2, 2, 2, 2, 2, 2,
@@ -261,9 +267,15 @@ char* twiss_table_cols[] =
   "k2l", "k2sl", "k3l", "k3sl", "k4l",
   "k4sl", "k5l", "k5sl", "k6l", "k6sl",
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
-  "k9sl", "k10l", "k10sl", "ks", "hkick",
+  "k9sl", "k10l", "k10sl", "k11l", "k11sl", 
+  "k12l", "k12sl", "k13l", "k13sl", 
+  "k14l", "k14sl", "k15l", "k15sl", 
+  "k16l", "k16sl", "k17l", "k17sl", 
+  "k18l", "k18sl", "k19l", "k19sl", 
+  "k20l", "k20sl", "ks", "hkick",
   "vkick", "tilt", "e1", "e2", "h1",
   "h2", "hgap", "fint", "fintx",
+  "volt", "lag", "freq", "harmon",
   "slot_id","assembly_id","mech_sep","lrad","parent",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",

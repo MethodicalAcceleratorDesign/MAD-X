@@ -466,14 +466,17 @@ void complete_twiss_table(struct table* t)
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
           val *= c_node->dipole_bv;
       else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 || 
-               strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0)
+               strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
+               strcmp(tmp, "volt") == 0 )
         val *= c_node->dipole_bv;
       if (el != zero)
       {
         if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
             && strcmp(tmp, "tilt") && strcmp(tmp, "e1") && strcmp(tmp, "e2")
             && strcmp(tmp, "h1") && strcmp(tmp, "h2") && strcmp(tmp, "hgap")
-            && strcmp(tmp, "fint") && strcmp(tmp, "fintx")) val *= el;
+            && strcmp(tmp, "fint") && strcmp(tmp, "fintx")
+            && strcmp(tmp, "volt") && strcmp(tmp, "lag")
+            && strcmp(tmp, "freq") && strcmp(tmp, "harmon")) val *= el;
       }
     }
     t->d_cols[j][i] = val;
