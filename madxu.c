@@ -3956,8 +3956,8 @@ void write_table(struct table* t, char* filename)
   /* writes rows with columns listed in row and col */
 {
   char l_name[NAME_L];
-  char sys_name[200];
-  char* pc = 0x0;
+  char sys_name[200], t_pc[2*NAME_L];
+  char* pc = t_pc;
   struct int_array* col = t->col_out;
   struct int_array* row = t->row_out;
   int i, j, k, tmp;
@@ -4062,9 +4062,7 @@ void write_table(struct table* t, char* filename)
             }
             else if (t->columns->inform[col->i[i]] == 3)
             {
-              pc = mymalloc("write_table",1);
-              *pc =       '\"';
-              *(c_dum->c) = '\"';
+              pc[0] = c_dum->c[0] = '\"';
               if (t->s_cols[col->i[i]][j] != NULL)
 		{
                  strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
