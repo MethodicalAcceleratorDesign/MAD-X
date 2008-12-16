@@ -177,6 +177,10 @@ void add_to_el_list( /* adds element to alphabetic element list */
             if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
             p_node = p_node->next;
           }
+          if (strcmp((*el)->base_type->name, "rfcavity") == 0 &&
+	      find_element((*el)->name, sequences->sequs[j]->cavities) != NULL)
+	    sequences->sequs[j]->cavities->elem[name_list_pos((*el)->name,
+	    sequences->sequs[j]->cavities->list)] = *el;
         }
         delete_element(ell->elem[pos]);
       }
