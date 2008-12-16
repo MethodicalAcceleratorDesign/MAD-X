@@ -412,8 +412,8 @@ contains
        call find_orbit(my_ring,x,1,default,c_1d_7)
 
        if ( .not. c_%stable_da) then
-          call fort_warn('ptc_twiss: ','DA got unstable after normal')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable after normal");
+          call fort_warn('ptc_twiss: ','DA got unstable at attempt to find closed orbit')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable at attempt to find closed orbit");
           stop
           return
        endif
