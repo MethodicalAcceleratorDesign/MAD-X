@@ -29,7 +29,7 @@ mkdir($extractDir, 0777);
 chdir($extractDir);
 
 
-$cvsDir = ":kserver:isscvs.cern.ch:/local/reps/madx" ;
+$cvsDir = ":gserver:isscvs.cern.ch:/local/reps/madx" ;
 
 
 # Do we need to do the check-out or do we rely on FesaBuild.pl instead?

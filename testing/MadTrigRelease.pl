@@ -29,7 +29,7 @@ $extractDir = $rootDir . "/MadCvsExtract_prod_assert" ;
 mkdir($extractDir, 0777);
 chdir($extractDir);
 
-$cvsDir = ":kserver:isscvs.cern.ch:/local/reps/madx" ;
+$cvsDir = ":gserver:isscvs.cern.ch:/local/reps/madx" ;
 
 # Redo a specific checkout
 foreach(@extractedPackages) {

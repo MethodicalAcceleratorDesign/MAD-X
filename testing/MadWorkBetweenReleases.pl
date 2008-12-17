@@ -17,7 +17,7 @@ mkdir($extractDir, 0777);
 chdir($extractDir);
 
 
-$cvsDir = ":kserver:isscvs.cern.ch:/local/reps/madx" ;
+$cvsDir = ":gserver:isscvs.cern.ch:/local/reps/madx" ;
 
 my $startTime = localtime;
 

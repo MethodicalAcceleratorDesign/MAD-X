@@ -28,7 +28,7 @@ foreach $targ (@targets){
 	mkdir $localCvsExtractDir;
 	chdir "$localCvsExtractDir";
 	# do the CVS extraction
-	my $cvsRootDir = ':kserver:isscvs.cern.ch:/local/reps/madx-examples';
+	my $cvsRootDir = ':gserver:isscvs.cern.ch:/local/reps/madx-examples';
 	`cvs -d $cvsRootDir checkout madX-examples/REF/$target`;
 	my $targetDir = "$localDirectory/$localCvsExtractDir/madX-examples/REF/$target";
 	chdir $targetDir;
