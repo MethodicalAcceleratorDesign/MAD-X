@@ -2001,6 +2001,9 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /*  struct table* s; */
   char tmp[16];
 
+  int returnStatus;
+  int row;
+
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
@@ -2053,6 +2056,64 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
   sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
   t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+  /* one-turn information gets computed iff ptc_twiss_summary set to 1 in madx_ptc_twiss.f90 */
+  if (get_option("ptc_twiss_summary") != zero){
+
+    /* now retreive all pieces of information from the ptc_twiss*/
+
+    row = 1; /* this particular table has only one row filled-in */
+
+    /* momentum compaction factor, phase-slip factor and energy transition */
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c", &row, &dtmp);
+    /* returnStatus should always be equal to zero */
+    sprintf(c_dum->c, v_format("@ ALPHA_C          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","eta_c", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ETA_C            %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","gamma_tr", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ GAMMA_TR         %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    /* tunes and chromaticities */
+    returnStatus = double_from_table("ptc_twiss_summary","q1", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","q2", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","dq1", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","dq2", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    /* extremas of the beta-function */
+    returnStatus = double_from_table("ptc_twiss_summary","beta_x_min", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_X_MIN       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","beta_x_max", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_X_MAX       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","beta_y_min", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_Y_MIN       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","beta_y_max", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_Y_MAX       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+
+  }
 }
 
 struct command_list* find_command_list(char* name,
