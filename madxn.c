@@ -5163,6 +5163,9 @@ void sector_out(char* sector_table_name, double* pos, double* kick,
                      double* rmatrix, double* tmatrix)
 {
   int i;
+  int j;
+  int k;
+  int index;
 
   /* the name is not \0 finished and displays ugly in C */
   /* but well, this is how table names are handled... */
@@ -5177,21 +5180,30 @@ void sector_out(char* sector_table_name, double* pos, double* kick,
     char kickStr[2+1];
     sprintf(kickStr,"k%i",i+1);
     kickStr[2]='\0';
-    double_to_table( sector_table_name, kickStr,&kick[i]);
+    index = i;
+    double_to_table( sector_table_name, kickStr,&kick[index]);
   }
   /* 36 R-matrix terms */
-  for (i=0; i<36; i++){
-    char rStr[3+1];
-    sprintf(rStr,"r%i",i+1);
-    rStr[3]='\0';
-    double_to_table( sector_table_name, rStr,&rmatrix[i]);
+  for (j=0; j<6; j++){
+    for (i=0; i<6; i++){
+      char rStr[3+1];
+      sprintf(rStr,"r%i%i",i+1,j+1);
+      rStr[3]='\0';
+      index = i+j*6;
+      double_to_table( sector_table_name, rStr,&rmatrix[index]);
+    }
   }
   /* 216 T-matrix terms */
-  for (i=0; i<216; i++){
-    char tStr[4+1];
-    sprintf(tStr,"t%i",i+1);
-    tStr[4]='\0';
-    double_to_table( sector_table_name, tStr,&tmatrix[i]);
+  for (k=0; k<6; k++){
+    for (j=0; j<6; j++){
+      for (i=0;i<6; i++){
+	char tStr[4+1];
+	sprintf(tStr,"t%i%i%i",i+1,j+1,k+1);
+	tStr[4]='\0';
+	index = i+j*6+k*36;
+	double_to_table( sector_table_name, tStr,&tmatrix[index]);
+      }
+    }
   }
 
   augment_count( sector_table_name ); /* move to next record */
