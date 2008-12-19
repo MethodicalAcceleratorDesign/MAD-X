@@ -10,7 +10,7 @@ PLUGIN_SUPPORT=NO
 
 f95=f95
 GCC_FLAGS=-c -g -m32 -Wall -D_CATCH_MEM
-GCCP_FLAGS_MPARS=-c -g -O3 -m32 -funroll-loops -Wall -pedantic -D_CATCH_MEM
+GCCP_FLAGS_MPARS=-c -g -O0 -m32 -funroll-loops -Wall -pedantic -D_CATCH_MEM
 GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
 f95_FLAGS=-gline -c -Wc,-m32 -Wl,-m32 -C=all -maxcontin=100 -nan -ieee=full
 FFLAGS77=-gline -c -Wc,-m32 -Wl,-m32 -fpp -maxcontin=100 -nan -ieee=stop -D_G95
