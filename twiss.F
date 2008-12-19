@@ -2151,7 +2151,7 @@
         hgap = node_value('hgap ')
         fint = node_value('fint ')
         fintx = node_value('fintx ')
-        sks = node_value('k3 ')
+        sks = node_value('k1s ')
         h = an / el
 
 !---- Apply field errors and change coefficients using DELTAP.
