@@ -1762,15 +1762,17 @@ void export_sequence(struct sequence* sequ, FILE* file)
   struct sequence* sq;
   struct node* c_node = sequ->start;
   int exp_par_flag;
+  int seqref = 0;
   char rpos[3][6] = {"exit", "centre", "entry"};
+  /* seqref = sequ->ref_flag */  /* uncomment line to get entry or exit */
   *c_dum->c = '\0';
   if (sequ->share) strcat(c_dum->c, "shared ");
   strcat(c_dum->c, sequ->export_name);
   strcat(c_dum->c, ": sequence");
-  if (sequ->ref_flag)
+  if (seqref)
   {
     strcat(c_dum->c, ", refer = ");
-    strcat(c_dum->c, rpos[sequ->ref_flag+1]);
+    strcat(c_dum->c, rpos[seqref+1]);
   }
   if (sequ->refpos != NULL)
   {
@@ -1830,17 +1832,20 @@ void export_sequence(struct sequence* sequ, FILE* file)
 
 void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   /* exports sequence in mad-8 format */
+  /* set refer = centre always (local var. seqref) HG 9.1.09 */
 {
   char num[2*NAME_L];
   int exp_par_flag;
+  int seqref = 0;
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
+  /* seqref = sequ->ref_flag */  /* uncomment line to get entry or exit */
   if (pass_select_list(sequ->name, cl) == 0)  return;
   *c_dum->c = '\0';
   strcat(c_dum->c, sequ->export_name);
   strcat(c_dum->c, ": sequence");
-  if (sequ->ref_flag ==1)  strcat(c_dum->c, ", refer=entry");
+  if (seqref ==1)  strcat(c_dum->c, ", refer=entry");
   write_nice_8(c_dum->c, file);
   while(c_node != NULL)
   {

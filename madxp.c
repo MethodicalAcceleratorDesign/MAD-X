@@ -2521,7 +2521,6 @@ double get_node_pos(struct node* node, struct sequence* sequ) /*recursive */
 {
   double fact = 0.5 * sequ->ref_flag; /* element half-length offset */
   double pos, from = 0;
-  sequ->ref_flag = 0;  /* set reference to centre always - HG 14.4.08 */
   if (loop_cnt++ == MAX_LOOP)
   {
     sprintf(c_dum->c, "%s   occurrence: %d", node->p_elem->name,
@@ -4343,6 +4342,7 @@ void seq_flatten(struct sequence* sequ)
     if (c_node == sequ->end) break;
     c_node = c_node->next;
   }
+  sequ->ref_flag = 0;
 }
 
 void set_defaults(char* string) /* reset options, beam etc. to defaults */
