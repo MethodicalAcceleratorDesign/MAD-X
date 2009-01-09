@@ -88,7 +88,7 @@
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 28          /* no. of valid element types */
+#define N_TYPES 29          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -117,6 +117,7 @@ void att_quadrupole(struct c6t_element*);
 void att_rbend(struct c6t_element*);
 void att_rfcavity(struct c6t_element*);
 void att_crabcavity(struct c6t_element*);
+void att_dipedge(struct c6t_element*);
 void att_sbend(struct c6t_element*);
 void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
@@ -160,6 +161,7 @@ void mod_quadrupole(struct c6t_element*);
 void mod_rbend(struct c6t_element*);
 void mod_rfcavity(struct c6t_element*);
 void mod_crabcavity(struct c6t_element*);
+void mod_dipedge(struct c6t_element*);
 void mod_sextupole(struct c6t_element*);
 void multi_loop();
 struct c6t_element* new_c6t_element(int, char*, char*);
@@ -247,6 +249,7 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "vkicker      5       5       5       1       0       3",
  "vmonitor     0       1       1       1       0       0",
  "crabcavity   3       3       3       0       0       2",
+ "dipedge      2       2       2       0       0       0",
 };
 
 char keep_these[MM_KEEP][24] = {"ip", "mt_"};
@@ -446,6 +449,7 @@ void assign_att()
         else if (strcmp(el->base_name, "rcollimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
         else if (strcmp(el->base_name, "crabcavity") == 0) att_crabcavity(el);
+        else if (strcmp(el->base_name, "dipedge") == 0) att_dipedge(el);
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
@@ -640,6 +644,26 @@ void att_crabcavity(struct c6t_element* el)
   if (lag < -0.5) lag +=1.;
   else if (lag > 0.5) lag -=1.;
   el->out_4 = 360. * lag;
+}
+
+void att_dipedge(struct c6t_element* el)
+{
+  double corr;
+  corr = 2*el->value[1]*el->value[8]*el->value[9];
+  if (el->value[1] != zero && (el->value[2] != zero || corr != zero))
+  {
+    el->out_1 = 24;
+    el->out_2 =  el->value[1]*tan(el->value[2]);
+    el->out_3 = -el->value[1]*tan(el->value[2]-corr/cos(el->value[2])*
+                                  (one+sin(el->value[2])*sin(el->value[2])));
+  }
+  else
+  {
+    el->out_1 = 0;
+    el->out_2 = 0;
+    el->out_3 = 0;
+  }
+  el->out_4 = 0;
 }
 
 void att_sbend(struct c6t_element* el)
@@ -1127,6 +1151,16 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[9] = el_par_value_recurse("shunt",p->p_elem);
     c6t_elem->value[10] = el_par_value_recurse("tfill",p->p_elem);
     c6t_elem->value[11] = el_par_value_recurse("harmon",p->p_elem);
+  }
+  else if ((strcmp(p->base_name,"dipedge") == 0))
+  {
+    c6t_elem = new_c6t_element(11,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[1] = el_par_value("h",p->p_elem);
+    c6t_elem->value[2] = el_par_value_recurse("e1",p->p_elem);
+    c6t_elem->value[8] = el_par_value_recurse("hgap",p->p_elem);
+    c6t_elem->value[9] = el_par_value_recurse("fint",p->p_elem);
   }
   else if ((strcmp(p->base_name,"marker") == 0)   ||
            (strcmp(p->base_name,"instrument") == 0)    ||
