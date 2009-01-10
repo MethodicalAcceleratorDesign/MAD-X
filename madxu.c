@@ -1764,7 +1764,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
   int exp_par_flag;
   int seqref = 0;
   char rpos[3][6] = {"exit", "centre", "entry"};
-  /* seqref = sequ->ref_flag */  /* uncomment line to get entry or exit */
+  seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
   *c_dum->c = '\0';
   if (sequ->share) strcat(c_dum->c, "shared ");
   strcat(c_dum->c, sequ->export_name);
@@ -1840,7 +1840,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
-  /* seqref = sequ->ref_flag */  /* uncomment line to get entry or exit */
+  seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
   if (pass_select_list(sequ->name, cl) == 0)  return;
   *c_dum->c = '\0';
   strcat(c_dum->c, sequ->export_name);
