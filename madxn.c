@@ -410,7 +410,7 @@ void comm_para(char* name, int* n_int, int* n_double, int* n_string,
 void complete_twiss_table(struct table* t)
   /* fills all items missing after "twiss" into twiss table */
 {
-  int i, j, mult, n;
+  int i, j, mult, n, myrbend;
   double el, val;
   struct node* c_node;
   char tmp[16];
@@ -426,12 +426,12 @@ void complete_twiss_table(struct table* t)
   {
     el = c_node->length;
     strcpy(tmp, twiss_table_cols[j]);
-    rbend = (strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
+    myrbend = (strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
     if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
     else if (strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "e1") == 0 || strcmp(tmp, "e2") == 0)
     { 
-      if(rbend)
+      if(myrbend)
       {
         val =  el_par_value(tmp, c_node->p_elem) +
           c_node->other_bv * el_par_value("angle", c_node->p_elem) / two;
