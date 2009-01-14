@@ -1898,7 +1898,6 @@ void exec_save(struct in_cmd* cmd)
       if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
           && strcmp(el->base_type->name, "drift") != 0)
       {
-        if (el->def_type != 0) el = el->parent;
         while (el->base_type != el)
         {
           add_to_el_list(&el, 0, ell, 0);
