@@ -5970,13 +5970,15 @@
 !----------------------------------------------------------------------*
       logical ftrk,fmap
       double precision fint,e1,h,hgap,corr,rw(6,6),tw(6,6,6),orbit(6),  &
-     &node_value,zero,one
+     &bvk,node_value,zero,one
       parameter(zero=0d0,one=1d0)
 
       call m66one(rw)
 
       e1 = node_value('e1 ')
       h = node_value('h ')
+      bvk = node_value('other_bv ')
+      h = bvk * h
       hgap = node_value('hgap ')
       fint = node_value('fint ')
       corr = (h + h) * hgap * fint
