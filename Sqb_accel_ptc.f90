@@ -6,7 +6,8 @@ module accel_ptc
   implicit none
   public
   !  integer n_cav_accel
-  integer :: nvolt=20, NHARMON=1
+  integer, parameter :: nvolt=20
+  integer  :: NHARMON=1
   integer :: slope_sign=1,slope_flip=1
   logicaL :: autoflip=.False.,must_stop=.False.,use_time=.False.
   real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0
@@ -272,7 +273,7 @@ contains
           do k=1,rays%n
 
 
-             call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
+             if(abs(rays%x(k,1))<1.e9) call ptc_track_particle(i,rays%x(k,1),rays%x(k,2),rays%x(k,3),rays%x(k,4),&
                   rays%x(k,5),rays%x(k,6))
 
           enddo
@@ -361,7 +362,8 @@ SUBROUTINE ptc_synchronous_set(i_node)
         freqf=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
         p_orbit%mag%freq=freqf
 
-        call compute_phase(x_orbit_sync,my_ORBIT_LATTICE%state,vo,ph,dt0)
+        call compute_phase(x_orbit_sync,my_ORBIT_LATTICE%state, &
+             my_ORBIT_LATTICE%orbit_deltae,vo,ph,dt0)
         x6=x_orbit_sync(6)
 
         x_orbit_sync(5)=x_orbit_sync(5)+my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c
@@ -373,7 +375,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
      call ORBIT_TRACK_NODE_fake(i_node1,x_orbit_sync)
 
      if(my_ORBIT_LATTICE%ORBIT_NODES(i_node1)%CAVITY) then
-        call adjust_phase(x6,state,dt0)
+        call adjust_phase(state,dt0)
 
         p_orbit%magp%freq=p_orbit%mag%freq
         p_orbit%magp%volt=p_orbit%mag%volt
@@ -521,12 +523,13 @@ SUBROUTINE ptc_synchronous_after(i_node)
 END SUBROUTINE  ptc_synchronous_after
 
 
-SUBROUTINE compute_phase(x,state,v,ph,dt0)
+SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
   USE accel_ptc    !,vrff=>vrf,freqf=>freq
   IMPLICIT NONE
-  real(dp) a,x(6),o,dl,driv,dt0,dtp0
-  real(dp) v(nvolt),ph(nvolt),normb,norm
-  integer n,i,k,j
+  real(dp) a,x(6),o,dl,driv,dt0,dtp0,e(2)
+  real(dp) v(nvolt),ph(nvolt)
+  real(dp) normb,norm,deltae
+  integer n,i,k,j,nvo
   TYPE(CAV4),pointer :: EL
   TYPE(CAV4p),pointer :: ELp
   type(real_8) y(6)
@@ -537,7 +540,9 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
   el=>p_orbit%mag%c4
   elp=>p_orbit%magp%c4
   n=size(p_orbit%mag%c4%f)
+  !  nvo=size(v)
   if(n>nvolt) then
+     !  if(n>nvo) then
      write(6,*) " stopped in compute_phase "
      stop 546
   endif
@@ -589,26 +594,19 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
 
   do while(conti.and.k<100)
      k=k+1
-     !   a=zero
-     !   driv=zero
-
-
-     !     do i=1,n
-
-     !      a=a-dl*el%f(i)*p_orbit%dir*p_orbit%charge*EL%volt*c_1d_3*sin(i*o*dt0+EL%PH(i)+EL%phas+EL%phase0)
-     !      driv=driv-i*o*dl*el%f(i)*p_orbit%dir*p_orbit%charge*EL%volt*c_1d_3*cos(i*o*dt0+EL%PH(i)+EL%phas+EL%phase0)
-
-     !   enddo
-     !write(6,*) my_ORBIT_LATTICE%orbit_deltae,driv,o*dt0
-
      do j=1,5; y(j)=x(j); enddo;
 
         y(6)=dt0+(one.mono.1)
         call track(p_orbit,y,local_state)
 
         driv=y(5).sub.'1'
-        !     write(6,*) (y(5).sub.'0'),driv,my_ORBIT_LATTICE%orbit_deltae,p_orbit%mag%p%p0c
-        !      pause 777
+        !      e(1)=y(5)
+        !      e(2)=y(6)*p_orbit%mag%p%p0c
+        !             write(6,*) e
+        !             write(6,*) (y(5).sub.'0'),driv,deltae,p_orbit%mag%p%p0c
+        !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
+
+        !             pause 777
         if(slope_sign*driv<0.and.autoflip) then  !!!!
            slope_flip=-slope_flip
            EL%volt=-EL%volt
@@ -618,7 +616,8 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
 
            normb=abs(o*(dt0-dtp0))
            dtp0=dt0
-           dt0=(my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
+           !           dt0=(my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
+           dt0=(deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
            norm=abs(o*(dt0-dtp0))
            if(norm<1.e-9_dp.and.doit) then
               doit=.false.
@@ -630,19 +629,19 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
 
      enddo
 
-     !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees ",my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c
+     !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees ",deltae/p_orbit%mag%p%p0c
      call kill(y)
      if(k>100) then
         write(6,*) " did not converge in compute_phase "
         write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
-        norm=my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
+        norm=deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
         write(6,*) " Norm of DE ",norm
         write(6,*) " Normb  ",normb
         stop 100
      endif
      if(abs(o*(dt0))>maximum_phase) then
         write(6,*) "phase shift is huge ",abs(o*(dt0))*rad_to_deg_ ," degrees "
-        norm=my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
+        norm=deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
         write(6,*) " Norm of DE ",norm
         write(6,*) " Normb  ",normb
         stop 101
@@ -656,7 +655,7 @@ SUBROUTINE compute_phase(x,state,v,ph,dt0)
    end SUBROUTINE compute_phase
 
 
-   SUBROUTINE adjust_phase(x6,state,dt0)
+   SUBROUTINE adjust_phase(state,dt0)
      USE accel_ptc    !,vrff=>vrf,freqf=>freq
      IMPLICIT NONE
      real(dp) x6,dt0

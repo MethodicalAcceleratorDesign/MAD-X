@@ -32,12 +32,12 @@ module precision_constants
   integer,parameter::nlp=24
   integer,parameter::vp=24
   integer,parameter::lp=4
-! double precision
+  ! double precision
   integer,parameter::sp=kind(1.e0)
   integer,parameter::dp=selected_real_kind(2*precision(1.e0))
-! quadrupole precision
-!  integer,parameter::sp=selected_real_kind(2*precision(1.e0))
-!  integer,parameter::dp=selected_real_kind(4*precision(1.e0))
+  ! quadrupole precision
+  !  integer,parameter::sp=selected_real_kind(2*precision(1.e0))
+  !  integer,parameter::dp=selected_real_kind(4*precision(1.e0))
   !Logicals
   logical(lp),parameter:: my_true=.true.
   logical(lp),parameter:: my_false=.false.
@@ -166,6 +166,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
   LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
   REAL(dp),TARGET   :: absolute_aperture=c_1d3
+  integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
   logical(lp),TARGET :: print_frame =.true.
@@ -180,7 +181,7 @@ module precision_constants
   character*255 :: def_orbit_node="def_orbit_node.txt"
   character*255 :: file_block_name="noprint"
   real(dp) :: lmax=1.e38_dp
-
+  logical(lp) :: printdainfo=my_false
   type info_window
      character(3) adv
      integer nc,nr,ni
@@ -216,6 +217,7 @@ module precision_constants
      REAL(dp),pointer     :: da_absolute_aperture  ! in case one tracks with da.
      !
 
+     integer,pointer :: wherelost     ! counting lost particles in integration nodes
      logical(lp),pointer  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
      logical(lp),pointer  :: CHECK_STABLE !=.TRUE. particle status
      logical(lp),pointer  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture

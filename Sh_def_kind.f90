@@ -23,6 +23,7 @@ MODULE S_DEF_KIND
   PRIVATE SYMPINTEXR,SYMPINTEXP
   PRIVATE KICK_SOLR,KICK_SOLP !,KICK_SOL
   PRIVATE SOL_ROTR,SOL_ROTP !,SOL_ROT
+  PRIVATE FRINGE2SOLR,FRINGE2SOLP,FRINGE2SOL
   PRIVATE INTESOLR,INTESOLP,INTESOL
   PRIVATE FACER,FACEP !,FACE
   PRIVATE NEWFACER,NEWFACEP
@@ -422,6 +423,11 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE KICK_SOLP
   END INTERFACE
 
+  INTERFACE FRINGE2SOL
+     MODULE PROCEDURE FRINGE2SOLR
+     MODULE PROCEDURE FRINGE2SOLP
+  END INTERFACE
+
   INTERFACE GETMULB_SOL
      MODULE PROCEDURE GETMULB_SOLR
      MODULE PROCEDURE GETMULB_SOLP
@@ -816,6 +822,7 @@ contains
     integer  i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+
     ! J=1 front
     IF(PRESENT(EL)) THEN
        !       DO I=1,B%N
@@ -874,15 +881,19 @@ contains
           if(EL5%P%DIR==1) THEN
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,1,X,k)
              IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,1,X,k)
           ELSE
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,2,X,k)
              IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,2,X,k)
           ENDIF
        else
           if(EL5%P%DIR==1) THEN
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,2,X,k)
              IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,2,X,k)
           ELSE
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,1,X,k)
              IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,1,X,k)
           ENDIF
@@ -914,15 +925,19 @@ contains
           if(EL17%P%DIR==1) THEN
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,1,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,1,X,k)
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,1,X,k)
           ELSE
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,2,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,2,X,k)
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,2,X,k)
           ENDIF
        else
           if(EL17%P%DIR==1) THEN
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,2,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,2,X,k)
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,2,X,k)
           ELSE
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,1,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,1,X,k)
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,1,X,k)
           ENDIF
@@ -944,6 +959,9 @@ contains
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     integer  i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+
+
     ! J=1 front
     IF(PRESENT(EL)) THEN
        !       DO I=1,B%N
@@ -953,7 +971,7 @@ contains
        if(J==1) then
           if(EL%P%DIR==1) THEN
              CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X,k)
-             IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
+             IF(k%FRINGE.or.EL%P%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
           ELSE
              CALL EDGE(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X,k)
              IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
@@ -1001,17 +1019,21 @@ contains
        if(J==1) then
           if(EL5%P%DIR==1) THEN
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,1,X,k)
-             IF(k%FRINGE.or.EL5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
+             IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,1,X,k)
           ELSE
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,2,X,k)
-             IF(k%FRINGE.or.EL5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
+             IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,2,X,k)
           ENDIF
        else
           if(EL5%P%DIR==1) THEN
-             IF(k%FRINGE.or.EL5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,2,X,k)
+             IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,2,X,k)
           ELSE
-             IF(k%FRINGE.or.EL5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
+             CALL FRINGE2SOL(EL5%P,EL5%B_SOL,EL5%FINT,EL5%HGAP,1,X,k)
+             IF(k%FRINGE.or.el5%p%permfringe) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,1,X,k)
           ENDIF
        ENDIF
@@ -1042,15 +1064,19 @@ contains
           if(EL17%P%DIR==1) THEN
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,1,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,1,X,k)
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,1,X,k)
           ELSE
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,2,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,2,X,k)
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,2,X,k)
           ENDIF
        else
           if(EL17%P%DIR==1) THEN
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,2,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,2,X,k)
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,2,X,k)
           ELSE
+             CALL FRINGE2SOL(EL17%P,EL17%B_SOL,EL17%FINT,EL17%HGAP,1,X,k)
              IF(k%FRINGE.or.EL17%p%permfringe) CALL MULTIPOLE_FRINGE(EL17%P,EL17%AN,EL17%BN,1,X,k)
              CALL EDGE(EL17%P,EL17%BN,EL17%H1,EL17%H2,EL17%FINT,EL17%HGAP,1,X,k)
           ENDIF
@@ -2574,6 +2600,76 @@ contains
     ENDDO
 
   END SUBROUTINE FRINGEP
+
+  SUBROUTINE FRINGE2SOLR(EL,BSOL,FINT,HGAP,K1,X,k)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    real(dp),INTENT(IN)::FINT,HGAP
+    INTEGER, INTENT(IN) :: K1
+    real(dp),INTENT(IN) :: BSOL
+    TYPE(MAGNET_CHART),INTENT(IN):: EL
+    real(dp) PZ,TIME_FAC
+    real(dp) B
+
+    TYPE(INTERNAL_STATE) k
+
+    IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
+    IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
+
+    if(k%TIME) then
+       PZ=ROOT(one+two*X(5)/el%beta0+x(5)**2)
+       TIME_FAC=(one/el%beta0+X(5))/PZ
+    else
+       PZ=ONE+X(5)
+       TIME_FAC=ONE
+    endif
+
+    B=BSOL**2*FINT*HGAP
+
+    X(2)=X(2)+X(1)*B/PZ
+    X(4)=X(4)+X(3)*B/PZ
+
+    X(6)=X(6)-HALF*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2
+
+  END SUBROUTINE FRINGE2SOLR
+
+  SUBROUTINE FRINGE2SOLP(EL,BSOL,FINT,HGAP,K1,X,k)
+    IMPLICIT NONE
+    TYPE(REAL_8),INTENT(INOUT):: X(6)
+    TYPE(REAL_8),INTENT(IN)::FINT,HGAP
+    INTEGER, INTENT(IN) :: K1
+    TYPE(REAL_8),INTENT(IN) :: BSOL
+    TYPE(MAGNET_CHART),INTENT(IN):: EL
+    TYPE(REAL_8) PZ,TIME_FAC
+    TYPE(REAL_8) B
+
+    TYPE(INTERNAL_STATE) k
+
+    CALL ALLOC(PZ,TIME_FAC,B)
+
+
+    IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
+    IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
+
+    if(k%TIME) then
+       PZ=SQRT(one+two*X(5)/el%beta0+x(5)**2)
+       TIME_FAC=(one/el%beta0+X(5))/PZ
+    else
+       PZ=ONE+X(5)
+       TIME_FAC=ONE
+    endif
+
+    B=BSOL**2*FINT*HGAP
+
+    X(2)=X(2)+X(1)*B/PZ
+    X(4)=X(4)+X(3)*B/PZ
+
+    X(6)=X(6)-HALF*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2
+
+    CALL KILL(PZ,TIME_FAC,B)
+
+  END SUBROUTINE FRINGE2SOLP
+
 
   SUBROUTINE EDGER_TRUE_PARALLEL(EL,BN,H1,H2,FINT,HGAP,I,X,k)
     IMPLICIT NONE
@@ -10163,7 +10259,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(STREX),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
-    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    real(dp) X1,X3,BBYTW,BBXTW,BBYTWT !,X5
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -10172,11 +10268,11 @@ contains
     X1=X(1)
     X3=X(3)
 
-    if(k%TIME) then
-       X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
-    else
-       X5=X(5)
-    endif
+    !   if(k%TIME) then
+    !      X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+    !!  else
+    !      X5=X(5)
+    !   endif
 
     IF(EL%P%NMUL>=1) THEN
        BBYTW=EL%BN(EL%P%NMUL)
@@ -10208,7 +10304,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(STREXP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
-    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    TYPE(REAL_8) X1,X3,BBYTW,BBXTW,BBYTWT !5
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -10216,18 +10312,18 @@ contains
 
     CALL ALLOC(X1)
     CALL ALLOC(X3)
-    CALL ALLOC(X5)
+    !   CALL ALLOC(X5)
     CALL ALLOC(BBYTW)
     CALL ALLOC(BBXTW)
     CALL ALLOC(BBYTWT)
 
     X1=X(1)
     X3=X(3)
-    if(k%TIME) then
-       X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
-    else
-       X5=X(5)
-    endif
+    !   if(k%TIME) then
+    !      X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+    !   else
+    !      X5=X(5)
+    !   endif
 
 
     IF(EL%P%NMUL>=1) THEN
@@ -10247,14 +10343,13 @@ contains
 
     X(2)=X(2)-YL*DIR*BBYTW
     X(4)=X(4)+YL*DIR*BBXTW
-
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
 
     CALL KILL(X1)
     CALL KILL(X3)
-    CALL KILL(X5)
+    !   CALL KILL(X5)
     CALL KILL(BBYTW)
     CALL KILL(BBXTW)
     CALL KILL(BBYTWT)

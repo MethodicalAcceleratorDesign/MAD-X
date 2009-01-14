@@ -1818,6 +1818,7 @@ CONTAINS
     NULLIFY(T%PARENT_FIBRE)
     !    NULLIFY(T%BB)
     NULLIFY(T%S)
+    NULLIFY(T%lost)
     NULLIFY(T%delta_rad_out)
     NULLIFY(T%delta_rad_in)
     NULLIFY(T%ref)
@@ -1842,9 +1843,11 @@ CONTAINS
     CALL NULL_THIN(CURRENT)
 
     ALLOCATE(CURRENT%S(5))
+    ALLOCATE(CURRENT%lost)
     ALLOCATE(CURRENT%delta_rad_in)
     ALLOCATE(CURRENT%delta_rad_out)
     ALLOCATE(CURRENT%ref(4))
+    CURRENT%lost=0
     CURRENT%ref=zero
     CURRENT%delta_rad_in=zero
     CURRENT%delta_rad_out=zero
@@ -2004,6 +2007,7 @@ CONTAINS
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)
     IF(ASSOCIATED(T%exi)) DEALLOCATE(T%exi)
     IF(ASSOCIATED(T%S)) DEALLOCATE(T%S)
+    IF(ASSOCIATED(T%lost)) DEALLOCATE(T%lost)
     !    IF(ASSOCIATED(T%ORBIT)) DEALLOCATE(T%ORBIT)
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
     IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)

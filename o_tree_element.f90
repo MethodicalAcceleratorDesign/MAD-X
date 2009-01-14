@@ -5,6 +5,7 @@ module tree_element_MODULE
   USE polymorphic_complextaylor, mon1=>mon
   IMPLICIT NONE
   public
+  integer,private,parameter::ndd=6
 
   PRIVATE track_TREE,track_TREEP,KILL_TREE,KILL_TREE_N
   PRIVATE track_TREE_G,track_TREEP_g
@@ -27,8 +28,15 @@ module tree_element_MODULE
   private read_probe8,ALLOC_33t,ALLOC_33p,KILL_33t,KILL_33p
   private purge_transverse,norm_matsr,norm_matsp
   private get_spin_nx_r,get_spin_nx_t
+  private scdaddo,daddsco
+  private real_8REAL6,REAL6real_8,real_8REAL_8,PRINT6
 
   INTERFACE assignment (=)
+     !
+     MODULE PROCEDURE REAL_8REAL6
+     MODULE PROCEDURE REAL6REAL_8
+     MODULE PROCEDURE real_8REAL_8
+     !
      MODULE PROCEDURE EQUAL_IDENTITY_RAY_8
      MODULE PROCEDURE EQUAL_IDENTITY_SPINOR_8
      MODULE PROCEDURE EQUAL_IDENTITY_SPINOR
@@ -64,7 +72,10 @@ module tree_element_MODULE
   INTERFACE operator (+)
      MODULE PROCEDURE scdadd
      MODULE PROCEDURE daddsc
+     MODULE PROCEDURE scdaddo
+     MODULE PROCEDURE daddsco
   END  INTERFACE
+
 
   INTERFACE exp_n_theta
      MODULE PROCEDURE exp_n_thetar
@@ -113,6 +124,8 @@ module tree_element_MODULE
 
 
   INTERFACE PRINT
+     MODULE PROCEDURE PRINT6
+!!!!
      MODULE PROCEDURE PRINT_DASPIN
      MODULE PROCEDURE PRINT_probe8
   END INTERFACE
@@ -173,6 +186,114 @@ module tree_element_MODULE
 
 
 CONTAINS
+!!! use to be in extend_poly
+
+  FUNCTION daddsco( S1, S2 )
+    implicit none
+    TYPE (real_8) daddsco(ndd)
+    TYPE (damap), INTENT (IN) :: S1
+    real(dp) , INTENT (IN) :: S2(ndd)
+    integer localmaster,iia(4),ico(4),nd2,i
+    call liepeek(iia,ico)
+    nd2=iia(4)
+
+
+    do i=1,nd2
+       localmaster=master
+       call ass(daddsco(i))
+       daddsco(i)=s1%v(i)+s2(i)-(s1%v(i).sub.'0')
+       master=localmaster
+    enddo
+    do i=nd2+1,ndd
+       localmaster=master
+       call ass(daddsco(i))
+       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
+          daddsco(i)=s2(i)+(one.mono.'00001')
+       else
+          daddsco(i)=s2(i)
+       endif
+       master=localmaster
+    enddo
+
+  END FUNCTION daddsco
+
+  FUNCTION scdaddo( S2,S1  )
+    implicit none
+    TYPE (real_8) scdaddo(ndd)
+    TYPE (damap), INTENT (IN) :: S1
+    real(dp) , INTENT (IN) :: S2(ndd)
+    integer localmaster,iia(4),ico(4),nd2,i
+    call liepeek(iia,ico)
+    nd2=iia(4)
+
+    do i=1,nd2
+       localmaster=master
+       call ass(scdaddo(i))
+       scdaddo(i)=s1%v(i)+s2(i)-(s1%v(i).sub.'0')
+       master=localmaster
+    enddo
+    do i=nd2+1,ndd
+       localmaster=master
+       call ass(scdaddo(i))
+       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
+          scdaddo(i)=s2(i)+(one.mono.'00001')
+       else
+          scdaddo(i)=s2(i)
+       endif
+       master=localmaster
+    enddo
+
+
+  END FUNCTION scdaddo
+
+  SUBROUTINE  REAL6real_8(S2,S1)
+    implicit none
+    real(dp),INTENT(inOUT)::S2(ndd)
+    type (real_8),INTENT(IN)::S1(ndd)
+    integer i
+
+
+    do i=1,ndd
+       s2(i)=s1(i)          !%t
+    enddo
+  END SUBROUTINE REAL6real_8
+
+  SUBROUTINE  real_8REAL_8(S1,S2)
+    implicit none
+    type (real_8),INTENT(in)::S2(ndd)
+    type (real_8),INTENT(inOUT)::S1(ndd)
+    integer i
+
+
+    do i=1,ndd
+       s1(i)=s2(i)
+    enddo
+  END SUBROUTINE real_8REAL_8
+
+  SUBROUTINE  real_8REAL6(S1,S2)
+    implicit none
+    real(dp),INTENT(in)::S2(ndd)
+    type (real_8),INTENT(inOUT)::S1(ndd)
+    integer i
+
+
+    do i=1,ndd
+       s1(i)=s2(i)
+    enddo
+  END SUBROUTINE real_8REAL6
+
+  SUBROUTINE  print6(S1,mf)
+    implicit none
+    type (real_8),INTENT(INout)::S1(ndd)
+    integer        mf,i
+
+    do i=1,ndd
+       call print(s1(i),mf)
+    enddo
+
+  END SUBROUTINE print6
+
+!!! end of "use to be in extend_poly"
 
   SUBROUTINE COPY_TREE(T,U)
     IMPLICIT NONE
@@ -894,6 +1015,7 @@ CONTAINS
     P%u=my_false
     P%S=0
     P%X=X
+    P%S%x(2)=one
 
   END    subroutine EQUAL_PROBE_REAL6
 
@@ -1912,8 +2034,8 @@ CONTAINS
        theta0=-theta0
     endif
 
-    write(6,*) " theta0 = ",theta0
-    write(6,*) " n0 = ",n0
+    !    write(6,*) " theta0 = ",theta0
+    !    write(6,*) " n0 = ",n0
 
   end subroutine find_n_thetar
 
@@ -2919,25 +3041,24 @@ CONTAINS
     implicit none
     TYPE(damapspin), INTENT(INout) :: DS
     real(dp), intent(inout) :: theta0,n0(3)
-    type(taylor) th,n(3)
-    integer i
+    real(dp) s(3,3),a(3,3),ai(3,3)
+    integer i,j,nsc
 
-    call alloc(th)
-    call alloc(n)
-
-    th=theta0
     do i=1,3
-       n(i)=n0(i)
-    enddo
-    call get_spin_nx(DS,th,n)
-
-    theta0=th
-    do i=1,3
-       n0(i)=n(i)
+       do j=1,3
+          s(i,j)=ds%s(i,j)
+       enddo
     enddo
 
-    call kill(th)
-    call kill(n)
+    call find_n_theta(s,theta0,n0)
+
+    call find_a(n0,a)
+    call inv_as(a,ai)
+    ai=matmul(ai,s)    !
+    s=matmul(ai,a)    !
+
+    theta0=atan2(s(1,3),s(1,1))
+
 
 
   end subroutine get_spin_nx_r

@@ -342,7 +342,7 @@ END TYPE BEAM
 
 TYPE INTEGRATION_NODE
    INTEGER, POINTER :: pos_in_fibre, CAS
-   INTEGER, POINTER ::  pos
+   INTEGER, POINTER ::  pos,lost
    real(dp), POINTER :: S(:)
    real(dp), POINTER :: ref(:)
    real(dp), pointer :: ent(:,:),a(:)

@@ -6,34 +6,24 @@ module S_extend_poly
   IMPLICIT NONE
   public
   integer,private,parameter::ndd=6
-  private real_8REAL6,REAL6real_8,env_8map,real_8REAL_8,env_8benv
-  private print6,PRINTenv
-  private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8,scdadd,daddsc
+  private PRINTenv,env_8map,env_8benv
+  private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8
   logical(lp), target :: ALWAYS_knobs=.false.
 
   INTERFACE ASSIGNMENT (=)
-     MODULE PROCEDURE REAL_8REAL6
-     MODULE PROCEDURE REAL6REAL_8
      MODULE PROCEDURE ENV_8MAP
      MODULE PROCEDURE REAL6env_8
-     MODULE PROCEDURE real_8REAL_8
      MODULE PROCEDURE env_8t
      MODULE PROCEDURE tenv_8
      MODULE PROCEDURE env_8benv
   END  INTERFACE
 
-  INTERFACE operator (+)
-     MODULE PROCEDURE scdadd
-     MODULE PROCEDURE daddsc
-  END  INTERFACE
 
   INTERFACE PRINT
-     MODULE PROCEDURE PRINT6
      MODULE PROCEDURE PRINTenv
   END  INTERFACE
 
   INTERFACE DAPRINT
-     MODULE PROCEDURE PRINT6
      MODULE PROCEDURE PRINTenv
   END  INTERFACE
 
@@ -140,16 +130,6 @@ CONTAINS
 
   ! Some polymorphism
 
-  SUBROUTINE  print6(S1,mf)
-    implicit none
-    type (real_8),INTENT(INout)::S1(ndd)
-    integer        mf,i
-
-    do i=1,ndd
-       call print(s1(i),mf)
-    enddo
-
-  END SUBROUTINE print6
 
   SUBROUTINE  printenv(S1,mf)
     implicit none
@@ -204,43 +184,6 @@ CONTAINS
 
 
 
-
-
-  SUBROUTINE  REAL6real_8(S2,S1)
-    implicit none
-    real(dp),INTENT(inOUT)::S2(ndd)
-    type (real_8),INTENT(IN)::S1(ndd)
-    integer i
-
-
-    do i=1,ndd
-       s2(i)=s1(i)          !%t
-    enddo
-  END SUBROUTINE REAL6real_8
-
-  SUBROUTINE  real_8REAL_8(S1,S2)
-    implicit none
-    type (real_8),INTENT(in)::S2(ndd)
-    type (real_8),INTENT(inOUT)::S1(ndd)
-    integer i
-
-
-    do i=1,ndd
-       s1(i)=s2(i)
-    enddo
-  END SUBROUTINE real_8REAL_8
-
-  SUBROUTINE  real_8REAL6(S1,S2)
-    implicit none
-    real(dp),INTENT(in)::S2(ndd)
-    type (real_8),INTENT(inOUT)::S1(ndd)
-    integer i
-
-
-    do i=1,ndd
-       s1(i)=s2(i)
-    enddo
-  END SUBROUTINE real_8REAL6
 
 
   SUBROUTINE  REAL6env_8(S2,S1)
@@ -327,64 +270,6 @@ CONTAINS
   END SUBROUTINE tenv_8
 
   ! End of Some polymorphism
-
-  FUNCTION daddsc( S1, S2 )
-    implicit none
-    TYPE (real_8) daddsc(ndd)
-    TYPE (damap), INTENT (IN) :: S1
-    real(dp) , INTENT (IN) :: S2(ndd)
-    integer localmaster,iia(4),ico(4),nd2,i
-    call liepeek(iia,ico)
-    nd2=iia(4)
-
-
-    do i=1,nd2
-       localmaster=master
-       call ass(daddsc(i))
-       daddsc(i)=s1%v(i)+s2(i)-(s1%v(i).sub.'0')
-       master=localmaster
-    enddo
-    do i=nd2+1,ndd
-       localmaster=master
-       call ass(daddsc(i))
-       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
-          daddsc(i)=s2(i)+(one.mono.'00001')
-       else
-          daddsc(i)=s2(i)
-       endif
-       master=localmaster
-    enddo
-
-  END FUNCTION daddsc
-
-  FUNCTION scdadd( S2,S1  )
-    implicit none
-    TYPE (real_8) scdadd(ndd)
-    TYPE (damap), INTENT (IN) :: S1
-    real(dp) , INTENT (IN) :: S2(ndd)
-    integer localmaster,iia(4),ico(4),nd2,i
-    call liepeek(iia,ico)
-    nd2=iia(4)
-
-    do i=1,nd2
-       localmaster=master
-       call ass(scdadd(i))
-       scdadd(i)=s1%v(i)+s2(i)-(s1%v(i).sub.'0')
-       master=localmaster
-    enddo
-    do i=nd2+1,ndd
-       localmaster=master
-       call ass(scdadd(i))
-       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
-          scdadd(i)=s2(i)+(one.mono.'00001')
-       else
-          scdadd(i)=s2(i)
-       endif
-       master=localmaster
-    enddo
-
-
-  END FUNCTION scdadd
 
 end module S_extend_poly
 

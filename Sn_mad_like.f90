@@ -2477,10 +2477,15 @@ CONTAINS
     s2%P%tiltd=S1%tilt
     if(s1%kind==kind4) then
        ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%DELTA_E,S2%THIN,S2%lag)
-       S2%lag=zero
+
+       S2%lag=S1%lag
        S2%volt=flip*S1%volt
        S2%freq=S1%freq0*S1%harmon
        S2%phas=-S1%lag
+       !       S2%lag=zero
+       !       S2%volt=flip*S1%volt
+       !       S2%freq=S1%freq0*S1%harmon
+       !       S2%phas=-S1%lag
        !      S2%p0c=S1%p0c
        !frs
        S2%DELTA_E=S1%DELTA_E
@@ -2737,6 +2742,7 @@ CONTAINS
     c_%NDPT_OTHER => NDPT_OTHER
 
     c_%CAVITY_TOTALPATH => CAVITY_TOTALPATH
+    c_%wherelost => wherelost
 
 
     c_%other_program => other_program

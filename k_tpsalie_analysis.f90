@@ -317,6 +317,7 @@ contains
           call idprset(-102)
        endif
     else
+       global_verbose=.true.
        call setidpr(0,S2%plane)
     endif
     ! global_verbose=.true.

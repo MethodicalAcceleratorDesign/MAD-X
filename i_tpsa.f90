@@ -1199,6 +1199,7 @@ CONTAINS
     TYPE (taylor) pbbra
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
+    integer i
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
@@ -1208,8 +1209,12 @@ CONTAINS
     call ass(pbbra)
 
     ! if(old) then
-    call DAPOI(s1%i,s2%i,temp,nd)
-    call dacop(temp,pbbra%i)
+    pbbra=zero
+    do i=1,nd
+       pbbra=(s1.d.(2*i-1))*(s2.d.(2*i))-(s2.d.(2*i-1))*(s1.d.(2*i))+pbbra
+    enddo
+    !    call DAPOI(s1%i,s2%i,temp,nd)
+    !    call dacop(temp,pbbra%i)
     !    else
     !       call newDAPOI(s1%j,s2%j,templ,nd)
     !       call newdacop(templ,pbbra%j)
@@ -1260,11 +1265,13 @@ CONTAINS
     call ass(CUTORDER)
 
     ! if(old) then
-    call dacop(S1%I,CUTORDER%i)
-    DO I=S2,NO
-       CALL TAKE(CUTORDER%I,I,TEMP)
-       CALL DASUB(CUTORDER%I,TEMP,CUTORDER%I)
-    ENDDO
+    call datrunc(S1%I,s2,CUTORDER%i)
+    !    call dacop(S1%I,CUTORDER%i)
+
+    !    DO I=S2,NO
+    !       CALL TAKE(CUTORDER%I,I,TEMP)
+    !       CALL DASUB(CUTORDER%I,TEMP,CUTORDER%I)
+    !    ENDDO
     !    else
     !       call NEWdacop(S1%J,CUTORDER%J)
     !       DO I=S2,NO
@@ -3054,7 +3061,7 @@ CONTAINS
     CALL ALLOC_U(S2,N,invc)
     do i=1,N
        k=ipoC+i-1
-       CALL GET_C_J(k,S2%C(I),J)
+       CALL GET_C_J(S1%I,k,S2%C(I),J)
        if(no==1) then
           j=0
           k=k-ipoc

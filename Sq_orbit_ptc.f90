@@ -329,6 +329,9 @@ contains
           CALL RESET_APERTURE_FLAG
           u=my_true
           x(1)=XBIG
+          if(wherelost==1) then
+             t%lost=t%lost+1
+          endif
        endif
        T=>T%NEXT
     ENDDO

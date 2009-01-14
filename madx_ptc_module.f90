@@ -448,17 +448,23 @@ CONTAINS
        case("rectellipse")
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
-          key%list%aperture_x=aperture(3)
-          key%list%aperture_y=aperture(3)
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)
+          key%list%aperture_r(2)=aperture(4)
+       case("marguerite")
+          key%list%aperture_on=.true.
+          key%list%aperture_kind=4
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
-          !       case("marguerite")
-          !          key%list%aperture_on=.true.
-          !          key%list%aperture_kind=4
-          !          key%list%aperture_r(1)=aperture(1)
-          !          key%list%aperture_r(2)=aperture(2)
-       case("general")
+       case("racetrack")
+          key%list%aperture_on=.true.
           key%list%aperture_kind=5
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)
+       case("general")
+          key%list%aperture_kind=6
           print*,"General aperture not implemented"
           stop
        end select

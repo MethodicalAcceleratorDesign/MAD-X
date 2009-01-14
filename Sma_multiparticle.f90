@@ -689,6 +689,9 @@ CONTAINS
 
     END SELECT
     !    T%PARENT_FIBRE%MAG=DEFAULT
+    if(wherelost==2.and.(.not.check_stable)) then
+       t%lost=t%lost+1
+    endif
   END SUBROUTINE TRACKR_NODE_SINGLE
 
 

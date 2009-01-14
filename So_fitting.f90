@@ -2660,11 +2660,11 @@ contains
 
   ! THIN LENS EXAMPLE
 
-  SUBROUTINE assign_one_aperture(L,pos,kindaper,R,X,Y)
+  SUBROUTINE assign_one_aperture(L,pos,kindaper,R,X,Y,dx,dy)
     IMPLICIT NONE
     TYPE(LAYOUT),TARGET :: L
     integer pos,kindaper
-    REAL(DP) R,X,Y
+    REAL(DP) R(:),X,Y,dx,dy
     type(fibre), pointer :: P
 
     call move_to(L,p,pos)
@@ -2679,9 +2679,13 @@ contains
        P%MAG%p%aperture%r    = R
        P%MAG%p%aperture%x    = X
        P%MAG%p%aperture%y    = y
+       P%MAG%p%aperture%x    = dX
+       P%MAG%p%aperture%y    = dy
        P%MAGP%p%aperture%r    = R
        P%MAGP%p%aperture%x    = X
        P%MAGP%p%aperture%y    = y
+       P%MAGP%p%aperture%x    = dX
+       P%MAGP%p%aperture%y    = dy
     endif
 
   end SUBROUTINE assign_one_aperture

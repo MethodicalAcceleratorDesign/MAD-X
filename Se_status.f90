@@ -386,7 +386,6 @@ CONTAINS
     TYPE(magnet_chart), POINTER :: p
     real(dp),intent(inout):: x(6)
     INTEGER N
-
     if(p%dir==1) then
        call CHECK_APERTURE(p%a(n)%aperture,X)
     else
@@ -496,7 +495,7 @@ CONTAINS
     implicit none
     type (MADX_APERTURE),INTENT(IN)::E
     REAL(DP), INTENT(IN):: X(6)
-    real(dp) xx,yy,dx,dy,ex,ey
+    !    real(dp) xx,yy,dx,dy,ex,ey
 
 
     IF(CHECK_MADX_APERTURE.AND.APERTURE_FLAG) THEN
@@ -511,12 +510,12 @@ CONTAINS
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
-             xx=X(1)-E%DX
-             yy=X(3)-E%DY
-             dx=E%DX
-             dy=E%DY
-             ex=E%X
-             ey=E%y
+             !             xx=X(1)-E%DX
+             !             yy=X(3)-E%DY
+             !             dx=E%DX
+             !             dy=E%DY
+             !             ex=E%X
+             !             ey=E%y
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
@@ -530,7 +529,18 @@ CONTAINS
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
           ENDIF
-       CASE(5) ! PILES OF POINTS
+       CASE(5) ! RACETRACK
+          IF( (abs(x(1)-e%dx)) > (e%r(1)+e%x)                  &
+               .or. abs(x(3)-e%dy) .gt. (e%y+e%r(1)) .or.                &
+               ((((abs(x(1)-e%dx)-e%x)**2+                            &
+               (abs(x(3)-e%dy)-e%y)**2) .gt. e%r(1)**2)                  &
+               .and. (abs(x(1)-e%dx)) .gt. e%x                        &
+               .and. abs(x(3)-e%dy) .gt. e%y)) THEN
+             CHECK_STABLE=.FALSE.
+             CHECK_MADX_APERTURE=.false.
+          ENDIF
+
+       CASE(6) ! PILES OF POINTS
           STOP 222
        CASE DEFAULT
           !   STOP 223
@@ -548,15 +558,6 @@ CONTAINS
     CALL CHECK_APERTURE(E,Y)
 
   END SUBROUTINE  CHECK_APERTURE_P
-
-  !  SUBROUTINE  CHECK_APERTURE_S(E,X)
-  !    implicit none
-  !    type (MADX_APERTURE),INTENT(IN)::E
-  !    TYPE(ENV_8), INTENT(IN):: X(6)
-  !    REAL(DP) Y(6)
-  !    Y=X
-  !    CALL CHECK_APERTURE(E,Y)
-  !  END SUBROUTINE  CHECK_APERTURE_S
 
   FUNCTION minu( S1,S2  )
     implicit none

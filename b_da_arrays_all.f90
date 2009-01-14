@@ -8,6 +8,9 @@ module da_arrays
   implicit none
   public
   integer lda,lea,lia,lst
+  integer,private,parameter::nmax=400
+  real(dp),private,parameter::tiny=c_1d_20
+  private ludcmp_nr,lubksb_nr
   ! johan
   ! integer,parameter::lno=2,lnv=6,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
   !
@@ -254,7 +257,7 @@ contains
     size=(three*REAL(lea,kind=DP)+two*(REAL(lia,kind=DP)+one)+five*REAL(lda,kind=DP))*four/c_1024**2
     size=size+ten*REAL(lda,kind=DP)/c_1024**2+REAL(lda,kind=DP)/eight/c_1024**2
     size=size+REAL(lst,kind=DP)*(eight/c_1024**2+two*four/c_1024**2)
-    if(size>total_da_size) then
+    if(size>total_da_size.or.printdainfo) then
        w_p=0
        w_p%nc=13
        w_p%fc='(12(1X,A72,/),(1X,A72))'
@@ -283,11 +286,219 @@ contains
        write(mf,*) "ndamaxi    = ",ndamaxi
        write(mf,*) "size in Mbytes = ",size
        write(mf,*) "Total_da_size Allowed = ",Total_da_size
+       write(6,*) "no,nv  = ",no,nv
+       write(6,*) "LEA = ",lea
+       write(6,*) "ldamin (with nd2=6)  = ",ldamin
+       write(6,*) "lia  = ",lia
+       write(6,*) "lda  = ",lda
+       write(6,*) "lst  = ",lst
+       write(6,*) "ndamaxi    = ",ndamaxi
+       write(6,*) "size in Mbytes = ",size
+       write(6,*) "Total_da_size Allowed = ",Total_da_size
        close(mf)
     endif
 
 
   end  subroutine danum0
+
+!!!!! some da stuff
+
+  real(dp) function bran(xran)
+    implicit none
+    !     ************************************
+    !
+    !     VERY SIMPLE RANDOM NUMBER GENERATOR
+    !
+    !-----------------------------------------------------------------------------
+    !
+    real(dp) xran
+    !
+    xran = xran + ten
+    if(xran.gt.c_1d4) xran = xran - c_9999_12345
+    bran = abs(sin(xran))
+    bran = 10*bran
+    bran = bran - int(bran)
+    !      IF(BRAN.LT. c_0_1) BRAN = BRAN + c_0_1
+    !
+    return
+  end function bran
+
+  subroutine matinv(a,ai,n,nmx,ier)
+
+    implicit none
+
+    integer i,ier,j,n,nmx
+    integer,dimension(nmax)::indx
+    real(dp) d
+    real(dp),dimension(nmx,nmx)::a,ai
+    real(dp),dimension(nmax,nmax)::aw
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+
+    aw(1:n,1:n) = a(1:n,1:n)
+
+    call ludcmp_nr(aw,n,nmax,indx,d,ier)
+    if (ier .eq. 132) return
+
+    ai(1:n,1:n) = zero
+    forall (i = 1:n) ai(i,i) = one
+
+    do j=1,n
+       call lubksb_nr(aw,n,nmax,indx,ai(1,j),nmx)
+    enddo
+
+  end subroutine matinv
+
+
+  !
+  subroutine ludcmp_nr(a,n,np,indx,d,ier)
+    implicit none
+    !     ************************************
+    !
+    !     THIS SUBROUTINE DECOMPOSES A MATRIX INTO LU FORMAT
+    !     INPUT A: NXN MATRIX - WILL BE OVERWRITTEN BY THE LU DECOMP.
+    !           NP: PHYSICAL DIMENSION OF A
+    !           INDX: ROW PERMUTATION VECTOR
+    !           D: EVEN OR ODD ROW INTERCHANGES
+    !
+    !     REFERENCE: NUMERICAL RECIPIES BY PRESS ET AL (CAMBRIDGE) PG. 35
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,ier,imax,j,k,n,np
+    integer,dimension(np)::indx
+    real(dp) aamax,d,dum,sum
+    real(dp),dimension(np,np)::a
+    real(dp),dimension(nmax)::vv
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    ier=0
+    d=one
+    do i=1,n
+       aamax=zero
+       do j=1,n
+          if(abs(a(i,j)).gt.aamax) aamax=abs(a(i,j))
+       enddo
+       if(aamax.eq.zero) then
+          ier=132
+          return
+       endif
+       vv(i)=one/aamax
+    enddo
+    do j=1,n
+       if(j.gt.1) then
+          do i=1,j-1
+             sum=a(i,j)
+             if(i.gt.1) then
+                do k=1,i-1
+                   sum=sum-a(i,k)*a(k,j)
+                enddo
+                a(i,j)=sum
+             endif
+          enddo
+       endif
+       aamax=zero
+       do i=j,n
+          sum=a(i,j)
+          if (j.gt.1) then
+             do k=1,j-1
+                sum=sum-a(i,k)*a(k,j)
+             enddo
+             a(i,j)=sum
+          endif
+          dum=vv(i)*abs(sum)
+          if(dum.ge.aamax) then
+             imax=i
+             aamax=dum
+          endif
+       enddo
+       if (j.ne.imax) then
+          do k=1,n
+             dum=a(imax,k)
+             a(imax,k)=a(j,k)
+             a(j,k)=dum
+          enddo
+          d=-d
+          vv(imax)=vv(j)
+       endif
+       indx(j)=imax
+       if(j.ne.n) then
+          if(a(j,j).eq.zero) a(j,j)=tiny
+          dum=one/a(j,j)
+          do i=j+1,n
+             a(i,j)=a(i,j)*dum
+          enddo
+       endif
+    enddo
+    if(a(n,n).eq.zero) a(n,n)=tiny
+    return
+  end subroutine ludcmp_nr
+  !
+  subroutine lubksb_nr(a,n,np,indx,b,nmx)
+    implicit none
+    !     ************************************
+    !
+    !     THIS SUBROUTINE SOLVES SET OF LINEAR EQUATIONS AX=B,
+    !     INPUT A: NXN MATRIX IN lu FORM GIVEN BY ludcmp_nr
+    !           NP: PHYSICAL DIMENSION OF A
+    !           INDX: ROW PERMUTATION VECTOR
+    !           D: EVEN OR ODD ROW INTERCHANGES
+    !           B: RHS OF LINEAR EQUATION - WILL BE OVERWRITTEN BY X
+    !
+    !     REFERENCE: NUMERICAL RECIPIES BY PRESS ET AL (CAMBRIDGE) PG. 36
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer i,ii,j,ll,n,nmx,np
+    integer,dimension(np)::indx
+    real(dp) sum
+    real(dp),dimension(np,np)::a
+    real(dp),dimension(nmx)::b
+    !
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    ii = 0
+    do i=1,n
+       ll = indx(i)
+       sum = b(ll)
+       b(ll) = b(i)
+       if(ii.ne.0) then
+          do j=ii,i-1
+             sum = sum-a(i,j)*b(j)
+          enddo
+       else if (sum.ne.zero) then
+          ii = i
+       endif
+       b(i)=sum
+    enddo
+    do i=n,1,-1
+       sum=b(i)
+       if(i.lt.n) then
+          do j=i+1,n
+             sum = sum-a(i,j)*b(j)
+          enddo
+       endif
+
+       b(i)=sum/a(i,i)
+
+    enddo
+    return
+  end subroutine lubksb_nr
+  !
 
 
 end  module da_arrays

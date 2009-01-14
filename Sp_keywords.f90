@@ -1401,13 +1401,16 @@ contains
     implicit none
     type(MADX_APERTURE), pointer :: m
     integer mf
+    character*200 line
+
     IF(.NOT.ASSOCIATED(M)) THEN
        write(mf,'(a20)') " NO MAGNET APERTURE "
     ELSE
-       write(mf,'(a20)') "    MAGNET APERTURE "
+       write(mf,'(a21)') " HAS MAGNET APERTURE "
        WRITE(MF,*) m%KIND   ! 1,2,3,4
        WRITE(MF,*) m%R
-       WRITE(MF,*) m%X,m%Y
+       WRITE(line,*)  m%X,m%Y,' SHIFT ',m%dX,m%dY
+       WRITE(MF,'(A200)') LINE
        write(mf,'(a23)')  " END OF MAGNET APERTURE"
     ENDIF
 
@@ -1418,9 +1421,10 @@ contains
     implicit none
     type(MADX_APERTURE), pointer :: m
     integer mf
-    character*120 line
+    character*200 line
+    character*5 ch
 
-    READ(mf,'(a120)') LINE
+    READ(mf,'(a120)') LINE(1:120)
 
     CALL CONTEXT(LINE)
 
@@ -1431,8 +1435,13 @@ contains
 
        READ(MF,*) m%KIND   ! 1,2,3,4
        READ(MF,*) m%R
-       READ(MF,*) m%X,m%Y
-       READ(mf,'(a120)') LINE
+       read(mf,'(a200)') line
+       if(index(line,"SHIFT")==0) then
+          READ(line,*) m%X,m%Y
+       else
+          READ(line,*) m%X,m%Y,ch,m%dX,m%dY
+       endif
+       READ(mf,'(a120)') LINE(1:120)
     ENDIF
 
   end subroutine READ_aperture

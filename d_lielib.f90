@@ -20,7 +20,7 @@ module lielib_berz
   PUBLIC DAPOK0,FACFLO,EXPFLOD,gofix
   public getcct,GETINV,gtrx,eig6
   private respoke
-  private lienot,etallnom,etppulnv,etmtree,etppush,etppush2,ppushlnv,simil
+  private etallnom,etppulnv,etmtree,etppush,etppush2,ppushlnv,simil
   private dapokzer,davar0,taked,daread,daprid,daflo,daflod,fexpo,etcom,etpoi
   private exp1d,expnd2,liefact,mapnorm,orderflo,nuanaflo,h2pluflo,rotflo,rotiflo
   private ctord,rtocd,resvec,reelflo,compcjg,midbflo,mulnd2,movearou,movemul,cpart
@@ -179,15 +179,8 @@ contains
 
     return
   end subroutine liepeek
-  subroutine lienot(not)
-    implicit none
-    integer no,not
 
-    call danot(not)
-    no=not
 
-    return
-  end subroutine lienot
   subroutine etallnom(x,n,nom)
     implicit none
     ! CREATES A AD-VARIABLE WHICH CAN BE DESTROYED BY DADAL
@@ -199,8 +192,9 @@ contains
 
     do i=1,iabs(n)
        x(i)=0
+       call daall0(x(i))
     enddo
-    call daallno(x,iabs(n),nom)
+    !    call daallno(x,iabs(n),nom)
     if(n.lt.0) then
        call liepeek(i1,i2)
        nd2=i1(4)
@@ -219,8 +213,9 @@ contains
 
     do i=1,iabs(n)
        x(i)=0
+       call daall0(x(i))
     enddo
-    call daallno(x,iabs(n),'ETALL     ')
+    !    call daallno(x,iabs(n),'ETALL     ')
     if(n.lt.0) then
        call liepeek(i1,i2)
        nd2=i1(4)
@@ -235,7 +230,7 @@ contains
     integer x
 
     x=0
-    call daall1(x,'etall     ',no,nv)
+    call daall0(x)
     return
   end subroutine etall1
   subroutine etppulnv(x,xi,xff)
@@ -744,11 +739,13 @@ contains
           call dapek(h,j,r)
           call dacon(ht,r)
        else
-          call danot(m)
-          call dacop(h,b1)
-          call danot(m-1)
-          call dacop(b1,b2)
-          call danot(no)
+          !          call danot(m)
+          !          call dacop(h,b1)
+          call datrunc(h,m+1,b1)
+          !          call danot(m-1)
+          !          call dacop(b1,b2)
+          call datrunc(b1,m,b2)
+          !          call danot(no)
           call dasub(b1,b2,b3)
           call dacop(b3,ht)
        endif
@@ -827,6 +824,21 @@ contains
     enddo
     return
   end subroutine dacopd
+
+  subroutine datruncd(h,io,ht)
+    implicit none
+    !    H goes into HT  (nd2 array)
+    integer i
+    integer,dimension(:)::h,ht
+    integer io
+    if(.not.c_%stable_da) return
+
+    do i=1,nd2
+       call datrunc(h(i),io,ht(i))
+    enddo
+    return
+  end subroutine datruncd
+
   subroutine dacmud(h,sca,ht)
     implicit none
     integer i
@@ -1373,15 +1385,17 @@ contains
     call etallnom(w,nd2  ,'W         ')
 
     call dacopd(xy,x)
-    call dacopd(x,v)
+    !    call dacopd(x,v)
+    call datruncd(x,2,v)
     call daclrd(w)
-    call danot(1)
+    !    call danot(1)
     call etinv(v,w)
-    call danot(no)
+    !    call danot(no)
     call etcct(x,w,v)
-    call danot(1)
-    call dacopd(xy,x)
-    call danot(no)
+    !    call danot(1)
+    !    call dacopd(xy,x)
+    call datruncd(xy,1,x)
+    !    call danot(no)
     call dacopd(v,w)
     call daclrd(h)
     do k=2,no
@@ -1574,15 +1588,17 @@ contains
     ! COMPUTATION OF A1 AND A1I USING DAINV
     call etini(rel)
 
-    call danot(nord)
+    !    call danot(nord)
 
     call etini(v)
 
     do i=1,nd2-ndc2
-       call dacop(xy(i),x(i))
+       !       call dacop(xy(i),x(i))
+       call datrunc(xy(i),nord+1,x(i))
        call dalin(x(i),one,rel(i),-one,v(i))
     enddo
     call etinv(v,w)
+    call datruncd(w,nord+1,w)
     call daclrd(x)
     if(ndc.eq.1) then
        call davar(x(ndpt),zero,ndpt)
@@ -1631,11 +1647,13 @@ contains
        call expflod(w,rel,a1,c_1d_7,10000)
        ! END OF  CORRECTIONS
 
+       call datruncd(a1,nord+1,a1)
        call etinv(a1,a1i)
+       call datruncd(a1i,nord+1,a1i)
 
     endif
 
-    call danot(no)
+    !    call danot(no)
 
     call dadal(rel,nd2)
     call dadal(v,nd2)

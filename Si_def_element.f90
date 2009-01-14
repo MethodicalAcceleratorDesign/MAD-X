@@ -3576,26 +3576,30 @@ CONTAINS
 
   END SUBROUTINE find_energy
 
-  subroutine put_aperture_el(el,kind,r,x,y)
+  subroutine put_aperture_el(el,kind,r,x,y,dx,dy)
     implicit none
-    real(dp),intent(in):: r(:),x,y
+    real(dp),intent(in):: r(2),x,y,dx,dy
     integer,intent(in):: kind
     type(element),intent(inout):: el
 
     if(.not.associated(el%p%aperture)) call alloc(el%p%aperture)
+    el%p%aperture%dx=dx
+    el%p%aperture%dy=dy
     el%p%aperture%x=x
     el%p%aperture%y=y
     el%p%aperture%r=r
     el%p%aperture%kind=kind
   end  subroutine put_aperture_el
 
-  subroutine put_aperture_elp(el,kind,r,x,y)
+  subroutine put_aperture_elp(el,kind,r,x,y,dx,dy)
     implicit none
-    real(dp),intent(in):: r(:),x,y
+    real(dp),intent(in):: r(2),x,y,dx,dy
     integer,intent(in):: kind
     type(elementp),intent(inout):: el
 
     if(.not.associated(el%p%aperture)) call alloc(el%p%aperture)
+    el%p%aperture%dx=dx
+    el%p%aperture%dy=dy
     el%p%aperture%x=x
     el%p%aperture%y=y
     el%p%aperture%r=r

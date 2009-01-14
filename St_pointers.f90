@@ -26,7 +26,7 @@ module pointer_lattice
   private thin
   real(dp) thin
   !  BEAM STUFF
-  REAL(DP) SIG(6)
+  REAL(DP) SIG(6),ait(6,6)
   type(beam), allocatable:: my_beams(:)
   type(beam), pointer:: my_beam
   INTEGER :: N_BEAM=0,USE_BEAM=1
@@ -94,8 +94,8 @@ contains
     real(dp),pointer :: beta(:,:,:)
     REAL(DP) DBETA,tune(3),tunenew(2),CHROM(2),DEL
     ! fitting and scanning tunes
-    real(dp) tune_ini(2),tune_fin(2),dtu(2)
-    integer nstep(2),i1,i2,I3,neq,i4,i5,I6,it
+    real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
+    integer nstep(2),i1,i2,I3,neq,i4,i5,I6,it,n_bessel
     LOGICAL(LP) STRAIGHT,skip
     ! end
     ! TRACK 4D NORMALIZED
@@ -114,7 +114,7 @@ contains
     TYPE(DAMAP) MY_A
     INTEGER MY_A_NO,MY_A_ND
     ! APERTURE
-    REAL(DP)  APER_R,APER_X,APER_Y
+    REAL(DP)  APER_R(2),APER_X,APER_Y
     INTEGER KINDAPER
     TYPE(integration_node), POINTER :: TL
     type(internal_state),target :: my_default
@@ -147,6 +147,9 @@ contains
     type(internal_state),pointer :: my_old_state
     integer temps(8)
     TYPE(WORK) W
+    INTEGER   KINDA   ! 1,2,3,4
+    REAL(DP) RA(2)
+    REAL(DP) XA,YA,DXA,DYA
 
     if(associated(my_estate)) my_old_state=>my_estate
     my_default=default
@@ -295,13 +298,43 @@ contains
           !    write(6,*) " you have 2 seconds to do so "
           !    CALL DATE_AND_TIME(values=temps)
           !    i1=temps(7)
-1         if(i1>=58) i1=i1-58
+          if(i1>=58) i1=i1-58
           !    do while(.true.)
           !     CALL DATE_AND_TIME(values=temps)
           !     if(temps(7)>i1+2) exit
           !    enddo
           !          endif
           ! end Orbit stuff
+       case('RECORDLOSTPARTICLEINORBIT')  !
+          wherelost=1
+       case('RECORDLOSTPARTICLE')  ! 1= orbit , 2 thin lens PTC
+          read(mf,*) wherelost
+       case('NOLOSTPARTICLE')  !
+          wherelost=0
+       case('CLEANLOSTPARTICLE')  !
+          if(associated(my_ering%T)) then
+             TL=>my_ering%T%START
+             DO j=1,my_ering%T%N
+                tl%lost=0
+                TL=>TL%NEXT
+             ENDDO
+          endif
+       case('PRINTLOSTPARTICLE')  !
+          read(mf,*) filename
+          CALL  kanalnummer(mfr)
+          OPEN(UNIT=MFR,FILE=FILENAME,status='REPLACE')
+          write(mfr,'(a42)') "  s          , lost  , cas , pos ,  name "
+          if(associated(my_ering%T)) then
+             TL=>my_ering%T%START
+             DO j=1,my_ering%T%N
+                if(TL%lost>0) then
+                   write(mfr,900) tl%s(1),TL%lost,tl%cas,TL%pos_in_fibre,tl%parent_fibre%mag%name
+900                FORMAT(F13.6,1x,(i8,1x),2(i4,1x),a16)
+                endif
+                TL=>TL%NEXT
+             ENDDO
+          endif
+          close(mfr)
        case('DEFAULT')
           my_estate=DEFAULT0
        case('+NOCAVITY')
@@ -480,13 +513,13 @@ contains
           WRITE(6,*) "OLD C_%APERTURE_FLAG ",C_%APERTURE_FLAG
           READ(MF,*) APERTURE_FLAG
           WRITE(6,*) "NEW C_%APERTURE_FLAG ",C_%APERTURE_FLAG
-       case('TURNOFFONEAPERTURE')
+       case('TURNOFFONEAPERTURE','TOGGLEAPERTURE')
           READ(MF,*) POS
           CALL TURN_OFF_ONE_aperture(my_ering,pos)
        case('SETONEAPERTURE')
           read(MF,*) pos
-          read(MF,*) kindaper, APER_R,APER_X,APER_Y
-          CALL assign_one_aperture(my_ering,pos,kindaper,APER_R,APER_X,APER_Y)
+          read(MF,*) kindaper, APER_R,APER_X,APER_Y,dxa,dya
+          CALL assign_one_aperture(my_ering,pos,kindaper,APER_R,APER_X,APER_Y,dxa,dya)
           ! end of layout stuff
           ! random stuff
 
@@ -594,6 +627,57 @@ contains
           ENDDO
           Write(6,*) " Number of parameters = ",np
           Write(6,*) " Number of polymorphic blocks = ",NPOL
+       case('SETAPERTURE')
+          READ(MF,*) KINDA,NAME
+
+          CALL CONTEXT(NAME)
+          N_NAME=0
+          IF(NAME(1:2)=='NO') THEN
+             READ(MF,*) NAME
+             call context(name)
+             N_NAME=len_trim(name)
+          ENDIF
+          READ(MF,*) XA,YA,DXA,DYA
+          READ(MF,*) RA(1),RA(2)
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+             found_it=MY_FALSE
+             IF(N_NAME==0) THEN
+                found_it=P%MAG%NAME==NAME
+             ELSE
+                found_it=P%MAG%NAME(1:N_NAME)==NAME(1:N_NAME)
+             ENDIF
+
+             IF(FOUND_IT) THEN
+                IF(.NOT.ASSOCIATED(P%MAG%P%APERTURE)) THEN
+                   CALL alloc(P%MAG%P%APERTURE)
+                ENDIF
+                IF(.NOT.ASSOCIATED(P%MAGP%P%APERTURE)) THEN
+                   CALL alloc(P%MAGP%P%APERTURE)
+                ENDIF
+
+                P%MAG%P%APERTURE%KIND= KINDA  ! 1,2,3,4
+                P%MAG%P%APERTURE%R= RA
+                P%MAG%P%APERTURE%X= XA
+                P%MAG%P%APERTURE%Y= YA
+                P%MAG%P%APERTURE%DX= DXA
+                P%MAG%P%APERTURE%DY= DYA
+                P%MAGP%P%APERTURE%KIND= KINDA  ! 1,2,3,4
+                P%MAGP%P%APERTURE%R= RA
+                P%MAGP%P%APERTURE%X= XA
+                P%MAGP%P%APERTURE%Y= YA
+                P%MAGP%P%APERTURE%DX= DXA
+                P%MAGP%P%APERTURE%DY= DYA
+
+             ENDIF
+
+             p=>p%next
+          enddo
+
+
+
+
        case('PUTFAMILY','LAYOUT<=KNOB')
           do j=1,NPOL
              my_ering=pol_(j)
@@ -864,6 +948,54 @@ contains
        case('PERMFRINGEOFF')
 
           CALL  PUTFRINGE(my_ering,MY_FALSE)
+
+       case('SOLENOID2','SOLENOIDFRINGE')
+
+          write(6,*) " At the ends of all solenoids kick of the form "
+          write(6,*) " X(2)=X(2)+X(1)*B/PZ      where pz=1+delta"
+          write(6,*) " X(4)=X(4)+X(3)*B/PZ "
+          write(6,*) " X(6)=X(6)-HALF*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2 "
+
+          read(mf,*) fint,hgap
+
+          p=>my_ering%start
+          nscan=0
+
+          do ii=1,my_ering%n
+             if(associated(p%mag%s5)) then
+                p%mag%s5%fint=fint
+                p%mag%s5%hgap=hgap
+                p%magp%s5%fint=fint
+                p%magp%s5%hgap=hgap
+                nscan=nscan+1
+             endif
+             if(associated(p%mag%s17)) then
+                p%mag%s17%fint=fint
+                p%mag%s17%hgap=hgap
+                p%magp%s17%fint=fint
+                p%magp%s17%hgap=hgap
+                nscan=nscan+1
+             endif
+             p=>p%next
+          enddo
+          Write(6,*) " Found ",nscan," Solenoids"
+
+       case('CAVITYBESSEL','CAVITYINNERFIELD')
+
+          read(mf,*) n_bessel
+          nscan=0
+          p=>my_ering%start
+
+          do ii=1,my_ering%n
+             if(associated(p%mag%c4)) then
+                p%mag%c4%n_bessel=n_bessel
+                p%magp%c4%n_bessel=n_bessel
+                nscan=nscan+1
+             endif
+             p=>p%next
+          enddo
+
+          Write(6,*) " Found ",nscan," Cavities"
 
        case('REVERSEBEAMLINE')
 

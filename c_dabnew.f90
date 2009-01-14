@@ -10,19 +10,20 @@ module dabnew
   !  private
   public
   private daallno1,daall,damult,dasqrt,dacmut,dacma,DALINt,dafunt,dacctt
-  private dainvt,ludcmp_nr,lubksb_nr,dapint,dadert,dacfuRt,dacfuIt,dacfut
+  private dainvt,dapint,dadert,dacfuRt,dacfuIt,dacfut
   private dadeb,dapac,dachk,damch,dadcd,dancd,hash,dehash
   public ppushstore,ppushprint,ppushGETN
-  public bran,DEALLOC_ALL,dainf
-  PUBLIC DAINI,DANOT,DAALLNO,DAVAR,DAALL1,PPUSH,MTREE,DADAL,DACCT,DADER,DASQR
+  public DEALLOC_ALL,dainf
+  PUBLIC DAINI,DANOT,DAVAR,DAALL1,PPUSH,MTREE,DADAL,DACCT,DADER,DASQR
   PUBLIC DAMUL,DAADD,DACOP,DAINV,DAPIN,DAPEK,DAPOK,DACFU,DASUB,DACON,DADAL1
   PUBLIC DACLR,DACMU,DALIN,DAREA,DAPRI,DAABS,DAEPS,DATRA,MATINV,DAFUN
-  PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR,DAPOI
+  PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR
   PUBLIC DACFUI,DAPRI77,DAREA77,GET_C_J,PPUSH1,DALLSTA,dacycle
   public count_da
+  integer,private,parameter:: lsw=1
 
-  integer,private,parameter::nmax=400,lsw=1
-  real(dp),private,parameter::tiny=c_1d_20
+  ! integer,private,parameter::nmax=400,lsw=1
+  ! real(dp),private,parameter::tiny=c_1d_20
   character(120),private :: line
 
 contains
@@ -549,117 +550,6 @@ contains
   !   11         0         0
   !   12        10        34   NOMAX = 3,  NVMAX = 4, NMMAX = 35
   !
-  subroutine daallno(ic,l,ccc)
-    implicit none
-    !     ********************************
-    !
-    !     THIS SUBROUTINE ALLOCATES STORAGE FOR A DA VECTOR WITH
-    !     ORDER NOmax AND NUMBER OF VARIABLES NVmax
-    !
-    !-----------------------------------------------------------------------------
-    !
-    logical(lp) incnda
-    integer i,ind,l,ndanum,no,nv,ipause,mypauses
-    integer,dimension(:)::ic
-    real(dp) x
-    character(10) c,ccc
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
-    !
-    no=nomax
-    nv=nvmax
-    ind = 1
-    do i=1,l
-       if(ic(i).gt.0.and.ic(i).le.nda_dab) then
-          !         DANAME(IC(I)) = C
-          !         IF(IDANO(IC(I)).EQ.NO.AND.IDANV(IC(I)).EQ.NV) THEN
-       else
-          if(nv.ne.0.and.(no.gt.nomax.or.nv.gt.nvmax)) then
-             write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
-                  &' NOMAX, NVMAX = ',nomax,nvmax
-             ipause=mypauses(5,line)
-             call dadeb(31,'ERR DAALL ',1)
-          endif
-          !
-          if(nhole.gt.0) then
-             ind=nda_dab
-20           if (allvec(ind)) then
-                ind = ind - 1
-                goto 20
-             endif
-             incnda = .false.
-             nhole=nhole-1
-          else
-             incnda = .true.
-             nda_dab = nda_dab + 1
-             ind=nda_dab
-             if(nda_dab.gt.lda) then
-                write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
-                ipause=mypauses(6,line)
-                call dadeb(31,'ERR DAALL ',1)
-             endif
-          endif
-
-          allvec(ind) = .true.
-          ic(i) = ind
-          !
-          if(nv.ne.0) then
-             call danum(no,nv,ndanum)
-          else
-             ndanum = no
-          endif
-
-          c = ccc
-          if(l.ne.1) write(c(6:10),'(I5)') i
-          daname(ind) = c
-
-          if (incnda) then
-             if(ind.gt.nomax+2) then
-                idano(ind) = nomax
-                idanv(ind) = nvmax
-                idapo(ind) = nst0 + 1
-                idalm(ind) = nmmax
-                idall(ind) = 0
-                nst0 = nst0 + nmmax
-             else
-                idano(ind) = no
-                idanv(ind) = nv
-                idapo(ind) = nst0 + 1
-                idalm(ind) = ndanum
-                idall(ind) = 0
-                nst0 = nst0 + ndanum
-             endif
-          endif
-          !
-          if(nst0.gt.lst) then
-             x=-one
-             w_p=0
-             w_p%nc=5
-             w_p%fc='(4(1X,a72,/),(1X,a72))'
-             w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-             w_p%c(2)=  ' NST,LST '
-             write(w_p%c(3),'(i8,1x,i8)') NST0,LST
-             w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-             write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-             CALL WRITE_E(124)
-             call dadeb(31,'ERR DAALL ',1)
-          endif
-          !
-          if(nv.eq.0.or.nomax.eq.1) then
-             call daclr(ic(i))
-             idall(ic(i)) = idalm(ic(i))
-          endif
-       endif
-    enddo
-    !
-    if(nda_dab.gt.ndamaxi) ndamaxi=nda_dab
-
-    return
-  end subroutine daallno
 
   subroutine daallno1(ic,ccc)
     implicit none
@@ -990,6 +880,118 @@ contains
 
     return
   end subroutine daall1
+
+  subroutine daall0(ic)
+    implicit none
+    !     ********************************
+    !
+    !     THIS SUBROUTINE ALLOCATES STORAGE FOR A DA VECTOR WITH
+    !     ORDER NO AND NUMBER OF VARIABLES NV
+    !
+    !-----------------------------------------------------------------------------
+    !
+    logical(lp) incnda
+    integer ic,ind,ndanum,no,nv,ipause,mypauses
+    character(10) c,ccc
+    ccc='         '
+    no=nomax
+    nv=nvmax
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    !
+    ind = 1
+
+    if(ic.gt.0.and.ic.le.nda_dab) then
+       !         DANAME(ic) = C
+       !         IF(IDANO(ic).EQ.NO.AND.IDANV(ic).EQ.NV) THEN
+    else
+       if(nv.ne.0.and.(no.gt.nomax.or.nv.gt.nvmax)) then
+          write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
+               &' NOMAX, NVMAX = ',nomax,nvmax
+          ipause=mypauses(11,line)
+          call dadeb(31,'ERR DAALL ',1)
+       endif
+       !
+       if(nhole.gt.0) then
+          ind=nda_dab
+20        if (allvec(ind)) then
+             ind = ind - 1
+             goto 20
+          endif
+          incnda = .false.
+          nhole=nhole-1
+       else
+          incnda = .true.
+          nda_dab = nda_dab + 1
+          ind=nda_dab
+          if(nda_dab.gt.lda) then
+             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             ipause=mypauses(12,line)
+             call dadeb(31,'ERR DAALL ',1)
+          endif
+       endif
+
+       allvec(ind) = .true.
+
+       ic = ind
+       !
+       if(nv.ne.0) then
+          call danum(no,nv,ndanum)
+       else
+          ndanum = no
+       endif
+
+       c = ccc
+       write(c(6:10),'(I5)') 1
+
+       daname(ind) = c
+
+       if (incnda) then
+          if(ind.gt.nomax+2) then
+             idano(ind) = nomax
+             idanv(ind) = nvmax
+             idapo(ind) = nst0 + 1
+             idalm(ind) = nmmax
+             idall(ind) = 0
+             nst0 = nst0 + nmmax
+          else
+             idano(ind) = no
+             idanv(ind) = nv
+             idapo(ind) = nst0 + 1
+             idalm(ind) = ndanum
+             idall(ind) = 0
+             nst0 = nst0 + ndanum
+          endif
+       endif
+       !
+       if(nst0.gt.lst) then
+          w_p=0
+          w_p%nc=5
+          w_p%fc='(4(1X,a72,/),(1X,a72))'
+          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
+          w_p%c(2)=  ' NST,LST '
+          write(w_p%c(3),'(i8,1x,i8)') NST0,LST
+          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
+          write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
+          CALL WRITE_E(127)
+          call dadeb(31,'ERR DAALL ',1)
+       endif
+       !
+       !          IF(NV.EQ.0) THEN
+       if(nv.eq.0.or.nomax.eq.1) then
+          call daclr(ic)
+          idall(ic) = idalm(ic)
+       endif
+    endif
+    !
+    if(nda_dab.gt.ndamaxi) ndamaxi=nda_dab
+
+    return
+  end subroutine daall0
   !
   subroutine dadal(idal,l)
     implicit none
@@ -1656,71 +1658,7 @@ contains
     return
   end subroutine dacop
 
-  !
-  !  subroutine datrashn(idif,ina,inbb)
-  !    implicit none
-  !     *************************
-  !
-  !     THIS SUBROUTINE COPIES THE DA VECTOR A TO THE DA VECTOR B
-  !
-  !-----------------------------------------------------------------------------
-  !
-  !    integer i,ia,idif,illa,ilma,ina,inb,inbb,inoa,inva,ipoa
-  !    integer,dimension(lnv)::jd
-  !    real(dp) rr
-  !
-  !    if((.not.C_%STABLE_DA)) then
-  !       if(c_%watch_user) then
-  !          write(6,*) "big problem in dabnew ", sqrt(crash)
-  !       endif
-  !      return
-  !   endif
-  !    call dainf(ina,inoa,inva,ipoa,ilma,illa)
-  !    if((.not.C_%STABLE_DA)) then
-  !       if(c_%watch_user) then
-  !          write(6,*) "big problem in dabnew ", sqrt(crash)
-  !       endif
-  !       return
-  !    endif
-  !    inb=0
 
-  !    if(inbb.eq.ina) then
-  !       call daall1(inb,'$$DAADD $$',inoa,inva)
-  !    else
-  !       inb=inbb
-  !    endif!
-
-  !    call daclr(inb)
-  !
-  !
-  !    do ia = ipoa,ipoa+illa-1
-  !
-  !       if(nomax.ne.1) then
-  !         call dancd(i_1(ia),i_2(ia),jd)
-  !       else
-  !          do i=1,lnv
-  !             jd(i)=0
-  !          enddo
-  !          if(ia.ne.ipoa) then
-  !             jd(ia-ipoa+1)=1
-  !          endif
-  !       endif
-  !
-  !       call dapek(ina,jd,rr)
-  !       jd(idif)=0
-  !       if(abs(rr).gt.zero) call dapok(inb,jd,rr)
-  !       !
-  !    enddo
-  !    !
-  !    !
-  !    if(inbb.eq.ina) then
-  !       call dacop(inb,inbb)
-  !       call dadal1(inb)
-  !    endif
-  !
-  !    return
-  !  end subroutine datrashn
-  !
   subroutine daadd(ina,inb,inc)
     implicit none
     !     *****************************
@@ -1764,6 +1702,29 @@ contains
     return
   end subroutine daadd
   !
+  subroutine datrunc(ina,io,inb)
+    implicit none
+    integer ina,io,inb,nt
+    if((.not.C_%STABLE_DA)) then
+       if(c_%watch_user) then
+          write(6,*) "big problem in dabnew ", sqrt(crash)
+       endif
+       return
+    endif
+    nt=nocut
+    if(io>nomax) then
+       if(ina/=inb) call dacop(ina,inb)
+       return
+    endif
+    nocut=io-1
+
+    call dacop(ina,inb)
+
+    nocut = nt
+
+
+  end subroutine datrunc
+
   subroutine dasub(ina,inb,inc)
     implicit none
     !     THIS SUBROUTINE PERFORMS A DA SUBTRACTION OF THE DA VECTORS A AND B.
@@ -1805,38 +1766,7 @@ contains
     !
     return
   end subroutine dasub
-  !
-  !  subroutine damulin(ina,inb,coe1,inc,ind,coe2,ine)
-  !    implicit none
-  !    !     *****************************
-  !    !
-  !    !     THIS SUBROUTINE PERFORMS A DA MULTIPLICATION OF THE DA VECTORS A AND B.
-  !    !     THE RESULT IS STORED IN C. AS TEMPORARY STORAGE, THE STACK SPACE
-  !    !     OF THE (NOMAX+2) SCRATCH VARIABLES ALLOCATED BY DAINI IS USED.
-  !    !
-  !    !-----------------------------------------------------------------------------
-  !    !
-  !    integer ina,inb,inc,incc,ind,ine,inoc,invc
-  !    real(dp) coe1,coe2
-  !    !
-  !    if((.not.C_%STABLE_DA)) then
-  !       if(c_%watch_user) then
-  !          write(6,*) "big problem in dabnew ", sqrt(crash)
-  !       endif
-  !       return
-  !    endif
-  !    call daall1(incc,'$$DAJUNK$$',inoc,invc)
-  !    call damul(ina,inb,incc)
-  !    call damul(inc,ind,ine)
-  !    call dalin(incc,coe1,ine,coe2,ine )
-  !    call dadal1(incc)
-  !
-  !    return
-  !  end subroutine damulin
-  !
-  !  !
-  !  !
-  !
+
   subroutine damul(ina,inb,inc)
     implicit none
     !     *****************************
@@ -3934,183 +3864,6 @@ contains
     return
   end subroutine dainvt
   !
-  subroutine matinv(a,ai,n,nmx,ier)
-
-    implicit none
-
-    integer i,ier,j,n,nmx
-    integer,dimension(nmax)::indx
-    real(dp) d
-    real(dp),dimension(nmx,nmx)::a,ai
-    real(dp),dimension(nmax,nmax)::aw
-    !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
-
-    aw(1:n,1:n) = a(1:n,1:n)
-
-    call ludcmp_nr(aw,n,nmax,indx,d,ier)
-    if (ier .eq. 132) return
-
-    ai(1:n,1:n) = zero
-    forall (i = 1:n) ai(i,i) = one
-
-    do j=1,n
-       call lubksb_nr(aw,n,nmax,indx,ai(1,j),nmx)
-    enddo
-
-  end subroutine matinv
-
-
-  !
-  subroutine ludcmp_nr(a,n,np,indx,d,ier)
-    implicit none
-    !     ************************************
-    !
-    !     THIS SUBROUTINE DECOMPOSES A MATRIX INTO LU FORMAT
-    !     INPUT A: NXN MATRIX - WILL BE OVERWRITTEN BY THE LU DECOMP.
-    !           NP: PHYSICAL DIMENSION OF A
-    !           INDX: ROW PERMUTATION VECTOR
-    !           D: EVEN OR ODD ROW INTERCHANGES
-    !
-    !     REFERENCE: NUMERICAL RECIPIES BY PRESS ET AL (CAMBRIDGE) PG. 35
-    !
-    !-----------------------------------------------------------------------------
-    !
-    integer i,ier,imax,j,k,n,np
-    integer,dimension(np)::indx
-    real(dp) aamax,d,dum,sum
-    real(dp),dimension(np,np)::a
-    real(dp),dimension(nmax)::vv
-    !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
-    ier=0
-    d=one
-    do i=1,n
-       aamax=zero
-       do j=1,n
-          if(abs(a(i,j)).gt.aamax) aamax=abs(a(i,j))
-       enddo
-       if(aamax.eq.zero) then
-          ier=132
-          return
-       endif
-       vv(i)=one/aamax
-    enddo
-    do j=1,n
-       if(j.gt.1) then
-          do i=1,j-1
-             sum=a(i,j)
-             if(i.gt.1) then
-                do k=1,i-1
-                   sum=sum-a(i,k)*a(k,j)
-                enddo
-                a(i,j)=sum
-             endif
-          enddo
-       endif
-       aamax=zero
-       do i=j,n
-          sum=a(i,j)
-          if (j.gt.1) then
-             do k=1,j-1
-                sum=sum-a(i,k)*a(k,j)
-             enddo
-             a(i,j)=sum
-          endif
-          dum=vv(i)*abs(sum)
-          if(dum.ge.aamax) then
-             imax=i
-             aamax=dum
-          endif
-       enddo
-       if (j.ne.imax) then
-          do k=1,n
-             dum=a(imax,k)
-             a(imax,k)=a(j,k)
-             a(j,k)=dum
-          enddo
-          d=-d
-          vv(imax)=vv(j)
-       endif
-       indx(j)=imax
-       if(j.ne.n) then
-          if(a(j,j).eq.zero) a(j,j)=tiny
-          dum=one/a(j,j)
-          do i=j+1,n
-             a(i,j)=a(i,j)*dum
-          enddo
-       endif
-    enddo
-    if(a(n,n).eq.zero) a(n,n)=tiny
-    return
-  end subroutine ludcmp_nr
-  !
-  subroutine lubksb_nr(a,n,np,indx,b,nmx)
-    implicit none
-    !     ************************************
-    !
-    !     THIS SUBROUTINE SOLVES SET OF LINEAR EQUATIONS AX=B,
-    !     INPUT A: NXN MATRIX IN lu FORM GIVEN BY ludcmp_nr
-    !           NP: PHYSICAL DIMENSION OF A
-    !           INDX: ROW PERMUTATION VECTOR
-    !           D: EVEN OR ODD ROW INTERCHANGES
-    !           B: RHS OF LINEAR EQUATION - WILL BE OVERWRITTEN BY X
-    !
-    !     REFERENCE: NUMERICAL RECIPIES BY PRESS ET AL (CAMBRIDGE) PG. 36
-    !
-    !-----------------------------------------------------------------------------
-    !
-    integer i,ii,j,ll,n,nmx,np
-    integer,dimension(np)::indx
-    real(dp) sum
-    real(dp),dimension(np,np)::a
-    real(dp),dimension(nmx)::b
-    !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
-    ii = 0
-    do i=1,n
-       ll = indx(i)
-       sum = b(ll)
-       b(ll) = b(i)
-       if(ii.ne.0) then
-          do j=ii,i-1
-             sum = sum-a(i,j)*b(j)
-          enddo
-       else if (sum.ne.zero) then
-          ii = i
-       endif
-       b(i)=sum
-    enddo
-    do i=n,1,-1
-       sum=b(i)
-       if(i.lt.n) then
-          do j=i+1,n
-             sum = sum-a(i,j)*b(j)
-          enddo
-       endif
-
-       b(i)=sum/a(i,i)
-
-    enddo
-    return
-  end subroutine lubksb_nr
-  !
-
   subroutine dapin(ma,ia,mb,ib,jx)
     implicit none
     !     *****************************
@@ -4374,51 +4127,6 @@ contains
     return
   end subroutine dadert
   !
-  subroutine dapoi(ina,inb,inc,n)
-    implicit none
-    !     *******************************
-    !
-    !     THIS SUBROUTINE COMPUTES THE POISSON BRACKET OF THE VECTORS A AND
-    !     B AND STORES THE RESULT IN C. N IS THE DEGREE OF FREEDOM OF THE SYSTEM.
-    !
-    !-----------------------------------------------------------------------------
-    !
-    integer i,ina,inb,inc, n,is(4)
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
-
-    !
-    is = 0
-    call daall(is,4,'$$DAPOI $$',nomax,nvmax)
-    !
-    !
-    do i=1,n
-       !
-       call dader(2*i-1,ina,is(1))
-       call dader(2*i,  inb,is(2))
-       call damul(is(1),is(2),is(3))
-       call daadd(is(4),is(3),is(1))
-       call dacop(is(1),is(4))
-       !
-       call dader(2*i,  ina,is(1))
-       call dader(2*i-1,inb,is(2))
-       call damul(is(1),is(2),is(3))
-       call dasub(is(4),is(3),is(1))
-       call dacop(is(1),is(4))
-       !
-    enddo
-
-    call dacop(is(4),inc)
-    !
-    call dadal(is,4)
-    !
-    return
-  end subroutine dapoi
-
 
   !
   subroutine dacfuR(ina,fun,inc)
@@ -4818,10 +4526,10 @@ contains
     return
   end subroutine dacfut
   !
-  subroutine GET_C_J(I,C,J)
+  subroutine GET_C_J(ina,I,C,J)
     implicit none
     !
-    INTEGER I
+    INTEGER I,ina
     integer, dimension(lnv)::j
     real(dp) C
     !
@@ -5676,48 +5384,6 @@ contains
     return
   end subroutine datra
 
-  !  subroutine etred(no1,nv1,ic1,ic2,no2,nv2,i_11,i_21)
-  !    implicit none
-  !    !     ****************************
-  !    !
-  !    !     THIS SUBROUTINE CODES THE EXPONENTS IN JJ INTO THEIR DA CODES i_1,i_2.
-  !    !
-  !    !-----------------------------------------------------------------------------
-  !    !
-  !    integer i,i_11,i_21,ic,ic1,ic2,no1,no2,nv1,nv2,ipause,mypauses
-  !    integer,dimension(lnv)::jj
-  !    !
-  !    if(nv1.gt.lnv.or.nv2.gt.lnv) then
-  !       write(line,'(a18)')  'ERROR IN RECODING '
-  !       ipause=mypauses(35,line)
-  !       stop 123
-  !    endif
-  !    call dehash(no1,nv1,ic1,ic2,jj)
-  !    ic=0
-  !
-  !    do i=nv1+1,nv2
-  !       if(jj(i).gt.0) then
-  !          i_11=-1
-  !          i_21=0
-  !          return
-  !       endif
-  !    enddo
-  !
-  !    do i=1,nv2
-  !       ic=ic+jj(i)
-  !    enddo
-  !
-  !    if(ic.gt.no2) then
-  !       i_11=-1
-  !       i_21=0
-  !       return
-  !    endif
-  !
-  !    call hash(no2,nv2,jj,i_11,i_21)
-  !
-  !    !
-  !    return
-  !  end subroutine etred
 
   subroutine hash(no1,nv1,jj,ic1,ic2)
     implicit none
@@ -5779,55 +5445,6 @@ contains
     return
   end subroutine dehash
 
-  !  subroutine daswap(j1,j2,inb)
-  !    implicit none
-  !    !     *************************
-  !    !
-  !    !     SWAP A DA VECTOR
-  !    !
-  !    !-----------------------------------------------------------------------------
-  !    !
-  !    integer ia,ic,ic1,ic2,illb,ilmb,inb,inob,invb,ipob,j1,j2,k1,k2
-  !    integer,dimension(lnv)::jj
-  !    !
-  !    if((.not.C_%STABLE_DA)) then
-  !       if(c_%watch_user) then
-  !          write(6,*) "big problem in dabnew ", sqrt(crash)
-  !       endif
-  !       return
-  !    endif
-  !    call dainf(inb,inob,invb,ipob,ilmb,illb)
-  !    if((.not.C_%STABLE_DA)) then
-  !       if(c_%watch_user) then
-  !          write(6,*) "big problem in dabnew ", sqrt(crash)
-  !       endif
-  !       return
-  !    endif
-  !
-  !    call daclr(1)
-  !    !
-  !
-  !    do ia = ipob,ipob+illb-1
-  !
-  !       call dehash(nomax,nvmax,i_1(ia),i_2(ia),jj)
-  !       k1=jj(j1)
-  !       k2=jj(j2)
-  !       jj(j1)=k2
-  !       jj(j2)=k1
-  !       call hash(nomax,nvmax,jj,ic1,ic2)
-  !
-  !       ic=ia1(ic1)+ia2(ic2)
-  !
-  !       cc(ic) = cc(ia)
-  !       i_1(ic) = ic1
-  !       i_2(ic) = ic2
-  !       !
-  !    enddo
-  !    !
-  !    !
-  !    call dapac(inb)
-  !    return
-  !  end subroutine daswap
 
   subroutine daran(ina,cm,xran)
     implicit none
@@ -5898,26 +5515,6 @@ contains
     return
   end subroutine daran
   !
-  real(dp) function bran(xran)
-    implicit none
-    !     ************************************
-    !
-    !     VERY SIMPLE RANDOM NUMBER GENERATOR
-    !
-    !-----------------------------------------------------------------------------
-    !
-    real(dp) xran
-    !
-    xran = xran + ten
-    if(xran.gt.c_1d4) xran = xran - c_9999_12345
-    bran = abs(sin(xran))
-    bran = 10*bran
-    bran = bran - int(bran)
-    !      IF(BRAN.LT. c_0_1) BRAN = BRAN + c_0_1
-    !
-    return
-  end function bran
-
 
 
   subroutine dacycle(ina,ipresent,value,illa,j)
@@ -5965,6 +5562,5 @@ contains
     return
 
   end subroutine dacycle
-
 
 end module dabnew
