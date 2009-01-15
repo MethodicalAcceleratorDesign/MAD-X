@@ -133,6 +133,7 @@ module definition
   TYPE DAMAP
      TYPE (TAYLOR) V(ndim2)    ! Ndim2=6 but allocated to nd2=2,4,6 ! etienne_oct_2004
   END TYPE DAMAP
+  !&1
   !@3 ---------------------------------------------</br>
 
   TYPE GMAP
@@ -140,6 +141,7 @@ module definition
      integer N
   END TYPE GMAP
 
+  !&4
   TYPE vecfield
      type (taylor) v(ndim2)          !@1 <font face="Times New Roman">V<sub>i</sub>&#8706;<sub>i</sub></font> Operator
      integer ifac                    !@1 Type of Factorization 0,1,-1 (One exponent, Dragt-Finn, Reversed Dragt-Finn)
@@ -149,6 +151,7 @@ module definition
      type (taylor) h
      integer ifac
   END TYPE pbfield
+  !&4
 
 
   TYPE tree
@@ -184,23 +187,19 @@ module definition
 
   !&5
 
+  !&3
   TYPE normalform
      type (damap) A_t   ! Total A  :  A_t= A1 o A_rest
      type (damap) A1    ! Dispersion
      type (reversedragtfinn) A  ! Linear A_t and nonlinear A_t
      type (dragtfinn) NORMAL    ! Normal is the Normal Form R
      type (damap) DHDJ  ! Contains the tunes in convenient form: extracted from NORMAL (=R)
-     !         .
-     !         .
-     !         .
-     !         .
-     !&3
      real(dp) TUNE(NDIM),DAMPING(NDIM)  ! linear tune and linear damping
      integer nord,jtune                 ! nord=1 A1 first order in parameters
      integer NRES,M(NDIM,NRESO),PLANE(NDIM)
      logical(lp) AUTO
-     !&3
   END TYPE normalform
+  !&3
 
   TYPE genfield
      type (taylor) h
@@ -252,21 +251,21 @@ module definition
   end  type tree_element
 
   type damapspin
-     !   REAL(DP) X(6)
+     REAL(DP) s0(3)
      type(damap) M
      !   type(real_8) s(3,3)
      type(taylor) s(3,3)
   end type damapspin
 
-  type normal_spin
-     type(normalform) N
-     type(taylor) NS(3,3)
-     type(taylor) AS(3,3)
-     real(dp) tune
-     type(damapspin) a_t
-     integer NRES,M(NDIM)
+  !  type normal_spin
+  !     type(normalform) N
+  !     type(taylor) NS(3,3)
+  !     type(taylor) AS(3,3)
+  !     real(dp) tune
+  !     type(damapspin) a_t
+  !     integer NRES,M(NDIM)
 
-  end type normal_spin
+  !  end type normal_spin
 
   include "a_def_frame_patch_chart.inc"
   include "a_def_all_kind.inc"
@@ -302,7 +301,5 @@ module definition
      type(integration_node),pointer :: c   ! pointer close to a(3)
      type(internal_state)  state
   END type TEMPORAL_BEAM
-
-
 
 end module definition

@@ -27,9 +27,10 @@ module tree_element_MODULE
   PRIVATE concat,assmap,EQUAL_damapspin,CUTORDER,assprobe_8,POWMAP
   private read_probe8,ALLOC_33t,ALLOC_33p,KILL_33t,KILL_33p
   private purge_transverse,norm_matsr,norm_matsp
-  private get_spin_nx_r,get_spin_nx_t
+  private get_spin_nx_r,get_spin_nx_t,get_spin_nx_rd
   private scdaddo,daddsco
   private real_8REAL6,REAL6real_8,real_8REAL_8,PRINT6
+  integer, target :: spin_extra_tpsa = 0
 
   INTERFACE assignment (=)
      !
@@ -119,6 +120,7 @@ module tree_element_MODULE
 
   INTERFACE get_spin_nx
      MODULE PROCEDURE get_spin_nx_r
+     MODULE PROCEDURE get_spin_nx_rd  ! takes DS (damapsin but return real)
      MODULE PROCEDURE get_spin_nx_t
   END INTERFACE
 
@@ -128,6 +130,11 @@ module tree_element_MODULE
 !!!!
      MODULE PROCEDURE PRINT_DASPIN
      MODULE PROCEDURE PRINT_probe8
+  END INTERFACE
+
+  INTERFACE daPRINT
+     MODULE PROCEDURE PRINT6
+!!!!
   END INTERFACE
 
   INTERFACE READ
@@ -182,6 +189,19 @@ module tree_element_MODULE
   END INTERFACE
 
 
+  type normal_spin
+     type(normalform) N
+     type(damapspin) a1   !!! full analysis of n0
+     type(damapspin) ar   !!! full analysis of n0
+     type(damapspin) a_t
+     type(taylor) N0(3)
+     type(taylor) theta0
+
+
+     real(dp) tune
+     integer NRES,M(NDIM)
+
+  end type normal_spin
 
 
 
@@ -938,6 +958,7 @@ CONTAINS
     enddo
 
     s%m=r%m
+    s%s0=r%s0
 
     !     do i=1,6
     !     s%x(i)=r%x(i)
@@ -1161,6 +1182,7 @@ CONTAINS
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damapspin), INTENT(INOUT) :: DS
     type(gmap) g
+    real(dp) s(3,3),n(3)
     INTEGER I,J
     ! if(C_%ND2/=6) then
     !  write(6,*) " not implemented in EQUAL_DASPIN_RAY8"
@@ -1170,6 +1192,10 @@ CONTAINS
     do i=1,C_%ND2
        g%v(i)=one.mono.i
     enddo
+
+    if(C_%ND2==4.and.(c_%npara==5.or.c_%npara==8)) then
+       g%v(5)=one.mono.5
+    endif
 
     do i=C_%SPIN_POS+3,C_%nv
        g%v(i)=one.mono.(i-3)
@@ -1188,6 +1214,21 @@ CONTAINS
           DS%S(I,J)=((R%S%X(I)%T).D.(C_%SPIN_POS+J-1))*G
        ENDDO
     ENDDO
+
+
+    DO I=1,3
+       n(i)=R%S%X(I)
+       DO J=1,3
+          S(I,J)=DS%S(I,J)
+       ENDDO
+    ENDDO
+
+    call inv_as(s,s)
+
+    n= matmul(s,n)
+
+    ds%s0=n
+
 
     call kill(g)
 
@@ -1210,10 +1251,15 @@ CONTAINS
     call alloc(g)
     call alloc(d)
 
+
     call alloc(g)
     do i=1,C_%ND2
        g%v(i)=one.mono.i
     enddo
+    if(C_%ND2==4.and.(c_%npara==5.or.c_%npara==8)) then
+       g%v(5)=one.mono.5
+    endif
+
 
     do i=C_%SPIN_POS+3,C_%nv
        g%v(i)=one.mono.(i-3)
@@ -1224,16 +1270,18 @@ CONTAINS
     g=g**(-1)
 
     DO I=1,C_%ND2
-       R%X(I)= MORPH(DS%M%V(I))+R%X(I)
+       R%X(I)= MORPH(DS%M%V(I))   !+R%X(I)
     ENDDO
 
 
     DO I=1,3
+       R%S%X(I)=zero
        DO J=1,3
           d=DS%S(I,J)*g
           !       call print(DS%S(I,J),6)
           !       call print(d,6)
-          R%S%X(I)=morph(d*(ONE.MONO.(C_%SPIN_POS+J-1)))+R%S%X(I)
+          R%S%X(I)=morph( d* ((ONE.MONO.(C_%SPIN_POS+J-1))+spin_extra_tpsa*ds%s0(j))  )+R%S%X(I)
+
        ENDDO
     ENDDO
 
@@ -1281,13 +1329,18 @@ CONTAINS
     integer localmaster,iia(4),ico(4),nd2,i,j
     type(taylor) d
     TYPE (probe_8) ds1
+    integer      spin_extra_tpsat
+
     call alloc(ds1)
 
+    spin_extra_tpsat=spin_extra_tpsa
+    spin_extra_tpsa=0
     ds1=s1
-
+    spin_extra_tpsa=spin_extra_tpsat
 
     call liepeek(iia,ico)
     nd2=iia(4)
+
     !   call ass(scdadd)
     scdadd%u=my_false
     scdadd%E_ij=zero
@@ -1297,9 +1350,10 @@ CONTAINS
        localmaster=master
        call ass(scdadd%x(i))
        !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       scdadd%x(i)=ds1%x(i)+s2%x(i)
+       scdadd%x(i)=ds1%x(i)+s2%x(i)-(ds1%x(i).sub.'0')
        master=localmaster
     enddo
+
     do i=nd2+1,6
        localmaster=master
        call ass(scdadd%x(i))
@@ -1339,9 +1393,16 @@ CONTAINS
     integer localmaster,iia(4),ico(4),nd2,i,j
     type(taylor) d
     TYPE (probe_8) ds1
+    integer      spin_extra_tpsat
+
     call alloc(ds1)
 
+    spin_extra_tpsat=spin_extra_tpsa
+    spin_extra_tpsa=0
     ds1=s1
+    spin_extra_tpsa=spin_extra_tpsat
+
+
     call liepeek(iia,ico)
     nd2=iia(4)
     !   call ass(daddsc)
@@ -1352,7 +1413,7 @@ CONTAINS
     do i=1,nd2
        localmaster=master
        call ass(daddsc%x(i))
-       daddsc%x(i)=ds1%x(i)+s2%x(i)
+       daddsc%x(i)=ds1%x(i)+s2%x(i)-(ds1%x(i).sub.'0')
        !       daddsc%x(i)=s1%m%v(i)+s2%x(i)
        master=localmaster
     enddo
@@ -1460,7 +1521,7 @@ CONTAINS
        DO J=1,3
           READ(MF1,*) LINE
           CALL READ(T,MF1)
-          DS%S(I,J)=MORPH(T)
+          DS%S(I,J)=T     !MORPH(T)
        ENDDO
     ENDDO
     if(present(file)) close(mf1)
@@ -1495,179 +1556,6 @@ CONTAINS
 
 
 
-  subroutine NORMAL_DASPIN(R,DS)
-    implicit none
-    TYPE(normal_spin), INTENT(INOUT) :: R
-    TYPE(damapspin), INTENT(INout) :: DS
-    real(dp) s00(3,3),tunes(4)
-    integer i,j
-    type(taylor) n0(3),a(3,3),ai(3,3),s0(3,3),s0i(3,3),b(3),theta0
-    type(taylor) s1(3,3),s1i(3,3)
-    type(damap) ri
-    type(taylor) t
-    type(taylorresonance) tr
-
-    call alloc_33(s1)
-    call alloc_33(s1i)
-    call alloc_33(s0)
-    call alloc_33(s0i)
-    call alloc_33(a)
-    call alloc_33(ai)
-    call alloc(n0,3)
-    call alloc(b,3)
-    call alloc(theta0)
-    call alloc(ri)
-    call alloc(t)
-
-    !   normalize orbital map
-    global_verbose=.true.
-    r%n%auto=.false.
-    ! call alloc(h)
-    ! h=-pi*(0.00133623d0)*((1.d0.mono.'0020')+(1.d0.mono.'0002'))
-    ! h%h=h%h+pi*(0.0013622341d0)*((1.d0.mono.'000020')+(1.d0.mono.'000002'))
-    ! ds%m =exp(h,ds%m)
-    r%n=ds%m
-    ri=r%n%normal
-    ri=ri**(-1)
-    tunes(1:3)=twopi*r%n%tune
-    !
-    !   do i=1,3
-    !   do j=1,3
-    !    r%ns%s(i,j)=morph(ds%s(i,j)%t*r%n%a_t)  ! go into normalized variables
-    !    r%ns%s(i,j)=morph(ds%s(i,j)%t*ri)  ! advances by r**(-1)
-    !   enddo
-    !   enddo
-    call trans_mat(ds%s,r%n%a_t,r%ns) ! go into normalized variables
-    call trans_mat(r%ns,ri,r%ns)      ! advances by r**(-1)
-
-    do i=1,3
-       do j=1,3
-          s00(i,j)=r%ns(i,j)
-          s0(i,j)=s00(i,j)
-       enddo
-    enddo
-
-    call find_n_theta(s0,theta0,n0)  ! s0=exp(theta0*n0.L)
-    tunes(4)=theta0
-
-    !    finds a
-    call find_a(n0,a)
-    call inv_as(a,ai)  ! a0**(-1) * s0 * a0 = exp(theta0*Ly)
-
-    call matmulp(ai,r%ns,r%ns) ! a0**(-1) * r%ns%s * a0
-    call matmulp(r%ns,a,r%ns) ! put result in r%ns%s
-
-    do i=1,3
-       do j=1,3
-          s00(i,j)=r%ns(i,j)
-          s0(i,j)=s00(i,j)
-          ! call print(s0(i,j),6)
-          !pause
-       enddo
-    enddo
-
-    call smatp(one,a,r%as)
-
-    call inv_as(s0,s0i)
-    call matmulp(r%ns,s0i,r%ns)    !
-
-    do i=1,c_%no+2
-
-       call find_n_theta(r%ns,theta0,n0,my_false)  ! s0=exp(theta0*n0.L)
-       !    call print(theta0,6)
-
-       do j=1,3
-          !     write(6,*) i,j
-          t=(n0(j)).cut.c_%no
-          !     call print(t,6)
-          !    pause
-       enddo
-
-       call res_bas_spin(R,tunes,n0,b)
-       theta0=one
-       call exp_n_theta(theta0,b,s1)
-       call inv_as(s1,s1i)
-       call matmulp(r%as,s1,r%as)     ! building A
-       call trans_mat(s1,ri,s1)
-
-       call matmulp(s1i,r%ns,r%ns)
-       call matmulp(r%ns,s0,r%ns)
-       call matmulp(r%ns,s1,r%ns)
-       call matmulp(r%ns,s0i,r%ns)
-
-    enddo
-
-    ri=(r%n%a_t)**(-1)
-    call trans_mat(r%as,ri,r%as)
-    call matmulp(r%ns,s0,r%ns)
-
-    call find_n_theta(r%ns,theta0,n0)  ! s0=exp(theta0*n0.L)
-    !    call print(theta0,17)
-    theta0=theta0.cut.c_%no
-    do i=1,3
-       n0(i)=n0(i).cut.c_%no
-       !    call print(n0(i),17)
-    enddo
-    n0(1)=cos(theta0)
-    n0(2)=sin(theta0)
-    do i=1,2
-       n0(i)=n0(i).cut.c_%no
-       !    call print(n0(i),17)
-    enddo
-    ! checking
-
-    call matmulp(ds%s,r%as,s0)
-    call trans_mat(r%as,ds%m,s0i)
-    call inv_as(s0i,s1)
-    call matmulp(s1,s0,s1i)
-
-    do i=1,3
-       do j=1,3
-
-          write(6,*) "final ",i,j
-          t=s1i(i,j)
-          !     t=s0(i,j)%t-s0i(i,j)%t
-          t=t.cut.c_%no
-          !     call print(t,6)
-          !    pause
-
-       enddo
-    enddo
-    call alloc(tr)
-    call trans_mat(s1i,r%n%a_t,s1i)
-    do i=1,3
-       do j=1,3
-
-          write(6,*) "final normal",i,j
-          t=s1i(i,j)
-          !     t=s0(i,j)%t-s0i(i,j)%t
-          t=t.cut.c_%no
-          tr=t
-          !     call print(tr%cos,6)
-          !     pause 1
-          !     call print(tr%sin,6)
-          !     pause 2
-
-       enddo
-    enddo
-
-    r%a_t%m=r%n%a_t
-    call smatp(one,r%as,r%a_t%s)
-
-    call kill_33(s1)
-    call kill_33(s1i)
-    call kill_33(s0)
-    call kill_33(s0i)
-    call kill_33(a)
-    call kill_33(ai)
-    call kill(n0,3)
-    call kill(b,3)
-    call kill(theta0)
-    call kill(ri)
-    call kill(t)
-
-    r%tune=tunes(4)/twopi
-  END subroutine NORMAL_DASPIN
 
   subroutine CHECK_RES_ORBIT(J,NRES,M,SKIP)
     implicit none
@@ -1988,147 +1876,139 @@ CONTAINS
   end subroutine exp_n_thetap
 
 
-  subroutine find_n_thetar(s0,theta0,n0)
+  subroutine find_n_thetar(s0,n0)
     implicit none
-    real(dp) s0(3,3),theta0,n0(3)
-    real(dp) ss(3,3),sc,ln(3,3),xx(3,3),an,anb
-    integer i,k
-    sc=0.1_dp
+    real(dp),intent(in) :: s0(3,3)
+    real(dp)  theta0,n0(3)
+    real(dp)  det,ss(3,3)
+    real(dp) sc,scmax
+    integer i,j,is
 
-    ss=s0
-    call power_rot(ss,sc,k)
 
-    do i=1,3
-       ss(i,i)=ss(i,i)-one
-    enddo
 
-    anb=1.e38_dp
-    ln=zero
-    xx=ss
 
-    do i=1,1000
-       ln= xx/i+ln
-       xx=-matmul(ss,xx)
-       if(i>20) then
-          call anti_mat(ln,an)
-          if(an>=anb) exit
-          anb=an
-       endif
-    enddo
-    if(i>950) then
-       write(6,*) " Did not converge in find_n_theta"
-       write(6,*) i,an
-    endif
-    !    write(6,*) ln(1,:)
-    !    write(6,*) ln(2,:)
-    !    write(6,*) ln(3,:)
-    n0(1)=ln(3,2)
-    n0(2)=ln(1,3)
-    n0(3)=ln(2,1)
-
-    theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
-    n0=n0/theta0
-
-    if(n0(spin_normal_position)<zero) then
-       n0=-n0
-       theta0=-theta0
-    endif
-
-    !    write(6,*) " theta0 = ",theta0
-    !    write(6,*) " n0 = ",n0
-
-  end subroutine find_n_thetar
-
-  subroutine find_n_thetap(s0,theta0,n0,powerflag,scc)
-    implicit none
-    type(taylor),intent(in) :: s0(3,3)
-    type(taylor)  theta0,n0(3)
-    type(taylor)  ss(3,3),ln(3,3),xx(3,3)
-    real(dp) sc,an,anb
-    integer i,j,k
-    integer , optional :: scc
-    logical(lp), optional :: powerflag
-    logical(lp):: powerf
-
-    k=1
-    powerf=my_true
-    call alloc_33(ss)
-    call alloc_33(ln)
-    call alloc_33(xx)
-
-    sc=0.1_dp
 
     do i=1,3
        do j=1,3
-          ln(i,j)=zero
           ss(i,j)=s0(i,j)
        enddo
     enddo
 
-    if(present(powerflag)) powerf=powerflag
-    if(powerf) call power_rot(ss,sc,k)
 
 
+    scmax=zero
     do i=1,3
+       sc=ss(i,i)
+       sc=abs(sc)
+       if(sc>scmax) then
+          is=i
+          scmax=sc
+       endif
        ss(i,i)=ss(i,i)-one
     enddo
 
-    anb=1.e38_dp
+    if(is==1) then
+       n0(is)=one
+       det=ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2)
+       n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
+       n0(3)=(-ss(1,1)*ss(3,1)+ss(3,2)*ss(2,1))/det
+    elseif(is==2) then
+       n0(is)=one
+       det=ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1)
+       n0(1)=(-ss(3,3)*ss(1,2)+ss(3,2)*ss(1,3))/det
+       n0(3)=(-ss(1,1)*ss(3,2)+ss(1,2)*ss(3,1))/det
+    else
+       n0(is)=one
+       det=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
+       n0(1)=(-ss(2,2)*ss(1,3)+ss(3,1)*ss(1,2))/det
+       n0(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
+    endif
+
+    theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
+
+    do i=1,3
+       n0(i)=n0(i)/theta0
+    enddo
+
+
+
+    if(n0(spin_normal_position)<zero) then
+       do i=1,3
+          n0(i)=-n0(i)
+       enddo
+    endif
+
+  end subroutine find_n_thetar
+
+  subroutine find_n_thetap(s0,n0)
+    implicit none
+    type(taylor),intent(in) :: s0(3,3)
+    type(taylor)  theta0,n0(3)
+    type(taylor)  det,ss(3,3)
+    real(dp) sc,scmax
+    integer i,j,is
+
+
+
+    call alloc(det)
+    call alloc(theta0)
+    call alloc_33(ss)
+
+
     do i=1,3
        do j=1,3
-          ln(i,j)=zero
-          xx(i,j)=ss(i,j)
+          ss(i,j)=s0(i,j)
        enddo
     enddo
 
-    do i=1,1000
 
-       sc=one/i
-       call  smatmulp(sc,xx,ln,ln)
-       !     ln= xx/i+ln
-       !      xx=-matmul(ss,xx)
-       call matmulp(ss,xx,xx)
-       call smatp(-one,xx,xx)
 
-       if(i>20) then
-          call anti_mat(ln,an)
-          if(an>=anb) exit
-          anb=an
+    scmax=zero
+    do i=1,3
+       sc=ss(i,i)
+       sc=abs(sc)
+       if(sc>scmax) then
+          is=i
+          scmax=sc
        endif
+       ss(i,i)=ss(i,i)-one
     enddo
-    if(i>950) then
-       write(6,*) " Did not converge in find_n_theta"
-       write(6,*) i,an
-    endif
-    !    write(6,*) ln(1,:)
-    !    write(6,*) ln(2,:)
-    !    write(6,*) ln(3,:)
-    n0(1)=ln(3,2)
-    n0(2)=ln(1,3)
-    n0(3)=ln(2,1)
-    theta0=one
-    if(powerf) then
 
-       theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
+    if(is==1) then
+       n0(is)=one
+       det=ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2)
+       n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
+       n0(3)=(-ss(1,1)*ss(3,1)+ss(3,2)*ss(2,1))/det
+    elseif(is==2) then
+       n0(is)=one
+       det=ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1)
+       n0(1)=(-ss(3,3)*ss(1,2)+ss(3,2)*ss(1,3))/det
+       n0(3)=(-ss(1,1)*ss(3,2)+ss(1,2)*ss(3,1))/det
+    else
+       n0(is)=one
+       det=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
+       n0(1)=(-ss(2,2)*ss(1,3)+ss(3,1)*ss(1,2))/det
+       n0(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
+    endif
+
+    theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
+
+    do i=1,3
+       n0(i)=n0(i)/theta0
+    enddo
+
+
+
+    if((n0(spin_normal_position).sub.'0')<zero) then
        do i=1,3
-          n0(i)=n0(i)/theta0
+          n0(i)=-n0(i)
        enddo
-
-
-       if((n0(spin_normal_position).sub.'0')<zero) then
-          do i=1,3
-             n0(i)=-n0(i)
-          enddo
-          theta0=-theta0
-       endif
-
     endif
 
+    call kill(det)
+    call kill(theta0)
     call kill_33(ss)
-    call kill_33(ln)
-    call kill_33(xx)
 
-    if(present(scc)) scc=k
   end subroutine find_n_thetap
 
   subroutine find_ar(n2,a)
@@ -2767,8 +2647,12 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          r=(m(i,j)*ri)
-          n(i,j)=morph(r)
+          if(c_%nd2/=0) then
+             r=(m(i,j)*ri)
+          else
+             r=m(i,j)
+          endif
+          n(i,j)=r    !morph(r)
           ! advances by r**(-1)
        enddo
     enddo
@@ -2802,7 +2686,7 @@ CONTAINS
     implicit none
     TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
-    !     D%X=ZERO
+    D%s0=ZERO
     CALL ALLOC(D%M)
     DO I=1,3
        DO J=1,3
@@ -2817,7 +2701,7 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: D
     INTEGER I,J
 
-    !     D%X=ZERO
+    D%s0=ZERO
     CALL KILL(D%M)
     DO I=1,3
        DO J=1,3
@@ -2827,29 +2711,7 @@ CONTAINS
 
   END    subroutine KILL_DASPIN
 
-  subroutine alloc_normal_spin(D)
-    implicit none
-    TYPE(normal_spin), INTENT(INOUT) :: D
 
-    CALL alloc(D%n)
-    CALL alloc(D%a_t)
-    CALL alloc_33(D%ns)
-    CALL alloc_33(D%as)
-    D%NRES=0
-    D%M=0
-
-  END    subroutine alloc_normal_spin
-
-  subroutine KILL_normal_spin(D)
-    implicit none
-    TYPE(normal_spin), INTENT(INOUT) :: D
-
-    CALL KILL(D%n)
-    CALL KILL(D%a_t)
-    CALL KILL_33(D%ns)
-    CALL KILL_33(D%as)
-
-  END    subroutine KILL_normal_spin
 
 
   subroutine ALLOC_SPINOR_8(S)
@@ -2923,59 +2785,6 @@ CONTAINS
     C_%SPIN_POS=C_%ND2+1   ! CAN BE OVERWRITTEN BY PTC
   end subroutine  init_SPIN
 
-!!!!!!!!!!!!!!!!   new stuff
-  subroutine Go_to_closed(N,DS,theta0,n0)
-    implicit none
-    TYPE(normalform), INTENT(INOUT) :: n
-    TYPE(damapspin), INTENT(INout) :: DS
-    type(damapspin) a1i,ds0,A1
-    type(taylor), intent(inout) :: theta0,n0(3)
-    type(taylor) s(3,3),a(3,3),ai(3,3)
-    real(dp) theta0r,n0r(3) !
-    type(real_8) a11,a13
-    integer i,j
-
-    call alloc(a1i)
-    call alloc(a1)
-    call alloc(ds0)
-    call alloc_33(s)
-    call alloc_33(a)
-    call alloc_33(ai)
-    call alloc(a11,a13)
-
-    A1=1   ! damapspin to fix point
-    a1%m=n%a1    ! fix point map a1 of orbital normal form
-    a1i=a1**(-1) ! fix point map a1 of orbital normal form
-
-    DS0=a1i*ds*a1  ! at this stage ds0 is the map around the fixed point
-
-    call clean_orbital_33(ds0%s,s)
-
-    ! at this stage s is the spin map  without dependence on orbital
-
-    call find_n_theta(s,theta0,n0)
-
-    call find_a(n0,a)
-    call inv_as(a,ai)
-
-    call matmulp(ai,s,ai)    !
-    call matmulp(ai,a,s)    !
-
-    a11=morph(s(1,1))
-    a13=morph(s(1,3))
-
-    theta0=atan2(a13,a11)
-
-    call kill(a1i)
-    call kill(a1)
-    call kill(ds0)
-    call kill_33(s)
-    call kill_33(a)
-    call kill_33(ai)
-
-    call kill(a11,a13)
-
-  end subroutine Go_to_closed
 
 !!!!!!!!!!!!!!!!   new stuff
   subroutine get_spin_nx_t(DS,theta0,n0)
@@ -2994,7 +2803,7 @@ CONTAINS
     call alloc_33(ai)
     call alloc(a11,a13)
 
-    call find_n_theta(ds%s,theta0,n0,scc=nsc)
+    call find_n_theta(ds%s,n0)
 
     !     call print(theta0,6)
 
@@ -3037,20 +2846,21 @@ CONTAINS
 
   end subroutine get_spin_nx_t
 
-  subroutine get_spin_nx_r(DS,theta0,n0)
+  subroutine get_spin_nx_r(S,theta0,n0)
     implicit none
-    TYPE(damapspin), INTENT(INout) :: DS
+    !    TYPE(damapspin), INTENT(INout) :: DS
     real(dp), intent(inout) :: theta0,n0(3)
-    real(dp) s(3,3),a(3,3),ai(3,3)
+    real(dp) a(3,3),ai(3,3)
     integer i,j,nsc
+    real(dp),  INTENT(INout) :: S(3,3)
 
-    do i=1,3
-       do j=1,3
-          s(i,j)=ds%s(i,j)
-       enddo
-    enddo
+    !     do i=1,3
+    !     do j=1,3
+    !      s(i,j)=ds%s(i,j)
+    !      enddo
+    !      enddo
 
-    call find_n_theta(s,theta0,n0)
+    call find_n_theta(s,n0)
 
     call find_a(n0,a)
     call inv_as(a,ai)
@@ -3062,6 +2872,32 @@ CONTAINS
 
 
   end subroutine get_spin_nx_r
+
+  subroutine get_spin_nx_rd(dS,theta0,n0)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    real(dp), intent(inout) :: theta0,n0(3)
+    real(dp) a(3,3),ai(3,3),S(3,3)
+    integer i,j,nsc
+
+    do i=1,3
+       do j=1,3
+          s(i,j)=ds%s(i,j)
+       enddo
+    enddo
+
+    call find_n_theta(s,n0)
+
+    call find_a(n0,a)
+    call inv_as(a,ai)
+    ai=matmul(ai,s)    !
+    s=matmul(ai,a)    !
+
+    theta0=atan2(s(1,3),s(1,1))
+
+
+
+  end subroutine get_spin_nx_rd
 
 
 
@@ -3137,14 +2973,18 @@ CONTAINS
     do i=1,3
        do j=1,3
           !     if(s2%s(i,j)%kind==2) then
-          t2%s(i,j)=s2%s(i,j)*s1%m
+          if(c_%nd2/=0) then
+             t2%s(i,j)=s2%s(i,j)*s1%m
+          else
+             t2%s(i,j)=s2%s(i,j)
+          endif
           !     else
           !      t2%s(i,j)=s2%s(i,j)
           !     endif
        enddo
     enddo
 
-    concat%m=s2%m*s1%m
+    if(c_%nd2/=0) concat%m=s2%m*s1%m
 
     !    do i=1,6
     !     concat%x(i)=s2%x(i)
@@ -3158,6 +2998,7 @@ CONTAINS
        enddo
     enddo
     call smatp(one,s,concat%s)
+    concat%s0=s1%s0
 
     call kill_33(s);
     call kill(t2);
@@ -3216,5 +3057,143 @@ CONTAINS
 
   end  subroutine clean_orbital
 
+!!!!!!!!!!  Normal form !!!!!!!!!!!!!!!
+  subroutine NORMAL_DASPIN_new(R,DS)
+    implicit none
+    TYPE(normal_spin), INTENT(INOUT) :: R
+    TYPE(damapspin), INTENT(INout) :: DS
+    !    real(dp) s00(3,3),tunes(4)
+    !    integer i,j
+    !   type(taylor) n0(3),a(3,3),ai(3,3),s0(3,3),s0i(3,3),b(3),theta0
+    !   type(taylor) s1(3,3),s1i(3,3)
+    !  type(damap) ri
+    !   type(taylor) t
+    !   type(taylorresonance) tr
+
+
+    !   normalize orbital map
+    global_verbose=.true.
+    r%n%auto=.false.
+
+    r%n=ds%m
+    !    ri=r%n%normal
+    !    ri=ri**(-1)
+    !    tunes(1:3)=twopi*r%n%tune
+
+
+  END subroutine NORMAL_DASPIN_new
+
+  subroutine alloc_normal_spin(D)
+    implicit none
+    TYPE(normal_spin), INTENT(INOUT) :: D
+
+    CALL alloc(D%n0,3)
+    CALL alloc(D%theta0)
+    CALL alloc(D%n)
+    CALL alloc(D%a_t)
+    CALL alloc(D%a1)
+    CALL alloc(D%ar)
+    D%NRES=0
+    D%M=0
+
+
+  END    subroutine alloc_normal_spin
+
+  subroutine KILL_normal_spin(D)
+    implicit none
+    TYPE(normal_spin), INTENT(INOUT) :: D
+
+    CALL KILL(D%n0,3)
+    CALL KILL(D%theta0)
+    CALL KILL(D%n)
+    CALL KILL(D%a_t)
+    CALL KILL(D%a1)
+    CALL KILL(D%ar)
+
+  END    subroutine KILL_normal_spin
+
+!!!!!!!!!!!!!!!!   new stuff
+  subroutine Go_to_closed(ns,DS,a1)
+    implicit none
+    integer ipause, mypause
+    TYPE(normal_spin), INTENT(INOUT) :: ns
+    TYPE(damapspin), INTENT(INout) :: DS
+    TYPE(damapspin), INTENT(INout) :: a1
+    type(damapspin) a1i,ds0
+    type(damapspin)s ,a ,ai
+    type(taylor) nn
+    !    type(taylor) s(3,3),a(3,3),ai(3,3)
+    real(dp) theta0r,n0r(3),r,rt !
+    type(real_8) a11,a13
+    integer i,j
+
+    call alloc(a1i)
+    call alloc(ds0)
+    call alloc(s)
+    call alloc(a)
+    call alloc(ai)
+    call alloc(nn)
+    !    call alloc_33(s)
+    !    call alloc_33(a)
+    !    call alloc_33(ai)
+    call alloc(a11,a13)
+
+    A1=1   ! damapspin to fix point
+
+
+    a1%m=ns%n%a1    ! fix point map a1 of orbital normal form
+
+    a1i=a1**(-1) ! fix point map a1 of orbital normal form
+
+    DS0=a1i*ds*a1  ! at this stage ds0 is the map around the fixed point
+    ! but spin matrix unchanged except for its dependence on transverse
+
+
+    s=1
+    a=1
+    ai=1
+
+    call clean_orbital_33(ds0%s,s%s)
+    ! at this stage s is the spin map  without dependence on orbital
+
+    call find_n_theta(s%s,ns%n0)
+
+    call find_a(ns%n0,a%s)
+
+    ai=a**(-1)
+    !    call inv_as(a%s,ai%s)
+
+    s=(ai*s)*a
+    do i=1,3
+       call print(ns%n0(i),6)
+    enddo
+    !    call find_n_theta(s%s,ns%n0)
+    !do i=1,3
+    ! call print(ns%n0(i),6)
+    !enddo
+    ipause=mypause(200)
+    !    call matmulp(ai,s,ai)    !
+    !    call matmulp(ai,a,s)    !
+
+    a11=morph(s%s(1,1))
+    a13=morph(s%s(1,3))
+
+    ns%theta0=atan2(a13,a11)
+
+    a1=a1*a
+
+    call kill(a1i)
+    call kill(ds0)
+    !    call kill_33(s)
+    !    call kill_33(a)
+    !    call kill_33(ai)
+    call kill(s)
+    call kill(a)
+    call kill(ai)
+
+    call kill(a11,a13)
+    call kill(nn)
+
+  end subroutine Go_to_closed
 
 end module tree_element_MODULE

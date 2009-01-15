@@ -2788,7 +2788,7 @@ contains
     character(nlp) nom
     type(fibre), pointer :: p
     logical(lp) integrated,f1
-    real(dp) cut,sig(6),mis(6),x
+    real(dp) cut,sig(6),mis(6),x,taxi(6)
 
     if(i1>i2) then
        Write(6,*) " error i1 > i2 ",i1,i2
@@ -2797,7 +2797,7 @@ contains
        Write(6,*) " error i2 > nlp ",i2,nlp
        return
     endif
-
+    taxi=0.d0
     call context(nom)
 
     ic=0
@@ -2818,6 +2818,7 @@ contains
              DO J=1,6
                 call GRNF(X,cut)
                 MIS(J)=X*SIG(J)
+                taxi(j)=taxi(j)+abs(MIS(J))
              ENDDO
              call MISALIGN_FIBRE(p,mis)
           endif
@@ -2825,7 +2826,11 @@ contains
        P=>P%NEXT
     ENDDO
 
-    write(6,*) ic," Magnets misalgned "
+    write(6,*) ic," Magnets misaligned "
+    taxi=taxi/ic
+
+    write(6,'(a16,3(1x,E15.8))') "displacements = ",taxi(1:3)
+    write(6,'(a16,3(1x,E15.8))') "rotations     = ",taxi(4:6)
 
   end  subroutine MESS_UP_ALIGNMENT_name
 

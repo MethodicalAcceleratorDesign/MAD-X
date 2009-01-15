@@ -3082,15 +3082,18 @@ contains
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: RING
     type(probe) , intent(inOUT) :: FIX
+    type(probe)  FIXT
     INTEGER , optional,intent(in) :: TURNS,node1,fibre1
-    real(dp)  eps,x0(6)
+    real(dp)  eps,x0(6),theta0r,s(3,3)
     real(dp), optional,intent(inout) :: theta0
     TYPE(INTERNAL_STATE), intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
     type(probe_8) xs
     type(damapspin) ds
-    integer i
-
+    integer i,turns0,J
+    turns0=1
+    theta0r=0.d0
+    if(present(turns)) turns0=turns
     x0=FIX%x
     stat=state
     call find_orbit_x(RING,x0,STATE,eps,TURNS,fibre1,node1)
@@ -3104,16 +3107,30 @@ contains
     call alloc(xs)
     call alloc(ds)
 
-    ds=1
-    xs= FIX + ds
+    !        ds=1
+    !        xs= FIX + ds
 
-    do i=1,TURNS
-       call track_probe(RING,xs,stat,fibre1,node1)
-    enddo
+    !      do i=1,TURNS0
+    !       call track_probe(RING,xs,stat,fibre1,node1)
+    !        enddo
 
-    ds=xs
+    !        ds=xs
 
-    call get_spin_nx(DS,theta0,FIX%s%x)
+    DO J=1,3
+       FIXT%X=x0
+       FIXT%S%X=ZERO
+       FIXT%S%X(J)=one
+
+       do i=1,TURNS0
+          call track_probe(RING,fixt,stat,fibre1,node1)
+       enddo
+
+       s(1:3,j)=FIXT%S%X
+    ENDDO
+
+
+    call get_spin_nx(S,theta0r,FIX%s%x)
+    if(present(theta0)) theta0=theta0r
 
     call kill(xs)
     call kill(ds)

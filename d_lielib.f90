@@ -3084,6 +3084,7 @@ contains
           w_p%fc='((1X,A120))'
           w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
           CALL WRITE_i
+          write(6,*) sqrt(reval(i)**2+aieval(i)**2)
        endif
     enddo
     return
