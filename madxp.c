@@ -5071,7 +5071,7 @@ void update_beam(struct command* comm)
   else
   {
     ex = command_par_value("ex", current_beam);
-    exn = command_par_value("exn", current_beam);
+    exn = ex * 4 * beta * gamma;
   }
   if (nlc->inform[name_list_pos("ey", nlc)])
   {
@@ -5086,7 +5086,7 @@ void update_beam(struct command* comm)
   else
   {
     ey = command_par_value("ey", current_beam);
-    eyn = command_par_value("eyn", current_beam);
+    eyn = ey * 4 * beta * gamma;
   }
   alfa = one / (gamma * gamma);
   if (nlc->inform[name_list_pos("circ", nlc)])
@@ -5107,8 +5107,13 @@ void update_beam(struct command* comm)
   if (nlc->inform[name_list_pos("bcurrent", nlc)])
   {
     bcurrent = command_par_value("bcurrent", comm);
-    if (freq0 > zero)
+    if (bcurrent > zero && freq0 > zero)
       npart = bcurrent / (beta * freq0 * ten_p_6 * get_variable("qelect"));
+    else if (nlc->inform[name_list_pos("npart", nlc)])
+    {
+     npart = command_par_value("npart", comm);
+     bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect");
+    }
   }
   else if (nlc->inform[name_list_pos("npart", nlc)])
   {
