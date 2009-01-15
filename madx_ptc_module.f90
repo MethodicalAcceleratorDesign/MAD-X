@@ -6,7 +6,6 @@ MODULE ptc_results
   integer :: order = 20
   character(len = 2), dimension(6) :: ptc_variables = (/'x ','xp','y ','yp','z ','dp'/)
   character(len = 2) :: ptc_var
-  type(real_8) y(6)
   type(normalform) n
   type (pbresonance) pbrg,pbrh
 END MODULE ptc_results
@@ -1559,47 +1558,6 @@ CONTAINS
 
 
   end subroutine ptc_dumpmaps
-
-
-  FUNCTION double_from_ptc(column)
-    USE ptc_results
-    implicit none
-    real(dp) double_from_ptc
-    integer :: column(*)
-    integer j,k,nn,var_length,ptc_variable_length,ind(6)
-    logical(lp) var_check
-
-    double_from_ptc = zero
-    var_length = LEN(ptc_var)
-    do j = 1 , number_variables
-       ptc_variable_length = LEN(ptc_variables(j))
-       if (var_length .NE. ptc_variable_length) THEN
-          print *,"No such a variable"
-          RETURN
-       ENDIF
-       var_check = .false.
-       do k = 1, var_length
-          if (ptc_variables(j)(k:k) .NE. ptc_var(k:k)) EXIT
-          var_check = .true.
-       enddo
-       if (var_check) EXIT
-    enddo
-    if (.NOT. var_check) THEN
-       print *,"No such a variable"
-       RETURN
-    ENDIF
-    nn = 0
-    do k = 1 , number_variables
-       ind(k) = column(k)
-       nn = nn + ind(k)
-    enddo
-    if (nn > order) THEN
-       print *,"The order is larger than ",order
-       RETURN
-    ENDIF
-    double_from_ptc = y(j)%t.sub.ind
-  END FUNCTION double_from_ptc
-
 
   RECURSIVE FUNCTION FACTORIAL (N) &
        RESULT (FACTORIAL_RESULT)

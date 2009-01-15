@@ -31,6 +31,7 @@ contains
     integer :: index1(1000,2)
     real(kind(1d0)) get_value,val_ptc
     character(len = 5) name_var
+    type(real_8) y(6)
     !------------------------------------------------------------------------------
 
     if(universe.le.0) then
