@@ -1101,6 +1101,7 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
            } else {
              t = new_table(e_d_name, "OFFSETS",    500, tnl);
            }
+	   t->curr = 0;
         }
       for (i = 0; i < tnl->curr; i++)
         {
