@@ -2669,6 +2669,7 @@ int interp_node(int *nint)
       e1 = e1 + bvk * angle / two;
       e2 = e2 + bvk * angle / two;
       strcpy(elem_name,"sbend");
+      el->def->mad8_type = 3;
     }
     angle = angle/numint;
     store_node_value("angle",&angle);
@@ -5150,6 +5151,7 @@ int reset_interpolation(int *nint)
     if (rbend)
     {
       strcpy(current_node->p_elem->base_type->name,"rbend");
+      current_node->p_elem->def->mad8_type = 2;
       e1 = e1 - bvk * angle / two;
       e2 = e2 - bvk * angle / two;
     }
