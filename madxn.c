@@ -430,7 +430,7 @@ void complete_twiss_table(struct table* t)
     if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
     else if (strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "e1") == 0 || strcmp(tmp, "e2") == 0)
-    { 
+    {
       if(myrbend)
       {
         val =  el_par_value(tmp, c_node->p_elem) +
@@ -467,7 +467,7 @@ void complete_twiss_table(struct table* t)
       val = el_par_value(tmp, c_node->p_elem);
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
           val *= c_node->dipole_bv;
-      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 || 
+      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 ||
                strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
                strcmp(tmp, "volt") == 0 )
         val *= c_node->dipole_bv;
