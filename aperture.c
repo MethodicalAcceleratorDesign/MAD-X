@@ -1559,6 +1559,7 @@ void aper_surv(double init[], int nint)
   aper_survey->cmd_def->par->parameters[aspos]->double_value = init[5];
   aper_survey->cmd_def->par_names->inform[aspos] = 1;
 
+/* frs: suppressing the survey file created by the internal survey command */
   aspos = name_list_pos("file", asnl);
   aper_survey->cmd_def->par->parameters[aspos]->string = NULL;
   aper_survey->cmd_def->par_names->inform[aspos] = 0;
