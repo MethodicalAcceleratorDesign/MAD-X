@@ -106,7 +106,8 @@ char command_def[] =
 "spec     = [r, 0.], "           /* aperture spec, for plotting only */
 "notsimple = [l, false, true], "         /* use if beam pipe is not a simply connex */
 "trueprofile = [s, none, none], "    /* read discrete displacements from this file */
-"offsetelem = [s, none, none]; "     /* read off-axis data from this file */
+"offsetelem = [s, none, none], "     /* read off-axis data from this file */
+"refnode = [s, none, none]; "     /* read reference element for the offset file */
 " "
 "assign: control none 0 0 "
 "echo     = [s, terminal, none]; "

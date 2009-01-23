@@ -291,6 +291,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double parxd,paryd,deltap_twiss;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L];
+  char *cmd_refnode;
   char apertype[NAME_L];
   char name[NAME_L];
   char tol_err_mess[80];
@@ -330,6 +331,9 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   notsimple = command_par_value("notsimple", this_cmd->clone);
   truefile = command_par_string("trueprofile", this_cmd->clone);
   offsfile = command_par_string("offsetelem", this_cmd->clone);
+
+  cmd_refnode = command_par_string("refnode", this_cmd->clone);
+
   mass = get_value("beam", "mass");
   energy = get_value("beam", "energy");
 
@@ -347,7 +351,11 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
   /* offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);*/
   offs_tab = aper_e_d_read_tfs(offsfile, &offs_cnt, refnode);
-  printf("\nref: %s",refnode);
+
+
+  if (cmd_refnode != NULL) strcpy(refnode, cmd_refnode);
+
+  printf("\nreference node: %s",refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1) ;
