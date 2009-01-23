@@ -353,7 +353,11 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   offs_tab = aper_e_d_read_tfs(offsfile, &offs_cnt, refnode);
 
 
-  if (cmd_refnode != NULL) strcpy(refnode, cmd_refnode);
+  if (cmd_refnode != NULL) 
+    {
+      strcpy(refnode, cmd_refnode);
+      strcat(refnode, ":1");
+    }
 
   printf("\nreference node: %s",refnode);
 
