@@ -1989,7 +1989,7 @@ void exec_show(struct in_cmd* cmd)
 }
 
 void exec_extract(struct in_cmd* cmd)
-  /* "split" command - split sequence in two from marker_1 to marker_2 */
+  /* "extract" command - extract part of  sequence from marker_1 to marker_2 */
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
@@ -2034,6 +2034,13 @@ void exec_extract(struct in_cmd* cmd)
   if (nl->inform[i] == 0)
   {
     warning("no 'to' marker given", " ");
+    return;
+  }
+  if (strchr(pl->parameters[i]->string, '$'))
+  {
+    warning("extract: use of internal markers forbidden:", 
+             pl->parameters[i]->string);
+    warning("sequence extraction aborted"," ");
     return;
   }
   sprintf(c_dum->c, "%s:1", pl->parameters[i]->string);
