@@ -93,8 +93,8 @@
       <test input = "example4.madx" output="example4.out" program="madxp" subdir="Example4"/>
       <test input = "diamond.madx" output="diamond.out" program="madxp" subdir="Example5"/>
       <test input = "lhc.madx" output="lhc.out" program="madxp" subdir="Example6"/>
-      <test input = "example.madx" output="example.out" program="madxp" subdir="SliceMagnets"/>
-      <test input = "example.madx" output="example.out" program="madxp" subdir="DeltaDependency"/>
+      <test input = "slice.madx" output="slice.out" program="madxp" subdir="SliceMagnets"/>
+      <test input = "deltaDependency.madx" output="deltaDependency.out" program="madxp" subdir="DeltaDependency"/>
    </target>
    <target name="special_features" responsible="Frank.Schmidt@cern.ch">
 	<test input ="setvars.madx" output="setvars.out"/>
