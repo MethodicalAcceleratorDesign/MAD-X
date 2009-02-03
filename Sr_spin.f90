@@ -2343,7 +2343,8 @@ contains
     TYPE(layout),target,INTENT(INOUT):: r
     integer,INTENT(IN):: i1
     type(probe_8) xs
-    type(env_8),target,intent(INOUT) ::  ys(6)
+!    type(env_8),target,intent(INOUT) ::  ys(6)
+    type(env_8),intent(INOUT) ::  ys(6)
     TYPE(INTERNAL_STATE) K
     integer i,j
     logical(lp) stoch
