@@ -2499,7 +2499,7 @@ CONTAINS
     endif
 
     if(s1%kind==kind21) then
-       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%LAG,S2%DELTA_E,S2%THIN,S2%lag)
+       ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%LAG,S2%DELTA_E,S2%THIN)
        S2%lag=zero
        S2%volt=flip*S1%volt
        S2%freq=S1%freq0*S1%harmon
