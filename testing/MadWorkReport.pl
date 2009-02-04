@@ -349,8 +349,29 @@ sub recordWork { # should also pass the output file name
     $html .= "</body>\n";
     $html .= "</html>\n";
 
-
-    print "closing $workReportFile\n";
+    
+    # also copy the work report into the MAD-X News html page
+    my $newsFile = "/afs/cern.ch/eng/sl/MAD-X/pro/docu/Introduction/news.html";
+    open NEWSFILE, "<$newsFile";
+    my $news = '';
+    while(<NEWSFILE>){
+	my $line = $_;
+	if ($line =~ /[\s\t]*<!\-\- do not remove \- START WORK LOG \- do not remove \-\->[\s\t]*/) { 
+	    # insert contents of the work report here
+	    $news .= "<!-- do not remove - START WORK LOG - do not remove -->\n";
+	    $news .= "<p>Work log between releases $rel1 and $rel2 </p>\n";   
+	    $news .= "<p>Log report started $startTime, ended $endTime</p>\n";
+	    $news .= "<table width=\"75%\" border=\"0\">\n";
+	    $news .= $workReportContent;
+	    $news .= "</table>\n";
+	} else{
+	    $news .= $line;
+	}
+    }
+    close NEWSFILE;
+    open NEWSFILE, ">$newsFile";
+    print NEWSFILE $news;
+    close NEWSFILE;
 
     print WORKFILE $html;
     close WORKFILE;
