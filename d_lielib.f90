@@ -38,6 +38,7 @@ module lielib_berz
   integer,private,parameter::ndim2=2*ndim,ntt=lnv    ! joahn 2008
   !  integer,private,parameter::ndim2=2*ndim,ntt=100
   character(120), private :: line
+  logical :: frankheader=.true.
 contains
 
   subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
@@ -210,12 +211,19 @@ contains
     integer i,n,nd2
     integer,dimension(:)::x
     integer,dimension(4)::i1,i2
-
     do i=1,iabs(n)
        x(i)=0
-       call daall0(x(i))
     enddo
-    !    call daallno(x,iabs(n),'ETALL     ')
+
+    if(.not.frankheader) then
+       do i=1,iabs(n)
+          call daall0(x(i))
+       enddo
+    else
+       do i=1,iabs(n)
+          call daall1(x(i),'etall     ',no,nv)
+       enddo
+    endif
     if(n.lt.0) then
        call liepeek(i1,i2)
        nd2=i1(4)
@@ -230,7 +238,11 @@ contains
     integer x
 
     x=0
-    call daall0(x)
+    if(.not.frankheader) then
+       call daall0(x)
+    else
+       call daall1(x,'etall     ',no,nv)
+    endif
     return
   end subroutine etall1
   subroutine etppulnv(x,xi,xff)
@@ -1394,7 +1406,10 @@ contains
     call etcct(x,w,v)
     !    call danot(1)
     !    call dacopd(xy,x)
-    call datruncd(xy,1,x)
+    !    call datruncd(xy,1,x)  ! lethal error
+    call datruncd(xy,2,x)
+
+
     !    call danot(no)
     call dacopd(v,w)
     call daclrd(h)
