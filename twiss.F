@@ -1911,8 +1911,8 @@
      &opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
         call fort_warn('Chromaticity calculation wrong due to coupling',&
      &'use manual derivative or madxp')
-        xix=zero
-        xiy=zero
+!frs         xix=zero ! The punishment was too harsh!!!!
+!        xiy=zero
       endif
 
 !---- Fill summary table
