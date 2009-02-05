@@ -579,6 +579,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   add_cmd_parameter_clone(cmd,return_param_recurse("kmin",    thick_elem),"kmin",    1);
   add_cmd_parameter_clone(cmd,return_param_recurse("calib",   thick_elem),"calib",   1);
   add_cmd_parameter_clone(cmd,return_param_recurse("polarity",thick_elem),"polarity",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("mech_sep",thick_elem),"mech_sep",1);
   /* create element with this command */
   if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
   else
@@ -825,6 +826,7 @@ struct node* new_marker(struct node *thick_node, double at, struct expression *a
     add_cmd_parameter_clone(clone,return_param_recurse("kmin",    thick_node->p_elem),"kmin",    1);
     add_cmd_parameter_clone(clone,return_param_recurse("calib",   thick_node->p_elem),"calib",   1);
     add_cmd_parameter_clone(clone,return_param_recurse("polarity",thick_node->p_elem),"polarity",1);
+    add_cmd_parameter_clone(clone,return_param_recurse("mech_sep",thick_node->p_elem),"mech_sep",1);
     elem = make_element(thick_node->p_elem->name, "marker", clone,-1);
     node = new_elem_node(elem, thick_node->occ_cnt);
     strcpy(node->name, thick_node->name);
