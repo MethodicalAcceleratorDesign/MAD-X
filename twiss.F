@@ -850,7 +850,7 @@
       if (inval .eq. 0) then
        call twdisp(rt,rt(1,6),disp0)
       else
-       call dcopy(opt_fun0(25), disp0, 4)
+       call dcopy(opt_fun0(15), disp0, 4)
       endif
       disp0(5) = zero
       disp0(6) = one
@@ -1410,7 +1410,7 @@
       if (inval .eq. 0)  then
         call twdisp(rt,aux,ddisp0)
       else
-        call dcopy(opt_fun0(25),disp0,4)
+        call dcopy(opt_fun0(25),ddisp0,4)
       endif
       ddisp0(5) = zero
       ddisp0(6) = zero
@@ -1906,6 +1906,14 @@
       sigxco = sigxco
       ycomax = ycomax
       sigyco = sigyco
+
+      if(opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.               &
+     &opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
+        call fort_warn('Chromaticity calculation wrong due to coupling',&
+     &'use manual derivative or madxp')
+!frs         xix=zero ! The punishment was too harsh!!!!
+!        xiy=zero
+      endif
 
 !---- Fill summary table
       call double_to_table('summ ','length ' ,suml)
