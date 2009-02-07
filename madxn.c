@@ -4053,6 +4053,8 @@ void pro_twiss()
     tol = command_par_value("tolerance", current_twiss);
     set_variable("twiss_tol", &tol);
   }
+  pos = name_list_pos("chrom", nl);
+  chrom_flg = command_par_value("chrom", current_twiss);
 
   /*
     end of command decoding
@@ -4071,9 +4073,7 @@ void pro_twiss()
   }
   set_option("twiss_inval", &beta_def);
   set_option("twiss_summ", &k);
-  pos = name_list_pos("chrom", nl);
-  set_option("twiss_chrom", &nl->inform[pos]);
-  chrom_flg = nl->inform[pos];
+  set_option("twiss_chrom", &chrom_flg);
   set_option("twiss_save", &k);
   set_twiss_deltas(current_twiss);
   adjust_beam();
