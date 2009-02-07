@@ -1907,13 +1907,13 @@
       ycomax = ycomax
       sigyco = sigyco
 
-      if(opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.               &
-     &opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
-        call fort_warn('Chromaticity calculation wrong due to coupling',&
-     &'use manual derivative or madxp')
+!      if(opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.               &
+!     &opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
+!        call fort_warn('Chromaticity calculation wrong due to coupling',&
+!     &'use manual derivative or madxp')
 !frs         xix=zero ! The punishment was too harsh!!!!
 !        xiy=zero
-      endif
+!      endif
 
 !---- Fill summary table
       call double_to_table('summ ','length ' ,suml)
@@ -1940,9 +1940,6 @@
       call double_to_table('summ ','synch_3 ' ,synch_3)
       call double_to_table('summ ','synch_4 ' ,synch_4)
       call double_to_table('summ ','synch_5 ' ,synch_5)
-
-!---- Augment table summ
-      call augment_count('summ ')
 
       end
       subroutine tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)

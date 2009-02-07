@@ -528,7 +528,7 @@ void double_to_table(char* table, char* name, double* val)
 }
 
 void double_to_table_row(char* table, char* name, int* row, double* val)
-  /* puts val at current position in column with name "name".
+  /* puts val at row position in column with name "name".
      The table count is increased separately with "augment_count" */
 {
   int pos;
@@ -3887,8 +3887,9 @@ void pro_twiss()
   char *filename = NULL, *name, *table_name, *sector_name = NULL;
   char *sector_table_name = "dummy"; /* second string required by twiss() */
   /* will be set to a proper string in case twiss_sector option selected */
-  double tol,tol_keep;
+  double tol,tol_keep, q1_val_p, q2_val_p, q1_val, q2_val, dq1, dq2;
   int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k = 1, ks, w_file, beta_def;
+  int chrom_flg;
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
@@ -4072,6 +4073,7 @@ void pro_twiss()
   set_option("twiss_summ", &k);
   pos = name_list_pos("chrom", nl);
   set_option("twiss_chrom", &nl->inform[pos]);
+  chrom_flg = nl->inform[pos];
   set_option("twiss_save", &k);
   set_twiss_deltas(current_twiss);
   adjust_beam();
@@ -4112,6 +4114,24 @@ void pro_twiss()
 
   for (i = 0; i < twiss_deltas->curr; i++)
   {
+    if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
+      {
+       twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+                             twiss_table_types, current_sequ->n_nodes);
+       twiss_table->dynamic = 1; /* flag for table row access to current row */
+       add_to_table_list(twiss_table, table_register);
+       current_sequ->tw_table = twiss_table;
+       twiss_table->org_sequ = current_sequ;
+       adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
+       adjust_rfc(); /* sets freq in rf-cavities from probe */
+       current_node = current_sequ->ex_start;
+       /* invoke twiss */
+       twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+       pos = name_list_pos("q1", summ_table->columns);
+       q1_val_p = summ_table->d_cols[pos][i];
+       pos = name_list_pos("q2", summ_table->columns);
+       q2_val_p = summ_table->d_cols[pos][i];
+      }
     twiss_table = make_table(table_name, "twiss", twiss_table_cols,
                              twiss_table_types, current_sequ->n_nodes);
     twiss_table->dynamic = 1; /* flag for table row access to current row */
@@ -4121,12 +4141,24 @@ void pro_twiss()
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
     current_node = current_sequ->ex_start;
-
     /* invoke twiss */
     twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
-
+    augment_count_("summ ");
     if ((twiss_success = get_option("twiss_success")))
     {
+     if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
+      {
+       pos = name_list_pos("q1", summ_table->columns);
+       q1_val = summ_table->d_cols[pos][i];
+       pos = name_list_pos("q2", summ_table->columns);
+       q2_val = summ_table->d_cols[pos][i];
+       dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
+       dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
+       pos = name_list_pos("dq1", summ_table->columns);
+       summ_table->d_cols[pos][i] = dq1;
+       pos = name_list_pos("dq2", summ_table->columns);
+       summ_table->d_cols[pos][i] = dq2;
+      }
       if (get_option("keeporbit"))  copy_double(orbit0,
                                                 current_sequ->orbits->vectors[k_orb]->a, 6);
       fill_twiss_header(twiss_table);

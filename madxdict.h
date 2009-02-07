@@ -1995,7 +1995,7 @@ char command_def[] =
 "r11      = [r, 0], r12      = [r, 0], "
 "r21      = [r, 0], r22      = [r, 0], "
 "energy   = [r, 0], "
-"chrom    = [l, false, true], "
+"chrom    = [l, true, true], "
 "file     = [s, none, twiss], "
 "save     = [s, none, twiss], "
 "table    = [s, none, twiss], "
