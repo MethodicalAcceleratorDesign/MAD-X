@@ -37,7 +37,7 @@
      &al_errors(align_max),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,         &
      &node_value,one,                                                   &
      &get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
-     &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*)
+     &zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap
       parameter(zero=0d0,one=1d0)
       character*12 tol_a, char_a
 !hbu
@@ -51,11 +51,17 @@
 !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
 
+
 !-------added by Yipeng SUN 01-12-2008--------------
+      deltap = get_value('probe ','deltap ')
+      
+      if(deltap.eq.0) then
       onepass = get_option('onepass ') .ne. 0
       if(onepass)   then
       else
       call trclor(orbit0)
+      endif
+      else
       endif
 !-------added by Yipeng SUN 01-12-2008--------------
 
@@ -1006,6 +1012,7 @@
       pc     = get_value('probe ','pc ')
       amass  = get_value('probe ','mass ')
       gamma  = get_value('probe ','gamma ')
+      deltap = get_value('probe ','deltap ')
       scalen = five / (twelve * hbar * clight)
       scaleu = hbar * three * clight / two
 
@@ -2796,7 +2803,7 @@
       print *," Full 6D closed orbit search."
       print*," Initial value of 6-D closed orbit from Twiss: "
       print*," orbit0 ",orbit0
-
+      
 !---- Initialize needed variables
       turn    = 1
       turnmax = 1
@@ -2860,13 +2867,12 @@
       beti   = one / betas
       dtbyds = get_value('probe ','dtbyds ')
       deltas = get_variable('track_deltap ')
+      deltap = get_value('probe ','deltap ')
       arad = get_value('probe ','arad ')
       dorad = get_value('probe ','radiate ') .ne. 0
       dodamp = get_option('damp ') .ne. 0
       dorand = get_option('quantum ') .ne. 0
       call dcopy(orbit0,orbit,6)
-      
-
 
 
 !---- Iteration for closed orbit.
