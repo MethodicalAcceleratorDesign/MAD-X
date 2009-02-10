@@ -714,9 +714,9 @@ void match_match(struct in_cmd* cmd)
 
   /* START CHK-CHROM; RDM 22.9.2005 */
   pos = name_list_pos("chrom", nl);
-  if(nl->inform[pos]) /* chrom specified */
+  cp = cmd->clone->par->parameters[pos];
+  if(cp) /* chrom specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
     {
       /* START adding chrom to TWISS input command for each sequence */
