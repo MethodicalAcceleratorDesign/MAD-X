@@ -4055,7 +4055,6 @@ void pro_twiss()
   }
   pos = name_list_pos("chrom", nl);
   chrom_flg = command_par_value("chrom", current_twiss);
-
   /*
     end of command decoding
   */
@@ -4214,7 +4213,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
     phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
     r11,r12,r21,r22,s;
   int i, jt=0, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
-  int ks, w_file, beta_def, err = 0, inval = 1;
+  int ks, w_file, beta_def, err = 0, inval = 1,chrom_flg;
   int keep_info = get_option("info");
 
   /* Set embedded_flag */
@@ -4323,6 +4322,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
     tol = command_par_value("tolerance", current_twiss);
     set_variable("twiss_tol", &tol);
   }
+  chrom_flg = command_par_value("chrom", current_twiss);
 
   /*
     end of command decoding
@@ -4346,8 +4346,7 @@ void pro_embedded_twiss(struct command* current_global_twiss)
   }
   set_option("twiss_inval", &beta_def);
   set_option("twiss_summ", &k);
-  pos = name_list_pos("chrom", nl);
-  set_option("twiss_chrom", &nl->inform[pos]);
+  set_option("twiss_chrom", &chrom_flg);
   set_option("twiss_save", &k);
 
   /* Read Twiss parameters */
