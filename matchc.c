@@ -481,7 +481,7 @@ void match_match(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   struct sequence* sequ;
-  int i, j, pos, n, tpos;
+  int i, j, pos, n, tpos, chrom_flg;
   int izero = 0;
   /* RDM 19/12/2005*/
   int ione = 1;
@@ -714,8 +714,8 @@ void match_match(struct in_cmd* cmd)
 
   /* START CHK-CHROM; RDM 22.9.2005 */
   pos = name_list_pos("chrom", nl);
-  cp = cmd->clone->par->parameters[pos];
-  if(cp) /* chrom specified */
+  chrom_flg = cmd->clone->par->parameters[pos]->double_value;
+  if(chrom_flg) /* chrom specified */
   {
     for (i = 0; i < match_num_seqs; i++)
     {
@@ -729,6 +729,7 @@ void match_match(struct in_cmd* cmd)
       /* END adding chrom to TWISS input command for each sequence */
     }
   }
+  else set_option("twiss_chrom",&izero);
   /* END CHK-CHROM; RDM 22.9.2005 */
 
   /* START CHK-SECTORMAP; RDM 16.12.2005 */
