@@ -3965,7 +3965,7 @@ void write_table(struct table* t, char* filename)
   char* pc = t_pc;
   struct int_array* col = t->col_out;
   struct int_array* row = t->row_out;
-  int i, j, k, tmp;
+  int i, j, k, tmp, n;
   time_t now;
   struct tm* tm;
 #ifndef _WIN32
@@ -3987,13 +3987,15 @@ void write_table(struct table* t, char* filename)
   if (t != NULL)
   {
     strcpy(l_name, t->name);
+    n = strlen(t->name);
     fprintf(out_file,
-            "@ NAME             %%%02ds \"%s\"\n", strlen(t->name),
+            "@ NAME             %%%02ds \"%s\"\n", n,
             stoupper(l_name));
 
     strcpy(l_name, t->type);
+    n = strlen(t->type);
     fprintf(out_file,
-            "@ TYPE             %%%02ds \"%s\"\n", strlen(t->type),
+            "@ TYPE             %%%02ds \"%s\"\n", n,
             stoupper(l_name));
 
     if (t->header != NULL)
@@ -4002,12 +4004,16 @@ void write_table(struct table* t, char* filename)
         fprintf(out_file, "%s\n", t->header->p[j]);
     }
     if (title != NULL)
+    {
+      n = strlen(title);
       fprintf(out_file,
-              "@ TITLE            %%%02ds \"%s\"\n", strlen(title), title);
+              "@ TITLE            %%%02ds \"%s\"\n", n, title);
+    }
 
+    n = strlen(myversion)+strlen(sys_name)+1;
     fprintf(out_file,
             "@ ORIGIN           %%%02ds \"%s %s\"\n",
-            strlen(myversion)+strlen(sys_name)+1, myversion, sys_name);
+            n, myversion, sys_name);
 
     fprintf(out_file,
             "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
