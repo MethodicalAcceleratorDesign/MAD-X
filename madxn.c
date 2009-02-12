@@ -3887,7 +3887,7 @@ void pro_twiss()
   char *filename = NULL, *name, *table_name, *sector_name = NULL;
   char *sector_table_name = "dummy"; /* second string required by twiss() */
   /* will be set to a proper string in case twiss_sector option selected */
-  double tol,tol_keep, q1_val_p, q2_val_p, q1_val, q2_val, dq1, dq2;
+  double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
   int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k = 1, ks, w_file, beta_def;
   int chrom_flg;
   int keep_info = get_option("info");
