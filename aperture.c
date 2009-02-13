@@ -1409,22 +1409,42 @@ int aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
 
 double aper_online(double xm, double ym, double startx, double starty,
                    double endx, double endy, double dist_limit)
-{
-  double cosfi=1 , aaa;
 
-  if (sqrt((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) <= dist_limit)
+/* BJ 13.02.2009.
+   - added check |x-e| < dist_limit
+   - removed useless calculations of sqrt
+   - made consistent use of dist_limit and min_double */
+/* BJ 13.02.2009
+   check if point x = (xm,ym) is in the segment [s,e] with
+   s = (startx,starty) and e = (endx,endy) by computing 
+   cosfi = (x-s).(x-e) / |x-s||x-e|. cosfi = -1 : x is in
+   first check if |x-s| and |x-e| are not too small.If yes for one of them : in
+   if OK , the zero divide check must be superfluous. But keep it anyway.
+*/
+
+{
+  double cosfi=1 , aaa, sss, eee;
+
+  sss = sqrt((xm-startx)*(xm-startx)+ (ym-starty)*(ym-starty));
+  eee = sqrt((xm-endx)*(xm-endx)    + (ym-endy)*(ym-endy));
+
+  if ( sss <= dist_limit)
+  {
+    cosfi=-1;
+  }
+  else if ( eee <= dist_limit)
   {
     cosfi=-1;
   }
   else
   {
-    aaa = ((xm-startx)*(xm-startx)+(ym-starty)*(ym-starty)) *
-      ((xm-endx)*(xm-endx)+(ym-endy)*(ym-endy));
-    if ( aaa < MIN_DOUBLE ) {
-      fatal_error("Attempt to zero divide ", "In aper_online");
-    }
+    aaa = sss * eee ;
+    if ( aaa < MIN_DOUBLE )
+      {
+	fatal_error("Attempt to zero divide ", "In aper_online");
+      }
 
-    cosfi=  ((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) / sqrt(aaa);
+    cosfi=  ((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) / aaa;
   }
 
   if (cosfi <= -1+dist_limit)
@@ -1436,7 +1456,7 @@ double aper_online(double xm, double ym, double startx, double starty,
 
 
 
-/* NEW VERSION of aper_race, 20feb08 BJ, potemtial zero-divide issues cleared */
+/* NEW VERSION of aper_race, 20feb08 BJ, potential zero-divide issues cleared */
 
 void aper_race(double xshift, double yshift, double r, double angle, double* x, double* y)
 {
