@@ -150,7 +150,7 @@ CONTAINS
     real(dp) fint,fintx,div,muonfactor
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
-    real(dp) gammatr
+    real(dp) gammatr,ksi
     real(kind(1d0)) get_value,node_value
     character(name_len) name
     character(name_len) aptype
@@ -774,8 +774,16 @@ CONTAINS
        if(l.ne.zero) then
           key%list%bsol=bvk*node_value('ks ')
        else
-          print*,"Thin solenoid: ",name," not implemented in PTC"
-          stop
+          ksi=bvk*node_value('ksi ')
+          if(ksi.eq.zero)then
+             key%magnet="marker"
+             print*,"Thin solenoid: ",name," not implemented in PTC - set to marker"
+          else
+             key%list%l=c_1d_9
+             l_machine=l_machine+c_1d_9
+             key%list%bsol=ksi/c_1d_9
+             print*,"Thin solenoid: ",name," not implemented in PTC"//"Attempting a fake solenoid" 
+          endif
        endif
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
