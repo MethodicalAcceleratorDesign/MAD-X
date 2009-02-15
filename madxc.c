@@ -2950,7 +2950,7 @@ struct table* read_my_table(struct in_cmd* cmd)
     {
      if ((tab_file = fopen(filename, "r")) == NULL)
        {
-        warning("cannot open file:", filename); return NULL;
+         fatal_error("cannot open file:", filename); return NULL; /* frs: to avoid unwanted results */
        }
     }
   else
