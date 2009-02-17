@@ -4694,7 +4694,7 @@ struct table* read_table(struct in_cmd* cmd)
   {
     if ((tab_file = fopen(filename, "r")) == NULL)
     {
-      fatal_error("cannot open file:", filename);
+      fatal_error("cannot open file:", filename); return NULL;
     }
   }
   else
