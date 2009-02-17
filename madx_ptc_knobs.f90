@@ -191,7 +191,7 @@ contains
              coeff  = e.sub.(pushes(i)%monomial)
              if (getdebug()>3) then
                 write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-                     &        "Putting coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+                     &        "4or5D putting",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
                      &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
                      &        " for fibre no ",n
              endif
@@ -205,7 +205,7 @@ contains
 
              if (getdebug()>3) then
                 write(6,*) &
-                     &        "Put 6D coef ",pushes(i)%monomial," arr_row ", pushes(i)%element,&
+                     &        "4or5D putting ",pushes(i)%monomial," arr_row ", pushes(i)%element,&
                      &        " at named ", pushes(i)%colname, &
                      &        " for fibre no ",n
                 write(6,*) "currentrow is ", currentrow," index ",pushes(i)%index
@@ -252,8 +252,8 @@ contains
             coeff = e.sub.monstr
 
             if (getdebug()>3) then
-               write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
-                    &        "Put 6D coef ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
+               write(6,'(a21, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
+                    &        "6D mode Put in table ",pushes(i)%monomial,"=",coeff," arr_row ", pushes(i)%element,&
                     &        " in table ", pushes(i)%tabname," at column ", pushes(i)%colname, &
                     &        " for fibre no ",n
             endif
@@ -268,9 +268,9 @@ contains
 
             if (getdebug()>3) then
                write(6,*) &
-                    &        "Put 6D coef ",pushes(i)%monomial," arr_row ", pushes(i)%element,&
+                    &        "6Dmode parametric ",pushes(i)%monomial," arr_row ", pushes(i)%element,&
                     &        " at named ", pushes(i)%colname, &
-                    &        " for fibre no ",n
+                   &        " for fibre no ",n
                write(6,*) "currentrow is ", currentrow," index ",pushes(i)%index
                call print(results(currentrow,pushes(i)%index),6)
             endif
@@ -1169,7 +1169,7 @@ contains
           enddo
        enddo
     enddo
-
+    
     ave(1,2,1) = -ave(1,2,1)
     results(currentrow, alfa11) = ave(1,2,1)
     results(currentrow, beta11) = ave(1,1,1)
@@ -1292,6 +1292,41 @@ contains
     results(currentrow, mu2) = phase(2)
     results(currentrow, mu3) = phase(3)
 
+
+
+
+    results(currentrow, beta11p) = zero
+    results(currentrow, beta12p) = zero
+    results(currentrow, beta13p) = zero
+    results(currentrow, beta21p) = zero
+    results(currentrow, beta22p) = zero
+    results(currentrow, beta23p) = zero
+    results(currentrow, beta31p) = zero
+    results(currentrow, beta32p) = zero
+    results(currentrow, beta33p) = zero
+    results(currentrow, alfa11p) = zero
+    results(currentrow, alfa12p) = zero
+    results(currentrow, alfa13p) = zero
+    results(currentrow, alfa21p) = zero
+    results(currentrow, alfa22p) = zero
+    results(currentrow, alfa23p) = zero
+    results(currentrow, alfa31p) = zero
+    results(currentrow, alfa32p) = zero
+    results(currentrow, alfa33p) = zero
+    results(currentrow, gama11p) = zero
+    results(currentrow, gama12p) = zero
+    results(currentrow, gama13p) = zero
+    results(currentrow, gama21p) = zero
+    results(currentrow, gama22p) = zero
+    results(currentrow, gama23p) = zero
+    results(currentrow, gama31p) = zero
+    results(currentrow, gama32p) = zero
+    results(currentrow, gama33p) = zero
+
+    
+!    print*, "parametrictwiss(",currentrow,",bet11):", beta12
+!    call print(results(currentrow,beta12),6)
+    
     !     print*, "Beta X"
     !     call daprint(ave(1,1,1),6)
     !
@@ -1601,7 +1636,12 @@ contains
     implicit none
     type(universal_taylor)  :: ut
     integer                 :: iunit, eqlen
-
+     
+    if( .not. associated (ut%n)) then
+       call fort_warn("printpareq", "this universal taylor is void")
+       return
+    endif
+    
     if(ut%nv /= c_%nv) then
        call fort_warn("printpareq",&
             "number of variables of this universal taylor is different from currnet TPSA")
