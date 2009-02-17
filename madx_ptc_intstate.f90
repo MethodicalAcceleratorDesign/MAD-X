@@ -65,7 +65,7 @@ contains
     !sets the internal state
     !if (getdebug() > 1)
     intstate = state
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine setintstate
 
   !____________________________________________________________________________________________
@@ -86,7 +86,7 @@ contains
     intstate = intst - nocavity0
     call update_states
 
-    if (getdebug() > 1) call print(intstate,6)
+    if ( associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine initintstate
   !____________________________________________________________________________________________
 
@@ -99,7 +99,7 @@ contains
     default = intstate
     call update_states
 
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
 
   end subroutine ptc_resetinternalstate
   !____________________________________________________________________________________________
@@ -168,7 +168,7 @@ contains
     endif
     default = intstate
     call update_states
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setexactmis
   !____________________________________________________________________________________________
 
@@ -186,7 +186,7 @@ contains
     endif
     default = intstate
     call update_states
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setradiation
   !____________________________________________________________________________________________
 
@@ -204,7 +204,7 @@ contains
 
     default = intstate
     call update_states
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setfringe
   !____________________________________________________________________________________________
 
@@ -222,7 +222,7 @@ contains
 
     default = intstate
     call update_states
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
 
   end subroutine ptc_settotalpath
   !____________________________________________________________________________________________
@@ -245,7 +245,7 @@ contains
 
     default = intstate
     call update_states
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
 
   end subroutine ptc_settime
 
@@ -265,7 +265,7 @@ contains
 
     default = intstate
     call update_states
-    if (getdebug() > 1) call print(intstate,6)
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setnocavity
 
 
@@ -274,7 +274,11 @@ contains
   subroutine printintstate(n)
     implicit none
     integer               :: n
-    call print(intstate,n)
+    if (associated(c_%no) ) then
+      call print(intstate,n)
+    else
+      write(n,*) 'printintstate: Can not print, PTC is not initialized yet'
+    endif
   end subroutine printintstate
   !____________________________________________________________________________________________
 
