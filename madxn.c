@@ -1112,7 +1112,7 @@ void exec_plot(struct in_cmd* cmd)
 
     /* find the column numbers corresponding to haxis_name & vaxis_name */
 
-    track_cols_length = sizeof(track_table_cols)/4 - 1;
+    track_cols_length = sizeof(track_table_cols)/sizeof(uintptr_t) - 1;
     for (j = 0; j < track_cols_length; j++)
     {
       if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
