@@ -594,7 +594,7 @@ contains
 
           tw=y
           if (getnpushes() > 0) then
-             call putusertable(i,current%mag%name,suml,getdeltae(),transfermap)
+             call putusertable(i,current%mag%name,suml,getdeltae(),transfermap,y)
           endif
 
 
@@ -1783,10 +1783,12 @@ contains
          suml = s ! another global!!! to be updated later-on with the actual s within the magnet
          ! suml is used internally to puttwisstable to save the curvilign abciss...
 
-         if (getnpushes() > 0) then ! what is this for ???
+         if (getnpushes() > 0) then ! !writes user selected map coeffs to user created tables. See ptc_select 
+                                      !also saves twiss parameters and used defined variables as Taylor series 
+                                      !             in function of knobs. See ptc_knob
             ! presently, do not enter here anyway
-            call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap) ! what is this for ???
-         endif
+            call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap, theAscript) 
+         endif                                                                                 
 
          call puttwisstable() ! writes the resulting tw above to an internal table
 

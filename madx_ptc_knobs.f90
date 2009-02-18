@@ -148,7 +148,7 @@ contains
 
   end subroutine nullify
 
-  subroutine putusertable(n,name,s,denergy,y)
+  subroutine putusertable(n,name,s,denergy,y,A)!here y is transfermap and A is a_ (in twiss it is called y)
     !puts the coefficients in tables as defined in array pushes
     implicit none
     integer              :: n !fibre number
@@ -156,6 +156,7 @@ contains
     real(kind(1d0))      :: s  !position along the orbit
     real(dp)             :: denergy
     type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
+    type(real_8),target  :: A(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
     type(real_8),pointer :: e !element in array
     real(kind(1d0))      :: coeff
     integer              :: i !iterator
@@ -172,8 +173,8 @@ contains
        pblockson = .true.  !it means there are parameters on
        spos(currentrow) = s
        deltaes(currentrow) = denergy
-       call parametric_coord(y)
-       call parametrictwiss(y)
+       call parametric_coord(A)
+       call parametrictwiss(A)
     else
        pblockson = .false.
     endif
@@ -1391,7 +1392,7 @@ contains
     integer       :: mf !macro file descriptor
     character(48) :: filename
     character(48) :: fmat
-    integer       :: i,j, nel
+    integer       :: i,j, nel, slen
     logical       :: fmt_ptc, fmt_tex
     integer, parameter         :: length=16
     character(length)          :: name
@@ -1459,7 +1460,8 @@ contains
        do j=1,npushes
           if (pushes(j)%index < 1 ) cycle
           !        print*, "Writing i, j->index",i,j,pushes(j)%index
-          write(mf,*) pushes(j)%colname
+          slen = len_trim(pushes(j)%colname) - 1
+          write(mf,*) pushes(j)%colname(1:slen)
           if (fmt_ptc)  call print(results(i,pushes(j)%index),mf)
           if (fmt_tex)  call printpareq(results(i,pushes(j)%index),mf)
           write(mf,*) " "
@@ -1559,7 +1561,6 @@ contains
 
        par = par + getnknobsm() !init cond starts as parameters after field components
     else
-
        do i=1, npolblocks
           if ( polblocks(i)%name == fibrename(1:nlp)) then
 
@@ -1652,7 +1653,7 @@ contains
     call getpareq(ut,textbuffer)
     eqlen = len_trim(textbuffer) + 1;
     write(iunit,'(A)')  textbuffer(1:eqlen)
-
+    
 
   end subroutine printpareq
   !_________________________________________________________________________________
