@@ -5317,7 +5317,7 @@ void seq_cycle(struct in_cmd* cmd)
     if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
     {
       node = edit_sequ->nodes->nodes[pos];
-      sprintf(c_dum->c, "%s_p_", strip(node->name));
+      sprintf(c_dum->c, "%s%s_p_", edit_sequ->name,strip(node->name));
       if (strstr(node->previous->name, "_p_") == NULL)
       {
         clone = clone_node(node, 0);
