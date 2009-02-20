@@ -1888,7 +1888,7 @@
 
 !---- Initialization transverse part
 !---  fix length problem - HG 14.4.08
-      suml    = currpos
+!      suml    = currpos
 !     suml    = currpos-get_value('sequence ','range_start ')
 !--- end of fix length problem - HG 14.4.08
       betx    = opt_fun0(3)
@@ -1941,6 +1941,9 @@
       call double_to_table('summ ','synch_4 ' ,synch_4)
       call double_to_table('summ ','synch_5 ' ,synch_5)
 
+      suml = zero
+      currpos = zero
+      
       end
       subroutine tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
