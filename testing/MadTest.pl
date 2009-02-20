@@ -612,9 +612,10 @@ foreach $test (@tests) {
 		# (if other files, should be omitted in the same way...)
 		if ($file eq "temp") { next; }
 
-		# specific case: skip Postcript '.ps' files
+		# specific case: skip Postcript '.ps' and '.eps' files
 		# (eventually Poscript files should be removed from the examples' reference CVS repo)
 		if ($file =~ /\.ps$/) { next; }
+		if ($file =~ /\.eps$/) { next; }
 
 		# check there is always two files to be compared
 		if ($sourceSubDir  eq "") {
