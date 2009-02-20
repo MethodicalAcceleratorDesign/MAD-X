@@ -39,7 +39,7 @@
         <test input ="lhc_example.madx" output="lhc_example.out"/>
         <!-- missing test input ="asp1b.madx" output="example3.out"/ -->
    </target>
-   <target name="match" responsible="Rogelio.Tomas@cern.ch">
+   <target name="match" responsible="Emanuele.Laface@cern.ch">
         <!-- warning - the list of targets available in the README file is different but specified files do not exist -->
         <test input ="job.lhc.2chromaticity.madx" output="job.lhc.2chromaticity.out" subdir="lhc.2chromaticity"/>
         <test input ="job.lhc.chromaticity.madx" output="job.lhc.chromaticity.out" subdir="lhc.chromaticity"/>
