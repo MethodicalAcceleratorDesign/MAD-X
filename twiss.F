@@ -1024,8 +1024,8 @@
      &node_al_errors,n_align
       double precision rt(6,6),ek(6),re(6,6),rm(6,6),rwi(6,6),rc(6,6),  &
      &te(6,6,6),el,elh,orbit(6),orbit0(6),betas,gammas,                 &
-     &al_errors(align_max),bvk,sumloc,node_value,get_value,sd,zero,one, &
-     &two
+     &al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
+     &one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 !---- Initialization
@@ -1110,6 +1110,7 @@
       if(centre) centre_cptk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       if(centre) then
+        pos0=currpos
         currpos=currpos+el/two
         sd = rt(5,6)
         do i = 1, 4
@@ -1171,7 +1172,7 @@
       sigdy =sigdy + disp(3)**2
       if(save.ne.0.and..not.centre) call twfill(1,opt_fun,currpos,1)
       if(centre) then
-        currpos=currpos+el/two
+        currpos=pos0+el
         opt_fun(2 )=currpos
         opt_fun(3 )=betx
         opt_fun(4 )=alfx
@@ -1478,7 +1479,7 @@
      &node_al_errors
       double precision orbit(6),orbit0(6),ek(6),re(6,6),rm(6,6),        &
      &te(6,6,6),tm(6,6,6),al_errors(align_max),deltap,el,betas,gammas,  &
-     &node_value,get_value,elh,zero,one,two
+     &node_value,get_value,pos0,elh,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 
@@ -1548,6 +1549,7 @@
       if(centre) centre_bttk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       if(centre) then
+        pos0=currpos
         currpos=currpos+el/two
         if(save.ne.0) call twfill(2,opt_fun,currpos, 1)
       endif
@@ -1564,7 +1566,7 @@
       endif
       if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero,1)
       if(centre) then
-        currpos=currpos+el/two
+        currpos=pos0+el
         opt_fun(2 )=currpos
         opt_fun(3 )=betx
         opt_fun(4 )=alfx
