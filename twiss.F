@@ -1024,8 +1024,8 @@
      &node_al_errors,n_align
       double precision rt(6,6),ek(6),re(6,6),rm(6,6),rwi(6,6),rc(6,6),  &
      &te(6,6,6),el,elh,orbit(6),orbit0(6),betas,gammas,                 &
-     &al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
-     &one,two
+     &al_errors(align_max),bvk,sumloc,node_value,get_value,sd,zero,one, &
+     &two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 !---- Initialization
@@ -1110,7 +1110,6 @@
       if(centre) centre_cptk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       if(centre) then
-        pos0=currpos
         currpos=currpos+el/two
         sd = rt(5,6)
         do i = 1, 4
@@ -1172,7 +1171,7 @@
       sigdy =sigdy + disp(3)**2
       if(save.ne.0.and..not.centre) call twfill(1,opt_fun,currpos,1)
       if(centre) then
-        currpos=pos0+el
+        currpos=currpos+el/two
         opt_fun(2 )=currpos
         opt_fun(3 )=betx
         opt_fun(4 )=alfx
@@ -1479,7 +1478,7 @@
      &node_al_errors
       double precision orbit(6),orbit0(6),ek(6),re(6,6),rm(6,6),        &
      &te(6,6,6),tm(6,6,6),al_errors(align_max),deltap,el,betas,gammas,  &
-     &node_value,get_value,pos0,elh,zero,one,two
+     &node_value,get_value,elh,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0)
       character*130 msg
 
@@ -1532,6 +1531,7 @@
       gammas= get_value('probe ','gamma ')
       centre_bttk=.false.
       i = restart_sequ()
+      if(centre) currpos = zero
  10   continue
       el = node_value('l ')
       code = node_value('mad8_type ')
@@ -1548,7 +1548,6 @@
       if(centre) centre_bttk=.true.
       call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
       if(centre) then
-        pos0=currpos
         currpos=currpos+el/two
         if(save.ne.0) call twfill(2,opt_fun,currpos, 1)
       endif
@@ -1565,7 +1564,7 @@
       endif
       if(save.ne.0.and..not.centre) call twfill(2,opt_fun,zero,1)
       if(centre) then
-        currpos=pos0+el
+        currpos=currpos+el/two
         opt_fun(2 )=currpos
         opt_fun(3 )=betx
         opt_fun(4 )=alfx
@@ -1888,7 +1887,7 @@
 
 !---- Initialization transverse part
 !---  fix length problem - HG 14.4.08
-!      suml    = currpos
+      suml    = currpos
 !     suml    = currpos-get_value('sequence ','range_start ')
 !--- end of fix length problem - HG 14.4.08
       betx    = opt_fun0(3)
@@ -1941,9 +1940,6 @@
       call double_to_table('summ ','synch_4 ' ,synch_4)
       call double_to_table('summ ','synch_5 ' ,synch_5)
 
-      suml = zero
-      currpos = zero
-      
       end
       subroutine tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
