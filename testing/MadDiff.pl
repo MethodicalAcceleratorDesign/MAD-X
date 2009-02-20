@@ -157,7 +157,7 @@ foreach $line (@lines) {
 				# and also have to add "\" before the right-anchor "$"
 				# ... to be clarified...
 				# try to replace " by '
-				$numPattern = '^[+-]?\d*.\d+[eE]?[+-]?\d*$'; # to account for the various formats found with Mad
+				$numPattern = '^[\+\-]?\d*.\d+[eE]?[\+\-]?\d*$'; # account for various formats found with Mad
 				if (($leftChunk =~ /$numPattern/) && ($rightChunk =~ /$numPattern/)) {
 				    $leftValue = $leftChunk;
 				    $rightValue = $rightChunk;
@@ -169,18 +169,28 @@ foreach $line (@lines) {
 					    # force to leave the for-loop
 					    $i = scalar(@leftChunks);
 					}
-			    	}
-			    	else {
+				    }
+				    else {
 					# define tolerance as the maximum incertitude between the two values
-
-					if ( (2.0*abs($leftValue-$rightValue)/($leftValue+$rightValue)) < $tolerance ) {
-				    	$numericalMatch = 1;
-					} else {
-				    	$numericalMatch = 0 ;
-				    	# force to leave the for-loop
-				    	$i = scalar(@leftChunks); 
+					$mean = ($leftValue+$rightValue)/2.0;
+					if ($mean != 0.0){
+					    if ( (abs($leftValue-$rightValue)/abs($mean)) < $tolerance ) {
+						$numericalMatch = 1;
+					    } else {
+						$numericalMatch = 0 ;
+						# force to leave the for-loop
+						$i = scalar(@leftChunks); 
+					    }
+					} else { # mean == 0.0 - special case
+					    if (abs($leftValue) > ($tolerance/2.0)){
+						$numericalMatch = 0;
+						# force to leave the for-loop
+						$i = scalar(@leftChunks);
+					    } else {
+						$numericalMatch = 1;
+					    }
 					}
-				
+				    
 				    }
 
 			} else { 
