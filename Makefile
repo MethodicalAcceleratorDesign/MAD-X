@@ -57,8 +57,12 @@ LDOPT=-static -m32
 #FC8
 #LIBX= -lX11 -lXdmcp -lXau -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/4.1.2" -lgcc -lgcc_eh
 #LIBX="-L/usr/X11R6/lib64" -lX11 "-L/usr/lib64/" -ldl -lpthread
+#SLC4 32bit
 LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
-
+#SLC5 32bit
+#LIBX="-L/afs/cern.ch/user/f/frs/public/lib32" -lX11 "-L/usr/lib" -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/3.4.6" -lgcc_eh
+#SLC5 64bit
+#LIBX="-L/afs/cern.ch/user/f/frs/public/lib64" -lX11 -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/3.4.6" -lgcc_eh
 # NAG f95 lib extension
 #LIBX_ext= -lgcc
 # LF95 f95 lib extension
