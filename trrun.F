@@ -477,7 +477,7 @@
         else if(aptype.eq.'racetrack') then
           apx = aperture(1)
           apy = aperture(2)
-	  apr = aperture(3)
+          apr = aperture(3)
           call trcoll1(4, apx, apy, turn, sum, part_id, last_turn,      &
      &last_pos, last_orbit, track,ktrack,al_errors, apr)
 !------------  LHC screen case ----------------------------------
@@ -2381,7 +2381,7 @@
      &.and. (abs(z(1,i)-al_errors(11))) .gt. apx                        & 
      &.and. abs(z(3,i)-al_errors(12)) .gt. apy)) then
           go to 99
-	endif
+        endif
         go to 98
  99     n = i
         nn=name_len
