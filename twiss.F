@@ -1,10 +1,10 @@
-! FS 15.03.2004: correcting warning printout
+!     FS 15.03.2004: correcting warning printout
       subroutine twiss(rt,disp0,tab_name,sector_tab_name)
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TWISS command: Track linear lattice parameters.                    *
+!     Purpose:                                                         *
+!     TWISS command: Track linear lattice parameters.                  *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissa.fi'
@@ -104,28 +104,28 @@
 !---- Initial values from command attributes.
       if (inval.ne.0) then
 
-!initialize user values
+!     initialize user values
         call twinifun(opt_fun0, rt)
 !---- Get transfer matrix.
         call tmpart(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
         if(eflag.ne.0) go to 900
 !---- Initial values from periodic solution.
       else
-       if (inval.eq.0) then
-        call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
-        if(eflag.ne.0) go to 900
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
-        if(eflag.ne.0) go to 900
-        call twcpin(rt,disp0,r0mat,eflag)
-        if(eflag.ne.0) go to 900
-       endif
-       if (sectormap)  then
-        call dcopy(orbit0, sorb, 6)
-        call m66one(srmat)
-        call dzero(stmat, 216)
-       endif
+        if (inval.eq.0) then
+          call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
+          if(eflag.ne.0) go to 900
+          call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
+          if(eflag.ne.0) go to 900
+          call twcpin(rt,disp0,r0mat,eflag)
+          if(eflag.ne.0) go to 900
+        endif
+        if (sectormap)  then
+          call dcopy(orbit0, sorb, 6)
+          call m66one(srmat)
+          call dzero(stmat, 216)
+        endif
 !---- Initialize opt_fun0
-      call twinifun(opt_fun0,rt)
+        call twinifun(opt_fun0,rt)
       endif
 
 !---- Build table of lattice functions, coupled.
@@ -151,11 +151,11 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Transfer matris w.r.t. ideal orbit for one period.                 *
-!   Ignores cavities, radiation, and imperfections.                    *
-! Output:                                                              *
-!   rt(6,6) (double) transfer matrix.                                  *
+!     Purpose:                                                         *
+!     Transfer matris w.r.t. ideal orbit for one period.               *
+!     Ignores cavities, radiation, and imperfections.                  *
+!     Output:                                                          *
+!     rt(6,6) (double) transfer matrix.                                *
 !----------------------------------------------------------------------*
       integer eflag
       double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6)
@@ -169,14 +169,14 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Transfer matrix w.r.t. ideal orbit for one period.                 *
-! Input:                                                               *
-!   kobs    if > 0, track until node with this obs. point number       *
-! Output:                                                              *
-!   orbit0(6) (double) closed orbit at start=end                       *
-!   orbit(6)  (double) closed orbit at obs. point kobs, or at end      *
-!   rt(6,6) (double) transfer matrix.                                  *
+!     Purpose:                                                         *
+!     Transfer matrix w.r.t. ideal orbit for one period.               *
+!     Input:                                                           *
+!     kobs    if > 0, track until node with this obs. point number     *
+!     Output:                                                          *
+!     orbit0(6) (double) closed orbit at start=end                     *
+!     orbit(6)  (double) closed orbit at obs. point kobs, or at end    *
+!     rt(6,6) (double) transfer matrix.                                *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       integer eflag,kobs,izero,ione
@@ -196,11 +196,11 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Initial twiss parameters put to opt_fun0.                          *
-! Input/output:                                                        *
-!   opt_fun0(fundim) (double) initial optical values:                  *
-!                         betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.    *
+!     Purpose:                                                         *
+!     Initial twiss parameters put to opt_fun0.                        *
+!     Input/output:                                                    *
+!     opt_fun0(fundim) (double) initial optical values:                *
+!     betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.                        *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
@@ -294,15 +294,15 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Fill twiss table with twiss parameters.                            *
-! Input:                                                               *
-!   case        (integer) =1 fill from twcpgo; =2 fill from twchgo     *
-!   position    (double)  end position of element                      *
-!   flag        (integer) fill flag: 0 no, !=0 yes                     *
-! Input/output:                                                        *
-!   opt_fun(fundim) (double) optical values:                           *
-!                        betx,alfx,amux,bety,alfy,amuy, etc.           *
+!     Purpose:                                                         *
+!     Fill twiss table with twiss parameters.                          *
+!     Input:                                                           *
+!     case        (integer) =1 fill from twcpgo; =2 fill from twchgo   *
+!     position    (double)  end position of element                    *
+!     flag        (integer) fill flag: 0 no, !=0 yes                   *
+!     Input/output:                                                    *
+!     opt_fun(fundim) (double) optical values:                         *
+!     betx,alfx,amux,bety,alfy,amuy, etc.                              *
 !----------------------------------------------------------------------*
       include 'twissa.fi'
       include 'twissl.fi'
@@ -360,19 +360,19 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Find closed orbit for a beam line sequence.                        *
-! Input:                                                               *
-!   guess(6)     (double)  first guess for orbit start                 *
-!   fsec         (logical) if true, return second order terms.         *
-!   ftrk         (logical) if true, track orbit.                       *
-! Output:                                                              *
-!   guess(6)     (double)  final orbit                                 *
-!   opt_fun0(fundim) (double)  initial optical values:                 *
-!                          betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.   *
-!   rt(6,6)      (double)  transfer matrix.                            *
-!   tt(6,6,6)    (double)  second order terms.                         *
-!   eflag        (integer) error flag (0: OK, else != 0)               *
+!     Purpose:                                                         *
+!     Find closed orbit for a beam line sequence.                      *
+!     Input:                                                           *
+!     guess(6)     (double)  first guess for orbit start               *
+!     fsec         (logical) if true, return second order terms.       *
+!     ftrk         (logical) if true, track orbit.                     *
+!     Output:                                                          *
+!     guess(6)     (double)  final orbit                               *
+!     opt_fun0(fundim) (double)  initial optical values:               *
+!     betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.                        *
+!     rt(6,6)      (double)  transfer matrix.                          *
+!     tt(6,6,6)    (double)  second order terms.                       *
+!     eflag        (integer) error flag (0: OK, else != 0)             *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,m66sta,pflag
       integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on
@@ -481,21 +481,21 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Transfer matrix w.r.t. actual orbit for one (half) superperiod.    *
-!   Misalignment and field errors are considered.                      *
-! Input:                                                               *
-!   orbit0(6) (double)  first guess for orbit start                    *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Output:                                                              *
-!   orbit(6)  (double)  orbit after one turn starting from orbit0      *
-!   rt(6,6)   (double)  transfer matrix.                               *
-!   tt(6,6,6) (double)  second order terms.                            *
-!   eflag     (integer) error flag.                                    *
-!   kobs      (integer) if > 0, stop at node with this obs. point #    *
-!   save      (integer) if > 0, save orbit at all BPMs                 *
-!   thr_on    (integer) if > 0, use threader                           *
+!     Purpose:                                                         *
+!     Transfer matrix w.r.t. actual orbit for one (half) superperiod.  *
+!     Misalignment and field errors are considered.                    *
+!     Input:                                                           *
+!     orbit0(6) (double)  first guess for orbit start                  *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Output:                                                          *
+!     orbit(6)  (double)  orbit after one turn starting from orbit0    *
+!     rt(6,6)   (double)  transfer matrix.                             *
+!     tt(6,6,6) (double)  second order terms.                          *
+!     eflag     (integer) error flag.                                  *
+!     kobs      (integer) if > 0, stop at node with this obs. point #  *
+!     save      (integer) if > 0, save orbit at all BPMs               *
+!     thr_on    (integer) if > 0, use threader                         *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissc.fi'
@@ -545,15 +545,15 @@
       parvec(7)=get_value('probe ','gamma ')
       bbd_cnt=0
       bbd_flag=1
-!--- start
+!---  start
       node = restart_sequ()
  10   continue
       bbd_pos=node
       code = node_value('mad8_type ')
       if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-!--- kicker
+!---  kicker
         if (thr_on .gt. 0)  then
-!--- threader is on - keep position,orbit,matrix,and tensor for restart
+!---  threader is on - keep position,orbit,matrix,and tensor for restart
           if (code .le. ccode) then
             restsum(1) = suml
             call dcopy(orbit,restorb(1,1),6)
@@ -588,10 +588,10 @@
       endif
       if (kobs.gt.0.and.kobs.eq.nobs) return
       if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-!--- kicker
+!---  kicker
         if (thr_on .gt. 0)  then
-!--- threader is on
-!--- keep matrix
+!---  threader is on
+!---  keep matrix
           if (code .le. ccode) then
             call dcopy(rt,cmatr(1,1,1),36)
             j = name_len
@@ -606,14 +606,14 @@
           endif
         endif
       elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then
-!--- monitor
+!---  monitor
         enable = node_value('enable ')
         if (save .gt. 0 .and. enable .gt. 0) then
           j = 6
           call store_node_vector('orbit_ref ', j, orbit)
         endif
         if (thr_on .gt. 0 .and. enable .gt. 0) then
-!--- threader is on - test for overflow w.r.t. stored orbit
+!---  threader is on - test for overflow w.r.t. stored orbit
           call dzero(reforb,6)
           j = 6
           call get_node_vector('orbit_ref ', j, reforb)
@@ -624,9 +624,9 @@
               dorb(j) = orbit(j) - reforb(j)
               if (abs(dorb(j)) .gt. vector(kpro)                        &
      &.and. node .ge. corr_pick(kpro))  then
-!--- reset count if new pickup
+!---  reset count if new pickup
                 if (node .gt. corr_pick(kpro)) rep_cnt(kpro) = 0
-!--- check for max. repitition
+!---  check for max. repitition
                 rep_cnt(kpro) = rep_cnt(kpro) + 1
                 if (rep_cnt(kpro) .gt. max_rep)  then
                   write(tmptxt1, '(i6)') max_rep
@@ -634,7 +634,7 @@
      &tmptxt1(:6)//' correction attempts')
                   goto 20
                 endif
-!--- keep matrix
+!---  keep matrix
                 call dcopy(rt,pmatr,36)
                 old = node
                 j = name_len
@@ -655,7 +655,7 @@
      &'-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))                 &
      &// '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total '             &
      &//ptxt(kpro)//'kick:', tmptxt1)
-!--- restore restart values
+!---  restore restart values
                   suml = restsum(kpro)
                   call dcopy(restorb(1,kpro),orbit,6)
                   call dcopy(restm(1,1,kpro),rt,36)
@@ -698,17 +698,17 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Find transfer matrix (+ tensor) for an open line                   *
-! Input:                                                               *
-!   guess(6)     (double)  first guess for orbit start                 *
-!   fsec         (logical) if true, return second order terms.         *
-!   ftrk         (logical) if true, track orbit.                       *
-! Output:                                                              *
-!   guess(6)     (double)  final orbit                                 *
-!   rt(6,6)      (double)  transfer matrix.                            *
-!   tt(6,6,6)    (double)  second order terms.                         *
-!   eflag        (integer) error flag (0: OK, else != 0)               *
+!     Purpose:                                                         *
+!     Find transfer matrix (+ tensor) for an open line                 *
+!     Input:                                                           *
+!     guess(6)     (double)  first guess for orbit start               *
+!     fsec         (logical) if true, return second order terms.       *
+!     ftrk         (logical) if true, track orbit.                     *
+!     Output:                                                          *
+!     guess(6)     (double)  final orbit                               *
+!     rt(6,6)      (double)  transfer matrix.                          *
+!     tt(6,6,6)    (double)  second order terms.                       *
+!     eflag        (integer) error flag (0: OK, else != 0)             *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,m66sta,pflag
       integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on
@@ -728,15 +728,15 @@
 !---- Initialize guess.
       call dcopy(guess,orbit0,6)
 !---- Track orbit and transfer matrix.
-        call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
-        if (eflag.ne.0)  return
+      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
+      if (eflag.ne.0)  return
 
 !---- Message and convergence test.
-        if (pflag)  then
-          print *, ' '
-          print '(''open line - error with deltap: '',1p,e14.6)',deltap
-          print '(''end values: '', 1p,6e14.6)', orbit
-        endif
+      if (pflag)  then
+        print *, ' '
+        print '(''open line - error with deltap: '',1p,e14.6)',deltap
+        print '(''end values: '', 1p,6e14.6)', orbit
+      endif
 
  999  end
 
@@ -744,19 +744,19 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:
-!   Correct orbit position at bpm in first pass (threader)
-! Input:
-!   kpro       (integer) projection (1 = x, 2 = y)
-!   dorb       (d.p.)    difference orbit at pickup
-!   cmatr      (d.p.)    transfer matrix up to preceding corrector
-!   pmatr      (d.p.)    transfer matrix up to current pickup
-!   thrvec     (d.p.)    threader parameter vector (see madxdict.h)
-! Input/Output:
-!   node       (integer) current node
-! Output:
-! cick         (d.p.)    kick value applied
-! error        (integer) 0: OK, else aborted
+!     Purpose:                                                         *
+!     Correct orbit position at bpm in first pass (threader)           *
+!     Input:                                                           *
+!     kpro       (integer) projection (1 = x, 2 = y)                   *
+!     dorb       (d.p.)    difference orbit at pickup                  *
+!     cmatr      (d.p.)    transfer matrix up to preceding corrector   *
+!     pmatr      (d.p.)    transfer matrix up to current pickup        *
+!     thrvec     (d.p.)    threader parameter vector (see madxdict.h)  *
+!     Input/Output:                                                    *
+!     node       (integer) current node                                *
+!     Output:                                                          *
+!     cick         (d.p.)    kick value applied                        *
+!     error        (integer) 0: OK, else aborted                       *
 !----------------------------------------------------------------------*
       integer error,node,kpro
       integer i,j,npick,advance_node,ccode
@@ -765,9 +765,9 @@
       double precision cick,tol1min,node_value,atemp(6,6)
       parameter (tol1min = 1.d-2,ccode=15)
 
-!--- keep position of current pickup
+!---  keep position of current pickup
       npick = node
-!--- look for one preceding corrector of correct (MAD-8) type
+!---  look for one preceding corrector of correct (MAD-8) type
       both = ccode
       itp = both + (-1)**kpro
       lc = 2 * (kpro - 1)
@@ -790,17 +790,17 @@
         ncorr = node
       endif
       if (icorr .eq. 0) goto 10
-!--- transport matrix from kicker to pickup
+!---  transport matrix from kicker to pickup
       call m66inv(cmatr,atemp)
       call m66mpy(pmatr,atemp,atemp)
       if (abs(atemp(lc1,lc2)) .lt. tol1min) then
-!--- kicker does not change orbit at pickup - try again
+!---  kicker does not change orbit at pickup - try again
         icorr = 0
         goto 10
       endif
-!--- now we got one good corrector - get kick with attenuation factor
+!---  now we got one good corrector - get kick with attenuation factor
       cick = -thrvec(3)*dorb(2*kpro-1)/atemp(lc1,lc2)
-!--- add kick to kicker strengths
+!---  add kick to kicker strengths
       if (kpro .eq. 1)  then
         cick = node_value('other_bv ') * cick + node_value('chkick ')
         call store_node_value('chkick ', cick)
@@ -808,7 +808,7 @@
         cick = node_value('other_bv ') * cick + node_value('cvkick ')
         call store_node_value('cvkick ', cick)
       endif
-!--- set node for restart in front of kicker
+!---  set node for restart in front of kicker
       if (retreat_node() .eq. 0)  then
         error = 2
         do i = node+1,npick
@@ -824,14 +824,14 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Initial values for linear coupling parameters.                     *
-! Input:                                                               *
-!   rt(6,6)      (double)  one turn transfer matrix.                   *
-! Output:                                                              *
-!   disp0        (double)  initial dispersion vector                   *
-!   r0mat(2,2)   (double)  coupling matrix                             *
-!   eflag        (integer) error flag.                                 *
+!     Purpose:                                                         *
+!     Initial values for linear coupling parameters.                   *
+!     Input:                                                           *
+!     rt(6,6)      (double)  one turn transfer matrix.                 *
+!     Output:                                                          *
+!     disp0        (double)  initial dispersion vector                 *
+!     r0mat(2,2)   (double)  coupling matrix                           *
+!     eflag        (integer) error flag.                               *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissc.fi'
@@ -848,9 +848,9 @@
 !---- Initial dispersion.
       inval=get_option('twiss_inval ')
       if (inval .eq. 0) then
-       call twdisp(rt,rt(1,6),disp0)
+        call twdisp(rt,rt(1,6),disp0)
       else
-       call dcopy(opt_fun0(15), disp0, 4)
+        call dcopy(opt_fun0(15), disp0, 4)
       endif
       disp0(5) = zero
       disp0(6) = one
@@ -969,16 +969,16 @@
       implicit none
 
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Initial values for dispersion or its first derivative by delta.    *
-!   Only the first four components of the vectors are set.             *
-! Input:                                                               *
-!   rt(6,6)   (double)    one turn transfer matrix.                    *
-!   vect(6)   (double)    right-hand side:                             *
-!                         column 6 of rt for dispersion,               *
-!                         auxiliary vector for derivative of dipersion.*
-! Output:                                                              *
-!   disp(6)   (double)    dispersion vector.                           *
+!     Purpose:                                                         *
+!     Initial values for dispersion or its first derivative by delta.  *
+!     Only the first four components of the vectors are set.           *
+!     Input:                                                           *
+!     rt(6,6)   (double)    one turn transfer matrix.                  *
+!     vect(6)   (double)    right-hand side:                           *
+!     column 6 of rt for dispersion,                                   *
+!     auxiliary vector for derivative of dipersion.                    *
+!     Output:                                                          *
+!     disp(6)   (double)    dispersion vector.                         *
 !----------------------------------------------------------------------*
       integer i,j,irank
       double precision rt(6,6),vect(6),disp(6),a(4,5),zero,one
@@ -1006,14 +1006,15 @@
 
       end
       subroutine twcpgo(rt)
-      
+
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track Twiss parameters with optional output, version with coupling.*
-! Input:                                                               *
-!   rt(6,6)   (double)  one turn transfer matrix.                      *
+!     Purpose:                                                         *
+!     Track Twiss parameters with optional output, version with        *
+!     coupling.                                                        *
+!     Input:                                                           *
+!     rt(6,6)   (double)  one turn transfer matrix.                    *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
@@ -1220,12 +1221,12 @@
       subroutine twcptk(re,orbit)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track coupled lattice functions.                                   *
-! Input:                                                               *
-!   re(6,6)  (double)   transfer matrix of element.                    *
-!   rt(6,6)  (double)   one turn transfer matrix.                      *
-!   orbit(6) (double)   closed orbit                                   *
+!     Purpose:                                                         *
+!     Track coupled lattice functions.                                 *
+!     Input:                                                           *
+!     re(6,6)  (double)   transfer matrix of element.                  *
+!     rt(6,6)  (double)   one turn transfer matrix.                    *
+!     orbit(6) (double)   closed orbit                                 *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
@@ -1352,11 +1353,11 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Initial values of Chromatic functions.                             *
-! Input:                                                               *
-!   rt(6,6)   (double)  transfer matrix.                               *
-!   tt(6,6,6) (double)  second order terms.                            *
+!     Purpose:                                                         *
+!     Initial values of Chromatic functions.                           *
+!     Input:                                                           *
+!     rt(6,6)   (double)  transfer matrix.                             *
+!     tt(6,6,6) (double)  second order terms.                          *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissc.fi'
@@ -1393,18 +1394,20 @@
       disp0(5) = zero
       disp0(6) = one
 
+      if (inval .eq. 0) then
 !---- Derivative of transfer matrix w.r.t. delta(p)/p.
-      call dzero(aux,6)
-      do i = 1, 6
-        do k = 1, 6
-          temp = zero
-          do j = 1, 6
-            temp = temp + tt(i,j,k) * disp0(j)
+        call dzero(aux,6)
+        do i = 1, 6
+          do k = 1, 6
+            temp = zero
+            do j = 1, 6
+              temp = temp + tt(i,j,k) * disp0(j)
+            enddo
+            aux(i) = aux(i) + temp * disp0(k)
+            rtp(i,k) = two * temp
           enddo
-          aux(i) = aux(i) + temp * disp0(k)
-          rtp(i,k) = two * temp
         enddo
-      enddo
+      endif
 
 !---- Derivative of dispersion.
       if (inval .eq. 0)  then
@@ -1418,57 +1421,59 @@
       call dcopy(disp0,disp,6)
       call dcopy(ddisp0,ddisp,6)
 
+      if (inval .eq. 0) then 
 !---- Horizontal motion.
-      cosmux = (rt(1,1) + rt(2,2)) / two
-      stabx = abs(cosmux) .lt. one
-      if (stabx) then
-        sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
-        if (sinmu2.lt.0) sinmu2 = eps
-        sinmux = sign(sqrt(sinmu2), rt(1,2))
-        betx = rt(1,2) / sinmux
-        alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
-        bx = rtp(1,2) / rt(1,2) +                                       &
+        cosmux = (rt(1,1) + rt(2,2)) / two
+        stabx = abs(cosmux) .lt. one
+        if (stabx) then
+          sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
+          if (sinmu2.lt.0) sinmu2 = eps
+          sinmux = sign(sqrt(sinmu2), rt(1,2))
+          betx = rt(1,2) / sinmux
+          alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
+          bx = rtp(1,2) / rt(1,2) +                                     &
      &(rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
-        ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                   &
+          ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                 &
      &alfx * rtp(1,2) / rt(1,2)
-        wx = sqrt(bx**2 + ax**2)
-        if (wx.gt.eps) phix = atan2(ax,bx)
-      endif
+          wx = sqrt(bx**2 + ax**2)
+          if (wx.gt.eps) phix = atan2(ax,bx)
+        endif
 
 !---- Vertical motion.
-      cosmuy = (rt(3,3) + rt(4,4)) / two
-      staby = abs(cosmuy) .lt. one
-      if (staby) then
-        sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
-        if (sinmu2.lt.0) sinmu2 = eps
-        sinmuy = sign(sqrt(sinmu2), rt(3,4))
-        bety = rt(3,4) / sinmuy
-        alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
-        by = rtp(3,4) / rt(3,4) +                                       &
+        cosmuy = (rt(3,3) + rt(4,4)) / two
+        staby = abs(cosmuy) .lt. one
+        if (staby) then
+          sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
+          if (sinmu2.lt.0) sinmu2 = eps
+          sinmuy = sign(sqrt(sinmu2), rt(3,4))
+          bety = rt(3,4) / sinmuy
+          alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
+          by = rtp(3,4) / rt(3,4) +                                     &
      &(rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
-        ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                   &
+          ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                 &
      &alfy * rtp(3,4) / rt(3,4)
-        wy = sqrt(by**2 + ay**2)
-        if (wy.gt.eps) phiy = atan2(ay,by)
-      endif
+          wy = sqrt(by**2 + ay**2)
+          if (wy.gt.eps) phiy = atan2(ay,by)
+        endif
 
 !---- Fill optics function array
-      opt_fun0(19)=wx
-      opt_fun0(20)=phix
-      opt_fun0(22)=wy
-      opt_fun0(23)=phiy
-      opt_fun0(25)=ddisp(1)
-      opt_fun0(26)=ddisp(2)
-      opt_fun0(27)=ddisp(3)
-      opt_fun0(28)=ddisp(4)
+        opt_fun0(19)=wx
+        opt_fun0(20)=phix
+        opt_fun0(22)=wy
+        opt_fun0(23)=phiy
+        opt_fun0(25)=ddisp(1)
+        opt_fun0(26)=ddisp(2)
+        opt_fun0(27)=ddisp(3)
+        opt_fun0(28)=ddisp(4)
+      endif
 
       end
       subroutine twchgo
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track Chromatic functions.                                         *
+!     Purpose:                                                         *
+!     Track Chromatic functions.                                       *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
@@ -1622,11 +1627,11 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track lattice functions, including chromatic effects.              *
-! Input:                                                               *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second order terms.                            *
+!     Purpose:                                                         *
+!     Track lattice functions, including chromatic effects.            *
+!     Input:                                                           *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second order terms.                          *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissl.fi'
@@ -1801,11 +1806,11 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Compute summary data for TWISS and OPTICS commands.                *
-! Input:                                                               *
-!   rt(6,6)   (double)  one turn transfer matrix.                      *
-!   tt(6,6,6) (double)  second order terms.                            *
+!     Purpose:                                                         *
+!     Compute summary data for TWISS and OPTICS commands.              *
+!     Input:                                                           *
+!     rt(6,6)   (double)  one turn transfer matrix.                    *
+!     tt(6,6,6) (double)  second order terms.                          *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       include 'twissc.fi'
@@ -1891,7 +1896,7 @@
 !---  fix length problem - HG 14.4.08
       suml    = currpos
 !     suml    = currpos-get_value('sequence ','range_start ')
-!--- end of fix length problem - HG 14.4.08
+!---  end of fix length problem - HG 14.4.08
       betx    = opt_fun0(3)
       alfx    = opt_fun0(4)
       amux    = opt_fun(5)
@@ -1908,13 +1913,13 @@
       ycomax = ycomax
       sigyco = sigyco
 
-!      if(opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.               &
+!     if(opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.             &
 !     &opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
-!        call fort_warn('Chromaticity calculation wrong due to coupling',&
+!     call fort_warn('Chromaticity calculation wrong due to coupling',&
 !     &'use manual derivative or madxp')
-!frs         xix=zero ! The punishment was too harsh!!!!
-!        xiy=zero
-!      endif
+!     frs         xix=zero ! The punishment was too harsh!!!!
+!     xiy=zero
+!     endif
 
 !---- Fill summary table
       call double_to_table('summ ','length ' ,suml)
@@ -1947,22 +1952,22 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! purpose:                                                             *
-!   transport map for a complete element.                              *
-!   optionally, follow orbit.                                          *
-! input:                                                               *
-!   code                element type code                              *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   bval                basic element parameters                       *
-!   fval                element force parameters                       *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     purpose:                                                         *
+!     transport map for a complete element.                            *
+!     optionally, follow orbit.                                        *
+!     input:                                                           *
+!     code                element type code                            *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     bval                basic element parameters                     *
+!     fval                element force parameters                     *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       integer code
       logical fsec, ftrk, fmap
@@ -2095,18 +2100,18 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for sector bending magnets                           *
-! Input:                                                               *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for sector bending magnets                         *
+!     Input:                                                           *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'twtrr.fi'
@@ -2148,7 +2153,7 @@
           e2 = e2 + bvk * node_value('angle ') / two
         endif
 
-!--- bvk also applied further down
+!---  bvk also applied further down
 
         sk1 = node_value('k1 ')
         sk2 = node_value('k2 ')
@@ -2278,19 +2283,19 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for a sector dipole without fringe fields.           *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   el        (double)  element length.                                *
-!   h         (double)  reference curvature of magnet.                 *
-!   dh        (double)  dipole field error.                            *
-!   sk1       (double)  quadrupole strength.                           *
-!   sk2       (double)  sextupole strengh.                             *
-! Output:                                                              *
-!   ek(6)     (double)  kick due to dipole.                            *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for a sector dipole without fringe fields.         *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     el        (double)  element length.                              *
+!     h         (double)  reference curvature of magnet.               *
+!     dh        (double)  dipole field error.                          *
+!     sk1       (double)  quadrupole strength.                         *
+!     sk2       (double)  sextupole strengh.                           *
+!     Output:                                                          *
+!     ek(6)     (double)  kick due to dipole.                          *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec
       double precision beta,gamma,dtbyds,bi,bi2,bi2gi2,cm,cp,cx,cy,cyy, &
@@ -2508,12 +2513,12 @@
       subroutine tmsymm(t)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Symmetrize second-order array T.                                   *
-! Input:                                                               *
-!   t(6,6,6)  (double)  array to be symmetrized.                       *
-! Output:                                                              *
-!   t(6,6,6)  (double)  symmetrized array.                             *
+!     Purpose:                                                         *
+!     Symmetrize second-order array T.                                 *
+!     Input:                                                           *
+!     t(6,6,6)  (double)  array to be symmetrized.                     *
+!     Output:                                                          *
+!     t(6,6,6)  (double)  symmetrized array.                           *
 !----------------------------------------------------------------------*
       integer i,k,l
       double precision t(6,6,6)
@@ -2530,19 +2535,19 @@
       subroutine tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for fringe field of a dipole.                        *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   h         (double)  curvature of magnet body.                      *
-!   sk1       (double)  quadrupole strength in magnet body.            *
-!   edge      (double)  edge focussing angle.                          *
-!   he        (double)  curvature of pole face.                        *
-!   sig       (double)  sign: +1 for entry, -1 for exit.               *
-!   corr      (double)  correction factor according to slac 75.        *
-! Output:                                                              *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for fringe field of a dipole.                      *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     h         (double)  curvature of magnet body.                    *
+!     sk1       (double)  quadrupole strength in magnet body.          *
+!     edge      (double)  edge focussing angle.                        *
+!     he        (double)  curvature of pole face.                      *
+!     sig       (double)  sign: +1 for entry, -1 for exit.             *
+!     corr      (double)  correction factor according to slac 75.      *
+!     Output:                                                          *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec
       double precision corr,edge,h,he,hh,psip,re(6,6),secedg,sig,sk1,   &
@@ -2584,15 +2589,15 @@
       subroutine tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Concatenate two TRANSPORT maps including zero-order terms.         *
-!   This routine is time-critical and is carefully optimized.          *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   eb(6), rb(6,6), tb(6,6,6)  second map in beam line order.          *
-!   ea(6), ra(6,6), ta(6,6,6)  first map in beam line order.           *
-! Output:                                                              *
-!   ed(6), rd(6,6), td(6,6,6)  result map.                             *
+!     Purpose:                                                         *
+!     Concatenate two TRANSPORT maps including zero-order terms.       *
+!     This routine is time-critical and is carefully optimized.        *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     eb(6), rb(6,6), tb(6,6,6)  second map in beam line order.        *
+!     ea(6), ra(6,6), ta(6,6,6)  first map in beam line order.         *
+!     Output:                                                          *
+!     ed(6), rd(6,6), td(6,6,6)  result map.                           *
 !----------------------------------------------------------------------*
       logical fsec
       integer i,ij,j,k
@@ -2687,19 +2692,19 @@
       subroutine tmtilt(fsec,tilt,ek,r,t)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Apply TILT to a TRANSPORT map.                                     *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   tilt      (double)  roll angle. The inverse is used to rotate the  *
-!                       matrix and tensor                              *
-!   ek(6)     (double)  element kick, unrotated.                       *
-!   r(6,6)    (double)  transfer matrix, unrotated.                    *
-!   t(6,6,6)  (double)  second order terms, unrotated.                 *
-! Output:                                                              *
-!   ek(6)     (double)  element kick, rotated.                         *
-!   r(6,6)    (double)  transfer matrix, rotated.                      *
-!   t(6,6,6)  (double)  second order terms, rotated.                   *
+!     Purpose:                                                         *
+!     Apply TILT to a TRANSPORT map.                                   *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     tilt      (double)  roll angle. The inverse is used to rotate    *
+!     the matrix and tensor                                            *
+!     ek(6)     (double)  element kick, unrotated.                     *
+!     r(6,6)    (double)  transfer matrix, unrotated.                  *
+!     t(6,6,6)  (double)  second order terms, unrotated.               *
+!     Output:                                                          *
+!     ek(6)     (double)  element kick, rotated.                       *
+!     r(6,6)    (double)  transfer matrix, rotated.                    *
+!     t(6,6,6)  (double)  second order terms, rotated.                 *
 !----------------------------------------------------------------------*
       logical fsec
       integer i,j,k
@@ -2770,19 +2775,19 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for orbit correctors.                                *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for orbit correctors.                              *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twtrr.fi'
       logical fsec,ftrk,fmap,cplxy,dorad
@@ -2882,17 +2887,17 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for thin multipole.                                  *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for thin multipole.                                *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'twtrr.fi'
@@ -3114,20 +3119,20 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for octupole element.                                *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Remark: the orbit is NOT rotated before and after this routine       *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for octupole element.                              *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Remark: the orbit is NOT rotated before and after this routine   *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'twtrr.fi'
@@ -3292,18 +3297,19 @@
       end
       subroutine tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
       implicit none
-! Purpose:                                                             *
-!   TRANSPORT map for arbitrary element.                               *
-! Input:                                                               *
-!   FSEC      (logical) If true, return second order terms.            *
-!   FTRK      (logical) If true, track orbit.                          *
-! Input/output:                                                        *
-!   ORBIT(6)  (real)    Closed orbit.                                  *
-! Output:                                                              *
-!   FMAP      (logical) If true, element has a map.                    *
-!   EK(6)     (real)    Kick due to element.                           *
-!   RE(6,6)   (real)    Transfer matrix.                               *
-!   TE(6,6,6) (real)    Second-order terms.                            *
+!----------------------------------------------------------------------*
+!     Purpose:                                                         *
+!     TRANSPORT map for arbitrary element.                             *
+!     Input:                                                           *
+!     FSEC      (logical) If true, return second order terms.          *
+!     FTRK      (logical) If true, track orbit.                        *
+!     Input/output:                                                    *
+!     ORBIT(6)  (real)    Closed orbit.                                *
+!     Output:                                                          *
+!     FMAP      (logical) If true, element has a map.                  *
+!     EK(6)     (real)    Kick due to element.                         *
+!     RE(6,6)   (real)    Transfer matrix.                             *
+!     TE(6,6,6) (real)    Second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'track.fi'
       logical fsec,ftrk,fmap
@@ -3595,21 +3601,22 @@
       subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for quadrupole element.                              *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-!   plot_tilt (double)  external tilt needed for plot                  *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Remark: the orbit is rotated (in tmmap) before and after this routine*
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for quadrupole element.                            *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     plot_tilt (double)  external tilt needed for plot                *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Remark: the orbit is rotated (in tmmap) before and after this    *
+!     routine                                                          *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'twtrr.fi'
@@ -3646,7 +3653,7 @@
         sk1 = sqrt(sk1**2 + sk1s**2)
       endif
       if (tilt .ne. zero)  then
-!--- rotate orbit before entry
+!---  rotate orbit before entry
         st = sin(tilt)
         ct = cos(tilt)
         tmp = orbit(1)
@@ -3702,7 +3709,7 @@
         orbit(6) = orbit(6) - rfac * (one + pt) ** 2
       endif
       if (tilt .ne. zero)  then
-!--- rotate orbit at exit
+!---  rotate orbit at exit
         tmp = orbit(1)
         orbit(1) = ct * tmp - st * orbit(3)
         orbit(3) = ct * orbit(3) + st * tmp
@@ -3716,20 +3723,20 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for quadrupole element.                              *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-!   tilt      (double)  map tilt angle                                 *
-!   sk1       (double)  processed quad kick                            *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for quadrupole element.                            *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     tilt      (double)  map tilt angle                               *
+!     sk1       (double)  processed quad kick                          *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec,ftrk
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),el,tilt,sk1,    &
@@ -3815,20 +3822,21 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for electrostatic separator.                         *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Remark: the orbit is rotated (in tmmap) before and after this routine*
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for electrostatic separator.                       *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Remark: the orbit is rotated (in tmmap) before and after this    *
+!     routine                                                          *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical fsec,ftrk,fmap,cplxy
@@ -3856,7 +3864,7 @@
           tilt = -atan2(eyfld, exfld) + tilt
         endif
         if (tilt .ne. zero)  then
-!--- rotate orbit before entry
+!---  rotate orbit before entry
           st = sin(tilt)
           ct = cos(tilt)
           tmp = orbit(1)
@@ -3894,7 +3902,7 @@
       endif
       call spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
       if (tilt .ne. zero)  then
-!--- rotate orbit at exit
+!---  rotate orbit at exit
         tmp = orbit(1)
         orbit(1) = ct * tmp - st * orbit(3)
         orbit(3) = ct * orbit(3) + st * tmp
@@ -3910,20 +3918,20 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for electrostatic separator.                         *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-!   tilt      (double)  map tilt angle                                 *
-!   ekick     (double)  processed electrostatic kick                   *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for electrostatic separator.                       *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     tilt      (double)  map tilt angle                               *
+!     ekick     (double)  processed electrostatic kick                 *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec,ftrk
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),el,tilt,ekl,ch, &
@@ -4014,20 +4022,21 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for sextupole element.                               *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Remark: the orbit is rotated (in tmmap) before and after this routine*
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for sextupole element.                             *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Remark: the orbit is rotated (in tmmap) before and after this    *
+!     routine                                                          *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'twtrr.fi'
@@ -4064,7 +4073,7 @@
         sk2 = sqrt(sk2**2 + sk2s**2)
       endif
       if (tilt .ne. zero)  then
-!--- rotate orbit before entry
+!---  rotate orbit before entry
         st = sin(tilt)
         ct = cos(tilt)
         tmp = orbit(1)
@@ -4121,7 +4130,7 @@
         endif
       endif
       if (tilt .ne. zero)  then
-!--- rotate orbit at exit
+!---  rotate orbit at exit
         tmp = orbit(1)
         orbit(1) = ct * tmp - st * orbit(3)
         orbit(3) = ct * orbit(3) + st * tmp
@@ -4137,20 +4146,20 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for sextupole element.                               *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-!   tilt      (double)  map tilt angle                                 *
-!   sk2       (double)  processed sextupole kick                       *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for sextupole element.                             *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     tilt      (double)  map tilt angle                               *
+!     sk2       (double)  processed sextupole kick                     *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec,ftrk
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),el,tilt,sk2,skl,&
@@ -4214,19 +4223,19 @@
       subroutine tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for solenoid element, with centre option.            *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for solenoid element, with centre option.          *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical fsec,ftrk,fmap
@@ -4261,19 +4270,19 @@
       subroutine tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for solenoid element, no centre option.              *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for solenoid element, no centre option.            *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,fmap,cplxy
       double precision orbit(6),ek(6),re(6,6),te(6,6,6),deltap,el,sks,  &
@@ -4371,17 +4380,17 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for rotation about S-axis.                           *
-! Input:                                                               *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for rotation about S-axis.                         *
+!     Input:                                                           *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical ftrk,fmap,cplxy
@@ -4431,18 +4440,18 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for rotation about Y-axis.                           *
-!   Treated in a purely linear way.                                    *
-! Input:                                                               *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for rotation about Y-axis.                         *
+!     Treated in a purely linear way.                                  *
+!     Input:                                                           *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical ftrk,fmap
@@ -4493,19 +4502,19 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for drift space, no centre option.                   *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   dl        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for drift space, no centre option.                 *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     dl        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       logical fsec,ftrk,fmap
       double precision dl,beta,gamma,dtbyds,orbit(6),ek(6),re(6,6),     &
@@ -4545,19 +4554,19 @@
       subroutine tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for drift space, with centre option.                 *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   dl        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for drift space, with centre option.               *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     dl        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical fsec,ftrk,fmap
@@ -4589,19 +4598,19 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for RF cavity.                                       *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   ftrk      (logical) if true, track orbit.                          *
-! Input/output:                                                        *
-!   orbit(6)  (double)  closed orbit.                                  *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   el        (double)  element length.                                *
-!   ek(6)     (double)  kick due to element.                           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     Purpose:                                                         *
+!     TRANSPORT map for RF cavity.                                     *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     ftrk      (logical) if true, track orbit.                        *
+!     Input/output:                                                    *
+!     orbit(6)  (double)  closed orbit.                                *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     el        (double)  element length.                              *
+!     ek(6)     (double)  kick due to element.                         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       logical fsec,ftrk,fmap
@@ -4685,15 +4694,15 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Concatenate two TRANSPORT maps.                                    *
-!   This routine is time-critical and is carefully optimized.          *
-! Input:                                                               *
-!   fsec      (logical) if true, return second order terms.            *
-!   rb(6,6), tb(6,6,6)  second map in beam line order.                 *
-!   ra(6,6), ta(6,6,6)  first map in beam line order.                  *
-! Output:                                                              *
-!   rd(6,6), td(6,6,6)  result map.                                    *
+!     Purpose:                                                         *
+!     Concatenate two TRANSPORT maps.                                  *
+!     This routine is time-critical and is carefully optimized.        *
+!     Input:                                                           *
+!     fsec      (logical) if true, return second order terms.          *
+!     rb(6,6), tb(6,6,6)  second map in beam line order.               *
+!     ra(6,6), ta(6,6,6)  first map in beam line order.                *
+!     Output:                                                          *
+!     rd(6,6), td(6,6,6)  result map.                                  *
 !----------------------------------------------------------------------*
       logical fsec
       integer i1,i2,i3
@@ -4746,16 +4755,16 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track orbit and change reference for RE matrix.                    *
-! Input:                                                               *
-!   ek(6)     (double)  kick on orbit.                                 *
-!   re(6,6)   (double)  transfer matrix before update.                 *
-!   te(6,6,6) (double)  second order terms.                            *
-!   orb1(6)   (double)  orbit before element.                          *
-! Output:                                                              *
-!   orb2(6)   (double)  orbit after element.                           *
-!   re(6,6)   (double)  transfer matrix after update.                  *
+!     Purpose:                                                         *
+!     Track orbit and change reference for RE matrix.                  *
+!     Input:                                                           *
+!     ek(6)     (double)  kick on orbit.                               *
+!     re(6,6)   (double)  transfer matrix before update.               *
+!     te(6,6,6) (double)  second order terms.                          *
+!     orb1(6)   (double)  orbit before element.                        *
+!     Output:                                                          *
+!     orb2(6)   (double)  orbit after element.                         *
+!     re(6,6)   (double)  transfer matrix after update.                *
 !----------------------------------------------------------------------*
       integer i,k,l,get_option
       double precision sum1,sum2,ek(6),re(6,6),te(6,6,6),orb1(6),       &
@@ -4784,13 +4793,13 @@
       subroutine tmsymp(r)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Symplectify a 6 by 6 matrix R.                                     *
-!   Algorithm described in the doctoral thesis by Liam Healey.         *
-! Input:                                                               *
-!   r(6,6)    (double)  matrix to be symplectified.                    *
-! Output:                                                              *
-!   r(6,6)    (double)  the symplectified matrix.                      *
+!     Purpose:                                                         *
+!     Symplectify a 6 by 6 matrix R.                                   *
+!     Algorithm described in the doctoral thesis by Liam Healey.       *
+!     Input:                                                           *
+!     r(6,6)    (double)  matrix to be symplectified.                  *
+!     Output:                                                          *
+!     r(6,6)    (double)  the symplectified matrix.                    *
 !----------------------------------------------------------------------*
       logical eflag
       integer i,j
@@ -4821,16 +4830,16 @@
       subroutine tmali1(orb1, errors, betas, gammas, orb2, rm)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for orbit displacement at entry of an element.       *
-! Input:                                                               *
-!   orb1(6)   (real)    Orbit before misalignment.                     *
-!   errors(align_max) (real)    alignment errors                       *
-!   betas     (real)    current beam beta                              *
-!   gammas    (real)    current beam gamma                             *
-! Output:                                                              *
-!   orb2(6)   (real)    Orbit after misalignment.                      *
-!   rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.      *
+!     Purpose:                                                         *
+!     TRANSPORT map for orbit displacement at entry of an element.     *
+!     Input:                                                           *
+!     orb1(6)   (real)    Orbit before misalignment.                   *
+!     errors(align_max) (real)    alignment errors                     *
+!     betas     (real)    current beam beta                            *
+!     gammas    (real)    current beam gamma                           *
+!     Output:                                                          *
+!     orb2(6)   (real)    Orbit after misalignment.                    *
+!     rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.    *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       double precision ds,dx,dy,phi,psi,rm(6,6),s2,the,betas, gammas,   &
@@ -4882,16 +4891,16 @@
       subroutine tmali2(el, orb1, errors, betas, gammas, orb2, rm)
       implicit none
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   TRANSPORT map for orbit displacement at exit of an element.        *
-! Input:                                                               *
-!   orb1(6)   (real)    Orbit before misalignment.                     *
-!   errors(align_max) (real)    alignment errors                       *
-!   betas     (real)    current beam beta                              *
-!   gammas    (real)    current beam gamma                             *
-! Output:                                                              *
-!   orb2(6)   (real)    Orbit after misalignment.                      *
-!   rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.      *
+!     Purpose:                                                         *
+!     TRANSPORT map for orbit displacement at exit of an element.      *
+!     Input:                                                           *
+!     orb1(6)   (real)    Orbit before misalignment.                   *
+!     errors(align_max) (real)    alignment errors                     *
+!     betas     (real)    current beam beta                            *
+!     gammas    (real)    current beam gamma                           *
+!     Output:                                                          *
+!     orb2(6)   (real)    Orbit after misalignment.                    *
+!     rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.    *
 !----------------------------------------------------------------------*
       include 'twiss0.fi'
       double precision ds,dx,dy,el,phi,psi,s2,the,tilt,orb1(6),orb2(6), &
@@ -4956,17 +4965,18 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! purpose:                                                             *
-!   transport map for beam-beam element.                               *
-! input:                                                               *
-!   fsec      (logical) must be .true. for this purpose                *
-!   ftrk      (logical) must be true for this purpose                  *
-! input/output:                                                        *
-!   orbit(6)  (double)  closed orbit (only kick is added since BB thin)*
-! output:                                                              *
-!   fmap      (logical) if map has been calculated correctly           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     purpose:                                                         *
+!     transport map for beam-beam element.                             *
+!     input:                                                           *
+!     fsec      (logical) must be .true. for this purpose              *
+!     ftrk      (logical) must be true for this purpose                *
+!     input/output:                                                    *
+!     orbit(6)  (double)  closed orbit (only kick is added             *
+!     since BB thin)                                                   *
+!     output:                                                          *
+!     fmap      (logical) if map has been calculated correctly         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'track.fi'
       integer beamshape, b_dir_int
@@ -4980,7 +4990,7 @@
       data first / .true. /
 !     if x > explim, exp(-x) is outside machine limits.
 
-!--- standard 4D
+!---  standard 4D
       q=get_value('probe ','charge ')
       q_prime=node_value('charge ')
       parvec(5)=get_value('probe ', 'arad ')
@@ -5279,7 +5289,7 @@
         xs  = orbit(1) - xm
         ys  = orbit(3) - ym
 !---- limit formulas for sigma(x) = sigma(y).
-!-----      preliminary the only case considered.
+!-----preliminary the only case considered.
         if (dabs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
           zz = 0.5*(r0x + r0y)
           r0x=zz
@@ -5333,7 +5343,7 @@
             re(2,3) = phixy*fk
             re(4,1) = phixy*fk
             re(4,3) = phiyy*fk
-! 2nd order effects
+!     2nd order effects
             if(fsec) then
               phirrr =  (8.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0   &
      &+ wx**2/48.0)/rho2**3 + 1.0/3.0/wx/rho**3)/norm
@@ -5362,7 +5372,7 @@
             re(2,3) = phixy*fk
             re(4,1) = phixy*fk
             re(4,3) = phiyy*fk
-! 2nd order effects
+!     2nd order effects
             if(fsec) then
               phirrr = 8.0/rho2**3
               phixxx = 3.0*xs*phirr + xs**3*phirrr
@@ -5446,8 +5456,9 @@
       fmap = .true.
       r0x = node_value('sigx ')
       r0y = node_value('sigy ')
-! width is given as FWHM of the parabolic density profile, but formulas
-! were derived with half width at the bottom of this density profile
+!     width is given as FWHM of the parabolic density profile,
+!     but formulas were derived with half width at the bottom of this
+!     density profile
       wi = node_value('width ')
       wi = wi/sqrt(2.0)
       xm = node_value('xma ')
@@ -5462,7 +5473,7 @@
           xs  = orbit(1) - xm
           ys  = orbit(3) - ym
 !---- limit formulas for sigma(x) = sigma(y).
-!-----      preliminary the only case considered.
+!-----preliminary the only case considered.
           if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
             zz = 0.5*(r0x + r0y)
             r0x=zz
@@ -5509,7 +5520,7 @@
             re(2,3) = phixy*fk
             re(4,1) = phixy*fk
             re(4,3) = phiyy*fk
-            ! 2nd order effects
+! 2nd order effects
             if(fsec) then
               phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/           &
      &wx**2-r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) -                      &
@@ -5539,7 +5550,7 @@
             re(2,3) = phixy*fk
             re(4,1) = phixy*fk
             re(4,3) = phiyy*fk
-! 2nd order effects
+!     2nd order effects
             if(fsec) then
               phirrr = 8.0/rho2**3
               phixxx = 3.0*xs*phirr + xs**3*phirrr
@@ -5591,17 +5602,18 @@
 
       implicit none
 !----------------------------------------------------------------------*
-! purpose:                                                             *
-!   transport map for beam-beam element.                               *
-! input:                                                               *
-!   fsec      (logical) must be .true. for this purpose                *
-!   ftrk      (logical) must be true for this purpose                  *
-! input/output:                                                        *
-!   orbit(6)  (double)  closed orbit (only kick is added since BB thin)*
-! output:                                                              *
-!   fmap      (logical) if map has been calculated correctly           *
-!   re(6,6)   (double)  transfer matrix.                               *
-!   te(6,6,6) (double)  second-order terms.                            *
+!     purpose:                                                         *
+!     transport map for beam-beam element.                             *
+!     input:                                                           *
+!     fsec      (logical) must be .true. for this purpose              *
+!     ftrk      (logical) must be true for this purpose                *
+!     input/output:                                                    *
+!     orbit(6)  (double)  closed orbit (only kick is added             *
+!     since BB thin)                                                   *
+!     output:                                                          *
+!     fmap      (logical) if map has been calculated correctly         *
+!     re(6,6)   (double)  transfer matrix.                             *
+!     te(6,6,6) (double)  second-order terms.                          *
 !----------------------------------------------------------------------*
       include 'twissl.fi'
       include 'bb.fi'
@@ -5635,7 +5647,7 @@
       sy = node_value('sigy ')
       xm = node_value('xma ')
       ym = node_value('yma ')
-!--- standard 4D
+!---  standard 4D
       parvec(5)=get_value('probe ', 'arad ')
       parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
       parvec(7)=get_value('probe ','gamma ')
@@ -5828,13 +5840,13 @@
       subroutine ccperrf(xx, yy, wx, wy)
       implicit none
 !----------------------------------------------------------------------*
-! purpose:                                                             *
-!   modification of wwerf, double precision complex error function,    *
-!   written at cern by K. Koelbig.                                     *
-! input:                                                               *
-!   xx, yy    (double)    real + imag argument                         *
-! output:                                                              *
-!   wx, wy    (double)    real + imag function result                  *
+!     purpose:                                                         *
+!     modification of wwerf, double precision complex error function,  *
+!     written at cern by K. Koelbig.                                   *
+!     input:                                                           *
+!     xx, yy    (double)    real + imag argument                       *
+!     output:                                                          *
+!     wx, wy    (double)    real + imag function result                *
 !----------------------------------------------------------------------*
       integer n,nc,nu
       double precision xx,yy,wx,wy,x,y,q,h,xl,xh,yh,tx,ty,tn,sx,sy,saux,&
@@ -5894,7 +5906,7 @@
         wy = cc * ry(1)
       endif
 
-!      if(y .eq. zero) wx = exp(-x**2)
+!     if(y .eq. zero) wx = exp(-x**2)
       if(yy .lt. zero) then
         wx =   two * exp(y*y-x*x) * cos(two*x*y) - wx
         wy = - two * exp(y*y-x*x) * sin(two*x*y) - wy
@@ -5917,12 +5929,12 @@
       end
       subroutine twwmap(pos, orbit)
 !----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Save concatenated sectormap (kick, rmatrix, tmatrix)               *
-!   Input:                                                             *
-!   pos   (double)  position                                           *
-!   orbit (double)  current orbit                                      *
-!   Further input in twissotm.fi                                       *
+!     Purpose:                                                         *
+!     Save concatenated sectormap (kick, rmatrix, tmatrix)             *
+!     Input:                                                           *
+!     pos   (double)  position                                         *
+!     orbit (double)  current orbit                                    *
+!     Further input in twissotm.fi                                     *
 !----------------------------------------------------------------------*
       implicit none
       include 'twissotm.fi'
@@ -5940,24 +5952,30 @@
             sum1 = sum1 + stmat(i,k,l) * sorb(l)
           enddo
           sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-!          srmat(i,k) = srmat(i,k) - 2.d0 * sum1
+!     srmat(i,k) = srmat(i,k) - 2.d0 * sum1
         enddo
         ek(i) = sum2
       enddo
       call dcopy(orbit, sorb, 6)
 
-!--- jluc: note that twiss can be called through madxn.c's (1) pro_twiss or (2) pro_embedded_twiss
-!     In the first case, sectorTableName is set by the user or by default. In the second case,
-!     the parameter is meaningless and the following sector data storage should be skipped.
-!     To this end, we test whether the passed sectorTableName is equal to 'dummy'
+!---  jluc: note that twiss can be called through madxn.c's (1)
+!     pro_twiss or (2) pro_embedded_twiss
+!     In the first case, sectorTableName is set by the user or
+!     by default. In the second case,
+!     the parameter is meaningless and the following sector data
+!     storage should be skipped.
+!     To this end, we test whether the passed sectorTableName is
+!     equal to 'dummy'
       if ( sectorTableName .ne. 'dummy') then
 !---- Output.
-         call sector_out(sectorTableName, pos, ek, srmat, stmat)
-      endif ! else should issue a warning albeit the test must be true
-!      write (99, '(g20.6)') pos
-!      write (99, '(6e16.8)') ek
-!      write (99, '(6e16.8)') srmat
-!      write (99, '(6e16.8)') stmat
+        call sector_out(sectorTableName, pos, ek, srmat, stmat)
+      endif
+!     else should issue a warning albeit the
+!     test must be true
+!     write (99, '(g20.6)') pos
+!     write (99, '(6e16.8)') ek
+!     write (99, '(6e16.8)') srmat
+!     write (99, '(6e16.8)') stmat
 !---- re-initialize map.
       call m66one(srmat)
       call dzero(stmat, 216)
@@ -5966,13 +5984,13 @@
       subroutine tmdpdg(ftrk,orbit,fmap,rw)
       implicit none
 !----------------------------------------------------------------------*
-! dipedge element                                                      *
-! Purpose: computes the effect of the dipole edge                      *
-! Input:                                                               *
-!   ftrk         (logical) if true, track orbit.                       *
-! Output:                                                              *
-!   fmap      (logical) if true, element has a map.                    *
-!   rw(6,6)      (double)  transfer matrix.                            *
+!     dipedge element                                                  *
+!     Purpose: computes the effect of the dipole edge                  *
+!     Input:                                                           *
+!     ftrk         (logical) if true, track orbit.                     *
+!     Output:                                                          *
+!     fmap      (logical) if true, element has a map.                  *
+!     rw(6,6)      (double)  transfer matrix.                          *
 !----------------------------------------------------------------------*
       logical ftrk,fmap
       double precision fint,e1,h,hgap,corr,rw(6,6),tw(6,6,6),orbit(6),  &
@@ -5990,7 +6008,7 @@
       corr = (h + h) * hgap * fint
       fmap = h .ne. zero .and. ( e1 .ne. zero .or. corr .ne. zero )
       if (.not. fmap) return
-!          print*,"------------------------------------------ "
+!     print *,"------------------------------------------ "
 !---- Fringe fields effects computed from the TWISS routine tmfrng
 !     tmfrng returns the matrix elements rw(used) and tw(unused)
 !     No radiation effects as it is a pure thin lens with no lrad
@@ -6002,14 +6020,14 @@
       return
       end
       subroutine tmsol_th(ftrk,orbit,fmap,ek,re,te)
-! Stolen from trrun.F courtesy Alex Koschick
+!     Stolen from trrun.F courtesy Alex Koschick
       implicit none
 !----------------------------------------------------------------------*
-!  Purpose:                                                            *
+!     Purpose:                                                         *
 !     TRANSPORT map for solenoid element, no centre option.            *
-!  Input:                                                              *
+!     Input:                                                           *
 !     ftrk      (logical) if true, track orbit.                        *
-!  Input/output:                                                       *
+!     Input/output:                                                    *
 !     orbit(6)  (double)  closed orbit.                                *
 !     Output:                                                          *
 !     fmap      (logical) if true, element has a map.                  *
