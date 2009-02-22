@@ -1382,90 +1382,87 @@
       wy     =opt_fun0(22)
       phiy   =opt_fun0(23)
       dmuy   =opt_fun0(24)
-
 !---- Initial value flag.
       inval=get_option('twiss_inval ')
-!---- Initial dispersion.
-      if (inval .eq. 0) then
-        call twdisp(rt,rt(1,6),disp0)
-      else
-        call dcopy(opt_fun0(15),disp0,4)
+      if (inval .ne. 0) then
+        call dcopy(opt_fun0(15),disp,4)
+        call dcopy(opt_fun0(25),ddisp,4)
+        disp(5) = zero
+        disp(6) = one
+        ddisp(5) = zero
+        ddisp(6) = zero
+        return
       endif
+
+!---- Initial dispersion.
+      call twdisp(rt,rt(1,6),disp0)
       disp0(5) = zero
       disp0(6) = one
 
-      if (inval .eq. 0) then
 !---- Derivative of transfer matrix w.r.t. delta(p)/p.
-        call dzero(aux,6)
-        do i = 1, 6
-          do k = 1, 6
-            temp = zero
-            do j = 1, 6
-              temp = temp + tt(i,j,k) * disp0(j)
-            enddo
-            aux(i) = aux(i) + temp * disp0(k)
-            rtp(i,k) = two * temp
+      call dzero(aux,6)
+      do i = 1, 6
+        do k = 1, 6
+          temp = zero
+          do j = 1, 6
+            temp = temp + tt(i,j,k) * disp0(j)
           enddo
+          aux(i) = aux(i) + temp * disp0(k)
+          rtp(i,k) = two * temp
         enddo
-      endif
+      enddo
 
 !---- Derivative of dispersion.
-      if (inval .eq. 0)  then
-        call twdisp(rt,aux,ddisp0)
-      else
-        call dcopy(opt_fun0(25),ddisp0,4)
-      endif
+      call twdisp(rt,aux,ddisp0)
+
       ddisp0(5) = zero
       ddisp0(6) = zero
-
       call dcopy(disp0,disp,6)
       call dcopy(ddisp0,ddisp,6)
 
-      if (inval .eq. 0) then 
 !---- Horizontal motion.
-        cosmux = (rt(1,1) + rt(2,2)) / two
-        stabx = abs(cosmux) .lt. one
-        if (stabx) then
-          sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
-          if (sinmu2.lt.0) sinmu2 = eps
-          sinmux = sign(sqrt(sinmu2), rt(1,2))
-          betx = rt(1,2) / sinmux
-          alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
-          bx = rtp(1,2) / rt(1,2) +                                     &
+      cosmux = (rt(1,1) + rt(2,2)) / two
+      stabx = abs(cosmux) .lt. one
+      if (stabx) then
+        sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
+        if (sinmu2.lt.0) sinmu2 = eps
+        sinmux = sign(sqrt(sinmu2), rt(1,2))
+        betx = rt(1,2) / sinmux
+        alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
+        bx = rtp(1,2) / rt(1,2) +                                       &
      &(rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
-          ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                 &
+        ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                   &
      &alfx * rtp(1,2) / rt(1,2)
-          wx = sqrt(bx**2 + ax**2)
-          if (wx.gt.eps) phix = atan2(ax,bx)
-        endif
+        wx = sqrt(bx**2 + ax**2)
+        if (wx.gt.eps) phix = atan2(ax,bx)
+      endif
 
 !---- Vertical motion.
-        cosmuy = (rt(3,3) + rt(4,4)) / two
-        staby = abs(cosmuy) .lt. one
-        if (staby) then
-          sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
-          if (sinmu2.lt.0) sinmu2 = eps
-          sinmuy = sign(sqrt(sinmu2), rt(3,4))
-          bety = rt(3,4) / sinmuy
-          alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
-          by = rtp(3,4) / rt(3,4) +                                     &
+      cosmuy = (rt(3,3) + rt(4,4)) / two
+      staby = abs(cosmuy) .lt. one
+      if (staby) then
+        sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
+        if (sinmu2.lt.0) sinmu2 = eps
+        sinmuy = sign(sqrt(sinmu2), rt(3,4))
+        bety = rt(3,4) / sinmuy
+        alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
+        by = rtp(3,4) / rt(3,4) +                                       &
      &(rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
-          ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                 &
+        ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                   &
      &alfy * rtp(3,4) / rt(3,4)
-          wy = sqrt(by**2 + ay**2)
-          if (wy.gt.eps) phiy = atan2(ay,by)
-        endif
+        wy = sqrt(by**2 + ay**2)
+        if (wy.gt.eps) phiy = atan2(ay,by)
+      endif
 
 !---- Fill optics function array
-        opt_fun0(19)=wx
-        opt_fun0(20)=phix
-        opt_fun0(22)=wy
-        opt_fun0(23)=phiy
-        opt_fun0(25)=ddisp(1)
-        opt_fun0(26)=ddisp(2)
-        opt_fun0(27)=ddisp(3)
-        opt_fun0(28)=ddisp(4)
-      endif
+      opt_fun0(19)=wx
+      opt_fun0(20)=phix
+      opt_fun0(22)=wy
+      opt_fun0(23)=phiy
+      opt_fun0(25)=ddisp(1)
+      opt_fun0(26)=ddisp(2)
+      opt_fun0(27)=ddisp(3)
+      opt_fun0(28)=ddisp(4)
 
       end
       subroutine twchgo
