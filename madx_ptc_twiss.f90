@@ -602,12 +602,14 @@ contains
           endif
 
           tw=y
+          
+          call puttwisstable(transfermap) 
+          
           if (tracktm) then
              call putusertable(i,current%mag%name,suml,getdeltae(),transfermap,y)
           endif
 
 
-          call puttwisstable(transfermap) ! must be the last since it has tendency for augmenting all tables count
 
           iii=advance_node()
           current=>current%next
@@ -1851,6 +1853,8 @@ contains
          suml = s ! another global!!! to be updated later-on with the actual s within the magnet
          ! suml is used internally to puttwisstable to save the curvilign abciss...
 
+         call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
+
          if (getnpushes() > 0) then ! !writes user selected map coeffs to user created tables. See ptc_select 
                                       !also saves twiss parameters and used defined variables as Taylor series 
                                       !             in function of knobs. See ptc_knob
@@ -1858,7 +1862,6 @@ contains
             call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap, theAscript) 
          endif                                                                                 
 
-         call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
 
          if (associated(nodePtr,fibrePtr%t1)) then
             write(24,*) s, thinLensPos, "located at the beginning of ", fibrePtr%mag%name
