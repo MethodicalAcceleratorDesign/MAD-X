@@ -434,7 +434,6 @@ contains
     write(mf,*) ''
     write(mf,*) 'mn->Draw("ogl");'
     write(mf,*) 'TGLViewer * v = (TGLViewer *)c->GetViewer3D();'
-    write(mf,*) 'v->SetDrawStyle(TGLDrawFlags::kOutline);'
 
     write(mf,*) ''
     write(mf,*) "}"
