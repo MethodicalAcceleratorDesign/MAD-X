@@ -55,6 +55,12 @@ void loadrplotlib()
     fprintf (stderr, "%s\n", dlerror());
     return;
   }
+
+  handle = dlopen( "libMathCore.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
   
   handle = dlopen( "libNet.so",   RTLD_GLOBAL | RTLD_LAZY);
   if (!handle) {
@@ -67,6 +73,31 @@ void loadrplotlib()
     fprintf (stderr, "%s\n", dlerror());
     return;
   }
+
+  handle = dlopen( "libMatrix.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
+
+  handle = dlopen( "libHist.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
+
+  handle = dlopen( "libGraf.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
+
+  handle = dlopen( "libGpad.so",   RTLD_GLOBAL | RTLD_LAZY);
+  if (!handle) {
+    fprintf (stderr, "%s\n", dlerror());
+    return;
+  }
+
 
   handle = dlopen( "libGui.so",   RTLD_GLOBAL | RTLD_LAZY);
   if (!handle) {
