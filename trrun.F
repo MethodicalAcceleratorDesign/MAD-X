@@ -2793,7 +2793,6 @@
       
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
       
-      print *,"madX::trrun.F::trclor()"
       print *," "
 !      print *," AK special version 2007/12/13"
 !      print *," ============================="
@@ -2998,7 +2997,6 @@
       goto 110
 
 100   continue      
-      print *,"madX::trrun.F::trclor()"
       print *," Singular matrix occurred during closed orbit search."
 
 110   continue  
