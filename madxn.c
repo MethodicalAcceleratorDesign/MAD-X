@@ -2145,6 +2145,8 @@ int get_select_ex_ranges(struct sequence* sequ, struct command_list* select,
   struct node* c_node;
   struct node* nodes[2];
   if (sequ == NULL) return 0;
+  s_ranges->curr = 0;
+  s_ranges->list->curr = 0;
   for (i = 0; i < select->curr; i++)
   {
     cd = select->commands[i];

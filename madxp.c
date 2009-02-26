@@ -3212,6 +3212,7 @@ void madx_start()
   last_time = start_time;
   printf("\n  +++++++++++++++++++++++++++++++++++++++++++\n");
   printf("  +              %s              +\n", myversion);
+  printf("  +    %s     +\n", version_type);
   printf("  + %s      +\n",code_mod_date);
   printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
