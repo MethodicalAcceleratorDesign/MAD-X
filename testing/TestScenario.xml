@@ -106,6 +106,9 @@
 	<test input ="lhcsrvB1" output="lhcsrvB1.out"/>
 	<test input ="lhcsrvB2" output="lhcsrvB2.out"/>
    </target>
+   <target name="sodd" responsible="Frank.Schmidt@cern.ch">
+	<test input ="sodd.madx" output="sodd.out"/>
+   </target>
    <target name="sxf" responsible="Frank.Schmidt@cern.ch">
 	<test input ="sxfwrite.madx" output="sxfwrite.out"/>
 	<test input ="sxfread.madx" output="sxfread.out"/>
