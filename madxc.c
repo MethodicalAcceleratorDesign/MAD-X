@@ -259,8 +259,10 @@ void correct_correct2(struct in_cmd* cmd)
     printf("RMS before %e\n",rrms);
     rrms = crms(resvec,imon);
     printf("RMS after  %e\n",rrms);
+    if(fgdata != NULL) {
     for (i=0; i<nmon; i++) {
        fprintf(fgdata,"%e %e \n",monvec[i],resvec[i]);
+    }
     }
 /*
     for (i=0; i<nmon; i++) {
