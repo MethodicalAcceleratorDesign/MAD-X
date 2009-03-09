@@ -334,7 +334,7 @@ contains
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform, tracktm
     character*48            :: summary_table_name
-
+    
     skipnormalform = my_false
 
     !all zeroing
@@ -1590,6 +1590,7 @@ contains
       type(normalform) theNormalForm
       real(dp) :: dispersion(4)
       integer :: debugFiles
+      integer :: icase
 
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
 
@@ -1611,7 +1612,24 @@ contains
 
       ! 3. need the one-turn map's coefficients to reproduce twiss.F formulas for momentum compaction
 
+
       state(:)=zero
+
+      ! added 9 march 2009 to take into dependency on deltap, as done in subroutine 'ptc_twiss'
+      icase = get_value('ptc_twiss ','icase ') ! mind the trailing space
+      deltap0 = get_value('ptc_twiss ','deltap ') ! mind the trailing space
+      deltap = zero
+      call my_state(icase,deltap,deltap0)
+      if (mytime) then
+         call Convert_dp_to_dt(deltap,dt)
+      else
+         dt = deltap
+      endif
+      if (icase.eq.5) then
+         state(5) = dt
+      endif
+      ! end of added part
+
       call find_orbit(my_ring,state,1,default)
 
       ! write(6,*) 'NOW ORBIT IS ',state(:) => y, py, pt, -cT all ZERO !!! (idem in ptc_twiss)
