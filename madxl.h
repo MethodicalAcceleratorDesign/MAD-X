@@ -242,9 +242,11 @@ int twiss_table_types[] =
   2,2,2, /* gama21p, gama22p, gama23p */
   2,2,2, /* gama31p, gama32p, gama33p */
   /* end of delta_p dependency terms */
-  2, 2, 2,
-  2, 2, 2,
-  2, 2, 2,
+  2, 2, 2, 2,
+  /* derivatives of dispersion w.r.t. delta_p */
+  2, 2, 2, 2,
+  /* end of dispersion derivatives w.r.t. delta_p */
+  2, 2, 2, /* mu1, mu2, mu3 */
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -304,9 +306,11 @@ char* twiss_table_cols[] =
   "gama21p", "gama22p","gama23p",
   "gama31p", "gama32p","gama33p",
   /* end of delta_p dependency */
+  "disp1", "disp2", "disp3","disp4",
+  /* derivatives of dispersion w.r.t. delta_p */
+  "disp1p", "disp2p", "disp3p", "disp4p",
+  /* end of dispersion derivatives w.r.t. delta_p */
   "mu1", "mu2", "mu3",
-  "disp1", "disp2", "disp3",
-  "disp4", "disp5", "disp6",
   "eign11", "eign12", "eign13", "eign14", "eign15", "eign16",
   "eign21", "eign22", "eign23", "eign24", "eign25", "eign26",
   "eign31", "eign32", "eign33", "eign34", "eign35", "eign36",

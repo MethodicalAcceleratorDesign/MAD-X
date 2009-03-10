@@ -34,6 +34,7 @@ module madx_ptc_twiss_module
      real(dp), dimension(3,3) ::  beta_p,alfa_p,gama_p ! derivatives of the above w.r.t delta_p
      real(dp), dimension(3)   ::  mu
      real(dp), dimension(6)   ::  disp
+     real(dp), dimension(6)   ::  disp_p ! derivatives of the dispersion w.r.t delta_p
      real(dp), dimension(3)   ::  tune
      real(dp), dimension(6,6) ::  eigen
   end type twiss
@@ -269,9 +270,9 @@ contains
     s1%gama_p(:,:)=zero
     s1%mu(:)=zero
     s1%disp(:)=zero
+    s1%disp_p(:)=zero
     s1%tune(:)=zero
     s1%eigen(:,:)=zero
-
   end subroutine killtwiss
   !_________________________________________________________________
 
@@ -296,6 +297,7 @@ contains
        s1%gama_p(:,:)=zero
        s1%mu(:)=zero
        s1%disp(:)=zero
+       s1%disp_p(:)=zero
        s1%tune(:)=zero
        s1%eigen(:,:)=zero
        dicu(:)=zero
@@ -1016,6 +1018,7 @@ contains
       endif
       ! --- end
 
+      ! march 10th: do we need to multiply by deltae the following?
       opt_fun(mu1)=tw%mu(1) !* deltae
       opt_fun(mu2)=tw%mu(2) !* deltae
       opt_fun(mu3)=tw%mu(3) !* deltae
@@ -1023,9 +1026,18 @@ contains
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
       opt_fun(disp3)=tw%disp(3) ! was 33 instead of 59
       opt_fun(disp4)=tw%disp(4) ! was 34 instead of 60
+
+      ! 9 march 2009: add 4 items
+      
+      opt_fun(disp1p) = tw%disp_p(1)
+      opt_fun(disp2p) = tw%disp_p(2)
+      opt_fun(disp3p) = tw%disp_p(3)
+      opt_fun(disp4p) = tw%disp_p(4)
+
+      ! JLUC TODO
       ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
       ! jluc: left the following umodified, except 36->62
-      opt_fun(62)=zero ! was 36 instead of 62
+      opt_fun(62+4)=zero ! was 36 instead of 62 => on 9 march add 4
       do i1=1,c_%nd2
          if(i1.le.4) then
             i1a=i1
@@ -1042,7 +1054,7 @@ contains
             else
                i2a=5
             endif
-            ii=62+(i1a-1)*6+i2a ! was 36 instead of 62
+            ii=(62+4)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
          enddo
@@ -1063,8 +1075,8 @@ contains
       !write(28,'(a,1(f8.4,1x))') current%MAG%name,suml
       ! jluc debug - end
 
-      ioptfun=81 !72->81 to accomodate additional derivatives w.r.t. delta_p
-      ! actually 3*21 elements from beta11 to include up to disp6
+      ioptfun=81+4 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
+      ! actually 3*21+6 (???) elements from beta11 to include up to disp6p
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
 
@@ -1925,7 +1937,7 @@ contains
     real(kind(1d0)) :: get_value ! C-function
     integer :: no ! order must be at equal to 2 to be able to get terms of the form x*deltap
     ! required to evaluate the derivatives of Twiss parameters w.r.t deltap
-
+    integer :: ndel ! as in subroutine 'equaltwiss'...
 
     ! in order to avoid this message, should prevent entering this subroutine
     ! in case none of the Twiss derivatives is selected...
@@ -1984,6 +1996,65 @@ contains
 !         (y(4)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(4)%t.sub.'010000')*(y(4)%t.sub.'010010')
 !    gama22 = (y(4)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(4)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
 !         (y(4)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(4)%t.sub.'000100')*(y(4)%t.sub.'000110')
+
+! now compute deltap dependencies of the dispersion
+
+! code to be differentiated, as in subroutine 'equaltwiss'
+!    J=0
+!    !here ND2=4 and delta is present      nd2=6 and delta is a constant
+!    !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
+!    if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
+!       !when there is no cavity it gives us dispersions
+!       do i=1,4
+!          lat(0,i,1)=(Y(i)%t.sub.J5)
+!       enddo
+!    elseif (c_%nd2 == 6) then
+!       do i=1,4
+!          lat(0,i,1) =              (Y(i)%t.sub.J5)*(Y(6)%t.sub.J6)
+!          lat(0,i,1) = lat(0,i,1) + (Y(i)%t.sub.J6)*(Y(5)%t.sub.J5)
+!       enddo
+!    else
+!       do i=1,4
+!          lat(0,i,1)=zero
+!       enddo
+!    endif
+!
+!    ...
+!
+!    !when there is no cavity it gives us dispersions
+!    do i=1,c_%nd2-2*ndel
+!       s1%disp(i)=lat(0,i,1)
+!    enddo
+
+
+
+    ! differentiating the code that computes the dispersion...
+    ndel=0
+    ! as in subroutine 'equaltwiss'...
+    if (c_%ndpt/=0) then
+       ndel=1
+    endif
+    if ((c_%npara ==5) .or. (c_%ndpt /= 0)) then
+       do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
+          ! enter here for DeltaDependency example
+          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020') ! derivating a term in deltap^2 yields a term in 2*deltap
+       enddo
+    elseif (c_%nd2 ==6) then
+       do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
+          ! u'v+uv' 
+          s1%disp_p(i) = & 
+               2.0*(y(i)%t.sub.'000020')*(y(6)%t.sub.'000001')+&
+               (y(i)%t.sub.'000010')*(y(6)%t.sub.'000011')+&
+               (y(i)%t.sub.'000011')*(y(5)%t.sub.'000010')+&
+               (y(i)%t.sub.'000001')*2.0*(y(5)%t.sub.'000020')
+       enddo
+    else
+       do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
+          s1%disp_p(i) = 0
+       enddo
+    endif
+    ! write(6,*) "dispersion derivative (1) = ",s1%disp_p(1)
+    ! checked the above yields non-zero value...
 
   end subroutine computeDeltapDependency
 
