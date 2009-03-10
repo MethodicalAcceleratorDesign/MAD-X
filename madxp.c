@@ -2196,6 +2196,9 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   while (p != NULL)
   {
     if (q == nodesequ->end) break;
+    if (strcmp(p->base_name, "rfcavity") == 0 &&
+      find_element(p->p_elem->name, top_sequ->cavities) == NULL)
+    add_to_el_list(&p->p_elem, 0, top_sequ->cavities, 0);
     p->next = clone_node(q->next, 0);
     p->next->previous = p;
     p = p->next;
