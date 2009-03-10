@@ -490,6 +490,7 @@ void complete_twiss_table(struct table*);
 char* compound(char*, int);
 struct expression* compound_expr(struct expression*, double, char*,
                                  struct expression*, double);
+int count_nodes(struct sequence*);
 void control(struct in_cmd*);
 void conv_char(char*, struct int_array*);
 void conv_sixtrack(struct in_cmd*);

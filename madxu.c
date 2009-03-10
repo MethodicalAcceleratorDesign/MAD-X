@@ -416,6 +416,18 @@ void add_vars_to_table(struct table* t)
   }
 }
 
+int count_nodes(struct sequence* sequ)
+{
+  int count = 1;
+  struct node* c_node = sequ->start;
+  while(c_node != sequ->end)
+    {
+     c_node = c_node->next;
+     count++;
+    }
+  return count;
+}
+
 void set_vars_from_table(struct table* t)
   /* set variables from current table_row) */
 {

@@ -5712,6 +5712,7 @@ void seq_replace(struct in_cmd* cmd)
   struct node *node, *c_node;
   char* name;
   struct element* el;
+  int count = count_nodes(edit_sequ);;
   int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
   {
@@ -5738,9 +5739,9 @@ void seq_replace(struct in_cmd* cmd)
           return;
         }
         rep_nodes = (struct node**)
-          mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
+          mymalloc("seq_replace", count*sizeof(struct node*));
         rep_els = (struct element**)
-          mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
+          mymalloc("seq_replace", count*sizeof(struct element*));
         if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
             == 0) any = 1;
         c_node = edit_sequ->start;
@@ -5770,9 +5771,9 @@ void seq_replace(struct in_cmd* cmd)
     else
     {
       rep_nodes = (struct node**)
-        mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct node*));
+        mymalloc("seq_replace", count*sizeof(struct node*));
       rep_els = (struct element**)
-        mymalloc("seq_replace", edit_sequ->n_nodes*sizeof(struct element*));
+        mymalloc("seq_replace", count*sizeof(struct element*));
       strcpy(c_dum->c, name);
       square_to_colon(c_dum->c);
       if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
