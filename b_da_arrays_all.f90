@@ -30,7 +30,7 @@ module da_arrays
 
   integer nda_dab
   integer :: ndamaxi=0
-  real(dp),TARGET :: total_da_size = c_300
+  real(dp),TARGET :: total_da_size = c_1d30
   integer nst0,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
