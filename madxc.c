@@ -255,6 +255,10 @@ void correct_correct2(struct in_cmd* cmd)
     /* printf("Time before micado:  %-6.3f\n",fextim());  */
     ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
     printf("Back from micado %d\n",ifail);
+    if(ifail != 0) {
+       printf("MICADO correction completed with error code %d\n\n",ifail);
+       warning("MICADO back with error",", no correction done");
+    }
     rrms = crms(monvec,imon);
     printf("RMS before %e\n",rrms);
     rrms = crms(resvec,imon);
@@ -292,6 +296,7 @@ void correct_correct2(struct in_cmd* cmd)
     /* printf("Time after micado:  %-6.3f\n",fextim());   */
     if(ifail != 0) {
        printf("MICADO correction completed with error code %d\n\n",ifail);
+       warning("MICADO back with error",", no correction done");
     }
     if(ifail == 0) {
        pro_correct2_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
@@ -671,10 +676,10 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
     m->val.before[0] = da1[ 9][m->id_ttb[0]]*1000.;
     m->val.before[1] = da1[11][m->id_ttb[0]]*1000.;
     } else if (m->id_ttb[1] > 0) {
-    m->val.before[0] = da2[ 9][m->id_ttb[1]];
-    m->val.before[1] = da2[11][m->id_ttb[1]];
-    m->val.before[0] = da2[ 9][m->id_ttb[1]]*1000.;
-    m->val.before[1] = da2[11][m->id_ttb[1]]*1000.;
+    m->val.before[0] = -da2[ 9][m->id_ttb[1]];
+    m->val.before[1] = -da2[11][m->id_ttb[1]];
+    m->val.before[0] = -da2[ 9][m->id_ttb[1]]*1000.;
+    m->val.before[1] = -da2[11][m->id_ttb[1]]*1000.;
     } else {
       printf("BIG SHIT .... \n");
       exit(-10);
@@ -1034,7 +1039,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
       }
       /* Fill horizontal corrections for beam 2  */
       if(c[nc[i]].id_ttb[1] > 0) {
-         c[nc[i]].p_node_s2->chkick += c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1];
+         c[nc[i]].p_node_s2->chkick += 0.001*corvec[nx[i]-1];
          pro_correct2_fill_corr_table(1,
                                       ip,
                                       c[nc[i]].p_node->name,
@@ -1042,7 +1047,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
                                       c[nc[i]].p_node_s2->chkick);
 /*                                    c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
-           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]);
+           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,0.001*corvec[nx[i]-1]);
          }
       }
 
@@ -1062,7 +1067,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
       }
       if(c[nc[i]].id_ttb[1] > 0) {
       /* Fill vertical corrections for beam 2  */
-         c[nc[i]].p_node_s2->cvkick += c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1];
+         c[nc[i]].p_node_s2->cvkick += 0.001*corvec[nx[i]-1];
          pro_correct2_fill_corr_table(1,
                                       ip,
                                       c[nc[i]].p_node->name,
@@ -1070,7 +1075,7 @@ void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
                                       c[nc[i]].p_node_s2->cvkick);
 /*                                    c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
          if(fcdata != NULL) {
-           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]);
+           fprintf(fcdata,"[2] %s = %e;\n",c[nc[i]].p_node->name,0.001*corvec[nx[i]-1]);
          }
       }
     }
@@ -1324,6 +1329,7 @@ void correct_correct1(struct in_cmd* cmd)
 
     if(ifail != 0) {
        printf("MICADO correction completed with error code %d\n\n",ifail);
+       warning("MICADO back with error",", no correction done");
     }
 if(ifail == 0) {
     pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
