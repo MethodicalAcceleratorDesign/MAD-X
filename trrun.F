@@ -337,7 +337,7 @@
 
       subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      &last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,        &
-     &onepass)                                                          &
+     &onepass)                                                          
       implicit none
 
 !----------------------------------------------------------------------*
@@ -1378,7 +1378,7 @@
 !      logical dorad,dodamp,dorand
       integer itrack,ktrack,n_ferr,node_fd_errors,code,bvk,i,get_option
       double precision bi2gi2,bil2,curv,dpx,dpy,el,pt,px,py,rfac,rpt,   &
-     &rpx,rpy,track(6,*),xkick,ykick, !deltas,arad,betas,gammas,dtbyds, &
+     &rpx,rpy,track(6,*),xkick,ykick,                                   &
      &div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
      &node_value,zero,one,two,three,half
       double precision dpxx,dpyy

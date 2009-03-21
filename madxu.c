@@ -180,7 +180,7 @@ void add_to_el_list( /* adds element to alphabetic element list */
           if (strcmp((*el)->base_type->name, "rfcavity") == 0 &&
 	      find_element((*el)->name, sequences->sequs[j]->cavities) != NULL)
 	    sequences->sequs[j]->cavities->elem[name_list_pos((*el)->name,
-	    sequences->sequs[j]->cavities->list)] = *el;
+                                                              sequences->sequs[j]->cavities->list)] = *el;
         }
         delete_element(ell->elem[pos]);
       }
@@ -293,11 +293,11 @@ void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
   for (i = 0; i < sql->curr; i++)
   {
     if (sql->sequs[i] == 0x0)
-     {
-       /*printf("add_to_sequ_list: pos %d is NULL\n",i);*/
-       firstfreeslot = i;
-       continue;
-     }
+    {
+      /*printf("add_to_sequ_list: pos %d is NULL\n",i);*/
+      firstfreeslot = i;
+      continue;
+    }
    
     if (strcmp(sql->sequs[i]->name, sequ->name) == 0)
     {
@@ -309,16 +309,16 @@ void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
   }
   
   if (firstfreeslot >= 0)
-   {/*This protects agains problems sequence redefinition*/
-     /*printf("add_to_sequ_list: adding at found free slot\n");*/
-     sql->sequs[firstfreeslot] = sequ;
-   }
+  {/*This protects agains problems sequence redefinition*/
+    /*printf("add_to_sequ_list: adding at found free slot\n");*/
+    sql->sequs[firstfreeslot] = sequ;
+  }
   else
-   { 
-     /*printf("add_to_sequ_list: adding at new slot\n");*/
-     if (sql->curr == sql->max) grow_sequence_list(sql);
-     sql->sequs[sql->curr++] = sequ;
-   }  
+  { 
+    /*printf("add_to_sequ_list: adding at new slot\n");*/
+    if (sql->curr == sql->max) grow_sequence_list(sql);
+    sql->sequs[sql->curr++] = sequ;
+  }  
 
   add_to_name_list(sequ->name, 0, sql->list);
   
@@ -347,7 +347,7 @@ void add_to_table_list_list(struct table_list* table_list,
 {
   int j;
   for (j = 0; j < tll->curr; j++) 
-     if (tll->table_lists[j] == table_list) return;
+    if (tll->table_lists[j] == table_list) return;
   if (tll->curr == tll->max) grow_table_list_list(tll);
   tll->table_lists[tll->curr++] = table_list;
 }
@@ -406,12 +406,12 @@ void add_vars_to_table(struct table* t)
       else t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
     }
     else if (current_node)
-      {
-       if ((p = command_par_string(t->columns->names[i],
-                                     current_node->p_elem->def)) == NULL)
-       t->s_cols[i][t->curr] = tmpbuff("none");
-       else t->s_cols[i][t->curr] = tmpbuff(p);
-      }
+    {
+      if ((p = command_par_string(t->columns->names[i],
+                                  current_node->p_elem->def)) == NULL)
+        t->s_cols[i][t->curr] = tmpbuff("none");
+      else t->s_cols[i][t->curr] = tmpbuff(p);
+    }
     else t->s_cols[i][t->curr] = get_varstring(t->columns->names[i]);
   }
 }
@@ -421,10 +421,10 @@ int count_nodes(struct sequence* sequ)
   int count = 1;
   struct node* c_node = sequ->start;
   while(c_node != sequ->end)
-    {
-     c_node = c_node->next;
-     count++;
-    }
+  {
+    c_node = c_node->next;
+    count++;
+  }
   return count;
 }
 
@@ -1391,12 +1391,12 @@ void dump_node(struct node* node)
 {
   int i;
   char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL", 
-       from_name[NAME_L] = "NULL";
+    from_name[NAME_L] = "NULL";
   if (node->previous != NULL) strcpy(pname, node->previous->name);
   if (node->next != NULL) strcpy(nname, node->next->name);
   if (node->from_name != NULL) strcpy(from_name, node->from_name);
   fprintf(prt_file, 
-  v_format("name: %S  occ: %I base: %S  from_name: %S at_value: %F  position: %F\n"),
+          v_format("name: %S  occ: %I base: %S  from_name: %S at_value: %F  position: %F\n"),
           node->name, node->occ_cnt, node->base_name, from_name, 
           node->at_value, node->position);
   fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
@@ -1439,16 +1439,16 @@ void exec_delete_sequ(char* name)
   int spos;
   if ((spos = name_list_pos(name, sequences->list)) >= 0)
   {
-   current_sequ = sequences->sequs[spos];
-   if (current_sequ->ex_start != NULL) /* delete expanded */
-   {
-    current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
-    current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
-    current_sequ->orbits = delete_vector_list(current_sequ->orbits);
-   }
-   sequences->sequs[spos] = delete_sequence(current_sequ);
-   remove_from_sequ_list(current_sequ, sequences);
-   current_sequ = keep;  
+    current_sequ = sequences->sequs[spos];
+    if (current_sequ->ex_start != NULL) /* delete expanded */
+    {
+      current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
+      current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
+      current_sequ->orbits = delete_vector_list(current_sequ->orbits);
+    }
+    sequences->sequs[spos] = delete_sequence(current_sequ);
+    remove_from_sequ_list(current_sequ, sequences);
+    current_sequ = keep;  
   }
   else warning("sequence to be deleted does not exist:", name);
 }
@@ -1459,14 +1459,14 @@ void exec_delete_table(char* name)
   int j, k, pos;
   for (j = 0; j < all_table_lists->curr; j++)
   {
-   tl = all_table_lists->table_lists[j];
-   if ((pos = name_list_pos(name, tl->names)) >= 0)
-   {
-    tl->tables[pos] = delete_table(tl->tables[pos]);
-    k = remove_from_name_list(name, tl->names);
-    tl->tables[k] = tl->tables[--tl->curr];
-    return;
-   }
+    tl = all_table_lists->table_lists[j];
+    if ((pos = name_list_pos(name, tl->names)) >= 0)
+    {
+      tl->tables[pos] = delete_table(tl->tables[pos]);
+      k = remove_from_name_list(name, tl->names);
+      tl->tables[k] = tl->tables[--tl->curr];
+      return;
+    }
   }
 }
 
@@ -2316,7 +2316,7 @@ void grow_table_list_list(struct table_list_list* tll)
 
   tll->max = new;
   tll->table_lists = (struct table_list**) 
-      mycalloc(rout_name,new, sizeof(struct table_list*));
+    mycalloc(rout_name,new, sizeof(struct table_list*));
   for (j = 0; j < tll->curr; j++) tll->table_lists[j] = t_loc[j];
   myfree(rout_name, t_loc);
 }
@@ -2452,14 +2452,14 @@ void* mycalloc(char* caller, size_t nelem, size_t size)
   int* i_p;
   size_t l_size = nelem*size + sizeof(double);
   if ((p = calloc(1, l_size)) == NULL)
-   {
+  {
 #ifdef _DONOTCATCHOVERFLOW
-      warning("mycalloc: memory overflow, called from routine:", caller);
-      warning("mycalloc: Program will crash now","");
+    warning("mycalloc: memory overflow, called from routine:", caller);
+    warning("mycalloc: Program will crash now","");
 #else
-      fatal_error("memory overflow, called from routine:", caller);
+    fatal_error("memory overflow, called from routine:", caller);
 #endif      
-   } 
+  } 
   mtable[-item_no]=p;
   i_p = (int*) p;
   *i_p++ = item_no;
@@ -2481,14 +2481,14 @@ void* mycalloc(char* caller, size_t nelem, size_t size)
   int* i_p;
   size_t l_size = nelem*size + sizeof(double);
   if ((p = calloc(1, l_size)) == NULL)
-   {
+  {
 #ifdef _DONOTCATCHOVERFLOW
-      warning("mycalloc: memory overflow, called from routine:", caller);
-      warning("mycalloc: Program will crash now","");
+    warning("mycalloc: memory overflow, called from routine:", caller);
+    warning("mycalloc: Program will crash now","");
 #else
-      fatal_error("memory overflow, called from routine:", caller);
+    fatal_error("memory overflow, called from routine:", caller);
 #endif      
-   } 
+  } 
   i_p = (int*) p; *i_p = FREECODE;
   return ((char*)p+sizeof(double));
 }
@@ -2566,14 +2566,14 @@ void* mymalloc(char* caller, size_t size)
   int* i_p;
   size_t l_size = size + sizeof(double);
   if ((p = malloc(l_size)) == NULL)
-   {
+  {
 #ifdef _DONOTCATCHOVERFLOW
-      warning("mymalloc: memory overflow, called from routine:", caller);
-      warning("mymalloc:","Program will crash now");
+    warning("mymalloc: memory overflow, called from routine:", caller);
+    warning("mymalloc:","Program will crash now");
 #else
-      fatal_error("memory overflow, called from routine:", caller);
+    fatal_error("memory overflow, called from routine:", caller);
 #endif      
-   } 
+  } 
   i_p = (int*) p;
   mtable[-item_no]=i_p;
   *i_p++ = item_no;
@@ -2596,14 +2596,14 @@ void* mymalloc(char* caller, size_t size)
   size_t l_size = size + sizeof(double)+2;
 /*  printf("xxxx %d xxxx\n",l_size);*/
   if ((p = malloc(l_size)) == NULL)
-   {
+  {
 #ifdef _DONOTCATCHOVERFLOW
-      warning("mymalloc: memory overflow, called from routine:", caller);
-      warning("mymalloc:","Program will crash now");
+    warning("mymalloc: memory overflow, called from routine:", caller);
+    warning("mymalloc:","Program will crash now");
 #else
-      fatal_error("memory overflow, called from routine:", caller);
+    fatal_error("memory overflow, called from routine:", caller);
 #endif      
-   } 
+  } 
   i_p = (int*) p; *i_p = FREECODE;
   return (void *)((char*)p+sizeof(double));
 }
@@ -2806,9 +2806,9 @@ struct command_list_list* delete_command_list_list( struct command_list_list* ll
   if (ll == 0x0) return 0x0;
   
   for (i = 0; i < ll->curr; i++)
-   {
-     delete_command_list(ll->command_lists[i]);
-   }
+  {
+    delete_command_list(ll->command_lists[i]);
+  }
 
   myfree(rout_name, ll->command_lists );
   
@@ -2931,15 +2931,15 @@ double expr_combine(struct expression* exp1, double val1, char* oper,
 
   if (exp1 == NULL && exp2 == NULL)
   {
-   *exp_comb = NULL;
-   switch(oper[1])
-   {
-    case '+':
+    *exp_comb = NULL;
+    switch(oper[1])
+    {
+      case '+':
 	val = val1 + val2;
         break;
-    case '-':
+      case '-':
         val = val1 - val2;
-   }
+    }
   }
   else if(exp1 == NULL) val = combine_val_expr(val1, oper, exp2, exp_comb);
   else if(exp2 == NULL) val = combine_expr_val(exp1, oper, val2, exp_comb);
@@ -3226,7 +3226,7 @@ struct table_list_list* new_table_list_list(int size)
   char rout_name[] = "new_table_list_list";
   struct table_list_list* tll
     = (struct table_list_list*) 
-        mycalloc(rout_name,1, sizeof(struct table_list_list));
+    mycalloc(rout_name,1, sizeof(struct table_list_list));
   strcpy(tll->name, "table_list_list");
   tll->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tll->name);
@@ -3234,7 +3234,7 @@ struct table_list_list* new_table_list_list(int size)
   tll->curr = 0;
   tll->table_lists
     = (struct table_list**) 
-      mycalloc(rout_name,size, sizeof(struct table_list*));
+    mycalloc(rout_name,size, sizeof(struct table_list*));
   return tll;
 }
 
@@ -3626,9 +3626,9 @@ double sequence_length(struct sequence* sequ)
   double val = 0;
   if (sequ)
   {
-   if (sequ->l_expr)  
-   val = sequ->length = expression_value(sequ->l_expr,2);
-   else val = sequ->length;
+    if (sequ->l_expr)  
+      val = sequ->length = expression_value(sequ->l_expr,2);
+    else val = sequ->length;
   }
   return val;
 }
@@ -3679,9 +3679,9 @@ void stolower_nq(char* s)
       toggle = 1; quote = *c;
     }
     else 
-     {
-       *c = (char) tolower((int) *c);
-     }  
+    {
+      *c = (char) tolower((int) *c);
+    }  
     c++;
   }
 }
@@ -4084,12 +4084,12 @@ void write_table(struct table* t, char* filename)
             {
               pc[0] = c_dum->c[0] = '\"';
               if (t->s_cols[col->i[i]][j] != NULL)
-		{
-                 strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
-                 stoupper(c_dum->c);
-                 pc = strip(c_dum->c); /* remove :<occ_count> */
-                 k = strlen(pc);
-		}
+              {
+                strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+                stoupper(c_dum->c);
+                pc = strip(c_dum->c); /* remove :<occ_count> */
+                k = strlen(pc);
+              }
               else k = 1;
               pc[k++] = '\"'; pc[k] = '\0';
               fprintf(out_file, v_format(" %S "), pc);

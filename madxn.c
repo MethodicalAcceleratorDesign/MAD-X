@@ -466,7 +466,7 @@ void complete_twiss_table(struct table* t)
         tmp[n] = '\0'; /* suppress trailing i in ksi */
       val = el_par_value(tmp, c_node->p_elem);
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
-          val *= c_node->dipole_bv;
+        val *= c_node->dipole_bv;
       else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 ||
                strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
                strcmp(tmp, "volt") == 0 )
@@ -557,10 +557,10 @@ void string_to_table_row(char* table, char* name, int* row, char* string)
   mycpy(c_dum->c, name);
   if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
       && t->columns->inform[pos] == 3)
-    {
-     mycpy(c_dum->c, string);
-     t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
-    }
+  {
+    mycpy(c_dum->c, string);
+    t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
+  }
 }
 
 int double_from_table(char* table, char* name, int* row, double* val)
@@ -750,15 +750,15 @@ void exec_create_table(struct in_cmd* cmd)
   for (j = 0; j < m->curr; j++)
   {
     if (*m->p[j] == '_')
-      {
-       t_types[j] = 3; /* type string */
-       t_c[j] = permbuff(&m->p[j][1]);
-      }
+    {
+      t_types[j] = 3; /* type string */
+      t_c[j] = permbuff(&m->p[j][1]);
+    }
     else
-      {
-       t_types[j] = 2; /* type double */
-       t_c[j] = permbuff(m->p[j]);
-      }
+    {
+      t_types[j] = 2; /* type double */
+      t_c[j] = permbuff(m->p[j]);
+    }
   }
   t_c[ncols] = blank;
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
@@ -1363,12 +1363,12 @@ void make_map_table(int* map_table_max_rows)
 {
   int k, pos;
   if ((pos = name_list_pos("map_table", table_register->names)) > -1)
-    {
-     delete_table(table_register->tables[pos]);
-     k = remove_from_name_list(table_register->tables[pos]->name,
-                           table_register->names);
-     table_register->tables[k] = table_register->tables[--table_register->curr];
-    }
+  {
+    delete_table(table_register->tables[pos]);
+    k = remove_from_name_list(table_register->tables[pos]->name,
+                              table_register->names);
+    table_register->tables[k] = table_register->tables[--table_register->curr];
+  }
   /* initialise table */
   map_table = make_table("map_table", "map_tab", map_tab_cols,
                          map_tab_types, *map_table_max_rows);
@@ -1636,9 +1636,9 @@ void expand_line(struct char_p_array* l_buff)
       rep = -1;
       sscanf(l_buff->p[pos-1], "%d", &rep);
       if (rep < 0)
-       {
-         fatal_error("expand_line","Problem with reading number of copies");
-       }
+      {
+        fatal_error("expand_line","Problem with reading number of copies");
+      }
       n = add = rep - 1;
       while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
       for (j = l_buff->curr; j > pos + 1; j--) /* shift upwards */
@@ -1723,7 +1723,7 @@ void expand_curr_sequ(int flag)
   struct node* c_node;
   int j;
   current_sequ->end->at_value = current_sequ->end->position
-       = sequence_length(current_sequ);
+    = sequence_length(current_sequ);
   if (current_sequ->ex_start != NULL)
   {
     current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
@@ -2604,7 +2604,7 @@ void insert_elem(struct sequence* sequ, struct node* node)
 }
 
 struct node* install_one(struct element* el, char* from_name, double at_value,
-                 struct expression* at_expr, double position)
+                         struct expression* at_expr, double position)
   /* adds an element to a sequence */
 {
   struct node* node;
@@ -3808,7 +3808,7 @@ void pro_ptc_twiss()
   /* --- */
   if (w_file_summary) out_table(summary_table_name, ptc_twiss_summary_table,
                                 summary_filename);
-   /* --- */
+  /* --- */
 
   /* cleanup */
   current_beam = keep_beam;
@@ -3852,7 +3852,7 @@ void pro_ptc_create_layout()
   if ((pos = name_list_pos("errors_field", table_register->names)) <= -1)
   {
     errors_field = make_table("errors_field", "efield", efield_table_cols,
-                               efield_table_types, 10000);
+                              efield_table_types, 10000);
     add_to_table_list(errors_field, table_register);
   }
   else
@@ -3863,7 +3863,7 @@ void pro_ptc_create_layout()
   if ((pos = name_list_pos("errors_total", table_register->names)) <= -1)
   {
     errors_total = make_table("errors_total", "efield", efield_table_cols,
-                               efield_table_types, 10000);
+                              efield_table_types, 10000);
     add_to_table_list(errors_total, table_register);
   }
   else
@@ -4116,23 +4116,23 @@ void pro_twiss()
   for (i = 0; i < twiss_deltas->curr; i++)
   {
     if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
-      {
-       twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                             twiss_table_types, current_sequ->n_nodes);
-       twiss_table->dynamic = 1; /* flag for table row access to current row */
-       add_to_table_list(twiss_table, table_register);
-       current_sequ->tw_table = twiss_table;
-       twiss_table->org_sequ = current_sequ;
-       adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
-       adjust_rfc(); /* sets freq in rf-cavities from probe */
-       current_node = current_sequ->ex_start;
-       /* invoke twiss */
-       twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
-       pos = name_list_pos("q1", summ_table->columns);
-       q1_val_p = summ_table->d_cols[pos][i];
-       pos = name_list_pos("q2", summ_table->columns);
-       q2_val_p = summ_table->d_cols[pos][i];
-      }
+    {
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+                               twiss_table_types, current_sequ->n_nodes);
+      twiss_table->dynamic = 1; /* flag for table row access to current row */
+      add_to_table_list(twiss_table, table_register);
+      current_sequ->tw_table = twiss_table;
+      twiss_table->org_sequ = current_sequ;
+      adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
+      adjust_rfc(); /* sets freq in rf-cavities from probe */
+      current_node = current_sequ->ex_start;
+      /* invoke twiss */
+      twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+      pos = name_list_pos("q1", summ_table->columns);
+      q1_val_p = summ_table->d_cols[pos][i];
+      pos = name_list_pos("q2", summ_table->columns);
+      q2_val_p = summ_table->d_cols[pos][i];
+    }
     twiss_table = make_table(table_name, "twiss", twiss_table_cols,
                              twiss_table_types, current_sequ->n_nodes);
     twiss_table->dynamic = 1; /* flag for table row access to current row */
@@ -4147,18 +4147,18 @@ void pro_twiss()
     augment_count_("summ ");
     if ((twiss_success = get_option("twiss_success")))
     {
-     if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
+      if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
       {
-       pos = name_list_pos("q1", summ_table->columns);
-       q1_val = summ_table->d_cols[pos][i];
-       pos = name_list_pos("q2", summ_table->columns);
-       q2_val = summ_table->d_cols[pos][i];
-       dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
-       dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
-       pos = name_list_pos("dq1", summ_table->columns);
-       summ_table->d_cols[pos][i] = dq1;
-       pos = name_list_pos("dq2", summ_table->columns);
-       summ_table->d_cols[pos][i] = dq2;
+        pos = name_list_pos("q1", summ_table->columns);
+        q1_val = summ_table->d_cols[pos][i];
+        pos = name_list_pos("q2", summ_table->columns);
+        q2_val = summ_table->d_cols[pos][i];
+        dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
+        dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
+        pos = name_list_pos("dq1", summ_table->columns);
+        summ_table->d_cols[pos][i] = dq1;
+        pos = name_list_pos("dq2", summ_table->columns);
+        summ_table->d_cols[pos][i] = dq2;
       }
       if (get_option("keeporbit"))  copy_double(orbit0,
                                                 current_sequ->orbits->vectors[k_orb]->a, 6);
@@ -5256,7 +5256,7 @@ double rfc_slope()
 }
 
 void sector_out(char* sector_table_name, double* pos, double* kick,
-                     double* rmatrix, double* tmatrix)
+                double* rmatrix, double* tmatrix)
 {
   int i;
   int j;
@@ -5534,39 +5534,39 @@ void seq_move(struct in_cmd* cmd)
         node = edit_sequ->start;
         while (node != edit_sequ->end)
         {
-         node = node->next; node->moved = 0;
+          node = node->next; node->moved = 0;
         }
-         node = edit_sequ->start;
+        node = edit_sequ->start;
         while (node != NULL && node != edit_sequ->end)
         {
-         next = node->next;
-         if (node->moved == 0)
-         {
-          if (any
-              || name_list_pos(node->name, selected_ranges->list) > -1)
+          next = node->next;
+          if (node->moved == 0)
           {
-            name = NULL;
-            for (k = 0; k < seqedit_select->curr; k++)
+            if (any
+                || name_list_pos(node->name, selected_ranges->list) > -1)
             {
-              if (node->p_elem != NULL) name = node->p_elem->name;
-              if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
-                              seqedit_select->commands[k])) break;
-            }
-            if (k < seqedit_select->curr)
-            {
-              at = node->position + by;
-              el = node->p_elem;
-              if (remove_one(node) > 0)
+              name = NULL;
+              for (k = 0; k < seqedit_select->curr; k++)
               {
-                node = install_one(el, NULL, at, NULL, at);
-                node->moved = 1;
-                seqedit_move++;
+                if (node->p_elem != NULL) name = node->p_elem->name;
+                if (name != NULL && strchr(name, '$') == NULL &&
+                    pass_select(name,
+                                seqedit_select->commands[k])) break;
+              }
+              if (k < seqedit_select->curr)
+              {
+                at = node->position + by;
+                el = node->p_elem;
+                if (remove_one(node) > 0)
+                {
+                  node = install_one(el, NULL, at, NULL, at);
+                  node->moved = 1;
+                  seqedit_move++;
+                }
               }
             }
           }
-         }
-         node = next;
+          node = next;
         }
       }
     }
@@ -5712,7 +5712,7 @@ void seq_replace(struct in_cmd* cmd)
   struct node *node, *c_node;
   char* name;
   struct element* el;
-  int count = count_nodes(edit_sequ);;
+  int count = count_nodes(edit_sequ);
   int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
   {
@@ -7205,9 +7205,9 @@ void pro_ptc_export_xml(struct in_cmd* cmd)
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
   {
-        /* should never enter here */
-        printf("madxn.c: pro_ptc_export_xml: file parameter does not exist.\n");
-        return;
+    /* should never enter here */
+    printf("madxn.c: pro_ptc_export_xml: file parameter does not exist.\n");
+    return;
   }
 
   filename  = c_parameters->parameters[pos]->string;
@@ -7223,7 +7223,7 @@ void pro_ptc_export_xml(struct in_cmd* cmd)
 
   conv_char(filename,filenameIA);
 
-    w_ptc_export_xml(filenameIA->i);
+  w_ptc_export_xml(filenameIA->i);
 
   delete_int_array(filenameIA);
 

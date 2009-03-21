@@ -2039,7 +2039,7 @@ void exec_extract(struct in_cmd* cmd)
   if (strchr(pl->parameters[i]->string, '$'))
   {
     warning("extract: use of internal markers forbidden:", 
-             pl->parameters[i]->string);
+            pl->parameters[i]->string);
     warning("sequence extraction aborted"," ");
     return;
   }
@@ -2197,8 +2197,8 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   {
     if (q == nodesequ->end) break;
     if (strcmp(p->base_name, "rfcavity") == 0 &&
-      find_element(p->p_elem->name, top_sequ->cavities) == NULL)
-    add_to_el_list(&p->p_elem, 0, top_sequ->cavities, 0);
+        find_element(p->p_elem->name, top_sequ->cavities) == NULL)
+      add_to_el_list(&p->p_elem, 0, top_sequ->cavities, 0);
     p->next = clone_node(q->next, 0);
     p->next->previous = p;
     p = p->next;
@@ -2838,14 +2838,14 @@ double get_beam_value(char* name, char* par)
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
   if (strcmp(c_dum->c, "current") == 0 && current_beam != NULL)
-      return get_value("beam", par);
+    return get_value("beam", par);
   else if (strcmp(c_dum->c, "default") == 0)
   {
-   cmd = find_command("default_beam", beam_list);
-   return command_par_value(aux_buff->c, cmd);
+    cmd = find_command("default_beam", beam_list);
+    return command_par_value(aux_buff->c, cmd);
   }
   else if ((cmd = find_command(c_dum->c, beam_list)) != NULL)
-   return command_par_value(aux_buff->c, cmd);
+    return command_par_value(aux_buff->c, cmd);
   else return INVALID;
 }
 
@@ -4910,8 +4910,8 @@ double table_value()
         }
         else if(ntok == 2)
 	{
-	 strncpy(temp, toks[1], NAME_L);
-         if (strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
+          strncpy(temp, toks[1], NAME_L);
+          if (strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
 	}
       }
     }
@@ -5007,14 +5007,14 @@ void update_beam(struct command* comm)
   }
   else if (nlc->inform[name_list_pos("mass", nlc)])
   {
-   mass = command_par_value("mass", comm);
-   pl->parameters[pos]->string = name = permbuff("default");
-   pos = name_list_pos("charge", nlc);
-   if (nlc->inform[pos]) charge = command_par_value("charge", comm);
-   else
+    mass = command_par_value("mass", comm);
+    pl->parameters[pos]->string = name = permbuff("default");
+    pos = name_list_pos("charge", nlc);
+    if (nlc->inform[pos]) charge = command_par_value("charge", comm);
+    else
     {
-     warning("charge +1 given to user particle:", name);
-     charge = 1;
+      warning("charge +1 given to user particle:", name);
+      charge = 1;
     }
   }
   else name = pl->parameters[pos]->string;
@@ -5122,8 +5122,8 @@ void update_beam(struct command* comm)
       npart = bcurrent / (beta * freq0 * ten_p_6 * get_variable("qelect"));
     else if (nlc->inform[name_list_pos("npart", nlc)])
     {
-     npart = command_par_value("npart", comm);
-     bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect");
+      npart = command_par_value("npart", comm);
+      bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect");
     }
   }
   else if (nlc->inform[name_list_pos("npart", nlc)])

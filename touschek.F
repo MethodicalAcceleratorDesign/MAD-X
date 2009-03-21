@@ -55,18 +55,18 @@
         harmonl = 1.E+06*rff*circ/clight
 
         pc = get_value('probe ','pc ')
-c        print *, ' pc ', pc
+!        print *, ' pc ', pc
         omega = rff * ten6p * twopi / clight
         vrf   = rfv * ten3m / (pc * (one + deltap))
 
         flag = double_from_table('twiss ','t ',1,orbit5)
         phirf = rfl * twopi - omega * orbit5
-        c0 =   vrf*charge 
+        c0 =   vrf*charge
         if (cos(phirf).lt.0) vrf=-vrf
         eta = alfa - one / gammas**2
         if (uloss.ne.zero) then
           qover = qover+rfv/uloss*charge
-          vrfsum = vrfsum+rfv/harmonl*charge 
+          vrfsum = vrfsum+rfv/harmonl*charge
           harmonlm=min(harmonl,harmonlm)
         else
           umt = umt+2d0/(harmonl*eta*pi)*c0
@@ -362,9 +362,12 @@ c        print *, ' pc ', pc
 
 ! *********************************************************************
 !
-! $Id: touschek.F,v 1.7 2008-03-07 10:09:53 frankz Exp $
+! $Id: touschek.F,v 1.8 2009-03-21 00:03:43 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.7  2008/03/07 10:09:53  frankz
+! add ion charge in rf bucket height calculation of Touschek module
+!
 ! Revision 1.6  2005/08/24 13:42:19  frs
 ! simple clean-up
 !
@@ -472,9 +475,12 @@ c        print *, ' pc ', pc
 
 !********************************************************************
 !
-! $Id: touschek.F,v 1.7 2008-03-07 10:09:53 frankz Exp $
+! $Id: touschek.F,v 1.8 2009-03-21 00:03:43 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.7  2008/03/07 10:09:53  frankz
+! add ion charge in rf bucket height calculation of Touschek module
+!
 ! Revision 1.6  2005/08/24 13:42:19  frs
 ! simple clean-up
 !
