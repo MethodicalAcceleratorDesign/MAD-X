@@ -235,8 +235,8 @@
                 do  jj = j+1,ic
                 if(abs(vmat(j,i)).gt.1.0E-4) then
                    rat = abs(vmat(j,i)) + abs(vmat(jj,i))
-C                  rat = abs(vmat(j,i) - vmat(jj,i))
-C                  rat = abs(vmat(j,i) + vmat(jj,i))
+!                  rat = abs(vmat(j,i) - vmat(jj,i))
+!                  rat = abs(vmat(j,i) + vmat(jj,i))
                    rat = rat/abs(abs(vmat(j,i)) - abs(vmat(jj,i)))
                    if(rat.gt.sngcut) then
                       IF(DBG.EQ.1) THEN
@@ -360,7 +360,7 @@ C                  rat = abs(vmat(j,i) + vmat(jj,i))
              do  j = 1,ic-1
                 do  jj = j+1,ic
                 if(abs(umat(j,i)).gt.1.0E-4) then
-C                  rat = abs(umat(j,i) - umat(jj,i))
+!                  rat = abs(umat(j,i) - umat(jj,i))
                    rat = abs(umat(j,i)) +  abs(umat(jj,i))
                    rat = rat/abs(abs(umat(j,i)) - abs(umat(jj,i)))
                    if(dbg.eq.1) then

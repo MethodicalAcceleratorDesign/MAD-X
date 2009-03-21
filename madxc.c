@@ -635,8 +635,6 @@ int pro_correct2_getorbit(struct in_cmd* cmd)
   double **da2;
   double xlimit;
 
-  double beam_bv;
-
   char   strx[40];
   char   stry[40];
 
