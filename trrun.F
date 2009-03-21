@@ -192,7 +192,8 @@
             print*,"MAKETHIN will save you"
             print*," "
             print*," "
-!           Better to use stop. If use return, irrelevant tracking output is printed
+!           Better to use stop. If use return, irrelevant tracking output 
+!           is printed
             stop
 !            call aafail('TRRUN',                                          &
 !     &      '----element with length found : CONVERT STRUCTURE WITH '//   &

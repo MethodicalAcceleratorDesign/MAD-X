@@ -194,9 +194,9 @@
       else if(code.eq.8) then
         call get_node_vector('knl ',nn,normal)
         if (nn .ne. 0) then
-           ang = normal(0)
+          ang = normal(0)
         else
-           ang = 0d0
+          ang = 0d0
         endif
       else
         ang = 0d0
