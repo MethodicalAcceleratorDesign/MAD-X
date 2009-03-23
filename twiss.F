@@ -119,13 +119,13 @@
           call twcpin(rt,disp0,r0mat,eflag)
           if(eflag.ne.0) go to 900
         endif
-        if (sectormap)  then
-          call dcopy(orbit0, sorb, 6)
-          call m66one(srmat)
-          call dzero(stmat, 216)
-        endif
 !---- Initialize opt_fun0
         call twinifun(opt_fun0,rt)
+      endif
+      if (sectormap)  then
+        call dcopy(orbit0, sorb, 6)
+        call m66one(srmat)
+        call dzero(stmat, 216)
       endif
 
 !---- Build table of lattice functions, coupled.
