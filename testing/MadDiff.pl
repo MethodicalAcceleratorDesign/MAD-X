@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+!/usr/bin/perl
 
 # performs a diff of two files and displays the output in HTML
 
@@ -83,7 +83,7 @@ foreach $line (@lines) {
 			     '^[\s\t]*\+[\s\t]+Code Modification Date:[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
 			     '^[\s\t]*\+[\s\t]+Execution Time Stamp:[\s\t]+\d+\.\d+\.\d+[\s\t]+\d+\.\d+\.\d+[\s\t]+\+[\s\t]*$',
 			     '^[\s\t]*\+[\s\t]+MAD-X[\s\t]+\d+\.\d+\.\d+[\s\t]+finished normally[\s\t]+\+[\s\t]*$',
-			     '^\+[\s\t]*\w+ Version[\w:!\s]*\+[\s\t]*$',
+			     '^\+[\s\t]*\w+ Version[\-\w:!\s]*\+[\s\t]*$',
 			     # patterns showing-up in postcript output
 			     '%%CreationDate:[\s\t]*\d\d\/\d\d\/\d\d',
 			     '\(MAD-X[\s\t]+\d+\.\d+.\d+[\s\t]+\d\d\/\d\d\/\d\d[\s\t]+\d\d\.\d\d\.\d\d\)',
