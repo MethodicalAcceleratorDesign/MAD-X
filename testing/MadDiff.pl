@@ -1,4 +1,4 @@
-!/usr/bin/perl
+#!/usr/bin/perl
 
 # performs a diff of two files and displays the output in HTML
 
