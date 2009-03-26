@@ -62,7 +62,7 @@ while (<$receiving>){
 	if ($os eq 'windows'){
 	    my $dir = getcwd; # get current working directory
 	    print "we are now in $dir\n";
-	    chdir("Z:\\MAD-X-WINDOWS\\madX");
+	    chdir("Y:\\MAD-X-WINDOWS\\madX"); # changed Z to Y
             $dir = getcwd;
 	    print "we are now in $dir\n";
 	    # first make sure we are in sync with the CVS repository
