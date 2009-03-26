@@ -18,7 +18,8 @@ use MIME::Lite; # to send e-mail
 
 use File::Path; # to remove directory trees
 
-$debug = 'no';
+$debug = 'no'; # this one is default and is required in automatic mode
+#$debug = 'yes'; # this one for manual tests to avoid sending e-mails to the community, and avoid tagging the CVS
 
 @extractedPackages = ('madX');
 
@@ -70,7 +71,7 @@ my $lastProd = @sortedProds[0];
 
 # decide whether a new release took place
 
-if ($lastProd eq $lastRelease) {
+if (($lastProd eq $lastRelease) && ($debug ne 'yes')) {
     # there's no need to release to production.
     chdir($rootDir);
     rmtree($extractDir);
@@ -82,7 +83,9 @@ if ($lastProd eq $lastRelease) {
     my $newProdTag = "prod-" . $newProd;
     # tag the CVS repository
     # ...
-    `cvs tag $newProdTag $representative`;
+    if ($debug ne "yes"){
+	`cvs tag $newProdTag $representative`;
+    }
     
     # generate HTML page for the work report between the two production releases
     my $beforeLastTag = "madX-$beforeLastRelease"."_prod";
@@ -110,16 +113,16 @@ if ($lastProd eq $lastRelease) {
     $workReport .= "http://test-mad-automation.web.cern.ch/test-mad-automation/workReport.html\n";
     
     # ... and send a summary to the list of watchers by e-mail
-    
-    $msg = MIME::Lite->new(
-			   From       => 'Jean-Luc.Nougaret@cern.ch',
-			   'Reply-To' => 'mad-automation-admin@cern.ch',
-			   To         => 'hep-project-madx@cern.ch',
-			   Subject    => "MAD $lastRelease has been released.",
-			   Data       => $workReport
-			   );
-    $msg->send;
-
+    if ($debug ne 'yes'){
+	$msg = MIME::Lite->new(
+			       From       => 'Jean-Luc.Nougaret@cern.ch',
+			       'Reply-To' => 'mad-automation-admin@cern.ch',
+			       To         => 'hep-project-madx@cern.ch',
+			       Subject    => "MAD $lastRelease released.",
+			       Data       => $workReport
+			       );
+	$msg->send;
+    }
     #
     # now trigger Windows compilation (note: this one runs as acrontab process with access to both AFS and NFS)
     #
@@ -139,7 +142,8 @@ if ($lastProd eq $lastRelease) {
     $madWindowsCompilationDir = $madForWindowsSambaFolder; # global used by other routines
     $madWindowsDeliveryDir = "/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries"; # global
     # also used by other routines
-    @windowsTargets = ('madx.exe','madxp.exe','mpars.exe'); # Windows/DOS deliverables
+    # @windowsTargets = ('madx.exe','madxp.exe','mpars.exe'); # Windows/DOS deliverables
+    @windowsTargets = ('madx.exe'); # Windows/DOS deliverables
     # above is global as used by other routines as well
 
     notify("MadWindowsCompileClient.pl will now forward the compilation request to the Windows host machine.");
@@ -181,7 +185,7 @@ if ($lastProd eq $lastRelease) {
     print "$thisLinuxHost accepts messages sent through socket $socketPortLinux\n";
     my $newClientSock = $clientSock->accept();
 	    
-    while (<$newClientSock>){
+    INFINITE_LOOP: while (<$newClientSock>){
 	print $_;
 	if (/Compilation completed/){
 	    $endTime = localtime;
@@ -200,14 +204,16 @@ if ($lastProd eq $lastRelease) {
     chdir($rootDir); # back to the top menu
     rmtree($extractDir);
     notify("MadTrigRelease.pl completed (RELEASED).");
-    $msg = MIME::Lite->new(
-			   From       => 'Jean-Luc.Nougaret@cern.ch',
-			   'Reply-To' => 'mad-automation-admin@cern.ch',
-			   To         => 'mad-windows-watchers@cern.ch',
-			   Subject    => "MAD-X for Windows updated",
-			   Data       => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards\nJean-Luc"
-			   );
-    $msg->send;
+    if ($debug ne 'yes'){
+	$msg = MIME::Lite->new(
+			       From       => 'Jean-Luc.Nougaret@cern.ch',
+			       'Reply-To' => 'mad-automation-admin@cern.ch',
+			       To         => 'mad-windows-watchers@cern.ch',
+			       Subject    => "MAD-X for Windows updated",
+			       Data       => "Dear colleagues,\n\nPlease take note that MAD-X version $madVersion is now available on Windows.\n\nThe new releases are available for download on the new Web page:\nhttps://test-mad-automation.web.cern.ch/test-mad-automation/windows-binaries/executables.htm\n\nRegards\nJean-Luc"
+			       );
+	$msg->send;
+    }
     
     exit 0; 
 }
@@ -433,12 +439,13 @@ sub deliverHtmlPage {
     my $contents =''; # blank at first
 
     # grep size of the binaries located in the AFS web folder
-    my @binaries = `ls -l $executablesAfsWebFolder/*.exe`;
+    # my @binaries = `ls -l $executablesAfsWebFolder/*.exe`;
+    my @binaries = `ls -l $executablesAfsWebFolder/madx.exe`; # from March 26th 2009, only one executable
 
 #    my $nBinaries = scalar(@binaries);
 #    notify("in '$executablesAfsWebFolder', 'found $nBinaries'");
 	
-    $contents .= "Version $madVersion compiled with Lahey Fortran and Microsoft Visual C++:\n";
+    $contents .= "<p>Version $madVersion compiled with Lahey Fortran and Microsoft Visual C++:</p>\n";
     $contents .= "<table width=\"75%\" border=\"0\">\n";
     my $oddOrEven = 'even'; # to colorize successive lines differently
     foreach $binary (@binaries){
@@ -455,8 +462,8 @@ sub deliverHtmlPage {
 	my $executable = $5;
 #	notify("size='$size',exec='$executable',descr='$description{$executable}'");
 	$description{'madx.exe'} = "standard version";
-	$description{'madxp.exe'} = "version including PTC";
-	$description{'mpars.exe'} = "\"parser-only\" version";
+#	$description{'madxp.exe'} = "version including PTC";
+#	$description{'mpars.exe'} = "\"parser-only\" version";
 	if ($oddOrEven eq 'odd'){
 	    $oddOrEven = 'even';
 	} else {
@@ -465,6 +472,14 @@ sub deliverHtmlPage {
 	$contents .= "<tr class=\"$oddOrEven\"><td>Download</td><td><a href=\"./$executable\">$executable</a></td><td>($megabytes Megabytes)</td><td>for the $description{$executable}.</td></tr>\n";
     }
     $contents .= "</table>\n";
+    $contents .= "<p>Version 3.04.53 accepting sequences files with BV flag, as until March 2009:</p>\n";
+    $contents .= "<table width=\"75%\" border=\"0\">\n";
+    $oldExecutable = "";
+    $megabytes = 123456789; # should put the actual value here
+    $contents .= "<tr class=\"even\"><td>Download</td><td><a href=\"./madx-old.exe\">madx-old.exe</a></td><td>(2.6132 Megabytes)</td><td>for the archived version, without PTC.</td></tr>\n";
+    $contents .= "<tr class=\"odd\"><td>Download</td><td><a href=\"./madxp-old.exe\">madxp-old.exe</a></td><td>(6.7554 Megabytes)</td><td>for the archived version, including PTC.</td></tr>\n";
+    $contents .= "</table>\n";
+
 
     # create web page in the correct AFS web folder location
     my $html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">';
