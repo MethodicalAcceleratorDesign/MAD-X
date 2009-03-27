@@ -317,6 +317,8 @@ clean:
 	rm -f *.mod
 	rm -f core
 	rm -f *~
+	rm -f fortran_wrappers.c fortran_wrappers.h
+	rm -f fortran_prototypes.h fortran_wrappers_prototypes.h
 
 info:
 	@echo default C compiler CC "    " = $(CC)
