@@ -43,10 +43,6 @@
 /emit.f90 -text
 /emit.fi -text
 /fortran_flush.F90 -text
-/fortran_prototypes.h -text
-/fortran_wrappers.c -text
-/fortran_wrappers.h -text
-/fortran_wrappers_prototypes.h -text
 /gxx11.f90 -text
 /gxx11c.c -text
 /gxx11ps.f90 -text
