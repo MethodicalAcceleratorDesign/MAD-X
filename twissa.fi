@@ -1,5 +1,0 @@
-      character*48 table_name
-      character*48 sectorTableName
-      character*48 charconv
-      common/twissa/table_name
-      common/twissa/sectorTableName
