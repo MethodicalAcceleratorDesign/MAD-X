@@ -4,123 +4,202 @@
 #
 #######################################################################
 
-PLUGIN_SUPPORT=NO
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# On Linux prior to using gfortran one has to source
+# source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
+#GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
+GF_HOME=/usr/bin/
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# compilers
 CC=gcc
-FC=g77
-# NAG for testing
-#f95=f95
-# LF95 for production
-f95=lf95
+f95=ifort
+ARCH=32
+DEBUG=NO
+ONLINE=NO
+MEMLEAKS=NO
+PROFILE=NO
+PLUGIN_SUPPORT=NO
+SLC5=NO
+FC8=NO
+FC10=NO
 
-# default fortran compiler options
-FCP=-O4 -m32 -fno-second-underscore -funroll-loops -I.
+#######################################################################
+# Compilers
+#######################################################################
 
-# alternative for development and debug
-FCM=-O2 -m32 -fno-second-underscore -funroll-loops
-FCDB=-g -O0 -m32 -fno-second-underscore
+#!!!!!!!!!!!!!!!!!!
+# C compilers
+#!!!!!!!!!!!!!!!!!!
+# CC=gcc
+# For gfortran the version of gcc has to be > 4.3.2 not available for SLC4
+# CC=$(GF_HOME)gcc
 
-# default C compiler flag options
-GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -I.
-GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-#to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# FORTRAN90 compilers proven to work
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# alternative for development
-GCC_FLAGS=-g -m32 -Wall -D_CATCH_MEM -D_FULL -D_WRAP_FORTRAN_CALLS
+# Production: Lahey
+# f95=lf95
 
-# NAG default f95 compiler options
-#f95_FLAGS=-gline -g90 -c -m32 -C=all -maxcontin=100 -nan
-# NAG alternative
-#f95_FLAGS=-c -O4 -m32 -maxcontin=100 -w=unused
-# LF95 default f95 compiler options
-f95_FLAGS= --o1 --tp -c -Wa,--32
+# GNU g95
+# f95=g95
 
-# NAG f95 compiler options to compile f77 code
-#FFLAGS77=-gline -g90 -c -m32 -maxcontin=100 -nan
-# NAG f95 alternatives for development and debug
-#FFLAGS77=-gline -g90 -c -m32 -maxcontin=100 -nan -ieee=full
-#FFLAGS77=-g90 -c -O4 -m32 -maxcontin=100 -w=unused
-# LF95 f95 compiler options to compile f77 code
-FFLAGS77= --o1 --tp -c -Wa,--32 -D_G95
+# GNU gfortran
+# f95$=(GF_HOME)gfortran
 
-# g77 link options
-FP=-static -m32
+# NAG f95
+# f95=f95
 
-# NAG f95 link options
-# LDOPT=-m32
-# LF95 f95 link options
-LDOPT=-static -m32
+# Intel ifort
+# f95=ifort
 
-# libraries
-#LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -lgcc
-#FC8
-#LIBX= -lX11 -lXdmcp -lXau -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/4.1.2" -lgcc -lgcc_eh
-#LIBX="-L/usr/X11R6/lib64" -lX11 "-L/usr/lib64/" -ldl -lpthread
-#SLC4 32bit
-LIBX="-L/usr/X11R6/lib" -lX11 "-L/usr/lib/" -ldl -lpthread
-#SLC5 32bit
-#LIBX="-L/afs/cern.ch/user/f/frs/public/lib32" -lX11 "-L/usr/lib" -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/3.4.6" -lgcc_eh
-#SLC5 64bit
-#LIBX="-L/afs/cern.ch/user/f/frs/public/lib64" -lX11 -lc -lpthread "-L/usr/lib/gcc/i386-redhat-linux/3.4.6" -lgcc_eh
-# NAG f95 lib extension
-#LIBX_ext= -lgcc
-# LF95 f95 lib extension
-LIBX_ext=
+#######################################################################
+# Compile flags
+#######################################################################
+
+ifeq ($(ARCH),32)
+  M32= -m32
+else
+  M32=
+endif
+
+# Production: C compiler flag options
+ GCCP_FLAGS= -g -O4 $(M32) -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -I. -D_FULL
+# to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
+
+# Standard FORTRAN flags
+ f95_FLAGS= -c -O4 -funroll-loops -I.
+
+
+#######################################################################
+# Link options
+#######################################################################
+
+LDOPT=-static $(M32)
+
+#######################################################################
+# Compiler special treatment
+#######################################################################
+
+ifeq ($(f95),lf95)
+  ifeq ($(ARCH),32)
+    f95_FLAGS= --o2 --tp -c -Wa,--32
+  else
+    f95_FLAGS= --o2 --tp
+  endif
+endif
+
+ifeq ($(f95),f95)
+  ifeq ($(ARCH),32)
+    f95_FLAGS= -gline -c -Wc,-m32 -Wl,-m32 -maxcontin=100 -ieee=full -D_NAG
+    LDOPT= -Bstatic -Wl,-m32
+  else
+    f95_FLAGS= -gline -c -maxcontin=100 -ieee=full -D_NAG
+    LDOPT= -Bstatic
+  endif
+endif
+
+ifeq ($(f95),g95)
+  ifeq ($(ARCH),32)
+    f95_FLAGS+= -Wa,--32 -fno-second-underscore
+  else
+    f95_FLAGS+= -fno-second-underscore
+  endif
+endif
+
+ifeq ($(f95),gfortran)
+  CC=$(GF_HOME)gcc
+  f95=$(GF_HOME)gfortran
+  f95_FLAGS+= $(M32) -fno-range-check
+endif
+
+ifeq ($(SLC5),YES)
+  LIBX= -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh libX11.a -L/usr/lib -lpthread
+else
+  LIBX=-L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread
+endif
+
+ifeq ($(FC8),YES)
+  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux/4.1.2 -lgcc_eh /usr/local/lib/libgfortran.a
+endif
+
+ifeq ($(FC10),YES)
+  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh /usr/lib/gcc/x86_64-redhat-linux/4.3.2/libgfortran.a
+endif
+
+ifeq ($(DEBUG),YES)
+  ifeq ($(f95),lf95)
+    # Replace Makefile_develop
+    # lff95 compiler options with severe lf95/Fujitsu flags
+    f95_FLAGS+= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
+    GCCP_FLAGS+= -Wall -pedantic
+  endif
+  ifeq ($(f95),f95)
+    # Replace Makefile_nag
+    f95_FLAGS+= -C=all -nan
+    GCCP_FLAGS+= -Wall -pedantic
+  endif
+endif
+
+ifeq ($(MEMLEAKS),YES)
+  ifeq ($(f95),f95)
+    f95_FLAGS+= -C=all -mtrace=size,line
+    GCCP_FLAGS+= -Wall -pedantic -D_MEM_LEAKS
+    LDOPT+= -mtrace=size,line
+  endif
+endif
+
+ifeq ($(ONLINE),YES)
+  GCCP_FLAGS+= -D_ONLINE
+  LIBX+= libSDDS1c.a libSDDS1.a libX.a librpnlib.a libmdbmth.a libmdblib.a
+endif
+
+ifeq ($(PROFILE),YES)
+  f95_FLAGS+= -pg
+  GCCP_FLAGS+= -pg
+  LDOPT+= -pg
+endif
 
 ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
-  #linker options to make dynamic linking
-  #Lahey lf95
-  LDOPT=--export -m32
-  #g95
-  #LDOPT=-rdynamic -m32
+  LDOPT=--export $(M32)
 endif
-
 
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
-# -fno-second-underscore  is old, do not use for more recent gnu compilers
 # include headers for gxx11c
-  GCCP_FLAGS_MPARS=-g -O4 -m32 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/
-  GCCP_FLAGS=$(GCCP_FLAGS_MPARS) -D_FULL
-  FP=-m32
-  LDOPT=-m32
+  GCCP_FLAGS=-g -O4 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/ -D_FULL
+  FP= $(M32)
 endif
 
 default: madx
 
-# dependencies of madxpf which combines the C-code
+# dependencies of madxp which combines the C-code
 madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h
-	$(CC) $(GCCP_FLAGS_MPARS) -c madxp.c
-
-madxpf.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h
-	$(CC) $(GCCP_FLAGS) -c -o madxpf.o madxp.c
-
-
-matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
+	$(CC) $(GCCP_FLAGS) -c -o madxp.o madxp.c
 
 # automatically generated code
 fortran_wrappers.h:
-	perl wrap_fortran_calls.pl 	# also generates fortran_wrappers.c, fortran_prototypes.h
-					# and fortran_wrappers_prototypes.h
+	perl wrap_fortran_calls.pl 	# creates fortran_wrappers.c, fortran_prototypes.h
+                                        # and fortran_wrappers_prototypes.h	
 
 fortran_wrappers.o: fortran_wrappers.c
 	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
 
+matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
+
 # fortran code dependencies on header files fi
-twiss_f77.o twiss.o: twiss.F twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
-util_f77.o util.o: util.F twiss0.fi twtrr.fi
-dynap_f77.o dynap.o: dynap.F deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
-ibsdb_f77.o ibsdb.o: ibsdb.F ibsdb.fi name_len.fi physcons.fi
-plot_f77.o plot.o: plot.F plot.fi plot_b.fi plot_c.fi plot_math.fi
-sodd_f77.o sodd.o: sodd.F
-trrun_f77.o trrun.o: trrun.F twiss0.fi name_len.fi track.fi bb.fi twtrr.fi
-emit_f77.o emit.o: emit.F twiss0.fi bb.fi emit.fi twtrr.fi
-match_f77.o match.o: match.F name_len.fi match.fi
-touschek_f77.o touschek.o: touschek.F touschek.fi name_len.fi physcons.fi
-resindex_f77.o resindex.o: resindex.F resindex.fi
-fortran_flush_f77.o: fortran_flush.F
+twiss.o: twiss.f90 twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi
+util.o: util.f90 twiss0.fi twtrr.fi
+dynap.o: dynap.f90 deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
+ibsdb.o: ibsdb.f90 ibsdb.fi name_len.fi physcons.fi
+plot.o: plot.f90 plot.fi plot_b.fi plot_c.fi plot_math.fi
+sodd.o: sodd.f90
+trrun.o: trrun.f90 twiss0.fi name_len.fi track.fi bb.fi twtrr.fi
+emit.o: emit.f90 twiss0.fi bb.fi emit.fi twtrr.fi
+match.o: match.f90 name_len.fi match.fi
+touschek.o: touschek.f90 touschek.fi name_len.fi physcons.fi
+resindex.o: resindex.f90 resindex.fi
 
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
@@ -170,7 +249,6 @@ madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o mad
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
 madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_twiss.f90
 madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.f90
-ptc_export_xml.o: ptc_export_xml.f90
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
@@ -182,47 +260,56 @@ user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 run_madx.o: madx_ptc_module.o run_madx.f90
 madx_main.o: run_madx.o madx_main.f90
 
-# matchlib2 for madx only
-matchlib2_f77.o: matchlib2.F
-	$(FC) -m32 -c -o $@ $<
-
 # implicit rule to compile with C
 %.o : %.c
 	$(CC) $(GCCP_FLAGS) -c -o $(@) $<
-
-# implicit rule to compile with f77. Append _f77 to distinguish from object code compiled with f95
-%_f77.o : %.F
-	$(FC) $(FCP) -c -o $(@) $<
-
-# implicit rule to compile f77 code with f95
-%.o : %.F
-	$(f95) $(FFLAGS77) $<
 
 # implicit rule to compile f90 code with f95
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $<
 
+# implicit rule to compile f90 code with f95
+%.o : %.F90
+	$(f95) $(f95_FLAGS) $<
 
-#Parser only
-mpars: madxm.F madxp.o
-	$(FC) $(FP) -o mpars madxm.F madxp.o $(LIBX) -lm -lc
-
-# madx_objectsf77: madxpf.o gxx11c.o  + all *.F except for gxx11ps.F timest.F timex.F (windows special & F90).
-# Append f77 to distinguish from objects compiled with f95
-madx_objectsf77 = madxpf.o gxx11c.o timel.o matchptcknobs.o fortran_wrappers.o\
-	$(filter-out gxx11ps_f77.o madxp.o, $(patsubst %.F,%_f77.o,$(wildcard *.F)))
-
-madx: $(madx_objectsf77);
-	$(FC) $(FP) -o $@ $(madx_objectsf77) $(LIBX) -lgcc -lm -lc
-
-# madx_objectsf95 all *.F without madxm.F, ptc_dummy.F & gxx11ps.F (windows special)
-madx_objectsf95 = $(filter-out madxm.o ptc_dummy.o gxx11ps.o madxp.o matchlib2_f77.o matchlib2.o, $(patsubst %.F,%.o,$(wildcard *.F)))
-# madxp_objects. All *.f90 , some c and F
-madxp_objects = $(patsubst %.f90,%.o,$(wildcard *.f90)) \
-	madxpf.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o\
-	$(madx_objectsf95)
-madxp: $(madxp_objects)
-	$(f95) $(LDOPT) -o $@ $(madxp_objects) $(LIBX) $(LIBX_ext)
+madx: \
+	madx_main.o run_madx.o madxp.o matchptcknobs.o twiss.o survey.o orbf.o emit.o util.o \
+	fortran_wrappers.o fortran_flush.o \
+	match.o matchsa.o matchjc.o matchlib.o touschek.o dynap.o plot.o sodd.o \
+	ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o timest.o timex.o \
+	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
+	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
+	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
+	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
+	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
+	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
+	Sma0_beam_beam_ptc.o Sma_multiparticle.o Sn_mad_like.o So_fitting.o \
+	Sp_keywords.o Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqb_accel_ptc.o \
+	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
+	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
+	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
+	madx_ptc_knobs.o madx_ptc_eplacement.o ptc_export_xml.o rplot.o \
+	user2_photon.o poisson.o wrap.o
+	$(f95) $(LDOPT) -o madx madx_main.o run_madx.o madxp.o matchptcknobs.o twiss.o \
+	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlib.o \
+	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
+	timest.o timex.o \
+	fortran_wrappers.o fortran_flush.o \
+	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
+	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
+	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
+	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
+	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
+	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
+	Sma0_beam_beam_ptc.o Sma_multiparticle.o Sn_mad_like.o So_fitting.o \
+	Sp_keywords.o Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqb_accel_ptc.o \
+	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
+	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
+	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
+	madx_ptc_knobs.o madx_ptc_eplacement.o ptc_export_xml.o rplot.o \
+	user2_photon.o poisson.o wrap.o \
+	$(LIBX)
+	strip madx
 
 clean:
 	rm -f *.o
@@ -230,28 +317,11 @@ clean:
 	rm -f *.mod
 	rm -f core
 	rm -f *~
-	rm -f fortran_wrappers.c fortran_wrappers.h
-	rm -f fortran_prototypes.h fortran_wrappers_prototypes.h
 
 info:
-	@echo "-------------------------------------"
-	@echo  Makefile for madX by Helmut Burkhardt
-	@echo "-------------------------------------"
-	@echo madx_objectsf77 = $(sort $(madx_objectsf77))
-	@echo
-	@echo madxp_objects = $(sort $(madxp_objects))
-	@echo
 	@echo default C compiler CC "    " = $(CC)
 	@echo GCC_FLAGS "                " = $(GCC_FLAGS)
-	@echo GCCP_FLAGS "               " = $(GCCP_FLAGS)
-	@echo default Fortran compiler FC  = $(FC)
-	@echo FFLAGS77 "                 " = $(FFLAGS77)
 	@echo f95 "                      " = $(f95)
-	@echo FCP "                      " = $(FCP)
-	@echo FCM "                      " = $(FCM)
-	@echo FCDB "                     " = $(FCDB)
 	@echo LIBX "                     " = $(LIBX)
-	@echo GLIB "                     " = $(GLIB)
-	@echo GPUB "                     " = $(GPUB)
 	@echo the OS is "                " = $(OS)
 	@echo the OSTYPE is "            " = $(OSTYPE)
