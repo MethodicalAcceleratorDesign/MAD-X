@@ -237,7 +237,7 @@ Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
 Sqb_accel_ptc.o: Sq_orbit_ptc.o Sqb_accel_ptc.f90
 Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
 Sra_fitting.o: Sr_spin.o Sra_fitting.f90
-madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90 
+madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90
 St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
 madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
