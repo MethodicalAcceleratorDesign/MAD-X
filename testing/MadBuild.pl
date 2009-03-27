@@ -74,7 +74,7 @@ $buildReport = "<table width=\"75%\" border=\"0\">\n";
 
 foreach $makefile (@makefiles){
 
-    TARGETS: foreach $target (@targets){
+    TARGETS: foreach $target (@targets){ # this loop now useless
 
 	my $detailedBuildReport = "";
 	$detailedBuildReport = "<table width=\"75%\" border=\"0\">\n";
@@ -153,10 +153,7 @@ foreach $makefile (@makefiles){
     # we no longer need to compile madxp, which is now merged with madx.
     # for the time-being, we create a symbolic to madx so that the test-suite works as usual
     # in the long-run, all the madx-related stuff should go away.    
-    my $ret = `ln -s ./madx\_$makefile ./madxp\_$makefile`;
-    if ($ret ne ''){
-	print "symbolic link ./madxp->./madx returned '$ret'\n";
-    }
+    `ln -s ./madx\_$makefile ./madxp\_$makefile`;
 }
 
 `make clean`; # final make clean, mostly to remove all the .o files
