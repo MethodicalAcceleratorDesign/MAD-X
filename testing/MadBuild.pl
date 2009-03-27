@@ -68,11 +68,13 @@ $buildReport = "<table width=\"75%\" border=\"0\">\n";
 
 @makefiles = ("Makefile_develop","Makefile_nag","Makefile"); # last one overwrites madx, madxp
 
-@targets = ("madx","madxp");
+#@targets = ("madx","madxp"); # note that madxp is just a link on madx => should clean-up later on...
+# note: we must do the clean-up everywhere, up to TestScenario.xml...
+@targets = ("madx");
 
 foreach $makefile (@makefiles){
 
-    foreach $target (@targets){
+    TARGETS: foreach $target (@targets){
 
 	my $detailedBuildReport = "";
 	$detailedBuildReport = "<table width=\"75%\" border=\"0\">\n";
@@ -83,9 +85,24 @@ foreach $makefile (@makefiles){
 	`rm $target\_$makefile`; # later-on, $target copied into $target\_$makefile ...
 
 	my $warnings = 0; # default
+	my $makefileInvocation = 'undefined'; # default
 
-	my $makeResult = `make -f $makefile $target 2>&1`; 
-	
+	if ($makefile eq 'Makefile'){
+	    $makefileInvocation = 'Makefile f95=/opt/intel/Compiler/11.0/081/bin/ia32/ifort DEBUG=NO'; 
+	    # intel compiler installed on pcslux99
+	} else {
+	    if ($makefile eq 'Makefile_develop'){
+		$makefileInvocation = 'Makefile f95=lf95 DEBUG=YES'; # the Lahey Fortran compiler
+	    } else {
+		if ($makefile eq 'Makefile_nag'){
+		    $makefileInvocation = 'Makefile f95=f95 DEBUG=YES'; # f95 is the NAG compiler
+		}
+	    }
+	}
+
+	my $makeResult = `make -f $makefileInvocation $target 2>&1`; # for good 
+	# $makeResult = "$makefileInvocation"; # for test
+
 	# if we wanted to redirect stdout and stderr into separate files...
         # system("make -f $makefile $target 1>build_result_stdout 2>build_result_stderr");
 
@@ -130,6 +147,18 @@ foreach $makefile (@makefiles){
 	
 } # for each makefile
 
+# now create the 'madxp' as symbolic links:
+
+foreach $makefile (@makefiles){
+    # we no longer need to compile madxp, which is now merged with madx.
+    # for the time-being, we create a symbolic to madx so that the test-suite works as usual
+    # in the long-run, all the madx-related stuff should go away.    
+    my $ret = `ln -s ./madx\_$makefile ./madxp\_$makefile`;
+    if ($ret ne ''){
+	print "symbolic link ./madxp->./madx returned '$ret'\n";
+    }
+}
+
 `make clean`; # final make clean, mostly to remove all the .o files
 
 $buildReport .= "</table>\n";
@@ -144,7 +173,8 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
   $msg = MIME::Lite->new(
 			 From       => 'Jean-Luc.Nougaret@cern.ch', # if "" instead of '', '@'->'\@'
 			 'Reply-To' => 'mad-automation-admin@cern.ch',
-			 To         => 'mad-automation-admin@cern.ch',
+			 To         => 'mad-automation-admin@cern.ch', # for good
+#			 To         => 'Jean-Luc.Nougaret@cern.ch', # for test
 			 Subject    => "Automated MAD Build $compilationOutcome{'madx'} for madx, $compilationOutcome{'madxp'} for madxp",
 			 Data       => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation/build.htm"
 			);
