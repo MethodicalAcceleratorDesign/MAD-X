@@ -152,7 +152,8 @@ foreach $makefile (@makefiles){
 foreach $makefile (@makefiles){
     # we no longer need to compile madxp, which is now merged with madx.
     # for the time-being, we create a symbolic to madx so that the test-suite works as usual
-    # in the long-run, all the madx-related stuff should go away.    
+    # in the long-run, all the madx-related stuff should go away.
+    `rm ./madxp\_$makefile`; # just in case the file or link already exists ...
     `ln -s ./madx\_$makefile ./madxp\_$makefile`;
 }
 
