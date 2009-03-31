@@ -60,41 +60,41 @@
    </target>
    <target name="ptc_accel" responsible="Frank.Schmidt@cern.ch">
        <!-- skip the 'track' test which creates hundreds of files -->
-        <test input = "track.ptc.madx" program="madxp" output="track.ptc.out" subdir="track"/>
-	<test input ="twiss.ptc.madx" program="madxp" output="twiss.ptc.out" subdir="twiss"/>
+        <test input = "track.ptc.madx" output="track.ptc.out" subdir="track"/>
+	<test input ="twiss.ptc.madx" output="twiss.ptc.out" subdir="twiss"/>
    </target>   
    <target name="ptc_madx_interface" responsible="Piotr.Skowronski@cern.ch">
-	<test input ="dumpmaps.ptc.madx" output="dumpmaps.ptc.out" program="madxp" subdir="dumpmaps"/>
+	<test input ="dumpmaps.ptc.madx" output="dumpmaps.ptc.out" subdir="dumpmaps"/>
         <!-- skip 'eplacement' with contains 'C' files -->
-	<test input ="intstate.ptc.madx" output="intstate.ptc.out" program="madxp" subdir="intstate"/>
-	<test input ="knobs.madx" output="knobs.out" program="madxp" subdir="knobs"/>	
-        <test input ="matchknobs.madx" output="matchknobs.out" program="madxp" subdir="matchknobs"/>
-        <test input ="matchwithknobs.madx" output="matchwithknobs.out" program="madxp" subdir="matchwithknobs"/>
-        <test input ="moments.madx" output="moments.out" program="madxp" subdir="moments"/>
-        <test input ="chicane.madx" output="chicane.out" program="madxp" subdir="ptc_secordmatch"/>
-        <test input ="rviewer.madx" output="rviewer.out" program="madxp" subdir="rviewer"/>
-        <test input ="psr.madx" output="psr.out" program="madxp" subdir="thirdordermatch"/>
+	<test input ="intstate.ptc.madx" output="intstate.ptc.out" subdir="intstate"/>
+	<test input ="knobs.madx" output="knobs.out" subdir="knobs"/>	
+        <test input ="matchknobs.madx" output="matchknobs.out" subdir="matchknobs"/>
+        <test input ="matchwithknobs.madx" output="matchwithknobs.out" subdir="matchwithknobs"/>
+        <test input ="moments.madx" output="moments.out" subdir="moments"/>
+        <test input ="chicane.madx" output="chicane.out" subdir="ptc_secordmatch"/>
+        <test input ="rviewer.madx" output="rviewer.out" subdir="rviewer"/>
+        <test input ="psr.madx" output="psr.out" subdir="thirdordermatch"/>
         <!-- for the same 'thirdordermatch' target, omit rhic.madx which generates too big a file for comparison (until we find a workaround...)  -->
    </target>
    <target name="ptc_normal" responsible="Frank.Schmidt@cern.ch">
-	<test input ="test_5frs.madx" program="madxp" output="test_5frs.out"/>
+	<test input ="test_5frs.madx" output="test_5frs.out"/>
    </target>
    <target name="ptc_track" responsible="Frank.Schmidt@cern.ch">
-	<test input ="fv9_1.madx" output="fv9_1.out" program="madxp" subdir="Example1"/>
-	<test input ="fv9_2.madx" output="fv9_2.out" program="madxp" subdir="Example2"/>
-	<test input ="fv9_3.madx" output="fv9_3.out" program="madxp" subdir="Example3"/>
-	<test input ="fv9_4.madx" output="fv9_4.out" program="madxp" subdir="Example4"/>
-	<test input ="fv9_5.madx" output="fv9_5.out" program="madxp" subdir="Example5"/>
+	<test input ="fv9_1.madx" output="fv9_1.out" subdir="Example1"/>
+	<test input ="fv9_2.madx" output="fv9_2.out" subdir="Example2"/>
+	<test input ="fv9_3.madx" output="fv9_3.out" subdir="Example3"/>
+	<test input ="fv9_4.madx" output="fv9_4.out" subdir="Example4"/>
+	<test input ="fv9_5.madx" output="fv9_5.out" subdir="Example5"/>
    </target>
      <target name = "ptc_twiss" responsible="Jean-Luc.Nougaret@cern.ch">
-      <test input = "example1.madx" output="example1.out" program="madxp" subdir="Example1"/> <!--unspecified program is 'madx'-->
-      <test input = "example2.madx" output="example2.out" program="madxp" subdir="Example2"/>
-      <test input = "example3.madx" output="example3.out" program="madxp" subdir="Example3"/>
-      <test input = "example4.madx" output="example4.out" program="madxp" subdir="Example4"/>
-      <test input = "diamond.madx" output="diamond.out" program="madxp" subdir="Example5"/>
-      <test input = "lhc.madx" output="lhc.out" program="madxp" subdir="Example6"/>
-      <test input = "slice.madx" output="slice.out" program="madxp" subdir="SliceMagnets"/>
-      <test input = "deltaDependency.madx" output="deltaDependency.out" program="madxp" subdir="DeltaDependency"/>
+      <test input = "example1.madx" output="example1.out" subdir="Example1"/> <!--unspecified program is 'madx'-->
+      <test input = "example2.madx" output="example2.out" subdir="Example2"/>
+      <test input = "example3.madx" output="example3.out" subdir="Example3"/>
+      <test input = "example4.madx" output="example4.out" subdir="Example4"/>
+      <test input = "diamond.madx" output="diamond.out" subdir="Example5"/>
+      <test input = "lhc.madx" output="lhc.out" subdir="Example6"/>
+      <test input = "slice.madx" output="slice.out" subdir="SliceMagnets"/>
+      <test input = "deltaDependency.madx" output="deltaDependency.out" subdir="DeltaDependency"/>
    </target>
    <target name="special_features" responsible="Frank.Schmidt@cern.ch">
 	<test input ="setvars.madx" output="setvars.out"/>
