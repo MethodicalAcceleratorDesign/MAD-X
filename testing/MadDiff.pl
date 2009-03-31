@@ -125,11 +125,15 @@ foreach $line (@lines) {
 	    $leftPart =~ s/^[\s\t]+//g; # no tab nor space at the beginning
 	    $leftPart =~ s/[\t\s]+/ /g; # replace multiple tabs and space as one space
 	    $leftPart =~ s/[\t\s]+$//g; # no tab nor space at the end
+	    $leftPart =~ s/[\n\r\f]//g; # no newline, no carriage return, no form-feed (maybe useless)
+	    
 
 	    my $rightPart = $parts[1];
 	    $rightPart =~ s/^[\s\t]+//g; # no tab nor space at the beginning
 	    $rightPart =~ s/[\t\s]+/ /g;
 	    $rightPart =~ s/[\t\s]+$//g; # no tab nor space at the end
+	    $rightPart =~ s/[\n\r\f]//g; # no newline, no carriage return, no form-feed (maybe useless)
+
 	    
 	    if ( $leftPart eq $rightPart ) {
 	   	$diffReport .= "<tr class=\"quasi-success\"><td>$parts[0]</td><td>$parts[1]</td></tr>\n";
@@ -140,16 +144,22 @@ foreach $line (@lines) {
 	    
 		    # before concluding the difference is a failure, check for numerical rounding errors
 		    $numericalMatch = 1; # default
-		    @leftChunks = split /[\s\t:=]+/, $parts[0];
-		    @rightChunks = split /[\s\t:=]+/, $parts[1];
+#		    @leftChunks = split /[\s\t:=]+/, $parts[0];
+#		    @rightChunks = split /[\s\t:=]+/, $parts[1];
+
+		    @leftChunks = split /[\s\t:=]+/, $leftPart;
+		    @rightChunks = split /[\s\t:=]+/, $rightPart;
 	    
 		    if (scalar(@leftChunks) == scalar(@rightChunks)) {
 
 	    
-			for ($i=0; $i<scalar(@leftChunks); $i++) {
+			CHUNK: for ($i=0; $i<scalar(@leftChunks); $i++) {
 			    $leftChunk = $leftChunks[$i];
 			    $rightChunk = $rightChunks[$i];
-			    if ($leftChunk eq $rightChunk) { next; } # substrings match, a fortiori numbers
+
+			    if ($leftChunk eq $rightChunk) { next CHUNK; } # substrings match, a fortiori numbers
+			    if (($leftChunk =~ /^[\+\-]?0$/) && ($rightChunk =~ /^[\+\-]?0$/ )){ next CHUNK; }
+			    # one is '0' while the other '-0', which may happen with Fortran signed zeroes
 			    else {
 				# numerical test
 				# tolerance expressed in %. 0 % means zero tolerance down to double float precision
