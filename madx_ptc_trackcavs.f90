@@ -285,7 +285,54 @@ contains
     deallocate (observedelements)
     !==============================================================================
   end subroutine ptc_track_everystep
+  !_________________________________________________________________________________
 
+
+  subroutine putinstatustable (npart,turn,elno,elna,spos,stat,x,xini,e,mf)
+    implicit none
+    include 'name_len.fi'
+    integer  :: npart,turn,nobs,stat,mf,elno
+    real(kind(1d0)) :: tt
+    character*36 table_puttab
+    character*36 table
+    character(name_len) elna
+    !hbu
+    real (dp)            :: x(1:6)
+    real (dp)            :: xini(1:6)
+    real(dp) :: spos,e
+    integer :: get_option
+    !hbu
+    data table        / 'tracksumm        ' /
+      
+    write(mf,*) npart,spos,turn,elno,elna,xini, x, e,stat
+    
+    !"number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
+    doublenum = npart
+    call double_to_table(table, 'number ' , doublenum)
+    doublenum = turn
+    call double_to_table(table, 'turn ' , doublenum)
+    doublenum = x(1)
+    call double_to_table(table, 'x ' , doublenum)
+    doublenum = x(2)
+    call double_to_table(table, 'px ' , doublenum)
+    doublenum = x(3)
+    call double_to_table(table, 'y ' , doublenum)
+    doublenum = x(4)
+    call double_to_table(table, 'py ' , doublenum)
+    doublenum = x(6)
+    call double_to_table(table, 't ' , doublenum)
+    doublenum = x(5)
+    call double_to_table(table, 'pt ' , doublenum)
+    doublenum = spos
+    call double_to_table(table, 's ' , doublenum)
+    doublenum = e
+    call double_to_table(table, 'e ' , doublenum)
+
+    call augment_count(table)
+    
+  end subroutine putinstatustable
+
+  !_________________________________________________________________________________
 
   subroutine putintracktable (npart,turn,nobs,x,px,y,py,t,pt,spos,e)
     implicit none
@@ -364,6 +411,7 @@ contains
     integer  :: charge    ! charge of an accelerated particle
     type(fibre), pointer :: p
     real (dp)            :: x(1:6)
+    real (dp)            :: xini(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
     real (dp)            :: xp, yp, pz, p0
     real (dp)            :: pathlegth = zero
@@ -388,6 +436,7 @@ contains
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
     integer              :: mf
+    type(work)           :: fen      ! Fibre ENergy
     !------------------------------------------------------
     !initialization
     npart = 1
@@ -472,6 +521,9 @@ contains
        call newrplot()
     endif
 
+    call kanalnummer(mf)
+    open(unit=mf,file='ptctracklinestatus.txt',POSITION='APPEND' , STATUS='UNKNOWN')
+
     n=1
     npart = getnumberoftracks()
     if (getdebug() > 0) print *, 'There is ', npart,' tracks'
@@ -484,7 +536,7 @@ contains
        call gettrack(n,x(1),x(2),x(3),x(4),x(6),x(5))
 
        if (getdebug() > 0 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
-
+       xini = x
        do t=1, nturns
 
           p=>my_ring%start
@@ -496,11 +548,23 @@ contains
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
 
              call track(my_ring,x,e,e+1,getintstate())
+             if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+                call fort_warn('ptc_trackline: ','DA got unstable')
+                call seterrorflag(10,"ptc_trackline ","DA got unstable ");
+                fen = p;
+                
+                call putinstatustable(n,t,e,p%MAG%name,pathlegth,3,x,xini,fen%energy,mf)
+                goto 100 !for the time being lets try next particle, 
+                         !but most probably we will need to stop tracking and reinit 
+	     !goto 101
+                
+             endif
+             
              pathlegth = pathlegth + p%mag%p%ld
 
              if (getdebug() > 2 ) then
                 write(6,*) e, 'l=',pathlegth
-                write(6,'(6f8.4)') x
+                write(6,'(5f8.4 f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
              endif
 
              p0=(1+x(5))
@@ -543,8 +607,12 @@ contains
                 write(whymsg,*) 'APERTURE error: ',why
                 call fort_warn('ptc_twiss: ',whymsg)
                 call seterrorflag(10,"ptc_twiss: ",whymsg);
-
-                exit; !goes to the ne
+                
+                fen = p;
+                call putinstatustable(n,t,e,p%MAG%name,pathlegth,1,x,xini,fen%energy,mf)
+                
+                goto 100 !take next track
+                
              endif
              p=>p%next
           enddo !over elements
@@ -554,10 +622,23 @@ contains
           endif
 
        enddo !loop over turns
+       !                     npart,turn,elno,elna,spos,stat,x,xini,e,mf
+       fen = p%previous;
+       t = t - 1
+       print*, t 
+       call putinstatustable(n,t,e,p%previous%MAG%name,pathlegth,0,x,xini,fen%energy,mf)
+      
+100    continue!take next track
+       
     enddo !loop over tracks
+    
 
+101 continue!finish the program
+    
     if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
+
+    close(mf)
 
     c_%x_prime=.false.
 
