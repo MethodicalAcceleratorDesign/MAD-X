@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # now supports a specific $debugMode to carry-out tests of a single target.
-# sample invocation: MadTest.pl ./MadCvsExtract/madx debug=match
+# sample invocation: MadTest.pl ./MadCvsExtract/madX debug=match
 # In this case, HTML file becomes test_debug.html instead of test.htm.
 
 # input: directory name in which madx and madxp are present
@@ -879,6 +879,12 @@ LINE: while(<IN>){
 	$fileRetreival = 1;
 	}
 	
+	# another way to read a table
+	if (/[\s\t]*[Rr][Ee][Aa][Dd][Tt][Aa][Bb][Ll][Ee],?[\s\t]*[Ff][Ii][Ll][Ee][\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;/){
+	@childs[$childCount++] = $1;
+	$fileRetreival = 1;	    
+	}
+
 	# another - rare - instruction that calls a script available in the input directory
 	# along the other input files. Such script must be copied locally along the other
 	# files.
