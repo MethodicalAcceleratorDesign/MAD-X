@@ -12,7 +12,7 @@ GF_HOME=/usr/bin/
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 CC=gcc
-f95=lf95
+f95=g95
 ARCH=32
 DEBUG=NO
 ONLINE=NO
@@ -64,11 +64,11 @@ else
 endif
 
 # Production: C compiler flag options
- GCCP_FLAGS= -g -O4 $(M32) -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -I. -D_FULL
+ GCCP_FLAGS= -g $(M32) -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -I. -D_FULL
 # to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
 
 # Standard FORTRAN flags
- f95_FLAGS= -c -O4 -funroll-loops -I.
+ f95_FLAGS= -c -funroll-loops -I.
 
 
 #######################################################################
@@ -139,6 +139,14 @@ ifeq ($(DEBUG),YES)
     f95_FLAGS+= -C=all -nan
     GCCP_FLAGS+= -Wall -pedantic
   endif
+  ifeq ($(f95),g95)
+    # Replace Makefile_nag
+    f95_FLAGS+= -ggdb3
+    GCCP_FLAGS+= -Wall -pedantic -ggdb3
+  endif
+else
+  GCCP_FLAGS+= -O4
+  f95_FLAGS+= -O4
 endif
 
 ifeq ($(MEMLEAKS),YES)
@@ -162,6 +170,7 @@ endif
 
 ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
+  LDOPT=-dynamic $(M32)
   LDOPT=--export $(M32)
 endif
 
