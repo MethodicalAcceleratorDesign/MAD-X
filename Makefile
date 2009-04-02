@@ -12,7 +12,7 @@ GF_HOME=/usr/bin/
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 CC=gcc
-f95=g95
+f95=lf95
 ARCH=32
 DEBUG=NO
 ONLINE=NO
@@ -45,7 +45,7 @@ FC10=NO
 # f95=g95
 
 # GNU gfortran
-# f95$=(GF_HOME)gfortran
+# f95=$(GF_HOME)gfortran
 
 # NAG f95
 # f95=f95
@@ -178,7 +178,7 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # include headers for gxx11c
   GCCP_FLAGS=-g -O4 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/ -D_FULL
-  FP= $(M32)
+  LDOPT= $(M32)
 endif
 
 default: madx
