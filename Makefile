@@ -15,7 +15,7 @@ CC=gcc
 f95=lf95
 ARCH=32
 DEBUG=NO
-ONLINE=NO
+ONLINE=YES
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
@@ -146,7 +146,9 @@ ifeq ($(DEBUG),YES)
   endif
 else
   GCCP_FLAGS+= -O4
-  f95_FLAGS+= -O4
+  ifneq ($(f95),lf95)
+    f95_FLAGS+= -O4
+  endif
 endif
 
 ifeq ($(MEMLEAKS),YES)
@@ -159,7 +161,7 @@ endif
 
 ifeq ($(ONLINE),YES)
   GCCP_FLAGS+= -D_ONLINE
-  LIBX+= libSDDS1c.a libSDDS1.a libX.a librpnlib.a libmdbmth.a libmdblib.a
+  LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libz.a
 endif
 
 ifeq ($(PROFILE),YES)
