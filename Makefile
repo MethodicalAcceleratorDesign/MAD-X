@@ -8,7 +8,9 @@
 # On Linux prior to using gfortran one has to source
 # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
 #GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
-GF_HOME=/usr/bin/
+ifneq ($(OSTYPE),darwin)
+  GF_HOME=/usr/bin/
+endif
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 CC=gcc
@@ -180,6 +182,9 @@ ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # include headers for gxx11c
   GCCP_FLAGS=-g -O4 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/ -D_FULL
+  ifeq ($(f95),g95)
+    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore
+  endif
   LDOPT= $(M32)
 endif
 
