@@ -3,6 +3,9 @@
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
 #endif
+#ifdef _WRAP_C_CALLS
+#include "c_wrappers.h"
+#endif
 
 void pro_sxf(struct in_cmd* cmd)
   /* controls reading and writing of SXF format files */

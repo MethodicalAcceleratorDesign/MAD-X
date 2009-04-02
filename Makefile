@@ -64,7 +64,7 @@ else
 endif
 
 # Production: C compiler flag options
- GCCP_FLAGS= -g $(M32) -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -I. -D_FULL
+ GCCP_FLAGS= -g $(M32) -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -I. -D_FULL
 # to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
 
 # Standard FORTRAN flags
@@ -184,16 +184,22 @@ endif
 default: madx
 
 # dependencies of madxp which combines the C-code
-madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h
+madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h c_wrappers.h
 	$(CC) $(GCCP_FLAGS) -c -o madxp.o madxp.c
 
 # automatically generated code
 fortran_wrappers.h:
 	perl wrap_fortran_calls.pl 	# creates fortran_wrappers.c, fortran_prototypes.h
-                                        # and fortran_wrappers_prototypes.h	
+                                        # and fortran_wrappers_prototypes.h
+
+c_wrappers.h:
+	python wrap_C_calls.py	
 
 fortran_wrappers.o: fortran_wrappers.c
 	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
+
+c_wrappers.o: c_wrappers.c
+	$(CC) $(GCCP_FLAGS) -c c_wrappers.c
 
 matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
 
@@ -283,7 +289,7 @@ madx_main.o: run_madx.o madx_main.f90
 
 madx: \
 	madx_main.o run_madx.o madxp.o matchptcknobs.o twiss.o survey.o orbf.o emit.o util.o \
-	fortran_wrappers.o fortran_flush.o \
+	fortran_wrappers.o c_wrappers.o fortran_flush.o \
 	match.o matchsa.o matchjc.o matchlib.o touschek.o dynap.o plot.o sodd.o \
 	ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o timest.o timex.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
@@ -303,7 +309,7 @@ madx: \
 	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlib.o \
 	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
 	timest.o timex.o \
-	fortran_wrappers.o fortran_flush.o \
+	fortran_wrappers.o c_wrappers.o fortran_flush.o \
 	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
 	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
 	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
@@ -328,6 +334,8 @@ clean:
 	rm -f *~
 	rm -f fortran_wrappers.c fortran_wrappers.h
 	rm -f fortran_prototypes.h fortran_wrappers_prototypes.h
+	rm -f c_wrappers.c c_wrappers.h
+	rm -f c_prototypes.h c_wrappers_prototypes.h
 
 info:
 	@echo default C compiler CC "    " = $(CC)

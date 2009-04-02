@@ -5,6 +5,9 @@
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
 #endif
+#ifdef _WRAP_C_CALLS
+#include "c_wrappers.h"
+#endif
 
 void mtsa_(int*, int*, double*, int*, int*, double*, double*, int*, int*,
            double*, int*, double*, double*, double*, double*, double*);

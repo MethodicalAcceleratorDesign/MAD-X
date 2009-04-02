@@ -37,6 +37,9 @@
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
 #endif
+#ifdef _WRAP_C_CALLS
+#include "c_wrappers.h"
+#endif
 
 double** trackstrarpositions = 0x0;/* two dimensional array with track positions*/
 

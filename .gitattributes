@@ -151,4 +151,5 @@ testing/mad_install -text
 /win32calls.fi -text
 /wmaxmin0.fi -text
 /wrap.f90 -text
+/wrap_C_calls.py -text
 /wrap_fortran_calls.pl -text

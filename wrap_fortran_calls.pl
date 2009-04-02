@@ -71,7 +71,10 @@ foreach $Cfile (@Cfiles){
 		}
 	       
 
-		if ($line =~ /([\w\d_]+)_\((.+)\)/){
+		if ($line =~ /([\w\d_]+)_\((.+)/){ 
+		    # new from April 2nd, 2009: we don't require the second
+		    # parenthesis to be present as the statement may run over several lines
+		    # ...
 			if (	($line =~ /^[\s\t]*\/\*/) || # only check /* on same line
 				($line =~ /^[\s\t]*\/\//)
 				) {
@@ -94,7 +97,7 @@ foreach $Cfile (@Cfiles){
 	close MYFILE;
 }
 
-my @fortran_extensions =('fi','F','f90');
+my @fortran_extensions =('fi','f90');
 @fortranCalledFromC = ();
 my $routineName = "undefined";  # the current FORTRAN subroutine being processed
 my $CparameterString; # C-style parameter string (associative list)
@@ -130,7 +133,7 @@ foreach $ext (@fortran_extensions){
 	my $simplifiedFile = "$file\_concatenated"; # to be deleted afterwards
 	open MY_SIMPLIFIED_FILE, ">$simplifiedFile";
 	while(<MYFILE>) { $fileContents .= $_; }
-	$fileContents =~ s/&[\s\t]*\n[\s\t]*&//g;
+	$fileContents =~ s/[\s\t]*&[\s\t]*\n[\s\t]*&[\s\t]*//g;
 	print MY_SIMPLIFIED_FILE $fileContents;
 	close(MYFILE);
 	close(MY_SIMPLIFIED_FILE);
@@ -343,7 +346,7 @@ print WRAPPER_FILE "/* set of $nbRoutines wrappers to synchronize FORTRAN and C 
 print WRAPPER_FILE "/* when crossing the border upon calling FORTRAN from C. */\n\n";
 print WRAPPER_FILE "#include <stdio.h>\n";
 print WRAPPER_FILE "#include \"fortran_prototypes.h\"\n\n";
-print WRAPPER_FILE "extern void call_fortran_flush_();\n\n";
+print WRAPPER_FILE "extern void call_fortran_flush_(char *, int);\n\n"; # Fortran needs hidden length parameter
 
 
 print DEFINE_WRAPPER_FILE "\#ifndef _FORTRAN_WRAPPERS_H\n";
@@ -368,9 +371,11 @@ foreach $subroutine (@fortranCalledFromC){
 	print WRAPPER_FILE "void $subroutine\_wrapper(";
 	print WRAPPER_FILE $CtypedParameterString{$subroutine};
 	print WRAPPER_FILE "){\n";
+	# print WRAPPER_FILE 'printf("FWRAPPER of '.$subroutine.' flushes C stdout\n");';
 	print WRAPPER_FILE "\tfflush(stdout);\n";
 	print WRAPPER_FILE "\t$subroutine\_($CparameterString{$subroutine});\n";
-	print WRAPPER_FILE "\tcall_fortran_flush_();\n";
+	$debugMsg = ""; # otherwise could be $subroutine
+	print WRAPPER_FILE "\t".'call_fortran_flush_("'.$debugMsg.'",'.length($debugMsg).');'."\n";
 	print WRAPPER_FILE "}\n";
        
 	print FORTRAN_PROTOS_FILE "/* Wrap '$subroutine' defined in '$filename'*/\n";
