@@ -54,6 +54,13 @@
 /j_tpsalie.f90 -text
 /k_tpsalie_analysis.f90 -text
 /l_complex_taylor.f90 -text
+/libSDDS1.a -text svneol=unset#unset
+/libSDDS1c.a -text svneol=unset#unset
+/libX11.a -text svneol=unset#unset
+/libmdblib.a -text svneol=unset#unset
+/libmdbmth.a -text svneol=unset#unset
+/librpnlib.a -text svneol=unset#unset
+/libz.a -text svneol=unset#unset
 /m_real_polymorph.f90 -text
 /madx.h -text
 /madx_main.f90 -text
