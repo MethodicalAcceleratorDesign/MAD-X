@@ -261,12 +261,12 @@
 !   fun_vect  (real)    function values                                *
 !   all other working spaces for lmdif                                 *
 !----------------------------------------------------------------------*
-      integer calls,call_lim,ncon,nvar,w_ipvt(*)
+      integer calls,call_lim,ncon,nvar
 ! icovar: functionality still unclear  HG 28.2.02
 ! ilevel: print level
       double precision tol,vect(*),dvect(*),fun_vec(*),diag(*),         &
      &w_ifjac(*),w_qtf(*),w_iwa1(*),w_iwa2(*),w_iwa3(*),w_iwa4(*),one,  &
-     &xold(*)
+     &xold(*),w_ipvt(*)
       parameter(one=1d0)
       include 'match.fi'
       external mtfcn
