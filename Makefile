@@ -27,6 +27,7 @@ FC10=NO
 
 ifeq ($(OSTYPE),darwin)
   f95=g95
+  f95=gfortran
 endif
 
 #######################################################################
@@ -298,43 +299,13 @@ madx_main.o: run_madx.o madx_main.f90
 %.o : %.F90
 	$(f95) $(f95_FLAGS) $<
 
-madx: \
-	madx_main.o run_madx.o madxp.o matchptcknobs.o twiss.o survey.o orbf.o emit.o util.o \
-	fortran_wrappers.o c_wrappers.o fortran_flush.o \
-	match.o matchsa.o matchjc.o matchlib.o touschek.o dynap.o plot.o sodd.o \
-	ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o timest.o timex.o \
-	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
-	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
-	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
-	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
-	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
-	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
-	Sma0_beam_beam_ptc.o Sma_multiparticle.o Sn_mad_like.o So_fitting.o \
-	Sp_keywords.o Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqb_accel_ptc.o \
-	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
-	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
-	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
-	madx_ptc_knobs.o madx_ptc_eplacement.o ptc_export_xml.o rplot.o \
-	user2_photon.o poisson.o wrap.o
-	$(f95) $(LDOPT) -o madx madx_main.o run_madx.o madxp.o matchptcknobs.o twiss.o \
-	survey.o orbf.o emit.o util.o match.o matchsa.o matchjc.o matchlib.o \
-	touschek.o dynap.o plot.o sodd.o ibsdb.o trrun.o gxx11.o gxx11c.o resindex.o \
-	timest.o timex.o \
-	fortran_wrappers.o c_wrappers.o fortran_flush.o \
-	a_scratch_size.o b_da_arrays_all.o c_dabnew.o d_lielib.o h_definition.o \
-	i_tpsa.o j_tpsalie.o k_tpsalie_analysis.o l_complex_taylor.o \
-	m_real_polymorph.o n_complex_polymorph.o o_tree_element.o \
-	Sa_extend_poly.o Sb_sagan_pol_arbitrary.o Sc_euclidean.o Sd_frame.o \
-	Se_status.o Sf_def_all_kinds.o  Sg_sagan_wiggler.o Sh_def_kind.o \
-	Si_def_element.o Sk_link_list.o Sl_family.o Sm_tracking.o \
-	Sma0_beam_beam_ptc.o Sma_multiparticle.o Sn_mad_like.o So_fitting.o \
-	Sp_keywords.o Spb_fake_gino_sub.o Sq_orbit_ptc.o Sqb_accel_ptc.o \
-	Sr_spin.o Sra_fitting.o madx_ptc_module.o St_pointers.o madx_ptc_track_run.o \
-	madx_ptc_intstate.o madx_ptc_trackcavs.o madx_ptc_setcavs.o \
-	madx_ptc_script.o madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
-	madx_ptc_knobs.o madx_ptc_eplacement.o ptc_export_xml.o rplot.o \
-	user2_photon.o poisson.o wrap.o \
-	$(LIBX)
+# madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
+madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o
+madx_objects += $(filter-out gxx11ps.o, $(patsubst %.f90,%.o,$(wildcard *.f90)))
+madx_objects += fortran_flush.o
+
+madx: $(madx_objects)
+	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
 	strip madx
 
 clean:
@@ -355,3 +326,4 @@ info:
 	@echo LIBX "                     " = $(LIBX)
 	@echo the OS is "                " = $(OS)
 	@echo the OSTYPE is "            " = $(OSTYPE)
+	@echo madx_objects "             " = $(madx_objects)
