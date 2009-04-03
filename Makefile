@@ -25,6 +25,10 @@ SLC5=NO
 FC8=NO
 FC10=NO
 
+ifeq ($(OSTYPE),darwin)
+  f95=g95
+endif
+
 #######################################################################
 # Compilers
 #######################################################################
@@ -181,7 +185,7 @@ endif
 ifeq ($(OSTYPE),darwin)
 # allows running of madx under Macinstosh System 10
 # include headers for gxx11c
-  GCCP_FLAGS=-g -O4 -funroll-loops -D_CATCH_MEM -I. -I /usr/X11R6/include/ -D_FULL
+  GCCP_FLAGS += -I /usr/X11R6/include/
   ifeq ($(f95),g95)
     f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore
   endif
