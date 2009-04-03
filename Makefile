@@ -7,14 +7,16 @@
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # On Linux prior to using gfortran one has to source
 # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
-#GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
 ifneq ($(OSTYPE),darwin)
+  #GF_HOME Home of gfortran 4.3.2 needed for SLC4
+  #GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
+  #GF_HOME typical HOME for gfortran
   GF_HOME=/usr/bin/
 endif
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 CC=gcc
-f95=lf95
+f95=gfortran
 ARCH=32
 DEBUG=NO
 ONLINE=NO
