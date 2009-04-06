@@ -16,7 +16,7 @@ endif
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 CC=gcc
-f95=gfortran
+f95=lf95
 ARCH=32
 DEBUG=NO
 ONLINE=NO
@@ -152,6 +152,10 @@ ifeq ($(DEBUG),YES)
     # Replace Makefile_nag
     f95_FLAGS+= -ggdb3
     GCCP_FLAGS+= -Wall -pedantic -ggdb3
+  endif
+  ifeq ($(f95),gfortran)
+    f95_FLAGS+= -Wall -pedantic
+    GCCP_FLAGS+= -Wall -pedantic
   endif
 else
   GCCP_FLAGS+= -O4
