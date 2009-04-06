@@ -9,9 +9,9 @@
 # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
 ifneq ($(OSTYPE),darwin)
   #GF_HOME Home of gfortran 4.3.2 needed for SLC4
-  #GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
+  GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
   #GF_HOME typical HOME for gfortran
-  GF_HOME=/usr/bin/
+  #GF_HOME=/usr/bin/
 endif
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -116,12 +116,6 @@ ifeq ($(f95),g95)
   endif
 endif
 
-ifeq ($(f95),gfortran)
-  CC=$(GF_HOME)gcc
-  f95=$(GF_HOME)gfortran
-  f95_FLAGS+= $(M32) -fno-range-check
-endif
-
 ifeq ($(SLC5),YES)
   LIBX= -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh libX11.a -L/usr/lib -lpthread
 else
@@ -162,6 +156,12 @@ else
   ifneq ($(f95),lf95)
     f95_FLAGS+= -O4
   endif
+endif
+
+ifeq ($(f95),gfortran)
+  CC=$(GF_HOME)gcc
+  f95=$(GF_HOME)gfortran
+  f95_FLAGS+= $(M32) -fno-range-check
 endif
 
 ifeq ($(MEMLEAKS),YES)
