@@ -261,7 +261,7 @@
 !   fun_vect  (real)    function values                                *
 !   all other working spaces for lmdif                                 *
 !----------------------------------------------------------------------*
-      integer calls,call_lim,ncon,nvar
+      integer calls,call_lim,ncon,nvar,i,ipvt(nvar)
 ! icovar: functionality still unclear  HG 28.2.02
 ! ilevel: print level
       double precision tol,vect(*),dvect(*),fun_vec(*),diag(*),         &
@@ -275,8 +275,10 @@
       ilevel = 0
       call mtgeti(vect,dvect)
       call lmdif(mtfcn,ncon,nvar,calls,call_lim,vect,fun_vec,tol,diag,  &
-     &one,w_ifjac,ncon,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
-
+     &one,w_ifjac,ncon,ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
+      do i=1,nvar
+         w_ipvt(i)=ipvt(i)
+      enddo
  9999 end
 
       subroutine lmdif(fcn,m,n,calls,call_lim,x,fvec,epsfcn,diag,factor,&
