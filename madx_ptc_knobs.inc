@@ -82,41 +82,41 @@ integer, parameter                ::   gama33=27
 
 ! additional parameters for the Twiss derivatives w.r.t delta_p:
 
-integer, parameter		::	beta11p = 28
-integer, parameter		:: 	beta12p = 29
-integer, parameter		::	beta13p = 30
+integer, parameter  :: beta11p = 28
+integer, parameter  ::  beta12p = 29
+integer, parameter  :: beta13p = 30
 
-integer, parameter		::	beta21p = 31
-integer, parameter		::	beta22p = 32
-integer, parameter		::	beta23p = 33
+integer, parameter  :: beta21p = 31
+integer, parameter  :: beta22p = 32
+integer, parameter  :: beta23p = 33
 
-integer, parameter		::	beta31p = 34
-integer, parameter		::	beta32p = 35
-integer, parameter		::	beta33p = 36
+integer, parameter  :: beta31p = 34
+integer, parameter  :: beta32p = 35
+integer, parameter  :: beta33p = 36
 
-integer, parameter		::	alfa11p = 37
-integer, parameter		::	alfa12p = 38
-integer, parameter		::	alfa13p = 39
+integer, parameter  :: alfa11p = 37
+integer, parameter  :: alfa12p = 38
+integer, parameter  :: alfa13p = 39
 
-integer, parameter		::	alfa21p = 40
-integer, parameter		::	alfa22p = 41
-integer, parameter		::	alfa23p = 42
+integer, parameter  :: alfa21p = 40
+integer, parameter  :: alfa22p = 41
+integer, parameter  :: alfa23p = 42
 
-integer, parameter		::	alfa31p = 43
-integer, parameter		::	alfa32p = 44
-integer, parameter		::	alfa33p = 45
+integer, parameter  :: alfa31p = 43
+integer, parameter  :: alfa32p = 44
+integer, parameter  :: alfa33p = 45
 
-integer, parameter		::	gama11p = 46
-integer, parameter		::	gama12p = 47
-integer, parameter		::	gama13p = 48
+integer, parameter  :: gama11p = 46
+integer, parameter  :: gama12p = 47
+integer, parameter  :: gama13p = 48
 
-integer, parameter		::	gama21p = 49
-integer, parameter		::	gama22p = 50
-integer, parameter		::	gama23p = 51
+integer, parameter  :: gama21p = 49
+integer, parameter  :: gama22p = 50
+integer, parameter  :: gama23p = 51
 
-integer, parameter		::	gama31p = 52
-integer, parameter		::	gama32p = 53
-integer, parameter		::	gama33p = 54
+integer, parameter  :: gama31p = 52
+integer, parameter  :: gama32p = 53
+integer, parameter  :: gama33p = 54
 
 !---
 
