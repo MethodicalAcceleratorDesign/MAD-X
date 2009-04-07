@@ -4,17 +4,6 @@
 #
 #######################################################################
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# On Linux prior to using gfortran one has to source
-# source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
-ifneq ($(OSTYPE),darwin)
-  #GF_HOME Home of gfortran 4.3.2 needed for SLC4
-  GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
-  #GF_HOME typical HOME for gfortran
-  #GF_HOME=/usr/bin/
-endif
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 CC=gcc
 f95=lf95
 ARCH=32
@@ -23,6 +12,7 @@ ONLINE=NO
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
+SLC4=YES
 SLC5=NO
 FC8=NO
 FC10=NO
@@ -30,6 +20,18 @@ FC10=NO
 ifeq ($(OSTYPE),darwin)
   f95=g95
   f95=gfortran
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# DON'T TOUCH FOR DARWIN !!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  DEBUG=NO
+  MEMLEAKS=NO
+  PROFILE=NO
+  SLC4=NO
+  SLC5=NO
+  FC8=NO
+  FC10=NO
 endif
 
 #######################################################################
@@ -40,8 +42,6 @@ endif
 # C compilers
 #!!!!!!!!!!!!!!!!!!
 # CC=gcc
-# For gfortran the version of gcc has to be > 4.3.2 not available for SLC4
-# CC=$(GF_HOME)gcc
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # FORTRAN90 compilers proven to work
@@ -53,8 +53,9 @@ endif
 # GNU g95
 # f95=g95
 
+# For gfortran the version of gcc has to be > 4.3.2 not standard for SLC4
 # GNU gfortran
-# f95=$(GF_HOME)gfortran
+# f95=gfortran
 
 # NAG f95
 # f95=f95
@@ -116,20 +117,6 @@ ifeq ($(f95),g95)
   endif
 endif
 
-ifeq ($(SLC5),YES)
-  LIBX= -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh libX11.a -L/usr/lib -lpthread
-else
-  LIBX=-L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread
-endif
-
-ifeq ($(FC8),YES)
-  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux/4.1.2 -lgcc_eh /usr/local/lib/libgfortran.a
-endif
-
-ifeq ($(FC10),YES)
-  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh /usr/lib/gcc/x86_64-redhat-linux/4.3.2/libgfortran.a
-endif
-
 ifeq ($(DEBUG),YES)
   ifeq ($(f95),lf95)
     # Replace Makefile_develop
@@ -158,10 +145,29 @@ else
   endif
 endif
 
-ifeq ($(f95),gfortran)
-  CC=$(GF_HOME)gcc
-  f95=$(GF_HOME)gfortran
-  f95_FLAGS+= $(M32) -fno-range-check
+ifeq ($(SLC4),YES)
+  ifeq ($(f95),gfortran)
+    # Needed on SLC4
+    # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
+    GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
+    CC=$(GF_HOME)gcc
+    f95=$(GF_HOME)gfortran
+    f95_FLAGS+= $(M32) -fno-range-check
+  endif
+endif
+
+ifeq ($(SLC5),YES)
+  LIBX= -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh libX11.a -L/usr/lib -lpthread
+else
+  LIBX=-L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread
+endif
+
+ifeq ($(FC8),YES)
+  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux/4.1.2 -lgcc_eh /usr/local/lib/libgfortran.a
+endif
+
+ifeq ($(FC10),YES)
+  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh /usr/lib/gcc/x86_64-redhat-linux/4.3.2/libgfortran.a
 endif
 
 ifeq ($(MEMLEAKS),YES)
