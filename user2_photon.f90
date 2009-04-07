@@ -220,16 +220,13 @@ double precision function   ran2(idum)
         mk = mj - mk
         if(mk.lt.mz) mk = mk + mbig
         mj = ma(ii)
-11      continue
      enddo
 
      do k=1,4
         do i=1,55
            ma(i) = ma(i) - ma(1+mod(i+30,55))
            if(ma(i).lt.mz) ma(i) = ma(i) + mbig
-12         continue
         enddo
-13      continue
      enddo
      inext = 0
      inextp = 31

@@ -162,6 +162,7 @@ MODULE madx_ptc_track_run_module
   PRIVATE
 
   PUBLIC :: ptc_track_run ! Subroutine inside the module
+  include 'name_len.fi'
 
   !------------------------------------------------------------------!
   !  Variables from input files and probably corrected by this code: !
@@ -237,7 +238,7 @@ MODULE madx_ptc_track_run_module
   REAL(dp), allocatable :: sum_length_at_observ(:)   ! the sum length for the current observ.
   !                                                  ! point from the ring start
 
-  CHARACTER(24), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
+  CHARACTER(name_len), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
   !                                                  ! contrary to <character (16)> in c-code
 
   !real(KIND(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
@@ -1496,8 +1497,7 @@ CONTAINS
 
       integer :: n_temp, j_last_particle_buffer,jmax_at_loop_start, i_current_elem, &
            iii_c_code, j_th_partic, j_part, number_observation_point
-      character(16) :: name_curr_elem
-      character(24) :: name_curr_elem_24
+      character(name_len) :: name_curr_elem
       LOGICAL(lp) ::  Entry_not_exit
       REAL(dp) :: length_curr_elem
       real (dp) :: x_coord_co_temp(1:6) ! buffer for the current values of CO
@@ -1524,7 +1524,6 @@ CONTAINS
          ! at element ENTRY ================================================!                         *
          Entry_not_Exit=.TRUE. ! interaction at the entry of the curent     !                         *
          name_curr_elem=current%MAG%name                                    !                         *
-         name_curr_elem_24=name_curr_elem                                   !                         *
          length_curr_elem=current%MAG%P%ld                                  !                         *
          if (ptc_track_debug) THEN !+++debug print++++++!                   !                         l
             Print *, &                                  !                   !                         o
@@ -1690,7 +1689,7 @@ CONTAINS
                        particle_ID, x_coord_incl_co, &                      !     !    #              *
                        x_coord_co_temp, & ! x_coord_co, &                   !     !    #              *
                        spos_current_position, i_current_elem, &             !     !    #              *
-                       name_curr_elem_24)                                   !     !    #              *
+                       name_curr_elem)                                      !     !    #              *
                   ! purpose: enter all particle coordinates in one table    !     !    #              *
                   !                                                         !     !    #              *
                   !                                                         !     !    #              *
@@ -2006,7 +2005,7 @@ CONTAINS
       implicit none
 
       INTEGER, INTENT(IN)       :: i_current_elem
-      CHARACTER(16), INTENT(IN) :: name_curr_elem !      current%MAG%    name
+      CHARACTER(name_len), INTENT(IN) :: name_curr_elem !      current%MAG%    name
       ! TYPE:fibre   element Character(16)
       LOGICAL(lp), INTENT(IN)       ::  Entry_not_exit
       REAL(dp), INTENT(IN)      ::  sum_length, length_curr_elem
@@ -2149,8 +2148,7 @@ CONTAINS
 
       REAL(dp) :: length_current_element_f90, length_current_element_c ! from two databases
 
-      character (16) ::      name_16
-      integer, parameter  :: name_length_16 = 16 ! 16
+      character (name_len) ::      local_name
 
       debug_printing_1: if (ptc_track_debug) then
          Print *, 'Start subr. <Prepare_Observation_points> max_obs=', max_obs
@@ -2197,8 +2195,8 @@ CONTAINS
          IF(number_obs.GT.0) THEN
             elem_number_at_observ(number_obs)= i_ring_element
             sum_length_at_observ(number_obs) = Sum_length_S
-            call element_name(name_16,name_length_16)
-            name_el_at_obsrv(number_obs) = name_16
+            call element_name(local_name,name_len)
+            name_el_at_obsrv(number_obs) = local_name
 
             save_CO_for_el_by_el: IF (element_by_element) THEN
                DO i_coord=1,icase_ptc
@@ -2211,7 +2209,7 @@ CONTAINS
             Print *, 'i_el ', i_ring_element,' num_obs=', number_obs
             Print *, ' l_c_code=',length_current_element_c,' l_f90=', &
                  length_current_element_f90, &
-                 ' name_c=', name_16, ' &_f90=', current%MAG%name
+                 ' name_c=', local_name, ' &_f90=', current%MAG%name
             Print *, 'x_coord_co_temp=', x_coord_co_temp
 
          endif
@@ -2257,7 +2255,7 @@ CONTAINS
 
       TYPE(damap) :: Map_damap
 
-      INTEGER ::  iii_c_code, i_obs_point, i_coord, ii, &
+      INTEGER ::  iii_c_code, i_obs_point, i_coord, &
            i_from, i_till, i_dummy, i_turn_tmp, j_part_tmp, ielem
       !INTEGER :: nda, NormOrder, npara, mynd2
       INTEGER :: flag_index,why(9)
@@ -2511,7 +2509,6 @@ CONTAINS
       !    z (double (6,*))       particle orbits                            *
       !    orbit0 (double array)  reference orbit                            *
       !----------------------------------------------------------------------*
-      include 'name_len.fi'
       integer i,j,npart,turn,tot_segm,segment,part_id(*),length
       REAL(dp) :: z(6,*),orbit0(6),tmp !, tt, ss
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
