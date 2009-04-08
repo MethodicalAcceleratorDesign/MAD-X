@@ -117,6 +117,10 @@ ifeq ($(f95),g95)
   endif
 endif
 
+ifeq ($(f95),gfortran)
+  f95_FLAGS+= -fno-range-check
+endif
+
 ifeq ($(DEBUG),YES)
   ifeq ($(f95),lf95)
     # Replace Makefile_develop
@@ -152,7 +156,7 @@ ifeq ($(SLC4),YES)
     GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
     CC=$(GF_HOME)gcc
     f95=$(GF_HOME)gfortran
-    f95_FLAGS+= $(M32) -fno-range-check
+    f95_FLAGS+= $(M32)
   endif
 endif
 
