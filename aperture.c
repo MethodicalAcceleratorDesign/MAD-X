@@ -1146,7 +1146,7 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
     }
   fclose(tab_file);
   t->origin = 1;
-  add_to_table_list(t, table_register);
+/*  add_to_table_list(t, table_register); */
   return t;
 }
 
