@@ -469,11 +469,11 @@ void complete_twiss_table(struct table* t)
         tmp[n] = '\0'; /* suppress trailing i in ksi */
       val = el_par_value(tmp, c_node->p_elem);
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
-        val *= c_node->dipole_bv;
+        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
       else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 ||
                strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
                strcmp(tmp, "volt") == 0 )
-        val *= c_node->dipole_bv;
+        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
       if (el != zero)
       {
         if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
