@@ -2906,20 +2906,45 @@ contains
 
   subroutine KILL_TPSA()
     IMPLICIT NONE
-    call KILL(varc1)
-    call KILL(varc2)
-    CALL KILL_fpp   ! IN TPSALIE_ANALISYS
-    first_time=.true.
+    logical present_tpsa
+
+    present_tpsa=lingyun_yang
+    !    if(.not.first_time) then
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       call KILL(varc1)
+       call KILL(varc2)
+       CALL KILL_fpp   ! IN TPSALIE_ANALISYS
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
+       call KILL(varc1)
+       call KILL(varc2)
+       CALL KILL_fpp   ! IN TPSALIE_ANALISYS
+    endif
+    lingyun_yang=default_tpsa
+    last_tpsa=0
+    !    endif
+    !    first_time=.true.
+
   END subroutine KILL_TPSA
 
   subroutine init_map_c(NO1,ND1,NP1,NDPT1,log)
     implicit none
     integer NO1,ND1,NP1,NDPT1
-    LOGICAL(lp) log
-    if(.not.first_time) then
+    LOGICAL(lp) log,present_tpsa
+    present_tpsa=lingyun_yang
+    !    if(.not.first_time) then
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       call kill(varc1)
+       call kill(varc2)
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
        call kill(varc1)
        call kill(varc2)
     endif
+    lingyun_yang=present_tpsa
+    !    endif
 
     call init_map(NO1,ND1,NP1,NDPT1,log)
     call set_in_complex(log)
@@ -2931,11 +2956,20 @@ contains
   subroutine init_tpsa_c(NO1,NP1,log)
     implicit none
     integer NO1,NP1
-    LOGICAL(lp) log
-    if(.not.first_time) then
+    LOGICAL(lp) log,present_tpsa
+    present_tpsa=lingyun_yang
+    !    if(.not.first_time) then
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       call kill(varc1)
+       call kill(varc2)
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
        call kill(varc1)
        call kill(varc2)
     endif
+    lingyun_yang=present_tpsa
+    !    endif
     call init_tpsa(NO1,NP1,log)
     call set_in_complex(log)
     call alloc(varc1)

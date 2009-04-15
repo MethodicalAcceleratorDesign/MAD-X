@@ -4,7 +4,7 @@ module beam_beam_ptc
   ! use madx_ptc_module
   implicit none
   public
-  private BBKICKP, BBKICKR
+  private BBKICKP, BBKICKR,PATCH_BBR,PATCH_BBP
   private ccperrfP, ccperrfr ,ccperrf
   !  private TRACK_NODE_LAYOUT_FLAG_R,TRACK_NODE_LAYOUT_FLAG_P
   private imax
@@ -20,15 +20,77 @@ module beam_beam_ptc
      MODULE PROCEDURE BBKICKR
      MODULE PROCEDURE BBKICKP
   END INTERFACE
-
-  !    INTERFACE track_x_bb
-  !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_R
-  !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_P
-  !    END INTERFACE
+  INTERFACE PATCH_BB
+     MODULE PROCEDURE PATCH_BBR
+     MODULE PROCEDURE PATCH_BBP
+  END INTERFACE
 
   logical(lp), target :: do_beam_beam= my_false
 
 contains
+
+  SUBROUTINE PATCH_BBR(B,X,k,BETA0,exact,ENTERING)
+    implicit none
+    ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
+    TYPE(BEAM_BEAM_NODE),TARGET,INTENT(INOUT):: B
+    real(dp), INTENT(INOUT):: X(6)
+    logical(lp),INTENT(IN):: exact,ENTERING
+    REAL(DP),INTENT(IN):: BETA0
+    REAL(DP) A(3),D(3)
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    IF(ENTERING) THEN
+       X(3)=B%A_X1*X(3);X(4)=B%A_X1*X(4);
+       CALL ROT_YZ(B%A(1),X,BETA0,exact,k%TIME)
+       CALL ROT_XZ(B%A(2),X,BETA0,exact,k%TIME)
+       CALL ROT_XY(B%A(3),X)  !,exact)
+       CALL TRANS(B%D,X,BETA0,exact,k%TIME)
+       X(3)=B%A_X2*X(3);X(4)=B%A_X2*X(4);
+    ELSE
+       A=-B%A
+       D=-B%D
+       X(3)=B%A_X2*X(3);X(4)=B%A_X2*X(4);
+       CALL TRANS(D,X,BETA0,exact,k%TIME)
+       CALL ROT_XY(A(3),X)  !,exact)
+       CALL ROT_XZ(A(2),X,BETA0,exact,k%TIME)
+       CALL ROT_YZ(A(1),X,BETA0,exact,k%TIME)
+       X(3)=B%A_X1*X(3);X(4)=B%A_X1*X(4);
+    ENDIF
+
+
+  END SUBROUTINE PATCH_BBR
+
+  SUBROUTINE PATCH_BBP(B,X,k,BETA0,exact,ENTERING)
+    implicit none
+    ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
+    TYPE(BEAM_BEAM_NODE),TARGET,INTENT(INOUT):: B
+    TYPE(REAL_8), INTENT(INOUT):: X(6)
+    logical(lp),INTENT(IN):: exact,ENTERING
+    REAL(DP),INTENT(IN):: BETA0
+    REAL(DP) A(3),D(3)
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    IF(ENTERING) THEN
+       X(3)=B%A_X1*X(3);X(4)=B%A_X1*X(4);
+       CALL ROT_YZ(B%A(1),X,BETA0,exact,k%TIME)
+       CALL ROT_XZ(B%A(2),X,BETA0,exact,k%TIME)
+       CALL ROT_XY(B%A(3),X)  !,exact)
+       CALL TRANS(B%D,X,BETA0,exact,k%TIME)
+       X(3)=B%A_X2*X(3);X(4)=B%A_X2*X(4);
+    ELSE
+       A=-B%A
+       D=-B%D
+       X(3)=B%A_X2*X(3);X(4)=B%A_X2*X(4);
+       CALL TRANS(D,X,BETA0,exact,k%TIME)
+       CALL ROT_XY(A(3),X)  !,exact)
+       CALL ROT_XZ(A(2),X,BETA0,exact,k%TIME)
+       CALL ROT_YZ(A(1),X,BETA0,exact,k%TIME)
+       X(3)=B%A_X1*X(3);X(4)=B%A_X1*X(4);
+    ENDIF
+
+
+  END SUBROUTINE PATCH_BBP
+
 
   subroutine BBKICKR(BB,X)
 
@@ -42,10 +104,8 @@ contains
     !   b%x(:,6)(double)  track coordinates: (x, px, y, py,  pt,t).        *
     !   b%n    (integer) number of tracks.                                 *
     !----------------------------------------------------------------------*
-    logical(lp) bborbit
-    integer itrack
     real(dp) sx2,sy2,xs,ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,&
-         bbpar,cbx,cby,ten3m,explim,sx,sy,xm,ym,DZ
+         cbx,cby,ten3m,explim,sx,sy,xm,ym
     TYPE(BEAM_BEAM_NODE), INTENT(INOUT) ::BB
     REAL(DP), INTENT(INOUT) :: X(6)
     parameter(ten3m=1.0e-3_dp,explim=150.0_dp)
@@ -238,8 +298,7 @@ contains
     !   b%x(:,6)(double)  track coordinates: (x, px, y, py,  pt,t).      *
     !   b%n    (integer) number of tracks.                              *
     !----------------------------------------------------------------------*
-    logical(lp) bborbit
-    integer itrack,it
+    integer it
     TYPE(REAL_8) xs,ys,tk,phix,phiy,xb,yb,crx,cry
     TYPE(REAL_8) xr,yr,cbx,cby,rho2
     REAL(DP) sx2,sy2,sx,sy,xm,ym,fk,ten3m,explim,xn1,xn2,xs1,xs2,arglim,rk

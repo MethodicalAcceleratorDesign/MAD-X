@@ -962,6 +962,7 @@ contains
     c_%nd => nd
     c_%nd2 => nd2
     c_%np => np
+    c_%NPARA => NPARA_original
     c_%NSPIN => NSPIN
     c_%SPIN_POS => SPIN_POS
     c_%ndpt => ndpt

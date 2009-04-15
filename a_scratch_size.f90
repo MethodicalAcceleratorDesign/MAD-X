@@ -104,6 +104,7 @@ module precision_constants
   ![GeV*m] old: HBC=1.9732858e-16_dp
   !Smallness Parameters
   real(dp),parameter::epsmac=1e-7_dp,c_1d_20=1e-20_dp,c_1d_37=1e-37_dp
+  real(dp) :: epsflo=1.e-10_dp
   real(dp),parameter::mybig=1e38_dp
   real(dp),parameter::machep=1e-17_dp
   real(dp),parameter::PUNY=1e-38_dp
@@ -174,6 +175,10 @@ module precision_constants
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=c_1d6
   real(dp),pointer :: crash
+  INTEGER,  TARGET :: NPARA_original
+  logical  :: default_tpsa=.false.
+  logical, target :: lingyun_yang=.false.
+  integer, target :: last_tpsa=0
   integer :: mf_herd=0
   character*255 :: print_herd="PRINT_HERD.TXT"
   character*255 :: initial_setting="FINAL_SETTINGS.TXT"
@@ -317,6 +322,7 @@ module precision_constants
   END INTERFACE
 
 contains
+
 
   SUBROUTINE  check_stability(S1)
     implicit none
@@ -463,6 +469,17 @@ contains
        IPAUSE=MYPAUSE(IEX)
     ENDIF
   END SUBROUTINE WRITE_G
+
+  SUBROUTINE WRITE_a(IEX)
+    IMPLICIT NONE
+    integer, OPTIONAL :: IEX
+    logical(lp) temp
+    temp=global_verbose
+    global_verbose=.true.
+    call WRITE_i(IEX)
+    global_verbose=temp
+
+  END SUBROUTINE WRITE_a
 
   SUBROUTINE read_int(IEX)
     IMPLICIT NONE

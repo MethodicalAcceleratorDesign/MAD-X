@@ -635,6 +635,25 @@ MODULE TPSA
   END INTERFACE
 
 
+  !  INTERFACE daread
+  !     MODULE PROCEDURE rea
+  !  END INTERFACE
+
+  !  INTERFACE read
+  !     MODULE PROCEDURE rea
+  !  END INTERFACE
+
+  !  INTERFACE daprint
+  !     MODULE PROCEDURE pri
+  !  END INTERFACE
+
+
+
+  !  INTERFACE print
+  !     MODULE PROCEDURE pri
+  !  END INTERFACE
+
+
   ! Constructors and Destructors
 
   INTERFACE alloc
@@ -671,6 +690,25 @@ MODULE TPSA
 CONTAINS
 
 
+  SUBROUTINE  change_default_tpsa(i)
+    implicit none
+    INTEGER, intent(in) :: I
+    if(last_tpsa==0) then
+       if(i==1) then
+          default_tpsa=.true.
+          if(i==1.and.lingyun_yang )write(6,*) " Default TPSA is CPP package of Yang"
+          call change_package(i)
+       else
+          default_tpsa=.false.
+          call change_package(i)
+          if(i==2.and.(.not.lingyun_yang) )write(6,*) " Default TPSA is FORTRAN package of Berz (LBNL)"
+       endif
+    else
+       write(6,*) " You could not change default TPSA here "
+       write(6,*) " Only prior to any call to TPSA or PTC or after a PTC_END "
+       stop 666
+    endif
+  end   SUBROUTINE  change_default_tpsa
 
 
   subroutine set_in_tpsa(NO1,ND1,ND21,NP1,NDPT1,NV1,log)
@@ -759,7 +797,8 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(INOUT)::S1
 
-    IF(first_time) THEN
+    !    IF(first_time) THEN
+    IF(last_tpsa==0) THEN
        w_p=0
        w_p%nc=1
        w_p=(/" No TPSA package ever initialized "/)
@@ -1256,7 +1295,6 @@ CONTAINS
     TYPE (taylor) CUTORDER
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
-    INTEGER I
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -2745,48 +2783,35 @@ CONTAINS
   END FUNCTION GETintnd2t
 
 
-  SUBROUTINE  taylor_cycle(S1,N,VALUE,J)
+  SUBROUTINE  taylor_cycle(S1,size,ii,VALUE,J)
     implicit none
     type (taylor),INTENT(IN)::S1
-    integer, intent(inout):: n
+    integer,optional, intent(inout):: size
+    integer,optional, intent(in):: ii
     integer,optional, intent(inout)::J(:)
     real(dp), OPTIONAL, intent(inout):: value
     INTEGER ipresent,ILLA
     real(dp) VALUE0
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) THEN
-    IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
-       call dacycle(S1%i,N,value,illa,J)
-    ELSE
-       call dacycle(S1%i,ipresent,value0,N)
+    IF(PRESENT(J).AND.PRESENT(VALUE).and.present(ii)) THEN
+       call dacycle(S1%i,ii,value,illa,J)
+    ELSEif(present(size)) then
+       call dacycle(S1%i,ipresent,value0,size)
+    else
+       write(6,*) "error in taylor_cycle"
+       stop 888
     ENDIF
-    !    ELSE
-    !       IF(PRESENT(J).AND.PRESENT(VALUE)) THEN
-    !          ILLA=0
-    !          DO i=1,SIZE(S1%J%R)
-    !             IF(PACKING) THEN
-    !                IF(S1%J%YES(I))      ILLA=ILLA+1
-    !             ELSE
-    !                IF(S1%J%R(I)/=zero)  ILLA=ILLA+1
-    !             ENDIF
-    !             IF(ILLA==N) EXIT
-    !          ENDDO
-    !          VALUE=S1%J%R(ILLA)
-    !          N=N+1
-    !       ELSE
-    !          N=0
-    !          DO i=1,SIZE(S1%J%R)
-    !             IF(PACKING) THEN
-    !                IF(S1%J%YES(I)) N=N+1
-    !             ELSE
-    !                IF(S1%J%R(I)/=zero)  N=N+1
-    !             ENDIF
-    !          ENDDO
-    !       ENDIF
-    !
-    !    ENDIF
 
   END SUBROUTINE taylor_cycle
+
+
+  SUBROUTINE  taylor_clean(S1,VALUE)
+    implicit none
+    type (taylor),INTENT(INout)::S1
+    real(dp) value
+    call daclean(S1%i,value)
+  END SUBROUTINE taylor_clean
 
   subroutine check_snake()
     implicit none
@@ -3043,8 +3068,9 @@ CONTAINS
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     type (TAYLOR), intent(in):: s1
-    INTEGER inoc,invc,ipoc,k,n,I,J(LNV)
-
+    INTEGER ipresent,k,n,I,illa
+    real(dp) value
+    INTEGER, allocatable :: j(:)
     call check_snake
 
     ! if(old) then
@@ -3056,22 +3082,24 @@ CONTAINS
 
     IF(ASSOCIATED(S2%N)) S2=-1
     S2=0
-    ! if(old) THEN
-    CALL dainf(S1%I,inoc,invc,ipoc,k,N)
-    CALL ALLOC_U(S2,N,invc)
+    ipresent=1
+    call dacycle(S1%I,ipresent,value,n)
+    CALL ALLOC_U(S2,N,c_%nv)
+    allocate(j(c_%nv))
+
     do i=1,N
-       k=ipoC+i-1
-       CALL GET_C_J(S1%I,k,S2%C(I),J)
-       if(no==1) then
-          j=0
-          k=k-ipoc
-          if(k/=0) j(k)=1
-       endif
-       DO N=1,S2%NV
-          S2%J(i,N)=J(N)
+       call dacycle(S1%I,i,value,illa,j)
+       S2%C(I)=value
+       DO k=1,S2%NV
+          S2%J(i,k)=J(k)
        ENDDO
     ENDDO
+
+    deallocate(j)
+
   END SUBROUTINE FILL_UNI
+
+
 
   SUBROUTINE  REFILL_UNI(S1,S2)
     implicit none
@@ -3444,12 +3472,13 @@ CONTAINS
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       master=sqrt(-dble(master))
+       write(6,*) " cannot indent anymore ",ndumt
        w_p=0
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
        CALL WRITE_E(100)
+       master=sqrt(-dble(master))
     end select
     !    write(26,*) "   taylor ",master
     call ass0(s1)

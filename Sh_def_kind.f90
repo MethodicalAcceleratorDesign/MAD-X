@@ -129,7 +129,6 @@ MODULE S_DEF_KIND
   real(dp), target :: phase0=-pi
   real(dp), target :: wedge_coeff(2)
   logical(lp), target :: MAD8_WEDGE=.TRUE.
-  INTEGER , target :: CAVITY_TOTALPATH=1   !  default is fake
   logical(lp) :: bug_intentional=.true.
   INTEGER :: N_CAV4_F=1
   ! stochastic radiation in straigth
@@ -819,9 +818,7 @@ contains
     !      TYPE(BEAM), INTENT(INOUT) ::B
     integer,INTENT(IN):: J
     real(dp), INTENT(INOUT) :: X(6)
-    integer  i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-
 
     ! J=1 front
     IF(PRESENT(EL)) THEN
@@ -957,7 +954,6 @@ contains
     !      TYPE(BEAM), INTENT(INOUT) ::B
     integer,INTENT(IN):: J
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
-    integer  i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
 
@@ -1092,7 +1088,6 @@ contains
     REAL(DP), INTENT(INOUT)::  X(6)
     TYPE(CAV4),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
-    integer i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(J==1) THEN
@@ -1124,7 +1119,6 @@ contains
     TYPE(REAL_8), INTENT(INOUT)::  X(6)
     TYPE(CAV4P),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
-    integer i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(J==1) THEN
@@ -1555,7 +1549,7 @@ contains
     REAL(DP), INTENT(INOUT) ::  X(6)
     TYPE(CAV4),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
-    integer i,JC
+    integer JC
     REAL(DP) C1,S1,V,O
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -1589,7 +1583,7 @@ contains
     TYPE(REAL_8), INTENT(INOUT) ::  X(6)
     TYPE(CAV4P),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
-    integer i,JC
+    integer JC
     TYPE(REAL_8) C1,S1,V,O
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -2884,7 +2878,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(DKD2),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
-    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -2941,7 +2935,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(DKD2P),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
-    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -3216,7 +3210,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
     TYPE(DKD2),INTENT(IN):: EL
-    INTEGER I,J
+    INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -3280,7 +3274,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SOL5),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
-    real(dp)  X_MEC(6),B(3),B2,X5,bsol
+    real(dp)  X5,bsol
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     ! NO EXACT EL%EXACT
@@ -3310,7 +3304,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SOL5P),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
-    TYPE(REAL_8)  X_MEC(6),B(3),B2,X5,BSOL
+    TYPE(REAL_8)  X5,BSOL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ALLOC(X5,BSOL)
@@ -4341,7 +4335,6 @@ contains
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(SOLT),INTENT(INOUT):: EL
 
-    INTEGER I
     real(dp) DK,DK2,DK4,DK5,DK6,DKT
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -4426,7 +4419,6 @@ contains
     TYPE(SOLTP),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    INTEGER I
     TYPE(REAL_8) DK,DK2,DK4,DK5,DK6,DKT
 
     CALL ALLOC(DK,DK2,DK4,DK5,DK6,DKT)
@@ -5215,7 +5207,6 @@ contains
     TYPE(KTK),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    INTEGER I
     real(dp) DK,DK2,DK6,DK4,DK5
 
 
@@ -5306,7 +5297,6 @@ contains
     TYPE(KTKP),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    INTEGER I
     TYPE(REAL_8) DK,DK2,DK6,DK4,DK5
 
 
@@ -5489,7 +5479,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(KTK),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
-    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -5533,7 +5523,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(KTKP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
-    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -6206,7 +6196,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(TKTF),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
-    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -6252,7 +6242,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(TKTFP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
-    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT,B(3),B2
+    TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT
     INTEGER J,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -6453,7 +6443,7 @@ contains
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(TKTF),INTENT(INOUT):: EL
     integer,optional :: pos
-    INTEGER I,f1
+    INTEGER f1
     real(dp) DK,DK2,DK6,DK4,DK5
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -6628,7 +6618,7 @@ contains
        call write_e(357)
     END SELECT
     !       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
-    !        call check_S_APERTURE_out(el%p,pos,x)
+    !       call check_S_APERTURE_out(el%p,pos,x)
 
   END SUBROUTINE INTER_TKTF
 
@@ -6637,7 +6627,7 @@ contains
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(TKTFP),INTENT(INOUT):: EL
     integer,optional :: pos
-    INTEGER I,f1
+    INTEGER f1
     TYPE(REAL_8) DK,DK2,DK6,DK4,DK5
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -8737,7 +8727,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN):: YL
     TYPE(TEAPOT),INTENT(IN):: EL
-    real(dp) X1,X3,X5,BX,BY,BTX,BTY,B(3),B2,BtYT
+    real(dp) X1,X3,X5,BX,BY,BTX,BTY,BtYT
     INTEGER J,M,A,K1,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -8842,7 +8832,6 @@ contains
     INTEGER J,M,A,K1,DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    real(dp) junk
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -9257,7 +9246,6 @@ contains
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(TEAPOT),INTENT(IN):: EL
     integer,INTENT(IN):: J
-    INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(EL%P%DIR==1) THEN
@@ -9361,7 +9349,7 @@ contains
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(TEAPOTP),INTENT(IN):: EL
     integer,INTENT(IN):: J
-    INTEGER I
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(EL%P%DIR==1) THEN
@@ -9462,7 +9450,6 @@ contains
 
   SUBROUTINE SSYMPINTR(EL,X,k,MID)
     IMPLICIT NONE
-    logical(lp) :: doneitt=.true.
     real(dp),INTENT(INOUT):: X(6)
     TYPE(TEAPOT),INTENT(IN):: EL
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
@@ -9479,7 +9466,6 @@ contains
 
   SUBROUTINE SSYMPINTP(EL,X,k)
     IMPLICIT NONE
-    logical(lp) :: doneitt=.true.
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(TEAPOTP),INTENT(INOUT):: EL
     ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
@@ -9863,7 +9849,6 @@ contains
     TYPE(ESEPTUM),INTENT(INOUT):: EL
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: MID
     real(dp) K1,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
-    LOGICAL(LP) EXACT
     integer, intent(IN) ::i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -10037,7 +10022,6 @@ contains
     TYPE(ESEPTUMP),INTENT(INOUT):: EL
     ! TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: MID
     TYPE(REAL_8) K1,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG
-    LOGICAL(LP) EXACT
     integer, intent(IN) ::i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -10691,7 +10675,7 @@ contains
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(STREX),INTENT(IN):: EL
     real(dp) ANGH
-    INTEGER I
+
     ! J=1 front
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -10877,7 +10861,6 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(STREXP),INTENT(IN):: EL
     ! TYPE(WORM_8),OPTIONAL,INTENT(INOUT):: MID
-    real(dp) ANGH
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL fringe_STREX(EL,X,k,1)
@@ -11187,7 +11170,6 @@ contains
     REAL(DP), INTENT(INOUT) :: X(6)
     TYPE(CAV_TRAV),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
-    integer i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(J==1) RETURN
@@ -11205,7 +11187,6 @@ contains
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
-    integer i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(J==1) RETURN
@@ -11225,7 +11206,6 @@ contains
 
     integer , INTENT(IN) :: j
     real(dp) D1
-    INTEGER I
     REAL(DP) Z0
     INTEGER TOTALPATH
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -11276,7 +11256,6 @@ contains
 
     !    TYPE(REAL_8), INTENT(IN) :: Z
     integer, INTENT(IN) :: j
-    INTEGER I
     TYPE(REAL_8) Z0,D1
     INTEGER TOTALPATH
 
@@ -11471,7 +11450,6 @@ contains
     integer,INTENT(IN):: J
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(CAV_TRAV),INTENT(INOUT):: EL
-    INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     ! J=1 front
     IF(J==1) THEN
@@ -11492,7 +11470,6 @@ contains
     integer,INTENT(IN):: J
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
-    INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     ! J=1 front
     IF(J==1) THEN
@@ -12309,7 +12286,7 @@ contains
   subroutine fxr(f,x,k,b,p)
     implicit none
 
-    real(dp)  d(3),c(6),BETA0,GAMMA0I,hcurv,b2
+    real(dp)  d(3),c(6),BETA0,GAMMA0I,hcurv
     real(dp) ,intent(in) :: b(3)
     type(MAGNET_CHART), pointer:: p
     real(dp) ,intent(inout) :: x(6)
@@ -12363,7 +12340,7 @@ contains
   subroutine fxp(f,x,k,b,p)
     implicit none
 
-    type(real_8)  d(3),c(6),b2
+    type(real_8)  d(3),c(6)
     type(real_8) ,intent(inout) :: x(6)
     type(real_8) ,intent(in) :: b(3)
     real(dp)   BETA0,GAMMA0I,hcurv
@@ -12630,7 +12607,6 @@ contains
   SUBROUTINE reset_pa(EL)
     IMPLICIT NONE
     TYPE(PANCAKEP), INTENT(INOUT)::EL
-    integer i
     ! CALL resetpoly_R31 ON ALL THE INTERNAL POLYMORPHS
 
     call resetpoly_R31(EL%SCALE)
@@ -12910,7 +12886,6 @@ contains
     TYPE(PANCAKE),INTENT(INOUT):: EL
 
     INTEGER, INTENT(IN) :: J
-    INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(J==1) then
@@ -12927,7 +12902,6 @@ contains
     TYPE(PANCAKEP),INTENT(INOUT):: EL
 
     INTEGER, INTENT(IN) :: J
-    INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     IF(J==1) then
@@ -12943,8 +12917,8 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(PANCAKE),INTENT(INOUT):: EL
     integer, intent(in) :: POS
-    INTEGER I,IS
-    real(dp) ti,h
+    INTEGER IS
+    real(dp) h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     H=el%L/el%p%NST
@@ -12975,7 +12949,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(PANCAKEP),INTENT(INOUT):: EL
     integer, intent(in) :: POS
-    INTEGER I,IS
+    INTEGER IS
     TYPE(REAL_8) ti,h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -13013,7 +12987,7 @@ contains
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
     TYPE(PANCAKE),INTENT(INOUT):: EL
     INTEGER I,IS
-    real(dp) ti,h
+    real(dp) h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     H=el%L/el%p%NST
@@ -13059,7 +13033,6 @@ contains
     TYPE(PANCAKEP),INTENT(INOUT):: EL
     INTEGER I,IS
     TYPE(REAL_8) ti,h
-    REAL(DP) a(2)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ALLOC(TI,H)
@@ -13361,7 +13334,7 @@ contains
     type (real_8)  yt(ne),f(ne),a(ne),b(ne)
     type (real_8)  tt
     type (cav_travp) ,INTENT(INOUT)::  GR
-    integer j,n_g,n_g_p
+    integer j
     type(real_8), intent(inout) :: ti,h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -13779,10 +13752,9 @@ contains
     real(dp),  INTENT(IN)::X(6),Z
     real(dp), OPTIONAL, INTENT(INOUT)::DA2(2),B(3),A(2),int_ax_dy,int_aY_dX
     real(dp), OPTIONAL, INTENT(INOUT)::d(3,3)
-    REAL(DP) R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si,F,FR,DA(3,3)
+    REAL(DP) R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si,F,DA(3,3)
     REAL(DP) x1,y1,k
     real(dp) int_x2_f_by_x_dy,int_y2_f_by_y_dx,int_f
-    INTEGER I
 
     x1=x(1)
     y1=x(3)
@@ -13865,7 +13837,7 @@ contains
     type(real_8), OPTIONAL, INTENT(INOUT):: d(3,3)
     type(real_8) x1,y1,k,F,FR,DA(3,3)
     type(real_8) int_x2_f_by_x_dy,int_y2_f_by_y_dx,int_f
-    INTEGER I,j,kk
+    INTEGER j,kk
 
     call alloc(R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si)
     call alloc(x1,y1,k,F,FR )
@@ -14248,7 +14220,6 @@ contains
 
   SUBROUTINE INTP_HE_TOT(EL,X,k)
     IMPLICIT NONE
-    integer ipause
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(HELICAL_DIPOLEP),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE)  K
@@ -14271,7 +14242,6 @@ contains
     TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
     real(dp),INTENT(IN):: L,Z
     real(dp) PZ,PZ0,DPZ
-    real(dp) A(3),int_ax_dy !,int_aY_dX
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
     !     CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
@@ -14323,7 +14293,7 @@ contains
     TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
     real(dp),INTENT(IN):: L,Z
     real(dp) PZ
-    real(dp) A(3),da(3,3),int_ax_dy !,int_aY_dX
+    real(dp) A(3),da(3,3) !,int_ax_dy !,int_aY_dX
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
 

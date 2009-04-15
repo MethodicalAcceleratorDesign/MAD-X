@@ -26,7 +26,7 @@ module ptc_spin
   private DTILTR_SPIN,DTILTP_SPIN,DTILT_SPIN
   PRIVATE TRACK_SPIN_FRONTR,TRACK_SPIN_FRONTP,TRACK_SPIN_FRONT
   PRIVATE TRACK_SPIN_BACKR,TRACK_SPIN_BACKP,TRACK_SPIN_BACK
-  private PUSH_SPIN_RAY8,TRACK_SPIN_BACK_RAY8,TRACK_SPIN_FRONT_ray8
+  private PUSH_SPIN_RAY8
   private radiate_2p,radiate_2r,radiate_2
   private TRACK_NODE_FLAG_probe_R,TRACK_NODE_FLAG_probe_p,TRACK_NODE_LAYOUT_FLAG_spinr_x
   private FIND_ORBIT_LAYOUT_noda,TRACK_NODE_LAYOUT_FLAG_spinp_x
@@ -39,6 +39,7 @@ module ptc_spin
   private alloc_temporal_probe,FIND_ORBIT_LAYOUT_noda_spin
   !REAL(DP) :: AG=A_ELECTRON
   REAL(DP) :: bran_init=pi
+  !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
 
   INTERFACE alloc
      MODULE PROCEDURE alloc_temporal_probe
@@ -128,13 +129,13 @@ module ptc_spin
   INTERFACE TRACK_SPIN_FRONT
      MODULE PROCEDURE TRACK_SPIN_FRONTR
      MODULE PROCEDURE TRACK_SPIN_FRONTP
-     MODULE PROCEDURE TRACK_SPIN_FRONT_ray8
+     !     MODULE PROCEDURE TRACK_SPIN_FRONT_ray8
   END INTERFACE
 
   INTERFACE TRACK_SPIN_BACK
      MODULE PROCEDURE TRACK_SPIN_BACKR
      MODULE PROCEDURE TRACK_SPIN_BACKP
-     MODULE PROCEDURE TRACK_SPIN_BACK_RAY8
+     !     MODULE PROCEDURE TRACK_SPIN_BACK_RAY8
   END INTERFACE
 
   INTERFACE GET_BE_CAV
@@ -216,108 +217,126 @@ module ptc_spin
 
 contains
 
-  subroutine rot_spin_yr(s,ang)
+  subroutine rot_spin_yr(P,ang)
     implicit none
-    REAL(DP),INTENT(INOUT) ::  S(3)
+    TYPE(PROBE),INTENT(INOUT) ::  P
     REAL(DP), INTENT(IN) :: ang
     REAL(DP) co,si,st
+    INTEGER I
 
     CO =COS(ang)
     SI =sin(ang)
 
-    ST=  CO *S(1)+SI *S(3)
-    S(3)=CO *S(3)-SI *S(1)
-    S(1)=ST
-
+    DO I=ISPIN0R,ISPIN1R
+       ST=  CO *P%S(I)%X(1)+SI *P%S(I)%X(3)
+       P%S(I)%X(3)=CO *P%S(I)%X(3)-SI *P%S(I)%X(1)
+       P%S(I)%X(1)=ST
+    ENDDO
   END subroutine rot_spin_yr
 
-  subroutine rot_spin_Xr(s,ang)
+  subroutine rot_spin_Xr(P,ang)
     implicit none
-    REAL(DP),INTENT(INOUT) ::  S(3)
+    TYPE(PROBE),INTENT(INOUT) ::  P
     REAL(DP), INTENT(IN) :: ang
     REAL(DP) co,si,st
+    INTEGER I
 
     CO =COS(ang)
     SI =sin(ang)
 
-    ST=  CO *S(2)+SI *S(3)
-    S(3)=CO *S(3)-SI *S(2)
-    S(2)=ST
+    DO I=ISPIN0R,ISPIN1R
+       ST=  CO *P%S(I)%X(2)+SI *P%S(I)%X(3)
+       P%S(I)%X(3)=CO *P%S(I)%X(3)-SI *P%S(I)%X(2)
+       P%S(I)%X(2)=ST
+    ENDDO
 
   END subroutine rot_spin_Xr
 
-  subroutine rot_spin_zr(s,ang)
+  subroutine rot_spin_zr(P,ang)
     implicit none
-    REAL(DP),INTENT(INOUT) ::  S(3)
+    TYPE(PROBE),INTENT(INOUT) ::  P
     REAL(DP), INTENT(IN) :: ang
     REAL(DP) co,si,st
+    INTEGER I
 
     CO =COS(ang)
     SI =sin(ang)
 
-    ST=  CO *S(1)+SI *S(2)
-    S(2)=CO *S(2)-SI *S(1)
-    S(1)=ST
+    DO I=ISPIN0R,ISPIN1R
+       ST=  CO *P%S(I)%X(1)+SI *P%S(I)%X(2)
+       P%S(I)%X(2)=CO *P%S(I)%X(2)-SI *P%S(I)%X(1)
+       P%S(I)%X(1)=ST
+    ENDDO
+
 
   END subroutine rot_spin_zr
 
 
-  subroutine rot_spin_yp(s,ang)
+  subroutine rot_spin_yp(P,ang)
     implicit none
-    type(real_8),INTENT(INOUT) ::  S(3)
+    type(PROBE_8),INTENT(INOUT) ::  P
     REAL(DP), INTENT(IN) :: ang
     REAL(DP) co,si
     type(real_8) st
     !type(real_8) co,si,st
+    INTEGER I
 
     call alloc(st)
 
     CO =COS(ang)
     SI =sin(ang)
 
-    ST=  CO *S(1)+SI *S(3)
-    S(3)=CO *S(3)-SI *S(1)
-    S(1)=ST
+    DO I=ISPIN0r,ISPIN1r
+       ST=  CO *P%S(I)%X(1)+SI *P%S(I)%X(3)
+       P%S(I)%X(3)=CO *P%S(I)%X(3)-SI *P%S(I)%X(1)
+       P%S(I)%X(1)=ST
+    ENDDO
 
     call kill(st)
 
   END subroutine rot_spin_yp
 
-  subroutine rot_spin_xp(s,ang)
+  subroutine rot_spin_xp(P,ang)
     implicit none
-    type(real_8),INTENT(INOUT) ::  S(3)
+    type(PROBE_8),INTENT(INOUT) :: P
     REAL(DP), INTENT(IN) :: ang
     REAL(DP) co,si
     type(real_8) st
+    INTEGER I
 
     call alloc(st)
 
     CO =COS(ang)
     SI =sin(ang)
 
-    ST=  CO *S(2)+SI *S(3)
-    S(3)=CO *S(3)-SI *S(2)
-    S(2)=ST
+    DO I=ISPIN0R,ISPIN1R
+       ST=  CO *P%S(I)%X(2)+SI *P%S(I)%X(3)
+       P%S(I)%X(3)=CO *P%S(I)%X(3)-SI *P%S(I)%X(2)
+       P%S(I)%X(2)=ST
+    ENDDO
 
     call kill(st)
 
   END subroutine rot_spin_xp
 
-  subroutine rot_spin_zp(s,ang)
+  subroutine rot_spin_zp(P,ang)
     implicit none
-    type(real_8),INTENT(INOUT) ::  S(3)
+    type(PROBE_8),INTENT(INOUT) ::  P
     REAL(DP), INTENT(IN) :: ang
     REAL(DP) co,si
     type(real_8) st
+    INTEGER I
 
     call alloc(st)
 
     CO =COS(ang)
     SI =sin(ang)
 
-    ST=  CO *S(1)+SI *S(2)
-    S(2)=CO *S(2)-SI *S(1)
-    S(1)=ST
+    DO I=ISPIN0R,ISPIN1R
+       ST=  CO *P%S(I)%X(1)+SI *P%S(I)%X(2)
+       P%S(I)%X(2)=CO *P%S(I)%X(2)-SI *P%S(I)%X(1)
+       P%S(I)%X(1)=ST
+    ENDDO
 
     call kill(st)
 
@@ -327,29 +346,26 @@ contains
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTP), POINTER::EL
-    TYPE(MAGNET_CHART), POINTER::P
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    TYPE(REAL_8), INTENT(IN) :: DS
+    TYPE(REAL_8), INTENT(INout) :: DS
     REAL(DP), INTENT(IN) :: FAC
-    TYPE(REAL_8) OM(3),CO(3),SI(3)
-    TYPE(REAL_8) ST
     type(probe_8),INTENT(INOUT) ::S
-    integer i,j
     LOGICAL(LP),intent(in) :: before
     type(internal_state) k
     el=>c%parent_fibre%magp
     if(EL%kind<=kind1) return
-    call PUSH_SPIN(c,DS,FAC,S%S%x,S%X,S%E_IJ,before,k,POS)
+    call PUSH_SPIN(c,DS,FAC,S,S%E_IJ,before,k,POS)
 
   end subroutine PUSH_SPIN_RAY8
 
-  subroutine radiate_2r(c,DS,FAC,X,b2,dlds,XP,before,k,POS)
+  !  subroutine radiate_2r(c,DS,FAC,X,b2,dlds,XP,before,k,POS)
+  subroutine radiate_2r(c,DS,FAC,X,b2,dlds,before,k,POS)
     use gauss_dis
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENT), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    real(dp),INTENT(INOUT) :: X(6),XP(2)
+    real(dp),INTENT(INOUT) :: X(6)  !,XP(2)
     real(dp), INTENT(IN) :: DS
     REAL(DP), INTENT(IN) :: FAC
     real(dp), intent(in):: B2,dlds
@@ -437,28 +453,32 @@ contains
 
   end subroutine radiate_2r
 
-  subroutine PUSH_SPINR(c,DS,FAC,S,X,before,k,POS)
+  !  subroutine PUSH_SPINR(c,DS,FAC,S,X,before,k,POS)
+  subroutine PUSH_SPINR(c,DS,FAC,P,before,k,POS)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENT), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    REAL(DP),INTENT(INOUT) :: X(6),S(3)
+    TYPE(PROBE), INTENT(INOUT) :: P
+    !    REAL(DP),INTENT(INOUT) :: X(6),S(3)
     REAL(DP), INTENT(IN) :: DS,FAC
     REAL(DP) OM(3),CO(3),SI(3),B2,XP(2)
     REAL(DP) ST,dlds
     LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
+    INTEGER I
 
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     if(.not.(k%radiation.or.k%SPIN)) return
     el=>c%parent_fibre%mag
     if(EL%kind<=kind1) return
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
 
     if(k%radiation.AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
-       call radiate_2(c,DS,FAC,X,b2,dlds,XP,before,k,POS)
+       !       call radiate_2(c,DS,FAC,P%X,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P%X,b2,dlds,before,k,POS)
     endif
 
 
@@ -470,26 +490,29 @@ contains
        CO(3)=COS(FAC*DS*OM(3))
        SI(3)=SIN(FAC*DS*OM(3))
 
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(3)*S(1)-SI(3)*S(2)
-       S(2)= CO(3)*S(2)+SI(3)*S(1)
-       S(1)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
+       DO I=ISPIN0R,ISPIN1R
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%S(I)%X(2)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(3)*p%S(I)%X(1)-SI(3)*p%S(I)%X(2)
+          p%S(I)%X(2)= CO(3)*p%S(I)%X(2)+SI(3)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%s(I)%X(2)=ST
+       ENDDO
     endif
 
     !if(el%p%radiation.AND.(.NOT.BEFORE)) then
     if(k%radiation.AND.(.NOT.BEFORE)) then
-       call radiate_2(c,DS,FAC,X,b2,dlds,XP,before,k,POS)
+       !       call radiate_2(c,DS,FAC,P%X,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P%X,b2,dlds,before,k,POS)
     endif
 
   END subroutine PUSH_SPINR
@@ -506,8 +529,7 @@ contains
     TYPE(REAL_8), intent(in):: B2,dlds
     LOGICAL(LP),intent(in) :: BEFORE
     TYPE(REAL_8) st,av(3),z
-    logical(lp) done_stoch
-    real(dp) b30,x1,x3,denf,b3
+    real(dp) b30,x1,x3,denf
     type(damap) xpmap
     integer i,j
     type(internal_state) k
@@ -637,17 +659,20 @@ contains
 
   end subroutine radiate_2p
 
-  subroutine PUSH_SPIN_fake_fringer(c,S,X,before,k,POS)
+  !  subroutine PUSH_SPIN_fake_fringer(c,p,before,k,POS)
+  subroutine PUSH_SPIN_fake_fringer(c,p,k,POS)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENT), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    real(dp),INTENT(INOUT) :: X(6),S(3)
+    !    real(dp),INTENT(INOUT) :: X(6),S(3)
+    type(probe),INTENT(INOUT) :: p
 
     real(dp) OM(3),CO(3),SI(3),B2,XP(2)
     real(dp) ST,dlds
-    LOGICAL(LP),intent(in) :: BEFORE
+    !    LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
+    INTEGER I
 
     if(.not.(k%radiation.or.k%SPIN)) return
     el=>c%parent_fibre%mag
@@ -656,7 +681,7 @@ contains
 
 
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,p%X,POS,k)
     !if(k%radiation.AND.BEFORE) then
     !if(el%p%radiation.AND.BEFORE) then
     ! call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
@@ -670,21 +695,23 @@ contains
        CO(3)=COS(OM(3))
        SI(3)=SIN(OM(3))
 
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(3)*S(1)-SI(3)*S(2)
-       S(2)= CO(3)*S(2)+SI(3)*S(1)
-       S(1)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
+       DO I=ISPIN0R,ISPIN1R
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%S(I)%X(2)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(3)*p%S(I)%X(1)-SI(3)*p%S(I)%X(2)
+          p%S(I)%X(2)= CO(3)*p%S(I)%X(2)+SI(3)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%s(I)%X(2)=ST
+       ENDDO
     endif
     !if(k%radiation.AND.(.NOT.BEFORE)) then
     ! call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
@@ -694,17 +721,20 @@ contains
 
   END subroutine PUSH_SPIN_fake_fringer
 
-  subroutine PUSH_SPIN_fake_fringep(c,S,X,before,k,POS)
+  !  subroutine PUSH_SPIN_fake_fringep(c,p,before,k,POS)
+  subroutine PUSH_SPIN_fake_fringep(c,p,k,POS)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTp), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
+    TYPE(probe_8),INTENT(INOUT) :: p
+    !    TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
 
     TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2)
     TYPE(REAL_8) ST,dlds
-    LOGICAL(LP),intent(in) :: BEFORE
+    !    LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
+    INTEGER I
 
     if(.not.(k%radiation.or.k%SPIN)) return
     el=>c%parent_fibre%magp
@@ -717,7 +747,7 @@ contains
     CALL ALLOC(XP,2)
     CALL ALLOC(ST,B2,dlds)
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,p%X,POS,k)
     !if(k%radiation.AND.BEFORE) then
     !if(el%p%radiation.AND.BEFORE) then
     ! call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
@@ -731,21 +761,40 @@ contains
        CO(3)=COS(OM(3))
        SI(3)=SIN(OM(3))
 
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(3)*S(1)-SI(3)*S(2)
-       S(2)= CO(3)*S(2)+SI(3)*S(1)
-       S(1)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
+       !       ST=   CO(1)*P%S%X(2)-SI(1)*P%S%X(3)
+       !       P%S%X(3)= CO(1)*P%S%X(3)+SI(1)*P%S%X(2)
+       !       P%S%X(2)=ST
+       !       ST=  CO(2)*P%S%X(1)+SI(2)*P%S%X(3)
+       !       P%S%X(3)=CO(2)*P%S%X(3)-SI(2)*P%S%X(1)
+       !       P%S%X(1)=ST
+       !       ST=   CO(3)*P%S%X(1)-SI(3)*P%S%X(2)
+       !       P%S%X(2)= CO(3)*P%S%X(2)+SI(3)*P%S%X(1)
+       !       P%S%X(1)=ST
+       !       ST=  CO(2)*P%S%X(1)+SI(2)*P%S%X(3)
+       !       P%S%X(3)=CO(2)*P%S%X(3)-SI(2)*P%S%X(1)
+       !       P%S%X(1)=ST
+       !       ST=   CO(1)*P%S%X(2)-SI(1)*P%S%X(3)
+       !       P%S%X(3)= CO(1)*P%S%X(3)+SI(1)*P%S%X(2)
+       !       P%S%X(2)=ST
+
+       DO I=ISPIN0R,ISPIN1R
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%S(I)%X(2)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(3)*p%S(I)%X(1)-SI(3)*p%S(I)%X(2)
+          p%S(I)%X(2)= CO(3)*p%S(I)%X(2)+SI(3)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%s(I)%X(2)=ST
+       ENDDO
+
     endif
     !if(k%radiation.AND.(.NOT.BEFORE)) then
     ! call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
@@ -760,19 +809,22 @@ contains
   END subroutine PUSH_SPIN_fake_fringep
 
 
-  subroutine PUSH_SPINP(c,DS,FAC,S,X,E_IJ,before,k,POS)
+  subroutine PUSH_SPINP(c,DS,FAC,P,E_IJ,before,k,POS)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTP), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
+    TYPE(PROBE_8),INTENT(INOUT) ::P
+    !    TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
     real(dp),INTENT(INOUT) :: E_IJ(6,6)
-    TYPE(REAL_8), INTENT(IN) :: DS
+    TYPE(REAL_8), INTENT(INout) :: DS
     REAL(DP), INTENT(IN) :: FAC
     TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2)
     TYPE(REAL_8) ST,dlds
     LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
+    INTEGER I
+
     if(.not.(k%radiation.or.k%SPIN)) return
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     el=>c%parent_fibre%magp
@@ -784,10 +836,10 @@ contains
     CALL ALLOC(XP,2)
     CALL ALLOC(ST,B2,dlds)
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
     if(k%radiation.AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
-       call radiate_2(c,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
 
     endif
 
@@ -799,25 +851,44 @@ contains
        CO(3)=COS(FAC*DS*OM(3))
        SI(3)=SIN(FAC*DS*OM(3))
 
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(3)*S(1)-SI(3)*S(2)
-       S(2)= CO(3)*S(2)+SI(3)*S(1)
-       S(1)=ST
-       ST=  CO(2)*S(1)+SI(2)*S(3)
-       S(3)=CO(2)*S(3)-SI(2)*S(1)
-       S(1)=ST
-       ST=   CO(1)*S(2)-SI(1)*S(3)
-       S(3)= CO(1)*S(3)+SI(1)*S(2)
-       S(2)=ST
+       !       ST=   CO(1)*P%S%X(2)-SI(1)*P%S%X(3)
+       !       P%S%X(3)= CO(1)*P%S%X(3)+SI(1)*P%S%X(2)
+       !       P%S%X(2)=ST
+       !       ST=  CO(2)*P%S%X(1)+SI(2)*P%S%X(3)
+       !       P%S%X(3)=CO(2)*P%S%X(3)-SI(2)*P%S%X(1)
+       !       P%S%X(1)=ST
+       !       ST=   CO(3)*P%S%X(1)-SI(3)*P%S%X(2)
+       !       P%S%X(2)= CO(3)*P%S%X(2)+SI(3)*P%S%X(1)
+       !       P%S%X(1)=ST
+       !       ST=  CO(2)*P%S%X(1)+SI(2)*P%S%X(3)
+       !       P%S%X(3)=CO(2)*P%S%X(3)-SI(2)*P%S%X(1)
+       !       P%S%X(1)=ST
+       !       ST=   CO(1)*P%S%X(2)-SI(1)*P%S%X(3)
+       !       P%S%X(3)= CO(1)*P%S%X(3)+SI(1)*P%S%X(2)
+       !       P%S%X(2)=ST
+
+       DO I=ISPIN0R,ISPIN1R
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%S(I)%X(2)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(3)*p%S(I)%X(1)-SI(3)*p%S(I)%X(2)
+          p%S(I)%X(2)= CO(3)*p%S(I)%X(2)+SI(3)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=  CO(2)*p%S(I)%X(1)+SI(2)*p%S(I)%X(3)
+          p%S(I)%X(3)=CO(2)*p%S(I)%X(3)-SI(2)*p%S(I)%X(1)
+          p%S(I)%X(1)=ST
+          ST=   CO(1)*p%S(I)%X(2)-SI(1)*p%S(I)%X(3)
+          p%S(I)%X(3)= CO(1)*p%S(I)%X(3)+SI(1)*p%S(I)%X(2)
+          p%s(I)%X(2)=ST
+       ENDDO
+
     endif
     if(k%radiation.AND.(.NOT.BEFORE)) then
        !if(el%p%radiation.AND.(.NOT.BEFORE)) then
-       call radiate_2(c,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
     endif
 
     CALL KILL(OM,3)
@@ -1453,7 +1524,7 @@ contains
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) BBYTWT,BBXTW,BBYTW,x1,x3
-    integer J,dir,ko
+    integer J,ko
 
     E=ZERO
     B=ZERO
@@ -1540,7 +1611,7 @@ contains
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     TYPE(REAL_8) BBYTWT,BBXTW,BBYTW,x1,x3
-    integer J,dir,KO
+    integer J,KO
 
     DO I=1,3
        E(I)=ZERO
@@ -2083,7 +2154,6 @@ contains
     INTEGER, INTENT(IN):: I1,I2
     INTEGER J   ,i22
     TYPE (INTEGRATION_NODE), POINTER :: C
-    real(dp) fac
 
 
     CALL RESET_APERTURE_FLAG
@@ -2249,7 +2319,6 @@ contains
     integer,optional:: fibre1,fibre2,node1,node2
     logical(lp), optional ::u
     type(integration_node),optional, pointer :: t
-
     if(.not.associated(r%t)) call MAKE_NODE_LAYOUT(r)
     call alloc(xs)
     xs%u=my_false
@@ -2343,7 +2412,7 @@ contains
     TYPE(layout),target,INTENT(INOUT):: r
     integer,INTENT(IN):: i1
     type(probe_8) xs
-!    type(env_8),target,intent(INOUT) ::  ys(6)
+    !    type(env_8),target,intent(INOUT) ::  ys(6)
     type(env_8),intent(INOUT) ::  ys(6)
     TYPE(INTERNAL_STATE) K
     integer i,j
@@ -2564,18 +2633,18 @@ contains
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=half
        !call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_true,k,C%POS_IN_FIBRE-3)
-       call PUSH_SPIN(c,ds,FAC,XS%S%X,XS%X,my_true,k,C%POS_IN_FIBRE-3)
+       call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
        !call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_false,k,C%POS_IN_FIBRE-2)
-       call PUSH_SPIN(c,ds,FAC,XS%S%X,XS%X,my_false,k,C%POS_IN_FIBRE-2)
+       call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       CALL TRACK_FRINGE_spin(C,XS%X,XS%S%X,K)
+       CALL TRACK_FRINGE_spin(C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
-          CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS%S%X)
+          CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
        ELSE
-          CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS%S%X)
+          CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
        ENDIF
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
 
@@ -2592,7 +2661,6 @@ contains
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC
     type(real_8) ds
-
     if(xs%u) return
     C%PARENT_FIBRE%MAGp%P%DIR    => C%PARENT_FIBRE%DIR
     C%PARENT_FIBRE%MAGp%P%beta0  => C%PARENT_FIBRE%beta0
@@ -2607,7 +2675,6 @@ contains
 
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 
-
     if(c%cas==0) then
        ds=c%parent_fibre%MAGp%L/c%parent_fibre%MAG%p%nst
        fac=half
@@ -2617,7 +2684,7 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       CALL TRACK_FRINGE_spin(C,XS%X,XS%S%X,K)
+       CALL TRACK_FRINGE_spin(C,XS,K)
        !        CALL TRACK_FRINGE_spin(C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
@@ -2638,9 +2705,10 @@ contains
 
 
 
-  SUBROUTINE TRACK_FRINGE_spin_R(C,X,S,K)
+  SUBROUTINE TRACK_FRINGE_spin_R(C,p,K)
     IMPLICIT NONE
-    real(dp), INTENT(INOUT):: X(6),S(3)
+    !    real(dp), INTENT(INOUT):: X(6),S(3)
+    type(probe), INTENT(INOUT):: p
     TYPE(INTERNAL_STATE) K
     TYPE (INTEGRATION_NODE), POINTER :: C
     TYPE(ELEMENT), POINTER :: EL
@@ -2653,25 +2721,27 @@ contains
     case(KIND5,KIND17)
        IF(C%CAS==CASE1) THEN
           pos=-2
-          call PUSH_SPIN_fake_fringe(c,S,X,my_true,k,pos)
+          !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
+          call PUSH_SPIN_fake_fringe(c,p,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
-          call PUSH_SPIN_fake_fringe(c,S,X,my_false,k,pos)
+          !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
+          call PUSH_SPIN_fake_fringe(c,p,k,pos)
        endif
     case(KIND6)
     case(KIND7)
     case(KIND10)
     case(KIND16)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%EDGE(1))
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
        ELSE
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%EDGE(2))
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
        ENDIF
     case(KIND20)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ELSE
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ENDIF
 
     case(KIND21,kind22)
@@ -2685,9 +2755,10 @@ contains
 
   END SUBROUTINE TRACK_FRINGE_spin_R
 
-  SUBROUTINE TRACK_FRINGE_spin_P(C,X,S,K)
+  SUBROUTINE TRACK_FRINGE_spin_P(C,p,K)
     IMPLICIT NONE
-    TYPE(REAL_8), INTENT(INOUT):: X(6),S(3)
+    TYPE(probe_8), INTENT(INOUT)::p
+    !    TYPE(REAL_8), INTENT(INOUT):: X(6),S(3)
     TYPE(INTERNAL_STATE) K
     TYPE (INTEGRATION_NODE), POINTER :: C
     TYPE(ELEMENTP), POINTER :: EL
@@ -2701,25 +2772,27 @@ contains
     case(KIND5,KIND17)
        IF(C%CAS==CASE1) THEN
           pos=-2
-          call PUSH_SPIN_fake_fringe(c,S,X,my_true,k,pos)
+          call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
-          call PUSH_SPIN_fake_fringe(c,S,X,my_false,k,pos)
+          !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
+          call PUSH_SPIN_fake_fringe(c,p,k,pos)
        endif
     case(KIND6)
     case(KIND7)
     case(KIND10)
     case(KIND16)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%EDGE(1))
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
        ELSE
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%EDGE(2))
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
        ENDIF
     case(KIND20)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ELSE
-          CALL rot_spin_y(s,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ENDIF
 
     case(KIND21,kind22)
@@ -2733,11 +2806,12 @@ contains
 
   END SUBROUTINE TRACK_FRINGE_spin_P
 
-  SUBROUTINE TRACK_SPIN_FRONTR(C,S)
+  SUBROUTINE TRACK_SPIN_FRONTR(C,P)
     implicit none
     logical(lp) :: doneitt=.true.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    real(dp), INTENT(INOUT) :: S(3)
+    TYPE(PROBE), INTENT(INOUT) :: P
+    !    real(dp), INTENT(INOUT) :: S(3)
     INTEGER(2) PATCHT,PATCHG,PATCHE
 
     IF(ASSOCIATED(C%PATCH)) THEN
@@ -2754,25 +2828,26 @@ contains
 
     ! The chart frame of reference is located here implicitely
     IF((PATCHG==1).or.(PATCHG==3)) THEN
-       CALL PATCH_SPIN(C,S,MY_TRUE)
+       CALL PATCH_SPIN(C,P,MY_TRUE)
     ENDIF
 
 
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,1,S)
+    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,1,P)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
-       CALL MIS_SPIN(C,S,DONEITT)
+       CALL MIS_SPIN(C,P,DONEITT)
     ENDIF
 
   END SUBROUTINE TRACK_SPIN_FRONTR
 
-  SUBROUTINE TRACK_SPIN_FRONTP(C,S)
+  SUBROUTINE TRACK_SPIN_FRONTP(C,P)
     implicit none
     logical(lp) :: doneitt=.true.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    TYPE(REAL_8), INTENT(INOUT) :: S(3)
+    TYPE(PROBE_8), INTENT(INOUT) :: P
+    !    TYPE(REAL_8), INTENT(INOUT) :: S(3)
     INTEGER(2) PATCHT,PATCHG,PATCHE
 
     IF(ASSOCIATED(C%PATCH)) THEN
@@ -2789,41 +2864,42 @@ contains
 
     ! The chart frame of reference is located here implicitely
     IF((PATCHG==1).or.(PATCHG==3)) THEN
-       CALL PATCH_SPIN(C,S,MY_TRUE)
+       CALL PATCH_SPIN(C,P,MY_TRUE)
     ENDIF
 
 
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,1,S)
+    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,1,P)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
-       CALL MIS_SPIN(C,S,DONEITT)
+       CALL MIS_SPIN(C,P,DONEITT)
     ENDIF
 
   END SUBROUTINE TRACK_SPIN_FRONTP
 
-  SUBROUTINE TRACK_SPIN_FRONT_RAY8(C,S)
-    implicit none
-    TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    type(probe_8),INTENT(INOUT) ::S
-    integer i,j
-    type(real_8) sp(3)
+  !  SUBROUTINE TRACK_SPIN_FRONT_RAY8(C,S)
+  !    implicit none
+  !    TYPE(FIBRE),TARGET,INTENT(INOUT):: C
+  !    type(probe_8),INTENT(INOUT) ::S
+  !    integer i,j
+  !    type(real_8) sp(3)
 
 
-    call TRACK_SPIN_front(C,S%S%X)
+  !    call TRACK_SPIN_front(C,S%S%X)
 
 
-  end subroutine TRACK_SPIN_FRONT_RAY8
+  !  end subroutine TRACK_SPIN_FRONT_RAY8
 
 
   ! back patch/misaglinments/tilt
 
-  SUBROUTINE TRACK_SPIN_BACKR(C,S)
+  SUBROUTINE TRACK_SPIN_BACKR(C,P)
     implicit none
     logical(lp) :: doneitf=.true.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    REAL(DP), INTENT(INOUT) :: S(3)
+    TYPE(PROBE), INTENT(INOUT) :: P
+    !    REAL(DP), INTENT(INOUT) :: S(3)
     INTEGER(2) PATCHT,PATCHG,PATCHE
 
 
@@ -2837,14 +2913,14 @@ contains
 
 
     IF(C%MAG%MIS) THEN
-       CALL MIS_SPIN(C,S,DONEITF)
+       CALL MIS_SPIN(C,P,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,S)
+    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,P)
 
 
     IF((PATCHG==2).or.(PATCHG==3)) THEN
-       CALL PATCH_SPIN(C,S,MY_FALSE)
+       CALL PATCH_SPIN(C,P,MY_FALSE)
     ENDIF
 
     ! The CHART frame of reference is located here implicitely
@@ -2852,25 +2928,26 @@ contains
 
   END SUBROUTINE TRACK_SPIN_BACKR
 
-  SUBROUTINE TRACK_SPIN_BACK_RAY8(C,S)
-    implicit none
-    TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    type(probe_8),INTENT(INOUT) ::S
-    integer i,j
+  !  SUBROUTINE TRACK_SPIN_BACK_RAY8(C,S)
+  !    implicit none
+  !    TYPE(FIBRE),TARGET,INTENT(INOUT):: C
+  !    type(probe_8),INTENT(INOUT) ::S
+  !    integer i,j
 
 
-    call TRACK_SPIN_BACK(C,S%S%X)
+  !    call TRACK_SPIN_BACK(C,S%S%X)
+  !
+  !
+  !  end subroutine TRACK_SPIN_BACK_RAY8
 
 
-  end subroutine TRACK_SPIN_BACK_RAY8
 
-
-
-  SUBROUTINE TRACK_SPIN_BACKP(C,S)
+  SUBROUTINE TRACK_SPIN_BACKP(C,P)
     implicit none
     logical(lp) :: doneitf=.true.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    TYPE(REAL_8), INTENT(INOUT) :: S(3)
+    TYPE(PROBE_8), INTENT(INOUT) :: P
+    !    TYPE(REAL_8), INTENT(INOUT) :: S(3)
     INTEGER(2) PATCHT,PATCHG,PATCHE
 
 
@@ -2884,14 +2961,14 @@ contains
 
 
     IF(C%MAG%MIS) THEN
-       CALL MIS_SPIN(C,S,DONEITF)
+       CALL MIS_SPIN(C,P,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,S)
+    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,P)
 
 
     IF((PATCHG==2).or.(PATCHG==3)) THEN
-       CALL PATCH_SPIN(C,S,MY_FALSE)
+       CALL PATCH_SPIN(C,P,MY_FALSE)
     ENDIF
 
     ! The CHART frame of reference is located here implicitely
@@ -2902,84 +2979,99 @@ contains
 
 
 
-  SUBROUTINE PATCH_SPINR(C,s,ENTERING)
+  SUBROUTINE PATCH_SPINR(C,P,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C
-    real(dp), INTENT(INOUT):: s(3)
+    TYPE(PROBE), INTENT(INOUT):: P
+    !    real(dp), INTENT(INOUT):: s(3)
     logical(lp),INTENT(IN):: ENTERING
     real(dp) da
     IF(ENTERING) THEN
        da=C%PATCH%A_ANG(1)+((C%PATCH%A_X1-1)/2)*pi
-       call rot_spin_x(s,da)
-       call rot_spin_y(s,C%PATCH%A_ANG(2))
-       call rot_spin_z(s,C%PATCH%A_ANG(3))
+       call rot_spin_x(P,da)
+       call rot_spin_y(P,C%PATCH%A_ANG(2))
+       call rot_spin_z(P,C%PATCH%A_ANG(3))
        da=((C%PATCH%A_X2-1)/2)*pi
-       call rot_spin_x(s,da)
+       call rot_spin_x(P,da)
     ELSE
        da=C%PATCH%B_ANG(1)+((C%PATCH%B_X1-1)/2)*pi
-       call rot_spin_x(s,da)
-       call rot_spin_y(s,C%PATCH%A_ANG(2))
-       call rot_spin_z(s,C%PATCH%b_ANG(3))
+       call rot_spin_x(P,da)
+       ! error etienne
+       !      call rot_spin_y(P,C%PATCH%A_ANG(2))
+       call rot_spin_y(P,C%PATCH%b_ANG(2))
+       call rot_spin_z(P,C%PATCH%b_ANG(3))
        da=((C%PATCH%B_X2-1)/2)*pi
-       call rot_spin_x(s,da)
+       call rot_spin_x(P,da)
     ENDIF
 
   END SUBROUTINE PATCH_SPINR
 
-  SUBROUTINE PATCH_SPINp(C,s,ENTERING)
+  SUBROUTINE PATCH_SPINp(C,P,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C
-    type(real_8), INTENT(INOUT):: s(3)
+    type(PROBE_8), INTENT(INOUT)::P
+    !    type(real_8), INTENT(INOUT):: s(3)
     logical(lp),INTENT(IN):: ENTERING
     real(dp) da
 
     IF(ENTERING) THEN
        da=C%PATCH%A_ANG(1)+((C%PATCH%A_X1-1)/2)*pi
-       call rot_spin_x(s,da)
-       call rot_spin_y(s,C%PATCH%A_ANG(2))
-       call rot_spin_z(s,C%PATCH%A_ANG(3))
+
+       call rot_spin_x(P,da)
+       call rot_spin_y(P,C%PATCH%A_ANG(2))
+       call rot_spin_z(P,C%PATCH%A_ANG(3))
+
+
        da=((C%PATCH%A_X2-1)/2)*pi
-       call rot_spin_x(s,da)
+
+       call rot_spin_x(P,da)
     ELSE
        da=C%PATCH%B_ANG(1)+((C%PATCH%B_X1-1)/2)*pi
-       call rot_spin_x(s,da)
-       call rot_spin_y(s,C%PATCH%A_ANG(2))
-       call rot_spin_z(s,C%PATCH%b_ANG(3))
+       call rot_spin_x(P,da)
+       ! error etienne
+       !       call rot_spin_y(P,C%PATCH%A_ANG(2))
+       call rot_spin_y(P,C%PATCH%b_ANG(2))
+       call rot_spin_z(P,C%PATCH%b_ANG(3))
+
+
        da=((C%PATCH%B_X2-1)/2)*pi
-       call rot_spin_x(s,da)
+
+       call rot_spin_x(P,da)
     ENDIF
+
 
   END SUBROUTINE PATCH_SPINp
 
   !   Misalignment routines
-  SUBROUTINE MIS_SPINR(C,S,ENTERING)
+  SUBROUTINE MIS_SPINR(C,P,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C
-    real(dp), INTENT(INOUT):: S(3)
+    TYPE(PROBE), INTENT(INOUT):: P
+    !    real(dp), INTENT(INOUT):: S(3)
     logical(lp),INTENT(IN):: ENTERING
 
     IF(ASSOCIATED(C%CHART)) THEN
        IF(C%DIR==1) THEN   ! FORWARD PROPAGATION
           IF(ENTERING) THEN
-             call rot_spin_X(s,C%CHART%ANG_IN(1))
-             call rot_spin_Y(s,C%CHART%ANG_IN(2))
-             call rot_spin_Z(s,C%CHART%ANG_IN(3))
+             call rot_spin_X(P,C%CHART%ANG_IN(1))
+             call rot_spin_Y(P,C%CHART%ANG_IN(2))
+             call rot_spin_Z(P,C%CHART%ANG_IN(3))
           ELSE
-             call rot_spin_X(s,C%CHART%ANG_OUT(1))
-             call rot_spin_Y(s,C%CHART%ANG_OUT(2))
-             call rot_spin_Z(s,C%CHART%ANG_OUT(3))
+             call rot_spin_X(P,C%CHART%ANG_OUT(1))
+             call rot_spin_Y(P,C%CHART%ANG_OUT(2))
+             call rot_spin_Z(P,C%CHART%ANG_OUT(3))
           ENDIF
        ELSE
           IF(ENTERING) THEN  ! BACKWARD PROPAGATION
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
-             call rot_spin_Z(s,C%CHART%ANG_OUT(3))
-             call rot_spin_Y(s,C%CHART%ANG_OUT(2))
-             call rot_spin_X(s,C%CHART%ANG_OUT(1))
+             call rot_spin_Z(P,C%CHART%ANG_OUT(3))
+             call rot_spin_Y(P,C%CHART%ANG_OUT(2))
+             call rot_spin_X(P,C%CHART%ANG_OUT(1))
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
@@ -2987,9 +3079,9 @@ contains
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
-             call rot_spin_Z(s,C%CHART%ANG_IN(3))
-             call rot_spin_Y(s,C%CHART%ANG_IN(2))
-             call rot_spin_X(s,C%CHART%ANG_IN(1))
+             call rot_spin_Z(P,C%CHART%ANG_IN(3))
+             call rot_spin_Y(P,C%CHART%ANG_IN(2))
+             call rot_spin_X(P,C%CHART%ANG_IN(1))
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
@@ -2998,32 +3090,35 @@ contains
     ENDIF
   END SUBROUTINE MIS_SPINR
 
-  SUBROUTINE MIS_SPINP(C,S,ENTERING)
+  SUBROUTINE MIS_SPINP(C,P,ENTERING)
     implicit none
     ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
     TYPE(FIBRE),INTENT(INOUT):: C
-    TYPE(REAL_8), INTENT(INOUT):: S(3)
+    TYPE(PROBE_8), INTENT(INOUT):: P
     logical(lp),INTENT(IN):: ENTERING
 
     IF(ASSOCIATED(C%CHART)) THEN
        IF(C%DIR==1) THEN   ! FORWARD PROPAGATION
           IF(ENTERING) THEN
-             call rot_spin_X(s,C%CHART%ANG_IN(1))
-             call rot_spin_Y(s,C%CHART%ANG_IN(2))
-             call rot_spin_Z(s,C%CHART%ANG_IN(3))
+             call rot_spin_X(P,C%CHART%ANG_IN(1))
+             call rot_spin_Y(P,C%CHART%ANG_IN(2))
+             call rot_spin_Z(P,C%CHART%ANG_IN(3))
           ELSE
-             call rot_spin_X(s,C%CHART%ANG_OUT(1))
-             call rot_spin_Y(s,C%CHART%ANG_OUT(2))
-             call rot_spin_Z(s,C%CHART%ANG_OUT(3))
+             call rot_spin_X(P,C%CHART%ANG_OUT(1))
+             call rot_spin_Y(P,C%CHART%ANG_OUT(2))
+             call rot_spin_Z(P,C%CHART%ANG_OUT(3))
           ENDIF
        ELSE
           IF(ENTERING) THEN  ! BACKWARD PROPAGATION
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
-             call rot_spin_Z(s,C%CHART%ANG_OUT(3))
-             call rot_spin_Y(s,C%CHART%ANG_OUT(2))
-             call rot_spin_X(s,C%CHART%ANG_OUT(1))
+
+
+             call rot_spin_Z(P,C%CHART%ANG_OUT(3))
+             call rot_spin_Y(P,C%CHART%ANG_OUT(2))
+             call rot_spin_X(P,C%CHART%ANG_OUT(1))
+
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
@@ -3031,9 +3126,11 @@ contains
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
-             call rot_spin_Z(s,C%CHART%ANG_IN(3))
-             call rot_spin_Y(s,C%CHART%ANG_IN(2))
-             call rot_spin_X(s,C%CHART%ANG_IN(1))
+
+             call rot_spin_Z(P,C%CHART%ANG_IN(3))
+             call rot_spin_Y(P,C%CHART%ANG_IN(2))
+             call rot_spin_X(P,C%CHART%ANG_IN(1))
+
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
@@ -3043,9 +3140,10 @@ contains
   END SUBROUTINE MIS_SPINP
 
 
-  SUBROUTINE DTILTR_SPIN(DIR,TILTD,I,S)
+  SUBROUTINE DTILTR_SPIN(DIR,TILTD,I,P)
     IMPLICIT NONE
-    real(dp),INTENT(INOUT):: S(3)
+    TYPE(PROBE),INTENT(INOUT):: P
+    !    real(dp),INTENT(INOUT):: S(3)
     INTEGER,INTENT(IN):: I,DIR
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
@@ -3053,17 +3151,18 @@ contains
     IF(TILTD==zero) RETURN
     IF(I==1) THEN
        YS=DIR*TILTD
-       call rot_spin_Z(s,YS)
+       call rot_spin_Z(P,YS)
     ELSE
        YS=-DIR*TILTD
-       call rot_spin_Z(s,YS)
+       call rot_spin_Z(P,YS)
     ENDIF
 
   END SUBROUTINE DTILTR_SPIN
 
-  SUBROUTINE DTILTP_SPIN(DIR,TILTD,I,S)
+  SUBROUTINE DTILTP_SPIN(DIR,TILTD,I,P)
     IMPLICIT NONE
-    TYPE(REAL_8),INTENT(INOUT):: S(3)
+    TYPE(PROBE_8),INTENT(INOUT):: P
+    !    TYPE(REAL_8),INTENT(INOUT):: S(3)
     INTEGER,INTENT(IN):: I,DIR
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
@@ -3071,10 +3170,10 @@ contains
     IF(TILTD==zero) RETURN
     IF(I==1) THEN
        YS=DIR*TILTD
-       call rot_spin_Z(s,YS)
+       call rot_spin_Z(P,YS)
     ELSE
        YS=-DIR*TILTD
-       call rot_spin_Z(s,YS)
+       call rot_spin_Z(P,YS)
     ENDIF
 
   END SUBROUTINE DTILTP_SPIN
@@ -3089,8 +3188,8 @@ contains
     real(dp), optional,intent(inout) :: theta0
     TYPE(INTERNAL_STATE), intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
-    type(probe_8) xs
-    type(damapspin) ds
+    !    type(probe_8) xs
+    !    type(damapspin) ds
     integer i,turns0,J
     turns0=1
     theta0r=0.d0
@@ -3103,38 +3202,37 @@ contains
 
     FIX=x0
 
-    call init(stat,1,0)
+    !        call init(stat,1,0)
 
-    call alloc(xs)
-    call alloc(ds)
+    !        call alloc(xs)
+    !        call alloc(ds)
 
     !        ds=1
     !        xs= FIX + ds
 
-    !      do i=1,TURNS0
-    !       call track_probe(RING,xs,stat,fibre1,node1)
+    !        do i=1,TURNS0
+    !         call track_probe(RING,xs,stat,fibre1,node1)
     !        enddo
 
     !        ds=xs
 
+    !         DO J=1,3
+    FIXT=x0
+
+    do i=1,TURNS0
+       call track_probe(RING,fixt,stat,fibre1,node1)
+    enddo
     DO J=1,3
-       FIXT%X=x0
-       FIXT%S%X=ZERO
-       FIXT%S%X(J)=one
-
-       do i=1,TURNS0
-          call track_probe(RING,fixt,stat,fibre1,node1)
-       enddo
-
-       s(1:3,j)=FIXT%S%X
+       s(1:3,j)=FIXT%S(J)%X(1:3)
     ENDDO
+    !         ENDDO
 
 
-    call get_spin_nx(S,theta0r,FIX%s%x)
+    call get_spin_nx(S,theta0r,FIX%s(1)%x)
     if(present(theta0)) theta0=theta0r
 
-    call kill(xs)
-    call kill(ds)
+    !        call kill(xs)
+    !        call kill(ds)
 
 
 
@@ -3152,7 +3250,7 @@ contains
 
     real(dp)  DIX(6),xdix,xdix0,tiny,freq
     real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
-    integer NO1,ND2,I,IU,ITE,ier,j,ITEM,loct,LOC
+    integer NO1,ND2,I,IU,ITE,ier,j,ITEM
     TYPE (fibre), POINTER :: C
     TYPE (integration_node), POINTER :: t
     logical(lp) APERTURE
@@ -3482,6 +3580,76 @@ contains
 
   END SUBROUTINE find_ENVELOPE
 
+  SUBROUTINE stroboscopic_average(ring,xs0,xst,x0,xst_closest,eps,pos,mstate0,nturn,kp,n)
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: RING
+    type(probe) , intent(inout) :: xs0,xst,xst_closest
+    real(dp), intent(in) ::x0(6)
+    TYPE(INTERNAL_STATE) mstate0,mstate
+    integer, intent(in) :: kp,pos,nturn
+    integer i,k,imax,nd2
+    type(spinor) n
+    real(dp) norm,norm0,eps,n0(3),theta0
+
+
+    mstate=mstate0+spin0
+    nd2=6
+    if(mstate%nocavity) nd2=4
+
+    do k=1,nturn
+       call track_probe(ring,xs0,mstate,node1=pos)  !,fibre2=3)
+
+       do i=1,3
+          xst%s(i)%x=xs0%s(i)%x+xst%s(i)%x
+       enddo
+       norm0=zero
+       do i=1,nd2/2
+          norm0=norm0+abs(xs0%x(2*i-1)-x0(2*i-1))
+       enddo
+
+       if(norm0<eps) then
+          xst_closest=xs0
+          eps=norm0
+          write(6,*) "luccio ",k,eps
+          call get_spin_nx(xs0,theta0,n0)
+          write(17,'(4(1x,E15.8))') norm0,n0
+          write(6,'(4(1x,E15.8))') norm0,n0
+       endif
+
+       if(mod(k,kp)==0) then  ! kp
+          write(6,*) k,"$$$$$$$$$$$$$$$$$$$$$$$$$"
+          do i=1,3
+             norm=sqrt(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
+             if(norm>=zero) then
+                norm=1.d0/norm
+             endif
+             write(6,*) 1.d0/norm
+             write(6,*) xst%s(1)%x(i)*norm,xst%s(2)%x(i)*norm,xst%s(3)%x(i)*norm
+          enddo
+       endif ! kp
+    enddo
+
+    norm0=zero
+    do i=1,3
+       norm=sqrt(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
+       if(norm>=norm0) then
+          imax=1
+          n%x(1)=xst%s(1)%x(i)/norm
+          n%x(2)=xst%s(2)%x(i)/norm
+          if(abs(n%x(2))>=abs(n%x(1))) imax=2
+          n%x(3)=xst%s(3)%x(i)/norm
+          if(abs(n%x(3))>=abs(n%x(2))) imax=3
+          if(n%x(imax)<0) n%x=-n%x
+          norm0=norm
+       endif
+    enddo
+
+
+  end SUBROUTINE stroboscopic_average
+
+
+
+
   ! time tracking
   SUBROUTINE TRACK_time(xT,DT,K)
     ! Tracks a single particle   of the beam for a time DT
@@ -3491,9 +3659,7 @@ contains
     REAL(DP), INTENT(IN) :: DT
     REAL(DP) XTT(6),DT0,YL,DT_BEFORE   !X(6),
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    type(element),pointer :: el
     LOGICAL(LP) END_OF_LINE
-    INTEGER I
     END_OF_LINE=.FALSE.
 
     IF(K%TOTALPATH==0) then
@@ -3662,11 +3828,12 @@ contains
   SUBROUTINE  alloc_temporal_probe(p) ! fibre i1 to i2
     IMPLICIT NONE
     type(temporal_probe), intent(inout):: p
-    integer i
 
     p%xs%u=my_false
     p%xs%x=zero
-    p%xs%s%x=zero
+    p%xs%s(1)=0
+    p%xs%s(2)=0
+    p%xs%s(3)=0
     p%ds=zero
     p%pos=zero
     nullify(p%node)
@@ -3680,7 +3847,7 @@ contains
     type(temporal_beam),intent(INOUT) ::  b
     type(integration_node), pointer :: t,tw
     integer i
-    real(dp) norm,d1,ds,p(3)
+    real(dp) norm,d1
     type(internal_state) :: k
 
     if(k%totalpath/=1) then
@@ -3727,10 +3894,9 @@ contains
     TYPE(layout),target,INTENT(INOUT):: r
     type(temporal_beam),intent(INOUT) ::  b
     type(integration_node), pointer :: t,tw
-    type(internal_state) :: k
     real(dp) a(3)
     integer i,j
-    real(dp) norm,d1,ds,p(3),da(3),dal(3)
+    real(dp) norm,d1,p(3),da(3),dal(3)
 
 
     ! locating the closest integration node

@@ -307,21 +307,12 @@ contains
     zero_(:)=zero
     !    if(old) then
     if(s2%normal%linear%V(1)%i==0)  call crap1("normalMAP 1") !call allocw(s2%normal%linear%V(1))  ! changed
-
-    if(S2%auto) then
-       global_verbose=.true.
-       !     call setidpr(-100,S2%plane)
-       if(print77) then
-          call idprset(-101)
-       else
-          call idprset(-102)
-       endif
-    else
-       global_verbose=.true.
-       call setidpr(0,S2%plane)
+    lielib_print(7)=0
+    if(.not.S2%auto) then
+       lielib_print(7)=-1
     endif
     ! global_verbose=.true.
-    !    call setidpr(0,S2%plane)
+    call setidpr(S2%plane)
     CALL INPUTRES(S2%M,S2%NRES)
     JUNK=S1
     S2%a%CONSTANT=JUNK
@@ -367,7 +358,7 @@ contains
     s2%a_t=s2%a1*s2%a_t
     S2%A_T=ZERO_
     CALL KILL(JUNK)
-    if(S2%auto) global_verbose=glo
+    global_verbose=glo
 
 
   END SUBROUTINE normalMAP
@@ -1259,21 +1250,35 @@ contains
   subroutine init_map(NO1,ND1,NP1,NDPT1,log1)
     implicit none
     integer NO1,ND1,NP1,NDPT1
-    LOGICAL(lp) log1
-    !   warnda=.false.
-    if(first_time) then
-       first_time=.false.
-       w_p=0
-       w_p%nc=1
-       w_p=(/" Welcome to TPSA Overloaded"/)
-       w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_i
-    else
+    LOGICAL(lp) log1,present_tpsa
+    !    if(first_time) then
+    !       first_time=.false.
+    !       w_p=0
+    !       w_p%nc=1
+    !       w_p=(/" Welcome to TPSA Overloaded"/)
+    !       w_p%fc='(1((1X,A72),/))'
+    !       CALL WRITE_i
+    !    else
+    !       call DATERMINATE
+    !       call kill(varf1)
+    !       call kill(varf2)
+    !    endif
+
+    !    if(.not.first_time) then
+    present_tpsa=lingyun_yang
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       call DATERMINATE
+       call kill(varf1)
+       call kill(varf2)
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
        call DATERMINATE
        call kill(varf1)
        call kill(varf2)
     endif
-    !   warnda=.true.
+    lingyun_yang=present_tpsa
+    !    endif
 
 
     master=0  !  master=1   2002.12.25
@@ -1326,40 +1331,66 @@ contains
     !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
-    npara_fpp=nd2+nspin
+    npara_fpp=nd2
+    NPARA_original=npara_fpp
   end subroutine init_map
 
 
 
   subroutine KILL_fpp()
     implicit none
-
-    call kill(varf1)
-    call kill(varf2)
-    call DATERMINATE  ! IN THIS MODULE
-    CALL dealloc_all    ! IN DABNEW
+    logical present_tpsa
+    present_tpsa=lingyun_yang
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       call kill(varf1)
+       call kill(varf2)
+       call DATERMINATE  ! IN THIS MODULE
+       CALL dealloc_all    ! IN DABNEW
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
+       call kill(varf1)
+       call kill(varf2)
+       call DATERMINATE  ! IN THIS MODULE
+       CALL dealloc_all    ! IN DABNEW
+    endif
+    lingyun_yang=present_tpsa
   END  subroutine KILL_fpp
 
 
   subroutine init_tpsa(NO1,NP1,log1)
     implicit none
     integer NO1,ND1,NP1,NDPT1
-    LOGICAL(lp) log1
+    LOGICAL(lp) log1,present_tpsa
 
-    !   warnda=.false.
-    if(first_time) then
-       first_time=.false.
-       w_p=0
-       w_p%nc=1
-       w_p=(/" Welcome to TPSA Overloaded"/)
-       w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_i
-    else
+    !    if(first_time) then
+    !       first_time=.false.
+    !       w_p=0
+    !       w_p%nc=1
+    !       w_p=(/" Welcome to TPSA Overloaded"/)
+    !       w_p%fc='(1((1X,A72),/))'
+    !       CALL WRITE_i
+    !    else
+    !       call DATERMINATE
+    !       call kill(varf1)
+    !       call kill(varf2)
+    !    endif
+
+    !    if(.not.first_time) then
+    present_tpsa=lingyun_yang
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       call DATERMINATE
+       call kill(varf1)
+       call kill(varf2)
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
        call DATERMINATE
        call kill(varf1)
        call kill(varf2)
     endif
-    !   warnda=.true.
+    lingyun_yang=present_tpsa
+    !    endif
 
     master=0  !  master=1   2002.12.25
 
@@ -1405,7 +1436,8 @@ contains
     !    CALL ASSIGNMAP
     call alloc(varf1)
     call alloc(varf2)
-    npara_fpp=nspin
+    npara_fpp=0
+    NPARA_original=0
   end subroutine init_tpsa
 
 
@@ -1413,8 +1445,17 @@ contains
 
   subroutine DATERMINATE()
     implicit none
+    logical present_tpsa
+    present_tpsa=lingyun_yang
+    if(last_tpsa==1) then
+       lingyun_yang=.true.
+       CALL DEASSIGN
+    elseif(last_tpsa==2) then
+       lingyun_yang=.false.
+       CALL DEASSIGN
+    endif
+    lingyun_yang=present_tpsa
 
-    CALL DEASSIGN
     !    CALL DEASSIGNMAP
     !   IF(.NOT.OLD) then
     !      CALL DE_initialize_da

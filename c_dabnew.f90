@@ -133,7 +133,7 @@ contains
   !
   !     DAPRI(A,U):         PRINTS DA VECTOR A TO UNIT U
   !     DAREA(A,U):         READS DA VECTOR A FROM UNIT U
-  !     DADEB(U,T,I):       DEBUGGER, DUMPS TO U. T: MEMO, I=0: RETURN, I=1:STOP
+  !     dadeb !(U,T,I):       DEBUGGER, DUMPS TO U. T: MEMO, I=0: RETURN, I=1:STOP
   !!     DARAN(A,R,seed):         FILLS A WITH RANDOM NUMBERS. R: FILLFACTOR
   !     DANUM(O,N,I):       COMPUTES NUMBER OF MONOMIALS IN N VAR THROUGH ORDER O
   !
@@ -199,7 +199,19 @@ contains
   !
   !-----------------------------------------------------------------------------
   !
-  subroutine daini(no,nv,nd2t,iunit)
+  subroutine change_package(i)
+    implicit none
+    integer, intent(in) :: i
+    if(i==2) then
+       lingyun_yang=.false.
+    else
+       write(6,*) "ONLY LBNL VERSION OF BERZ PERMITTED "
+       write(6,*) " LINGYUN YANG'S TPSA NOT IN THIS VERSION"
+       lingyun_yang=.false.
+       default_tpsa=.false.
+    endif
+  end  subroutine change_package
+  subroutine daini(no,nv,iunit)
     implicit none
     !     *****************************
     !
@@ -217,7 +229,7 @@ contains
     !-----------------------------------------------------------------------------
     !
     integer i,iall,ibase,ic1,ic2,icmax,io1,io2,iout,iunit,jd,jjj,jjjj,jl,js,&
-         nn,no,nv,nd2t,ipause,mypauses
+         nn,no,nv,ipause,mypauses
     integer,dimension(lnv+1)::n
     integer,dimension(0:lnv)::k
     integer,dimension(lnv)::j,jj
@@ -232,9 +244,10 @@ contains
        endif
        return
     endif
+    last_tpsa=2
     if(nv.eq.0) return
 
-    call alloc_all(no,nv,nd2t)
+    call alloc_all(no,nv)
     ndamaxi=0
     !
     do i=1, lda
@@ -266,7 +279,7 @@ contains
     if(nv.gt.lnv.or.no.gt.lno) then
        write(6,*) 'ERROR IN SUBROUTINE DAINI, NO, NV = ',no,nv
        ipause=mypauses(1,line)
-       call dadeb(31,'ERR DAINI ',1)
+       call dadeb !(31,'ERR DAINI ',1)
     endif
     !
     ibase = no+1
@@ -274,7 +287,7 @@ contains
     if(float(ibase)**((nv+1)/2).gt.float(lia)) then
        write(line,'(a12,i4,a7,i4,a21,i4)') 'ERROR, NO = ',no,', NV = ',nv,' TOO LARGE FOR LIA = ',lia
        ipause=mypauses(2,line)
-       call dadeb(31,'ERR DAINI ',1)
+       call dadeb !(31,'ERR DAINI ',1)
     endif
     !
     icmax = 0
@@ -395,7 +408,7 @@ contains
     if(nn.gt.lea.and.(.not.etiennefix)) then
        write(line,'(a21,i4,a12)') 'ERROR IN DAINI, NN = ',nn,' EXCEEDS LEA'
        ipause=mypauses(3,line)
-       call dadeb(31,'ERR DAINI ',1)
+       call dadeb !(31,'ERR DAINI ',1)
     endif
     !
     !     ALLOCATING SCRATCH VARIABLES
@@ -423,7 +436,7 @@ contains
        if(jjj.ne.i) then
           write(line,'(a48,i4)') 'ERROR IN DAINI IN ARRAYS IE1,IE2,IA1,IA2 AT I = ',i
           ipause=mypauses(4,line)
-          call dadeb(31,'ERR DAINI ',1)
+          call dadeb !(31,'ERR DAINI ',1)
        endif
        !
     enddo
@@ -581,7 +594,7 @@ contains
           write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
                &' NOMAX, NVMAX = ',nomax,nvmax
           ipause=mypauses(7,line)
-          call dadeb(31,'ERR DAALL ',1)
+          call dadeb !(31,'ERR DAALL ',1)
        endif
        !
        if(nhole.gt.0) then
@@ -599,7 +612,7 @@ contains
           if(nda_dab.gt.lda) then
              write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
              ipause=mypauses(8,line)
-             call dadeb(31,'ERR DAALL ',1)
+             call dadeb !(31,'ERR DAALL ',1)
           endif
        endif
 
@@ -644,7 +657,7 @@ contains
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
           CALL WRITE_E(125)
-          call dadeb(31,'ERR DAALL ',1)
+          call dadeb !(31,'ERR DAALL ',1)
        endif
        !
        if(nv.eq.0.or.nomax.eq.1) then
@@ -690,7 +703,7 @@ contains
              write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
                   &' NOMAX, NVMAX = ',nomax,nvmax
              ipause=mypauses(9,line)
-             call dadeb(31,'ERR DAALL ',1)
+             call dadeb !(31,'ERR DAALL ',1)
           endif
           !
           if(nhole.gt.0) then
@@ -708,7 +721,7 @@ contains
              if(nda_dab.gt.lda) then
                 write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
                 !    ipause=mypauses(10,line)
-                call dadeb(31,'ERR DAALL ',1)
+                call dadeb !(31,'ERR DAALL ',1)
                 stop 111
              endif
           endif
@@ -756,7 +769,7 @@ contains
              w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
              write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
              CALL WRITE_E(126)
-             call dadeb(31,'ERR DAALL ',1)
+             call dadeb !(31,'ERR DAALL ',1)
           endif
           !
           !          IF(NV.EQ.0) THEN
@@ -801,7 +814,7 @@ contains
           write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
                &' NOMAX, NVMAX = ',nomax,nvmax
           ipause=mypauses(11,line)
-          call dadeb(31,'ERR DAALL ',1)
+          call dadeb !(31,'ERR DAALL ',1)
        endif
        !
        if(nhole.gt.0) then
@@ -819,7 +832,7 @@ contains
           if(nda_dab.gt.lda) then
              write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
              ipause=mypauses(12,line)
-             call dadeb(31,'ERR DAALL ',1)
+             call dadeb !(31,'ERR DAALL ',1)
           endif
        endif
 
@@ -866,7 +879,7 @@ contains
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
           CALL WRITE_E(127)
-          call dadeb(31,'ERR DAALL ',1)
+          call dadeb !(31,'ERR DAALL ',1)
        endif
        !
        !          IF(NV.EQ.0) THEN
@@ -913,7 +926,7 @@ contains
           write(line,'(a23,i4,a14,i4,1x,i4,a16,i4,1x,i4)') 'ERROR IN DAALL, VECTOR ',c,' HAS NO, NV = ',no,nv, &
                &' NOMAX, NVMAX = ',nomax,nvmax
           ipause=mypauses(11,line)
-          call dadeb(31,'ERR DAALL ',1)
+          call dadeb !(31,'ERR DAALL ',1)
        endif
        !
        if(nhole.gt.0) then
@@ -931,7 +944,7 @@ contains
           if(nda_dab.gt.lda) then
              write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
              ipause=mypauses(12,line)
-             call dadeb(31,'ERR DAALL ',1)
+             call dadeb !(31,'ERR DAALL ',1)
           endif
        endif
 
@@ -978,7 +991,7 @@ contains
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
           CALL WRITE_E(127)
-          call dadeb(31,'ERR DAALL ',1)
+          call dadeb !(31,'ERR DAALL ',1)
        endif
        !
        !          IF(NV.EQ.0) THEN
@@ -1014,7 +1027,7 @@ contains
        if(idal(i).le.nomax+2.or.idal(i).gt.nda_dab) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda_dab
           ipause=mypauses(13,line)
-          call dadeb(31,'ERR DADAL ',1)
+          call dadeb !(31,'ERR DADAL ',1)
        endif
        if(idal(i).eq.nda_dab) then
           !       deallocate
@@ -1057,7 +1070,7 @@ contains
     if(idal.le.nomax+2.or.idal.gt.nda_dab) then
        write(line,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,nda_dab
        ipause=mypauses(14,line)
-       call dadeb(31,'ERR DADAL ',1)
+       call dadeb !(31,'ERR DADAL ',1)
     endif
     if(idal.eq.nda_dab) then
        !       deallocate
@@ -1066,7 +1079,9 @@ contains
     else
        nhole=nhole+1
     endif
-
+    !    if(.not.allocated(allvec)) then
+    !    pause 777
+    !    endif
     allvec(idal) = .false.
 
     !        IDANO(IDAL(I)) = 0
@@ -1127,13 +1142,13 @@ contains
     if(i.gt.inva) then
        write(line,'(a20,i8,a16,i8)') 'ERROR IN DAVAR, I = ',i,' EXCEEDS INVA = ',inva
        ipause=mypauses(14,line)
-       call dadeb(31,'ERR DAVAR ',1)
+       call dadeb !(31,'ERR DAVAR ',1)
     endif
     !
     if(nomax.eq.1) then
        if(i.gt.inva) then
           print*,'ERROR IN DAVAR, I = ',i,' EXCEEDS INVA = ',inva
-          !           CALL DADEB(31,'ERR DAVAR3',1)
+          !           CALL dadeb !(31,'ERR DAVAR3',1)
        endif
        call daclr(ina)
        cc(ipoa) = ckon
@@ -1230,7 +1245,7 @@ contains
     if(not.gt.nomax) then
        write(line,'(a15,i8,a17,i8)') 'ERROR, NOCUT = ',nocut,' EXCEEDS NOMAX = ',nomax
        ipause=mypauses(15,line)
-       call dadeb(31,'ERR DANOT ',1)
+       call dadeb !(31,'ERR DANOT ',1)
     endif
     !
     nocut = not
@@ -1251,7 +1266,7 @@ contains
   !    if(not.gt.nomax) then
   !       write(line,'(a15,i8,a17,i8)') 'ERROR, NOCUT = ',nocut,' EXCEEDS NOMAX = ',nomax
   !       ipause=mypauses(15,line)
-  !       call dadeb(31,'ERR DANOT ',1)
+  !       call dadeb !(31,'ERR DANOT ',1)
   !    endif
   !
   !    not=nocut
@@ -1333,7 +1348,7 @@ contains
        endif
        if(jj1.lt.1.or.jj1.gt.illa) then
           print*,'ERROR IN DAPEK, INDEX OUTSIDE RANGE, JJ(1) = ',jj1
-          !           CALL DADEB(31,'ERR DAPEK1',1)
+          !           CALL dadeb !(31,'ERR DAPEK1',1)
        endif
        ipek = ipoa + jj1 - 1
        cjj = cc(ipek)
@@ -1461,7 +1476,7 @@ contains
        endif
        if(jj1.lt.1.or.jj1.gt.illa) then
           print*,'ERROR IN DAPOK, INDEX OUTSIDE RANGE, JJ(1) = ',jj1
-          !           CALL DADEB(31,'ERR DAPOK1',1)
+          !           CALL dadeb !(31,'ERR DAPOK1',1)
        endif
        ipok = ipoa + jj1 - 1
        cc(ipok) = cjj
@@ -1556,7 +1571,7 @@ contains
     if(idall(ina).gt.idalm(ina)) then
        write(line,'(a15)') 'ERROR IN DAPOK '
        ipause=mypauses(17,line)
-       call dadeb(31,'ERR DAPOK ',1)
+       call dadeb !(31,'ERR DAPOK ',1)
     endif
     !
     return
@@ -2357,7 +2372,7 @@ contains
     if(idall(inb).gt.idalm(inb)) then
        write(line,'(a17)') 'ERROR IN DACMU '
        ipause=mypauses(18,line)
-       call dadeb(31,'ERR DACMU ',1)
+       call dadeb !(31,'ERR DACMU ',1)
     endif
     !
     return
@@ -2455,7 +2470,7 @@ contains
     !    if(ckon.eq.zero) then
     !       write(line,'(a18)') 'ERROR IN DACDI and DADIC, CKON IS ZERO' !2002.11.28
     !       ipause=mypauses(19,line)
-    !       call dadeb(31,'ERR DACDI ',1)
+    !       call dadeb !(31,'ERR DACDI ',1)
     !    endif
     !    call dacdi(ina,ckon,idadic)
     !    call dafun('INV ',idadic,inc)
@@ -2728,7 +2743,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a40)')  'ERROR IN dalint idall(inc).gt.idalm(inc)'
        ipause=mypauses(21,line)
-       call dadeb(31,'ERR DALIN ',1)
+       call dadeb !(31,'ERR DALIN ',1)
     endif
     !
     return
@@ -2854,7 +2869,7 @@ contains
              return
           else
              write(*,1000) cf,ina,a0
-             call dadeb(31,'ERR DAFUN ',1)
+             call dadeb !(31,'ERR DAFUN ',1)
              lfun = 0
              return
           endif
@@ -2877,7 +2892,7 @@ contains
              return
           else
              write(*,1000) cf,ina,a0
-             call dadeb(31,'ERR DAFUN ',1)
+             call dadeb !(31,'ERR DAFUN ',1)
              lfun = 0
              return
           endif
@@ -2902,7 +2917,7 @@ contains
              return
           else
              write(*,1000) cf,ina,a0
-             call dadeb(31,'ERR DAFUN ',1)
+             call dadeb !(31,'ERR DAFUN ',1)
              lfun = 0
              return
           endif
@@ -2926,7 +2941,7 @@ contains
              return
           else
              write(*,1000) cf,ina,a0
-             call dadeb(31,'ERR DAFUN ',1)
+             call dadeb !(31,'ERR DAFUN ',1)
              lfun = 0
              return
           endif
@@ -2972,7 +2987,7 @@ contains
              return
           else
              write(*,1000) cf,ina,a0
-             call dadeb(31,'ERR DAFUN ',1)
+             call dadeb !(31,'ERR DAFUN ',1)
              lfun = 0
              return
           endif
@@ -2996,7 +3011,7 @@ contains
              return
           else
              write(*,1000) cf,ina,a0
-             call dadeb(31,'ERR DAFUN ',1)
+             call dadeb !(31,'ERR DAFUN ',1)
              lfun = 0
              return
           endif
@@ -3172,11 +3187,11 @@ contains
     if(ia.ne.ib) then
        write(line,'(a26)')  'ERROR IN DACCT, IA .NE. IB'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR DACCT1',1)
+       call dadeb !(31,'ERR DACCT1',1)
     elseif(ic.ne.invb) then
        write(line,'(a26)')  'ERROR IN DACCT, IC.NE.INVB'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR DACCT2',1)
+       call dadeb !(31,'ERR DACCT2',1)
     endif
     !
     !     ALLOCATING LOCAL VECTORS AND CALLING MTREE
@@ -3269,7 +3284,7 @@ contains
     if(ib.ne.ic) then
        write(line,'(a26)')  'ERROR IN MTREE, IB .NE. IC'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR MTREE1',1)
+       call dadeb !(31,'ERR MTREE1',1)
     endif
     !
     !     ALLOCATING LOCAL VECTORS
@@ -3360,7 +3375,7 @@ contains
     else
        write(line,'(a49)')  'ERROR IN MTREE, ZEROTH ORDER TERM OF ICHK IS ZERO'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR MTREE2',1)
+       call dadeb !(31,'ERR MTREE2',1)
     endif
     !
     nterm = 1
@@ -3401,7 +3416,7 @@ contains
     if(nterm.gt.idalm(mc(1))) then
        write(line,'(a31)')  'ERROR IN MTREE, NTERM TOO LARGE'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR MTREE3',1)
+       call dadeb !(31,'ERR MTREE3',1)
     endif
     !
     call dapok(ichk,jjy,-one)
@@ -3427,14 +3442,14 @@ contains
     if(nterm.ne.ntermf.or.nterm.ne.idall(ichk)) then
        write(line,'(a46,1x,i8,1x,i8,1x,i8)') 'ERROR IN MTREE, NTERM, NTERMF, IDALL(ICHK) =  ',nterm,ntermf,idall(ichk)
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR MTREE4',1)
+       call dadeb !(31,'ERR MTREE4',1)
     endif
     !
     do i=idapo(ichk),idapo(ichk)+nterm-1
        if(abs(cc(i)+one).gt.epsmac) then
           write(line,'(a44)')  'ERROR IN MTREE, NOT ALL TERMS IN ICHK ARE -1'
           ipause=mypauses(35,line)
-          call dadeb(31,'ERR MTREE5',1)
+          call dadeb !(31,'ERR MTREE5',1)
        endif
     enddo
     !
@@ -3729,11 +3744,11 @@ contains
     if(ia.ne.ib) then
        write(line,'(a26)')  'ERROR IN DAINV, IA .NE. IB'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR DAINV1',1)
+       call dadeb !(31,'ERR DAINV1',1)
     elseif(ia.ne.inva.or.ib.ne.invb) then
        write(line,'(a40)')  'ERROR IN DAINV, IA.NE.INVA.OR.IB.NE.INVB'
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR DAINV2',1)
+       call dadeb !(31,'ERR DAINV2',1)
     endif
     !
     !     ALLOCATING LOCAL VECTORS
@@ -3778,7 +3793,7 @@ contains
        else
           write(line,'(a22)')  'ERROR IN ROUTINE DAINV'
           ipause=mypauses(35,line)
-          call dadeb(31,'ERR DAINV3',1)
+          call dadeb !(31,'ERR DAINV3',1)
        endif
     endif
     !
@@ -3815,7 +3830,7 @@ contains
        enddo
     enddo
     !
-    if(ier.eq.1) call dadeb(31,'ERR DAINV4',1)
+    if(ier.eq.1) call dadeb !(31,'ERR DAINV4',1)
     !
     !     ITERATIVELY COMPUTING DIFFERENT PARTS OF THE INVERSE
     !     ****************************************************
@@ -4057,7 +4072,7 @@ contains
     !
     if(nomax.eq.1) then
        !         PRINT*,'ERROR, DADER CALLED WITH NOMAX = 1'
-       !        CALL DADEB(31,'ERR DADER1',1)
+       !        CALL dadeb !(31,'ERR DADER1',1)
        !         stop 666
        do i=1,lnv
           jd(i)=0
@@ -4121,7 +4136,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a15)') 'ERROR IN DADER '
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR DADER2',1)
+       call dadeb !(31,'ERR DADER2',1)
     endif
     !
     return
@@ -4227,7 +4242,7 @@ contains
           j(i)=0
        enddo
        !         PRINT*,'ERROR, DACFU CALLED WITH NOMAX = 1'
-       !        CALL DADEB(31,'ERR DACFU ',1)
+       !        CALL dadeb !(31,'ERR DACFU ',1)
        !         stop 667
        return
     endif
@@ -4255,7 +4270,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a15)') 'ERROR IN DACFU '
        ipause=mypauses(36,line)
-       call dadeb(31,'ERR DACFU ',1)
+       call dadeb !(31,'ERR DACFU ',1)
     endif
     !
     return
@@ -4398,7 +4413,7 @@ contains
           j(i)=0
        enddo
        !         PRINT*,'ERROR, DACFU CALLED WITH NOMAX = 1'
-       !        CALL DADEB(31,'ERR DACFU ',1)
+       !        CALL dadeb !(31,'ERR DACFU ',1)
        !         stop 667
        return
     endif
@@ -4426,7 +4441,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a15)') 'ERROR IN DACFU '
        ipause=mypauses(37,line)
-       call dadeb(31,'ERR DACFU ',1)
+       call dadeb !(31,'ERR DACFU ',1)
     endif
     !
     return
@@ -4492,7 +4507,7 @@ contains
           j(i)=0
        enddo
        !         PRINT*,'ERROR, DACFU CALLED WITH NOMAX = 1'
-       !        CALL DADEB(31,'ERR DACFU ',1)
+       !        CALL dadeb !(31,'ERR DACFU ',1)
        !         stop 667
        return
     endif
@@ -4520,7 +4535,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a15)') 'ERROR IN DACFU '
        ipause=mypauses(38,line)
-       call dadeb(31,'ERR DACFU ',1)
+       call dadeb !(31,'ERR DACFU ',1)
     endif
     !
     return
@@ -5025,7 +5040,7 @@ contains
     return
   end subroutine darea77
 
-  subroutine dadeb(iunit,c,istop)
+  subroutine dadeb  !(istop)
     implicit none
     !     *******************************
     !
@@ -5034,9 +5049,7 @@ contains
     !
     !-----------------------------------------------------------------------------
     !
-    integer istop,iunit
     !integer,dimension(0:1)::i8
-    character(10) c
     !
     !etienne
     !    if(check_da) then
@@ -5073,7 +5086,7 @@ contains
     !
     write(line,'(a26,1x,i8,1x,a11)')  'ERROR IN DAINF, DA VECTOR ',inc,' NOT FOUND '
     ipause=mypauses(35,line)
-    call dadeb(31,'ERR DAINF ',1)
+    call dadeb !(31,'ERR DAINF ',1)
     !
     return
   end subroutine dainf
@@ -5112,7 +5125,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a15)')  'ERROR IN DAPAC '
        ipause=mypauses(35,line)
-       call dadeb(31,'ERR DAPAC ',1)
+       call dadeb !(31,'ERR DAPAC ',1)
     endif
     !
     return
@@ -5151,7 +5164,7 @@ contains
           write(line,'(a16,i8,a5,i8,a17,4(1x,i8))')  'ERROR IN DACHK, ',ina,' AND ',inc, &
                & ' ARE INCOMPATIBLE',inoa,inva,inoc,invc
           ipause=mypauses(35,line)
-          call dadeb(31,'ERR DACHK1',1)
+          call dadeb !(31,'ERR DACHK1',1)
        endif
        !
        !     CASE OF A BINARY OPERATION
@@ -5170,7 +5183,7 @@ contains
           write(line,'(a16,i8,a1,i8,a5,i8,a17)')  'ERROR IN DACHK, ',ina,',',inb &
                & ,' AND ',inc,' ARE INCOMPATIBLE'
           ipause=mypauses(35,line)
-          call dadeb(31,'ERR DACHK2',1)
+          call dadeb !(31,'ERR DACHK2',1)
        endif
     endif
     !
@@ -5378,7 +5391,7 @@ contains
     if(idall(inc).gt.idalm(inc)) then
        write(line,'(a16)')  'ERROR IN DADTRA '
        ipause=mypauses(35,line)
-       call dadeb(111,'ERR DADTRA',1)
+       call dadeb !(111,'ERR DADTRA',1)
     endif
     !
     return
@@ -5491,7 +5504,7 @@ contains
     if(inoa.ne.nomax.or.inva.ne.nvmax) then
        line='ERROR IN DARAN, ONLY VECTORS WITH NO = NOMAX AND NV = NVMAX ALLOWED'
        ipause=mypauses(31,line)
-       call dadeb(31,'ERR DARAN1',1)
+       call dadeb !(31,'ERR DARAN1',1)
     endif
     !
     call daclr(1)
@@ -5506,7 +5519,7 @@ contains
        else
           line='ERROR IN ROUTINE DARAN'
           ipause=mypauses(31,line)
-          call dadeb(31,'ERR DARAN2',1)
+          call dadeb !(31,'ERR DARAN2',1)
        endif
     enddo
     !
@@ -5544,8 +5557,10 @@ contains
     illa = idall(ina)
     if(.not.present(j)) return
     iout = 0
-    if(ipresent.gt.illa) then
-       ipresent=1
+    if(ipresent.gt.illa.or.ipresent<1) then
+       write(6,*) ipresent,illa
+       write(6,*) " error in dacycle "
+       stop 101
     endif
     ii=ipresent+ipoa-1
     call dancd(i_1(ii),i_2(ii),j)
@@ -5555,12 +5570,53 @@ contains
        j=0
        if(ipresent/=1) j(ipresent-1)=1
     endif
-    ipresent=1+ipresent
+    !    ipresent=1+ipresent
 
 
 
     return
 
   end subroutine dacycle
+
+!!!! new stuff lingyun
+
+  subroutine daclean(ina,value)
+    implicit none
+    integer ipause, mypauses
+    !     ***************************
+    !
+    !     THIS SUBROUTINE PRINTS THE DA VECTOR INA TO UNIT IUNIT.
+    !
+    !-----------------------------------------------------------------------------
+    !
+    integer ii,illa,ilma,ina,inoa,inva,iout,ipoa
+    real(dp) value
+    !
+    if(ina.lt.1.or.ina.gt.nda_dab) then
+       write(line,'(a22,i8)') 'ERROR IN dacycle, INA = ',ina
+       ipause=mypauses(39,line)
+       stop
+    endif
+    !
+
+    inoa = idano(ina)
+    inva = idanv(ina)
+    ipoa = idapo(ina)
+    ilma = idalm(ina)
+    illa = idall(ina)
+    iout = 0
+
+
+    do ii=ipoa,ipoa+ilma-1
+       if(abs(cc(ii))<value) cc(ii)=zero
+    enddo
+
+
+    !    call dapac(ina)
+
+    return
+
+  end subroutine daclean
+
 
 end module dabnew

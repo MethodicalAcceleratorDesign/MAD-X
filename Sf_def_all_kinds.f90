@@ -177,7 +177,6 @@ contains
     IMPLICIT NONE
     TYPE(worm), INTENT(INOUT):: X_IN
     TYPE(FIBRE),TARGET, INTENT(INOUT):: P
-    INTEGER I
 
     allocate(x_in%nst)
     X_IN%NST=3

@@ -27,6 +27,7 @@ MODULE S_FIBRE_BUNDLE
   INTEGER :: INDEX_node=0
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   real(dp),target :: eps_pos=c_1d_10
+  integer(2),parameter::it0=0,it1=1,it2=2,it3=3,it4=4,it5=5,it6=6,it7=7,it8=8,it9=9
 
   INTERFACE kill
      MODULE PROCEDURE kill_layout
@@ -314,7 +315,6 @@ CONTAINS
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
     integer i,k,POS
-    logical(lp) doneit
 
     !    CALL LINE_L(L,doneit)  !TGV
     I=mod_n(POS,L%N)
@@ -1290,17 +1290,17 @@ CONTAINS
           EL2%PATCH%A_D=D
           EL2%PATCH%A_ANG=ANG
           SELECT CASE(EL2%PATCH%PATCH)
-          CASE(0,1)
+          CASE(it0,it1)
              EL2%PATCH%PATCH=1*PATCH_NEEDED
-          CASE(2,3)
+          CASE(it2,it3)
              EL2%PATCH%PATCH=PATCH_NEEDED + 2     ! etienne 2008.05.29
           END SELECT
           IF(ENE) THEN
 
              SELECT CASE(EL2%PATCH%ENERGY)
-             CASE(0,1)
+             CASE(it0,it1)
                 EL2%PATCH%ENERGY=1
-             CASE(2,3)
+             CASE(it2,it3)
                 EL2%PATCH%ENERGY=3
              END SELECT
           ENDIF
@@ -1312,16 +1312,16 @@ CONTAINS
           EL1%PATCH%B_D=D
           EL1%PATCH%B_ANG=ANG
           SELECT CASE(EL1%PATCH%PATCH)
-          CASE(0,2)
+          CASE(it0,it2)
              EL1%PATCH%PATCH=2*PATCH_NEEDED
-          CASE(1,3)
+          CASE(it1,it3)
              EL1%PATCH%PATCH=2*PATCH_NEEDED + 1     ! etienne 2008.05.29
           END SELECT
           IF(ENE) THEN
              SELECT CASE(EL2%PATCH%ENERGY)
-             CASE(0,2)
+             CASE(it0,it2)
                 EL1%PATCH%ENERGY=2
-             CASE(1,3)
+             CASE(it1,it3)
                 EL1%PATCH%ENERGY=3
              END SELECT
           ENDIF
@@ -1341,9 +1341,9 @@ CONTAINS
           IF(ASSOCIATED(EL2%PATCH)) THEN
              IF(ENE) THEN
                 SELECT CASE(EL2%PATCH%ENERGY)
-                CASE(0,1)
+                CASE(it0,it1)
                    EL2%PATCH%ENERGY=1
-                CASE(2,3)
+                CASE(it2,it3)
                    EL2%PATCH%ENERGY=3
                 END SELECT
              ENDIF
@@ -1360,9 +1360,9 @@ CONTAINS
           IF(ASSOCIATED(EL2%PATCH)) THEN
              IF(ENE) THEN
                 SELECT CASE(EL2%PATCH%ENERGY)
-                CASE(0,2)
+                CASE(it0,it2)
                    EL1%PATCH%ENERGY=2
-                CASE(1,3)
+                CASE(it1,it3)
                    EL1%PATCH%ENERGY=3
                 END SELECT
              ENDIF
@@ -1542,7 +1542,6 @@ CONTAINS
   SUBROUTINE FIND_POS_in_universe(C,i )  ! Finds the location "i" of the fibre C in layout L
     implicit none
     INTEGER, INTENT(INOUT) :: I
-    logical(lp) doneit
     TYPE (layout), POINTER :: C
     TYPE (layout), POINTER :: P
     NULLIFY(P);
@@ -1624,8 +1623,7 @@ CONTAINS
 
   SUBROUTINE locate_in_universe(F,i,j)
     IMPLICIT NONE
-    integer i_tot,i,j
-    integer k
+    integer i,j
     TYPE(FIBRE),pointer ::  F
 
 
@@ -1639,7 +1637,6 @@ CONTAINS
   SUBROUTINE FIND_POS_in_layout(L, C,i )  ! Finds the location "i" of the fibre C in layout L
     implicit none
     INTEGER, INTENT(INOUT) :: I
-    logical(lp) doneit
     TYPE(LAYOUT) L
     TYPE (fibre), POINTER :: C
     TYPE (fibre), POINTER :: P
@@ -1754,7 +1751,6 @@ CONTAINS
     ! moves to next one in list called name in tied universe
     implicit none
     TYPE (fibre), POINTER :: Current
-    TYPE (layout), POINTER :: L
     TYPE (mad_universe), target :: m_u
     integer, intent(inout):: pos
     character(*), intent(in):: name
@@ -2059,7 +2055,7 @@ CONTAINS
   SUBROUTINE de_Set_Up_ORBIT_LATTICE( L ) ! deallocates layout content
     implicit none
     TYPE (ORBIT_LATTICE),POINTER :: L
-    INTEGER I,N
+    INTEGER I
 
     DO I=1,L%ORBIT_N_NODE+1
        !       CALL KILL_ORBIT_NODE(L%ORBIT_NODES,I)
@@ -2127,8 +2123,7 @@ CONTAINS
   SUBROUTINE Set_Up_ORBIT_LATTICE(O,N,U)
     IMPLICIT NONE
     TYPE(ORBIT_LATTICE), TARGET, intent(inout):: O
-    INTEGER N,I
-    INTEGER  ::  ORBIT_N_NODE
+    INTEGER N
     LOGICAL(lp)  ::  U
 
     if(N>0) THEN
@@ -2191,7 +2186,6 @@ CONTAINS
     TYPE (INTEGRATION_NODE), POINTER :: Current
     TYPE (NODE_LAYOUT), TARGET, intent(inout):: L
     integer i,k,POS,nt
-    logical(lp) doneit,runit
     nt=l%n
     I=mod_n(POS,L%N)
 
@@ -2236,7 +2230,7 @@ CONTAINS
     TYPE(BEAM_BEAM_NODE),POINTER :: B
 
     allocate(B)
-    ALLOCATE(B%DS)
+    !    ALLOCATE(B%DS)
     ALLOCATE(B%S)
     ALLOCATE(B%FK)
     ALLOCATE(B%SX)
@@ -2245,12 +2239,24 @@ CONTAINS
     ALLOCATE(B%YM)
     ALLOCATE(B%DPOS)
     ALLOCATE(B%bbk(2))
+    ALLOCATE(B%A(3))
+    ALLOCATE(B%D(3))
+    ALLOCATE(B%beta0)
+    ALLOCATE(B%A_X1)
+    ALLOCATE(B%A_X2)
+    ALLOCATE(B%PATCH)
+    B%PATCH=.FALSE.
+    B%A_X1=1
+    B%A_X2=1
+    B%beta0=one
+    B%A=zero
+    B%D=zero
     B%bbk=zero
     B%SX=one
     B%Sy=one
     B%XM=zero
     B%YM=zero
-    B%DS=ZERO
+    !    B%DS=ZERO
     B%S=zero
     B%DPOS=0
     B%FK=ZERO
@@ -2260,7 +2266,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(BEAM_BEAM_NODE),POINTER :: B
 
-    DEALLOCATE(B%DS)
+    !    DEALLOCATE(B%DS)
     DEALLOCATE(B%FK)
     DEALLOCATE(B%SX)
     DEALLOCATE(B%SY)
@@ -2269,6 +2275,13 @@ CONTAINS
     DEALLOCATE(B%s)
     DEALLOCATE(B%DPOS)
     DEALLOCATE(B%bbk)
+    DEALLOCATE(B%A)
+    DEALLOCATE(B%D)
+    DEALLOCATE(B%beta0)
+    DEALLOCATE(B%A_X1)
+    DEALLOCATE(B%A_X2)
+    DEALLOCATE(B%PATCH)
+
     DEALLOCATE(B)
 
   END SUBROUTINE KILL_BEAM_BEAM_NODE

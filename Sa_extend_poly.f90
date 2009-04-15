@@ -426,6 +426,7 @@ contains
     call alloc(fs,no)
     call alloc(a,no)
     call alloc(b,no)
+
     do i=1,no
        call alloc(da(i,1))
        call alloc(da(i,2))
@@ -439,8 +440,6 @@ contains
           call alloc(F(i,j))
        enddo
     enddo
-
-
 
     y0=1
     y0%v(2)=zero
@@ -470,7 +469,6 @@ contains
        b(i)=(b(i).d.1)/(one+(one.mono.'1'))
     enddo
 
-
     jd(:)=0
     do j=1,no
 
@@ -491,6 +489,7 @@ contains
     enddo
 
     call matinv(MA,MA,no,no,result)
+
     if(result/=0) then
        w_p=0
        w_p%nc=1
@@ -499,6 +498,7 @@ contains
        CALL WRITE_E(result)
     endif
     call matinv(MB,MB,no,no,result)
+
     if(result/=0) then
        w_p=0
        w_p%nc=1
@@ -511,7 +511,6 @@ contains
        a(i)=zero
        b(i)=zero
     enddo
-
 
     do i=1,no
        do j=1,no
@@ -591,6 +590,7 @@ contains
     call kill(fs,no)
     call kill(a,no)
     call kill(b,no)
+
     do i=1,no
        call kill(da(i,1))
        call kill(da(i,2))

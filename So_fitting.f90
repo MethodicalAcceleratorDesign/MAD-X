@@ -27,7 +27,6 @@ contains
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     REAL(DP) CHROM(:)
-    integer i,IB
     TYPE(internal_state) state
     real(dp) closed(6)
     type(DAMAP) ID
@@ -66,7 +65,6 @@ contains
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
-    integer i,IB
     TYPE(internal_state) state
     real(dp) closed(6)
     type(DAMAP) ID
@@ -168,13 +166,11 @@ contains
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     TYPE(internal_state) state
-    integer pos,no,is,i,mf
-    real(dp) closed(6),del,s
+    integer pos,no,is,mf
+    real(dp) closed(6),del
     type(DAMAP) ID
     TYPE(REAL_8) Y(6)
-    CHARACTER(NLP) NAME
     CHARACTER(*) FILENAME
-    TYPE(FIBRE), POINTER :: P
     type(normalform) norm
     type(taylor) betax,betax2
     integer, allocatable :: expo1(:),expo2(:)
@@ -430,7 +426,7 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,more
+    INTEGER I,SCRATCHFILE
     TYPE(TAYLOR), allocatable:: EQ(:)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
@@ -554,7 +550,7 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,more
+    INTEGER I,SCRATCHFILE
     TYPE(TAYLOR), allocatable:: EQ(:)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
@@ -681,7 +677,7 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,more
+    INTEGER I,SCRATCHFILE
     TYPE(TAYLOR), allocatable:: EQ(:)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
@@ -1494,7 +1490,6 @@ contains
 
   SUBROUTINE  track_aperture(r,my_state,beta,dbeta,tuneold,ib,ITMAX,emit0,aper,pos,nturn,FILENAME,FILEtune,FILESMEAR,resmax)
     IMPLICIT NONE
-    INTEGER NTE
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
     TYPE(layout),target, intent(inout) :: R
@@ -1766,7 +1761,7 @@ contains
     real(dp), OPTIONAL, intent(in) ::xbend
     type(fibre), OPTIONAL, target :: fib
     logical(lp), OPTIONAL :: useknob
-    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggb,ggbt,xbend1,gf(7)
+    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggbt,xbend1,gf(7)
     INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb
     integer incold ,parityold
     integer, optional :: lim(2)
@@ -2289,7 +2284,7 @@ contains
     real(dp) lmax0
     TYPE(FIBRE),target :: C
     INTEGER I,f0
-    logical(lp) drift,doit,doodd
+    logical(lp) drift,doit
 
     if(associated(c%parent_layout)) then
        if(associated(c%parent_layout%parent_universe)) then
@@ -2320,7 +2315,7 @@ contains
        endif
        IF(doit) then
 
-          !       f0=nint(C%MAG%l/lmax0)
+          !         f0=nint(C%MAG%l/lmax0)
           f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/2)
           if(C%MAG%p%method==6) f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/4)
           if(f0==0) f0=1
@@ -2384,10 +2379,9 @@ contains
   SUBROUTINE  RECUT_KIND7(R,lmax0,drift) ! A re-splitting routine
     IMPLICIT NONE
     TYPE(layout),target, intent(inout) :: R
-    TYPE(layout),POINTER :: L
     real(dp) lmax0
     TYPE(FIBRE),POINTER :: C
-    INTEGER I,f0
+    INTEGER I
     logical(lp) drift
 
 
@@ -2476,8 +2470,7 @@ contains
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
-    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii  !,limit0(2)
+    INTEGER M1,M2,M3, MK1,MK2,MK3,nst_tot,ii  !,limit0(2)
     type(fibre), OPTIONAL, target :: fib
     logical(lp), OPTIONAL :: useknob
     logical(lp) doit
@@ -2710,7 +2703,6 @@ contains
     TYPE(LAYOUT),TARGET :: R
     integer J,I
     type(fibre), pointer :: P
-    type(layout) temp
     logical(lp), optional:: changeanbn
     logical(lp) changeanbn0
 
@@ -2787,7 +2779,7 @@ contains
     integer i1,i2,j,ic,i
     character(nlp) nom
     type(fibre), pointer :: p
-    logical(lp) integrated,f1
+    logical(lp) f1
     real(dp) cut,sig(6),mis(6),x,taxi(6)
 
     if(i1>i2) then
@@ -2891,9 +2883,8 @@ contains
     real(dp) x(6)
     REAL(DP) x_in,del_in,closed(6),r(6),rt(6)
     REAL(DP) lamT,lams,lamu,dlam,DLAMT,DX,ang,ang_in,ang_out
-    integer pos,nturn,i,st,ite,ic,mf,J,n_in,j_in
+    integer pos,nturn,i,st,ite,ic,mf,n_in,j_in
     TYPE(INTERNAL_STATE) STATE
-    TYPE(FIBRE), POINTER :: P
     !
     !    TYPE(REAL_8) Y(6)
     !    TYPE(DAMAP) ID

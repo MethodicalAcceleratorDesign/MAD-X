@@ -50,7 +50,7 @@ contains
     LOGICAL(LP) EXACT0,magnet0
     logical(lp) FIBRE_flip0,MAD0
     logical(lp) :: t=.true.,f=.false.
-    INTEGER FIBRE_DIR0,IL,multipi
+    INTEGER FIBRE_DIR0,IL
     real(dp) e1_true,norm
 
 
@@ -278,7 +278,6 @@ contains
     implicit none
 
     type(keywords) , intent(out):: key
-    real h
     key%magnet="CROTTE"
     select case(MADTHICK)
     CASE(drift_kick_drift)
@@ -307,10 +306,9 @@ contains
   subroutine print_COMPLEX_SINGLE_STRUCTURE(L,FILENAME,LMAX0,NL)
     implicit none
     character(*) filename
-    integer I,MF,N,n_l,ncon1,ncon2,j
+    integer I,MF,N,n_l
     type(LAYOUT), TARGET :: L
     type(LAYOUT), pointer :: CL
-    type(FIBRE), pointer :: P
     REAL(DP),OPTIONAL :: LMAX0
     integer,OPTIONAL :: NL
 
@@ -440,7 +438,6 @@ contains
     integer mf,I,N,RES,se1,se2
     integer, optional :: mf1
     type(LAYOUT), TARGET :: L
-    type(FIBRE), pointer :: P
     LOGICAL(LP), OPTIONAL :: RING
     REAL(DP), OPTIONAL :: LMAX0
     LOGICAL(LP) RING_IT,doneit
@@ -588,7 +585,7 @@ contains
 
   subroutine print_FIBRE(m,mf)
     implicit none
-    integer mf,I,siam_pos,siam_index,GIRD_POS,GIRD_index
+    integer mf,siam_pos,siam_index,GIRD_POS,GIRD_index
     type(FIBRE), pointer :: m
     siam_pos=0
     siam_index=0
@@ -623,7 +620,7 @@ contains
 
   subroutine READ_FIBRE(m,mf)
     implicit none
-    integer mf,I
+    integer mf
     type(FIBRE), pointer :: m
     character*255 line
     READ(MF,*) LINE
@@ -637,7 +634,7 @@ contains
 
   subroutine READ_FIBRE_2_lines(mf,DIR,index,pos,n,siam_index,siam_pos,gird_index,gird_pos)
     implicit none
-    integer mf,I
+    integer mf
     character*255 line
 
     integer DIR,index,pos,n,siam_index,siam_pos,gird_index,gird_pos
@@ -657,7 +654,7 @@ contains
 
   subroutine print_PATCH(m,mf)
     implicit none
-    integer mf,I,i1,i2,i3
+    integer mf,i1,i2,i3
     type(PATCH), pointer :: m
     character*255 line
 
@@ -682,7 +679,7 @@ contains
 
   subroutine READ_PATCH(m,mf)
     implicit none
-    integer mf,I
+    integer mf
     type(PATCH), pointer :: m
     character*255 line
 
@@ -727,7 +724,7 @@ contains
 
   subroutine READ_chart(m,mf)
     implicit none
-    integer mf,I
+    integer mf
     type(CHART), pointer :: m
     character*60 line
     READ(mf,*) LINE
@@ -744,7 +741,7 @@ contains
 
   subroutine READ_chart_fake(mf)
     implicit none
-    integer mf,I
+    integer mf
     character*60 line
     type(magnet_frame), pointer :: f
     real(dp) d1(3),d2(3)
@@ -816,9 +813,9 @@ contains
     if(associated(p%MAG%TP10)) then
        if(p%MAG%TP10%DRIFTKICK.and.p%MAG%p%method==2) f0=p%MAG%TP10%f
     endif
-    !     if(f0>0) then
-    !      Write(mf,*) f0," Internal Recutting "
-    !     endif
+    !    if(f0>0) then
+    !     Write(mf,*) f0," Internal Recutting "
+    !    endif
     IF(ASSOCIATED(M%an)) THEN
        do i=1,m%p%NMUL
           write(line,*) m%bn(i),m%an(i),f0, "  BN AN %f ",I
@@ -1162,7 +1159,7 @@ contains
     ENDIF
     CALL  READ_magnet_chart(p,m%P,mf)
 
-    !      Write(mf,*) f0," Internal Recutting "
+    !     Write(mf,*) f0," Internal Recutting "
     IF(M%P%NMUL/=0) THEN
        IF(.NOT.ASSOCIATED(M%AN)) THEN
           ALLOCATE(M%AN(M%P%NMUL))
@@ -1313,7 +1310,7 @@ contains
     integer mf
     character*200 line
     character*5 til
-    real(dp) BETA0,GAMMA0I, GAMBET,P0C
+    real(dp) BETA0,GAMMA0I, GAMBET
 
 
     READ(MF,*) LINE
@@ -1471,13 +1468,11 @@ contains
   subroutine read_COMPLEX_SINGLE_STRUCTURE(U,filename,RING,LMAX0)
     implicit none
     character(*) filename
-    integer mf,n,i,n_l,J,ncon1,ncon2,k,m,POS1,POS2
+    integer mf,n,i,n_l,J
     type(MAD_UNIVERSE), TARGET :: U
-    type(layout), pointer :: L,DNA_END
+    type(layout), pointer :: L
     LOGICAL(LP), OPTIONAL :: RING
     REAL(DP), OPTIONAL :: LMAX0
-    character*120 line
-    type(FIBRE), pointer :: P
 
     call kanalnummer(mf)
     open(unit=mf,file=filename,status='OLD',err=2001)
@@ -1573,7 +1568,7 @@ contains
   subroutine READ_pointed_INTO_VIRGIN_LAYOUT(L,FILENAME,RING,LMAX0,mf1)
     implicit none
     character(*) filename
-    integer I,mf,N,DIR,index_,pos,nt,kc,siam_index,siam_pos,gird_index,gird_pos
+    integer I,mf,N,DIR,index_,pos,nt,siam_index,siam_pos,gird_index,gird_pos
     type(LAYOUT), TARGET :: L
     type(FIBRE), pointer :: P,current,siam,gird
     LOGICAL(LP), OPTIONAL :: RING
@@ -1730,7 +1725,7 @@ contains
     implicit none
     TYPE (fibre), target :: el
     character(*) name
-    integer i,nm,EXCEPTION,met1,nst1
+    integer i,nm,EXCEPTION
     real(dp),OPTIONAL:: a,r,freq,t
     real(dp), allocatable :: an(:),bn(:)
     type(keywords) key

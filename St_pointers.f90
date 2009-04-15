@@ -33,7 +33,7 @@ module pointer_lattice
 
   TYPE(REAL_8),private :: Y(6)
   TYPE(DAMAP),PRIVATE :: ID
-  integer nd2,npara
+  !  integer nd2,npara
   !  PRIVATE POWER_CAVITY,RADIA
   ! stuff from my fortran
   type(internal_state), target:: etat
@@ -67,8 +67,8 @@ contains
     my_scale_planar=100.d0
     my_fix(1)=.000d0
 
-    write(6,*) " absolute_aperture  ", c_%absolute_aperture
-    write(6,*) " hyperbolic_aperture ", c_%hyperbolic_aperture
+    write(6,*) " absolute_aperture  ", absolute_aperture
+    write(6,*) " hyperbolic_aperture ", hyperbolic_aperture
 
     ! CALL create_p_ring
 
@@ -82,12 +82,12 @@ contains
     CHARACTER*(120) com,COMT,filename,name_root,title,name_root_res,filetune,FILESMEAR
     character*(4) suffix,SUFFIX_res
     character(*) ptc_fichier
-    integer i,ii,mf,i_layout_temp,LIM(2),IB,NO
+    integer i,ii,mf,i_layout_temp,IB,NO
     !  FITTING FAMILIES
-    INTEGER NPOL,J,NMUL,K,ICN,N,np,MRESO(3)
+    INTEGER NPOL,J,NMUL,K,ICN,N,np
     type(pol_block), ALLOCATABLE :: pol_(:)
     type(pol_block) :: pb
-    CHARACTER*(NLP) NAME,flag,VORNAME
+    CHARACTER*(NLP) NAME,VORNAME
     real(dp) targ_tune(2),targ_chrom(2),EPSF
     real(dp) targ_RES(4)
     !  END FITTING FAMILIES
@@ -95,7 +95,7 @@ contains
     REAL(DP) DBETA,tune(3),tunenew(2),CHROM(2),DEL
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
-    integer nstep(2),i1,i2,I3,neq,i4,i5,I6,it,n_bessel
+    integer nstep(2),i1,i2,I3,n_bessel
     LOGICAL(LP) STRAIGHT,skip
     ! end
     ! TRACK 4D NORMALIZED
@@ -105,14 +105,14 @@ contains
     real(dp), allocatable :: resu(:,:)
     ! END
     ! RANDOM MULTIPOLE
-    INTEGER iseed,nMULT,addi
+    INTEGER addi
     REAL(DP) CUT,cn,cns
     LOGICAL(LP) integrated
     ! END
     ! LOCAL BEAM STUFF
-    INTEGER NUMBER_OF_PARTICLE,printmod
+    INTEGER NUMBER_OF_PARTICLE
     TYPE(DAMAP) MY_A
-    INTEGER MY_A_NO,MY_A_ND
+    INTEGER MY_A_NO
     ! APERTURE
     REAL(DP)  APER_R(2),APER_X,APER_Y
     INTEGER KINDAPER
@@ -122,9 +122,8 @@ contains
     REAL(DP) r_in,del_in,DLAM,ang_in,ang_out
     INTEGER ITE,n_in,POSR
     logical(lp) found_it
-    type(fibre),pointer ::p,p1
+    type(fibre),pointer ::p
     ! TRACKING RAYS
-    INTEGER NRAYS
     INTEGER IBN,N_name
     REAL(DP) X(6),DT(3),x_ref(6),sc,NLAM,A1,B1,HPHA,B_TESTLA,CUR1,CUR2
     REAL(DP)VOLT,PHASE
@@ -132,20 +131,13 @@ contains
     ! changing magnet
     logical(lp) bend_like
     logical exists
-    integer              :: apertflag
-    character(200)       :: whymsg
-    integer              :: why(9),stable_ray
     ! remove_patches
-    logical(lp) do_not_remove,put_geo_patch
     save my_default
     integer :: limit_int(2) =(/4,18/)
-    LOGICAL :: track_k,CLOSED_ORBIT=MY_FALSE,b_b
-    REAL(DP) CLOSED(6),XP(6),te(6),xbend
+    LOGICAL :: b_b
+    REAL(DP) xbend
     ! automatic track
-    integer lim_t(6,2),IEXT
-    real(dp) dlim_t(6)
     type(internal_state),pointer :: my_old_state
-    integer temps(8)
     TYPE(WORK) W
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
@@ -370,7 +362,17 @@ contains
        case('-EXACTMIS')
           my_estate=my_estate-EXACTMIS0
 
-
+          !       case('DEFAULTTPSA')
+          !       read(mf,*) default_tpsa
+          !       if(default_tpsa) then
+          !        write(6,*) " Default TPSA is Chinese "
+          !       else
+          !        write(6,*) " Default TPSA is Germanic "
+          !       endif
+       case('BERZ','GERMANIC','MARTIN')
+          CALL change_package(2)
+       case('YANG','CHINESE','LINGYUN')
+          CALL change_package(1)
        case('ALLOCATEBETA')
           ALLOCATE(BETA(2,2,my_ering%N))
 
@@ -588,9 +590,9 @@ contains
              tl%bb%fk=X_ref(1)* X_ref(4)**2
              tl%bb%sx=X_ref(2)* X_ref(4)
              tl%bb%sy=X_ref(3)* X_ref(4)
-             if(pos<1) tl%bb%ds=SC-TL%S(1)
+             !           if(pos<1) tl%bb%ds=SC-TL%S(1)
              write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
-             write(6,*) " ds = ",tl%bb%ds
+             !              write(6,*) " ds = ",tl%bb%ds
           else
              write(6,*) " Beam-Beam position not found "
           endif
@@ -891,7 +893,7 @@ contains
           write(6,*) "El name ", p%mag%name
 
 
-          CALL INIT(default,3,1,BERZ,ND2,NPARA)
+          CALL INIT(default,3,1,BERZ)
 
           print*, "Npara is ", c_%NPARA
 
@@ -1331,7 +1333,7 @@ contains
     TYPE(LAYOUT),TARGET :: R,NR
     integer I,IG
     type(fibre), pointer :: P,bend
-    logical(lp) doneit,first
+    logical(lp) doneit
     real(dp) ent(3,3),a(3),ang(3),d(3)
 
     p=>r%start
@@ -1843,6 +1845,15 @@ subroutine read_ptc_command77(ptc_fichier)
   implicit none
   character(*) ptc_fichier
   integer m
+
+  if(ptc_fichier(1:len_trim(ptc_fichier))=='CPP') then
+     call change_default_tpsa(1)
+     return
+  endif
+  if(ptc_fichier(1:len_trim(ptc_fichier))=='FORTRAN') then
+     call change_default_tpsa(2)
+     return
+  endif
 
   call kanalnummer(m)
 

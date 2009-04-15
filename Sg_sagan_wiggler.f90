@@ -142,7 +142,6 @@ contains
     TYPE(sagan),INTENT(INOUT):: EL
 
     INTEGER, INTENT(IN) :: J
-    INTEGER I
 
     IF(J==1) RETURN
 
@@ -379,7 +378,6 @@ contains
 
   SUBROUTINE INTP(EL,X,k)
     IMPLICIT NONE
-    integer ipause
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE),OPTIONAL :: K
@@ -1211,7 +1209,6 @@ contains
     TYPE(REAL_8),INTENT(IN):: Z
     TYPE(REAL_8),INTENT(INOUT):: A,B
     INTEGER I
-    real(dp) J1,J2,J3
     TYPE(REAL_8) s1,s2,s3
     A=zero
     B=zero
@@ -1429,7 +1426,7 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: L,Z
-    real(dp) B_F(3),A,B,AP,BP,C,B2,X_MEC(6),x5
+    real(dp) A,B
     TYPE(INTERNAL_STATE),OPTIONAL :: K
 
 
@@ -1450,7 +1447,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: L,Z
-    TYPE(REAL_8) B_F(3),A,B,AP,BP,C,B2,X_MEC(6),x5
+    TYPE(REAL_8) A,B,AP,BP
     TYPE(INTERNAL_STATE),OPTIONAL :: K
 
 

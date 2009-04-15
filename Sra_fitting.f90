@@ -11,20 +11,20 @@ contains
   subroutine special_alex_main_ring(r,n_name,targ,sc)
     implicit none
     TYPE(layout), target, intent(inout):: R
-    integer  i1,i2,I3,I4,it1,it2,it3,it4
+    integer  i1,i2,it1,it2,it3,it4
     INTEGER I,N,NU,N2,NP2,mf,nt,NP,J,n_name
     type(fibre), pointer :: p1,p2
     TYPE(POL_BLOCK) QC(11)
     TYPE(REAL_8) Y(6)
     TYPE(DAMAP) ID
-    REAL(DP) X(6),targ(2),xx  ,tas(6)
+    REAL(DP) X(6),targ(2),xx
     TYPE(INTERNAL_STATE) STATE
     LOGICAL(LP) U
     type(normalform) nf
     type(gmap) g
     type(TAYLOR) T,eq(5)
 
-    REAL(DP) ALX,ALY,BEX,BEY,NUX,NUY,TA(2),sc
+    REAL(DP) ALX,ALY,TA(2),sc
 
     !targ(1)=22.43d0
     !targ(2)=20.82d0
@@ -522,7 +522,7 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE,more
+    INTEGER I,SCRATCHFILE
     TYPE(TAYLOR), allocatable:: EQ(:)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM

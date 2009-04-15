@@ -10,7 +10,7 @@ module accel_ptc
   integer  :: NHARMON=1
   integer :: slope_sign=1,slope_flip=1
   logicaL :: autoflip=.False.,must_stop=.False.,use_time=.False.
-  real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0
+  real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0,b0_table,p0c_table
   TYPE fibre_array
      type(fibre), pointer :: p
      integer, pointer :: pos
@@ -87,6 +87,9 @@ contains
 
     close(mf)
     deallocate(imode)
+    b0_table=b0
+    p0c_table=p0c
+
   end subroutine make_table
 
   subroutine get_from_table_volt(time,p0,vo,ph)
@@ -193,7 +196,6 @@ contains
     TYPE(BEAM),target :: RAYS
     real(dp) sig0(6),x(6)
     integer mf,mfp
-    type(fibre), pointer :: p
     character(*) filetable
 
     sig0=1.e-6
@@ -210,11 +212,7 @@ contains
 
     call make_table(filetable)
 
-    !call make_table("NOACC_ACC_210.DAT")
-    !call make_table("RF_Pattern_210kV_INJ120mc_ACC350ms.DAT")
-    !call make_table("ACCWAVE_40kV_280kV_350ms.DAT")
-    !call make_table("ACCWAVE_210KVH9_350ms.DAT")
-    !call make_table("noaccel.DAT")
+
 
     write(6,*) "Read RF_table ... from RF_file: ", filetable(1:len_trim(filetable))
     ipause=mypause(321)
@@ -237,10 +235,6 @@ contains
        n_turn=-n_turn
        use_time=.true.
     endif
-    !n_turn=20
-
-    !rays%x(2,1:6)=0.d0
-    !rays%x(2,6)=0.00001d0
 
     call ptc_synchronous_set(-1)
     write(6,*) " reading rays after some turns ?"
@@ -263,8 +257,6 @@ contains
     endif
 
 
-    !call print(my_ORBIT_LATTICE%state,6)
-
     do j=1,n_turn
 
        do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
@@ -285,7 +277,8 @@ contains
           DO KK=1,RAYS%N
              X(5)=rays%x(kk,6)+my_ORBIT_LATTICE%ORBIT_P0C
              X(6)=x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000
-             write(mfp,'(1x,E25.17,1x,i8,1x,1(1x,E25.17))') x(6),j,x(5)     !rays%x(kk,1:6)
+             x(1)=X(5)/p0c_table*b0_table
+             write(mfp,'(1x,E25.17,1x,i8,1x,1(1x,E25.17),1x,1(1x,E25.17))') x(6),j,x(5),x(1)     !rays%x(kk,1:6)
           ENDDO
        endif
        if(must_stop) exit
@@ -323,8 +316,7 @@ SUBROUTINE ptc_synchronous_set(i_node)
   INTEGER  i_node
   INTEGER  i_node1,i,mf,j,nf
   type(internal_state) state
-  real(dp) p0,vrfx,dphat,freqf,dt0,dt,x6,vo(nvolt),ph(nvolt)
-  TYPE(INTEGRATION_NODE), POINTER  :: T
+  real(dp) p0,dphat,freqf,dt0,x6,vo(nvolt),ph(nvolt)
 
 
   i_node1 = i_node + 1
@@ -526,10 +518,10 @@ END SUBROUTINE  ptc_synchronous_after
 SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
   USE accel_ptc    !,vrff=>vrf,freqf=>freq
   IMPLICIT NONE
-  real(dp) a,x(6),o,dl,driv,dt0,dtp0,e(2)
+  real(dp) x(6),o,dl,driv,dt0,dtp0
   real(dp) v(nvolt),ph(nvolt)
   real(dp) normb,norm,deltae
-  integer n,i,k,j,nvo
+  integer n,i,k,j
   TYPE(CAV4),pointer :: EL
   TYPE(CAV4p),pointer :: ELp
   type(real_8) y(6)
@@ -600,8 +592,8 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
         call track(p_orbit,y,local_state)
 
         driv=y(5).sub.'1'
-        !      e(1)=y(5)
-        !      e(2)=y(6)*p_orbit%mag%p%p0c
+        !        e(1)=y(5)
+        !        e(2)=y(6)*p_orbit%mag%p%p0c
         !             write(6,*) e
         !             write(6,*) (y(5).sub.'0'),driv,deltae,p_orbit%mag%p%p0c
         !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
@@ -658,10 +650,7 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
    SUBROUTINE adjust_phase(state,dt0)
      USE accel_ptc    !,vrff=>vrf,freqf=>freq
      IMPLICIT NONE
-     real(dp) x6,dt0
-     integer n,i
-     TYPE(CAV4),pointer :: EL
-     TYPE(CAV4p),pointer :: ELp
+     real(dp) dt0
      type(internal_state) state
 
      if(.not.state%totalpath==1) then
@@ -674,7 +663,7 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
 
      USE accel_ptc
      IMPLICIT NONE
-     REAL(DP) x,xp,y,yp,phi,dE,x6
+     REAL(DP) x,xp,y,yp,phi,dE
      INTEGER node_index
      INTEGER i
 

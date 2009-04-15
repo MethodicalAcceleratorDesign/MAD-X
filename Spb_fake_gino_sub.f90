@@ -3,6 +3,7 @@ subroutine call_gino(GINO_COMMAND)
   CHARACTER(*) GINO_COMMAND
 
   Write(6,*) "  "
+  Write(6,*) GINO_COMMAND
   Write(6,*) " This is not available for this version  of MAD-X"
   Write(6,*) " The code for the Windows Operating System is available at"
   Write(6,*) " http://mad.web.cern.ch/mad/PTC_proper/mad-xp-gino/"

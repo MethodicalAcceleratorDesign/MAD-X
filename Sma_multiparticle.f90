@@ -378,7 +378,6 @@ CONTAINS
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
-    INTEGER I
 
 
     IF(ASSOCIATED(C%PATCH)) THEN
@@ -443,7 +442,6 @@ CONTAINS
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
-    INTEGER I
 
 
     IF(ASSOCIATED(C%PATCH)) THEN
@@ -555,7 +553,6 @@ CONTAINS
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
-    INTEGER I
 
     ! call cpu_time(ttime0)
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
@@ -627,9 +624,10 @@ CONTAINS
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE)  &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
        if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
-          call TRANS((/zero,zero,t%bb%ds/),X,el%P%beta0,my_false,k%time)
+
+          if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
           call BBKICK(t%bb,X)
-          call TRANS((/zero,zero,-t%bb%ds/),X,el%P%beta0,my_false,k%time)
+          if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
        endif
 
        SELECT CASE(EL%KIND)
@@ -704,7 +702,6 @@ CONTAINS
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(elementp),pointer :: el
-    INTEGER I
     logical(lp) BN2,L
     logical(lp) CHECK_KNOB
     logical(lp), pointer,dimension(:)::AN,BN
@@ -772,11 +769,9 @@ CONTAINS
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
        if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
-          call TRANS((/zero,zero,t%bb%ds/),X,el%P%beta0,my_false,k%time)
-          !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
+          if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
           call BBKICK(t%bb,X)
-          call TRANS((/zero,zero,-t%bb%ds/),X,el%P%beta0,my_false,k%time)
-          !       ,ALWAYS_EXACT_PATCHING.or.el%P%EXACT,k%time)
+          if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
        endif
        SELECT CASE(EL%KIND)
        CASE(KIND0)
@@ -1039,8 +1034,8 @@ CONTAINS
     real(dp),INTENT(IN):: DT
     TYPE(INTEGRATION_NODE), pointer :: T
     TYPE(magnet_chart), pointer :: p
-    real(dp) XN(6),PZ,PT
-    real(dp)  A,b,R
+    real(dp) PZ
+    real(dp)  b
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     P=>T%PARENT_FIBRE%MAG%P
@@ -1099,8 +1094,8 @@ CONTAINS
     TYPE(INTEGRATION_NODE), pointer :: T
     !    TYPE(magnet_chart), pointer :: p
     !    TYPE(magnet_chart), pointer :: p
-    real(dp) XN(6),PZ,PT
-    real(dp)  A,b,R
+    real(dp) PZ
+    real(dp)  b
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     !    P=>T%PARENT_FIBRE%MAG%P
@@ -1158,7 +1153,7 @@ CONTAINS
     TYPE(INTEGRATION_NODE), pointer :: T
     TYPE(magnet_chart), pointer :: p
     type(real_8) XN(6),PZ,PT
-    real(dp)  A,b,R
+    real(dp)  b
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     P=>T%PARENT_FIBRE%MAG%P
@@ -1220,7 +1215,7 @@ CONTAINS
     type(fibre), pointer ::c
     type(INTEGRATION_NODE), pointer ::t
     type(worm) vers
-    integer k,my_start,ic,j
+    integer k,ic,j
     real(dp) x(6),ent(3,3),a(3)
     LOGICAL(LP) APER
     aper=APERTURE_FLAG
@@ -1505,8 +1500,6 @@ CONTAINS
     implicit none
     INTEGER k,mf
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(INTEGRATION_NODE),POINTER::T
-    TYPE(FIBRE),POINTER::F
 
     DO K=1,b%n
        IF(.not.B%U(K)) THEN
@@ -1524,8 +1517,6 @@ CONTAINS
     implicit none
     INTEGER k,mf
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(INTEGRATION_NODE),POINTER::T
-    TYPE(FIBRE),POINTER::F
 
     DO K=1,b%n
        IF(.not.B%U(K)) THEN
@@ -1543,8 +1534,6 @@ CONTAINS
     implicit none
     INTEGER i,j,k,mf,NOTlost,N
     TYPE(BEAM), INTENT(IN):: B
-    TYPE(INTEGRATION_NODE),POINTER::T
-    TYPE(FIBRE),POINTER::F
     real(dp), optional :: xm(6)
     real(dp), allocatable :: av(:,:)
     real(dp) em(2),beta(2),xma(6)

@@ -266,7 +266,7 @@ CONTAINS
 
   SUBROUTINE TRACK_R(X)
     IMPLICIT NONE
-    REAL(DP) X(6),x6,xp,yp,x5
+    REAL(DP) X(6),x6,xp,yp
     INTEGER icharef
     COMMON/ptc/ icharef
 
@@ -649,8 +649,7 @@ CONTAINS
     implicit none
     type (POL_BLOCK),INTENT(IN):: S1
     TYPE(ELEMENTP),INTENT(inOUT):: S2
-    INTEGER I,S1NMUL
-    logical(lp) DOIT,DONEIT                    !,checkname
+    logical(lp) DOIT                    !,checkname
     CHARACTER(nlp) S1NAME
     CHARACTER(vp)    S1VORNAME
 
@@ -704,7 +703,6 @@ CONTAINS
     TYPE(ELEMENTP),INTENT(inOUT):: S2
     INTEGER I,S1NMUL
     logical(lp) DOIT,DONEIT                    !,checkname
-    type(work) w
 
     IF(S2%P%NMUL>NMAX) THEN
        w_p=0
@@ -2639,7 +2637,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT),INTENT(IN)::  EL
     TYPE(ELEMENTP),INTENT(inOUT)::  ELP
-    INTEGER I,J,k,l
+    INTEGER J,i
 
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
@@ -2896,7 +2894,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENTP),INTENT(IN)::  EL
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
-    INTEGER I,J,k,l
+    INTEGER I,J
 
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
@@ -3142,7 +3140,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT),INTENT(IN)::  EL
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
-    INTEGER I,J,k,l
+    INTEGER I,J
 
 
     !    if(associated(el%siamese)) elp%siamese=>el%siamese

@@ -40,6 +40,7 @@ module definition
   INTEGER,PARAMETER::NMAX=20
   integer,private,parameter::n_max=10   ! sagan stuff
   INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2  !,CASE3=3
+  INTEGER,PARAMETER  :: ISPIN0R=1,ISPIN1R=3
 
   !
   TYPE sub_taylor
@@ -137,7 +138,7 @@ module definition
   !@3 ---------------------------------------------</br>
 
   TYPE GMAP
-     TYPE (TAYLOR) V(lnv)    ! Ndim2=6 but allocated to nd2=2,4,6 ! etienne_oct_2004
+     TYPE (TAYLOR) V(lnv)    !
      integer N
   END TYPE GMAP
 
@@ -251,21 +252,22 @@ module definition
   end  type tree_element
 
   type damapspin
-     REAL(DP) s0(3)
      type(damap) M
-     !   type(real_8) s(3,3)
-     type(taylor) s(3,3)
+     type(real_8) s(3,3)
   end type damapspin
 
-  !  type normal_spin
-  !     type(normalform) N
-  !     type(taylor) NS(3,3)
-  !     type(taylor) AS(3,3)
-  !     real(dp) tune
-  !     type(damapspin) a_t
-  !     integer NRES,M(NDIM)
+  type normal_spin
+     type(normalform) N
+     type(damapspin) a1   !
+     type(damapspin) ar   !
+     type(damapspin) as
+     type(damapspin) a_t
+     ! !! (a_t%m,a_t%s) = (a1%m, I ) o (I ,as%s) o (ar%m,I)
+!!!  extra info
+     type(real_8) n0(3)
+     type(real_8) theta0
+  end type normal_spin
 
-  !  end type normal_spin
 
   include "a_def_frame_patch_chart.inc"
   include "a_def_all_kind.inc"
@@ -274,14 +276,16 @@ module definition
 
   type probe
      real(dp) x(6)
-     type(spinor) s
+     type(spinor) s(ISPIN0R:ISPIN1R)
      logical u
      type(integration_node),pointer :: lost_node
   end type probe
 
   type probe_8
      type(real_8) x(6)
-     type(spinor_8) s
+     type(spinor_8) s(ISPIN0R:ISPIN1R)
+     !     type(spinor_8) sy
+     !     type(spinor_8) sz
      !  type (REAL_8) E_ij(ndim2,ndim2)
      real(dp) E_ij(ndim2,ndim2)
      logical u

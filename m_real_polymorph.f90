@@ -46,7 +46,7 @@ module polymorphic_taylor
   private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT,polymorpht
   ! PRIVATE EQUAL1D,EQUAL2D
   ! end complex stuff
-  private printpoly,printdouble,printsingle
+  private printpoly,printdouble,printsingle,dmulmapconcat
   private line
   character(120) line
   !integer npol
@@ -380,6 +380,7 @@ module polymorphic_taylor
      MODULE PROCEDURE scmul   !
      MODULE PROCEDURE imulsc   !
      MODULE PROCEDURE iscmul   !
+     MODULE PROCEDURE      dmulmapconcat  ! concatenation real_8*damap
   END INTERFACE
 
   !@       <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="135">
@@ -3654,6 +3655,46 @@ contains
     end select
   END FUNCTION div
 
+  FUNCTION dmulmapconcat( S1, S2 )
+    implicit none
+    TYPE (real_8) dmulmapconcat
+    TYPE (real_8), INTENT (IN) :: S1
+    type(damap) , INTENT (IN) :: S2
+    integer localmaster
+
+    select case(s1%kind)
+    case(m1)
+       dmulmapconcat%r=s1%r
+       dmulmapconcat%kind=1
+    case(m2)
+       localmaster=master
+       call ass(dmulmapconcat)
+       dmulmapconcat%t= s1%t*s2
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(dmulmapconcat)
+          call varfk1(S1)
+          dmulmapconcat%t= varf1*s2
+          master=localmaster
+       else
+          dmulmapconcat%r=s1%r
+          dmulmapconcat%kind=1
+       endif
+    case default
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,A72,/,1x,a72))'
+       w_p%fi='(2((1X,i4)))'
+       w_p%c(1)= " trouble in dmulmapconcat "
+       w_p%c(2)= "s1%kind   "
+       w_p=(/s1%kind  /)
+       call write_e(0)
+    end select
+  END FUNCTION dmulmapconcat
+
+
   FUNCTION dmulsc( S1, S2 )
     implicit none
     TYPE (real_8) dmulsc
@@ -4117,11 +4158,12 @@ contains
     end select
   END FUNCTION iscdiv
 
-  SUBROUTINE  printpoly(S2,i)
+  SUBROUTINE  printpoly(S2,i,prec)
     implicit none
     integer ipause, mypauses
     type (real_8),INTENT(INOUT)::S2
     integer i
+    real(dp), optional :: prec
 
     if(s2%kind/=0) then
 
@@ -4129,7 +4171,7 @@ contains
        case(m1)
           write(i,*)  s2%r
        case(m2)
-          call pri(S2%t,i)
+          call pri(S2%t,i,prec)
        case(m3)
           if(s2%i>0) then
              write(i,*) s2%r,"  +",s2%s,"  *x_",int(s2%i)
@@ -5069,6 +5111,40 @@ contains
     s1%i=0
 
   end subroutine ASSp
+
+  subroutine assp_no_master(s1)
+    implicit none
+    TYPE (real_8) s1
+
+
+    call ass0(s1%t)
+    s1%alloc=t
+    s1%kind=1
+    s1%i=0
+
+  end subroutine assp_no_master
+
+  subroutine assp_master(s1)
+    implicit none
+    TYPE (real_8) s1
+    integer ipause,mypauses
+    ! lastmaster=master  ! 2002.12.13
+
+    select case(master)
+    case(0:ndumt-1)
+       master=master+1
+    case(ndumt)
+       line=  " cannot indent anymore "
+       ipause=mypauses(0,line)
+    end select
+    !    write(26,*) " real polymorph  ",master
+
+    call ass0(s1%t)
+    s1%alloc=t
+    s1%kind=1
+    s1%i=0
+
+  end subroutine assp_master
 
   ! complex
 

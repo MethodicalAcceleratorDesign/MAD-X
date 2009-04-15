@@ -376,6 +376,17 @@ contains
     !    endif
   END SUBROUTINE alloctree
 
+  SUBROUTINE  damap_clean(S1,value)
+    implicit none
+    type (damap),INTENT(INOUT)::S1
+    real(dp),INTENT(INOUT)::value
+    INTEGER I
+
+    DO I=1,ND2
+       CALL taylor_clean(S1%V(I),value)
+    ENDDO
+
+  END SUBROUTINE damap_clean
 
   SUBROUTINE  allocmap(S1)
     implicit none
@@ -411,6 +422,17 @@ contains
 
   END SUBROUTINE allocgmap
 
+  SUBROUTINE  gmap_clean(S1,value)
+    implicit none
+    type (gmap),INTENT(INOUT)::S1
+    real(dp),INTENT(INOUT)::value
+    INTEGER I
+
+    DO I=1,s1%n
+       CALL taylor_clean(S1%V(I),value)
+    ENDDO
+
+  END SUBROUTINE gmap_clean
 
   SUBROUTINE  allocvec(S1)
     implicit none

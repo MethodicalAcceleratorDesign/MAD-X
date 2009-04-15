@@ -6,8 +6,6 @@ MODULE S_FAMILY
   IMPLICIT NONE
   public
 
-  TYPE(AFFINE_FRAME),POINTER :: AF
-
   ! LINKED LIST
   PRIVATE SURVEY_EXIST_PLANAR_L_NEW ,SURVEY_EXIST_PLANAR_IJ,MISALIGN_FIBRE_EQUAL ,SURVEY_EXIST_PLANAR_I
   !,SURVEY_NO_PATCH
@@ -140,7 +138,6 @@ CONTAINS
     TYPE(magnet_frame),target, OPTIONAL :: magnetframe
     INTEGER, intent(in):: dir
     TYPE(INNER_FRAME), OPTIONAL :: E_IN
-    real(dp) ent(3,3),a(3),d(3),s
 
     !  All PTC magnet have the same convention for the internal frame
     !  Show a user want to add a magnet with corckscrew survey
@@ -512,9 +509,14 @@ CONTAINS
     ! FIND THE ELEMENT (CN) ON WHICH THE AFFINE_FRAME IS
     IMPLICIT NONE
     TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
+    TYPE(AFFINE_FRAME),POINTER :: AF
     TYPE(ELEMENT), POINTER :: C,CN
     INTEGER K
     LOGICAL(LP),INTENT(INOUT)::FOUND
+
+    !    NULLIFY(AF)
+    !    NULLIFY(CN)
+
 
     FOUND=MY_FALSE
     K=0
@@ -595,6 +597,7 @@ CONTAINS
     real(dp) a1(3),e1(3,3),a2(3),e2(3,3),dg1(3),ag1(3),mis(6)
     LOGICAL(LP), OPTIONAL, INTENT(IN) :: ADD,preserve_girder
     LOGICAL(LP) ADDIN,pres
+    !    TYPE(AFFINE_FRAME),POINTER :: AF
     LOGICAL(LP) FOUND
     LOGICAL(LP) FOUNDg
     type(element), pointer :: caf
@@ -671,9 +674,14 @@ CONTAINS
     ! LOCATES MAGNET CN WHERE C%GIRDER_FRAME IS
     IMPLICIT NONE
     TYPE(FIBRE),TARGET,INTENT(INOUT):: S2
+    TYPE(AFFINE_FRAME),POINTER :: AF
     TYPE(ELEMENT), POINTER :: C,CN
     INTEGER K
     LOGICAL(LP),INTENT(INOUT)::FOUND
+
+    !    NULLIFY(AF)
+    !    NULLIFY(CN)
+
 
     FOUND=MY_FALSE
     K=0
@@ -731,10 +739,15 @@ CONTAINS
     ! USED IN PTC_GIRDER
     IMPLICIT NONE
     TYPE(element),TARGET,INTENT(INOUT):: S2
+    TYPE(AFFINE_FRAME),POINTER :: AF
     TYPE(ELEMENT), POINTER :: C,CN
     INTEGER K
     LOGICAL(LP),INTENT(INOUT)::FOUND
     REAL(DP),INTENT(INOUT):: ENT(3,3),A(3)
+
+    NULLIFY(AF)
+    NULLIFY(CN)
+
 
     FOUND=MY_FALSE
     K=0
@@ -864,7 +877,6 @@ CONTAINS
     REAL(DP) ANGLE(3),T_GLOBAL(3),d(3),r(3)
     TYPE(MAGNET_FRAME), POINTER :: F,F0
     REAL(DP) D_IN(3),D_OUT(3),OMEGAT(3),BASIST(3,3)
-    TYPE(INTEGRATION_NODE),POINTER :: T
     INTEGER I
     LOGICAL(LP) ADDIN,pres
     LOGICAL(LP) FOUNDg
@@ -1047,15 +1059,11 @@ CONTAINS
     TYPE (element),pointer :: c,cn,caf
     REAL(DP),INTENT(IN):: D(3)
     REAL(DP), OPTIONAL :: BASIS(3,3)
-    TYPE(FIBRE), POINTER::P
-    INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    TYPE(INTEGRATION_NODE), POINTER :: T
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
-    LOGICAL(LP) PAT,FOUND
-    REAL(DP) PREC0, exi(3,3), BASISt(3,3),b(3),t_global(3)
-    type(fibre_appearance), pointer :: dk
+    LOGICAL(LP) FOUND
+    REAL(DP) exi(3,3), BASISt(3,3),b(3),t_global(3)
     integer k
 
     FOUND=.FALSE.
@@ -1127,15 +1135,11 @@ CONTAINS
     TYPE (element),pointer :: c,cn
     REAL(DP),INTENT(IN):: D(3)
     REAL(DP), OPTIONAL :: BASIS(3,3)
-    TYPE(FIBRE), POINTER::P
-    INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    TYPE(INTEGRATION_NODE), POINTER :: T
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
-    LOGICAL(LP) PAT,FOUND
-    REAL(DP) PREC0, exi(3,3), BASISt(3,3),b(3)
-    type(fibre_appearance), pointer :: dk
+    LOGICAL(LP) FOUND
+    REAL(DP)  exi(3,3), BASISt(3,3),b(3)
     integer k
 
     FOUND=.FALSE.
@@ -1195,9 +1199,7 @@ CONTAINS
     REAL(DP),INTENT(IN):: D(3)
     REAL(DP), OPTIONAL :: BASIS(3,3)
     TYPE(FIBRE), POINTER::P
-    INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    TYPE(INTEGRATION_NODE), POINTER :: T
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
     LOGICAL(LP) PAT
@@ -1241,9 +1243,7 @@ CONTAINS
     REAL(DP),INTENT(IN):: ang(3)
     REAL(DP), OPTIONAL :: BASIS(3,3)
     TYPE(FIBRE), POINTER::P
-    INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    TYPE(INTEGRATION_NODE), POINTER :: T
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
     LOGICAL(LP) PAT
@@ -1328,15 +1328,11 @@ CONTAINS
     REAL(DP),INTENT(IN):: ang(3)
     TYPE (element),pointer :: c,cn
     REAL(DP), OPTIONAL :: BASIS(3,3),omega(3)
-    TYPE(FIBRE), POINTER::P
-    INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    TYPE(INTEGRATION_NODE), POINTER :: T
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
-    LOGICAL(LP) PAT,FOUND
-    REAL(DP) PREC0,b(3),exi(3,3), BASISt(3,3),omegat(3)
-    type(fibre_appearance), pointer :: dk
+    LOGICAL(LP) FOUND
+    REAL(DP) b(3),exi(3,3), BASISt(3,3),omegat(3)
     integer k
 
     FOUND=.FALSE.
@@ -1407,15 +1403,11 @@ CONTAINS
     REAL(DP),INTENT(IN):: ang(3)
     TYPE (element),pointer :: c,cn,caf
     REAL(DP), OPTIONAL :: BASIS(3,3),omega(3)
-    TYPE(FIBRE), POINTER::P
-    INTEGER IORDER
     INTEGER, OPTIONAL, INTENT(IN) :: ORDER
-    TYPE(INTEGRATION_NODE), POINTER :: T
     LOGICAL(LP),OPTIONAL :: PATCH
     REAL(DP),OPTIONAL :: PREC
-    LOGICAL(LP) PAT,FOUND
-    REAL(DP) PREC0,b(3),exi(3,3), BASISt(3,3),omegat(3)
-    type(fibre_appearance), pointer :: dk
+    LOGICAL(LP) FOUND
+    REAL(DP) b(3),exi(3,3), BASISt(3,3),omegat(3)
     TYPE(MAGNET_FRAME), POINTER :: F
     integer k
 
@@ -1546,7 +1538,7 @@ CONTAINS
     TYPE(INTEGRATION_NODE), POINTER :: T
     TYPE(element), POINTER::caf
     logical(lp), OPTIONAL, INTENT(IN) :: dogirder
-    REAL(DP) DD(3),T_GLOBAL(3)
+    REAL(DP) DD(3)
     type(fibre_appearance), pointer :: dk
 
     logical(lp) dog
@@ -2096,7 +2088,6 @@ CONTAINS
     TYPE(LAYOUT),target, INTENT(INOUT):: R1
     TYPE(LAYOUT),target, INTENT(INOUT):: R2
     TYPE (FIBRE), POINTER :: C
-    LOGICAL(LP) DONEIT
     LOGICAL(LP) :: DONEITT=.TRUE.
     INTEGER I   !  TGV
     NULLIFY(C)
@@ -2131,7 +2122,6 @@ CONTAINS
     TYPE(LAYOUT),target, INTENT(INOUT):: R2
     INTEGER, INTENT(IN):: I,J
     TYPE (FIBRE), POINTER :: C
-    LOGICAL(LP) DONEIT
     LOGICAL(LP) :: DONEITT=.TRUE.
     INTEGER K
     NULLIFY(C)
@@ -2182,7 +2172,6 @@ CONTAINS
     IMPLICIT NONE
     TYPE(LAYOUT),target,INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
-    LOGICAL(LP) DONEIT
     INTEGER I
     c_%np_pol=0
     NULLIFY(C)
@@ -2219,7 +2208,6 @@ CONTAINS
     TYPE(POL_BLOCK), INTENT(IN):: B
 
     TYPE (FIBRE), POINTER :: C
-    LOGICAL(LP) DONEIT
     INTEGER I
 
     NULLIFY(C)
@@ -2242,7 +2230,6 @@ CONTAINS
     IMPLICIT  NONE
     TYPE(LAYOUT),target, INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
-    LOGICAL(LP) DONEIT
     INTEGER I
 
     NULLIFY(C)
@@ -2264,7 +2251,6 @@ CONTAINS
     IMPLICIT  NONE
     TYPE(LAYOUT),target, INTENT(INOUT):: R
     TYPE (FIBRE), POINTER :: C
-    LOGICAL(LP) DONEIT
     INTEGER I
     NULLIFY(C)
 
@@ -2292,7 +2278,7 @@ CONTAINS
     type(fibre), pointer ::c
     type(INTEGRATION_NODE), pointer ::t
     type(worm) vers
-    integer my_start,ic,j
+    integer ic,j
     real(dp) x(6),ent(3,3),a(3)
     !    INTEGER, TARGET :: CHARGE
     LOGICAL(LP) APER
@@ -2422,20 +2408,14 @@ CONTAINS
 
   SUBROUTINE TRACK_FIBRE_RR(C,X,K,X_IN)
     implicit none
-    logical(lp) :: doneitt=.true.
-    logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     !    INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
-    logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
-    TYPE (fibre), POINTER :: CN
-    real(dp), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
     !    integer,target :: charge1
-    real(dp) xp
 
 
 

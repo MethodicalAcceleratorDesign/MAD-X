@@ -48,7 +48,6 @@ module Mad_like
   integer :: symplectic_order = 0
   REAL(DP) :: symplectic_eps = -one
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
-  INTEGER, PRIVATE, TARGET :: NPARA
   type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
 
   TYPE EL_LIST
@@ -2735,7 +2734,6 @@ CONTAINS
     implicit none
     call set_da_pointers
     c_%NP_pol => NP_pol
-    c_%NPARA => NPARA
     c_%ALWAYS_EXACTMIS=> ALWAYS_EXACTMIS
 
     c_%x_prime => x_prime

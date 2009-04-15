@@ -297,8 +297,6 @@ contains
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
     REAL(DP) ENT(3,3), A(3)
-    integer,target :: charge1
-    real(dp) xp
 
     ! real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,P0C,MASS0
     !INTEGER, POINTER :: CHARGE
@@ -521,9 +519,6 @@ contains
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (FIBRE), POINTER :: CN
     REAL(DP), POINTER :: P0,B0
-    REAL(DP) ENT(3,3), A(3)
-    integer,target :: charge1
-    TYPE(REAL_8) xp
 
     IF(.NOT.CHECK_STABLE) return
     !    C%MAGp%P%p0c=>c%p0c
@@ -765,14 +760,14 @@ contains
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
        CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
-       CALL ROT_XY(C%PATCH%A_ANG(3),X,PATCH)
+       CALL ROT_XY(C%PATCH%A_ANG(3),X)  !,PATCH)
        CALL TRANS(C%PATCH%A_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%A_X2*X(3);X(4)=C%PATCH%A_X2*X(4);
     ELSE
        X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
        CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
        CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
-       CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
+       CALL ROT_XY(C%PATCH%B_ANG(3),X)  !,PATCH)
        CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
@@ -793,14 +788,14 @@ contains
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAGP%P%BETA0,PATCH,k%TIME)
        CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAGP%P%BETA0,PATCH,k%TIME)
-       CALL ROT_XY(C%PATCH%A_ANG(3),X,PATCH)
+       CALL ROT_XY(C%PATCH%A_ANG(3),X)  !,PATCH)
        CALL TRANS(C%PATCH%A_D,X,C%MAGP%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%A_X2*X(3);X(4)=C%PATCH%A_X2*X(4);
     ELSE
        X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
        CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAGP%P%BETA0,PATCH,k%TIME)
        CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAGP%P%BETA0,PATCH,k%TIME)
-       CALL ROT_XY(C%PATCH%B_ANG(3),X,PATCH)
+       CALL ROT_XY(C%PATCH%B_ANG(3),X)  !,PATCH)
        CALL TRANS(C%PATCH%B_D,X,C%MAGP%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
@@ -822,12 +817,12 @@ contains
           IF(ENTERING) THEN
              CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
              CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
-             CALL ROT_XY(C%CHART%ANG_IN(3),X,OU)
+             CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
              CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
           ELSE
              CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
              CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
-             CALL ROT_XY(C%CHART%ANG_OUT(3),X,OU)
+             CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
              CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
           ENDIF
        ELSE
@@ -836,7 +831,7 @@ contains
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
              CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
-             CALL ROT_XY(C%CHART%ANG_OUT(3),X,OU)
+             CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
              CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
              CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
@@ -847,7 +842,7 @@ contains
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
              CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
-             CALL ROT_XY(C%CHART%ANG_IN(3),X,OU)
+             CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
              CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
              CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
@@ -870,12 +865,12 @@ contains
           IF(ENTERING) THEN
              CALL ROT_YZ(C%CHART%ang_in(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
              CALL ROT_XZ(C%CHART%ang_in(2),X,C%MAGP%P%BETA0,OU,k%TIME)
-             CALL ROT_XY(C%CHART%ang_in(3),X,OU)
+             CALL ROT_XY(C%CHART%ang_in(3),X)  !,OU)
              CALL TRANS(C%CHART%d_in,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
           ELSE
              CALL ROT_YZ(C%CHART%ang_out(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
              CALL ROT_XZ(C%CHART%ang_out(2),X,C%MAGP%P%BETA0,OU,k%TIME)
-             CALL ROT_XY(C%CHART%ang_out(3),X,OU)
+             CALL ROT_XY(C%CHART%ang_out(3),X)  !,OU)
              CALL TRANS(C%CHART%d_out,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
           ENDIF
        ELSE
@@ -884,7 +879,7 @@ contains
              C%CHART%d_out(2)=-C%CHART%d_out(2)
              C%CHART%ang_out(3)=-C%CHART%ang_out(3)
              CALL TRANS(C%CHART%d_out,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
-             CALL ROT_XY(C%CHART%ang_out(3),X,OU)
+             CALL ROT_XY(C%CHART%ang_out(3),X)  !,OU)
              CALL ROT_XZ(C%CHART%ang_out(2),X,C%MAGP%P%BETA0,OU,k%TIME)
              CALL ROT_YZ(C%CHART%ang_out(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
              C%CHART%d_out(1)=-C%CHART%d_out(1)
@@ -895,7 +890,7 @@ contains
              C%CHART%d_in(2)=-C%CHART%d_in(2)
              C%CHART%ang_in(3)=-C%CHART%ang_in(3)
              CALL TRANS(C%CHART%d_in,X,C%MAGP%P%BETA0,OU,k%TIME)                       !translation
-             CALL ROT_XY(C%CHART%ang_in(3),X,OU)
+             CALL ROT_XY(C%CHART%ang_in(3),X)  !,OU)
              CALL ROT_XZ(C%CHART%ang_in(2),X,C%MAGP%P%BETA0,OU,k%TIME)
              CALL ROT_YZ(C%CHART%ang_in(1),X,C%MAGP%P%BETA0,OU,k%TIME)                ! rotations
              C%CHART%d_in(1)=-C%CHART%d_in(1)

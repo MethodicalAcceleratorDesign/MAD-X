@@ -30,7 +30,7 @@ module da_arrays
 
   integer nda_dab
   integer :: ndamaxi=0
-  real(dp),TARGET :: total_da_size = c_1d30
+  real(dp),TARGET :: total_da_size = 1.D38  !c_300
   integer nst0,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
@@ -38,12 +38,12 @@ module da_arrays
 
 contains
 
-  subroutine alloc_all(no,nv,nd2t)
+  subroutine alloc_all(no,nv)
     implicit none
-    integer no,nv,nd2t
+    integer no,nv
     if(reallocate) then
        call dealloc_all
-       call danum0(no,nv,nd2t)
+       call danum0(no,nv)
        call alloc_
        notallocated=.false.
     endif
@@ -218,11 +218,11 @@ contains
     enddo
   end  subroutine danum
 
-  subroutine danum0(no,nv,nd2t)
+  subroutine danum0(no,nv)
     use scratch_size
     use file_handler
     implicit none
-    integer i,mm,no,nv,ldamin,nd2t ,nvt
+    integer i,mm,no,nv,ldamin ,nvt
     integer mf
     real(dp) size
     !     *****************************
@@ -254,9 +254,13 @@ contains
     lda=lda_used+ldamin
     lst=lda*lea
 
-    size=(three*REAL(lea,kind=DP)+two*(REAL(lia,kind=DP)+one)+five*REAL(lda,kind=DP))*four/c_1024**2
-    size=size+ten*REAL(lda,kind=DP)/c_1024**2+REAL(lda,kind=DP)/eight/c_1024**2
-    size=size+REAL(lst,kind=DP)*(eight/c_1024**2+two*four/c_1024**2)
+    if(lingyun_yang) then
+       size=REAL(lst,kind=DP)*(eight/c_1024**2+two*four/c_1024**2)
+    else
+       size=(three*REAL(lea,kind=DP)+two*(REAL(lia,kind=DP)+one)+five*REAL(lda,kind=DP))*four/c_1024**2
+       size=size+ten*REAL(lda,kind=DP)/c_1024**2+REAL(lda,kind=DP)/eight/c_1024**2
+       size=size+REAL(lst,kind=DP)*(eight/c_1024**2+two*four/c_1024**2)
+    endif
     if(size>total_da_size.or.printdainfo) then
        w_p=0
        w_p%nc=13
@@ -346,7 +350,10 @@ contains
     if (ier .eq. 132) return
 
     ai(1:n,1:n) = zero
-    forall (i = 1:n) ai(i,i) = one
+    !    forall (i = 1:n) ai(i,i) = one
+    do i=1,n
+       ai(i,i) = one
+    enddo
 
     do j=1,n
        call lubksb_nr(aw,n,nmax,indx,ai(1,j),nmx)

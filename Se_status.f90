@@ -68,6 +68,7 @@ module S_status
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   !  real(dp),PARAMETER::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
   !  real(dp),PARAMETER::FD1=half/(one+AAA),FD2=AAA*FD1,FK1=one/(one+AAA),FK2=(AAA-one)*FK1
+  INTEGER , target :: CAVITY_TOTALPATH=1   !  default is fake
 
   LOGICAL(lp) :: firsttime_coef=.true.
 
@@ -316,7 +317,6 @@ CONTAINS
   SUBROUTINE  dealloc_p(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
-    INTEGER I
     if(.not.associated(p)) return
 
     !    if(associated(P%dir)) then
@@ -746,8 +746,8 @@ CONTAINS
     endif
     write(mf,'((1X,a28,1x,i4))' ) ' Default integration method ',METD
     write(mf,'((1X,a28,1x,i4))' ) ' Default integration steps  ',NSTD
-    if(c_%CAVITY_TOTALPATH==1) write(mf,'((1X,a24))' ) ' Real Pill Box Cavities '
-    if(c_%CAVITY_TOTALPATH==0) write(mf,'((1X,a24))' ) ' Fake Pill Box Cavities '
+    if(CAVITY_TOTALPATH==1) write(mf,'((1X,a24))' ) ' Real Pill Box Cavities '
+    if(CAVITY_TOTALPATH==0) write(mf,'((1X,a24))' ) ' Fake Pill Box Cavities '
 
     If(electron) then
        if(muon==one)  then
@@ -949,120 +949,51 @@ CONTAINS
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
     INTEGER,optional :: ND2,NPARA
-    INTEGER  ND2l,NPARAl,NSPIN1
+    INTEGER  ND2l,NPARAl
     LOGICAL(lp) package
 
     package=my_true
+    if(present(pack))     package=my_true
 
-    IF(STATE%SPIN_ONLY) THEN
 
-       NDEL=0
-       NDPT1=0
-       ND1=0
-       IF(STATE%NOCAVITY)  THEN
-          IF(STATE%ONLY_4D) THEN
-             IF(STATE%DELTA) THEN
-                NDEL=1
-                !             MAPINT=5
-             ELSE
-                NDEL=0
-                !            MAPINT=4
-             ENDIF
+    NDEL=0
+    NDPT1=0
+    IF(STATE%NOCAVITY)  THEN
+       IF(STATE%ONLY_4D) THEN
+          IF(STATE%DELTA) THEN
+             ND1=2
+             NDEL=1
+             !             MAPINT=5
           ELSE
+             ND1=2
              NDEL=0
-             !         MAPINT=6
+             !            MAPINT=4
           ENDIF
-       ENDIF
-       NSPIN1=STATE%SPIN_DIM
-       CALL init_SPIN(NO1,ND1,NP1+NDEL,NSPIN1,NDPT1,PACKAGE)
-
-
-       ND2l=ND1*2
-       NPARAl=ND2l+NDEL+C_%NSPIN
-       C_%NPARA=NPARAl
-       C_%ND2=ND2l
-       C_%npara_fpp=NPARAl
-       C_%SPIN_POS=C_%NPARA-C_%NSPIN+1
-
-       if(present(nd2)) nd2=nd2l
-       if(present(npara)) npara=nparal
-    ELSEIF(STATE%SPIN.AND.(.NOT.STATE%SPIN_ONLY)) THEN
-       NDEL=0
-       NDPT1=0
-       IF(STATE%NOCAVITY)  THEN
-          IF(STATE%ONLY_4D) THEN
-             IF(STATE%DELTA) THEN
-                ND1=2
-                NDEL=1
-                !             MAPINT=5
-             ELSE
-                ND1=2
-                NDEL=0
-                !            MAPINT=4
-             ENDIF
-          ELSE
-             ND1=3
-             NDEL=0
-             NDPT1=5+C_%NDPT_OTHER
-             !         MAPINT=6
-          ENDIF
-       ELSE              ! CAVITY IN RING
+       ELSE
           ND1=3
-          NDPT1=0
-          !       MAPINT=6
+          NDEL=0
+          NDPT1=5+C_%NDPT_OTHER
+          !         MAPINT=6
        ENDIF
-
-       NSPIN1=STATE%SPIN_DIM
-       CALL init_SPIN(NO1,ND1,NP1+NDEL,NSPIN1,NDPT1,PACKAGE)
-
-       ND2l=ND1*2
-       NPARAl=ND2l+NDEL+C_%NSPIN
-       C_%NPARA=NPARAl
-       C_%ND2=ND2l
-       C_%npara_fpp=NPARAl
-       C_%SPIN_POS=C_%NPARA-C_%NSPIN+1
-
-       if(present(nd2)) nd2=nd2l
-       if(present(npara)) npara=nparal
-    ELSE
-       NDEL=0
+    ELSE              ! CAVITY IN RING
+       ND1=3
        NDPT1=0
-       IF(STATE%NOCAVITY)  THEN
-          IF(STATE%ONLY_4D) THEN
-             IF(STATE%DELTA) THEN
-                ND1=2
-                NDEL=1
-                !             MAPINT=5
-             ELSE
-                ND1=2
-                NDEL=0
-                !            MAPINT=4
-             ENDIF
-          ELSE
-             ND1=3
-             NDEL=0
-             NDPT1=5+C_%NDPT_OTHER
-             !         MAPINT=6
-          ENDIF
-       ELSE              ! CAVITY IN RING
-          ND1=3
-          NDPT1=0
-          !       MAPINT=6
-       ENDIF
-
-       CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
-
-       ND2l=ND1*2
-       NPARAl=ND2l+NDEL
-       C_%NPARA=NPARAl
-       C_%ND2=ND2l
-       C_%npara_fpp=NPARAl
-       C_%SPIN_POS=0
-       C_%NSPIN=0
-
-       if(present(nd2)) nd2=nd2l
-       if(present(npara)) npara=nparal
+       !       MAPINT=6
     ENDIF
+
+    CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
+
+    ND2l=ND1*2
+    NPARAl=ND2l+NDEL
+    C_%NPARA=NPARAl
+    C_%ND2=ND2l
+    C_%npara_fpp=NPARAl
+    C_%SPIN_POS=0
+    C_%NSPIN=0
+
+    if(present(nd2)) nd2=nd2l
+    if(present(npara)) npara=nparal
+
   END  subroutine S_init
 
 

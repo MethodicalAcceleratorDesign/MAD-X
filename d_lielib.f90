@@ -14,20 +14,20 @@ module lielib_berz
   PUBLIC LIEPEEK,INITPERT,HYPER,MAPFLOL
   PUBLIC ETALL1,TAKE,ETALL,DAPEK0,ETINI,DACLRD,DACOPD,DIFD
   PUBLIC INTD,ETCCT,TRXFLO,TRX,FACFLOD,EXPFLO,DALIND,ETINV
-  PUBLIC IDPRSET,SETIDPR,INPUTRES,MAPNORMF,DHDJFLO,GETTURA
+  PUBLIC INPUTRES,MAPNORMF,DHDJFLO,GETTURA   !,SETIDPRIDPRSET,
   PUBLIC FLOFACG,FLOFAC,DACMUD,CTORFLO,RTOCFLO,CTOR,RTOC,ETPIN
   PUBLIC LIEINIT,PERTPEEK,FLOWPARA,COMCFU
   PUBLIC DAPOK0,FACFLO,EXPFLOD,gofix
   public getcct,GETINV,gtrx,eig6
   private respoke
-  private etallnom,etppulnv,etmtree,etppush,etppush2,ppushlnv,simil
+  private etallnom,simil
   private dapokzer,davar0,taked,daread,daprid,daflo,daflod,fexpo,etcom,etpoi
   private exp1d,expnd2,liefact,mapnorm,orderflo,nuanaflo,h2pluflo,rotflo,rotiflo
   private ctord,rtocd,resvec,reelflo,compcjg,midbflo,mulnd2,movearou,movemul,cpart
   private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3
   integer,public,parameter::ndim=3,nreso=100
   integer,public::no,nv,nd,nd2,ndpt
-  integer, private :: ndc,ndc2,ndt,iref,itu,idpr,iflow,jtune,nres,ifilt
+  integer, private :: ndc,ndc2,ndt,iref,itu,iflow,jtune,nres,ifilt !,idpr
   integer, private,dimension(ndim)::nplane,idsta,ista
   real(dp), private,dimension(0:20)::xintex
   real(dp), private,dimension(ndim)::dsta,sta,angle,rad,ps,rads
@@ -39,6 +39,17 @@ module lielib_berz
   !  integer,private,parameter::ndim2=2*ndim,ntt=100
   character(120), private :: line
   logical :: frankheader=.true.
+
+  integer :: lielib_print(8)=0
+  !  lielib_print(1)=1   lieinit prints info
+  !  lielib_print(2)=1   expflo warning if no convergence
+  !  lielib_print(3)=1   Shows details in flofacg
+  !  lielib_print(4)=1   tunes and damping
+  !  lielib_print(5)=1  order in orbital normal form
+  !  lielib_print(6)=1  symplectic condition
+  !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
+  !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
+
 contains
 
   subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
@@ -61,7 +72,7 @@ contains
     !    do i=1,100
     !       is(i)=0
     !    enddo
-    call daini(no,nv,nd2,0)
+    call daini(no,nv,0)
     !    if(nis.gt.0)call etallnom(is,nis,'$$IS      ')
     if(ndpt1.eq.0) then
        ndpt=0
@@ -93,8 +104,8 @@ contains
     endif
     if(iref1.eq.0) iref=-1
 
-    if(idpr.eq.1) then
-       write(6,'(a6,i4,a20)') ' NO = ',no,' IN DA-CALCULATIONS '
+    if(lielib_print(1)==1) then
+       write(6,'(a17,4(1x,i4))') ' no,nv,nd,ndpt = ',no1,nv1,nd1,ndpt1
     endif
 
     do i=0,20
@@ -107,6 +118,7 @@ contains
     xintex(6) =one/c_30240
     xintex(8) =-one/c_1209600
     xintex(10)=one/c_21772800
+
 
     return
   end subroutine lieinit
@@ -182,14 +194,14 @@ contains
   end subroutine liepeek
 
 
-  subroutine etallnom(x,n,nom)
+  subroutine etallnom(x,n)
     implicit none
     ! CREATES A AD-VARIABLE WHICH CAN BE DESTROYED BY DADAL
     ! allocates vector of n polynomials and give it the name NOM=A10
     integer i,n,nd2
     integer,dimension(:)::x
     integer,dimension(4)::i1,i2
-    character(10) nom
+    !    character(10) nom
 
     do i=1,iabs(n)
        x(i)=0
@@ -245,119 +257,7 @@ contains
     endif
     return
   end subroutine etall1
-  subroutine etppulnv(x,xi,xff)
-    implicit none
-    integer i
-    integer,dimension(:)::x
-    real(dp),dimension(ntt)::xf,xii
-    real(dp),dimension(:)::xi,xff
-    if(.not.c_%stable_da) return
 
-    do i=1,nv
-       xii(i)=xi(i)
-    enddo
-    do i=nv+1,ntt
-       xii(i)=zero
-    enddo
-
-    call ppush(x,nv,xii,xf)
-
-    do i=1,nv
-       xff(i)=xf(i)
-    enddo
-
-    return
-  end subroutine etppulnv
-  subroutine etmtree(y,x)
-    implicit none
-    ! ROUTINES USING THE MAP IN AD-FORM
-    integer i,nt
-    integer,dimension(ntt)::ie,iv
-    integer,dimension(:)::x,y
-    if(.not.c_%stable_da) return
-
-    nt=nv-nd2
-    if(nt.gt.0) then
-       call etallnom(ie,nt,'IE        ')
-       do i=nd2+1,nv
-          call davar(ie(i-nd2),zero,i)
-       enddo
-       do i=nd2+1,nv
-          iv(i)=ie(i-nd2)
-       enddo
-    endif
-    do i=1,nd2
-       iv(i)=y(i)
-    enddo
-    call mtree(iv,nv,x,nv)
-    if(nt.gt.0) then
-       call dadal(ie,nt)
-    endif
-    return
-  end subroutine etmtree
-  subroutine etppush(x,xi)
-    implicit none
-    integer i
-    integer,dimension(:)::x
-    real(dp),dimension(ntt)::xf,xii
-    real(dp),dimension(:)::xi
-    if(.not.c_%stable_da) return
-
-    do i=1,nd2
-       xii(i)=xi(i)
-    enddo
-
-    call ppush(x,nv,xii,xf)
-
-    do i=1,nd2
-       xi(i)=xf(i)
-    enddo
-
-    return
-  end subroutine etppush
-  subroutine etppush2(x,xi,xff)
-    implicit none
-    integer i
-    integer,dimension(:)::x
-    real(dp),dimension(ntt)::xf,xii
-    real(dp),dimension(:)::xi,xff
-    if(.not.c_%stable_da) return
-
-    do i=1,nd2
-       xii(i)=xi(i)
-    enddo
-
-    call ppush(x,nv,xii,xf)
-
-    do i=1,nd2
-       xff(i)=xf(i)
-    enddo
-
-    return
-  end subroutine etppush2
-  subroutine ppushlnv(x,xi,xff,nd1)
-    implicit none
-    integer i,nd1
-    integer,dimension(:)::x
-    real(dp),dimension(ntt)::xf,xii
-    real(dp),dimension(:)::xi,xff
-    if(.not.c_%stable_da) return
-
-    do i=1,nd1
-       xii(i)=xi(i)
-    enddo
-    do i=nd1+1,ntt
-       xii(i)=zero
-    enddo
-
-    call ppush(x,nv,xii,xf)
-
-    do i=1,nd1
-       xff(i)=xf(i)
-    enddo
-
-    return
-  end subroutine ppushlnv
   subroutine etcct(x,y,z)
     implicit none
     !  Z=XoY
@@ -368,7 +268,7 @@ contains
 
     nt=nv-nd2
     if(nt.gt.0) then
-       call etallnom(ie,nt,'IE        ')
+       call etallnom(ie,nt) !,'IE        ')
        do i=nd2+1,nv
           call davar(ie(i-nd2),zero,i)
        enddo
@@ -396,7 +296,7 @@ contains
 
     nt=nv-n
     if(nt.gt.0) then
-       call etallnom(ie,nt,'IE        ')
+       call etallnom(ie,nt)  !,'IE        ')
        do i=n+1,nv
           call davar(ie(i-n),zero,i)
        enddo
@@ -426,7 +326,7 @@ contains
 
     nt=nv-nd2
     if(nt.gt.0) then
-       call etallnom(ie,nt,'IE        ')
+       call etallnom(ie,nt)  !,'IE        ')
        do i=nd2+1,nv
           call davar(ie(i-nd2),zero,i)
        enddo
@@ -457,7 +357,7 @@ contains
 
     nt=nv-n
     if(nt.gt.0) then
-       call etallnom(ie,nt,'IE        ')
+       call etallnom(ie,nt)  !,'IE        ')
        do i=n+1,nv
           call davar(ie(i-n),zero,i)
        enddo
@@ -485,8 +385,8 @@ contains
     integer,dimension(ndim2)::yi,ht
     if(.not.c_%stable_da) return
 
-    call etallnom(yi,nd2  ,'YI        ')
-    call etallnom(ht,nd2  ,'HT        ')
+    call etallnom(yi,nd2)  !  ,'YI        ')
+    call etallnom(ht,nd2)  !  ,'HT        ')
     call etall1(b1 )
     call etall1(b2 )
 
@@ -518,8 +418,8 @@ contains
     integer,dimension(ndim2)::w,v
     if(.not.c_%stable_da) return
 
-    call etallnom(w,nd2  ,'W         ')
-    call etallnom(v,nd2  ,'V         ')
+    call etallnom(w,nd2) ! ,'W         ')
+    call etallnom(v,nd2) ! ,'V         ')
 
     call etcct(a,x,w)
     call etcct(w,ai,v)
@@ -555,8 +455,8 @@ contains
           ie1(i)=0
           ie2(i)=0
        enddo
-       call etallnom(ie1,nt,'IE1       ')
-       call etallnom(ie2,nt,'IE2       ')
+       call etallnom(ie1,nt) !,'IE1       ')
+       call etallnom(ie2,nt) !,'IE2       ')
        do i=nd2+1,nv
           call davar(ie1(i-nd2),zero,i)
        enddo
@@ -591,8 +491,8 @@ contains
           ie1(i)=0
           ie2(i)=0
        enddo
-       call etallnom(ie1,nt,'IE1       ')
-       call etallnom(ie2,nt,'IE2       ')
+       call etallnom(ie1,nt) !,'IE1       ')
+       call etallnom(ie2,nt) !,'IE2       ')
        do i=nd2+1,nv
           call davar(ie1(i-nd2),zero,i)
        enddo
@@ -628,8 +528,8 @@ contains
           ie1(i)=0
           ie2(i)=0
        enddo
-       call etallnom(ie1,nt,'IE1       ')
-       call etallnom(ie2,nt,'IE2       ')
+       call etallnom(ie1,nt) !,'IE1       ')
+       call etallnom(ie2,nt) !,'IE2       ')
        do i=n+1,nv
           call davar(ie1(i-n),zero,i)
        enddo
@@ -797,7 +697,7 @@ contains
 
     call etall1(b1)
     call etall1(b2)
-    call etallnom(x,nd2  ,'X         ')
+    call etallnom(x,nd2) !  ,'X         ')
 
 
     do i=1,ntt
@@ -871,7 +771,7 @@ contains
     real(dp) rh,rt
     if(.not.c_%stable_da) return
 
-    call etallnom(b,nd2  ,'B         ')
+    call etallnom(b,nd2) !  ,'B         ')
 
     do i=1,nd2
        call dalin(h(i),rh,ht(i),rt,b(i))
@@ -979,7 +879,7 @@ contains
     call etall1(b2)
     call etall1(b3)
     call etall1(b4)
-    call etallnom(x,nd2  ,'X         ')
+    call etallnom(x,nd2) !  ,'X         ')
 
     call daclr(b4)
     call daclr(h)
@@ -1067,10 +967,8 @@ contains
 100    continue
        call dacop(b3,b4)
     enddo
-    if(idpr.ge.0) then
+    if(lielib_print(2)==1) then
        write(6,'(a6,1x,g20.14,1x,a25)') ' NORM ',eps,' NEVER REACHED IN EXPFLO '
-       write(6,*) 'NEW IDPR '
-       read(5,*)idpr
     endif
     call dacop(b3,y)
     call dadal1(b4)
@@ -1090,7 +988,7 @@ contains
     if(.not.c_%stable_da) return
 
     call etall1(b0 )
-    call etallnom(v,nd2  ,'V         ')
+    call etallnom(v,nd2) !  ,'V         ')
 
     call dacopd(x,v)
     do j=1,nd2
@@ -1114,14 +1012,15 @@ contains
     real(dp) eps,sca
     if(.not.c_%stable_da) return
 
-    call etallnom(bm,nd2  ,'BM        ')
-    call etallnom(b0,nd2  ,'B0        ')
+    call etallnom(bm,nd2) !  ,'BM        ')
+    call etallnom(b0,nd2) !  ,'B0        ')
     call etall1(v)
 
     call dacop(x,v)
 
-    eps=-one
-    call daeps(eps)
+    !    eps=-one
+    !    call daeps(eps)
+    eps=epsflo
     nmax=100
     !
     ! IFAC =1 ---> V = EXP(:SCA*H(NRMAX):)...EXP(:SCA*H(NRMIN):)X
@@ -1276,7 +1175,7 @@ contains
     if(.not.c_%stable_da) return
 
     call etall1(b0)
-    call etallnom(v,nd2  ,'V         ')
+    call etallnom(v,nd2) !  ,'V         ')
 
     call dacopd(x,v)
     do j=1,nd2
@@ -1302,11 +1201,11 @@ contains
 
     jj(1)=1
     !
-    call etallnom(v,nd2  ,'V         ')
-    call etallnom(w,nd2  ,'W         ')
-    call etallnom(t,nd2  ,'T         ')
-    call etallnom(x,nd2  ,'Z         ')
-    call etallnom(z,nd2  ,'Z         ')
+    call etallnom(v,nd2) !  ,'V         ')
+    call etallnom(w,nd2) !  ,'W         ')
+    call etallnom(t,nd2) !  ,'T         ')
+    call etallnom(x,nd2) !  ,'Z         ')
+    call etallnom(z,nd2) !  ,'Z         ')
 
     call etini(v)
     call daclrd(w)
@@ -1327,12 +1226,12 @@ contains
        ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
        ! call daprid(t,1,1,20)
        if(xn.lt.epsone) then
-          if(idpr.ge.0) then
+          if(lielib_print(3)==1) then
              w_p=0
              w_p%nc=1
              write(w_p%c(1),'(a14,g20.14)') " xn quadratic ",xn
              w_p%fc='(1((1X,A72)))'
-             CALL WRITE_i
+             CALL WRITE_a
           endif
           call daflod(t,t,w)
           call dalind(t,one,w,-half,t)
@@ -1359,12 +1258,12 @@ contains
           xnorm=xnorm+r
        enddo
        xn=xnorm/xnorm1
-       if(xn.ge.epsone.and.(idpr.ge.0)) then
+       if(xn.ge.epsone.and.(lielib_print(3)==1)) then
           w_p=0
           w_p%nc=1
           write(w_p%c(1),'(a11,g20.14)') " xn linear ",xn
           w_p%fc='(1((1X,A72)))'
-          CALL WRITE_i
+          CALL WRITE_a
        endif
        if(xn.lt.eps.or.more) then
           more=.true.
@@ -1373,11 +1272,12 @@ contains
        endif
     enddo
 1000 continue
+    WRITE(6,*) " K ", K,epsone
     w_p=0
     w_p%nc=1
     write(w_p%c(1),'(a11,i4)') " iteration " , k
     w_p%fc='(1((1X,A72)))'
-    CALL WRITE_i
+    CALL WRITE_a
     call dadal(x,nd2)
     call dadal(w,nd2)
     call dadal(v,nd2)
@@ -1393,8 +1293,8 @@ contains
     integer,dimension(ndim2)::v,w
     if(.not.c_%stable_da) return
 
-    call etallnom(v,nd2  ,'V         ')
-    call etallnom(w,nd2  ,'W         ')
+    call etallnom(v,nd2) !  ,'V         ')
+    call etallnom(w,nd2) !  ,'W         ')
 
     call dacopd(xy,x)
     !    call dacopd(x,v)
@@ -1473,28 +1373,26 @@ contains
 
     return
   end subroutine gettura
-  subroutine setidpr(idprint,nplan)
+  subroutine setidpr(nplan)
     implicit none
-    integer idprint,ik
+    integer ik
     integer,dimension(ndim)::nplan
     if(.not.c_%stable_da) return
 
     do ik=1,nd
        nplane(ik)=nplan(ik)
     enddo
-    idpr=idprint
-
     return
   end subroutine setidpr
-  subroutine idprset(idprint)
-    implicit none
-    integer idprint
-    if(.not.c_%stable_da) return
-
-    idpr=idprint
-
-    return
-  end subroutine idprset
+  !  subroutine idprset(idprint)
+  !    implicit none
+  !    integer idprint
+  !    if(.not.c_%stable_da) return!
+  !
+  !    idpr=idprint
+  !
+  !    return
+  !  end subroutine idprset
   subroutine mapnormf(x,ft,a2,a1,xy,h,nord,isi)
     implicit none
     integer ij,isi,nord
@@ -1503,8 +1401,8 @@ contains
     real(dp),dimension(ndim)::angle,rad,st,p
     if(.not.c_%stable_da) return
 
-    call etallnom(a1i,nd2  ,'A1I       ')
-    call etallnom(a2i,nd2  ,'A2I       ')
+    call etallnom(a1i,nd2) !  ,'A1I       ')
+    call etallnom(a2i,nd2) !  ,'A2I       ')
     !     frank/etienne
     do itu=1,ndim
        angle(itu)=zero
@@ -1530,7 +1428,7 @@ contains
        p(ij)=angle(ij)*(st(ij)*(twopii-one)+one)
     enddo
     if(ndc.eq.1) p(nd)=angle(nd)
-    if(idpr.ge.0) then
+    if(lielib_print(4)==1) then
        w_p=1
        w_p%nc=1
        w_p%nr=2
@@ -1540,7 +1438,7 @@ contains
        enddo
        w_p%fc='((1X,A8))'
        w_p%fr='(3(1x,g20.14))'
-       CALL WRITE_i
+       CALL WRITE_a
        w_p=1
        w_p%nc=1
        w_p%nr=2
@@ -1550,7 +1448,7 @@ contains
        enddo
        w_p%fc='((1X,A8))'
        w_p%fr='(3(1x,g20.14))'
-       CALL WRITE_i
+       CALL WRITE_a
     endif
     do ij=1,nd       !  -ndc    Frank
        ps(ij)=p(ij)
@@ -1568,7 +1466,7 @@ contains
           w_p%nc=1
           w_p%fc='((1X,A72))'
           write(w_p%c(1),'(i4,a27,g20.14)') ij,' TH TUNE MODIFIED IN H2 TO ',p(ij)*twopii
-          CALL WRITE_i
+          CALL WRITE_a
        endif
     enddo
     call h2pluflo(h,p,rad)
@@ -1595,10 +1493,10 @@ contains
     real(dp) xic
     if(.not.c_%stable_da) return
 
-    call etallnom(x,nd2  ,  'X         ')
-    call etallnom(w,nd2  ,  'W         ')
-    call etallnom(v,nd2  ,  'V         ')
-    call etallnom(rel,nd2  ,'REL       ')
+    call etallnom(x,nd2) !  ,  'X         ')
+    call etallnom(w,nd2) !  ,  'W         ')
+    call etallnom(v,nd2) !  ,  'V         ')
+    call etallnom(rel,nd2) !  ,'REL       ')
 
     ! COMPUTATION OF A1 AND A1I USING DAINV
     call etini(rel)
@@ -1701,14 +1599,14 @@ contains
     real(dp),dimension(ndim)::ang,ra
     if(.not.c_%stable_da) return
 
-    call etallnom(w,nd2  ,'W         ')
-    call etallnom(v,nd2  ,'V         ')
-    call etallnom(rel,nd2  ,'REL       ')
-    call etallnom(roi,nd2  ,'ROI       ')
-    call etallnom(b1,nd2  ,'B1        ')
-    call etallnom(b5,nd2  ,'B5        ')
-    call etallnom(b6,nd2  ,'B6        ')
-    call etallnom(b9,nd2  ,'B9        ')
+    call etallnom(w,nd2) !  ,'W         ')
+    call etallnom(v,nd2) !  ,'V         ')
+    call etallnom(rel,nd2) !  ,'REL       ')
+    call etallnom(roi,nd2) !  ,'ROI       ')
+    call etallnom(b1,nd2) !  ,'B1        ')
+    call etallnom(b5,nd2) !  ,'B5        ')
+    call etallnom(b6,nd2) !  ,'B6        ')
+    call etallnom(b9,nd2) !  ,'B9        ')
     call rotiflo(roi,ang,ra)
     call etini(rel)
     call daclrd(h)
@@ -1735,12 +1633,12 @@ contains
        call facflod(b6,rel,v,k,k,-one,1)
        ! W = V o X
        call etcct(v,x,w)
-       if(idpr.ge.0) then
+       if(lielib_print(5)==1) then
           w_p=0
           w_p%nc=1
           w_p%fc='(1((1X,A72),/))'
           write(w_p%c(1),'(a13,i4)') ' ORDERFLO K= ', k
-          CALL WRITE_i
+          CALL WRITE_a
        endif
        ! X = EXP(B9) W
        call facflod(b9,w,x,k,k,one,1)
@@ -2172,7 +2070,7 @@ contains
 
     call etall1(b1)
     call etall1(b2)
-    call etallnom(x,nd2  ,'X         ')
+    call etallnom(x,nd2) !  ,'X         ')
 
     call ctoi(c1,b1)
     call etcjg(x)
@@ -2473,12 +2371,12 @@ contains
     endif
     call mulnd2(xj,w)
     call mulnd2(cr,w)
-    if(idpr.ge.0.or.idpr.eq.-102) then
+    if(lielib_print(6)==1) then
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,A72),/))'
        w_p%c(1)= 'Check of the symplectic condition on the linear part'
-       CALL WRITE_i
+       CALL WRITE_a
        xsu=zero
        do i=1,nd2
           w_p=0
@@ -2487,7 +2385,7 @@ contains
           do j=1,nd2
              w_p%r(j)=w(i,j)
           enddo
-          CALL WRITE_i
+          CALL WRITE_a
 
           do j=1,nd2
              xsu=xsu+abs(w(i,j)-XJ(I,J))
@@ -2497,7 +2395,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
-       CALL WRITE_i
+       CALL WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
     if(no_hyperbolic_in_normal_form) then
@@ -2518,34 +2416,35 @@ contains
           write(6,*) " RESET STABLE FLAGS "
        endif
     endif
-    if(idpr.ge.0) then
+    if(lielib_print(7)==-1) then
        w_p=0
        w_p%nc=3
        w_p%fc='(2(1X,A120,/),(1X,A120))'
        w_p%c(2)= '       Index         Real Part         ArcSin(Imaginary Part)/2/pi'
-       CALL WRITE_i
+       CALL WRITE_a
        do i=1,nd-ndc
           rd1=SQRT(rr(2*i-1)**2+ri(2*i-1)**2)
           rd=SQRT(rr(2*i)**2+ri(2*i)**2)
           w_p=0
           w_p%nc=3
           w_p%fc='(2(1X,A120,/),(1X,A120))'
-          write(w_p%c(1),'(i4,2(1x,g20.14))') 2*i-1,rr(2*i-1),ASIN(ri(2*i-1)/rd1)*twopii
-          write(w_p%c(2),'(i4,2(1x,g20.14))') 2*i,rr(2*i),ASIN(ri(2*i)/rd)*twopii
-          write(w_p%c(3),'(a8,g20.14)') ' alphas ', LOG(SQRT(rd*rd1))
-          CALL WRITE_i
+          write(6,'(i4,2(1x,g20.14))') 2*i-1,rr(2*i-1),ASIN(ri(2*i-1)/rd1)*twopii
+          write(6,'(i4,2(1x,g20.14))') 2*i,rr(2*i),ASIN(ri(2*i)/rd)*twopii
+          write(6,'(a8,g20.14)') ' alphas ', LOG(SQRT(rd*rd1))
+          CALL WRITE_a
        enddo
        w_p=0
        w_p%nc=1
        w_p%fc='((1X,A120))'
        write(w_p%c(1),'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
-       CALL WRITE_i
+       CALL WRITE_a
        call read(n,nd-ndc)
-    elseif(idpr.eq.-100) then
+    elseif(lielib_print(8)==-1) then
        do i=1,nd-ndc
           n(i)=nplane(i)
        enddo
-    elseif(idpr.eq.-101.or.idpr.eq.-102) then
+       !    elseif(idpr.eq.-101.or.idpr.eq.-102) then
+    else  ! new line
        do i=1,nd-ndc
           if(ri(2*i).ne.zero) then
              n(i)=2*i-1
@@ -2553,10 +2452,10 @@ contains
              n(i)=-2*i+1
           endif
        enddo
-    else
-       do i=1,nd-ndc
-          n(i)=2*i-1
-       enddo
+       !    else
+       !       do i=1,nd-ndc
+       !          n(i)=2*i-1
+       !       enddo
     endif
     iunst=0
     do i=1,nd-ndc                  ! Frank NDC  kept
@@ -2591,9 +2490,9 @@ contains
           endif
        enddo
     enddo
-    if(idpr.eq.-101.or.idpr.eq.-102) then
-       call movearou(sai)
-    endif
+    !    if(idpr.eq.-101.or.idpr.eq.-102) then
+    call movearou(sai)
+    !    endif
     ! adjust sa such that sa(1,2)=0 and sa(3,4)=zero (courant-snyder-edwards-teng
     ! phase advances)
     if(iunst.ne.1) then
@@ -2783,10 +2682,10 @@ contains
        i=i+1
        w_p%c(i)=  " x-z-y permuted"
     endif
-    if(idpr.gt.-101) then
-       w_p%nc=i
-       call write_i
-    endif
+    !    if(idpr.gt.-101) then
+    !       w_p%nc=i
+    !       call write_i
+    !    endif
     do i=1,nd2
        do j=1,nd2
           rt(i,j)=rto(i,j)
@@ -2855,7 +2754,7 @@ contains
     elseif(iref.eq.0) then
        nres=0
     endif
-    if(nres.ne.0) then
+    if(nres.ne.0.and.global_verbose) then
        w_p=0
        w_p%nc=1
        w_p%fc='((1X,A120))'
@@ -2953,7 +2852,7 @@ contains
     if(.not.c_%stable_da) return
 
     call etall1(b1)
-    call etallnom(x,nd2  ,'X         ')
+    call etallnom(x,nd2) !  ,'X         ')
 
     call cpart(f1,b1)
     call etctr(x)
@@ -2969,7 +2868,7 @@ contains
     if(.not.c_%stable_da) return
 
     call etall1(b1)
-    call etallnom(x,nd2  ,'X         ')
+    call etallnom(x,nd2) !  ,'X         ')
 
     call etrtc(x)
     call trx(f1,b1,x)
@@ -2985,7 +2884,7 @@ contains
     integer,dimension(ndim2)::rel
     if(.not.c_%stable_da) return
 
-    call etallnom(rel,nd2  ,'REL       ')
+    call etallnom(rel,nd2) !  ,'REL       ')
 
     call etini(rel)
     call etini(x)
@@ -3003,7 +2902,7 @@ contains
     integer,dimension(ndim2)::rel
     if(.not.c_%stable_da) return
 
-    call etallnom(rel,nd2  ,'REL       ')
+    call etallnom(rel,nd2) !  ,'REL       ')
 
     call etini(rel)
     call etini(x)
@@ -3021,7 +2920,7 @@ contains
     integer,dimension(ndim2)::rel
     if(.not.c_%stable_da) return
 
-    call etallnom(rel,nd2  ,'REL       ')
+    call etallnom(rel,nd2) !  ,'REL       ')
 
     call etini(rel)
     call etini(x)
@@ -3098,7 +2997,7 @@ contains
           w_p%nc=1
           w_p%fc='((1X,A120))'
           w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
-          CALL WRITE_i
+          CALL WRITE_a
           write(6,*) sqrt(reval(i)**2+aieval(i)**2)
        endif
     enddo
