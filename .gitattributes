@@ -36,6 +36,8 @@
 /c6t.c -text
 /c6t.h -text
 /c_dabnew.f90 -text
+/c_dabnew_berz.f90 -text
+/c_tpsa_interface.f90 -text
 /d_lielib.f90 -text
 /deltra.fi -text
 /dynap.f90 -text
@@ -143,6 +145,8 @@ testing/mad_install -text
 /timex.f90 -text
 /touschek.f90 -text
 /touschek.fi -text
+/tpsa.cpp -text
+/tpsa.h -text
 /track.fi -text
 /trrun.f90 -text
 /tunes.fi -text
