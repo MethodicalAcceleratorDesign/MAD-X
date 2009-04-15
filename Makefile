@@ -16,6 +16,7 @@ SLC4=YES
 SLC5=NO
 FC8=NO
 FC10=NO
+NTPSA=YES
 
 ifeq ($(OSTYPE),darwin)
   f95=g95
@@ -160,18 +161,22 @@ ifeq ($(SLC4),YES)
   endif
 endif
 
+LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -lstdc++
+
 ifeq ($(SLC5),YES)
-  LIBX= -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh libX11.a -L/usr/lib -lpthread
-else
-  LIBX=-L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread
+  LIBX= libX11.a -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh -lstdc++ -L/usr/lib -lpthread
+endif
+
+ifeq ($(SLC4),YES)
+  LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/usr/lib/gcc/x86_64-redhat-linux5E/4.1.2/32 -lstdc++ -lgcc_eh
 endif
 
 ifeq ($(FC8),YES)
-  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux/4.1.2 -lgcc_eh /usr/local/lib/libgfortran.a
+  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux/4.1.2 -lgcc_eh /usr/local/lib/libgfortran.a -lstdc++
 endif
 
 ifeq ($(FC10),YES)
-  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh /usr/lib/gcc/x86_64-redhat-linux/4.3.2/libgfortran.a
+  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh -lgfortran -lstdc++
 endif
 
 ifeq ($(MEMLEAKS),YES)
@@ -247,9 +252,22 @@ resindex.o: resindex.f90 resindex.fi
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
 b_da_arrays_all.o: a_scratch_size.o b_da_arrays_all.f90
-c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
-d_lielib.o: c_dabnew.o d_lielib.f90
-h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90
+ifeq ($(NTPSA),YES)
+  c_dabnew_berz.o: b_da_arrays_all.o c_dabnew_berz.f90
+  c_tpsa_interface.o: c_dabnew_berz.o c_tpsa_interface.f90
+  d_lielib.o: c_tpsa_interface.o d_lielib.f90
+  h_definition.o: a_scratch_size.o c_dabnew_berz.o d_lielib.o h_definition.f90
+  tpsa.o: tpsa.cpp tpsa.h
+	$(CC) $(GCCP_FLAGS) -c -o tpsa.o tpsa.cpp
+  TPSA= tpsa.o
+  FILT_TP= c_dabnew.o
+else
+  c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
+  d_lielib.o: c_dabnew.o d_lielib.f90
+  h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90
+  TPSA=
+  FILT_TP= c_dabnew_berz.o  c_tpsa_interface.o
+endif
 i_tpsa.o: h_definition.o i_tpsa.f90
 j_tpsalie.o: i_tpsa.o j_tpsalie.f90
 k_tpsalie_analysis.o: j_tpsalie.o k_tpsalie_analysis.f90
@@ -311,13 +329,14 @@ madx_main.o: run_madx.o madx_main.f90
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $<
 
+
 # implicit rule to compile f90 code with f95
 %.o : %.F90
 	$(f95) $(f95_FLAGS) $<
 
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
-madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o
-madx_objects += $(filter-out gxx11ps.o, $(patsubst %.f90,%.o,$(wildcard *.f90)))
+madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o $(TPSA)
+madx_objects += $(filter-out gxx11ps.o $(FILT_TP), $(patsubst %.f90,%.o,$(wildcard *.f90)))
 madx_objects += fortran_flush.o
 
 madx: $(madx_objects)
