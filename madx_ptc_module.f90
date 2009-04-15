@@ -52,6 +52,8 @@ CONTAINS
 
     print77=.false.
     read77 =.false.
+    lingyun_yang=get_value('ptc_create_universe ','ntpsa ').ne.0
+    lielib_print(6)=get_value('ptc_create_universe ','symprint ')
 
     nullify(maps)
 

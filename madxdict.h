@@ -371,7 +371,9 @@ char command_def[] =
 " "
 "ptc_create_universe: ptc_create_universe none 0 0 "
 "sector_nmul_max = [i, 10], "
-"sector_nmul = [i, 5]; "
+"sector_nmul = [i, 5], "
+"symprint = [l, true], "
+"ntpsa = [l, false, true]; "
 " "
 "ptc_export_xml: ptc_export_xml none 0 0 " /* space after 0! */
 "file = [s,output.xml,output.xml] ; " /* defaults to output.xml */
