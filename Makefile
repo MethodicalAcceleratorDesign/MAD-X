@@ -19,7 +19,11 @@ FC10=NO
 NTPSA=YES
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
-  f95=g95
+
+# Presently g95 is no longer the default for Darwin since
+# gfortran is more available. The latter comes automatically
+# with gcc. Special LIBX is needed for g95 (see below)
+#  f95=g95
   f95=gfortran
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -162,6 +166,12 @@ ifeq ($(SLC4),YES)
 endif
 
 LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -lstdc++
+
+ifeq ($(findstring arwin, $(OSTYPE)),arwin)
+  ifeq ($(f95),g95)
+    LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/sw/lib/gcc4.3/lib -lstdc++ /sw/lib/gcc4.3/lib/gcc/i686-apple-darwin9/4.3.2 -lgcc_eh  
+  endif
+endif
 
 ifeq ($(SLC5),YES)
   LIBX= libX11.a -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh -lstdc++ -L/usr/lib -lpthread
