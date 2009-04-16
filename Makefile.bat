@@ -65,7 +65,7 @@ lf95 -c -o1 -tp %MADX%\resindex.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\a_scratch_size.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\b_da_arrays_all.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\c_dabnew_berz.f90 -winconsole -ml msvc
-lf95 -c -o1 -tp %FPP%\c_tpsa_interface.F90 -D_WIN32 -winconsole -ml msvc
+lf95 -c -o1 -lfe "-Cpp" -tp -D_WIN32 %FPP%\c_tpsa_interface.F90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\d_lielib.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\h_definition.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\i_tpsa.f90 -winconsole -ml msvc

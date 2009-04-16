@@ -147,6 +147,7 @@ testing/mad_install -text
 /touschek.fi -text
 /tpsa.cpp -text
 /tpsa.h -text
+/tpsa.lib -text svneol=unset#unset
 /track.fi -text
 /trrun.f90 -text
 /tunes.fi -text
