@@ -1025,7 +1025,7 @@
       INFO = 0
       MINMN = MIN( M, N )
       MAXMN = MAX( M, N )
-      MNTHR = ILAENV( 6, 'DGELSD', ' ', M, N, NRHS, -1 )
+      MNTHR = ILAENV( 6, 'DGELSD', M, N, NRHS, -1 )
       LQUERY = ( LWORK.EQ.-1 )
       IF( M.LT.0 ) THEN
         INFO = -1
@@ -1039,7 +1039,7 @@
         INFO = -7
       END IF
 !
-      SMLSIZ = ILAENV( 9, 'DGELSD', ' ', 0, 0, 0, 0 )
+      SMLSIZ = ILAENV( 9, 'DGELSD', 0, 0, 0, 0 )
 !
 !     Compute workspace.
 !     (Note: Comments in the code beginning "Workspace:" describe the
@@ -1061,21 +1061,21 @@
 !           Path 1a - overdetermined, with many more rows than columns.
 !
           MM = N
-          MAXWRK = MAX( MAXWRK, N+N*ILAENV( 1, 'DGEQRF', ' ', M, N,     &
+          MAXWRK = MAX( MAXWRK, N+N*ILAENV( 1, 'DGEQRF', M, N,     &
      &-1, -1 ) )
           MAXWRK = MAX( MAXWRK, N+NRHS*                                 &
-     &ILAENV( 1, 'DORMQR', 'LT', M, NRHS, N, -1 ) )
+     &ILAENV( 1, 'DORMQR', M, NRHS, N, -1 ) )
         END IF
         IF( M.GE.N ) THEN
 !
 !           Path 1 - overdetermined or exactly determined.
 !
           MAXWRK = MAX( MAXWRK, 3*N+( MM+N )*                           &
-     &ILAENV( 1, 'DGEBRD', ' ', MM, N, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', MM, N, -1, -1 ) )
           MAXWRK = MAX( MAXWRK, 3*N+NRHS*                               &
-     &ILAENV( 1, 'DORMBR', 'QLT', MM, NRHS, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', MM, NRHS, N, -1 ) )
           MAXWRK = MAX( MAXWRK, 3*N+( N-1 )*                            &
-     &ILAENV( 1, 'DORMBR', 'PLN', N, NRHS, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, NRHS, N, -1 ) )
           WLALSD = 9*N+2*N*SMLSIZ+8*N*NLVL+N*NRHS+(SMLSIZ+1)**2
           MAXWRK = MAX( MAXWRK, 3*N+WLALSD )
           MINWRK = MAX( 3*N+MM, 3*N+NRHS, 3*N+WLALSD )
@@ -1087,31 +1087,31 @@
 !              Path 2a - underdetermined, with many more columns
 !              than rows.
 !
-            MAXWRK = M + M*ILAENV( 1, 'DGELQF', ' ', M, N, -1, -1 )
+            MAXWRK = M + M*ILAENV( 1, 'DGELQF', M, N, -1, -1 )
             MAXWRK = MAX( MAXWRK, M*M+4*M+2*M*                          &
-     &ILAENV( 1, 'DGEBRD', ' ', M, M, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', M, M, -1, -1 ) )
             MAXWRK = MAX( MAXWRK, M*M+4*M+NRHS*                         &
-     &ILAENV( 1, 'DORMBR', 'QLT', M, NRHS, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, NRHS, M, -1 ) )
             MAXWRK = MAX( MAXWRK, M*M+4*M+( M-1 )*                      &
-     &ILAENV( 1, 'DORMBR', 'PLN', M, NRHS, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, NRHS, M, -1 ) )
             IF( NRHS.GT.1 ) THEN
               MAXWRK = MAX( MAXWRK, M*M+M+M*NRHS )
             ELSE
               MAXWRK = MAX( MAXWRK, M*M+2*M )
             END IF
             MAXWRK = MAX( MAXWRK, M+NRHS*                               &
-     &ILAENV( 1, 'DORMLQ', 'LT', N, NRHS, M, -1 ) )
+     &ILAENV( 1, 'DORMLQ', N, NRHS, M, -1 ) )
             MAXWRK = MAX( MAXWRK, M*M+4*M+WLALSD )
           ELSE
 !
 !              Path 2 - remaining underdetermined cases.
 !
-            MAXWRK = 3*M + ( N+M )*ILAENV( 1, 'DGEBRD', ' ', M, N,      &
+            MAXWRK = 3*M + ( N+M )*ILAENV( 1, 'DGEBRD', M, N,      &
      &-1, -1 )
             MAXWRK = MAX( MAXWRK, 3*M+NRHS*                             &
-     &ILAENV( 1, 'DORMBR', 'QLT', M, NRHS, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, NRHS, N, -1 ) )
             MAXWRK = MAX( MAXWRK, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PLN', N, NRHS, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, NRHS, M, -1 ) )
             MAXWRK = MAX( MAXWRK, 3*M+WLALSD )
           END IF
           MINWRK = MAX( 3*M+NRHS, 3*M+M, 3*M+WLALSD )
@@ -2883,7 +2883,7 @@
 !     End of DLAMC5
 !
       END
-      INTEGER FUNCTION ILAENV( ISPEC, NAME, OPTS, N1, N2, N3, N4 )
+      INTEGER FUNCTION ILAENV( ISPEC, NAME, N1, N2, N3, N4 )
       implicit none
 !
 !  -- LAPACK auxiliary routine (version 3.1) --
@@ -2891,7 +2891,7 @@
 !     November 2006
 !
 !     .. Scalar Arguments ..
-      CHARACTER*( * )    NAME, OPTS
+      CHARACTER*( * )    NAME
       INTEGER            ISPEC, N1, N2, N3, N4
 !     ..
 !
@@ -2949,12 +2949,6 @@
 !          The name of the calling subroutine, in either upper case or
 !          lower case.
 !
-!  OPTS    (input) CHARACTER*(*)
-!          The character options to the subroutine NAME, concatenated
-!          into a single character string.  For example, UPLO = 'U',
-!          TRANS = 'T', and DIAG = 'N' for a triangular routine would
-!          be specified as OPTS = 'UTN'.
-!
 !  N1      (input) INTEGER
 !  N2      (input) INTEGER
 !  N3      (input) INTEGER
@@ -2971,19 +2965,15 @@
 !
 !  The following conventions have been used when calling ILAENV from the
 !  LAPACK routines:
-!  1)  OPTS is a concatenation of all of the character options to
-!      subroutine NAME, in the same order that they appear in the
-!      argument list for NAME, even if they are not used in determining
-!      the value of the parameter specified by ISPEC.
-!  2)  The problem dimensions N1, N2, N3, N4 are specified in the order
+!  1)  The problem dimensions N1, N2, N3, N4 are specified in the order
 !      that they appear in the argument list for NAME.  N1 is used
 !      first, N2 second, and so on, and unused problem dimensions are
 !      passed a value of -1.
-!  3)  The parameter value returned by ILAENV is checked for validity in
+!  2)  The parameter value returned by ILAENV is checked for validity in
 !      the calling subroutine.  For example, ILAENV is used to retrieve
 !      the optimal blocksize for STRTRI as follows:
 !
-!      NB = ILAENV( 1, 'STRTRI', UPLO // DIAG, N, -1, -1, -1 )
+!      NB = ILAENV( 1, 'STRTRI', N, -1, -1, -1 )
 !      IF( NB.LE.1 ) NB = MAX( 1, N )
 !
 !  =====================================================================
@@ -3002,13 +2992,44 @@
 !     ..
 !     .. Executable Statements ..
 !
-      GO TO ( 10, 10, 10, 80, 90, 100, 110, 120,                        &
-     &130, 140, 150, 160, 160, 160, 160, 160 )ISPEC
-!
-!     Invalid value for ISPEC
-!
-      ILAENV = -1
-      RETURN
+
+      SELECT CASE(ISPEC)
+         CASE(1)
+              GO TO 10 
+         CASE(2)
+              GO TO 10
+         CASE(3)
+              GO TO 10
+         CASE(4)
+              GO TO 80
+         CASE(5)
+              GO TO 90
+         CASE(6)
+              GO TO 100
+         CASE(7)
+              GO TO 110
+         CASE(8)
+              GO TO 120
+         CASE(9)
+              GO TO 130
+         CASE(10)
+              GO TO 140
+         CASE(11)
+              GO TO 150
+         CASE(12)
+              GO TO 160
+         CASE(13)
+              GO TO 160
+         CASE(14)
+              GO TO 160
+         CASE(15)
+              GO TO 160
+         CASE(16)
+              GO TO 160
+         CASE DEFAULT
+              ILAENV = -1
+              RETURN
+      END SELECT
 !
    10 CONTINUE
 !
@@ -3071,7 +3092,16 @@
       C3 = SUBNAM( 4: 6 )
       C4 = C3( 2: 3 )
 !
-      GO TO ( 50, 60, 70 )ISPEC
+
+      SELECT CASE(ISPEC)
+         CASE(1)
+              GO TO 50 
+         CASE(2)
+              GO TO 60
+         CASE(3)
+              GO TO 70
+      END SELECT
+
 !
  50   CONTINUE
 !
@@ -3430,7 +3460,7 @@
 !
 !     12 <= ISPEC <= 16: xHSEQR or one of its subroutines.
 !
-      ILAENV = IPARMQ( ISPEC, NAME, OPTS, N1, N2, N3, N4 )
+      ILAENV = IPARMQ( ISPEC, N2, N3 )
       RETURN
 !
 !     End of ILAENV
@@ -3584,7 +3614,7 @@
 !
       RETURN
       END
-      INTEGER FUNCTION IPARMQ( ISPEC, NAME, OPTS, N, ILO, IHI, LWORK )
+      INTEGER FUNCTION IPARMQ( ISPEC, ILO, IHI )
       implicit none
 !
 !  -- LAPACK auxiliary routine (version 3.1) --
@@ -3592,8 +3622,7 @@
 !     November 2006
 !
 !     .. Scalar Arguments ..
-      INTEGER            IHI, ILO, ISPEC, LWORK, N
-      CHARACTER          NAME*( * ), OPTS*( * )
+      INTEGER            IHI, ILO, ISPEC
 !
 !  Purpose
 !  =======
@@ -3658,23 +3687,10 @@
 !                        IPARMQ(ISPEC=16)=2 despite the greater level of
 !                        arithmetic work implied by the latter choice.)
 !
-!       NAME    (input) character string
-!               Name of the calling subroutine
-!
-!       OPTS    (input) character string
-!               This is a concatenation of the string arguments to
-!               TTQRE.
-!
-!       N       (input) integer scalar
-!               N is the order of the Hessenberg matrix H.
-!
 !       ILO     (input) INTEGER
 !       IHI     (input) INTEGER
 !               It is assumed that H is already upper triangular
 !               in rows and columns 1:ILO-1 and IHI+1:N.
-!
-!       LWORK   (input) integer scalar
-!               The amount of workspace available.
 !
 !  Further Details
 !  ===============
@@ -4127,7 +4143,7 @@
 !
       IF( N.EQ.0 )                                                      &
      &RETURN
-      SMLSIZ = ILAENV( 9, 'DBDSDC', ' ', 0, 0, 0, 0 )
+      SMLSIZ = ILAENV( 9, 'DBDSDC', 0, 0, 0, 0 )
       IF( N.EQ.1 ) THEN
         IF( ICOMPQ.EQ.1 ) THEN
           Q( 1 ) = SIGN( ONE, D( 1 ) )
@@ -5565,7 +5581,7 @@
 !     Test the input parameters
 !
       INFO = 0
-      NB = MAX( 1, ILAENV( 1, 'DGEBRD', ' ', M, N, -1, -1 ) )
+      NB = MAX( 1, ILAENV( 1, 'DGEBRD', M, N, -1, -1 ) )
       LWKOPT = ( M+N )*NB
       WORK( 1 ) = DBLE( LWKOPT )
       LQUERY = ( LWORK.EQ.-1 )
@@ -5601,7 +5617,7 @@
 !
 !        Set the crossover point NX.
 !
-        NX = MAX( NB, ILAENV( 3, 'DGEBRD', ' ', M, N, -1, -1 ) )
+        NX = MAX( NB, ILAENV( 3, 'DGEBRD', M, N, -1, -1 ) )
 !
 !        Determine when to switch from blocked to unblocked code.
 !
@@ -5612,7 +5628,7 @@
 !              Not enough work space for the optimal NB, consider using
 !              a smaller block size.
 !
-            NBMIN = ILAENV( 2, 'DGEBRD', ' ', M, N, -1, -1 )
+            NBMIN = ILAENV( 2, 'DGEBRD', M, N, -1, -1 )
             IF( LWORK.GE.( M+N )*NBMIN ) THEN
               NB = LWORK / ( M+N )
             ELSE
@@ -5891,7 +5907,7 @@
 !     Test the input arguments
 !
       INFO = 0
-      NB = ILAENV( 1, 'DGELQF', ' ', M, N, -1, -1 )
+      NB = ILAENV( 1, 'DGELQF', M, N, -1, -1 )
       LWKOPT = M*NB
       WORK( 1 ) = LWKOPT
       LQUERY = ( LWORK.EQ.-1 )
@@ -5926,7 +5942,7 @@
 !
 !        Determine when to cross over from blocked to unblocked code.
 !
-        NX = MAX( 0, ILAENV( 3, 'DGELQF', ' ', M, N, -1, -1 ) )
+        NX = MAX( 0, ILAENV( 3, 'DGELQF', M, N, -1, -1 ) )
         IF( NX.LT.K ) THEN
 !
 !           Determine if workspace is large enough for blocked code.
@@ -5939,7 +5955,7 @@
 !              determine the minimum value of NB.
 !
             NB = LWORK / LDWORK
-            NBMIN = MAX( 2, ILAENV( 2, 'DGELQF', ' ', M, N, -1,         &
+            NBMIN = MAX( 2, ILAENV( 2, 'DGELQF', M, N, -1,         &
      &-1 ) )
           END IF
         END IF
@@ -6166,21 +6182,21 @@
      &TPSD = .FALSE.
 !
         IF( M.GE.N ) THEN
-          NB = ILAENV( 1, 'DGEQRF', ' ', M, N, -1, -1 )
+          NB = ILAENV( 1, 'DGEQRF', M, N, -1, -1 )
           IF( TPSD ) THEN
-            NB = MAX( NB, ILAENV( 1, 'DORMQR', 'LN', M, NRHS, N,        &
+            NB = MAX( NB, ILAENV( 1, 'DORMQR', M, NRHS, N,        &
      &-1 ) )
           ELSE
-            NB = MAX( NB, ILAENV( 1, 'DORMQR', 'LT', M, NRHS, N,        &
+            NB = MAX( NB, ILAENV( 1, 'DORMQR', M, NRHS, N,        &
      &-1 ) )
           END IF
         ELSE
-          NB = ILAENV( 1, 'DGELQF', ' ', M, N, -1, -1 )
+          NB = ILAENV( 1, 'DGELQF', M, N, -1, -1 )
           IF( TPSD ) THEN
-            NB = MAX( NB, ILAENV( 1, 'DORMLQ', 'LT', N, NRHS, M,        &
+            NB = MAX( NB, ILAENV( 1, 'DORMLQ', N, NRHS, M,        &
      &-1 ) )
           ELSE
-            NB = MAX( NB, ILAENV( 1, 'DORMLQ', 'LN', N, NRHS, M,        &
+            NB = MAX( NB, ILAENV( 1, 'DORMLQ', N, NRHS, M,        &
      &-1 ) )
           END IF
         END IF
@@ -7209,7 +7225,7 @@
 !     Test the input arguments
 !
       INFO = 0
-      NB = ILAENV( 1, 'DGEQRF', ' ', M, N, -1, -1 )
+      NB = ILAENV( 1, 'DGEQRF', M, N, -1, -1 )
       LWKOPT = N*NB
       WORK( 1 ) = LWKOPT
       LQUERY = ( LWORK.EQ.-1 )
@@ -7244,7 +7260,7 @@
 !
 !        Determine when to cross over from blocked to unblocked code.
 !
-        NX = MAX( 0, ILAENV( 3, 'DGEQRF', ' ', M, N, -1, -1 ) )
+        NX = MAX( 0, ILAENV( 3, 'DGEQRF', M, N, -1, -1 ) )
         IF( NX.LT.K ) THEN
 !
 !           Determine if workspace is large enough for blocked code.
@@ -7257,7 +7273,7 @@
 !              determine the minimum value of NB.
 !
             NB = LWORK / LDWORK
-            NBMIN = MAX( 2, ILAENV( 2, 'DGEQRF', ' ', M, N, -1,         &
+            NBMIN = MAX( 2, ILAENV( 2, 'DGEQRF', M, N, -1,         &
      &-1 ) )
           END IF
         END IF
@@ -7697,25 +7713,25 @@
 !
 !                 Path 1 (M much larger than N, JOBZ='N')
 !
-              WRKBL = N + N*ILAENV( 1, 'DGEQRF', ' ', M, N, -1,         &
+              WRKBL = N + N*ILAENV( 1, 'DGEQRF', M, N, -1,         &
      &-1 )
               WRKBL = MAX( WRKBL, 3*N+2*N*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', N, N, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', N, N, -1, -1 ) )
               MAXWRK = MAX( WRKBL, BDSPAC+N )
               MINWRK = BDSPAC + N
             ELSE IF( WNTQO ) THEN
 !
 !                 Path 2 (M much larger than N, JOBZ='O')
 !
-              WRKBL = N + N*ILAENV( 1, 'DGEQRF', ' ', M, N, -1, -1 )
-              WRKBL = MAX( WRKBL, N+N*ILAENV( 1, 'DORGQR', ' ', M,      &
+              WRKBL = N + N*ILAENV( 1, 'DGEQRF', M, N, -1, -1 )
+              WRKBL = MAX( WRKBL, N+N*ILAENV( 1, 'DORGQR', M,      &
      &N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+2*N*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', N, N, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', N, N, -1, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*N )
               MAXWRK = WRKBL + 2*N*N
               MINWRK = BDSPAC + 2*N*N + 3*N
@@ -7723,15 +7739,15 @@
 !
 !                 Path 3 (M much larger than N, JOBZ='S')
 !
-              WRKBL = N + N*ILAENV( 1, 'DGEQRF', ' ', M, N, -1, -1 )
-              WRKBL = MAX( WRKBL, N+N*ILAENV( 1, 'DORGQR', ' ', M,      &
+              WRKBL = N + N*ILAENV( 1, 'DGEQRF', M, N, -1, -1 )
+              WRKBL = MAX( WRKBL, N+N*ILAENV( 1, 'DORGQR', M,      &
      &N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+2*N*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', N, N, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', N, N, -1, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*N )
               MAXWRK = WRKBL + N*N
               MINWRK = BDSPAC + N*N + 3*N
@@ -7739,15 +7755,15 @@
 !
 !                 Path 4 (M much larger than N, JOBZ='A')
 !
-              WRKBL = N + N*ILAENV( 1, 'DGEQRF', ' ', M, N, -1, -1 )
-              WRKBL = MAX( WRKBL, N+M*ILAENV( 1, 'DORGQR', ' ', M,      &
+              WRKBL = N + N*ILAENV( 1, 'DGEQRF', M, N, -1, -1 )
+              WRKBL = MAX( WRKBL, N+M*ILAENV( 1, 'DORGQR', M,      &
      &M, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+2*N*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', N, N, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', N, N, -1, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*N )
               MAXWRK = WRKBL + N*N
               MINWRK = BDSPAC + N*N + 3*N
@@ -7756,31 +7772,31 @@
 !
 !              Path 5 (M at least N, but not much larger)
 !
-            WRKBL = 3*N + ( M+N )*ILAENV( 1, 'DGEBRD', ' ', M, N, -1,   &
+            WRKBL = 3*N + ( M+N )*ILAENV( 1, 'DGEBRD', M, N, -1,   &
      &-1 )
             IF( WNTQN ) THEN
               MAXWRK = MAX( WRKBL, BDSPAC+3*N )
               MINWRK = 3*N + MAX( M, BDSPAC )
             ELSE IF( WNTQO ) THEN
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*N )
               MAXWRK = WRKBL + M*N
               MINWRK = 3*N + MAX( M, N*N+BDSPAC )
             ELSE IF( WNTQS ) THEN
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, N, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               MAXWRK = MAX( WRKBL, BDSPAC+3*N )
               MINWRK = 3*N + MAX( M, BDSPAC )
             ELSE IF( WNTQA ) THEN
               WRKBL = MAX( WRKBL, 3*N+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*N+N*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, N, -1 ) )
               MAXWRK = MAX( MAXWRK, BDSPAC+3*N )
               MINWRK = 3*N + MAX( M, BDSPAC )
             END IF
@@ -7800,25 +7816,25 @@
 !
 !                 Path 1t (N much larger than M, JOBZ='N')
 !
-              WRKBL = M + M*ILAENV( 1, 'DGELQF', ' ', M, N, -1,         &
+              WRKBL = M + M*ILAENV( 1, 'DGELQF', M, N, -1,         &
      &-1 )
               WRKBL = MAX( WRKBL, 3*M+2*M*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', M, M, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', M, M, -1, -1 ) )
               MAXWRK = MAX( WRKBL, BDSPAC+M )
               MINWRK = BDSPAC + M
             ELSE IF( WNTQO ) THEN
 !
 !                 Path 2t (N much larger than M, JOBZ='O')
 !
-              WRKBL = M + M*ILAENV( 1, 'DGELQF', ' ', M, N, -1, -1 )
-              WRKBL = MAX( WRKBL, M+M*ILAENV( 1, 'DORGLQ', ' ', M,      &
+              WRKBL = M + M*ILAENV( 1, 'DGELQF', M, N, -1, -1 )
+              WRKBL = MAX( WRKBL, M+M*ILAENV( 1, 'DORGLQ', M,      &
      &N, M, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+2*M*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', M, M, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', M, M, -1, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, M, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', M, M, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, M, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*M )
               MAXWRK = WRKBL + 2*M*M
               MINWRK = BDSPAC + 2*M*M + 3*M
@@ -7826,15 +7842,15 @@
 !
 !                 Path 3t (N much larger than M, JOBZ='S')
 !
-              WRKBL = M + M*ILAENV( 1, 'DGELQF', ' ', M, N, -1, -1 )
-              WRKBL = MAX( WRKBL, M+M*ILAENV( 1, 'DORGLQ', ' ', M,      &
+              WRKBL = M + M*ILAENV( 1, 'DGELQF', M, N, -1, -1 )
+              WRKBL = MAX( WRKBL, M+M*ILAENV( 1, 'DORGLQ', M,      &
      &N, M, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+2*M*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', M, M, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', M, M, -1, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, M, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', M, M, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, M, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*M )
               MAXWRK = WRKBL + M*M
               MINWRK = BDSPAC + M*M + 3*M
@@ -7842,15 +7858,15 @@
 !
 !                 Path 4t (N much larger than M, JOBZ='A')
 !
-              WRKBL = M + M*ILAENV( 1, 'DGELQF', ' ', M, N, -1, -1 )
-              WRKBL = MAX( WRKBL, M+N*ILAENV( 1, 'DORGLQ', ' ', N,      &
+              WRKBL = M + M*ILAENV( 1, 'DGELQF', M, N, -1, -1 )
+              WRKBL = MAX( WRKBL, M+N*ILAENV( 1, 'DORGLQ', N,      &
      &N, M, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+2*M*                              &
-     &ILAENV( 1, 'DGEBRD', ' ', M, M, -1, -1 ) )
+     &ILAENV( 1, 'DGEBRD', M, M, -1, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, M, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', M, M, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, M, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*M )
               MAXWRK = WRKBL + M*M
               MINWRK = BDSPAC + M*M + 3*M
@@ -7859,31 +7875,31 @@
 !
 !              Path 5t (N greater than M, but not much larger)
 !
-            WRKBL = 3*M + ( M+N )*ILAENV( 1, 'DGEBRD', ' ', M, N, -1,   &
+            WRKBL = 3*M + ( M+N )*ILAENV( 1, 'DGEBRD', M, N, -1,   &
      &-1 )
             IF( WNTQN ) THEN
               MAXWRK = MAX( WRKBL, BDSPAC+3*M )
               MINWRK = 3*M + MAX( N, BDSPAC )
             ELSE IF( WNTQO ) THEN
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', M, N, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, N, M, -1 ) )
               WRKBL = MAX( WRKBL, BDSPAC+3*M )
               MAXWRK = WRKBL + M*N
               MINWRK = 3*M + MAX( N, M*M+BDSPAC )
             ELSE IF( WNTQS ) THEN
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', M, N, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, N, M, -1 ) )
               MAXWRK = MAX( WRKBL, BDSPAC+3*M )
               MINWRK = 3*M + MAX( N, BDSPAC )
             ELSE IF( WNTQA ) THEN
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'QLN', M, M, N, -1 ) )
+     &ILAENV( 1, 'DORMBR', M, M, N, -1 ) )
               WRKBL = MAX( WRKBL, 3*M+M*                                &
-     &ILAENV( 1, 'DORMBR', 'PRT', N, N, M, -1 ) )
+     &ILAENV( 1, 'DORMBR', N, N, M, -1 ) )
               MAXWRK = MAX( WRKBL, BDSPAC+3*M )
               MINWRK = 3*M + MAX( N, BDSPAC )
             END IF
@@ -15949,8 +15965,8 @@
 !
 !     Check whether the machine is IEEE conformable.
 !
-      IEEE = ILAENV( 10, 'DLASQ2', 'N', 1, 2, 3, 4 ).EQ.1 .AND.         &
-     &ILAENV( 11, 'DLASQ2', 'N', 1, 2, 3, 4 ).EQ.1
+      IEEE = ILAENV( 10, 'DLASQ2', 1, 2, 3, 4 ).EQ.1 .AND.         &
+     &ILAENV( 11, 'DLASQ2', 1, 2, 3, 4 ).EQ.1
 !
 !     Rearrange data for locality: Z=(q1,qq1,e1,ee1,q2,qq2,e2,ee2,...).
 !
@@ -18325,9 +18341,9 @@
 !
       IF( INFO.EQ.0 ) THEN
         IF( WANTQ ) THEN
-          NB = ILAENV( 1, 'DORGQR', ' ', M, N, K, -1 )
+          NB = ILAENV( 1, 'DORGQR', M, N, K, -1 )
         ELSE
-          NB = ILAENV( 1, 'DORGLQ', ' ', M, N, K, -1 )
+          NB = ILAENV( 1, 'DORGLQ', M, N, K, -1 )
         END IF
         LWKOPT = MAX( 1, MN )*NB
         WORK( 1 ) = LWKOPT
@@ -18656,7 +18672,7 @@
 !     Test the input arguments
 !
       INFO = 0
-      NB = ILAENV( 1, 'DORGLQ', ' ', M, N, K, -1 )
+      NB = ILAENV( 1, 'DORGLQ', M, N, K, -1 )
       LWKOPT = MAX( 1, M )*NB
       WORK( 1 ) = LWKOPT
       LQUERY = ( LWORK.EQ.-1 )
@@ -18692,7 +18708,7 @@
 !
 !        Determine when to cross over from blocked to unblocked code.
 !
-        NX = MAX( 0, ILAENV( 3, 'DORGLQ', ' ', M, N, K, -1 ) )
+        NX = MAX( 0, ILAENV( 3, 'DORGLQ', M, N, K, -1 ) )
         IF( NX.LT.K ) THEN
 !
 !           Determine if workspace is large enough for blocked code.
@@ -18705,7 +18721,7 @@
 !              determine the minimum value of NB.
 !
             NB = LWORK / LDWORK
-            NBMIN = MAX( 2, ILAENV( 2, 'DORGLQ', ' ', M, N, K, -1 ) )
+            NBMIN = MAX( 2, ILAENV( 2, 'DORGLQ', M, N, K, -1 ) )
           END IF
         END IF
       END IF
@@ -18873,7 +18889,7 @@
 !     Test the input arguments
 !
       INFO = 0
-      NB = ILAENV( 1, 'DORGQR', ' ', M, N, K, -1 )
+      NB = ILAENV( 1, 'DORGQR', M, N, K, -1 )
       LWKOPT = MAX( 1, N )*NB
       WORK( 1 ) = LWKOPT
       LQUERY = ( LWORK.EQ.-1 )
@@ -18909,7 +18925,7 @@
 !
 !        Determine when to cross over from blocked to unblocked code.
 !
-        NX = MAX( 0, ILAENV( 3, 'DORGQR', ' ', M, N, K, -1 ) )
+        NX = MAX( 0, ILAENV( 3, 'DORGQR', M, N, K, -1 ) )
         IF( NX.LT.K ) THEN
 !
 !           Determine if workspace is large enough for blocked code.
@@ -18922,7 +18938,7 @@
 !              determine the minimum value of NB.
 !
             NB = LWORK / LDWORK
-            NBMIN = MAX( 2, ILAENV( 2, 'DORGQR', ' ', M, N, K, -1 ) )
+            NBMIN = MAX( 2, ILAENV( 2, 'DORGQR', M, N, K, -1 ) )
           END IF
         END IF
       END IF
@@ -19375,18 +19391,18 @@
       IF( INFO.EQ.0 ) THEN
         IF( APPLYQ ) THEN
           IF( LEFT ) THEN
-            NB = ILAENV( 1, 'DORMQR', SIDE // TRANS, M-1, N, M-1,       &
+            NB = ILAENV( 1, 'DORMQR', M-1, N, M-1,       &
      &-1 )
           ELSE
-            NB = ILAENV( 1, 'DORMQR', SIDE // TRANS, M, N-1, N-1,       &
+            NB = ILAENV( 1, 'DORMQR', M, N-1, N-1,       &
      &-1 )
           END IF
         ELSE
           IF( LEFT ) THEN
-            NB = ILAENV( 1, 'DORMLQ', SIDE // TRANS, M-1, N, M-1,       &
+            NB = ILAENV( 1, 'DORMLQ', M-1, N, M-1,       &
      &-1 )
           ELSE
-            NB = ILAENV( 1, 'DORMLQ', SIDE // TRANS, M, N-1, N-1,       &
+            NB = ILAENV( 1, 'DORMLQ', M, N-1, N-1,       &
      &-1 )
           END IF
         END IF
@@ -19838,7 +19854,7 @@
 !        Determine the block size.  NB may be at most NBMAX, where NBMAX
 !        is used to define the local array T.
 !
-        NB = MIN( NBMAX, ILAENV( 1, 'DORMLQ', SIDE // TRANS, M, N, K,   &
+        NB = MIN( NBMAX, ILAENV( 1, 'DORMLQ', M, N, K,   &
      &-1 ) )
         LWKOPT = MAX( 1, NW )*NB
         WORK( 1 ) = LWKOPT
@@ -19864,7 +19880,7 @@
         IWS = NW*NB
         IF( LWORK.LT.IWS ) THEN
           NB = LWORK / LDWORK
-          NBMIN = MAX( 2, ILAENV( 2, 'DORMLQ', SIDE // TRANS, M, N, K,  &
+          NBMIN = MAX( 2, ILAENV( 2, 'DORMLQ', M, N, K,  &
      &-1 ) )
         END IF
       ELSE
@@ -20105,7 +20121,7 @@
 !        Determine the block size.  NB may be at most NBMAX, where NBMAX
 !        is used to define the local array T.
 !
-        NB = MIN( NBMAX, ILAENV( 1, 'DORMQR', SIDE // TRANS, M, N, K,   &
+        NB = MIN( NBMAX, ILAENV( 1, 'DORMQR', M, N, K,   &
      &-1 ) )
         LWKOPT = MAX( 1, NW )*NB
         WORK( 1 ) = LWKOPT
@@ -20131,7 +20147,7 @@
         IWS = NW*NB
         IF( LWORK.LT.IWS ) THEN
           NB = LWORK / LDWORK
-          NBMIN = MAX( 2, ILAENV( 2, 'DORMQR', SIDE // TRANS, M, N, K,  &
+          NBMIN = MAX( 2, ILAENV( 2, 'DORMQR', M, N, K,  &
      &-1 ) )
         END IF
       ELSE
