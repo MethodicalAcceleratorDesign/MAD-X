@@ -37,7 +37,7 @@
 /c6t.h -text
 /c_dabnew.f90 -text
 /c_dabnew_berz.f90 -text
-/c_tpsa_interface.f90 -text
+/c_tpsa_interface.F90 -text
 /d_lielib.f90 -text
 /deltra.fi -text
 /dynap.f90 -text

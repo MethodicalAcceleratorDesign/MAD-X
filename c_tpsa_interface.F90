@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.f90,v 1.2 2009-04-16 13:15:44 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.1 2009-04-16 14:23:50 frs Exp $
 ! */
 
 
@@ -20,6 +20,7 @@ module dabnew
   ! real(dp),private,parameter::tiny=c_1d_20
   character(120),private :: line
 
+#ifdef WIN32
   !DEC$ ATTRIBUTES DLLIMPORT :: ad_tra, ad_shift, ad_print, ad_save_block, ad_read_block
   !DEC$ ATTRIBUTES DLLIMPORT :: ad_fill_ran, ad_nvar, ad_length, ad_derivative
   !DEC$ ATTRIBUTES DLLIMPORT :: ad_subst, ad_cos, ad_sin, ad_log, ad_exp, ad_sqrt, ad_abs
@@ -36,6 +37,8 @@ module dabnew
   DLL_IMPORT ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
   DLL_IMPORT ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem ,ad_resetvars
   !, ad_resetvars
+#endif
+
   private trx_cpp
 
 
