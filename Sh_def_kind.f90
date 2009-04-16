@@ -10759,7 +10759,6 @@ contains
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(STREXP),INTENT(IN):: EL
     real(dp) ANGH
-    INTEGER I
     ! J=1 front
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 

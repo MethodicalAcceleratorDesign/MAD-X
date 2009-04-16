@@ -2448,9 +2448,12 @@ contains
   subroutine checksymp(s1,norm)
     implicit none
     TYPE (damap) s1
-    real(dp)  norm,mat(6,6),xj(6,6)
+    real(dp)  norm1,mat(6,6),xj(6,6)
+    real(dp), optional :: norm
     integer i,j
+    logical(lp) nn
     ! checks symplectic conditions on linear map
+    nn=.not.present(norm)
     mat=0.d0
     mat=s1
     xj=0.d0
@@ -2461,15 +2464,17 @@ contains
 
     xj= MATMUL( transpose(mat),MATMUL(xj,mat))
 
-    norm=0.d0
+    norm1=0.d0
     do i=1,nd2
-       write(6,'(6(1x,E15.8))') xj(i,1:nd2)
+       if(lielib_print(9)==1.or.nn)     write(6,'(6(1x,E15.8))') xj(i,1:nd2)
        do j=1,nd2
 
-          norm=norm+abs(xj(i,j))
+          norm1=norm1+abs(xj(i,j))
        enddo
     enddo
-    norm=norm-nd2
+    norm1=norm1-nd2
+    if(lielib_print(9)==1.or.nn) write(6,'(a29,(1x,E15.8))')"deviation from symplecticity ", norm1
+    if(present(norm)) norm=norm1
 
   end subroutine checksymp
 

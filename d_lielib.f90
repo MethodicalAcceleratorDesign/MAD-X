@@ -40,7 +40,7 @@ module lielib_berz
   character(120), private :: line
   logical :: frankheader=.true.
 
-  integer :: lielib_print(8)=0
+  integer :: lielib_print(9)=0
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
   !  lielib_print(3)=1   Shows details in flofacg
@@ -49,6 +49,7 @@ module lielib_berz
   !  lielib_print(6)=1  symplectic condition
   !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
   !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
+  !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
 
 contains
 

@@ -35,6 +35,7 @@
 #define ad_mult       ad_mult_
 #define ad_sub        ad_sub_
 #define ad_reset      ad_reset_
+#define ad_resetvars  ad_resetvars_
 #define ad_pok        ad_pok_
 #define ad_pek        ad_pek_
 #define ad_truncate   ad_truncate_
@@ -74,6 +75,7 @@
 #define ad_mult       AD_MULT
 #define ad_sub        AD_SUB
 #define ad_reset      AD_RESET
+#define ad_resetvars  AD_RESETVARS_
 #define ad_pok        AD_POK
 #define ad_pek        AD_PEK
 #define ad_truncate   AD_TRUNCATE
@@ -91,7 +93,7 @@
 
 //! \brief Automatic Differentiation
 //! \file tpsa.h
-//! \version $Id: tpsa.h,v 1.1 2009-04-15 15:08:36 frs Exp $
+//! \version $Id: tpsa.h,v 1.2 2009-04-16 13:15:44 frs Exp $
 //! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #include <vector>

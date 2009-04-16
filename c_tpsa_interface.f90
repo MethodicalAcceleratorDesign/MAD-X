@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.f90,v 1.1 2009-04-15 15:08:36 frs Exp $
+! * Version: $Id: c_tpsa_interface.f90,v 1.2 2009-04-16 13:15:44 frs Exp $
 ! */
 
 
@@ -20,6 +20,21 @@ module dabnew
   ! real(dp),private,parameter::tiny=c_1d_20
   character(120),private :: line
 
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_tra, ad_shift, ad_print, ad_save_block, ad_read_block
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_fill_ran, ad_nvar, ad_length, ad_derivative
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_subst, ad_cos, ad_sin, ad_log, ad_exp, ad_sqrt, ad_abs
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_div_c, ad_c_div, ad_mult_const, ad_add_const
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_div, ad_mult, ad_sub, ad_reset, ad_pok, ad_pek
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
+  !DEC$ ATTRIBUTES DLLIMPORT :: ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem
+
+  DLL_IMPORT ad_tra, ad_shift, ad_print, ad_save_block, ad_read_block
+  DLL_IMPORT ad_fill_ran, ad_nvar, ad_length, ad_derivative
+  DLL_IMPORT ad_subst, ad_cos, ad_sin, ad_log, ad_exp, ad_sqrt, ad_abs
+  DLL_IMPORT ad_div_c, ad_c_div, ad_mult_const, ad_add_const
+  DLL_IMPORT ad_div, ad_mult, ad_sub, ad_reset, ad_pok, ad_pek
+  DLL_IMPORT ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
+  DLL_IMPORT ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem ,ad_resetvars
   !, ad_resetvars
   private trx_cpp
 
@@ -32,7 +47,7 @@ contains
     !    integer, intent(in) :: nd,nv,nd2,k
     integer nd,nv,k
     if(lingyun_yang) then !%%%%
-       !     if(last_tpsa==1) call ad_resetvars(nv)
+       if(last_tpsa==1) call ad_resetvars(nv)
        call danum0(nd,nv)
        call ad_init(nv, nd)
        call ad_reserve(lda)
