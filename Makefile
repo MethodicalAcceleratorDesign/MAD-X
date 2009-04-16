@@ -169,7 +169,7 @@ LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -lstdc++
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   ifeq ($(f95),g95)
-    LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/sw/lib/gcc4.3/lib -lstdc++ /sw/lib/gcc4.3/lib/gcc/i686-apple-darwin9/4.3.2 -lgcc_eh  
+    LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/sw/lib/gcc4.3/lib -lstdc++ -L/sw/lib/gcc4.3/lib/gcc/i686-apple-darwin9/4.3.3 -lgcc_eh  
   endif
 endif
 
