@@ -18,7 +18,7 @@ FC8=NO
 FC10=NO
 NTPSA=YES
 
-ifeq ($(OSTYPE),darwin)
+ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   f95=g95
   f95=gfortran
 
@@ -204,7 +204,7 @@ ifeq ($(PLUGIN_SUPPORT),YES)
   LDOPT=--export $(M32)
 endif
 
-ifeq ($(OSTYPE),darwin)
+ifeq ($(findstring arwin, $(OSTYPE)),arwin)
 # allows running of madx under Macinstosh System 10
 # include headers for gxx11c
   GCCP_FLAGS += -I /usr/X11R6/include/
