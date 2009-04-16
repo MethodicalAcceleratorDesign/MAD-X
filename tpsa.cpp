@@ -9,7 +9,7 @@
 
 //! \brief Automatic Differentiation Test
 //! \file tpsa.cpp
-//! \version $Id: tpsa.cpp,v 1.1 2009-04-15 15:08:36 frs Exp $
+//! \version $Id: tpsa.cpp,v 1.2 2009-04-16 22:13:36 frs Exp $
 //! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #include <iostream>
@@ -262,7 +262,7 @@ void ad_reserve(unsigned int* n)
     if (N <= 0) return;
 
     advecpool = new double*[N];
-    for (int i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
         advecpool[i] = new double[FULL_VEC_LEN];
         advec.push_back(NULL);
         if (adveclen.size() <= i) adveclen.push_back(0);
@@ -474,7 +474,7 @@ void ad_alloc(unsigned int* i)
     }
 
 
-    size_t n = 0;
+    //size_t n = 0;
     //ad_count(&n);
     //std::cerr << "Found space for AD vector: " << *i << " " << n << std::endl;
     unsigned int iv = *i;
@@ -749,7 +749,7 @@ void ad_var(unsigned int* ivec, const double* x, unsigned int* ibvec)
     unsigned int iv = *ivec;
     unsigned int ibv = *ibvec;
     double x0 = *x;
-    unsigned int nbvmax;
+    //unsigned int nbvmax;
     // TNVND i = iv - 1;
     double *v = advec[iv];
  #ifdef DEBUG_ALL
@@ -1384,7 +1384,7 @@ void ad_sin(const TVEC* iv, const TVEC* iret)
     ad_free(&ip);
     ad_free(&ipnod);
     ad_free(&ipnev);
-};
+}
 
 
 #ifdef MSVC_DLL
@@ -1460,7 +1460,7 @@ void ad_cos(const TVEC* iv, const TVEC* iret)
     ad_free(&ipnod);
     ad_free(&ipnev);
 
-};
+}
 
 #ifdef MSVC_DLL
 _declspec(dllexport) void _stdcall ad_derivative(const TVEC* iv, unsigned int* expo, const TVEC* iret)
@@ -1469,7 +1469,7 @@ void ad_derivative(const TVEC* iv, unsigned int* expo, const TVEC* iret)
 #endif
 {
     TNVND* p = base;
-    size_t k = 0;
+    //size_t k = 0;
     unsigned int iexpo = *expo;
 
     unsigned int *cef = new unsigned int[gnv];
@@ -1557,7 +1557,7 @@ void ad_tra(const TVEC* iv, unsigned int* expo, const TVEC* iret)
 #endif
 {
     TNVND* p = base;
-    size_t k = 0;
+    //size_t k = 0;
     unsigned int iexpo = *expo;
 
     unsigned int *cef = new unsigned int[gnv];
@@ -1749,7 +1749,7 @@ void ad_subst(const TVEC* iv, const TVEC* ibv, const TNVND* nbv, const TVEC* ire
     ad_alloc(&it2);
     TNVND* pb = base;
     double* pv1 = advec[it1];
-    double* pv2 = advec[it2];
+    //double* pv2 = advec[it2];
     // loop every entry(monimial)
     for(size_t i = 0; i < adveclen[*iv]; ++i) {
         // only problem of this "== 0" would be(if any) is the speed.
@@ -1986,7 +1986,7 @@ void ad_save_block(const TVEC* iv,
 #endif
 {
     //unsigned int ii = *iv;
-    TNVND* p = base;
+    //TNVND* p = base;
     //os << "iv= " << ii << std::endl;
     adveclen[*iv] = *N;
 
@@ -2188,3 +2188,4 @@ extern "C" unsigned long __stdcall DllEntryPoint(void *hDll, unsigned long Reaso
     return (1);
 }
 #endif
+
