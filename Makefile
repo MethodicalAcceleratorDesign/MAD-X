@@ -260,14 +260,12 @@ ifeq ($(NTPSA),YES)
   tpsa.o: tpsa.cpp tpsa.h
 	$(CC) $(GCCP_FLAGS) -c -o tpsa.o tpsa.cpp
   TPSA= tpsa.o
-  FILT_TP_IN= c_tpsa_interface.o
   FILT_TP_OUT= c_dabnew.o
 else
   c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
   d_lielib.o: c_dabnew.o d_lielib.f90
   h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90
   TPSA=
-  FILT_TP_IN=
   FILT_TP_OUT= c_dabnew_berz.o  c_tpsa_interface.o
 endif
 i_tpsa.o: h_definition.o i_tpsa.f90
@@ -339,7 +337,7 @@ madx_main.o: run_madx.o madx_main.f90
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
 madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o $(TPSA)
 madx_objects += $(filter-out gxx11ps.o $(FILT_TP_OUT), $(patsubst %.f90,%.o,$(wildcard *.f90)))
-madx_objects += fortran_flush.o $(FILT_TP_IN)
+madx_objects += $(patsubst %.F90,%.o,$(wildcard *.F90))
 
 madx: $(madx_objects)
 	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
