@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.2 2009-04-16 17:56:43 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.3 2009-04-17 08:29:34 frs Exp $
 ! */
 
 
@@ -633,7 +633,7 @@ contains
     real(dp) xf
     real(dp),dimension(:)::xi
     integer,dimension(1)::rh,hs
-    integer i,h
+    integer i,h,rh1
     integer,dimension(lnv)::y
     integer, allocatable :: jv(:)
 
@@ -641,7 +641,9 @@ contains
     hs(1)=h
     allocate(jv(c_%nv))
     jv=0
-    call ad_alloc(rh)
+    call ad_alloc(rh1)
+    rh(1)=rh1
+
 
     do i=1,c_%nv
        call ad_alloc(y(i))
@@ -649,14 +651,15 @@ contains
     enddo
 
     call dacct(hs,1,y,c_%nv,rh,1)
+    rh1=rh(1)
 
-    call ad_pek(rh, jv, c_%nv, xf)
+    call ad_pek(rh1, jv, c_%nv, xf)
 
 
     do i=1,c_%nv
        call ad_free(y(i))
     enddo
-    call ad_free(rh)
+    call ad_free(rh1)
     deallocate(jv)
 
     return

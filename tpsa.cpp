@@ -9,7 +9,7 @@
 
 //! \brief Automatic Differentiation Test
 //! \file tpsa.cpp
-//! \version $Id: tpsa.cpp,v 1.2 2009-04-16 22:13:36 frs Exp $
+//! \version $Id: tpsa.cpp,v 1.3 2009-04-17 08:29:34 frs Exp $
 //! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #include <iostream>
@@ -21,20 +21,20 @@
 
 #include "tpsa.h"
 
-unsigned int comb_num(unsigned int n, unsigned int r);
-unsigned int gcd(unsigned int a, unsigned int b);
-void init_order_index(unsigned int nv, unsigned int nd);
-void init_prod_index(unsigned int nv, unsigned int nd);
-bool within_limit(TNVND nv, TNVND nd);
-TNVND* choose(TNVND n, TNVND r, TNVND* p, TNVND nv, TNVND nd);
-void init_base(TNVND nv, TNVND nd);
+static unsigned int comb_num(unsigned int n, unsigned int r);
+static unsigned int gcd(unsigned int a, unsigned int b);
+static void init_order_index(unsigned int nv, unsigned int nd);
+static void init_prod_index(unsigned int nv, unsigned int nd);
+static bool within_limit(TNVND nv, TNVND nd);
+static TNVND* choose(TNVND n, TNVND r, TNVND* p, TNVND nv, TNVND nd);
+static void init_base(TNVND nv, TNVND nd);
 
 //! Search for the element index of the product of two elements.
-unsigned int prod_index(TNVND* pb, TNVND* pm, TNVND order);
+// static unsigned int prod_index(TNVND* pb, TNVND* pm, TNVND order);
 
 //! Maximum length of AD vector. A system with nv variables and nd orders will
 //! have length C(nv+nd, nd).
-const unsigned int MAX_N_BASE =
+static const unsigned int MAX_N_BASE =
     std::numeric_limits<unsigned int>::max()/2;
 
 //! global nv, nd
@@ -252,12 +252,12 @@ void init_prod_index(unsigned int nv, unsigned int nd)
  * \see ad_init
  */
 #ifdef MSVC_DLL
-_declspec(dllexport) void _stdcall ad_reserve(TVEC* n)
+_declspec(dllexport) void _stdcall ad_reserve(const TVEC* n)
 #else
-void ad_reserve(unsigned int* n)
+void ad_reserve(const unsigned int* n)
 #endif
 {
-    unsigned int N = *n;
+    const unsigned int N = *n;
 
     if (N <= 0) return;
 
@@ -497,9 +497,9 @@ void ad_alloc(unsigned int* i)
  * \param i TPS vector
  */
 #ifdef MSVC_DLL
-_declspec(dllexport) void _stdcall ad_free(TVEC* i)
+_declspec(dllexport) void _stdcall ad_free(const TVEC* i)
 #else
-void ad_free(unsigned int* i)
+void ad_free(const unsigned int* i)
 #endif
 {
     advec[*i] = NULL;
@@ -604,12 +604,12 @@ void ad_fill_ran(const TVEC* iv, const double* ratio, const double* xm)
 /**
  */
 #ifdef MSVC_DLL
-_declspec(dllexport) void _stdcall ad_pok(TVEC* ivec, int* c, size_t* n, double* x)
+_declspec(dllexport) void _stdcall ad_pok(const TVEC* ivec, int* c, size_t* n, double* x)
 #else
-void ad_pok(unsigned int* ivec, int* c, size_t* n, double* x)
+void ad_pok(const unsigned int* ivec, int* c, size_t* n, double* x)
 #endif
 {
-    unsigned int ii = *ivec;
+    const unsigned int ii = *ivec;
     size_t N = (*n > gnv) ? gnv : *n;
     double r = *x;
  #ifdef DEBUG_ALL
@@ -659,12 +659,12 @@ void ad_pok(unsigned int* ivec, int* c, size_t* n, double* x)
 // ith element of ivec, save pattern in c, value in x
 // c has length gnv
 #ifdef MSVC_DLL
-_declspec(dllexport) void _stdcall ad_elem(TVEC* ivec, unsigned int* idx, unsigned int* c, double* x)
+_declspec(dllexport) void _stdcall ad_elem(const TVEC* ivec, unsigned int* idx, unsigned int* c, double* x)
 #else
-void ad_elem(TVEC* ivec, unsigned int* idx, unsigned int* c, double* x)
+void ad_elem(const TVEC* ivec, unsigned int* idx, unsigned int* c, double* x)
 #endif
 {
-    TVEC ii = *ivec;
+    const TVEC ii = *ivec;
 
     for (size_t i = 0; i < gnv; ++i) c[i] = 0;
     if (*idx > adveclen[ii] || *idx < 1) {
@@ -685,12 +685,12 @@ void ad_elem(TVEC* ivec, unsigned int* idx, unsigned int* c, double* x)
 
 
 #ifdef MSVC_DLL
-_declspec(dllexport) void _stdcall ad_pek(TVEC* ivec, int* c, size_t* n, double* x)
+_declspec(dllexport) void _stdcall ad_pek(const TVEC* ivec, int* c, size_t* n, double* x)
 #else
-void ad_pek(unsigned int* ivec, int* c, size_t* n, double* x)
+void ad_pek(const unsigned int* ivec, int* c, size_t* n, double* x)
 #endif
 {
-    unsigned int ii = *ivec;
+    const unsigned int ii = *ivec;
     size_t N = (*n > gnv) ? gnv : *n;
     //double r = *x;
 
@@ -741,12 +741,12 @@ void ad_pek(unsigned int* ivec, int* c, size_t* n, double* x)
 // set the vector ii be the base vector iv
 // ii, iv are 0-started index.
 #ifdef MSVC_DLL
-_declspec(dllexport) void _stdcall ad_var(TVEC* ivec, const double* x, unsigned int* ibvec)
+_declspec(dllexport) void _stdcall ad_var(const TVEC* ivec, const double* x, unsigned int* ibvec)
 #else
-void ad_var(unsigned int* ivec, const double* x, unsigned int* ibvec)
+void ad_var(const unsigned int* ivec, const double* x, unsigned int* ibvec)
 #endif
 {
-    unsigned int iv = *ivec;
+    const unsigned int iv = *ivec;
     unsigned int ibv = *ibvec;
     double x0 = *x;
     //unsigned int nbvmax;
@@ -1753,7 +1753,8 @@ void ad_subst(const TVEC* iv, const TVEC* ibv, const TNVND* nbv, const TVEC* ire
     // loop every entry(monimial)
     for(size_t i = 0; i < adveclen[*iv]; ++i) {
         // only problem of this "== 0" would be(if any) is the speed.
-        if (advec[*iv][i] == 0) {
+        //if (advec[*iv][i] == 0) {
+        if (std::abs(advec[*iv][i]) < std::numeric_limits<double>::min()) {
             pb += gnv;
             continue;
         }
@@ -2188,4 +2189,3 @@ extern "C" unsigned long __stdcall DllEntryPoint(void *hDll, unsigned long Reaso
     return (1);
 }
 #endif
-

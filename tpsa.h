@@ -6,6 +6,10 @@
  * Please get permission from Lingyun Yang before you redistribute this file.
  *
  */
+//! \brief Automatic Differentiation
+//! \file tpsa.h
+//! \version $Id: tpsa.h,v 1.3 2009-04-17 08:29:34 frs Exp $
+//! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #ifndef WIN32
 
@@ -91,10 +95,6 @@
 #define ad_init       AD_INIT
 #endif
 
-//! \brief Automatic Differentiation
-//! \file tpsa.h
-//! \version $Id: tpsa.h,v 1.2 2009-04-16 13:15:44 frs Exp $
-//! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #include <vector>
 #include <limits>
@@ -114,11 +114,11 @@ extern "C" {
 #endif
 
  #ifdef MSVC_DLL
-    _declspec(dllexport) void _stdcall ad_reserve(TVEC* n);
+    _declspec(dllexport) void _stdcall ad_reserve(const TVEC* n);
     _declspec(dllexport) void _stdcall ad_init(const TNVND* nv, const TNVND* nd);
     _declspec(dllexport) void _stdcall ad_resetvars(const TNVND* nv);
     _declspec(dllexport) void _stdcall ad_alloc(TVEC* i);
-    _declspec(dllexport) void _stdcall ad_free(TVEC* i);
+    _declspec(dllexport) void _stdcall ad_free(const TVEC* i);
     _declspec(dllexport) void _stdcall ad_poolsize(size_t* n);
 
     _declspec(dllexport) void _stdcall ad_count(TVEC* n);
@@ -127,7 +127,7 @@ extern "C" {
     _declspec(dllexport) void _stdcall ad_copy(const TVEC* i, const TVEC* j);
     _declspec(dllexport) void _stdcall ad_elem(TVEC* ivec, unsigned int* idx, unsigned int* c, double* x);
     _declspec(dllexport) void _stdcall ad_pek(TVEC* ivec, int* c, size_t* n, double* x);
-    _declspec(dllexport) void _stdcall ad_pok(TVEC* ivec, int* c, size_t* n, double* x);
+    _declspec(dllexport) void _stdcall ad_pok(const TVEC* ivec, int* c, size_t* n, double* x);
     _declspec(dllexport) void _stdcall ad_var(TVEC* ii, const double* x, unsigned int* iv);
     _declspec(dllexport) void _stdcall ad_abs(const TVEC* iv, double* r);
     _declspec(dllexport) void _stdcall ad_truncate(const TVEC* iv, const TNVND* d);
@@ -172,21 +172,21 @@ extern "C" {
     _declspec(dllexport) void _stdcall ad_print(const TVEC* iv);
     _declspec(dllexport) void _stdcall ad_print_array(const TVEC* iv, const TVEC* nv);
  #else
-    void ad_reserve(TVEC* n);
+    void ad_reserve(const TVEC* n);
     void ad_init(const TNVND* nv, const TNVND* nd);
     void ad_resetvars(const TNVND* nv);
     void ad_alloc(TVEC* i);
-    void ad_free(TVEC* i);
+    void ad_free(const TVEC* i);
     void ad_poolsize(size_t* n);
 
     void ad_count(TVEC* n);
     void ad_nvar(TVEC* n);
     void ad_length(const TVEC* iv, unsigned int* n);
     void ad_copy(const TVEC* i, const TVEC* j);
-    void ad_elem(TVEC* ivec, unsigned int* idx, unsigned int* c, double* x);
-    void ad_pek(TVEC* ivec, int* c, size_t* n, double* x);
-    void ad_pok(TVEC* ivec, int* c, size_t* n, double* x);
-    void ad_var(TVEC* ii, const double* x, unsigned int* iv);
+    void ad_elem(const TVEC* ivec, unsigned int* idx, unsigned int* c, double* x);
+    void ad_pek(const TVEC* ivec, int* c, size_t* n, double* x);
+    void ad_pok(const TVEC* ivec, int* c, size_t* n, double* x);
+    void ad_var(const TVEC* ii, const double* x, unsigned int* iv);
     void ad_abs(const TVEC* iv, double* r);
     void ad_truncate(const TVEC* iv, const TNVND* d);
 
