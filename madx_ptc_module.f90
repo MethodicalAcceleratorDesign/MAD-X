@@ -161,7 +161,7 @@ CONTAINS
     character(name_len) magnet_name
     logical(lp)         exact0
     integer             exact1
-    integer             sector_nmul_max0,sector_nmul0,sector_nmul1
+    integer             sector_nmul_max0,sector_nmul0
     integer             model
     integer             method0,method1
     integer             nst0,nst1,ord_max,kk
@@ -2095,7 +2095,6 @@ CONTAINS
     type(layout),target :: lhc1
     integer i,k,pos,nfac(maxmul+1),flag,string_from_table,double_from_table
     real(dp) d(2*maxmul+2),b(maxmul+1),a(maxmul+1)
-    character*255 line
     character(name_len) name,name2
     type(fibre),pointer :: p
     character*4 :: mag_index1(10)=(/'k0l ','k1l ','k2l ','k3l ','k4l ','k5l ','k6l ','k7l ','k8l ','k9l '/)
