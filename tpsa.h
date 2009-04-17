@@ -8,7 +8,7 @@
  */
 //! \brief Automatic Differentiation
 //! \file tpsa.h
-//! \version $Id: tpsa.h,v 1.3 2009-04-17 08:29:34 frs Exp $
+//! \version $Id: tpsa.h,v 1.4 2009-04-17 17:32:23 frs Exp $
 //! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #ifndef WIN32
@@ -125,10 +125,10 @@ extern "C" {
     _declspec(dllexport) void _stdcall ad_nvar(TVEC* n);
     _declspec(dllexport) void _stdcall ad_length(const TVEC* iv, unsigned int* n);
     _declspec(dllexport) void _stdcall ad_copy(const TVEC* i, const TVEC* j);
-    _declspec(dllexport) void _stdcall ad_elem(TVEC* ivec, unsigned int* idx, unsigned int* c, double* x);
-    _declspec(dllexport) void _stdcall ad_pek(TVEC* ivec, int* c, size_t* n, double* x);
+    _declspec(dllexport) void _stdcall ad_elem(const TVEC* ivec, unsigned int* idx, unsigned int* c, double* x);
+    _declspec(dllexport) void _stdcall ad_pek(const TVEC* ivec, int* c, size_t* n, double* x);
     _declspec(dllexport) void _stdcall ad_pok(const TVEC* ivec, int* c, size_t* n, double* x);
-    _declspec(dllexport) void _stdcall ad_var(TVEC* ii, const double* x, unsigned int* iv);
+    _declspec(dllexport) void _stdcall ad_var(const TVEC* ii, const double* x, unsigned int* iv);
     _declspec(dllexport) void _stdcall ad_abs(const TVEC* iv, double* r);
     _declspec(dllexport) void _stdcall ad_truncate(const TVEC* iv, const TNVND* d);
 
