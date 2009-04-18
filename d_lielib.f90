@@ -4,7 +4,7 @@
 ! Its distribution and commercial usage may therefore be governed by the laws of the
 ! United States of America
 
-module lielib_berz
+module lielib_yang_berz
   use dabnew
   use precision_constants
   implicit none
@@ -27,7 +27,7 @@ module lielib_berz
   private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3
   integer,public,parameter::ndim=3,nreso=100
   integer,public::no,nv,nd,nd2,ndpt
-  integer, private :: ndc,ndc2,ndt,iref,itu,iflow,jtune,nres,ifilt !,idpr
+  integer, private :: ndc,ndc2,ndt,iref,itu,iflow,jtune,nres !,idpr
   integer, private,dimension(ndim)::nplane,idsta,ista
   real(dp), private,dimension(0:20)::xintex
   real(dp), private,dimension(ndim)::dsta,sta,angle,rad,ps,rads
@@ -40,16 +40,6 @@ module lielib_berz
   character(120), private :: line
   logical :: frankheader=.true.
 
-  integer :: lielib_print(9)=0
-  !  lielib_print(1)=1   lieinit prints info
-  !  lielib_print(2)=1   expflo warning if no convergence
-  !  lielib_print(3)=1   Shows details in flofacg
-  !  lielib_print(4)=1   tunes and damping
-  !  lielib_print(5)=1  order in orbital normal form
-  !  lielib_print(6)=1  symplectic condition
-  !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
-  !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
-  !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
 
 contains
 
@@ -480,7 +470,7 @@ contains
   end subroutine etinv
   subroutine etpin(x,y,jj)
     implicit none
-    !  Y=PARTIAL INVERSION OF X SEE BERZ'S PACKAGE
+
     integer i,nt
     integer,dimension(ntt)::ie1,ie2,iv1,iv2
     integer,dimension(:)::x,y,jj
@@ -553,7 +543,7 @@ contains
   end subroutine getinv
   subroutine dapek0(v,x,jj)
     implicit none
-    !- MORE EXTENSIONS OF BASIC BERZ'S PACKAGE
+
     integer i,jj
     integer,dimension(ntt)::jd
     integer,dimension(:)::v
@@ -3751,4 +3741,4 @@ contains
     return
   end subroutine sympl3
 
-end module lielib_berz
+end module lielib_yang_berz

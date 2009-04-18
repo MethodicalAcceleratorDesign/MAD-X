@@ -4619,9 +4619,9 @@ contains
     !
     return
   end subroutine dacfut
-  !
+  
   subroutine GET_C_J_b(ina,I,C,J)
-    !$$$$  subroutine GET_C_J(ina,I,C,J)
+!!$$$$  subroutine GET_C_J(ina,I,C,J)
     implicit none
     !
     INTEGER I,ina
@@ -4629,10 +4629,10 @@ contains
     real(dp) C
     !
     C=CC(I)
-    call dancd(i_1(I),i_2(I),J)
+    call dancd(i_1(I),i_2(I),J)!
 
   END subroutine GET_C_J_b
-  !$$$$  END subroutine GET_C_J
+!!$$$$  END subroutine GET_C_J
 
   subroutine dapri_b(ina,iunit)
     !$$$$  subroutine dapri(ina,iunit)

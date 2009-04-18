@@ -1,3 +1,4 @@
+
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and CERN
 
@@ -6,9 +7,6 @@ module ptc_multiparticle
   use beam_beam_ptc
   implicit none
   public
-  private index
-  INTEGER, PRIVATE :: TOTALPATH_FLAG
-  integer :: index =0
   CHARACTER*27 CASE_NAME(-2:3)
   PRIVATE fuzzy_eq,fuzzy_neq
   PRIVATE TRACK_FIBRE_FRONTR,TRACK_FIBRE_FRONTP

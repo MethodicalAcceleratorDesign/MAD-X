@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.3 2009-04-17 08:29:34 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.4 2009-04-18 23:23:04 frs Exp $
 ! */
 
 
@@ -36,7 +36,6 @@ module dabnew
   DLL_IMPORT ad_div, ad_mult, ad_sub, ad_reset, ad_pok, ad_pek
   DLL_IMPORT ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
   DLL_IMPORT ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem ,ad_resetvars
-  !, ad_resetvars
 #endif
 
   private trx_cpp
@@ -50,7 +49,7 @@ contains
     !    integer, intent(in) :: nd,nv,nd2,k
     integer nd,nv,k
     if(lingyun_yang) then !%%%%
-       if(last_tpsa==1) call ad_resetvars(nv)
+     if(last_tpsa==1.and.lielib_print(10)==0) call ad_resetvars(nv)
        call danum0(nd,nv)
        call ad_init(nv, nd)
        call ad_reserve(lda)

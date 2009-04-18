@@ -6,7 +6,7 @@ module definition
   use precision_constants   ! added to replace use define_newda
   use scratch_size
   use DABNEW
-  use lielib_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
+  use lielib_yang_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
   !  use newda
   !  USE LIELIB_ETIENNE
   implicit none

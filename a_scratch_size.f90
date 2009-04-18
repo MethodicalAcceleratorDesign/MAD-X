@@ -187,6 +187,23 @@ module precision_constants
   character*255 :: file_block_name="noprint"
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
+
+  integer   lielib_print(10)
+  DATA lielib_print /0,0,0,0,0,0,0,0,0,0/
+
+  !  lielib_print(1)=1   lieinit prints info
+  !  lielib_print(2)=1   expflo warning if no convergence
+  !  lielib_print(3)=1   Shows details in flofacg
+  !  lielib_print(4)=1   tunes and damping
+  !  lielib_print(5)=1  order in orbital normal form
+  !  lielib_print(6)=1  symplectic condition
+  !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
+  !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
+  !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
+  !  lielib_print(10)=1  print lingyun's checks
+
+
+
   type info_window
      character(3) adv
      integer nc,nr,ni
@@ -271,10 +288,6 @@ module precision_constants
      integer, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
      real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
      logical(lp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
-
-
-
-
 
      logical(lp), pointer:: electron     !  electron if true otherwise proton
      real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true

@@ -18,7 +18,7 @@ module dabnew
   PUBLIC DAMUL,DAADD,DACOP,DAINV,DAPIN,DAPEK,DAPOK,DACFU,DASUB,DACON,DADAL1
   PUBLIC DACLR,DACMU,DALIN,DAREA,DAPRI,DAABS,DAEPS,DATRA,MATINV,DAFUN
   PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR
-  PUBLIC DACFUI,DAPRI77,DAREA77,GET_C_J,PPUSH1,DALLSTA,dacycle
+  PUBLIC DACFUI,DAPRI77,DAREA77,PPUSH1,DALLSTA,dacycle  !,GET_C_J
   public count_da
   integer,private,parameter:: lsw=1
 
@@ -4541,17 +4541,18 @@ contains
     return
   end subroutine dacfut
   !
-  subroutine GET_C_J(ina,I,C,J)
-    implicit none
-    !
-    INTEGER I,ina
-    integer, dimension(lnv)::j
-    real(dp) C
-    !
-    C=CC(I)
-    call dancd(i_1(I),i_2(I),J)
+  !  subroutine GET_C_J(ina,I,C,J)
+  !    implicit none
+  !    !
+  !    INTEGER I,ina
+  !    integer, dimension(lnv)::j
+  !    real(dp) C
+  !
 
-  END subroutine GET_C_J
+  !    C=CC(I)
+  !    call dancd(i_1(I),i_2(I),J)
+
+  !  END subroutine GET_C_J
 
   subroutine dapri(ina,iunit)
     implicit none
