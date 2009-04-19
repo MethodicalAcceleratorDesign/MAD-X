@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.4 2009-04-18 23:23:04 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.5 2009-04-19 01:00:04 frs Exp $
 ! */
 
 
@@ -945,27 +945,27 @@ contains
   end subroutine dacfu
 
   ! done
-  subroutine GET_C_J(ina,I,C,J)
-    implicit none
-    INTEGER I,nv,ns,k,ina
-    integer, dimension(lnv)::j
-    integer, allocatable :: j1d(:)
-    real(dp), allocatable :: v(:)
-    real(dp) C
-    if(lingyun_yang) then !%%%%
-       call ad_length(ina, ns)
-       call ad_nvar(nv)
-       allocate(j1d(nv*ns))
-       call ad_read_block(ina, v, j1d, ns)
-       C = v(i)
-       do k=1,nv
-          j(k) = j1d((i-1)*nv+k)
-       enddo
-       deallocate(j1d)
-    else !%%%%
-       call GET_C_J_b(ina,I,C,J)
-    endif !%%%%
-  end  subroutine GET_C_J
+!  subroutine GET_C_J(ina,I,C,J)
+!    implicit none
+!    INTEGER I,nv,ns,k,ina
+!    integer, dimension(lnv)::j
+!    integer, allocatable :: j1d(:)
+!    real(dp), allocatable :: v(:)
+!    real(dp) C
+!    if(lingyun_yang) then !%%%%
+!       call ad_length(ina, ns)
+!       call ad_nvar(nv)
+!       allocate(j1d(nv*ns))
+!       call ad_read_block(ina, v, j1d, ns)
+!       C = v(i)
+!       do k=1,nv
+!          j(k) = j1d((i-1)*nv+k)
+!       enddo
+!       deallocate(j1d)
+!    else !%%%%
+!       call GET_C_J_b(ina,I,C,J)
+!    endif !%%%%
+!  end  subroutine GET_C_J
 
   subroutine dapri(ina,iunit)
     implicit none
