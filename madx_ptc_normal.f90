@@ -24,7 +24,7 @@ contains
     integer i,ii,j1,k,l,starti
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
-         string_from_table, double_from_table, result_from_normal
+         string_from_table, double_from_table
     real(dp) x(6),deltap0,deltap,dt
     integer :: indexa(4)
     integer :: row_haml(101)
