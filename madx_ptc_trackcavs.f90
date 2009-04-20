@@ -37,7 +37,7 @@ contains
     integer              :: t = 1
     logical(lp)          :: gcs
     logical(lp)          :: rplot
-    real (dp)            :: gposx, gposy, gposz
+!    real (dp)            :: gposx, gposy, gposz
     integer              :: e, ni
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
@@ -291,16 +291,17 @@ contains
   subroutine putinstatustable (npart,turn,elno,elna,spos,stat,x,xini,e,mf)
     implicit none
     include 'name_len.fi'
-    integer  :: npart,turn,nobs,stat,mf,elno
-    real(kind(1d0)) :: tt
-    character*36 table_puttab
+ !   integer  :: npart,turn,nobs,stat,mf,elno
+    integer  :: npart,turn,stat,mf,elno
+!    real(kind(1d0)) :: tt
+!    character*36 table_puttab
     character*36 table
     character(name_len) elna
     !hbu
     real (dp)            :: x(1:6)
     real (dp)            :: xini(1:6)
     real(dp) :: spos,e
-    integer :: get_option
+!    integer :: get_option
     !hbu
     data table        / 'tracksumm        ' /
       
