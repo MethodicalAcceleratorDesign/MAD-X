@@ -3,7 +3,7 @@ use madx_ptc_module ! to access the layout 'MY_RING'
 implicit none
 
 private
-public :: ptc_export_xml ! external interface 
+public	:: ptc_export_xml ! external interface 
 
 
 contains
@@ -12,24 +12,25 @@ contains
     implicit none
     integer filenameIA(*)
     character(48) filename   
-    integer I,MF,DI,nt
+    !integer I,MF,DI,nt
+    integer i,mf
     type(LAYOUT), TARGET :: L
     type(FIBRE), pointer :: P
-    character*255 line
-    REAL(DP) D(3),ANG(3),PREC,DS
-    LOGICAL(LP) ENERGY_PATCH
-      integer xml_level
-      
-      xml_level = 0
+    !character*255 line
+    !REAL(DP) D(3),ANG(3),PREC,DS
+    !LOGICAL(LP) ENERGY_PATCH
+	integer xml_level
+	
+	xml_level = 0
     
-      filename = charconv(filenameIA)
-      
-      write(6,*) 'Fortran: export XML document "', trim(filename),'"representing PTC machine' 
+	filename = charconv(filenameIA)
+	
+	write(6,*) 'Fortran: export XML document "', trim(filename),'"representing PTC machine'	
 
 
 
-      L = MY_RING ! my ring is global variable from madx_ptc_module 
-       
+	L = MY_RING ! my ring is global variable from madx_ptc_module	
+		
 !    P=>L%START
 !    i=1
 !    nt=0
@@ -40,9 +41,9 @@ contains
 !       nt=nt+1
 !    ENDDO
 
-nt=0
+!nt=0
 
-    PREC=1.D-10
+!    PREC=1.D-10
      call kanalnummer(mf)
      open(unit=mf,file=filename)
 
@@ -68,223 +69,223 @@ nt=0
 
   subroutine print_FIBRE_SIXTRACK(fibre_ptr,file_handle,xml_level)
     implicit none
-    integer file_handle,I
+    integer file_handle
     integer xml_level
     type(FIBRE), pointer :: fibre_ptr
     character propagation*32
     select case(fibre_ptr%dir)
     case(1)
-      propagation = 'forward'
+    	propagation = 'forward'
     case(-1)
-      propagation = 'backward'
+    	propagation = 'backward'
     case default
-      propagation = 'undefined'
+    	propagation = 'undefined'
     end select
     
     write(file_handle,*) '<fibre propagation-direction="',trim(propagation),'">'
     call print_XML_patches(file_handle,fibre_ptr,xml_level+1)
     call print_XML_misalignments(file_handle,fibre_ptr,xml_level+1)
-    call print_XML_element(fibre_ptr,fibre_ptr%mag,file_handle,xml_level+1)
+    call print_XML_element(fibre_ptr%mag,file_handle,xml_level+1)
      write(file_handle,*) '</fibre>'
   END subroutine print_FIBRE_SIXTRACK
   
   subroutine print_XML_patches(mf,f,xml_level)
-      implicit none
-      type(FIBRE), pointer :: f 
-      integer mf,i
-      integer xml_level
-      character padding*10
-      real(dp) xi,yi,zi,xo,yo,zo
-      real(dp) rxi,ryi,rzi,rxo,ryo,rzo
-      padding = ''
-      do i=1,10
-       padding = padding//' '
-      end do
-      ! input patch
-      xi = f%patch%a_d(1)
-      yi = f%patch%a_d(2)
-      zi = f%patch%a_d(3)
-      rxi = f%patch%a_ang(1)
-      ryi = f%patch%a_ang(2)
-      rzi = f%patch%a_ang(3)  
-      ! output patch
-      xo = f%patch%b_d(1)
-      yo = f%patch%b_d(2)
-      zo = f%patch%b_d(3)
-      rxo = f%patch%b_ang(1)
-      ryo = f%patch%b_ang(2)
-      rzo = f%patch%b_ang(3)  
-      write(mf,*) padding(1:xml_level), '<patches>'
-      write(mf,*) padding(1:xml_level+1), '<input>'
-      write(mf,*) padding(1:xml_level+2), '<translations x="',xi,'"',' y="',yi,'"',' z="',zi,'"/>'
-      write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxi,'"',' ry="',ryi,'"',' rz="',rzi,'"/>'
-      write(mf,*) padding(1:xml_level+1), '</input>'
-      write(mf,*) padding(1:xml_level+1), '<output>'
-      write(mf,*) padding(1:xml_level+2), '<translations x="',xo,'"',' y="',yo,'"',' z="',zo,'"/>'
-      write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxo,'"',' ry="',ryo,'"',' rz="',rzo,'"/>'
-      write(mf,*) padding(1:xml_level+1), '</output>' 
-      write(mf,*) padding(1:xml_level), '</patches>'
+  	implicit none
+	type(FIBRE), pointer :: f	
+	integer mf,i
+	integer xml_level
+	character padding*10
+	real(dp) xi,yi,zi,xo,yo,zo
+	real(dp) rxi,ryi,rzi,rxo,ryo,rzo
+	padding = ''
+	do i=1,10
+		padding = padding//' '
+	end do
+	! input patch
+	xi = f%patch%a_d(1)
+	yi = f%patch%a_d(2)
+	zi = f%patch%a_d(3)
+	rxi = f%patch%a_ang(1)
+	ryi = f%patch%a_ang(2)
+	rzi = f%patch%a_ang(3)		
+	! output patch
+	xo = f%patch%b_d(1)
+	yo = f%patch%b_d(2)
+	zo = f%patch%b_d(3)
+	rxo = f%patch%b_ang(1)
+	ryo = f%patch%b_ang(2)
+	rzo = f%patch%b_ang(3)		
+	write(mf,*) padding(1:xml_level), '<patches>'
+	write(mf,*) padding(1:xml_level+1), '<input>'
+	write(mf,*) padding(1:xml_level+2), '<translations x="',xi,'"',' y="',yi,'"',' z="',zi,'"/>'
+	write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxi,'"',' ry="',ryi,'"',' rz="',rzi,'"/>'
+	write(mf,*) padding(1:xml_level+1), '</input>'
+	write(mf,*) padding(1:xml_level+1), '<output>'
+	write(mf,*) padding(1:xml_level+2), '<translations x="',xo,'"',' y="',yo,'"',' z="',zo,'"/>'
+	write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxo,'"',' ry="',ryo,'"',' rz="',rzo,'"/>'
+	write(mf,*) padding(1:xml_level+1), '</output>'	
+	write(mf,*) padding(1:xml_level), '</patches>'
   end subroutine print_XML_patches
   
   subroutine print_XML_misalignments(mf,f,xml_level)
-      implicit none
-      integer mf
-      integer xml_level,i
-      type(FIBRE), pointer ::f
-      character padding*10
-      real(dp) xi,yi,zi,xo,yo,zo
-      real(dp) rxi,ryi,rzi,rxo,ryo,rzo
-      
-      padding = ''
-      do i=1,10
-       padding = padding//' '
-      end do 
-      ! input misalignment
-      xi = f%chart%d_in(1)
-      yi = f%chart%d_in(2)
-      zi = f%chart%d_in(3)
-      rxi = f%chart%ang_in(1)
-      ryi = f%chart%ang_in(2)
-      rzi = f%chart%ang_in(3)
-      ! output misalignment
-      xo = f%chart%d_out(1)
-      yo = f%chart%d_out(2)
-      zo = f%chart%d_out(3)
-      rxo = f%chart%ang_out(1)
-      ryo = f%chart%ang_out(2)
-      rzo = f%chart%ang_out(3)  
-      write(mf,*) padding(1:xml_level), '<misalignments>'
-      write(mf,*) padding(1:xml_level+1), '<input>'
-      write(mf,*) padding(1:xml_level+2), '<translations x="',xi,'"',' y="',yi,'"',' z="',zi,'"/>'
-      write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxi,'"',' ry="',ryi,'"',' rz="',rzi,'"/>'
-      write(mf,*) padding(1:xml_level+1), '</input>'
-      write(mf,*) padding(1:xml_level+1), '<output>'
-      write(mf,*) padding(1:xml_level+2), '<translations x="',xo,'"',' y="',yo,'"',' z="',zo,'"/>'
-      write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxo,'"',' ry="',ryo,'"',' rz="',rzo,'"/>'
-      write(mf,*) padding(1:xml_level+1), '</output>'  
-      write(mf,*) padding(1:xml_level), '</misalignments>'
+  	implicit none
+	integer mf
+	integer xml_level,i
+	type(FIBRE), pointer ::f
+	character padding*10
+	real(dp) xi,yi,zi,xo,yo,zo
+	real(dp) rxi,ryi,rzi,rxo,ryo,rzo
+	
+	padding = ''
+	do i=1,10
+		padding = padding//' '
+	end do 
+	! input misalignment
+	xi = f%chart%d_in(1)
+	yi = f%chart%d_in(2)
+	zi = f%chart%d_in(3)
+	rxi = f%chart%ang_in(1)
+	ryi = f%chart%ang_in(2)
+	rzi = f%chart%ang_in(3)
+	! output misalignment
+	xo = f%chart%d_out(1)
+	yo = f%chart%d_out(2)
+	zo = f%chart%d_out(3)
+	rxo = f%chart%ang_out(1)
+	ryo = f%chart%ang_out(2)
+	rzo = f%chart%ang_out(3)		
+	write(mf,*) padding(1:xml_level), '<misalignments>'
+	write(mf,*) padding(1:xml_level+1), '<input>'
+	write(mf,*) padding(1:xml_level+2), '<translations x="',xi,'"',' y="',yi,'"',' z="',zi,'"/>'
+	write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxi,'"',' ry="',ryi,'"',' rz="',rzi,'"/>'
+	write(mf,*) padding(1:xml_level+1), '</input>'
+	write(mf,*) padding(1:xml_level+1), '<output>'
+	write(mf,*) padding(1:xml_level+2), '<translations x="',xo,'"',' y="',yo,'"',' z="',zo,'"/>'
+	write(mf,*) padding(1:xml_level+2), '<rotations rx="',rxo,'"',' ry="',ryo,'"',' rz="',rzo,'"/>'
+	write(mf,*) padding(1:xml_level+1), '</output>'		
+	write(mf,*) padding(1:xml_level), '</misalignments>'
   end subroutine print_XML_misalignments
   
   
-  subroutine print_XML_element(P,m,mf,xml_level)
-      implicit none
-      integer mf
-      integer xml_level,i
-      type(FIBRE), pointer :: P
-      type(element), pointer :: m
-      real(dp) length ! for a drift or a magnet
-      real(dp) voltage, phase, frequency ! for an RF cavity
-      real(dp) ks ! try this for a solenoid
-      real(dp) a1,b1 ! for a crab cavity
-      character el_name*48 ! the name of the element
-      character padding*10
-      el_name = ''
-      padding = ''
-      do i=1,10
-       padding = padding//' '
-      end do
-      do i=1,len(trim(M%VORNAME))
-       el_name(i:i)=lowercase(M%VORNAME(i:i))
-      end do
-      ! hardcode design-tilt as 0.0 for the time-being
-      write (MF,*) padding(1:xml_level), '<element name="',trim(el_name),'" design-tilt="0.0"><!-- instance of ',TRIM(M%NAME),'-->'
-      write(MF,*) padding(1:xml_level+1), '<kind>'
-      ! trim to remove trailing blanks
-      select case (M%KIND)
-       case (30) ! this is a marker
-        write(MF,*) padding(1:xml_level+2), '<marker/>'
-       case (31) ! this is a drift
-        length = M%L
-        write(MF,*) padding(1:xml_level+2), '<drift length="',length,'"/>'
-       case (32) ! this is a drift-kick-drift??
-        !write(MF,*) padding(1:xml_level+2), '<UNIDENTIFIED/><!-- drift-kick-drift -->'
-        ! should ensure this is a quadrupole (do we end-up here for sextupole as well?
-        length = M%L
-        write(MF,*) padding(1:xml_level+2), '<magnet length="',length,'">'
-        ! Does it account for any kind of magnet - at least this is what we
-        ! agreed on in the Schema
-        if (ASSOCIATED(M%an)) then
-          do i=1,m%p%NMUL
-             ! write(mf,*) m%bn(i),m%an(i), " BN AN ",I
-             write(mf,*) padding(1:xml_level+3), '<an index="',i,'" value="',m%an(i),'"/>'
-             write(mf,*) padding(1:xml_level+3), '<bn index="',i,'" value="',m%bn(i),'"/>'
-          enddo
-        endif
-        write(MF,*) padding(1:xml_level+2), '</magnet>'
-       case (33) ! this is a multiple block
-        ! As far as I know let's identify it as a MAD multipole composed of a series
-        ! of zero length thin lenses
-        ! for the time being omit, MAD's LRAD fictitious length (synchrotron radiation)
-        ! and TILT
-        write(MF,*) padding(1:xml_level+2), '<thin-lens-series>'
-        if (ASSOCIATED(M%an)) then
-        do i=1,m%p%NMUL
-         write(MF,*) padding(1:xml_level+3), '<an index="',i,'" value="',m%bn(i),'"/><!-- skew component-->'
-         write(MF,*) padding(1:xml_level+3), '<bn index="',i,'" value="',m%an(i),'"/><!-- normal component-->'    
-        enddo 
-        endif
-        write(MF,*) padding(1:xml_level+2), '</thin-lens-series>'   
-       case (34) ! this is a cavity
-        length = M%L
-        voltage = M%VOLT ! for an ordinary RF cavity (i.e. not a crab)
-        frequency = M%FREQ
-        phase = M%PHAS + M%C4%PHASE0 + M%C4%PH(1)
-        write(MF,*) padding(1:xml_level), '<RF-cavity length="',length, &
-        '"  voltage="',voltage,'" frequency="',frequency,'" phase="',phase,'">'
-         ! following should be conditionnal to the cavity being
-         ! a crab cavity
-         a1 = M%AN(1)
-         b1 = M%BN(1)
-         write(MF,*) padding(1:xml_level+3), '<a1 value="',a1,'"/>'
-         write(MF,*) padding(1:xml_level+3), '<b1 value="',b1,'"/>'
-        write(MF,*) padding(1:xml_level+2), '</RF-cavity>'
-       case (35) ! found-out that this is a solenoid
-        length = M%L
-        ks = 0 ! as I don't know yet where to pick it up
-        write(MF,*) padding(1:xml_level), '<solenoid length="',length,'" ks="',ks,'"/>'
-       case (41) ! found-out that this is monitor
-        length = M%L
-        write(MF,*) padding(1:xml_level), '<monitor length="',length,'"/>'
-        ! monitor actual has a type, but let's forget it for the time-being
-       case (42) ! found-out this is an H-monitor
-        length = M%L
-        write(MF,*) padding(1:xml_level), '<H-monitor length="',length,'"/>'
-       case (43) ! found-out this is a V-monitor
-        length = M%L
-        write(MF,*) padding(1:xml_level), '<V-monitor length="',length,'"/>'
-       case (44) ! found-out this is an instrument
-        write(MF,*) padding(1:xml_level), '<instrument/>'
-       case (48) ! found-out this is a R-collimator
-        length = M%L
-        write(MF,*) padding(1:xml_level), '<R-collimator length="',length,'"/>'
-       ! and what about an E-collimator ???
-       case (51) ! to be confirmed that this is indeed a  cavity...
-        !voltage = M%VOLT;
-        length = M%L
-        write(MF,*) padding(1:xml_level), '<TW-cavity length="',length,'"/>'
-       case default
-        write(MF,*) padding(1:xml_level), '<device code="',M%KIND,'"--/><!--unknown-->'
-      end select
-      write (MF,*) padding(1:xml_level+1), '</kind>'
-      write (MF,*) padding(1:xml_level), '</element>'
+  subroutine print_XML_element(m,mf,xml_level)
+  	implicit none
+	integer mf
+	integer xml_level,i
+!	type(FIBRE), pointer :: P
+	type(element), pointer :: m
+	real(dp) length ! for a drift or a magnet
+	real(dp) voltage, phase, frequency ! for an RF cavity
+	real(dp) ks ! try this for a solenoid
+	real(dp) a1,b1 ! for a crab cavity
+	character el_name*48 ! the name of the element
+	character padding*10
+	el_name = ''
+	padding = ''
+	do i=1,10
+		padding = padding//' '
+	end do
+	do i=1,len(trim(M%VORNAME))
+		el_name(i:i)=lowercase(M%VORNAME(i:i))
+	end do
+	! hardcode design-tilt as 0.0 for the time-being
+	write (MF,*) padding(1:xml_level), '<element name="',trim(el_name),'" design-tilt="0.0"><!-- instance of ',TRIM(M%NAME),'-->'
+	write(MF,*) padding(1:xml_level+1), '<kind>'
+	! trim to remove trailing blanks
+	select case (M%KIND)
+		case (30) ! this is a marker
+			write(MF,*) padding(1:xml_level+2), '<marker/>'
+		case (31) ! this is a drift
+			length = M%L
+			write(MF,*) padding(1:xml_level+2), '<drift length="',length,'"/>'
+		case (32) ! this is a drift-kick-drift??
+			!write(MF,*) padding(1:xml_level+2), '<UNIDENTIFIED/><!-- drift-kick-drift -->'
+			! should ensure this is a quadrupole (do we end-up here for sextupole as well?
+			length = M%L
+			write(MF,*) padding(1:xml_level+2), '<magnet length="',length,'">'
+			! Does it account for any kind of magnet - at least this is what we
+			! agreed on in the Schema
+			if (ASSOCIATED(M%an)) then
+       			do i=1,m%p%NMUL
+          			! write(mf,*) m%bn(i),m%an(i), " BN AN ",I
+          			write(mf,*) padding(1:xml_level+3), '<an index="',i,'" value="',m%an(i),'"/>'
+          			write(mf,*) padding(1:xml_level+3), '<bn index="',i,'" value="',m%bn(i),'"/>'
+       			enddo
+    			endif
+			write(MF,*) padding(1:xml_level+2), '</magnet>'
+		case (33) ! this is a multiple block
+			! As far as I know let's identify it as a MAD multipole composed of a series
+			! of zero length thin lenses
+			! for the time being omit, MAD's LRAD fictitious length (synchrotron radiation)
+			! and TILT
+			write(MF,*) padding(1:xml_level+2), '<thin-lens-series>'
+			if (ASSOCIATED(M%an)) then
+			do i=1,m%p%NMUL
+				write(MF,*) padding(1:xml_level+3), '<an index="',i,'" value="',m%bn(i),'"/><!-- skew component-->'
+				write(MF,*) padding(1:xml_level+3), '<bn index="',i,'" value="',m%an(i),'"/><!-- normal component-->'				
+			enddo	
+			endif
+			write(MF,*) padding(1:xml_level+2), '</thin-lens-series>'			
+		case (34) ! this is a cavity
+			length = M%L
+			voltage = M%VOLT ! for an ordinary RF cavity (i.e. not a crab)
+			frequency = M%FREQ
+			phase = M%PHAS + M%C4%PHASE0 + M%C4%PH(1)
+			write(MF,*) padding(1:xml_level), '<RF-cavity length="',length, &
+			'"  voltage="',voltage,'" frequency="',frequency,'" phase="',phase,'">'
+				! following should be conditionnal to the cavity being
+				! a crab cavity
+				a1 = M%AN(1)
+				b1 = M%BN(1)
+				write(MF,*) padding(1:xml_level+3), '<a1 value="',a1,'"/>'
+				write(MF,*) padding(1:xml_level+3), '<b1 value="',b1,'"/>'
+			write(MF,*) padding(1:xml_level+2), '</RF-cavity>'
+		case (35) ! found-out that this is a solenoid
+			length = M%L
+			ks = 0 ! as I don't know yet where to pick it up
+			write(MF,*) padding(1:xml_level), '<solenoid length="',length,'" ks="',ks,'"/>'
+		case (41) ! found-out that this is monitor
+			length = M%L
+			write(MF,*) padding(1:xml_level), '<monitor length="',length,'"/>'
+			! monitor actual has a type, but let's forget it for the time-being
+		case (42) ! found-out this is an H-monitor
+			length = M%L
+			write(MF,*) padding(1:xml_level), '<H-monitor length="',length,'"/>'
+		case (43) ! found-out this is a V-monitor
+			length = M%L
+			write(MF,*) padding(1:xml_level), '<V-monitor length="',length,'"/>'
+		case (44) ! found-out this is an instrument
+			write(MF,*) padding(1:xml_level), '<instrument/>'
+		case (48) ! found-out this is a R-collimator
+			length = M%L
+			write(MF,*) padding(1:xml_level), '<R-collimator length="',length,'"/>'
+		! and what about an E-collimator ???
+		case (51) ! to be confirmed that this is indeed a  cavity...
+			!voltage = M%VOLT;
+			length = M%L
+			write(MF,*) padding(1:xml_level), '<TW-cavity length="',length,'"/>'
+		case default
+			write(MF,*) padding(1:xml_level), '<device code="',M%KIND,'"--/><!--unknown-->'
+	end select
+	write (MF,*) padding(1:xml_level+1), '</kind>'
+	write (MF,*) padding(1:xml_level), '</element>'
   end subroutine print_XML_element
   
   
   subroutine print_XML_beam(L,file_handle, xml_level)
-      integer file_handle,xml_level
-      integer i
-      real(dp) charge,mass,beta0,p0c
-      type(LAYOUT), TARGET :: L
-      character padding*10;
-      padding = ''
-      do i=1,10
-       padding = padding//' '
-      end do
-      charge = L%START%charge
-      mass = L%START%mass
-      beta0 = L%START%beta0
-      p0c = L%START%MAG%P%p0c
-      write(file_handle,*) padding(1:xml_level), '<beam charge="',charge,'" mass="',mass,'" beta0="',beta0,'" p0c="',p0c,'"/>' 
+  	integer file_handle,xml_level
+	integer i
+	real(dp) charge,mass,beta0,p0c
+	type(LAYOUT), TARGET :: L
+	character padding*10;
+	padding = ''
+	do i=1,10
+		padding = padding//' '
+	end do
+	charge = L%START%charge
+	mass = L%START%mass
+	beta0 = L%START%beta0
+	p0c = L%START%MAG%P%p0c
+	write(file_handle,*) padding(1:xml_level), '<beam charge="',charge,'" mass="',mass,'" beta0="',beta0,'" p0c="',p0c,'"/>'	
   end subroutine print_XML_beam
   
   subroutine print_element_SIXTRACK(P,m,mf)
@@ -344,14 +345,14 @@ nt=0
 
     write(mf,'(a68)') "END MAGNET CHART END MAGNET CHART END MAGNET CHART END MAGNET CHART "
 
-      if(M%METHOD/=2.and.p%mag%l>zero) then
-        write(6,*) " error method must be 2 ",P%mag%name
-        stop
-      endif
-      if(M%exact) then
-        write(6,*) " No exact magnet permitted ",P%mag%name
-        stop
-      endif
+	if(M%METHOD/=2.and.p%mag%l>zero) then
+	  write(6,*) " error method must be 2 ",P%mag%name
+	  stop
+	endif
+	if(M%exact) then
+	  write(6,*) " No exact magnet permitted ",P%mag%name
+	  stop
+	endif
   end subroutine print_magnet_chart_SIXTRACK
 
   subroutine print_PATCH_MIS_SIXTRACK(m,mf)
@@ -382,15 +383,15 @@ nt=0
   end subroutine print_PATCH_MIS_SIXTRACK
   
   character function lowercase(C)
-      implicit none
-      character C
-      integer asciiDiff
-       asciiDiff = iachar('a') - iachar('A')
+  	implicit none
+  	character C
+	integer asciiDiff
+      	asciiDiff = iachar('a') - iachar('A')
         if (LGE(C,'A') .AND. LLE(C,'Z')) then
-         lowercase = achar(iachar(C) + asciiDiff)
-      else
-       lowercase = C
-      endif
+       		lowercase = achar(iachar(C) + asciiDiff)
+	else
+		lowercase = C
+	endif
   end function
 
   ! following copied from util.F

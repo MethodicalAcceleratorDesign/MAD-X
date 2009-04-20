@@ -135,7 +135,8 @@ class Wrapper:
         header.append('/* set of '+str(nFunc)+' wrappers to synchronize FORTRAN and C stdout buffers */\n')
         header.append('/* when crossing the border upon calling C from FORTRAN. */\n\n')
         header.append('#include <stdio.h>\n\n')
-        header.append('#include "c_prototypes.h"\n\n') # prototypes
+        header.append('#include "c_wrappers_prototypes.h"\n\n') # prototypes
+        header.append('extern void call_fortran_flush_(char *,int);\n\n')
         for func in self.fortranCalls:
             # recompose compound arg string:
             argStr = '' # together with their types, for the signature
@@ -165,10 +166,17 @@ class Wrapper:
             code.append(newSignature)
             # code.append('printf("WRAPPER: now returning from invocation of '+func.name+'\\n");\n')
             debugMsg = '' # otherwise could be func.name
+            if not func.returnType == 'void':
+                code.append('\t'+func.returnType+' retVal;\n')
             code.append('\tcall_fortran_flush_("'+debugMsg+'",'+str(len(debugMsg))+');\n')
-            body = '\t' +func.name+'_wrapped('+argList+');\n' # should return a void (to be checked later on)
+            if func.returnType == 'void':
+                body = '\t' +func.name+'_wrapped('+argList+');\n' # usual case
+            else:
+                body = '\tretVal = '+ func.name+'_wrapped('+argList+');\n'
             code.append(body)
             code.append('\tfflush(stdout);\n')
+            if not func.returnType == 'void':
+                code.append('\treturn retVal;\n')
             code.append('}\n\n')
         for struct in structures:
             header.append('extern struct '+struct+';\n')
