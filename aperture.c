@@ -276,7 +276,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
   double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, ex, ey, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
-  double x_end_former=0,y_end_former=0;
+  double xeff=0,yeff=0;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
   double node_s=-1, node_n1=-1;
@@ -359,7 +359,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       strcat(refnode, ":1");
     }
 
-  printf("\nreference node: %s",refnode);
+  printf("\nreference node: %s\n",refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1) ;
@@ -543,11 +543,6 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y,
                           &betx, &bety, &dx, &dy);
-        /* BJ added next 4 lines 24oct08 */
-        if (jslice == nint) {
-          x_end_former = x;
-          y_end_former = y;
-        }
 
           s_curr=s_start+s;
           aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength,
@@ -568,29 +563,31 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         /*  jslice==0, parameters from previous node will be used  */
         {
           s_curr+=1.e-12;     /*to get correct plot at start of elements*/
-          s=0; /*used to calc elem_x elem_y) */
-
-        /* BJ added next 2 lines 24oct08 */
-        x = x_end_former;
-        y = y_end_former;
+          s=0;                /*used to calc elem_x elem_y) */
         }
 
-      /* printf ("%20s  x %13.6f  y %13.6f x_end_former %13.6f y_end_former %13.6f\n",name,x,y,x_end_former,x_end_former); */
+	/*       printf ("%20s  s %10.6f / x %10.6f   y %10.6f\n",name,s,x,y); */
 
+	xeff = x;
+	yeff = y;
+	  
         /* survey adjustments */
+       /* BJ 3 APR 2009 : introduced xeff and yeff in order to avoid
+          interferences with x and y as used for the first slice 
+	  (re-use from end of former node) */
         if (offs_node)
         {
           elem_x=xa*s*s+xb*s+xc;
           elem_y=ya*s*s+yb*s+yc;
-          x+=(surv_x-elem_x);
-          y+=(surv_y-elem_y);
+          xeff=x+(surv_x-elem_x);
+          yeff=y+(surv_y-elem_y);
         }
 
         /* discrete adjustments */
         if (true_node)
         {
-          x+=true_tab[truepos].tab[jslice][1];
-          y+=true_tab[truepos].tab[jslice][2];
+          xeff+=true_tab[truepos].tab[jslice][1];
+          yeff+=true_tab[truepos].tab[jslice][2];
         }
 
         for (angle=0;angle<twopi;angle+=dangle)
@@ -615,9 +612,8 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
           aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
 
           /* add all displacements */
-          /* modified 27feb08 BJ */
-          deltax = coxadj + tolxadj + x + dispxadj;
-          deltay = coyadj + tolyadj + y + dispyadj;
+          deltax = coxadj + tolxadj + xeff + dispxadj;
+          deltay = coyadj + tolyadj + yeff + dispyadj;
 
           /* send beta adjusted halo and its displacement to aperture calculation */
           aper_calc(deltax,deltay,&ratio,haloxsi,haloysi,
@@ -631,7 +627,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
         n1x_m=n1*bbeat*sqrt(betx*ex);
         n1y_m=n1*bbeat*sqrt(bety*ey);
 
-/* Change below, BJ 23oct1008                              */
+/* Change below, BJ 23oct2008                              */
 /* test block 'if (n1 < node_n1)' included in test block   */
 /*   if ( (is_zero_len == 0) ...'                          */
 
@@ -639,7 +635,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
 
           aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
                            &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
-                           &x, &y, &betx, &bety, &dx, &dy, table);
+                           &xeff, &yeff, &betx, &bety, &dx, &dy, table);
 
         /* save node minimum n1 */
 
@@ -648,7 +644,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
             node_n1=n1; node_s=s_curr;
           }
 
-      } /* end if 'is_zero_len ... */
+	} /* end if 'is_zero_len ... */
 
       }
 
@@ -944,7 +940,7 @@ int aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* re
         stolower(refnode);
         strcat(refnode, ":1");
       }
-      printf("\nReference node: %s",refnode);
+      /* printf("\nReference node: %s\n",refnode);*/
       /* end reading reference node */
 
       i=0;
@@ -1026,6 +1022,8 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
   int i, k, error = 0;
   short  sk;
   char *cc, *tmp, *name;
+  int tempcount;
+      tempcount = 0;
 
 
   if (e_d_name == NULL) return NULL;
@@ -1038,10 +1036,12 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
       warning("cannot open file:", e_d_name); return NULL;
     }
 
-
   while (fgets(aux_buff->c, aux_buff->max, tab_file))
     {
+     tempcount++;
+
      cc = strtok(aux_buff->c, " \"\n");
+
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
@@ -1056,16 +1056,19 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
            }
            }
         }
-       /* printf("\nReference node: %s",refnode); */
+       /* printf("\n+++++ Reference node: %s\n",refnode); */
        }
+
+
      else if (*cc == '*' && tnl == NULL)
        {
-      tnl = new_name_list("table_names", 20);
-        while ((tmp = strtok(NULL, " \"\n")) != NULL)
-            add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
+	 tnl = new_name_list("table_names", 20);
+	 while ((tmp = strtok(NULL, " \"\n")) != NULL)
+	   add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
        }
      else if (*cc == '$' && tcpa == NULL)
        {
+
       if (tnl == NULL)
         {
          warning("formats before names","skipped"); return NULL;
@@ -1115,6 +1118,7 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
            }
 	   t->curr = 0;
         }
+ 
       for (i = 0; i < tnl->curr; i++)
         {
          if (t->curr == t->max) grow_table(t);
@@ -1144,9 +1148,12 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
         t->curr++;
        }
     }
+
   fclose(tab_file);
   t->origin = 1;
-/*  add_to_table_list(t, table_register); */
+  /*  next line commented : avoid memory error at 2nd APERTURE command */
+  /*  when the offset file has the same same, BJ 8apr2009 */
+  /*  add_to_table_list(t, table_register);*/
   return t;
 }
 
