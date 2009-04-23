@@ -1,6 +1,7 @@
 * text=auto !eol
 /Makefile -text
 /Makefile.bat -text
+/MakefileIntel.bat -text
 /Sa_extend_poly.f90 -text
 /Sb_sagan_pol_arbitrary.f90 -text
 /Sc_euclidean.f90 -text
