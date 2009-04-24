@@ -13,6 +13,8 @@ SET MADX=.
 REM on Windows, one should set the 'Include' environment variable from
 REM My Computer's Properties.
 REM set INCLUDE="C:\Program Files\Microsoft Visual Studio\VC98\include";%INCLUDE%
+REM In the Windows Termin you might want to set up the environment
+REM call "C:\Program Files\Microsoft Visual Studio\VC98\VCVARS32.BAT"
 
 REM Some environment variables for generating wrappers when calling Fortran from C
 IF EXIST C:\Perl\bin\perl.exe (
@@ -35,7 +37,7 @@ SET WRAPPERS_OBJ=
 
 IF %WRAP_FORTRAN_CALLS% == 1 (
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MADX%\fortran_wrappers.c
-lf95 -c -o1 -lfe "-Cpp" -tp %MADX%\fortran_flush.F90
+lf95 -c -o1 -tp -lfe "-Cpp" %MADX%\fortran_flush.F90
 )
 
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %WRAP_FLAG% %MADX%\madxp.c
@@ -65,7 +67,7 @@ lf95 -c -o1 -tp %MADX%\resindex.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\a_scratch_size.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\b_da_arrays_all.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\c_dabnew_berz.f90 -winconsole -ml msvc
-lf95 -c -o1 -lfe "-Cpp" -tp -D_WIN32 %FPP%\c_tpsa_interface.F90 -winconsole -ml msvc
+lf95 -c -o1 -tp -lfe "-Cpp" -lfe "-D_WIN32_DLL" %FPP%\c_tpsa_interface.F90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\d_lielib.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\h_definition.f90 -winconsole -ml msvc
 lf95 -c -o1 -tp %FPP%\i_tpsa.f90 -winconsole -ml msvc
