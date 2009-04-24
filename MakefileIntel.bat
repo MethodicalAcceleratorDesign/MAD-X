@@ -57,7 +57,7 @@ SET WRAPPERS_OBJ=
 
 IF %WRAP_FORTRAN_CALLS% == 1 (
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\fortran_wrappers.c
-ifort /c /names:lowercase /assume:underscore /fpp -D_FLUSH_NO_CALL %MADX%\fortran_flush.F90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 -D_FLUSH_NO_CALL %MADX%\fortran_flush.F90
 REM in the above, removing /assume:underscore did not help _call_fortran_flush_ and _flush unresolved
 )
 
@@ -66,84 +66,80 @@ cl -c /Zm1000 -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\gxx11psc.c
 cl -c /Zm1000 -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\rplot.c
 cl -c /Zm1000 -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\matchptcknobs.c
 
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\plot.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\sodd.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\gxx11ps.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\dynap.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\emit.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\twiss.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\match.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\matchjc.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\matchlib.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\matchsa.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\touschek.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\poisson.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\survey.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\trrun.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\util.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\orbf.f90
-REM ifort /c /names:lowercase /assume:underscore /fpp %MADX%\ptc_dummy.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\plot.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\sodd.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\gxx11ps.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\dynap.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\emit.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\twiss.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\match.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\matchjc.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\matchlib.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\matchsa.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\touschek.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\poisson.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\survey.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\trrun.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\util.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\orbf.f90
+REM ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\ptc_dummy.f90
 REM the above fails - ignored
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\ibsdb.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\resindex.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\a_scratch_size.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\b_da_arrays_all.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\c_dabnew_berz.f90
-REM JLUC added all the following
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\c_dabnew.f90
-REM JLUC added all the above
-REM the above 5 files compile successfully - afterwards almost nothing compile except Spb_fake_gino_sub.f90 ...
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\c_tpsa_interface.F90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\d_lielib.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\h_definition.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\i_tpsa.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\j_tpsalie.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\k_tpsalie_analysis.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\l_complex_taylor.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\m_real_polymorph.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\n_complex_polymorph.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\o_tree_element.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sa_extend_poly.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sb_sagan_pol_arbitrary.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sc_euclidean.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sd_frame.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Se_status.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sf_def_all_kinds.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sg_sagan_wiggler.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sh_def_kind.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Si_def_element.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sk_link_list.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sl_family.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sm_tracking.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sma0_beam_beam_ptc.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sma_multiparticle.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sn_mad_like.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\So_fitting.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sp_keywords.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Spb_fake_gino_sub.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sq_orbit_ptc.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sqb_accel_ptc.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sr_spin.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\Sra_fitting.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_intstate.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_setcavs.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_knobs.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_module.f90
-ifort /c /names:lowercase /assume:underscore /fpp %FPP%\St_pointers.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_script.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_eplacement.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_distrib.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_normal.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_twiss.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_track_run.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_ptc_trackcavs.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\ptc_export_xml.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\wrap.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\user2_photon.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\timest.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\timex.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\run_madx.f90
-ifort /c /names:lowercase /assume:underscore /fpp %MADX%\madx_main.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\ibsdb.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\resindex.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\a_scratch_size.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\b_da_arrays_all.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\c_dabnew_berz.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\c_tpsa_interface.F90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\d_lielib.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\h_definition.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\i_tpsa.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\j_tpsalie.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\k_tpsalie_analysis.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\l_complex_taylor.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\m_real_polymorph.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\n_complex_polymorph.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\o_tree_element.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sa_extend_poly.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sb_sagan_pol_arbitrary.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sc_euclidean.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sd_frame.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Se_status.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sf_def_all_kinds.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sg_sagan_wiggler.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sh_def_kind.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Si_def_element.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sk_link_list.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sl_family.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sm_tracking.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sma0_beam_beam_ptc.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sma_multiparticle.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sn_mad_like.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\So_fitting.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sp_keywords.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Spb_fake_gino_sub.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sq_orbit_ptc.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sqb_accel_ptc.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sr_spin.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\Sra_fitting.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_intstate.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_setcavs.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_knobs.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_module.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %FPP%\St_pointers.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_script.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_eplacement.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_distrib.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_normal.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_twiss.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_track_run.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_ptc_trackcavs.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\ptc_export_xml.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\wrap.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\user2_photon.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\timest.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\timex.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\run_madx.f90
+ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\madx_main.f90
 goto :link
 :link
 
