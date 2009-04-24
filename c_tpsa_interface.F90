@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.5 2009-04-19 01:00:04 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.6 2009-04-24 07:07:02 nougaret Exp $
 ! */
 
 
@@ -29,13 +29,14 @@ module dabnew
   !DEC$ ATTRIBUTES DLLIMPORT :: ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
   !DEC$ ATTRIBUTES DLLIMPORT :: ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem
 
-  DLL_IMPORT ad_tra, ad_shift, ad_print, ad_save_block, ad_read_block
-  DLL_IMPORT ad_fill_ran, ad_nvar, ad_length, ad_derivative
-  DLL_IMPORT ad_subst, ad_cos, ad_sin, ad_log, ad_exp, ad_sqrt, ad_abs
-  DLL_IMPORT ad_div_c, ad_c_div, ad_mult_const, ad_add_const
-  DLL_IMPORT ad_div, ad_mult, ad_sub, ad_reset, ad_pok, ad_pek
-  DLL_IMPORT ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
-  DLL_IMPORT ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem ,ad_resetvars
+  ! JLUC commented the following in April 22nd 2009
+  !DLL_IMPORT ad_tra, ad_shift, ad_print, ad_save_block, ad_read_block
+  !DLL_IMPORT ad_fill_ran, ad_nvar, ad_length, ad_derivative
+  !DLL_IMPORT ad_subst, ad_cos, ad_sin, ad_log, ad_exp, ad_sqrt, ad_abs
+  !DLL_IMPORT ad_div_c, ad_c_div, ad_mult_const, ad_add_const
+  !DLL_IMPORT ad_div, ad_mult, ad_sub, ad_reset, ad_pok, ad_pek
+  !DLL_IMPORT ad_var, ad_truncate, ad_const, ad_count, ad_free, ad_add
+  !DLL_IMPORT ad_copy, ad_clean, ad_alloc, ad_reserve, ad_init, ad_elem ,ad_resetvars
 #endif
 
   private trx_cpp
