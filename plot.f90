@@ -364,11 +364,11 @@ subroutine pefill(ierr)
   integer i,j,k,l,new1,new2,currtyp,crow,pltyp,pos_flag
   integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
   integer nint
-  double precision fact, d_val, d_val1
+  double precision fact, d_val, d_val1, get_value
   double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
        &currk2l, currk2sl, currk3l, currk3sl
-  real tval, step
-  logical machp, rselect
+  real tval, step, mystep
+  logical machp, rselect, marker_plot
   character*120 msg
 
   !--- definitions of function primitives
@@ -386,7 +386,12 @@ subroutine pefill(ierr)
        &0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
        &20 * 0 /
 
-  !--- Output initialisation
+! Initialize marker_plot logical
+
+  marker_plot=get_value('plot ','marker_plot ').ne.zero
+ 
+
+ !--- Output initialisation
 
   ierr = 0
 
@@ -588,6 +593,11 @@ subroutine pefill(ierr)
            endif
         endif
      endif
+     if(marker_plot) then
+        mystep=0
+     else
+        mystep=0.1d0 * step
+     endif
      do l = 1, nivvar
         if (nqval(l) .eq. maxseql)  then
            print *, 'Warning: plot buffer full, plot truncated'
@@ -602,7 +612,7 @@ subroutine pefill(ierr)
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
            endif
         elseif (itbv .eq. 0 .or. currpos - qhval(nqval(l),l)          &
-             &.gt. 0.1d0 * step) then
+             .gt. mystep) then
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
            k = double_from_table(tabname, sname(l), j, d_val)
