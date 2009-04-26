@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.7 2009-04-24 14:47:19 nougaret Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.8 2009-04-26 19:58:03 frs Exp $
 ! */
 
 
@@ -13,6 +13,7 @@ module dabnew
   !$$$$  use da_arrays
   use dabnew_b !$$$$
   implicit none
+  public
   !  private
   ! integer,private,parameter:: lsw=1
 
