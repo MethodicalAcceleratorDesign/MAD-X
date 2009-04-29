@@ -368,7 +368,7 @@ subroutine pefill(ierr)
   double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
        &currk2l, currk2sl, currk3l, currk3sl
   real tval, step, mystep
-  logical machp, rselect, marker_plot
+  logical machp, rselect, marker_plot, range_plot
   character*120 msg
 
   !--- definitions of function primitives
@@ -389,6 +389,7 @@ subroutine pefill(ierr)
 ! Initialize marker_plot logical
 
   marker_plot=get_value('plot ','marker_plot ').ne.zero
+  range_plot=get_value('plot ','range_plot ').ne.zero
  
 
  !--- Output initialisation
@@ -483,7 +484,7 @@ subroutine pefill(ierr)
      endif
      if (sname(l) .eq. 'dpp') dpp_flag = .true.
   enddo
-  if (rselect)  then
+  if (rselect .or. range_plot)  then
 
      !-------adjust element range to horizontal range
 
@@ -499,7 +500,7 @@ subroutine pefill(ierr)
      nrrang(1) = new1
      if (nrrang(2) .gt. new2+2) nrrang(2) = new2 + 2
   endif
-  if (itbv .eq. 0)  then
+  if (itbv .eq. 0 .and. .not. range_plot)  then
      nrrang(1) = 1
      nrrang(2) = table_length(tabname)
   endif

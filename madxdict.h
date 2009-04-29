@@ -258,6 +258,7 @@ char command_def[] =
 "multiple = [l, false, true], "
 "ptc  = [l, false, true], "
 "marker_plot = [l, false, true], "
+"range_plot = [l, false, true], "
 "table    = [s, twiss], "
 "ptc_table    = [s, ptc_twiss], "
 "title    = [s, none], "
