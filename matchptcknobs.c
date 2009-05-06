@@ -859,7 +859,7 @@ int findsetknob(char* ename, int exactnamematch, char* initialpar)
     for (i = 0; i < madx_mpk_Nknobs; i++)
     {
       if (madx_mpk_knobs[i].elname == 0x0) continue;
-      cmpres = strcmp(ename,madx_mpk_knobs[i].elname);
+      cmpres = my_strcmp(ename,madx_mpk_knobs[i].elname);
       if (cmpres == 0)
       {
         if ( exactnamematch == madx_mpk_knobs[i].exactnamematch )
@@ -897,7 +897,7 @@ int findsetknob(char* ename, int exactnamematch, char* initialpar)
     {
       if (madx_mpk_knobs[i].initial)
       {
-        if (( strcmp(initialpar,madx_mpk_knobs[i].initial) == 0 ))
+        if (( my_strcmp(initialpar,madx_mpk_knobs[i].initial) == 0 ))
         {
 
           error("findsetknob","Such initial parameter is already defined");
@@ -956,62 +956,62 @@ void madx_mpk_setcalc(struct in_cmd* cmd)
 int mapptctomad(char* ptcname, char* madxname)
 {
 
-  if( strcmp(ptcname,"beta11") == 0 )
+  if( my_strcmp(ptcname,"beta11") == 0 )
   {
     strcpy(madxname,"betx");
     return 0;
   }
 
-  if( strcmp(ptcname,"beta22") == 0 )
+  if( my_strcmp(ptcname,"beta22") == 0 )
   {
     strcpy(madxname,"bety");
     return 0;
   }
 
-  if( strcmp(ptcname,"beta33") == 0 )
+  if( my_strcmp(ptcname,"beta33") == 0 )
   {
     strcpy(madxname,"betz");
     return 0;
   }
 
-  if( strcmp(ptcname,"alfa11") == 0 )
+  if( my_strcmp(ptcname,"alfa11") == 0 )
   {
     strcpy(madxname,"alfx");
     return 0;
   }
 
-  if( strcmp(ptcname,"alfa22") == 0 )
+  if( my_strcmp(ptcname,"alfa22") == 0 )
   {
     strcpy(madxname,"alfy");
     return 0;
   }
 
-  if( strcmp(ptcname,"alfa33") == 0 )
+  if( my_strcmp(ptcname,"alfa33") == 0 )
   {
     strcpy(madxname,"alfz");
     return 0;
   }
 
 
-  if( strcmp(ptcname,"disp1") == 0 )
+  if( my_strcmp(ptcname,"disp1") == 0 )
   {
     strcpy(madxname,"dx");
     return 0;
   }
 
-  if( strcmp(ptcname,"disp2") == 0 )
+  if( my_strcmp(ptcname,"disp2") == 0 )
   {
     strcpy(madxname,"dpz");
     return 0;
   }
 
-  if( strcmp(ptcname,"disp3") == 0 )
+  if( my_strcmp(ptcname,"disp3") == 0 )
   {
     strcpy(madxname,"dy");
     return 0;
   }
 
-  if( strcmp(ptcname,"disp4") == 0 )
+  if( my_strcmp(ptcname,"disp4") == 0 )
   {
     strcpy(madxname,"dpy");
     return 0;
@@ -1142,7 +1142,7 @@ int  readstartvalues()
         p = strstr(buff,":");
         if (p) *p = 0;
 
-        if ( strcmp(buff,kn->elname) == 0 )
+        if ( my_strcmp(buff,kn->elname) == 0 )
         {
           break;
         }
@@ -1495,7 +1495,7 @@ int run_ptccalculation(int setknobs, char* readstartval)
 
         for(start=0; start<ntoks; start++)
         {
-          if (strcmp(toks[start],buff)==0)
+          if (my_strcmp(toks[start],buff)==0)
           {
             break;
           }

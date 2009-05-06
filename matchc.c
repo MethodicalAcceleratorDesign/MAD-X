@@ -43,13 +43,13 @@ void match_action(struct in_cmd* cmd)
 
   current_call_lim += match_calls;
 
-  if (strcmp(cmd->tok_list->p[0], "lmdif") == 0 && total_vars > total_const)
+  if (my_strcmp(cmd->tok_list->p[0], "lmdif") == 0 && total_vars > total_const)
   {
     print_match_summary = 0;
     warning("number of variables larger than number of constraints:", "match command ignored");
     return;
   }
-  else if (strcmp(cmd->tok_list->p[0], "lmdif") == 0 && total_vars <= total_const)
+  else if (my_strcmp(cmd->tok_list->p[0], "lmdif") == 0 && total_vars <= total_const)
   {
     print_match_summary = 1;
     match_work[0] = new_double_array(total_vars);
@@ -70,7 +70,7 @@ void match_action(struct in_cmd* cmd)
             match_work[4]->a, match_work[5]->a, match_work[6]->a,
             match_work[7]->a,match_work[9]->a);
   }
-  else if (strcmp(cmd->tok_list->p[0], "jacobian") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "jacobian") == 0)
   {
     print_match_summary = 0;
     jac_strategy = command_par_value("strategy", cmd->clone);
@@ -98,7 +98,7 @@ void match_action(struct in_cmd* cmd)
       mtjacprint(total_const,total_vars,match_work[0]->a,cmd);
     }
   }
-  else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 && total_vars <= total_const)
+  else if (my_strcmp(cmd->tok_list->p[0], "migrad") == 0 && total_vars <= total_const)
   {
     print_match_summary = 1;
     mig_strategy = command_par_value("strategy", cmd->clone);
@@ -118,7 +118,7 @@ void match_action(struct in_cmd* cmd)
             match_work[3]->a, match_work[4]->a, match_work[5]->a,
             match_work[6]->a, match_work[7]->a);
   }
-  else if (strcmp(cmd->tok_list->p[0], "simplex") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "simplex") == 0)
   {
     print_match_summary = 1;
     match_work[0] = new_double_array(total_vars*(total_vars+1));
@@ -130,7 +130,7 @@ void match_action(struct in_cmd* cmd)
             vary_vect->a, vary_dvect->a, fun_vect->a,
             match_work[0]->a, match_work[1]->a, match_work[2]->a);
   }
-  else if (strcmp(cmd->tok_list->p[0], "siman") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "siman") == 0)
   {
     print_match_summary = 1;
     iseed = 1;
@@ -265,7 +265,7 @@ void match_constraint(struct in_cmd* cmd)
       cp = cmd->clone->par->parameters[pos];
       for (n = 0; n < match_sequs->curr; n++)
       {
-        if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0)
+        if (my_strcmp(cp->string, match_sequs->sequs[n]->name) == 0)
         {
           break;
         }
@@ -430,7 +430,7 @@ void match_global(struct in_cmd* cmd)
     cp = cmd->clone->par->parameters[pos];
     for (n = 0; n < match_sequs->curr; n++)
     {
-      if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0) break;
+      if (my_strcmp(cp->string, match_sequs->sequs[n]->name) == 0) break;
     }
     if (n == match_sequs->curr)
     {
@@ -922,7 +922,7 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
     for(j=0;j<MAX_MATCH_CONS;j++)
     {
       if (match2_cons_name[i][j]==NULL) break;
-      if ( strcmp(match2_cons_name[i][j],"0")!=0 )
+      if ( my_strcmp(match2_cons_name[i][j],"0")!=0 )
         if (jacfilename) fprintf(jacfile, "%16s:=%+20.10e",match2_cons_name[i][j],match2_cons_value[i][j]);
       for(l=0;l<n;l++)
       {
@@ -931,10 +931,10 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
         fprintf(prt_file, "%10s ",command_par_string("name",stored_match_var->commands[l]));
         fprintf(prt_file, "%20.10e",jac[l*m+k]);
         fprintf(prt_file, "\n");
-      if (jacfilename) if ( strcmp(match2_cons_name[i][j],"0")!=0 )
+      if (jacfilename) if ( my_strcmp(match2_cons_name[i][j],"0")!=0 )
         fprintf(jacfile, "%+20.10e*%16s",jac[l*m+k],command_par_string("name",stored_match_var->commands[l]));
       }
-      if (jacfilename) if ( strcmp(match2_cons_name[i][j],"0")!=0 )
+      if (jacfilename) if ( my_strcmp(match2_cons_name[i][j],"0")!=0 )
       fprintf(jacfile, ";\n");
       k++;
     }
@@ -1003,7 +1003,7 @@ void mtjacprint(int m, int n,double* jac,struct in_cmd* cmd){
           /*        fprintf(prt_file,"U  %d,%d,%12.5e\n",j,t,U[j+t*m]);*/
         }
         /*      fprintf(prt_file,"M-1 %d,%d,%e \n",i,j,tmp);*/
-        if ( strcmp(match2_cons_name[k][l],"0")!=0 ) {
+        if ( my_strcmp(match2_cons_name[k][l],"0")!=0 ) {
           fprintf(knobfile, "%+15.8e*%s",tmp,match2_cons_name[k][l]);
         };
         l++;

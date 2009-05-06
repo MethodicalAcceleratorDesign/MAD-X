@@ -480,7 +480,7 @@ void match2_constraint(struct in_cmd* cmd)
   exprfound = 0;
   for(start=0; start<n; start++)
   {
-    if (strcmp(toks[start],"expr")==0)
+    if (my_strcmp(toks[start],"expr")==0)
     {
       exprfound = 1;
       break;
@@ -558,7 +558,7 @@ void match2_constraint(struct in_cmd* cmd)
   match2_cons_weight[i][j]=command_par_value("weight",cmd->clone);
   for(start=0; start<n; start++)
   {
-    if (strcmp(toks[start],"expr")==0)
+    if (my_strcmp(toks[start],"expr")==0)
     {
       break;
     }

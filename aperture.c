@@ -29,7 +29,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
 
   /*   printf("-- #%s#\n",apertype); */
 
-  if (!strcmp(apertype,"circle"))
+  if (!my_strcmp(apertype,"circle"))
   {
     *ap3=get_aperture(current_node, "var1"); /*radius circle*/
 
@@ -43,7 +43,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
     else err = -1;
   }
 
-  else if (!strcmp(apertype,"ellipse"))
+  else if (!my_strcmp(apertype,"ellipse"))
   {
     *ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
     *ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
@@ -54,7 +54,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
     if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
 
-  else if (!strcmp(apertype,"rectangle"))
+  else if (!my_strcmp(apertype,"rectangle"))
   {
 
     *ap1 = get_aperture(current_node, "var1");      /*half width rect*/
@@ -67,7 +67,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
     if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
 
-  else if (!strcmp(apertype,"lhcscreen"))
+  else if (!my_strcmp(apertype,"lhcscreen"))
   {
     *ap1=get_aperture(current_node, "var1"); /*half width rect*/
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -79,13 +79,13 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
     if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
 
-  else if (!strcmp(apertype,"marguerite"))
+  else if (!my_strcmp(apertype,"marguerite"))
   {
     printf("\nApertype %s not yet supported.", apertype);
     err=-1;
   }
 
-  else if (!strcmp(apertype,"rectellipse"))
+  else if (!my_strcmp(apertype,"rectellipse"))
   {
     *ap1=get_aperture(current_node, "var1"); /*half width rect*/
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -105,7 +105,7 @@ int aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4,
     if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
   }
 
-  else if (!strcmp(apertype,"racetrack"))
+  else if (!my_strcmp(apertype,"racetrack"))
   {
     *ap1=get_aperture(current_node, "var1"); /*half width rect*/
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -418,7 +418,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
     }
     else on_elem=1;
 
-    if ( (offs_tab!= NULL) && (strcmp(refnode, name) == 0)) do_survey=1;
+    if ( (offs_tab!= NULL) && (my_strcmp(refnode, name) == 0)) do_survey=1;
     /* printf("\nname: %s, ref: %s, do_survey:: %d\n",name,refnode, do_survey);*/
 
 
@@ -672,7 +672,7 @@ struct aper_node* aperture(char *table, struct node* use_range[], struct table* 
       }
     }
 
-    if (!strcmp(current_node->name,use_range[1]->name)) stop=1;
+    if (!my_strcmp(current_node->name,use_range[1]->name)) stop=1;
     if (!advance_node()) stop=1;
   }
 
@@ -693,7 +693,7 @@ int aper_tab_search(int cnt, struct aper_e_d* tab, char* name, int* pos)
   while (i < cnt && found == 0)
   {
     i++;
-    if (strcmp(name,tab[i].name) == 0) found=1;
+    if (my_strcmp(name,tab[i].name) == 0) found=1;
   }
   *pos=i;
 
@@ -736,7 +736,7 @@ int aper_tab_search_tfs(struct table* t, char* name, double* row)
   while (i < t->curr && found == 0)
     {
       i++;
-      if( !strcmp(t->s_cols[name_pos][i-1],name)) {
+      if( !my_strcmp(t->s_cols[name_pos][i-1],name)) {
       row[1] = t->d_cols[s_ip_pos][i-1];
       row[2] = t->d_cols[x_off_pos][i-1];
       row[3] = t->d_cols[dx_off_pos][i-1];
@@ -1045,7 +1045,7 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
-           && strcmp(tmp, "REFERENCE") == 0) /* search for reference node */
+           && my_strcmp(tmp, "REFERENCE") == 0) /* search for reference node */
         {
          if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
            {
@@ -1077,9 +1077,9 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
         while ((tmp = strtok(NULL, " \"\n")) != NULL)
         {
          if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
-           if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
-           else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
-           else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
+           if (my_strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+           else if (my_strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+           else if (my_strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
            else                              tnl->inform[tcpa->curr] = 2;
            tcpa->p[tcpa->curr++] = permbuff(tmp);
         }
@@ -1123,15 +1123,15 @@ struct table* aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-           if (strcmp(tmp,"%s") == 0)  {
+           if (my_strcmp(tmp,"%s") == 0)  {
            t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
            strcat(t->s_cols[i][t->curr], ":1");
          }
-           else if (strcmp(tmp,"%d") == 0 )
+           else if (my_strcmp(tmp,"%d") == 0 )
            {
             sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
            }
-           else if (strcmp(tmp,"%hd") == 0 )
+           else if (my_strcmp(tmp,"%hd") == 0 )
            {
             sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
            }

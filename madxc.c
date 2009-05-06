@@ -20,39 +20,39 @@ void primat_(int*, int*, int*);
 void prdmat_(double*, int*, int*);
 void pro_correct(struct in_cmd* cmd)
 {
-  if (strcmp(cmd->tok_list->p[0], "correct") == 0)
+  if (my_strcmp(cmd->tok_list->p[0], "correct") == 0)
     {
      correct_correct(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "usekick") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "usekick") == 0)
     {
      correct_usekick(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "usemonitor") == 0)
     {
      correct_usemonitor(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "getorbit") == 0)
     {
      correct_getorbit(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "putorbit") == 0)
     {
      correct_putorbit(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "readmytable") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "readmytable") == 0)
     {
      read_my_table(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "readcorr") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "readcorr") == 0)
     {
      correct_readcorr(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "setcorr") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "setcorr") == 0)
     {
      correct_setcorr(cmd);
     }
-  else if (strcmp(cmd->tok_list->p[0], "coption") == 0)
+  else if (my_strcmp(cmd->tok_list->p[0], "coption") == 0)
     {
      correct_option(cmd);
     }
@@ -226,7 +226,7 @@ void correct_correct2(struct in_cmd* cmd)
   }
   }
 
-  if(strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
+  if(my_strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
     if(dmat != NULL) myfree(rout_name,dmat);
     /* icor and imon used to set up correct matrix size !! */
     dmat = (double *)pro_correct2_response_ring(ip,icor,imon);
@@ -237,7 +237,7 @@ void correct_correct2(struct in_cmd* cmd)
   /* MICADO correction, get desired number of correctors from command */
   corrl = command_par_value("corrlim",cmd->clone);
   set_variable("corrlim",&corrl);
-  if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
+  if(my_strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
     printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
           printf("Requested %d correctors (\?\?\?) set to %d\n",niter,icor);
@@ -520,7 +520,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
          (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
         mon_l12->id_ttb[0] = j;
          for (k=0; k < b2->curr; k++) {
-           if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
+           if(my_strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
             mon_l12->id_ttb[1] = k;
            }
          }
@@ -540,7 +540,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
          (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
          cor_l12->id_ttb[0] = j;
          for (k=0; k < b2->curr; k++) {
-           if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
+           if(my_strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
             cor_l12->id_ttb[1] = k;
            }
          }
@@ -591,7 +591,7 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
      while(prt != NULL) {
        printf("Correctors beam12: %s %ld %ld\n",prt->p_node->name,prt->id_ttb[0],prt->id_ttb[1]);
        for (j=0; j < b2->curr; j++) {
-         if(strcmp(b2->p_nodes[j]->name,prt->p_node->name) == 0) {
+         if(my_strcmp(b2->p_nodes[j]->name,prt->p_node->name) == 0) {
             prt->id_ttb[1] = j;
             printf("matched correctors beam12: %s %ld %ld\n",prt->p_node->name,prt->id_ttb[0],prt->id_ttb[1]);
          }
@@ -1205,7 +1205,7 @@ void correct_correct1(struct in_cmd* cmd)
 
   /* set up response matrix for ring or line */
   corl = correct_orbit->cor_table;
-  if(strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
+  if(my_strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
     if(dmat != NULL) myfree(rout_name,dmat);
     /* icor and imon used to set up correct matrix size !! */
     dmat = (double *)pro_correct_response_ring(ip,icor,imon);
@@ -1241,7 +1241,7 @@ void correct_correct1(struct in_cmd* cmd)
        printf("Finally found %d singular values\n",sflag);
     }
   }
-  else if(strcmp("line",command_par_string("flag",cmd->clone)) == 0) {
+  else if(my_strcmp("line",command_par_string("flag",cmd->clone)) == 0) {
     if(dmat != NULL) myfree(rout_name,dmat);
           printf("make response for line\n");
     dmat = (double *)pro_correct_response_line(ip,icor,imon); 
@@ -1286,7 +1286,7 @@ void correct_correct1(struct in_cmd* cmd)
 
 
   /* LSQ correction, use all available correctors */
-  if(strcmp("lsq",command_par_string("mode",cmd->clone)) == 0) {
+  if(my_strcmp("lsq",command_par_string("mode",cmd->clone)) == 0) {
     /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
     /* printf("Time before lsq:  %-6.3f\n",fextim());   */
     c_haveit(dmat,monvec,corvec,resvec,nx,imon,icor);
@@ -1296,7 +1296,7 @@ void correct_correct1(struct in_cmd* cmd)
 
 
   /* SVD correction, use all available correctors */
-  if(strcmp("svd",command_par_string("mode",cmd->clone)) == 0) {
+  if(my_strcmp("svd",command_par_string("mode",cmd->clone)) == 0) {
     /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
     /* printf("Time before svd-corr:  %-6.3f\n",fextim());   */
        sflag=c_svdcorr(dmat,monvec,corvec,resvec,nx,imon,icor);
@@ -1308,7 +1308,7 @@ void correct_correct1(struct in_cmd* cmd)
   /* MICADO correction, get desired number of correctors from command */
   corrl = command_par_value("corrlim",cmd->clone);
   set_variable("corrlim",&corrl);
-  if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
+  if(my_strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
     printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
           printf("Requested %d correctors (\?\?\?) set to %d\n",niter,icor);
@@ -1405,13 +1405,13 @@ int pro_correct_getcommands(struct in_cmd* cmd)
     }
 
   strcpy(plane,command_par_string(att[1],cmd->clone));
-  if(strcmp("x",plane) == 0) {
+  if(my_strcmp("x",plane) == 0) {
     iplane = 1;
-  } else if (strcmp("y",plane) == 0) {
+  } else if (my_strcmp("y",plane) == 0) {
     iplane = 2;
-  } else if (strcmp("h",plane) == 0) {
+  } else if (my_strcmp("h",plane) == 0) {
     iplane = 1;
-  } else if (strcmp("v",plane) == 0) {
+  } else if (my_strcmp("v",plane) == 0) {
     iplane = 2;
   } else {
     printf("No valid plane specified, x plane used \n");
@@ -2371,7 +2371,7 @@ void pro_correct_fill_corr_table(int ip ,char *name, double old, double new)
   cor =  corr_table;
 
   for (j=0; j < cor->curr; j++) {
-    if(strcmp(name,cor->s_cols[0][j]) == 0) {
+    if(my_strcmp(name,cor->s_cols[0][j]) == 0) {
       cor->d_cols[ip][j] = old;
       cor->d_cols[ip+2][j] = new;
     }
@@ -2395,7 +2395,7 @@ void pro_correct2_fill_corr_table(int b, int ip ,char *name, double old, double 
   if(b == 1) cor =  corr_table2;
 
   for (j=0; j < cor->curr; j++) {
-    if(strcmp(name,cor->s_cols[0][j]) == 0) {
+    if(my_strcmp(name,cor->s_cols[0][j]) == 0) {
       cor->d_cols[ip][j] = old;
       cor->d_cols[ip+2][j] = new;
     }
@@ -2411,7 +2411,7 @@ void pro_correct_fill_mon_table(int ip ,char *name, double old, double new)
   mon =  mon_table;
 
   for (j=0; j < mon->curr; j++) {
-    if(strcmp(name,mon->s_cols[0][j]) == 0) {
+    if(my_strcmp(name,mon->s_cols[0][j]) == 0) {
       mon->d_cols[ip][j] = old*0.001;
       mon->d_cols[ip+2][j] = new*0.001;
     }
@@ -2427,7 +2427,7 @@ void pro_correct2_fill_mon_table(int ip ,char *name, double old, double new)
   mon =  mon_table;
 
   for (j=0; j < mon->curr; j++) {
-    if(strcmp(name,mon->s_cols[0][j]) == 0) {
+    if(my_strcmp(name,mon->s_cols[0][j]) == 0) {
       mon->d_cols[ip][j] = old*0.001;
       mon->d_cols[ip+2][j] = new*0.001;
     }
@@ -2974,7 +2974,7 @@ struct table* read_my_table(struct in_cmd* cmd)
      if (*cc == '@')
        {
        if ((tmp = strtok(NULL, " \"\n")) != NULL
-              && strcmp(tmp, "TYPE") == 0)
+              && my_strcmp(tmp, "TYPE") == 0)
         {
          if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
            {
@@ -2999,9 +2999,9 @@ struct table* read_my_table(struct in_cmd* cmd)
         while ((tmp = strtok(NULL, " \"\n")) != NULL)
         {
          if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
-           if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
-           else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
-           else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
+           if (my_strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+           else if (my_strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+           else if (my_strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
            else                              tnl->inform[tcpa->curr] = 2;
            tcpa->p[tcpa->curr++] = permbuff(tmp);
         }
@@ -3047,12 +3047,12 @@ struct table* read_my_table(struct in_cmd* cmd)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-           if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-           else if (strcmp(tmp,"%d") == 0 )
+           if (my_strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+           else if (my_strcmp(tmp,"%d") == 0 )
            {
             sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
            }
-           else if (strcmp(tmp,"%hd") == 0 )
+           else if (my_strcmp(tmp,"%hd") == 0 )
            {
             sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
            }
@@ -3156,7 +3156,7 @@ void correct_setcorr(struct in_cmd* cmd)
              /* printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
              printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); */
        
-             if(strcmp(slname,slnname) == 0) {
+             if(my_strcmp(slname,slnname) == 0) {
                 /*
                 printf("Corrector selection found: %s, %s %d\n",lname,nextnode->name,nextnode->sel_err);
                 printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);    
@@ -3246,7 +3246,7 @@ void correct_readcorr(struct in_cmd* cmd)
              printf("seq d in (3): %s %d %s %d\n",uslnname,strlen(uslnname),uslname,strlen(uslname)); 
              printf("compare: %s %d %s %d \n",uslname,strlen(uslname),uslnname,strlen(uslnname)); */
        
-             if(strcmp(uslname,uslnname) == 0) {
+             if(my_strcmp(uslname,uslnname) == 0) {
                 /*
                 printf("Corrector selection found: %s, %s %d\n",lname,nextnode->name,nextnode->sel_err);
                 printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);    

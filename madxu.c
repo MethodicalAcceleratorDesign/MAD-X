@@ -68,7 +68,7 @@ void add_table_vars(struct name_list* cols, struct command_list* select)
       for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
       {
         var_name = pl->parameters[pos]->m_string->p[j];
-        if (strcmp(var_name, "apertype") == 0)
+        if (my_strcmp(var_name, "apertype") == 0)
         {
           if ((n = aperture_count(current_sequ)) > 0)
           {
@@ -180,7 +180,7 @@ void add_to_el_list( /* adds element to alphabetic element list */
             if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
             p_node = p_node->next;
           }
-          if (strcmp((*el)->base_type->name, "rfcavity") == 0 &&
+          if (my_strcmp((*el)->base_type->name, "rfcavity") == 0 &&
 	      find_element((*el)->name, sequences->sequs[j]->cavities) != NULL)
 	    sequences->sequs[j]->cavities->elem[name_list_pos((*el)->name,
                                                               sequences->sequs[j]->cavities->list)] = *el;
@@ -239,6 +239,7 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
   /* RDM new matching*/
 }
 
+
 int add_to_name_list(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
@@ -253,7 +254,7 @@ int add_to_name_list(char* name, int inf, struct name_list* vlist)
     while (low <= high)
     {
       mid = (low + high) / 2;
-      if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0)
+      if ((num = my_strcmp(name, vlist->names[vlist->index[mid]])) < 0)
       {
         high = mid - 1; pos = mid;
       }
@@ -302,7 +303,7 @@ void add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
       continue;
     }
    
-    if (strcmp(sql->sequs[i]->name, sequ->name) == 0)
+    if (my_strcmp(sql->sequs[i]->name, sequ->name) == 0)
     {
       /*printf("add_to_sequ_list sequence with this name is already in: %s \n",sequ->name);*/
       sql->sequs[i] = sequ;
@@ -530,7 +531,7 @@ int char_p_pos(char* name, struct char_p_array* p)
      or -1 if not found */
 {
   int i;
-  for (i = 0; i < p->curr; i++) if (strcmp(name, p->p[i]) == 0) return i;
+  for (i = 0; i < p->curr; i++) if (my_strcmp(name, p->p[i]) == 0) return i;
   return -1;
 }
 
@@ -873,7 +874,7 @@ int compare_no_case(char* string_1, char* string_2)
   char* s2 = mymalloc(rout_name, strlen(string_2)+1);
   strcpy(s1, string_1); stolower(s1);
   strcpy(s2, string_2); stolower(s2);
-  ret = strcmp(s1, s2);
+  ret = my_strcmp(s1, s2);
   myfree(rout_name, s1); myfree(rout_name, s2);
   return ret;
 }
@@ -1332,7 +1333,7 @@ void dump_exp_sequ(struct sequence* sequ, int level)
       }
       if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
     }
-    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
+    else if (level > 0 && my_strcmp(c_node->base_name, "drift") != 0)
       fprintf(prt_file, v_format("%S: at = %F  flag = %I\n"), c_node->name,
               c_node->position, c_node->enable);
     if (c_node == sequ->ex_end)  break;
@@ -1422,7 +1423,7 @@ void dump_sequ(struct sequence* c_sequ, int level)
       dump_node(c_node);
       if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
     }
-    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
+    else if (level > 0 && my_strcmp(c_node->base_name, "drift") != 0)
       fprintf(prt_file, v_format("%S: at = %F\n"),
               c_node->name, c_node->position);
     if (c_node == c_sequ->end)  break;
@@ -1610,43 +1611,43 @@ void export_el_def_8(struct element* el, char* string)
     par = def->par->parameters[i];
     if (def->par_names->inform[i])
     {
-      if (strcmp(base_name, "quadrupole") == 0)
+      if (my_strcmp(base_name, "quadrupole") == 0)
       {
         div = 2;
-        if (strcmp(par->name,"k1") == 0) val[0] = command_par_special("k1", el);
-        else if (strcmp(par->name,"k1s") == 0)
+        if (my_strcmp(par->name,"k1") == 0) val[0] = command_par_special("k1", el);
+        else if (my_strcmp(par->name,"k1s") == 0)
           val[1] = command_par_special("k1s", el);
-        else if (strcmp(par->name,"tilt") == 0)
+        else if (my_strcmp(par->name,"tilt") == 0)
           val[2] = command_par_special("tilt", el);
         else if(par_out_flag(el->base_type->name, par->name))
           export_el_par_8(par, string);
       }
-      else if (strcmp(base_name, "sextupole") == 0)
+      else if (my_strcmp(base_name, "sextupole") == 0)
       {
         div = 3;
-        if (strcmp(par->name,"k2") == 0) val[0] = command_par_special("k2", el);
-        else if (strcmp(par->name,"k2s") == 0)
+        if (my_strcmp(par->name,"k2") == 0) val[0] = command_par_special("k2", el);
+        else if (my_strcmp(par->name,"k2s") == 0)
           val[1] = command_par_special("k2s", el);
-        else if (strcmp(par->name,"tilt") == 0)
+        else if (my_strcmp(par->name,"tilt") == 0)
           val[2] = command_par_special("tilt", el);
         else if(par_out_flag(el->base_type->name, par->name))
           export_el_par_8(par, string);
       }
-      else if (strcmp(base_name, "octupole") == 0)
+      else if (my_strcmp(base_name, "octupole") == 0)
       {
         div = 4;
-        if (strcmp(par->name,"k3") == 0) val[0] = command_par_special("k3", el);
-        else if (strcmp(par->name,"k3s") == 0)
+        if (my_strcmp(par->name,"k3") == 0) val[0] = command_par_special("k3", el);
+        else if (my_strcmp(par->name,"k3s") == 0)
           val[1] = command_par_special("k3s", el);
-        else if (strcmp(par->name,"tilt") == 0)
+        else if (my_strcmp(par->name,"tilt") == 0)
           val[2] = command_par_special("tilt", el);
         else if(par_out_flag(el->base_type->name, par->name))
           export_el_par_8(par, string);
       }
-      else if (strcmp(base_name, "elseparator") == 0)
+      else if (my_strcmp(base_name, "elseparator") == 0)
       {
-        if (strcmp(par->name,"ex") == 0) val[0] = command_par_special("ex", el);
-        else if (strcmp(par->name,"ey") == 0)
+        if (my_strcmp(par->name,"ex") == 0) val[0] = command_par_special("ex", el);
+        else if (my_strcmp(par->name,"ey") == 0)
           val[1] = command_par_special("ey", el);
         else if(par_out_flag(el->base_type->name, par->name))
           export_el_par_8(par, string);
@@ -1661,19 +1662,19 @@ void export_el_def_8(struct element* el, char* string)
   if (val[0] != zero)
   {
     strcat(string, ",");
-    if (strcmp(base_name, "quadrupole") == 0)
+    if (my_strcmp(base_name, "quadrupole") == 0)
     {
       strcat(string, "k1 =");
     }
-    else if (strcmp(base_name, "sextupole") == 0)
+    else if (my_strcmp(base_name, "sextupole") == 0)
     {
       strcat(string, "k2 =");
     }
-    else if (strcmp(base_name, "octupole") == 0)
+    else if (my_strcmp(base_name, "octupole") == 0)
     {
       strcat(string, "k3 =");
     }
-    else if (strcmp(base_name, "elseparator") == 0)
+    else if (my_strcmp(base_name, "elseparator") == 0)
     {
       strcat(string, "e =");
     }
@@ -1707,7 +1708,7 @@ void export_el_par_8(struct command_parameter* par, char* string)
       strcat(string, ",");
       strcat(string, par->name);
       strcat(string, "=");
-      if (par->expr != NULL && strcmp(par->name, "harmon") != 0)
+      if (par->expr != NULL && my_strcmp(par->name, "harmon") != 0)
         strcat(string, par->expr->string);
       else
       {
@@ -1730,7 +1731,7 @@ void export_el_par_8(struct command_parameter* par, char* string)
       break;
     case 11:
     case 12:
-      vtilt = strcmp(par->name, "ks") == 0 ? 1 : 0;
+      vtilt = my_strcmp(par->name, "ks") == 0 ? 1 : 0;
       for (last = par->double_array->curr-1; last > 0; last--)
       {
         if (par->expr_list->list[last] != NULL)
@@ -1808,7 +1809,7 @@ void export_sequence(struct sequence* sequ, FILE* file)
     *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
         && strstr(c_node->name, "_p_") == NULL
-        && strcmp(c_node->base_name, "drift") != 0)
+        && my_strcmp(c_node->base_name, "drift") != 0)
     {
       if ((el = c_node->p_elem) != NULL)
       {
@@ -1867,7 +1868,7 @@ void export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
     exp_par_flag = 0;
     *c_dum->c = '\0';
     if (strchr(c_node->name, '$') == NULL
-        && strcmp(c_node->base_name, "drift") != 0)
+        && my_strcmp(c_node->base_name, "drift") != 0)
     {
       if ((el = c_node->p_elem) != NULL)
       {
@@ -1971,7 +1972,7 @@ double find_value(char* name, int ntok, char** toks)
   int j;
   for (j = 0; j < ntok; j++)
   {
-    if (strcmp(toks[j], name) == 0)
+    if (my_strcmp(toks[j], name) == 0)
     {
       if (j+2 < ntok && *toks[j+1] == '=')
       {
@@ -2690,15 +2691,31 @@ void myrepl(char* in, char* out, char* string_in, char* string_out)
   strcpy(string_out, string_in);
 }
 
-int name_list_pos(char* p, struct name_list* vlist)
-{
-  int num, mid, low = 0, high = vlist->curr - 1;
-  while (low <= high)
-  {
+int name_list_pos(char *p, struct name_list* vlist){
+  int num, mid, low = 0, high = vlist->curr-1;
+
+  while (low <= high) {
     mid = (low + high) / 2;
-    if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
-    else if ( num > 0) low  = mid + 1;
-    else               return vlist->index[mid];
+    /* optimization: compare first character before invoking strcmp */
+    if ( (*p) < (*(vlist->names[vlist->index[mid]])) ) { 
+      high = mid-1;
+    } else { 
+      /* optimization: compare first character before invoking strcmp */
+      if ( (*p) > (*(vlist->names[vlist->index[mid]])) ) { 
+	low = mid+1;
+      } else {
+	if ((num=my_strcmp(p,vlist->names[vlist->index[mid]]))<0) { 
+	  high = mid-1;
+	} else { 
+	  if (num>0) { 
+	    low = mid+1;
+	  } else {
+	    // num == 0
+	    return vlist->index[mid];
+	  }
+	}
+      }
+    }
   }
   return -1;
 }
@@ -3350,13 +3367,13 @@ char* noquote(char* string)
 int par_out_flag(char* base_name, char* par_name)
 {
   /* marks the element parameters that are to be written on "save" */
-  if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
-  if (strcmp(base_name, "multipole") == 0
-      && strcmp(par_name,"l") == 0) return 0;
-  if (strcmp(base_name, "rcollimator") == 0
-      && strcmp(par_name,"lrad") == 0) return 0;
-  if (strcmp(base_name, "ecollimator") == 0
-      && strcmp(par_name,"lrad") == 0) return 0;
+  if (my_strcmp(par_name,"at") == 0 || my_strcmp(par_name,"from") == 0) return 0;
+  if (my_strcmp(base_name, "multipole") == 0
+      && my_strcmp(par_name,"l") == 0) return 0;
+  if (my_strcmp(base_name, "rcollimator") == 0
+      && my_strcmp(par_name,"lrad") == 0) return 0;
+  if (my_strcmp(base_name, "ecollimator") == 0
+      && my_strcmp(par_name,"lrad") == 0) return 0;
   return 1;
 }
 
@@ -3588,7 +3605,7 @@ int remove_from_name_list(char* name, struct name_list* nl)
 {
   int j, i, k = -1;
   for (i = 0; i < nl->curr; i++)
-    if (strcmp(nl->names[nl->index[i]], name) == 0) break;
+    if (my_strcmp(nl->names[nl->index[i]], name) == 0) break;
   
   
   if (i < nl->curr)
@@ -3779,7 +3796,7 @@ char* supp_tb(char* string) /* suppress trailing blanks in string */
 
 void termination_handler(int signum)
 {
-  if (strcmp(myfree_caller, "none") == 0)
+  if (my_strcmp(myfree_caller, "none") == 0)
     puts("+++ memory access outside program range, fatal +++");
   else
     printf("+++ illegal call to free memory from routine: %s +++\n",
@@ -3991,7 +4008,7 @@ void write_table(struct table* t, char* filename)
 
   time(&now);    /* get system time */
   tm = localtime(&now); /* split system time */
-  if (strcmp(filename, "terminal") == 0) out_file = stdout;
+  if (my_strcmp(filename, "terminal") == 0) out_file = stdout;
   else if ((out_file = fopen(filename, "w")) == NULL)
   {
     warning("cannot open output file:", filename); return;
@@ -4101,7 +4118,7 @@ void write_table(struct table* t, char* filename)
         fprintf(out_file, "\n");
       }
     }
-    if (strcmp(filename, "terminal") != 0) fclose(out_file);
+    if (my_strcmp(filename, "terminal") != 0) fclose(out_file);
   }
 }
 

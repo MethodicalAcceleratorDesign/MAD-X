@@ -1060,52 +1060,52 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
     {
       seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
     }
-    else if(strcmp(thick_node->base_name,"matrix") == 0)
+    else if(my_strcmp(thick_node->base_name,"matrix") == 0)
     { /*hbu. Take matrix as it is, including any length */
       seq_diet_add(thick_node,thin_sequ);
     }
     else
     { /* we have to slim it down a bit...*/
-      if (strcmp(thick_node->base_name,"marker") == 0    ||
-          strcmp(thick_node->base_name,"instrument") == 0  ||
-          strcmp(thick_node->base_name,"hmonitor") == 0    ||
-          strcmp(thick_node->base_name,"vmonitor") == 0    ||
-          strcmp(thick_node->base_name,"monitor") == 0     ||
-          strcmp(thick_node->base_name,"vkicker") == 0     ||
-          strcmp(thick_node->base_name,"hkicker") == 0     ||
-          strcmp(thick_node->base_name,"kicker") == 0      ||
-          strcmp(thick_node->base_name,"rfcavity") == 0    ||
-	  strcmp(thick_node->base_name,"crabcavity") == 0
+      if (my_strcmp(thick_node->base_name,"marker") == 0    ||
+          my_strcmp(thick_node->base_name,"instrument") == 0  ||
+          my_strcmp(thick_node->base_name,"hmonitor") == 0    ||
+          my_strcmp(thick_node->base_name,"vmonitor") == 0    ||
+          my_strcmp(thick_node->base_name,"monitor") == 0     ||
+          my_strcmp(thick_node->base_name,"vkicker") == 0     ||
+          my_strcmp(thick_node->base_name,"hkicker") == 0     ||
+          my_strcmp(thick_node->base_name,"kicker") == 0      ||
+          my_strcmp(thick_node->base_name,"rfcavity") == 0    ||
+	  my_strcmp(thick_node->base_name,"crabcavity") == 0
         )
       {
         seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
         /*   delete_node(thick_node); */
         /* special cavity list stuff */
-        if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
+        if (my_strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
             find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
           add_to_el_list(&thin_node->p_elem, 0, thin_sequ->cavities, 0);
 	/* special crab cavity list stuff */
-        if (strcmp(thin_node->p_elem->base_type->name, "crabcavity") == 0 &&
+        if (my_strcmp(thin_node->p_elem->base_type->name, "crabcavity") == 0 &&
             find_element(thin_node->p_elem->name, thin_sequ->crabcavities) == NULL)
           add_to_el_list(&thin_node->p_elem, 0, thin_sequ->crabcavities, 0);
       }
-      else if (strcmp(thick_node->base_name,"rbend") == 0 ||
-               strcmp(thick_node->base_name,"sbend") == 0       ||
-               strcmp(thick_node->base_name,"quadrupole") == 0  ||
-               strcmp(thick_node->base_name,"sextupole") == 0   ||
-               strcmp(thick_node->base_name,"octupole") == 0    ||
-               strcmp(thick_node->base_name,"solenoid") == 0    || /*hbu */
-               strcmp(thick_node->base_name,"multipole") == 0
+      else if (my_strcmp(thick_node->base_name,"rbend") == 0 ||
+               my_strcmp(thick_node->base_name,"sbend") == 0       ||
+               my_strcmp(thick_node->base_name,"quadrupole") == 0  ||
+               my_strcmp(thick_node->base_name,"sextupole") == 0   ||
+               my_strcmp(thick_node->base_name,"octupole") == 0    ||
+               my_strcmp(thick_node->base_name,"solenoid") == 0    || /*hbu */
+               my_strcmp(thick_node->base_name,"multipole") == 0
                || /* special spliting required. */
-               strcmp(thick_node->base_name,"rcollimator") == 0 ||
-               strcmp(thick_node->base_name,"ecollimator") == 0 ||
-               strcmp(thick_node->base_name,"elseparator") == 0
+               my_strcmp(thick_node->base_name,"rcollimator") == 0 ||
+               my_strcmp(thick_node->base_name,"ecollimator") == 0 ||
+               my_strcmp(thick_node->base_name,"elseparator") == 0
         )
       {
         seq_diet_add_elem(thick_node,thin_sequ);
         /*   delete_node(thick_node); */
       }
-      else if (strcmp(thick_node->base_name,"drift") == 0)
+      else if (my_strcmp(thick_node->base_name,"drift") == 0)
       {
         /* ignore this as it makes no sense to slice */
       }
@@ -1327,15 +1327,15 @@ double collim_q_shift(int slices,int slice_no)
 /* return at relative shifts from center of unsliced magnet */
 double at_shift(int slices,int slice_no)
 {
-  if (thin_style == NULL || strcmp(thin_style,"teapot")==0)
+  if (thin_style == NULL || my_strcmp(thin_style,"teapot")==0)
   {
     return teapot_at_shift(slices,slice_no);
   }
-  else if (strcmp(thin_style,"simple")==0)
+  else if (my_strcmp(thin_style,"simple")==0)
   {
     return simple_at_shift(slices,slice_no);
   }
-  else if (strcmp(thin_style,"collim")==0)
+  else if (my_strcmp(thin_style,"collim")==0)
   {
     return collim_at_shift(slices,slice_no);
   }
@@ -1349,15 +1349,15 @@ double at_shift(int slices,int slice_no)
 /* return at relative strength shifts from unsliced magnet */
 double q_shift(int slices,int slice_no)
 {
-  if (thin_style == NULL || strcmp(thin_style,"teapot")==0)
+  if (thin_style == NULL || my_strcmp(thin_style,"teapot")==0)
   {
     return teapot_q_shift(slices,slice_no);
   }
-  else if (strcmp(thin_style,"simple")==0)
+  else if (my_strcmp(thin_style,"simple")==0)
   {
     return simple_q_shift(slices,slice_no);
   }
-  else if (strcmp(thin_style,"collim")==0)
+  else if (my_strcmp(thin_style,"collim")==0)
   {
     return collim_q_shift(slices,slice_no);
   }
