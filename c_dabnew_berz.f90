@@ -605,6 +605,10 @@ contains
        !
        if(nhole.gt.0) then
           ind=nda_dab
+          if(ind.gt.lda) then
+             print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+             stop
+          endif
 20        if (allvec(ind)) then
              ind = ind - 1
              goto 20
@@ -622,6 +626,10 @@ contains
           endif
        endif
 
+       if(ind.gt.lda) then
+          print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+          stop
+       endif
        allvec(ind) = .true.
        ic = ind
        !
@@ -714,6 +722,10 @@ contains
           !
           if(nhole.gt.0) then
              ind=nda_dab
+             if(ind.gt.lda) then
+                print*, 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+                stop
+             endif
 20           if (allvec(ind)) then
                 ind = ind - 1
                 goto 20
@@ -732,6 +744,10 @@ contains
              endif
           endif
           !write(30,*) no,ind,lda,size(allvec)
+          if(ind.gt.lda) then
+             print*, 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+             stop
+          endif
           allvec(ind) = .true.
 
           ic(i) = ind
@@ -826,6 +842,10 @@ contains
        !
        if(nhole.gt.0) then
           ind=nda_dab
+          if(ind.gt.lda) then
+             print*, 'ERROR IN DAALL1_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+             stop
+          endif
 20        if (allvec(ind)) then
              ind = ind - 1
              goto 20
@@ -843,6 +863,10 @@ contains
           endif
        endif
 
+       if(ind.gt.lda) then
+          print*, 'ERROR IN DAALL1_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+          stop
+       endif
        allvec(ind) = .true.
 
        ic = ind
@@ -940,6 +964,10 @@ contains
        !
        if(nhole.gt.0) then
           ind=nda_dab
+          if(ind.gt.lda) then
+             print*, 'ERROR IN DAALL0_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+             stop
+          endif
 20        if (allvec(ind)) then
              ind = ind - 1
              goto 20
@@ -957,6 +985,10 @@ contains
           endif
        endif
 
+       if(ind.gt.lda) then
+          print*, 'ERROR IN DAALL0_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+          stop
+       endif
        allvec(ind) = .true.
 
        ic = ind
@@ -1049,6 +1081,10 @@ contains
           nhole=nhole+1
        endif
 
+       if(idal(i).gt.lda) then
+          print*, 'ERROR IN DADAL_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+          stop
+       endif
        allvec(idal(i)) = .false.
 
        !        IDANO(IDAL(I)) = 0
@@ -1094,6 +1130,10 @@ contains
        nhole=nhole+1
     endif
 
+    if(idal.gt.lda) then
+       print*, 'ERROR IN DADAL1_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+       stop
+    endif
     allvec(idal) = .false.
 
     !        IDANO(IDAL(I)) = 0
