@@ -2704,7 +2704,8 @@ int name_list_pos(char *p, struct name_list* vlist){
       if ( (*p) > (*(vlist->names[vlist->index[mid]])) ) { 
 	low = mid+1;
       } else {
-	if ((num=my_strcmp(p,vlist->names[vlist->index[mid]]))<0) { 
+	if ((num=strcmp(p,vlist->names[vlist->index[mid]]))<0) {
+	  /* my_strcmp would perform redundant test here */
 	  high = mid-1;
 	} else { 
 	  if (num>0) { 
