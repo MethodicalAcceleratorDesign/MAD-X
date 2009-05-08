@@ -159,8 +159,16 @@ endif
 ifeq ($(SLC4),YES)
   ifeq ($(f95),gfortran)
     # Needed on SLC4
+    #
+    # works on SLC4 genuine 32bit
+    #
+    # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/i686/setup.csh
+    # GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/i686/bin/
+    #
+    # works on SLC4 lxplus 64bit needed for 32bit
+    #
     # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
-    GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
+    GF_HOME= /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
      CC=$(GF_HOME)gcc
     f95=$(GF_HOME)gfortran
     f95_FLAGS+= $(M32)
