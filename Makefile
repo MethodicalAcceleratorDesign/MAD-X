@@ -161,7 +161,7 @@ ifeq ($(SLC4),YES)
     # Needed on SLC4
     # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
     GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
-    CC=$(GF_HOME)gcc
+     CC=$(GF_HOME)gcc
     f95=$(GF_HOME)gfortran
     f95_FLAGS+= $(M32)
   endif
@@ -180,7 +180,7 @@ ifeq ($(SLC5),YES)
 endif
 
 ifeq ($(SLC4),YES)
-  LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/usr/lib/gcc/x86_64-redhat-linux5E/4.1.2/32 -lstdc++ -lgcc_eh
+  LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread /afs/cern.ch/sw/lcg/contrib/gcc/4.3.2/slc4_ia32_gcc34/lib/libstdc++.a /afs/cern.ch/sw/lcg/contrib/gcc/4.3.2/slc4_ia32_gcc34/lib/gcc/i686-pc-linux-gnu/4.3.2/libgcc_eh.a
 endif
 
 ifeq ($(FC8),YES)
