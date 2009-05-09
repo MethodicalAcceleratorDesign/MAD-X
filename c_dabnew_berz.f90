@@ -5,7 +5,7 @@
 ! United States of America
 
 !$$$$ module dabnew
-module dabnew_b
+module dabnew_b  !$$$$
   use da_arrays
   implicit none
   !  private
@@ -22,13 +22,13 @@ module dabnew_b
   !  PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR
   !  PUBLIC DACFUI,DAPRI77,DAREA77,GET_C_J,PPUSH1,DALLSTA,dacycle
   !  public count_da
-  private dacsu !$$$$
   integer,private,parameter:: lsw=1
+  integer :: lda_max_used=0
 
   ! integer,private,parameter::nmax=400,lsw=1
   ! real(dp),private,parameter::tiny=c_1d_20
   character(120),private :: line
-
+  private dacsu_b !$$$$
 contains
   !******************************************************************************
   !                                                                             *
@@ -215,8 +215,8 @@ contains
     endif
   end  subroutine change_package
 
-  !$$$$  subroutine daini(no,nv,nd2t,iunit)
-  subroutine daini_b(no,nv,iunit)
+  !$$$$  subroutine daini(no,nv,iunit)
+  subroutine daini_b(no,nv,iunit)  !$$$$
     implicit none
     !     *****************************
     !
@@ -468,7 +468,7 @@ contains
     enddo
     !
     return
-  end subroutine daini_b
+  end subroutine daini_b !$$$$
   !$$$$  end subroutine daini
 
   !  subroutine daexter
@@ -605,10 +605,6 @@ contains
        !
        if(nhole.gt.0) then
           ind=nda_dab
-          if(ind.gt.lda) then
-             print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
-             stop
-          endif
 20        if (allvec(ind)) then
              ind = ind - 1
              goto 20
@@ -626,7 +622,9 @@ contains
           endif
        endif
 
-       if(ind.gt.lda) then
+       if(ind>lda_max_used) lda_max_used=ind
+       if(ind>lda) then
+          write(6,*) "ind>lda ",lda,ind
           print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
           stop
        endif
@@ -722,10 +720,6 @@ contains
           !
           if(nhole.gt.0) then
              ind=nda_dab
-             if(ind.gt.lda) then
-                print*, 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
-                stop
-             endif
 20           if (allvec(ind)) then
                 ind = ind - 1
                 goto 20
@@ -744,8 +738,10 @@ contains
              endif
           endif
           !write(30,*) no,ind,lda,size(allvec)
-          if(ind.gt.lda) then
-             print*, 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+          if(ind>lda_max_used) lda_max_used=ind
+          if(ind>lda) then
+             write(6,*) "ind>lda ",lda,ind
+             print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
              stop
           endif
           allvec(ind) = .true.
@@ -807,7 +803,7 @@ contains
     return
   end subroutine daall
 
-  subroutine daall1_b(ic,ccc,no,nv)
+  subroutine daall1_b(ic,ccc,no,nv) !$$$$
     !$$$$  subroutine daall1(ic,ccc,no,nv)
     implicit none
     !     ********************************
@@ -842,10 +838,6 @@ contains
        !
        if(nhole.gt.0) then
           ind=nda_dab
-          if(ind.gt.lda) then
-             print*, 'ERROR IN DAALL1_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
-             stop
-          endif
 20        if (allvec(ind)) then
              ind = ind - 1
              goto 20
@@ -863,8 +855,10 @@ contains
           endif
        endif
 
-       if(ind.gt.lda) then
-          print*, 'ERROR IN DAALL1_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+       if(ind>lda_max_used) lda_max_used=ind
+       if(ind>lda) then
+          write(6,*) "ind>lda ",lda,ind
+          print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
           stop
        endif
        allvec(ind) = .true.
@@ -924,10 +918,10 @@ contains
 
     return
     !$$$$  end subroutine daall1
-  end subroutine daall1_b
+  end subroutine daall1_b  !$$$$
 
   !$$$$  subroutine daall0(ic)
-  subroutine daall0_b(ic)
+  subroutine daall0_b(ic) !$$$$
     implicit none
     !     ********************************
     !
@@ -964,10 +958,6 @@ contains
        !
        if(nhole.gt.0) then
           ind=nda_dab
-          if(ind.gt.lda) then
-             print*, 'ERROR IN DAALL0_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
-             stop
-          endif
 20        if (allvec(ind)) then
              ind = ind - 1
              goto 20
@@ -985,8 +975,10 @@ contains
           endif
        endif
 
-       if(ind.gt.lda) then
-          print*, 'ERROR IN DAALL0_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
+       if(ind>lda_max_used) lda_max_used=ind
+       if(ind>lda) then
+          write(6,*) "ind>lda ",lda,ind
+          print*, 'ERROR IN DAALLNO1, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
           stop
        endif
        allvec(ind) = .true.
@@ -1046,11 +1038,11 @@ contains
 
     return
     !$$$$  end subroutine daall0
-  end subroutine daall0_b
+  end subroutine daall0_b !$$$$
 
   !
   !$$$$  subroutine dadal(idal,l)
-  subroutine dadal_b(idal,l)
+  subroutine dadal_b(idal,l) !$$$$
     implicit none
     !     ************************
     !
@@ -1081,10 +1073,6 @@ contains
           nhole=nhole+1
        endif
 
-       if(idal(i).gt.lda) then
-          print*, 'ERROR IN DADAL_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
-          stop
-       endif
        allvec(idal(i)) = .false.
 
        !        IDANO(IDAL(I)) = 0
@@ -1098,10 +1086,10 @@ contains
 
     return
     !$$$$  end subroutine dadal
-  end subroutine dadal_b
+  end subroutine dadal_b !$$$$
 
   !$$$$  subroutine dadal1(idal)
-  subroutine dadal1_b(idal)
+  subroutine dadal1_b(idal) !$$$$
     implicit none
     !     ************************
     !
@@ -1130,10 +1118,6 @@ contains
        nhole=nhole+1
     endif
 
-    if(idal.gt.lda) then
-       print*, 'ERROR IN DADAL1_B, MAX NUMBER OF DA VECTORS EXHAUSTED: LDA = ',LDA
-       stop
-    endif
     allvec(idal) = .false.
 
     !        IDANO(IDAL(I)) = 0
@@ -1146,10 +1130,10 @@ contains
 
     return
     !$$$$  end subroutine dadal1
-  end subroutine dadal1_b
+  end subroutine dadal1_b !$$$$
 
   !$$$$  subroutine count_da(n)
-  subroutine count_da_b(n)
+  subroutine count_da_b(n) !$$$$
     implicit none
     !     ************************
     !
@@ -1165,10 +1149,10 @@ contains
     enddo
     return
     !$$$$  end subroutine count_da
-  end subroutine count_da_b
+  end subroutine count_da_b !$$$$
 
   !$$$$  subroutine davar(ina,ckon,i)
-  subroutine davar_b(ina,ckon,i)
+  subroutine davar_b(ina,ckon,i) !$$$$
     implicit none
     !     ****************************
     !
@@ -1240,10 +1224,10 @@ contains
     !
     return
     !$$$$  end subroutine davar
-  end subroutine davar_b
+  end subroutine davar_b !$$$$
   !
   !$$$$  subroutine dacon(ina,ckon)
-  subroutine dacon_b(ina,ckon)
+  subroutine dacon_b(ina,ckon) !$$$$
     implicit none
     !     **************************
     !
@@ -1283,10 +1267,10 @@ contains
     !
     return
     !$$$$  end subroutine dacon
-  end subroutine dacon_b
+  end subroutine dacon_b !$$$$
   !
   !$$$$  subroutine danot(not)
-  subroutine danot_b(not)
+  subroutine danot_b(not) !$$$$
     implicit none
     !     *********************
     !
@@ -1311,7 +1295,7 @@ contains
     nocut = not
     !
     return
-  end subroutine danot_b
+  end subroutine danot_b !$$$$
   !$$$$  end subroutine danot
 
   !  subroutine getdanot(not)
@@ -1336,7 +1320,7 @@ contains
   !  end subroutine getdanot
 
   !$$$$  subroutine daeps(deps)
-  subroutine daeps_b(deps)
+  subroutine daeps_b(deps) !$$$$
     implicit none
     !     **********************
     !
@@ -1354,10 +1338,10 @@ contains
     !
     return
     !$$$$  end subroutine daeps
-  end subroutine daeps_b
+  end subroutine daeps_b !$$$$
   !
   !$$$$  subroutine dapek(ina,jv,cjj)
-  subroutine dapek_b(ina,jv,cjj)
+  subroutine dapek_b(ina,jv,cjj) !$$$$
     implicit none
     !     ****************************
     !
@@ -1488,10 +1472,10 @@ contains
     goto 10
     !
     !$$$$  end subroutine dapek
-  end subroutine dapek_b
+  end subroutine dapek_b !$$$$
   !
   !$$$$  subroutine dapok(ina,jv,cjj)
-  subroutine dapok_b(ina,jv,cjj)
+  subroutine dapok_b(ina,jv,cjj) !$$$$
     implicit none
     !     ****************************
     !
@@ -1657,10 +1641,10 @@ contains
     return
     !
     !$$$$  end subroutine dapok
-  end subroutine dapok_b
+  end subroutine dapok_b !$$$$
   !
   !$$$$  subroutine daclr(inc)
-  subroutine daclr_b(inc)
+  subroutine daclr_b(inc) !$$$$
     implicit none
     !     *********************
     !
@@ -1693,10 +1677,10 @@ contains
     !
     return
     !$$$$  end subroutine daclr
-  end subroutine daclr_b
+  end subroutine daclr_b !$$$$
   !
   !$$$$  subroutine dacop(ina,inb)
-  subroutine dacop_b(ina,inb)
+  subroutine dacop_b(ina,inb) !$$$$
     implicit none
     !     *************************
     !
@@ -1741,12 +1725,12 @@ contains
     !
     idall(inb) = ib - ipob + 1
     return
-    !  end subroutine dacop
-  end subroutine dacop_b
+    !$$$$  end subroutine dacop
+  end subroutine dacop_b !$$$$
 
 
   !$$$$  subroutine daadd(ina,inb,inc)
-  subroutine daadd_b(ina,inb,inc)
+  subroutine daadd_b(ina,inb,inc) !$$$$
     implicit none
     !     *****************************
     !
@@ -1788,10 +1772,10 @@ contains
     !
     return
     !$$$$  end subroutine daadd
-  end subroutine daadd_b
+  end subroutine daadd_b !$$$$
   !
   !$$$$    subroutine datrunc(ina,io,inb)
-  subroutine datrunc_b(ina,io,inb)
+  subroutine datrunc_b(ina,io,inb) !$$$$
     implicit none
     integer ina,io,inb,nt
     if((.not.C_%STABLE_DA)) then
@@ -1812,11 +1796,11 @@ contains
     nocut = nt
 
 
-    !    end subroutine datrunc
-  end subroutine datrunc_b
+    !$$$$    end subroutine datrunc
+  end subroutine datrunc_b !$$$$
 
   !$$$$  subroutine dasub(ina,inb,inc)
-  subroutine dasub_b(ina,inb,inc)
+  subroutine dasub_b(ina,inb,inc) !$$$$
     implicit none
     !     THIS SUBROUTINE PERFORMS A DA SUBTRACTION OF THE DA VECTORS A AND B.
     !     THE RESULT IS STORED IN C.
@@ -1857,10 +1841,10 @@ contains
     !
     return
     !$$$$  end subroutine dasub
-  end subroutine dasub_b
+  end subroutine dasub_b !$$$$
 
   !$$$$  subroutine damul(ina,inb,inc)
-  subroutine damul_b(ina,inb,inc)
+  subroutine damul_b(ina,inb,inc) !$$$$
     implicit none
     !     *****************************
     !
@@ -1908,7 +1892,7 @@ contains
 
     return
     !$$$$  end subroutine damul
-  end subroutine damul_b
+  end subroutine damul_b !$$$$
 
   subroutine damult(ina,inb,inc)
     implicit none
@@ -2031,7 +2015,7 @@ contains
   end subroutine damult
   !
   !$$$$  subroutine dadiv(ina,inb,inc)
-  subroutine dadiv_b(ina,inb,inc)
+  subroutine dadiv_b(ina,inb,inc) !$$$$
     implicit none
     !     *************************
     !
@@ -2075,8 +2059,8 @@ contains
     call dadal1_b(idadiv)
     !
     return
-    !  end subroutine dadiv
-  end subroutine dadiv_b
+    !$$$$  end subroutine dadiv
+  end subroutine dadiv_b !$$$$
 
   !
   subroutine dasqr(ina,inc)
@@ -2245,7 +2229,7 @@ contains
   end subroutine dasqrt
   !
   !$$$$  subroutine dacad(ina,ckon,inb)
-  subroutine dacad_b(ina,ckon,inb)
+  subroutine dacad_b(ina,ckon,inb) !$$$$
     !  use da_arrays
     implicit none
     !    integer,dimension(lnv)::jjy
@@ -2278,9 +2262,10 @@ contains
     !
     return
     !$$$$  end subroutine dacad
-  end subroutine dacad_b
+  end subroutine dacad_b !$$$$
   !
-  subroutine dacsu(ina,ckon,inb)
+  subroutine dacsu_b(ina,ckon,inb) !$$$$
+    !$$$$  subroutine dacsu(ina,ckon,inb)
     implicit none
     !     ******************************
     !
@@ -2309,10 +2294,11 @@ contains
     call dapok_b(inb,jjx,const-ckon)
     !
     return
-  end subroutine dacsu
+    !$$$$  end subroutine dacsu
+  end subroutine dacsu_b !$$$$
   !
   !$$$$  subroutine dasuc(ina,ckon,inb)
-  subroutine dasuc_b(ina,ckon,inb)
+  subroutine dasuc_b(ina,ckon,inb) !$$$$
     implicit none
     !     ******************************
     !
@@ -2343,15 +2329,15 @@ contains
        return
     endif
 
-    call dacsu(ina,ckon,inb)
+    call dacsu_b(ina,ckon,inb)
     call dacmu_b(inb,-one,inb)
     !
     return
-    !  end subroutine dasuc
-  end subroutine dasuc_b
+    !$$$$  end subroutine dasuc
+  end subroutine dasuc_b !$$$$
   !
   !$$$$  subroutine dacmu(ina,ckon,inc)
-  subroutine dacmu_b(ina,ckon,inc)
+  subroutine dacmu_b(ina,ckon,inc) !$$$$
     implicit none
     !     ******************************
     !
@@ -2393,7 +2379,7 @@ contains
 
     return
     !$$$$  end subroutine dacmu
-  end subroutine dacmu_b
+  end subroutine dacmu_b !$$$$
 
   subroutine dacmut(ina,ckon,inb)
     implicit none
@@ -2466,7 +2452,7 @@ contains
   end subroutine dacmut
   !
   !$$$$  subroutine dacdi(ina,ckon,inb)
-  subroutine dacdi_b(ina,ckon,inb)
+  subroutine dacdi_b(ina,ckon,inb) !$$$$
     implicit none
     !     ******************************
     !
@@ -2508,11 +2494,11 @@ contains
     !
     return
     !$$$$  end subroutine dacdi
-  end subroutine dacdi_b
+  end subroutine dacdi_b !$$$$
   !
   !
   !$$$$  subroutine dadic(ina,ckon,inc)
-  subroutine dadic_b(ina,ckon,inc)
+  subroutine dadic_b(ina,ckon,inc) !$$$$
     implicit none
     !     ******************************
     !
@@ -2572,7 +2558,7 @@ contains
     !
     return
     !$$$$  end subroutine dadic
-  end subroutine dadic_b
+  end subroutine dadic_b !$$$$
   !
   subroutine dacma(ina,inb,bfac,inc)
     implicit none
@@ -2615,7 +2601,7 @@ contains
     return
   end subroutine dacma
   !
-  subroutine dalin_b(ina,afac,inb,bfac,inc)
+  subroutine dalin_b(ina,afac,inb,bfac,inc) !$$$$
     !$$$$  subroutine dalin(ina,afac,inb,bfac,inc)
     implicit none
     integer ina,inb,inc,incc,ipoc
@@ -2661,7 +2647,7 @@ contains
     endif
 
     return
-  end subroutine dalin_b
+  end subroutine dalin_b !$$$$
   !$$$$  end subroutine dalin
 
 
@@ -2842,7 +2828,7 @@ contains
     return
   end subroutine dalint
   !
-  subroutine dafun_b(cf,ina,inc)
+  subroutine dafun_b(cf,ina,inc) !$$$$
     !$$$$  subroutine dafun(cf,ina,inc)
     implicit none
     !     ****************************
@@ -2875,7 +2861,7 @@ contains
     endif
 
     return
-  end subroutine dafun_b
+  end subroutine dafun_b !$$$$
   !$$$$  end subroutine dafun
 
   subroutine dafunt(cf,ina,inc)
@@ -3151,7 +3137,7 @@ contains
   !
 
   !$$$$  subroutine daabs(ina,anorm)
-  subroutine daabs_b(ina,anorm)
+  subroutine daabs_b(ina,anorm) !$$$$
     implicit none
     !     ***************************
     !
@@ -3183,11 +3169,11 @@ contains
     !
     return
     !$$$$  end subroutine daabs
-  end subroutine daabs_b
+  end subroutine daabs_b !$$$$
   !
 
   !
-  subroutine dacct_b(ma,ia,mb,ib,mc,ic)
+  subroutine dacct_b(ma,ia,mb,ib,mc,ic) !$$$$
     !$$$$  subroutine dacct(ma,ia,mb,ib,mc,ic)
     implicit none
     !     ***********************************
@@ -3230,7 +3216,7 @@ contains
     endif
 
     return
-  end subroutine dacct_b
+  end subroutine dacct_b !$$$$
   !$$$$  end subroutine dacct
 
   subroutine dacctt(mb,ib,mc,ic,ma,ia)
@@ -3340,7 +3326,7 @@ contains
   end subroutine dacctt
   !
   !$$$$  subroutine mtree(mb,ib,mc,ic)
-  subroutine mtree_b(mb,ib,mc,ic)
+  subroutine mtree_b(mb,ib,mc,ic) !$$$$
     implicit none
     !     *****************************
     !
@@ -3556,7 +3542,7 @@ contains
     call dadal1_b(ichk)
     !
     return
-  end subroutine mtree_b
+  end subroutine mtree_b !$$$$
   !$$$$  end subroutine mtree
   !
   subroutine ppushprint(mc,ic,mf,jc,line)
@@ -3595,7 +3581,7 @@ contains
   end subroutine ppushprint
   !
   !$$$$  subroutine ppushstore(mc,nd2,coef,ml,mv)
-  subroutine ppushstore_b(mc,nd2,coef,ml,mv)
+  subroutine ppushstore_b(mc,nd2,coef,ml,mv) !$$$$
     implicit none
     !
     integer i,ic,iv,jc,jl,jv,ntot,nd2
@@ -3632,10 +3618,10 @@ contains
     enddo
     return
     !$$$$  end subroutine ppushstore
-  end subroutine ppushstore_b
+  end subroutine ppushstore_b !$$$$
 
   !$$$$  subroutine ppushGETN(mc,ND2,ntot)
-  subroutine ppushGETN_b(mc,ND2,ntot)
+  subroutine ppushGETN_b(mc,ND2,ntot) !$$$$
     implicit none
     !
     integer ntot,ND2
@@ -3643,7 +3629,7 @@ contains
     !
     ntot=idall(mc(1))*nd2
     !$$$$  end subroutine ppushGETN
-  end subroutine ppushGETN_b
+  end subroutine ppushGETN_b !$$$$
   !
 
   subroutine ppush(mc,ic,xi,xf)
@@ -3699,7 +3685,7 @@ contains
   end subroutine ppush
 
   !$$$$  subroutine ppush1(mc,xi,xf)
-  subroutine ppush1_b(mc,xi,xf)
+  subroutine ppush1_b(mc,xi,xf) !$$$$
     implicit none
     !     *****************************
     !
@@ -3746,10 +3732,10 @@ contains
     endif
     return
     !$$$$  end subroutine ppush1
-  end subroutine ppush1_b
+  end subroutine ppush1_b !$$$$
 
   !$$$$  subroutine dainv(ma,ia,mb,ib)
-  subroutine dainv_b(ma,ia,mb,ib)
+  subroutine dainv_b(ma,ia,mb,ib) !$$$$
     implicit none
     !     *****************************
     !
@@ -3806,7 +3792,7 @@ contains
 
     return
     !$$$$  end subroutine dainv
-  end subroutine dainv_b
+  end subroutine dainv_b !$$$$
 
   subroutine dainvt(ma,ia,mb,ib)
     implicit none
@@ -3989,7 +3975,7 @@ contains
   end subroutine dainvt
   !
   !$$$$  subroutine dapin(ma,ia,mb,ib,jx)
-  subroutine dapin_b(ma,ia,mb,ib,jx)
+  subroutine dapin_b(ma,ia,mb,ib,jx) !$$$$
     implicit none
     !     *****************************
     !
@@ -4046,7 +4032,7 @@ contains
 
     return
     !$$$$  end subroutine dapin
-  end subroutine dapin_b
+  end subroutine dapin_b !$$$$
 
   subroutine dapint(ma,ia,mb,ib,jind)
     implicit none
@@ -4114,7 +4100,8 @@ contains
     return
   end subroutine dapint
   !
-  subroutine dader_b(idif,ina,inc)
+  !$$$$  subroutine dader(idif,ina,inc)
+  subroutine dader_b(idif,ina,inc) !$$$$
     !  subroutine dader(idif,ina,inc)
     implicit none
     !     ******************************
@@ -4150,7 +4137,7 @@ contains
     endif
 
     return
-  end subroutine dader_b
+  end subroutine dader_b !$$$$
   !$$$$  end subroutine dader
 
   subroutine dadert(idif,ina,inc)
@@ -4258,7 +4245,7 @@ contains
 
   !
   !$$$$  subroutine dacfuR(ina,fun,inc)
-  subroutine dacfuR_b(ina,fun,inc)
+  subroutine dacfuR_b(ina,fun,inc) !$$$$
     implicit none
     !     *****************************
     !
@@ -4296,7 +4283,7 @@ contains
 
     return
     !$$$$  end subroutine dacfuR
-  end subroutine dacfuR_b
+  end subroutine dacfuR_b !$$$$
 
   subroutine dacfuRt(ina,fun,inc)
     implicit none
@@ -4392,7 +4379,7 @@ contains
   end subroutine dacfuRt
   !
   !$$$$  subroutine dacfu(ina,fun,inc)
-  subroutine dacfu_b(ina,fun,inc)
+  subroutine dacfu_b(ina,fun,inc) !$$$$
     implicit none
     !     *****************************
     !
@@ -4430,10 +4417,10 @@ contains
 
     return
     !$$$$  end subroutine dacfu
-  end subroutine dacfu_b
+  end subroutine dacfu_b !$$$$
 
   !$$$$  subroutine dacfuI(ina,fun,inc)
-  subroutine dacfuI_b(ina,fun,inc)
+  subroutine dacfuI_b(ina,fun,inc) !$$$$
     implicit none
     !     *****************************
     !
@@ -4471,7 +4458,7 @@ contains
 
     return
     !$$$$  end subroutine dacfuI
-  end subroutine dacfuI_b
+  end subroutine dacfuI_b !$$$$
 
   subroutine dacfuIt(ina,fun,inc)
     implicit none
@@ -4659,22 +4646,22 @@ contains
     !
     return
   end subroutine dacfut
-  
-!  subroutine GET_C_J_b(ina,I,C,J)
-!!$$$$  subroutine GET_C_J(ina,I,C,J)
-!    implicit none
-    !
-!    INTEGER I,ina
-!    integer, dimension(lnv)::j
-!    real(dp) C
-    !
-!    C=CC(I)
-!    call dancd(i_1(I),i_2(I),J)!
 
-!  END subroutine GET_C_J_b
+  !  subroutine GET_C_J_b(ina,I,C,J)
+!!$$$$  subroutine GET_C_J(ina,I,C,J)
+  !    implicit none
+  !
+  !    INTEGER I,ina
+  !    integer, dimension(lnv)::j
+  !    real(dp) C
+  !
+  !    C=CC(I)
+  !    call dancd(i_1(I),i_2(I),J)!
+
+  !  END subroutine GET_C_J_b
 !!$$$$  END subroutine GET_C_J
 
-  subroutine dapri_b(ina,iunit)
+  subroutine dapri_b(ina,iunit) !$$$$
     !$$$$  subroutine dapri(ina,iunit)
     implicit none
     !     ***************************
@@ -4756,10 +4743,10 @@ contains
     !
     return
     !$$$$  end subroutine dapri
-  end subroutine dapri_b
+  end subroutine dapri_b !$$$$
 
-  !  subroutine dapri77(ina,iunit)
-  subroutine dapri77_b(ina,iunit)
+  !$$$$  subroutine dapri77(ina,iunit)
+  subroutine dapri77_b(ina,iunit) !$$$$
     implicit none
     !     ***************************
     !       Etienne
@@ -4856,10 +4843,10 @@ contains
     !
     return
     !$$$$  end subroutine dapri77
-  end subroutine dapri77_b
+  end subroutine dapri77_b !$$$$
 
   !$$$$  subroutine dashift(ina,inc,ishift)
-  subroutine dashift_b(ina,inc,ishift)
+  subroutine dashift_b(ina,inc,ishift) !$$$$
     implicit none
     !      real(dp) c
     !       Frank
@@ -4980,10 +4967,10 @@ contains
     !
     return
     !$$$$  end subroutine dashift
-  end subroutine dashift_b
+  end subroutine dashift_b !$$$$
 
   !$$$$  subroutine darea(ina,iunit)
-  subroutine darea_b(ina,iunit)
+  subroutine darea_b(ina,iunit) !$$$$
     implicit none
     !       Frank
     !-----------------------------------------------------------------------------
@@ -5085,11 +5072,11 @@ contains
     !
     return
     !$$$$  end subroutine darea
-  end subroutine darea_b
+  end subroutine darea_b !$$$$
   !FF
   !
   !$$$$  subroutine darea77(ina,iunit)
-  subroutine darea77_b(ina,iunit)
+  subroutine darea77_b(ina,iunit) !$$$$
     implicit none
     !     ***************************
     !     Etienne
@@ -5169,7 +5156,7 @@ contains
     !
     return
     !$$$$  end subroutine darea77
-  end subroutine darea77_b
+  end subroutine darea77_b !$$$$
 
   subroutine dadeb   !(iunit,c,istop)
     implicit none
@@ -5431,7 +5418,7 @@ contains
 
   !ETIENNE
   !$$$$  subroutine datra(idif,ina,inc)
-  subroutine datra_b(idif,ina,inc)
+  subroutine datra_b(idif,ina,inc) !$$$$
     implicit none
     !     ******************************
     !
@@ -5528,7 +5515,7 @@ contains
     !
     return
     !$$$$  end subroutine datra
-  end subroutine datra_b
+  end subroutine datra_b !$$$$
 
 
   subroutine hash(no1,nv1,jj,ic1,ic2)
@@ -5593,7 +5580,7 @@ contains
 
 
   !$$$$  subroutine daran(ina,cm,xran)
-  subroutine daran_b(ina,cm,xran)
+  subroutine daran_b(ina,cm,xran) !$$$$
     implicit none
     !     ************************
     !
@@ -5660,13 +5647,13 @@ contains
     call dapac(ina)
     !
     return
-    !  end subroutine daran
-  end subroutine daran_b
+    !$$$$  end subroutine daran
+  end subroutine daran_b !$$$$
   !
 
 
   !$$$$  subroutine dacycle(ina,ipresent,value,illa,j)
-  subroutine dacycle_b(ina,ipresent,value,illa,j)
+  subroutine dacycle_b(ina,ipresent,value,illa,j) !$$$$
     implicit none
     integer ipause, mypauses
     !     ***************************
@@ -5713,12 +5700,12 @@ contains
     return
 
     !$$$$  end subroutine dacycle
-  end subroutine dacycle_b
+  end subroutine dacycle_b !$$$$
 
 !!!! new stuff lingyun
 
   !$$$$  subroutine daclean(ina,value)
-  subroutine daclean_b(ina,value)
+  subroutine daclean_b(ina,value) !$$$$
     implicit none
     integer ipause, mypauses
     !     ***************************
@@ -5755,8 +5742,8 @@ contains
     return
 
     !$$$$  end subroutine daclean
-  end subroutine daclean_b
+  end subroutine daclean_b !$$$$
 
 
   !$$$$ end module dabnew
-end module dabnew_b
+end module dabnew_b !$$$$

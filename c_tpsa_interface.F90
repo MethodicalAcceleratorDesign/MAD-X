@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.8 2009-04-26 19:58:03 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.9 2009-05-09 20:20:41 frs Exp $
 ! */
 
 
@@ -14,7 +14,6 @@ module dabnew
   use dabnew_b !$$$$
   implicit none
   public
-  !  private
   ! integer,private,parameter:: lsw=1
 
   ! integer,private,parameter::nmax=400,lsw=1
@@ -50,7 +49,7 @@ contains
     !    integer, intent(in) :: nd,nv,nd2,k
     integer nd,nv,k
     if(lingyun_yang) then !%%%%
-     if(last_tpsa==1.and.lielib_print(10)==0) call ad_resetvars(nv)
+       if(last_tpsa==1.and.lielib_print(10)==0) call ad_resetvars(nv)
        call danum0(nd,nv)
        call ad_init(nv, nd)
        call ad_reserve(lda)
@@ -946,27 +945,27 @@ contains
   end subroutine dacfu
 
   ! done
-!  subroutine GET_C_J(ina,I,C,J)
-!    implicit none
-!    INTEGER I,nv,ns,k,ina
-!    integer, dimension(lnv)::j
-!    integer, allocatable :: j1d(:)
-!    real(dp), allocatable :: v(:)
-!    real(dp) C
-!    if(lingyun_yang) then !%%%%
-!       call ad_length(ina, ns)
-!       call ad_nvar(nv)
-!       allocate(j1d(nv*ns))
-!       call ad_read_block(ina, v, j1d, ns)
-!       C = v(i)
-!       do k=1,nv
-!          j(k) = j1d((i-1)*nv+k)
-!       enddo
-!       deallocate(j1d)
-!    else !%%%%
-!       call GET_C_J_b(ina,I,C,J)
-!    endif !%%%%
-!  end  subroutine GET_C_J
+  !  subroutine GET_C_J(ina,I,C,J)
+  !    implicit none
+  !    INTEGER I,nv,ns,k,ina
+  !    integer, dimension(lnv)::j
+  !    integer, allocatable :: j1d(:)
+  !    real(dp), allocatable :: v(:)
+  !    real(dp) C
+  !    if(lingyun_yang) then !%%%%
+  !       call ad_length(ina, ns)
+  !       call ad_nvar(nv)
+  !       allocate(j1d(nv*ns))
+  !       call ad_read_block(ina, v, j1d, ns)
+  !       C = v(i)
+  !       do k=1,nv
+  !          j(k) = j1d((i-1)*nv+k)
+  !       enddo
+  !       deallocate(j1d)
+  !    else !%%%%
+  !       call GET_C_J_b(ina,I,C,J)
+  !    endif !%%%%
+  !  end  subroutine GET_C_J
 
   subroutine dapri(ina,iunit)
     implicit none

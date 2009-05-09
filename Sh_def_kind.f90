@@ -3136,7 +3136,6 @@ contains
        D=EL%L/EL%P%NST
        DD=EL%P%LD/two/EL%P%NST
 
-
        CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        CALL KICK (EL,D,X,k)
        CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
@@ -5420,8 +5419,8 @@ contains
 
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
-    CALL ALLOC(EL)
-    CALL GETMAT(EL,X,k)
+    !    CALL ALLOC(EL)
+    !    CALL GETMAT(EL,X,k)
 
 
     DO I=1,EL%P%NST
@@ -5429,7 +5428,7 @@ contains
     ENDDO
 
 
-    CALL KILL(EL)
+    !    CALL KILL(EL)
 
   END SUBROUTINE INTKTKD
 

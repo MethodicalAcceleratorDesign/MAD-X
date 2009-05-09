@@ -14,7 +14,7 @@ module da_arrays
   ! johan
   ! integer,parameter::lno=2,lnv=6,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
   !
-  integer,parameter::lno=200,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=110000,leamax=5000,liamax=50000
+  integer,parameter::lno=200,lnv=100,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
   logical(lp) :: reallocate = .true.
   logical(lp) :: notallocated = .true.
   logical(lp),parameter::etiennefix=.true.
@@ -34,7 +34,7 @@ module da_arrays
   integer nst0,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
-  integer,TARGET :: lda_used =100000
+  integer,TARGET :: lda_used =15000
 
 contains
 
