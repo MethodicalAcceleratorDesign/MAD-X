@@ -949,7 +949,8 @@ contains
     select case(el%kind)
     CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
     case(kind3)
-       WRITE(LINE,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle," patch ",el%k3%patch
+       WRITE(LINE,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle," patch_edge ",&
+            el%k3%patch,el%k3%hf,el%k3%vf
        WRITE(MF,'(A255)') LINE
     case(kind4)
        WRITE(line,*) el%c4%N_BESSEL, " HARMON ",el%c4%NF," constant&ripple ",el%c4%a,el%c4%r,el%c4%always_on
@@ -996,7 +997,10 @@ contains
     case(kind3)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        READ(MF,"(a255)") LINE
-       if(index(line,"patch")/=0) then
+       if(index(line,"patch_edge")/=0) then
+          read(line,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle &
+               ,rip,el%k3%patch,el%k3%hf,el%k3%vf
+       elseif(index(line,"patch")/=0) then
           read(line,*) el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle &
                ,harmon,el%k3%patch
        else

@@ -149,7 +149,7 @@ CONTAINS
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
-    real(dp) fint,fintx,div,muonfactor
+    real(dp) fint,fintx,div,muonfactor,edge,rhoi,hgap,corr,tanedg,secedg,psip
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
     real(dp) gammatr,ksi
@@ -880,6 +880,23 @@ CONTAINS
        !     key%list%x_col=node_value('xsize ')
        !     key%list%y_col=node_value('ysize ')
        !     key%tiltd=node_value('tilt ')
+    case(33)
+       !---- This is the dipedge element
+       edge= node_value('e1 ')
+       hgap= node_value('hgap ')
+       rhoi= bvk * node_value('h ')
+       fint= node_value('fint ')
+       corr= 2 * rhoi * hgap * fint
+       if(rhoi .ne. zero .and. ( edge .ne. zero .or. corr .ne. zero )) then
+          key%magnet="multipole"
+          tanedg = tan(edge)
+          secedg = one / cos(edge)
+          psip = edge - corr * secedg * (one + sin(edge)**2)
+          key%list%hf= rhoi * tanedg
+          key%list%vf= -rhoi * tan(psip)
+       else
+          key%magnet="marker"
+       endif
     case(24)
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')

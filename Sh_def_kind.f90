@@ -1934,12 +1934,12 @@ contains
     ELSE
        if(k%TIME) then
           PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
+          X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
+          X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
           X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
        else
-          X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
-          X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
+          X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
+          X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
           X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
        endif
 
@@ -2035,13 +2035,13 @@ contains
     if(k%TIME) then
        call alloc(pz)
        PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
+       X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
+       X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
        X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
        call kill(pz)
     else
-       X(2)=X(2)-EL%thin_h_foc*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
-       X(4)=X(4)-EL%thin_v_foc*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
+       X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
+       X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
        X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)
     endif
 
@@ -12135,6 +12135,8 @@ contains
     !integer k
     IF(I==-1) THEN
        if(ASSOCIATED(EL%thin_h_foc)) then
+          deallocate(EL%hf)
+          deallocate(EL%vf)
           deallocate(EL%thin_h_foc)
           deallocate(EL%thin_v_foc)
           deallocate(EL%thin_h_angle)
@@ -12143,6 +12145,8 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%hf)
+       NULLIFY(EL%vf)
        NULLIFY(EL%thin_h_foc)
        NULLIFY(EL%thin_v_foc)
        NULLIFY(EL%thin_h_angle)
@@ -12159,11 +12163,15 @@ contains
     !integer k
     IF(I==-1) THEN
        if(ASSOCIATED(EL%thin_h_foc)) then
+          CALL KILL(EL%hf)
+          CALL KILL(EL%vf)
           CALL KILL(EL%thin_h_foc)
           CALL KILL(EL%thin_v_foc)
           CALL KILL(EL%thin_h_angle)
           CALL KILL(EL%thin_v_angle)
 
+          deallocate(EL%hf)
+          deallocate(EL%vf)
           deallocate(EL%thin_h_foc)
           deallocate(EL%thin_v_foc)
           deallocate(EL%thin_h_angle)
@@ -12172,6 +12180,8 @@ contains
        endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%hf)
+       NULLIFY(EL%vf)
        NULLIFY(EL%thin_h_foc)
        NULLIFY(EL%thin_v_foc)
        NULLIFY(EL%thin_h_angle)

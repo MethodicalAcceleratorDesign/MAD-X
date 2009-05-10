@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.9 2009-05-09 20:20:41 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.10 2009-05-10 11:09:19 frs Exp $
 ! */
 
 

@@ -1018,6 +1018,8 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%K3%AN=>EL%AN
        EL%K3%BN=>EL%BN
+       ALLOCATE(EL%K3%hf);EL%K3%hf=0
+       ALLOCATE(EL%K3%vf);EL%K3%vf=0
        ALLOCATE(EL%K3%thin_h_foc);EL%K3%thin_h_foc=0
        ALLOCATE(EL%K3%thin_v_foc);EL%K3%thin_v_foc=0
        ALLOCATE(EL%K3%thin_h_angle);EL%K3%thin_h_angle=0
@@ -1470,6 +1472,8 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%K3%AN=>EL%AN
        EL%K3%BN=>EL%BN
+       ALLOCATE(EL%K3%hf);CALL ALLOC(EL%K3%hf);EL%K3%hf=ZERO
+       ALLOCATE(EL%K3%vf);CALL ALLOC(EL%K3%vf);EL%K3%vf=ZERO
        ALLOCATE(EL%K3%thin_h_foc);CALL ALLOC(EL%K3%thin_h_foc);EL%K3%thin_h_foc=ZERO
        ALLOCATE(EL%K3%thin_v_foc);CALL ALLOC(EL%K3%thin_v_foc);EL%K3%thin_v_foc=ZERO
        ALLOCATE(EL%K3%thin_h_angle);CALL ALLOC(EL%K3%thin_h_angle);EL%K3%thin_h_angle=ZERO
@@ -2282,11 +2286,14 @@ CONTAINS
        !       IF(ASSOCIATED(EL%K16)) DEALLOCATE(EL%K16)       ! INTEGRATOR
        !       IF(ASSOCIATED(EL%K3)) DEALLOCATE(EL%K3)       !  THIN LENS
        IF(ASSOCIATED(EL%K3)) then
-          IF(ASSOCIATED(EL%K3%thin_h_foc)) DEALLOCATE(EL%K3%thin_h_foc)
-          IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
-          IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
-          IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
-          IF(ASSOCIATED(EL%K3%patch)) DEALLOCATE(EL%K3%patch)
+          !          IF(ASSOCIATED(EL%K3%hf)) DEALLOCATE(EL%K3%hf)
+          !          IF(ASSOCIATED(EL%K3%vf)) DEALLOCATE(EL%K3%vf)
+          !          IF(ASSOCIATED(EL%K3%thin_h_foc)) DEALLOCATE(EL%K3%thin_h_foc)
+          !          IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
+          !          IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
+          !          IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
+          !          IF(ASSOCIATED(EL%K3%patch)) DEALLOCATE(EL%K3%patch)
+          EL%K3=-1
           DEALLOCATE(EL%K3)
        endif
 
@@ -2440,12 +2447,15 @@ CONTAINS
        !       IF(ASSOCIATED(EL%K16)) DEALLOCATE(EL%K16)       ! INTEGRATOR
        !       IF(ASSOCIATED(EL%K3)) DEALLOCATE(EL%K3)       !  THIN LENS
        IF(ASSOCIATED(EL%K3)) then
-          IF(ASSOCIATED(EL%K3%thin_h_foc)) DEALLOCATE(EL%K3%thin_h_foc)
-          IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
-          IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
-          IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
-          IF(ASSOCIATED(EL%K3%patch)) DEALLOCATE(EL%K3%patch)
+          EL%K3=-1
           DEALLOCATE(EL%K3)
+          !          IF(ASSOCIATED(EL%K3%hf)) DEALLOCATE(EL%K3%hf)
+          !          IF(ASSOCIATED(EL%K3%vf)) DEALLOCATE(EL%K3%vf)
+          !          IF(ASSOCIATED(EL%K3%thin_h_foc)) DEALLOCATE(EL%K3%thin_h_foc)
+          !          IF(ASSOCIATED(EL%K3%thin_v_foc)) DEALLOCATE(EL%K3%thin_v_foc)
+          !          IF(ASSOCIATED(EL%K3%thin_h_angle)) DEALLOCATE(EL%K3%thin_h_angle)
+          !          IF(ASSOCIATED(EL%K3%thin_v_angle)) DEALLOCATE(EL%K3%thin_v_angle)
+          !          IF(ASSOCIATED(EL%K3%patch)) DEALLOCATE(EL%K3%patch)
        endif
 
        IF(ASSOCIATED(EL%C4)) THEN
@@ -2707,6 +2717,8 @@ CONTAINS
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
        CALL SETFAMILY(ELP)
+       ELP%K3%hf=EL%K3%hf
+       ELP%K3%vf=EL%K3%vf
        ELP%K3%thin_h_foc=EL%K3%thin_h_foc
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
@@ -2962,6 +2974,8 @@ CONTAINS
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
        CALL SETFAMILY(ELP)
+       ELP%K3%hf=EL%K3%hf
+       ELP%K3%vf=EL%K3%vf
        ELP%K3%thin_h_foc=EL%K3%thin_h_foc
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
@@ -3211,6 +3225,8 @@ CONTAINS
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
        CALL SETFAMILY(ELP)
+       ELP%K3%hf=EL%K3%hf
+       ELP%K3%vf=EL%K3%vf
        ELP%K3%thin_h_foc=EL%K3%thin_h_foc
        ELP%K3%thin_v_foc=EL%K3%thin_v_foc
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
@@ -3424,6 +3440,8 @@ CONTAINS
     ENDIF
 
     IF(ELP%KIND==KIND3) THEN
+       CALL resetpoly_R31(ELP%K3%hf)
+       CALL resetpoly_R31(ELP%K3%vf)
        CALL resetpoly_R31(ELP%K3%thin_h_foc)
        CALL resetpoly_R31(ELP%K3%thin_v_foc)
        CALL resetpoly_R31(ELP%K3%thin_h_angle )

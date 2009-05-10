@@ -34,6 +34,7 @@ TYPE KICKT3
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp),  DIMENSION(:), POINTER :: AN,BN                 !Multipole component
    real(dp),   POINTER:: thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
+   real(dp),   POINTER:: hf,vf  ! highly illegal additions by frs for fringe
    logical(lp),   POINTER:: patch ! highly illegal additions by frs
 END  TYPE KICKT3
 
@@ -41,6 +42,7 @@ TYPE KICKT3P
    TYPE(MAGNET_CHART), POINTER:: P
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8),   POINTER:: thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle  ! highly illegal additions by frs
+   TYPE(REAL_8),   POINTER:: hf,vf  ! highly illegal additions by frs for fringe
    logical(lp),   POINTER:: patch ! highly illegal additions by frs
 END  TYPE KICKT3P
 
