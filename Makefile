@@ -276,7 +276,7 @@ ifeq ($(NTPSA),YES)
   c_dabnew_berz.o: b_da_arrays_all.o c_dabnew_berz.f90
   c_tpsa_interface.o: c_dabnew_berz.o c_tpsa_interface.F90
   d_lielib.o: c_tpsa_interface.o d_lielib.f90
-  h_definition.o: a_scratch_size.o c_dabnew_berz.o d_lielib.o h_definition.f90
+  h_definition.o: a_scratch_size.o c_dabnew_berz.o d_lielib.o h_definition.f90 a_def_frame_patch_chart.inc a_def_all_kind.inc a_def_sagan.inc a_def_element_fibre_layout.inc
   tpsa.o: tpsa.cpp tpsa.h
 	$(CC) $(GCCP_FLAGS) -c -o tpsa.o tpsa.cpp
   TPSA= tpsa.o
@@ -285,7 +285,7 @@ ifeq ($(NTPSA),YES)
 else
   c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
   d_lielib.o: c_dabnew.o d_lielib.f90
-  h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90
+  h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90 a_def_frame_patch_chart.inc a_def_all_kind.inc a_def_sagan.inc a_def_element_fibre_layout.inc
   TPSA=
   FILT_TP_OUT= c_dabnew_berz.o
   FILT_TP_OUT_F90= c_tpsa_interface.o
@@ -303,7 +303,7 @@ Sc_euclidean.o: Sb_sagan_pol_arbitrary.o Sc_euclidean.f90
 Sd_frame.o: Sc_euclidean.o Sd_frame.f90
 Se_status.o: Sd_frame.o Se_status.f90 a_def_all_kind.inc a_def_sagan.inc \
 	a_def_element_fibre_layout.inc
-Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90
+Sf_def_all_kinds.o: Se_status.o Sf_def_all_kinds.f90 a_def_worm.inc
 Sg_sagan_wiggler.o: Sf_def_all_kinds.o Sg_sagan_wiggler.f90
 Sh_def_kind.o: Sg_sagan_wiggler.o Sh_def_kind.f90
 Si_def_element.o: Sh_def_kind.o Si_def_element.f90
@@ -320,18 +320,18 @@ Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
 Sqb_accel_ptc.o: Sq_orbit_ptc.o Sqb_accel_ptc.f90
 Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
 Sra_fitting.o: Sr_spin.o Sra_fitting.f90
-madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90
+madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90 twtrr.fi name_len.fi twiss0.fi
 St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
-madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
+madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90 name_len.fi bb.fi
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
-madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.f90
-madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90
-madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90
-madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
+madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_setcavs.f90 name_len.fi
+madx_ptc_script.o  : Sp_keywords.o madx_ptc_script.f90 twissa.fi
+madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.f90 madx_ptc_knobs.inc twissa.fi 
+madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90 twissa.fi
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
-madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_twiss.f90
-madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.f90
+madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_twiss.f90 madx_ptc_knobs.inc madx_ptc_distrib.inc twissa.fi
+madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.f90 madx_ptc_distrib.inc twissa.fi
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
